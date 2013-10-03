@@ -429,7 +429,7 @@ else:
 
   pickle.dump(res, file(filename,'w'))
 
-R.gROOT.ProcessLine(".L ../../Scripts/aclic/tdrstyle.C")
+R.gROOT.ProcessLine(".L ../scripts/tdrstyle.C")
 R.setTDRStyle()
 
 aData = R.TH1F("aData","aData", 4, 1.5, 5.5)

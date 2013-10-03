@@ -3,7 +3,7 @@ from math import *
 from simplePlotsCommon import *
 
 ROOT.tdrStyle.SetPadRightMargin(0.16)
-ROOT.gROOT.ProcessLine(".L ../../Scripts/aclic/useNiceColorPalette.C")
+ROOT.gROOT.ProcessLine(".L ../scripts/useNiceColorPalette.C")
 ROOT.useNiceColorPalette(255)
 
 run = "205236"

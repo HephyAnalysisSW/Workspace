@@ -1,9 +1,9 @@
 import os, sys, ROOT
-ROOT.gROOT.ProcessLine(".L ../../Scripts/aclic/tdrstyle.C")
+ROOT.gROOT.ProcessLine(".L ../scripts/tdrstyle.C")
 ROOT.setTDRStyle()
 ROOT.tdrStyle.SetPadRightMargin(0.20)
 
-ROOT.gROOT.ProcessLine(".L ../../Scripts/aclic/useNiceColorPalette.C")
+ROOT.gROOT.ProcessLine(".L ../scripts/useNiceColorPalette.C")
 ROOT.useNiceColorPalette(255)
 ROOT.gROOT.ProcessLine(".L TriangularInterpolation.C+")
 ROOT.gROOT.ProcessLine(".L SmoothingUtils.C+")

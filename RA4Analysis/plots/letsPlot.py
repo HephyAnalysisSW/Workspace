@@ -1,5 +1,5 @@
 import ROOT
-ROOT.gROOT.ProcessLine(".L ../../Scripts/aclic/tdrstyle.C")
+ROOT.gROOT.ProcessLine(".L ../scripts/tdrstyle.C")
 ROOT.setTDRStyle()
 from xsec import xsec
 

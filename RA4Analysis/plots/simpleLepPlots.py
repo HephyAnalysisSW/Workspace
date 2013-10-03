@@ -1,7 +1,7 @@
 import ROOT
 
 if not globals().has_key("loadedNCP"):
-  ROOT.gROOT.ProcessLine(".L ../../Scripts/aclic/useNiceColorPalette.C")
+  ROOT.gROOT.ProcessLine(".L ../scripts/useNiceColorPalette.C")
   ROOT.useNiceColorPalette(255)
   globals()["loadedNCP"] = True
 

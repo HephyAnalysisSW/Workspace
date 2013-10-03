@@ -8,7 +8,7 @@ if type(ROOT.tdrStyle)!=type(ROOT.gStyle):
   ROOT.setTDRStyle()
 
 ROOT.tdrStyle.SetPadRightMargin(0.16)
-ROOT.gROOT.ProcessLine(".L ../../Scripts/aclic/useNiceColorPalette.C")
+ROOT.gROOT.ProcessLine(".L ../scripts/useNiceColorPalette.C")
 ROOT.useNiceColorPalette(255)
 
 #load stuff

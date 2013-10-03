@@ -1,10 +1,10 @@
 import ROOT, pickle, os
 from math import sqrt
 
-ROOT.gROOT.ProcessLine(".L ../../Scripts/aclic/tdrstyle.C")
+ROOT.gROOT.ProcessLine(".L ../scripts/tdrstyle.C")
 ROOT.setTDRStyle()
 
-ROOT.gROOT.ProcessLine(".L ../../Scripts/aclic/useNiceColorPalette.C")
+ROOT.gROOT.ProcessLine(".L ../scripts/useNiceColorPalette.C")
 ROOT.useNiceColorPalette(255)
 #ROOT.tdrStyle.SetPadRightMargin(0.16)
 ROOT.gStyle.SetPadRightMargin(0.18)

@@ -2,7 +2,7 @@ import ROOT, copy, pickle
 from array import array
 #ROOT.gROOT.SetStyle("Plain")
 #ROOT.gROOT.ForceStyle()
-ROOT.gROOT.ProcessLine(".L ../../Scripts/aclic/tdrstyle.C")
+ROOT.gROOT.ProcessLine(".L ../scripts/tdrstyle.C")
 ROOT.setTDRStyle()
 from simplePlotsLocals import *
 dataColor =   ROOT.kBlack
