@@ -1,0 +1,37 @@
+imax      3
+jmax      *
+kmax      *
+--------------------------------------------------------------------------------------
+bin                                     b0                    b1                    b2
+observation                           OBS0                  OBS1                  OBS2
+--------------------------------------------------------------------------------------
+bin                           b0        b0          b1        b1          b2        b2
+process                      sig       bkg         sig       bkg         sig       bkg
+process                        0         1           0         1           0         1
+rate                        SIG0      BKG0        SIG1      BKG1        SIG2      BKG2
+--------------------------------------------------------------------------------------
+b0StatF        lnN             -    CHOL00           -    CHOL10           -    CHOL20
+b1StatF        lnN             -         -           -    CHOL11           -    CHOL21
+b2StatF        lnN             -         -           -         -           -    CHOL22
+b0StatP   gmN     NREG         -     NRAT0           -     NRAT1           -     NRAT2
+Closure        lnN             -     CLOS0           -     CLOS1           -     CLOS2
+Beta           lnN             -     BETA0           -     BETA1           -     BETA2
+TTXsec         lnN             -      TTX0           -      TTX1           -      TTX2
+TTPol          lnN             -      TTP0           -      TTP1           -      TTP2
+WXsec          lnN             -       WX0           -       WX1           -       WX2
+WbbXsec        lnN             -     WBBX0           -     WBBX1           -     WBBX2
+diLep          lnN             -     DLEP0           -     DLEP1           -     DLEP2
+tau            lnN             -      TAU0           -      TAU1           -      TAU2
+nonL           lnN             -     NONL0           -     NONL1           -     NONL2
+ErfDataMC      lnN             -     ERDM0           -     ERDM1           -     ERDM2
+ErfNL1         lnN             -     ERF10           -     ERF11           -     ERF12
+ErfNL2         lnN             -     ERF20           -     ERF21           -     ERF22
+MuEff1         lnN        SMEF10    BMEF10      SMEF10    BMEF11      SMEF10    BMEF12
+MuEff2         lnN        SMEF20    BMEF20      SMEF20    BMEF21      SMEF20    BMEF22
+EleEff         lnN        SEEFF0    BEEFF0      SEEFF0    BEEFF1      SEEFF0    BEEFF2
+PU             lnN          SPU0       PU0        SPU1       PU1        SPU2       PU2
+JES            lnN         JESS0     JESB0       JESS1     JESB1       JESS2     JESB2
+SFb            lnN         SFbS0     SFbB0       SFbS1     SFbB1       SFbS2     SFbB2
+SFl            lnN         SFlS0     SFlB0       SFlS1     SFlB1       SFlS2     SFlB2
+lumi           lnN          LUMI         -        LUMI         -        LUMI         -
+

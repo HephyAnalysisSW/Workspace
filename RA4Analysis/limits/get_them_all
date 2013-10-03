@@ -1,0 +1,11 @@
+#!/bin/sh
+
+./get_from_dpm schoef lim2_130618_T1tttt-madgraph_part0     lim2_130618_T1tttt-madgraph_part0   &
+./get_from_dpm schoef lim2_130618_T1tttt-madgraph_part1     lim2_130618_T1tttt-madgraph_part1   &
+./get_from_dpm schoef lim3_130618_T1tttt-madgraph_part0     lim3_130618_T1tttt-madgraph_part0   &
+./get_from_dpm schoef lim3_130618_T1tttt-madgraph_part1     lim3_130618_T1tttt-madgraph_part1   &
+./get_from_dpm schoef lim_130618_T1t1t_part0                lim_130618_T1t1t_part0   &
+./get_from_dpm schoef lim_130618_T1tttt-madgraph_part0      lim_130618_T1tttt-madgraph_part0   &
+./get_from_dpm schoef lim_130618_T1tttt-madgraph_part1      lim_130618_T1tttt-madgraph_part1   &
+./get_from_dpm schoef lim_130618_T5tttt_part0               lim_130618_T5tttt_part0   &
+./get_from_dpm schoef lim_130618_T5tttt_part1               lim_130618_T5tttt_part1   &
