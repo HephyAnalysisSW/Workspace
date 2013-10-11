@@ -9,23 +9,20 @@ from random import randint
 
 ROOT.gROOT.ProcessLine(".L polSys/WPolarizationVariation.C+")
 ROOT.gROOT.ProcessLine(".L polSys/TTbarPolarization.C+")
-ROOT.gROOT.ProcessLine(".L mt2w_bisect.cpp+")
+ROOT.gROOT.ProcessLine(".L mt2w/mt2w_bisect.cpp+")
+ROOT.gROOT.ProcessLine(".L alphaT/alphaT.C+")
 
 mt2w = ROOT.mt2w(500, 499, 0.5)
 
-small =False
+small = True
 
-mode = "Mu"
+#mode = "Mu"
 #mode = "Ele"
-#mode = "HT"
+mode = "HT"
 
 targetLumi = 19400.
-#if targetLumi==12000.:
-#  outputDir = "/data/schoef/convertedTuples_v15/"
-#if targetLumi==20000.:
-#  outputDir = "/data/schoef/convertedTuples_v16/"
 if targetLumi==19400.:
-  outputDir = "/data/schoef/convertedTuples_v20/"
+  outputDir = "/data/schoef/convertedTuples_v21/"
 
 #mode = "HT"
 #chmode = "copy"
@@ -40,7 +37,8 @@ chmodes = [\
 
 #         "chmode = 'copyMET50HT750'",
 #         "chmode = 'copyMET50'",
-         "chmode = 'copyMET'",
+#         "chmode = 'copyMET'",
+         "chmode = 'copyHT'",
 #        "chmode = 'copyMET_JES+'",
 #         "chmode = 'copyMET_JES-'",
 #         "chmode = 'copyMET_separateBTagWeights'",
@@ -110,19 +108,22 @@ if mode=="Ele" or mode=="Mu":
   if targetLumi == 12000.:
     data["bins"] = data["bins"][:4]
     for sample in [ttbar, ttbarPowHeg, wjets, wjetsInc, wjetsCombined, wbbjets, wbbjetsCombined, dy, stop, qcd]:
-        sample["reweightingHistoFile"]          = "PU/reweightingHisto_Summer2012-S10-Run2012ABC_60max_true_pixelcorr_Sys0.root"
-        sample["reweightingHistoFileSysPlus"]   = "PU/reweightingHisto_Summer2012-S10-Run2012ABC_60max_true_pixelcorr_SysPlus5.root"
-        sample["reweightingHistoFileSysMinus"]  = "PU/reweightingHisto_Summer2012-S10-Run2012ABC_60max_true_pixelcorr_SysMinus5.root"
+        sample["reweightingHistoFile"]          = "/data/schoef/results2012/PU/reweightingHisto_Summer2012-S10-Run2012ABC_60max_true_pixelcorr_Sys0.root"
+        sample["reweightingHistoFileSysPlus"]   = "/data/schoef/results2012/PU/reweightingHisto_Summer2012-S10-Run2012ABC_60max_true_pixelcorr_SysPlus5.root"
+        sample["reweightingHistoFileSysMinus"]  = "/data/schoef/results2012/PU/reweightingHisto_Summer2012-S10-Run2012ABC_60max_true_pixelcorr_SysMinus5.root"
     print "Using only databins", data["bins"]
   if targetLumi == 20000. or targetLumi==19400.:
     for sample in [ttbarScaleDown, ttbarScaleUp, ttbarMatchingDown, ttbarMatchingUp, ttbar, ttbarPowHeg, wjets, wjetsInc, wjetsCombined, wbbjets, wbbjetsCombined, dy, stop, qcd]:
-        sample["reweightingHistoFile"]          = "PU/reweightingHisto_Summer2012-S10-Run2012ABCD_60max_true_pixelcorr_Sys0.root"
-        sample["reweightingHistoFileSysPlus"]   = "PU/reweightingHisto_Summer2012-S10-Run2012ABCD_60max_true_pixelcorr_SysPlus5.root"
-        sample["reweightingHistoFileSysMinus"]  = "PU/reweightingHisto_Summer2012-S10-Run2012ABCD_60max_true_pixelcorr_SysMinus5.root"
+        sample["reweightingHistoFile"]          = "/data/schoef/results2012/PU/reweightingHisto_Summer2012-S10-Run2012ABCD_60max_true_pixelcorr_Sys0.root"
+        sample["reweightingHistoFileSysPlus"]   = "/data/schoef/results2012/PU/reweightingHisto_Summer2012-S10-Run2012ABCD_60max_true_pixelcorr_SysPlus5.root"
+        sample["reweightingHistoFileSysMinus"]  = "/data/schoef/results2012/PU/reweightingHisto_Summer2012-S10-Run2012ABCD_60max_true_pixelcorr_SysMinus5.root"
 
 if mode=="HT":
-  allSamples = [ttbarPowHeg, HTdata, qcdHad, wjets, wjetsInc, wjetsCombined, dy, stop]
-  qcdHad["reweightingHistoFile"] = "PU/reweightingHisto_Summer2012-S7-Run2012ABCD_60max_true_pixelcorr_Sys0.root"
+#  allSamples = [zToNuNu]#, qcdHad,  
+  allSamples = [zToNuNu, qcdHad, ttbarPowHeg, HTdata, wjets, wjetsInc, wjetsCombined, dy, stop]
+  for sample in allSamples:
+    sample["reweightingHistoFile"]   = "/data/schoef/results2012/PU/reweightingHisto_Summer2012-S10-Run2012ABCD_60max_true_pixelcorr_Sys0.root"
+  qcdHad["reweightingHistoFile"] = "/data/schoef/results2012/PU/reweightingHisto_Summer2012-S7-Run2012ABCD_60max_true_pixelcorr_Sys0.root"
 else:
   allSamples = [ttbarPowHeg, singleLeptonData, wjets, wjetsInc, wjetsCombined, dy, stop, qcd, data]
 
@@ -131,7 +132,7 @@ else:
 #allSamples = [wjetsCombined, dy, stop, qcd]
 
 #allSamples = [ttbarPowHeg, wjets, wjetsInc, wjetsCombined, dy, stop, qcd, data, ttwJets, ttzJets, singleLeptonData]
-allSamples = [ttbarScaleDown, ttbarScaleUp, ttbarMatchingDown, ttbarMatchingUp]
+#allSamples = [ttbarScaleDown, ttbarScaleUp, ttbarMatchingDown, ttbarMatchingUp]
 from smsInfo import getT1ttttMadgraphDirs, getT5ttttMadgraphDirs, nfsDirectories
 def getT1ttttSample(mgl, mN):
   res= {}
@@ -142,9 +143,9 @@ def getT1ttttSample(mgl, mN):
   res["dirname"] = nfsDirectories["T1tttt"]
   res["name"] = "T1tttt_"+str(mgl)+"_"+str(mN)
   res["additionalCut"] = "(osetMgl=="+str(mgl)+"&&osetMN=="+str(max(1,mN))+")"
-  res["reweightingHistoFile"]          = "PU/reweightingHisto_Summer2012-S7-Run2012ABCD_60max_true_pixelcorr_Sys0.root"
-  res["reweightingHistoFileSysPlus"]   = "PU/reweightingHisto_Summer2012-S7-Run2012ABCD_60max_true_pixelcorr_SysPlus5.root"
-  res["reweightingHistoFileSysMinus"]  = "PU/reweightingHisto_Summer2012-S7-Run2012ABCD_60max_true_pixelcorr_SysMinus5.root"
+  res["reweightingHistoFile"]          = "/data/schoef/results2012/PU/reweightingHisto_Summer2012-S7-Run2012ABCD_60max_true_pixelcorr_Sys0.root"
+  res["reweightingHistoFileSysPlus"]   = "/data/schoef/results2012/PU/reweightingHisto_Summer2012-S7-Run2012ABCD_60max_true_pixelcorr_SysPlus5.root"
+  res["reweightingHistoFileSysMinus"]  = "/data/schoef/results2012/PU/reweightingHisto_Summer2012-S7-Run2012ABCD_60max_true_pixelcorr_SysMinus5.root"
   res["Chain"] = "Events"
   return res
 
@@ -170,7 +171,6 @@ if sms=="T1tttt":
 #  T1tttt[mgl][mN] = getT1ttttSample(mgl, mN)
 #  allSamples.append(T1tttt[mgl][mN])
 
-
 if sms=="T1t1t":
   T1t1tSamples = []
   T1t1t = {}
@@ -188,9 +188,9 @@ if sms=="T1t1t":
       T1t1t[mN][msq]["name"] = "T1t1t_"+str(mN)+"_"+str(msq)
       T1t1t[mN][msq]["additionalCut"] = "(osetMN=="+str(mN)+"&&osetMsq=="+str(msq)+")"
       
-      T1t1t[mN][msq]["reweightingHistoFile"]          = "PU/reweightingHisto_Summer2012-S7-Run2012ABCD_60max_true_pixelcorr_Sys0.root"
-      T1t1t[mN][msq]["reweightingHistoFileSysPlus"]   = "PU/reweightingHisto_Summer2012-S7-Run2012ABCD_60max_true_pixelcorr_SysPlus5.root"
-      T1t1t[mN][msq]["reweightingHistoFileSysMinus"]  = "PU/reweightingHisto_Summer2012-S7-Run2012ABCD_60max_true_pixelcorr_SysMinus5.root"
+      T1t1t[mN][msq]["reweightingHistoFile"]          = "/data/schoef/results2012/PU/reweightingHisto_Summer2012-S7-Run2012ABCD_60max_true_pixelcorr_Sys0.root"
+      T1t1t[mN][msq]["reweightingHistoFileSysPlus"]   = "/data/schoef/results2012/PU/reweightingHisto_Summer2012-S7-Run2012ABCD_60max_true_pixelcorr_SysPlus5.root"
+      T1t1t[mN][msq]["reweightingHistoFileSysMinus"]  = "/data/schoef/results2012/PU/reweightingHisto_Summer2012-S7-Run2012ABCD_60max_true_pixelcorr_SysMinus5.root"
 
       T1t1t[mN][msq]["Chain"] = "Events"
       T1t1tSamples.append(T1t1t[mN][msq])
@@ -209,9 +209,9 @@ if sms=="T5tttt":
       T5tttt[mgl][msq]["dirname"] = getT5ttttMadgraphDirs(mgl) 
       T5tttt[mgl][msq]["name"] = "T5tttt_"+str(mgl)+"_"+str(msq)
       T5tttt[mgl][msq]["additionalCut"] = "(osetMgl=="+str(mgl)+"&&osetMsq=="+str(msq)+")"
-      T5tttt[mgl][msq]["reweightingHistoFile"]          = "PU/reweightingHisto_Summer2012-S7-Run2012ABCD_60max_true_pixelcorr_Sys0.root"
-      T5tttt[mgl][msq]["reweightingHistoFileSysPlus"]   = "PU/reweightingHisto_Summer2012-S7-Run2012ABCD_60max_true_pixelcorr_SysPlus5.root"
-      T5tttt[mgl][msq]["reweightingHistoFileSysMinus"]  = "PU/reweightingHisto_Summer2012-S7-Run2012ABCD_60max_true_pixelcorr_SysMinus5.root"
+      T5tttt[mgl][msq]["reweightingHistoFile"]          = "/data/schoef/results2012/PU/reweightingHisto_Summer2012-S7-Run2012ABCD_60max_true_pixelcorr_Sys0.root"
+      T5tttt[mgl][msq]["reweightingHistoFileSysPlus"]   = "/data/schoef/results2012/PU/reweightingHisto_Summer2012-S7-Run2012ABCD_60max_true_pixelcorr_SysPlus5.root"
+      T5tttt[mgl][msq]["reweightingHistoFileSysMinus"]  = "/data/schoef/results2012/PU/reweightingHisto_Summer2012-S7-Run2012ABCD_60max_true_pixelcorr_SysMinus5.root"
       T5tttt[mgl][msq]["Chain"] = "Events"
       T5ttttSamples.append(T5tttt[mgl][msq])
   allSamples = T5ttttSamples
@@ -230,9 +230,9 @@ if sms=="T5tttt":
 #    T5tttt[mgl][msq]["dirname"] = getT5ttttMadgraphDirs(mgl) 
 #    T5tttt[mgl][msq]["name"] = "T5tttt_"+str(mgl)+"_"+str(msq)
 #    T5tttt[mgl][msq]["additionalCut"] = "(osetMgl=="+str(mgl)+"&&osetMsq=="+str(msq)+")"
-#    T5tttt[mgl][msq]["reweightingHistoFile"]          = "PU/reweightingHisto_Summer2012-S7-Run2012ABCD_60max_true_pixelcorr_Sys0.root"
-#    T5tttt[mgl][msq]["reweightingHistoFileSysPlus"]   = "PU/reweightingHisto_Summer2012-S7-Run2012ABCD_60max_true_pixelcorr_SysPlus5.root"
-#    T5tttt[mgl][msq]["reweightingHistoFileSysMinus"]  = "PU/reweightingHisto_Summer2012-S7-Run2012ABCD_60max_true_pixelcorr_SysMinus5.root"
+#    T5tttt[mgl][msq]["reweightingHistoFile"]          = "/data/schoef/results2012/PU/reweightingHisto_Summer2012-S7-Run2012ABCD_60max_true_pixelcorr_Sys0.root"
+#    T5tttt[mgl][msq]["reweightingHistoFileSysPlus"]   = "/data/schoef/results2012/PU/reweightingHisto_Summer2012-S7-Run2012ABCD_60max_true_pixelcorr_SysPlus5.root"
+#    T5tttt[mgl][msq]["reweightingHistoFileSysMinus"]  = "/data/schoef/results2012/PU/reweightingHisto_Summer2012-S7-Run2012ABCD_60max_true_pixelcorr_SysMinus5.root"
 #    T5tttt[mgl][msq]["Chain"] = "Events"
 #    T5ttttSamples.append(T5tttt[mgl][msq])
 #allSamples = T5ttttSamples
@@ -552,6 +552,8 @@ for nc, m in enumerate(chmodes):
       commoncf = "jet1pt>40&&nvetoMuons==0&&nvetoElectrons==0"
     if chmode=="copy6JleptVeto":
       commoncf = "njets>=6&&nvetoMuons==0&&nvetoElectrons==0"
+    if chmode=="copyHT":
+      commoncf =   "(ht>200)"
   if chmode[-5:] == "Total":
     commoncf = "(1)"
   if not os.path.isdir(outputDir+"/"+chmode):
@@ -573,7 +575,7 @@ for nc, m in enumerate(chmodes):
 
     variables = []
 #    extraVariables=["mbb", "mbl", "phibb"]
-    extraVariables=[]
+    extraVariables=["alphaT"]
     if mode=="Ele" or mode=="Mu":
       variables = ["weight",  "weightPUSysPlus", "weightPUSysMinus", "targetLumi", "xsec", "weightLumi", "run", "lumi", "met", "type1phiMet", "type1phiMetpx", "type1phiMetpy", "metpx", "metpy", "metphi", "mT", "barepfmet" ,"ht", "btag0", "btag1", "btag2", "btag3","rawMetpx", "rawMetpy", "m3", "mht", "singleMuonic", "singleElectronic", \
       "leptonPt", "leptonEta", "leptonPhi", "leptonPdg", "njets", "nbtags", "nbjets", "jet0pt", "jet1pt", "jet2pt", "jet3pt", "jet0phi", "jet1phi","nvetoMuons", "nvetoElectrons", "ngoodMuons", "ngoodElectrons", "ngoodVertices", "nTrueGenVertices",
@@ -589,27 +591,25 @@ for nc, m in enumerate(chmodes):
                      "prePFHT350Mu15PFMET45", "prePFHT350Mu15PFMET50", "prePFHT400Mu5PFMET45", "prePFHT400Mu5PFMET50", "prePFNoPUHT350Mu15PFMET45", "prePFNoPUHT350Mu15PFMET50", "prePFNoPUHT400Mu5PFMET45", "prePFNoPUHT400Mu5PFMET50"]
       if sample["name"]=="singleEleData" and mode=="Ele":
         variables += ["HLTCleanPFHT300Ele15CaloIdTCaloIsoVLTrkIdTTrkIsoVLPFMET45", "HLTCleanPFHT300Ele15CaloIdTCaloIsoVLTrkIdTTrkIsoVLPFMET50", "HLTCleanPFHT350Ele5CaloIdTCaloIsoVLTrkIdTTrkIsoVLPFMET45", "HLTCleanPFHT350Ele5CaloIdTCaloIsoVLTrkIdTTrkIsoVLPFMET50", "HLTCleanPFNoPUHT300Ele15CaloIdTCaloIsoVLTrkIdTTrkIsoVLPFMET45", "HLTCleanPFNoPUHT300Ele15CaloIdTCaloIsoVLTrkIdTTrkIsoVLPFMET50", "HLTCleanPFNoPUHT350Ele5CaloIdTCaloIsoVLTrkIdTTrkIsoVLPFMET45", "HLTCleanPFNoPUHT350Ele5CaloIdTCaloIsoVLTrkIdTTrkIsoVLPFMET50", "HLTEle27WP80", "preCleanPFHT300Ele15CaloIdTCaloIsoVLTrkIdTTrkIsoVLPFMET45", "preCleanPFHT300Ele15CaloIdTCaloIsoVLTrkIdTTrkIsoVLPFMET50", "preCleanPFHT350Ele5CaloIdTCaloIsoVLTrkIdTTrkIsoVLPFMET45", "preCleanPFHT350Ele5CaloIdTCaloIsoVLTrkIdTTrkIsoVLPFMET50", "preCleanPFNoPUHT300Ele15CaloIdTCaloIsoVLTrkIdTTrkIsoVLPFMET45", "preCleanPFNoPUHT300Ele15CaloIdTCaloIsoVLTrkIdTTrkIsoVLPFMET50", "preCleanPFNoPUHT350Ele5CaloIdTCaloIsoVLTrkIdTTrkIsoVLPFMET45", "preCleanPFNoPUHT350Ele5CaloIdTCaloIsoVLTrkIdTTrkIsoVLPFMET50", "preEle27WP80"]
+
       MC_variables =  ["genmet", "genmetpx","genmetpy", "btag0parton", "btag1parton", "btag2parton", "btag3parton",\
                        "antinuMu", "antinuE", "antinuTau", "nuMu", "nuE", "nuTau", "nuMuFromTausFromWs", "nuEFromTausFromWs", "nuTauFromTausFromWs", "weightTTPolPlus5", "weightTTPolMinus5", "weightTTxsecPlus30", "weightTTxsecMinus30",
                        "weightDiLepPlus15", "weightDiLepMinus15", "weightTauPlus15", "weightTauMinus15",  "weightWxsecPlus30", "weightWxsecMinus30" , "weightNonLeadingxsecPlus30", "weightNonLeadingxsecMinus30", "hasGluonSplitting", "numBPartons", "numCPartons"]
       if sms!="":
         MC_variables+=["gluino0Pt", "gluino0Eta", "gluino0Phi", "gluino0Pdg"]
         MC_variables+=["gluino1Pt", "gluino1Eta", "gluino1Phi", "gluino1Pdg"]
+        MC_variables+=["osetMgl", "osetMN", "osetMsq"]
       if sample["name"].lower().count("ttjets"):
         MC_variables+= ["top0WDaughter0Pdg", "top0WDaughter0Px", "top0WDaughter0Py", "top0WDaughter0Pz"]
         MC_variables+= ["top0WDaughter1Pdg", "top0WDaughter1Px", "top0WDaughter1Py", "top0WDaughter1Pz"]
         MC_variables+= ["top1WDaughter0Pdg", "top1WDaughter0Px", "top1WDaughter0Py", "top1WDaughter0Pz"]
         MC_variables+= ["top1WDaughter1Pdg", "top1WDaughter1Px", "top1WDaughter1Py", "top1WDaughter1Pz"]
         MC_variables+= ["top0Px", "top1Px", "top0Py", "top1Py", "top0Pz", "top1Pz"]
-        
-      if sms!="":
-        MC_variables += ["osetMgl", "osetMN", "osetMsq"]
       if sample["bins"][0].count("Run")==0:
         variables+=MC_variables
         extraVariables += ["weightWPol1Plus10","weightWPol1Minus10","weightWPol2PlusPlus5","weightWPol2PlusMinus5","weightWPol2MinusPlus5","weightWPol2MinusMinus5","weightWPol3Plus10","weightWPol3Minus10"]
+
     btagVars=[]
-
-
     separateBTagWeights = False
     if len(chmode.split("_"))>1 and chmode.split("_")[1]=="separateBTagWeights" :
       separateBTagWeights = True
@@ -630,11 +630,12 @@ for nc, m in enumerate(chmodes):
           btagVars.append("weightBTag"+str(i)+"p_SF_b_Down")
           btagVars.append("weightBTag"+str(i)+"p_SF_light_Up")
           btagVars.append("weightBTag"+str(i)+"p_SF_light_Down")
-
     extraVariables += btagVars
 
     if mode=="HT":
-      variables = ["weight",  "weightPUSysPlus", "weightPUSysMinus", "run", "lumi", "met", "metpx", "metpy" ,"ht", "btag0", "btag1", "btag2", "btags3", "nbtags", "njets", "jet0pt", "jet1pt", "jet2pt", "jet3pt", "ngoodVertices", "rawMetpx", "rawMetpy" , "nvetoMuons", "nvetoElectrons", "type1phiMet", "type1phiMetpx", "type1phiMetpy"]
+      variables = ["weight",  "weightPUSysPlus", "weightPUSysMinus", "targetLumi", "xsec", "weightLumi", "run", "lumi", "met", "type1phiMet", "type1phiMetpx", "type1phiMetpy", "metpx", "metpy", "metphi", "mT", "barepfmet" ,"ht", "btag0", "btag1", "btag2", "btag3","rawMetpx", "rawMetpy", "m3", "mht", "singleMuonic", "singleElectronic", \
+      "leptonPt", "leptonEta", "leptonPhi", "leptonPdg", "njets", "nbtags", "nbjets", "jet0pt", "jet1pt", "jet2pt", "jet3pt", "jet0phi", "jet1phi","nvetoMuons", "nvetoElectrons", "ngoodMuons", "ngoodElectrons", "ngoodVertices", "nTrueGenVertices",
+      "btag0pt", "btag1pt", "btag2pt", "btag3pt", "btag0eta", "btag1eta", "btag2eta", "btag3eta", "btag0Mass", "btag1Mass", "btag2Mass", "btag3Mass"]
       if sample["bins"][0].count("Run"):
         alltriggers =  [  "HLTHT200", "HLTHT250", "HLTHT300", "HLTHT350", "HLTHT400", "HLTHT450", "HLTHT500", "HLTHT550", "HLTHT600", "HLTHT650", "HLTHT700", "HLTHT750"]
         for trigger in alltriggers:
@@ -642,7 +643,6 @@ for nc, m in enumerate(chmodes):
           variables.append(trigger.replace("HLT", "pre") )
       else:
         variables+=["genmet","genmetpx","genmetpy"]
-      extraVariables = []
 
     print variables, extraVariables
 
@@ -764,9 +764,12 @@ for nc, m in enumerate(chmodes):
                 num+=j["pt"]
             if len(jets)>0:
               s.htRatio = num/den
-#            print s.htRatio,den,s.ht
+#            print jets         
             if 1<abs(den-s.ht):print "WARNING HT <> sum(JET-pt) DISAGREEMENT!!"
-
+            if len(jets)>=2:
+              s.alphaT =  ROOT.CalcAlphaT(array.array('d', [ j['pt'] for j in jets ]), array.array('d', [ j['eta'] for j in jets ]), array.array('d', [ j['phi'] for j in jets ]), len(jets) ) 
+#            if s.njets==3:
+#              print "njets",s.njets, "met",s.met, "ht", s.ht, "alphaT", s.alphaT
             if len(bjets)==0 and len(ljets)>=3: #All combinations from the highest three light (or b-) jets
               b0=getJetArray(ljets[0])
               b1=getJetArray(ljets[1])
@@ -1125,7 +1128,7 @@ for nc, m in enumerate(chmodes):
       else:
         print "Zero entries in", bin, sample["name"]
       del c
-    if (not small):
+    if True or (not small):
       f = ROOT.TFile(ofile, "recreate")
       t.Write()
       f.Close()

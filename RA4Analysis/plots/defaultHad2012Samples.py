@@ -9,7 +9,6 @@ HTdata["specialCuts"] = []
 HTdata["hasWeight"] = False
 
 
-
 QCDHad_Bins = ["8TeV-QCD_Pt-1000to1400","8TeV-QCD_Pt-120to170","8TeV-QCD_Pt-1400to1800","8TeV-QCD_Pt-170to300","8TeV-QCD_Pt-1800","8TeV-QCD_Pt-300to470","8TeV-QCD_Pt-30to50","8TeV-QCD_Pt-470to600","8TeV-QCD_Pt-50to80",
 #  "8TeV-QCD_Pt-600to800",#FIXME
   "8TeV-QCD_Pt-800to1000","8TeV-QCD_Pt-80to120"]
@@ -127,4 +126,10 @@ ttvJets = copy.deepcopy(mc)
 ttvJets["dirname"] = "/data/schoef/pat_130517/"
 ttvJets["bins"] = ["8TeV-TTZJets", "8TeV-TTWJets"]
 ttvJets["name"] = "TTVJets"
+
+zToNuNu=copy.deepcopy(mc) 
+zToNuNu["name"] = "ZToNuNu" 
+zToNuNu["dirname"] = "/data/mhickel/pat_130714/" 
+zToNuNu["specialCuts"] = [] 
+zToNuNu["bins"] = ["8TeV-ZJetsToNuNu-HT100to200", "8TeV-ZJetsToNuNu-HT200to400", "8TeV-ZJetsToNuNu-HT400",  "8TeV-ZJetsToNuNu-HT50to100"] 
 

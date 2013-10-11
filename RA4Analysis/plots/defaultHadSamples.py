@@ -18,6 +18,14 @@ qcdHad["dirname"] = "/scratch/schoef/pat_110924/Had/"
 qcdHad["specialCuts"] = []
 qcdHad["bins"] = ["QCD_Pt_120to170", "QCD_Pt_15to30", "QCD_Pt_1800", "QCD_Pt_30to50", "QCD_Pt_50to80", "QCD_Pt_600to800", "QCD_Pt_80to120", "QCD_Pt_1000to1400", "QCD_Pt_1400to1800", "QCD_Pt_170to300", "QCD_Pt_300to470", "QCD_Pt_470to600", "QCD_Pt_800to1000"]
 
+zToNuNu={}
+zToNuNu["name"] = "ZToNuNu"
+zToNuNu["dirname"] = "/data/mhickel/pat_130714/"
+zToNuNu["specialCuts"] = []
+zToNuNu["bins"] = ["8TeV-ZJetsToNuNu-HT100to200", "8TeV-ZJetsToNuNu-HT200to400", "8TeV-ZJetsToNuNu-HT400",  "8TeV-ZJetsToNuNu-HT50to100"]
+ 
+
+
 #QCD_Bins = ["QCD_Pt-20to30_MuPt5Enriched",  "QCD_Pt-30to50_MuPt5Enriched", "QCD_Pt-50to80_MuPt5Enriched",  "QCD_Pt-80to120_MuPt5Enriched", "QCD_Pt-120to150_MuPt5Enriched", "QCD_Pt-150_MuPt5Enriched"]
 #
 #WJets_Bins = ["WJetsToLNu"]
