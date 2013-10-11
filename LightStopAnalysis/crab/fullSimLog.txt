@@ -1,0 +1,2 @@
+#Step1
+cmsDriver.py Configuration/GenProduction/python/EightTeV/Hadronizer_SMS_Scans_2jets_Qcut44_TuneZ2star_8TeV_madgraph_tauola_cff.py --mc --eventcontent RAWSIM --datatier GEN-SIM --conditions START53_V7C::All --beamspot Realistic8TeVCollision --step GEN,SIM --filein=file:decayed_xqcut0_fix.lhe -n -1 --no_exec
