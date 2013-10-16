@@ -1,2 +1,6 @@
-#Step1
+#Step 0
 cmsDriver.py Configuration/GenProduction/python/EightTeV/Hadronizer_SMS_Scans_2jets_Qcut44_TuneZ2star_8TeV_madgraph_tauola_cff.py --mc --eventcontent RAWSIM --datatier GEN-SIM --conditions START53_V7C::All --beamspot Realistic8TeVCollision --step GEN,SIM --filein=file:decayed_xqcut0_fix.lhe -n -1 --no_exec
+#Then used crab_step0.cfg and published with crab -publish
+
+#Step 1: You can execute the resulting cfg on lxplus
+cmsDriver.py step1 --mc --eventcontent RAWSIM --pileup_input "dbs:/MinBias_TuneZ2star_8TeV-pythia6/Summer12-START50_V13-v3/GEN-SIM" --pileup 2012_Summer_50ns_PoissonOOTPU --datatier GEN-SIM-RAW --conditions START53_V19::All --step DIGI,L1,DIGI2RAW,HLT:7E33v2 --filein=file:Hadronizer_SMS_Scans_2jets_Qcut44_TuneZ2star_8TeV_madgraph_tauola_cff_py_GEN_SIM.root -n 10 --no_exec
