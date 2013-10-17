@@ -42,7 +42,7 @@ namespace EdmHelper {
   std::vector<pat::Jet> muonCleanedJets(std::vector<pat::Jet> & jets, std::vector<pat::Muon> & muons, double deltaRCut = 0.3);
 
   template<class T>
-  bool passesDeltaRCleaning (pat::Jet & jet, std::vector<T> & leptons, double deltaRCut)
+  bool passesDeltaRCleaning (const pat::Jet & jet, std::vector<T> & leptons, double deltaRCut)
   {
     for(unsigned i=0; i<leptons.size(); i++)
     {
@@ -216,6 +216,28 @@ namespace EdmHelper {
     // std::cout << "[EdmHelper] getObjs ends" << std::endl;
     return ret;
   }
+
+//  template<class T>
+//  std::vector<edm::Ref< T, T > > getObjRefs( const edm::Event& event, const edm::InputTag& name,
+//        const bool verbose = false )
+//  {
+//    edm::Handle< std::vector<T> > objsHandle;
+//    event.getByLabel( name, objsHandle );
+//    if ( !objsHandle.isValid() )
+//    {
+//      edm::LogError("EdmHelper") << "problem reading collection ``" << name << "''";
+//      return std::vector<T>();
+//    }
+//    std::vector<edm::Ref<T, T> > ret;
+//    for (unsigned int i=0; i<objsHandle->size(); ++i){
+//      edm::Ref< T, T > myRef(objsHandle, i);
+//      ret.push_back( myRef  );
+//    }
+//    if (verbose) std::cout<<"[getObjs] taken "<<ret.size()<<" \""<<name.instance()<<"\" (\""<<name.label()<<"\") from "
+//                          <<objsHandle->size()<<std::endl;
+//    // std::cout << "[EdmHelper] getObjs ends" << std::endl;
+//    return ret;
+//  }
 
   /**
    * retrieve a vector of objects by name

@@ -3,7 +3,7 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process("PAT")
 
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring('/store/caf/user/imikulec/lstop/Hadronizer_SMS_Scans_2jets_Qcut44_TuneZ2star_8TeV_madgraph_tauola_cff_py_GEN_FASTSIM_HLT_PU.root'),
+    fileNames = cms.untracked.vstring('file:/data/schoef/local/TTJets-53X-syncfile-AODSIM.root'),
     duplicateCheckMode = cms.untracked.string('noDuplicateCheck')
 )
 process.AK5PFCandMETcorr = cms.EDProducer("PFCandMETcorrInputProducer",
@@ -113,7 +113,7 @@ process.SUSYTupelizer = cms.EDProducer("SUSYTupelizer",
     eleDEtaBarrel = cms.untracked.double(0.004),
     eleDEtaEndcap = cms.untracked.double(0.007),
     vetoEleDPhiEndcap = cms.untracked.double(0.7),
-    addHEPHYCommonToolsInfo = cms.untracked.bool(True),
+    addRA4AnalysisInfo = cms.untracked.bool(True),
     elePt = cms.untracked.double(20),
     vetoEleHoEBarrel = cms.untracked.double(0.15),
     muonEta = cms.untracked.double(2.4),
@@ -147,7 +147,7 @@ process.SUSYTupelizer = cms.EDProducer("SUSYTupelizer",
     vetoElePt = cms.untracked.double(15),
     vetoMuonIsPF = cms.untracked.bool(True),
     type1phiMETs = cms.untracked.InputTag("patPFMETsTypeIPhicorrected"),
-    addPDFWeights = cms.untracked.bool(True),
+    addPDFWeights = cms.untracked.bool(False),
     vetoMuonPFRelIsoDeltaBeta = cms.untracked.bool(True),
     verbose = cms.untracked.bool(True),
     eleConversionRejection = cms.untracked.bool(True),
@@ -169,7 +169,7 @@ process.SUSYTupelizer = cms.EDProducer("SUSYTupelizer",
     rawMETs = cms.untracked.InputTag("patRAWPFMETs"),
     muonPt = cms.untracked.double(20),
     muonDxy = cms.untracked.double(0.02),
-    addMSugraOSETInfo = cms.untracked.bool(True),
+    addMSugraOSETInfo = cms.untracked.bool(False),
     triggersToMonitor = cms.untracked.vstring('HLT_IsoMu24_eta2p1'),
     eleDz = cms.untracked.double(0.1),
     addFullLeptonInfo = cms.untracked.bool(True),
@@ -209,7 +209,8 @@ process.SUSYTupelizer = cms.EDProducer("SUSYTupelizer",
     btag = cms.untracked.string('combinedSecondaryVertexBJetTags'),
     patMuons = cms.untracked.InputTag("cleanPatMuons"),
     vertices = cms.untracked.InputTag("goodVertices"),
-    muonNumTrackerLayersWithMeasurement = cms.untracked.int32(5)
+    muonNumTrackerLayersWithMeasurement = cms.untracked.int32(5),
+    addHEPHYCommonToolsInfo = cms.untracked.bool(True)
 )
 
 
@@ -15857,14 +15858,6 @@ process.patTriggerEvent = cms.EDProducer("PATTriggerEventProducer",
 )
 
 
-process.pdfWeights = cms.EDProducer("PdfWeightProducer",
-    PdfInfoTag = cms.untracked.InputTag("generator"),
-    PdfSetNames = cms.untracked.vstring('cteq66.LHgrid', 
-        'MSTW2008nlo68cl.LHgrid', 
-        'NNPDF20_100.LHgrid')
-)
-
-
 process.pfCandMETcorr = cms.EDProducer("PFCandMETcorrInputProducer",
     src = cms.InputTag("pfCandsNotInJet")
 )
@@ -18629,6 +18622,194 @@ process.photonMatchPF = cms.EDProducer("MCMatcher",
     checkCharge = cms.bool(True),
     resolveAmbiguities = cms.bool(True),
     matched = cms.InputTag("genParticles")
+)
+
+
+process.puJetIdpatJetsAK5PF = cms.EDProducer("PileupJetIdProducer",
+    residualsTxt = cms.FileInPath('CMGTools/External/data/dummy.txt'),
+    runMvas = cms.bool(False),
+    inputIsCorrected = cms.bool(True),
+    vertexes = cms.InputTag("offlinePrimaryVertices"),
+    produceJetIds = cms.bool(True),
+    jec = cms.string('AK5PF'),
+    residualsFromTxt = cms.bool(False),
+    applyJec = cms.bool(False),
+    jetids = cms.InputTag(""),
+    rho = cms.InputTag("kt6PFJets","rho"),
+    jets = cms.InputTag("patJetsAK5PF"),
+    algos = cms.VPSet(cms.PSet(
+        tmvaVariables = cms.vstring('nvtx', 
+            'dZ', 
+            'beta', 
+            'betaStar', 
+            'nCharged', 
+            'nNeutrals', 
+            'dR2Mean', 
+            'ptD', 
+            'frac01', 
+            'frac02', 
+            'frac03', 
+            'frac04', 
+            'frac05'),
+        tmvaMethod = cms.string('JetIDMVAHighPt'),
+        cutBased = cms.bool(False),
+        tmvaWeights = cms.string('CMGTools/External/data/TMVAClassificationCategory_JetID_53X_Dec2012.weights.xml'),
+        tmvaSpectators = cms.vstring('jetPt', 
+            'jetEta', 
+            'jetPhi'),
+        label = cms.string('full53x'),
+        version = cms.int32(-1),
+        JetIdParams = cms.PSet(
+            Pt2030_Tight = cms.vdouble(0.73, 0.05, -0.26, -0.42),
+            Pt2030_Loose = cms.vdouble(-0.63, -0.6, -0.55, -0.45),
+            Pt3050_Medium = cms.vdouble(0.1, -0.36, -0.54, -0.54),
+            Pt1020_MET = cms.vdouble(0.3, -0.2, -0.4, -0.4),
+            Pt2030_Medium = cms.vdouble(0.1, -0.36, -0.54, -0.54),
+            Pt010_Tight = cms.vdouble(-0.83, -0.81, -0.74, -0.81),
+            Pt1020_Tight = cms.vdouble(-0.83, -0.81, -0.74, -0.81),
+            Pt3050_MET = cms.vdouble(0.0, 0.0, -0.1, -0.2),
+            Pt010_MET = cms.vdouble(0.0, -0.6, -0.4, -0.4),
+            Pt1020_Loose = cms.vdouble(-0.95, -0.96, -0.94, -0.95),
+            Pt010_Medium = cms.vdouble(-0.83, -0.92, -0.9, -0.92),
+            Pt1020_Medium = cms.vdouble(-0.83, -0.92, -0.9, -0.92),
+            Pt2030_MET = cms.vdouble(0.0, 0.0, 0.0, 0.0),
+            Pt010_Loose = cms.vdouble(-0.95, -0.96, -0.94, -0.95),
+            Pt3050_Loose = cms.vdouble(-0.63, -0.6, -0.55, -0.45),
+            Pt3050_Tight = cms.vdouble(0.73, 0.05, -0.26, -0.42)
+        ),
+        impactParTkThreshold = cms.double(1.0)
+    ))
+)
+
+
+process.puJetMvapatJetsAK5PF = cms.EDProducer("PileupJetIdProducer",
+    residualsTxt = cms.FileInPath('CMGTools/External/data/dummy.txt'),
+    runMvas = cms.bool(True),
+    inputIsCorrected = cms.bool(True),
+    vertexes = cms.InputTag("offlinePrimaryVertices"),
+    produceJetIds = cms.bool(False),
+    jec = cms.string('AK5PF'),
+    residualsFromTxt = cms.bool(False),
+    applyJec = cms.bool(False),
+    jetids = cms.InputTag("puJetIdpatJetsAK5PF"),
+    rho = cms.InputTag("kt6PFJets","rho"),
+    jets = cms.InputTag("patJetsAK5PF"),
+    algos = cms.VPSet(cms.PSet(
+        tmvaVariables = cms.vstring('nvtx', 
+            'dZ', 
+            'beta', 
+            'betaStar', 
+            'nCharged', 
+            'nNeutrals', 
+            'dR2Mean', 
+            'ptD', 
+            'frac01', 
+            'frac02', 
+            'frac03', 
+            'frac04', 
+            'frac05'),
+        tmvaMethod = cms.string('JetIDMVAHighPt'),
+        cutBased = cms.bool(False),
+        tmvaWeights = cms.string('CMGTools/External/data/TMVAClassificationCategory_JetID_53X_Dec2012.weights.xml'),
+        tmvaSpectators = cms.vstring('jetPt', 
+            'jetEta', 
+            'jetPhi'),
+        label = cms.string('full53x'),
+        version = cms.int32(-1),
+        JetIdParams = cms.PSet(
+            Pt2030_Tight = cms.vdouble(0.73, 0.05, -0.26, -0.42),
+            Pt2030_Loose = cms.vdouble(-0.63, -0.6, -0.55, -0.45),
+            Pt3050_Medium = cms.vdouble(0.1, -0.36, -0.54, -0.54),
+            Pt1020_MET = cms.vdouble(0.3, -0.2, -0.4, -0.4),
+            Pt2030_Medium = cms.vdouble(0.1, -0.36, -0.54, -0.54),
+            Pt010_Tight = cms.vdouble(-0.83, -0.81, -0.74, -0.81),
+            Pt1020_Tight = cms.vdouble(-0.83, -0.81, -0.74, -0.81),
+            Pt3050_MET = cms.vdouble(0.0, 0.0, -0.1, -0.2),
+            Pt010_MET = cms.vdouble(0.0, -0.6, -0.4, -0.4),
+            Pt1020_Loose = cms.vdouble(-0.95, -0.96, -0.94, -0.95),
+            Pt010_Medium = cms.vdouble(-0.83, -0.92, -0.9, -0.92),
+            Pt1020_Medium = cms.vdouble(-0.83, -0.92, -0.9, -0.92),
+            Pt2030_MET = cms.vdouble(0.0, 0.0, 0.0, 0.0),
+            Pt010_Loose = cms.vdouble(-0.95, -0.96, -0.94, -0.95),
+            Pt3050_Loose = cms.vdouble(-0.63, -0.6, -0.55, -0.45),
+            Pt3050_Tight = cms.vdouble(0.73, 0.05, -0.26, -0.42)
+        ),
+        impactParTkThreshold = cms.double(1.0)
+    ), 
+        cms.PSet(
+            tmvaVariables = cms.vstring('nvtx', 
+                'jetPt', 
+                'jetEta', 
+                'jetPhi', 
+                'dZ', 
+                'beta', 
+                'betaStar', 
+                'nCharged', 
+                'nNeutrals', 
+                'dR2Mean', 
+                'ptD', 
+                'frac01', 
+                'frac02', 
+                'frac03', 
+                'frac04', 
+                'frac05'),
+            tmvaMethod = cms.string('JetIDMVAMET'),
+            cutBased = cms.bool(False),
+            tmvaWeights = cms.string('CMGTools/External/data/TMVAClassificationCategory_JetID_MET_53X_Dec2012.weights.xml'),
+            tmvaSpectators = cms.vstring(),
+            label = cms.string('met53x'),
+            version = cms.int32(-1),
+            JetIdParams = cms.PSet(
+                Pt2030_Tight = cms.vdouble(-2, -2, -2, -2, -2),
+                Pt2030_Loose = cms.vdouble(-2, -2, -2, -2, -2),
+                Pt3050_Medium = cms.vdouble(-2, -2, -2, -2, -2),
+                Pt1020_MET = cms.vdouble(-0.2, -0.2, -0.5, -0.3),
+                Pt2030_Medium = cms.vdouble(-2, -2, -2, -2, -2),
+                Pt010_Tight = cms.vdouble(-2, -2, -2, -2, -2),
+                Pt1020_Tight = cms.vdouble(-2, -2, -2, -2, -2),
+                Pt3050_MET = cms.vdouble(-0.2, -0.2, 0.0, 0.2),
+                Pt010_MET = cms.vdouble(-0.2, -0.3, -0.5, -0.5),
+                Pt1020_Loose = cms.vdouble(-2, -2, -2, -2, -2),
+                Pt010_Medium = cms.vdouble(-2, -2, -2, -2, -2),
+                Pt1020_Medium = cms.vdouble(-2, -2, -2, -2, -2),
+                Pt2030_MET = cms.vdouble(-0.2, -0.2, -0.2, 0.1),
+                Pt010_Loose = cms.vdouble(-2, -2, -2, -2, -2),
+                Pt3050_Loose = cms.vdouble(-2, -2, -2, -2, -2),
+                Pt3050_Tight = cms.vdouble(-2, -2, -2, -2, -2)
+            ),
+            impactParTkThreshold = cms.double(1.0)
+        ), 
+        cms.PSet(
+            cutBased = cms.bool(True),
+            JetIdParams = cms.PSet(
+                Pt010_RMSLoose = cms.vdouble(0.06, 0.05, 0.05, 0.07),
+                Pt3050_RMSMedium = cms.vdouble(0.06, 0.03, 0.03, 0.04),
+                Pt3050_BetaStarMedium = cms.vdouble(0.2, 0.3, 999.0, 999.0),
+                Pt010_BetaStarMedium = cms.vdouble(0.2, 0.3, 999.0, 999.0),
+                Pt1020_BetaStarTight = cms.vdouble(0.15, 0.15, 999.0, 999.0),
+                Pt010_RMSMedium = cms.vdouble(0.06, 0.03, 0.03, 0.04),
+                Pt1020_RMSLoose = cms.vdouble(0.06, 0.05, 0.05, 0.07),
+                Pt1020_BetaStarLoose = cms.vdouble(0.2, 0.3, 999.0, 999.0),
+                Pt2030_RMSTight = cms.vdouble(0.05, 0.07, 0.03, 0.045),
+                Pt3050_RMSTight = cms.vdouble(0.05, 0.06, 0.03, 0.04),
+                Pt1020_RMSTight = cms.vdouble(0.06, 0.07, 0.04, 0.05),
+                Pt3050_BetaStarTight = cms.vdouble(0.15, 0.15, 999.0, 999.0),
+                Pt3050_RMSLoose = cms.vdouble(0.06, 0.05, 0.05, 0.055),
+                Pt2030_RMSLoose = cms.vdouble(0.06, 0.05, 0.05, 0.055),
+                Pt010_BetaStarTight = cms.vdouble(0.15, 0.15, 999.0, 999.0),
+                Pt2030_BetaStarMedium = cms.vdouble(0.2, 0.3, 999.0, 999.0),
+                Pt1020_RMSMedium = cms.vdouble(0.06, 0.03, 0.03, 0.04),
+                Pt2030_BetaStarLoose = cms.vdouble(0.2, 0.3, 999.0, 999.0),
+                Pt2030_BetaStarTight = cms.vdouble(0.15, 0.15, 999.0, 999.0),
+                Pt2030_RMSMedium = cms.vdouble(0.06, 0.03, 0.03, 0.04),
+                Pt010_BetaStarLoose = cms.vdouble(0.2, 0.3, 999.0, 999.0),
+                Pt3050_BetaStarLoose = cms.vdouble(0.2, 0.3, 999.0, 999.0),
+                Pt1020_BetaStarMedium = cms.vdouble(0.2, 0.3, 999.0, 999.0),
+                Pt010_RMSTight = cms.vdouble(0.06, 0.07, 0.04, 0.05)
+            ),
+            impactParTkThreshold = cms.double(1.0),
+            label = cms.string('cutbased')
+        ))
 )
 
 
@@ -23005,6 +23186,646 @@ process.vertexMerger = cms.EDProducer("VertexMerger",
 )
 
 
+process.CSCBasedHaloFilter = cms.EDFilter("CSCHaloFilter",
+    ExpectedBX = cms.int32(3),
+    MinOuterMomentumTheta = cms.double(0.1),
+    FilterCSCTight = cms.bool(False),
+    CollisionMuonLabel = cms.InputTag("muons"),
+    MatchingDPhiThreshold = cms.double(0.18),
+    MinNumberOfOutOfTimeDigis = cms.untracked.int32(1),
+    MaxOuterMomentumTheta = cms.double(3.0),
+    OuterRMax = cms.double(99999.0),
+    ALCTDigiLabel = cms.InputTag("muonCSCDigis","MuonCSCALCTDigi"),
+    SACosmicMuonLabel = cms.InputTag("cosmicMuons"),
+    NormChi2 = cms.double(8.0),
+    FilterDigiLevel = cms.bool(True),
+    FilterTriggerLevel = cms.bool(True),
+    TrackAssociatorParameters = cms.PSet(
+        muonMaxDistanceSigmaX = cms.double(0.0),
+        muonMaxDistanceSigmaY = cms.double(0.0),
+        CSCSegmentCollectionLabel = cms.InputTag("cscSegments"),
+        dRHcal = cms.double(9999.0),
+        dRPreshowerPreselection = cms.double(0.2),
+        CaloTowerCollectionLabel = cms.InputTag("towerMaker"),
+        useEcal = cms.bool(True),
+        dREcal = cms.double(9999.0),
+        dREcalPreselection = cms.double(0.05),
+        HORecHitCollectionLabel = cms.InputTag("horeco"),
+        dRMuon = cms.double(9999.0),
+        propagateAllDirections = cms.bool(True),
+        muonMaxDistanceX = cms.double(5.0),
+        muonMaxDistanceY = cms.double(5.0),
+        useHO = cms.bool(True),
+        trajectoryUncertaintyTolerance = cms.double(-1.0),
+        usePreshower = cms.bool(False),
+        DTRecSegment4DCollectionLabel = cms.InputTag("dt4DSegments"),
+        EERecHitCollectionLabel = cms.InputTag("ecalRecHit","EcalRecHitsEE"),
+        dRHcalPreselection = cms.double(0.2),
+        useMuon = cms.bool(True),
+        useCalo = cms.bool(False),
+        accountForTrajectoryChangeCalo = cms.bool(False),
+        EBRecHitCollectionLabel = cms.InputTag("ecalRecHit","EcalRecHitsEB"),
+        dRMuonPreselection = cms.double(0.2),
+        truthMatch = cms.bool(False),
+        HBHERecHitCollectionLabel = cms.InputTag("hbhereco"),
+        useHcal = cms.bool(True)
+    ),
+    Deta = cms.double(0.1),
+    FilterRecoLevel = cms.bool(True),
+    CSCSegmentLabel = cms.InputTag("cscSegments"),
+    InnerRMax = cms.double(99999.0),
+    MaxDROverDz = cms.double(0.13),
+    L1MuGMTReadoutLabel = cms.InputTag("gtDigis"),
+    MinNumberOfHaloTracks = cms.untracked.int32(1),
+    OuterRMin = cms.double(0.0),
+    InnerRMin = cms.double(0.0),
+    FilterCSCLoose = cms.bool(False),
+    BeamHaloSummaryLabel = cms.InputTag("BeamHaloSummary"),
+    MatchingDEtaThreshold = cms.double(0.4),
+    MatchingDWireThreshold = cms.int32(5),
+    MinNumberOfHaloTriggers = cms.untracked.int32(1),
+    Dphi = cms.double(1.0),
+    CSCRecHitLabel = cms.InputTag("csc2DRecHits"),
+    CSCHaloDataLabel = cms.InputTag("CSCHaloData")
+)
+
+
+process.CSCHaloFilterDigiAndRecoLevel = cms.EDFilter("CSCHaloFilter",
+    ExpectedBX = cms.int32(3),
+    MinOuterMomentumTheta = cms.double(0.1),
+    MaxDROverDz = cms.double(0.13),
+    CollisionMuonLabel = cms.InputTag("muons"),
+    MatchingDPhiThreshold = cms.double(0.18),
+    MinNumberOfOutOfTimeDigis = cms.untracked.int32(1),
+    MaxOuterMomentumTheta = cms.double(3.0),
+    OuterRMax = cms.double(99999.0),
+    ALCTDigiLabel = cms.InputTag("muonCSCDigis","MuonCSCALCTDigi"),
+    SACosmicMuonLabel = cms.InputTag("cosmicMuons"),
+    NormChi2 = cms.double(8.0),
+    FilterDigiLevel = cms.bool(True),
+    FilterTriggerLevel = cms.bool(False),
+    TrackAssociatorParameters = cms.PSet(
+        muonMaxDistanceSigmaX = cms.double(0.0),
+        muonMaxDistanceSigmaY = cms.double(0.0),
+        CSCSegmentCollectionLabel = cms.InputTag("cscSegments"),
+        dRHcal = cms.double(9999.0),
+        dRPreshowerPreselection = cms.double(0.2),
+        CaloTowerCollectionLabel = cms.InputTag("towerMaker"),
+        useEcal = cms.bool(True),
+        dREcal = cms.double(9999.0),
+        dREcalPreselection = cms.double(0.05),
+        HORecHitCollectionLabel = cms.InputTag("horeco"),
+        dRMuon = cms.double(9999.0),
+        propagateAllDirections = cms.bool(True),
+        muonMaxDistanceX = cms.double(5.0),
+        muonMaxDistanceY = cms.double(5.0),
+        useHO = cms.bool(True),
+        trajectoryUncertaintyTolerance = cms.double(-1.0),
+        usePreshower = cms.bool(False),
+        DTRecSegment4DCollectionLabel = cms.InputTag("dt4DSegments"),
+        EERecHitCollectionLabel = cms.InputTag("ecalRecHit","EcalRecHitsEE"),
+        dRHcalPreselection = cms.double(0.2),
+        useMuon = cms.bool(True),
+        useCalo = cms.bool(False),
+        accountForTrajectoryChangeCalo = cms.bool(False),
+        EBRecHitCollectionLabel = cms.InputTag("ecalRecHit","EcalRecHitsEB"),
+        dRMuonPreselection = cms.double(0.2),
+        truthMatch = cms.bool(False),
+        HBHERecHitCollectionLabel = cms.InputTag("hbhereco"),
+        useHcal = cms.bool(True)
+    ),
+    Deta = cms.double(0.1),
+    FilterRecoLevel = cms.bool(True),
+    CSCSegmentLabel = cms.InputTag("cscSegments"),
+    InnerRMax = cms.double(99999.0),
+    FilterCSCTight = cms.bool(False),
+    L1MuGMTReadoutLabel = cms.InputTag("gtDigis"),
+    MinNumberOfHaloTracks = cms.untracked.int32(1),
+    OuterRMin = cms.double(0.0),
+    InnerRMin = cms.double(0.0),
+    FilterCSCLoose = cms.bool(False),
+    BeamHaloSummaryLabel = cms.InputTag("BeamHaloSummary"),
+    MatchingDEtaThreshold = cms.double(0.4),
+    MatchingDWireThreshold = cms.int32(5),
+    MinNumberOfHaloTriggers = cms.untracked.int32(1),
+    Dphi = cms.double(1.0),
+    CSCRecHitLabel = cms.InputTag("csc2DRecHits"),
+    CSCHaloDataLabel = cms.InputTag("CSCHaloData")
+)
+
+
+process.CSCHaloFilterDigiAndTriggerLevel = cms.EDFilter("CSCHaloFilter",
+    ExpectedBX = cms.int32(3),
+    MinOuterMomentumTheta = cms.double(0.1),
+    MaxDROverDz = cms.double(0.13),
+    CollisionMuonLabel = cms.InputTag("muons"),
+    MatchingDPhiThreshold = cms.double(0.18),
+    MinNumberOfOutOfTimeDigis = cms.untracked.int32(1),
+    MaxOuterMomentumTheta = cms.double(3.0),
+    OuterRMax = cms.double(99999.0),
+    ALCTDigiLabel = cms.InputTag("muonCSCDigis","MuonCSCALCTDigi"),
+    SACosmicMuonLabel = cms.InputTag("cosmicMuons"),
+    NormChi2 = cms.double(8.0),
+    FilterDigiLevel = cms.bool(True),
+    FilterTriggerLevel = cms.bool(True),
+    TrackAssociatorParameters = cms.PSet(
+        muonMaxDistanceSigmaX = cms.double(0.0),
+        muonMaxDistanceSigmaY = cms.double(0.0),
+        CSCSegmentCollectionLabel = cms.InputTag("cscSegments"),
+        dRHcal = cms.double(9999.0),
+        dRPreshowerPreselection = cms.double(0.2),
+        CaloTowerCollectionLabel = cms.InputTag("towerMaker"),
+        useEcal = cms.bool(True),
+        dREcal = cms.double(9999.0),
+        dREcalPreselection = cms.double(0.05),
+        HORecHitCollectionLabel = cms.InputTag("horeco"),
+        dRMuon = cms.double(9999.0),
+        propagateAllDirections = cms.bool(True),
+        muonMaxDistanceX = cms.double(5.0),
+        muonMaxDistanceY = cms.double(5.0),
+        useHO = cms.bool(True),
+        trajectoryUncertaintyTolerance = cms.double(-1.0),
+        usePreshower = cms.bool(False),
+        DTRecSegment4DCollectionLabel = cms.InputTag("dt4DSegments"),
+        EERecHitCollectionLabel = cms.InputTag("ecalRecHit","EcalRecHitsEE"),
+        dRHcalPreselection = cms.double(0.2),
+        useMuon = cms.bool(True),
+        useCalo = cms.bool(False),
+        accountForTrajectoryChangeCalo = cms.bool(False),
+        EBRecHitCollectionLabel = cms.InputTag("ecalRecHit","EcalRecHitsEB"),
+        dRMuonPreselection = cms.double(0.2),
+        truthMatch = cms.bool(False),
+        HBHERecHitCollectionLabel = cms.InputTag("hbhereco"),
+        useHcal = cms.bool(True)
+    ),
+    Deta = cms.double(0.1),
+    FilterRecoLevel = cms.bool(False),
+    CSCSegmentLabel = cms.InputTag("cscSegments"),
+    InnerRMax = cms.double(99999.0),
+    FilterCSCTight = cms.bool(False),
+    L1MuGMTReadoutLabel = cms.InputTag("gtDigis"),
+    MinNumberOfHaloTracks = cms.untracked.int32(1),
+    OuterRMin = cms.double(0.0),
+    InnerRMin = cms.double(0.0),
+    FilterCSCLoose = cms.bool(False),
+    BeamHaloSummaryLabel = cms.InputTag("BeamHaloSummary"),
+    MatchingDEtaThreshold = cms.double(0.4),
+    MatchingDWireThreshold = cms.int32(5),
+    MinNumberOfHaloTriggers = cms.untracked.int32(1),
+    Dphi = cms.double(1.0),
+    CSCRecHitLabel = cms.InputTag("csc2DRecHits"),
+    CSCHaloDataLabel = cms.InputTag("CSCHaloData")
+)
+
+
+process.CSCHaloFilterDigiLevel = cms.EDFilter("CSCHaloFilter",
+    ExpectedBX = cms.int32(3),
+    MinOuterMomentumTheta = cms.double(0.1),
+    MaxDROverDz = cms.double(0.13),
+    CollisionMuonLabel = cms.InputTag("muons"),
+    MatchingDPhiThreshold = cms.double(0.18),
+    MinNumberOfOutOfTimeDigis = cms.untracked.int32(1),
+    MaxOuterMomentumTheta = cms.double(3.0),
+    OuterRMax = cms.double(99999.0),
+    ALCTDigiLabel = cms.InputTag("muonCSCDigis","MuonCSCALCTDigi"),
+    SACosmicMuonLabel = cms.InputTag("cosmicMuons"),
+    NormChi2 = cms.double(8.0),
+    FilterDigiLevel = cms.bool(True),
+    FilterTriggerLevel = cms.bool(False),
+    TrackAssociatorParameters = cms.PSet(
+        muonMaxDistanceSigmaX = cms.double(0.0),
+        muonMaxDistanceSigmaY = cms.double(0.0),
+        CSCSegmentCollectionLabel = cms.InputTag("cscSegments"),
+        dRHcal = cms.double(9999.0),
+        dRPreshowerPreselection = cms.double(0.2),
+        CaloTowerCollectionLabel = cms.InputTag("towerMaker"),
+        useEcal = cms.bool(True),
+        dREcal = cms.double(9999.0),
+        dREcalPreselection = cms.double(0.05),
+        HORecHitCollectionLabel = cms.InputTag("horeco"),
+        dRMuon = cms.double(9999.0),
+        propagateAllDirections = cms.bool(True),
+        muonMaxDistanceX = cms.double(5.0),
+        muonMaxDistanceY = cms.double(5.0),
+        useHO = cms.bool(True),
+        trajectoryUncertaintyTolerance = cms.double(-1.0),
+        usePreshower = cms.bool(False),
+        DTRecSegment4DCollectionLabel = cms.InputTag("dt4DSegments"),
+        EERecHitCollectionLabel = cms.InputTag("ecalRecHit","EcalRecHitsEE"),
+        dRHcalPreselection = cms.double(0.2),
+        useMuon = cms.bool(True),
+        useCalo = cms.bool(False),
+        accountForTrajectoryChangeCalo = cms.bool(False),
+        EBRecHitCollectionLabel = cms.InputTag("ecalRecHit","EcalRecHitsEB"),
+        dRMuonPreselection = cms.double(0.2),
+        truthMatch = cms.bool(False),
+        HBHERecHitCollectionLabel = cms.InputTag("hbhereco"),
+        useHcal = cms.bool(True)
+    ),
+    Deta = cms.double(0.1),
+    FilterRecoLevel = cms.bool(False),
+    CSCSegmentLabel = cms.InputTag("cscSegments"),
+    InnerRMax = cms.double(99999.0),
+    FilterCSCTight = cms.bool(False),
+    L1MuGMTReadoutLabel = cms.InputTag("gtDigis"),
+    MinNumberOfHaloTracks = cms.untracked.int32(1),
+    OuterRMin = cms.double(0.0),
+    InnerRMin = cms.double(0.0),
+    FilterCSCLoose = cms.bool(False),
+    BeamHaloSummaryLabel = cms.InputTag("BeamHaloSummary"),
+    MatchingDEtaThreshold = cms.double(0.4),
+    MatchingDWireThreshold = cms.int32(5),
+    MinNumberOfHaloTriggers = cms.untracked.int32(1),
+    Dphi = cms.double(1.0),
+    CSCRecHitLabel = cms.InputTag("csc2DRecHits"),
+    CSCHaloDataLabel = cms.InputTag("CSCHaloData")
+)
+
+
+process.CSCHaloFilterRecoAndDigiAndTriggerLevel = cms.EDFilter("CSCHaloFilter",
+    ExpectedBX = cms.int32(3),
+    MinOuterMomentumTheta = cms.double(0.1),
+    MaxDROverDz = cms.double(0.13),
+    CollisionMuonLabel = cms.InputTag("muons"),
+    MatchingDPhiThreshold = cms.double(0.18),
+    MinNumberOfOutOfTimeDigis = cms.untracked.int32(1),
+    MaxOuterMomentumTheta = cms.double(3.0),
+    OuterRMax = cms.double(99999.0),
+    ALCTDigiLabel = cms.InputTag("muonCSCDigis","MuonCSCALCTDigi"),
+    SACosmicMuonLabel = cms.InputTag("cosmicMuons"),
+    NormChi2 = cms.double(8.0),
+    FilterDigiLevel = cms.bool(True),
+    FilterTriggerLevel = cms.bool(True),
+    TrackAssociatorParameters = cms.PSet(
+        muonMaxDistanceSigmaX = cms.double(0.0),
+        muonMaxDistanceSigmaY = cms.double(0.0),
+        CSCSegmentCollectionLabel = cms.InputTag("cscSegments"),
+        dRHcal = cms.double(9999.0),
+        dRPreshowerPreselection = cms.double(0.2),
+        CaloTowerCollectionLabel = cms.InputTag("towerMaker"),
+        useEcal = cms.bool(True),
+        dREcal = cms.double(9999.0),
+        dREcalPreselection = cms.double(0.05),
+        HORecHitCollectionLabel = cms.InputTag("horeco"),
+        dRMuon = cms.double(9999.0),
+        propagateAllDirections = cms.bool(True),
+        muonMaxDistanceX = cms.double(5.0),
+        muonMaxDistanceY = cms.double(5.0),
+        useHO = cms.bool(True),
+        trajectoryUncertaintyTolerance = cms.double(-1.0),
+        usePreshower = cms.bool(False),
+        DTRecSegment4DCollectionLabel = cms.InputTag("dt4DSegments"),
+        EERecHitCollectionLabel = cms.InputTag("ecalRecHit","EcalRecHitsEE"),
+        dRHcalPreselection = cms.double(0.2),
+        useMuon = cms.bool(True),
+        useCalo = cms.bool(False),
+        accountForTrajectoryChangeCalo = cms.bool(False),
+        EBRecHitCollectionLabel = cms.InputTag("ecalRecHit","EcalRecHitsEB"),
+        dRMuonPreselection = cms.double(0.2),
+        truthMatch = cms.bool(False),
+        HBHERecHitCollectionLabel = cms.InputTag("hbhereco"),
+        useHcal = cms.bool(True)
+    ),
+    Deta = cms.double(0.1),
+    FilterRecoLevel = cms.bool(True),
+    CSCSegmentLabel = cms.InputTag("cscSegments"),
+    InnerRMax = cms.double(99999.0),
+    FilterCSCTight = cms.bool(False),
+    L1MuGMTReadoutLabel = cms.InputTag("gtDigis"),
+    MinNumberOfHaloTracks = cms.untracked.int32(1),
+    OuterRMin = cms.double(0.0),
+    InnerRMin = cms.double(0.0),
+    FilterCSCLoose = cms.bool(False),
+    BeamHaloSummaryLabel = cms.InputTag("BeamHaloSummary"),
+    MatchingDEtaThreshold = cms.double(0.4),
+    MatchingDWireThreshold = cms.int32(5),
+    MinNumberOfHaloTriggers = cms.untracked.int32(1),
+    Dphi = cms.double(1.0),
+    CSCRecHitLabel = cms.InputTag("csc2DRecHits"),
+    CSCHaloDataLabel = cms.InputTag("CSCHaloData")
+)
+
+
+process.CSCHaloFilterRecoAndTriggerLevel = cms.EDFilter("CSCHaloFilter",
+    ExpectedBX = cms.int32(3),
+    MinOuterMomentumTheta = cms.double(0.1),
+    MaxDROverDz = cms.double(0.13),
+    CollisionMuonLabel = cms.InputTag("muons"),
+    MatchingDPhiThreshold = cms.double(0.18),
+    MinNumberOfOutOfTimeDigis = cms.untracked.int32(1),
+    MaxOuterMomentumTheta = cms.double(3.0),
+    OuterRMax = cms.double(99999.0),
+    ALCTDigiLabel = cms.InputTag("muonCSCDigis","MuonCSCALCTDigi"),
+    SACosmicMuonLabel = cms.InputTag("cosmicMuons"),
+    NormChi2 = cms.double(8.0),
+    FilterDigiLevel = cms.bool(False),
+    FilterTriggerLevel = cms.bool(True),
+    TrackAssociatorParameters = cms.PSet(
+        muonMaxDistanceSigmaX = cms.double(0.0),
+        muonMaxDistanceSigmaY = cms.double(0.0),
+        CSCSegmentCollectionLabel = cms.InputTag("cscSegments"),
+        dRHcal = cms.double(9999.0),
+        dRPreshowerPreselection = cms.double(0.2),
+        CaloTowerCollectionLabel = cms.InputTag("towerMaker"),
+        useEcal = cms.bool(True),
+        dREcal = cms.double(9999.0),
+        dREcalPreselection = cms.double(0.05),
+        HORecHitCollectionLabel = cms.InputTag("horeco"),
+        dRMuon = cms.double(9999.0),
+        propagateAllDirections = cms.bool(True),
+        muonMaxDistanceX = cms.double(5.0),
+        muonMaxDistanceY = cms.double(5.0),
+        useHO = cms.bool(True),
+        trajectoryUncertaintyTolerance = cms.double(-1.0),
+        usePreshower = cms.bool(False),
+        DTRecSegment4DCollectionLabel = cms.InputTag("dt4DSegments"),
+        EERecHitCollectionLabel = cms.InputTag("ecalRecHit","EcalRecHitsEE"),
+        dRHcalPreselection = cms.double(0.2),
+        useMuon = cms.bool(True),
+        useCalo = cms.bool(False),
+        accountForTrajectoryChangeCalo = cms.bool(False),
+        EBRecHitCollectionLabel = cms.InputTag("ecalRecHit","EcalRecHitsEB"),
+        dRMuonPreselection = cms.double(0.2),
+        truthMatch = cms.bool(False),
+        HBHERecHitCollectionLabel = cms.InputTag("hbhereco"),
+        useHcal = cms.bool(True)
+    ),
+    Deta = cms.double(0.1),
+    FilterRecoLevel = cms.bool(True),
+    CSCSegmentLabel = cms.InputTag("cscSegments"),
+    InnerRMax = cms.double(99999.0),
+    FilterCSCTight = cms.bool(False),
+    L1MuGMTReadoutLabel = cms.InputTag("gtDigis"),
+    MinNumberOfHaloTracks = cms.untracked.int32(1),
+    OuterRMin = cms.double(0.0),
+    InnerRMin = cms.double(0.0),
+    FilterCSCLoose = cms.bool(False),
+    BeamHaloSummaryLabel = cms.InputTag("BeamHaloSummary"),
+    MatchingDEtaThreshold = cms.double(0.4),
+    MatchingDWireThreshold = cms.int32(5),
+    MinNumberOfHaloTriggers = cms.untracked.int32(1),
+    Dphi = cms.double(1.0),
+    CSCRecHitLabel = cms.InputTag("csc2DRecHits"),
+    CSCHaloDataLabel = cms.InputTag("CSCHaloData")
+)
+
+
+process.CSCHaloFilterRecoLevel = cms.EDFilter("CSCHaloFilter",
+    ExpectedBX = cms.int32(3),
+    MinOuterMomentumTheta = cms.double(0.1),
+    MaxDROverDz = cms.double(0.13),
+    CollisionMuonLabel = cms.InputTag("muons"),
+    MatchingDPhiThreshold = cms.double(0.18),
+    MinNumberOfOutOfTimeDigis = cms.untracked.int32(1),
+    MaxOuterMomentumTheta = cms.double(3.0),
+    OuterRMax = cms.double(99999.0),
+    ALCTDigiLabel = cms.InputTag("muonCSCDigis","MuonCSCALCTDigi"),
+    SACosmicMuonLabel = cms.InputTag("cosmicMuons"),
+    NormChi2 = cms.double(8.0),
+    FilterDigiLevel = cms.bool(False),
+    FilterTriggerLevel = cms.bool(False),
+    TrackAssociatorParameters = cms.PSet(
+        muonMaxDistanceSigmaX = cms.double(0.0),
+        muonMaxDistanceSigmaY = cms.double(0.0),
+        CSCSegmentCollectionLabel = cms.InputTag("cscSegments"),
+        dRHcal = cms.double(9999.0),
+        dRPreshowerPreselection = cms.double(0.2),
+        CaloTowerCollectionLabel = cms.InputTag("towerMaker"),
+        useEcal = cms.bool(True),
+        dREcal = cms.double(9999.0),
+        dREcalPreselection = cms.double(0.05),
+        HORecHitCollectionLabel = cms.InputTag("horeco"),
+        dRMuon = cms.double(9999.0),
+        propagateAllDirections = cms.bool(True),
+        muonMaxDistanceX = cms.double(5.0),
+        muonMaxDistanceY = cms.double(5.0),
+        useHO = cms.bool(True),
+        trajectoryUncertaintyTolerance = cms.double(-1.0),
+        usePreshower = cms.bool(False),
+        DTRecSegment4DCollectionLabel = cms.InputTag("dt4DSegments"),
+        EERecHitCollectionLabel = cms.InputTag("ecalRecHit","EcalRecHitsEE"),
+        dRHcalPreselection = cms.double(0.2),
+        useMuon = cms.bool(True),
+        useCalo = cms.bool(False),
+        accountForTrajectoryChangeCalo = cms.bool(False),
+        EBRecHitCollectionLabel = cms.InputTag("ecalRecHit","EcalRecHitsEB"),
+        dRMuonPreselection = cms.double(0.2),
+        truthMatch = cms.bool(False),
+        HBHERecHitCollectionLabel = cms.InputTag("hbhereco"),
+        useHcal = cms.bool(True)
+    ),
+    Deta = cms.double(0.1),
+    FilterRecoLevel = cms.bool(True),
+    CSCSegmentLabel = cms.InputTag("cscSegments"),
+    InnerRMax = cms.double(99999.0),
+    FilterCSCTight = cms.bool(False),
+    L1MuGMTReadoutLabel = cms.InputTag("gtDigis"),
+    MinNumberOfHaloTracks = cms.untracked.int32(1),
+    OuterRMin = cms.double(0.0),
+    InnerRMin = cms.double(0.0),
+    FilterCSCLoose = cms.bool(False),
+    BeamHaloSummaryLabel = cms.InputTag("BeamHaloSummary"),
+    MatchingDEtaThreshold = cms.double(0.4),
+    MatchingDWireThreshold = cms.int32(5),
+    MinNumberOfHaloTriggers = cms.untracked.int32(1),
+    Dphi = cms.double(1.0),
+    CSCRecHitLabel = cms.InputTag("csc2DRecHits"),
+    CSCHaloDataLabel = cms.InputTag("CSCHaloData")
+)
+
+
+process.CSCHaloFilterTriggerLevel = cms.EDFilter("CSCHaloFilter",
+    ExpectedBX = cms.int32(3),
+    MinOuterMomentumTheta = cms.double(0.1),
+    MaxDROverDz = cms.double(0.13),
+    CollisionMuonLabel = cms.InputTag("muons"),
+    MatchingDPhiThreshold = cms.double(0.18),
+    MinNumberOfOutOfTimeDigis = cms.untracked.int32(1),
+    MaxOuterMomentumTheta = cms.double(3.0),
+    OuterRMax = cms.double(99999.0),
+    ALCTDigiLabel = cms.InputTag("muonCSCDigis","MuonCSCALCTDigi"),
+    SACosmicMuonLabel = cms.InputTag("cosmicMuons"),
+    NormChi2 = cms.double(8.0),
+    FilterDigiLevel = cms.bool(False),
+    FilterTriggerLevel = cms.bool(True),
+    TrackAssociatorParameters = cms.PSet(
+        muonMaxDistanceSigmaX = cms.double(0.0),
+        muonMaxDistanceSigmaY = cms.double(0.0),
+        CSCSegmentCollectionLabel = cms.InputTag("cscSegments"),
+        dRHcal = cms.double(9999.0),
+        dRPreshowerPreselection = cms.double(0.2),
+        CaloTowerCollectionLabel = cms.InputTag("towerMaker"),
+        useEcal = cms.bool(True),
+        dREcal = cms.double(9999.0),
+        dREcalPreselection = cms.double(0.05),
+        HORecHitCollectionLabel = cms.InputTag("horeco"),
+        dRMuon = cms.double(9999.0),
+        propagateAllDirections = cms.bool(True),
+        muonMaxDistanceX = cms.double(5.0),
+        muonMaxDistanceY = cms.double(5.0),
+        useHO = cms.bool(True),
+        trajectoryUncertaintyTolerance = cms.double(-1.0),
+        usePreshower = cms.bool(False),
+        DTRecSegment4DCollectionLabel = cms.InputTag("dt4DSegments"),
+        EERecHitCollectionLabel = cms.InputTag("ecalRecHit","EcalRecHitsEE"),
+        dRHcalPreselection = cms.double(0.2),
+        useMuon = cms.bool(True),
+        useCalo = cms.bool(False),
+        accountForTrajectoryChangeCalo = cms.bool(False),
+        EBRecHitCollectionLabel = cms.InputTag("ecalRecHit","EcalRecHitsEB"),
+        dRMuonPreselection = cms.double(0.2),
+        truthMatch = cms.bool(False),
+        HBHERecHitCollectionLabel = cms.InputTag("hbhereco"),
+        useHcal = cms.bool(True)
+    ),
+    Deta = cms.double(0.1),
+    FilterRecoLevel = cms.bool(False),
+    CSCSegmentLabel = cms.InputTag("cscSegments"),
+    InnerRMax = cms.double(99999.0),
+    FilterCSCTight = cms.bool(False),
+    L1MuGMTReadoutLabel = cms.InputTag("gtDigis"),
+    MinNumberOfHaloTracks = cms.untracked.int32(1),
+    OuterRMin = cms.double(0.0),
+    InnerRMin = cms.double(0.0),
+    FilterCSCLoose = cms.bool(False),
+    BeamHaloSummaryLabel = cms.InputTag("BeamHaloSummary"),
+    MatchingDEtaThreshold = cms.double(0.4),
+    MatchingDWireThreshold = cms.int32(5),
+    MinNumberOfHaloTriggers = cms.untracked.int32(1),
+    Dphi = cms.double(1.0),
+    CSCRecHitLabel = cms.InputTag("csc2DRecHits"),
+    CSCHaloDataLabel = cms.InputTag("CSCHaloData")
+)
+
+
+process.CSCLooseHaloFilter = cms.EDFilter("CSCHaloFilter",
+    ExpectedBX = cms.int32(3),
+    MinOuterMomentumTheta = cms.double(0.1),
+    MaxDROverDz = cms.double(0.13),
+    CollisionMuonLabel = cms.InputTag("muons"),
+    MatchingDPhiThreshold = cms.double(0.18),
+    MinNumberOfOutOfTimeDigis = cms.untracked.int32(1),
+    MaxOuterMomentumTheta = cms.double(3.0),
+    OuterRMax = cms.double(99999.0),
+    ALCTDigiLabel = cms.InputTag("muonCSCDigis","MuonCSCALCTDigi"),
+    SACosmicMuonLabel = cms.InputTag("cosmicMuons"),
+    NormChi2 = cms.double(8.0),
+    FilterDigiLevel = cms.bool(True),
+    FilterTriggerLevel = cms.bool(True),
+    TrackAssociatorParameters = cms.PSet(
+        muonMaxDistanceSigmaX = cms.double(0.0),
+        muonMaxDistanceSigmaY = cms.double(0.0),
+        CSCSegmentCollectionLabel = cms.InputTag("cscSegments"),
+        dRHcal = cms.double(9999.0),
+        dRPreshowerPreselection = cms.double(0.2),
+        CaloTowerCollectionLabel = cms.InputTag("towerMaker"),
+        useEcal = cms.bool(True),
+        dREcal = cms.double(9999.0),
+        dREcalPreselection = cms.double(0.05),
+        HORecHitCollectionLabel = cms.InputTag("horeco"),
+        dRMuon = cms.double(9999.0),
+        propagateAllDirections = cms.bool(True),
+        muonMaxDistanceX = cms.double(5.0),
+        muonMaxDistanceY = cms.double(5.0),
+        useHO = cms.bool(True),
+        trajectoryUncertaintyTolerance = cms.double(-1.0),
+        usePreshower = cms.bool(False),
+        DTRecSegment4DCollectionLabel = cms.InputTag("dt4DSegments"),
+        EERecHitCollectionLabel = cms.InputTag("ecalRecHit","EcalRecHitsEE"),
+        dRHcalPreselection = cms.double(0.2),
+        useMuon = cms.bool(True),
+        useCalo = cms.bool(False),
+        accountForTrajectoryChangeCalo = cms.bool(False),
+        EBRecHitCollectionLabel = cms.InputTag("ecalRecHit","EcalRecHitsEB"),
+        dRMuonPreselection = cms.double(0.2),
+        truthMatch = cms.bool(False),
+        HBHERecHitCollectionLabel = cms.InputTag("hbhereco"),
+        useHcal = cms.bool(True)
+    ),
+    Deta = cms.double(0.1),
+    FilterRecoLevel = cms.bool(True),
+    CSCSegmentLabel = cms.InputTag("cscSegments"),
+    InnerRMax = cms.double(99999.0),
+    FilterCSCTight = cms.bool(False),
+    L1MuGMTReadoutLabel = cms.InputTag("gtDigis"),
+    MinNumberOfHaloTracks = cms.untracked.int32(1),
+    OuterRMin = cms.double(0.0),
+    InnerRMin = cms.double(0.0),
+    FilterCSCLoose = cms.bool(True),
+    BeamHaloSummaryLabel = cms.InputTag("BeamHaloSummary"),
+    MatchingDEtaThreshold = cms.double(0.4),
+    MatchingDWireThreshold = cms.int32(5),
+    MinNumberOfHaloTriggers = cms.untracked.int32(1),
+    Dphi = cms.double(1.0),
+    CSCRecHitLabel = cms.InputTag("csc2DRecHits"),
+    CSCHaloDataLabel = cms.InputTag("CSCHaloData")
+)
+
+
+process.CSCTightHaloFilter = cms.EDFilter("CSCHaloFilter",
+    ExpectedBX = cms.int32(3),
+    MinOuterMomentumTheta = cms.double(0.1),
+    MaxDROverDz = cms.double(0.13),
+    CollisionMuonLabel = cms.InputTag("muons"),
+    MatchingDPhiThreshold = cms.double(0.18),
+    MinNumberOfOutOfTimeDigis = cms.untracked.int32(1),
+    MaxOuterMomentumTheta = cms.double(3.0),
+    OuterRMax = cms.double(99999.0),
+    ALCTDigiLabel = cms.InputTag("muonCSCDigis","MuonCSCALCTDigi"),
+    SACosmicMuonLabel = cms.InputTag("cosmicMuons"),
+    NormChi2 = cms.double(8.0),
+    FilterDigiLevel = cms.bool(True),
+    FilterTriggerLevel = cms.bool(True),
+    TrackAssociatorParameters = cms.PSet(
+        muonMaxDistanceSigmaX = cms.double(0.0),
+        muonMaxDistanceSigmaY = cms.double(0.0),
+        CSCSegmentCollectionLabel = cms.InputTag("cscSegments"),
+        dRHcal = cms.double(9999.0),
+        dRPreshowerPreselection = cms.double(0.2),
+        CaloTowerCollectionLabel = cms.InputTag("towerMaker"),
+        useEcal = cms.bool(True),
+        dREcal = cms.double(9999.0),
+        dREcalPreselection = cms.double(0.05),
+        HORecHitCollectionLabel = cms.InputTag("horeco"),
+        dRMuon = cms.double(9999.0),
+        propagateAllDirections = cms.bool(True),
+        muonMaxDistanceX = cms.double(5.0),
+        muonMaxDistanceY = cms.double(5.0),
+        useHO = cms.bool(True),
+        trajectoryUncertaintyTolerance = cms.double(-1.0),
+        usePreshower = cms.bool(False),
+        DTRecSegment4DCollectionLabel = cms.InputTag("dt4DSegments"),
+        EERecHitCollectionLabel = cms.InputTag("ecalRecHit","EcalRecHitsEE"),
+        dRHcalPreselection = cms.double(0.2),
+        useMuon = cms.bool(True),
+        useCalo = cms.bool(False),
+        accountForTrajectoryChangeCalo = cms.bool(False),
+        EBRecHitCollectionLabel = cms.InputTag("ecalRecHit","EcalRecHitsEB"),
+        dRMuonPreselection = cms.double(0.2),
+        truthMatch = cms.bool(False),
+        HBHERecHitCollectionLabel = cms.InputTag("hbhereco"),
+        useHcal = cms.bool(True)
+    ),
+    Deta = cms.double(0.1),
+    FilterRecoLevel = cms.bool(True),
+    CSCSegmentLabel = cms.InputTag("cscSegments"),
+    InnerRMax = cms.double(99999.0),
+    FilterCSCTight = cms.bool(True),
+    L1MuGMTReadoutLabel = cms.InputTag("gtDigis"),
+    MinNumberOfHaloTracks = cms.untracked.int32(1),
+    OuterRMin = cms.double(0.0),
+    InnerRMin = cms.double(0.0),
+    FilterCSCLoose = cms.bool(False),
+    BeamHaloSummaryLabel = cms.InputTag("BeamHaloSummary"),
+    MatchingDEtaThreshold = cms.double(0.4),
+    MatchingDWireThreshold = cms.int32(5),
+    MinNumberOfHaloTriggers = cms.untracked.int32(1),
+    Dphi = cms.double(1.0),
+    CSCRecHitLabel = cms.InputTag("csc2DRecHits"),
+    CSCHaloDataLabel = cms.InputTag("CSCHaloData")
+)
+
+
 process.EcalDeadCellTriggerPrimitiveFilter = cms.EDFilter("EcalDeadCellTriggerPrimitiveFilter",
     maskedEcalChannelStatusThreshold = cms.int32(1),
     ebReducedRecHitCollection = cms.InputTag("reducedEcalRecHitsEB"),
@@ -23150,6 +23971,18 @@ process.countPatTausPF = cms.EDFilter("PATCandViewCountFilter",
 )
 
 
+process.eeBadScFilter = cms.EDFilter("EEBadScFilter",
+    SCsize = cms.int32(5),
+    badscEE = cms.vint32(-1023023, 1048098, -1078063),
+    EtminSC = cms.double(1000.0),
+    EminHit = cms.double(1000.0),
+    EERecHitSource = cms.InputTag("reducedEcalRecHitsEE"),
+    taggingMode = cms.bool(False),
+    debug = cms.bool(False),
+    nBadHitsSC = cms.int32(2)
+)
+
+
 process.flavorHistoryFilter = cms.EDFilter("FlavorHistoryFilter",
     bsrc = cms.InputTag("bFlavorHistoryProducer","bPartonFlavorHistory"),
     pathToSelect = cms.int32(-1),
@@ -23174,6 +24007,22 @@ process.goodVertices = cms.EDFilter("VertexSelector",
     filter = cms.bool(False),
     src = cms.InputTag("offlinePrimaryVertices"),
     cut = cms.string('!isFake && ndof > 4 && abs(z) <= 24 && position.Rho <= 2')
+)
+
+
+process.hcalLaserEventFilter = cms.EDFilter("HcalLaserEventFilter",
+    vetoByHBHEOccupancy = cms.untracked.bool(True),
+    maxerrormessage = cms.untracked.int32(5),
+    forceUseRecHitCollection = cms.untracked.bool(False),
+    forceUseHcalNoiseSummary = cms.untracked.bool(False),
+    hbheInputLabel = cms.untracked.InputTag("hbhereco"),
+    minOccupiedHBHE = cms.untracked.uint32(4000),
+    taggingMode = cms.bool(False),
+    debug = cms.untracked.bool(False),
+    vetoByRunEventNumber = cms.untracked.bool(False),
+    reverseFilter = cms.untracked.bool(False),
+    BadRunEventNumbers = (cms.untracked.vuint32(160957, 146483131, 160957, 146483132, 160957, 367078426, 163289, 120704451, 163289, 120704452, 163332, 300924904, 163587, 5705088, 163588, 86700074, 163659, 269761831, 163659, 379050220, 165415, 696548170, 165415, 696548171, 165617, 295894671, 165617, 295894672, 165993, 120876169, 165993, 120876170, 166011, 58123616, 166011, 58123617, 166380, 833988349, 166380, 833988350, 166380, 874735805, 166380, 874735806, 166380, 915050480, 166380, 1037024294, 166512, 1222721981, 166512, 1222721982, 166563, 299342294, 166563, 299431306, 166563, 299431307, 166563, 299645965, 166699, 908134746, 166699, 908134747, 167281, 115904577, 167282, 286707493, 167282, 286707494, 167282, 286766119, 167282, 286766120, 167284, 44118160, 167284, 44118161, 167551, 365086623, 167551, 365086624, 167674, 59067344, 167674, 59067345, 167675, 227610655, 167675, 227610656, 167754, 73011356, 167754, 73011357, 167807, 1202030368, 167807, 1202030369, 167898, 568063754, 167898, 568063755, 167898, 718530727, 167969, 3462839, 167969, 3462840, 167969, 9442755, 167969, 9442756, 167969, 11435992, 167969, 11435993, 170255, 83361834, 170255, 83361835, 170304, 57541359, 170304, 57541360, 170854, 291050200, 170854, 291050201, 170854, 329611102, 170854, 329611103, 170899, 39787119, 170899, 39787120, 171091, 9021397, 171091, 9021398, 171091, 97261559, 171091, 97261560, 171156, 369378017, 171156, 369378018, 171897, 353709470, 172033, 412685841, 172033, 412685842, 172033, 885328695, 172033, 982705197, 172033, 982705198, 172163, 530358965, 172389, 45660388, 172389, 45660389, 172411, 173742880, 172411, 173742881, 172478, 53762243, 172478, 53762244, 172478, 54053290, 172478, 54092625, 172478, 54092626, 172478, 54092948, 172478, 98093904, 172478, 98093905, 172485, 424192588, 172485, 424192589, 172791, 966404647, 172802, 464891113, 172802, 464891114, 172802, 464892883, 172802, 464892884, 172819, 81201593, 172822, 1074244840, 172822, 2836941609, 172868, 393947631, 172868, 393947632, 172868, 1421063049, 172868, 1421063050, 172868, 1421076216, 172868, 1421076217, 172868, 2012432054, 172868, 2012432055, 172868, 2137890207, 172868, 2137890208, 173198, 741435194, 173198, 741435195, 173198, 1009198868, 173198, 1009198869, 173226, 781573, 173226, 781574, 173241, 746837625, 173241, 746837626, 173380, 21324672, 173380, 21324673, 173659, 128113809, 173659, 128113810, 173662, 10511470, 173662, 10511471, 173692)+cms.untracked.vuint32(755803939, 173692, 2597438478, 173692, 2597438479, 174809, 777532, 174809, 777533, 175560, 2368923, 175560, 2368924, 175560, 7580776, 175834, 105072341, 175834, 105072342, 175866, 343429213, 175866, 343429214, 175875, 182390835, 175875, 182390836, 175888, 49192628, 175888, 49192629, 175888, 128999776, 175888, 128999777, 175973, 122366434, 175973, 122366435, 175976, 80421989, 175976, 80421990, 175990, 6376426, 175990, 6376427, 175990, 75007084, 175990, 75007085, 175990, 146437701, 175990, 146437702, 176161, 15560079, 176161, 15560080, 176202, 119772380, 176202, 119772381, 176202, 324604001, 176202, 324604002, 176309, 233512658, 176309, 233512659, 176309, 935495115, 176309, 935495116, 176309, 1331935829, 176309, 1331935830, 176309, 2496631352, 176697, 403510, 176697, 403511, 176701, 73573187, 176701, 73573188, 176702, 11693970, 176702, 11693971, 176702, 67569367, 176702, 67569368, 176801, 410530622, 176929, 460082240, 176929, 460082241, 176954, 138469, 176954, 138470, 177053, 327815438, 177053, 327815439, 177074, 154911610, 177074, 154911611, 177140, 785923000, 177317, 72936561, 177317, 72936562, 177317, 73219012, 177317, 73219013, 177449, 275466422, 177449, 275466423, 177452, 226991391, 177452, 226991392, 177509, 99081581, 177509, 99081582, 177509, 314204437, 177509, 314204438, 177509, 314319381, 177509, 314319382, 177515, 291757022, 177515, 291757023, 177515, 1103056195, 177515, 1103056196, 177515, 1534353246, 177515, 1534353247, 177718, 890704274, 177718, 890704275, 177719, 294071879, 177719, 294071880, 177730, 1850737398, 177730, 1850737399, 177730, 2007600403, 177730, 2007600404, 177730, 2563818242, 177730, 2563818243, 177790, 507968788, 177790, 507968789, 177790, 772640382, 177790, 772640383, 177791, 89470582, 177791, 89470583, 177875, 647616276, 177875, 647616277, 178041, 783372, 178041, 783394, 178041, 783395, 178041, 784044, 178041, 784045, 178041, 784499, 178041, 784500, 178041, 784551, 178041, 784552, 178041, 786438, 178041, 786439, 178041, 786770, 178041, 786771, 178041, 787142, 178041, 787143, 178041, 787202, 178100, 898633273, 178100, 1566052885, 178100, 1566052886, 178116, 453801141, 178116, 453801142, 178424, 630485076, 178424, 630485077, 178667, 494184, 178667, 494185, 178667, 51504048, 178667, 51504049, 178825, 149780, 178825, 149781, 178866, 410333501, 178866, 410333502)+cms.untracked.vuint32(178866, 651783943, 178866, 651783944, 178871, 236100751, 178970, 660540406, 178970, 660540407, 178985, 85355292, 178985, 85355293, 179547, 21999275, 179547, 21999276, 179563, 143108913, 179563, 143108914, 179563, 391201547, 179563, 391201548, 180163, 7578238, 180163, 7578239, 180222, 6076323, 180222, 24642472, 180241, 500046589, 180241, 500562971, 180241, 500562972, 180250, 371542986, 180250, 371542987, 180275, 10578469, 180275, 10578470, 180275, 10583104, 180275, 10583105)),
+    hcalNoiseSummaryLabel = cms.untracked.InputTag("hcalnoise")
 )
 
 
@@ -23716,6 +24565,17 @@ process.patCandidateSummaryPF = cms.EDAnalyzer("CandidateSummaryTable",
 )
 
 
+process.printTree = cms.EDAnalyzer("ParticleTreeDrawer",
+    status = cms.untracked.vint32(1, 2, 3),
+    src = cms.InputTag("genParticles"),
+    printP4 = cms.untracked.bool(False),
+    printStatus = cms.untracked.bool(True),
+    printIndex = cms.untracked.bool(False),
+    printVertex = cms.untracked.bool(False),
+    printPtEtaPhi = cms.untracked.bool(False)
+)
+
+
 process.selectedPatCandidateSummary = cms.EDAnalyzer("CandidateSummaryTable",
     logName = cms.untracked.string('selectedPatCanddiates|PATSummaryTables'),
     candidates = cms.VInputTag(cms.InputTag("selectedPatElectrons"), cms.InputTag("selectedPatMuons"), cms.InputTag("selectedPatTaus"), cms.InputTag("selectedPatPhotons"), cms.InputTag("selectedPatJets"), 
@@ -23735,10 +24595,7 @@ process.out = cms.OutputModule("PoolOutputModule",
     SelectEvents = cms.untracked.PSet(
         SelectEvents = cms.vstring('p')
     ),
-    outputCommands = cms.untracked.vstring('drop *', 
-        'keep *_*SUSYTupelizer*_*_*', 
-        'keep *_*EventCounter*_*_*', 
-        'keep *_genParticles_*_*')
+    outputCommands = cms.untracked.vstring('keep *')
 )
 
 
@@ -23748,7 +24605,7 @@ process.patElectronTrackIsolation = cms.Sequence(process.eleIsoDepositTk+process
 process.pfMEtSysShiftCorrSequence = cms.Sequence(process.selectedVerticesForMEtCorr+process.pfMEtSysShiftCorr)
 
 
-process.filterSequence = cms.Sequence(process.EventCounter+process.hltFilter+process.EventCounterAfterHLT+process.scrapingVeto+process.EventCounterAfterScraping+process.primaryVertexFilter+process.EventCounterAfterPV+process.goodVertices+process.trackingFailureFilter+process.EventCounterAfterTrackingFailure+process.EcalDeadCellTriggerPrimitiveFilter+process.EventCounterAfterECALTP)
+process.filterSequence = cms.Sequence(process.EventCounter+process.hltFilter+process.EventCounterAfterHLT+process.scrapingVeto+process.EventCounterAfterScraping+process.primaryVertexFilter+process.EventCounterAfterPV+process.HBHENoiseFilter+process.EventCounterAfterHBHE+process.goodVertices+process.trackingFailureFilter+process.EventCounterAfterTrackingFailure+process.hcalLaserEventFilter+process.EventCounterAfterLaser+process.CSCTightHaloFilter+process.EventCounterAfterCSC+process.eeBadScFilter+process.EventCounterAfterEEBadSC+process.EcalDeadCellTriggerPrimitiveFilter+process.EventCounterAfterECALTP)
 
 
 process.electronPFIsolationDepositsSequencePF = cms.Sequence(process.elPFIsoDepositChargedPF+process.elPFIsoDepositChargedAllPF+process.elPFIsoDepositGammaPF+process.elPFIsoDepositNeutralPF+process.elPFIsoDepositPUPF)
@@ -23764,6 +24621,9 @@ process.producePFMETCorrectionsPF = cms.Sequence(process.pfCandsNotInJetPF+proce
 
 
 process.patJetFlavourIdPF = cms.Sequence(process.patJetPartonsPF+process.patJetPartonAssociationPF+process.patJetFlavourAssociationPF)
+
+
+process.CSCHaloFilterDigiOrRecoLevel = cms.Sequence(process.CSCHaloFilterDigiLevel+process.CSCHaloFilterRecoLevel)
 
 
 process.makePatElectrons = cms.Sequence(process.electronMatch+process.patElectrons)
@@ -23814,13 +24674,16 @@ process.electronPFIsolationDepositsSequencePFIso = cms.Sequence(process.elPFIsoD
 process.triggerMatchingDefaultSequence = cms.Sequence(process.cleanMuonTriggerMatchHLTMu20+process.cleanMuonTriggerMatchHLTDoubleMu6+process.cleanPhotonTriggerMatchHLTPhoton26IsoVLPhoton18+process.cleanElectronTriggerMatchHLTEle27CaloIdVTCaloIsoTTrkIdTTrkIsoT+process.cleanTauTriggerMatchHLTDoubleIsoPFTau20Trk5+process.cleanJetTriggerMatchHLTJet240+process.metTriggerMatchHLTMET100+process.cleanMuonTriggerMatchHLTMu17CentralJet30+process.cleanJetTriggerMatchHLTMu17CentralJet30)
 
 
+process.CSCHaloFilterDigiOrRecoOrTriggerLevel = cms.Sequence(process.CSCHaloFilterDigiLevel+process.CSCHaloFilterRecoLevel+process.CSCHaloFilterTriggerLevel)
+
+
 process.makePatMuons = cms.Sequence(process.muonMatch+process.patMuons)
 
 
 process.pfSortByTypeSequence = cms.Sequence(process.pfAllNeutralHadrons+process.pfAllChargedHadrons+process.pfAllPhotons+process.pfAllChargedParticles+process.pfPileUpAllChargedParticles+process.pfAllNeutralHadronsAndPhotons)
 
 
-process.photonPFIsolationDepositsSequencePF = cms.Sequence(process.phPFIsoDepositChargedPF+process.phPFIsoDepositChargedAllPF+process.phPFIsoDepositGammaPF+process.phPFIsoDepositNeutralPF+process.phPFIsoDepositPUPF)
+process.genForPF2PATSequence = cms.Sequence(process.genParticlesForJetsNoNu+process.iterativeCone5GenJetsNoNu+process.ak5GenJetsNoNu+process.ak7GenJetsNoNu)
 
 
 process.patJetFlavourId = cms.Sequence(process.patJetPartons+process.patJetPartonAssociation+process.patJetFlavourAssociation)
@@ -23871,6 +24734,9 @@ process.patPhotonTrackIsolation = cms.Sequence(process.gamIsoDepositTk+process.g
 process.pfTausBaseSequence = cms.Sequence(process.pfTausProducerSansRefs+process.pfTausProducer+process.pfTausDiscriminationByLeadingTrackFinding+process.pfTausDiscriminationByLeadingPionPtCut+process.pfTausDiscriminationByIsolation)
 
 
+process.CSCHaloFilterRecoOrTriggerLevel = cms.Sequence(process.CSCHaloFilterTriggerLevel+process.CSCHaloFilterRecoLevel)
+
+
 process.patDefaultSequenceTrigger = cms.Sequence(process.patTrigger)
 
 
@@ -23910,7 +24776,7 @@ process.hpsPFTauDiscriminationByIsolationSeq = cms.Sequence(process.hpsPFTauDisc
 process.recoAllGenJetsNoMuNoNu = cms.Sequence(process.sisCone5GenJetsNoMuNoNu+process.sisCone7GenJetsNoMuNoNu+process.kt4GenJetsNoMuNoNu+process.kt6GenJetsNoMuNoNu+process.iterativeCone5GenJetsNoMuNoNu+process.ak5GenJetsNoMuNoNu+process.ak7GenJetsNoMuNoNu+process.gk5GenJetsNoMuNoNu+process.gk7GenJetsNoMuNoNu+process.ca4GenJetsNoMuNoNu+process.ca6GenJetsNoMuNoNu)
 
 
-process.genForPF2PATSequence = cms.Sequence(process.genParticlesForJetsNoNu+process.iterativeCone5GenJetsNoNu+process.ak5GenJetsNoNu+process.ak7GenJetsNoNu)
+process.photonPFIsolationDepositsSequencePF = cms.Sequence(process.phPFIsoDepositChargedPF+process.phPFIsoDepositChargedAllPF+process.phPFIsoDepositGammaPF+process.phPFIsoDepositNeutralPF+process.phPFIsoDepositPUPF)
 
 
 process.hpsPFTauDiscriminationByIsolationSeqPF = cms.Sequence(process.hpsPFTauDiscriminationByVLooseIsolationPF+process.hpsPFTauDiscriminationByLooseIsolationPF+process.hpsPFTauDiscriminationByMediumIsolationPF+process.hpsPFTauDiscriminationByTightIsolationPF)
@@ -23985,6 +24851,9 @@ process.eleIsoSequence = cms.Sequence(process.pfElectronIsolationSequencePFIso)
 process.patElectronEcalIsolation = cms.Sequence(process.eleIsoDepositEcalFromHits+process.eleIsoFromDepsEcalFromHitsByCrystal)
 
 
+process.puJetIdSequencepatJetsAK5PF = cms.Sequence(process.puJetIdpatJetsAK5PF+process.puJetMvapatJetsAK5PF)
+
+
 process.selectedPatCandidates = cms.Sequence(process.selectedPatElectrons+process.selectedPatMuons+process.selectedPatTaus+process.selectedPatPhotons+process.selectedPatJets+process.selectedPatCandidateSummary)
 
 
@@ -24036,6 +24905,9 @@ process.pfElectronSequencePF = cms.Sequence(process.pfAllElectronsPF+process.pfE
 process.makePatElectronsPF = cms.Sequence(process.electronMatchPF+process.patElectronsPF)
 
 
+process.CSCHaloFilterDigiOrTriggerLevel = cms.Sequence(process.CSCHaloFilterDigiLevel+process.CSCHaloFilterTriggerLevel)
+
+
 process.pfJetSequencePF = cms.Sequence(process.pfJetsPF)
 
 
@@ -24058,6 +24930,9 @@ process.pfPhotonSequence = cms.Sequence(process.pfSelectedPhotons+process.pfPhot
 
 
 process.pfTauSequence = cms.Sequence(process.pfTausPreSequence+process.pfTausBaseSequence+process.pfTaus)
+
+
+process.CSCHaloFilter_DigiAndReco_Or_DigiAndTrigger_Or_RecoAndTrigger = cms.Sequence(process.CSCHaloFilterRecoAndTriggerLevel+process.CSCHaloFilterDigiAndTriggerLevel+process.CSCHaloFilterDigiAndRecoLevel)
 
 
 process.pfSortByTypeSequencePF = cms.Sequence(process.pfAllNeutralHadronsPF+process.pfAllChargedHadronsPF+process.pfAllPhotonsPF+process.pfAllChargedParticlesPF+process.pfPileUpAllChargedParticlesPF+process.pfAllNeutralHadronsAndPhotonsPF)
@@ -24213,7 +25088,7 @@ process.patPF2PATSequence = cms.Sequence(process.PFBRECO+process.patDefaultSeque
 process.susyPatDefaultSequence = cms.Sequence(process.eventCountProducer+process.patPF2PATSequence+process.patPF2PATSequencePF)
 
 
-process.p = cms.Path(process.goodOfflinePrimaryVertices+process.filterSequence+process.susyPatDefaultSequence+process.kt6PFJetsForIsolation2011+process.pfMEtSysShiftCorrSequence+process.producePFMETCorrections+process.type0PFMEtCorrection+process.pfType1Type0PFCandidateCorrectedMet+process.pfType1PhiCorrectedMet+process.patPFMETsTypeIcorrected+process.patPFMETsTypeIPhicorrected+process.patPFMETsTypeIType0PFCandcorrected+process.rawpfMet+process.patRAWPFMETs+process.pdfWeights+process.bFlavorHistoryProducer+process.cFlavorHistoryProducer+process.flavorHistoryFilter+process.SUSYTupelizer)
+process.p = cms.Path(process.goodOfflinePrimaryVertices+process.filterSequence+process.susyPatDefaultSequence+process.puJetIdpatJetsAK5PF+process.puJetMvapatJetsAK5PF+process.kt6PFJetsForIsolation2011+process.pfMEtSysShiftCorrSequence+process.producePFMETCorrections+process.type0PFMEtCorrection+process.pfType1Type0PFCandidateCorrectedMet+process.pfType1PhiCorrectedMet+process.patPFMETsTypeIcorrected+process.patPFMETsTypeIPhicorrected+process.patPFMETsTypeIType0PFCandcorrected+process.rawpfMet+process.patRAWPFMETs+process.bFlavorHistoryProducer+process.cFlavorHistoryProducer+process.flavorHistoryFilter+process.SUSYTupelizer)
 
 
 process.outpath = cms.EndPath(process.out)
@@ -26181,7 +27056,12 @@ process.GlobalTag = cms.ESSource("PoolDBESSource",
     BlobStreamerName = cms.untracked.string('TBufferBlobStreamingService'),
     toGet = cms.VPSet(),
     connect = cms.string('frontier://FrontierProd/CMS_COND_31X_GLOBALTAG'),
-    globaltag = cms.string('START52_V9B::All')
+    globaltag = cms.string('START53_V7F::All')
+)
+
+
+process.HepPDTESSource = cms.ESSource("HepPDTESSource",
+    pdtFileName = cms.FileInPath('SimGeneral/HepPDTESSource/data/pythiaparticle.tbl')
 )
 
 
@@ -26693,6 +27573,69 @@ process.ThreeProngOnePiZeroIso = cms.PSet(
     decayModeIndices = cms.vint32(11)
 )
 
+process.TrackAssociatorParameterBlock = cms.PSet(
+    TrackAssociatorParameters = cms.PSet(
+        muonMaxDistanceSigmaX = cms.double(0.0),
+        muonMaxDistanceSigmaY = cms.double(0.0),
+        CSCSegmentCollectionLabel = cms.InputTag("cscSegments"),
+        dRHcal = cms.double(9999.0),
+        dRPreshowerPreselection = cms.double(0.2),
+        CaloTowerCollectionLabel = cms.InputTag("towerMaker"),
+        useEcal = cms.bool(True),
+        dREcal = cms.double(9999.0),
+        dREcalPreselection = cms.double(0.05),
+        HORecHitCollectionLabel = cms.InputTag("horeco"),
+        dRMuon = cms.double(9999.0),
+        propagateAllDirections = cms.bool(True),
+        muonMaxDistanceX = cms.double(5.0),
+        muonMaxDistanceY = cms.double(5.0),
+        useHO = cms.bool(True),
+        trajectoryUncertaintyTolerance = cms.double(-1.0),
+        usePreshower = cms.bool(False),
+        DTRecSegment4DCollectionLabel = cms.InputTag("dt4DSegments"),
+        EERecHitCollectionLabel = cms.InputTag("ecalRecHit","EcalRecHitsEE"),
+        dRHcalPreselection = cms.double(0.2),
+        useMuon = cms.bool(True),
+        useCalo = cms.bool(False),
+        accountForTrajectoryChangeCalo = cms.bool(False),
+        EBRecHitCollectionLabel = cms.InputTag("ecalRecHit","EcalRecHitsEB"),
+        dRMuonPreselection = cms.double(0.2),
+        truthMatch = cms.bool(False),
+        HBHERecHitCollectionLabel = cms.InputTag("hbhereco"),
+        useHcal = cms.bool(True)
+    )
+)
+
+process.TrackAssociatorParameters = cms.PSet(
+    muonMaxDistanceSigmaX = cms.double(0.0),
+    muonMaxDistanceSigmaY = cms.double(0.0),
+    CSCSegmentCollectionLabel = cms.InputTag("cscSegments"),
+    dRHcal = cms.double(9999.0),
+    dREcal = cms.double(9999.0),
+    CaloTowerCollectionLabel = cms.InputTag("towerMaker"),
+    useEcal = cms.bool(True),
+    dREcalPreselection = cms.double(0.05),
+    HORecHitCollectionLabel = cms.InputTag("horeco"),
+    dRMuon = cms.double(9999.0),
+    propagateAllDirections = cms.bool(True),
+    muonMaxDistanceX = cms.double(5.0),
+    muonMaxDistanceY = cms.double(5.0),
+    useHO = cms.bool(True),
+    trajectoryUncertaintyTolerance = cms.double(-1.0),
+    usePreshower = cms.bool(False),
+    DTRecSegment4DCollectionLabel = cms.InputTag("dt4DSegments"),
+    EERecHitCollectionLabel = cms.InputTag("ecalRecHit","EcalRecHitsEE"),
+    dRHcalPreselection = cms.double(0.2),
+    useMuon = cms.bool(True),
+    useCalo = cms.bool(False),
+    accountForTrajectoryChangeCalo = cms.bool(False),
+    EBRecHitCollectionLabel = cms.InputTag("ecalRecHit","EcalRecHitsEB"),
+    dRMuonPreselection = cms.double(0.2),
+    truthMatch = cms.bool(False),
+    HBHERecHitCollectionLabel = cms.InputTag("hbhereco"),
+    useHcal = cms.bool(True)
+)
+
 process.combinedSecondaryVertexCommon = cms.PSet(
     trackPseudoSelection = cms.PSet(
         totalHitsMin = cms.uint32(0),
@@ -26994,7 +27937,7 @@ process.looseSoftPFElectronCleanerForwardCuts = cms.PSet(
 )
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(1000)
+    input = cms.untracked.int32(10)
 )
 
 process.mediumSoftPFElectronCleanerBarrelCuts = cms.PSet(
