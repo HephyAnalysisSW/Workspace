@@ -281,6 +281,10 @@ public:
   std::string btagPure_;
   double btagPureWP_;
   bool hasL1Trigger_;
+  edm::InputTag puJetIdCutBased_;
+  edm::InputTag puJetIdFull53X_;
+  edm::InputTag puJetIdMET53X_;
+
   private:
   bool hlt_initialized_;
   std::vector<std::string> HLT_names_;

@@ -39,8 +39,8 @@ options.register ('addRA4Info',True,
           VarParsing.VarParsing.varType.bool,
           "whether or not to add RA4 specific Info")
 
-#infiles = ['file:/data/schoef/local/TTJets-53X-syncfile-AODSIM.root']
-infiles = ['/store/caf/user/imikulec/lstop/Hadronizer_SMS_Scans_2jets_Qcut44_TuneZ2star_8TeV_madgraph_tauola_cff_py_GEN_FASTSIM_HLT_PU.root']
+infiles = ['file:/data/schoef/local/TTJets-53X-syncfile-AODSIM.root']
+#infiles = ['/store/caf/user/imikulec/lstop/Hadronizer_SMS_Scans_2jets_Qcut44_TuneZ2star_8TeV_madgraph_tauola_cff_py_GEN_FASTSIM_HLT_PU.root']
 #infiles = ['file:/data/jkancsar/pickevent/event4874249.root']
 #infiles = ['file:/afs/hephy.at/scratch/s/schoefbeck/CMS/CMSSW_5_3_3_patch2/src/Workspace/HEPHYCommonTools/crab/pickEvents/pickevents.root']
 options.files=infiles
@@ -106,7 +106,8 @@ process.out = cms.OutputModule("PoolOutputModule",
      #verbose = cms.untracked.bool(True),
      SelectEvents   = cms.untracked.PSet( SelectEvents = cms.vstring('p') ),
      fileName = cms.untracked.string('histo.root'),
-     outputCommands = cms.untracked.vstring('drop *', 'keep *_*SUSYTupelizer*_*_*' , 'keep *_*EventCounter*_*_*', 'keep *_genParticles_*_SIM') 
+     outputCommands = cms.untracked.vstring() 
+#     outputCommands = cms.untracked.vstring('keep *') 
 )
 
 #-- SUSYPAT and GlobalTag Settings -----------------------------------------------------------
@@ -220,7 +221,7 @@ process.load('RecoMET.METAnalyzers.CSCHaloFilter_cfi')
 process.load('RecoMET.METFilters.EcalDeadCellTriggerPrimitiveFilter_cfi')
 process.load('RecoMET.METFilters.trackingFailureFilter_cfi')
 
-process.load('Workspace.Filter.EventCounter')
+process.load('Workspace.HEPHYCommonTools.EventCounter')
 
 process.EventCounterAfterHLT = process.EventCounter.clone()
 process.EventCounterAfterScraping = process.EventCounter.clone()
@@ -315,12 +316,15 @@ process.printTree = cms.EDAnalyzer("ParticleTreeDrawer",
 #    maxEventsToPrint = cms.untracked.int32(-1)
 #)
 
+from CMGTools.External.pujetidsequence_cff import loadPujetId
+loadPujetId(process,'patJetsAK5PF',mvaOnly=False,isChs=False,release="53X")
+
 #-- Execution path ------------------------------------------------------------
 # Full path
 process.load('CommonTools.ParticleFlow.goodOfflinePrimaryVertices_cfi') #FIXME Added R.S.
 
 
-process.p = cms.Path(process.goodOfflinePrimaryVertices + process.filterSequence + process.susyPatDefaultSequence )
+process.p = cms.Path(process.goodOfflinePrimaryVertices + process.filterSequence + process.susyPatDefaultSequence + process.puJetIdpatJetsAK5PF + process.puJetMvapatJetsAK5PF)
 #process.p += process.printTree
 process.p += process.kt6PFJetsForIsolation2011
 process.p += process.pfMEtSysShiftCorrSequence
@@ -380,7 +384,7 @@ process.p += process.SUSYTupelizer
 #  src = cms.InputTag("genParticles")
 #)
 #process.p+=process.printTree
-
+process.out.outputCommands =  cms.untracked.vstring('drop *', 'keep *_*SUSYTupelizer*_*_*' , 'keep *_*EventCounter*_*_*', 'keep *_genParticles_*_SIM')
 process.outpath = cms.EndPath(process.out)
 #-- Dump config ------------------------------------------------------------
 file = open('vienna_SusyPAT_cfg.py','w')

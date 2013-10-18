@@ -6,6 +6,7 @@ import os, copy, array, xsec, sys, random
 from xsecSMS import gluino8TeV_NLONLL
 from btagEff import getMCEff, getTagWeightDict, getSF
 from random import randint
+import eventShape
 
 ROOT.gROOT.ProcessLine(".L polSys/WPolarizationVariation.C+")
 ROOT.gROOT.ProcessLine(".L polSys/TTbarPolarization.C+")
@@ -16,9 +17,9 @@ mt2w = ROOT.mt2w(500, 499, 0.5)
 
 small = True
 
-#mode = "Mu"
+mode = "Mu"
 #mode = "Ele"
-mode = "HT"
+#mode = "HT"
 
 targetLumi = 19400.
 if targetLumi==19400.:
@@ -37,8 +38,8 @@ chmodes = [\
 
 #         "chmode = 'copyMET50HT750'",
 #         "chmode = 'copyMET50'",
-#         "chmode = 'copyMET'",
-         "chmode = 'copyHT'",
+         "chmode = 'copyMET'",
+#         "chmode = 'copyHT'",
 #        "chmode = 'copyMET_JES+'",
 #         "chmode = 'copyMET_JES-'",
 #         "chmode = 'copyMET_separateBTagWeights'",
@@ -133,6 +134,7 @@ else:
 
 #allSamples = [ttbarPowHeg, wjets, wjetsInc, wjetsCombined, dy, stop, qcd, data, ttwJets, ttzJets, singleLeptonData]
 #allSamples = [ttbarScaleDown, ttbarScaleUp, ttbarMatchingDown, ttbarMatchingUp]
+
 from smsInfo import getT1ttttMadgraphDirs, getT5ttttMadgraphDirs, nfsDirectories
 def getT1ttttSample(mgl, mN):
   res= {}
@@ -576,10 +578,12 @@ for nc, m in enumerate(chmodes):
     variables = []
 #    extraVariables=["mbb", "mbl", "phibb"]
     extraVariables=["alphaT"]
+    extraVariables+=["S3D", "C3D", "C2D", "FWMT1", "FWMT2", "FWMT3", "FWMT4", "c2DLepMET", "FWMT1LepMET", "FWMT2LepMET", "FWMT3LepMET", "FWMT4LepMET"]
     if mode=="Ele" or mode=="Mu":
       variables = ["weight",  "weightPUSysPlus", "weightPUSysMinus", "targetLumi", "xsec", "weightLumi", "run", "lumi", "met", "type1phiMet", "type1phiMetpx", "type1phiMetpy", "metpx", "metpy", "metphi", "mT", "barepfmet" ,"ht", "btag0", "btag1", "btag2", "btag3","rawMetpx", "rawMetpy", "m3", "mht", "singleMuonic", "singleElectronic", \
       "leptonPt", "leptonEta", "leptonPhi", "leptonPdg", "njets", "nbtags", "nbjets", "jet0pt", "jet1pt", "jet2pt", "jet3pt", "jet0phi", "jet1phi","nvetoMuons", "nvetoElectrons", "ngoodMuons", "ngoodElectrons", "ngoodVertices", "nTrueGenVertices",
       "btag0pt", "btag1pt", "btag2pt", "btag3pt", "btag0eta", "btag1eta", "btag2eta", "btag3eta", "btag0Mass", "btag1Mass", "btag2Mass", "btag3Mass"]
+
       if chmode=="copyMET":
         extraVariables += ["weightEleEff", "weightMuEff1", "weightMuEff2", "probOneMoreBTag", "probOneMoreBTagSF", "mt2w", "minDeltaPhi", "htRatio"]
 #        if sms=="" and chmode[:7]=="copyMET":
@@ -840,6 +844,30 @@ for nc, m in enumerate(chmodes):
 #            print s.mt2w
             s.minDeltaPhi = min(abs(deltaPhi(s.jet0phi, metPhi)), abs(deltaPhi(s.jet1phi, metPhi)))
 #            print s.minDeltaPhi
+            if len(jets)>1:
+              s3D = eventShape.sphericity(jets)
+              c3D = eventShape.circularity(s3D["eigenvalues"])
+              c2D = eventShape.circularity2D(jets)
+              foxwolfram = eventShape.foxWolframMoments(jets)
+              s.S3D= s3D['sphericity']
+              s.C3D= c3D
+              s.C2D= c2D
+              s.FWMT1= foxwolfram["FWMT1"]
+              s.FWMT2= foxwolfram["FWMT2"]
+              s.FWMT3= foxwolfram["FWMT3"]
+              s.FWMT4= foxwolfram["FWMT4"]
+
+              if mode=='Mu' or mode=='Ele': 
+                metObj = {"pt":s.type1phiMet, "phi":metPhi}
+                lepObj = {"pt":s.leptonPt, "phi":s.leptonPhi}
+                c2DLepMET = eventShape.circularity2D(jets+[lepObj]+[metObj])
+                foxwolfram = eventShape.foxWolframMoments(jets+[lepObj]+[metObj])
+                s.c2DLepMET   =  c2DLepMET          
+                s.FWMT1LepMET = foxwolfram["FWMT1"]
+                s.FWMT2LepMET = foxwolfram["FWMT2"]
+                s.FWMT3LepMET = foxwolfram["FWMT3"]
+                s.FWMT4LepMET = foxwolfram["FWMT4"]
+
 
             if len(chmode.split("_"))>1 and chmode.split("_")[1][:3]=="JES":
 #              print "\n",s.met, s.ht,s.njets,s.nbtags
