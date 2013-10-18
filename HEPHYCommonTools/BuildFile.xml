@@ -27,7 +27,7 @@
 <use name="MagneticField/Engine"/>
 <use name="DataFormats/PatCandidates"/>
 <use name="DataFormats/FWLite"/>
-
+<use name="CMGTools/External"/>
 <export>
   <lib   name="1"/>
 </export>

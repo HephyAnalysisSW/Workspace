@@ -1,11 +1,9 @@
-#include "Workspace/HEPHYCommonTools/plugins/SUSYTupelizer.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
+#include "Workspace/HEPHYCommonTools/plugins/SUSYTupelizer.h"
 #include "Workspace/HEPHYCommonTools/interface/EdmHelper.h"
 #include <SimDataFormats/GeneratorProducts/interface/HepMCProduct.h>
 #include <SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h>
-
 #include "L1Trigger/GlobalTriggerAnalyzer/interface/L1GtUtils.h"
-
 #include "CondFormats/L1TObjects/interface/L1GtTriggerMenu.h"
 #include "CondFormats/DataRecord/interface/L1GtTriggerMenuRcd.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
@@ -16,6 +14,7 @@
 #include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerObjectMapRecord.h"
 #include "HLTrigger/HLTfilters/interface/HLTLevel1GTSeed.h"
 #include "DataFormats/HLTReco/interface/TriggerEvent.h"
+#include "CMGTools/External/interface/PileupJetIdentifier.h"
 #include "DataFormats/METReco/interface/GenMET.h"
 #include "DataFormats/METReco/interface/GenMETCollection.h"
 #include "DataFormats/METReco/interface/PFMET.h"
@@ -163,7 +162,6 @@ SUSYTupelizer::SUSYTupelizer( const edm::ParameterSet & pset):
   // steerables Ele:
   elePt_ ( pset.getUntrackedParameter< double >("elePt") ),
   eleEta_ (pset.getUntrackedParameter< double >("eleEta") ),
-  eleHasPFMatch_ (pset.getUntrackedParameter< bool >("eleHasPFMatch") ),
   eleOneOverEMinusOneOverP_ ( pset.getUntrackedParameter< double >("eleOneOverEMinusOneOverP") ),
   eleDxy_ ( pset.getUntrackedParameter< double >("eleDxy") ),
   eleDz_ ( pset.getUntrackedParameter< double >("eleDz") ),
@@ -181,6 +179,7 @@ SUSYTupelizer::SUSYTupelizer( const edm::ParameterSet & pset):
   eleDEtaEndcap_ ( pset.getUntrackedParameter< double >("eleDEtaEndcap") ),
   eleMissingHits_ ( pset.getUntrackedParameter< int    >("eleMissingHits") ),
   eleConversionRejection_ ( pset.getUntrackedParameter< bool >("eleConversionRejection") ),
+  eleHasPFMatch_ (pset.getUntrackedParameter< bool >("eleHasPFMatch") ),
   // steerables veto Ele:
   vetoElePt_ ( pset.getUntrackedParameter< double >("vetoElePt") ),
   vetoEleEta_ (pset.getUntrackedParameter< double >("vetoEleEta") ),
@@ -204,12 +203,16 @@ SUSYTupelizer::SUSYTupelizer( const edm::ParameterSet & pset):
   btagPure_     ( pset.getUntrackedParameter< std::string >("btagPure") ),
   btagPureWP_       ( pset.getUntrackedParameter< double >("btagPureWP") ),
   hasL1Trigger_ ( pset.getUntrackedParameter< bool >("hasL1Trigger") ),
+  puJetIdCutBased_( pset.getUntrackedParameter< edm::InputTag >("puJetIdCutBased") ),
+  puJetIdFull53X_( pset.getUntrackedParameter< edm::InputTag >("puJetIdFull53X") ),
+  puJetIdMET53X_( pset.getUntrackedParameter< edm::InputTag >("puJetIdMET53X") ),
+
   moduleLabel_( params_.getParameter<std::string>("@module_label") ),
   addRA4AnalysisInfo_( pset.getUntrackedParameter<bool>("addRA4AnalysisInfo")),
   addTriggerInfo_(pset.getUntrackedParameter<bool>("addTriggerInfo")),
-  addMetUncertaintyInfo_(pset.getUntrackedParameter<bool>("addMetUncertaintyInfo")),
   triggersToMonitor_(pset.getUntrackedParameter<std::vector<std::string> > ("triggersToMonitor") ), 
   metsToMonitor_(pset.getUntrackedParameter<std::vector<std::string> > ("metsToMonitor") ), 
+  addMetUncertaintyInfo_(pset.getUntrackedParameter<bool>("addMetUncertaintyInfo")),
   addFullBTagInfo_(pset.getUntrackedParameter<bool>("addFullBTagInfo")),
   addFullJetInfo_(pset.getUntrackedParameter<bool>("addFullJetInfo")),
   addFullLeptonInfo_(pset.getUntrackedParameter<bool>("addFullLeptonInfo")),
@@ -543,7 +546,7 @@ void SUSYTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup) {
   std::vector<int> elesPassConversionRejection, elesPassPATConversionVeto;
   int eleCounter=0;
 
-   //electron PFiso variables
+//   //electron PFiso variables
   typedef std::vector< edm::Handle< edm::ValueMap<reco::IsoDeposit> > > IsoDepositMaps;
   typedef std::vector< edm::Handle< edm::ValueMap<double> > > IsoDepositVals;
   IsoDepositVals electronIsoValPFId(3);
@@ -734,18 +737,30 @@ void SUSYTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup) {
 //|_| /_/   \_\_|    \___/ \___|\__|___/
 
 
-  vector<pat::Jet> patJets (EdmHelper::getObjs<pat::Jet> (ev,  patJets_));
-  sort(patJets.begin(), patJets.end(), MathHelper::greaterPt<pat::Jet> ); //Scaled Jets need not be sorted!
-  JetIDSelectionFunctor jetPURE09LOOSE(
-      JetIDSelectionFunctor::PURE09,
-      JetIDSelectionFunctor::LOOSE );
-  PFJetIDSelectionFunctor pfjetFIRSTDATALOOSE(
-      PFJetIDSelectionFunctor::FIRSTDATA,
-      PFJetIDSelectionFunctor::LOOSE );
+//  vector<pat::Jet> patJets (EdmHelper::getObjs<pat::Jet> (ev,  patJets_));
+  edm::Handle< edm::View<pat::Jet > > patJets;
+  ev.getByLabel( patJets_, patJets );
+//  vector<edm::Ref<pat::Jet, pat::Jet> > patJetRefs (EdmHelper::getObjRefs<pat::Jet> (ev, patJets_));
+//  sort(patJets.begin(), patJets.end(), MathHelper::greaterPt<pat::Jet> ); //Scaled Jets need not be sorted!
+  JetIDSelectionFunctor jetPURE09LOOSE(JetIDSelectionFunctor::PURE09, JetIDSelectionFunctor::LOOSE );
+  PFJetIDSelectionFunctor pfjetFIRSTDATALOOSE( PFJetIDSelectionFunctor::FIRSTDATA, PFJetIDSelectionFunctor::LOOSE );
   edm::ESHandle<JetCorrectorParametersCollection> JetCorParColl;
   setup.get<JetCorrectionsRecord>().get("AK5PF",JetCorParColl); 
   JetCorrectorParameters const & JetCorPar = (*JetCorParColl)["Uncertainty"];
   JetCorrectionUncertainty *jecUnc = new JetCorrectionUncertainty(JetCorPar);
+
+//  edm::Handle<edm::ValueMap<float> > cutbasedPUJetIdMVA;
+//  ev.getByLabel("cutbasedDiscriminant",cutbasedPUJetIdMVA);
+  edm::Handle<edm::ValueMap<int> > cutbasedPUJetIdFlag;
+  ev.getByLabel(puJetIdCutBased_, cutbasedPUJetIdFlag);
+//  edm::Handle<edm::ValueMap<float> > full53XPUJetIdMVA;
+//  ev.getByLabel("full53XDiscriminant",full53XPUJetIdMVA);
+  edm::Handle<edm::ValueMap<int> > full53XPUJetIdFlag;
+  ev.getByLabel(puJetIdFull53X_,full53XPUJetIdFlag);
+//  edm::Handle<edm::ValueMap<float> > met53XPUJetIdMVA;
+//  ev.getByLabel("met53XDiscriminant",met53XPUJetIdMVA);
+  edm::Handle<edm::ValueMap<int> > met53XPUJetIdFlag;
+  ev.getByLabel(puJetIdMET53X_,met53XPUJetIdFlag);
 
   bool hasNoBadJet = true;
   double delta_met_x (0.), delta_met_y(0.), deltaHT(0.);
@@ -753,44 +768,53 @@ void SUSYTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup) {
   int njetsJESUp(0), njetsJESDown(0);
   vector<pat::Jet> good_Jets;
   int ngoodUncleandJets(0), ngoodEleCleanedJets(0), ngoodMuCleanedJets(0);
-  std::vector<float> jetspt, jetsptUncorr, jetseta, jetsbtag, jetsSVMass, jetsphi, jetsUnc;
-  std::vector<int> jetsparton, jetsEleCleaned, jetsMuCleaned, jetsID;
+  std::vector<float> jetspt, jetsptUncorr, jetseta, jetsbtag, jetsSVMass, jetsphi, jetsUnc, jetsMass2;
+  std::vector<int> jetsparton, jetsEleCleaned, jetsMuCleaned, jetsID, jetsCutBasedPUJetIDFlag, jetsMET53XPUJetIDFlag, jetsFull53XPUJetIDFlag;
+
   std::vector<float> jetsChargedHadronEnergyFraction, jetsNeutralHadronEnergyFraction, jetsChargedEmEnergyFraction, jetsNeutralEmEnergyFraction, jetsPhotonEnergyFraction, jetsElectronEnergyFraction, jetsMuonEnergyFraction, jetsHFHadronEnergyFraction, jetsHFEMEnergyFraction;
   int numBPartons(0), numCPartons(0);
-  for (unsigned i = 0; i<patJets.size();i++) {
+  for (unsigned i = 0; i<patJets->size();i++) {
+    const pat::Jet & patJet = patJets->at(i);
 //    if (not (patJets[i].pt() > softJetThreshold)) continue;
     bool jetID;
-    if ( patJets[i].isPFJet() ) {
+    if ( patJet.isPFJet() ) {
 //    if ( false ) {
     //https://twiki.cern.ch/twiki/bin/viewauth/CMS/JetID
 
-      jetID = pfjetFIRSTDATALOOSE(patJets[i]);
+      jetID = pfjetFIRSTDATALOOSE(patJet);
 
     } else {
-      jetID = jetPURE09LOOSE(patJets[i]);
+      jetID = jetPURE09LOOSE(patJet);
     }
-    bool jetPassesEleCleaning = EdmHelper::passesDeltaRCleaning(patJets[i], veto_electrons, 0.3);
-    bool jetPassesMuCleaning = EdmHelper::passesDeltaRCleaning(patJets[i], veto_muons, 0.3);
+    bool jetPassesEleCleaning = EdmHelper::passesDeltaRCleaning(patJet, veto_electrons, 0.3);
+    bool jetPassesMuCleaning = EdmHelper::passesDeltaRCleaning(patJet, veto_muons, 0.3);
 
-    bool jet_is_good = (jetID and (patJets[i].pt() >= minJetPt_)  and (fabs( patJets[i].eta() ) <= maxJetEta_));
-    bool jet_is_soft = (patJets[i].pt() >= softJetThreshold);
-    if ((patJets[i].pt() > minJetPt_) and (fabs( patJets[i].eta() ) <  5.0) and not jetID) hasNoBadJet = false;
-    if (jet_is_good and jetPassesEleCleaning and jetPassesMuCleaning) good_Jets.push_back(patJets[i]);
+    bool jet_is_good = (jetID and (patJet.pt() >= minJetPt_)  and (fabs( patJet.eta() ) <= maxJetEta_));
+    bool jet_is_soft = (patJet.pt() >= softJetThreshold);
+    if ((patJet.pt() > minJetPt_) and (fabs( patJet.eta() ) <  5.0) and not jetID) hasNoBadJet = false;
+    if (jet_is_good and jetPassesEleCleaning and jetPassesMuCleaning) good_Jets.push_back(patJet);
     if (addGeneratorInfo_) {
-      if (jet_is_good and jetPassesEleCleaning and jetPassesMuCleaning and abs(patJets[i].partonFlavour())==4) numCPartons+=1; 
-      if (jet_is_good and jetPassesEleCleaning and jetPassesMuCleaning and abs(patJets[i].partonFlavour())==5) numBPartons+=1;
+      if (jet_is_good and jetPassesEleCleaning and jetPassesMuCleaning and abs(patJet.partonFlavour())==4) numCPartons+=1; 
+      if (jet_is_good and jetPassesEleCleaning and jetPassesMuCleaning and abs(patJet.partonFlavour())==5) numBPartons+=1;
     } 
     if (jet_is_soft) {
-      jetspt.push_back(patJets[i].pt());
-      jetsptUncorr.push_back(patJets[i].correctedJet("Uncorrected").pt());
-      jetseta.push_back(patJets[i].eta());
-      jetsphi.push_back(patJets[i].phi());
+      jetspt.push_back(patJet.pt());
+      jetsptUncorr.push_back(patJet.correctedJet("Uncorrected").pt());
+      jetseta.push_back(patJet.eta());
+      jetsphi.push_back(patJet.phi());
+      jetsMass2.push_back(patJet.p4().mass2());
       if (!isData) {
-        jetsparton.push_back(patJets[i].partonFlavour());
+        jetsparton.push_back(patJet.partonFlavour());
       } else {jetsparton.push_back(0);}
-      jetsbtag.push_back(patJets[i].bDiscriminator(btag_));
+      jetsbtag.push_back(patJet.bDiscriminator(btag_));
 
-      const reco::SecondaryVertexTagInfo  * SVtagInfo = patJets[i].tagInfoSecondaryVertex();
+//      int idflag = (*cutbasedPUJetIdFlag)[patJets->refAt(i)];
+//      cout<<i<<" "<<idflag<<endl;
+//      cout<< PileupJetIdentifier::passJetId( idflag, PileupJetIdentifier::kLoose )<<endl;
+      jetsCutBasedPUJetIDFlag.push_back((*cutbasedPUJetIdFlag)[patJets->refAt(i)]);
+      jetsMET53XPUJetIDFlag.push_back((*met53XPUJetIdFlag)[patJets->refAt(i)]);
+      jetsFull53XPUJetIDFlag.push_back((*full53XPUJetIdFlag)[patJets->refAt(i)]);
+      const reco::SecondaryVertexTagInfo  * SVtagInfo = patJet.tagInfoSecondaryVertex();
       bool hasSVMass(false);
       if(SVtagInfo){
         if(SVtagInfo->nVertices()>0){
@@ -801,50 +825,51 @@ void SUSYTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup) {
       }
       if (not hasSVMass) jetsSVMass.push_back(-1.);
 
-      jecUnc->setJetEta(patJets[i].eta());
-      jecUnc->setJetPt(patJets[i].pt()); // here you must use the CORRECTED jet pt
-      double unc = (patJets[i].pt() > 10. && fabs(patJets[i].eta())<5.) ? jecUnc->getUncertainty(true) : 0.1;
+      jecUnc->setJetEta(patJet.eta());
+      jecUnc->setJetPt(patJet.pt()); // here you must use the CORRECTED jet pt
+      double unc = (patJet.pt() > 10. && fabs(patJet.eta())<5.) ? jecUnc->getUncertainty(true) : 0.1;
       jetsUnc.push_back(unc);
       jetsEleCleaned.push_back(jetPassesEleCleaning);
       jetsMuCleaned.push_back(jetPassesMuCleaning);
       jetsID.push_back(jetID);
-      jetsChargedHadronEnergyFraction.push_back(patJets[i].chargedHadronEnergyFraction());
-      jetsNeutralHadronEnergyFraction.push_back(patJets[i].neutralHadronEnergyFraction());
-      jetsChargedEmEnergyFraction.push_back(patJets[i].chargedEmEnergyFraction());
-      jetsNeutralEmEnergyFraction.push_back(patJets[i].neutralEmEnergyFraction());
-      jetsPhotonEnergyFraction.push_back(patJets[i].photonEnergyFraction());
-      jetsElectronEnergyFraction.push_back(patJets[i].electronEnergyFraction());
-      jetsMuonEnergyFraction.push_back(patJets[i].muonEnergyFraction());
-      jetsHFHadronEnergyFraction.push_back(patJets[i].HFHadronEnergyFraction());
-      jetsHFEMEnergyFraction.push_back(patJets[i].HFEMEnergyFraction());
+      jetsChargedHadronEnergyFraction.push_back(patJet.chargedHadronEnergyFraction());
+      jetsNeutralHadronEnergyFraction.push_back(patJet.neutralHadronEnergyFraction());
+      jetsChargedEmEnergyFraction.push_back(patJet.chargedEmEnergyFraction());
+      jetsNeutralEmEnergyFraction.push_back(patJet.neutralEmEnergyFraction());
+      jetsPhotonEnergyFraction.push_back(patJet.photonEnergyFraction());
+      jetsElectronEnergyFraction.push_back(patJet.electronEnergyFraction());
+      jetsMuonEnergyFraction.push_back(patJet.muonEnergyFraction());
+      jetsHFHadronEnergyFraction.push_back(patJet.HFHadronEnergyFraction());
+      jetsHFEMEnergyFraction.push_back(patJet.HFEMEnergyFraction());
     }
     if (jet_is_good) ngoodUncleandJets++;
     if (jet_is_good and jetPassesEleCleaning) ngoodEleCleanedJets++;
     if (jet_is_good and jetPassesMuCleaning) ngoodMuCleanedJets++;
     
-    if ((verbose_) and (patJets[i].pt() > softJetThreshold)) cout<<"[jet "<<i<<"] "<<" pt "<<patJets[i].pt()<<" eta "<<patJets[i].eta()<<" phi "<<patJets[i].phi()<<boolalpha<<" jetID? "<<jetID<<" jetID+pt+eta cut?"<< jet_is_good <<" passes Ele c.c? "<<jetPassesEleCleaning<<" passes Mu c.c? "<<jetPassesMuCleaning<<endl;
-    jecUnc->setJetEta(patJets[i].eta());
-    jecUnc->setJetPt(patJets[i].pt()); // here you must use the CORRECTED jet pt
-    double unc = (patJets[i].pt() > 10. && fabs(patJets[i].eta()<5)) ? jecUnc->getUncertainty(true) : 0.1;
-    pat::Jet scaledJet = patJets[i];
+    if ((verbose_) and (patJet.pt() > softJetThreshold)) cout<<"[jet "<<i<<"] "<<" pt "<<patJet.pt()<<" eta "<<patJet.eta()<<" phi "<<patJet.phi()<<boolalpha<<" jetID? "<<jetID<<" jetID+pt+eta cut?"<< jet_is_good <<" passes Ele c.c? "<<jetPassesEleCleaning<<" passes Mu c.c? "<<jetPassesMuCleaning<<endl;
+    jecUnc->setJetEta(patJet.eta());
+    jecUnc->setJetPt(patJet.pt()); // here you must use the CORRECTED jet pt
+    double unc = (patJet.pt() > 10. && fabs(patJet.eta()<5)) ? jecUnc->getUncertainty(true) : 0.1;
+    pat::Jet scaledJet = patJet;
     scaledJet.scaleEnergy(1+unc);
-    delta_met_x += - scaledJet.px() + patJets[i].px();    
-    delta_met_y += - scaledJet.py() + patJets[i].py();  
-    deltaHT     += scaledJet.pt() - patJets[i].pt();
-    if (patJets[i].pt()<10.) {
-      delta_met_x_unclustered += - scaledJet.px() + patJets[i].px();    
-      delta_met_y_unclustered += - scaledJet.py() + patJets[i].py();  
-      deltaHT_unclustered     += scaledJet.pt() - patJets[i].pt();
+    delta_met_x += - scaledJet.px() + patJet.px();    
+    delta_met_y += - scaledJet.py() + patJet.py();  
+    deltaHT     += scaledJet.pt() - patJet.pt();
+    if (patJet.pt()<10.) {
+      delta_met_x_unclustered += - scaledJet.px() + patJet.px();    
+      delta_met_y_unclustered += - scaledJet.py() + patJet.py();  
+      deltaHT_unclustered     += scaledJet.pt() - patJet.pt();
     }
-    if (jetID and (fabs( patJets[i].eta() ) < maxJetEta_) and jetPassesEleCleaning and jetPassesMuCleaning and scaledJet.pt()>minJetPt_) njetsJESUp++;
+    if (jetID and (fabs( patJet.eta() ) < maxJetEta_) and jetPassesEleCleaning and jetPassesMuCleaning and scaledJet.pt()>minJetPt_) njetsJESUp++;
     scaledJet.scaleEnergy((1-unc)/(1+unc));
-    if (jetID and (fabs( patJets[i].eta() ) < maxJetEta_) and jetPassesEleCleaning and jetPassesMuCleaning and scaledJet.pt()>minJetPt_) njetsJESDown++;
+    if (jetID and (fabs( patJet.eta() ) < maxJetEta_) and jetPassesEleCleaning and jetPassesMuCleaning and scaledJet.pt()>minJetPt_) njetsJESDown++;
   }
   if (addFullJetInfo_){
     put("jetsPt", jetspt);
     put("jetsPtUncorr", jetsptUncorr);
     put("jetsEta", jetseta);
     put("jetsPhi", jetsphi);
+    put("jetsMass2", jetsMass2);
     put("jetsParton", jetsparton);
     put("jetsBtag", jetsbtag);
     put("jetsSVMass", jetsSVMass);
@@ -852,6 +877,9 @@ void SUSYTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup) {
     put("jetsEleCleaned", jetsEleCleaned);
     put("jetsMuCleaned", jetsMuCleaned);
     put("jetsID", jetsID);
+    put("jetsCutBasedPUJetIDFlag", jetsCutBasedPUJetIDFlag);
+    put("jetsMET53XPUJetIDFlag", jetsMET53XPUJetIDFlag);
+    put("jetsFull53XPUJetIDFlag", jetsFull53XPUJetIDFlag);
     put("jetsChargedHadronEnergyFraction", jetsChargedHadronEnergyFraction);
     put("jetsNeutralHadronEnergyFraction", jetsNeutralHadronEnergyFraction);
     put("jetsChargedEmEnergyFraction", jetsChargedEmEnergyFraction);
@@ -2055,12 +2083,16 @@ void SUSYTupelizer::addAllVars( )
     addVar("jetsPtUncorr/F[]");
     addVar("jetsEta/F[]");
     addVar("jetsPhi/F[]");
+    addVar("jetsMass2/F[]");
     addVar("jetsParton/I[]");
     addVar("jetsBtag/F[]");
     addVar("jetsSVMass/F[]");
     addVar("jetsUnc/F[]");
     addVar("jetsEleCleaned/I[]");
     addVar("jetsMuCleaned/I[]");
+    addVar("jetsCutBasedPUJetIDFlag/I[]");
+    addVar("jetsMET53XPUJetIDFlag/I[]");
+    addVar("jetsFull53XPUJetIDFlag/I[]");
     addVar("jetsID/I[]");
     addVar("jetsChargedHadronEnergyFraction/F[]");
     addVar("jetsNeutralHadronEnergyFraction/F[]");
