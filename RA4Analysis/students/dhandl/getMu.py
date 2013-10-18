@@ -1,7 +1,8 @@
 import ROOT
-import funcs,sys,os
+import funcs, sys, os
 sys.path.insert(0,'/afs/hephy.at/scratch/d/dhandl/CMSSW_5_3_3_patch2/src/Workspace/RA4Analysis/plots')
 from defaultMu2012Samples import *
+from localConfig import defaultWWWPath
 
 ROOT.gROOT.ProcessLine('.L ../../scripts/tdrstyle.C')
 ROOT.setTDRStyle()
@@ -9,17 +10,24 @@ ROOT.setTDRStyle()
 #cut = "ht>400&&met>150"
 cut =  "(singleMuonic&&nvetoMuons==1&&nvetoElectrons==0||singleElectronic&&nvetoElectrons==1&&nvetoMuons==0)&&ht>400&&met>150&&njets>=3"     #cut to use
 prefix = 'FirstTry'
+metVar = "type1phiMet"
 
 allVariables = []
 
-spher = {'name':'mysphericity', 'legendName':'Sphericity', 'binning':[40,0,1]}
-circ = {'name':'mycircularity', 'legendName':'Circularity', 'binning':[40,0,1]}
-circ2D = {'name':'mycircularity2D', 'legendName':'2D Circularity', 'binning':[40,0,1]}
-ht0 = {'name':'myHT0', 'legendName':'H_{0}^{T}', 'binning':[40,0,1]}
-ht1 = {'name':'myHT1', 'legendName':'H_{1}^{T}', 'binning':[40,0,1]}
-ht2 = {'name':'myHT2', 'legendName':'H_{2}^{T}', 'binning':[40,0,1]}
-ht3 = {'name':'myHT3', 'legendName':'H_{3}^{T}', 'binning':[40,0,1]}
-ht4 = {'name':'myHT4', 'legendName':'H_{4}^{T}', 'binning':[40,0,1]}
+spher = {'name':'S3D', 'legendName':'Sphericity (3D)', 'binning':[40,0,1]}
+circ = {'name':'C3D', 'legendName':'Circularity (3D)', 'binning':[40,0,1]}
+circ2D = {'name':'C2D', 'legendName':'Circularity (2D)', 'binning':[40,0,1]}
+ht0 = {'name':'FWMT0', 'legendName':'FWM_{0}^{T}', 'binning':[40,0,1]}
+ht1 = {'name':'FWMT1', 'legendName':'FWM_{1}^{T}', 'binning':[40,0,1]}
+ht2 = {'name':'FWMT2', 'legendName':'FWM_{2}^{T}', 'binning':[40,0,1]}
+ht3 = {'name':'FWMT3', 'legendName':'FWM_{3}^{T}', 'binning':[40,0,1]}
+ht4 = {'name':'FWMT4', 'legendName':'FWM_{4}^{T}', 'binning':[40,0,1]}
+circ2DLepMET = {'name':'C2DLepMET', 'legendName':'Circularity (2D)', 'binning':[40,0,1]}
+ht0LepMET    = {'name':'FWMT0LepMET', 'legendName':'FWM_{0}^{T}', 'binning':[40,0,1]}
+ht1LepMET    = {'name':'FWMT1LepMET', 'legendName':'FWM_{1}^{T}', 'binning':[40,0,1]}
+ht2LepMET    = {'name':'FWMT2LepMET', 'legendName':'FWM_{2}^{T}', 'binning':[40,0,1]}
+ht3LepMET    = {'name':'FWMT3LepMET', 'legendName':'FWM_{3}^{T}', 'binning':[40,0,1]}
+ht4LepMET    = {'name':'FWMT4LepMET', 'legendName':'FWM_{4}^{T}', 'binning':[40,0,1]}
 
 allVariables.append(spher)
 allVariables.append(circ)
@@ -29,6 +37,12 @@ allVariables.append(ht1)
 allVariables.append(ht2)
 allVariables.append(ht3)
 allVariables.append(ht4)
+allVariables.append(circ2DLepMET)
+allVariables.append(ht0LepMET)
+allVariables.append(ht1LepMET)
+allVariables.append(ht2LepMET)
+allVariables.append(ht3LepMET)
+allVariables.append(ht4LepMET)
 
 #Creat Chain with Samples
 DATA = ROOT.TChain("Events")
@@ -106,35 +120,40 @@ for sample in extraSamples + allSamples: #Loop over samples
   
   for i in range(number_events): #Loop over those events
     sample["chain"].GetEntry(elist.GetEntry(i))  #Set the chain to the current event (it's the i-th event of the eList). This is the central line in this file!
-    nmuons = getVarValue(sample['chain'], "nmuons")
-    neles = getVarValue(sample['chain'], "neles")
+    nmuons = funcs.getVarValue(sample['chain'], "nmuons")
+    neles = funcs.getVarValue(sample['chain'], "neles")
     #print i+1,". Event: ",nmuons," Muons; ",neles," Electrons"
     #mulist = getGoodMuons(sample['chain'], nmuons)
     #elelist = getGoodElectrons(sample['chain'],neles)
-    leplist = getGoodLeptons(sample['chain'], nmuons, neles)
-    jetlist = getGoodJets(sample['chain'], leplist['leptons'])
+    leplist = funcs.getGoodLeptons(sample['chain'], nmuons, neles)
+    allJets, bjets = funcs.getGoodJets(sample['chain'], leplist['leptons'])
 
-#    weight = 1
-#    if sample.has_key('weight'):
-#      if type(sample['weight'])==type(''):
-#        weight = getVarValue(sample['chain'], sample['weight'])
-#      else:
-#        weight = sample['weight']
-
-    s = sphericity(jetlist[0])
-    c = circularity(s)
-    c2D = circularity2D(jetlist[0])
-    foxwolfram = HT(jetlist[0])
-
+    s3D = funcs.sphericity(allJets)
+    c3D = funcs.circularity(s3D["eigenvalues"])
+    c2D = funcs.circularity2D(allJets)
+    foxwolfram = funcs.foxWolframMoments(allJets)
 #    print i+1,'.Event:',foxwolfram
-    histos[sample['name']]['mysphericity'].Fill(s[0],sample['weight'])  
-    histos[sample['name']]['mycircularity'].Fill(c,sample['weight'])  
-    histos[sample['name']]['mycircularity2D'].Fill(c2D,sample['weight'])
-    histos[sample['name']]['myHT0'].Fill(foxwolfram[0],sample['weight'])
-    histos[sample['name']]['myHT1'].Fill(foxwolfram[1],sample['weight'])
-    histos[sample['name']]['myHT2'].Fill(foxwolfram[2],sample['weight'])
-    histos[sample['name']]['myHT3'].Fill(foxwolfram[3],sample['weight'])
-    histos[sample['name']]['myHT4'].Fill(foxwolfram[4],sample['weight'])
+    histos[sample['name']]['S3D'].Fill(s3D['sphericity'],sample['weight'])  
+    histos[sample['name']]['C3D'].Fill(c3D,sample['weight'])  
+    histos[sample['name']]['C2D'].Fill(c2D,sample['weight'])
+    histos[sample['name']]['FWMT0'].Fill(foxwolfram["FWMT0"],sample['weight'])
+    histos[sample['name']]['FWMT1'].Fill(foxwolfram["FWMT1"],sample['weight'])
+    histos[sample['name']]['FWMT2'].Fill(foxwolfram["FWMT2"],sample['weight'])
+    histos[sample['name']]['FWMT3'].Fill(foxwolfram["FWMT3"],sample['weight'])
+    histos[sample['name']]['FWMT4'].Fill(foxwolfram["FWMT4"],sample['weight'])
+
+    if len(leplist['leptons'])==1:
+      metObj = {"pt":funcs.getVarValue(sample['chain'], metVar), "phi":funcs.getVarValue(sample['chain'], metVar+"phi")}
+#      print metObj
+      c2DLepMET = funcs.circularity2D(allJets+leplist['leptons']+[metObj])
+      foxwolfram = funcs.foxWolframMoments(allJets+leplist['leptons']+[metObj])
+  #    print i+1,'.Event:',foxwolfram
+      histos[sample['name']]['C2DLepMET'].Fill(c2DLepMET,sample['weight'])
+      histos[sample['name']]['FWMT0LepMET'].Fill(foxwolfram["FWMT0"],sample['weight'])
+      histos[sample['name']]['FWMT1LepMET'].Fill(foxwolfram["FWMT1"],sample['weight'])
+      histos[sample['name']]['FWMT2LepMET'].Fill(foxwolfram["FWMT2"],sample['weight'])
+      histos[sample['name']]['FWMT3LepMET'].Fill(foxwolfram["FWMT3"],sample['weight'])
+      histos[sample['name']]['FWMT4LepMET'].Fill(foxwolfram["FWMT4"],sample['weight'])
     
   del elist
 
@@ -146,30 +165,31 @@ for var in allVariables:
   l.SetBorderSize(1)
   l.SetShadowColor(ROOT.kWhite)
 #  stack = ROOT.THStack('stack','Stacked Histograms')
-
-  for sample in allSamples:
-    histos[sample['name']][var['name']].SetLineColor(ROOT.kBlack)
-    histos[sample['name']][var['name']].SetFillColor(sample['color'])
-    histos[sample['name']][var['name']].SetMarkerStyle(0)
-    histos[sample['name']][var['name']].GetXaxis().SetTitle(var['legendName'])
-    histos[sample['name']][var['name']].GetYaxis().SetTitle('Number of Events / '+ str( (var['binning'][2] - var['binning'][1])/var['binning'][0]))
-    histos[sample['name']][var['name']].GetXaxis().SetLabelSize(0.04)
-    histos[sample['name']][var['name']].GetYaxis().SetLabelSize(0.04)
-    stack.Add(histos[sample['name']][var['name']])
-    l.AddEntry(histos[sample['name']][var['name']], sample['name'],'f')
-
+#
+#  for sample in allSamples:
+#    histos[sample['name']][var['name']].SetLineColor(ROOT.kBlack)
+#    histos[sample['name']][var['name']].SetFillColor(sample['color'])
+#    histos[sample['name']][var['name']].SetMarkerStyle(0)
+#    histos[sample['name']][var['name']].GetXaxis().SetTitle(var['legendName'])
+#    histos[sample['name']][var['name']].GetYaxis().SetTitle('Number of Events / '+ str( (var['binning'][2] - var['binning'][1])/var['binning'][0]))
+#    histos[sample['name']][var['name']].GetXaxis().SetLabelSize(0.04)
+#    histos[sample['name']][var['name']].GetYaxis().SetLabelSize(0.04)
+#    stack.Add(histos[sample['name']][var['name']])
+#    l.AddEntry(histos[sample['name']][var['name']], sample['name'],'f')
+#
 #  stack.Draw()
 #  stack.GetXaxis().SetTitle(var['legendName'])
 #  stack.GetYaxis().SetTitle('Number of Events / '+ str( (var['binning'][2] - var['binning'][1])/var['binning'][0]))
 
   for extra in extraSamples:
     histos[extra['name']][var['name']].SetMarkerStyle(21)
-    histos[extra['name']][var['name']].Draw('same E')
+    histos[extra['name']][var['name']].Draw('E')
+#    histos[extra['name']][var['name']].Draw('same E') #FIXME
     
     l.AddEntry(histos[extra['name']][var['name']],extra['name'])
 
   l.Draw()
-#  canvas.Print('/afs/hephy.at/user/d/dhandl/www/esv/'+prefix+'_'+var['name']+'.png')
-#  canvas.Print('/afs/hephy.at/user/d/dhandl/www/esv/'+prefix+'_'+var['name']+'.root')
-#  canvas.Print('/afs/hephy.at/user/d/dhandl/www/esv/'+prefix+'_'+var['name']+'.pdf')
+  canvas.Print(defaultWWWPath+'/pngESV/'+prefix+'_'+var['name']+'.png')
+  canvas.Print(defaultWWWPath+'/pngESV/'+prefix+'_'+var['name']+'.root')
+  canvas.Print(defaultWWWPath+'/pngESV/'+prefix+'_'+var['name']+'.pdf')
                                  

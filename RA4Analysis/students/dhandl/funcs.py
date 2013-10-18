@@ -58,7 +58,7 @@ def getGoodJets(c, crosscleanobjects):
 #  print '----- b ---------'
 #  for b in bres:
 #    print b
-  return res, bres, ht, nbtags
+  return res, bres #, ht, nbtags
 
 def getGoodBJets(c):
   njets = getVarValue(c, "nsoftjets")
@@ -209,36 +209,35 @@ def psquare(x, y, z):
 
 def sphericity(jets):
   msum = ROOT.TMatrixDSym(3)
+  p2sum = 0
+
   for i in range(3):
     for j in range(3):
       msum[i][j] = 0
-  p2sum = 0
 
   for obj in jets:
     x = px(obj)
     y = py(obj)
     z = pz(obj)
-    p2 = psquare(x, y, z)
-    p2sum += p2
 
-    a = ROOT.TMatrixDSym(3)
-    
-    a[0][0] = x * x
-    a[0][1] = x * y
-    a[0][2] = x * z
+    p2sum += psquare(x, y, z)
 
-    a[1][0] = y * x 
-    a[1][1] = y * y
-    a[1][2] = y * z
-    
-    a[2][0] = z * x
-    a[2][1] = z * y
-    a[2][2] = z * z
+    msum[0][0] += x * x
+    msum[0][1] += x * y
+    msum[0][2] += x * z
+
+    msum[1][0] += y * x 
+    msum[1][1] += y * y
+    msum[1][2] += y * z
+
+    msum[2][0] += z * x
+    msum[2][1] += z * y
+    msum[2][2] += z * z
      
-#    s = ROOT.TMatrixD(s,ROOT.kPlus,a)
-    for i in range(3):
-      for j in range(3):
-        msum[i][j] = msum[i][j] + a[i][j]
+##    s = ROOT.TMatrixD(s,ROOT.kPlus,a)
+#    for i in range(3):
+#      for j in range(3):
+#        msum[i][j] = msum[i][j] + a[i][j]
 
   for n in range(3):
     for m in range(3):
@@ -246,14 +245,15 @@ def sphericity(jets):
 
   eigenproblem = ROOT.TMatrixDSymEigen(msum)
   eigenvalue = eigenproblem.GetEigenValues()
-  if eigenvalue < 0:
+  if eigenvalue[0] < 0 or eigenvalue[1] < 0 or eigenvalue[2] < 0:
     print 'Warning: eigenvalue < 0'
+#    print eigenvalue[0], eigenvalue[1] , eigenvalue[2]
   s = ((eigenvalue[2] + eigenvalue[1]) * 3) / 2
 
-  return s,eigenvalue[0],eigenvalue[1],eigenvalue[2]
+  return {'sphericity':s, "eigenvalues":eigenvalue}
 
-def circularity(slist):
-  c = (2 * slist[2]) / (slist[1] + slist[2])
+def circularity(eigenvalues3D):
+  c = (2 * eigenvalues3D[2]) / (eigenvalues3D[1] + eigenvalues3D[2])
   return c
 
 def circularity2D(jets):
@@ -267,21 +267,11 @@ def circularity2D(jets):
   for obj in jets:
     x = px(obj)
     y = py(obj)
-
-    p2 = (x * x) + (y * y)
-    p2sum += p2
-
-    a = ROOT.TMatrixDSym(2)
-
-    a[0][0] = x * x
-    a[0][1] = x * y
-
-    a[1][0] = y * x
-    a[1][1] = y * y
-
-    for i in range(2):
-      for j in range(2):
-        msum[i][j] = msum[i][j] + a[i][j]
+    p2sum += (x * x) + (y * y) 
+    msum[0][0] += x * x
+    msum[0][1] += x * y
+    msum[1][0] += y * x
+    msum[1][1] += y * y
 
   for n in range(2):
     for m in range(2):
@@ -289,28 +279,29 @@ def circularity2D(jets):
 
   eigenproblem = ROOT.TMatrixDSymEigen(msum)
   eigenvalue = eigenproblem.GetEigenValues()
-  if eigenvalue < 0:
+#  print eigenvalue
+  if eigenvalue[0] < 0 or eigenvalue[1]<0:
     print 'Warning: eigenvalue < 0'
   c2D = (2 * eigenvalue[1]) / (eigenvalue[0] + eigenvalue[1])
 
   return c2D
 
-def WT(obj):
-  for i in obj[0]:
-    pt = obj[0][i]['pt']
-    psum += pt
+#def WT(obj):
+#  for i in obj[0]:
+#    pt = obj[0][i]['pt']
+#    psum += pt
+#
+#  for i in obj[0]:
+#    pt1 = obj[0][i]['pt']
+#    for j in obj[0]:
+#      pt2 = obj[0][j]['pt']
+#      wt = (pt1 * pt2) / (psum * psum)
+#  return wt
 
-  for i in obj[0]:
-    pt1 = obj[0][i]['pt']
-    for j in obj[0]:
-      pt2 = obj[0][j]['pt']
-      wt = (pt1 * pt2) / (psum * psum)
-  return wt
+#def theta(obj):
+#  return 2 * atan(exp(-(obj['eta'])))
 
-def theta(obj):
-  return 2 * atan(exp(-(obj['eta'])))
-
-def HT(jets):
+def foxWolframMoments(jets):
   psum = 0  
   for obj in jets:
     pt = obj['pt']
@@ -330,9 +321,9 @@ def HT(jets):
       ctheta = cos(obj1['phi'] - obj2['phi'])      
       P0 = 1
       P1 = ctheta
-      P2 = ((3 * ctheta * ctheta) - 1) / 2 
-      P3 = ((5 * ctheta * ctheta * ctheta) - (3 * ctheta)) / 2 
-      P4 = ((35 * ctheta * ctheta * ctheta * ctheta) - (30 * ctheta * ctheta) + 3) / 8
+      P2 = ((3 * ctheta * ctheta) - 1) / 2. 
+      P3 = ((5 * ctheta * ctheta * ctheta) - (3 * ctheta)) / 2. 
+      P4 = ((35 * ctheta * ctheta * ctheta * ctheta) - (30 * ctheta * ctheta) + 3) / 8.
  
       ht0 += wt * P0
       ht1 += wt * P1
@@ -340,6 +331,6 @@ def HT(jets):
       ht3 += wt * P3
       ht4 += wt * P4
 
-  return  ht0,ht1,ht2,ht3,ht4
+  return  {"FWMT0":ht0,"FWMT1":ht1,"FWMT2":ht2,"FWMT3":ht3,"FWMT4":ht4}
 
 
