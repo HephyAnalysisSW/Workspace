@@ -4,3 +4,6 @@ cmsDriver.py Configuration/GenProduction/python/EightTeV/Hadronizer_SMS_Scans_2j
 
 #Step 1: You can execute the resulting cfg on lxplus
 cmsDriver.py step1 --mc --eventcontent RAWSIM --pileup_input "dbs:/MinBias_TuneZ2star_8TeV-pythia6/Summer12-START50_V13-v3/GEN-SIM" --pileup 2012_Summer_50ns_PoissonOOTPU --datatier GEN-SIM-RAW --conditions START53_V19::All --step DIGI,L1,DIGI2RAW,HLT:7E33v2 --filein=file:Hadronizer_SMS_Scans_2jets_Qcut44_TuneZ2star_8TeV_madgraph_tauola_cff_py_GEN_SIM.root -n 10 --no_exec
+
+#Step 2: Actual RECO (Removed Validation and DQM Step)
+cmsDriver.py step2 --mc --eventcontent AODSIM --datatier AODSIM --conditions START53_V19::All --step RAW2DIGI,L1Reco,RECO --filein=file:step1_DIGI_L1_DIGI2RAW_HLT_PU.root -n 3
