@@ -162,7 +162,6 @@ SUSYTupelizer::SUSYTupelizer( const edm::ParameterSet & pset):
   // steerables Ele:
   elePt_ ( pset.getUntrackedParameter< double >("elePt") ),
   eleEta_ (pset.getUntrackedParameter< double >("eleEta") ),
-  eleHasPFMatch_ (pset.getUntrackedParameter< bool >("eleHasPFMatch") ),
   eleOneOverEMinusOneOverP_ ( pset.getUntrackedParameter< double >("eleOneOverEMinusOneOverP") ),
   eleDxy_ ( pset.getUntrackedParameter< double >("eleDxy") ),
   eleDz_ ( pset.getUntrackedParameter< double >("eleDz") ),
@@ -180,6 +179,7 @@ SUSYTupelizer::SUSYTupelizer( const edm::ParameterSet & pset):
   eleDEtaEndcap_ ( pset.getUntrackedParameter< double >("eleDEtaEndcap") ),
   eleMissingHits_ ( pset.getUntrackedParameter< int    >("eleMissingHits") ),
   eleConversionRejection_ ( pset.getUntrackedParameter< bool >("eleConversionRejection") ),
+  eleHasPFMatch_ (pset.getUntrackedParameter< bool >("eleHasPFMatch") ),
   // steerables veto Ele:
   vetoElePt_ ( pset.getUntrackedParameter< double >("vetoElePt") ),
   vetoEleEta_ (pset.getUntrackedParameter< double >("vetoEleEta") ),
@@ -203,12 +203,16 @@ SUSYTupelizer::SUSYTupelizer( const edm::ParameterSet & pset):
   btagPure_     ( pset.getUntrackedParameter< std::string >("btagPure") ),
   btagPureWP_       ( pset.getUntrackedParameter< double >("btagPureWP") ),
   hasL1Trigger_ ( pset.getUntrackedParameter< bool >("hasL1Trigger") ),
+  puJetIdCutBased_( pset.getUntrackedParameter< edm::InputTag >("puJetIdCutBased") ),
+  puJetIdFull53X_( pset.getUntrackedParameter< edm::InputTag >("puJetIdFull53X") ),
+  puJetIdMET53X_( pset.getUntrackedParameter< edm::InputTag >("puJetIdMET53X") ),
+
   moduleLabel_( params_.getParameter<std::string>("@module_label") ),
   addRA4AnalysisInfo_( pset.getUntrackedParameter<bool>("addRA4AnalysisInfo")),
   addTriggerInfo_(pset.getUntrackedParameter<bool>("addTriggerInfo")),
-  addMetUncertaintyInfo_(pset.getUntrackedParameter<bool>("addMetUncertaintyInfo")),
   triggersToMonitor_(pset.getUntrackedParameter<std::vector<std::string> > ("triggersToMonitor") ), 
   metsToMonitor_(pset.getUntrackedParameter<std::vector<std::string> > ("metsToMonitor") ), 
+  addMetUncertaintyInfo_(pset.getUntrackedParameter<bool>("addMetUncertaintyInfo")),
   addFullBTagInfo_(pset.getUntrackedParameter<bool>("addFullBTagInfo")),
   addFullJetInfo_(pset.getUntrackedParameter<bool>("addFullJetInfo")),
   addFullLeptonInfo_(pset.getUntrackedParameter<bool>("addFullLeptonInfo")),
@@ -748,15 +752,15 @@ void SUSYTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup) {
 //  edm::Handle<edm::ValueMap<float> > cutbasedPUJetIdMVA;
 //  ev.getByLabel("cutbasedDiscriminant",cutbasedPUJetIdMVA);
   edm::Handle<edm::ValueMap<int> > cutbasedPUJetIdFlag;
-  ev.getByLabel("puJetMvapatJetsAK5PF", "cutbasedId",cutbasedPUJetIdFlag);
+  ev.getByLabel(puJetIdCutBased_, cutbasedPUJetIdFlag);
 //  edm::Handle<edm::ValueMap<float> > full53XPUJetIdMVA;
 //  ev.getByLabel("full53XDiscriminant",full53XPUJetIdMVA);
   edm::Handle<edm::ValueMap<int> > full53XPUJetIdFlag;
-  ev.getByLabel("puJetMvapatJetsAK5PF", "full53xId",full53XPUJetIdFlag);
+  ev.getByLabel(puJetIdFull53X_,full53XPUJetIdFlag);
 //  edm::Handle<edm::ValueMap<float> > met53XPUJetIdMVA;
 //  ev.getByLabel("met53XDiscriminant",met53XPUJetIdMVA);
   edm::Handle<edm::ValueMap<int> > met53XPUJetIdFlag;
-  ev.getByLabel("puJetMvapatJetsAK5PF", "met53xId",met53XPUJetIdFlag);
+  ev.getByLabel(puJetIdMET53X_,met53XPUJetIdFlag);
 
   bool hasNoBadJet = true;
   double delta_met_x (0.), delta_met_y(0.), deltaHT(0.);

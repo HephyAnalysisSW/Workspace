@@ -106,8 +106,8 @@ process.out = cms.OutputModule("PoolOutputModule",
      #verbose = cms.untracked.bool(True),
      SelectEvents   = cms.untracked.PSet( SelectEvents = cms.vstring('p') ),
      fileName = cms.untracked.string('histo.root'),
-#     outputCommands = cms.untracked.vstring('drop *', 'keep *_*SUSYTupelizer*_*_*' , 'keep *_*EventCounter*_*_*', 'keep *_genParticles_*_SIM') 
-     outputCommands = cms.untracked.vstring('keep *') 
+     outputCommands = cms.untracked.vstring() 
+#     outputCommands = cms.untracked.vstring('keep *') 
 )
 
 #-- SUSYPAT and GlobalTag Settings -----------------------------------------------------------
@@ -384,7 +384,7 @@ process.p += process.SUSYTupelizer
 #  src = cms.InputTag("genParticles")
 #)
 #process.p+=process.printTree
-process.out.outputCommands = cms.untracked.vstring('keep *') 
+process.out.outputCommands =  cms.untracked.vstring('drop *', 'keep *_*SUSYTupelizer*_*_*' , 'keep *_*EventCounter*_*_*', 'keep *_genParticles_*_SIM')
 process.outpath = cms.EndPath(process.out)
 #-- Dump config ------------------------------------------------------------
 file = open('vienna_SusyPAT_cfg.py','w')
