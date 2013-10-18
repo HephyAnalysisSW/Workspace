@@ -876,6 +876,7 @@ void SUSYTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup) {
     put("jetsUnc", jetsUnc);
     put("jetsEleCleaned", jetsEleCleaned);
     put("jetsMuCleaned", jetsMuCleaned);
+    put("jetsID", jetsID);
     put("jetsCutBasedPUJetIDFlag", jetsCutBasedPUJetIDFlag);
     put("jetsMET53XPUJetIDFlag", jetsMET53XPUJetIDFlag);
     put("jetsFull53XPUJetIDFlag", jetsFull53XPUJetIDFlag);
