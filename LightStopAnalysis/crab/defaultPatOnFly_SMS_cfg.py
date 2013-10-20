@@ -14,7 +14,7 @@ options.register ('hltName','HLT',
           VarParsing.VarParsing.varType.string,
           "HLT Trigger collection")
 
-options.register ('GT','START52_V9B::All',#GR_R_52_V9::All
+options.register ('GT','START53_V19:All',
           VarParsing.VarParsing.multiplicity.singleton,
           VarParsing.VarParsing.varType.string,
           "Global Tag")
@@ -35,7 +35,8 @@ options.register ('verbose',False,
           "verbosity")
 
 infiles = [
-  'file:/store/caf/user/imikulec/lstop/Hadronizer_SMS_Scans_2jets_Qcut44_TuneZ2star_8TeV_madgraph_tauola_cff_py_GEN_FASTSIM_HLT_PU.root']
+  'file:step2_RAW2DIGI_L1Reco_RECO.root']
+#  'file:/store/caf/user/imikulec/lstop/Hadronizer_SMS_Scans_2jets_Qcut44_TuneZ2star_8TeV_madgraph_tauola_cff_py_GEN_FASTSIM_HLT_PU.root']
 #  'file:/afs/hephy.at/scratch/s/schoefbeck/CMS/CMSSW_5_3_3_patch2/src/Workspace/RA4Analysis/crab/pickEvents/pick/pickevents_12_1_5oR.root',
 #  'file:/afs/hephy.at/scratch/s/schoefbeck/CMS/CMSSW_5_3_3_patch2/src/Workspace/RA4Analysis/crab/pickEvents/pick/pickevents_1_1_5VT.root',
 #  'file:/afs/hephy.at/scratch/s/schoefbeck/CMS/CMSSW_5_3_3_patch2/src/Workspace/RA4Analysis/crab/pickEvents/pick/pickevents_4_2_ilF.root',
