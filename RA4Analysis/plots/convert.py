@@ -15,7 +15,7 @@ ROOT.gROOT.ProcessLine(".L alphaT/alphaT.C+")
 
 mt2w = ROOT.mt2w(500, 499, 0.5)
 
-small = True
+small = False
 
 mode = "Mu"
 #mode = "Ele"
@@ -114,7 +114,7 @@ if mode=="Ele" or mode=="Mu":
         sample["reweightingHistoFileSysMinus"]  = "/data/schoef/results2012/PU/reweightingHisto_Summer2012-S10-Run2012ABC_60max_true_pixelcorr_SysMinus5.root"
     print "Using only databins", data["bins"]
   if targetLumi == 20000. or targetLumi==19400.:
-    for sample in [ttbarScaleDown, ttbarScaleUp, ttbarMatchingDown, ttbarMatchingUp, ttbar, ttbarPowHeg, wjets, wjetsInc, wjetsCombined, wbbjets, wbbjetsCombined, dy, stop, qcd]:
+    for sample in [ttbarScaleDown, ttbarScaleUp, ttbarMatchingDown, ttbarMatchingUp, ttbar, ttbarPowHeg, wjets, wjetsInc, wjetsCombined, wbbjets, wbbjetsCombined, dy, stop, qcd, ttwJets, ttzJets,]:
         sample["reweightingHistoFile"]          = "/data/schoef/results2012/PU/reweightingHisto_Summer2012-S10-Run2012ABCD_60max_true_pixelcorr_Sys0.root"
         sample["reweightingHistoFileSysPlus"]   = "/data/schoef/results2012/PU/reweightingHisto_Summer2012-S10-Run2012ABCD_60max_true_pixelcorr_SysPlus5.root"
         sample["reweightingHistoFileSysMinus"]  = "/data/schoef/results2012/PU/reweightingHisto_Summer2012-S10-Run2012ABCD_60max_true_pixelcorr_SysMinus5.root"
@@ -132,8 +132,9 @@ else:
 #allSamples = [ttbarPowHeg, wjetsCombined, dy, stop, qcd]
 #allSamples = [wjetsCombined, dy, stop, qcd]
 
-#allSamples = [ttbarPowHeg, wjets, wjetsInc, wjetsCombined, dy, stop, qcd, data, ttwJets, ttzJets, singleLeptonData]
-#allSamples = [ttbarScaleDown, ttbarScaleUp, ttbarMatchingDown, ttbarMatchingUp]
+#allSamples = [ttbarPowHeg]
+#allSamples = [wjets, wjetsInc, wjetsCombined,dy, stop, qcd, ttwJets, ttzJets]
+allSamples = [data, singleLeptonData]
 
 from smsInfo import getT1ttttMadgraphDirs, getT5ttttMadgraphDirs, nfsDirectories
 def getT1ttttSample(mgl, mN):
@@ -1156,7 +1157,7 @@ for nc, m in enumerate(chmodes):
       else:
         print "Zero entries in", bin, sample["name"]
       del c
-    if True or (not small):
+    if (not small):
       f = ROOT.TFile(ofile, "recreate")
       t.Write()
       f.Close()
