@@ -14,7 +14,7 @@ options.register ('hltName','HLT',
           VarParsing.VarParsing.varType.string,
           "HLT Trigger collection")
 
-options.register ('GT','START52_V9B::All',#GR_R_52_V9::All
+options.register ('GT','START53_V19::All',
           VarParsing.VarParsing.multiplicity.singleton,
           VarParsing.VarParsing.varType.string,
           "Global Tag")
@@ -34,20 +34,17 @@ options.register ('verbose',False,
           VarParsing.VarParsing.varType.bool,
           "verbosity")
 
-#infiles = [
-#  'file:/afs/hephy.at/scratch/s/schoefbeck/CMS/CMSSW_5_3_3_patch2/src/Workspace/HEPHYCommonTools/crab/pickEvents/pick/pickevents_11_1_wAw.root',
-#  'file:/afs/hephy.at/scratch/s/schoefbeck/CMS/CMSSW_5_3_3_patch2/src/Workspace/HEPHYCommonTools/crab/pickEvents/pick/pickevents_12_1_5oR.root',
-#  'file:/afs/hephy.at/scratch/s/schoefbeck/CMS/CMSSW_5_3_3_patch2/src/Workspace/HEPHYCommonTools/crab/pickEvents/pick/pickevents_1_1_5VT.root',
-#  'file:/afs/hephy.at/scratch/s/schoefbeck/CMS/CMSSW_5_3_3_patch2/src/Workspace/HEPHYCommonTools/crab/pickEvents/pick/pickevents_4_2_ilF.root',
-#  'file:/afs/hephy.at/scratch/s/schoefbeck/CMS/CMSSW_5_3_3_patch2/src/Workspace/HEPHYCommonTools/crab/pickEvents/pick/pickevents_6_2_NBg.root',
-#  'file:/afs/hephy.at/scratch/s/schoefbeck/CMS/CMSSW_5_3_3_patch2/src/Workspace/HEPHYCommonTools/crab/pickEvents/pick/pickevents_9_2_eHB.root']
+infiles = [
+  '/afs/hephy.at/scratch/s/schoefbeck/CMS/CMSSW_5_3_11_patch6/src/Workspace/LightStopAnalysis/crab/step2_RAW2DIGI_L1Reco_RECO.root'
 
+#  'file:/store/caf/user/imikulec/lstop/Hadronizer_SMS_Scans_2jets_Qcut44_TuneZ2star_8TeV_madgraph_tauola_cff_py_GEN_FASTSIM_HLT_PU.root']
+]
 #infiles = ['file:/afs/hephy.at/scratch/w/walten/3C304C5F-58ED-E111-9DDB-0025901E4F3C.root']  #T1tttt madgraph
 
 #infiles = ['file:/data/schoef/local/SMS-T5tttt_mGo-800to1200_mStop-225to1025_mLSP_50_8TeV-Madgraph_Summer12-START52_V9_FSIM_AODSIM_UFLPrivate_998.root'] #T5tttt private
 #infiles = ['file:/data/schoef/local/test_T5tttt.root'] #T5tttt with xsec-model string 
 #infiles = ['file:/data/schoef/local/T1t1t.root'] #T1t1t private
-infiles = ['/store/caf/user/imikulec/lstop/Hadronizer_SMS_Scans_2jets_Qcut44_TuneZ2star_8TeV_madgraph_tauola_cff_py_GEN_FASTSIM_HLT_PU.root']
+
 options.files=infiles
 
 #options.isMC = False
@@ -114,7 +111,7 @@ process.out = cms.OutputModule("PoolOutputModule",
      #verbose = cms.untracked.bool(True),
      SelectEvents   = cms.untracked.PSet( SelectEvents = cms.vstring('p') ),
      fileName = cms.untracked.string('histo.root'),
-     outputCommands = cms.untracked.vstring('drop *', 'keep *_*SUSYTupelizer*_*_*' , 'keep *_*EventCounter*_*_*',  'keep *_genParticles_*_*') 
+     outputCommands = cms.untracked.vstring('drop *', 'keep *_*SUSYTupelizer*_*_*' , 'keep *_*EventCounter*_*_*')
 )
 
 #-- SUSYPAT and GlobalTag Settings -----------------------------------------------------------
@@ -227,7 +224,7 @@ process.goodVertices = cms.EDFilter(
 process.load('RecoMET.METFilters.EcalDeadCellTriggerPrimitiveFilter_cfi')
 process.load('RecoMET.METFilters.trackingFailureFilter_cfi')
 
-process.load('Workspace.Filter.EventCounter')
+process.load('Workspace.HEPHYCommonTools.EventCounter')
 
 process.EventCounterAfterHLT = process.EventCounter.clone()
 process.EventCounterAfterScraping = process.EventCounter.clone()
@@ -360,18 +357,15 @@ process.SUSYTupelizer.addPDFWeights = cms.untracked.bool(True)
 process.SUSYTupelizer.verbose = cms.untracked.bool(options.verbose)
 process.SUSYTupelizer.addFullMuonInfo = cms.untracked.bool(True)
 process.SUSYTupelizer.addFullEleInfo = cms.untracked.bool(True)
-process.SUSYTupelizer.addFullTauInfo = cms.untracked.bool(True)
-
-
 process.p += process.SUSYTupelizer
 
 process.out = cms.OutputModule("PoolOutputModule",
      #verbose = cms.untracked.bool(True),
-     SelectEvents   = cms.untracked.PSet( SelectEvents = cms.vstring('p') ),
      fileName = cms.untracked.string('histo.root'),
-     outputCommands = cms.untracked.vstring('drop *', 'keep *_*SUSYTupelizer*_*_*' , 'keep *_*EventCounter*_*_*',  'keep *_genParticles_*_*') 
+     SelectEvents   = cms.untracked.PSet( SelectEvents = cms.vstring('p') ),
+     outputCommands = cms.untracked.vstring('drop *', 'keep *_*SUSYTupelizer*_*_*' , 'keep *_*EventCounter*_*_*' 
+		 )
 )
-
 process.outpath = cms.EndPath(process.out)
 #-- Dump config ------------------------------------------------------------
 file = open('vienna_SusyPAT_cfg.py','w')
