@@ -111,7 +111,7 @@ process.out = cms.OutputModule("PoolOutputModule",
      #verbose = cms.untracked.bool(True),
      SelectEvents   = cms.untracked.PSet( SelectEvents = cms.vstring('p') ),
      fileName = cms.untracked.string('histo.root'),
-     outputCommands = cms.untracked.vstring('drop *', 'keep *_*SUSYTupelizer*_*_*' , 'keep *_*EventCounter*_*_*')
+     outputCommands = cms.untracked.vstring('drop *', 'keep *_*SUSYTupelizer*_*_*' , 'keep *_*EventCounter*_*_*', 'keep *_genParticles_*_*')
 )
 
 #-- SUSYPAT and GlobalTag Settings -----------------------------------------------------------
@@ -360,6 +360,7 @@ process.SUSYTupelizer.addPDFWeights = cms.untracked.bool(True)
 process.SUSYTupelizer.verbose = cms.untracked.bool(options.verbose)
 process.SUSYTupelizer.addFullMuonInfo = cms.untracked.bool(True)
 process.SUSYTupelizer.addFullEleInfo = cms.untracked.bool(True)
+process.SUSYTupelizer.addFullTauInfo = cms.untracked.bool(True)
 process.p += process.SUSYTupelizer
 
 process.out = cms.OutputModule("PoolOutputModule",
