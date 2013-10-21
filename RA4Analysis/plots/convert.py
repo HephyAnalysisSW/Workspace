@@ -17,8 +17,8 @@ mt2w = ROOT.mt2w(500, 499, 0.5)
 
 small = False
 
-mode = "Mu"
-#mode = "Ele"
+#mode = "Mu"
+mode = "Ele"
 #mode = "HT"
 
 targetLumi = 19400.
@@ -114,7 +114,7 @@ if mode=="Ele" or mode=="Mu":
         sample["reweightingHistoFileSysMinus"]  = "/data/schoef/results2012/PU/reweightingHisto_Summer2012-S10-Run2012ABC_60max_true_pixelcorr_SysMinus5.root"
     print "Using only databins", data["bins"]
   if targetLumi == 20000. or targetLumi==19400.:
-    for sample in [ttbarScaleDown, ttbarScaleUp, ttbarMatchingDown, ttbarMatchingUp, ttbar, ttbarPowHeg, wjets, wjetsInc, wjetsCombined, wbbjets, wbbjetsCombined, dy, stop, qcd, ttwJets, ttzJets,]:
+    for sample in [ttbarScaleDown, ttbarScaleUp, ttbarMatchingDown, ttbarMatchingUp, ttbar, ttbarPowHeg, wjets, wjetsInc, wjetsCombined, wbbjets, wbbjetsCombined, dy, stop, qcd, ttwJets, ttzJets]:
         sample["reweightingHistoFile"]          = "/data/schoef/results2012/PU/reweightingHisto_Summer2012-S10-Run2012ABCD_60max_true_pixelcorr_Sys0.root"
         sample["reweightingHistoFileSysPlus"]   = "/data/schoef/results2012/PU/reweightingHisto_Summer2012-S10-Run2012ABCD_60max_true_pixelcorr_SysPlus5.root"
         sample["reweightingHistoFileSysMinus"]  = "/data/schoef/results2012/PU/reweightingHisto_Summer2012-S10-Run2012ABCD_60max_true_pixelcorr_SysMinus5.root"
@@ -127,10 +127,6 @@ if mode=="HT":
   qcdHad["reweightingHistoFile"] = "/data/schoef/results2012/PU/reweightingHisto_Summer2012-S7-Run2012ABCD_60max_true_pixelcorr_Sys0.root"
 else:
   allSamples = [ttbarPowHeg, singleLeptonData, wjets, wjetsInc, wjetsCombined, dy, stop, qcd, data]
-
-#allSamples = [ttbarPowHeg]
-#allSamples = [ttbarPowHeg, wjetsCombined, dy, stop, qcd]
-#allSamples = [wjetsCombined, dy, stop, qcd]
 
 #allSamples = [ttbarPowHeg]
 #allSamples = [wjets, wjetsInc, wjetsCombined,dy, stop, qcd, ttwJets, ttzJets]
@@ -579,7 +575,7 @@ for nc, m in enumerate(chmodes):
     variables = []
 #    extraVariables=["mbb", "mbl", "phibb"]
     extraVariables=["alphaT"]
-    extraVariables+=["S3D", "C3D", "C2D", "FWMT1", "FWMT2", "FWMT3", "FWMT4", "c2DLepMET", "FWMT1LepMET", "FWMT2LepMET", "FWMT3LepMET", "FWMT4LepMET"]
+    extraVariables+=["S3D", "C3D", "C2D", "linS3D", "linC3D", "linC2D", "FWMT1", "FWMT2", "FWMT3", "FWMT4","linC2DLepMET", "c2DLepMET", "FWMT1LepMET", "FWMT2LepMET", "FWMT3LepMET", "FWMT4LepMET"]
     if mode=="Ele" or mode=="Mu":
       variables = ["weight",  "weightPUSysPlus", "weightPUSysMinus", "targetLumi", "xsec", "weightLumi", "run", "lumi", "met", "type1phiMet", "type1phiMetpx", "type1phiMetpy", "metpx", "metpy", "metphi", "mT", "barepfmet" ,"ht", "btag0", "btag1", "btag2", "btag3","rawMetpx", "rawMetpy", "m3", "mht", "singleMuonic", "singleElectronic", \
       "leptonPt", "leptonEta", "leptonPhi", "leptonPdg", "njets", "nbtags", "nbjets", "jet0pt", "jet1pt", "jet2pt", "jet3pt", "jet0phi", "jet1phi","nvetoMuons", "nvetoElectrons", "ngoodMuons", "ngoodElectrons", "ngoodVertices", "nTrueGenVertices",
@@ -668,7 +664,10 @@ for nc, m in enumerate(chmodes):
       t.Branch(var,   ROOT.AddressOf(s,var), var+'/F')
     for var in extraVariables:
       t.Branch(var,   ROOT.AddressOf(s,var), var+'/F')
-    ofile = outputDir+"/"+chmode+"/"+mode+"/"+sample["name"]+"/histo_"+sample["name"]+".root"
+    sfix = ""
+    if small:
+      sfix="_small"
+    ofile = outputDir+"/"+chmode+"/"+mode+"/"+sample["name"]+"/histo_"+sample["name"]+sfix+".root"
     if os.path.isfile(ofile) and overwrite:
       print "Warning! will overwrite",ofile
     if os.path.isfile(ofile) and not overwrite:
@@ -847,12 +846,17 @@ for nc, m in enumerate(chmodes):
 #            print s.minDeltaPhi
             if len(jets)>1:
               s3D = eventShape.sphericity(jets)
-              c3D = eventShape.circularity(s3D["eigenvalues"])
+              c3D = eventShape.circularity(s3D["ev"])
+              linC3D = eventShape.circularity(s3D["linEv"])
+
               c2D = eventShape.circularity2D(jets)
               foxwolfram = eventShape.foxWolframMoments(jets)
               s.S3D= s3D['sphericity']
+              s.linS3D= s3D['linSphericity']
               s.C3D= c3D
-              s.C2D= c2D
+              s.linC3D= linC3D
+              s.C2D= c2D["c2D"]
+              s.linC2D= c2D["linC2D"]
               s.FWMT1= foxwolfram["FWMT1"]
               s.FWMT2= foxwolfram["FWMT2"]
               s.FWMT3= foxwolfram["FWMT3"]
@@ -863,7 +867,8 @@ for nc, m in enumerate(chmodes):
                 lepObj = {"pt":s.leptonPt, "phi":s.leptonPhi}
                 c2DLepMET = eventShape.circularity2D(jets+[lepObj]+[metObj])
                 foxwolfram = eventShape.foxWolframMoments(jets+[lepObj]+[metObj])
-                s.c2DLepMET   =  c2DLepMET          
+                s.c2DLepMET   =  c2DLepMET['c2D'] 
+                s.linC2DLepMET=  c2DLepMET['linC2D']   
                 s.FWMT1LepMET = foxwolfram["FWMT1"]
                 s.FWMT2LepMET = foxwolfram["FWMT2"]
                 s.FWMT3LepMET = foxwolfram["FWMT3"]
@@ -1157,7 +1162,7 @@ for nc, m in enumerate(chmodes):
       else:
         print "Zero entries in", bin, sample["name"]
       del c
-    if (not small):
+    if True or (not small):
       f = ROOT.TFile(ofile, "recreate")
       t.Write()
       f.Close()
