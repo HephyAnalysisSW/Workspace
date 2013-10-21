@@ -14,7 +14,7 @@ options.register ('hltName','HLT',
           VarParsing.VarParsing.varType.string,
           "HLT Trigger collection")
 
-options.register ('GT','START53_V19::All',
+options.register ('GT','START53_V7F::All',
           VarParsing.VarParsing.multiplicity.singleton,
           VarParsing.VarParsing.varType.string,
           "Global Tag")
@@ -35,7 +35,7 @@ options.register ('verbose',False,
           "verbosity")
 
 infiles = [
-  '/afs/hephy.at/scratch/s/schoefbeck/CMS/CMSSW_5_3_11_patch6/src/Workspace/LightStopAnalysis/crab/step2_RAW2DIGI_L1Reco_RECO.root'
+  'file:/afs/hephy.at/scratch/s/schoefbeck/CMS/CMSSW_5_3_11_patch6/src/Workspace/LightStopAnalysis/crab/step2_RAW2DIGI_L1Reco_RECO.root'
 
 #  'file:/store/caf/user/imikulec/lstop/Hadronizer_SMS_Scans_2jets_Qcut44_TuneZ2star_8TeV_madgraph_tauola_cff_py_GEN_FASTSIM_HLT_PU.root']
 ]
@@ -272,10 +272,13 @@ process.kt6PFJetsForIsolation2012 = kt4PFJets.clone( rParam = 0.6, doRhoFastjet 
 process.kt6PFJetsForIsolation2012.Rho_EtaMax = cms.double(4.4)
 process.kt6PFJetsForIsolation2012.voronoiRfact = cms.double(0.9)
 
+from CMGTools.External.pujetidsequence_cff import loadPujetId
+loadPujetId(process,'patJetsAK5PF',mvaOnly=False,isChs=False,release="53X")
+
 #-- Execution path ------------------------------------------------------------
 # Full path
-process.load('CommonTools.ParticleFlow.goodOfflinePrimaryVertices_cfi') #FIXME Added R.S.
-process.p = cms.Path(process.goodOfflinePrimaryVertices + process.filterSequence + process.susyPatDefaultSequence )
+process.load('CommonTools.ParticleFlow.goodOfflinePrimaryVertices_cfi') 
+process.p = cms.Path(process.goodOfflinePrimaryVertices + process.filterSequence + process.susyPatDefaultSequence + process.puJetIdpatJetsAK5PF + process.puJetMvapatJetsAK5PF)
 
 process.p += process.kt6PFJetsForIsolation2011
 process.p += process.pfMEtSysShiftCorrSequence
