@@ -56,25 +56,29 @@ public:
 //    }
 //    init(cands);
 
-  template<typename const_iterator>
-  Thrust(int n, double * px, double * py) :
-    thrust_(0), axis_(0, 0, 0), pSum_(0),
-    n_(n), p_(n_) {
+//  template<typename const_iterator>
+  Thrust(unsigned n, double * px, double * py): 
+    thrust_(0), 
+    axis_(0, 0, 0), 
+    pSum_(0),
+    n_(n), 
+    p_(n_) 
+    {
     if (n_ == 0) return;
     std::vector<const LorentzVector*> cands;
-    for( int i = 0; i < n_ ; i++) {
-      const LorentzVector * p(px[i], py[i], 0., sqrt(px[i]*px[i] + py[i]*py[i]));
-      cands.push_back(p);
+    for( unsigned i = 0; i < n_ ; i++) {
+      const LorentzVector * ptemp = new const LorentzVector(px[i], py[i], 0., sqrt(px[i]*px[i] + py[i]*py[i]));
+      cands.push_back(ptemp);
     }
     init(cands);
-
-
-  } 
+//    std::cout << "Cands:"<<cands.size()<<std::endl;
+  }; 
   /// thrust value (in the range [0.5, 1.0])
   double thrust() const { return thrust_; } 
   /// thrust axis (with magnitude = 1)
   const Vector& axis() const { return axis_; } 
-
+  double thrustPhi () {return thrustPhi_;};
+  double thrustEta () {return thrustEta_;};
 private:
   double thrust_;
   Vector axis_;
@@ -86,7 +90,8 @@ private:
     ThetaPhi(double t, double p) : theta( t ), phi( p ) { }
     double theta, phi;
   };
-  double thrust(const Vector & theAxis) const; 
+  double thrust(const Vector & theAxis, const bool verbose = false) const; 
+  double thrustEta_, thrustPhi_;
   ThetaPhi initialAxis() const;
   ThetaPhi finalAxis(ThetaPhi) const;
   Vector axis(double theta, double phi) const;

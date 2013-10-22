@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 import sys, os
 
-dirname = "/data/schoef/pat_130501/"
+dirname = "/data/schoef/pat_131021/"
 
 subdirnames = os.listdir(dirname)
 toBeRemovedGlobal=[]

@@ -367,7 +367,7 @@ process.out = cms.OutputModule("PoolOutputModule",
      #verbose = cms.untracked.bool(True),
      fileName = cms.untracked.string('histo.root'),
      SelectEvents   = cms.untracked.PSet( SelectEvents = cms.vstring('p') ),
-     outputCommands = cms.untracked.vstring('drop *', 'keep *_*SUSYTupelizer*_*_*' , 'keep *_*EventCounter*_*_*' 
+     outputCommands = cms.untracked.vstring('drop *', 'keep *_*SUSYTupelizer*_*_*' , 'keep *_*EventCounter*_*_*', 'keep *_genParticles_*_*' 
 		 )
 )
 process.outpath = cms.EndPath(process.out)

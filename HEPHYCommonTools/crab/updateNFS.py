@@ -4,7 +4,7 @@ import os
 from optparse import OptionParser
 
 parser = OptionParser()
-parser.add_option("--userNameDPM", dest="userNameDPM", default="mhickel", type="string", action="store", help="username of DPM User")
+parser.add_option("--userNameDPM", dest="userNameDPM", default="schoef", type="string", action="store", help="username of DPM User")
 parser.add_option("--userNameNFS", dest="userNameNFS", default="schoef", type="string", action="store", help="username on NFS disk /data/")
 parser.add_option("--source", dest="source", default="pat_130418/8TeV-T1tttt-test", type="string", action="store", help="source directory in users dpm folder")
 parser.add_option("--target", dest="target", default="pat_130501/8TeV-T1tttt", type="string", action="store", help="target directory in users NFS folder")
@@ -37,7 +37,7 @@ for line in p.stdout.readlines():
           break
       if found: continue
       else: 
-        if not size> 100000:
+        if not size> 1000:
           print "Skipping because file is too small (",filename, "size:", size,")"
           continue
         print "Copying", dpmDir+"/"+filename, "to", oDir+"/"+filename

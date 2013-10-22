@@ -12,6 +12,7 @@ ROOT.gROOT.ProcessLine(".L polSys/WPolarizationVariation.C+")
 ROOT.gROOT.ProcessLine(".L polSys/TTbarPolarization.C+")
 ROOT.gROOT.ProcessLine(".L mt2w/mt2w_bisect.cpp+")
 ROOT.gROOT.ProcessLine(".L alphaT/alphaT.C+")
+ROOT.gROOT.ProcessLine(".L ../../HEPHYCommonTools/scripts/root/Thrust.C+")
 
 mt2w = ROOT.mt2w(500, 499, 0.5)
 
@@ -574,7 +575,7 @@ for nc, m in enumerate(chmodes):
 
     variables = []
 #    extraVariables=["mbb", "mbl", "phibb"]
-    extraVariables=["alphaT"]
+    extraVariables=["alphaT", "thrust", "thrustPhi", "thrustEta", "htThrustLepSide", "htThrustOppSide"]
     extraVariables+=["S3D", "C3D", "C2D", "linS3D", "linC3D", "linC2D", "FWMT1", "FWMT2", "FWMT3", "FWMT4","linC2DLepMET", "c2DLepMET", "FWMT1LepMET", "FWMT2LepMET", "FWMT3LepMET", "FWMT4LepMET"]
     if mode=="Ele" or mode=="Mu":
       variables = ["weight",  "weightPUSysPlus", "weightPUSysMinus", "targetLumi", "xsec", "weightLumi", "run", "lumi", "met", "type1phiMet", "type1phiMetpx", "type1phiMetpy", "metpx", "metpy", "metphi", "mT", "barepfmet" ,"ht", "btag0", "btag1", "btag2", "btag3","rawMetpx", "rawMetpy", "m3", "mht", "singleMuonic", "singleElectronic", \
@@ -771,7 +772,7 @@ for nc, m in enumerate(chmodes):
 #            print jets         
             if 1<abs(den-s.ht):print "WARNING HT <> sum(JET-pt) DISAGREEMENT!!"
             if len(jets)>=2:
-              s.alphaT =  ROOT.CalcAlphaT(array.array('d', [ j['pt'] for j in jets ]), array.array('d', [ j['eta'] for j in jets ]), array.array('d', [ j['phi'] for j in jets ]), len(jets) ) 
+              s.alphaT =  ROOT.CalcAlphaT(array.array('d', [ j['pt'] for j in jets ]), array.array('d', [ j['eta'] for j in jets ]), array.array('d', [ j['phi'] for j in jets ]), len(jets) )
 #            if s.njets==3:
 #              print "njets",s.njets, "met",s.met, "ht", s.ht, "alphaT", s.alphaT
             if len(bjets)==0 and len(ljets)>=3: #All combinations from the highest three light (or b-) jets
@@ -873,8 +874,33 @@ for nc, m in enumerate(chmodes):
                 s.FWMT2LepMET = foxwolfram["FWMT2"]
                 s.FWMT3LepMET = foxwolfram["FWMT3"]
                 s.FWMT4LepMET = foxwolfram["FWMT4"]
+                px = [cos(s.leptonPhi)*s.leptonPt] + [s.type1phiMetpx] + [cos(j['phi'])*j['pt'] for j in jets]
+                py = [sin(s.leptonPhi)*s.leptonPt] + [s.type1phiMetpy] + [sin(j['phi'])*j['pt'] for j in jets]
+                
+                thrust = ROOT.Thrust(2+len(jets), array.array('d', px), array.array('d', py))
+                s.thrust = thrust.thrust()
+                s.thrustPhi = thrust.thrustPhi()
+                s.thrustEta = thrust.thrustEta() 
+                if s.thrustEta>0.1:
+                    print "transversal thrust.eta() not zero?", thrust.thrust(), s.njets, s.thrustPhi, s.thrustEta
+                if cos(s.leptonPhi - s.thrustPhi)>0:
+                  sign = 1
+                else:
+                  sign=-1
+                htThrustLepSide = 0.
+                htThrustOppSide = 0.
+                for j in jets:
+                  if sign*cos(s.thrustPhi - j['phi'])>0:
+                    htThrustLepSide+=j['pt']
+                  else:
+                    htThrustOppSide+=j['pt']
+                s.htThrustLepSide = htThrustLepSide
+                s.htThrustOppSide = htThrustOppSide
+#                print jets
+#                print sign, s.thrustPhi, s.leptonPhi,'lepSide', htThrustLepSide, 'OppSide',htThrustOppSide,'ht',s.ht
+      
 
-
+#                print [s.leptonPt] + [s.type1phiMet] + [j['pt'] for j in jets], thrust.thrust()
             if len(chmode.split("_"))>1 and chmode.split("_")[1][:3]=="JES":
 #              print "\n",s.met, s.ht,s.njets,s.nbtags
               jesmode = chmode.split("_")[1][3]
