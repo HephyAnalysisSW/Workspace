@@ -85,7 +85,7 @@ def sphericity(jets):
   return {'sphericity':s, "ev":ev, "linSphericity":s_lin, "linEv":ev_lin}
 
 def circularity(ev3D):
-  c = (2 * ev3D[2]) / (ev3D[1] + ev3D[2])
+  c = (2 * ev3D[1]) / (ev3D[1] + ev3D[0])
   return c
 
 def circularity2D(jets):

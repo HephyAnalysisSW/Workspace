@@ -4,10 +4,15 @@ sys.path.insert(0,'/afs/hephy.at/scratch/d/dhandl/CMSSW_5_3_3_patch2/src/Workspa
 from defaultMu2012Samples import *
 from localConfig import defaultWWWPath
 
+path = os.path.abspath('../../plots')
+if not path in sys.path:
+    sys.path.insert(1, path)
+del path
+import eventShape
+
 ROOT.gROOT.ProcessLine('.L ../../scripts/tdrstyle.C')
 ROOT.setTDRStyle()
 
-#cut = "ht>400&&met>150"
 cut =  "(singleMuonic&&nvetoMuons==1&&nvetoElectrons==0||singleElectronic&&nvetoElectrons==1&&nvetoMuons==0)&&ht>400&&met>150&&njets>=3"     #cut to use
 prefix = 'FirstTry'
 metVar = "type1phiMet"
@@ -17,32 +22,32 @@ allVariables = []
 spher = {'name':'S3D', 'legendName':'Sphericity (3D)', 'binning':[40,0,1]}
 circ = {'name':'C3D', 'legendName':'Circularity (3D)', 'binning':[40,0,1]}
 circ2D = {'name':'C2D', 'legendName':'Circularity (2D)', 'binning':[40,0,1]}
-ht0 = {'name':'FWMT0', 'legendName':'FWM_{0}^{T}', 'binning':[40,0,1]}
-ht1 = {'name':'FWMT1', 'legendName':'FWM_{1}^{T}', 'binning':[40,0,1]}
-ht2 = {'name':'FWMT2', 'legendName':'FWM_{2}^{T}', 'binning':[40,0,1]}
-ht3 = {'name':'FWMT3', 'legendName':'FWM_{3}^{T}', 'binning':[40,0,1]}
-ht4 = {'name':'FWMT4', 'legendName':'FWM_{4}^{T}', 'binning':[40,0,1]}
+#fwmt0 = {'name':'FWMT0', 'legendName':'FWM_{0}^{T}', 'binning':[40,0,1]}
+fwmt1 = {'name':'FWMT1', 'legendName':'FWM_{1}^{T}', 'binning':[40,0,1]}
+fwmt2 = {'name':'FWMT2', 'legendName':'FWM_{2}^{T}', 'binning':[40,0,1]}
+fwmt3 = {'name':'FWMT3', 'legendName':'FWM_{3}^{T}', 'binning':[40,0,1]}
+fwmt4 = {'name':'FWMT4', 'legendName':'FWM_{4}^{T}', 'binning':[40,0,1]}
 circ2DLepMET = {'name':'C2DLepMET', 'legendName':'Circularity (2D)', 'binning':[40,0,1]}
-ht0LepMET    = {'name':'FWMT0LepMET', 'legendName':'FWM_{0}^{T}', 'binning':[40,0,1]}
-ht1LepMET    = {'name':'FWMT1LepMET', 'legendName':'FWM_{1}^{T}', 'binning':[40,0,1]}
-ht2LepMET    = {'name':'FWMT2LepMET', 'legendName':'FWM_{2}^{T}', 'binning':[40,0,1]}
-ht3LepMET    = {'name':'FWMT3LepMET', 'legendName':'FWM_{3}^{T}', 'binning':[40,0,1]}
-ht4LepMET    = {'name':'FWMT4LepMET', 'legendName':'FWM_{4}^{T}', 'binning':[40,0,1]}
+#fwmt0LepMET    = {'name':'FWMT0LepMET', 'legendName':'FWM_{0}^{T}', 'binning':[40,0,1]}
+fwmt1LepMET    = {'name':'FWMT1LepMET', 'legendName':'FWM_{1}^{T}', 'binning':[40,0,1]}
+fwmt2LepMET    = {'name':'FWMT2LepMET', 'legendName':'FWM_{2}^{T}', 'binning':[40,0,1]}
+fwmt3LepMET    = {'name':'FWMT3LepMET', 'legendName':'FWM_{3}^{T}', 'binning':[40,0,1]}
+fwmt4LepMET    = {'name':'FWMT4LepMET', 'legendName':'FWM_{4}^{T}', 'binning':[40,0,1]}
 
 allVariables.append(spher)
 allVariables.append(circ)
 allVariables.append(circ2D)
-allVariables.append(ht0)
-allVariables.append(ht1)
-allVariables.append(ht2)
-allVariables.append(ht3)
-allVariables.append(ht4)
+#allVariables.append(fwmt0)
+allVariables.append(fwmt1)
+allVariables.append(fwmt2)
+allVariables.append(fwmt3)
+allVariables.append(fwmt4)
 allVariables.append(circ2DLepMET)
-allVariables.append(ht0LepMET)
-allVariables.append(ht1LepMET)
-allVariables.append(ht2LepMET)
-allVariables.append(ht3LepMET)
-allVariables.append(ht4LepMET)
+#allVariables.append(fwmt0LepMET)
+allVariables.append(fwmt1LepMET)
+allVariables.append(fwmt2LepMET)
+allVariables.append(fwmt3LepMET)
+allVariables.append(fwmt4LepMET)
 
 #Creat Chain with Samples
 DATA = ROOT.TChain("Events")
@@ -128,15 +133,15 @@ for sample in extraSamples + allSamples: #Loop over samples
     leplist = funcs.getGoodLeptons(sample['chain'], nmuons, neles)
     allJets, bjets = funcs.getGoodJets(sample['chain'], leplist['leptons'])
 
-    s3D = funcs.sphericity(allJets)
-    c3D = funcs.circularity(s3D["eigenvalues"])
-    c2D = funcs.circularity2D(allJets)
-    foxwolfram = funcs.foxWolframMoments(allJets)
+    s3D = eventShape.sphericity(allJets)
+    c3D = eventShape.circularity(s3D["ev"])
+    c2D = eventshape.circularity2D(allJets)
+    foxwolfram = eventShape.foxWolframMoments(allJets)
 #    print i+1,'.Event:',foxwolfram
     histos[sample['name']]['S3D'].Fill(s3D['sphericity'],sample['weight'])  
     histos[sample['name']]['C3D'].Fill(c3D,sample['weight'])  
     histos[sample['name']]['C2D'].Fill(c2D,sample['weight'])
-    histos[sample['name']]['FWMT0'].Fill(foxwolfram["FWMT0"],sample['weight'])
+#    histos[sample['name']]['FWMT0'].Fill(foxwolfram["FWMT0"],sample['weight'])
     histos[sample['name']]['FWMT1'].Fill(foxwolfram["FWMT1"],sample['weight'])
     histos[sample['name']]['FWMT2'].Fill(foxwolfram["FWMT2"],sample['weight'])
     histos[sample['name']]['FWMT3'].Fill(foxwolfram["FWMT3"],sample['weight'])
@@ -149,7 +154,7 @@ for sample in extraSamples + allSamples: #Loop over samples
       foxwolfram = funcs.foxWolframMoments(allJets+leplist['leptons']+[metObj])
   #    print i+1,'.Event:',foxwolfram
       histos[sample['name']]['C2DLepMET'].Fill(c2DLepMET,sample['weight'])
-      histos[sample['name']]['FWMT0LepMET'].Fill(foxwolfram["FWMT0"],sample['weight'])
+#      histos[sample['name']]['FWMT0LepMET'].Fill(foxwolfram["FWMT0"],sample['weight'])
       histos[sample['name']]['FWMT1LepMET'].Fill(foxwolfram["FWMT1"],sample['weight'])
       histos[sample['name']]['FWMT2LepMET'].Fill(foxwolfram["FWMT2"],sample['weight'])
       histos[sample['name']]['FWMT3LepMET'].Fill(foxwolfram["FWMT3"],sample['weight'])
