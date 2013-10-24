@@ -22,8 +22,8 @@ small = False
 mode = "Ele"
 #mode = "HT"
 
-targetLumi = 19400.
-if targetLumi==19400.:
+targetLumi = 19700.
+if targetLumi==19700.:
   outputDir = "/data/schoef/convertedTuples_v21/"
 
 #mode = "HT"
@@ -114,7 +114,7 @@ if mode=="Ele" or mode=="Mu":
         sample["reweightingHistoFileSysPlus"]   = "/data/schoef/results2012/PU/reweightingHisto_Summer2012-S10-Run2012ABC_60max_true_pixelcorr_SysPlus5.root"
         sample["reweightingHistoFileSysMinus"]  = "/data/schoef/results2012/PU/reweightingHisto_Summer2012-S10-Run2012ABC_60max_true_pixelcorr_SysMinus5.root"
     print "Using only databins", data["bins"]
-  if targetLumi == 20000. or targetLumi==19400.:
+  if targetLumi == 20000. or targetLumi==19400. or targetLumi==19700:
     for sample in [ttbarScaleDown, ttbarScaleUp, ttbarMatchingDown, ttbarMatchingUp, ttbar, ttbarPowHeg, wjets, wjetsInc, wjetsCombined, wbbjets, wbbjetsCombined, dy, stop, qcd, ttwJets, ttzJets]:
         sample["reweightingHistoFile"]          = "/data/schoef/results2012/PU/reweightingHisto_Summer2012-S10-Run2012ABCD_60max_true_pixelcorr_Sys0.root"
         sample["reweightingHistoFileSysPlus"]   = "/data/schoef/results2012/PU/reweightingHisto_Summer2012-S10-Run2012ABCD_60max_true_pixelcorr_SysPlus5.root"
@@ -583,7 +583,7 @@ for nc, m in enumerate(chmodes):
       "btag0pt", "btag1pt", "btag2pt", "btag3pt", "btag0eta", "btag1eta", "btag2eta", "btag3eta", "btag0Mass", "btag1Mass", "btag2Mass", "btag3Mass"]
 
       if chmode=="copyMET":
-        extraVariables += ["weightEleEff", "weightMuEff1", "weightMuEff2", "probOneMoreBTag", "probOneMoreBTagSF", "mt2w", "minDeltaPhi", "htRatio"]
+        extraVariables += ["weightEleEff", "weightMuEff1", "weightMuEff2", "probOneMoreBTag", "probOneMoreBTagSF", "mt2w", "minDeltaPhi", "htRatio", "cosDeltaPhi"]
 #        if sms=="" and chmode[:7]=="copyMET":
 #          extraVariables+= [ "numBPartons", "numCPartons"]
       if sample["name"]=="singleMuData" and mode=="Mu":
@@ -595,8 +595,9 @@ for nc, m in enumerate(chmodes):
         variables += ["HLTCleanPFHT300Ele15CaloIdTCaloIsoVLTrkIdTTrkIsoVLPFMET45", "HLTCleanPFHT300Ele15CaloIdTCaloIsoVLTrkIdTTrkIsoVLPFMET50", "HLTCleanPFHT350Ele5CaloIdTCaloIsoVLTrkIdTTrkIsoVLPFMET45", "HLTCleanPFHT350Ele5CaloIdTCaloIsoVLTrkIdTTrkIsoVLPFMET50", "HLTCleanPFNoPUHT300Ele15CaloIdTCaloIsoVLTrkIdTTrkIsoVLPFMET45", "HLTCleanPFNoPUHT300Ele15CaloIdTCaloIsoVLTrkIdTTrkIsoVLPFMET50", "HLTCleanPFNoPUHT350Ele5CaloIdTCaloIsoVLTrkIdTTrkIsoVLPFMET45", "HLTCleanPFNoPUHT350Ele5CaloIdTCaloIsoVLTrkIdTTrkIsoVLPFMET50", "HLTEle27WP80", "preCleanPFHT300Ele15CaloIdTCaloIsoVLTrkIdTTrkIsoVLPFMET45", "preCleanPFHT300Ele15CaloIdTCaloIsoVLTrkIdTTrkIsoVLPFMET50", "preCleanPFHT350Ele5CaloIdTCaloIsoVLTrkIdTTrkIsoVLPFMET45", "preCleanPFHT350Ele5CaloIdTCaloIsoVLTrkIdTTrkIsoVLPFMET50", "preCleanPFNoPUHT300Ele15CaloIdTCaloIsoVLTrkIdTTrkIsoVLPFMET45", "preCleanPFNoPUHT300Ele15CaloIdTCaloIsoVLTrkIdTTrkIsoVLPFMET50", "preCleanPFNoPUHT350Ele5CaloIdTCaloIsoVLTrkIdTTrkIsoVLPFMET45", "preCleanPFNoPUHT350Ele5CaloIdTCaloIsoVLTrkIdTTrkIsoVLPFMET50", "preEle27WP80"]
 
       MC_variables =  ["genmet", "genmetpx","genmetpy", "btag0parton", "btag1parton", "btag2parton", "btag3parton",\
-                       "antinuMu", "antinuE", "antinuTau", "nuMu", "nuE", "nuTau", "nuMuFromTausFromWs", "nuEFromTausFromWs", "nuTauFromTausFromWs", "weightTTPolPlus5", "weightTTPolMinus5", "weightTTxsecPlus30", "weightTTxsecMinus30",
-                       "weightDiLepPlus15", "weightDiLepMinus15", "weightTauPlus15", "weightTauMinus15",  "weightWxsecPlus30", "weightWxsecMinus30" , "weightNonLeadingxsecPlus30", "weightNonLeadingxsecMinus30", "hasGluonSplitting", "numBPartons", "numCPartons"]
+                       "antinuMu", "antinuE", "antinuTau", "nuMu", "nuE", "nuTau", "nuMuFromTausFromWs", "nuEFromTausFromWs", "nuTauFromTausFromWs", "weightTTPolPlus5", "weightTTPolMinus5", #"weightTTxsecPlus30", "weightTTxsecMinus30",
+                       #"weightDiLepPlus15", "weightDiLepMinus15", "weightTauPlus15", "weightTauMinus15",  "weightWxsecPlus30", "weightWxsecMinus30" , "weightNonLeadingxsecPlus30", "weightNonLeadingxsecMinus30", 
+                       "hasGluonSplitting", "numBPartons", "numCPartons"]
       if sms!="":
         MC_variables+=["gluino0Pt", "gluino0Eta", "gluino0Phi", "gluino0Pdg"]
         MC_variables+=["gluino1Pt", "gluino1Eta", "gluino1Phi", "gluino1Pdg"]
@@ -769,7 +770,10 @@ for nc, m in enumerate(chmodes):
                 num+=j["pt"]
             if len(jets)>0:
               s.htRatio = num/den
-#            print jets         
+#            print jets        
+            pW = sqrt((s.leptonPt*cos(s.leptonPhi) + s.type1phiMetpx)**2 + (s.leptonPt*sin(s.leptonPhi) + s.type1phiMetpy)**2)
+            s.cosDeltaPhi = ((s.leptonPt*cos(s.leptonPhi) + s.type1phiMetpx)*cos(s.leptonPhi) + (s.leptonPt*sin(s.leptonPhi) + s.type1phiMetpy)*sin(s.leptonPhi) )/pW
+ 
             if 1<abs(den-s.ht):print "WARNING HT <> sum(JET-pt) DISAGREEMENT!!"
             if len(jets)>=2:
               s.alphaT =  ROOT.CalcAlphaT(array.array('d', [ j['pt'] for j in jets ]), array.array('d', [ j['eta'] for j in jets ]), array.array('d', [ j['phi'] for j in jets ]), len(jets) )

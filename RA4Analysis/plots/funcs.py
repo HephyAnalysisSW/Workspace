@@ -202,6 +202,18 @@ def cosDeltaPhiLepMET(chain):
   res =  1. - mT**2/(2.*met*lepton_pt)
   return res
 
+def cosDeltaPhiLepW(chain):
+  lPt = getValue(chain, "leptonPt")
+  lPhi = getValue(chain, "leptonPhi")
+  mpx = getValue(chain, "type1phiMetpx")
+  mpy = getValue(chain, "type1phiMetpy")
+  cosLepPhi = cos(lPhi)
+  sinLepPhi = sin(lPhi)
+  return ((lPt*cosLepPhi + mpx)*cosLepPhi + (lPt*sinLepPhi + mpy)*sinLepPhi )/pW
+
+  
+
+
 def cleanMTFunc(cutVal):
   def cleanMT(chain):
     cosDeltaPhi = cosDeltaPhiLepMET(chain)
@@ -303,6 +315,18 @@ def fakeMet(chain):
 #
 #  return 
 
+def htThrustLepRatio(chain):
+  ht = getValue(chain, "ht")
+  htThrustLepSide = getValue(chain, "htThrustLepSide")
+  return htThrustLepSide/ht
+
+def htThrustOppRatio(chain):
+  ht = getValue(chain, "ht")
+  htThrustOppSide = getValue(chain, "htThrustOppSide")
+  return htThrustOppSide/ht
+
+def minDeltaPhiOverPi(chain):
+  return getValue(chain, "minDeltaPhi")/ROOT.TMath.Pi()
 
 def genLP(chain):
   lepton_pt = getValue(chain,"leptonPt")

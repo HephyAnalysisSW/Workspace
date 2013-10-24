@@ -134,6 +134,9 @@ for sample in allSamples:
                   reweightFac = var.reweightHisto.GetBinContent(var.reweightHisto.FindBin(getValue(c, var.reweightVar)))
 #                 print "reweightVar = ",var.reweightVar, c.GetLeaf(var.reweightVar).GetValue(), "->", reweightFac
               nvtxWeight=reweightFac*nvtxWeight 
+              scaleFac = 1
+              if sample.has_key('scaleFac'):
+                scaleFac = sample['scaleFac']
               weight = 1
               if sample.has_key("hasWeight"):
                 if sample["hasWeight"]:
@@ -143,10 +146,10 @@ for sample in allSamples:
               else:
                 weight = sample["weight"][bin]
               if var.varfunc!="":
-                var.data_histo.Fill(var.varfunc(c), weight*nvtxWeight)
+                var.data_histo.Fill(var.varfunc(c), weight*nvtxWeight*scaleFac)
 #                print "var",var,"name",var.name,"Using ", var.varfunc(c),"instead of", var.name 
               else:
-                var.data_histo.Fill(getValue(c, var.name), weight*nvtxWeight)
+                var.data_histo.Fill(getValue(c, var.name), weight*nvtxWeight*scaleFac)
 #                print "var",var,"name",var.name,"weight",weight,"nvtxWeight",nvtxWeight, "Using ", getValue(c, var.name) 
           del elist
     else:
