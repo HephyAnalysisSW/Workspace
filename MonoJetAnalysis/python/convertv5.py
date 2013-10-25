@@ -20,7 +20,8 @@ small  = False
 overwrite = True
 target_lumi = 19375 #pb-1
 
-outputDir = "/data/imikulec"
+from localInfo import username
+outputDir = "/data/"+username+"/"
 
 ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
