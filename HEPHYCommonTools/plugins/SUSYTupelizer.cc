@@ -1089,6 +1089,7 @@ void SUSYTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup) {
       put("rawMetpy", rawMET[0].py());//Apply changes from JES
       put("rawMet", rawMET[0].pt()); //sqrt(rawmetpx*rawmetpx + rawmetpy*rawmetpy);
       put("rawMetphi",rawMET[0].phi());
+      put("rawMetSignificance",rawMET[0].significance());
     }
     
     vector<pat::MET> type01MET (EdmHelper::getObjs<pat::MET > (ev,  type01MET_));
@@ -2237,6 +2238,7 @@ void SUSYTupelizer::addAllVars( )
     addVar("rawMetpy/F"); // NAN);
     addVar("rawMet/F"); // NAN);
     addVar("rawMetphi/F"); // NAN);
+    addVar("rawMetSignificance/F");
     addVar("type01Metpx/F"); // NAN);
     addVar("type01Metpy/F"); // NAN);
     addVar("type01Met/F"); // NAN);

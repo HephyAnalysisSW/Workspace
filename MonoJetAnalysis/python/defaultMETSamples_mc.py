@@ -137,5 +137,10 @@ sigtest = copy.deepcopy(mc)
 sigtest["dirname"] = "/data/imikulec/testmc/"
 sigtest["bins"] = ["8TeV-stop300-LSP270"]
 sigtest["name"] = "S300N270"
+
+sigFullSimTest = copy.deepcopy(mc)
+sigFullSimTest["dirname"] = "/data/schoef/pat_131021/"
+sigFullSimTest["bins"] = ["8TeV-stop300-LSP270-FullSim"]
+sigFullSimTest["name"] = "S300N270FullSim"
 ####
 

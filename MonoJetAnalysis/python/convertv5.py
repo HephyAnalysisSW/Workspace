@@ -255,12 +255,10 @@ for sample in allSamples:
     print 'Sample', sample['name'], 'bin', bin, 'n-events',nevents,'weight',weight
     sample["weight"][bin]=weight
 
-
 if not os.path.isdir(outputDir+"/"+chmode):
   os.system("mkdir "+outputDir+"/"+chmode)
 if not os.path.isdir(outputDir+"/"+chmode+"/"+mode):
   os.system("mkdir "+outputDir+"/"+chmode+"/"+mode)
-
 
 nc = 0
 for isample, sample in enumerate(allSamples):
@@ -286,7 +284,6 @@ for isample, sample in enumerate(allSamples):
     mcvars = ["gpPdg", "gpM", "gpPt", "gpEta", "gpPhi", "gpMo1", "gpMo2", "gpDa1", "gpDa2", "gpSta"]
 
   extraVariables=["nbtags", "ht"]
-
 
   structString = "struct MyStruct_"+str(nc)+"_"+str(isample)+"{ULong64_t event;"
   for var in variables:
@@ -348,7 +345,6 @@ for isample, sample in enumerate(allSamples):
     for var in mcvars:
       t.Branch(var,   ROOT.AddressOf(s,var), var+'[ngp]/F')
 
-
   for bin in sample["bins"]:
     c = ROOT.TChain(sample["Chain"])
     for thisfile in sample["filenames"][bin]:
@@ -387,11 +383,11 @@ for isample, sample in enumerate(allSamples):
         if elist.GetN()>0 and ntot>0:
           c.GetEntry(elist.GetEntry(i))
 # MC specific part
-	  if mode == "MC":
-	    events.to(elist.GetEntry(i))
-	    events.getByLabel(label,handle)
+          if mode == "MC":
+            events.to(elist.GetEntry(i))
+            events.getByLabel(label,handle)
             gps = handle.product()
-	    
+            
             lgp = []
             lgp2 = []
             igp = 0
@@ -403,30 +399,30 @@ for isample, sample in enumerate(allSamples):
             lgp2 = sorted(lgp2, key=lambda k: -k.pt())
             s.ngp = min(len(lgp)+len(lgp2),20)
             for igp,gp in enumerate(lgp):
-	      s.gpPdg[igp] = gp.pdgId()
-	      s.gpM[igp] = gp.mass()
-	      s.gpPt[igp] = gp.pt()
-	      s.gpEta[igp] = gp.eta()
-	      s.gpPhi[igp] = gp.phi()
-	      s.gpMo1[igp] = find(gp.mother(0),lgp)
-	      s.gpMo2[igp] = find(gp.mother(min(gp.numberOfMothers(),1)),lgp)
-	      s.gpDa1[igp] = find(gp.daughter(0),lgp)
-	      s.gpDa2[igp] = find(gp.daughter(min(gp.numberOfDaughters(),1)),lgp)
-	      s.gpSta[igp] = gp.status()
+              s.gpPdg[igp] = gp.pdgId()
+              s.gpM[igp] = gp.mass()
+              s.gpPt[igp] = gp.pt()
+              s.gpEta[igp] = gp.eta()
+              s.gpPhi[igp] = gp.phi()
+              s.gpMo1[igp] = find(gp.mother(0),lgp)
+              s.gpMo2[igp] = find(gp.mother(min(gp.numberOfMothers(),1)),lgp)
+              s.gpDa1[igp] = find(gp.daughter(0),lgp)
+              s.gpDa2[igp] = find(gp.daughter(min(gp.numberOfDaughters(),1)),lgp)
+              s.gpSta[igp] = gp.status()
             for igp2,gp2 in enumerate(lgp2,igp+1):
-	      if igp2 == 20:
-	        break
+              if igp2 == 20:
+                break
               gpm = findSec(gp2,gps)
-	      s.gpPdg[igp2] = gp2.pdgId()
-	      s.gpM[igp2] = gp2.mass()
-	      s.gpPt[igp2] = gp2.pt()
-	      s.gpEta[igp2] = gp2.eta()
-	      s.gpPhi[igp2] = gp2.phi()
-	      s.gpMo1[igp2] = find(gpm,lgp)
-	      s.gpMo2[igp2] = -2
-	      s.gpDa1[igp2] = -1
-	      s.gpDa2[igp2] = -1
-	      s.gpSta[igp2] = gp2.status()
+              s.gpPdg[igp2] = gp2.pdgId()
+              s.gpM[igp2] = gp2.mass()
+              s.gpPt[igp2] = gp2.pt()
+              s.gpEta[igp2] = gp2.eta()
+              s.gpPhi[igp2] = gp2.phi()
+              s.gpMo1[igp2] = find(gpm,lgp)
+              s.gpMo2[igp2] = -2
+              s.gpDa1[igp2] = -1
+              s.gpDa2[igp2] = -1
+              s.gpSta[igp2] = gp2.status()
 ###################
           s.weight = sample["weight"][bin]
           for var in variables[1:]:
@@ -448,49 +444,49 @@ for isample, sample in enumerate(allSamples):
             s.njet = len(jetResult["jets"])
 #            print "\nevent,run,lumi",s.event,int(s.run), int(s.lumi),"nbtags", int(s.nbtags)
             for i in xrange(min(10,s.njet)):
-	      s.jetPt[i] = jetResult["jets"][i]['pt']
-	      s.jetEta[i] = jetResult["jets"][i]['eta']
-	      s.jetPhi[i] = jetResult["jets"][i]['phi']
-	      s.jetPdg[i] = jetResult["jets"][i]['pdg']
-	      s.jetBtag[i] = jetResult["jets"][i]['btag']
-	      s.jetChef[i] = jetResult["jets"][i]['chef']
-	      s.jetNhef[i] = jetResult["jets"][i]['nhef']
-	      s.jetCeef[i] = jetResult["jets"][i]['ceef']
-	      s.jetNeef[i] = jetResult["jets"][i]['neef']
-	      s.jetHFhef[i] = jetResult["jets"][i]['hfhef']
-	      s.jetHFeef[i] = jetResult["jets"][i]['hfeef']
-	      s.jetMuef[i] = jetResult["jets"][i]['muef']
-	      s.jetElef[i] = jetResult["jets"][i]['elef']
-	      s.jetPhef[i] = jetResult["jets"][i]['phef']
-	      s.jetId[i] = jetResult["jets"][i]['id']
+              s.jetPt[i] = jetResult["jets"][i]['pt']
+              s.jetEta[i] = jetResult["jets"][i]['eta']
+              s.jetPhi[i] = jetResult["jets"][i]['phi']
+              s.jetPdg[i] = jetResult["jets"][i]['pdg']
+              s.jetBtag[i] = jetResult["jets"][i]['btag']
+              s.jetChef[i] = jetResult["jets"][i]['chef']
+              s.jetNhef[i] = jetResult["jets"][i]['nhef']
+              s.jetCeef[i] = jetResult["jets"][i]['ceef']
+              s.jetNeef[i] = jetResult["jets"][i]['neef']
+              s.jetHFhef[i] = jetResult["jets"][i]['hfhef']
+              s.jetHFeef[i] = jetResult["jets"][i]['hfeef']
+              s.jetMuef[i] = jetResult["jets"][i]['muef']
+              s.jetElef[i] = jetResult["jets"][i]['elef']
+              s.jetPhef[i] = jetResult["jets"][i]['phef']
+              s.jetId[i] = jetResult["jets"][i]['id']
 #              print "Jet pt's:",i,jetResult["jets"][i]['pt']
-	    s.nmu = len(allGoodLeptons["muons"])
+            s.nmu = len(allGoodLeptons["muons"])
             for i in xrange(min(10,s.nmu)):
-	      s.muPt[i] = allGoodLeptons["muons"][i]['pt']
-	      s.muEta[i] = allGoodLeptons["muons"][i]['eta']
-	      s.muPhi[i] = allGoodLeptons["muons"][i]['phi']
-	      s.muPdg[i] = allGoodLeptons["muons"][i]['pdg']
-	      s.muIso[i] = allGoodLeptons["muons"][i]['iso']
-	      s.muDxy[i] = allGoodLeptons["muons"][i]['dxy']
-	      s.muDz[i] = allGoodLeptons["muons"][i]['dz']
+              s.muPt[i] = allGoodLeptons["muons"][i]['pt']
+              s.muEta[i] = allGoodLeptons["muons"][i]['eta']
+              s.muPhi[i] = allGoodLeptons["muons"][i]['phi']
+              s.muPdg[i] = allGoodLeptons["muons"][i]['pdg']
+              s.muIso[i] = allGoodLeptons["muons"][i]['iso']
+              s.muDxy[i] = allGoodLeptons["muons"][i]['dxy']
+              s.muDz[i] = allGoodLeptons["muons"][i]['dz']
 #              print "Muon pt's:",i,allGoodLeptons["muons"][i]['pt']
-	    s.nel = len(allGoodLeptons["electrons"])
+            s.nel = len(allGoodLeptons["electrons"])
             for i in xrange(min(10,s.nel)):
-	      s.elPt[i] = allGoodLeptons["electrons"][i]['pt']
-	      s.elEta[i] = allGoodLeptons["electrons"][i]['eta']
-	      s.elPhi[i] = allGoodLeptons["electrons"][i]['phi']
-	      s.elPdg[i] = allGoodLeptons["electrons"][i]['pdg']
-	      s.elIso[i] = allGoodLeptons["electrons"][i]['iso']
-	      s.elDxy[i] = allGoodLeptons["electrons"][i]['dxy']
-	      s.elDz[i] = allGoodLeptons["electrons"][i]['dz']
+              s.elPt[i] = allGoodLeptons["electrons"][i]['pt']
+              s.elEta[i] = allGoodLeptons["electrons"][i]['eta']
+              s.elPhi[i] = allGoodLeptons["electrons"][i]['phi']
+              s.elPdg[i] = allGoodLeptons["electrons"][i]['pdg']
+              s.elIso[i] = allGoodLeptons["electrons"][i]['iso']
+              s.elDxy[i] = allGoodLeptons["electrons"][i]['dxy']
+              s.elDz[i] = allGoodLeptons["electrons"][i]['dz']
 #              print "Electron pt's:",i,allGoodLeptons["electrons"][i]['pt']
-	    s.nta = len(allGoodLeptons["taus"])
+            s.nta = len(allGoodLeptons["taus"])
             for i in xrange(min(10,s.nta)):
-	      s.taPt[i] = allGoodLeptons["taus"][i]['pt']
-	      s.taEta[i] = allGoodLeptons["taus"][i]['eta']
-	      s.taPhi[i] = allGoodLeptons["taus"][i]['phi']
-	      s.taPdg[i] = allGoodLeptons["taus"][i]['pdg']
-	      
+              s.taPt[i] = allGoodLeptons["taus"][i]['pt']
+              s.taEta[i] = allGoodLeptons["taus"][i]['eta']
+              s.taPhi[i] = allGoodLeptons["taus"][i]['phi']
+              s.taPdg[i] = allGoodLeptons["taus"][i]['pdg']
+              
           t.Fill()
       del elist
     else:

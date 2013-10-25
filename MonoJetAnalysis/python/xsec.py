@@ -353,3 +353,4 @@ xsec["8TeV-ZJetsToNuNu-HT200to400"] = 41.49
 xsec["8TeV-ZJetsToNuNu-HT400"] = 5.274
 xsec["8TeV-WW"] = 54.838
 xsec["8TeV-stop300-LSP270"] = 1.99608
+xsec["8TeV-stop300-LSP270-FullSim"] = 1.99608

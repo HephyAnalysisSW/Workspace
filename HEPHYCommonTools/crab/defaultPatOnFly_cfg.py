@@ -320,10 +320,8 @@ from CMGTools.External.pujetidsequence_cff import loadPujetId
 loadPujetId(process,'patJetsAK5PF',mvaOnly=False,isChs=False,release="53X")
 
 #-- Execution path ------------------------------------------------------------
-# Full path
+
 process.load('CommonTools.ParticleFlow.goodOfflinePrimaryVertices_cfi') #FIXME Added R.S.
-
-
 process.p = cms.Path(process.goodOfflinePrimaryVertices + process.filterSequence + process.susyPatDefaultSequence + process.puJetIdpatJetsAK5PF + process.puJetMvapatJetsAK5PF)
 #process.p += process.printTree
 process.p += process.kt6PFJetsForIsolation2011
@@ -360,7 +358,6 @@ print "TriggersToMonitor:",process.SUSYTupelizer.triggersToMonitor
 
 process.SUSYTupelizer.triggerCollection = cms.untracked.string( options.hltName )
 
-process.SUSYTupelizer.addFullLeptonInfo = cms.untracked.bool(True)
 process.SUSYTupelizer.addFullJetInfo = cms.untracked.bool(True)
 process.SUSYTupelizer.addFullMETInfo = cms.untracked.bool(True)
 process.SUSYTupelizer.useForDefaultAlias = cms.untracked.bool(True)
@@ -384,7 +381,7 @@ process.p += process.SUSYTupelizer
 #  src = cms.InputTag("genParticles")
 #)
 #process.p+=process.printTree
-process.out.outputCommands =  cms.untracked.vstring('drop *', 'keep *_*SUSYTupelizer*_*_*' , 'keep *_*EventCounter*_*_*', 'keep *_genParticles_*_SIM')
+process.out.outputCommands =  cms.untracked.vstring('drop *', 'keep *_*SUSYTupelizer*_*_*' , 'keep *_*EventCounter*_*_*', 'keep *_genParticles_*_*')
 process.outpath = cms.EndPath(process.out)
 #-- Dump config ------------------------------------------------------------
 file = open('vienna_SusyPAT_cfg.py','w')

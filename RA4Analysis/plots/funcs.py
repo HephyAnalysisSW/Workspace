@@ -213,7 +213,6 @@ def cosDeltaPhiLepW(chain):
 
   
 
-
 def cleanMTFunc(cutVal):
   def cleanMT(chain):
     cosDeltaPhi = cosDeltaPhiLepMET(chain)

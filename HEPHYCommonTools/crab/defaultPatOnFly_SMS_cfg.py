@@ -346,7 +346,6 @@ print "TriggersToMonitor:",process.SUSYTupelizer.triggersToMonitor
 
 process.SUSYTupelizer.triggerCollection = cms.untracked.string( options.hltName )
 
-process.SUSYTupelizer.addFullLeptonInfo = cms.untracked.bool(True)
 process.SUSYTupelizer.addFullJetInfo = cms.untracked.bool(True)
 process.SUSYTupelizer.addFullMETInfo = cms.untracked.bool(True)
 process.SUSYTupelizer.useForDefaultAlias = cms.untracked.bool(True)
