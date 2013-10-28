@@ -6,16 +6,21 @@ import sys, os, copy
 from datetime import datetime
 import xsec
 
-# from first parameter get mode, second parameter is sample type
-modeinp = sys.argv[1]
-sampinp = sys.argv[2]
-
-#steerable
-mode = modeinp    #what dataset (i.e. require MET cut, or maybe Mu<->muon, etc.)
 chmode = "copy" #what variations you applied (i.e. JES, etc.)
-#samples
 from defaultMETSamples_mc import *
-exec("allSamples = [" + sampinp + "]")
+
+mode = "MC"
+allSamples = [wjets, wjetsInc, ttbar, dy, qcd, ww]
+
+# from first parameter get mode, second parameter is sample type
+if len(sys.argv)>=3:
+  modeinp = sys.argv[1]
+  sampinp = sys.argv[2]
+
+  #steerable
+  mode = modeinp    #what dataset (i.e. require MET cut, or maybe Mu<->muon, etc.)
+  exec("allSamples = [" + sampinp + "]")
+
 small  = False
 overwrite = True
 target_lumi = 19375 #pb-1
@@ -390,7 +395,7 @@ for isample, sample in enumerate(allSamples):
         if number_events>1000:
           number_events=1000
       for i in range(0, number_events):
-        if (i%100000 == 0) and i>0 :
+        if (i%10000 == 0) and i>0 :
           print i
   #      # Update all the Tuples
         if elist.GetN()>0 and ntot>0:
