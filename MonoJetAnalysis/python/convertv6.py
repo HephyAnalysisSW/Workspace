@@ -243,9 +243,9 @@ for sample in allSamples:
       allFiles = os.popen("rfdir %s | awk '{print $9}'" % (subdirname))
       for file in allFiles.readlines():
         file = file.rstrip()
-        if(file.find("histo_548_1_nmN") > -1): continue
+#        if(file.find("histo_548_1_nmN") > -1): continue
         filelist.append(file)
-      prefix = "rfio:"
+      prefix = "root://hephyse.oeaw.ac.at/"#+subdirname
 ####
     nf = 20 
     for tfile in filelist:
@@ -256,6 +256,7 @@ for sample in allSamples:
         nf-=1
 
     for tfile in sample['filenames'][bin]:
+#      print prefix+tfile
       c.Add(prefix+tfile)
       d.Add(prefix+tfile)
     nevents = 0
@@ -368,7 +369,8 @@ for isample, sample in enumerate(allSamples):
     for thisfile in sample["filenames"][bin]:
       prefix = ""
       if thisfile[0:5] == "/dpm/":
-        prefix = "rfio:"
+#        prefix = "rfio:"
+        prefix = "root://hephyse.oeaw.ac.at/"#+subdirname
       c.Add(prefix+thisfile)
     ntot = c.GetEntries()
     if mode == "MC":
