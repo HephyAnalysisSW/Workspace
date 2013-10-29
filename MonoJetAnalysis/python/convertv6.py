@@ -127,7 +127,7 @@ def getAllElectrons(c, neles ):
     if goodEleID_POG(c, i, abs(eta)):
       res.append({'pt':getVarValue(c, 'elesPt', i),'eta':eta, 'phi':getVarValue(c, 'elesPhi', i),\
       'pdg':getVarValue(c, 'elesPdg', i), 'relIso':getVarValue(c, 'elesPfRelIso', i),\
-      'dxy':getVarValue(c, 'elesDxy', i), 'dz':getVarValue(c, 'elensDz', i)} )
+      'dxy':getVarValue(c, 'elesDxy', i), 'dz':getVarValue(c, 'elesDz', i)} )
   res = sorted(res, key=lambda k: -k['pt'])
   return res
 
@@ -246,17 +246,15 @@ for sample in allSamples:
 #        if(file.find("histo_548_1_nmN") > -1): continue
         filelist.append(file)
       prefix = "root://hephyse.oeaw.ac.at/"#+subdirname
+
+    if small: filelist = filelist[:10]
 ####
-    nf = 20 
     for tfile in filelist:
 #      if os.path.isfile(subdirname+tfile) and tfile[-5:] == '.root' and tfile.count('histo') == 1:
         sample['filenames'][bin].append(subdirname+tfile)
-        if small and not nf:
-          break
-        nf-=1
 
     for tfile in sample['filenames'][bin]:
-#      print prefix+tfile
+      print sample['name'], prefix+tfile
       c.Add(prefix+tfile)
       d.Add(prefix+tfile)
     nevents = 0
@@ -275,6 +273,7 @@ if not os.path.isdir(outputDir+"/"+chmode):
   os.system("mkdir "+outputDir+"/"+chmode)
 if not os.path.isdir(outputDir+"/"+chmode+"/"+mode):
   os.system("mkdir "+outputDir+"/"+chmode+"/"+mode)
+
 
 nc = 0
 for isample, sample in enumerate(allSamples):
