@@ -133,10 +133,10 @@ ww = copy.deepcopy(mc)
 ww["bins"] = ["8TeV-WW"]
 ww["name"] = "WW"
 ####
-sigtest = copy.deepcopy(mc)
-sigtest["dirname"] = "/data/imikulec/testmc/"
-sigtest["bins"] = ["8TeV-stop300-LSP270"]
-sigtest["name"] = "S300N270"
+sigTest = copy.deepcopy(mc)
+sigTest["dirname"] = "/data/imikulec/testmc/"
+sigTest["bins"] = ["8TeV-stop300-LSP270"]
+sigTest["name"] = "S300N270"
 
 sigFullSimTest = copy.deepcopy(mc)
 sigFullSimTest["dirname"] = "/data/schoef/pat_131021/"

@@ -6,7 +6,7 @@ import sys, os, copy
 from datetime import datetime
 import xsec
 
-chmode = "copy" #what variations you applied (i.e. JES, etc.)
+chmode = "incNoISRJetID" #what variations you applied (i.e. JES, etc.)
 from defaultMETSamples_mc import *
 
 mode = "MC"
@@ -15,11 +15,11 @@ allSamples = [wjets, wjetsInc, ttbar, dy, qcd, ww]
 # from first parameter get mode, second parameter is sample type
 if len(sys.argv)>=3:
   modeinp = sys.argv[1]
-  sampinp = sys.argv[2]
+  sampinp = sys.argv[2:]
 
   #steerable
   mode = modeinp    #what dataset (i.e. require MET cut, or maybe Mu<->muon, etc.)
-  exec("allSamples = [" + sampinp + "]")
+  exec("allSamples = [" + ",".join(sampinp) + "]")
 
 small  = False
 overwrite = True
@@ -160,7 +160,7 @@ def getGoodJets(c, crosscleanobjects, relIsoCleaningRequ = 0.2):
     eta = getVarValue(c, 'jetsEta', i)
     pt  = getVarValue(c, 'jetsPt', i)
     id  = getVarValue(c, 'jetsID', i)
-    if abs(eta) <= 4.5 and pt >= 30.:
+    if abs(eta) <= 4.5 and pt >= 30. and id:
       phi = getVarValue(c, 'jetsPhi', i)
       parton = int(abs(getVarValue(c, 'jetsParton', i)))
       jet = {'pt':pt, 'eta':eta,'phi':phi, 'pdg':parton,\
@@ -193,8 +193,12 @@ def getGoodJets(c, crosscleanobjects, relIsoCleaningRequ = 0.2):
   bres = sorted(bres, key=lambda k: -k['pt'])
   return {"jets":res, "bjets":bres,"ht": ht, "nbtags":nbtags}
 
-def isrJetID(j):
-  return j['chef'] > 0.2 and j['neef']<0.7 and j['nhef']<0.7
+if chmode == "incNoISRJetID":
+  def isrJetID(j):
+    return abs(j['eta']) < 2.4
+else:
+  def isrJetID(j):
+    return j['chef'] > 0.2 and j['neef']<0.7 and j['nhef']<0.7 and j['ceef'] < 0.5 and abs(j['eta']) < 2.4
 
 # helpers for GenParticle serching
 def find(x,lp):
@@ -214,12 +218,12 @@ def findSec(x,lp):
 ##################################################################################
 
 commoncf = ""
-if mode=="MET":
+if chmode=="copy":
 #  commoncf = "met>200"
-  commoncf = "met>150"
-if mode == "MC":
+  commoncf = "type1phiMet>150"
+if chmode[:3] == "inc":
 #  commoncf = "met>200"
-  commoncf = "met>150"
+  commoncf = "(1)"
 
 for sample in allSamples:
   sample['filenames'] = {}
@@ -282,7 +286,7 @@ for isample, sample in enumerate(allSamples):
   else:
     print "Directory", outputDir+"/"+chmode+"/"+mode, "already found"
 
-  variables = ["weight", "run", "lumi", "ngoodVertices", "met", "metphi"]
+  variables = ["weight", "run", "lumi", "ngoodVertices", "type1phiMet", "type1phiMetphi"]
   if mode != "MC":
     alltriggers =  [ "HLTL1ETM40", "HLTMET120", "HLTMET120HBHENoiseCleaned", "HLTMonoCentralPFJet80PFMETnoMu105NHEF0p95", "HLTMonoCentralPFJet80PFMETnoMu95NHEF0p95"]
     for trigger in alltriggers:
@@ -308,7 +312,7 @@ for isample, sample in enumerate(allSamples):
     structString +="Float_t "+var+";"
   for var in extraVariables:
     structString +="Float_t "+var+";"
-  structString +="Int_t njet;"
+  structString +="Int_t njet, njetCount, nmuCount, nelCount, ntaCount, njet60;"
   for var in jetvars:
     structString +="Float_t "+var+"[10];"
   structString +="Int_t nmu;"
@@ -347,17 +351,19 @@ for isample, sample in enumerate(allSamples):
   for var in extraVariables:
     t.Branch(var,   ROOT.AddressOf(s,var), var+'/F')
   t.Branch("njet",   ROOT.AddressOf(s,"njet"), 'njet/I')
+  t.Branch("njetCount",   ROOT.AddressOf(s,"njetCount"), 'njetCount/I')
+  t.Branch("njet60",   ROOT.AddressOf(s,"njet60"), 'njet60/I')
   for var in jetvars:
-    t.Branch(var,   ROOT.AddressOf(s,var), var+'[njet]/F')
+    t.Branch(var,   ROOT.AddressOf(s,var), var+'[njetCount]/F')
   t.Branch("nmu",   ROOT.AddressOf(s,"nmu"), 'nmu/I')
   for var in muvars:
-    t.Branch(var,   ROOT.AddressOf(s,var), var+'[nmu]/F')
+    t.Branch(var,   ROOT.AddressOf(s,var), var+'[nmuCount]/F')
   t.Branch("nel",   ROOT.AddressOf(s,"nel"), 'nel/I')
   for var in elvars:
-    t.Branch(var,   ROOT.AddressOf(s,var), var+'[nel]/F')
+    t.Branch(var,   ROOT.AddressOf(s,var), var+'[nelCount]/F')
   t.Branch("nta",   ROOT.AddressOf(s,"nta"), 'nta/I')
   for var in tavars:
-    t.Branch(var,   ROOT.AddressOf(s,var), var+'[nta]/F')
+    t.Branch(var,   ROOT.AddressOf(s,var), var+'[ntaCount]/F')
   if mode == "MC":
     t.Branch("ngp",   ROOT.AddressOf(s,"ngp"), 'ngp/I')
     for var in mcvars:
@@ -478,9 +484,9 @@ for isample, sample in enumerate(allSamples):
 
             jetResult = getGoodJets(c, hardMuons + hardElectrons, relIsoCleaningRequ = 0.2)
             s.ht = jetResult["ht"]
-            s.nbtags = jetResult["nbtags"]
-            s.njet = len(jetResult["jets"])
-
+            s.nbtags  = jetResult["nbtags"]
+            s.njet    = len(jetResult["jets"])
+            s.njet60  = len(filter(lambda j:j['pt']>60 and abs(j['eta'])<4.5, jetResult["jets"]))
             if len( jetResult['jets'] )>=1 and jetResult['jets'][0]['pt']>110 and isrJetID(jetResult['jets'][0]):
               leadingJet = jetResult['jets'][0]
               s.isrJetPt = leadingJet['pt']
@@ -514,7 +520,8 @@ for isample, sample in enumerate(allSamples):
               s.softIsolatedMuDz = softIsolatedMuons[0]['dz']
  
 #            print "\nevent,run,lumi",s.event,int(s.run), int(s.lumi),"nbtags", int(s.nbtags)
-            for i in xrange(min(10,s.njet)):
+            s.njetCount = min(10,s.njet)
+            for i in xrange(s.njetCount):
               s.jetPt[i] = jetResult["jets"][i]['pt']
               s.jetEta[i] = jetResult["jets"][i]['eta']
               s.jetPhi[i] = jetResult["jets"][i]['phi']
@@ -535,7 +542,8 @@ for isample, sample in enumerate(allSamples):
 #              s.jetId[i] = jetResult["jets"][i]['id']
 #              print "Jet pt's:",i,jetResult["jets"][i]['pt']
             s.nmu = len(allGoodMuons)
-            for i in xrange(min(10,s.nmu)):
+            s.nmuCount = min(10,s.nmu)
+            for i in xrange(s.nmuCount):
               s.muPt[i] = allGoodMuons[i]['pt']
               s.muEta[i] = allGoodMuons[i]['eta']
               s.muPhi[i] = allGoodMuons[i]['phi']
@@ -545,7 +553,8 @@ for isample, sample in enumerate(allSamples):
               s.muDz[i] = allGoodMuons[i]['dz']
 #              print "Muon pt's:",i,allGoodMuons[i]['pt']
             s.nel = len(allGoodElectrons)
-            for i in xrange(min(10,s.nel)):
+            s.nelCount = min(10,s.nel)
+            for i in xrange(s.nelCount):
               s.elPt[i] = allGoodElectrons[i]['pt']
               s.elEta[i] = allGoodElectrons[i]['eta']
               s.elPhi[i] = allGoodElectrons[i]['phi']
@@ -555,7 +564,8 @@ for isample, sample in enumerate(allSamples):
               s.elDz[i] = allGoodElectrons[i]['dz']
 #              print "Electron pt's:",i,allGoodElectrons[i]['pt']
             s.nta = len(allGoodTaus)
-            for i in xrange(min(10,s.nta)):
+            s.ntaCount = min(10,s.nta)
+            for i in xrange(s.ntaCount):
               s.taPt[i] = allGoodTaus[i]['pt']
               s.taEta[i] = allGoodTaus[i]['eta']
               s.taPhi[i] = allGoodTaus[i]['phi']
