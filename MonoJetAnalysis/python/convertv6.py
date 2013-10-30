@@ -6,7 +6,8 @@ import sys, os, copy
 from datetime import datetime
 import xsec
 
-chmode = "incNoISRJetID" #what variations you applied (i.e. JES, etc.)
+#chmode = "incNoISRJetID" 
+chmode = "copy" 
 from defaultMETSamples_mc import *
 
 mode = "MC"
@@ -352,16 +353,19 @@ for isample, sample in enumerate(allSamples):
     t.Branch(var,   ROOT.AddressOf(s,var), var+'/F')
   t.Branch("njet",   ROOT.AddressOf(s,"njet"), 'njet/I')
   t.Branch("njetCount",   ROOT.AddressOf(s,"njetCount"), 'njetCount/I')
+  t.Branch("nmu",   ROOT.AddressOf(s,"nmu"), 'nmu/I')
+  t.Branch("nmuCount",   ROOT.AddressOf(s,"nmuCount"), 'nmuCount/I')
+  t.Branch("nel",   ROOT.AddressOf(s,"nel"), 'nel/I')
+  t.Branch("nelCount",   ROOT.AddressOf(s,"nelCount"), 'nelCount/I')
+  t.Branch("nta",   ROOT.AddressOf(s,"nta"), 'nta/I')
+  t.Branch("ntaCount",   ROOT.AddressOf(s,"ntaCount"), 'ntaCount/I')
   t.Branch("njet60",   ROOT.AddressOf(s,"njet60"), 'njet60/I')
   for var in jetvars:
     t.Branch(var,   ROOT.AddressOf(s,var), var+'[njetCount]/F')
-  t.Branch("nmu",   ROOT.AddressOf(s,"nmu"), 'nmu/I')
   for var in muvars:
     t.Branch(var,   ROOT.AddressOf(s,var), var+'[nmuCount]/F')
-  t.Branch("nel",   ROOT.AddressOf(s,"nel"), 'nel/I')
   for var in elvars:
     t.Branch(var,   ROOT.AddressOf(s,var), var+'[nelCount]/F')
-  t.Branch("nta",   ROOT.AddressOf(s,"nta"), 'nta/I')
   for var in tavars:
     t.Branch(var,   ROOT.AddressOf(s,var), var+'[ntaCount]/F')
   if mode == "MC":
