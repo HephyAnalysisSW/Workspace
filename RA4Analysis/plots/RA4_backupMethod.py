@@ -158,7 +158,7 @@ if not os.path.exists(filename):
     ROOT.setTDRStyle()
 
   ROOT.tdrStyle.SetPadRightMargin(0.16)
-  ROOT.gROOT.ProcessLine(".L ../scripts/useNiceColorPalette.C")
+  ROOT.gROOT.ProcessLine(".L ../../HEPHYCommonTools/scripts/root/useNiceColorPalette.C")
   ROOT.useNiceColorPalette(255)
 
   for var in allVars:
