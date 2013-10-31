@@ -13,7 +13,7 @@ if type(ROOT.tdrStyle)!=type(ROOT.gStyle):
 
 ROOT.tdrStyle.SetPadRightMargin(0.16)
 if not ROOT.__dict__.has_key("useNiceColorPalette"):
-  ROOT.gROOT.ProcessLine(".L ../scripts/useNiceColorPalette.C")
+  ROOT.gROOT.ProcessLine(".L ../../HEPHYCommonTools/scripts/root/useNiceColorPalette.C")
 
 ROOT.useNiceColorPalette(255)
 
