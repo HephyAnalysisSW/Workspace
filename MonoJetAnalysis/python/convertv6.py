@@ -175,9 +175,9 @@ def getGoodJets(c, crosscleanobjects, relIsoCleaningRequ = 0.2):
       isolated = True
 #      if max([jet['muef'],jet['elef']]) > 0.6 : print jet
       for obj in crosscleanobjects:   #Jet cross-cleaning
-        if deltaR(jet, obj) < 0.4 and (obj['pt']/jet['pt']) > 0.4 and obj['relIso']< relIsoCleaningRequ:  
+        if deltaR(jet, obj) < 0.3 and  obj['relIso']< relIsoCleaningRequ: #(obj['pt']/jet['pt']) > 0.4:  
           isolated = False
-#          print "Cleaned", 'deltaR', deltaR(jet, obj), 'maxfrac', max([jet['muef'],jet['elef']]), 'pt:jet/obj', jet['pt'], obj['pt']
+          print "Cleaned", 'deltaR', deltaR(jet, obj), 'maxfrac', max([jet['muef'],jet['elef']]), 'pt:jet/obj', jet['pt'], obj['pt']
 #          print 'Not this one!', jet, obj, deltaR(jet, obj)
           break
 #      for obj in crosscleanobjects:   #Jet cross-cleaning
