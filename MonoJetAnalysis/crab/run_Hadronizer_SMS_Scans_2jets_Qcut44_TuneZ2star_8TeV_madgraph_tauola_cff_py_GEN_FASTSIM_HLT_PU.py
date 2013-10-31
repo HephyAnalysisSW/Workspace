@@ -12,6 +12,10 @@ options.register ('infile','infile.root',
           VarParsing.VarParsing.multiplicity.singleton,
           VarParsing.VarParsing.varType.string,
           "InputFile")
+options.register ('outfile','outfile.root',
+          VarParsing.VarParsing.multiplicity.singleton,
+          VarParsing.VarParsing.varType.string,
+          "outputFile")
 options.register ('skipEvents',0,
           VarParsing.VarParsing.multiplicity.singleton,
           VarParsing.VarParsing.varType.int,
@@ -62,7 +66,8 @@ process.configurationMetadata = cms.untracked.PSet(
 process.AODSIMoutput = cms.OutputModule("PoolOutputModule",
     eventAutoFlushCompressedSize = cms.untracked.int32(15728640),
     outputCommands = process.AODSIMEventContent.outputCommands,
-    fileName = cms.untracked.string("/data/schoef/root/from_"+str(options.skipEvents)+"_to_"+str(options.skipEvents+options.maxEvents)+"_"+(options.infile.split("/")[-1]).replace('.lhe', '.root').replace('file:', '')),
+#    fileName = cms.untracked.string("/data/schoef/root/from_"+str(options.skipEvents)+"_to_"+str(options.skipEvents+options.maxEvents)+"_"+(options.infile.split("/")[-1]).replace('.lhe', '.root').replace('file:', '')),
+    fileName = cms.untracked.string(options.outfile),
     dataset = cms.untracked.PSet(
         filterName = cms.untracked.string(''),
         dataTier = cms.untracked.string('AODSIM')
