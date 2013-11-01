@@ -4,30 +4,42 @@ from PhysicsTools.PythonAnalysis import *
 from math import *
 import sys, os, copy
 from datetime import datetime
-import xsec
 
 #chmode = "incNoISRJetID" 
 chmode = "copy" 
+#chmode = "copyCleanedWithAllLeptons" 
 from defaultMETSamples_mc import *
 
-mode = "MC"
+path = os.path.abspath('../../HEPHYCommonTools/python')
+if not path in sys.path:
+    sys.path.insert(1, path)
+del path
+
+
+import xsec
+
+subDir = "monoJetTuples_v1"
+
+#chmode = "incNoISRJetID" 
+#chmode = "copy" 
+chmode = "copyCleanedWithAllLeptons" 
+from defaultMETSamples_mc import *
+
 allSamples = [wjets, wjetsInc, ttbar, dy, qcd, ww]
 
 # from first parameter get mode, second parameter is sample type
 if len(sys.argv)>=3:
-  modeinp = sys.argv[1]
+  chmode = sys.argv[1]
   sampinp = sys.argv[2:]
-
   #steerable
-  mode = modeinp    #what dataset (i.e. require MET cut, or maybe Mu<->muon, etc.)
   exec("allSamples = [" + ",".join(sampinp) + "]")
 
-small  = False
-overwrite = True
+small  = True
+overwrite = False
 target_lumi = 19375 #pb-1
 
 from localInfo import username
-outputDir = "/data/"+username+"/"
+outputDir = "/data/"+username+"/"+subDir+"/"
 
 ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
@@ -49,7 +61,7 @@ def minAbsPiMinusDeltaPhi(phi, phis):
   if len(phis)>0:
     return min([abs(abs(deltaPhi(phi, x)) - pi) for x in phis])
   else: return float('inf')
-  
+
 def invMassOfLightObjects(p31, p32):
   [px1, py1, pz1] = p31
   [px2, py2, pz2] = p32
@@ -60,10 +72,10 @@ def invMassOfLightObjects(p31, p32):
   p2 = sqrt(px2*px2+py2*py2+pz2*pz2)
   p = sqrt(px*px+py*py+pz*pz)  
   return   sqrt((p1 + p2)*(p1 + p2) - p*p)
-    
+  
 def deltaR(l1, l2):
   return sqrt(deltaPhi(l1['phi'], l2['phi'])**2 + (l1['eta'] - l2['eta'])**2)
-  
+
 def getVarValue(c, var, n=0):
   varNameHisto = var
   leaf = c.GetAlias(varNameHisto)
@@ -71,7 +83,7 @@ def getVarValue(c, var, n=0):
     return c.GetLeaf(leaf).GetValue(n) 
   else: 
     return float('nan') 
-    
+  
 def getValue(chain, varname):
   alias = chain.GetAlias(varname)
   if alias!='':
@@ -80,9 +92,9 @@ def getValue(chain, varname):
     return chain.GetLeaf( varname ).GetValue()
 
 def goodMuID_POG(c, imu ):  
-# POG MU Tight
-#  return getVarValue(c, 'muonsPt', imu)>20. and getVarValue(c, 'muonsisPF', imu) and getVarValue(c, 'muonsisGlobal', imu) and abs(getVarValue(c, 'muonsEta', imu)) < 2.4  and getVarValue(c, 'muonsPFRelIso', imu)<0.20 and getVarValue(c, 'muonsNormChi2', imu)<10. and getVarValue(c, 'muonsNValMuonHits', imu)>0 and getVarValue(c, 'muonsNumMatchedStadions', imu) > 1 and getVarValue(c, 'muonsPixelHits', imu) > 0 and getVarValue(c, 'muonsNumtrackerLayerWithMeasurement', imu) > 5 and getVarValue(c, 'muonsDxy', imu) < 0.2 and getVarValue(c, 'muonsDz', imu) < 0.5 
-# POG MU Loose
+  # POG MU Tight
+  #  return getVarValue(c, 'muonsPt', imu)>20. and getVarValue(c, 'muonsisPF', imu) and getVarValue(c, 'muonsisGlobal', imu) and abs(getVarValue(c, 'muonsEta', imu)) < 2.4  and getVarValue(c, 'muonsPFRelIso', imu)<0.20 and getVarValue(c, 'muonsNormChi2', imu)<10. and getVarValue(c, 'muonsNValMuonHits', imu)>0 and getVarValue(c, 'muonsNumMatchedStadions', imu) > 1 and getVarValue(c, 'muonsPixelHits', imu) > 0 and getVarValue(c, 'muonsNumtrackerLayerWithMeasurement', imu) > 5 and getVarValue(c, 'muonsDxy', imu) < 0.2 and getVarValue(c, 'muonsDz', imu) < 0.5 
+  # POG MU Loose
   return getVarValue(c, 'muonsisPF', imu) and ( getVarValue(c, 'muonsisGlobal', imu) or getVarValue(c, 'muonsisTracker', imu)) and getVarValue(c, 'muonsPt', imu)>5.
 
 # -------------------------------------------
@@ -106,7 +118,7 @@ def goodEleID_POG(c, iele, eta = 'none'): # POG Ele veto
     and ( (isEB and dphi < 0.8) or (isEE and dphi < 0.7)) and ( (isEB and deta < 0.007) or (isEE and deta < 0.01) )\
     and getVarValue(c, 'elesDxy', iele) < 0.04 and getVarValue(c, 'elesDz', iele) < 0.2 and getVarValue(c, 'elesPt', iele)>5.
 
-# -------------------------------------------
+  # -------------------------------------------
 
 def goodTauID_POG(c, itau ): 
   return getVarValue(c, 'tauisPF', itau) and getVarValue(c, 'tausDecayModeFinding', itau) and getVarValue(c, 'tausAgainstMuonLoose', itau) and getVarValue(c, 'tausAgainstElectronLoose', itau) and getVarValue(c, 'tausByLooseCombinedIsolationDBSumPtCorr', itau) and getVarValue(c, 'tausPt', itau)>5.
@@ -150,7 +162,7 @@ def splitListOfObjects(var, val, s):
     else:
       resHigh.append(x)
   return resLow, resHigh
-    
+  
 def getGoodJets(c, crosscleanobjects, relIsoCleaningRequ = 0.2):
   njets = getVarValue(c, 'nsoftjets')   # jet.pt() > 10.
   res = []
@@ -165,7 +177,7 @@ def getGoodJets(c, crosscleanobjects, relIsoCleaningRequ = 0.2):
       phi = getVarValue(c, 'jetsPhi', i)
       parton = int(abs(getVarValue(c, 'jetsParton', i)))
       jet = {'pt':pt, 'eta':eta,'phi':phi, 'pdg':parton,\
-#      'ptUncorr':getVarValue(c, 'jetsPtUncorr', i),\
+  #      'ptUncorr':getVarValue(c, 'jetsPtUncorr', i),\
       'chef':getVarValue(c, 'jetsChargedHadronEnergyFraction', i), 'nhef':getVarValue(c, 'jetsNeutralHadronEnergyFraction', i),\
       'ceef':getVarValue(c, 'jetsChargedEmEnergyFraction', i), 'neef':getVarValue(c, 'jetsNeutralEmEnergyFraction', i), 'id':id,\
       'hfhef':getVarValue(c, 'jetsHFHadronEnergyFraction', i), 'hfeef':getVarValue(c, 'jetsHFEMEnergyFraction', i),\
@@ -173,14 +185,14 @@ def getGoodJets(c, crosscleanobjects, relIsoCleaningRequ = 0.2):
       'jetCutBasedPUJetIDFlag':getVarValue(c, 'jetsCutBasedPUJetIDFlag', i),'jetMET53XPUJetIDFlag':getVarValue(c, 'jetsMET53XPUJetIDFlag', i),'jetFull53XPUJetIDFlag':getVarValue(c, 'jetsFull53XPUJetIDFlag', i) 
       }
       isolated = True
-#      if max([jet['muef'],jet['elef']]) > 0.6 : print jet
+  #      if max([jet['muef'],jet['elef']]) > 0.6 : print jet
       for obj in crosscleanobjects:   #Jet cross-cleaning
         if deltaR(jet, obj) < 0.3 and  obj['relIso']< relIsoCleaningRequ: #(obj['pt']/jet['pt']) > 0.4:  
           isolated = False
-          print "Cleaned", 'deltaR', deltaR(jet, obj), 'maxfrac', max([jet['muef'],jet['elef']]), 'pt:jet/obj', jet['pt'], obj['pt']
-#          print 'Not this one!', jet, obj, deltaR(jet, obj)
+#          print "Cleaned", 'deltaR', deltaR(jet, obj), 'maxfrac', max([jet['muef'],jet['elef']]), 'pt:jet/obj', jet['pt'], obj['pt'], "relIso",  obj['relIso'], 'btag',getVarValue(c, 'jetsBtag', i), "parton", parton
+  #          print 'Not this one!', jet, obj, deltaR(jet, obj)
           break
-#      for obj in crosscleanobjects:   #Jet cross-cleaning
+  #      for obj in crosscleanobjects:   #Jet cross-cleaning
       if isolated:
         ht += jet['pt']
         btag = getVarValue(c, 'jetsBtag', i)
@@ -189,7 +201,6 @@ def getGoodJets(c, crosscleanobjects, relIsoCleaningRequ = 0.2):
         if btag >= 0.679:   # bjets
           bres.append(jet)
           nbtags = nbtags+1
-
   res  = sorted(res,  key=lambda k: -k['pt'])
   bres = sorted(bres, key=lambda k: -k['pt'])
   return {"jets":res, "bjets":bres,"ht": ht, "nbtags":nbtags}
@@ -209,7 +220,7 @@ def find(x,lp):
   if ip == len(lp)-1:
     ip = -1
   return ip
-  
+
 def findSec(x,lp):
   gp = x
   while gp.status() != 3:
@@ -219,11 +230,9 @@ def findSec(x,lp):
 ##################################################################################
 
 commoncf = ""
-if chmode=="copy":
-#  commoncf = "met>200"
+if chmode[:4]=="copy":
   commoncf = "type1phiMet>150"
 if chmode[:3] == "inc":
-#  commoncf = "met>200"
   commoncf = "(1)"
 
 for sample in allSamples:
@@ -243,19 +252,19 @@ for sample in allSamples:
     if subdirname[0:5] != "/dpm/":
       filelist = os.listdir(subdirname)
     else:
-# this is specific to rfio    
+  # this is specific to rfio    
       filelist = []
       allFiles = os.popen("rfdir %s | awk '{print $9}'" % (subdirname))
       for file in allFiles.readlines():
         file = file.rstrip()
-#        if(file.find("histo_548_1_nmN") > -1): continue
+  #        if(file.find("histo_548_1_nmN") > -1): continue
         filelist.append(file)
       prefix = "root://hephyse.oeaw.ac.at/"#+subdirname
 
     if small: filelist = filelist[:10]
-####
+  ####
     for tfile in filelist:
-#      if os.path.isfile(subdirname+tfile) and tfile[-5:] == '.root' and tfile.count('histo') == 1:
+  #      if os.path.isfile(subdirname+tfile) and tfile[-5:] == '.root' and tfile.count('histo') == 1:
         sample['filenames'][bin].append(subdirname+tfile)
 
     for tfile in sample['filenames'][bin]:
@@ -267,28 +276,27 @@ for sample in allSamples:
     for i in range(0, nruns):
       d.GetEntry(i)
       nevents += getValue(d,'uint_EventCounter_runCounts_PAT.obj')
-    if mode == "MC":
+    if not bin.lower().count('run'):
       weight = xsec.xsec[bin]*target_lumi/nevents
     else:
       weight = 1.
     print 'Sample', sample['name'], 'bin', bin, 'n-events',nevents,'weight',weight
     sample["weight"][bin]=weight
 
+if not os.path.isdir(outputDir):
+  os.system('mkdir -p '+outputDir)
 if not os.path.isdir(outputDir+"/"+chmode):
   os.system("mkdir "+outputDir+"/"+chmode)
-if not os.path.isdir(outputDir+"/"+chmode+"/"+mode):
-  os.system("mkdir "+outputDir+"/"+chmode+"/"+mode)
-
 
 nc = 0
 for isample, sample in enumerate(allSamples):
-  if not os.path.isdir(outputDir+"/"+chmode+"/"+mode+"/"+sample["name"]):
-    os.system("mkdir "+outputDir+"/"+chmode+"/"+mode+"/"+sample["name"])
+  if not os.path.isdir(outputDir+"/"+chmode+"/"+sample["name"]):
+    os.system("mkdir "+outputDir+"/"+chmode+"/"+sample["name"])
   else:
-    print "Directory", outputDir+"/"+chmode+"/"+mode, "already found"
+    print "Directory", outputDir+"/"+chmode, "already found"
 
   variables = ["weight", "run", "lumi", "ngoodVertices", "type1phiMet", "type1phiMetphi"]
-  if mode != "MC":
+  if sample['name'].lower().count('data'):
     alltriggers =  [ "HLTL1ETM40", "HLTMET120", "HLTMET120HBHENoiseCleaned", "HLTMonoCentralPFJet80PFMETnoMu105NHEF0p95", "HLTMonoCentralPFJet80PFMETnoMu95NHEF0p95"]
     for trigger in alltriggers:
       variables.append(trigger)
@@ -300,7 +308,7 @@ for isample, sample in enumerate(allSamples):
   muvars = ["muPt", "muEta", "muPhi", "muPdg", "muRelIso", "muDxy", "muDz"]
   elvars = ["elPt", "elEta", "elPhi", "elPdg", "elRelIso", "elDxy", "elDz"]
   tavars = ["taPt", "taEta", "taPhi", "taPdg"]
-  if mode == "MC":
+  if not sample['name'].lower().count('data'):
     mcvars = ["gpPdg", "gpM", "gpPt", "gpEta", "gpPhi", "gpMo1", "gpMo2", "gpDa1", "gpDa2", "gpSta"]
 
   extraVariables=["nbtags", "ht", "nSoftMuons", "nSoftIsolatedMuons", "nHardMuons", "nSoftElectrons", "nHardElectrons", "nSoftTaus", "nHardTaus"]
@@ -326,7 +334,7 @@ for isample, sample in enumerate(allSamples):
   for var in tavars:
     structString +="Float_t "+var+"[10];"
   structString +="Int_t ngp;"
-  if mode == "MC":
+  if not sample['name'].lower().count('data'):
     for var in mcvars:
       structString +="Float_t "+var+"[20];"
   structString   +="};"
@@ -336,8 +344,10 @@ for isample, sample in enumerate(allSamples):
   exec("from ROOT import MyStruct_"+str(nc)+"_"+str(isample))
   exec("s = MyStruct_"+str(nc)+"_"+str(isample)+"()")
   nc+=1
-
-  ofile = outputDir+"/"+chmode+"/"+mode+"/"+sample["name"]+"/histo_"+sample["name"]+".root"
+  postfix=""
+  if small:
+    postfix="_small"
+  ofile = outputDir+"/"+chmode+"/"+sample["name"]+"/histo_"+sample["name"]+postfix+".root"
   if os.path.isfile(ofile) and overwrite:
     print "Warning! will overwrite",ofile
   if os.path.isfile(ofile) and not overwrite:
@@ -368,7 +378,7 @@ for isample, sample in enumerate(allSamples):
     t.Branch(var,   ROOT.AddressOf(s,var), var+'[nelCount]/F')
   for var in tavars:
     t.Branch(var,   ROOT.AddressOf(s,var), var+'[ntaCount]/F')
-  if mode == "MC":
+  if not sample['name'].lower().count('data'):
     t.Branch("ngp",   ROOT.AddressOf(s,"ngp"), 'ngp/I')
     for var in mcvars:
       t.Branch(var,   ROOT.AddressOf(s,var), var+'[ngp]/F')
@@ -382,7 +392,7 @@ for isample, sample in enumerate(allSamples):
         prefix = "root://hephyse.oeaw.ac.at/"#+subdirname
       c.Add(prefix+thisfile)
     ntot = c.GetEntries()
-    if mode == "MC":
+    if not sample['name'].lower().count('data'):
       mclist = []
       for thisfile in sample["filenames"][bin]:
         mclist.append(prefix+thisfile)
@@ -412,7 +422,7 @@ for isample, sample in enumerate(allSamples):
         if elist.GetN()>0 and ntot>0:
           c.GetEntry(elist.GetEntry(i))
 # MC specific part
-          if mode == "MC":
+          if not sample['name'].lower().count('data'):
             events.to(elist.GetEntry(i))
             events.getByLabel(label,handle)
             gps = handle.product()
@@ -485,8 +495,10 @@ for isample, sample in enumerate(allSamples):
             s.nSoftTaus = len(softTaus)
             s.nHardTaus = len(hardTaus)
  
-
-            jetResult = getGoodJets(c, hardMuons + hardElectrons, relIsoCleaningRequ = 0.2)
+            if chmode.count("CleanedWithAllLeptons"):
+              jetResult = getGoodJets(c, allGoodMuons + allGoodElectrons, relIsoCleaningRequ = 0.2)
+            else:
+              jetResult = getGoodJets(c, hardMuons + hardElectrons, relIsoCleaningRequ = 0.2)
             s.ht = jetResult["ht"]
             s.nbtags  = jetResult["nbtags"]
             s.njet    = len(jetResult["jets"])

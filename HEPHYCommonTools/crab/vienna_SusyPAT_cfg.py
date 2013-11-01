@@ -3,7 +3,7 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process("PAT")
 
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring('file:/afs/hephy.at/scratch/s/schoefbeck/CMS/CMSSW_5_3_11_patch6/src/Workspace/MonoJetAnalysis/crab/skipEvents_1_decayed_stop200lsp170g100.root'),
+    fileNames = cms.untracked.vstring('file:/data/schoef/local/TTJets-53X-syncfile-AODSIM.root'),
     duplicateCheckMode = cms.untracked.string('noDuplicateCheck')
 )
 process.AK5PFCandMETcorr = cms.EDProducer("PFCandMETcorrInputProducer",

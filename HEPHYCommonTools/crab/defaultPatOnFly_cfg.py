@@ -19,6 +19,11 @@ options.register ('GT','START53_V7F::All',#GR_R_52_V9::All
           VarParsing.VarParsing.varType.string,
           "Global Tag")
 
+options.register ('outfile','histo.root',
+          VarParsing.VarParsing.multiplicity.singleton,
+          VarParsing.VarParsing.varType.string,
+          "outfile")
+
 options.register ('triggers','*',
           VarParsing.VarParsing.multiplicity.list,
           VarParsing.VarParsing.varType.string,
@@ -105,7 +110,7 @@ process.patTrigger.addL1Algos = cms.bool( True )
 process.out = cms.OutputModule("PoolOutputModule",
      #verbose = cms.untracked.bool(True),
      SelectEvents   = cms.untracked.PSet( SelectEvents = cms.vstring('p') ),
-     fileName = cms.untracked.string('histo.root'),
+     fileName = cms.untracked.string(options.outfile),
      outputCommands = cms.untracked.vstring() 
 #     outputCommands = cms.untracked.vstring('keep *') 
 )

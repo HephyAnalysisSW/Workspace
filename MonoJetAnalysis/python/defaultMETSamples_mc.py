@@ -54,6 +54,24 @@ wjets["name"] = "WJetsHT250"
 wjetsInc = copy.deepcopy(wjets)
 wjetsInc["bins"] = ["8TeV-WJetsToLNu-3"] 
 wjetsInc["name"] = "WJetsToLNu" 
+
+w1jets = copy.deepcopy(wjets)
+w1jets["dirname"] = "/dpm/oeaw.ac.at/home/cms/store/user/schoef/pat_131028" 
+w1jets["bins"] = ["8TeV-W1JetsToLNu"] 
+w1jets["name"] = "W1JetsToLNu"
+
+w2jets = copy.deepcopy(w1jets)
+w2jets["bins"] = ["8TeV-W2JetsToLNu"] 
+w2jets["name"] = "W2JetsToLNu"
+
+w3jets = copy.deepcopy(w1jets)
+w3jets["bins"] = ["8TeV-W3JetsToLNu"] 
+w3jets["name"] = "W3JetsToLNu"
+
+w4jets = copy.deepcopy(w1jets)
+w4jets["bins"] = ["8TeV-W4JetsToLNu"] 
+w4jets["name"] = "W4JetsToLNu"
+ 
 #
 #wjetsCombined = copy.deepcopy(wjets)
 #wjetsCombined["bins"]+=wjetsInc["bins"]
@@ -144,3 +162,22 @@ sigFullSimTest["bins"] = ["8TeV-stop300-LSP270-FullSim"]
 sigFullSimTest["name"] = "S300N270FullSim"
 ####
 
+stop200lsp170g100 = copy.deepcopy(mc)
+stop200lsp170g100["dirname"] = "/data/schoef/monoJetSignals/FastSim"
+stop200lsp170g100["bins"] = ["stop200lsp170g100"]
+stop200lsp170g100["name"] = "stop200lsp170g100"
+
+stop300lsp240g150 = copy.deepcopy(mc)
+stop300lsp240g150["dirname"] = "/data/schoef/monoJetSignals/FastSim"
+stop300lsp240g150["bins"] = ["stop300lsp240g150"]
+stop300lsp240g150["name"] = "stop300lsp240g150"
+
+stop300lsp270g175 = copy.deepcopy(mc)
+stop300lsp270g175["dirname"] = "/data/schoef/monoJetSignals/FastSim"
+stop300lsp270g175["bins"] = ["stop300lsp270g175"]
+stop300lsp270g175["name"] = "stop300lsp270g175"
+
+stop300lsp270g200 = copy.deepcopy(mc)
+stop300lsp270g200["dirname"] = "/data/schoef/monoJetSignals/FastSim"
+stop300lsp270g200["bins"] = ["stop300lsp270g200"]
+stop300lsp270g200["name"] = "stop300lsp270g200"

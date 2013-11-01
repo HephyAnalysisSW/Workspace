@@ -32,6 +32,11 @@ xsec["8TeV-TTZJets"]                            =       0.2057
 
 xsec["8TeV-WJetsToLNu"]                         =       36257.2
 
+#https://twiki.cern.ch/twiki/bin/view/CMS/TTbarHiggs
+xsec["8TeV-W1JetsToLNu"] =  6440.4  
+xsec["8TeV-W2JetsToLNu"] =  2087.2  
+xsec["8TeV-W3JetsToLNu"] =  619.0 
+xsec["8TeV-W4JetsToLNu"] =  255.2 
 
 ##http://cms.cern.ch/iCMS/prep/requestmanagement?campid=Summer12_DR52X
 #xsec["8TeV-Tbar-tW"]                            =       10.7*0.996
