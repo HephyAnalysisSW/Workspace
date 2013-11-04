@@ -1,6 +1,10 @@
 import FWCore.ParameterSet.Config as cms
 import FWCore.ParameterSet.VarParsing as VarParsing
 
+infiles = [
+  'file:/afs/hephy.at/scratch/s/schoefbeck/CMS/CMSSW_5_3_11_patch6/src/Workspace/LightStopAnalysis/crab/step2_RAW2DIGI_L1Reco_RECO.root'
+]
+
 process = cms.Process("PAT")
 options = VarParsing.VarParsing ('standard')
 
@@ -39,19 +43,6 @@ options.register ('verbose',False,
           VarParsing.VarParsing.varType.bool,
           "verbosity")
 
-infiles = [
-  'file:/afs/hephy.at/scratch/s/schoefbeck/CMS/CMSSW_5_3_11_patch6/src/Workspace/LightStopAnalysis/crab/step2_RAW2DIGI_L1Reco_RECO.root'
-
-#  'file:/store/caf/user/imikulec/lstop/Hadronizer_SMS_Scans_2jets_Qcut44_TuneZ2star_8TeV_madgraph_tauola_cff_py_GEN_FASTSIM_HLT_PU.root']
-]
-#infiles = ['file:/afs/hephy.at/scratch/w/walten/3C304C5F-58ED-E111-9DDB-0025901E4F3C.root']  #T1tttt madgraph
-
-#infiles = ['file:/data/schoef/local/SMS-T5tttt_mGo-800to1200_mStop-225to1025_mLSP_50_8TeV-Madgraph_Summer12-START52_V9_FSIM_AODSIM_UFLPrivate_998.root'] #T5tttt private
-#infiles = ['file:/data/schoef/local/test_T5tttt.root'] #T5tttt with xsec-model string 
-#infiles = ['file:/data/schoef/local/T1t1t.root'] #T1t1t private
-
-options.files=infiles
-
 #options.isMC = False
 options.isMC = True
 options.maxEvents=10
@@ -61,6 +52,14 @@ if not 'ipython' in VarParsing.sys.argv[0]:
 else:
   print "No parsing of arguments!"
 
+if options.files[0][:9] == 'load:stop':
+  from Workspace.HEPHYCommonTools.fastSimSignals_cfi import *
+  print "Loading files from Workspace.HEPHYCommonTools.fastSimSignals_cfi"
+  infiles =  eval(options.files[0][5:])
+  for f in options.files:
+    options.files.remove(f)
+  options.files = infiles[1:]
+  
 jec = []
 if options.isMC:
   jec = ['L1FastJet', 'L2Relative', 'L3Absolute']
@@ -348,7 +347,6 @@ for t in options.triggersToMonitor:
 process.SUSYTupelizer.triggersToMonitor = list(set(process.SUSYTupelizer.triggersToMonitor)) #remove duplicates
 
 print "TriggersToMonitor:",process.SUSYTupelizer.triggersToMonitor
-
 process.SUSYTupelizer.triggerCollection = cms.untracked.string( options.hltName )
 
 process.SUSYTupelizer.addFullJetInfo = cms.untracked.bool(True)
@@ -369,7 +367,7 @@ process.p += process.SUSYTupelizer
 
 process.out = cms.OutputModule("PoolOutputModule",
      #verbose = cms.untracked.bool(True),
-     fileName = cms.untracked.string('histo.root'),
+     fileName = cms.untracked.string(options.outfile),
      SelectEvents   = cms.untracked.PSet( SelectEvents = cms.vstring('p') ),
      outputCommands = cms.untracked.vstring('drop *', 'keep *_*SUSYTupelizer*_*_*' , 'keep *_*EventCounter*_*_*', 'keep *_genParticles_*_*' 
 		 )

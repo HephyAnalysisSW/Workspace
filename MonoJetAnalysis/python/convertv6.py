@@ -34,7 +34,7 @@ if len(sys.argv)>=3:
   #steerable
   exec("allSamples = [" + ",".join(sampinp) + "]")
 
-small  = True
+small  = False
 overwrite = False
 target_lumi = 19375 #pb-1
 

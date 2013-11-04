@@ -96,6 +96,20 @@ xsec["8TeV-QCD_BCtoE_Pt_170_250"]              =        30980.0*0.0204
 xsec["8TeV-QCD_BCtoE_Pt_250_350"]              =        4250.0*0.0243
 xsec["8TeV-QCD_BCtoE_Pt_350"]                  =        811.0*0.0295
 
+xsec["8TeV-ZJetsToNuNu-HT50to100"] = 381.2
+xsec["8TeV-ZJetsToNuNu-HT100to200"] = 160.3
+xsec["8TeV-ZJetsToNuNu-HT200to400"] = 41.49
+xsec["8TeV-ZJetsToNuNu-HT400"] = 5.274
+xsec["8TeV-WW"] = 54.838
+
+#MonoJet Signals
+#https://twiki.cern.ch/twiki/bin/view/LHCPhysics/SUSYCrossSections8TeVstopsbottom
+xsec["8TeV-stop300-LSP270"] = 1.99608
+xsec["8TeV-stop300-LSP270-FullSim"] = 1.99608
+xsec["8TeV-stop200lsp170g100"] = 18.5245  
+xsec["8TeV-stop300lsp240g150"] = 1.99608
+xsec["8TeV-stop300lsp270g175"] = 1.99608
+xsec["8TeV-stop300lsp270g200"] = 1.99608
 
 #OLD and 7TeV samples
 
@@ -358,3 +372,4 @@ xsec["8TeV-QCD_BCtoE_Pt_350"]                  =        811.0*0.0295
 #xsec["G_Pt_800to1400"]  = 3.481*10**(-3)
 #xsec["G_Pt_1400to1800"] = 1.270*10**(-5)
 #xsec["G_Pt_1800"]       = 2.936*10**(-7)
+

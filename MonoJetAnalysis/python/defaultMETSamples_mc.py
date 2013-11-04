@@ -163,21 +163,21 @@ sigFullSimTest["name"] = "S300N270FullSim"
 ####
 
 stop200lsp170g100 = copy.deepcopy(mc)
-stop200lsp170g100["dirname"] = "/data/schoef/monoJetSignals/FastSim"
-stop200lsp170g100["bins"] = ["stop200lsp170g100"]
+stop200lsp170g100["dirname"] = "/data/schoef/monoJetSignals/SUSYTupelizer/FastSim"
+stop200lsp170g100["bins"] = ["8TeV-stop200lsp170g100"]
 stop200lsp170g100["name"] = "stop200lsp170g100"
 
 stop300lsp240g150 = copy.deepcopy(mc)
-stop300lsp240g150["dirname"] = "/data/schoef/monoJetSignals/FastSim"
-stop300lsp240g150["bins"] = ["stop300lsp240g150"]
+stop300lsp240g150["dirname"] = "/data/schoef/monoJetSignals/SUSYTupelizer/FastSim"
+stop300lsp240g150["bins"] = ["8TeV-stop300lsp240g150"]
 stop300lsp240g150["name"] = "stop300lsp240g150"
 
 stop300lsp270g175 = copy.deepcopy(mc)
-stop300lsp270g175["dirname"] = "/data/schoef/monoJetSignals/FastSim"
-stop300lsp270g175["bins"] = ["stop300lsp270g175"]
+stop300lsp270g175["dirname"] = "/data/schoef/monoJetSignals/SUSYTupelizer/FastSim"
+stop300lsp270g175["bins"] = ["8TeV-stop300lsp270g175"]
 stop300lsp270g175["name"] = "stop300lsp270g175"
 
 stop300lsp270g200 = copy.deepcopy(mc)
-stop300lsp270g200["dirname"] = "/data/schoef/monoJetSignals/FastSim"
-stop300lsp270g200["bins"] = ["stop300lsp270g200"]
+stop300lsp270g200["dirname"] = "/data/schoef/monoJetSignals/SUSYTupelizer/FastSim"
+stop300lsp270g200["bins"] = ["8TeV-stop300lsp270g200"]
 stop300lsp270g200["name"] = "stop300lsp270g200"
