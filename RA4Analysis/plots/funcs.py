@@ -209,6 +209,8 @@ def cosDeltaPhiLepW(chain):
   mpy = getValue(chain, "type1phiMetpy")
   cosLepPhi = cos(lPhi)
   sinLepPhi = sin(lPhi)
+  pW = sqrt((lPt*cosLepPhi + mpx)**2 + (lPt*sinLepPhi + mpy)**2)
+
   return ((lPt*cosLepPhi + mpx)*cosLepPhi + (lPt*sinLepPhi + mpy)*sinLepPhi )/pW
 
   
