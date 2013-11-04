@@ -10,7 +10,7 @@ if not path in sys.path:
 del path
 import eventShape
 
-ROOT.gROOT.ProcessLine('.L ../../scripts/tdrstyle.C')
+ROOT.gROOT.ProcessLine('.L ../../../HEPHYCommonTools/scripts/root/tdrstyle.C')
 ROOT.setTDRStyle()
 
 cut =  "(singleMuonic&&nvetoMuons==1&&nvetoElectrons==0||singleElectronic&&nvetoElectrons==1&&nvetoMuons==0)&&ht>400&&met>150&&njets>=3"     #cut to use

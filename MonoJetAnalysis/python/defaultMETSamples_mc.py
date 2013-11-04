@@ -162,22 +162,22 @@ sigFullSimTest["bins"] = ["8TeV-stop300-LSP270-FullSim"]
 sigFullSimTest["name"] = "S300N270FullSim"
 ####
 
-stop200lsp170g100 = copy.deepcopy(mc)
-stop200lsp170g100["dirname"] = "/data/schoef/monoJetSignals/SUSYTupelizer/FastSim"
-stop200lsp170g100["bins"] = ["8TeV-stop200lsp170g100"]
-stop200lsp170g100["name"] = "stop200lsp170g100"
+stop200lsp170g100FastSim = copy.deepcopy(mc)
+stop200lsp170g100FastSim["dirname"] = "/data/schoef/monoJetSignals/SUSYTupelizer/FastSim"
+stop200lsp170g100FastSim["bins"] = ["8TeV-stop200lsp170g100"]
+stop200lsp170g100FastSim["name"] = "stop200lsp170g100FastSim"
 
-stop300lsp240g150 = copy.deepcopy(mc)
-stop300lsp240g150["dirname"] = "/data/schoef/monoJetSignals/SUSYTupelizer/FastSim"
-stop300lsp240g150["bins"] = ["8TeV-stop300lsp240g150"]
-stop300lsp240g150["name"] = "stop300lsp240g150"
+stop300lsp240g150FastSim = copy.deepcopy(mc)
+stop300lsp240g150FastSim["dirname"] = "/data/schoef/monoJetSignals/SUSYTupelizer/FastSim"
+stop300lsp240g150FastSim["bins"] = ["8TeV-stop300lsp240g150"]
+stop300lsp240g150FastSim["name"] = "stop300lsp240g150FastSim"
 
-stop300lsp270g175 = copy.deepcopy(mc)
-stop300lsp270g175["dirname"] = "/data/schoef/monoJetSignals/SUSYTupelizer/FastSim"
-stop300lsp270g175["bins"] = ["8TeV-stop300lsp270g175"]
-stop300lsp270g175["name"] = "stop300lsp270g175"
+stop300lsp270g175FastSim = copy.deepcopy(mc)
+stop300lsp270g175FastSim["dirname"] = "/data/schoef/monoJetSignals/SUSYTupelizer/FastSim"
+stop300lsp270g175FastSim["bins"] = ["8TeV-stop300lsp270g175"]
+stop300lsp270g175FastSim["name"] = "stop300lsp270g175FastSim"
 
-stop300lsp270g200 = copy.deepcopy(mc)
-stop300lsp270g200["dirname"] = "/data/schoef/monoJetSignals/SUSYTupelizer/FastSim"
-stop300lsp270g200["bins"] = ["8TeV-stop300lsp270g200"]
-stop300lsp270g200["name"] = "stop300lsp270g200"
+stop300lsp270g200FastSim = copy.deepcopy(mc)
+stop300lsp270g200FastSim["dirname"] = "/data/schoef/monoJetSignals/SUSYTupelizer/FastSim"
+stop300lsp270g200FastSim["bins"] = ["8TeV-stop300lsp270g200"]
+stop300lsp270g200FastSim["name"] = "stop300lsp270g200FastSim"

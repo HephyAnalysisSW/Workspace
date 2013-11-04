@@ -1,5 +1,5 @@
 import os, sys, ROOT
-ROOT.gROOT.ProcessLine(".L ../scripts/tdrstyle.C")
+ROOT.gROOT.ProcessLine(".L ../../HEPHYCommonTools/scripts/root/tdrstyle.C")
 ROOT.setTDRStyle()
 ROOT.tdrStyle.SetPadRightMargin(0.20)
 

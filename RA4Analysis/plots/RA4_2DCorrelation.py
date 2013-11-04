@@ -1,6 +1,6 @@
 import ROOT
 from math import *
-ROOT.gROOT.ProcessLine(".L ../scripts/tdrstyle.C")
+ROOT.gROOT.ProcessLine(".L ../../HEPHYCommonTools/scripts/root/tdrstyle.C")
 ROOT.setTDRStyle()
 ROOT.gROOT.ProcessLine(".L ../../HEPHYCommonTools/scripts/root/useNiceColorPalette.C")
 ROOT.useNiceColorPalette(20)

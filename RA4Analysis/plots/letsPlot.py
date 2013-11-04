@@ -1,5 +1,5 @@
 import ROOT
-ROOT.gROOT.ProcessLine(".L ../scripts/tdrstyle.C")
+ROOT.gROOT.ProcessLine(".L ../../HEPHYCommonTools/scripts/root/tdrstyle.C")
 ROOT.setTDRStyle()
 from xsec import xsec
 

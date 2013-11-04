@@ -1,7 +1,7 @@
 import ROOT, pickle, os
 from math import sqrt
 
-ROOT.gROOT.ProcessLine(".L ../scripts/tdrstyle.C")
+ROOT.gROOT.ProcessLine(".L ../../HEPHYCommonTools/scripts/root/tdrstyle.C")
 ROOT.setTDRStyle()
 
 ROOT.gROOT.ProcessLine(".L ../../HEPHYCommonTools/scripts/root/useNiceColorPalette.C")
