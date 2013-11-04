@@ -1,0 +1,6 @@
+#! /bin/sh -x 
+for name in `ls -d Step0-*`
+do
+  tokens
+  crab $1 $2 -c $name 
+done
