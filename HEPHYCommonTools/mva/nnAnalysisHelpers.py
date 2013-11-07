@@ -244,6 +244,7 @@ def constructDataset(setup, signal, background, overWrite = False):
 #          scaleTo14 = gluino14TeV_NLO[addVars['osetMgl'].value] /  gluino8TeV_NLONLL[addVars['osetMgl'].value]
 #          addVars['weight14'].value = scaleTo14*vars['weight'].value
 #          addVars['weightLumi14'].value = scaleTo14*vars['weightLumi'][0]
+          print "sig" ,mvaWeightFac
           addVars['weightForMVA'].value  = sample.GetLeaf(setup['weightForMVA']['weight']).GetValue()*setup['weightForMVA']['sigFac']*mvaWeightFac
         else:
           for v in setup['modelVars']:
