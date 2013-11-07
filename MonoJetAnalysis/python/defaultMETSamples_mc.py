@@ -97,9 +97,9 @@ zinv = copy.deepcopy(mc)
 zinv["bins"] = ZJetsInv_Bins 
 zinv["name"] = "ZJetsInv"
 
-tops = copy.deepcopy(mc)
-tops["bins"] = singleTop_Bins 
-tops["name"] = "singleTop"
+singleTop = copy.deepcopy(mc)
+singleTop["bins"] = singleTop_Bins 
+singleTop["name"] = "singleTop"
 
 qcd = copy.deepcopy(mc)
 qcd["bins"] = QCD_Bins 
@@ -176,6 +176,11 @@ stop300lsp270g175FastSim = copy.deepcopy(mc)
 stop300lsp270g175FastSim["dirname"] = "/data/schoef/monoJetSignals/SUSYTupelizer/FastSim"
 stop300lsp270g175FastSim["bins"] = ["8TeV-stop300lsp270g175"]
 stop300lsp270g175FastSim["name"] = "stop300lsp270g175FastSim"
+
+stop300lsp270FastSim = copy.deepcopy(mc)
+stop300lsp270FastSim["dirname"] = "/data/schoef/monoJetSignals/SUSYTupelizer/FastSim"
+stop300lsp270FastSim["bins"] = ["8TeV-stop300lsp270"]
+stop300lsp270FastSim["name"] = "stop300lsp270FastSim"
 
 stop300lsp270g200FastSim = copy.deepcopy(mc)
 stop300lsp270g200FastSim["dirname"] = "/data/schoef/monoJetSignals/SUSYTupelizer/FastSim"

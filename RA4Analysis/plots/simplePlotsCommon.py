@@ -168,11 +168,12 @@ class variable:
   ratioMax = 1.9
   logRatio = False
   ratioVarName = "Data / MC"
-  def __init__(self, name, binning, cutfunc="", profile=False, varfunc = ""):
+  def __init__(self, name, binning, commoncf="", profile=False, varfunc = "", additionalCutFunc=""):
     self.initname = name
     sname=""
     self.title=""
     self.varfunc = varfunc
+    self.additionalCutFunc=additionalCutFunc
     if name.count(":")>0:
       sname = name.split(":")
       self.title = sname[0]
@@ -205,7 +206,7 @@ class variable:
       self.data_histo = ROOT.TProfile(self.name+"_Data",self.hname+self.titleaxisstring,*binning)
 
     self.data_histo.Reset()
-    self.cutfunc=cutfunc
+    self.commoncf=commoncf
     self.logy=False
     self.logx=False
     self.color=ROOT.kBlue
@@ -290,7 +291,7 @@ def drawStack(stack,normalized=False):
         if refValue>0:
           scaleFac = var.normalizeTo.data_histo.Integral()/refValue
         else:
-          print "Warning! (Not scaled!)",var.name,"normalizeTo",var.normalizeTo.name,var.normalizeTo.cutfunc,"normalizeWhat",var.normalizeWhat.name,var.normalizeWhat.cutfunc,"has Integral",refValue
+          print "Warning! (Not scaled!)",var.name,"normalizeTo",var.normalizeTo.name,var.normalizeTo.commoncf,"normalizeWhat",var.normalizeWhat.name,var.normalizeWhat.commoncf,"has Integral",refValue
     if type(var.sample) == type({}):
       print var.name,var.sample["name"],hcopy.Integral(),"scaleFac",scaleFac
     hcopy.Scale(scaleFac)
@@ -411,7 +412,7 @@ def drawNMStacks(intn, intm, thesestacks, filename, normalized=False, path = def
       bottompad.SetRightMargin(0.02)
       bottompad.SetBottomMargin(scaleFacBottomPad*0.13)
       bottompad.SetPad(bottompad.GetX1(), bottompad.GetY1(), bottompad.GetX2(), yBorder)
-      rvar = variable(stack[0].initname, stack[0].binning, stack[0].cutfunc)
+      rvar = variable(stack[0].initname, stack[0].binning, stack[0].commoncf)
       rvar.data_histo.Sumw2()
       rvar.logy = False
       rvar.minimum=0.2
@@ -487,9 +488,9 @@ class variable2D:
       self.data_histo = ROOT.TH2F(self.name,self.name+";"+self.titleaxisstring,*self.binning)
       self.data_histo.Sumw2()
     self.data_histo.Reset()
-    if var1.cutfunc!=var2.cutfunc:
-      print "Warning! var2.cutfunc ignored:", var2.name, "taken:",var1.cutfunc,"skipped:",var2.cutfunc
-    self.cutfunc=var1.cutfunc
+    if var1.commoncf!=var2.commoncf:
+      print "Warning! var2.commoncf ignored:", var2.name, "taken:",var1.commoncf,"skipped:",var2.commoncf
+    self.commoncf=var1.commoncf
     self.logy=False
 
 def drawExclusionRegions(histo, var1cuts, var2cuts):

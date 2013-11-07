@@ -157,7 +157,7 @@ def splitListOfObjects(var, val, s):
   resLow = []
   resHigh = []
   for x in s:
-    if x[var]<=val:
+    if x[var]<val:
       resLow.append(x)
     else:
       resHigh.append(x)

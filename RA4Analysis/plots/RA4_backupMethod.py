@@ -143,10 +143,10 @@ if not os.path.exists(filename):
           htmp=ROOT.TH2F("htmp","htmp",*(var.binning))
           htmp.SetBins(len(binningkinMetSig) - 1, array('d',binningkinMetSig), len(binningHT) - 1, array('d',binningHT))
           htmp.Sumw2()
-          c.Draw(var.var2.name+":"+var.var1.name+">>htmp",str(sample["weight"][bin])+"*("+var.cutfunc+")")
+          c.Draw(var.var2.name+":"+var.var1.name+">>htmp",str(sample["weight"][bin])+"*("+var.commoncf+")")
           htmp=ROOT.gDirectory.Get("htmp")
           var.data_histo.Add(htmp.Clone())
-          print "At variable",var.name, "Sample",sample["name"],"bin",bin, "adding",htmp.Integral(),str(sample["weight"][bin])+"*("+var.cutfunc+")"
+          print "At variable",var.name, "Sample",sample["name"],"bin",bin, "adding",htmp.Integral(),str(sample["weight"][bin])+"*("+var.commoncf+")"
           del htmp
       del c
 

@@ -93,11 +93,11 @@ for sample in allSamples:
 #        if var.style=="e":
         htmp.Sumw2()
         if not sample["hasWeight"]:
-          c.Draw(var.name+">>htmpSPK",str(sample["weight"][bin])+"*("+var.cutfunc+")")
-          print "At variable",var.name, "Sample",sample["name"],"bin",bin, "adding",htmp.Integral(),str(sample["weight"][bin])+"*("+var.cutfunc+")"
+          c.Draw(var.name+">>htmpSPK",str(sample["weight"][bin])+"*("+var.commoncf+")")
+          print "At variable",var.name, "Sample",sample["name"],"bin",bin, "adding",htmp.Integral(),str(sample["weight"][bin])+"*("+var.commoncf+")"
         else:
-          c.Draw(var.name+">>htmpSPK",var.cutfunc)
-          print "At variable",var.name, "Sample",sample["name"],"bin",bin, "adding",htmp.Integral(),var.cutfunc
+          c.Draw(var.name+">>htmpSPK",var.commoncf)
+          print "At variable",var.name, "Sample",sample["name"],"bin",bin, "adding",htmp.Integral(),var.commoncf
         htmp=ROOT.gDirectory.Get("htmpSPK")
         var.data_histo.Add(htmp.Clone())
         del htmp

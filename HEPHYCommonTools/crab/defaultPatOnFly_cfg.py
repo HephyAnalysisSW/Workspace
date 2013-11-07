@@ -24,6 +24,15 @@ options.register ('outfile','histo.root',
           VarParsing.VarParsing.varType.string,
           "outfile")
 
+options.register ('startFileNumber',-1,
+          VarParsing.VarParsing.multiplicity.singleton,
+          VarParsing.VarParsing.varType.int,
+          "start at n-th file (-1=all)")
+options.register ('stopFileNumber',-1,
+          VarParsing.VarParsing.multiplicity.singleton,
+          VarParsing.VarParsing.varType.int,
+          "stop before n-th file (-1=all)")
+
 options.register ('triggers','*',
           VarParsing.VarParsing.multiplicity.list,
           VarParsing.VarParsing.varType.string,
@@ -62,10 +71,14 @@ if options.files[0][:9] == 'load:stop':
   from Workspace.HEPHYCommonTools.fastSimSignals_cfi import *
   print "Loading files from Workspace.HEPHYCommonTools.fastSimSignals_cfi"
   infiles =  eval(options.files[0][5:])
+  if options.startFileNumber!=-1 and options.stopFileNumber!=-1:
+    print "Only taking files[",options.startFileNumber,",",options.stopFileNumber,"]"
+  print "Length of total file list:", len(infiles)
+  infiles = infiles[options.startFileNumber:options.stopFileNumber]
   for f in options.files:
     options.files.remove(f)
-  options.files = infiles[1:]
-
+  options.files = infiles
+  print options.files
 
 isMC = (options.mode.lower()=='sms' or options.mode.lower()=='mc')
 jec = []

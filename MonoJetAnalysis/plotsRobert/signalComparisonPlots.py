@@ -29,14 +29,16 @@ lumiScale = 1.
 #FullSim["name"] = "S300N270FullSim"
 
 chmode = "copy"
-from convertedTuples import stop300lsp270g200, stop300lsp270g175, stop200lsp170g100, stop300lsp240g150
+from convertedTuples import stop300lsp270g200, stop300lsp270g175, stop200lsp170g100, stop300lsp240g150, stop300lsp270
 
 stop300lsp270g200["legendText"]  = "m_{#tilde t} = 300, m_{LSP} = 270, g=200"
 stop300lsp270g175["legendText"]  = "m_{#tilde t} = 300, m_{LSP} = 270, g=175"
+stop300lsp270["legendText"]  = "m_{#tilde t} = 300, m_{LSP} = 270"
+stop300lsp240g150["legendText"]  = "m_{#tilde t} = 300, m_{LSP} = 240, g=150"
 stop200lsp170g100["legendText"]  = "m_{#tilde t} = 200, m_{LSP} = 170, g=100"
 
 
-allSamples = [stop200lsp170g100, stop300lsp270g200, stop300lsp270g175]
+allSamples = [stop200lsp170g100, stop300lsp270, stop300lsp240g150]
 signals = allSamples
 
 #  if sample['name'].lower().count('data'):

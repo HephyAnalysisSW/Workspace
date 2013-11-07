@@ -102,13 +102,15 @@ for sample in allSamples:
     if ntot>0:
       for var in allVars:
         if var.sample["name"] == sample["name"] and var.sample["bins"].count(bin)==1:
-          c.Draw(">>eList",var.cutfunc)
+          c.Draw(">>eList",var.commoncf)
           elist = ROOT.gDirectory.Get("eList")
           number_events = elist.GetN()
           if var.varfunc!="":
-            print "var: Func:", var.varfunc.func_name,"Reading: ", sample["name"], bin, "with",number_events,"Events using cut", var.cutfunc
+            print "var: Func:", var.varfunc.func_name,"Reading: ", sample["name"], bin, "with",number_events,"Events using cut", var.commoncf
           else:
-            print "var:", var.name,"Reading: ", sample["name"], bin, "with",number_events,"Events using cut", var.cutfunc
+            print "var:", var.name,"Reading: ", sample["name"], bin, "with",number_events,"Events using cut", var.commoncf
+          if var.additionalCutFunc!="":
+            print "Using additional Cut requirement:",var.additionalCutFunc
           if small:
             if number_events>200:
               number_events=200
@@ -118,6 +120,8 @@ for sample in allSamples:
       #      # Update all the Tuples
             if elist.GetN()>0 and ntot>0:
               c.GetEntry(elist.GetEntry(i))
+              if var.additionalCutFunc!="" and not var.additionalCutFunc(c):
+                continue
               nvtxWeight = 1.
               if rwHisto!="" and xsec.xsec.has_key(bin):
                 nvtxWeight = rwHisto.GetBinContent(rwHisto.FindBin(getValue(c, "ngoodVertices" )))

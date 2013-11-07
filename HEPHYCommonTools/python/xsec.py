@@ -109,6 +109,7 @@ xsec["8TeV-stop300-LSP270-FullSim"] = 1.99608
 xsec["8TeV-stop200lsp170g100"] = 18.5245  
 xsec["8TeV-stop300lsp240g150"] = 1.99608
 xsec["8TeV-stop300lsp270g175"] = 1.99608
+xsec["8TeV-stop300lsp270"] = 1.99608
 xsec["8TeV-stop300lsp270g200"] = 1.99608
 
 #OLD and 7TeV samples
