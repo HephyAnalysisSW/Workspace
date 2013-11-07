@@ -29,7 +29,7 @@ lumiScale = 1.
 #FullSim["name"] = "S300N270FullSim"
 
 chmode = "copy"
-from convertedTuples import stop300lsp270g200, stop300lsp270g175, stop200lsp170g100, stop300lsp240g150, stop300lsp270
+from defaultConvertedTuples import stop300lsp270g200, stop300lsp270g175, stop200lsp170g100, stop300lsp240g150, stop300lsp270
 
 stop300lsp270g200["legendText"]  = "m_{#tilde t} = 300, m_{LSP} = 270, g=200"
 stop300lsp270g175["legendText"]  = "m_{#tilde t} = 300, m_{LSP} = 270, g=175"

@@ -5,12 +5,10 @@ from localConfig import afsUser, nfsUser, localPlotDir
 from array import array
 import os, sys
 
-from nnAnalysisHelpers_TMVA import getEList, constructDataset
-
-path = os.path.abspath('../cardFileWriter/')
-if not path in sys.path:
-    sys.path.insert(1, path)
-del path
+from nnAnalysisHelpers import getEList, constructDataset
+for path in [os.path.abspath(p) for p in ['../../HEPHYCommonTools/mva', 'HEPHYCommonTools/cardFileWriter/']]:
+  if not path in sys.path:
+      sys.path.insert(1, path)
 
 model = "T1tttt"
 mgl = 1300

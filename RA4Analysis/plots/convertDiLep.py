@@ -3,6 +3,10 @@ import ROOT
 from simplePlotsCommon import *
 from math import *
 import os, copy, array, xsec, sys, random, itertools
+for path in [os.path.abspath(p) for p in ['../../HEPHYCommonTools/python/']]:
+  if not path in sys.path:
+      sys.path.insert(1, path)
+
 from xsecSMS import stop8TeV_NLONLL
 small = False
 outputDir = "/data/schoef/convertedTuples_v13/"

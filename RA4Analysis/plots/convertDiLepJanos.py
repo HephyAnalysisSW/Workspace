@@ -3,6 +3,10 @@ import ROOT
 from simplePlotsCommon import *
 from math import *
 import sys, os, copy, array, xsec, random, itertools
+for path in [os.path.abspath(p) for p in ['../../HEPHYCommonTools/python/']]:
+  if not path in sys.path:
+      sys.path.insert(1, path)
+
 from xsecSMS import stop8TeV_NLONLL
 from RecDiLep_RECO import RecDiLepton, calcSigmaShift
 from RecDiLepAnalytic import RecDiLeptonAnalytic

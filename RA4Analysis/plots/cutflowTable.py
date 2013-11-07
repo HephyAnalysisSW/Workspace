@@ -1,5 +1,9 @@
 import ROOT
 from analysisHelpers import getBkgChain, getSignalChain, getCutSignalYield
+for path in [os.path.abspath(p) for p in ['../../HEPHYCommonTools/python/']]:
+  if not path in sys.path:
+      sys.path.insert(1, path)
+
 from xsecSMS import gluino8TeV_NLONLL, gluino14TeV_NLO
 #signals = [(1500, 0), (1850,0), (2000, 0), (1250, 0)]
 signals = [(1000,600), (1250, 0)]

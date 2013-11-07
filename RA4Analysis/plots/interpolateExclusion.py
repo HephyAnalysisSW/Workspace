@@ -1,4 +1,8 @@
 import ROOT
+for path in [os.path.abspath(p) for p in ['../../HEPHYCommonTools/python/']]:
+  if not path in sys.path:
+      sys.path.insert(1, path)
+
 from xsecSMS import *
 
 for x in ["gluino8TeV_NLONLL", "stop8TeV_NLONLL", "gluino8TeV_NLONLL_Up", "gluino8TeV_NLONLL_Down", "gluino14TeV_NLO"]:
