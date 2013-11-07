@@ -4,10 +4,10 @@ import FWCore.ParameterSet.VarParsing as VarParsing
 process = cms.Process("PAT")
 options = VarParsing.VarParsing ('standard')
 
-options.register ('isMC','True',
+options.register ('mode','mc',
           VarParsing.VarParsing.multiplicity.singleton,
-          VarParsing.VarParsing.varType.bool,
-          "Switch between MC and Data")
+          VarParsing.VarParsing.varType.string,
+          "Switch between MC, data and SMS")
 
 options.register ('hltName','HLT',
           VarParsing.VarParsing.multiplicity.singleton,
@@ -45,13 +45,12 @@ options.register ('addRA4Info',True,
           "whether or not to add RA4 specific Info")
 
 infiles = ['file:/data/schoef/local/TTJets-53X-syncfile-AODSIM.root']
-#infiles = ['/store/caf/user/imikulec/lstop/Hadronizer_SMS_Scans_2jets_Qcut44_TuneZ2star_8TeV_madgraph_tauola_cff_py_GEN_FASTSIM_HLT_PU.root']
-#infiles = ['file:/data/jkancsar/pickevent/event4874249.root']
-#infiles = ['file:/afs/hephy.at/scratch/s/schoefbeck/CMS/CMSSW_5_3_3_patch2/src/Workspace/HEPHYCommonTools/crab/pickEvents/pickevents.root']
+#  infiles = ['file:/data/jkancsar/pickevent/event4874249.root']
+#  infiles = ['file:/data/schoef/monoJetSignals/FastSim/stop200lsp170g100/from_0_to_10000_decayed_stop200lsp170g100.root']
+
 options.files=infiles
 
-#options.isMC = False
-options.isMC = True
+options.mode = 'mc'
 options.maxEvents=10
 
 if not 'ipython' in VarParsing.sys.argv[0]:
@@ -59,8 +58,18 @@ if not 'ipython' in VarParsing.sys.argv[0]:
 else:
   print "No parsing of arguments!"
 
+if options.files[0][:9] == 'load:stop':
+  from Workspace.HEPHYCommonTools.fastSimSignals_cfi import *
+  print "Loading files from Workspace.HEPHYCommonTools.fastSimSignals_cfi"
+  infiles =  eval(options.files[0][5:])
+  for f in options.files:
+    options.files.remove(f)
+  options.files = infiles[1:]
+
+
+isMC = (options.mode.lower()=='sms' or options.mode.lower()=='mc')
 jec = []
-if options.isMC:
+if isMC:
   jec = ['L1FastJet', 'L2Relative', 'L3Absolute']
 else:
   jec = ['L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual']
@@ -69,7 +78,7 @@ else:
 #  if options.mode=="Ele":
 #    triggers = ['HLT_CleanPFHT350_Ele5_CaloIdT_CaloIsoVL_TrkIdT_TrkIsoVL_PFMET45_v*','HLT_CleanPFHT350_Ele5_CaloIdT_CaloIsoVL_TrkIdT_TrkIsoVL_PFMET50_v*','HLT_CleanPFHT300_Ele15_CaloIdT_CaloIsoVL_TrkIdT_TrkIsoVL_PFMET45_v*','HLT_CleanPFHT300_Ele15_CaloIdT_CaloIsoVL_TrkIdT_TrkIsoVL_PFMET50_v*']
 
-print "isMC?",options.isMC,", verbose?",options.verbose,", add RA4 Info?",options.addRA4Info, ", JEC:",jec,", GT",options.GT, ", triggers", options.triggers
+print "mode",options.mode,"isMC?",isMC, ", verbose?",options.verbose,", add RA4 Info?",options.addRA4Info, ", JEC:",jec,", GT",options.GT, ", triggers", options.triggers
 
 
 
@@ -119,7 +128,7 @@ process.out = cms.OutputModule("PoolOutputModule",
 from PhysicsTools.Configuration.SUSY_pattuple_cff import addDefaultSUSYPAT, getSUSY_pattuple_outputCommands
 
 process.GlobalTag.globaltag = options.GT 
-addDefaultSUSYPAT(process,options.isMC,options.hltName,jec,'',['AK5PF'])
+addDefaultSUSYPAT(process,isMC,options.hltName,jec,'',['AK5PF'])
 
 process.patJetsAK5PF.addTagInfos = cms.bool(True)
 process.pfNoTauPF.enable = cms.bool(False)
@@ -131,7 +140,7 @@ process.pfNoTauPF.enable = cms.bool(False)
 #process.load('RecoMET.METFilters.EcalDeadCellBoundaryEnergyFilter_cfi')
 process.load("JetMETCorrections.Type1MET.pfMETCorrections_cff")
 
-if options.isMC:
+if isMC:
   process.pfJetMETcorr.jetCorrLabel = "ak5PFL1FastL2L3"
 else:
   process.pfJetMETcorr.jetCorrLabel = "ak5PFL1FastL2L3Residual"
@@ -169,7 +178,7 @@ process.patPFMETsTypeIType0PFCandcorrected = process.patPFMETs.clone(
             )
 process.load("JetMETCorrections.Type1MET.pfMETsysShiftCorrections_cfi")
 
-if options.isMC:
+if isMC:
   process.pfMEtSysShiftCorr.parameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_mc
 else:
   process.pfMEtSysShiftCorr.parameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_data
@@ -217,12 +226,12 @@ process.goodVertices = cms.EDFilter(
             src = cms.InputTag("offlinePrimaryVertices"),
             cut = cms.string("!isFake && ndof > 4 && abs(z) <= 24 && position.Rho <= 2")
           )
-
-process.load("RecoMET.METFilters.hcalLaserEventFilter_cfi")
-process.hcalLaserEventFilter.vetoByRunEventNumber=cms.untracked.bool(False)
-process.hcalLaserEventFilter.vetoByHBHEOccupancy=cms.untracked.bool(True)
-process.load('RecoMET.METFilters.eeBadScFilter_cfi')
-process.load('RecoMET.METAnalyzers.CSCHaloFilter_cfi')
+if not options.mode.lower()=='sms':
+  process.load("RecoMET.METFilters.hcalLaserEventFilter_cfi")
+  process.hcalLaserEventFilter.vetoByRunEventNumber=cms.untracked.bool(False)
+  process.hcalLaserEventFilter.vetoByHBHEOccupancy=cms.untracked.bool(True)
+  process.load('RecoMET.METFilters.eeBadScFilter_cfi')
+  process.load('RecoMET.METAnalyzers.CSCHaloFilter_cfi')
 process.load('RecoMET.METFilters.EcalDeadCellTriggerPrimitiveFilter_cfi')
 process.load('RecoMET.METFilters.trackingFailureFilter_cfi')
 
@@ -239,48 +248,35 @@ process.EventCounterAfterEEBadSC = process.EventCounter.clone()
 process.EventCounterAfterECALTP = process.EventCounter.clone()
 
 process.filterSequence = cms.Sequence(
-            process.EventCounter*
-              process.hltFilter *
-            process.EventCounterAfterHLT*
-              process.scrapingVeto *
-            process.EventCounterAfterScraping*
-              process.primaryVertexFilter*
-            process.EventCounterAfterPV*
-              process.HBHENoiseFilter*
-            process.EventCounterAfterHBHE*
-              process.goodVertices*
-              process.trackingFailureFilter*
-            process.EventCounterAfterTrackingFailure*
-              process.hcalLaserEventFilter*
-            process.EventCounterAfterLaser*
-              process.CSCTightHaloFilter*
-            process.EventCounterAfterCSC*
-              process.eeBadScFilter*
-            process.EventCounterAfterEEBadSC*
-              process.EcalDeadCellTriggerPrimitiveFilter*
-              #process.EcalDeadCellBoundaryEnergyFilter*
-            process.EventCounterAfterECALTP
-              #process.totalKinematicsFilter*
-            #process.EventCounterAfterTotalKinematicsFilter
-          )
+    process.EventCounter*
+      process.hltFilter *
+    process.EventCounterAfterHLT*
+      process.scrapingVeto *
+    process.EventCounterAfterScraping*
+      process.primaryVertexFilter*
+    process.EventCounterAfterPV)
+if not options.mode.lower()=='sms':
+   process.filterSequence+= process.HBHENoiseFilter
+   process.filterSequence+= process.EventCounterAfterHBHE
+process.filterSequence+= process.goodVertices
+process.filterSequence+= process.trackingFailureFilter
+process.filterSequence+= process.EventCounterAfterTrackingFailure
+if not options.mode.lower()=='sms':
+   process.filterSequence+= process.hcalLaserEventFilter
+   process.filterSequence+= process.EventCounterAfterLaser
+   process.filterSequence+= process.CSCTightHaloFilter
+   process.filterSequence+= process.EventCounterAfterCSC
+   process.filterSequence+= process.eeBadScFilter
+   process.filterSequence+= process.EventCounterAfterEEBadSC
+process.filterSequence+= process.EcalDeadCellTriggerPrimitiveFilter
+process.filterSequence+= process.EventCounterAfterECALTP
 
-if options.isMC:
-  print "\nFilter List:", "HLT, scraping, PV, HBHE, CSCTightHalo, EcalTP, Laser, eeBadSc\n"
-else:
-#  process.load("EventFilter.HcalRawToDigi.hcallasereventfilter2012_cfi")
-#  process.filterSequence+=process.hcallasereventfilter2012
-#  process.EventCounterAfterHCALLaser2012 = process.EventCounter.clone()
-#  process.filterSequence+=process.EventCounterAfterHCALLaser2012
-#  process.load('RecoMET.METFilters.ecalLaserCorrFilter_cfi')
-#  process.filterSequence+= process.ecalLaserCorrFilter
-#  process.EventCounterafterECalLaserCorrectionFilter = process.EventCounter.clone()
-#  process.filterSequence+=process.EventCounterafterECalLaserCorrectionFilter
-#  process.load('RecoMET.METFilters.trackingPOGFilters_cff')
-#  process.filterSequence+=process.trkPOGFilters
-#  process.EventCounterAfterTrkPOGFilters = process.EventCounter.clone()
-#  process.filterSequence+=process.EventCounterAfterTrkPOGFilters
-#  process.load("EventFilter.HcalRawToDigi.hcallasereventfilter2012_cff")
+if options.mode.lower()=='sms':
+  print "\nFilter List:", "HLT, scraping, PV, trackingFailureFilter, EcalTP\n"
+if options.mode.lower()=='mc':
+  print "\nFilter List:", "HLT, scraping, PV, HBHE, trackingFailureFilter, hcalLaser, CSCTightHalo, eeBadSC, EcalTP\n"
 
+if options.mode.lower()=='data':
   process.load("EventFilter.HcalRawToDigi.hcallasereventfilter2012_cfi")
   process.filterSequence+=process.hcallasereventfilter2012
   process.EventCounterAfterHCALLaser2012 = process.EventCounter.clone()
@@ -289,12 +285,8 @@ else:
   process.filterSequence+= process.ecalLaserCorrFilter
   process.EventCounterafterECalLaserCorrectionFilter = process.EventCounter.clone()
   process.filterSequence+=process.EventCounterafterECalLaserCorrectionFilter
-#  process.load('RecoMET.METFilters.trackingPOGFilters_cff')
-#  process.filterSequence+=process.trkPOGFilters
-#  process.EventCounterAfterTrkPOGFilters = process.EventCounter.clone()
-#  process.filterSequence+=process.EventCounterAfterTrkPOGFilters
 
-  print "\nFilter List:", "HLT, scraping, PV, HBHE, CSCTightHalo, EcalTP, Laser, eeBadSc, hcal2012, ecallaser\n"
+  print "\nFilter List:", "HLT, scraping, PV, HBHE, trackingFailureFilter, hcalLaser, CSCTightHalo, eeBadSC, EcalTP, hcalLaser2012, ecalLaserCorr\n"
 
 
 from RecoJets.JetProducers.kt4PFJets_cfi import *
@@ -340,11 +332,41 @@ process.p += process.patPFMETsTypeIPhicorrected
 process.p += process.patPFMETsTypeIType0PFCandcorrected
 process.p += process.rawpfMet
 process.p += process.patRAWPFMETs
+if options.mode.lower()=='sms':
+#  process.pdfWeights = cms.EDProducer("PdfWeightProducer",
+#        # Fix POWHEG if buggy (this PDF set will also appear on output, 
+#        # so only two more PDF sets can be added in PdfSetNames if not "")
+#        #FixPOWHEG = cms.untracked.string("cteq66.LHgrid"),
+#        GenTag = cms.untracked.InputTag("genParticles"),
+#        PdfInfoTag = cms.untracked.InputTag("generator"),
+#        PdfSetNames = cms.untracked.vstring(
+#                "cteq66.LHgrid"
+#              , "MRST2006nnlo.LHgrid"
+##              , "NNPDF10_100.LHgrid"
+#        )
+#  )
+  process.pdfWeights = cms.EDProducer("PdfWeightProducer",
+              PdfInfoTag = cms.untracked.InputTag("generator"),
+              PdfSetNames = cms.untracked.vstring(
+    "cteq66.LHgrid"
+    , "MSTW2008nlo68cl.LHgrid"
+    , "NNPDF20_100.LHgrid"
+    ))
+#  process.pdfWeights = cms.EDProducer("PdfWeightProducer",
+#        FixPOWHEG = cms.untracked.bool(False), # fix POWHEG (it requires cteq66* PDFs in the list)
+#        PdfInfoTag = cms.untracked.InputTag("generator"),
+#        PdfSetNames = cms.untracked.vstring(
+#                "cteq65.LHgrid"
+#              , "MRST2006nnlo.LHgrid"
+#              , "MRST2007lomod.LHgrid"
+#        )
+#  )
+  process.p += process.pdfWeights
 
 process.load("PhysicsTools.HepMCCandAlgos.flavorHistoryProducer_cfi")
 process.load("PhysicsTools.HepMCCandAlgos.flavorHistoryFilter_cfi")
 process.load('Workspace.HEPHYCommonTools.SUSYTupelizer_cfi')
-if options.isMC:
+if isMC:
   process.p +=      process.bFlavorHistoryProducer
   process.p +=      process.cFlavorHistoryProducer
   process.p +=      process.flavorHistoryFilter
@@ -366,12 +388,12 @@ process.SUSYTupelizer.triggerCollection = cms.untracked.string( options.hltName 
 process.SUSYTupelizer.addFullJetInfo = cms.untracked.bool(True)
 process.SUSYTupelizer.addFullMETInfo = cms.untracked.bool(True)
 process.SUSYTupelizer.useForDefaultAlias = cms.untracked.bool(True)
-#process.SUSYTupelizer.addLeptonTriggerInfo = cms.untracked.bool(False)
 process.SUSYTupelizer.addTriggerInfo = cms.untracked.bool(True)
 process.SUSYTupelizer.addFullLeptonInfo = cms.untracked.bool(True)
 process.SUSYTupelizer.addFullBTagInfo = cms.untracked.bool(True)
-process.SUSYTupelizer.addGeneratorInfo = cms.untracked.bool(options.isMC)
-#process.SUSYTupelizer.addMSugraOSETInfo = cms.untracked.bool(True)
+process.SUSYTupelizer.addGeneratorInfo = cms.untracked.bool(isMC)
+process.SUSYTupelizer.addMSugraOSETInfo = cms.untracked.bool(options.mode.lower()=='sms')
+process.SUSYTupelizer.addPDFWeights = cms.untracked.bool(options.mode.lower()=='sms')
 process.SUSYTupelizer.verbose = cms.untracked.bool(options.verbose)
 process.SUSYTupelizer.addFullMuonInfo = cms.untracked.bool(True)
 process.SUSYTupelizer.addFullEleInfo = cms.untracked.bool(True)

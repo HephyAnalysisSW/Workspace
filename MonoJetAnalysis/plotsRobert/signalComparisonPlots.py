@@ -29,15 +29,14 @@ lumiScale = 1.
 #FullSim["name"] = "S300N270FullSim"
 
 chmode = "copy"
-from convertedTuples import stop300lsp270g200, stop300lsp270g175
+from convertedTuples import stop300lsp270g200, stop300lsp270g175, stop200lsp170g100, stop300lsp240g150
 
-stop300lsp270g200["color"]     = ROOT.kBlack
 stop300lsp270g200["legendText"]  = "m_{#tilde t} = 300, m_{LSP} = 270, g=200"
-stop300lsp270g175["color"]     = ROOT.kRed - 3
 stop300lsp270g175["legendText"]  = "m_{#tilde t} = 300, m_{LSP} = 270, g=175"
+stop200lsp170g100["legendText"]  = "m_{#tilde t} = 200, m_{LSP} = 170, g=100"
 
 
-allSamples = [stop300lsp270g200, stop300lsp270g175]
+allSamples = [stop200lsp170g100, stop300lsp270g200, stop300lsp270g175]
 signals = allSamples
 
 #  if sample['name'].lower().count('data'):
@@ -47,8 +46,6 @@ signals = allSamples
 
 allVars=[]
 allStacks=[]
-
-signalColors = [ROOT.kBlack, ROOT.kBlue + 1, ROOT.kGreen + 2, ROOT.kOrange + 2]
 
 ## plots for studying preselection 
 

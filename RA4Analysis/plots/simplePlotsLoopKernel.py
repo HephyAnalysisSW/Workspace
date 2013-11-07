@@ -132,7 +132,7 @@ for sample in allSamples:
               else:
                 if var.reweightVar!="":
                   reweightFac = var.reweightHisto.GetBinContent(var.reweightHisto.FindBin(getValue(c, var.reweightVar)))
-#                 print "reweightVar = ",var.reweightVar, c.GetLeaf(var.reweightVar).GetValue(), "->", reweightFac
+#                  print "reweightVar = ",var.reweightVar, c.GetLeaf(var.reweightVar).GetValue(), "->", reweightFac
               nvtxWeight=reweightFac*nvtxWeight 
               scaleFac = 1
               if sample.has_key('scaleFac'):
