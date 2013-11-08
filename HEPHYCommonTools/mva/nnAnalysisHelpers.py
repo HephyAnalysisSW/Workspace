@@ -234,25 +234,28 @@ def constructDataset(setup, signal, background, overWrite = False):
       else:
         if setup.has_key('bkgMVAWeightFac'):
           mvaWeightFac = setup["bkgMVAWeightFac"]
-    
+   
+      if type(setup['weightForMVA']['weight'])!=type(""):
+        weight =  setup['weightForMVA']['weight']
       for i in range(eList.GetN()):
         if i%10000==0:print 'type',i_type.value, 'Event.:',i,'/',eList.GetN()
         sample.GetEntry(eList.GetEntry(i))
+        if type(setup['weightForMVA']['weight'])==type(""):
+          weight = sample.GetLeaf(setup['weightForMVA']['weight']).GetValue() 
         if i_type.value==1:
           for v in setup['modelVars']:
             addVars[v].value = sample.GetLeaf(v).GetValue()
 #          scaleTo14 = gluino14TeV_NLO[addVars['osetMgl'].value] /  gluino8TeV_NLONLL[addVars['osetMgl'].value]
 #          addVars['weight14'].value = scaleTo14*vars['weight'].value
 #          addVars['weightLumi14'].value = scaleTo14*vars['weightLumi'][0]
-          print "sig" ,mvaWeightFac
-          addVars['weightForMVA'].value  = sample.GetLeaf(setup['weightForMVA']['weight']).GetValue()*setup['weightForMVA']['sigFac']*mvaWeightFac
+          addVars['weightForMVA'].value  = weight*setup['weightForMVA']['sigFac']*mvaWeightFac
         else:
           for v in setup['modelVars']:
             addVars[v].value = float('nan')
 #          scaleTo14 = 882.29/225.197
 #          addVars['weight14'].value = scaleTo14*vars['weight'].value
 #          addVars['weightLumi14'].value = scaleTo14*vars['weightLumi'][0]
-          addVars['weightForMVA'].value  = sample.GetLeaf(setup['weightForMVA']['weight']).GetValue()*setup['weightForMVA']['bkgFac']*mvaWeightFac
+          addVars['weightForMVA'].value  = weight*setup['weightForMVA']['bkgFac']*mvaWeightFac
 #        addVars['weightForMVA'].value  = sample.GetLeaf(setup['weightForMVA']).GetValue()*mvaWeightFac
         for v in setup["additionalVars"]:
           addVars[v[0]].value  = v[1](sample) 
@@ -366,7 +369,8 @@ def setupMVAFrameWork(setup, data, methods, prefix):
 
   pfile = setup['outputFile'].replace('.root','')+'.pkl'
   setupStripped = copy.deepcopy(setup)
-  setupStripped.pop('additionalVars',None)
+  setupStripped['additionalVars'] = [v[:-1]+['removedFunction'] for v in setupStripped['additionalVars']]
+    
   pickle.dump(setupStripped, file(pfile,"w"))
   print "Stored setup in",pfile
    
@@ -571,13 +575,67 @@ def setupMVAFrameWork(setup, data, methods, prefix):
   ROOT.gROOT.cd(olddir)
   return
 
-def getYield(c, cut, weight = "weight"):
-
-  cut = weight+"*("+cut+")"
-  print cut
-  c.Draw("1>>htmp(1,0,2)", cut, "goff")
-  htmp =  ROOT.gDirectory.Get("htmp")
-  res = htmp.Integral()
-  del htmp
+def getYield(sample, setup, reader, method, cut, nnCutVal, weight):
+  res=0.
+  l = getEList(sample, cut)
+  for i in range(l.GetN()):
+    sample.GetEntry(l.GetEntry(i))
+    inputs = ROOT.std.vector('float')()
+    for var in setup['inputVars']:
+      val = sample.GetLeaf(var).GetValue()
+#      vars[var][0] = val
+    #inputs = array('f', [sample.GetLeaf(var).GetValue() for var in setup['inputVars']])
+      inputs.push_back(val)
+#    print inputs
+    if method['type']!=ROOT.TMVA.Types.kCuts:
+      nno =   reader.EvaluateMVA(inputs,  method['name'])
+#    print nno
+#    print inputs, nno, sample.GetLeaf(weight).GetValue()
+      if nno>=nnCutVal:
+        res+=sample.GetLeaf(weight).GetValue()
+    else:
+      if nnCutVal<0:
+        nno=1
+      else:
+        nno =   reader.EvaluateMVA(inputs,  method['name'], nnCutVal)
+#      print nno, inputs[0],inputs[1], nnCutVal
+      if nno:res+=sample.GetLeaf(weight).GetValue()
+  del l
   return res
+
+def fillNNHisto(sample, setup, reader, method, cut, histo, weight):
+  histo.Reset() 
+  l = getEList(sample, cut)
+  for i in range(l.GetN()):
+    sample.GetEntry(l.GetEntry(i))
+    inputs = ROOT.std.vector('float')()
+    for var in setup['inputVars']:
+      val = sample.GetLeaf(var).GetValue()
+#      vars[var][0] = val
+    #inputs = array('f', [sample.GetLeaf(var).GetValue() for var in setup['inputVars']])
+      inputs.push_back(val)
+#    print inputs
+    if type(weight)!=type(""):
+      w=weight
+    else:
+      w=sample.GetLeaf(weight).GetValue()
+    if method['type']!=ROOT.TMVA.Types.kCuts:
+      nno =   reader.EvaluateMVA(inputs,  method['name'])
+#    else:
+#      nno =   reader.EvaluateMVA(inputs,  method['name'], nnCutVal)
+##      print nno, inputs[0],inputs[1], nnCutVal
+#      if nno:res+=sample.GetLeaf(weight).GetValue()
+    histo.Fill(nno, w)
+  return histo
+
+
+#def getYield(c, cut, weight = "weight"):
+#
+#  cut = weight+"*("+cut+")"
+#  print cut
+#  c.Draw("1>>htmp(1,0,2)", cut, "goff")
+#  htmp =  ROOT.gDirectory.Get("htmp")
+#  res = htmp.Integral()
+#  del htmp
+#  return res
 
