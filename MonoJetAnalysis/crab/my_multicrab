@@ -1,5 +1,5 @@
 #! /bin/sh -x 
-for name in `ls -d Step0-*try3`
+for name in `ls -d Step0-*try6`
 do
   tokens
   crab $1 $2 -c $name 
