@@ -22,3 +22,18 @@ def passPUJetID(flag, level="Tight"): #Medium, #Loose,  kTight  = 0,   kMedium =
     l=2
   return ( flag & (1 << l) ) != 0
 
+def getVarValue(c, var, n=0):
+  varNameHisto = var
+  leaf = c.GetAlias(varNameHisto)
+  if leaf!='':
+    return c.GetLeaf(leaf).GetValue(n)
+  else:
+    return float('nan')
+
+#def getValue(chain, varname):
+#  alias = chain.GetAlias(varname)
+#  if alias!='':
+#    return chain.GetLeaf( alias ).GetValue()
+#  else:
+#    return chain.GetLeaf( varname ).GetValue()
+#

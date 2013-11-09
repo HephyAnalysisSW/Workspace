@@ -4,6 +4,7 @@ from PhysicsTools.PythonAnalysis import *
 from math import *
 import sys, os, copy
 from datetime import datetime
+from helpers import getVarValue
 
 #chmode = "incNoISRJetID" 
 chmode = "copy" 
@@ -76,20 +77,6 @@ def invMassOfLightObjects(p31, p32):
 def deltaR(l1, l2):
   return sqrt(deltaPhi(l1['phi'], l2['phi'])**2 + (l1['eta'] - l2['eta'])**2)
 
-def getVarValue(c, var, n=0):
-  varNameHisto = var
-  leaf = c.GetAlias(varNameHisto)
-  if leaf!='':
-    return c.GetLeaf(leaf).GetValue(n) 
-  else: 
-    return float('nan') 
-  
-def getValue(chain, varname):
-  alias = chain.GetAlias(varname)
-  if alias!='':
-    return chain.GetLeaf( alias ).GetValue()
-  else:
-    return chain.GetLeaf( varname ).GetValue()
 
 def goodMuID_POG(c, imu ):  
   # POG MU Tight
@@ -275,7 +262,7 @@ for sample in allSamples:
     nruns = d.GetEntries()
     for i in range(0, nruns):
       d.GetEntry(i)
-      nevents += getValue(d,'uint_EventCounter_runCounts_PAT.obj')
+      nevents += getVarValue(d,'uint_EventCounter_runCounts_PAT.obj')
     if not bin.lower().count('run'):
       weight = xsec.xsec[bin]*target_lumi/nevents
     else:

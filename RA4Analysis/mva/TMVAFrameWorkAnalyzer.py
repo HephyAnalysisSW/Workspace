@@ -5,12 +5,11 @@ from localConfig import afsUser, nfsUser, localPlotDir
 from array import array
 import os, sys
 
-from nnAnalysisHelpers_TMVA import getEList, constructDataset
+for path in [os.path.abspath(p) for p in ['../../HEPHYCommonTools/mva', 'HEPHYCommonTools/cardFileWriter/', '../python', '../../HEPHYCommonTools/cardFileWriter']]:
+  if not path in sys.path:
+      sys.path.insert(1, path)
 
-path = os.path.abspath('../cardFileWriter/')
-if not path in sys.path:
-    sys.path.insert(1, path)
-del path
+from nnAnalysisHelpers import getEList, constructDataset, getYield
 
 model = "T1tttt"
 mgl = 1300
@@ -25,34 +24,6 @@ allJobs = [[mgl, mN]]
 start=0
 stop = len(allJobs)
 
-
-def getYield(sample, setup, method, cut, nnCutVal, weight=weight, aux=0.):
-  res=0.
-  l = getEList(sample, cut)
-  for i in range(l.GetN()):
-    sample.GetEntry(l.GetEntry(i))
-    inputs = ROOT.std.vector('float')()
-    for var in setup['inputVars']:
-      val = sample.GetLeaf(var).GetValue()  
-#      vars[var][0] = val
-    #inputs = array('f', [sample.GetLeaf(var).GetValue() for var in setup['inputVars']])
-      inputs.push_back(val)
-#    print inputs
-    if method['type']!=ROOT.TMVA.Types.kCuts: 
-      nno =   reader.EvaluateMVA(inputs,  method['name'])
-#    print nno
-#    print inputs, nno, sample.GetLeaf(weight).GetValue()
-      if nno>=nnCutVal:
-        res+=sample.GetLeaf(weight).GetValue()
-    else:
-      if nnCutVal<0:
-        nno=1
-      else:
-        nno =   reader.EvaluateMVA(inputs,  method['name'], nnCutVal)
-#      print nno, inputs[0],inputs[1], nnCutVal
-      if nno:res+=sample.GetLeaf(weight).GetValue()
-      
-  return res
 
 #for mgl in range(400, 1425, 25):
 #  for mN in range(0, mgl-175-1, 25):
@@ -122,14 +93,14 @@ for job in allJobs[start:stop]:
     import numpy as np
     from scipy import optimize
 #      def getBkgDev(thresh):
-#        res= getYield(data['simu'], setup, allMethods[methodName]['config'], setup["preselection"]+"&&type==0", thresh, 'weightLumi') 
+#        res= getYield(data['simu'], setup, reader, allMethods[methodName]['config'], setup["preselection"]+"&&type==0", thresh, 'weightLumi') 
 #        print "Optimizing MVA cut for bkg estimation of ",targetBkg,". Testing threshold",thresh,"found bkg exp.:",res
 #        return abs(res-targetBkg)
 #      x0 = np.array([0.9])
 #      optThresh = optimize.fmin(getBkgDev, x0)
-    sigInc = lumiFac*getYield(data['simu'], setup, allMethods[methodName]['config'], setup["preselection"]+"&&type==1&&osetMgl=="+str(mgl)+"&&osetMN=="+str(mN), -1, weight)
+    sigInc = lumiFac*getYield(data['simu'], setup, reader, allMethods[methodName]['config'], setup["preselection"]+"&&type==1&&osetMgl=="+str(mgl)+"&&osetMN=="+str(mN), -1, weight)
     def getSigEffDev(thresh):
-      sig = lumiFac*getYield(data['simu'],    setup, allMethods[methodName]['config'], setup["preselection"]+"&&type==1&&osetMgl=="+str(mgl)+"&&osetMN=="+str(mN), thresh, weight)
+      sig = lumiFac*getYield(data['simu'],  setup, reader, allMethods[methodName]['config'], setup["preselection"]+"&&type==1&&osetMgl=="+str(mgl)+"&&osetMN=="+str(mN), thresh, weight)
       res= sig/float(sigInc) 
       print "Optimizing MVA cut for targetSigEff of ",targetSigEff,". Testing threshold",thresh,"found sig eff.:", res
       return abs(res-targetSigEff)
@@ -143,8 +114,8 @@ for job in allJobs[start:stop]:
       opt = ""
 
     def getExpExcl(thresh, retType=None): 
-      bkg = lumiFac*getYield(data['simu'], setup, allMethods[methodName]['config'], setup["preselection"]+"&&type==0", thresh, weight)
-      sig = lumiFac*getYield(data['simu'], setup, allMethods[methodName]['config'], setup["preselection"]+"&&type==1&&osetMgl=="+str(mgl)+"&&osetMN=="+str(mN), thresh, weight)
+      bkg = lumiFac*getYield(data['simu'], setup, reader, allMethods[methodName]['config'], setup["preselection"]+"&&type==0", thresh, weight)
+      sig = lumiFac*getYield(data['simu'], setup, reader, allMethods[methodName]['config'], setup["preselection"]+"&&type==1&&osetMgl=="+str(mgl)+"&&osetMN=="+str(mN), thresh, weight)
 
       c = cardFileWriter()
       c.addBin('Bin0', ['bkg'], 'Bin0')
@@ -174,10 +145,10 @@ for job in allJobs[start:stop]:
     limits[methodName]['result']=getExpExcl(optThresh[0], retType=1)
     if not limits[methodName]['result']['0.500']<float('inf'):
       limits[methodName]['cutVal']=optThresh[0]
-      sigInc = lumiFac*getYield(data['simu'], setup, allMethods[methodName]['config'], setup["preselection"]+"&&type==1&&osetMgl=="+str(mgl)+"&&osetMN=="+str(mN), -1, weight)
-      sig = lumiFac*getYield(data['simu'],    setup, allMethods[methodName]['config'], setup["preselection"]+"&&type==1&&osetMgl=="+str(mgl)+"&&osetMN=="+str(mN), optThresh[0], weight)
-      bkgInc = lumiFac*getYield(data['simu'], setup, allMethods[methodName]['config'], setup["preselection"]+"&&type==0", -1, weight)
-      bkg = lumiFac*getYield(data['simu'],    setup, allMethods[methodName]['config'], setup["preselection"]+"&&type==0", optThresh[0], weight)
+      sigInc = lumiFac*getYield(data['simu'], setup, reader,  allMethods[methodName]['config'], setup["preselection"]+"&&type==1&&osetMgl=="+str(mgl)+"&&osetMN=="+str(mN), -1, weight)
+      sig = lumiFac*getYield(data['simu'],    setup, reader,  allMethods[methodName]['config'], setup["preselection"]+"&&type==1&&osetMgl=="+str(mgl)+"&&osetMN=="+str(mN), optThresh[0], weight)
+      bkgInc = lumiFac*getYield(data['simu'], setup, reader,  allMethods[methodName]['config'], setup["preselection"]+"&&type==0", -1, weight)
+      bkg = lumiFac*getYield(data['simu'],    setup, reader,  allMethods[methodName]['config'], setup["preselection"]+"&&type==0", optThresh[0], weight)
       limits[methodName]['sigEff']=sig/float(sigInc)
       limits[methodName]['bkgEff']=bkg/float(bkgInc)
   pickle.dump(limits, file(resFile, 'w')) 

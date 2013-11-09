@@ -1,6 +1,12 @@
-from nnAnalysisHelpers import *
+import os,sys
 from math import sqrt, pi
 from localConfig import afsUser, nfsUser, localPlotDir
+
+for path in [os.path.abspath(p) for p in ['../../HEPHYCommonTools/mva', '../../HEPHYCommonTools/cardFileWriter/', '../../HEPHYCommonTools/python/']]:
+  if not path in sys.path:
+      sys.path.insert(1, path)
+
+from nnAnalysisHelpers import getEList, constructDataset, setupMVAFrameWork
 from xsec import xsec
 from xsecSMS import gluino8TeV_NLONLL, gluino14TeV_NLO
 import copy
@@ -11,15 +17,17 @@ from smsHelpers import *
 model="T1tttt"
 mgl = 1300
 mN = 850
-refWeight = 1000
-prepreprefix = 'RA4_EventShapeVars_refWeight'+str(refWeight)+'_'+model+'_4j_bt1_met100_mt2w0_NormDeco_10000_sigmoid_BP_S03_SE08_'
+sigMVAWeightFac = 1000
+prepreprefix = 'RA4_EventShapeVars_sigMVAWeightFac'+str(sigMVAWeightFac)+'_'+model+'_4j_bt1_met100_mt2w0_NormDeco_10000_sigmoid_BP_S03_SE08_'
 
-overWriteData = True
+overWriteData = False
 overWriteTMVAFrameWork = True
 
 setup={}
 methodCutOpt={}
 methodMLP={}
+
+setup['TMVAFactoryOptions'] = ["!V","!Silent","Color","DrawProgressBar","Transformations=I;D;P;G,D","AnalysisType=Classification"]
 
 def setupMVAForModelPoint(mgl, mN):
    
@@ -67,10 +75,11 @@ def setupMVAForModelPoint(mgl, mN):
   if counter==0:
     print "No signal points found!"
     return 
-   
-#  setup["sigMVAWeightFac"] = gluino14TeV_NLO[mgl]/gluino8TeV_NLONLL[mgl]*refWeight #avgRatio/counter 
-  setup["sigMVAWeightFac"] = refWeight #avgRatio/counter 
-  print "Scaling signal weights by ", setup["sigMVAWeightFac"]
+  
+  setup['weightForMVA'] = {'weight':'weightLumi', 'sigFac':gluino14TeV_NLO[mgl]/gluino8TeV_NLONLL[mgl], 'bkgFac':882.29/225.197}
+#  setup["sigMVAWeightFac"] = gluino14TeV_NLO[mgl]/gluino8TeV_NLONLL[mgl]*sigMVAWeightFac #avgRatio/counter 
+  setup["sigMVAWeightFac"] = sigMVAWeightFac #avgRatio/counter 
+  print "Scaling signal weights by ", setup["sigMVAWeightFac"],'using weight', setup['weightForMVA']
 
   background  = ROOT.TChain('Events')
   background.Add('/data/schoef/convertedTuples_v21/copyMET/Mu/TTJets-PowHeg/histo_TTJets-PowHeg.root')
@@ -84,9 +93,15 @@ def setupMVAForModelPoint(mgl, mN):
 
   #If changing between met and type1phiMet the formula for deltaPhi (if used) has to be changed!
   setup['varNames'] = ['njets', 'type1phiMet', 'mT', 'nbtags', 'weightLumi', 'ht', 'singleMuonic', 'singleElectronic', 'nvetoMuons', 'nvetoElectrons', 'mt2w', 'minDeltaPhi', 'thrust']
-  #setup['inputVars'] = ['mT', 'mt2w', 'minDeltaPhi', 'htRatio' ]
-  #setup['NN_layers'] = [1,1]
-  setup['additionalVars'] = ['jet10pt', 'jet20pt', 'jet30pt', 'deltaPhi']
+  setup['modelVars'] =  ["osetMN", "osetMgl", "osetMsq"]
+  from mvaFuncs import cosDeltaPhiLepW
+  from math import acos
+  setup['additionalVars'] = [\
+                ['jet10pt', lambda c:c.GetLeaf('jet0pt').GetValue()/c.GetLeaf('jet1pt').GetValue()],
+                ['jet20pt', lambda c:c.GetLeaf('jet0pt').GetValue()/c.GetLeaf('jet2pt').GetValue()],
+                ['jet30pt', lambda c:c.GetLeaf('jet0pt').GetValue()/c.GetLeaf('jet3pt').GetValue()],
+                  ['deltaPhi', lambda c:acos(cosDeltaPhiLepW(c))]
+    ]
 
   setup['plotDir'] = '/afs/hephy.at/user/'+afsUser[0]+'/'+afsUser+'/www/'+localPlotDir
 
