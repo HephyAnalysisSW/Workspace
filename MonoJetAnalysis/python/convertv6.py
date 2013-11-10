@@ -4,7 +4,7 @@ from PhysicsTools.PythonAnalysis import *
 from math import *
 import sys, os, copy
 from datetime import datetime
-from helpers import getVarValue
+from helpers import getVarValue, deltaPhi, minAbsDeltaPhi, invMassOfLightObjects, deltaR
 
 #chmode = "incNoISRJetID" 
 chmode = "copy" 
@@ -44,39 +44,6 @@ outputDir = "/data/"+username+"/"+subDir+"/"
 
 ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
-
-def deltaPhi(phi1, phi2):
-  dphi = phi2-phi1
-  if  dphi > pi:
-    dphi -= 2.0*pi
-  if dphi <= -pi:
-    dphi += 2.0*pi
-  return abs(dphi)
-
-def minAbsDeltaPhi(phi, phis):
-  if len(phis) > 0:
-    return min([abs(deltaPhi(phi, x)) for x in phis])
-  else: return float('inf')
-
-def minAbsPiMinusDeltaPhi(phi, phis):
-  if len(phis)>0:
-    return min([abs(abs(deltaPhi(phi, x)) - pi) for x in phis])
-  else: return float('inf')
-
-def invMassOfLightObjects(p31, p32):
-  [px1, py1, pz1] = p31
-  [px2, py2, pz2] = p32
-  px = px1+px2 
-  py = py1+py2
-  pz = pz1+pz2
-  p1 = sqrt(px1*px1+py1*py1+pz1*pz1)
-  p2 = sqrt(px2*px2+py2*py2+pz2*pz2)
-  p = sqrt(px*px+py*py+pz*pz)  
-  return   sqrt((p1 + p2)*(p1 + p2) - p*p)
-  
-def deltaR(l1, l2):
-  return sqrt(deltaPhi(l1['phi'], l2['phi'])**2 + (l1['eta'] - l2['eta'])**2)
-
 
 def goodMuID_POG(c, imu ):  
   # POG MU Tight

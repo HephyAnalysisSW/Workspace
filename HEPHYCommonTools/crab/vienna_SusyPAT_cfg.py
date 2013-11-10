@@ -3,10 +3,7 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process("PAT")
 
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring('file:/data/schoef/monoJetSignals/FastSim/stop300lsp240g150/from_230000_to_240000_decayed_stop300lsp240g150.root', 
-        'file:/data/schoef/monoJetSignals/FastSim/stop300lsp240g150/from_240000_to_250000_decayed_stop300lsp240g150.root', 
-        'file:/data/schoef/monoJetSignals/FastSim/stop300lsp240g150/from_250000_to_260000_decayed_stop300lsp240g150.root', 
-        'file:/data/schoef/monoJetSignals/FastSim/stop300lsp240g150/from_260000_to_270000_decayed_stop300lsp240g150.root'),
+    fileNames = cms.untracked.vstring('root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/schoef/MonoJetFullSim_Step0_try6_Step0-stop200lsp170g100-try6/MonoJetFullSim_Step0_try6_Step0-stop200lsp170g100-try6/1181215016689a9995b238fce4346450/outfile_100_1_QGt.root'),
     duplicateCheckMode = cms.untracked.string('noDuplicateCheck')
 )
 process.AK5PFCandMETcorr = cms.EDProducer("PFCandMETcorrInputProducer",
@@ -23937,7 +23934,7 @@ process.selectedPatCandidateSummaryPF = cms.EDAnalyzer("CandidateSummaryTable",
 
 
 process.out = cms.OutputModule("PoolOutputModule",
-    fileName = cms.untracked.string('/data/schoef/stop300lsp240g150_16_20.root'),
+    fileName = cms.untracked.string('/data/schoef/monoJetSignals/SUSYTupelizer/FastSim/8TeV-stop200lsp170g100_0_1.root'),
     SelectEvents = cms.untracked.PSet(
         SelectEvents = cms.vstring('p')
     ),

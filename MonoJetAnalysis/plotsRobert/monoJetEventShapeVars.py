@@ -5,8 +5,8 @@ for path in [os.path.abspath(p) for p in paths]:
   if not path in sys.path:
     sys.path.insert(1, path)
 
-from helpers import getVarValue
-
+from helpers import getVarValue, deltaPhi
+import array
 
 def px(obj):
   return obj['pt'] * cos(obj['phi'])
@@ -188,6 +188,51 @@ def calcFoxWolframMoments(jets):
 #  return  {"FWMT0":ht0,"FWMT1":ht1,"FWMT2":ht2,"FWMT3":ht3,"FWMT4":ht4}
   return  {"FWMT1":ht1,"FWMT2":ht2,"FWMT3":ht3,"FWMT4":ht4}
 
+def calcHTRatio(jets, metPhi):
+  htRatio = -1
+  den=0.
+  num=0.
+  for j in jets:
+    den+=j["pt"]
+    if abs(deltaPhi(metPhi, j["phi"])) <= pi/2:
+      num+=j["pt"]
+  if len(jets)>0:
+    htRatio = num/den
+  return htRatio
+
+ROOT.gROOT.ProcessLine(".L ../../HEPHYCommonTools/scripts/root/Thrust.C+")
+
+def calcThrust(jets, l, m):
+  p_x = [cos(l["phi"])*l["pt"]] + [cos(m["phi"])*m["pt"]] + [cos(j['phi'])*j['pt'] for j in jets]
+  p_y = [sin(l["phi"])*l["pt"]] + [sin(m["phi"])*m["pt"]] + [sin(j['phi'])*j['pt'] for j in jets]
+
+  ht = 0.
+  thrust = ROOT.Thrust(2+len(jets), array.array('d', p_x), array.array('d', p_y))
+  th = thrust.thrust()
+  thPhi = thrust.thrustPhi()
+  thEta = thrust.thrustEta()
+  if thEta>0.1:
+      print "transversal thrust.eta() not zero?", th.thrust(), "jets",jets,"lepton",l,"met",m
+  if cos(l['phi'] - thPhi)>0:
+    sign = 1
+  else:
+    sign=-1
+  htThrustLepSide = 0.
+  for j in jets:
+    ht+=j['pt']
+    if sign*cos(thPhi - j['phi'])>0:
+      htThrustLepSide+=j['pt']
+
+  if cos(m['phi'] - thPhi)>0:
+    sign = 1
+  else:
+    sign=-1
+  htThrustMetSide = 0.
+  for j in jets:
+    if sign*cos(thPhi - j['phi'])>0:
+      htThrustMetSide+=j['pt']
+  return {'thrust':th, 'htThrustLepSide':htThrustLepSide/ht, 'htThrustMetSide':htThrustMetSide/ht}  
+
 
 def getJets(c):
   njets = int(c.GetLeaf('njetCount').GetValue())
@@ -199,12 +244,20 @@ def getJets(c):
 def getRelevantObjects(c):
   return {'jets':getJets(c), \
           'mu':{'pt':getVarValue(c, 'softIsolatedMuPt'), 'phi':getVarValue(c, 'softIsolatedMuPhi')},
-          'met':{'pt':getVarValue(c, 'type1phiMet'), 'phi':getVarValue(c, 'type1phiMetPhi')} }
+          'met':{'pt':getVarValue(c, 'type1phiMet'), 'phi':getVarValue(c, 'type1phiMetphi')} }
 
 def foxWolframMoments(c):
   objs = getRelevantObjects(c)
-  return calcFoxWolframMoments(objs['jets'] + [objs['mu'] + [objs['met']]])
+  return calcFoxWolframMoments(objs['jets'] + [objs['mu']] + [objs['met']])
 
 def circularity2D(c):
   objs = getRelevantObjects(c)
-  return calcCircularity2D(objs['jets'] + [objs['mu'] + [objs['met']]])
+  return calcCircularity2D(objs['jets'] + [objs['mu']] + [objs['met']])
+
+def thrust(c):
+  objs = getRelevantObjects(c)
+  return calcThrust(objs['jets'], objs['mu'], objs['met'])
+
+def htRatio(c):
+  objs = getRelevantObjects(c)
+  return calcHTRatio(objs['jets'], objs['met']['phi'])

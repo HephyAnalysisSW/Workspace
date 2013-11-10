@@ -33,7 +33,8 @@ def getVarValue(c, var, n=0):
   if leaf!='':
     return c.GetLeaf(leaf).GetValue(n)
   else:
-    return float('nan')
+    return c.GetLeaf(var).GetValue(n)
+
 
 def getValue(chain, varname):
   alias = chain.GetAlias(varname)
