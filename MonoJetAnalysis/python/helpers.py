@@ -1,5 +1,5 @@
 import ROOT
-from math import pi
+from math import pi, sqrt
 
 def getObjFromFile(fname, hname):
   f = ROOT.TFile(fname)

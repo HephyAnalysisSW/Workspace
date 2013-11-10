@@ -36,7 +36,7 @@ if len(sys.argv)>=3:
   exec("allSamples = [" + ",".join(sampinp) + "]")
 
 small  = False
-overwrite = False
+overwrite = True
 target_lumi = 19375 #pb-1
 
 from localInfo import username
@@ -75,7 +75,12 @@ def goodEleID_POG(c, iele, eta = 'none'): # POG Ele veto
   # -------------------------------------------
 
 def goodTauID_POG(c, itau ): 
-  return getVarValue(c, 'tauisPF', itau) and getVarValue(c, 'tausDecayModeFinding', itau) and getVarValue(c, 'tausAgainstMuonLoose', itau) and getVarValue(c, 'tausAgainstElectronLoose', itau) and getVarValue(c, 'tausByLooseCombinedIsolationDBSumPtCorr', itau) and getVarValue(c, 'tausPt', itau)>5.
+  return getVarValue(c, 'tausisPF', itau) and \
+         getVarValue(c, 'tausDecayModeFinding', itau) and \
+         getVarValue(c, 'tausAgainstMuonLoose', itau) and \
+         getVarValue(c, 'tausAgainstElectronLoose', itau) and \
+         getVarValue(c, 'tausByLooseCombinedIsolationDBSumPtCorr', itau) and \
+         getVarValue(c, 'tausPt', itau)>5.
 
 def getAllMuons(c, nmuons ):
   res=[]
