@@ -1,6 +1,6 @@
 import ROOT
 from array import array
-import ctypes, pickle, os, sys, copy 
+import ctypes, pickle, os, sys, copy
 from math import sqrt, cos, sin
 
 ROOT.gROOT.ProcessLine(".L ../../HEPHYCommonTools/scripts/root/tdrstyle.C")
@@ -8,7 +8,7 @@ ROOT.setTDRStyle()
 
 stuff=[]
 p_c_float = ctypes.c_float * 1
-p_c_int = ctypes.c_int * 1
+#p_c_int = ctypes.c_int * 1
 
 path = os.path.abspath('../../RA4Analysis/plots')
 if not path in sys.path:
@@ -31,7 +31,7 @@ def getObjFromFile(fname,hname):
     obj = obj_t.Clone()
   if type(fname)==type(""):
     f.Close()
-  return obj             
+  return obj
 
 def getVarValList( sample, eList, variable ):
   l = sample.GetLeaf(variable)
@@ -48,7 +48,7 @@ def getVarValList( sample, eList, variable ):
 def getEList(chain, cut, newname='eListTMP'):
   chain.Draw('>>eListTMP_t', cut)
   elistTMP_t = ROOT.gROOT.Get('eListTMP_t')
-  elistTMP = elistTMP_t.Clone(newname) 
+  elistTMP = elistTMP_t.Clone(newname)
   del elistTMP_t
   return elistTMP
 
@@ -56,7 +56,7 @@ def getPlot(chain, cut, var, binning):
 # if (verbose):print 'chain:',chain,' cut:',cut,' var:',var,' binning:',binning[0],' ',binning[1],' ',binning[2]
   chain.Draw(var+'>>hTMP_t('+str(binning[0])+','+str(binning[1])+','+str(binning[2])+')', cut, 'goff')
   hTMP_t = ROOT.gROOT.Get('hTMP_t')
-  hTMP = hTMP_t.Clone(var) 
+  hTMP = hTMP_t.Clone(var)
   del hTMP_t
   return hTMP
 
@@ -81,15 +81,15 @@ def getNNCutPlot(data, setup, cut, var, binning, weight, tmlp, nnBin = (-999, 99
   eList = ROOT.gROOT.Get('eListTMP_t')
   res  = ROOT.TH1F(var,var, *binning)
   vars={}
-  for vn in setup['varNames']+setup['additionalVars']:
-    vars[vn] = chain.GetLeaf(vn) 
+  for vn in setup['varsFromInputData']+setup['varsCalculated']:
+    vars[vn] = chain.GetLeaf(vn)
   print 'var',var,'filling',eList.GetN()
   for i in range(eList.GetN()):
     chain.GetEntry(eList.GetEntry(i))
 ##    if type(tmlp) == type(ROOT.TMultiLayerPerceptron()):
-##      nno = tmlp.Evaluate(0, array('d',[vars[k].GetValue() for k in setup['inputVars']]))
+##      nno = tmlp.Evaluate(0, array('d',[vars[k].GetValue() for k in setup['mvaInputVars']]))
 ##    else:
-##      nno = tmlp.value(0, *[vars[k].GetValue() for k in setup['inputVars']])
+##      nno = tmlp.value(0, *[vars[k].GetValue() for k in setup['mvaInputVars']])
     val = vars[var].GetValue()
     if weight!='':
       weightVal = vars['weight'].GetValue()
@@ -113,7 +113,7 @@ def getNNOutput(tmlp, sample, eList, varNames, tinputs, result='plot', nbins=200
     res =  ROOT.TH1F('bgh', 'NN output', nbins, -.5, 1.5)
     res.Reset()
   if result.lower()=='list':
-    res=[] 
+    res=[]
   if result.lower()=='weightsum':
     res=0.
   for i in range(eList.GetN()) :
@@ -132,7 +132,7 @@ def getNNOutput(tmlp, sample, eList, varNames, tinputs, result='plot', nbins=200
   return res
 
 def getFOMPlot(bgDisc, sigDisc):
-  if not bgDisc.GetNbinsX()==sigDisc.GetNbinsX(): 
+  if not bgDisc.GetNbinsX()==sigDisc.GetNbinsX():
     print 'bkg and sig shapes have unequal binning'
     return
   zeros = []
@@ -182,47 +182,47 @@ def getFOMPlot(bgDisc, sigDisc):
   return {'central':grCentral, 'plus':grPlus, 'minus':grMinus}
 
 #if not ROOT.gROOT.GetClass('TMultiLayerPerceptron'):
-#ROOT.gSystem.Load('libMLPXXX')
+
+def getVarName(v):
+  return v.split('/')[0]
+def getVarType(v):
+  if v.count('/'): return v.split('/')[1]
+  return 'F'
 
 def constructDataset(setup, signal, background, overWrite = False):
-#  modelVars = ["osetMN", "osetMgl", "osetMsq"]
-#  setup['additionalVars'] = ['weightForMVA','weightLumi14']+['jet10pt', 'jet20pt', 'jet30pt', 'deltaPhi']
 
   if (not os.path.isfile(setup['dataFile'])) or overWrite:
     print 'Creating NN dataset',setup['dataFile']
     if overWrite and os.path.isfile(setup['dataFile']):
       print 'Warning! File will be overwritten'
     simu =  ROOT.TTree('MonteCarlo', 'Filtered Monte Carlo Events')
-    print simu
+    varType={}
+    for vn in setup['varsFromInputData']+[v[0] for v in setup['varsCalculated']]+['weightForMVA']:
+      varType[getVarName(vn)] = getVarType(vn)
     vars={}
-    vartype={}
-    for vn in setup['varNames']:
-      vartype[vn]='F'
-      if vn.count('/'):
-        vn, tp = vn.split('/')
-        vartype[vn] = tp
+    for vn in setup['varsFromInputData']:
+      n = getVarName(vn)
+      if varType[n]=='F': vars[n] = p_c_float(0.)
+      if varType[n]=='I': vars[n] = ctypes.c_int(0)
 
-      if vartype[vn]=='F':
-        vars[vn] = p_c_float(0.)
-      elif vartype[vn]=='I':
-        vars[vn] = p_c_int(0)
-      else:
-        print "Type ", vartype[vn], "not implemented! Using float"
-        vartype[vn] = 'F'
-      
-    i_type    = ctypes.c_int(0) 
+    i_type    = ctypes.c_int(0)
     for sample in [signal, background]:
       for k in vars.keys():
         sample.SetBranchAddress(k, vars[k])
+#        print "Input data addresses", sample,k, vars[k], sample.GetBranch(k)
+
     for k in vars.keys():
-      simu.Branch(k, vars[k], k+'/'+vartype[k])
+      simu.Branch(k, vars[k], k+'/'+varType[k])
+#      print k, vars[k], k+'/'+varType[k], simu.GetBranch(k)
     simu.Branch('type',   ctypes.addressof(i_type),   'type/I')
 
-    addVars = {} 
-    for v in ['weightForMVA']+[v[0] for v in setup['additionalVars']]+setup['modelVars']:
-      addVars[v] = ctypes.c_float(0.)
-      simu.Branch(v,   ctypes.addressof(addVars[v]),   v+'/F')
-
+    addVars = {}
+    for v in [getVarName(vn) for vn in ['weightForMVA'] + [v[0] for v in setup['varsCalculated']] ] :
+      if varType[v]=='F': addVars[v] = ctypes.c_float(0.)
+      if varType[v]=='I': addVars[v] = ctypes.c_int(0)
+      if not ( varType[v]=='F' or varType[v]=='I') : print "Warning! Unknown varType'"+varType[v]+"'for variable", v
+      simu.Branch(v,   ctypes.addressof(addVars[v]),   v+'/'+varType[v])
+#      print v,   ctypes.addressof(addVars[v]),   v+'/'+varType[v]
     eListSig = getEList(signal,        setup['preselection'], 'eListSig')
     eListBkg = getEList(background,    setup['preselection'], 'eListBkg')
 
@@ -234,31 +234,32 @@ def constructDataset(setup, signal, background, overWrite = False):
       else:
         if setup.has_key('bkgMVAWeightFac'):
           mvaWeightFac = setup["bkgMVAWeightFac"]
-   
+
       if type(setup['weightForMVA']['weight'])!=type(""):
         weight =  setup['weightForMVA']['weight']
       for i in range(eList.GetN()):
         if i%10000==0:print 'type',i_type.value, 'Event.:',i,'/',eList.GetN()
         sample.GetEntry(eList.GetEntry(i))
         if type(setup['weightForMVA']['weight'])==type(""):
-          weight = sample.GetLeaf(setup['weightForMVA']['weight']).GetValue() 
+          weight = sample.GetLeaf(setup['weightForMVA']['weight']).GetValue()
         if i_type.value==1:
-          for v in setup['modelVars']:
+          for v in setup['varsFromInputSignal']:
             addVars[v].value = sample.GetLeaf(v).GetValue()
-#          scaleTo14 = gluino14TeV_NLO[addVars['osetMgl'].value] /  gluino8TeV_NLONLL[addVars['osetMgl'].value]
-#          addVars['weight14'].value = scaleTo14*vars['weight'].value
-#          addVars['weightLumi14'].value = scaleTo14*vars['weightLumi'][0]
           addVars['weightForMVA'].value  = weight*setup['weightForMVA']['sigFac']*mvaWeightFac
+#          print addVars['weightForMVA'].value, weight, setup['weightForMVA']['sigFac'], mvaWeightFac
         else:
-          for v in setup['modelVars']:
+          for v in setup['varsFromInputSignal']:
             addVars[v].value = float('nan')
-#          scaleTo14 = 882.29/225.197
-#          addVars['weight14'].value = scaleTo14*vars['weight'].value
-#          addVars['weightLumi14'].value = scaleTo14*vars['weightLumi'][0]
           addVars['weightForMVA'].value  = weight*setup['weightForMVA']['bkgFac']*mvaWeightFac
-#        addVars['weightForMVA'].value  = sample.GetLeaf(setup['weightForMVA']).GetValue()*mvaWeightFac
-        for v in setup["additionalVars"]:
-          addVars[v[0]].value  = v[1](sample) 
+#          print addVars['weightForMVA'].value, weight, setup['weightForMVA']['bkgFac'], mvaWeightFac
+        for v in setup["varsCalculated"]:
+          vn = getVarName(v[0])
+          if varType[vn] =="I":
+            addVars[vn].value  = int(v[1](sample))
+          if varType[vn] =="F":
+            addVars[vn].value  = v[1](sample)
+
+#          print vn, addVars[vn].value#,      simu.GetLeaf(getVarName(v[0])).GetValue()
         simu.Fill()
 
 #    eListTest         = getEList(simu,    setup['preselection'] +'&&'+ setup['testRequ']       ,'eListTest')
@@ -310,17 +311,17 @@ def constructDataset(setup, signal, background, overWrite = False):
   print '...done.'
 #  return {'simu':simu, 'eListBkgTest':eListBkgTest, 'eListSigTest':eListSigTest, 'eListBkgTraining':eListBkgTraining, 'eListSigTraining':eListSigTraining, 'eListBkg':eListBkg, 'eListSig':eListSig, 'eListTest':eListTest, 'eListTraining':eListTraining}
   return {'simu':simu, 'eListBkg':eListBkg, 'eListSig':eListSig}
-  
+
 
 def getConstSoverSqrtBFunc(l, bkgXsec, sigXsec, bkgPreselectionEff, sigPreselectionEff, const):
   return ROOT.TF1('func', '1. - '+str(l)+'*('+str(sigPreselectionEff)+'*'+str(sigXsec)+'*x/'+str(const)+')**2/('+str(bkgPreselectionEff)+'*'+str(bkgXsec)+')', 0, 1)
 
 
 def setupMVAFrameWork(setup, data, methods, prefix):
-  olddir = ROOT.gDirectory.CurrentDirectory().GetName()+':/' 
+  olddir = ROOT.gDirectory.CurrentDirectory().GetName()+':/'
   vstring=''
-  for v in setup['inputVars']:
-    vstring+=v+','
+  for v in setup['mvaInputVars']:
+    vstring+=getVarName(v)+','
   vstring = vstring[:-1]
 
 #  lstring=':'.join(str(i) for i in setup['NN_layers'])
@@ -331,11 +332,11 @@ def setupMVAFrameWork(setup, data, methods, prefix):
   ROOT.TMVA.gConfig().GetIONames().fWeightFileDir = setup['weightDir']
   ROOT.TMVA.gConfig().GetVariablePlotting().fNbinsXOfROCCurve = 200
 
-  fout = ROOT.TFile(setup['outputFile'],"RECREATE") 
+  fout = ROOT.TFile(setup['outputFile'],"RECREATE")
   factory = ROOT.TMVA.Factory("TMVAClassification", fout,":".join(setup['TMVAFactoryOptions']))
   factory.DeleteAllMethods()
   factory.SetBackgroundWeightExpression("weightForMVA")
-  factory.SetSignalWeightExpression(    "weightForMVA") 
+  factory.SetSignalWeightExpression(    "weightForMVA")
 
   factory.AddSignalTree(data['simu'])
   factory.AddBackgroundTree(data['simu'])
@@ -345,16 +346,17 @@ def setupMVAFrameWork(setup, data, methods, prefix):
 # bnode.SetBiasNeuron()
 # print bnode
 # bnode.ForceValue(0)
-# print bnode  
+# print bnode
 
-  for i in setup['inputVars']:
-    factory.AddVariable(i)
+  for i in setup['mvaInputVars']:
+    print "Adding to factory variable",getVarName(i), 'of type', getVarType(i)
+    factory.AddVariable(getVarName(i), getVarType(i))
 
   sigCut = ROOT.TCut("type==1&&"+setup['preselection'])
-  bgCut = ROOT.TCut("type==0&&"+setup['preselection']) 
+  bgCut = ROOT.TCut("type==0&&"+setup['preselection'])
 
   factory.PrepareTrainingAndTestTree(sigCut,bgCut,":".join(["nTrain_Signal=0", "nTrain_Background=0","SplitMode=Random","SplitSeed=100","NormMode=None","!V"]))
-  
+
   #Using all Methods:
   for m in methods:
     args = (m['type'], m['name'],':'.join(m['options']))
@@ -365,17 +367,17 @@ def setupMVAFrameWork(setup, data, methods, prefix):
   factory.TestAllMethods()
   factory.EvaluateAllMethods()
 #  method.WriteWeightsToStream(fout)
-  fout.Close() 
+  fout.Close()
 
   pfile = setup['outputFile'].replace('.root','')+'.pkl'
   setupStripped = copy.deepcopy(setup)
-  setupStripped['additionalVars'] = [v[:-1]+['removedFunction'] for v in setupStripped['additionalVars']]
-    
+  setupStripped['varsCalculated'] = [v[:-1]+['removedFunction'] for v in setupStripped['varsCalculated']]
+
   pickle.dump(setupStripped, file(pfile,"w"))
   print "Stored setup in",pfile
-   
+
   mlpa_canvas = ROOT.TCanvas('mlpa_canvas', 'Network analysis', 1200, 400*(1+len(methods)))
-  mlpa_canvas.SetFillColor(ROOT.kWhite) 
+  mlpa_canvas.SetFillColor(ROOT.kWhite)
   mlpa_canvas.Divide(2,1+len(methods))
   ROOT.setTDRStyle()
 
@@ -442,7 +444,7 @@ def setupMVAFrameWork(setup, data, methods, prefix):
     l5.AddEntry(histFOM,m['niceName'])
   l5.SetFillColor(0)
   l5.SetShadowColor(ROOT.kWhite)
-  l5.SetBorderSize(1) 
+  l5.SetBorderSize(1)
   l5.Draw()
 
   print '  '
@@ -468,9 +470,9 @@ def setupMVAFrameWork(setup, data, methods, prefix):
   opt="AL"
   for m in methods:
     m['FOMFromFile'] = getObjFromFile(setup['outputFile'],'MVA_'+m['name']+'_rejBvsS')
-    m['FOMFromFile'].SetStats(False) 
+    m['FOMFromFile'].SetStats(False)
     m['FOMFromFile'].SetLineColor(m['lineColor'])
-    
+
     m['FOMFromTree'] = getFOMPlot(m['hbgTestFine'], m['hsigTestFine'])
     m['FOMFromTree']['central'].SetLineColor(m['lineColor'])
     m['FOMFromTree']['central'].Draw(opt)
@@ -513,24 +515,57 @@ def setupMVAFrameWork(setup, data, methods, prefix):
       fom_plots[k].Draw('L')
 #    histCutFOM.Draw('same')
     l3.Draw()
-
-  mlpa_canvas.Print(setup['plotDir']+'/nnValidation_'+prefix+'.pdf')
-  mlpa_canvas.Print(setup['plotDir']+'/nnValidation_'+prefix+'.png')
-  mlpa_canvas.Print(setup['plotDir']+'/nnValidation_'+prefix+'.root')
+  os.system('rm -f ./plots/*.png')
+  os.system('rm -f ./plots/*.root')
+  os.system('rm -f ./plots/*.pdf')
+  os.system('rm -f ./plots/*.gif')
+  os.system('mkdir -p '+setup['plotDir']+'/'+setup['plotSubDir'])
+  mlpa_canvas.Print(setup['plotDir']+'/'+setup['plotSubDir']+'/nnValidation'+'.pdf')
+  mlpa_canvas.Print(setup['plotDir']+'/'+setup['plotSubDir']+'/nnValidation'+'.png')
+  mlpa_canvas.Print(setup['plotDir']+'/'+setup['plotSubDir']+'/nnValidation'+'.root')
   del mlpa_canvas
 
-  network_canvas = ROOT.gROOT.ProcessLine('.x ./../../HEPHYCommonTools/mva/tmvaMacros/network.C("'+setup['outputFile']+'")')
-  
+  ROOT.gROOT.ProcessLine('.x ./../../HEPHYCommonTools/mva/tmvaMacros/correlations.C("'+setup['outputFile']+'")')
+  os.system('mv ./plots/CorrelationMatrix*.* '+setup['plotDir']+'/'+setup['plotSubDir']+'/')
+  for s in setup['plotTransformations']:
+    ROOT.gROOT.ProcessLine('.x ./../../HEPHYCommonTools/mva/tmvaMacros/variables.C("'+setup['outputFile']+'", "InputVariables_'+s+'")')
+    os.system('mv ./plots/variables_'+s.lower()+'_c1.png  '+setup['plotDir']+'/'+setup['plotSubDir']+'/variables_'+s+'.png')
+    os.system('mv ./plots/variables_'+s.lower()+'_c1.pdf  '+setup['plotDir']+'/'+setup['plotSubDir']+'/variables_'+s+'.pdf')
+    os.system('mv ./plots/variables_'+s.lower()+'_c1.root '+setup['plotDir']+'/'+setup['plotSubDir']+'/variables_'+s+'.root')
+    if setup['makeCorrelationScatterPlots']:
+      for v in setup['mvaInputVars']:
+        ROOT.gROOT.ProcessLine('.x ./../../HEPHYCommonTools/mva/tmvaMacros/correlationscatters.C("'+setup['outputFile']+'","'+v+'", "InputVariables_'+s+'")')
+      os.system('mv ./plots/correlationscatter_* '+setup['plotDir']+'/'+setup['plotSubDir']+'/')
+
   for m in methods:
-#   print m['name']
     if not m['name']=='myCut':
-      os.system('mv ./plots/'+m['name']+'.png '+setup['plotDir']+'/netStructure_'+prefix+'_'+m['name']+'.png')
+      ROOT.gROOT.ProcessLine('.x ./../../HEPHYCommonTools/mva/tmvaMacros/network.C("'+setup['outputFile']+'")')
+      os.system('mv ./plots/'+m['name']+'.png  '+setup['plotDir']+'/'+setup['plotSubDir']+'/netStructure_'+m['name']+'.png')
+      os.system('mv ./plots/'+m['name']+'.pdf  '+setup['plotDir']+'/'+setup['plotSubDir']+'/netStructure_'+m['name']+'.pdf')
+      os.system('mv ./plots/'+m['name']+'.root '+setup['plotDir']+'/'+setup['plotSubDir']+'/netStructure_'+m['name']+'.root')
+      ROOT.gROOT.ProcessLine('.x ./../../HEPHYCommonTools/mva/tmvaMacros/efficiencies.C("'+setup['outputFile']+'")')
+      os.system('mv ./plots/rejBvsS.png  '+setup['plotDir']+'/'+setup['plotSubDir']+'/rejBvsS_'+m['name']+'.png')
+      os.system('mv ./plots/rejBvsS.pdf  '+setup['plotDir']+'/'+setup['plotSubDir']+'/rejBvsS_'+m['name']+'.pdf')
+      os.system('mv ./plots/rejBvsS.root '+setup['plotDir']+'/'+setup['plotSubDir']+'/rejBvsS_'+m['name']+'.root')
+      if setup['plotMVAEffs']:
+        ROOT.gROOT.ProcessLine('.L ./../../HEPHYCommonTools/mva/tmvaMacros/mvaeffs.C+')
+        print 'mvaeffs("'+setup['outputFile']+'")'
+        ROOT.gROOT.ProcessLine('mvaeffs("'+setup['outputFile']+'")')
+        os.system('mv ./plots/mvaeffs_'+m['name']+'.png  '+setup['plotDir']+'/'+setup['plotSubDir']+'/mvaeffs_'+m['name']+'.png')
+        os.system('mv ./plots/mvaeffs_'+m['name']+'.pdf  '+setup['plotDir']+'/'+setup['plotSubDir']+'/mvaeffs_'+m['name']+'.pdf')
+        os.system('mv ./plots/mvaeffs_'+m['name']+'.root '+setup['plotDir']+'/'+setup['plotSubDir']+'/mvaeffs_'+m['name']+'.root')
+      for i, fname in enumerate(['mva', 'proba', 'rarity', 'overtrain']):
+#        print '.x ./../../HEPHYCommonTools/mva/tmvaMacros/mvas.C("'+setup['outputFile']+','+str(i)+'")'
+        ROOT.gROOT.ProcessLine('.x ./../../HEPHYCommonTools/mva/tmvaMacros/mvas.C("'+setup['outputFile']+'",'+str(i)+')')
+        os.system('mv ./plots/'+fname+'_'+m['name']+'.png  '+setup['plotDir']+'/'+setup['plotSubDir']+'/'+fname+m['name']+'.png')
+        os.system('mv ./plots/'+fname+'_'+m['name']+'.pdf  '+setup['plotDir']+'/'+setup['plotSubDir']+'/'+fname+m['name']+'.pdf')
+        os.system('mv ./plots/'+fname+'_'+m['name']+'.root '+setup['plotDir']+'/'+setup['plotSubDir']+'/'+fname+m['name']+'.root')
 
   ROOT.gROOT.cd(olddir)
 
-  coord_canvas = ROOT.TCanvas('coord_canvas', 'Network Coordinates',1200, 400*(1+len(methods))) 
+  coord_canvas = ROOT.TCanvas('coord_canvas', 'Network Coordinates',1200, 400*(1+len(methods)))
   coord_canvas.SetFillColor(ROOT.kWhite)
-  inp = ":".join(setup['inputVars'])
+  inp = ":".join(setup['mvaInputVars'])
 
   namesOfDrawnMethods = []
   for m in methods:
@@ -569,7 +604,7 @@ def setupMVAFrameWork(setup, data, methods, prefix):
     para_bkg.GetCurrentSelection().SetLineColor(ROOT.kViolet)
 
 
-  coord_canvas.Print(setup['plotDir']+'/nnCoord_'+prefix+'.png')       
+  coord_canvas.Print(setup['plotDir']+'/'+setup['plotSubDir']+'/nnCoord.png')
   t.IsA().Destructor(t)
   del t
   ROOT.gROOT.cd(olddir)
@@ -581,10 +616,10 @@ def getYield(sample, setup, reader, method, cut, nnCutVal, weight):
   for i in range(l.GetN()):
     sample.GetEntry(l.GetEntry(i))
     inputs = ROOT.std.vector('float')()
-    for var in setup['inputVars']:
+    for var in setup['mvaInputVars']:
       val = sample.GetLeaf(var).GetValue()
 #      vars[var][0] = val
-    #inputs = array('f', [sample.GetLeaf(var).GetValue() for var in setup['inputVars']])
+    #inputs = array('f', [sample.GetLeaf(var).GetValue() for var in setup['mvaInputVars']])
       inputs.push_back(val)
 #    print inputs
     if method['type']!=ROOT.TMVA.Types.kCuts:
@@ -604,15 +639,15 @@ def getYield(sample, setup, reader, method, cut, nnCutVal, weight):
   return res
 
 def fillNNHisto(sample, setup, reader, method, cut, histo, weight):
-  histo.Reset() 
+  histo.Reset()
   l = getEList(sample, cut)
   for i in range(l.GetN()):
     sample.GetEntry(l.GetEntry(i))
     inputs = ROOT.std.vector('float')()
-    for var in setup['inputVars']:
+    for var in setup['mvaInputVars']:
       val = sample.GetLeaf(var).GetValue()
 #      vars[var][0] = val
-    #inputs = array('f', [sample.GetLeaf(var).GetValue() for var in setup['inputVars']])
+    #inputs = array('f', [sample.GetLeaf(var).GetValue() for var in setup['mvaInputVars']])
       inputs.push_back(val)
 #    print inputs
     if type(weight)!=type(""):

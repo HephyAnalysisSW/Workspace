@@ -36,10 +36,10 @@ def setupMVAForModelPoint(mgl, mN):
   blockStr = "mgl_"+str(mgl)+"_mN_"+str(mN)
   preprefix = prepreprefix+blockStr+'_'
 
-  setup['inputVars'] = ["mT", "type1phiMet", "mt2w","nbtags","njets",'minDeltaPhi', 'deltaPhi','thrust']
+  setup['mvaInputVars'] = ["mT", "type1phiMet", "mt2w","nbtags","njets",'minDeltaPhi', 'deltaPhi','thrust']
 
   prefix = ''
-  for v in setup['inputVars']:
+  for v in setup['mvaInputVars']:
     prefix+=v+'_'
   prefix = preprefix+prefix[:-1]
 
@@ -92,11 +92,11 @@ def setupMVAForModelPoint(mgl, mN):
   #setup['testRequ']      = '(Entry$+1)%2'
 
   #If changing between met and type1phiMet the formula for deltaPhi (if used) has to be changed!
-  setup['varNames'] = ['njets', 'type1phiMet', 'mT', 'nbtags', 'weightLumi', 'ht', 'singleMuonic', 'singleElectronic', 'nvetoMuons', 'nvetoElectrons', 'mt2w', 'minDeltaPhi', 'thrust']
-  setup['modelVars'] =  ["osetMN", "osetMgl", "osetMsq"]
+  setup['varsFromInputData'] = ['njets', 'type1phiMet', 'mT', 'nbtags', 'weightLumi', 'ht', 'singleMuonic', 'singleElectronic', 'nvetoMuons', 'nvetoElectrons', 'mt2w', 'minDeltaPhi', 'thrust']
+  setup['varsFromInputSignal'] =  ["osetMN", "osetMgl", "osetMsq"]
   from mvaFuncs import cosDeltaPhiLepW
   from math import acos
-  setup['additionalVars'] = [\
+  setup['varsCalculated'] = [\
                 ['jet10pt', lambda c:c.GetLeaf('jet0pt').GetValue()/c.GetLeaf('jet1pt').GetValue()],
                 ['jet20pt', lambda c:c.GetLeaf('jet0pt').GetValue()/c.GetLeaf('jet2pt').GetValue()],
                 ['jet30pt', lambda c:c.GetLeaf('jet0pt').GetValue()/c.GetLeaf('jet3pt').GetValue()],
@@ -112,7 +112,7 @@ def setupMVAForModelPoint(mgl, mN):
   methodCutOpt['options'] =('!H','!V','VarTransform=None','CreateMVAPdfs=True','FitMethod=GA','EffMethod=EffSel','VarProp=NotEnforced','CutRangeMin=-1','CutRangeMax=-1')
 
   addNeurons = [2,1]
-  nn_layers = [len(setup['inputVars'])+ i for i in addNeurons]
+  nn_layers = [len(setup['mvaInputVars'])+ i for i in addNeurons]
   hiddenLayers = ','.join([str(i) for i in nn_layers ])
   methodMLP['type']=ROOT.TMVA.Types.kMLP
   methodMLP['name']='MLP21'

@@ -47,9 +47,9 @@ for job in allJobs[start:stop]:
   preprefix = prepreprefix+blockStr+'_'
 #  block = getBlock(mgl, mN, model)
 #  blockStr = getBlockString(mgl, mN, model)
-  inputVars = ["mT", "type1phiMet", "mt2w","nbtags","njets",'minDeltaPhi', 'htRatio','deltaPhi']
+  mvaInputVars = ["mT", "type1phiMet", "mt2w","nbtags","njets",'minDeltaPhi', 'htRatio','deltaPhi']
   prefix = ''
-  for v in inputVars:
+  for v in mvaInputVars:
     prefix+=v+'_'
   prefix = preprefix+prefix[:-1]
   
@@ -70,7 +70,7 @@ for job in allJobs[start:stop]:
 
   reader = ROOT.TMVA.Reader()  
   #vars={}
-  for var in setup['inputVars']:
+  for var in setup['mvaInputVars']:
     var_i  = array('f',[0])
   #  vars[var] = var_i
     reader.AddVariable(var,var_i)

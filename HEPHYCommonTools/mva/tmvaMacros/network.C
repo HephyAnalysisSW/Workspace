@@ -29,7 +29,7 @@ Bool_t MovieMode = kFALSE; //Default is kFALSE!!
 void draw_network( TFile* f, TDirectory* d, const TString& hName = "weights_hist", 
                    Bool_t movieMode = kFALSE, const TString& epoch = "" )
 {
-   Bool_t __PRINT_LOGO__ = kTRUE;
+   Bool_t __PRINT_LOGO__ = kFALSE;
    Network_GFile = f;
 
    MovieMode = movieMode;
