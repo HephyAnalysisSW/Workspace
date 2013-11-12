@@ -107,6 +107,7 @@ def setupMVAForModelPoint(mgl, mN):
     ]
 
   setup['plotDir'] = '/afs/hephy.at/user/'+afsUser[0]+'/'+afsUser+'/www/'+localPlotDir
+  setup['plotSubDir'] = prefix
 
   methodCutOpt['type']=ROOT.TMVA.Types.kCuts
   methodCutOpt['name']='myCut'
@@ -128,8 +129,8 @@ def setupMVAForModelPoint(mgl, mN):
   methodMLP['options']    = ('!H','!V','VarTransform=Norm,Deco','NeuronType=sigmoid','NCycles=10000','TrainingMethod=BP','LearningRate=0.03', 'DecayRate=0.01','HiddenLayers='+hiddenLayers,'Sampling=0.3','SamplingEpoch=0.8','ConvergenceTests=1','CreateMVAPdfs=True','TestRate=10' )
 
   data = constructDataset(setup, signal, background, overWriteData)
-  allMethods = [methodMLP, methodCutOpt]
-#  allMethods = [methodMLP]
+#  allMethods = [methodMLP, methodCutOpt]
+  allMethods = [methodMLP]
   setup["methodConfigs"] = copy.deepcopy(allMethods)
 
   if not os.path.isdir(setup['weightDir']) or overWriteTMVAFrameWork:

@@ -533,16 +533,14 @@ def setupMVAFrameWork(setup, data, methods, prefix):
   os.system('mv ./plots/CorrelationMatrix*.* '+setup['plotDir']+'/'+setup['plotSubDir']+'/')
   for s in setup['plotTransformations']:
     ROOT.gROOT.ProcessLine('.x ./../../HEPHYCommonTools/mva/tmvaMacros/variables.C("'+setup['outputFile']+'", "InputVariables_'+s+'")')
-    os.system('mv ./plots/variables_'+s.lower()+'_c1.png  '+setup['plotDir']+'/'+setup['plotSubDir']+'/variables_'+s+'.png')
-    os.system('mv ./plots/variables_'+s.lower()+'_c1.pdf  '+setup['plotDir']+'/'+setup['plotSubDir']+'/variables_'+s+'.pdf')
-    os.system('mv ./plots/variables_'+s.lower()+'_c1.root '+setup['plotDir']+'/'+setup['plotSubDir']+'/variables_'+s+'.root')
+    os.system('mv ./plots/variables_*  '+setup['plotDir']+'/'+setup['plotSubDir']+'/')
     if setup['makeCorrelationScatterPlots']:
       for v in setup['mvaInputVars']:
         ROOT.gROOT.ProcessLine('.x ./../../HEPHYCommonTools/mva/tmvaMacros/correlationscatters.C("'+setup['outputFile']+'","'+v+'", "InputVariables_'+s+'")')
       os.system('mv ./plots/correlationscatter_* '+setup['plotDir']+'/'+setup['plotSubDir']+'/')
 
   for m in methods:
-    if not m['name']=='myCut':
+    if m['type']!=ROOT.TMVA.Types.kCuts:
       ROOT.gROOT.ProcessLine('.x ./../../HEPHYCommonTools/mva/tmvaMacros/network.C("'+setup['outputFile']+'")')
       os.system('mv ./plots/'+m['name']+'.png  '+setup['plotDir']+'/'+setup['plotSubDir']+'/netStructure_'+m['name']+'.png')
       os.system('mv ./plots/'+m['name']+'.pdf  '+setup['plotDir']+'/'+setup['plotSubDir']+'/netStructure_'+m['name']+'.pdf')
@@ -564,6 +562,12 @@ def setupMVAFrameWork(setup, data, methods, prefix):
         os.system('mv ./plots/'+fname+'_'+m['name']+'.png  '+setup['plotDir']+'/'+setup['plotSubDir']+'/'+fname+m['name']+'.png')
         os.system('mv ./plots/'+fname+'_'+m['name']+'.pdf  '+setup['plotDir']+'/'+setup['plotSubDir']+'/'+fname+m['name']+'.pdf')
         os.system('mv ./plots/'+fname+'_'+m['name']+'.root '+setup['plotDir']+'/'+setup['plotSubDir']+'/'+fname+m['name']+'.root')
+    if m['type']==ROOT.TMVA.Types.kMLP:
+      ROOT.gROOT.ProcessLine('.x ./../../HEPHYCommonTools/mva/tmvaMacros/annconvergencetest.C("'+setup['outputFile']+'")')
+      os.system('mv ./plots/annconvergencetest.png  '+setup['plotDir']+'/'+setup['plotSubDir']+'/annconvergencetest_'+m['name']+'.png')
+      os.system('mv ./plots/annconvergencetest.pdf  '+setup['plotDir']+'/'+setup['plotSubDir']+'/annconvergencetest_'+m['name']+'.pdf')
+      os.system('mv ./plots/annconvergencetest.root '+setup['plotDir']+'/'+setup['plotSubDir']+'/annconvergencetest_'+m['name']+'.root')
+            
 
   ROOT.gROOT.cd(olddir)
 
