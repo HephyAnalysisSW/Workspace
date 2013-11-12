@@ -197,7 +197,7 @@ def constructDataset(setup, signal, background, overWrite = False):
       print 'Warning! File will be overwritten'
     simu =  ROOT.TTree('MonteCarlo', 'Filtered Monte Carlo Events')
     varType={}
-    for vn in setup['varsFromInputData']+[v[0] for v in setup['varsCalculated']]+['weightForMVA']:
+    for vn in setup['varsFromInputData']+[v[0] for v in setup['varsCalculated']]+['weightForMVA']+setup['varsFromInputSignal']:
       varType[getVarName(vn)] = getVarType(vn)
     vars={}
     for vn in setup['varsFromInputData']:
@@ -217,7 +217,7 @@ def constructDataset(setup, signal, background, overWrite = False):
     simu.Branch('type',   ctypes.addressof(i_type),   'type/I')
 
     addVars = {}
-    for v in [getVarName(vn) for vn in ['weightForMVA'] + [v[0] for v in setup['varsCalculated']] ] :
+    for v in [getVarName(vn) for vn in ['weightForMVA'] + [v[0] for v in setup['varsCalculated']] + setup['varsFromInputSignal']]  :
       if varType[v]=='F': addVars[v] = ctypes.c_float(0.)
       if varType[v]=='I': addVars[v] = ctypes.c_int(0)
       if not ( varType[v]=='F' or varType[v]=='I') : print "Warning! Unknown varType'"+varType[v]+"'for variable", v
@@ -244,12 +244,20 @@ def constructDataset(setup, signal, background, overWrite = False):
           weight = sample.GetLeaf(setup['weightForMVA']['weight']).GetValue()
         if i_type.value==1:
           for v in setup['varsFromInputSignal']:
-            addVars[v].value = sample.GetLeaf(v).GetValue()
+            vn = getVarName(v)
+            if varType[vn] =="I":
+              addVars[vn].value  = int(sample.GetLeaf(vn).GetValue())
+            if varType[vn] =="F":
+              addVars[vn].value  = float(sample.GetLeaf(vn).GetValue()) 
           addVars['weightForMVA'].value  = weight*setup['weightForMVA']['sigFac']*mvaWeightFac
 #          print addVars['weightForMVA'].value, weight, setup['weightForMVA']['sigFac'], mvaWeightFac
         else:
           for v in setup['varsFromInputSignal']:
-            addVars[v].value = float('nan')
+            vn = getVarName(v)
+            if varType[vn] =="I":
+              addVars[vn].value  = 0
+            if varType[vn] =="F":
+              addVars[vn].value  = float('nan') 
           addVars['weightForMVA'].value  = weight*setup['weightForMVA']['bkgFac']*mvaWeightFac
 #          print addVars['weightForMVA'].value, weight, setup['weightForMVA']['bkgFac'], mvaWeightFac
         for v in setup["varsCalculated"]:

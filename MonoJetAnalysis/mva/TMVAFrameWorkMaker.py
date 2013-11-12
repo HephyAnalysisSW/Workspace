@@ -19,7 +19,7 @@ signalModel = stop300lsp270
 backgrounds = [wJetsToLNu]
 
 
-overWriteData = False 
+overWriteData = True 
 overWriteTMVAFrameWork = True
 
 setup={}
@@ -49,7 +49,7 @@ CutRangeMax['type1phiMet']='500'
 #addNeurons = [2,1]
 for addNeurons in [[2,1]]:
 #  for nCycles in [100, 1000, 5000, 10000, 20000]:
-  for nCycles in [100]:
+  for nCycles in [20000]:
     prepreprefix = 'MonoJet_MLP'+''.join([str(x) for x in addNeurons])+'_'+signalModel['name']+'_refsel_NormDeco_'+str(nCycles)+'_sigmoid_BP_S03_SE08_'
 
     def setupMVAForModelPoint(signalModel):
@@ -123,7 +123,7 @@ for addNeurons in [[2,1]]:
 
     #  methodMLP['options']    = ('!H','!V','VarTransform=Norm,Deco','NeuronType=sigmoid','NCycles=10000','TrainingMethod=BP','LearningRate=0.03', 'DecayRate=0.01','HiddenLayers='+hiddenLayers,'Sampling=0.3','SamplingEpoch=0.8','ConvergenceTests=1','CreateMVAPdfs=True','TestRate=10' )
     #  methodMLP['options']    = ('!H','!V','VarTransform=None','NeuronType=sigmoid','NCycles=10000','TrainingMethod=BP','LearningRate=0.03', 'DecayRate=0.01','HiddenLayers='+hiddenLayers,'Sampling=0.3','SamplingEpoch=0.8','ConvergenceTests=1','CreateMVAPdfs=False','TestRate=10' )
-      methodMLP['options']    = ('!H','V','VarTransform=Norm,Deco','NeuronType=sigmoid','NCycles='+str(nCycles),'TrainingMethod=BP','LearningRate=0.03', 'DecayRate=0.01','HiddenLayers='+hiddenLayers,'Sampling=0.3','SamplingEpoch=0.8','ConvergenceTests=0','CreateMVAPdfs=True','TestRate=10' )
+      methodMLP['options']    = ('!H','V','VarTransform=Norm,Deco','NeuronType=sigmoid','NCycles='+str(nCycles),'TrainingMethod=BP','LearningRate=0.03', 'DecayRate=0.01','HiddenLayers='+hiddenLayers,'Sampling=0.3','SamplingEpoch=0.8','ConvergenceTests=1','CreateMVAPdfs=True','TestRate=10' )
 
     #  allMethods = [methodMLP, methodCutOpt]
     #  allMethods = [methodCutOpt]

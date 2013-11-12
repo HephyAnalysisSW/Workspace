@@ -20,7 +20,7 @@ mN = 850
 sigMVAWeightFac = 1000
 prepreprefix = 'RA4_EventShapeVars_sigMVAWeightFac'+str(sigMVAWeightFac)+'_'+model+'_4j_bt1_met100_mt2w0_NormDeco_10000_sigmoid_BP_S03_SE08_'
 
-overWriteData = False
+overWriteData = True
 overWriteTMVAFrameWork = True
 
 setup={}
