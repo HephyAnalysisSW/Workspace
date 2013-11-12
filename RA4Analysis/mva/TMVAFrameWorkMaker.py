@@ -95,15 +95,18 @@ def setupMVAForModelPoint(mgl, mN):
   #setup['testRequ']      = '(Entry$+1)%2'
 
   #If changing between met and type1phiMet the formula for deltaPhi (if used) has to be changed!
-  setup['varsFromInputData'] = ['njets/I', 'type1phiMet', 'mT', 'nbtags/I', 'weightLumi', 'ht', 'singleMuonic', 'singleElectronic', 'nvetoMuons', 'nvetoElectrons', 'mt2w', 'minDeltaPhi', 'thrust']
-  setup['varsFromInputSignal'] =  ["osetMN/I", "osetMgl/I", "osetMsq/I"]
+  setup['varsFromInputData'] = ['type1phiMet', 'mT', 'weightLumi', 'ht', 'singleMuonic', 'singleElectronic', 'nvetoMuons', 'nvetoElectrons', 'mt2w', 'minDeltaPhi', 'thrust']
+  setup['varsFromInputSignal'] =  ["osetMN", "osetMgl", "osetMsq"]
+  setup['varsFromInputSignal'] =  []
   from mvaFuncs import cosDeltaPhiLepW
   from math import acos
   setup['varsCalculated'] = [\
+                ['njets/I', lambda c:int(c.GetLeaf('njets').GetValue())],
+                ['nbtags/I', lambda c:int(c.GetLeaf('nbtags').GetValue())],
                 ['jet10pt', lambda c:c.GetLeaf('jet0pt').GetValue()/c.GetLeaf('jet1pt').GetValue()],
                 ['jet20pt', lambda c:c.GetLeaf('jet0pt').GetValue()/c.GetLeaf('jet2pt').GetValue()],
                 ['jet30pt', lambda c:c.GetLeaf('jet0pt').GetValue()/c.GetLeaf('jet3pt').GetValue()],
-                  ['deltaPhi', lambda c:acos(cosDeltaPhiLepW(c))]
+                ['deltaPhi', lambda c:acos(cosDeltaPhiLepW(c))]
     ]
 
   setup['plotDir'] = '/afs/hephy.at/user/'+afsUser[0]+'/'+afsUser+'/www/'+localPlotDir

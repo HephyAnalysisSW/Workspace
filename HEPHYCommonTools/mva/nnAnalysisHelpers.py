@@ -197,7 +197,7 @@ def constructDataset(setup, signal, background, overWrite = False):
       print 'Warning! File will be overwritten'
     simu =  ROOT.TTree('MonteCarlo', 'Filtered Monte Carlo Events')
     varType={}
-    for vn in setup['varsFromInputData']+[v[0] for v in setup['varsCalculated']]+['weightForMVA']+setup['varsFromInputSignal']:
+    for vn in setup['varsFromInputData']+[v[0] for v in setup['varsCalculated']]+['weightForMVA'] + setup['varsFromInputSignal']:
       varType[getVarName(vn)] = getVarType(vn)
     vars={}
     for vn in setup['varsFromInputData']:
@@ -222,7 +222,7 @@ def constructDataset(setup, signal, background, overWrite = False):
       if varType[v]=='I': addVars[v] = ctypes.c_int(0)
       if not ( varType[v]=='F' or varType[v]=='I') : print "Warning! Unknown varType'"+varType[v]+"'for variable", v
       simu.Branch(v,   ctypes.addressof(addVars[v]),   v+'/'+varType[v])
-#      print v,   ctypes.addressof(addVars[v]),   v+'/'+varType[v]
+      print v,   ctypes.addressof(addVars[v]),   v+'/'+varType[v]
     eListSig = getEList(signal,        setup['preselection'], 'eListSig')
     eListBkg = getEList(background,    setup['preselection'], 'eListBkg')
 
