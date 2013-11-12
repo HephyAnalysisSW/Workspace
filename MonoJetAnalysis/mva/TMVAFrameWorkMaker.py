@@ -56,7 +56,6 @@ for addNeurons in [[2,1]]:
        
       preprefix = prepreprefix
 
-
       setup['mvaInputVars'] = ["softIsolatedMT", "type1phiMet", 'deltaPhi']
       prefix = '_'.join(setup['mvaInputVars'])
       prefix = preprefix+prefix

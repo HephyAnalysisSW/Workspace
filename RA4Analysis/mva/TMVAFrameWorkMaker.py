@@ -28,6 +28,9 @@ methodCutOpt={}
 methodMLP={}
 
 setup['TMVAFactoryOptions'] = ["!V","!Silent","Color","DrawProgressBar","Transformations=I;D;P;G,D","AnalysisType=Classification"]
+setup['plotTransformations'] = ['Id', 'Deco', 'PCA', 'Gauss_Deco']
+setup['makeCorrelationScatterPlots'] = False
+setup['plotMVAEffs'] = False #needs active X-forwarding since a QT Object is involved
 
 def setupMVAForModelPoint(mgl, mN):
    
@@ -92,8 +95,8 @@ def setupMVAForModelPoint(mgl, mN):
   #setup['testRequ']      = '(Entry$+1)%2'
 
   #If changing between met and type1phiMet the formula for deltaPhi (if used) has to be changed!
-  setup['varsFromInputData'] = ['njets', 'type1phiMet', 'mT', 'nbtags', 'weightLumi', 'ht', 'singleMuonic', 'singleElectronic', 'nvetoMuons', 'nvetoElectrons', 'mt2w', 'minDeltaPhi', 'thrust']
-  setup['varsFromInputSignal'] =  ["osetMN", "osetMgl", "osetMsq"]
+  setup['varsFromInputData'] = ['njets/I', 'type1phiMet', 'mT', 'nbtags/I', 'weightLumi', 'ht', 'singleMuonic', 'singleElectronic', 'nvetoMuons', 'nvetoElectrons', 'mt2w', 'minDeltaPhi', 'thrust']
+  setup['varsFromInputSignal'] =  ["osetMN/I", "osetMgl/I", "osetMsq/I"]
   from mvaFuncs import cosDeltaPhiLepW
   from math import acos
   setup['varsCalculated'] = [\

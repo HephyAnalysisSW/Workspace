@@ -347,10 +347,14 @@ def setupMVAFrameWork(setup, data, methods, prefix):
 # print bnode
 # bnode.ForceValue(0)
 # print bnode
+  varType={}
+  for vn in setup['varsFromInputData']+[v[0] for v in setup['varsCalculated']]+['weightForMVA']:
+    varType[getVarName(vn)] = getVarType(vn)
 
-  for i in setup['mvaInputVars']:
-    print "Adding to factory variable",getVarName(i), 'of type', getVarType(i)
-    factory.AddVariable(getVarName(i), getVarType(i))
+  for v in setup['mvaInputVars']:
+    print "Adding to factory variable", v, 'of type', varType[v] 
+
+    factory.AddVariable(getVarName(v), varType[v])
 
   sigCut = ROOT.TCut("type==1&&"+setup['preselection'])
   bgCut = ROOT.TCut("type==0&&"+setup['preselection'])
