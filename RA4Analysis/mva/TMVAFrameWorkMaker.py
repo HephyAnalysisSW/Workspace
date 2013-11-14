@@ -20,7 +20,7 @@ mN = 850
 sigMVAWeightFac = 1000
 prepreprefix = 'RA4_EventShapeVars_sigMVAWeightFac'+str(sigMVAWeightFac)+'_'+model+'_4j_bt1_met100_mt2w0_NormDeco_10000_sigmoid_BP_S03_SE08_'
 
-overWriteData = True
+overWriteData = False
 overWriteTMVAFrameWork = True
 
 setup={}
@@ -39,7 +39,7 @@ def setupMVAForModelPoint(mgl, mN):
   blockStr = "mgl_"+str(mgl)+"_mN_"+str(mN)
   preprefix = prepreprefix+blockStr+'_'
 
-  setup['mvaInputVars'] = ["mT", "type1phiMet", "mt2w","nbtags","njets",'minDeltaPhi', 'deltaPhi','thrust']
+  setup['mvaInputVars'] = ["mT", "type1phiMet", "mt2w","nbtags","njets",'minDeltaPhi', 'deltaPhi']
 
   prefix = ''
   for v in setup['mvaInputVars']:
@@ -95,7 +95,7 @@ def setupMVAForModelPoint(mgl, mN):
   #setup['testRequ']      = '(Entry$+1)%2'
 
   #If changing between met and type1phiMet the formula for deltaPhi (if used) has to be changed!
-  setup['varsFromInputData'] = ['type1phiMet', 'mT', 'weightLumi', 'ht', 'singleMuonic', 'singleElectronic', 'nvetoMuons', 'nvetoElectrons', 'mt2w', 'minDeltaPhi', 'thrust']
+  setup['varsFromInputData'] = ['type1phiMet', 'mT', 'weightLumi', 'ht', 'singleMuonic', 'singleElectronic', 'nvetoMuons', 'nvetoElectrons', 'mt2w', 'minDeltaPhi']
   setup['varsFromInputSignal'] =  ["osetMN", "osetMgl", "osetMsq"]
   setup['varsFromInputSignal'] =  []
   from mvaFuncs import cosDeltaPhiLepW
@@ -106,7 +106,8 @@ def setupMVAForModelPoint(mgl, mN):
                 ['jet10pt', lambda c:c.GetLeaf('jet0pt').GetValue()/c.GetLeaf('jet1pt').GetValue()],
                 ['jet20pt', lambda c:c.GetLeaf('jet0pt').GetValue()/c.GetLeaf('jet2pt').GetValue()],
                 ['jet30pt', lambda c:c.GetLeaf('jet0pt').GetValue()/c.GetLeaf('jet3pt').GetValue()],
-                ['deltaPhi', lambda c:acos(cosDeltaPhiLepW(c))]
+                ['deltaPhi', lambda c:acos(cosDeltaPhiLepW(c))],
+                ['htThrustLepSideRatio', lambda c:c.GetLeaf('htThrustLepSide').GetValue()/c.GetLeaf('ht').GetValue()]
     ]
 
   setup['plotDir'] = '/afs/hephy.at/user/'+afsUser[0]+'/'+afsUser+'/www/'+localPlotDir

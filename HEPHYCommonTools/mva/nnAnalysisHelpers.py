@@ -13,7 +13,6 @@ p_c_float = ctypes.c_float * 1
 path = os.path.abspath('../../RA4Analysis/plots')
 if not path in sys.path:
     sys.path.insert(1, path)
-from xsecSMS import gluino8TeV_NLONLL, gluino14TeV_NLO
 del path
 
 def getObjFromFile(fname,hname):
