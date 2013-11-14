@@ -18,19 +18,24 @@ from monoJetFuncs import softIsolatedMT
 signalModel = stop300lsp270
 backgrounds = [wJetsToLNu]
 
+colors = [ROOT.kBlue, ROOT.kRed, ROOT.kGreen, ROOT.kOrange, ROOT.kMagenta]
 
-overWriteData = True 
+overWriteData = False 
 overWriteTMVAFrameWork = True
 
 setup={}
 methodCutOpt={}
 methodMLP={}
+methodBDT={}
 
 #setup['TMVAFactoryOptions'] = ["!V","!Silent","Color","DrawProgressBar","Transformations=I;D;G,D","AnalysisType=Classification"]
 setup['TMVAFactoryOptions'] = ["!V","!Silent","Color","DrawProgressBar","Transformations=I;D;P;G,D","AnalysisType=Classification"]
 setup['plotTransformations'] = ['Id', 'Deco', 'PCA', 'Gauss_Deco']
 setup['makeCorrelationScatterPlots'] = False
 setup['plotMVAEffs'] = False #needs active X-forwarding since a QT Object is involved
+setup['datasetFactoryOptions'] = ["nTrain_Signal=0", "nTrain_Background=0","SplitMode=Random","SplitSeed=100","NormMode=None","!V"]
+
+convTest=15
 
 VarProp={}
 VarProp['deltaPhi']='NotEnforced'
@@ -46,11 +51,21 @@ CutRangeMax['softIsolatedMT']='500'
 CutRangeMax['type1phiMet']='500'
 
 
-#addNeurons = [2,1]
-for addNeurons in [[2,1]]:
-#  for nCycles in [100, 1000, 5000, 10000, 20000]:
-  for nCycles in [20000]:
-    prepreprefix = 'MonoJet_MLP'+''.join([str(x) for x in addNeurons])+'_'+signalModel['name']+'_refsel_NormDeco_'+str(nCycles)+'_sigmoid_BP_S03_SE08_'
+addNeurons = [2,1]
+nCycles=1000
+
+nCuts = 40
+maxDepth = 2
+nTrees = 1200
+#for addNeurons in [[2,1]]:
+#  for nCycles in [1000]:
+#  for nCycles in [20000]:
+#    prepreprefix = 'MonoJet_MLP'+''.join([str(x) for x in addNeurons])+'_'+signalModel['name']+'_refsel_Norm_UseRegulator_ConvergenceTests'+str(convTest)+'_ConvImpr1e-6_'+str(nCycles)+'_sigmoid_BP_S1_SE1_'
+#    prepreprefix = 'MonoJet_BDTvsMLP_'+signalModel['name']+'_refsel_None_'
+if True:
+#    prepreprefix = 'MonoJet_BDT_nTreeComparison_nCuts'+str(nCuts)+'_maxDepth'+str(maxDepth)+'_'+signalModel['name']+'_refsel_None_'
+#    prepreprefix = 'MonoJet_BDT_maxDepthComparison_nCuts'+str(nCuts)+'_nTrees'+str(nTrees)+'_'+signalModel['name']+'_refsel_None_'
+    prepreprefix = 'MonoJet_BDT_minNodeSizeComparison_maxDepth'+str(maxDepth)+'_nCuts'+str(nCuts)+'_nTrees'+str(nTrees)+'_'+signalModel['name']+'_refsel_None_'
 
     def setupMVAForModelPoint(signalModel):
        
@@ -121,15 +136,50 @@ for addNeurons in [[2,1]]:
       methodMLP['drawInParallelCoord'] = True
       methodMLP['niceName'] = "MLP_{"+",".join([str(i) for i in addNeurons])+"}"
 
-    #  methodMLP['options']    = ('!H','!V','VarTransform=Norm,Deco','NeuronType=sigmoid','NCycles=10000','TrainingMethod=BP','LearningRate=0.03', 'DecayRate=0.01','HiddenLayers='+hiddenLayers,'Sampling=0.3','SamplingEpoch=0.8','ConvergenceTests=1','CreateMVAPdfs=True','TestRate=10' )
-    #  methodMLP['options']    = ('!H','!V','VarTransform=None','NeuronType=sigmoid','NCycles=10000','TrainingMethod=BP','LearningRate=0.03', 'DecayRate=0.01','HiddenLayers='+hiddenLayers,'Sampling=0.3','SamplingEpoch=0.8','ConvergenceTests=1','CreateMVAPdfs=False','TestRate=10' )
-      methodMLP['options']    = ('!H','V','VarTransform=Norm,Deco','NeuronType=sigmoid','NCycles='+str(nCycles),'TrainingMethod=BP','LearningRate=0.03', 'DecayRate=0.01','HiddenLayers='+hiddenLayers,'Sampling=0.3','SamplingEpoch=0.8','ConvergenceTests=1','CreateMVAPdfs=True','TestRate=10' )
+      methodMLP['options']    = ('!H','V','VarTransform=Norm','NeuronType=sigmoid', 'HiddenLayers='+hiddenLayers, 'NCycles='+str(nCycles), 'CreateMVAPdfs=True', 'EpochMonitoring=True', \
+                                  'TrainingMethod=BP', 'BPMode=sequential', 'LearningRate=0.02', 'DecayRate=0.01', 
+#                                  'Sampling=0.3','SamplingEpoch=0.8', 
+                                  'Sampling=1.','SamplingEpoch=1.', 
+                                  'ConvergenceTests='+str(convTest),'ConvergenceImprove=1e-6', 'TestRate=10',
+                                  'UseRegulator=False' )
 
-    #  allMethods = [methodMLP, methodCutOpt]
-    #  allMethods = [methodCutOpt]
+#     NN_book_options_list.append("!H:!V:NTrees=400:nEventsMin=400:MaxDepth=3:BoostType=AdaBoost:SeparationType=GiniIndex:nCuts=20:PruneMethod=NoPruning")
+#     https://svnweb.cern.ch/cern/wsvn/UGentSUSY/trunk/User/Sigamani/babyReaderSTOPS/runBDT/makeconfigs.py
       allMethods = [methodMLP]
-      setup["methodConfigs"] = copy.deepcopy(allMethods)
+      for i, mNS in enumerate([1,2,4,8]):
+        methodBDT['type']=ROOT.TMVA.Types.kBDT
+        methodBDT['name']='BDT_minNodeSize'+str(mNS)
+        methodBDT['lineColor']=colors[i]
+        methodBDT['niceName']=methodBDT['name']
+        methodBDT['options'] =('!H','V','VarTransform=None', 'CreateMVAPdfs=True', 'BoostType=AdaBoost',\
+                               'NTrees='+str(nTrees), 
+  #                             'nEventsMin=400', 
+                               'MinNodeSize='+str(mNS)+'%',
+                               'MaxDepth='+str(maxDepth),
+                               'SeparationType=GiniIndex',
+                               'nCuts='+str(nCuts),
+                               'PruneMethod=NoPruning'
+        )
+        allMethods.append(copy.deepcopy(methodBDT))
 
+#      for i, nT in enumerate([200, 400, 800, 1200]):
+
+#      for i, mD in enumerate([2,3,4,10]):
+#        methodBDT['type']=ROOT.TMVA.Types.kBDT
+#        methodBDT['name']='BDT_maxDepth'+str(mD)
+#        methodBDT['lineColor']=colors[i]
+#        methodBDT['niceName']='BDT_maxDepth'+str(mD)
+#        methodBDT['options'] =('!H','V','VarTransform=None', 'CreateMVAPdfs=True', 'BoostType=AdaBoost',\
+#                               'NTrees='+str(nTrees),
+#  #                             'nEventsMin=400', 
+#                               'MaxDepth='+str(mD),
+#                               'SeparationType=GiniIndex',
+#                               'nCuts='+str(nCuts),
+#                               'PruneMethod=NoPruning'
+#        )
+
+
+      setup["methodConfigs"] = copy.deepcopy(allMethods)
       if not os.path.isdir(setup['weightDir']) or overWriteTMVAFrameWork:
         setupMVAFrameWork(setup, data, allMethods, prefix)
 

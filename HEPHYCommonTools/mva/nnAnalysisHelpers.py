@@ -367,7 +367,7 @@ def setupMVAFrameWork(setup, data, methods, prefix):
   sigCut = ROOT.TCut("type==1&&"+setup['preselection'])
   bgCut = ROOT.TCut("type==0&&"+setup['preselection'])
 
-  factory.PrepareTrainingAndTestTree(sigCut,bgCut,":".join(["nTrain_Signal=0", "nTrain_Background=0","SplitMode=Random","SplitSeed=100","NormMode=None","!V"]))
+  factory.PrepareTrainingAndTestTree(sigCut,bgCut,":".join(setup["datasetFactoryOptions"]))
 
   #Using all Methods:
   for m in methods:
@@ -559,7 +559,6 @@ def setupMVAFrameWork(setup, data, methods, prefix):
       os.system('mv ./plots/rejBvsS.root '+setup['plotDir']+'/'+setup['plotSubDir']+'/rejBvsS_'+m['name']+'.root')
       if setup['plotMVAEffs']:
         ROOT.gROOT.ProcessLine('.L ./../../HEPHYCommonTools/mva/tmvaMacros/mvaeffs.C+')
-        print 'mvaeffs("'+setup['outputFile']+'")'
         ROOT.gROOT.ProcessLine('mvaeffs("'+setup['outputFile']+'")')
         os.system('mv ./plots/mvaeffs_'+m['name']+'.png  '+setup['plotDir']+'/'+setup['plotSubDir']+'/mvaeffs_'+m['name']+'.png')
         os.system('mv ./plots/mvaeffs_'+m['name']+'.pdf  '+setup['plotDir']+'/'+setup['plotSubDir']+'/mvaeffs_'+m['name']+'.pdf')
@@ -567,14 +566,20 @@ def setupMVAFrameWork(setup, data, methods, prefix):
       for i, fname in enumerate(['mva', 'proba', 'rarity', 'overtrain']):
 #        print '.x ./../../HEPHYCommonTools/mva/tmvaMacros/mvas.C("'+setup['outputFile']+','+str(i)+'")'
         ROOT.gROOT.ProcessLine('.x ./../../HEPHYCommonTools/mva/tmvaMacros/mvas.C("'+setup['outputFile']+'",'+str(i)+')')
-        os.system('mv ./plots/'+fname+'_'+m['name']+'.png  '+setup['plotDir']+'/'+setup['plotSubDir']+'/'+fname+m['name']+'.png')
-        os.system('mv ./plots/'+fname+'_'+m['name']+'.pdf  '+setup['plotDir']+'/'+setup['plotSubDir']+'/'+fname+m['name']+'.pdf')
-        os.system('mv ./plots/'+fname+'_'+m['name']+'.root '+setup['plotDir']+'/'+setup['plotSubDir']+'/'+fname+m['name']+'.root')
+        os.system('mv ./plots/'+fname+'_'+m['name']+'.png  '+setup['plotDir']+'/'+setup['plotSubDir']+'/'+fname+'_'+m['name']+'.png')
+        os.system('mv ./plots/'+fname+'_'+m['name']+'.pdf  '+setup['plotDir']+'/'+setup['plotSubDir']+'/'+fname+'_'+m['name']+'.pdf')
+        os.system('mv ./plots/'+fname+'_'+m['name']+'.root '+setup['plotDir']+'/'+setup['plotSubDir']+'/'+fname+'_'+m['name']+'.root')
     if m['type']==ROOT.TMVA.Types.kMLP:
       ROOT.gROOT.ProcessLine('.x ./../../HEPHYCommonTools/mva/tmvaMacros/annconvergencetest.C("'+setup['outputFile']+'")')
       os.system('mv ./plots/annconvergencetest.png  '+setup['plotDir']+'/'+setup['plotSubDir']+'/annconvergencetest_'+m['name']+'.png')
       os.system('mv ./plots/annconvergencetest.pdf  '+setup['plotDir']+'/'+setup['plotSubDir']+'/annconvergencetest_'+m['name']+'.pdf')
       os.system('mv ./plots/annconvergencetest.root '+setup['plotDir']+'/'+setup['plotSubDir']+'/annconvergencetest_'+m['name']+'.root')
+    if m['type']==ROOT.TMVA.Types.kBDT:
+      ROOT.gROOT.ProcessLine('.x ./../../HEPHYCommonTools/mva/tmvaMacros/BDTControlPlots.C("'+setup['outputFile']+'")')
+      os.system('mv ./plots/'+m['name']+'_ControlPlots.png  '+setup['plotDir']+'/'+setup['plotSubDir']+'/'+m['name']+'_ControlPlots.png')
+      os.system('mv ./plots/'+m['name']+'_ControlPlots.pdf  '+setup['plotDir']+'/'+setup['plotSubDir']+'/'+m['name']+'_ControlPlots.pdf')
+      os.system('mv ./plots/'+m['name']+'_ControlPlots.root '+setup['plotDir']+'/'+setup['plotSubDir']+'/'+m['name']+'_ControlPlots.root')
+#      ROOT.gROOT.ProcessLine('.x ./../../HEPHYCommonTools/mva/tmvaMacros/BoostControlPlots.C("'+setup['outputFile']+'")')
             
 
   ROOT.gROOT.cd(olddir)
