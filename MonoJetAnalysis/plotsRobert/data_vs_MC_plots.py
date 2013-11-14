@@ -38,7 +38,7 @@ minimum=10**(-0.5)
 
 chmode = "copy"
 #presel = "refSel"
-presel = "refSel"
+presel = "incMu"
 
 preprefix = "simplePU"
 additionalCut = ""
@@ -48,20 +48,22 @@ additionalCut = "type1phiMet>150"
 doOnlyMET = True
 subdir = "/pngMJ/"
 
-addData = False
+addData = True
 normalizeToData = False
 
-chainstring = "empty"
+chainstring = "Events"
 commoncf = "(0)"
 prefix="empty_"
 if presel == "refSel":
   commoncf="isrJetPt>110&&isrJetBTBVetoPassed&&softIsolatedMuPt>5&&nHardElectrons+nHardMuons==0&&njet60<=2&&softIsolatedMuDz<0.2"
+if presel == "inc":
+  commoncf="(1)"
+if presel == "incMu":
+  commoncf="softIsolatedMuPt>5&&nHardElectrons+nHardMuons==0"
 #  commoncf="njet<=3"
-  chainstring = "Events"
 if presel == "inclusive":
   commoncf="(1)"
 #  commoncf="njet<=3"
-  chainstring = "Events"
 
 if additionalCut!="":
   commoncf+="&&"+additionalCut
@@ -73,7 +75,8 @@ stop300lsp270g200["legendText"]  = "m_{#tilde t} = 300, m_{LSP} = 270, g=200"
 stop300lsp270g175["legendText"]  = "m_{#tilde t} = 300, m_{LSP} = 270, g=175"
 stop200lsp170g100["legendText"]  = "m_{#tilde t} = 200, m_{LSP} = 170, g=100"
 
-signals = [stop300lsp270, stop200lsp170g100, stop300lsp240g150]
+#signals = [stop300lsp270, stop200lsp170g100, stop300lsp240g150]
+signals=[]
 
 allSamples += signals
 
@@ -156,63 +159,67 @@ def getStack(varstring, binning, cutstring, signals, varfunc = "", addData=True,
     for var in res:
       var.varfunc = varfunc
   return res
+  
+isrJetPt_stack = getStack(":isrJetPt;p_{T} of ISR jet;Number of Events / 50 GeV",[50,0,2500], commoncf, signals, addData = addData)
+isrJetPt_stack[0].addOverFlowBin = "upper"
+allStacks.append(isrJetPt_stack)
 
 met_stack = getStack(":type1phiMet;#slash{E}_{T} (GeV);Number of Events / 50 GeV",[18,150,1050], commoncf, signals, addData = addData)
 met_stack[0].addOverFlowBin = "upper"
 allStacks.append(met_stack)
 
-cosPhiMetJet_stack = getStack(":xxx;cos(#phi(#slash{E}_{T}, ISR-jet));Number of Events",[20,-1,1], commoncf, signals, addData = addData, varfunc = lambda c: cos(getVarValue(c, 'isrJetPhi') - getVarValue(c, 'softIsolatedMuPhi')))
-cosPhiMetJet_stack[0].addOverFlowBin = "both"
-allStacks.append(cosPhiMetJet_stack)
-
-FWMT1_stack = getStack(":xxx;FMWT1 (jets,lep,MET);Number of Events",[20,0,1], commoncf, signals, addData = addData, varfunc = lambda c:foxWolframMoments(c)['FWMT1'])
-FWMT1_stack[0].addOverFlowBin = "upper"
-allStacks.append(FWMT1_stack)
-
-FWMT2_stack = getStack(":xxx;FMWT2 (jets,lep,MET);Number of Events",[20,0,1], commoncf, signals, addData = addData, varfunc = lambda c:foxWolframMoments(c)['FWMT2'])
-FWMT2_stack[0].addOverFlowBin = "upper"
-allStacks.append(FWMT2_stack)
-
-FWMT3_stack = getStack(":xxx;FMWT3 (jets,lep,MET);Number of Events",[20,0,1], commoncf, signals, addData = addData, varfunc = lambda c:foxWolframMoments(c)['FWMT3'])
-FWMT3_stack[0].addOverFlowBin = "upper"
-allStacks.append(FWMT3_stack)
-
-FWMT4_stack = getStack(":xxx;FMWT4 (jets,lep,MET);Number of Events",[20,0,1], commoncf, signals, addData = addData, varfunc = lambda c:foxWolframMoments(c)['FWMT4'])
-FWMT4_stack[0].addOverFlowBin = "upper"
-allStacks.append(FWMT4_stack)
-
-
-c2D_stack = getStack(":xxx;c2D (jets,lep,MET);Number of Events",[20,0,1], commoncf, signals, addData = addData, varfunc = lambda c:circularity2D(c)['c2D'])
-c2D_stack[0].addOverFlowBin = "upper"
-allStacks.append(c2D_stack)
-
-linC2D_stack = getStack(":xxx;linC2D (jets,lep,MET);Number of Events",[20,0,1], commoncf, signals, addData = addData, varfunc = lambda c:circularity2D(c)['linC2D'])
-linC2D_stack[0].addOverFlowBin = "upper"
-allStacks.append(linC2D_stack)
-
-#
-#softIsolatedMuDz_zoomed_stack = getStack(":softIsolatedMuDz;d_{z} of soft isolated muon;Number of Events",[40,0,1], commoncf.replace('&&softIsolatedMuDz<0.2',''), signals, addData = addData)
-#softIsolatedMuDz_zoomed_stack[0].addOverFlowBin = "both"
-#allStacks.append(softIsolatedMuDz_zoomed_stack)
-
-htRatio_stack = getStack(":xxx;H_{T}^{ratio};Number of Events",[40,0,0.6], commoncf, signals, addData = addData, varfunc = lambda c: htRatio(c))
-htRatio_stack[0].addOverFlowBin = "upper"
-allStacks.append(htRatio_stack)
-
-thrust_stack = getStack(":xxx;thrust;Number of Events",[20,0.6,1], commoncf, signals, addData = addData, varfunc = lambda c: thrust(c)['thrust'])
-thrust_stack[0].addOverFlowBin = "upper"
-allStacks.append(thrust_stack)
-
-htThrustLepSide_stack = getStack(":xxx;htThrustLepSide;Number of Events",[50,0,1], commoncf, signals, addData = addData, varfunc = lambda c: thrust(c)['htThrustLepSide'])
-htThrustLepSide_stack[0].addOverFlowBin = "upper"
-allStacks.append(htThrustLepSide_stack)
-
-htThrustMetSide_stack = getStack(":xxx;htThrustMetSide;Number of Events",[50,0,1], commoncf, signals, addData = addData, varfunc = lambda c: thrust(c)['htThrustMetSide'])
-htThrustMetSide_stack[0].addOverFlowBin = "upper"
-allStacks.append(htThrustMetSide_stack)
-
 
 if not doOnlyMET:
+  cosPhiMetJet_stack = getStack(":xxx;cos(#phi(#slash{E}_{T}, ISR-jet));Number of Events",[20,-1,1], commoncf, signals, addData = addData, varfunc = lambda c: cos(getVarValue(c, 'isrJetPhi') - getVarValue(c, 'softIsolatedMuPhi')))
+  cosPhiMetJet_stack[0].addOverFlowBin = "both"
+  allStacks.append(cosPhiMetJet_stack)
+
+  FWMT1_stack = getStack(":xxx;FMWT1 (jets,lep,MET);Number of Events",[20,0,1], commoncf, signals, addData = addData, varfunc = lambda c:foxWolframMoments(c)['FWMT1'])
+  FWMT1_stack[0].addOverFlowBin = "upper"
+  allStacks.append(FWMT1_stack)
+
+  FWMT2_stack = getStack(":xxx;FMWT2 (jets,lep,MET);Number of Events",[20,0,1], commoncf, signals, addData = addData, varfunc = lambda c:foxWolframMoments(c)['FWMT2'])
+  FWMT2_stack[0].addOverFlowBin = "upper"
+  allStacks.append(FWMT2_stack)
+
+  FWMT3_stack = getStack(":xxx;FMWT3 (jets,lep,MET);Number of Events",[20,0,1], commoncf, signals, addData = addData, varfunc = lambda c:foxWolframMoments(c)['FWMT3'])
+  FWMT3_stack[0].addOverFlowBin = "upper"
+  allStacks.append(FWMT3_stack)
+
+  FWMT4_stack = getStack(":xxx;FMWT4 (jets,lep,MET);Number of Events",[20,0,1], commoncf, signals, addData = addData, varfunc = lambda c:foxWolframMoments(c)['FWMT4'])
+  FWMT4_stack[0].addOverFlowBin = "upper"
+  allStacks.append(FWMT4_stack)
+
+
+  c2D_stack = getStack(":xxx;c2D (jets,lep,MET);Number of Events",[20,0,1], commoncf, signals, addData = addData, varfunc = lambda c:circularity2D(c)['c2D'])
+  c2D_stack[0].addOverFlowBin = "upper"
+  allStacks.append(c2D_stack)
+
+  linC2D_stack = getStack(":xxx;linC2D (jets,lep,MET);Number of Events",[20,0,1], commoncf, signals, addData = addData, varfunc = lambda c:circularity2D(c)['linC2D'])
+  linC2D_stack[0].addOverFlowBin = "upper"
+  allStacks.append(linC2D_stack)
+
+  #
+  #softIsolatedMuDz_zoomed_stack = getStack(":softIsolatedMuDz;d_{z} of soft isolated muon;Number of Events",[40,0,1], commoncf.replace('&&softIsolatedMuDz<0.2',''), signals, addData = addData)
+  #softIsolatedMuDz_zoomed_stack[0].addOverFlowBin = "both"
+  #allStacks.append(softIsolatedMuDz_zoomed_stack)
+
+  htRatio_stack = getStack(":xxx;H_{T}^{ratio};Number of Events",[40,0,0.6], commoncf, signals, addData = addData, varfunc = lambda c: htRatio(c))
+  htRatio_stack[0].addOverFlowBin = "upper"
+  allStacks.append(htRatio_stack)
+
+  thrust_stack = getStack(":xxx;thrust;Number of Events",[20,0.6,1], commoncf, signals, addData = addData, varfunc = lambda c: thrust(c)['thrust'])
+  thrust_stack[0].addOverFlowBin = "upper"
+  allStacks.append(thrust_stack)
+
+  htThrustLepSide_stack = getStack(":xxx;htThrustLepSide;Number of Events",[50,0,1], commoncf, signals, addData = addData, varfunc = lambda c: thrust(c)['htThrustLepSide'])
+  htThrustLepSide_stack[0].addOverFlowBin = "upper"
+  allStacks.append(htThrustLepSide_stack)
+
+  htThrustMetSide_stack = getStack(":xxx;htThrustMetSide;Number of Events",[50,0,1], commoncf, signals, addData = addData, varfunc = lambda c: thrust(c)['htThrustMetSide'])
+  htThrustMetSide_stack[0].addOverFlowBin = "upper"
+  allStacks.append(htThrustMetSide_stack)
+
 
   mT_stack  = getStack(":mT;m_{T} (GeV);Number of Events / 10 GeV",[21,0,210], commoncf, signals, softIsolatedMT, addData = addData)
   mT_stack[0].addOverFlowBin = "upper"
@@ -444,34 +451,35 @@ for stack in allStacks:
 #  stack[0].lines = [[0.2, 0.9, "#font[22]{CMS preliminary}"], [0.2,0.85,str(int(round(targetLumi)))+" pb^{-1},  #sqrt{s} = 7 TeV"]]
   stack[0].lines = [[0.2, 0.9, "#font[22]{CMS Collaboration}"], [0.2,0.85,str(int(round(targetLumi/10.))/100.)+" fb^{-1},  #sqrt{s} = 8 TeV"]]
 
-FWMT2_stack[0].maximum = 6*10**4 *FWMT2_stack[0].data_histo.GetMaximum()
-FWMT3_stack[0].maximum = 6*10**3 *FWMT3_stack[0].data_histo.GetMaximum()
-FWMT4_stack[0].maximum = 6*10**4 *FWMT4_stack[0].data_histo.GetMaximum()
-cosPhiMetJet_stack[0].maximum = 6*10**3 *cosPhiMetJet_stack[0].data_histo.GetMaximum()
-
-htRatio_stack[0].maximum = 6*10**3 *htRatio_stack[0].data_histo.GetMaximum()
-thrust_stack[0].maximum = 6*10**4 *thrust_stack[0].data_histo.GetMaximum()
-htThrustLepSide_stack[0].maximum = 6*10**5 *htThrustLepSide_stack[0].data_histo.GetMaximum()
-htThrustMetSide_stack[0].maximum = 6*10**5 *htThrustMetSide_stack[0].data_histo.GetMaximum()
 
 drawNMStacks(1,1,[met_stack],             subdir+prefix+"met", False)
-drawNMStacks(1,1,[cosPhiMetJet_stack], subdir+prefix+"cosPhiMetJet", False)
-drawNMStacks(1,1,[FWMT1_stack],             subdir+prefix+"FWMT1", False)
-drawNMStacks(1,1,[FWMT2_stack],             subdir+prefix+"FWMT2", False)
-drawNMStacks(1,1,[FWMT3_stack],             subdir+prefix+"FWMT3", False)
-drawNMStacks(1,1,[FWMT4_stack],             subdir+prefix+"FWMT4", False)
-drawNMStacks(1,1,[c2D_stack],             subdir+prefix+"c2D", False)
-drawNMStacks(1,1,[linC2D_stack],             subdir+prefix+"linC2D", False)
-
-drawNMStacks(1,1,[htRatio_stack],             subdir+prefix+"htRatio", False)
-drawNMStacks(1,1,[thrust_stack],             subdir+prefix+"thrust", False)
-drawNMStacks(1,1,[htThrustLepSide_stack],             subdir+prefix+"htThrustLepSide", False)
-drawNMStacks(1,1,[htThrustMetSide_stack],             subdir+prefix+"htThrustMetSide", False)
-
+drawNMStacks(1,1,[isrJetPt_stack],             subdir+prefix+"isrJetPt", False)
 #drawNMStacks(1,1,[softIsolatedMuDz_zoomed_stack],            subdir+prefix+"_zoomed_softIsolatedMuDz", False)
 
 
 if not doOnlyMET:
+  FWMT2_stack[0].maximum = 6*10**4 *FWMT2_stack[0].data_histo.GetMaximum()
+  FWMT3_stack[0].maximum = 6*10**3 *FWMT3_stack[0].data_histo.GetMaximum()
+  FWMT4_stack[0].maximum = 6*10**4 *FWMT4_stack[0].data_histo.GetMaximum()
+  cosPhiMetJet_stack[0].maximum = 6*10**3 *cosPhiMetJet_stack[0].data_histo.GetMaximum()
+
+  htRatio_stack[0].maximum = 6*10**3 *htRatio_stack[0].data_histo.GetMaximum()
+  thrust_stack[0].maximum = 6*10**4 *thrust_stack[0].data_histo.GetMaximum()
+  htThrustLepSide_stack[0].maximum = 6*10**5 *htThrustLepSide_stack[0].data_histo.GetMaximum()
+  htThrustMetSide_stack[0].maximum = 6*10**5 *htThrustMetSide_stack[0].data_histo.GetMaximum()
+  drawNMStacks(1,1,[cosPhiMetJet_stack], subdir+prefix+"cosPhiMetJet", False)
+  drawNMStacks(1,1,[FWMT1_stack],             subdir+prefix+"FWMT1", False)
+  drawNMStacks(1,1,[FWMT2_stack],             subdir+prefix+"FWMT2", False)
+  drawNMStacks(1,1,[FWMT3_stack],             subdir+prefix+"FWMT3", False)
+  drawNMStacks(1,1,[FWMT4_stack],             subdir+prefix+"FWMT4", False)
+  drawNMStacks(1,1,[c2D_stack],             subdir+prefix+"c2D", False)
+  drawNMStacks(1,1,[linC2D_stack],             subdir+prefix+"linC2D", False)
+
+  drawNMStacks(1,1,[htRatio_stack],             subdir+prefix+"htRatio", False)
+  drawNMStacks(1,1,[thrust_stack],             subdir+prefix+"thrust", False)
+  drawNMStacks(1,1,[htThrustLepSide_stack],             subdir+prefix+"htThrustLepSide", False)
+  drawNMStacks(1,1,[htThrustMetSide_stack],             subdir+prefix+"htThrustMetSide", False)
+
   drawNMStacks(1,1,[mT_stack],              subdir+prefix+"mT", False)
   drawNMStacks(1,1,[ht_stack],              subdir+prefix+"ht", False)
   drawNMStacks(1,1,[type1phiMetphi_stack],             subdir+prefix+"type1phiMetphi", False)

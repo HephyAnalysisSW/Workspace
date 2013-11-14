@@ -459,9 +459,6 @@ def setupMVAFrameWork(setup, data, methods, prefix):
   l5.SetBorderSize(1)
   l5.Draw()
 
-  print '  '
-  print '  '
-
   pad = mlpa_canvas.cd(2)
 
   bkgPreselectionEff = data['simu'].GetEntries('type==0&&'+setup['preselection'])/float(data['simu'].GetEntries('type==0'))
@@ -487,6 +484,10 @@ def setupMVAFrameWork(setup, data, methods, prefix):
 
     m['FOMFromTree'] = getFOMPlot(m['hbgTestFine'], m['hsigTestFine'])
     m['FOMFromTree']['central'].SetLineColor(m['lineColor'])
+    if setup.has_key('fomPlotZoomCoordinates'):
+      coord = setup['fomPlotZoomCoordinates']
+      m['FOMFromTree']['central'].GetXaxis().SetRangeUser(coord[0],coord[2])
+      m['FOMFromTree']['central'].GetYaxis().SetRangeUser(coord[1],coord[3])
     m['FOMFromTree']['central'].Draw(opt)
     if not  m['type']==ROOT.TMVA.Types.kCuts:
       l3.AddEntry(m['FOMFromTree']['central'],m['niceName'],'LP')
@@ -495,6 +496,8 @@ def setupMVAFrameWork(setup, data, methods, prefix):
     opt="L"
     if m.has_key('drawStatUncertainty') and m['drawStatUncertainty']:
       if not  m['type']==ROOT.TMVA.Types.kCuts:
+        m['FOMFromTree']['plus'].SetLineStyle(3)
+        m['FOMFromTree']['minus'].SetLineStyle(3)
         m['FOMFromTree']['plus'].Draw(opt)
         m['FOMFromTree']['minus'].Draw(opt)
         l3.AddEntry(m['FOMFromTree']['plus'], m['niceName']+' (#pm 1#sigma)', 'LP')
@@ -526,7 +529,8 @@ def setupMVAFrameWork(setup, data, methods, prefix):
     for k in fom_plots.keys():
       fom_plots[k].Draw('L')
 #    histCutFOM.Draw('same')
-    l3.Draw()
+  l3.Draw()
+
   os.system('rm -f ./plots/*.png')
   os.system('rm -f ./plots/*.root')
   os.system('rm -f ./plots/*.pdf')

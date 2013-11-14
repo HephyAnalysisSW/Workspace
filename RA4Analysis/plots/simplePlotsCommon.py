@@ -45,7 +45,6 @@ def getValue(chain, varname):
 
 
 def frange(start, end=None, inc=None):
-    "A range function, that does accept float increments..."
     if end == None:
         end = start + 0.0
         start = 0.0

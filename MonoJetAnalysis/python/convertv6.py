@@ -21,9 +21,6 @@ import xsec
 
 subDir = "monoJetTuples_v1"
 
-#chmode = "incNoISRJetID" 
-#chmode = "copy" 
-chmode = "copyCleanedWithAllLeptons" 
 from defaultMETSamples_mc import *
 
 allSamples = [wjets, wjetsInc, ttbar, dy, qcd, ww]

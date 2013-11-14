@@ -34,7 +34,7 @@ setup['plotTransformations'] = ['Id', 'Deco', 'PCA', 'Gauss_Deco']
 setup['makeCorrelationScatterPlots'] = False
 setup['plotMVAEffs'] = False #needs active X-forwarding since a QT Object is involved
 setup['datasetFactoryOptions'] = ["nTrain_Signal=0", "nTrain_Background=0","SplitMode=Random","SplitSeed=100","NormMode=None","!V"]
-
+setup['fomPlotZoomCoordinates'] = [0, 0.95, 0.2, 1.0]
 convTest=15
 
 VarProp={}
@@ -54,18 +54,18 @@ CutRangeMax['type1phiMet']='500'
 addNeurons = [2,1]
 nCycles=1000
 
-nCuts = 40
-maxDepth = 2
-nTrees = 1200
+nCuts = -1
+maxDepth = 1
+nTrees = 400
 #for addNeurons in [[2,1]]:
 #  for nCycles in [1000]:
 #  for nCycles in [20000]:
 #    prepreprefix = 'MonoJet_MLP'+''.join([str(x) for x in addNeurons])+'_'+signalModel['name']+'_refsel_Norm_UseRegulator_ConvergenceTests'+str(convTest)+'_ConvImpr1e-6_'+str(nCycles)+'_sigmoid_BP_S1_SE1_'
 #    prepreprefix = 'MonoJet_BDTvsMLP_'+signalModel['name']+'_refsel_None_'
 if True:
-#    prepreprefix = 'MonoJet_BDT_nTreeComparison_nCuts'+str(nCuts)+'_maxDepth'+str(maxDepth)+'_'+signalModel['name']+'_refsel_None_'
+    prepreprefix = 'MonoJet_BDT_nTreeComparison_nCuts'+str(nCuts)+'_maxDepth'+str(maxDepth)+'_'+signalModel['name']+'_refsel_None_'
 #    prepreprefix = 'MonoJet_BDT_maxDepthComparison_nCuts'+str(nCuts)+'_nTrees'+str(nTrees)+'_'+signalModel['name']+'_refsel_None_'
-    prepreprefix = 'MonoJet_BDT_minNodeSizeComparison_maxDepth'+str(maxDepth)+'_nCuts'+str(nCuts)+'_nTrees'+str(nTrees)+'_'+signalModel['name']+'_refsel_None_'
+#    prepreprefix = 'MonoJet_BDT_nEventsMinComparison_maxDepth'+str(maxDepth)+'_nCuts'+str(nCuts)+'_nTrees'+str(nTrees)+'_'+signalModel['name']+'_refsel_None_'
 
     def setupMVAForModelPoint(signalModel):
        
@@ -105,13 +105,13 @@ if True:
       setup['varsCalculated'] = [\
                       ['softIsolatedMT', softIsolatedMT],
                       ['deltaPhi', lambda c:acos(cosDeltaPhiLepW(c))],
-                      ['softIsolatedCharge/I', lambda c:-c.GetLeaf('softIsolatedMuPdg').GetValue()/abs(c.GetLeaf('softIsolatedMuPdg').GetValue())]
+                      ['softIsolatedMuCharge/I', lambda c:-c.GetLeaf('softIsolatedMuPdg').GetValue()/abs(c.GetLeaf('softIsolatedMuPdg').GetValue())]
         ]
       print "Scaling signal weights by ", setup["sigMVAWeightFac"],'using weight', setup['weightForMVA']
 
 
-      setup['fom_plot_vars'] = [['softIsolatedMT', [0,1000] , ROOT.kGreen], ['type1phiMet', [0,1000] , ROOT.kMagenta], ['deltaPhi', [0,1000] , ROOT.kBlue]]
-    #  setup['fom_plot_vars'] = []
+#      setup['fom_plot_vars'] = [['softIsolatedMT', [0,1000] , ROOT.kGreen], ['type1phiMet', [0,1000] , ROOT.kMagenta], ['deltaPhi', [0,1000] , ROOT.kBlue]]
+      setup['fom_plot_vars'] = []
 
 
       setup['plotDir']    = '/afs/hephy.at/user/'+afsUser[0]+'/'+afsUser+'/www/'+localPlotDir
@@ -145,24 +145,45 @@ if True:
 
 #     NN_book_options_list.append("!H:!V:NTrees=400:nEventsMin=400:MaxDepth=3:BoostType=AdaBoost:SeparationType=GiniIndex:nCuts=20:PruneMethod=NoPruning")
 #     https://svnweb.cern.ch/cern/wsvn/UGentSUSY/trunk/User/Sigamani/babyReaderSTOPS/runBDT/makeconfigs.py
-      allMethods = [methodMLP]
-      for i, mNS in enumerate([1,2,4,8]):
+#      allMethods = [methodMLP]
+      allMethods = []
+
+
+      for i, nT in enumerate([ 100, 200, 400, 800]):
         methodBDT['type']=ROOT.TMVA.Types.kBDT
-        methodBDT['name']='BDT_minNodeSize'+str(mNS)
+        methodBDT['name']='BDT_nTrees'+str(nT)
         methodBDT['lineColor']=colors[i]
         methodBDT['niceName']=methodBDT['name']
         methodBDT['options'] =('!H','V','VarTransform=None', 'CreateMVAPdfs=True', 'BoostType=AdaBoost',\
-                               'NTrees='+str(nTrees), 
+                               'NTrees='+str(nT), 
   #                             'nEventsMin=400', 
-                               'MinNodeSize='+str(mNS)+'%',
+#                               'MinNodeSize='+str(mNS),
+#                               'nEventsMin='+str(mNS),
                                'MaxDepth='+str(maxDepth),
                                'SeparationType=GiniIndex',
                                'nCuts='+str(nCuts),
-                               'PruneMethod=NoPruning'
+                               'PruneMethod=NoPruning',
+                               'AdaBoostBeta=0.5',
+                               'UseRandomisedTrees=True'
         )
         allMethods.append(copy.deepcopy(methodBDT))
 
-#      for i, nT in enumerate([200, 400, 800, 1200]):
+#      for i, mNS in enumerate([30,  100, 374, 500]):
+#        methodBDT['type']=ROOT.TMVA.Types.kBDT
+#        methodBDT['name']='BDT_minNodeSize'+str(mNS)
+#        methodBDT['lineColor']=colors[i]
+#        methodBDT['niceName']=methodBDT['name']
+#        methodBDT['options'] =('!H','V','VarTransform=None', 'CreateMVAPdfs=True', 'BoostType=AdaBoost',\
+#                               'NTrees='+str(nTrees), 
+#  #                             'nEventsMin=400', 
+##                               'MinNodeSize='+str(mNS),
+#                               'nEventsMin='+str(mNS),
+#                               'MaxDepth='+str(maxDepth),
+#                               'SeparationType=GiniIndex',
+#                               'nCuts='+str(nCuts),
+#                               'PruneMethod=NoPruning'
+#        )
+#        allMethods.append(copy.deepcopy(methodBDT))
 
 #      for i, mD in enumerate([2,3,4,10]):
 #        methodBDT['type']=ROOT.TMVA.Types.kBDT
@@ -177,7 +198,8 @@ if True:
 #                               'nCuts='+str(nCuts),
 #                               'PruneMethod=NoPruning'
 #        )
-
+#        allMethods.append(copy.deepcopy(methodBDT))
+#
 
       setup["methodConfigs"] = copy.deepcopy(allMethods)
       if not os.path.isdir(setup['weightDir']) or overWriteTMVAFrameWork:

@@ -35,9 +35,6 @@ setup['datasetFactoryOptions'] = ["nTrain_Signal=0", "nTrain_Background=0","Spli
 
 
 def setupMVAForModelPoint(mgl, mN):
-   
-#  block = getBlock(mgl, mN, model)
-#  blockStr = getBlockString(mgl, mN, model)
   blockStr = "mgl_"+str(mgl)+"_mN_"+str(mN)
   preprefix = prepreprefix+blockStr+'_'
 
