@@ -31,6 +31,8 @@ setup['TMVAFactoryOptions'] = ["!V","!Silent","Color","DrawProgressBar","Transfo
 setup['plotTransformations'] = ['Id', 'Deco', 'PCA', 'Gauss_Deco']
 setup['makeCorrelationScatterPlots'] = False
 setup['plotMVAEffs'] = False #needs active X-forwarding since a QT Object is involved
+setup['datasetFactoryOptions'] = ["nTrain_Signal=0", "nTrain_Background=0","SplitMode=Random","SplitSeed=100","NormMode=None","!V"]
+
 
 def setupMVAForModelPoint(mgl, mN):
    
@@ -97,7 +99,7 @@ def setupMVAForModelPoint(mgl, mN):
   #If changing between met and type1phiMet the formula for deltaPhi (if used) has to be changed!
   setup['varsFromInputData'] = ['type1phiMet', 'mT', 'weightLumi', 'ht', 'singleMuonic', 'singleElectronic', 'nvetoMuons', 'nvetoElectrons', 'mt2w', 'minDeltaPhi']
   setup['varsFromInputSignal'] =  ["osetMN", "osetMgl", "osetMsq"]
-  setup['varsFromInputSignal'] =  []
+#  setup['varsFromInputSignal'] =  []
   from mvaFuncs import cosDeltaPhiLepW
   from math import acos
   setup['varsCalculated'] = [\
