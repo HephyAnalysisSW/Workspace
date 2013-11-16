@@ -22,8 +22,8 @@ signalModel = stop300lsp270
 backgrounds = [wJetsToLNu]
 
 #preprefix = 'MonoJet_Try2_'+signalModel['name']+'_refsel_NormDeco_10000_sigmoid_BP_S03_SE08_'
-prefix = "MonoJet_MLP21_"+signalModel['name']+"_refsel_Norm_ConvergenceTests15_ConvImpr1e-6_1000_sigmoid_BP_S1_SE1_softIsolatedMT_type1phiMet_deltaPhi"
-
+#prefix = "MonoJet_MLP21_"+signalModel['name']+"_refsel_Norm_ConvergenceTests15_ConvImpr1e-6_1000_sigmoid_BP_S1_SE1_softIsolatedMT_type1phiMet_deltaPhi"
+prefix = "MonoJet_BDTvsMLP_"+signalModel['name']+"_refsel_None_softIsolatedMT_type1phiMet_deltaPhi_isrJetPt_htRatio"
 #targetSigEff=0.2
 postfix = ""
 weight = 'weight'
@@ -76,10 +76,10 @@ if overWrite or not os.path.isfile(resFile):
     opt = ""
 
     def getExpExcl(thresh, retType=None): 
-      bkgPlus = getYield(data['simu'], setup, reader, allMethods[methodName]['config'], setup["preselection"]+"&&type==0&&softIsolatedCharge==1", thresh, weight)
-      sigPlus = getYield(data['simu'], setup, reader, allMethods[methodName]['config'], setup["preselection"]+"&&type==1&&softIsolatedCharge==1", thresh, weight)
-      bkgMinus = getYield(data['simu'], setup, reader, allMethods[methodName]['config'], setup["preselection"]+"&&type==0&&softIsolatedCharge==-1", thresh, weight)
-      sigMinus = getYield(data['simu'], setup, reader, allMethods[methodName]['config'], setup["preselection"]+"&&type==1&&softIsolatedCharge==-1", thresh, weight)
+      bkgPlus = getYield(data['simu'], setup, reader, allMethods[methodName]['config'], setup["preselection"]+"&&type==0&&softIsolatedMuCharge==1", thresh, weight)
+      sigPlus = getYield(data['simu'], setup, reader, allMethods[methodName]['config'], setup["preselection"]+"&&type==1&&softIsolatedMuCharge==1", thresh, weight)
+      bkgMinus = getYield(data['simu'], setup, reader, allMethods[methodName]['config'], setup["preselection"]+"&&type==0&&softIsolatedMuCharge==-1", thresh, weight)
+      sigMinus = getYield(data['simu'], setup, reader, allMethods[methodName]['config'], setup["preselection"]+"&&type==1&&softIsolatedMuCharge==-1", thresh, weight)
 
       c = cardFileWriter()
       c.addBin('BinPlus', ['bkg'], 'BinPlus')
@@ -91,12 +91,12 @@ if overWrite or not os.path.isfile(resFile):
       c.specifyExpectation('BinMinus', 'bkg', bkgMinus)
       c.specifyExpectation('BinMinus', 'signal', sigMinus)
       c.addUncertainty('globalUnc', 'lnN')
-      c.specifyUncertainty('globalUnc', 'BinPlus', 'bkg', 1.1414)
-      c.specifyUncertainty('globalUnc', 'BinMinus', 'bkg', 1.1414)
+      c.specifyUncertainty('globalUnc', 'BinPlus', 'bkg', 1.09)
+      c.specifyUncertainty('globalUnc', 'BinMinus', 'bkg', 1.09)
       c.addUncertainty('globalUncPlus', 'lnN')
-      c.specifyUncertainty('globalUncPlus', 'BinPlus', 'bkg', 1.1414)
+      c.specifyUncertainty('globalUncPlus', 'BinPlus', 'bkg', 1.09)
       c.addUncertainty('globalUncMinus', 'lnN')
-      c.specifyUncertainty('globalUncMinus', 'BinMinus', 'bkg', 1.1414)
+      c.specifyUncertainty('globalUncMinus', 'BinMinus', 'bkg', 1.09)
       if bkgPlus==0. or sigPlus==0. or bkgMinus==0. or sigMinus==0.:
         res={'0.500':float('nan')}
       else:
@@ -117,14 +117,14 @@ if overWrite or not os.path.isfile(resFile):
     limits[methodName]['result']=getExpExcl(optThresh[0], retType=1)
     if limits[methodName]['result']['0.500']<float('inf'):
       limits[methodName]['cutVal']=optThresh[0]
-      sigPlusInc = getYield(data['simu'], setup, reader, allMethods[methodName]['config'], setup["preselection"]+"&&type==1&&softIsolatedCharge==1", -1, weight)
-      sigPlus = getYield(data['simu'],    setup, reader, allMethods[methodName]['config'], setup["preselection"]+"&&type==1&&softIsolatedCharge==1", optThresh[0], weight)
-      bkgPlusInc = getYield(data['simu'], setup, reader, allMethods[methodName]['config'], setup["preselection"]+"&&type==0&&softIsolatedCharge==1", -1, weight)
-      bkgPlus = getYield(data['simu'],    setup, reader, allMethods[methodName]['config'], setup["preselection"]+"&&type==0&&softIsolatedCharge==1", optThresh[0], weight)
-      sigMinusInc = getYield(data['simu'], setup, reader, allMethods[methodName]['config'], setup["preselection"]+"&&type==1&&softIsolatedCharge==-1", -1, weight)
-      sigMinus = getYield(data['simu'],    setup, reader, allMethods[methodName]['config'], setup["preselection"]+"&&type==1&&softIsolatedCharge==-1", optThresh[0], weight)
-      bkgMinusInc = getYield(data['simu'], setup, reader, allMethods[methodName]['config'], setup["preselection"]+"&&type==0&&softIsolatedCharge==-1", -1, weight)
-      bkgMinus = getYield(data['simu'],    setup, reader, allMethods[methodName]['config'], setup["preselection"]+"&&type==0&&softIsolatedCharge==-1", optThresh[0], weight)
+      sigPlusInc = getYield(data['simu'], setup, reader, allMethods[methodName]['config'], setup["preselection"]+"&&type==1&&softIsolatedMuCharge==1", -1, weight)
+      sigPlus = getYield(data['simu'],    setup, reader, allMethods[methodName]['config'], setup["preselection"]+"&&type==1&&softIsolatedMuCharge==1", optThresh[0], weight)
+      bkgPlusInc = getYield(data['simu'], setup, reader, allMethods[methodName]['config'], setup["preselection"]+"&&type==0&&softIsolatedMuCharge==1", -1, weight)
+      bkgPlus = getYield(data['simu'],    setup, reader, allMethods[methodName]['config'], setup["preselection"]+"&&type==0&&softIsolatedMuCharge==1", optThresh[0], weight)
+      sigMinusInc = getYield(data['simu'], setup, reader, allMethods[methodName]['config'], setup["preselection"]+"&&type==1&&softIsolatedMuCharge==-1", -1, weight)
+      sigMinus = getYield(data['simu'],    setup, reader, allMethods[methodName]['config'], setup["preselection"]+"&&type==1&&softIsolatedMuCharge==-1", optThresh[0], weight)
+      bkgMinusInc = getYield(data['simu'], setup, reader, allMethods[methodName]['config'], setup["preselection"]+"&&type==0&&softIsolatedMuCharge==-1", -1, weight)
+      bkgMinus = getYield(data['simu'],    setup, reader, allMethods[methodName]['config'], setup["preselection"]+"&&type==0&&softIsolatedMuCharge==-1", optThresh[0], weight)
       limits[methodName]['sigPlusEff']=sigPlus/float(sigPlusInc)
       limits[methodName]['bkgPlusEff']=bkgPlus/float(bkgPlusInc)
       limits[methodName]['sigMinusEff']=sigMinus/float(sigMinusInc)
@@ -135,11 +135,11 @@ else:
   limits = pickle.load(file(resFile))
 
 #methodName = 'MLP21_nCyc1000'
-#hSigPlus = fillNNHisto(data['simu'], setup, reader, allMethods[methodName]['config'], setup["preselection"]+"&&type==1&&softIsolatedCharge==1", ROOT.TH1F("h", "h", 50,0,1.5), weight)
-#hBkgPlus = fillNNHisto(data['simu'], setup, reader, allMethods[methodName]['config'], setup["preselection"]+"&&type==0&&softIsolatedCharge==1", ROOT.TH1F("h", "h", 50,0,1.5), weight)
+#hSigPlus = fillNNHisto(data['simu'], setup, reader, allMethods[methodName]['config'], setup["preselection"]+"&&type==1&&softIsolatedMuCharge==1", ROOT.TH1F("h", "h", 50,0,1.5), weight)
+#hBkgPlus = fillNNHisto(data['simu'], setup, reader, allMethods[methodName]['config'], setup["preselection"]+"&&type==0&&softIsolatedMuCharge==1", ROOT.TH1F("h", "h", 50,0,1.5), weight)
 #
-#hSigMinus = fillNNHisto(data['simu'], setup, reader, allMethods[methodName]['config'], setup["preselection"]+"&&type==1&&softIsolatedCharge==-1", ROOT.TH1F("h", "h", 50,0,1.5), weight)
-#hBkgMinus = fillNNHisto(data['simu'], setup, reader, allMethods[methodName]['config'], setup["preselection"]+"&&type==0&&softIsolatedCharge==-1", ROOT.TH1F("h", "h", 50,0,1.5), weight)
+#hSigMinus = fillNNHisto(data['simu'], setup, reader, allMethods[methodName]['config'], setup["preselection"]+"&&type==1&&softIsolatedMuCharge==-1", ROOT.TH1F("h", "h", 50,0,1.5), weight)
+#hBkgMinus = fillNNHisto(data['simu'], setup, reader, allMethods[methodName]['config'], setup["preselection"]+"&&type==0&&softIsolatedMuCharge==-1", ROOT.TH1F("h", "h", 50,0,1.5), weight)
 #
 ##cutMin = ROOT.std.vector('float')()
 ##cutMax = ROOT.std.vector('float')()

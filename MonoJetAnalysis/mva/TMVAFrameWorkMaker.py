@@ -12,7 +12,8 @@ from xsecSMS import gluino8TeV_NLONLL, gluino14TeV_NLO
 import copy, sys
 from defaultConvertedTuples import stop300lsp270, stop200lsp170g100, stop300lsp240g150
 from defaultConvertedTuples import wJetsToLNu
-from monoJetFuncs import softIsolatedMT 
+from monoJetFuncs import softIsolatedMT
+from helpers import htRatio 
 #RA4
 
 signalModel = stop300lsp270
@@ -20,7 +21,7 @@ backgrounds = [wJetsToLNu]
 
 colors = [ROOT.kBlue, ROOT.kRed, ROOT.kGreen, ROOT.kOrange, ROOT.kMagenta]
 
-overWriteData = False 
+overWriteData = True 
 overWriteTMVAFrameWork = True
 
 setup={}
@@ -37,11 +38,16 @@ setup['datasetFactoryOptions'] = ["nTrain_Signal=0", "nTrain_Background=0","Spli
 setup['fomPlotZoomCoordinates'] = [0, 0.95, 0.2, 1.0]
 convTest=15
 
+
 VarProp={}
 VarProp['deltaPhi']='NotEnforced'
 VarProp['softIsolatedMT']='FMin'
 VarProp['type1phiMet']='FMin'
+VarProp['isrJetPt']='FMin'
+VarProp['htRatio']='NotEnforced'
 CutRangeMin={}
+CutRangeMin['isrJetPt']='110.'
+CutRangeMin['htRatio']='0.'
 CutRangeMin['deltaPhi']='0.'
 CutRangeMin['softIsolatedMT']='0'
 CutRangeMin['type1phiMet']='150.'
@@ -49,21 +55,24 @@ CutRangeMax={}
 CutRangeMax['deltaPhi']='3.1415926'
 CutRangeMax['softIsolatedMT']='500'
 CutRangeMax['type1phiMet']='500'
+CutRangeMax['isrJetPt']='1000.'
+CutRangeMax['htRatio']='1.'
+
 
 
 addNeurons = [2,1]
 nCycles=1000
 
 nCuts = -1
-maxDepth = 1
+maxDepth = 2
 nTrees = 400
 #for addNeurons in [[2,1]]:
 #  for nCycles in [1000]:
 #  for nCycles in [20000]:
 #    prepreprefix = 'MonoJet_MLP'+''.join([str(x) for x in addNeurons])+'_'+signalModel['name']+'_refsel_Norm_UseRegulator_ConvergenceTests'+str(convTest)+'_ConvImpr1e-6_'+str(nCycles)+'_sigmoid_BP_S1_SE1_'
-#    prepreprefix = 'MonoJet_BDTvsMLP_'+signalModel['name']+'_refsel_None_'
+prepreprefix = 'MonoJet_BDTvsMLP_'+signalModel['name']+'_refsel_None_'
 if True:
-    prepreprefix = 'MonoJet_BDT_nTreeComparison_nCuts'+str(nCuts)+'_maxDepth'+str(maxDepth)+'_'+signalModel['name']+'_refsel_None_'
+#    prepreprefix = 'MonoJet_BDT_nTreeComparison_nCuts'+str(nCuts)+'_maxDepth'+str(maxDepth)+'_'+signalModel['name']+'_refsel_None_'
 #    prepreprefix = 'MonoJet_BDT_maxDepthComparison_nCuts'+str(nCuts)+'_nTrees'+str(nTrees)+'_'+signalModel['name']+'_refsel_None_'
 #    prepreprefix = 'MonoJet_BDT_nEventsMinComparison_maxDepth'+str(maxDepth)+'_nCuts'+str(nCuts)+'_nTrees'+str(nTrees)+'_'+signalModel['name']+'_refsel_None_'
 
@@ -71,7 +80,7 @@ if True:
        
       preprefix = prepreprefix
 
-      setup['mvaInputVars'] = ["softIsolatedMT", "type1phiMet", 'deltaPhi']
+      setup['mvaInputVars'] = ["softIsolatedMT", "type1phiMet", 'deltaPhi', 'isrJetPt', 'htRatio']
       prefix = '_'.join(setup['mvaInputVars'])
       prefix = preprefix+prefix
 
@@ -99,13 +108,14 @@ if True:
       setup["bkgMVAWeightFac"] = 1.
       setup['weightForMVA'] = {'weight':1., 'sigFac':1, 'bkgFac':1}
       #If changing between met and type1phiMet the formula for deltaPhi (if used) has to be changed!
-      setup['varsFromInputData'] = ['type1phiMet', 'isrJetPt', 'isrJetBTBVetoPassed', 'softIsolatedMuPt', 'nHardElectrons', 'nHardMuons', 'njet60/I', 'weight']
+      setup['varsFromInputData'] = ['type1phiMet', 'isrJetPt', 'isrJetBTBVetoPassed', 'softIsolatedMuPt', 'nHardElectrons', 'nHardMuons', 'njet60/I', 'weight', 'isrJetPt']
       from monoJetFuncs import cosDeltaPhiLepW, softIsolatedMT
       from math import acos
       setup['varsCalculated'] = [\
                       ['softIsolatedMT', softIsolatedMT],
                       ['deltaPhi', lambda c:acos(cosDeltaPhiLepW(c))],
-                      ['softIsolatedMuCharge/I', lambda c:-c.GetLeaf('softIsolatedMuPdg').GetValue()/abs(c.GetLeaf('softIsolatedMuPdg').GetValue())]
+                      ['softIsolatedMuCharge/I', lambda c:-c.GetLeaf('softIsolatedMuPdg').GetValue()/abs(c.GetLeaf('softIsolatedMuPdg').GetValue())],
+                      ['htRatio', htRatio]
         ]
       print "Scaling signal weights by ", setup["sigMVAWeightFac"],'using weight', setup['weightForMVA']
 
@@ -143,30 +153,48 @@ if True:
                                   'ConvergenceTests='+str(convTest),'ConvergenceImprove=1e-6', 'TestRate=10',
                                   'UseRegulator=False' )
 
+      methodBDT['type']=ROOT.TMVA.Types.kBDT
+      methodBDT['name']='BDT_nTrees'+str(nTrees)
+      methodBDT['lineColor']=colors[i]
+      methodBDT['niceName']=methodBDT['name']
+      methodBDT['options'] =('!H','V','VarTransform=None', 'CreateMVAPdfs=True', 'BoostType=AdaBoost',\
+                             'NTrees='+str(nTrees), 
+#                             'nEventsMin=400', 
+#                               'MinNodeSize='+str(mNS),
+#                               'nEventsMin='+str(mNS),
+                             'MaxDepth='+str(maxDepth),
+                             'SeparationType=GiniIndex',
+                             'nCuts='+str(nCuts),
+                             'PruneMethod=NoPruning',
+                             'AdaBoostBeta=0.5',
+                             'UseRandomisedTrees=True'
+      )
+
+      allMethods = [methodMLP, methodBDT]
+
 #     NN_book_options_list.append("!H:!V:NTrees=400:nEventsMin=400:MaxDepth=3:BoostType=AdaBoost:SeparationType=GiniIndex:nCuts=20:PruneMethod=NoPruning")
 #     https://svnweb.cern.ch/cern/wsvn/UGentSUSY/trunk/User/Sigamani/babyReaderSTOPS/runBDT/makeconfigs.py
 #      allMethods = [methodMLP]
-      allMethods = []
 
 
-      for i, nT in enumerate([ 100, 200, 400, 800]):
-        methodBDT['type']=ROOT.TMVA.Types.kBDT
-        methodBDT['name']='BDT_nTrees'+str(nT)
-        methodBDT['lineColor']=colors[i]
-        methodBDT['niceName']=methodBDT['name']
-        methodBDT['options'] =('!H','V','VarTransform=None', 'CreateMVAPdfs=True', 'BoostType=AdaBoost',\
-                               'NTrees='+str(nT), 
-  #                             'nEventsMin=400', 
-#                               'MinNodeSize='+str(mNS),
-#                               'nEventsMin='+str(mNS),
-                               'MaxDepth='+str(maxDepth),
-                               'SeparationType=GiniIndex',
-                               'nCuts='+str(nCuts),
-                               'PruneMethod=NoPruning',
-                               'AdaBoostBeta=0.5',
-                               'UseRandomisedTrees=True'
-        )
-        allMethods.append(copy.deepcopy(methodBDT))
+#      for i, nT in enumerate([ 100, 200, 400, 800]):
+#        methodBDT['type']=ROOT.TMVA.Types.kBDT
+#        methodBDT['name']='BDT_nTrees'+str(nT)
+#        methodBDT['lineColor']=colors[i]
+#        methodBDT['niceName']=methodBDT['name']
+#        methodBDT['options'] =('!H','V','VarTransform=None', 'CreateMVAPdfs=True', 'BoostType=AdaBoost',\
+#                               'NTrees='+str(nT), 
+#  #                             'nEventsMin=400', 
+##                               'MinNodeSize='+str(mNS),
+##                               'nEventsMin='+str(mNS),
+#                               'MaxDepth='+str(maxDepth),
+#                               'SeparationType=GiniIndex',
+#                               'nCuts='+str(nCuts),
+#                               'PruneMethod=NoPruning',
+#                               'AdaBoostBeta=0.5',
+#                               'UseRandomisedTrees=True'
+#        )
+#        allMethods.append(copy.deepcopy(methodBDT))
 
 #      for i, mNS in enumerate([30,  100, 374, 500]):
 #        methodBDT['type']=ROOT.TMVA.Types.kBDT

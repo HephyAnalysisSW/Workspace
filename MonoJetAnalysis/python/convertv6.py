@@ -21,8 +21,6 @@ import xsec
 
 subDir = "monoJetTuples_v1"
 
-from defaultMETSamples_mc import *
-
 allSamples = [wjets, wjetsInc, ttbar, dy, qcd, ww]
 
 # from first parameter get mode, second parameter is sample type

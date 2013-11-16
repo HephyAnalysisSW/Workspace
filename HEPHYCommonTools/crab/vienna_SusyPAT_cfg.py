@@ -3,7 +3,56 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process("PAT")
 
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring('root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/schoef/MonoJetFullSim_Step0_try7_Step0-stop300lsp270g200-try7/MonoJetFullSim_Step2_try1_Step2-stop300lsp270g200/ab45720b22c4f98257a2f100c39d504b/step2_RAW2DIGI_L1Reco_RECO_9_1_xGw.root'),
+    fileNames = cms.untracked.vstring('root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/schoef/MonoJetFullSim_Step0_try7_Step0-stop300lsp270g200-try7/MonoJetFullSim_Step2_try1_Step2-stop300lsp270g200/ab45720b22c4f98257a2f100c39d504b/step2_RAW2DIGI_L1Reco_RECO_54_1_d2Y.root', 
+        'root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/schoef/MonoJetFullSim_Step0_try7_Step0-stop300lsp270g200-try7/MonoJetFullSim_Step2_try1_Step2-stop300lsp270g200/ab45720b22c4f98257a2f100c39d504b/step2_RAW2DIGI_L1Reco_RECO_55_1_DAD.root', 
+        'root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/schoef/MonoJetFullSim_Step0_try7_Step0-stop300lsp270g200-try7/MonoJetFullSim_Step2_try1_Step2-stop300lsp270g200/ab45720b22c4f98257a2f100c39d504b/step2_RAW2DIGI_L1Reco_RECO_56_1_5mO.root', 
+        'root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/schoef/MonoJetFullSim_Step0_try7_Step0-stop300lsp270g200-try7/MonoJetFullSim_Step2_try1_Step2-stop300lsp270g200/ab45720b22c4f98257a2f100c39d504b/step2_RAW2DIGI_L1Reco_RECO_57_1_pO7.root', 
+        'root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/schoef/MonoJetFullSim_Step0_try7_Step0-stop300lsp270g200-try7/MonoJetFullSim_Step2_try1_Step2-stop300lsp270g200/ab45720b22c4f98257a2f100c39d504b/step2_RAW2DIGI_L1Reco_RECO_58_1_ayM.root', 
+        'root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/schoef/MonoJetFullSim_Step0_try7_Step0-stop300lsp270g200-try7/MonoJetFullSim_Step2_try1_Step2-stop300lsp270g200/ab45720b22c4f98257a2f100c39d504b/step2_RAW2DIGI_L1Reco_RECO_59_1_aPf.root', 
+        'root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/schoef/MonoJetFullSim_Step0_try7_Step0-stop300lsp270g200-try7/MonoJetFullSim_Step2_try1_Step2-stop300lsp270g200/ab45720b22c4f98257a2f100c39d504b/step2_RAW2DIGI_L1Reco_RECO_5_1_Y3d.root', 
+        'root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/schoef/MonoJetFullSim_Step0_try7_Step0-stop300lsp270g200-try7/MonoJetFullSim_Step2_try1_Step2-stop300lsp270g200/ab45720b22c4f98257a2f100c39d504b/step2_RAW2DIGI_L1Reco_RECO_60_1_Gvj.root', 
+        'root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/schoef/MonoJetFullSim_Step0_try7_Step0-stop300lsp270g200-try7/MonoJetFullSim_Step2_try1_Step2-stop300lsp270g200/ab45720b22c4f98257a2f100c39d504b/step2_RAW2DIGI_L1Reco_RECO_61_1_v7L.root', 
+        'root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/schoef/MonoJetFullSim_Step0_try7_Step0-stop300lsp270g200-try7/MonoJetFullSim_Step2_try1_Step2-stop300lsp270g200/ab45720b22c4f98257a2f100c39d504b/step2_RAW2DIGI_L1Reco_RECO_62_1_pgw.root', 
+        'root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/schoef/MonoJetFullSim_Step0_try7_Step0-stop300lsp270g200-try7/MonoJetFullSim_Step2_try1_Step2-stop300lsp270g200/ab45720b22c4f98257a2f100c39d504b/step2_RAW2DIGI_L1Reco_RECO_63_1_gli.root', 
+        'root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/schoef/MonoJetFullSim_Step0_try7_Step0-stop300lsp270g200-try7/MonoJetFullSim_Step2_try1_Step2-stop300lsp270g200/ab45720b22c4f98257a2f100c39d504b/step2_RAW2DIGI_L1Reco_RECO_64_1_Bq4.root', 
+        'root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/schoef/MonoJetFullSim_Step0_try7_Step0-stop300lsp270g200-try7/MonoJetFullSim_Step2_try1_Step2-stop300lsp270g200/ab45720b22c4f98257a2f100c39d504b/step2_RAW2DIGI_L1Reco_RECO_65_1_hX8.root', 
+        'root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/schoef/MonoJetFullSim_Step0_try7_Step0-stop300lsp270g200-try7/MonoJetFullSim_Step2_try1_Step2-stop300lsp270g200/ab45720b22c4f98257a2f100c39d504b/step2_RAW2DIGI_L1Reco_RECO_66_1_ASy.root', 
+        'root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/schoef/MonoJetFullSim_Step0_try7_Step0-stop300lsp270g200-try7/MonoJetFullSim_Step2_try1_Step2-stop300lsp270g200/ab45720b22c4f98257a2f100c39d504b/step2_RAW2DIGI_L1Reco_RECO_67_1_5ql.root', 
+        'root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/schoef/MonoJetFullSim_Step0_try7_Step0-stop300lsp270g200-try7/MonoJetFullSim_Step2_try1_Step2-stop300lsp270g200/ab45720b22c4f98257a2f100c39d504b/step2_RAW2DIGI_L1Reco_RECO_68_1_e4K.root', 
+        'root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/schoef/MonoJetFullSim_Step0_try7_Step0-stop300lsp270g200-try7/MonoJetFullSim_Step2_try1_Step2-stop300lsp270g200/ab45720b22c4f98257a2f100c39d504b/step2_RAW2DIGI_L1Reco_RECO_69_1_ico.root', 
+        'root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/schoef/MonoJetFullSim_Step0_try7_Step0-stop300lsp270g200-try7/MonoJetFullSim_Step2_try1_Step2-stop300lsp270g200/ab45720b22c4f98257a2f100c39d504b/step2_RAW2DIGI_L1Reco_RECO_6_1_w9h.root', 
+        'root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/schoef/MonoJetFullSim_Step0_try7_Step0-stop300lsp270g200-try7/MonoJetFullSim_Step2_try1_Step2-stop300lsp270g200/ab45720b22c4f98257a2f100c39d504b/step2_RAW2DIGI_L1Reco_RECO_70_1_ZmT.root', 
+        'root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/schoef/MonoJetFullSim_Step0_try7_Step0-stop300lsp270g200-try7/MonoJetFullSim_Step2_try1_Step2-stop300lsp270g200/ab45720b22c4f98257a2f100c39d504b/step2_RAW2DIGI_L1Reco_RECO_71_1_4mO.root', 
+        'root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/schoef/MonoJetFullSim_Step0_try7_Step0-stop300lsp270g200-try7/MonoJetFullSim_Step2_try1_Step2-stop300lsp270g200/ab45720b22c4f98257a2f100c39d504b/step2_RAW2DIGI_L1Reco_RECO_72_1_noI.root', 
+        'root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/schoef/MonoJetFullSim_Step0_try7_Step0-stop300lsp270g200-try7/MonoJetFullSim_Step2_try1_Step2-stop300lsp270g200/ab45720b22c4f98257a2f100c39d504b/step2_RAW2DIGI_L1Reco_RECO_73_1_R6P.root', 
+        'root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/schoef/MonoJetFullSim_Step0_try7_Step0-stop300lsp270g200-try7/MonoJetFullSim_Step2_try1_Step2-stop300lsp270g200/ab45720b22c4f98257a2f100c39d504b/step2_RAW2DIGI_L1Reco_RECO_74_1_QQR.root', 
+        'root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/schoef/MonoJetFullSim_Step0_try7_Step0-stop300lsp270g200-try7/MonoJetFullSim_Step2_try1_Step2-stop300lsp270g200/ab45720b22c4f98257a2f100c39d504b/step2_RAW2DIGI_L1Reco_RECO_75_1_q0e.root', 
+        'root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/schoef/MonoJetFullSim_Step0_try7_Step0-stop300lsp270g200-try7/MonoJetFullSim_Step2_try1_Step2-stop300lsp270g200/ab45720b22c4f98257a2f100c39d504b/step2_RAW2DIGI_L1Reco_RECO_76_1_rwR.root', 
+        'root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/schoef/MonoJetFullSim_Step0_try7_Step0-stop300lsp270g200-try7/MonoJetFullSim_Step2_try1_Step2-stop300lsp270g200/ab45720b22c4f98257a2f100c39d504b/step2_RAW2DIGI_L1Reco_RECO_77_1_bNk.root', 
+        'root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/schoef/MonoJetFullSim_Step0_try7_Step0-stop300lsp270g200-try7/MonoJetFullSim_Step2_try1_Step2-stop300lsp270g200/ab45720b22c4f98257a2f100c39d504b/step2_RAW2DIGI_L1Reco_RECO_78_1_rJA.root', 
+        'root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/schoef/MonoJetFullSim_Step0_try7_Step0-stop300lsp270g200-try7/MonoJetFullSim_Step2_try1_Step2-stop300lsp270g200/ab45720b22c4f98257a2f100c39d504b/step2_RAW2DIGI_L1Reco_RECO_79_1_7H7.root', 
+        'root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/schoef/MonoJetFullSim_Step0_try7_Step0-stop300lsp270g200-try7/MonoJetFullSim_Step2_try1_Step2-stop300lsp270g200/ab45720b22c4f98257a2f100c39d504b/step2_RAW2DIGI_L1Reco_RECO_7_1_2ku.root', 
+        'root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/schoef/MonoJetFullSim_Step0_try7_Step0-stop300lsp270g200-try7/MonoJetFullSim_Step2_try1_Step2-stop300lsp270g200/ab45720b22c4f98257a2f100c39d504b/step2_RAW2DIGI_L1Reco_RECO_80_1_Ie7.root', 
+        'root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/schoef/MonoJetFullSim_Step0_try7_Step0-stop300lsp270g200-try7/MonoJetFullSim_Step2_try1_Step2-stop300lsp270g200/ab45720b22c4f98257a2f100c39d504b/step2_RAW2DIGI_L1Reco_RECO_81_1_r1Z.root', 
+        'root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/schoef/MonoJetFullSim_Step0_try7_Step0-stop300lsp270g200-try7/MonoJetFullSim_Step2_try1_Step2-stop300lsp270g200/ab45720b22c4f98257a2f100c39d504b/step2_RAW2DIGI_L1Reco_RECO_82_1_pVe.root', 
+        'root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/schoef/MonoJetFullSim_Step0_try7_Step0-stop300lsp270g200-try7/MonoJetFullSim_Step2_try1_Step2-stop300lsp270g200/ab45720b22c4f98257a2f100c39d504b/step2_RAW2DIGI_L1Reco_RECO_83_1_zqO.root', 
+        'root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/schoef/MonoJetFullSim_Step0_try7_Step0-stop300lsp270g200-try7/MonoJetFullSim_Step2_try1_Step2-stop300lsp270g200/ab45720b22c4f98257a2f100c39d504b/step2_RAW2DIGI_L1Reco_RECO_84_1_qlP.root', 
+        'root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/schoef/MonoJetFullSim_Step0_try7_Step0-stop300lsp270g200-try7/MonoJetFullSim_Step2_try1_Step2-stop300lsp270g200/ab45720b22c4f98257a2f100c39d504b/step2_RAW2DIGI_L1Reco_RECO_85_1_cSg.root', 
+        'root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/schoef/MonoJetFullSim_Step0_try7_Step0-stop300lsp270g200-try7/MonoJetFullSim_Step2_try1_Step2-stop300lsp270g200/ab45720b22c4f98257a2f100c39d504b/step2_RAW2DIGI_L1Reco_RECO_86_1_ZXv.root', 
+        'root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/schoef/MonoJetFullSim_Step0_try7_Step0-stop300lsp270g200-try7/MonoJetFullSim_Step2_try1_Step2-stop300lsp270g200/ab45720b22c4f98257a2f100c39d504b/step2_RAW2DIGI_L1Reco_RECO_87_1_EWQ.root', 
+        'root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/schoef/MonoJetFullSim_Step0_try7_Step0-stop300lsp270g200-try7/MonoJetFullSim_Step2_try1_Step2-stop300lsp270g200/ab45720b22c4f98257a2f100c39d504b/step2_RAW2DIGI_L1Reco_RECO_88_1_ljK.root', 
+        'root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/schoef/MonoJetFullSim_Step0_try7_Step0-stop300lsp270g200-try7/MonoJetFullSim_Step2_try1_Step2-stop300lsp270g200/ab45720b22c4f98257a2f100c39d504b/step2_RAW2DIGI_L1Reco_RECO_89_1_ua4.root', 
+        'root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/schoef/MonoJetFullSim_Step0_try7_Step0-stop300lsp270g200-try7/MonoJetFullSim_Step2_try1_Step2-stop300lsp270g200/ab45720b22c4f98257a2f100c39d504b/step2_RAW2DIGI_L1Reco_RECO_8_1_ges.root', 
+        'root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/schoef/MonoJetFullSim_Step0_try7_Step0-stop300lsp270g200-try7/MonoJetFullSim_Step2_try1_Step2-stop300lsp270g200/ab45720b22c4f98257a2f100c39d504b/step2_RAW2DIGI_L1Reco_RECO_90_1_AWX.root', 
+        'root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/schoef/MonoJetFullSim_Step0_try7_Step0-stop300lsp270g200-try7/MonoJetFullSim_Step2_try1_Step2-stop300lsp270g200/ab45720b22c4f98257a2f100c39d504b/step2_RAW2DIGI_L1Reco_RECO_91_1_Mzb.root', 
+        'root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/schoef/MonoJetFullSim_Step0_try7_Step0-stop300lsp270g200-try7/MonoJetFullSim_Step2_try1_Step2-stop300lsp270g200/ab45720b22c4f98257a2f100c39d504b/step2_RAW2DIGI_L1Reco_RECO_92_1_e5f.root', 
+        'root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/schoef/MonoJetFullSim_Step0_try7_Step0-stop300lsp270g200-try7/MonoJetFullSim_Step2_try1_Step2-stop300lsp270g200/ab45720b22c4f98257a2f100c39d504b/step2_RAW2DIGI_L1Reco_RECO_93_1_5CL.root', 
+        'root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/schoef/MonoJetFullSim_Step0_try7_Step0-stop300lsp270g200-try7/MonoJetFullSim_Step2_try1_Step2-stop300lsp270g200/ab45720b22c4f98257a2f100c39d504b/step2_RAW2DIGI_L1Reco_RECO_94_1_mw0.root', 
+        'root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/schoef/MonoJetFullSim_Step0_try7_Step0-stop300lsp270g200-try7/MonoJetFullSim_Step2_try1_Step2-stop300lsp270g200/ab45720b22c4f98257a2f100c39d504b/step2_RAW2DIGI_L1Reco_RECO_95_1_rrW.root', 
+        'root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/schoef/MonoJetFullSim_Step0_try7_Step0-stop300lsp270g200-try7/MonoJetFullSim_Step2_try1_Step2-stop300lsp270g200/ab45720b22c4f98257a2f100c39d504b/step2_RAW2DIGI_L1Reco_RECO_96_1_uFX.root', 
+        'root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/schoef/MonoJetFullSim_Step0_try7_Step0-stop300lsp270g200-try7/MonoJetFullSim_Step2_try1_Step2-stop300lsp270g200/ab45720b22c4f98257a2f100c39d504b/step2_RAW2DIGI_L1Reco_RECO_97_1_pkr.root', 
+        'root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/schoef/MonoJetFullSim_Step0_try7_Step0-stop300lsp270g200-try7/MonoJetFullSim_Step2_try1_Step2-stop300lsp270g200/ab45720b22c4f98257a2f100c39d504b/step2_RAW2DIGI_L1Reco_RECO_98_1_HSp.root', 
+        'root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/schoef/MonoJetFullSim_Step0_try7_Step0-stop300lsp270g200-try7/MonoJetFullSim_Step2_try1_Step2-stop300lsp270g200/ab45720b22c4f98257a2f100c39d504b/step2_RAW2DIGI_L1Reco_RECO_99_1_eBs.root'),
     duplicateCheckMode = cms.untracked.string('noDuplicateCheck')
 )
 process.AK5PFCandMETcorr = cms.EDProducer("PFCandMETcorrInputProducer",
@@ -23934,7 +23983,7 @@ process.selectedPatCandidateSummaryPF = cms.EDAnalyzer("CandidateSummaryTable",
 
 
 process.out = cms.OutputModule("PoolOutputModule",
-    fileName = cms.untracked.string('test.root'),
+    fileName = cms.untracked.string('/data/schoef/monoJetSignals/SUSYTupelizer/FullSim/8TeV-stop300lsp270g200_350_400.root'),
     SelectEvents = cms.untracked.PSet(
         SelectEvents = cms.vstring('p')
     ),
@@ -27205,7 +27254,7 @@ process.looseSoftPFElectronCleanerForwardCuts = cms.PSet(
 )
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(10)
+    input = cms.untracked.int32(-1)
 )
 
 process.mediumSoftPFElectronCleanerBarrelCuts = cms.PSet(

@@ -12,12 +12,12 @@ for path in [os.path.abspath(p) for p in paths]:
   if not path in sys.path:
     sys.path.insert(1, path)
 
-from helpers import getObjFromFile, passPUJetID
+from helpers import getObjFromFile, passPUJetID, htRatio
 simplePUreweightHisto = getObjFromFile('/data/schoef/monoJetStuff/simpPUreweighting.root', "ngoodVertices_Data")
 
 from simplePlotsCommon import *
 from monoJetFuncs import *
-from monoJetEventShapeVars import circularity2D, foxWolframMoments, thrust, htRatio
+from monoJetEventShapeVars import circularity2D, foxWolframMoments, thrust
 
 import xsec
 small = False
@@ -27,7 +27,7 @@ targetLumi = 19375.
 from defaultConvertedTuples import * 
 
 
-allSamples = [data, dy, ttJets, zJetsInv, wJetsToLNu, singleTop, qcd]
+allSamples = [data, dy, ttJets, zJetsInv, wJetsToLNu, singleTop]
 
 allVars=[]
 allStacks=[]
@@ -38,17 +38,17 @@ minimum=10**(-0.5)
 
 chmode = "copy"
 #presel = "refSel"
-presel = "incMu"
+presel = "refSel"
 
 preprefix = "simplePU"
+#preprefix += "-met150"
+#additionalCut = "type1phiMet>150"
 additionalCut = ""
-preprefix += "-met150"
-additionalCut = "type1phiMet>150"
 
 doOnlyMET = True
 subdir = "/pngMJ/"
 
-addData = True
+addData = False
 normalizeToData = False
 
 chainstring = "Events"
@@ -101,8 +101,8 @@ def getStack(varstring, binning, cutstring, signals, varfunc = "", addData=True,
   MC_ZJETSINV.sample           = zJetsInv
   MC_ZJETS                     = variable(varstring, binning, cutstring, additionalCutFunc=additionalCutFunc) 
   MC_ZJETS.sample              = dy
-  MC_QCD                       = variable(varstring, binning, cutstring, additionalCutFunc=additionalCutFunc)
-  MC_QCD.sample                = qcd
+#  MC_QCD                       = variable(varstring, binning, cutstring, additionalCutFunc=additionalCutFunc)
+#  MC_QCD.sample                = qcd
 
   MC_WJETS.legendText          = "W + Jets"
   MC_WJETS.style               = "f0"
@@ -122,14 +122,15 @@ def getStack(varstring, binning, cutstring, signals, varfunc = "", addData=True,
   MC_ZJETSINV.color              = ROOT.kCyan - 8
   MC_ZJETS.legendText          = "DY + Jets"
   MC_ZJETS.style               = "f0"
-  MC_ZJETS.add                 = [MC_QCD]
+  MC_ZJETS.add                 = []
+#  MC_ZJETS.add                 = [MC_QCD]
   MC_ZJETS.color               = ROOT.kGreen + 3
-  MC_QCD.color                 = myBlue
-  MC_QCD.legendText            = "QCD"
-  MC_QCD.style                 = "f0"
-  MC_QCD.add                   = []
+#  MC_QCD.color                 = myBlue
+#  MC_QCD.legendText            = "QCD"
+#  MC_QCD.style                 = "f0"
+#  MC_QCD.add                   = []
 
-  res = [MC_WJETS, MC_TTJETS, MC_STOP, MC_ZJETS, MC_ZJETSINV, MC_QCD]
+  res = [MC_WJETS, MC_TTJETS, MC_STOP,MC_ZJETSINV, MC_ZJETS]
   if onlyW:
     MC_WJETS.add=[]
     res = [MC_WJETS]
@@ -150,8 +151,8 @@ def getStack(varstring, binning, cutstring, signals, varfunc = "", addData=True,
   getLinesForStack(res, targetLumi)
   nhistos = len(res)
   if addData:
-    res[0].dataMCRatio = [DATA, res[0]]
     res.append(DATA)
+    res[0].dataMCRatio = [DATA, res[0]]
   else:
     res[0].dataMCRatio = [res[-3], res[0]]
     res[0].ratioVarName = "SUS/SM" 
@@ -159,14 +160,22 @@ def getStack(varstring, binning, cutstring, signals, varfunc = "", addData=True,
     for var in res:
       var.varfunc = varfunc
   return res
-  
-isrJetPt_stack = getStack(":isrJetPt;p_{T} of ISR jet;Number of Events / 50 GeV",[50,0,2500], commoncf, signals, addData = addData)
-isrJetPt_stack[0].addOverFlowBin = "upper"
-allStacks.append(isrJetPt_stack)
 
-met_stack = getStack(":type1phiMet;#slash{E}_{T} (GeV);Number of Events / 50 GeV",[18,150,1050], commoncf, signals, addData = addData)
-met_stack[0].addOverFlowBin = "upper"
-allStacks.append(met_stack)
+htRatio_stack = getStack(":xxx;H_{T}^{ratio};Number of Events",[40,0,0.6], commoncf, signals, addData = addData, varfunc = lambda c: htRatio(c))
+htRatio_stack[0].addOverFlowBin = "upper"
+allStacks.append(htRatio_stack)
+
+htThrustMetSide_stack = getStack(":xxx;htThrustMetSide;Number of Events",[50,0,1], commoncf, signals, addData = addData, varfunc = lambda c: thrust(c)['htThrustMetSide'])
+htThrustMetSide_stack[0].addOverFlowBin = "upper"
+allStacks.append(htThrustMetSide_stack)
+  
+#isrJetPt_stack = getStack(":isrJetPt;p_{T} of ISR jet;Number of Events / 50 GeV",[50,0,2500], commoncf, signals, addData = addData)
+#isrJetPt_stack[0].addOverFlowBin = "upper"
+#allStacks.append(isrJetPt_stack)
+#
+#met_stack = getStack(":type1phiMet;#slash{E}_{T} (GeV);Number of Events / 50 GeV",[18,150,1050], commoncf, signals, addData = addData)
+#met_stack[0].addOverFlowBin = "upper"
+#allStacks.append(met_stack)
 
 
 if not doOnlyMET:
@@ -436,11 +445,6 @@ else:
       var.normalizeWhat = "" 
   
 for stack in allStacks:
-   stack[-3].normalizeTo = stack[0]
-   stack[-2].normalizeTo = stack[0]
-   stack[-1].normalizeTo = stack[0]
-
-for stack in allStacks:
   if addData:
     stack[0].maximum = 6*10**2 *stack[-1].data_histo.GetMaximum()
   else:
@@ -452,8 +456,10 @@ for stack in allStacks:
   stack[0].lines = [[0.2, 0.9, "#font[22]{CMS Collaboration}"], [0.2,0.85,str(int(round(targetLumi/10.))/100.)+" fb^{-1},  #sqrt{s} = 8 TeV"]]
 
 
-drawNMStacks(1,1,[met_stack],             subdir+prefix+"met", False)
-drawNMStacks(1,1,[isrJetPt_stack],             subdir+prefix+"isrJetPt", False)
+drawNMStacks(1,1,[htRatio_stack],             subdir+prefix+"htRatio", False)
+drawNMStacks(1,1,[htThrustMetSide_stack],             subdir+prefix+"htThrustMetSide", False)
+#drawNMStacks(1,1,[met_stack],             subdir+prefix+"met", False)
+#drawNMStacks(1,1,[isrJetPt_stack],             subdir+prefix+"isrJetPt", False)
 #drawNMStacks(1,1,[softIsolatedMuDz_zoomed_stack],            subdir+prefix+"_zoomed_softIsolatedMuDz", False)
 
 

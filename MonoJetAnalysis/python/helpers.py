@@ -1,5 +1,5 @@
 import ROOT
-from math import pi, sqrt
+from math import pi, sqrt, cos
 
 def getObjFromFile(fname, hname):
   f = ROOT.TFile(fname)
@@ -30,7 +30,7 @@ def getVarValue(c, var, n=0):
     return c.GetLeaf(leaf).GetValue(n)
   else:
     l = c.GetLeaf(var)
-    if l:return l.GetValue()
+    if l:return l.GetValue(n)
     return float('nan')
 
 #def getValue(chain, varname):
@@ -73,3 +73,40 @@ def invMassOfLightObjects(p31, p32):
 def deltaR(l1, l2):
   return sqrt(deltaPhi(l1['phi'], l2['phi'])**2 + (l1['eta'] - l2['eta'])**2)
 
+def getJets(c):
+  njets = int(c.GetLeaf('njetCount').GetValue())
+  jets =[]
+  for i in range(njets):
+    jets.append({'pt':getVarValue(c, 'jetPt', i), 'eta':getVarValue(c, 'jetEta', i), 'phi':getVarValue(c, 'jetPhi', i)})
+  return jets
+
+def calcHTRatio(jets, metPhi):
+  htRatio = -1
+  den=0.
+  num=0.
+  for j in jets:
+    den+=j["pt"]
+    if abs(deltaPhi(metPhi, j["phi"])) <= pi/2:
+      num+=j["pt"]
+  if len(jets)>0:
+    htRatio = num/den
+  return htRatio
+
+def calcHTRatio(jets, metPhi):
+  htRatio = -1
+  den=0.
+  num=0.
+  for j in jets:
+    den+=j["pt"]
+    if abs(deltaPhi(metPhi, j["phi"])) <= pi/2:
+      num+=j["pt"]
+  if len(jets)>0:
+    htRatio = num/den
+  return htRatio
+
+
+def htRatio(c):
+  jets = getJets(c)
+  metPhi = c.GetLeaf('type1phiMetphi').GetValue()
+#  print calcHTRatio(jets, metPhi)
+  return calcHTRatio(jets, metPhi)
