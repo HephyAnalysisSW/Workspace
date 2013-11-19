@@ -94,7 +94,7 @@ chainstring = "empty"
 commoncf = "(0)"
 prefix="empty_"
 if presel == "refSel":
-  commoncf="isrJetPt>110&&isrJetBTBVetoPassed&&softIsolatedMuPt>5&&nHardElectrons+nHardMuons==0&&njet60<=2"
+  commoncf="isrJetPt>110&&isrJetBTBVetoPassed&&softIsolatedMuPt>5&&nHardElectrons==0&&nHardMuons==0&&njet60<=2"
 #  commoncf="njet<=3"
   chainstring = "Events"
 if presel == "inclusive":
@@ -279,6 +279,18 @@ if not doOnlyOne:
   allStacks.append(isrJetPhef_endcap_stack)
 
 
+  nHardMuons_stack = getStack(":nHardMuons;n_{#mu};Number of Events ",[5,0,5], commoncf.replace("&&nHardMuons==0", ""), signals)
+  nHardMuons_stack[0].addOverFlowBin = "upper"
+  allStacks.append(nHardMuons_stack)
+
+  nHardElectrons_stack = getStack(":nHardElectrons;n_{e};Number of Events ",[5,0,5], commoncf.replace("&&nHardElectrons==0", ""), signals)
+  nHardElectrons_stack[0].addOverFlowBin = "upper"
+  allStacks.append(nHardElectrons_stack)
+
+  nHardTaus_stack = getStack(":nHardTaus;n_{#tau};Number of Events ",[5,0,5], commoncf, signals)
+  nHardTaus_stack[0].addOverFlowBin = "upper"
+  allStacks.append(nHardTaus_stack)
+
   njet_stack = getStack(":njet;n_{jet};Number of Events / 50 GeV",[10,0,10], commoncf.replace('&&njet60<=2',''), signals)
   njet_stack[0].addOverFlowBin = "upper"
   allStacks.append(njet_stack)
@@ -397,7 +409,7 @@ for stack in allStacks:
 #  stack[0].legendCoordinates=[0.76,0.95 - 0.3,.98,.95]
 #  stack[0].lines = [[0.2, 0.9, "#font[22]{CMS preliminary}"], [0.2,0.85,str(int(round(targetLumi)))+" pb^{-1},  #sqrt{s} = 7 TeV"]]
   stack[0].legendCoordinates=[0.51,0.95 - 0.08*3 ,.98,.95]
-  stack[0].lines = [[0.2, 0.9, "#font[22]{CMS Collaboration}"], [0.2,0.85,str(int(round(targetLumi/10.))/100.)+" fb^{-1}"],[0.2,0.8,  "sqrt{s} = 8 TeV"]]
+  stack[0].lines = [[0.2, 0.9, "#font[22]{CMS Collaboration}"], [0.2,0.85,str(int(round(targetLumi/10.))/100.)+" fb^{-1}"],[0.2,0.8,  "#sqrt{s} = 8 TeV"]]
 
 
 drawNMStacks(1,1,[isrJetPt_stack],             subdir+prefix+"isrJetPt", False)
@@ -440,6 +452,9 @@ if not doOnlyOne:
 
 
   drawNMStacks(1,1,[softIsolatedMuPt_stack],             subdir+prefix+"softIsolatedMuPt", False)
+  drawNMStacks(1,1,[nHardMuons_stack],             subdir+prefix+"nHardMuons", False)
+  drawNMStacks(1,1,[nHardElectrons_stack],             subdir+prefix+"nHardElectrons", False)
+  drawNMStacks(1,1,[nHardTaus_stack],             subdir+prefix+"nHardTaus", False)
   drawNMStacks(1,1,[njet_stack],             subdir+prefix+"njet", False)
   drawNMStacks(1,1,[njet60_stack],             subdir+prefix+"njet60", False)
   drawNMStacks(1,1,[type1phiMet_stack],             subdir+prefix+"type1phiMet", False)

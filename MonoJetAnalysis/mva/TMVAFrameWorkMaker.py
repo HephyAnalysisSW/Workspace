@@ -10,13 +10,13 @@ from nnAnalysisHelpers import getEList, constructDataset, setupMVAFrameWork
 from xsec import xsec
 from xsecSMS import gluino8TeV_NLONLL, gluino14TeV_NLO
 import copy, sys
-from defaultConvertedTuples import stop300lsp270, stop200lsp170g100, stop300lsp240g150
+from defaultConvertedTuples import stop300lsp270FastSim, stop200lsp170g100FastSim, stop300lsp240g150FastSim
 from defaultConvertedTuples import wJetsToLNu
 from monoJetFuncs import softIsolatedMT
 from helpers import htRatio 
 #RA4
 
-signalModel = stop300lsp270
+signalModel = stop300lsp270FastSim
 backgrounds = [wJetsToLNu]
 
 colors = [ROOT.kBlue, ROOT.kRed, ROOT.kGreen, ROOT.kOrange, ROOT.kMagenta]
@@ -58,11 +58,9 @@ CutRangeMax['type1phiMet']='500'
 CutRangeMax['isrJetPt']='1000.'
 CutRangeMax['htRatio']='1.'
 
-
-
-addNeurons = [2,1]
+addNeurons = [2,2]
 nCycles=1000
-
+reversed = False
 nCuts = -1
 maxDepth = 2
 nTrees = 400
@@ -70,7 +68,9 @@ nTrees = 400
 #  for nCycles in [1000]:
 #  for nCycles in [20000]:
 #    prepreprefix = 'MonoJet_MLP'+''.join([str(x) for x in addNeurons])+'_'+signalModel['name']+'_refsel_Norm_UseRegulator_ConvergenceTests'+str(convTest)+'_ConvImpr1e-6_'+str(nCycles)+'_sigmoid_BP_S1_SE1_'
-prepreprefix = 'MonoJet_BDTvsMLP_'+signalModel['name']+'_refsel_None_'
+prepreprefix = 'MonoJet_BDTvsMLP_RudiTest_'+signalModel['name']+'_refsel_'
+if reversed:
+  prepreprefix+="reversed_"
 if True:
 #    prepreprefix = 'MonoJet_BDT_nTreeComparison_nCuts'+str(nCuts)+'_maxDepth'+str(maxDepth)+'_'+signalModel['name']+'_refsel_None_'
 #    prepreprefix = 'MonoJet_BDT_maxDepthComparison_nCuts'+str(nCuts)+'_nTrees'+str(nTrees)+'_'+signalModel['name']+'_refsel_None_'
@@ -80,7 +80,8 @@ if True:
        
       preprefix = prepreprefix
 
-      setup['mvaInputVars'] = ["softIsolatedMT", "type1phiMet", 'deltaPhi', 'isrJetPt', 'htRatio']
+#      setup['mvaInputVars'] = ["softIsolatedMT", "type1phiMet", 'deltaPhi', 'isrJetPt', 'htRatio']
+      setup['mvaInputVars'] = ["softIsolatedMT", "type1phiMet", 'deltaPhi']
       prefix = '_'.join(setup['mvaInputVars'])
       prefix = preprefix+prefix
 
@@ -101,6 +102,9 @@ if True:
       for bkg in backgrounds:
         for b in bkg['bins']:
           background.Add(bkg['dirname']+'/'+b+'/*.root')
+
+      if reversed:
+        background, signal = signal, background
 
       setup['preselection'] = 'isrJetPt>110&&isrJetBTBVetoPassed&&softIsolatedMuPt>5&&nHardElectrons+nHardMuons==0&&njet60<=2&&type1phiMet>150'
       setup['varsFromInputSignal'] = [] #model parameters to be stored in MVA data file

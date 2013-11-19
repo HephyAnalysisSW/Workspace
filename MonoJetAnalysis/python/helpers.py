@@ -12,6 +12,7 @@ def getObjFromFile(fname, hname):
   f.Close()
   return res
 
+
 def passPUJetID(flag, level="Tight"): #Medium, #Loose,  kTight  = 0,   kMedium = 1,   kLoose  = 2
   if type(level)==type(0):
     return ( flag & (1 << level) ) != 0
