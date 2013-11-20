@@ -36,7 +36,7 @@ setup['makeCorrelationScatterPlots'] = False
 setup['plotMVAEffs'] = False #needs active X-forwarding since a QT Object is involved
 setup['datasetFactoryOptions'] = ["nTrain_Signal=0", "nTrain_Background=0","SplitMode=Random","SplitSeed=100","NormMode=None","!V"]
 setup['fomPlotZoomCoordinates'] = [0, 0.95, 0.2, 1.0]
-convTest=15
+convTest=6
 
 
 VarProp={}
@@ -59,7 +59,7 @@ CutRangeMax['isrJetPt']='1000.'
 CutRangeMax['htRatio']='1.'
 
 addNeurons = [2,2]
-nCycles=1000
+nCycles=100
 reversed = False
 nCuts = -1
 maxDepth = 2
@@ -68,8 +68,9 @@ nTrees = 400
 #  for nCycles in [1000]:
 #  for nCycles in [20000]:
 #    prepreprefix = 'MonoJet_MLP'+''.join([str(x) for x in addNeurons])+'_'+signalModel['name']+'_refsel_Norm_UseRegulator_ConvergenceTests'+str(convTest)+'_ConvImpr1e-6_'+str(nCycles)+'_sigmoid_BP_S1_SE1_'
-for sigScale in [10, 20, 50, 80, 100, 200]:
-  prepreprefix = 'MonoJet_BDTvsMLP_RudiTest_'+signalModel['name']+'_sigScale'+str(sigScale)+'_'
+#for sigScale in [10, 20, 50, 80, 100, 200]:
+for convTest in [1,6,10,20, 100]:
+  prepreprefix = 'MonoJet_BDTvsMLP_RudiTest_'+signalModel['name']+'_convTest'+str(convTest)+'_'
   if reversed:
     prepreprefix+="reversed_"
 #    prepreprefix = 'MonoJet_BDT_nTreeComparison_nCuts'+str(nCuts)+'_maxDepth'+str(maxDepth)+'_'+signalModel['name']+'_refsel_None_'
@@ -154,7 +155,7 @@ for sigScale in [10, 20, 50, 80, 100, 200]:
                                 'TrainingMethod=BP', 'BPMode=sequential', 'LearningRate=0.02', 'DecayRate=0.01', 
 #                                  'Sampling=0.3','SamplingEpoch=0.8', 
                                 'Sampling=1.','SamplingEpoch=1.', 
-                                'ConvergenceTests='+str(convTest),'ConvergenceImprove=1e-6', 'TestRate=10',
+                                'ConvergenceTests='+str(convTest),'ConvergenceImprove=1e-6', 'TestRate=1',
                                 'UseRegulator=False' )
 
     methodBDT['type']=ROOT.TMVA.Types.kBDT
