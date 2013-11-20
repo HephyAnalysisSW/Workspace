@@ -30,6 +30,7 @@ if len(sys.argv)>=3:
   #steerable
   exec("allSamples = [" + ",".join(sampinp) + "]")
 
+
 small  = False
 overwrite = True
 target_lumi = 19375 #pb-1
@@ -198,7 +199,7 @@ def findSec(x,lp):
 ##################################################################################
 storeVectors = True
 commoncf = ""
-if chmode=="copy":
+if chmode=="copy" or chmode=="copyMuDzID":
   commoncf = "type1phiMet>150"
 if chmode == "copyInc":
   commoncf = "(1)"
@@ -321,7 +322,7 @@ for isample, sample in enumerate(allSamples):
   if os.path.isfile(ofile) and not overwrite:
     print ofile, "already there! Skipping!!!"
     continue
-  
+  chain_gDir = ROOT.gDirectory.func() 
   t = ROOT.TTree( "Events", "Events", 1 )
   t.Branch("event",   ROOT.AddressOf(s,"event"), 'event/l')
   for var in variables:
@@ -480,7 +481,7 @@ for isample, sample in enumerate(allSamples):
             if chmode.count("CleanedWithAllLeptons"):
               jetResult = getGoodJets(c, allGoodMuons + allGoodElectrons)
             else:
-              jetResult = getGoodJets(c, hardMuons + hardElectrons)
+              jetResult = getGoodJets(c, hardMuonsRelIso02 + hardElectrons)
             s.ht = jetResult["ht"]
             s.nbtags  = jetResult["nbtags"]
             s.njet    = len(jetResult["jets"])
@@ -578,15 +579,16 @@ for isample, sample in enumerate(allSamples):
                 s.taEta[i] = allGoodTaus[i]['eta']
                 s.taPhi[i] = allGoodTaus[i]['phi']
                 s.taPdg[i] = allGoodTaus[i]['pdg']
-              
+          tmpDir = ROOT.gDirectory.func()
+          chain_gDir.cd()
           t.Fill()
+          tmpDir.cd()
       del elist
     else:
       print "Zero entries in", bin, sample["name"]
     del c
   if True or not small: #FIXME
     f = ROOT.TFile(ofile, "recreate")
-    f.cd()
     t.Write()
     f.Close()
     print "Written",ofile

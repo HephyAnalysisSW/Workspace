@@ -68,113 +68,113 @@ nTrees = 400
 #  for nCycles in [1000]:
 #  for nCycles in [20000]:
 #    prepreprefix = 'MonoJet_MLP'+''.join([str(x) for x in addNeurons])+'_'+signalModel['name']+'_refsel_Norm_UseRegulator_ConvergenceTests'+str(convTest)+'_ConvImpr1e-6_'+str(nCycles)+'_sigmoid_BP_S1_SE1_'
-prepreprefix = 'MonoJet_BDTvsMLP_RudiTest_'+signalModel['name']+'_refsel_'
-if reversed:
-  prepreprefix+="reversed_"
-if True:
+for sigScale in [10, 20, 50, 80, 100, 200]:
+  prepreprefix = 'MonoJet_BDTvsMLP_RudiTest_'+signalModel['name']+'_sigScale'+str(sigScale)+'_'
+  if reversed:
+    prepreprefix+="reversed_"
 #    prepreprefix = 'MonoJet_BDT_nTreeComparison_nCuts'+str(nCuts)+'_maxDepth'+str(maxDepth)+'_'+signalModel['name']+'_refsel_None_'
 #    prepreprefix = 'MonoJet_BDT_maxDepthComparison_nCuts'+str(nCuts)+'_nTrees'+str(nTrees)+'_'+signalModel['name']+'_refsel_None_'
 #    prepreprefix = 'MonoJet_BDT_nEventsMinComparison_maxDepth'+str(maxDepth)+'_nCuts'+str(nCuts)+'_nTrees'+str(nTrees)+'_'+signalModel['name']+'_refsel_None_'
 
-    def setupMVAForModelPoint(signalModel):
-       
-      preprefix = prepreprefix
+  def setupMVAForModelPoint(signalModel):
+     
+    preprefix = prepreprefix
 
 #      setup['mvaInputVars'] = ["softIsolatedMT", "type1phiMet", 'deltaPhi', 'isrJetPt', 'htRatio']
-      setup['mvaInputVars'] = ["softIsolatedMT", "type1phiMet", 'deltaPhi']
-      prefix = '_'.join(setup['mvaInputVars'])
-      prefix = preprefix+prefix
+    setup['mvaInputVars'] = ["softIsolatedMT", "type1phiMet", 'deltaPhi']
+    prefix = '_'.join(setup['mvaInputVars'])
+    prefix = preprefix+prefix
 
-      setup['dataFile'] = '/data/'+nfsUser+'/MonoJetNNAnalysis/datasets/'+prefix+'.root'
-      setup['outputFile'] =     '/data/'+nfsUser+'/MonoJetNNAnalysis/MVA_Analyzer/'+prefix+'.root'
-      setup['weightDir'] ='/data/'+nfsUser+'/MonoJetNNAnalysis/MVA_Analyzer/'+prefix+'/'
+    setup['dataFile'] = '/data/'+nfsUser+'/MonoJetNNAnalysis/datasets/'+prefix+'.root'
+    setup['outputFile'] =     '/data/'+nfsUser+'/MonoJetNNAnalysis/MVA_Analyzer/'+prefix+'.root'
+    setup['weightDir'] ='/data/'+nfsUser+'/MonoJetNNAnalysis/MVA_Analyzer/'+prefix+'/'
 
-      if (not overWriteData and ( os.path.isfile(setup['dataFile']))) and (not overWriteTMVAFrameWork and os.path.isfile(setup['outputFile'])):
-        return
-      
-      signal      = ROOT.TChain('Events')
-      for b in signalModel['bins']:
-        fstring  = signalModel['dirname']+'/'+b+'/*.root'
-        signal.Add(fstring)
-        entries = signal.GetEntries()
-        print "Added bin ",b,"to signal, now,",entries,"entries"
-      background  = ROOT.TChain('Events')
-      for bkg in backgrounds:
-        for b in bkg['bins']:
-          background.Add(bkg['dirname']+'/'+b+'/*.root')
+    if (not overWriteData and ( os.path.isfile(setup['dataFile']))) and (not overWriteTMVAFrameWork and os.path.isfile(setup['outputFile'])):
+      return
+    
+    signal      = ROOT.TChain('Events')
+    for b in signalModel['bins']:
+      fstring  = signalModel['dirname']+'/'+b+'/*.root'
+      signal.Add(fstring)
+      entries = signal.GetEntries()
+      print "Added bin ",b,"to signal, now,",entries,"entries"
+    background  = ROOT.TChain('Events')
+    for bkg in backgrounds:
+      for b in bkg['bins']:
+        background.Add(bkg['dirname']+'/'+b+'/*.root')
 
-      if reversed:
-        background, signal = signal, background
+    if reversed:
+      background, signal = signal, background
 
-      setup['preselection'] = 'isrJetPt>110&&isrJetBTBVetoPassed&&softIsolatedMuPt>5&&nHardElectrons+nHardMuons==0&&njet60<=2&&type1phiMet>150'
-      setup['varsFromInputSignal'] = [] #model parameters to be stored in MVA data file
-      setup["sigMVAWeightFac"] = background.GetEntries(setup['preselection'])/float(signal.GetEntries(setup['preselection']))
-      setup["bkgMVAWeightFac"] = 1.
-      setup['weightForMVA'] = {'weight':1., 'sigFac':1, 'bkgFac':1}
-      #If changing between met and type1phiMet the formula for deltaPhi (if used) has to be changed!
-      setup['varsFromInputData'] = ['type1phiMet', 'isrJetPt', 'isrJetBTBVetoPassed', 'softIsolatedMuPt', 'nHardElectrons', 'nHardMuons', 'njet60/I', 'weight', 'isrJetPt']
-      from monoJetFuncs import cosDeltaPhiLepW, softIsolatedMT
-      from math import acos
-      setup['varsCalculated'] = [\
-                      ['softIsolatedMT', softIsolatedMT],
-                      ['deltaPhi', lambda c:acos(cosDeltaPhiLepW(c))],
-                      ['softIsolatedMuCharge/I', lambda c:-c.GetLeaf('softIsolatedMuPdg').GetValue()/abs(c.GetLeaf('softIsolatedMuPdg').GetValue())],
-                      ['htRatio', htRatio]
-        ]
-      print "Scaling signal weights by ", setup["sigMVAWeightFac"],'using weight', setup['weightForMVA']
+    setup['preselection'] = 'isrJetPt>110&&isrJetBTBVetoPassed&&softIsolatedMuPt>5&&nHardElectrons+nHardMuons==0&&njet60<=2&&type1phiMet>150'
+    setup['varsFromInputSignal'] = [] #model parameters to be stored in MVA data file
+    setup["sigMVAWeightFac"] = background.GetEntries(setup['preselection'])/float(signal.GetEntries(setup['preselection']))
+    setup["bkgMVAWeightFac"] = 1.
+    setup['weightForMVA'] = {'weight':1., 'sigFac':float(sigScale)/100., 'bkgFac':1}
+    #If changing between met and type1phiMet the formula for deltaPhi (if used) has to be changed!
+    setup['varsFromInputData'] = ['type1phiMet', 'isrJetPt', 'isrJetBTBVetoPassed', 'softIsolatedMuPt', 'nHardElectrons', 'nHardMuons', 'njet60/I', 'weight', 'isrJetPt']
+    from monoJetFuncs import cosDeltaPhiLepW, softIsolatedMT
+    from math import acos
+    setup['varsCalculated'] = [\
+                    ['softIsolatedMT', softIsolatedMT],
+                    ['deltaPhi', lambda c:acos(cosDeltaPhiLepW(c))],
+                    ['softIsolatedMuCharge/I', lambda c:-c.GetLeaf('softIsolatedMuPdg').GetValue()/abs(c.GetLeaf('softIsolatedMuPdg').GetValue())],
+                    ['htRatio', htRatio]
+      ]
+    print "Scaling signal weights by ", setup["sigMVAWeightFac"],'using weight', setup['weightForMVA']
 
 
 #      setup['fom_plot_vars'] = [['softIsolatedMT', [0,1000] , ROOT.kGreen], ['type1phiMet', [0,1000] , ROOT.kMagenta], ['deltaPhi', [0,1000] , ROOT.kBlue]]
-      setup['fom_plot_vars'] = []
+    setup['fom_plot_vars'] = []
 
 
-      setup['plotDir']    = '/afs/hephy.at/user/'+afsUser[0]+'/'+afsUser+'/www/'+localPlotDir
-      setup['plotSubDir'] = prefix
-      data = constructDataset(setup, signal, background, overWriteData)
+    setup['plotDir']    = '/afs/hephy.at/user/'+afsUser[0]+'/'+afsUser+'/www/'+localPlotDir
+    setup['plotSubDir'] = prefix
+    data = constructDataset(setup, signal, background, overWriteData)
 
-      methodCutOpt['type']=ROOT.TMVA.Types.kCuts
-      methodCutOpt['name']='myCut'
-      methodCutOpt['lineColor']=ROOT.kRed
-      methodCutOpt['niceName']='cutOptimized'
-      methodCutOpt['options'] =('!H','V','VarTransform=None','CreateMVAPdfs=False','FitMethod=SA','EffMethod=EffSel','VarProp=NotEnforced','CutRangeMin[0]=-1','CutRangeMax[0]=-1')
-      methodCutOpt['options']+=tuple(["CutRangeMin["+str(i)+"]="+CutRangeMin[v]  for i,v in enumerate(setup['mvaInputVars'])])
-      methodCutOpt['options']+=tuple(["CutRangeMax["+str(i)+"]="+CutRangeMax[v]  for i,v in enumerate(setup['mvaInputVars'])])
-      methodCutOpt['options']+=tuple(["VarProp["+str(i)+"]="+VarProp[v]  for i,v in enumerate(setup['mvaInputVars'])])
+    methodCutOpt['type']=ROOT.TMVA.Types.kCuts
+    methodCutOpt['name']='myCut'
+    methodCutOpt['lineColor']=ROOT.kRed
+    methodCutOpt['niceName']='cutOptimized'
+    methodCutOpt['options'] =('!H','V','VarTransform=None','CreateMVAPdfs=False','FitMethod=SA','EffMethod=EffSel','VarProp=NotEnforced','CutRangeMin[0]=-1','CutRangeMax[0]=-1')
+    methodCutOpt['options']+=tuple(["CutRangeMin["+str(i)+"]="+CutRangeMin[v]  for i,v in enumerate(setup['mvaInputVars'])])
+    methodCutOpt['options']+=tuple(["CutRangeMax["+str(i)+"]="+CutRangeMax[v]  for i,v in enumerate(setup['mvaInputVars'])])
+    methodCutOpt['options']+=tuple(["VarProp["+str(i)+"]="+VarProp[v]  for i,v in enumerate(setup['mvaInputVars'])])
 
-      nn_layers = [len(setup['mvaInputVars'])+ i for i in addNeurons]
-      hiddenLayers = ','.join([str(i) for i in nn_layers ])
-      methodMLP['type']=ROOT.TMVA.Types.kMLP
-      methodMLP['name']='MLP'+"".join([str(x) for x in addNeurons])+"_nCyc"+str(nCycles)
-      methodMLP['lineColor']=ROOT.kBlack
-      methodMLP['drawStatUncertainty'] = True
-      methodMLP['drawInParallelCoord'] = True
-      methodMLP['niceName'] = "MLP_{"+",".join([str(i) for i in addNeurons])+"}"
+    nn_layers = [len(setup['mvaInputVars'])+ i for i in addNeurons]
+    hiddenLayers = ','.join([str(i) for i in nn_layers ])
+    methodMLP['type']=ROOT.TMVA.Types.kMLP
+    methodMLP['name']='MLP'+"".join([str(x) for x in addNeurons])+"_nCyc"+str(nCycles)
+    methodMLP['lineColor']=ROOT.kBlack
+    methodMLP['drawStatUncertainty'] = True
+    methodMLP['drawInParallelCoord'] = True
+    methodMLP['niceName'] = "MLP_{"+",".join([str(i) for i in addNeurons])+"}"
 
-      methodMLP['options']    = ('!H','V','VarTransform=Norm','NeuronType=sigmoid', 'HiddenLayers='+hiddenLayers, 'NCycles='+str(nCycles), 'CreateMVAPdfs=True', 'EpochMonitoring=True', \
-                                  'TrainingMethod=BP', 'BPMode=sequential', 'LearningRate=0.02', 'DecayRate=0.01', 
+    methodMLP['options']    = ('!H','V','VarTransform=Norm','NeuronType=sigmoid', 'HiddenLayers='+hiddenLayers, 'NCycles='+str(nCycles), 'CreateMVAPdfs=True', 'EpochMonitoring=True', \
+                                'TrainingMethod=BP', 'BPMode=sequential', 'LearningRate=0.02', 'DecayRate=0.01', 
 #                                  'Sampling=0.3','SamplingEpoch=0.8', 
-                                  'Sampling=1.','SamplingEpoch=1.', 
-                                  'ConvergenceTests='+str(convTest),'ConvergenceImprove=1e-6', 'TestRate=10',
-                                  'UseRegulator=False' )
+                                'Sampling=1.','SamplingEpoch=1.', 
+                                'ConvergenceTests='+str(convTest),'ConvergenceImprove=1e-6', 'TestRate=10',
+                                'UseRegulator=False' )
 
-      methodBDT['type']=ROOT.TMVA.Types.kBDT
-      methodBDT['name']='BDT_nTrees'+str(nTrees)
-      methodBDT['lineColor']=colors[i]
-      methodBDT['niceName']=methodBDT['name']
-      methodBDT['options'] =('!H','V','VarTransform=None', 'CreateMVAPdfs=True', 'BoostType=AdaBoost',\
-                             'NTrees='+str(nTrees), 
+    methodBDT['type']=ROOT.TMVA.Types.kBDT
+    methodBDT['name']='BDT_nTrees'+str(nTrees)
+    methodBDT['lineColor']=colors[i]
+    methodBDT['niceName']=methodBDT['name']
+    methodBDT['options'] =('!H','V','VarTransform=None', 'CreateMVAPdfs=True', 'BoostType=AdaBoost',\
+                           'NTrees='+str(nTrees), 
 #                             'nEventsMin=400', 
 #                               'MinNodeSize='+str(mNS),
 #                               'nEventsMin='+str(mNS),
-                             'MaxDepth='+str(maxDepth),
-                             'SeparationType=GiniIndex',
-                             'nCuts='+str(nCuts),
-                             'PruneMethod=NoPruning',
-                             'AdaBoostBeta=0.5',
-                             'UseRandomisedTrees=True'
-      )
+                           'MaxDepth='+str(maxDepth),
+                           'SeparationType=GiniIndex',
+                           'nCuts='+str(nCuts),
+                           'PruneMethod=NoPruning',
+                           'AdaBoostBeta=0.5',
+                           'UseRandomisedTrees=True'
+    )
 
-      allMethods = [methodMLP, methodBDT]
+    allMethods = [methodMLP, methodBDT]
 
 #     NN_book_options_list.append("!H:!V:NTrees=400:nEventsMin=400:MaxDepth=3:BoostType=AdaBoost:SeparationType=GiniIndex:nCuts=20:PruneMethod=NoPruning")
 #     https://svnweb.cern.ch/cern/wsvn/UGentSUSY/trunk/User/Sigamani/babyReaderSTOPS/runBDT/makeconfigs.py
@@ -233,15 +233,15 @@ if True:
 #        allMethods.append(copy.deepcopy(methodBDT))
 #
 
-      setup["methodConfigs"] = copy.deepcopy(allMethods)
-      if not os.path.isdir(setup['weightDir']) or overWriteTMVAFrameWork:
-        setupMVAFrameWork(setup, data, allMethods, prefix)
+    setup["methodConfigs"] = copy.deepcopy(allMethods)
+    if not os.path.isdir(setup['weightDir']) or overWriteTMVAFrameWork:
+      setupMVAFrameWork(setup, data, allMethods, prefix)
 
-      for o in data.values():
-       if o:
-         o.IsA().Destructor(o)
-      del data
+    for o in data.values():
+     if o:
+       o.IsA().Destructor(o)
+    del data
 
 
-    setupMVAForModelPoint(signalModel)
+  setupMVAForModelPoint(signalModel)
 
