@@ -31,7 +31,7 @@ if len(sys.argv)>=3:
   exec("allSamples = [" + ",".join(sampinp) + "]")
 
 
-small  = False
+small  = True
 overwrite = True
 target_lumi = 19375 #pb-1
 
@@ -45,18 +45,13 @@ def goodMuID(c, imu ):
   # POG MU Tight
   #  return getVarValue(c, 'muonsPt', imu)>20. and getVarValue(c, 'muonsisPF', imu) and getVarValue(c, 'muonsisGlobal', imu) and abs(getVarValue(c, 'muonsEta', imu)) < 2.4  and getVarValue(c, 'muonsPFRelIso', imu)<0.20 and getVarValue(c, 'muonsNormChi2', imu)<10. and getVarValue(c, 'muonsNValMuonHits', imu)>0 and getVarValue(c, 'muonsNumMatchedStadions', imu) > 1 and getVarValue(c, 'muonsPixelHits', imu) > 0 and getVarValue(c, 'muonsNumtrackerLayerWithMeasurement', imu) > 5 and getVarValue(c, 'muonsDxy', imu) < 0.2 and getVarValue(c, 'muonsDz', imu) < 0.5 
   # POG MU Loose
-  isPF = getVarValue(c, 'muonsisPF', imu) 
+  isPF = getVarValue(c, 'muonsisPF', imu)
   isGlobal = getVarValue(c, 'muonsisGlobal', imu)
   isTracker = getVarValue(c, 'muonsisTracker', imu)
   pt = getVarValue(c, 'muonsPt', imu)
-  relIso = getVarValue(c, 'muonsPFRelIso', imu)
-  dz = getVarValue(c, 'muonsDz', imu)
-  eta = getVarValue(c, 'muonsEta', imu)
-  phi = getVarValue(c, 'muonsPhi', imu)
-  requireDz = (chmode.lower().count('mudzid')>0)
-#  print "equdz", requireDz
-  if isPF and (isGlobal or isTracker) and ((pt>5 and pt<20 and pt*relIso<10) or (pt>=20 and relIso<0.5)) and ((not requireDz) or abs(dz)<0.2) : 
-    return {'Pt':pt, 'IsGlobal':isGlobal, 'IsTracker':isTracker, 'IsPF':isPF, 'RelIso':relIso, 'Dz':dz, 'eta':eta, 'phi':phi} 
+  if isPF and (isGlobal or isTracker) and pt>5.:
+    return {'pt':pt, 'phi':getVarValue(c, 'muonsPhi', imu), 'eta':getVarValue(c, 'muonsEta', imu), 'IsGlobal':isGlobal, 'IsTracker':isTracker, 'IsPF':isPF, 'relIso':getVarValue(c, 'muonsRelIso', imu)} 
+
 
 # -------------------------------------------
 
@@ -94,13 +89,13 @@ def getAllMuons(c, nmuons ):
   for i in range(0, int(nmuons)):
     cand = goodMuID(c, i)
     if cand:
-      for v in ['Pdg', 'Dxy', 'NormChi2', 'NValMuonHits', 'NumMatchedStations', 'PixelHits', 'NumtrackerLayerWithMeasurement']:
+      for v in ['Pdg', 'Dxy', 'Dz', 'NormChi2', 'NValMuonHits', 'NumMatchedStations', 'PixelHits', 'NumtrackerLayerWithMeasurement']:
         cand[v] = getVarValue(c, 'muons'+v, i)
       res.append(cand)
 #      res.append({'pt':getVarValue(c, 'muonsPt', i),'eta':getVarValue(c, 'muonsEta', i), 'phi':getVarValue(c, 'muonsPhi', i),\
 #      'pdg':getVarValue(c, 'muonsPdg', i), 'relIso':getVarValue(c, 'muonsPFRelIso', i),\
 #      'dxy':getVarValue(c, 'muonsDxy', i), 'dz':getVarValue(c, 'muonsDz', i)})
-  res = sorted(res, key=lambda k: -k['Pt'])
+  res = sorted(res, key=lambda k: -k['pt'])
   return res
 
 def getAllElectrons(c, neles ):
@@ -276,7 +271,7 @@ for isample, sample in enumerate(allSamples):
     variables.extend(["nTrueGenVertices", "genmet", "genmetphi", "puWeight", "puWeightSysPlus", "puWeightSysMinus"])
   
   jetvars = ["jetPt", "jetEta", "jetPhi", "jetPdg", "jetBtag", "jetCutBasedPUJetIDFlag","jetFull53XPUJetIDFlag","jetMET53XPUJetIDFlag", "jetChef", "jetNhef", "jetCeef", "jetNeef", "jetHFhef", "jetHFeef", "jetMuef", "jetElef", "jetPhef"]
-  muvars = ["muPt", "muEta", "muPhi", "muPdg", "muRelIso", "muDxy", "muDz", "muNormChi2", "muNValMuonHits", "muNumMatchedStations", "muPixelHits", "muNumtrackerLayerWithMeasurement"]
+  muvars = ["muPt", "muEta", "muPhi", "muPdg", "muRelIso", "muDxy", "muDz", "muNormChi2", "muNValMuonHits", "muNumMatchedStations", "muPixelHits", "muNumtrackerLayerWithMeasurement", 'muIsGlobal', 'muIsTracker']
   elvars = ["elPt", "elEta", "elPhi", "elPdg", "elRelIso", "elDxy", "elDz"]
   tavars = ["taPt", "taEta", "taPhi", "taPdg"]
   if not sample['name'].lower().count('data'):
@@ -285,7 +280,7 @@ for isample, sample in enumerate(allSamples):
   extraVariables=["nbtags", "ht", "nSoftIsolatedMuons", "nHardMuons", "nHardMuonsRelIso02", "nSoftElectrons", "nHardElectrons", "nSoftTaus", "nHardTaus"]
   extraVariables += ["isrJetPt", "isrJetEta", "isrJetPhi", "isrJetPdg", "isrJetBtag", "isrJetChef", "isrJetNhef", "isrJetCeef", "isrJetNeef", "isrJetHFhef", "isrJetHFeef", "isrJetMuef", "isrJetElef", "isrJetPhef", "isrJetCutBasedPUJetIDFlag", "isrJetFull53XPUJetIDFlag", "isrJetMET53XPUJetIDFlag", "isrJetBTBVetoPassed"]
 
-  extraVariables += ["softIsolatedMuPt", "softIsolatedMuEta", "softIsolatedMuPhi", "softIsolatedMuPdg", "softIsolatedMuRelIso", "softIsolatedMuDxy", "softIsolatedMuDz",  'softIsolatedMuNormChi2', 'softIsolatedMuNValMuonHits', 'softIsolatedMuNumMatchedStations', 'softIsolatedMuPixelHits', 'softIsolatedMuNumtrackerLayerWithMeasurement']
+  extraVariables += ["softIsolatedMuPt", "softIsolatedMuEta", "softIsolatedMuPhi", "softIsolatedMuPdg", "softIsolatedMuRelIso", "softIsolatedMuDxy", "softIsolatedMuDz",  'softIsolatedMuNormChi2', 'softIsolatedMuNValMuonHits', 'softIsolatedMuNumMatchedStations', 'softIsolatedMuPixelHits', 'softIsolatedMuNumtrackerLayerWithMeasurement', 'softIsolatedMuIsTracker', 'softIsolatedMuIsGlobal']
 
   structString = "struct MyStruct_"+str(nc)+"_"+str(isample)+"{ULong64_t event;"
   for var in variables:
@@ -462,16 +457,19 @@ for isample, sample in enumerate(allSamples):
             allGoodElectrons = getAllElectrons(c, neles)
             allGoodTaus = getAllTaus(c, ntaus)
 
-            softMuons, hardMuons         = splitListOfObjects('Pt', 20, allGoodMuons)
+            softMuons, hardMuons         = splitListOfObjects('pt', 20, allGoodMuons)
             softElectrons, hardElectrons = splitListOfObjects('pt', 20, allGoodElectrons)
             softTaus, hardTaus           = splitListOfObjects('pt', 20, allGoodTaus)
             
-            hardMuonsRelIso02 = filter(lambda m:m['RelIso']<0.2, hardMuons)
+            hardMuonsRelIso02 = filter(lambda m:m['relIso']<0.2, hardMuons)
 #            softMuons = sorted(softMuons, key=lambda k: -k['pt'])
 #            s.nSoftMuons = len(softMuons)
-#            softIsolatedMuons = filter(lambda m:m['relIso']*m['pt']<5.0, softMuons)
-             
-            s.nSoftIsolatedMuons = len(softMuons)
+            softIsolatedMuons = filter(lambda m:m['relIso']*m['pt']<10.0, softMuons)
+            if chmode.lower().count('mudzid'):
+              softIsolatedMuons = filter(lambda m:m['Dz']<0.2, softIsolatedMuons)
+  
+ 
+            s.nSoftIsolatedMuons = len(softIsolatedMuons)
             s.nHardMuons = len(hardMuons)
             s.nHardMuonsRelIso02 = len(hardMuonsRelIso02)
             s.nSoftElectrons = len(softElectrons)
@@ -510,19 +508,21 @@ for isample, sample in enumerate(allSamples):
               recoilJets = filter(lambda j:j['pt']>60 and deltaPhi(j['phi'], leadingJet['phi']) >=2.5, jetResult['jets'][1:])
               s.isrJetBTBVetoPassed = (len(recoilJets)==0)
             
-            if len(softMuons)>=1:
-              s.softIsolatedMuPt                             = softMuons[0]['Pt']
-              s.softIsolatedMuEta                            = softMuons[0]['eta']
-              s.softIsolatedMuPhi                            = softMuons[0]['phi']
-              s.softIsolatedMuPdg                            = softMuons[0]['Pdg']
-              s.softIsolatedMuRelIso                         = softMuons[0]['RelIso']
-              s.softIsolatedMuDxy                            = softMuons[0]['Dxy']
-              s.softIsolatedMuDz                             = softMuons[0]['Dz']
-              s.softIsolatedMuNormChi2                       = softMuons[0]['NormChi2']
-              s.softIsolatedMuNValMuonHits                   = softMuons[0]['NValMuonHits']
-              s.softIsolatedMuNumMatchedStations             = softMuons[0]['NumMatchedStations']
-              s.softIsolatedMuPixelHits                      = softMuons[0]['PixelHits']
-              s.softIsolatedMuNumtrackerLayerWithMeasurement = softMuons[0]['NumtrackerLayerWithMeasurement']
+            if len(softIsolatedMuons)>=1:
+              s.softIsolatedMuPt                             = softIsolatedMuons[0]['pt']
+              s.softIsolatedMuEta                            = softIsolatedMuons[0]['eta']
+              s.softIsolatedMuPhi                            = softIsolatedMuons[0]['phi']
+              s.softIsolatedMuPdg                            = softIsolatedMuons[0]['Pdg']
+              s.softIsolatedMuRelIso                         = softIsolatedMuons[0]['relIso']
+              s.softIsolatedMuDxy                            = softIsolatedMuons[0]['Dxy']
+              s.softIsolatedMuDz                             = softIsolatedMuons[0]['Dz']
+              s.softIsolatedMuNormChi2                       = softIsolatedMuons[0]['NormChi2']
+              s.softIsolatedMuNValMuonHits                   = softIsolatedMuons[0]['NValMuonHits']
+              s.softIsolatedMuNumMatchedStations             = softIsolatedMuons[0]['NumMatchedStations']
+              s.softIsolatedMuPixelHits                      = softIsolatedMuons[0]['PixelHits']
+              s.softIsolatedMuNumtrackerLayerWithMeasurement = softIsolatedMuons[0]['NumtrackerLayerWithMeasurement']
+              s.softIsolatedMuIsGlobal                       = softIsolatedMuons[0]['IsGlobal']
+              s.softIsolatedMuIsTracker                      = softIsolatedMuons[0]['IsTracker']
 
             s.nmu = len(allGoodMuons)
             s.nel = len(allGoodElectrons)
@@ -551,11 +551,11 @@ for isample, sample in enumerate(allSamples):
   #              print "Jet pt's:",i,jetResult["jets"][i]['pt']
               s.nmuCount = min(10,s.nmu)
               for i in xrange(s.nmuCount):
-                s.muPt[i] = allGoodMuons[i]['Pt']
+                s.muPt[i] = allGoodMuons[i]['pt']
                 s.muEta[i] = allGoodMuons[i]['eta']
                 s.muPhi[i] = allGoodMuons[i]['phi']
                 s.muPdg[i] = allGoodMuons[i]['Pdg']
-                s.muRelIso[i] = allGoodMuons[i]['RelIso']
+                s.muRelIso[i] = allGoodMuons[i]['relIso']
                 s.muDxy[i] = allGoodMuons[i]['Dxy']
                 s.muDz[i] = allGoodMuons[i]['Dz']
                 s.muNormChi2[i] = allGoodMuons[i]['NormChi2']
@@ -563,6 +563,8 @@ for isample, sample in enumerate(allSamples):
                 s.muNumMatchedStations[i] = allGoodMuons[i]['NumMatchedStations']
                 s.muPixelHits[i] = allGoodMuons[i]['PixelHits']
                 s.muNumtrackerLayerWithMeasurement[i] = allGoodMuons[i]['NumtrackerLayerWithMeasurement']
+                s.muIsGlobal[i] = allGoodMuons[i]['IsGlobal']
+                s.muIsTracker[i] = allGoodMuons[i]['IsTracker']
 
               s.nelCount = min(10,s.nel)
               for i in xrange(s.nelCount):
