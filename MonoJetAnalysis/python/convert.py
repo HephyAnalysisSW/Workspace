@@ -53,8 +53,9 @@ def goodMuID(c, imu ):
   dz = getVarValue(c, 'muonsDz', imu)
   eta = getVarValue(c, 'muonsEta', imu)
   phi = getVarValue(c, 'muonsPhi', imu)
-  requireDz = chmode.lower().count('mudzid')
-  if isPF and isGlobal and isTracker and ((pt>5 and pt<20 and pt*relIso<10) or (pt>=20 and relIso<0.5)) and (not requireDz or abs(dz)<0.2) : 
+  requireDz = (chmode.lower().count('mudzid')>0)
+#  print "equdz", requireDz
+  if isPF and (isGlobal or isTracker) and ((pt>5 and pt<20 and pt*relIso<10) or (pt>=20 and relIso<0.5)) and ((not requireDz) or abs(dz)<0.2) : 
     return {'Pt':pt, 'IsGlobal':isGlobal, 'IsTracker':isTracker, 'IsPF':isPF, 'RelIso':relIso, 'Dz':dz, 'eta':eta, 'phi':phi} 
 
 # -------------------------------------------

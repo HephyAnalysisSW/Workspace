@@ -34,6 +34,7 @@ setup['TMVAFactoryOptions'] = ["!V","!Silent","Color","DrawProgressBar","Transfo
 setup['plotTransformations'] = ['Id', 'Deco', 'PCA', 'Gauss_Deco']
 setup['makeCorrelationScatterPlots'] = False
 setup['plotMVAEffs'] = False #needs active X-forwarding since a QT Object is involved
+#setup['datasetFactoryOptions'] = ["nTrain_Signal=0", "nTrain_Background=0","SplitMode=Random","SplitSeed=100","NormMode=None","!V"]
 setup['datasetFactoryOptions'] = ["nTrain_Signal=0", "nTrain_Background=0","SplitMode=Random","SplitSeed=100","NormMode=None","!V"]
 setup['fomPlotZoomCoordinates'] = [0, 0.95, 0.2, 1.0]
 convTest=6
@@ -58,19 +59,24 @@ CutRangeMax['type1phiMet']='500'
 CutRangeMax['isrJetPt']='1000.'
 CutRangeMax['htRatio']='1.'
 
-addNeurons = [2,2]
-nCycles=100
+addNeurons = [3,3]
+nCycles=500
 reversed = False
 nCuts = -1
 maxDepth = 2
 nTrees = 400
+sigScale = 100
+convTest = 20
+convImprove = "1e-7"
 #for addNeurons in [[2,1]]:
 #  for nCycles in [1000]:
 #  for nCycles in [20000]:
 #    prepreprefix = 'MonoJet_MLP'+''.join([str(x) for x in addNeurons])+'_'+signalModel['name']+'_refsel_Norm_UseRegulator_ConvergenceTests'+str(convTest)+'_ConvImpr1e-6_'+str(nCycles)+'_sigmoid_BP_S1_SE1_'
 #for sigScale in [10, 20, 50, 80, 100, 200]:
-for convTest in [1,6,10,20, 100]:
-  prepreprefix = 'MonoJet_BDTvsMLP_RudiTest_'+signalModel['name']+'_convTest'+str(convTest)+'_'
+#for convImprove in ["1e-5", "1e-6", "1e-7", "1e-8", "1e-9"]:
+for onlyBkg in ['W1JetsToLNu', 'W2JetsToLNu', 'W3JetsToLNu', 'W4JetsToLNu']:
+
+  prepreprefix = 'MonoJet_BDTvsMLP_reducedSigStat_'+signalModel['name']+'_convTest'+str(convTest)+'_convImprove'+convImprove+"_"+onlyBkg+"_"
   if reversed:
     prepreprefix+="reversed_"
 #    prepreprefix = 'MonoJet_BDT_nTreeComparison_nCuts'+str(nCuts)+'_maxDepth'+str(maxDepth)+'_'+signalModel['name']+'_refsel_None_'
@@ -100,18 +106,19 @@ for convTest in [1,6,10,20, 100]:
       entries = signal.GetEntries()
       print "Added bin ",b,"to signal, now,",entries,"entries"
     background  = ROOT.TChain('Events')
-    for bkg in backgrounds:
-      for b in bkg['bins']:
-        background.Add(bkg['dirname']+'/'+b+'/*.root')
+#    for bkg in backgrounds:
+#      for b in bkg['bins']:
+    background.Add(wJetsToLNu['dirname']+'/'+onlyBkg+'/*.root')
 
     if reversed:
       background, signal = signal, background
 
     setup['preselection'] = 'isrJetPt>110&&isrJetBTBVetoPassed&&softIsolatedMuPt>5&&nHardElectrons+nHardMuons==0&&njet60<=2&&type1phiMet>150'
     setup['varsFromInputSignal'] = [] #model parameters to be stored in MVA data file
-    setup["sigMVAWeightFac"] = background.GetEntries(setup['preselection'])/float(signal.GetEntries(setup['preselection']))
+    setup["sigMVAWeightFac"] = 1.#background.GetEntries(setup['preselection'])/float(signal.GetEntries(setup['preselection']))
     setup["bkgMVAWeightFac"] = 1.
-    setup['weightForMVA'] = {'weight':1., 'sigFac':float(sigScale)/100., 'bkgFac':1}
+#    setup['weightForMVA'] = {'weight':1., 'sigFac':float(sigScale)/100., 'bkgFac':1}
+    setup['weightForMVA'] = {'weight':1., 'sigFac':1., 'bkgFac':1}
     #If changing between met and type1phiMet the formula for deltaPhi (if used) has to be changed!
     setup['varsFromInputData'] = ['type1phiMet', 'isrJetPt', 'isrJetBTBVetoPassed', 'softIsolatedMuPt', 'nHardElectrons', 'nHardMuons', 'njet60/I', 'weight', 'isrJetPt']
     from monoJetFuncs import cosDeltaPhiLepW, softIsolatedMT
@@ -131,7 +138,7 @@ for convTest in [1,6,10,20, 100]:
 
     setup['plotDir']    = '/afs/hephy.at/user/'+afsUser[0]+'/'+afsUser+'/www/'+localPlotDir
     setup['plotSubDir'] = prefix
-    data = constructDataset(setup, signal, background, overWriteData)
+    data = constructDataset(setup, signal, background, overWriteData, maxEvents = min([background.GetEntries(setup['preselection']), signal.GetEntries(setup['preselection'])]) )
 
     methodCutOpt['type']=ROOT.TMVA.Types.kCuts
     methodCutOpt['name']='myCut'
@@ -155,7 +162,7 @@ for convTest in [1,6,10,20, 100]:
                                 'TrainingMethod=BP', 'BPMode=sequential', 'LearningRate=0.02', 'DecayRate=0.01', 
 #                                  'Sampling=0.3','SamplingEpoch=0.8', 
                                 'Sampling=1.','SamplingEpoch=1.', 
-                                'ConvergenceTests='+str(convTest),'ConvergenceImprove=1e-6', 'TestRate=1',
+                                'ConvergenceTests='+str(convTest),'ConvergenceImprove='+convImprove, 'TestRate=1',
                                 'UseRegulator=False' )
 
     methodBDT['type']=ROOT.TMVA.Types.kBDT
@@ -172,7 +179,7 @@ for convTest in [1,6,10,20, 100]:
                            'nCuts='+str(nCuts),
                            'PruneMethod=NoPruning',
                            'AdaBoostBeta=0.5',
-                           'UseRandomisedTrees=True'
+                           'UseRandomisedTrees=False'
     )
 
     allMethods = [methodMLP, methodBDT]

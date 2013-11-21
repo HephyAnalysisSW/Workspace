@@ -188,7 +188,7 @@ def getVarType(v):
   if v.count('/'): return v.split('/')[1]
   return 'F'
 
-def constructDataset(setup, signal, background, overWrite = False):
+def constructDataset(setup, signal, background, overWrite = False, maxEvents=-1):
 
   if (not os.path.isfile(setup['dataFile'])) or overWrite:
     print 'Creating NN dataset',setup['dataFile']
@@ -236,7 +236,12 @@ def constructDataset(setup, signal, background, overWrite = False):
 
       if type(setup['weightForMVA']['weight'])!=type(""):
         weight =  setup['weightForMVA']['weight']
-      for i in range(eList.GetN()):
+      maxN = eList.GetN()
+      if maxEvents>0 : 
+        print i_type.value , sample, ": Instead of ",maxN,"take only",min(maxEvents, maxN),"events",maxEvents
+        maxN = min([maxEvents, maxN])
+      
+      for i in range(maxN):
         if i%10000==0:print 'type',i_type.value, 'Event.:',i,'/',eList.GetN()
         sample.GetEntry(eList.GetEntry(i))
         if type(setup['weightForMVA']['weight'])==type(""):

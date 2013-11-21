@@ -13,7 +13,7 @@ for path in [os.path.abspath(p) for p in paths]:
 
 from simplePlotsCommon import *
 from funcs import *
-
+from helpers import passPUJetID
 import xsec
 small = False
 doOnlyOne = False
@@ -94,7 +94,10 @@ chainstring = "empty"
 commoncf = "(0)"
 prefix="empty_"
 if presel == "refSel":
-  commoncf="isrJetPt>110&&isrJetBTBVetoPassed&&softIsolatedMuPt>5&&nHardElectrons==0&&nHardMuons==0&&njet60<=2"
+  hadRefSel = "isrJetPt>110&&isrJetBTBVetoPassed&&njet60<=2"
+  softIsolatedMu = "softIsolatedMuPt>5"
+  hardlepVeto = "nHardElectrons==0&&nHardMuonsRelIso02==0"
+  commoncf = hadRefSel+"&&"+softIsolatedMu+"&&"+hardlepVeto
 #  commoncf="njet<=3"
   chainstring = "Events"
 if presel == "inclusive":
@@ -111,6 +114,7 @@ if preprefix!="":
 
 for sample in allSamples:
   sample["Chain"] = chainstring
+  sample["dirname"]  = "/data/schoef/monoJetTuples_v2/"+chmode+"/"
 
 
 def getStack(varstring, binning, cutstring, signals = False, varfunc = ""):
@@ -278,12 +282,15 @@ if not doOnlyOne:
   isrJetPhef_endcap_stack[0].addOverFlowBin = "upper"
   allStacks.append(isrJetPhef_endcap_stack)
 
+  nHardMuonsRelIso02_stack = getStack(":nHardMuonsRelIso02;n_{#mu};Number of Events ",[5,0,5], hadRefSel+"&&"+softIsolatedMu, signals)
+  nHardMuonsRelIso02_stack[0].addOverFlowBin = "upper"
+  allStacks.append(nHardMuonsRelIso02_stack)
 
-  nHardMuons_stack = getStack(":nHardMuons;n_{#mu};Number of Events ",[5,0,5], commoncf.replace("&&nHardMuons==0", ""), signals)
+  nHardMuons_stack = getStack(":nHardMuons;n_{#mu};Number of Events ",[5,0,5], hadRefSel+"&&"+softIsolatedMu, signals)
   nHardMuons_stack[0].addOverFlowBin = "upper"
   allStacks.append(nHardMuons_stack)
 
-  nHardElectrons_stack = getStack(":nHardElectrons;n_{e};Number of Events ",[5,0,5], commoncf.replace("&&nHardElectrons==0", ""), signals)
+  nHardElectrons_stack = getStack(":nHardElectrons;n_{e};Number of Events ",[5,0,5], hadRefSel+"&&"+softIsolatedMu, signals)
   nHardElectrons_stack[0].addOverFlowBin = "upper"
   allStacks.append(nHardElectrons_stack)
 
@@ -298,6 +305,7 @@ if not doOnlyOne:
   njet60_stack = getStack(":njet60;n_{jet};Number of Events / 50 GeV",[10,0,10], commoncf.replace('&&njet60<=2',''), signals)
   njet60_stack[0].addOverFlowBin = "upper"
   allStacks.append(njet60_stack)
+  
 
   ht_stack = getStack(":ht;H_{T} (GeV);Number of Events / 25 GeV",[40,0,1000], commoncf, signals)
   ht_stack[0].addOverFlowBin = "upper"
@@ -319,6 +327,18 @@ if not doOnlyOne:
   genmet_stack[0].addOverFlowBin = "upper"
   genmet_stack[0].data_histo.GetXaxis().SetLabelSize(0.02)
   allStacks.append(genmet_stack)
+  
+  def fakeMETx(c): return c.GetLeaf('type1phiMet').GetValue()*cos(c.GetLeaf('type1phiMetphi').GetValue()) - c.GetLeaf('genmet').GetValue()*cos(c.GetLeaf('genmetphi').GetValue())
+  fakeMETx_stack = getStack("xxx:;fake-#slash{E}_{x} (GeV);Number of Events / 4 GeV",[50,-100,100], commoncf, signals, varfunc = fakeMETx )
+  fakeMETx_stack[0].addOverFlowBin = "upper"
+  fakeMETx_stack[0].data_histo.GetXaxis().SetLabelSize(0.02)
+  allStacks.append(fakeMETx_stack)
+
+  def fakeMETy(c): return c.GetLeaf('type1phiMet').GetValue()*sin(c.GetLeaf('type1phiMetphi').GetValue()) - c.GetLeaf('genmet').GetValue()*sin(c.GetLeaf('genmetphi').GetValue())
+  fakeMETy_stack = getStack("yyy:;fake-#slash{E}_{y} (GeV);Number of Events / 4 GeV",[50,-100,100], commoncf, signals, varfunc = fakeMETy )
+  fakeMETy_stack[0].addOverFlowBin = "upper"
+  fakeMETy_stack[0].data_histo.GetXaxis().SetLabelSize(0.02)
+  allStacks.append(fakeMETy_stack)
 
   genmet_reversed_stack = copy.deepcopy(genmet_stack) 
   genmet_reversed_stack.reverse()
@@ -377,6 +397,30 @@ if not doOnlyOne:
   softIsolatedMuDz_stack = getStack(":softIsolatedMuDz;d_{z} of soft isolated muon;Number of Events",[40,0,20], commoncf, signals)
   softIsolatedMuDz_stack[0].addOverFlowBin = "both"
   allStacks.append(softIsolatedMuDz_stack)
+  softIsolatedMuDz_zoomed_stack = getStack(":softIsolatedMuDz;d_{z} of soft isolated muon;Number of Events",[40,0,2], commoncf, signals)
+  softIsolatedMuDz_zoomed_stack[0].addOverFlowBin = "both"
+  allStacks.append(softIsolatedMuDz_zoomed_stack)
+
+  isrJetFull53XPUJetIDTight_stack = getStack(":isrJetFull53XPUJetIDTight;isrJetFull53XPUJetIDTight;Number of Events",[2,0,2], commoncf, signals,lambda c: passPUJetID(int(c.GetLeaf('isrJetFull53XPUJetIDFlag').GetValue()),'Tight'))
+  allStacks.append(isrJetFull53XPUJetIDTight_stack)
+  isrJetFull53XPUJetIDMedium_stack = getStack(":isrJetFull53XPUJetIDMedium;isrJetFull53XPUJetIDMedium;Number of Events",[2,0,2], commoncf, signals,lambda c: passPUJetID(int(c.GetLeaf('isrJetFull53XPUJetIDFlag').GetValue()),'Medium'))
+  allStacks.append(isrJetFull53XPUJetIDMedium_stack)
+  isrJetFull53XPUJetIDLoose_stack = getStack(":isrJetFull53XPUJetIDLoose;isrJetFull53XPUJetIDLoose;Number of Events",[2,0,2], commoncf, signals,lambda c: passPUJetID(int(c.GetLeaf('isrJetFull53XPUJetIDFlag').GetValue()),'Loose'))
+  allStacks.append(isrJetFull53XPUJetIDLoose_stack)
+
+  isrJetMET53XPUJetIDTight_stack = getStack(":isrJetMET53XPUJetIDTight;isrJetMET53XPUJetIDTight;Number of Events",[2,0,2], commoncf, signals,lambda c: passPUJetID(int(c.GetLeaf('isrJetMET53XPUJetIDFlag').GetValue()),'Tight'))
+  allStacks.append(isrJetMET53XPUJetIDTight_stack)
+  isrJetMET53XPUJetIDMedium_stack = getStack(":isrJetMET53XPUJetIDMedium;isrJetMET53XPUJetIDMedium;Number of Events",[2,0,2], commoncf, signals,lambda c: passPUJetID(int(c.GetLeaf('isrJetMET53XPUJetIDFlag').GetValue()),'Medium'))
+  allStacks.append(isrJetMET53XPUJetIDMedium_stack)
+  isrJetMET53XPUJetIDLoose_stack = getStack(":isrJetMET53XPUJetIDLoose;isrJetMET53XPUJetIDLoose;Number of Events",[2,0,2], commoncf, signals,lambda c: passPUJetID(int(c.GetLeaf('isrJetMET53XPUJetIDFlag').GetValue()),'Loose'))
+  allStacks.append(isrJetMET53XPUJetIDLoose_stack)
+  
+  isrJetCutBasedPUJetIDTight_stack = getStack(":isrJetCutBasedPUJetIDTight;isrJetCutBasedPUJetIDTight;Number of Events",[2,0,2], commoncf, signals,lambda c: passPUJetID(int(c.GetLeaf('isrJetCutBasedPUJetIDFlag').GetValue()),'Tight'))
+  allStacks.append(isrJetCutBasedPUJetIDTight_stack)
+  isrJetCutBasedPUJetIDMedium_stack = getStack(":isrJetCutBasedPUJetIDMedium;isrJetCutBasedPUJetIDMedium;Number of Events",[2,0,2], commoncf, signals,lambda c: passPUJetID(int(c.GetLeaf('isrJetCutBasedPUJetIDFlag').GetValue()),'Medium'))
+  allStacks.append(isrJetCutBasedPUJetIDMedium_stack)
+  isrJetCutBasedPUJetIDLoose_stack = getStack(":isrJetCutBasedPUJetIDLoose;isrJetCutBasedPUJetIDLoose;Number of Events",[2,0,2], commoncf, signals,lambda c: passPUJetID(int(c.GetLeaf('isrJetCutBasedPUJetIDFlag').GetValue()),'Loose'))
+  allStacks.append(isrJetCutBasedPUJetIDLoose_stack)
 
 
 for stack in allStacks:
@@ -452,6 +496,7 @@ if not doOnlyOne:
 
 
   drawNMStacks(1,1,[softIsolatedMuPt_stack],             subdir+prefix+"softIsolatedMuPt", False)
+  drawNMStacks(1,1,[nHardMuonsRelIso02_stack],             subdir+prefix+"nHardMuonsRelIso02", False)
   drawNMStacks(1,1,[nHardMuons_stack],             subdir+prefix+"nHardMuons", False)
   drawNMStacks(1,1,[nHardElectrons_stack],             subdir+prefix+"nHardElectrons", False)
   drawNMStacks(1,1,[nHardTaus_stack],             subdir+prefix+"nHardTaus", False)
@@ -464,6 +509,8 @@ if not doOnlyOne:
   drawNMStacks(1,1,[genmet_stack],             subdir+prefix+"genmet", False)
   drawNMStacks(1,1,[genmet_reversed_stack],             subdir+prefix+"genmet_reversed", False)
   drawNMStacks(1,1,[ngoodVertices_stack],             subdir+prefix+"ngoodVertices", False)
+  drawNMStacks(1,1,[fakeMETx_stack],             subdir+prefix+"fakeMETx", False)
+  drawNMStacks(1,1,[fakeMETy_stack],             subdir+prefix+"fakeMETy", False)
 
   drawNMStacks(1,1,[softIsolatedMuPt_stack],            subdir+prefix+"softIsolatedMuPt", False)
   drawNMStacks(1,1,[softIsolatedMuEta_stack],            subdir+prefix+"softIsolatedMuEta", False)
@@ -477,5 +524,14 @@ if not doOnlyOne:
   drawNMStacks(1,1,[softIsolatedMuAbsIso_endcap_stack],            subdir+prefix+"endcap_softIsolatedMuAbsIso", False)
   drawNMStacks(1,1,[softIsolatedMuDxy_stack],            subdir+prefix+"softIsolatedMuDxy", False)
   drawNMStacks(1,1,[softIsolatedMuDz_stack],            subdir+prefix+"softIsolatedMuDz", False)
+  drawNMStacks(1,1,[softIsolatedMuDz_zoomed_stack],            subdir+prefix+"softIsolatedMuDz_zoomed", False)
 
-
+  drawNMStacks(1,1,[isrJetFull53XPUJetIDTight_stack], subdir+prefix+"isrJetFull53XPUJetIDTight", False)
+  drawNMStacks(1,1,[isrJetFull53XPUJetIDMedium_stack], subdir+prefix+"isrJetFull53XPUJetIDMedium", False)
+  drawNMStacks(1,1,[isrJetFull53XPUJetIDLoose_stack], subdir+prefix+"isrJetFull53XPUJetIDLoose", False)
+  drawNMStacks(1,1,[isrJetMET53XPUJetIDTight_stack], subdir+prefix+"isrJetMET53XPUJetIDTight", False)
+  drawNMStacks(1,1,[isrJetMET53XPUJetIDMedium_stack], subdir+prefix+"isrJetMET53XPUJetIDMedium", False)
+  drawNMStacks(1,1,[isrJetMET53XPUJetIDLoose_stack], subdir+prefix+"isrJetMET53XPUJetIDLoose", False)
+  drawNMStacks(1,1,[isrJetCutBasedPUJetIDTight_stack], subdir+prefix+"isrJetCutBasedPUJetIDTight", False)
+  drawNMStacks(1,1,[isrJetCutBasedPUJetIDMedium_stack], subdir+prefix+"isrJetCutBasedPUJetIDMedium", False)
+  drawNMStacks(1,1,[isrJetCutBasedPUJetIDLoose_stack], subdir+prefix+"isrJetCutBasedPUJetIDLoose", False)

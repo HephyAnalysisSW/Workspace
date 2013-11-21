@@ -44,7 +44,7 @@ for sample in allSamples:
     if sample["hasWeight"]:
       if not sample.has_key('weight'):
         sample['weight']="weight"
-      print "Sample has stored weight!", sample["dirname"] , sample["name"], bin, "using weight:",sample['weight']
+      print "Sample has stored weight!", sample["dirname"] , sample["name"], "using weight:",sample['weight']
       continue
 #  print "peng", sample["name"]
   sample["weight"]={}
@@ -99,6 +99,7 @@ for sample in allSamples:
     for thisfile in sample["filenames"][bin]:
       c.Add(thisfile)
     ntot = c.GetEntries()
+    print "Sample",sample, "Total number of Events",ntot
     if ntot>0:
       for var in allVars:
         if var.sample["name"] == sample["name"] and var.sample["bins"].count(bin)==1:
