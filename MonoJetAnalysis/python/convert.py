@@ -50,7 +50,7 @@ def goodMuID(c, imu ):
   isTracker = getVarValue(c, 'muonsisTracker', imu)
   pt = getVarValue(c, 'muonsPt', imu)
   if isPF and (isGlobal or isTracker) and pt>5.:
-    return {'pt':pt, 'phi':getVarValue(c, 'muonsPhi', imu), 'eta':getVarValue(c, 'muonsEta', imu), 'IsGlobal':isGlobal, 'IsTracker':isTracker, 'IsPF':isPF, 'relIso':getVarValue(c, 'muonsRelIso', imu)} 
+    return {'pt':pt, 'phi':getVarValue(c, 'muonsPhi', imu), 'eta':getVarValue(c, 'muonsEta', imu), 'IsGlobal':isGlobal, 'IsTracker':isTracker, 'IsPF':isPF, 'relIso':getVarValue(c, 'muonsPFRelIso', imu)} 
 
 
 # -------------------------------------------
@@ -468,7 +468,6 @@ for isample, sample in enumerate(allSamples):
             if chmode.lower().count('mudzid'):
               softIsolatedMuons = filter(lambda m:m['Dz']<0.2, softIsolatedMuons)
   
- 
             s.nSoftIsolatedMuons = len(softIsolatedMuons)
             s.nHardMuons = len(hardMuons)
             s.nHardMuonsRelIso02 = len(hardMuonsRelIso02)
