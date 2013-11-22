@@ -16,7 +16,7 @@ from funcs import *
 from helpers import passPUJetID
 import xsec
 small = False
-doOnlyOne = False
+doOnlyOne = True
 targetLumi = 19375.
 lumiScale = 1.
 
@@ -28,7 +28,8 @@ lumiScale = 1.
 #FullSim["bins"] = ["S300N270FullSim"]
 #FullSim["name"] = "S300N270FullSim"
 
-chmode = "copy"
+chmode = "copyMuDzID"
+
 from defaultConvertedTuples import stop300lsp270g200FastSim, stop300lsp270g175FastSim, stop200lsp170g100FastSim, stop300lsp240g150FastSim, stop300lsp270FastSim
 from defaultConvertedTuples import stop300lsp270g200FullSim, stop300lsp270g175FullSim, stop200lsp170g100FullSim, stop300lsp240g150FullSim, stop300lsp270FullSim
 
@@ -148,6 +149,51 @@ def getStack(varstring, binning, cutstring, signals = False, varfunc = ""):
 isrJetPt_stack = getStack(":isrJetPt;p_{T} of ISR jet;Number of Events / 50 GeV",[50,0,1000], commoncf, signals)
 isrJetPt_stack[0].addOverFlowBin = "upper"
 allStacks.append(isrJetPt_stack)
+
+softIsolatedNormChi2_stack = getStack(":softIsolatedNormChi2;#chi^{2} of global muon track;Number of Events",[30,0,30], commoncf, signals)
+softIsolatedNormChi2_stack[0].addOverFlowBin = "both"
+allStacks.append(softIsolatedNormChi2_stack)
+
+softIsolatedNValMuonHits_stack = getStack(":softIsolatedNValMuonHits;valid hits;Number of Events",[60,0,60], commoncf, signals)
+softIsolatedNValMuonHits_stack[0].addOverFlowBin = "both"
+allStacks.append(softIsolatedNValMuonHits_stack)
+
+softIsolatedNumMatchedStations_stack = getStack(":softIsolatedNumMatchedStations;matched stations;Number of Events",[8,0,8], commoncf, signals)
+softIsolatedNumMatchedStations_stack[0].addOverFlowBin = "both"
+allStacks.append(softIsolatedNumMatchedStations_stack)
+
+softIsolatedPixelHits_stack = getStack(":softIsolatedPixelHits;Pixel hits;Number of Events",[10,0,10], commoncf, signals)
+softIsolatedPixelHits_stack[0].addOverFlowBin = "both"
+allStacks.append(softIsolatedPixelHits_stack)
+
+softIsolatedPixelHits_lowDz_stack = getStack(":softIsolatedPixelHits;Pixel hits;Number of Events",[10,0,10], commoncf+"&&softIsolatedMuDz<0.2", signals)
+softIsolatedPixelHits_lowDz_stack[0].addOverFlowBin = "both"
+allStacks.append(softIsolatedPixelHits_lowDz_stack)
+
+softIsolatedPixelHits_highDz_stack = getStack(":softIsolatedPixelHits;Pixel hits;Number of Events",[10,0,10], commoncf+"&&softIsolatedMuDz>=0.2", signals)
+softIsolatedPixelHits_highDz_stack[0].addOverFlowBin = "both"
+allStacks.append(softIsolatedPixelHits_highDz_stack)
+
+softIsolatedNumtrackerLayerWithMeasurement_stack = getStack(":softIsolatedNumtrackerLayerWithMeasurement;tracker layer w. meas.;Number of Events",[20,0,20], commoncf, signals)
+softIsolatedNumtrackerLayerWithMeasurement_stack[0].addOverFlowBin = "both"
+allStacks.append(softIsolatedNumtrackerLayerWithMeasurement_stack)
+
+softIsolatedIsGlobal_stack = getStack(":softIsolatedIsGlobal;isGlobal;Number of Events",[2,0,2], commoncf, signals)
+softIsolatedIsGlobal_stack[0].addOverFlowBin = "both"
+allStacks.append(softIsolatedIsGlobal_stack)
+
+softIsolatedIsTracker_stack = getStack(":softIsolatedIsTracker;isTracker;Number of Events",[2,0,2], commoncf, signals)
+softIsolatedIsTracker_stack[0].addOverFlowBin = "both"
+allStacks.append(softIsolatedIsTracker_stack)
+
+softIsolatedMuDz_stack = getStack(":softIsolatedMuDz;d_{z} of soft isolated muon;Number of Events",[40,0,20], commoncf, signals)
+softIsolatedMuDz_stack[0].addOverFlowBin = "both"
+allStacks.append(softIsolatedMuDz_stack)
+
+softIsolatedMuDz_zoomed_stack = getStack(":softIsolatedMuDz;d_{z} of soft isolated muon;Number of Events",[40,0,2], commoncf, signals)
+softIsolatedMuDz_zoomed_stack[0].addOverFlowBin = "both"
+allStacks.append(softIsolatedMuDz_zoomed_stack)
+
 
 if not doOnlyOne:
   isrJetEta_stack = getStack(":isrJetEta;#eta of ISR jet;Number of Events",[20,-5,5], commoncf, signals)
@@ -394,12 +440,6 @@ if not doOnlyOne:
   softIsolatedMuDxy_stack[0].addOverFlowBin = "both"
   allStacks.append(softIsolatedMuDxy_stack)
 
-  softIsolatedMuDz_stack = getStack(":softIsolatedMuDz;d_{z} of soft isolated muon;Number of Events",[40,0,20], commoncf, signals)
-  softIsolatedMuDz_stack[0].addOverFlowBin = "both"
-  allStacks.append(softIsolatedMuDz_stack)
-  softIsolatedMuDz_zoomed_stack = getStack(":softIsolatedMuDz;d_{z} of soft isolated muon;Number of Events",[40,0,2], commoncf, signals)
-  softIsolatedMuDz_zoomed_stack[0].addOverFlowBin = "both"
-  allStacks.append(softIsolatedMuDz_zoomed_stack)
 
   isrJetFull53XPUJetIDTight_stack = getStack(":isrJetFull53XPUJetIDTight;isrJetFull53XPUJetIDTight;Number of Events",[2,0,2], commoncf, signals,lambda c: passPUJetID(int(c.GetLeaf('isrJetFull53XPUJetIDFlag').GetValue()),'Tight'))
   allStacks.append(isrJetFull53XPUJetIDTight_stack)
@@ -457,6 +497,19 @@ for stack in allStacks:
 
 
 drawNMStacks(1,1,[isrJetPt_stack],             subdir+prefix+"isrJetPt", False)
+drawNMStacks(1,1,[softIsolatedNormChi2_stack                       ]   , subdir+prefix+"softIsolatedNormChi2", False)
+drawNMStacks(1,1,[softIsolatedNValMuonHits_stack                   ]   , subdir+prefix+"softIsolatedNValMuonHits", False)
+drawNMStacks(1,1,[softIsolatedNumMatchedStations_stack             ]   , subdir+prefix+"softIsolatedNumMatchedStations", False)
+drawNMStacks(1,1,[softIsolatedPixelHits_stack                      ]   , subdir+prefix+"softIsolatedPixelHits", False)
+drawNMStacks(1,1,[softIsolatedPixelHits_lowDz_stack                      ]   , subdir+prefix+"softIsolatedPixelHits_lowDz", False)
+drawNMStacks(1,1,[softIsolatedPixelHits_highDz_stack                      ]   , subdir+prefix+"softIsolatedPixelHits_highDz", False)
+drawNMStacks(1,1,[softIsolatedNumtrackerLayerWithMeasurement_stack ]   , subdir+prefix+"softIsolatedNumtrackerLayerWithMeasurement", False)
+drawNMStacks(1,1,[softIsolatedIsGlobal_stack                       ]   , subdir+prefix+"softIsolatedIsGlobal", False)
+drawNMStacks(1,1,[softIsolatedIsTracker_stack                       ]   , subdir+prefix+"softIsolatedIsTracker", False)
+drawNMStacks(1,1,[softIsolatedMuDz_stack],            subdir+prefix+"softIsolatedMuDz", False)
+drawNMStacks(1,1,[softIsolatedMuDz_zoomed_stack],            subdir+prefix+"softIsolatedMuDz_zoomed", False)
+
+
 if not doOnlyOne:
   drawNMStacks(1,1,[isrJetEta_stack],             subdir+prefix+"isrJetEta", False)
   drawNMStacks(1,1,[isrJetPhi_stack],             subdir+prefix+"isrJetPhi", False)
@@ -523,8 +576,6 @@ if not doOnlyOne:
   drawNMStacks(1,1,[softIsolatedMuRelIso_endcap_stack],            subdir+prefix+"endcap_softIsolatedMuRelIso", False)
   drawNMStacks(1,1,[softIsolatedMuAbsIso_endcap_stack],            subdir+prefix+"endcap_softIsolatedMuAbsIso", False)
   drawNMStacks(1,1,[softIsolatedMuDxy_stack],            subdir+prefix+"softIsolatedMuDxy", False)
-  drawNMStacks(1,1,[softIsolatedMuDz_stack],            subdir+prefix+"softIsolatedMuDz", False)
-  drawNMStacks(1,1,[softIsolatedMuDz_zoomed_stack],            subdir+prefix+"softIsolatedMuDz_zoomed", False)
 
   drawNMStacks(1,1,[isrJetFull53XPUJetIDTight_stack], subdir+prefix+"isrJetFull53XPUJetIDTight", False)
   drawNMStacks(1,1,[isrJetFull53XPUJetIDMedium_stack], subdir+prefix+"isrJetFull53XPUJetIDMedium", False)

@@ -39,7 +39,6 @@ setup['datasetFactoryOptions'] = ["nTrain_Signal=0", "nTrain_Background=0","Spli
 setup['fomPlotZoomCoordinates'] = [0, 0.95, 0.2, 1.0]
 convTest=6
 
-
 VarProp={}
 VarProp['deltaPhi']='NotEnforced'
 VarProp['softIsolatedMT']='FMin'
@@ -60,6 +59,7 @@ CutRangeMax['isrJetPt']='1000.'
 CutRangeMax['htRatio']='1.'
 
 addNeurons = [3,3]
+shuffleInput = False
 nCycles=500
 reversed = False
 nCuts = -1
@@ -75,8 +75,7 @@ convImprove = "1e-7"
 #for sigScale in [10, 20, 50, 80, 100, 200]:
 #for convImprove in ["1e-5", "1e-6", "1e-7", "1e-8", "1e-9"]:
 for onlyBkg in ['W1JetsToLNu', 'W2JetsToLNu', 'W3JetsToLNu', 'W4JetsToLNu']:
-
-  prepreprefix = 'MonoJet_BDTvsMLP_reducedSigStat_'+signalModel['name']+'_convTest'+str(convTest)+'_convImprove'+convImprove+"_"+onlyBkg+"_"
+  prepreprefix = 'MonoJet_BDTvsMLP_'+signalModel['name']+'_convTest'+str(convTest)+'_convImprove'+convImprove+"_"+onlyBkg+"_shuffleInput_"+str(shuffleInput)+"_"
   if reversed:
     prepreprefix+="reversed_"
 #    prepreprefix = 'MonoJet_BDT_nTreeComparison_nCuts'+str(nCuts)+'_maxDepth'+str(maxDepth)+'_'+signalModel['name']+'_refsel_None_'
@@ -135,10 +134,10 @@ for onlyBkg in ['W1JetsToLNu', 'W2JetsToLNu', 'W3JetsToLNu', 'W4JetsToLNu']:
 #      setup['fom_plot_vars'] = [['softIsolatedMT', [0,1000] , ROOT.kGreen], ['type1phiMet', [0,1000] , ROOT.kMagenta], ['deltaPhi', [0,1000] , ROOT.kBlue]]
     setup['fom_plot_vars'] = []
 
-
     setup['plotDir']    = '/afs/hephy.at/user/'+afsUser[0]+'/'+afsUser+'/www/'+localPlotDir
     setup['plotSubDir'] = prefix
-    data = constructDataset(setup, signal, background, overWriteData, maxEvents = min([background.GetEntries(setup['preselection']), signal.GetEntries(setup['preselection'])]) )
+#    data = constructDataset(setup, signal, background, overWriteData, maxEvents = min([background.GetEntries(setup['preselection']), signal.GetEntries(setup['preselection'])]), shuffleInput = shuffleInput )
+    data = constructDataset(setup, signal, background, overWriteData, maxEvents = -1, shuffleInput = shuffleInput )
 
     methodCutOpt['type']=ROOT.TMVA.Types.kCuts
     methodCutOpt['name']='myCut'

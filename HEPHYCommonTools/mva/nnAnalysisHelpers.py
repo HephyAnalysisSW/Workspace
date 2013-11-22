@@ -188,7 +188,7 @@ def getVarType(v):
   if v.count('/'): return v.split('/')[1]
   return 'F'
 
-def constructDataset(setup, signal, background, overWrite = False, maxEvents=-1):
+def constructDataset(setup, signal, background, overWrite = False, maxEvents=-1, shuffleInput = False):
 
   if (not os.path.isfile(setup['dataFile'])) or overWrite:
     print 'Creating NN dataset',setup['dataFile']
@@ -236,14 +236,20 @@ def constructDataset(setup, signal, background, overWrite = False, maxEvents=-1)
 
       if type(setup['weightForMVA']['weight'])!=type(""):
         weight =  setup['weightForMVA']['weight']
+
       maxN = eList.GetN()
+      sequence = range(eList.GetN())
+      if shuffleInput:
+        import random 
+        print "Random shuffling!"
+        random.seed(100)
+        random.shuffle(sequence)
       if maxEvents>0 : 
-        print i_type.value , sample, ": Instead of ",maxN,"take only",min(maxEvents, maxN),"events",maxEvents
+        print i_type.value , sample, ": Available ",maxN," taken:",min(maxEvents, maxN),"limit:",maxEvents
         maxN = min([maxEvents, maxN])
-      
       for i in range(maxN):
         if i%10000==0:print 'type',i_type.value, 'Event.:',i,'/',eList.GetN()
-        sample.GetEntry(eList.GetEntry(i))
+        sample.GetEntry(eList.GetEntry(sequence[i]))
         if type(setup['weightForMVA']['weight'])==type(""):
           weight = sample.GetLeaf(setup['weightForMVA']['weight']).GetValue()
         if i_type.value==1:
