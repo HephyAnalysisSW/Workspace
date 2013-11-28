@@ -35,10 +35,10 @@ allStacks=[]
 
 minimum=10**(-0.5)
 
-chmode = "copyInc"
+chmode = "copyMuDzID"
 #presel = "refSel"
 presel = "refSel"
-ver = "v1"
+ver = "v2"
 #preprefix = ""
 preprefix = "metInc_"+ver
 additionalCut = "type1phiMet>150&&type1phiMet<250"
@@ -164,12 +164,21 @@ def getStack(varstring, binning, cutstring, signals, varfunc = "", addData=True,
       var.varfunc = varfunc
   return res
 
-met_stack = getStack(":type1phiMet;#slash{E}_{T} (GeV);Number of Events / 50 GeV",[18,150,1050], commoncf, signals, addData = addData)
-met_stack[0].addOverFlowBin = "upper"
-allStacks.append(met_stack)
+def htThrustMetSideFunc(c):
+  t = thrust(c)['htThrustMetSide']
+  if t>0.7: print c.GetLeaf('run').GetValue(), c.GetLeaf('lumi').GetValue(), c.GetLeaf('event').GetValue()
+  return t
+
+htThrustMetSide_stack = getStack(":xxx;htThrustMetSide;Number of Events",[50,0,1], commoncf, signals, addData = addData, varfunc = htThrustMetSideFunc)
+htThrustMetSide_stack[0].addOverFlowBin = "upper"
+allStacks.append(htThrustMetSide_stack)
 
 
 if not doOnlyOne:
+  met_stack = getStack(":type1phiMet;#slash{E}_{T} (GeV);Number of Events / 50 GeV",[18,150,1050], commoncf, signals, addData = addData)
+  met_stack[0].addOverFlowBin = "upper"
+  allStacks.append(met_stack)
+
     
   softIsolatedMuNormChi2_stack = getStack(":softIsolatedMuNormChi2;#chi^{2} of global muon track;Number of Events",[30,0,30], commoncf, signals)
   softIsolatedMuNormChi2_stack[0].addOverFlowBin = "both"
@@ -268,9 +277,6 @@ if not doOnlyOne:
   htThrustLepSide_stack[0].addOverFlowBin = "upper"
   allStacks.append(htThrustLepSide_stack)
 
-  htThrustMetSide_stack = getStack(":xxx;htThrustMetSide;Number of Events",[50,0,1], commoncf, signals, addData = addData, varfunc = lambda c: thrust(c)['htThrustMetSide'])
-  htThrustMetSide_stack[0].addOverFlowBin = "upper"
-  allStacks.append(htThrustMetSide_stack)
 
 
   mT_stack  = getStack(":mT;m_{T} (GeV);Number of Events / 10 GeV",[21,0,210], commoncf, signals, softIsolatedMT, addData = addData)
@@ -495,9 +501,11 @@ for stack in allStacks:
   stack[0].lines = [[0.2, 0.9, "#font[22]{CMS Collaboration}"], [0.2,0.85,str(int(round(targetLumi/10.))/100.)+" fb^{-1},  #sqrt{s} = 8 TeV"]]
 
 
-drawNMStacks(1,1,[met_stack],             subdir+prefix+"met", False)
+htThrustMetSide_stack[0].maximum = 6*10**5 *htThrustMetSide_stack[0].data_histo.GetMaximum()
+drawNMStacks(1,1,[htThrustMetSide_stack],             subdir+prefix+"htThrustMetSide", False)
 
 if not doOnlyOne:
+  drawNMStacks(1,1,[met_stack],             subdir+prefix+"met", False)
   drawNMStacks(1,1,[softIsolatedMuNormChi2_stack                       ]   , subdir+prefix+"softIsolatedMuNormChi2", False)
   drawNMStacks(1,1,[softIsolatedMuNValMuonHits_stack                   ]   , subdir+prefix+"softIsolatedMuNValMuonHits", False)
   softIsolatedMuNumMatchedStations_stack[0].maximum = 10**4 *softIsolatedMuNumMatchedStations_stack[0].data_histo.GetMaximum()
@@ -524,7 +532,6 @@ if not doOnlyOne:
   htRatio_stack[0].maximum = 6*10**3 *htRatio_stack[0].data_histo.GetMaximum()
   thrust_stack[0].maximum = 6*10**4 *thrust_stack[0].data_histo.GetMaximum()
   htThrustLepSide_stack[0].maximum = 6*10**5 *htThrustLepSide_stack[0].data_histo.GetMaximum()
-  htThrustMetSide_stack[0].maximum = 6*10**5 *htThrustMetSide_stack[0].data_histo.GetMaximum()
   drawNMStacks(1,1,[cosPhiMetJet_stack], subdir+prefix+"cosPhiMetJet", False)
   drawNMStacks(1,1,[FWMT1_stack],             subdir+prefix+"FWMT1", False)
   drawNMStacks(1,1,[FWMT2_stack],             subdir+prefix+"FWMT2", False)
@@ -536,7 +543,6 @@ if not doOnlyOne:
   drawNMStacks(1,1,[htRatio_stack],             subdir+prefix+"htRatio", False)
   drawNMStacks(1,1,[thrust_stack],             subdir+prefix+"thrust", False)
   drawNMStacks(1,1,[htThrustLepSide_stack],             subdir+prefix+"htThrustLepSide", False)
-  drawNMStacks(1,1,[htThrustMetSide_stack],             subdir+prefix+"htThrustMetSide", False)
 
   drawNMStacks(1,1,[mT_stack],              subdir+prefix+"mT", False)
   drawNMStacks(1,1,[ht_stack],              subdir+prefix+"ht", False)
