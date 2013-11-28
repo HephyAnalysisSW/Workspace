@@ -35,7 +35,7 @@ setup['plotTransformations'] = ['Id', 'Deco', 'PCA', 'Gauss_Deco']
 setup['makeCorrelationScatterPlots'] = False
 setup['plotMVAEffs'] = False #needs active X-forwarding since a QT Object is involved
 #setup['datasetFactoryOptions'] = ["nTrain_Signal=0", "nTrain_Background=0","SplitMode=Random","SplitSeed=100","NormMode=None","!V"]
-setup['datasetFactoryOptions'] = ["nTrain_Signal=0", "nTrain_Background=0","SplitMode=Random","SplitSeed=100","NormMode=None","!V"]
+#setup['datasetFactoryOptions'] = ["nTrain_Signal=0", "nTrain_Background=0","SplitMode=Random","SplitSeed=100","NormMode=None","!V"]
 setup['fomPlotZoomCoordinates'] = [0, 0.95, 0.2, 1.0]
 convTest=6
 

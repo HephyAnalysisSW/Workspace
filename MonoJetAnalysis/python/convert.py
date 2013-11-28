@@ -7,7 +7,7 @@ from datetime import datetime
 from helpers import getVarValue, deltaPhi, minAbsDeltaPhi, invMassOfLightObjects, deltaR
 
 #chmode = "incNoISRJetID" 
-chmode = "copyMuDzID" 
+chmode = "copyIncMuDzID" 
 #chmode = "copyCleanedWithAllLeptons" 
 from defaultMETSamples_mc import *
 
@@ -31,7 +31,7 @@ if len(sys.argv)>=3:
   exec("allSamples = [" + ",".join(sampinp) + "]")
 
 
-small  = True
+small  = False
 overwrite = True
 target_lumi = 19375 #pb-1
 
@@ -195,9 +195,9 @@ def findSec(x,lp):
 ##################################################################################
 storeVectors = True
 commoncf = ""
-if chmode=="copy" or chmode=="copyMuDzID":
+if chmode[:4]=="copy":
   commoncf = "type1phiMet>150"
-if chmode == "copyInc":
+if chmode[:7] == "copyInc":
   commoncf = "(1)"
   storeVectors = False
 

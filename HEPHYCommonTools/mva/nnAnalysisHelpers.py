@@ -188,7 +188,7 @@ def getVarType(v):
   if v.count('/'): return v.split('/')[1]
   return 'F'
 
-def constructDataset(setup, signal, background, overWrite = False, maxEvents=-1, shuffleInput = False):
+def constructDataset(setup, signal, background, overWrite = False ):
 
   if (not os.path.isfile(setup['dataFile'])) or overWrite:
     print 'Creating NN dataset',setup['dataFile']
@@ -204,7 +204,8 @@ def constructDataset(setup, signal, background, overWrite = False, maxEvents=-1,
       if varType[n]=='F': vars[n] = p_c_float(0.)
       if varType[n]=='I': vars[n] = ctypes.c_int(0)
 
-    i_type    = ctypes.c_int(0)
+    i_type      = ctypes.c_int(0)
+    i_isTraining    = ctypes.c_int(0)
     for sample in [signal, background]:
       for k in vars.keys():
         sample.SetBranchAddress(k, vars[k])
@@ -213,7 +214,8 @@ def constructDataset(setup, signal, background, overWrite = False, maxEvents=-1,
     for k in vars.keys():
       simu.Branch(k, vars[k], k+'/'+varType[k])
 #      print k, vars[k], k+'/'+varType[k], simu.GetBranch(k)
-    simu.Branch('type',   ctypes.addressof(i_type),   'type/I')
+    simu.Branch('type'  ,   ctypes.addressof(i_type),     'type/I')
+    simu.Branch('isTraining',   ctypes.addressof(i_isTraining),   'isTraining/I')
 
     addVars = {}
     for v in [getVarName(vn) for vn in ['weightForMVA'] + [v[0] for v in setup['varsCalculated']] + setup['varsFromInputSignal']]  :
@@ -237,48 +239,68 @@ def constructDataset(setup, signal, background, overWrite = False, maxEvents=-1,
       if type(setup['weightForMVA']['weight'])!=type(""):
         weight =  setup['weightForMVA']['weight']
 
-      maxN = eList.GetN()
-      sequence = range(eList.GetN())
-      if shuffleInput:
-        import random 
-        print "Random shuffling!"
-        random.seed(100)
-        random.shuffle(sequence)
-      if maxEvents>0 : 
-        print i_type.value , sample, ": Available ",maxN," taken:",min(maxEvents, maxN),"limit:",maxEvents
-        maxN = min([maxEvents, maxN])
-      for i in range(maxN):
-        if i%10000==0:print 'type',i_type.value, 'Event.:',i,'/',eList.GetN()
-        sample.GetEntry(eList.GetEntry(sequence[i]))
-        if type(setup['weightForMVA']['weight'])==type(""):
-          weight = sample.GetLeaf(setup['weightForMVA']['weight']).GetValue()
-        if i_type.value==1:
-          for v in setup['varsFromInputSignal']:
-            vn = getVarName(v)
-            if varType[vn] =="I":
-              addVars[vn].value  = int(sample.GetLeaf(vn).GetValue())
-            if varType[vn] =="F":
-              addVars[vn].value  = float(sample.GetLeaf(vn).GetValue()) 
-          addVars['weightForMVA'].value  = weight*setup['weightForMVA']['sigFac']*mvaWeightFac
-#          print addVars['weightForMVA'].value, weight, setup['weightForMVA']['sigFac'], mvaWeightFac
-        else:
-          for v in setup['varsFromInputSignal']:
-            vn = getVarName(v)
-            if varType[vn] =="I":
-              addVars[vn].value  = 0
-            if varType[vn] =="F":
-              addVars[vn].value  = float('nan') 
-          addVars['weightForMVA'].value  = weight*setup['weightForMVA']['bkgFac']*mvaWeightFac
-#          print addVars['weightForMVA'].value, weight, setup['weightForMVA']['bkgFac'], mvaWeightFac
-        for v in setup["varsCalculated"]:
-          vn = getVarName(v[0])
-          if varType[vn] =="I":
-            addVars[vn].value  = int(v[1](sample))
-          if varType[vn] =="F":
-            addVars[vn].value  = v[1](sample)
+#      maxN = eList.GetN()
+#      sequence = range(eList.GetN())
+#      if shuffleInput:
+#        import random 
+#        print "Random shuffling!"
+#        random.seed(100)
+#        random.shuffle(sequence)
+#      if maxEvents>0 : 
+#        print i_type.value , sample, ": Available ",maxN," taken:",min(maxEvents, maxN),"limit:",maxEvents
+#        maxN = min([maxEvents, maxN])
+      if len(set(setup["backgroundTrainEvents"]) & set(setup["backgroundTestEvents"])) !=0:
+        print "Warning: Bkg. train/test sets not exclusive!"
+      if len(set(setup["signalTrainEvents"]) & set(setup["signalTestEvents"])) !=0:
+        print "Warning: Sig. train/test sets not exclusive!"
 
-#          print vn, addVars[vn].value#,      simu.GetLeaf(getVarName(v[0])).GetValue()
-        simu.Fill()
+      for i_isTraining.value in [0,1]:
+        print 'signal?',i_type.value==1, ", train sample?",i_isTraining.value==0
+        eventList = []
+        if   (i_type.value == 0 and i_isTraining.value ==1):
+          eventList = setup["backgroundTrainEvents"]
+        elif (i_type.value == 1 and i_isTraining.value ==1):
+          eventList = setup["signalTrainEvents"] 
+        elif (i_type.value == 0 and i_isTraining.value ==0):
+          eventList = setup["backgroundTestEvents"] 
+        elif (i_type.value == 1 and i_isTraining.value ==0):
+          eventList = setup["signalTestEvents"] 
+     
+        if len(eventList)==0:
+          print "Warning!! Empty event list for type", i_type.value,"isTraining", i_isTraining.value
+ 
+        for i, ev in enumerate(eventList):
+          if i%1000==0:print 'type',i_type.value, 'isTraining', i_isTraining.value, 'Event.:',i,'/',len(eventList)
+          sample.GetEntry(eList.GetEntry(ev))
+          if type(setup['weightForMVA']['weight'])==type(""):
+            weight = sample.GetLeaf(setup['weightForMVA']['weight']).GetValue()
+          if i_type.value==1:
+            for v in setup['varsFromInputSignal']:
+              vn = getVarName(v)
+              if varType[vn] =="I":
+                addVars[vn].value  = int(sample.GetLeaf(vn).GetValue())
+              if varType[vn] =="F":
+                addVars[vn].value  = float(sample.GetLeaf(vn).GetValue()) 
+            addVars['weightForMVA'].value  = weight*setup['weightForMVA']['sigFac']*mvaWeightFac
+  #          print addVars['weightForMVA'].value, weight, setup['weightForMVA']['sigFac'], mvaWeightFac
+          else:
+            for v in setup['varsFromInputSignal']:
+              vn = getVarName(v)
+              if varType[vn] =="I":
+                addVars[vn].value  = 0
+              if varType[vn] =="F":
+                addVars[vn].value  = float('nan') 
+            addVars['weightForMVA'].value  = weight*setup['weightForMVA']['bkgFac']*mvaWeightFac
+  #          print addVars['weightForMVA'].value, weight, setup['weightForMVA']['bkgFac'], mvaWeightFac
+          for v in setup["varsCalculated"]:
+            vn = getVarName(v[0])
+            if varType[vn] =="I":
+              addVars[vn].value  = int(v[1](sample))
+            if varType[vn] =="F":
+              addVars[vn].value  = v[1](sample)
+
+  #          print vn, addVars[vn].value#,      simu.GetLeaf(getVarName(v[0])).GetValue()
+          simu.Fill()
 
 #    eListTest         = getEList(simu,    setup['preselection'] +'&&'+ setup['testRequ']       ,'eListTest')
 #    eListTraining     = getEList(simu,    setup['preselection'] +'&&'+ setup['trainingRequ']   ,'eListTraining')
@@ -353,31 +375,51 @@ def setupMVAFrameWork(setup, data, methods, prefix):
   fout = ROOT.TFile(setup['outputFile'],"RECREATE")
   factory = ROOT.TMVA.Factory("TMVAClassification", fout,":".join(setup['TMVAFactoryOptions']))
   factory.DeleteAllMethods()
-  factory.SetBackgroundWeightExpression("weightForMVA")
-  factory.SetSignalWeightExpression(    "weightForMVA")
 
-  factory.AddSignalTree(data['simu'])
-  factory.AddBackgroundTree(data['simu'])
 
-  #There is a Bias-Neuron in the NN!
-# bnode=ROOT.TMVA.TNeuron()
-# bnode.SetBiasNeuron()
-# print bnode
-# bnode.ForceValue(0)
-# print bnode
   varType={}
   for vn in setup['varsFromInputData']+[v[0] for v in setup['varsCalculated']]+['weightForMVA']:
     varType[getVarName(vn)] = getVarType(vn)
 
   for v in setup['mvaInputVars']:
     print "Adding to factory variable", v, 'of type', varType[v] 
-
     factory.AddVariable(getVarName(v), varType[v])
 
   sigCut = ROOT.TCut("type==1&&"+setup['preselection'])
   bgCut = ROOT.TCut("type==0&&"+setup['preselection'])
-
   factory.PrepareTrainingAndTestTree(sigCut,bgCut,":".join(setup["datasetFactoryOptions"]))
+
+  nEvents = data['simu'].GetEntries()
+  nBkgTrain=0
+  nSigTrain=0
+  nBkgTest=0
+  nSigTest=0
+  for ievent in range(nEvents):
+    data['simu'].GetEnty()
+    isTraining =  data['simu'].GetLeaf('isTraining').GetValue()
+    type =  data['simu'].GetLeaf('type').GetValue()
+    if (type == 0 and isTraining == 1):
+      bookMethod = factory.AddBackgroundTrainingEvent
+      nBkgTrain+=1
+    elif (type == 1 and isTraining ==1):
+      bookMethod = factory.AddSignalTrainingEvent
+      nSigTrain+=1
+    elif (type == 0 and isTraining ==0):
+      bookMethod = factory.AddBackgroundTestEvent
+      nBkgTest=0
+    if (type == 1 and isTraining ==0):
+      bookMethod = factory.AddSignalTestEvent
+      nSigTest=0
+    else: continue
+    bookMethod(array('d', [data['simu'].GetLeaf(v).GetValue() for v in setup['mvaInputVars']]), data['simu'].GetLeaf(setup['weightForMVA']).GetValue()) 
+  print "Booked Events: Train(Bkg/Sig)", str(nBkgTrain)+"/"+str(nSigTrain),"Test(Bkg/Sig)",str(nBkgTest)+"/"+str(nSigTest)
+#  factory.SetBackgroundWeightExpression("weightForMVA")
+#  factory.SetSignalWeightExpression(    "weightForMVA")
+
+#  factory.AddSignalTree(data['simu'])
+#  factory.AddBackgroundTree(data['simu'])
+  
+  #Fill training/test dataset event by event  
 
   #Using all Methods:
   for m in methods:

@@ -35,16 +35,16 @@ allStacks=[]
 
 minimum=10**(-0.5)
 
-chmode = "copy"
+chmode = "copyInc"
 #presel = "refSel"
 presel = "refSel"
-ver = "v2"
+ver = "v1"
 #preprefix = ""
-preprefix = "met150-250_"+ver
+preprefix = "metInc_"+ver
 additionalCut = "type1phiMet>150&&type1phiMet<250"
 #additionalCut = ""
 
-doOnlyOne = False
+doOnlyOne = True
 subdir = "/pngMJ/"
 
 addData = True
@@ -167,65 +167,66 @@ def getStack(varstring, binning, cutstring, signals, varfunc = "", addData=True,
 met_stack = getStack(":type1phiMet;#slash{E}_{T} (GeV);Number of Events / 50 GeV",[18,150,1050], commoncf, signals, addData = addData)
 met_stack[0].addOverFlowBin = "upper"
 allStacks.append(met_stack)
-  
-softIsolatedMuNormChi2_stack = getStack(":softIsolatedMuNormChi2;#chi^{2} of global muon track;Number of Events",[30,0,30], commoncf, signals)
-softIsolatedMuNormChi2_stack[0].addOverFlowBin = "both"
-allStacks.append(softIsolatedMuNormChi2_stack)
-
-softIsolatedMuNValMuonHits_stack = getStack(":softIsolatedMuNValMuonHits;valid hits;Number of Events",[60,0,60], commoncf, signals)
-softIsolatedMuNValMuonHits_stack[0].addOverFlowBin = "both"
-allStacks.append(softIsolatedMuNValMuonHits_stack)
-
-softIsolatedMuNumMatchedStations_stack = getStack(":softIsolatedMuNumMatchedStations;matched stations;Number of Events",[8,0,8], commoncf, signals)
-softIsolatedMuNumMatchedStations_stack[0].addOverFlowBin = "both"
-allStacks.append(softIsolatedMuNumMatchedStations_stack)
-
-softIsolatedMuPixelHits_stack = getStack(":softIsolatedMuPixelHits;Pixel hits;Number of Events",[10,0,10], commoncf, signals)
-softIsolatedMuPixelHits_stack[0].addOverFlowBin = "both"
-allStacks.append(softIsolatedMuPixelHits_stack)
-
-softIsolatedMuPixelHits_lowDz_stack = getStack(":softIsolatedMuPixelHits;Pixel hits;Number of Events",[10,0,10], commoncf+"&&softIsolatedMuDz<0.2", signals)
-softIsolatedMuPixelHits_lowDz_stack[0].addOverFlowBin = "both"
-allStacks.append(softIsolatedMuPixelHits_lowDz_stack)
-
-softIsolatedMuPixelHits_highDz_stack = getStack(":softIsolatedMuPixelHits;Pixel hits;Number of Events",[10,0,10], commoncf+"&&softIsolatedMuDz>=0.2", signals)
-softIsolatedMuPixelHits_highDz_stack[0].addOverFlowBin = "both"
-allStacks.append(softIsolatedMuPixelHits_highDz_stack)
-
-softIsolatedMuNumtrackerLayerWithMeasurement_stack = getStack(":softIsolatedMuNumtrackerLayerWithMeasurement;tracker layer w. meas.;Number of Events",[20,0,20], commoncf, signals)
-softIsolatedMuNumtrackerLayerWithMeasurement_stack[0].addOverFlowBin = "both"
-allStacks.append(softIsolatedMuNumtrackerLayerWithMeasurement_stack)
-
-softIsolatedMuIsGlobal_stack = getStack(":softIsolatedMuIsGlobal;isGlobal;Number of Events",[2,0,2], commoncf, signals)
-softIsolatedMuIsGlobal_stack[0].addOverFlowBin = "both"
-allStacks.append(softIsolatedMuIsGlobal_stack)
-
-softIsolatedMuIsTracker_stack = getStack(":softIsolatedMuIsTracker;isTracker;Number of Events",[2,0,2], commoncf, signals)
-softIsolatedMuIsTracker_stack[0].addOverFlowBin = "both"
-allStacks.append(softIsolatedMuIsTracker_stack)
-
-softIsolatedMuDz_stack = getStack(":softIsolatedMuDz;d_{z} of soft isolated muon;Number of Events",[40,0,20], commoncf, signals)
-softIsolatedMuDz_stack[0].addOverFlowBin = "both"
-allStacks.append(softIsolatedMuDz_stack)
-
-softIsolatedMuDz_zoomed_stack = getStack(":softIsolatedMuDz;d_{z} of soft isolated muon;Number of Events",[40,0,2], commoncf, signals)
-softIsolatedMuDz_zoomed_stack[0].addOverFlowBin = "both"
-allStacks.append(softIsolatedMuDz_zoomed_stack)
-
-softIsolatedMuDz_noPixelHits_stack = getStack(":softIsolatedMuDz;d_{z} of soft isolated muon;Number of Events",[40,0,2], commoncf+"&&softIsolatedMuPixelHits==0", signals)
-softIsolatedMuDz_noPixelHits_stack[0].addOverFlowBin = "both"
-allStacks.append(softIsolatedMuDz_noPixelHits_stack)
-
-softIsolatedMuDz_onePixelHit_stack = getStack(":softIsolatedMuDz;d_{z} of soft isolated muon;Number of Events",[40,0,2], commoncf+"&&softIsolatedMuPixelHits>=1", signals)
-softIsolatedMuDz_onePixelHit_stack[0].addOverFlowBin = "both"
-allStacks.append(softIsolatedMuDz_onePixelHit_stack)
-
-softIsolatedMuDz_twoPixelHits_stack = getStack(":softIsolatedMuDz;d_{z} of soft isolated muon;Number of Events",[40,0,2], commoncf+"&&softIsolatedMuPixelHits>=2", signals)
-softIsolatedMuDz_twoPixelHits_stack[0].addOverFlowBin = "both"
-allStacks.append(softIsolatedMuDz_twoPixelHits_stack)
 
 
 if not doOnlyOne:
+    
+  softIsolatedMuNormChi2_stack = getStack(":softIsolatedMuNormChi2;#chi^{2} of global muon track;Number of Events",[30,0,30], commoncf, signals)
+  softIsolatedMuNormChi2_stack[0].addOverFlowBin = "both"
+  allStacks.append(softIsolatedMuNormChi2_stack)
+
+  softIsolatedMuNValMuonHits_stack = getStack(":softIsolatedMuNValMuonHits;valid hits;Number of Events",[60,0,60], commoncf, signals)
+  softIsolatedMuNValMuonHits_stack[0].addOverFlowBin = "both"
+  allStacks.append(softIsolatedMuNValMuonHits_stack)
+
+  softIsolatedMuNumMatchedStations_stack = getStack(":softIsolatedMuNumMatchedStations;matched stations;Number of Events",[8,0,8], commoncf, signals)
+  softIsolatedMuNumMatchedStations_stack[0].addOverFlowBin = "both"
+  allStacks.append(softIsolatedMuNumMatchedStations_stack)
+
+  softIsolatedMuPixelHits_stack = getStack(":softIsolatedMuPixelHits;Pixel hits;Number of Events",[10,0,10], commoncf, signals)
+  softIsolatedMuPixelHits_stack[0].addOverFlowBin = "both"
+  allStacks.append(softIsolatedMuPixelHits_stack)
+
+  softIsolatedMuPixelHits_lowDz_stack = getStack(":softIsolatedMuPixelHits;Pixel hits;Number of Events",[10,0,10], commoncf+"&&softIsolatedMuDz<0.2", signals)
+  softIsolatedMuPixelHits_lowDz_stack[0].addOverFlowBin = "both"
+  allStacks.append(softIsolatedMuPixelHits_lowDz_stack)
+
+  softIsolatedMuPixelHits_highDz_stack = getStack(":softIsolatedMuPixelHits;Pixel hits;Number of Events",[10,0,10], commoncf+"&&softIsolatedMuDz>=0.2", signals)
+  softIsolatedMuPixelHits_highDz_stack[0].addOverFlowBin = "both"
+  allStacks.append(softIsolatedMuPixelHits_highDz_stack)
+
+  softIsolatedMuNumtrackerLayerWithMeasurement_stack = getStack(":softIsolatedMuNumtrackerLayerWithMeasurement;tracker layer w. meas.;Number of Events",[20,0,20], commoncf, signals)
+  softIsolatedMuNumtrackerLayerWithMeasurement_stack[0].addOverFlowBin = "both"
+  allStacks.append(softIsolatedMuNumtrackerLayerWithMeasurement_stack)
+
+  softIsolatedMuIsGlobal_stack = getStack(":softIsolatedMuIsGlobal;isGlobal;Number of Events",[2,0,2], commoncf, signals)
+  softIsolatedMuIsGlobal_stack[0].addOverFlowBin = "both"
+  allStacks.append(softIsolatedMuIsGlobal_stack)
+
+  softIsolatedMuIsTracker_stack = getStack(":softIsolatedMuIsTracker;isTracker;Number of Events",[2,0,2], commoncf, signals)
+  softIsolatedMuIsTracker_stack[0].addOverFlowBin = "both"
+  allStacks.append(softIsolatedMuIsTracker_stack)
+
+  softIsolatedMuDz_stack = getStack(":softIsolatedMuDz;d_{z} of soft isolated muon;Number of Events",[40,0,20], commoncf, signals)
+  softIsolatedMuDz_stack[0].addOverFlowBin = "both"
+  allStacks.append(softIsolatedMuDz_stack)
+
+  softIsolatedMuDz_zoomed_stack = getStack(":softIsolatedMuDz;d_{z} of soft isolated muon;Number of Events",[40,0,2], commoncf, signals)
+  softIsolatedMuDz_zoomed_stack[0].addOverFlowBin = "both"
+  allStacks.append(softIsolatedMuDz_zoomed_stack)
+
+  softIsolatedMuDz_noPixelHits_stack = getStack(":softIsolatedMuDz;d_{z} of soft isolated muon;Number of Events",[40,0,2], commoncf+"&&softIsolatedMuPixelHits==0", signals)
+  softIsolatedMuDz_noPixelHits_stack[0].addOverFlowBin = "both"
+  allStacks.append(softIsolatedMuDz_noPixelHits_stack)
+
+  softIsolatedMuDz_onePixelHit_stack = getStack(":softIsolatedMuDz;d_{z} of soft isolated muon;Number of Events",[40,0,2], commoncf+"&&softIsolatedMuPixelHits>=1", signals)
+  softIsolatedMuDz_onePixelHit_stack[0].addOverFlowBin = "both"
+  allStacks.append(softIsolatedMuDz_onePixelHit_stack)
+
+  softIsolatedMuDz_twoPixelHits_stack = getStack(":softIsolatedMuDz;d_{z} of soft isolated muon;Number of Events",[40,0,2], commoncf+"&&softIsolatedMuPixelHits>=2", signals)
+  softIsolatedMuDz_twoPixelHits_stack[0].addOverFlowBin = "both"
+  allStacks.append(softIsolatedMuDz_twoPixelHits_stack)
+
   cosPhiMetJet_stack = getStack(":xxx;cos(#phi(#slash{E}_{T}, ISR-jet));Number of Events",[20,-1,1], commoncf, signals, addData = addData, varfunc = lambda c: cos(getVarValue(c, 'isrJetPhi') - getVarValue(c, 'softIsolatedMuPhi')))
   cosPhiMetJet_stack[0].addOverFlowBin = "both"
   allStacks.append(cosPhiMetJet_stack)
@@ -255,7 +256,7 @@ if not doOnlyOne:
   linC2D_stack[0].addOverFlowBin = "upper"
   allStacks.append(linC2D_stack)
 
-  htRatio_stack = getStack(":xxx;H_{T}^{ratio};Number of Events",[40,0,0.6], commoncf, signals, addData = addData, varfunc = lambda c: htRatio(c))
+  htRatio_stack = getStack(":xxx;H_{T}^{ratio};Number of Events",[40,0,1.0], commoncf, signals, addData = addData, varfunc = lambda c: htRatio(c))
   htRatio_stack[0].addOverFlowBin = "upper"
   allStacks.append(htRatio_stack)
 
@@ -390,7 +391,7 @@ if not doOnlyOne:
   softIsolatedMuRelIso_stack[0].addOverFlowBin = "both"
   allStacks.append(softIsolatedMuRelIso_stack)
 
-  softIsolatedMuAbsIso_stack = getStack(":XXX;I_{abs.} of soft isolated muon;Number of Events",[30,0,6], commoncf, signals, lambda c: c.GetLeaf('softIsolatedMuRelIso').GetValue()*c.GetLeaf('softIsolatedMuPt').GetValue(), addData = addData)
+  softIsolatedMuAbsIso_stack = getStack(":XXX;I_{abs.} of soft isolated muon;Number of Events",[30,0,12], commoncf, signals, lambda c: c.GetLeaf('softIsolatedMuRelIso').GetValue()*c.GetLeaf('softIsolatedMuPt').GetValue(), addData = addData)
   softIsolatedMuAbsIso_stack[0].addOverFlowBin = "both"
   allStacks.append(softIsolatedMuAbsIso_stack)
 
@@ -495,27 +496,26 @@ for stack in allStacks:
 
 
 drawNMStacks(1,1,[met_stack],             subdir+prefix+"met", False)
-drawNMStacks(1,1,[softIsolatedMuNormChi2_stack                       ]   , subdir+prefix+"softIsolatedMuNormChi2", False)
-drawNMStacks(1,1,[softIsolatedMuNValMuonHits_stack                   ]   , subdir+prefix+"softIsolatedMuNValMuonHits", False)
-softIsolatedMuNumMatchedStations_stack[0].maximum = 10**4 *softIsolatedMuNumMatchedStations_stack[0].data_histo.GetMaximum()
-drawNMStacks(1,1,[softIsolatedMuNumMatchedStations_stack             ]   , subdir+prefix+"softIsolatedMuNumMatchedStations", False)
-drawNMStacks(1,1,[softIsolatedMuPixelHits_stack                      ]   , subdir+prefix+"softIsolatedMuPixelHits", False)
-drawNMStacks(1,1,[softIsolatedMuPixelHits_lowDz_stack                      ]   , subdir+prefix+"softIsolatedMuPixelHits_lowDz", False)
-drawNMStacks(1,1,[softIsolatedMuPixelHits_highDz_stack                      ]   , subdir+prefix+"softIsolatedMuPixelHits_highDz", False)
-softIsolatedMuNumtrackerLayerWithMeasurement_stack[0].maximum = 10**4 *softIsolatedMuNumtrackerLayerWithMeasurement_stack[0].data_histo.GetMaximum()
-drawNMStacks(1,1,[softIsolatedMuNumtrackerLayerWithMeasurement_stack ]   , subdir+prefix+"softIsolatedMuNumtrackerLayerWithMeasurement", False)
-softIsolatedMuIsGlobal_stack[0].maximum = 10**4 *softIsolatedMuIsGlobal_stack[0].data_histo.GetMaximum()
-drawNMStacks(1,1,[softIsolatedMuIsGlobal_stack                       ]   , subdir+prefix+"softIsolatedMuIsGlobal", False)
-softIsolatedMuIsTracker_stack[0].maximum = 10**4 *softIsolatedMuIsTracker_stack[0].data_histo.GetMaximum()
-drawNMStacks(1,1,[softIsolatedMuIsTracker_stack                       ]   , subdir+prefix+"softIsolatedMuIsTracker", False)
-drawNMStacks(1,1,[softIsolatedMuDz_stack],            subdir+prefix+"softIsolatedMuDz", False)
-drawNMStacks(1,1,[softIsolatedMuDz_zoomed_stack],            subdir+prefix+"softIsolatedMuDz_zoomed", False)
-drawNMStacks(1,1,[softIsolatedMuDz_noPixelHits_stack],            subdir+prefix+"softIsolatedMuDz_noPixelHits", False)
-drawNMStacks(1,1,[softIsolatedMuDz_onePixelHit_stack],            subdir+prefix+"softIsolatedMuDz_onePixelHit", False)
-drawNMStacks(1,1,[softIsolatedMuDz_twoPixelHits_stack],            subdir+prefix+"softIsolatedMuDz_twoPixelHits", False)
-
 
 if not doOnlyOne:
+  drawNMStacks(1,1,[softIsolatedMuNormChi2_stack                       ]   , subdir+prefix+"softIsolatedMuNormChi2", False)
+  drawNMStacks(1,1,[softIsolatedMuNValMuonHits_stack                   ]   , subdir+prefix+"softIsolatedMuNValMuonHits", False)
+  softIsolatedMuNumMatchedStations_stack[0].maximum = 10**4 *softIsolatedMuNumMatchedStations_stack[0].data_histo.GetMaximum()
+  drawNMStacks(1,1,[softIsolatedMuNumMatchedStations_stack             ]   , subdir+prefix+"softIsolatedMuNumMatchedStations", False)
+  drawNMStacks(1,1,[softIsolatedMuPixelHits_stack                      ]   , subdir+prefix+"softIsolatedMuPixelHits", False)
+  drawNMStacks(1,1,[softIsolatedMuPixelHits_lowDz_stack                      ]   , subdir+prefix+"softIsolatedMuPixelHits_lowDz", False)
+  drawNMStacks(1,1,[softIsolatedMuPixelHits_highDz_stack                      ]   , subdir+prefix+"softIsolatedMuPixelHits_highDz", False)
+  softIsolatedMuNumtrackerLayerWithMeasurement_stack[0].maximum = 10**4 *softIsolatedMuNumtrackerLayerWithMeasurement_stack[0].data_histo.GetMaximum()
+  drawNMStacks(1,1,[softIsolatedMuNumtrackerLayerWithMeasurement_stack ]   , subdir+prefix+"softIsolatedMuNumtrackerLayerWithMeasurement", False)
+  softIsolatedMuIsGlobal_stack[0].maximum = 10**4 *softIsolatedMuIsGlobal_stack[0].data_histo.GetMaximum()
+  drawNMStacks(1,1,[softIsolatedMuIsGlobal_stack                       ]   , subdir+prefix+"softIsolatedMuIsGlobal", False)
+  softIsolatedMuIsTracker_stack[0].maximum = 10**4 *softIsolatedMuIsTracker_stack[0].data_histo.GetMaximum()
+  drawNMStacks(1,1,[softIsolatedMuIsTracker_stack                       ]   , subdir+prefix+"softIsolatedMuIsTracker", False)
+  drawNMStacks(1,1,[softIsolatedMuDz_stack],            subdir+prefix+"softIsolatedMuDz", False)
+  drawNMStacks(1,1,[softIsolatedMuDz_zoomed_stack],            subdir+prefix+"softIsolatedMuDz_zoomed", False)
+  drawNMStacks(1,1,[softIsolatedMuDz_noPixelHits_stack],            subdir+prefix+"softIsolatedMuDz_noPixelHits", False)
+  drawNMStacks(1,1,[softIsolatedMuDz_onePixelHit_stack],            subdir+prefix+"softIsolatedMuDz_onePixelHit", False)
+  drawNMStacks(1,1,[softIsolatedMuDz_twoPixelHits_stack],            subdir+prefix+"softIsolatedMuDz_twoPixelHits", False)
   FWMT2_stack[0].maximum = 6*10**4 *FWMT2_stack[0].data_histo.GetMaximum()
   FWMT3_stack[0].maximum = 6*10**3 *FWMT3_stack[0].data_histo.GetMaximum()
   FWMT4_stack[0].maximum = 6*10**4 *FWMT4_stack[0].data_histo.GetMaximum()
@@ -540,6 +540,7 @@ if not doOnlyOne:
 
   drawNMStacks(1,1,[mT_stack],              subdir+prefix+"mT", False)
   drawNMStacks(1,1,[ht_stack],              subdir+prefix+"ht", False)
+  
   drawNMStacks(1,1,[type1phiMetphi_stack],             subdir+prefix+"type1phiMetphi", False)
   drawNMStacks(1,1,[cosDeltaPhiLepW_stack],             subdir+prefix+"cosDeltaPhiLepW", False)
   drawNMStacks(1,1,[cosDeltaPhiLepMET_stack],             subdir+prefix+"cosDeltaPhiLepMET", False)

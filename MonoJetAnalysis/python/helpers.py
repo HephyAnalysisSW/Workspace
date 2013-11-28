@@ -111,3 +111,34 @@ def htRatio(c):
   metPhi = c.GetLeaf('type1phiMetphi').GetValue()
 #  print calcHTRatio(jets, metPhi)
   return calcHTRatio(jets, metPhi)
+
+def KolmogorovDistance(s0, s1): #Kolmogorov distance from two list of values (unbinned, discrete)
+  from fractions import Fraction, gcd
+
+  s0.sort()
+  s1.sort()
+
+  tot = [[x,0] for x in s0] + [[x,1] for x in s1]
+  tot.sort()
+  F={}
+  lenS={}
+  lenS[0] = len(s0)
+  lenS[1] = len(s1)
+  F[0] = 0
+  F[1] = 0
+  l = len(tot)
+#  print tot
+  maxDist = Fraction(0,1)
+  for i, t in enumerate(tot):
+#    print "Now",F
+    F[t[1]]+=1#lenS[t[1]]
+#    print "...",F
+    if i+1<l and tot[i+1][0]==t[0]:
+      continue
+#    print "Calc dist..."
+    dist= abs(Fraction(F[0],lenS[0])-Fraction(F[1],lenS[1]))
+    if dist>maxDist:
+      maxDist=dist
+#    print dist, maxDist
+  return maxDist
+
