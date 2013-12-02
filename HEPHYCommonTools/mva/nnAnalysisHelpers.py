@@ -189,7 +189,9 @@ def getVarType(v):
   return 'F'
 
 def constructDataset(setup, signal, background, overWrite = False ):
-
+  if (not overWrite) and (not os.path.isfile(setup['dataFile'])):
+    print "Not found:",setup['dataFile']
+    return
   if (not os.path.isfile(setup['dataFile'])) or overWrite:
     print 'Creating NN dataset',setup['dataFile']
     if overWrite and os.path.isfile(setup['dataFile']):
@@ -224,10 +226,10 @@ def constructDataset(setup, signal, background, overWrite = False ):
       if not ( varType[v]=='F' or varType[v]=='I') : print "Warning! Unknown varType'"+varType[v]+"'for variable", v
       simu.Branch(v,   ctypes.addressof(addVars[v]),   v+'/'+varType[v])
       print v,   ctypes.addressof(addVars[v]),   v+'/'+varType[v]
-    eListSig = getEList(signal,        setup['preselection'], 'eListSig')
-    eListBkg = getEList(background,    setup['preselection'], 'eListBkg')
+#    eListSig = getEList(signal,        setup['preselection'], 'eListSig')
+#    eListBkg = getEList(background,    setup['preselection'], 'eListBkg')
 
-    for i_type.value , sample, eList in [[ 1, signal, eListSig], [0, background, eListBkg]]:
+    for i_type.value , sample in [[ 1, signal], [0, background]]:
       mvaWeightFac=1
       if i_type.value==1:
         if setup.has_key('sigMVAWeightFac'):
@@ -271,7 +273,8 @@ def constructDataset(setup, signal, background, overWrite = False ):
  
         for i, ev in enumerate(eventList):
           if i%1000==0:print 'type',i_type.value, 'isTraining', i_isTraining.value, 'Event.:',i,'/',len(eventList)
-          sample.GetEntry(eList.GetEntry(ev))
+#          sample.GetEntry(eList.GetEntry(ev))
+          sample.GetEntry(ev)
           if type(setup['weightForMVA']['weight'])==type(""):
             weight = sample.GetLeaf(setup['weightForMVA']['weight']).GetValue()
           if i_type.value==1:
@@ -322,7 +325,14 @@ def constructDataset(setup, signal, background, overWrite = False ):
 #    eListSigTraining.Write()
     f.Close()
     print 'Written NN dataset to', setup['dataFile']
-    print simu
+    setup['dataSetConfigFile'] = setup['dataFile'].replace('.root', '.pkl')
+    setupStripped = copy.deepcopy(setup)
+    setupStripped['varsCalculated'] = [v[:-1]+['removedFunction'] for v in setupStripped['varsCalculated']]
+    for v in ['backgroundTrainEvents', 'signalTrainEvents', 'backgroundTestEvents', 'backgroundTrainEvents']:
+      setupStripped[v]='removed' 
+    pickle.dump(setupStripped, file(setup['dataSetConfigFile'],"w"))
+
+    print 'Written NN setup to',setup['dataSetConfigFile'] 
     Events = ROOT.gDirectory.Get("Events")
     del Events
     del simu
@@ -385,36 +395,51 @@ def setupMVAFrameWork(setup, data, methods, prefix):
     print "Adding to factory variable", v, 'of type', varType[v] 
     factory.AddVariable(getVarName(v), varType[v])
 
-  sigCut = ROOT.TCut("type==1&&"+setup['preselection'])
-  bgCut = ROOT.TCut("type==0&&"+setup['preselection'])
-  factory.PrepareTrainingAndTestTree(sigCut,bgCut,":".join(setup["datasetFactoryOptions"]))
+#  sigCut = ROOT.TCut("type==1&&"+setup['preselection'])
+#  bgCut = ROOT.TCut("type==0&&"+setup['preselection'])
+#  factory.PrepareTrainingAndTestTree(sigCut,bgCut,":".join(setup["datasetFactoryOptions"]))
 
-  nEvents = data['simu'].GetEntries()
-  nBkgTrain=0
-  nSigTrain=0
-  nBkgTest=0
-  nSigTest=0
-  for ievent in range(nEvents):
-    data['simu'].GetEnty()
-    isTraining =  data['simu'].GetLeaf('isTraining').GetValue()
-    type =  data['simu'].GetLeaf('type').GetValue()
-    if (type == 0 and isTraining == 1):
-      bookMethod = factory.AddBackgroundTrainingEvent
-      nBkgTrain+=1
-    elif (type == 1 and isTraining ==1):
-      bookMethod = factory.AddSignalTrainingEvent
-      nSigTrain+=1
-    elif (type == 0 and isTraining ==0):
-      bookMethod = factory.AddBackgroundTestEvent
-      nBkgTest=0
-    if (type == 1 and isTraining ==0):
-      bookMethod = factory.AddSignalTestEvent
-      nSigTest=0
-    else: continue
-    bookMethod(array('d', [data['simu'].GetLeaf(v).GetValue() for v in setup['mvaInputVars']]), data['simu'].GetLeaf(setup['weightForMVA']).GetValue()) 
-  print "Booked Events: Train(Bkg/Sig)", str(nBkgTrain)+"/"+str(nSigTrain),"Test(Bkg/Sig)",str(nBkgTest)+"/"+str(nSigTest)
-#  factory.SetBackgroundWeightExpression("weightForMVA")
-#  factory.SetSignalWeightExpression(    "weightForMVA")
+#  nEvents = data['simu'].GetEntries()
+#  nBkgTrain=0
+#  nSigTrain=0
+#  nBkgTest=0
+#  nSigTest=0
+#  for ievent in range(nEvents):
+#    data['simu'].GetEntry(ievent)
+#    isTraining =  int(data['simu'].GetLeaf('isTraining').GetValue())
+#    type =  int(data['simu'].GetLeaf('type').GetValue())
+##    print isTraining, type
+#    if (type == 0 and isTraining == 1):
+#      eventBookMethod = factory.AddBackgroundTrainingEvent
+#      nBkgTrain+=1
+#    if (type == 1 and isTraining ==1):
+#      eventBookMethod = factory.AddSignalTrainingEvent
+#      nSigTrain+=1
+#    if (type == 0 and isTraining ==0):
+#      eventBookMethod = factory.AddBackgroundTestEvent
+#      nBkgTest+=1
+#    if (type == 1 and isTraining ==0):
+#      eventBookMethod = factory.AddSignalTestEvent
+#      nSigTest+=1
+#    if (not ( (type == 1) or (type == 0)) ) or not ((isTraining == 1) or (isTraining == 0)):
+#      print "Warning!",isTraining,type
+#    vals = ROOT.std.vector('double')()
+#    for v in setup['mvaInputVars'] : vals.push_back(data['simu'].GetLeaf(v).GetValue())
+##    print eventBookMethod, vals,isTraining,type
+#    eventBookMethod(vals, data['simu'].GetLeaf('weightForMVA').GetValue()) 
+#    del vals
+#  print "Booked Events: Train(Bkg/Sig)", str(nBkgTrain)+"/"+str(nSigTrain),"Test(Bkg/Sig)",str(nBkgTest)+"/"+str(nSigTest)
+
+  bkgTestTree =   data['simu'].CopyTree("isTraining==0&&type==0")
+  sigTestTree =   data['simu'].CopyTree("isTraining==0&&type==1")
+  bkgTrainTree =  data['simu'].CopyTree("isTraining==1&&type==0")
+  sigTrainTree =  data['simu'].CopyTree("isTraining==1&&type==1")
+  factory.AddBackgroundTree( bkgTrainTree,  1.0, "Training" );
+  factory.AddBackgroundTree( bkgTestTree,   1.0,  "Test" );
+  factory.AddSignalTree( sigTrainTree,      1.0, "Training" );
+  factory.AddSignalTree( sigTestTree,       1.0,  "Test" );
+  factory.SetBackgroundWeightExpression("weightForMVA")
+  factory.SetSignalWeightExpression(    "weightForMVA")
 
 #  factory.AddSignalTree(data['simu'])
 #  factory.AddBackgroundTree(data['simu'])
