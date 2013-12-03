@@ -54,8 +54,8 @@ nTrees = 400
 convTest = 20
 convImprove = "1e-7"
 
-if True:
-  datasetName =   'MonoJet_stop300lsp270FastSim_BkgMix_0'
+for seed in range(1):
+  datasetName =   'MonoJet_stop300lsp270FastSim_BkgMix_'+str(seed)
   datasetFile =   '/data/'+nfsUser+'/MonoJetNNAnalysis/datasets/'+datasetName
 #  prepreprefix = datasetName+'_nTrees'+str(nTrees)+"_nCuts_"+str(nCuts)+"_maxDepth"+str(maxDepth)+"_nEventsMinComparison_"
   prepreprefix = datasetName+'_nTrees'+str(nTrees)+"_nCuts_"+str(nCuts)+"_maxDepthComparison_"
@@ -71,17 +71,18 @@ if True:
   setup['fomPlotZoomCoordinates'] = [0, 0.95, 0.2, 1.0]
 
 #      setup['mvaInputVars'] = ["softIsolatedMT", "type1phiMet", 'deltaPhi', 'isrJetPt', 'htRatio']
-  setup['mvaInputVars'] = ["softIsolatedMT", "type1phiMet", 'deltaPhi']
+#  setup['mvaInputVars'] = ["softIsolatedMT", "type1phiMet", 'deltaPhi']
+  setup['mvaInputVars'] = ["softIsolatedMT", "type1phiMet"]
   prefix = '_'.join(setup['mvaInputVars'])
   prefix = preprefix+prefix
 
-  setup['outputFile'] =     '/data/'+nfsUser+'/MonoJetNNAnalysis/MVA_Analyzer/'+prefix+'.root'
+  setup['TMVAOutputFile'] =     '/data/'+nfsUser+'/MonoJetNNAnalysis/MVA_Analyzer/'+prefix+'.root'
   setup['weightDir'] ='/data/'+nfsUser+'/MonoJetNNAnalysis/MVA_Analyzer/'+prefix+'/'
 
   data = constructDataset(setup, None, None, False)
   if not data:
     print "Could not load dataset -> do nothing"
-  if data and (overWriteTMVAFrameWork or not os.path.isfile(setup['outputFile'])):
+  if data and (overWriteTMVAFrameWork or not os.path.isfile(setup['TMVAOutputFile'])):
   #      setup['fom_plot_vars'] = [['softIsolatedMT', [0,1000] , ROOT.kGreen], ['type1phiMet', [0,1000] , ROOT.kMagenta], ['deltaPhi', [0,1000] , ROOT.kBlue]]
     setup['fom_plot_vars'] = []
 

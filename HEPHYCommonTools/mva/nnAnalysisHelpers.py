@@ -32,14 +32,22 @@ def getObjFromFile(fname,hname):
     f.Close()
   return obj
 
-def getVarValList( sample, eList, variable ):
+def getVarValList( sample, variable, selection = ""):
   l = sample.GetLeaf(variable)
   res=[]
-  for i in range(eList.GetN()) :
-    sample.GetEntry(eList.GetEntry(i))
-    val = l.GetValue()
-    res.append(val)
-#    print i, variable, val
+  if type(selection)==type(ROOT.TEventList()):
+    for i in range(selection.GetN()) :
+      sample.GetEntry(selection.GetEntry(i))
+      val = l.GetValue()
+      res.append(val)
+  if type(selection)==type(""):
+    sample.Draw(">>eListTMP", selection)
+    eListTMP = ROOT.gDirectory.Get("eListTMP")
+    for i in range(eListTMP.GetN()) :
+      sample.GetEntry(eListTMP.GetEntry(i))
+      val = l.GetValue()
+      res.append(val)
+    del eListTMP
   return res
   del l
 
@@ -51,9 +59,13 @@ def getEList(chain, cut, newname='eListTMP'):
   del elistTMP_t
   return elistTMP
 
-def getPlot(chain, cut, var, binning):
+def getPlot(chain, cut, var, binning=None):
 # if (verbose):print 'chain:',chain,' cut:',cut,' var:',var,' binning:',binning[0],' ',binning[1],' ',binning[2]
-  chain.Draw(var+'>>hTMP_t('+str(binning[0])+','+str(binning[1])+','+str(binning[2])+')', cut, 'goff')
+  if binning:
+    chain.Draw(var+'>>hTMP_t('+str(binning[0])+','+str(binning[1])+','+str(binning[2])+')', cut, 'goff')
+  else:
+    chain.Draw(var+'>>hTMP_t', cut, 'goff')
+  
   hTMP_t = ROOT.gROOT.Get('hTMP_t')
   hTMP = hTMP_t.Clone(var)
   del hTMP_t
@@ -382,7 +394,7 @@ def setupMVAFrameWork(setup, data, methods, prefix):
   ROOT.TMVA.gConfig().GetIONames().fWeightFileDir = setup['weightDir']
   ROOT.TMVA.gConfig().GetVariablePlotting().fNbinsXOfROCCurve = 200
 
-  fout = ROOT.TFile(setup['outputFile'],"RECREATE")
+  fout = ROOT.TFile(setup['TMVAOutputFile'],"RECREATE")
   factory = ROOT.TMVA.Factory("TMVAClassification", fout,":".join(setup['TMVAFactoryOptions']))
   factory.DeleteAllMethods()
 
@@ -458,7 +470,7 @@ def setupMVAFrameWork(setup, data, methods, prefix):
 #  method.WriteWeightsToStream(fout)
   fout.Close()
 
-  pfile = setup['outputFile'].replace('.root','')+'.pkl'
+  pfile = setup['TMVAOutputFile'].replace('.root','')+'.pkl'
   setupStripped = copy.deepcopy(setup)
   setupStripped['varsCalculated'] = [v[:-1]+['removedFunction'] for v in setupStripped['varsCalculated']]
 
@@ -475,7 +487,7 @@ def setupMVAFrameWork(setup, data, methods, prefix):
   for j, m in enumerate(methods):
     for i, treeName in enumerate(['Test', 'Train']):
       l = ROOT.TLegend(.65, .80, 0.99, 0.99)
-      t = getObjFromFile(setup['outputFile'], treeName+'Tree')
+      t = getObjFromFile(setup['TMVAOutputFile'], treeName+'Tree')
       mlpa_canvas.cd(1 + 2*(j+1)+i)
       l.SetFillColor(ROOT.kWhite)
       l.SetShadowColor(ROOT.kWhite)
@@ -520,7 +532,7 @@ def setupMVAFrameWork(setup, data, methods, prefix):
   l5 = ROOT.TLegend(.16, .13, 0.5, 0.35)
   opt=""
   for m in methods:
-    histFOM = getObjFromFile(setup['outputFile'],'MVA_'+m['name']+'_rejBvsS')
+    histFOM = getObjFromFile(setup['TMVAOutputFile'],'MVA_'+m['name']+'_rejBvsS')
 #   print 'histFOM (pad1):',histFOM
     stuff.append(histFOM)
     histFOM.SetStats(False)
@@ -555,7 +567,7 @@ def setupMVAFrameWork(setup, data, methods, prefix):
   l3.SetBorderSize(1)
   opt="AL"
   for m in methods:
-    m['FOMFromFile'] = getObjFromFile(setup['outputFile'],'MVA_'+m['name']+'_rejBvsS')
+    m['FOMFromFile'] = getObjFromFile(setup['TMVAOutputFile'],'MVA_'+m['name']+'_rejBvsS')
     m['FOMFromFile'].SetStats(False)
     m['FOMFromFile'].SetLineColor(m['lineColor'])
 
@@ -593,7 +605,7 @@ def setupMVAFrameWork(setup, data, methods, prefix):
 #  latex.SetTextAlign(11); # align right
 #  [latex.DrawLatex(*cArg) for cArg in latexArgs]
 #
-  t = getObjFromFile(setup['outputFile'], 'TestTree')
+  t = getObjFromFile(setup['TMVAOutputFile'], 'TestTree')
   fom_plots = {}
   for fom_var, fom_var_range, fom_var_color in setup['fom_plot_vars']:
     print fom_var, fom_var_range, fom_var_color
@@ -618,49 +630,49 @@ def setupMVAFrameWork(setup, data, methods, prefix):
   mlpa_canvas.Print(setup['plotDir']+'/'+setup['plotSubDir']+'/nnValidation'+'.root')
   del mlpa_canvas
 
-  ROOT.gROOT.ProcessLine('.x ./../../HEPHYCommonTools/mva/tmvaMacros/correlations.C("'+setup['outputFile']+'")')
+  ROOT.gROOT.ProcessLine('.x ./../../HEPHYCommonTools/mva/tmvaMacros/correlations.C("'+setup['TMVAOutputFile']+'")')
   os.system('mv ./plots/CorrelationMatrix*.* '+setup['plotDir']+'/'+setup['plotSubDir']+'/')
   for s in setup['plotTransformations']:
-    ROOT.gROOT.ProcessLine('.x ./../../HEPHYCommonTools/mva/tmvaMacros/variables.C("'+setup['outputFile']+'", "InputVariables_'+s+'")')
+    ROOT.gROOT.ProcessLine('.x ./../../HEPHYCommonTools/mva/tmvaMacros/variables.C("'+setup['TMVAOutputFile']+'", "InputVariables_'+s+'")')
     os.system('mv ./plots/variables_*  '+setup['plotDir']+'/'+setup['plotSubDir']+'/')
     if setup['makeCorrelationScatterPlots']:
       for v in setup['mvaInputVars']:
-        ROOT.gROOT.ProcessLine('.x ./../../HEPHYCommonTools/mva/tmvaMacros/correlationscatters.C("'+setup['outputFile']+'","'+v+'", "InputVariables_'+s+'")')
+        ROOT.gROOT.ProcessLine('.x ./../../HEPHYCommonTools/mva/tmvaMacros/correlationscatters.C("'+setup['TMVAOutputFile']+'","'+v+'", "InputVariables_'+s+'")')
       os.system('mv ./plots/correlationscatter_* '+setup['plotDir']+'/'+setup['plotSubDir']+'/')
 
   for m in methods:
     if m['type']!=ROOT.TMVA.Types.kCuts:
-      ROOT.gROOT.ProcessLine('.x ./../../HEPHYCommonTools/mva/tmvaMacros/network.C("'+setup['outputFile']+'")')
+      ROOT.gROOT.ProcessLine('.x ./../../HEPHYCommonTools/mva/tmvaMacros/network.C("'+setup['TMVAOutputFile']+'")')
       os.system('mv ./plots/'+m['name']+'.png  '+setup['plotDir']+'/'+setup['plotSubDir']+'/netStructure_'+m['name']+'.png')
       os.system('mv ./plots/'+m['name']+'.pdf  '+setup['plotDir']+'/'+setup['plotSubDir']+'/netStructure_'+m['name']+'.pdf')
       os.system('mv ./plots/'+m['name']+'.root '+setup['plotDir']+'/'+setup['plotSubDir']+'/netStructure_'+m['name']+'.root')
-      ROOT.gROOT.ProcessLine('.x ./../../HEPHYCommonTools/mva/tmvaMacros/efficiencies.C("'+setup['outputFile']+'")')
+      ROOT.gROOT.ProcessLine('.x ./../../HEPHYCommonTools/mva/tmvaMacros/efficiencies.C("'+setup['TMVAOutputFile']+'")')
       os.system('mv ./plots/rejBvsS.png  '+setup['plotDir']+'/'+setup['plotSubDir']+'/rejBvsS_'+m['name']+'.png')
       os.system('mv ./plots/rejBvsS.pdf  '+setup['plotDir']+'/'+setup['plotSubDir']+'/rejBvsS_'+m['name']+'.pdf')
       os.system('mv ./plots/rejBvsS.root '+setup['plotDir']+'/'+setup['plotSubDir']+'/rejBvsS_'+m['name']+'.root')
       if setup['plotMVAEffs']:
         ROOT.gROOT.ProcessLine('.L ./../../HEPHYCommonTools/mva/tmvaMacros/mvaeffs.C+')
-        ROOT.gROOT.ProcessLine('mvaeffs("'+setup['outputFile']+'")')
+        ROOT.gROOT.ProcessLine('mvaeffs("'+setup['TMVAOutputFile']+'")')
         os.system('mv ./plots/mvaeffs_'+m['name']+'.png  '+setup['plotDir']+'/'+setup['plotSubDir']+'/mvaeffs_'+m['name']+'.png')
         os.system('mv ./plots/mvaeffs_'+m['name']+'.pdf  '+setup['plotDir']+'/'+setup['plotSubDir']+'/mvaeffs_'+m['name']+'.pdf')
         os.system('mv ./plots/mvaeffs_'+m['name']+'.root '+setup['plotDir']+'/'+setup['plotSubDir']+'/mvaeffs_'+m['name']+'.root')
       for i, fname in enumerate(['mva', 'proba', 'rarity', 'overtrain']):
-#        print '.x ./../../HEPHYCommonTools/mva/tmvaMacros/mvas.C("'+setup['outputFile']+','+str(i)+'")'
-        ROOT.gROOT.ProcessLine('.x ./../../HEPHYCommonTools/mva/tmvaMacros/mvas.C("'+setup['outputFile']+'",'+str(i)+')')
+#        print '.x ./../../HEPHYCommonTools/mva/tmvaMacros/mvas.C("'+setup['TMVAOutputFile']+','+str(i)+'")'
+        ROOT.gROOT.ProcessLine('.x ./../../HEPHYCommonTools/mva/tmvaMacros/mvas.C("'+setup['TMVAOutputFile']+'",'+str(i)+')')
         os.system('mv ./plots/'+fname+'_'+m['name']+'.png  '+setup['plotDir']+'/'+setup['plotSubDir']+'/'+fname+'_'+m['name']+'.png')
         os.system('mv ./plots/'+fname+'_'+m['name']+'.pdf  '+setup['plotDir']+'/'+setup['plotSubDir']+'/'+fname+'_'+m['name']+'.pdf')
         os.system('mv ./plots/'+fname+'_'+m['name']+'.root '+setup['plotDir']+'/'+setup['plotSubDir']+'/'+fname+'_'+m['name']+'.root')
     if m['type']==ROOT.TMVA.Types.kMLP:
-      ROOT.gROOT.ProcessLine('.x ./../../HEPHYCommonTools/mva/tmvaMacros/annconvergencetest.C("'+setup['outputFile']+'")')
+      ROOT.gROOT.ProcessLine('.x ./../../HEPHYCommonTools/mva/tmvaMacros/annconvergencetest.C("'+setup['TMVAOutputFile']+'")')
       os.system('mv ./plots/annconvergencetest.png  '+setup['plotDir']+'/'+setup['plotSubDir']+'/annconvergencetest_'+m['name']+'.png')
       os.system('mv ./plots/annconvergencetest.pdf  '+setup['plotDir']+'/'+setup['plotSubDir']+'/annconvergencetest_'+m['name']+'.pdf')
       os.system('mv ./plots/annconvergencetest.root '+setup['plotDir']+'/'+setup['plotSubDir']+'/annconvergencetest_'+m['name']+'.root')
     if m['type']==ROOT.TMVA.Types.kBDT:
-      ROOT.gROOT.ProcessLine('.x ./../../HEPHYCommonTools/mva/tmvaMacros/BDTControlPlots.C("'+setup['outputFile']+'")')
+      ROOT.gROOT.ProcessLine('.x ./../../HEPHYCommonTools/mva/tmvaMacros/BDTControlPlots.C("'+setup['TMVAOutputFile']+'")')
       os.system('mv ./plots/'+m['name']+'_ControlPlots.png  '+setup['plotDir']+'/'+setup['plotSubDir']+'/'+m['name']+'_ControlPlots.png')
       os.system('mv ./plots/'+m['name']+'_ControlPlots.pdf  '+setup['plotDir']+'/'+setup['plotSubDir']+'/'+m['name']+'_ControlPlots.pdf')
       os.system('mv ./plots/'+m['name']+'_ControlPlots.root '+setup['plotDir']+'/'+setup['plotSubDir']+'/'+m['name']+'_ControlPlots.root')
-#      ROOT.gROOT.ProcessLine('.x ./../../HEPHYCommonTools/mva/tmvaMacros/BoostControlPlots.C("'+setup['outputFile']+'")')
+#      ROOT.gROOT.ProcessLine('.x ./../../HEPHYCommonTools/mva/tmvaMacros/BoostControlPlots.C("'+setup['TMVAOutputFile']+'")')
             
 
   ROOT.gROOT.cd(olddir)

@@ -46,10 +46,10 @@ def setupMVAForModelPoint(mgl, mN):
   prefix = preprefix+prefix[:-1]
 
   setup['dataFile'] = '/data/'+nfsUser+'/nnAnalysis/datasets/'+prefix+'.root'
-  setup['outputFile'] =     '/data/'+nfsUser+'/nnAnalysis/MVA_Analyzer/'+prefix+'.root'
+  setup['TMVAOutputFile'] =     '/data/'+nfsUser+'/nnAnalysis/MVA_Analyzer/'+prefix+'.root'
   setup['weightDir'] ='/data/'+nfsUser+'/nnAnalysis/MVA_Analyzer/'+prefix+'/'
 
-  if (not overWriteData and ( os.path.isfile(setup['dataFile']))) and (not overWriteTMVAFrameWork and os.path.isfile(setup['outputFile'])):
+  if (not overWriteData and ( os.path.isfile(setup['dataFile']))) and (not overWriteTMVAFrameWork and os.path.isfile(setup['TMVAOutputFile'])):
     return
   
   allModelsInBlock = [[mgl, mN]]#getAllInBlock(mgl, mN, model)

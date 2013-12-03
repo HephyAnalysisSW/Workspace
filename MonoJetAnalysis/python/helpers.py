@@ -142,3 +142,7 @@ def KolmogorovDistance(s0, s1): #Kolmogorov distance from two list of values (un
 #    print dist, maxDist
   return maxDist
 
+def KolmogorovProbability(s0, s1):
+  ksDist = float(KolmogorovDistance(s0, s1))
+  return ROOT.TMath.KolmogorovProb(ksDist*sqrt(len(s0)*len(s1)/float(len(s0)+len(s1))))
+
