@@ -11,28 +11,42 @@ from nnAnalysisHelpers import getEList, constructDataset, setupMVAFrameWork
 from xsec import xsec
 from xsecSMS import gluino8TeV_NLONLL, gluino14TeV_NLO
 import copy, sys
-from defaultConvertedTuples import stop300lsp270FastSim, stop200lsp170g100FastSim, stop300lsp240g150FastSim
+from defaultConvertedTuples import stop300lsp270FastSim, stop200lsp170g100FastSim, stop300lsp240g150FastSim, stopDeltaM30FastSim
 from defaultConvertedTuples import wJetsToLNu
 from monoJetFuncs import softIsolatedMT
 from helpers import htRatio, KolmogorovDistance 
 #RA4
 
-signalModel = stop300lsp270FastSim
+#signalModel = stop300lsp270FastSim#,stopDeltaM30FastSim 
+signalModel = stopDeltaM30FastSim 
 backgroundModel = wJetsToLNu
 
 colors = [ROOT.kBlue, ROOT.kRed, ROOT.kGreen, ROOT.kOrange, ROOT.kMagenta]
 
 overWriteData = True 
-
+addAllTestEventsTree = True
 setup={}
 
 #setup['TMVAFactoryOptions'] = ["!V","!Silent","Color","DrawProgressBar","Transformations=I;D;G,D","AnalysisType=Classification"]
 
+def getMassesFromFilename(c):
+  f = c.GetFile().GetName()
+  f2 = f.split('/')[-1].replace('.root','').replace('histo_','')
+  if f2[:4]=='stop':
+    f3 = f2[4:].split('lsp')
+    stop = int(f3[0])
+    lsp = int(f3[1][:3])
+  return stop, lsp 
+
+def getStopMassFromFilename(c):
+  return getMassesFromFilename(c)[0]
+def getLSPMassFromFilename(c):
+  return getMassesFromFilename(c)[1]
+
 ksres = {}
-for seed in range(50):
+for seed in range(1):
   prepreprefix = 'MonoJet_'+signalModel['name']+"_BkgMix_"+str(seed)
 
-#  def createDatasetForModelPoint(signalModel):
   if True:    
     preprefix = prepreprefix
     prefix = preprefix
@@ -49,8 +63,10 @@ for seed in range(50):
   #    setup['weightForMVA'] = {'weight':1., 'sigFac':float(sigScale)/100., 'bkgFac':1}
       setup['weightForMVA'] = {'weight':1., 'sigFac':1., 'bkgFac':1}
       #If changing between met and type1phiMet the formula for deltaPhi (if used) has to be changed!
-      setup['varsFromInputData'] = ['type1phiMet', 'isrJetPt', 'isrJetBTBVetoPassed', 'softIsolatedMuPt', 'nHardElectrons', 'nHardMuons', 'njet60/I', 'weight', 'isrJetPt']
-      setup['varsFromInputSignal'] = [] #model parameters to be stored in MVA data file
+      setup['varsFromInputData'] = ['type1phiMet', 'isrJetPt', 'isrJetBTBVetoPassed', 'softIsolatedMuPt', 'softIsolatedMuEta','ht', 'nHardElectrons', 'nHardMuons', 'njet60/I','njet/I', 'weight', 'isrJetPt']
+      setup['varsFromInputSignal'] = [\
+            ['mstop/I', getStopMassFromFilename],\
+            ['mlsp/I', getLSPMassFromFilename]] 
 
       from monoJetFuncs import cosDeltaPhiLepW, softIsolatedMT
       from math import acos
@@ -134,14 +150,21 @@ for seed in range(50):
       nTrainEvents = signalModel['optimalSize']/2
       setup["signalTrainEvents"] = []
       setup["signalTestEvents"] = []
+      if addAllTestEventsTree:
+        setup["signalAllTestEvents"] = []
       for i in signalEvents[:nTrainEvents]:
         setup["signalTrainEvents"].append(signalModel['eListPreselection'].GetEntry(i)) 
       for i in signalEvents[nTrainEvents:signalModel['optimalSize']]:
-        setup["signalTestEvents"].append(signalModel['eListPreselection'].GetEntry(i)) 
+        setup["signalTestEvents"].append(signalModel['eListPreselection'].GetEntry(i))
+      if addAllTestEventsTree:
+        scaleToNominal = signalModel['eListPreselection'].GetN() / float(signalModel['eListPreselection'].GetN() - nTrainEvents) 
+        for i in signalEvents[nTrainEvents:]:
+          setup["signalAllTestEvents"].append([signalModel['eListPreselection'].GetEntry(i), scaleToNominal]) 
 
       setup["backgroundTrainEvents"] = []
       setup["backgroundTestEvents"] = []
-
+      if addAllTestEventsTree:
+        setup["backgroundAllTestEvents"] = []
       eventsPassingPreselection = {}
       for bin in backgroundModel['bins']:
         eventsPassingPreselection[bin]=[]
@@ -158,10 +181,13 @@ for seed in range(50):
           setup["backgroundTrainEvents"].append(ev) 
         for ev in eventsPassingPreselection[bin][nTrainEvents:backgroundModel['optimalSize'][bin]]:
           setup["backgroundTestEvents"].append(ev) 
+        if addAllTestEventsTree:
+          scaleToNominal =  len(eventsPassingPreselection[bin])/float(len(eventsPassingPreselection[bin]) - nTrainEvents) 
+          for ev in eventsPassingPreselection[bin][nTrainEvents:]:
+            setup["backgroundAllTestEvents"].append([ev, scaleToNominal]) 
 
-      data = constructDataset(setup, signal, background, overWriteData)
+      data = constructDataset(setup, signal, background, overWriteData, addAllTestEventsTree = addAllTestEventsTree)
       
-
     evList={}
     testVars=['type1phiMet', 'softIsolatedMT', 'deltaPhi', 'rand']
     n = data['simu'].GetEntries()
@@ -199,13 +225,13 @@ for seed in range(50):
        o.IsA().Destructor(o)
     del data
 
-for v in ['type1phiMet', 'softIsolatedMT', 'deltaPhi', 'rand']:
-  c1 = ROOT.TCanvas()
-  h = ROOT.TH1F('ksres','ksres', 100,0,1)
-  for prefix in ksres.keys():
-    h.Fill(ksres[prefix][v]['ksProb'])
-  h.Draw()
-  c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngMJ/inputKSTest_'+prefix+"_"+v+".png")
+#for v in ['type1phiMet', 'softIsolatedMT', 'deltaPhi', 'rand']:
+#  c1 = ROOT.TCanvas()
+#  h = ROOT.TH1F('ksres','ksres', 100,0,1)
+#  for prefix in ksres.keys():
+#    h.Fill(ksres[prefix][v]['ksProb'])
+#  h.Draw()
+#  c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngMJ/inputKSTest_'+prefix+"_"+v+".png")
 
 
 

@@ -7,7 +7,7 @@ from datetime import datetime
 from helpers import getVarValue, deltaPhi, minAbsDeltaPhi, invMassOfLightObjects, deltaR
 
 #chmode = "incNoISRJetID" 
-chmode = "copy" 
+chmode = "copyIncMuDzID" 
 #chmode = "copyCleanedWithAllLeptons" 
 from defaultMETSamples_mc import *
 
@@ -18,7 +18,7 @@ del path
 
 import xsec
 
-subDir = "monoJetTuples_v3"
+subDir = "monoJetTuples_v2"
 
 #allSamples = [wjets, wjetsInc, ttbar, dy, qcd, ww]
 allSamples = [ttbar]
@@ -49,10 +49,8 @@ def goodMuID(c, imu ):
   isGlobal = getVarValue(c, 'muonsisGlobal', imu)
   isTracker = getVarValue(c, 'muonsisTracker', imu)
   pt = getVarValue(c, 'muonsPt', imu)
-  dz = getVarValue(c, 'muonsDz', imu)
-  eta=getVarValue(c, 'muonsEta', imu)
-  if isPF and (isGlobal or isTracker) and pt>5. and abs(eta)<2.1 and dz<0.5:
-    return {'pt':pt, 'phi':getVarValue(c, 'muonsPhi', imu), 'eta':eta, 'IsGlobal':isGlobal, 'IsTracker':isTracker, 'IsPF':isPF, 'relIso':getVarValue(c, 'muonsPFRelIso', imu), 'Dz':dz} 
+  if isPF and (isGlobal or isTracker) and pt>5.:
+    return {'pt':pt, 'phi':getVarValue(c, 'muonsPhi', imu), 'eta':getVarValue(c, 'muonsEta', imu), 'IsGlobal':isGlobal, 'IsTracker':isTracker, 'IsPF':isPF, 'relIso':getVarValue(c, 'muonsPFRelIso', imu)} 
 
 
 # -------------------------------------------
@@ -91,7 +89,7 @@ def getAllMuons(c, nmuons ):
   for i in range(0, int(nmuons)):
     cand = goodMuID(c, i)
     if cand:
-      for v in ['Pdg', 'Dxy', 'NormChi2', 'NValMuonHits', 'NumMatchedStations', 'PixelHits', 'NumtrackerLayerWithMeasurement']:
+      for v in ['Pdg', 'Dxy', 'Dz', 'NormChi2', 'NValMuonHits', 'NumMatchedStations', 'PixelHits', 'NumtrackerLayerWithMeasurement']:
         cand[v] = getVarValue(c, 'muons'+v, i)
       res.append(cand)
 #      res.append({'pt':getVarValue(c, 'muonsPt', i),'eta':getVarValue(c, 'muonsEta', i), 'phi':getVarValue(c, 'muonsPhi', i),\
@@ -139,18 +137,17 @@ def getGoodJets(c, crosscleanobjects):
   for i in range(int(njets)):
     eta = getVarValue(c, 'jetsEta', i)
     pt  = getVarValue(c, 'jetsPt', i)
-    if abs(eta) <= 4.5 and pt >= 30.:
-      id =  getVarValue(c, 'jetsID', i)
+    id  = getVarValue(c, 'jetsID', i)
+    if abs(eta) <= 4.5 and pt >= 30. and id:
       phi = getVarValue(c, 'jetsPhi', i)
       parton = int(abs(getVarValue(c, 'jetsParton', i)))
       jet = {'pt':pt, 'eta':eta,'phi':phi, 'pdg':parton,\
-      'id':id,
+  #      'ptUncorr':getVarValue(c, 'jetsPtUncorr', i),\
       'chef':getVarValue(c, 'jetsChargedHadronEnergyFraction', i), 'nhef':getVarValue(c, 'jetsNeutralHadronEnergyFraction', i),\
       'ceef':getVarValue(c, 'jetsChargedEmEnergyFraction', i), 'neef':getVarValue(c, 'jetsNeutralEmEnergyFraction', i), 'id':id,\
       'hfhef':getVarValue(c, 'jetsHFHadronEnergyFraction', i), 'hfeef':getVarValue(c, 'jetsHFEMEnergyFraction', i),\
       'muef':getVarValue(c, 'jetsMuonEnergyFraction', i), 'elef':getVarValue(c, 'jetsElectronEnergyFraction', i), 'phef':getVarValue(c, 'jetsPhotonEnergyFraction', i),\
-      'jetCutBasedPUJetIDFlag':getVarValue(c, 'jetsCutBasedPUJetIDFlag', i),'jetMET53XPUJetIDFlag':getVarValue(c, 'jetsMET53XPUJetIDFlag', i),'jetFull53XPUJetIDFlag':getVarValue(c, 'jetsFull53XPUJetIDFlag', i), 
-      'btag': getVarValue(c, 'jetsBtag', i)
+      'jetCutBasedPUJetIDFlag':getVarValue(c, 'jetsCutBasedPUJetIDFlag', i),'jetMET53XPUJetIDFlag':getVarValue(c, 'jetsMET53XPUJetIDFlag', i),'jetFull53XPUJetIDFlag':getVarValue(c, 'jetsFull53XPUJetIDFlag', i) 
       }
       isolated = True
   #      if max([jet['muef'],jet['elef']]) > 0.6 : print jet
@@ -160,17 +157,25 @@ def getGoodJets(c, crosscleanobjects):
 #          print "Cleaned", 'deltaR', deltaR(jet, obj), 'maxfrac', max([jet['muef'],jet['elef']]), 'pt:jet/obj', jet['pt'], obj['pt'], "relIso",  obj['relIso'], 'btag',getVarValue(c, 'jetsBtag', i), "parton", parton
   #          print 'Not this one!', jet, obj, deltaR(jet, obj)
           break
-      jet['isolated'] = isolated
-      res.append(jet)
+  #      for obj in crosscleanobjects:   #Jet cross-cleaning
+      if isolated:
+        ht += jet['pt']
+        btag = getVarValue(c, 'jetsBtag', i)
+        jet['btag'] = btag
+        res.append(jet)
+        if btag >= 0.679:   # bjets
+          bres.append(jet)
+          nbtags = nbtags+1
   res  = sorted(res,  key=lambda k: -k['pt'])
-  return res 
+  bres = sorted(bres, key=lambda k: -k['pt'])
+  return {"jets":res, "bjets":bres,"ht": ht, "nbtags":nbtags}
 
 #if chmode == "incNoISRJetID":
 #  def isrJetID(j):
 #    return abs(j['eta']) < 2.4
 #else:
 def isrJetID(j):
-  return j['id'] and j['chef'] > 0.2 and j['neef']<0.7 and j['nhef']<0.7 and j['ceef'] < 0.5 and abs(j['eta']) < 2.4
+  return j['chef'] > 0.2 and j['neef']<0.7 and j['nhef']<0.7 and j['ceef'] < 0.5 and abs(j['eta']) < 2.4
 
 # helpers for GenParticle serching
 def find(x,lp):
@@ -265,7 +270,7 @@ for isample, sample in enumerate(allSamples):
   else:
     variables.extend(["nTrueGenVertices", "genmet", "genmetphi", "puWeight", "puWeightSysPlus", "puWeightSysMinus"])
   
-  jetvars = ["jetPt", "jetEta", "jetPhi", "jetPdg", "jetBtag", "jetCutBasedPUJetIDFlag","jetFull53XPUJetIDFlag","jetMET53XPUJetIDFlag", "jetChef", "jetNhef", "jetCeef", "jetNeef", "jetHFhef", "jetHFeef", "jetMuef", "jetElef", "jetPhef", "jetISRJetID"]
+  jetvars = ["jetPt", "jetEta", "jetPhi", "jetPdg", "jetBtag", "jetCutBasedPUJetIDFlag","jetFull53XPUJetIDFlag","jetMET53XPUJetIDFlag", "jetChef", "jetNhef", "jetCeef", "jetNeef", "jetHFhef", "jetHFeef", "jetMuef", "jetElef", "jetPhef"]
   muvars = ["muPt", "muEta", "muPhi", "muPdg", "muRelIso", "muDxy", "muDz", "muNormChi2", "muNValMuonHits", "muNumMatchedStations", "muPixelHits", "muNumtrackerLayerWithMeasurement", 'muIsGlobal', 'muIsTracker']
   elvars = ["elPt", "elEta", "elPhi", "elPdg", "elRelIso", "elDxy", "elDz"]
   tavars = ["taPt", "taEta", "taPhi", "taPdg"]
@@ -282,7 +287,7 @@ for isample, sample in enumerate(allSamples):
     structString +="Float_t "+var+";"
   for var in extraVariables:
     structString +="Float_t "+var+";"
-  structString +="Int_t nmu, nel, nta, njet, njet60, njet60FailID, njet30FailID, njet60FailISRJetID, njet30FailISRJetID;"
+  structString +="Int_t nmu, nel, nta, njet, njet60;"
   if storeVectors:
     structString +="Int_t njetCount, nmuCount, nelCount, ntaCount;"
     for var in jetvars:
@@ -325,10 +330,6 @@ for isample, sample in enumerate(allSamples):
   t.Branch("nel",   ROOT.AddressOf(s,"nel"), 'nel/I')
   t.Branch("nta",   ROOT.AddressOf(s,"nta"), 'nta/I')
   t.Branch("njet60",   ROOT.AddressOf(s,"njet60"), 'njet60/I')
-  t.Branch("njet30FailID",   ROOT.AddressOf(s,"njet30FailID"), 'njet30FailID/I')
-  t.Branch("njet30FailISRJetID",   ROOT.AddressOf(s,"njet30FailISRJetID"), 'njet30FailISRJetID/I')
-  t.Branch("njet60FailID",   ROOT.AddressOf(s,"njet60FailID"), 'njet60FailID/I')
-  t.Branch("njet60FailISRJetID",   ROOT.AddressOf(s,"njet60FailISRJetID"), 'njet60FailISRJetID/I')
   if storeVectors:
     t.Branch("njetCount",   ROOT.AddressOf(s,"njetCount"), 'njetCount/I')
     t.Branch("nelCount",   ROOT.AddressOf(s,"nelCount"), 'nelCount/I')
@@ -444,149 +445,142 @@ for isample, sample in enumerate(allSamples):
               s.puWeightSysMinus = s.weight*sample['reweightingHistoFileSysMinus'].GetBinContent(sample['reweightingHistoFileSysMinus'].FindBin(s.nTrueGenVertices))
 
 
-          for var in extraVariables:
-            exec("s."+var+"=float('nan')")
-          nmuons = getVarValue(c, 'nmuons')   #Number of muons in Muon Vec
-          neles  = getVarValue(c, 'neles')    #Number of eles in Ele Vec
-          ntaus  = getVarValue(c, 'ntaus')    #Number of eles in Ele Vec
+          if len(extraVariables)>0: #Fill struct with nan's
+            for var in extraVariables:
+              exec("s."+var+"=float('nan')")
+            nmuons = getVarValue(c, 'nmuons')   #Number of muons in Muon Vec
+            neles  = getVarValue(c, 'neles')    #Number of eles in Ele Vec
+            ntaus  = getVarValue(c, 'ntaus')    #Number of eles in Ele Vec
 
 #            allGoodLeptons = getGoodLeptons(c, nmuons, neles, ntaus)   #get all good leptons
-          allGoodMuons = getAllMuons(c,nmuons)
-          allGoodElectrons = getAllElectrons(c, neles)
-          allGoodTaus = getAllTaus(c, ntaus)
+            allGoodMuons = getAllMuons(c,nmuons)
+            allGoodElectrons = getAllElectrons(c, neles)
+            allGoodTaus = getAllTaus(c, ntaus)
 
-          softMuons, hardMuons         = splitListOfObjects('pt', 20, allGoodMuons)
-          softElectrons, hardElectrons = splitListOfObjects('pt', 20, allGoodElectrons)
-          softTaus, hardTaus           = splitListOfObjects('pt', 20, allGoodTaus)
-          
-          hardMuonsRelIso02 = filter(lambda m:m['relIso']<0.2, hardMuons)
+            softMuons, hardMuons         = splitListOfObjects('pt', 20, allGoodMuons)
+            softElectrons, hardElectrons = splitListOfObjects('pt', 20, allGoodElectrons)
+            softTaus, hardTaus           = splitListOfObjects('pt', 20, allGoodTaus)
+            
+            hardMuonsRelIso02 = filter(lambda m:m['relIso']<0.2, hardMuons)
 #            softMuons = sorted(softMuons, key=lambda k: -k['pt'])
 #            s.nSoftMuons = len(softMuons)
-          softIsolatedMuons = filter(lambda m:m['relIso']*m['pt']<10.0, softMuons)
-          if chmode.lower().count('mudzid'):
-            softIsolatedMuons = filter(lambda m:m['Dz']<0.2, softIsolatedMuons)
-
-          s.nSoftIsolatedMuons = len(softIsolatedMuons)
-          s.nHardMuons = len(hardMuons)
-          s.nHardMuonsRelIso02 = len(hardMuonsRelIso02)
-          s.nSoftElectrons = len(softElectrons)
-          s.nHardElectrons = len(hardElectrons)
-          s.nSoftTaus = len(softTaus)
-          s.nHardTaus = len(hardTaus)
-
-          if chmode.count("CleanedWithAllLeptons"):
-            jetResult = getGoodJets(c, allGoodMuons + allGoodElectrons)
-          else:
-            jetResult = getGoodJets(c, hardMuonsRelIso02 + hardElectrons)
-          idJets30 = filter(lambda j:j['id'] and j['isolated'], jetResult)
-          for j in idJets30:
-            j['isrJetID'] = isrJetID(j)
-          idJets60 = filter(lambda j:j['id'] and j['isolated'] and j['pt']>60, jetResult)
-          s.ht = sum([ j['pt'] for j in idJets30])
-          s.njet    = len(idJets30)
-          s.nbtags  = len(filter(lambda j:j['btag']>0.679, idJets30))
-          s.njet60  = len(idJets60)
-          s.njet60FailID = len(filter(lambda j:not j['id'] and j['isolated'], jetResult))
-          s.njet30FailID = len(filter(lambda j:not j['id'] and j['isolated'] and j['pt']>60, jetResult))
-          s.njet60FailISRJetID = len(filter(lambda j:not isrJetID(j) and j['isolated'], jetResult))
-          s.njet30FailISRJetID = len(filter(lambda j:not isrJetID(j) and j['isolated'] and j['pt']>60, jetResult))
-          if len( jetResult )>=1 and jetResult[0]['pt']>110 and isrJetID(jetResult[0]) and jetResult[0]['id'] and jetResult[0]['isolated']:
-            leadingJet = jetResult[0]
-            s.isrJetPt = leadingJet['pt']
-            s.isrJetEta = leadingJet['eta']
-            s.isrJetPhi = leadingJet['phi']
-            s.isrJetPdg = leadingJet['pdg']
-            s.isrJetBtag = leadingJet['btag']
-            s.isrJetChef = leadingJet['chef']
-            s.isrJetNhef = leadingJet['nhef']
-            s.isrJetCeef = leadingJet['ceef']
-            s.isrJetNeef = leadingJet['neef']
-            s.isrJetHFhef = leadingJet['hfhef']
-            s.isrJetHFeef = leadingJet['hfeef']
-            s.isrJetMuef = leadingJet['muef']
-            s.isrJetElef = leadingJet['elef']
-            s.isrJetPhef = leadingJet['phef']
-            s.isrJetCutBasedPUJetIDFlag = leadingJet['jetCutBasedPUJetIDFlag']
-            s.isrJetFull53XPUJetIDFlag = leadingJet['jetFull53XPUJetIDFlag']
-            s.isrJetMET53XPUJetIDFlag = leadingJet['jetMET53XPUJetIDFlag']
+            softIsolatedMuons = filter(lambda m:m['relIso']*m['pt']<10.0, softMuons)
+            if chmode.lower().count('mudzid'):
+              softIsolatedMuons = filter(lambda m:m['Dz']<0.2, softIsolatedMuons)
+  
+            s.nSoftIsolatedMuons = len(softIsolatedMuons)
+            s.nHardMuons = len(hardMuons)
+            s.nHardMuonsRelIso02 = len(hardMuonsRelIso02)
+            s.nSoftElectrons = len(softElectrons)
+            s.nHardElectrons = len(hardElectrons)
+            s.nSoftTaus = len(softTaus)
+            s.nHardTaus = len(hardTaus)
+ 
+            if chmode.count("CleanedWithAllLeptons"):
+              jetResult = getGoodJets(c, allGoodMuons + allGoodElectrons)
+            else:
+              jetResult = getGoodJets(c, hardMuonsRelIso02 + hardElectrons)
+            s.ht = jetResult["ht"]
+            s.nbtags  = jetResult["nbtags"]
+            s.njet    = len(jetResult["jets"])
+            s.njet60  = len(filter(lambda j:j['pt']>60 and abs(j['eta'])<4.5, jetResult["jets"]))
+            if len( jetResult['jets'] )>=1 and jetResult['jets'][0]['pt']>110 and isrJetID(jetResult['jets'][0]):
+              leadingJet = jetResult['jets'][0]
+              s.isrJetPt = leadingJet['pt']
+              s.isrJetEta = leadingJet['eta']
+              s.isrJetPhi = leadingJet['phi']
+              s.isrJetPdg = leadingJet['pdg']
+              s.isrJetBtag = leadingJet['btag']
+              s.isrJetChef = leadingJet['chef']
+              s.isrJetNhef = leadingJet['nhef']
+              s.isrJetCeef = leadingJet['ceef']
+              s.isrJetNeef = leadingJet['neef']
+              s.isrJetHFhef = leadingJet['hfhef']
+              s.isrJetHFeef = leadingJet['hfeef']
+              s.isrJetMuef = leadingJet['muef']
+              s.isrJetElef = leadingJet['elef']
+              s.isrJetPhef = leadingJet['phef']
+              s.isrJetCutBasedPUJetIDFlag = leadingJet['jetCutBasedPUJetIDFlag']
+              s.isrJetFull53XPUJetIDFlag = leadingJet['jetFull53XPUJetIDFlag']
+              s.isrJetMET53XPUJetIDFlag = leadingJet['jetMET53XPUJetIDFlag']
+              
+              recoilJets = filter(lambda j:j['pt']>60 and deltaPhi(j['phi'], leadingJet['phi']) >=2.5, jetResult['jets'][1:])
+              s.isrJetBTBVetoPassed = (len(recoilJets)==0)
             
-            recoilJets = filter(lambda j:j['pt']>60 and j['id'] and j['isolated'] and deltaPhi(j['phi'], leadingJet['phi']) >=2.5, jetResult[1:])
-            s.isrJetBTBVetoPassed = (len(recoilJets)==0)
-          
-          if len(softIsolatedMuons)>=1:
-            s.softIsolatedMuPt                             = softIsolatedMuons[0]['pt']
-            s.softIsolatedMuEta                            = softIsolatedMuons[0]['eta']
-            s.softIsolatedMuPhi                            = softIsolatedMuons[0]['phi']
-            s.softIsolatedMuPdg                            = softIsolatedMuons[0]['Pdg']
-            s.softIsolatedMuRelIso                         = softIsolatedMuons[0]['relIso']
-            s.softIsolatedMuDxy                            = softIsolatedMuons[0]['Dxy']
-            s.softIsolatedMuDz                             = softIsolatedMuons[0]['Dz']
-            s.softIsolatedMuNormChi2                       = softIsolatedMuons[0]['NormChi2']
-            s.softIsolatedMuNValMuonHits                   = softIsolatedMuons[0]['NValMuonHits']
-            s.softIsolatedMuNumMatchedStations             = softIsolatedMuons[0]['NumMatchedStations']
-            s.softIsolatedMuPixelHits                      = softIsolatedMuons[0]['PixelHits']
-            s.softIsolatedMuNumtrackerLayerWithMeasurement = softIsolatedMuons[0]['NumtrackerLayerWithMeasurement']
-            s.softIsolatedMuIsGlobal                       = softIsolatedMuons[0]['IsGlobal']
-            s.softIsolatedMuIsTracker                      = softIsolatedMuons[0]['IsTracker']
+            if len(softIsolatedMuons)>=1:
+              s.softIsolatedMuPt                             = softIsolatedMuons[0]['pt']
+              s.softIsolatedMuEta                            = softIsolatedMuons[0]['eta']
+              s.softIsolatedMuPhi                            = softIsolatedMuons[0]['phi']
+              s.softIsolatedMuPdg                            = softIsolatedMuons[0]['Pdg']
+              s.softIsolatedMuRelIso                         = softIsolatedMuons[0]['relIso']
+              s.softIsolatedMuDxy                            = softIsolatedMuons[0]['Dxy']
+              s.softIsolatedMuDz                             = softIsolatedMuons[0]['Dz']
+              s.softIsolatedMuNormChi2                       = softIsolatedMuons[0]['NormChi2']
+              s.softIsolatedMuNValMuonHits                   = softIsolatedMuons[0]['NValMuonHits']
+              s.softIsolatedMuNumMatchedStations             = softIsolatedMuons[0]['NumMatchedStations']
+              s.softIsolatedMuPixelHits                      = softIsolatedMuons[0]['PixelHits']
+              s.softIsolatedMuNumtrackerLayerWithMeasurement = softIsolatedMuons[0]['NumtrackerLayerWithMeasurement']
+              s.softIsolatedMuIsGlobal                       = softIsolatedMuons[0]['IsGlobal']
+              s.softIsolatedMuIsTracker                      = softIsolatedMuons[0]['IsTracker']
 
-          s.nmu = len(allGoodMuons)
-          s.nel = len(allGoodElectrons)
-          s.nta = len(allGoodTaus)
-          if storeVectors:
-            s.njetCount = min(10,s.njet)
-            for i in xrange(s.njetCount):
-              s.jetPt[i]    = idJets30[i]['pt']
-              s.jetEta[i]   = idJets30[i]['eta']
-              s.jetPhi[i]   = idJets30[i]['phi']
-              s.jetPdg[i]   = idJets30[i]['pdg']
-              s.jetBtag[i]  = idJets30[i]['btag']
-              s.jetChef[i]  = idJets30[i]['chef']
-              s.jetNhef[i]  = idJets30[i]['nhef']
-              s.jetCeef[i]  = idJets30[i]['ceef']
-              s.jetNeef[i]  = idJets30[i]['neef']
-              s.jetHFhef[i] = idJets30[i]['hfhef']
-              s.jetHFeef[i] = idJets30[i]['hfeef']
-              s.jetMuef[i]  = idJets30[i]['muef']
-              s.jetElef[i]  = idJets30[i]['elef']
-              s.jetPhef[i]  = idJets30[i]['phef']
-              s.jetCutBasedPUJetIDFlag[i] = idJets30[i]['jetCutBasedPUJetIDFlag']
-              s.jetFull53XPUJetIDFlag[i]  = idJets30[i]['jetFull53XPUJetIDFlag']
-              s.jetMET53XPUJetIDFlag[i]   = idJets30[i]['jetMET53XPUJetIDFlag']
-              s.jetISRJetID[i] = idJets30[i]['isrJetID']
+            s.nmu = len(allGoodMuons)
+            s.nel = len(allGoodElectrons)
+            s.nta = len(allGoodTaus)
+            if storeVectors:
+              s.njetCount = min(10,s.njet)
+              for i in xrange(s.njetCount):
+                s.jetPt[i] = jetResult["jets"][i]['pt']
+                s.jetEta[i] = jetResult["jets"][i]['eta']
+                s.jetPhi[i] = jetResult["jets"][i]['phi']
+                s.jetPdg[i] = jetResult["jets"][i]['pdg']
+                s.jetBtag[i] = jetResult["jets"][i]['btag']
+                s.jetChef[i] = jetResult["jets"][i]['chef']
+                s.jetNhef[i] = jetResult["jets"][i]['nhef']
+                s.jetCeef[i] = jetResult["jets"][i]['ceef']
+                s.jetNeef[i] = jetResult["jets"][i]['neef']
+                s.jetHFhef[i] = jetResult["jets"][i]['hfhef']
+                s.jetHFeef[i] = jetResult["jets"][i]['hfeef']
+                s.jetMuef[i] = jetResult["jets"][i]['muef']
+                s.jetElef[i] = jetResult["jets"][i]['elef']
+                s.jetPhef[i] = jetResult["jets"][i]['phef']
+                s.jetCutBasedPUJetIDFlag[i] = jetResult["jets"][i]['jetCutBasedPUJetIDFlag']
+                s.jetFull53XPUJetIDFlag[i] = jetResult["jets"][i]['jetFull53XPUJetIDFlag']
+                s.jetMET53XPUJetIDFlag[i] = jetResult["jets"][i]['jetMET53XPUJetIDFlag']
+  #              s.jetId[i] = jetResult["jets"][i]['id']
+  #              print "Jet pt's:",i,jetResult["jets"][i]['pt']
+              s.nmuCount = min(10,s.nmu)
+              for i in xrange(s.nmuCount):
+                s.muPt[i] = allGoodMuons[i]['pt']
+                s.muEta[i] = allGoodMuons[i]['eta']
+                s.muPhi[i] = allGoodMuons[i]['phi']
+                s.muPdg[i] = allGoodMuons[i]['Pdg']
+                s.muRelIso[i] = allGoodMuons[i]['relIso']
+                s.muDxy[i] = allGoodMuons[i]['Dxy']
+                s.muDz[i] = allGoodMuons[i]['Dz']
+                s.muNormChi2[i] = allGoodMuons[i]['NormChi2']
+                s.muNValMuonHits[i] = allGoodMuons[i]['NValMuonHits']
+                s.muNumMatchedStations[i] = allGoodMuons[i]['NumMatchedStations']
+                s.muPixelHits[i] = allGoodMuons[i]['PixelHits']
+                s.muNumtrackerLayerWithMeasurement[i] = allGoodMuons[i]['NumtrackerLayerWithMeasurement']
+                s.muIsGlobal[i] = allGoodMuons[i]['IsGlobal']
+                s.muIsTracker[i] = allGoodMuons[i]['IsTracker']
 
-            s.nmuCount = min(10,s.nmu)
-            for i in xrange(s.nmuCount):
-              s.muPt[i] = allGoodMuons[i]['pt']
-              s.muEta[i] = allGoodMuons[i]['eta']
-              s.muPhi[i] = allGoodMuons[i]['phi']
-              s.muPdg[i] = allGoodMuons[i]['Pdg']
-              s.muRelIso[i] = allGoodMuons[i]['relIso']
-              s.muDxy[i] = allGoodMuons[i]['Dxy']
-              s.muDz[i] = allGoodMuons[i]['Dz']
-              s.muNormChi2[i] = allGoodMuons[i]['NormChi2']
-              s.muNValMuonHits[i] = allGoodMuons[i]['NValMuonHits']
-              s.muNumMatchedStations[i] = allGoodMuons[i]['NumMatchedStations']
-              s.muPixelHits[i] = allGoodMuons[i]['PixelHits']
-              s.muNumtrackerLayerWithMeasurement[i] = allGoodMuons[i]['NumtrackerLayerWithMeasurement']
-              s.muIsGlobal[i] = allGoodMuons[i]['IsGlobal']
-              s.muIsTracker[i] = allGoodMuons[i]['IsTracker']
-
-            s.nelCount = min(10,s.nel)
-            for i in xrange(s.nelCount):
-              s.elPt[i] = allGoodElectrons[i]['pt']
-              s.elEta[i] = allGoodElectrons[i]['eta']
-              s.elPhi[i] = allGoodElectrons[i]['phi']
-              s.elPdg[i] = allGoodElectrons[i]['pdg']
-              s.elRelIso[i] = allGoodElectrons[i]['relIso']
-              s.elDxy[i] = allGoodElectrons[i]['dxy']
-              s.elDz[i] = allGoodElectrons[i]['dz']
-#              print "Electron pt's:",i,allGoodElectrons[i]['pt']
-            s.ntaCount = min(10,s.nta)
-            for i in xrange(s.ntaCount):
-              s.taPt[i] = allGoodTaus[i]['pt']
-              s.taEta[i] = allGoodTaus[i]['eta']
-              s.taPhi[i] = allGoodTaus[i]['phi']
-              s.taPdg[i] = allGoodTaus[i]['pdg']
+              s.nelCount = min(10,s.nel)
+              for i in xrange(s.nelCount):
+                s.elPt[i] = allGoodElectrons[i]['pt']
+                s.elEta[i] = allGoodElectrons[i]['eta']
+                s.elPhi[i] = allGoodElectrons[i]['phi']
+                s.elPdg[i] = allGoodElectrons[i]['pdg']
+                s.elRelIso[i] = allGoodElectrons[i]['relIso']
+                s.elDxy[i] = allGoodElectrons[i]['dxy']
+                s.elDz[i] = allGoodElectrons[i]['dz']
+  #              print "Electron pt's:",i,allGoodElectrons[i]['pt']
+              s.ntaCount = min(10,s.nta)
+              for i in xrange(s.ntaCount):
+                s.taPt[i] = allGoodTaus[i]['pt']
+                s.taEta[i] = allGoodTaus[i]['eta']
+                s.taPhi[i] = allGoodTaus[i]['phi']
+                s.taPdg[i] = allGoodTaus[i]['pdg']
           tmpDir = ROOT.gDirectory.func()
           chain_gDir.cd()
           t.Fill()

@@ -11,7 +11,7 @@ for path in [os.path.abspath(p) for p in paths]:
   if not path in sys.path:
     sys.path.insert(1, path)
 
-from helpers import getObjFromFile, passPUJetID, htRatio
+from helpers import getObjFromFile, passPUJetID, htRatio, closestMuJetMass, closestMuJetDeltaR
 #simplePUreweightHisto = getObjFromFile('/data/schoef/monoJetStuff/simpPUreweighting.root', "ngoodVertices_Data")
 
 from simplePlotsCommon import *
@@ -40,15 +40,17 @@ chmode = "copyMuDzID"
 presel = "refSel"
 ver = "v2"
 #preprefix = ""
-preprefix = "metInc_"+ver
-additionalCut = "type1phiMet>150&&type1phiMet<250"
+preprefix = "met250_"+ver
+#additionalCut = "type1phiMet>150&&type1phiMet<250"
+additionalCut = "type1phiMet>250"
 #additionalCut = ""
 
 doOnlyOne = True
 subdir = "/pngMJ/"
 
-addData = True
+addData = False
 normalizeToData = False
+normalizeSignalToMCSum = True
 
 chainstring = "Events"
 commoncf = "(0)"
@@ -77,9 +79,11 @@ if preprefix!="":
 stop300lsp270FullSim["legendText"]  = "m_{#tilde t} = 300, m_{LSP} = 270 (Fulls.)"
 stop300lsp270FullSim["color"]  = ROOT.kRed + 3 
 
+stop300lsp240g150FullSim["legendText"]  = "m_{#tilde t} = 300, m_{LSP} = 240 (Fulls.)"
+stop300lsp240g150FullSim["color"]  = ROOT.kBlue + 3 
 #signals = [stop300lsp270, stop200lsp170g100, stop300lsp240g150]
 #signals=[stop300lsp270FullSim]
-signals=[]
+signals=[stop300lsp270FullSim, stop300lsp240g150FullSim]
 
 allSamples += signals
 
@@ -151,30 +155,54 @@ def getStack(varstring, binning, cutstring, signals, varfunc = "", addData=True,
     MC_SIGNAL.color              = signal['color'] 
     MC_SIGNAL.add = []
     res.append(MC_SIGNAL)
+    if normalizeSignalToMCSum:
+      MC_SIGNAL.normalizeTo = res[0]
+ 
   getLinesForStack(res, targetLumi)
   nhistos = len(res)
   if addData:
     res.append(DATA)
     res[0].dataMCRatio = [DATA, res[0]]
   else:
-    res[0].dataMCRatio = [res[-3], res[0]]
+    res[0].dataMCRatio = [MC_SIGNAL, res[0]]
     res[0].ratioVarName = "SUS/SM" 
   if varfunc!="":
     for var in res:
       var.varfunc = varfunc
   return res
 
-def htThrustMetSideFunc(c):
-  t = thrust(c)['htThrustMetSide']
-  if t>0.7: print c.GetLeaf('run').GetValue(), c.GetLeaf('lumi').GetValue(), c.GetLeaf('event').GetValue()
-  return t
 
-htThrustMetSide_stack = getStack(":xxx;htThrustMetSide;Number of Events",[50,0,1], commoncf, signals, addData = addData, varfunc = htThrustMetSideFunc)
-htThrustMetSide_stack[0].addOverFlowBin = "upper"
-allStacks.append(htThrustMetSide_stack)
+mT_stack  = getStack(":mT;m_{T} (GeV);Number of Events / 10 GeV",[21,0,210], commoncf, signals, softIsolatedMT, addData = addData)
+mT_stack[0].addOverFlowBin = "upper"
+allStacks.append(mT_stack)
+
+htRatio_stack = getStack(":xxx;H_{T}^{ratio};Number of Events",[40,0,1.0], commoncf, signals, addData = addData, varfunc = lambda c: htRatio(c))
+htRatio_stack[0].addOverFlowBin = "upper"
+allStacks.append(htRatio_stack)
 
 
 if not doOnlyOne:
+  def htThrustMetSideFunc(c):
+    t = thrust(c)['htThrustMetSide']
+    if t>0.7: print c.GetLeaf('run').GetValue(), c.GetLeaf('lumi').GetValue(), c.GetLeaf('event').GetValue()
+    return t
+
+  htThrustMetSide_stack = getStack(":xxx;htThrustMetSide;Number of Events",[50,0,1], commoncf, signals, addData = addData, varfunc = htThrustMetSideFunc)
+  htThrustMetSide_stack[0].addOverFlowBin = "upper"
+  allStacks.append(htThrustMetSide_stack)
+
+  closestMuJetMass_stack = getStack(":xxx;closestMuJetMass;Number of Events",[50,0,500], commoncf, signals, addData = addData, varfunc = closestMuJetMass)
+  closestMuJetMass_stack[0].addOverFlowBin = "upper"
+  allStacks.append(closestMuJetMass_stack)
+
+  closestMuJetDeltaR_stack = getStack(":xxx;closestMuJetDeltaR;Number of Events",[50,0,7], commoncf, signals, addData = addData, varfunc = closestMuJetDeltaR)
+  closestMuJetDeltaR_stack[0].addOverFlowBin = "upper"
+  allStacks.append(closestMuJetDeltaR_stack)
+
+  closestMuJetDeltaR_zoomed_stack = getStack(":xxx;closestMuJetDeltaR;Number of Events",[50,0,1], commoncf, signals, addData = addData, varfunc = closestMuJetDeltaR)
+  closestMuJetDeltaR_zoomed_stack[0].addOverFlowBin = "upper"
+  allStacks.append(closestMuJetDeltaR_zoomed_stack)
+
   met_stack = getStack(":type1phiMet;#slash{E}_{T} (GeV);Number of Events / 50 GeV",[18,150,1050], commoncf, signals, addData = addData)
   met_stack[0].addOverFlowBin = "upper"
   allStacks.append(met_stack)
@@ -264,10 +292,6 @@ if not doOnlyOne:
   linC2D_stack = getStack(":xxx;linC2D (jets,lep,MET);Number of Events",[20,0,1], commoncf, signals, addData = addData, varfunc = lambda c:circularity2D(c)['linC2D'])
   linC2D_stack[0].addOverFlowBin = "upper"
   allStacks.append(linC2D_stack)
-
-  htRatio_stack = getStack(":xxx;H_{T}^{ratio};Number of Events",[40,0,1.0], commoncf, signals, addData = addData, varfunc = lambda c: htRatio(c))
-  htRatio_stack[0].addOverFlowBin = "upper"
-  allStacks.append(htRatio_stack)
 
   thrust_stack = getStack(":xxx;thrust;Number of Events",[20,0.6,1], commoncf, signals, addData = addData, varfunc = lambda c: thrust(c)['thrust'])
   thrust_stack[0].addOverFlowBin = "upper"
@@ -483,12 +507,12 @@ if normalizeToData:
       var.normalizeWhat = stack[0]
     stack[-1].normalizeTo=""
     stack[-1].normalizeWhat=""
-else:
-  for stack in allStacks:
-    for var in stack:
-      var.normalizeTo = ""
-      var.normalizeWhat = "" 
-  
+#else:
+#  for stack in allStacks:
+#    for var in stack:
+#      var.normalizeTo = ""
+#      var.normalizeWhat = "" 
+#
 for stack in allStacks:
   if addData:
     stack[0].maximum = 6*10**2 *stack[-1].data_histo.GetMaximum()
@@ -500,11 +524,18 @@ for stack in allStacks:
 #  stack[0].lines = [[0.2, 0.9, "#font[22]{CMS preliminary}"], [0.2,0.85,str(int(round(targetLumi)))+" pb^{-1},  #sqrt{s} = 7 TeV"]]
   stack[0].lines = [[0.2, 0.9, "#font[22]{CMS Collaboration}"], [0.2,0.85,str(int(round(targetLumi/10.))/100.)+" fb^{-1},  #sqrt{s} = 8 TeV"]]
 
+drawNMStacks(1,1,[mT_stack],              subdir+prefix+"mT", False)
+htRatio_stack[0].maximum = 6*10**3 *htRatio_stack[0].data_histo.GetMaximum()
+drawNMStacks(1,1,[htRatio_stack],             subdir+prefix+"htRatio", False)
 
-htThrustMetSide_stack[0].maximum = 6*10**5 *htThrustMetSide_stack[0].data_histo.GetMaximum()
-drawNMStacks(1,1,[htThrustMetSide_stack],             subdir+prefix+"htThrustMetSide", False)
 
 if not doOnlyOne:
+  htThrustMetSide_stack[0].maximum = 6*10**5 *htThrustMetSide_stack[0].data_histo.GetMaximum()
+  drawNMStacks(1,1,[htThrustMetSide_stack],             subdir+prefix+"htThrustMetSide", False)
+  drawNMStacks(1,1,[closestMuJetMass_stack] ,             subdir+prefix+"closestMuJetMass_stack", False)
+  drawNMStacks(1,1,[closestMuJetDeltaR_stack] ,        subdir+prefix+"closestMuJetDeltaR_stack", False)
+  drawNMStacks(1,1,[closestMuJetDeltaR_zoomed_stack] ,        subdir+prefix+"closestMuJetDeltaR_zoomed_stack", False)
+
   drawNMStacks(1,1,[met_stack],             subdir+prefix+"met", False)
   drawNMStacks(1,1,[softIsolatedMuNormChi2_stack                       ]   , subdir+prefix+"softIsolatedMuNormChi2", False)
   drawNMStacks(1,1,[softIsolatedMuNValMuonHits_stack                   ]   , subdir+prefix+"softIsolatedMuNValMuonHits", False)
@@ -529,7 +560,6 @@ if not doOnlyOne:
   FWMT4_stack[0].maximum = 6*10**4 *FWMT4_stack[0].data_histo.GetMaximum()
   cosPhiMetJet_stack[0].maximum = 6*10**3 *cosPhiMetJet_stack[0].data_histo.GetMaximum()
 
-  htRatio_stack[0].maximum = 6*10**3 *htRatio_stack[0].data_histo.GetMaximum()
   thrust_stack[0].maximum = 6*10**4 *thrust_stack[0].data_histo.GetMaximum()
   htThrustLepSide_stack[0].maximum = 6*10**5 *htThrustLepSide_stack[0].data_histo.GetMaximum()
   drawNMStacks(1,1,[cosPhiMetJet_stack], subdir+prefix+"cosPhiMetJet", False)
@@ -540,11 +570,9 @@ if not doOnlyOne:
   drawNMStacks(1,1,[c2D_stack],             subdir+prefix+"c2D", False)
   drawNMStacks(1,1,[linC2D_stack],             subdir+prefix+"linC2D", False)
 
-  drawNMStacks(1,1,[htRatio_stack],             subdir+prefix+"htRatio", False)
   drawNMStacks(1,1,[thrust_stack],             subdir+prefix+"thrust", False)
   drawNMStacks(1,1,[htThrustLepSide_stack],             subdir+prefix+"htThrustLepSide", False)
 
-  drawNMStacks(1,1,[mT_stack],              subdir+prefix+"mT", False)
   drawNMStacks(1,1,[ht_stack],              subdir+prefix+"ht", False)
   
   drawNMStacks(1,1,[type1phiMetphi_stack],             subdir+prefix+"type1phiMetphi", False)

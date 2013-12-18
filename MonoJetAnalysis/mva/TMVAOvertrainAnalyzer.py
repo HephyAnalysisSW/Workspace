@@ -28,7 +28,8 @@ ksProbBkgTH1X = ROOT.TH1F('ksProbBkgTestTH1X', 'ksProbBkgTest', 100, 0, 1)
 
 for i in range(1):
 #  prefix =  "MonoJet_stop300lsp270FastSim_BkgMix_"+str(i)+"_nTrees400_nCuts_-1_maxDepthComparison_softIsolatedMT_type1phiMet_deltaPhi"
-  prefix =  "MonoJet_stop300lsp270FastSim_BkgMix_"+str(i)+"_nTrees400_nCuts_-1_maxDepthComparison_softIsolatedMT_type1phiMet"
+#  prefix =  "MonoJet_stop300lsp270FastSim_BkgMix_"+str(i)+"_nTrees400_nCuts_-1_maxDepthComparison_softIsolatedMT_type1phiMet"
+  prefix =  "MonoJet_stopDeltaM30FastSim_BkgMix_"+str(i)+"_nTrees400_nCuts_-1_maxDepthComparison_softIsolatedMT_type1phiMet"
 
   setup=pickle.load(file('/data/'+nfsUser+'/MonoJetNNAnalysis/MVA_Analyzer/'+prefix+'.pkl'))
 

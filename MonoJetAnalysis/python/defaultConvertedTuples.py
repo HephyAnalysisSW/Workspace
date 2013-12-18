@@ -59,6 +59,14 @@ stop300lsp240g150FastSim["name"]     = "stop300lsp240g150FastSim"
 stop300lsp240g150FastSim["hasWeight"]     = True
 stop300lsp240g150FastSim["dirname"]  = "/data/schoef/monoJetTuples_v2/copy/"
 
+stopDeltaM30FastSim = {}
+stopDeltaM30FastSim["bins"]     = ["stop300lsp270FastSim", "stop200lsp170g100FastSim"]
+stopDeltaM30FastSim["name"]     = "stopDeltaM30FastSim"
+stopDeltaM30FastSim["hasWeight"]     = True
+stopDeltaM30FastSim["dirname"]  = "/data/schoef/monoJetTuples_v2/copy/"
+
+
+
 data = {}
 data["bins"]    = ["data"]
 data["name"]    = "data"

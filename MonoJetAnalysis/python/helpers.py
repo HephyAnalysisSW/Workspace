@@ -1,5 +1,5 @@
 import ROOT
-from math import pi, sqrt, cos
+from math import pi, sqrt, cos, sin, sinh
 
 def getObjFromFile(fname, hname):
   f = ROOT.TFile(fname)
@@ -81,17 +81,8 @@ def getJets(c):
     jets.append({'pt':getVarValue(c, 'jetPt', i), 'eta':getVarValue(c, 'jetEta', i), 'phi':getVarValue(c, 'jetPhi', i)})
   return jets
 
-def calcHTRatio(jets, metPhi):
-  htRatio = -1
-  den=0.
-  num=0.
-  for j in jets:
-    den+=j["pt"]
-    if abs(deltaPhi(metPhi, j["phi"])) <= pi/2:
-      num+=j["pt"]
-  if len(jets)>0:
-    htRatio = num/den
-  return htRatio
+def getSoftIsolatedMu(c):
+  return {'pt':c.GetLeaf('softIsolatedMuPt').GetValue(), 'eta':c.GetLeaf('softIsolatedMuEta').GetValue(), 'phi':c.GetLeaf('softIsolatedMuPhi').GetValue()}
 
 def calcHTRatio(jets, metPhi):
   htRatio = -1
@@ -105,6 +96,44 @@ def calcHTRatio(jets, metPhi):
     htRatio = num/den
   return htRatio
 
+def calcHTRatio(jets, metPhi):
+  htRatio = -1
+  den=0.
+  num=0.
+  for j in jets:
+    den+=j["pt"]
+    if abs(deltaPhi(metPhi, j["phi"])) <= pi/2:
+      num+=j["pt"]
+  if len(jets)>0:
+    htRatio = num/den
+  return htRatio
+
+def findClosestJet(c, obj):
+  jets = getJets(c)
+  res=[]
+  for j in jets:
+    res.append([sqrt((j['phi'] - obj['phi'])**2 + (j['eta'] - obj['eta'])**2), j])
+  res.sort()
+  if len(res)>0:
+    return {'deltaR':res[0][0], 'jet':res[0][1]}
+
+def closestMuJetDeltaR(c):
+  return findClosestJet(c, getSoftIsolatedMu(c))['deltaR']
+def closestMuJetMass(c):
+  mu = getSoftIsolatedMu(c)
+  jet = findClosestJet(c, mu)['jet']
+
+  pxMu = mu['pt']*cos(mu['phi']) 
+  pyMu = mu['pt']*sin(mu['phi']) 
+  pzMu = mu['pt']*sinh(mu['eta'])
+  EMu = sqrt(pxMu**2 + pyMu**2 + pzMu**2)
+
+  pxJet = jet['pt']*cos(jet['phi'])
+  pyJet = jet['pt']*sin(jet['phi'])
+  pzJet = jet['pt']*sinh(jet['eta'])
+  EJet = sqrt(pxJet**2 + pyJet**2 + pzJet**2)
+
+  return sqrt( (EMu + EJet)**2 - (pxMu + pxJet)**2 - (pyMu + pyJet)**2 - (pzMu + pzJet)**2)
 
 def htRatio(c):
   jets = getJets(c)
