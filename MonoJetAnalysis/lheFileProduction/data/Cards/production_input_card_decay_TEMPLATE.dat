@@ -1,0 +1,15 @@
+import model mssm
+define j g u c d s b u~ c~ d~ s~ b~
+define fu u c ve vm vt
+define fd d s e- mu- ta-
+define fu~ u~ c~ ve~ vm~ vt~
+define fd~ d~ s~ e+ mu+ ta+
+XCSTOPgenerate t1 > b fd~ fu n1 / b1 b2 x1+ x2+ h+
+XCANTIgenerate t1~ > b~ fd fu~ n1 / b1~ b2~ x1- x2- h- 
+output PROC_NAME
+! cp official_run_card_decay_TEMPLATE.dat PROC_NAME/Cards/run_card.dat
+! cp official_param_card_TEMPLATE.dat PROC_NAME/Cards/param_card.dat
+! perl -p -i -e 's/YSEED/XSEED/;' PROC_NAME/Cards/run_card.dat
+! perl -p -i -e 's/YLSPMASS/XLSPMASS/;s/YSTOPMASS/XSTOPMASS/;' PROC_NAME/Cards/param_card.dat
+launch -i
+generate_events
