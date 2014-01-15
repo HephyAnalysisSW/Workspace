@@ -241,6 +241,7 @@ process.goodVertices = cms.EDFilter(
             src = cms.InputTag("offlinePrimaryVertices"),
             cut = cms.string("!isFake && ndof > 4 && abs(z) <= 24 && position.Rho <= 2")
           )
+
 if not options.mode.lower()=='sms':
   process.load("RecoMET.METFilters.hcalLaserEventFilter_cfi")
   process.hcalLaserEventFilter.vetoByRunEventNumber=cms.untracked.bool(False)

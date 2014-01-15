@@ -86,31 +86,31 @@ def getPlot(chain, cut, var, binning=None):
 
 #def getMacroPlots(TMVA_outputfile,macrotype,name
 
-def getNNCutPlot(chain, setup, cut, var, binning, weight='', nnBin = (-999, 999), weightFunc = None):
-  chain.Draw('>>eListTMP_t', cut)
-  eList = ROOT.gROOT.Get('eListTMP_t')
-  res  = ROOT.TH1F(var,var, *binning)
-#  vars={}
-#  for vn in setup['varsFromInputData']+setup['varsCalculated']:
-#    vars[vn] = chain.GetLeaf(vn)
-  print 'var',var,'filling',eList.GetN()
-  for i in range(eList.GetN()):
-    chain.GetEntry(eList.GetEntry(i))
-#    val = vars[var].GetValue()
-    if weight!='':
-      weightVal = vars[weight].GetValue()
-    if weightFunc:
-      weightVal = weightFunc(chain)
-    else:
-      weightVal = 1.
-    if nnBin[0]<=-999: #or nno>nnBin[0]:
-      if nnBin[1]>=999:#or nno<=nnBin[1]:
-        res.Fill(val, weightVal)
-#        print i, val, weightVal, nno
-  del eList
-  return res.Clone()
+#def getMVACutPlot(chain, setup, cut, var, binning, weight='', nnBin = (-999, 999), weightFunc = None):
+#  chain.Draw('>>eListTMP_t', cut)
+#  eList = ROOT.gROOT.Get('eListTMP_t')
+#  res  = ROOT.TH1F(var,var, *binning)
+##  vars={}
+##  for vn in setup['varsFromInputData']+setup['varsCalculated']:
+##    vars[vn] = chain.GetLeaf(vn)
+#  print 'var',var,'filling',eList.GetN()
+#  for i in range(eList.GetN()):
+#    chain.GetEntry(eList.GetEntry(i))
+##    val = vars[var].GetValue()
+#    if weight!='':
+#      weightVal = vars[weight].GetValue()
+#    if weightFunc:
+#      weightVal = weightFunc(chain)
+#    else:
+#      weightVal = 1.
+#    if nnBin[0]<=-999: #or nno>nnBin[0]:
+#      if nnBin[1]>=999:#or nno<=nnBin[1]:
+#        res.Fill(val, weightVal)
+##        print i, val, weightVal, nno
+#  del eList
+#  return res.Clone()
 
-#def getNNOutput(tmlp, sample, eList, varNames, tinputs, result='plot', nbins=200, nnThreshold=-999.):
+#def getMVAOutput(tmlp, sample, eList, varNames, tinputs, result='plot', nbins=200, nnThreshold=-999.):
 #  vars={}
 ##tmlp is 'MLP_ANN': output of TMVA
 #  for vn in varNames:
@@ -202,7 +202,7 @@ def constructDataset(setup, signal, background, overWrite = False, addAllTestEve
     print "Not found:",setup['dataFile']
     return
   if (not os.path.isfile(setup['dataFile'])) or overWrite:
-    print 'Creating NN dataset',setup['dataFile']
+    print 'Creating MVA dataset',setup['dataFile']
     if overWrite and os.path.isfile(setup['dataFile']):
       print 'Warning! File will be overwritten'
     simu =  ROOT.TTree('MonteCarlo', 'Filtered Monte Carlo Events')
@@ -376,7 +376,7 @@ def constructDataset(setup, signal, background, overWrite = False, addAllTestEve
     eListSig.Write()
     f.Close()
 
-    print 'Written NN dataset to', setup['dataFile']
+    print 'Written MVA dataset to', setup['dataFile']
     setup['dataSetConfigFile'] = setup['dataFile'].replace('.root', '.pkl')
     setupStripped = copy.deepcopy(setup)
     setupStripped['varsCalculated'] = [v[:-1]+['removedFunction'] for v in setupStripped['varsCalculated']]
@@ -385,7 +385,7 @@ def constructDataset(setup, signal, background, overWrite = False, addAllTestEve
       setupStripped[v]='removed' 
     pickle.dump(setupStripped, file(setup['dataSetConfigFile'],"w"))
 
-    print 'Written NN setup to',setup['dataSetConfigFile'] 
+    print 'Written MVA setup to',setup['dataSetConfigFile'] 
     Events = ROOT.gDirectory.Get("Events")
     del Events
     del simu
@@ -393,7 +393,7 @@ def constructDataset(setup, signal, background, overWrite = False, addAllTestEve
       del test
     del eListBkg
     del eListSig
-  print 'Loading NN dataset from', setup['dataFile']
+  print 'Loading MVA dataset from', setup['dataFile']
   g = ROOT.gDirectory.Get("MonteCarlo")
   if g: del g
   simu      = getObjFromFile(setup['dataFile'],'MonteCarlo')
@@ -788,7 +788,32 @@ def getYield(sample, setup, reader, method, cut, nnCutVal, weight='weight', weig
   del l
   return res
 
-def fillNNHisto(sample, setup, reader, method, cut, histo, weight):
+def fillHistoAfterMVA(sample, setup, reader, method, cut, var, histo, mvaBin = [-999,999], weight=None, weightFunc = None):
+  histo.Reset()
+  l = getEList(sample, cut)
+  for i in range(l.GetN()):
+    sample.GetEntry(l.GetEntry(i))
+    inputs = ROOT.std.vector('float')()
+    for v in setup['mvaInputVars']:
+      val = sample.GetLeaf(v).GetValue()
+      inputs.push_back(val)
+    if weight:
+      if type(weight)!=type(""):
+        w=weight
+      else:
+        w=sample.GetLeaf(weight).GetValue()
+    if weightFunc:
+      w = weightFunc(sample)
+    if method['type']!=ROOT.TMVA.Types.kCuts:
+      nno =   reader.EvaluateMVA(inputs,  method['name'])
+    if nno>mvaBin[0] and nno<=mvaBin[1]:
+      if type(var)==type(""):
+        histo.Fill(sample.GetLeaf(var).GetValue(), w)
+      else:
+        histo.Fill(var(sample), w)
+  return histo
+
+def fillMVAHisto(sample, setup, reader, method, cut, histo, weight=None, weightFunc = None):
   histo.Reset()
   l = getEList(sample, cut)
   for i in range(l.GetN()):
@@ -796,26 +821,21 @@ def fillNNHisto(sample, setup, reader, method, cut, histo, weight):
     inputs = ROOT.std.vector('float')()
     for var in setup['mvaInputVars']:
       val = sample.GetLeaf(var).GetValue()
-#      vars[var][0] = val
-    #inputs = array('f', [sample.GetLeaf(var).GetValue() for var in setup['mvaInputVars']])
       inputs.push_back(val)
-#    print inputs
-    if type(weight)!=type(""):
-      w=weight
-    else:
-      w=sample.GetLeaf(weight).GetValue()
+    if weight:
+      if type(weight)!=type(""):
+        w=weight
+      else:
+        w=sample.GetLeaf(weight).GetValue()
+    if weightFunc:
+      w = weightFunc(sample)
     if method['type']!=ROOT.TMVA.Types.kCuts:
       nno =   reader.EvaluateMVA(inputs,  method['name'])
-#    else:
-#      nno =   reader.EvaluateMVA(inputs,  method['name'], nnCutVal)
-##      print nno, inputs[0],inputs[1], nnCutVal
-#      if nno:res+=sample.GetLeaf(weight).GetValue()
     histo.Fill(nno, w)
   return histo
 
 
 def getYieldFromChain(c, cut, weight = "weight"):
-
   cut = weight+"*("+cut+")"
   c.Draw("1>>htmp(1,0,2)", cut, "goff")
   htmp =  ROOT.gDirectory.Get("htmp")

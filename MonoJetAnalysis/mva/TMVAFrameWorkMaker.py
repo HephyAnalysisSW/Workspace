@@ -57,11 +57,19 @@ convImprove = "1e-7"
 #comparison = "nTree"
 #comparison = "maxDepth"
 #comparison = "nEventsMin"
-allVars = ["softIsolatedMT", "type1phiMet",'deltaPhi', 'isrJetPt', 'softIsolatedMuPt', 'softIsolatedMuEta', 'softIsolatedMuCharge', 'ht', 'njet' ]
-#for omit in range(len(allVars)):
-#  selectedVars = allVars[0:omit] + allVars[omit+1:] 
-if True:
-  selectedVars = allVars
+#allVars = ["softIsolatedMT", "type1phiMet",'deltaPhi', 'isrJetPt', 'softIsolatedMuPt', 'softIsolatedMuEta', 'softIsolatedMuCharge', 'ht', 'njet' ] #1st remove: deltaPhi
+#allVars = ["softIsolatedMT", "type1phiMet",'isrJetPt', 'softIsolatedMuPt', 'softIsolatedMuEta', 'softIsolatedMuCharge', 'ht', 'njet' ] #2nd remove:ht
+#allVars = ["softIsolatedMT", "type1phiMet",'isrJetPt', 'softIsolatedMuPt', 'softIsolatedMuEta', 'softIsolatedMuCharge', 'njet' ]#rd remove: softIsolatedMuEta
+#allVars = ["softIsolatedMT", "type1phiMet",'isrJetPt', 'softIsolatedMuPt', 'softIsolatedMuCharge', 'njet' ]
+
+#allVars = ["type1phiMet", 'isrJetPt', 'softIsolatedMuPt', 'softIsolatedMuEta','ht', 'njet' ]
+#allVars = ["type1phiMet", 'isrJetPt', 'softIsolatedMuPt', 'softIsolatedMuEta', 'softIsolatedMuCharge','ht', 'njet' ] #1st omit: ht
+allVars = ["type1phiMet", 'isrJetPt', 'softIsolatedMuPt', 'softIsolatedMuCharge', 'njet' ] #2nd omit: softIsolatedMuEta
+
+for omit in range(len(allVars)):
+  selectedVars = allVars[0:omit] + allVars[omit+1:] 
+#if True:
+#  selectedVars = allVars
   for comparison in ['nTree', 'maxDepth', 'nEventsMin']:
     for seed in range(1):
     #  datasetName =   'MonoJet_stop300lsp270FastSim_BkgMix_'+str(seed)
