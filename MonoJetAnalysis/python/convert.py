@@ -5,7 +5,6 @@ from math import *
 import sys, os, copy
 from datetime import datetime
 from helpers import getVarValue, deltaPhi, minAbsDeltaPhi, invMassOfLightObjects, deltaR
-
 #chmode = "incNoISRJetID" 
 chmode = "copy" 
 #chmode = "copyCleanedWithAllLeptons" 
@@ -15,6 +14,7 @@ path = os.path.abspath('../../HEPHYCommonTools/python')
 if not path in sys.path:
     sys.path.insert(1, path)
 del path
+from monoJetFuncs import softIsolatedMT, pmuboost3d
 
 import xsec
 
@@ -276,7 +276,7 @@ for isample, sample in enumerate(allSamples):
   extraVariables += ["isrJetPt", "isrJetEta", "isrJetPhi", "isrJetPdg", "isrJetBtag", "isrJetChef", "isrJetNhef", "isrJetCeef", "isrJetNeef", "isrJetHFhef", "isrJetHFeef", "isrJetMuef", "isrJetElef", "isrJetPhef", "isrJetCutBasedPUJetIDFlag", "isrJetFull53XPUJetIDFlag", "isrJetMET53XPUJetIDFlag", "isrJetBTBVetoPassed"]
 
   extraVariables += ["softIsolatedMuPt", "softIsolatedMuEta", "softIsolatedMuPhi", "softIsolatedMuPdg", "softIsolatedMuRelIso", "softIsolatedMuDxy", "softIsolatedMuDz",  'softIsolatedMuNormChi2', 'softIsolatedMuNValMuonHits', 'softIsolatedMuNumMatchedStations', 'softIsolatedMuPixelHits', 'softIsolatedMuNumtrackerLayerWithMeasurement', 'softIsolatedMuIsTracker', 'softIsolatedMuIsGlobal']
-
+  extraVariables += ["softIsolatedMT", "softIsolatedpmuboost3d"]
   structString = "struct MyStruct_"+str(nc)+"_"+str(isample)+"{ULong64_t event;"
   for var in variables:
     structString +="Float_t "+var+";"
@@ -528,7 +528,8 @@ for isample, sample in enumerate(allSamples):
             s.softIsolatedMuNumtrackerLayerWithMeasurement = softIsolatedMuons[0]['NumtrackerLayerWithMeasurement']
             s.softIsolatedMuIsGlobal                       = softIsolatedMuons[0]['IsGlobal']
             s.softIsolatedMuIsTracker                      = softIsolatedMuons[0]['IsTracker']
-
+            s.softIsolatedMT                               = sqrt(2.0*s.softIsolatedMuPt*s.type1phiMet*(1-cos(s.softIsolatedMuPhi - s.type1phiMetphi)))
+            s.softIsolatedpmuboost3d                       = pmuboost3d(s)
           s.nmu = len(allGoodMuons)
           s.nel = len(allGoodElectrons)
           s.nta = len(allGoodTaus)

@@ -1,5 +1,5 @@
 import os, sys, ROOT
-from math import cos, sin, sqrt, asinh
+from math import cos, sin, sqrt, asinh, acosh, sinh
 
 def getValue(chain, varname):
   alias = chain.GetAlias(varname)
@@ -34,14 +34,14 @@ def pmuboost3d(e):
     wwwtlv = ROOT.TLorentzVector(1e-9,1e-9,1e-9,1e-9)
     mettlv = ROOT.TLorentzVector(1e-9,1e-9,1e-9,1e-9)
     leptlv = ROOT.TLorentzVector(1e-9,1e-9,1e-9,1e-9)
-    for ij in xrange(e.njet):
+    for ij in xrange(e.njetCount):
         if(e.jetPt[ij] > 30.):
             tlvaux = ROOT.TLorentzVector(1e-9,1e-9,1e-9,1e-9)
             tlvaux.SetPtEtaPhiM(e.jetPt[ij],0.,e.jetPhi[ij],0.)
             wwwtlv -= tlvaux
     mettlv.SetPtEtaPhiM(e.type1phiMet,0.,e.type1phiMetphi,0.)
-#    leptlv.SetPtEtaPhiM(e.softIsolatedMuPt,e.softIsolatedMuEta,e.softIsolatedMuPhi,0.)
-    leptlv.SetPtEtaPhiM(e.muPt[0],e.muEta[0],e.muPhi[0],0.)
+    leptlv.SetPtEtaPhiM(e.softIsolatedMuPt,e.softIsolatedMuEta,e.softIsolatedMuPhi,0.)
+#    leptlv.SetPtEtaPhiM(e.muPt[0],e.muEta[0],e.muPhi[0],0.)
 # calculate eta(W) estimate; take the + solution
     ptl = (wwwtlv - mettlv).Pt()
     ptn = mettlv.Pt()

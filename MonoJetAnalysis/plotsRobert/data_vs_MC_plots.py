@@ -35,22 +35,28 @@ allStacks=[]
 
 minimum=10**(-0.5)
 
-chmode = "copyMuDzID"
+chmode = "copy"
 #presel = "refSel"
 presel = "refSel"
-ver = "v2"
+ver = "v3"
 #preprefix = ""
-preprefix = "met250_"+ver
+preprefix = "met150-250_"+ver
 #additionalCut = "type1phiMet>150&&type1phiMet<250"
-additionalCut = "type1phiMet>250"
+additionalCut = "type1phiMet>150&&type1phiMet<250"
 #additionalCut = ""
 
-doOnlyOne = True
-subdir = "/pngMJ/"
+subdir = "/pngDegStop/"
 
-addData = False
+doAnalysisVars            = True
+doAllDiscriminatingVars   = False 
+doSoftIsolatedVars        = False 
+doISRJetVars              = False 
+doOtherVars               = False 
+
+addData = True
+addSignals = True
 normalizeToData = False
-normalizeSignalToMCSum = True
+normalizeSignalToMCSum = False
 
 chainstring = "Events"
 commoncf = "(0)"
@@ -84,8 +90,8 @@ stop300lsp240g150FullSim["color"]  = ROOT.kBlue + 3
 #signals = [stop300lsp270, stop200lsp170g100, stop300lsp240g150]
 #signals=[stop300lsp270FullSim]
 signals=[stop300lsp270FullSim, stop300lsp240g150FullSim]
-
-allSamples += signals
+if addSignals:
+  allSamples += signals
 
 for sample in allSamples:
   sample["Chain"] = chainstring
@@ -171,17 +177,41 @@ def getStack(varstring, binning, cutstring, signals, varfunc = "", addData=True,
       var.varfunc = varfunc
   return res
 
+if doAnalysisVars:
+  pmuboost3d_stack  = getStack(":pmuboost3d;pmuboost3d (GeV);Number of Events / 10 GeV",[21,0,210], commoncf, signals, pmuboost3d, addData = addData)
+  pmuboost3d_stack[0].addOverFlowBin = "upper"
+  allStacks.append(pmuboost3d_stack)
 
-mT_stack  = getStack(":mT;m_{T} (GeV);Number of Events / 10 GeV",[21,0,210], commoncf, signals, softIsolatedMT, addData = addData)
-mT_stack[0].addOverFlowBin = "upper"
-allStacks.append(mT_stack)
+  mT_stack  = getStack(":mT;m_{T} (GeV);Number of Events / 10 GeV",[21,0,210], commoncf, signals, softIsolatedMT, addData = addData)
+  mT_stack[0].addOverFlowBin = "upper"
+  allStacks.append(mT_stack)
 
-htRatio_stack = getStack(":xxx;H_{T}^{ratio};Number of Events",[40,0,1.0], commoncf, signals, addData = addData, varfunc = lambda c: htRatio(c))
-htRatio_stack[0].addOverFlowBin = "upper"
-allStacks.append(htRatio_stack)
+  htRatio_stack = getStack(":xxx;H_{T}^{ratio};Number of Events",[40,0,1.0], commoncf, signals, addData = addData, varfunc = lambda c: htRatio(c))
+  htRatio_stack[0].addOverFlowBin = "upper"
+  allStacks.append(htRatio_stack)
+
+  met_stack = getStack(":type1phiMet;#slash{E}_{T} (GeV);Number of Events / 50 GeV",[18,150,1050], commoncf, signals, addData = addData)
+  met_stack[0].addOverFlowBin = "upper"
+  allStacks.append(met_stack)
+
+  njet_stack = getStack(":njet;n_{jet};Number of Events",[10,0,10], commoncf, signals, addData = addData)
+  njet_stack[0].addOverFlowBin = "upper"
+  allStacks.append(njet_stack)
+
+  njet60_stack = getStack(":njet60;n_{jet};Number of Events",[10,0,10], commoncf.replace('&&njet60<=2',''), signals, addData = addData)
+  njet60_stack[0].addOverFlowBin = "upper"
+  allStacks.append(njet60_stack)
+  
+  nbtags_stack = getStack(":nbtags;n_{b-tags};Number of Events",[10,0,10], commoncf, signals, addData = addData)
+  nbtags_stack[0].addOverFlowBin = "upper"
+  allStacks.append(nbtags_stack)
+
+  ht_stack                          = getStack(":ht;H_{T} (GeV);Number of Events / 25 GeV",[41,500,1525 ], commoncf, signals, addData = addData)
+  ht_stack[0].addOverFlowBin = "upper"
+  allStacks.append(ht_stack)
 
 
-if not doOnlyOne:
+if doAllDiscriminatingVars:
   def htThrustMetSideFunc(c):
     t = thrust(c)['htThrustMetSide']
     if t>0.7: print c.GetLeaf('run').GetValue(), c.GetLeaf('lumi').GetValue(), c.GetLeaf('event').GetValue()
@@ -203,11 +233,87 @@ if not doOnlyOne:
   closestMuJetDeltaR_zoomed_stack[0].addOverFlowBin = "upper"
   allStacks.append(closestMuJetDeltaR_zoomed_stack)
 
-  met_stack = getStack(":type1phiMet;#slash{E}_{T} (GeV);Number of Events / 50 GeV",[18,150,1050], commoncf, signals, addData = addData)
-  met_stack[0].addOverFlowBin = "upper"
-  allStacks.append(met_stack)
+  cosPhiMetJet_stack = getStack(":xxx;cos(#phi(#slash{E}_{T}, ISR-jet));Number of Events",[20,-1,1], commoncf, signals, addData = addData, varfunc = lambda c: cos(getVarValue(c, 'isrJetPhi') - getVarValue(c, 'softIsolatedMuPhi')))
+  cosPhiMetJet_stack[0].addOverFlowBin = "both"
+  allStacks.append(cosPhiMetJet_stack)
 
-    
+  FWMT1_stack = getStack(":xxx;FMWT1 (jets,lep,MET);Number of Events",[20,0,1], commoncf, signals, addData = addData, varfunc = lambda c:foxWolframMoments(c)['FWMT1'])
+  FWMT1_stack[0].addOverFlowBin = "upper"
+  allStacks.append(FWMT1_stack)
+
+  FWMT2_stack = getStack(":xxx;FMWT2 (jets,lep,MET);Number of Events",[20,0,1], commoncf, signals, addData = addData, varfunc = lambda c:foxWolframMoments(c)['FWMT2'])
+  FWMT2_stack[0].addOverFlowBin = "upper"
+  allStacks.append(FWMT2_stack)
+
+  FWMT3_stack = getStack(":xxx;FMWT3 (jets,lep,MET);Number of Events",[20,0,1], commoncf, signals, addData = addData, varfunc = lambda c:foxWolframMoments(c)['FWMT3'])
+  FWMT3_stack[0].addOverFlowBin = "upper"
+  allStacks.append(FWMT3_stack)
+
+  FWMT4_stack = getStack(":xxx;FMWT4 (jets,lep,MET);Number of Events",[20,0,1], commoncf, signals, addData = addData, varfunc = lambda c:foxWolframMoments(c)['FWMT4'])
+  FWMT4_stack[0].addOverFlowBin = "upper"
+  allStacks.append(FWMT4_stack)
+
+
+  c2D_stack = getStack(":xxx;c2D (jets,lep,MET);Number of Events",[20,0,1], commoncf, signals, addData = addData, varfunc = lambda c:circularity2D(c)['c2D'])
+  c2D_stack[0].addOverFlowBin = "upper"
+  allStacks.append(c2D_stack)
+
+  linC2D_stack = getStack(":xxx;linC2D (jets,lep,MET);Number of Events",[20,0,1], commoncf, signals, addData = addData, varfunc = lambda c:circularity2D(c)['linC2D'])
+  linC2D_stack[0].addOverFlowBin = "upper"
+  allStacks.append(linC2D_stack)
+
+  thrust_stack = getStack(":xxx;thrust;Number of Events",[20,0.6,1], commoncf, signals, addData = addData, varfunc = lambda c: thrust(c)['thrust'])
+  thrust_stack[0].addOverFlowBin = "upper"
+  allStacks.append(thrust_stack)
+
+  htThrustLepSide_stack = getStack(":xxx;htThrustLepSide;Number of Events",[50,0,1], commoncf, signals, addData = addData, varfunc = lambda c: thrust(c)['htThrustLepSide'])
+  htThrustLepSide_stack[0].addOverFlowBin = "upper"
+  allStacks.append(htThrustLepSide_stack)
+
+  sTlep_stack  = getStack(":XXX;S_{T, lep.} (GeV);Number of Events / 50 GeV",[21,0,1050], commoncf, signals, lambda c: c.GetLeaf('softIsolatedMuPt').GetValue() + c.GetLeaf('type1phiMet').GetValue() , addData = addData)
+  sTlep_stack[0].addOverFlowBin = "upper"
+  allStacks.append(sTlep_stack)
+
+  cosDeltaPhiLepMET_stack  = getStack(":xxx;cos(#Delta #phi(l, #slash{E}_{T}));Number of Events",[30,-1.1,1.1], commoncf, signals, lambda c: cos(c.GetLeaf('softIsolatedMuPhi').GetValue() - c.GetLeaf('type1phiMetphi').GetValue()), addData = addData)
+  allStacks.append(cosDeltaPhiLepMET_stack)
+
+  cosDeltaPhiLepW_stack  = getStack(":xxx;cos(#Delta #phi(l, #slash{E}_{T}));Number of Events",[30,-1.1,1.1], commoncf, signals, cosDeltaPhiLepW, addData = addData)
+  allStacks.append(cosDeltaPhiLepW_stack)
+
+#  ptw_stack = getStack(":sqrt((metpx + leptonPt*cos(lepton_phi))**2 + (metpy + leptonPt*sin(lepton_phi))**2);(l+#slash{E})_{T}; Number of Events / 25 GeV",[21,0,525], commoncf, signals, addData = addData)
+#  ptw_stack[0].addOverFlowBin = "upper"
+#  allStacks.append(ptw_stack)
+
+
+if doSoftIsolatedVars:
+  softIsolatedMuPt_stack = getStack(":softIsolatedMuPt;p_{T} of soft isolated muon;Number of Events / 1 GeV",[25,0,25], commoncf, signals, addData = addData)
+  softIsolatedMuPt_stack[0].addOverFlowBin = "upper"
+  allStacks.append(softIsolatedMuPt_stack)
+
+  softIsolatedMuEta_stack = getStack(":softIsolatedMuEta;#eta of soft isolated muon;Number of Events",[20,-4,4], commoncf, signals, addData = addData)
+  softIsolatedMuEta_stack[0].addOverFlowBin = "both"
+  allStacks.append(softIsolatedMuEta_stack)
+
+  softIsolatedMuPhi_stack = getStack(":softIsolatedMuPhi;#phi of soft isolated muon;Number of Events",[20,-4,4], commoncf, signals, addData = addData)
+  softIsolatedMuPhi_stack[0].addOverFlowBin = "both"
+  allStacks.append(softIsolatedMuPhi_stack)
+
+  softIsolatedMuCharge_stack = getStack(":XXX;charge of soft isolated muon;Number of Events",[3,-1,2], commoncf, signals, lambda c: c.GetLeaf('softIsolatedMuPdg').GetValue()/abs(c.GetLeaf('softIsolatedMuPdg').GetValue()), addData = addData)
+  softIsolatedMuCharge_stack[0].addOverFlowBin = "both"
+  allStacks.append(softIsolatedMuCharge_stack)
+
+  softIsolatedMuRelIso_stack = getStack(":softIsolatedMuRelIso;I_{rel.} of soft isolated muon;Number of Events",[24,0,1.2], commoncf, signals, addData = addData)
+  softIsolatedMuRelIso_stack[0].addOverFlowBin = "both"
+  allStacks.append(softIsolatedMuRelIso_stack)
+
+  softIsolatedMuAbsIso_stack = getStack(":XXX;I_{abs.} of soft isolated muon;Number of Events",[30,0,12], commoncf, signals, lambda c: c.GetLeaf('softIsolatedMuRelIso').GetValue()*c.GetLeaf('softIsolatedMuPt').GetValue(), addData = addData)
+  softIsolatedMuAbsIso_stack[0].addOverFlowBin = "both"
+  allStacks.append(softIsolatedMuAbsIso_stack)
+
+  softIsolatedMuDxy_stack = getStack(":softIsolatedMuDxy;d_{xy} of soft isolated muon;Number of Events",[40,0,.08], commoncf, signals, addData = addData)
+  softIsolatedMuDxy_stack[0].addOverFlowBin = "both"
+  allStacks.append(softIsolatedMuDxy_stack)
+
   softIsolatedMuNormChi2_stack = getStack(":softIsolatedMuNormChi2;#chi^{2} of global muon track;Number of Events",[30,0,30], commoncf, signals)
   softIsolatedMuNormChi2_stack[0].addOverFlowBin = "both"
   allStacks.append(softIsolatedMuNormChi2_stack)
@@ -264,75 +370,8 @@ if not doOnlyOne:
   softIsolatedMuDz_twoPixelHits_stack[0].addOverFlowBin = "both"
   allStacks.append(softIsolatedMuDz_twoPixelHits_stack)
 
-  cosPhiMetJet_stack = getStack(":xxx;cos(#phi(#slash{E}_{T}, ISR-jet));Number of Events",[20,-1,1], commoncf, signals, addData = addData, varfunc = lambda c: cos(getVarValue(c, 'isrJetPhi') - getVarValue(c, 'softIsolatedMuPhi')))
-  cosPhiMetJet_stack[0].addOverFlowBin = "both"
-  allStacks.append(cosPhiMetJet_stack)
 
-  FWMT1_stack = getStack(":xxx;FMWT1 (jets,lep,MET);Number of Events",[20,0,1], commoncf, signals, addData = addData, varfunc = lambda c:foxWolframMoments(c)['FWMT1'])
-  FWMT1_stack[0].addOverFlowBin = "upper"
-  allStacks.append(FWMT1_stack)
-
-  FWMT2_stack = getStack(":xxx;FMWT2 (jets,lep,MET);Number of Events",[20,0,1], commoncf, signals, addData = addData, varfunc = lambda c:foxWolframMoments(c)['FWMT2'])
-  FWMT2_stack[0].addOverFlowBin = "upper"
-  allStacks.append(FWMT2_stack)
-
-  FWMT3_stack = getStack(":xxx;FMWT3 (jets,lep,MET);Number of Events",[20,0,1], commoncf, signals, addData = addData, varfunc = lambda c:foxWolframMoments(c)['FWMT3'])
-  FWMT3_stack[0].addOverFlowBin = "upper"
-  allStacks.append(FWMT3_stack)
-
-  FWMT4_stack = getStack(":xxx;FMWT4 (jets,lep,MET);Number of Events",[20,0,1], commoncf, signals, addData = addData, varfunc = lambda c:foxWolframMoments(c)['FWMT4'])
-  FWMT4_stack[0].addOverFlowBin = "upper"
-  allStacks.append(FWMT4_stack)
-
-
-  c2D_stack = getStack(":xxx;c2D (jets,lep,MET);Number of Events",[20,0,1], commoncf, signals, addData = addData, varfunc = lambda c:circularity2D(c)['c2D'])
-  c2D_stack[0].addOverFlowBin = "upper"
-  allStacks.append(c2D_stack)
-
-  linC2D_stack = getStack(":xxx;linC2D (jets,lep,MET);Number of Events",[20,0,1], commoncf, signals, addData = addData, varfunc = lambda c:circularity2D(c)['linC2D'])
-  linC2D_stack[0].addOverFlowBin = "upper"
-  allStacks.append(linC2D_stack)
-
-  thrust_stack = getStack(":xxx;thrust;Number of Events",[20,0.6,1], commoncf, signals, addData = addData, varfunc = lambda c: thrust(c)['thrust'])
-  thrust_stack[0].addOverFlowBin = "upper"
-  allStacks.append(thrust_stack)
-
-  htThrustLepSide_stack = getStack(":xxx;htThrustLepSide;Number of Events",[50,0,1], commoncf, signals, addData = addData, varfunc = lambda c: thrust(c)['htThrustLepSide'])
-  htThrustLepSide_stack[0].addOverFlowBin = "upper"
-  allStacks.append(htThrustLepSide_stack)
-
-
-
-  mT_stack  = getStack(":mT;m_{T} (GeV);Number of Events / 10 GeV",[21,0,210], commoncf, signals, softIsolatedMT, addData = addData)
-  mT_stack[0].addOverFlowBin = "upper"
-  allStacks.append(mT_stack)
-
-  sTlep_stack  = getStack(":XXX;S_{T, lep.} (GeV);Number of Events / 50 GeV",[21,0,1050], commoncf, signals, lambda c: c.GetLeaf('softIsolatedMuPt').GetValue() + c.GetLeaf('type1phiMet').GetValue() , addData = addData)
-  sTlep_stack[0].addOverFlowBin = "upper"
-  allStacks.append(sTlep_stack)
-
-  cosDeltaPhiLepMET_stack  = getStack(":xxx;cos(#Delta #phi(l, #slash{E}_{T}));Number of Events",[30,-1.1,1.1], commoncf, signals, lambda c: cos(c.GetLeaf('softIsolatedMuPhi').GetValue() - c.GetLeaf('type1phiMetphi').GetValue()), addData = addData)
-  allStacks.append(cosDeltaPhiLepMET_stack)
-
-  cosDeltaPhiLepW_stack  = getStack(":xxx;cos(#Delta #phi(l, #slash{E}_{T}));Number of Events",[30,-1.1,1.1], commoncf, signals, cosDeltaPhiLepW, addData = addData)
-  allStacks.append(cosDeltaPhiLepW_stack)
-
-  ht_stack                          = getStack(":ht;H_{T} (GeV);Number of Events / 25 GeV",[41,500,1525 ], commoncf, signals, addData = addData)
-  ht_stack[0].addOverFlowBin = "upper"
-  allStacks.append(ht_stack)
-
-#  ptw_stack = getStack(":sqrt((metpx + leptonPt*cos(lepton_phi))**2 + (metpy + leptonPt*sin(lepton_phi))**2);(l+#slash{E})_{T}; Number of Events / 25 GeV",[21,0,525], commoncf, signals, addData = addData)
-#  ptw_stack[0].addOverFlowBin = "upper"
-#  allStacks.append(ptw_stack)
-
-  type1phiMetphi_stack = getStack(":type1phiMetphi;#phi(#slash{E}_{T});Number of Events",[40,-pi,pi], commoncf, signals, addData = addData)
-  type1phiMetphi_stack[0].addOverFlowBin = "upper"
-  allStacks.append(type1phiMetphi_stack)
-
-  ngoodVertices_stack = getStack(":ngoodVertices;Number of Vertices;Number of Events",[61,0,61], commoncf, signals, addData = addData)
-  ngoodVertices_stack[0].addOverFlowBin = "upper"
-  allStacks.append(ngoodVertices_stack)
-
+if doISRJetVars:
   isrJetPt_stack = getStack(":isrJetPt;p_{T} of ISR jet;Number of Events / 50 GeV",[50,0,1000], commoncf, signals, addData = addData)
   isrJetPt_stack[0].addOverFlowBin = "upper"
   allStacks.append(isrJetPt_stack)
@@ -385,49 +424,19 @@ if not doOnlyOne:
   isrJetPhef_stack[0].addOverFlowBin = "upper"
   allStacks.append(isrJetPhef_stack)
 
+if doOtherVars:
+  type1phiMetphi_stack = getStack(":type1phiMetphi;#phi(#slash{E}_{T});Number of Events",[40,-pi,pi], commoncf, signals, addData = addData)
+  type1phiMetphi_stack[0].addOverFlowBin = "upper"
+  allStacks.append(type1phiMetphi_stack)
+
+  ngoodVertices_stack = getStack(":ngoodVertices;Number of Vertices;Number of Events",[61,0,61], commoncf, signals, addData = addData)
+  ngoodVertices_stack[0].addOverFlowBin = "upper"
+  allStacks.append(ngoodVertices_stack)
+
   njetWOjetCut_stack = getStack(":njet;n_{jet};Number of Events",[10,0,10], commoncf.replace('&&njet60<=2',''), signals, addData = addData)
   njetWOjetCut_stack[0].addOverFlowBin = "upper"
   allStacks.append(njetWOjetCut_stack)
   
-  njet_stack = getStack(":njet;n_{jet};Number of Events",[10,0,10], commoncf, signals, addData = addData)
-  njet_stack[0].addOverFlowBin = "upper"
-  allStacks.append(njet_stack)
-
-  njet60_stack = getStack(":njet60;n_{jet};Number of Events",[10,0,10], commoncf.replace('&&njet60<=2',''), signals, addData = addData)
-  njet60_stack[0].addOverFlowBin = "upper"
-  allStacks.append(njet60_stack)
-  
-  nbtags_stack = getStack(":nbtags;n_{b-tags};Number of Events",[10,0,10], commoncf, signals, addData = addData)
-  nbtags_stack[0].addOverFlowBin = "upper"
-  allStacks.append(nbtags_stack)
-
-  softIsolatedMuPt_stack = getStack(":softIsolatedMuPt;p_{T} of soft isolated muon;Number of Events / 1 GeV",[25,0,25], commoncf, signals, addData = addData)
-  softIsolatedMuPt_stack[0].addOverFlowBin = "upper"
-  allStacks.append(softIsolatedMuPt_stack)
-
-  softIsolatedMuEta_stack = getStack(":softIsolatedMuEta;#eta of soft isolated muon;Number of Events",[20,-4,4], commoncf, signals, addData = addData)
-  softIsolatedMuEta_stack[0].addOverFlowBin = "both"
-  allStacks.append(softIsolatedMuEta_stack)
-
-  softIsolatedMuPhi_stack = getStack(":softIsolatedMuPhi;#phi of soft isolated muon;Number of Events",[20,-4,4], commoncf, signals, addData = addData)
-  softIsolatedMuPhi_stack[0].addOverFlowBin = "both"
-  allStacks.append(softIsolatedMuPhi_stack)
-
-  softIsolatedMuCharge_stack = getStack(":XXX;charge of soft isolated muon;Number of Events",[3,-1,2], commoncf, signals, lambda c: c.GetLeaf('softIsolatedMuPdg').GetValue()/abs(c.GetLeaf('softIsolatedMuPdg').GetValue()), addData = addData)
-  softIsolatedMuCharge_stack[0].addOverFlowBin = "both"
-  allStacks.append(softIsolatedMuCharge_stack)
-
-  softIsolatedMuRelIso_stack = getStack(":softIsolatedMuRelIso;I_{rel.} of soft isolated muon;Number of Events",[24,0,1.2], commoncf, signals, addData = addData)
-  softIsolatedMuRelIso_stack[0].addOverFlowBin = "both"
-  allStacks.append(softIsolatedMuRelIso_stack)
-
-  softIsolatedMuAbsIso_stack = getStack(":XXX;I_{abs.} of soft isolated muon;Number of Events",[30,0,12], commoncf, signals, lambda c: c.GetLeaf('softIsolatedMuRelIso').GetValue()*c.GetLeaf('softIsolatedMuPt').GetValue(), addData = addData)
-  softIsolatedMuAbsIso_stack[0].addOverFlowBin = "both"
-  allStacks.append(softIsolatedMuAbsIso_stack)
-
-  softIsolatedMuDxy_stack = getStack(":softIsolatedMuDxy;d_{xy} of soft isolated muon;Number of Events",[40,0,.08], commoncf, signals, addData = addData)
-  softIsolatedMuDxy_stack[0].addOverFlowBin = "both"
-  allStacks.append(softIsolatedMuDxy_stack)
 
 #  isrJetFull53XPUJetIDTight_stack = getStack(":isrJetFull53XPUJetIDTight;isrJetFull53XPUJetIDTight;Number of Events",[2,0,2], commoncf, signals,lambda c: passPUJetID(int(c.GetLeaf('isrJetFull53XPUJetIDFlag').GetValue()),'Tight'), addData = addData, onlyW=True)
 #  allStacks.append(isrJetFull53XPUJetIDTight_stack)
@@ -524,19 +533,46 @@ for stack in allStacks:
 #  stack[0].lines = [[0.2, 0.9, "#font[22]{CMS preliminary}"], [0.2,0.85,str(int(round(targetLumi)))+" pb^{-1},  #sqrt{s} = 7 TeV"]]
   stack[0].lines = [[0.2, 0.9, "#font[22]{CMS Collaboration}"], [0.2,0.85,str(int(round(targetLumi/10.))/100.)+" fb^{-1},  #sqrt{s} = 8 TeV"]]
 
-drawNMStacks(1,1,[mT_stack],              subdir+prefix+"mT", False)
-htRatio_stack[0].maximum = 6*10**3 *htRatio_stack[0].data_histo.GetMaximum()
-drawNMStacks(1,1,[htRatio_stack],             subdir+prefix+"htRatio", False)
-
-
-if not doOnlyOne:
+if doAnalysisVars:
+  drawNMStacks(1,1,[pmuboost3d_stack],      subdir+prefix+"pmuboost3d", False)
+  drawNMStacks(1,1,[mT_stack],              subdir+prefix+"mT", False)
+  htRatio_stack[0].maximum = 6*10**3 *htRatio_stack[0].data_histo.GetMaximum()
+  drawNMStacks(1,1,[htRatio_stack],             subdir+prefix+"htRatio", False)
+  drawNMStacks(1,1,[met_stack],             subdir+prefix+"met", False)
+  drawNMStacks(1,1,[njet_stack],             subdir+prefix+"njet", False)
+  drawNMStacks(1,1,[njet60_stack],             subdir+prefix+"njet60", False)
+  drawNMStacks(1,1,[nbtags_stack],             subdir+prefix+"nbtags", False)
+  drawNMStacks(1,1,[ht_stack],              subdir+prefix+"ht", False)
+if doAllDiscriminatingVars:
   htThrustMetSide_stack[0].maximum = 6*10**5 *htThrustMetSide_stack[0].data_histo.GetMaximum()
   drawNMStacks(1,1,[htThrustMetSide_stack],             subdir+prefix+"htThrustMetSide", False)
   drawNMStacks(1,1,[closestMuJetMass_stack] ,             subdir+prefix+"closestMuJetMass_stack", False)
   drawNMStacks(1,1,[closestMuJetDeltaR_stack] ,        subdir+prefix+"closestMuJetDeltaR_stack", False)
   drawNMStacks(1,1,[closestMuJetDeltaR_zoomed_stack] ,        subdir+prefix+"closestMuJetDeltaR_zoomed_stack", False)
-
-  drawNMStacks(1,1,[met_stack],             subdir+prefix+"met", False)
+  FWMT2_stack[0].maximum = 6*10**4 *FWMT2_stack[0].data_histo.GetMaximum()
+  FWMT3_stack[0].maximum = 6*10**3 *FWMT3_stack[0].data_histo.GetMaximum()
+  FWMT4_stack[0].maximum = 6*10**4 *FWMT4_stack[0].data_histo.GetMaximum()
+  cosPhiMetJet_stack[0].maximum = 6*10**3 *cosPhiMetJet_stack[0].data_histo.GetMaximum()
+  thrust_stack[0].maximum = 6*10**4 *thrust_stack[0].data_histo.GetMaximum()
+  htThrustLepSide_stack[0].maximum = 6*10**5 *htThrustLepSide_stack[0].data_histo.GetMaximum()
+  drawNMStacks(1,1,[cosPhiMetJet_stack], subdir+prefix+"cosPhiMetJet", False)
+  drawNMStacks(1,1,[FWMT1_stack],             subdir+prefix+"FWMT1", False)
+  drawNMStacks(1,1,[FWMT2_stack],             subdir+prefix+"FWMT2", False)
+  drawNMStacks(1,1,[FWMT3_stack],             subdir+prefix+"FWMT3", False)
+  drawNMStacks(1,1,[FWMT4_stack],             subdir+prefix+"FWMT4", False)
+  drawNMStacks(1,1,[c2D_stack],             subdir+prefix+"c2D", False)
+  drawNMStacks(1,1,[linC2D_stack],             subdir+prefix+"linC2D", False)
+  drawNMStacks(1,1,[thrust_stack],             subdir+prefix+"thrust", False)
+  drawNMStacks(1,1,[htThrustLepSide_stack],             subdir+prefix+"htThrustLepSide", False)
+if doSoftIsolatedVars:
+  drawNMStacks(1,1,[softIsolatedMuPt_stack],            subdir+prefix+"softIsolatedMuPt", False)
+  drawNMStacks(1,1,[softIsolatedMuEta_stack],            subdir+prefix+"softIsolatedMuEta", False)
+  drawNMStacks(1,1,[softIsolatedMuPhi_stack],            subdir+prefix+"softIsolatedMuPhi", False)
+  drawNMStacks(1,1,[softIsolatedMuCharge_stack],            subdir+prefix+"softIsolatedMuCharge", False)
+  drawNMStacks(1,1,[softIsolatedMuRelIso_stack],            subdir+prefix+"softIsolatedMuRelIso", False)
+  drawNMStacks(1,1,[softIsolatedMuAbsIso_stack],            subdir+prefix+"softIsolatedMuAbsIso", False)
+  drawNMStacks(1,1,[softIsolatedMuDxy_stack],            subdir+prefix+"softIsolatedMuDxy", False)
+  drawNMStacks(1,1,[softIsolatedMuDz_stack],            subdir+prefix+"softIsolatedMuDz", False)
   drawNMStacks(1,1,[softIsolatedMuNormChi2_stack                       ]   , subdir+prefix+"softIsolatedMuNormChi2", False)
   drawNMStacks(1,1,[softIsolatedMuNValMuonHits_stack                   ]   , subdir+prefix+"softIsolatedMuNValMuonHits", False)
   softIsolatedMuNumMatchedStations_stack[0].maximum = 10**4 *softIsolatedMuNumMatchedStations_stack[0].data_histo.GetMaximum()
@@ -555,31 +591,10 @@ if not doOnlyOne:
   drawNMStacks(1,1,[softIsolatedMuDz_noPixelHits_stack],            subdir+prefix+"softIsolatedMuDz_noPixelHits", False)
   drawNMStacks(1,1,[softIsolatedMuDz_onePixelHit_stack],            subdir+prefix+"softIsolatedMuDz_onePixelHit", False)
   drawNMStacks(1,1,[softIsolatedMuDz_twoPixelHits_stack],            subdir+prefix+"softIsolatedMuDz_twoPixelHits", False)
-  FWMT2_stack[0].maximum = 6*10**4 *FWMT2_stack[0].data_histo.GetMaximum()
-  FWMT3_stack[0].maximum = 6*10**3 *FWMT3_stack[0].data_histo.GetMaximum()
-  FWMT4_stack[0].maximum = 6*10**4 *FWMT4_stack[0].data_histo.GetMaximum()
-  cosPhiMetJet_stack[0].maximum = 6*10**3 *cosPhiMetJet_stack[0].data_histo.GetMaximum()
-
-  thrust_stack[0].maximum = 6*10**4 *thrust_stack[0].data_histo.GetMaximum()
-  htThrustLepSide_stack[0].maximum = 6*10**5 *htThrustLepSide_stack[0].data_histo.GetMaximum()
-  drawNMStacks(1,1,[cosPhiMetJet_stack], subdir+prefix+"cosPhiMetJet", False)
-  drawNMStacks(1,1,[FWMT1_stack],             subdir+prefix+"FWMT1", False)
-  drawNMStacks(1,1,[FWMT2_stack],             subdir+prefix+"FWMT2", False)
-  drawNMStacks(1,1,[FWMT3_stack],             subdir+prefix+"FWMT3", False)
-  drawNMStacks(1,1,[FWMT4_stack],             subdir+prefix+"FWMT4", False)
-  drawNMStacks(1,1,[c2D_stack],             subdir+prefix+"c2D", False)
-  drawNMStacks(1,1,[linC2D_stack],             subdir+prefix+"linC2D", False)
-
-  drawNMStacks(1,1,[thrust_stack],             subdir+prefix+"thrust", False)
-  drawNMStacks(1,1,[htThrustLepSide_stack],             subdir+prefix+"htThrustLepSide", False)
-
-  drawNMStacks(1,1,[ht_stack],              subdir+prefix+"ht", False)
-  
-  drawNMStacks(1,1,[type1phiMetphi_stack],             subdir+prefix+"type1phiMetphi", False)
+  drawNMStacks(1,1,[sTlep_stack],             subdir+prefix+"sTlep", False)
   drawNMStacks(1,1,[cosDeltaPhiLepW_stack],             subdir+prefix+"cosDeltaPhiLepW", False)
   drawNMStacks(1,1,[cosDeltaPhiLepMET_stack],             subdir+prefix+"cosDeltaPhiLepMET", False)
-  drawNMStacks(1,1,[sTlep_stack],             subdir+prefix+"sTlep", False)
-  drawNMStacks(1,1,[ngoodVertices_stack],             subdir+prefix+"ngoodVertices", False)
+if doISRJetVars:
   drawNMStacks(1,1,[isrJetPt_stack],             subdir+prefix+"isrJetPt", False)
   drawNMStacks(1,1,[isrJetEta_stack],             subdir+prefix+"isrJetEta", False)
   drawNMStacks(1,1,[isrJetPhi_stack],             subdir+prefix+"isrJetPhi", False)
@@ -593,20 +608,13 @@ if not doOnlyOne:
   drawNMStacks(1,1,[isrJetMuef_stack],            subdir+prefix+"isrJetMuef", False)
   drawNMStacks(1,1,[isrJetElef_stack],            subdir+prefix+"isrJetElef", False)
   drawNMStacks(1,1,[isrJetPhef_stack],            subdir+prefix+"isrJetPhef", False)
-
-  drawNMStacks(1,1,[njet_stack],             subdir+prefix+"njet", False)
+if doOtherVars:
+  drawNMStacks(1,1,[ngoodVertices_stack],             subdir+prefix+"ngoodVertices", False)
+  drawNMStacks(1,1,[type1phiMetphi_stack],             subdir+prefix+"type1phiMetphi", False)
   drawNMStacks(1,1,[njetWOjetCut_stack],             subdir+prefix+"njetWOJetCut", False)
-  drawNMStacks(1,1,[njet60_stack],             subdir+prefix+"njet60", False)
-  drawNMStacks(1,1,[nbtags_stack],             subdir+prefix+"nbtags", False)
 
-  drawNMStacks(1,1,[softIsolatedMuPt_stack],            subdir+prefix+"softIsolatedMuPt", False)
-  drawNMStacks(1,1,[softIsolatedMuEta_stack],            subdir+prefix+"softIsolatedMuEta", False)
-  drawNMStacks(1,1,[softIsolatedMuPhi_stack],            subdir+prefix+"softIsolatedMuPhi", False)
-  drawNMStacks(1,1,[softIsolatedMuCharge_stack],            subdir+prefix+"softIsolatedMuCharge", False)
-  drawNMStacks(1,1,[softIsolatedMuRelIso_stack],            subdir+prefix+"softIsolatedMuRelIso", False)
-  drawNMStacks(1,1,[softIsolatedMuAbsIso_stack],            subdir+prefix+"softIsolatedMuAbsIso", False)
-  drawNMStacks(1,1,[softIsolatedMuDxy_stack],            subdir+prefix+"softIsolatedMuDxy", False)
-  drawNMStacks(1,1,[softIsolatedMuDz_stack],            subdir+prefix+"softIsolatedMuDz", False)
+
+
 #  drawNMStacks(1,1,[isrJetFull53XPUJetIDTight_stack], subdir+prefix+"isrJetFull53XPUJetIDTight", False)
 #  drawNMStacks(1,1,[isrJetFull53XPUJetIDMedium_stack], subdir+prefix+"isrJetFull53XPUJetIDMedium", False)
 #  drawNMStacks(1,1,[isrJetFull53XPUJetIDLoose_stack], subdir+prefix+"isrJetFull53XPUJetIDLoose", False)
