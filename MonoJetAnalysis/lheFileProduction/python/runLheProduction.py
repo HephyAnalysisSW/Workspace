@@ -71,22 +71,25 @@ def findNrEvents(fileName):
     return nrEventsPerFile
 
 
-def extractListOfFiles (stageUndecayedLheFilesValue, lheUndecayedEosDir, undecayedFilesStageDir):
+def extractListOfFiles (stageUndecayedLheFilesValue, \
+                        lheUndecayedEosDir, \
+                        undecayedFilesStageDir, \
+                        undecayedFilesDir):
     
     # extract the full list of the LHE undecayed files, for all stop masses and generated LSP masses 
  
     debug = False
- 
+    
     # take the list of file from the EOS directory, if files are to be staged, 
-    # or from the staged file directory
+    # or from the local undecayed LHE file directory
     tmpFileList = 'tmpListOfFiles.txt'
     
     if stageUndecayedLheFilesValue: 
         os.system('cmsLs ' + lheUndecayedEosDir + ' > ' + tmpFileList)  
         lheLsPrefix = lheUndecayedEosDir 
         prefixFullName = lheLsPrefix + '/'
-    else:
-        os.system('ls -1 ' + undecayedFilesStageDir + ' > ' + tmpFileList)    
+    else:   
+        os.system('cp ' + undecayedFilesDir + '.txt ' + tmpFileList)               
         lheLsPrefix = '' 
         prefixFullName = undecayedFilesStageDir + '/'
         
@@ -137,7 +140,7 @@ def extractListOfFiles (stageUndecayedLheFilesValue, lheUndecayedEosDir, undecay
 
     
 
-def extractListOfFilesToStage (lheFileList, stopMassLimitsValues, generatedLspMassLimitsValues):
+def extractListOfUndecayedFiles (lheFileList, stopMassLimitsValues, generatedLspMassLimitsValues):
     
     # extract the list of LHE undecayed files corresponding to the given input parameters to be staged
     
@@ -174,8 +177,8 @@ def extractListOfFilesToStage (lheFileList, stopMassLimitsValues, generatedLspMa
                     fileList.append(lheFile)
             
 
-    print '\nFiles to stage: ' + str(len(fileList)) + ' files',\
-        ' [extractListOfFilesToStage]\n'
+    print '\nUndecayed LHE files to be processed: ' + str(len(fileList)) + ' files',\
+        ' [extractListOfUndecayedFiles]\n'
     
     if debug:
         print '\n'
@@ -211,7 +214,39 @@ def stageLheFiles (fileList, lheStageDirectory):
         
     return
 
-def assignLspMass(lheFileList, deltaMassStopLspValues, deltaMassStopLspFractionsValues, splitUndecayedSampleValue, undecayedFilesStageDir):
+def copyLheFiles(fileList, lheLocalDirectory):
+
+    # copy the undecayed LHE files from fileList to the local job directory of undecayed files
+
+    debug = False
+
+    print '\nCopying LHE files to: ' + lheLocalDirectory + '\n    '
+    print  str(len(fileList)) + ' files to be copied', \
+            ' [copyLheFiles]\n'
+
+    for lheFile in fileList:
+        
+        remoteFile = lheFile.fullName 
+        localFile = lheLocalDirectory + '/' + lheFile.name
+        
+        # use cp for local source and destination files, and xrdcp if the remote file
+        # is on the storage element 
+        copyProtocol = 'cp'
+        fileTypeIndicator = ':/'
+        if (fileTypeIndicator in remoteFile):
+            copyProtocol = 'xrdcp'
+        
+        if debug:
+            print '    ' + copyProtocol + ' ' + remoteFile + ' ' + localFile
+            
+        os.system(copyProtocol + ' ' + remoteFile + ' ' + localFile)
+    
+        if debug:
+            print
+        
+    return
+
+def assignLspMass(lheFileList, deltaMassStopLspValues, deltaMassStopLspFractionsValues, splitUndecayedSampleValue, undecayedFilesDir):
 
     # assign to each entry from lheFileList the decay LSP mass to be used, according to 
     # the statistics fraction if splitUndecayedSample is True
@@ -224,13 +259,15 @@ def assignLspMass(lheFileList, deltaMassStopLspValues, deltaMassStopLspFractions
     stopMassValuesUnsorted = set()
     nrEventsPerStopMass = dict()
     nrFilesPerStopMass = dict()
+    nrEventsPerStopMassLocal = dict()
+    nrFilesPerStopMassLocal = dict()
 
     fileListLhe = []   
                 
     for lheFile in lheFileList:
         stopMassValue = lheFile.stopMass
         stopMassValuesUnsorted.add(stopMassValue)
-        stagedFileName = undecayedFilesStageDir + '/' + lheFile.name
+        stagedFileName = undecayedFilesDir + '/' + lheFile.name
         lheFileNrEvents = findNrEvents(stagedFileName)
 
         lheFileNew = LheFile(lheFile.fullName, lheFile.name, \
@@ -248,8 +285,12 @@ def assignLspMass(lheFileList, deltaMassStopLspValues, deltaMassStopLspFractions
     for stopMass in stopMassValues:
          nrEventsPerStopMass[stopMass] = 0
          nrFilesPerStopMass[stopMass] = 0
+         nrEventsPerStopMassLocal[stopMass] = 0
+         nrFilesPerStopMassLocal[stopMass] = 0
          nrEvents = 0
          nrFiles = 0
+         nrEventsLocal = 0
+         nrFilesLocal = 0
          
          for lheFile in fileListLhe:
              stopMassValue = lheFile.stopMass
@@ -257,20 +298,33 @@ def assignLspMass(lheFileList, deltaMassStopLspValues, deltaMassStopLspFractions
                  lheFileNrEvents = lheFile.nrEvents
                  if (lheFileNrEvents > 0):
                      nrEvents += lheFileNrEvents
+                     nrEventsLocal += lheFileNrEvents
+                     nrFilesLocal += 1
                  else:
                      nrEvents = -1
                  nrFiles += 1
        
          nrEventsPerStopMass[stopMass] = nrEvents
          nrFilesPerStopMass[stopMass] = nrFiles
+         nrEventsPerStopMassLocal[stopMass] = nrEventsLocal
+         nrFilesPerStopMassLocal[stopMass] = nrFilesLocal
          
          if (nrEventsPerStopMass[stopMass] > 0):
-             print '    stop mass = ', stopMass, ' GeV: ', nrFilesPerStopMass[stopMass], \
-                ' files; number of events: ', nrEventsPerStopMass[stopMass]
+             print '    stop mass = ', stopMass, ' GeV',  \
+                '\n      Total:     ', \
+                nrFilesPerStopMass[stopMass], ' files; number of events: ', nrEventsPerStopMass[stopMass], \
+                '\n      Job local: ', \
+                nrFilesPerStopMassLocal[stopMass], ' files; number of events: ', nrEventsPerStopMassLocal[stopMass], \
+                '\n'
+                
          else:
-             print '    stop mass = ', stopMass, ' GeV: ', nrFilesPerStopMass[stopMass], \
-                ' files; number of events: N/A'
-                    
+             print '    stop mass = ', stopMass, ' GeV',  \
+                '\n      Total:     ', \
+                nrFilesPerStopMass[stopMass], ' files; number of events: N/A', \
+                '\n      Job local: ', \
+                nrFilesPerStopMassLocal[stopMass], ' files; number of events: ', nrEventsPerStopMassLocal[stopMass], \
+                '\n'
+
 
     # check if all deltaMassStopLsp values are possible for each stop mass, otherwise re-adjust 
     # the fractions, increasing them proportionally FIXME implement it, if ever needed
@@ -496,7 +550,7 @@ def madgraphProduceDecays (fileListDecay, \
 def mergeDecayedParticles(fileListDecay, \
                           madGraphDir, \
                           decayParticleValue, decayAntiParticleValue, \
-                          undecayedFilesStageDir, mergedFilesDir):
+                          undecayedFilesDir, mergedFilesDir):
     
     workDir = os.getcwd()
     
@@ -512,7 +566,7 @@ def mergeDecayedParticles(fileListDecay, \
         processName = processNameDef(lheFile, decayAntiParticleValue)
         lheFileAntiParticle = 'PROC_' + processName + '/Events/run_01/unweighted_events.lhe.gz'
         
-        lheFileUndecayed = undecayedFilesStageDir + '/' + lheFile.name
+        lheFileUndecayed = undecayedFilesDir + '/' + lheFile.name
         
         tmpMergedFilesDirectory = 'PROC_mergedFiles'
         if(not os.path.exists(tmpMergedFilesDirectory)):
@@ -554,32 +608,41 @@ def runLheProduction(prodParameters):
         
     fileListAllUndecayed = extractListOfFiles (prodParameters.stageUndecayedLheFiles, \
                                                prodParameters.lheUndecayedEosDirectory, \
-                                               prodParameters.undecayedFilesStageDirectory)
+                                               prodParameters.undecayedFilesStageDirectory, \
+                                               prodParameters.undecayedFilesDirectory)
     
     #
     # extract the list of the LHE undecayed files corresponding to the given input parameters 
-    # and stage the files from EOS in the corresponding directory, if requested
+
+    #     and stage the files from EOS in the corresponding directory, if requested
+    # FIXME: keep generatedLspMassLimitsStage = [-1]?
     
     if prodParameters.stageUndecayedLheFiles:
-        prodParameters.generatedLspMassLimitsStage = [-1] 
-        fileListStage = extractListOfFilesToStage (fileListAllUndecayed, \
+        generatedLspMassLimitsStage = [-1] 
+        fileListStage = extractListOfUndecayedFiles (fileListAllUndecayed, \
                                                    prodParameters.stopMassLimits, \
-                                                   prodParameters.generatedLspMassLimitsStage)
+                                                   generatedLspMassLimitsStage)
     
         stageLheFiles(fileListStage, prodParameters.undecayedFilesStageDirectory)
     
-        # exit if only staging the undecayed files was requested
-        if prodParameters.stageOnlyUndecayedLheFiles:
-            print '\n  Staging file complete. Exit as requested.'
-            sys.exit(0)
+        # exit if staging the undecayed files was requested
+        print '\n  Staging file complete. Exit as requested.'
+        sys.exit(0)
     
+    #     or copy them in the local job directory of undecayed files
+    fileListLocalJob = extractListOfUndecayedFiles (fileListAllUndecayed, \
+                                                   prodParameters.stopMassLimits, \
+                                                   prodParameters.generatedLspMassLimits)
+    copyLheFiles(fileListLocalJob, prodParameters.undecayedFilesDirectory)
+    
+
     # assign to undecayed file the decay LSP mass to be used (if splitUndecayedSampleValue is True, 
     # according to the statistics fraction, otherwise loop over all requested LSP values)
     
     fileListAllLsp = assignLspMass(fileListAllUndecayed, \
                                    prodParameters.deltaMassStopLsp, prodParameters.deltaMassStopLspFractions, \
                                    prodParameters.splitUndecayedSample, \
-                                   prodParameters.undecayedFilesStageDirectory)
+                                   prodParameters.undecayedFilesDirectory)
     
     # list of files (with decay LSP mass defined) corresponding to the given input parameters, to be processed by MadGraph
     fileListProcess = extractListOfFilesToProcess (fileListAllLsp, \
@@ -606,10 +669,14 @@ def runLheProduction(prodParameters):
     mergeDecayedParticles(fileListProcess, \
                           prodParameters.madGraphDirectory, \
                           decayParticle, decayAntiParticle, \
-                          prodParameters.undecayedFilesStageDirectory, \
+                          prodParameters.undecayedFilesDirectory, \
                           prodParameters.mergedFilesDirectory)
        
 #
+# main program
+# 
+from datetime import datetime
+print '\nJob starting time: ' + str(datetime.now()) + '\n'
 
 jobParametersFile = 'jobParameters.' + str(sys.argv[1])
 from jobParameters.runLheProduction_parameters import LheProductionParameters
@@ -621,5 +688,5 @@ print lheProductionParameters
 #
 runLheProduction(lheProductionParameters)
 
-
+print '\nJob ending time: ' + str(datetime.now()) + '\n'
 

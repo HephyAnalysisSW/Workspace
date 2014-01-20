@@ -80,7 +80,45 @@ def parseStringToVars(input):
     else:
         return int(input)
 
-def writeHead(inname, outname, lspGenMassValue, lspMassValue):
+def extractBlock(lheFile, blockName):
+    
+    # extract a block blockName from the header of lheFile
+    print '\nExtract block ' + blockName + ' from file ' + lheFile
+    
+    debug = False   
+    blockStatus = False
+    
+    lheFileObj = gzip.open(lheFile)
+    block = []
+    
+    for line in lheFileObj:
+        
+        if blockName in line:
+            blockStatus = True
+            block.append(line)
+            continue
+         
+        if (blockStatus == True):
+            block.append(line) 
+            if ('#' in line) and (len(line) == 2):
+                blockStatus = False
+                break
+
+        # additional end of header check                 
+        if (line.find("<init>")!= -1):
+            break
+    
+    lheFileObj.close()
+    blockStr = ''.join(block)
+    
+    if debug:
+        print '\nBlock ' + blockName + '\n'
+        print blockStr
+           
+    return blockStr
+
+    
+def writeHead(decname, inname, outname, lspGenMassValue, lspMassValue):
     f = gzip.open(inname)
     g = open(outname,'w')
     
@@ -88,25 +126,65 @@ def writeHead(inname, outname, lspGenMassValue, lspMassValue):
     lspName = '~chi_10'
     lspGenMassString = ' ' + str(lspGenMassValue) + ' '
     lspMassString =  ' ' + str(lspMassValue) + '. '
+
+    blockNmix = 'BLOCK NMIX'
+    blockStopmix = 'BLOCK STOPMIX'
+    blockMass = 'BLOCK MASS'
     
-    blockMass = False
-    
+    blockMassStatus = False
+    blockNmixStatus = False
+    blockStopmixStatus = False
+ 
+    # extract the NMIX and STOPMIX blocks from the decayed files
+    blockNmixObj = extractBlock(decname, blockNmix)
+    blockStopmixObj = extractBlock(decname, blockStopmix)
+   
     while 1:
         try:
             line=f.readline()
         except IOError:
             print "Problem reading from file ",f.name
             sys.exit(0)
-            
-        if line.find('BLOCK MASS'):
-            blockMass = True
-        if (blockMass == True):
+        
+        # change the mass of LSP to the value used in the decay files    
+        if line.find(blockMass):
+            blockMassStatus = True
+        if (blockMassStatus == True):
             if ((line.find(lspID) > 0) and (line.find(lspGenMassString) > 0) and (line.find(lspName) > 0)):
                 lspMassLine = string.replace(line, lspGenMassString, lspMassString)
-                blockMass = False
+                blockMassStatus = False
                 g.write(lspMassLine)
                 continue
+        
+        # replace BLOCK NMIX and BLOCK STOPMIX with the corresponding block from
+        # the decayed sample      
+        if blockNmix in line:
+            blockNmixStatus = True
+            # write new block
+            g.write(blockNmixObj)
             
+        if (blockNmixStatus == True):   
+            # skip the rest of the block lines
+            if ('#' in line) and (len(line) == 2):
+                blockNmixStatus = False
+                continue
+            else:
+                continue
+
+        if blockStopmix in line:
+            blockStopmixStatus = True
+            # write new block
+            g.write(blockStopmixObj)
+            
+        if (blockStopmixStatus == True):   
+            # skip the rest of the block lines
+            if ('#' in line) and (len(line) == 2):
+                blockStopmixStatus = False
+                continue
+            else:
+                continue
+        
+        # otherwise copy the line from the input file header                 
         if line.find("<init>")==-1:
             g.write(line)
         else:
@@ -184,7 +262,7 @@ def getIndex(ev, pid):
 ###
 def lheMergeDecayedParticles(filenameD1, filenameD2, filenameP, filenameO, lspGenMass, lspMass, modelComment):
         
-    writeHead(filenameP, filenameO, lspGenMass, lspMass)
+    writeHead(filenameD1, filenameP, filenameO, lspGenMass, lspMass)
     writeInit(filenameP,filenameO)
     
     reflistP = getEventList(filenameP)
