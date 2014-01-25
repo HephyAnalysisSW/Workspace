@@ -121,7 +121,7 @@ python -u Workspace/MonoJetAnalysis/lheFileProduction/python/runLheProduction.py
 
 # copy the output data 
 
-# for interactive jobs and rfcp protocol, one needs to create the directory
+# for interactive jobs and rfcp / globus-url-copy protocol, one needs to create the directory
 if [ -d ${dataFinalDir} ]
 then
     echo "Directory ${dataFinalDir} already exists"
