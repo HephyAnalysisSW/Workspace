@@ -37,30 +37,31 @@ class LheProductionParameters:
         self.madGraphDirectory = getattr(__import__(jobParametersFile, 
                            fromlist=['madGraphDirectory']), 'madGraphDirectory')
 
+        self.undecayedFilesDirectory = getattr(__import__(jobParametersFile, 
+                           fromlist=['undecayedFilesDirectory']), 'undecayedFilesDirectory')
+
+        self.mergedFilesDirectory = getattr(__import__(jobParametersFile, 
+                           fromlist=['mergedFilesDirectory']), 'mergedFilesDirectory')
+
         self.lheUndecayedEosDirectory = getattr(__import__(jobParametersFile, 
                            fromlist=['lheUndecayedEosDirectory']), 'lheUndecayedEosDirectory')
 
         self.undecayedFilesStageDirectory = getattr(__import__(jobParametersFile, 
                            fromlist=['undecayedFilesStageDirectory']), 'undecayedFilesStageDirectory')
 
-        self.mergedFilesDirectory = getattr(__import__(jobParametersFile, 
-                           fromlist=['mergedFilesDirectory']), 'mergedFilesDirectory')
-
         self.stageUndecayedLheFiles = getattr(__import__(jobParametersFile, 
                            fromlist=['stageUndecayedLheFiles']), 'stageUndecayedLheFiles')
-
-        self.stageOnlyUndecayedLheFiles = getattr(__import__(jobParametersFile, 
-                           fromlist=['stageOnlyUndecayedLheFiles']), 'stageOnlyUndecayedLheFiles')
 
         self.numberEvents = getattr(__import__(jobParametersFile, 
                            fromlist=['numberEvents']), 'numberEvents')
     
     def __str__(self):
 
-        lheUndecayedEosDirectoryStr =  '    EOS LHE undecayed sample:    ' + self.lheUndecayedEosDirectory
-        undecayedFilesStageDirectory = '    Staged LHE undecayed sample: ' + self.undecayedFilesStageDirectory
-        mergedFilesDirectory =         '    Merged LHE decayed sample:   ' + self.mergedFilesDirectory
-        workDirectoryStr =             '    Work directory:   ' + self.workDirectory
+        lheUndecayedEosDirectoryStr =     '    EOS LHE undecayed sample:       ' + self.lheUndecayedEosDirectory
+        undecayedFilesStageDirectoryStr = '    Staged LHE undecayed sample:    ' + self.undecayedFilesStageDirectory
+        undecayedFilesDirectoryStr =      '    Job local LHE undecayed sample: ' + self.undecayedFilesDirectory
+        mergedFilesDirectoryStr =         '    Merged LHE decayed sample:      ' + self.mergedFilesDirectory
+        workDirectoryStr =                '    Work directory:                 ' + self.workDirectory
         
         if self.stopMassLimits[0] < 0:
             stopMassLimitsStr = '    Use all available stop mass values'
@@ -89,11 +90,6 @@ class LheProductionParameters:
         else:
             stageUndecayedLheFilesStr = '    stageUndecayedLheFiles = False'
 
-        if (self.stageOnlyUndecayedLheFiles == True):
-            stageOnlyUndecayedLheFilesStr = '    stageOnlyUndecayedLheFiles = True'
-        else:
-            stageOnlyUndecayedLheFilesStr = '    stageOnlyUndecayedLheFiles = False'
-
         if self.numberEvents < 0:
             numberEventsStr = '    Use all available events'
         else:
@@ -102,16 +98,16 @@ class LheProductionParameters:
         return \
             '\nInput parameters' + '\n' + \
             lheUndecayedEosDirectoryStr + '\n' + \
-            undecayedFilesStageDirectory + '\n' + \
-            mergedFilesDirectory + '\n' + \
+            undecayedFilesStageDirectoryStr + '\n' + \
+            workDirectoryStr + '\n' + \
+            undecayedFilesDirectoryStr + '\n' + \
+            mergedFilesDirectoryStr + '\n' + \
             stopMassLimitsStr + '\n' + \
             generatedLspMassLimitsStr + '\n' + \
             '    deltaMassStopLsp values' + '\n' + \
             deltaMassStopLspStr + '\n' + \
             splitUndecayedSampleStr + '\n' + \
             stageUndecayedLheFilesStr + '\n' + \
-            stageOnlyUndecayedLheFilesStr + '\n' + \
-            workDirectoryStr + '\n' + \
             numberEventsStr + '\n' + \
             '\n'
         
@@ -124,10 +120,15 @@ class LheProductionParameters:
 
         if ((len(self.deltaMassStopLsp) != len(self.deltaMassStopLspFractions)) and  (self.splitUndecayedSample == True)):
             sys.exit('\nInconsistent deltaMassStopLsp and deltaMassStopLspFractions parameters. Different sizes.')
-  
-        if ((self.stageOnlyUndecayedLheFiles == True) and (self.stageUndecayedLheFiles == False)):
-            sys.exit('\n Inconsistent stageOnlyUndecayedLheFiles and stageUndecayedLheFiles values. \n You stage or you do not stage...')
-    
+      
+        if ((self.undecayedFilesStageDirectory) == ''):
+            sys.exit('\nEmpty directory name for the stage directory of undecayed LHE file.')
+
+        if ((self.undecayedFilesDirectory) == ''):
+            sys.exit('\nEmpty directory name for the job local directory of undecayed LHE file.')
+
+        if ((self.mergedFilesDirectory) == ''):
+            sys.exit('\nEmpty directory name for the job local directory of merged LHE file.')
 
 # the stop mass values are fixed for the LHE files with undecayed stops, 
 # one can only choose the range the files are selected and processed
@@ -172,15 +173,22 @@ deltaMassStopLspSelected = []
 numberEvents = -1
 #numberEvents = 100
 
-# work directory, where the MadGraph is installed and the files are staged
+# work directory for a job
 workDirectory = os.getcwd()
 
+# actual values for the empty names of the directories will be set in 
+# the run shell script 
+
 # MadGraph home
-madGraphDirectory = workDirectory + '/' + 'MG5v1.5.11'
+madGraphDirectory = ''
+
+# directory where undecayed LHE file are to be found by a job 
+undecayedFilesDirectory = ''
+
+# directory to save the merged files by a job
+mergedFilesDirectory = ''
 
 # EOS location of the T2tt undecayed LHE files
-# directory to stage undecayed LHE file, or where files are already staged 
-# directory to save the merged files
 # 
 # lheSample: T2tt or stop_stop
 
@@ -188,27 +196,24 @@ lheSample = 'stop_stop'
 
 if lheSample == 'stop_stop':
     lheUndecayedEosDirectory = '/store/group/phys_susy/LHE/stop_stop/T2tt_Undecayed'
-    undecayedFilesStageDirectory = workDirectory + '/' + 'T2tt_undecayedFiles'
-    mergedFilesDirectory =         workDirectory + '/' + 'T2tt_mergedFiles'
 elif lheSample == 'T2tt':   
     lheUndecayedEosDirectory = '/store/group/phys_susy/LHE/T2tt'
-    undecayedFilesStageDirectory = workDirectory + '/' + 'T2tt' + '/' + 'T2tt' + '/' + 'T2tt_undecayedFiles'
-    mergedFilesDirectory =         workDirectory + '/' + 'T2tt' + '/' + 'T2tt' + '/' + 'T2tt_mergedFiles'
 else:
     sys.exit('No valid EOS LHE sample.')
+
+# directory to stage undecayed LHE file, or where files are already staged
+# directory must be given as absolute path
+undecayedFilesStageDirectory = ''
 
 # options to control the job
 #
 
 # stageUndecayedLheFiles
-#     if the value is False, the program assumes the files are already staged in the local directory 
+#     if the value is False, the program assumes the files are already staged in a local/storage element directory 
 #         defined by undecayedFilesStageDirectory
 #         ! in this case, the list of files to be processed is built from that directory (only)
-#     if True, it stages the selected files from EOS directory defined by lheUndecayedEosDirectory
+#     if True, it stages the selected files from EOS directory defined by lheUndecayedEosDirectory, then exit
 stageUndecayedLheFiles = False
 
-# stageOnlyUndecayedLheFiles
-#     if True and if staging the undecayed files is requested, exit after files are staged
-stageOnlyUndecayedLheFiles = False
 
 
