@@ -5,7 +5,7 @@ for path in [os.path.abspath(p) for p in paths]:
   if not path in sys.path:
     sys.path.insert(1, path)
 
-from helpers import getVarValue, deltaPhi
+from helpers import getVarValue, deltaPhi, getJets
 import array
 
 def px(obj):
@@ -188,17 +188,17 @@ def calcFoxWolframMoments(jets):
 #  return  {"FWMT0":ht0,"FWMT1":ht1,"FWMT2":ht2,"FWMT3":ht3,"FWMT4":ht4}
   return  {"FWMT1":ht1,"FWMT2":ht2,"FWMT3":ht3,"FWMT4":ht4}
 
-def calcHTRatio(jets, metPhi):
-  htRatio = -1
-  den=0.
-  num=0.
-  for j in jets:
-    den+=j["pt"]
-    if abs(deltaPhi(metPhi, j["phi"])) <= pi/2:
-      num+=j["pt"]
-  if len(jets)>0:
-    htRatio = num/den
-  return htRatio
+#def calcHTRatio(jets, metPhi):
+#  htRatio = -1
+#  den=0.
+#  num=0.
+#  for j in jets:
+#    den+=j["pt"]
+#    if abs(deltaPhi(metPhi, j["phi"])) <= pi/2:
+#      num+=j["pt"]
+#  if len(jets)>0:
+#    htRatio = num/den
+#  return htRatio
 
 ROOT.gROOT.ProcessLine(".L ../../HEPHYCommonTools/scripts/root/Thrust.C+")
 
@@ -234,13 +234,6 @@ def calcThrust(jets, l, m):
   return {'thrust':th, 'htThrustLepSide':htThrustLepSide/ht, 'htThrustMetSide':htThrustMetSide/ht}  
 
 
-def getJets(c):
-  njets = int(c.GetLeaf('njetCount').GetValue())
-  jets =[]
-  for i in range(njets):
-    jets.append({'pt':getVarValue(c, 'jetPt', i), 'eta':getVarValue(c, 'jetEta', i), 'phi':getVarValue(c, 'jetPhi', i)})
-  return jets
-
 def getRelevantObjects(c):
   return {'jets':getJets(c), \
           'mu':{'pt':getVarValue(c, 'softIsolatedMuPt'), 'phi':getVarValue(c, 'softIsolatedMuPhi')},
@@ -258,6 +251,7 @@ def thrust(c):
   objs = getRelevantObjects(c)
   return calcThrust(objs['jets'], objs['mu'], objs['met'])
 
-def htRatio(c):
-  objs = getRelevantObjects(c)
-  return calcHTRatio(objs['jets'], objs['met']['phi'])
+#def htRatio(c):
+#  objs = getRelevantObjects(c)
+##  print objs['jets'], objs['met']['phi']
+#  return calcHTRatio(objs['jets'], objs['met']['phi'])

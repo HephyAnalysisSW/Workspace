@@ -28,26 +28,28 @@ methodCutOpt={}
 methodMLP={}
 
 setup['TMVAFactoryOptions'] = ["!V","!Silent","Color","DrawProgressBar","Transformations=I;D;P;G,D","AnalysisType=Classification"]
+setup['plotTransformations'] = ['Id', 'Deco', 'PCA', 'Gauss_Deco']
+setup['makeCorrelationScatterPlots'] = False
+setup['plotMVAEffs'] = False #needs active X-forwarding since a QT Object is involved
+setup['datasetFactoryOptions'] = ["nTrain_Signal=0", "nTrain_Background=0","SplitMode=Random","SplitSeed=100","NormMode=None","!V"]
+
 
 def setupMVAForModelPoint(mgl, mN):
-   
-#  block = getBlock(mgl, mN, model)
-#  blockStr = getBlockString(mgl, mN, model)
   blockStr = "mgl_"+str(mgl)+"_mN_"+str(mN)
   preprefix = prepreprefix+blockStr+'_'
 
-  setup['inputVars'] = ["mT", "type1phiMet", "mt2w","nbtags","njets",'minDeltaPhi', 'deltaPhi','thrust']
+  setup['mvaInputVars'] = ["mT", "type1phiMet", "mt2w","nbtags","njets",'minDeltaPhi', 'deltaPhi']
 
   prefix = ''
-  for v in setup['inputVars']:
+  for v in setup['mvaInputVars']:
     prefix+=v+'_'
   prefix = preprefix+prefix[:-1]
 
   setup['dataFile'] = '/data/'+nfsUser+'/nnAnalysis/datasets/'+prefix+'.root'
-  setup['outputFile'] =     '/data/'+nfsUser+'/nnAnalysis/MVA_Analyzer/'+prefix+'.root'
+  setup['TMVAOutputFile'] =     '/data/'+nfsUser+'/nnAnalysis/MVA_Analyzer/'+prefix+'.root'
   setup['weightDir'] ='/data/'+nfsUser+'/nnAnalysis/MVA_Analyzer/'+prefix+'/'
 
-  if (not overWriteData and ( os.path.isfile(setup['dataFile']))) and (not overWriteTMVAFrameWork and os.path.isfile(setup['outputFile'])):
+  if (not overWriteData and ( os.path.isfile(setup['dataFile']))) and (not overWriteTMVAFrameWork and os.path.isfile(setup['TMVAOutputFile'])):
     return
   
   allModelsInBlock = [[mgl, mN]]#getAllInBlock(mgl, mN, model)
@@ -92,18 +94,23 @@ def setupMVAForModelPoint(mgl, mN):
   #setup['testRequ']      = '(Entry$+1)%2'
 
   #If changing between met and type1phiMet the formula for deltaPhi (if used) has to be changed!
-  setup['varNames'] = ['njets', 'type1phiMet', 'mT', 'nbtags', 'weightLumi', 'ht', 'singleMuonic', 'singleElectronic', 'nvetoMuons', 'nvetoElectrons', 'mt2w', 'minDeltaPhi', 'thrust']
-  setup['modelVars'] =  ["osetMN", "osetMgl", "osetMsq"]
+  setup['varsFromInputData'] = ['type1phiMet', 'mT', 'weightLumi', 'ht', 'singleMuonic', 'singleElectronic', 'nvetoMuons', 'nvetoElectrons', 'mt2w', 'minDeltaPhi']
+  setup['varsFromInputSignal'] =  ["osetMN", "osetMgl", "osetMsq"]
+#  setup['varsFromInputSignal'] =  []
   from mvaFuncs import cosDeltaPhiLepW
   from math import acos
-  setup['additionalVars'] = [\
+  setup['varsCalculated'] = [\
+                ['njets/I', lambda c:int(c.GetLeaf('njets').GetValue())],
+                ['nbtags/I', lambda c:int(c.GetLeaf('nbtags').GetValue())],
                 ['jet10pt', lambda c:c.GetLeaf('jet0pt').GetValue()/c.GetLeaf('jet1pt').GetValue()],
                 ['jet20pt', lambda c:c.GetLeaf('jet0pt').GetValue()/c.GetLeaf('jet2pt').GetValue()],
                 ['jet30pt', lambda c:c.GetLeaf('jet0pt').GetValue()/c.GetLeaf('jet3pt').GetValue()],
-                  ['deltaPhi', lambda c:acos(cosDeltaPhiLepW(c))]
+                ['deltaPhi', lambda c:acos(cosDeltaPhiLepW(c))],
+                ['htThrustLepSideRatio', lambda c:c.GetLeaf('htThrustLepSide').GetValue()/c.GetLeaf('ht').GetValue()]
     ]
 
   setup['plotDir'] = '/afs/hephy.at/user/'+afsUser[0]+'/'+afsUser+'/www/'+localPlotDir
+  setup['plotSubDir'] = prefix
 
   methodCutOpt['type']=ROOT.TMVA.Types.kCuts
   methodCutOpt['name']='myCut'
@@ -112,7 +119,7 @@ def setupMVAForModelPoint(mgl, mN):
   methodCutOpt['options'] =('!H','!V','VarTransform=None','CreateMVAPdfs=True','FitMethod=GA','EffMethod=EffSel','VarProp=NotEnforced','CutRangeMin=-1','CutRangeMax=-1')
 
   addNeurons = [2,1]
-  nn_layers = [len(setup['inputVars'])+ i for i in addNeurons]
+  nn_layers = [len(setup['mvaInputVars'])+ i for i in addNeurons]
   hiddenLayers = ','.join([str(i) for i in nn_layers ])
   methodMLP['type']=ROOT.TMVA.Types.kMLP
   methodMLP['name']='MLP21'
@@ -125,8 +132,8 @@ def setupMVAForModelPoint(mgl, mN):
   methodMLP['options']    = ('!H','!V','VarTransform=Norm,Deco','NeuronType=sigmoid','NCycles=10000','TrainingMethod=BP','LearningRate=0.03', 'DecayRate=0.01','HiddenLayers='+hiddenLayers,'Sampling=0.3','SamplingEpoch=0.8','ConvergenceTests=1','CreateMVAPdfs=True','TestRate=10' )
 
   data = constructDataset(setup, signal, background, overWriteData)
-  allMethods = [methodMLP, methodCutOpt]
-#  allMethods = [methodMLP]
+#  allMethods = [methodMLP, methodCutOpt]
+  allMethods = [methodMLP]
   setup["methodConfigs"] = copy.deepcopy(allMethods)
 
   if not os.path.isdir(setup['weightDir']) or overWriteTMVAFrameWork:

@@ -45,7 +45,6 @@ def getValue(chain, varname):
 
 
 def frange(start, end=None, inc=None):
-    "A range function, that does accept float increments..."
     if end == None:
         end = start + 0.0
         start = 0.0
@@ -266,9 +265,12 @@ def drawStack(stack,normalized=False):
       hcopy.SetFillColor(var.color)
       hcopy.SetMarkerColor(ROOT.kBlack);
       hcopy.SetMarkerStyle(0);
-    if var.style[0] == "l":
+    if var.style[0] == "l" or var.style[0] == "d":
       hcopy.SetLineColor(var.color)
-      hcopy.SetLineStyle(0)
+      if var.style[0] == "l":
+        hcopy.SetLineStyle(0)
+      if var.style[0] == "d":
+        hcopy.SetLineStyle(2)
       hcopy.SetLineWidth(0)
       if len(var.style)>=3:
         hcopy.SetLineWidth(int(var.style[2]))
@@ -303,7 +305,7 @@ def drawStack(stack,normalized=False):
         if var.maximum!="":
            hcopy.SetMaximum(var.maximum)
         hcopy.Draw("e1")
-      if var.style[0] == "f" or var.style[0] == "l":
+      if var.style[0] == "f" or var.style[0] == "l" or var.style[0] == "d":
         if var.minimum!="":
            hcopy.SetMinimum(var.minimum)
         if var.maximum!="":
@@ -325,7 +327,7 @@ def drawStack(stack,normalized=False):
         if var.maximum!="":
            hcopy.SetMaximum(var.maximum)
         hcopy.Draw("e1same")
-      if var.style[0] == "f" or var.style[0] == "l":
+      if var.style[0] == "f" or var.style[0] == "l" or var.style[0] == "d":
         if var.minimum!="":
            hcopy.SetMinimum(var.minimum)
         if var.maximum!="":

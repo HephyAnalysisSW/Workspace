@@ -266,23 +266,24 @@ namespace TMVAGlob {
          gSystem->mkdir( dir );
 
          TString pngName = fname + ".png";
-         TString gifName = fname + ".gif";
-         TString epsName = fname + ".eps";
+         TString rootName = fname + ".root";
+         TString pdfName = fname + ".pdf";
          c->cd();
 
          // create eps (other option: c->Print( epsName ))
-         if (UsePaperStyle) {
-            c->Print(epsName);
-         } 
-         else {
-            cout << "--- --------------------------------------------------------------------" << endl;
-            cout << "--- If you want to save the image as eps, gif or png, please comment out " << endl;
-            cout << "--- the corresponding lines (line no. 239-241) in tmvaglob.C" << endl;
-            cout << "--- --------------------------------------------------------------------" << endl;
-            c->Print(epsName);
+//         if (UsePaperStyle) {
+//            c->Print(epsName);
+//         } 
+//         else {
+//            cout << "--- --------------------------------------------------------------------" << endl;
+//            cout << "--- If you want to save the image as eps, gif or png, please comment out " << endl;
+//            cout << "--- the corresponding lines (line no. 239-241) in tmvaglob.C" << endl;
+//            cout << "--- --------------------------------------------------------------------" << endl;
+//            c->Print(epsName);
             c->Print(pngName);
-            // c->Print(gifName);
-         }
+            c->Print(rootName);
+            c->Print(pdfName);
+         //}
       }
    }
 
@@ -316,46 +317,46 @@ namespace TMVAGlob {
    void plot_logo( Float_t v_scale = 1.0, Float_t skew = 1.0 )
    {
 
-      TImage *img = findImage("tmva_logo.gif");
-      if (!img) {
-         cout << "+++ Could not open image tmva_logo.gif" << endl;
-         return;
-      }
-      
-      img->SetConstRatio(kFALSE);
-      UInt_t h_ = img->GetHeight();
-      UInt_t w_ = img->GetWidth();
-
-      Float_t r = w_/h_;
-      gPad->Update();
-      Float_t rpad = Double_t(gPad->VtoAbsPixel(0) - gPad->VtoAbsPixel(1))/(gPad->UtoAbsPixel(1) - gPad->UtoAbsPixel(0));
-      r *= rpad;
-
-      Float_t d = 0.055;
-      // absolute coordinates
-      Float_t x1R = 1 - gStyle->GetPadRightMargin(); 
-      Float_t y1B = 1 - gStyle->GetPadTopMargin()+.01; // we like the logo to sit a bit above the histo 
-
-      Float_t x1L = x1R - d*r/skew;
-      Float_t y1T = y1B + d*v_scale*skew;
-      if (y1T>0.99) y1T = 0.99;
-
-      TPad *p1 = new TPad("imgpad", "imgpad", x1L, y1B, x1R, y1T );
-      p1->SetRightMargin(0);
-      p1->SetBottomMargin(0);
-      p1->SetLeftMargin(0);
-      p1->SetTopMargin(0);
-      p1->Draw();
-
-      Int_t xSizeInPixel = p1->UtoAbsPixel(1) - p1->UtoAbsPixel(0);
-      Int_t ySizeInPixel = p1->VtoAbsPixel(0) - p1->VtoAbsPixel(1);
-      if (xSizeInPixel<=25 || ySizeInPixel<=25) {
-         delete p1;
-         return; // ROOT doesn't draw smaller than this
-      }
-
-      p1->cd();
-      img->Draw();
+//      TImage *img = findImage("tmva_logo.gif");
+//      if (!img) {
+//         cout << "+++ Could not open image tmva_logo.gif" << endl;
+//         return;
+//      }
+//      
+//      img->SetConstRatio(kFALSE);
+//      UInt_t h_ = img->GetHeight();
+//      UInt_t w_ = img->GetWidth();
+//
+//      Float_t r = w_/h_;
+//      gPad->Update();
+//      Float_t rpad = Double_t(gPad->VtoAbsPixel(0) - gPad->VtoAbsPixel(1))/(gPad->UtoAbsPixel(1) - gPad->UtoAbsPixel(0));
+//      r *= rpad;
+//
+//      Float_t d = 0.055;
+//      // absolute coordinates
+//      Float_t x1R = 1 - gStyle->GetPadRightMargin(); 
+//      Float_t y1B = 1 - gStyle->GetPadTopMargin()+.01; // we like the logo to sit a bit above the histo 
+//
+//      Float_t x1L = x1R - d*r/skew;
+//      Float_t y1T = y1B + d*v_scale*skew;
+//      if (y1T>0.99) y1T = 0.99;
+//
+//      TPad *p1 = new TPad("imgpad", "imgpad", x1L, y1B, x1R, y1T );
+//      p1->SetRightMargin(0);
+//      p1->SetBottomMargin(0);
+//      p1->SetLeftMargin(0);
+//      p1->SetTopMargin(0);
+//      p1->Draw();
+//
+//      Int_t xSizeInPixel = p1->UtoAbsPixel(1) - p1->UtoAbsPixel(0);
+//      Int_t ySizeInPixel = p1->VtoAbsPixel(0) - p1->VtoAbsPixel(1);
+//      if (xSizeInPixel<=25 || ySizeInPixel<=25) {
+//         delete p1;
+//         return; // ROOT doesn't draw smaller than this
+//      }
+//
+//      p1->cd();
+//      img->Draw();
    } 
 
    void NormalizeHist( TH1* h ) 

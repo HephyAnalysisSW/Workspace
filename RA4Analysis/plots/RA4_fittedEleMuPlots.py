@@ -61,13 +61,13 @@ topIsLargest = True
 minimum=10**(-0.5)
 
 presel = "pf-6j40"
-preprefix     = "ht400-met250-bt2"
-additionalCut = "ht>400&&type1phiMet>250&&nbtags==2"
+preprefix     = "ht400-met150-bt2"
+additionalCut = "ht>400&&type1phiMet>150&&nbtags==2"
 
 
 subdir = "/8TeV-6j/"
 
-doOnlyMET = False
+doOnlyMET = True
 floatWJets = False
 floatTTJets = False
 normalizeToData = False
@@ -222,10 +222,10 @@ allStacks.append(met_stack)
 #leptonRelIso_zoomed_stack[0].data_histo.GetXaxis().SetLabelSize(0.04)
 #allStacks.append(leptonRelIso_zoomed_stack)
 
-#ht_stack                          = getStack(":ht;H_{T} (GeV);Number of Events / 25 GeV",[41,500,1525 ], commoncf, signals, topIsLargest)
-#ht_stack[0].addOverFlowBin = "upper"
-#allStacks.append(ht_stack)
-#
+ht_stack                          = getStack(":ht;H_{T} (GeV);Number of Events / 25 GeV",[41,500,1525 ], commoncf, signals, topIsLargest)
+ht_stack[0].addOverFlowBin = "upper"
+allStacks.append(ht_stack)
+
 
 #btag0mass_stack               = getStack(":btag0Mass;btag0Mass;Number of Events",[20,0,8.0], commoncf+"&&btag0>1.74", signals, topIsLargest)
 #btag0mass_stack[0].addOverFlowBin = "upper"
@@ -516,6 +516,7 @@ drawNMStacks(1,1,[met_stack],             subdir+prefix+"met", False)
 #drawNMStacks(1,1,[cleanMT08_stack],              subdir+prefix+"cleanMT08", False)
 #drawNMStacks(1,1,[cosDeltaPhiLepMET_stack],              subdir+prefix+"cosDeltaPhiLepMET", False)
 #drawNMStacks(1,1,[leptonRelIso_zoomed_stack],               subdir+prefix+"leptonRelIso_zoomed", False)
+drawNMStacks(1,1,[ht_stack],              subdir+prefix+"ht", False)
 
 if not doOnlyMET:
   drawNMStacks(1,1,[ngoodVertices_stack],             subdir+prefix+"ngoodVertices", False)

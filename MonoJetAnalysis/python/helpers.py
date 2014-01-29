@@ -1,5 +1,5 @@
 import ROOT
-from math import pi
+from math import pi, sqrt, cos, sin, sinh
 
 def getObjFromFile(fname, hname):
   f = ROOT.TFile(fname)
@@ -11,6 +11,7 @@ def getObjFromFile(fname, hname):
   res = htmp.Clone()
   f.Close()
   return res
+
 
 def passPUJetID(flag, level="Tight"): #Medium, #Loose,  kTight  = 0,   kMedium = 1,   kLoose  = 2
   if type(level)==type(0):
@@ -29,7 +30,9 @@ def getVarValue(c, var, n=0):
   if leaf!='':
     return c.GetLeaf(leaf).GetValue(n)
   else:
-    return c.GetLeaf(var).GetValue(n)
+    l = c.GetLeaf(var)
+    if l:return l.GetValue(n)
+    return float('nan')
 
 #def getValue(chain, varname):
 #  alias = chain.GetAlias(varname)
@@ -70,4 +73,105 @@ def invMassOfLightObjects(p31, p32):
 
 def deltaR(l1, l2):
   return sqrt(deltaPhi(l1['phi'], l2['phi'])**2 + (l1['eta'] - l2['eta'])**2)
+
+def getJets(c):
+  njets = int(c.GetLeaf('njetCount').GetValue())
+  jets =[]
+  for i in range(njets):
+    jets.append({'pt':getVarValue(c, 'jetPt', i), 'eta':getVarValue(c, 'jetEta', i), 'phi':getVarValue(c, 'jetPhi', i)})
+  return jets
+
+def getSoftIsolatedMu(c):
+  return {'pt':c.GetLeaf('softIsolatedMuPt').GetValue(), 'eta':c.GetLeaf('softIsolatedMuEta').GetValue(), 'phi':c.GetLeaf('softIsolatedMuPhi').GetValue()}
+
+def calcHTRatio(jets, metPhi):
+  htRatio = -1
+  den=0.
+  num=0.
+  for j in jets:
+    den+=j["pt"]
+    if abs(deltaPhi(metPhi, j["phi"])) <= pi/2:
+      num+=j["pt"]
+  if len(jets)>0:
+    htRatio = num/den
+  return htRatio
+
+def calcHTRatio(jets, metPhi):
+  htRatio = -1
+  den=0.
+  num=0.
+  for j in jets:
+    den+=j["pt"]
+    if abs(deltaPhi(metPhi, j["phi"])) <= pi/2:
+      num+=j["pt"]
+  if len(jets)>0:
+    htRatio = num/den
+  return htRatio
+
+def findClosestJet(c, obj):
+  jets = getJets(c)
+  res=[]
+  for j in jets:
+    res.append([sqrt((j['phi'] - obj['phi'])**2 + (j['eta'] - obj['eta'])**2), j])
+  res.sort()
+  if len(res)>0:
+    return {'deltaR':res[0][0], 'jet':res[0][1]}
+
+def closestMuJetDeltaR(c):
+  return findClosestJet(c, getSoftIsolatedMu(c))['deltaR']
+def closestMuJetMass(c):
+  mu = getSoftIsolatedMu(c)
+  jet = findClosestJet(c, mu)['jet']
+
+  pxMu = mu['pt']*cos(mu['phi']) 
+  pyMu = mu['pt']*sin(mu['phi']) 
+  pzMu = mu['pt']*sinh(mu['eta'])
+  EMu = sqrt(pxMu**2 + pyMu**2 + pzMu**2)
+
+  pxJet = jet['pt']*cos(jet['phi'])
+  pyJet = jet['pt']*sin(jet['phi'])
+  pzJet = jet['pt']*sinh(jet['eta'])
+  EJet = sqrt(pxJet**2 + pyJet**2 + pzJet**2)
+
+  return sqrt( (EMu + EJet)**2 - (pxMu + pxJet)**2 - (pyMu + pyJet)**2 - (pzMu + pzJet)**2)
+
+def htRatio(c):
+  jets = getJets(c)
+  metPhi = c.GetLeaf('type1phiMetphi').GetValue()
+#  print calcHTRatio(jets, metPhi)
+  return calcHTRatio(jets, metPhi)
+
+def KolmogorovDistance(s0, s1): #Kolmogorov distance from two list of values (unbinned, discrete)
+  from fractions import Fraction, gcd
+
+  s0.sort()
+  s1.sort()
+
+  tot = [[x,0] for x in s0] + [[x,1] for x in s1]
+  tot.sort()
+  F={}
+  lenS={}
+  lenS[0] = len(s0)
+  lenS[1] = len(s1)
+  F[0] = 0
+  F[1] = 0
+  l = len(tot)
+#  print tot
+  maxDist = Fraction(0,1)
+  for i, t in enumerate(tot):
+#    print "Now",F
+    F[t[1]]+=1#lenS[t[1]]
+#    print "...",F
+    if i+1<l and tot[i+1][0]==t[0]:
+      continue
+#    print "Calc dist..."
+    dist= abs(Fraction(F[0],lenS[0])-Fraction(F[1],lenS[1]))
+    if dist>maxDist:
+      maxDist=dist
+#    print dist, maxDist
+  return maxDist
+
+def KolmogorovProbability(s0, s1):
+  ksDist = float(KolmogorovDistance(s0, s1))
+  return ROOT.TMath.KolmogorovProb(ksDist*sqrt(len(s0)*len(s1)/float(len(s0)+len(s1))))
 

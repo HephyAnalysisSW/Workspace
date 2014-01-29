@@ -68,13 +68,14 @@ else:
   print "No parsing of arguments!"
 
 if options.files[0][:9] == 'load:stop':
-  from Workspace.HEPHYCommonTools.fastSimSignals_cfi import *
-  print "Loading files from Workspace.HEPHYCommonTools.fastSimSignals_cfi"
+  from Workspace.HEPHYCommonTools.fullSimSignals_cfi import *
+  print "Loading files from Workspace.HEPHYCommonTools.fullSimSignals_cfi"
   infiles =  eval(options.files[0][5:])
-  if options.startFileNumber!=-1 and options.stopFileNumber!=-1:
+  if options.startFileNumber!=-1 :
     print "Only taking files[",options.startFileNumber,",",options.stopFileNumber,"]"
   print "Length of total file list:", len(infiles)
-  infiles = infiles[options.startFileNumber:options.stopFileNumber]
+  lastFile = min([len(infiles), options.stopFileNumber])
+  infiles = infiles[options.startFileNumber:lastFile]
   for f in options.files:
     options.files.remove(f)
   options.files = infiles
@@ -109,6 +110,7 @@ process.MessageLogger.cerr.PATSummaryTables = cms.untracked.PSet(
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(options.files)
 )
+
 
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(options.maxEvents ) )
 #process.source.lumisToProcess = cms.untracked.VLuminosityBlockRange(
@@ -239,6 +241,7 @@ process.goodVertices = cms.EDFilter(
             src = cms.InputTag("offlinePrimaryVertices"),
             cut = cms.string("!isFake && ndof > 4 && abs(z) <= 24 && position.Rho <= 2")
           )
+
 if not options.mode.lower()=='sms':
   process.load("RecoMET.METFilters.hcalLaserEventFilter_cfi")
   process.hcalLaserEventFilter.vetoByRunEventNumber=cms.untracked.bool(False)
