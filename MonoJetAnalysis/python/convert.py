@@ -4,7 +4,7 @@ from PhysicsTools.PythonAnalysis import *
 from math import *
 import sys, os, copy
 from datetime import datetime
-from helpers import getVarValue, deltaPhi, minAbsDeltaPhi, invMassOfLightObjects, deltaR
+from helpers import getVarValue, deltaPhi, minAbsDeltaPhi, invMassOfLightObjects, deltaR, closestMuJetDeltaR
 #chmode = "incNoISRJetID" 
 chmode = "copy" 
 #chmode = "copyCleanedWithAllLeptons" 
@@ -31,7 +31,7 @@ if len(sys.argv)>=3:
   exec("allSamples = [" + ",".join(sampinp) + "]")
 
 
-small  = False
+small  = True
 overwrite = True
 target_lumi = 19375 #pb-1
 
@@ -40,6 +40,15 @@ outputDir = "/data/"+username+"/"+subDir+"/"
 
 ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
+
+def ptISR(e):
+    sumtlv = ROOT.TLorentzVector(1.e-9,1.e-9,1.e-9,1.e-9)
+    for igp in range(e.ngp):
+        if(abs(e.gpPdg[igp])==1000006 and e.gpSta[igp]==3):
+            tlvaux = ROOT.TLorentzVector(0.,0.,0.,0.)
+            tlvaux.SetPtEtaPhiM(e.gpPt[igp],e.gpEta[igp],e.gpPhi[igp],e.gpM[igp])
+            sumtlv += tlvaux
+    return sumtlv.Pt()
 
 def goodMuID(c, imu ):  
   # POG MU Tight
@@ -51,30 +60,31 @@ def goodMuID(c, imu ):
   pt = getVarValue(c, 'muonsPt', imu)
   dz = getVarValue(c, 'muonsDz', imu)
   eta=getVarValue(c, 'muonsEta', imu)
-  if isPF and (isGlobal or isTracker) and pt>5. and abs(eta)<2.1 and dz<0.5:
+  if isPF and (isGlobal or isTracker) and pt>5. and abs(eta)<2.1 and abs(dz)<0.5:
     return {'pt':pt, 'phi':getVarValue(c, 'muonsPhi', imu), 'eta':eta, 'IsGlobal':isGlobal, 'IsTracker':isTracker, 'IsPF':isPF, 'relIso':getVarValue(c, 'muonsPFRelIso', imu), 'Dz':dz} 
 
 
 # -------------------------------------------
 
-def goodEleID_POG(c, iele, eta = 'none'): # POG Ele veto
+def goodEleID_POG(c, iele, eta = 'none'): # POG Ele veto https://twiki.cern.ch/twiki/bin/viewauth/CMS/EgammaCutBasedIdentification
   if eta=='none':
     eta = getVarValue(c, 'elesEta', iele)
   sietaieta = getVarValue(c, 'elesSigmaIEtaIEta', iele)
   dphi = getVarValue(c, 'elesDPhi', iele)
   deta = getVarValue(c, 'elesDEta', iele)
   HoE  = getVarValue(c, 'elesHoE', iele)
-  isEB = abs(eta) < 1.4442
-  isEE = abs(eta) > 1.566
+  isEB = abs(eta) < 1.479
+  isEE = abs(eta) > 1.479 and abs(eta) < 2.5
   relIso = getVarValue(c, 'elesPfRelIso', iele)
   pt = getVarValue(c, 'elesPt', iele)
   relIsoCut = 0.15
-  return ( isEE or isEB)\
-    and ( relIso < relIsoCut ) and (abs(eta) < 2.5)\
-    and ( (isEB and HoE < 0.15 ) or (isEE and HoE < 0.10))\
-    and ( (isEB and sietaieta < 0.01 ) or (isEE and sietaieta < 0.03))\
-    and ( (isEB and dphi < 0.8) or (isEE and dphi < 0.7)) and ( (isEB and deta < 0.007) or (isEE and deta < 0.01) )\
-    and getVarValue(c, 'elesDxy', iele) < 0.04 and getVarValue(c, 'elesDz', iele) < 0.2 and getVarValue(c, 'elesPt', iele)>5.
+  return( isEE or isEB)\
+    and ((isEB and dphi < 0.8) or (isEE and dphi < 0.7)) and ( (isEB and deta < 0.007) or (isEE and deta < 0.01) )\
+    and ((isEB and sietaieta < 0.01 ) or (isEE and sietaieta < 0.03))\
+    and ( isEB and HoE < 0.15 )\
+    and getVarValue(c, 'elesDxy', iele) < 0.04 and getVarValue(c, 'elesDz', iele) < 0.2 \
+    and ( relIso < relIsoCut ) \
+    and getVarValue(c, 'elesPt', iele)>5.
 
   # -------------------------------------------
 
@@ -276,7 +286,9 @@ for isample, sample in enumerate(allSamples):
   extraVariables += ["isrJetPt", "isrJetEta", "isrJetPhi", "isrJetPdg", "isrJetBtag", "isrJetChef", "isrJetNhef", "isrJetCeef", "isrJetNeef", "isrJetHFhef", "isrJetHFeef", "isrJetMuef", "isrJetElef", "isrJetPhef", "isrJetCutBasedPUJetIDFlag", "isrJetFull53XPUJetIDFlag", "isrJetMET53XPUJetIDFlag", "isrJetBTBVetoPassed"]
 
   extraVariables += ["softIsolatedMuPt", "softIsolatedMuEta", "softIsolatedMuPhi", "softIsolatedMuPdg", "softIsolatedMuRelIso", "softIsolatedMuDxy", "softIsolatedMuDz",  'softIsolatedMuNormChi2', 'softIsolatedMuNValMuonHits', 'softIsolatedMuNumMatchedStations', 'softIsolatedMuPixelHits', 'softIsolatedMuNumtrackerLayerWithMeasurement', 'softIsolatedMuIsTracker', 'softIsolatedMuIsGlobal']
-  extraVariables += ["softIsolatedMT", "softIsolatedpmuboost3d"]
+  extraVariables += ["softIsolatedMT", "ptISR", "closestMuJetDeltaR"]
+  if storeVectors: 
+    extraVariables+=[ "softIsolatedpmuboost3d"]
   structString = "struct MyStruct_"+str(nc)+"_"+str(isample)+"{ULong64_t event;"
   for var in variables:
     structString +="Float_t "+var+";"
@@ -449,7 +461,8 @@ for isample, sample in enumerate(allSamples):
           nmuons = getVarValue(c, 'nmuons')   #Number of muons in Muon Vec
           neles  = getVarValue(c, 'neles')    #Number of eles in Ele Vec
           ntaus  = getVarValue(c, 'ntaus')    #Number of eles in Ele Vec
-
+          s.ptISR = ptISR(c)
+          s.closestMuJetDeltaR = closestMuJetDeltaR(c)
 #            allGoodLeptons = getGoodLeptons(c, nmuons, neles, ntaus)   #get all good leptons
           allGoodMuons = getAllMuons(c,nmuons)
           allGoodElectrons = getAllElectrons(c, neles)
@@ -528,8 +541,8 @@ for isample, sample in enumerate(allSamples):
             s.softIsolatedMuNumtrackerLayerWithMeasurement = softIsolatedMuons[0]['NumtrackerLayerWithMeasurement']
             s.softIsolatedMuIsGlobal                       = softIsolatedMuons[0]['IsGlobal']
             s.softIsolatedMuIsTracker                      = softIsolatedMuons[0]['IsTracker']
+          if len(softIsolatedMuons)>=1:
             s.softIsolatedMT                               = sqrt(2.0*s.softIsolatedMuPt*s.type1phiMet*(1-cos(s.softIsolatedMuPhi - s.type1phiMetphi)))
-            s.softIsolatedpmuboost3d                       = pmuboost3d(s)
           s.nmu = len(allGoodMuons)
           s.nel = len(allGoodElectrons)
           s.nta = len(allGoodTaus)
@@ -588,6 +601,8 @@ for isample, sample in enumerate(allSamples):
               s.taEta[i] = allGoodTaus[i]['eta']
               s.taPhi[i] = allGoodTaus[i]['phi']
               s.taPdg[i] = allGoodTaus[i]['pdg']
+            if len(softIsolatedMuons)>=1:
+              s.softIsolatedpmuboost3d                       = pmuboost3d(s)
           tmpDir = ROOT.gDirectory.func()
           chain_gDir.cd()
           t.Fill()
