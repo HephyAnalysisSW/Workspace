@@ -5,8 +5,12 @@ from ROOT import *
 from LHEUtilities import *
 from math import sqrt,cos
 
+#
+# transverse mass from 2 4-vectors
+#
 def mt(p,q):
   return sqrt(2*p.Pt()*q.Pt()*(1-cos(p.Phi()-q.Phi())))
+
 
 #
 # simple histogram-based validation of T2tt (with 4-body stop decay) LHEs
@@ -16,6 +20,39 @@ def mt(p,q):
 # arguments:
 #   directory (on SE)
 #   comma-separated list of input files (relative to directory)
+
+#
+# simple class defining and holding pt, eta and mass histograms
+#
+class KinHistos:
+  #
+  # histogram name and binning
+  #
+  def __init__(name,binsPt=None,binsEta=None,binsM=None):
+    if binsPt!=None:
+      self.pt = ROOT.TH1F(name+"_pt",name+"_pt",binsPt[0],binsPt[1],binsPt[2])
+    else:
+      self.pt = None
+    if binsEta!=None:
+      self.eta = ROOT.TH1F(name+"_eta",name+"_eta",binsEta[0],binsEta[1],binsEta[2])
+    else:
+      self.eta = None
+    if binsM!=None:
+      self.m = ROOT.TH1F(name+"_m",name+"_m",binsM[0],binsM[1],binsM[2])
+    else:
+      self.m = None
+  #
+  # fill with values from a 4-vector
+  #
+  def fill(p4,absEta=True):
+    if self.pt!=None:
+      self.pt.Fill(p4.Pt())
+    if self.eta!=None and p4.Pt()>0.001:
+      eta = p4.Eta()
+      if absEta:  eta = abs(eta)
+      self.eta.Fill(eta)
+    if self.m!=None:
+      self.m.Fill(p4.M())
 
 # filename can be xxx.lhe or xxx.lhe.gz
 dirname = sys.argv[1]
@@ -36,36 +73,16 @@ h_nisr = ROOT.TH1F("nisr","nisr",20,-0.5,19.5)
 h_nw = ROOT.TH1F("nw","nw",20,-0.5,19.5)
 h_ntop = ROOT.TH1F("ntop","ntop",20,-0.5,19.5)
 
-h_stop_pt = ROOT.TH1F("stop_pt","stop_pt",200,0.,1000.)
-h_blnu_pt = ROOT.TH1F("blnu_pt","blnu_pt",200,0.,1000.)
-h_lnu_pt = ROOT.TH1F("lnu_pt","lnu_pt",200,0.,1000.)
-h_b_pt = ROOT.TH1F("b_pt","b_pt",200,0.,1000.)
-h_l_pt = ROOT.TH1F("l_pt","l_pt",200,0.,1000.)
-h_lsp_pt = ROOT.TH1F("lsp_pt","lsp_pt",200,0.,1000.)
-h_isr_pt = ROOT.TH1F("isr_pt","isr_pt",200,0.,1000.)
-h_isrtot_pt = ROOT.TH1F("isrtot_pt","isrtot_pt",200,0.,1000.)
-h_stopstop_pt = ROOT.TH1F("stopstop_pt","stopstop_pt",200,0.,1000.)
-h_lsplsp_pt = ROOT.TH1F("lsplsp_pt","lsplsp_pt",200,0.,1000.)
-
-h_stop_eta = ROOT.TH1F("stop_eta","stop_eta",200,-5.,5.)
-h_blnu_eta = ROOT.TH1F("blnu_eta","blnu_eta",200,-5.,5.)
-h_lnu_eta = ROOT.TH1F("lnu_eta","lnu_eta",200,-5.,5.)
-h_b_eta = ROOT.TH1F("b_eta","b_eta",200,-5.,5.)
-h_l_eta = ROOT.TH1F("l_eta","l_eta",200,-5.,5.)
-h_lsp_eta = ROOT.TH1F("lsp_eta","lsp_eta",200,-5.,5.)
-h_isr_eta = ROOT.TH1F("isr_eta","isr_eta",200,-5.,5.)
-h_isrtot_eta = ROOT.TH1F("isrtot_eta","isrtot_eta",200,-5.,5.)
-h_stopstop_eta = ROOT.TH1F("stopstop_eta","stopstop_eta",200,-5.,5.)
-h_lsplsp_eta = ROOT.TH1F("lsplsp_eta","lsplsp_eta",200,-5.,5.)
-
-h_stop_m = ROOT.TH1F("stop_m","stop_m",200,0.,1000.)
-h_blnu_m = ROOT.TH1F("blnu_m","blnu_m",250,0.,1000.)
-h_lnu_m = ROOT.TH1F("lnu_m","lnu_m",200,0.,100.)
-h_lsp_m = ROOT.TH1F("lsp_m","lsp_m",200,0.,1000.)
-h_isr_m = ROOT.TH1F("isr_m","isr_m",200,0.,1000.)
-h_isrtot_m = ROOT.TH1F("isrtot_m","isrtot_m",200,0.,1000.)
-h_stopstop_m = ROOT.TH1F("stopstop_m","stopstop_m",200,0.,5000.)
-h_lsplsp_m = ROOT.TH1F("lsplsp_m","lsplsp_m",200,0.,5000.)
+h_stop = KinHistos("stop",binsPt=(200,0.,1000.),binsEta=(200,0.,5.),binsM=(200,0.,1000.))
+h_blnu = KinHistos("blnu",binsPt=(200,0.,1000.),binsEta=(200,0.,5.),binsM=(250,0.,1000.))
+h_lnu = KinHistos("lnu",binsPt=(200,0.,1000.),binsEta=(200,0.,5.),binsM=(200,0.,100.))
+h_b = KinHistos("b",binsPt=(200,0.,1000.),binsEta=(200,0.,5.),binsM=None)
+h_l = KinHistos("l",binsPt=(200,0.,1000.),binsEta=(200,0.,5.),binsM=None)
+h_lsp = KinHistos("lsp",binsPt=(200,0.,1000.),binsEta=(200,0.,5.),binsM=(200,0.,1000.))
+h_isr = KinHistos("isr",binsPt=(200,0.,1000.),binsEta=(200,0.,5.),binsM=(200,0.,1000.))
+h_isrtot = KinHistos("isrtot",binsPt=(200,0.,1000.),binsEta=(200,0.,5.),binsM=(200,0.,1000.))
+h_stopstop = KinHistos("stopstop",binsPt=(200,0.,1000.),binsEta=(200,0.,5.),binsM=(200,0.,5000.))
+h_lsplsp = KinHistos("lsplsp",binsPt=(200,0.,1000.),binsEta=(200,0.,5.),binsM=(200,0.,5000.))
 
 h_met = ROOT.TH1F("met","met",200,0.,1000.)
 h_mt = ROOT.TH1F("mt","mt",200,0.,200.)
@@ -146,9 +163,7 @@ for filename in filenames:
       wdecays = [ ]
       leptons = [ ]
       for i,stop in enumerate(stops):
-        h_stop_pt.Fill(stop.p4().Pt())
-        h_stop_eta.Fill(stop.p4().Eta())
-        h_stop_m.Fill(stop.p4().M())
+        h_stop.fill(stop.p4())
         # all stop descendants
         stopDescendants = event.findDescendants(stop)
         tops = filterByPdgId(stopDescendants,6)
@@ -159,14 +174,11 @@ for filename in filenames:
         stopFinals = filterStable(event.findDescendants(stop))
         lsps = filterByPdgId(stopFinals,1000022)
         assert len(lsps)==1
-        h_lsp_pt.Fill(lsps[0].p4().Pt())
-        h_lsp_eta.Fill(lsps[0].p4().Eta())
-        h_lsp_m.Fill(lsps[0].p4().M())
+        h_lsp.fill(lsps[0].p4())
         # b from stop decay
         bs = filterByPdgId(stopFinals,5)
         assert len(bs)==1
-        h_b_pt.Fill(bs[0].p4().Pt())
-        h_b_eta.Fill(bs[0].p4().Eta())
+        h_b.fill(bs[0].p4())
         # "W decay" products (stop decay - b - LSP)
         nonbs = filterByPdgIds(stopFinals,[5,1000022],invert=True)
         assert len(nonbs)==2
@@ -178,19 +190,14 @@ for filename in filenames:
         neutrino = None
         if abs(nonbs[0].pdgId) in [11,13,15]:
           lepton = nonbs[0]
-          h_l_pt.Fill(lepton.p4().Pt())
-          h_l_eta.Fill(lepton.p4().Eta())
+          h_l.fill(lepton.p4())
           leptons.append(lepton)
           assert abs(nonbs[1].pdgId) in [12,14,16]
           neutrino = nonbs[1]
           p4lnu = sumP4([lepton,neutrino])
-          h_lnu_pt.Fill(p4lnu.Pt())
-          h_lnu_eta.Fill(p4lnu.Eta())
-          h_lnu_m.Fill(p4lnu.M())
+          h_lnu.fill(p4lnu)
           p4blnu = sumP4([bs[0],lepton,neutrino])
-          h_blnu_pt.Fill(p4blnu.Pt())
-          h_blnu_eta.Fill(p4blnu.Eta())
-          h_blnu_m.Fill(p4blnu.M())
+          h_blnu.fill(p4blnu)
           p4bl = sumP4([bs[0],lepton])
           p4lnulsp = sumP4([lepton,neutrino,lsps[0]])
           h_m2blnu_m2lnulsp.Fill(p4blnu.M2()/175**2,p4lnulsp.M2()/stop.p4().M2())
@@ -214,10 +221,7 @@ for filename in filenames:
       # stop-stop system
       #
       p4stopstop = sumP4(stops)
-      h_stopstop_pt.Fill(p4stopstop.Pt())
-      if p4stopstop.Pt()>0.001:
-        h_stopstop_eta.Fill(p4stopstop.Eta())
-      h_stopstop_m.Fill(p4stopstop.M())
+      h_stopstop.fill(p4stopstop)
       #
       # find lsps
       #
@@ -227,9 +231,7 @@ for filename in filenames:
       # lsp-lsp system
       #
       p4lsplsp = sumP4(lsps)
-      h_lsplsp_pt.Fill(p4lsplsp.Pt())
-      h_lsplsp_eta.Fill(p4lsplsp.Eta())
-      h_lsplsp_m.Fill(p4lsplsp.M())
+      h_lsplsp.fill(p4lsplsp)
       #
       # find undetectables
       #
@@ -242,14 +244,10 @@ for filename in filenames:
       isrs = filterByPdgId(event.findPrimaries(),1000006,invert=True)
       h_nisr.Fill(len(isrs))
       for isr in isrs:
-        h_isr_pt.Fill(isr.p4().Pt())
-        h_isr_eta.Fill(isr.p4().Eta())
-        h_isr_m.Fill(isr.p4().M())
+        h_isr.fill(isr.p4())
       if len(isrs)>0:
         p4IsrTot = sumP4(isrs)
-        h_isrtot_pt.Fill(p4IsrTot.Pt())
-        h_isrtot_eta.Fill(p4IsrTot.Eta())
-        h_isrtot_m.Fill(p4IsrTot.M())
+        h_isrtot.fill(p4IsrTot)
     #
     # add one line to event
     #
