@@ -141,20 +141,8 @@ for filename in filenames:
       #
       # check decay kinematics
       #
-      outgoing = event.findOutgoing()
-      for p in outgoing:
-        if not p.isStable():
-          sump4 = sumP4(event.findDaughters(p))
-          if abs(sump4.Px()-p.p4().Px())>0.001 or \
-                abs(sump4.Py()-p.p4().Py())>0.001 or \
-                abs(sump4.Pz()-p.p4().Pz())>0.001 or \
-                abs(sump4.E()-p.p4().E())>0.001 or \
-                abs(sump4.M()-p.p4().M())>0.001:
-            print  "Inconsistency in decay of ",p
-            print  "  incoming x,y,z,e,m = ",p.p4().Px(),p.p4().Py(),p.p4().Pz(),p.p4().E(),p.p4().M()
-            print  "  outgoing x,y,z,e,m = ",sump4.Px(),sump4.Py(),sump4.Pz(),sump4.E(),sump4.M()
-            sys.exit(1)
-
+      if not event.checkDecays():
+        sys.exit(1)
       #
       # find stops
       #
