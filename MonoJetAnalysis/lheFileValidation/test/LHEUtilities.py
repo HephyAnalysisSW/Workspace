@@ -139,7 +139,7 @@ class LHEEvent:
                                 float(fields[9]),float(fields[10]), 
                                 int(fields[2])-1,int(fields[3])-1)
                 self.particles.append(p)
-#TEMPORARY#        assert len(self.particles)==npexp
+        assert len(self.particles)==npexp
         #
         # establish links to daughters
         #

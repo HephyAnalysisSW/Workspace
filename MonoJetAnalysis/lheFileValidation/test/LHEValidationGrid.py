@@ -28,7 +28,7 @@ class KinHistos:
   #
   # histogram name and binning
   #
-  def __init__(name,binsPt=None,binsEta=None,binsM=None):
+  def __init__(self,name,binsPt=None,binsEta=None,binsM=None):
     if binsPt!=None:
       self.pt = ROOT.TH1F(name+"_pt",name+"_pt",binsPt[0],binsPt[1],binsPt[2])
     else:
@@ -44,7 +44,7 @@ class KinHistos:
   #
   # fill with values from a 4-vector
   #
-  def fill(p4,absEta=True):
+  def fill(self,p4,absEta=True):
     if self.pt!=None:
       self.pt.Fill(p4.Pt())
     if self.eta!=None and p4.Pt()>0.001:
@@ -84,6 +84,9 @@ h_isrtot = KinHistos("isrtot",binsPt=(200,0.,1000.),binsEta=(200,0.,5.),binsM=(2
 h_stopstop = KinHistos("stopstop",binsPt=(200,0.,1000.),binsEta=(200,0.,5.),binsM=(200,0.,5000.))
 h_lsplsp = KinHistos("lsplsp",binsPt=(200,0.,1000.),binsEta=(200,0.,5.),binsM=(200,0.,5000.))
 
+h_lpcosth = ROOT.TH1F("lpcosth","lpcosth",200,-1.,1.)
+h_lmcosth = ROOT.TH1F("lmcosth","lmcosth",200,-1.,1.)
+
 h_met = ROOT.TH1F("met","met",200,0.,1000.)
 h_mt = ROOT.TH1F("mt","mt",200,0.,200.)
 
@@ -101,10 +104,8 @@ inEvent = False
 # loop over files
 #
 for filename in filenames:
-#  print "xrdcp root://hephyse.oeaw.ac.at/"+dirname+"/"+filename+" "+filename
   # copy to working directory
   os.system("xrdcp root://hephyse.oeaw.ac.at/"+dirname+"/"+filename+" "+filename)
-#  os.system("ls")
   # verify success of copy
   if not os.path.isfile(filename):
     print "File not found :",filename
@@ -191,6 +192,26 @@ for filename in filenames:
           h_m2blnu_m2lnulsp.Fill(p4blnu.M2()/175**2,p4lnulsp.M2()/stop.p4().M2())
           h_m2bl_m2lnu.Fill(p4bl.M2()/175**2,p4lnu.M2()/80**2)
           h_mt.Fill(mt(lepton.p4(),neutrino.p4()))
+          #
+          # polarization
+          #
+          # boost "W" to "top" rest system
+          boostBlnu = -p4blnu.BoostVector()
+          p4lnuBoostBlnu = p4lnu.Clone()
+          p4lnuBoostBlnu.Boost(boostBlnu)
+          # boost lepton to "W" rest system
+          boostLnu = -p4lnu.BoostVector()
+          p4lBoostLnu = lepton.p4().Clone()
+          p4lBoostLnu.Boost(boostLnu)
+          # angle between lepton in "W" rest system and
+          #   "W" direction in "top" rest system
+          p3lnuBoostBlnu = p4lnuBoostBlnu.Vect().Unit()
+          p3lBoostLnu = p4lBoostLnu.Vect().Unit()
+          cosThetaStar = p3lnuBoostBlnu.Dot(p3lBoostLnu)
+          if lepton.pdgId>0:
+            h_lmcosth.Fill(cosThetaStar)
+          else:
+            h_lpcosth.Fill(cosThetaStar)
         #
         # create list of W-decay daughter ids (smallest abs(pdgId) non-b daughter of stop)
         #
@@ -269,6 +290,18 @@ for i,k in enumerate(w_decays):
     if key in ww_decay_counts:
       h_ww_decays.SetBinContent(h_ww_decays.GetBin(i+1,j+1),
                                 ww_decay_counts[key])
+#
+# fit polarization histograms
+#
+n_lpcosth = h_lpcosth.GetEntries()
+f_lpcosth = ROOT.TF1("f_lpcosth","[0]*(1+x)*(1+x)+[1]*(1-x)*(1-x)+2*[2]*(1-x*x)",-1.,1.)
+f_lpcosth.SetParameters(n_lpcosth/1000.,n_lpcosth/1000.,n_lpcosth/1000.)
+h_lpcosth.Fit(f_lpcosth,"0")
+#
+n_lmcosth = h_lmcosth.GetEntries()
+f_lmcosth = ROOT.TF1("f_lmcosth","[0]*(1+x)*(1+x)+[1]*(1-x)*(1-x)+2*[2]*(1-x*x)",-1.,1.)
+f_lmcosth.SetParameters(n_lmcosth/1000.,n_lmcosth/1000.,n_lmcosth/1000.)
+h_lmcosth.Fit(f_lmcosth,"0")
 #
 # write and close output file
 #
