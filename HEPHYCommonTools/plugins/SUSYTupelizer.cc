@@ -14,7 +14,8 @@
 #include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerObjectMapRecord.h"
 #include "HLTrigger/HLTfilters/interface/HLTLevel1GTSeed.h"
 #include "DataFormats/HLTReco/interface/TriggerEvent.h"
-#include "CMGTools/External/interface/PileupJetIdentifier.h"
+//#include "CMGTools/External/interface/PileupJetIdentifier.h"
+#include "DataFormats/JetReco/interface/PileupJetIdentifier.h"
 #include "DataFormats/METReco/interface/GenMET.h"
 #include "DataFormats/METReco/interface/GenMETCollection.h"
 #include "DataFormats/METReco/interface/PFMET.h"
@@ -31,7 +32,6 @@
 using namespace std;
 
 namespace {
-  double softJetThreshold = 10.;
 
   string prefix ("[SUSYTupelizer] ");
  
@@ -124,9 +124,9 @@ SUSYTupelizer::SUSYTupelizer( const edm::ParameterSet & pset):
   triggerCollection_ ( pset.getUntrackedParameter< std::string >("triggerCollection") ),
   patJets_      ( pset.getUntrackedParameter< edm::InputTag >("patJets") ),
   patMET_       ( pset.getUntrackedParameter< edm::InputTag >("patMETs") ),
-  rawMET_       ( pset.getUntrackedParameter< edm::InputTag >("rawMETs") ),
-  type01MET_       ( pset.getUntrackedParameter< edm::InputTag >("type01METs") ),
-  type1phiMET_       ( pset.getUntrackedParameter< edm::InputTag >("type1phiMETs") ),
+//  rawMET_       ( pset.getUntrackedParameter< edm::InputTag >("rawMETs") ),
+//  type01MET_       ( pset.getUntrackedParameter< edm::InputTag >("type01METs") ),
+//  type1phiMET_       ( pset.getUntrackedParameter< edm::InputTag >("type1phiMETs") ),
 //  type01phiMET_       ( pset.getUntrackedParameter< edm::InputTag >("type01phiMETs") ),
 
   patMuons_     ( pset.getUntrackedParameter< edm::InputTag >("patMuons") ),
@@ -135,6 +135,7 @@ SUSYTupelizer::SUSYTupelizer( const edm::ParameterSet & pset):
 
   vertices_ ( pset.getUntrackedParameter< edm::InputTag >("vertices") ),
   lowLeptonPtThreshold_ (pset.getUntrackedParameter< double >("lowLeptonPtThreshold") ),
+  softJetPtThreshold_ (pset.getUntrackedParameter< double >("softJetPtThreshold") ),
 
   muonPt_ (pset.getUntrackedParameter< double >("muonPt") ),
   muonEta_ (pset.getUntrackedParameter< double >("muonEta") ),
@@ -216,7 +217,7 @@ SUSYTupelizer::SUSYTupelizer( const edm::ParameterSet & pset):
   addFullBTagInfo_(pset.getUntrackedParameter<bool>("addFullBTagInfo")),
   addFullJetInfo_(pset.getUntrackedParameter<bool>("addFullJetInfo")),
   addFullLeptonInfo_(pset.getUntrackedParameter<bool>("addFullLeptonInfo")),
-  addFullMETInfo_(pset.getUntrackedParameter<bool>("addFullMETInfo")),
+//  addFullMETInfo_(pset.getUntrackedParameter<bool>("addFullMETInfo")),
   addFullMuonInfo_(pset.getUntrackedParameter<bool>("addFullMuonInfo")),
   addFullEleInfo_(pset.getUntrackedParameter<bool>("addFullEleInfo")),
   addFullTauInfo_(pset.getUntrackedParameter<bool>("addFullTauInfo")),
@@ -790,7 +791,7 @@ void SUSYTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup) {
     bool jetPassesMuCleaning = EdmHelper::passesDeltaRCleaning(patJet, veto_muons, 0.3);
 
     bool jet_is_good = (jetID and (patJet.pt() >= minJetPt_)  and (fabs( patJet.eta() ) <= maxJetEta_));
-    bool jet_is_soft = (patJet.pt() >= softJetThreshold);
+    bool jet_is_soft = (patJet.pt() >= softJetPtThreshold_);
     if ((patJet.pt() > minJetPt_) and (fabs( patJet.eta() ) <  5.0) and not jetID) hasNoBadJet = false;
     if (jet_is_good and jetPassesEleCleaning and jetPassesMuCleaning) good_Jets.push_back(patJet);
     if (addGeneratorInfo_) {
@@ -846,7 +847,7 @@ void SUSYTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup) {
     if (jet_is_good and jetPassesEleCleaning) ngoodEleCleanedJets++;
     if (jet_is_good and jetPassesMuCleaning) ngoodMuCleanedJets++;
     
-    if ((verbose_) and (patJet.pt() > softJetThreshold)) cout<<"[jet "<<i<<"] "<<" pt "<<patJet.pt()<<" eta "<<patJet.eta()<<" phi "<<patJet.phi()<<boolalpha<<" jetID? "<<jetID<<" jetID+pt+eta cut?"<< jet_is_good <<" passes Ele c.c? "<<jetPassesEleCleaning<<" passes Mu c.c? "<<jetPassesMuCleaning<<endl;
+    if ((verbose_) and (patJet.pt() > softJetPtThreshold_)) cout<<"[jet "<<i<<"] "<<" pt "<<patJet.pt()<<" eta "<<patJet.eta()<<" phi "<<patJet.phi()<<boolalpha<<" jetID? "<<jetID<<" jetID+pt+eta cut?"<< jet_is_good <<" passes Ele c.c? "<<jetPassesEleCleaning<<" passes Mu c.c? "<<jetPassesMuCleaning<<endl;
     jecUnc->setJetEta(patJet.eta());
     jecUnc->setJetPt(patJet.pt()); // here you must use the CORRECTED jet pt
     double unc = (patJet.pt() > 10. && fabs(patJet.eta()<5)) ? jecUnc->getUncertainty(true) : 0.1;
@@ -1025,11 +1026,13 @@ void SUSYTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup) {
     for (std::vector<std::string>::iterator s = metsToMonitor_.begin(); s != metsToMonitor_.end(); s++) {
         vector<pat::MET> patCorrMET (EdmHelper::getObjs<pat::MET > (ev,  *s));  // get PATCorr Objects
         std::string metName = *s;
-        float metVal;
-
-        metVal = patCorrMET[0].pt();
+        float metVal = patCorrMET[0].pt();
+        float metValphi = patCorrMET[0].phi();
+        float metValsumEt = patCorrMET[0].sumEt();
         //cout<<prefix<<"Monitoring the following met: "<<*s<<": "<<metVal<<endl;
         put(metName, metVal);
+        put(metName+"phi", metValphi);
+        put(metName+"sumEt", metValsumEt);
     }
   }
 
@@ -1047,23 +1050,23 @@ void SUSYTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup) {
     patMET_p4.SetE (met );
 
     put("metphi", patMET_p4.phi());
-    put("sumET", patMET[0].sumEt());
+    put("sumEt", patMET[0].sumEt());
 
   }
-  float barepfmetpx(NAN); 
-  float barepfmetpy(NAN); 
-  float barepfmet(NAN); 
-  vector<reco::PFMET> recoPFMET (EdmHelper::getObjs< reco::PFMET > (ev, edm::InputTag("pfMet") ) );
-  if (recoPFMET.size()>0) {
-    barepfmetpx = recoPFMET[0].px();// + delta_met_x; 
-    barepfmetpy = recoPFMET[0].py();// + delta_met_y; 
-    barepfmet   =  sqrt(barepfmetpx*barepfmetpx + barepfmetpy*barepfmetpy);
-    put("barepfmetpx", barepfmetpx);     //Apply changes from JES
-    put("barepfmetpy", barepfmetpy);     //Apply changes from JES
-    put("barepfmet", barepfmet);
-    put("barepfmetsumEt", recoPFMET[0].sumEt()); // NAN);
-    
-  }
+//  float barepfmetpx(NAN); 
+//  float barepfmetpy(NAN); 
+//  float barepfmet(NAN); 
+//  vector<reco::PFMET> recoPFMET (EdmHelper::getObjs< reco::PFMET > (ev, edm::InputTag("pfMet") ) );
+//  if (recoPFMET.size()>0) {
+//    barepfmetpx = recoPFMET[0].px();// + delta_met_x; 
+//    barepfmetpy = recoPFMET[0].py();// + delta_met_y; 
+//    barepfmet   =  sqrt(barepfmetpx*barepfmetpx + barepfmetpy*barepfmetpy);
+//    put("barepfmetpx", barepfmetpx);     //Apply changes from JES
+//    put("barepfmetpy", barepfmetpy);     //Apply changes from JES
+//    put("barepfmet", barepfmet);
+//    put("barepfmetsumEt", recoPFMET[0].sumEt()); // NAN);
+//    
+//  }
   //GenMET
   edm::Handle<reco::GenMETCollection> genmet;
   if (ev.getByLabel("genMetTrue", genmet) && genmet->size() > 0) {
@@ -1081,34 +1084,34 @@ void SUSYTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup) {
     }
   }
   
-  if(addFullMETInfo_){
-    vector<pat::MET> rawMET (EdmHelper::getObjs<pat::MET > (ev,  rawMET_));
-//     math::XYZTLorentzVector rawMET_p4 = MathHelper::nanVector();
-    if (rawMET.size()>0) {
-      put("rawMetpx", rawMET[0].px());//Apply changes from JES
-      put("rawMetpy", rawMET[0].py());//Apply changes from JES
-      put("rawMet", rawMET[0].pt()); //sqrt(rawmetpx*rawmetpx + rawmetpy*rawmetpy);
-      put("rawMetphi",rawMET[0].phi());
-      put("rawMetSignificance",rawMET[0].significance());
-    }
-    
-    vector<pat::MET> type01MET (EdmHelper::getObjs<pat::MET > (ev,  type01MET_));
-//     math::XYZTLorentzVector type01MET_p4 = MathHelper::nanVector();
-    if (type01MET.size()>0) {
-      put("type01Metpx", type01MET[0].px());//Apply changes from JES
-      put("type01Metpy", type01MET[0].py());//Apply changes from JES
-      put("type01Met", type01MET[0].pt()); //sqrt(type01metpx*type01metpx + type01metpy*type01metpy);
-      put("type01Metphi",type01MET[0].phi());
-    }
-    
-    vector<pat::MET> type1phiMET (EdmHelper::getObjs<pat::MET > (ev,  type1phiMET_));
-//     math::XYZTLorentzVector type1phiMET_p4 = MathHelper::nanVector();
-    if (type1phiMET.size()>0) {
-      put("type1phiMetpx", type1phiMET[0].px());//Apply changes from JES
-      put("type1phiMetpy", type1phiMET[0].py());//Apply changes from JES
-      put("type1phiMet", type1phiMET[0].pt()); //sqrt(type1phimetpx*type1phimetpx + type1phimetpy*type1phimetpy);
-      put("type1phiMetphi",type1phiMET[0].phi());
-    }
+///  if(addFullMETInfo_){
+///    vector<pat::MET> rawMET (EdmHelper::getObjs<pat::MET > (ev,  rawMET_));
+/////     math::XYZTLorentzVector rawMET_p4 = MathHelper::nanVector();
+///    if (rawMET.size()>0) {
+///      put("rawMetpx", rawMET[0].px());//Apply changes from JES
+///      put("rawMetpy", rawMET[0].py());//Apply changes from JES
+///      put("rawMet", rawMET[0].pt()); //sqrt(rawmetpx*rawmetpx + rawmetpy*rawmetpy);
+///      put("rawMetphi",rawMET[0].phi());
+///      put("rawMetSignificance",rawMET[0].significance());
+///    }
+///    
+///    vector<pat::MET> type01MET (EdmHelper::getObjs<pat::MET > (ev,  type01MET_));
+/////     math::XYZTLorentzVector type01MET_p4 = MathHelper::nanVector();
+///    if (type01MET.size()>0) {
+///      put("type01Metpx", type01MET[0].px());//Apply changes from JES
+///      put("type01Metpy", type01MET[0].py());//Apply changes from JES
+///      put("type01Met", type01MET[0].pt()); //sqrt(type01metpx*type01metpx + type01metpy*type01metpy);
+///      put("type01Metphi",type01MET[0].phi());
+///    }
+///    
+///    vector<pat::MET> type1phiMET (EdmHelper::getObjs<pat::MET > (ev,  type1phiMET_));
+/////     math::XYZTLorentzVector type1phiMET_p4 = MathHelper::nanVector();
+///    if (type1phiMET.size()>0) {
+///      put("type1phiMetpx", type1phiMET[0].px());//Apply changes from JES
+///      put("type1phiMetpy", type1phiMET[0].py());//Apply changes from JES
+///      put("type1phiMet", type1phiMET[0].pt()); //sqrt(type1phimetpx*type1phimetpx + type1phimetpy*type1phimetpy);
+///      put("type1phiMetphi",type1phiMET[0].phi());
+///    }
     
 //    vector<pat::MET> type01phiMET (EdmHelper::getObjs<pat::MET > (ev,  type01phiMET_));
 ////     math::XYZTLorentzVector type01phiMET_p4 = MathHelper::nanVector();
@@ -1118,8 +1121,8 @@ void SUSYTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup) {
 //      put("type01phiMet", type01phiMET[0].pt()); //sqrt(type01phimetpx*type01phimetpx + type01phimetpy*type01phimetpy);
 //      put("type01phiMetphi",type01phiMET[0].phi());
 //    }
-
-  }
+//
+//  }
 
 /*  ____      _   _  _     ____       _           _   _
    |  _ \    / \ | || |   / ___|  ___| | ___  ___| |_(_) ___  _ __
@@ -2109,6 +2112,8 @@ void SUSYTupelizer::addAllVars( )
     for (std::vector<std::string>::iterator s = metsToMonitor_.begin(); s != metsToMonitor_.end(); s++) {
       std::string metName = *s;
       addVar(metName+"/F");
+      addVar(metName+"phi/F");
+      addVar(metName+"sumEt/F");
     }
   }
 
@@ -2215,11 +2220,11 @@ void SUSYTupelizer::addAllVars( )
   addVar("metpx/F"); // NAN);
   addVar("metpy/F"); // NAN);
   addVar("metphi/F"); // NAN);
-  addVar("sumET/F"); // NAN);
-  addVar("barepfmetpx/F"); // NAN);
-  addVar("barepfmetpy/F"); // NAN);
-  addVar("barepfmet/F"); // NAN);
-  addVar("barepfmetsumEt/F"); // NAN);
+  addVar("sumEt/F"); // NAN);
+//  addVar("barepfmetpx/F"); // NAN);
+//  addVar("barepfmetpy/F"); // NAN);
+//  addVar("barepfmet/F"); // NAN);
+//  addVar("barepfmetsumEt/F"); // NAN);
   addVar("genmetpx/F"); // NAN);
   addVar("genmetpy/F"); // NAN);
   addVar("genmet/F"); // NAN);
@@ -2233,25 +2238,25 @@ void SUSYTupelizer::addAllVars( )
     addVar("genmetSumEt/F"); // NAN);
   }
 
-  if (addFullMETInfo_){
-    addVar("rawMetpx/F"); // NAN);
-    addVar("rawMetpy/F"); // NAN);
-    addVar("rawMet/F"); // NAN);
-    addVar("rawMetphi/F"); // NAN);
-    addVar("rawMetSignificance/F");
-    addVar("type01Metpx/F"); // NAN);
-    addVar("type01Metpy/F"); // NAN);
-    addVar("type01Met/F"); // NAN);
-    addVar("type01Metphi/F"); // NAN);
-    addVar("type1phiMetpx/F"); // NAN);
-    addVar("type1phiMetpy/F"); // NAN);
-    addVar("type1phiMet/F"); // NAN);
-    addVar("type1phiMetphi/F"); // NAN);
+//  if (addFullMETInfo_){
+//    addVar("rawMetpx/F"); // NAN);
+//    addVar("rawMetpy/F"); // NAN);
+//    addVar("rawMet/F"); // NAN);
+//    addVar("rawMetphi/F"); // NAN);
+//    addVar("rawMetSignificance/F");
+//    addVar("type01Metpx/F"); // NAN);
+//    addVar("type01Metpy/F"); // NAN);
+//    addVar("type01Met/F"); // NAN);
+//    addVar("type01Metphi/F"); // NAN);
+//    addVar("type1phiMetpx/F"); // NAN);
+//    addVar("type1phiMetpy/F"); // NAN);
+//    addVar("type1phiMet/F"); // NAN);
+//    addVar("type1phiMetphi/F"); // NAN);
 //    addVar("type01phiMetpx/F"); // NAN);
 //    addVar("type01phiMetpy/F"); // NAN);
 //    addVar("type01phiMet/F"); // NAN);
 //    addVar("type01phiMetphi/F"); // NAN);    
-  }
+//  }
 
   if (addRA4AnalysisInfo_) {
     addVar("singleMuonic/I"); // -1);
