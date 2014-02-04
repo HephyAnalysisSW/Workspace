@@ -103,12 +103,29 @@ inEvent = False
 #
 # loop over files
 #
-for filename in filenames:
-  # copy to working directory
-  os.system("xrdcp root://hephyse.oeaw.ac.at/"+dirname+"/"+filename+" "+filename)
-  # verify success of copy
-  if not os.path.isfile(filename):
-    print "File not found :",filename
+localFiles = None
+for fn in filenames:
+  #
+  # try two file sources (local and via rootd)
+  #
+  found = False
+  if localFiles==None or localFiles==True:
+    # try to use a local directory
+    found = os.path.isfile(dirname+"/"+fn)
+    if found:
+      if localFiles==None:
+        localFiles = True
+      filename = dirname+"/"+fn
+  if localFiles==False or ( not found ):
+    # try copy from SE to working directory
+    os.system("xrdcp root://hephyse.oeaw.ac.at/"+dirname+"/"+fn+" "+fn)
+    found = os.path.isfile(fn)
+    if found:
+      if localFiles==None:
+        localFiles = False
+      filename = fn
+  if not found:
+    print "File not found :",fn
     sys.exit(1)
   # open file (via gzip, if necessary)
   print 'opening file ',filename
@@ -266,7 +283,8 @@ for filename in filenames:
   # close and remove local input file
   #
   filehandle.close()
-  os.system("rm "+filename)
+  if localFiles==False:
+    os.system("rm "+filename)
 #
 # create and fill histogram with one bin / W-decay id
 #
