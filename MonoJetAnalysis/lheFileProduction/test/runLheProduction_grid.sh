@@ -110,30 +110,31 @@ fi
 
 jobIdentifier=${jobParameters}_stopMass_${stopMassValues}_genLsp_${generatedLspMassValues}_dMStopLsp_${deltaMassStopLspSelected}
 logFile=${jobIdentifier}.log
-dataFinalDir=${dataMergedLheDir}/${jobDirMergedLhe}.${jobIdentifier}
+dataFinalDir="${dataMergedLheDir}/${jobDirMergedLhe}.${jobIdentifier}"
 
 python -u Workspace/MonoJetAnalysis/lheFileProduction/python/runLheProduction.py ${jobParameters} > ${logFile}
 
 # copy the output data 
 
-# for interactive jobs and rfcp protocol, one needs to create the directory
+# for interactive jobs and rfcp / globus-url-copy protocol, one needs to create the directory
 
-rfdir ${dataFinalDir}
+rfdir "${dataFinalDir}"
 
 if [ $? == 0 ]
 then
     echo "Directory ${dataFinalDir} already exists"
 else
     echo "Trying to create directory ${dataFinalDir}"
-    rfmkdir -p ${dataFinalDir}
+     dpns-mkdir -p "hephyse.oeaw.ac.at:${dataFinalDir}"
 fi
 
-rfcp ${logFile} ${dataMergedLheDir}/${logFile}
+globus-url-copy file://`pwd`/${logFile} gsiftp://hephyse.oeaw.ac.at/${dataMergedLheDir}/${logFile}
 
 for lheFile in ${jobDirMergedLhe}/*; do
     [ -e "${lheFile}" ] || continue
     lheFileName="$(basename "${lheFile}")"
-    rfcp ${jobDirMergedLhe}/${lheFileName} ${dataFinalDir}/${lheFileName}  
+    globus-url-copy file://`pwd`/${jobDirMergedLhe}/${lheFileName} gsiftp://hephyse.oeaw.ac.at/${dataFinalDir}/${lheFileName}
+       
 done
 
 exit 0

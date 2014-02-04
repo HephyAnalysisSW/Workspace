@@ -55,7 +55,7 @@ def findNrEvents(fileName):
     if os.path.isfile(fileName):  
         
         lheFile = gzip.open(fileName, 'rb')
-        nrEv = 0 
+        nrEv = -1 
         nrEvLine = '#  Number of Events        :'
         for fileLine in lheFile:
             if (nrEvLine in fileLine):
@@ -291,6 +291,7 @@ def assignLspMass(lheFileList, deltaMassStopLspValues, deltaMassStopLspFractions
          nrFiles = 0
          nrEventsLocal = 0
          nrFilesLocal = 0
+         flagStaged = True
          
          for lheFile in fileListLhe:
              stopMassValue = lheFile.stopMass
@@ -301,10 +302,14 @@ def assignLspMass(lheFileList, deltaMassStopLspValues, deltaMassStopLspFractions
                      nrEventsLocal += lheFileNrEvents
                      nrFilesLocal += 1
                  else:
-                     nrEvents = -1
+                     flagStaged = False
                  nrFiles += 1
-       
-         nrEventsPerStopMass[stopMass] = nrEvents
+
+         if flagStaged == True:        
+             nrEventsPerStopMass[stopMass] = nrEvents
+         else:
+             nrEventsPerStopMass[stopMass] = -1
+             
          nrFilesPerStopMass[stopMass] = nrFiles
          nrEventsPerStopMassLocal[stopMass] = nrEventsLocal
          nrFilesPerStopMassLocal[stopMass] = nrFilesLocal

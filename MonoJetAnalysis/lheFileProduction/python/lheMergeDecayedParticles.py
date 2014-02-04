@@ -354,11 +354,20 @@ def lheMergeDecayedParticles(filenameD1, filenameD2, filenameP, filenameO, lspGe
             pSum.printMe()
         else:
             g.write("<event>\n")
-            g.write(eventDS+"\n")
+            
+            nrParticles = len(eventP)
+            firstSpacePos = eventDS.find(' ')
+            if firstSpacePos > 0:
+                g.write(str(nrParticles) + eventDS[firstSpacePos:] + "\n")
+            else: 
+                print "\nNo space found in event description line - write unmodified event description"
+                g.write(eventDS + "\n")
+                
             for p in eventP:
                 g.write(p.writeMe())
+                
             g.write(eventPS+"\n")
-            g.write('#  ' + modelComment + '\n')
+            g.write('# model ' + modelComment + '\n')
             g.write("</event>\n")
     
     g.close()
