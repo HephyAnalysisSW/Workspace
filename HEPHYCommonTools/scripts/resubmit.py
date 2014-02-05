@@ -30,9 +30,11 @@ indications = [\
 "60302",
 "60318",
 "50115",
+"50669",
 "70500",
 "Cancelled",
 "1          1",
+"9          9",
 "127        127",
 "Created"
 ]
@@ -48,6 +50,7 @@ for line in lines:
       if line.count(ind)>0:                           
         jobn  = int(jobm.group())
         resubmitjobs[latestwdir] .append(jobn)
+        break
 outfile = file('resubmit.sh', 'w')
 outfile.write('#!/bin/sh\n')
 for key in resubmitjobs:

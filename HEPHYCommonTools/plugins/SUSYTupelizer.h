@@ -198,9 +198,9 @@ public:
   std::string triggerCollection_;
   edm::InputTag patJets_;
   edm::InputTag patMET_;
-  edm::InputTag rawMET_;
-  edm::InputTag type01MET_;
-  edm::InputTag type1phiMET_;
+//  edm::InputTag rawMET_;
+//  edm::InputTag type01MET_;
+//  edm::InputTag type1phiMET_;
 //  edm::InputTag type01phiMET_;
   edm::InputTag patMuons_;
   edm::InputTag patElectrons_;
@@ -208,6 +208,7 @@ public:
   edm::InputTag vertices_;
 
   double lowLeptonPtThreshold_;
+  double softJetPtThreshold_;
 
   // steerables Mu:
   double muonPt_;
@@ -299,7 +300,7 @@ public:
   bool addFullBTagInfo_;
   bool addFullJetInfo_;
   bool addFullLeptonInfo_;
-  bool addFullMETInfo_;
+//  bool addFullMETInfo_;
   bool addFullMuonInfo_;
   bool addFullEleInfo_;
   bool addFullTauInfo_;
