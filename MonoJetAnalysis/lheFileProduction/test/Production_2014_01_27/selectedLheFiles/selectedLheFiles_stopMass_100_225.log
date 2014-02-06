@@ -1,0 +1,2631 @@
+
+Input file:                            ProductionAnalysis_Round_2014_01_27/LheFiles.txt
+Statistics per (stop mass, LSP mass):    1600000
+Low stop mass limit:                     100
+High stop mass limit:                    225
+File to save list of selected LHE file:  selectedLheFiles_stopMass_100_225.txt
+
+Number of existing stop mass bins:  17 
+
+
+Begin loop: stop mass =  100  lspMass =  20 ( deltaMassStopLsp =  80 )
+
+   8TeV_T2tt_2j_100_0_run2504_merged_100_20.lhe.gz
+   stop mass =  100  lspMass =  20  lspGeneratedMass =  0 runNumber =  2504  nrEventsPoint =  100000 
+
+   8TeV_T2tt_2j_100_0_run3119_merged_100_20.lhe.gz
+   stop mass =  100  lspMass =  20  lspGeneratedMass =  0 runNumber =  3119  nrEventsPoint =  200000 
+
+   8TeV_T2tt_2j_100_0_run3122_merged_100_20.lhe.gz
+   stop mass =  100  lspMass =  20  lspGeneratedMass =  0 runNumber =  3122  nrEventsPoint =  300000 
+
+   8TeV_T2tt_2j_100_0_run4486_merged_100_20.lhe.gz
+   stop mass =  100  lspMass =  20  lspGeneratedMass =  0 runNumber =  4486  nrEventsPoint =  400000 
+
+   8TeV_T2tt_2j_100_0_run5753_merged_100_20.lhe.gz
+   stop mass =  100  lspMass =  20  lspGeneratedMass =  0 runNumber =  5753  nrEventsPoint =  500000 
+
+   8TeV_T2tt_2j_100_0_run7087_merged_100_20.lhe.gz
+   stop mass =  100  lspMass =  20  lspGeneratedMass =  0 runNumber =  7087  nrEventsPoint =  600000 
+
+   8TeV_T2tt_2j_100_0_run9229_merged_100_20.lhe.gz
+   stop mass =  100  lspMass =  20  lspGeneratedMass =  0 runNumber =  9229  nrEventsPoint =  700000 
+
+   8TeV_T2tt_2j_100_0_run11429_merged_100_20.lhe.gz
+   stop mass =  100  lspMass =  20  lspGeneratedMass =  0 runNumber =  11429  nrEventsPoint =  800000 
+
+   8TeV_T2tt_2j_100_0_run14936_merged_100_20.lhe.gz
+   stop mass =  100  lspMass =  20  lspGeneratedMass =  0 runNumber =  14936  nrEventsPoint =  900000 
+
+   8TeV_T2tt_2j_100_0_run19201_merged_100_20.lhe.gz
+   stop mass =  100  lspMass =  20  lspGeneratedMass =  0 runNumber =  19201  nrEventsPoint =  1000000 
+
+   8TeV_T2tt_2j_100_0_run20705_merged_100_20.lhe.gz
+   stop mass =  100  lspMass =  20  lspGeneratedMass =  0 runNumber =  20705  nrEventsPoint =  1100000 
+
+   8TeV_T2tt_2j_100_0_run22699_merged_100_20.lhe.gz
+   stop mass =  100  lspMass =  20  lspGeneratedMass =  0 runNumber =  22699  nrEventsPoint =  1200000 
+
+   8TeV_T2tt_2j_100_0_run23882_merged_100_20.lhe.gz
+   stop mass =  100  lspMass =  20  lspGeneratedMass =  0 runNumber =  23882  nrEventsPoint =  1300000 
+
+   8TeV_T2tt_2j_100_0_run29178_merged_100_20.lhe.gz
+   stop mass =  100  lspMass =  20  lspGeneratedMass =  0 runNumber =  29178  nrEventsPoint =  1400000 
+
+   8TeV_T2tt_2j_100_0_run30077_merged_100_20.lhe.gz
+   stop mass =  100  lspMass =  20  lspGeneratedMass =  0 runNumber =  30077  nrEventsPoint =  1500000 
+
+   8TeV_T2tt_2j_100_0_run32733_merged_100_20.lhe.gz
+   stop mass =  100  lspMass =  20  lspGeneratedMass =  0 runNumber =  32733  nrEventsPoint =  1600000 
+
+
+  Number of events for stop mass =  100  lspMass =  20 ( deltaMassStopLsp =  80 ):  1600000  events
+
+Begin loop: stop mass =  100  lspMass =  30 ( deltaMassStopLsp =  70 )
+
+   8TeV_T2tt_2j_100_0_run2504_merged_100_30.lhe.gz
+   stop mass =  100  lspMass =  30  lspGeneratedMass =  0 runNumber =  2504  nrEventsPoint =  100000 
+
+   8TeV_T2tt_2j_100_0_run3119_merged_100_30.lhe.gz
+   stop mass =  100  lspMass =  30  lspGeneratedMass =  0 runNumber =  3119  nrEventsPoint =  200000 
+
+   8TeV_T2tt_2j_100_0_run3122_merged_100_30.lhe.gz
+   stop mass =  100  lspMass =  30  lspGeneratedMass =  0 runNumber =  3122  nrEventsPoint =  300000 
+
+   8TeV_T2tt_2j_100_0_run4486_merged_100_30.lhe.gz
+   stop mass =  100  lspMass =  30  lspGeneratedMass =  0 runNumber =  4486  nrEventsPoint =  400000 
+
+   8TeV_T2tt_2j_100_0_run5753_merged_100_30.lhe.gz
+   stop mass =  100  lspMass =  30  lspGeneratedMass =  0 runNumber =  5753  nrEventsPoint =  500000 
+
+   8TeV_T2tt_2j_100_0_run7087_merged_100_30.lhe.gz
+   stop mass =  100  lspMass =  30  lspGeneratedMass =  0 runNumber =  7087  nrEventsPoint =  600000 
+
+   8TeV_T2tt_2j_100_0_run9229_merged_100_30.lhe.gz
+   stop mass =  100  lspMass =  30  lspGeneratedMass =  0 runNumber =  9229  nrEventsPoint =  700000 
+
+   8TeV_T2tt_2j_100_0_run11429_merged_100_30.lhe.gz
+   stop mass =  100  lspMass =  30  lspGeneratedMass =  0 runNumber =  11429  nrEventsPoint =  800000 
+
+   8TeV_T2tt_2j_100_0_run14936_merged_100_30.lhe.gz
+   stop mass =  100  lspMass =  30  lspGeneratedMass =  0 runNumber =  14936  nrEventsPoint =  900000 
+
+   8TeV_T2tt_2j_100_0_run19201_merged_100_30.lhe.gz
+   stop mass =  100  lspMass =  30  lspGeneratedMass =  0 runNumber =  19201  nrEventsPoint =  1000000 
+
+   8TeV_T2tt_2j_100_0_run20705_merged_100_30.lhe.gz
+   stop mass =  100  lspMass =  30  lspGeneratedMass =  0 runNumber =  20705  nrEventsPoint =  1100000 
+
+   8TeV_T2tt_2j_100_0_run22699_merged_100_30.lhe.gz
+   stop mass =  100  lspMass =  30  lspGeneratedMass =  0 runNumber =  22699  nrEventsPoint =  1200000 
+
+   8TeV_T2tt_2j_100_0_run23882_merged_100_30.lhe.gz
+   stop mass =  100  lspMass =  30  lspGeneratedMass =  0 runNumber =  23882  nrEventsPoint =  1300000 
+
+   8TeV_T2tt_2j_100_0_run29178_merged_100_30.lhe.gz
+   stop mass =  100  lspMass =  30  lspGeneratedMass =  0 runNumber =  29178  nrEventsPoint =  1400000 
+
+   8TeV_T2tt_2j_100_0_run30077_merged_100_30.lhe.gz
+   stop mass =  100  lspMass =  30  lspGeneratedMass =  0 runNumber =  30077  nrEventsPoint =  1500000 
+
+   8TeV_T2tt_2j_100_0_run32733_merged_100_30.lhe.gz
+   stop mass =  100  lspMass =  30  lspGeneratedMass =  0 runNumber =  32733  nrEventsPoint =  1600000 
+
+
+  Number of events for stop mass =  100  lspMass =  30 ( deltaMassStopLsp =  70 ):  1600000  events
+
+Begin loop: stop mass =  100  lspMass =  40 ( deltaMassStopLsp =  60 )
+
+   8TeV_T2tt_2j_100_0_run2504_merged_100_40.lhe.gz
+   stop mass =  100  lspMass =  40  lspGeneratedMass =  0 runNumber =  2504  nrEventsPoint =  100000 
+
+   8TeV_T2tt_2j_100_0_run3119_merged_100_40.lhe.gz
+   stop mass =  100  lspMass =  40  lspGeneratedMass =  0 runNumber =  3119  nrEventsPoint =  200000 
+
+   8TeV_T2tt_2j_100_0_run3122_merged_100_40.lhe.gz
+   stop mass =  100  lspMass =  40  lspGeneratedMass =  0 runNumber =  3122  nrEventsPoint =  300000 
+
+   8TeV_T2tt_2j_100_0_run4486_merged_100_40.lhe.gz
+   stop mass =  100  lspMass =  40  lspGeneratedMass =  0 runNumber =  4486  nrEventsPoint =  400000 
+
+   8TeV_T2tt_2j_100_0_run5753_merged_100_40.lhe.gz
+   stop mass =  100  lspMass =  40  lspGeneratedMass =  0 runNumber =  5753  nrEventsPoint =  500000 
+
+   8TeV_T2tt_2j_100_0_run7087_merged_100_40.lhe.gz
+   stop mass =  100  lspMass =  40  lspGeneratedMass =  0 runNumber =  7087  nrEventsPoint =  600000 
+
+   8TeV_T2tt_2j_100_0_run9229_merged_100_40.lhe.gz
+   stop mass =  100  lspMass =  40  lspGeneratedMass =  0 runNumber =  9229  nrEventsPoint =  700000 
+
+   8TeV_T2tt_2j_100_0_run11429_merged_100_40.lhe.gz
+   stop mass =  100  lspMass =  40  lspGeneratedMass =  0 runNumber =  11429  nrEventsPoint =  800000 
+
+   8TeV_T2tt_2j_100_0_run14936_merged_100_40.lhe.gz
+   stop mass =  100  lspMass =  40  lspGeneratedMass =  0 runNumber =  14936  nrEventsPoint =  900000 
+
+   8TeV_T2tt_2j_100_0_run19201_merged_100_40.lhe.gz
+   stop mass =  100  lspMass =  40  lspGeneratedMass =  0 runNumber =  19201  nrEventsPoint =  1000000 
+
+   8TeV_T2tt_2j_100_0_run20705_merged_100_40.lhe.gz
+   stop mass =  100  lspMass =  40  lspGeneratedMass =  0 runNumber =  20705  nrEventsPoint =  1100000 
+
+   8TeV_T2tt_2j_100_0_run22699_merged_100_40.lhe.gz
+   stop mass =  100  lspMass =  40  lspGeneratedMass =  0 runNumber =  22699  nrEventsPoint =  1200000 
+
+   8TeV_T2tt_2j_100_0_run23882_merged_100_40.lhe.gz
+   stop mass =  100  lspMass =  40  lspGeneratedMass =  0 runNumber =  23882  nrEventsPoint =  1300000 
+
+   8TeV_T2tt_2j_100_0_run29178_merged_100_40.lhe.gz
+   stop mass =  100  lspMass =  40  lspGeneratedMass =  0 runNumber =  29178  nrEventsPoint =  1400000 
+
+   8TeV_T2tt_2j_100_0_run30077_merged_100_40.lhe.gz
+   stop mass =  100  lspMass =  40  lspGeneratedMass =  0 runNumber =  30077  nrEventsPoint =  1500000 
+
+   8TeV_T2tt_2j_100_0_run32733_merged_100_40.lhe.gz
+   stop mass =  100  lspMass =  40  lspGeneratedMass =  0 runNumber =  32733  nrEventsPoint =  1600000 
+
+
+  Number of events for stop mass =  100  lspMass =  40 ( deltaMassStopLsp =  60 ):  1600000  events
+
+Begin loop: stop mass =  100  lspMass =  50 ( deltaMassStopLsp =  50 )
+
+   8TeV_T2tt_2j_100_0_run2504_merged_100_50.lhe.gz
+   stop mass =  100  lspMass =  50  lspGeneratedMass =  0 runNumber =  2504  nrEventsPoint =  100000 
+
+   8TeV_T2tt_2j_100_0_run3119_merged_100_50.lhe.gz
+   stop mass =  100  lspMass =  50  lspGeneratedMass =  0 runNumber =  3119  nrEventsPoint =  200000 
+
+   8TeV_T2tt_2j_100_0_run3122_merged_100_50.lhe.gz
+   stop mass =  100  lspMass =  50  lspGeneratedMass =  0 runNumber =  3122  nrEventsPoint =  300000 
+
+   8TeV_T2tt_2j_100_0_run4486_merged_100_50.lhe.gz
+   stop mass =  100  lspMass =  50  lspGeneratedMass =  0 runNumber =  4486  nrEventsPoint =  400000 
+
+   8TeV_T2tt_2j_100_0_run5753_merged_100_50.lhe.gz
+   stop mass =  100  lspMass =  50  lspGeneratedMass =  0 runNumber =  5753  nrEventsPoint =  500000 
+
+   8TeV_T2tt_2j_100_0_run7087_merged_100_50.lhe.gz
+   stop mass =  100  lspMass =  50  lspGeneratedMass =  0 runNumber =  7087  nrEventsPoint =  600000 
+
+   8TeV_T2tt_2j_100_0_run9229_merged_100_50.lhe.gz
+   stop mass =  100  lspMass =  50  lspGeneratedMass =  0 runNumber =  9229  nrEventsPoint =  700000 
+
+   8TeV_T2tt_2j_100_0_run11429_merged_100_50.lhe.gz
+   stop mass =  100  lspMass =  50  lspGeneratedMass =  0 runNumber =  11429  nrEventsPoint =  800000 
+
+   8TeV_T2tt_2j_100_0_run14936_merged_100_50.lhe.gz
+   stop mass =  100  lspMass =  50  lspGeneratedMass =  0 runNumber =  14936  nrEventsPoint =  900000 
+
+   8TeV_T2tt_2j_100_0_run19201_merged_100_50.lhe.gz
+   stop mass =  100  lspMass =  50  lspGeneratedMass =  0 runNumber =  19201  nrEventsPoint =  1000000 
+
+   8TeV_T2tt_2j_100_0_run20705_merged_100_50.lhe.gz
+   stop mass =  100  lspMass =  50  lspGeneratedMass =  0 runNumber =  20705  nrEventsPoint =  1100000 
+
+   8TeV_T2tt_2j_100_0_run22699_merged_100_50.lhe.gz
+   stop mass =  100  lspMass =  50  lspGeneratedMass =  0 runNumber =  22699  nrEventsPoint =  1200000 
+
+   8TeV_T2tt_2j_100_0_run23882_merged_100_50.lhe.gz
+   stop mass =  100  lspMass =  50  lspGeneratedMass =  0 runNumber =  23882  nrEventsPoint =  1300000 
+
+   8TeV_T2tt_2j_100_0_run29178_merged_100_50.lhe.gz
+   stop mass =  100  lspMass =  50  lspGeneratedMass =  0 runNumber =  29178  nrEventsPoint =  1400000 
+
+   8TeV_T2tt_2j_100_0_run30077_merged_100_50.lhe.gz
+   stop mass =  100  lspMass =  50  lspGeneratedMass =  0 runNumber =  30077  nrEventsPoint =  1500000 
+
+   8TeV_T2tt_2j_100_0_run32733_merged_100_50.lhe.gz
+   stop mass =  100  lspMass =  50  lspGeneratedMass =  0 runNumber =  32733  nrEventsPoint =  1600000 
+
+
+  Number of events for stop mass =  100  lspMass =  50 ( deltaMassStopLsp =  50 ):  1600000  events
+
+Begin loop: stop mass =  100  lspMass =  60 ( deltaMassStopLsp =  40 )
+
+   8TeV_T2tt_2j_100_0_run2504_merged_100_60.lhe.gz
+   stop mass =  100  lspMass =  60  lspGeneratedMass =  0 runNumber =  2504  nrEventsPoint =  100000 
+
+   8TeV_T2tt_2j_100_0_run3119_merged_100_60.lhe.gz
+   stop mass =  100  lspMass =  60  lspGeneratedMass =  0 runNumber =  3119  nrEventsPoint =  200000 
+
+   8TeV_T2tt_2j_100_0_run3122_merged_100_60.lhe.gz
+   stop mass =  100  lspMass =  60  lspGeneratedMass =  0 runNumber =  3122  nrEventsPoint =  300000 
+
+   8TeV_T2tt_2j_100_0_run4486_merged_100_60.lhe.gz
+   stop mass =  100  lspMass =  60  lspGeneratedMass =  0 runNumber =  4486  nrEventsPoint =  400000 
+
+   8TeV_T2tt_2j_100_0_run5753_merged_100_60.lhe.gz
+   stop mass =  100  lspMass =  60  lspGeneratedMass =  0 runNumber =  5753  nrEventsPoint =  500000 
+
+   8TeV_T2tt_2j_100_0_run7087_merged_100_60.lhe.gz
+   stop mass =  100  lspMass =  60  lspGeneratedMass =  0 runNumber =  7087  nrEventsPoint =  600000 
+
+   8TeV_T2tt_2j_100_0_run9229_merged_100_60.lhe.gz
+   stop mass =  100  lspMass =  60  lspGeneratedMass =  0 runNumber =  9229  nrEventsPoint =  700000 
+
+   8TeV_T2tt_2j_100_0_run11429_merged_100_60.lhe.gz
+   stop mass =  100  lspMass =  60  lspGeneratedMass =  0 runNumber =  11429  nrEventsPoint =  800000 
+
+   8TeV_T2tt_2j_100_0_run14936_merged_100_60.lhe.gz
+   stop mass =  100  lspMass =  60  lspGeneratedMass =  0 runNumber =  14936  nrEventsPoint =  900000 
+
+   8TeV_T2tt_2j_100_0_run19201_merged_100_60.lhe.gz
+   stop mass =  100  lspMass =  60  lspGeneratedMass =  0 runNumber =  19201  nrEventsPoint =  1000000 
+
+   8TeV_T2tt_2j_100_0_run20705_merged_100_60.lhe.gz
+   stop mass =  100  lspMass =  60  lspGeneratedMass =  0 runNumber =  20705  nrEventsPoint =  1100000 
+
+   8TeV_T2tt_2j_100_0_run22699_merged_100_60.lhe.gz
+   stop mass =  100  lspMass =  60  lspGeneratedMass =  0 runNumber =  22699  nrEventsPoint =  1200000 
+
+   8TeV_T2tt_2j_100_0_run23882_merged_100_60.lhe.gz
+   stop mass =  100  lspMass =  60  lspGeneratedMass =  0 runNumber =  23882  nrEventsPoint =  1300000 
+
+   8TeV_T2tt_2j_100_0_run29178_merged_100_60.lhe.gz
+   stop mass =  100  lspMass =  60  lspGeneratedMass =  0 runNumber =  29178  nrEventsPoint =  1400000 
+
+   8TeV_T2tt_2j_100_0_run30077_merged_100_60.lhe.gz
+   stop mass =  100  lspMass =  60  lspGeneratedMass =  0 runNumber =  30077  nrEventsPoint =  1500000 
+
+   8TeV_T2tt_2j_100_0_run32733_merged_100_60.lhe.gz
+   stop mass =  100  lspMass =  60  lspGeneratedMass =  0 runNumber =  32733  nrEventsPoint =  1600000 
+
+
+  Number of events for stop mass =  100  lspMass =  60 ( deltaMassStopLsp =  40 ):  1600000  events
+
+Begin loop: stop mass =  100  lspMass =  70 ( deltaMassStopLsp =  30 )
+
+   8TeV_T2tt_2j_100_0_run2504_merged_100_70.lhe.gz
+   stop mass =  100  lspMass =  70  lspGeneratedMass =  0 runNumber =  2504  nrEventsPoint =  100000 
+
+   8TeV_T2tt_2j_100_0_run3119_merged_100_70.lhe.gz
+   stop mass =  100  lspMass =  70  lspGeneratedMass =  0 runNumber =  3119  nrEventsPoint =  200000 
+
+   8TeV_T2tt_2j_100_0_run3122_merged_100_70.lhe.gz
+   stop mass =  100  lspMass =  70  lspGeneratedMass =  0 runNumber =  3122  nrEventsPoint =  300000 
+
+   8TeV_T2tt_2j_100_0_run4486_merged_100_70.lhe.gz
+   stop mass =  100  lspMass =  70  lspGeneratedMass =  0 runNumber =  4486  nrEventsPoint =  400000 
+
+   8TeV_T2tt_2j_100_0_run5753_merged_100_70.lhe.gz
+   stop mass =  100  lspMass =  70  lspGeneratedMass =  0 runNumber =  5753  nrEventsPoint =  500000 
+
+   8TeV_T2tt_2j_100_0_run7087_merged_100_70.lhe.gz
+   stop mass =  100  lspMass =  70  lspGeneratedMass =  0 runNumber =  7087  nrEventsPoint =  600000 
+
+   8TeV_T2tt_2j_100_0_run9229_merged_100_70.lhe.gz
+   stop mass =  100  lspMass =  70  lspGeneratedMass =  0 runNumber =  9229  nrEventsPoint =  700000 
+
+   8TeV_T2tt_2j_100_0_run11429_merged_100_70.lhe.gz
+   stop mass =  100  lspMass =  70  lspGeneratedMass =  0 runNumber =  11429  nrEventsPoint =  800000 
+
+   8TeV_T2tt_2j_100_0_run14936_merged_100_70.lhe.gz
+   stop mass =  100  lspMass =  70  lspGeneratedMass =  0 runNumber =  14936  nrEventsPoint =  900000 
+
+   8TeV_T2tt_2j_100_0_run19201_merged_100_70.lhe.gz
+   stop mass =  100  lspMass =  70  lspGeneratedMass =  0 runNumber =  19201  nrEventsPoint =  1000000 
+
+   8TeV_T2tt_2j_100_0_run20705_merged_100_70.lhe.gz
+   stop mass =  100  lspMass =  70  lspGeneratedMass =  0 runNumber =  20705  nrEventsPoint =  1100000 
+
+   8TeV_T2tt_2j_100_0_run22699_merged_100_70.lhe.gz
+   stop mass =  100  lspMass =  70  lspGeneratedMass =  0 runNumber =  22699  nrEventsPoint =  1200000 
+
+   8TeV_T2tt_2j_100_0_run23882_merged_100_70.lhe.gz
+   stop mass =  100  lspMass =  70  lspGeneratedMass =  0 runNumber =  23882  nrEventsPoint =  1300000 
+
+   8TeV_T2tt_2j_100_0_run29178_merged_100_70.lhe.gz
+   stop mass =  100  lspMass =  70  lspGeneratedMass =  0 runNumber =  29178  nrEventsPoint =  1400000 
+
+   8TeV_T2tt_2j_100_0_run30077_merged_100_70.lhe.gz
+   stop mass =  100  lspMass =  70  lspGeneratedMass =  0 runNumber =  30077  nrEventsPoint =  1500000 
+
+   8TeV_T2tt_2j_100_0_run32733_merged_100_70.lhe.gz
+   stop mass =  100  lspMass =  70  lspGeneratedMass =  0 runNumber =  32733  nrEventsPoint =  1600000 
+
+
+  Number of events for stop mass =  100  lspMass =  70 ( deltaMassStopLsp =  30 ):  1600000  events
+
+Begin loop: stop mass =  100  lspMass =  80 ( deltaMassStopLsp =  20 )
+
+   8TeV_T2tt_2j_100_0_run2504_merged_100_80.lhe.gz
+   stop mass =  100  lspMass =  80  lspGeneratedMass =  0 runNumber =  2504  nrEventsPoint =  100000 
+
+   8TeV_T2tt_2j_100_0_run3119_merged_100_80.lhe.gz
+   stop mass =  100  lspMass =  80  lspGeneratedMass =  0 runNumber =  3119  nrEventsPoint =  200000 
+
+   8TeV_T2tt_2j_100_0_run3122_merged_100_80.lhe.gz
+   stop mass =  100  lspMass =  80  lspGeneratedMass =  0 runNumber =  3122  nrEventsPoint =  300000 
+
+   8TeV_T2tt_2j_100_0_run4486_merged_100_80.lhe.gz
+   stop mass =  100  lspMass =  80  lspGeneratedMass =  0 runNumber =  4486  nrEventsPoint =  400000 
+
+   8TeV_T2tt_2j_100_0_run5753_merged_100_80.lhe.gz
+   stop mass =  100  lspMass =  80  lspGeneratedMass =  0 runNumber =  5753  nrEventsPoint =  500000 
+
+   8TeV_T2tt_2j_100_0_run7087_merged_100_80.lhe.gz
+   stop mass =  100  lspMass =  80  lspGeneratedMass =  0 runNumber =  7087  nrEventsPoint =  600000 
+
+   8TeV_T2tt_2j_100_0_run9229_merged_100_80.lhe.gz
+   stop mass =  100  lspMass =  80  lspGeneratedMass =  0 runNumber =  9229  nrEventsPoint =  700000 
+
+   8TeV_T2tt_2j_100_0_run11429_merged_100_80.lhe.gz
+   stop mass =  100  lspMass =  80  lspGeneratedMass =  0 runNumber =  11429  nrEventsPoint =  800000 
+
+   8TeV_T2tt_2j_100_0_run14936_merged_100_80.lhe.gz
+   stop mass =  100  lspMass =  80  lspGeneratedMass =  0 runNumber =  14936  nrEventsPoint =  900000 
+
+   8TeV_T2tt_2j_100_0_run19201_merged_100_80.lhe.gz
+   stop mass =  100  lspMass =  80  lspGeneratedMass =  0 runNumber =  19201  nrEventsPoint =  1000000 
+
+   8TeV_T2tt_2j_100_0_run20705_merged_100_80.lhe.gz
+   stop mass =  100  lspMass =  80  lspGeneratedMass =  0 runNumber =  20705  nrEventsPoint =  1100000 
+
+   8TeV_T2tt_2j_100_0_run22699_merged_100_80.lhe.gz
+   stop mass =  100  lspMass =  80  lspGeneratedMass =  0 runNumber =  22699  nrEventsPoint =  1200000 
+
+   8TeV_T2tt_2j_100_0_run23882_merged_100_80.lhe.gz
+   stop mass =  100  lspMass =  80  lspGeneratedMass =  0 runNumber =  23882  nrEventsPoint =  1300000 
+
+   8TeV_T2tt_2j_100_0_run29178_merged_100_80.lhe.gz
+   stop mass =  100  lspMass =  80  lspGeneratedMass =  0 runNumber =  29178  nrEventsPoint =  1400000 
+
+   8TeV_T2tt_2j_100_0_run30077_merged_100_80.lhe.gz
+   stop mass =  100  lspMass =  80  lspGeneratedMass =  0 runNumber =  30077  nrEventsPoint =  1500000 
+
+   8TeV_T2tt_2j_100_0_run32733_merged_100_80.lhe.gz
+   stop mass =  100  lspMass =  80  lspGeneratedMass =  0 runNumber =  32733  nrEventsPoint =  1600000 
+
+
+  Number of events for stop mass =  100  lspMass =  80 ( deltaMassStopLsp =  20 ):  1600000  events
+
+Begin loop: stop mass =  100  lspMass =  90 ( deltaMassStopLsp =  10 )
+
+   8TeV_T2tt_2j_100_0_run2504_merged_100_90.lhe.gz
+   stop mass =  100  lspMass =  90  lspGeneratedMass =  0 runNumber =  2504  nrEventsPoint =  100000 
+
+   8TeV_T2tt_2j_100_0_run3119_merged_100_90.lhe.gz
+   stop mass =  100  lspMass =  90  lspGeneratedMass =  0 runNumber =  3119  nrEventsPoint =  200000 
+
+   8TeV_T2tt_2j_100_0_run3122_merged_100_90.lhe.gz
+   stop mass =  100  lspMass =  90  lspGeneratedMass =  0 runNumber =  3122  nrEventsPoint =  300000 
+
+   8TeV_T2tt_2j_100_0_run4486_merged_100_90.lhe.gz
+   stop mass =  100  lspMass =  90  lspGeneratedMass =  0 runNumber =  4486  nrEventsPoint =  400000 
+
+   8TeV_T2tt_2j_100_0_run5753_merged_100_90.lhe.gz
+   stop mass =  100  lspMass =  90  lspGeneratedMass =  0 runNumber =  5753  nrEventsPoint =  500000 
+
+   8TeV_T2tt_2j_100_0_run7087_merged_100_90.lhe.gz
+   stop mass =  100  lspMass =  90  lspGeneratedMass =  0 runNumber =  7087  nrEventsPoint =  600000 
+
+   8TeV_T2tt_2j_100_0_run9229_merged_100_90.lhe.gz
+   stop mass =  100  lspMass =  90  lspGeneratedMass =  0 runNumber =  9229  nrEventsPoint =  700000 
+
+   8TeV_T2tt_2j_100_0_run11429_merged_100_90.lhe.gz
+   stop mass =  100  lspMass =  90  lspGeneratedMass =  0 runNumber =  11429  nrEventsPoint =  800000 
+
+   8TeV_T2tt_2j_100_0_run14936_merged_100_90.lhe.gz
+   stop mass =  100  lspMass =  90  lspGeneratedMass =  0 runNumber =  14936  nrEventsPoint =  900000 
+
+   8TeV_T2tt_2j_100_0_run19201_merged_100_90.lhe.gz
+   stop mass =  100  lspMass =  90  lspGeneratedMass =  0 runNumber =  19201  nrEventsPoint =  1000000 
+
+   8TeV_T2tt_2j_100_0_run20705_merged_100_90.lhe.gz
+   stop mass =  100  lspMass =  90  lspGeneratedMass =  0 runNumber =  20705  nrEventsPoint =  1100000 
+
+   8TeV_T2tt_2j_100_0_run22699_merged_100_90.lhe.gz
+   stop mass =  100  lspMass =  90  lspGeneratedMass =  0 runNumber =  22699  nrEventsPoint =  1200000 
+
+   8TeV_T2tt_2j_100_0_run23882_merged_100_90.lhe.gz
+   stop mass =  100  lspMass =  90  lspGeneratedMass =  0 runNumber =  23882  nrEventsPoint =  1300000 
+
+   8TeV_T2tt_2j_100_0_run29178_merged_100_90.lhe.gz
+   stop mass =  100  lspMass =  90  lspGeneratedMass =  0 runNumber =  29178  nrEventsPoint =  1400000 
+
+   8TeV_T2tt_2j_100_0_run30077_merged_100_90.lhe.gz
+   stop mass =  100  lspMass =  90  lspGeneratedMass =  0 runNumber =  30077  nrEventsPoint =  1500000 
+
+   8TeV_T2tt_2j_100_0_run32733_merged_100_90.lhe.gz
+   stop mass =  100  lspMass =  90  lspGeneratedMass =  0 runNumber =  32733  nrEventsPoint =  1600000 
+
+
+  Number of events for stop mass =  100  lspMass =  90 ( deltaMassStopLsp =  10 ):  1600000  events
+
+Begin loop: stop mass =  125  lspMass =  45 ( deltaMassStopLsp =  80 )
+
+   8TeV_T2tt_2j_125_0_run1239_merged_125_45.lhe.gz
+   stop mass =  125  lspMass =  45  lspGeneratedMass =  0 runNumber =  1239  nrEventsPoint =  100000 
+
+   8TeV_T2tt_2j_125_0_run2454_merged_125_45.lhe.gz
+   stop mass =  125  lspMass =  45  lspGeneratedMass =  0 runNumber =  2454  nrEventsPoint =  200000 
+
+   8TeV_T2tt_2j_125_0_run5082_merged_125_45.lhe.gz
+   stop mass =  125  lspMass =  45  lspGeneratedMass =  0 runNumber =  5082  nrEventsPoint =  300000 
+
+   8TeV_T2tt_2j_125_0_run8290_merged_125_45.lhe.gz
+   stop mass =  125  lspMass =  45  lspGeneratedMass =  0 runNumber =  8290  nrEventsPoint =  400000 
+
+   8TeV_T2tt_2j_125_0_run9306_merged_125_45.lhe.gz
+   stop mass =  125  lspMass =  45  lspGeneratedMass =  0 runNumber =  9306  nrEventsPoint =  500000 
+
+   8TeV_T2tt_2j_125_0_run26109_merged_125_45.lhe.gz
+   stop mass =  125  lspMass =  45  lspGeneratedMass =  0 runNumber =  26109  nrEventsPoint =  600000 
+
+   8TeV_T2tt_2j_125_0_run29906_merged_125_45.lhe.gz
+   stop mass =  125  lspMass =  45  lspGeneratedMass =  0 runNumber =  29906  nrEventsPoint =  700000 
+
+   8TeV_T2tt_2j_125_0_run30098_merged_125_45.lhe.gz
+   stop mass =  125  lspMass =  45  lspGeneratedMass =  0 runNumber =  30098  nrEventsPoint =  800000 
+
+   8TeV_T2tt_2j_125_25_run616_merged_125_45.lhe.gz
+   stop mass =  125  lspMass =  45  lspGeneratedMass =  25 runNumber =  616  nrEventsPoint =  900000 
+
+   8TeV_T2tt_2j_125_25_run1740_merged_125_45.lhe.gz
+   stop mass =  125  lspMass =  45  lspGeneratedMass =  25 runNumber =  1740  nrEventsPoint =  1000000 
+
+   8TeV_T2tt_2j_125_25_run6235_merged_125_45.lhe.gz
+   stop mass =  125  lspMass =  45  lspGeneratedMass =  25 runNumber =  6235  nrEventsPoint =  1100000 
+
+   8TeV_T2tt_2j_125_25_run9545_merged_125_45.lhe.gz
+   stop mass =  125  lspMass =  45  lspGeneratedMass =  25 runNumber =  9545  nrEventsPoint =  1200000 
+
+   8TeV_T2tt_2j_125_25_run13331_merged_125_45.lhe.gz
+   stop mass =  125  lspMass =  45  lspGeneratedMass =  25 runNumber =  13331  nrEventsPoint =  1300000 
+
+   8TeV_T2tt_2j_125_25_run21482_merged_125_45.lhe.gz
+   stop mass =  125  lspMass =  45  lspGeneratedMass =  25 runNumber =  21482  nrEventsPoint =  1400000 
+
+   8TeV_T2tt_2j_125_25_run21516_merged_125_45.lhe.gz
+   stop mass =  125  lspMass =  45  lspGeneratedMass =  25 runNumber =  21516  nrEventsPoint =  1500000 
+
+   8TeV_T2tt_2j_125_25_run26694_merged_125_45.lhe.gz
+   stop mass =  125  lspMass =  45  lspGeneratedMass =  25 runNumber =  26694  nrEventsPoint =  1600000 
+
+
+  Number of events for stop mass =  125  lspMass =  45 ( deltaMassStopLsp =  80 ):  1600000  events
+
+Begin loop: stop mass =  125  lspMass =  55 ( deltaMassStopLsp =  70 )
+
+   8TeV_T2tt_2j_125_0_run1239_merged_125_55.lhe.gz
+   stop mass =  125  lspMass =  55  lspGeneratedMass =  0 runNumber =  1239  nrEventsPoint =  100000 
+
+   8TeV_T2tt_2j_125_0_run2454_merged_125_55.lhe.gz
+   stop mass =  125  lspMass =  55  lspGeneratedMass =  0 runNumber =  2454  nrEventsPoint =  200000 
+
+   8TeV_T2tt_2j_125_0_run5082_merged_125_55.lhe.gz
+   stop mass =  125  lspMass =  55  lspGeneratedMass =  0 runNumber =  5082  nrEventsPoint =  300000 
+
+   8TeV_T2tt_2j_125_0_run8290_merged_125_55.lhe.gz
+   stop mass =  125  lspMass =  55  lspGeneratedMass =  0 runNumber =  8290  nrEventsPoint =  400000 
+
+   8TeV_T2tt_2j_125_0_run9306_merged_125_55.lhe.gz
+   stop mass =  125  lspMass =  55  lspGeneratedMass =  0 runNumber =  9306  nrEventsPoint =  500000 
+
+   8TeV_T2tt_2j_125_0_run26109_merged_125_55.lhe.gz
+   stop mass =  125  lspMass =  55  lspGeneratedMass =  0 runNumber =  26109  nrEventsPoint =  600000 
+
+   8TeV_T2tt_2j_125_0_run29906_merged_125_55.lhe.gz
+   stop mass =  125  lspMass =  55  lspGeneratedMass =  0 runNumber =  29906  nrEventsPoint =  700000 
+
+   8TeV_T2tt_2j_125_0_run30098_merged_125_55.lhe.gz
+   stop mass =  125  lspMass =  55  lspGeneratedMass =  0 runNumber =  30098  nrEventsPoint =  800000 
+
+   8TeV_T2tt_2j_125_25_run616_merged_125_55.lhe.gz
+   stop mass =  125  lspMass =  55  lspGeneratedMass =  25 runNumber =  616  nrEventsPoint =  900000 
+
+   8TeV_T2tt_2j_125_25_run1740_merged_125_55.lhe.gz
+   stop mass =  125  lspMass =  55  lspGeneratedMass =  25 runNumber =  1740  nrEventsPoint =  1000000 
+
+   8TeV_T2tt_2j_125_25_run6235_merged_125_55.lhe.gz
+   stop mass =  125  lspMass =  55  lspGeneratedMass =  25 runNumber =  6235  nrEventsPoint =  1100000 
+
+   8TeV_T2tt_2j_125_25_run9545_merged_125_55.lhe.gz
+   stop mass =  125  lspMass =  55  lspGeneratedMass =  25 runNumber =  9545  nrEventsPoint =  1200000 
+
+   8TeV_T2tt_2j_125_25_run13331_merged_125_55.lhe.gz
+   stop mass =  125  lspMass =  55  lspGeneratedMass =  25 runNumber =  13331  nrEventsPoint =  1300000 
+
+   8TeV_T2tt_2j_125_25_run21482_merged_125_55.lhe.gz
+   stop mass =  125  lspMass =  55  lspGeneratedMass =  25 runNumber =  21482  nrEventsPoint =  1400000 
+
+   8TeV_T2tt_2j_125_25_run21516_merged_125_55.lhe.gz
+   stop mass =  125  lspMass =  55  lspGeneratedMass =  25 runNumber =  21516  nrEventsPoint =  1500000 
+
+   8TeV_T2tt_2j_125_25_run26694_merged_125_55.lhe.gz
+   stop mass =  125  lspMass =  55  lspGeneratedMass =  25 runNumber =  26694  nrEventsPoint =  1600000 
+
+
+  Number of events for stop mass =  125  lspMass =  55 ( deltaMassStopLsp =  70 ):  1600000  events
+
+Begin loop: stop mass =  125  lspMass =  65 ( deltaMassStopLsp =  60 )
+
+   8TeV_T2tt_2j_125_0_run1239_merged_125_65.lhe.gz
+   stop mass =  125  lspMass =  65  lspGeneratedMass =  0 runNumber =  1239  nrEventsPoint =  100000 
+
+   8TeV_T2tt_2j_125_0_run2454_merged_125_65.lhe.gz
+   stop mass =  125  lspMass =  65  lspGeneratedMass =  0 runNumber =  2454  nrEventsPoint =  200000 
+
+   8TeV_T2tt_2j_125_0_run5082_merged_125_65.lhe.gz
+   stop mass =  125  lspMass =  65  lspGeneratedMass =  0 runNumber =  5082  nrEventsPoint =  300000 
+
+   8TeV_T2tt_2j_125_0_run8290_merged_125_65.lhe.gz
+   stop mass =  125  lspMass =  65  lspGeneratedMass =  0 runNumber =  8290  nrEventsPoint =  400000 
+
+   8TeV_T2tt_2j_125_0_run9306_merged_125_65.lhe.gz
+   stop mass =  125  lspMass =  65  lspGeneratedMass =  0 runNumber =  9306  nrEventsPoint =  500000 
+
+   8TeV_T2tt_2j_125_0_run26109_merged_125_65.lhe.gz
+   stop mass =  125  lspMass =  65  lspGeneratedMass =  0 runNumber =  26109  nrEventsPoint =  600000 
+
+   8TeV_T2tt_2j_125_0_run29906_merged_125_65.lhe.gz
+   stop mass =  125  lspMass =  65  lspGeneratedMass =  0 runNumber =  29906  nrEventsPoint =  700000 
+
+   8TeV_T2tt_2j_125_0_run30098_merged_125_65.lhe.gz
+   stop mass =  125  lspMass =  65  lspGeneratedMass =  0 runNumber =  30098  nrEventsPoint =  800000 
+
+   8TeV_T2tt_2j_125_25_run616_merged_125_65.lhe.gz
+   stop mass =  125  lspMass =  65  lspGeneratedMass =  25 runNumber =  616  nrEventsPoint =  900000 
+
+   8TeV_T2tt_2j_125_25_run1740_merged_125_65.lhe.gz
+   stop mass =  125  lspMass =  65  lspGeneratedMass =  25 runNumber =  1740  nrEventsPoint =  1000000 
+
+   8TeV_T2tt_2j_125_25_run6235_merged_125_65.lhe.gz
+   stop mass =  125  lspMass =  65  lspGeneratedMass =  25 runNumber =  6235  nrEventsPoint =  1100000 
+
+   8TeV_T2tt_2j_125_25_run9545_merged_125_65.lhe.gz
+   stop mass =  125  lspMass =  65  lspGeneratedMass =  25 runNumber =  9545  nrEventsPoint =  1200000 
+
+   8TeV_T2tt_2j_125_25_run13331_merged_125_65.lhe.gz
+   stop mass =  125  lspMass =  65  lspGeneratedMass =  25 runNumber =  13331  nrEventsPoint =  1300000 
+
+   8TeV_T2tt_2j_125_25_run21482_merged_125_65.lhe.gz
+   stop mass =  125  lspMass =  65  lspGeneratedMass =  25 runNumber =  21482  nrEventsPoint =  1400000 
+
+   8TeV_T2tt_2j_125_25_run21516_merged_125_65.lhe.gz
+   stop mass =  125  lspMass =  65  lspGeneratedMass =  25 runNumber =  21516  nrEventsPoint =  1500000 
+
+   8TeV_T2tt_2j_125_25_run26694_merged_125_65.lhe.gz
+   stop mass =  125  lspMass =  65  lspGeneratedMass =  25 runNumber =  26694  nrEventsPoint =  1600000 
+
+
+  Number of events for stop mass =  125  lspMass =  65 ( deltaMassStopLsp =  60 ):  1600000  events
+
+Begin loop: stop mass =  125  lspMass =  75 ( deltaMassStopLsp =  50 )
+
+   8TeV_T2tt_2j_125_0_run1239_merged_125_75.lhe.gz
+   stop mass =  125  lspMass =  75  lspGeneratedMass =  0 runNumber =  1239  nrEventsPoint =  100000 
+
+   8TeV_T2tt_2j_125_0_run2454_merged_125_75.lhe.gz
+   stop mass =  125  lspMass =  75  lspGeneratedMass =  0 runNumber =  2454  nrEventsPoint =  200000 
+
+   8TeV_T2tt_2j_125_0_run5082_merged_125_75.lhe.gz
+   stop mass =  125  lspMass =  75  lspGeneratedMass =  0 runNumber =  5082  nrEventsPoint =  300000 
+
+   8TeV_T2tt_2j_125_0_run8290_merged_125_75.lhe.gz
+   stop mass =  125  lspMass =  75  lspGeneratedMass =  0 runNumber =  8290  nrEventsPoint =  400000 
+
+   8TeV_T2tt_2j_125_0_run9306_merged_125_75.lhe.gz
+   stop mass =  125  lspMass =  75  lspGeneratedMass =  0 runNumber =  9306  nrEventsPoint =  500000 
+
+   8TeV_T2tt_2j_125_0_run26109_merged_125_75.lhe.gz
+   stop mass =  125  lspMass =  75  lspGeneratedMass =  0 runNumber =  26109  nrEventsPoint =  600000 
+
+   8TeV_T2tt_2j_125_0_run29906_merged_125_75.lhe.gz
+   stop mass =  125  lspMass =  75  lspGeneratedMass =  0 runNumber =  29906  nrEventsPoint =  700000 
+
+   8TeV_T2tt_2j_125_0_run30098_merged_125_75.lhe.gz
+   stop mass =  125  lspMass =  75  lspGeneratedMass =  0 runNumber =  30098  nrEventsPoint =  800000 
+
+   8TeV_T2tt_2j_125_25_run616_merged_125_75.lhe.gz
+   stop mass =  125  lspMass =  75  lspGeneratedMass =  25 runNumber =  616  nrEventsPoint =  900000 
+
+   8TeV_T2tt_2j_125_25_run1740_merged_125_75.lhe.gz
+   stop mass =  125  lspMass =  75  lspGeneratedMass =  25 runNumber =  1740  nrEventsPoint =  1000000 
+
+   8TeV_T2tt_2j_125_25_run6235_merged_125_75.lhe.gz
+   stop mass =  125  lspMass =  75  lspGeneratedMass =  25 runNumber =  6235  nrEventsPoint =  1100000 
+
+   8TeV_T2tt_2j_125_25_run9545_merged_125_75.lhe.gz
+   stop mass =  125  lspMass =  75  lspGeneratedMass =  25 runNumber =  9545  nrEventsPoint =  1200000 
+
+   8TeV_T2tt_2j_125_25_run13331_merged_125_75.lhe.gz
+   stop mass =  125  lspMass =  75  lspGeneratedMass =  25 runNumber =  13331  nrEventsPoint =  1300000 
+
+   8TeV_T2tt_2j_125_25_run21482_merged_125_75.lhe.gz
+   stop mass =  125  lspMass =  75  lspGeneratedMass =  25 runNumber =  21482  nrEventsPoint =  1400000 
+
+   8TeV_T2tt_2j_125_25_run21516_merged_125_75.lhe.gz
+   stop mass =  125  lspMass =  75  lspGeneratedMass =  25 runNumber =  21516  nrEventsPoint =  1500000 
+
+   8TeV_T2tt_2j_125_25_run26694_merged_125_75.lhe.gz
+   stop mass =  125  lspMass =  75  lspGeneratedMass =  25 runNumber =  26694  nrEventsPoint =  1600000 
+
+
+  Number of events for stop mass =  125  lspMass =  75 ( deltaMassStopLsp =  50 ):  1600000  events
+
+Begin loop: stop mass =  125  lspMass =  85 ( deltaMassStopLsp =  40 )
+
+   8TeV_T2tt_2j_125_0_run1239_merged_125_85.lhe.gz
+   stop mass =  125  lspMass =  85  lspGeneratedMass =  0 runNumber =  1239  nrEventsPoint =  100000 
+
+   8TeV_T2tt_2j_125_0_run2454_merged_125_85.lhe.gz
+   stop mass =  125  lspMass =  85  lspGeneratedMass =  0 runNumber =  2454  nrEventsPoint =  200000 
+
+   8TeV_T2tt_2j_125_0_run5082_merged_125_85.lhe.gz
+   stop mass =  125  lspMass =  85  lspGeneratedMass =  0 runNumber =  5082  nrEventsPoint =  300000 
+
+   8TeV_T2tt_2j_125_0_run8290_merged_125_85.lhe.gz
+   stop mass =  125  lspMass =  85  lspGeneratedMass =  0 runNumber =  8290  nrEventsPoint =  400000 
+
+   8TeV_T2tt_2j_125_0_run9306_merged_125_85.lhe.gz
+   stop mass =  125  lspMass =  85  lspGeneratedMass =  0 runNumber =  9306  nrEventsPoint =  500000 
+
+   8TeV_T2tt_2j_125_0_run26109_merged_125_85.lhe.gz
+   stop mass =  125  lspMass =  85  lspGeneratedMass =  0 runNumber =  26109  nrEventsPoint =  600000 
+
+   8TeV_T2tt_2j_125_0_run29906_merged_125_85.lhe.gz
+   stop mass =  125  lspMass =  85  lspGeneratedMass =  0 runNumber =  29906  nrEventsPoint =  700000 
+
+   8TeV_T2tt_2j_125_0_run30098_merged_125_85.lhe.gz
+   stop mass =  125  lspMass =  85  lspGeneratedMass =  0 runNumber =  30098  nrEventsPoint =  800000 
+
+   8TeV_T2tt_2j_125_25_run616_merged_125_85.lhe.gz
+   stop mass =  125  lspMass =  85  lspGeneratedMass =  25 runNumber =  616  nrEventsPoint =  900000 
+
+   8TeV_T2tt_2j_125_25_run1740_merged_125_85.lhe.gz
+   stop mass =  125  lspMass =  85  lspGeneratedMass =  25 runNumber =  1740  nrEventsPoint =  1000000 
+
+   8TeV_T2tt_2j_125_25_run6235_merged_125_85.lhe.gz
+   stop mass =  125  lspMass =  85  lspGeneratedMass =  25 runNumber =  6235  nrEventsPoint =  1100000 
+
+   8TeV_T2tt_2j_125_25_run9545_merged_125_85.lhe.gz
+   stop mass =  125  lspMass =  85  lspGeneratedMass =  25 runNumber =  9545  nrEventsPoint =  1200000 
+
+   8TeV_T2tt_2j_125_25_run13331_merged_125_85.lhe.gz
+   stop mass =  125  lspMass =  85  lspGeneratedMass =  25 runNumber =  13331  nrEventsPoint =  1300000 
+
+   8TeV_T2tt_2j_125_25_run21482_merged_125_85.lhe.gz
+   stop mass =  125  lspMass =  85  lspGeneratedMass =  25 runNumber =  21482  nrEventsPoint =  1400000 
+
+   8TeV_T2tt_2j_125_25_run21516_merged_125_85.lhe.gz
+   stop mass =  125  lspMass =  85  lspGeneratedMass =  25 runNumber =  21516  nrEventsPoint =  1500000 
+
+   8TeV_T2tt_2j_125_25_run26694_merged_125_85.lhe.gz
+   stop mass =  125  lspMass =  85  lspGeneratedMass =  25 runNumber =  26694  nrEventsPoint =  1600000 
+
+
+  Number of events for stop mass =  125  lspMass =  85 ( deltaMassStopLsp =  40 ):  1600000  events
+
+Begin loop: stop mass =  125  lspMass =  95 ( deltaMassStopLsp =  30 )
+
+   8TeV_T2tt_2j_125_0_run1239_merged_125_95.lhe.gz
+   stop mass =  125  lspMass =  95  lspGeneratedMass =  0 runNumber =  1239  nrEventsPoint =  100000 
+
+   8TeV_T2tt_2j_125_0_run2454_merged_125_95.lhe.gz
+   stop mass =  125  lspMass =  95  lspGeneratedMass =  0 runNumber =  2454  nrEventsPoint =  200000 
+
+   8TeV_T2tt_2j_125_0_run5082_merged_125_95.lhe.gz
+   stop mass =  125  lspMass =  95  lspGeneratedMass =  0 runNumber =  5082  nrEventsPoint =  300000 
+
+   8TeV_T2tt_2j_125_0_run8290_merged_125_95.lhe.gz
+   stop mass =  125  lspMass =  95  lspGeneratedMass =  0 runNumber =  8290  nrEventsPoint =  400000 
+
+   8TeV_T2tt_2j_125_0_run9306_merged_125_95.lhe.gz
+   stop mass =  125  lspMass =  95  lspGeneratedMass =  0 runNumber =  9306  nrEventsPoint =  500000 
+
+   8TeV_T2tt_2j_125_0_run26109_merged_125_95.lhe.gz
+   stop mass =  125  lspMass =  95  lspGeneratedMass =  0 runNumber =  26109  nrEventsPoint =  600000 
+
+   8TeV_T2tt_2j_125_0_run29906_merged_125_95.lhe.gz
+   stop mass =  125  lspMass =  95  lspGeneratedMass =  0 runNumber =  29906  nrEventsPoint =  700000 
+
+   8TeV_T2tt_2j_125_0_run30098_merged_125_95.lhe.gz
+   stop mass =  125  lspMass =  95  lspGeneratedMass =  0 runNumber =  30098  nrEventsPoint =  800000 
+
+   8TeV_T2tt_2j_125_25_run616_merged_125_95.lhe.gz
+   stop mass =  125  lspMass =  95  lspGeneratedMass =  25 runNumber =  616  nrEventsPoint =  900000 
+
+   8TeV_T2tt_2j_125_25_run1740_merged_125_95.lhe.gz
+   stop mass =  125  lspMass =  95  lspGeneratedMass =  25 runNumber =  1740  nrEventsPoint =  1000000 
+
+   8TeV_T2tt_2j_125_25_run6235_merged_125_95.lhe.gz
+   stop mass =  125  lspMass =  95  lspGeneratedMass =  25 runNumber =  6235  nrEventsPoint =  1100000 
+
+   8TeV_T2tt_2j_125_25_run9545_merged_125_95.lhe.gz
+   stop mass =  125  lspMass =  95  lspGeneratedMass =  25 runNumber =  9545  nrEventsPoint =  1200000 
+
+   8TeV_T2tt_2j_125_25_run13331_merged_125_95.lhe.gz
+   stop mass =  125  lspMass =  95  lspGeneratedMass =  25 runNumber =  13331  nrEventsPoint =  1300000 
+
+   8TeV_T2tt_2j_125_25_run21482_merged_125_95.lhe.gz
+   stop mass =  125  lspMass =  95  lspGeneratedMass =  25 runNumber =  21482  nrEventsPoint =  1400000 
+
+   8TeV_T2tt_2j_125_25_run21516_merged_125_95.lhe.gz
+   stop mass =  125  lspMass =  95  lspGeneratedMass =  25 runNumber =  21516  nrEventsPoint =  1500000 
+
+   8TeV_T2tt_2j_125_25_run26694_merged_125_95.lhe.gz
+   stop mass =  125  lspMass =  95  lspGeneratedMass =  25 runNumber =  26694  nrEventsPoint =  1600000 
+
+
+  Number of events for stop mass =  125  lspMass =  95 ( deltaMassStopLsp =  30 ):  1600000  events
+
+Begin loop: stop mass =  125  lspMass =  105 ( deltaMassStopLsp =  20 )
+
+   8TeV_T2tt_2j_125_0_run1239_merged_125_105.lhe.gz
+   stop mass =  125  lspMass =  105  lspGeneratedMass =  0 runNumber =  1239  nrEventsPoint =  100000 
+
+   8TeV_T2tt_2j_125_0_run2454_merged_125_105.lhe.gz
+   stop mass =  125  lspMass =  105  lspGeneratedMass =  0 runNumber =  2454  nrEventsPoint =  200000 
+
+   8TeV_T2tt_2j_125_0_run5082_merged_125_105.lhe.gz
+   stop mass =  125  lspMass =  105  lspGeneratedMass =  0 runNumber =  5082  nrEventsPoint =  300000 
+
+   8TeV_T2tt_2j_125_0_run8290_merged_125_105.lhe.gz
+   stop mass =  125  lspMass =  105  lspGeneratedMass =  0 runNumber =  8290  nrEventsPoint =  400000 
+
+   8TeV_T2tt_2j_125_0_run9306_merged_125_105.lhe.gz
+   stop mass =  125  lspMass =  105  lspGeneratedMass =  0 runNumber =  9306  nrEventsPoint =  500000 
+
+   8TeV_T2tt_2j_125_0_run26109_merged_125_105.lhe.gz
+   stop mass =  125  lspMass =  105  lspGeneratedMass =  0 runNumber =  26109  nrEventsPoint =  600000 
+
+   8TeV_T2tt_2j_125_0_run29906_merged_125_105.lhe.gz
+   stop mass =  125  lspMass =  105  lspGeneratedMass =  0 runNumber =  29906  nrEventsPoint =  700000 
+
+   8TeV_T2tt_2j_125_0_run30098_merged_125_105.lhe.gz
+   stop mass =  125  lspMass =  105  lspGeneratedMass =  0 runNumber =  30098  nrEventsPoint =  800000 
+
+   8TeV_T2tt_2j_125_25_run616_merged_125_105.lhe.gz
+   stop mass =  125  lspMass =  105  lspGeneratedMass =  25 runNumber =  616  nrEventsPoint =  900000 
+
+   8TeV_T2tt_2j_125_25_run1740_merged_125_105.lhe.gz
+   stop mass =  125  lspMass =  105  lspGeneratedMass =  25 runNumber =  1740  nrEventsPoint =  1000000 
+
+   8TeV_T2tt_2j_125_25_run6235_merged_125_105.lhe.gz
+   stop mass =  125  lspMass =  105  lspGeneratedMass =  25 runNumber =  6235  nrEventsPoint =  1100000 
+
+   8TeV_T2tt_2j_125_25_run9545_merged_125_105.lhe.gz
+   stop mass =  125  lspMass =  105  lspGeneratedMass =  25 runNumber =  9545  nrEventsPoint =  1200000 
+
+   8TeV_T2tt_2j_125_25_run13331_merged_125_105.lhe.gz
+   stop mass =  125  lspMass =  105  lspGeneratedMass =  25 runNumber =  13331  nrEventsPoint =  1300000 
+
+   8TeV_T2tt_2j_125_25_run21482_merged_125_105.lhe.gz
+   stop mass =  125  lspMass =  105  lspGeneratedMass =  25 runNumber =  21482  nrEventsPoint =  1400000 
+
+   8TeV_T2tt_2j_125_25_run21516_merged_125_105.lhe.gz
+   stop mass =  125  lspMass =  105  lspGeneratedMass =  25 runNumber =  21516  nrEventsPoint =  1500000 
+
+   8TeV_T2tt_2j_125_25_run26694_merged_125_105.lhe.gz
+   stop mass =  125  lspMass =  105  lspGeneratedMass =  25 runNumber =  26694  nrEventsPoint =  1600000 
+
+
+  Number of events for stop mass =  125  lspMass =  105 ( deltaMassStopLsp =  20 ):  1600000  events
+
+Begin loop: stop mass =  125  lspMass =  115 ( deltaMassStopLsp =  10 )
+
+   8TeV_T2tt_2j_125_0_run1239_merged_125_115.lhe.gz
+   stop mass =  125  lspMass =  115  lspGeneratedMass =  0 runNumber =  1239  nrEventsPoint =  100000 
+
+   8TeV_T2tt_2j_125_0_run2454_merged_125_115.lhe.gz
+   stop mass =  125  lspMass =  115  lspGeneratedMass =  0 runNumber =  2454  nrEventsPoint =  200000 
+
+   8TeV_T2tt_2j_125_0_run5082_merged_125_115.lhe.gz
+   stop mass =  125  lspMass =  115  lspGeneratedMass =  0 runNumber =  5082  nrEventsPoint =  300000 
+
+   8TeV_T2tt_2j_125_0_run8290_merged_125_115.lhe.gz
+   stop mass =  125  lspMass =  115  lspGeneratedMass =  0 runNumber =  8290  nrEventsPoint =  400000 
+
+   8TeV_T2tt_2j_125_0_run9306_merged_125_115.lhe.gz
+   stop mass =  125  lspMass =  115  lspGeneratedMass =  0 runNumber =  9306  nrEventsPoint =  500000 
+
+   8TeV_T2tt_2j_125_0_run26109_merged_125_115.lhe.gz
+   stop mass =  125  lspMass =  115  lspGeneratedMass =  0 runNumber =  26109  nrEventsPoint =  600000 
+
+   8TeV_T2tt_2j_125_0_run29906_merged_125_115.lhe.gz
+   stop mass =  125  lspMass =  115  lspGeneratedMass =  0 runNumber =  29906  nrEventsPoint =  700000 
+
+   8TeV_T2tt_2j_125_0_run30098_merged_125_115.lhe.gz
+   stop mass =  125  lspMass =  115  lspGeneratedMass =  0 runNumber =  30098  nrEventsPoint =  800000 
+
+   8TeV_T2tt_2j_125_25_run616_merged_125_115.lhe.gz
+   stop mass =  125  lspMass =  115  lspGeneratedMass =  25 runNumber =  616  nrEventsPoint =  900000 
+
+   8TeV_T2tt_2j_125_25_run1740_merged_125_115.lhe.gz
+   stop mass =  125  lspMass =  115  lspGeneratedMass =  25 runNumber =  1740  nrEventsPoint =  1000000 
+
+   8TeV_T2tt_2j_125_25_run6235_merged_125_115.lhe.gz
+   stop mass =  125  lspMass =  115  lspGeneratedMass =  25 runNumber =  6235  nrEventsPoint =  1100000 
+
+   8TeV_T2tt_2j_125_25_run9545_merged_125_115.lhe.gz
+   stop mass =  125  lspMass =  115  lspGeneratedMass =  25 runNumber =  9545  nrEventsPoint =  1200000 
+
+   8TeV_T2tt_2j_125_25_run13331_merged_125_115.lhe.gz
+   stop mass =  125  lspMass =  115  lspGeneratedMass =  25 runNumber =  13331  nrEventsPoint =  1300000 
+
+   8TeV_T2tt_2j_125_25_run21482_merged_125_115.lhe.gz
+   stop mass =  125  lspMass =  115  lspGeneratedMass =  25 runNumber =  21482  nrEventsPoint =  1400000 
+
+   8TeV_T2tt_2j_125_25_run21516_merged_125_115.lhe.gz
+   stop mass =  125  lspMass =  115  lspGeneratedMass =  25 runNumber =  21516  nrEventsPoint =  1500000 
+
+   8TeV_T2tt_2j_125_25_run26694_merged_125_115.lhe.gz
+   stop mass =  125  lspMass =  115  lspGeneratedMass =  25 runNumber =  26694  nrEventsPoint =  1600000 
+
+
+  Number of events for stop mass =  125  lspMass =  115 ( deltaMassStopLsp =  10 ):  1600000  events
+
+Begin loop: stop mass =  150  lspMass =  70 ( deltaMassStopLsp =  80 )
+
+   8TeV_T2tt_2j_150_0_run276_merged_150_70.lhe.gz
+   stop mass =  150  lspMass =  70  lspGeneratedMass =  0 runNumber =  276  nrEventsPoint =  100000 
+
+   8TeV_T2tt_2j_150_0_run1271_merged_150_70.lhe.gz
+   stop mass =  150  lspMass =  70  lspGeneratedMass =  0 runNumber =  1271  nrEventsPoint =  200000 
+
+   8TeV_T2tt_2j_150_0_run6691_merged_150_70.lhe.gz
+   stop mass =  150  lspMass =  70  lspGeneratedMass =  0 runNumber =  6691  nrEventsPoint =  300000 
+
+   8TeV_T2tt_2j_150_0_run13235_merged_150_70.lhe.gz
+   stop mass =  150  lspMass =  70  lspGeneratedMass =  0 runNumber =  13235  nrEventsPoint =  400000 
+
+   8TeV_T2tt_2j_150_0_run18032_merged_150_70.lhe.gz
+   stop mass =  150  lspMass =  70  lspGeneratedMass =  0 runNumber =  18032  nrEventsPoint =  500000 
+
+   8TeV_T2tt_2j_150_0_run24354_merged_150_70.lhe.gz
+   stop mass =  150  lspMass =  70  lspGeneratedMass =  0 runNumber =  24354  nrEventsPoint =  600000 
+
+   8TeV_T2tt_2j_150_0_run27922_merged_150_70.lhe.gz
+   stop mass =  150  lspMass =  70  lspGeneratedMass =  0 runNumber =  27922  nrEventsPoint =  700000 
+
+   8TeV_T2tt_2j_150_0_run31131_merged_150_70.lhe.gz
+   stop mass =  150  lspMass =  70  lspGeneratedMass =  0 runNumber =  31131  nrEventsPoint =  800000 
+
+   8TeV_T2tt_2j_150_25_run227_merged_150_70.lhe.gz
+   stop mass =  150  lspMass =  70  lspGeneratedMass =  25 runNumber =  227  nrEventsPoint =  900000 
+
+   8TeV_T2tt_2j_150_25_run5047_merged_150_70.lhe.gz
+   stop mass =  150  lspMass =  70  lspGeneratedMass =  25 runNumber =  5047  nrEventsPoint =  1000000 
+
+   8TeV_T2tt_2j_150_25_run10586_merged_150_70.lhe.gz
+   stop mass =  150  lspMass =  70  lspGeneratedMass =  25 runNumber =  10586  nrEventsPoint =  1100000 
+
+   8TeV_T2tt_2j_150_25_run20365_merged_150_70.lhe.gz
+   stop mass =  150  lspMass =  70  lspGeneratedMass =  25 runNumber =  20365  nrEventsPoint =  1200000 
+
+   8TeV_T2tt_2j_150_25_run22883_merged_150_70.lhe.gz
+   stop mass =  150  lspMass =  70  lspGeneratedMass =  25 runNumber =  22883  nrEventsPoint =  1300000 
+
+   8TeV_T2tt_2j_150_25_run27688_merged_150_70.lhe.gz
+   stop mass =  150  lspMass =  70  lspGeneratedMass =  25 runNumber =  27688  nrEventsPoint =  1400000 
+
+   8TeV_T2tt_2j_150_25_run31088_merged_150_70.lhe.gz
+   stop mass =  150  lspMass =  70  lspGeneratedMass =  25 runNumber =  31088  nrEventsPoint =  1500000 
+
+   8TeV_T2tt_2j_150_25_run31419_merged_150_70.lhe.gz
+   stop mass =  150  lspMass =  70  lspGeneratedMass =  25 runNumber =  31419  nrEventsPoint =  1600000 
+
+
+        Break run loop
+        Break lspGeneratedMass loop
+        Break while loop
+
+  Number of events for stop mass =  150  lspMass =  70 ( deltaMassStopLsp =  80 ):  1600000  events
+
+Begin loop: stop mass =  150  lspMass =  80 ( deltaMassStopLsp =  70 )
+
+   8TeV_T2tt_2j_150_50_run1477_merged_150_80.lhe.gz
+   stop mass =  150  lspMass =  80  lspGeneratedMass =  50 runNumber =  1477  nrEventsPoint =  100000 
+
+   8TeV_T2tt_2j_150_50_run10030_merged_150_80.lhe.gz
+   stop mass =  150  lspMass =  80  lspGeneratedMass =  50 runNumber =  10030  nrEventsPoint =  200000 
+
+   8TeV_T2tt_2j_150_50_run14337_merged_150_80.lhe.gz
+   stop mass =  150  lspMass =  80  lspGeneratedMass =  50 runNumber =  14337  nrEventsPoint =  300000 
+
+   8TeV_T2tt_2j_150_50_run23238_merged_150_80.lhe.gz
+   stop mass =  150  lspMass =  80  lspGeneratedMass =  50 runNumber =  23238  nrEventsPoint =  400000 
+
+   8TeV_T2tt_2j_150_50_run25618_merged_150_80.lhe.gz
+   stop mass =  150  lspMass =  80  lspGeneratedMass =  50 runNumber =  25618  nrEventsPoint =  500000 
+
+   8TeV_T2tt_2j_150_50_run26069_merged_150_80.lhe.gz
+   stop mass =  150  lspMass =  80  lspGeneratedMass =  50 runNumber =  26069  nrEventsPoint =  600000 
+
+   8TeV_T2tt_2j_150_50_run27873_merged_150_80.lhe.gz
+   stop mass =  150  lspMass =  80  lspGeneratedMass =  50 runNumber =  27873  nrEventsPoint =  700000 
+
+   8TeV_T2tt_2j_150_50_run29802_merged_150_80.lhe.gz
+   stop mass =  150  lspMass =  80  lspGeneratedMass =  50 runNumber =  29802  nrEventsPoint =  800000 
+
+   8TeV_T2tt_2j_150_0_run276_merged_150_80.lhe.gz
+   stop mass =  150  lspMass =  80  lspGeneratedMass =  0 runNumber =  276  nrEventsPoint =  900000 
+
+   8TeV_T2tt_2j_150_0_run1271_merged_150_80.lhe.gz
+   stop mass =  150  lspMass =  80  lspGeneratedMass =  0 runNumber =  1271  nrEventsPoint =  1000000 
+
+   8TeV_T2tt_2j_150_0_run6691_merged_150_80.lhe.gz
+   stop mass =  150  lspMass =  80  lspGeneratedMass =  0 runNumber =  6691  nrEventsPoint =  1100000 
+
+   8TeV_T2tt_2j_150_0_run13235_merged_150_80.lhe.gz
+   stop mass =  150  lspMass =  80  lspGeneratedMass =  0 runNumber =  13235  nrEventsPoint =  1200000 
+
+   8TeV_T2tt_2j_150_0_run18032_merged_150_80.lhe.gz
+   stop mass =  150  lspMass =  80  lspGeneratedMass =  0 runNumber =  18032  nrEventsPoint =  1300000 
+
+   8TeV_T2tt_2j_150_0_run24354_merged_150_80.lhe.gz
+   stop mass =  150  lspMass =  80  lspGeneratedMass =  0 runNumber =  24354  nrEventsPoint =  1400000 
+
+   8TeV_T2tt_2j_150_0_run27922_merged_150_80.lhe.gz
+   stop mass =  150  lspMass =  80  lspGeneratedMass =  0 runNumber =  27922  nrEventsPoint =  1500000 
+
+   8TeV_T2tt_2j_150_0_run31131_merged_150_80.lhe.gz
+   stop mass =  150  lspMass =  80  lspGeneratedMass =  0 runNumber =  31131  nrEventsPoint =  1600000 
+
+
+        Break run loop
+        Break lspGeneratedMass loop
+        Break while loop
+
+  Number of events for stop mass =  150  lspMass =  80 ( deltaMassStopLsp =  70 ):  1600000  events
+
+Begin loop: stop mass =  150  lspMass =  90 ( deltaMassStopLsp =  60 )
+
+   8TeV_T2tt_2j_150_25_run227_merged_150_90.lhe.gz
+   stop mass =  150  lspMass =  90  lspGeneratedMass =  25 runNumber =  227  nrEventsPoint =  100000 
+
+   8TeV_T2tt_2j_150_25_run5047_merged_150_90.lhe.gz
+   stop mass =  150  lspMass =  90  lspGeneratedMass =  25 runNumber =  5047  nrEventsPoint =  200000 
+
+   8TeV_T2tt_2j_150_25_run10586_merged_150_90.lhe.gz
+   stop mass =  150  lspMass =  90  lspGeneratedMass =  25 runNumber =  10586  nrEventsPoint =  300000 
+
+   8TeV_T2tt_2j_150_25_run20365_merged_150_90.lhe.gz
+   stop mass =  150  lspMass =  90  lspGeneratedMass =  25 runNumber =  20365  nrEventsPoint =  400000 
+
+   8TeV_T2tt_2j_150_25_run22883_merged_150_90.lhe.gz
+   stop mass =  150  lspMass =  90  lspGeneratedMass =  25 runNumber =  22883  nrEventsPoint =  500000 
+
+   8TeV_T2tt_2j_150_25_run27688_merged_150_90.lhe.gz
+   stop mass =  150  lspMass =  90  lspGeneratedMass =  25 runNumber =  27688  nrEventsPoint =  600000 
+
+   8TeV_T2tt_2j_150_25_run31088_merged_150_90.lhe.gz
+   stop mass =  150  lspMass =  90  lspGeneratedMass =  25 runNumber =  31088  nrEventsPoint =  700000 
+
+   8TeV_T2tt_2j_150_25_run31419_merged_150_90.lhe.gz
+   stop mass =  150  lspMass =  90  lspGeneratedMass =  25 runNumber =  31419  nrEventsPoint =  800000 
+
+   8TeV_T2tt_2j_150_50_run1477_merged_150_90.lhe.gz
+   stop mass =  150  lspMass =  90  lspGeneratedMass =  50 runNumber =  1477  nrEventsPoint =  900000 
+
+   8TeV_T2tt_2j_150_50_run10030_merged_150_90.lhe.gz
+   stop mass =  150  lspMass =  90  lspGeneratedMass =  50 runNumber =  10030  nrEventsPoint =  1000000 
+
+   8TeV_T2tt_2j_150_50_run14337_merged_150_90.lhe.gz
+   stop mass =  150  lspMass =  90  lspGeneratedMass =  50 runNumber =  14337  nrEventsPoint =  1100000 
+
+   8TeV_T2tt_2j_150_50_run23238_merged_150_90.lhe.gz
+   stop mass =  150  lspMass =  90  lspGeneratedMass =  50 runNumber =  23238  nrEventsPoint =  1200000 
+
+   8TeV_T2tt_2j_150_50_run25618_merged_150_90.lhe.gz
+   stop mass =  150  lspMass =  90  lspGeneratedMass =  50 runNumber =  25618  nrEventsPoint =  1300000 
+
+   8TeV_T2tt_2j_150_50_run26069_merged_150_90.lhe.gz
+   stop mass =  150  lspMass =  90  lspGeneratedMass =  50 runNumber =  26069  nrEventsPoint =  1400000 
+
+   8TeV_T2tt_2j_150_50_run27873_merged_150_90.lhe.gz
+   stop mass =  150  lspMass =  90  lspGeneratedMass =  50 runNumber =  27873  nrEventsPoint =  1500000 
+
+   8TeV_T2tt_2j_150_50_run29802_merged_150_90.lhe.gz
+   stop mass =  150  lspMass =  90  lspGeneratedMass =  50 runNumber =  29802  nrEventsPoint =  1600000 
+
+
+  Number of events for stop mass =  150  lspMass =  90 ( deltaMassStopLsp =  60 ):  1600000  events
+
+Begin loop: stop mass =  150  lspMass =  100 ( deltaMassStopLsp =  50 )
+
+   8TeV_T2tt_2j_150_0_run276_merged_150_100.lhe.gz
+   stop mass =  150  lspMass =  100  lspGeneratedMass =  0 runNumber =  276  nrEventsPoint =  100000 
+
+   8TeV_T2tt_2j_150_0_run1271_merged_150_100.lhe.gz
+   stop mass =  150  lspMass =  100  lspGeneratedMass =  0 runNumber =  1271  nrEventsPoint =  200000 
+
+   8TeV_T2tt_2j_150_0_run6691_merged_150_100.lhe.gz
+   stop mass =  150  lspMass =  100  lspGeneratedMass =  0 runNumber =  6691  nrEventsPoint =  300000 
+
+   8TeV_T2tt_2j_150_0_run13235_merged_150_100.lhe.gz
+   stop mass =  150  lspMass =  100  lspGeneratedMass =  0 runNumber =  13235  nrEventsPoint =  400000 
+
+   8TeV_T2tt_2j_150_0_run18032_merged_150_100.lhe.gz
+   stop mass =  150  lspMass =  100  lspGeneratedMass =  0 runNumber =  18032  nrEventsPoint =  500000 
+
+   8TeV_T2tt_2j_150_0_run24354_merged_150_100.lhe.gz
+   stop mass =  150  lspMass =  100  lspGeneratedMass =  0 runNumber =  24354  nrEventsPoint =  600000 
+
+   8TeV_T2tt_2j_150_0_run27922_merged_150_100.lhe.gz
+   stop mass =  150  lspMass =  100  lspGeneratedMass =  0 runNumber =  27922  nrEventsPoint =  700000 
+
+   8TeV_T2tt_2j_150_0_run31131_merged_150_100.lhe.gz
+   stop mass =  150  lspMass =  100  lspGeneratedMass =  0 runNumber =  31131  nrEventsPoint =  800000 
+
+   8TeV_T2tt_2j_150_25_run227_merged_150_100.lhe.gz
+   stop mass =  150  lspMass =  100  lspGeneratedMass =  25 runNumber =  227  nrEventsPoint =  900000 
+
+   8TeV_T2tt_2j_150_25_run5047_merged_150_100.lhe.gz
+   stop mass =  150  lspMass =  100  lspGeneratedMass =  25 runNumber =  5047  nrEventsPoint =  1000000 
+
+   8TeV_T2tt_2j_150_25_run10586_merged_150_100.lhe.gz
+   stop mass =  150  lspMass =  100  lspGeneratedMass =  25 runNumber =  10586  nrEventsPoint =  1100000 
+
+   8TeV_T2tt_2j_150_25_run20365_merged_150_100.lhe.gz
+   stop mass =  150  lspMass =  100  lspGeneratedMass =  25 runNumber =  20365  nrEventsPoint =  1200000 
+
+   8TeV_T2tt_2j_150_25_run22883_merged_150_100.lhe.gz
+   stop mass =  150  lspMass =  100  lspGeneratedMass =  25 runNumber =  22883  nrEventsPoint =  1300000 
+
+   8TeV_T2tt_2j_150_25_run27688_merged_150_100.lhe.gz
+   stop mass =  150  lspMass =  100  lspGeneratedMass =  25 runNumber =  27688  nrEventsPoint =  1400000 
+
+   8TeV_T2tt_2j_150_25_run31088_merged_150_100.lhe.gz
+   stop mass =  150  lspMass =  100  lspGeneratedMass =  25 runNumber =  31088  nrEventsPoint =  1500000 
+
+   8TeV_T2tt_2j_150_25_run31419_merged_150_100.lhe.gz
+   stop mass =  150  lspMass =  100  lspGeneratedMass =  25 runNumber =  31419  nrEventsPoint =  1600000 
+
+
+        Break run loop
+        Break lspGeneratedMass loop
+        Break while loop
+
+  Number of events for stop mass =  150  lspMass =  100 ( deltaMassStopLsp =  50 ):  1600000  events
+
+Begin loop: stop mass =  150  lspMass =  110 ( deltaMassStopLsp =  40 )
+
+   8TeV_T2tt_2j_150_50_run1477_merged_150_110.lhe.gz
+   stop mass =  150  lspMass =  110  lspGeneratedMass =  50 runNumber =  1477  nrEventsPoint =  100000 
+
+   8TeV_T2tt_2j_150_50_run10030_merged_150_110.lhe.gz
+   stop mass =  150  lspMass =  110  lspGeneratedMass =  50 runNumber =  10030  nrEventsPoint =  200000 
+
+   8TeV_T2tt_2j_150_50_run14337_merged_150_110.lhe.gz
+   stop mass =  150  lspMass =  110  lspGeneratedMass =  50 runNumber =  14337  nrEventsPoint =  300000 
+
+   8TeV_T2tt_2j_150_50_run23238_merged_150_110.lhe.gz
+   stop mass =  150  lspMass =  110  lspGeneratedMass =  50 runNumber =  23238  nrEventsPoint =  400000 
+
+   8TeV_T2tt_2j_150_50_run25618_merged_150_110.lhe.gz
+   stop mass =  150  lspMass =  110  lspGeneratedMass =  50 runNumber =  25618  nrEventsPoint =  500000 
+
+   8TeV_T2tt_2j_150_50_run26069_merged_150_110.lhe.gz
+   stop mass =  150  lspMass =  110  lspGeneratedMass =  50 runNumber =  26069  nrEventsPoint =  600000 
+
+   8TeV_T2tt_2j_150_50_run27873_merged_150_110.lhe.gz
+   stop mass =  150  lspMass =  110  lspGeneratedMass =  50 runNumber =  27873  nrEventsPoint =  700000 
+
+   8TeV_T2tt_2j_150_50_run29802_merged_150_110.lhe.gz
+   stop mass =  150  lspMass =  110  lspGeneratedMass =  50 runNumber =  29802  nrEventsPoint =  800000 
+
+   8TeV_T2tt_2j_150_0_run276_merged_150_110.lhe.gz
+   stop mass =  150  lspMass =  110  lspGeneratedMass =  0 runNumber =  276  nrEventsPoint =  900000 
+
+   8TeV_T2tt_2j_150_0_run1271_merged_150_110.lhe.gz
+   stop mass =  150  lspMass =  110  lspGeneratedMass =  0 runNumber =  1271  nrEventsPoint =  1000000 
+
+   8TeV_T2tt_2j_150_0_run6691_merged_150_110.lhe.gz
+   stop mass =  150  lspMass =  110  lspGeneratedMass =  0 runNumber =  6691  nrEventsPoint =  1100000 
+
+   8TeV_T2tt_2j_150_0_run13235_merged_150_110.lhe.gz
+   stop mass =  150  lspMass =  110  lspGeneratedMass =  0 runNumber =  13235  nrEventsPoint =  1200000 
+
+   8TeV_T2tt_2j_150_0_run18032_merged_150_110.lhe.gz
+   stop mass =  150  lspMass =  110  lspGeneratedMass =  0 runNumber =  18032  nrEventsPoint =  1300000 
+
+   8TeV_T2tt_2j_150_0_run24354_merged_150_110.lhe.gz
+   stop mass =  150  lspMass =  110  lspGeneratedMass =  0 runNumber =  24354  nrEventsPoint =  1400000 
+
+   8TeV_T2tt_2j_150_0_run27922_merged_150_110.lhe.gz
+   stop mass =  150  lspMass =  110  lspGeneratedMass =  0 runNumber =  27922  nrEventsPoint =  1500000 
+
+   8TeV_T2tt_2j_150_0_run31131_merged_150_110.lhe.gz
+   stop mass =  150  lspMass =  110  lspGeneratedMass =  0 runNumber =  31131  nrEventsPoint =  1600000 
+
+
+        Break run loop
+        Break lspGeneratedMass loop
+        Break while loop
+
+  Number of events for stop mass =  150  lspMass =  110 ( deltaMassStopLsp =  40 ):  1600000  events
+
+Begin loop: stop mass =  150  lspMass =  120 ( deltaMassStopLsp =  30 )
+
+   8TeV_T2tt_2j_150_25_run227_merged_150_120.lhe.gz
+   stop mass =  150  lspMass =  120  lspGeneratedMass =  25 runNumber =  227  nrEventsPoint =  100000 
+
+   8TeV_T2tt_2j_150_25_run5047_merged_150_120.lhe.gz
+   stop mass =  150  lspMass =  120  lspGeneratedMass =  25 runNumber =  5047  nrEventsPoint =  200000 
+
+   8TeV_T2tt_2j_150_25_run10586_merged_150_120.lhe.gz
+   stop mass =  150  lspMass =  120  lspGeneratedMass =  25 runNumber =  10586  nrEventsPoint =  300000 
+
+   8TeV_T2tt_2j_150_25_run20365_merged_150_120.lhe.gz
+   stop mass =  150  lspMass =  120  lspGeneratedMass =  25 runNumber =  20365  nrEventsPoint =  400000 
+
+   8TeV_T2tt_2j_150_25_run22883_merged_150_120.lhe.gz
+   stop mass =  150  lspMass =  120  lspGeneratedMass =  25 runNumber =  22883  nrEventsPoint =  500000 
+
+   8TeV_T2tt_2j_150_25_run27688_merged_150_120.lhe.gz
+   stop mass =  150  lspMass =  120  lspGeneratedMass =  25 runNumber =  27688  nrEventsPoint =  600000 
+
+   8TeV_T2tt_2j_150_25_run31088_merged_150_120.lhe.gz
+   stop mass =  150  lspMass =  120  lspGeneratedMass =  25 runNumber =  31088  nrEventsPoint =  700000 
+
+   8TeV_T2tt_2j_150_25_run31419_merged_150_120.lhe.gz
+   stop mass =  150  lspMass =  120  lspGeneratedMass =  25 runNumber =  31419  nrEventsPoint =  800000 
+
+   8TeV_T2tt_2j_150_50_run1477_merged_150_120.lhe.gz
+   stop mass =  150  lspMass =  120  lspGeneratedMass =  50 runNumber =  1477  nrEventsPoint =  900000 
+
+   8TeV_T2tt_2j_150_50_run10030_merged_150_120.lhe.gz
+   stop mass =  150  lspMass =  120  lspGeneratedMass =  50 runNumber =  10030  nrEventsPoint =  1000000 
+
+   8TeV_T2tt_2j_150_50_run14337_merged_150_120.lhe.gz
+   stop mass =  150  lspMass =  120  lspGeneratedMass =  50 runNumber =  14337  nrEventsPoint =  1100000 
+
+   8TeV_T2tt_2j_150_50_run23238_merged_150_120.lhe.gz
+   stop mass =  150  lspMass =  120  lspGeneratedMass =  50 runNumber =  23238  nrEventsPoint =  1200000 
+
+   8TeV_T2tt_2j_150_50_run25618_merged_150_120.lhe.gz
+   stop mass =  150  lspMass =  120  lspGeneratedMass =  50 runNumber =  25618  nrEventsPoint =  1300000 
+
+   8TeV_T2tt_2j_150_50_run26069_merged_150_120.lhe.gz
+   stop mass =  150  lspMass =  120  lspGeneratedMass =  50 runNumber =  26069  nrEventsPoint =  1400000 
+
+   8TeV_T2tt_2j_150_50_run27873_merged_150_120.lhe.gz
+   stop mass =  150  lspMass =  120  lspGeneratedMass =  50 runNumber =  27873  nrEventsPoint =  1500000 
+
+   8TeV_T2tt_2j_150_50_run29802_merged_150_120.lhe.gz
+   stop mass =  150  lspMass =  120  lspGeneratedMass =  50 runNumber =  29802  nrEventsPoint =  1600000 
+
+
+  Number of events for stop mass =  150  lspMass =  120 ( deltaMassStopLsp =  30 ):  1600000  events
+
+Begin loop: stop mass =  150  lspMass =  130 ( deltaMassStopLsp =  20 )
+
+   8TeV_T2tt_2j_150_0_run276_merged_150_130.lhe.gz
+   stop mass =  150  lspMass =  130  lspGeneratedMass =  0 runNumber =  276  nrEventsPoint =  100000 
+
+   8TeV_T2tt_2j_150_0_run1271_merged_150_130.lhe.gz
+   stop mass =  150  lspMass =  130  lspGeneratedMass =  0 runNumber =  1271  nrEventsPoint =  200000 
+
+   8TeV_T2tt_2j_150_0_run6691_merged_150_130.lhe.gz
+   stop mass =  150  lspMass =  130  lspGeneratedMass =  0 runNumber =  6691  nrEventsPoint =  300000 
+
+   8TeV_T2tt_2j_150_0_run13235_merged_150_130.lhe.gz
+   stop mass =  150  lspMass =  130  lspGeneratedMass =  0 runNumber =  13235  nrEventsPoint =  400000 
+
+   8TeV_T2tt_2j_150_0_run18032_merged_150_130.lhe.gz
+   stop mass =  150  lspMass =  130  lspGeneratedMass =  0 runNumber =  18032  nrEventsPoint =  500000 
+
+   8TeV_T2tt_2j_150_0_run24354_merged_150_130.lhe.gz
+   stop mass =  150  lspMass =  130  lspGeneratedMass =  0 runNumber =  24354  nrEventsPoint =  600000 
+
+   8TeV_T2tt_2j_150_0_run27922_merged_150_130.lhe.gz
+   stop mass =  150  lspMass =  130  lspGeneratedMass =  0 runNumber =  27922  nrEventsPoint =  700000 
+
+   8TeV_T2tt_2j_150_0_run31131_merged_150_130.lhe.gz
+   stop mass =  150  lspMass =  130  lspGeneratedMass =  0 runNumber =  31131  nrEventsPoint =  800000 
+
+   8TeV_T2tt_2j_150_25_run227_merged_150_130.lhe.gz
+   stop mass =  150  lspMass =  130  lspGeneratedMass =  25 runNumber =  227  nrEventsPoint =  900000 
+
+   8TeV_T2tt_2j_150_25_run5047_merged_150_130.lhe.gz
+   stop mass =  150  lspMass =  130  lspGeneratedMass =  25 runNumber =  5047  nrEventsPoint =  1000000 
+
+   8TeV_T2tt_2j_150_25_run10586_merged_150_130.lhe.gz
+   stop mass =  150  lspMass =  130  lspGeneratedMass =  25 runNumber =  10586  nrEventsPoint =  1100000 
+
+   8TeV_T2tt_2j_150_25_run20365_merged_150_130.lhe.gz
+   stop mass =  150  lspMass =  130  lspGeneratedMass =  25 runNumber =  20365  nrEventsPoint =  1200000 
+
+   8TeV_T2tt_2j_150_25_run22883_merged_150_130.lhe.gz
+   stop mass =  150  lspMass =  130  lspGeneratedMass =  25 runNumber =  22883  nrEventsPoint =  1300000 
+
+   8TeV_T2tt_2j_150_25_run27688_merged_150_130.lhe.gz
+   stop mass =  150  lspMass =  130  lspGeneratedMass =  25 runNumber =  27688  nrEventsPoint =  1400000 
+
+   8TeV_T2tt_2j_150_25_run31088_merged_150_130.lhe.gz
+   stop mass =  150  lspMass =  130  lspGeneratedMass =  25 runNumber =  31088  nrEventsPoint =  1500000 
+
+   8TeV_T2tt_2j_150_25_run31419_merged_150_130.lhe.gz
+   stop mass =  150  lspMass =  130  lspGeneratedMass =  25 runNumber =  31419  nrEventsPoint =  1600000 
+
+
+        Break run loop
+        Break lspGeneratedMass loop
+        Break while loop
+
+  Number of events for stop mass =  150  lspMass =  130 ( deltaMassStopLsp =  20 ):  1600000  events
+
+Begin loop: stop mass =  150  lspMass =  140 ( deltaMassStopLsp =  10 )
+
+   8TeV_T2tt_2j_150_50_run1477_merged_150_140.lhe.gz
+   stop mass =  150  lspMass =  140  lspGeneratedMass =  50 runNumber =  1477  nrEventsPoint =  100000 
+
+   8TeV_T2tt_2j_150_50_run10030_merged_150_140.lhe.gz
+   stop mass =  150  lspMass =  140  lspGeneratedMass =  50 runNumber =  10030  nrEventsPoint =  200000 
+
+   8TeV_T2tt_2j_150_50_run14337_merged_150_140.lhe.gz
+   stop mass =  150  lspMass =  140  lspGeneratedMass =  50 runNumber =  14337  nrEventsPoint =  300000 
+
+   8TeV_T2tt_2j_150_50_run23238_merged_150_140.lhe.gz
+   stop mass =  150  lspMass =  140  lspGeneratedMass =  50 runNumber =  23238  nrEventsPoint =  400000 
+
+   8TeV_T2tt_2j_150_50_run25618_merged_150_140.lhe.gz
+   stop mass =  150  lspMass =  140  lspGeneratedMass =  50 runNumber =  25618  nrEventsPoint =  500000 
+
+   8TeV_T2tt_2j_150_50_run26069_merged_150_140.lhe.gz
+   stop mass =  150  lspMass =  140  lspGeneratedMass =  50 runNumber =  26069  nrEventsPoint =  600000 
+
+   8TeV_T2tt_2j_150_50_run27873_merged_150_140.lhe.gz
+   stop mass =  150  lspMass =  140  lspGeneratedMass =  50 runNumber =  27873  nrEventsPoint =  700000 
+
+   8TeV_T2tt_2j_150_50_run29802_merged_150_140.lhe.gz
+   stop mass =  150  lspMass =  140  lspGeneratedMass =  50 runNumber =  29802  nrEventsPoint =  800000 
+
+   8TeV_T2tt_2j_150_0_run276_merged_150_140.lhe.gz
+   stop mass =  150  lspMass =  140  lspGeneratedMass =  0 runNumber =  276  nrEventsPoint =  900000 
+
+   8TeV_T2tt_2j_150_0_run1271_merged_150_140.lhe.gz
+   stop mass =  150  lspMass =  140  lspGeneratedMass =  0 runNumber =  1271  nrEventsPoint =  1000000 
+
+   8TeV_T2tt_2j_150_0_run6691_merged_150_140.lhe.gz
+   stop mass =  150  lspMass =  140  lspGeneratedMass =  0 runNumber =  6691  nrEventsPoint =  1100000 
+
+   8TeV_T2tt_2j_150_0_run13235_merged_150_140.lhe.gz
+   stop mass =  150  lspMass =  140  lspGeneratedMass =  0 runNumber =  13235  nrEventsPoint =  1200000 
+
+   8TeV_T2tt_2j_150_0_run18032_merged_150_140.lhe.gz
+   stop mass =  150  lspMass =  140  lspGeneratedMass =  0 runNumber =  18032  nrEventsPoint =  1300000 
+
+   8TeV_T2tt_2j_150_0_run24354_merged_150_140.lhe.gz
+   stop mass =  150  lspMass =  140  lspGeneratedMass =  0 runNumber =  24354  nrEventsPoint =  1400000 
+
+   8TeV_T2tt_2j_150_0_run27922_merged_150_140.lhe.gz
+   stop mass =  150  lspMass =  140  lspGeneratedMass =  0 runNumber =  27922  nrEventsPoint =  1500000 
+
+   8TeV_T2tt_2j_150_0_run31131_merged_150_140.lhe.gz
+   stop mass =  150  lspMass =  140  lspGeneratedMass =  0 runNumber =  31131  nrEventsPoint =  1600000 
+
+
+        Break run loop
+        Break lspGeneratedMass loop
+        Break while loop
+
+  Number of events for stop mass =  150  lspMass =  140 ( deltaMassStopLsp =  10 ):  1600000  events
+
+Begin loop: stop mass =  175  lspMass =  95 ( deltaMassStopLsp =  80 )
+
+   8TeV_T2tt_2j_175_0_run14660_merged_175_95.lhe.gz
+   stop mass =  175  lspMass =  95  lspGeneratedMass =  0 runNumber =  14660  nrEventsPoint =  100000 
+
+   8TeV_T2tt_2j_175_0_run17286_merged_175_95.lhe.gz
+   stop mass =  175  lspMass =  95  lspGeneratedMass =  0 runNumber =  17286  nrEventsPoint =  200000 
+
+   8TeV_T2tt_2j_175_0_run18601_merged_175_95.lhe.gz
+   stop mass =  175  lspMass =  95  lspGeneratedMass =  0 runNumber =  18601  nrEventsPoint =  300000 
+
+   8TeV_T2tt_2j_175_0_run20085_merged_175_95.lhe.gz
+   stop mass =  175  lspMass =  95  lspGeneratedMass =  0 runNumber =  20085  nrEventsPoint =  400000 
+
+   8TeV_T2tt_2j_175_25_run154_merged_175_95.lhe.gz
+   stop mass =  175  lspMass =  95  lspGeneratedMass =  25 runNumber =  154  nrEventsPoint =  500000 
+
+   8TeV_T2tt_2j_175_25_run2782_merged_175_95.lhe.gz
+   stop mass =  175  lspMass =  95  lspGeneratedMass =  25 runNumber =  2782  nrEventsPoint =  600000 
+
+   8TeV_T2tt_2j_175_25_run16892_merged_175_95.lhe.gz
+   stop mass =  175  lspMass =  95  lspGeneratedMass =  25 runNumber =  16892  nrEventsPoint =  700000 
+
+   8TeV_T2tt_2j_175_25_run26432_merged_175_95.lhe.gz
+   stop mass =  175  lspMass =  95  lspGeneratedMass =  25 runNumber =  26432  nrEventsPoint =  800000 
+
+   8TeV_T2tt_2j_175_50_run144_merged_175_95.lhe.gz
+   stop mass =  175  lspMass =  95  lspGeneratedMass =  50 runNumber =  144  nrEventsPoint =  900000 
+
+   8TeV_T2tt_2j_175_50_run340_merged_175_95.lhe.gz
+   stop mass =  175  lspMass =  95  lspGeneratedMass =  50 runNumber =  340  nrEventsPoint =  1000000 
+
+   8TeV_T2tt_2j_175_50_run5625_merged_175_95.lhe.gz
+   stop mass =  175  lspMass =  95  lspGeneratedMass =  50 runNumber =  5625  nrEventsPoint =  1100000 
+
+   8TeV_T2tt_2j_175_50_run16681_merged_175_95.lhe.gz
+   stop mass =  175  lspMass =  95  lspGeneratedMass =  50 runNumber =  16681  nrEventsPoint =  1200000 
+
+   8TeV_T2tt_2j_175_75_run12637_merged_175_95.lhe.gz
+   stop mass =  175  lspMass =  95  lspGeneratedMass =  75 runNumber =  12637  nrEventsPoint =  1300000 
+
+   8TeV_T2tt_2j_175_75_run24998_merged_175_95.lhe.gz
+   stop mass =  175  lspMass =  95  lspGeneratedMass =  75 runNumber =  24998  nrEventsPoint =  1400000 
+
+   8TeV_T2tt_2j_175_75_run29511_merged_175_95.lhe.gz
+   stop mass =  175  lspMass =  95  lspGeneratedMass =  75 runNumber =  29511  nrEventsPoint =  1500000 
+
+   8TeV_T2tt_2j_175_75_run29753_merged_175_95.lhe.gz
+   stop mass =  175  lspMass =  95  lspGeneratedMass =  75 runNumber =  29753  nrEventsPoint =  1600000 
+
+
+  Number of events for stop mass =  175  lspMass =  95 ( deltaMassStopLsp =  80 ):  1600000  events
+
+Begin loop: stop mass =  175  lspMass =  105 ( deltaMassStopLsp =  70 )
+
+   8TeV_T2tt_2j_175_0_run14660_merged_175_105.lhe.gz
+   stop mass =  175  lspMass =  105  lspGeneratedMass =  0 runNumber =  14660  nrEventsPoint =  100000 
+
+   8TeV_T2tt_2j_175_0_run17286_merged_175_105.lhe.gz
+   stop mass =  175  lspMass =  105  lspGeneratedMass =  0 runNumber =  17286  nrEventsPoint =  200000 
+
+   8TeV_T2tt_2j_175_0_run18601_merged_175_105.lhe.gz
+   stop mass =  175  lspMass =  105  lspGeneratedMass =  0 runNumber =  18601  nrEventsPoint =  300000 
+
+   8TeV_T2tt_2j_175_0_run20085_merged_175_105.lhe.gz
+   stop mass =  175  lspMass =  105  lspGeneratedMass =  0 runNumber =  20085  nrEventsPoint =  400000 
+
+   8TeV_T2tt_2j_175_25_run154_merged_175_105.lhe.gz
+   stop mass =  175  lspMass =  105  lspGeneratedMass =  25 runNumber =  154  nrEventsPoint =  500000 
+
+   8TeV_T2tt_2j_175_25_run2782_merged_175_105.lhe.gz
+   stop mass =  175  lspMass =  105  lspGeneratedMass =  25 runNumber =  2782  nrEventsPoint =  600000 
+
+   8TeV_T2tt_2j_175_25_run16892_merged_175_105.lhe.gz
+   stop mass =  175  lspMass =  105  lspGeneratedMass =  25 runNumber =  16892  nrEventsPoint =  700000 
+
+   8TeV_T2tt_2j_175_25_run26432_merged_175_105.lhe.gz
+   stop mass =  175  lspMass =  105  lspGeneratedMass =  25 runNumber =  26432  nrEventsPoint =  800000 
+
+   8TeV_T2tt_2j_175_50_run144_merged_175_105.lhe.gz
+   stop mass =  175  lspMass =  105  lspGeneratedMass =  50 runNumber =  144  nrEventsPoint =  900000 
+
+   8TeV_T2tt_2j_175_50_run340_merged_175_105.lhe.gz
+   stop mass =  175  lspMass =  105  lspGeneratedMass =  50 runNumber =  340  nrEventsPoint =  1000000 
+
+   8TeV_T2tt_2j_175_50_run5625_merged_175_105.lhe.gz
+   stop mass =  175  lspMass =  105  lspGeneratedMass =  50 runNumber =  5625  nrEventsPoint =  1100000 
+
+   8TeV_T2tt_2j_175_50_run16681_merged_175_105.lhe.gz
+   stop mass =  175  lspMass =  105  lspGeneratedMass =  50 runNumber =  16681  nrEventsPoint =  1200000 
+
+   8TeV_T2tt_2j_175_75_run12637_merged_175_105.lhe.gz
+   stop mass =  175  lspMass =  105  lspGeneratedMass =  75 runNumber =  12637  nrEventsPoint =  1300000 
+
+   8TeV_T2tt_2j_175_75_run24998_merged_175_105.lhe.gz
+   stop mass =  175  lspMass =  105  lspGeneratedMass =  75 runNumber =  24998  nrEventsPoint =  1400000 
+
+   8TeV_T2tt_2j_175_75_run29511_merged_175_105.lhe.gz
+   stop mass =  175  lspMass =  105  lspGeneratedMass =  75 runNumber =  29511  nrEventsPoint =  1500000 
+
+   8TeV_T2tt_2j_175_75_run29753_merged_175_105.lhe.gz
+   stop mass =  175  lspMass =  105  lspGeneratedMass =  75 runNumber =  29753  nrEventsPoint =  1600000 
+
+
+  Number of events for stop mass =  175  lspMass =  105 ( deltaMassStopLsp =  70 ):  1600000  events
+
+Begin loop: stop mass =  175  lspMass =  115 ( deltaMassStopLsp =  60 )
+
+   8TeV_T2tt_2j_175_0_run14660_merged_175_115.lhe.gz
+   stop mass =  175  lspMass =  115  lspGeneratedMass =  0 runNumber =  14660  nrEventsPoint =  100000 
+
+   8TeV_T2tt_2j_175_0_run17286_merged_175_115.lhe.gz
+   stop mass =  175  lspMass =  115  lspGeneratedMass =  0 runNumber =  17286  nrEventsPoint =  200000 
+
+   8TeV_T2tt_2j_175_0_run18601_merged_175_115.lhe.gz
+   stop mass =  175  lspMass =  115  lspGeneratedMass =  0 runNumber =  18601  nrEventsPoint =  300000 
+
+   8TeV_T2tt_2j_175_0_run20085_merged_175_115.lhe.gz
+   stop mass =  175  lspMass =  115  lspGeneratedMass =  0 runNumber =  20085  nrEventsPoint =  400000 
+
+   8TeV_T2tt_2j_175_25_run154_merged_175_115.lhe.gz
+   stop mass =  175  lspMass =  115  lspGeneratedMass =  25 runNumber =  154  nrEventsPoint =  500000 
+
+   8TeV_T2tt_2j_175_25_run2782_merged_175_115.lhe.gz
+   stop mass =  175  lspMass =  115  lspGeneratedMass =  25 runNumber =  2782  nrEventsPoint =  600000 
+
+   8TeV_T2tt_2j_175_25_run16892_merged_175_115.lhe.gz
+   stop mass =  175  lspMass =  115  lspGeneratedMass =  25 runNumber =  16892  nrEventsPoint =  700000 
+
+   8TeV_T2tt_2j_175_25_run26432_merged_175_115.lhe.gz
+   stop mass =  175  lspMass =  115  lspGeneratedMass =  25 runNumber =  26432  nrEventsPoint =  800000 
+
+   8TeV_T2tt_2j_175_50_run144_merged_175_115.lhe.gz
+   stop mass =  175  lspMass =  115  lspGeneratedMass =  50 runNumber =  144  nrEventsPoint =  900000 
+
+   8TeV_T2tt_2j_175_50_run340_merged_175_115.lhe.gz
+   stop mass =  175  lspMass =  115  lspGeneratedMass =  50 runNumber =  340  nrEventsPoint =  1000000 
+
+   8TeV_T2tt_2j_175_50_run5625_merged_175_115.lhe.gz
+   stop mass =  175  lspMass =  115  lspGeneratedMass =  50 runNumber =  5625  nrEventsPoint =  1100000 
+
+   8TeV_T2tt_2j_175_50_run16681_merged_175_115.lhe.gz
+   stop mass =  175  lspMass =  115  lspGeneratedMass =  50 runNumber =  16681  nrEventsPoint =  1200000 
+
+   8TeV_T2tt_2j_175_75_run12637_merged_175_115.lhe.gz
+   stop mass =  175  lspMass =  115  lspGeneratedMass =  75 runNumber =  12637  nrEventsPoint =  1300000 
+
+   8TeV_T2tt_2j_175_75_run24998_merged_175_115.lhe.gz
+   stop mass =  175  lspMass =  115  lspGeneratedMass =  75 runNumber =  24998  nrEventsPoint =  1400000 
+
+   8TeV_T2tt_2j_175_75_run29511_merged_175_115.lhe.gz
+   stop mass =  175  lspMass =  115  lspGeneratedMass =  75 runNumber =  29511  nrEventsPoint =  1500000 
+
+   8TeV_T2tt_2j_175_75_run29753_merged_175_115.lhe.gz
+   stop mass =  175  lspMass =  115  lspGeneratedMass =  75 runNumber =  29753  nrEventsPoint =  1600000 
+
+
+  Number of events for stop mass =  175  lspMass =  115 ( deltaMassStopLsp =  60 ):  1600000  events
+
+Begin loop: stop mass =  175  lspMass =  125 ( deltaMassStopLsp =  50 )
+
+   8TeV_T2tt_2j_175_0_run14660_merged_175_125.lhe.gz
+   stop mass =  175  lspMass =  125  lspGeneratedMass =  0 runNumber =  14660  nrEventsPoint =  100000 
+
+   8TeV_T2tt_2j_175_0_run17286_merged_175_125.lhe.gz
+   stop mass =  175  lspMass =  125  lspGeneratedMass =  0 runNumber =  17286  nrEventsPoint =  200000 
+
+   8TeV_T2tt_2j_175_0_run18601_merged_175_125.lhe.gz
+   stop mass =  175  lspMass =  125  lspGeneratedMass =  0 runNumber =  18601  nrEventsPoint =  300000 
+
+   8TeV_T2tt_2j_175_0_run20085_merged_175_125.lhe.gz
+   stop mass =  175  lspMass =  125  lspGeneratedMass =  0 runNumber =  20085  nrEventsPoint =  400000 
+
+   8TeV_T2tt_2j_175_25_run154_merged_175_125.lhe.gz
+   stop mass =  175  lspMass =  125  lspGeneratedMass =  25 runNumber =  154  nrEventsPoint =  500000 
+
+   8TeV_T2tt_2j_175_25_run2782_merged_175_125.lhe.gz
+   stop mass =  175  lspMass =  125  lspGeneratedMass =  25 runNumber =  2782  nrEventsPoint =  600000 
+
+   8TeV_T2tt_2j_175_25_run16892_merged_175_125.lhe.gz
+   stop mass =  175  lspMass =  125  lspGeneratedMass =  25 runNumber =  16892  nrEventsPoint =  700000 
+
+   8TeV_T2tt_2j_175_25_run26432_merged_175_125.lhe.gz
+   stop mass =  175  lspMass =  125  lspGeneratedMass =  25 runNumber =  26432  nrEventsPoint =  800000 
+
+   8TeV_T2tt_2j_175_50_run144_merged_175_125.lhe.gz
+   stop mass =  175  lspMass =  125  lspGeneratedMass =  50 runNumber =  144  nrEventsPoint =  900000 
+
+   8TeV_T2tt_2j_175_50_run340_merged_175_125.lhe.gz
+   stop mass =  175  lspMass =  125  lspGeneratedMass =  50 runNumber =  340  nrEventsPoint =  1000000 
+
+   8TeV_T2tt_2j_175_50_run5625_merged_175_125.lhe.gz
+   stop mass =  175  lspMass =  125  lspGeneratedMass =  50 runNumber =  5625  nrEventsPoint =  1100000 
+
+   8TeV_T2tt_2j_175_50_run16681_merged_175_125.lhe.gz
+   stop mass =  175  lspMass =  125  lspGeneratedMass =  50 runNumber =  16681  nrEventsPoint =  1200000 
+
+   8TeV_T2tt_2j_175_75_run12637_merged_175_125.lhe.gz
+   stop mass =  175  lspMass =  125  lspGeneratedMass =  75 runNumber =  12637  nrEventsPoint =  1300000 
+
+   8TeV_T2tt_2j_175_75_run24998_merged_175_125.lhe.gz
+   stop mass =  175  lspMass =  125  lspGeneratedMass =  75 runNumber =  24998  nrEventsPoint =  1400000 
+
+   8TeV_T2tt_2j_175_75_run29511_merged_175_125.lhe.gz
+   stop mass =  175  lspMass =  125  lspGeneratedMass =  75 runNumber =  29511  nrEventsPoint =  1500000 
+
+   8TeV_T2tt_2j_175_75_run29753_merged_175_125.lhe.gz
+   stop mass =  175  lspMass =  125  lspGeneratedMass =  75 runNumber =  29753  nrEventsPoint =  1600000 
+
+
+  Number of events for stop mass =  175  lspMass =  125 ( deltaMassStopLsp =  50 ):  1600000  events
+
+Begin loop: stop mass =  175  lspMass =  135 ( deltaMassStopLsp =  40 )
+
+   8TeV_T2tt_2j_175_0_run14660_merged_175_135.lhe.gz
+   stop mass =  175  lspMass =  135  lspGeneratedMass =  0 runNumber =  14660  nrEventsPoint =  100000 
+
+   8TeV_T2tt_2j_175_0_run17286_merged_175_135.lhe.gz
+   stop mass =  175  lspMass =  135  lspGeneratedMass =  0 runNumber =  17286  nrEventsPoint =  200000 
+
+   8TeV_T2tt_2j_175_0_run18601_merged_175_135.lhe.gz
+   stop mass =  175  lspMass =  135  lspGeneratedMass =  0 runNumber =  18601  nrEventsPoint =  300000 
+
+   8TeV_T2tt_2j_175_0_run20085_merged_175_135.lhe.gz
+   stop mass =  175  lspMass =  135  lspGeneratedMass =  0 runNumber =  20085  nrEventsPoint =  400000 
+
+   8TeV_T2tt_2j_175_25_run154_merged_175_135.lhe.gz
+   stop mass =  175  lspMass =  135  lspGeneratedMass =  25 runNumber =  154  nrEventsPoint =  500000 
+
+   8TeV_T2tt_2j_175_25_run2782_merged_175_135.lhe.gz
+   stop mass =  175  lspMass =  135  lspGeneratedMass =  25 runNumber =  2782  nrEventsPoint =  600000 
+
+   8TeV_T2tt_2j_175_25_run16892_merged_175_135.lhe.gz
+   stop mass =  175  lspMass =  135  lspGeneratedMass =  25 runNumber =  16892  nrEventsPoint =  700000 
+
+   8TeV_T2tt_2j_175_25_run26432_merged_175_135.lhe.gz
+   stop mass =  175  lspMass =  135  lspGeneratedMass =  25 runNumber =  26432  nrEventsPoint =  800000 
+
+   8TeV_T2tt_2j_175_50_run144_merged_175_135.lhe.gz
+   stop mass =  175  lspMass =  135  lspGeneratedMass =  50 runNumber =  144  nrEventsPoint =  900000 
+
+   8TeV_T2tt_2j_175_50_run340_merged_175_135.lhe.gz
+   stop mass =  175  lspMass =  135  lspGeneratedMass =  50 runNumber =  340  nrEventsPoint =  1000000 
+
+   8TeV_T2tt_2j_175_50_run5625_merged_175_135.lhe.gz
+   stop mass =  175  lspMass =  135  lspGeneratedMass =  50 runNumber =  5625  nrEventsPoint =  1100000 
+
+   8TeV_T2tt_2j_175_50_run16681_merged_175_135.lhe.gz
+   stop mass =  175  lspMass =  135  lspGeneratedMass =  50 runNumber =  16681  nrEventsPoint =  1200000 
+
+   8TeV_T2tt_2j_175_75_run12637_merged_175_135.lhe.gz
+   stop mass =  175  lspMass =  135  lspGeneratedMass =  75 runNumber =  12637  nrEventsPoint =  1300000 
+
+   8TeV_T2tt_2j_175_75_run24998_merged_175_135.lhe.gz
+   stop mass =  175  lspMass =  135  lspGeneratedMass =  75 runNumber =  24998  nrEventsPoint =  1400000 
+
+   8TeV_T2tt_2j_175_75_run29511_merged_175_135.lhe.gz
+   stop mass =  175  lspMass =  135  lspGeneratedMass =  75 runNumber =  29511  nrEventsPoint =  1500000 
+
+   8TeV_T2tt_2j_175_75_run29753_merged_175_135.lhe.gz
+   stop mass =  175  lspMass =  135  lspGeneratedMass =  75 runNumber =  29753  nrEventsPoint =  1600000 
+
+
+  Number of events for stop mass =  175  lspMass =  135 ( deltaMassStopLsp =  40 ):  1600000  events
+
+Begin loop: stop mass =  175  lspMass =  145 ( deltaMassStopLsp =  30 )
+
+   8TeV_T2tt_2j_175_0_run14660_merged_175_145.lhe.gz
+   stop mass =  175  lspMass =  145  lspGeneratedMass =  0 runNumber =  14660  nrEventsPoint =  100000 
+
+   8TeV_T2tt_2j_175_0_run17286_merged_175_145.lhe.gz
+   stop mass =  175  lspMass =  145  lspGeneratedMass =  0 runNumber =  17286  nrEventsPoint =  200000 
+
+   8TeV_T2tt_2j_175_0_run18601_merged_175_145.lhe.gz
+   stop mass =  175  lspMass =  145  lspGeneratedMass =  0 runNumber =  18601  nrEventsPoint =  300000 
+
+   8TeV_T2tt_2j_175_0_run20085_merged_175_145.lhe.gz
+   stop mass =  175  lspMass =  145  lspGeneratedMass =  0 runNumber =  20085  nrEventsPoint =  400000 
+
+   8TeV_T2tt_2j_175_25_run154_merged_175_145.lhe.gz
+   stop mass =  175  lspMass =  145  lspGeneratedMass =  25 runNumber =  154  nrEventsPoint =  500000 
+
+   8TeV_T2tt_2j_175_25_run2782_merged_175_145.lhe.gz
+   stop mass =  175  lspMass =  145  lspGeneratedMass =  25 runNumber =  2782  nrEventsPoint =  600000 
+
+   8TeV_T2tt_2j_175_25_run16892_merged_175_145.lhe.gz
+   stop mass =  175  lspMass =  145  lspGeneratedMass =  25 runNumber =  16892  nrEventsPoint =  700000 
+
+   8TeV_T2tt_2j_175_25_run26432_merged_175_145.lhe.gz
+   stop mass =  175  lspMass =  145  lspGeneratedMass =  25 runNumber =  26432  nrEventsPoint =  800000 
+
+   8TeV_T2tt_2j_175_50_run144_merged_175_145.lhe.gz
+   stop mass =  175  lspMass =  145  lspGeneratedMass =  50 runNumber =  144  nrEventsPoint =  900000 
+
+   8TeV_T2tt_2j_175_50_run340_merged_175_145.lhe.gz
+   stop mass =  175  lspMass =  145  lspGeneratedMass =  50 runNumber =  340  nrEventsPoint =  1000000 
+
+   8TeV_T2tt_2j_175_50_run5625_merged_175_145.lhe.gz
+   stop mass =  175  lspMass =  145  lspGeneratedMass =  50 runNumber =  5625  nrEventsPoint =  1100000 
+
+   8TeV_T2tt_2j_175_50_run16681_merged_175_145.lhe.gz
+   stop mass =  175  lspMass =  145  lspGeneratedMass =  50 runNumber =  16681  nrEventsPoint =  1200000 
+
+   8TeV_T2tt_2j_175_75_run12637_merged_175_145.lhe.gz
+   stop mass =  175  lspMass =  145  lspGeneratedMass =  75 runNumber =  12637  nrEventsPoint =  1300000 
+
+   8TeV_T2tt_2j_175_75_run24998_merged_175_145.lhe.gz
+   stop mass =  175  lspMass =  145  lspGeneratedMass =  75 runNumber =  24998  nrEventsPoint =  1400000 
+
+   8TeV_T2tt_2j_175_75_run29511_merged_175_145.lhe.gz
+   stop mass =  175  lspMass =  145  lspGeneratedMass =  75 runNumber =  29511  nrEventsPoint =  1500000 
+
+   8TeV_T2tt_2j_175_75_run29753_merged_175_145.lhe.gz
+   stop mass =  175  lspMass =  145  lspGeneratedMass =  75 runNumber =  29753  nrEventsPoint =  1600000 
+
+
+  Number of events for stop mass =  175  lspMass =  145 ( deltaMassStopLsp =  30 ):  1600000  events
+
+Begin loop: stop mass =  175  lspMass =  155 ( deltaMassStopLsp =  20 )
+
+   8TeV_T2tt_2j_175_0_run14660_merged_175_155.lhe.gz
+   stop mass =  175  lspMass =  155  lspGeneratedMass =  0 runNumber =  14660  nrEventsPoint =  100000 
+
+   8TeV_T2tt_2j_175_0_run17286_merged_175_155.lhe.gz
+   stop mass =  175  lspMass =  155  lspGeneratedMass =  0 runNumber =  17286  nrEventsPoint =  200000 
+
+   8TeV_T2tt_2j_175_0_run18601_merged_175_155.lhe.gz
+   stop mass =  175  lspMass =  155  lspGeneratedMass =  0 runNumber =  18601  nrEventsPoint =  300000 
+
+   8TeV_T2tt_2j_175_0_run20085_merged_175_155.lhe.gz
+   stop mass =  175  lspMass =  155  lspGeneratedMass =  0 runNumber =  20085  nrEventsPoint =  400000 
+
+   8TeV_T2tt_2j_175_25_run154_merged_175_155.lhe.gz
+   stop mass =  175  lspMass =  155  lspGeneratedMass =  25 runNumber =  154  nrEventsPoint =  500000 
+
+   8TeV_T2tt_2j_175_25_run2782_merged_175_155.lhe.gz
+   stop mass =  175  lspMass =  155  lspGeneratedMass =  25 runNumber =  2782  nrEventsPoint =  600000 
+
+   8TeV_T2tt_2j_175_25_run16892_merged_175_155.lhe.gz
+   stop mass =  175  lspMass =  155  lspGeneratedMass =  25 runNumber =  16892  nrEventsPoint =  700000 
+
+   8TeV_T2tt_2j_175_25_run26432_merged_175_155.lhe.gz
+   stop mass =  175  lspMass =  155  lspGeneratedMass =  25 runNumber =  26432  nrEventsPoint =  800000 
+
+   8TeV_T2tt_2j_175_50_run144_merged_175_155.lhe.gz
+   stop mass =  175  lspMass =  155  lspGeneratedMass =  50 runNumber =  144  nrEventsPoint =  900000 
+
+   8TeV_T2tt_2j_175_50_run340_merged_175_155.lhe.gz
+   stop mass =  175  lspMass =  155  lspGeneratedMass =  50 runNumber =  340  nrEventsPoint =  1000000 
+
+   8TeV_T2tt_2j_175_50_run5625_merged_175_155.lhe.gz
+   stop mass =  175  lspMass =  155  lspGeneratedMass =  50 runNumber =  5625  nrEventsPoint =  1100000 
+
+   8TeV_T2tt_2j_175_50_run16681_merged_175_155.lhe.gz
+   stop mass =  175  lspMass =  155  lspGeneratedMass =  50 runNumber =  16681  nrEventsPoint =  1200000 
+
+   8TeV_T2tt_2j_175_75_run12637_merged_175_155.lhe.gz
+   stop mass =  175  lspMass =  155  lspGeneratedMass =  75 runNumber =  12637  nrEventsPoint =  1300000 
+
+   8TeV_T2tt_2j_175_75_run24998_merged_175_155.lhe.gz
+   stop mass =  175  lspMass =  155  lspGeneratedMass =  75 runNumber =  24998  nrEventsPoint =  1400000 
+
+   8TeV_T2tt_2j_175_75_run29511_merged_175_155.lhe.gz
+   stop mass =  175  lspMass =  155  lspGeneratedMass =  75 runNumber =  29511  nrEventsPoint =  1500000 
+
+   8TeV_T2tt_2j_175_75_run29753_merged_175_155.lhe.gz
+   stop mass =  175  lspMass =  155  lspGeneratedMass =  75 runNumber =  29753  nrEventsPoint =  1600000 
+
+
+  Number of events for stop mass =  175  lspMass =  155 ( deltaMassStopLsp =  20 ):  1600000  events
+
+Begin loop: stop mass =  175  lspMass =  165 ( deltaMassStopLsp =  10 )
+
+   8TeV_T2tt_2j_175_0_run14660_merged_175_165.lhe.gz
+   stop mass =  175  lspMass =  165  lspGeneratedMass =  0 runNumber =  14660  nrEventsPoint =  100000 
+
+   8TeV_T2tt_2j_175_0_run17286_merged_175_165.lhe.gz
+   stop mass =  175  lspMass =  165  lspGeneratedMass =  0 runNumber =  17286  nrEventsPoint =  200000 
+
+   8TeV_T2tt_2j_175_0_run18601_merged_175_165.lhe.gz
+   stop mass =  175  lspMass =  165  lspGeneratedMass =  0 runNumber =  18601  nrEventsPoint =  300000 
+
+   8TeV_T2tt_2j_175_0_run20085_merged_175_165.lhe.gz
+   stop mass =  175  lspMass =  165  lspGeneratedMass =  0 runNumber =  20085  nrEventsPoint =  400000 
+
+   8TeV_T2tt_2j_175_25_run154_merged_175_165.lhe.gz
+   stop mass =  175  lspMass =  165  lspGeneratedMass =  25 runNumber =  154  nrEventsPoint =  500000 
+
+   8TeV_T2tt_2j_175_25_run2782_merged_175_165.lhe.gz
+   stop mass =  175  lspMass =  165  lspGeneratedMass =  25 runNumber =  2782  nrEventsPoint =  600000 
+
+   8TeV_T2tt_2j_175_25_run16892_merged_175_165.lhe.gz
+   stop mass =  175  lspMass =  165  lspGeneratedMass =  25 runNumber =  16892  nrEventsPoint =  700000 
+
+   8TeV_T2tt_2j_175_25_run26432_merged_175_165.lhe.gz
+   stop mass =  175  lspMass =  165  lspGeneratedMass =  25 runNumber =  26432  nrEventsPoint =  800000 
+
+   8TeV_T2tt_2j_175_50_run144_merged_175_165.lhe.gz
+   stop mass =  175  lspMass =  165  lspGeneratedMass =  50 runNumber =  144  nrEventsPoint =  900000 
+
+   8TeV_T2tt_2j_175_50_run340_merged_175_165.lhe.gz
+   stop mass =  175  lspMass =  165  lspGeneratedMass =  50 runNumber =  340  nrEventsPoint =  1000000 
+
+   8TeV_T2tt_2j_175_50_run5625_merged_175_165.lhe.gz
+   stop mass =  175  lspMass =  165  lspGeneratedMass =  50 runNumber =  5625  nrEventsPoint =  1100000 
+
+   8TeV_T2tt_2j_175_50_run16681_merged_175_165.lhe.gz
+   stop mass =  175  lspMass =  165  lspGeneratedMass =  50 runNumber =  16681  nrEventsPoint =  1200000 
+
+   8TeV_T2tt_2j_175_75_run12637_merged_175_165.lhe.gz
+   stop mass =  175  lspMass =  165  lspGeneratedMass =  75 runNumber =  12637  nrEventsPoint =  1300000 
+
+   8TeV_T2tt_2j_175_75_run24998_merged_175_165.lhe.gz
+   stop mass =  175  lspMass =  165  lspGeneratedMass =  75 runNumber =  24998  nrEventsPoint =  1400000 
+
+   8TeV_T2tt_2j_175_75_run29511_merged_175_165.lhe.gz
+   stop mass =  175  lspMass =  165  lspGeneratedMass =  75 runNumber =  29511  nrEventsPoint =  1500000 
+
+   8TeV_T2tt_2j_175_75_run29753_merged_175_165.lhe.gz
+   stop mass =  175  lspMass =  165  lspGeneratedMass =  75 runNumber =  29753  nrEventsPoint =  1600000 
+
+
+  Number of events for stop mass =  175  lspMass =  165 ( deltaMassStopLsp =  10 ):  1600000  events
+
+Begin loop: stop mass =  200  lspMass =  120 ( deltaMassStopLsp =  80 )
+
+   8TeV_T2tt_2j_200_0_run10562_merged_200_120.lhe.gz
+   stop mass =  200  lspMass =  120  lspGeneratedMass =  0 runNumber =  10562  nrEventsPoint =  100000 
+
+   8TeV_T2tt_2j_200_0_run13468_merged_200_120.lhe.gz
+   stop mass =  200  lspMass =  120  lspGeneratedMass =  0 runNumber =  13468  nrEventsPoint =  200000 
+
+   8TeV_T2tt_2j_200_0_run20994_merged_200_120.lhe.gz
+   stop mass =  200  lspMass =  120  lspGeneratedMass =  0 runNumber =  20994  nrEventsPoint =  300000 
+
+   8TeV_T2tt_2j_200_0_run21605_merged_200_120.lhe.gz
+   stop mass =  200  lspMass =  120  lspGeneratedMass =  0 runNumber =  21605  nrEventsPoint =  400000 
+
+   8TeV_T2tt_2j_200_25_run1632_merged_200_120.lhe.gz
+   stop mass =  200  lspMass =  120  lspGeneratedMass =  25 runNumber =  1632  nrEventsPoint =  500000 
+
+   8TeV_T2tt_2j_200_25_run11384_merged_200_120.lhe.gz
+   stop mass =  200  lspMass =  120  lspGeneratedMass =  25 runNumber =  11384  nrEventsPoint =  600000 
+
+   8TeV_T2tt_2j_200_25_run14358_merged_200_120.lhe.gz
+   stop mass =  200  lspMass =  120  lspGeneratedMass =  25 runNumber =  14358  nrEventsPoint =  700000 
+
+   8TeV_T2tt_2j_200_25_run28021_merged_200_120.lhe.gz
+   stop mass =  200  lspMass =  120  lspGeneratedMass =  25 runNumber =  28021  nrEventsPoint =  800000 
+
+   8TeV_T2tt_2j_200_50_run19306_merged_200_120.lhe.gz
+   stop mass =  200  lspMass =  120  lspGeneratedMass =  50 runNumber =  19306  nrEventsPoint =  900000 
+
+   8TeV_T2tt_2j_200_50_run21023_merged_200_120.lhe.gz
+   stop mass =  200  lspMass =  120  lspGeneratedMass =  50 runNumber =  21023  nrEventsPoint =  1000000 
+
+   8TeV_T2tt_2j_200_50_run22592_merged_200_120.lhe.gz
+   stop mass =  200  lspMass =  120  lspGeneratedMass =  50 runNumber =  22592  nrEventsPoint =  1100000 
+
+   8TeV_T2tt_2j_200_50_run25730_merged_200_120.lhe.gz
+   stop mass =  200  lspMass =  120  lspGeneratedMass =  50 runNumber =  25730  nrEventsPoint =  1200000 
+
+   8TeV_T2tt_2j_200_75_run2171_merged_200_120.lhe.gz
+   stop mass =  200  lspMass =  120  lspGeneratedMass =  75 runNumber =  2171  nrEventsPoint =  1300000 
+
+   8TeV_T2tt_2j_200_75_run13567_merged_200_120.lhe.gz
+   stop mass =  200  lspMass =  120  lspGeneratedMass =  75 runNumber =  13567  nrEventsPoint =  1400000 
+
+   8TeV_T2tt_2j_200_75_run16101_merged_200_120.lhe.gz
+   stop mass =  200  lspMass =  120  lspGeneratedMass =  75 runNumber =  16101  nrEventsPoint =  1500000 
+
+   8TeV_T2tt_2j_200_75_run22176_merged_200_120.lhe.gz
+   stop mass =  200  lspMass =  120  lspGeneratedMass =  75 runNumber =  22176  nrEventsPoint =  1600000 
+
+
+        Break run loop
+        Break lspGeneratedMass loop
+        Break while loop
+
+  Number of events for stop mass =  200  lspMass =  120 ( deltaMassStopLsp =  80 ):  1600000  events
+
+Begin loop: stop mass =  200  lspMass =  130 ( deltaMassStopLsp =  70 )
+
+   8TeV_T2tt_2j_200_100_run13528_merged_200_130.lhe.gz
+   stop mass =  200  lspMass =  130  lspGeneratedMass =  100 runNumber =  13528  nrEventsPoint =  100000 
+
+   8TeV_T2tt_2j_200_100_run20231_merged_200_130.lhe.gz
+   stop mass =  200  lspMass =  130  lspGeneratedMass =  100 runNumber =  20231  nrEventsPoint =  200000 
+
+   8TeV_T2tt_2j_200_100_run22569_merged_200_130.lhe.gz
+   stop mass =  200  lspMass =  130  lspGeneratedMass =  100 runNumber =  22569  nrEventsPoint =  300000 
+
+   8TeV_T2tt_2j_200_100_run31165_merged_200_130.lhe.gz
+   stop mass =  200  lspMass =  130  lspGeneratedMass =  100 runNumber =  31165  nrEventsPoint =  400000 
+
+   8TeV_T2tt_2j_200_0_run10562_merged_200_130.lhe.gz
+   stop mass =  200  lspMass =  130  lspGeneratedMass =  0 runNumber =  10562  nrEventsPoint =  500000 
+
+   8TeV_T2tt_2j_200_0_run13468_merged_200_130.lhe.gz
+   stop mass =  200  lspMass =  130  lspGeneratedMass =  0 runNumber =  13468  nrEventsPoint =  600000 
+
+   8TeV_T2tt_2j_200_0_run20994_merged_200_130.lhe.gz
+   stop mass =  200  lspMass =  130  lspGeneratedMass =  0 runNumber =  20994  nrEventsPoint =  700000 
+
+   8TeV_T2tt_2j_200_0_run21605_merged_200_130.lhe.gz
+   stop mass =  200  lspMass =  130  lspGeneratedMass =  0 runNumber =  21605  nrEventsPoint =  800000 
+
+   8TeV_T2tt_2j_200_25_run1632_merged_200_130.lhe.gz
+   stop mass =  200  lspMass =  130  lspGeneratedMass =  25 runNumber =  1632  nrEventsPoint =  900000 
+
+   8TeV_T2tt_2j_200_25_run11384_merged_200_130.lhe.gz
+   stop mass =  200  lspMass =  130  lspGeneratedMass =  25 runNumber =  11384  nrEventsPoint =  1000000 
+
+   8TeV_T2tt_2j_200_25_run14358_merged_200_130.lhe.gz
+   stop mass =  200  lspMass =  130  lspGeneratedMass =  25 runNumber =  14358  nrEventsPoint =  1100000 
+
+   8TeV_T2tt_2j_200_25_run28021_merged_200_130.lhe.gz
+   stop mass =  200  lspMass =  130  lspGeneratedMass =  25 runNumber =  28021  nrEventsPoint =  1200000 
+
+   8TeV_T2tt_2j_200_50_run19306_merged_200_130.lhe.gz
+   stop mass =  200  lspMass =  130  lspGeneratedMass =  50 runNumber =  19306  nrEventsPoint =  1300000 
+
+   8TeV_T2tt_2j_200_50_run21023_merged_200_130.lhe.gz
+   stop mass =  200  lspMass =  130  lspGeneratedMass =  50 runNumber =  21023  nrEventsPoint =  1400000 
+
+   8TeV_T2tt_2j_200_50_run22592_merged_200_130.lhe.gz
+   stop mass =  200  lspMass =  130  lspGeneratedMass =  50 runNumber =  22592  nrEventsPoint =  1500000 
+
+   8TeV_T2tt_2j_200_50_run25730_merged_200_130.lhe.gz
+   stop mass =  200  lspMass =  130  lspGeneratedMass =  50 runNumber =  25730  nrEventsPoint =  1600000 
+
+
+        Break run loop
+        Break lspGeneratedMass loop
+        Break while loop
+
+  Number of events for stop mass =  200  lspMass =  130 ( deltaMassStopLsp =  70 ):  1600000  events
+
+Begin loop: stop mass =  200  lspMass =  140 ( deltaMassStopLsp =  60 )
+
+   8TeV_T2tt_2j_200_75_run2171_merged_200_140.lhe.gz
+   stop mass =  200  lspMass =  140  lspGeneratedMass =  75 runNumber =  2171  nrEventsPoint =  100000 
+
+   8TeV_T2tt_2j_200_75_run13567_merged_200_140.lhe.gz
+   stop mass =  200  lspMass =  140  lspGeneratedMass =  75 runNumber =  13567  nrEventsPoint =  200000 
+
+   8TeV_T2tt_2j_200_75_run16101_merged_200_140.lhe.gz
+   stop mass =  200  lspMass =  140  lspGeneratedMass =  75 runNumber =  16101  nrEventsPoint =  300000 
+
+   8TeV_T2tt_2j_200_75_run22176_merged_200_140.lhe.gz
+   stop mass =  200  lspMass =  140  lspGeneratedMass =  75 runNumber =  22176  nrEventsPoint =  400000 
+
+   8TeV_T2tt_2j_200_100_run13528_merged_200_140.lhe.gz
+   stop mass =  200  lspMass =  140  lspGeneratedMass =  100 runNumber =  13528  nrEventsPoint =  500000 
+
+   8TeV_T2tt_2j_200_100_run20231_merged_200_140.lhe.gz
+   stop mass =  200  lspMass =  140  lspGeneratedMass =  100 runNumber =  20231  nrEventsPoint =  600000 
+
+   8TeV_T2tt_2j_200_100_run22569_merged_200_140.lhe.gz
+   stop mass =  200  lspMass =  140  lspGeneratedMass =  100 runNumber =  22569  nrEventsPoint =  700000 
+
+   8TeV_T2tt_2j_200_100_run31165_merged_200_140.lhe.gz
+   stop mass =  200  lspMass =  140  lspGeneratedMass =  100 runNumber =  31165  nrEventsPoint =  800000 
+
+   8TeV_T2tt_2j_200_0_run10562_merged_200_140.lhe.gz
+   stop mass =  200  lspMass =  140  lspGeneratedMass =  0 runNumber =  10562  nrEventsPoint =  900000 
+
+   8TeV_T2tt_2j_200_0_run13468_merged_200_140.lhe.gz
+   stop mass =  200  lspMass =  140  lspGeneratedMass =  0 runNumber =  13468  nrEventsPoint =  1000000 
+
+   8TeV_T2tt_2j_200_0_run20994_merged_200_140.lhe.gz
+   stop mass =  200  lspMass =  140  lspGeneratedMass =  0 runNumber =  20994  nrEventsPoint =  1100000 
+
+   8TeV_T2tt_2j_200_0_run21605_merged_200_140.lhe.gz
+   stop mass =  200  lspMass =  140  lspGeneratedMass =  0 runNumber =  21605  nrEventsPoint =  1200000 
+
+   8TeV_T2tt_2j_200_25_run1632_merged_200_140.lhe.gz
+   stop mass =  200  lspMass =  140  lspGeneratedMass =  25 runNumber =  1632  nrEventsPoint =  1300000 
+
+   8TeV_T2tt_2j_200_25_run11384_merged_200_140.lhe.gz
+   stop mass =  200  lspMass =  140  lspGeneratedMass =  25 runNumber =  11384  nrEventsPoint =  1400000 
+
+   8TeV_T2tt_2j_200_25_run14358_merged_200_140.lhe.gz
+   stop mass =  200  lspMass =  140  lspGeneratedMass =  25 runNumber =  14358  nrEventsPoint =  1500000 
+
+   8TeV_T2tt_2j_200_25_run28021_merged_200_140.lhe.gz
+   stop mass =  200  lspMass =  140  lspGeneratedMass =  25 runNumber =  28021  nrEventsPoint =  1600000 
+
+
+        Break run loop
+        Break lspGeneratedMass loop
+        Break while loop
+
+  Number of events for stop mass =  200  lspMass =  140 ( deltaMassStopLsp =  60 ):  1600000  events
+
+Begin loop: stop mass =  200  lspMass =  150 ( deltaMassStopLsp =  50 )
+
+   8TeV_T2tt_2j_200_50_run19306_merged_200_150.lhe.gz
+   stop mass =  200  lspMass =  150  lspGeneratedMass =  50 runNumber =  19306  nrEventsPoint =  100000 
+
+   8TeV_T2tt_2j_200_50_run21023_merged_200_150.lhe.gz
+   stop mass =  200  lspMass =  150  lspGeneratedMass =  50 runNumber =  21023  nrEventsPoint =  200000 
+
+   8TeV_T2tt_2j_200_50_run22592_merged_200_150.lhe.gz
+   stop mass =  200  lspMass =  150  lspGeneratedMass =  50 runNumber =  22592  nrEventsPoint =  300000 
+
+   8TeV_T2tt_2j_200_50_run25730_merged_200_150.lhe.gz
+   stop mass =  200  lspMass =  150  lspGeneratedMass =  50 runNumber =  25730  nrEventsPoint =  400000 
+
+   8TeV_T2tt_2j_200_75_run2171_merged_200_150.lhe.gz
+   stop mass =  200  lspMass =  150  lspGeneratedMass =  75 runNumber =  2171  nrEventsPoint =  500000 
+
+   8TeV_T2tt_2j_200_75_run13567_merged_200_150.lhe.gz
+   stop mass =  200  lspMass =  150  lspGeneratedMass =  75 runNumber =  13567  nrEventsPoint =  600000 
+
+   8TeV_T2tt_2j_200_75_run16101_merged_200_150.lhe.gz
+   stop mass =  200  lspMass =  150  lspGeneratedMass =  75 runNumber =  16101  nrEventsPoint =  700000 
+
+   8TeV_T2tt_2j_200_75_run22176_merged_200_150.lhe.gz
+   stop mass =  200  lspMass =  150  lspGeneratedMass =  75 runNumber =  22176  nrEventsPoint =  800000 
+
+   8TeV_T2tt_2j_200_100_run13528_merged_200_150.lhe.gz
+   stop mass =  200  lspMass =  150  lspGeneratedMass =  100 runNumber =  13528  nrEventsPoint =  900000 
+
+   8TeV_T2tt_2j_200_100_run20231_merged_200_150.lhe.gz
+   stop mass =  200  lspMass =  150  lspGeneratedMass =  100 runNumber =  20231  nrEventsPoint =  1000000 
+
+   8TeV_T2tt_2j_200_100_run22569_merged_200_150.lhe.gz
+   stop mass =  200  lspMass =  150  lspGeneratedMass =  100 runNumber =  22569  nrEventsPoint =  1100000 
+
+   8TeV_T2tt_2j_200_100_run31165_merged_200_150.lhe.gz
+   stop mass =  200  lspMass =  150  lspGeneratedMass =  100 runNumber =  31165  nrEventsPoint =  1200000 
+
+   8TeV_T2tt_2j_200_0_run10562_merged_200_150.lhe.gz
+   stop mass =  200  lspMass =  150  lspGeneratedMass =  0 runNumber =  10562  nrEventsPoint =  1300000 
+
+   8TeV_T2tt_2j_200_0_run13468_merged_200_150.lhe.gz
+   stop mass =  200  lspMass =  150  lspGeneratedMass =  0 runNumber =  13468  nrEventsPoint =  1400000 
+
+   8TeV_T2tt_2j_200_0_run20994_merged_200_150.lhe.gz
+   stop mass =  200  lspMass =  150  lspGeneratedMass =  0 runNumber =  20994  nrEventsPoint =  1500000 
+
+   8TeV_T2tt_2j_200_0_run21605_merged_200_150.lhe.gz
+   stop mass =  200  lspMass =  150  lspGeneratedMass =  0 runNumber =  21605  nrEventsPoint =  1600000 
+
+
+        Break run loop
+        Break lspGeneratedMass loop
+        Break while loop
+
+  Number of events for stop mass =  200  lspMass =  150 ( deltaMassStopLsp =  50 ):  1600000  events
+
+Begin loop: stop mass =  200  lspMass =  160 ( deltaMassStopLsp =  40 )
+
+   8TeV_T2tt_2j_200_25_run1632_merged_200_160.lhe.gz
+   stop mass =  200  lspMass =  160  lspGeneratedMass =  25 runNumber =  1632  nrEventsPoint =  100000 
+
+   8TeV_T2tt_2j_200_25_run11384_merged_200_160.lhe.gz
+   stop mass =  200  lspMass =  160  lspGeneratedMass =  25 runNumber =  11384  nrEventsPoint =  200000 
+
+   8TeV_T2tt_2j_200_25_run14358_merged_200_160.lhe.gz
+   stop mass =  200  lspMass =  160  lspGeneratedMass =  25 runNumber =  14358  nrEventsPoint =  300000 
+
+   8TeV_T2tt_2j_200_25_run28021_merged_200_160.lhe.gz
+   stop mass =  200  lspMass =  160  lspGeneratedMass =  25 runNumber =  28021  nrEventsPoint =  400000 
+
+   8TeV_T2tt_2j_200_50_run19306_merged_200_160.lhe.gz
+   stop mass =  200  lspMass =  160  lspGeneratedMass =  50 runNumber =  19306  nrEventsPoint =  500000 
+
+   8TeV_T2tt_2j_200_50_run21023_merged_200_160.lhe.gz
+   stop mass =  200  lspMass =  160  lspGeneratedMass =  50 runNumber =  21023  nrEventsPoint =  600000 
+
+   8TeV_T2tt_2j_200_50_run22592_merged_200_160.lhe.gz
+   stop mass =  200  lspMass =  160  lspGeneratedMass =  50 runNumber =  22592  nrEventsPoint =  700000 
+
+   8TeV_T2tt_2j_200_50_run25730_merged_200_160.lhe.gz
+   stop mass =  200  lspMass =  160  lspGeneratedMass =  50 runNumber =  25730  nrEventsPoint =  800000 
+
+   8TeV_T2tt_2j_200_75_run2171_merged_200_160.lhe.gz
+   stop mass =  200  lspMass =  160  lspGeneratedMass =  75 runNumber =  2171  nrEventsPoint =  900000 
+
+   8TeV_T2tt_2j_200_75_run13567_merged_200_160.lhe.gz
+   stop mass =  200  lspMass =  160  lspGeneratedMass =  75 runNumber =  13567  nrEventsPoint =  1000000 
+
+   8TeV_T2tt_2j_200_75_run16101_merged_200_160.lhe.gz
+   stop mass =  200  lspMass =  160  lspGeneratedMass =  75 runNumber =  16101  nrEventsPoint =  1100000 
+
+   8TeV_T2tt_2j_200_75_run22176_merged_200_160.lhe.gz
+   stop mass =  200  lspMass =  160  lspGeneratedMass =  75 runNumber =  22176  nrEventsPoint =  1200000 
+
+   8TeV_T2tt_2j_200_100_run13528_merged_200_160.lhe.gz
+   stop mass =  200  lspMass =  160  lspGeneratedMass =  100 runNumber =  13528  nrEventsPoint =  1300000 
+
+   8TeV_T2tt_2j_200_100_run20231_merged_200_160.lhe.gz
+   stop mass =  200  lspMass =  160  lspGeneratedMass =  100 runNumber =  20231  nrEventsPoint =  1400000 
+
+   8TeV_T2tt_2j_200_100_run22569_merged_200_160.lhe.gz
+   stop mass =  200  lspMass =  160  lspGeneratedMass =  100 runNumber =  22569  nrEventsPoint =  1500000 
+
+   8TeV_T2tt_2j_200_100_run31165_merged_200_160.lhe.gz
+   stop mass =  200  lspMass =  160  lspGeneratedMass =  100 runNumber =  31165  nrEventsPoint =  1600000 
+
+
+  Number of events for stop mass =  200  lspMass =  160 ( deltaMassStopLsp =  40 ):  1600000  events
+
+Begin loop: stop mass =  200  lspMass =  170 ( deltaMassStopLsp =  30 )
+
+   8TeV_T2tt_2j_200_0_run10562_merged_200_170.lhe.gz
+   stop mass =  200  lspMass =  170  lspGeneratedMass =  0 runNumber =  10562  nrEventsPoint =  100000 
+
+   8TeV_T2tt_2j_200_0_run13468_merged_200_170.lhe.gz
+   stop mass =  200  lspMass =  170  lspGeneratedMass =  0 runNumber =  13468  nrEventsPoint =  200000 
+
+   8TeV_T2tt_2j_200_0_run20994_merged_200_170.lhe.gz
+   stop mass =  200  lspMass =  170  lspGeneratedMass =  0 runNumber =  20994  nrEventsPoint =  300000 
+
+   8TeV_T2tt_2j_200_0_run21605_merged_200_170.lhe.gz
+   stop mass =  200  lspMass =  170  lspGeneratedMass =  0 runNumber =  21605  nrEventsPoint =  400000 
+
+   8TeV_T2tt_2j_200_25_run1632_merged_200_170.lhe.gz
+   stop mass =  200  lspMass =  170  lspGeneratedMass =  25 runNumber =  1632  nrEventsPoint =  500000 
+
+   8TeV_T2tt_2j_200_25_run11384_merged_200_170.lhe.gz
+   stop mass =  200  lspMass =  170  lspGeneratedMass =  25 runNumber =  11384  nrEventsPoint =  600000 
+
+   8TeV_T2tt_2j_200_25_run14358_merged_200_170.lhe.gz
+   stop mass =  200  lspMass =  170  lspGeneratedMass =  25 runNumber =  14358  nrEventsPoint =  700000 
+
+   8TeV_T2tt_2j_200_25_run28021_merged_200_170.lhe.gz
+   stop mass =  200  lspMass =  170  lspGeneratedMass =  25 runNumber =  28021  nrEventsPoint =  800000 
+
+   8TeV_T2tt_2j_200_50_run19306_merged_200_170.lhe.gz
+   stop mass =  200  lspMass =  170  lspGeneratedMass =  50 runNumber =  19306  nrEventsPoint =  900000 
+
+   8TeV_T2tt_2j_200_50_run21023_merged_200_170.lhe.gz
+   stop mass =  200  lspMass =  170  lspGeneratedMass =  50 runNumber =  21023  nrEventsPoint =  1000000 
+
+   8TeV_T2tt_2j_200_50_run22592_merged_200_170.lhe.gz
+   stop mass =  200  lspMass =  170  lspGeneratedMass =  50 runNumber =  22592  nrEventsPoint =  1100000 
+
+   8TeV_T2tt_2j_200_50_run25730_merged_200_170.lhe.gz
+   stop mass =  200  lspMass =  170  lspGeneratedMass =  50 runNumber =  25730  nrEventsPoint =  1200000 
+
+   8TeV_T2tt_2j_200_75_run2171_merged_200_170.lhe.gz
+   stop mass =  200  lspMass =  170  lspGeneratedMass =  75 runNumber =  2171  nrEventsPoint =  1300000 
+
+   8TeV_T2tt_2j_200_75_run13567_merged_200_170.lhe.gz
+   stop mass =  200  lspMass =  170  lspGeneratedMass =  75 runNumber =  13567  nrEventsPoint =  1400000 
+
+   8TeV_T2tt_2j_200_75_run16101_merged_200_170.lhe.gz
+   stop mass =  200  lspMass =  170  lspGeneratedMass =  75 runNumber =  16101  nrEventsPoint =  1500000 
+
+   8TeV_T2tt_2j_200_75_run22176_merged_200_170.lhe.gz
+   stop mass =  200  lspMass =  170  lspGeneratedMass =  75 runNumber =  22176  nrEventsPoint =  1600000 
+
+
+        Break run loop
+        Break lspGeneratedMass loop
+        Break while loop
+
+  Number of events for stop mass =  200  lspMass =  170 ( deltaMassStopLsp =  30 ):  1600000  events
+
+Begin loop: stop mass =  200  lspMass =  180 ( deltaMassStopLsp =  20 )
+
+   8TeV_T2tt_2j_200_100_run13528_merged_200_180.lhe.gz
+   stop mass =  200  lspMass =  180  lspGeneratedMass =  100 runNumber =  13528  nrEventsPoint =  100000 
+
+   8TeV_T2tt_2j_200_100_run20231_merged_200_180.lhe.gz
+   stop mass =  200  lspMass =  180  lspGeneratedMass =  100 runNumber =  20231  nrEventsPoint =  200000 
+
+   8TeV_T2tt_2j_200_100_run22569_merged_200_180.lhe.gz
+   stop mass =  200  lspMass =  180  lspGeneratedMass =  100 runNumber =  22569  nrEventsPoint =  300000 
+
+   8TeV_T2tt_2j_200_100_run31165_merged_200_180.lhe.gz
+   stop mass =  200  lspMass =  180  lspGeneratedMass =  100 runNumber =  31165  nrEventsPoint =  400000 
+
+   8TeV_T2tt_2j_200_0_run10562_merged_200_180.lhe.gz
+   stop mass =  200  lspMass =  180  lspGeneratedMass =  0 runNumber =  10562  nrEventsPoint =  500000 
+
+   8TeV_T2tt_2j_200_0_run13468_merged_200_180.lhe.gz
+   stop mass =  200  lspMass =  180  lspGeneratedMass =  0 runNumber =  13468  nrEventsPoint =  600000 
+
+   8TeV_T2tt_2j_200_0_run20994_merged_200_180.lhe.gz
+   stop mass =  200  lspMass =  180  lspGeneratedMass =  0 runNumber =  20994  nrEventsPoint =  700000 
+
+   8TeV_T2tt_2j_200_0_run21605_merged_200_180.lhe.gz
+   stop mass =  200  lspMass =  180  lspGeneratedMass =  0 runNumber =  21605  nrEventsPoint =  800000 
+
+   8TeV_T2tt_2j_200_25_run1632_merged_200_180.lhe.gz
+   stop mass =  200  lspMass =  180  lspGeneratedMass =  25 runNumber =  1632  nrEventsPoint =  900000 
+
+   8TeV_T2tt_2j_200_25_run11384_merged_200_180.lhe.gz
+   stop mass =  200  lspMass =  180  lspGeneratedMass =  25 runNumber =  11384  nrEventsPoint =  1000000 
+
+   8TeV_T2tt_2j_200_25_run14358_merged_200_180.lhe.gz
+   stop mass =  200  lspMass =  180  lspGeneratedMass =  25 runNumber =  14358  nrEventsPoint =  1100000 
+
+   8TeV_T2tt_2j_200_25_run28021_merged_200_180.lhe.gz
+   stop mass =  200  lspMass =  180  lspGeneratedMass =  25 runNumber =  28021  nrEventsPoint =  1200000 
+
+   8TeV_T2tt_2j_200_50_run19306_merged_200_180.lhe.gz
+   stop mass =  200  lspMass =  180  lspGeneratedMass =  50 runNumber =  19306  nrEventsPoint =  1300000 
+
+   8TeV_T2tt_2j_200_50_run21023_merged_200_180.lhe.gz
+   stop mass =  200  lspMass =  180  lspGeneratedMass =  50 runNumber =  21023  nrEventsPoint =  1400000 
+
+   8TeV_T2tt_2j_200_50_run22592_merged_200_180.lhe.gz
+   stop mass =  200  lspMass =  180  lspGeneratedMass =  50 runNumber =  22592  nrEventsPoint =  1500000 
+
+   8TeV_T2tt_2j_200_50_run25730_merged_200_180.lhe.gz
+   stop mass =  200  lspMass =  180  lspGeneratedMass =  50 runNumber =  25730  nrEventsPoint =  1600000 
+
+
+        Break run loop
+        Break lspGeneratedMass loop
+        Break while loop
+
+  Number of events for stop mass =  200  lspMass =  180 ( deltaMassStopLsp =  20 ):  1600000  events
+
+Begin loop: stop mass =  200  lspMass =  190 ( deltaMassStopLsp =  10 )
+
+   8TeV_T2tt_2j_200_75_run2171_merged_200_190.lhe.gz
+   stop mass =  200  lspMass =  190  lspGeneratedMass =  75 runNumber =  2171  nrEventsPoint =  100000 
+
+   8TeV_T2tt_2j_200_75_run13567_merged_200_190.lhe.gz
+   stop mass =  200  lspMass =  190  lspGeneratedMass =  75 runNumber =  13567  nrEventsPoint =  200000 
+
+   8TeV_T2tt_2j_200_75_run16101_merged_200_190.lhe.gz
+   stop mass =  200  lspMass =  190  lspGeneratedMass =  75 runNumber =  16101  nrEventsPoint =  300000 
+
+   8TeV_T2tt_2j_200_75_run22176_merged_200_190.lhe.gz
+   stop mass =  200  lspMass =  190  lspGeneratedMass =  75 runNumber =  22176  nrEventsPoint =  400000 
+
+   8TeV_T2tt_2j_200_100_run13528_merged_200_190.lhe.gz
+   stop mass =  200  lspMass =  190  lspGeneratedMass =  100 runNumber =  13528  nrEventsPoint =  500000 
+
+   8TeV_T2tt_2j_200_100_run20231_merged_200_190.lhe.gz
+   stop mass =  200  lspMass =  190  lspGeneratedMass =  100 runNumber =  20231  nrEventsPoint =  600000 
+
+   8TeV_T2tt_2j_200_100_run22569_merged_200_190.lhe.gz
+   stop mass =  200  lspMass =  190  lspGeneratedMass =  100 runNumber =  22569  nrEventsPoint =  700000 
+
+   8TeV_T2tt_2j_200_100_run31165_merged_200_190.lhe.gz
+   stop mass =  200  lspMass =  190  lspGeneratedMass =  100 runNumber =  31165  nrEventsPoint =  800000 
+
+   8TeV_T2tt_2j_200_0_run10562_merged_200_190.lhe.gz
+   stop mass =  200  lspMass =  190  lspGeneratedMass =  0 runNumber =  10562  nrEventsPoint =  900000 
+
+   8TeV_T2tt_2j_200_0_run13468_merged_200_190.lhe.gz
+   stop mass =  200  lspMass =  190  lspGeneratedMass =  0 runNumber =  13468  nrEventsPoint =  1000000 
+
+   8TeV_T2tt_2j_200_0_run20994_merged_200_190.lhe.gz
+   stop mass =  200  lspMass =  190  lspGeneratedMass =  0 runNumber =  20994  nrEventsPoint =  1100000 
+
+   8TeV_T2tt_2j_200_0_run21605_merged_200_190.lhe.gz
+   stop mass =  200  lspMass =  190  lspGeneratedMass =  0 runNumber =  21605  nrEventsPoint =  1200000 
+
+   8TeV_T2tt_2j_200_25_run1632_merged_200_190.lhe.gz
+   stop mass =  200  lspMass =  190  lspGeneratedMass =  25 runNumber =  1632  nrEventsPoint =  1300000 
+
+   8TeV_T2tt_2j_200_25_run11384_merged_200_190.lhe.gz
+   stop mass =  200  lspMass =  190  lspGeneratedMass =  25 runNumber =  11384  nrEventsPoint =  1400000 
+
+   8TeV_T2tt_2j_200_25_run14358_merged_200_190.lhe.gz
+   stop mass =  200  lspMass =  190  lspGeneratedMass =  25 runNumber =  14358  nrEventsPoint =  1500000 
+
+   8TeV_T2tt_2j_200_25_run28021_merged_200_190.lhe.gz
+   stop mass =  200  lspMass =  190  lspGeneratedMass =  25 runNumber =  28021  nrEventsPoint =  1600000 
+
+
+        Break run loop
+        Break lspGeneratedMass loop
+        Break while loop
+
+  Number of events for stop mass =  200  lspMass =  190 ( deltaMassStopLsp =  10 ):  1600000  events
+
+Begin loop: stop mass =  225  lspMass =  145 ( deltaMassStopLsp =  80 )
+
+   8TeV_T2tt_2j_225_0_run18488_merged_225_145.lhe.gz
+   stop mass =  225  lspMass =  145  lspGeneratedMass =  0 runNumber =  18488  nrEventsPoint =  100000 
+
+   8TeV_T2tt_2j_225_0_run19419_merged_225_145.lhe.gz
+   stop mass =  225  lspMass =  145  lspGeneratedMass =  0 runNumber =  19419  nrEventsPoint =  200000 
+
+   8TeV_T2tt_2j_225_0_run27843_merged_225_145.lhe.gz
+   stop mass =  225  lspMass =  145  lspGeneratedMass =  0 runNumber =  27843  nrEventsPoint =  300000 
+
+   8TeV_T2tt_2j_225_0_run32225_merged_225_145.lhe.gz
+   stop mass =  225  lspMass =  145  lspGeneratedMass =  0 runNumber =  32225  nrEventsPoint =  400000 
+
+   8TeV_T2tt_2j_225_25_run1249_merged_225_145.lhe.gz
+   stop mass =  225  lspMass =  145  lspGeneratedMass =  25 runNumber =  1249  nrEventsPoint =  500000 
+
+   8TeV_T2tt_2j_225_25_run16110_merged_225_145.lhe.gz
+   stop mass =  225  lspMass =  145  lspGeneratedMass =  25 runNumber =  16110  nrEventsPoint =  600000 
+
+   8TeV_T2tt_2j_225_25_run16685_merged_225_145.lhe.gz
+   stop mass =  225  lspMass =  145  lspGeneratedMass =  25 runNumber =  16685  nrEventsPoint =  700000 
+
+   8TeV_T2tt_2j_225_25_run18023_merged_225_145.lhe.gz
+   stop mass =  225  lspMass =  145  lspGeneratedMass =  25 runNumber =  18023  nrEventsPoint =  800000 
+
+   8TeV_T2tt_2j_225_50_run1867_merged_225_145.lhe.gz
+   stop mass =  225  lspMass =  145  lspGeneratedMass =  50 runNumber =  1867  nrEventsPoint =  900000 
+
+   8TeV_T2tt_2j_225_50_run4514_merged_225_145.lhe.gz
+   stop mass =  225  lspMass =  145  lspGeneratedMass =  50 runNumber =  4514  nrEventsPoint =  1000000 
+
+   8TeV_T2tt_2j_225_50_run14337_merged_225_145.lhe.gz
+   stop mass =  225  lspMass =  145  lspGeneratedMass =  50 runNumber =  14337  nrEventsPoint =  1100000 
+
+   8TeV_T2tt_2j_225_50_run16943_merged_225_145.lhe.gz
+   stop mass =  225  lspMass =  145  lspGeneratedMass =  50 runNumber =  16943  nrEventsPoint =  1200000 
+
+   8TeV_T2tt_2j_225_75_run1724_merged_225_145.lhe.gz
+   stop mass =  225  lspMass =  145  lspGeneratedMass =  75 runNumber =  1724  nrEventsPoint =  1300000 
+
+   8TeV_T2tt_2j_225_75_run12583_merged_225_145.lhe.gz
+   stop mass =  225  lspMass =  145  lspGeneratedMass =  75 runNumber =  12583  nrEventsPoint =  1400000 
+
+   8TeV_T2tt_2j_225_75_run25137_merged_225_145.lhe.gz
+   stop mass =  225  lspMass =  145  lspGeneratedMass =  75 runNumber =  25137  nrEventsPoint =  1500000 
+
+   8TeV_T2tt_2j_225_75_run28260_merged_225_145.lhe.gz
+   stop mass =  225  lspMass =  145  lspGeneratedMass =  75 runNumber =  28260  nrEventsPoint =  1600000 
+
+
+        Break run loop
+        Break lspGeneratedMass loop
+        Break while loop
+
+  Number of events for stop mass =  225  lspMass =  145 ( deltaMassStopLsp =  80 ):  1600000  events
+
+Begin loop: stop mass =  225  lspMass =  155 ( deltaMassStopLsp =  70 )
+
+   8TeV_T2tt_2j_225_100_run12767_merged_225_155.lhe.gz
+   stop mass =  225  lspMass =  155  lspGeneratedMass =  100 runNumber =  12767  nrEventsPoint =  100000 
+
+   8TeV_T2tt_2j_225_100_run13400_merged_225_155.lhe.gz
+   stop mass =  225  lspMass =  155  lspGeneratedMass =  100 runNumber =  13400  nrEventsPoint =  200000 
+
+   8TeV_T2tt_2j_225_100_run13858_merged_225_155.lhe.gz
+   stop mass =  225  lspMass =  155  lspGeneratedMass =  100 runNumber =  13858  nrEventsPoint =  300000 
+
+   8TeV_T2tt_2j_225_100_run15523_merged_225_155.lhe.gz
+   stop mass =  225  lspMass =  155  lspGeneratedMass =  100 runNumber =  15523  nrEventsPoint =  400000 
+
+   8TeV_T2tt_2j_225_125_run1508_merged_225_155.lhe.gz
+   stop mass =  225  lspMass =  155  lspGeneratedMass =  125 runNumber =  1508  nrEventsPoint =  500000 
+
+   8TeV_T2tt_2j_225_125_run12301_merged_225_155.lhe.gz
+   stop mass =  225  lspMass =  155  lspGeneratedMass =  125 runNumber =  12301  nrEventsPoint =  600000 
+
+   8TeV_T2tt_2j_225_125_run17385_merged_225_155.lhe.gz
+   stop mass =  225  lspMass =  155  lspGeneratedMass =  125 runNumber =  17385  nrEventsPoint =  700000 
+
+   8TeV_T2tt_2j_225_125_run28209_merged_225_155.lhe.gz
+   stop mass =  225  lspMass =  155  lspGeneratedMass =  125 runNumber =  28209  nrEventsPoint =  800000 
+
+   8TeV_T2tt_2j_225_0_run18488_merged_225_155.lhe.gz
+   stop mass =  225  lspMass =  155  lspGeneratedMass =  0 runNumber =  18488  nrEventsPoint =  900000 
+
+   8TeV_T2tt_2j_225_0_run19419_merged_225_155.lhe.gz
+   stop mass =  225  lspMass =  155  lspGeneratedMass =  0 runNumber =  19419  nrEventsPoint =  1000000 
+
+   8TeV_T2tt_2j_225_0_run27843_merged_225_155.lhe.gz
+   stop mass =  225  lspMass =  155  lspGeneratedMass =  0 runNumber =  27843  nrEventsPoint =  1100000 
+
+   8TeV_T2tt_2j_225_0_run32225_merged_225_155.lhe.gz
+   stop mass =  225  lspMass =  155  lspGeneratedMass =  0 runNumber =  32225  nrEventsPoint =  1200000 
+
+   8TeV_T2tt_2j_225_25_run1249_merged_225_155.lhe.gz
+   stop mass =  225  lspMass =  155  lspGeneratedMass =  25 runNumber =  1249  nrEventsPoint =  1300000 
+
+   8TeV_T2tt_2j_225_25_run16110_merged_225_155.lhe.gz
+   stop mass =  225  lspMass =  155  lspGeneratedMass =  25 runNumber =  16110  nrEventsPoint =  1400000 
+
+   8TeV_T2tt_2j_225_25_run16685_merged_225_155.lhe.gz
+   stop mass =  225  lspMass =  155  lspGeneratedMass =  25 runNumber =  16685  nrEventsPoint =  1500000 
+
+   8TeV_T2tt_2j_225_25_run18023_merged_225_155.lhe.gz
+   stop mass =  225  lspMass =  155  lspGeneratedMass =  25 runNumber =  18023  nrEventsPoint =  1600000 
+
+
+        Break run loop
+        Break lspGeneratedMass loop
+        Break while loop
+
+  Number of events for stop mass =  225  lspMass =  155 ( deltaMassStopLsp =  70 ):  1600000  events
+
+Begin loop: stop mass =  225  lspMass =  165 ( deltaMassStopLsp =  60 )
+
+   8TeV_T2tt_2j_225_50_run1867_merged_225_165.lhe.gz
+   stop mass =  225  lspMass =  165  lspGeneratedMass =  50 runNumber =  1867  nrEventsPoint =  100000 
+
+   8TeV_T2tt_2j_225_50_run4514_merged_225_165.lhe.gz
+   stop mass =  225  lspMass =  165  lspGeneratedMass =  50 runNumber =  4514  nrEventsPoint =  200000 
+
+   8TeV_T2tt_2j_225_50_run14337_merged_225_165.lhe.gz
+   stop mass =  225  lspMass =  165  lspGeneratedMass =  50 runNumber =  14337  nrEventsPoint =  300000 
+
+   8TeV_T2tt_2j_225_50_run16943_merged_225_165.lhe.gz
+   stop mass =  225  lspMass =  165  lspGeneratedMass =  50 runNumber =  16943  nrEventsPoint =  400000 
+
+   8TeV_T2tt_2j_225_75_run1724_merged_225_165.lhe.gz
+   stop mass =  225  lspMass =  165  lspGeneratedMass =  75 runNumber =  1724  nrEventsPoint =  500000 
+
+   8TeV_T2tt_2j_225_75_run12583_merged_225_165.lhe.gz
+   stop mass =  225  lspMass =  165  lspGeneratedMass =  75 runNumber =  12583  nrEventsPoint =  600000 
+
+   8TeV_T2tt_2j_225_75_run25137_merged_225_165.lhe.gz
+   stop mass =  225  lspMass =  165  lspGeneratedMass =  75 runNumber =  25137  nrEventsPoint =  700000 
+
+   8TeV_T2tt_2j_225_75_run28260_merged_225_165.lhe.gz
+   stop mass =  225  lspMass =  165  lspGeneratedMass =  75 runNumber =  28260  nrEventsPoint =  800000 
+
+   8TeV_T2tt_2j_225_100_run12767_merged_225_165.lhe.gz
+   stop mass =  225  lspMass =  165  lspGeneratedMass =  100 runNumber =  12767  nrEventsPoint =  900000 
+
+   8TeV_T2tt_2j_225_100_run13400_merged_225_165.lhe.gz
+   stop mass =  225  lspMass =  165  lspGeneratedMass =  100 runNumber =  13400  nrEventsPoint =  1000000 
+
+   8TeV_T2tt_2j_225_100_run13858_merged_225_165.lhe.gz
+   stop mass =  225  lspMass =  165  lspGeneratedMass =  100 runNumber =  13858  nrEventsPoint =  1100000 
+
+   8TeV_T2tt_2j_225_100_run15523_merged_225_165.lhe.gz
+   stop mass =  225  lspMass =  165  lspGeneratedMass =  100 runNumber =  15523  nrEventsPoint =  1200000 
+
+   8TeV_T2tt_2j_225_125_run1508_merged_225_165.lhe.gz
+   stop mass =  225  lspMass =  165  lspGeneratedMass =  125 runNumber =  1508  nrEventsPoint =  1300000 
+
+   8TeV_T2tt_2j_225_125_run12301_merged_225_165.lhe.gz
+   stop mass =  225  lspMass =  165  lspGeneratedMass =  125 runNumber =  12301  nrEventsPoint =  1400000 
+
+   8TeV_T2tt_2j_225_125_run17385_merged_225_165.lhe.gz
+   stop mass =  225  lspMass =  165  lspGeneratedMass =  125 runNumber =  17385  nrEventsPoint =  1500000 
+
+   8TeV_T2tt_2j_225_125_run28209_merged_225_165.lhe.gz
+   stop mass =  225  lspMass =  165  lspGeneratedMass =  125 runNumber =  28209  nrEventsPoint =  1600000 
+
+
+  Number of events for stop mass =  225  lspMass =  165 ( deltaMassStopLsp =  60 ):  1600000  events
+
+Begin loop: stop mass =  225  lspMass =  175 ( deltaMassStopLsp =  50 )
+
+   8TeV_T2tt_2j_225_0_run18488_merged_225_175.lhe.gz
+   stop mass =  225  lspMass =  175  lspGeneratedMass =  0 runNumber =  18488  nrEventsPoint =  100000 
+
+   8TeV_T2tt_2j_225_0_run19419_merged_225_175.lhe.gz
+   stop mass =  225  lspMass =  175  lspGeneratedMass =  0 runNumber =  19419  nrEventsPoint =  200000 
+
+   8TeV_T2tt_2j_225_0_run27843_merged_225_175.lhe.gz
+   stop mass =  225  lspMass =  175  lspGeneratedMass =  0 runNumber =  27843  nrEventsPoint =  300000 
+
+   8TeV_T2tt_2j_225_0_run32225_merged_225_175.lhe.gz
+   stop mass =  225  lspMass =  175  lspGeneratedMass =  0 runNumber =  32225  nrEventsPoint =  400000 
+
+   8TeV_T2tt_2j_225_25_run1249_merged_225_175.lhe.gz
+   stop mass =  225  lspMass =  175  lspGeneratedMass =  25 runNumber =  1249  nrEventsPoint =  500000 
+
+   8TeV_T2tt_2j_225_25_run16110_merged_225_175.lhe.gz
+   stop mass =  225  lspMass =  175  lspGeneratedMass =  25 runNumber =  16110  nrEventsPoint =  600000 
+
+   8TeV_T2tt_2j_225_25_run16685_merged_225_175.lhe.gz
+   stop mass =  225  lspMass =  175  lspGeneratedMass =  25 runNumber =  16685  nrEventsPoint =  700000 
+
+   8TeV_T2tt_2j_225_25_run18023_merged_225_175.lhe.gz
+   stop mass =  225  lspMass =  175  lspGeneratedMass =  25 runNumber =  18023  nrEventsPoint =  800000 
+
+   8TeV_T2tt_2j_225_50_run1867_merged_225_175.lhe.gz
+   stop mass =  225  lspMass =  175  lspGeneratedMass =  50 runNumber =  1867  nrEventsPoint =  900000 
+
+   8TeV_T2tt_2j_225_50_run4514_merged_225_175.lhe.gz
+   stop mass =  225  lspMass =  175  lspGeneratedMass =  50 runNumber =  4514  nrEventsPoint =  1000000 
+
+   8TeV_T2tt_2j_225_50_run14337_merged_225_175.lhe.gz
+   stop mass =  225  lspMass =  175  lspGeneratedMass =  50 runNumber =  14337  nrEventsPoint =  1100000 
+
+   8TeV_T2tt_2j_225_50_run16943_merged_225_175.lhe.gz
+   stop mass =  225  lspMass =  175  lspGeneratedMass =  50 runNumber =  16943  nrEventsPoint =  1200000 
+
+   8TeV_T2tt_2j_225_75_run1724_merged_225_175.lhe.gz
+   stop mass =  225  lspMass =  175  lspGeneratedMass =  75 runNumber =  1724  nrEventsPoint =  1300000 
+
+   8TeV_T2tt_2j_225_75_run12583_merged_225_175.lhe.gz
+   stop mass =  225  lspMass =  175  lspGeneratedMass =  75 runNumber =  12583  nrEventsPoint =  1400000 
+
+   8TeV_T2tt_2j_225_75_run25137_merged_225_175.lhe.gz
+   stop mass =  225  lspMass =  175  lspGeneratedMass =  75 runNumber =  25137  nrEventsPoint =  1500000 
+
+   8TeV_T2tt_2j_225_75_run28260_merged_225_175.lhe.gz
+   stop mass =  225  lspMass =  175  lspGeneratedMass =  75 runNumber =  28260  nrEventsPoint =  1600000 
+
+
+        Break run loop
+        Break lspGeneratedMass loop
+        Break while loop
+
+  Number of events for stop mass =  225  lspMass =  175 ( deltaMassStopLsp =  50 ):  1600000  events
+
+Begin loop: stop mass =  225  lspMass =  185 ( deltaMassStopLsp =  40 )
+
+   8TeV_T2tt_2j_225_100_run12767_merged_225_185.lhe.gz
+   stop mass =  225  lspMass =  185  lspGeneratedMass =  100 runNumber =  12767  nrEventsPoint =  100000 
+
+   8TeV_T2tt_2j_225_100_run13400_merged_225_185.lhe.gz
+   stop mass =  225  lspMass =  185  lspGeneratedMass =  100 runNumber =  13400  nrEventsPoint =  200000 
+
+   8TeV_T2tt_2j_225_100_run13858_merged_225_185.lhe.gz
+   stop mass =  225  lspMass =  185  lspGeneratedMass =  100 runNumber =  13858  nrEventsPoint =  300000 
+
+   8TeV_T2tt_2j_225_100_run15523_merged_225_185.lhe.gz
+   stop mass =  225  lspMass =  185  lspGeneratedMass =  100 runNumber =  15523  nrEventsPoint =  400000 
+
+   8TeV_T2tt_2j_225_125_run1508_merged_225_185.lhe.gz
+   stop mass =  225  lspMass =  185  lspGeneratedMass =  125 runNumber =  1508  nrEventsPoint =  500000 
+
+   8TeV_T2tt_2j_225_125_run12301_merged_225_185.lhe.gz
+   stop mass =  225  lspMass =  185  lspGeneratedMass =  125 runNumber =  12301  nrEventsPoint =  600000 
+
+   8TeV_T2tt_2j_225_125_run17385_merged_225_185.lhe.gz
+   stop mass =  225  lspMass =  185  lspGeneratedMass =  125 runNumber =  17385  nrEventsPoint =  700000 
+
+   8TeV_T2tt_2j_225_125_run28209_merged_225_185.lhe.gz
+   stop mass =  225  lspMass =  185  lspGeneratedMass =  125 runNumber =  28209  nrEventsPoint =  800000 
+
+   8TeV_T2tt_2j_225_0_run18488_merged_225_185.lhe.gz
+   stop mass =  225  lspMass =  185  lspGeneratedMass =  0 runNumber =  18488  nrEventsPoint =  900000 
+
+   8TeV_T2tt_2j_225_0_run19419_merged_225_185.lhe.gz
+   stop mass =  225  lspMass =  185  lspGeneratedMass =  0 runNumber =  19419  nrEventsPoint =  1000000 
+
+   8TeV_T2tt_2j_225_0_run27843_merged_225_185.lhe.gz
+   stop mass =  225  lspMass =  185  lspGeneratedMass =  0 runNumber =  27843  nrEventsPoint =  1100000 
+
+   8TeV_T2tt_2j_225_0_run32225_merged_225_185.lhe.gz
+   stop mass =  225  lspMass =  185  lspGeneratedMass =  0 runNumber =  32225  nrEventsPoint =  1200000 
+
+   8TeV_T2tt_2j_225_25_run1249_merged_225_185.lhe.gz
+   stop mass =  225  lspMass =  185  lspGeneratedMass =  25 runNumber =  1249  nrEventsPoint =  1300000 
+
+   8TeV_T2tt_2j_225_25_run16110_merged_225_185.lhe.gz
+   stop mass =  225  lspMass =  185  lspGeneratedMass =  25 runNumber =  16110  nrEventsPoint =  1400000 
+
+   8TeV_T2tt_2j_225_25_run16685_merged_225_185.lhe.gz
+   stop mass =  225  lspMass =  185  lspGeneratedMass =  25 runNumber =  16685  nrEventsPoint =  1500000 
+
+   8TeV_T2tt_2j_225_25_run18023_merged_225_185.lhe.gz
+   stop mass =  225  lspMass =  185  lspGeneratedMass =  25 runNumber =  18023  nrEventsPoint =  1600000 
+
+
+        Break run loop
+        Break lspGeneratedMass loop
+        Break while loop
+
+  Number of events for stop mass =  225  lspMass =  185 ( deltaMassStopLsp =  40 ):  1600000  events
+
+Begin loop: stop mass =  225  lspMass =  195 ( deltaMassStopLsp =  30 )
+
+   8TeV_T2tt_2j_225_50_run1867_merged_225_195.lhe.gz
+   stop mass =  225  lspMass =  195  lspGeneratedMass =  50 runNumber =  1867  nrEventsPoint =  100000 
+
+   8TeV_T2tt_2j_225_50_run4514_merged_225_195.lhe.gz
+   stop mass =  225  lspMass =  195  lspGeneratedMass =  50 runNumber =  4514  nrEventsPoint =  200000 
+
+   8TeV_T2tt_2j_225_50_run14337_merged_225_195.lhe.gz
+   stop mass =  225  lspMass =  195  lspGeneratedMass =  50 runNumber =  14337  nrEventsPoint =  300000 
+
+   8TeV_T2tt_2j_225_50_run16943_merged_225_195.lhe.gz
+   stop mass =  225  lspMass =  195  lspGeneratedMass =  50 runNumber =  16943  nrEventsPoint =  400000 
+
+   8TeV_T2tt_2j_225_75_run1724_merged_225_195.lhe.gz
+   stop mass =  225  lspMass =  195  lspGeneratedMass =  75 runNumber =  1724  nrEventsPoint =  500000 
+
+   8TeV_T2tt_2j_225_75_run12583_merged_225_195.lhe.gz
+   stop mass =  225  lspMass =  195  lspGeneratedMass =  75 runNumber =  12583  nrEventsPoint =  600000 
+
+   8TeV_T2tt_2j_225_75_run25137_merged_225_195.lhe.gz
+   stop mass =  225  lspMass =  195  lspGeneratedMass =  75 runNumber =  25137  nrEventsPoint =  700000 
+
+   8TeV_T2tt_2j_225_75_run28260_merged_225_195.lhe.gz
+   stop mass =  225  lspMass =  195  lspGeneratedMass =  75 runNumber =  28260  nrEventsPoint =  800000 
+
+   8TeV_T2tt_2j_225_100_run12767_merged_225_195.lhe.gz
+   stop mass =  225  lspMass =  195  lspGeneratedMass =  100 runNumber =  12767  nrEventsPoint =  900000 
+
+   8TeV_T2tt_2j_225_100_run13400_merged_225_195.lhe.gz
+   stop mass =  225  lspMass =  195  lspGeneratedMass =  100 runNumber =  13400  nrEventsPoint =  1000000 
+
+   8TeV_T2tt_2j_225_100_run13858_merged_225_195.lhe.gz
+   stop mass =  225  lspMass =  195  lspGeneratedMass =  100 runNumber =  13858  nrEventsPoint =  1100000 
+
+   8TeV_T2tt_2j_225_100_run15523_merged_225_195.lhe.gz
+   stop mass =  225  lspMass =  195  lspGeneratedMass =  100 runNumber =  15523  nrEventsPoint =  1200000 
+
+   8TeV_T2tt_2j_225_125_run1508_merged_225_195.lhe.gz
+   stop mass =  225  lspMass =  195  lspGeneratedMass =  125 runNumber =  1508  nrEventsPoint =  1300000 
+
+   8TeV_T2tt_2j_225_125_run12301_merged_225_195.lhe.gz
+   stop mass =  225  lspMass =  195  lspGeneratedMass =  125 runNumber =  12301  nrEventsPoint =  1400000 
+
+   8TeV_T2tt_2j_225_125_run17385_merged_225_195.lhe.gz
+   stop mass =  225  lspMass =  195  lspGeneratedMass =  125 runNumber =  17385  nrEventsPoint =  1500000 
+
+   8TeV_T2tt_2j_225_125_run28209_merged_225_195.lhe.gz
+   stop mass =  225  lspMass =  195  lspGeneratedMass =  125 runNumber =  28209  nrEventsPoint =  1600000 
+
+
+  Number of events for stop mass =  225  lspMass =  195 ( deltaMassStopLsp =  30 ):  1600000  events
+
+Begin loop: stop mass =  225  lspMass =  205 ( deltaMassStopLsp =  20 )
+
+   8TeV_T2tt_2j_225_0_run18488_merged_225_205.lhe.gz
+   stop mass =  225  lspMass =  205  lspGeneratedMass =  0 runNumber =  18488  nrEventsPoint =  100000 
+
+   8TeV_T2tt_2j_225_0_run19419_merged_225_205.lhe.gz
+   stop mass =  225  lspMass =  205  lspGeneratedMass =  0 runNumber =  19419  nrEventsPoint =  200000 
+
+   8TeV_T2tt_2j_225_0_run27843_merged_225_205.lhe.gz
+   stop mass =  225  lspMass =  205  lspGeneratedMass =  0 runNumber =  27843  nrEventsPoint =  300000 
+
+   8TeV_T2tt_2j_225_0_run32225_merged_225_205.lhe.gz
+   stop mass =  225  lspMass =  205  lspGeneratedMass =  0 runNumber =  32225  nrEventsPoint =  400000 
+
+   8TeV_T2tt_2j_225_25_run1249_merged_225_205.lhe.gz
+   stop mass =  225  lspMass =  205  lspGeneratedMass =  25 runNumber =  1249  nrEventsPoint =  500000 
+
+   8TeV_T2tt_2j_225_25_run16110_merged_225_205.lhe.gz
+   stop mass =  225  lspMass =  205  lspGeneratedMass =  25 runNumber =  16110  nrEventsPoint =  600000 
+
+   8TeV_T2tt_2j_225_25_run16685_merged_225_205.lhe.gz
+   stop mass =  225  lspMass =  205  lspGeneratedMass =  25 runNumber =  16685  nrEventsPoint =  700000 
+
+   8TeV_T2tt_2j_225_25_run18023_merged_225_205.lhe.gz
+   stop mass =  225  lspMass =  205  lspGeneratedMass =  25 runNumber =  18023  nrEventsPoint =  800000 
+
+   8TeV_T2tt_2j_225_50_run1867_merged_225_205.lhe.gz
+   stop mass =  225  lspMass =  205  lspGeneratedMass =  50 runNumber =  1867  nrEventsPoint =  900000 
+
+   8TeV_T2tt_2j_225_50_run4514_merged_225_205.lhe.gz
+   stop mass =  225  lspMass =  205  lspGeneratedMass =  50 runNumber =  4514  nrEventsPoint =  1000000 
+
+   8TeV_T2tt_2j_225_50_run14337_merged_225_205.lhe.gz
+   stop mass =  225  lspMass =  205  lspGeneratedMass =  50 runNumber =  14337  nrEventsPoint =  1100000 
+
+   8TeV_T2tt_2j_225_50_run16943_merged_225_205.lhe.gz
+   stop mass =  225  lspMass =  205  lspGeneratedMass =  50 runNumber =  16943  nrEventsPoint =  1200000 
+
+   8TeV_T2tt_2j_225_75_run1724_merged_225_205.lhe.gz
+   stop mass =  225  lspMass =  205  lspGeneratedMass =  75 runNumber =  1724  nrEventsPoint =  1300000 
+
+   8TeV_T2tt_2j_225_75_run12583_merged_225_205.lhe.gz
+   stop mass =  225  lspMass =  205  lspGeneratedMass =  75 runNumber =  12583  nrEventsPoint =  1400000 
+
+   8TeV_T2tt_2j_225_75_run25137_merged_225_205.lhe.gz
+   stop mass =  225  lspMass =  205  lspGeneratedMass =  75 runNumber =  25137  nrEventsPoint =  1500000 
+
+   8TeV_T2tt_2j_225_75_run28260_merged_225_205.lhe.gz
+   stop mass =  225  lspMass =  205  lspGeneratedMass =  75 runNumber =  28260  nrEventsPoint =  1600000 
+
+
+        Break run loop
+        Break lspGeneratedMass loop
+        Break while loop
+
+  Number of events for stop mass =  225  lspMass =  205 ( deltaMassStopLsp =  20 ):  1600000  events
+
+Begin loop: stop mass =  225  lspMass =  215 ( deltaMassStopLsp =  10 )
+
+   8TeV_T2tt_2j_225_100_run12767_merged_225_215.lhe.gz
+   stop mass =  225  lspMass =  215  lspGeneratedMass =  100 runNumber =  12767  nrEventsPoint =  100000 
+
+   8TeV_T2tt_2j_225_100_run13400_merged_225_215.lhe.gz
+   stop mass =  225  lspMass =  215  lspGeneratedMass =  100 runNumber =  13400  nrEventsPoint =  200000 
+
+   8TeV_T2tt_2j_225_100_run13858_merged_225_215.lhe.gz
+   stop mass =  225  lspMass =  215  lspGeneratedMass =  100 runNumber =  13858  nrEventsPoint =  300000 
+
+   8TeV_T2tt_2j_225_100_run15523_merged_225_215.lhe.gz
+   stop mass =  225  lspMass =  215  lspGeneratedMass =  100 runNumber =  15523  nrEventsPoint =  400000 
+
+   8TeV_T2tt_2j_225_125_run1508_merged_225_215.lhe.gz
+   stop mass =  225  lspMass =  215  lspGeneratedMass =  125 runNumber =  1508  nrEventsPoint =  500000 
+
+   8TeV_T2tt_2j_225_125_run12301_merged_225_215.lhe.gz
+   stop mass =  225  lspMass =  215  lspGeneratedMass =  125 runNumber =  12301  nrEventsPoint =  600000 
+
+   8TeV_T2tt_2j_225_125_run17385_merged_225_215.lhe.gz
+   stop mass =  225  lspMass =  215  lspGeneratedMass =  125 runNumber =  17385  nrEventsPoint =  700000 
+
+   8TeV_T2tt_2j_225_125_run28209_merged_225_215.lhe.gz
+   stop mass =  225  lspMass =  215  lspGeneratedMass =  125 runNumber =  28209  nrEventsPoint =  800000 
+
+   8TeV_T2tt_2j_225_0_run18488_merged_225_215.lhe.gz
+   stop mass =  225  lspMass =  215  lspGeneratedMass =  0 runNumber =  18488  nrEventsPoint =  900000 
+
+   8TeV_T2tt_2j_225_0_run19419_merged_225_215.lhe.gz
+   stop mass =  225  lspMass =  215  lspGeneratedMass =  0 runNumber =  19419  nrEventsPoint =  1000000 
+
+   8TeV_T2tt_2j_225_0_run27843_merged_225_215.lhe.gz
+   stop mass =  225  lspMass =  215  lspGeneratedMass =  0 runNumber =  27843  nrEventsPoint =  1100000 
+
+   8TeV_T2tt_2j_225_0_run32225_merged_225_215.lhe.gz
+   stop mass =  225  lspMass =  215  lspGeneratedMass =  0 runNumber =  32225  nrEventsPoint =  1200000 
+
+   8TeV_T2tt_2j_225_25_run1249_merged_225_215.lhe.gz
+   stop mass =  225  lspMass =  215  lspGeneratedMass =  25 runNumber =  1249  nrEventsPoint =  1300000 
+
+   8TeV_T2tt_2j_225_25_run16110_merged_225_215.lhe.gz
+   stop mass =  225  lspMass =  215  lspGeneratedMass =  25 runNumber =  16110  nrEventsPoint =  1400000 
+
+   8TeV_T2tt_2j_225_25_run16685_merged_225_215.lhe.gz
+   stop mass =  225  lspMass =  215  lspGeneratedMass =  25 runNumber =  16685  nrEventsPoint =  1500000 
+
+   8TeV_T2tt_2j_225_25_run18023_merged_225_215.lhe.gz
+   stop mass =  225  lspMass =  215  lspGeneratedMass =  25 runNumber =  18023  nrEventsPoint =  1600000 
+
+
+        Break run loop
+        Break lspGeneratedMass loop
+        Break while loop
+
+  Number of events for stop mass =  225  lspMass =  215 ( deltaMassStopLsp =  10 ):  1600000  events
+
+End of job
