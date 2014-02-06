@@ -9,6 +9,11 @@ options.register ('mode','mc',
           VarParsing.VarParsing.varType.string,
           "Switch between MC and data")
 
+options.register ('leptonSelection','None',
+          VarParsing.VarParsing.multiplicity.singleton,
+          VarParsing.VarParsing.varType.string,
+          "lepton selection")
+
 options.register ('hltName','HLT',
           VarParsing.VarParsing.multiplicity.singleton,
           VarParsing.VarParsing.varType.string,
@@ -84,6 +89,7 @@ process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(False) )
 #process.load("RecoTracker.TransientTrackingRecHit.TTRHBuilders_cff")
 #process.TTRHBuilderAngleAndTemplate.ComputeCoarseLocalPositionFromDisk = True
 
+
 isMC = (options.mode.lower()=='mc')
 isData = not isMC
 jec = []
@@ -92,7 +98,7 @@ if isMC:
 else:
   jec = ['L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual']
 
-print "mode",options.mode,"isMC?",isMC, ", verbose?",options.verbose,", add RA4 Info?",options.addRA4Info, ", JEC:",jec,", GT",options.GT, ", triggers", options.triggers
+print "mode",options.mode,"isMC?",isMC, 'leptonSelection',options.leptonSelection, ", verbose?",options.verbose,", add RA4 Info?",options.addRA4Info, ", JEC:",jec,", GT",options.GT, ", triggers", options.triggers
 
 
 #-- Source information ------------------------------------------------------
@@ -154,6 +160,26 @@ process.patElectrons.isolationValuesNoPFId = cms.PSet(
         )
 process.patMETs.addGenMET = cms.bool(isMC)
 
+
+if options.leptonSelection.lower()=='doublemu':
+  print "\nRequiring 2 Muons!"
+  process.leptonCounter = cms.EDFilter("PATCandViewCountFilter",
+     src = cms.InputTag("selectedPatMuons"),
+     maxNumber = cms.uint32(2000),
+     minNumber = cms.uint32(2),
+     filter = cms.bool(True)
+  )
+  process.patDefaultSequence += process.leptonCounter
+if options.leptonSelection.lower()=='doubleele':
+  print "\nRequiring 2 Electrons!"
+  process.leptonCounter = cms.EDFilter("PATCandViewCountFilter",
+     src = cms.InputTag("selectedPatElectrons"),
+     maxNumber = cms.uint32(2000),
+     minNumber = cms.uint32(2),
+     filter = cms.bool(True)
+  )
+  process.patDefaultSequence += process.leptonCounter
+ 
 process.load("RecoLocalCalo.EcalRecAlgos.EcalSeverityLevelESProducer_cfi");
 
 from PhysicsTools.PatAlgos.tools.jetTools import *
@@ -298,12 +324,13 @@ process.pileupJetIdProducer.jets = cms.InputTag('selectedPatJets')
 #electron
 Ele_acceptance = '(pt >= 19 && abs(eta)<2.5)'
 Ele_Id = 'abs(deltaPhiSuperClusterTrackAtVtx)<0.06 && abs(deltaEtaSuperClusterTrackAtVtx)<0.007 && scSigmaIEtaIEta<0.03 && hadronicOverEm<0.12'
-Ele_Iso = '(chargedHadronIso + max(neutralHadronIso + photonIso - 0.5*puChargedHadronIso, 0.))/pt < 0.2'
+Ele_Iso = '(chargedHadronIso + max(neutralHadronIso + photonIso - 0.5*puChargedHadronIso, 0.))/pt < 0.3'
 Mu_acceptance = '(abs(eta)<2.4 && pt>=15)'
 Mu_Id = 'isPFMuon && isGlobalMuon && isTrackerMuon && globalTrack.normalizedChi2 < 10 && globalTrack.hitPattern.numberOfValidMuonHits > 0'
 Mu_Iso = '(chargedHadronIso + max(neutralHadronIso + photonIso - 0.5*puChargedHadronIso, 0.))/pt < 0.2'
 process.selectedPatMuons.cut = Mu_acceptance+'&&'+Mu_Id+'&&'+Mu_Iso
 process.selectedPatElectrons.cut = Ele_acceptance+"&&"+Ele_Id+"&&"+Ele_Iso
+
 
 ### No Pu MET
 process.load('JetMETCorrections.METPUSubtraction.noPileUpPFMET_cff')
@@ -350,7 +377,7 @@ runType1PFMEtUncertainties(
   process,
   electronCollection = '',#cms.InputTag('selectedPatElectrons'),
   photonCollection = '',
-  muonCollection = cms.InputTag('selectedPatMuons'),#FIXME
+  muonCollection = cms.InputTag('selectedPatMuons'),
   tauCollection = '',
   jetCollection = cms.InputTag('patJets'),
   makeType1corrPFMEt = True,
@@ -386,66 +413,6 @@ runNoPileUpMEtUncertainties(
   doSmearJets =isMC,
   postfix = ''
   )
-
-#runMVAMEtUncertainties(
-#  process,
-#  electronCollection = cms.InputTag('selectedPatElectrons'),
-#  photonCollection = '',
-#  muonCollection = cms.InputTag('selectedPatMuons'),
-#  tauCollection = '',
-#  jetCollection = cms.InputTag('patJets'),
-#  addToPatDefaultSequence = False,
-#  postfix = "EMu",
-#  doSmearJets =isMC
-#  )
-#
-#runNoPileUpMEtUncertainties(
-#  process,
-#  electronCollection = cms.InputTag('selectedPatElectrons'),
-#  photonCollection = '',
-#  muonCollection = cms.InputTag('selectedPatMuons'),
-#  tauCollection = '',
-#  jetCollection = cms.InputTag('patJets'),
-#  addToPatDefaultSequence = False,
-#  postfix = "EMu",
-#  doSmearJets =isMC
-#)
-#
-#runType1PFMEtUncertainties(
-#  process,
-#  electronCollection = cms.InputTag('selectedPatElectrons'),
-#  photonCollection = '',
-#  muonCollection = '', #cms.InputTag('selectedPatMuons'),
-#  tauCollection = '',
-#  jetCollection = cms.InputTag('patJets'),
-#  makeType1corrPFMEt = True,
-#  makeType1p2corrPFMEt = True,
-#  doApplyType0corr = True,
-#  doSmearJets =isMC,
-#  addToPatDefaultSequence = False,
-#  postfix = "Ele"
-#)
-#
-#
-#runType1PFMEtUncertainties(
-#  process,
-#  electronCollection = cms.InputTag('selectedPatElectrons'),
-#  photonCollection = '',
-#  muonCollection = cms.InputTag('selectedPatMuons'),
-#  tauCollection = '',
-#  jetCollection = cms.InputTag('patJets'),
-##   jetCorrLabel = 'L2L3Residual',
-#  makeType1corrPFMEt = True,
-#  makeType1p2corrPFMEt = True,
-#  doApplyType0corr = True,
-#  addToPatDefaultSequence = False,
-#  postfix = "EMu",
-#  doSmearJets =isMC
-#  )
-
-#process.noPileUpPFMEtEMu.srcLeptons = cms.VInputTag(["selectedPatMuons","selectedPatElectrons"])
-#process.pfMEtMVAEMu.srcLeptons = cms.VInputTag( ["selectedPatMuons","selectedPatElectrons"])
-### unity response training
 
 
 runMVAMEtUncertainties(
@@ -636,9 +603,12 @@ metsToMonitor = []
 metsToMonitor.extend( [ 
     "patMETs",
     "patPFMet",
+    "patPFMetMVA",
+    "patPFMetMVAUnity",
+    "patPFMetNoPileUp",
+    "patType1p2CorrectedPFMet",
     "patPFMetJetEnDown",
     "patPFMetJetEnUp",
-    "patPFMetMVA",
     "patPFMetMVAJetEnDown",
     "patPFMetMVAJetEnDownUnity",
     "patPFMetMVAJetEnUp",
@@ -651,10 +621,8 @@ metsToMonitor.extend( [
     "patPFMetMVAUnclusteredEnDownUnity",
     "patPFMetMVAUnclusteredEnUp",
     "patPFMetMVAUnclusteredEnUpUnity",
-    "patPFMetMVAUnity",
     "patPFMetMuonEnDown",
     "patPFMetMuonEnUp",
-    "patPFMetNoPileUp",
     "patPFMetNoPileUpJetEnDown",
     "patPFMetNoPileUpJetEnUp",
     "patPFMetNoPileUpMuonEnDown",
@@ -670,7 +638,6 @@ metsToMonitor.extend( [
     "patType1CorrectedPFMetMuonEnUp",
     "patType1CorrectedPFMetUnclusteredEnDown",
     "patType1CorrectedPFMetUnclusteredEnUp",
-    "patType1p2CorrectedPFMet",
     "patType1p2CorrectedPFMetJetEnDown",
     "patType1p2CorrectedPFMetJetEnUp",
     "patType1p2CorrectedPFMetMuonEnDown",
