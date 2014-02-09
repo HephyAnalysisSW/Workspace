@@ -8,7 +8,8 @@ undecayedLheFiles = 'T2tt_stopMass_0_500_undecayedFiles.txt'
 decayedLheFiles = 'LheFiles.txt'
 
 model = '8TeV_T2tt_2j_'
-stopMassList = [100, 125, 150, 175, 200, 225, 250, 275, 300, 325, 350, 375, 400, 425, 450, 475, 500]
+#stopMassList = [100, 125, 150, 175, 200, 225, 250, 275, 300, 325, 350, 375, 400, 425, 450, 475, 500]
+stopMassList = [100, 125, 150, 175, 200, 225, 250, 275, 300, 325, 350, 375, 400]
 deltaMassStopLsp = [10, 20, 30, 40, 50, 60, 70, 80]
 
 nrFilesPerStopMass = dict()
