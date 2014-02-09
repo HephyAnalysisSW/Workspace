@@ -31,7 +31,10 @@ xsec["8TeV-TTWJets"]                            =       0.232
 xsec["8TeV-TTZJets"]                            =       0.2057 
 
 xsec["8TeV-WJetsToLNu"]                         =       36257.2
-xsec["8TeV-WJetsToLNu-3"]                         =       36257.2
+xsec["8TeV-WJetsToLNu-3"]                       =       36257.2
+xsec["8TeV-WJetsToLNu-v1"]                      =       36257.2
+xsec["8TeV-WJetsToLNu-v2"]                      =       36257.2
+xsec["8TeV-WJetsToLNu-v1+2"]                    =       36257.2
 
 #https://twiki.cern.ch/twiki/bin/view/CMS/TTbarHiggs
 xsec["8TeV-W1JetsToLNu"] =  6440.4  
@@ -102,6 +105,8 @@ xsec["8TeV-ZJetsToNuNu-HT100to200"] = 160.3
 xsec["8TeV-ZJetsToNuNu-HT200to400"] = 41.49
 xsec["8TeV-ZJetsToNuNu-HT400"] = 5.274
 xsec["8TeV-WW"] = 54.838
+xsec["8TeV-WZ"] = 32.3 
+xsec["8TeV-ZZ"] = 7.7 
 
 #MonoJet Signals
 #https://twiki.cern.ch/twiki/bin/view/LHCPhysics/SUSYCrossSections8TeVstopsbottom

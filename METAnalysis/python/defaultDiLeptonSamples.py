@@ -1,5 +1,19 @@
 import copy, os, sys
-allSamples = []
+eventsInSample={}
+eventsInSample['DYJetsToLL-M50'] = 30459503
+eventsInSample['DYJetsToLL-M10to50'] = 7132223
+eventsInSample['TTJets']  = 6923750
+eventsInSample['T-tW']  = 497658
+eventsInSample['T-s']  = 259961
+eventsInSample['T-t']  = 99876
+eventsInSample['Tbar-tW']  = 493460
+eventsInSample['Tbar-s']  = 139974
+eventsInSample['Tbar-t']  = 1935072
+eventsInSample['WJetsToLNu-v2'] = 57709905 
+eventsInSample['WJetsToLNu-v1'] = 18393090 
+eventsInSample['WW'] = 10000431 
+eventsInSample['WZ'] = 10000283 
+eventsInSample['ZZ'] = 9799908 
 
 path = os.path.abspath('../../HEPHYCommonTools/python')
 if not path in sys.path:
@@ -14,17 +28,15 @@ S10rwMinusHisto = getPUReweightingUncertainty("S10", dataFile = "/data/schoef/re
 dataZmumu={}
 dataZmumu["name"]     = "dataZmumu";
 dataZmumu["dirname"] = "/dpm/oeaw.ac.at/home/cms/store/user/schoef/MET_050214/" 
-dataZmumu["bins"]    = ["DoubleMuon-Run2012A-22Jan2013", "DoubleMuon-Run2012B-22Jan2013", "DoubleMuon-Run2012C-22Jan2013", "DoubleMuon-Run2012D-22Jan2013"]
+dataZmumu["bins"]    = ["DoubleMu-Run2012A-22Jan2013", "DoubleMu-Run2012B-22Jan2013", "DoubleMu-Run2012C-22Jan2013", "DoubleMu-Run2012D-22Jan2013"]
 dataZmumu["Chain"] = "Events"
 dataZmumu["Counter"] = "bool_EventCounter_passed_PAT.obj"
-allSamples.append(dataZmumu)
 dataZee={}
 dataZee["name"]     = "dataZee";
 dataZee["dirname"] = "/dpm/oeaw.ac.at/home/cms/store/user/schoef/MET_050214/" 
 dataZee["bins"]    = ["DoubleElectron-Run2012A-22Jan2013", "DoubleElectron-Run2012B-22Jan2013", "DoubleElectron-Run2012C-22Jan2013", "DoubleElectron-Run2012D-22Jan2013"]
 dataZee["Chain"] = "Events"
 dataZee["Counter"] = "bool_EventCounter_passed_PAT.obj"
-allSamples.append(dataZee)
 
 
 mc={}
@@ -46,19 +58,23 @@ ttbar_mumu["bins"] = ["Mu-TTJets"]
 ttbar_mumu["name"] = "TTJets" 
 
 wjets_ee = copy.deepcopy(mc)
-wjets_ee["bins"] = ["Ele-WJetsToLNu-v2"] 
+wjets_ee["bins"] = ["Ele-WJetsToLNu-v1+2"]
+wjets_ee["subDirs"] = {"Ele-WJetsToLNu-v1+2":["Ele-WJetsToLNu-v1", "Ele-WJetsToLNu-v2"]}
 wjets_ee["name"] = "WJetsToLNu" 
 wjets_ee['reweightingHistoFile'] = S10rwHisto
 wjets_ee['reweightingHistoFileSysPlus'] = S10rwPlusHisto
 wjets_ee['reweightingHistoFileSysMinus'] = S10rwMinusHisto
 wjets_mumu = copy.deepcopy(mc)
-wjets_mumu["bins"] = ["Mu-WJetsToLNu-v2"] 
+wjets_mumu["bins"] = ["Mu-WJetsToLNu-v1+2"]
+wjets_mumu["subDirs"] = {"Mu-WJetsToLNu-v1+2":["Mu-WJetsToLNu-v1", "Mu-WJetsToLNu-v2"]}
 wjets_mumu["name"] = "WJetsToLNu" 
 wjets_mumu['reweightingHistoFile'] = S10rwHisto
 wjets_mumu['reweightingHistoFileSysPlus'] = S10rwPlusHisto
 wjets_mumu['reweightingHistoFileSysMinus'] = S10rwMinusHisto
 
 drellYan_ee = copy.deepcopy(mc)
+
+
 drellYan_ee["bins"] = ["Ele-DYJetsToLL-M50", "Ele-DYJetsToLL-M10to50"] 
 drellYan_ee["name"] = "DY"
 drellYan_ee['reweightingHistoFile'] = S10rwHisto
