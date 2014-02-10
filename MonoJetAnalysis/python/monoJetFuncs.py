@@ -2,11 +2,22 @@ import os, sys, ROOT
 from math import cos, sin, sqrt, asinh, acosh, sinh
 
 def getValue(chain, varname):
-  alias = chain.GetAlias(varname)
+  # can treat scalars or arrays with a numeric index
+  #   default index (for a scalar) is 0
+  vn = varname
+  idx = 0
+  # try to find index
+  iidx = varname.find('[')
+  if iidx>-1:
+    assert varname[-1] == ']'
+    vn = varname[:iidx]
+    idx = int(varname[iidx+1:-1])
+    
+  alias = chain.GetAlias(vn)
   if alias!="":
-    return chain.GetLeaf( alias ).GetValue()
+    return chain.GetLeaf( alias ).GetValue(idx)
   else:
-    return chain.GetLeaf( varname ).GetValue()
+    return chain.GetLeaf( vn ).GetValue(idx)
 
 def softIsolatedMT(chain):
   lepton_pt   = getValue(chain, "softIsolatedMuPt")
