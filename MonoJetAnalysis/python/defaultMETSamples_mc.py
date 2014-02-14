@@ -100,6 +100,14 @@ w4jets["name"] = "W4JetsToLNu"
 w4jets['reweightingHistoFile'] = S10rwHisto
 w4jets['reweightingHistoFileSysPlus'] = S10rwPlusHisto
 w4jets['reweightingHistoFileSysMinus'] = S10rwMinusHisto
+
+wbbjets = copy.deepcopy(wjets)
+wbbjets["dirname"] = "/dpm/oeaw.ac.at/home/cms/store/user/schoef/pat_140212"
+wbbjets["bins"]=["8TeV-WbbJetsToLNu"]
+wbbjets["name"] = "WbbJets"
+wbbjets['reweightingHistoFile'] = S10rwHisto
+wbbjets['reweightingHistoFileSysPlus'] = S10rwPlusHisto
+wbbjets['reweightingHistoFileSysMinus'] = S10rwMinusHisto
  
 dy = copy.deepcopy(mc)
 dy["bins"] = DY_Bins 
@@ -205,9 +213,6 @@ ww['reweightingHistoFileSysMinus'] = S10rwMinusHisto
 #wbbjetsCombined["name"] = "WbbJetsCombined"
 #wbbjetsCombined["additionalCut"] = {"8TeV-WbbJetsToLNu":"nbjets>0&&ht>300", "8TeV-WJets-HT250to300":"nbjets==0", "8TeV-WJets-HT300to400":"nbjets==0", "8TeV-WJets-HT400":"nbjets==0"}
 #
-#wbbjets = copy.deepcopy(wjets)
-#wbbjets["bins"]=["8TeV-WbbJetsToLNu"]
-#wbbjets["name"] = "WbbJets"
 #
 #
 #####

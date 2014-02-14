@@ -81,8 +81,8 @@ def getJets(c):
     jets.append({'pt':getVarValue(c, 'jetPt', i), 'eta':getVarValue(c, 'jetEta', i), 'phi':getVarValue(c, 'jetPhi', i)})
   return jets
 
-def getSoftIsolatedMu(c):
-  return {'pt':c.GetLeaf('softIsolatedMuPt').GetValue(), 'eta':c.GetLeaf('softIsolatedMuEta').GetValue(), 'phi':c.GetLeaf('softIsolatedMuPhi').GetValue()}
+#def getSoftIsolatedMu(c):
+#  return {'pt':c.GetLeaf('softIsolatedMuPt').GetValue(), 'eta':c.GetLeaf('softIsolatedMuEta').GetValue(), 'phi':c.GetLeaf('softIsolatedMuPhi').GetValue()}
 
 def calcHTRatio(jets, metPhi):
   htRatio = -1
@@ -108,8 +108,8 @@ def calcHTRatio(jets, metPhi):
     htRatio = num/den
   return htRatio
 
-def findClosestJet(c, obj):
-  jets = getJets(c)
+def findClosestJet(jets, obj):
+##  jets = getJets(c)
   res=[]
   for j in jets:
     res.append([sqrt((j['phi'] - obj['phi'])**2 + (j['eta'] - obj['eta'])**2), j])
@@ -117,23 +117,21 @@ def findClosestJet(c, obj):
   if len(res)>0:
     return {'deltaR':res[0][0], 'jet':res[0][1]}
 
-def closestMuJetDeltaR(c):
-  return findClosestJet(c, getSoftIsolatedMu(c))['deltaR']
-def closestMuJetMass(c):
-  mu = getSoftIsolatedMu(c)
-  jet = findClosestJet(c, mu)['jet']
+#def closestMuJetDeltaR(c):
+#  return findClosestJet(c, getSoftIsolatedMu(c))['deltaR']
+def invMass(p1 , p2):
 
-  pxMu = mu['pt']*cos(mu['phi']) 
-  pyMu = mu['pt']*sin(mu['phi']) 
-  pzMu = mu['pt']*sinh(mu['eta'])
-  EMu = sqrt(pxMu**2 + pyMu**2 + pzMu**2)
+  pxp1 = p1['pt']*cos(p1['phi']) 
+  pyp1 = p1['pt']*sin(p1['phi']) 
+  pzp1 = p1['pt']*sinh(p1['eta'])
+  Ep1 = sqrt(pxp1**2 + pyp1**2 + pzp1**2)
 
-  pxJet = jet['pt']*cos(jet['phi'])
-  pyJet = jet['pt']*sin(jet['phi'])
-  pzJet = jet['pt']*sinh(jet['eta'])
-  EJet = sqrt(pxJet**2 + pyJet**2 + pzJet**2)
+  pxp2 = p2['pt']*cos(p2['phi'])
+  pyp2 = p2['pt']*sin(p2['phi'])
+  pzp2 = p2['pt']*sinh(p2['eta'])
+  Ep2 = sqrt(pxp2**2 + pyp2**2 + pzp2**2)
 
-  return sqrt( (EMu + EJet)**2 - (pxMu + pxJet)**2 - (pyMu + pyJet)**2 - (pzMu + pzJet)**2)
+  return sqrt( (Ep1 + Ep2)**2 - (pxp1 + pxp2)**2 - (pyp1 + pyp2)**2 - (pzp1 + pzp2)**2)
 
 def htRatio(c):
   jets = getJets(c)

@@ -14,8 +14,8 @@
 #include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerObjectMapRecord.h"
 #include "HLTrigger/HLTfilters/interface/HLTLevel1GTSeed.h"
 #include "DataFormats/HLTReco/interface/TriggerEvent.h"
-//#include "CMGTools/External/interface/PileupJetIdentifier.h"
-#include "DataFormats/JetReco/interface/PileupJetIdentifier.h"
+#include "CMGTools/External/interface/PileupJetIdentifier.h"
+//#include "DataFormats/JetReco/interface/PileupJetIdentifier.h"
 #include "DataFormats/METReco/interface/GenMET.h"
 #include "DataFormats/METReco/interface/GenMETCollection.h"
 #include "DataFormats/METReco/interface/PFMET.h"
@@ -1084,43 +1084,43 @@ void SUSYTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup) {
     }
   }
   
-///  if(addFullMETInfo_){
-///    vector<pat::MET> rawMET (EdmHelper::getObjs<pat::MET > (ev,  rawMET_));
-/////     math::XYZTLorentzVector rawMET_p4 = MathHelper::nanVector();
-///    if (rawMET.size()>0) {
-///      put("rawMetpx", rawMET[0].px());//Apply changes from JES
-///      put("rawMetpy", rawMET[0].py());//Apply changes from JES
-///      put("rawMet", rawMET[0].pt()); //sqrt(rawmetpx*rawmetpx + rawmetpy*rawmetpy);
-///      put("rawMetphi",rawMET[0].phi());
-///      put("rawMetSignificance",rawMET[0].significance());
-///    }
-///    
-///    vector<pat::MET> type01MET (EdmHelper::getObjs<pat::MET > (ev,  type01MET_));
-/////     math::XYZTLorentzVector type01MET_p4 = MathHelper::nanVector();
-///    if (type01MET.size()>0) {
-///      put("type01Metpx", type01MET[0].px());//Apply changes from JES
-///      put("type01Metpy", type01MET[0].py());//Apply changes from JES
-///      put("type01Met", type01MET[0].pt()); //sqrt(type01metpx*type01metpx + type01metpy*type01metpy);
-///      put("type01Metphi",type01MET[0].phi());
-///    }
-///    
-///    vector<pat::MET> type1phiMET (EdmHelper::getObjs<pat::MET > (ev,  type1phiMET_));
-/////     math::XYZTLorentzVector type1phiMET_p4 = MathHelper::nanVector();
-///    if (type1phiMET.size()>0) {
-///      put("type1phiMetpx", type1phiMET[0].px());//Apply changes from JES
-///      put("type1phiMetpy", type1phiMET[0].py());//Apply changes from JES
-///      put("type1phiMet", type1phiMET[0].pt()); //sqrt(type1phimetpx*type1phimetpx + type1phimetpy*type1phimetpy);
-///      put("type1phiMetphi",type1phiMET[0].phi());
-///    }
-    
-//    vector<pat::MET> type01phiMET (EdmHelper::getObjs<pat::MET > (ev,  type01phiMET_));
-////     math::XYZTLorentzVector type01phiMET_p4 = MathHelper::nanVector();
-//    if (type01phiMET.size()>0) {
-//      put("type01phiMetpx", type01phiMET[0].px());//Apply changes from JES
-//      put("type01phiMetpy", type01phiMET[0].py());//Apply changes from JES
-//      put("type01phiMet", type01phiMET[0].pt()); //sqrt(type01phimetpx*type01phimetpx + type01phimetpy*type01phimetpy);
-//      put("type01phiMetphi",type01phiMET[0].phi());
+//  if(addFullMETInfo_){
+//    vector<pat::MET> rawMET (EdmHelper::getObjs<pat::MET > (ev,  rawMET_));
+////     math::XYZTLorentzVector rawMET_p4 = MathHelper::nanVector();
+//    if (rawMET.size()>0) {
+//      put("rawMetpx", rawMET[0].px());//Apply changes from JES
+//      put("rawMetpy", rawMET[0].py());//Apply changes from JES
+//      put("rawMet", rawMET[0].pt()); //sqrt(rawmetpx*rawmetpx + rawmetpy*rawmetpy);
+//      put("rawMetphi",rawMET[0].phi());
+//      put("rawMetSignificance",rawMET[0].significance());
 //    }
+//    
+//    vector<pat::MET> type01MET (EdmHelper::getObjs<pat::MET > (ev,  type01MET_));
+////     math::XYZTLorentzVector type01MET_p4 = MathHelper::nanVector();
+//    if (type01MET.size()>0) {
+//      put("type01Metpx", type01MET[0].px());//Apply changes from JES
+//      put("type01Metpy", type01MET[0].py());//Apply changes from JES
+//      put("type01Met", type01MET[0].pt()); //sqrt(type01metpx*type01metpx + type01metpy*type01metpy);
+//      put("type01Metphi",type01MET[0].phi());
+//    }
+//    
+//    vector<pat::MET> type1phiMET (EdmHelper::getObjs<pat::MET > (ev,  type1phiMET_));
+////     math::XYZTLorentzVector type1phiMET_p4 = MathHelper::nanVector();
+//    if (type1phiMET.size()>0) {
+//      put("type1phiMetpx", type1phiMET[0].px());//Apply changes from JES
+//      put("type1phiMetpy", type1phiMET[0].py());//Apply changes from JES
+//      put("type1phiMet", type1phiMET[0].pt()); //sqrt(type1phimetpx*type1phimetpx + type1phimetpy*type1phimetpy);
+//      put("type1phiMetphi",type1phiMET[0].phi());
+//    }
+// 
+//   vector<pat::MET> type01phiMET (EdmHelper::getObjs<pat::MET > (ev,  type01phiMET_));
+////     math::XYZTLorentzVector type01phiMET_p4 = MathHelper::nanVector();
+//   if (type01phiMET.size()>0) {
+//     put("type01phiMetpx", type01phiMET[0].px());//Apply changes from JES
+//     put("type01phiMetpy", type01phiMET[0].py());//Apply changes from JES
+//     put("type01phiMet", type01phiMET[0].pt()); //sqrt(type01phimetpx*type01phimetpx + type01phimetpy*type01phimetpy);
+//     put("type01phiMetphi",type01phiMET[0].phi());
+//   }
 //
 //  }
 

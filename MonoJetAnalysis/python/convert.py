@@ -4,7 +4,7 @@ from PhysicsTools.PythonAnalysis import *
 from math import *
 import sys, os, copy
 from datetime import datetime
-from helpers import getVarValue, deltaPhi, minAbsDeltaPhi, invMassOfLightObjects, deltaR, closestMuJetDeltaR
+from helpers import getVarValue, deltaPhi, minAbsDeltaPhi,  deltaR, invMass, findClosestJet
 #chmode = "incNoISRJetID" 
 chmode = "copy" 
 #chmode = "copyCleanedWithAllLeptons" 
@@ -18,7 +18,7 @@ from monoJetFuncs import softIsolatedMT, pmuboost3d
 
 import xsec
 
-subDir = "monoJetTuples_v3"
+subDir = "monoJetTuples_v4"
 
 #allSamples = [wjets, wjetsInc, ttbar, dy, qcd, ww]
 allSamples = [ttbar]
@@ -31,7 +31,7 @@ if len(sys.argv)>=3:
   exec("allSamples = [" + ",".join(sampinp) + "]")
 
 
-small  = True
+small  = False
 overwrite = True
 target_lumi = 19375 #pb-1
 
@@ -41,7 +41,7 @@ outputDir = "/data/"+username+"/"+subDir+"/"
 ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 
-def ptISR(e):
+def getPtISR(e):
     sumtlv = ROOT.TLorentzVector(1.e-9,1.e-9,1.e-9,1.e-9)
     for igp in range(e.ngp):
         if(abs(e.gpPdg[igp])==1000006 and e.gpSta[igp]==3):
@@ -273,7 +273,7 @@ for isample, sample in enumerate(allSamples):
       variables.append(trigger)
       variables.append(trigger.replace("HLT", "pre") )
   else:
-    variables.extend(["nTrueGenVertices", "genmet", "genmetphi", "puWeight", "puWeightSysPlus", "puWeightSysMinus"])
+    variables.extend(["nTrueGenVertices", "genmet", "genmetphi", "puWeight", "puWeightSysPlus", "puWeightSysMinus", "ptISR"])
   
   jetvars = ["jetPt", "jetEta", "jetPhi", "jetPdg", "jetBtag", "jetCutBasedPUJetIDFlag","jetFull53XPUJetIDFlag","jetMET53XPUJetIDFlag", "jetChef", "jetNhef", "jetCeef", "jetNeef", "jetHFhef", "jetHFeef", "jetMuef", "jetElef", "jetPhef", "jetISRJetID"]
   muvars = ["muPt", "muEta", "muPhi", "muPdg", "muRelIso", "muDxy", "muDz", "muNormChi2", "muNValMuonHits", "muNumMatchedStations", "muPixelHits", "muNumtrackerLayerWithMeasurement", 'muIsGlobal', 'muIsTracker']
@@ -286,7 +286,7 @@ for isample, sample in enumerate(allSamples):
   extraVariables += ["isrJetPt", "isrJetEta", "isrJetPhi", "isrJetPdg", "isrJetBtag", "isrJetChef", "isrJetNhef", "isrJetCeef", "isrJetNeef", "isrJetHFhef", "isrJetHFeef", "isrJetMuef", "isrJetElef", "isrJetPhef", "isrJetCutBasedPUJetIDFlag", "isrJetFull53XPUJetIDFlag", "isrJetMET53XPUJetIDFlag", "isrJetBTBVetoPassed"]
 
   extraVariables += ["softIsolatedMuPt", "softIsolatedMuEta", "softIsolatedMuPhi", "softIsolatedMuPdg", "softIsolatedMuRelIso", "softIsolatedMuDxy", "softIsolatedMuDz",  'softIsolatedMuNormChi2', 'softIsolatedMuNValMuonHits', 'softIsolatedMuNumMatchedStations', 'softIsolatedMuPixelHits', 'softIsolatedMuNumtrackerLayerWithMeasurement', 'softIsolatedMuIsTracker', 'softIsolatedMuIsGlobal']
-  extraVariables += ["softIsolatedMT", "ptISR", "closestMuJetDeltaR"]
+  extraVariables += ["softIsolatedMT", "closestMuJetDeltaR"]
   if storeVectors: 
     extraVariables+=[ "softIsolatedpmuboost3d"]
   structString = "struct MyStruct_"+str(nc)+"_"+str(isample)+"{ULong64_t event;"
@@ -461,9 +461,8 @@ for isample, sample in enumerate(allSamples):
           nmuons = getVarValue(c, 'nmuons')   #Number of muons in Muon Vec
           neles  = getVarValue(c, 'neles')    #Number of eles in Ele Vec
           ntaus  = getVarValue(c, 'ntaus')    #Number of eles in Ele Vec
-          s.ptISR = ptISR(c)
-          s.closestMuJetDeltaR = closestMuJetDeltaR(c)
-#            allGoodLeptons = getGoodLeptons(c, nmuons, neles, ntaus)   #get all good leptons
+          if not sample['name'].lower().count('data'):
+            s.ptISR = getPtISR(s)
           allGoodMuons = getAllMuons(c,nmuons)
           allGoodElectrons = getAllElectrons(c, neles)
           allGoodTaus = getAllTaus(c, ntaus)
@@ -543,6 +542,13 @@ for isample, sample in enumerate(allSamples):
             s.softIsolatedMuIsTracker                      = softIsolatedMuons[0]['IsTracker']
           if len(softIsolatedMuons)>=1:
             s.softIsolatedMT                               = sqrt(2.0*s.softIsolatedMuPt*s.type1phiMet*(1-cos(s.softIsolatedMuPhi - s.type1phiMetphi)))
+            if len(idJets30)>0:
+              cjet = findClosestJet(idJets30, {'phi':softIsolatedMuons[0]['phi'], 'eta':softIsolatedMuons[0]['eta']})
+              s.closestMuJetDeltaR = cjet['deltaR']
+              s.closestMuJetMass = invMass(cjet['jet'], {'phi':softIsolatedMuons[0]['phi'], 'pt':softIsolatedMuons[0]['pt'], 'eta':softIsolatedMuons[0]['eta']})
+            s.softIsolatedpmuboost3d = pmuboost3d(idJets30, {'pt':s.type1phiMet, 'phi':s.type1phiMetphi}, {'phi':softIsolatedMuons[0]['phi'], 'pt':softIsolatedMuons[0]['pt'], 'eta':softIsolatedMuons[0]['eta']} )
+             
+
           s.nmu = len(allGoodMuons)
           s.nel = len(allGoodElectrons)
           s.nta = len(allGoodTaus)
@@ -601,12 +607,14 @@ for isample, sample in enumerate(allSamples):
               s.taEta[i] = allGoodTaus[i]['eta']
               s.taPhi[i] = allGoodTaus[i]['phi']
               s.taPdg[i] = allGoodTaus[i]['pdg']
-            if len(softIsolatedMuons)>=1:
-              s.softIsolatedpmuboost3d                       = pmuboost3d(s)
           tmpDir = ROOT.gDirectory.func()
           chain_gDir.cd()
           t.Fill()
           tmpDir.cd()
+#          if s.type1phiMet<150:
+#            print "Warning", s.type1phiMet
+#          else:
+#            print "OK",s.type1phiMet
       del elist
     else:
       print "Zero entries in", bin, sample["name"]

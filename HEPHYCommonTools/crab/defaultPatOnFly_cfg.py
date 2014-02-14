@@ -400,9 +400,9 @@ process.SUSYTupelizer.triggersToMonitor = list(set(process.SUSYTupelizer.trigger
 print "TriggersToMonitor:",process.SUSYTupelizer.triggersToMonitor
 
 process.SUSYTupelizer.triggerCollection = cms.untracked.string( options.hltName )
-
+process.SUSYTupelizer.patMETs = cms.untracked.InputTag("patPFMETsTypeIPhicorrected")
 process.SUSYTupelizer.addFullJetInfo = cms.untracked.bool(True)
-process.SUSYTupelizer.addFullMETInfo = cms.untracked.bool(True)
+#process.SUSYTupelizer.addFullMETInfo = cms.untracked.bool(True)
 process.SUSYTupelizer.useForDefaultAlias = cms.untracked.bool(True)
 process.SUSYTupelizer.addTriggerInfo = cms.untracked.bool(True)
 process.SUSYTupelizer.addFullLeptonInfo = cms.untracked.bool(True)
@@ -415,6 +415,8 @@ process.SUSYTupelizer.addFullMuonInfo = cms.untracked.bool(True)
 process.SUSYTupelizer.addFullEleInfo = cms.untracked.bool(True)
 process.SUSYTupelizer.addFullTauInfo = cms.untracked.bool(True)
 process.SUSYTupelizer.addHEPHYCommonToolsInfo = cms.untracked.bool(options.addRA4Info)
+
+process.SUSYTupelizer.metsToMonitor = ["patPFMETsTypeIPhicorrected", "patPFMETsTypeIcorrected", "patPFMETsTypeIType0PFCandcorrected", "patRAWPFMETs"]
 process.p += process.SUSYTupelizer
 
 #process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")

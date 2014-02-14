@@ -300,7 +300,7 @@ public:
   bool addFullBTagInfo_;
   bool addFullJetInfo_;
   bool addFullLeptonInfo_;
-//  bool addFullMETInfo_;
+  bool addFullMETInfo_;
   bool addFullMuonInfo_;
   bool addFullEleInfo_;
   bool addFullTauInfo_;

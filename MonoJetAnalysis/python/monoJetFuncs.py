@@ -40,18 +40,18 @@ def cosDeltaPhiLepW(chain):
   return ((lPt*cosLepPhi + mpx)*cosLepPhi + (lPt*sinLepPhi + mpy)*sinLepPhi )/pW
 
 
-def pmuboost3d(e):
+def pmuboost3d(jets, met, lep):
     mw = 80.385
     wwwtlv = ROOT.TLorentzVector(1e-9,1e-9,1e-9,1e-9)
     mettlv = ROOT.TLorentzVector(1e-9,1e-9,1e-9,1e-9)
     leptlv = ROOT.TLorentzVector(1e-9,1e-9,1e-9,1e-9)
-    for ij in xrange(e.njetCount):
-        if(e.jetPt[ij] > 30.):
+    for jet in jets:
+#        if(e.jetPt[ij] > 30.):
             tlvaux = ROOT.TLorentzVector(1e-9,1e-9,1e-9,1e-9)
-            tlvaux.SetPtEtaPhiM(e.jetPt[ij],0.,e.jetPhi[ij],0.)
+            tlvaux.SetPtEtaPhiM(jet['pt'],0.,jet['phi'],0.)
             wwwtlv -= tlvaux
-    mettlv.SetPtEtaPhiM(e.type1phiMet,0.,e.type1phiMetphi,0.)
-    leptlv.SetPtEtaPhiM(e.softIsolatedMuPt,e.softIsolatedMuEta,e.softIsolatedMuPhi,0.)
+    mettlv.SetPtEtaPhiM(met['pt'],0.,met['phi'],0.)
+    leptlv.SetPtEtaPhiM(lep['pt'],lep['eta'],lep['phi'], 0.)
 #    leptlv.SetPtEtaPhiM(e.muPt[0],e.muEta[0],e.muPhi[0],0.)
 # calculate eta(W) estimate; take the + solution
     ptl = (wwwtlv - mettlv).Pt()
