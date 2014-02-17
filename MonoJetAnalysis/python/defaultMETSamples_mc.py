@@ -19,6 +19,28 @@ data["Chain"] = "Events"
 data["Counter"] = "bool_EventCounter_passed_PAT.obj"
 allSamples.append(data)
 
+data_singleMu_Run2012AB={}
+data_singleMu_Run2012AB["name"]     = "data_singleMu_Run2012AB";
+data_singleMu_Run2012AB["dirname"] = "/dpm/oeaw.ac.at/home/cms/store/user/schoef/pat_281113"
+data_singleMu_Run2012AB["bins"]    = ["SingleMu-Run2012A-22Jan2013-2", "SingleMu-Run2012B-22Jan2013-2"]
+data_singleMu_Run2012AB["Chain"] = "Events"
+data_singleMu_Run2012AB["Counter"] = "bool_EventCounter_passed_PAT.obj"
+
+
+data_singleMu_Run2012C={}
+data_singleMu_Run2012C["name"]     = "data_singleMu_Run2012C";
+data_singleMu_Run2012C["dirname"] = "/data/mhickel/pat_181213/"
+data_singleMu_Run2012C["bins"]    = ["SingleMu-Run2012C-22Jan2013"]
+data_singleMu_Run2012C["Chain"] = "Events"
+data_singleMu_Run2012C["Counter"] = "bool_EventCounter_passed_PAT.obj"
+
+data_singleMu_Run2012D={}
+data_singleMu_Run2012D["name"]     = "data_singleMu_Run2012D";
+data_singleMu_Run2012D["dirname"] = "/data/mhickel/pat_181213/"
+data_singleMu_Run2012D["bins"]    = ["SingleMu-Run2012D-22Jan2013"]
+data_singleMu_Run2012D["Chain"] = "Events"
+data_singleMu_Run2012D["Counter"] = "bool_EventCounter_passed_PAT.obj"
+
 mc={}
 mc["name"]     = "mc";
 mc["dirname"] = "/dpm/oeaw.ac.at/home/cms/store/user/mhickel/pat_130527"

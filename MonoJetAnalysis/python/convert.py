@@ -5,10 +5,19 @@ from math import *
 import sys, os, copy
 from datetime import datetime
 from helpers import getVarValue, deltaPhi, minAbsDeltaPhi,  deltaR, invMass, findClosestJet
-#chmode = "incNoISRJetID" 
-chmode = "copy" 
-#chmode = "copyCleanedWithAllLeptons" 
 from defaultMETSamples_mc import *
+
+from optparse import OptionParser
+parser = OptionParser()
+parser.add_option("--chmode", dest="chmode", default="copy", type="string", action="store", help="chmode: What to do.")
+parser.add_option("--samples", dest="allsamples", default="copy", type="string", action="store", help="samples:Which samples.")
+parser.add_option("--small", dest="small", action="store_true", help="Just do a small subset.")
+parser.add_option("--fromPercentage", dest="fromPercentage", default="0", type="float", action="store", help="from (% of tot. events)")
+parser.add_option("--toPercentage", dest="toPercentage", default="100", type="float", action="store", help="to (% of tot. events)")
+
+(options, args) = parser.parse_args()
+
+
 
 path = os.path.abspath('../../HEPHYCommonTools/python')
 if not path in sys.path:
@@ -21,17 +30,11 @@ import xsec
 subDir = "monoJetTuples_v4"
 
 #allSamples = [wjets, wjetsInc, ttbar, dy, qcd, ww]
-allSamples = [ttbar]
+#allSamples = [ttbar]
 
-# from first parameter get mode, second parameter is sample type
-if len(sys.argv)>=3:
-  chmode = sys.argv[1]
-  sampinp = sys.argv[2:]
-  #steerable
-  exec("allSamples = [" + ",".join(sampinp) + "]")
+exec("allSamples = [" +options.allsamples+ "]")
 
 
-small  = False
 overwrite = True
 target_lumi = 19375 #pb-1
 
@@ -175,7 +178,7 @@ def getGoodJets(c, crosscleanobjects):
   res  = sorted(res,  key=lambda k: -k['pt'])
   return res 
 
-#if chmode == "incNoISRJetID":
+#if options.chmode == "incNoISRJetID":
 #  def isrJetID(j):
 #    return abs(j['eta']) < 2.4
 #else:
@@ -200,10 +203,12 @@ def findSec(x,lp):
 ##################################################################################
 storeVectors = True
 commoncf = ""
-if chmode[:4]=="copy":
+if options.chmode[:4]=="copy":
   commoncf = "type1phiMet>150"
-if chmode[:7] == "copyInc":
+if options.chmode[:7] == "copyInc":
   commoncf = "(1)"
+if options.chmode[:7] == "copyMu":
+  commoncf = "ngoodMuons==1"
 #  storeVectors = False
 
 for sample in allSamples:
@@ -216,7 +221,6 @@ for sample in allSamples:
     c = ROOT.TChain('Events')
     d = ROOT.TChain('Runs')
     sample['filenames'][bin] = [subdirname+'/h*.root']
-    #if small: Chain only a few files
 
     sample['filenames'][bin] = []
     prefix = ""
@@ -232,7 +236,7 @@ for sample in allSamples:
         filelist.append(file)
       prefix = "root://hephyse.oeaw.ac.at/"#+subdirname
 
-    if small: filelist = filelist[:10]
+    if options.small: filelist = filelist[:10]
   ####
     for tfile in filelist:
   #      if os.path.isfile(subdirname+tfile) and tfile[-5:] == '.root' and tfile.count('histo') == 1:
@@ -256,15 +260,15 @@ for sample in allSamples:
 
 if not os.path.isdir(outputDir):
   os.system('mkdir -p '+outputDir)
-if not os.path.isdir(outputDir+"/"+chmode):
-  os.system("mkdir "+outputDir+"/"+chmode)
+if not os.path.isdir(outputDir+"/"+options.chmode):
+  os.system("mkdir "+outputDir+"/"+options.chmode)
 
 nc = 0
 for isample, sample in enumerate(allSamples):
-  if not os.path.isdir(outputDir+"/"+chmode+"/"+sample["name"]):
-    os.system("mkdir "+outputDir+"/"+chmode+"/"+sample["name"])
+  if not os.path.isdir(outputDir+"/"+options.chmode+"/"+sample["name"]):
+    os.system("mkdir "+outputDir+"/"+options.chmode+"/"+sample["name"])
   else:
-    print "Directory", outputDir+"/"+chmode, "already found"
+    print "Directory", outputDir+"/"+options.chmode, "already found"
 
   variables = ["weight", "run", "lumi", "ngoodVertices", "type1phiMet", "type1phiMetphi"]
   if sample['name'].lower().count('data'):
@@ -317,9 +321,9 @@ for isample, sample in enumerate(allSamples):
   exec("s = MyStruct_"+str(nc)+"_"+str(isample)+"()")
   nc+=1
   postfix=""
-  if small:
+  if options.small:
     postfix="_small"
-  ofile = outputDir+"/"+chmode+"/"+sample["name"]+"/histo_"+sample["name"]+postfix+".root"
+  ofile = outputDir+"/"+options.chmode+"/"+sample["name"]+"/histo_"+sample["name"]+postfix+".root"
   if os.path.isfile(ofile) and overwrite:
     print "Warning! will overwrite",ofile
   if os.path.isfile(ofile) and not overwrite:
@@ -387,11 +391,14 @@ for isample, sample in enumerate(allSamples):
       c.Draw(">>eList", commoncf)
       elist = ROOT.gDirectory.Get("eList")
       number_events = elist.GetN()
+      if options.small:
+        if number_events>1001:
+          number_events=1001
+      start = int(options.fromPercentage/100.*number_events)
+      stop  = int(options.toPercentage/100.*number_events)
       print "Reading: ", sample["name"], bin, "with",number_events,"Events using cut", commoncf
-      if small:
-        if number_events>1000:
-          number_events=1000
-      for i in range(0, number_events):
+      print "Rading percentage ",options.fromPercentage, "to",options.toPercentage, "which is range",start,"to",stop,"of",number_events
+      for i in range(start, stop):
         if (i%10000 == 0) and i>0 :
           print i
   #      # Update all the Tuples
@@ -475,7 +482,7 @@ for isample, sample in enumerate(allSamples):
 #            softMuons = sorted(softMuons, key=lambda k: -k['pt'])
 #            s.nSoftMuons = len(softMuons)
           softIsolatedMuons = filter(lambda m:m['relIso']*m['pt']<10.0, softMuons)
-          if chmode.lower().count('mudzid'):
+          if options.chmode.lower().count('mudzid'):
             softIsolatedMuons = filter(lambda m:m['Dz']<0.2, softIsolatedMuons)
 
           s.nSoftIsolatedMuons = len(softIsolatedMuons)
@@ -486,7 +493,7 @@ for isample, sample in enumerate(allSamples):
           s.nSoftTaus = len(softTaus)
           s.nHardTaus = len(hardTaus)
 
-          if chmode.count("CleanedWithAllLeptons"):
+          if options.chmode.count("CleanedWithAllLeptons"):
             jetResult = getGoodJets(c, allGoodMuons + allGoodElectrons)
           else:
             jetResult = getGoodJets(c, hardMuonsRelIso02 + hardElectrons)
@@ -619,7 +626,7 @@ for isample, sample in enumerate(allSamples):
     else:
       print "Zero entries in", bin, sample["name"]
     del c
-  if True or not small: #FIXME
+  if True or not options.small: #FIXME
     f = ROOT.TFile(ofile, "recreate")
     t.Write()
     f.Close()
