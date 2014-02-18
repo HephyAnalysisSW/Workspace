@@ -99,15 +99,6 @@ def partonName (parton):
   if parton==4:  return 'c'
   return 'other'
 
-def topWeight(topPt):
-  p0 = 1.18246e+00;
-  p1 = 4.63312e+02;
-  p2 = 2.10061e-06;
-
-  if  topPt>p1 : topPt = p1;
-  return  p0 + p2 * topPt * ( topPt - 2 * p1 );
-
-
 nvtxReweightingVar = "nTrueGenVertices"
 if mode=="Ele" or mode=="Mu":
   allSamples = [ttbarPowHeg, wjets, wjetsInc, wjetsCombined, ttbar, dy, stop, qcd, wbbjets, wbbjetsCombined]

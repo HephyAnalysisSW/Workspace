@@ -2,7 +2,7 @@ import ROOT
 from DataFormats.FWLite import Events, Handle
 from PhysicsTools.PythonAnalysis import *
 from math import *
-import sys, os, copy
+import sys, os, copy, random
 from datetime import datetime
 from helpers import getVarValue, deltaPhi, minAbsDeltaPhi,  deltaR, invMass, findClosestJet
 from defaultMETSamples_mc import *
@@ -10,13 +10,46 @@ from defaultMETSamples_mc import *
 from optparse import OptionParser
 parser = OptionParser()
 parser.add_option("--chmode", dest="chmode", default="copy", type="string", action="store", help="chmode: What to do.")
+parser.add_option("--jermode", dest="jermode", default="none", type="string", action="store", help="jermode: up/down/central/none")
+parser.add_option("--jesmode", dest="jesmode", default="none", type="string", action="store", help="jesmode: up/down/none")
 parser.add_option("--samples", dest="allsamples", default="copy", type="string", action="store", help="samples:Which samples.")
 parser.add_option("--small", dest="small", action="store_true", help="Just do a small subset.")
-parser.add_option("--fromPercentage", dest="fromPercentage", default="0", type="float", action="store", help="from (% of tot. events)")
-parser.add_option("--toPercentage", dest="toPercentage", default="100", type="float", action="store", help="to (% of tot. events)")
+parser.add_option("--fromPercentage", dest="fromPercentage", default="0", type="int", action="store", help="from (% of tot. events)")
+parser.add_option("--toPercentage", dest="toPercentage", default="100", type="int", action="store", help="to (% of tot. events)")
 
 (options, args) = parser.parse_args()
 
+def jerEtaBin(eta):
+  feta = fabs(eta)
+  if feta<=.5 : return 0
+  if feta>.5 and feta<=1.1: return 1
+  if feta>1.1 and feta<=1.7: return 2
+  if feta>1.7 and feta<=2.3: return 3
+  if feta>2.3 and feta<=5.0: return 4
+  return -1
+
+def jerDifferenceScaleFactor( eta, jermode = "none"): #https://twiki.cern.ch/twiki/bin/viewauth/CMS/JetResolution
+  if jermode.lower()=="none": return 1.
+  etab = jerEtaBin(eta)
+  if jermode.lower()=="down":
+    if etab== 0: return  1.0  
+    if etab== 1: return  1.001 
+    if etab== 2: return  1.032
+    if etab== 3: return  1.042 
+    if etab== 4: return  1.089 
+  if jermode.lower()=="central":
+    if etab== 0: return 1.052
+    if etab== 1: return 1.057
+    if etab== 2: return 1.096
+    if etab== 3: return 1.134
+    if etab== 4: return 1.288
+  if jermode.lower()=="up":
+    if etab== 0: return 1.115  
+    if etab== 1: return 1.114 
+    if etab== 2: return 1.161 
+    if etab== 3: return 1.228 
+    if etab== 4: return 1.488 
+  return 1.
 
 
 path = os.path.abspath('../../HEPHYCommonTools/python')
@@ -27,7 +60,7 @@ from monoJetFuncs import softIsolatedMT, pmuboost3d
 
 import xsec
 
-subDir = "monoJetTuples_v4"
+subDir = "monoJetTuples_v5"
 
 #allSamples = [wjets, wjetsInc, ttbar, dy, qcd, ww]
 #allSamples = [ttbar]
@@ -54,9 +87,6 @@ def getPtISR(e):
     return sumtlv.Pt()
 
 def goodMuID(c, imu ):  
-  # POG MU Tight
-  #  return getVarValue(c, 'muonsPt', imu)>20. and getVarValue(c, 'muonsisPF', imu) and getVarValue(c, 'muonsisGlobal', imu) and abs(getVarValue(c, 'muonsEta', imu)) < 2.4  and getVarValue(c, 'muonsPFRelIso', imu)<0.20 and getVarValue(c, 'muonsNormChi2', imu)<10. and getVarValue(c, 'muonsNValMuonHits', imu)>0 and getVarValue(c, 'muonsNumMatchedStadions', imu) > 1 and getVarValue(c, 'muonsPixelHits', imu) > 0 and getVarValue(c, 'muonsNumtrackerLayerWithMeasurement', imu) > 5 and getVarValue(c, 'muonsDxy', imu) < 0.2 and getVarValue(c, 'muonsDz', imu) < 0.5 
-  # POG MU Loose
   isPF = getVarValue(c, 'muonsisPF', imu)
   isGlobal = getVarValue(c, 'muonsisGlobal', imu)
   isTracker = getVarValue(c, 'muonsisTracker', imu)
@@ -107,9 +137,6 @@ def getAllMuons(c, nmuons ):
       for v in ['Pdg', 'Dxy', 'NormChi2', 'NValMuonHits', 'NumMatchedStations', 'PixelHits', 'NumtrackerLayerWithMeasurement']:
         cand[v] = getVarValue(c, 'muons'+v, i)
       res.append(cand)
-#      res.append({'pt':getVarValue(c, 'muonsPt', i),'eta':getVarValue(c, 'muonsEta', i), 'phi':getVarValue(c, 'muonsPhi', i),\
-#      'pdg':getVarValue(c, 'muonsPdg', i), 'relIso':getVarValue(c, 'muonsPFRelIso', i),\
-#      'dxy':getVarValue(c, 'muonsDxy', i), 'dz':getVarValue(c, 'muonsDz', i)})
   res = sorted(res, key=lambda k: -k['pt'])
   return res
 
@@ -143,40 +170,65 @@ def splitListOfObjects(var, val, s):
       resHigh.append(x)
   return resLow, resHigh
   
-def getGoodJets(c, crosscleanobjects):
+def getGoodJets(c, crosscleanobjects, jermode=options.jermode, jesmode=options.jesmode):
   njets = getVarValue(c, 'nsoftjets')   # jet.pt() > 10.
   res = []
   bres = []
   ht = 0.
   nbtags = 0
+  met_dx = 0.
+  met_dy = 0.
+  if jesmode.lower()!="none":
+    if jesmode.lower()=='up':
+      sign=+1
+    if jesmode.lower()=='down':
+      sign=-1
+    delta_met_x_unclustered = getVarValue(c, 'deltaMETxUnclustered')
+    delta_met_y_unclustered = getVarValue(c, 'deltaMETyUnclustered')
+    met_dx+=0.1*delta_met_x_unclustered
+    met_dy+=0.1*delta_met_y_unclustered
   for i in range(int(njets)):
     eta = getVarValue(c, 'jetsEta', i)
     pt  = getVarValue(c, 'jetsPt', i)
-    if abs(eta) <= 4.5 and pt >= 30.:
+    if abs(eta) <= 4.5:
+      unc = getVarValue(c, 'jetsUnc', i)
       id =  getVarValue(c, 'jetsID', i)
       phi = getVarValue(c, 'jetsPhi', i)
-      parton = int(abs(getVarValue(c, 'jetsParton', i)))
-      jet = {'pt':pt, 'eta':eta,'phi':phi, 'pdg':parton,\
-      'id':id,
-      'chef':getVarValue(c, 'jetsChargedHadronEnergyFraction', i), 'nhef':getVarValue(c, 'jetsNeutralHadronEnergyFraction', i),\
-      'ceef':getVarValue(c, 'jetsChargedEmEnergyFraction', i), 'neef':getVarValue(c, 'jetsNeutralEmEnergyFraction', i), 'id':id,\
-      'hfhef':getVarValue(c, 'jetsHFHadronEnergyFraction', i), 'hfeef':getVarValue(c, 'jetsHFEMEnergyFraction', i),\
-      'muef':getVarValue(c, 'jetsMuonEnergyFraction', i), 'elef':getVarValue(c, 'jetsElectronEnergyFraction', i), 'phef':getVarValue(c, 'jetsPhotonEnergyFraction', i),\
-      'jetCutBasedPUJetIDFlag':getVarValue(c, 'jetsCutBasedPUJetIDFlag', i),'jetMET53XPUJetIDFlag':getVarValue(c, 'jetsMET53XPUJetIDFlag', i),'jetFull53XPUJetIDFlag':getVarValue(c, 'jetsFull53XPUJetIDFlag', i), 
-      'btag': getVarValue(c, 'jetsBtag', i)
-      }
-      isolated = True
   #      if max([jet['muef'],jet['elef']]) > 0.6 : print jet
-      for obj in crosscleanobjects:   #Jet cross-cleaning
-        if deltaR(jet, obj) < 0.3:# and  obj['relIso']< relIsoCleaningRequ: #(obj['pt']/jet['pt']) > 0.4:  
-          isolated = False
-#          print "Cleaned", 'deltaR', deltaR(jet, obj), 'maxfrac', max([jet['muef'],jet['elef']]), 'pt:jet/obj', jet['pt'], obj['pt'], "relIso",  obj['relIso'], 'btag',getVarValue(c, 'jetsBtag', i), "parton", parton
-  #          print 'Not this one!', jet, obj, deltaR(jet, obj)
-          break
-      jet['isolated'] = isolated
-      res.append(jet)
+      if jermode.lower()!="none":
+        c_jet = jerDifferenceScaleFactor(eta, jermode)
+        sigma = sqrt(c_jet**2 - 1)*unc
+        scale = random.gauss(1,sigma)
+        met_dx+=(1-scale)*cos(phi)*pt
+        met_dy+=(1-scale)*sin(phi)*pt
+        pt*=random.gauss(1,sigma)
+      if jesmode.lower()!="none":
+        scale = 1. + sign*unc
+        met_dx+=(1-scale)*cos(phi)*pt
+        met_dy+=(1-scale)*sin(phi)*pt
+        pt*=scale
+      if pt>30:
+        parton = int(abs(getVarValue(c, 'jetsParton', i)))
+        jet = {'pt':pt, 'eta':eta,'phi':phi, 'pdg':parton,\
+        'id':id,
+        'chef':getVarValue(c, 'jetsChargedHadronEnergyFraction', i), 'nhef':getVarValue(c, 'jetsNeutralHadronEnergyFraction', i),\
+        'ceef':getVarValue(c, 'jetsChargedEmEnergyFraction', i), 'neef':getVarValue(c, 'jetsNeutralEmEnergyFraction', i), 'id':id,\
+        'hfhef':getVarValue(c, 'jetsHFHadronEnergyFraction', i), 'hfeef':getVarValue(c, 'jetsHFEMEnergyFraction', i),\
+        'muef':getVarValue(c, 'jetsMuonEnergyFraction', i), 'elef':getVarValue(c, 'jetsElectronEnergyFraction', i), 'phef':getVarValue(c, 'jetsPhotonEnergyFraction', i),\
+        'jetCutBasedPUJetIDFlag':getVarValue(c, 'jetsCutBasedPUJetIDFlag', i),'jetMET53XPUJetIDFlag':getVarValue(c, 'jetsMET53XPUJetIDFlag', i),'jetFull53XPUJetIDFlag':getVarValue(c, 'jetsFull53XPUJetIDFlag', i), 
+        'btag': getVarValue(c, 'jetsBtag', i), 'unc': unc 
+        }
+        isolated = True
+        for obj in crosscleanobjects:   #Jet cross-cleaning
+          if deltaR(jet, obj) < 0.3:# and  obj['relIso']< relIsoCleaningRequ: #(obj['pt']/jet['pt']) > 0.4:  
+            isolated = False
+  #          print "Cleaned", 'deltaR', deltaR(jet, obj), 'maxfrac', max([jet['muef'],jet['elef']]), 'pt:jet/obj', jet['pt'], obj['pt'], "relIso",  obj['relIso'], 'btag',getVarValue(c, 'jetsBtag', i), "parton", parton
+    #          print 'Not this one!', jet, obj, deltaR(jet, obj)
+            break
+        jet['isolated'] = isolated
+        res.append(jet)
   res  = sorted(res,  key=lambda k: -k['pt'])
-  return res 
+  return {'jets':res,'met_dx':met_dx, 'met_dy':met_dy}
 
 #if options.chmode == "incNoISRJetID":
 #  def isrJetID(j):
@@ -260,15 +312,20 @@ for sample in allSamples:
 
 if not os.path.isdir(outputDir):
   os.system('mkdir -p '+outputDir)
-if not os.path.isdir(outputDir+"/"+options.chmode):
-  os.system("mkdir "+outputDir+"/"+options.chmode)
+outSubDir = options.chmode
+if options.jermode.lower()!='none':
+  outSubDir = outSubDir+"_JER"+options.jermode.lower()
+if options.jesmode.lower()!='none':
+  outSubDir = outSubDir+"_JES"+options.jesmode.lower()
+if not os.path.isdir(outputDir+"/"+outSubDir):
+  os.system("mkdir "+outputDir+"/"+outSubDir)
 
 nc = 0
 for isample, sample in enumerate(allSamples):
-  if not os.path.isdir(outputDir+"/"+options.chmode+"/"+sample["name"]):
-    os.system("mkdir "+outputDir+"/"+options.chmode+"/"+sample["name"])
+  if not os.path.isdir(outputDir+"/"+outSubDir+"/"+sample["name"]):
+    os.system("mkdir "+outputDir+"/"+outSubDir+"/"+sample["name"])
   else:
-    print "Directory", outputDir+"/"+options.chmode, "already found"
+    print "Directory", outputDir+"/"+outSubDir, "already found"
 
   variables = ["weight", "run", "lumi", "ngoodVertices", "type1phiMet", "type1phiMetphi"]
   if sample['name'].lower().count('data'):
@@ -279,7 +336,7 @@ for isample, sample in enumerate(allSamples):
   else:
     variables.extend(["nTrueGenVertices", "genmet", "genmetphi", "puWeight", "puWeightSysPlus", "puWeightSysMinus", "ptISR"])
   
-  jetvars = ["jetPt", "jetEta", "jetPhi", "jetPdg", "jetBtag", "jetCutBasedPUJetIDFlag","jetFull53XPUJetIDFlag","jetMET53XPUJetIDFlag", "jetChef", "jetNhef", "jetCeef", "jetNeef", "jetHFhef", "jetHFeef", "jetMuef", "jetElef", "jetPhef", "jetISRJetID"]
+  jetvars = ["jetPt", "jetEta", "jetPhi", "jetPdg", "jetBtag", "jetCutBasedPUJetIDFlag","jetFull53XPUJetIDFlag","jetMET53XPUJetIDFlag", "jetChef", "jetNhef", "jetCeef", "jetNeef", "jetHFhef", "jetHFeef", "jetMuef", "jetElef", "jetPhef", "jetISRJetID", "jetUnc"]
   muvars = ["muPt", "muEta", "muPhi", "muPdg", "muRelIso", "muDxy", "muDz", "muNormChi2", "muNValMuonHits", "muNumMatchedStations", "muPixelHits", "muNumtrackerLayerWithMeasurement", 'muIsGlobal', 'muIsTracker']
   elvars = ["elPt", "elEta", "elPhi", "elPdg", "elRelIso", "elDxy", "elDz"]
   tavars = ["taPt", "taEta", "taPhi", "taPdg"]
@@ -287,12 +344,14 @@ for isample, sample in enumerate(allSamples):
     mcvars = ["gpPdg", "gpM", "gpPt", "gpEta", "gpPhi", "gpMo1", "gpMo2", "gpDa1", "gpDa2", "gpSta"]
 
   extraVariables=["nbtags", "ht", "nSoftIsolatedMuons", "nHardMuons", "nHardMuonsRelIso02", "nSoftElectrons", "nHardElectrons", "nSoftTaus", "nHardTaus"]
-  extraVariables += ["isrJetPt", "isrJetEta", "isrJetPhi", "isrJetPdg", "isrJetBtag", "isrJetChef", "isrJetNhef", "isrJetCeef", "isrJetNeef", "isrJetHFhef", "isrJetHFeef", "isrJetMuef", "isrJetElef", "isrJetPhef", "isrJetCutBasedPUJetIDFlag", "isrJetFull53XPUJetIDFlag", "isrJetMET53XPUJetIDFlag", "isrJetBTBVetoPassed"]
+  extraVariables += ["isrJetPt", "isrJetEta", "isrJetPhi", "isrJetPdg", "isrJetBtag", "isrJetChef", "isrJetNhef", "isrJetCeef", "isrJetNeef", "isrJetHFhef", "isrJetHFeef", "isrJetMuef", "isrJetElef", "isrJetPhef", "isrJetCutBasedPUJetIDFlag", "isrJetFull53XPUJetIDFlag", "isrJetMET53XPUJetIDFlag", "isrJetBTBVetoPassed", "isrJetUnc"]
 
   extraVariables += ["softIsolatedMuPt", "softIsolatedMuEta", "softIsolatedMuPhi", "softIsolatedMuPdg", "softIsolatedMuRelIso", "softIsolatedMuDxy", "softIsolatedMuDz",  'softIsolatedMuNormChi2', 'softIsolatedMuNValMuonHits', 'softIsolatedMuNumMatchedStations', 'softIsolatedMuPixelHits', 'softIsolatedMuNumtrackerLayerWithMeasurement', 'softIsolatedMuIsTracker', 'softIsolatedMuIsGlobal']
-  extraVariables += ["softIsolatedMT", "closestMuJetDeltaR"]
+  extraVariables += ["softIsolatedMT", "closestMuJetDeltaR", "nHardbtags", "nSoftbtags"]
   if storeVectors: 
     extraVariables+=[ "softIsolatedpmuboost3d"]
+    if sample['name'].lower().count('ttjets'):
+      extraVariables+=["top0Pt", "top1Pt", "topPtWeight"] 
   structString = "struct MyStruct_"+str(nc)+"_"+str(isample)+"{ULong64_t event;"
   for var in variables:
     structString +="Float_t "+var+";"
@@ -323,7 +382,9 @@ for isample, sample in enumerate(allSamples):
   postfix=""
   if options.small:
     postfix="_small"
-  ofile = outputDir+"/"+options.chmode+"/"+sample["name"]+"/histo_"+sample["name"]+postfix+".root"
+  if options.fromPercentage!=0 or options.toPercentage!=100:
+    postfix += "_from"+str(options.fromPercentage)+"To"+str(options.toPercentage)
+  ofile = outputDir+"/"+outSubDir+"/"+sample["name"]+"/histo_"+sample["name"]+postfix+".root"
   if os.path.isfile(ofile) and overwrite:
     print "Warning! will overwrite",ofile
   if os.path.isfile(ofile) and not overwrite:
@@ -397,7 +458,7 @@ for isample, sample in enumerate(allSamples):
       start = int(options.fromPercentage/100.*number_events)
       stop  = int(options.toPercentage/100.*number_events)
       print "Reading: ", sample["name"], bin, "with",number_events,"Events using cut", commoncf
-      print "Rading percentage ",options.fromPercentage, "to",options.toPercentage, "which is range",start,"to",stop,"of",number_events
+      print "Reading percentage ",options.fromPercentage, "to",options.toPercentage, "which is range",start,"to",stop,"of",number_events
       for i in range(start, stop):
         if (i%10000 == 0) and i>0 :
           print i
@@ -412,8 +473,11 @@ for isample, sample in enumerate(allSamples):
             if storeVectors: 
               lgp = []
               lgp2 = []
+              tops = []
               igp = 0
               for gp in gps:
+                if abs(gp.pdgId()) == 6:
+                  tops.append(gp)
                 if gp.status() == 3:
                   lgp.append(gp)
 #                elif (abs(gp.pdgId())==11 or abs(gp.pdgId())==13) and gp.pt() > 3.:
@@ -462,9 +526,13 @@ for isample, sample in enumerate(allSamples):
             if sample.has_key('reweightingHistoFileSysMinus'): 
               s.puWeightSysMinus = s.weight*sample['reweightingHistoFileSysMinus'].GetBinContent(sample['reweightingHistoFileSysMinus'].FindBin(s.nTrueGenVertices))
 
-
           for var in extraVariables:
             exec("s."+var+"=float('nan')")
+
+          if storeVectors and sample['name'].lower().count('ttjets') and len(tops)==2: #https://twiki.cern.ch/twiki/bin/viewauth/CMS/TopPtReweighting
+            s.top0Pt = tops[0].pt()
+            s.top1Pt = tops[1].pt()
+            s.topPtWeight = sqrt(exp( 0.156 - 0.00137*tops[0].pt())*exp( 0.156 - 0.00137*tops[1].pt()))
           nmuons = getVarValue(c, 'nmuons')   #Number of muons in Muon Vec
           neles  = getVarValue(c, 'neles')    #Number of eles in Ele Vec
           ntaus  = getVarValue(c, 'ntaus')    #Number of eles in Ele Vec
@@ -494,9 +562,17 @@ for isample, sample in enumerate(allSamples):
           s.nHardTaus = len(hardTaus)
 
           if options.chmode.count("CleanedWithAllLeptons"):
-            jetResult = getGoodJets(c, allGoodMuons + allGoodElectrons)
+            jResult = getGoodJets(c, allGoodMuons + allGoodElectrons, jermode=options.jermode, jesmode=options.jesmode)
           else:
-            jetResult = getGoodJets(c, hardMuonsRelIso02 + hardElectrons)
+            jResult = getGoodJets(c, hardMuonsRelIso02 + hardElectrons, jermode=options.jermode, jesmode=options.jesmode)
+          jetResult = jResult['jets']
+          met_dx = jResult['met_dx']
+          met_dy = jResult['met_dy']
+          corrMetx = s.type1phiMet*cos(s.type1phiMetphi) + met_dx
+          corrMety = s.type1phiMet*sin(s.type1phiMetphi) + met_dy
+          s.type1phiMet     = sqrt(corrMetx**2+corrMety**2)
+          s.type1phiMetphi  = atan2(corrMety, corrMetx)
+
           idJets30 = filter(lambda j:j['id'] and j['isolated'], jetResult)
           for j in idJets30:
             j['isrJetID'] = isrJetID(j)
@@ -504,6 +580,8 @@ for isample, sample in enumerate(allSamples):
           s.ht = sum([ j['pt'] for j in idJets30])
           s.njet    = len(idJets30)
           s.nbtags  = len(filter(lambda j:j['btag']>0.679, idJets30))
+          s.nHardbtags  = len(filter(lambda j:j['pt']>=60 and j['btag']>0.679, idJets30))
+          s.nSoftbtags  = len(filter(lambda j:j['pt']<60 and j['btag']>0.679, idJets30))
           s.njet60  = len(idJets60)
           s.njet60FailID = len(filter(lambda j:not j['id'] and j['isolated'], jetResult))
           s.njet30FailID = len(filter(lambda j:not j['id'] and j['isolated'] and j['pt']>60, jetResult))
@@ -512,6 +590,7 @@ for isample, sample in enumerate(allSamples):
           if len( jetResult )>=1 and jetResult[0]['pt']>110 and isrJetID(jetResult[0]) and jetResult[0]['id'] and jetResult[0]['isolated']:
             leadingJet = jetResult[0]
             s.isrJetPt = leadingJet['pt']
+            s.isrJetUnc = leadingJet['unc']
             s.isrJetEta = leadingJet['eta']
             s.isrJetPhi = leadingJet['phi']
             s.isrJetPdg = leadingJet['pdg']
@@ -563,6 +642,7 @@ for isample, sample in enumerate(allSamples):
             s.njetCount = min(10,s.njet)
             for i in xrange(s.njetCount):
               s.jetPt[i]    = idJets30[i]['pt']
+              s.jetUnc[i]   = idJets30[i]['unc']
               s.jetEta[i]   = idJets30[i]['eta']
               s.jetPhi[i]   = idJets30[i]['phi']
               s.jetPdg[i]   = idJets30[i]['pdg']

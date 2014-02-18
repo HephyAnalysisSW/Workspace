@@ -173,3 +173,38 @@ def KolmogorovProbability(s0, s1):
   ksDist = float(KolmogorovDistance(s0, s1))
   return ROOT.TMath.KolmogorovProb(ksDist*sqrt(len(s0)*len(s1)/float(len(s0)+len(s1))))
 
+def getISRweight(c, mode="Central"):
+  ptISR = c.GetLeaf('ptISR').GetValue()
+  if mode.lower()=='central':
+    if ptISR<120:return 1.
+    if ptISR<150:return .95
+    if ptISR<250:return .90
+    return 0.80
+  if mode.lower()=='down':
+    if ptISR<120:return 1.
+    if ptISR<150:return .90
+    if ptISR<250:return .80
+    return 0.60
+  if mode.lower()=='up':
+    return 1.0
+
+def getISRweightString(mode="Central", var="ptISR"):
+    if mode.lower()=="down"   : return "(1.*("+var+"<120) + "+".90*( "+var+">120&&"+var+"<150) + "+".80*( "+var+">150&&"+var+"<250) + "+".60*( "+var+">250))"
+    if mode.lower()=="up": return "(1)"
+    return "(1.*("+var+"<120) + "+".95*( "+var+">120&&"+var+"<150) + "+".90*( "+var+">150&&"+var+"<250) + "+".80*( "+var+">250))"
+
+def goodMuID(c, imu ):
+  if isPF and (isGlobal or isTracker) and pt>5. and abs(eta)<2.1 and abs(dz)<0.5:
+    return {'pt':pt, 'phi':getVarValue(c, 'muonsPhi', imu), 'eta':eta, 'IsGlobal':isGlobal, 'IsTracker':isTracker, 'IsPF':isPF, 'relIso':getVarValue(c, 'muonsPFRelIso', imu), 'Dz':dz}
+
+
+def getHardestMuon(c):
+  for imu in reversed(range(int(getVarValue(c, 'nmuCount')))):
+    relIso = getVarValue(c, 'muRelIso', imu)
+    if relIso<0.2:
+      return {'pt':getVarValue(c, 'muPt', imu), 'eta':getVarValue(c, 'muEta', imu), 'phi':getVarValue(c, 'muPhi', imu), 'pdg':getVarValue(c, 'muPdg', imu)}
+def calcMT(lepton, met):
+  if lepton and met:
+    return sqrt(2.*met['pt']*lepton['pt']*(1-cos(lepton['phi'] - met['phi'])))
+  else:
+    return float('nan')

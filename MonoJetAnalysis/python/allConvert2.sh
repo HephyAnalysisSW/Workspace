@@ -1,10 +1,10 @@
 #!/bin/sh
-python convert.py $1 w1jets  &
-python convert.py $1 w2jets  &
-python convert.py $1 w3jets  &
-python convert.py $1 w4jets  &
-python convert.py $1 wjets  &
-python convert.py $1 qcd1  &
-python convert.py $1 qcd2 &
-python convert.py $1 qcd3 &
+python convert.py --samples=w1jets  --chmode=$1 --jesmode=$2 &
+python convert.py --samples=w2jets  --chmode=$1 --jesmode=$2 &
+python convert.py --samples=w3jets  --chmode=$1 --jesmode=$2 &
+python convert.py --samples=w4jets  --chmode=$1 --jesmode=$2 &
+python convert.py --samples=wjets   --chmode=$1 --jesmode=$2 &
+python convert.py --samples=qcd1    --chmode=$1 --jesmode=$2 &
+python convert.py --samples=qcd2    --chmode=$1 --jesmode=$2 &
+python convert.py --samples=qcd3    --chmode=$1 --jesmode=$2 &
 

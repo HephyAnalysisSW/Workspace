@@ -255,3 +255,6 @@ def thrust(c):
 #  objs = getRelevantObjects(c)
 ##  print objs['jets'], objs['met']['phi']
 #  return calcHTRatio(objs['jets'], objs['met']['phi'])
+def resmearedMT(c, sig = 0.1):
+  jets =  getJets(c)
+   

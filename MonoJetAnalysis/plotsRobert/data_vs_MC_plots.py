@@ -11,7 +11,8 @@ for path in [os.path.abspath(p) for p in paths]:
   if not path in sys.path:
     sys.path.insert(1, path)
 
-from helpers import getObjFromFile, passPUJetID, htRatio, closestMuJetMass, closestMuJetDeltaR
+
+from helpers import getObjFromFile, passPUJetID, getISRweight#, findClosestJet, invMass 
 #simplePUreweightHisto = getObjFromFile('/data/schoef/monoJetStuff/simpPUreweighting.root', "ngoodVertices_Data")
 
 from simplePlotsCommon import *
@@ -25,7 +26,8 @@ targetLumi = 19375.
 
 from defaultConvertedTuples import * 
 
-allSamples = [data, dy, ttJets, zJetsInv, wJetsToLNu, singleTop, qcd]
+
+allSamples = [data, dy_and_ww, ttJets, zJetsInv, wJetsToLNu, singleTop, ww, qcd]
 #allSamples = [data, dy,  zJetsInv, wJetsToLNu, singleTop, qcd]
 
 allVars=[]
@@ -37,40 +39,114 @@ minimum=10**(-0.5)
 
 chmode = "copy"
 presel = "refSel"
-ver = "v3"
+ver = "v4"
 #region = "preSel"
 #region = "negCh_pmuboost3d_below_45"
 #region = "negCh_isrJetPt350"
 #region = "highMETlowISRJetPtCR"
 #region = "lowMETlowISRJetPtCR"
-region = "SR"
+#region = "SR23NoMT"
+region = "CR23NoMTPosCharge"
+#region = "CR23NoMTNegCharge"
+#region = "CR23NoMTPosChargeISRJetPt200"
+#region = "CR23NoMTNegChargeISRJetPt200"
+#region = "CR23NoMTPosChargeHighMT"
+#region = "CR23NoMTNegChargeHighMT"
+#region = "CR23NoMTPosChargenbtag1"
+#region = "CR23NoMTNegChargenbtag1"
 preprefix = region+"_"+ver
-if region == "SR":
+if region == "SR1":
   #isrjet>350, met>250, mT<70
-  additionalCut = "type1phiMet>250&&isrJetPt>350&&softIsolatedMT<70&&softIsolatedMuPdg>0"
+  additionalCut = "type1phiMet>300&&isrJetPt>325&&Sum$(jetBtag>0.679&&jetPt>60)==0&&nbtags>0"
   addData = False
   addSignals = True
   normalizeToData = False
   normalizeSignalToMCSum = False
-if region == "lowMEThighISRJetPtCR":
-  additionalCut = "type1phiMet>150&&type1phiMet<=250&&isrJetPt>350&&softIsolatedMT<70&&softIsolatedMuPdg>0"
+if region == "SR2":
+  additionalCut = "type1phiMet>300&&ht>400&&nbtags==0&&softIsolatedMuPdg>0&&abs(softIsolatedMuEta)<1.5&&softIsolatedMT<60."
+  addData = False
+  addSignals = True
+  normalizeToData = False
+  normalizeSignalToMCSum = False
+if region == "SR3":
+  additionalCut = "type1phiMet>300&&ht>400&&nbtags==0&&softIsolatedMuPdg>0&&abs(softIsolatedMuEta)<1.5&&softIsolatedMT>88."
+  addData = False
+  addSignals = True
+  normalizeToData = False
+  normalizeSignalToMCSum = False
+if region == "SR23NoMT":
+  additionalCut = "type1phiMet>300&&ht>400&&nbtags==0&&softIsolatedMuPdg>0&&abs(softIsolatedMuEta)<1.5"
+  addData = False
+  addSignals = True
+  normalizeToData = False
+  normalizeSignalToMCSum = False
+if region == "CR23NoMTNegCharge":
+  additionalCut = "type1phiMet>200&&type1phiMet<300&&nbtags==0&&softIsolatedMuPdg>0&&abs(softIsolatedMuEta)<1.5"
   addData = True
   addSignals = True
   normalizeToData = False
   normalizeSignalToMCSum = False
-if region == "highMETlowISRJetPtCR":
-  additionalCut = "type1phiMet>250&&isrJetPt<=350&&softIsolatedMT<70&&softIsolatedMuPdg>0"
+if region == "CR23NoMTPosCharge":
+  additionalCut = "type1phiMet>200&&type1phiMet<300&&nbtags==0&&softIsolatedMuPdg<0&&abs(softIsolatedMuEta)<1.5"
   addData = True
   addSignals = True
   normalizeToData = False
   normalizeSignalToMCSum = False
-if region == "lowMETlowISRJetPtCR":
-  additionalCut = "type1phiMet<=250&&isrJetPt<=350&&softIsolatedMT<70&&softIsolatedMuPdg>0"
+if region == "CR23NoMTNegChargenbtag1":
+  additionalCut = "type1phiMet>200&&type1phiMet<300&&nbtags>=1&&softIsolatedMuPdg>0&&abs(softIsolatedMuEta)<1.5"
   addData = True
   addSignals = True
   normalizeToData = False
   normalizeSignalToMCSum = False
-if region == "preSel":
+if region == "CR23NoMTPosChargenbtag1":
+  additionalCut = "type1phiMet>200&&type1phiMet<300&&nbtags>=1&&softIsolatedMuPdg<0&&abs(softIsolatedMuEta)<1.5"
+  addData = True
+  addSignals = True
+  normalizeToData = False
+  normalizeSignalToMCSum = False
+if region == "CR23NoMTNegChargeHighMT":
+  additionalCut = "type1phiMet>200&&type1phiMet<300&&nbtags==0&&softIsolatedMuPdg>0&&abs(softIsolatedMuEta)<1.5&&softIsolatedMT>90"
+  addData = True
+  addSignals = True
+  normalizeToData = False
+  normalizeSignalToMCSum = False
+if region == "CR23NoMTPosChargeHighMT":
+  additionalCut = "type1phiMet>200&&type1phiMet<300&&nbtags==0&&softIsolatedMuPdg<0&&abs(softIsolatedMuEta)<1.5&&softIsolatedMT>90"
+  addData = True
+  addSignals = True
+  normalizeToData = False
+  normalizeSignalToMCSum = False
+if region == "CR23NoMTNegChargeISRJetPt200":
+  additionalCut = "type1phiMet>200&&type1phiMet<300&&nbtags==0&&softIsolatedMuPdg>0&&abs(softIsolatedMuEta)<1.5&&isrJetPt>200"
+  addData = True
+  addSignals = True
+  normalizeToData = False
+  normalizeSignalToMCSum = False
+if region == "CR23NoMTPosChargeISRJetPt200":
+  additionalCut = "type1phiMet>200&&type1phiMet<300&&nbtags==0&&softIsolatedMuPdg<0&&abs(softIsolatedMuEta)<1.5&&isrJetPt>200"
+  addData = True
+  addSignals = True
+  normalizeToData = False
+  normalizeSignalToMCSum = False
+#if region == "lowMEThighISRJetPtCR":
+#  additionalCut = "type1phiMet>150&&type1phiMet<=250&&isrJetPt>350&&softIsolatedMT<70&&softIsolatedMuPdg>0"
+#  addData = True
+#  addSignals = True
+#  normalizeToData = False
+#  normalizeSignalToMCSum = False
+#if region == "highMETlowISRJetPtCR":
+#  additionalCut = "type1phiMet>250&&isrJetPt<=350&&softIsolatedMT<70&&softIsolatedMuPdg>0"
+#  addData = True
+#  addSignals = True
+#  normalizeToData = False
+#  normalizeSignalToMCSum = False
+#if region == "lowMETlowISRJetPtCR":
+#  additionalCut = "type1phiMet<=250&&isrJetPt<=350&&softIsolatedMT<70&&softIsolatedMuPdg>0"
+#  addData = True
+#  addSignals = True
+#  normalizeToData = False
+#  normalizeSignalToMCSum = False
+if region == "presel":
   #isrjet>350, met>250, mT<70
   additionalCut = "(1)"
   addData = True
@@ -102,14 +178,15 @@ doAnalysisVars            = True
 doAllDiscriminatingVars   = False 
 doSoftIsolatedVars        = False 
 doISRJetVars              = False 
-doOtherVars               = False 
+doOtherVars               = True 
 
 chainstring = "Events"
 commoncf = "(0)"
 prefix="empty_"
 if presel == "refSel":
-#  commoncf="isrJetPt>110&&isrJetBTBVetoPassed&&softIsolatedMuPt>5&&nHardElectrons+nHardMuonsRelIso02==0&&njet60<=2&&softIsolatedMuDz<0.2"
-  commoncf="isrJetPt>110&&isrJetBTBVetoPassed&&softIsolatedMuPt>5&&nHardElectrons+nHardMuonsRelIso02==0&&njet60<=2&&abs(softIsolatedMuEta)<1.5&&type1phiMet>150"
+  commoncf="isrJetPt>110&&type1phiMet>200&&isrJetBTBVetoPassed&&softIsolatedMuPt>5&&nHardElectrons+nHardMuonsRelIso02+nHardTaus==0&&njet60<=2"
+if presel == "refSelNoTau":
+  commoncf="isrJetPt>110&&type1phiMet>200&&isrJetBTBVetoPassed&&softIsolatedMuPt>5&&nHardElectrons+nHardMuonsRelIso02==0&&njet60<=2"
 if presel == "inc":
   commoncf="(1)"
 if presel == "incMu":
@@ -141,6 +218,8 @@ if addSignals:
 for sample in allSamples:
   sample["Chain"] = chainstring
   sample["dirname"] = "/data/schoef/monoJetTuples_"+ver+"/"+chmode+"/"
+for sample in allSamples[1:]:
+  sample["weight"] = "puWeight"
 
 def getStack(varstring, binning, cutstring, signals, varfunc = "", addData=True,onlyW=False, additionalCutFunc = ""):
   DATA          = variable(varstring, binning, cutstring,additionalCutFunc=additionalCutFunc)
@@ -157,8 +236,10 @@ def getStack(varstring, binning, cutstring, signals, varfunc = "", addData=True,
   MC_STOP.sample               = singleTop
   MC_ZJETSINV                  = variable(varstring, binning, cutstring, additionalCutFunc=additionalCutFunc) 
   MC_ZJETSINV.sample           = zJetsInv
-  MC_ZJETS                     = variable(varstring, binning, cutstring, additionalCutFunc=additionalCutFunc) 
-  MC_ZJETS.sample              = dy
+  MC_Z_AND_WW                  = variable(varstring, binning, cutstring, additionalCutFunc=additionalCutFunc) 
+  MC_Z_AND_WW.sample           = dy_and_ww
+  MC_WW                        = variable(varstring, binning, cutstring, additionalCutFunc=additionalCutFunc) 
+  MC_WW.sample                 = ww
   MC_QCD                       = variable(varstring, binning, cutstring, additionalCutFunc=additionalCutFunc)
   MC_QCD.sample                = qcd
 
@@ -176,19 +257,25 @@ def getStack(varstring, binning, cutstring, signals, varfunc = "", addData=True,
   MC_STOP.color                = ROOT.kOrange + 4
   MC_ZJETSINV.legendText         = "Z to Inv."
   MC_ZJETSINV.style              = "f0"
-  MC_ZJETSINV.add                = [MC_ZJETS]
+  MC_ZJETSINV.add                = [MC_Z_AND_WW]
   MC_ZJETSINV.color              = ROOT.kCyan - 8
-  MC_ZJETS.legendText          = "DY + Jets"
-  MC_ZJETS.style               = "f0"
-#  MC_ZJETS.add                 = []
-  MC_ZJETS.add                 = [MC_QCD]
-  MC_ZJETS.color               = ROOT.kGreen + 3
+  MC_Z_AND_WW.legendText          = "DY, WW + Jets"
+  MC_Z_AND_WW.style               = "f0"
+#  MC_Z_AND_WW.add                 = []
+  MC_Z_AND_WW.add                 = [MC_QCD]
+  MC_Z_AND_WW.color               = ROOT.kGreen + 3
+#  MC_WW.legendText          = "WW"
+#  MC_WW.style               = "f0"
+##  MC_WW.add                 = []
+#  MC_WW.add                 = [MC_QCD]
+#  MC_WW.color               = ROOT.kViolet + 8
+
   MC_QCD.color                 = myBlue
   MC_QCD.legendText            = "QCD"
   MC_QCD.style                 = "f0"
   MC_QCD.add                   = []
 
-  res = [MC_WJETS, MC_TTJETS, MC_STOP,MC_ZJETSINV, MC_ZJETS, MC_QCD]
+  res = [MC_WJETS, MC_TTJETS, MC_STOP,MC_ZJETSINV, MC_Z_AND_WW,  MC_QCD]
   if onlyW:
     MC_WJETS.add=[]
     res = [MC_WJETS]
@@ -205,6 +292,7 @@ def getStack(varstring, binning, cutstring, signals, varfunc = "", addData=True,
     MC_SIGNAL.style              = "l02"
     MC_SIGNAL.color              = signal['color'] 
     MC_SIGNAL.add = []
+    MC_SIGNAL.reweightVar = lambda c:getISRweight(c, mode='Central')
     res.append(MC_SIGNAL)
     if normalizeSignalToMCSum:
       MC_SIGNAL.normalizeTo = res[0]
@@ -223,21 +311,28 @@ def getStack(varstring, binning, cutstring, signals, varfunc = "", addData=True,
   return res
 
 if doAnalysisVars:
-  pmuboost3d_stack  = getStack(":pmuboost3d;pmuboost3d (GeV);Number of Events / 10 GeV",[21,0,210], commoncf, signals, pmuboost3d, addData = addData)
-  pmuboost3d_stack[0].addOverFlowBin = "upper"
-  allStacks.append(pmuboost3d_stack)
+#  pmuboost3d_stack  = getStack(":pmuboost3d;pmuboost3d (GeV);Number of Events / 10 GeV",[21,0,210], commoncf, signals, pmuboost3d, addData = addData)
+#  pmuboost3d_stack[0].addOverFlowBin = "upper"
+#  allStacks.append(pmuboost3d_stack)
+  isrJetEta_stack = getStack(":isrJetEta;#eta of ISR jet;Number of Events",[20,-5,5], commoncf, signals, addData = addData)
+  isrJetEta_stack[0].addOverFlowBin = "upper"
+  allStacks.append(isrJetEta_stack)
 
-  mT_stack  = getStack(":mT;m_{T} (GeV);Number of Events / 10 GeV",[21,0,210], commoncf, signals, softIsolatedMT, addData = addData)
+  softIsolatedMuPt_stack = getStack(":softIsolatedMuPt;p_{T} of soft isolated muon;Number of Events / 1 GeV",[25,0,25], commoncf, signals, addData = addData)
+  softIsolatedMuPt_stack[0].addOverFlowBin = "upper"
+  allStacks.append(softIsolatedMuPt_stack)
+
+  mT_stack  = getStack(":softIsolatedMT;m_{T} (GeV);Number of Events / 10 GeV",[21,0,210], commoncf, signals, addData = addData)
   mT_stack[0].addOverFlowBin = "upper"
   allStacks.append(mT_stack)
-
-  htRatio_stack = getStack(":xxx;H_{T}^{ratio};Number of Events",[40,0,1.0], commoncf, signals, addData = addData, varfunc = lambda c: htRatio(c))
-  htRatio_stack[0].addOverFlowBin = "upper"
-  allStacks.append(htRatio_stack)
 
   met_stack = getStack(":type1phiMet;#slash{E}_{T} (GeV);Number of Events / 50 GeV",[18,150,1050], commoncf, signals, addData = addData)
   met_stack[0].addOverFlowBin = "upper"
   allStacks.append(met_stack)
+
+  metNoMETCut_stack = getStack(":type1phiMet;#slash{E}_{T} (GeV);Number of Events / 50 GeV",[18,150,1050], commoncf.replace('&&type1phiMet>200','').replace('&&type1phiMet<300','').replace('&&type1phiMet>300',''), signals, addData = addData)
+  metNoMETCut_stack[0].addOverFlowBin = "upper"
+  allStacks.append(metNoMETCut_stack)
 
   njet_stack = getStack(":njet;n_{jet};Number of Events",[10,0,10], commoncf, signals, addData = addData)
   njet_stack[0].addOverFlowBin = "upper"
@@ -279,17 +374,17 @@ if doAllDiscriminatingVars:
   htThrustMetSide_stack[0].addOverFlowBin = "upper"
   allStacks.append(htThrustMetSide_stack)
 
-  closestMuJetMass_stack = getStack(":xxx;closestMuJetMass;Number of Events",[50,0,500], commoncf, signals, addData = addData, varfunc = closestMuJetMass)
-  closestMuJetMass_stack[0].addOverFlowBin = "upper"
-  allStacks.append(closestMuJetMass_stack)
-
-  closestMuJetDeltaR_stack = getStack(":xxx;closestMuJetDeltaR;Number of Events",[50,0,7], commoncf, signals, addData = addData, varfunc = closestMuJetDeltaR)
-  closestMuJetDeltaR_stack[0].addOverFlowBin = "upper"
-  allStacks.append(closestMuJetDeltaR_stack)
-
-  closestMuJetDeltaR_zoomed_stack = getStack(":xxx;closestMuJetDeltaR;Number of Events",[50,0,1], commoncf, signals, addData = addData, varfunc = closestMuJetDeltaR)
-  closestMuJetDeltaR_zoomed_stack[0].addOverFlowBin = "upper"
-  allStacks.append(closestMuJetDeltaR_zoomed_stack)
+#  closestMuJetMass_stack = getStack(":xxx;closestMuJetMass;Number of Events",[50,0,500], commoncf, signals, addData = addData, varfunc = closestMuJetMass)
+#  closestMuJetMass_stack[0].addOverFlowBin = "upper"
+#  allStacks.append(closestMuJetMass_stack)
+#
+#  closestMuJetDeltaR_stack = getStack(":xxx;closestMuJetDeltaR;Number of Events",[50,0,7], commoncf, signals, addData = addData, varfunc = closestMuJetDeltaR)
+#  closestMuJetDeltaR_stack[0].addOverFlowBin = "upper"
+#  allStacks.append(closestMuJetDeltaR_stack)
+#
+#  closestMuJetDeltaR_zoomed_stack = getStack(":xxx;closestMuJetDeltaR;Number of Events",[50,0,1], commoncf, signals, addData = addData, varfunc = closestMuJetDeltaR)
+#  closestMuJetDeltaR_zoomed_stack[0].addOverFlowBin = "upper"
+#  allStacks.append(closestMuJetDeltaR_zoomed_stack)
 
   cosPhiMetJet_stack = getStack(":xxx;cos(#phi(#slash{E}_{T}, ISR-jet));Number of Events",[20,-1,1], commoncf, signals, addData = addData, varfunc = lambda c: cos(getVarValue(c, 'isrJetPhi') - getVarValue(c, 'softIsolatedMuPhi')))
   cosPhiMetJet_stack[0].addOverFlowBin = "both"
@@ -344,9 +439,6 @@ if doAllDiscriminatingVars:
 
 
 if doSoftIsolatedVars:
-  softIsolatedMuPt_stack = getStack(":softIsolatedMuPt;p_{T} of soft isolated muon;Number of Events / 1 GeV",[25,0,25], commoncf, signals, addData = addData)
-  softIsolatedMuPt_stack[0].addOverFlowBin = "upper"
-  allStacks.append(softIsolatedMuPt_stack)
 
   softIsolatedMuPhi_stack = getStack(":softIsolatedMuPhi;#phi of soft isolated muon;Number of Events",[20,-4,4], commoncf, signals, addData = addData)
   softIsolatedMuPhi_stack[0].addOverFlowBin = "both"
@@ -422,10 +514,6 @@ if doSoftIsolatedVars:
 
 
 if doISRJetVars:
-
-  isrJetEta_stack = getStack(":isrJetEta;#eta of ISR jet;Number of Events",[20,-5,5], commoncf, signals, addData = addData)
-  isrJetEta_stack[0].addOverFlowBin = "upper"
-  allStacks.append(isrJetEta_stack)
 
   isrJetPhi_stack = getStack(":isrJetPhi;#phi of ISR jet;Number of Events",[20,-pi,pi], commoncf, signals, addData = addData)
   isrJetPhi_stack[0].addOverFlowBin = "upper"
@@ -581,11 +669,14 @@ for stack in allStacks:
   stack[0].lines = [[0.2, 0.9, "#font[22]{CMS Collaboration}"], [0.2,0.85,str(int(round(targetLumi/10.))/100.)+" fb^{-1},  #sqrt{s} = 8 TeV"]]
 
 if doAnalysisVars:
-  drawNMStacks(1,1,[pmuboost3d_stack],      subdir+prefix+"pmuboost3d", False)
+  drawNMStacks(1,1,[isrJetEta_stack],             subdir+prefix+"isrJetEta", False)
+#  drawNMStacks(1,1,[pmuboost3d_stack],      subdir+prefix+"pmuboost3d", False)
   drawNMStacks(1,1,[mT_stack],              subdir+prefix+"mT", False)
-  htRatio_stack[0].maximum = 6*10**3 *htRatio_stack[0].data_histo.GetMaximum()
-  drawNMStacks(1,1,[htRatio_stack],             subdir+prefix+"htRatio", False)
+  drawNMStacks(1,1,[softIsolatedMuPt_stack],            subdir+prefix+"softIsolatedMuPt", False)
+  mT_stack[0].logY = False
+  drawNMStacks(1,1,[mT_stack],              subdir+prefix+"mT_lin", False)
   drawNMStacks(1,1,[met_stack],             subdir+prefix+"met", False)
+  drawNMStacks(1,1,[metNoMETCut_stack], subdir+prefix+"metNoMETCut", False)
   drawNMStacks(1,1,[njet_stack],             subdir+prefix+"njet", False)
   drawNMStacks(1,1,[njet60_stack],             subdir+prefix+"njet60", False)
   drawNMStacks(1,1,[nbtags_stack],             subdir+prefix+"nbtags", False)
@@ -598,9 +689,9 @@ if doAnalysisVars:
 if doAllDiscriminatingVars:
   htThrustMetSide_stack[0].maximum = 6*10**5 *htThrustMetSide_stack[0].data_histo.GetMaximum()
   drawNMStacks(1,1,[htThrustMetSide_stack],             subdir+prefix+"htThrustMetSide", False)
-  drawNMStacks(1,1,[closestMuJetMass_stack] ,             subdir+prefix+"closestMuJetMass_stack", False)
-  drawNMStacks(1,1,[closestMuJetDeltaR_stack] ,        subdir+prefix+"closestMuJetDeltaR_stack", False)
-  drawNMStacks(1,1,[closestMuJetDeltaR_zoomed_stack] ,        subdir+prefix+"closestMuJetDeltaR_zoomed_stack", False)
+#  drawNMStacks(1,1,[closestMuJetMass_stack] ,             subdir+prefix+"closestMuJetMass_stack", False)
+#  drawNMStacks(1,1,[closestMuJetDeltaR_stack] ,        subdir+prefix+"closestMuJetDeltaR_stack", False)
+#  drawNMStacks(1,1,[closestMuJetDeltaR_zoomed_stack] ,        subdir+prefix+"closestMuJetDeltaR_zoomed_stack", False)
   FWMT2_stack[0].maximum = 6*10**4 *FWMT2_stack[0].data_histo.GetMaximum()
   FWMT3_stack[0].maximum = 6*10**3 *FWMT3_stack[0].data_histo.GetMaximum()
   FWMT4_stack[0].maximum = 6*10**4 *FWMT4_stack[0].data_histo.GetMaximum()
@@ -617,7 +708,6 @@ if doAllDiscriminatingVars:
   drawNMStacks(1,1,[thrust_stack],             subdir+prefix+"thrust", False)
   drawNMStacks(1,1,[htThrustLepSide_stack],             subdir+prefix+"htThrustLepSide", False)
 if doSoftIsolatedVars:
-  drawNMStacks(1,1,[softIsolatedMuPt_stack],            subdir+prefix+"softIsolatedMuPt", False)
   drawNMStacks(1,1,[softIsolatedMuPhi_stack],            subdir+prefix+"softIsolatedMuPhi", False)
   drawNMStacks(1,1,[softIsolatedMuRelIso_stack],            subdir+prefix+"softIsolatedMuRelIso", False)
   drawNMStacks(1,1,[softIsolatedMuAbsIso_stack],            subdir+prefix+"softIsolatedMuAbsIso", False)
@@ -645,7 +735,6 @@ if doSoftIsolatedVars:
   drawNMStacks(1,1,[cosDeltaPhiLepW_stack],             subdir+prefix+"cosDeltaPhiLepW", False)
   drawNMStacks(1,1,[cosDeltaPhiLepMET_stack],             subdir+prefix+"cosDeltaPhiLepMET", False)
 if doISRJetVars:
-  drawNMStacks(1,1,[isrJetEta_stack],             subdir+prefix+"isrJetEta", False)
   drawNMStacks(1,1,[isrJetPhi_stack],             subdir+prefix+"isrJetPhi", False)
   drawNMStacks(1,1,[isrJetBtag_stack],            subdir+prefix+"isrJetBtag", False)
   drawNMStacks(1,1,[isrJetChef_stack],            subdir+prefix+"isrJetChef", False)

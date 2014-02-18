@@ -1,9 +1,9 @@
 #!/bin/sh
-python convert.py $1 data  &
-python convert.py $1 ttbar  &
-python convert.py $1 ww  &
-python convert.py $1 singleTop  &
-python convert.py $1 wjetsInc  &
-python convert.py $1 dy  &
-python convert.py $1 zinv  &
+python convert.py --samples=data      --chmode=$1 --jesmode=$2&
+python convert.py --samples=ttbar     --chmode=$1 --jesmode=$2&
+python convert.py --samples=ww        --chmode=$1 --jesmode=$2&
+python convert.py --samples=singleTop --chmode=$1 --jesmode=$2&
+python convert.py --samples=wjetsInc  --chmode=$1 --jesmode=$2&
+python convert.py --samples=dy        --chmode=$1 --jesmode=$2&
+python convert.py --samples=zinv      --chmode=$1 --jesmode=$2&
 

@@ -836,7 +836,7 @@ def fillMVAHisto(sample, setup, reader, method, cut, histo, weight=None, weightF
 
 
 def getYieldFromChain(c, cut, weight = "weight"):
-  cut = weight+"*("+cut+")"
+  cut = "("+weight+")*("+cut+")"
   c.Draw("1>>htmp(1,0,2)", cut, "goff")
   htmp =  ROOT.gDirectory.Get("htmp")
   res = htmp.Integral()
