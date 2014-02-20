@@ -18,13 +18,16 @@ class Sample:
         self.file = None
         self.fileindex = None
 
+    def fullname(self,name):
+        return self.base+"/"+name+"/histo_"+name+".root"
+
     def getchain(self,ind=0):
         assert ind>=0 and ind<len(self.names)
         if self.fileindex==None or self.fileindex!=ind:
             if self.file!=None:
                 self.file.Close()
             n = self.names[ind]
-            self.file = ROOT.TFile(self.base+"/"+n+"/histo_"+n+".root")
+            self.file = ROOT.TFile(self.fullname(n))
         result = self.file.Get("Events")
         return result
 

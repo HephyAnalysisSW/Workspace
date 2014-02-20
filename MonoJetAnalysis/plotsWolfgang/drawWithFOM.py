@@ -3,52 +3,23 @@ from math import *
 
 class DrawWithFOM:
 
-    def __init__(self):
+    def __init__(self,fom):
         self.systematics = 0.05
-        
-    def ssqrtb(self,h1,h2,scut,syst=0.):
-        hr = h1.Clone(h1.GetName()+"R")
-        hr.Reset()
-        if(scut=="u"): 
-            i1,i2,i3,ioff = 1,h1.GetNbinsX(),1,1
-        elif(scut=="l"): 
-            i1,i2,i3,ioff = h1.GetNbinsX()-1,0,-1,0
-        s, b = 0, 0
-        es, eb = 0, 0
-        if h2.InheritsFrom(ROOT.THStack.Class()):
-            hsum = h2.GetStack().Last().Clone()
+        if fom!=None:
+            self.fom = fom.lower()
         else:
-            hsum = h2.Clone()
-        lastFOM = None
-        show = h1.GetName().find("njet60")>-1
-        for i in range(i1,i2,i3):
-            s += h1.GetBinContent(i)
-            es += h1.GetBinError(i)**2
-            b += hsum.GetBinContent(i)
-            eb += hsum.GetBinError(i)**2
-            if b>1.e-9:
-                if syst<1.e-9:
-                    hr.SetBinContent(i+ioff,s/sqrt(b))
-                else:
-                    hr.SetBinContent(i+ioff,s/sqrt(b+pow(syst*b,2)))
-                lastFOM =  hr.GetBinContent(i+ioff)
-#                hr.SetBinContent(i+ioff,s/b)
-#                hr.SetBinError(i+ioff,sqrt(es**2+(eb*s/b)**2)/b)
-        print "***",hr.GetName()," total SSQRTB = ",lastFOM
-        print h1.GetSumOfWeights(),hsum.GetSumOfWeights()
-        return hr
-
-    def sb(self,h1,h2,scut,syst=0.):
+            self.fom = fom
+        
+    def getFom(self,h1,h2,scut,syst=0.):
         hr = h1.Clone(h1.GetName()+"R")
         hr.Reset()
-        if(scut=="u"): 
+        if scut=="u": 
             i1,i2,i3,ioff = 1,h1.GetNbinsX(),1,1
-        elif(scut=="l"): 
+        elif scut=="l": 
             i1,i2,i3,ioff = h1.GetNbinsX()-1,0,-1,0
-        elif(scut=="b"): 
+        elif scut=="b": 
             i1,i2,i3,ioff = 1,h1.GetNbinsX(),1,0
-        s, b = 0, 0
-        es, eb = 0, 0
+        s, b, es, eb = [ 0 ]*4
         if h2.InheritsFrom(ROOT.THStack.Class()):
             hsum = h2.GetStack().Last().Clone()
         else:
@@ -57,22 +28,45 @@ class DrawWithFOM:
         show = h1.GetName().find("njet60")>-1
         for i in range(i1,i2,i3):
             if scut=="b":
-                s = 0
-                es = 0
-                b = 0
-                eb = 0
+                s, b, es, eb = [ 0 ]*4
             s += h1.GetBinContent(i)
             es += h1.GetBinError(i)**2
             b += hsum.GetBinContent(i)
             eb += hsum.GetBinError(i)**2
+            fom = None
             if b>1.e-9:
-                hr.SetBinContent(i+ioff,s/b)
-                lastFOM =  hr.GetBinContent(i+ioff)
+                if self.fom=="sob":
+                    fom = s/b
+                elif self.fom=="sosqrtb":
+                    if syst<1.e-9:
+                        fom = s/sqrt(b)
+                    else:
+                        fom = s/sqrt(b+pow(syst*b,2))
+            if fom!=None:
+                hr.SetBinContent(i+ioff,fom)
+                lastFOM = fom
 #                hr.SetBinContent(i+ioff,s/b)
 #                hr.SetBinError(i+ioff,sqrt(es**2+(eb*s/b)**2)/b)
-        print "***",hr.GetName()," total SoB = ",lastFOM
-        print h1.GetSumOfWeights(),hsum.GetSumOfWeights()
+
+        btot, ebtot = 0, 0
+        stot, estot = 0, 0
+        for i in range(h1.GetNbinsX()+2):
+            btot += hsum.GetBinContent(i)
+            ebtot += hsum.GetBinError(i)**2
+            stot += h1.GetBinContent(i)
+            estot += h1.GetBinError(i)**2
+        ebtot = sqrt(ebtot)
+        estot = sqrt(estot)
+        line = "*** "+hr.GetName().ljust(20)
+#        line += " s,b {0:7.2f} {1:7.2f}".format(h1.GetSumOfWeights(),hsum.GetSumOfWeights())
+        line += " s {0:7.2f} +- {1:5.2f}".format(stot,estot)
+        line += " b {0:7.2f} +- {1:5.2f}".format(btot,ebtot)
+        if lastFOM!=None:
+            line += " total "+self.fom+" = {0:7.3f}".format(lastFOM)
+        print line
+#        print h1.GetSumOfWeights(),hsum.GetSumOfWeights()
         return hr
+
 
     def drawStack(self, samples, histograms, pad=None):
 
@@ -94,20 +88,20 @@ class DrawWithFOM:
                 h.SetLineWidth(3)
             if s.isBackground():
                 if bkgs==None:
-                    print "Defining background ",s.name,h.GetName()
+#                    print "Defining background ",s.name,h.GetName()
                     bkgs = ROOT.THStack()
                     bkgs.SetNameTitle(h.GetName(),h.GetTitle())
                 opt = "hist "
                 if s.fill:
                     opt += "F"
-                print s.name,h.GetName(),opt
+#                print s.name,h.GetName(),opt
                 bkgs.Add(h,opt)
-                print "Adding to background ",s.name,h.GetName(),opt
-                if s.name.startswith("W"):
-                    print s.name," contents ",h.GetSumOfWeights()
+#                print "Adding to background ",s.name,h.GetName(),opt
+#                if s.name.startswith("W"):
+#                    print s.name," contents ",h.GetSumOfWeights()
             elif s.isSignal():
                 sigs.append(h)
-                print "Adding to signal ",s.name,h.GetName()
+#                print "Adding to signal ",s.name,h.GetName()
             if s.fill:
                 opt = "F"
             else:
@@ -124,27 +118,16 @@ class DrawWithFOM:
         legend.SetBit(ROOT.kCanDelete)
 #        ROOT.gPad.SetLogy(1)
 
+        pad.Update()
+
         return ( bkgs, sigs , legend )
 
-    def drawSoSqrtB(self, bkgs, sigs, scut='l', pad=None):
+    def drawFom(self, bkgs, sigs, scut='l', pad=None):
+
+        if self.fom==None:
+            return
 
         assert bkgs!=None
-
-#        cnv = ROOT.TCanvas(bkgs.GetName(),bkgs.GetName(),700,700)
-
-#        p1 = ROOT.TPad("p1","", 0, 0.28, 1, 0.95)
-#        p1.SetTopMargin(1e-7)
-#        p1.Draw()
-#        p2 = ROOT.TPad("p2","", 0, 0, 1, 0.3)
-#        p2.SetTopMargin(1e-7)
-#        p2.Draw()
-
-#        p1.cd()
-#        bkgs.Draw()
-#        bkgs.GetYaxis().SetTitle("Events / bin")
-#        for s in sigs:
-#            s.Draw("same hist")
-#        p1.SetLogy(1)
 
         if pad!=None:
             pad.cd()
@@ -153,61 +136,16 @@ class DrawWithFOM:
         hrs = [ ]
         hrmax = 0.
         for s in sigs:
-            hr = self.ssqrtb(s,bkgs,scut,0.05)
-            hrs.append(hr)
+            hr = self.getFom(s,bkgs,scut,self.systematics)
+#            hrs.append(hr)
             if hr.GetMaximum()>hrmax:
                 hrmax = hr.GetMaximum()
             if opt=="":
                 hr.GetYaxis().SetTitle("S/B")
                 hr.GetYaxis().SetTitleSize(0.08)
-            hr.DrawCopy(opt+"hist")
+            hrs.append(hr.DrawCopy(opt+"hist"))
             opt = "same "
         if len(hrs)>0:
             hrs[0].SetMaximum(hrmax/0.85)
 
-#        cnv.cd()
-#        cnv.Update()
-#        return cnv
-
-    def drawSoB(self, bkgs, sigs, scut='l', pad=None):
-
-        assert bkgs!=None
-
-#        cnv = ROOT.TCanvas(bkgs.GetName(),bkgs.GetName(),700,700)
-
-#        p1 = ROOT.TPad("p1","", 0, 0.28, 1, 0.95)
-#        p1.SetTopMargin(1e-7)
-#        p1.Draw()
-#        p2 = ROOT.TPad("p2","", 0, 0, 1, 0.3)
-#        p2.SetTopMargin(1e-7)
-#        p2.Draw()
-
-#        p1.cd()
-#        bkgs.Draw()
-#        bkgs.GetYaxis().SetTitle("Events / bin")
-#        for s in sigs:
-#            s.Draw("same hist")
-#        p1.SetLogy(1)
-
-        if pad!=None:
-            pad.cd()
-
-        opt = ""
-        hrs = [ ]
-        hrmax = 0.
-        for s in sigs:
-            hr = self.sb(s,bkgs,scut)
-            hrs.append(hr)
-            if hr.GetMaximum()>hrmax:
-                hrmax = hr.GetMaximum()
-            if opt=="":
-                hr.GetYaxis().SetTitle("S/B")
-                hr.GetYaxis().SetTitleSize(0.08)
-            hr.DrawCopy(opt+"hist")
-            opt = "same "
-        if len(hrs)>0:
-            hrs[0].SetMaximum(hrmax/0.85)
-
-#        cnv.cd()
-#        cnv.Update()
-#        return cnv
+        pad.Update()

@@ -50,6 +50,9 @@ class PlotsBase:
     def __init__(self,name,preselection=None,elist=None,elistBase="./elists"):
         self.name = name
         self.preselection = preselection
+        self.elist = elist
+        if elist!=None:
+            self.elist = elist.lower()[0]
         self.elistBase = elistBase
         assert os.path.isdir(elistBase)
         self.timers = [ ]
@@ -57,11 +60,11 @@ class PlotsBase:
             self.timers.append(MyTimer())
         self.writeElist = False
         self.readElist = False
-        if self.preselection!=None and elist!=None:
+        if self.preselection!=None and self.elist!=None:
             self.preselName = self.preselection.__class__.__name__
-            if elist.lower().startswith("w"):
+            if self.elist=="w" or self.elist=="a":
                 self.writeElist = True
-            elif elist.lower().startswith("r"):
+            elif self.elist=="r" or self.elist=="a":
                 self.readElist = True
         if self.writeElist or self.readElist:
             self.preselDirName = os.path.join(self.elistBase,self.preselName)
@@ -80,7 +83,21 @@ class PlotsBase:
         elistFile = None
         if self.readElist or self.writeElist:
             elistFileName = os.path.join(self.preselDirName,subSampleName+"_elist.root")
-            opt = "create" if self.writeElist else "read"
+            if self.elist=="a":
+                self.writeElist = False
+                self.readElist = False
+                if not os.path.exists(elistFileName):
+                    self.writeElist = True
+                else:
+                    elistTime = os.path.getmtime(elistFileName)
+                    if elistTime<=os.path.getmtime(self.preselection.sourcefile):
+                        self.writeElist = True
+                    if elistTime<=os.path.getmtime(sample.fullname(subSampleName)):
+                        self.writeElist = True
+                    self.readElist = not self.writeElist
+                if self.writeElist:
+                    print "(Re)creating elist for ",sample.name,subSampleName
+            opt = "recreate" if self.writeElist else "read"
             elistFile = ROOT.TFile(elistFileName,opt)
             objarr = ROOT.TObjArray()
             if self.writeElist:
@@ -111,8 +128,8 @@ class PlotsBase:
     def fillall(self,sample):
         for itree in range(len(sample.names)):
             tree = sample.getchain(itree)
-            print sample.name,itree
-            print tree.GetEntries()
+#            print sample.name,itree
+#            print tree.GetEntries()
             nentries = tree.GetEntries()
             downscale = sample.downscale
             iterator = self.createGenerator(tree.GetEntries(),sample.downscale)
@@ -136,7 +153,7 @@ class PlotsBase:
                     if self.writeElist:
                         elist.Enter(iev)
                     nsel += 1
-            print "Ntot for ",sample.name,sample.names[itree]," = ",nall,nsel
+#            print "Ntot for ",sample.name,sample.names[itree]," = ",nall,nsel
 #        for ev in tree:
 #            self.fill(ev)
             self.timers[6].stop()

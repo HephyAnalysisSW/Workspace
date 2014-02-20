@@ -1,5 +1,5 @@
 import ROOT
-import os,sys
+import os,sys,string
 from Sample import *
 from drawWithFOM import *
 #from drawSoB import *
@@ -7,12 +7,15 @@ from optparse import OptionParser
 
 parser = OptionParser()
 parser.add_option("--preselection", "-p", dest="preselection",  help="preselection", default=None)
-parser.add_option("--elist", "-e", dest="elist",  help="event list mode", choices=[ "w", "r" ], default=None )
+parser.add_option("--elist", "-e", dest="elist",  help="event list mode", choices=[ "w", "r", "a" ], default=None )
+parser.add_option("--fom", dest="fom",  help="fom to be used", choices=[ "sob", "sosqrtb", "None" ], default="sosqrtb" )
 parser.add_option("--elistBase", dest="elistBase",  help="base directory for event lists", default="./elists")
-parser.add_option("-s", dest="save",  help="save plots", action="store_true", default=False)
+parser.add_option("-s", dest="save",  help="directory for saved plots", default=None)
 parser.add_option("-b", dest="batch",  help="batch mode", action="store_true", default=False)
 (options, args) = parser.parse_args()
 assert len(args)>0
+if options.fom=="None":
+    options.fom = None
 
 plotGlobals = {}
 execfile(args[0],plotGlobals)
@@ -26,6 +29,7 @@ if options.preselection!=None:
     preselClassName = os.path.splitext(os.path.basename(options.preselection))[0]
     preselClass = preselGlobals[preselClassName]
     presel = preselClass()
+    setattr(presel,"sourcefile",options.preselection)
 
 sampleBase = "/home/adamwo/data/monoJetTuples_v4/copy/"
 
@@ -38,6 +42,7 @@ samples.append(Sample("DY",sampleBase,type="B",color=3,fill=True))
 samples.append(Sample("singleTop",sampleBase,type="B",color=4,fill=True))
 samples.append(Sample("TTJets",sampleBase,type="B",color=2,fill=True))
 #samples.append(Sample("WJetsToLNu",sampleBase,type="B",color=5,fill=True))
+#samples.append(Sample("WJetsHT250",sampleBase,type="B",color=5,fill=True))
 samples.append(Sample("WNJetsToLNu",sampleBase,type="B",color=5,fill=True,downscale=2, \
                           namelist=[ "W1JetsToLNu", "W2JetsToLNu", "W3JetsToLNu", "W4JetsToLNu"  ]))
 #samples.append(Sample("stop200lsp170g100FastSim",sampleBase,type="S",color=2,fill=False))
@@ -68,6 +73,7 @@ ROOT.gStyle.SetOptStat(0)
 ROOT.gStyle.SetOptTitle(0)
 
 canvases = [ ]
+pads = [ ]
 allstacks = [ ]
 for varname in variables:
     variable, histograms = variables[varname]
@@ -84,7 +90,10 @@ for varname in variables:
     p2.SetTopMargin(1e-7)
     p2.Draw()
 
-    drawClass = DrawWithFOM()
+    pads.append(p1)
+    pads.append(p2)
+
+    drawClass = DrawWithFOM(fom=options.fom)
 
     bkgs, sigs, legend = drawClass.drawStack(samples,histograms,p1)
     if variable.uselog:
@@ -95,17 +104,20 @@ for varname in variables:
         allstacks.append(bkgs)
     if len(sigs)>0:
         allstacks.extend(sigs)
-    if bkgs!=None and variable.scut!=None:
+    if bkgs!=None and variable.scut!=None and options.fom!=None:
 #        drawClass.drawSoB(bkgs,sigs,variable.scut,pad=p2)
-        drawClass.drawSoSqrtB(bkgs,sigs,variable.scut,pad=p2)
+        drawClass.drawFom(bkgs,sigs,variable.scut,pad=p2)
     cnv.Update()
-#    if bkgs!=None:
-#        cnv = drawClass.drawSoSqrtB(bkgs,sigs,'l',pad=p2)
-#        canvases.append(cnv)
 
 if not options.batch:
     raw_input("Press enter")
 if options.save:
+    savedir = "".join(s for s in options.save if s in string.letters+string.digits+"_-")
+    savedir = "plots_"+savedir+"/"
+    if not os.path.isdir(savedir):
+        os.mkdir(savedir)
+    else:
+        os.system("rm "+savedir+"*.png")
     for c in canvases:
-        c.SaveAs(c.GetName()+".png")
+        c.SaveAs(savedir+c.GetName()+".png")
 print "continuing"
