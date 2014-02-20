@@ -42,7 +42,11 @@ class Preselection:
         if abs(eh.get("softIsolatedMuEta"))>self.softIsolatedMuEtaMax:
             return False
 
-        if eh.get("nHardElectrons")+eh.get("nHardMuonsRelIso02")>0:
+        if eh.get("nHardElectrons")>0:
+            return False
+        if eh.get("nHardMuonsRelIso02")>0:
+            return False
+        if eh.get("nHardTaus")>0:
             return False
 
         if eh.get("njet60")>self.njet60Max:
