@@ -68,7 +68,7 @@ class DrawWithFOM:
         return hr
 
 
-    def drawStack(self, samples, histograms, pad=None):
+    def drawStack1D(self, samples, histograms, pad=None):
 
         if pad!=None:
             pad.cd()
@@ -118,7 +118,69 @@ class DrawWithFOM:
         legend.SetBit(ROOT.kCanDelete)
 #        ROOT.gPad.SetLogy(1)
 
-        pad.Update()
+        if pad!=None:
+            pad.Update()
+
+        return ( bkgs, sigs , legend )
+
+    def drawStack2D(self, samples, histograms, pad=None):
+
+        if pad!=None:
+            pad.cd()
+
+        bkgs = None
+        sigs = [ ]
+        legend = ROOT.TLegend(0.60,0.75,0.90,0.89)
+        legend.SetBorderSize(0)
+        legend.SetFillColor(10)
+#        legend.SetFillStyle(0)
+        for i,s in enumerate(samples):
+            h = histograms[i]
+            if s.fill:
+                h.SetFillStyle(1001)
+                h.SetFillColor(s.color)
+            else:
+                h.SetLineColor(s.color)
+                h.SetLineWidth(3)
+            if s.isBackground():
+                if bkgs==None:
+#                    print "Defining background ",s.name,h.GetName()
+                    bkgs = h.Clone()
+                    print "Cloning bkg histo from ",s.name,h.GetName()
+                    legend.AddEntry(bkgs,"Backgrounds","")
+                else:
+                    bkgs.Add(h)
+                    print "Adding bkg histo for ",s.name,h.GetName()
+#                legend.SetHeader("Backgrounds")
+            elif s.isSignal():
+                h.SetLineColor(s.color)
+                h.SetLineWidth(1)
+                sigs.append(h)
+                legend.AddEntry(h,s.name,"L")
+                print "Sig histo from ",s.name,h.GetName()
+#                print "Adding to signal ",s.name,h.GetName()
+#            if s.fill:
+#                opt = "F"
+#            else:
+#                opt = "L"
+
+        bkgmax = bkgs.GetMaximum()
+        bkgs.SetMaximum(bkgmax/0.85)
+        bkgs.SetMinimum(0.1)
+        print "bkgmax = ",bkgmax
+        bkgs.Draw("zcol")
+#        bkgs.GetYaxis().SetTitle("Events / bin")
+        for s in sigs:
+#            s.SetMaximum(bkgmax/0.85)
+#            s.SetMinimum(0.1)
+            s.SetContour(3)
+            s.Draw("cont3 same")
+        legend.Draw()
+        legend.SetBit(ROOT.kCanDelete)
+#        ROOT.gPad.SetLogy(1)
+
+        if pad!=None:
+            pad.Update()
 
         return ( bkgs, sigs , legend )
 

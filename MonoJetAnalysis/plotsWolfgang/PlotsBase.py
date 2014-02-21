@@ -2,7 +2,7 @@ import ROOT
 import time
 import os
 from EventHelper import EventHelper
-from Variable import Variable
+from Variable import *
 
 class MyTimer:
     def __init__(self):
@@ -37,15 +37,29 @@ class PlotsBase:
     def getVariables(self):
         return PlotsBase.variables
 
+    def getVariables1D(self):
+        return [ v for v in PlotsBase.variables if not v.is2D() ]
+
+    def getVariables2D(self):
+        return [ v for v in PlotsBase.variables if v.is2D() ]
+
     def addVariable(self,name,nbins,xmin,xmax,scut='l',uselog=True):
         assert name.isalnum()
         assert not name in self.histogramList
         if not name in PlotsBase.variables:
             PlotsBase.variables[name] = Variable(name,nbins,xmin,xmax,scut,uselog)
-        h1d = PlotsBase.variables[name].createTH1()
+        h1d = PlotsBase.variables[name].createHistogram()
         self.histogramList[name] = h1d
         setattr(self,"h"+name,h1d)
 
+    def addVariablePair(self,xname,nbinsx,xmin,xmax,yname,nbinsy,ymin,ymax,uselog=True):
+        varPair = VariablePair(xname,nbinsx,xmin,xmax,yname,nbinsy,ymin,ymax,uselog)
+        assert not varPair.name in self.histogramList
+        if not varPair.name in PlotsBase.variables:
+            PlotsBase.variables[varPair.name] = varPair
+        h2d = varPair.createHistogram()
+        self.histogramList[varPair.name] = h2d
+        setattr(self,"h"+varPair.name,h2d)
 
     def __init__(self,name,preselection=None,elist=None,elistBase="./elists"):
         self.name = name

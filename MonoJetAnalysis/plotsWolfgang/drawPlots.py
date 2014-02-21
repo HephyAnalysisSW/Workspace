@@ -75,6 +75,7 @@ ROOT.gStyle.SetOptTitle(0)
 canvases = [ ]
 pads = [ ]
 allstacks = [ ]
+definedPalette = False
 for varname in variables:
     variable, histograms = variables[varname]
 
@@ -83,28 +84,41 @@ for varname in variables:
     cnv = ROOT.TCanvas("cnv","cnv",700,700)
     canvases.append(cnv)
 
-    p1 = ROOT.TPad("p1","", 0, 0.28, 1, 0.95)
-    p1.SetTopMargin(1e-7)
-    p1.Draw()
-    p2 = ROOT.TPad("p2","", 0, 0, 1, 0.3)
-    p2.SetTopMargin(1e-7)
-    p2.Draw()
-
-    pads.append(p1)
-    pads.append(p2)
-
     drawClass = DrawWithFOM(fom=options.fom)
 
-    bkgs, sigs, legend = drawClass.drawStack(samples,histograms,p1)
-    if variable.uselog:
-        p1.SetLogy(1)
+    if variable.is2D():
+        cnv.SetRightMargin(0.15)
+        if not definedPalette:
+            ROOT.gROOT.ProcessLine(".L ../../HEPHYCommonTools/scripts/root/useNiceColorPalette.C")
+            ROOT.useNiceColorPalette()
+            definedPalette = True
+        bkgs, sigs, legend = drawClass.drawStack2D(samples,histograms)
+        if variable.uselog:
+            cnv.SetLogz(1)
+
+    else:
+        p1 = ROOT.TPad("p1","", 0, 0.28, 1, 0.95)
+        p1.SetTopMargin(1e-7)
+        p1.Draw()
+        p2 = ROOT.TPad("p2","", 0, 0, 1, 0.3)
+        p2.SetTopMargin(1e-7)
+        p2.Draw()
+
+        pads.append(p1)
+        pads.append(p2)
+
+
+        bkgs, sigs, legend = drawClass.drawStack1D(samples,histograms,p1)
+        if variable.uselog:
+            p1.SetLogy(1)
+
     cnv.SetName(bkgs.GetName())
     cnv.SetTitle(bkgs.GetName())
     if bkgs!=None:
         allstacks.append(bkgs)
     if len(sigs)>0:
         allstacks.extend(sigs)
-    if bkgs!=None and variable.scut!=None and options.fom!=None:
+    if not variable.is2D() and bkgs!=None and variable.scut!=None and options.fom!=None:
 #        drawClass.drawSoB(bkgs,sigs,variable.scut,pad=p2)
         drawClass.drawFom(bkgs,sigs,variable.scut,pad=p2)
     cnv.Update()
