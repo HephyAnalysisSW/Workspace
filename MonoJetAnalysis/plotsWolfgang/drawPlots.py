@@ -12,10 +12,12 @@ parser.add_option("--fom", dest="fom",  help="fom to be used", choices=[ "sob", 
 parser.add_option("--elistBase", dest="elistBase",  help="base directory for event lists", default="./elists")
 parser.add_option("-s", dest="save",  help="directory for saved plots", default=None)
 parser.add_option("-b", dest="batch",  help="batch mode", action="store_true", default=False)
+parser.add_option("--rebin", dest="rebin",  help="rebin factor", type=int, default=1)
 (options, args) = parser.parse_args()
 assert len(args)>0
 if options.fom=="None":
     options.fom = None
+assert options.rebin>0
 
 plotGlobals = {}
 execfile(args[0],plotGlobals)
@@ -42,9 +44,13 @@ samples.append(Sample("DY",sampleBase,type="B",color=3,fill=True))
 samples.append(Sample("singleTop",sampleBase,type="B",color=4,fill=True))
 samples.append(Sample("TTJets",sampleBase,type="B",color=2,fill=True))
 #samples.append(Sample("WJetsToLNu",sampleBase,type="B",color=5,fill=True))
-#samples.append(Sample("WJetsHT250",sampleBase,type="B",color=5,fill=True))
-samples.append(Sample("WNJetsToLNu",sampleBase,type="B",color=5,fill=True,downscale=2, \
-                          namelist=[ "W1JetsToLNu", "W2JetsToLNu", "W3JetsToLNu", "W4JetsToLNu"  ]))
+samples.append(Sample("WJetsHT250",sampleBase,type="B",color=5,fill=True))
+#samples.append(Sample("WNJetsToLNu",sampleBase,type="B",color=5,fill=True,downscale=2, \
+#                          namelist=[ "W1JetsToLNu", "W2JetsToLNu", "W3JetsToLNu", "W4JetsToLNu"  ]))
+#samples.append(Sample("W1JetsToLNu",sampleBase,type="B",color=2,fill=True,hatch=3245))
+#samples.append(Sample("W2JetsToLNu",sampleBase,type="B",color=3,fill=True,hatch=3254))
+#samples.append(Sample("W3JetsToLNu",sampleBase,type="B",color=4,fill=True,hatch=3245))
+#samples.append(Sample("W4JetsToLNu",sampleBase,type="B",color=5,fill=True,hatch=3254))
 #samples.append(Sample("stop200lsp170g100FastSim",sampleBase,type="S",color=2,fill=False))
 #samples.append(Sample("stop300lsp270g175FastSim",sampleBase,type="S",color=3,fill=False))
 #samples.append(Sample("stop300lsp270g200FastSim",sampleBase,type="S",color=4,fill=False))
@@ -56,7 +62,7 @@ ROOT.TH1.SetDefaultSumw2()
 allplots = [ ]
 variables = { }
 for s in samples:
-    plots = plotClass(s.name,presel,elist=options.elist,elistBase=options.elistBase)
+    plots = plotClass(s.name,presel,elist=options.elist,elistBase=options.elistBase,rebin=options.rebin)
     allplots.append(plots)
     plots.fillall(s)
     if len(variables)==0:

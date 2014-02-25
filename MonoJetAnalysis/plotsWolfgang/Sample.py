@@ -3,7 +3,7 @@ import os
 
 class Sample:
 
-    def __init__(self,name,base,namelist=None,title=None,type="B",color=1,fill=False,downscale=1):
+    def __init__(self,name,base,namelist=None,title=None,type="B",color=1,fill=False,hatch=None,downscale=1):
         self.name = name
         if namelist==None or namelist==[ ]:
             self.names = [ name ]
@@ -14,6 +14,7 @@ class Sample:
         self.type = type
         self.color = color
         self.fill = fill
+        self.hatch = hatch
         self.downscale = downscale
         self.file = None
         self.fileindex = None

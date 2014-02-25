@@ -26,8 +26,8 @@ class StdPlots(PlotsBase):
         self.histogramList.append(h1d)
         setattr(self,"h"+name,h1d)
         
-    def __init__(self,name,preselection=None,elist=None,elistBase="./elists"):
-        PlotsBase.__init__(self,name,preselection,elist=elist,elistBase=elistBase)
+    def __init__(self,name,preselection=None,elist=None,elistBase="./elists",rebin=None):
+        PlotsBase.__init__(self,name,preselection,elist=elist,elistBase=elistBase,rebin=rebin)
         self.histogramList = { }
         curdir = ROOT.gDirectory
         if not ROOT.gROOT.Get(name):

@@ -47,13 +47,13 @@ class PlotsBase:
         assert name.isalnum()
         assert not name in self.histogramList
         if not name in PlotsBase.variables:
-            PlotsBase.variables[name] = Variable(name,nbins,xmin,xmax,scut,uselog)
+            PlotsBase.variables[name] = Variable(name,nbins/self.rebin,xmin,xmax,scut,uselog)
         h1d = PlotsBase.variables[name].createHistogram()
         self.histogramList[name] = h1d
         setattr(self,"h"+name,h1d)
 
     def addVariablePair(self,xname,nbinsx,xmin,xmax,yname,nbinsy,ymin,ymax,uselog=True):
-        varPair = VariablePair(xname,nbinsx,xmin,xmax,yname,nbinsy,ymin,ymax,uselog)
+        varPair = VariablePair(xname,nbinsx/self.rebin,xmin,xmax,yname,nbinsy/self.rebin,ymin,ymax,uselog)
         assert not varPair.name in self.histogramList
         if not varPair.name in PlotsBase.variables:
             PlotsBase.variables[varPair.name] = varPair
@@ -61,7 +61,7 @@ class PlotsBase:
         self.histogramList[varPair.name] = h2d
         setattr(self,"h"+varPair.name,h2d)
 
-    def __init__(self,name,preselection=None,elist=None,elistBase="./elists"):
+    def __init__(self,name,preselection=None,elist=None,elistBase="./elists",rebin=1):
         self.name = name
         self.preselection = preselection
         self.elist = elist
@@ -84,6 +84,7 @@ class PlotsBase:
             self.preselDirName = os.path.join(self.elistBase,self.preselName)
             if not os.path.isdir(self.preselDirName):
                 os.mkdir(self.preselDirName,0744)
+        self.rebin = rebin
          
     def showTimers(self):
         line = ""

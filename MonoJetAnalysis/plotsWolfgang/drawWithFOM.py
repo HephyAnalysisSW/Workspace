@@ -10,6 +10,14 @@ class DrawWithFOM:
         else:
             self.fom = fom
         
+    def getIntegralWithError(self,h):
+        sum = 0.
+        esum = 0.
+        for i in range(h.GetNbinsX()+1):
+            sum += h.GetBinContent(i)
+            esum += h.GetBinError(i)**2
+        return ( sum, sqrt(esum) )
+        
     def getFom(self,h1,h2,scut,syst=0.):
         hr = h1.Clone(h1.GetName()+"R")
         hr.Reset()
@@ -83,9 +91,14 @@ class DrawWithFOM:
             if s.fill:
                 h.SetFillStyle(1001)
                 h.SetFillColor(s.color)
+                if s.hatch:
+                    h.SetFillStyle(s.hatch)
             else:
                 h.SetLineColor(s.color)
-                h.SetLineWidth(3)
+                if s.hatch:
+                    h.SetFillStyle(s.hatch)
+                else:
+                    h.SetLineWidth(3)
             if s.isBackground():
                 if bkgs==None:
 #                    print "Defining background ",s.name,h.GetName()
@@ -96,6 +109,8 @@ class DrawWithFOM:
                     opt += "F"
 #                print s.name,h.GetName(),opt
                 bkgs.Add(h,opt)
+                integ, einteg = self.getIntegralWithError(h)
+                print "   ",h.GetName().ljust(10),s.name.ljust(20),"{0:8.2f} +- {1:7.2f}".format(integ,einteg)
 #                print "Adding to background ",s.name,h.GetName(),opt
 #                if s.name.startswith("W"):
 #                    print s.name," contents ",h.GetSumOfWeights()
