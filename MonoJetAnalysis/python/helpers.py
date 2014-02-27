@@ -201,7 +201,8 @@ def goodMuID(c, imu ):
 def getHardestMuon(c):
   for imu in reversed(range(int(getVarValue(c, 'nmuCount')))):
     relIso = getVarValue(c, 'muRelIso', imu)
-    if relIso<0.2:
+    pt = getVarValue(c, 'muPt', imu)
+    if (pt<20. and pt*relIso<10) or (pt>20. and relIso<0.2):
       return {'pt':getVarValue(c, 'muPt', imu), 'eta':getVarValue(c, 'muEta', imu), 'phi':getVarValue(c, 'muPhi', imu), 'pdg':getVarValue(c, 'muPdg', imu)}
 def calcMT(lepton, met):
   if lepton and met:

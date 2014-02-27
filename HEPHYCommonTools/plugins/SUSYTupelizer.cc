@@ -49,7 +49,6 @@ namespace {
     return 0;
   }
  
- 
   int prod(std::pair<int,int> p) {
   return p.first*p.second;
   }
@@ -892,7 +891,15 @@ void SUSYTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup) {
     put("jetsHFEMEnergyFraction", jetsHFEMEnergyFraction);
   }
   delete jecUnc;
-  put  ("nsoftjets", jetspt.size());
+  put("nsoftjets", jetspt.size());
+  put("deltaMETx", delta_met_x);
+  put("deltaMETy", delta_met_y);
+  put("deltaHT", deltaHT);
+  put("deltaMETxUnclustered", delta_met_x_unclustered);
+  put("deltaMETyUnclustered", delta_met_y_unclustered);
+  put("deltaHTUnclustered", deltaHT_unclustered);
+  put("njetsJESUp", njetsJESUp);
+  put("njetsJESDown", njetsJESDown);
   if (addRA4AnalysisInfo_) {
     put ("hasNoBadJet", hasNoBadJet);
     put  ("ngoodUncleanedJets", ngoodUncleandJets); 
@@ -902,14 +909,6 @@ void SUSYTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup) {
       put("numBPartons", numBPartons);
       put("numCPartons", numCPartons);
     }
-    put("deltaMETx", delta_met_x);
-    put("deltaMETy", delta_met_y);
-    put("deltaHT", deltaHT);
-    put("deltaMETxUnclustered", delta_met_x_unclustered);
-    put("deltaMETyUnclustered", delta_met_y_unclustered);
-    put("deltaHTUnclustered", deltaHT_unclustered);
-    put("njetsJESUp", njetsJESUp);
-    put("njetsJESDown", njetsJESDown);
     sort(good_Jets.begin(), good_Jets.end(), MathHelper::greaterPt<pat::Jet> );
     //number of jets above 50 GeV
     put  ("njets"  , good_Jets.size());
@@ -2131,19 +2130,20 @@ void SUSYTupelizer::addAllVars( )
   addVar("eleRho/F");
   addVar("nsoftjets/I"); // NAN);
 
+  addVar("deltaMETx/F");
+  addVar("deltaMETy/F");
+  addVar("deltaHT/F"); 
+  addVar("deltaMETxUnclustered/F");
+  addVar("deltaMETyUnclustered/F");
+  addVar("deltaHTUnclustered/F"); 
+  addVar("njetsJESUp/I");
+  addVar("njetsJESDown/I");
+
   if (addRA4AnalysisInfo_) {
     addVar("ngoodMuons/I"); // -1);
     addVar("nvetoMuons/I"); // -1);
     addVar("ngoodElectrons/I"); // -1);
     addVar("nvetoElectrons/I"); // -1);
-    addVar("deltaMETx/F");
-    addVar("deltaMETy/F");
-    addVar("deltaHT/F"); 
-    addVar("deltaMETxUnclustered/F");
-    addVar("deltaMETyUnclustered/F");
-    addVar("deltaHTUnclustered/F"); 
-    addVar("njetsJESUp/I");
-    addVar("njetsJESDown/I");
 
     addVar("hasNoBadJet/O"); // NAN);
     addVar("ngoodUncleanedJets/I");
