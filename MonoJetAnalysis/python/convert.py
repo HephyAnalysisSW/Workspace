@@ -14,10 +14,12 @@ parser.add_option("--jermode", dest="jermode", default="none", type="string", ac
 parser.add_option("--jesmode", dest="jesmode", default="none", type="string", action="store", help="jesmode: up/down/none")
 parser.add_option("--samples", dest="allsamples", default="copy", type="string", action="store", help="samples:Which samples.")
 parser.add_option("--small", dest="small", action="store_true", help="Just do a small subset.")
+parser.add_option("--newMETCollection", dest="newMETCollection", action="store_true", help="New tupelizer calls met what was previosuly type1phiMet.")
 parser.add_option("--fromPercentage", dest="fromPercentage", default="0", type="int", action="store", help="from (% of tot. events)")
 parser.add_option("--toPercentage", dest="toPercentage", default="100", type="int", action="store", help="to (% of tot. events)")
 
 (options, args) = parser.parse_args()
+print "options: chmode",options.chmode, "jermode",options.jermode, "jesmode",options.jesmode, "newMETCollection", options.newMETCollection
 
 def jerEtaBin(eta):
   feta = fabs(eta)
@@ -257,6 +259,8 @@ storeVectors = True
 commoncf = ""
 if options.chmode[:4]=="copy":
   commoncf = "type1phiMet>150"
+  if options.newMETCollection:
+    commoncf = "met>150"
 if options.chmode[:7] == "copyInc":
   commoncf = "(1)"
 if options.chmode[:7] == "copyMu":
@@ -327,7 +331,11 @@ for isample, sample in enumerate(allSamples):
   else:
     print "Directory", outputDir+"/"+outSubDir, "already found"
 
-  variables = ["weight", "run", "lumi", "ngoodVertices", "type1phiMet", "type1phiMetphi"]
+  variables = ["weight", "run", "lumi", "ngoodVertices"]
+  if options.newMETCollection:
+    variables+=["met", "metphi"]
+  else:
+    variables+=["type1phiMet", "type1phiMetphi"]
   if sample['name'].lower().count('data'):
     alltriggers =  [ "HLTL1ETM40", "HLTMET120", "HLTMET120HBHENoiseCleaned", "HLTMonoCentralPFJet80PFMETnoMu105NHEF0p95", "HLTMonoCentralPFJet80PFMETnoMu95NHEF0p95"]
     for trigger in alltriggers:
@@ -344,6 +352,8 @@ for isample, sample in enumerate(allSamples):
     mcvars = ["gpPdg", "gpM", "gpPt", "gpEta", "gpPhi", "gpMo1", "gpMo2", "gpDa1", "gpDa2", "gpSta"]
 
   extraVariables=["nbtags", "ht", "nSoftIsolatedMuons", "nHardMuons", "nHardMuonsRelIso02", "nSoftElectrons", "nHardElectrons", "nSoftTaus", "nHardTaus"]
+  if options.newMETCollection:
+    extraVariables+=["type1phiMet", "type1phiMetphi"]
   extraVariables += ["isrJetPt", "isrJetEta", "isrJetPhi", "isrJetPdg", "isrJetBtag", "isrJetChef", "isrJetNhef", "isrJetCeef", "isrJetNeef", "isrJetHFhef", "isrJetHFeef", "isrJetMuef", "isrJetElef", "isrJetPhef", "isrJetCutBasedPUJetIDFlag", "isrJetFull53XPUJetIDFlag", "isrJetMET53XPUJetIDFlag", "isrJetBTBVetoPassed", "isrJetUnc"]
 
   extraVariables += ["softIsolatedMuPt", "softIsolatedMuEta", "softIsolatedMuPhi", "softIsolatedMuPdg", "softIsolatedMuRelIso", "softIsolatedMuDxy", "softIsolatedMuDz",  'softIsolatedMuNormChi2', 'softIsolatedMuNValMuonHits', 'softIsolatedMuNumMatchedStations', 'softIsolatedMuPixelHits', 'softIsolatedMuNumtrackerLayerWithMeasurement', 'softIsolatedMuIsTracker', 'softIsolatedMuIsGlobal']
@@ -516,6 +526,9 @@ for isample, sample in enumerate(allSamples):
             getVar = var
             exec("s."+var+"="+str(getVarValue(c, getVar)).replace("nan","float('nan')"))
           s.event = long(c.GetLeaf(c.GetAlias('event')).GetValue())
+          if options.newMETCollection:
+            s.type1phiMet=s.met
+            s.type1phiMetphi=s.metphi
 
           if not sample['name'].lower().count('data'):
             nvtxWeightSysPlus, nvtxWeightSysMinus, nvtxWeight = 1.,1.,1.

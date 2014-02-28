@@ -223,6 +223,29 @@ ww['reweightingHistoFile'] = S10rwHisto
 ww['reweightingHistoFileSysPlus'] = S10rwPlusHisto
 ww['reweightingHistoFileSysMinus'] = S10rwMinusHisto
 
+wz = copy.deepcopy(mc)
+wz["dirname"] = "/dpm/oeaw.ac.at/home/cms/store/user/schoef/pat_140212/"
+wz["bins"] = ["8TeV-WZ"]
+wz["name"] = "WZ"
+wz['reweightingHistoFile'] = S10rwHisto
+wz['reweightingHistoFileSysPlus'] = S10rwPlusHisto
+wz['reweightingHistoFileSysMinus'] = S10rwMinusHisto
+
+zz = copy.deepcopy(mc)
+zz["bins"] = ["8TeV-ZZ"]
+zz["dirname"] = "/dpm/oeaw.ac.at/home/cms/store/user/schoef/pat_140212/"
+zz["name"] = "ZZ"
+zz['reweightingHistoFile'] = S10rwHisto
+zz['reweightingHistoFileSysPlus'] = S10rwPlusHisto
+zz['reweightingHistoFileSysMinus'] = S10rwMinusHisto
+
+ttw = copy.deepcopy(mc)
+ttw["bins"] = ["8TeV-TTWJets"]
+ttw["name"] = "TTWJets"
+ttw['reweightingHistoFile'] = S10rwHisto
+ttw['reweightingHistoFileSysPlus'] = S10rwPlusHisto
+ttw['reweightingHistoFileSysMinus'] = S10rwMinusHisto
+
 #
 #wjetsCombined = copy.deepcopy(wjets)
 #wjetsCombined["bins"]+=wjetsInc["bins"]

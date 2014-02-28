@@ -74,7 +74,7 @@ for var in allVars:
   var.data_histo.Reset("M")
 for sample in allSamples:
   for bin in sample["bins"]:
-    chainstring = "recoJetAnalyzer/Events"
+    chainstring = "Events"
     if sample.has_key("Chain"):
       chainstring = sample["Chain"]
     c = ROOT.TChain(chainstring)
@@ -96,8 +96,9 @@ for sample in allSamples:
           c.Draw(var.name+">>htmpSPK",str(sample["weight"][bin])+"*("+var.commoncf+")")
           print "At variable",var.name, "Sample",sample["name"],"bin",bin, "adding",htmp.Integral(),str(sample["weight"][bin])+"*("+var.commoncf+")"
         else:
-          c.Draw(var.name+">>htmpSPK",var.commoncf)
-          print "At variable",var.name, "Sample",sample["name"],"bin",bin, "adding",htmp.Integral(),var.commoncf
+          sstring = sample['weight']+"*("+var.commoncf+")"
+          c.Draw(var.name+">>htmpSPK",sstring)
+          print "At variable",var.name, "Sample",sample["name"],"bin",bin, "adding",htmp.Integral(),sstring
         htmp=ROOT.gDirectory.Get("htmpSPK")
         var.data_histo.Add(htmp.Clone())
         del htmp
