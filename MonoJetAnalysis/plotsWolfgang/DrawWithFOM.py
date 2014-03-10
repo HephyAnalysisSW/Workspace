@@ -3,12 +3,12 @@ from math import *
 
 class DrawWithFOM:
 
-    def __init__(self,fom):
+    def __init__(self,options):
         self.systematics = 0.05
-        if fom!=None:
-            self.fom = fom.lower()
+        if options.fom!=None:
+            self.fom = options.fom.lower()
         else:
-            self.fom = fom
+            self.fom = options.fom
         
     def getIntegralWithError(self,h):
         sum = 0.

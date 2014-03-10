@@ -7,6 +7,7 @@ from optparse import OptionParser
 
 parser = OptionParser()
 parser.add_option("--preselection", "-p", dest="preselection",  help="preselection", default=None)
+parser.add_option("--draw", "-d", dest="drawClass",  help="draw class", default="DrawWithFOM.py")
 parser.add_option("--elist", "-e", dest="elist",  help="event list mode", choices=[ "w", "r", "a" ], default=None )
 parser.add_option("--fom", dest="fom",  help="fom to be used", choices=[ "sob", "sosqrtb", "None" ], default="sosqrtb" )
 parser.add_option("--elistBase", dest="elistBase",  help="base directory for event lists", default="./elists")
@@ -23,6 +24,11 @@ plotGlobals = {}
 execfile(args[0],plotGlobals)
 plotClassName = os.path.splitext(os.path.basename(args[0]))[0]
 plotClass = plotGlobals[plotClassName]
+
+drawGlobals = {}
+execfile(options.drawClass,drawGlobals)
+drawClassName = os.path.splitext(os.path.basename(options.drawClass))[0]
+drawClass = drawGlobals[drawClassName](options)
 
 presel = None
 if options.preselection!=None:
@@ -44,13 +50,13 @@ samples.append(Sample("DY",sampleBase,type="B",color=3,fill=True))
 samples.append(Sample("singleTop",sampleBase,type="B",color=4,fill=True))
 samples.append(Sample("TTJets",sampleBase,type="B",color=2,fill=True))
 #samples.append(Sample("WJetsToLNu",sampleBase,type="B",color=5,fill=True))
-samples.append(Sample("WJetsHT250",sampleBase,type="B",color=5,fill=True))
+#samples.append(Sample("WJetsHT250",sampleBase,type="B",color=5,fill=True))
 #samples.append(Sample("WNJetsToLNu",sampleBase,type="B",color=5,fill=True,downscale=2, \
 #                          namelist=[ "W1JetsToLNu", "W2JetsToLNu", "W3JetsToLNu", "W4JetsToLNu"  ]))
-#samples.append(Sample("W1JetsToLNu",sampleBase,type="B",color=2,fill=True,hatch=3245))
-#samples.append(Sample("W2JetsToLNu",sampleBase,type="B",color=3,fill=True,hatch=3254))
-#samples.append(Sample("W3JetsToLNu",sampleBase,type="B",color=4,fill=True,hatch=3245))
-#samples.append(Sample("W4JetsToLNu",sampleBase,type="B",color=5,fill=True,hatch=3254))
+samples.append(Sample("W1JetsToLNu",sampleBase,type="B",color=2,fill=True,hatch=3245))
+samples.append(Sample("W2JetsToLNu",sampleBase,type="B",color=3,fill=True,hatch=3254))
+samples.append(Sample("W3JetsToLNu",sampleBase,type="B",color=4,fill=True,hatch=3245))
+samples.append(Sample("W4JetsToLNu",sampleBase,type="B",color=5,fill=True,hatch=3254))
 #samples.append(Sample("stop200lsp170g100FastSim",sampleBase,type="S",color=2,fill=False))
 #samples.append(Sample("stop300lsp270g175FastSim",sampleBase,type="S",color=3,fill=False))
 #samples.append(Sample("stop300lsp270g200FastSim",sampleBase,type="S",color=4,fill=False))
@@ -90,7 +96,7 @@ for varname in variables:
     cnv = ROOT.TCanvas("cnv","cnv",700,700)
     canvases.append(cnv)
 
-    drawClass = DrawWithFOM(fom=options.fom)
+#    drawClass = DrawWithFOM(fom=options.fom)
 
     if variable.is2D():
         cnv.SetRightMargin(0.15)
