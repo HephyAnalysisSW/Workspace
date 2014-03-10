@@ -526,10 +526,6 @@ for isample, sample in enumerate(allSamples):
             getVar = var
             exec("s."+var+"="+str(getVarValue(c, getVar)).replace("nan","float('nan')"))
           s.event = long(c.GetLeaf(c.GetAlias('event')).GetValue())
-          if options.newMETCollection:
-            s.type1phiMet=s.met
-            s.type1phiMetphi=s.metphi
-
           if not sample['name'].lower().count('data'):
             nvtxWeightSysPlus, nvtxWeightSysMinus, nvtxWeight = 1.,1.,1.
             if sample.has_key('reweightingHistoFile'): 
@@ -541,6 +537,9 @@ for isample, sample in enumerate(allSamples):
 
           for var in extraVariables:
             exec("s."+var+"=float('nan')")
+          if options.newMETCollection:
+            s.type1phiMet=s.met
+            s.type1phiMetphi=s.metphi
 
           if storeVectors and sample['name'].lower().count('ttjets') and len(tops)==2: #https://twiki.cern.ch/twiki/bin/viewauth/CMS/TopPtReweighting
             s.top0Pt = tops[0].pt()

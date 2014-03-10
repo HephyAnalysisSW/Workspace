@@ -24529,6 +24529,9 @@ process.trackingFailureFilter = cms.EDFilter("TrackingFailureFilter",
 )
 
 
+process.caloTowers = cms.EDAnalyzer("CaloTowers")
+
+
 process.cleanPatCandidateSummary = cms.EDAnalyzer("CandidateSummaryTable",
     logName = cms.untracked.string('cleanPatCandidates|PATSummaryTables'),
     candidates = cms.VInputTag(cms.InputTag("cleanPatElectrons"), cms.InputTag("cleanPatMuons"), cms.InputTag("cleanPatTaus"), cms.InputTag("cleanPatPhotons"), cms.InputTag("cleanPatJetsAK5Calo"), 
@@ -24589,7 +24592,8 @@ process.out = cms.OutputModule("PoolOutputModule",
     outputCommands = cms.untracked.vstring('drop *', 
         'keep *_*SUSYTupelizer*_*_*', 
         'keep *_*EventCounter*_*_*', 
-        'keep *_genParticles_*_*')
+        'keep *_genParticles_*_*', 
+        'keep *_*aloTowers_*_*')
 )
 
 
@@ -25082,7 +25086,7 @@ process.patPF2PATSequence = cms.Sequence(process.PFBRECO+process.patDefaultSeque
 process.susyPatDefaultSequence = cms.Sequence(process.eventCountProducer+process.patPF2PATSequence+process.patPF2PATSequencePF)
 
 
-process.p = cms.Path(process.goodOfflinePrimaryVertices+process.filterSequence+process.susyPatDefaultSequence+process.puJetIdpatJetsAK5PF+process.puJetMvapatJetsAK5PF+process.kt6PFJetsForIsolation2011+process.pfMEtSysShiftCorrSequence+process.producePFMETCorrections+process.type0PFMEtCorrection+process.pfType1Type0PFCandidateCorrectedMet+process.pfType1PhiCorrectedMet+process.patPFMETsTypeIcorrected+process.patPFMETsTypeIPhicorrected+process.patPFMETsTypeIType0PFCandcorrected+process.rawpfMet+process.patRAWPFMETs+process.bFlavorHistoryProducer+process.cFlavorHistoryProducer+process.flavorHistoryFilter+process.SUSYTupelizer)
+process.p = cms.Path(process.goodOfflinePrimaryVertices+process.filterSequence+process.susyPatDefaultSequence+process.puJetIdpatJetsAK5PF+process.puJetMvapatJetsAK5PF+process.kt6PFJetsForIsolation2011+process.pfMEtSysShiftCorrSequence+process.producePFMETCorrections+process.type0PFMEtCorrection+process.pfType1Type0PFCandidateCorrectedMet+process.pfType1PhiCorrectedMet+process.patPFMETsTypeIcorrected+process.patPFMETsTypeIPhicorrected+process.patPFMETsTypeIType0PFCandcorrected+process.rawpfMet+process.patRAWPFMETs+process.bFlavorHistoryProducer+process.cFlavorHistoryProducer+process.flavorHistoryFilter+process.SUSYTupelizer+process.caloTowers)
 
 
 process.outpath = cms.EndPath(process.out)

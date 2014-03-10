@@ -30,4 +30,7 @@
 <library   file="EventCounter.cc" name="EventCounter">
   <flags   EDM_PLUGIN="1"/>
 </library>
+<library   file="CaloTowers.cc" name="CaloTowers">
+  <flags   EDM_PLUGIN="1"/>
+</library>
 

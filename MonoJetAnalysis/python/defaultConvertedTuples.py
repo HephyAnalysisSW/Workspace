@@ -65,8 +65,6 @@ stopDeltaM30FastSim["name"]     = "stopDeltaM30FastSim"
 stopDeltaM30FastSim["hasWeight"]     = True
 stopDeltaM30FastSim["dirname"]  = "/data/schoef/monoJetTuples_v5/copy/"
 
-
-
 data = {}
 data["bins"]    = ["data"]
 data["name"]    = "data"
@@ -150,6 +148,31 @@ wJetsHT250["bins"]    = ["WJetsHT250"]
 wJetsHT250["name"]    = "WJetsHT250"
 wJetsHT250["hasWeight"]     = True
 wJetsHT250["dirname"] = "/data/schoef/monoJetTuples_v5/copy/" 
+
+wJetsHT150v2 = {}
+wJetsHT150v2["bins"]    = ["WJetsHT150v2"]
+wJetsHT150v2["name"]    = "WJetsHT150v2"
+wJetsHT150v2["hasWeight"]     = True
+wJetsHT150v2["dirname"] = "/data/schoef/monoJetTuples_v5/copy/" 
+
+wJetsPtW50 = {}
+wJetsPtW50["bins"]    = ["WJetsToLNu_PtW-50_TuneZ2star_8TeV-madgraph"]
+wJetsPtW50["name"]    = "WJetsToLNu_PtW-50"
+wJetsPtW50["hasWeight"]     = True
+wJetsPtW50["dirname"] = "/data/schoef/monoJetTuples_v5/copy/" 
+
+wJetsPtW100 = {}
+wJetsPtW100["bins"]    = ["WJetsToLNu_PtW-100_TuneZ2star_8TeV_ext-madgraph-tarball"]
+wJetsPtW100["name"]    = "WJetsToLNu_PtW-100"
+wJetsPtW100["hasWeight"]     = True
+wJetsPtW100["dirname"] = "/data/schoef/monoJetTuples_v5/copy/" 
+
+wJetsPtW180 = {}
+wJetsPtW180["bins"]    = ["WJetsToLNu_PtW-180_TuneZ2star_8TeV-madgraph-tarball"]
+wJetsPtW180["name"]    = "WJetsToLNu_PtW-180"
+wJetsPtW180["hasWeight"]     = True
+wJetsPtW180["dirname"] = "/data/schoef/monoJetTuples_v5/copy/" 
+
 
 wJetsToLNu_and_bb = {}
 wJetsToLNu_and_bb["bins"]    = ["W1JetsToLNu", "W2JetsToLNu", "W3JetsToLNu", "W4JetsToLNu", "WbbJets"]
