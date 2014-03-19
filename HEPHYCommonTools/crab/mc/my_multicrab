@@ -1,5 +1,5 @@
 #! /bin/sh -x 
-for name in `ls -d 8TeV*`
+for name in `ls -d 8TeV-*`
 #for name in `ls -d 8TeV-Wplus* 8TeV-Wminus* 8TeV-WJetsToLNu_HT-*`
 #for name in `ls -d 8TeV-*-2`
 do

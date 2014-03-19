@@ -15,7 +15,6 @@
 #include "HLTrigger/HLTfilters/interface/HLTLevel1GTSeed.h"
 #include "DataFormats/HLTReco/interface/TriggerEvent.h"
 #include "CMGTools/External/interface/PileupJetIdentifier.h"
-//#include "DataFormats/JetReco/interface/PileupJetIdentifier.h"
 #include "DataFormats/METReco/interface/GenMET.h"
 #include "DataFormats/METReco/interface/GenMETCollection.h"
 #include "DataFormats/METReco/interface/PFMET.h"
@@ -27,7 +26,6 @@
 #include "PhysicsTools/SelectorUtils/interface/PFJetIDSelectionFunctor.h"
 #include "RecoEgamma/EgammaTools/interface/ConversionTools.h"
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
-//#include "ElectroWeakAnalysis/Utilities/src/PdfWeightProducer.cc"
 
 using namespace std;
 
@@ -118,15 +116,12 @@ namespace {
 SUSYTupelizer::~SUSYTupelizer() {}
 
 SUSYTupelizer::SUSYTupelizer( const edm::ParameterSet & pset):
+  Tupelizer(pset),
   params_ ( pset ),
   verbose_      ( pset.getUntrackedParameter< bool >("verbose")),
   triggerCollection_ ( pset.getUntrackedParameter< std::string >("triggerCollection") ),
   patJets_      ( pset.getUntrackedParameter< edm::InputTag >("patJets") ),
   patMET_       ( pset.getUntrackedParameter< edm::InputTag >("patMETs") ),
-//  rawMET_       ( pset.getUntrackedParameter< edm::InputTag >("rawMETs") ),
-//  type01MET_       ( pset.getUntrackedParameter< edm::InputTag >("type01METs") ),
-//  type1phiMET_       ( pset.getUntrackedParameter< edm::InputTag >("type1phiMETs") ),
-//  type01phiMET_       ( pset.getUntrackedParameter< edm::InputTag >("type01phiMETs") ),
 
   patMuons_     ( pset.getUntrackedParameter< edm::InputTag >("patMuons") ),
   patElectrons_ ( pset.getUntrackedParameter< edm::InputTag >("patElectrons") ),
@@ -207,7 +202,6 @@ SUSYTupelizer::SUSYTupelizer( const edm::ParameterSet & pset):
   puJetIdFull53X_( pset.getUntrackedParameter< edm::InputTag >("puJetIdFull53X") ),
   puJetIdMET53X_( pset.getUntrackedParameter< edm::InputTag >("puJetIdMET53X") ),
 
-  moduleLabel_( params_.getParameter<std::string>("@module_label") ),
   addRA4AnalysisInfo_( pset.getUntrackedParameter<bool>("addRA4AnalysisInfo")),
   addTriggerInfo_(pset.getUntrackedParameter<bool>("addTriggerInfo")),
   triggersToMonitor_(pset.getUntrackedParameter<std::vector<std::string> > ("triggersToMonitor") ), 
@@ -222,9 +216,7 @@ SUSYTupelizer::SUSYTupelizer( const edm::ParameterSet & pset):
   addFullTauInfo_(pset.getUntrackedParameter<bool>("addFullTauInfo")),
   addGeneratorInfo_(pset.getUntrackedParameter<bool>("addGeneratorInfo")),
   addMSugraOSETInfo_(pset.getUntrackedParameter<bool>("addMSugraOSETInfo")),
-  addPDFWeights_(pset.getUntrackedParameter<bool>("addPDFWeights")),
-
-  defaultAlias_(pset.getUntrackedParameter<bool>("useForDefaultAlias"))
+  addPDFWeights_(pset.getUntrackedParameter<bool>("addPDFWeights"))
 
 {
   addAllVars();

@@ -2,7 +2,9 @@
 #define Workspace_FWLite_StringTools_H
 
 #include <string>
+#include <vector>
 #include <list>
+#include <sstream>
 
 namespace StringTools {
   /** some helper functions to manipulate strings **/
@@ -15,6 +17,22 @@ namespace StringTools {
 
   /// split up <source> at every <sep>, returning a list of tokens
   std::list< std::string > msplit( std::string source, std::string sep );
+
+//  std::vector<std::string> &splitToVec(const std::string &s, char delim, std::vector<std::string> &elems) {
+//      std::stringstream ss(s);
+//      std::string item;
+//      while (std::getline(ss, item, delim)) {
+//          elems.push_back(item);
+//      }
+//      return elems;
+//  }
+//
+//  std::vector<std::string> splitToVec(const std::string &s, char delim) {
+//      std::vector<std::string> elems;
+//      splitToVec(s, delim, elems);
+//      return elems;
+//  }
+
 }
 
 #endif

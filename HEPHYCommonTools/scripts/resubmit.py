@@ -48,7 +48,6 @@ for line in lines:
     latestwdir = wstring                              
   jobm = joblinePat.match(line)                       
   if jobm:                                            
-#    print line                                       
     for ind in indications:                           
       if line.count(ind)>0:                           
         jobn  = int(jobm.group())
@@ -58,13 +57,11 @@ outfile = file('resubmit.sh', 'w')
 outfile.write('#!/bin/sh\n')
 for key in resubmitjobs:
   if len(resubmitjobs[key])>0:
-    sstring = "crab -forceResubmit "+str(resubmitjobs[key][0])
-    for j in resubmitjobs[key][1:]:
-      sstring += ","+str(j)
-    sstring += " -c "+key
-    sstring += ' &'
-    outfile.write(sstring+'\n') 
-    print sstring
+    prestring = "crab -forceResubmit "
+    for n in range(len(resubmitjobs[key])/500+1):
+      sstring = prestring + ','.join([str(j) for j in resubmitjobs[key][500*n:500*(n+1)]])+' -c ' +key
+      outfile.write(sstring+'\n') 
+      print sstring
 print "Written resubmit.sh"
 outfile.close()
 os.system("chmod +x resubmit.sh")

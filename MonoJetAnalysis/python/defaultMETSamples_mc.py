@@ -19,6 +19,14 @@ data["Chain"] = "Events"
 data["Counter"] = "bool_EventCounter_passed_PAT.obj"
 allSamples.append(data)
 
+
+dataReRecoRun2012ABC={}
+dataReRecoRun2012ABC["name"]     = "dataReRecoRun2012ABC";
+dataReRecoRun2012ABC["dirname"] = "/dpm/oeaw.ac.at/home/cms/store/user/schoef/pat_281113"
+dataReRecoRun2012ABC["bins"]    = ["MET-Run2012A-22Jan2013", "MET-Run2012B-22Jan2013", "MET-Run2012C-22Jan2013"]
+dataReRecoRun2012ABC["Chain"] = "Events"
+dataReRecoRun2012ABC["Counter"] = "bool_EventCounter_passed_PAT.obj"
+
 data_singleMu_Run2012AB={}
 data_singleMu_Run2012AB["name"]     = "data_singleMu_Run2012AB";
 data_singleMu_Run2012AB["dirname"] = "/dpm/oeaw.ac.at/home/cms/store/user/schoef/pat_281113"
@@ -72,6 +80,16 @@ ttbar["name"] = "TTJets"
 ttbar['reweightingHistoFile'] = S10rwHisto
 ttbar['reweightingHistoFileSysPlus'] = S10rwPlusHisto
 ttbar['reweightingHistoFileSysMinus'] = S10rwMinusHisto
+
+ttbarPowHeg = copy.deepcopy(mc)
+ttbarPowHeg['reweightingHistoFile'] = S10rwHisto 
+ttbarPowHeg['reweightingHistoFileSysPlus'] = S10rwPlusHisto
+ttbarPowHeg['reweightingHistoFileSysMinus'] = S10rwMinusHisto
+ttbarPowHeg["bins"] = ["8TeV-TTJets-powheg-v2"]
+ttbarPowHeg["name"] = "8TeV-TTJets-powheg-v2" 
+ttbarPowHeg['reweightingHistoFile'] = S10rwHisto
+ttbarPowHeg['reweightingHistoFileSysPlus'] = S10rwPlusHisto
+ttbarPowHeg['reweightingHistoFileSysMinus'] = S10rwMinusHisto
 #
 #ttbarPowHeg = copy.deepcopy(mc)
 #ttbarPowHeg["dirname"] = "/data/mhickel/pat_130328/"

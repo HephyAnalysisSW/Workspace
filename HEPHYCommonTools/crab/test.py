@@ -427,9 +427,10 @@ process.p += process.SUSYTupelizer
 #)
 #process.p+=process.printTree
 
-process.load('Workspace.HEPHYCommonTools.caloTowers_cfi')
-process.p += process.caloTowers
-process.out.outputCommands =  cms.untracked.vstring('drop *', 'keep *_*SUSYTupelizer*_*_*' , 'keep *_*EventCounter*_*_*', 'keep *_genParticles_*_*', 'keep *_*aloTowers_*_*')
+process.load('Workspace.HEPHYCommonTools.caloTowersTupelizer_cfi')
+process.CaloTowersTupelizer.verbose = cms.untracked.bool(False)
+process.p += process.CaloTowersTupelizer
+process.out.outputCommands =  cms.untracked.vstring('drop *', 'keep *_*SUSYTupelizer*_*_*' , 'keep *_*EventCounter*_*_*', 'keep *_genParticles_*_*', 'keep *_CaloTowersTupelizer_*_*')
 process.outpath = cms.EndPath(process.out)
 #-- Dump config ------------------------------------------------------------
 file = open('vienna_SusyPAT_cfg.py','w')

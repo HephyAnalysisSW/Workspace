@@ -119,6 +119,12 @@ ttJets["name"]    = "TTJets"
 ttJets["hasWeight"]     = True
 ttJets["dirname"] = "/data/schoef/monoJetTuples_v5/copy/" 
 
+ttJetsPowHeg = {}
+ttJetsPowHeg["bins"]    = ["TTJets-PowHeg"]
+ttJetsPowHeg["name"]    = "TTJets-PowHeg"
+ttJetsPowHeg["hasWeight"]     = True
+ttJetsPowHeg["dirname"] = "/data/schoef/monoJetTuples_v5/copy/" 
+
 zJetsInv = {}
 zJetsInv["bins"]    = ["ZJetsInv"]
 zJetsInv["name"]    = "ZJetsInv"

@@ -5,6 +5,22 @@
 
 using namespace std;
 
+std::vector<std::string> &splitToVec(const std::string &s, char delim, std::vector<std::string> &elems) {
+    std::stringstream ss(s);
+    std::string item;
+    while (std::getline(ss, item, delim)) {
+        elems.push_back(item);
+    }
+    return elems;
+}
+
+
+std::vector<std::string> splitToVec(const std::string &s, char delim) {
+    std::vector<std::string> elems;
+    splitToVec(s, delim, elems);
+    return elems;
+}
+
 void ModelParameters::lheMSUGRA ( const std::string & t )
 {
   size_t foundLength = t.size();
@@ -113,6 +129,51 @@ void ModelParameters::lheSMS ( const std::string & t )
   iss.clear();
   
   float mchi=xCHI * mLSP + ( 1. - xCHI ) * mGL;
+
+//  cout<<"t "<<t.find("8TeV_T2tt_2j_")<<endl;
+//  cout<<"x "<<std::string("x").find("8TeV_T2tt_2j_")<<endl;
+
+  if ( string::npos!=t.find("8TeV_T2tt_2j_")) {// for T2Degeneratestop
+    std::vector<std::string> splitsm = splitToVec(smaller, '_'); 
+//    cout<<splitsm.size()<<endl;
+    for (unsigned i=0;i<splitsm.size();i++){
+      if (debug_) cout<<i<<" "<<splitsm[i]<<endl;
+    }  
+    mGL = 0.;
+    iss.str(splitsm[0]);
+    iss >> mSQ;
+    iss.clear();
+    iss.str(splitsm[1]);
+    iss >> mLSP;
+    iss.clear();
+    iss.str(splitsm[5]);
+    iss >> mchi;
+    iss.clear();
+  }
+  if ( string::npos!=t.find("T5lnu_")) {
+    std::vector<std::string> splitsm = splitToVec(t, ' '); 
+//    cout<<"smaller "<<smaller<<endl;
+    for (unsigned i=0;i<splitsm.size();i++){
+      if (debug_) cout<<i<<" "<<splitsm[i]<<endl;
+    }  
+    splitsm = splitToVec(splitsm[2], '_'); 
+    for (unsigned i=0;i<splitsm.size();i++){
+      if (debug_) cout<<i<<" "<<splitsm[i]<<endl;
+    }  
+    iss.str(splitsm[1]);
+    iss >> mGL;
+    iss.clear();
+    iss.str(splitsm[2]);
+    iss >> mLSP;
+    iss.clear();
+    iss.str(splitsm[3]);
+    iss >> xCHI;
+    iss.clear();
+    iss.str(splitsm[4]);
+    iss >> mchi;
+    iss.clear();
+  }
+
 
   if ( mmodel == "T2" || mmodel=="T2tt" )
   {

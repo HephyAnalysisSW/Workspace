@@ -81,6 +81,10 @@ def getJets(c):
     jets.append({'pt':getVarValue(c, 'jetPt', i), 'eta':getVarValue(c, 'jetEta', i), 'phi':getVarValue(c, 'jetPhi', i)})
   return jets
 
+def minDeltaRLeptonJets(c):
+  jets = getJets(c)
+  return min([deltaR(j, {'phi':getVarValue(c, 'softIsolatedMuPhi'), 'eta':getVarValue(c, 'softIsolatedMuEta')}) for j in jets])
+
 #def getSoftIsolatedMu(c):
 #  return {'pt':c.GetLeaf('softIsolatedMuPt').GetValue(), 'eta':c.GetLeaf('softIsolatedMuEta').GetValue(), 'phi':c.GetLeaf('softIsolatedMuPhi').GetValue()}
 

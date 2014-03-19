@@ -15,7 +15,6 @@ float WjetPolarizationAngle(LorentzVector p4w, LorentzVector p4lepton){
 
   genp4_Wplus_=p4w;    
   genp4_lplus_=p4lepton;    
-  
 
   ROOT::Math::Boost boost_Wplus_CM( genp4_Wplus_.BoostToCM().x(), genp4_Wplus_.BoostToCM().y(), genp4_Wplus_.BoostToCM().z() );
 //  cout<<" boost_Wplus_CM "<<boost_Wplus_CM<<endl;
@@ -44,8 +43,11 @@ float GetWeightFLminusFR(float x,float var,LorentzVector p4W, bool Wplus ){
 
   //  TFile *_file0 = TFile::Open("Wpolarization_es_taus_too.root");
   //  TFile *_file0 = TFile::Open("new_file_HT300.root");
-  TFile _file0("new_file_HT300.root");
-
+  TFile _file0("/data/schoef/tools/polSys/new_file_HT300.root");
+//  if (!_file0) {
+//    cout<<"Polarization data not found"<<endl;
+//    return -999.;
+//  }
   //  TH1F* h_polarization_Wplus[4][3];
   //  TH1F* h_polarization_Wminus[4][3];
   
@@ -54,8 +56,6 @@ float GetWeightFLminusFR(float x,float var,LorentzVector p4W, bool Wplus ){
 
   //  TString bin_names_pt[4] = {"pt_50_100_","pt_100_300_","pt_300_500_","pt_500_up_"};
   //  TString bin_names_eta[3] = {"eta_0_1","eta_1_2","eta_2_5"};
-
-
 
   float fl_plus = 0;
   float fr_plus = 0;
@@ -166,7 +166,12 @@ float GetWeightF0(float x,float var,LorentzVector p4W, bool Wplus ){
   // variable x is cos(theta) here
 
   //  TFile *_file0 = TFile::Open("Wpolarization_es_taus_too.root");
-  TFile _file0("new_file_HT300.root");
+//  TFile _file0("new_file_HT300.root");
+  TFile _file0("/data/schoef/tools/polSys/new_file_HT300.root");
+//  if (!_file0) {
+//    cout<<"Polarization data not found"<<endl;
+//    return -999.;
+//  }
 
   //  TH1F* h_polarization_Wplus[4][3];
   //  TH1F* h_polarization_Wminus[4][3];
