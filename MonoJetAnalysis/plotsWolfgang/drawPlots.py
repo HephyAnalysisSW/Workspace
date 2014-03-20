@@ -39,7 +39,7 @@ if options.preselection!=None:
     presel = preselClass()
     setattr(presel,"sourcefile",options.preselection)
 
-sampleBase = "/home/adamwo/data/monoJetTuples_v4/copy/"
+sampleBase = "/home/adamwo/data/monoJetTuples_v5/copy/"
 
 
 samples = []
@@ -48,15 +48,17 @@ samples.append(Sample("QCD",sampleBase,type="B",color=7,fill=True, \
 samples.append(Sample("WW",sampleBase,type="B",color=6,fill=True))
 samples.append(Sample("DY",sampleBase,type="B",color=3,fill=True))
 samples.append(Sample("singleTop",sampleBase,type="B",color=4,fill=True))
-samples.append(Sample("TTJets",sampleBase,type="B",color=2,fill=True))
+#samples.append(Sample("TTJets",sampleBase,type="B",color=2,fill=True))
+samples.append(Sample("TTJets-powheg-v2",sampleBase,type="B",color=2,fill=True))
 #samples.append(Sample("WJetsToLNu",sampleBase,type="B",color=5,fill=True))
+samples.append(Sample("WJetsHT150v2",sampleBase,type="B",color=5,fill=True))
 #samples.append(Sample("WJetsHT250",sampleBase,type="B",color=5,fill=True))
 #samples.append(Sample("WNJetsToLNu",sampleBase,type="B",color=5,fill=True,downscale=2, \
 #                          namelist=[ "W1JetsToLNu", "W2JetsToLNu", "W3JetsToLNu", "W4JetsToLNu"  ]))
-samples.append(Sample("W1JetsToLNu",sampleBase,type="B",color=2,fill=True,hatch=3245))
-samples.append(Sample("W2JetsToLNu",sampleBase,type="B",color=3,fill=True,hatch=3254))
-samples.append(Sample("W3JetsToLNu",sampleBase,type="B",color=4,fill=True,hatch=3245))
-samples.append(Sample("W4JetsToLNu",sampleBase,type="B",color=5,fill=True,hatch=3254))
+#samples.append(Sample("W1JetsToLNu",sampleBase,type="B",color=2,fill=True,hatch=3245))
+#samples.append(Sample("W2JetsToLNu",sampleBase,type="B",color=3,fill=True,hatch=3254))
+#samples.append(Sample("W3JetsToLNu",sampleBase,type="B",color=4,fill=True,hatch=3245))
+#samples.append(Sample("W4JetsToLNu",sampleBase,type="B",color=5,fill=True,hatch=3254))
 #samples.append(Sample("stop200lsp170g100FastSim",sampleBase,type="S",color=2,fill=False))
 #samples.append(Sample("stop300lsp270g175FastSim",sampleBase,type="S",color=3,fill=False))
 #samples.append(Sample("stop300lsp270g200FastSim",sampleBase,type="S",color=4,fill=False))
@@ -104,7 +106,7 @@ for varname in variables:
             ROOT.gROOT.ProcessLine(".L ../../HEPHYCommonTools/scripts/root/useNiceColorPalette.C")
             ROOT.useNiceColorPalette()
             definedPalette = True
-        bkgs, sigs, legend = drawClass.drawStack2D(samples,histograms)
+        bkgs, sigs, legend = drawClass.drawStack2D(samples,histograms,cnv)
         if variable.uselog:
             cnv.SetLogz(1)
 
@@ -144,6 +146,8 @@ if options.save:
         os.mkdir(savedir)
     else:
         os.system("rm "+savedir+"*.png")
+        os.system("rm "+savedir+"*.root")
     for c in canvases:
         c.SaveAs(savedir+c.GetName()+".png")
+        c.SaveAs(savedir+c.GetName()+".root")
 print "continuing"

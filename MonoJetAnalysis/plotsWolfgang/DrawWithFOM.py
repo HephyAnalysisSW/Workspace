@@ -1,4 +1,5 @@
 import ROOT
+import ctypes
 from math import *
 
 class DrawWithFOM:
@@ -141,13 +142,16 @@ class DrawWithFOM:
     def drawStack2D(self, samples, histograms, pad=None):
 
         if pad!=None:
+            currpad = pad
             pad.cd()
+        else:
+            currpad = ROOT.gPad
 
         bkgs = None
         sigs = [ ]
-        legend = ROOT.TLegend(0.60,0.75,0.90,0.89)
-        legend.SetBorderSize(0)
-        legend.SetFillColor(10)
+#        legend = ROOT.TLegend(0.60,0.75,0.90,0.89)
+#        legend.SetBorderSize(0)
+#        legend.SetFillColor(10)
 #        legend.SetFillStyle(0)
         for i,s in enumerate(samples):
             h = histograms[i]
@@ -162,7 +166,7 @@ class DrawWithFOM:
 #                    print "Defining background ",s.name,h.GetName()
                     bkgs = h.Clone()
                     print "Cloning bkg histo from ",s.name,h.GetName()
-                    legend.AddEntry(bkgs,"Backgrounds","")
+#                    legend.AddEntry(bkgs,"Backgrounds","")
                 else:
                     bkgs.Add(h)
                     print "Adding bkg histo for ",s.name,h.GetName()
@@ -171,7 +175,8 @@ class DrawWithFOM:
                 h.SetLineColor(s.color)
                 h.SetLineWidth(1)
                 sigs.append(h)
-                legend.AddEntry(h,s.name,"L")
+                h.SetTitle(s.name)
+#                legend.AddEntry(h,s.name,"L")
                 print "Sig histo from ",s.name,h.GetName()
 #                print "Adding to signal ",s.name,h.GetName()
 #            if s.fill:
@@ -179,25 +184,60 @@ class DrawWithFOM:
 #            else:
 #                opt = "L"
 
+        ipads = [ ]
+        nsig = 0
+        for s in samples:
+            if s.isSignal():  
+                nsig += 1
+                ipads.append(nsig+1)
+            else:
+                ipads.append(1)
+        nsub = int(sqrt(nsig+1))
+        if nsub**2<(nsig+1):
+            nsub += 1
+        currpad.Divide(nsub,nsub)
+        latexs = [ ]
+        latex = ROOT.TLatex()
+        latex.SetNDC(1)
+        latex.SetTextSize(0.04)
+
+        currpad.cd(1)
+        ROOT.gPad.SetRightMargin(0.15)
         bkgmax = bkgs.GetMaximum()
         bkgs.SetMaximum(bkgmax/0.85)
         bkgs.SetMinimum(0.1)
         print "bkgmax = ",bkgmax
         bkgs.Draw("zcol")
+        latexs.append(latex.DrawLatex(0.40,0.15,"Backgrounds"))
 #        bkgs.GetYaxis().SetTitle("Events / bin")
-        for s in sigs:
-#            s.SetMaximum(bkgmax/0.85)
-#            s.SetMinimum(0.1)
-            s.SetContour(3)
-            s.Draw("cont3 same")
-        legend.Draw()
-        legend.SetBit(ROOT.kCanDelete)
-#        ROOT.gPad.SetLogy(1)
+#        contlist = [ bkgmax/0.85*10**(-i) for i in range(2,5) ]
+#        c_contlist = ((ctypes.c_double)*(len(contlist)))(*contlist)
+#        legend.Draw()
+#        legend.SetBit(ROOT.kCanDelete)
+        ROOT.gPad.SetLogz(1)
+        for i,s in enumerate(sigs):
+##            s.SetMaximum(bkgmax/0.85)
+##            s.SetMinimum(0.1)
+##            s.SetContour(len(contlist),c_contlist)
+##            s.SetLineWidth(2)
+##            s.Draw("cont3 same")
+            currpad.cd(i+2)
+            ROOT.gPad.SetRightMargin(0.15)
+#            bkgs.DrawClone("zcol")
+            s.SetMaximum(bkgmax/0.85)
+            s.SetMinimum(0.1)
+            s.Draw("zcol")
+            latexs.append(latex.DrawLatex(0.40,0.15,s.GetTitle()))
+            ROOT.gPad.SetLogz(1)
+            print "Drawing signal index ",i,currpad.GetPad(i+2)
 
         if pad!=None:
             pad.Update()
 
-        return ( bkgs, sigs , legend )
+        currpad.cd()
+        currpad.Update()
+
+        return ( bkgs, sigs , latexs )
 
     def drawFom(self, bkgs, sigs, scut='l', pad=None):
 
