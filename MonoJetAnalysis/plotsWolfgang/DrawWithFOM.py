@@ -76,12 +76,30 @@ class DrawWithFOM:
 #        print h1.GetSumOfWeights(),hsum.GetSumOfWeights()
         return hr
 
+    def getDoMC(self,h1,h2):
+        hr = h1.Clone(h1.GetName()+"DoMC")
+        if h2.InheritsFrom(ROOT.THStack.Class()):
+            hsum = h2.GetStack().Last().Clone()
+        else:
+            hsum = h2.Clone()
+        hr.Reset()
+        for i in range(1,hr.GetNbinsX()+1):
+            d = h1.GetBinContent(i)
+            ed = h1.GetBinError(i)
+            b = hsum.GetBinContent(i)
+            eb = hsum.GetBinError(i)
+            if b>0:
+                hr.SetBinContent(i,d/b)
+                hr.SetBinError(i,sqrt((ed)**2+(eb*d/b)**2)/b)
+        return hr
+
 
     def drawStack1D(self, samples, histograms, pad=None):
 
         if pad!=None:
             pad.cd()
 
+        data = None
         bkgs = None
         sigs = [ ]
         legend = ROOT.TLegend(0.60,0.75,0.90,0.99)
@@ -118,10 +136,19 @@ class DrawWithFOM:
             elif s.isSignal():
                 sigs.append(h)
 #                print "Adding to signal ",s.name,h.GetName()
+            elif s.isData():
+                data = h
+                h.SetMarkerStyle(20)
+                h.SetLineColor(s.color)
+                h.SetMarkerColor(s.color)
+                
+#                print "Adding to signal ",s.name,h.GetName()
             if s.fill:
                 opt = "F"
             else:
                 opt = "L"
+            if s.isData():
+                opt = "P"
             if bkgs!=None:
                 bkgs.SetMinimum(0.1)
             legend.AddEntry(h,s.name,opt)       
@@ -130,6 +157,8 @@ class DrawWithFOM:
         bkgs.GetYaxis().SetTitle("Events / bin")
         for s in sigs:
             s.Draw("same hist")
+        if data:
+            data.Draw("same")
         legend.Draw()
         legend.SetBit(ROOT.kCanDelete)
 #        ROOT.gPad.SetLogy(1)
@@ -137,7 +166,8 @@ class DrawWithFOM:
         if pad!=None:
             pad.Update()
 
-        return ( bkgs, sigs , legend )
+        print data, bkgs, sigs, legend 
+        return ( data, bkgs, sigs, legend )
 
     def drawStack2D(self, samples, histograms, pad=None):
 
@@ -154,6 +184,8 @@ class DrawWithFOM:
 #        legend.SetFillColor(10)
 #        legend.SetFillStyle(0)
         for i,s in enumerate(samples):
+            if s.isData():
+                continue
             h = histograms[i]
             if s.fill:
                 h.SetFillStyle(1001)
@@ -264,5 +296,28 @@ class DrawWithFOM:
             opt = "same "
         if len(hrs)>0:
             hrs[0].SetMaximum(hrmax/0.85)
+
+        pad.Update()
+
+    def drawDoMC(self, data, bkgs, pad=None):
+
+        assert data!=None and bkgs!=None
+
+        if pad!=None:
+            pad.cd()
+
+        opt = ""
+        hr = self.getDoMC(data,bkgs)
+        print hr,hr.GetBinContent(10),hr.GetBinError(10)
+        hr.SetMinimum(0.)
+        hr.SetMaximum(2.)
+        hr.GetYaxis().SetTitle("data/MC")
+        hr.GetYaxis().SetTitleSize(0.08)
+        hr.SetMarkerStyle(20)
+        hr.SetMarkerColor(1)
+        hr.SetLineColor(1)
+        hr.DrawCopy()
+        ROOT.gPad.SetGridx(1)
+        ROOT.gPad.SetGridy(1)
 
         pad.Update()

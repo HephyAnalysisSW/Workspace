@@ -47,3 +47,6 @@ class Sample:
     def isSignal(self):
         return len(self.type)>0 and self.type.lower()[0]=="s"
 
+    def isData(self):
+        return len(self.type)>0 and self.type.lower()[0]=="d"
+
