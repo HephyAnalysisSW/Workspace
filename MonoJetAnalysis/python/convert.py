@@ -13,13 +13,13 @@ parser.add_option("--chmode", dest="chmode", default="copy", type="string", acti
 parser.add_option("--jermode", dest="jermode", default="none", type="string", action="store", help="jermode: up/down/central/none")
 parser.add_option("--jesmode", dest="jesmode", default="none", type="string", action="store", help="jesmode: up/down/none")
 parser.add_option("--samples", dest="allsamples", default="copy", type="string", action="store", help="samples:Which samples.")
+parser.add_option("--smsMsqRange", dest="smsMsqRangeString", default="None", type="string", action="store", help="What is the Msq range? Maximum is 100-425.")
 parser.add_option("--small", dest="small", action="store_true", help="Just do a small subset.")
-parser.add_option("--newMETCollection", dest="newMETCollection", action="store_true", help="New tupelizer calls met what was previosuly type1phiMet.")
 parser.add_option("--fromPercentage", dest="fromPercentage", default="0", type="int", action="store", help="from (% of tot. events)")
 parser.add_option("--toPercentage", dest="toPercentage", default="100", type="int", action="store", help="to (% of tot. events)")
 
 (options, args) = parser.parse_args()
-print "options: chmode",options.chmode, "jermode",options.jermode, "jesmode",options.jesmode, "newMETCollection", options.newMETCollection
+print "options: chmode",options.chmode, "jermode",options.jermode, "jesmode",options.jesmode
 
 def jerEtaBin(eta):
   feta = fabs(eta)
@@ -60,18 +60,56 @@ if not path in sys.path:
 del path
 from monoJetFuncs import softIsolatedMT, pmuboost3d
 
-import xsec
+from xsec import xsec
 
-subDir = "monoJetTuples_v5"
+subDir = "monoJetTuples_v6"
 
-#allSamples = [wjets, wjetsInc, ttbar, dy, qcd, ww]
-#allSamples = [ttbar]
 
-exec("allSamples = [" +options.allsamples+ "]")
+if options.smsMsqRangeString!='None' and options.allsamples.lower()=='sms':
+  from Workspace.HEPHYCommonTools.xsecSMS import stop8TeV_NLONLL
+  allSamples=[]
+  msqStart = int(options.smsMsqRangeString.split('-')[0])
+  msqEnd = int(options.smsMsqRangeString.split('-')[1])
+  msqVals = range(msqStart, msqEnd, 25)
+  print "Converting Msq from",msqStart, 'to',msqEnd,'. Thats the following:',msqVals
+  xsec = {}
+  for msq in msqVals:
 
+    b = None 
+    if msq>=100 and msq<=150:
+      b = "T2DegenerateStop_2J_mStop-100to150"
+    if msq>=175 and msq<=225:
+      b = "T2DegenerateStop_2J_mStop-175to225"
+    if not b: 
+      print "Don't know which bin on dpm for msq",msq
+      continue
+
+    for deltaM in range(0,110,10):
+#    for deltaM in [100]:
+      T2DegStop = {}  
+      T2DegStop={}
+      T2DegStop["dirname"] = "/dpm/oeaw.ac.at/home/cms/store/user/schoef/pat_140314/"
+      T2DegStop['newMETCollection'] = True
+      T2DegStop["Chain"] = "Events"
+      name = "T2DegStop_"+str(msq)+"_"+str(deltaM)
+      T2DegStop["bins"] = [[name,[b]]]
+      T2DegStop["name"] = name
+      xsec[name] = stop8TeV_NLONLL[msq]
+      T2DegStop["additionalCut"] = "osetMsq=="+str(msq)+"&&osetMN=="+str(msq-deltaM)
+#      T2DegStop["additionalCut"] = "(1)"
+      T2DegStop['reweightingHistoFile'] = S10rwHisto
+      T2DegStop['reweightingHistoFileSysPlus'] = S10rwPlusHisto
+      T2DegStop['reweightingHistoFileSysMinus'] = S10rwMinusHisto
+      T2DegStop['reweightingHistoFile'] = S10rwHisto
+      T2DegStop['reweightingHistoFileSysPlus'] = S10rwPlusHisto
+      T2DegStop['reweightingHistoFileSysMinus'] = S10rwMinusHisto
+      allSamples.append(T2DegStop)
+      print "Added SMS",T2DegStop["name"]
+else:
+  exec("allSamples = [" +options.allsamples+ "]")
 
 overwrite = True
-target_lumi = 19375 #pb-1
+target_lumi = 19700 #pb-1
 
 from localInfo import username
 outputDir = "/data/"+username+"/"+subDir+"/"
@@ -256,62 +294,65 @@ def findSec(x,lp):
 
 ##################################################################################
 storeVectors = True
-commoncf = ""
-if options.chmode[:4]=="copy":
-  commoncf = "type1phiMet>150"
-  if options.newMETCollection:
-    commoncf = "met>150"
-if options.chmode[:7] == "copyInc":
-  commoncf = "(1)"
-if options.chmode[:7] == "copyMu":
-  commoncf = "ngoodMuons==1"
-#  storeVectors = False
 
 for sample in allSamples:
   sample['filenames'] = {}
   sample['weight'] = {}
-  for bin in sample['bins']:
-    subdirname = sample['dirname']+'/'+bin+'/'
-    if sample['bins'] == ['']:
-      subdirname = sample['dirname']+'/'
-    c = ROOT.TChain('Events')
-    d = ROOT.TChain('Runs')
-    sample['filenames'][bin] = [subdirname+'/h*.root']
-
-    sample['filenames'][bin] = []
-    prefix = ""
-    if subdirname[0:5] != "/dpm/":
-      filelist = os.listdir(subdirname)
+  for bin_ in sample['bins']:
+    if type(bin_) == type([]):
+      bin = bin_[0]
+      subdirs = bin_[1]
     else:
-  # this is specific to rfio    
-      filelist = []
-      allFiles = os.popen("rfdir %s | awk '{print $9}'" % (subdirname))
-      for file in allFiles.readlines():
-        file = file.rstrip()
-  #        if(file.find("histo_548_1_nmN") > -1): continue
-        filelist.append(file)
-      prefix = "root://hephyse.oeaw.ac.at/"#+subdirname
+      subdirs = [bin_]
+      bin=bin_
+    sample['filenames'][bin] = []
+    for dir in subdirs:
+      subdirname = sample['dirname']+'/'+dir+'/'
+      print "Looping over subdir",subdirname
+      if sample['bins'] == ['']:
+        subdirname = sample['dirname']+'/'
+      prefix = ""
+      if subdirname[0:5] != "/dpm/":
+        filelist = os.listdir(subdirname)
+      else:
+        filelist = []
+        allFiles = os.popen("rfdir %s | awk '{print $9}'" % (subdirname))
+        for file in allFiles.readlines():
+          file = file.rstrip()
+          filelist.append(file)
+        prefix = "root://hephyse.oeaw.ac.at/"#+subdirname
+      if options.small: filelist = filelist[:10]
+      for tfile in filelist:
+          sample['filenames'][bin].append(subdirname+tfile)
 
-    if options.small: filelist = filelist[:10]
-  ####
-    for tfile in filelist:
-  #      if os.path.isfile(subdirname+tfile) and tfile[-5:] == '.root' and tfile.count('histo') == 1:
-        sample['filenames'][bin].append(subdirname+tfile)
+    if options.allsamples.lower()=='sms':
+      c = ROOT.TChain(sample['Chain'])
+      for tfile in sample['filenames'][bin]:
+        print "Adding",prefix+tfile
+        c.Add(prefix+tfile)
+      nevents = c.GetEntries(sample['additionalCut'])
+      print nevents, sample['additionalCut']
+      del c
+    else:
+      d = ROOT.TChain('Runs')
+      for tfile in sample['filenames'][bin]:
+        d.Add(prefix+tfile)
+      nevents = 0
+      nruns = d.GetEntries()
+      for i in range(0, nruns):
+        d.GetEntry(i)
+        nevents += getVarValue(d,'uint_EventCounter_runCounts_PAT.obj')
+      del d
 
-    for tfile in sample['filenames'][bin]:
-      print sample['name'], prefix+tfile
-      c.Add(prefix+tfile)
-      d.Add(prefix+tfile)
-    nevents = 0
-    nruns = d.GetEntries()
-    for i in range(0, nruns):
-      d.GetEntry(i)
-      nevents += getVarValue(d,'uint_EventCounter_runCounts_PAT.obj')
     if not bin.lower().count('run'):
-      weight = xsec.xsec[bin]*target_lumi/nevents
+      if nevents>0:
+        weight = xsec[bin]*target_lumi/nevents
+      else:
+        weight=0
+      print 'Sample', sample['name'], 'bin', bin,'xsec',xsec[bin], 'n-events',nevents,'weight',weight
     else:
       weight = 1.
-    print 'Sample', sample['name'], 'bin', bin, 'n-events',nevents,'weight',weight
+      print 'Sample', sample['name'], 'bin', bin, 'n-events',nevents,'weight',weight
     sample["weight"][bin]=weight
 
 if not os.path.isdir(outputDir):
@@ -332,7 +373,7 @@ for isample, sample in enumerate(allSamples):
     print "Directory", outputDir+"/"+outSubDir, "already found"
 
   variables = ["weight", "run", "lumi", "ngoodVertices"]
-  if options.newMETCollection:
+  if sample['newMETCollection']:
     variables+=["met", "metphi"]
   else:
     variables+=["type1phiMet", "type1phiMetphi"]
@@ -350,9 +391,10 @@ for isample, sample in enumerate(allSamples):
   tavars = ["taPt", "taEta", "taPhi", "taPdg"]
   if not sample['name'].lower().count('data'):
     mcvars = ["gpPdg", "gpM", "gpPt", "gpEta", "gpPhi", "gpMo1", "gpMo2", "gpDa1", "gpDa2", "gpSta"]
-
+  if options.allsamples.lower()=='sms':
+    variables+=['osetMgl', 'osetMN', 'osetMC', 'osetMsq']
   extraVariables=["nbtags", "ht", "nSoftIsolatedMuons", "nHardMuons", "nHardMuonsRelIso02", "nSoftElectrons", "nHardElectrons", "nSoftTaus", "nHardTaus"]
-  if options.newMETCollection:
+  if sample['newMETCollection']:
     extraVariables+=["type1phiMet", "type1phiMetphi"]
   extraVariables += ["isrJetPt", "isrJetEta", "isrJetPhi", "isrJetPdg", "isrJetBtag", "isrJetChef", "isrJetNhef", "isrJetCeef", "isrJetNeef", "isrJetHFhef", "isrJetHFeef", "isrJetMuef", "isrJetElef", "isrJetPhef", "isrJetCutBasedPUJetIDFlag", "isrJetFull53XPUJetIDFlag", "isrJetMET53XPUJetIDFlag", "isrJetBTBVetoPassed", "isrJetUnc"]
 
@@ -434,7 +476,19 @@ for isample, sample in enumerate(allSamples):
       for var in mcvars:
         t.Branch(var,   ROOT.AddressOf(s,var), var+'[ngp]/F')
 
-  for bin in sample["bins"]:
+  for bin_ in sample["bins"]:
+    commoncf = ""
+    if options.chmode[:4]=="copy":
+      commoncf = "type1phiMet>150"
+    if options.chmode[:7] == "copyInc":
+      commoncf = "(1)"
+    if options.chmode[:7] == "copyMu":
+      commoncf = "ngoodMuons==1"
+    #  storeVectors = False
+    if type(bin_) == type([]):
+      bin = bin_[0]
+    else:
+      bin=bin_
     c = ROOT.TChain(sample["Chain"])
     for thisfile in sample["filenames"][bin]:
       prefix = ""
@@ -457,7 +511,8 @@ for isample, sample in enumerate(allSamples):
           commoncf = commoncf+"&&"+sample["additionalCut"][bin]
       else:
         commoncf = commoncf+"&&"+sample["additionalCut"]
-
+    if sample['newMETCollection']:
+      commoncf = commoncf.replace('type1phiMet', 'met')
     if ntot>0:
       c.Draw(">>eList", commoncf)
       elist = ROOT.gDirectory.Get("eList")
@@ -525,6 +580,9 @@ for isample, sample in enumerate(allSamples):
           for var in variables[1:]:
             getVar = var
             exec("s."+var+"="+str(getVarValue(c, getVar)).replace("nan","float('nan')"))
+#          if options.allsamples.lower()=='sms':
+#            for var in ['osetMgl', 'osetMN', 'osetMC', 'osetMsq']:
+#              print s.event, var, getVarValue(c, var)
           s.event = long(c.GetLeaf(c.GetAlias('event')).GetValue())
           if not sample['name'].lower().count('data'):
             nvtxWeightSysPlus, nvtxWeightSysMinus, nvtxWeight = 1.,1.,1.
@@ -537,7 +595,7 @@ for isample, sample in enumerate(allSamples):
 
           for var in extraVariables:
             exec("s."+var+"=float('nan')")
-          if options.newMETCollection:
+          if sample['newMETCollection']:
             s.type1phiMet=s.met
             s.type1phiMetphi=s.metphi
 

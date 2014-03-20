@@ -55,6 +55,7 @@ xsec["8TeV-WbbJetsToLNu"]                   =       3*0.108*377.4 #https://twiki
 
 
 #http://cms.cern.ch/iCMS/jsp/mcprod/admin/requestmanagement.jsp?campid=Summer12_DR53X
+xsec["8TeV-WJetsToLNu_HT-150To200"] = 235.6  #/WJetsToLNu_HT-150To200_8TeV-madgraph/Summer12_DR53X-PU_S10_START53_V7C-v1/AODSIM
 xsec["8TeV-WJetsToLNu_HT-150To200-2"] = 235.6  #/WJetsToLNu_HT-150To200_8TeV-madgraph/Summer12_DR53X-PU_S10_START53_V7C-v1/AODSIM
 xsec["8TeV-WJetsToLNu_HT-200To250"] =  90.27#/WJetsToLNu_HT-200To250_8TeV-madgraph/Summer12_DR53X-PU_S10_START53_V7C-v1/AODSIM
 xsec["8TeV-WJetsToLNu_HT-200To250-2"] =90.27  #/WJetsToLNu_HT-200To250_8TeV-madgraph/Summer12_DR53X-PU_S10_START53_V7C-v1/AODSIM

@@ -37,15 +37,15 @@ def calcPolWeights(c):
           WPol1Minus10_weight_flfr       = ROOT.GetWeightWjetsPolarizationFLminusFR(genp4_W_,genp4_l_,-10,1);
           WPol2PlusPlus5_weight_flfr        = ROOT.GetWeightWjetsPolarizationFLminusFR(genp4_W_,genp4_l_,5,1);
           WPol2PlusMinus5_weight_flfr        = ROOT.GetWeightWjetsPolarizationFLminusFR(genp4_W_,genp4_l_,-5,1);
-          WPol3Plus10_weight_flfr        = ROOT.GetWeightWjetsPolarizationF0(genp4_W_,genp4_l_,+10,1);
-          WPol3Minus10_weight_flfr        = ROOT.GetWeightWjetsPolarizationF0(genp4_W_,genp4_l_,-10,1);
+          WPol3Plus10_weight_f0        = ROOT.GetWeightWjetsPolarizationF0(genp4_W_,genp4_l_,+10,1);
+          WPol3Minus10_weight_f0        = ROOT.GetWeightWjetsPolarizationF0(genp4_W_,genp4_l_,-10,1);
         else:
           WPol1Plus10_weight_flfr        = ROOT.GetWeightWjetsPolarizationFLminusFR(genp4_W_,genp4_l_,10,0);
           WPol1Minus10_weight_flfr       = ROOT.GetWeightWjetsPolarizationFLminusFR(genp4_W_,genp4_l_,-10,0);
           WPol2MinusPlus5_weight_flfr        = ROOT.GetWeightWjetsPolarizationFLminusFR(genp4_W_,genp4_l_,5,0);
           WPol2MinusMinus5_weight_flfr        = ROOT.GetWeightWjetsPolarizationFLminusFR(genp4_W_,genp4_l_,-5,0);
-          WPol3Plus10_weight_flfr        = ROOT.GetWeightWjetsPolarizationF0(genp4_W_,genp4_l_,+10,0);
-          WPol3Minus10_weight_flfr        = ROOT.GetWeightWjetsPolarizationF0(genp4_W_,genp4_l_,-10,0);
+          WPol3Plus10_weight_f0        = ROOT.GetWeightWjetsPolarizationF0(genp4_W_,genp4_l_,+10,0);
+          WPol3Minus10_weight_f0        = ROOT.GetWeightWjetsPolarizationF0(genp4_W_,genp4_l_,-10,0);
         res = {\
           "WPol1Plus10_weight_flfr":WPol1Plus10_weight_flfr,
           "WPol1Minus10_weight_flfr":WPol1Minus10_weight_flfr,
@@ -53,8 +53,8 @@ def calcPolWeights(c):
           "WPol2PlusMinus5_weight_flfr":WPol2PlusMinus5_weight_flfr,
           "WPol2MinusPlus5_weight_flfr":WPol2MinusPlus5_weight_flfr,
           "WPol2MinusMinus5_weight_flfr":WPol2MinusMinus5_weight_flfr,
-          "WPol3Plus10_weight_flfr":WPol3Plus10_weight_flfr,
-          "WPol3Minus10_weight_flfr":WPol3Minus10_weight_flfr
+          "WPol3Plus10_weight_f0":WPol3Plus10_weight_f0,
+          "WPol3Minus10_weight_f0":WPol3Minus10_weight_f0
         }
 
         return res 
