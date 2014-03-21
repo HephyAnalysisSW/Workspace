@@ -91,11 +91,11 @@ if options.smsMsqRangeString!='None' and options.allsamples.lower()=='sms':
       T2DegStop["dirname"] = "/dpm/oeaw.ac.at/home/cms/store/user/schoef/pat_140314/"
       T2DegStop['newMETCollection'] = True
       T2DegStop["Chain"] = "Events"
-      name = "T2DegStop_"+str(msq)+"_"+str(deltaM)
+      name = "T2DegStop_"+str(msq)+"_"+str(msq-deltaM)
       T2DegStop["bins"] = [[name,[b]]]
       T2DegStop["name"] = name
       xsec[name] = stop8TeV_NLONLL[msq]
-      T2DegStop["additionalCut"] = "osetMsq=="+str(msq)+"&&osetMN=="+str(msq-deltaM)
+      T2DegStop["additionalCut"] = "osetMsq=="+str(msq)+"&&osetMC=="+str(msq-deltaM)
 #      T2DegStop["additionalCut"] = "(1)"
       T2DegStop['reweightingHistoFile'] = S10rwHisto
       T2DegStop['reweightingHistoFileSysPlus'] = S10rwPlusHisto
@@ -405,10 +405,11 @@ for isample, sample in enumerate(allSamples):
     if sample['name'].lower().count('ttjets'):
       extraVariables+=["top0Pt", "top1Pt", "topPtWeight"] 
   structString = "struct MyStruct_"+str(nc)+"_"+str(isample)+"{ULong64_t event;"
-  for var in variables:
-    structString +="Float_t "+var+";"
-  for var in extraVariables:
-    structString +="Float_t "+var+";"
+  structString+="Float_t "+",".join(variables+extraVariables)+";"
+#  for var in variables:
+#    structString +="Float_t "+var+";"
+#  for var in extraVariables:
+#    structString +="Float_t "+var+";"
   structString +="Int_t nmu, nel, nta, njet, njet60, njet60FailID, njet30FailID, njet60FailISRJetID, njet30FailISRJetID;"
   if storeVectors:
     structString +="Int_t njetCount, nmuCount, nelCount, ntaCount;"
@@ -580,7 +581,9 @@ for isample, sample in enumerate(allSamples):
           for var in variables[1:]:
             getVar = var
             exec("s."+var+"="+str(getVarValue(c, getVar)).replace("nan","float('nan')"))
-#          if options.allsamples.lower()=='sms':
+          if options.allsamples.lower()=='sms':
+            s.osetMN, s.osetMC = s.osetMC, s.osetMN# swap, because I misinterpreted the model string
+            
 #            for var in ['osetMgl', 'osetMN', 'osetMC', 'osetMsq']:
 #              print s.event, var, getVarValue(c, var)
           s.event = long(c.GetLeaf(c.GetAlias('event')).GetValue())
