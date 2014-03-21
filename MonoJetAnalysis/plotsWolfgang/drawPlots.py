@@ -9,7 +9,7 @@ parser = OptionParser()
 parser.add_option("--preselection", "-p", dest="preselection",  help="preselection", default=None)
 parser.add_option("--draw", "-d", dest="drawClass",  help="draw class", default="DrawWithFOM.py")
 parser.add_option("--elist", "-e", dest="elist",  help="event list mode", choices=[ "w", "r", "a" ], default=None )
-parser.add_option("--fom", dest="fom",  help="fom to be used", choices=[ "sob", "sosqrtb", "None" ], default="sosqrtb" )
+parser.add_option("--fom", dest="fom",  help="fom to be used", choices=[ "sob", "sosqrtb", "dataovermc", "None" ], default="sosqrtb" )
 parser.add_option("--elistBase", dest="elistBase",  help="base directory for event lists", default="./elists")
 parser.add_option("-s", dest="save",  help="directory for saved plots", default=None)
 parser.add_option("-b", dest="batch",  help="batch mode", action="store_true", default=False)
@@ -64,6 +64,7 @@ samples.append(Sample("WJetsHT150v2",sampleBase,type="B",color=5,fill=True))
 #samples.append(Sample("stop300lsp270g200FastSim",sampleBase,type="S",color=4,fill=False))
 samples.append(Sample("stop300lsp270FastSim",sampleBase,type="S",color=4,fill=False))
 samples.append(Sample("stop300lsp240g150FastSim",sampleBase,type="S",color=2,fill=False))
+samples.append(Sample("data",sampleBase,type="D",color=1,fill=False))
 
 ROOT.TH1.SetDefaultSumw2()
 
@@ -100,6 +101,7 @@ for varname in variables:
 
 #    drawClass = DrawWithFOM(fom=options.fom)
 
+    data = None
     if variable.is2D():
         cnv.SetRightMargin(0.15)
         if not definedPalette:
@@ -122,7 +124,7 @@ for varname in variables:
         pads.append(p2)
 
 
-        bkgs, sigs, legend = drawClass.drawStack1D(samples,histograms,p1)
+        data, bkgs, sigs, legend = drawClass.drawStack1D(samples,histograms,p1)
         if variable.uselog:
             p1.SetLogy(1)
 
@@ -132,9 +134,12 @@ for varname in variables:
         allstacks.append(bkgs)
     if len(sigs)>0:
         allstacks.extend(sigs)
-    if not variable.is2D() and bkgs!=None and variable.scut!=None and options.fom!=None:
+    if not variable.is2D() and bkgs!=None and options.fom!=None:
 #        drawClass.drawSoB(bkgs,sigs,variable.scut,pad=p2)
-        drawClass.drawFom(bkgs,sigs,variable.scut,pad=p2)
+        if data!=None and options.fom=="dataovermc":
+            drawClass.drawDoMC(data,bkgs,pad=p2)
+        elif variable.scut!=None:
+            drawClass.drawFom(bkgs,sigs,variable.scut,pad=p2)
     cnv.Update()
 
 if not options.batch:
