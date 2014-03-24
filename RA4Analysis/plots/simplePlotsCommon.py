@@ -155,6 +155,7 @@ class variable:
   style="e"
   color=ROOT.kBlue
   markerStyle=-1
+  markerSize=-1
   normalizeTo=""
   normalizeWhat=""
   add=[]
@@ -257,7 +258,10 @@ def drawStack(stack,normalized=False):
         hcopy.SetMarkerStyle(var.markerStyle)
       else:
         hcopy.SetMarkerStyle(20)
-      hcopy.SetMarkerSize(1)
+      if var.markerSize>0:
+        hcopy.SetMarkerSize(var.markerSize)
+      else:
+        hcopy.SetMarkerSize(1)
     if var.style[0] == "f":
       hcopy.SetLineColor(ROOT.kBlack)
       hcopy.SetLineStyle(0)
@@ -353,6 +357,14 @@ def drawStack(stack,normalized=False):
   latex.SetTextSize(0.04);
   latex.SetTextAlign(11); # align right
   for line in stack[0].lines:
+    if len(line)>3:
+      latex.SetTextSize(line[3])
+    else:
+      latex.SetTextSize(0.04)
+#    if len(line)>4:
+#      latex.SetTextAlign(line[4])
+#    else:
+#      latex.SetTextSize(11) #align right
     stuff.append(latex.DrawLatex(line[0],line[1],line[2]))
   if len(stack[0].dataMCRatio) == 2:
     return [returnDataForDataOverMC, returnMCForDataOverMC]
@@ -422,6 +434,8 @@ def drawNMStacks(intn, intm, thesestacks, filename, normalized=False, path = def
       rvar.maximum=1.7
       rvar.data_histo = datamcstacks[0] 
       rvar.data_histo.Divide(datamcstacks[1])
+      rvar.markerSize = datamcstacks[0].GetMarkerSize()
+      rvar.makerStyle = datamcstacks[0].GetMarkerStyle()
       rvar.lines = []
       rvar.style = "e"
       rvar.color = stack[0].dataMCRatio[0].color

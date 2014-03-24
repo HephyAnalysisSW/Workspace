@@ -163,7 +163,7 @@ class PlotsBase:
                 jev = iev if not self.readElist else elist.GetEntry(iev)
                 eh.getEntry(jev)
                 nall += 1
-                if self.readElist or self.preselection==None or self.preselection.accept(eh):
+                if self.readElist or self.preselection==None or self.preselection.accept(eh,sample):
                     self.fill(eh,sample.downscale)
                     if self.writeElist:
                         elist.Enter(iev)

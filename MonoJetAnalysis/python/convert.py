@@ -58,6 +58,7 @@ path = os.path.abspath('../../HEPHYCommonTools/python')
 if not path in sys.path:
     sys.path.insert(1, path)
 del path
+from helpers import getVarValue, deltaPhi, minAbsDeltaPhi, invMassOfLightObjects, deltaR, closestMuJetDeltaR
 from monoJetFuncs import softIsolatedMT, pmuboost3d
 
 from xsec import xsec
@@ -769,6 +770,11 @@ for isample, sample in enumerate(allSamples):
               s.taPdg[i] = allGoodTaus[i]['pdg']
           tmpDir = ROOT.gDirectory.func()
           chain_gDir.cd()
+#          print s.type1phiMet
+          if s.type1phiMet<150:
+            print "Warning!!"
+          else:
+            print "OK"
           t.Fill()
           tmpDir.cd()
 #          if s.type1phiMet<150:
