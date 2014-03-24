@@ -108,7 +108,7 @@ if options.smsMsqRangeString!='None' and options.allsamples.lower()=='sms':
 else:
   exec("allSamples = [" +options.allsamples+ "]")
 
-overwrite = True
+overwrite = False
 target_lumi = 19700 #pb-1
 
 from localInfo import username

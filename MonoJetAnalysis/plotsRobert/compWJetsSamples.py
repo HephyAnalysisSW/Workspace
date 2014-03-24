@@ -172,7 +172,7 @@ for pdgSign in [-1,+1]:
 #      if mu and muRequirement(mu) and pdgSign==mu['pdg']/abs(mu['pdg']):
       pdg_ = getVarValue(c, 'softIsolatedMuPdg') 
 
-      if  pdgSign*pdg_>0:
+      if  pdgSign*pdg_>0 and abs(getVarValue(c, 'softIsolatedMuEta'))<1.5:
         mT = getVarValue(c, 'softIsolatedMT')
 #        if mT-getVarValue(c, 'softIsolatedMT')>10:
 #          print getVarValue(c,'event'), getVarValue(c,'lumi'), mT-getVarValue(c, 'softIsolatedMT')

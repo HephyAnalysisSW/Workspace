@@ -1,6 +1,9 @@
 import ROOT
 from math import pi, sqrt, cos, sin, sinh
 
+def test():
+  return 1
+
 def getObjFromFile(fname, hname):
   f = ROOT.TFile(fname)
   assert not f.IsZombie()
