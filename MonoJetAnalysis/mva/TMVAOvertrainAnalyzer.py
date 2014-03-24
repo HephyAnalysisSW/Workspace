@@ -4,7 +4,7 @@ from localConfig import afsUser, nfsUser, localPlotDir
 from array import array
 import os, sys
 
-for path in [os.path.abspath(p) for p in ['../../HEPHYCommonTools/mva', 'HEPHYCommonTools/cardFileWriter/', '../python', '../../HEPHYCommonTools/cardFileWriter']]:
+for path in [os.path.abspath(p) for p in ['../../HEPHYCommonTools/mva', 'HEPHYCommonTools/cardFileWriter/', '../../HEPHYCommonTools/python', '../python', '../../HEPHYCommonTools/cardFileWriter']]:
   if not path in sys.path:
       sys.path.insert(1, path)
 

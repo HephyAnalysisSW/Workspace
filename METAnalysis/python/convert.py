@@ -5,8 +5,8 @@ from math import *
 import sys, os, copy
 from datetime import datetime
 
-chmode = "Zmumu"
 from defaultDiLeptonSamples import *
+chmode = "Zmumu"
 
 for p in ['../../MonoJetAnalysis/python', '../../HEPHYCommonTools/python']:
   path = os.path.abspath(p)
@@ -17,9 +17,9 @@ from helpers import getVarValue, deltaR, invMassOfLightObjects
 
 import xsec
 
-subDir = "diBosonTuples_v1"
+subDir = "dileptonTuples_v1"
 
-allSamples = [dataZmumu]
+allSamples = [data_mumu]
 #drellYan_mumu['bins']=drellYan_mumu['bins'][:1]
 # from first parameter get mode, second parameter is sample type
 if len(sys.argv)>=3:
@@ -28,7 +28,7 @@ if len(sys.argv)>=3:
   #steerable
   exec("allSamples = [" + ",".join(sampinp) + "]")
 
-small  = True
+small  = False
 overwrite = True
 target_lumi = 19700 #pb-1
 
@@ -179,8 +179,9 @@ for sample in allSamples:
       subDirsToAdd = [bin]
     for subdir in subDirsToAdd:
       print "Sample",sample['name'], "Bin",bin,"adding",subdir
-      nEvents+=eventsInSample[subdir.replace('Mu-','').replace('Ele-','')]
       subdirname = sample['dirname']+'/'+subdir+'/'
+      if not bin.lower().count('run'):
+        nEvents+=eventsInSample[subdir.replace('Mu-','').replace('Ele-','')]
       prefix = ""
       if subdirname[0:5] != "/dpm/":
         filelist = os.listdir(subdirname)
@@ -193,7 +194,6 @@ for sample in allSamples:
     #        if(file.find("histo_548_1_nmN") > -1): continue
           filelist.append(file)
         prefix = "root://hephyse.oeaw.ac.at/"#+subdirname
-
       if small: filelist = filelist[:10]
     ####
       for tfile in filelist:
@@ -203,8 +203,9 @@ for sample in allSamples:
       weight = xsec.xsec[bin.replace("Ele-","8TeV-").replace("Mu-","8TeV-")]*target_lumi/nEvents
     else:
       weight = 1.
-    print 'Sample', sample['name'], 'bin', bin, 'nEvents',nEvents,'weight',weight
+    print 'Sample', sample['name'], 'bin', bin, 'nEvents(only valid for MC)',nEvents,'weight',weight
     sample["weight"][bin]=weight
+
 
 if not os.path.isdir(outputDir):
   os.system('mkdir -p '+outputDir)
@@ -219,13 +220,11 @@ for isample, sample in enumerate(allSamples):
     print "Directory", outputDir+"/"+chmode, "already found"
 
   variables = ["weight", "run", "lumi", "ngoodVertices", "type1phiMet", "type1phiMetphi"]
-  if sample['name'].lower().count('data'):
+  if not sample['name'].lower().count('data'):
 #    alltriggers =  [ "HLTL1ETM40", "HLTMET120", "HLTMET120HBHENoiseCleaned", "HLTMonoCentralPFJet80PFMETnoMu105NHEF0p95", "HLTMonoCentralPFJet80PFMETnoMu95NHEF0p95"]
 #    for trigger in alltriggers:
 #      variables.append(trigger)
 #      variables.append(trigger.replace("HLT", "pre") )
-    continue
-  else:
     variables.extend(["nTrueGenVertices", "genmet", "genmetphi", "genmetChargedEM", "genmetChargedHad", "genmetMuonEt",  "genmetNeutralEM",  "genmetNeutralHad",  "genmetSumEt", "puWeight", "puWeightSysPlus", "puWeightSysMinus"])
   
   jetvars = ["jetPt", "jetEta", "jetPhi", "jetPdg", "jetBtag", "jetCutBasedPUJetIDFlag","jetFull53XPUJetIDFlag","jetMET53XPUJetIDFlag", "jetChef", "jetNhef", "jetCeef", "jetNeef", "jetHFhef", "jetHFeef", "jetMuef", "jetElef", "jetPhef"]
@@ -295,7 +294,6 @@ for isample, sample in enumerate(allSamples):
       t.Branch(var,   ROOT.AddressOf(s,var), var+'[nelCount]/F')
     for var in tavars:
       t.Branch(var,   ROOT.AddressOf(s,var), var+'[ntaCount]/F')
-
   for bin in sample["bins"]:
     c = ROOT.TChain(sample["Chain"])
     for thisfile in sample["filenames"][bin]:
@@ -303,6 +301,8 @@ for isample, sample in enumerate(allSamples):
       if thisfile[0:5] == "/dpm/":
 #        prefix = "rfio:"
         prefix = "root://hephyse.oeaw.ac.at/"#+subdirname
+#      print "Chaining",prefix+thisfile
+
       c.Add(prefix+thisfile)
     ntot = c.GetEntries()
     if sample.has_key("additionalCut"):

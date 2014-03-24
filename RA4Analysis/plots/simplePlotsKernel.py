@@ -37,7 +37,7 @@ for sample in allSamples:
   if sample.has_key("hasWeight"):
     if sample["hasWeight"]:
       for bin in sample["bins"]:
-        print "Sample has stored weight! Ignored!!", sample["dirname"] , sample["name"], bin
+        print "Sample has stored weight! Not calculated!!", sample["dirname"] , sample["name"], bin
       continue
 #  print "peng", sample["name"]
   sample["weight"]={}
@@ -96,7 +96,7 @@ for sample in allSamples:
           c.Draw(var.name+">>htmpSPK",str(sample["weight"][bin])+"*("+var.commoncf+")")
           print "At variable",var.name, "Sample",sample["name"],"bin",bin, "adding",htmp.Integral(),str(sample["weight"][bin])+"*("+var.commoncf+")"
         else:
-          c.Draw(var.name+">>htmpSPK",var.commoncf)
+          c.Draw(var.name+">>htmpSPK",sample["weight"][bin]+"*("+var.commoncf+")")
           print "At variable",var.name, "Sample",sample["name"],"bin",bin, "adding",htmp.Integral(),var.commoncf
         htmp=ROOT.gDirectory.Get("htmpSPK")
         var.data_histo.Add(htmp.Clone())

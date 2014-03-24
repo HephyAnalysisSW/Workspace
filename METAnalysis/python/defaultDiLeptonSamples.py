@@ -25,18 +25,18 @@ S10rwHisto = getPUReweightingUncertainty("S10", dataFile = "/data/schoef/results
 S10rwPlusHisto = getPUReweightingUncertainty("S10", dataFile = "/data/schoef/results2012/PU/MyDataPileupHistogram_Run2012ABCD_60max_true_pixelcorr_SysPlus5.root")
 S10rwMinusHisto = getPUReweightingUncertainty("S10", dataFile = "/data/schoef/results2012/PU/MyDataPileupHistogram_Run2012ABCD_60max_true_pixelcorr_SysMinus5.root")
 
-dataZmumu={}
-dataZmumu["name"]     = "dataZmumu";
-dataZmumu["dirname"] = "/dpm/oeaw.ac.at/home/cms/store/user/schoef/MET_050214/" 
-dataZmumu["bins"]    = ["DoubleMu-Run2012A-22Jan2013", "DoubleMu-Run2012B-22Jan2013", "DoubleMu-Run2012C-22Jan2013", "DoubleMu-Run2012D-22Jan2013"]
-dataZmumu["Chain"] = "Events"
-dataZmumu["Counter"] = "bool_EventCounter_passed_PAT.obj"
-dataZee={}
-dataZee["name"]     = "dataZee";
-dataZee["dirname"] = "/dpm/oeaw.ac.at/home/cms/store/user/schoef/MET_050214/" 
-dataZee["bins"]    = ["DoubleElectron-Run2012A-22Jan2013", "DoubleElectron-Run2012B-22Jan2013", "DoubleElectron-Run2012C-22Jan2013", "DoubleElectron-Run2012D-22Jan2013"]
-dataZee["Chain"] = "Events"
-dataZee["Counter"] = "bool_EventCounter_passed_PAT.obj"
+data_mumu={}
+data_mumu["name"]     = "data_mumu";
+data_mumu["dirname"] = "/dpm/oeaw.ac.at/home/cms/store/user/schoef/MET_050214/" 
+data_mumu["bins"]    = ["DoubleMu-Run2012A-22Jan2013", "DoubleMu-Run2012B-22Jan2013", "DoubleMu-Run2012C-22Jan2013", "DoubleMu-Run2012D-22Jan2013"]
+data_mumu["Chain"] = "Events"
+data_mumu["Counter"] = "bool_EventCounter_passed_PAT.obj"
+data_ee={}
+data_ee["name"]     = "data_ee";
+data_ee["dirname"] = "/dpm/oeaw.ac.at/home/cms/store/user/schoef/MET_050214/" 
+data_ee["bins"]    = ["DoubleElectron-Run2012A-22Jan2013", "DoubleElectron-Run2012B-22Jan2013", "DoubleElectron-Run2012C-22Jan2013", "DoubleElectron-Run2012D-22Jan2013"]
+data_ee["Chain"] = "Events"
+data_ee["Counter"] = "bool_EventCounter_passed_PAT.obj"
 
 
 mc={}

@@ -4,7 +4,6 @@ from PhysicsTools.PythonAnalysis import *
 from math import *
 import sys, os, copy
 from datetime import datetime
-from helpers import getVarValue, deltaPhi, minAbsDeltaPhi, invMassOfLightObjects, deltaR, closestMuJetDeltaR
 #chmode = "incNoISRJetID" 
 chmode = "copy" 
 #chmode = "copyCleanedWithAllLeptons" 
@@ -14,6 +13,7 @@ path = os.path.abspath('../../HEPHYCommonTools/python')
 if not path in sys.path:
     sys.path.insert(1, path)
 del path
+from helpers import getVarValue, deltaPhi, minAbsDeltaPhi, invMassOfLightObjects, deltaR, closestMuJetDeltaR
 from monoJetFuncs import softIsolatedMT, pmuboost3d
 
 import xsec
@@ -605,6 +605,11 @@ for isample, sample in enumerate(allSamples):
               s.softIsolatedpmuboost3d                       = pmuboost3d(s)
           tmpDir = ROOT.gDirectory.func()
           chain_gDir.cd()
+#          print s.type1phiMet
+          if s.type1phiMet<150:
+            print "Warning!!"
+          else:
+            print "OK"
           t.Fill()
           tmpDir.cd()
       del elist
