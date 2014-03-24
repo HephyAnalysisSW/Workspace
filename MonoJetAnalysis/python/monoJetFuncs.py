@@ -2,11 +2,22 @@ import os, sys, ROOT
 from math import cos, sin, sqrt, asinh, acosh, sinh
 
 def getValue(chain, varname):
-  alias = chain.GetAlias(varname)
+  # can treat scalars or arrays with a numeric index
+  #   default index (for a scalar) is 0
+  vn = varname
+  idx = 0
+  # try to find index
+  iidx = varname.find('[')
+  if iidx>-1:
+    assert varname[-1] == ']'
+    vn = varname[:iidx]
+    idx = int(varname[iidx+1:-1])
+    
+  alias = chain.GetAlias(vn)
   if alias!="":
-    return chain.GetLeaf( alias ).GetValue()
+    return chain.GetLeaf( alias ).GetValue(idx)
   else:
-    return chain.GetLeaf( varname ).GetValue()
+    return chain.GetLeaf( vn ).GetValue(idx)
 
 def softIsolatedMT(chain):
   lepton_pt   = getValue(chain, "softIsolatedMuPt")
@@ -29,18 +40,18 @@ def cosDeltaPhiLepW(chain):
   return ((lPt*cosLepPhi + mpx)*cosLepPhi + (lPt*sinLepPhi + mpy)*sinLepPhi )/pW
 
 
-def pmuboost3d(e):
+def pmuboost3d(jets, met, lep):
     mw = 80.385
     wwwtlv = ROOT.TLorentzVector(1e-9,1e-9,1e-9,1e-9)
     mettlv = ROOT.TLorentzVector(1e-9,1e-9,1e-9,1e-9)
     leptlv = ROOT.TLorentzVector(1e-9,1e-9,1e-9,1e-9)
-    for ij in xrange(e.njetCount):
-        if(e.jetPt[ij] > 30.):
+    for jet in jets:
+#        if(e.jetPt[ij] > 30.):
             tlvaux = ROOT.TLorentzVector(1e-9,1e-9,1e-9,1e-9)
-            tlvaux.SetPtEtaPhiM(e.jetPt[ij],0.,e.jetPhi[ij],0.)
+            tlvaux.SetPtEtaPhiM(jet['pt'],0.,jet['phi'],0.)
             wwwtlv -= tlvaux
-    mettlv.SetPtEtaPhiM(e.type1phiMet,0.,e.type1phiMetphi,0.)
-    leptlv.SetPtEtaPhiM(e.softIsolatedMuPt,e.softIsolatedMuEta,e.softIsolatedMuPhi,0.)
+    mettlv.SetPtEtaPhiM(met['pt'],0.,met['phi'],0.)
+    leptlv.SetPtEtaPhiM(lep['pt'],lep['eta'],lep['phi'], 0.)
 #    leptlv.SetPtEtaPhiM(e.muPt[0],e.muEta[0],e.muPhi[0],0.)
 # calculate eta(W) estimate; take the + solution
     ptl = (wwwtlv - mettlv).Pt()

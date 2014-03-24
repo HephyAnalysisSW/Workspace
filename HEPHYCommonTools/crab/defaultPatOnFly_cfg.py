@@ -84,9 +84,9 @@ if options.files[0][:9] == 'load:stop':
 isMC = (options.mode.lower()=='sms' or options.mode.lower()=='mc')
 jec = []
 if isMC:
-  jec = ['L1FastJet', 'L2Relative', 'L3Absolute']
-else:
   jec = ['L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual']
+else:
+  jec = ['L1FastJet', 'L2Relative', 'L3Absolute']
 #  if options.mode=="Mu":
 #    triggers =  ['HLT_PFHT350_Mu15_PFMET45_v*','HLT_PFHT350_Mu15_PFMET50_v*','HLT_PFHT400_Mu5_PFMET45_v*','HLT_PFHT400_Mu5_PFMET50_v*']
 #  if options.mode=="Ele":
@@ -400,9 +400,9 @@ process.SUSYTupelizer.triggersToMonitor = list(set(process.SUSYTupelizer.trigger
 print "TriggersToMonitor:",process.SUSYTupelizer.triggersToMonitor
 
 process.SUSYTupelizer.triggerCollection = cms.untracked.string( options.hltName )
-
+process.SUSYTupelizer.patMETs = cms.untracked.InputTag("patPFMETsTypeIPhicorrected")
 process.SUSYTupelizer.addFullJetInfo = cms.untracked.bool(True)
-process.SUSYTupelizer.addFullMETInfo = cms.untracked.bool(True)
+#process.SUSYTupelizer.addFullMETInfo = cms.untracked.bool(True)
 process.SUSYTupelizer.useForDefaultAlias = cms.untracked.bool(True)
 process.SUSYTupelizer.addTriggerInfo = cms.untracked.bool(True)
 process.SUSYTupelizer.addFullLeptonInfo = cms.untracked.bool(True)
@@ -415,6 +415,8 @@ process.SUSYTupelizer.addFullMuonInfo = cms.untracked.bool(True)
 process.SUSYTupelizer.addFullEleInfo = cms.untracked.bool(True)
 process.SUSYTupelizer.addFullTauInfo = cms.untracked.bool(True)
 process.SUSYTupelizer.addHEPHYCommonToolsInfo = cms.untracked.bool(options.addRA4Info)
+
+process.SUSYTupelizer.metsToMonitor = ["patPFMETsTypeIPhicorrected", "patPFMETsTypeIcorrected", "patPFMETsTypeIType0PFCandcorrected", "patRAWPFMETs"]
 process.p += process.SUSYTupelizer
 
 #process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")

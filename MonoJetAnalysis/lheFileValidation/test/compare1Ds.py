@@ -37,6 +37,9 @@ parser.add_option("--dir", dest="dir",  help="input directory", action="store", 
                   default="/data/adamwo/DegenerateLightStop/LheProduction/T2tt/stop_stop/validationGridFilesModifiedHeaders/")
 parser.add_option("--masses", "-m",  dest="masses",  help="mass pair (mstop,dm)", action="append", \
                   default=None)
+parser.add_option("--label", dest="label",  help="axis label", action="store", \
+                  default=None)
+parser.add_option("--unique", "-u",  dest="unique",  help="select only one file per mass point", action="store_true", default=False)
 parser.add_option("-b",  dest="batch",  help="batch mode", action="store_true", default=False)
 (options, args) = parser.parse_args()
 assert len(args)==1
@@ -59,12 +62,15 @@ ROOT.gStyle.SetOptStat(0)
 #   and define binning
 #
 filteredFiles = [ ]
+filteredMasses = [ ]
 for file in os.listdir(options.dir):
     mstop,dm = decodeFileName(file)
     if mstop==None or dm==None:
         continue
     if (mstop,dm) in masses:
-        filteredFiles.append( ( file, mstop, dm ) )
+        if not options.unique or not (mstop,dm) in filteredMasses:
+            filteredFiles.append( ( file, mstop, dm ) )
+            filteredMasses.append( ( mstop, dm ) )
 filteredFiles.sort(key=itemgetter(1,2))
 print filteredFiles
 #
@@ -100,12 +106,13 @@ for i,n in enumerate(histograms):
     leg = ROOT.TLegend(0.65,0.7,0.9,0.9)
     leg.SetBorderSize(0)
     leg.SetFillStyle(0)
+    leg.SetHeader("m(stop) / #delta m(stop-LSP)")
     opt = "hist"
     for j,h in enumerate(histograms[n]):
         if h:
             h.SetMaximum(hmax)
             h.Draw(opt)
-            leg.AddEntry(h,str(filteredFiles[j][1])+" / "+str(filteredFiles[j][2]),"l")
+            leg.AddEntry(h,str(filteredFiles[j][1])+" GeV / "+str(filteredFiles[j][2])+" GeV","l")
             opt = "hist same"
     leg.Draw()
     cnv.SaveAs(n+".png")

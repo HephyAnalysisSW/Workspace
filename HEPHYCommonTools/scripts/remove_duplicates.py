@@ -35,14 +35,15 @@ def readFileSize(f):
 for subdir in subdirnames:
   subdirname = options.dirname+"/"+subdir+"/"
   print  "At subdir ", subdirname
+  filenames = []
   if options.mode=='nfs':
     filenames = os.listdir(subdirname)
   if options.mode=='dpm':
-    filenames = []
-    p = subprocess.Popen(["dpns-ls "+ subdirname], shell = True , stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    p = subprocess.Popen(["dpns-ls -l "+ subdirname], shell = True , stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     for line in p.stdout.readlines():
-      line = line[:-1]
+      line = line[:-1].split()[-1]
       filenames.append(line)
+#      if line.count('_1429_'):print 'l', line
   numbers=[]
   for file in filenames:
     sstring = file.split("_")
@@ -57,6 +58,7 @@ for subdir in subdirnames:
     filesPerNumber[str(i)]=[]
     for file in filenames:
       if file.count("histo_"+str(i)+"_")>0:
+#        if i==1429:print file
         filesPerNumber[str(i)].append(file)
   for i in range(1,maxFileNumber+1):
     if len(filesPerNumber[str(i)])>1:
@@ -71,6 +73,7 @@ for subdir in subdirnames:
         if options.mode=="nfs":
           size = os.path.getsize(filename)
         else:
+          print filename, filesPerNumber[str(i)]
           size = readFileSize(filename)
         print filename, "size", size
         if size>=maxSize:

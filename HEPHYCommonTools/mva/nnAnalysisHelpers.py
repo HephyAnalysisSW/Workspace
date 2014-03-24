@@ -380,7 +380,13 @@ def constructDataset(setup, signal, background, overWrite = False, addAllTestEve
     setup['dataSetConfigFile'] = setup['dataFile'].replace('.root', '.pkl')
     setupStripped = copy.deepcopy(setup)
     setupStripped['varsCalculated'] = [v[:-1]+['removedFunction'] for v in setupStripped['varsCalculated']]
-    setupStripped['varsFromInputSignal'] = [v[:-1]+['removedFunction'] for v in setupStripped['varsFromInputSignal']]
+    setupStripped['varsFromInputSignal'] = []
+    for v in setup['varsCalculated']:
+      if type(v)==type(""):
+        setupStripped['varsFromInputSignal'].append(v)
+      else:
+        setupStripped['varsFromInputSignal'].append('removedFunction')
+ 
     for v in ['backgroundTrainEvents', 'signalTrainEvents', 'backgroundTestEvents', 'backgroundTrainEvents',  'backgroundAllTestEvents', 'signalAllTestEvents']:
       setupStripped[v]='removed' 
     pickle.dump(setupStripped, file(setup['dataSetConfigFile'],"w"))
@@ -836,7 +842,7 @@ def fillMVAHisto(sample, setup, reader, method, cut, histo, weight=None, weightF
 
 
 def getYieldFromChain(c, cut, weight = "weight"):
-  cut = weight+"*("+cut+")"
+  cut = "("+weight+")*("+cut+")"
   c.Draw("1>>htmp(1,0,2)", cut, "goff")
   htmp =  ROOT.gDirectory.Get("htmp")
   res = htmp.Integral()

@@ -1,31 +1,38 @@
 import copy, os, sys
 allSamples = []
 
-path = os.path.abspath('../../HEPHYCommonTools/python')
-if not path in sys.path:
-    sys.path.insert(1, path)
-del path
-from createPUReweightingHisto import getPUReweightingUncertainty
+from Workspace.HEPHYCommonTools.createPUReweightingHisto import getPUReweightingUncertainty
 
-S10rwHisto = getPUReweightingUncertainty("S10", dataFile = "/data/schoef/results2012/PU/MyDataPileupHistogram_Run2012ABCD_60max_true_pixelcorr_Sys0.root")
-S10rwPlusHisto = getPUReweightingUncertainty("S10", dataFile = "/data/schoef/results2012/PU/MyDataPileupHistogram_Run2012ABCD_60max_true_pixelcorr_SysPlus5.root")
-S10rwMinusHisto = getPUReweightingUncertainty("S10", dataFile = "/data/schoef/results2012/PU/MyDataPileupHistogram_Run2012ABCD_60max_true_pixelcorr_SysMinus5.root")
+S10rwHisto = getPUReweightingUncertainty("S10", dataFile = "/data/schoef/tools/PU/MyDataPileupHistogram_Run2012ABCD_60max_true_pixelcorr_Sys0.root")
+S10rwPlusHisto = getPUReweightingUncertainty("S10", dataFile = "/data/schoef/tools/PU/MyDataPileupHistogram_Run2012ABCD_60max_true_pixelcorr_SysPlus5.root")
+S10rwMinusHisto = getPUReweightingUncertainty("S10", dataFile = "/data/schoef/tools/PU/MyDataPileupHistogram_Run2012ABCD_60max_true_pixelcorr_SysMinus5.root")
 
 data={}
 data["name"]     = "data";
-data["dirname"] = "/data/mhickel/pat_130531/"
-data["bins"]    = ["MET-Run2012A-13Jul2012","MET-Run2012B-13Jul2012","MET-Run2012C-Aug24ReReco","MET-Run2012C-PromptReco-v2", "MET-Run2012D-PromptReco"]
+data["dirname"] = "/dpm/oeaw.ac.at/home/cms/store/user/schoef/pat_140314/"
+data['newMETCollection'] = True
+data["bins"]    = ["MET-Run2012A-22Jan2013", "MET-Run2012B-22Jan2013", "MET-Run2012C-22Jan2013", "MET-Run2012D-22Jan2013"]
 data["Chain"] = "Events"
 data["Counter"] = "bool_EventCounter_passed_PAT.obj"
 allSamples.append(data)
 
+dataSingleMu={}
+dataSingleMu["name"]     = "data";
+dataSingleMu['newMETCollection'] = True
+dataSingleMu["dirname"] = "/dpm/oeaw.ac.at/home/cms/store/user/schoef/pat_140314/"
+dataSingleMu["bins"]    = ["SingleMu-Run2012A-22Jan2013", "SingleMu-Run2012B-22Jan2013", "SingleMu-Run2012C-22Jan2013", "SingleMu-Run2012D-22Jan2013"]
+dataSingleMu["Chain"] = "Events"
+dataSingleMu["Counter"] = "bool_EventCounter_passed_PAT.obj"
+allSamples.append(dataSingleMu)
+
 mc={}
 mc["name"]     = "mc";
 mc["dirname"] = "/dpm/oeaw.ac.at/home/cms/store/user/mhickel/pat_130527"
+mc['newMETCollection'] = False
 mc["Chain"] = "Events"
-#mc["reweightingHistoFile"]          = "/data/schoef/results2012/PU/reweightingHisto_Summer2012-S10-Run2012ABCD_60max_true_pixelcorr_Sys0.root"
-#mc["reweightingHistoFileSysPlus"]   = "/data/schoef/results2012/PU/reweightingHisto_Summer2012-S10-Run2012ABCD_60max_true_pixelcorr_SysPlus5.root"
-#mc["reweightingHistoFileSysMinus"]  = "/data/schoef/results2012/PU/reweightingHisto_Summer2012-S10-Run2012ABCD_60max_true_pixelcorr_SysMinus5.root"
+#mc["reweightingHistoFile"]          = "/data/schoef/tools/PU/reweightingHisto_Summer2012-S10-Run2012ABCD_60max_true_pixelcorr_Sys0.root"
+#mc["reweightingHistoFileSysPlus"]   = "/data/schoef/tools/PU/reweightingHisto_Summer2012-S10-Run2012ABCD_60max_true_pixelcorr_SysPlus5.root"
+#mc["reweightingHistoFileSysMinus"]  = "/data/schoef/tools/PU/reweightingHisto_Summer2012-S10-Run2012ABCD_60max_true_pixelcorr_SysMinus5.root"
 
 QCD_Bins = \
   ["8TeV-QCD-Pt1000-MuEnrichedPt5", "8TeV-QCD-Pt120to170-MuEnrichedPt5", "8TeV-QCD-Pt170to300-MuEnrichedPt5",\
@@ -33,7 +40,7 @@ QCD_Bins = \
    "8TeV-QCD-Pt470to600-MuEnrichedPt5", "8TeV-QCD-Pt50to80-MuEnrichedPt5",\
    "8TeV-QCD-Pt600to800-MuEnrichedPt5", "8TeV-QCD-Pt800to1000-MuEnrichedPt5", "8TeV-QCD-Pt80to120-MuEnrichedPt5"]
 
-WJets_Bins = ["8TeV-WJets-HT250to300", "8TeV-WJets-HT300to400", "8TeV-WJets-HT400"]
+#WJets_Bins = ["8TeV-WJets-HT250to300", "8TeV-WJets-HT300to400", "8TeV-WJets-HT400"]
 #
 DY_Bins = ["8TeV-DYJetsToLL-M10to50", "8TeV-DYJetsToLL-M50"]
 #ZJets_Bins = DY_Bins
@@ -51,29 +58,40 @@ ttbar["name"] = "TTJets"
 ttbar['reweightingHistoFile'] = S10rwHisto
 ttbar['reweightingHistoFileSysPlus'] = S10rwPlusHisto
 ttbar['reweightingHistoFileSysMinus'] = S10rwMinusHisto
+
+ttbarPowHeg = copy.deepcopy(mc)
+ttbarPowHeg['reweightingHistoFile'] = S10rwHisto 
+ttbarPowHeg['reweightingHistoFileSysPlus'] = S10rwPlusHisto
+ttbarPowHeg['reweightingHistoFileSysMinus'] = S10rwMinusHisto
+ttbarPowHeg["bins"] = [["8TeV-TTJets-powheg-v1+2", ["8TeV-TTJets-powheg-v1", "8TeV-TTJets-powheg-v2"]]]
+ttbarPowHeg["name"] = "TTJetsPowHeg" 
+ttbarPowHeg['reweightingHistoFile'] = S10rwHisto
+ttbarPowHeg['reweightingHistoFileSysPlus'] = S10rwPlusHisto
+ttbarPowHeg['reweightingHistoFileSysMinus'] = S10rwMinusHisto
 #
 #ttbarPowHeg = copy.deepcopy(mc)
 #ttbarPowHeg["dirname"] = "/data/mhickel/pat_130328/"
 #ttbarPowHeg["bins"] = ["8TeV-TTJets-powheg-v1+2"]
 #ttbarPowHeg["name"] = "TTJets-PowHeg" 
 
-wjets = copy.deepcopy(mc)
-wjets["bins"] = WJets_Bins 
-wjets["name"] = "WJetsHT250" 
-wjets['reweightingHistoFile'] = S10rwHisto
-wjets['reweightingHistoFileSysPlus'] = S10rwPlusHisto
-wjets['reweightingHistoFileSysMinus'] = S10rwMinusHisto
+#wjets = copy.deepcopy(mc)
+#wjets["bins"] = WJets_Bins 
+#wjets["name"] = "WJetsHT250" 
+#wjets['reweightingHistoFile'] = S10rwHisto
+#wjets['reweightingHistoFileSysPlus'] = S10rwPlusHisto
+#wjets['reweightingHistoFileSysMinus'] = S10rwMinusHisto
 
 #wjets["dirname"] = "/data/mhickel/pat_120917_S10/mc8TeV/"
-wjetsInc = copy.deepcopy(wjets)
+wjetsInc = copy.deepcopy(mc)
 wjetsInc["bins"] = ["8TeV-WJetsToLNu-3"] 
 wjetsInc["name"] = "WJetsToLNu" 
 wjetsInc['reweightingHistoFile'] = S10rwHisto
 wjetsInc['reweightingHistoFileSysPlus'] = S10rwPlusHisto
 wjetsInc['reweightingHistoFileSysMinus'] = S10rwMinusHisto
 
-w1jets = copy.deepcopy(wjets)
-w1jets["dirname"] = "/dpm/oeaw.ac.at/home/cms/store/user/schoef/pat_131028" 
+w1jets = copy.deepcopy(mc)
+w1jets["dirname"] = "/dpm/oeaw.ac.at/home/cms/store/user/schoef/pat_140314/" 
+w1jets['newMETCollection'] = True
 w1jets["bins"] = ["8TeV-W1JetsToLNu"] 
 w1jets["name"] = "W1JetsToLNu"
 w1jets['reweightingHistoFile'] = S10rwHisto
@@ -82,6 +100,7 @@ w1jets['reweightingHistoFileSysMinus'] = S10rwMinusHisto
 
 w2jets = copy.deepcopy(w1jets)
 w2jets["bins"] = ["8TeV-W2JetsToLNu"] 
+w2jets['newMETCollection'] = True
 w2jets["name"] = "W2JetsToLNu"
 w2jets['reweightingHistoFile'] = S10rwHisto
 w2jets['reweightingHistoFileSysPlus'] = S10rwPlusHisto
@@ -89,6 +108,7 @@ w2jets['reweightingHistoFileSysMinus'] = S10rwMinusHisto
 
 w3jets = copy.deepcopy(w1jets)
 w3jets["bins"] = ["8TeV-W3JetsToLNu"] 
+w3jets['newMETCollection'] = True
 w3jets["name"] = "W3JetsToLNu"
 w3jets['reweightingHistoFile'] = S10rwHisto
 w3jets['reweightingHistoFileSysPlus'] = S10rwPlusHisto
@@ -96,11 +116,78 @@ w3jets['reweightingHistoFileSysMinus'] = S10rwMinusHisto
 
 w4jets = copy.deepcopy(w1jets)
 w4jets["bins"] = ["8TeV-W4JetsToLNu"] 
+w4jets['newMETCollection'] = True
 w4jets["name"] = "W4JetsToLNu"
 w4jets['reweightingHistoFile'] = S10rwHisto
 w4jets['reweightingHistoFileSysPlus'] = S10rwPlusHisto
 w4jets['reweightingHistoFileSysMinus'] = S10rwMinusHisto
- 
+
+wbbjets = copy.deepcopy(w1jets)
+wbbjets["dirname"] = "/dpm/oeaw.ac.at/home/cms/store/user/schoef/pat_140212"
+wbbjets['newMETCollection'] = True
+wbbjets["bins"]=["8TeV-WbbJetsToLNu"]
+wbbjets["name"] = "WbbJets"
+wbbjets['reweightingHistoFile'] = S10rwHisto
+wbbjets['reweightingHistoFileSysPlus'] = S10rwPlusHisto
+wbbjets['reweightingHistoFileSysMinus'] = S10rwMinusHisto
+
+
+wjetsHT150v2 = copy.deepcopy(mc)
+wjetsHT150v2["dirname"] = "/dpm/oeaw.ac.at/home/cms/store/user/schoef/pat_140314"
+wjetsHT150v2['newMETCollection'] = True
+wjetsHT150v2["bins"] = ["8TeV-WJetsToLNu_HT-150To200", "8TeV-WJetsToLNu_HT-200To250", "8TeV-WJetsToLNu_HT-250To300", "8TeV-WJetsToLNu_HT-300To400", "8TeV-WJetsToLNu_HT-400ToInf"] 
+wjetsHT150v2["name"] = "WJetsHT150v2" 
+wjetsHT150v2['reweightingHistoFile'] = S10rwHisto
+wjetsHT150v2['reweightingHistoFileSysPlus'] = S10rwPlusHisto
+wjetsHT150v2['reweightingHistoFileSysMinus'] = S10rwMinusHisto
+
+
+wjetsToLNuPtW100 = copy.deepcopy(mc)
+wjetsToLNuPtW100["dirname"] = "/dpm/oeaw.ac.at/home/cms/store/user/schoef/pat_140314"
+wjetsToLNuPtW100['newMETCollection'] = True
+wjetsToLNuPtW100["bins"] = ["8TeV-WJetsToLNu_PtW-100_TuneZ2star_8TeV_ext-madgraph-tarball"] 
+wjetsToLNuPtW100["name"] = "WJetsToLNu_PtW-100_TuneZ2star_8TeV_ext-madgraph-tarball" 
+wjetsToLNuPtW100['reweightingHistoFile'] = S10rwHisto
+wjetsToLNuPtW100['reweightingHistoFileSysPlus'] = S10rwPlusHisto
+wjetsToLNuPtW100['reweightingHistoFileSysMinus'] = S10rwMinusHisto
+
+wjetsToLNuPtW180 = copy.deepcopy(mc)
+wjetsToLNuPtW180["dirname"] = "/dpm/oeaw.ac.at/home/cms/store/user/schoef/pat_140314"
+wjetsToLNuPtW180['newMETCollection'] = True
+wjetsToLNuPtW180["bins"] = ["8TeV-WJetsToLNu_PtW-180_TuneZ2star_8TeV-madgraph-tarball"] 
+wjetsToLNuPtW180["name"] = "WJetsToLNu_PtW-180_TuneZ2star_8TeV-madgraph-tarball" 
+wjetsToLNuPtW180['reweightingHistoFile'] = S10rwHisto
+wjetsToLNuPtW180['reweightingHistoFileSysPlus'] = S10rwPlusHisto
+wjetsToLNuPtW180['reweightingHistoFileSysMinus'] = S10rwMinusHisto
+
+wjetsToLNuPtW50 = copy.deepcopy(mc)
+wjetsToLNuPtW50["dirname"] = "/dpm/oeaw.ac.at/home/cms/store/user/schoef/pat_140314"
+wjetsToLNuPtW50['newMETCollection'] = True
+wjetsToLNuPtW50["bins"] = ["8TeV-WJetsToLNu_PtW-50To70_TuneZ2star_8TeV-madgraph", "8TeV-WJetsToLNu_PtW-70To100_TuneZ2star_8TeV-madgraph", "8TeV-WJetsToLNu_PtW-100_TuneZ2star_8TeV-madgraph"] 
+wjetsToLNuPtW50["name"] = "WJetsToLNu_PtW-50_TuneZ2star_8TeV-madgraph" 
+wjetsToLNuPtW50['reweightingHistoFile'] = S10rwHisto
+wjetsToLNuPtW50['reweightingHistoFileSysPlus'] = S10rwPlusHisto
+wjetsToLNuPtW50['reweightingHistoFileSysMinus'] = S10rwMinusHisto
+
+
+wMinusToLNu = copy.deepcopy(mc)
+wMinusToLNu["dirname"] = "/dpm/oeaw.ac.at/home/cms/store/user/schoef/pat_140314"
+wMinusToLNu['newMETCollection'] = True
+wMinusToLNu["bins"] = ["8TeV-WminusToENu", "8TeV-WminusToMuNu", "8TeV-WminusToTauNu-tauola"] 
+wMinusToLNu["name"] = "WminusToLNu" 
+wMinusToLNu['reweightingHistoFile'] = S10rwHisto
+wMinusToLNu['reweightingHistoFileSysPlus'] = S10rwPlusHisto
+wMinusToLNu['reweightingHistoFileSysMinus'] = S10rwMinusHisto
+
+wPlusToLNu = copy.deepcopy(mc)
+wPlusToLNu["dirname"] = "/dpm/oeaw.ac.at/home/cms/store/user/schoef/pat_140314"
+wPlusToLNu['newMETCollection'] = True
+wPlusToLNu["bins"] = ["8TeV-WplusToENu", "8TeV-WplusToMuNu", "8TeV-WplusToTauNu-tauola"] 
+wPlusToLNu["name"] = "WplusToLNu" 
+wPlusToLNu['reweightingHistoFile'] = S10rwHisto
+wPlusToLNu['reweightingHistoFileSysPlus'] = S10rwPlusHisto
+wPlusToLNu['reweightingHistoFileSysPlus'] = S10rwPlusHisto
+
 dy = copy.deepcopy(mc)
 dy["bins"] = DY_Bins 
 dy["name"] = "DY"
@@ -108,12 +195,68 @@ dy['reweightingHistoFile'] = S10rwHisto
 dy['reweightingHistoFileSysPlus'] = S10rwPlusHisto
 dy['reweightingHistoFileSysMinus'] = S10rwMinusHisto
 
+dyJetsToLLPtZ180 = copy.deepcopy(mc)
+dyJetsToLLPtZ180["dirname"] = "/dpm/oeaw.ac.at/home/cms/store/user/schoef/pat_140314"
+dyJetsToLLPtZ180['newMETCollection'] = True
+dyJetsToLLPtZ180["bins"] = ["8TeV-DYJetsToLL_PtZ-180_TuneZ2star_8TeV-madgraph-tarball"] 
+dyJetsToLLPtZ180["name"] = "DYJetsToLL_PtZ-180_TuneZ2star_8TeV-madgraph-tarball" 
+dyJetsToLLPtZ180['reweightingHistoFile'] = S10rwHisto
+dyJetsToLLPtZ180['reweightingHistoFileSysPlus'] = S10rwPlusHisto
+dyJetsToLLPtZ180['reweightingHistoFileSysMinus'] = S10rwMinusHisto
+
+dyJetsToLLPtZ50 = copy.deepcopy(mc)
+dyJetsToLLPtZ50["dirname"] = "/dpm/oeaw.ac.at/home/cms/store/user/schoef/pat_140314"
+dyJetsToLLPtZ50['newMETCollection'] = True
+dyJetsToLLPtZ50["bins"] = ["8TeV-DYJetsToLL_PtZ-50To70_TuneZ2star_8TeV-madgraph-tarball", "8TeV-DYJetsToLL_PtZ-70To100_TuneZ2star_8TeV-madgraph-tarball", "8TeV-DYJetsToLL_PtZ-100_TuneZ2star_8TeV-madgraph"] 
+dyJetsToLLPtZ50["name"] = "DYJetsToLL_PtZ-50_TuneZ2star_8TeV-madgraph-tarball" 
+dyJetsToLLPtZ50['reweightingHistoFile'] = S10rwHisto
+dyJetsToLLPtZ50['reweightingHistoFileSysPlus'] = S10rwPlusHisto
+dyJetsToLLPtZ50['reweightingHistoFileSysMinus'] = S10rwMinusHisto
+
+dyJetsToLLPtZ50Ext = copy.deepcopy(mc)
+dyJetsToLLPtZ50Ext['newMETCollection'] = True
+dyJetsToLLPtZ50Ext["dirname"] = "/dpm/oeaw.ac.at/home/cms/store/user/schoef/pat_140314"
+dyJetsToLLPtZ50Ext["bins"] = ["8TeV-DYJetsToLL_PtZ-50To70_TuneZ2star_8TeV_ext-madgraph-tarball", "8TeV-DYJetsToLL_PtZ-70To100_TuneZ2star_8TeV_ext-madgraph-tarball", "8TeV-DYJetsToLL_PtZ-100_TuneZ2star_8TeV_ext-madgraph-tarball"] 
+dyJetsToLLPtZ50Ext["name"] = "8TeV-DYJetsToLL_PtZ-50_TuneZ2star_8TeV_ext-madgraph-tarball" 
+dyJetsToLLPtZ50Ext['reweightingHistoFile'] = S10rwHisto
+dyJetsToLLPtZ50Ext['reweightingHistoFileSysPlus'] = S10rwPlusHisto
+dyJetsToLLPtZ50Ext['reweightingHistoFileSysMinus'] = S10rwMinusHisto
+
+
 zinv = copy.deepcopy(mc)
 zinv["bins"] = ZJetsInv_Bins 
 zinv["name"] = "ZJetsInv"
 zinv['reweightingHistoFile'] = S10rwHisto
 zinv['reweightingHistoFileSysPlus'] = S10rwPlusHisto
 zinv['reweightingHistoFileSysMinus'] = S10rwMinusHisto
+
+zJetsToNuNuHT50 = copy.deepcopy(mc)
+zJetsToNuNuHT50["dirname"] = "/dpm/oeaw.ac.at/home/cms/store/user/schoef/pat_140314"
+zJetsToNuNuHT50['newMETCollection'] = True
+zJetsToNuNuHT50["bins"] = ["8TeV-ZJetsToNuNu_50_HT_100_TuneZ2Star_8TeV_madgraph", "8TeV-ZJetsToNuNu_100_HT_200_TuneZ2Star_8TeV_madgraph", "8TeV-ZJetsToNuNu_200_HT_400_TuneZ2Star_8TeV_madgraph", "8TeV-ZJetsToNuNu_400_HT_inf_TuneZ2Star_8TeV_madgraph"] 
+zJetsToNuNuHT50["name"] = "8TeV-ZJetsToNuNu_50_TuneZ2Star_8TeV_madgraph" 
+zJetsToNuNuHT50['reweightingHistoFile'] = S10rwHisto
+zJetsToNuNuHT50['reweightingHistoFileSysPlus'] = S10rwPlusHisto
+zJetsToNuNuHT50['reweightingHistoFileSysMinus'] = S10rwMinusHisto
+
+zJetsToNuNuHT50Ext = copy.deepcopy(mc)
+zJetsToNuNuHT50Ext["dirname"] = "/dpm/oeaw.ac.at/home/cms/store/user/schoef/pat_140314"
+zJetsToNuNuHT50Ext['newMETCollection'] = True
+zJetsToNuNuHT50Ext["bins"] = ["8TeV-ZJetsToNuNu_50_HT_100_TuneZ2Star_8TeV_madgraph_ext", "8TeV-ZJetsToNuNu_100_HT_200_TuneZ2Star_8TeV_madgraph_ext", "8TeV-ZJetsToNuNu_200_HT_400_TuneZ2Star_8TeV_madgraph_ext", "8TeV-ZJetsToNuNu_400_HT_inf_TuneZ2Star_8TeV_madgraph_ext"] 
+zJetsToNuNuHT50Ext["name"] = "8TeV-ZJetsToNuNu_50_TuneZ2Star_8TeV_madgraph_ext" 
+zJetsToNuNuHT50Ext['reweightingHistoFile'] = S10rwHisto
+zJetsToNuNuHT50Ext['reweightingHistoFileSysPlus'] = S10rwPlusHisto
+zJetsToNuNuHT50Ext['reweightingHistoFileSysMinus'] = S10rwMinusHisto
+
+#zJetsToNuNuPtZ70 = copy.deepcopy(mc)
+#zJetsToNuNuPtZ70["bins"] = ["8TeV-ZJetsToNuNu_PtZ-70To100_8TeV", "8TeV-ZJetsToNuNu_PtZ-100_8TeV-madgraph"] 
+#zJetsToNuNuPtZ70["name"] = "8TeV-ZJetsToNuNu_50_TuneZ2Star_8TeV_madgraph_ext" 
+#zJetsToNuNuPtZ70['reweightingHistoFile'] = S10rwHisto
+#zJetsToNuNuPtZ70['reweightingHistoFileSysPlus'] = S10rwPlusHisto
+#zJetsToNuNuPtZ70['reweightingHistoFileSysMinus'] = S10rwMinusHisto
+#
+#xsec["8TeV-ZJetsToNuNu_PtZ-70To100_8TeV"] = 32.9  #/ZJetsToNuNu_PtZ-70To100_8TeV/Summer12_DR53X-PU_S10_START53_V7C-v1/AODSIM
+#xsec["8TeV-ZJetsToNuNu_PtZ-100_8TeV-madgraph"] = 21.44 #/Z
 
 singleTop = copy.deepcopy(mc)
 singleTop["bins"] = singleTop_Bins 
@@ -193,34 +336,31 @@ ww['reweightingHistoFile'] = S10rwHisto
 ww['reweightingHistoFileSysPlus'] = S10rwPlusHisto
 ww['reweightingHistoFileSysMinus'] = S10rwMinusHisto
 
-#
-#wjetsCombined = copy.deepcopy(wjets)
-#wjetsCombined["bins"]+=wjetsInc["bins"]
-#wjetsCombined["name"] = "WJetsCombined"
-#wjetsCombined["additionalCut"] = {"8TeV-WJetsToLNu":"ht<325", "8TeV-WJets-HT250to300":"ht>=325"}
-#wjetsCombined["scaleFac"] = {"8TeV-WJetsToLNu":0.8851333125242441}
-#
-#wbbjetsCombined = copy.deepcopy(wjets)
-#wbbjetsCombined["bins"]+=["8TeV-WbbJetsToLNu"]
-#wbbjetsCombined["name"] = "WbbJetsCombined"
-#wbbjetsCombined["additionalCut"] = {"8TeV-WbbJetsToLNu":"nbjets>0&&ht>300", "8TeV-WJets-HT250to300":"nbjets==0", "8TeV-WJets-HT300to400":"nbjets==0", "8TeV-WJets-HT400":"nbjets==0"}
-#
-#wbbjets = copy.deepcopy(wjets)
-#wbbjets["bins"]=["8TeV-WbbJetsToLNu"]
-#wbbjets["name"] = "WbbJets"
-#
-#
-#####
-#sigTest = copy.deepcopy(mc)
-#sigTest["dirname"] = "/data/imikulec/testmc/"
-#sigTest["bins"] = ["8TeV-stop300-LSP270"]
-#sigTest["name"] = "S300N270"
-#
-#sigFullSimTest = copy.deepcopy(mc)
-#sigFullSimTest["dirname"] = "/data/schoef/pat_131021/"
-#sigFullSimTest["bins"] = ["8TeV-stop300-LSP270-FullSim"]
-#sigFullSimTest["name"] = "S300N270FullSim"
-#####
+wz = copy.deepcopy(mc)
+wz["dirname"] = "/dpm/oeaw.ac.at/home/cms/store/user/schoef/pat_140314/"
+wz['newMETCollection'] = True
+wz["bins"] = ["8TeV-WZ"]
+wz["name"] = "WZ"
+wz['reweightingHistoFile'] = S10rwHisto
+wz['reweightingHistoFileSysPlus'] = S10rwPlusHisto
+wz['reweightingHistoFileSysMinus'] = S10rwMinusHisto
+
+zz = copy.deepcopy(mc)
+zz["bins"] = ["8TeV-ZZ"]
+zz['newMETCollection'] = True
+zz["dirname"] = "/dpm/oeaw.ac.at/home/cms/store/user/schoef/pat_140314/"
+zz["name"] = "ZZ"
+zz['reweightingHistoFile'] = S10rwHisto
+zz['reweightingHistoFileSysPlus'] = S10rwPlusHisto
+zz['reweightingHistoFileSysMinus'] = S10rwMinusHisto
+
+ttw = copy.deepcopy(mc)
+ttw["bins"] = ["8TeV-TTWJets"]
+ttw["name"] = "TTWJets"
+ttw['reweightingHistoFile'] = S10rwHisto
+ttw['reweightingHistoFileSysPlus'] = S10rwPlusHisto
+ttw['reweightingHistoFileSysMinus'] = S10rwMinusHisto
+
 
 stop200lsp170g100FastSim = copy.deepcopy(mc)
 stop200lsp170g100FastSim["dirname"] = "/data/schoef/monoJetSignals/SUSYTupelizer/FastSim"

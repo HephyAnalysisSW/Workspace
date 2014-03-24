@@ -12,8 +12,8 @@ from btagEff import getMCEff, getTagWeightDict, getSF
 from random import randint
 import eventShape
 
-ROOT.gROOT.ProcessLine(".L polSys/WPolarizationVariation.C+")
-ROOT.gROOT.ProcessLine(".L polSys/TTbarPolarization.C+")
+ROOT.gROOT.ProcessLine(".L ../../HEPHYCommonTools/scripts/root/polSys/WPolarizationVariation.C+")
+ROOT.gROOT.ProcessLine(".L ../../HEPHYCommonTools/scripts/root/polSys/TTbarPolarization.C+")
 ROOT.gROOT.ProcessLine(".L mt2w/mt2w_bisect.cpp+")
 ROOT.gROOT.ProcessLine(".L alphaT/alphaT.C+")
 ROOT.gROOT.ProcessLine(".L ../../HEPHYCommonTools/scripts/root/Thrust.C+")
@@ -98,15 +98,6 @@ def partonName (parton):
   if parton==5:  return 'b'
   if parton==4:  return 'c'
   return 'other'
-
-def topWeight(topPt):
-  p0 = 1.18246e+00;
-  p1 = 4.63312e+02;
-  p2 = 2.10061e-06;
-
-  if  topPt>p1 : topPt = p1;
-  return  p0 + p2 * topPt * ( topPt - 2 * p1 );
-
 
 nvtxReweightingVar = "nTrueGenVertices"
 if mode=="Ele" or mode=="Mu":
