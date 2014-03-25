@@ -1,10 +1,15 @@
+#include "TROOT.h"
 #include "TFile.h"
+#include "TDirectory.h"
 #include "TH1F.h"
 #include "TLorentzVector.h"
 #include "Math/Boost.h"
-
+#include <iostream>
 
 typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > LorentzVector;
+
+TH1F* H_polarization_Wplus[3] = { 0, 0, 0 };
+TH1F* H_polarization_Wminus[3] = { 0, 0, 0 };
 
 float WjetPolarizationAngle(LorentzVector p4w, LorentzVector p4lepton){
 
@@ -36,18 +41,38 @@ float WjetPolarizationAngle(LorentzVector p4w, LorentzVector p4lepton){
   return theta_lplus_nu_WCM_;
 }
 
+void LoadPolarizationHistograms() {
+  if ( H_polarization_Wplus[0] && H_polarization_Wminus[0] )  return;
 
+  std::cout << "WPolarizationVaration: loading histograms " << std::endl;
+
+  TDirectory* curdir = gDirectory;
+  //  _file0 = TFile::Open("Wpolarization_es_taus_too.root");
+  //  _file0 = TFile::Open("new_file_HT300.root");
+
+  TFile _file0("/data/schoef/tools/polSys/new_file_HT300.root");
+  TDirectory* hdir = gROOT->mkdir("WPolarizationVariation");
+  H_polarization_Wplus[0] = (TH1F*)_file0.Get("h_W_plus_fl")->Clone();
+  H_polarization_Wplus[1] = (TH1F*)_file0.Get("h_W_plus_fr")->Clone();
+  H_polarization_Wplus[2] = (TH1F*)_file0.Get("h_W_plus_f0")->Clone();
+  H_polarization_Wminus[0] = (TH1F*)_file0.Get("h_W_minus_fl")->Clone();
+  H_polarization_Wminus[1] = (TH1F*)_file0.Get("h_W_minus_fr")->Clone();
+  H_polarization_Wminus[2] = (TH1F*)_file0.Get("h_W_minus_f0")->Clone();
+
+  for ( unsigned int i=0; i<3; ++i ) {
+    H_polarization_Wplus[i]->SetDirectory(hdir);
+    H_polarization_Wminus[i]->SetDirectory(hdir);
+  }
+  //  if (!_file0) {
+  //    cout<<"Polarization data not found"<<endl;
+  //    return -999.;
+  //  }
+  curdir->cd();
+}
 
 float GetWeightFLminusFR(float x,float var,LorentzVector p4W, bool Wplus ){
   // variable x is cos(theta) here
 
-  //  TFile *_file0 = TFile::Open("Wpolarization_es_taus_too.root");
-  //  TFile *_file0 = TFile::Open("new_file_HT300.root");
-  TFile _file0("/data/schoef/tools/polSys/new_file_HT300.root");
-//  if (!_file0) {
-//    cout<<"Polarization data not found"<<endl;
-//    return -999.;
-//  }
   //  TH1F* h_polarization_Wplus[4][3];
   //  TH1F* h_polarization_Wminus[4][3];
   
@@ -65,7 +90,9 @@ float GetWeightFLminusFR(float x,float var,LorentzVector p4W, bool Wplus ){
   float fr_minus = 0; 
   float f0_minus = 0;
   
-  
+  if ( H_polarization_Wplus[0]==0 || H_polarization_Wminus[0]==0 ) 
+    LoadPolarizationHistograms();
+
   for(int i=0;i<4;i++){
     for(int ii=0;ii<3;ii++){
       if(p4W.Pt()>pt_bins[i]&&p4W.Pt()<pt_bins[i+1]&&fabs(p4W.Rapidity())>eta_bins[ii]&&fabs(p4W.Rapidity())<eta_bins[ii+1]){
@@ -76,27 +103,15 @@ float GetWeightFLminusFR(float x,float var,LorentzVector p4W, bool Wplus ){
 	else{
 	  
 	  if(Wplus){
-	    TH1F* h_polarization_Wplus_fl;
-	    TH1F* h_polarization_Wplus_fr;
-	    TH1F* h_polarization_Wplus_f0;
-	    h_polarization_Wplus_fl = (TH1F*)_file0.Get("h_W_plus_fl");
-	    h_polarization_Wplus_fr = (TH1F*)_file0.Get("h_W_plus_fr");
-	    h_polarization_Wplus_f0 = (TH1F*)_file0.Get("h_W_plus_f0");
-	    fl_plus = h_polarization_Wplus_fl->GetBinContent(i,ii);
-	    fr_plus = h_polarization_Wplus_fr->GetBinContent(i,ii);
-	    //	    f0_plus = h_polarization_Wplus_f0->GetBinContent(i,ii);
+	    fl_plus = H_polarization_Wplus[0]->GetBinContent(i,ii);
+	    fr_plus = H_polarization_Wplus[1]->GetBinContent(i,ii);
+	    //	    f0_plus = H_polarization_Wplus[2]->GetBinContent(i,ii);
 	    f0_plus = 1-fl_plus-fr_plus;
 	  }//end of Wplus
 	  if(!Wplus){
-	    TH1F* h_polarization_Wminus_fl;
-	    TH1F* h_polarization_Wminus_fr;
-	    TH1F* h_polarization_Wminus_f0;
-	    h_polarization_Wminus_fl = (TH1F*)_file0.Get("h_W_minus_fl");
-	    h_polarization_Wminus_fr = (TH1F*)_file0.Get("h_W_minus_fr");
-	    h_polarization_Wminus_f0 = (TH1F*)_file0.Get("h_W_minus_f0");
-	    fl_minus = h_polarization_Wminus_fl->GetBinContent(i,ii);
-	    fr_minus = h_polarization_Wminus_fr->GetBinContent(i,ii);
-	    //	    f0_minus = h_polarization_Wminus_f0->GetBinContent(i,ii);
+	    fl_minus = H_polarization_Wminus[0]->GetBinContent(i,ii);
+	    fr_minus = H_polarization_Wminus[1]->GetBinContent(i,ii);
+	    //	    f0_minus = H_polarization_Wminus[2]->GetBinContent(i,ii);
 	    f0_minus = 1-fl_minus-fr_minus;
 	  }//end of Wminus
 	}//end of requiring that last bin in helicity not be used 
@@ -155,7 +170,6 @@ float GetWeightFLminusFR(float x,float var,LorentzVector p4W, bool Wplus ){
     else{cout<< "ERROR"<< endl; exit(1);}
   }
 
-  _file0.Close();
   //  cout<<"Weight is: "<<w<<endl;
   return w;
 
@@ -165,13 +179,6 @@ float GetWeightFLminusFR(float x,float var,LorentzVector p4W, bool Wplus ){
 float GetWeightF0(float x,float var,LorentzVector p4W, bool Wplus ){
   // variable x is cos(theta) here
 
-  //  TFile *_file0 = TFile::Open("Wpolarization_es_taus_too.root");
-//  TFile _file0("new_file_HT300.root");
-  TFile _file0("/data/schoef/tools/polSys/new_file_HT300.root");
-//  if (!_file0) {
-//    cout<<"Polarization data not found"<<endl;
-//    return -999.;
-//  }
 
   //  TH1F* h_polarization_Wplus[4][3];
   //  TH1F* h_polarization_Wminus[4][3];
@@ -192,6 +199,8 @@ float GetWeightF0(float x,float var,LorentzVector p4W, bool Wplus ){
   float fr_minus = 0; 
   float f0_minus = 0;
   
+  if ( H_polarization_Wplus[0]==0 || H_polarization_Wminus[0]==0 ) 
+    LoadPolarizationHistograms();
   
   for(int i=0;i<4;i++){
     for(int ii=0;ii<3;ii++){
@@ -203,28 +212,16 @@ float GetWeightF0(float x,float var,LorentzVector p4W, bool Wplus ){
 	else{
 
 	  if(Wplus){
-	    TH1F* h_polarization_Wplus_fl;
-	    TH1F* h_polarization_Wplus_fr;
-	    TH1F* h_polarization_Wplus_f0;
-	    h_polarization_Wplus_fl = (TH1F*)_file0.Get("h_W_plus_fl");
-	    h_polarization_Wplus_fr = (TH1F*)_file0.Get("h_W_plus_fr");
-	    h_polarization_Wplus_f0 = (TH1F*)_file0.Get("h_W_plus_f0");
-	    fl_plus = h_polarization_Wplus_fl->GetBinContent(i,ii);
-	    fr_plus = h_polarization_Wplus_fr->GetBinContent(i,ii);
-	    //	    f0_plus = h_polarization_Wplus_f0->GetBinContent(i,ii);
+	    fl_plus = H_polarization_Wplus[0]->GetBinContent(i,ii);
+	    fr_plus = H_polarization_Wplus[1]->GetBinContent(i,ii);
+	    //	    f0_plus = H_polarization_Wplus[2]->GetBinContent(i,ii);
 	    f0_plus = 1-fl_plus-fr_plus;
 	  }//end of Wplus
 	  if(!Wplus){
-	    TH1F* h_polarization_Wminus_fl;
-	    TH1F* h_polarization_Wminus_fr;
-	    TH1F* h_polarization_Wminus_f0;
-	    h_polarization_Wminus_fl = (TH1F*)_file0.Get("h_W_minus_fl");
-	    h_polarization_Wminus_fr = (TH1F*)_file0.Get("h_W_minus_fr");
-	    h_polarization_Wminus_f0 = (TH1F*)_file0.Get("h_W_minus_f0");
-	    fl_minus = h_polarization_Wminus_fl->GetBinContent(i,ii);
-	    fr_minus = h_polarization_Wminus_fr->GetBinContent(i,ii);
+	    fl_minus = H_polarization_Wminus[0]->GetBinContent(i,ii);
+	    fr_minus = H_polarization_Wminus[1]->GetBinContent(i,ii);
 	    f0_plus = 1-fl_plus-fr_plus;
-	    //	    f0_minus = h_polarization_Wminus_f0->GetBinContent(i,ii);
+	    //	    f0_minus = H_polarization_Wminus[2]->GetBinContent(i,ii);
 	  }//end of Wminus
 	}//end of requiring that last bin in helicity not be used 
       }//end of if statement for W pt and helicity
@@ -280,7 +277,6 @@ float GetWeightF0(float x,float var,LorentzVector p4W, bool Wplus ){
     else{cout<< "ERROR"<< endl; exit(1);}
   }
 
-  _file0.Close();
 
   return w;
 
