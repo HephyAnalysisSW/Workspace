@@ -4,7 +4,10 @@ from PhysicsTools.PythonAnalysis import *
 from math import *
 import sys, os, copy, random
 from datetime import datetime
-from helpers import getVarValue, deltaPhi, minAbsDeltaPhi,  deltaR, invMass, findClosestJet
+#from helpers import getVarValue, deltaPhi, minAbsDeltaPhi,  deltaR, invMass, findClosestJet
+from Workspace.HEPHYCommonTools.helpers import getVarValue, deltaPhi, minAbsDeltaPhi, invMassOfLightObjects, deltaR, closestMuJetDeltaR, invMass
+from monoJetFuncs import softIsolatedMT, pmuboost3d
+
 from defaultMETSamples_mc import *
 
 from optparse import OptionParser
@@ -58,8 +61,6 @@ path = os.path.abspath('../../HEPHYCommonTools/python')
 if not path in sys.path:
     sys.path.insert(1, path)
 del path
-from helpers import getVarValue, deltaPhi, minAbsDeltaPhi, invMassOfLightObjects, deltaR, closestMuJetDeltaR
-from monoJetFuncs import softIsolatedMT, pmuboost3d
 
 from xsec import xsec
 

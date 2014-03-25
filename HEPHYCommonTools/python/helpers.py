@@ -123,8 +123,9 @@ def findClosestJet(jets, obj):
   if len(res)>0:
     return {'deltaR':res[0][0], 'jet':res[0][1]}
 
-#def closestMuJetDeltaR(c):
-#  return findClosestJet(c, getSoftIsolatedMu(c))['deltaR']
+def closestMuJetDeltaR(c):
+  return findClosestJet(c, getSoftIsolatedMu(c))['deltaR']
+
 def invMass(p1 , p2):
 
   pxp1 = p1['pt']*cos(p1['phi']) 
