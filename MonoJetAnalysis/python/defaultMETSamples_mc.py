@@ -20,7 +20,7 @@ dataSingleMu={}
 dataSingleMu["name"]     = "data";
 dataSingleMu['newMETCollection'] = True
 dataSingleMu["dirname"] = "/dpm/oeaw.ac.at/home/cms/store/user/schoef/pat_140314/"
-dataSingleMu["bins"]    = ["SingleMu-Run2012A-22Jan2013", "SingleMu-Run2012B-22Jan2013", "SingleMu-Run2012C-22Jan2013", "SingleMu-Run2012D-22Jan2013"]
+dataSingleMu["bins"]    = ["SingleMu-Run2012A-22Jan2013", "SingleMu-Run2012B-22Jan2013-2", "SingleMu-Run2012C-22Jan2013", "SingleMu-Run2012D-22Jan2013"]
 dataSingleMu["Chain"] = "Events"
 dataSingleMu["Counter"] = "bool_EventCounter_passed_PAT.obj"
 allSamples.append(dataSingleMu)

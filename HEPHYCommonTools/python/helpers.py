@@ -1,6 +1,9 @@
 import ROOT
 from math import pi, sqrt, cos, sin, sinh
 
+def test():
+  return 1
+
 def getObjFromFile(fname, hname):
   f = ROOT.TFile(fname)
   assert not f.IsZombie()
@@ -11,7 +14,6 @@ def getObjFromFile(fname, hname):
   res = htmp.Clone()
   f.Close()
   return res
-
 
 def passPUJetID(flag, level="Tight"): #Medium, #Loose,  kTight  = 0,   kMedium = 1,   kLoose  = 2
   if type(level)==type(0):
@@ -121,8 +123,9 @@ def findClosestJet(jets, obj):
   if len(res)>0:
     return {'deltaR':res[0][0], 'jet':res[0][1]}
 
-#def closestMuJetDeltaR(c):
-#  return findClosestJet(c, getSoftIsolatedMu(c))['deltaR']
+def closestMuJetDeltaR(c):
+  return findClosestJet(c, getSoftIsolatedMu(c))['deltaR']
+
 def invMass(p1 , p2):
 
   pxp1 = p1['pt']*cos(p1['phi']) 

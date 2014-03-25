@@ -4,7 +4,10 @@ from PhysicsTools.PythonAnalysis import *
 from math import *
 import sys, os, copy, random
 from datetime import datetime
-from helpers import getVarValue, deltaPhi, minAbsDeltaPhi,  deltaR, invMass, findClosestJet
+#from helpers import getVarValue, deltaPhi, minAbsDeltaPhi,  deltaR, invMass, findClosestJet
+from Workspace.HEPHYCommonTools.helpers import getVarValue, deltaPhi, minAbsDeltaPhi, invMassOfLightObjects, deltaR, closestMuJetDeltaR, invMass
+from monoJetFuncs import softIsolatedMT, pmuboost3d
+
 from defaultMETSamples_mc import *
 
 from optparse import OptionParser
@@ -58,7 +61,6 @@ path = os.path.abspath('../../HEPHYCommonTools/python')
 if not path in sys.path:
     sys.path.insert(1, path)
 del path
-from monoJetFuncs import softIsolatedMT, pmuboost3d
 
 from xsec import xsec
 
@@ -108,7 +110,7 @@ if options.smsMsqRangeString!='None' and options.allsamples.lower()=='sms':
 else:
   exec("allSamples = [" +options.allsamples+ "]")
 
-overwrite = True
+overwrite = False
 target_lumi = 19700 #pb-1
 
 from localInfo import username
@@ -769,6 +771,11 @@ for isample, sample in enumerate(allSamples):
               s.taPdg[i] = allGoodTaus[i]['pdg']
           tmpDir = ROOT.gDirectory.func()
           chain_gDir.cd()
+#          print s.type1phiMet
+          if s.type1phiMet<150:
+            print "Warning!!"
+          else:
+            print "OK"
           t.Fill()
           tmpDir.cd()
 #          if s.type1phiMet<150:

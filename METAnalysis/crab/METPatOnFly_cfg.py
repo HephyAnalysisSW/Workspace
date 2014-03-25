@@ -658,7 +658,7 @@ process.p += process.SUSYTupelizer
 #  src = cms.InputTag("genParticles")
 #)
 #process.p+=process.printTree
-process.out.outputCommands =  cms.untracked.vstring('drop *', 'keep *_*SUSYTupelizer*_*_*' , 'keep *_*EventCounter*_*_*')#, 'keep *_genParticles_*_*' ,'keep *')
+process.out.outputCommands =  cms.untracked.vstring('drop *', 'keep *_*SUSYTupelizer*_*_*' , 'keep *_*EventCounter*_*_*', 'keep *_genParticles_*_*' ,'keep *_particleFlow__RECO')
 process.outpath = cms.EndPath(process.out)
 #-- Dump config ------------------------------------------------------------
 file = open('vienna_SusyPAT_cfg.py','w')
