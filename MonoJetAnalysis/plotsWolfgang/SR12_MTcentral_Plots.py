@@ -3,6 +3,18 @@ import math
 import time
 from PlotsBase import *
 from EventHelper import EventHelper
+from myPolSys import calcPolWeights
+
+polVar = None
+#polVar = "WPol1Plus10_weight_flfr"
+#polVar = "WPol1Minus10_weight_flfr"
+#polVar = "WPol2PlusPlus5_weight_flfr"
+#polVar = "WPol2PlusMinus5_weight_flfr"
+#polVar = "WPol2MinusPlus5_weight_flfr"
+#polVar = "WPol2MinusMinus5_weight_flfr"
+#polVar = "WPol3Plus10_weight_f0"
+#polVar = "WPol3Minus10_weight_f0"
+
 
 def deltaPhi(phi1,phi2):
     result = phi2 - phi1
@@ -47,7 +59,9 @@ class SR12_MTcentral_Plots(PlotsBase):
         self.addVariable("softMuEtaMinus",60,0.,3.,'u')
         self.addVariable("jetmuDeltaEtaMinus",50,0.,10.,'l')
         self.addVariable("jetmuDeltaRMinus",50,0.,10.,'l')
-        self.addVariable("htmetIndexMinus",6,-112.5,37.5,'')
+        self.addVariable("htmetIndexMinus",6,-112.5,37.5,'b')
+        self.addVariable("htMinus",24,0.,600.,'b')
+        self.addVariable("countMinus",1,-0.5,1.5,'b')
 
         self.addVariable("isrJetPtPlus",100,0.,1000.,'l')
         self.addVariable("isrJetEtaPlus",50,0.,5.,'u')
@@ -62,7 +76,9 @@ class SR12_MTcentral_Plots(PlotsBase):
         self.addVariable("softMuEtaPlus",60,0.,3.,'u')
         self.addVariable("jetmuDeltaEtaPlus",50,0.,10.,'l')
         self.addVariable("jetmuDeltaRPlus",50,0.,10.,'l')
-        self.addVariable("htmetIndexPlus",6,-112.5,37.5,'')
+        self.addVariable("htmetIndexPlus",6,-112.5,37.5,'b')
+        self.addVariable("htPlus",24,0.,600.,'b')
+        self.addVariable("countPlus",1,-0.5,1.5,'b')
 
         self.addVariablePair("met",40,0.,1000.,"ht",40,0.,1000.)
 
@@ -105,22 +121,23 @@ class SR12_MTcentral_Plots(PlotsBase):
 #        if met<300:
 #            return
         metphi = eh.get("type1phiMetphi")
-        mt = math.sqrt(2*met*softMuPt*(1-math.cos(metphi-softMuPhi)))
-        if ( mt < 60 ) or ( mt > 88 ):
-            return
+#        mt = math.sqrt(2*met*softMuPt*(1-math.cos(metphi-softMuPhi)))
+        mt = eh.get("softIsolatedMT")
+#        if ( mt < 60 ) or ( mt > 88 ):
+#            return
 
-        ht = 0
-        for i in range(njet):
-            if jetPts[i]>30:
-                ht += jetPts[i]
-
+#        ht = 0
+#        for i in range(njet):
+#            if jetPts[i]>30:
+#                ht += jetPts[i]
+        ht = eh.get("ht")
 
         ihtmet = 25
         while True:
             metcut = 300 + ihtmet
             htcut = 400 + ihtmet
-            if metcut<0 or htcut<0:
-                return
+#            if metcut<0 or htcut<0:
+#                return
             if met >= metcut and ht >= htcut:
                 break
             ihtmet -= 25
@@ -133,14 +150,27 @@ class SR12_MTcentral_Plots(PlotsBase):
         else:
             w = 1
         self.timers[0].stop()
+
+        if self.name.startswith("WJets") and polVar!=None:
+            polVars = calcPolWeights(eh)
+            w *= polVars[polVar]
         
         pdg = eh.get("softIsolatedMuPdg")
+
+        if met>300 and ht>400:
+            if pdg>0:
+                self.hcountMinus.Fill(0.,w)
+            else:
+                self.hcountPlus.Fill(0.,w)
 
         self.hht_vs_met.Fill(met,ht,w)
         self.fillOne1D("htmetIndex",pdg,ihtmet,w)
 
         if ihtmet<-100:
             return
+
+        self.fillOne1D("ht",pdg,ht,w)
+        self.fillOne1D("met",pdg,met,w)
 
         self.fillOne1D("mt",pdg,mt,w)
         
@@ -163,7 +193,6 @@ class SR12_MTcentral_Plots(PlotsBase):
         self.fillOne1D("njet60",pdg,eh.get("njet60"),w)
         self.fillOne1D("njet",pdg,eh.get("njetCount"),w)
 
-        self.fillOne1D("met",pdg,met,w)
 
         softMuEta = eh.get("softIsolatedMuEta")
         self.fillOne1D("softMuPt",pdg,softMuPt,w)
