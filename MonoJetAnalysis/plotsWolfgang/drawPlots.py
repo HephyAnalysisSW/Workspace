@@ -14,6 +14,7 @@ parser.add_option("--elistBase", dest="elistBase",  help="base directory for eve
 parser.add_option("-s", dest="save",  help="directory for saved plots", default=None)
 parser.add_option("-b", dest="batch",  help="batch mode", action="store_true", default=False)
 parser.add_option("--rebin", dest="rebin",  help="rebin factor", type=int, default=1)
+parser.add_option("--singleMu", dest="singleMu", help="use single mu dataset", action="store_true", default=False)
 (options, args) = parser.parse_args()
 assert len(args)>0
 if options.fom=="None":
@@ -39,32 +40,49 @@ if options.preselection!=None:
     presel = preselClass()
     setattr(presel,"sourcefile",options.preselection)
 
-sampleBase = "/home/adamwo/data/monoJetTuples_v5/copy/"
+sampleBase = "/home/adamwo/data/monoJetTuples_v5/"
+if options.singleMu:
+    sampleBase += "copyMu/"
+else:
+    sampleBase += "copy/"
 
 
 samples = []
-samples.append(Sample("QCD",sampleBase,type="B",color=7,fill=True, \
-                          namelist=[ "QCD20to600", "QCD600to1000", "QCD1000" ]))
-samples.append(Sample("WW",sampleBase,type="B",color=6,fill=True))
-samples.append(Sample("DY",sampleBase,type="B",color=3,fill=True))
-samples.append(Sample("singleTop",sampleBase,type="B",color=4,fill=True))
-#samples.append(Sample("TTJets",sampleBase,type="B",color=2,fill=True))
-samples.append(Sample("TTJets-powheg-v2",sampleBase,type="B",color=2,fill=True))
-#samples.append(Sample("WJetsToLNu",sampleBase,type="B",color=5,fill=True))
-samples.append(Sample("WJetsHT150v2",sampleBase,type="B",color=5,fill=True))
-#samples.append(Sample("WJetsHT250",sampleBase,type="B",color=5,fill=True))
-#samples.append(Sample("WNJetsToLNu",sampleBase,type="B",color=5,fill=True,downscale=2, \
-#                          namelist=[ "W1JetsToLNu", "W2JetsToLNu", "W3JetsToLNu", "W4JetsToLNu"  ]))
-#samples.append(Sample("W1JetsToLNu",sampleBase,type="B",color=2,fill=True,hatch=3245))
-#samples.append(Sample("W2JetsToLNu",sampleBase,type="B",color=3,fill=True,hatch=3254))
-#samples.append(Sample("W3JetsToLNu",sampleBase,type="B",color=4,fill=True,hatch=3245))
-#samples.append(Sample("W4JetsToLNu",sampleBase,type="B",color=5,fill=True,hatch=3254))
-#samples.append(Sample("stop200lsp170g100FastSim",sampleBase,type="S",color=2,fill=False))
-#samples.append(Sample("stop300lsp270g175FastSim",sampleBase,type="S",color=3,fill=False))
-#samples.append(Sample("stop300lsp270g200FastSim",sampleBase,type="S",color=4,fill=False))
-samples.append(Sample("stop300lsp270FastSim",sampleBase,type="S",color=4,fill=False))
-samples.append(Sample("stop300lsp240g150FastSim",sampleBase,type="S",color=2,fill=False))
-samples.append(Sample("data",sampleBase,type="D",color=1,fill=False))
+if options.singleMu:
+    samples.append(Sample("QCD",sampleBase,type="B",color=7,fill=True, \
+                              namelist=[ "QCD20to600", "QCD600to1000", "QCD1000" ]))
+    samples.append(Sample("WW",sampleBase,type="B",color=6,fill=True))
+    samples.append(Sample("DY",sampleBase,type="B",color=3,fill=True))
+    samples.append(Sample("singleTop",sampleBase,type="B",color=4,fill=True))
+    samples.append(Sample("TTJets-powheg-v2",sampleBase,type="B",color=2,fill=True))
+    samples.append(Sample("WJetsHT150v2",sampleBase,type="B",color=5,fill=True))
+    samples.append(Sample("stop300lsp270FastSim",sampleBase,type="S",color=4,fill=False))
+    samples.append(Sample("stop300lsp240g150FastSim",sampleBase,type="S",color=2,fill=False))
+    samples.append(Sample("data",sampleBase,type="D",color=1,fill=False, \
+                              namelist=[ 'data_singleMu_Run2012AB', 'data_singleMu_Run2012C', 'data_singleMu_Run2012D' ]))
+else:
+    samples.append(Sample("QCD",sampleBase,type="B",color=7,fill=True, \
+                              namelist=[ "QCD20to600", "QCD600to1000", "QCD1000" ]))
+    samples.append(Sample("WW",sampleBase,type="B",color=6,fill=True))
+    samples.append(Sample("DY",sampleBase,type="B",color=3,fill=True))
+    samples.append(Sample("singleTop",sampleBase,type="B",color=4,fill=True))
+    #samples.append(Sample("TTJets",sampleBase,type="B",color=2,fill=True))
+    samples.append(Sample("TTJets-powheg-v2",sampleBase,type="B",color=2,fill=True))
+    #samples.append(Sample("WJetsToLNu",sampleBase,type="B",color=5,fill=True))
+    samples.append(Sample("WJetsHT150v2",sampleBase,type="B",color=5,fill=True))
+    #samples.append(Sample("WJetsHT250",sampleBase,type="B",color=5,fill=True))
+    #samples.append(Sample("WNJetsToLNu",sampleBase,type="B",color=5,fill=True,downscale=2, \
+    #                          namelist=[ "W1JetsToLNu", "W2JetsToLNu", "W3JetsToLNu", "W4JetsToLNu"  ]))
+    #samples.append(Sample("W1JetsToLNu",sampleBase,type="B",color=2,fill=True,hatch=3245))
+    #samples.append(Sample("W2JetsToLNu",sampleBase,type="B",color=3,fill=True,hatch=3254))
+    #samples.append(Sample("W3JetsToLNu",sampleBase,type="B",color=4,fill=True,hatch=3245))
+    #samples.append(Sample("W4JetsToLNu",sampleBase,type="B",color=5,fill=True,hatch=3254))
+    #samples.append(Sample("stop200lsp170g100FastSim",sampleBase,type="S",color=2,fill=False))
+    #samples.append(Sample("stop300lsp270g175FastSim",sampleBase,type="S",color=3,fill=False))
+    #samples.append(Sample("stop300lsp270g200FastSim",sampleBase,type="S",color=4,fill=False))
+    samples.append(Sample("stop300lsp270FastSim",sampleBase,type="S",color=4,fill=False))
+    samples.append(Sample("stop300lsp240g150FastSim",sampleBase,type="S",color=2,fill=False))
+    samples.append(Sample("data",sampleBase,type="D",color=1,fill=False))
 
 ROOT.TH1.SetDefaultSumw2()
 

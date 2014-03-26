@@ -19,9 +19,11 @@ class Variable:
 
 class VariablePair:
 
-  def __init__(self,xname,nbinsx,xmin,xmax,yname,nbinsy,ymin,ymax,uselog=True):
+  def __init__(self,xname,nbinsx,xmin,xmax,yname,nbinsy,ymin,ymax,uselog=True,suffix=None):
     assert xname.isalnum() and yname.isalnum()
     self.name = yname+"_vs_"+xname
+    if suffix!=None:
+      self.name += "_"+suffix
     self.varx = Variable(xname,nbinsx,xmin,xmax,scut='b')
     self.vary = Variable(yname,nbinsy,ymin,ymax,scut='b')
     self.uselog = uselog

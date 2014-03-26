@@ -52,8 +52,9 @@ class PlotsBase:
         self.histogramList[name] = h1d
         setattr(self,"h"+name,h1d)
 
-    def addVariablePair(self,xname,nbinsx,xmin,xmax,yname,nbinsy,ymin,ymax,uselog=True):
-        varPair = VariablePair(xname,nbinsx/self.rebin,xmin,xmax,yname,nbinsy/self.rebin,ymin,ymax,uselog)
+    def addVariablePair(self,xname,nbinsx,xmin,xmax,yname,nbinsy,ymin,ymax,uselog=True,suffix=None):
+        varPair = VariablePair(xname,nbinsx/self.rebin,xmin,xmax,yname,nbinsy/self.rebin,ymin,ymax, \
+                                   uselog,suffix)
         assert not varPair.name in self.histogramList
         if not varPair.name in PlotsBase.variables:
             PlotsBase.variables[varPair.name] = varPair

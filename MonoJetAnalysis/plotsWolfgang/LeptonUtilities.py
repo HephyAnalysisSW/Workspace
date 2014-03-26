@@ -11,10 +11,13 @@ def isolatedMuons(eh,ptmin1=5.,etamax=1.5,ptmin2=30.,reliso=0.2):
       continue
     if abs(muetas[i])>etamax:
       continue
-    relisomax = reliso
+    absiso = murelisos[i]*mupts[i]
+    absisomax = reliso
     if mupts[i]<ptmin2:
-      relisomax *= mupts[i]
-    if murelisos[i]<relisomax:
+      absisomax = reliso*ptmin2
+    else:
+      absisomax = reliso*mupts[i]
+    if absiso<absisomax:
       imus.append(i)
   return imus
 

@@ -179,13 +179,12 @@ class DrawWithFOM:
 
         bkgs = None
         sigs = [ ]
+        data = None
 #        legend = ROOT.TLegend(0.60,0.75,0.90,0.89)
 #        legend.SetBorderSize(0)
 #        legend.SetFillColor(10)
 #        legend.SetFillStyle(0)
         for i,s in enumerate(samples):
-            if s.isData():
-                continue
             h = histograms[i]
             if s.fill:
                 h.SetFillStyle(1001)
@@ -215,17 +214,22 @@ class DrawWithFOM:
 #                opt = "F"
 #            else:
 #                opt = "L"
+            elif s.isData():
+                data = h.Clone()
+                h.SetTitle("Data")
 
         ipads = [ ]
         nsig = 0
         for s in samples:
             if s.isSignal():  
                 nsig += 1
-                ipads.append(nsig+1)
+                ipads.append(nsig+2)
+            elif s.isData():
+                ipads.append(2)
             else:
                 ipads.append(1)
-        nsub = int(sqrt(nsig+1))
-        if nsub**2<(nsig+1):
+        nsub = int(sqrt(nsig+2))
+        if nsub**2<(nsig+2):
             nsub += 1
         currpad.Divide(nsub,nsub)
         latexs = [ ]
@@ -247,6 +251,16 @@ class DrawWithFOM:
 #        legend.Draw()
 #        legend.SetBit(ROOT.kCanDelete)
         ROOT.gPad.SetLogz(1)
+
+        if data!=None:
+            currpad.cd(2)
+            ROOT.gPad.SetRightMargin(0.15)
+            data.SetMaximum(bkgmax/0.85)
+            data.SetMinimum(0.1)
+            data.Draw("zcol")
+            latexs.append(latex.DrawLatex(0.40,0.15,"Data"))
+            ROOT.gPad.SetLogz(1)
+
         for i,s in enumerate(sigs):
 ##            s.SetMaximum(bkgmax/0.85)
 ##            s.SetMinimum(0.1)
