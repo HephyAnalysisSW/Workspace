@@ -1,4 +1,4 @@
-#pftypes = ["X", "h", "e", "mu", "gamma", "h0", "h_HF", "egamma_HF"]
+pfTypes = ["X", "h", "e", "mu", "gamma", "h0", "h_HF", "egamma_HF"]
 label = {"X":0,"h":1, "e":2, "mu":3,"gamma":4, 'h0':5, 'h_HF':6, 'egamma_HF':7, 0:"X",1:"h", 2:"e", 3:"mu",4:"gamma", 5:'h0', 6:'h_HF', 7:'egamma_HF'}
 
 categories = {\

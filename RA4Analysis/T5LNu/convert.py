@@ -480,11 +480,6 @@ for isample, sample in enumerate(allSamples):
     commoncf = ""
     if options.chmode[:4]=="copy":
       commoncf = "type1phiMet>150"
-    if options.chmode[:7] == "copyInc":
-      commoncf = "(1)"
-    if options.chmode[:7] == "copyMu":
-      commoncf = "ngoodMuons==1"
-    #  storeVectors = False
     if type(bin_) == type([]):
       bin = bin_[0]
     else:

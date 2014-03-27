@@ -2,7 +2,7 @@ import ROOT
 import os
 from DataFormats.FWLite import Events, Handle
 from PhysicsTools.PythonAnalysis import *
-from math import sqrt, sin, cos, atan2
+from math import sqrt, sin, cos, atan2, pi
 from Workspace.HEPHYCommonTools.helpers import getVarValue
 
 import ctypes
@@ -22,8 +22,15 @@ if options.small:
   postfix="_small"
 if options.fromPercentage!=0 or options.toPercentage!=100:
   postfix += "_from"+str(options.fromPercentage)+"To"+str(options.toPercentage)
-ofile = options.odir+"/histo"+postfix+".root"
-ofile = ROOT.TFile(ofile, 'recreate')
+ofilen = options.odir+"/histo"+postfix+".root"
+ofile = ROOT.TFile(ofilen, 'recreate')
+
+from commons import label, categories, pfTypes
+occupancy = {}
+energy = {}
+for k in pfTypes:
+  occupancy[k]  = ROOT.TH2D('occ_'+k,'occ_'+k, 100,-5.5,5.5,100,-pi,pi)
+  energy[k]     = ROOT.TH2D('en_'+k,'en_'+k, 100,-5.5,5.5,100,-pi,pi)
 
 print "Tupelizing",options.idir
 prefix = ""
@@ -77,9 +84,8 @@ labelpfmet = ("patPFMet")
 #pfMethandle = Handle("vector<reco::PFMET>")
 pfMethandle = Handle("float")
 
-from commons import label, categories
 
-pftypes = categories.keys() 
+usedPFTypes = categories.keys() 
 storedVars = ['MEx/F', 'MEy/F', 'nCand/I']
 extraVars = ['phiZ/F', 'ptZ/F', 'MEx/F', 'MEy/F', 'nCand/I', 'patMEx/F', 'patMEy/F', 'ngoodVertices/I']
 
@@ -111,8 +117,8 @@ def calcMet(pfCands):
 
 nEvents = eList.GetN()
 if options.small:
-  if nEvents>1001:
-    nEvents=1001
+  if nEvents>5001:
+    nEvents=5001
 
 #print "Reading percentage ",options.fromPercentage, "to",options.toPercentage, "which is range",start,"to",stop,"of",nEvents
 for i in range(nEvents):
@@ -136,7 +142,7 @@ for i in range(nEvents):
   events.getByLabel(labelpf,pfhandle)
   pfc = pfhandle.product()
   vecs={}
-  for t in pftypes:
+  for t in usedPFTypes:
     vecs[t] = [] 
   for p in pfc:
     id = p.particleId()
@@ -144,12 +150,15 @@ for i in range(nEvents):
     p4 = p.p4()
     Et = p4.Et()
     phi = p4.phi()
+    eta = p4.eta()
+    occupancy[l].Fill(eta, phi)
+    energy[l].Fill(eta, phi, Et)
     px = Et*cos(phi)
     py = Et*sin(phi)
     vars['MEx'].value -= px
     vars['MEy'].value -= py
     vars['nCand'].value += 1
-    if l in pftypes: 
+    if l in usedPFTypes: 
       eta = p4.eta()
       eb = None
       for etab in categories[l]:
@@ -185,7 +194,13 @@ for i in range(nEvents):
 ##      eb = etab[0]
 ##      print eb, vars['MEx_'+eb].value, vars['MEy_'+eb].value, vars['nCand_'+eb].value
   tree.Fill()
+for k in pfTypes:
+  occupancy[k].Scale(1./nEvents)
+  energy[k].Scale(1./nEvents)
 print "Writing",ofile
 ofile.cd()
 tree.Write()
+for k in pfTypes:
+  occupancy[k].Write()
+  energy[k].Write()
 ofile.Close()
