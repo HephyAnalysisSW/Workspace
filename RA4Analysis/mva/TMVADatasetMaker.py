@@ -3,7 +3,6 @@ from math import sqrt, pi
 from localConfig import afsUser, nfsUser, localPlotDir
 import random
 from array import array
-
 from Workspace.HEPHYPythonTools.nnAnalysisHelpers import getEList, constructDataset
 from Workspace.HEPHYPythonTools.xsec import xsec
 from Workspace.HEPHYPythonTools.xsecSMS import gluino8TeV_NLONLL, gluino14TeV_NLO
@@ -30,7 +29,6 @@ def getT1ttttSample(mgl, mN, mode):
   return res
 
 from Workspace.HEPHYPythonTools.helpers import htRatio, KolmogorovDistance 
-#RA4
 
 mgl=1300
 mN=850
@@ -64,8 +62,10 @@ print "Scaling signal weights by ", setup["sigMVAWeightFac"],'using weight', set
 
 #setup['TMVAFactoryOptions'] = ["!V","!Silent","Color","DrawProgressBar","Transformations=I;D;G,D","AnalysisType=Classification"]
 
+print 'x'
 ksres = {}
 for seed in range(1):
+  print 'y'
   prepreprefix = 'RA4NNAnalysis_T1tttt_'+str(mgl)+"_"+str(mN)+"_BkgMix_"+str(seed)
   preprefix = prepreprefix
   prefix = preprefix
