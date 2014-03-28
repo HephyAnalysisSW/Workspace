@@ -29,8 +29,8 @@ from commons import label, categories, pfTypes
 occupancy = {}
 energy = {}
 for k in pfTypes:
-  occupancy[k]  = ROOT.TH2D('occ_'+k,'occ_'+k, 100,-5.5,5.5,100,-pi,pi)
-  energy[k]     = ROOT.TH2D('en_'+k,'en_'+k, 100,-5.5,5.5,100,-pi,pi)
+  occupancy[k]  = ROOT.TH2D('occ_'+k,'occ_'+k, 50,-5.5,5.5,40,-pi,pi)
+  energy[k]     = ROOT.TH2D('en_'+k,'en_'+k, 50,-5.5,5.5,40,-pi,pi)
 
 print "Tupelizing",options.idir
 prefix = ""
@@ -117,8 +117,8 @@ def calcMet(pfCands):
 
 nEvents = eList.GetN()
 if options.small:
-  if nEvents>5001:
-    nEvents=5001
+  if nEvents>1001:
+    nEvents=1001
 
 #print "Reading percentage ",options.fromPercentage, "to",options.toPercentage, "which is range",start,"to",stop,"of",nEvents
 for i in range(nEvents):
@@ -197,7 +197,7 @@ for i in range(nEvents):
 for k in pfTypes:
   occupancy[k].Scale(1./nEvents)
   energy[k].Scale(1./nEvents)
-print "Writing",ofile
+print "Writing",ofilen
 ofile.cd()
 tree.Write()
 for k in pfTypes:

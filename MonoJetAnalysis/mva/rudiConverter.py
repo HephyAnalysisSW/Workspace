@@ -9,7 +9,7 @@ import ROOT, os, sys
 path = os.path.abspath('../../HEPHYCommonTools/mva')
 if not path in sys.path:
     sys.path.insert(1, path)
-from nnAnalysisHelpers import getObjFromFile
+from Workspace.HEPHYCommonTools.nnAnalysisHelpers import getObjFromFile
 from array import array
 
 if len(sys.argv)>2:

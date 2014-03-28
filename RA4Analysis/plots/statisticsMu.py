@@ -6,7 +6,7 @@ from array import array
 from math import *
 import os, copy, fnmatch
 
-from simplePlotsCommon import *
+from Workspace.RA4Analysis.simplePlotsCommon import *
 
 from defaultMuSamples import *
 from simpleStatTools import *

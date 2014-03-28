@@ -3,7 +3,7 @@ from array import array
 from math import *
 import os, copy
 from simpleStatTools import niceNum
-from simplePlotsCommon import *
+from Workspace.RA4Analysis.simplePlotsCommon import *
 import xsec, pickle
 
 from msugraCount import msugraCount

@@ -1,6 +1,6 @@
 import ROOT
 from math import sqrt, pi
-from simplePlotsCommon import *
+from Workspace.RA4Analysis.simplePlotsCommon import *
 
 def getVarValue(c, var, n=0):
   leaf = c.GetAlias(var)

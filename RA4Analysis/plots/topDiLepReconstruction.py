@@ -2,7 +2,7 @@ import ROOT
 import copy, sys, os
 import pickle
 from math import *
-from simplePlotsCommon import *
+from Workspace.RA4Analysis.simplePlotsCommon import *
 
 ROOT.gStyle.SetOptStat(0)
 ROOT.setTDRStyle()

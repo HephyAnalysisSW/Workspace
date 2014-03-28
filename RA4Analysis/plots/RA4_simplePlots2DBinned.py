@@ -3,7 +3,7 @@ from array import array
 from math import *
 import os, copy
 
-from simplePlotsCommon import *
+from Workspace.RA4Analysis.simplePlotsCommon import *
 #execfile("simplePlotsCommon.py")
 import xsec
 small = False

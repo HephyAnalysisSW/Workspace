@@ -1,6 +1,6 @@
 import ROOT
 from array import array
-from simplePlotsCommon import *
+from Workspace.RA4Analysis.simplePlotsCommon import *
 ROOT.setTDRStyle()
 
 filename = "/afs/hephy.at/user/s/schoefbeck/www/pngFake2012/525_5fb_typeIpfMET_templates.root"

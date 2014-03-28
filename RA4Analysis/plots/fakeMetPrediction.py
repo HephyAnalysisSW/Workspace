@@ -2,7 +2,7 @@ import ROOT
 from array import array
 from math import *
 import os, copy, random
-from simplePlotsCommon import *
+from Workspace.RA4Analysis.simplePlotsCommon import *
 import xsec, types
 from funcs import *
 small = False

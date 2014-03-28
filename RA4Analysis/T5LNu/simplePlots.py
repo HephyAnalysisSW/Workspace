@@ -25,13 +25,11 @@ allVars=[]
 allStacks=[]
 
 ## plots for studying preselection 
-
 minimum=10**(-0.5)
 
 chmode = "copy"
 presel = "refSel"
 ver = "v5"
-#region = "preSel"
 region = "signal"
 preprefix = region+"_"+ver
 if region == "preSel":
@@ -43,7 +41,56 @@ if region == "preSel":
   normalizeSignalToMCSum = False
 if region == "signal":
   #isrjet>350, met>250, mT<70
-  additionalCut = "(ht>750&&met>350)"
+  additionalCut = "(ht>750&&type1phiMet>350)"
+  addData = False
+  addSignals = True
+  normalizeToData = False
+  normalizeSignalToMCSum = False
+if region == "signal2j":
+  #isrjet>350, met>250, mT<70
+  additionalCut = "(ht>750&&type1phiMet>350&&njets==2)"
+  addData = False
+  addSignals = True
+  normalizeToData = False
+  normalizeSignalToMCSum = False
+if region == "signal5j":
+  #isrjet>350, met>250, mT<70
+  additionalCut = "(ht>750&&type1phiMet>350&&njets>=5)"
+  addData = False
+  addSignals = True
+  normalizeToData = False
+  normalizeSignalToMCSum = False
+if region == "signal3j":
+  #isrjet>350, met>250, mT<70
+  additionalCut = "(ht>750&&type1phiMet>350&&njets==3)"
+  addData = False
+  addSignals = True
+  normalizeToData = False
+  normalizeSignalToMCSum = False
+if region == "signalHTFLS04":
+  #isrjet>350, met>250, mT<70
+  additionalCut = "(ht>750&&type1phiMet>350)&&htThrustLepSideRatio>0.4"
+  addData = False
+  addSignals = True
+  normalizeToData = False
+  normalizeSignalToMCSum = False
+if region == "signalCosMLPhi":
+  #isrjet>350, met>250, mT<70
+  additionalCut = "(ht>750&&type1phiMet>350)&&cos(leptonPhi-type1phiMetphi)<0.8"
+  addData = False
+  addSignals = True
+  normalizeToData = False
+  normalizeSignalToMCSum = False
+if region == "signalCosMLPhi2j":
+  #isrjet>350, met>250, mT<70
+  additionalCut = "(ht>750&&type1phiMet>350)&&cos(leptonPhi-type1phiMetphi)<0.8&&njets==2"
+  addData = False
+  addSignals = True
+  normalizeToData = False
+  normalizeSignalToMCSum = False
+if region == "signalCosMLPhi3j":
+  #isrjet>350, met>250, mT<70
+  additionalCut = "(ht>750&&type1phiMet>350)&&cos(leptonPhi-type1phiMetphi)<0.8&&njets==3"
   addData = False
   addSignals = True
   normalizeToData = False
@@ -60,6 +107,8 @@ commoncf = "(0)"
 prefix="empty_"
 if presel == "refSel":
   commoncf="njets>=4&&ht>400&&nTightMuons+nTightElectrons==1&&nbtags==0"
+if presel == "refSelNoNJet":
+  commoncf="ht>400&&nTightMuons+nTightElectrons==1&&nbtags==0"
 
 if additionalCut!="":
   commoncf+="&&"+additionalCut
@@ -176,8 +225,30 @@ def cosDeltaPhiLepW(chain):
 
   return ((lPt*cosLepPhi + mpx)*cosLepPhi + (lPt*sinLepPhi + mpy)*sinLepPhi )/pW
 
+#def dHtOrth(c):
+#  htf=0.
+#  for i in range(c.njetCount):
+#    htf+=c.jetPt[i]*abs(cos(c.type1phiMetphi+pi/2.-c.jetPhi[i]))
+#  return htf/c.ht
 
 if doAnalysisVars:
+#  dHtOrth_stack = getStack(":xxx;dHtOrth;Number of Events",[25,0,1], commoncf, signals, varfunc = dHtOrth, addData = addData)
+#  dHtOrth_stack[0].addOverFlowBin = "upper"
+#  allStacks.append(dHtOrth_stack)
+
+  cosPhiLepJet0_stack = getStack(":xxx;cosPhiLepJet0;Number of Events",[25,-1,1], commoncf, signals, varfunc = lambda c:cos(c.leptonPhi - c.jetPhi[0]), addData = addData)
+  cosPhiLepJet0_stack[0].addOverFlowBin = "upper"
+  allStacks.append(cosPhiLepJet0_stack)
+  cosPhiLepJet1_stack = getStack(":xxx;cosPhiLepJet1;Number of Events",[25,-1,1], commoncf, signals, varfunc = lambda c:cos(c.leptonPhi - c.jetPhi[1]), addData = addData)
+  cosPhiLepJet1_stack[0].addOverFlowBin = "upper"
+  allStacks.append(cosPhiLepJet1_stack)
+  cosPhiMETJet0_stack = getStack(":xxx;cosPhiMETJet0;Number of Events",[25,-1,1], commoncf, signals, varfunc = lambda c:cos(c.type1phiMetphi - c.jetPhi[0]), addData = addData)
+  cosPhiMETJet0_stack[0].addOverFlowBin = "upper"
+  allStacks.append(cosPhiMETJet0_stack)
+  cosPhiMETJet1_stack = getStack(":xxx;cosPhiMETJet1;Number of Events",[25,-1,1], commoncf, signals, varfunc = lambda c:cos(c.type1phiMetphi - c.jetPhi[1]), addData = addData)
+  cosPhiMETJet1_stack[0].addOverFlowBin = "upper"
+  allStacks.append(cosPhiMETJet1_stack)
+
   htThrustLepSideRatio_stack = getStack(":htThrustLepSideRatio;htThrustLepSideRatio;Number of Events",[25,0,1], commoncf, signals, addData = addData)
   htThrustLepSideRatio_stack[0].addOverFlowBin = "upper"
   allStacks.append(htThrustLepSideRatio_stack)
@@ -254,7 +325,7 @@ if doAllDiscriminatingVars:
   cosDeltaPhiLepMET_stack  = getStack(":xxx;cos(#Delta #phi(l, #slash{E}_{T}));Number of Events",[22,-1.1,1.1], commoncf, signals, lambda c: cos(c.GetLeaf('leptonPhi').GetValue() - c.GetLeaf('type1phiMetphi').GetValue()), addData = addData)
   allStacks.append(cosDeltaPhiLepMET_stack)
 
-  cosDeltaPhiLepW_stack  = getStack(":xxx;cos(#Delta #phi(l, #slash{E}_{T}));Number of Events",[22,-1.1,1.1], commoncf, signals, cosDeltaPhiLepW, addData = addData)
+  cosDeltaPhiLepW_stack  = getStack(":cosDeltaPhi;cos(#Delta #phi(l, #slash{E}_{T}));Number of Events",[22,-1.1,1.1], commoncf, signals, addData = addData)
   allStacks.append(cosDeltaPhiLepW_stack)
 
 
@@ -287,9 +358,14 @@ for stack in allStacks:
 #  stack[0].lines = [[0.2, 0.9, "#font[22]{CMS preliminary}"], [0.2,0.85,str(int(round(targetLumi)))+" pb^{-1},  #sqrt{s} = 7 TeV"]]
   stack[0].lines = [[0.2, 0.9, "#font[22]{CMS Collaboration}"], [0.2,0.85,str(int(round(targetLumi/10.))/100.)+" fb^{-1},  #sqrt{s} = 8 TeV"]]
 
-if doAnalysisVars:
+if doAnalysisVars: 
+  drawNMStacks(1,1,[cosPhiLepJet0_stack],             subdir+prefix+"cosPhiLepJet0", False)
+  drawNMStacks(1,1,[cosPhiLepJet1_stack],             subdir+prefix+"cosPhiLepJet1", False)
+  drawNMStacks(1,1,[cosPhiMETJet0_stack],             subdir+prefix+"cosPhiMETJet0", False)
+  drawNMStacks(1,1,[cosPhiMETJet1_stack],             subdir+prefix+"cosPhiMETJet1", False)
   htThrustMetSideRatio_stack[0].maximum = 6*10**5 *htThrustMetSideRatio_stack[0].data_histo.GetMaximum()
   drawNMStacks(1,1,[htThrustMetSideRatio_stack],             subdir+prefix+"htThrustMetSideRatio", False)
+#  drawNMStacks(1,1,[dHtOrth_stack],             subdir+prefix+"dHtOrth", False)
   htThrustLepSideRatio_stack[0].maximum = 6*10**5 *htThrustLepSideRatio_stack[0].data_histo.GetMaximum()
   drawNMStacks(1,1,[htThrustLepSideRatio_stack],             subdir+prefix+"htThrustLepSideRatio", False)
   htThrustWSideRatio_stack[0].maximum = 6*10**5 *htThrustWSideRatio_stack[0].data_histo.GetMaximum()
@@ -316,6 +392,6 @@ if doAllDiscriminatingVars:
   drawNMStacks(1,1,[c2D_stack],             subdir+prefix+"c2D", False)
   drawNMStacks(1,1,[linC2D_stack],             subdir+prefix+"linC2D", False)
   drawNMStacks(1,1,[thrust_stack],             subdir+prefix+"thrust", False)
-  drawNMStacks(1,1,[sTlep_stack],             subdir+prefix+"sTlep", False)
+#  drawNMStacks(1,1,[sTlep_stack],             subdir+prefix+"sTlep", False)
   drawNMStacks(1,1,[cosDeltaPhiLepW_stack],             subdir+prefix+"cosDeltaPhiLepW", False)
   drawNMStacks(1,1,[cosDeltaPhiLepMET_stack],             subdir+prefix+"cosDeltaPhiLepMET", False)

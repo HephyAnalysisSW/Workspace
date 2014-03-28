@@ -7,7 +7,7 @@ if not path in sys.path:
     sys.path.insert(1, path)
 
 
-from nnAnalysisHelpers import getObjFromFile
+from Workspace.HEPHYCommonTools.nnAnalysisHelpers import getObjFromFile
 ifile = "/afs/hephy.at/user/s/schoefbeck/www/pngNN/nnValidation_RA4_test_refWeight1000_T1tttt_4j_bt1_met100_mt2w0_NormDeco_10000_sigmoid_BP_S03_SE08_mgl_1300_mN_850_mT_type1phiMet_mt2w_nbtags_njets_minDeltaPhi_htRatio_deltaPhi.root"
 
 ROOT.TH1F().SetDefaultSumw2()

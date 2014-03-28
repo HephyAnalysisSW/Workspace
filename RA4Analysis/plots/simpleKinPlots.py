@@ -1,6 +1,6 @@
 import copy
 import ROOT
-from simplePlotsCommon import *
+from Workspace.RA4Analysis.simplePlotsCommon import *
 from math import *
 import os, copy, array
 
@@ -69,7 +69,7 @@ def getExpParameter(c, htInterval, cut="", lowerMETcut = 100, upperMETcut=1000):
   return [myfunc.GetParameter(1), resWOFit, myfunc]
 
 import ROOT, array
-from simplePlotsCommon import *
+from Workspace.RA4Analysis.simplePlotsCommon import *
 
 #c = ROOT.TChain("pfRA4Analyzer/Events")
 #c.Add("/scratch/schoef/pat_110815/Mu/WJetsToLNu/histo_*.root")

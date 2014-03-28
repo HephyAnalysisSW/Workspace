@@ -9,7 +9,7 @@ for path in [os.path.abspath(p) for p in ['../../HEPHYCommonTools/mva', 'HEPHYCo
   if not path in sys.path:
       sys.path.insert(1, path)
 
-from nnAnalysisHelpers import getEList, constructDataset, getYield
+from Workspace.HEPHYCommonTools.nnAnalysisHelpers import getEList, constructDataset, getYield
 
 model = "T1tttt"
 mgl = 1300

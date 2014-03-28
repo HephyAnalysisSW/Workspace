@@ -7,7 +7,7 @@ for path in [os.path.abspath(p) for p in ['../../HEPHYCommonTools/mva', '../../H
   if not path in sys.path:
       sys.path.insert(1, path)
 
-from nnAnalysisHelpers import getEList, constructDataset
+from Workspace.HEPHYCommonTools.nnAnalysisHelpers import getEList, constructDataset
 from xsec import xsec
 from xsecSMS import gluino8TeV_NLONLL, gluino14TeV_NLO
 import copy, sys

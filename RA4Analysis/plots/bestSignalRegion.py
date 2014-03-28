@@ -1,6 +1,6 @@
 import ROOT, pickle
 
-from simplePlotsCommon import *
+from Workspace.RA4Analysis.simplePlotsCommon import *
 from math import *
 from simpleStatTools import niceNum
 subdir = "/afs/hephy.at/scratch/s/schoefbeck/CMS/CMSSW_4_2_8_patch7/src/Workspace/RA4Analysis/plots/pickle/"

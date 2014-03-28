@@ -1,6 +1,6 @@
 import copy, pickle
 import ROOT
-from simplePlotsCommon import *
+from Workspace.RA4Analysis.simplePlotsCommon import *
 from math import *
 import sys, os, copy, array, xsec, random, itertools
 for path in [os.path.abspath(p) for p in ['../../HEPHYCommonTools/python/']]:

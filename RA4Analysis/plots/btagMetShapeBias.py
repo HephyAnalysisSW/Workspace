@@ -1,5 +1,5 @@
 import ROOT
-from simplePlotsCommon import *
+from Workspace.RA4Analysis.simplePlotsCommon import *
 
 def getLepVar(var):
   cvar =  "((top1WDaughter0Pdg>=10)*("+var.replace("topL", "top1").replace("topH", "top0")+")+(top0WDaughter0Pdg>=10)*("+var.replace("topL", "top0").replace("topH","top1")+"))"

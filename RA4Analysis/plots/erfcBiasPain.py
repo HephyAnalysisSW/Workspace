@@ -1,5 +1,5 @@
 import ROOT
-from simplePlotsCommon import *
+from Workspace.RA4Analysis.simplePlotsCommon import *
 
 #c = ROOT.TChain("Events")
 #c.Add("/data/schoef/convertedTuples_v11/copyMET/Mu/TTJets-PowHeg/histo_TTJets-PowHeg.root")

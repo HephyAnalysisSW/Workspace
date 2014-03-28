@@ -1,5 +1,5 @@
 import ROOT, pickle
-from simplePlotsCommon import *
+from Workspace.RA4Analysis.simplePlotsCommon import *
 ROOT.gStyle.SetOptStat(0)
 ROOT.setTDRStyle()
 #ROOT.gStyle.SetPadRightMargin(0.10);

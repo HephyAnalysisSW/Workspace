@@ -12,7 +12,7 @@ def delErr(g):
     g.GetEY()[i]=0
   
 
-from nnAnalysisHelpers import getObjFromFile
+from Workspace.HEPHYCommonTools.nnAnalysisHelpers import getObjFromFile
 foms = [ \
 #    {"name":"MLP21","color":ROOT.kBlack,  "fname":"/afs/hephy.at/user/s/schoefbeck/www/pngMJNN/nnValidation_MonoJet_MLP21_stop300lsp270FastSim_refsel_NormDeco_10000_sigmoid_BP_S03_SE08_softIsolatedMT_type1phiMet_deltaPhi.root"},
 #    {"name":"MLP22","color":ROOT.kGreen,  "fname":"/afs/hephy.at/user/s/schoefbeck/www/pngMJNN/nnValidation_MonoJet_MLP22_stop300lsp270FastSim_refsel_NormDeco_10000_sigmoid_BP_S03_SE08_softIsolatedMT_type1phiMet_deltaPhi.root"},

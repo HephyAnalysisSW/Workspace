@@ -117,47 +117,49 @@ c.Add('/afs/hephy.at/newscratch/s/schoefbeck/histo_'+ver+'.root')
 #
 #pickle.dump(shifts, file('/data/schoef/tools/metPhiShifts/shifts_'+ver+'.pkl', 'w'))
 #
-#shifts = pickle.load(file('/data/schoef/tools/metPhiShifts/shifts_'+ver+'.pkl'))
-#mphi = {}
-#mphi_corr={}
-#m = {}
-#m_corr={}
-#mx = {}
-#mx_corr={}
-#my = {}
-#my_corr={}
-#mphi['all']      = ROOT.TH1F('metphi','metphi', 30,-pi,pi)
-#mphi_corr['all'] = ROOT.TH1F('metphi','metphi', 30,-pi,pi)
-#mphi_corr['all'].SetLineColor(ROOT.kRed)
-#m['all']      = ROOT.TH1F('met','met', 200,0,100)
-#m_corr['all'] = ROOT.TH1F('met','met', 200,0,100)
-#m_corr['all'].SetLineColor(ROOT.kRed)
-#mx['all']      = ROOT.TH1F('metx','metx', 200,-100,100)
-#mx_corr['all'] = ROOT.TH1F('metx','metx', 200,-100,100)
-#mx_corr['all'].SetLineColor(ROOT.kRed)
-#my['all']      = ROOT.TH1F('mety','mety', 200,-100,100)
-#my_corr['all'] = ROOT.TH1F('mety','mety', 200,-100,100)
-#my_corr['all'].SetLineColor(ROOT.kRed)
-#for s in [k[4:] for k in shifts.keys()]:
-#  mphi[s]      = ROOT.TH1F('metphi_'+s,'metphi_'+s, 30,-pi,pi)
-#  mphi_corr[s] = ROOT.TH1F('metphi_'+s,'metphi_'+s, 30,-pi,pi)
-#  mphi_corr[s].SetLineColor(ROOT.kRed)
-#  m[s]      = ROOT.TH1F('met_'+s,'met_'+s, 200,0,100)
-#  m_corr[s] = ROOT.TH1F('met_'+s,'met_'+s, 200,0,100)
-#  m_corr[s].SetLineColor(ROOT.kRed)
-#  mx[s]      = ROOT.TH1F('metx_'+s,'metx_'+s,200,-100,100)
-#  mx_corr[s] = ROOT.TH1F('metx_'+s,'metx_'+s,200,-100,100)
-#  mx_corr[s].SetLineColor(ROOT.kRed)
-#  my[s]      = ROOT.TH1F('mety_'+s,'mety_'+s,200,-100,100)
-#  my_corr[s] = ROOT.TH1F('mety_'+s,'mety_'+s,200,-100,100)
-#  my_corr[s].SetLineColor(ROOT.kRed)
-  
-n = c.GetEntries()
+shifts = pickle.load(file('/data/schoef/tools/metPhiShifts/shifts_'+ver+'.pkl'))
+mphi = {}
+mphi_corr={}
+m = {}
+m_corr={}
+mx = {}
+mx_corr={}
+my = {}
+my_corr={}
+mphi['all']      = ROOT.TH1F('metphi','metphi', 30,-pi,pi)
+mphi_corr['all'] = ROOT.TH1F('metphi','metphi', 30,-pi,pi)
+mphi_corr['all'].SetLineColor(ROOT.kRed)
+m['all']      = ROOT.TH1F('met','met', 200,0,100)
+m_corr['all'] = ROOT.TH1F('met','met', 200,0,100)
+m_corr['all'].SetLineColor(ROOT.kRed)
+mx['all']      = ROOT.TH1F('metx','metx', 200,-100,100)
+mx_corr['all'] = ROOT.TH1F('metx','metx', 200,-100,100)
+mx_corr['all'].SetLineColor(ROOT.kRed)
+my['all']      = ROOT.TH1F('mety','mety', 200,-100,100)
+my_corr['all'] = ROOT.TH1F('mety','mety', 200,-100,100)
+my_corr['all'].SetLineColor(ROOT.kRed)
+for s in [k[4:] for k in shifts.keys()]:
+  mphi[s]      = ROOT.TH1F('metphi_'+s,'metphi_'+s, 30,-pi,pi)
+  mphi_corr[s] = ROOT.TH1F('metphi_'+s,'metphi_'+s, 30,-pi,pi)
+  mphi_corr[s].SetLineColor(ROOT.kRed)
+  m[s]      = ROOT.TH1F('met_'+s,'met_'+s, 200,0,100)
+  m_corr[s] = ROOT.TH1F('met_'+s,'met_'+s, 200,0,100)
+  m_corr[s].SetLineColor(ROOT.kRed)
+  mx[s]      = ROOT.TH1F('metx_'+s,'metx_'+s,200,-100,100)
+  mx_corr[s] = ROOT.TH1F('metx_'+s,'metx_'+s,200,-100,100)
+  mx_corr[s].SetLineColor(ROOT.kRed)
+  my[s]      = ROOT.TH1F('mety_'+s,'mety_'+s,200,-100,100)
+  my_corr[s] = ROOT.TH1F('mety_'+s,'mety_'+s,200,-100,100)
+  my_corr[s].SetLineColor(ROOT.kRed)
+prefix = 'ptZ100' 
+c.Draw(">>eList", 'ptZ>100')
+eList = ROOT.gDirectory.Get('eList')
+n = eList.GetN()
 #n=20000
 for i in range(n):
   if i%1000==0:
     print i,'/',n
-  c.GetEntry(i)
+  c.GetEntry(eList.GetEntry(i))
   tot_shift_x = 0.
   tot_shift_y = 0.
   tot_MEx = 0. 
@@ -235,8 +237,8 @@ for d, d_corr, name in [[mphi, mphi_corr,'metPhi'], [m, m_corr, 'MEt'], [mx,mx_c
     l.SetShadowColor(ROOT.kWhite)
     l.SetBorderSize(1)
     l.Draw()
-    c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngPF/'+ver+'_'+name+'_corr_'+k+'.png')
-    c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngPF/'+ver+'_'+name+'_corr_'+k+'.root')
+    c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngPF/'+prefix+"_"+ver+'_'+name+'_corr_'+k+'.png')
+    c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngPF/'+prefix+"_"+ver+'_'+name+'_corr_'+k+'.root')
     del c1
 #  c1 = ROOT.TCanvas()
 #  m[k].Draw()

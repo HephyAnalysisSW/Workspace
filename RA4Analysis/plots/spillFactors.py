@@ -1,7 +1,7 @@
 import ROOT, pickle, os, sys
 from array import array
 from math import *
-from simplePlotsCommon import *
+from Workspace.RA4Analysis.simplePlotsCommon import *
 import numpy as np
 
 small = False

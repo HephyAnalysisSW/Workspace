@@ -1,6 +1,6 @@
 import copy
 import ROOT
-from simplePlotsCommon import *
+from Workspace.RA4Analysis.simplePlotsCommon import *
 from math import *
 import os, copy, array, xsec, sys
 small = False
