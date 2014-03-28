@@ -4,8 +4,8 @@ from PhysicsTools.PythonAnalysis import *
 from math import *
 import sys, os, copy, random
 from datetime import datetime
-#from helpers import getVarValue, deltaPhi, minAbsDeltaPhi,  deltaR, invMass, findClosestJet
-from Workspace.HEPHYCommonTools.helpers import getVarValue, deltaPhi, minAbsDeltaPhi, invMassOfLightObjects, deltaR, closestMuJetDeltaR, invMass
+#from helpers import getVarValue, deltaPhi, minAbsDeltaPhi,  deltaR, invMass,
+from Workspace.HEPHYPythonTools.helpers import getVarValue, deltaPhi, minAbsDeltaPhi, invMassOfLightObjects, deltaR, closestMuJetDeltaR, invMass,  findClosestJet
 from monoJetFuncs import softIsolatedMT, pmuboost3d
 
 from defaultMETSamples_mc import *
@@ -57,7 +57,7 @@ def jerDifferenceScaleFactor( eta, jermode = "none"): #https://twiki.cern.ch/twi
   return 1.
 
 
-path = os.path.abspath('../../HEPHYCommonTools/python')
+path = os.path.abspath('../../HEPHYPythonTools/python')
 if not path in sys.path:
     sys.path.insert(1, path)
 del path
@@ -68,7 +68,7 @@ subDir = "monoJetTuples_v6"
 
 
 if options.smsMsqRangeString!='None' and options.allsamples.lower()=='sms':
-  from Workspace.HEPHYCommonTools.xsecSMS import stop8TeV_NLONLL
+  from Workspace.HEPHYPythonTools.xsecSMS import stop8TeV_NLONLL
   allSamples=[]
   msqStart = int(options.smsMsqRangeString.split('-')[0])
   msqEnd = int(options.smsMsqRangeString.split('-')[1])
@@ -774,8 +774,6 @@ for isample, sample in enumerate(allSamples):
 #          print s.type1phiMet
           if s.type1phiMet<150:
             print "Warning!!"
-          else:
-            print "OK"
           t.Fill()
           tmpDir.cd()
 #          if s.type1phiMet<150:

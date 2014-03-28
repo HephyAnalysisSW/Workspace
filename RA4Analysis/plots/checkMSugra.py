@@ -8,7 +8,7 @@ if type(ROOT.tdrStyle)!=type(ROOT.gStyle):
   ROOT.setTDRStyle()
 
 ROOT.tdrStyle.SetPadRightMargin(0.16)
-ROOT.gROOT.ProcessLine(".L ../../HEPHYCommonTools/scripts/root/useNiceColorPalette.C")
+ROOT.gROOT.ProcessLine(".L ../../HEPHYPythonTools/scripts/root/useNiceColorPalette.C")
 ROOT.useNiceColorPalette(255)
 
 #if not globals().has_key("LO_Mu_efficiency"):

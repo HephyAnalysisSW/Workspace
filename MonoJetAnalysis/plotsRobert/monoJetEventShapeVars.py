@@ -1,6 +1,6 @@
 import ROOT, os, sys
 from math import *
-paths = ['../../HEPHYCommonTools/python']
+paths = ['../../HEPHYPythonTools/python']
 for path in [os.path.abspath(p) for p in paths]:
   if not path in sys.path:
     sys.path.insert(1, path)
@@ -200,7 +200,7 @@ def calcFoxWolframMoments(jets):
 #    htRatio = num/den
 #  return htRatio
 
-ROOT.gROOT.ProcessLine(".L ../../HEPHYCommonTools/scripts/root/Thrust.C+")
+ROOT.gROOT.ProcessLine(".L ../../HEPHYPythonTools/scripts/root/Thrust.C+")
 
 def calcThrust(jets, l, m):
   p_x = [cos(l["phi"])*l["pt"]] + [cos(m["phi"])*m["pt"]] + [cos(j['phi'])*j['pt'] for j in jets]

@@ -1,7 +1,7 @@
 from optparse import OptionParser
 import os, sys, pickle
 import ROOT
-ROOT.gROOT.ProcessLine(".L ../../HEPHYCommonTools/scripts/root/useNiceColorPalette.C")
+ROOT.gROOT.ProcessLine(".L ../../HEPHYPythonTools/scripts/root/useNiceColorPalette.C")
 ROOT.useNiceColorPalette(255)
 
 ROOT.gROOT.ProcessLine(".L TriangularInterpolation.C+")

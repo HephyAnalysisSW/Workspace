@@ -429,7 +429,7 @@ else:
 
   pickle.dump(res, file(filename,'w'))
 
-R.gROOT.ProcessLine(".L ../../HEPHYCommonTools/scripts/root/tdrstyle.C")
+R.gROOT.ProcessLine(".L ../../HEPHYPythonTools/scripts/root/tdrstyle.C")
 R.setTDRStyle()
 
 aData = R.TH1F("aData","aData", 4, 1.5, 5.5)

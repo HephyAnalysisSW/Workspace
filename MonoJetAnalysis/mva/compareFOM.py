@@ -2,17 +2,13 @@ import ROOT, os, sys
 smoother = ROOT.TGraphSmooth("smoother")
 doSmooth = True
 
-path = os.path.abspath('../../HEPHYCommonTools/mva')
-if not path in sys.path:
-    sys.path.insert(1, path)
-
 def delErr(g):
   for i in range(g.GetN()):
     g.GetEX()[i]=0
     g.GetEY()[i]=0
   
 
-from Workspace.HEPHYCommonTools.nnAnalysisHelpers import getObjFromFile
+from Workspace.HEPHYPythonTools.nnAnalysisHelpers import getObjFromFile
 foms = [ \
 #    {"name":"MLP21","color":ROOT.kBlack,  "fname":"/afs/hephy.at/user/s/schoefbeck/www/pngMJNN/nnValidation_MonoJet_MLP21_stop300lsp270FastSim_refsel_NormDeco_10000_sigmoid_BP_S03_SE08_softIsolatedMT_type1phiMet_deltaPhi.root"},
 #    {"name":"MLP22","color":ROOT.kGreen,  "fname":"/afs/hephy.at/user/s/schoefbeck/www/pngMJNN/nnValidation_MonoJet_MLP22_stop300lsp270FastSim_refsel_NormDeco_10000_sigmoid_BP_S03_SE08_softIsolatedMT_type1phiMet_deltaPhi.root"},

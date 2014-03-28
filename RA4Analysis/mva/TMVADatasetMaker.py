@@ -3,17 +3,14 @@ from math import sqrt, pi
 from localConfig import afsUser, nfsUser, localPlotDir
 import random
 from array import array
-for path in [os.path.abspath(p) for p in ['../../HEPHYCommonTools/mva', '../../HEPHYCommonTools/cardFileWriter/', '../../HEPHYCommonTools/python/', '../python/']]:
-  if not path in sys.path:
-      sys.path.insert(1, path)
 
-from Workspace.HEPHYCommonTools.nnAnalysisHelpers import getEList, constructDataset
-from xsec import xsec
-from xsecSMS import gluino8TeV_NLONLL, gluino14TeV_NLO
+from Workspace.HEPHYPythonTools.nnAnalysisHelpers import getEList, constructDataset
+from Workspace.HEPHYPythonTools.xsec import xsec
+from Workspace.HEPHYPythonTools.xsecSMS import gluino8TeV_NLONLL, gluino14TeV_NLO
 import copy, sys
 
 
-from smsInfo import getT1ttttMadgraphDirs, getT5ttttMadgraphDirs, nfsDirectories
+from Workspace.RA4Analysis.smsInfo import getT1ttttMadgraphDirs, getT5ttttMadgraphDirs, nfsDirectories
 
 def getBkgSample(name, mode):
   res = {}
@@ -32,7 +29,7 @@ def getT1ttttSample(mgl, mN, mode):
   res["dirname"]  = "/data/schoef/convertedTuples_v21/copyMET/"+mode+"/"
   return res
 
-from Workspace.MonoJetAnalysis.helpers import htRatio, KolmogorovDistance 
+from Workspace.HEPHYPythonTools.helpers import htRatio, KolmogorovDistance 
 #RA4
 
 mgl=1300
@@ -51,7 +48,7 @@ setup['weightForMVA'] = {'weight':1., 'sigFac':1., 'bkgFac':1}
 setup['varsFromInputData'] = ['type1phiMet', 'mT', 'weightLumi', 'ht', 'singleMuonic', 'singleElectronic', 'nvetoMuons', 'nvetoElectrons', 'mt2w', 'minDeltaPhi']
 setup['varsFromInputSignal'] =  ["osetMN", "osetMgl", "osetMsq"]
 
-from mvaFuncs import cosDeltaPhiLepW
+from Workspace.RA4Analysis.mvaFuncs import cosDeltaPhiLepW
 from math import acos
 setup['varsCalculated'] = [\
               ['njets/I', lambda c:int(c.GetLeaf('njets').GetValue())],

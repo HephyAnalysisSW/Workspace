@@ -5,11 +5,11 @@ from array import array
 import os, sys
 from math import sqrt
 
-for path in [os.path.abspath(p) for p in ['../../HEPHYCommonTools/mva', 'HEPHYCommonTools/cardFileWriter/', '../python', '../../HEPHYCommonTools/cardFileWriter']]:
+for path in [os.path.abspath(p) for p in ['HEPHYPythonTools/cardFileWriter/', '../python', '../../HEPHYPythonTools/cardFileWriter']]:
   if not path in sys.path:
       sys.path.insert(1, path)
 
-from Workspace.HEPHYCommonTools.nnAnalysisHelpers import getEList, constructDataset, getYield, fillNNHisto
+from Workspace.HEPHYPythonTools.nnAnalysisHelpers import getEList, constructDataset, getYield
 from xsec import xsec
 from xsecSMS import gluino8TeV_NLONLL, gluino14TeV_NLO
 import copy, sys

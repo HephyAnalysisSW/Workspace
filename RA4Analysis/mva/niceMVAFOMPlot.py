@@ -2,11 +2,7 @@ import ROOT
 smoother = ROOT.TGraphSmooth("smoother")
 doSmooth = True
 
-path = os.path.abspath('../../HEPHYCommonTools/mva')
-if not path in sys.path:
-    sys.path.insert(1, path)
-
-from Workspace.HEPHYCommonTools.nnAnalysisHelpers import getObjFromFile
+from Workspace.HEPHYPythonTools.nnAnalysisHelpers import getObjFromFile
 #ifile = "/afs/hephy.at/user/s/schoefbeck/www/pngNN/nnValidation_RA4_test_T1tttt-madgraph_4j_met100_mt2w200_NormDeco_10000_sigmoid_BP_S03_SE08_mD_600_800_mN_500_600_mT_type1phiMet_mt2w_nbtags_njets_minDeltaPhi_htRatio_deltaPhi.root"
 #ifile = "/afs/hephy.at/user/s/schoefbeck/www/pngNN/nnValidation_RA4_4j_met100_mt2w200_NormDeco_5000_sigmoid_mD_200_400_mN_500_600_mT_type1phiMet_mt2w_nbtags_njets_minDeltaPhi_htRatio_deltaPhi.root"
 #ifile = "/afs/hephy.at/user/s/schoefbeck/www/pngNN/nnValidation_RA4_test_refWeight200_T1tttt-madgraph_4j_met100_mt2w200_NormDeco_10000_sigmoid_BP_S03_SE08_mgl_1400_mN_800_mT_type1phiMet_mt2w_nbtags_njets_minDeltaPhi_htRatio_deltaPhi.root"

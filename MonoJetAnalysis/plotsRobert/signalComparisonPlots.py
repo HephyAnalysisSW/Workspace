@@ -5,8 +5,8 @@ import os, copy, sys
 
 ROOT.TH1F().SetDefaultSumw2()
 
-paths = ['../../HEPHYCommonTools/python', '../../HEPHYCommonTools/plots', '../../RA4Analysis/plots', '../python']
-#path = os.path.abspath('../../HEPHYCommonTools/python')
+paths = ['../../HEPHYPythonTools/python', '../../HEPHYPythonTools/plots', '../../RA4Analysis/plots', '../python']
+#path = os.path.abspath('../../HEPHYPythonTools/python')
 for path in [os.path.abspath(p) for p in paths]:
   if not path in sys.path:
     sys.path.insert(1, path)

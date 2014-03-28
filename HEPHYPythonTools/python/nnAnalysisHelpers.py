@@ -3,7 +3,7 @@ from array import array
 import ctypes, pickle, os, sys, copy
 from math import sqrt, cos, sin
 
-ROOT.gROOT.ProcessLine(".L ../../HEPHYCommonTools/scripts/root/tdrstyle.C")
+ROOT.gROOT.ProcessLine(".L ../../HEPHYPythonTools/scripts/root/tdrstyle.C")
 ROOT.setTDRStyle()
 
 stuff=[]

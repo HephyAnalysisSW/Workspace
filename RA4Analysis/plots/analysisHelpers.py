@@ -1,7 +1,7 @@
 import ROOT
 from math import *
 import os
-ROOT.gROOT.ProcessLine(".L ../../HEPHYCommonTools/scripts/root/tdrstyle.C")
+ROOT.gROOT.ProcessLine(".L ../../HEPHYPythonTools/scripts/root/tdrstyle.C")
 ROOT.setTDRStyle()
 metNormReg = [150, 250] #low MEt normalization region
 verbose = False

@@ -1,6 +1,6 @@
 import ROOT
 from Workspace.MonoJetAnalysis.helpers import getVarValue
-ROOT.gROOT.ProcessLine('.L ../../HEPHYCommonTools/scripts/root/WPolarizationVariation.C+')
+ROOT.gROOT.ProcessLine('.L ../../HEPHYPythonTools/scripts/root/WPolarizationVariation.C+')
 def calcPolWeights(c):
   #find gen W
   ngp = int(getVarValue(c, 'ngp'))

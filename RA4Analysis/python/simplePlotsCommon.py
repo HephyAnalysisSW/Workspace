@@ -2,9 +2,9 @@ import ROOT, copy, pickle
 from array import array
 #ROOT.gROOT.SetStyle("Plain")
 #ROOT.gROOT.ForceStyle()
-ROOT.gROOT.ProcessLine(".L ../../HEPHYCommonTools/scripts/root/tdrstyle.C")
+ROOT.gROOT.ProcessLine(".L ../../HEPHYPythonTools/scripts/root/tdrstyle.C")
 ROOT.setTDRStyle()
-from simplePlotsLocals import *
+from Workspace.RA4Analysis.simplePlotsLocals import *
 dataColor =   ROOT.kBlack
 caloColor =  ROOT.kYellow
 typeIColor =  ROOT.kYellow

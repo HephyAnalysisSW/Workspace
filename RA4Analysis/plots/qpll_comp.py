@@ -3,7 +3,7 @@ from math import *
 from Workspace.RA4Analysis.simplePlotsCommon import *
 
 ROOT.tdrStyle.SetPadRightMargin(0.16)
-ROOT.gROOT.ProcessLine(".L ../../HEPHYCommonTools/scripts/root/useNiceColorPalette.C")
+ROOT.gROOT.ProcessLine(".L ../../HEPHYPythonTools/scripts/root/useNiceColorPalette.C")
 ROOT.useNiceColorPalette(255)
 
 run = "205236"

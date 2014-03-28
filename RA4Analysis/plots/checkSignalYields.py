@@ -1,5 +1,5 @@
 from analysisHelpers import *
-for path in [os.path.abspath(p) for p in ['../../HEPHYCommonTools/python/']]:
+for path in [os.path.abspath(p) for p in ['../../HEPHYPythonTools/python/']]:
   if not path in sys.path:
       sys.path.insert(1, path)
 

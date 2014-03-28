@@ -8,7 +8,7 @@ from Workspace.MonoJetAnalysis.helpers import getVarValue, deltaPhi, minAbsDelta
 from defaultSamples import *
 from  Workspace.RA4Analysis import eventShape, mt2w
 
-ROOT.gROOT.ProcessLine(".L ../../HEPHYCommonTools/scripts/root/Thrust.C+")
+ROOT.gROOT.ProcessLine(".L ../../HEPHYPythonTools/scripts/root/Thrust.C+")
 
 from optparse import OptionParser
 parser = OptionParser()
@@ -82,12 +82,12 @@ def jerDifferenceScaleFactor( eta, jermode = "none"): #https://twiki.cern.ch/twi
   return 1.
 
 
-from Workspace.HEPHYCommonTools.xsec import xsec
+from Workspace.HEPHYPythonTools.xsec import xsec
 
 subDir = "convertedTuples_v22"
 
 if options.smsMglRangeString!='None' and options.allsamples.lower()=='sms':
-  from Workspace.HEPHYCommonTools.xsecSMS import gluino8TeV_NLONLL
+  from Workspace.HEPHYPythonTools.xsecSMS import gluino8TeV_NLONLL
   allSamples=[]
   mglStart = int(options.smsMglRangeString.split('-')[0])
   mglEnd = int(options.smsMglRangeString.split('-')[1])

@@ -15,7 +15,7 @@ eventsInSample['WW'] = 10000431
 eventsInSample['WZ'] = 10000283 
 eventsInSample['ZZ'] = 9799908 
 
-path = os.path.abspath('../../HEPHYCommonTools/python')
+path = os.path.abspath('../../HEPHYPythonTools/python')
 if not path in sys.path:
     sys.path.insert(1, path)
 del path

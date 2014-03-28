@@ -1,7 +1,7 @@
 import copy, os, sys
 allSamples = []
 
-from Workspace.HEPHYCommonTools.createPUReweightingHisto import getPUReweightingUncertainty
+from Workspace.HEPHYPythonTools.createPUReweightingHisto import getPUReweightingUncertainty
 
 S10rwHisto = getPUReweightingUncertainty("S10", dataFile = "/data/schoef/tools/PU/MyDataPileupHistogram_Run2012ABCD_60max_true_pixelcorr_Sys0.root")
 S10rwPlusHisto = getPUReweightingUncertainty("S10", dataFile = "/data/schoef/tools/PU/MyDataPileupHistogram_Run2012ABCD_60max_true_pixelcorr_SysPlus5.root")

@@ -5,26 +5,16 @@ import os, copy, sys
 
 ROOT.TH1F().SetDefaultSumw2()
 
-paths = ['../../HEPHYCommonTools/python', '../../HEPHYCommonTools/plots', '../../RA4Analysis/plots', '../mva' , '../python']
-#path = os.path.abspath('../../HEPHYCommonTools/python')
-for path in [os.path.abspath(p) for p in paths]:
-  if not path in sys.path:
-    sys.path.insert(1, path)
 
-
-from helpers import getObjFromFile, passPUJetID, getISRweight, minDeltaRLeptonJets#, findClosestJet, invMass 
+from Workspace.HEPHYPythonTools.helpers import getObjFromFile, passPUJetID, getISRweight, minDeltaRLeptonJets#, findClosestJet, invMass 
 #simplePUreweightHisto = getObjFromFile('/data/schoef/monoJetStuff/simpPUreweighting.root', "ngoodVertices_Data")
-
-from simplePlotsCommon import *
-from monoJetFuncs import *
-from monoJetEventShapeVars import circularity2D, foxWolframMoments, thrust
-
-import xsec
+from Workspace.RA4Analysis.mvaFuncs import cosDeltaPhiLepW
+from Workspace.RA4Analysis.simplePlotsCommon import *
 small = False
 
 targetLumi = 19375.
 
-from defaultConvertedTuples import * 
+from Workspace.MonoJetAnalysis.defaultConvertedTuples import * 
 
 wjetsSample = wJetsToLNuInc
 #allSamples = [data, dy_and_ww, ttJets, zJetsInv, wJetsToLNu, singleTop, ww, qcd]

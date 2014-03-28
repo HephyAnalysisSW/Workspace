@@ -1,7 +1,7 @@
 import ROOT
 import funcs
 
-ROOT.gROOT.ProcessLine('.L ../../../HEPHYCommonTools/scripts/root/tdrstyle.C')
+ROOT.gROOT.ProcessLine('.L ../../../HEPHYPythonTools/scripts/root/tdrstyle.C')
 ROOT.setTDRStyle()
 
 cut = "ht>400&&met>150"

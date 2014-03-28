@@ -3,7 +3,7 @@ import ROOT
 from simplePlotsCommon import *
 from math import *
 import os, copy, array, xsec, sys, random
-for path in [os.path.abspath(p) for p in ['../../HEPHYCommonTools/python/']]:
+for path in [os.path.abspath(p) for p in ['../../HEPHYPythonTools/python/']]:
   if not path in sys.path:
       sys.path.insert(1, path)
 
@@ -12,11 +12,11 @@ from btagEff import getMCEff, getTagWeightDict, getSF
 from random import randint
 import eventShape
 
-ROOT.gROOT.ProcessLine(".L ../../HEPHYCommonTools/scripts/root/polSys/WPolarizationVariation.C+")
-ROOT.gROOT.ProcessLine(".L ../../HEPHYCommonTools/scripts/root/polSys/TTbarPolarization.C+")
+ROOT.gROOT.ProcessLine(".L ../../HEPHYPythonTools/scripts/root/polSys/WPolarizationVariation.C+")
+ROOT.gROOT.ProcessLine(".L ../../HEPHYPythonTools/scripts/root/polSys/TTbarPolarization.C+")
 ROOT.gROOT.ProcessLine(".L mt2w/mt2w_bisect.cpp+")
 ROOT.gROOT.ProcessLine(".L alphaT/alphaT.C+")
-ROOT.gROOT.ProcessLine(".L ../../HEPHYCommonTools/scripts/root/Thrust.C+")
+ROOT.gROOT.ProcessLine(".L ../../HEPHYPythonTools/scripts/root/Thrust.C+")
 
 mt2w = ROOT.mt2w(500, 499, 0.5)
 
