@@ -5,7 +5,7 @@ guy="RS"
 guy="WK"
 postfix = "nj4"
 if not globals().has_key("loadedNCP"):
-  ROOT.gROOT.ProcessLine(".L ../../HEPHYCommonTools/scripts/root/useNiceColorPalette.C")
+  ROOT.gROOT.ProcessLine(".L ../../HEPHYPythonTools/scripts/root/useNiceColorPalette.C")
   ROOT.useNiceColorPalette(255)
   globals()["loadedNCP"] = True
 

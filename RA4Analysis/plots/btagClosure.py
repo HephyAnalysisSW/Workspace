@@ -1,5 +1,5 @@
 import ROOT, pickle, itertools
-from simplePlotsCommon import *
+from Workspace.RA4Analysis.simplePlotsCommon import *
 c = ROOT.TChain("Events")
 c.Add("/data/schoef/convertedTuples_v10/copyMET/Mu/TTJets-53X/histo_TTJets-53X.root")
 

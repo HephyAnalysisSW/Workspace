@@ -3,7 +3,7 @@ from array import array
 from math import *
 import os, copy, random
 from simpleStatTools import *
-from simplePlotsCommon import *
+from Workspace.RA4Analysis.simplePlotsCommon import *
 import xsec
 small = False
 frac = 0.05

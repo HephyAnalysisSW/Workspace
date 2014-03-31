@@ -3,7 +3,7 @@ from array import array
 from math import *
 import os, copy, sys
 
-from simplePlotsCommon import *
+from Workspace.RA4Analysis.simplePlotsCommon import *
 from funcs import *
 
 import xsec

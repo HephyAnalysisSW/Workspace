@@ -1,14 +1,11 @@
+import ROOT
 import os,sys,pickle
 from math import sqrt, pi
 from localConfig import afsUser, nfsUser, localPlotDir
 
-for path in [os.path.abspath(p) for p in ['../../HEPHYCommonTools/mva', '../../HEPHYCommonTools/cardFileWriter/', '../../HEPHYCommonTools/python/']]:
-  if not path in sys.path:
-      sys.path.insert(1, path)
-
-from nnAnalysisHelpers import getEList, constructDataset, setupMVAFrameWork
-from xsec import xsec
-from xsecSMS import gluino8TeV_NLONLL, gluino14TeV_NLO
+from Workspace.HEPHYPythonTools.nnAnalysisHelpers import getEList, constructDataset, setupMVAFrameWork
+from Workspace.HEPHYPythonTools.xsec import xsec
+from Workspace.HEPHYPythonTools.xsecSMS import gluino8TeV_NLONLL, gluino14TeV_NLO
 import copy
 import sys
 

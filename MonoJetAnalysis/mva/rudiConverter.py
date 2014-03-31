@@ -6,10 +6,7 @@ import ROOT
 #c.Scan("type:weight:weightForMVA:type1phiMet:softIsolatedMuPt:isrJetPt:softIsolatedMT:deltaPhi:htRatio:softIsolatedMuCharge", "","@colsize=20")
 
 import ROOT, os, sys
-path = os.path.abspath('../../HEPHYCommonTools/mva')
-if not path in sys.path:
-    sys.path.insert(1, path)
-from nnAnalysisHelpers import getObjFromFile
+from Workspace.HEPHYPythonTools.nnAnalysisHelpers import getObjFromFile
 from array import array
 
 if len(sys.argv)>2:

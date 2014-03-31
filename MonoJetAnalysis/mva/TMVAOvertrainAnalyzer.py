@@ -4,17 +4,17 @@ from localConfig import afsUser, nfsUser, localPlotDir
 from array import array
 import os, sys
 
-for path in [os.path.abspath(p) for p in ['../../HEPHYCommonTools/mva', 'HEPHYCommonTools/cardFileWriter/', '../../HEPHYCommonTools/python', '../python', '../../HEPHYCommonTools/cardFileWriter']]:
+for path in [os.path.abspath(p) for p in [ 'HEPHYPythonTools/cardFileWriter/', '../../HEPHYPythonTools/python', '../python', '../../HEPHYPythonTools/cardFileWriter']]:
   if not path in sys.path:
       sys.path.insert(1, path)
 
-from nnAnalysisHelpers import getEList, constructDataset, getYield, fillNNHisto, getObjFromFile, getVarValList, getPlot
+from Workspace.HEPHYPythonTools.nnAnalysisHelpers import getEList, constructDataset, getYield, getObjFromFile, getVarValList, getPlot
 from xsec import xsec
 from xsecSMS import gluino8TeV_NLONLL, gluino14TeV_NLO
 import copy, sys
 from monoJetFuncs import softIsolatedMT
 from cardFileWriter import cardFileWriter
-from helpers import KolmogorovProbability, KolmogorovDistance
+from Workspace.HEPHYPythonTools.helpers import KolmogorovProbability, KolmogorovDistance
 #RA4
 
 #prefix =  /data/schoef/MonoJetNNAnalysis/MVA_Analyzer/MonoJet_stop300lsp270FastSim_BkgMix_0_nTrees400_nCuts_-1_maxDepthComparison_softIsolatedMT_type1phiMet_deltaPhi.root 

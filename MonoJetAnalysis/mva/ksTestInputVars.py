@@ -1,8 +1,5 @@
 import ROOT, os, sys
-path = os.path.abspath('../../HEPHYCommonTools/mva')
-if not path in sys.path:
-    sys.path.insert(1, path)
-from nnAnalysisHelpers import getObjFromFile
+from Workspace.HEPHYPythonTools.nnAnalysisHelpers import getObjFromFile
 from array import array
 #ifile = "/data/schoef/MonoJetNNAnalysis/MVA_Analyzer/MonoJet_BDTvsMLP_RudiTest_stop300lsp270FastSim_sigScale100_softIsolatedMT_type1phiMet_deltaPhi.root"
 for nj in range(1,5):

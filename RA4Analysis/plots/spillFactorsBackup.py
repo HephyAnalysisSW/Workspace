@@ -1,7 +1,7 @@
 import ROOT
 from array import array
 from math import *
-from simplePlotsCommon import *
+from Workspace.RA4Analysis.simplePlotsCommon import *
 
 cMad = ROOT.TChain("Events")
 cMad.Add("/data/schoef/convertedTuples_v10/copyMET/Mu/TTJets-53X/histo_TTJets-53X.root")

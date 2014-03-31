@@ -1,7 +1,7 @@
 import ROOT, array
 from math import pi, sqrt, cos, sin, sinh
 
-ROOT.gROOT.ProcessLine(".L ../../HEPHYCommonTools/scripts/root/mt2w_bisect.cpp+")
+ROOT.gROOT.ProcessLine(".L ../../HEPHYPythonTools/scripts/root/mt2w_bisect.cpp+")
 def getJetArray(j):
   px = j['pt']*cos(j['phi'] )
   py = j['pt']*sin(j['phi'] )

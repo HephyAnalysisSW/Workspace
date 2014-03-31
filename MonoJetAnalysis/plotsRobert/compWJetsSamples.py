@@ -3,7 +3,7 @@ import os, sys
 from math import sqrt
 
 paths = ['../python']
-#path = os.path.abspath('../../HEPHYCommonTools/python')
+#path = os.path.abspath('../../HEPHYPythonTools/python')
 for path in [os.path.abspath(p) for p in paths]:
   if not path in sys.path:
     sys.path.insert(1, path)

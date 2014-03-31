@@ -53,7 +53,7 @@ def findBinning(values):
 #
 ROOT.gStyle.SetOptStat(0)
 ROOT.gStyle.SetPadRightMargin(0.15)
-ROOT.gROOT.ProcessLine(".L ../../../HEPHYCommonTools/scripts/root/useNiceColorPalette.C")
+ROOT.gROOT.ProcessLine(".L ../../../HEPHYPythonTools/scripts/root/useNiceColorPalette.C")
 ROOT.useNiceColorPalette()
 #
 summaryHistograms = { }

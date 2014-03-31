@@ -1,5 +1,5 @@
 import ROOT, pickle
-from simplePlotsCommon import *
+from Workspace.RA4Analysis.simplePlotsCommon import *
 ROOT.gStyle.SetOptStat(0)
 ROOT.setTDRStyle()
 #ROOT.gStyle.SetPadRightMargin(0.10);
@@ -8,7 +8,7 @@ if type(ROOT.tdrStyle)!=type(ROOT.gStyle):
   ROOT.setTDRStyle()
 
 ROOT.tdrStyle.SetPadRightMargin(0.16)
-ROOT.gROOT.ProcessLine(".L ../../HEPHYCommonTools/scripts/root/useNiceColorPalette.C")
+ROOT.gROOT.ProcessLine(".L ../../HEPHYPythonTools/scripts/root/useNiceColorPalette.C")
 ROOT.useNiceColorPalette(255)
 
 #if not globals().has_key("LO_Mu_efficiency"):

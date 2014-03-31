@@ -115,7 +115,7 @@ def getStr(i):
 #  emuRun2012BOSDL.Scan("event:run:lumi:njets:met:ht:muonsPt:muonsEta:muonsisPF:muonsisGlobal:muonsPFRelIso:muonsNormChi2:muonsNValMuonHits:muonsNumMatchedStadions:muonsPixelHits:muonsNumtrackerLayerWithMeasurement:muonsDxy:muonsDz", getStr(i))
 #  emuRun2012BOSDL.Scan("event:run:lumi:njets:met:ht:elesPt:elesEta:elesOneOverEMinusOneOverP:elesPfRelIso:elesSigmaIEtaIEta:elesHoE:elesDPhi:elesDEta:elesMissingHits:elesDxy:elesDz:elesPassConversionRejection", getStr(i))
 
-#from simplePlotsCommon import *
+#from Workspace.RA4Analysis.simplePlotsCommon import *
 #from convertDiLep import goodEleID
 #c = ROOT.TChain("Events")
 #c.Add("../crab/pickEvents/histo_Trigger.root")

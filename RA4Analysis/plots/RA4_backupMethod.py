@@ -3,7 +3,7 @@ from array import array
 from math import *
 import os, copy
 from simpleStatTools import niceNum
-from simplePlotsCommon import *
+from Workspace.RA4Analysis.simplePlotsCommon import *
 import xsec
 
 small = False
@@ -158,7 +158,7 @@ if not os.path.exists(filename):
     ROOT.setTDRStyle()
 
   ROOT.tdrStyle.SetPadRightMargin(0.16)
-  ROOT.gROOT.ProcessLine(".L ../../HEPHYCommonTools/scripts/root/useNiceColorPalette.C")
+  ROOT.gROOT.ProcessLine(".L ../../HEPHYPythonTools/scripts/root/useNiceColorPalette.C")
   ROOT.useNiceColorPalette(255)
 
   for var in allVars:

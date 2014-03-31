@@ -1,5 +1,5 @@
 import ROOT
-from simplePlotsCommon import *
+from Workspace.RA4Analysis.simplePlotsCommon import *
 
 htvals = [\
     [350,400,   "HLTHT300"],
@@ -18,7 +18,7 @@ htvals = [\
   ]
 
 if not globals().has_key("loadedNCP"):
-  ROOT.gROOT.ProcessLine(".L ../../HEPHYCommonTools/scripts/root/useNiceColorPalette.C")
+  ROOT.gROOT.ProcessLine(".L ../../HEPHYPythonTools/scripts/root/useNiceColorPalette.C")
   ROOT.useNiceColorPalette(255)
   globals()["loadedNCP"] = True
 

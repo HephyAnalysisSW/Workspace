@@ -1,5 +1,5 @@
 import ROOT
-from simplePlotsCommon import *
+from Workspace.RA4Analysis.simplePlotsCommon import *
 
 small = False
 

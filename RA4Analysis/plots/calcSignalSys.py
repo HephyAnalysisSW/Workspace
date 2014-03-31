@@ -1,7 +1,7 @@
 import ROOT
 from analysisHelpers import *
 
-ROOT.gROOT.ProcessLine(".L ../../HEPHYCommonTools/scripts/root/useNiceColorPalette.C")
+ROOT.gROOT.ProcessLine(".L ../../HEPHYPythonTools/scripts/root/useNiceColorPalette.C")
 ROOT.useNiceColorPalette(255)
 
 cMC = getRefChain()

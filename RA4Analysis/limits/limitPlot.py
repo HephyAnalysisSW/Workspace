@@ -7,7 +7,7 @@ if not path in sys.path:
 
 from xsecSMS import gluino8TeV_NLONLL, gluino8TeV_NLONLL_Up, gluino8TeV_NLONLL_Down
 from smsInfo import xAxisTitle, yAxisTitle
-R.gROOT.ProcessLine(".L ../../HEPHYCommonTools/scripts/root/useNiceColorPalette.C")
+R.gROOT.ProcessLine(".L ../../HEPHYPythonTools/scripts/root/useNiceColorPalette.C")
 R.useNiceColorPalette(255)
 R.gROOT.ProcessLine(".L TriangularInterpolation.C+")
 R.gROOT.ProcessLine(".L LimitSmoothing.C+")

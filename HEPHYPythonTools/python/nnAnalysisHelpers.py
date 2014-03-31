@@ -3,17 +3,12 @@ from array import array
 import ctypes, pickle, os, sys, copy
 from math import sqrt, cos, sin
 
-ROOT.gROOT.ProcessLine(".L ../../HEPHYCommonTools/scripts/root/tdrstyle.C")
+ROOT.gROOT.ProcessLine(".L ../../HEPHYPythonTools/scripts/root/tdrstyle.C")
 ROOT.setTDRStyle()
 
 stuff=[]
 p_c_float = ctypes.c_float * 1
 #p_c_int = ctypes.c_int * 1
-
-path = os.path.abspath('../../RA4Analysis/plots')
-if not path in sys.path:
-    sys.path.insert(1, path)
-del path
 
 def getObjFromFile(fname,hname):
   olddir = ROOT.gDirectory.CurrentDirectory().GetName()+':/'

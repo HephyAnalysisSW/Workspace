@@ -1,5 +1,5 @@
 import ROOT
-from simplePlotsCommon import *
+from Workspace.RA4Analysis.simplePlotsCommon import *
 from defaultHad2012Samples import *
 import copy, os, xsec, types
 from math import sqrt

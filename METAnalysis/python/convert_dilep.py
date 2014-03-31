@@ -8,7 +8,7 @@ from datetime import datetime
 from defaultDiLeptonSamples import *
 chmode = "Zmumu"
 
-for p in ['../../MonoJetAnalysis/python', '../../HEPHYCommonTools/python']:
+for p in ['../../MonoJetAnalysis/python', '../../HEPHYPythonTools/python']:
   path = os.path.abspath(p)
   if not path in sys.path:
       sys.path.insert(1, path)

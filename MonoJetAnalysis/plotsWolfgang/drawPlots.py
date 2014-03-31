@@ -123,7 +123,7 @@ for varname in variables:
     if variable.is2D():
         cnv.SetRightMargin(0.15)
         if not definedPalette:
-            ROOT.gROOT.ProcessLine(".L ../../HEPHYCommonTools/scripts/root/useNiceColorPalette.C")
+            ROOT.gROOT.ProcessLine(".L ../../HEPHYPythonTools/scripts/root/useNiceColorPalette.C")
             ROOT.useNiceColorPalette()
             definedPalette = True
         data, bkgs, sigs, legend = drawClass.drawStack2D(samples,histograms,cnv)

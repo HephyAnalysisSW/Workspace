@@ -11,7 +11,7 @@ chmode = "copyIncMuDzID"
 #chmode = "copyCleanedWithAllLeptons" 
 from defaultMETSamples_mc import *
 
-path = os.path.abspath('../../HEPHYCommonTools/python')
+path = os.path.abspath('../../HEPHYPythonTools/python')
 if not path in sys.path:
     sys.path.insert(1, path)
 del path
