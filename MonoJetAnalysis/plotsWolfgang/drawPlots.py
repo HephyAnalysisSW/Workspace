@@ -126,7 +126,7 @@ for varname in variables:
             ROOT.gROOT.ProcessLine(".L ../../HEPHYCommonTools/scripts/root/useNiceColorPalette.C")
             ROOT.useNiceColorPalette()
             definedPalette = True
-        bkgs, sigs, legend = drawClass.drawStack2D(samples,histograms,cnv)
+        data, bkgs, sigs, legend = drawClass.drawStack2D(samples,histograms,cnv)
         if variable.uselog:
             cnv.SetLogz(1)
 
@@ -148,6 +148,8 @@ for varname in variables:
 
     cnv.SetName(bkgs.GetName())
     cnv.SetTitle(bkgs.GetName())
+    if data!=None:
+        allstacks.append(data)
     if bkgs!=None:
         allstacks.append(bkgs)
     if len(sigs)>0:
