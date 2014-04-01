@@ -218,16 +218,10 @@ class DrawWithFOM:
                 data = h.Clone()
                 h.SetTitle("Data")
 
-        ipads = [ ]
         nsig = 0
         for s in samples:
             if s.isSignal():  
                 nsig += 1
-                ipads.append(nsig+2)
-            elif s.isData():
-                ipads.append(2)
-            else:
-                ipads.append(1)
         nsub = int(sqrt(nsig+2))
         if nsub**2<(nsig+2):
             nsub += 1
@@ -258,6 +252,7 @@ class DrawWithFOM:
             data.SetMaximum(bkgmax/0.85)
             data.SetMinimum(0.1)
             data.Draw("zcol")
+            print "DataEntries: ",data.GetName(),data.GetTitle(),data.GetEntries()
             latexs.append(latex.DrawLatex(0.40,0.15,"Data"))
             ROOT.gPad.SetLogz(1)
 
@@ -267,7 +262,7 @@ class DrawWithFOM:
 ##            s.SetContour(len(contlist),c_contlist)
 ##            s.SetLineWidth(2)
 ##            s.Draw("cont3 same")
-            currpad.cd(i+2)
+            currpad.cd(i+3)
             ROOT.gPad.SetRightMargin(0.15)
 #            bkgs.DrawClone("zcol")
             s.SetMaximum(bkgmax/0.85)
@@ -283,7 +278,7 @@ class DrawWithFOM:
         currpad.cd()
         currpad.Update()
 
-        return ( bkgs, sigs , latexs )
+        return ( data, bkgs, sigs , latexs )
 
     def drawFom(self, bkgs, sigs, scut='l', pad=None):
 
