@@ -139,6 +139,7 @@ class LP_plots(PlotsBase):
 
         softMuPt = muPts[imu]
         softMuPhi = muPhis[imu]
+        softMuEta = muEtas[imu]
         met = eh.get("type1phiMet")
 #        if met<300:
 #            return
@@ -200,8 +201,8 @@ class LP_plots(PlotsBase):
         self.fillOne1D("ht",pdg,ht,w)
         self.fillOne1D("met",pdg,met,w)
 
-        if ihtmet<-100:
-            return
+#        if ihtmet<-100:
+#            return
 
         self.fillOne1D("mt",pdg,mt,w)
         
@@ -225,7 +226,6 @@ class LP_plots(PlotsBase):
         self.fillOne1D("njet",pdg,eh.get("njetCount"),w)
 
 
-        softMuEta = eh.get("softIsolatedMuEta")
         self.fillOne1D("softMuPt",pdg,softMuPt,w)
         self.fillOne1D("softMuEta",pdg,abs(softMuEta),w)
            
