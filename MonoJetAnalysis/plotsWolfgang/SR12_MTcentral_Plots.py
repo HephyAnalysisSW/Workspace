@@ -46,39 +46,45 @@ class SR12_MTcentral_Plots(PlotsBase):
             ROOT.gROOT.mkdir(name)
         ROOT.gROOT.cd(name)
 
-        self.addVariable("isrJetPtMinus",100,0.,1000.,'l')
-        self.addVariable("isrJetEtaMinus",50,0.,5.,'u')
-        self.addVariable("jet2PtMinus",100,0.,1000.,'u')
-        self.addVariable("jet2EtaMinus",50,0.,5.,'u')
-        self.addVariable("jetPtRatioMinus",50,0.,1.,'u')
-        self.addVariable("njet60Minus",10,-0.5,9.5,'u')
-        self.addVariable("njetMinus",20,-0.5,19.5,'u')
-        self.addVariable("metMinus",100,0.,1000.,'l')
-        self.addVariable("mtMinus",50,0.,200.,'l')
-        self.addVariable("softMuPtMinus",100,0.,25.,'u')
-        self.addVariable("softMuEtaMinus",60,0.,3.,'u')
-        self.addVariable("jetmuDeltaEtaMinus",50,0.,10.,'l')
-        self.addVariable("jetmuDeltaRMinus",50,0.,10.,'l')
-        self.addVariable("htmetIndexMinus",6,-112.5,37.5,'b')
-        self.addVariable("htMinus",24,0.,600.,'b')
-        self.addVariable("countMinus",1,-0.5,1.5,'b')
+        for sign in [ "Minus", "Plus" ]:
+            self.addVariable("isrJetPt"+sign,100,0.,1000.,'l')
+            self.addVariable("isrJetEta"+sign,50,0.,5.,'u')
+            self.addVariable("jet2Pt"+sign,100,0.,1000.,'u')
+            self.addVariable("jet2Eta"+sign,50,0.,5.,'u')
+            self.addVariable("jetPtRatio"+sign,50,0.,1.,'u')
+            self.addVariable("njet60"+sign,10,-0.5,9.5,'u')
+            self.addVariable("njet"+sign,20,-0.5,19.5,'u')
+            self.addVariable("met"+sign,100,0.,1000.,'l')
+            self.addVariable("mt"+sign,50,0.,200.,'l')
+            self.addVariable("softMuPt"+sign,100,0.,25.,'u')
+            self.addVariable("softMuEta"+sign,60,0.,3.,'u')
+            self.addVariable("jetmuDeltaEta"+sign,50,0.,10.,'l')
+            self.addVariable("jetmuDeltaR"+sign,50,0.,10.,'l')
+            self.addVariable("htmetIndex"+sign,6,-112.5,37.5,'b')
+            self.addVariable("ht"+sign,24,0.,600.,'b')
+            self.addVariable("count"+sign,1,-0.5,1.5,'b')
+            self.addVariablePair("muabsiso",50,0.,10.,"htmet",6,-112.5,37.5,suffix=sign)
+            self.addVariablePair("mudxy",50,0.,0.2,"htmet",6,-112.5,37.5,suffix=sign)
+            self.addVariablePair("mudz",50,0.,0.5,"htmet",6,-112.5,37.5,suffix=sign)
+            self.addVariablePair("mupix",5,0.,5.,"htmet",6,-112.5,37.5,suffix=sign)
+            self.addVariablePair("isrJetPt",50,0.,1000.,"htmet",6,-112.5,37.5,suffix=sign)
+            self.addVariablePair("isrJetEta",25,0.,5.,"htmet",6,-112.5,37.5,suffix=sign)
+            self.addVariablePair("njet60",10,-0.5,9.5,"htmet",6,-112.5,37.5,suffix=sign)
+            self.addVariablePair("njet",20,-0.5,19.5,"htmet",6,-112.5,37.5,suffix=sign)
+            self.addVariablePair("softMuPt",50,0.,25.,"htmet",6,-112.5,37.5,suffix=sign)
+            self.addVariablePair("softMuEta",30,0.,3.,"htmet",6,-112.5,37.5,suffix=sign)
+            self.addVariablePair("jetmuDeltaEta",25,0.,10.,"htmet",6,-112.5,37.5,suffix=sign)
+            self.addVariablePair("jetmuDeltaR",25,0.,10.,"htmet",6,-112.5,37.5,suffix=sign)
+            self.addVariablePair("softEle",10,0.,10.,"htmet",6,-112.5,37.5,suffix=sign)
+            self.addVariablePair("softTau",10,0.,10.,"htmet",6,-112.5,37.5,suffix=sign)
+            self.addVariablePair("softB",10,0.,10.,"htmet",6,-112.5,37.5,suffix=sign)
+            self.addVariablePair("softMuIsGlob",2,0.,2.,"htmet",6,-112.5,37.5,suffix=sign)
+            self.addVariablePair("softMuIsTk",2,0.,2.,"htmet",6,-112.5,37.5,suffix=sign)
+            self.addVariablePair("softMuNValMu",10,0.,10.,"htmet",6,-112.5,37.5,suffix=sign)
+            self.addVariablePair("softMuNormChi2",10,0.,20.,"htmet",6,-112.5,37.5,suffix=sign)
+            self.addVariablePair("softMuNMatched",20,0.,20.,"htmet",6,-112.5,37.5,suffix=sign)
+            self.addVariablePair("softMuNTkLayer",20,0.,20.,"htmet",6,-112.5,37.5,suffix=sign)
 
-        self.addVariable("isrJetPtPlus",100,0.,1000.,'l')
-        self.addVariable("isrJetEtaPlus",50,0.,5.,'u')
-        self.addVariable("jet2PtPlus",100,0.,1000.,'u')
-        self.addVariable("jet2EtaPlus",50,0.,5.,'u')
-        self.addVariable("jetPtRatioPlus",50,0.,1.,'u')
-        self.addVariable("njet60Plus",10,-0.5,9.5,'u')
-        self.addVariable("njetPlus",20,-0.5,19.5,'u')
-        self.addVariable("metPlus",100,0.,1000.,'l')
-        self.addVariable("mtPlus",50,0.,200.,'l')
-        self.addVariable("softMuPtPlus",100,0.,25.,'u')
-        self.addVariable("softMuEtaPlus",60,0.,3.,'u')
-        self.addVariable("jetmuDeltaEtaPlus",50,0.,10.,'l')
-        self.addVariable("jetmuDeltaRPlus",50,0.,10.,'l')
-        self.addVariable("htmetIndexPlus",6,-112.5,37.5,'b')
-        self.addVariable("htPlus",24,0.,600.,'b')
-        self.addVariable("countPlus",1,-0.5,1.5,'b')
 
         self.addVariablePair("met",40,0.,1000.,"ht",40,0.,1000.)
 
@@ -91,6 +97,14 @@ class SR12_MTcentral_Plots(PlotsBase):
         else:
             fullname += "Plus"
         self.histogramList[fullname].Fill(value,weight)
+
+    def fillOne2D(self,name,pdg,xvalue,yvalue,weight):
+        fullname = name + "_"
+        if pdg>0:
+            fullname += "Minus"
+        else:
+            fullname += "Plus"
+        self.histogramList[fullname].Fill(xvalue,yvalue,weight)
 
     def fill(self,eh,downscale=1):
 
@@ -175,7 +189,43 @@ class SR12_MTcentral_Plots(PlotsBase):
         self.fillOne1D("mt",pdg,mt,w)
         
         self.fillOne1D("isrJetPt",pdg,isrJetPt,w)
+        self.fillOne2D("htmet_vs_isrJetPt",pdg,isrJetPt,ihtmet,w)
         self.fillOne1D("isrJetEta",pdg,abs(eh.get("isrJetEta")),w)
+        self.fillOne2D("htmet_vs_isrJetEta",pdg,abs(eh.get("isrJetEta")),ihtmet,w)
+
+        softMuIso = eh.get("softIsolatedMuRelIso")
+        self.fillOne2D("htmet_vs_muabsiso",pdg,softMuIso*softMuPt,ihtmet,w)
+
+        softMuDxy = eh.get("softIsolatedMuDxy")
+        self.fillOne2D("htmet_vs_mudxy",pdg,softMuDxy,ihtmet,w)
+
+        softMuDz = eh.get("softIsolatedMuDz")
+        self.fillOne2D("htmet_vs_mudz",pdg,softMuDz,ihtmet,w)
+
+        softMuPix = eh.get("softIsolatedMuPixelHits")
+        self.fillOne2D("htmet_vs_mupix",pdg,softMuPix,ihtmet,w)
+
+        softMuIsGlob = eh.get("softIsolatedMuIsGlobal")
+        self.fillOne2D("htmet_vs_softMuIsGlob",pdg,softMuIsGlob,ihtmet,w)
+
+        softMuIsTk = eh.get("softIsolatedMuIsTracker")
+        self.fillOne2D("htmet_vs_softMuIsTk",pdg,softMuIsTk,ihtmet,w)
+
+        softMuNValMu = eh.get("softIsolatedMuNValMuonHits")
+        self.fillOne2D("htmet_vs_softMuNValMu",pdg,softMuNValMu,ihtmet,w)
+
+        softMuNormChi2 = eh.get("softIsolatedMuNormChi2")
+        self.fillOne2D("htmet_vs_softMuNormChi2",pdg,softMuNormChi2,ihtmet,w)
+
+        softMuNMatched = eh.get("softIsolatedMuNumMatchedStations")
+        self.fillOne2D("htmet_vs_softMuNMatched",pdg,softMuNMatched,ihtmet,w)
+
+        softMuNTkLayer = eh.get("softIsolatedMuNumtrackerLayerWithMeasurement")
+        self.fillOne2D("htmet_vs_softMuNTkLayer",pdg,softMuNTkLayer,ihtmet,w)
+
+        self.fillOne2D("htmet_vs_softEle",pdg,eh.get("nSoftElectrons"),ihtmet,w)
+        self.fillOne2D("htmet_vs_softTau",pdg,eh.get("nSoftTaus"),ihtmet,w)
+        self.fillOne2D("htmet_vs_softB",pdg,eh.get("nSoftbtags"),ihtmet,w)
 
         jetPtRatio = 0.
         jet2Pt = 0.
@@ -191,16 +241,22 @@ class SR12_MTcentral_Plots(PlotsBase):
         self.fillOne1D("jet2Eta",pdg,jet2Eta,w)
 
         self.fillOne1D("njet60",pdg,eh.get("njet60"),w)
+        self.fillOne2D("htmet_vs_njet60",pdg,eh.get("njet60"),ihtmet,w)
         self.fillOne1D("njet",pdg,eh.get("njetCount"),w)
+        self.fillOne2D("htmet_vs_njet",pdg,eh.get("njetCount"),ihtmet,w)
 
 
         softMuEta = eh.get("softIsolatedMuEta")
         self.fillOne1D("softMuPt",pdg,softMuPt,w)
+        self.fillOne2D("htmet_vs_softMuPt",pdg,softMuPt,ihtmet,w)
         self.fillOne1D("softMuEta",pdg,abs(softMuEta),w)
+        self.fillOne2D("htmet_vs_softMuEta",pdg,abs(softMuEta),ihtmet,w)
            
         jetPhis = eh.get("jetPhi")
         self.fillOne1D("jetmuDeltaEta",pdg,abs(jetEtas[0]-softMuEta),w)
+        self.fillOne2D("htmet_vs_jetmuDeltaEta",pdg,abs(jetEtas[0]-softMuEta),ihtmet,w)
         self.fillOne1D("jetmuDeltaR",pdg,deltaR(jetPhis[0],jetEtas[0],softMuPhi,softMuEta),w)
+        self.fillOne2D("htmet_vs_jetmuDeltaR",pdg,deltaR(jetPhis[0],jetEtas[0],softMuPhi,softMuEta),ihtmet,w)
 
     def showTimers(self):
         line = ""
