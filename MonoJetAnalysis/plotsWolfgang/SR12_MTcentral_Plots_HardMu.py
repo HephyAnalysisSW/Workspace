@@ -3,6 +3,7 @@ import math
 import time
 from PlotsBase import *
 from EventHelper import EventHelper
+from LeptonUtilities import *
 from myPolSys import calcPolWeights
 
 polVar = None
@@ -30,7 +31,7 @@ def deltaR(phi1,eta1,phi2,eta2):
     return math.sqrt(dphi*dphi+deta*deta)
 
         
-class SR12_MTcentral_Plots(PlotsBase):
+class SR12_MTcentral_Plots_HardMu(PlotsBase):
 
     def addHistogram1D(self,name,nbins,xmin,xmax):
         assert name.isalnum()
@@ -108,10 +109,17 @@ class SR12_MTcentral_Plots(PlotsBase):
 
     def fill(self,eh,downscale=1):
 
+        imu = hardestIsolatedMuon(eh,ptmin1=5.,ptmin2=20.,etamax=1.5,reliso=0.5)
         isrJetPt = eh.get("isrJetPt")
-        softMuPt = eh.get("softIsolatedMuPt")
+        if imu==None or math.isnan(isrJetPt):
+            return
+
+#        softMuPt = eh.get("softIsolatedMuPt")
+        softMuPt = eh.get("muPt")[imu]
         if math.isnan(softMuPt) or math.isnan(isrJetPt):
             return
+#        if softMuPt<30:
+#            return
 
 #        if isrJetPt<350:
 #            return
@@ -130,13 +138,14 @@ class SR12_MTcentral_Plots(PlotsBase):
         if ib!=None:
             return
 
-        softMuPhi = eh.get("softIsolatedMuPhi")
+#        softMuPhi = eh.get("softIsolatedMuPhi")
+        softMuPhi = eh.get("muPhi")[imu]
         met = eh.get("type1phiMet")
 #        if met<300:
 #            return
         metphi = eh.get("type1phiMetphi")
-#        mt = math.sqrt(2*met*softMuPt*(1-math.cos(metphi-softMuPhi)))
-        mt = eh.get("softIsolatedMT")
+        mt = math.sqrt(2*met*softMuPt*(1-math.cos(metphi-softMuPhi)))
+#        mt = eh.get("softIsolatedMT")
         if ( mt < 60 ) or ( mt > 88 ):
             return
 
@@ -169,7 +178,11 @@ class SR12_MTcentral_Plots(PlotsBase):
             polVars = calcPolWeights(eh)
             w *= polVars[polVar]
         
-        pdg = eh.get("softIsolatedMuPdg")
+#        pdg = eh.get("softIsolatedMuPdg")
+        pdg = eh.get("muPdg")[imu]
+        if ihtmet>=0 and pdg>0 and self.name=="data":
+            print "Selected ",self.name,": ",ht,met,ihtmet,softMuPt,mt,eh.get("run"),eh.get("lumi"),eh.get("event"),w
+
 
         if met>300 and ht>400:
             if pdg>0:
@@ -193,34 +206,44 @@ class SR12_MTcentral_Plots(PlotsBase):
         self.fillOne1D("isrJetEta",pdg,abs(eh.get("isrJetEta")),w)
         self.fillOne2D("htmet_vs_isrJetEta",pdg,abs(eh.get("isrJetEta")),ihtmet,w)
 
-        softMuIso = eh.get("softIsolatedMuRelIso")
+#        softMuIso = eh.get("softIsolatedMuRelIso")
+        softMuIso = eh.get("muRelIso")[imu]
         self.fillOne2D("htmet_vs_muabsiso",pdg,softMuIso*softMuPt,ihtmet,w)
 
-        softMuDxy = eh.get("softIsolatedMuDxy")
+#        softMuDxy = eh.get("softIsolatedMuDxy")
+        softMuDxy = eh.get("muDxy")[imu]
         self.fillOne2D("htmet_vs_mudxy",pdg,softMuDxy,ihtmet,w)
 
-        softMuDz = eh.get("softIsolatedMuDz")
+#        softMuDz = eh.get("softIsolatedMuDz")
+        softMuDz = eh.get("muDz")[imu]
         self.fillOne2D("htmet_vs_mudz",pdg,softMuDz,ihtmet,w)
 
-        softMuPix = eh.get("softIsolatedMuPixelHits")
+#        softMuPix = eh.get("softIsolatedMuPixelHits")
+        softMuPix = eh.get("muPixelHits")[imu]
         self.fillOne2D("htmet_vs_mupix",pdg,softMuPix,ihtmet,w)
 
-        softMuIsGlob = eh.get("softIsolatedMuIsGlobal")
+#        softMuIsGlob = eh.get("softIsolatedMuIsGlobal")
+        softMuIsGlob = eh.get("muIsGlobal")[imu]
         self.fillOne2D("htmet_vs_softMuIsGlob",pdg,softMuIsGlob,ihtmet,w)
 
-        softMuIsTk = eh.get("softIsolatedMuIsTracker")
+#        softMuIsTk = eh.get("softIsolatedMuIsTracker")
+        softMuIsTk = eh.get("muIsTracker")[imu]
         self.fillOne2D("htmet_vs_softMuIsTk",pdg,softMuIsTk,ihtmet,w)
 
-        softMuNValMu = eh.get("softIsolatedMuNValMuonHits")
+#        softMuNValMu = eh.get("softIsolatedMuNValMuonHits")
+        softMuNValMu = eh.get("muNValMuonHits")[imu]
         self.fillOne2D("htmet_vs_softMuNValMu",pdg,softMuNValMu,ihtmet,w)
 
-        softMuNormChi2 = eh.get("softIsolatedMuNormChi2")
+#        softMuNormChi2 = eh.get("softIsolatedMuNormChi2")
+        softMuNormChi2 = eh.get("muNormChi2")[imu]
         self.fillOne2D("htmet_vs_softMuNormChi2",pdg,softMuNormChi2,ihtmet,w)
 
-        softMuNMatched = eh.get("softIsolatedMuNumMatchedStations")
+#        softMuNMatched = eh.get("softIsolatedMuNumMatchedStations")
+        softMuNMatched = eh.get("muNumMatchedStations")[imu]
         self.fillOne2D("htmet_vs_softMuNMatched",pdg,softMuNMatched,ihtmet,w)
 
-        softMuNTkLayer = eh.get("softIsolatedMuNumtrackerLayerWithMeasurement")
+#        softMuNTkLayer = eh.get("softIsolatedMuNumtrackerLayerWithMeasurement")
+        softMuNTkLayer = eh.get("muNumtrackerLayerWithMeasurement")[imu]
         self.fillOne2D("htmet_vs_softMuNTkLayer",pdg,softMuNTkLayer,ihtmet,w)
 
         self.fillOne2D("htmet_vs_softEle",pdg,eh.get("nSoftElectrons"),ihtmet,w)
@@ -246,7 +269,8 @@ class SR12_MTcentral_Plots(PlotsBase):
         self.fillOne2D("htmet_vs_njet",pdg,eh.get("njetCount"),ihtmet,w)
 
 
-        softMuEta = eh.get("softIsolatedMuEta")
+#        softMuEta = eh.get("softIsolatedMuEta")
+        softMuEta = eh.get("muEta")[imu]
         self.fillOne1D("softMuPt",pdg,softMuPt,w)
         self.fillOne2D("htmet_vs_softMuPt",pdg,softMuPt,ihtmet,w)
         self.fillOne1D("softMuEta",pdg,abs(softMuEta),w)
