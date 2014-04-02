@@ -38,10 +38,10 @@ class PlotsBase:
         return PlotsBase.variables
 
     def getVariables1D(self):
-        return [ v for v in PlotsBase.variables if not v.is2D() ]
+        return [ v for v in PlotsBase.variables.values() if not v.is2D() ]
 
     def getVariables2D(self):
-        return [ v for v in PlotsBase.variables if v.is2D() ]
+        return [ v for v in PlotsBase.variables.values() if v.is2D() ]
 
     def addVariable(self,name,nbins,xmin,xmax,scut='l',uselog=True):
         assert name.isalnum()
