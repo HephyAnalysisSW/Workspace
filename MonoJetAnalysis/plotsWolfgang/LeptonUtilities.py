@@ -1,6 +1,6 @@
 from EventHelper import EventHelper
 
-def isolatedMuons(eh,ptmin1=5.,etamax=1.5,ptmin2=30.,reliso=0.2):
+def isolatedMuons(eh,ptmin1=5.,etamax=1.5,ptmin2=20.,reliso=0.5):
   imus = [ ]
   nmu = int(eh.get("nmu")+0.5)
   mupts = eh.get("muPt")
@@ -12,7 +12,7 @@ def isolatedMuons(eh,ptmin1=5.,etamax=1.5,ptmin2=30.,reliso=0.2):
     if abs(muetas[i])>etamax:
       continue
     absiso = murelisos[i]*mupts[i]
-    absisomax = reliso
+#    absisomax = reliso
     if mupts[i]<ptmin2:
       absisomax = reliso*ptmin2
     else:
@@ -21,7 +21,7 @@ def isolatedMuons(eh,ptmin1=5.,etamax=1.5,ptmin2=30.,reliso=0.2):
       imus.append(i)
   return imus
 
-def hardestIsolatedMuon(eh,ptmin1=5.,etamax=1.5,ptmin2=30.,reliso=0.2):
+def hardestIsolatedMuon(eh,ptmin1=5.,etamax=1.5,ptmin2=20.,reliso=0.5):
   imus = isolatedMuons(eh,ptmin1,etamax,ptmin2,reliso)
   if len(imus)>0:
     return imus[0]
