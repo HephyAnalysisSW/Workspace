@@ -38,7 +38,7 @@ class PreselHardMu:
 
         imus = isolatedMuons(eh,ptmin1=self.softIsolatedMuPtMin, \
                                  etamax=self.softIsolatedMuEtaMax, \
-                                 ptmin2=30.,reliso=0.2)
+                                 ptmin2=20.,reliso=0.5)
         if len(imus)!=1:
             return False
         imu = imus[0]
@@ -61,8 +61,40 @@ class PreselHardMu:
         if eh.get("njet60")>self.njet60Max:
             return False
 
+#
+# match with HT-binned W+jets sample
+#
+        if eh.get("ht")<200:
+            return False
+
         assert not math.isnan(eh.get("isrJetBTBVetoPassed"))
         if self.isrJetBTBVeto and eh.get("isrJetBTBVetoPassed")==0:
             return False
+
+        #
+        # SR veto
+        #
+        if sample.isData() and eh.get("muPt")[imu]<20.:
+            # btags
+            nball = 0
+            nbsoft = 0
+            njet = int(eh.get("njetCount")+0.5)
+            jetPts = eh.get("jetPt")
+            jetEtas = eh.get("jetEta")
+            jetBtags = eh.get("jetBtag")
+            for i in range(njet):
+                if jetPts[i]>30 and abs(jetEtas[i])<2.4 and jetBtags[i]>0.679:
+                    nball += 1
+                    if jetPts[i]<60:
+                        nbsoft += 1
+            # SR1
+            if nbsoft>0 and nbsoft==nball:
+                if met>300 and isrJetPt>325:
+                    return False
+            # SR2/3
+            if nball==0 and met>300 and eh.get("ht")>400:
+                mt = eh.get("softIsolatedMT")
+                if mt<60 or mt>88:
+                    return False
 
         return True
