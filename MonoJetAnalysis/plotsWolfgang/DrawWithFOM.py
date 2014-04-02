@@ -114,6 +114,7 @@ class DrawWithFOM:
                     h.SetFillStyle(s.hatch)
             else:
                 h.SetLineColor(s.color)
+                h.SetLineStyle(s.line)
                 if s.hatch:
                     h.SetFillStyle(s.hatch)
                 else:
@@ -135,9 +136,13 @@ class DrawWithFOM:
 #                    print s.name," contents ",h.GetSumOfWeights()
             elif s.isSignal():
                 sigs.append(h)
+                integ, einteg = self.getIntegralWithError(h)
+                print "   ",h.GetName().ljust(10),s.name.ljust(20),"{0:8.2f} +- {1:7.2f}".format(integ,einteg)
 #                print "Adding to signal ",s.name,h.GetName()
             elif s.isData():
                 data = h
+                integ, einteg = self.getIntegralWithError(h)
+                print "   ",h.GetName().ljust(10),s.name.ljust(20),"{0:8.2f} +- {1:7.2f}".format(integ,einteg)
                 h.SetMarkerStyle(20)
                 h.SetLineColor(s.color)
                 h.SetMarkerColor(s.color)
