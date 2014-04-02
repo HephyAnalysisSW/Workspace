@@ -24,7 +24,7 @@ class StdPlots(PlotsBase):
 #        assert name.isalnum()
 #        h1d = ROOT.TH1F(name,name,nbins,xmin,xmax)
 #        self.histogramList.append(h1d)
-        setattr(self,"h"+name,h1d)
+#        setattr(self,"h"+name,h1d)
         
     def __init__(self,name,preselection=None,elist=None,elistBase="./elists",rebin=None):
         PlotsBase.__init__(self,name,preselection,elist=elist,elistBase=elistBase,rebin=rebin)
