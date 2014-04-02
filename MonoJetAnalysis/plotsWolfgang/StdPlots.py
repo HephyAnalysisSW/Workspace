@@ -20,10 +20,10 @@ def deltaR(phi1,eta1,phi2,eta2):
         
 class StdPlots(PlotsBase):
 
-    def addHistogram1D(self,name,nbins,xmin,xmax):
-        assert name.isalnum()
-        h1d = ROOT.TH1F(name,name,nbins,xmin,xmax)
-        self.histogramList.append(h1d)
+#    def addHistogram1D(self,name,nbins,xmin,xmax):
+#        assert name.isalnum()
+#        h1d = ROOT.TH1F(name,name,nbins,xmin,xmax)
+#        self.histogramList.append(h1d)
         setattr(self,"h"+name,h1d)
         
     def __init__(self,name,preselection=None,elist=None,elistBase="./elists",rebin=None):
@@ -42,6 +42,7 @@ class StdPlots(PlotsBase):
         self.addVariable("njet60",10,-0.5,9.5,'u')
         self.addVariable("njet",20,-0.5,19.5,'u')
         self.addVariable("met",100,0.,1000.,'l')
+        self.addVariable("ht",100,0.,1000.,'l')
         self.addVariable("mt",50,0.,200.,'l')
         self.addVariable("softMuPt",100,0.,25.,'u')
         self.addVariable("softMuEta",60,0.,3.,'u')
@@ -81,6 +82,8 @@ class StdPlots(PlotsBase):
                 ht += jetPts[i]
 #        if ht<400:
 #            return
+        if njet>1 or ht>400:
+            return
         if eh.get("softIsolatedMuPdg")<0:
             return
 
@@ -103,11 +106,15 @@ class StdPlots(PlotsBase):
 
 
         self.timers[0].start()
-        w = eh.get("puWeight")*downscale
+        if self.name!="data":
+            w = eh.get("puWeight")*downscale
+        else:
+            w = 1
         self.timers[0].stop()
         
         self.hht_vs_met.Fill(met,ht,w)
 
+        self.hht.Fill(ht,w)
         self.hmt.Fill(mt,w)
         
         self.hisrJetPt.Fill(isrJetPt,w)
