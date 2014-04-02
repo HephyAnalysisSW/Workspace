@@ -13,6 +13,7 @@ parser.add_option("--fom", dest="fom",  help="fom to be used", choices=[ "sob", 
 parser.add_option("--elistBase", dest="elistBase",  help="base directory for event lists", default="./elists")
 parser.add_option("-s", dest="save",  help="directory for saved plots", default=None)
 parser.add_option("-b", dest="batch",  help="batch mode", action="store_true", default=False)
+parser.add_option("--fomByBin", dest="fomByBin",  help="calculate fom by bin", action="store_true", default=False)
 parser.add_option("--rebin", dest="rebin",  help="rebin factor", type=int, default=1)
 parser.add_option("--singleMu", dest="singleMu", help="use single mu dataset", action="store_true", default=False)
 (options, args) = parser.parse_args()
@@ -40,7 +41,7 @@ if options.preselection!=None:
     presel = preselClass()
     setattr(presel,"sourcefile",options.preselection)
 
-sampleBase = "/home/adamwo/data/monoJetTuples_v5/"
+sampleBase = "/home/adamwo/data/monoJetTuples_v6/"
 if options.singleMu:
     sampleBase += "copyMu/"
 else:
@@ -67,7 +68,7 @@ else:
     samples.append(Sample("DY",sampleBase,type="B",color=3,fill=True))
     samples.append(Sample("singleTop",sampleBase,type="B",color=4,fill=True))
     #samples.append(Sample("TTJets",sampleBase,type="B",color=2,fill=True))
-    samples.append(Sample("TTJets-powheg-v2",sampleBase,type="B",color=2,fill=True))
+    samples.append(Sample("TTJetsPowHeg",sampleBase,type="B",color=2,fill=True))
     #samples.append(Sample("WJetsToLNu",sampleBase,type="B",color=5,fill=True))
     samples.append(Sample("WJetsHT150v2",sampleBase,type="B",color=5,fill=True))
     #samples.append(Sample("WJetsHT250",sampleBase,type="B",color=5,fill=True))
@@ -80,8 +81,14 @@ else:
     #samples.append(Sample("stop200lsp170g100FastSim",sampleBase,type="S",color=2,fill=False))
     #samples.append(Sample("stop300lsp270g175FastSim",sampleBase,type="S",color=3,fill=False))
     #samples.append(Sample("stop300lsp270g200FastSim",sampleBase,type="S",color=4,fill=False))
-    samples.append(Sample("stop300lsp270FastSim",sampleBase,type="S",color=4,fill=False))
-    samples.append(Sample("stop300lsp240g150FastSim",sampleBase,type="S",color=2,fill=False))
+#    samples.append(Sample("stop300lsp270FastSim",sampleBase,type="S",color=4,fill=False))
+#    samples.append(Sample("T2DegStop_225_145",sampleBase,type="S",color=3,fill=False))
+#    samples.append(Sample("T2DegStop_200_170",sampleBase,type="S",color=3,fill=False))
+#    samples.append(Sample("T2DegStop_150_120",sampleBase,type="S",color=2,fill=False))
+    samples.append(Sample("T2DegStop_100_20",sampleBase,type="S",color=1,line=1,fill=False))
+    samples.append(Sample("T2DegStop_225_145",sampleBase,type="S",color=1,line=2,fill=False))
+    samples.append(Sample("T2DegStop_200_170",sampleBase,type="S",color=1,line=3,fill=False))
+    samples.append(Sample("T2DegStop_150_120",sampleBase,type="S",color=1,line=4,fill=False))
     samples.append(Sample("data",sampleBase,type="D",color=1,fill=False))
 
 ROOT.TH1.SetDefaultSumw2()
@@ -90,6 +97,9 @@ allplots = [ ]
 variables = { }
 for s in samples:
     plots = plotClass(s.name,presel,elist=options.elist,elistBase=options.elistBase,rebin=options.rebin)
+    if options.fomByBin:
+        for v in plots.getVariables1D():
+            v.scut = 'b'
     allplots.append(plots)
     plots.fillall(s)
     if len(variables)==0:
@@ -107,7 +117,7 @@ ROOT.gStyle.SetOptTitle(0)
 
 canvases = [ ]
 pads = [ ]
-allstacks = [ ]
+allobjects = [ ]
 definedPalette = False
 for varname in variables:
     variable, histograms = variables[varname]
@@ -149,11 +159,13 @@ for varname in variables:
     cnv.SetName(bkgs.GetName())
     cnv.SetTitle(bkgs.GetName())
     if data!=None:
-        allstacks.append(data)
+        allobjects.append(data)
     if bkgs!=None:
-        allstacks.append(bkgs)
+        allobjects.append(bkgs)
+    if legend!=None:
+        allobjects.append(legend)
     if len(sigs)>0:
-        allstacks.extend(sigs)
+        allobjects.extend(sigs)
     if not variable.is2D() and bkgs!=None and options.fom!=None:
 #        drawClass.drawSoB(bkgs,sigs,variable.scut,pad=p2)
         if data!=None and options.fom=="dataovermc":
