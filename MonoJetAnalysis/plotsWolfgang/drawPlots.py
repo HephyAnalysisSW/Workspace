@@ -16,6 +16,7 @@ parser.add_option("-b", dest="batch",  help="batch mode", action="store_true", d
 parser.add_option("--fomByBin", dest="fomByBin",  help="calculate fom by bin", action="store_true", default=False)
 parser.add_option("--rebin", dest="rebin",  help="rebin factor", type=int, default=1)
 parser.add_option("--singleMu", dest="singleMu", help="use single mu dataset", action="store_true", default=False)
+parser.add_option("--data", dest="data", help="show data", action="store_true", default=False)
 (options, args) = parser.parse_args()
 assert len(args)>0
 if options.fom=="None":
@@ -69,7 +70,7 @@ else:
     samples.append(Sample("singleTop",sampleBase,type="B",color=4,fill=True))
     #samples.append(Sample("TTJets",sampleBase,type="B",color=2,fill=True))
     samples.append(Sample("TTJetsPowHeg",sampleBase,type="B",color=2,fill=True))
-    #samples.append(Sample("WJetsToLNu",sampleBase,type="B",color=5,fill=True))
+#    samples.append(Sample("WJetsToLNu",sampleBase,type="B",color=5,fill=True))
     samples.append(Sample("WJetsHT150v2",sampleBase,type="B",color=5,fill=True))
     #samples.append(Sample("WJetsHT250",sampleBase,type="B",color=5,fill=True))
     #samples.append(Sample("WNJetsToLNu",sampleBase,type="B",color=5,fill=True,downscale=2, \
@@ -79,17 +80,20 @@ else:
     #samples.append(Sample("W3JetsToLNu",sampleBase,type="B",color=4,fill=True,hatch=3245))
     #samples.append(Sample("W4JetsToLNu",sampleBase,type="B",color=5,fill=True,hatch=3254))
     #samples.append(Sample("stop200lsp170g100FastSim",sampleBase,type="S",color=2,fill=False))
-    #samples.append(Sample("stop300lsp270g175FastSim",sampleBase,type="S",color=3,fill=False))
-    #samples.append(Sample("stop300lsp270g200FastSim",sampleBase,type="S",color=4,fill=False))
-#    samples.append(Sample("stop300lsp270FastSim",sampleBase,type="S",color=4,fill=False))
-#    samples.append(Sample("T2DegStop_225_145",sampleBase,type="S",color=3,fill=False))
-#    samples.append(Sample("T2DegStop_200_170",sampleBase,type="S",color=3,fill=False))
-#    samples.append(Sample("T2DegStop_150_120",sampleBase,type="S",color=2,fill=False))
-    samples.append(Sample("T2DegStop_100_20",sampleBase,type="S",color=1,line=1,fill=False))
-    samples.append(Sample("T2DegStop_225_145",sampleBase,type="S",color=1,line=2,fill=False))
-    samples.append(Sample("T2DegStop_200_170",sampleBase,type="S",color=1,line=3,fill=False))
-    samples.append(Sample("T2DegStop_150_120",sampleBase,type="S",color=1,line=4,fill=False))
-    samples.append(Sample("data",sampleBase,type="D",color=1,fill=False))
+#    samples.append(Sample("stop300lsp270g175FastSim",sampleBase,type="S",color=1,line=1,fill=False))
+    samples.append(Sample("stop300lsp270g200FastSim",sampleBase,type="S",color=1,line=2,fill=False))
+    samples.append(Sample("stop300lsp240g150FastSim",sampleBase,type="S",color=1,line=1,fill=False))
+##    samples.append(Sample("stop300lsp270FastSim",sampleBase,type="S",color=4,fill=False))
+##    samples.append(Sample("T2DegStop_225_145",sampleBase,type="S",color=3,fill=False))
+##    samples.append(Sample("T2DegStop_200_170",sampleBase,type="S",color=3,fill=False))
+##    samples.append(Sample("T2DegStop_150_120",sampleBase,type="S",color=2,fill=False))
+#    samples.append(Sample("T2DegStop_100_20",sampleBase,type="S",color=1,line=1,fill=False))
+#    samples.append(Sample("T2DegStop_225_145",sampleBase,type="S",color=1,line=2,fill=False))
+#    samples.append(Sample("T2DegStop_200_140",sampleBase,type="S",color=1,line=1,fill=False))
+#    samples.append(Sample("T2DegStop_200_170",sampleBase,type="S",color=1,line=2,fill=False))
+#    samples.append(Sample("T2DegStop_150_120",sampleBase,type="S",color=1,line=4,fill=False))
+    if options.data:
+        samples.append(Sample("data",sampleBase,type="D",color=1,fill=False))
 
 ROOT.TH1.SetDefaultSumw2()
 
@@ -141,16 +145,21 @@ for varname in variables:
             cnv.SetLogz(1)
 
     else:
-        p1 = ROOT.TPad("p1","", 0, 0.28, 1, 0.95)
-        p1.SetTopMargin(1e-7)
-        p1.Draw()
-        p2 = ROOT.TPad("p2","", 0, 0, 1, 0.3)
-        p2.SetTopMargin(1e-7)
-        p2.Draw()
+        if options.fom!=None:
+            p1 = ROOT.TPad("p1","", 0, 0.28, 1, 0.95)
+            p1.SetTopMargin(1e-7)
+            p1.Draw()
+            p2 = ROOT.TPad("p2","", 0, 0, 1, 0.3)
+            p2.SetTopMargin(1e-7)
+            p2.Draw()
 
-        pads.append(p1)
-        pads.append(p2)
-
+            pads.append(p1)
+            pads.append(p2)
+        else:
+            p1 = ROOT.TPad("p1","", 0, 0., 1, 0.95)
+            p1.SetTopMargin(1e-7)
+            p1.Draw()
+            pads.append(p1)
 
         data, bkgs, sigs, legend = drawClass.drawStack1D(samples,histograms,p1)
         if variable.uselog:
