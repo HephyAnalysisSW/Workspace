@@ -4,6 +4,7 @@ from Sample import *
 from drawWithFOM import *
 #from drawSoB import *
 from optparse import OptionParser
+from SampleFilters import *
 
 parser = OptionParser()
 parser.add_option("--preselection", "-p", dest="preselection",  help="preselection", default=None)
@@ -71,7 +72,11 @@ else:
     #samples.append(Sample("TTJets",sampleBase,type="B",color=2,fill=True))
     samples.append(Sample("TTJetsPowHeg",sampleBase,type="B",color=2,fill=True))
 #    samples.append(Sample("WJetsToLNu",sampleBase,type="B",color=5,fill=True))
-    samples.append(Sample("WJetsHT150v2",sampleBase,type="B",color=5,fill=True))
+#    samples.append(Sample("WJetsHT150v2",sampleBase,type="B",color=5,fill=True))
+    samples.append(Sample("WJetsHT150v2Tau",sampleBase,type="B",color=8,fill=True, \
+                              namelist=["WJetsHT150v2"],filter=LeptonFilter(16)))
+    samples.append(Sample("WJetsHT150v2NoTau",sampleBase,type="B",color=5,fill=True, \
+                              namelist=["WJetsHT150v2"],filter=InvertedSampleFilter(LeptonFilter(16))))
     #samples.append(Sample("WJetsHT250",sampleBase,type="B",color=5,fill=True))
     #samples.append(Sample("WNJetsToLNu",sampleBase,type="B",color=5,fill=True,downscale=2, \
     #                          namelist=[ "W1JetsToLNu", "W2JetsToLNu", "W3JetsToLNu", "W4JetsToLNu"  ]))

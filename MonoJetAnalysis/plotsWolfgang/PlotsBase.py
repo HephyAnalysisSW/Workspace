@@ -110,9 +110,11 @@ class PlotsBase:
                         self.writeElist = True
                     if elistTime<=os.path.getmtime(sample.fullname(subSampleName)):
                         self.writeElist = True
-                    self.readElist = not self.writeElist
-                if self.writeElist:
-                    print "(Re)creating elist for ",sample.name,subSampleName
+                self.readElist = not self.writeElist
+            if self.writeElist:
+                print "(Re)creating elist for ",sample.name,subSampleName
+            if self.writeElist:
+                print "Reading elist for ",sample.name,subSampleName
             opt = "recreate" if self.writeElist else "read"
             elistFile = ROOT.TFile(elistFileName,opt)
             objarr = ROOT.TObjArray()
@@ -164,7 +166,9 @@ class PlotsBase:
                 jev = iev if not self.readElist else elist.GetEntry(iev)
                 eh.getEntry(jev)
                 nall += 1
-                if self.readElist or self.preselection==None or self.preselection.accept(eh,sample):
+                if self.readElist or ( \
+                    ( self.preselection==None or self.preselection.accept(eh,sample) ) and \
+                    ( sample.filter==None or sample.filter.accept(eh) ) ):
                     self.fill(eh,sample.downscale)
                     if self.writeElist:
                         elist.Enter(iev)
