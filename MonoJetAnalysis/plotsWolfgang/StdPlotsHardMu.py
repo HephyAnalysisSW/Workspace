@@ -31,6 +31,12 @@ class StdPlotsHardMu(PlotsBase):
             self.addVariable("mt"+sign,50,0.,200.,'l')
             self.addVariable("softMuPt"+sign,100,0.,250.,'u')
             self.addVariable("softMuEta"+sign,60,0.,3.,'u')
+            self.addVariable("softMuIso"+sign,100,0.,10.,'u')
+            self.addVariable("softMuNPix"+sign,10,0.,10.,'u')
+            self.addVariable("softMuNTk"+sign,20,0.,20.,'u')
+            self.addVariable("softMuDxy"+sign,100,0.,0.1,'u')
+            self.addVariable("softMuDz"+sign,100,0.,0.2,'u')
+            self.addVariable("npv"+sign,100,0.,100.,'u')
             self.addVariable("jetmuDeltaEta"+sign,50,0.,10.,'l')
             self.addVariable("jetmuDeltaR"+sign,50,0.,10.,'l')
             self.addVariable("mlb"+sign,20,0.,100.,'u')
@@ -72,8 +78,8 @@ class StdPlotsHardMu(PlotsBase):
         for i in range(njet):
             if jetPts[i]>30:
                 ht += jetPts[i]
-        if ht<300:
-            return
+#        if ht<300:
+#            return
 
         pdg = eh.get("muPdg")[imu]
         if len(self.charges)==1:
@@ -86,9 +92,9 @@ class StdPlotsHardMu(PlotsBase):
         for i in range(njet):
 #            if jetPts[i]>30 and jetPts[i]<60 and jetBtags[i]>0.679:
             if jetPts[i]>30 and abs(jetEtas[i])<2.4 and jetBtags[i]>0.679:
-                ib = i
+                if ib==None:
+                    ib = i
                 nb += 1
-#                break
         if ib!=None:
             return
 #        if nb<2:
@@ -107,6 +113,19 @@ class StdPlotsHardMu(PlotsBase):
             w = 1
         self.timers[0].stop()
         
+        npv = eh.get("ngoodVertices")
+        self.fill1DBySign("npv",pdg,npv,w)
+        softMuIso = eh.get("muRelIso")[imu]*softMuPt
+        self.fill1DBySign("softMuIso",pdg,softMuIso,w)
+        softMuNPix = eh.get("muPixelHits")[imu]
+        self.fill1DBySign("softMuNPix",pdg,softMuNPix,w)
+        softMuNTk = eh.get("muNumtrackerLayerWithMeasurement")[imu]
+        self.fill1DBySign("softMuNTk",pdg,softMuNTk,w)
+        softMuDxy = eh.get("muDxy")[imu]
+        self.fill1DBySign("softMuDxy",pdg,softMuDxy,w)
+        softMuDz = eh.get("muDz")[imu]
+        self.fill1DBySign("softMuDz",pdg,softMuDz,w)
+
         self.fill2DBySign("ht_vs_met",pdg,met,ht,w)
         self.fill2DBySign("muPt_vs_met",pdg,met,softMuPt,w)
 

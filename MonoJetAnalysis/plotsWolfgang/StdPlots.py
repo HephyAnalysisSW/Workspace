@@ -43,6 +43,9 @@ class StdPlots(PlotsBase):
             self.addVariable("btag1Pt"+sign,50,0.,250.,'u')
             self.addVariable("btag1Eta"+sign,50,0.,2.5,'u')
             self.addVariablePair("met",40,0.,1000.,"ht",40,0.,1000.,suffix=sign)
+            self.addVariablePair("met",40,0.,1000.,"muPt",40,0.,1000.,suffix=sign)
+            self.addVariablePair("WPt",40,0.,1000.,"met",40,0.,1000.,suffix=sign)
+            self.addVariablePair("WPt",40,0.,1000.,"muPt",40,0.,1000.,suffix=sign)
 
         curdir.cd()
 
@@ -72,8 +75,7 @@ class StdPlots(PlotsBase):
                 ht += jetPts[i]
 #        if ht<400:
 #            return
-#        if eh.get("softIsolatedMuPdg")<0:
-#            return
+
         pdg = eh.get("softIsolatedMuPdg")
         if len(self.charges)==1:
             pdg = 0
@@ -81,11 +83,13 @@ class StdPlots(PlotsBase):
         jetEtas = eh.get("jetEta")
         jetBtags = eh.get("jetBtag")
         ib = None
+        nb = 0
         for i in range(njet):
 #            if jetPts[i]>30 and jetPts[i]<60 and jetBtags[i]>0.679:
             if jetPts[i]>30 and abs(jetEtas[i])<2.4 and jetBtags[i]>0.679:
-                ib = i
-                break
+                if ib==None:
+                    ib = i
+                nb += 1
         if ib!=None:
             return
         
@@ -94,7 +98,6 @@ class StdPlots(PlotsBase):
         mt = math.sqrt(2*met*softMuPt*(1-math.cos(metphi-softMuPhi)))
 #        if mt<60 or mt>88:
 #            return
-
 
         self.timers[0].start()
         if self.name!="data":
@@ -117,6 +120,13 @@ class StdPlots(PlotsBase):
         self.fill1DBySign("softMuDz",pdg,softMuDz,w)
 
         self.fill2DBySign("ht_vs_met",pdg,met,ht,w)
+        self.fill2DBySign("muPt_vs_met",pdg,met,softMuPt,w)
+
+        wPx = softMuPt*math.cos(softMuPhi) + met*math.cos(metphi)
+        wPy = softMuPt*math.sin(softMuPhi) + met*math.sin(metphi)
+        wPt = math.sqrt(wPx**2+wPy**2)
+        self.fill2DBySign("met_vs_WPt",pdg,wPt,met,w)
+        self.fill2DBySign("muPt_vs_WPt",pdg,wPt,softMuPt,w)
 
         self.fill1DBySign("ht",pdg,ht,w)
         self.fill1DBySign("mt",pdg,mt,w)
