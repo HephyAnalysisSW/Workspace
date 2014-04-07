@@ -3,6 +3,7 @@ xsec={}
 #SUMMER 12
 #https://twiki.cern.ch/twiki/bin/viewauth/CMS/StandardModelCrossSectionsat8TeV
 xsec["8TeV-DYJetsToLL-M50"]                     =       3503.71
+xsec["Mu-DYJetsToLL-M50"]                       =       3503.71
 xsec["8TeV-DYJetsToLL-M10to50"]                 =       877.
 xsec["8TeV-DYToEE-M20"]                         =       1915.08333
 xsec["8TeV-DYToMuMu-M20"]                       =       1915.08333

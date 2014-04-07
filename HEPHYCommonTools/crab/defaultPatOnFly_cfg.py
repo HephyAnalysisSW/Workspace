@@ -52,6 +52,10 @@ options.register ('addRA4Info',True,
           VarParsing.VarParsing.multiplicity.singleton,
           VarParsing.VarParsing.varType.bool,
           "whether or not to add RA4 specific Info")
+options.register ('keepPFCandidates',False,
+          VarParsing.VarParsing.multiplicity.singleton,
+          VarParsing.VarParsing.varType.bool,
+          "whether or not to keep pf candidates")
 
 infiles = ['file:/data/schoef/local/TTJets-53X-syncfile-AODSIM.root']
 #  infiles = ['file:/data/jkancsar/pickevent/event4874249.root']
@@ -92,7 +96,7 @@ else:
 #  if options.mode=="Ele":
 #    triggers = ['HLT_CleanPFHT350_Ele5_CaloIdT_CaloIsoVL_TrkIdT_TrkIsoVL_PFMET45_v*','HLT_CleanPFHT350_Ele5_CaloIdT_CaloIsoVL_TrkIdT_TrkIsoVL_PFMET50_v*','HLT_CleanPFHT300_Ele15_CaloIdT_CaloIsoVL_TrkIdT_TrkIsoVL_PFMET45_v*','HLT_CleanPFHT300_Ele15_CaloIdT_CaloIsoVL_TrkIdT_TrkIsoVL_PFMET50_v*']
 
-print "mode",options.mode,"isMC?",isMC, ", verbose?",options.verbose,", add RA4 Info?",options.addRA4Info, ", JEC:",jec,", GT",options.GT, ", triggers", options.triggers
+print "mode",options.mode,"isMC?",isMC, ", verbose?",options.verbose,", add RA4 Info?",options.addRA4Info,'keepPFCandidates?', options.keepPFCandidates, ", JEC:",jec,", GT",options.GT, ", triggers", options.triggers
 
 
 
@@ -427,6 +431,8 @@ process.p += process.SUSYTupelizer
 #)
 #process.p+=process.printTree
 process.out.outputCommands =  cms.untracked.vstring('drop *', 'keep *_*SUSYTupelizer*_*_*' , 'keep *_*EventCounter*_*_*', 'keep *_genParticles_*_*')
+if options.keepPFCandidates:
+  process.out.outputCommands =  cms.untracked.vstring('drop *', 'keep *_*SUSYTupelizer*_*_*' , 'keep *_*EventCounter*_*_*', 'keep *_genParticles_*_*', 'keep *_particleFlow__*')
 process.outpath = cms.EndPath(process.out)
 #-- Dump config ------------------------------------------------------------
 file = open('vienna_SusyPAT_cfg.py','w')

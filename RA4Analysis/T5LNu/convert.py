@@ -4,7 +4,7 @@ from PhysicsTools.PythonAnalysis import *
 from math import *
 import sys, os, copy, random, array
 from datetime import datetime
-from Workspace.MonoJetAnalysis.helpers import getVarValue, deltaPhi, minAbsDeltaPhi,  deltaR, invMass, findClosestJet
+from Workspace.HEPHYPythonTools.helpers import getVarValue, deltaPhi, minAbsDeltaPhi,  deltaR, invMass, findClosestJet
 from defaultSamples import *
 from  Workspace.RA4Analysis import eventShape, mt2w
 
@@ -122,7 +122,7 @@ else:
 overwrite = True
 target_lumi = 19700 #pb-1
 
-from localInfo import username
+from localConfig import username
 outputDir = "/data/"+username+"/"+subDir+"/"
 
 ROOT.gSystem.Load("libFWCoreFWLite.so")
@@ -391,6 +391,7 @@ for isample, sample in enumerate(allSamples):
       variables.append(trigger.replace("HLT", "pre") )
   else:
     variables.extend(["nTrueGenVertices", "genmet", "genmetphi", "puWeight", "puWeightSysPlus", "puWeightSysMinus", "ptISR"])
+    variables.extend(["antinuMu", "antinuE", "antinuTau", "nuMu", "nuE", "nuTau", "nuMuFromTausFromWs", "nuEFromTausFromWs", "nuTauFromTausFromWs"])
 
   jetvars = ["jetPt", "jetEta", "jetPhi", "jetPdg", "jetBtag", "jetCutBasedPUJetIDFlag","jetFull53XPUJetIDFlag","jetMET53XPUJetIDFlag", "jetChef", "jetNhef", "jetCeef", "jetNeef", "jetHFhef", "jetHFeef", "jetMuef", "jetElef", "jetPhef", "jetUnc"]
   muvars = ["muPt", "muEta", "muPhi", "muPdg", "muRelIso", "muDxy", "muDz", "muNormChi2", "muNValMuonHits", "muNumMatchedStations", "muPixelHits", "muNumtrackerLayerWithMeasurement", 'muIsGlobal', 'muIsTracker']

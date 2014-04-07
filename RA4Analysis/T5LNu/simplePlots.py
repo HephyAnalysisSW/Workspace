@@ -25,12 +25,12 @@ allVars=[]
 allStacks=[]
 
 ## plots for studying preselection 
-minimum=10**(-0.5)
+minimum=10**(-2.5)
 
 chmode = "copy"
 presel = "refSel"
 ver = "v5"
-region = "signal"
+region = "preSel"
 preprefix = region+"_"+ver
 if region == "preSel":
   #isrjet>350, met>250, mT<70
@@ -39,9 +39,23 @@ if region == "preSel":
   addSignals = True
   normalizeToData = False
   normalizeSignalToMCSum = False
+if region == "signal34jht500-750":
+  #isrjet>350, met>250, mT<70
+  additionalCut = "(ht>400&&ht<600&&type1phiMet>350&&njets>=3&&njets<=4)"
+  addData = False
+  addSignals = True
+  normalizeToData = False
+  normalizeSignalToMCSum = False
+if region == "signal5jht400-750":
+  #isrjet>350, met>250, mT<70
+  additionalCut = "(ht>400&&ht<750&&type1phiMet>350&&njets>=5)"
+  addData = False
+  addSignals = True
+  normalizeToData = False
+  normalizeSignalToMCSum = False
 if region == "signal":
   #isrjet>350, met>250, mT<70
-  additionalCut = "(ht>750&&type1phiMet>350)"
+  additionalCut = "(ht>750&&type1phiMet>350&&njets>=4)"
   addData = False
   addSignals = True
   normalizeToData = False
@@ -53,16 +67,23 @@ if region == "signal2j":
   addSignals = True
   normalizeToData = False
   normalizeSignalToMCSum = False
-if region == "signal5j":
+if region == "signal3j":
   #isrjet>350, met>250, mT<70
-  additionalCut = "(ht>750&&type1phiMet>350&&njets>=5)"
+  additionalCut = "(ht>750&&type1phiMet>350&&njets==3)"
   addData = False
   addSignals = True
   normalizeToData = False
   normalizeSignalToMCSum = False
-if region == "signal3j":
+if region == "signal4j":
   #isrjet>350, met>250, mT<70
-  additionalCut = "(ht>750&&type1phiMet>350&&njets==3)"
+  additionalCut = "(ht>750&&type1phiMet>350&&njets==4)"
+  addData = False
+  addSignals = True
+  normalizeToData = False
+  normalizeSignalToMCSum = False
+if region == "signal5j":
+  #isrjet>350, met>250, mT<70
+  additionalCut = "(ht>750&&type1phiMet>350&&njets>=5)"
   addData = False
   addSignals = True
   normalizeToData = False
@@ -109,11 +130,13 @@ if presel == "refSel":
   commoncf="njets>=4&&ht>400&&nTightMuons+nTightElectrons==1&&nbtags==0"
 if presel == "refSelNoNJet":
   commoncf="ht>400&&nTightMuons+nTightElectrons==1&&nbtags==0"
+if presel == "refSelTauNoNJet":
+  commoncf="ht>400&&nTightMuons+nTightElectrons==1&&nbtags==0&&Sum$(taPt>20)==0"
 
 if additionalCut!="":
   commoncf+="&&"+additionalCut
 
-prefix = "Test_"+preprefix+"_"+presel+"_"+chmode+"_"
+prefix = "T5Lnu_"+preprefix+"_"+presel+"_"+chmode+"_"
 
 def getT5LNu(mgl, mn, color = ROOT.kBlue):
   res = {} 
@@ -261,7 +284,7 @@ if doAnalysisVars:
   htThrustWSideRatio_stack[0].addOverFlowBin = "upper"
   allStacks.append(htThrustWSideRatio_stack)
 
-  mT_stack  = getStack(":mT;m_{T} (GeV);Number of Events / 10 GeV",[21,0,210], commoncf, signals, addData = addData)
+  mT_stack  = getStack(":mT;m_{T} (GeV);Number of Events / 10 GeV",[41,0,410], commoncf, signals, addData = addData)
   mT_stack[0].addOverFlowBin = "upper"
   allStacks.append(mT_stack)
 
@@ -325,7 +348,7 @@ if doAllDiscriminatingVars:
   cosDeltaPhiLepMET_stack  = getStack(":xxx;cos(#Delta #phi(l, #slash{E}_{T}));Number of Events",[22,-1.1,1.1], commoncf, signals, lambda c: cos(c.GetLeaf('leptonPhi').GetValue() - c.GetLeaf('type1phiMetphi').GetValue()), addData = addData)
   allStacks.append(cosDeltaPhiLepMET_stack)
 
-  cosDeltaPhiLepW_stack  = getStack(":cosDeltaPhi;cos(#Delta #phi(l, #slash{E}_{T}));Number of Events",[22,-1.1,1.1], commoncf, signals, addData = addData)
+  cosDeltaPhiLepW_stack  = getStack(":cosDeltaPhi;cos(#Delta #phi(l, W));Number of Events",[22,-1.1,1.1], commoncf, signals, addData = addData)
   allStacks.append(cosDeltaPhiLepW_stack)
 
 
@@ -351,7 +374,7 @@ for stack in allStacks:
   if addData:
     stack[0].maximum = 6*10**2 *stack[-1].data_histo.GetMaximum()
   else:
-    stack[0].maximum = 6*10**2 *stack[0].data_histo.GetMaximum()
+    stack[0].maximum = 2*10**2 *stack[0].data_histo.GetMaximum()
   stack[0].logy = True
   stack[0].minimum = minimum
 #  stack[0].legendCoordinates=[0.76,0.95 - 0.3,.98,.95]

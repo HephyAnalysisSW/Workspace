@@ -772,8 +772,8 @@ for isample, sample in enumerate(allSamples):
           tmpDir = ROOT.gDirectory.func()
           chain_gDir.cd()
 #          print s.type1phiMet
-          if s.type1phiMet<150:
-            print "Warning!!"
+#          if s.type1phiMet<150:
+#            print "Warning!!"
           t.Fill()
           tmpDir.cd()
 #          if s.type1phiMet<150:
