@@ -180,3 +180,18 @@ class PlotsBase:
         self.showTimers()
             
         
+    def fill1DBySign(self,name,pdg,value,weight):
+        fullname = name
+        if pdg>0:
+            fullname += "Minus"
+        elif pdg<0:
+            fullname += "Plus"
+        self.histogramList[fullname].Fill(value,weight)
+
+    def fill2DBySign(self,name,pdg,xvalue,yvalue,weight):
+        fullname = name + "_"
+        if pdg>0:
+            fullname += "Minus"
+        elif pdg<0:
+            fullname += "Plus"
+        self.histogramList[fullname].Fill(xvalue,yvalue,weight)
