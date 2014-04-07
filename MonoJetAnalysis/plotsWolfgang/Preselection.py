@@ -1,20 +1,7 @@
 import math
 from EventHelper import EventHelper
+from KinematicUtilities import *
 
-def deltaPhi(phi1,phi2):
-    result = phi2 - phi1
-    if result<-pi:
-        result += 2*pi
-    if result>pi:
-        result -= 2*pi
-    return result
-
-def deltaR(phi1,eta1,phi2,eta2):
-    dphi = deltaPhi(phi1,phi2)
-    deta = eta2 - eta1
-    return sqrt(dphi*dphi+deta*deta)
-
-        
 class Preselection:
 
     def __init__(self):
@@ -22,8 +9,8 @@ class Preselection:
         self.isrJetBTBVeto = True
         self.softIsolatedMuPtMin = 5
         self.njet60Max = 2
-        self.type1phiMetMin = 150
-        self.softIsolatedMuEtaMax = 1.5
+        self.type1phiMetMin = 200
+        self.softIsolatedMuEtaMax = 999.
 
     def accept(self,eh,sample):
 
