@@ -98,7 +98,10 @@ class PlotsBase:
         elist = None
         elistFile = None
         if self.readElist or self.writeElist:
-            elistFileName = os.path.join(self.preselDirName,subSampleName+"_elist.root")
+            dirName = os.path.join(self.preselDirName,sample.name)
+            if not os.path.isdir(dirName):
+                os.mkdir(dirName,0744)
+            elistFileName = os.path.join(dirName,subSampleName+"_elist.root")
             if self.elist=="a":
                 self.writeElist = False
                 self.readElist = False
