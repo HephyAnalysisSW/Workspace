@@ -374,6 +374,7 @@ if not os.path.isdir(outputDir+"/"+outSubDir):
 
 nc = 0
 for isample, sample in enumerate(allSamples):
+  isData = sample['name'].lower().count('data')
   if not os.path.isdir(outputDir+"/"+outSubDir+"/"+sample["name"]):
     os.system("mkdir "+outputDir+"/"+outSubDir+"/"+sample["name"])
   else:
@@ -384,7 +385,7 @@ for isample, sample in enumerate(allSamples):
     variables+=["met", "metphi"]
   else:
     variables+=["type1phiMet", "type1phiMetphi"]
-  if sample['name'].lower().count('data'):
+  if isData:
     alltriggers =  [ "HLTL1ETM40", "HLTMET120", "HLTMET120HBHENoiseCleaned", "HLTMonoCentralPFJet80PFMETnoMu105NHEF0p95", "HLTMonoCentralPFJet80PFMETnoMu95NHEF0p95"]
     for trigger in alltriggers:
       variables.append(trigger)
@@ -397,7 +398,7 @@ for isample, sample in enumerate(allSamples):
   muvars = ["muPt", "muEta", "muPhi", "muPdg", "muRelIso", "muDxy", "muDz", "muNormChi2", "muNValMuonHits", "muNumMatchedStations", "muPixelHits", "muNumtrackerLayerWithMeasurement", 'muIsGlobal', 'muIsTracker']
   elvars = ["elPt", "elEta", "elPhi", "elPdg","elSIEtaIEta", "elDPhi", "elDEta", "elHoE", "elOneOverEMinusOneOverP", "elConvRejection", "elMissingHits", "elIsEB", "elIsEE", "elRelIso", "elDxy", "elDz"]
   tavars = ["taPt", "taEta", "taPhi", "taPdg"]
-  if not sample['name'].lower().count('data'):
+  if not isData:
     mcvars = ["gpPdg", "gpM", "gpPt", "gpEta", "gpPhi", "gpMo1", "gpMo2", "gpDa1", "gpDa2", "gpSta"]
   if options.allsamples.lower()=='sms':
     variables+=['osetMgl', 'osetMN', 'osetMC', 'osetMsq']
@@ -424,7 +425,7 @@ for isample, sample in enumerate(allSamples):
       structString +="Float_t "+var+"[10];"
     for var in tavars:
       structString +="Float_t "+var+"[10];"
-    if not sample['name'].lower().count('data'):
+    if not isData:
       structString +="Int_t ngp;"
       for var in mcvars:
         structString +="Float_t "+var+"[40];"
@@ -472,7 +473,7 @@ for isample, sample in enumerate(allSamples):
       t.Branch(var,   ROOT.AddressOf(s,var), var+'[nelCount]/F')
     for var in tavars:
       t.Branch(var,   ROOT.AddressOf(s,var), var+'[ntaCount]/F')
-    if not sample['name'].lower().count('data'):
+    if not isData:
       t.Branch("ngp",   ROOT.AddressOf(s,"ngp"), 'ngp/I')
       for var in mcvars:
         t.Branch(var,   ROOT.AddressOf(s,var), var+'[ngp]/F')
@@ -493,7 +494,7 @@ for isample, sample in enumerate(allSamples):
         prefix = "root://hephyse.oeaw.ac.at/"#+subdirname
       c.Add(prefix+thisfile)
     ntot = c.GetEntries()
-    if not sample['name'].lower().count('data'):
+    if not isData:
       mclist = []
       for thisfile in sample["filenames"][bin]:
         mclist.append(prefix+thisfile)
@@ -527,7 +528,7 @@ for isample, sample in enumerate(allSamples):
         if elist.GetN()>0 and ntot>0:
           c.GetEntry(elist.GetEntry(i))
 # MC specific part
-          if not sample['name'].lower().count('data'):
+          if not isData:
             events.to(elist.GetEntry(i))
             events.getByLabel(label,handle)
             gps = handle.product()
@@ -580,7 +581,7 @@ for isample, sample in enumerate(allSamples):
 #            for var in ['osetMgl', 'osetMN', 'osetMC', 'osetMsq']:
 #              print s.event, var, getVarValue(c, var)
           s.event = long(c.GetLeaf(c.GetAlias('event')).GetValue())
-          if not sample['name'].lower().count('data'):
+          if not isData:
             vtxWeightSysPlus, nvtxWeightSysMinus, nvtxWeight = 1.,1.,1.
             if sample.has_key('reweightingHistoFile'): 
               s.puWeight = s.weight*sample['reweightingHistoFile'].GetBinContent(sample['reweightingHistoFile'].FindBin(s.nTrueGenVertices))
@@ -602,7 +603,7 @@ for isample, sample in enumerate(allSamples):
           nmuons = getVarValue(c, 'nmuons')   #Number of muons in Muon Vec
           neles  = getVarValue(c, 'neles')    #Number of eles in Ele Vec
           ntaus  = getVarValue(c, 'ntaus')    #Number of eles in Ele Vec
-          if not sample['name'].lower().count('data'):
+          if not isData:
             s.ptISR = getPtISR(s)
           allGoodMuons = getAllMuons(c,nmuons)
           allGoodElectrons = getAllElectrons(c, neles)
@@ -613,11 +614,18 @@ for isample, sample in enumerate(allSamples):
           s.nTightMuons = len(tightMuons)
           s.nTightElectrons = len(tightElectrons)
 
-          jResult = getGoodJets(c, tightMuons + tightElectrons , jermode=options.jermode, jesmode=options.jesmode)
-          jetResult = jResult['jets']
 
           allTightLeptons = tightMuons + tightElectrons 
           allTightLeptons = sorted(allTightLeptons, key=lambda k: -k['pt'])
+          if isData:
+            if len(allTightLeptons)==0:continue
+            if abs(allTightLeptons[0]['Pdg'])==11 and bin.count('MuHad'):continue 
+            if abs(allTightLeptons[0]['Pdg'])==13 and bin.count('ElectronHad'):continue 
+      
+
+          jResult = getGoodJets(c, allTightLeptons , jermode=options.jermode, jesmode=options.jesmode)
+          jetResult = jResult['jets']
+
           if len(allTightLeptons)>0:
             s.leptonPt = allTightLeptons[0]['pt']
             s.leptonEta = allTightLeptons[0]['eta']

@@ -36,7 +36,7 @@ for s in subDirs:
 
 finishedJobs = {}
 for s in subDirs:
-  p1 = os.popen("dpns-ls "+options.dpmDir+"/"+(s.split('/')[-1])+"|wc -l")
+  p1 = os.popen("dpns-ls -l "+options.dpmDir+"/"+(s.split('/')[-1])+"|wc -l")
   l=p1.readline()
   p1.close()
   if not l: continue

@@ -28,9 +28,9 @@ allStacks=[]
 minimum=10**(-2.5)
 
 chmode = "copy"
-presel = "refSel"
+presel = "refSelNoNJet"
 ver = "v5"
-region = "preSel"
+region = "signal"
 preprefix = region+"_"+ver
 if region == "preSel":
   #isrjet>350, met>250, mT<70
@@ -63,7 +63,7 @@ if region == "signal":
 if region == "signal2j":
   #isrjet>350, met>250, mT<70
   additionalCut = "(ht>750&&type1phiMet>350&&njets==2)"
-  addData = False
+  addData = False 
   addSignals = True
   normalizeToData = False
   normalizeSignalToMCSum = False
@@ -118,10 +118,10 @@ if region == "signalCosMLPhi3j":
   normalizeSignalToMCSum = False
 
 subdir = "/pngT5LNu/"
-doOnlyOne=True
-doAnalysisVars            = True
-doAllDiscriminatingVars   = True 
-doOtherVars               = True 
+doAnalysisVars            = True 
+doAllDiscriminatingVars   = False  
+doOtherVars               = False  
+doMTPlots                 = False
 
 chainstring = "Events"
 commoncf = "(0)"
@@ -159,7 +159,7 @@ for sample in allSamples:
 for sample in allSamples[1:]:
   sample["weight"] = "puWeight"
 
-def getStack(varstring, binning, cutstring, signals, varfunc = "", addData=True, additionalCutFunc = ""):
+def getStack(varstring, binning, cutstring, signals, varfunc = "", addData=True, additionalCutFunc = "", symmetrizeSignalCharge = False):
   DATA          = variable(varstring, binning, cutstring,additionalCutFunc=additionalCutFunc)
   DATA.sample   = data
 #  DATA.color    = ROOT.kGray
@@ -211,11 +211,16 @@ def getStack(varstring, binning, cutstring, signals, varfunc = "", addData=True,
 #    v.reweightHisto = simplePUreweightHisto 
     v.legendCoordinates=[0.61,0.95 - 0.08*5,.98,.95]
   for signal in signals:
-    MC_SIGNAL                    = variable(varstring, binning, cutstring,additionalCutFunc=additionalCutFunc)
+    if symmetrizeSignalCharge:
+      MC_SIGNAL                    = variable(varstring, binning, cutstring.replace("&&leptonPdg<0","").replace("&&leptonPdg>0",""),additionalCutFunc=additionalCutFunc)
+    else:
+      MC_SIGNAL                    = variable(varstring, binning, cutstring,additionalCutFunc=additionalCutFunc)
     MC_SIGNAL.sample             = copy.deepcopy(signal)
     MC_SIGNAL.legendText         = signal["name"]
     MC_SIGNAL.style              = "l02"
-    MC_SIGNAL.color              = signal['color'] 
+    MC_SIGNAL.color              = signal['color']
+    if symmetrizeSignalCharge: 
+      MC_SIGNAL.scale              = 0.5
     MC_SIGNAL.add = []
     MC_SIGNAL.reweightVar = lambda c:getISRweight(c, mode='Central')
     res.append(MC_SIGNAL)
@@ -259,50 +264,58 @@ if doAnalysisVars:
 #  dHtOrth_stack[0].addOverFlowBin = "upper"
 #  allStacks.append(dHtOrth_stack)
 
-  cosPhiLepJet0_stack = getStack(":xxx;cosPhiLepJet0;Number of Events",[25,-1,1], commoncf, signals, varfunc = lambda c:cos(c.leptonPhi - c.jetPhi[0]), addData = addData)
-  cosPhiLepJet0_stack[0].addOverFlowBin = "upper"
-  allStacks.append(cosPhiLepJet0_stack)
-  cosPhiLepJet1_stack = getStack(":xxx;cosPhiLepJet1;Number of Events",[25,-1,1], commoncf, signals, varfunc = lambda c:cos(c.leptonPhi - c.jetPhi[1]), addData = addData)
-  cosPhiLepJet1_stack[0].addOverFlowBin = "upper"
-  allStacks.append(cosPhiLepJet1_stack)
-  cosPhiMETJet0_stack = getStack(":xxx;cosPhiMETJet0;Number of Events",[25,-1,1], commoncf, signals, varfunc = lambda c:cos(c.type1phiMetphi - c.jetPhi[0]), addData = addData)
-  cosPhiMETJet0_stack[0].addOverFlowBin = "upper"
-  allStacks.append(cosPhiMETJet0_stack)
-  cosPhiMETJet1_stack = getStack(":xxx;cosPhiMETJet1;Number of Events",[25,-1,1], commoncf, signals, varfunc = lambda c:cos(c.type1phiMetphi - c.jetPhi[1]), addData = addData)
-  cosPhiMETJet1_stack[0].addOverFlowBin = "upper"
-  allStacks.append(cosPhiMETJet1_stack)
+#  njetsNoNJetCut_stack = getStack(":njets;n_{jet};Number of Events",[10,0,10], commoncf.replace('&&njets>=4',''), signals, addData = addData)
+#  njetsNoNJetCut_stack[0].addOverFlowBin = "upper"
+#  allStacks.append(njetsNoNJetCut_stack)
 
-  htThrustLepSideRatio_stack = getStack(":htThrustLepSideRatio;htThrustLepSideRatio;Number of Events",[25,0,1], commoncf, signals, addData = addData)
-  htThrustLepSideRatio_stack[0].addOverFlowBin = "upper"
-  allStacks.append(htThrustLepSideRatio_stack)
+  htNoHT_stack                          = getStack(":ht;H_{T} (GeV);Number of Events / 50 GeV",[31,0,1550 ], commoncf.replace('ht>750&&',''), signals, addData = addData)
+  htNoHT_stack[0].addOverFlowBin = "upper"
+  allStacks.append(htNoHT_stack)
 
-  htThrustMetSideRatio_stack = getStack(":htThrustMetSideRatio;htThrustMetSideRatio;Number of Events",[25,0,1], commoncf, signals, addData = addData)
-  htThrustMetSideRatio_stack[0].addOverFlowBin = "upper"
-  allStacks.append(htThrustMetSideRatio_stack)
-
-  htThrustWSideRatio_stack = getStack(":htThrustWSideRatio;htThrustWSideRatio;Number of Events",[25,0,1], commoncf, signals, addData = addData)
-  htThrustWSideRatio_stack[0].addOverFlowBin = "upper"
-  allStacks.append(htThrustWSideRatio_stack)
-
-  mT_stack  = getStack(":mT;m_{T} (GeV);Number of Events / 10 GeV",[41,0,410], commoncf, signals, addData = addData)
-  mT_stack[0].addOverFlowBin = "upper"
-  allStacks.append(mT_stack)
-
-  met_stack = getStack(":type1phiMet;#slash{E}_{T} (GeV);Number of Events / 50 GeV",[18,150,1050], commoncf, signals, addData = addData)
-  met_stack[0].addOverFlowBin = "upper"
-  allStacks.append(met_stack)
-
-  njets_stack = getStack(":njets;n_{jet};Number of Events",[10,0,10], commoncf, signals, addData = addData)
-  njets_stack[0].addOverFlowBin = "upper"
-  allStacks.append(njets_stack)
-
-  nbtags_stack = getStack(":nbtags;n_{b-tags};Number of Events",[10,0,10], commoncf, signals, addData = addData)
-  nbtags_stack[0].addOverFlowBin = "upper"
-  allStacks.append(nbtags_stack)
-
-  ht_stack                          = getStack(":ht;H_{T} (GeV);Number of Events / 50 GeV",[31,0,1550 ], commoncf, signals, addData = addData)
-  ht_stack[0].addOverFlowBin = "upper"
-  allStacks.append(ht_stack)
+#  cosPhiLepJet0_stack = getStack(":xxx;cosPhiLepJet0;Number of Events",[25,-1,1], commoncf, signals, varfunc = lambda c:cos(c.leptonPhi - c.jetPhi[0]), addData = addData)
+#  cosPhiLepJet0_stack[0].addOverFlowBin = "upper"
+#  allStacks.append(cosPhiLepJet0_stack)
+#  cosPhiLepJet1_stack = getStack(":xxx;cosPhiLepJet1;Number of Events",[25,-1,1], commoncf, signals, varfunc = lambda c:cos(c.leptonPhi - c.jetPhi[1]), addData = addData)
+#  cosPhiLepJet1_stack[0].addOverFlowBin = "upper"
+#  allStacks.append(cosPhiLepJet1_stack)
+#  cosPhiMETJet0_stack = getStack(":xxx;cosPhiMETJet0;Number of Events",[25,-1,1], commoncf, signals, varfunc = lambda c:cos(c.type1phiMetphi - c.jetPhi[0]), addData = addData)
+#  cosPhiMETJet0_stack[0].addOverFlowBin = "upper"
+#  allStacks.append(cosPhiMETJet0_stack)
+#  cosPhiMETJet1_stack = getStack(":xxx;cosPhiMETJet1;Number of Events",[25,-1,1], commoncf, signals, varfunc = lambda c:cos(c.type1phiMetphi - c.jetPhi[1]), addData = addData)
+#  cosPhiMETJet1_stack[0].addOverFlowBin = "upper"
+#  allStacks.append(cosPhiMETJet1_stack)
+#
+#  htThrustLepSideRatio_stack = getStack(":htThrustLepSideRatio;htThrustLepSideRatio;Number of Events",[25,0,1], commoncf, signals, addData = addData)
+#  htThrustLepSideRatio_stack[0].addOverFlowBin = "upper"
+#  allStacks.append(htThrustLepSideRatio_stack)
+#
+#  htThrustMetSideRatio_stack = getStack(":htThrustMetSideRatio;htThrustMetSideRatio;Number of Events",[25,0,1], commoncf, signals, addData = addData)
+#  htThrustMetSideRatio_stack[0].addOverFlowBin = "upper"
+#  allStacks.append(htThrustMetSideRatio_stack)
+#
+#  htThrustWSideRatio_stack = getStack(":htThrustWSideRatio;htThrustWSideRatio;Number of Events",[25,0,1], commoncf, signals, addData = addData)
+#  htThrustWSideRatio_stack[0].addOverFlowBin = "upper"
+#  allStacks.append(htThrustWSideRatio_stack)
+#
+#  mT_stack  = getStack(":mT;m_{T} (GeV);Number of Events / 10 GeV",[41,0,410], commoncf, signals, addData = addData)
+#  mT_stack[0].addOverFlowBin = "upper"
+#  allStacks.append(mT_stack)
+#
+#  met_stack = getStack(":type1phiMet;#slash{E}_{T} (GeV);Number of Events / 50 GeV",[18,150,1050], commoncf, signals, addData = addData)
+#  met_stack[0].addOverFlowBin = "upper"
+#  allStacks.append(met_stack)
+#
+#  njets_stack = getStack(":njets;n_{jet};Number of Events",[10,0,10], commoncf, signals, addData = addData)
+#  njets_stack[0].addOverFlowBin = "upper"
+#  allStacks.append(njets_stack)
+#
+#  nbtags_stack = getStack(":nbtags;n_{b-tags};Number of Events",[10,0,10], commoncf, signals, addData = addData)
+#  nbtags_stack[0].addOverFlowBin = "upper"
+#  allStacks.append(nbtags_stack)
+#
+#  ht_stack                          = getStack(":ht;H_{T} (GeV);Number of Events / 50 GeV",[31,0,1550 ], commoncf, signals, addData = addData)
+#  ht_stack[0].addOverFlowBin = "upper"
+#  allStacks.append(ht_stack)
 
 
 if doAllDiscriminatingVars:
@@ -351,6 +364,16 @@ if doAllDiscriminatingVars:
   cosDeltaPhiLepW_stack  = getStack(":cosDeltaPhi;cos(#Delta #phi(l, W));Number of Events",[22,-1.1,1.1], commoncf, signals, addData = addData)
   allStacks.append(cosDeltaPhiLepW_stack)
 
+if doMTPlots:
+  mTReco_PosCharge_stack  = getStack(":mT;m_{T} (GeV);Number of Events / 100 GeV",[8,20,820], commoncf+"&&leptonPdg<0", signals, addData = addData, symmetrizeSignalCharge = True)
+  mTReco_PosCharge_stack[0].addOverFlowBin = "upper"
+  allStacks.append(mTReco_PosCharge_stack)
+  mTReco_NegCharge_stack  = getStack(":mT;m_{T} (GeV);Number of Events / 100 GeV",[8,20,820], commoncf+"&&leptonPdg>0", signals, addData = addData, symmetrizeSignalCharge = True)
+  mTReco_NegCharge_stack[0].addOverFlowBin = "upper"
+  allStacks.append(mTReco_NegCharge_stack)
+  mTReco_stack  = getStack(":mT;m_{T} (GeV);Number of Events / 100 GeV",[8,20,820], commoncf, signals, addData = addData, symmetrizeSignalCharge = True)
+  mTReco_stack[0].addOverFlowBin = "upper"
+  allStacks.append(mTReco_stack)
 
 for stack in allStacks:
   stack[0].minimum = minimum
@@ -381,23 +404,26 @@ for stack in allStacks:
 #  stack[0].lines = [[0.2, 0.9, "#font[22]{CMS preliminary}"], [0.2,0.85,str(int(round(targetLumi)))+" pb^{-1},  #sqrt{s} = 7 TeV"]]
   stack[0].lines = [[0.2, 0.9, "#font[22]{CMS Collaboration}"], [0.2,0.85,str(int(round(targetLumi/10.))/100.)+" fb^{-1},  #sqrt{s} = 8 TeV"]]
 
-if doAnalysisVars: 
-  drawNMStacks(1,1,[cosPhiLepJet0_stack],             subdir+prefix+"cosPhiLepJet0", False)
-  drawNMStacks(1,1,[cosPhiLepJet1_stack],             subdir+prefix+"cosPhiLepJet1", False)
-  drawNMStacks(1,1,[cosPhiMETJet0_stack],             subdir+prefix+"cosPhiMETJet0", False)
-  drawNMStacks(1,1,[cosPhiMETJet1_stack],             subdir+prefix+"cosPhiMETJet1", False)
-  htThrustMetSideRatio_stack[0].maximum = 6*10**5 *htThrustMetSideRatio_stack[0].data_histo.GetMaximum()
-  drawNMStacks(1,1,[htThrustMetSideRatio_stack],             subdir+prefix+"htThrustMetSideRatio", False)
-#  drawNMStacks(1,1,[dHtOrth_stack],             subdir+prefix+"dHtOrth", False)
-  htThrustLepSideRatio_stack[0].maximum = 6*10**5 *htThrustLepSideRatio_stack[0].data_histo.GetMaximum()
-  drawNMStacks(1,1,[htThrustLepSideRatio_stack],             subdir+prefix+"htThrustLepSideRatio", False)
-  htThrustWSideRatio_stack[0].maximum = 6*10**5 *htThrustWSideRatio_stack[0].data_histo.GetMaximum()
-  drawNMStacks(1,1,[htThrustWSideRatio_stack],             subdir+prefix+"htThrustWSideRatio", False)
-  drawNMStacks(1,1,[mT_stack],              subdir+prefix+"mT", False)
-  drawNMStacks(1,1,[met_stack],             subdir+prefix+"met", False)
-  drawNMStacks(1,1,[njets_stack],             subdir+prefix+"njets", False)
-  drawNMStacks(1,1,[nbtags_stack],             subdir+prefix+"nbtags", False)
-  drawNMStacks(1,1,[ht_stack],              subdir+prefix+"ht", False)
+if doAnalysisVars:
+#  drawNMStacks(1,1,[njetsNoNJetCut_stack],             subdir+prefix+"njetsNoNJetCut", False)
+  drawNMStacks(1,1,[htNoHT_stack],             subdir+prefix+"htNoHT", False)
+
+#  drawNMStacks(1,1,[cosPhiLepJet0_stack],             subdir+prefix+"cosPhiLepJet0", False)
+#  drawNMStacks(1,1,[cosPhiLepJet1_stack],             subdir+prefix+"cosPhiLepJet1", False)
+#  drawNMStacks(1,1,[cosPhiMETJet0_stack],             subdir+prefix+"cosPhiMETJet0", False)
+#  drawNMStacks(1,1,[cosPhiMETJet1_stack],             subdir+prefix+"cosPhiMETJet1", False)
+#  htThrustMetSideRatio_stack[0].maximum = 6*10**5 *htThrustMetSideRatio_stack[0].data_histo.GetMaximum()
+#  drawNMStacks(1,1,[htThrustMetSideRatio_stack],             subdir+prefix+"htThrustMetSideRatio", False)
+##  drawNMStacks(1,1,[dHtOrth_stack],             subdir+prefix+"dHtOrth", False)
+#  htThrustLepSideRatio_stack[0].maximum = 6*10**5 *htThrustLepSideRatio_stack[0].data_histo.GetMaximum()
+#  drawNMStacks(1,1,[htThrustLepSideRatio_stack],             subdir+prefix+"htThrustLepSideRatio", False)
+#  htThrustWSideRatio_stack[0].maximum = 6*10**5 *htThrustWSideRatio_stack[0].data_histo.GetMaximum()
+#  drawNMStacks(1,1,[htThrustWSideRatio_stack],             subdir+prefix+"htThrustWSideRatio", False)
+#  drawNMStacks(1,1,[mT_stack],              subdir+prefix+"mT", False)
+#  drawNMStacks(1,1,[met_stack],             subdir+prefix+"met", False)
+#  drawNMStacks(1,1,[njets_stack],             subdir+prefix+"njets", False)
+#  drawNMStacks(1,1,[nbtags_stack],             subdir+prefix+"nbtags", False)
+#  drawNMStacks(1,1,[ht_stack],              subdir+prefix+"ht", False)
 if doAllDiscriminatingVars:
 #  drawNMStacks(1,1,[closestMuJetMass_stack] ,             subdir+prefix+"closestMuJetMass_stack", False)
 #  drawNMStacks(1,1,[closestMuJetDeltaR_stack] ,        subdir+prefix+"closestMuJetDeltaR_stack", False)
@@ -418,3 +444,8 @@ if doAllDiscriminatingVars:
 #  drawNMStacks(1,1,[sTlep_stack],             subdir+prefix+"sTlep", False)
   drawNMStacks(1,1,[cosDeltaPhiLepW_stack],             subdir+prefix+"cosDeltaPhiLepW", False)
   drawNMStacks(1,1,[cosDeltaPhiLepMET_stack],             subdir+prefix+"cosDeltaPhiLepMET", False)
+
+if doMTPlots:
+  drawNMStacks(1,1,[mTReco_PosCharge_stack], subdir+prefix+"mTReco_PosCharge", False)
+  drawNMStacks(1,1,[mTReco_NegCharge_stack], subdir+prefix+"mTReco_NegCharge", False)
+  drawNMStacks(1,1,[mTReco_stack], subdir+prefix+"mTReco", False)
