@@ -56,6 +56,10 @@ options.register ('keepPFCandidates',False,
           VarParsing.VarParsing.multiplicity.singleton,
           VarParsing.VarParsing.varType.bool,
           "whether or not to keep pf candidates")
+options.register ('addPDFWeights',False,
+          VarParsing.VarParsing.multiplicity.singleton,
+          VarParsing.VarParsing.varType.bool,
+          "whether or not to add pdfWeights")
 
 infiles = ['file:/data/schoef/local/TTJets-53X-syncfile-AODSIM.root']
 #  infiles = ['file:/data/jkancsar/pickevent/event4874249.root']
@@ -96,7 +100,7 @@ else:
 #  if options.mode=="Ele":
 #    triggers = ['HLT_CleanPFHT350_Ele5_CaloIdT_CaloIsoVL_TrkIdT_TrkIsoVL_PFMET45_v*','HLT_CleanPFHT350_Ele5_CaloIdT_CaloIsoVL_TrkIdT_TrkIsoVL_PFMET50_v*','HLT_CleanPFHT300_Ele15_CaloIdT_CaloIsoVL_TrkIdT_TrkIsoVL_PFMET45_v*','HLT_CleanPFHT300_Ele15_CaloIdT_CaloIsoVL_TrkIdT_TrkIsoVL_PFMET50_v*']
 
-print "mode",options.mode,"isMC?",isMC, ", verbose?",options.verbose,", add RA4 Info?",options.addRA4Info,'keepPFCandidates?', options.keepPFCandidates, ", JEC:",jec,", GT",options.GT, ", triggers", options.triggers
+print "mode",options.mode,"isMC?",isMC, ", verbose?",options.verbose,", add RA4 Info?",options.addRA4Info,'keepPFCandidates?', options.keepPFCandidates, ", JEC:",jec,", GT",options.GT, ", triggers", options.triggers, 'addPDFWeights?',options.addPDFWeights
 
 
 
@@ -352,7 +356,7 @@ process.p += process.patPFMETsTypeIPhicorrected
 process.p += process.patPFMETsTypeIType0PFCandcorrected
 process.p += process.rawpfMet
 process.p += process.patRAWPFMETs
-if options.mode.lower()=='sms':
+if options.mode.lower()=='sms' or options.addPDFWeights:
 #  process.pdfWeights = cms.EDProducer("PdfWeightProducer",
 #        # Fix POWHEG if buggy (this PDF set will also appear on output, 
 #        # so only two more PDF sets can be added in PdfSetNames if not "")
@@ -413,7 +417,7 @@ process.SUSYTupelizer.addFullLeptonInfo = cms.untracked.bool(True)
 process.SUSYTupelizer.addFullBTagInfo = cms.untracked.bool(True)
 process.SUSYTupelizer.addGeneratorInfo = cms.untracked.bool(isMC)
 process.SUSYTupelizer.addMSugraOSETInfo = cms.untracked.bool(options.mode.lower()=='sms')
-process.SUSYTupelizer.addPDFWeights = cms.untracked.bool(options.mode.lower()=='sms')
+process.SUSYTupelizer.addPDFWeights = cms.untracked.bool(options.mode.lower()=='sms' or options.addPDFWeights)
 process.SUSYTupelizer.verbose = cms.untracked.bool(options.verbose)
 process.SUSYTupelizer.addFullMuonInfo = cms.untracked.bool(True)
 process.SUSYTupelizer.addFullEleInfo = cms.untracked.bool(True)

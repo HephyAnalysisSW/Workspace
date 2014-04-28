@@ -54,16 +54,15 @@ if options.sample.lower().count('doublemu') or options.sample.lower().count('min
   else:
     c.Add('/data/schoef/convertedMETTuples_v2/inc/'+options.sample+'/histo_'+options.sample+'*.root')
 
-print "Entries", c.GetEntries()
 
 c.SetBranchStatus("*", 0)
 c.SetBranchStatus("candPt", 1)
-#c.SetBranchStatus("candPdg", 1)
+c.SetBranchStatus("ht", 1)
 c.SetBranchStatus("candPhi", 1)
 c.SetBranchStatus("candEta", 1)
 c.SetBranchStatus("candId", 1)
 
-map = h0Barrel
+map = h
 eb = energyBins[1]
 
 ifile = '/afs/hephy.at/user/s/schoefbeck/www/pngMetPhi/'+options.sample+'_occ_'+map['name']+'_pt_'+str(eb[0])+'_'+str(eb[1])+'.root'
@@ -110,8 +109,18 @@ mety = ROOT.TH1F('mety','mety',100,-100,100)
 metyCorr = ROOT.TH1F('metyCorr','metyCorr',100,-100,100)
 metyCorrPt = ROOT.TH1F('metyCorrPt','metyCorrPt',100,-100,100)
 
-nEvents = min([30000, c.GetEntries()])
+cut="(1)"
+if options.prefix[:2] == 'ht':
+  cut = 'ht>'+options.prefix[2:] 
+c.Draw(">>eList", cut)
+eList = ROOT.gDirectory.Get('eList')
+n = eList.GetN()
+print "cut",cut,"Entries", n
+
+#nEvents = min([1000, n])
+nEvents = min([30000, n])
 for i in range(nEvents):
+  c.GetEntry(eList.GetEntry(i))
   if i%100==0:print "At",i,"/",nEvents
   mexUncorr = 0.
   meyUncorr = 0.
@@ -173,7 +182,7 @@ metPhiCorr.SetLineColor(ROOT.kRed)
 metPhiCorr.Draw('same')
 metPhiCorrPt.SetLineColor(ROOT.kGreen)
 metPhiCorrPt.Draw('same')
-c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngMetPhi/metPhi_comparison_'+options.sample+'_'+map['name']+'_pt_'+str(eb[0])+'_'+str(eb[1])+'.png')
+c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngMetPhi/'+prefix+'metPhi_comparison_'+options.sample+'_'+map['name']+'_pt_'+str(eb[0])+'_'+str(eb[1])+'.png')
 
 c1 = ROOT.TCanvas()
 met.SetLineColor(ROOT.kBlue)
@@ -182,7 +191,7 @@ metCorr.SetLineColor(ROOT.kRed)
 metCorr.Draw('same')
 metCorrPt.SetLineColor(ROOT.kGreen)
 metCorrPt.Draw('same')
-c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngMetPhi/met_comparison_'+options.sample+'_'+map['name']+'_pt_'+str(eb[0])+'_'+str(eb[1])+'.png')
+c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngMetPhi/'+prefix+'met_comparison_'+options.sample+'_'+map['name']+'_pt_'+str(eb[0])+'_'+str(eb[1])+'.png')
 
 c1 = ROOT.TCanvas()
 metx.SetLineColor(ROOT.kBlue)
@@ -191,12 +200,12 @@ metxCorr.SetLineColor(ROOT.kRed)
 metxCorr.Draw('same')
 metxCorrPt.SetLineColor(ROOT.kGreen)
 metxCorrPt.Draw('same')
-c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngMetPhi/metx_comparison_'+options.sample+'_'+map['name']+'_pt_'+str(eb[0])+'_'+str(eb[1])+'.png')
+c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngMetPhi/'+prefix+'metx_comparison_'+options.sample+'_'+map['name']+'_pt_'+str(eb[0])+'_'+str(eb[1])+'.png')
 
 c1 = ROOT.TCanvas()
 mety.SetLineColor(ROOT.kBlue)
 mety.Draw()
 metyCorrPt.SetLineColor(ROOT.kGreen)
 metyCorrPt.Draw('same')
-c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngMetPhi/mety_comparison_'+options.sample+'_'+map['name']+'_pt_'+str(eb[0])+'_'+str(eb[1])+'.png')
+c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngMetPhi/'+prefix+'mety_comparison_'+options.sample+'_'+map['name']+'_pt_'+str(eb[0])+'_'+str(eb[1])+'.png')
 

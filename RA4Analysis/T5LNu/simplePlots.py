@@ -28,13 +28,20 @@ allStacks=[]
 minimum=10**(-2.5)
 
 chmode = "copy"
-presel = "refSelNoNJet"
+presel = "refSel"
 ver = "v5"
 region = "signal"
 preprefix = region+"_"+ver
 if region == "preSel":
   #isrjet>350, met>250, mT<70
   additionalCut = "(1)"
+  addData = False
+  addSignals = True
+  normalizeToData = False
+  normalizeSignalToMCSum = False
+if region == "signal":
+  #isrjet>350, met>250, mT<70
+  additionalCut = "(ht>750&&type1phiMet>350&&njets>=4)"
   addData = False
   addSignals = True
   normalizeToData = False
@@ -49,13 +56,6 @@ if region == "signal34jht500-750":
 if region == "signal5jht400-750":
   #isrjet>350, met>250, mT<70
   additionalCut = "(ht>400&&ht<750&&type1phiMet>350&&njets>=5)"
-  addData = False
-  addSignals = True
-  normalizeToData = False
-  normalizeSignalToMCSum = False
-if region == "signal":
-  #isrjet>350, met>250, mT<70
-  additionalCut = "(ht>750&&type1phiMet>350&&njets>=4)"
   addData = False
   addSignals = True
   normalizeToData = False
@@ -122,16 +122,17 @@ doAnalysisVars            = True
 doAllDiscriminatingVars   = False  
 doOtherVars               = False  
 doMTPlots                 = False
+symmetrizeSignalCharge    = True
 
 chainstring = "Events"
 commoncf = "(0)"
 prefix="empty_"
 if presel == "refSel":
-  commoncf="njets>=4&&ht>400&&nTightMuons+nTightElectrons==1&&nbtags==0"
+  commoncf="type1phiMet>150&&njets>=4&&ht>400&&nTightMuons+nTightElectrons==1&&nbtags==0"
 if presel == "refSelNoNJet":
-  commoncf="ht>400&&nTightMuons+nTightElectrons==1&&nbtags==0"
+  commoncf="type1phiMet>150&&ht>400&&nTightMuons+nTightElectrons==1&&nbtags==0"
 if presel == "refSelTauNoNJet":
-  commoncf="ht>400&&nTightMuons+nTightElectrons==1&&nbtags==0&&Sum$(taPt>20)==0"
+  commoncf="type1phiMet>150&&ht>400&&nTightMuons+nTightElectrons==1&&nbtags==0&&Sum$(taPt>20)==0"
 
 if additionalCut!="":
   commoncf+="&&"+additionalCut
@@ -268,10 +269,6 @@ if doAnalysisVars:
 #  njetsNoNJetCut_stack[0].addOverFlowBin = "upper"
 #  allStacks.append(njetsNoNJetCut_stack)
 
-  htNoHT_stack                          = getStack(":ht;H_{T} (GeV);Number of Events / 50 GeV",[31,0,1550 ], commoncf.replace('ht>750&&',''), signals, addData = addData)
-  htNoHT_stack[0].addOverFlowBin = "upper"
-  allStacks.append(htNoHT_stack)
-
 #  cosPhiLepJet0_stack = getStack(":xxx;cosPhiLepJet0;Number of Events",[25,-1,1], commoncf, signals, varfunc = lambda c:cos(c.leptonPhi - c.jetPhi[0]), addData = addData)
 #  cosPhiLepJet0_stack[0].addOverFlowBin = "upper"
 #  allStacks.append(cosPhiLepJet0_stack)
@@ -297,25 +294,34 @@ if doAnalysisVars:
 #  htThrustWSideRatio_stack[0].addOverFlowBin = "upper"
 #  allStacks.append(htThrustWSideRatio_stack)
 #
-#  mT_stack  = getStack(":mT;m_{T} (GeV);Number of Events / 10 GeV",[41,0,410], commoncf, signals, addData = addData)
-#  mT_stack[0].addOverFlowBin = "upper"
-#  allStacks.append(mT_stack)
-#
-#  met_stack = getStack(":type1phiMet;#slash{E}_{T} (GeV);Number of Events / 50 GeV",[18,150,1050], commoncf, signals, addData = addData)
-#  met_stack[0].addOverFlowBin = "upper"
-#  allStacks.append(met_stack)
-#
-#  njets_stack = getStack(":njets;n_{jet};Number of Events",[10,0,10], commoncf, signals, addData = addData)
-#  njets_stack[0].addOverFlowBin = "upper"
-#  allStacks.append(njets_stack)
-#
-#  nbtags_stack = getStack(":nbtags;n_{b-tags};Number of Events",[10,0,10], commoncf, signals, addData = addData)
-#  nbtags_stack[0].addOverFlowBin = "upper"
-#  allStacks.append(nbtags_stack)
-#
-#  ht_stack                          = getStack(":ht;H_{T} (GeV);Number of Events / 50 GeV",[31,0,1550 ], commoncf, signals, addData = addData)
-#  ht_stack[0].addOverFlowBin = "upper"
-#  allStacks.append(ht_stack)
+  mT_stack  = getStack(":mT;m_{T} (GeV);Number of Events / 10 GeV",[41,0,410], commoncf, signals, addData = addData)
+  mT_stack[0].addOverFlowBin = "upper"
+  allStacks.append(mT_stack)
+
+  met_stack = getStack(":type1phiMet;#slash{E}_{T} (GeV);Number of Events / 50 GeV",[18,150,1050], commoncf, signals, addData = addData)
+  met_stack[0].addOverFlowBin = "upper"
+  allStacks.append(met_stack)
+
+  metNoMET_stack = getStack(":type1phiMet;#slash{E}_{T} (GeV);Number of Events / 50 GeV",[18,150,1050], commoncf.replace('type1phiMet>350&&',''), signals, addData = addData)
+  metNoMET_stack[0].addOverFlowBin = "upper"
+  allStacks.append(metNoMET_stack)
+
+  njets_stack = getStack(":njets;n_{jet};Number of Events",[10,0,10], commoncf, signals, addData = addData)
+  njets_stack[0].addOverFlowBin = "upper"
+  allStacks.append(njets_stack)
+
+  nbtags_stack = getStack(":nbtags;n_{b-tags};Number of Events",[10,0,10], commoncf, signals, addData = addData)
+  nbtags_stack[0].addOverFlowBin = "upper"
+  allStacks.append(nbtags_stack)
+
+  ht_stack                          = getStack(":ht;H_{T} (GeV);Number of Events / 50 GeV",[31,0,1550 ], commoncf, signals, addData = addData)
+  ht_stack[0].addOverFlowBin = "upper"
+  allStacks.append(ht_stack)
+
+  htNoHT_stack                          = getStack(":ht;H_{T} (GeV);Number of Events / 50 GeV",[31,0,1550 ], commoncf.replace('ht>750&&',''), signals, addData = addData)
+  htNoHT_stack[0].addOverFlowBin = "upper"
+  allStacks.append(htNoHT_stack)
+
 
 
 if doAllDiscriminatingVars:
@@ -365,13 +371,13 @@ if doAllDiscriminatingVars:
   allStacks.append(cosDeltaPhiLepW_stack)
 
 if doMTPlots:
-  mTReco_PosCharge_stack  = getStack(":mT;m_{T} (GeV);Number of Events / 100 GeV",[8,20,820], commoncf+"&&leptonPdg<0", signals, addData = addData, symmetrizeSignalCharge = True)
+  mTReco_PosCharge_stack  = getStack(":mT;m_{T} (GeV);Number of Events / 100 GeV",[8,20,820], commoncf+"&&leptonPdg<0", signals, addData = addData, symmetrizeSignalCharge = symmetrizeSignalCharge)
   mTReco_PosCharge_stack[0].addOverFlowBin = "upper"
   allStacks.append(mTReco_PosCharge_stack)
-  mTReco_NegCharge_stack  = getStack(":mT;m_{T} (GeV);Number of Events / 100 GeV",[8,20,820], commoncf+"&&leptonPdg>0", signals, addData = addData, symmetrizeSignalCharge = True)
+  mTReco_NegCharge_stack  = getStack(":mT;m_{T} (GeV);Number of Events / 100 GeV",[8,20,820], commoncf+"&&leptonPdg>0", signals, addData = addData, symmetrizeSignalCharge = symmetrizeSignalCharge)
   mTReco_NegCharge_stack[0].addOverFlowBin = "upper"
   allStacks.append(mTReco_NegCharge_stack)
-  mTReco_stack  = getStack(":mT;m_{T} (GeV);Number of Events / 100 GeV",[8,20,820], commoncf, signals, addData = addData, symmetrizeSignalCharge = True)
+  mTReco_stack  = getStack(":mT;m_{T} (GeV);Number of Events / 100 GeV",[8,20,820], commoncf, signals, addData = addData, symmetrizeSignalCharge = symmetrizeSignalCharge)
   mTReco_stack[0].addOverFlowBin = "upper"
   allStacks.append(mTReco_stack)
 
@@ -406,7 +412,6 @@ for stack in allStacks:
 
 if doAnalysisVars:
 #  drawNMStacks(1,1,[njetsNoNJetCut_stack],             subdir+prefix+"njetsNoNJetCut", False)
-  drawNMStacks(1,1,[htNoHT_stack],             subdir+prefix+"htNoHT", False)
 
 #  drawNMStacks(1,1,[cosPhiLepJet0_stack],             subdir+prefix+"cosPhiLepJet0", False)
 #  drawNMStacks(1,1,[cosPhiLepJet1_stack],             subdir+prefix+"cosPhiLepJet1", False)
@@ -419,11 +424,13 @@ if doAnalysisVars:
 #  drawNMStacks(1,1,[htThrustLepSideRatio_stack],             subdir+prefix+"htThrustLepSideRatio", False)
 #  htThrustWSideRatio_stack[0].maximum = 6*10**5 *htThrustWSideRatio_stack[0].data_histo.GetMaximum()
 #  drawNMStacks(1,1,[htThrustWSideRatio_stack],             subdir+prefix+"htThrustWSideRatio", False)
-#  drawNMStacks(1,1,[mT_stack],              subdir+prefix+"mT", False)
-#  drawNMStacks(1,1,[met_stack],             subdir+prefix+"met", False)
-#  drawNMStacks(1,1,[njets_stack],             subdir+prefix+"njets", False)
-#  drawNMStacks(1,1,[nbtags_stack],             subdir+prefix+"nbtags", False)
-#  drawNMStacks(1,1,[ht_stack],              subdir+prefix+"ht", False)
+  drawNMStacks(1,1,[mT_stack],              subdir+prefix+"mT", False)
+  drawNMStacks(1,1,[met_stack],             subdir+prefix+"met", False)
+  drawNMStacks(1,1,[metNoMET_stack],             subdir+prefix+"metNoMET", False)
+  drawNMStacks(1,1,[njets_stack],             subdir+prefix+"njets", False)
+  drawNMStacks(1,1,[nbtags_stack],             subdir+prefix+"nbtags", False)
+  drawNMStacks(1,1,[ht_stack],              subdir+prefix+"ht", False)
+  drawNMStacks(1,1,[htNoHT_stack],             subdir+prefix+"htNoHT", False)
 if doAllDiscriminatingVars:
 #  drawNMStacks(1,1,[closestMuJetMass_stack] ,             subdir+prefix+"closestMuJetMass_stack", False)
 #  drawNMStacks(1,1,[closestMuJetDeltaR_stack] ,        subdir+prefix+"closestMuJetDeltaR_stack", False)

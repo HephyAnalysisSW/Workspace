@@ -22,10 +22,10 @@ p1.close()
 totNJobs = {}
 dataset={}
 for s in subDirs:
-  p1 = os.popen("grep 'total # of jobs' "+s+"/log/crab.log | tail -n1")
+  p1 = os.popen("grep --binary-files=text 'total # of jobs' "+s+"/log/crab.log | tail -n1")
   l=p1.readline()
   p1.close()
-  if l: 
+  if l:
     totNJobs[s] = int(l[:-1].split()[-1])
 
   p1 = os.popen("grep 'Requested dataset:' "+s+"/log/crab.log | tail -n1")

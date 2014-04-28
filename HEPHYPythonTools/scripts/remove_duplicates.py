@@ -95,9 +95,6 @@ for subdir in subdirnames:
       print "Keep:", toBeKept, "Remove:", toBeRemoved
       toBeRemovedGlobal.extend(toBeRemoved)
 
-for f in onlyOnNameServer:
-  if options.delete and not options.mode='nfs':
-    print "Would remove",f
 
 for f in toBeRemovedGlobal:
   if options.delete:
@@ -109,3 +106,8 @@ for f in toBeRemovedGlobal:
   else:
     print "Would remove",f
 
+for f in onlyOnNameServer:
+  if not options.mode=='nfs':
+    print "Entry only in name server:",f,'--> Remove from db'
+    if options.delete:
+      os.system('dpns-rm -f '+f)

@@ -88,11 +88,11 @@ for m in maps:
   c1.SetLogy()
   
   for eb in energyBins:
-    name = "en_"+str(ptb[0])
-    enCut = "cosh(candEta)*candPt>="+str(ptb[0])
-    if ptb[1]>0:
-      name+="_"+str(ptb[1])
-      enCut += "&&cosh(candEta)*candPt<"+str(ptb[1])
+    name = "en_"+str(eb[0])
+    enCut = "cosh(candEta)*candPt>="+str(eb[0])
+    if eb[1]>0:
+      name+="_"+str(eb[1])
+      enCut += "&&cosh(candEta)*candPt<"+str(eb[1])
     c1 = ROOT.TCanvas()
     c.Draw('candPhi:candEta>>occ_'+m['name'],cutString+"&&"+enCut,'COLZ')#,"Sum$(candId=="+label(k)+")")
     c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngMetPhi/'+prefix+options.sample+'_occ_'+m['name']+'_'+name+'.png')
