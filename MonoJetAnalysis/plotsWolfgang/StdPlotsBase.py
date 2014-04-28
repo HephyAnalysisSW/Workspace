@@ -148,6 +148,7 @@ class StdPlotsBase(PlotsBase):
                 self.addVariablePair("ptGenTau",50,0.,1000.,"ptGenMu",25,0.,250.,suffix=sign)
             else:
                 self.addVariablePair("ptGenTau",50,0.,100.,"ptGenMu",25,0.,25.,suffix=sign)
+            self.addVariablePair("mt",25,0.,200.,"ht",40,0.,1000.,suffix=sign)
             self.addVariablePair("met",40,0.,1000.,"ht",40,0.,1000.,suffix=sign)
             self.addVariablePair("met",40,0.,1000.,"muPt",40,0.,1000.,suffix=sign)
             self.addVariablePair("WPt",40,0.,1000.,"met",40,0.,1000.,suffix=sign)
@@ -299,6 +300,7 @@ class StdPlotsBase(PlotsBase):
 
         self.fill1DBySign("ht",pdg,ht,w)
         self.fill1DBySign("mt",pdg,mt,w)
+        self.fill2DBySign("ht_vs_mt",pdg,mt,ht,w)
         
         self.fill1DBySign("isrJetPt",pdg,isrJetPt,w)
         self.fill1DBySign("isrJetEta",pdg,abs(eh.get("isrJetEta")),w)
