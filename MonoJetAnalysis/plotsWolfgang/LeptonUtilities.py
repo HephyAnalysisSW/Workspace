@@ -4,6 +4,7 @@ def isolatedMuons(eh,ptmin1=5.,etamax=1.5,ptmin2=20.,reliso=0.5):
   imus = [ ]
   nmu = int(eh.get("nmu")+0.5)
   mupts = eh.get("muPt")
+  assert len(mupts)==nmu
   muetas = eh.get("muEta")
   murelisos = eh.get("muRelIso")
   for i in range(nmu):
