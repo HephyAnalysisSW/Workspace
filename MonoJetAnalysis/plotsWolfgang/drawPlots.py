@@ -2,7 +2,7 @@ import ROOT
 import os,sys,string
 from fnmatch import fnmatch
 from Sample import *
-from drawWithFOM import *
+#from drawWithFOM import *
 #from drawSoB import *
 from optparse import OptionParser
 from SampleFilters import *
