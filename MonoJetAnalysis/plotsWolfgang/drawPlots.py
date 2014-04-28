@@ -1,5 +1,6 @@
 import ROOT
 import os,sys,string
+from fnmatch import fnmatch
 from Sample import *
 from drawWithFOM import *
 #from drawSoB import *
@@ -18,11 +19,17 @@ parser.add_option("--fomByBin", dest="fomByBin",  help="calculate fom by bin", a
 parser.add_option("--rebin", dest="rebin",  help="rebin factor", type=int, default=1)
 parser.add_option("--singleMu", dest="singleMu", help="use single mu dataset", action="store_true", default=False)
 parser.add_option("--data", dest="data", help="show data", action="store_true", default=False)
+parser.add_option("--canvasNames",dest="canvasNames",help="(comma-separated list) of canvases to show",default=None)
 (options, args) = parser.parse_args()
 assert len(args)>0
 if options.fom=="None":
     options.fom = None
 assert options.rebin>0
+selectedCanvasNames = [ ]
+if options.canvasNames!=None:
+    for cnvname in  options.canvasNames.split(","):
+        selectedCanvasNames.append(cnvname)
+    print selectedCanvasNames
 
 plotGlobals = {}
 execfile(args[0],plotGlobals)
@@ -71,6 +78,12 @@ else:
     samples.append(Sample("singleTop",sampleBase,type="B",color=4,fill=True))
     #samples.append(Sample("TTJets",sampleBase,type="B",color=2,fill=True))
     samples.append(Sample("TTJetsPowHeg",sampleBase,type="B",color=2,fill=True))
+##    samples.append(Sample("WJetsToLNu",sampleBase,type="B",color=5,fill=True)
+#    samples.append(Sample("WJetsToLNuTau",sampleBase,type="B",color=8,fill=True, \
+#                              namelist=["WJetsToLNu"],filter=LeptonFilter(16)))
+#    samples.append(Sample("WJetsToLNuNoTau",sampleBase,type="B",color=5,fill=True, \
+#                              namelist=["WJetsToLNu"],filter=InvertedSampleFilter(LeptonFilter(16))))
+#    samples.append(Sample("WJetsToLNu",sampleBase,type="B",color=5,fill=True))
 #    samples.append(Sample("WJetsToLNu",sampleBase,type="B",color=5,fill=True))
 #    samples.append(Sample("WJetsHT150v2",sampleBase,type="B",color=5,fill=True))
     samples.append(Sample("WJetsHT150v2Tau",sampleBase,type="B",color=8,fill=True, \
@@ -129,6 +142,15 @@ pads = [ ]
 allobjects = [ ]
 definedPalette = False
 for varname in variables:
+
+    showCanvas = False if selectedCanvasNames else True
+    for cnvname in selectedCanvasNames:
+        if fnmatch(varname,cnvname):
+            showCanvas = True
+            break
+    if not showCanvas:
+        continue
+
     variable, histograms = variables[varname]
 
 
