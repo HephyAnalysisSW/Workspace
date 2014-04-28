@@ -61,51 +61,35 @@ class SR12_MTcentral_Plots_HardMu(PlotsBase):
             self.addVariable("softMuEta"+sign,60,0.,3.,'u')
             self.addVariable("jetmuDeltaEta"+sign,50,0.,10.,'l')
             self.addVariable("jetmuDeltaR"+sign,50,0.,10.,'l')
-            self.addVariable("htmetIndex"+sign,6,-112.5,37.5,'b')
+            self.addVariable("htmetIndex"+sign,4,-100,0,'b')
             self.addVariable("ht"+sign,24,0.,600.,'b')
             self.addVariable("count"+sign,1,-0.5,1.5,'b')
-            self.addVariablePair("muabsiso",50,0.,10.,"htmet",6,-112.5,37.5,suffix=sign)
-            self.addVariablePair("mudxy",50,0.,0.2,"htmet",6,-112.5,37.5,suffix=sign)
-            self.addVariablePair("mudz",50,0.,0.5,"htmet",6,-112.5,37.5,suffix=sign)
-            self.addVariablePair("mupix",5,0.,5.,"htmet",6,-112.5,37.5,suffix=sign)
-            self.addVariablePair("isrJetPt",50,0.,1000.,"htmet",6,-112.5,37.5,suffix=sign)
-            self.addVariablePair("isrJetEta",25,0.,5.,"htmet",6,-112.5,37.5,suffix=sign)
-            self.addVariablePair("njet60",10,-0.5,9.5,"htmet",6,-112.5,37.5,suffix=sign)
-            self.addVariablePair("njet",20,-0.5,19.5,"htmet",6,-112.5,37.5,suffix=sign)
-            self.addVariablePair("softMuPt",50,0.,25.,"htmet",6,-112.5,37.5,suffix=sign)
-            self.addVariablePair("softMuEta",30,0.,3.,"htmet",6,-112.5,37.5,suffix=sign)
-            self.addVariablePair("jetmuDeltaEta",25,0.,10.,"htmet",6,-112.5,37.5,suffix=sign)
-            self.addVariablePair("jetmuDeltaR",25,0.,10.,"htmet",6,-112.5,37.5,suffix=sign)
-            self.addVariablePair("softEle",10,0.,10.,"htmet",6,-112.5,37.5,suffix=sign)
-            self.addVariablePair("softTau",10,0.,10.,"htmet",6,-112.5,37.5,suffix=sign)
-            self.addVariablePair("softB",10,0.,10.,"htmet",6,-112.5,37.5,suffix=sign)
-            self.addVariablePair("softMuIsGlob",2,0.,2.,"htmet",6,-112.5,37.5,suffix=sign)
-            self.addVariablePair("softMuIsTk",2,0.,2.,"htmet",6,-112.5,37.5,suffix=sign)
-            self.addVariablePair("softMuNValMu",10,0.,10.,"htmet",6,-112.5,37.5,suffix=sign)
-            self.addVariablePair("softMuNormChi2",10,0.,20.,"htmet",6,-112.5,37.5,suffix=sign)
-            self.addVariablePair("softMuNMatched",20,0.,20.,"htmet",6,-112.5,37.5,suffix=sign)
-            self.addVariablePair("softMuNTkLayer",20,0.,20.,"htmet",6,-112.5,37.5,suffix=sign)
+            self.addVariablePair("muabsiso",50,0.,10.,"htmet",4,-100,0,suffix=sign)
+            self.addVariablePair("mudxy",50,0.,0.2,"htmet",4,-100,0,suffix=sign)
+            self.addVariablePair("mudz",50,0.,0.5,"htmet",4,-100,0,suffix=sign)
+            self.addVariablePair("mupix",5,0.,5.,"htmet",4,-100,0,suffix=sign)
+            self.addVariablePair("isrJetPt",50,0.,1000.,"htmet",4,-100,0,suffix=sign)
+            self.addVariablePair("isrJetEta",25,0.,5.,"htmet",4,-100,0,suffix=sign)
+            self.addVariablePair("njet60",10,-0.5,9.5,"htmet",4,-100,0,suffix=sign)
+            self.addVariablePair("njet",20,-0.5,19.5,"htmet",4,-100,0,suffix=sign)
+            self.addVariablePair("softMuPt",50,0.,25.,"htmet",4,-100,0,suffix=sign)
+            self.addVariablePair("softMuEta",30,0.,3.,"htmet",4,-100,0,suffix=sign)
+            self.addVariablePair("jetmuDeltaEta",25,0.,10.,"htmet",4,-100,0,suffix=sign)
+            self.addVariablePair("jetmuDeltaR",25,0.,10.,"htmet",4,-100,0,suffix=sign)
+            self.addVariablePair("softEle",10,0.,10.,"htmet",4,-100,0,suffix=sign)
+            self.addVariablePair("softTau",10,0.,10.,"htmet",4,-100,0,suffix=sign)
+            self.addVariablePair("softB",10,0.,10.,"htmet",4,-100,0,suffix=sign)
+            self.addVariablePair("softMuIsGlob",2,0.,2.,"htmet",4,-100,0,suffix=sign)
+            self.addVariablePair("softMuIsTk",2,0.,2.,"htmet",4,-100,0,suffix=sign)
+            self.addVariablePair("softMuNValMu",10,0.,10.,"htmet",4,-100,0,suffix=sign)
+            self.addVariablePair("softMuNormChi2",10,0.,20.,"htmet",4,-100,0,suffix=sign)
+            self.addVariablePair("softMuNMatched",20,0.,20.,"htmet",4,-100,0,suffix=sign)
+            self.addVariablePair("softMuNTkLayer",20,0.,20.,"htmet",4,-100,0,suffix=sign)
 
 
         self.addVariablePair("met",40,0.,1000.,"ht",40,0.,1000.)
 
         curdir.cd()
-
-    def fillOne1D(self,name,pdg,value,weight):
-        fullname = name
-        if pdg>0:
-            fullname += "Minus"
-        else:
-            fullname += "Plus"
-        self.histogramList[fullname].Fill(value,weight)
-
-    def fillOne2D(self,name,pdg,xvalue,yvalue,weight):
-        fullname = name + "_"
-        if pdg>0:
-            fullname += "Minus"
-        else:
-            fullname += "Plus"
-        self.histogramList[fullname].Fill(xvalue,yvalue,weight)
 
     def fill(self,eh,downscale=1):
 
@@ -118,14 +102,17 @@ class SR12_MTcentral_Plots_HardMu(PlotsBase):
         softMuPt = eh.get("muPt")[imu]
         if math.isnan(softMuPt) or math.isnan(isrJetPt):
             return
-#        if softMuPt<30:
-#            return
+        if softMuPt<30:
+            return
 
 #        if isrJetPt<350:
 #            return
 
 
         njet = int(eh.get("njetCount")+0.5)
+#        if njet>3:
+#            return
+
         jetPts = eh.get("jetPt")
         jetEtas = eh.get("jetEta")
         jetBtags = eh.get("jetBtag")
@@ -141,8 +128,8 @@ class SR12_MTcentral_Plots_HardMu(PlotsBase):
 #        softMuPhi = eh.get("softIsolatedMuPhi")
         softMuPhi = eh.get("muPhi")[imu]
         met = eh.get("type1phiMet")
-#        if met<300:
-#            return
+        if met<300:
+            return
         metphi = eh.get("type1phiMetphi")
         mt = math.sqrt(2*met*softMuPt*(1-math.cos(metphi-softMuPhi)))
 #        mt = eh.get("softIsolatedMT")
@@ -154,8 +141,10 @@ class SR12_MTcentral_Plots_HardMu(PlotsBase):
 #            if jetPts[i]>30:
 #                ht += jetPts[i]
         ht = eh.get("ht")
+        if ht<400:
+            return
 
-        ihtmet = 25
+        ihtmet = -25
         while True:
             metcut = 300 + ihtmet
             htcut = 400 + ihtmet
@@ -180,9 +169,6 @@ class SR12_MTcentral_Plots_HardMu(PlotsBase):
         
 #        pdg = eh.get("softIsolatedMuPdg")
         pdg = eh.get("muPdg")[imu]
-        if ihtmet>=0 and pdg>0 and self.name=="data":
-            print "Selected ",self.name,": ",ht,met,ihtmet,softMuPt,mt,eh.get("run"),eh.get("lumi"),eh.get("event"),w
-
 
         if met>300 and ht>400:
             if pdg>0:
@@ -191,64 +177,64 @@ class SR12_MTcentral_Plots_HardMu(PlotsBase):
                 self.hcountPlus.Fill(0.,w)
 
         self.hht_vs_met.Fill(met,ht,w)
-        self.fillOne1D("htmetIndex",pdg,ihtmet,w)
+        self.fill1DBySign("htmetIndex",pdg,ihtmet,w)
 
         if ihtmet<-100:
             return
 
-        self.fillOne1D("ht",pdg,ht,w)
-        self.fillOne1D("met",pdg,met,w)
+        self.fill1DBySign("ht",pdg,ht,w)
+        self.fill1DBySign("met",pdg,met,w)
 
-        self.fillOne1D("mt",pdg,mt,w)
+        self.fill1DBySign("mt",pdg,mt,w)
         
-        self.fillOne1D("isrJetPt",pdg,isrJetPt,w)
-        self.fillOne2D("htmet_vs_isrJetPt",pdg,isrJetPt,ihtmet,w)
-        self.fillOne1D("isrJetEta",pdg,abs(eh.get("isrJetEta")),w)
-        self.fillOne2D("htmet_vs_isrJetEta",pdg,abs(eh.get("isrJetEta")),ihtmet,w)
+        self.fill1DBySign("isrJetPt",pdg,isrJetPt,w)
+        self.fill2DBySign("htmet_vs_isrJetPt",pdg,isrJetPt,ihtmet,w)
+        self.fill1DBySign("isrJetEta",pdg,abs(eh.get("isrJetEta")),w)
+        self.fill2DBySign("htmet_vs_isrJetEta",pdg,abs(eh.get("isrJetEta")),ihtmet,w)
 
 #        softMuIso = eh.get("softIsolatedMuRelIso")
         softMuIso = eh.get("muRelIso")[imu]
-        self.fillOne2D("htmet_vs_muabsiso",pdg,softMuIso*softMuPt,ihtmet,w)
+        self.fill2DBySign("htmet_vs_muabsiso",pdg,softMuIso*softMuPt,ihtmet,w)
 
 #        softMuDxy = eh.get("softIsolatedMuDxy")
         softMuDxy = eh.get("muDxy")[imu]
-        self.fillOne2D("htmet_vs_mudxy",pdg,softMuDxy,ihtmet,w)
+        self.fill2DBySign("htmet_vs_mudxy",pdg,softMuDxy,ihtmet,w)
 
 #        softMuDz = eh.get("softIsolatedMuDz")
         softMuDz = eh.get("muDz")[imu]
-        self.fillOne2D("htmet_vs_mudz",pdg,softMuDz,ihtmet,w)
+        self.fill2DBySign("htmet_vs_mudz",pdg,softMuDz,ihtmet,w)
 
 #        softMuPix = eh.get("softIsolatedMuPixelHits")
         softMuPix = eh.get("muPixelHits")[imu]
-        self.fillOne2D("htmet_vs_mupix",pdg,softMuPix,ihtmet,w)
+        self.fill2DBySign("htmet_vs_mupix",pdg,softMuPix,ihtmet,w)
 
 #        softMuIsGlob = eh.get("softIsolatedMuIsGlobal")
         softMuIsGlob = eh.get("muIsGlobal")[imu]
-        self.fillOne2D("htmet_vs_softMuIsGlob",pdg,softMuIsGlob,ihtmet,w)
+        self.fill2DBySign("htmet_vs_softMuIsGlob",pdg,softMuIsGlob,ihtmet,w)
 
 #        softMuIsTk = eh.get("softIsolatedMuIsTracker")
         softMuIsTk = eh.get("muIsTracker")[imu]
-        self.fillOne2D("htmet_vs_softMuIsTk",pdg,softMuIsTk,ihtmet,w)
+        self.fill2DBySign("htmet_vs_softMuIsTk",pdg,softMuIsTk,ihtmet,w)
 
 #        softMuNValMu = eh.get("softIsolatedMuNValMuonHits")
         softMuNValMu = eh.get("muNValMuonHits")[imu]
-        self.fillOne2D("htmet_vs_softMuNValMu",pdg,softMuNValMu,ihtmet,w)
+        self.fill2DBySign("htmet_vs_softMuNValMu",pdg,softMuNValMu,ihtmet,w)
 
 #        softMuNormChi2 = eh.get("softIsolatedMuNormChi2")
         softMuNormChi2 = eh.get("muNormChi2")[imu]
-        self.fillOne2D("htmet_vs_softMuNormChi2",pdg,softMuNormChi2,ihtmet,w)
+        self.fill2DBySign("htmet_vs_softMuNormChi2",pdg,softMuNormChi2,ihtmet,w)
 
 #        softMuNMatched = eh.get("softIsolatedMuNumMatchedStations")
         softMuNMatched = eh.get("muNumMatchedStations")[imu]
-        self.fillOne2D("htmet_vs_softMuNMatched",pdg,softMuNMatched,ihtmet,w)
+        self.fill2DBySign("htmet_vs_softMuNMatched",pdg,softMuNMatched,ihtmet,w)
 
 #        softMuNTkLayer = eh.get("softIsolatedMuNumtrackerLayerWithMeasurement")
         softMuNTkLayer = eh.get("muNumtrackerLayerWithMeasurement")[imu]
-        self.fillOne2D("htmet_vs_softMuNTkLayer",pdg,softMuNTkLayer,ihtmet,w)
+        self.fill2DBySign("htmet_vs_softMuNTkLayer",pdg,softMuNTkLayer,ihtmet,w)
 
-        self.fillOne2D("htmet_vs_softEle",pdg,eh.get("nSoftElectrons"),ihtmet,w)
-        self.fillOne2D("htmet_vs_softTau",pdg,eh.get("nSoftTaus"),ihtmet,w)
-        self.fillOne2D("htmet_vs_softB",pdg,eh.get("nSoftbtags"),ihtmet,w)
+        self.fill2DBySign("htmet_vs_softEle",pdg,eh.get("nSoftElectrons"),ihtmet,w)
+        self.fill2DBySign("htmet_vs_softTau",pdg,eh.get("nSoftTaus"),ihtmet,w)
+        self.fill2DBySign("htmet_vs_softB",pdg,eh.get("nSoftbtags"),ihtmet,w)
 
         jetPtRatio = 0.
         jet2Pt = 0.
@@ -259,28 +245,28 @@ class SR12_MTcentral_Plots_HardMu(PlotsBase):
             jet2Pt = jetPts[1]
 #            jetEtas = eh.get("jetEta")
             jet2Eta = jetEtas[1]
-        self.fillOne1D("jetPtRatio",pdg,jetPtRatio,w)
-        self.fillOne1D("jet2Pt",pdg,jet2Pt,w)
-        self.fillOne1D("jet2Eta",pdg,jet2Eta,w)
+        self.fill1DBySign("jetPtRatio",pdg,jetPtRatio,w)
+        self.fill1DBySign("jet2Pt",pdg,jet2Pt,w)
+        self.fill1DBySign("jet2Eta",pdg,jet2Eta,w)
 
-        self.fillOne1D("njet60",pdg,eh.get("njet60"),w)
-        self.fillOne2D("htmet_vs_njet60",pdg,eh.get("njet60"),ihtmet,w)
-        self.fillOne1D("njet",pdg,eh.get("njetCount"),w)
-        self.fillOne2D("htmet_vs_njet",pdg,eh.get("njetCount"),ihtmet,w)
+        self.fill1DBySign("njet60",pdg,eh.get("njet60"),w)
+        self.fill2DBySign("htmet_vs_njet60",pdg,eh.get("njet60"),ihtmet,w)
+        self.fill1DBySign("njet",pdg,eh.get("njetCount"),w)
+        self.fill2DBySign("htmet_vs_njet",pdg,eh.get("njetCount"),ihtmet,w)
 
 
 #        softMuEta = eh.get("softIsolatedMuEta")
         softMuEta = eh.get("muEta")[imu]
-        self.fillOne1D("softMuPt",pdg,softMuPt,w)
-        self.fillOne2D("htmet_vs_softMuPt",pdg,softMuPt,ihtmet,w)
-        self.fillOne1D("softMuEta",pdg,abs(softMuEta),w)
-        self.fillOne2D("htmet_vs_softMuEta",pdg,abs(softMuEta),ihtmet,w)
+        self.fill1DBySign("softMuPt",pdg,softMuPt,w)
+        self.fill2DBySign("htmet_vs_softMuPt",pdg,softMuPt,ihtmet,w)
+        self.fill1DBySign("softMuEta",pdg,abs(softMuEta),w)
+        self.fill2DBySign("htmet_vs_softMuEta",pdg,abs(softMuEta),ihtmet,w)
            
         jetPhis = eh.get("jetPhi")
-        self.fillOne1D("jetmuDeltaEta",pdg,abs(jetEtas[0]-softMuEta),w)
-        self.fillOne2D("htmet_vs_jetmuDeltaEta",pdg,abs(jetEtas[0]-softMuEta),ihtmet,w)
-        self.fillOne1D("jetmuDeltaR",pdg,deltaR(jetPhis[0],jetEtas[0],softMuPhi,softMuEta),w)
-        self.fillOne2D("htmet_vs_jetmuDeltaR",pdg,deltaR(jetPhis[0],jetEtas[0],softMuPhi,softMuEta),ihtmet,w)
+        self.fill1DBySign("jetmuDeltaEta",pdg,abs(jetEtas[0]-softMuEta),w)
+        self.fill2DBySign("htmet_vs_jetmuDeltaEta",pdg,abs(jetEtas[0]-softMuEta),ihtmet,w)
+        self.fill1DBySign("jetmuDeltaR",pdg,deltaR(jetPhis[0],jetEtas[0],softMuPhi,softMuEta),w)
+        self.fill2DBySign("htmet_vs_jetmuDeltaR",pdg,deltaR(jetPhis[0],jetEtas[0],softMuPhi,softMuEta),ihtmet,w)
 
     def showTimers(self):
         line = ""
