@@ -12,17 +12,30 @@ class MyTimer:
         self.entries = 0
         self.sum = 0.
 
-    def start(self):
-        self.active = True
+    def resume(self):
+        assert self.active and self.paused
+        self.paused = False
         self.start_ = time.clock()
 
-    def stop(self):
+    def start(self,paused=False):
+        assert not self.active
+        self.active = True
+        self.paused = True
+        if not self.paused:
+            self.resume()
+
+    def pause(self):
         self.stop_ = time.clock()
-        assert self.active
-        self.entries += 1
+        assert self.active and not self.paused
         self.sum += self.stop_ - self.start_
         self.start_ = 0.
         self.stop_ = 0.
+        self.paused = True
+
+    def stop(self):
+        if not self.paused:
+            self.pause()
+        self.entries += 1
         self.active = False
 
     def meanTime(self):
@@ -160,9 +173,11 @@ class PlotsBase:
                     iterator = self.createGenerator(elist.GetN())
             self.timers[6].start()
             eh = EventHelper(tree)
+            self.timers[6].stop()
 #        for iev in range(tree.GetEntries()):
             nall = 0
             nsel = 0
+            self.timers[7].start(paused=True)
             for iev in iterator:
 #            for iev in sample.getentries(tree):
 #            if sample.downscale==1 or (iev%sample.downscale)==0:
@@ -172,14 +187,16 @@ class PlotsBase:
                 if self.readElist or ( \
                     ( self.preselection==None or self.preselection.accept(eh,sample) ) and \
                     ( sample.filter==None or sample.filter.accept(eh) ) ):
+                    self.timers[7].resume()
                     self.fill(eh,sample.downscale)
+                    self.timers[7].pause()
                     if self.writeElist:
                         elist.Enter(iev)
                     nsel += 1
 #            print "Ntot for ",sample.name,sample.names[itree]," = ",nall,nsel
 #        for ev in tree:
 #            self.fill(ev)
-            self.timers[6].stop()
+            self.timers[7].stop()
             if self.writeElist:
                 elist.Write()
             if self.writeElist or self.readElist:
