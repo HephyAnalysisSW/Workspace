@@ -4,8 +4,9 @@ class LeptonFilter:
     self.leptonPdg = abs(leptonPdg)
 
   def accept(self,eh):
+    ngp = int(eh.get("ngp"))
     pdgs = eh.get("gpPdg")
-    for pdg in pdgs:
+    for pdg in pdgs[:ngp]:
       if abs(pdg)==self.leptonPdg:
         return True
     return False
