@@ -1,3 +1,4 @@
+#!/bin/env python
 import os, sys
 
 from optparse import OptionParser
@@ -42,7 +43,6 @@ for s in subDirs:
   if not l: continue
   finishedJobs[s] = int(l[:-1].split()[-1])
 
-print totNJobs, finishedJobs, dataset
 tot=0 
 done=0
 for k in sorted(totNJobs.keys()):
