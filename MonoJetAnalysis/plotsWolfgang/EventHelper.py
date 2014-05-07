@@ -89,7 +89,7 @@ class EventHelper:
         if refs[4]<0:
             refs[0].GetEntry(self.entry)
             refs[4] = refs[1].GetLen()
-            assert len(refs[2])>=refs[4] and refs[4]>0
+            assert len(refs[2])>=refs[4] # and refs[4]>0
         # for arrays: return only the first part according to the leaf length
         if refs[3]:
             return refs[2][:refs[4]]
