@@ -17,7 +17,7 @@ parser.add_option("-s", dest="save",  help="directory for saved plots", default=
 parser.add_option("-b", dest="batch",  help="batch mode", action="store_true", default=False)
 parser.add_option("--fomByBin", dest="fomByBin",  help="calculate fom by bin", action="store_true", default=False)
 parser.add_option("--rebin", dest="rebin",  help="rebin factor", type=int, default=1)
-parser.add_option("--singleMu", dest="singleMu", help="use single mu dataset", action="store_true", default=False)
+parser.add_option("--dset", dest="dset", help="dataset", choices=[ "met", "singleMu", "diMu" ], default="met" )
 parser.add_option("--data", dest="data", help="show data", action="store_true", default=False)
 parser.add_option("--canvasNames",dest="canvasNames",help="(comma-separated list) of canvases to show",default=None)
 (options, args) = parser.parse_args()
@@ -51,14 +51,16 @@ if options.preselection!=None:
     setattr(presel,"sourcefile",options.preselection)
 
 sampleBase = "/home/adamwo/data/monoJetTuples_v6/"
-if options.singleMu:
+if options.dset=="singleMu":
+    sampleBase += "copyMu/"
+elif options.dset=="diMu":
     sampleBase += "copyMu/"
 else:
     sampleBase += "copy/"
 
 
 samples = []
-if options.singleMu:
+if options.dset=="singleMu":
     samples.append(Sample("QCD",sampleBase,type="B",color=7,fill=True, \
                               namelist=[ "QCD20to600", "QCD600to1000", "QCD1000" ]))
     samples.append(Sample("WW",sampleBase,type="B",color=6,fill=True))
@@ -69,6 +71,16 @@ if options.singleMu:
     samples.append(Sample("stop300lsp270FastSim",sampleBase,type="S",color=4,fill=False))
     samples.append(Sample("stop300lsp240g150FastSim",sampleBase,type="S",color=2,fill=False))
     samples.append(Sample("data",sampleBase,type="D",color=1,fill=False, \
+                              namelist=[ 'data_singleMu_Run2012AB', 'data_singleMu_Run2012C', 'data_singleMu_Run2012D' ]))
+elif options.dset=="diMu":
+    samples.append(Sample("WW",sampleBase,type="B",color=6,fill=True))
+    samples.append(Sample("DY",sampleBase,type="B",color=3,fill=True))
+    samples.append(Sample("singleTop",sampleBase,type="B",color=4,fill=True))
+    samples.append(Sample("TTJetsPowHeg",sampleBase,type="B",color=2,fill=True))
+    samples.append(Sample("WJetsHT150v2",sampleBase,type="B",color=5,fill=True))
+    samples.append(Sample("stop300lsp270FastSim",sampleBase,type="S",color=4,fill=False))
+    samples.append(Sample("stop300lsp240g150FastSim",sampleBase,type="S",color=2,fill=False))
+    samples.append(Sample("data","/home/adamwo/data/monoJetTuples_v5/copyDiMu/",type="D",color=1,fill=False, \
                               namelist=[ 'data_singleMu_Run2012AB', 'data_singleMu_Run2012C', 'data_singleMu_Run2012D' ]))
 else:
     samples.append(Sample("QCD",sampleBase,type="B",color=7,fill=True, \
@@ -137,6 +149,14 @@ ROOT.gROOT.cd()
 ROOT.gStyle.SetOptStat(0)
 ROOT.gStyle.SetOptTitle(0)
 
+if options.save:
+    savedir = "".join(s for s in options.save if s in string.letters+string.digits+"_-")
+    savedir = "plots_"+savedir+"/"
+    if not os.path.isdir(savedir):
+        os.mkdir(savedir)
+    else:
+        os.system("rm "+savedir+"*.png")
+        os.system("rm "+savedir+"*.root")
 canvases = [ ]
 pads = [ ]
 allobjects = [ ]
@@ -156,7 +176,8 @@ for varname in variables:
 
 #    cnv = ROOT.TCanvas(bkgs.GetName(),bkgs.GetName(),700,700)
     cnv = ROOT.TCanvas("cnv","cnv",700,700)
-    canvases.append(cnv)
+    if not options.batch:
+        canvases.append(cnv)
 
 #    drawClass = DrawWithFOM(fom=options.fom)
 
@@ -179,14 +200,15 @@ for varname in variables:
             p2 = ROOT.TPad("p2","", 0, 0, 1, 0.3)
             p2.SetTopMargin(1e-7)
             p2.Draw()
-
-            pads.append(p1)
-            pads.append(p2)
+            if not options.batch:
+                pads.append(p1)
+                pads.append(p2)
         else:
             p1 = ROOT.TPad("p1","", 0, 0., 1, 0.95)
             p1.SetTopMargin(1e-7)
             p1.Draw()
-            pads.append(p1)
+            if not options.batch:
+                pads.append(p1)
 
         data, bkgs, sigs, legend = drawClass.drawStack1D(samples,histograms,p1)
         if variable.uselog:
@@ -194,14 +216,15 @@ for varname in variables:
 
     cnv.SetName(bkgs.GetName())
     cnv.SetTitle(bkgs.GetName())
-    if data!=None:
-        allobjects.append(data)
-    if bkgs!=None:
-        allobjects.append(bkgs)
-    if legend!=None:
-        allobjects.append(legend)
-    if len(sigs)>0:
-        allobjects.extend(sigs)
+    if not options.batch:
+        if data!=None:
+            allobjects.append(data)
+        if bkgs!=None:
+            allobjects.append(bkgs)
+        if legend!=None:
+            allobjects.append(legend)
+        if len(sigs)>0:
+            allobjects.extend(sigs)
     if not variable.is2D() and bkgs!=None and options.fom!=None:
 #        drawClass.drawSoB(bkgs,sigs,variable.scut,pad=p2)
         if data!=None and options.fom=="dataovermc":
@@ -209,18 +232,21 @@ for varname in variables:
         elif variable.scut!=None:
             drawClass.drawFom(bkgs,sigs,variable.scut,pad=p2)
     cnv.Update()
+    if options.save:
+        cnv.SaveAs(savedir+cnv.GetName()+".png")
+        cnv.SaveAs(savedir+cnv.GetName()+".root")
 
 if not options.batch:
     raw_input("Press enter")
-if options.save:
-    savedir = "".join(s for s in options.save if s in string.letters+string.digits+"_-")
-    savedir = "plots_"+savedir+"/"
-    if not os.path.isdir(savedir):
-        os.mkdir(savedir)
-    else:
-        os.system("rm "+savedir+"*.png")
-        os.system("rm "+savedir+"*.root")
-    for c in canvases:
-        c.SaveAs(savedir+c.GetName()+".png")
-        c.SaveAs(savedir+c.GetName()+".root")
+#if options.save:
+#    savedir = "".join(s for s in options.save if s in string.letters+string.digits+"_-")
+#    savedir = "plots_"+savedir+"/"
+#    if not os.path.isdir(savedir):
+#        os.mkdir(savedir)
+#    else:
+#        os.system("rm "+savedir+"*.png")
+#        os.system("rm "+savedir+"*.root")
+#    for c in canvases:
+#        c.SaveAs(savedir+c.GetName()+".png")
+#        c.SaveAs(savedir+c.GetName()+".root")
 print "continuing"
