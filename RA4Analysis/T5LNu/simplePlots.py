@@ -19,7 +19,7 @@ targetLumi = 19700.
 from defaultConvertedTuples import * 
 
 wjetsSample = wJetsHT150v2 
-allSamples = [dy, ttJetsPowHeg, wjetsSample, singleTop, vv, qcd]
+allSamples = [data, dy, ttJetsPowHeg, wjetsSample, singleTop, vv, qcd]
 
 allVars=[]
 allStacks=[]
@@ -28,14 +28,14 @@ allStacks=[]
 minimum=10**(-2.5)
 
 chmode = "copy"
-presel = "refSel"
+presel = "refSelNoNJet"
 ver = "v5"
-region = "signal"
+region = "signal23j"
 preprefix = region+"_"+ver
 if region == "preSel":
   #isrjet>350, met>250, mT<70
   additionalCut = "(1)"
-  addData = False
+  addData = True
   addSignals = True
   normalizeToData = False
   normalizeSignalToMCSum = False
@@ -49,7 +49,7 @@ if region == "signal":
 if region == "signal34jht500-750":
   #isrjet>350, met>250, mT<70
   additionalCut = "(ht>400&&ht<600&&type1phiMet>350&&njets>=3&&njets<=4)"
-  addData = False
+  addData = True
   addSignals = True
   normalizeToData = False
   normalizeSignalToMCSum = False
@@ -63,14 +63,28 @@ if region == "signal5jht400-750":
 if region == "signal2j":
   #isrjet>350, met>250, mT<70
   additionalCut = "(ht>750&&type1phiMet>350&&njets==2)"
-  addData = False 
+  addData = True 
+  addSignals = True
+  normalizeToData = False
+  normalizeSignalToMCSum = False
+if region == "signal23j":
+  #isrjet>350, met>250, mT<70
+  additionalCut = "(ht>750&&type1phiMet>350&&njets>=2&&njets<=3)"
+  addData = True 
+  addSignals = True
+  normalizeToData = False
+  normalizeSignalToMCSum = False
+if region == "refSel2j":
+  #isrjet>350, met>250, mT<70
+  additionalCut = "(njets==2)"
+  addData = True 
   addSignals = True
   normalizeToData = False
   normalizeSignalToMCSum = False
 if region == "signal3j":
   #isrjet>350, met>250, mT<70
   additionalCut = "(ht>750&&type1phiMet>350&&njets==3)"
-  addData = False
+  addData = True
   addSignals = True
   normalizeToData = False
   normalizeSignalToMCSum = False
@@ -242,10 +256,10 @@ def getStack(varstring, binning, cutstring, signals, varfunc = "", addData=True,
   return res
 
 def cosDeltaPhiLepW(chain):
-  lPt = getValue(chain, "leptonPt")
-  lPhi = getValue(chain, "leptonPhi")
-  metphi = getValue(chain, "type1phiMetphi")
-  met = getValue(chain, "type1phiMet")
+  lPt = getVarValue(chain, "leptonPt")
+  lPhi = getVarValue(chain, "leptonPhi")
+  metphi = getVarValue(chain, "type1phiMetphi")
+  met = getVarValue(chain, "type1phiMet")
   cosLepPhi = cos(lPhi)
   sinLepPhi = sin(lPhi)
   mpx = met*cos(metphi)
@@ -298,17 +312,29 @@ if doAnalysisVars:
   mT_stack[0].addOverFlowBin = "upper"
   allStacks.append(mT_stack)
 
+  mTCoarse_stack  = getStack(":mT;m_{T} (GeV);Number of Events / 100 GeV",[10,20,1020], commoncf, signals, addData = addData)
+  mTCoarse_stack[0].addOverFlowBin = "upper"
+  allStacks.append(mTCoarse_stack)
+
   met_stack = getStack(":type1phiMet;#slash{E}_{T} (GeV);Number of Events / 50 GeV",[18,150,1050], commoncf, signals, addData = addData)
   met_stack[0].addOverFlowBin = "upper"
   allStacks.append(met_stack)
+
+  metphi_stack = getStack(":type1phiMetphi;#slash{E}_{T} (GeV);Number of Events / 50 GeV",[18,-pi,pi], commoncf, signals, addData = addData)
+  metphi_stack[0].addOverFlowBin = "upper"
+  allStacks.append(metphi_stack)
 
   metNoMET_stack = getStack(":type1phiMet;#slash{E}_{T} (GeV);Number of Events / 50 GeV",[18,150,1050], commoncf.replace('type1phiMet>350&&',''), signals, addData = addData)
   metNoMET_stack[0].addOverFlowBin = "upper"
   allStacks.append(metNoMET_stack)
 
-  njets_stack = getStack(":njets;n_{jet};Number of Events",[10,0,10], commoncf, signals, addData = addData)
+  njets_stack = getStack(":njets;n_{jet};Number of Events",[15,0,15], commoncf, signals, addData = addData)
   njets_stack[0].addOverFlowBin = "upper"
   allStacks.append(njets_stack)
+
+  njetsNoNJet_stack = getStack(":njets;n_{jet};Number of Events",[15,0,15], commoncf.replace('&&njets>=4',''), signals, addData = addData)
+  njetsNoNJet_stack[0].addOverFlowBin = "upper"
+  allStacks.append(njetsNoNJet_stack)
 
   nbtags_stack = getStack(":nbtags;n_{b-tags};Number of Events",[10,0,10], commoncf, signals, addData = addData)
   nbtags_stack[0].addOverFlowBin = "upper"
@@ -318,7 +344,7 @@ if doAnalysisVars:
   ht_stack[0].addOverFlowBin = "upper"
   allStacks.append(ht_stack)
 
-  htNoHT_stack                          = getStack(":ht;H_{T} (GeV);Number of Events / 50 GeV",[31,0,1550 ], commoncf.replace('ht>750&&',''), signals, addData = addData)
+  htNoHT_stack                          = getStack(":ht;H_{T} (GeV);Number of Events / 50 GeV",[31,0,1550 ], commoncf.replace('ht>750&&','').replace('ht>400&&',''), signals, addData = addData)
   htNoHT_stack[0].addOverFlowBin = "upper"
   allStacks.append(htNoHT_stack)
 
@@ -425,9 +451,13 @@ if doAnalysisVars:
 #  htThrustWSideRatio_stack[0].maximum = 6*10**5 *htThrustWSideRatio_stack[0].data_histo.GetMaximum()
 #  drawNMStacks(1,1,[htThrustWSideRatio_stack],             subdir+prefix+"htThrustWSideRatio", False)
   drawNMStacks(1,1,[mT_stack],              subdir+prefix+"mT", False)
+  drawNMStacks(1,1,[mTCoarse_stack],              subdir+prefix+"mTCoarse", False)
+
   drawNMStacks(1,1,[met_stack],             subdir+prefix+"met", False)
+  drawNMStacks(1,1,[metphi_stack],             subdir+prefix+"metphi", False)
   drawNMStacks(1,1,[metNoMET_stack],             subdir+prefix+"metNoMET", False)
   drawNMStacks(1,1,[njets_stack],             subdir+prefix+"njets", False)
+  drawNMStacks(1,1,[njetsNoNJet_stack],             subdir+prefix+"njetsNoNJet", False)
   drawNMStacks(1,1,[nbtags_stack],             subdir+prefix+"nbtags", False)
   drawNMStacks(1,1,[ht_stack],              subdir+prefix+"ht", False)
   drawNMStacks(1,1,[htNoHT_stack],             subdir+prefix+"htNoHT", False)

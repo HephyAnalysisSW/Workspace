@@ -23,7 +23,7 @@ from optparse import OptionParser
 parser = OptionParser()
 parser.add_option("--sample", dest="sample", default="dy53X", type="string", action="store", help="samples:Which samples.")
 parser.add_option("--prefix", dest="prefix", default="", type="string", action="store", help="prefix:Which prefix.")
-parser.add_option("--maps", dest="maps", default='all', type="string", action="store", help="samples:Which samples.")
+parser.add_option("--maps", dest="maps", default='all', type="string", action="store", help="samples:Which maps.")
 parser.add_option("--small", dest="small", action="store_true", help="Just do a small subset.")
 
 (options, args) = parser.parse_args()
@@ -64,12 +64,10 @@ c.SetBranchStatus("candPhi", 1)
 c.SetBranchStatus("candEta", 1)
 c.SetBranchStatus("candId", 1)
 
-occupancy = {}
-energy = {}
 for m in maps:
   k=m['name']
-  m['occupancy'] = ROOT.TH2D('occ_'+k,'occ_'+k,  *(m['binning']))
-  m['energy'] = ROOT.TH2D('en_'+k,'en_'+k,    *(m['binning']))
+  m['occupancy']  = ROOT.TH2D('occ_'+k,'occ_'+k,  *(m['binning']))
+  m['pt']     = ROOT.TH2D('pt_'+k,'pt_'+k,    *(m['binning']))
 
 #for k in pfTypes[1:]:
 for m in maps:
@@ -79,26 +77,27 @@ for m in maps:
   c.Draw('candPhi:candEta>>occ_'+m['name'],cutString,'COLZ')#,"Sum$(candId=="+label(k)+")")
   c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngMetPhi/'+prefix+options.sample+'_occ_'+m['name']+'.png')
   c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngMetPhi/'+prefix+options.sample+'_occ_'+m['name']+'.root')
-  c.Draw('candPhi:candEta>>en_'+m['name'],'cosh(candEta)*candPt*('+cutString+')','COLZ')#,"Sum$(candId=="+label(k)+")")
-  c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngMetPhi/'+prefix+options.sample+'_en_'+m['name']+'.png')
-  c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngMetPhi/'+prefix+options.sample+'_en_'+m['name']+'.root')
+#  c.Draw('candPhi:candEta>>pt_'+m['name'],'candPt*('+cutString+')','COLZ')#,"Sum$(candId=="+label(k)+")")
+#  c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngMetPhi/'+prefix+options.sample+'_pt_'+m['name']+'.png')
+#  c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngMetPhi/'+prefix+options.sample+'_pt_'+m['name']+'.root')
 
-  c.Draw('cosh(candEta)*candPt>>hTMP(200,0,100)','candEta>'+str(m['binning'][1])+'&&candEta<='+str(m['binning'][2])+'&&('+cutString+')')#,"Sum$(candId=="+label(k)+")")
-  c1.SetLogx()
-  c1.SetLogy()
+#  c.Draw('candPt>>hTMP(200,0,100)','candEta>'+str(m['binning'][1])+'&&candEta<='+str(m['binning'][2])+'&&('+cutString+')')#,"Sum$(candId=="+label(k)+")")
+#  c1.SetLogx()
+#  c1.SetLogy()
   
-  for eb in energyBins:
-    name = "en_"+str(eb[0])
-    enCut = "cosh(candEta)*candPt>="+str(eb[0])
-    if eb[1]>0:
-      name+="_"+str(eb[1])
-      enCut += "&&cosh(candEta)*candPt<"+str(eb[1])
+  for ptb in ptBins:
+    name = "pt_"+str(ptb[0])
+#    enCut = "cosh(candEta)*candPt>="+str(eb[0])
+    ptCut = "candPt>="+str(ptb[0])
+    if ptb[1]>0:
+      name+="_"+str(ptb[1])
+      ptCut += "&&candPt<"+str(ptb[1])
     c1 = ROOT.TCanvas()
-    c.Draw('candPhi:candEta>>occ_'+m['name'],cutString+"&&"+enCut,'COLZ')#,"Sum$(candId=="+label(k)+")")
+    c.Draw('candPhi:candEta>>occ_'+m['name'],cutString+"&&"+ptCut,'COLZ')#,"Sum$(candId=="+label(k)+")")
     c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngMetPhi/'+prefix+options.sample+'_occ_'+m['name']+'_'+name+'.png')
     c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngMetPhi/'+prefix+options.sample+'_occ_'+m['name']+'_'+name+'.root')
-    c.Draw('candPhi:candEta>>en_'+m['name'],'cosh(candEta)*candPt*('+cutString+'&&'+enCut+')','COLZ')#,"Sum$(candId=="+label(k)+")")
-    c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngMetPhi/'+prefix+options.sample+'_en_'+m['name']+'_'+name+'.png')
-    c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngMetPhi/'+prefix+options.sample+'_en_'+m['name']+'_'+name+'.root')
+#    c.Draw('candPhi:candEta>>pt_'+m['name'],'candPt*('+cutString+'&&'+ptCut+')','COLZ')#,"Sum$(candId=="+label(k)+")")
+#    c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngMetPhi/'+prefix+options.sample+'_pt_'+m['name']+'_'+name+'.png')
+#    c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngMetPhi/'+prefix+options.sample+'_pt_'+m['name']+'_'+name+'.root')
      
 

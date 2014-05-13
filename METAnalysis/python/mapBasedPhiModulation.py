@@ -22,6 +22,7 @@ ROOT.useNiceColorPalette(255)
 from optparse import OptionParser
 parser = OptionParser()
 parser.add_option("--sample", dest="sample", default="dy53X", type="string", action="store", help="samples:Which samples.")
+parser.add_option("--maxEvents", dest="maxEvents", default=30000, type="int", action="store", help="How many.")
 parser.add_option("--prefix", dest="prefix", default="", type="string", action="store", help="prefix:Which prefix.")
 parser.add_option("--small", dest="small", action="store_true", help="Just do a small subset.")
 
@@ -62,43 +63,52 @@ c.SetBranchStatus("candPhi", 1)
 c.SetBranchStatus("candEta", 1)
 c.SetBranchStatus("candId", 1)
 
-map = h
-eb = energyBins[1]
+map = h_HF_Plus
+#ptb = [3, 10]
+occ={}
+hpt={}
+for ptb in ptBins:
+  eName = str(ptb[0])
+  if ptb[1]>0:
+    eName+='_'+str(ptb[1])
 
-ifile = '/afs/hephy.at/user/s/schoefbeck/www/pngMetPhi/'+options.sample+'_occ_'+map['name']+'_pt_'+str(eb[0])+'_'+str(eb[1])+'.root'
-f = ROOT.TFile(ifile)
-k = f.GetListOfKeys()[0].GetName()
-f.Close()
-canv = getObjFromFile(ifile, k)
-occ = canv.GetPrimitive('occ_'+map['name']).Clone()
+  ifile = '/afs/hephy.at/user/s/schoefbeck/www/pngMetPhi/'+options.sample+'_occ_'+map['name']+'_pt_'+eName+'.root'
+  f = ROOT.TFile(ifile)
+  k = f.GetListOfKeys()[0].GetName()
+  f.Close()
+  canv = getObjFromFile(ifile, k)
+  occ[tuple(ptb)] = canv.GetPrimitive('occ_'+map['name']).Clone('occ_'+eName+'_'+map['name'])
 
-ifile = '/afs/hephy.at/user/s/schoefbeck/www/pngMetPhi/'+options.sample+'_en_'+map['name']+'_pt_'+str(eb[0])+'_'+str(eb[1])+'.root'
-f = ROOT.TFile(ifile)
-k = f.GetListOfKeys()[0].GetName()
-f.Close()
-canv = getObjFromFile(ifile, k)
-en = canv.GetPrimitive('en_'+map['name']).Clone()
-
-a = occ.GetXaxis()
+  ifile = '/afs/hephy.at/user/s/schoefbeck/www/pngMetPhi/'+options.sample+'_pt_'+map['name']+'_pt_'+eName+'.root'
+  f = ROOT.TFile(ifile)
+  k = f.GetListOfKeys()[0].GetName()
+  f.Close()
+  canv = getObjFromFile(ifile, k)
+  hpt[tuple(ptb)] = canv.GetPrimitive('pt_'+map['name']).Clone('pt_'+eName+'_'+map['name'])
+a = hpt[tuple(ptb)].GetXaxis()
 etaBinning = [a.GetNbins(), a.GetXmin(),  a.GetXmax()]
 
 projOcc={}
-projEn={}
-for i in range(1,1+etaBinning[0]):
-  h=occ.ProjectionY('occ_'+str(i),i,i)
-  integr = h.Integral()
-  if integr>0:
-    h.Scale(h.GetNbinsX()/integr)
-  projOcc[i] = h
-  h=en.ProjectionY('en_'+str(i),i,i)
-  integr = h.Integral()
-  if integr>0:
-    h.Scale(h.GetNbinsX()/integr)
-  projEn[i] = h
+projPt={}
+for ptb in ptBins:
+  projOcc[tuple(ptb)]={}
+  projPt[tuple(ptb)]={}
+  for i in range(1,1+etaBinning[0]):
+    h=occ[tuple(ptb)].ProjectionY('occ_'+str(i)+'_from_'+occ[tuple(ptb)].GetName(),i,i)
+    integr = h.Integral()
+    if integr>0:
+      h.Scale(h.GetNbinsX()/integr)
+    projOcc[tuple(ptb)][i] = h
+    h=hpt[tuple(ptb)].ProjectionY('pt_'+str(i)+'_from_'+hpt[tuple(ptb)].GetName(),i,i)
+    integr = h.Integral()
+    if integr>0:
+      h.Scale(h.GetNbinsX()/integr)
+#    print ptb, i, integr, h.GetNbinsX()/integr, h.GetBinContent(6)
+    projPt[tuple(ptb)][i] = h
 
-metPhi = ROOT.TH1F('metPhi','metPhi',30,-pi,pi)
-metPhiCorr = ROOT.TH1F('metPhiCorr','metPhiCorr',30,-pi,pi)
-metPhiCorrPt = ROOT.TH1F('metPhiCorrPt','metPhiCorrPt',30,-pi,pi)
+metPhi = ROOT.TH1F('metPhi','metPhi',18,-pi,pi)
+metPhiCorr = ROOT.TH1F('metPhiCorr','metPhiCorr',18,-pi,pi)
+metPhiCorrPt = ROOT.TH1F('metPhiCorrPt','metPhiCorrPt',18,-pi,pi)
 met = ROOT.TH1F('met','met',100,0,100)
 metCorr = ROOT.TH1F('metCorr','metCorr',100,0,100)
 metCorrPt = ROOT.TH1F('metCorrPt','metCorrPt',100,0,100)
@@ -118,10 +128,11 @@ n = eList.GetN()
 print "cut",cut,"Entries", n
 
 #nEvents = min([1000, n])
-nEvents = min([30000, n])
+nEvents = min([options.maxEvents, n])
 for i in range(nEvents):
   c.GetEntry(eList.GetEntry(i))
   if i%100==0:print "At",i,"/",nEvents
+  print "At",i,"/",nEvents
   mexUncorr = 0.
   meyUncorr = 0.
   mexCorr = 0.
@@ -135,42 +146,53 @@ for i in range(nEvents):
     if label[getVarValue(c, 'candId', j)] == map['type']:
       eta = getVarValue (c, 'candEta', j)
       pt = getVarValue (c, 'candPt', j)
-      en = pt*cosh(eta)
-      if en>=eb[0] and en<eb[1]:
-        if eta>=map['binning'][1] and eta<map['binning'][2]:
-          counter+=1
-          etaBin =  a.FindBin(eta)
-          phi = getVarValue (c, 'candPhi', j)
-          phiBin = projOcc[etaBin].FindBin(phi)
-          resOcc = projOcc[etaBin].GetBinContent(phiBin)
-          weightOcc=1.
-          if resOcc>0:
-            weightOcc=1./resOcc
-          resEn = projEn[etaBin].GetBinContent(phiBin)
-          weightEn=1.
-          if resEn>0:
-            weightEn=1./resEn
-  #        print i,j,weight,'pt',pt,'eta',eta,'phi',phi
-          cp = cos(phi)
-          sp = sin(phi)
-          dmx=cp*pt
-          dmy=sp*pt
-          mexUncorr-=dmx
-          meyUncorr-=dmy
-          mexCorr-=dmx*weightOcc
-          meyCorr-=dmy*weightOcc
-          mexCorrPt-=dmx*weightEn
-          meyCorrPt-=dmy*weightEn
-  if counter>0:
+#      pt = pt*cosh(eta)
+      for ptb_ in ptBins:
+        if pt>ptb_[0] and (pt<ptb_[1] or ptb_[1]<0):
+          ptb=tuple(ptb_)
+          break
+#      if not ptb==(0,0.5):continue
+      if eta>=map['binning'][1] and eta<map['binning'][2]:
+#        counter+=1
+        etaBin =  a.FindBin(eta)
+        phi = getVarValue (c, 'candPhi', j)
+        phiBin = projOcc[ptb][etaBin].FindBin(phi)
+        resOcc = projOcc[ptb][etaBin].GetBinContent(phiBin)
+        weightOcc=1.
+        if resOcc>0:
+          weightOcc=1./resOcc
+        phiBin = projPt[ptb][etaBin].FindBin(phi)
+        resPt = projPt[ptb][etaBin].GetBinContent(phiBin)
+        weightPt=1.
+        if resPt>0:
+          weightPt=1./resPt
+#        print i,j,weight,'pt',pt,'eta',eta,'phi',phi
+        cp = cos(phi)
+        sp = sin(phi)
+        dmx=cp*pt
+        dmy=sp*pt
+        mexUncorr-=dmx
+        meyUncorr-=dmy
+        mexCorr-=dmx*weightOcc
+        meyCorr-=dmy*weightOcc
+        mexCorrPt-=dmx*weightPt
+        meyCorrPt-=dmy*weightPt
+        counter+=1
+#        print counter, label[getVarValue(c, 'candId', j)],'bins',ptb,etaBin,phiBin,'kin',pt,eta,phi,'resPt',resPt,'weightPt',weightPt
+  print map['name'],mexUncorr, meyUncorr, sqrt(mexUncorr**2+meyUncorr**2), mexCorrPt,meyCorrPt,sqrt(mexCorrPt**2+meyCorrPt**2)
+  if True:#counter>0:
     metPhi.Fill(atan2(meyUncorr, mexUncorr))
     metPhiCorr.Fill(atan2(meyCorr, mexCorr))
     metPhiCorrPt.Fill(atan2(meyCorrPt, mexCorrPt))
+
     met.Fill(sqrt(mexUncorr**2+meyUncorr**2))
     metCorr.Fill(sqrt(mexCorr**2+meyCorr**2))
     metCorrPt.Fill(sqrt(mexCorrPt**2+meyCorrPt**2))
+
     metx.Fill(mexUncorr)
     metxCorr.Fill(mexCorr)
     metxCorrPt.Fill(mexCorrPt)
+
     mety.Fill(meyUncorr)
     metyCorr.Fill(meyCorr)
     metyCorrPt.Fill(meyCorrPt)
@@ -182,7 +204,7 @@ metPhiCorr.SetLineColor(ROOT.kRed)
 metPhiCorr.Draw('same')
 metPhiCorrPt.SetLineColor(ROOT.kGreen)
 metPhiCorrPt.Draw('same')
-c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngMetPhi/'+prefix+'metPhi_comparison_'+options.sample+'_'+map['name']+'_pt_'+str(eb[0])+'_'+str(eb[1])+'.png')
+c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngMetPhi/'+prefix+'metPhi_comparison_'+options.sample+'_'+map['name']+'.png')
 
 c1 = ROOT.TCanvas()
 met.SetLineColor(ROOT.kBlue)
@@ -191,7 +213,7 @@ metCorr.SetLineColor(ROOT.kRed)
 metCorr.Draw('same')
 metCorrPt.SetLineColor(ROOT.kGreen)
 metCorrPt.Draw('same')
-c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngMetPhi/'+prefix+'met_comparison_'+options.sample+'_'+map['name']+'_pt_'+str(eb[0])+'_'+str(eb[1])+'.png')
+c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngMetPhi/'+prefix+'met_comparison_'+options.sample+'_'+map['name']+'.png')
 
 c1 = ROOT.TCanvas()
 metx.SetLineColor(ROOT.kBlue)
@@ -200,12 +222,14 @@ metxCorr.SetLineColor(ROOT.kRed)
 metxCorr.Draw('same')
 metxCorrPt.SetLineColor(ROOT.kGreen)
 metxCorrPt.Draw('same')
-c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngMetPhi/'+prefix+'metx_comparison_'+options.sample+'_'+map['name']+'_pt_'+str(eb[0])+'_'+str(eb[1])+'.png')
+c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngMetPhi/'+prefix+'metx_comparison_'+options.sample+'_'+map['name']+'.png')
 
 c1 = ROOT.TCanvas()
 mety.SetLineColor(ROOT.kBlue)
 mety.Draw()
+metyCorr.SetLineColor(ROOT.kRed)
+metyCorr.Draw('same')
 metyCorrPt.SetLineColor(ROOT.kGreen)
 metyCorrPt.Draw('same')
-c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngMetPhi/'+prefix+'mety_comparison_'+options.sample+'_'+map['name']+'_pt_'+str(eb[0])+'_'+str(eb[1])+'.png')
+c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngMetPhi/'+prefix+'mety_comparison_'+options.sample+'_'+map['name']+'.png')
 

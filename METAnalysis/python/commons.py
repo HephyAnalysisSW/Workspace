@@ -1,8 +1,12 @@
 from math import pi
-energyBins = [[0,0.5],[0.5,1], [1,2],[2,3], [3,10], [10,-999]]
+#energyBins = [[0,0.5],[0.5,1], [1,2],[2,3], [3,10], [10,-999]]
+ptBins = [[0,0.5],[0.5,1], [1,2],[2,3], [3,10], [10,20], [20,-999]]
+#energyBins = {\
+#        'h': [[0,0.5],[0.5,1], [1,2],[2,3], [3,10], [10,-999]],
+#        'h0Barrel':[[0,0.5],[0.5,1], [1,2],[2,3], [3,10], [10,-999]],
 
 def getPtBin(pt):  
-  for b in energyBins:
+  for b in ptBins:
     if pt>=b[0] and (pt<b[1] or b[1]<0):
       return b
 
@@ -45,7 +49,7 @@ nEtaBinsHF = 2
 egamma_HF_InnerMostRingsMinus        = {'name':'egamma_HFInnerMostRingsMinus', 'type':'egamma_HF', 'binning':[nEtaBinsHF,-etaMaxDepth1,-etaMinDepth1,9,-pi-.1,pi]}
 egamma_HF_InnerMostRingsPlus         = {'name':'egamma_HFInnerMostRingsPlus', 'type':'egamma_HF',  'binning':[nEtaBinsHF,etaMinDepth1,etaMaxDepth1,9,-pi-.1,pi]}
 
-allMaps = [h, h0Barrel, h0EndcapPlus, h0EndcapMinus, gammaBarrel, gammaForwardPlus, gammaForwardMinus, e, h_HF_Minus, h_HF_Plus, \
+allMaps = [h, h0Barrel, h0EndcapPlus, h0EndcapMinus, gammaBarrel, gammaEndcapPlus, gammaEndcapMinus, gammaForwardPlus, gammaForwardMinus, e, h_HF_Minus, h_HF_Plus, \
            h_HF_InnerMostRingsMinus, h_HF_InnerMostRingsPlus, egamma_HF_Minus, egamma_HF_Plus, egamma_HF_InnerMostRingsMinus, egamma_HF_InnerMostRingsPlus]
 
 #categories = {\

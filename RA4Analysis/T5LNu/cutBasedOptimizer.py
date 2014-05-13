@@ -3,7 +3,7 @@ from math import sqrt, pi
 from localConfig import afsUser, nfsUser, localPlotDir
 import operator
 
-from Workspace.HEPHYPythonTools.nnAnalysisHelpers import getEList, getYieldFromChain, getCutYieldFromChain
+from Workspace.HEPHYPythonTools.nnAnalysisHelpers import getEList, getYieldFromChain
 from Workspace.HEPHYPythonTools.xsec import xsec
 import copy, sys
 from defaultConvertedTuples import * 

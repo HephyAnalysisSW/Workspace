@@ -1,5 +1,6 @@
 #!/bin/env python
-import os, sys, uuid, subprocess
+import os, sys, uuid, subprocess, ROOT
+from Workspace.HEPHYPythonTools.helpers import getVarValue
 from optparse import OptionParser
 parser = OptionParser()
 parser.add_option("--dpmDir", dest="dpmDir", default="/dpm/oeaw.ac.at/home/cms/store/user/schoef/pat_140314", type="string", action="store", help="dpmDir: What to do.")
@@ -18,6 +19,18 @@ def readFileSize(f):
   for line in p.stdout.readlines():
     line = line[:-1]
   return int(line.split()[4])
+
+def getNEvents(dir, flist):
+  d = ROOT.TChain('Runs')
+  for f in flist:
+    d.Add('root://hephyse.oeaw.ac.at/'+dir+'/'+f)
+  nevents = 0
+  nruns = d.GetEntries()
+  for i in range(0, nruns):
+    d.GetEntry(i)
+    nevents += getVarValue(d,'uint_EventCounter_runCounts_PAT.obj')
+  del d
+  return int(nevents)
 
 files = []
 p1 = os.popen("dpns-ls -l "+options.dpmDir+"/")
@@ -40,17 +53,19 @@ for i, f in enumerate(files):
     jobSize=0.
     jobFiles=[]
 
-for j, size in jobs:
+for j, size in jobs[:1]:
   print j, '--> size', size
+  nEvents = getNEvents(options.dpmDir, j) 
+  print "Total events", nEvents
 #  localFileName = 'root://hephyse.oeaw.ac.at/'+options.dpmDir+'/'+targetFileName
   localFile = str(uuid.uuid4())
   localFileList = options.tmpDir+'/'+localFile+'.txt'
 #  localFileName = '/data/schoef/tmp/'+targetFileName
-  localFileName = options.tmpDir+'/'+localFile+'.root'
+  localFileName = options.tmpDir+'/'+localFile+'_nEvents'+str(nEvents)+'.root'
+  targetFileName = localFile+'_nEvents'+str(nEvents)+'.root' 
 #  targetFileName='histo_'
 #  targetFileName+='_'.join([f.split('_')[1] for f in j])
 #  targetFileName+='.root'
-  targetFileName = localFile+'.root' 
   print localFileName, targetFileName
   list = file(localFileList, 'w')
   dpmSize=0
@@ -63,15 +78,21 @@ for j, size in jobs:
   prefix=''
   if not options.noPretend:
     prefix='echo '
+#  os.system(prefix+'edmCopyPickMerge inputFiles_load='+localFileList+' outputFile='+localFileName+' maxSize=-1 &>/dev/null')
   os.system(prefix+'edmCopyPickMerge inputFiles_load='+localFileList+' outputFile='+localFileName+' maxSize=-1')
   if not options.onlyLocal:
-    os.system(prefix+'rfcp '+localFileName+' '+options.dpmDir+'/'+targetFileName)
+    targetDir = options.dpmDir
+    if targetDir[-1]=='/':
+      targetDir=targetDir[:-1]
+    targetDir+='_joined'
+    os.system(prefix+'rfmkdir '+targetDir)
+    os.system(prefix+'rfcp '+localFileName+' '+targetDir+'/'+targetFileName)
     os.system(prefix+'rm -f '+localFileName)
     os.system(prefix+'rm -f '+localFileList)
-  if options.noPretend:
-    finalSize=readFileSize(options.dpmDir+'/'+targetFileName)
+  if options.noPretend and not options.onlyLocal:
+    finalSize=readFileSize(targetDir+'/'+targetFileName)
   else:
     finalSize=dpmSize
-  if finalSize/float(dpmSize)>0.2 and not options.onlyLocal:
-    for f in j:
-      os.system(prefix+'rfrm '+options.dpmDir+'/'+f)
+#  if finalSize/float(dpmSize)>0.2 and not options.onlyLocal:
+#    for f in j:
+#      os.system(prefix+'rfrm '+options.dpmDir+'/'+f)

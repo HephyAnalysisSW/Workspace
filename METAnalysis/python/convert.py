@@ -1,4 +1,5 @@
-import ROOT 
+import ROOT
+import uuid 
 from DataFormats.FWLite import Events, Handle
 from PhysicsTools.PythonAnalysis import *
 from math import *
@@ -6,22 +7,41 @@ import sys, os, copy, random, array
 from datetime import datetime
 from Workspace.HEPHYPythonTools.helpers import getVarValue, deltaPhi, minAbsDeltaPhi,  deltaR, invMass, findClosestJet
 from defaultSamples import *
-
+from getReweightingHistos import getReweightingHistos
 ROOT.gROOT.ProcessLine(".L ../../HEPHYPythonTools/scripts/root/Thrust.C+")
-
+from commons import allMaps, pfTypes, label, allMaps
 from optparse import OptionParser
 parser = OptionParser()
 parser.add_option("--chmode", dest="chmode", default="inc", type="string", action="store", help="chmode: What to do.")
 parser.add_option("--samples", dest="allsamples", default="dy53X", type="string", action="store", help="samples:Which samples.")
 parser.add_option("--fileNumbers", dest="fileNumbers", default="", type="string", action="store", help="which file numbers? parse e.g. 7,1,11 -> histo_X where X in 1,7,11")
 parser.add_option("--small", dest="small", action="store_true", help="Just do a small subset.")
+parser.add_option("--maxEvents", dest="maxEvents", default="-1", type="int", action="store", help="just these few.")
 parser.add_option("--fromPercentage", dest="fromPercentage", default="0", type="int", action="store", help="from (% of tot. events)")
 parser.add_option("--toPercentage", dest="toPercentage", default="100", type="int", action="store", help="to (% of tot. events)")
+parser.add_option("--reweightPFCandidates", dest="reweightPFCandidates", default="", type="string", action="store", help="reweighting in syntax from:to")
 
 
 (options, args) = parser.parse_args()
 print "options: chmode",options.chmode
 exec("allSamples = [" +options.allsamples+ "]")
+
+samplePostFix=""
+if options.reweightPFCandidates!="":
+  rwsFrom, rwsTo = options.reweightPFCandidates.split(":")
+  samplePostFix="_"+rwsFrom+"_rwTo_"+rwsTo
+  reweightingHistos = getReweightingHistos(rwsFrom, rwsTo)
+  etaBinToMapname = {}
+  for t in reweightingHistos.keys():
+    maps = filter(lambda m:m['type']==t, allMaps)
+    etaBinToMapname[t] = {}
+    p = reweightingHistos[t].keys()[0]
+    etaBins = reweightingHistos[t][p].keys()
+    for eB in etaBins:
+      for m in maps:
+        if eB[0]>=m['binning'][1] and eB[0]<=m['binning'][2] and eB[1]>=m['binning'][1] and eB[1]<=m['binning'][2]:
+          etaBinToMapname[t][eB]=m['name']
+
 
 from Workspace.HEPHYPythonTools.xsec import xsec
 
@@ -208,9 +228,9 @@ for sample in allSamples:
       else:
         filelist = []
         allFiles = os.popen("rfdir %s | awk '{print $9}'" % (subdirname))
-        for file in allFiles.readlines():
-          file = file.rstrip()
-          filelist.append(file)
+        for f in allFiles.readlines():
+          f = f.rstrip()
+          filelist.append(f)
         prefix = "root://hephyse.oeaw.ac.at/"#+subdirname
       if options.fileNumbers!="":
         exec("fileNumbers = ["+options.fileNumbers+"]")
@@ -223,19 +243,18 @@ for sample in allSamples:
         filelist = newList
         print "Doing only", newList
       if options.small: filelist = filelist[:10]
-      for tfile in filelist:
-          sample['filenames'][bin].append(subdirname+tfile)
+      for f in filelist:
+          sample['filenames'][bin].append(subdirname+f)
     d = ROOT.TChain('Runs')
-    for tfile in sample['filenames'][bin]:
-      print "Adding",tfile
-      d.Add(prefix+tfile)
+    for f in sample['filenames'][bin]:
+      print "Adding",f
+      d.Add(prefix+f)
     nevents = 0
     nruns = d.GetEntries()
     for i in range(0, nruns):
       d.GetEntry(i)
       nevents += getVarValue(d,'uint_EventCounter_runCounts_PAT.obj')
     del d
-
     if not bin.lower().count('run'):
       if nevents>0:
         weight = xsec[bin]*target_lumi/nevents
@@ -255,12 +274,12 @@ if not os.path.isdir(outputDir+"/"+outSubDir):
 
 nc = 0
 for isample, sample in enumerate(allSamples):
-  if not os.path.isdir(outputDir+"/"+outSubDir+"/"+sample["name"]):
-    os.system("mkdir "+outputDir+"/"+outSubDir+"/"+sample["name"])
+  if not os.path.isdir(outputDir+"/"+outSubDir+"/"+sample["name"]+samplePostFix):
+    os.system("mkdir "+outputDir+"/"+outSubDir+"/"+sample["name"]+samplePostFix)
   else:
     print "Directory", outputDir+"/"+outSubDir, "already found"
 
-  variables = ["weight", "run", "lumi", "ngoodVertices", 'patPFMet', 'patPFMetphi', 'patPFMetsumEt', 'patMETs', 'patMETsphi', 'patMETssumEt']
+  variables = ["weight", "run", "lumi", "ngoodVertices", 'patPFMet', 'patPFMetphi', 'patPFMetsumEt', 'patMETs', 'patMETsphi', 'patMETssumEt', 'met','metpx','metpy']
   if sample['name'].lower().count('run'):
     alltriggers =  [ "HLTL1ETM40", "HLTMET120", "HLTMET120HBHENoiseCleaned", "HLTMonoCentralPFJet80PFMETnoMu105NHEF0p95", "HLTMonoCentralPFJet80PFMETnoMu95NHEF0p95"]
     for trigger in alltriggers:
@@ -269,6 +288,8 @@ for isample, sample in enumerate(allSamples):
   else:
     variables.extend(["nTrueGenVertices", "genmet", "genmetphi", "puWeight", "puWeightSysPlus", "puWeightSysMinus"])
   candvars = ['candPt', 'candPhi', 'candEta', 'candE']
+  if options.reweightPFCandidates!='':
+    candvars+=['candW']
   jetvars = ["jetPt", "jetEta", "jetPhi", "jetPdg", "jetBtag", "jetChef", "jetNhef", "jetCeef", "jetNeef", "jetHFhef", "jetHFeef", "jetMuef", "jetElef", "jetPhef", "jetUnc"]
   muvars = ["muPt", "muEta", "muPhi", "muPdg", "muRelIso", "muDxy", "muDz", "muNormChi2", "muNValMuonHits", "muNumMatchedStations", "muPixelHits", "muNumtrackerLayerWithMeasurement", 'muIsGlobal', 'muIsTracker']
   elvars = ["elPt", "elEta", "elPhi", "elPdg","elSIEtaIEta", "elDPhi", "elDEta", "elHoE", "elOneOverEMinusOneOverP", "elConvRejection", "elMissingHits", "elIsEB", "elIsEE", "elRelIso", "elDxy", "elDz"]
@@ -278,33 +299,49 @@ for isample, sample in enumerate(allSamples):
   if options.allsamples.lower()=='sms':
     variables+=['osetMgl', 'osetMN', 'osetMC', 'osetMsq']
   extraVariables=["ht","nTightMuons", "nTightElectrons"]
-
-  structString = "struct MyStruct_"+str(nc)+"_"+str(isample)+"{ULong64_t event;"
-  structString+="Float_t "+",".join(variables+extraVariables)+";"
-  structString +="Int_t nmu, nel, nta, njets, nbtags, njetFailID;"
-  structString +="Int_t njetCount, nmuCount, nelCount, ntaCount, nCand;"
+  if options.reweightPFCandidates!='':
+    extraVariables+=['pfMet', 'pfMetx', 'pfMety','pfMetRW','pfMetRWx','pfMetRWy', 'pfMet_None', 'pfMetx_None', 'pfMety_None']
+    mapNames = ['map_'+m['name'] for m in allMaps]
+    extraVariables+=['pfMet_'+t for t in pfTypes+mapNames]
+    extraVariables+=['pfMetx_'+t for t in pfTypes+mapNames]
+    extraVariables+=['pfMety_'+t for t in pfTypes+mapNames]
+    extraVariables+=['pfMetRW_'+t for t in pfTypes+mapNames]
+    extraVariables+=['pfMetRWx_'+t for t in pfTypes+mapNames]
+    extraVariables+=['pfMetRWy_'+t for t in pfTypes+mapNames]
+    extraVariables+=['pfMet_'+t+'_None' for t in pfTypes]
+    extraVariables+=['pfMetx_'+t+'_None' for t in pfTypes]
+    extraVariables+=['pfMety_'+t+'_None' for t in pfTypes]
+  structString = "struct MyStruct_"+str(nc)+"_"+str(isample)+"{ULong64_t event;\n"
+  structString+="Float_t "+",".join(variables+extraVariables)+";\n"
+  structString +="Int_t nmu, nel, nta, njets, nbtags, njetFailID;\n"
+  structString +="Int_t njetCount, nmuCount, nelCount, ntaCount, nCand;\n"
   for var in jetvars:
-    structString +="Float_t "+var+"[10];"
+    structString +="Float_t "+var+"[10];\n"
   for var in muvars:
-    structString +="Float_t "+var+"[10];"
+    structString +="Float_t "+var+"[10];\n"
   for var in elvars:
-    structString +="Float_t "+var+"[10];"
+    structString +="Float_t "+var+"[10];\n"
   for var in tavars:
-    structString +="Float_t "+var+"[10];"
-  structString +="Int_t candId[100000];"
-  structString +="Int_t candCharge[100000];"
+    structString +="Float_t "+var+"[10];\n"
+  structString +="Int_t candId[100000];\n"
+  structString +="Int_t candCharge[100000];\n"
   for var in candvars:
-    structString +="Float_t "+var+"[100000];"
+    structString +="Float_t "+var+"[100000];\n"
   if not sample['name'].lower().count('run'):
-    structString +="Int_t ngp;"
+    structString +="Int_t ngp;\n"
     for var in mcvars:
-      structString +="Float_t "+var+"[40];"
-  structString   +="};"
+      structString +="Float_t "+var+"[40];\n"
+  structString   +="};\n"
 #  print structString
-
-  ROOT.gROOT.ProcessLine(structString)
+  uniqueFilename = str(uuid.uuid4())
+  tmpFileName = '/data/'+username+'/tmp/'+uniqueFilename+'.C'
+  f = file(tmpFileName,'w')
+  f.write(structString)
+  f.close()
+  ROOT.gROOT.ProcessLine('.L '+tmpFileName)
   exec("from ROOT import MyStruct_"+str(nc)+"_"+str(isample))
   exec("s = MyStruct_"+str(nc)+"_"+str(isample)+"()")
+  os.system('rm '+tmpFileName)
   nc+=1
   postfix=""
   if options.fileNumbers!="":
@@ -313,7 +350,7 @@ for isample, sample in enumerate(allSamples):
     postfix+="_small"
   if options.fromPercentage!=0 or options.toPercentage!=100:
     postfix += "_from"+str(options.fromPercentage)+"To"+str(options.toPercentage)
-  ofile = outputDir+"/"+outSubDir+"/"+sample["name"]+"/histo_"+sample["name"]+postfix+".root"
+  ofile = outputDir+"/"+outSubDir+"/"+sample["name"]+samplePostFix+"/histo_"+sample["name"]+postfix+".root"
   print "Writing to file",ofile
   if os.path.isfile(ofile) and overwrite:
     print "Warning! will overwrite",ofile
@@ -392,33 +429,140 @@ for isample, sample in enumerate(allSamples):
       elist = ROOT.gDirectory.Get("eList")
       number_events = elist.GetN()
       if options.small:
-        if number_events>1001:
-          number_events=1001
+        number_events=1000
+      if options.maxEvents>0:
+        if number_events>options.maxEvents:
+          number_events=options.maxEvents
       start = int(options.fromPercentage/100.*number_events)
       stop  = int(options.toPercentage/100.*number_events)
       print "Reading: ", sample["name"], bin, "with",number_events,"Events using cut", commoncf
       print "Reading percentage ",options.fromPercentage, "to",options.toPercentage, "which is range",start,"to",stop,"of",number_events
       for i in range(start, stop):
         if (i%10000 == 0) and i>0 :
-          print i
-  #      # Update all the Tuples
+          print "At",i
+#        print "At",i
         if elist.GetN()>0 and ntot>0:
           c.GetEntry(elist.GetEntry(i))
-# MC specific part
           events.to(elist.GetEntry(i))
+          s.weight = sample["weight"][bin]
+          for var in variables[1:]:
+            getVar = var
+            exec("s."+var+"="+str(getVarValue(c, getVar)).replace("nan","float('nan')"))
+          for var in extraVariables:
+            exec("s."+var+"=float('nan')")
           events.getByLabel(pflabel,pfhandle)
           pfcands = pfhandle.product()
+          if options.reweightPFCandidates!='':
+            check_x=0
+            check_y=0
+            s.pfMet_None=0.
+            s.pfMetx_None=0.
+            s.pfMety_None=0.
+            s.pfMet=0.
+            s.pfMetx=0.
+            s.pfMety=0.
+            s.pfMetRW=0.
+            s.pfMetRWx=0.
+            s.pfMetRWy=0.
+            for tp in pfTypes+mapNames:
+              exec('s.pfMet_'+tp+'=0.')
+              exec('s.pfMetx_'+tp+'=0.')
+              exec('s.pfMety_'+tp+'=0.')
+              exec('s.pfMetRW_'+tp+'=0.')
+              exec('s.pfMetRWx_'+tp+'=0.')
+              exec('s.pfMetRWy_'+tp+'=0.')
+            for tp in pfTypes:
+              exec('s.pfMet_'+tp+'_None=0.')
+              exec('s.pfMetx_'+tp+'_None=0.')
+              exec('s.pfMety_'+tp+'_None=0.')
           count=0
+          scount=0
           for cand in pfcands:
             p4 = cand.p4()
-            s.candPt[count]=p4.pt()
-            s.candEta[count]=p4.eta()
-            s.candPhi[count]=p4.phi()
-            s.candE[count]=p4.E()
-            s.candId[count]=cand.particleId()
+            pt = p4.pt()
+            eta = p4.eta()
+            phi = p4.phi()
+            E = p4.E()
+            id=cand.particleId()
+        
+            s.candPt[count]=pt
+            s.candEta[count]=eta
+            s.candPhi[count]=phi
+            s.candE[count]=E
+            s.candId[count]=id
             s.candCharge[count]=cand.charge()
+            if options.reweightPFCandidates!='':
+              ptKey=None
+              etaKey=None
+              tp = label[id]
+              cphi = cos(phi)
+              sphi = sin(phi)
+              s.pfMetx-=pt*cphi
+              s.pfMety-=pt*sphi
+              exec('s.pfMetx_'+tp+'-=pt*cphi')
+              exec('s.pfMety_'+tp+'-=pt*sphi')
+              if reweightingHistos.has_key(tp):
+                for k in reweightingHistos[tp].keys():
+                  if pt>=k[0] and (pt<k[1] or k[1]<0): 
+                    ptKey = k
+                    break
+                if ptKey:
+                  for k in reweightingHistos[tp][ptKey].keys():
+                    if eta>=k[0] and eta<k[1]: 
+                      etaKey=k
+                      break
+              s.candW[count]=1
+              if not (ptKey and etaKey): 
+                s.pfMetRWx-=pt*cphi
+                s.pfMetRWy-=pt*sphi
+                exec('s.pfMetRWx_'+tp+'-=pt*cphi')
+                exec('s.pfMetRWy_'+tp+'-=pt*sphi')
+                exec('s.pfMetx_None-=pt*cphi')
+                exec('s.pfMety_None-=pt*sphi')
+                exec('s.pfMetx_'+tp+'_None-=pt*cphi')
+                exec('s.pfMety_'+tp+'_None-=pt*sphi')
+              else:
+#                print tp,'E',E,'found ptKey',ptKey,'eta',eta,'found etaKey',etaKey
+                hw = reweightingHistos[tp][ptKey][etaKey]
+                phiBin = hw.FindBin(phi) 
+                rw = hw.GetBinContent(phiBin)
+                if rw==0:
+                  rw=1
+                s.candW[count]=rw
+                s.pfMetRWx-=rw*pt*cphi
+                s.pfMetRWy-=rw*pt*sphi
+                exec('s.pfMetRWx_'+tp+'-=rw*pt*cphi')
+                exec('s.pfMetRWy_'+tp+'-=rw*pt*sphi')
+                exec('s.pfMetx_map_'+etaBinToMapname[tp][etaKey]+'-=pt*cphi')
+                exec('s.pfMety_map_'+etaBinToMapname[tp][etaKey]+'-=pt*sphi')
+                exec('s.pfMetRWx_map_'+etaBinToMapname[tp][etaKey]+'-=rw*pt*cphi')
+                exec('s.pfMetRWy_map_'+etaBinToMapname[tp][etaKey]+'-=rw*pt*sphi')
+#              if tp=='h_HF' and eta<-2.901376 and eta>-4.78:#pt>0 and pt<0.5 and 
+              if tp=='h_HF' and eta>2.901376 and eta<4.78:#pt>0 and pt<0.5 and 
+                scount+=1
+                check_x-=pt*cos(phi)
+                check_y-=pt*sin(phi)
+#                print scount,'bins',etaKey,phiBin,'kin',pt,eta,phi,'weightPt',rw,'xy',pt*cos(phi),pt*sin(phi),'check_xy',check_x,check_y,'s.pfMetXY_map_h_HFMinus',s.pfMetx_map_h_HFMinus,s.pfMety_map_h_HFMinus, etaBinToMapname[tp][etaKey]
+#          print 'HFPlus:',s.pfMetx_map_h_HFPlus, s.pfMety_map_h_HFPlus, s.pfMet_map_h_HFPlus,'RW:',s.pfMetRWx_map_h_HFPlus, s.pfMetRWy_map_h_HFPlus, s.pfMetRW_map_h_HFPlus,'checkx,y',check_x,check_y
             count+=1
+
+          if options.reweightPFCandidates!='':
+            s.pfMet=sqrt(s.pfMetx**2+s.pfMety**2)
+            s.pfMet_None=sqrt(s.pfMetx_None**2+s.pfMety_None**2)
+            s.pfMet_mu_None=sqrt(s.pfMetx_mu_None**2+s.pfMety_mu_None**2)
+            s.pfMetRW=sqrt(s.pfMetRWx**2+s.pfMetRWy**2)
+#            print
+#            print 's.pfMetx',s.pfMetx,'s.pfMetRWx',s.pfMetRWx
+            for tp in pfTypes+mapNames:
+              exec('s.pfMetRW_'+tp+'=sqrt(s.pfMetRWx_'+tp+'**2+s.pfMetRWy_'+tp+'**2)')
+              exec('s.pfMet_'+tp+'=sqrt(s.pfMetx_'+tp+'**2+s.pfMety_'+tp+'**2)')
+#              print i,'x', 's.pfMetx_'+tp, eval('s.pfMetx_'+tp),'RW','s.pfMetRWx_'+tp, eval('s.pfMetRWx_'+tp)
+            for tp in pfTypes:
+              exec('s.pfMet_'+tp+'_None=sqrt(s.pfMetx_'+tp+'_None**2+s.pfMety_'+tp+'_None**2)')
+#              print i,'x', 's.pfMetx_'+tp+'_None', eval('s.pfMetx_'+tp+'_None')
           s.nCand = count
+
+# MC specific part
           if not sample['name'].lower().count('run'):
             events.getByLabel(gplabel,gphandle)
             gps = gphandle.product()
@@ -462,10 +606,6 @@ for isample, sample in enumerate(allSamples):
               s.gpDa2[igp2] = -1
               s.gpSta[igp2] = gp2.status()
 ###################
-          s.weight = sample["weight"][bin]
-          for var in variables[1:]:
-            getVar = var
-            exec("s."+var+"="+str(getVarValue(c, getVar)).replace("nan","float('nan')"))
 #          if options.allsamples.lower()=='sms':
 #            for var in ['osetMgl', 'osetMN', 'osetMC', 'osetMsq']:
 #              print s.event, var, getVarValue(c, var)
@@ -478,9 +618,6 @@ for isample, sample in enumerate(allSamples):
               s.puWeightSysPlus = s.weight*sample['reweightingHistoFileSysPlus'].GetBinContent(sample['reweightingHistoFileSysPlus'].FindBin(s.nTrueGenVertices))
             if sample.has_key('reweightingHistoFileSysMinus'): 
               s.puWeightSysMinus = s.weight*sample['reweightingHistoFileSysMinus'].GetBinContent(sample['reweightingHistoFileSysMinus'].FindBin(s.nTrueGenVertices))
-
-          for var in extraVariables:
-            exec("s."+var+"=float('nan')")
 
           nmuons = getVarValue(c, 'nmuons')   #Number of muons in Muon Vec
           neles  = getVarValue(c, 'neles')    #Number of eles in Ele Vec

@@ -18,6 +18,7 @@ parser.add_option("--jesmode", dest="jesmode", default="none", type="string", ac
 parser.add_option("--samples", dest="allsamples", default="copy", type="string", action="store", help="samples:Which samples.")
 parser.add_option("--smsMglRange", dest="smsMglRangeString", default="None", type="string", action="store", help="What is the Mgl range? Maximum is 400-1425.")
 parser.add_option("--small", dest="small", action="store_true", help="Just do a small subset.")
+parser.add_option("--keepPDFWeights", dest="keepPDFWeights", action="store_true", help="keep PDF Weights?")
 parser.add_option("--fromPercentage", dest="fromPercentage", default="0", type="int", action="store", help="from (% of tot. events)")
 parser.add_option("--toPercentage", dest="toPercentage", default="100", type="int", action="store", help="to (% of tot. events)")
 
@@ -81,6 +82,25 @@ def jerDifferenceScaleFactor( eta, jermode = "none"): #https://twiki.cern.ch/twi
     if etab== 4: return 1.488 
   return 1.
 
+sigmaMCDict =\
+ {0:{'N':-0.34921, 'S':  0.29783, 'C':  0., 'm':  0.47112},
+  1:{'N':-0.49974, 'S':  0.33639, 'C':  0., 'm':  0.43069},
+  2:{'N':-0.56165, 'S':  0.42029, 'C':  0., 'm':  0.3924 },
+  3:{'N':-1.12329, 'S':  0.65789, 'C':  0., 'm':  0.1396 },
+  4:{'N': 1.04792, 'S':  0.46676, 'C':  0., 'm':  0.19314},
+  5:{'N': 1.89961, 'S':  0.33432, 'C':  0., 'm':  0.36541},
+  6:{'N': 1.66267, 'S':  0.3778 , 'C':  0., 'm':  0.43943},
+  7:{'N': 1.50961, 'S':  0.22757, 'C':  0., 'm':  0.60094},
+  8:{'N': 0.99052, 'S':  0.27026, 'C':  0., 'm':  0.46273},
+  9:{'N': 1.37916, 'S':  0.28933, 'C':  0., 'm':  0.6123 }
+  }
+def sigmaMCParams(aeta):
+  aeta=abs(aeta)
+  return sigmaMCDict[min([int(aeta/0.5),9])]
+
+def jerSigmaMCRel(pt, eta):
+  p = sigmaMCParams(abs(eta))
+  return sqrt(p['N']*abs(p['N'])/pt**2 + p['S']**2*pt**(p['m']-1) + p['C']**2)
 
 from Workspace.HEPHYPythonTools.xsec import xsec
 
@@ -238,48 +258,49 @@ def getGoodJets(c, crosscleanobjects, jermode=options.jermode, jesmode=options.j
       sign=-1
     delta_met_x_unclustered = getVarValue(c, 'deltaMETxUnclustered')
     delta_met_y_unclustered = getVarValue(c, 'deltaMETyUnclustered')
-    met_dx+=0.1*delta_met_x_unclustered
-    met_dy+=0.1*delta_met_y_unclustered
+    met_dx+=0.1*sign*delta_met_x_unclustered
+    met_dy+=0.1*sign*delta_met_y_unclustered
   for i in range(int(nSoftJets)):
     eta = getVarValue(c, 'jetsEta', i)
     pt  = getVarValue(c, 'jetsPt', i)
-    if abs(eta) <= 4.5:
-      unc = getVarValue(c, 'jetsUnc', i)
-      id =  getVarValue(c, 'jetsID', i)
-      phi = getVarValue(c, 'jetsPhi', i)
-  #      if max([jet['muef'],jet['elef']]) > 0.6 : print jet
-      if jermode.lower()!="none":
-        c_jet = jerDifferenceScaleFactor(eta, jermode)
-        sigma = sqrt(c_jet**2 - 1)*unc
-        scale = random.gauss(1,sigma)
-        met_dx+=(1-scale)*cos(phi)*pt
-        met_dy+=(1-scale)*sin(phi)*pt
-        pt*=random.gauss(1,sigma)
-      if jesmode.lower()!="none":
-        scale = 1. + sign*unc
-        met_dx+=(1-scale)*cos(phi)*pt
-        met_dy+=(1-scale)*sin(phi)*pt
-        pt*=scale
-      if pt>40:
-        parton = int(abs(getVarValue(c, 'jetsParton', i)))
-        jet = {'pt':pt, 'eta':eta,'phi':phi, 'Pdg':parton,\
-        'id':id,
-        'chef':getVarValue(c, 'jetsChargedHadronEnergyFraction', i), 'nhef':getVarValue(c, 'jetsNeutralHadronEnergyFraction', i),\
-        'ceef':getVarValue(c, 'jetsChargedEmEnergyFraction', i), 'neef':getVarValue(c, 'jetsNeutralEmEnergyFraction', i), 'id':id,\
-        'hfhef':getVarValue(c, 'jetsHFHadronEnergyFraction', i), 'hfeef':getVarValue(c, 'jetsHFEMEnergyFraction', i),\
-        'muef':getVarValue(c, 'jetsMuonEnergyFraction', i), 'elef':getVarValue(c, 'jetsElectronEnergyFraction', i), 'phef':getVarValue(c, 'jetsPhotonEnergyFraction', i),\
-        'jetCutBasedPUJetIDFlag':getVarValue(c, 'jetsCutBasedPUJetIDFlag', i),'jetMET53XPUJetIDFlag':getVarValue(c, 'jetsMET53XPUJetIDFlag', i),'jetFull53XPUJetIDFlag':getVarValue(c, 'jetsFull53XPUJetIDFlag', i), 
-        'btag': getVarValue(c, 'jetsBtag', i), 'unc': unc 
-        }
-        isolated = True
-        for obj in crosscleanobjects:   #Jet cross-cleaning
-          if deltaR(jet, obj) < 0.3:# and  obj['relIso']< relIsoCleaningRequ: #(obj['pt']/jet['pt']) > 0.4:  
-            isolated = False
-  #          print "Cleaned", 'deltaR', deltaR(jet, obj), 'maxfrac', max([jet['muef'],jet['elef']]), 'pt:jet/obj', jet['pt'], obj['pt'], "relIso",  obj['relIso'], 'btag',getVarValue(c, 'jetsBtag', i), "parton", parton
-    #          print 'Not this one!', jet, obj, deltaR(jet, obj)
-            break
-        jet['isolated'] = isolated
-        res.append(jet)
+    unc = getVarValue(c, 'jetsUnc', i)
+    id =  getVarValue(c, 'jetsID', i)
+    phi = getVarValue(c, 'jetsPhi', i)
+#      if max([jet['muef'],jet['elef']]) > 0.6 : print jet
+    if jermode.lower()!="none":
+      c_jet = jerDifferenceScaleFactor(eta, jermode)
+      sigmaMCRel = jerSigmaMCRel(pt, eta)
+      sigma = sqrt(c_jet**2 - 1)*sigmaMCRel
+      scale = random.gauss(1,sigma)
+      met_dx+=(1-scale)*cos(phi)*pt
+      met_dy+=(1-scale)*sin(phi)*pt
+      pt*=scale
+#      print i,'pt', pt, 'eta',eta, 'sigmaMCRel', sigmaMCRel, 'c_jet',c_jet,'sigma', sigma,'scale',scale, 'met_dx',met_dx,'met_dy',met_dy
+    if jesmode.lower()!="none":
+      scale = 1. + sign*unc
+      met_dx+=(1-scale)*cos(phi)*pt
+      met_dy+=(1-scale)*sin(phi)*pt
+      pt*=scale
+    if abs(eta) <= 4.5 and pt>40:
+      parton = int(abs(getVarValue(c, 'jetsParton', i)))
+      jet = {'pt':pt, 'eta':eta,'phi':phi, 'Pdg':parton,\
+      'id':id,
+      'chef':getVarValue(c, 'jetsChargedHadronEnergyFraction', i), 'nhef':getVarValue(c, 'jetsNeutralHadronEnergyFraction', i),\
+      'ceef':getVarValue(c, 'jetsChargedEmEnergyFraction', i), 'neef':getVarValue(c, 'jetsNeutralEmEnergyFraction', i), 'id':id,\
+      'hfhef':getVarValue(c, 'jetsHFHadronEnergyFraction', i), 'hfeef':getVarValue(c, 'jetsHFEMEnergyFraction', i),\
+      'muef':getVarValue(c, 'jetsMuonEnergyFraction', i), 'elef':getVarValue(c, 'jetsElectronEnergyFraction', i), 'phef':getVarValue(c, 'jetsPhotonEnergyFraction', i),\
+      'jetCutBasedPUJetIDFlag':getVarValue(c, 'jetsCutBasedPUJetIDFlag', i),'jetMET53XPUJetIDFlag':getVarValue(c, 'jetsMET53XPUJetIDFlag', i),'jetFull53XPUJetIDFlag':getVarValue(c, 'jetsFull53XPUJetIDFlag', i), 
+      'btag': getVarValue(c, 'jetsBtag', i), 'unc': unc 
+      }
+      isolated = True
+      for obj in crosscleanobjects:   #Jet cross-cleaning
+        if deltaR(jet, obj) < 0.3:# and  obj['relIso']< relIsoCleaningRequ: #(obj['pt']/jet['pt']) > 0.4:  
+          isolated = False
+#          print "Cleaned", 'deltaR', deltaR(jet, obj), 'maxfrac', max([jet['muef'],jet['elef']]), 'pt:jet/obj', jet['pt'], obj['pt'], "relIso",  obj['relIso'], 'btag',getVarValue(c, 'jetsBtag', i), "parton", parton
+  #          print 'Not this one!', jet, obj, deltaR(jet, obj)
+          break
+      jet['isolated'] = isolated
+      res.append(jet)
   res  = sorted(res,  key=lambda k: -k['pt'])
   return {'jets':res,'met_dx':met_dx, 'met_dy':met_dy}
 
@@ -398,6 +419,8 @@ for isample, sample in enumerate(allSamples):
   muvars = ["muPt", "muEta", "muPhi", "muPdg", "muRelIso", "muDxy", "muDz", "muNormChi2", "muNValMuonHits", "muNumMatchedStations", "muPixelHits", "muNumtrackerLayerWithMeasurement", 'muIsGlobal', 'muIsTracker']
   elvars = ["elPt", "elEta", "elPhi", "elPdg","elSIEtaIEta", "elDPhi", "elDEta", "elHoE", "elOneOverEMinusOneOverP", "elConvRejection", "elMissingHits", "elIsEB", "elIsEE", "elRelIso", "elDxy", "elDz"]
   tavars = ["taPt", "taEta", "taPhi", "taPdg"]
+  if options.keepPDFWeights:
+    pdfVars = ["cteqWeights", "mstwWeights", "nnpdfWeights"]
   if not isData:
     mcvars = ["gpPdg", "gpM", "gpPt", "gpEta", "gpPhi", "gpMo1", "gpMo2", "gpDa1", "gpDa2", "gpSta"]
   if options.allsamples.lower()=='sms':
@@ -429,6 +452,9 @@ for isample, sample in enumerate(allSamples):
       structString +="Int_t ngp;"
       for var in mcvars:
         structString +="Float_t "+var+"[40];"
+    if options.keepPDFWeights:
+      structString +="Float_t cteqWeights[45];Float_t mstwWeights[41];Float_t nnpdfWeights[101];"
+      
   structString   +="};"
 #  print structString
 
@@ -477,6 +503,10 @@ for isample, sample in enumerate(allSamples):
       t.Branch("ngp",   ROOT.AddressOf(s,"ngp"), 'ngp/I')
       for var in mcvars:
         t.Branch(var,   ROOT.AddressOf(s,var), var+'[ngp]/F')
+    if options.keepPDFWeights:
+      t.Branch('cteqWeights',   ROOT.AddressOf(s,'cteqWeights'), 'cteqWeights[45]/F')
+      t.Branch('mstwWeights',   ROOT.AddressOf(s,'mstwWeights'), 'mstwWeights[41]/F')
+      t.Branch('nnpdfWeights',   ROOT.AddressOf(s,'nnpdfWeights'), 'nnpdfWeights[101]/F')
 
   for bin_ in sample["bins"]:
     commoncf = ""
@@ -625,7 +655,12 @@ for isample, sample in enumerate(allSamples):
 
           jResult = getGoodJets(c, allTightLeptons , jermode=options.jermode, jesmode=options.jesmode)
           jetResult = jResult['jets']
-
+          met_dx = jResult['met_dx']
+          met_dy = jResult['met_dy']
+          corrMetx = s.type1phiMet*cos(s.type1phiMetphi) + met_dx
+          corrMety = s.type1phiMet*sin(s.type1phiMetphi) + met_dy
+          s.type1phiMet     = sqrt(corrMetx**2+corrMety**2)
+          s.type1phiMetphi  = atan2(corrMety, corrMetx)
           if len(allTightLeptons)>0:
             s.leptonPt = allTightLeptons[0]['pt']
             s.leptonEta = allTightLeptons[0]['eta']
@@ -641,12 +676,6 @@ for isample, sample in enumerate(allSamples):
             s.lepton2Phi = allTightLeptons[1]['phi']
             s.lepton2Pdg = allTightLeptons[1]['Pdg']
 
-          met_dx = jResult['met_dx']
-          met_dy = jResult['met_dy']
-          corrMetx = s.type1phiMet*cos(s.type1phiMetphi) + met_dx
-          corrMety = s.type1phiMet*sin(s.type1phiMetphi) + met_dy
-          s.type1phiMet     = sqrt(corrMetx**2+corrMety**2)
-          s.type1phiMetphi  = atan2(corrMety, corrMetx)
 
           jets = filter(lambda j:j['id'] and j['isolated'], jetResult)
           s.ht = sum([ j['pt'] for j in jets])
@@ -722,6 +751,13 @@ for isample, sample in enumerate(allSamples):
               s.taEta[i] = allGoodTaus[i]['eta']
               s.taPhi[i] = allGoodTaus[i]['phi']
               s.taPdg[i] = allGoodTaus[i]['Pdg']
+            if options.keepPDFWeights:
+              for i in range(45):
+                s.cteqWeights[i]=getVarValue(c, 'cteqWeights',i)
+              for i in range(41):
+                s.mstwWeights[i]=getVarValue(c, 'mstwWeights',i)
+              for i in range(101):
+                s.nnpdfWeights[i]=getVarValue(c, 'nnpdfWeights',i)
           if len(jets)>1:
             s3D = eventShape.sphericity(jets)
             c3D = eventShape.circularity(s3D["ev"])

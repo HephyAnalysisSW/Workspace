@@ -1,6 +1,10 @@
 import ROOT
 
 data = {}
+data["bins"]    = ["data"]
+data["name"]    = "data"
+data["hasWeight"]     = True
+data["dirname"] = "/data/schoef/convertedTuples_v22/copy/" 
 
 dy = {}
 dy["bins"]    = ["DY"]

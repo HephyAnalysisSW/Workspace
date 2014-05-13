@@ -3,7 +3,7 @@ from array import array
 from math import sqrt, pi, cos, sin, atan2
 #from localInfo import username
 from Workspace.HEPHYPythonTools.helpers import getObjFromFile, getVarValue
-from commons import pfTypes, label
+from commons import pfTypes, label, ptBins
 
 ROOT.gROOT.ProcessLine(".L ../../HEPHYPythonTools/scripts/root/tdrstyle.C")
 ROOT.gROOT.ProcessLine(".L ../../HEPHYPythonTools/scripts/root/useNiceColorPalette.C")
@@ -18,7 +18,7 @@ ROOT.tdrStyle.SetPadRightMargin(0.18)
 ROOT.useNiceColorPalette(255)
 
 sample = 'dy53X'
-t = 'h'
+t = 'h_HFPlus'
 c = ROOT.TChain('Events')
 c.Add('/data/schoef/convertedMETTuples_v2/inc/dy53X/histo_dy53X_from0To1.root')
 c.Add('/data/schoef/convertedMETTuples_v2/inc/dy53X/histo_dy53X_from1To2.root')
@@ -31,16 +31,20 @@ c.Add('/data/schoef/convertedMETTuples_v2/inc/dy53X/histo_dy53X_from7To8.root')
 c.Add('/data/schoef/convertedMETTuples_v2/inc/dy53X/histo_dy53X_from8To9.root')
 c.Add('/data/schoef/convertedMETTuples_v2/inc/dy53X/histo_dy53X_from9To10.root')
 
-for ptBin in [[0,1],[1,2],[2,3], [3,10], [10,25]]:
+for ptBin in [10, -999]:
 
-  ifile = '/afs/hephy.at/user/s/schoefbeck/www/pngMetPhi/'+sample+'_occ_'+t+'_pt_'+str(ptBin[0])+'_'+str(ptBin[1])+'.root'
+  name = str(ptBin[0])
+  if ptBin[1]>0:
+    name+='_'+str(ptBin[1])
+
+  ifile = '/afs/hephy.at/user/s/schoefbeck/www/pngMetPhi.notsoold/'+sample+'_occ_'+t+'_pt_'+name+'.root'
   f = ROOT.TFile(ifile)
   k = f.GetListOfKeys()[0].GetName()
   f.Close()
   canv = getObjFromFile(ifile, k)
   occ = canv.GetPrimitive('occ_'+t).Clone()
 
-  ifile = '/afs/hephy.at/user/s/schoefbeck/www/pngMetPhi/'+sample+'_en_'+t+'_pt_'+str(ptBin[0])+'_'+str(ptBin[1])+'.root'
+  ifile = '/afs/hephy.at/user/s/schoefbeck/www/pngMetPhi.notsoold/'+sample+'_en_'+t+'_pt_'+name+'.root'
   f = ROOT.TFile(ifile)
   k = f.GetListOfKeys()[0].GetName()
   f.Close()

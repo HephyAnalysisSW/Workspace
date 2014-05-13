@@ -31,6 +31,13 @@ dy53X["bins"]    = ["Mu-DYJetsToLL-M50"]
 dy53X["Chain"] = "Events"
 dy53X["Counter"] = "bool_EventCounter_passed_PAT.obj"
 
+ttJets={}
+ttJets["name"]     = "ttJets";
+ttJets["dirname"] = "/dpm/oeaw.ac.at/home/cms/store/user/schoef/pat_270414/"
+ttJets["bins"]    = ["8TeV-TTJets-powheg-v1-2"]
+ttJets["Chain"] = "Events"
+ttJets["Counter"] = "bool_EventCounter_passed_PAT.obj"
+
 doubleMuRun2012A={}
 doubleMuRun2012A["name"]     = "DoubleMu-Run2012A-22Jan2013";
 doubleMuRun2012A["dirname"] = "/dpm/oeaw.ac.at/home/cms/store/user/schoef/pat_140314/"

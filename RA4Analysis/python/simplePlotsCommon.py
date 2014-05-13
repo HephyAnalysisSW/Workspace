@@ -169,7 +169,7 @@ class variable:
   ratioMax = 1.9
   logRatio = False
   ratioVarName = "Data / MC"
-  def __init__(self, name, binning, commoncf="", profile=False, varfunc = "", additionalCutFunc=""):
+  def __init__(self, name, binning, commoncf="", profile=False, varfunc = "", additionalCutFunc="", binningIsExplicit=False):
     self.initname = name
     sname=""
     self.title=""
@@ -189,6 +189,7 @@ class variable:
       self.name = splitsemic[0]
       self.titleaxisstring=";"+splitsemic[1]+";"+splitsemic[2]
     self.binning=binning
+    self.binningIsExplicit = binningIsExplicit
 
 #    if self.prefix!="":
 #      self.hname=self.prefix+"_"+self.name
@@ -201,10 +202,15 @@ class variable:
     except:
       pass
     self.title = self.hname+self.titleaxisstring
-    self.data_histo = ROOT.TH1F(self.name+"_Data",self.hname+self.titleaxisstring,*binning)
+    if binningIsExplicit:
+      self.data_histo = ROOT.TH1F(self.name+"_Data",self.hname+self.titleaxisstring,len(binning) - 1, array('d',binning))
+      if profile:
+        self.data_histo = ROOT.TProfile(self.name+"_Data",self.hname+self.titleaxisstring,len(binning) - 1, array('d',binning))
+    else:
+      self.data_histo = ROOT.TH1F(self.name+"_Data",self.hname+self.titleaxisstring,*binning)
+      if profile:
+        self.data_histo = ROOT.TProfile(self.name+"_Data",self.hname+self.titleaxisstring,*binning)
     self.data_histo.Sumw2()
-    if profile:
-      self.data_histo = ROOT.TProfile(self.name+"_Data",self.hname+self.titleaxisstring,*binning)
 
     self.data_histo.Reset()
     self.commoncf=commoncf
@@ -212,15 +218,14 @@ class variable:
     self.logx=False
     self.color=ROOT.kBlue
 
-  binningIsExplicit = False
-  def setExplicitBinning(self, binning):
-    self.binningIsExplicit = True
-    csqbins = array('d',binning)
-    if len(binning)<2:
-      print "Warning! setExplicitBinning with len(binning)<2 for var", self,"skipped!"
-    else:
-      self.data_histo.SetBins(len(binning) - 1, csqbins)
-      self.binning = csqbins 
+#  def setExplicitBinning(self, binning):
+#    self.binningIsExplicit = True
+#    csqbins = array('d',binning)
+#    if len(binning)<2:
+#      print "Warning! setExplicitBinning with len(binning)<2 for var", self,"skipped!"
+#    else:
+#      self.data_histo.SetBins(len(binning) - 1, csqbins)
+#      self.binning = csqbins 
 
 allVars=[]
 allStacks=[]
@@ -427,7 +432,7 @@ def drawNMStacks(intn, intm, thesestacks, filename, normalized=False, path = def
       bottompad.SetRightMargin(0.02)
       bottompad.SetBottomMargin(scaleFacBottomPad*0.13)
       bottompad.SetPad(bottompad.GetX1(), bottompad.GetY1(), bottompad.GetX2(), yBorder)
-      rvar = variable(stack[0].initname, stack[0].binning, stack[0].commoncf)
+      rvar = variable(stack[0].initname, stack[0].binning, stack[0].commoncf, binningIsExplicit = stack[0].binningIsExplicit)
       rvar.data_histo.Sumw2()
       rvar.logy = False
       rvar.minimum=0.2

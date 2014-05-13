@@ -1,5 +1,6 @@
 #! /bin/sh -x 
-for name in `ls -d T5lnu* T2D*`
+#for name in `ls -d T5lnu* T2D*`
+for name in `ls -d T2DegenerateStop_2J_mStop-250to300-4 T2DegenerateStop_2J_mStop-400-2`
 #for name in `ls -d 8TeV-Wplus* 8TeV-Wminus* 8TeV-WJetsToLNu_HT-*`
 #for name in `ls -d 8TeV-*-2`
 do
