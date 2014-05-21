@@ -182,6 +182,10 @@ xsec["8TeV-stop300lsp270g175"] = 1.99608
 xsec["8TeV-stop300lsp270"] = 1.99608
 xsec["8TeV-stop300lsp270g200"] = 1.99608
 
+
+#RA4 + 0b signals
+xsec["T5Full_1100_200_100-4"] = 0.0101744
+xsec["T5Full_1100_800_600-4"] = 0.0101744
 #OLD and 7TeV samples
 
 

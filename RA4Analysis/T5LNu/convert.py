@@ -181,14 +181,14 @@ def getVetoEle(c, iele): # POG Ele veto https://twiki.cern.ch/twiki/bin/viewauth
     and ((isEB and dphi < 0.8) or (isEE and dphi < 0.7)) and ( (isEB and deta < 0.007) or (isEE and deta < 0.01) )\
     and ((isEB and sietaieta < 0.01 ) or (isEE and sietaieta < 0.03))\
     and ( isEB and HoE < 0.15 )\
-    and dxy < 0.04 and dz < 0.2 \
+    and abs(dxy) < 0.04 and abs(dz) < 0.2 \
     and ( relIso < relIsoCut ) \
     and pt>5.:
     return {'pt':pt, 'phi':getVarValue(c, 'elesPhi', iele), 'Pdg':pdg, 'eta':eta, 'sIEtaIEta':sietaieta, 'DPhi':dphi, \
             'DEta':deta, 'HoE':HoE, 'OneOverEMinusOneOverP':oneOverEMinusOneOverP, 'ConvRejection':convRej, 'MissingHits':missingHits,\
             'isEB':isEB, 'isEE':isEE, 'relIso':relIso, 'Dxy':dxy, 'Dz':dz} 
 def tightEleID(ele):
-  return ele['pt']>20 and abs(ele['eta'])<2.5 and ele['relIso']<0.15 and ele['ConvRejection'] and ele['MissingHits']<=1 and ele['Dxy']<0.02 and ele['Dz']<0.1 and (\
+  return ele['pt']>20 and abs(ele['eta'])<2.5 and ele['relIso']<0.15 and ele['ConvRejection'] and ele['MissingHits']<=1 and abs(ele['Dxy'])<0.02 and abs(ele['Dz'])<0.1 and (\
     (ele['isEB'] and ele['DPhi']<0.06 and ele['DEta']<0.004 and ele['sIEtaIEta']<0.01) or
     (ele['isEE'] and ele['DPhi']<0.03 and ele['DEta']<0.007 and ele['sIEtaIEta']<0.03))
 
@@ -213,7 +213,7 @@ def getAllMuons(c, nmuons ):
 
 def tightMuID(mu):
   return mu['IsGlobal'] and mu['IsPF'] and mu['pt']>20 and abs(mu['eta'])<2.1 and mu['relIso']<0.12 and mu['NormChi2']<=10 and mu['NValMuonHits']>0\
-     and mu['NumMatchedStations']>1 and mu['PixelHits']>0 and mu['NumtrackerLayerWithMeasurement']>5 and mu['Dxy']<0.02 and mu['Dz']<0.5
+     and mu['NumMatchedStations']>1 and mu['PixelHits']>0 and mu['NumtrackerLayerWithMeasurement']>5 and abs(mu['Dxy'])<0.02 and abs(mu['Dz'])<0.5
 
 def getAllElectrons(c, neles ):
   res=[]

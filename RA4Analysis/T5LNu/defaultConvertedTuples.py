@@ -1,5 +1,18 @@
 import ROOT
 
+
+T5Full_1100_200_100 = {}
+T5Full_1100_200_100["bins"]    = ["T5Full_1100_200_100"]
+T5Full_1100_200_100["name"]    = "T5Full_1100_200_100"
+T5Full_1100_200_100["hasWeight"]     = True
+T5Full_1100_200_100["dirname"] = "/data/schoef/convertedTuples_v22/copy/" 
+
+T5Full_1100_800_600 = {}
+T5Full_1100_800_600["bins"]    = ["T5Full_1100_800_600"]
+T5Full_1100_800_600["name"]    = "T5Full_1100_800_600"
+T5Full_1100_800_600["hasWeight"]     = True
+T5Full_1100_800_600["dirname"] = "/data/schoef/convertedTuples_v22/copy/" 
+
 data = {}
 data["bins"]    = ["data"]
 data["name"]    = "data"

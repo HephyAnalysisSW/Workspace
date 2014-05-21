@@ -11,7 +11,7 @@ from defaultConvertedTuples import *
 colors = [ROOT.kBlue, ROOT.kRed, ROOT.kGreen, ROOT.kOrange, ROOT.kMagenta]
 
 cSignal = ROOT.TChain("Events")
-cSignal.Add("/data/schoef/convertedTuples_v22/copy/T5LNu_1000_100/histo_T5LNu_1000_100.root")
+cSignal.Add("/data/schoef/convertedTuples_v22/copy/T5Full_1100_200_100/histo_T5Full_1100_200_100.root")
 
 cBkg    = ROOT.TChain("Events")
 cBkg.Add("/data/schoef/convertedTuples_v22/copy/WJetsHT150v2/histo_WJetsHT150v2_from*.root")
@@ -22,11 +22,11 @@ from scipy import optimize
 cuts = [
   {'var':'type1phiMet',   'type':'lower', 'startVal': 200, 'minVal':200},\
   {'var': 'mT',      'type':'lower', 'startVal': 70,   'minVal':70.,  'maxVal':200.  },\
-  {'var':'ht',      'type':'lower', 'startVal': 400., 'minVal':400., 'maxVal':1000}
+  {'var':'ht',      'type':'lower', 'startVal': 750., 'minVal':750., 'maxVal':1500}
   ]
 
 prepreprefix = 'cutBasedOptimizer_'
-presel = "njets>=4&&ht>400&&nTightMuons+nTightElectrons==1&&nbtags==0&&type1phiMet>150."
+presel = "njets>=4&&ht>750&&nTightMuons+nTightElectrons==1&&nbtags==0&&type1phiMet>150."
 #presel = "isrJetPt>110&&isrJetBTBVetoPassed&&softIsolatedMuPt>5&&nHardElectrons+nHardMuons==0&&njet60<=2&&type1phiMet>150"
 
 #  print "S:",yieldS, "B:",yieldB
@@ -62,9 +62,9 @@ def getFom(cutVals, relSysErr=0.20, verbose=False):
 
 goodRes = []
 c=0
-for met in range(250, 450, 25):
+for met in range(250, 550, 25):
   for mT in range(70, 200, 10):
-    for ht in range(500,900,100):
+    for ht in range(700,1500,100):
       vals = [met, mT, ht]
       fom = getFom(vals,relSysErr=0.20, verbose=True)
       c+=1
@@ -75,7 +75,7 @@ for met in range(250, 450, 25):
 goodRes.sort()
 goodRes.reverse()
 print goodRes
-pickle.dump(goodRes, file('/data/schoef/T5LNuStuff/cutBased/met_mT_ht_results.pkl','w'))
+pickle.dump(goodRes, file('/data/schoef/T5FullStuff/cutBased/met_mT_ht_results.pkl','w'))
 
 #
 #Optimizing

@@ -43,6 +43,9 @@ nEtaBinsHF = 11
 egamma_HF_Minus        = {'name':'egamma_HFMinus', 'type':'egamma_HF',  'binning':[nEtaBinsHF,-etaMaxDepth1,-etaMinDepth1,18,-pi,pi]}
 egamma_HF_Plus         = {'name':'egamma_HFPlus', 'type':'egamma_HF',   'binning':[nEtaBinsHF,etaMinDepth1,etaMaxDepth1,18,-pi,pi]}
 
+h_HF         = {'name':'h_HF', 'type':'h_HF',   'binning':[-1,-5.5,5.5,18,-pi,pi]}
+egamma_HF         = {'name':'egamma_HF', 'type':'egamma_HF',   'binning':[-1,-5.5,5.5,18,-pi,pi]}
+
 etaMaxDepth1 = 5.2
 etaMinDepth1 = 4.78
 nEtaBinsHF = 2

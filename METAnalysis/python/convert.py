@@ -552,14 +552,14 @@ for isample, sample in enumerate(allSamples):
             s.pfMet_mu_None=sqrt(s.pfMetx_mu_None**2+s.pfMety_mu_None**2)
             s.pfMetRW=sqrt(s.pfMetRWx**2+s.pfMetRWy**2)
 #            print
-#            print 's.pfMetx',s.pfMetx,'s.pfMetRWx',s.pfMetRWx
+            print 's.pfMetx',s.pfMetx,'s.pfMetRWx',s.pfMetRWx
             for tp in pfTypes+mapNames:
               exec('s.pfMetRW_'+tp+'=sqrt(s.pfMetRWx_'+tp+'**2+s.pfMetRWy_'+tp+'**2)')
               exec('s.pfMet_'+tp+'=sqrt(s.pfMetx_'+tp+'**2+s.pfMety_'+tp+'**2)')
-#              print i,'x', 's.pfMetx_'+tp, eval('s.pfMetx_'+tp),'RW','s.pfMetRWx_'+tp, eval('s.pfMetRWx_'+tp)
+              print i,'x', 's.pfMetx_'+tp, eval('s.pfMetx_'+tp),'RW','s.pfMetRWx_'+tp, eval('s.pfMetRWx_'+tp)
             for tp in pfTypes:
               exec('s.pfMet_'+tp+'_None=sqrt(s.pfMetx_'+tp+'_None**2+s.pfMety_'+tp+'_None**2)')
-#              print i,'x', 's.pfMetx_'+tp+'_None', eval('s.pfMetx_'+tp+'_None')
+              print i,'x', 's.pfMetx_'+tp+'_None', eval('s.pfMetx_'+tp+'_None')
           s.nCand = count
 
 # MC specific part

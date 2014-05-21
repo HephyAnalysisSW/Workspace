@@ -63,7 +63,8 @@ c.SetBranchStatus("candPhi", 1)
 c.SetBranchStatus("candEta", 1)
 c.SetBranchStatus("candId", 1)
 
-map = h_HF_Plus
+#map = h_HF_InnerMostRingsPlus
+map = egamma_HF_Plus
 #ptb = [3, 10]
 occ={}
 hpt={}

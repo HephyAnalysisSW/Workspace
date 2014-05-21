@@ -106,7 +106,10 @@ print "mode",options.mode,"isMC?",isMC, ", verbose?",options.verbose,", add RA4 
 
 #-- Message Logger ------------------------------------------------------------
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
-process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(False) )
+process.options = cms.untracked.PSet(
+  SkipEvent = cms.untracked.vstring('ProductNotFound'),
+  wantSummary = cms.untracked.bool(False)
+)
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 process.MessageLogger.categories.append('PATSummaryTables')
 process.MessageLogger.cerr.PATSummaryTables = cms.untracked.PSet(
@@ -279,24 +282,23 @@ process.filterSequence = cms.Sequence(
     process.EventCounterAfterScraping*
       process.primaryVertexFilter*
     process.EventCounterAfterPV)
-if not options.mode.lower()=='sms':
-   process.filterSequence+= process.HBHENoiseFilter
-   process.filterSequence+= process.EventCounterAfterHBHE
 process.filterSequence+= process.goodVertices
-process.filterSequence+= process.trackingFailureFilter
-process.filterSequence+= process.EventCounterAfterTrackingFailure
 if not options.mode.lower()=='sms':
-   process.filterSequence+= process.hcalLaserEventFilter
-   process.filterSequence+= process.EventCounterAfterLaser
-   process.filterSequence+= process.CSCTightHaloFilter
-   process.filterSequence+= process.EventCounterAfterCSC
-   process.filterSequence+= process.eeBadScFilter
-   process.filterSequence+= process.EventCounterAfterEEBadSC
+  process.filterSequence+= process.HBHENoiseFilter
+  process.filterSequence+= process.EventCounterAfterHBHE
+  process.filterSequence+= process.trackingFailureFilter
+  process.filterSequence+= process.EventCounterAfterTrackingFailure
+  process.filterSequence+= process.hcalLaserEventFilter
+  process.filterSequence+= process.EventCounterAfterLaser
+  process.filterSequence+= process.CSCTightHaloFilter
+  process.filterSequence+= process.EventCounterAfterCSC
+  process.filterSequence+= process.eeBadScFilter
+  process.filterSequence+= process.EventCounterAfterEEBadSC
 process.filterSequence+= process.EcalDeadCellTriggerPrimitiveFilter
 process.filterSequence+= process.EventCounterAfterECALTP
 
 if options.mode.lower()=='sms':
-  print "\nFilter List:", "HLT, scraping, PV, trackingFailureFilter, EcalTP\n"
+  print "\nFilter List:", "HLT, scraping, PV, EcalTP\n"
 if options.mode.lower()=='mc':
   print "\nFilter List:", "HLT, scraping, PV, HBHE, trackingFailureFilter, hcalLaser, CSCTightHalo, eeBadSC, EcalTP\n"
 

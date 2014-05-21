@@ -8,6 +8,9 @@ from datetime import datetime
 from Workspace.HEPHYPythonTools.helpers import getVarValue, deltaPhi, minAbsDeltaPhi, invMassOfLightObjects, deltaR, closestMuJetDeltaR, invMass,  findClosestJet
 from monoJetFuncs import softIsolatedMT, pmuboost3d
 
+from Workspace.HEPHYPythonTools.btagEff import getMCEff, getTagWeightDict, getSF 
+maxConsideredBTagWeight = 3 
+
 from defaultMETSamples_mc import *
 
 from optparse import OptionParser
@@ -56,15 +59,29 @@ def jerDifferenceScaleFactor( eta, jermode = "none"): #https://twiki.cern.ch/twi
     if etab== 4: return 1.488 
   return 1.
 
+sigmaMCDict =\
+ {0:{'N':-0.34921, 'S':  0.29783, 'C':  0., 'm':  0.47112},
+  1:{'N':-0.49974, 'S':  0.33639, 'C':  0., 'm':  0.43069},
+  2:{'N':-0.56165, 'S':  0.42029, 'C':  0., 'm':  0.3924 },
+  3:{'N':-1.12329, 'S':  0.65789, 'C':  0., 'm':  0.1396 },
+  4:{'N': 1.04792, 'S':  0.46676, 'C':  0., 'm':  0.19314},
+  5:{'N': 1.89961, 'S':  0.33432, 'C':  0., 'm':  0.36541},
+  6:{'N': 1.66267, 'S':  0.3778 , 'C':  0., 'm':  0.43943},
+  7:{'N': 1.50961, 'S':  0.22757, 'C':  0., 'm':  0.60094},
+  8:{'N': 0.99052, 'S':  0.27026, 'C':  0., 'm':  0.46273},
+  9:{'N': 1.37916, 'S':  0.28933, 'C':  0., 'm':  0.6123 }
+  }
+def sigmaMCParams(aeta):
+  aeta=abs(aeta)
+  return sigmaMCDict[min([int(aeta/0.5),9])]
 
-path = os.path.abspath('../../HEPHYPythonTools/python')
-if not path in sys.path:
-    sys.path.insert(1, path)
-del path
+def jerSigmaMCRel(pt, eta):
+  p = sigmaMCParams(abs(eta))
+  return sqrt(p['N']*abs(p['N'])/pt**2 + p['S']**2*pt**(p['m']-1) + p['C']**2)
 
-from xsec import xsec
+from Workspace.HEPHYPythonTools.xsec import xsec
 
-subDir = "monoJetTuples_v6"
+subDir = "monoJetTuples_v7"
 
 
 if options.smsMsqRangeString!='None' and options.allsamples.lower()=='sms':
@@ -105,6 +122,7 @@ if options.smsMsqRangeString!='None' and options.allsamples.lower()=='sms':
       T2DegStop['reweightingHistoFile'] = S10rwHisto
       T2DegStop['reweightingHistoFileSysPlus'] = S10rwPlusHisto
       T2DegStop['reweightingHistoFileSysMinus'] = S10rwMinusHisto
+      T2DegStop['isFastSim'] = True
       allSamples.append(T2DegStop)
       print "Added SMS",T2DegStop["name"]
 else:
@@ -157,7 +175,7 @@ def goodEleID_POG(c, iele, eta = 'none'): # POG Ele veto https://twiki.cern.ch/t
     and ((isEB and dphi < 0.8) or (isEE and dphi < 0.7)) and ( (isEB and deta < 0.007) or (isEE and deta < 0.01) )\
     and ((isEB and sietaieta < 0.01 ) or (isEE and sietaieta < 0.03))\
     and ( isEB and HoE < 0.15 )\
-    and getVarValue(c, 'elesDxy', iele) < 0.04 and getVarValue(c, 'elesDz', iele) < 0.2 \
+    and abs(getVarValue(c, 'elesDxy', iele)) < 0.04 and abs(getVarValue(c, 'elesDz', iele)) < 0.2 \
     and ( relIso < relIsoCut ) \
     and getVarValue(c, 'elesPt', iele)>5.
 
@@ -170,6 +188,14 @@ def goodTauID_POG(c, itau ):
          getVarValue(c, 'tausAgainstElectronLoose', itau) and \
          getVarValue(c, 'tausByLooseCombinedIsolationDBSumPtCorr', itau) and \
          getVarValue(c, 'tausPt', itau)>5.
+
+def hybridIso(m, wp):
+  if wp=='loose':
+    return  (m['pt']<25 and m['relIso']*m['pt']<10) or (m['pt']>=25 and m['relIso']<0.4)
+  if wp=='medium':
+    return  (m['pt']<25 and m['relIso']*m['pt']<5) or (m['pt']>=25 and m['relIso']<0.2)
+  if wp=='tight':
+    return  (m['pt']<25 and m['relIso']*m['pt']<3) or (m['pt']>=25 and m['relIso']<0.12)
 
 def getAllMuons(c, nmuons ):
   res=[]
@@ -217,7 +243,6 @@ def getGoodJets(c, crosscleanobjects, jermode=options.jermode, jesmode=options.j
   res = []
   bres = []
   ht = 0.
-  nbtags = 0
   met_dx = 0.
   met_dy = 0.
   if jesmode.lower()!="none":
@@ -232,45 +257,82 @@ def getGoodJets(c, crosscleanobjects, jermode=options.jermode, jesmode=options.j
   for i in range(int(njets)):
     eta = getVarValue(c, 'jetsEta', i)
     pt  = getVarValue(c, 'jetsPt', i)
-    if abs(eta) <= 4.5:
-      unc = getVarValue(c, 'jetsUnc', i)
-      id =  getVarValue(c, 'jetsID', i)
-      phi = getVarValue(c, 'jetsPhi', i)
-  #      if max([jet['muef'],jet['elef']]) > 0.6 : print jet
-      if jermode.lower()!="none":
-        c_jet = jerDifferenceScaleFactor(eta, jermode)
-        sigma = sqrt(c_jet**2 - 1)*unc
-        scale = random.gauss(1,sigma)
-        met_dx+=(1-scale)*cos(phi)*pt
-        met_dy+=(1-scale)*sin(phi)*pt
-        pt*=random.gauss(1,sigma)
-      if jesmode.lower()!="none":
-        scale = 1. + sign*unc
-        met_dx+=(1-scale)*cos(phi)*pt
-        met_dy+=(1-scale)*sin(phi)*pt
-        pt*=scale
-      if pt>30:
-        parton = int(abs(getVarValue(c, 'jetsParton', i)))
-        jet = {'pt':pt, 'eta':eta,'phi':phi, 'pdg':parton,\
-        'id':id,
-        'chef':getVarValue(c, 'jetsChargedHadronEnergyFraction', i), 'nhef':getVarValue(c, 'jetsNeutralHadronEnergyFraction', i),\
-        'ceef':getVarValue(c, 'jetsChargedEmEnergyFraction', i), 'neef':getVarValue(c, 'jetsNeutralEmEnergyFraction', i), 'id':id,\
-        'hfhef':getVarValue(c, 'jetsHFHadronEnergyFraction', i), 'hfeef':getVarValue(c, 'jetsHFEMEnergyFraction', i),\
-        'muef':getVarValue(c, 'jetsMuonEnergyFraction', i), 'elef':getVarValue(c, 'jetsElectronEnergyFraction', i), 'phef':getVarValue(c, 'jetsPhotonEnergyFraction', i),\
-        'jetCutBasedPUJetIDFlag':getVarValue(c, 'jetsCutBasedPUJetIDFlag', i),'jetMET53XPUJetIDFlag':getVarValue(c, 'jetsMET53XPUJetIDFlag', i),'jetFull53XPUJetIDFlag':getVarValue(c, 'jetsFull53XPUJetIDFlag', i), 
-        'btag': getVarValue(c, 'jetsBtag', i), 'unc': unc 
-        }
-        isolated = True
-        for obj in crosscleanobjects:   #Jet cross-cleaning
-          if deltaR(jet, obj) < 0.3:# and  obj['relIso']< relIsoCleaningRequ: #(obj['pt']/jet['pt']) > 0.4:  
-            isolated = False
-  #          print "Cleaned", 'deltaR', deltaR(jet, obj), 'maxfrac', max([jet['muef'],jet['elef']]), 'pt:jet/obj', jet['pt'], obj['pt'], "relIso",  obj['relIso'], 'btag',getVarValue(c, 'jetsBtag', i), "parton", parton
-    #          print 'Not this one!', jet, obj, deltaR(jet, obj)
-            break
-        jet['isolated'] = isolated
-        res.append(jet)
+    unc = getVarValue(c, 'jetsUnc', i)
+    id =  getVarValue(c, 'jetsID', i)
+    phi = getVarValue(c, 'jetsPhi', i)
+#      if max([jet['muef'],jet['elef']]) > 0.6 : print jet
+    if jermode.lower()!="none":
+      c_jet = jerDifferenceScaleFactor(eta, jermode)
+      sigmaMCRel = jerSigmaMCRel(pt, eta)
+      sigma = sqrt(c_jet**2 - 1)*sigmaMCRel
+      scale = random.gauss(1,sigma)
+      met_dx+=(1-scale)*cos(phi)*pt
+      met_dy+=(1-scale)*sin(phi)*pt
+      pt*=scale
+    if jesmode.lower()!="none":
+      scale = 1. + sign*unc
+      met_dx+=(1-scale)*cos(phi)*pt
+      met_dy+=(1-scale)*sin(phi)*pt
+      pt*=scale
+    if pt>30 and abs(eta)<4.5:
+      parton = int(abs(getVarValue(c, 'jetsParton', i)))
+      jet = {'pt':pt, 'eta':eta,'phi':phi, 'pdg':parton,\
+      'id':id,
+      'chef':getVarValue(c, 'jetsChargedHadronEnergyFraction', i), 'nhef':getVarValue(c, 'jetsNeutralHadronEnergyFraction', i),\
+      'ceef':getVarValue(c, 'jetsChargedEmEnergyFraction', i), 'neef':getVarValue(c, 'jetsNeutralEmEnergyFraction', i), 'id':id,\
+      'hfhef':getVarValue(c, 'jetsHFHadronEnergyFraction', i), 'hfeef':getVarValue(c, 'jetsHFEMEnergyFraction', i),\
+      'muef':getVarValue(c, 'jetsMuonEnergyFraction', i), 'elef':getVarValue(c, 'jetsElectronEnergyFraction', i), 'phef':getVarValue(c, 'jetsPhotonEnergyFraction', i),\
+      'jetCutBasedPUJetIDFlag':getVarValue(c, 'jetsCutBasedPUJetIDFlag', i),'jetMET53XPUJetIDFlag':getVarValue(c, 'jetsMET53XPUJetIDFlag', i),'jetFull53XPUJetIDFlag':getVarValue(c, 'jetsFull53XPUJetIDFlag', i), 
+      'btag': getVarValue(c, 'jetsBtag', i), 'unc': unc 
+      }
+      isolated = True
+      for obj in crosscleanobjects:   #Jet cross-cleaning
+        if deltaR(jet, obj) < 0.3:# and  obj['relIso']< relIsoCleaningRequ: #(obj['pt']/jet['pt']) > 0.4:  
+          isolated = False
+#          print "Cleaned", 'deltaR', deltaR(jet, obj), 'maxfrac', max([jet['muef'],jet['elef']]), 'pt:jet/obj', jet['pt'], obj['pt'], "relIso",  obj['relIso'], 'btag',getVarValue(c, 'jetsBtag', i), "parton", parton
+  #          print 'Not this one!', jet, obj, deltaR(jet, obj)
+          break
+      jet['isolated'] = isolated
+      res.append(jet)
   res  = sorted(res,  key=lambda k: -k['pt'])
   return {'jets':res,'met_dx':met_dx, 'met_dy':met_dy}
+
+def getMCEfficiencyForBTagSF(jets, isFastSim=False):
+  for jet in jets:
+    r = getMCEff(parton=jet['pdg'], pt=jet['pt'], eta=jet['eta'], year=2012)#getEfficiencyAndMistagRate(jPt, jEta, jParton )
+    jet['effData']=r
+#    print [j[0] for j in jets]
+  mceffs = tuple()
+  mceffs_SF = tuple()
+  mceffs_SF_b_Up = tuple()
+  mceffs_SF_b_Down = tuple()
+  mceffs_SF_light_Up = tuple()
+  mceffs_SF_light_Down = tuple()
+  for jet in jets:
+    if isFastSim:
+      fsim_SF =       ROOT.getFastSimCorr(partonName(abs(jet['pdg'])),jet['Pt'],"mean",jet['Eta'])
+      fsim_SF_up =    ROOT.getFastSimCorr(partonName(abs(jet['pdg'])),jet['Pt'],"up",  jet['Eta'])
+      fsim_SF_down =  ROOT.getFastSimCorr(partonName(abs(jet['pdg'])),jet['Pt'],"down",jet['Eta'])
+    else:
+      fsim_SF = 1.
+      fsim_SF_up = 1.
+      fsim_SF_down = 1.
+    mceffs += (jet['effData']["mcEff"],)
+    mceffs_SF += (jet['effData']["mcEff"]*jet['effData']["SF"]*fsim_SF,)
+    if abs(jet['pdg'])==5 or abs(jet['pdg'])==4:
+      mceffs_SF_b_Up   += (jet['effData']["mcEff"]*jet['effData']["SF_up"]*fsim_SF_up,)
+      mceffs_SF_b_Down += (jet['effData']["mcEff"]*jet['effData']["SF_down"]*fsim_SF_down,)
+      mceffs_SF_light_Up   += (jet['effData']["mcEff"]*jet['effData']["SF"],)
+      mceffs_SF_light_Down += (jet['effData']["mcEff"]*jet['effData']["SF"],)
+    else:
+      mceffs_SF_b_Up   += (jet['effData']["mcEff"]*jet['effData']["SF"],)
+      mceffs_SF_b_Down += (jet['effData']["mcEff"]*jet['effData']["SF"],)
+      mceffs_SF_light_Up   += (jet['effData']["mcEff"]*jet['effData']["SF_up"]*fsim_SF_up,)
+      mceffs_SF_light_Down += (jet['effData']["mcEff"]*jet['effData']["SF_down"]*fsim_SF_down,)
+
+  return {"mceffs":mceffs, "mceffs_SF":mceffs_SF, "mceffs_SF_b_Up":mceffs_SF_b_Up, "mceffs_SF_b_Down":mceffs_SF_b_Down, "mceffs_SF_light_Up":mceffs_SF_light_Up, "mceffs_SF_light_Down":mceffs_SF_light_Down}
+
+
 
 #if options.chmode == "incNoISRJetID":
 #  def isrJetID(j):
@@ -298,6 +360,8 @@ def findSec(x,lp):
 storeVectors = True
 
 for sample in allSamples:
+  if not sample.has_key('isFastSim'):
+    sample['isFastSim']=False
   sample['filenames'] = {}
   sample['weight'] = {}
   for bin_ in sample['bins']:
@@ -389,21 +453,44 @@ for isample, sample in enumerate(allSamples):
   
   jetvars = ["jetPt", "jetEta", "jetPhi", "jetPdg", "jetBtag", "jetCutBasedPUJetIDFlag","jetFull53XPUJetIDFlag","jetMET53XPUJetIDFlag", "jetChef", "jetNhef", "jetCeef", "jetNeef", "jetHFhef", "jetHFeef", "jetMuef", "jetElef", "jetPhef", "jetISRJetID", "jetUnc"]
   muvars = ["muPt", "muEta", "muPhi", "muPdg", "muRelIso", "muDxy", "muDz", "muNormChi2", "muNValMuonHits", "muNumMatchedStations", "muPixelHits", "muNumtrackerLayerWithMeasurement", 'muIsGlobal', 'muIsTracker']
+  muvars+= ["muMT", "muClosestJetDeltaR", "muClosestJetMass", "muPBoost3D"]
+
   elvars = ["elPt", "elEta", "elPhi", "elPdg", "elRelIso", "elDxy", "elDz"]
   tavars = ["taPt", "taEta", "taPhi", "taPdg"]
   if not sample['name'].lower().count('data'):
     mcvars = ["gpPdg", "gpM", "gpPt", "gpEta", "gpPhi", "gpMo1", "gpMo2", "gpDa1", "gpDa2", "gpSta"]
   if options.allsamples.lower()=='sms':
     variables+=['osetMgl', 'osetMN', 'osetMC', 'osetMsq']
-  extraVariables=["nbtags", "ht", "nSoftIsolatedMuons", "nHardMuons", "nHardMuonsRelIso02", "nSoftElectrons", "nHardElectrons", "nSoftTaus", "nHardTaus"]
+  extraVariables=["nbtags", "ht",  "nSoftElectrons", "nHardElectrons", "nSoftTaus", "nHardTaus"]
   if sample['newMETCollection']:
     extraVariables+=["type1phiMet", "type1phiMetphi"]
   extraVariables += ["isrJetPt", "isrJetEta", "isrJetPhi", "isrJetPdg", "isrJetBtag", "isrJetChef", "isrJetNhef", "isrJetCeef", "isrJetNeef", "isrJetHFhef", "isrJetHFeef", "isrJetMuef", "isrJetElef", "isrJetPhef", "isrJetCutBasedPUJetIDFlag", "isrJetFull53XPUJetIDFlag", "isrJetMET53XPUJetIDFlag", "isrJetBTBVetoPassed", "isrJetUnc"]
 
-  extraVariables += ["softIsolatedMuPt", "softIsolatedMuEta", "softIsolatedMuPhi", "softIsolatedMuPdg", "softIsolatedMuRelIso", "softIsolatedMuDxy", "softIsolatedMuDz",  'softIsolatedMuNormChi2', 'softIsolatedMuNValMuonHits', 'softIsolatedMuNumMatchedStations', 'softIsolatedMuPixelHits', 'softIsolatedMuNumtrackerLayerWithMeasurement', 'softIsolatedMuIsTracker', 'softIsolatedMuIsGlobal']
-  extraVariables += ["softIsolatedMT", "closestMuJetDeltaR", "nHardbtags", "nSoftbtags"]
+  extraVariables += ["looseMuIndex", "mediumMuIndex", "tightMuIndex"]
+  extraVariables += ["nSoftMuonsLooseID","nHardMuonsLooseID","nSoftMuonsMediumID","nHardMuonsMediumID","nSoftMuonsTightID","nHardMuonsTightID"]
+
+  if not bin.lower().count('run'):
+    btagVars=[]
+    for i in range(maxConsideredBTagWeight+1):
+      btagVars.append("weightBTag"+str(i)+"")
+      btagVars.append("weightBTag"+str(i)+"_SF")
+      btagVars.append("weightBTag"+str(i)+"_SF_b_Up")
+      btagVars.append("weightBTag"+str(i)+"_SF_b_Down")
+      btagVars.append("weightBTag"+str(i)+"_SF_light_Up")
+      btagVars.append("weightBTag"+str(i)+"_SF_light_Down")
+      if i>0:
+        btagVars.append("weightBTag"+str(i)+"p")
+        btagVars.append("weightBTag"+str(i)+"p_SF")
+        btagVars.append("weightBTag"+str(i)+"p_SF_b_Up")
+        btagVars.append("weightBTag"+str(i)+"p_SF_b_Down")
+        btagVars.append("weightBTag"+str(i)+"p_SF_light_Up")
+        btagVars.append("weightBTag"+str(i)+"p_SF_light_Down")
+    extraVariables+=btagVars
+
+#  extraVariables += ["softIsolatedMuPt", "softIsolatedMuEta", "softIsolatedMuPhi", "softIsolatedMuPdg", "softIsolatedMuRelIso", "softIsolatedMuDxy", "softIsolatedMuDz",  'softIsolatedMuNormChi2', 'softIsolatedMuNValMuonHits', 'softIsolatedMuNumMatchedStations', 'softIsolatedMuPixelHits', 'softIsolatedMuNumtrackerLayerWithMeasurement', 'softIsolatedMuIsTracker', 'softIsolatedMuIsGlobal']
+#  extraVariables += ["softIsolatedMT", "closestMuJetDeltaR", "nHardbtags", "nSoftbtags"]
   if storeVectors: 
-    extraVariables+=[ "softIsolatedpmuboost3d"]
+#    extraVariables+=[ "softIsolatedpmuboost3d"]
     if sample['name'].lower().count('ttjets'):
       extraVariables+=["top0Pt", "top1Pt", "topPtWeight"] 
   structString = "struct MyStruct_"+str(nc)+"_"+str(isample)+"{ULong64_t event;"
@@ -613,24 +700,27 @@ for isample, sample in enumerate(allSamples):
           ntaus  = getVarValue(c, 'ntaus')    #Number of eles in Ele Vec
           if not sample['name'].lower().count('data'):
             s.ptISR = getPtISR(s)
-          allGoodMuons = getAllMuons(c,nmuons)
           allGoodElectrons = getAllElectrons(c, neles)
           allGoodTaus = getAllTaus(c, ntaus)
+          allGoodMuons = getAllMuons(c,nmuons) #Loose ID without relIso and Dz<0.5
 
-          softMuons, hardMuons         = splitListOfObjects('pt', 20, allGoodMuons)
           softElectrons, hardElectrons = splitListOfObjects('pt', 20, allGoodElectrons)
           softTaus, hardTaus           = splitListOfObjects('pt', 20, allGoodTaus)
-          
-          hardMuonsRelIso02 = filter(lambda m:m['relIso']<0.2, hardMuons)
-#            softMuons = sorted(softMuons, key=lambda k: -k['pt'])
-#            s.nSoftMuons = len(softMuons)
-          softIsolatedMuons = filter(lambda m:m['relIso']*m['pt']<10.0, softMuons)
-          if options.chmode.lower().count('mudzid'):
-            softIsolatedMuons = filter(lambda m:m['Dz']<0.2, softIsolatedMuons)
+          muCandidates = filter(lambda m:abs(m['Dz'])<0.02, allGoodMuons)  #Apply Dz<0.02
+          softMuons, hardMuons = splitListOfObjects('pt', 20, muCandidates)
+          hardMuonsMediumID = filter(lambda m:hybridIso(m, 'medium'), hardMuons) #for crosscleaning
 
-          s.nSoftIsolatedMuons = len(softIsolatedMuons)
-          s.nHardMuons = len(hardMuons)
-          s.nHardMuonsRelIso02 = len(hardMuonsRelIso02)
+          s.nSoftMuonsLooseID = len(filter(lambda m:hybridIso(m, 'loose'), softMuons)) 
+          s.nHardMuonsLooseID = len(filter(lambda m:hybridIso(m, 'loose'), hardMuons)) 
+          s.nSoftMuonsMediumID = len(filter(lambda m:hybridIso(m, 'medium'), softMuons)) 
+          s.nHardMuonsMediumID = len(hardMuonsMediumID) 
+          s.nSoftMuonsTightID = len(filter(lambda m:hybridIso(m, 'tight'), softMuons)) 
+          s.nHardMuonsTightID = len(filter(lambda m:hybridIso(m, 'tight'), hardMuons)) 
+
+          s.looseMuIndex = next((i for i in range(len(muCandidates)) if hybridIso(muCandidates[i], 'loose')), -1) 
+          s.mediumMuIndex =next((i for i in range(len(muCandidates)) if hybridIso(muCandidates[i], 'medium')), -1) 
+          s.tightMuIndex = next((i for i in range(len(muCandidates)) if hybridIso(muCandidates[i], 'tight')), -1) 
+
           s.nSoftElectrons = len(softElectrons)
           s.nHardElectrons = len(hardElectrons)
           s.nSoftTaus = len(softTaus)
@@ -639,7 +729,7 @@ for isample, sample in enumerate(allSamples):
           if options.chmode.count("CleanedWithAllLeptons"):
             jResult = getGoodJets(c, allGoodMuons + allGoodElectrons, jermode=options.jermode, jesmode=options.jesmode)
           else:
-            jResult = getGoodJets(c, hardMuonsRelIso02 + hardElectrons, jermode=options.jermode, jesmode=options.jesmode)
+            jResult = getGoodJets(c, hardMuonsMediumID + hardElectrons, jermode=options.jermode, jesmode=options.jesmode)
           jetResult = jResult['jets']
           met_dx = jResult['met_dx']
           met_dy = jResult['met_dy']
@@ -654,9 +744,9 @@ for isample, sample in enumerate(allSamples):
           idJets60 = filter(lambda j:j['id'] and j['isolated'] and j['pt']>60, jetResult)
           s.ht = sum([ j['pt'] for j in idJets30])
           s.njet    = len(idJets30)
-          s.nbtags  = len(filter(lambda j:j['btag']>0.679, idJets30))
-          s.nHardbtags  = len(filter(lambda j:j['pt']>=60 and j['btag']>0.679, idJets30))
-          s.nSoftbtags  = len(filter(lambda j:j['pt']<60 and j['btag']>0.679, idJets30))
+          s.nbtags  = len(filter(lambda j:j['btag']>0.679 and abs(j['eta'])<2.4, idJets30))
+          s.nHardbtags  = len(filter(lambda j:j['pt']>=60 and j['btag']>0.679 and abs(j['eta'])<2.4, idJets30))
+          s.nSoftbtags  = len(filter(lambda j:j['pt']<60 and j['btag']>0.679 and abs(j['eta'])<2.4, idJets30))
           s.njet60  = len(idJets60)
           s.njet60FailID = len(filter(lambda j:not j['id'] and j['isolated'], jetResult))
           s.njet30FailID = len(filter(lambda j:not j['id'] and j['isolated'] and j['pt']>60, jetResult))
@@ -686,29 +776,6 @@ for isample, sample in enumerate(allSamples):
             recoilJets = filter(lambda j:j['pt']>60 and j['id'] and j['isolated'] and deltaPhi(j['phi'], leadingJet['phi']) >=2.5, jetResult[1:])
             s.isrJetBTBVetoPassed = (len(recoilJets)==0)
           
-          if len(softIsolatedMuons)>=1:
-            s.softIsolatedMuPt                             = softIsolatedMuons[0]['pt']
-            s.softIsolatedMuEta                            = softIsolatedMuons[0]['eta']
-            s.softIsolatedMuPhi                            = softIsolatedMuons[0]['phi']
-            s.softIsolatedMuPdg                            = softIsolatedMuons[0]['Pdg']
-            s.softIsolatedMuRelIso                         = softIsolatedMuons[0]['relIso']
-            s.softIsolatedMuDxy                            = softIsolatedMuons[0]['Dxy']
-            s.softIsolatedMuDz                             = softIsolatedMuons[0]['Dz']
-            s.softIsolatedMuNormChi2                       = softIsolatedMuons[0]['NormChi2']
-            s.softIsolatedMuNValMuonHits                   = softIsolatedMuons[0]['NValMuonHits']
-            s.softIsolatedMuNumMatchedStations             = softIsolatedMuons[0]['NumMatchedStations']
-            s.softIsolatedMuPixelHits                      = softIsolatedMuons[0]['PixelHits']
-            s.softIsolatedMuNumtrackerLayerWithMeasurement = softIsolatedMuons[0]['NumtrackerLayerWithMeasurement']
-            s.softIsolatedMuIsGlobal                       = softIsolatedMuons[0]['IsGlobal']
-            s.softIsolatedMuIsTracker                      = softIsolatedMuons[0]['IsTracker']
-          if len(softIsolatedMuons)>=1:
-            s.softIsolatedMT                               = sqrt(2.0*s.softIsolatedMuPt*s.type1phiMet*(1-cos(s.softIsolatedMuPhi - s.type1phiMetphi)))
-            if len(idJets30)>0:
-              cjet = findClosestJet(idJets30, {'phi':softIsolatedMuons[0]['phi'], 'eta':softIsolatedMuons[0]['eta']})
-              s.closestMuJetDeltaR = cjet['deltaR']
-              s.closestMuJetMass = invMass(cjet['jet'], {'phi':softIsolatedMuons[0]['phi'], 'pt':softIsolatedMuons[0]['pt'], 'eta':softIsolatedMuons[0]['eta']})
-            s.softIsolatedpmuboost3d = pmuboost3d(idJets30, {'pt':s.type1phiMet, 'phi':s.type1phiMetphi}, {'phi':softIsolatedMuons[0]['phi'], 'pt':softIsolatedMuons[0]['pt'], 'eta':softIsolatedMuons[0]['eta']} )
-             
 
           s.nmu = len(allGoodMuons)
           s.nel = len(allGoodElectrons)
@@ -752,6 +819,16 @@ for isample, sample in enumerate(allSamples):
               s.muNumtrackerLayerWithMeasurement[i] = allGoodMuons[i]['NumtrackerLayerWithMeasurement']
               s.muIsGlobal[i] = allGoodMuons[i]['IsGlobal']
               s.muIsTracker[i] = allGoodMuons[i]['IsTracker']
+              s.muMT[i]    = sqrt(2.0*s.muPt[i]*s.type1phiMet*(1-cos(s.muPhi[i] - s.type1phiMetphi)))
+              if len(idJets30)>0:
+                cjet = findClosestJet(idJets30, {'phi':s.muPhi[i], 'eta':s.muEta[i]})
+                s.muClosestJetDeltaR[i] = cjet['deltaR']
+                s.muClosestJetMass[i] = invMass(cjet['jet'], {'phi':s.muPhi[i], 'pt':s.muPt[i], 'eta':s.muEta[i]})
+              else:
+                s.muClosestJetDeltaR[i] =float('nan') 
+                s.muClosestJetMass[i] =  float('nan') 
+              s.muPBoost3D[i] = pmuboost3d(idJets30, {'pt':s.type1phiMet, 'phi':s.type1phiMetphi}, {'phi':s.muPhi[i], 'pt':s.muPt[i], 'eta':s.muEta[i]} )
+             
 
             s.nelCount = min(10,s.nel)
             for i in xrange(s.nelCount):
@@ -769,6 +846,46 @@ for isample, sample in enumerate(allSamples):
               s.taEta[i] = allGoodTaus[i]['eta']
               s.taPhi[i] = allGoodTaus[i]['phi']
               s.taPdg[i] = allGoodTaus[i]['pdg']
+            if not bin.lower().count('run'):
+              zeroTagWeight = 1.
+              bjetCandidates=filter(lambda j:abs(j['eta'])<2.4, idJets30)
+              mceff = getMCEfficiencyForBTagSF(bjetCandidates, sample['isFastSim'])
+              mceffW                = getTagWeightDict(mceff["mceffs"], maxConsideredBTagWeight)
+              mceffW_SF             = getTagWeightDict(mceff["mceffs_SF"], maxConsideredBTagWeight)
+              mceffW_SF_b_Up        = getTagWeightDict(mceff["mceffs_SF_b_Up"], maxConsideredBTagWeight)
+              mceffW_SF_b_Down      = getTagWeightDict(mceff["mceffs_SF_b_Down"], maxConsideredBTagWeight)
+              mceffW_SF_light_Up    = getTagWeightDict(mceff["mceffs_SF_light_Up"], maxConsideredBTagWeight)
+              mceffW_SF_light_Down  = getTagWeightDict(mceff["mceffs_SF_light_Down"], maxConsideredBTagWeight)
+#              print "mceffW                 ", mceffW
+#              print "mceffW_SF              ", mceffW_SF
+#              print "mceffW_SF_b_Up       ", mceffW_SF_b_Up
+#              print "mceffW_SF_b_Down     ", mceffW_SF_b_Down
+#              print "mceffW_SF_light_Up   ", mceffW_SF_light_Up
+#              print "mceffW_SF_light_Down ", mceffW_SF_light_Down
+#              print
+              for i in range(1, maxConsideredBTagWeight+1):
+                exec("s.weightBTag"+str(i)+"p=1")
+                exec("s.weightBTag"+str(i)+"p_SF=1")
+                exec("s.weightBTag"+str(i)+"p_SF_b_Up=1")
+                exec("s.weightBTag"+str(i)+"p_SF_b_Down=1")
+                exec("s.weightBTag"+str(i)+"p_SF_light_Up=1")
+                exec("s.weightBTag"+str(i)+"p_SF_light_Down=1")
+              for i in range(maxConsideredBTagWeight+1):
+                exec("s.weightBTag"+str(i)+"="+str(mceffW[i]))
+                exec("s.weightBTag"+str(i)+"_SF="+str(mceffW_SF[i]))
+                exec("s.weightBTag"+str(i)+"_SF_b_Up="+str(mceffW_SF_b_Up[i]))
+                exec("s.weightBTag"+str(i)+"_SF_b_Down="+str(mceffW_SF_b_Down[i]))
+                exec("s.weightBTag"+str(i)+"_SF_light_Up="+str(mceffW_SF_light_Up[i]))
+                exec("s.weightBTag"+str(i)+"_SF_light_Down="+str(mceffW_SF_light_Down[i]))
+                for j in range(i+1, maxConsideredBTagWeight+1):
+                  exec("s.weightBTag"+str(j)+"p               -="+str(mceffW[i]))
+                  exec("s.weightBTag"+str(j)+"p_SF            -="+str(mceffW_SF[i]))
+                  exec("s.weightBTag"+str(j)+"p_SF_b_Up       -="+str(mceffW_SF_b_Up[i]))
+                  exec("s.weightBTag"+str(j)+"p_SF_b_Down     -="+str(mceffW_SF_b_Down[i]))
+                  exec("s.weightBTag"+str(j)+"p_SF_light_Up   -="+str(mceffW_SF_light_Up[i]))
+                  exec("s.weightBTag"+str(j)+"p_SF_light_Down -="+str(mceffW_SF_light_Down[i]))
+
+
           tmpDir = ROOT.gDirectory.func()
           chain_gDir.cd()
 #          print s.type1phiMet

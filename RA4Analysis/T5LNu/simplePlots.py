@@ -28,9 +28,9 @@ allStacks=[]
 minimum=10**(-2.5)
 
 chmode = "copy"
-presel = "refSelNoNJet"
+presel = "refSel"
 ver = "v5"
-region = "signal23j"
+region = "signal"
 preprefix = region+"_"+ver
 if region == "preSel":
   #isrjet>350, met>250, mT<70
@@ -131,7 +131,7 @@ if region == "signalCosMLPhi3j":
   normalizeToData = False
   normalizeSignalToMCSum = False
 
-subdir = "/pngT5LNu/"
+subdir = "/pngT5Full/"
 doAnalysisVars            = True 
 doAllDiscriminatingVars   = False  
 doOtherVars               = False  
@@ -151,20 +151,11 @@ if presel == "refSelTauNoNJet":
 if additionalCut!="":
   commoncf+="&&"+additionalCut
 
-prefix = "T5Lnu_"+preprefix+"_"+presel+"_"+chmode+"_"
+prefix = "T5Full_"+preprefix+"_"+presel+"_"+chmode+"_"
+T5Full_1100_200_100['color'] = ROOT.kBlue + 3
+T5Full_1100_800_600['color'] = ROOT.kRed + 3
 
-def getT5LNu(mgl, mn, color = ROOT.kBlue):
-  res = {} 
-  res["dirname"] = ["/data/schoef/convertedTuples_v22/copy/"]
-  res["bins"] = ["T5LNu_"+str(mgl)+"_"+str(mn)]
-  res["hasWeight"] = True
-  res["weight"] = "weight"
-  res["color"] = color
-  res["name"] = res["bins"][0]
-  return res
-
-
-signals=[getT5LNu(1000,100, ROOT.kBlue + 3), getT5LNu(1000, 600, ROOT.kRed + 3)]
+signals=[T5Full_1100_200_100, T5Full_1100_800_600]
 if addSignals:
   allSamples += signals
 
@@ -172,7 +163,8 @@ for sample in allSamples:
   sample["Chain"] = chainstring
   sample["dirname"] = "/data/schoef/convertedTuples_v22/"+chmode+"/"
 for sample in allSamples[1:]:
-  sample["weight"] = "puWeight"
+#  sample["weight"] = "puWeight"
+  sample["weight"] = "weight"
 
 def getStack(varstring, binning, cutstring, signals, varfunc = "", addData=True, additionalCutFunc = "", symmetrizeSignalCharge = False):
   DATA          = variable(varstring, binning, cutstring,additionalCutFunc=additionalCutFunc)

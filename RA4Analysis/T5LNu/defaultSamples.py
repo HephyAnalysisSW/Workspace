@@ -27,6 +27,29 @@ dataSingleMu["Chain"] = "Events"
 dataSingleMu["Counter"] = "bool_EventCounter_passed_PAT.obj"
 allSamples.append(dataSingleMu)
 
+
+T5Full_1100_200_100={}
+T5Full_1100_200_100['reweightingHistoFile'] = S10rwHisto 
+T5Full_1100_200_100['reweightingHistoFileSysPlus'] = S10rwPlusHisto
+T5Full_1100_200_100['reweightingHistoFileSysMinus'] = S10rwMinusHisto
+T5Full_1100_200_100["name"]     = "T5Full_1100_200_100"
+T5Full_1100_200_100['newMETCollection'] = True
+T5Full_1100_200_100["dirname"] = "/dpm/oeaw.ac.at/home/cms/store/user/schoef/pat_160514/"
+T5Full_1100_200_100["bins"]    = ["T5Full_1100_200_100-4"]
+T5Full_1100_200_100["Chain"] = "Events"
+T5Full_1100_200_100["Counter"] = "bool_EventCounter_passed_PAT.obj"
+
+T5Full_1100_800_600={}
+T5Full_1100_800_600['reweightingHistoFile'] = S10rwHisto 
+T5Full_1100_800_600['reweightingHistoFileSysPlus'] = S10rwPlusHisto
+T5Full_1100_800_600['reweightingHistoFileSysMinus'] = S10rwMinusHisto
+T5Full_1100_800_600["name"]     = "T5Full_1100_800_600"
+T5Full_1100_800_600['newMETCollection'] = True
+T5Full_1100_800_600["dirname"] = "/dpm/oeaw.ac.at/home/cms/store/user/schoef/pat_160514/"
+T5Full_1100_800_600["bins"]    = ["T5Full_1100_800_600-4"]
+T5Full_1100_800_600["Chain"] = "Events"
+T5Full_1100_800_600["Counter"] = "bool_EventCounter_passed_PAT.obj"
+
 mc={}
 mc["name"]     = "mc";
 mc["dirname"] = "/dpm/oeaw.ac.at/home/cms/store/user/mhickel/pat_130527"
@@ -57,9 +80,6 @@ ttbar['reweightingHistoFileSysPlus'] = S10rwPlusHisto
 ttbar['reweightingHistoFileSysMinus'] = S10rwMinusHisto
 ttbar["bins"] = ["8TeV-TTJets"]
 ttbar["name"] = "TTJets" 
-ttbar['reweightingHistoFile'] = S10rwHisto
-ttbar['reweightingHistoFileSysPlus'] = S10rwPlusHisto
-ttbar['reweightingHistoFileSysMinus'] = S10rwMinusHisto
 
 ttbarPowHeg = copy.deepcopy(mc)
 ttbarPowHeg['reweightingHistoFile'] = S10rwHisto 
@@ -67,9 +87,6 @@ ttbarPowHeg['reweightingHistoFileSysPlus'] = S10rwPlusHisto
 ttbarPowHeg['reweightingHistoFileSysMinus'] = S10rwMinusHisto
 ttbarPowHeg["bins"] = [["8TeV-TTJets-powheg-v1+2", ["8TeV-TTJets-powheg-v1", "8TeV-TTJets-powheg-v2"]]]
 ttbarPowHeg["name"] = "TTJetsPowHeg" 
-ttbarPowHeg['reweightingHistoFile'] = S10rwHisto
-ttbarPowHeg['reweightingHistoFileSysPlus'] = S10rwPlusHisto
-ttbarPowHeg['reweightingHistoFileSysMinus'] = S10rwMinusHisto
 #
 #ttbarPowHeg = copy.deepcopy(mc)
 #ttbarPowHeg["dirname"] = "/data/mhickel/pat_130328/"
