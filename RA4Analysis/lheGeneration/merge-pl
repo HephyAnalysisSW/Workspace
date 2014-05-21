@@ -30,14 +30,11 @@ my $begin_event  = '<event>';
 my $end_event    = '</event>';
 my $begin_init   = '<init>';
 my $end_init     = '</init>';
-my $begin_slha   = '<slha>';
-my $end_slha     = '</slha>';
 
 # Parse the command line arguments
 if ( $#ARGV < 3 ) {
   die "This script must be called with at least four filenames as arguments!\n";
 }
-my $bannerfile_new = pop(@ARGV);
 my $bannerfile = pop(@ARGV);
 my $outfile = pop(@ARGV);
 
@@ -204,8 +201,7 @@ $dispxsec = sprintf('%0.5E', $totxsec);
 $uwgt = sprintf('%0.5E', $totxsec / $totevents);
 
 # Display new information
-print "New banner file: $bannerfile_new\n";
-print "Old banner file: $bannerfile\n";
+print "Banner file: $bannerfile\n";
 print "Output file: $outfile\n";
 print " No. Events = $totevents, Cross-section = $dispxsec\n";
 for ($i = 1; $i <= $#oldinit; $i++) {
@@ -226,8 +222,7 @@ print " Unit weight = $uwgt\n";
 ###########################################################################
 
 $gzout    = gzopen($outfile, "w") || die ("Couldn't open file $outfile\n");
-open(BANNER, ">$bannerfile")      || die ("Couldn't open file $bannerfile\n");
-$slhain  = gzopen($bannerfile_new,"r")      || die ("Couldn't open file $bannerfile_new\n");
+open(BANNER, ">$bannerfile")      || die ("Couldn't open file $outfile\n");
 
 $stage = 0;
 $eventcount = 0;
@@ -251,22 +246,6 @@ foreach $infile (@infiles) {
 
       if ($gzline =~ m/$end_header/)   { $stage++; }
       else { print BANNER $gzline; }
-
-      if ($gzline =~ m/$begin_slha/)  {
-	while (1) {
-	  $gzbytes = $slhain->gzreadline($gzline);
-	  if ($gzbytes == 0)  { last; }
-          $gzout->gzwrite($gzline);
-	}
-	while (1) {
-          $gzbytes = $gzin->gzreadline($gzline);
-	  print BANNER $gzline;
-	  if ($gzline =~ m/$end_slha/) { 
-            $gzbytes = $gzin->gzreadline($gzline);
-	    last; 
-	  }
-	}
-      }
 
     # Init block
     } elsif ($stage == 2) {
