@@ -466,8 +466,8 @@ for isample, sample in enumerate(allSamples):
     extraVariables+=["type1phiMet", "type1phiMetphi"]
   extraVariables += ["isrJetPt", "isrJetEta", "isrJetPhi", "isrJetPdg", "isrJetBtag", "isrJetChef", "isrJetNhef", "isrJetCeef", "isrJetNeef", "isrJetHFhef", "isrJetHFeef", "isrJetMuef", "isrJetElef", "isrJetPhef", "isrJetCutBasedPUJetIDFlag", "isrJetFull53XPUJetIDFlag", "isrJetMET53XPUJetIDFlag", "isrJetBTBVetoPassed", "isrJetUnc"]
 
-  extraVariables += ["looseMuIndex", "mediumMuIndex", "tightMuIndex"]
-  extraVariables += ["nSoftMuonsLooseID","nHardMuonsLooseID","nSoftMuonsMediumID","nHardMuonsMediumID","nSoftMuonsTightID","nHardMuonsTightID"]
+#  extraVariables += ["looseMuIndex", "mediumMuIndex", "tightMuIndex"]
+  extraVariables += ["nSoftMuonsLooseWP","nHardMuonsLooseWP","nSoftMuonsMediumWP","nHardMuonsMediumWP","nSoftMuonsTightWP","nHardMuonsTightWP"]
 
   if not bin.lower().count('run'):
     btagVars=[]
@@ -499,7 +499,7 @@ for isample, sample in enumerate(allSamples):
 #    structString +="Float_t "+var+";"
 #  for var in extraVariables:
 #    structString +="Float_t "+var+";"
-  structString +="Int_t nmu, nel, nta, njet, njet60, njet60FailID, njet30FailID, njet60FailISRJetID, njet30FailISRJetID;"
+  structString +="Int_t nmu, nel, nta, njet, njet60, njet60FailID, njet30FailID, njet60FailISRJetID, njet30FailISRJetID, looseMuIndex, mediumMuIndex, tightMuIndex;"
   if storeVectors:
     structString +="Int_t njetCount, nmuCount, nelCount, ntaCount;"
     for var in jetvars:
@@ -708,14 +708,14 @@ for isample, sample in enumerate(allSamples):
           softTaus, hardTaus           = splitListOfObjects('pt', 20, allGoodTaus)
           muCandidates = filter(lambda m:abs(m['Dz'])<0.02, allGoodMuons)  #Apply Dz<0.02
           softMuons, hardMuons = splitListOfObjects('pt', 20, muCandidates)
-          hardMuonsMediumID = filter(lambda m:hybridIso(m, 'medium'), hardMuons) #for crosscleaning
+          hardMuonsMediumWP = filter(lambda m:hybridIso(m, 'medium'), hardMuons) #for crosscleaning
 
-          s.nSoftMuonsLooseID = len(filter(lambda m:hybridIso(m, 'loose'), softMuons)) 
-          s.nHardMuonsLooseID = len(filter(lambda m:hybridIso(m, 'loose'), hardMuons)) 
-          s.nSoftMuonsMediumID = len(filter(lambda m:hybridIso(m, 'medium'), softMuons)) 
-          s.nHardMuonsMediumID = len(hardMuonsMediumID) 
-          s.nSoftMuonsTightID = len(filter(lambda m:hybridIso(m, 'tight'), softMuons)) 
-          s.nHardMuonsTightID = len(filter(lambda m:hybridIso(m, 'tight'), hardMuons)) 
+          s.nSoftMuonsLooseWP = len(filter(lambda m:hybridIso(m, 'loose'), softMuons)) 
+          s.nHardMuonsLooseWP = len(filter(lambda m:hybridIso(m, 'loose'), hardMuons)) 
+          s.nSoftMuonsMediumWP = len(filter(lambda m:hybridIso(m, 'medium'), softMuons)) 
+          s.nHardMuonsMediumWP = len(hardMuonsMediumWP) 
+          s.nSoftMuonsTightWP = len(filter(lambda m:hybridIso(m, 'tight'), softMuons)) 
+          s.nHardMuonsTightWP = len(filter(lambda m:hybridIso(m, 'tight'), hardMuons)) 
 
           s.looseMuIndex = next((i for i in range(len(muCandidates)) if hybridIso(muCandidates[i], 'loose')), -1) 
           s.mediumMuIndex =next((i for i in range(len(muCandidates)) if hybridIso(muCandidates[i], 'medium')), -1) 
@@ -729,7 +729,7 @@ for isample, sample in enumerate(allSamples):
           if options.chmode.count("CleanedWithAllLeptons"):
             jResult = getGoodJets(c, allGoodMuons + allGoodElectrons, jermode=options.jermode, jesmode=options.jesmode)
           else:
-            jResult = getGoodJets(c, hardMuonsMediumID + hardElectrons, jermode=options.jermode, jesmode=options.jesmode)
+            jResult = getGoodJets(c, hardMuonsMediumWP + hardElectrons, jermode=options.jermode, jesmode=options.jesmode)
           jetResult = jResult['jets']
           met_dx = jResult['met_dx']
           met_dy = jResult['met_dy']
