@@ -88,9 +88,17 @@ for f in filelist:
 #sumStr1x = 'pfMetx'
 #sumStr2x = 'pfMetx - pfMetx_h + pfMetRWx_h '
 
-#prefix="h0"
-#sumStr1x = 'pfMetx'
-#sumStr2x = 'pfMetx - pfMetx_h0 + pfMetRWx_h0'
+prefix="h0"
+sumStr1x = 'pfMetx'
+sumStr2x = 'pfMetx - pfMetx_h0 + pfMetRWx_h0'
+
+#prefix="combined_h"
+#sumStr1x = 'pfMetx_h'
+#sumStr2x = 'pfMetRWx_h'
+#
+#prefix="combined_h0"
+#sumStr1x = 'pfMetx_h0'
+#sumStr2x = 'pfMetRWx_h0'
 
 #prefix="combined_h_h0"
 #sumStr1x = 'pfMetx_h + pfMetx_h0'
@@ -100,9 +108,9 @@ for f in filelist:
 #sumStr1x = 'pfMetx_h + pfMetx_h0 + pfMetx_gamma'
 #sumStr2x = 'pfMetRWx_h + pfMetRWx_h0 + pfMetRWx_gamma'
 
-prefix="combined_h_h0_gamma_hHF_egammaHF_mu_e"
-sumStr1x = 'pfMetx_h + pfMetx_h0 + pfMetx_gamma+pfMetx_h_HF + pfMetx_egamma_HF+pfMetx_mu+pfMetx_e'
-sumStr2x = 'pfMetRWx_h + pfMetRWx_h0 + pfMetRWx_gamma+pfMetRWx_h_HF + pfMetRWx_egamma_HF+pfMetRWx_mu+pfMetRWx_e'
+#prefix="combined_h_h0_gamma_hHF_egammaHF_mu_e"
+#sumStr1x = 'pfMetx_h + pfMetx_h0 + pfMetx_gamma+pfMetx_h_HF + pfMetx_egamma_HF+pfMetx_mu+pfMetx_e'
+#sumStr2x = 'pfMetRWx_h + pfMetRWx_h0 + pfMetRWx_gamma+pfMetRWx_h_HF + pfMetRWx_egamma_HF+pfMetRWx_mu+pfMetRWx_e'
 
 #prefix="h_h0"
 #sumStr1x = 'pfMetx'
@@ -182,8 +190,5 @@ for m, m2, var, var2, binning in sumvars:
   c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngPF/'+prefix+'_'+m+".png")
   c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngPF/'+prefix+'_'+m+".root")
 
-  for t in pfTypes:
-    h[m+'_'+t] = ROOT.TH1F(m+'_'+t, m+'_'+t, 200,-200,200)
-    h[m+'_'+t] = ROOT.TH1F(m+'_'+t, m+'_'+t, 200,-200,200)
 
 

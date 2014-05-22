@@ -681,7 +681,7 @@ for isample, sample in enumerate(allSamples):
               lgp2 = []
               tops = []
               igp = 0
-	      lgps = list(gps)
+              lgps = list(gps)
               for gp in gps:
                 if abs(gp.pdgId()) == 6:
                   tops.append(gp)
