@@ -341,20 +341,68 @@ def getMCEfficiencyForBTagSF(jets, isFastSim=False):
 def isrJetID(j):
   return j['id'] and j['chef'] > 0.2 and j['neef']<0.7 and j['nhef']<0.7 and j['ceef'] < 0.5 and abs(j['eta']) < 2.4
 
-# helpers for GenParticle serching
+# helpers for GenParticle searching and matching
 def find(x,lp):
-  for ip,p in enumerate(lp):
-    if x == p:
-      break
-  if ip == len(lp)-1:
-    ip = -1
-  return ip
+  if x in lp:
+    return lp.index(x)
+  else:
+    return -1
 
-def findSec(x,lp):
-  gp = x
+def findSec1(gp):
   while gp.status() != 3:
     gp = gp.mother(0)
   return gp
+  
+def findSec2(gp):
+  while gp.status() != 3:
+    gp = gp.mother(max(gp.numberOfMothers()-1,0))
+  return gp
+  
+def assignGpTag(gpmu,gpmo1,gpmo2,lgp):
+# get primary and taus
+  if gpmu.status() == 3: return 1
+  if abs(gpmo1.pdgId()) == 13 and gpmo1.status() == 3: return 1
+  if abs(gpmo1.pdgId()) == 15 and gpmo1.status() == 3: return 2
+# try jets through mother
+  tag1 = -1
+  igpmo1 = find(gpmo1,lgp)
+  if igpmo1>5:
+    if abs(gpmo1.pdgId()) in [1,2,3,21]: tag1 = 3
+    if abs(gpmo1.pdgId()) in [4,5]: tag1 = abs(gpmo1.pdgId())
+  tag2 = -1
+  igpmo2 = find(gpmo2,lgp)
+  if igpmo2>5:
+    if abs(gpmo2.pdgId()) in [1,2,3,21]: tag2 = 3
+    if abs(gpmo2.pdgId()) in [4,5]: tag2 = abs(gpmo2.pdgId())
+  if tag1>-1 and tag2>-1:
+    dr1 = deltaR({'eta':gpmu.eta(),'phi':gpmu.phi()},{'eta':gpmo1.eta(),'phi':gpmo1.phi()})
+    dr2 = deltaR({'eta':gpmu.eta(),'phi':gpmu.phi()},{'eta':gpmo2.eta(),'phi':gpmo2.phi()})
+    return tag1 if dr1<dr2 else tag2
+  else:
+    return tag1 if tag1>-1 else tag2
+# if not use dr matching
+  drmin = 0.5
+  tag = 0
+  for igp,gp in enumerate(lgp):
+    if igp<6: continue
+    absId = abs(gp.pdgId())
+    if absId in [1,2,3,4,5,21]:
+      dr = deltaR({'eta':gpmu.eta(),'phi':gpmu.phi()},{'eta':gp.eta(),'phi':gp.phi()})
+      if dr < drmin:
+        drmin = dr
+        tag = absId if absId in [4,5] else 3
+  return tag
+  
+def assignMuIgp(i,s):
+  drmin = 0.2
+  igpmin = -1
+  for igp in range(s.ngp):
+    if not abs(s.gpPdg[igp])==13: continue
+    dr = deltaR({'eta':s.muEta[i],'phi':s.muPhi[i]},{'eta':s.gpEta[igp],'phi':s.gpPhi[igp]})
+    if dr < drmin:
+      drmin = dr
+      igpmin = igp
+  return igpmin
 
 ##################################################################################
 storeVectors = True
@@ -453,12 +501,12 @@ for isample, sample in enumerate(allSamples):
   
   jetvars = ["jetPt", "jetEta", "jetPhi", "jetPdg", "jetBtag", "jetCutBasedPUJetIDFlag","jetFull53XPUJetIDFlag","jetMET53XPUJetIDFlag", "jetChef", "jetNhef", "jetCeef", "jetNeef", "jetHFhef", "jetHFeef", "jetMuef", "jetElef", "jetPhef", "jetISRJetID", "jetUnc"]
   muvars = ["muPt", "muEta", "muPhi", "muPdg", "muRelIso", "muDxy", "muDz", "muNormChi2", "muNValMuonHits", "muNumMatchedStations", "muPixelHits", "muNumtrackerLayerWithMeasurement", 'muIsGlobal', 'muIsTracker']
-  muvars+= ["muMT", "muClosestJetDeltaR", "muClosestJetMass", "muPBoost3D"]
+  muvars+= ["muMT", "muClosestJetDeltaR", "muClosestJetMass", "muPBoost3D", "muIgpMatch"]
 
   elvars = ["elPt", "elEta", "elPhi", "elPdg", "elRelIso", "elDxy", "elDz"]
   tavars = ["taPt", "taEta", "taPhi", "taPdg"]
   if not sample['name'].lower().count('data'):
-    mcvars = ["gpPdg", "gpM", "gpPt", "gpEta", "gpPhi", "gpMo1", "gpMo2", "gpDa1", "gpDa2", "gpSta"]
+    mcvars = ["gpPdg", "gpM", "gpPt", "gpEta", "gpPhi", "gpMo1", "gpMo2", "gpDa1", "gpDa2", "gpSta", "gpTag"]
   if options.allsamples.lower()=='sms':
     variables+=['osetMgl', 'osetMN', 'osetMC', 'osetMsq']
   extraVariables=["nbtags", "ht",  "nSoftElectrons", "nHardElectrons", "nSoftTaus", "nHardTaus"]
@@ -513,7 +561,7 @@ for isample, sample in enumerate(allSamples):
     if not sample['name'].lower().count('data'):
       structString +="Int_t ngp;"
       for var in mcvars:
-        structString +="Float_t "+var+"[20];"
+        structString +="Float_t "+var+"[30];"
   structString   +="};"
 #  print structString
 
@@ -633,6 +681,7 @@ for isample, sample in enumerate(allSamples):
               lgp2 = []
               tops = []
               igp = 0
+	      lgps = list(gps)
               for gp in gps:
                 if abs(gp.pdgId()) == 6:
                   tops.append(gp)
@@ -642,7 +691,7 @@ for isample, sample in enumerate(allSamples):
                 elif (abs(gp.pdgId())==11 or abs(gp.pdgId())==13 or abs(gp.pdgId())==15) and gp.pt() > 3.:
                   lgp2.append(gp)
               lgp2 = sorted(lgp2, key=lambda k: -k.pt())
-              s.ngp = min(len(lgp)+len(lgp2),20)
+              s.ngp = min(len(lgp)+len(lgp2),30)
               for igp,gp in enumerate(lgp):
                 s.gpPdg[igp] = gp.pdgId()
                 s.gpM[igp] = gp.mass()
@@ -650,24 +699,27 @@ for isample, sample in enumerate(allSamples):
                 s.gpEta[igp] = gp.eta()
                 s.gpPhi[igp] = gp.phi()
                 s.gpMo1[igp] = find(gp.mother(0),lgp)
-                s.gpMo2[igp] = find(gp.mother(min(gp.numberOfMothers(),1)),lgp)
+                s.gpMo2[igp] = find(gp.mother(max(gp.numberOfMothers()-1,0)),lgp)
                 s.gpDa1[igp] = find(gp.daughter(0),lgp)
-                s.gpDa2[igp] = find(gp.daughter(min(gp.numberOfDaughters(),1)),lgp)
+                s.gpDa2[igp] = find(gp.daughter(max(gp.numberOfDaughters()-1,0)),lgp)
                 s.gpSta[igp] = gp.status()
+                s.gpTag[igp] = 1 if abs(gp.pdgId())==13 else -1
               for igp2,gp2 in enumerate(lgp2,igp+1):
-                if igp2 == 20:
+                if igp2 == 30:
                   break
-                gpm = findSec(gp2,gps)
+                gpm1 = findSec1(gp2)
+                gpm2 = findSec2(gp2)
                 s.gpPdg[igp2] = gp2.pdgId()
                 s.gpM[igp2] = gp2.mass()
                 s.gpPt[igp2] = gp2.pt()
                 s.gpEta[igp2] = gp2.eta()
                 s.gpPhi[igp2] = gp2.phi()
-                s.gpMo1[igp2] = find(gpm,lgp)
-                s.gpMo2[igp2] = -2
+                s.gpMo1[igp2] = find(gpm1,lgp)
+                s.gpMo2[igp2] = find(gpm2,lgp)
                 s.gpDa1[igp2] = -1
                 s.gpDa2[igp2] = -1
                 s.gpSta[igp2] = gp2.status()
+                s.gpTag[igp2] = assignGpTag(gp2,gpm1,gpm2,lgp) if abs(gp2.pdgId())==13 else -1
 ###################
           s.weight = sample["weight"][bin]
           for var in variables[1:]:
@@ -705,11 +757,11 @@ for isample, sample in enumerate(allSamples):
             s.ptISR = getPtISR(s)
           allGoodElectrons = getAllElectrons(c, neles)
           allGoodTaus = getAllTaus(c, ntaus)
-          allGoodMuons = getAllMuons(c,nmuons) #Loose ID without relIso and Dz<0.5
+          allGoodMuons = getAllMuons(c,nmuons) #Loose ID without relIso and Dxy<0.02
 
           softElectrons, hardElectrons = splitListOfObjects('pt', 20, allGoodElectrons)
           softTaus, hardTaus           = splitListOfObjects('pt', 20, allGoodTaus)
-          muCandidates = filter(lambda m:abs(m['Dz'])<0.02, allGoodMuons)  #Apply Dz<0.02
+          muCandidates = filter(lambda m:abs(m['Dxy'])<0.02, allGoodMuons)  #Apply Dxy<0.02
           softMuons, hardMuons = splitListOfObjects('pt', 20, muCandidates)
           hardMuonsMediumWP = filter(lambda m:hybridIso(m, 'medium'), hardMuons) #for crosscleaning
 
@@ -831,6 +883,11 @@ for isample, sample in enumerate(allSamples):
                 s.muClosestJetDeltaR[i] =float('nan') 
                 s.muClosestJetMass[i] =  float('nan') 
               s.muPBoost3D[i] = pmuboost3d(idJets30, {'pt':s.type1phiMet, 'phi':s.type1phiMetphi}, {'phi':s.muPhi[i], 'pt':s.muPt[i], 'eta':s.muEta[i]} )
+              s.muIgpMatch[i] = -1
+# MC specific part
+              if not sample['name'].lower().count('data'):
+                s.muIgpMatch[i] = assignMuIgp(i,s)
+###################
              
 
             s.nelCount = min(10,s.nel)
