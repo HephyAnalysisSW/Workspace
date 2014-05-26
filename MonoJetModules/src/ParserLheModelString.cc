@@ -199,7 +199,7 @@ const bool ParserLheModelString::parseLheModelString(
                 }
 
                 // last pattern special treatment: end of string, no delimiter
-                if (((*cIter).first) == (numberPatterns - 1)) {
+                if (int((*cIter).first) == int(numberPatterns - 1)) {
 
                     patternEndPosition = lheModelStringSize - 1;
 
