@@ -8,7 +8,7 @@ from datetime import datetime
 from Workspace.HEPHYPythonTools.helpers import getVarValue, deltaPhi, minAbsDeltaPhi, invMassOfLightObjects, deltaR, closestMuJetDeltaR, invMass,  findClosestJet
 from monoJetFuncs import softIsolatedMT, pmuboost3d
 
-from Workspace.HEPHYPythonTools.btagEff import getMCEff, getTagWeightDict, getSF 
+from Workspace.HEPHYPythonTools.btagEff import getMCEff, getTagWeightDict, getSF, partonName 
 maxConsideredBTagWeight = 3 
 
 from defaultMETSamples_mc import *
@@ -99,6 +99,13 @@ if options.smsMsqRangeString!='None' and options.allsamples.lower()=='sms':
       b = "T2DegenerateStop_2J_mStop-100to150"
     if msq>=175 and msq<=225:
       b = "T2DegenerateStop_2J_mStop-175to225"
+    if msq>=250 and msq<=300:
+      b = "T2DegenerateStop_2J_mStop-250to300-4"
+    if msq>=325 and msq<=375:
+      b = "T2DegenerateStop_2J_mStop-325to375"
+    if msq>=400:
+      b = "T2DegenerateStop_2J_mStop-400-2"
+
     if not b: 
       print "Don't know which bin on dpm for msq",msq
       continue
@@ -128,7 +135,7 @@ if options.smsMsqRangeString!='None' and options.allsamples.lower()=='sms':
 else:
   exec("allSamples = [" +options.allsamples+ "]")
 
-overwrite = False
+overwrite = True
 target_lumi = 19700 #pb-1
 
 from localInfo import username
@@ -310,9 +317,9 @@ def getMCEfficiencyForBTagSF(jets, isFastSim=False):
   mceffs_SF_light_Down = tuple()
   for jet in jets:
     if isFastSim:
-      fsim_SF =       ROOT.getFastSimCorr(partonName(abs(jet['pdg'])),jet['Pt'],"mean",jet['Eta'])
-      fsim_SF_up =    ROOT.getFastSimCorr(partonName(abs(jet['pdg'])),jet['Pt'],"up",  jet['Eta'])
-      fsim_SF_down =  ROOT.getFastSimCorr(partonName(abs(jet['pdg'])),jet['Pt'],"down",jet['Eta'])
+      fsim_SF =       ROOT.getFastSimCorr(partonName(abs(jet['pdg'])),jet['pt'],"mean",jet['eta'])
+      fsim_SF_up =    ROOT.getFastSimCorr(partonName(abs(jet['pdg'])),jet['pt'],"up",  jet['eta'])
+      fsim_SF_down =  ROOT.getFastSimCorr(partonName(abs(jet['pdg'])),jet['pt'],"down",jet['eta'])
     else:
       fsim_SF = 1.
       fsim_SF_up = 1.
@@ -500,7 +507,7 @@ for isample, sample in enumerate(allSamples):
     variables.extend(["nTrueGenVertices", "genmet", "genmetphi", "puWeight", "puWeightSysPlus", "puWeightSysMinus", "ptISR"])
   
   jetvars = ["jetPt", "jetEta", "jetPhi", "jetPdg", "jetBtag", "jetCutBasedPUJetIDFlag","jetFull53XPUJetIDFlag","jetMET53XPUJetIDFlag", "jetChef", "jetNhef", "jetCeef", "jetNeef", "jetHFhef", "jetHFeef", "jetMuef", "jetElef", "jetPhef", "jetISRJetID", "jetUnc"]
-  muvars = ["muPt", "muEta", "muPhi", "muPdg", "muRelIso", "muDxy", "muDz", "muNormChi2", "muNValMuonHits", "muNumMatchedStations", "muPixelHits", "muNumtrackerLayerWithMeasurement", 'muIsGlobal', 'muIsTracker']
+  muvars = ["muPt", "muEta", "muPhi", "muPdg", "muRelIso", "muDxy", "muDz", "muNormChi2", "muNValMuonHits", "muNumMatchedStations", "muPixelHits", "muNumtrackerLayerWithMeasurement", 'muIsGlobal', 'muIsTracker', 'muWPt']
   muvars+= ["muMT", "muClosestJetDeltaR", "muClosestJetMass", "muPBoost3D", "muIgpMatch"]
 
   elvars = ["elPt", "elEta", "elPhi", "elPdg", "elRelIso", "elDxy", "elDz"]
@@ -516,6 +523,7 @@ for isample, sample in enumerate(allSamples):
 
 #  extraVariables += ["looseMuIndex", "mediumMuIndex", "tightMuIndex"]
   extraVariables += ["nSoftMuonsLooseWP","nHardMuonsLooseWP","nSoftMuonsMediumWP","nHardMuonsMediumWP","nSoftMuonsTightWP","nHardMuonsTightWP"]
+  extraVariables += ["nHardbtags", "nSoftbtags"]
 
   if not bin.lower().count('run'):
     btagVars=[]
@@ -536,7 +544,6 @@ for isample, sample in enumerate(allSamples):
     extraVariables+=btagVars
 
 #  extraVariables += ["softIsolatedMuPt", "softIsolatedMuEta", "softIsolatedMuPhi", "softIsolatedMuPdg", "softIsolatedMuRelIso", "softIsolatedMuDxy", "softIsolatedMuDz",  'softIsolatedMuNormChi2', 'softIsolatedMuNValMuonHits', 'softIsolatedMuNumMatchedStations', 'softIsolatedMuPixelHits', 'softIsolatedMuNumtrackerLayerWithMeasurement', 'softIsolatedMuIsTracker', 'softIsolatedMuIsGlobal']
-#  extraVariables += ["softIsolatedMT", "closestMuJetDeltaR", "nHardbtags", "nSoftbtags"]
   if storeVectors: 
 #    extraVariables+=[ "softIsolatedpmuboost3d"]
     if sample['name'].lower().count('ttjets'):
@@ -799,7 +806,7 @@ for isample, sample in enumerate(allSamples):
           idJets60 = filter(lambda j:j['id'] and j['isolated'] and j['pt']>60, jetResult)
           s.ht = sum([ j['pt'] for j in idJets30])
           s.njet    = len(idJets30)
-          s.nbtags  = len(filter(lambda j:j['btag']>0.679 and abs(j['eta'])<2.4, idJets30))
+          s.nbtags      = len(filter(lambda j:j['btag']>0.679 and abs(j['eta'])<2.4, idJets30))
           s.nHardbtags  = len(filter(lambda j:j['pt']>=60 and j['btag']>0.679 and abs(j['eta'])<2.4, idJets30))
           s.nSoftbtags  = len(filter(lambda j:j['pt']<60 and j['btag']>0.679 and abs(j['eta'])<2.4, idJets30))
           s.njet60  = len(idJets60)
@@ -883,6 +890,8 @@ for isample, sample in enumerate(allSamples):
                 s.muClosestJetDeltaR[i] =float('nan') 
                 s.muClosestJetMass[i] =  float('nan') 
               s.muPBoost3D[i] = pmuboost3d(idJets30, {'pt':s.type1phiMet, 'phi':s.type1phiMetphi}, {'phi':s.muPhi[i], 'pt':s.muPt[i], 'eta':s.muEta[i]} )
+              s.muWPt[i] = sqrt( (allGoodMuons[i]['pt']*cos(allGoodMuons[i]['phi']) + s.type1phiMet*cos(s.type1phiMetphi))**2\
+                               + (allGoodMuons[i]['pt']*sin(allGoodMuons[i]['phi']) + s.type1phiMet*sin(s.type1phiMetphi))**2)
               s.muIgpMatch[i] = -1
 # MC specific part
               if not sample['name'].lower().count('data'):

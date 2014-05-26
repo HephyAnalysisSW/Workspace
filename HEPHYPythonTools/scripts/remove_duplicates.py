@@ -17,7 +17,8 @@ if options.mode=="dpm":
   p = subprocess.Popen(["dpns-ls "+ options.dirname], shell = True , stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
   for line in p.stdout.readlines():
     line = line[:-1]
-    subdirnames.append(line)
+    if not line.count('joined'):
+      subdirnames.append(line)
 
 if options.mode=="nfs":
   subdirnames = os.listdir(options.dirname) 

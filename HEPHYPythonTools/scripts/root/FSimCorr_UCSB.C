@@ -19,8 +19,9 @@ double getFastSimCorr(std::string flavor, double pt, std::string SFvary, double 
     highPtErrFac = 2;
   }
   if(pt<40) {
-    std::cout<<"Error, pt too low"<<std::endl;
-    exit(1);
+//    std::cout<<"Error, pt too low"<<std::endl;
+//    exit(1);
+    pt=40; //Dirty fix for DegStop SMS
   }
 
   double ptBins[14] = {40, 50, 60, 70, 80, 100, 120, 160, 210, 260, 320, 400, 500, 670};

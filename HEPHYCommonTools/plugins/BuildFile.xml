@@ -1,0 +1,36 @@
+<use   name="root"/>
+<use   name="lhapdf"/>
+<use   name="FWCore/Framework"/>
+<use   name="FWCore/ParameterSet"/>
+<use   name="FWCore/ServiceRegistry"/>
+<use   name="SimGeneral/HepPDTRecord"/>
+<use   name="CommonTools/UtilAlgos"/>
+<use   name="CondFormats/JetMETObjects"/>
+<use   name="HLTrigger/HLTcore"/>
+<use   name="DataFormats/Luminosity"/>
+<use   name="TrackingTools/TransientTrack"/>
+<use   name="TrackingTools/Records"/>
+<use   name="JetMETCorrections/Objects"/>
+<use   name="DataFormats/GeometrySurface"/>
+<use   name="DataFormats/Candidate"/>
+<use   name="DataFormats/MuonReco"/>
+<use   name="DataFormats/JetReco"/>
+<use   name="DataFormats/METReco"/>
+<use   name="DataFormats/L1GlobalTrigger"/>
+<use   name="DataFormats/VertexReco"/>
+<use   name="DataFormats/BTauReco"/>
+<use   name="DataFormats/PatCandidates"/>
+<use   name="SimDataFormats/JetMatching"/>
+<use   name="RecoEgamma/EgammaTools"/>
+<use   name="MagneticField/Engine"/>
+<use   name="Workspace/HEPHYCommonTools"/>
+<library   file="SUSYTupelizer.cc" name="SUSYTupelizer">
+  <flags   EDM_PLUGIN="1"/>
+</library>
+<library   file="EventCounter.cc" name="EventCounter">
+  <flags   EDM_PLUGIN="1"/>
+</library>
+<library   file="CaloTowersTupelizer.cc" name="CaloTowersTupelizer">
+  <flags   EDM_PLUGIN="1"/>
+</library>
+

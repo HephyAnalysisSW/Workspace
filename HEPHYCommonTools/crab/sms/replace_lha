@@ -1,0 +1,4 @@
+#! /bin/sh
+
+sed -i "s/eval \`scram runtime -sh | grep -v SCRAMRT_LSB_JOBNAME\`/eval \`scram runtime -sh | grep -v SCRAMRT_LSB_JOBNAME\`; scramv1 setup lhapdffull; scramv1 b/"   */job/CMSSW.sh
+
