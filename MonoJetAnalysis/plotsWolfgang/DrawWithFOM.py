@@ -200,12 +200,13 @@ class DrawWithFOM:
             if s.isBackground():
                 if bkgs==None:
 #                    print "Defining background ",s.name,h.GetName()
-                    bkgs = h.Clone()
-                    print "Cloning bkg histo from ",s.name,h.GetName()
-#                    legend.AddEntry(bkgs,"Backgrounds","")
-                else:
-                    bkgs.Add(h)
-                    print "Adding bkg histo for ",s.name,h.GetName()
+                    bkgs = ROOT.THStack()
+                    bkgs.SetNameTitle(h.GetName(),h.GetTitle())
+                opt = "hist "
+                if s.fill:
+                    opt += "F"
+                bkgs.Add(h,opt)
+#                print "Adding bkg histo for ",s.name,h.GetName()
 #                legend.SetHeader("Backgrounds")
             elif s.isSignal():
                 h.SetLineColor(s.color)
@@ -238,11 +239,22 @@ class DrawWithFOM:
 
         currpad.cd(1)
         ROOT.gPad.SetRightMargin(0.15)
-        bkgmax = bkgs.GetMaximum()
+        # common maximum (from sum of histograms)
+        bkgmax = bkgs.GetStack().Last().GetMaximum()
         bkgs.SetMaximum(bkgmax/0.85)
         bkgs.SetMinimum(0.1)
-        print "bkgmax = ",bkgmax
+        for sh in bkgs.GetHists():
+            sh.SetMaximum(bkgmax/0.85)
+            sh.SetMinimum(0.1)
+        for sh in bkgs.GetStack():
+            sh.SetMaximum(bkgmax/0.85)
+            sh.SetMinimum(0.1)
+        # draw all histograms in stack 
+        #   (just a workaround to store the individual histograms in the canvas)
         bkgs.Draw("zcol")
+        # overwrite with the sum (last histogram in stack)
+        bkgs.GetStack().Last().SetFillStyle(0)
+        bkgs.GetStack().Last().Draw("zcol same")
         latexs.append(latex.DrawLatex(0.40,0.15,"Backgrounds"))
 #        bkgs.GetYaxis().SetTitle("Events / bin")
 #        contlist = [ bkgmax/0.85*10**(-i) for i in range(2,5) ]
