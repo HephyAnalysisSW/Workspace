@@ -8,6 +8,12 @@ from KinematicUtilities import *
 
 # from viewWs import viewWs
 
+def floatEqual(a,b):
+    tolerance = 1.e-6
+    if a==0 and b==0:
+        return True
+    return abs(a-b)/(a+b)<tolerance
+
 def getTauToMu(eh):
     gpPdgs = [ int(v) for v in eh.get("gpPdg") ]
     itau = None
@@ -162,16 +168,16 @@ class StdPlotsBase(PlotsBase):
         if math.isnan(isrJetPt):
             return
 
+        imu = hardestIsolatedMuon(eh,ptmin=5.,etamax=1.5)
+        if imu==None:
+            return
+
+        softMuPt = eh.get("muPt")[imu]
         if self.hardMuon:
-            imu = hardestIsolatedMuon(eh,ptmin1=5.,ptmin2=20.,etamax=1.5,reliso=0.5)
-            if imu==None:
-                return
-            softMuPt = eh.get("muPt")[imu]
             if softMuPt<30:
                 return
         else:
-            softMuPt = eh.get("softIsolatedMuPt")
-            if math.isnan(softMuPt):
+            if softMuPt>20:
                 return
 
 #        if isrJetPt<350:
@@ -181,20 +187,14 @@ class StdPlotsBase(PlotsBase):
 #        if met<300:
 #            return
 
-        if self.hardMuon:
-            softMuEta = eh.get("muEta")[imu]
-        else:
-            softMuEta = eh.get("softIsolatedMuEta")
+        softMuEta = eh.get("muEta")[imu]
         if abs(softMuEta)>1.5:
             return
 
         njet = int(eh.get("njetCount")+0.5)
         jetPts = eh.get("jetPt")
         assert len(jetPts)==njet
-        ht = 0
-        for i in range(njet):
-            if jetPts[i]>30:
-                ht += jetPts[i]
+        ht = eh.get("ht")
 
 #        if met<300 or ht<400:
 #            return
@@ -208,10 +208,7 @@ class StdPlotsBase(PlotsBase):
 #        if abs(softMuDxy)>0.006 or abs(softMuDz)>0.012:
 #            return
 
-        if self.hardMuon:
-            pdg = eh.get("muPdg")[imu]
-        else:
-            pdg = eh.get("softIsolatedMuPdg")
+        pdg = eh.get("muPdg")[imu]
         if len(self.charges)==1:
             pdg = 0
 
@@ -228,12 +225,10 @@ class StdPlotsBase(PlotsBase):
         if ib!=None:
             return
         
-        if self.hardMuon:
-            softMuPhi = eh.get("muPhi")[imu]
-        else:
-            softMuPhi = eh.get("softIsolatedMuPhi")
+        softMuPhi = eh.get("muPhi")[imu]
         metphi = eh.get("type1phiMetphi")
         mt = math.sqrt(2*met*softMuPt*(1-math.cos(metphi-softMuPhi)))
+        assert floatEqual(mt,eh.get("muMT")[imu])
 #        if mt<60 or mt>88:
 #            return
 
@@ -271,18 +266,11 @@ class StdPlotsBase(PlotsBase):
         npv = eh.get("ngoodVertices")
         self.fill1DBySign("npv",pdg,npv,w)
 
-        if self.hardMuon:
-            softMuIso = eh.get("muRelIso")[imu]*softMuPt
-            softMuNPix = eh.get("muPixelHits")[imu]
-            softMuNTk = eh.get("muNumtrackerLayerWithMeasurement")[imu]
-            softMuDxy = eh.get("muDxy")[imu]
-            softMuDz = eh.get("muDz")[imu]
-        else:
-            softMuIso = eh.get("softIsolatedMuRelIso")*softMuPt
-            softMuNPix = eh.get("softIsolatedMuPixelHits")
-            softMuNTk = eh.get("softIsolatedMuNumtrackerLayerWithMeasurement")
-            softMuDxy = eh.get("softIsolatedMuDxy")
-            softMuDz = eh.get("softIsolatedMuDz")
+        softMuIso = eh.get("muRelIso")[imu]*softMuPt
+        softMuNPix = eh.get("muPixelHits")[imu]
+        softMuNTk = eh.get("muNumtrackerLayerWithMeasurement")[imu]
+        softMuDxy = eh.get("muDxy")[imu]
+        softMuDz = eh.get("muDz")[imu]
         self.fill1DBySign("softMuIso",pdg,softMuIso,w)
         self.fill1DBySign("softMuNPix",pdg,softMuNPix,w)
         self.fill1DBySign("softMuNTk",pdg,softMuNTk,w)

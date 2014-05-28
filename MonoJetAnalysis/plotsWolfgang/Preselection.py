@@ -1,15 +1,17 @@
 import math
 from EventHelper import EventHelper
 from KinematicUtilities import *
+from LeptonUtilities import *
 
 class Preselection:
 
     def __init__(self):
         self.isrJetPtMin = 110
         self.isrJetBTBVeto = True
-        self.softIsolatedMuPtMin = 5
+        self.softIsolatedMuPtMin = 5.
+        self.softIsolatedMuPtMax = 20.
         self.njet60Max = 2
-        self.type1phiMetMin = 200
+        self.type1phiMetMin = 200.
         self.softIsolatedMuEtaMax = 999.
 
     def accept(self,eh,sample):
@@ -22,16 +24,23 @@ class Preselection:
         if math.isnan(isrJetPt) or met<self.type1phiMetMin:
             return False
 
-        softIsolatedMuPt = eh.get("softIsolatedMuPt")
-        if math.isnan(softIsolatedMuPt) or softIsolatedMuPt<self.softIsolatedMuPtMin:
+        mediumMuIndex = int(eh.get("mediumMuIndex"))
+        if mediumMuIndex<0:
+            return False
+        imu = hardestIsolatedMuon(eh,ptmin=self.softIsolatedMuPtMin,etamax=self.softIsolatedMuEtaMax)
+        if imu==None:
             return False
 
-        if abs(eh.get("softIsolatedMuEta"))>self.softIsolatedMuEtaMax:
+        muPts = eh.get("muPt")
+        isolatedMuPt = muPts[imu]
+        if isolatedMuPt<self.softIsolatedMuPtMin or isolatedMuPt>self.softIsolatedMuPtMax:
+            return False
+
+        muEtas = eh.get("muEta")
+        if muEtas[imu]>self.softIsolatedMuEtaMax:
             return False
 
         if eh.get("nHardElectrons")>0:
-            return False
-        if eh.get("nHardMuonsRelIso02")>0:
             return False
         if eh.get("nHardTaus")>0:
             return False

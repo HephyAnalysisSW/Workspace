@@ -8,10 +8,11 @@ class PreselHardMu:
     def __init__(self):
         self.isrJetPtMin = 110
         self.isrJetBTBVeto = True
-        self.softIsolatedMuPtMin = 5
+        self.softIsolatedMuPtMin = 5.
+        self.hardIsolatedMuPtMin = 30.
         self.njet60Max = 2
-        self.type1phiMetMin = 200
-        self.softIsolatedMuEtaMax = 999
+        self.type1phiMetMin = 200.
+        self.softIsolatedMuEtaMax = 999.
 
     def accept(self,eh,sample):
 
@@ -23,41 +24,37 @@ class PreselHardMu:
         if math.isnan(isrJetPt) or met<self.type1phiMetMin:
             return False
 
-        imus = isolatedMuons(eh,ptmin1=self.softIsolatedMuPtMin, \
-                                 etamax=self.softIsolatedMuEtaMax, \
-                                 ptmin2=20.,reliso=0.5)
+        mediumMuIndex = int(eh.get("mediumMuIndex"))
+        if mediumMuIndex<0:
+            return False
         #
         # ask for at least one muon and veto 2nd muon at pT>20
         #
+        imus = isolatedMuons(eh,ptmin=self.softIsolatedMuPtMin,etamax=self.softIsolatedMuEtaMax)
         if len(imus)==0:
             return False
         if len(imus)>1 and eh.get("muPt")[imus[1]]>20.:
             return False
         imu = imus[0]
-#        if eh.get("muPt")[imu]<30.:
-#            return False
-
-#        if abs(eh.get("softIsolatedMuEta"))>self.softIsolatedMuEtaMax:
+#        if eh.get("muPt")[imu]<self.hardIsolatedMuPtMin:
 #            return False
 
         if eh.get("nHardElectrons")>0:
             return False
-#        if eh.get("nHardMuonsRelIso02")>0:
-#            return False
         if eh.get("nHardTaus")>0:
             return False
 
         if eh.get("njet60")>self.njet60Max:
             return False
 
+        assert not math.isnan(eh.get("isrJetBTBVetoPassed"))
+        if self.isrJetBTBVeto and eh.get("isrJetBTBVetoPassed")==0:
+            return False
+
 #
 # match with HT-binned W+jets sample
 #
         if eh.get("ht")<200:
-            return False
-
-        assert not math.isnan(eh.get("isrJetBTBVetoPassed"))
-        if self.isrJetBTBVeto and eh.get("isrJetBTBVetoPassed")==0:
             return False
 
         #

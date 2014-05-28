@@ -50,7 +50,7 @@ if options.preselection!=None:
     presel = preselClass()
     setattr(presel,"sourcefile",options.preselection)
 
-sampleBase = "/home/adamwo/data/monoJetTuples_v6/"
+sampleBase = "/home/adamwo/data/monoJetTuples_v7/"
 if options.dset=="singleMu":
     sampleBase += "copyMu/"
 elif options.dset=="diMu":
