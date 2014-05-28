@@ -1,5 +1,5 @@
-#include "Workspace/HEPHYCommonTools/interface/ModelParameters.h"
-#include "Workspace/HEPHYCommonTools/interface/StringTools.h"
+#include "Workspace/HEPHYCMSSWTools/interface/ModelParameters.h"
+#include "Workspace/HEPHYCMSSWTools/interface/StringTools.h"
 #include <algorithm>
 #include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
 

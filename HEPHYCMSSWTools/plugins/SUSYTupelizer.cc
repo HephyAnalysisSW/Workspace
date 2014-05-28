@@ -1,6 +1,6 @@
 #include "FWCore/Framework/interface/MakerMacros.h"
-#include "Workspace/HEPHYCommonTools/plugins/SUSYTupelizer.h"
-#include "Workspace/HEPHYCommonTools/interface/EdmHelper.h"
+#include "Workspace/HEPHYCMSSWTools/plugins/SUSYTupelizer.h"
+#include "Workspace/HEPHYCMSSWTools/interface/EdmHelper.h"
 #include <SimDataFormats/GeneratorProducts/interface/HepMCProduct.h>
 #include <SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h>
 #include "L1Trigger/GlobalTriggerAnalyzer/interface/L1GtUtils.h"
@@ -19,7 +19,7 @@
 #include "DataFormats/METReco/interface/GenMETCollection.h"
 #include "DataFormats/METReco/interface/PFMET.h"
 #include "DataFormats/PatCandidates/interface/TriggerEvent.h"
-#include "Workspace/HEPHYCommonTools/interface/ElectronEffectiveArea.h"
+#include "Workspace/HEPHYCMSSWTools/interface/ElectronEffectiveArea.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "JetMETCorrections/Objects/interface/JetCorrectionsRecord.h"
 #include "PhysicsTools/PatAlgos/plugins/PATElectronProducer.h"

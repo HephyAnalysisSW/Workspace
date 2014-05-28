@@ -76,8 +76,8 @@ else:
   print "No parsing of arguments!"
 
 if options.files[0][:9] == 'load:stop':
-  from Workspace.HEPHYCommonTools.fullSimSignals_cfi import *
-  print "Loading files from Workspace.HEPHYCommonTools.fullSimSignals_cfi"
+  from Workspace.HEPHYCMSSWTools.fullSimSignals_cfi import *
+  print "Loading files from Workspace.HEPHYCMSSWTools.fullSimSignals_cfi"
   infiles =  eval(options.files[0][5:])
   if options.startFileNumber!=-1 :
     print "Only taking files[",options.startFileNumber,",",options.stopFileNumber,"]"
@@ -262,7 +262,7 @@ if not options.mode.lower()=='sms':
 process.load('RecoMET.METFilters.EcalDeadCellTriggerPrimitiveFilter_cfi')
 process.load('RecoMET.METFilters.trackingFailureFilter_cfi')
 
-process.load('Workspace.HEPHYCommonTools.EventCounter')
+process.load('Workspace.HEPHYCMSSWTools.EventCounter')
 
 process.EventCounterAfterHLT = process.EventCounter.clone()
 process.EventCounterAfterScraping = process.EventCounter.clone()
@@ -391,7 +391,7 @@ if options.mode.lower()=='sms' or options.addPDFWeights:
 
 process.load("PhysicsTools.HepMCCandAlgos.flavorHistoryProducer_cfi")
 process.load("PhysicsTools.HepMCCandAlgos.flavorHistoryFilter_cfi")
-process.load('Workspace.HEPHYCommonTools.SUSYTupelizer_cfi')
+process.load('Workspace.HEPHYCMSSWTools.SUSYTupelizer_cfi')
 if isMC:
   process.p +=      process.bFlavorHistoryProducer
   process.p +=      process.cFlavorHistoryProducer
@@ -424,7 +424,7 @@ process.SUSYTupelizer.verbose = cms.untracked.bool(options.verbose)
 process.SUSYTupelizer.addFullMuonInfo = cms.untracked.bool(True)
 process.SUSYTupelizer.addFullEleInfo = cms.untracked.bool(True)
 process.SUSYTupelizer.addFullTauInfo = cms.untracked.bool(True)
-process.SUSYTupelizer.addHEPHYCommonToolsInfo = cms.untracked.bool(options.addRA4Info)
+process.SUSYTupelizer.addHEPHYCMSSWToolsInfo = cms.untracked.bool(options.addRA4Info)
 
 process.SUSYTupelizer.metsToMonitor = ["patPFMETsTypeIPhicorrected", "patPFMETsTypeIcorrected", "patPFMETsTypeIType0PFCandcorrected", "patRAWPFMETs"]
 process.p += process.SUSYTupelizer

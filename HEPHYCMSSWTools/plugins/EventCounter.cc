@@ -1,4 +1,4 @@
-#include "Workspace/HEPHYCommonTools/plugins/EventCounter.h"
+#include "Workspace/HEPHYCMSSWTools/plugins/EventCounter.h"
 #include "FWCore/Framework/interface/ESHandle.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/EventSetup.h"

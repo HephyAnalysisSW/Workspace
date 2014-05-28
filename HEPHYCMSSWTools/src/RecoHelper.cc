@@ -1,6 +1,6 @@
-#include "Workspace/HEPHYCommonTools/interface/RecoHelper.h"
-#include "Workspace/HEPHYCommonTools/interface/MathHelper.h"
-#include "Workspace/HEPHYCommonTools/interface/CombinatoricsHelper.h"
+#include "Workspace/HEPHYCMSSWTools/interface/RecoHelper.h"
+#include "Workspace/HEPHYCMSSWTools/interface/MathHelper.h"
+#include "Workspace/HEPHYCMSSWTools/interface/CombinatoricsHelper.h"
 #include "Validation/EcalClusters/interface/AnglesUtil.h"
 
 #include "DataFormats/Common/interface/Handle.h"

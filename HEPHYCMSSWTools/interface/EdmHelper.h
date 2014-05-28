@@ -1,5 +1,5 @@
-#ifndef HEPHYCommonTools_EdmHelper_H
-#define HEPHYCommonTools_EdmHelper_H
+#ifndef HEPHYCMSSWTools_EdmHelper_H
+#define HEPHYCMSSWTools_EdmHelper_H
 
 #include "FWCore/Framework/interface/Event.h"
 
@@ -20,7 +20,7 @@
 // #include "PhysicsTools/UtilAlgos/interface/StringCutObjectSelector.h"
 #include "CommonTools/UtilAlgos/interface/StringCutObjectSelector.h"
 
-#include "Workspace/HEPHYCommonTools/interface/MathHelper.h"
+#include "Workspace/HEPHYCMSSWTools/interface/MathHelper.h"
 
 //#include "TLorentzVector.h"
 

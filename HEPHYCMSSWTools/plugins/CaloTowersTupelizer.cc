@@ -1,5 +1,5 @@
 #include "FWCore/Framework/interface/MakerMacros.h"
-#include "Workspace/HEPHYCommonTools/plugins/CaloTowersTupelizer.h"
+#include "Workspace/HEPHYCMSSWTools/plugins/CaloTowersTupelizer.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 
 #include "DataFormats/HcalRecHit/interface/HcalRecHitCollections.h"

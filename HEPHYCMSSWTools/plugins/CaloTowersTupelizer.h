@@ -11,7 +11,7 @@
 #include "FWCore/Framework/interface/ESHandle.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
 
-#include "Workspace/HEPHYCommonTools/plugins/Tupelizer.h"
+#include "Workspace/HEPHYCMSSWTools/plugins/Tupelizer.h"
 
 #include "TNtuple.h"
 #include "TTree.h"

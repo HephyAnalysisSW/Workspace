@@ -1,8 +1,8 @@
-#ifndef HEPHYCommonTools_CombinatoricsHelper_H
-#define HEPHYCommonTools_CombinatoricsHelper_H
+#ifndef HEPHYCMSSWTools_CombinatoricsHelper_H
+#define HEPHYCMSSWTools_CombinatoricsHelper_H
 
-#include "Workspace/HEPHYCommonTools/interface/combination.h"
-#include "Workspace/HEPHYCommonTools/interface/MathHelper.h"
+#include "Workspace/HEPHYCMSSWTools/interface/combination.h"
+#include "Workspace/HEPHYCMSSWTools/interface/MathHelper.h"
 #include "DataFormats/PatCandidates/interface/Particle.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
 #include <vector>

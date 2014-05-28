@@ -1,5 +1,5 @@
-#ifndef Workspace_HEPHYCommonTools_ModelParameters_H
-#define Workspace_HEPHYCommonTools_ModelParameters_H
+#ifndef Workspace_HEPHYCMSSWTools_ModelParameters_H
+#define Workspace_HEPHYCMSSWTools_ModelParameters_H
 
 #include <string>
 #include <vector>

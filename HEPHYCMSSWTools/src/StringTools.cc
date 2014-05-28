@@ -1,4 +1,4 @@
-#include "Workspace/HEPHYCommonTools/interface/StringTools.h"
+#include "Workspace/HEPHYCMSSWTools/interface/StringTools.h"
 #include <cmath>
 #include <iostream>
 

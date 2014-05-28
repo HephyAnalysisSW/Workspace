@@ -1,6 +1,6 @@
-#include "Workspace/HEPHYCommonTools/interface/EdmHelper.h"
-#include "Workspace/HEPHYCommonTools/interface/MathHelper.h"
-#include "Workspace/HEPHYCommonTools/interface/CombinatoricsHelper.h"
+#include "Workspace/HEPHYCMSSWTools/interface/EdmHelper.h"
+#include "Workspace/HEPHYCMSSWTools/interface/MathHelper.h"
+#include "Workspace/HEPHYCMSSWTools/interface/CombinatoricsHelper.h"
 #include "FWCore/Common/interface/TriggerNames.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include <iostream>

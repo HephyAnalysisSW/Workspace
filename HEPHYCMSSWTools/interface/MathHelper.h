@@ -1,12 +1,12 @@
-#ifndef HEPHYCommonTools_MathHelper_H
-#define HEPHYCommonTools_MathHelper_H
+#ifndef HEPHYCMSSWTools_MathHelper_H
+#define HEPHYCMSSWTools_MathHelper_H
 #include <vector>
 #include "DataFormats/Math/interface/LorentzVector.h"
 #include "DataFormats/Candidate/interface/Particle.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
 #include "DataFormats/PatCandidates/interface/Muon.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
-//#include "Workspace/HEPHYCommonTools/interface/TaggedParticle.h"
+//#include "Workspace/HEPHYCMSSWTools/interface/TaggedParticle.h"
 
 class TLorentzVector;
 

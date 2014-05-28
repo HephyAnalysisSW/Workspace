@@ -1,5 +1,5 @@
-#ifndef Workspace_HEPHYCommonTools_RecoHelper_H
-#define Workspace_HEPHYCommonTools_RecoHelper_H
+#ifndef Workspace_HEPHYCMSSWTools_RecoHelper_H
+#define Workspace_HEPHYCMSSWTools_RecoHelper_H
 
 #include "DataFormats/PatCandidates/interface/Electron.h"
 #include "DataFormats/PatCandidates/interface/Muon.h"

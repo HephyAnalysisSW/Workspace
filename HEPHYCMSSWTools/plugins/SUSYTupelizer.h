@@ -41,11 +41,11 @@
 
 #include "SimGeneral/HepPDTRecord/interface/ParticleDataTable.h"
 
-#include "Workspace/HEPHYCommonTools/interface/RecoHelper.h"
-#include "Workspace/HEPHYCommonTools/interface/MathHelper.h"
-#include "Workspace/HEPHYCommonTools/interface/ModelParameters.h"
+#include "Workspace/HEPHYCMSSWTools/interface/RecoHelper.h"
+#include "Workspace/HEPHYCMSSWTools/interface/MathHelper.h"
+#include "Workspace/HEPHYCMSSWTools/interface/ModelParameters.h"
 
-#include "Workspace/HEPHYCommonTools/plugins/Tupelizer.h"
+#include "Workspace/HEPHYCMSSWTools/plugins/Tupelizer.h"
 
 #include "TNtuple.h"
 #include "TTree.h"
