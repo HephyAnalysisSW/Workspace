@@ -14,7 +14,7 @@
 #include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerObjectMapRecord.h"
 #include "HLTrigger/HLTfilters/interface/HLTLevel1GTSeed.h"
 #include "DataFormats/HLTReco/interface/TriggerEvent.h"
-#include "CMGTools/External/interface/PileupJetIdentifier.h"
+#include "DataFormats/JetReco/interface/PileupJetIdentifier.h"
 #include "DataFormats/METReco/interface/GenMET.h"
 #include "DataFormats/METReco/interface/GenMETCollection.h"
 #include "DataFormats/METReco/interface/PFMET.h"
@@ -270,7 +270,7 @@ int SUSYTupelizer::prescale(edm::Event & ev, const edm::EventSetup & setup, std:
 
 void SUSYTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup) {
   ev_ = &ev;
-  int peng(0);
+//  int peng(0);
   put("event",ev.id().event());
   put("run",ev.id().run());
   put("lumi",ev.luminosityBlock());
@@ -332,8 +332,8 @@ void SUSYTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup) {
       SUSYTupelizer::hlt_initialized_ = true;
     }
   }
-  bool muonTriggerUnprescaled = false;
-  bool electronTriggerUnprescaled = false;
+//  bool muonTriggerUnprescaled = false;
+//  bool electronTriggerUnprescaled = false;
   for (unsigned i=0; i<HLT_names_.size(); ++i){
     if (addTriggerInfo_) {
       for (unsigned j = 0; j< triggersToMonitor_.size(); j++) {
@@ -675,11 +675,6 @@ void SUSYTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup) {
     put("ngoodElectrons", good_electrons.size());
     put("nvetoElectrons", veto_electrons.size());
  } 
-// ____   _  _____   _____               
-//|  _ \ / \|_   _| |_   _|_ _ _   _ ___ 
-//| |_) / _ \ | |     | |/ _` | | | / __|
-//|  __/ ___ \| |     | | (_| | |_| \__ \
-//|_| /_/   \_\_|     |_|\__,_|\__,_|___/
 
   if (addFullTauInfo_) {
     vector<pat::Tau> patTaus (EdmHelper::getObjs<pat::Tau>(ev,  patTaus_));
@@ -721,13 +716,6 @@ void SUSYTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup) {
     put("tausAgainstElectronLoose", tausAgainstElectronLoose);
     put("taushasMCMatch", taushasMCMatch);
   }
-
-// ____   _  _____       _      _       
-//|  _ \ / \|_   _|     | | ___| |_ ___ 
-//| |_) / _ \ | |    _  | |/ _ \ __/ __|
-//|  __/ ___ \| |   | |_| |  __/ |_\__ \
-//|_| /_/   \_\_|    \___/ \___|\__|___/
-
 
 //  vector<pat::Jet> patJets (EdmHelper::getObjs<pat::Jet> (ev,  patJets_));
   edm::Handle< edm::View<pat::Jet > > patJets;
@@ -1408,10 +1396,10 @@ void SUSYTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup) {
     double isr_y = 0.;
     double ttbar_x = 0.;
     double ttbar_y = 0.;
-    double bMinusFromTopPt = NAN;
-    double bMinusFromTopEta = NAN;
-    double bPlusFromTopPt = NAN;
-    double bPlusFromTopEta = NAN;
+//    double bMinusFromTopPt = NAN;
+//    double bMinusFromTopEta = NAN;
+//    double bPlusFromTopPt = NAN;
+//    double bPlusFromTopEta = NAN;
     for (unsigned i = 0; i<genParticles.size(); i++) {
       //find top in decay chain
   //    cout<<prefix<<" At "<<i<<endl;
@@ -1441,9 +1429,9 @@ void SUSYTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup) {
         }
       }
     }
-    double isr = sqrt(isr_x*isr_x + isr_y*isr_y);
-    double isr30 = sqrt(isr30_x*isr30_x + isr30_y*isr30_y);
-    double ttbar = sqrt(ttbar_x*ttbar_x + ttbar_y*ttbar_y);
+//    double isr = sqrt(isr_x*isr_x + isr_y*isr_y);
+//    double isr30 = sqrt(isr30_x*isr30_x + isr30_y*isr30_y);
+//    double ttbar = sqrt(ttbar_x*ttbar_x + ttbar_y*ttbar_y);
   //  if (isr>0.) {
   //    cout<<prefix<<"Total ISR30 pT:" <<isr30<<endl;
   //    cout<<prefix<<"Total ISR   pT:" <<isr<<endl;
@@ -1660,8 +1648,8 @@ void SUSYTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup) {
       put("antinuE", antinuE);
       put("antinuMu", antinuMu);
       put("antinuTau", antinuTau);
-      int sumNu = nuMu + nuE + nuTau;
-      int sumantiNu = antinuMu + antinuE + antinuTau;
+//      int sumNu = nuMu + nuE + nuTau;
+//      int sumantiNu = antinuMu + antinuE + antinuTau;
 
       vector<const reco::GenParticle* > genTausFromWs;
   //    vector<const reco::GenParticle* > genNuFromW;

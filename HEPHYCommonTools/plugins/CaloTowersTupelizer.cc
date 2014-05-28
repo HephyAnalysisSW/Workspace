@@ -50,7 +50,7 @@ void CaloTowersTupelizer::beginRun ( edm::Run & iRun, edm::EventSetup const & iS
 
 void CaloTowersTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup) {
   ev_ = &ev;
-  int peng(0);
+//  int peng(0);
 
   edm::ESHandle<CaloGeometry> geometry;
   setup.get<CaloGeometryRecord>().get(geometry);
@@ -61,10 +61,10 @@ void CaloTowersTupelizer::produce( edm::Event & ev, const edm::EventSetup & setu
   //  decoder->setup(iSetup, CaloTPGTranscoder::HcalTPG);
 
   const CaloGeometry* geo = geometry.product();
-  const CaloSubdetectorGeometry* gHB =
-    geo->getSubdetectorGeometry(DetId::Hcal,HcalBarrel);
-  const CaloSubdetectorGeometry* gHE =
-    geo->getSubdetectorGeometry(DetId::Hcal,HcalEndcap);
+//  const CaloSubdetectorGeometry* gHB =
+//    geo->getSubdetectorGeometry(DetId::Hcal,HcalBarrel);
+//  const CaloSubdetectorGeometry* gHE =
+//    geo->getSubdetectorGeometry(DetId::Hcal,HcalEndcap);
   const CaloSubdetectorGeometry* gHF =
     geo->getSubdetectorGeometry(DetId::Hcal,HcalForward);
 
