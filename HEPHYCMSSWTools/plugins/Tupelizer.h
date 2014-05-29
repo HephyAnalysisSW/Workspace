@@ -39,8 +39,8 @@ public:
       fullvarname = moduleLabel_+"_"+varname;
     }
     tname.replace(0, spos+1, "");
-//    std::cout<<"Name: "<<varname<<" Type: "<<tname<<std::endl;
     types[varname] = tname; 
+    std::cout<<"Varname "<<varname<<" tname "<<tname<<std::endl;
     if (tname.find("[]")!=std::string::npos) {
       switch (tname.at(0)) {
               case 'B' : {produces<std::vector<Char_t> >(varname)    .setBranchAlias(fullvarname); break;}
@@ -76,7 +76,7 @@ public:
   template < class U > 
   void putVar(const std::string & name, U value) {
 //    std::cout<<"Name: "<<name<<" typePtr: "<<defaultTypes[name]<<std::endl;
-//    dynamic_cast<defaultTypes[name]> 
+//    dynamic_cast<defaultTypes[name]>
     std::auto_ptr<U> myvar( new U );
     *myvar = value;
 //    std::type_info const * mytype (defaultTypes[name]);
@@ -101,8 +101,6 @@ public:
 
   template < class T > 
   void put (const std::string & name, T value) {
-//    std::cout<<"Put typename      :"<<name<<" Type: "<<types[name]<<"X"<<std::endl;
-//    std::cout<<"Put typename.at(0):"<<name<<" Type: "<<types[name].at(0)<<"X"<<std::endl;
     try {
       switch (types[name].at(0)) {
               case 'B' : {putVar<Char_t>(name, value);    break;}

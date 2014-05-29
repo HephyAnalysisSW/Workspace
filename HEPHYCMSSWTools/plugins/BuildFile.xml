@@ -33,4 +33,9 @@
 <library   file="CaloTowersTupelizer.cc" name="CaloTowersTupelizer">
   <flags   EDM_PLUGIN="1"/>
 </library>
-
+<library   file="PFCandTupelizer.cc" name="PFCandTupelizer">
+  <flags   EDM_PLUGIN="1"/>
+</library>
+<library   file="PFCandTupelizer2.cc" name="PFCandTupelizer2">
+  <flags   EDM_PLUGIN="1"/>
+</library>
