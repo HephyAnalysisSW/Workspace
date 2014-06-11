@@ -80,8 +80,9 @@ class Preselection:
                     return False
             # SR2/3
             if nball==0 and met>300 and eh.get("ht")>400:
-                mt = eh.get("softIsolatedMT")
-                if mt<60 or mt>88:
-                    return False
+#                mt = eh.get("softIsolatedMT")
+#                if mt<60 or mt>88:
+#                    return False
+                return False
 
         return True
