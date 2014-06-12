@@ -99,6 +99,8 @@ class DrawWithFOM:
         if pad!=None:
             pad.cd()
 
+        allEmpty = True
+
         data = None
         bkgs = None
         sigs = [ ]
@@ -107,6 +109,8 @@ class DrawWithFOM:
         legend.SetFillStyle(0)
         for i,s in enumerate(samples):
             h = histograms[i]
+            if h.GetSumOfWeights()>1.e-6:
+                allEmpty = False
             if s.fill:
                 h.SetFillStyle(1001)
                 h.SetFillColor(s.color)
@@ -158,6 +162,9 @@ class DrawWithFOM:
                 bkgs.SetMinimum(0.1)
             legend.AddEntry(h,s.name,opt)       
 
+        if allEmpty:
+            return ( None, None, None, None )
+
         bkgs.Draw()
         bkgs.GetYaxis().SetTitle("Events / bin")
         for s in sigs:
@@ -171,7 +178,24 @@ class DrawWithFOM:
         if pad!=None:
             pad.Update()
 
-        print data, bkgs, sigs, legend 
+        print "Begin DrawStack1D:"
+        if data:
+            print "Data :",data
+        bkgprint = [ ]
+        for hb in bkgs.GetHists():
+            bkgprint.append(hb)
+        print "Bkg ",bkgs,bkgprint
+        print "Sig ",sigs
+        print "Leg ",legend
+        ROOT.gROOT.ls()
+        print ROOT.gDirectory.GetName()
+        for tf in ROOT.gROOT.GetListOfFiles():
+            print "file ",tf.GetName()
+        print data.GetDirectory().GetPath()
+        data.GetDirectory().ls()
+        data.GetDirectory().Print()
+        print "End DrawStack1D"
+#        print data, bkgs, sigs, legend 
         return ( data, bkgs, sigs, legend )
 
     def drawStack2D(self, samples, histograms, pad=None):

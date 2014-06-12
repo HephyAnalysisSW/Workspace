@@ -176,8 +176,6 @@ for varname in variables:
 
 #    cnv = ROOT.TCanvas(bkgs.GetName(),bkgs.GetName(),700,700)
     cnv = ROOT.TCanvas("cnv","cnv",700,700)
-    if not options.batch:
-        canvases.append(cnv)
 
 #    drawClass = DrawWithFOM(fom=options.fom)
 
@@ -211,8 +209,13 @@ for varname in variables:
                 pads.append(p1)
 
         data, bkgs, sigs, legend = drawClass.drawStack1D(samples,histograms,p1)
+        if data==None and bkgs==None and sigs==None and legend==None:
+            continue
         if variable.uselog:
             p1.SetLogy(1)
+
+    if not options.batch:
+        canvases.append(cnv)
 
     cnv.SetName(bkgs.GetName())
     cnv.SetTitle(bkgs.GetName())
@@ -235,6 +238,8 @@ for varname in variables:
     if options.save:
         cnv.SaveAs(savedir+cnv.GetName()+".png")
         cnv.SaveAs(savedir+cnv.GetName()+".root")
+    if options.batch:
+        del cnv
 
 if not options.batch:
     raw_input("Press enter")
