@@ -178,24 +178,7 @@ class DrawWithFOM:
         if pad!=None:
             pad.Update()
 
-        print "Begin DrawStack1D:"
-        if data:
-            print "Data :",data
-        bkgprint = [ ]
-        for hb in bkgs.GetHists():
-            bkgprint.append(hb)
-        print "Bkg ",bkgs,bkgprint
-        print "Sig ",sigs
-        print "Leg ",legend
-        ROOT.gROOT.ls()
-        print ROOT.gDirectory.GetName()
-        for tf in ROOT.gROOT.GetListOfFiles():
-            print "file ",tf.GetName()
-        print data.GetDirectory().GetPath()
-        data.GetDirectory().ls()
-        data.GetDirectory().Print()
-        print "End DrawStack1D"
-#        print data, bkgs, sigs, legend 
+        print data, bkgs, sigs, legend 
         return ( data, bkgs, sigs, legend )
 
     def drawStack2D(self, samples, histograms, pad=None):
@@ -206,9 +189,9 @@ class DrawWithFOM:
         else:
             currpad = ROOT.gPad
 
+        data = None
         bkgs = None
         sigs = [ ]
-        data = None
 #        legend = ROOT.TLegend(0.60,0.75,0.90,0.89)
 #        legend.SetBorderSize(0)
 #        legend.SetFillColor(10)
@@ -245,7 +228,7 @@ class DrawWithFOM:
 #            else:
 #                opt = "L"
             elif s.isData():
-                data = h.Clone()
+                data = h
                 h.SetTitle("Data")
 
         nsig = 0
@@ -319,7 +302,7 @@ class DrawWithFOM:
         currpad.cd()
         currpad.Update()
 
-        return ( data, bkgs, sigs , latexs )
+        return ( data, bkgs, sigs, latexs )
 
     def drawFom(self, bkgs, sigs, scut='l', pad=None):
 

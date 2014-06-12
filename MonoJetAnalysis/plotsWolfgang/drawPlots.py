@@ -217,6 +217,7 @@ for varname in variables:
     if not options.batch:
         canvases.append(cnv)
 
+    ROOT.SetOwnership(bkgs,False)
     cnv.SetName(bkgs.GetName())
     cnv.SetTitle(bkgs.GetName())
     if not options.batch:

@@ -1,7 +1,7 @@
-from StdPlotsEleBase import StdPlotsEleBase
+from StdPlotsBase import StdPlotsBase
 
-class StdPlotsSoftEle(StdPlotsEleBase):
+class StdPlotsSoftEle(StdPlotsBase):
 
     def __init__(self,name,preselection=None,elist=None,elistBase="./elists",rebin=None):
-        StdPlotsEleBase.__init__(self,name,preselection=preselection,elist=elist,elistBase=elistBase, \
-                                     rebin=rebin,hardElectron=False)
+        StdPlotsBase.__init__(self,name,preselection=preselection,elist=elist,elistBase=elistBase, \
+                                  rebin=rebin,leptonPdg=11,hardLepton=False)

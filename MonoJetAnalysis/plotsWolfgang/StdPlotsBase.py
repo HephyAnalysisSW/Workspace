@@ -14,7 +14,7 @@ def floatEqual(a,b):
         return True
     return abs(a-b)/(a+b)<tolerance
 
-def getTauToMu(eh):
+def getTauToEorMu(eh,pdgDaughter):
     gpPdgs = [ int(v) for v in eh.get("gpPdg") ]
     itau = None
     for i,pdg in enumerate(gpPdgs):
@@ -28,13 +28,13 @@ def getTauToMu(eh):
     if gpMo1s[itau]<0 or abs(gpPdgs[gpMo1s[itau]])!=24:
         return [ None, None ]
 
-    imu = None
+    ilep = None
     for i in range(len(gpPdgs)):
-        if gpMo1s[i]==itau and abs(gpPdgs[i])==13:
-            imu = i
+        if gpMo1s[i]==itau and abs(gpPdgs[i])==pdgDaughter:
+            ilep = i
             break
 
-    return [ itau, imu ]
+    return [ itau, ilep ]
 
 #def drawWs(eh,tree):
 #    gpPdgs = eh.get("gpPdg")
@@ -99,9 +99,18 @@ def getTauToMu(eh):
 
 class StdPlotsBase(PlotsBase):
 
-    def __init__(self,name,preselection=None,elist=None,elistBase="./elists",rebin=None,hardMuon=False):
+    def __init__(self,name,preselection=None,elist=None,elistBase="./elists",rebin=None,leptonPdg=13,hardLepton=False):
         PlotsBase.__init__(self,name,preselection,elist=elist,elistBase=elistBase,rebin=rebin)
-        self.hardMuon = hardMuon
+        assert leptonPdg==11 or leptonPdg==13
+        self.leptonPdg = leptonPdg
+        if leptonPdg==11:
+            self.leptonPrefix = "el"
+            self.leptonMass = 0.000511
+        else:
+            self.leptonPrefix = "mu"
+            self.leptonMass = 0.105
+        self.leptonPrefixCap = self.leptonPrefix.capitalize()
+        self.hardLepton = hardLepton
         self.histogramList = { }
         curdir = ROOT.gDirectory
         if not ROOT.gROOT.Get(name):
@@ -122,43 +131,44 @@ class StdPlotsBase(PlotsBase):
             self.addVariable("met"+sign,100,0.,1000.,'l')
             self.addVariable("ht"+sign,100,0.,1000.,'l')
             self.addVariable("mt"+sign,50,0.,200.,'u')
-            if self.hardMuon:
-                self.addVariable("softMuPt"+sign,100,0.,250.,'u')
+            if self.hardLepton:
+                self.addVariable("soft"+self.leptonPrefixCap+"Pt"+sign,100,0.,250.,'u')
             else:
-                self.addVariable("softMuPt"+sign,100,0.,25.,'u')
-            self.addVariable("softMuEta"+sign,60,0.,3.,'u')
-            self.addVariable("softMuIso"+sign,100,0.,10.,'u')
-            self.addVariable("softMuNPix"+sign,10,0.,10.,'u')
-            self.addVariable("softMuNTk"+sign,20,0.,20.,'u')
-            self.addVariable("softMuDxy"+sign,100,0.,0.1,'u')
-            self.addVariable("softMuDz"+sign,100,0.,0.2,'u')
+                self.addVariable("soft"+self.leptonPrefixCap+"Pt"+sign,100,0.,25.,'u')
+            self.addVariable("soft"+self.leptonPrefixCap+"Eta"+sign,60,0.,3.,'u')
+            self.addVariable("soft"+self.leptonPrefixCap+"Iso"+sign,100,0.,10.,'u')
+            if self.leptonPdg==13:
+                self.addVariable("soft"+self.leptonPrefixCap+"NPix"+sign,10,0.,10.,'u')
+                self.addVariable("soft"+self.leptonPrefixCap+"NTk"+sign,20,0.,20.,'u')
+            self.addVariable("soft"+self.leptonPrefixCap+"Dxy"+sign,100,0.,0.1,'u')
+            self.addVariable("soft"+self.leptonPrefixCap+"Dz"+sign,100,0.,0.2,'u')
             self.addVariable("npv"+sign,100,0.,100.,'u')
-            self.addVariable("jetmuDeltaEta"+sign,50,0.,10.,'l')
-            self.addVariable("jetmuDeltaPhi"+sign,50,0.,10.,'l')
-            self.addVariable("jetmuDeltaR"+sign,50,0.,10.,'l')
+            self.addVariable("jet"+self.leptonPrefix+"DeltaEta"+sign,50,0.,10.,'l')
+            self.addVariable("jet"+self.leptonPrefix+"DeltaPhi"+sign,50,0.,10.,'l')
+            self.addVariable("jet"+self.leptonPrefix+"DeltaR"+sign,50,0.,10.,'l')
             self.addVariable("mlb"+sign,20,0.,100.,'u')
             self.addVariable("drlb"+sign,20,0.,10.,'u')
-            if self.hardMuon:
+            if self.hardLepton:
                 self.addVariable("btag1Pt"+sign,50,0.,1000.,'u')
             else:
                 self.addVariable("btag1Pt"+sign,50,0.,250.,'u')
             self.addVariable("btag1Eta"+sign,50,0.,2.5,'u')
-#            self.addVariable("drMuGenReco"+sign,500,0.,10.,'u')
-#            self.addVariable("ptRatioMuGenReco"+sign,500,0.,2.,'u')
+#            self.addVariable("dr"+self.leptonPrefixCap+"GenReco"+sign,500,0.,10.,'u')
+#            self.addVariable("ptRatio"+self.leptonPrefixCap+"GenReco"+sign,500,0.,2.,'u')
             self.addVariable("ptTau"+sign,100,0.,50.,'u')
-            self.addVariable("deltaPhiMuTau"+sign,100,-pi,pi,'b')
+            self.addVariable("deltaPhi"+self.leptonPrefixCap+"Tau"+sign,100,-pi,pi,'b')
             self.addVariable("etaW"+sign,125,0,2.5,'l')
             self.addVariable("costhPol"+sign,100,-1,1,'u')
             self.addVariable("phiPol"+sign,100,0,pi/2,'u')
-            if self.hardMuon:
-                self.addVariablePair("ptGenTau",50,0.,1000.,"ptGenMu",25,0.,250.,suffix=sign)
+            if self.hardLepton:
+                self.addVariablePair("ptGenTau",50,0.,1000.,"ptGen"+self.leptonPrefixCap+"",25,0.,250.,suffix=sign)
             else:
-                self.addVariablePair("ptGenTau",50,0.,100.,"ptGenMu",25,0.,25.,suffix=sign)
+                self.addVariablePair("ptGenTau",50,0.,100.,"ptGen"+self.leptonPrefixCap+"",25,0.,25.,suffix=sign)
             self.addVariablePair("mt",25,0.,200.,"ht",40,0.,1000.,suffix=sign)
             self.addVariablePair("met",40,0.,1000.,"ht",40,0.,1000.,suffix=sign)
-            self.addVariablePair("met",40,0.,1000.,"muPt",40,0.,1000.,suffix=sign)
+            self.addVariablePair("met",40,0.,1000.,self.leptonPrefix+"Pt",40,0.,1000.,suffix=sign)
             self.addVariablePair("WPt",40,0.,1000.,"met",40,0.,1000.,suffix=sign)
-            self.addVariablePair("WPt",40,0.,1000.,"muPt",40,0.,1000.,suffix=sign)
+            self.addVariablePair("WPt",40,0.,1000.,self.leptonPrefix+"Pt",40,0.,1000.,suffix=sign)
 
         curdir.cd()
 
@@ -168,16 +178,19 @@ class StdPlotsBase(PlotsBase):
         if math.isnan(isrJetPt):
             return
 
-        imu = hardestIsolatedMuon(eh,ptmin=5.,etamax=1.5)
-        if imu==None:
+        if self.leptonPdg==11:
+            ilep = hardestIsolatedElectron(eh,ptmin=7.,etamax=1.5)
+        else:
+            ilep = hardestIsolatedMuon(eh,ptmin=5.,etamax=1.5)
+        if ilep==None:
             return
 
-        softMuPt = eh.get("muPt")[imu]
-        if self.hardMuon:
-            if softMuPt<30:
+        softLepPt = eh.get(self.leptonPrefix+"Pt")[ilep]
+        if self.hardLepton:
+            if softLepPt<30:
                 return
         else:
-            if softMuPt>20:
+            if softLepPt>20:
                 return
 
 #        if isrJetPt<350:
@@ -187,8 +200,8 @@ class StdPlotsBase(PlotsBase):
 #        if met<300:
 #            return
 
-        softMuEta = eh.get("muEta")[imu]
-        if abs(softMuEta)>1.5:
+        softLepEta = eh.get(self.leptonPrefix+"Eta")[ilep]
+        if abs(softLepEta)>1.5:
             return
 
         njet = int(eh.get("njetCount")+0.5)
@@ -199,16 +212,16 @@ class StdPlotsBase(PlotsBase):
 #        if met<300 or ht<400:
 #            return
 
-#        if self.hardMuon:
-#            softMuDxy = eh.get("muDxy")[imu]
-#            softMuDz = eh.get("muDz")[imu]
+#        if self.hardLepton:
+#            softLepDxy = eh.get(self.leptonPrefix+"Dxy")[ilep]
+#            softLepDz = eh.get(self.leptonPrefix+"Dz")[ilep]
 #        else:
-#            softMuDxy = eh.get("softIsolatedMuDxy")
-#            softMuDz = eh.get("softIsolatedMuDz")
-#        if abs(softMuDxy)>0.006 or abs(softMuDz)>0.012:
+#            softLepDxy = eh.get("softIsolated"+self.leptonPrefixCap+"Dxy")
+#            softLepDz = eh.get("softIsolated"+self.leptonPrefixCap+"Dz")
+#        if abs(softLepDxy)>0.006 or abs(softLepDz)>0.012:
 #            return
 
-        pdg = eh.get("muPdg")[imu]
+        pdg = eh.get(self.leptonPrefix+"Pdg")[ilep]
         if len(self.charges)==1:
             pdg = 0
 
@@ -225,10 +238,11 @@ class StdPlotsBase(PlotsBase):
         if ib!=None:
             return
         
-        softMuPhi = eh.get("muPhi")[imu]
+        softLepPhi = eh.get(self.leptonPrefix+"Phi")[ilep]
         metphi = eh.get("type1phiMetphi")
-        mt = math.sqrt(2*met*softMuPt*(1-math.cos(metphi-softMuPhi)))
-        assert floatEqual(mt,eh.get("muMT")[imu])
+        mt = math.sqrt(2*met*softLepPt*(1-math.cos(metphi-softLepPhi)))
+        if self.leptonPdg==13:
+            assert floatEqual(mt,eh.get(self.leptonPrefix+"MT")[ilep])
 #        if mt<60 or mt>88:
 #            return
 
@@ -253,10 +267,10 @@ class StdPlotsBase(PlotsBase):
 #            gpEtas = eh.get("gpEta")
 #            gpPhis = eh.get("gpPhi")
 #            for i in igenmus:
-#                dr = deltaR(softMuPhi,softMuEta,gpPhis[i],gpEtas[i])
+#                dr = deltaR(softLepPhi,softLepEta,gpPhis[i],gpEtas[i])
 #                if dr<drmin:
 #                    drmin = dr
-#                    dptmin = softMuPt/gpPts[i]
+#                    dptmin = softLepPt/gpPts[i]
 #        
 #        self.fill1DBySign("drMuGenReco",pdg,drmin,w)
 #        self.fill1DBySign("ptRatioMuGenReco",pdg,dptmin,w)
@@ -266,25 +280,26 @@ class StdPlotsBase(PlotsBase):
         npv = eh.get("ngoodVertices")
         self.fill1DBySign("npv",pdg,npv,w)
 
-        softMuIso = eh.get("muRelIso")[imu]*softMuPt
-        softMuNPix = eh.get("muPixelHits")[imu]
-        softMuNTk = eh.get("muNumtrackerLayerWithMeasurement")[imu]
-        softMuDxy = eh.get("muDxy")[imu]
-        softMuDz = eh.get("muDz")[imu]
-        self.fill1DBySign("softMuIso",pdg,softMuIso,w)
-        self.fill1DBySign("softMuNPix",pdg,softMuNPix,w)
-        self.fill1DBySign("softMuNTk",pdg,softMuNTk,w)
-        self.fill1DBySign("softMuDxy",pdg,softMuDxy,w)
-        self.fill1DBySign("softMuDz",pdg,softMuDz,w)
+        softLepIso = eh.get(self.leptonPrefix+"RelIso")[ilep]*softLepPt
+        softLepDxy = eh.get(self.leptonPrefix+"Dxy")[ilep]
+        softLepDz = eh.get(self.leptonPrefix+"Dz")[ilep]
+        self.fill1DBySign("soft"+self.leptonPrefixCap+"Iso",pdg,softLepIso,w)
+        self.fill1DBySign("soft"+self.leptonPrefixCap+"Dxy",pdg,softLepDxy,w)
+        self.fill1DBySign("soft"+self.leptonPrefixCap+"Dz",pdg,softLepDz,w)
+        if self.leptonPdg==13:
+            softLepNPix = eh.get(self.leptonPrefix+"PixelHits")[ilep]
+            softLepNTk = eh.get(self.leptonPrefix+"NumtrackerLayerWithMeasurement")[ilep]
+            self.fill1DBySign("soft"+self.leptonPrefixCap+"NPix",pdg,softLepNPix,w)
+            self.fill1DBySign("soft"+self.leptonPrefixCap+"NTk",pdg,softLepNTk,w)
 
         self.fill2DBySign("ht_vs_met",pdg,met,ht,w)
-        self.fill2DBySign("muPt_vs_met",pdg,met,softMuPt,w)
+        self.fill2DBySign(self.leptonPrefix+"Pt_vs_met",pdg,met,softLepPt,w)
 
-        wPx = softMuPt*math.cos(softMuPhi) + met*math.cos(metphi)
-        wPy = softMuPt*math.sin(softMuPhi) + met*math.sin(metphi)
+        wPx = softLepPt*math.cos(softLepPhi) + met*math.cos(metphi)
+        wPy = softLepPt*math.sin(softLepPhi) + met*math.sin(metphi)
         wPt = math.sqrt(wPx**2+wPy**2)
         self.fill2DBySign("met_vs_WPt",pdg,wPt,met,w)
-        self.fill2DBySign("muPt_vs_WPt",pdg,wPt,softMuPt,w)
+        self.fill2DBySign(self.leptonPrefix+"Pt_vs_WPt",pdg,wPt,softLepPt,w)
 
         self.fill1DBySign("ht",pdg,ht,w)
         self.fill1DBySign("mt",pdg,mt,w)
@@ -322,50 +337,50 @@ class StdPlotsBase(PlotsBase):
 
         self.fill1DBySign("met",pdg,met,w)
 
-        self.fill1DBySign("softMuPt",pdg,softMuPt,w)
-        self.fill1DBySign("softMuEta",pdg,abs(softMuEta),w)
+        self.fill1DBySign("soft"+self.leptonPrefixCap+"Pt",pdg,softLepPt,w)
+        self.fill1DBySign("soft"+self.leptonPrefixCap+"Eta",pdg,abs(softLepEta),w)
            
-        p4mu = ROOT.TLorentzVector()
-        p4mu.SetPtEtaPhiM(softMuPt,softMuEta,softMuPhi,0.105)
+        p4lep = ROOT.TLorentzVector()
+        p4lep.SetPtEtaPhiM(softLepPt,softLepEta,softLepPhi,self.leptonMass)
 
         jetPhis = eh.get("jetPhi")
         if ib!=None:
             p4b = ROOT.TLorentzVector()
             p4b.SetPtEtaPhiM(jetPts[ib],jetEtas[ib],jetPhis[ib],5.)
-            self.fill1DBySign("mlb",pdg,(p4mu+p4b).M(),w)
-            self.fill1DBySign("drlb",pdg,p4mu.DeltaR(p4b),w)
+            self.fill1DBySign("mlb",pdg,(p4lep+p4b).M(),w)
+            self.fill1DBySign("drlb",pdg,p4lep.DeltaR(p4b),w)
 
-        self.fill1DBySign("jetmuDeltaEta",pdg,abs(jetEtas[0]-softMuEta),w)
-        self.fill1DBySign("jetmuDeltaPhi",pdg,deltaPhi(jetPhis[0],softMuPhi),w)
-        self.fill1DBySign("jetmuDeltaR",pdg,deltaR(jetPhis[0],jetEtas[0],softMuPhi,softMuEta),w)
+        self.fill1DBySign("jet"+self.leptonPrefix+"DeltaEta",pdg,abs(jetEtas[0]-softLepEta),w)
+        self.fill1DBySign("jet"+self.leptonPrefix+"DeltaPhi",pdg,deltaPhi(jetPhis[0],softLepPhi),w)
+        self.fill1DBySign("jet"+self.leptonPrefix+"DeltaR",pdg,deltaR(jetPhis[0],jetEtas[0],softLepPhi,softLepEta),w)
 
 #        if self.name.startswith("WJets") and self.name.endswith("NoTau"):
 #            print self.name
-#            print deltaR(jetPhis[0],jetEtas[0],softMuPhi,softMuEta),deltaPhi(jetPhis[0],softMuPhi)
+#            print deltaR(jetPhis[0],jetEtas[0],softLepPhi,softLepEta),deltaPhi(jetPhis[0],softLepPhi)
 #            tree = viewWs(eh)
 #            tree.append( ( -1, 0, jetPts[0], jetPhis[0], jetEtas[0] ) )
 #            drawWs(eh,tree)
 
-        ws = wSolutions(met,metphi,softMuPt,softMuPhi,softMuEta)
+        ws = wSolutions(met,metphi,softLepPt,softLepPhi,softLepEta)
         ws.sort(key=lambda x: abs(x.Eta()))
         self.fill1DBySign("etaW",pdg,abs(ws[0].Eta()),w)
-        toPolFrame(ws[0],p4mu)
+        toPolFrame(ws[0],p4lep)
         if self.name.startswith("WJets"):
-            itau, imu = getTauToMu(eh)
+            itau, iltau = getTauToEorMu(eh,self.leptonPdg)
             if itau!=None:
                 gpPts = eh.get("gpPt")
-                if imu!=None:
-                    self.fill2DBySign("ptGenMu_vs_ptGenTau",pdg,gpPts[itau],gpPts[imu],w)
+                if iltau!=None:
+                    self.fill2DBySign("ptGen"+self.leptonPrefixCap+"_vs_ptGenTau",pdg,gpPts[itau],gpPts[iltau],w)
                     gpPhis = eh.get("gpPhi")
-                    self.fill1DBySign("deltaPhiMuTau",pdg,deltaPhi(gpPhis[itau],gpPhis[imu]),w)
+                    self.fill1DBySign("deltaPhi"+self.leptonPrefixCap+"Tau",pdg,deltaPhi(gpPhis[itau],gpPhis[iltau]),w)
                 else:
-                    self.fill2DBySign("ptGenMu_vs_ptGenTau",pdg,gpPts[itau],0.,w)
+                    self.fill2DBySign("ptGen"+self.leptonPrefixCap+"_vs_ptGenTau",pdg,gpPts[itau],0.,w)
 
-        p4muPol = toPolFrame(ws[0],p4mu)
-        self.fill1DBySign("costhPol",pdg,p4muPol.Pz()/p4muPol.P(),w)
-        self.fill1DBySign("phiPol",pdg,abs(abs(p4muPol.Phi())-pi),w)
-#        p4mu = ROOT.TLorentzVector()
-#        p4mu.SetPtEtaPhiM(softMuPt,softMuEta,softMuPhi,0.105)
+        p4lepPol = toPolFrame(ws[0],p4lep)
+        self.fill1DBySign("costhPol",pdg,p4lepPol.Pz()/p4lepPol.P(),w)
+        self.fill1DBySign("phiPol",pdg,abs(abs(p4lepPol.Phi())-pi),w)
+#        p4lep = ROOT.TLorentzVector()
+#        p4lep.SetPtEtaPhiM(softLepPt,softLepEta,softLepPhi,self.leptonMass)
 #        p4b = ROOT.TLorentzVector()
 #        p4b.SetPtEtaPhiM(jetPts[ib],jetEtas[ib],jetPhis[ib],5.)
             
