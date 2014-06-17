@@ -52,6 +52,29 @@ nEtaBinsHF = 2
 egamma_HF_InnerMostRingsMinus        = {'name':'egamma_HFInnerMostRingsMinus', 'type':'egamma_HF', 'binning':[nEtaBinsHF,-etaMaxDepth1,-etaMinDepth1,9,-pi-.1,pi]}
 egamma_HF_InnerMostRingsPlus         = {'name':'egamma_HFInnerMostRingsPlus', 'type':'egamma_HF',  'binning':[nEtaBinsHF,etaMinDepth1,etaMaxDepth1,9,-pi-.1,pi]}
 
+h['candBinning'] = [50,0,1500]
+h0Barrel['candBinning'] = [50,0,50]
+h0EndcapPlus['candBinning'] = [50,0,50]
+h0EndcapMinus['candBinning'] = [50,0,50]
+gammaBarrel['candBinning'] = [25,0,500]
+gammaEndcapPlus['candBinning'] = [25,0,150]
+gammaEndcapMinus['candBinning'] = [25,0,150]
+gammaForwardPlus['candBinning'] = [10,0,10]
+gammaForwardMinus['candBinning'] = [10,0,10]
+e['candBinning'] = [10,0,10]
+mu['candBinning'] = [10,0,10]
+h_HF_Minus['candBinning'] = [25,0,250]
+h_HF_Plus['candBinning'] = [25,0,250]
+h_HF_InnerMostRingsMinus['candBinning'] = [25,0,50]
+h_HF_InnerMostRingsPlus['candBinning'] = [25,0,50]
+egamma_HF_Minus['candBinning'] = [25,0,250]
+egamma_HF_Plus['candBinning'] = [25,0,250]
+egamma_HF_InnerMostRingsMinus['candBinning'] = [25,0,50]
+egamma_HF_InnerMostRingsPlus['candBinning'] = [25,0,50]
+h_HF['candBinning'] = [25,0,500]
+egamma_HF['candBinning'] = [25,0,500]
+
+
 allMaps = [h, h0Barrel, h0EndcapPlus, h0EndcapMinus, gammaBarrel, gammaEndcapPlus, gammaEndcapMinus, gammaForwardPlus, gammaForwardMinus, e, h_HF_Minus, h_HF_Plus, \
            h_HF_InnerMostRingsMinus, h_HF_InnerMostRingsPlus, egamma_HF_Minus, egamma_HF_Plus, egamma_HF_InnerMostRingsMinus, egamma_HF_InnerMostRingsPlus]
 

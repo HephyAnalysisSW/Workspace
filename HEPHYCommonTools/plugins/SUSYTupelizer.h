@@ -283,6 +283,7 @@ public:
   bool addTriggerInfo_;
   std::vector<std::string> triggersToMonitor_, trigNames_, prescNames_, metsToMonitor_;
   bool addMetUncertaintyInfo_;
+  bool addL1Info_;
   bool addFullBTagInfo_;
   bool addFullJetInfo_;
   bool addFullLeptonInfo_;

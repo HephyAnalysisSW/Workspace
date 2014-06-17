@@ -52,6 +52,10 @@ options.register ('addRA4Info',True,
           VarParsing.VarParsing.multiplicity.singleton,
           VarParsing.VarParsing.varType.bool,
           "whether or not to add RA4 specific Info")
+options.register ('addL1Info',False,
+          VarParsing.VarParsing.multiplicity.singleton,
+          VarParsing.VarParsing.varType.bool,
+          "whether or not to add RA4 specific Info")
 options.register ('keepPFCandidates',False,
           VarParsing.VarParsing.multiplicity.singleton,
           VarParsing.VarParsing.varType.bool,
@@ -412,6 +416,7 @@ print "TriggersToMonitor:",process.SUSYTupelizer.triggersToMonitor
 process.SUSYTupelizer.triggerCollection = cms.untracked.string( options.hltName )
 process.SUSYTupelizer.patMETs = cms.untracked.InputTag("patPFMETsTypeIPhicorrected")
 process.SUSYTupelizer.addFullJetInfo = cms.untracked.bool(True)
+process.SUSYTupelizer.addL1Info = cms.untracked.bool(options.addL1Info)
 #process.SUSYTupelizer.addFullMETInfo = cms.untracked.bool(True)
 process.SUSYTupelizer.useForDefaultAlias = cms.untracked.bool(True)
 process.SUSYTupelizer.addTriggerInfo = cms.untracked.bool(True)
@@ -424,7 +429,7 @@ process.SUSYTupelizer.verbose = cms.untracked.bool(options.verbose)
 process.SUSYTupelizer.addFullMuonInfo = cms.untracked.bool(True)
 process.SUSYTupelizer.addFullEleInfo = cms.untracked.bool(True)
 process.SUSYTupelizer.addFullTauInfo = cms.untracked.bool(True)
-process.SUSYTupelizer.addHEPHYCommonToolsInfo = cms.untracked.bool(options.addRA4Info)
+process.SUSYTupelizer.addRA4AnalysisInfo = cms.untracked.bool(options.addRA4Info)
 
 process.SUSYTupelizer.metsToMonitor = ["patPFMETsTypeIPhicorrected", "patPFMETsTypeIcorrected", "patPFMETsTypeIType0PFCandcorrected", "patRAWPFMETs"]
 process.p += process.SUSYTupelizer

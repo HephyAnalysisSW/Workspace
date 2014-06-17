@@ -38,7 +38,7 @@ for line in p.stdout.readlines():
           break
       if found: continue
       else: 
-        if not size> 100000:
+        if not size> 1000:
           print "Skipping because file is too small (",filename, "size:", size,")"
           continue
         print "Copying", dpmDir+"/"+filename, "to", oDir+"/"+filename

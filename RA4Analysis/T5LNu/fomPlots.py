@@ -23,14 +23,18 @@ import copy, sys
 colors = [ROOT.kBlue, ROOT.kRed, ROOT.kGreen, ROOT.kOrange, ROOT.kMagenta]
 
 cSignal = ROOT.TChain("Events")
-cSignal.Add("/data/schoef/convertedTuples_v22//copy/T5LNu_1200_100/histo_T5LNu_1200_100.root")
+#cSignal.Add("/data/schoef/convertedTuples_v22/copy/T5Full_1100_200_100/histo_T5Full_1100_200_100.root")
+cSignal.Add("/data/schoef/convertedTuples_v22/copy/T5Full_1100_200_100/histo_T5Full_1100_200_100.root")
+postfix = "_1100_200_100_njet4"
+#cSignal.Add("/data/schoef/convertedTuples_v22/copy/T5Full_1100_800_600/histo_T5Full_1100_800_600.root")
+#postfix = "_1100_800_600_njet4"
 
 cBkg    = ROOT.TChain("Events")
 cBkg.Add("/data/schoef/convertedTuples_v22//copy/WJetsHT150v2/histo_WJetsHT150v2_from*")
 cBkg.Add("/data/schoef/convertedTuples_v22//copy/TTJetsPowHeg/histo_TTJetsPowHeg_from*")
 
 prepreprefix = 'cutFomPlot_'
-presel = "njets>=4&&ht>400&&nTightMuons+nTightElectrons==1&&nbtags==0&&type1phiMet>150.&&ht>750&&type1phiMet>300"
+presel = "njets>=4&&ht>1000&&nTightMuons+nTightElectrons==1&&nbtags==0&&type1phiMet>150.&&ht>750&&type1phiMet>300"
 
 colors = [ROOT.kBlack, ROOT.kBlue, ROOT.kGreen-4, ROOT.kMagenta, ROOT.kCyan, ROOT.kYellow+3, ROOT.kOrange, ROOT.kGreen + 3, ROOT.kRed - 7, ROOT.kGray + 2]
 
@@ -57,14 +61,13 @@ def getConstSoverSqrtBFunc(nPreB, nPreS, relSys, sigLevel):
   return ROOT.TF1('func', formula, 0, 1)
 
 cutType = {'mT':'lower', 'cosDeltaPhi':'upper', 'htThrustLepSideRatio':'lower'}
-nThresh=2000
-zeros = array('d',[0. for i in range(nThresh)])
+#nThresh=10000
 sigTot = len(events['sig'])
 bkgTot = len(events['bkg'])
 sigYield = sum(e['weight'] for e in events['sig'])
 bkgYield = sum(e['weight'] for e in events['bkg'])
 stuff=[]
-for htThresh in [700, 750, 800, 900, 1000]:
+for htThresh in [ 1000, 1200, 1300]:
 #for htThresh in [700]:
   l = ROOT.TLegend(.16, .13, 0.63, 0.4)
   l.SetFillColor(ROOT.kWhite)
@@ -74,9 +77,12 @@ for htThresh in [700, 750, 800, 900, 1000]:
   drawopt="al"
   for iv, v in enumerate(['htThrustLepSideRatio','cosDeltaPhi', 'mT']):
     vals = [e[v] for e in events['sig']+events['bkg']]
+    vals.sort()
     minimum = min(vals)
     maximum = max(vals)
-    thresholds = [ minimum + (maximum-minimum)*i/float(nThresh-1) for i in range(nThresh)]
+    thresholds = vals#[ minimum + (maximum-minimum)*i/float(nThresh-1) for i in range(nThresh)]
+    nThresh=len(thresholds)
+    zeros = array('d',[0. for i in range(nThresh)])
 
     sigEff = []
     sigEffPlus = []
@@ -86,8 +92,8 @@ for htThresh in [700, 750, 800, 900, 1000]:
     bkgEffMinus = []
     for thresh in thresholds:
       if cutType[v]=='lower': 
-        sigPassed = filter(lambda e: e[v]>thresh and e['ht']>htThresh, events['sig'])
-        bkgPassed = filter(lambda e: e[v]>thresh and e['ht']>htThresh, events['bkg'])
+        sigPassed = filter(lambda e: e[v]>=thresh and e['ht']>htThresh, events['sig'])
+        bkgPassed = filter(lambda e: e[v]>=thresh and e['ht']>htThresh, events['bkg'])
       else:
         sigPassed = filter(lambda e: e[v]<thresh and e['ht']>htThresh, events['sig'])
         bkgPassed = filter(lambda e: e[v]<thresh and e['ht']>htThresh, events['bkg'])
@@ -109,7 +115,7 @@ for htThresh in [700, 750, 800, 900, 1000]:
     h.SetMarkerStyle(0)
     h.SetMarkerSize(0)
     h.GetXaxis().SetRangeUser(0., 0.4)
-    h.GetYaxis().SetRangeUser(0.95,1.0)
+    h.GetYaxis().SetRangeUser(0.98,1.0)
     h.GetYaxis().SetTitle("Background rejection")
     h.GetXaxis().SetTitle("Signal efficiency")
     h.Draw(drawopt)
@@ -135,7 +141,7 @@ for htThresh in [700, 750, 800, 900, 1000]:
   f2_20.Draw('same')
   f3_20.Draw('same')
 #  del l, f2_20, f3_20, f2_50, f3_50
-  c.Print('/afs/hephy.at/user/s/schoefbeck/www/pngT5LNu/fomComparison_presel_ht_'+str(htThresh)+'.png')
+  c.Print('/afs/hephy.at/user/s/schoefbeck/www/pngT5Full/fomComparison'+postfix+'_presel_ht_'+str(htThresh)+'.png')
 
 #
 #def getConstSoverSqrtBFunc(nPreB, nPreS, relSys, sigLevel):
