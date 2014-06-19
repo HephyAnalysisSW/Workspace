@@ -1,5 +1,5 @@
 #! /bin/sh -x 
-for name in `ls -d ElectronHad-*-2`
+for name in `ls -d SingleMu-*`
 #for name in `ls -d MuHad-* ElectronHad-*`
 do
   tokens

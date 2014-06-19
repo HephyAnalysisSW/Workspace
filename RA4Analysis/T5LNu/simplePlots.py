@@ -12,6 +12,7 @@ from Workspace.RA4Analysis.simplePlotsCommon import *
 #from monoJetEventShapeVars import circularity2D, foxWolframMoments, thrust
 
 from Workspace.HEPHYPythonTools.xsec import xsec
+from Workspace.HEPHYPythonTools.xsecSMS import gluino8TeV_NLONLL, gluino13TeV_NLONLL
 small = False
 
 targetLumi = 19700.
@@ -31,7 +32,13 @@ chmode = "copy"
 presel = "refSel"
 ver = "v5"
 region = "signal6j"
-preprefix = region+"_"+ver
+scaleTo13TeV = True
+preprefixes=[]
+if scaleTo13TeV:
+  preprefixes.append("scaleTo13TeV")
+preprefixes += [region, ver]
+
+preprefix="_".join(preprefixes)
 if region == "preSel":
   #isrjet>350, met>250, mT<70
   additionalCut = "(1)"
@@ -134,9 +141,10 @@ T5Full_1100_200_100['color'] = ROOT.kBlue + 3
 T5Full_1100_800_600['color'] = ROOT.kRed + 3
 
 signals=[T5Full_1100_200_100, T5Full_1100_800_600]
+for s in [T5Full_1100_200_100, T5Full_1100_800_600]:
+  s['kFac13TeV'] = gluino13TeV_NLONLL[1100]/gluino8TeV_NLONLL[1100]
 if addSignals:
   allSamples += signals
-
 for sample in allSamples:
   sample["Chain"] = chainstring
   sample["dirname"] = "/data/schoef/convertedTuples_v22/"+chmode+"/"
@@ -190,6 +198,14 @@ def getStack(varstring, binning, cutstring, signals, varfunc = "", addData=True,
   MC_QCD.style                 = "f0"
   MC_QCD.add                   = []
 
+  if scaleTo13TeV:
+    MC_TTJETS.scale = 3.31
+    MC_WJETS.scale  = 1.663
+    MC_Z.scale      = 1.65
+    MC_STOP.scale   = 2.
+    MC_VV.scale     = 2.
+    MC_QCD.scale    = 2.
+
   res = [MC_WJETS, MC_TTJETS, MC_STOP, MC_Z, MC_VV, MC_QCD]
   for v in res:
 #    v.reweightVar = "ngoodVertices"
@@ -203,6 +219,8 @@ def getStack(varstring, binning, cutstring, signals, varfunc = "", addData=True,
     MC_SIGNAL.color              = signal['color']
     MC_SIGNAL.add = []
     MC_SIGNAL.reweightVar = lambda c:getISRweight(c, mode='Central')
+    if scaleTo13TeV:
+      MC_SIGNAL.scale = signal['kFac13TeV'] 
     res.append(MC_SIGNAL)
     if normalizeSignalToMCSum:
       MC_SIGNAL.normalizeTo = res[0]
