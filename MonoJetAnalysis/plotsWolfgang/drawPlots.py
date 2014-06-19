@@ -87,6 +87,7 @@ else:
                               namelist=[ "QCD20to600", "QCD600to1000", "QCD1000" ]))
     samples.append(Sample("WW",sampleBase,type="B",color=6,fill=True))
     samples.append(Sample("DY",sampleBase,type="B",color=3,fill=True))
+    samples.append(Sample("ZJetsInv",sampleBase,type="B",color=9,fill=True))
     samples.append(Sample("singleTop",sampleBase,type="B",color=4,fill=True))
     #samples.append(Sample("TTJets",sampleBase,type="B",color=2,fill=True))
     samples.append(Sample("TTJetsPowHeg",sampleBase,type="B",color=2,fill=True))
