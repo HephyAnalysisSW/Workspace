@@ -2,62 +2,28 @@ import math
 from EventHelper import EventHelper
 from KinematicUtilities import *
 from LeptonUtilities import *
+import PreselectionTools as PreTools
         
-class PreselHardMu:
-
-    def __init__(self):
-        self.isrJetPtMin = 110
-        self.isrJetBTBVeto = True
-        self.softIsolatedMuPtMin = 5.
-        self.softIsolatedMuPtMax = 20.
-        self.hardIsolatedMuPtMin = 30.
-        self.njet60Max = 2
-        self.type1phiMetMin = 200.
-        self.softIsolatedMuEtaMax = 999.
+class PreselHardMuNew:
 
     def accept(self,eh,sample):
 
-        isrJetPt = eh.get("isrJetPt")
-        if math.isnan(isrJetPt) or isrJetPt<self.isrJetPtMin:
+        if not PreTools.passesHadronicSelection(eh):
             return False
 
-        met = eh.get("type1phiMet")
-        if math.isnan(isrJetPt) or met<self.type1phiMetMin:
+        leptonInfo = PreTools.selectedLepton(eh,13,True)
+#        ht = eh.get("ht")
+#        met = eh.get("type1phiMet")
+#        if ht>211.58 and ht<211.59 and met>225.20 and met<225.21:
+#            print "ht,met,leptonInfo ",ht,met,leptonInfo
+
+        if leptonInfo==None:
             return False
 
-        mediumMuIndex = int(eh.get("mediumMuIndex"))
-        if mediumMuIndex<0:
-            return False
-        imus = isolatedMuons(eh,ptmin=self.softIsolatedMuPtMin,etamax=self.softIsolatedMuEtaMax)
-        if len(imus)==0:
-            return False
-        imu = imus[0]
-        #
-        # require one muon with pt>30 and no other muon with pt>20
-        #
-        muPts = eh.get("muPt")
-        if muPts[imu]<self.hardIsolatedMuPtMin:
-            return False
-        if len(imus)>1 and muPts[imus[1]]>self.softIsolatedMuPtMax:
-            return False
+#        if ht>211.58 and ht<211.59 and met>225.20 and met<225.21:
+#            print "ht,met,leptonInfo ",ht,met,leptonInfo
 
-        if eh.get("nHardElectrons")>0:
-            return False
-        if eh.get("nHardTaus")>0:
-            return False
-
-        if eh.get("njet60")>self.njet60Max:
-            return False
-
-        assert not math.isnan(eh.get("isrJetBTBVetoPassed"))
-        if self.isrJetBTBVeto and eh.get("isrJetBTBVetoPassed")==0:
-            return False
-
-        #
-        # match with HT-binned W+jets sample
-        #
-        if eh.get("ht")<200:
-            return False
+        return True
 
 ###        #
 ###        # SR veto
