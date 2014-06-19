@@ -7,6 +7,7 @@ def isolatedMuons(eh,ptmin=5.,etamax=1.5,wp="medium"):
   assert len(mupts)==nmu
   muetas = eh.get("muEta")
   murelisos = eh.get("muRelIso")
+  mudxys = eh.get("muDxy")
 
   relabstransition = 25.
   if wp.lower().startswith("loose"):
@@ -22,6 +23,8 @@ def isolatedMuons(eh,ptmin=5.,etamax=1.5,wp="medium"):
     if mupts[i]<ptmin:
       continue
     if abs(muetas[i])>etamax:
+      continue
+    if abs(mudxys[i])>0.02:
       continue
     absiso = murelisos[i]*mupts[i]
 #    absisomax = reliso
