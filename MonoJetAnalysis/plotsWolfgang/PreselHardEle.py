@@ -4,7 +4,7 @@ from KinematicUtilities import *
 from LeptonUtilities import *
 import PreselectionTools as PreTools
         
-class PreselHardEleNew:
+class PreselHardEle:
 
     def accept(self,eh,sample):
 

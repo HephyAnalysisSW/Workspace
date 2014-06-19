@@ -4,7 +4,7 @@ from KinematicUtilities import *
 from LeptonUtilities import *
 import PreselectionTools as PreTools
         
-class PreselSoftMuNew:
+class PreselSoftMu:
 
     def accept(self,eh,sample):
 
