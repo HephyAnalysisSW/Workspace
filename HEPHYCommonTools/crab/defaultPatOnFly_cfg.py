@@ -96,9 +96,9 @@ if options.files[0][:9] == 'load:stop':
 isMC = (options.mode.lower()=='sms' or options.mode.lower()=='mc')
 jec = []
 if isMC:
-  jec = ['L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual']
-else:
   jec = ['L1FastJet', 'L2Relative', 'L3Absolute']
+else:
+  jec = ['L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual']
 #  if options.mode=="Mu":
 #    triggers =  ['HLT_PFHT350_Mu15_PFMET45_v*','HLT_PFHT350_Mu15_PFMET50_v*','HLT_PFHT400_Mu5_PFMET45_v*','HLT_PFHT400_Mu5_PFMET50_v*']
 #  if options.mode=="Ele":
