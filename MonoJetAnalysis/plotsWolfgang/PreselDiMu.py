@@ -24,7 +24,7 @@ class PreselDiMu:
         mu0p4.SetPtEtaPhiM(mupts[imu0],muetas[imu0],muphis[imu0],0.105)
         mu1p4 = ROOT.TLorentzVector()
         mu1p4.SetPtEtaPhiM(mupts[imu1],muetas[imu1],muphis[imu1],0.105)
-        if (mu0p4+mu1p4).M()<20.:
+        if (mu0p4+mu1p4).M()<55.:
             return False
 #        zpt = (mu0p4+mu1p4).Pt()
 #        if not PreTools.passesHadronicSelection(eh,recalculatedMet=zpt):
