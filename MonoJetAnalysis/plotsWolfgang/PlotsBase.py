@@ -201,6 +201,9 @@ class PlotsBase:
                 elist.Write()
             if self.writeElist or self.readElist:
                 elistFile.Close()
+        # handle under- & overflows
+        for n,v in PlotsBase.variables.iteritems():
+            v.moveUnderOverFlow(self.histogramList[n])
         self.showTimers()
             
         
