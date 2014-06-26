@@ -12,12 +12,12 @@ softIsolatedPtMax = ( 20., 20. )
 hardIsolatedPtMin = ( 30., 30. )
 softIsolatedEtaMax = ( 999., 999. )
 
-def passesHadronicSelection(eh):
+def passesHadronicSelection(eh,recalculatedMet=None):
     isrJetPt = eh.get("isrJetPt")
     if math.isnan(isrJetPt) or isrJetPt<isrJetPtMin:
         return False
 
-    met = eh.get("type1phiMet")
+    met = eh.get("type1phiMet") if recalculatedMet==None else recalculatedMet
     if math.isnan(isrJetPt) or met<type1phiMetMin:
         return False
 

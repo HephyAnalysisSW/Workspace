@@ -130,6 +130,9 @@ class StdPlotsBase(PlotsBase):
             self.addVariable("njet"+sign,20,-0.5,19.5,'u')
             self.addVariable("met"+sign,100,0.,1000.,'l')
             self.addVariable("ht"+sign,100,0.,1000.,'l')
+            self.addVariable("metHtRatio"+sign,100,0.,2.5,'b')
+            self.addVariable("metIsrPtRatio"+sign,100,0.,5.0,'b')
+            self.addVariable("htIsrPtRatio"+sign,100,0.,5.0,'b')
             self.addVariable("mt"+sign,50,0.,200.,'u')
             if self.hardLepton:
                 self.addVariable("soft"+self.leptonPrefixCap+"Pt"+sign,100,0.,250.,'u')
@@ -292,6 +295,7 @@ class StdPlotsBase(PlotsBase):
             self.fill1DBySign("soft"+self.leptonPrefixCap+"NPix",pdg,softLepNPix,w)
             self.fill1DBySign("soft"+self.leptonPrefixCap+"NTk",pdg,softLepNTk,w)
 
+        self.fill1DBySign("metHtRatio",pdg,met/ht,w)
         self.fill2DBySign("ht_vs_met",pdg,met,ht,w)
         self.fill2DBySign(self.leptonPrefix+"Pt_vs_met",pdg,met,softLepPt,w)
 
@@ -307,6 +311,9 @@ class StdPlotsBase(PlotsBase):
         
         self.fill1DBySign("isrJetPt",pdg,isrJetPt,w)
         self.fill1DBySign("isrJetEta",pdg,abs(eh.get("isrJetEta")),w)
+
+        self.fill1DBySign("metIsrPtRatio",pdg,met/isrJetPt,w)
+        self.fill1DBySign("htIsrPtRatio",pdg,ht/isrJetPt,w)
 
         jetPtRatio = 0.
         jet2Pt = 0.

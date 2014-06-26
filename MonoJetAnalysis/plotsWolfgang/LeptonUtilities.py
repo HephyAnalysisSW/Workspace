@@ -80,3 +80,22 @@ def hardestIsolatedElectron(eh,ptmin=7.,etamax=1.5,wp="medium"):
   if len(ieles)>0:
     return ieles[0]
   return None
+
+def diMuon(eh): 
+  imus = [ ]
+  nmu = int(eh.get("nmuCount")+0.5)
+  if nmu<2:
+    return ( None, None )
+  mupts = eh.get("muPt")
+  muetas = eh.get("muEta")
+  murelisos = eh.get("muRelIso")
+  ptcut = 25.
+  for i in range(nmu):
+    if mupts[i]>ptcut and abs(muetas[i])<2.1 and murelisos[i]<0.12:
+      ptcut = 20.
+      imus.append(i)
+      if len(imus)==2:
+        return ( imus[0], imus[1] )
+  return ( None, None )
+
+
