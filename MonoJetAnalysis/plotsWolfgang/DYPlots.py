@@ -42,7 +42,6 @@ class DYPlots(PlotsBase):
             self.addVariable("zpt"+sign,100,0.,1000.,'b')
             self.addVariable("zeta"+sign,50,0.,5.,'b')
             self.addVariable("mt"+sign,50,0.,200.,'u')
-            self.addVariable("m3"+sign,100,0.,1000.,'u')
             for i in range(2):
                 self.addVariable("hardMu"+str(i)+"Pt"+sign,100,0.,500.,'b')
                 self.addVariable("hardMu"+str(i)+"Eta"+sign,60,0.,3.,'b')
@@ -53,6 +52,11 @@ class DYPlots(PlotsBase):
             self.addVariable("soft"+self.leptonPrefixCap+"RelIso"+sign,100,0.,10.,'u')
             self.addVariable("soft"+self.leptonPrefixCap+"Iso"+sign,100,0.,1000.,'u')
             self.addVariable("soft"+self.leptonPrefixCap+"Dxy"+sign,150,0.,0.15,'u')
+
+            self.addVariablePair("isrJetPt",100,0.,1000.,"thirdMuon",2,-0.5,1.5,suffix=sign)
+            self.addVariablePair("njet60",10,-0.5,9.5,"thirdMuon",2,-0.5,1.5,suffix=sign)
+            self.addVariablePair("njet",20,-0.5,19.5,"thirdMuon",2,-0.5,1.5,suffix=sign)
+            self.addVariablePair("zpt",100,0.,1000.,"thirdMuon",2,-0.5,1.5,suffix=sign)
 
         curdir.cd()
 
@@ -138,6 +142,7 @@ class DYPlots(PlotsBase):
             self.fill1DBySign("hardMu"+str(i)+"Dxy",pdg,mudxys[j],w)
 
         self.fill1DBySign("isrJetPt",pdg,isrJetPt,w)
+        self.fill2DBySign("thirdMuon_vs_isrJetPt",pdg,isrJetPt,float(imu!=None),w)
         self.fill1DBySign("isrJetEta",pdg,abs(eh.get("isrJetEta")),w)
         jetPtRatio = 0.
         jet2Pt = 0.
@@ -152,7 +157,9 @@ class DYPlots(PlotsBase):
         self.fill1DBySign("jet2Pt",pdg,jet2Pt,w)
         self.fill1DBySign("jet2Eta",pdg,jet2Eta,w)
         self.fill1DBySign("njet60",pdg,eh.get("njet60"),w)
+        self.fill2DBySign("thirdMuon_vs_njet60",pdg,njet60,float(imu!=None),w)
         self.fill1DBySign("njet",pdg,eh.get("njetCount"),w)
+        self.fill2DBySign("thirdMuon_vs_njet",pdg,njet,float(imu!=None),w)
 
         self.fill1DBySign("met",pdg,met,w)
         self.fill1DBySign("ht",pdg,ht,w)
@@ -160,6 +167,7 @@ class DYPlots(PlotsBase):
         self.fill1DBySign("zm",pdg,zp4.M(),w)
         self.fill1DBySign("zpt",pdg,zp4.Pt(),w)
         self.fill1DBySign("zeta",pdg,zp4.Eta(),w)
+        self.fill2DBySign("thirdMuon_vs_zpt",pdg,zpt,float(imu!=None),w)
 
         mt = 0.
         softMuPt = 0.
@@ -180,20 +188,6 @@ class DYPlots(PlotsBase):
                 self.fill1DBySign("softMuRelIso",pdg,murelisos[imu],w)
             self.fill1DBySign("softMuDxy",pdg,mudxys[imu],w)
 
-        jetPhis = eh.get("jetPhi")
-        m3 = 0.
-        if njet>=3:
-            m3p4 = None
-            p4 = ROOT.TLorentzVector()
-            for i in range(min(njet,3)):
-                p4.SetPtEtaPhiM(jetPts[i],jetEtas[i],jetPhis[i],0.)
-                if m3p4 == None:
-                    m3p4 = ROOT.TLorentzVector(p4)
-                else:
-                    m3p4 += p4
-            if m3p4!=None:
-                m3 = m3p4.M()
-        self.fill1DBySign("m3",pdg,m3,w)
 
     def showTimers(self):
         line = ""
