@@ -1,6 +1,6 @@
 #! /bin/sh -x 
-for name in `ls -d T2DegenerateStop_2J_mStop-250to300-4 T2DegenerateStop_2J_mStop-400-2 T5Full*`
-#for name in `ls -d T5Full*`
+#for name in `ls -d T2DegenerateStop_2J*-4`
+for name in `ls -d T5Full* T2DegenerateStop_2J*-4`
 do
   tokens
   crab $1 $2 -c $name 

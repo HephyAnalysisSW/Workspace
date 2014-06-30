@@ -1,6 +1,6 @@
 #! /bin/sh -x 
-for name in `ls -d SingleMu-*`
-#for name in `ls -d MuHad-* ElectronHad-*`
+for name in `ls -d *Run*`
+#for name in `ls -d  ElectronHad-*`
 do
   tokens
   crab $1 $2 -c $name 
