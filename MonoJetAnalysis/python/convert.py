@@ -96,15 +96,15 @@ if options.smsMsqRangeString!='None' and options.allsamples.lower()=='sms':
 
     b = None 
     if msq>=100 and msq<=150:
-      b = "T2DegenerateStop_2J_mStop-100to150"
+      b = "T2DegenerateStop_2J_mStop-100to150-4"
     if msq>=175 and msq<=225:
-      b = "T2DegenerateStop_2J_mStop-175to225"
+      b = "T2DegenerateStop_2J_mStop-175to225-4"
     if msq>=250 and msq<=300:
       b = "T2DegenerateStop_2J_mStop-250to300-4"
     if msq>=325 and msq<=375:
-      b = "T2DegenerateStop_2J_mStop-325to375"
+      b = "T2DegenerateStop_2J_mStop-325to375-4"
     if msq>=400:
-      b = "T2DegenerateStop_2J_mStop-400-2"
+      b = "T2DegenerateStop_2J_mStop-400-4"
 
     if not b: 
       print "Don't know which bin on dpm for msq",msq
@@ -114,7 +114,7 @@ if options.smsMsqRangeString!='None' and options.allsamples.lower()=='sms':
 #    for deltaM in [100]:
       T2DegStop = {}  
       T2DegStop={}
-      T2DegStop["dirname"] = "/dpm/oeaw.ac.at/home/cms/store/user/schoef/pat_140314/"
+      T2DegStop["dirname"] = "/dpm/oeaw.ac.at/home/cms/store/user/schoef/pat_240614/"
       T2DegStop['newMETCollection'] = True
       T2DegStop["Chain"] = "Events"
       name = "T2DegStop_"+str(msq)+"_"+str(msq-deltaM)
@@ -447,13 +447,13 @@ for sample in allSamples:
           sample['filenames'][bin].append(subdirname+tfile)
 
     if options.allsamples.lower()=='sms':
-      c = ROOT.TChain(sample['Chain'])
+      c_ = ROOT.TChain(sample['Chain'])
       for tfile in sample['filenames'][bin]:
         print "Adding",prefix+tfile
-        c.Add(prefix+tfile)
-      nevents = c.GetEntries(sample['additionalCut'])
-      print nevents, sample['additionalCut']
-      del c
+        c_.Add(prefix+tfile)
+      nevents = c_.GetEntries(sample['additionalCut'])
+      print nevents,'found with requirement', sample['additionalCut']
+      del c_
     else:
       d = ROOT.TChain('Runs')
       for tfile in sample['filenames'][bin]:
@@ -747,12 +747,11 @@ for isample, sample in enumerate(allSamples):
           for var in variables[1:]:
             getVar = var
             exec("s."+var+"="+str(getVarValue(c, getVar)).replace("nan","float('nan')"))
+          s.event = long(c.GetLeaf(c.GetAlias('event')).GetValue())
           if options.allsamples.lower()=='sms':
             s.osetMN, s.osetMC = s.osetMC, s.osetMN# swap, because I misinterpreted the model string
-            
-#            for var in ['osetMgl', 'osetMN', 'osetMC', 'osetMsq']:
-#              print s.event, var, getVarValue(c, var)
-          s.event = long(c.GetLeaf(c.GetAlias('event')).GetValue())
+#          for var in ['osetMgl', 'osetMN', 'osetMC', 'osetMsq']:
+#            print s.event, var, eval('s.'+var)
           if not sample['name'].lower().count('data'):
             nvtxWeightSysPlus, nvtxWeightSysMinus, nvtxWeight = 1.,1.,1.
             if sample.has_key('reweightingHistoFile'): 
@@ -1003,8 +1002,9 @@ for isample, sample in enumerate(allSamples):
 #          print s.type1phiMet
 #          if s.type1phiMet<150:
 #            print "Warning!!"
+	  f.cd()
           t.Fill()
-#          tmpDir.cd()
+          tmpDir.cd()
 #          if s.type1phiMet<150:
 #            print "Warning", s.type1phiMet
 #          else:
