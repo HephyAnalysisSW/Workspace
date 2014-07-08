@@ -54,7 +54,7 @@ sampleBase = "/home/adamwo/data/monoJetTuples_v7/"
 if options.dset=="singleMu":
     sampleBase += "copyMu/"
 elif options.dset=="diMu":
-    sampleBase += "copyMu/"
+    sampleBase = "/home/adamwo/data/monoJetTuples_v8/copyDiMu/"
 else:
     sampleBase += "copy/"
 
@@ -73,15 +73,13 @@ if options.dset=="singleMu":
     samples.append(Sample("data",sampleBase,type="D",color=1,fill=False, \
                               namelist=[ 'data_singleMu_Run2012AB', 'data_singleMu_Run2012C', 'data_singleMu_Run2012D' ]))
 elif options.dset=="diMu":
-    samples.append(Sample("WW",sampleBase,type="B",color=6,fill=True))
-    samples.append(Sample("DY",sampleBase,type="B",color=3,fill=True))
-    samples.append(Sample("singleTop",sampleBase,type="B",color=4,fill=True))
     samples.append(Sample("TTJetsPowHeg",sampleBase,type="B",color=2,fill=True))
-    samples.append(Sample("WJetsHT150v2",sampleBase,type="B",color=5,fill=True))
-    samples.append(Sample("stop300lsp270FastSim",sampleBase,type="S",color=4,fill=False))
-    samples.append(Sample("stop300lsp240g150FastSim",sampleBase,type="S",color=2,fill=False))
-    samples.append(Sample("data","/home/adamwo/data/monoJetTuples_v5/copyDiMu/",type="D",color=1,fill=False, \
-                              namelist=[ 'data_singleMu_Run2012AB', 'data_singleMu_Run2012C', 'data_singleMu_Run2012D' ]))
+    samples.append(Sample("VV",sampleBase,type="B",color=6,fill=True, \
+                              namelist=[ "WW", "WZ", "ZZ"]))
+#    samples.append(Sample("DY",sampleBase,type="B",color=3,fill=True))
+    samples.append(Sample("DYJetsToLL_PtZ-50_TuneZ2star_8TeV-madgraph-tarball",sampleBase,type="B",color=3,fill=True))
+#    samples.append(Sample("TTSignal",sampleBase,type="S",color=4,fill=False))
+    samples.append(Sample("data",sampleBase,type="D",color=1,fill=False))
 else:
     samples.append(Sample("QCD",sampleBase,type="B",color=7,fill=True, \
                               namelist=[ "QCD20to600", "QCD600to1000", "QCD1000" ]))
