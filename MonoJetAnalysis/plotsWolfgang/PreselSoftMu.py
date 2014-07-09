@@ -11,7 +11,7 @@ class PreselSoftMu:
         if not PreTools.passesHadronicSelection(eh):
             return False
 
-        leptonInfo = PreTools.selectedLepton(eh,13,False)
+        leptonInfo = PreTools.selectedLepton(eh,13,mode="soft")
 #        ht = eh.get("ht")
 #        met = eh.get("type1phiMet")
 #        if ht>211.58 and ht<211.59 and met>225.20 and met<225.21:
