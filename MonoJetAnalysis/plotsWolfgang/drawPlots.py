@@ -50,7 +50,7 @@ if options.preselection!=None:
     presel = preselClass()
     setattr(presel,"sourcefile",options.preselection)
 
-sampleBase = "/home/adamwo/data/monoJetTuples_v7/"
+sampleBase = "/home/adamwo/data/monoJetTuples_v8/"
 if options.dset=="singleMu":
     sampleBase += "copyMu/"
 elif options.dset=="diMu":
@@ -81,46 +81,46 @@ elif options.dset=="diMu":
 #    samples.append(Sample("TTSignal",sampleBase,type="S",color=4,fill=False))
     samples.append(Sample("data",sampleBase,type="D",color=1,fill=False))
 else:
-    samples.append(Sample("QCD",sampleBase,type="B",color=7,fill=True, \
-                              namelist=[ "QCD20to600", "QCD600to1000", "QCD1000" ]))
-    samples.append(Sample("WW",sampleBase,type="B",color=6,fill=True))
-    samples.append(Sample("DY",sampleBase,type="B",color=3,fill=True))
-    samples.append(Sample("ZJetsInv",sampleBase,type="B",color=9,fill=True))
-    samples.append(Sample("singleTop",sampleBase,type="B",color=4,fill=True))
-    #samples.append(Sample("TTJets",sampleBase,type="B",color=2,fill=True))
+#    samples.append(Sample("QCD",sampleBase,type="B",color=7,fill=True, \
+#                              namelist=[ "QCD20to600", "QCD600to1000", "QCD1000" ]))
+#    samples.append(Sample("WW",sampleBase,type="B",color=6,fill=True))
+#    samples.append(Sample("DY",sampleBase,type="B",color=3,fill=True))
+#    samples.append(Sample("ZJetsInv",sampleBase,type="B",color=9,fill=True))
+#    samples.append(Sample("singleTop",sampleBase,type="B",color=4,fill=True))
+#    #samples.append(Sample("TTJets",sampleBase,type="B",color=2,fill=True))
     samples.append(Sample("TTJetsPowHeg",sampleBase,type="B",color=2,fill=True))
-##    samples.append(Sample("WJetsToLNu",sampleBase,type="B",color=5,fill=True)
-#    samples.append(Sample("WJetsToLNuTau",sampleBase,type="B",color=8,fill=True, \
-#                              namelist=["WJetsToLNu"],filter=LeptonFilter(16)))
-#    samples.append(Sample("WJetsToLNuNoTau",sampleBase,type="B",color=5,fill=True, \
-#                              namelist=["WJetsToLNu"],filter=InvertedSampleFilter(LeptonFilter(16))))
-#    samples.append(Sample("WJetsToLNu",sampleBase,type="B",color=5,fill=True))
-#    samples.append(Sample("WJetsToLNu",sampleBase,type="B",color=5,fill=True))
-#    samples.append(Sample("WJetsHT150v2",sampleBase,type="B",color=5,fill=True))
+###    samples.append(Sample("WJetsToLNu",sampleBase,type="B",color=5,fill=True)
+##    samples.append(Sample("WJetsToLNuTau",sampleBase,type="B",color=8,fill=True, \
+##                              namelist=["WJetsToLNu"],filter=LeptonFilter(16)))
+##    samples.append(Sample("WJetsToLNuNoTau",sampleBase,type="B",color=5,fill=True, \
+##                              namelist=["WJetsToLNu"],filter=InvertedSampleFilter(LeptonFilter(16))))
+##    samples.append(Sample("WJetsToLNu",sampleBase,type="B",color=5,fill=True))
+##    samples.append(Sample("WJetsToLNu",sampleBase,type="B",color=5,fill=True))
+##    samples.append(Sample("WJetsHT150v2",sampleBase,type="B",color=5,fill=True))
     samples.append(Sample("WJetsHT150v2Tau",sampleBase,type="B",color=8,fill=True, \
                               namelist=["WJetsHT150v2"],filter=LeptonFilter(16)))
     samples.append(Sample("WJetsHT150v2NoTau",sampleBase,type="B",color=5,fill=True, \
                               namelist=["WJetsHT150v2"],filter=InvertedSampleFilter(LeptonFilter(16))))
-    #samples.append(Sample("WJetsHT250",sampleBase,type="B",color=5,fill=True))
-    #samples.append(Sample("WNJetsToLNu",sampleBase,type="B",color=5,fill=True,downscale=2, \
-    #                          namelist=[ "W1JetsToLNu", "W2JetsToLNu", "W3JetsToLNu", "W4JetsToLNu"  ]))
-    #samples.append(Sample("W1JetsToLNu",sampleBase,type="B",color=2,fill=True,hatch=3245))
-    #samples.append(Sample("W2JetsToLNu",sampleBase,type="B",color=3,fill=True,hatch=3254))
-    #samples.append(Sample("W3JetsToLNu",sampleBase,type="B",color=4,fill=True,hatch=3245))
-    #samples.append(Sample("W4JetsToLNu",sampleBase,type="B",color=5,fill=True,hatch=3254))
-    #samples.append(Sample("stop200lsp170g100FastSim",sampleBase,type="S",color=2,fill=False))
-#    samples.append(Sample("stop300lsp270g175FastSim",sampleBase,type="S",color=1,line=1,fill=False))
-    samples.append(Sample("stop300lsp270g200FastSim",sampleBase,type="S",color=1,line=2,fill=False))
-    samples.append(Sample("stop300lsp240g150FastSim",sampleBase,type="S",color=1,line=1,fill=False))
-##    samples.append(Sample("stop300lsp270FastSim",sampleBase,type="S",color=4,fill=False))
-##    samples.append(Sample("T2DegStop_225_145",sampleBase,type="S",color=3,fill=False))
-##    samples.append(Sample("T2DegStop_200_170",sampleBase,type="S",color=3,fill=False))
-##    samples.append(Sample("T2DegStop_150_120",sampleBase,type="S",color=2,fill=False))
-#    samples.append(Sample("T2DegStop_100_20",sampleBase,type="S",color=1,line=1,fill=False))
-#    samples.append(Sample("T2DegStop_225_145",sampleBase,type="S",color=1,line=2,fill=False))
-#    samples.append(Sample("T2DegStop_200_140",sampleBase,type="S",color=1,line=1,fill=False))
-#    samples.append(Sample("T2DegStop_200_170",sampleBase,type="S",color=1,line=2,fill=False))
-#    samples.append(Sample("T2DegStop_150_120",sampleBase,type="S",color=1,line=4,fill=False))
+#    #samples.append(Sample("WJetsHT250",sampleBase,type="B",color=5,fill=True))
+#    #samples.append(Sample("WNJetsToLNu",sampleBase,type="B",color=5,fill=True,downscale=2, \
+#    #                          namelist=[ "W1JetsToLNu", "W2JetsToLNu", "W3JetsToLNu", "W4JetsToLNu"  ]))
+#    #samples.append(Sample("W1JetsToLNu",sampleBase,type="B",color=2,fill=True,hatch=3245))
+#    #samples.append(Sample("W2JetsToLNu",sampleBase,type="B",color=3,fill=True,hatch=3254))
+#    #samples.append(Sample("W3JetsToLNu",sampleBase,type="B",color=4,fill=True,hatch=3245))
+#    #samples.append(Sample("W4JetsToLNu",sampleBase,type="B",color=5,fill=True,hatch=3254))
+#    #samples.append(Sample("stop200lsp170g100FastSim",sampleBase,type="S",color=2,fill=False))
+##    samples.append(Sample("stop300lsp270g175FastSim",sampleBase,type="S",color=1,line=1,fill=False))
+#    samples.append(Sample("stop300lsp270g200FastSim",sampleBase,type="S",color=1,line=2,fill=False))
+#    samples.append(Sample("stop300lsp240g150FastSim",sampleBase,type="S",color=1,line=1,fill=False))
+###    samples.append(Sample("stop300lsp270FastSim",sampleBase,type="S",color=4,fill=False))
+###    samples.append(Sample("T2DegStop_225_145",sampleBase,type="S",color=3,fill=False))
+###    samples.append(Sample("T2DegStop_200_170",sampleBase,type="S",color=3,fill=False))
+###    samples.append(Sample("T2DegStop_150_120",sampleBase,type="S",color=2,fill=False))
+##    samples.append(Sample("T2DegStop_100_20",sampleBase,type="S",color=1,line=1,fill=False))
+##    samples.append(Sample("T2DegStop_225_145",sampleBase,type="S",color=1,line=2,fill=False))
+##    samples.append(Sample("T2DegStop_200_140",sampleBase,type="S",color=1,line=1,fill=False))
+    samples.append(Sample("T2DegStop_300_270",sampleBase,type="S",color=1,line=2,fill=False))
+    samples.append(Sample("T2DegStop_300_240",sampleBase,type="S",color=1,line=4,fill=False))
     if options.data:
         samples.append(Sample("data",sampleBase,type="D",color=1,fill=False))
 

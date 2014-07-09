@@ -32,8 +32,12 @@ def isolatedMuons(eh,ptmin=5.,etamax=1.5,wp="medium"):
       absisomax = relisomax*relabstransition
     else:
       absisomax = relisomax*mupts[i]
+    if int(eh.get("run"))==194429 and int(eh.get("lumi"))==824 and eh.get("event")==723391041:
+      print "Muon ",i,mupts[i],murelisos[i],absiso,absisomax
     if absiso<absisomax:
       imus.append(i)
+  if int(eh.get("run"))==194429 and int(eh.get("lumi"))==824 and eh.get("event")==723391041:
+    print "Muons ",imus
   return imus
 
 def hardestIsolatedMuon(eh,ptmin=5.,etamax=1.5,wp="medium"):
