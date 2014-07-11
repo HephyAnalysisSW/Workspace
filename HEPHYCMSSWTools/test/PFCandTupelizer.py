@@ -10,6 +10,8 @@ process.source = cms.Source(
     )
 
 
+import Workspace.HEPHYCMSSWTools.PFCandTupelizer_cff
+
 process.load('Configuration.StandardSequences.Services_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 process.GlobalTag.globaltag = 'POSTLS170_V6::All'

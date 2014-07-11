@@ -129,70 +129,10 @@ SUSYTupelizer::SUSYTupelizer( const edm::ParameterSet & pset):
   lowLeptonPtThreshold_ (pset.getUntrackedParameter< double >("lowLeptonPtThreshold") ),
   softJetPtThreshold_ (pset.getUntrackedParameter< double >("softJetPtThreshold") ),
 
-// muonPt_ (pset.getUntrackedParameter< double >("muonPt") ),
-// muonEta_ (pset.getUntrackedParameter< double >("muonEta") ),
-// muonIsGlobal_ (pset.getUntrackedParameter< bool >("muonIsGlobal") ),
-// muonHasPFMatch_ (pset.getUntrackedParameter< bool >("muonHasPFMatch") ),
-// muonIsPF_ (pset.getUntrackedParameter< bool >("muonIsPF") ),
-// muonNormChi2_ (pset.getUntrackedParameter< double >("muonNormChi2") ),
-// muonNumValMuonHits_ (pset.getUntrackedParameter< int >("muonNumValMuonHits") ),
-// muonNumMatchedStations_ (pset.getUntrackedParameter< int >("muonNumMatchedStations") ),
-// muonNumPixelHits_ (pset.getUntrackedParameter< int >("muonNumPixelHits") ),
-// muonNumTrackerLayersWithMeasurement_ (pset.getUntrackedParameter< int >("muonNumTrackerLayersWithMeasurement") ),
-// muonPFRelIso_ (pset.getUntrackedParameter< double >("muonPFRelIso") ),
   muonPFRelIsoDeltaBeta_ (pset.getUntrackedParameter< bool >("muonPFRelIsoDeltaBeta") ),
-// muonDxy_ (pset.getUntrackedParameter< double >("muonDxy") ),
-// muonDz_ (pset.getUntrackedParameter< double >("muonDz") ),
-//
-// vetoMuonPt_ (pset.getUntrackedParameter< double >("vetoMuonPt") ),
-// vetoMuonEta_ (pset.getUntrackedParameter< double >("vetoMuonEta") ),
-// vetoMuonIsGlobalOrIsTracker_ (pset.getUntrackedParameter< bool >("vetoMuonIsGlobalOrIsTracker") ),
-// vetoMuonIsPF_ (pset.getUntrackedParameter< bool >("vetoMuonIsPF") ),
-// vetoMuonPFRelIso_ (pset.getUntrackedParameter< double >("vetoMuonPFRelIso") ),
-// vetoMuonPFRelIsoDeltaBeta_ (pset.getUntrackedParameter< bool >("vetoMuonPFRelIsoDeltaBeta") ),
-// vetoMuonDxy_ (pset.getUntrackedParameter< double >("vetoMuonDxy") ),
-// vetoMuonDz_ (pset.getUntrackedParameter< double >("vetoMuonDz") ),
-// // steerables Ele:
-// elePt_ ( pset.getUntrackedParameter< double >("elePt") ),
-// eleEta_ (pset.getUntrackedParameter< double >("eleEta") ),
-// eleOneOverEMinusOneOverP_ ( pset.getUntrackedParameter< double >("eleOneOverEMinusOneOverP") ),
-// eleDxy_ ( pset.getUntrackedParameter< double >("eleDxy") ),
-// eleDz_ ( pset.getUntrackedParameter< double >("eleDz") ),
-// elePFRelIsoBarrel_ ( pset.getUntrackedParameter< double >("elePFRelIsoBarrel") ),
-// elePFRelIsoEndcap_ ( pset.getUntrackedParameter< double >("elePFRelIsoEndcap") ),
   elePFRelIsoAreaCorrected_ ( pset.getUntrackedParameter< bool >("elePFRelIsoAreaCorrected") ),
   eleRho_ ( pset.getUntrackedParameter< edm::InputTag >("eleRho") ),
-// eleSigmaIEtaIEtaBarrel_ ( pset.getUntrackedParameter< double >("eleSigmaIEtaIEtaBarrel") ),
-// eleSigmaIEtaIEtaEndcap_ ( pset.getUntrackedParameter< double >("eleSigmaIEtaIEtaEndcap") ),
-// eleHoEBarrel_ ( pset.getUntrackedParameter< double >("eleHoEBarrel") ),
-// eleHoEEndcap_ ( pset.getUntrackedParameter< double >("eleHoEEndcap") ),
-// eleDPhiBarrel_ ( pset.getUntrackedParameter< double >("eleDPhiBarrel") ),
-// eleDPhiEndcap_ ( pset.getUntrackedParameter< double >("eleDPhiEndcap") ),
-// eleDEtaBarrel_ ( pset.getUntrackedParameter< double >("eleDEtaBarrel") ),
-// eleDEtaEndcap_ ( pset.getUntrackedParameter< double >("eleDEtaEndcap") ),
-// eleMissingHits_ ( pset.getUntrackedParameter< int >("eleMissingHits") ),
-// eleConversionRejection_ ( pset.getUntrackedParameter< bool >("eleConversionRejection") ),
-// eleHasPFMatch_ (pset.getUntrackedParameter< bool >("eleHasPFMatch") ),
-  // steerables veto Ele:
-// vetoElePt_ ( pset.getUntrackedParameter< double >("vetoElePt") ),
-// vetoEleEta_ (pset.getUntrackedParameter< double >("vetoEleEta") ),
-// vetoEleDxy_ ( pset.getUntrackedParameter< double >("vetoEleDxy") ),
-// vetoEleDz_ ( pset.getUntrackedParameter< double >("vetoEleDz") ),
-// vetoElePFRelIsoBarrel_ ( pset.getUntrackedParameter< double >("vetoElePFRelIsoBarrel") ),
-// vetoElePFRelIsoEndcap_ ( pset.getUntrackedParameter< double >("vetoElePFRelIsoEndcap") ),
-// vetoEleSigmaIEtaIEtaBarrel_ ( pset.getUntrackedParameter< double >("vetoEleSigmaIEtaIEtaBarrel") ),
-// vetoEleSigmaIEtaIEtaEndcap_ ( pset.getUntrackedParameter< double >("vetoEleSigmaIEtaIEtaEndcap") ),
-// vetoEleHoEBarrel_ ( pset.getUntrackedParameter< double >("vetoEleHoEBarrel") ),
-// vetoEleHoEEndcap_ ( pset.getUntrackedParameter< double >("vetoEleHoEEndcap") ),
-// vetoEleDPhiBarrel_ ( pset.getUntrackedParameter< double >("vetoEleDPhiBarrel") ),
-// vetoEleDPhiEndcap_ ( pset.getUntrackedParameter< double >("vetoEleDPhiEndcap") ),
-// vetoEleDEtaBarrel_ ( pset.getUntrackedParameter< double >("vetoEleDEtaBarrel") ),
-// vetoEleDEtaEndcap_ ( pset.getUntrackedParameter< double >("vetoEleDEtaEndcap") ),
-
-// minJetPt_ ( pset.getUntrackedParameter< double >("minJetPt") ),
-// maxJetEta_ ( pset.getUntrackedParameter< double >("maxJetEta") ),
   btag_ ( pset.getUntrackedParameter< std::string >("btag") ),
-  hasL1Trigger_ ( pset.getUntrackedParameter< bool >("hasL1Trigger") ),
   puJetIdCutBased_( pset.getUntrackedParameter< edm::InputTag >("puJetIdCutBased") ),
   puJetIdFull53X_( pset.getUntrackedParameter< edm::InputTag >("puJetIdFull53X") ),
   puJetIdMET53X_( pset.getUntrackedParameter< edm::InputTag >("puJetIdMET53X") ),
@@ -204,8 +144,7 @@ SUSYTupelizer::SUSYTupelizer( const edm::ParameterSet & pset):
   addJetVector_(pset.getUntrackedParameter<bool>("addJetVector")),
   addMuonVector_(pset.getUntrackedParameter<bool>("addMuonVector")),
   addEleVector_(pset.getUntrackedParameter<bool>("addEleVector")),
-  addFullTauInfo_(pset.getUntrackedParameter<bool>("addFullTauInfo")),
-// addGeneratorInfo_(pset.getUntrackedParameter<bool>("addGeneratorInfo")),
+  addTauVector_(pset.getUntrackedParameter<bool>("addTauVector")),
   addMSugraOSETInfo_(pset.getUntrackedParameter<bool>("addMSugraOSETInfo")),
   addPDFWeights_(pset.getUntrackedParameter<bool>("addPDFWeights"))
 
@@ -440,7 +379,6 @@ void SUSYTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup) {
           muonsNumtrackerLayerWithMeasurement.push_back(numTrackerLayersWithMeasurement);
           muonsDxy.push_back(dxy);
           muonsDz.push_back(dz);
-  // muonsPFDeltaPT.push_back(deltapT);
       }
       if (verbose_) {
         cout<<"[muon "<< muon - patMuons.begin()<<boolalpha<<"]"<<endl;//isGood? "<<isGood<<" isGoodVeto "<<isGoodVeto<<endl;
@@ -584,7 +522,7 @@ void SUSYTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup) {
     put("elesPassPATConversionVeto", elesPassPATConversionVeto);
   }
 
-  if (addFullTauInfo_) {
+  if (addTauVector_) {
     vector<pat::Tau> patTaus (EdmHelper::getObjs<pat::Tau>(ev, patTaus_));
     int ntaus(0);
     std::vector<int> tausPdg, tausisPF, taushasMCMatch, tausByLooseCombinedIsolationDBSumPtCorr, tausDecayModeFinding, tausAgainstMuonLoose, tausAgainstElectronLoose;
@@ -889,7 +827,7 @@ void SUSYTupelizer::addAllVars( )
     addVar("elesPassConversionRejection/I[]");
     addVar("elesPassPATConversionVeto/I[]");
   }
-  if (addFullTauInfo_) {
+  if (addTauVector_) {
     addVar("ntaus/I");
     addVar("tausPt/F[]");
     addVar("tausEta/F[]");

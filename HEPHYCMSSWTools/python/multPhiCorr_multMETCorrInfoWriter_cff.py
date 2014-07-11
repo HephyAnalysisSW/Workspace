@@ -1,12 +1,12 @@
 import FWCore.ParameterSet.Config as cms
 
-from Workspace.HEPHYCommonTools.multPhiCorr_multMETCorrInfoWriter_53X_cfi import multPhiCorr_multMETCorrInfoWriter_53X
+from Workspace.HEPHYCMSSWTools.multPhiCorr_multMETCorrInfoWriter_cfi import multPhiCorr_multMETCorrInfoWriter
 
 ##____________________________________________________________________________||
 
 pfMEtMultCorrInfoWriter = cms.EDAnalyzer("multMETCorrInfoWriter",
     srcPFlow = cms.InputTag('particleFlow', ''),
-    parameters = multPhiCorr_multMETCorrInfoWriter_53X
+    parameters = multPhiCorr_multMETCorrInfoWriter
 )
 
 pfMEtMultCorrInfoWriterSequence = cms.Sequence( pfMEtMultCorrInfoWriter )

@@ -27,6 +27,24 @@
 <library   file="SUSYTupelizer.cc" name="SUSYTupelizer">
   <flags   EDM_PLUGIN="1"/>
 </library>
+<library   file="JetTupelizer.cc" name="JetTupelizer">
+  <flags   EDM_PLUGIN="1"/>
+</library>
+<library   file="MuonTupelizer.cc" name="MuonTupelizer">
+  <flags   EDM_PLUGIN="1"/>
+</library>
+<library   file="ElectronTupelizer.cc" name="ElectronTupelizer">
+  <flags   EDM_PLUGIN="1"/>
+</library>
+<library   file="TauTupelizer.cc" name="TauTupelizer">
+  <flags   EDM_PLUGIN="1"/>
+</library>
+<library   file="BasicTupelizer.cc" name="BasicTupelizer">
+  <flags   EDM_PLUGIN="1"/>
+</library>
+<library   file="TriggerTupelizer.cc" name="TriggerTupelizer">
+  <flags   EDM_PLUGIN="1"/>
+</library>
 <library   file="EventCounter.cc" name="EventCounter">
   <flags   EDM_PLUGIN="1"/>
 </library>
@@ -36,6 +54,6 @@
 <library   file="PFCandTupelizer.cc" name="PFCandTupelizer">
   <flags   EDM_PLUGIN="1"/>
 </library>
-<library   file="PFCandTupelizer2.cc" name="PFCandTupelizer2">
+<library   file="multMETCorrInfoWriter.cc" name="multMETCorrInfoWriter">
   <flags   EDM_PLUGIN="1"/>
 </library>

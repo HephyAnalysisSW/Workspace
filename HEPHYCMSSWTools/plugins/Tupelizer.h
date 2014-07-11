@@ -40,7 +40,7 @@ public:
     }
     tname.replace(0, spos+1, "");
     types[varname] = tname; 
-    std::cout<<"Varname "<<varname<<" tname "<<tname<<std::endl;
+//    std::cout<<"Varname "<<varname<<" tname "<<tname<<std::endl;
     if (tname.find("[]")!=std::string::npos) {
       switch (tname.at(0)) {
               case 'B' : {produces<std::vector<Char_t> >(varname)    .setBranchAlias(fullvarname); break;}

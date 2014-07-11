@@ -87,7 +87,6 @@ public:
   bool   elePFRelIsoAreaCorrected_;
   edm::InputTag   eleRho_;
   std::string btag_;
-  bool hasL1Trigger_;
   edm::InputTag puJetIdCutBased_;
   edm::InputTag puJetIdFull53X_;
   edm::InputTag puJetIdMET53X_;
@@ -106,8 +105,7 @@ public:
   bool addJetVector_;
   bool addMuonVector_;
   bool addEleVector_;
-  bool addFullTauInfo_;
-//  bool addGeneratorInfo_;
+  bool addTauVector_;
   bool addMSugraOSETInfo_;
   bool addPDFWeights_;
 

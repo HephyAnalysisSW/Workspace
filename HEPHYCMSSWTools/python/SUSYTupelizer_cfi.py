@@ -22,20 +22,16 @@ SUSYTupelizer = cms.EDProducer ( "SUSYTupelizer",
     puJetIdFull53X    = cms.untracked.InputTag("puJetMvapatJetsAK5PF", "full53xId"),
     puJetIdMET53X     = cms.untracked.InputTag("puJetMvapatJetsAK5PF", "met53xId"),
 
-#    addRA4AnalysisInfo = cms.untracked.bool(True),
-#    addTriggerInfo = cms.untracked.bool(False),
+    addTriggerInfo = cms.untracked.bool(True),
     triggersToMonitor = cms.untracked.vstring(["HLT_IsoMu24_eta2p1"]),
-#    addFullBTagInfo = cms.untracked.bool(False),
     addJetVector = cms.untracked.bool(False),
-#    addFullLeptonInfo = cms.untracked.bool(False),
-    addFullTauInfo = cms.untracked.bool(False),
+    addTauVector = cms.untracked.bool(False),
     addMuonVector = cms.untracked.bool(False),
     addEleVector = cms.untracked.bool(False),
-#    addGeneratorInfo = cms.untracked.bool(False),
     addMSugraOSETInfo = cms.untracked.bool(False),
     addPDFWeights = cms.untracked.bool(False),
     addMetUncertaintyInfo = cms.untracked.bool(False),
-    metsToMonitor = cms.untracked.vstring(["patType1CorrectedPFMet","patType1CorrectedPFMetElectronEnDown","patType1CorrectedPFMetElectronEnUp","patType1CorrectedPFMetJetEnDown","patType1CorrectedPFMetJetEnUp","patType1CorrectedPFMetJetResDown","patType1CorrectedPFMetJetResUp","patType1CorrectedPFMetMuonEnDown","patType1CorrectedPFMetMuonEnUp","patType1CorrectedPFMetTauEnDown","patType1CorrectedPFMetTauEnUp","patType1CorrectedPFMetUnclusteredEnDown","patType1CorrectedPFMetUnclusteredEnUp"]),
+    metsToMonitor = cms.untracked.vstring([]),
     useForDefaultAlias = cms.untracked.bool(False)
 
 ) 

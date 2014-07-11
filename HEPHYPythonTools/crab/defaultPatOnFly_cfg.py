@@ -14,7 +14,7 @@ options.register ('hltName','HLT',
           VarParsing.VarParsing.varType.string,
           "HLT Trigger collection")
 
-options.register ('GT','START53_V7F::All',#GR_R_52_V9::All
+options.register ('GT','POSTLS170_V5::All',
           VarParsing.VarParsing.multiplicity.singleton,
           VarParsing.VarParsing.varType.string,
           "Global Tag")
@@ -24,14 +24,14 @@ options.register ('outfile','histo.root',
           VarParsing.VarParsing.varType.string,
           "outfile")
 
-options.register ('startFileNumber',-1,
-          VarParsing.VarParsing.multiplicity.singleton,
-          VarParsing.VarParsing.varType.int,
-          "start at n-th file (-1=all)")
-options.register ('stopFileNumber',-1,
-          VarParsing.VarParsing.multiplicity.singleton,
-          VarParsing.VarParsing.varType.int,
-          "stop before n-th file (-1=all)")
+#options.register ('startFileNumber',-1,
+#          VarParsing.VarParsing.multiplicity.singleton,
+#          VarParsing.VarParsing.varType.int,
+#          "start at n-th file (-1=all)")
+#options.register ('stopFileNumber',-1,
+#          VarParsing.VarParsing.multiplicity.singleton,
+#          VarParsing.VarParsing.varType.int,
+#          "stop before n-th file (-1=all)")
 
 options.register ('triggers','*',
           VarParsing.VarParsing.multiplicity.list,
@@ -48,10 +48,6 @@ options.register ('verbose',False,
           VarParsing.VarParsing.varType.bool,
           "verbosity")
 
-options.register ('addRA4Info',True,
-          VarParsing.VarParsing.multiplicity.singleton,
-          VarParsing.VarParsing.varType.bool,
-          "whether or not to add RA4 specific Info")
 options.register ('keepPFCandidates',False,
           VarParsing.VarParsing.multiplicity.singleton,
           VarParsing.VarParsing.varType.bool,
@@ -61,9 +57,8 @@ options.register ('addPDFWeights',False,
           VarParsing.VarParsing.varType.bool,
           "whether or not to add pdfWeights")
 
-infiles = ['file:/data/schoef/local/TTJets-53X-syncfile-AODSIM.root']
-#  infiles = ['file:/data/jkancsar/pickevent/event4874249.root']
-#  infiles = ['file:/data/schoef/monoJetSignals/FastSim/stop200lsp170g100/from_0_to_10000_decayed_stop200lsp170g100.root']
+#infiles = ['root://xrootd.unl.edu//store/mc/Spring14dr/WJetsToLNu_HT-100to200_Tune4C_13TeV-madgraph-tauola/AODSIM/PU20bx25_POSTLS170_V5-v1/00000/00165B45-82E6-E311-B68D-002590AC4FEC.root']
+infiles = ['root://eoscms.cern.ch//eos/cms/store/relval/CMSSW_7_0_5/RelValTTbar_13/GEN-SIM-RECO/POSTLS170_V6-v3/00000/0423767B-B5DD-E311-A1E0-02163E00E5B5.root']
 
 options.files=infiles
 
@@ -75,40 +70,22 @@ if not 'ipython' in VarParsing.sys.argv[0]:
 else:
   print "No parsing of arguments!"
 
-if options.files[0][:9] == 'load:stop':
-  from Workspace.HEPHYCMSSWTools.fullSimSignals_cfi import *
-  print "Loading files from Workspace.HEPHYCMSSWTools.fullSimSignals_cfi"
-  infiles =  eval(options.files[0][5:])
-  if options.startFileNumber!=-1 :
-    print "Only taking files[",options.startFileNumber,",",options.stopFileNumber,"]"
-  print "Length of total file list:", len(infiles)
-  lastFile = min([len(infiles), options.stopFileNumber])
-  infiles = infiles[options.startFileNumber:lastFile]
-  for f in options.files:
-    options.files.remove(f)
-  options.files = infiles
-  print options.files
-
 isMC = (options.mode.lower()=='sms' or options.mode.lower()=='mc')
 jec = []
 if isMC:
   jec = ['L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual']
 else:
   jec = ['L1FastJet', 'L2Relative', 'L3Absolute']
-#  if options.mode=="Mu":
-#    triggers =  ['HLT_PFHT350_Mu15_PFMET45_v*','HLT_PFHT350_Mu15_PFMET50_v*','HLT_PFHT400_Mu5_PFMET45_v*','HLT_PFHT400_Mu5_PFMET50_v*']
-#  if options.mode=="Ele":
-#    triggers = ['HLT_CleanPFHT350_Ele5_CaloIdT_CaloIsoVL_TrkIdT_TrkIsoVL_PFMET45_v*','HLT_CleanPFHT350_Ele5_CaloIdT_CaloIsoVL_TrkIdT_TrkIsoVL_PFMET50_v*','HLT_CleanPFHT300_Ele15_CaloIdT_CaloIsoVL_TrkIdT_TrkIsoVL_PFMET45_v*','HLT_CleanPFHT300_Ele15_CaloIdT_CaloIsoVL_TrkIdT_TrkIsoVL_PFMET50_v*']
 
-print "mode",options.mode,"isMC?",isMC, ", verbose?",options.verbose,", add RA4 Info?",options.addRA4Info,'keepPFCandidates?', options.keepPFCandidates, ", JEC:",jec,", GT",options.GT, ", triggers", options.triggers, 'addPDFWeights?',options.addPDFWeights
-
+print "mode",options.mode,"isMC?",isMC, ", verbose?",options.verbose,'keepPFCandidates?', options.keepPFCandidates, ", JEC:",jec,", GT",options.GT, ", triggers", options.triggers, 'addPDFWeights?',options.addPDFWeights
 
 
 #-- Message Logger ------------------------------------------------------------
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
 process.options = cms.untracked.PSet(
   SkipEvent = cms.untracked.vstring('ProductNotFound'),
-  wantSummary = cms.untracked.bool(False)
+  wantSummary = cms.untracked.bool(False),
+  allowUnscheduled = cms.untracked.bool( True )
 )
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 process.MessageLogger.categories.append('PATSummaryTables')
@@ -133,14 +110,10 @@ process.source.duplicateCheckMode = cms.untracked.string('noDuplicateCheck')
 ## Geometry and Detector Conditions (needed for a few patTuple production steps)
 process.load("Configuration.Geometry.GeometryIdeal_cff")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
+process.GlobalTag.globaltag = options.GT
 process.load("Configuration.StandardSequences.MagneticField_cff")
-
 ## Standard PAT Configuration File
 process.load("PhysicsTools.PatAlgos.patSequences_cff")
-
-#Need this for L1 triggers with CMSSW >= 381
-process.load("PhysicsTools.PatAlgos.triggerLayer1.triggerProducer_cff")
-process.patTrigger.addL1Algos = cms.bool( True )
 
 process.out = cms.OutputModule("PoolOutputModule",
      #verbose = cms.untracked.bool(True),
@@ -149,79 +122,6 @@ process.out = cms.OutputModule("PoolOutputModule",
      outputCommands = cms.untracked.vstring() 
 #     outputCommands = cms.untracked.vstring('keep *') 
 )
-
-#-- SUSYPAT and GlobalTag Settings -----------------------------------------------------------
-from PhysicsTools.Configuration.SUSY_pattuple_cff import addDefaultSUSYPAT, getSUSY_pattuple_outputCommands
-
-process.GlobalTag.globaltag = options.GT 
-addDefaultSUSYPAT(process,isMC,options.hltName,jec,'',['AK5PF'])
-
-process.patJetsAK5PF.addTagInfos = cms.bool(True)
-process.pfNoTauPF.enable = cms.bool(False)
-#SUSY_pattuple_outputCommands = getSUSY_pattuple_outputCommands( process )
-
-############################## END SUSYPAT specifics ####################################
-
-################### Add Type-I PFMET (for default RECO-PF jets) ########################
-#process.load('RecoMET.METFilters.EcalDeadCellBoundaryEnergyFilter_cfi')
-process.load("JetMETCorrections.Type1MET.pfMETCorrections_cff")
-
-if isMC:
-  process.pfJetMETcorr.jetCorrLabel = "ak5PFL1FastL2L3"
-else:
-  process.pfJetMETcorr.jetCorrLabel = "ak5PFL1FastL2L3Residual"
-
-process.patPFMETs = process.patMETs.clone(
-             metSource = cms.InputTag('pfMet'),
-             addMuonCorrections = cms.bool(False),
-             #genMETSource = cms.InputTag('genMetTrue'),
-             #addGenMET = cms.bool(True)
-             )
-
-process.pfType1CorrectedMet.applyType0Corrections = cms.bool(False)
-
-process.patPFMETsTypeIcorrected = process.patPFMETs.clone(
-             metSource = cms.InputTag('pfType1CorrectedMet'),
-             )
-
-process.rawpfMet = process.pfType1CorrectedMet.clone(applyType1Corrections = cms.bool(False))
-
-process.patRAWPFMETs = process.patPFMETs.clone(
-    metSource = cms.InputTag('rawpfMet'),
-)
-
-process.load("JetMETCorrections.Type1MET.pfMETCorrectionType0_cfi")
-process.pfType1Type0PFCandidateCorrectedMet = process.pfType1CorrectedMet.clone(
-           applyType0Corrections = cms.bool(False),
-           srcType1Corrections = cms.VInputTag(
-           cms.InputTag('pfMETcorrType0'),
-           cms.InputTag('pfJetMETcorr', 'type1')
-           )
-             )
-
-process.patPFMETsTypeIType0PFCandcorrected = process.patPFMETs.clone(
-             metSource = cms.InputTag('pfType1Type0PFCandidateCorrectedMet'),
-            )
-process.load("JetMETCorrections.Type1MET.pfMETsysShiftCorrections_cfi")
-
-if isMC:
-  process.pfMEtSysShiftCorr.parameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_mc
-else:
-  process.pfMEtSysShiftCorr.parameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_data
-
-process.pfType1PhiCorrectedMet = process.pfType1CorrectedMet.clone(
-  srcType1Corrections = cms.VInputTag(
-      cms.InputTag('pfJetMETcorr', 'type1') ,
-      cms.InputTag('pfMEtSysShiftCorr')  
-  )
-)
-#process.producePFMETCorrections += process.pfType1PhiCorrectedMet
-process.patPFMETsTypeIPhicorrected = process.patPFMETs.clone(
-             metSource = cms.InputTag('pfType1PhiCorrectedMet'),
-             )
-#Turn on trigger info
-from PhysicsTools.PatAlgos.tools.trigTools import switchOnTrigger
-switchOnTrigger(process, triggerProducer='patTrigger', triggerEventProducer='patTriggerEvent', sequence='patDefaultSequence', hltProcess="HLT")
 
 import HLTrigger.HLTfilters.hltHighLevel_cfi as hlt
 process.hltFilter = hlt.hltHighLevel.clone(
@@ -258,7 +158,7 @@ if not options.mode.lower()=='sms':
   process.hcalLaserEventFilter.vetoByRunEventNumber=cms.untracked.bool(False)
   process.hcalLaserEventFilter.vetoByHBHEOccupancy=cms.untracked.bool(True)
   process.load('RecoMET.METFilters.eeBadScFilter_cfi')
-  process.load('RecoMET.METAnalyzers.CSCHaloFilter_cfi')
+  process.load('RecoMET.METFilters.CSCTightHaloFilter_cfi')
 process.load('RecoMET.METFilters.EcalDeadCellTriggerPrimitiveFilter_cfi')
 process.load('RecoMET.METFilters.trackingFailureFilter_cfi')
 
@@ -314,15 +214,6 @@ if options.mode.lower()=='data':
 
   print "\nFilter List:", "HLT, scraping, PV, HBHE, trackingFailureFilter, hcalLaser, CSCTightHalo, eeBadSC, EcalTP, hcalLaser2012, ecalLaserCorr\n"
 
-
-from RecoJets.JetProducers.kt4PFJets_cfi import *
-process.kt6PFJetsForIsolation2011 = kt4PFJets.clone( rParam = 0.6, doRhoFastjet = True )
-process.kt6PFJetsForIsolation2011.Rho_EtaMax = cms.double(2.5)
-#compute rho for 2012 effective area Egamma isolation corrections
-process.kt6PFJetsForIsolation2012 = kt4PFJets.clone( rParam = 0.6, doRhoFastjet = True )
-process.kt6PFJetsForIsolation2012.Rho_EtaMax = cms.double(4.4)
-process.kt6PFJetsForIsolation2012.voronoiRfact = cms.double(0.9)
-
 process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
 process.printTree = cms.EDAnalyzer("ParticleTreeDrawer",
                                    src = cms.InputTag("genParticles"),                                                                 
@@ -339,38 +230,12 @@ process.printTree = cms.EDAnalyzer("ParticleTreeDrawer",
 #    maxEventsToPrint = cms.untracked.int32(-1)
 #)
 
-from CMGTools.External.pujetidsequence_cff import loadPujetId
-loadPujetId(process,'patJetsAK5PF',mvaOnly=False,isChs=False,release="53X")
-
 #-- Execution path ------------------------------------------------------------
 
 process.load('CommonTools.ParticleFlow.goodOfflinePrimaryVertices_cfi') #FIXME Added R.S.
-process.p = cms.Path(process.goodOfflinePrimaryVertices + process.filterSequence + process.susyPatDefaultSequence + process.puJetIdpatJetsAK5PF + process.puJetMvapatJetsAK5PF)
+process.p = cms.Path(process.goodOfflinePrimaryVertices + process.filterSequence + process.patDefaultSequence)
 #process.p += process.printTree
-process.p += process.kt6PFJetsForIsolation2011
-process.p += process.pfMEtSysShiftCorrSequence
-process.p += process.producePFMETCorrections
-process.p += process.type0PFMEtCorrection
-process.p += process.pfType1Type0PFCandidateCorrectedMet
-process.p += process.pfType1PhiCorrectedMet
-process.p += process.patPFMETsTypeIcorrected
-process.p += process.patPFMETsTypeIPhicorrected
-process.p += process.patPFMETsTypeIType0PFCandcorrected
-process.p += process.rawpfMet
-process.p += process.patRAWPFMETs
 if options.mode.lower()=='sms' or options.addPDFWeights:
-#  process.pdfWeights = cms.EDProducer("PdfWeightProducer",
-#        # Fix POWHEG if buggy (this PDF set will also appear on output, 
-#        # so only two more PDF sets can be added in PdfSetNames if not "")
-#        #FixPOWHEG = cms.untracked.string("cteq66.LHgrid"),
-#        GenTag = cms.untracked.InputTag("genParticles"),
-#        PdfInfoTag = cms.untracked.InputTag("generator"),
-#        PdfSetNames = cms.untracked.vstring(
-#                "cteq66.LHgrid"
-#              , "MRST2006nnlo.LHgrid"
-##              , "NNPDF10_100.LHgrid"
-#        )
-#  )
   process.pdfWeights = cms.EDProducer("PdfWeightProducer",
               PdfInfoTag = cms.untracked.InputTag("generator"),
               PdfSetNames = cms.untracked.vstring(
@@ -378,25 +243,16 @@ if options.mode.lower()=='sms' or options.addPDFWeights:
     , "MSTW2008nlo68cl.LHgrid"
     , "NNPDF20_100.LHgrid"
     ))
-#  process.pdfWeights = cms.EDProducer("PdfWeightProducer",
-#        FixPOWHEG = cms.untracked.bool(False), # fix POWHEG (it requires cteq66* PDFs in the list)
-#        PdfInfoTag = cms.untracked.InputTag("generator"),
-#        PdfSetNames = cms.untracked.vstring(
-#                "cteq65.LHgrid"
-#              , "MRST2006nnlo.LHgrid"
-#              , "MRST2007lomod.LHgrid"
-#        )
-#  )
   process.p += process.pdfWeights
 
 process.load("PhysicsTools.HepMCCandAlgos.flavorHistoryProducer_cfi")
 process.load("PhysicsTools.HepMCCandAlgos.flavorHistoryFilter_cfi")
-process.load('Workspace.HEPHYCMSSWTools.SUSYTupelizer_cfi')
 if isMC:
   process.p +=      process.bFlavorHistoryProducer
   process.p +=      process.cFlavorHistoryProducer
   process.p +=      process.flavorHistoryFilter
 
+process.load('Workspace.HEPHYCMSSWTools.SUSYTupelizer_cfi')
 if options.triggersToMonitor!='':
   options.triggersToMonitor+=options.triggers
 else:
@@ -409,24 +265,22 @@ process.SUSYTupelizer.triggersToMonitor = list(set(process.SUSYTupelizer.trigger
 
 print "TriggersToMonitor:",process.SUSYTupelizer.triggersToMonitor
 
-process.SUSYTupelizer.triggerCollection = cms.untracked.string( options.hltName )
-process.SUSYTupelizer.patMETs = cms.untracked.InputTag("patPFMETsTypeIPhicorrected")
-process.SUSYTupelizer.addFullJetInfo = cms.untracked.bool(True)
-#process.SUSYTupelizer.addFullMETInfo = cms.untracked.bool(True)
-process.SUSYTupelizer.useForDefaultAlias = cms.untracked.bool(True)
+from RecoJets.JetProducers.kt4PFJets_cfi import *
+process.kt6PFJetsForIsolation2011 = kt4PFJets.clone( rParam = 0.6, doRhoFastjet = True )
+process.kt6PFJetsForIsolation2011.Rho_EtaMax = cms.double(2.5)
+process.p+=process.kt6PFJetsForIsolation2011
+
+process.SUSYTupelizer.triggerCollection = cms.untracked.InputTag( options.hltName )
+#process.SUSYTupelizer.useForDefaultAlias = cms.untracked.bool(True)
 process.SUSYTupelizer.addTriggerInfo = cms.untracked.bool(True)
-process.SUSYTupelizer.addFullLeptonInfo = cms.untracked.bool(True)
-process.SUSYTupelizer.addFullBTagInfo = cms.untracked.bool(True)
-process.SUSYTupelizer.addGeneratorInfo = cms.untracked.bool(isMC)
 process.SUSYTupelizer.addMSugraOSETInfo = cms.untracked.bool(options.mode.lower()=='sms')
 process.SUSYTupelizer.addPDFWeights = cms.untracked.bool(options.mode.lower()=='sms' or options.addPDFWeights)
 process.SUSYTupelizer.verbose = cms.untracked.bool(options.verbose)
-process.SUSYTupelizer.addFullMuonInfo = cms.untracked.bool(True)
-process.SUSYTupelizer.addFullEleInfo = cms.untracked.bool(True)
-process.SUSYTupelizer.addFullTauInfo = cms.untracked.bool(True)
-process.SUSYTupelizer.addHEPHYCMSSWToolsInfo = cms.untracked.bool(options.addRA4Info)
+process.SUSYTupelizer.addMuonVector = cms.untracked.bool(True)
+process.SUSYTupelizer.addEleVector = cms.untracked.bool(True)
+process.SUSYTupelizer.addTauiVector = cms.untracked.bool(True)
 
-process.SUSYTupelizer.metsToMonitor = ["patPFMETsTypeIPhicorrected", "patPFMETsTypeIcorrected", "patPFMETsTypeIType0PFCandcorrected", "patRAWPFMETs"]
+process.SUSYTupelizer.metsToMonitor = []
 process.p += process.SUSYTupelizer
 
 #process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
@@ -436,11 +290,7 @@ process.p += process.SUSYTupelizer
 #  src = cms.InputTag("genParticles")
 #)
 #process.p+=process.printTree
-process.out.outputCommands =  cms.untracked.vstring('drop *', 'keep *_*SUSYTupelizer*_*_*' , 'keep *_*EventCounter*_*_*', 'keep *_genParticles_*_*')
+process.out.outputCommands =  cms.untracked.vstring('keep *', 'keep *_*SUSYTupelizer*_*_*' , 'keep *_*EventCounter*_*_*', 'keep *_genParticles_*_*')
 if options.keepPFCandidates:
   process.out.outputCommands =  cms.untracked.vstring('drop *', 'keep *_*SUSYTupelizer*_*_*' , 'keep *_*EventCounter*_*_*', 'keep *_genParticles_*_*', 'keep *_particleFlow__*')
 process.outpath = cms.EndPath(process.out)
-#-- Dump config ------------------------------------------------------------
-file = open('vienna_SusyPAT_cfg.py','w')
-file.write(str(process.dumpPython()))
-file.close()

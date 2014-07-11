@@ -1,5 +1,5 @@
 import FWCore.ParameterSet.Config as cms
-multPhiCorr_multMETCorrInfoWriter_53X = cms.VPSet(
+multPhiCorr_multMETCorrInfoWriter = cms.VPSet(
     cms.PSet(
       name=cms.string("h"),
       type=cms.int32(1),
