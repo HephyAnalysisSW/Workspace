@@ -600,10 +600,7 @@ for isample, sample in enumerate(allSamples):
   if os.path.isfile(ofile) and not overwrite:
     print ofile, "already there! Skipping!!!"
     continue
-  tmp_gDir = ROOT.gDirectory.func() 
-  f = ROOT.TFile(ofile, "recreate")
   t = ROOT.TTree( "Events", "Events", 1 )
-  tmp_gDir.cd()
   t.Branch("event",   ROOT.AddressOf(s,"event"), 'event/l')
   for var in variables:
     t.Branch(var,   ROOT.AddressOf(s,var), var+'/F')
@@ -997,14 +994,14 @@ for isample, sample in enumerate(allSamples):
                   exec("s.weightHBTag"+str(j)+"p_SF_light_Down -="+str(mcHeffW_SF_light_Down[i]))
 
 
-          tmpDir = ROOT.gDirectory.func()
+#          tmpDir = ROOT.gDirectory.func()
 #          chain_gDir.cd()
 #          print s.type1phiMet
 #          if s.type1phiMet<150:
 #            print "Warning!!"
-	  f.cd()
+#     	  f.cd()
           t.Fill()
-          tmpDir.cd()
+#          tmpDir.cd()
 #          if s.type1phiMet<150:
 #            print "Warning", s.type1phiMet
 #          else:
@@ -1014,11 +1011,9 @@ for isample, sample in enumerate(allSamples):
       print "Zero entries in", bin, sample["name"]
     del c
   if True or not options.small: #FIXME
-    tmpDir = ROOT.gDirectory.func()
-    f.cd()
+    f = ROOT.TFile(ofile, "recreate")
     t.Write()
     f.Close()
-    tmpDir.cd()
 #    if t:t.IsA().Destructor(t)
     print "Written",ofile
   else:

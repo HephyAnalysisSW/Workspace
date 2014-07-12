@@ -28,7 +28,16 @@ postFix = '_'.join([options.sample, options.postFix])
 ##c.Draw('sqrt(Sum$((candId==6)*candPt*cos(candPhi))**2+Sum$((candId==6)*candPt*sin(candPhi))**2)')
 #c.Draw('atan2(Sum$((candId==6)*candPt*sin(candPhi)),Sum$((candId==6)*candPt*cos(candPhi)))>>(20,-pi,pi)')
 
+c.Draw('atan2(Sum$(('+options.cut+')*candPt*sin(candPhi)),Sum$(('+options.cut+')*candPt*cos(candPhi)))>>hStart(30,-pi,pi)','','goff')
+hStart=ROOT.gDirectory.Get('hStart')
+hStart.SetLineColor(ROOT.kRed)
+history = [hStart]
+iter=0
+
 def getChi2Ndf(x, candRequ, verbose):
+  global iter
+  global history
+  global c1
 #  aprime=x[0]/1100.
 #  phiHF=x[1]
   dx, dy = x
@@ -58,30 +67,66 @@ def getChi2Ndf(x, candRequ, verbose):
 #  fRes=h.Fit('pol0','S')
 #  res = func.GetParameter(1)
 #  if verbose:print 'Chi2',fRes.Chi2(),fRes.Ndf(), 'Target:',res, 'at xHF/phiHF',x 
+  h.SetLineColor(ROOT.kBlack)
+  history.append(h.Clone('iter_'+str(iter)))
+  history[0].Draw()
+  for hist in history[-1:]:
+    hist.Draw('same')
+  lines=[]
+  lines.append([0.5, 0.4,  "#Delta x = "+str(round(dx,2))+" cm"])
+  lines.append([0.5, 0.35, "#Delta y = "+str(round(dy,2))+" cm"])
+  latex = ROOT.TLatex();
+  latex.SetNDC();
+  latex.SetTextSize(0.04);
+  latex.SetTextAlign(11); # align right
+  for line in lines:
+    latex.SetTextSize(0.04)
+    latex.DrawLatex(line[0],line[1],line[2])
+  c1.Modified()
+  c1.Update()
+  c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngHF/metPhiHF_'+postFix+'.gif+')
+
+  iter+=1
   if verbose:print 'Target:',res, 'at dx/dy',x, 'sample', options.sample 
   del h
   return res 
 
 print "All files:", c.GetListOfFiles().ls() 
 print "nEvents:", c.GetEntries()
+
 #Optimizing
 bnds = ((-2, 2), (-2, 2))
 x0 = np.array([0.5,0.5])
 #res= optimize.anneal(lambda x:getChi2Ndf(x,candRequ, verbose=True), x0, T0=.0001, learn_rate=1.5)
+c1 = ROOT.TCanvas()
 res= optimize.fmin(lambda x:getChi2Ndf(x,options.cut, verbose=True), x0)
+c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngHF/metPhiHF_'+postFix+'.gif++')
+
+del c1
 #optChi2 = optimize.minimize(lambda x:getChi2Ndf(x,candRequ, verbose=True), x0, bounds=bnds)
 dx, dy = res
 candRequ=options.cut
 c1 = ROOT.TCanvas()
-c.Draw('atan2(Sum$(('+candRequ+')*candPt*sin(candPhi)),Sum$(('+candRequ+')*candPt*cos(candPhi)))>>hBefore(20,-pi,pi)')
-hBefore=ROOT.gDirectory.Get('hBefore')
+hStart.Draw()
 f = 'atan2(Sum$(('+candRequ+')*candPt*sin(atan2(sin(candPhi)+abs(sinh(candEta))*('+str(dy)+')/1100., cos(candPhi)+abs(sinh(candEta))*('+str(dx)+')/1100.))),'\
 +'Sum$(('+candRequ+')*candPt*cos(atan2(sin(candPhi)+abs(sinh(candEta))*('+str(dy)+')/1100., cos(candPhi)+abs(sinh(candEta))*('+str(dx)+')/1100.))))'
-c.Draw(f+'>>hAfter(20,-pi,pi)', '', 'same')
+c.Draw(f+'>>hAfter(30,-pi,pi)', '', 'same')
 hAfter=ROOT.gDirectory.Get('hAfter')
-hAfter.SetLineColor(ROOT.kRed)
 hAfter.Draw('same')
-result = {'dx':dx, 'dy':dy, 'hBefore':hBefore, 'hAfter':hAfter, 'cut':options.cut, 'nEvents':c.GetEntries(), 'fileList':c.GetListOfFiles()}
+
+lines=[]
+lines.append([0.5, 0.4,  "#Delta x = "+str(round(dx,2))+" cm"])
+lines.append([0.5, 0.35, "#Delta y = "+str(round(dy,2))+" cm"])
+latex = ROOT.TLatex();
+latex.SetNDC();
+latex.SetTextSize(0.04);
+latex.SetTextAlign(11); # align right
+for line in lines:
+  latex.SetTextSize(0.04)
+  latex.DrawLatex(line[0],line[1],line[2])
+
+
+result = {'dx':dx, 'dy':dy, 'hStart':hStart, 'hAfter':hAfter, 'cut':options.cut, 'nEvents':c.GetEntries(), 'fileList':c.GetListOfFiles()}
 c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngHF/metPhiHF_'+postFix+'.png')
 c1.Print('/data/schoef/results2014/HFFit//metPhiHF_'+postFix+'.png')
 pickle.dump(result,file( '/data/schoef/results2014/HFFit/metPhiHF_results_'+postFix+'.pkl', 'w'))
