@@ -1006,7 +1006,7 @@ for isample, sample in enumerate(allSamples):
 #            print "Warning!!"
           dbf = ROOT.gDirectory.func()
           f.cd()
-          print 'before',dbf,'now',ROOT.gDirectory.func(), 'go back to',pyroot_gDir
+#          print 'before',dbf,'now',ROOT.gDirectory.func(), 'go back to',pyroot_gDir
           t.Fill()
           pyroot_gDir.cd()
 #          if s.type1phiMet<150:
