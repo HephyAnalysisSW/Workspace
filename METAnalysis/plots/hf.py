@@ -4,6 +4,7 @@ import numpy as np
 import pickle
 from scipy import optimize
 from optparse import OptionParser
+from localInfo import userName
 
 parser = OptionParser()
 parser.add_option("--sample", dest="sample", default="dy53X", type="string", action="store", help="samples:Which samples.")
@@ -52,7 +53,7 @@ def getChi2Ndf(x, candRequ, verbose):
   c.Draw(f+'>>h(30,-pi,pi)', '', 'goff')
   h=ROOT.gDirectory.Get('h')
 #h.SetLineColor(ROOT.kRed)
-#c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngHF/metPhiHF.png')
+#c1.Print('/afs/hephy.at/user/'+userName[0]+'/'+userName+'/www/pngHF/metPhiHF.png')
   s_c=0
   c_c=0
   n2=0
@@ -84,7 +85,7 @@ def getChi2Ndf(x, candRequ, verbose):
     latex.DrawLatex(line[0],line[1],line[2])
   c1.Modified()
   c1.Update()
-  c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngHF/metPhiHF_'+postFix+'.gif+')
+  c1.Print('/afs/hephy.at/user/'+userName[0]+'/'+userName+'/www/pngHF/metPhiHF_'+postFix+'.gif+')
 
   iter+=1
   if verbose:print 'Target:',res, 'at dx/dy',x, 'sample', options.sample 
@@ -100,7 +101,7 @@ x0 = np.array([0.5,0.5])
 #res= optimize.anneal(lambda x:getChi2Ndf(x,candRequ, verbose=True), x0, T0=.0001, learn_rate=1.5)
 c1 = ROOT.TCanvas()
 res= optimize.fmin(lambda x:getChi2Ndf(x,options.cut, verbose=True), x0)
-c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngHF/metPhiHF_'+postFix+'.gif++')
+c1.Print('/afs/hephy.at/user/'+userName[0]+'/'+userName+'/www/pngHF/metPhiHF_'+postFix+'.gif++')
 
 del c1
 #optChi2 = optimize.minimize(lambda x:getChi2Ndf(x,candRequ, verbose=True), x0, bounds=bnds)
@@ -127,6 +128,6 @@ for line in lines:
 
 
 result = {'dx':dx, 'dy':dy, 'hStart':hStart, 'hAfter':hAfter, 'cut':options.cut, 'nEvents':c.GetEntries(), 'fileList':c.GetListOfFiles()}
-c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngHF/metPhiHF_'+postFix+'.png')
-c1.Print('/data/schoef/results2014/HFFit//metPhiHF_'+postFix+'.png')
-pickle.dump(result,file( '/data/schoef/results2014/HFFit/metPhiHF_results_'+postFix+'.pkl', 'w'))
+c1.Print('/afs/hephy.at/user/'+userName[0]+'/'+userName+'/www/pngHF/metPhiHF_'+postFix+'.png')
+c1.Print('/data/'+nfsName+'/results2014/HFFit//metPhiHF_'+postFix+'.png')
+pickle.dump(result,file( '/data/'+nfsName+'/results2014/HFFit/metPhiHF_results_'+postFix+'.pkl', 'w'))

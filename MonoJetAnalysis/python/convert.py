@@ -647,6 +647,8 @@ for isample, sample in enumerate(allSamples):
       commoncf = "(1)"
     if options.chmode[:7] == "copyMu":
       commoncf = "ngoodMuons==1"
+    if options.chmode[:8] == "copyDiMu":
+      commoncf = "ngoodMuons>1"
     #  storeVectors = False
     if type(bin_) == type([]):
       bin = bin_[0]
