@@ -26,7 +26,6 @@ BasicTupelizer::BasicTupelizer( const edm::ParameterSet & pset):
   vertices_ ( pset.getUntrackedParameter< edm::InputTag >("vertices") ),
 
   metsToMonitor_(pset.getUntrackedParameter<std::vector<std::string> > ("metsToMonitor") ),
-  addMetUncertaintyInfo_(pset.getUntrackedParameter<bool>("addMetUncertaintyInfo")),
   addMSugraOSETInfo_(pset.getUntrackedParameter<bool>("addMSugraOSETInfo")),
   addPDFWeights_(pset.getUntrackedParameter<bool>("addPDFWeights"))
 
@@ -82,10 +81,6 @@ void BasicTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup) {
       put("ngenVertices",-1);
       put("nTrueGenVertices",-1);
     }
-//    edm::Handle<unsigned int > flavHist;
-//    ev.getByLabel("flavorHistoryFilter", flavHist);
-//    const unsigned int flavorPath = *flavHist;
-//    put("flavorHistory", flavorPath);
   }
 
   //BeamSpot
@@ -122,6 +117,21 @@ void BasicTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup) {
   math::XYZPoint vertexPosition(NAN, NAN, NAN);
   if (goodVertices.size()>0) {
     vertexPosition = goodVertices[0].position();
+  }
+
+  for (std::vector<std::string>::iterator s = metsToMonitor_.begin(); s != metsToMonitor_.end(); s++) {
+    std::string metName = *s;
+    edm::Handle<vector<pat::MET> > met;
+    try {
+      ev.getByLabel( edm::InputTag(*s), met );
+    } catch ( cms::Exception & e ) {
+      cout <<prefix<<"error: " << e.what() << endl;
+    }
+
+    put(metName, (*met)[0].pt());
+    put(metName+"Phi", (*met)[0].phi());
+    put(metName+"SumEt", (*met)[0].sumEt());
+    put(metName+"Significance", (*met)[0].significance());
   }
 
   if (addMSugraOSETInfo_) {
@@ -213,13 +223,12 @@ void BasicTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup) {
 
 void BasicTupelizer::addAllVars( )
 {
-  if(addMetUncertaintyInfo_) {
-    for (std::vector<std::string>::iterator s = metsToMonitor_.begin(); s != metsToMonitor_.end(); s++) {
-      std::string metName = *s;
-      addVar(metName+"/F");
-      addVar(metName+"phi/F");
-      addVar(metName+"sumEt/F");
-    }
+  for (std::vector<std::string>::iterator s = metsToMonitor_.begin(); s != metsToMonitor_.end(); s++) {
+    std::string metName = *s;
+    addVar(metName+"/F");
+    addVar(metName+"Phi/F");
+    addVar(metName+"SumEt/F");
+    addVar(metName+"Significance/F");
   }
 
   addVar("event/l"); // 0);
@@ -230,13 +239,8 @@ void BasicTupelizer::addAllVars( )
   addVar("ngenVertices/I"); // -1);
   addVar("nTrueGenVertices/F"); // -1);
 
-  addVar("flavorHistory/i"); // 0);
   addVar("ngoodVertices/I"); // -1);
 
-  addVar("genmetpx/F"); // NAN);
-  addVar("genmetpy/F"); // NAN);
-  addVar("genmet/F"); // NAN);
-  addVar("genmetphi/F"); // NAN);
 
   if (addMSugraOSETInfo_) {
     addVar("sparticles/I[]");

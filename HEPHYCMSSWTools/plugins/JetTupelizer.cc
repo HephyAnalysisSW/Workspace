@@ -25,10 +25,8 @@ JetTupelizer::JetTupelizer( const edm::ParameterSet & pset):
   verbose_ ( pset.getUntrackedParameter< bool >("verbose")),
   input_ ( pset.getUntrackedParameter< edm::InputTag >("input") ),
   ptThreshold_ (pset.getUntrackedParameter< double >("ptThreshold") ),
-  btag_ ( pset.getUntrackedParameter< std::string >("btag") ),
-  puJetIdCutBased_( pset.getUntrackedParameter< edm::InputTag >("puJetIdCutBased") ),
-  puJetIdFull53X_( pset.getUntrackedParameter< edm::InputTag >("puJetIdFull53X") ),
-  puJetIdMET53X_( pset.getUntrackedParameter< edm::InputTag >("puJetIdMET53X") )
+  userFloats_ ( pset.getUntrackedParameter< std::vector<edm::ParameterSet> >("userFloats") ),
+  bTags_ ( pset.getUntrackedParameter< std::vector<edm::ParameterSet> >("bTags") )
 {
   addAllVars();
 }
@@ -60,18 +58,18 @@ void JetTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup) {
   setup.get<JetCorrectionsRecord>().get("AK5PF",JetCorParColl);
   JetCorrectorParameters const & JetCorPar = (*JetCorParColl)["Uncertainty"];
   JetCorrectionUncertainty *jecUnc = new JetCorrectionUncertainty(JetCorPar);
-  edm::Handle<edm::ValueMap<int> > cutbasedPUJetIdFlag;
-  ev.getByLabel(puJetIdCutBased_, cutbasedPUJetIdFlag);
-  edm::Handle<edm::ValueMap<int> > full53XPUJetIdFlag;
-  ev.getByLabel(puJetIdFull53X_,full53XPUJetIdFlag);
-  edm::Handle<edm::ValueMap<int> > met53XPUJetIdFlag;
-  ev.getByLabel(puJetIdMET53X_,met53XPUJetIdFlag);
 
   double delta_met_x (0.), delta_met_y(0.);
-  double delta_met_x_unclustered (0.), delta_met_y_unclustered(0.);
-  std::vector<float> jetspt, jetsptUncorr, jetseta, jetsbtag, jetsSVMass, jetsphi, jetsUnc, jetsMass2;
-  std::vector<int> jetsparton, jetsID, jetsCutBasedPUJetIDFlag, jetsMET53XPUJetIDFlag, jetsFull53XPUJetIDFlag;
-
+//  double delta_met_x_unclustered (0.), delta_met_y_unclustered(0.);
+  std::vector<float> jetspt, jetsptUncorr, jetseta, jetsphi, jetsUnc, jetsMass;
+  std::vector<int> jetsparton, jetsID;
+  std::vector<std::vector<float> > userFloats, bTags;
+  for (std::vector<edm::ParameterSet>::const_iterator it=userFloats_.begin(); it!=userFloats_.end();it++) {
+    userFloats.push_back(std::vector<float>()) ;
+  }
+  for (std::vector<edm::ParameterSet>::const_iterator it=bTags_.begin(); it!=bTags_.end();it++) {
+    bTags.push_back(std::vector<float>()) ;
+  }
   std::vector<float> jetsChargedHadronEnergyFraction, jetsNeutralHadronEnergyFraction, jetsChargedEmEnergyFraction, jetsNeutralEmEnergyFraction, jetsPhotonEnergyFraction, jetsElectronEnergyFraction, jetsMuonEnergyFraction, jetsHFHadronEnergyFraction, jetsHFEMEnergyFraction;
   for (unsigned i = 0; i<jets->size();i++) {
     const pat::Jet & jet = jets->at(i);
@@ -92,26 +90,10 @@ void JetTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup) {
       jetsptUncorr.push_back(jet.correctedJet("Uncorrected").pt());
       jetseta.push_back(jet.eta());
       jetsphi.push_back(jet.phi());
-      jetsMass2.push_back(jet.p4().mass2());
+      jetsMass.push_back(jet.p4().mass());
       if (!isData) {
         jetsparton.push_back(jet.partonFlavour());
       } else {jetsparton.push_back(0);}
-      jetsbtag.push_back(jet.bDiscriminator(btag_));
-
-      jetsCutBasedPUJetIDFlag.push_back((*cutbasedPUJetIdFlag)[jets->refAt(i)]);
-      jetsMET53XPUJetIDFlag.push_back((*met53XPUJetIdFlag)[jets->refAt(i)]);
-      jetsFull53XPUJetIDFlag.push_back((*full53XPUJetIdFlag)[jets->refAt(i)]);
-      const reco::SecondaryVertexTagInfo * SVtagInfo = jet.tagInfoSecondaryVertex();
-      bool hasSVMass(false);
-      if(SVtagInfo){
-        if(SVtagInfo->nVertices()>0){
-          const reco::Vertex &SVertex=SVtagInfo->secondaryVertex(0);
-          jetsSVMass.push_back(SVertex.p4().M());
-          hasSVMass = true;
-        }
-      }
-      if (not hasSVMass) jetsSVMass.push_back(-1.);
-
       jecUnc->setJetEta(jet.eta());
       jecUnc->setJetPt(jet.pt()); // here you must use the CORRECTED jet pt
       double unc = (jet.pt() > 10. && fabs(jet.eta())<5.) ? jecUnc->getUncertainty(true) : 0.1;
@@ -136,24 +118,27 @@ void JetTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup) {
     scaledJet.scaleEnergy(1+unc);
     delta_met_x += - scaledJet.px() + jet.px();
     delta_met_y += - scaledJet.py() + jet.py();
-    if (jet.pt()<10.) {
-      delta_met_x_unclustered += - scaledJet.px() + jet.px();
-      delta_met_y_unclustered += - scaledJet.py() + jet.py();
+//    if (jet.pt()<10.) {
+//      delta_met_x_unclustered += - scaledJet.px() + jet.px();
+//      delta_met_y_unclustered += - scaledJet.py() + jet.py();
+//    }
+    for (std::vector<edm::ParameterSet>::const_iterator it=userFloats_.begin(); it!=userFloats_.end();it++) {
+      userFloats[it-userFloats_.begin()].push_back(jet.userFloat(it->getUntrackedParameter<std::string>("accessTag")));
+    }
+    for (std::vector<edm::ParameterSet>::const_iterator it=bTags_.begin(); it!=bTags_.end();it++) {
+      bTags[it-bTags_.begin()].push_back(jet.bDiscriminator(it->getUntrackedParameter<std::string>("accessTag")));
     }
   }
   put("jetsPt", jetspt);
   put("jetsPtUncorr", jetsptUncorr);
   put("jetsEta", jetseta);
   put("jetsPhi", jetsphi);
-  put("jetsMass2", jetsMass2);
+  put("jetsMass", jetsMass);
   put("jetsParton", jetsparton);
-  put("jetsBtag", jetsbtag);
-  put("jetsSVMass", jetsSVMass);
+//  put("jetsBtag", jetsbtag);
+//  put("jetsSVMass", jetsSVMass);
   put("jetsUnc", jetsUnc);
   put("jetsID", jetsID);
-  put("jetsCutBasedPUJetIDFlag", jetsCutBasedPUJetIDFlag);
-  put("jetsMET53XPUJetIDFlag", jetsMET53XPUJetIDFlag);
-  put("jetsFull53XPUJetIDFlag", jetsFull53XPUJetIDFlag);
   put("jetsChargedHadronEnergyFraction", jetsChargedHadronEnergyFraction);
   put("jetsNeutralHadronEnergyFraction", jetsNeutralHadronEnergyFraction);
   put("jetsChargedEmEnergyFraction", jetsChargedEmEnergyFraction);
@@ -164,11 +149,17 @@ void JetTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup) {
   put("jetsHFHadronEnergyFraction", jetsHFHadronEnergyFraction);
   put("jetsHFEMEnergyFraction", jetsHFEMEnergyFraction);
 
-  put("nsoftjets", jetspt.size());
+  put("nJets", jetspt.size());
   put("deltaMETx", delta_met_x);
   put("deltaMETy", delta_met_y);
-  put("deltaMETxUnclustered", delta_met_x_unclustered);
-  put("deltaMETyUnclustered", delta_met_y_unclustered);
+//  put("deltaMETxUnclustered", delta_met_x_unclustered);
+//  put("deltaMETyUnclustered", delta_met_y_unclustered);
+  for (std::vector<edm::ParameterSet>::const_iterator it=userFloats_.begin(); it!=userFloats_.end();it++) {
+    putVar( (std::string("jets")+it->getUntrackedParameter<std::string>("storeTag")).c_str(), userFloats[it-userFloats_.begin()]);
+  }
+  for (std::vector<edm::ParameterSet>::const_iterator it=bTags_.begin(); it!=bTags_.end();it++) {
+    putVar( (std::string("jets")+it->getUntrackedParameter<std::string>("storeTag")).c_str(), bTags[it-bTags_.begin()]);
+  }
   delete jecUnc;
 }
 
@@ -178,16 +169,11 @@ void JetTupelizer::addAllVars( )
   addVar("jetsPtUncorr/F[]");
   addVar("jetsEta/F[]");
   addVar("jetsPhi/F[]");
-  addVar("jetsMass2/F[]");
+  addVar("jetsMass/F[]");
   addVar("jetsParton/I[]");
-  addVar("jetsBtag/F[]");
-  addVar("jetsSVMass/F[]");
   addVar("jetsUnc/F[]");
 // addVar("jetsEleCleaned/I[]");
 // addVar("jetsMuCleaned/I[]");
-  addVar("jetsCutBasedPUJetIDFlag/I[]");
-  addVar("jetsMET53XPUJetIDFlag/I[]");
-  addVar("jetsFull53XPUJetIDFlag/I[]");
   addVar("jetsID/I[]");
   addVar("jetsChargedHadronEnergyFraction/F[]");
   addVar("jetsNeutralHadronEnergyFraction/F[]");
@@ -198,11 +184,17 @@ void JetTupelizer::addAllVars( )
   addVar("jetsMuonEnergyFraction/F[]");
   addVar("jetsHFHadronEnergyFraction/F[]");
   addVar("jetsHFEMEnergyFraction/F[]");
-  addVar("nsoftjets/I"); // NAN);
+  addVar("nJets/I"); // NAN);
   addVar("deltaMETx/F");
   addVar("deltaMETy/F");
-  addVar("deltaMETxUnclustered/F");
-  addVar("deltaMETyUnclustered/F");
+//  addVar("deltaMETxUnclustered/F");
+//  addVar("deltaMETyUnclustered/F");
+  for (std::vector<edm::ParameterSet>::const_iterator it=userFloats_.begin(); it!=userFloats_.end();it++) {
+    addVar( (std::string("jets")+it->getUntrackedParameter<std::string>("storeTag")+std::string("/F[]")).c_str());
+  }
+  for (std::vector<edm::ParameterSet>::const_iterator it=bTags_.begin(); it!=bTags_.end();it++) {
+    addVar( (std::string("jets")+it->getUntrackedParameter<std::string>("storeTag")+std::string("/F[]")).c_str());
+  }
 }
 
 DEFINE_FWK_MODULE(JetTupelizer);

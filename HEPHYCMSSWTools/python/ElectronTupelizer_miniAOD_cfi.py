@@ -1,0 +1,50 @@
+import FWCore.ParameterSet.Config as cms
+
+ElectronTupelizer = cms.EDProducer ( "ElectronTupelizer",
+    verbose           = cms.untracked.bool(False),
+    input             = cms.untracked.InputTag("slimmedElectrons"),
+    ptThreshold       = cms.untracked.double(5.),
+
+    elePFRelIsoAreaCorrected = cms.untracked.bool(True) ,
+    eleRho = cms.untracked.InputTag('fixedGridRhoFastjetAll'),
+    vertices = cms.untracked.InputTag("offlineSlimmedPrimaryVertices"),
+
+    eleIDs = cms.untracked.VPSet(
+        cms.untracked.PSet(accessTag = cms.untracked.string("eidLoose"),
+                           storeTag = cms.untracked.string("EidLoose")),
+        cms.untracked.PSet(accessTag = cms.untracked.string("eidRobustHighEnergy"),
+                           storeTag = cms.untracked.string("EidRobustHighEnergy")),
+        cms.untracked.PSet(accessTag = cms.untracked.string("eidRobustLoose"),
+                           storeTag = cms.untracked.string("EidRobustLoose")),
+        cms.untracked.PSet(accessTag = cms.untracked.string("eidRobustTight"),
+                           storeTag = cms.untracked.string("EidRobustTight")),
+        cms.untracked.PSet(accessTag = cms.untracked.string("eidTight"),
+                           storeTag = cms.untracked.string("EidTight"))
+    ),
+#        cms.untracked.PSet(accessTag = cms.untracked.string("simpleEleId95relIso"),
+#                           storeTag = cms.untracked.string("SimpleEleId95relIso")),
+#        cms.untracked.PSet(accessTag = cms.untracked.string("simpleEleId90relIso"),
+#                           storeTag = cms.untracked.string("SimpleEleId90relIso")),
+#        cms.untracked.PSet(accessTag = cms.untracked.string("simpleEleId85relIso"),
+#                           storeTag = cms.untracked.string("SimpleEleId85relIso")),
+#        cms.untracked.PSet(accessTag = cms.untracked.string("simpleEleId80relIso"),
+#                           storeTag = cms.untracked.string("SimpleEleId80relIso")),
+#        cms.untracked.PSet(accessTag = cms.untracked.string("simpleEleId70relIso"),
+#                           storeTag = cms.untracked.string("SimpleEleId70relIso")),
+#        cms.untracked.PSet(accessTag = cms.untracked.string("simpleEleId60relIso"),
+#                           storeTag = cms.untracked.string("SimpleEleId60relIso")),
+#        cms.untracked.PSet(accessTag = cms.untracked.string("simpleEleId95cIso"),
+#                           storeTag = cms.untracked.string("SimpleEleId95cIso")),
+#        cms.untracked.PSet(accessTag = cms.untracked.string("simpleEleId90cIso"),
+#                           storeTag = cms.untracked.string("SimpleEleId90cIso")),
+#        cms.untracked.PSet(accessTag = cms.untracked.string("simpleEleId85cIso"),
+#                           storeTag = cms.untracked.string("SimpleEleId85cIso")),
+#        cms.untracked.PSet(accessTag = cms.untracked.string("simpleEleId80cIso"),
+#                           storeTag = cms.untracked.string("SimpleEleId80cIso")),
+#        cms.untracked.PSet(accessTag = cms.untracked.string("simpleEleId70cIso"),
+#                           storeTag = cms.untracked.string("SimpleEleId70cIso")),
+#        cms.untracked.PSet(accessTag = cms.untracked.string("simpleEleId60cIso"),
+#                           storeTag = cms.untracked.string("SimpleEleId60cIso")),
+    useForDefaultAlias = cms.untracked.bool(False)
+
+) 

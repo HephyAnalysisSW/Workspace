@@ -51,11 +51,7 @@ public:
 
   double ptThreshold_;
 
-  std::string btag_;
-  edm::InputTag puJetIdCutBased_;
-  edm::InputTag puJetIdFull53X_;
-  edm::InputTag puJetIdMET53X_;
-
+  std::vector<edm::ParameterSet> userFloats_, bTags_;
   private:
 
 };

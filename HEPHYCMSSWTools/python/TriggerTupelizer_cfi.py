@@ -1,10 +1,10 @@
 import FWCore.ParameterSet.Config as cms
 
-BasicTupelizer = cms.EDProducer ( "BasicTupelizer",
+TriggerTupelizer = cms.EDProducer ( "TriggerTupelizer",
     verbose           = cms.untracked.bool(False),
-    triggerCollection = cms.untracked.InputTag("HLT"),
-
+    triggerCollection = cms.untracked.InputTag("TriggerResults", "HLT"),
     triggersToMonitor = cms.untracked.vstring(["HLT_IsoMu24_eta2p1"]),
-    useForDefaultAlias = cms.untracked.bool(False)
+    addL1Prescales = cms.untracked.bool(False),
 
+    useForDefaultAlias = cms.untracked.bool(False)
 ) 

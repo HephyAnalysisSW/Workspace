@@ -58,7 +58,6 @@ public:
   ModelParameters modelParameters_;
 
   std::vector<std::string> metsToMonitor_;
-  bool addMetUncertaintyInfo_;
   bool addMSugraOSETInfo_;
   bool addPDFWeights_;
 

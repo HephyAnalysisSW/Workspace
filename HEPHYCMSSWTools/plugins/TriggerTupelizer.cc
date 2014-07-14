@@ -13,8 +13,8 @@
 #include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutRecord.h"
 #include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerObjectMapRecord.h"
 #include "HLTrigger/HLTfilters/interface/HLTLevel1GTSeed.h"
-#include "DataFormats/HLTReco/interface/TriggerEvent.h"
-#include "DataFormats/PatCandidates/interface/TriggerEvent.h"
+//#include "DataFormats/HLTReco/interface/TriggerEvent.h"
+//#include "DataFormats/PatCandidates/interface/TriggerEvent.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 
@@ -32,22 +32,23 @@ TriggerTupelizer::TriggerTupelizer( const edm::ParameterSet & pset):
   verbose_ ( pset.getUntrackedParameter< bool >("verbose")),
   triggerCollection_ ( pset.getUntrackedParameter< edm::InputTag >("triggerCollection") ),
 
-  addTriggerInfo_(pset.getUntrackedParameter<bool>("addTriggerInfo")),
-  triggersToMonitor_(pset.getUntrackedParameter<std::vector<std::string> > ("triggersToMonitor") )
+  triggersToMonitor_(pset.getUntrackedParameter<std::vector<std::string> > ("triggersToMonitor") ),
+  addL1Prescales_(pset.getUntrackedParameter<bool> ("addL1Prescales") )
+  
 
 {
-  if (addTriggerInfo_) {
-    for (std::vector<std::string>::iterator s = triggersToMonitor_.begin(); s != triggersToMonitor_.end(); s++) {
-      cout<<prefix<<"Monitoring the following trigger:"<<*s<<endl;
-      std::string trigName = *s;
-      std::string::size_type k = 0;
-      while((k=trigName.find('_',k))!=trigName.npos) {
-        trigName.erase(k, 1);
-      }
+  for (std::vector<std::string>::iterator s = triggersToMonitor_.begin(); s != triggersToMonitor_.end(); s++) {
+    cout<<prefix<<"Monitoring the following trigger:"<<*s<<endl;
+    std::string trigName = *s;
+    std::string::size_type k = 0;
+    while((k=trigName.find('_',k))!=trigName.npos) {
+      trigName.erase(k, 1);
+    }
+    addVar(trigName+"/I");
+    trigNames_.push_back(trigName);
+    if (addL1Prescales_) {
       std::string prescName = trigName;
       prescName.replace(0, 3, "pre");
-      addVar(trigName+"/I");
-      trigNames_.push_back(trigName);
       addVar(prescName+"/I");
       prescNames_.push_back(prescName);
     }
@@ -86,16 +87,16 @@ void TriggerTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup) 
   ev_ = &ev;
 //  bool isData (ev.eventAuxiliary().isRealData());
   
-  //HLT - Triggers
-  edm::Handle<trigger::TriggerEvent> triggerEvent;
-  ev.getByLabel("hltTriggerSummaryAOD", triggerEvent);
-  if (not triggerEvent.isValid()) {
-    std::cout << "HLT Results with label: " << "hltTriggerSummaryAOD"
-              << " not found" << std::endl;
-    }
+//  //HLT - Triggers
+//  edm::Handle<trigger::TriggerEvent> triggerEvent;
+//  ev.getByLabel(triggerLabel_, triggerEvent);
+//  if (not triggerEvent.isValid()) {
+//    std::cout << "HLT Results with label: " << triggerLabel_
+//              << " not found" << std::endl;
+//    }
   edm::Handle<edm::TriggerResults> HLTR;
-  edm::InputTag HLTTag = edm::InputTag("TriggerResults", "", triggerCollection_.label().c_str());
-  ev.getByLabel(HLTTag, HLTR);
+//  edm::InputTag HLTTag = edm::InputTag(triggerLabel_, "", triggerCollection_.label().c_str());
+  ev.getByLabel(triggerCollection_, HLTR);
   if (HLTR.isValid()) {
 // cout << "Init HLT info" << endl;
     edm::TriggerNames triggerNames = ev.triggerNames(*HLTR);
@@ -111,10 +112,11 @@ void TriggerTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup) 
 // bool muonTriggerUnprescaled = false;
 // bool electronTriggerUnprescaled = false;
   for (unsigned i=0; i<HLT_names_.size(); ++i){
-    if (addTriggerInfo_) {
-      for (unsigned j = 0; j< triggersToMonitor_.size(); j++) {
-        if (std::strstr(HLT_names_[i].c_str(), (triggersToMonitor_[j]+"_v").c_str())) {put(trigNames_[j], HLTR->accept(i));put(prescNames_[j], prescale( ev, setup, HLT_names_[i].c_str()));};
-      }
+    for (unsigned j = 0; j< triggersToMonitor_.size(); j++) {
+      if (std::strstr(HLT_names_[i].c_str(), (triggersToMonitor_[j]+"_v").c_str())) {
+        put(trigNames_[j], HLTR->accept(i));
+        if (addL1Prescales_) put(prescNames_[j], prescale( ev, setup, HLT_names_[i].c_str()));
+      };
     }
   }
 

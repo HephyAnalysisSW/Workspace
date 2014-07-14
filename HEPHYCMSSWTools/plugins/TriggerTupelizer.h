@@ -57,8 +57,8 @@ public:
   std::vector<std::string> HLT_names_;
   HLTConfigProvider hltConfig_;
 
-  bool addTriggerInfo_;
   std::vector<std::string> triggersToMonitor_, trigNames_, prescNames_;
+  bool addL1Prescales_;
 
 };
 #endif

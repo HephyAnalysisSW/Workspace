@@ -31,7 +31,9 @@ TauTupelizer::TauTupelizer( const edm::ParameterSet & pset):
   params_ ( pset ),
   verbose_ ( pset.getUntrackedParameter< bool >("verbose")),
   input_ ( pset.getUntrackedParameter< edm::InputTag >("input") ),
-  ptThreshold_ (pset.getUntrackedParameter< double >("lowLeptonPtThreshold") )
+  ptThreshold_ (pset.getUntrackedParameter< double >("ptThreshold") ),  
+  tauIDs_ ( pset.getUntrackedParameter< std::vector<edm::ParameterSet> >("tauIDs") )
+
 {
   addAllVars();
 }
@@ -56,30 +58,29 @@ void TauTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup) {
   ev_ = &ev;
   vector<pat::Tau> taus (EdmHelper::getObjs<pat::Tau>(ev, input_));
   int ntaus(0);
-  std::vector<int> tausPdg, tausisPF, taushasMCMatch, tausByLooseCombinedIsolationDBSumPtCorr, tausDecayModeFinding, tausAgainstMuonLoose, tausAgainstElectronLoose;
+  std::vector<int> tausPdg, tausisPF, taushasMCMatch;
   std::vector<float> tausPt, tausEta, tausPhi;
-  for (unsigned i = 0; i<taus.size();i++) {
-    int byLooseCombinedIsolationDeltaBetaCorr = taus[i].tauID("byLooseCombinedIsolationDeltaBetaCorr");
-    int decayModeFinding = taus[i].tauID("decayModeFinding");
-    int againstMuonLoose = taus[i].tauID("againstMuonLoose");
-    int againstElectronLoose = taus[i].tauID("againstElectronLoose");
-// if (taus[i].pt()>10. && (byLooseCombinedIsolationDeltaBetaCorr&&decayModeFinding&&againstMuonLoose&&againstElectronLoose)) {
-    if (taus[i].pt()>10. && (decayModeFinding)) {
-      ntaus++;
-      tausPt.push_back(taus[i].pt());
-      tausEta.push_back(taus[i].eta());
-      tausPhi.push_back(taus[i].phi());
-      tausPdg.push_back(taus[i].pdgId());
-      tausisPF.push_back(taus[i].isPFTau());
-      tausByLooseCombinedIsolationDBSumPtCorr.push_back(byLooseCombinedIsolationDeltaBetaCorr);
-      tausDecayModeFinding.push_back(decayModeFinding);
-      tausAgainstMuonLoose.push_back(againstMuonLoose);
-      tausAgainstElectronLoose.push_back(againstElectronLoose);
-      getGenTau(taus[i])? taushasMCMatch.push_back(1):taushasMCMatch.push_back(0);
+  std::vector<std::vector<int> > tauIDs;
+  for (std::vector<edm::ParameterSet>::const_iterator it=tauIDs_.begin(); it!=tauIDs_.end();it++) {
+    tauIDs.push_back(std::vector<int>()) ;
+  }
+
+  for (std::vector<pat::Tau>::const_iterator tau=taus.begin(); tau!=taus.end();tau++) {
+    for (std::vector<edm::ParameterSet>::const_iterator it=tauIDs_.begin(); it!=tauIDs_.end();it++) {
+      tauIDs[it-tauIDs_.begin()].push_back(tau->tauID(it->getUntrackedParameter<std::string>("accessTag")));
     }
-    if ((verbose_) and (taus[i].pt() > 10)) cout<<"[tau "<<i<<"/"<<ntaus<<"] "<<" pt "<<taus[i].pt()<<" eta "<<taus[i].eta()<<" phi "<<taus[i].phi()
-       <<" tausPdg "<<taus[i].pdgId()<<boolalpha<<" tausisPF "<< taus[i].isPFTau() <<" tausByLooseCombinedIsolationDBSumPtCorr "<<byLooseCombinedIsolationDeltaBetaCorr
-       <<" tausDecayModeFinding "<<decayModeFinding<<" tausAgainstMuonLoose "<<againstMuonLoose<<" tausAgainstElectronLoose "<<againstElectronLoose<<" taushasMCMatch "<<getGenTau(taus[i])<<endl;
+
+    if (tau->pt()>ptThreshold_ ) {
+      ntaus++;
+      tausPt.push_back(tau->pt());
+      tausEta.push_back(tau->eta());
+      tausPhi.push_back(tau->phi());
+      tausPdg.push_back(tau->pdgId());
+      tausisPF.push_back(tau->isPFTau());
+      getGenTau(*tau)? taushasMCMatch.push_back(1):taushasMCMatch.push_back(0);
+    }
+    if (verbose_) cout<<"[tau "<<tau-taus.begin()<<"/"<<ntaus<<"] "<<" pt "<<tau->pt()<<" eta "<<tau->eta()<<" phi "<<tau->phi()
+       <<" tausPdg "<<tau->pdgId()<<boolalpha<<" tausisPF "<< tau->isPFTau() <<" taushasMCMatch "<<getGenTau(*tau)<<endl;
   }
   put("ntaus", ntaus);
   put("tausPt", tausPt);
@@ -87,11 +88,12 @@ void TauTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup) {
   put("tausPhi", tausPhi);
   put("tausPdg", tausPdg);
   put("tausisPF", tausisPF);
-  put("tausByLooseCombinedIsolationDBSumPtCorr", tausByLooseCombinedIsolationDBSumPtCorr);
-  put("tausDecayModeFinding", tausDecayModeFinding);
-  put("tausAgainstMuonLoose", tausAgainstMuonLoose);
-  put("tausAgainstElectronLoose", tausAgainstElectronLoose);
   put("taushasMCMatch", taushasMCMatch);
+
+  for (std::vector<edm::ParameterSet>::const_iterator it=tauIDs_.begin(); it!=tauIDs_.end();it++) {
+    putVar( (std::string("taus")+it->getUntrackedParameter<std::string>("storeTag")).c_str(), tauIDs[it-tauIDs_.begin()]);
+  }
+
 }
 
 void TauTupelizer::addAllVars( )
@@ -103,10 +105,10 @@ void TauTupelizer::addAllVars( )
   addVar("tausPdg/I[]");
   addVar("taushasMCMatch/I[]");
   addVar("tausisPF/I[]");
-  addVar("tausByLooseCombinedIsolationDBSumPtCorr/I[]");
-  addVar("tausDecayModeFinding/I[]");
-  addVar("tausAgainstMuonLoose/I[]");
-  addVar("tausAgainstElectronLoose/I[]");
+  for (std::vector<edm::ParameterSet>::const_iterator it=tauIDs_.begin(); it!=tauIDs_.end();it++) {
+    addVar( (std::string("taus")+it->getUntrackedParameter<std::string>("storeTag")+std::string("/I[]")).c_str());
+  }
+
 }
 
 DEFINE_FWK_MODULE(TauTupelizer);

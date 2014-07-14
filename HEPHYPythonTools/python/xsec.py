@@ -1,4 +1,8 @@
 xsec={}
+
+
+xsec["ttbarTest"]                             =       500.
+
 #------------------------------------------------------------
 #SUMMER 12
 #https://twiki.cern.ch/twiki/bin/viewauth/CMS/StandardModelCrossSectionsat8TeV
@@ -16,6 +20,7 @@ xsec["8TeV-T-tW"]                               =       11.1
 xsec["8TeV-Tbar-s"]                             =       1.76
 xsec["8TeV-Tbar-t"]                             =       30.7
 xsec["8TeV-Tbar-tW"]                            =       11.1
+
 
 xsec["8TeV-TTJets"]                             =       225.197
 xsec["8TeV-TTJets-S6"]                          =       225.197

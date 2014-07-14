@@ -48,6 +48,7 @@ public:
 
   edm::InputTag input_;
   double ptThreshold_;
+  std::vector<edm::ParameterSet> tauIDs_;
 
   private:
 };
