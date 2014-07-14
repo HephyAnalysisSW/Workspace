@@ -603,7 +603,6 @@ for isample, sample in enumerate(allSamples):
   pyroot_gDir = ROOT.gDirectory.func()
   f = ROOT.TFile(ofile, "recreate")
   t = ROOT.TTree( "Events", "Events", 1 )
-  pyroot_gDir.cd()
   t.Branch("event",   ROOT.AddressOf(s,"event"), 'event/l')
   for var in variables:
     t.Branch(var,   ROOT.AddressOf(s,var), var+'/F')
@@ -638,6 +637,7 @@ for isample, sample in enumerate(allSamples):
       t.Branch("ngp",   ROOT.AddressOf(s,"ngp"), 'ngp/I')
       for var in mcvars:
         t.Branch(var,   ROOT.AddressOf(s,var), var+'[ngp]/F')
+  pyroot_gDir.cd()
 
   for bin_ in sample["bins"]:
     commoncf = ""
