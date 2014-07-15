@@ -606,7 +606,8 @@ for isample, sample in enumerate(allSamples):
     print ofile, "already there! Skipping!!!"
     continue
   pyroot_gDir = ROOT.gDirectory.func()
-  f = ROOT.TFile(ofile, "recreate")
+#  f = ROOT.TFile(ofile, "recreate")
+  chain_gDir = ROOT.gDirectory.func()
   t = ROOT.TTree( "Events", "Events", 1 )
   t.Branch("event",   ROOT.AddressOf(s,"event"), 'event/l')
   for var in variables:
@@ -1019,11 +1020,16 @@ for isample, sample in enumerate(allSamples):
 #          print s.type1phiMet
 #          if s.type1phiMet<150:
 #            print "Warning!!"
-          dbf = ROOT.gDirectory.func()
-          f.cd()
-#          print 'before',dbf,'now',ROOT.gDirectory.func(), 'go back to',pyroot_gDir
+          tmpDir = ROOT.gDirectory.func()
+          chain_gDir.cd()
           t.Fill()
-          pyroot_gDir.cd()
+          tmpDir.cd()
+
+#          dbf = ROOT.gDirectory.func()
+#          f.cd()
+#          print 'before',dbf,'now',ROOT.gDirectory.func(), 'go back to',pyroot_gDir
+#          t.Fill()
+#          pyroot_gDir.cd()
 #          if s.type1phiMet<150:
 #            print "Warning", s.type1phiMet
 #          else:
@@ -1033,10 +1039,13 @@ for isample, sample in enumerate(allSamples):
       print "Zero entries in", bin, sample["name"]
     del c
   if True or not options.small: #FIXME
-    f.cd()
+    f = ROOT.TFile(ofile, "recreate")
     t.Write()
     f.Close()
-    pyroot_gDir.cd()
+#    f.cd()
+#    t.Write()
+#    f.Close()
+#    pyroot_gDir.cd()
 #    if t:t.IsA().Destructor(t)
     print "Written",ofile
   else:
