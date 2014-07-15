@@ -8,7 +8,7 @@ from localInfo import userName
 
 parser = OptionParser()
 parser.add_option("--sample", dest="sample", default="dy53X", type="string", action="store", help="samples:Which samples.")
-parser.add_option("--cut", dest="cut", default='candId==6&&candEta>0', type="string", action="store", help="")
+parser.add_option("--candRequ", dest="cut", default='candId==6&&candEta>0', type="string", action="store", help="")
 parser.add_option("--postFix", dest="postFix", default='hHFPlus', type="string", action="store", help="")
 
 (options, args) = parser.parse_args()
@@ -29,8 +29,8 @@ postFix = '_'.join([options.sample, options.postFix])
 ##c.Draw('sqrt(Sum$((candId==6)*candPt*cos(candPhi))**2+Sum$((candId==6)*candPt*sin(candPhi))**2)')
 #c.Draw('atan2(Sum$((candId==6)*candPt*sin(candPhi)),Sum$((candId==6)*candPt*cos(candPhi)))>>(20,-pi,pi)')
 
-c.Draw('atan2(Sum$(('+options.cut+')*candPt*sin(candPhi)),Sum$(('+options.cut+')*candPt*cos(candPhi)))>>hStart(30,-pi,pi)','','goff')
-hStart=ROOT.gDirectory.Get('hStart')
+hStart = ROOT.TH1F('hStart', 'hStart', 30, -pi, pi)
+c.Draw('atan2(Sum$(('+options.cut+')*candPt*sin(candPhi)),Sum$(('+options.cut+')*candPt*cos(candPhi)))>>hStart','Sum$('+options.cut+')>0','goff')
 hStart.SetLineColor(ROOT.kRed)
 history = [hStart]
 iter=0
@@ -50,8 +50,8 @@ def getChi2Ndf(x, candRequ, verbose):
   +'Sum$(('+candRequ+')*candPt*cos(atan2(sin(candPhi)+abs(sinh(candEta))*('+str(dy)+')/1100., cos(candPhi)+abs(sinh(candEta))*('+str(dx)+')/1100.))))'
 
   if verbose:  print f
-  c.Draw(f+'>>h(30,-pi,pi)', '', 'goff')
-  h=ROOT.gDirectory.Get('h')
+  h = ROOT.TH1F('hTMP', 'hTMP', 30, -pi, pi)
+  c.Draw(f+'>>hTMP', 'Sum$('+options.cut+')>0', 'goff')
 #h.SetLineColor(ROOT.kRed)
 #c1.Print('/afs/hephy.at/user/'+userName[0]+'/'+userName+'/www/pngHF/metPhiHF.png')
   s_c=0
@@ -70,6 +70,7 @@ def getChi2Ndf(x, candRequ, verbose):
 #  if verbose:print 'Chi2',fRes.Chi2(),fRes.Ndf(), 'Target:',res, 'at xHF/phiHF',x 
   h.SetLineColor(ROOT.kBlack)
   history.append(h.Clone('iter_'+str(iter)))
+  del h
   history[0].Draw()
   for hist in history[-1:]:
     hist.Draw('same')
@@ -89,7 +90,6 @@ def getChi2Ndf(x, candRequ, verbose):
 
   iter+=1
   if verbose:print 'Target:',res, 'at dx/dy',x, 'sample', options.sample 
-  del h
   return res 
 
 print "All files:", c.GetListOfFiles().ls() 
@@ -111,8 +111,8 @@ c1 = ROOT.TCanvas()
 hStart.Draw()
 f = 'atan2(Sum$(('+candRequ+')*candPt*sin(atan2(sin(candPhi)+abs(sinh(candEta))*('+str(dy)+')/1100., cos(candPhi)+abs(sinh(candEta))*('+str(dx)+')/1100.))),'\
 +'Sum$(('+candRequ+')*candPt*cos(atan2(sin(candPhi)+abs(sinh(candEta))*('+str(dy)+')/1100., cos(candPhi)+abs(sinh(candEta))*('+str(dx)+')/1100.))))'
-c.Draw(f+'>>hAfter(30,-pi,pi)', '', 'same')
-hAfter=ROOT.gDirectory.Get('hAfter')
+hAfter = ROOT.TH1F('hAfter', 'hAfter', 30, -pi, pi)
+c.Draw(f+'>>hAfter', 'Sum$('+options.cut+')>0')
 hAfter.Draw('same')
 
 lines=[]
