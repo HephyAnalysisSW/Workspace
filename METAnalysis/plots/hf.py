@@ -1,7 +1,7 @@
 import ROOT
 from math import pi, sin, cos, sqrt
 import numpy as np
-import pickle
+import pickle, os
 from scipy import optimize
 from optparse import OptionParser
 from localInfo import userName
@@ -31,9 +31,13 @@ postFix = '_'.join([options.sample, options.postFix])
 
 hStart = ROOT.TH1F('hStart', 'hStart', 30, -pi, pi)
 c.Draw('atan2(Sum$(('+options.cut+')*candPt*sin(candPhi)),Sum$(('+options.cut+')*candPt*cos(candPhi)))>>hStart','Sum$('+options.cut+')>0','goff')
+yRange = [0, 1.2*hStart.GetBinContent(hStart.GetMaximumBin())]
+hStart.GetYaxis().SetRangeUser(*yRange)
 hStart.SetLineColor(ROOT.kRed)
 history = [hStart]
 iter=0
+gifFile = '/afs/hephy.at/user/'+userName[0]+'/'+userName+'/www/pngHF/metPhiHF_'+postFix+'.gif'
+os.system('rm -rf '+gifFile)
 
 def getChi2Ndf(x, candRequ, verbose):
   global iter
@@ -72,7 +76,9 @@ def getChi2Ndf(x, candRequ, verbose):
   history.append(h.Clone('iter_'+str(iter)))
   del h
   history[0].Draw()
+  history[0].GetYaxis().SetRangeUser(*yRange)
   for hist in history[-1:]:
+    hist.GetYaxis().SetRangeUser(*yRange)
     hist.Draw('same')
   lines=[]
   lines.append([0.5, 0.4,  "#Delta x = "+str(round(dx,2))+" cm"])
@@ -86,7 +92,7 @@ def getChi2Ndf(x, candRequ, verbose):
     latex.DrawLatex(line[0],line[1],line[2])
   c1.Modified()
   c1.Update()
-  c1.Print('/afs/hephy.at/user/'+userName[0]+'/'+userName+'/www/pngHF/metPhiHF_'+postFix+'.gif+')
+  c1.Print(gifFile+'+')
 
   iter+=1
   if verbose:print 'Target:',res, 'at dx/dy',x, 'sample', options.sample 
@@ -101,13 +107,14 @@ x0 = np.array([0.5,0.5])
 #res= optimize.anneal(lambda x:getChi2Ndf(x,candRequ, verbose=True), x0, T0=.0001, learn_rate=1.5)
 c1 = ROOT.TCanvas()
 res= optimize.fmin(lambda x:getChi2Ndf(x,options.cut, verbose=True), x0)
-c1.Print('/afs/hephy.at/user/'+userName[0]+'/'+userName+'/www/pngHF/metPhiHF_'+postFix+'.gif++')
+c1.Print(gifFile+'++')
 
 del c1
 #optChi2 = optimize.minimize(lambda x:getChi2Ndf(x,candRequ, verbose=True), x0, bounds=bnds)
 dx, dy = res
 candRequ=options.cut
 c1 = ROOT.TCanvas()
+hStart.GetYaxis().SetRangeUser(*yRange)
 hStart.Draw()
 f = 'atan2(Sum$(('+candRequ+')*candPt*sin(atan2(sin(candPhi)+abs(sinh(candEta))*('+str(dy)+')/1100., cos(candPhi)+abs(sinh(candEta))*('+str(dx)+')/1100.))),'\
 +'Sum$(('+candRequ+')*candPt*cos(atan2(sin(candPhi)+abs(sinh(candEta))*('+str(dy)+')/1100., cos(candPhi)+abs(sinh(candEta))*('+str(dx)+')/1100.))))'

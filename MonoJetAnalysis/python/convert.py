@@ -513,8 +513,6 @@ for isample, sample in enumerate(allSamples):
   muvars+= ["muMT", "muClosestJetDeltaR", "muClosestJetMass", "muPBoost3D", "muIgpMatch"]
   elvars = ["elPt", "elEta", "elPhi", "elPdg", "elRelIso", "elDxy", "elDz"]
   tavars = ["taPt", "taEta", "taPhi", "taPdg"]
-  if options.keepPDFWeights:
-    pdfVars = ["cteqWeights", "mstwWeights", "nnpdfWeights"]
   if not sample['name'].lower().count('data'):
     mcvars = ["gpPdg", "gpM", "gpPt", "gpEta", "gpPhi", "gpMo1", "gpMo2", "gpDa1", "gpDa2", "gpSta", "gpTag"]
   if options.allsamples.lower()=='sms':
@@ -586,7 +584,8 @@ for isample, sample in enumerate(allSamples):
       for var in mcvars:
         structString +="Float_t "+var+"[30];"
     if options.keepPDFWeights:
-      pdfVars = ["cteqWeights", "mstwWeights", "nnpdfWeights"]
+      structString +="Float_t cteqWeights[45];Float_t mstwWeights[41];Float_t nnpdfWeights[101];"
+
   structString   +="};"
 #  print structString
 
