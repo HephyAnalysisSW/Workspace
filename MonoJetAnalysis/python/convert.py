@@ -23,6 +23,8 @@ parser.add_option("--smsMsqRange", dest="smsMsqRangeString", default="None", typ
 parser.add_option("--small", dest="small", action="store_true", help="Just do a small subset.")
 parser.add_option("--fromPercentage", dest="fromPercentage", default="0", type="int", action="store", help="from (% of tot. events)")
 parser.add_option("--toPercentage", dest="toPercentage", default="100", type="int", action="store", help="to (% of tot. events)")
+parser.add_option("--keepPDFWeights", dest="keepPDFWeights", action="store_true", help="keep PDF Weights?")
+ 
 
 (options, args) = parser.parse_args()
 print "options: chmode",options.chmode, "jermode",options.jermode, "jesmode",options.jesmode
@@ -509,9 +511,10 @@ for isample, sample in enumerate(allSamples):
   jetvars = ["jetPt", "jetEta", "jetPhi", "jetPdg", "jetBtag", "jetCutBasedPUJetIDFlag","jetFull53XPUJetIDFlag","jetMET53XPUJetIDFlag", "jetChef", "jetNhef", "jetCeef", "jetNeef", "jetHFhef", "jetHFeef", "jetMuef", "jetElef", "jetPhef", "jetISRJetID", "jetUnc"]
   muvars = ["muPt", "muEta", "muPhi", "muPdg", "muRelIso", "muDxy", "muDz", "muNormChi2", "muNValMuonHits", "muNumMatchedStations", "muPixelHits", "muNumtrackerLayerWithMeasurement", 'muIsGlobal', 'muIsTracker', 'muWPt']
   muvars+= ["muMT", "muClosestJetDeltaR", "muClosestJetMass", "muPBoost3D", "muIgpMatch"]
-
   elvars = ["elPt", "elEta", "elPhi", "elPdg", "elRelIso", "elDxy", "elDz"]
   tavars = ["taPt", "taEta", "taPhi", "taPdg"]
+  if options.keepPDFWeights:
+    pdfVars = ["cteqWeights", "mstwWeights", "nnpdfWeights"]
   if not sample['name'].lower().count('data'):
     mcvars = ["gpPdg", "gpM", "gpPt", "gpEta", "gpPhi", "gpMo1", "gpMo2", "gpDa1", "gpDa2", "gpSta", "gpTag"]
   if options.allsamples.lower()=='sms':
@@ -582,6 +585,8 @@ for isample, sample in enumerate(allSamples):
       structString +="Int_t ngp;"
       for var in mcvars:
         structString +="Float_t "+var+"[30];"
+    if options.keepPDFWeights:
+      pdfVars = ["cteqWeights", "mstwWeights", "nnpdfWeights"]
   structString   +="};"
 #  print structString
 
@@ -637,6 +642,10 @@ for isample, sample in enumerate(allSamples):
       t.Branch("ngp",   ROOT.AddressOf(s,"ngp"), 'ngp/I')
       for var in mcvars:
         t.Branch(var,   ROOT.AddressOf(s,var), var+'[ngp]/F')
+    if options.keepPDFWeights:
+      t.Branch('cteqWeights',   ROOT.AddressOf(s,'cteqWeights'), 'cteqWeights[45]/F')
+      t.Branch('mstwWeights',   ROOT.AddressOf(s,'mstwWeights'), 'mstwWeights[41]/F')
+      t.Branch('nnpdfWeights',   ROOT.AddressOf(s,'nnpdfWeights'), 'nnpdfWeights[101]/F')
   pyroot_gDir.cd()
 
   for bin_ in sample["bins"]:
@@ -915,7 +924,6 @@ for isample, sample in enumerate(allSamples):
               if not sample['name'].lower().count('data'):
                 s.muIgpMatch[i] = assignMuIgp(i,s)
 ###################
-             
 
             s.nelCount = min(10,s.nel)
             for i in xrange(s.nelCount):
@@ -933,6 +941,13 @@ for isample, sample in enumerate(allSamples):
               s.taEta[i] = allGoodTaus[i]['eta']
               s.taPhi[i] = allGoodTaus[i]['phi']
               s.taPdg[i] = allGoodTaus[i]['pdg']
+            if options.keepPDFWeights:
+              for i in range(45):
+                s.cteqWeights[i]=getVarValue(c, 'cteqWeights',i)
+              for i in range(41):
+                s.mstwWeights[i]=getVarValue(c, 'mstwWeights',i)
+              for i in range(101):
+                s.nnpdfWeights[i]=getVarValue(c, 'nnpdfWeights',i)
             if not bin.lower().count('run'):
               zeroTagWeight = 1.
               bjetSCandidates=filter(lambda j:abs(j['eta'])<2.4 and j['pt']<60, idJets30)
