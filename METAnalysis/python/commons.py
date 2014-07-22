@@ -75,7 +75,6 @@ h_HF['candBinning']                           = [5*25,0,5*500]
 egamma_HF['candBinning']                      = [5*25,0,5*500]
 
 
-
 allMaps = [h, h0Barrel, h0EndcapPlus, h0EndcapMinus, gammaBarrel, gammaEndcapPlus, gammaEndcapMinus, gammaForwardPlus, gammaForwardMinus, e, h_HF_Minus, h_HF_Plus, \
            h_HF_InnerMostRingsMinus, h_HF_InnerMostRingsPlus, egamma_HF_Minus, egamma_HF_Plus, egamma_HF_InnerMostRingsMinus, egamma_HF_InnerMostRingsPlus]
 

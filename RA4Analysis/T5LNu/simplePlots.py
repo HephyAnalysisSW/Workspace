@@ -12,6 +12,7 @@ from Workspace.RA4Analysis.simplePlotsCommon import *
 #from monoJetEventShapeVars import circularity2D, foxWolframMoments, thrust
 
 from Workspace.HEPHYPythonTools.xsec import xsec
+from Workspace.HEPHYPythonTools.xsecSMS import gluino8TeV_NLONLL, gluino13TeV_NLONLL
 small = False
 
 targetLumi = 19700.
@@ -30,8 +31,14 @@ minimum=10**(-2.5)
 chmode = "copy"
 presel = "refSel"
 ver = "v5"
-region = "signal"
-preprefix = region+"_"+ver
+region = "signal6j"
+scaleTo13TeV = True
+preprefixes=[]
+if scaleTo13TeV:
+  preprefixes.append("scaleTo13TeV")
+preprefixes += [region, ver]
+
+preprefix="_".join(preprefixes)
 if region == "preSel":
   #isrjet>350, met>250, mT<70
   additionalCut = "(1)"
@@ -102,30 +109,9 @@ if region == "signal5j":
   addSignals = True
   normalizeToData = False
   normalizeSignalToMCSum = False
-if region == "signalHTFLS04":
+if region == "signal6j":
   #isrjet>350, met>250, mT<70
-  additionalCut = "(ht>750&&type1phiMet>350)&&htThrustLepSideRatio>0.4"
-  addData = False
-  addSignals = True
-  normalizeToData = False
-  normalizeSignalToMCSum = False
-if region == "signalCosMLPhi":
-  #isrjet>350, met>250, mT<70
-  additionalCut = "(ht>750&&type1phiMet>350)&&cos(leptonPhi-type1phiMetphi)<0.8"
-  addData = False
-  addSignals = True
-  normalizeToData = False
-  normalizeSignalToMCSum = False
-if region == "signalCosMLPhi2j":
-  #isrjet>350, met>250, mT<70
-  additionalCut = "(ht>750&&type1phiMet>350)&&cos(leptonPhi-type1phiMetphi)<0.8&&njets==2"
-  addData = False
-  addSignals = True
-  normalizeToData = False
-  normalizeSignalToMCSum = False
-if region == "signalCosMLPhi3j":
-  #isrjet>350, met>250, mT<70
-  additionalCut = "(ht>750&&type1phiMet>350)&&cos(leptonPhi-type1phiMetphi)<0.8&&njets==3"
+  additionalCut = "(ht>750&&type1phiMet>350&&njets>=6)"
   addData = False
   addSignals = True
   normalizeToData = False
@@ -136,7 +122,6 @@ doAnalysisVars            = True
 doAllDiscriminatingVars   = False  
 doOtherVars               = False  
 doMTPlots                 = False
-symmetrizeSignalCharge    = True
 
 chainstring = "Events"
 commoncf = "(0)"
@@ -156,9 +141,10 @@ T5Full_1100_200_100['color'] = ROOT.kBlue + 3
 T5Full_1100_800_600['color'] = ROOT.kRed + 3
 
 signals=[T5Full_1100_200_100, T5Full_1100_800_600]
+for s in [T5Full_1100_200_100, T5Full_1100_800_600]:
+  s['kFac13TeV'] = gluino13TeV_NLONLL[1100]/gluino8TeV_NLONLL[1100]
 if addSignals:
   allSamples += signals
-
 for sample in allSamples:
   sample["Chain"] = chainstring
   sample["dirname"] = "/data/schoef/convertedTuples_v22/"+chmode+"/"
@@ -166,7 +152,7 @@ for sample in allSamples[1:]:
 #  sample["weight"] = "puWeight"
   sample["weight"] = "weight"
 
-def getStack(varstring, binning, cutstring, signals, varfunc = "", addData=True, additionalCutFunc = "", symmetrizeSignalCharge = False):
+def getStack(varstring, binning, cutstring, signals, varfunc = "", addData=True, additionalCutFunc = ""):
   DATA          = variable(varstring, binning, cutstring,additionalCutFunc=additionalCutFunc)
   DATA.sample   = data
 #  DATA.color    = ROOT.kGray
@@ -212,24 +198,29 @@ def getStack(varstring, binning, cutstring, signals, varfunc = "", addData=True,
   MC_QCD.style                 = "f0"
   MC_QCD.add                   = []
 
+  if scaleTo13TeV:
+    MC_TTJETS.scale = 3.31
+    MC_WJETS.scale  = 1.663
+    MC_Z.scale      = 1.65
+    MC_STOP.scale   = 2.
+    MC_VV.scale     = 2.
+    MC_QCD.scale    = 2.
+
   res = [MC_WJETS, MC_TTJETS, MC_STOP, MC_Z, MC_VV, MC_QCD]
   for v in res:
 #    v.reweightVar = "ngoodVertices"
 #    v.reweightHisto = simplePUreweightHisto 
     v.legendCoordinates=[0.61,0.95 - 0.08*5,.98,.95]
   for signal in signals:
-    if symmetrizeSignalCharge:
-      MC_SIGNAL                    = variable(varstring, binning, cutstring.replace("&&leptonPdg<0","").replace("&&leptonPdg>0",""),additionalCutFunc=additionalCutFunc)
-    else:
-      MC_SIGNAL                    = variable(varstring, binning, cutstring,additionalCutFunc=additionalCutFunc)
+    MC_SIGNAL                    = variable(varstring, binning, cutstring,additionalCutFunc=additionalCutFunc)
     MC_SIGNAL.sample             = copy.deepcopy(signal)
     MC_SIGNAL.legendText         = signal["name"]
     MC_SIGNAL.style              = "l02"
     MC_SIGNAL.color              = signal['color']
-    if symmetrizeSignalCharge: 
-      MC_SIGNAL.scale              = 0.5
     MC_SIGNAL.add = []
     MC_SIGNAL.reweightVar = lambda c:getISRweight(c, mode='Central')
+    if scaleTo13TeV:
+      MC_SIGNAL.scale = signal['kFac13TeV'] 
     res.append(MC_SIGNAL)
     if normalizeSignalToMCSum:
       MC_SIGNAL.normalizeTo = res[0]
@@ -324,7 +315,7 @@ if doAnalysisVars:
   njets_stack[0].addOverFlowBin = "upper"
   allStacks.append(njets_stack)
 
-  njetsNoNJet_stack = getStack(":njets;n_{jet};Number of Events",[15,0,15], commoncf.replace('&&njets>=4',''), signals, addData = addData)
+  njetsNoNJet_stack = getStack(":njets;n_{jet};Number of Events",[15,0,15], commoncf.replace('&&njets>=4','').replace('&&njets>=5','').replace('&&njets>=6',''), signals, addData = addData)
   njetsNoNJet_stack[0].addOverFlowBin = "upper"
   allStacks.append(njetsNoNJet_stack)
 
@@ -332,18 +323,16 @@ if doAnalysisVars:
   nbtags_stack[0].addOverFlowBin = "upper"
   allStacks.append(nbtags_stack)
 
-  ht_stack                          = getStack(":ht;H_{T} (GeV);Number of Events / 50 GeV",[31,0,1550 ], commoncf, signals, addData = addData)
+  ht_stack                          = getStack(":ht;H_{T} (GeV);Number of Events / 100 GeV",[31,0,2600 ], commoncf, signals, addData = addData)
   ht_stack[0].addOverFlowBin = "upper"
   allStacks.append(ht_stack)
 
-  htNoHT_stack                          = getStack(":ht;H_{T} (GeV);Number of Events / 50 GeV",[31,0,1550 ], commoncf.replace('ht>750&&','').replace('ht>400&&',''), signals, addData = addData)
+  htNoHT_stack                          = getStack(":ht;H_{T} (GeV);Number of Events / 100 GeV",[26,0,2600 ], commoncf.replace('ht>750&&','').replace('ht>400&&',''), signals, addData = addData)
   htNoHT_stack[0].addOverFlowBin = "upper"
   allStacks.append(htNoHT_stack)
 
 
-
 if doAllDiscriminatingVars:
-
 
 #  cosPhiMetJet_stack = getStack(":xxx;cos(#phi(#slash{E}_{T}, ISR-jet));Number of Events",[20,-1,1], commoncf, signals, addData = addData, varfunc = lambda c: cos(getVarValue(c, 'isrJetPhi') - getVarValue(c, 'leptonPhi')))
 #  cosPhiMetJet_stack[0].addOverFlowBin = "both"
@@ -389,13 +378,13 @@ if doAllDiscriminatingVars:
   allStacks.append(cosDeltaPhiLepW_stack)
 
 if doMTPlots:
-  mTReco_PosCharge_stack  = getStack(":mT;m_{T} (GeV);Number of Events / 100 GeV",[8,20,820], commoncf+"&&leptonPdg<0", signals, addData = addData, symmetrizeSignalCharge = symmetrizeSignalCharge)
+  mTReco_PosCharge_stack  = getStack(":mT;m_{T} (GeV);Number of Events / 100 GeV",[8,20,820], commoncf+"&&leptonPdg<0", signals, addData = addData)
   mTReco_PosCharge_stack[0].addOverFlowBin = "upper"
   allStacks.append(mTReco_PosCharge_stack)
-  mTReco_NegCharge_stack  = getStack(":mT;m_{T} (GeV);Number of Events / 100 GeV",[8,20,820], commoncf+"&&leptonPdg>0", signals, addData = addData, symmetrizeSignalCharge = symmetrizeSignalCharge)
+  mTReco_NegCharge_stack  = getStack(":mT;m_{T} (GeV);Number of Events / 100 GeV",[8,20,820], commoncf+"&&leptonPdg>0", signals, addData = addData)
   mTReco_NegCharge_stack[0].addOverFlowBin = "upper"
   allStacks.append(mTReco_NegCharge_stack)
-  mTReco_stack  = getStack(":mT;m_{T} (GeV);Number of Events / 100 GeV",[8,20,820], commoncf, signals, addData = addData, symmetrizeSignalCharge = symmetrizeSignalCharge)
+  mTReco_stack  = getStack(":mT;m_{T} (GeV);Number of Events / 100 GeV",[8,20,820], commoncf, signals, addData = addData)
   mTReco_stack[0].addOverFlowBin = "upper"
   allStacks.append(mTReco_stack)
 

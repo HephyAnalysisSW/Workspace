@@ -34,6 +34,36 @@ def nameAndCut(metb, htb, njetb, pdg, btagRequirement='def'):
     name+='_negPdg'
   return [name, cut]
 
+def nameAndCutLShape(shape, njetb, pdg, btagRequirement='def'):
+  cut='nbtags==0'
+  if btagRequirement.lower()=='none':
+    cut='(1)'
+  if btagRequirement.lower()=='noloose':
+    cut='(Sum$(jetBtag>0.244)==0)'
+  if btagRequirement.lower()=='notight':
+    cut='(Sum$(jetBtag>0.898)==0)'
+  cut+='&&nTightMuons+nTightElectrons==1'
+  if not shape[0]=="L":return
+  n = int(shape[1])
+  htL = 400+n*70
+  htH = 400+(n+1)*70
+  metL =150 +n*40
+  metH =150 +(n+1)*40
+  cut+='&&(ht>='+str(htL)+'&&type1phiMet>'+str(metL)+')&&(!(ht>='+str(htH)+'&&type1phiMet>='+str(metH)+'))'
+  name=shape
+  name+='_njet'+str(njetb[0])
+  cut+='&&njets>='+str(njetb[0])
+  if len(njetb)>1 and njetb[1]>0:
+    cut+='&&njets<='+str(njetb[1])
+    name+='-'+str(njetb[1])
+  if pdg.lower()=='pos':
+    cut+='&&leptonPdg>0'
+    name+='_posPdg'
+  if pdg.lower()=='neg':
+    cut+='&&leptonPdg<0'
+    name+='_negPdg'
+  return [name, cut]
+
 def wRecoPt(chain):
   lPt = getVarValue(chain, "leptonPt")
   lPhi = getVarValue(chain, "leptonPhi")

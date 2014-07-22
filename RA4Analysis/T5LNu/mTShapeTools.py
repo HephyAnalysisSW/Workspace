@@ -2,7 +2,7 @@ import ROOT
 from math import sqrt
 from Workspace.HEPHYPythonTools.helpers import getCutPlotFromChain, getCutYieldFromChain, getObjFromFile
 from array import array
-from helpers import nameAndCut, wRecoPt
+from helpers import nameAndCut, nameAndCutLShape, wRecoPt
 
 ROOT.TH1F().SetDefaultSumw2()
 ROOT.gROOT.ProcessLine(".L ../../HEPHYPythonTools/scripts/root/tdrstyle.C")
@@ -13,21 +13,17 @@ redFac  =  {"cteq":1.654, "mstw":1., "nnpdf":1.}
 
 targetLumi=19700
 defaultLines = [[0.2, 0.9, "#font[22]{CMS Collaboration}"], [0.2,0.85,str(int(round(targetLumi/10.))/100.)+" fb^{-1},  #sqrt{s} = 8 TeV"]]
-outDir = "/afs/hephy.at/user/s/schoefbeck/www/pngT5LNu/"
+outDir = "/afs/hephy.at/user/s/schoefbeck/www/pngT5Full/"
 binningCoarse = [0,140,200,400,800]
 binningFine = range(0,1000,20)
 doPDF= False
 logy = True
 
 
-def getT5LNu(mgl, mn, color = ROOT.kBlue):
-  res = {}
-  res["dirname"] = "/data/schoef/convertedTuples_v22/copy/T5LNu_"+str(mgl)+"_"+str(mn)
-  res["color"] = color
-  res["name"] = "T5LNu_"+str(mgl)+"_"+str(mn)
-  return res
-
-signals=[getT5LNu(1100,100, ROOT.kBlue), getT5LNu(1100, 600, ROOT.kRed )]
+from defaultConvertedTuples import T5Full_1100_200_100, T5Full_1100_800_600 
+T5Full_1100_200_100['color'] = ROOT.kBlue + 3
+T5Full_1100_800_600['color'] = ROOT.kRed + 3
+signals=[T5Full_1100_200_100, T5Full_1100_800_600]
 
 stuff=[]
 
@@ -144,85 +140,250 @@ def makeMTPlotWithUncertainties(c,  binning, cut, weight, doPDF = doPDF):
   return {'hist':hMT, 'unc':{'pdf':hPDF, 'jes':hErrJES, 'jer':hErrJER}}
 
 plots = [\
-#  nameAndCut([150,350], [400,750], [2,3], 'pos') +[ True ],
+#  nameAndCut([150,350], [400,750], [2,4], 'pos') +[ True ],
 #  nameAndCut([150,350], [400,750], [2,2], 'pos') +[ True ],
 #  nameAndCut([150,350], [400,750], [3,3], 'pos') +[ True ],
-#  nameAndCut([150,350], [400,750], [2,3], 'neg') +[ True ],
+#  nameAndCut([150,350], [400,750], [4,4], 'pos') +[ True ],
+#  nameAndCut([150,350], [400,750], [2,4], 'neg') +[ True ],
 #  nameAndCut([150,350], [400,750], [2,2], 'neg') +[ True ],
 #  nameAndCut([150,350], [400,750], [3,3], 'neg') +[ True ],
-#  nameAndCut([150,350], [400,750], [2,3], '')    +[ True ],
+#  nameAndCut([150,350], [400,750], [4,4], 'neg') +[ True ],
+#  nameAndCut([150,350], [400,750], [2,4], '')    +[ True ],
 #  nameAndCut([150,350], [400,750], [2,2], '')    +[ True ],
 #  nameAndCut([150,350], [400,750], [3,3], '')    +[ True ],
+#  nameAndCut([150,350], [400,750], [4,4], '')    +[ True ],
 #
-#  nameAndCut([350,-1], [400,750], [2,3], 'pos') +[ True ],
+#  nameAndCut([350,-1], [400,750], [2,4], 'pos') +[ True ],
 #  nameAndCut([350,-1], [400,750], [2,2], 'pos') +[ True ],
 #  nameAndCut([350,-1], [400,750], [3,3], 'pos') +[ True ],
-#  nameAndCut([350,-1], [400,750], [2,3], 'neg') +[ True ],
+#  nameAndCut([350,-1], [400,750], [4,4], 'pos') +[ True ],
+#  nameAndCut([350,-1], [400,750], [2,4], 'neg') +[ True ],
 #  nameAndCut([350,-1], [400,750], [2,2], 'neg') +[ True ],
 #  nameAndCut([350,-1], [400,750], [3,3], 'neg') +[ True ],
-#  nameAndCut([350,-1], [400,750], [2,3], '')    +[ True ],
+#  nameAndCut([350,-1], [400,750], [4,4], 'neg') +[ True ],
+#  nameAndCut([350,-1], [400,750], [2,4], '')    +[ True ],
 #  nameAndCut([350,-1], [400,750], [2,2], '')    +[ True ],
 #  nameAndCut([350,-1], [400,750], [3,3], '')    +[ True ],
+#  nameAndCut([350,-1], [400,750], [4,4], '')    +[ True ],
 #
-#  nameAndCut([150,350], [750, -1], [2,3], 'pos') +[ True ],
+#  nameAndCut([150,350], [750, -1], [2,4], 'pos') +[ True ],
 #  nameAndCut([150,350], [750, -1], [2,2], 'pos') +[ True ],
 #  nameAndCut([150,350], [750, -1], [3,3], 'pos') +[ True ],
-#  nameAndCut([150,350], [750, -1], [2,3], 'neg') +[ True ],
+#  nameAndCut([150,350], [750, -1], [4,4], 'pos') +[ True ],
+#  nameAndCut([150,350], [750, -1], [2,4], 'neg') +[ True ],
 #  nameAndCut([150,350], [750, -1], [2,2], 'neg') +[ True ],
 #  nameAndCut([150,350], [750, -1], [3,3], 'neg') +[ True ],
-#  nameAndCut([150,350], [750, -1], [2,3], '')    +[ True ],
+#  nameAndCut([150,350], [750, -1], [4,4], 'neg') +[ True ],
+#  nameAndCut([150,350], [750, -1], [2,4], '')    +[ True ],
 #  nameAndCut([150,350], [750, -1], [2,2], '')    +[ True ],
 #  nameAndCut([150,350], [750, -1], [3,3], '')    +[ True ],
+#  nameAndCut([150,350], [750, -1], [4,4], '')    +[ True ],
 #
-#  nameAndCut([350, -1], [750, -1], [2,3], 'pos') +[ True ],
+#  nameAndCut([350, -1], [750, -1], [2,4], 'pos') +[ True ],
 #  nameAndCut([350, -1], [750, -1], [2,2], 'pos') +[ True ],
 #  nameAndCut([350, -1], [750, -1], [3,3], 'pos') +[ True ],
-#  nameAndCut([350, -1], [750, -1], [2,3], 'neg') +[ True ],
+#  nameAndCut([350, -1], [750, -1], [4,4], 'pos') +[ True ],
+#  nameAndCut([350, -1], [750, -1], [2,4], 'neg') +[ True ],
 #  nameAndCut([350, -1], [750, -1], [2,2], 'neg') +[ True ],
 #  nameAndCut([350, -1], [750, -1], [3,3], 'neg') +[ True ],
-#  nameAndCut([350, -1], [750, -1], [2,3], '')    +[ True ],
+#  nameAndCut([350, -1], [750, -1], [4,4], 'neg') +[ True ],
+#  nameAndCut([350, -1], [750, -1], [2,4], '')    +[ True ],
 #  nameAndCut([350, -1], [750, -1], [2,2], '')    +[ True ],
 #  nameAndCut([350, -1], [750, -1], [3,3], '')    +[ True ],
+#  nameAndCut([350, -1], [750, -1], [4,4], '')    +[ True ],
 #
-#  nameAndCut([150,350], [400,750], [4,4], 'pos') +[ True ],
-#  nameAndCut([150,350], [400,750], [4],   'pos') +[ True ],
+#  nameAndCut([150,350], [1000, -1], [2,4], 'pos') +[ True ],
+#  nameAndCut([150,350], [1000, -1], [2,2], 'pos') +[ True ],
+#  nameAndCut([150,350], [1000, -1], [3,3], 'pos') +[ True ],
+#  nameAndCut([150,350], [1000, -1], [4,4], 'pos') +[ True ],
+#  nameAndCut([150,350], [1000, -1], [2,4], 'neg') +[ True ],
+#  nameAndCut([150,350], [1000, -1], [2,2], 'neg') +[ True ],
+#  nameAndCut([150,350], [1000, -1], [3,3], 'neg') +[ True ],
+#  nameAndCut([150,350], [1000, -1], [4,4], 'neg') +[ True ],
+#  nameAndCut([150,350], [1000, -1], [2,4], '')    +[ True ],
+#  nameAndCut([150,350], [1000, -1], [2,2], '')    +[ True ],
+#  nameAndCut([150,350], [1000, -1], [3,3], '')    +[ True ],
+#  nameAndCut([150,350], [1000, -1], [4,4], '')    +[ True ],
+#
+#  nameAndCut([350, -1], [1000, -1], [2,4], 'pos') +[ True ],
+#  nameAndCut([350, -1], [1000, -1], [2,2], 'pos') +[ True ],
+#  nameAndCut([350, -1], [1000, -1], [3,3], 'pos') +[ True ],
+#  nameAndCut([350, -1], [1000, -1], [4,4], 'pos') +[ True ],
+#  nameAndCut([350, -1], [1000, -1], [2,4], 'neg') +[ True ],
+#  nameAndCut([350, -1], [1000, -1], [2,2], 'neg') +[ True ],
+#  nameAndCut([350, -1], [1000, -1], [3,3], 'neg') +[ True ],
+#  nameAndCut([350, -1], [1000, -1], [4,4], 'neg') +[ True ],
+#  nameAndCut([350, -1], [1000, -1], [2,4], '')    +[ True ],
+#  nameAndCut([350, -1], [1000, -1], [2,2], '')    +[ True ],
+#  nameAndCut([350, -1], [1000, -1], [3,3], '')    +[ True ],
+#  nameAndCut([350, -1], [1000, -1], [4,4], '')    +[ True ],
+#
+#  nameAndCut([150,350], [400,750], [5,5], 'pos') +[ True ],
 #  nameAndCut([150,350], [400,750], [5],   'pos') +[ True ],
-#  nameAndCut([150,350], [400,750], [4,4], 'neg') +[ True ],
-#  nameAndCut([150,350], [400,750], [4],   'neg') +[ True ],
+#  nameAndCut([150,350], [400,750], [6],   'pos') +[ True ],
+#  nameAndCut([150,350], [400,750], [5,5], 'neg') +[ True ],
 #  nameAndCut([150,350], [400,750], [5],   'neg') +[ True ],
-#  nameAndCut([150,350], [400,750], [4,4], '')    +[ True ],
-#  nameAndCut([150,350], [400,750], [4],   '')    +[ True ],
+#  nameAndCut([150,350], [400,750], [6],   'neg') +[ True ],
+#  nameAndCut([150,350], [400,750], [5,5], '')    +[ True ],
 #  nameAndCut([150,350], [400,750], [5],   '')    +[ True ],
+#  nameAndCut([150,350], [400,750], [6],   '')    +[ True ],
 #
-#  nameAndCut([350,-1], [400,750], [4,4], 'pos') +[ True ],
-#  nameAndCut([350,-1], [400,750], [4],   'pos') +[ True ],
+#  nameAndCut([350,-1], [400,750], [5,5], 'pos') +[ True ],
 #  nameAndCut([350,-1], [400,750], [5],   'pos') +[ True ],
-#  nameAndCut([350,-1], [400,750], [4,4], 'neg') +[ True ],
-#  nameAndCut([350,-1], [400,750], [4],   'neg') +[ True ],
+#  nameAndCut([350,-1], [400,750], [6],   'pos') +[ True ],
+#  nameAndCut([350,-1], [400,750], [5,5], 'neg') +[ True ],
 #  nameAndCut([350,-1], [400,750], [5],   'neg') +[ True ],
-#  nameAndCut([350,-1], [400,750], [4,4], '')    +[ True ],
-#  nameAndCut([350,-1], [400,750], [4],   '')    +[ True ],
+#  nameAndCut([350,-1], [400,750], [6],   'neg') +[ True ],
+#  nameAndCut([350,-1], [400,750], [5,5], '')    +[ True ],
 #  nameAndCut([350,-1], [400,750], [5],   '')    +[ True ],
+#  nameAndCut([350,-1], [400,750], [6],   '')    +[ True ],
 #
-#  nameAndCut([150,350], [750, -1], [4,4], 'pos') +[ True ],
-#  nameAndCut([150,350], [750, -1], [4],   'pos') +[ True ],
+#  nameAndCut([150,350], [750, -1], [5,5], 'pos') +[ True ],
 #  nameAndCut([150,350], [750, -1], [5],   'pos') +[ True ],
-#  nameAndCut([150,350], [750, -1], [4,4], 'neg') +[ True ],
-#  nameAndCut([150,350], [750, -1], [4],   'neg') +[ True ],
+#  nameAndCut([150,350], [750, -1], [6],   'pos') +[ True ],
+#  nameAndCut([150,350], [750, -1], [5,5], 'neg') +[ True ],
 #  nameAndCut([150,350], [750, -1], [5],   'neg') +[ True ],
-#  nameAndCut([150,350], [750, -1], [4,4], '')    +[ True ],
-#  nameAndCut([150,350], [750, -1], [4],   '')    +[ True ],
+#  nameAndCut([150,350], [750, -1], [6],   'neg') +[ True ],
+#  nameAndCut([150,350], [750, -1], [5,5], '')    +[ True ],
 #  nameAndCut([150,350], [750, -1], [5],   '')    +[ True ],
+#  nameAndCut([150,350], [750, -1], [6],   '')    +[ True ],
 #
-#  nameAndCut([350, -1], [750, -1], [4,4], 'pos')+[ False ],
-#  nameAndCut([350, -1], [750, -1], [4],   'pos')+[ False ],
+#  nameAndCut([350, -1], [750, -1], [5,5], 'pos')+[ False ],
 #  nameAndCut([350, -1], [750, -1], [5],   'pos')+[ False ],
-#  nameAndCut([350, -1], [750, -1], [4,4], 'neg')+[ False ],
-#  nameAndCut([350, -1], [750, -1], [4],   'neg')+[ False ],
+#  nameAndCut([350, -1], [750, -1], [6],   'pos')+[ False ],
+#  nameAndCut([350, -1], [750, -1], [5,5], 'neg')+[ False ],
 #  nameAndCut([350, -1], [750, -1], [5],   'neg')+[ False ],
-#  nameAndCut([350, -1], [750, -1], [4,4], '')   +[ False ],
-#  nameAndCut([350, -1], [750, -1], [4],   '')   +[ False ],
+#  nameAndCut([350, -1], [750, -1], [6],   'neg')+[ False ],
+#  nameAndCut([350, -1], [750, -1], [5,5], '')   +[ False ],
 #  nameAndCut([350, -1], [750, -1], [5],   '')   +[ False ],
+#  nameAndCut([350, -1], [750, -1], [6],   '')   +[ False ],
+#
+#  nameAndCut([150,350], [1000, -1], [5,5], 'pos') +[ True ],
+#  nameAndCut([150,350], [1000, -1], [5],   'pos') +[ True ],
+#  nameAndCut([150,350], [1000, -1], [6],   'pos') +[ True ],
+#  nameAndCut([150,350], [1000, -1], [5,5], 'neg') +[ True ],
+#  nameAndCut([150,350], [1000, -1], [5],   'neg') +[ True ],
+#  nameAndCut([150,350], [1000, -1], [6],   'neg') +[ True ],
+#  nameAndCut([150,350], [1000, -1], [5,5], '')    +[ True ],
+#  nameAndCut([150,350], [1000, -1], [5],   '')    +[ True ],
+#  nameAndCut([150,350], [1000, -1], [6],   '')    +[ True ],
+#
+#  nameAndCut([350, -1], [1000, -1], [5,5], 'pos')+[ False ],
+#  nameAndCut([350, -1], [1000, -1], [5],   'pos')+[ False ],
+#  nameAndCut([350, -1], [1000, -1], [6],   'pos')+[ False ],
+#  nameAndCut([350, -1], [1000, -1], [5,5], 'neg')+[ False ],
+#  nameAndCut([350, -1], [1000, -1], [5],   'neg')+[ False ],
+#  nameAndCut([350, -1], [1000, -1], [6],   'neg')+[ False ],
+#  nameAndCut([350, -1], [1000, -1], [5,5], '')   +[ False ],
+#  nameAndCut([350, -1], [1000, -1], [5],   '')   +[ False ],
+#  nameAndCut([350, -1], [1000, -1], [6],   '')   +[ False ],
+
+  nameAndCutLShape("L0", [2,2], '') + [ True ],
+  nameAndCutLShape("L0", [3,3], '') + [ True ],
+  nameAndCutLShape("L0", [4,4], '') + [ True ],
+  nameAndCutLShape("L0", [2,4], '') + [ True ],
+  nameAndCutLShape("L0", [5,5], '') + [ True ],
+  nameAndCutLShape("L0", [5], '') + [ True ],
+  nameAndCutLShape("L0", [6], '') + [ True ],
+  nameAndCutLShape("L1", [2,2], '') + [ True ],
+  nameAndCutLShape("L1", [3,3], '') + [ True ],
+  nameAndCutLShape("L1", [4,4], '') + [ True ],
+  nameAndCutLShape("L1", [2,4], '') + [ True ],
+  nameAndCutLShape("L1", [5,5], '') + [ True ],
+  nameAndCutLShape("L1", [5], '') + [ True ],
+  nameAndCutLShape("L1", [6], '') + [ True ],
+  nameAndCutLShape("L2", [2,2], '') + [ True ],
+  nameAndCutLShape("L2", [3,3], '') + [ True ],
+  nameAndCutLShape("L2", [4,4], '') + [ True ],
+  nameAndCutLShape("L2", [2,4], '') + [ True ],
+  nameAndCutLShape("L2", [5,5], '') + [ True ],
+  nameAndCutLShape("L2", [5], '') + [ True ],
+  nameAndCutLShape("L2", [6], '') + [ True ],
+  nameAndCutLShape("L3", [2,2], '') + [ True ],
+  nameAndCutLShape("L3", [3,3], '') + [ True ],
+  nameAndCutLShape("L3", [4,4], '') + [ True ],
+  nameAndCutLShape("L3", [2,4], '') + [ True ],
+  nameAndCutLShape("L3", [5,5], '') + [ True ],
+  nameAndCutLShape("L3", [5], '') + [ True ],
+  nameAndCutLShape("L3", [6], '') + [ True ],
+  nameAndCutLShape("L4", [2,2], '') + [ True ],
+  nameAndCutLShape("L4", [3,3], '') + [ True ],
+  nameAndCutLShape("L4", [4,4], '') + [ True ],
+  nameAndCutLShape("L4", [2,4], '') + [ True ],
+  nameAndCutLShape("L4", [5,5], '') + [ True ],
+  nameAndCutLShape("L4", [5], '') + [ True ],
+  nameAndCutLShape("L4", [6], '') + [ True ],
+ 
+  nameAndCutLShape("L0", [2,2], 'pos') + [ True ],
+  nameAndCutLShape("L0", [3,3], 'pos') + [ True ],
+  nameAndCutLShape("L0", [4,4], 'pos') + [ True ],
+  nameAndCutLShape("L0", [2,4], 'pos') + [ True ],
+  nameAndCutLShape("L0", [5,5], 'pos') + [ True ],
+  nameAndCutLShape("L0", [5], 'pos') + [ True ],
+  nameAndCutLShape("L0", [6], 'pos') + [ True ],
+  nameAndCutLShape("L1", [2,2], 'pos') + [ True ],
+  nameAndCutLShape("L1", [3,3], 'pos') + [ True ],
+  nameAndCutLShape("L1", [4,4], 'pos') + [ True ],
+  nameAndCutLShape("L1", [2,4], 'pos') + [ True ],
+  nameAndCutLShape("L1", [5,5], 'pos') + [ True ],
+  nameAndCutLShape("L1", [5], 'pos') + [ True ],
+  nameAndCutLShape("L1", [6], 'pos') + [ True ],
+  nameAndCutLShape("L2", [2,2], 'pos') + [ True ],
+  nameAndCutLShape("L2", [3,3], 'pos') + [ True ],
+  nameAndCutLShape("L2", [4,4], 'pos') + [ True ],
+  nameAndCutLShape("L2", [2,4], 'pos') + [ True ],
+  nameAndCutLShape("L2", [5,5], 'pos') + [ True ],
+  nameAndCutLShape("L2", [5], 'pos') + [ True ],
+  nameAndCutLShape("L2", [6], 'pos') + [ True ],
+  nameAndCutLShape("L3", [2,2], 'pos') + [ True ],
+  nameAndCutLShape("L3", [3,3], 'pos') + [ True ],
+  nameAndCutLShape("L3", [4,4], 'pos') + [ True ],
+  nameAndCutLShape("L3", [2,4], 'pos') + [ True ],
+  nameAndCutLShape("L3", [5,5], 'pos') + [ True ],
+  nameAndCutLShape("L3", [5], 'pos') + [ True ],
+  nameAndCutLShape("L3", [6], 'pos') + [ True ],
+  nameAndCutLShape("L4", [2,2], 'pos') + [ True ],
+  nameAndCutLShape("L4", [3,3], 'pos') + [ True ],
+  nameAndCutLShape("L4", [4,4], 'pos') + [ True ],
+  nameAndCutLShape("L4", [2,4], 'pos') + [ True ],
+  nameAndCutLShape("L4", [5,5], 'pos') + [ True ],
+  nameAndCutLShape("L4", [5], 'pos') + [ True ],
+  nameAndCutLShape("L4", [6], 'pos') + [ True ],
+  nameAndCutLShape("L0", [2,2], 'neg') + [ True ],
+  nameAndCutLShape("L0", [3,3], 'neg') + [ True ],
+  nameAndCutLShape("L0", [4,4], 'neg') + [ True ],
+  nameAndCutLShape("L0", [2,4], 'neg') + [ True ],
+  nameAndCutLShape("L0", [5,5], 'neg') + [ True ],
+  nameAndCutLShape("L0", [5], 'neg') + [ True ],
+  nameAndCutLShape("L0", [6], 'neg') + [ True ],
+  nameAndCutLShape("L1", [2,2], 'neg') + [ True ],
+  nameAndCutLShape("L1", [3,3], 'neg') + [ True ],
+  nameAndCutLShape("L1", [4,4], 'neg') + [ True ],
+  nameAndCutLShape("L1", [2,4], 'neg') + [ True ],
+  nameAndCutLShape("L1", [5,5], 'neg') + [ True ],
+  nameAndCutLShape("L1", [5], 'neg') + [ True ],
+  nameAndCutLShape("L1", [6], 'neg') + [ True ],
+  nameAndCutLShape("L2", [2,2], 'neg') + [ True ],
+  nameAndCutLShape("L2", [3,3], 'neg') + [ True ],
+  nameAndCutLShape("L2", [4,4], 'neg') + [ True ],
+  nameAndCutLShape("L2", [2,4], 'neg') + [ True ],
+  nameAndCutLShape("L2", [5,5], 'neg') + [ True ],
+  nameAndCutLShape("L2", [5], 'neg') + [ True ],
+  nameAndCutLShape("L2", [6], 'neg') + [ True ],
+  nameAndCutLShape("L3", [2,2], 'neg') + [ True ],
+  nameAndCutLShape("L3", [3,3], 'neg') + [ True ],
+  nameAndCutLShape("L3", [4,4], 'neg') + [ True ],
+  nameAndCutLShape("L3", [2,4], 'neg') + [ True ],
+  nameAndCutLShape("L3", [5,5], 'neg') + [ True ],
+  nameAndCutLShape("L3", [5], 'neg') + [ True ],
+  nameAndCutLShape("L3", [6], 'neg') + [ True ],
+  nameAndCutLShape("L4", [2,2], 'neg') + [ True ],
+  nameAndCutLShape("L4", [3,3], 'neg') + [ True ],
+  nameAndCutLShape("L4", [4,4], 'neg') + [ True ],
+  nameAndCutLShape("L4", [2,4], 'neg') + [ True ],
+  nameAndCutLShape("L4", [5,5], 'neg') + [ True ],
+  nameAndCutLShape("L4", [5], 'neg') + [ True ],
+  nameAndCutLShape("L4", [6], 'neg') + [ True ],
   ]
 
 cAllMC = ROOT.TChain('Events')
@@ -241,7 +402,6 @@ cData.Add('/data/schoef/convertedTuples_v22/copy/data/histo_data*.root')
 for postFix, binning in [['_binningCoarse', binningCoarse], ['_binningFine', binningFine] ]:
   for plotName, cut, addData in plots:
     print "At", plotName, cut,'addData', addData
-
     mTRes = makeMTPlotWithUncertainties(cWJets, binning, cut, 'weight', doPDF = doPDF)
     hRest = getCutPlotFromChain(cRest, 'mT', binning, cut, 'weight', binningIsExplicit=True, addOverFlowBin='upper')
     mTRes['hist'].Add(hRest)
@@ -388,13 +548,9 @@ for postFix, binning in [['_binningCoarse', binningCoarse], ['_binningFine', bin
 
     for s in signals:
       cS = ROOT.TChain('Events')
-      cS.Add(s['dirname']+'/h*.root')
-      cutS = cut.replace('&&leptonPdg<0', '').replace('&&leptonPdg>0', '')
-      print cutS
-      hcS = getCutPlotFromChain(cS, 'mT', binning, cutS, 'weight', binningIsExplicit=True, addOverFlowBin='upper')
-      if plotName.count('negPdg') or plotName.count('posPdg'):
-        print 'Scaling signal by 0.5!'
-        hcS.Scale(0.5) 
+      cS.Add(s['dirname']+'/'+s['name']+'/h*.root')
+      hcS = getCutPlotFromChain(cS, 'mT', binning, cut, 'weight', binningIsExplicit=True, addOverFlowBin='upper')
+#      print 'signalInt',hcS.Integral()
       hcS.SetLineColor(s['color'])
       hcS.SetMarkerSize(0)
       hcS.SetMarkerColor(s['color'])
@@ -445,105 +601,105 @@ for postFix, binning in [['_binningCoarse', binningCoarse], ['_binningFine', bin
     c1.Print(outDir+"/"+prefix+plotName+postFix+".pdf")
     c1.Print(outDir+"/"+prefix+plotName+postFix+".root")
 
-mTBins = [ (binningCoarse[i], binningCoarse[i+1]) for i in range(len(binningCoarse)-2)]+[(binningCoarse[-2],-1)]
-
-def getPrediction(metb, htb, njetCR, njetSR, leptonPdg, btagRequirement='def', useData = False):
-  if useData:
-    cDataAnalysis = cData
-  else:
-    cDataAnalysis = cAllMC
-
-  nameCR, cutCR = nameAndCut(metb, htb, njetCR, leptonPdg, btagRequirement=btagRequirement)
-  nameSR, cutSR = nameAndCut(metb, htb, njetSR, leptonPdg, btagRequirement=btagRequirement)
-  namePostFix='_to_njet'+str(njetSR[0])
-  if len(njetSR)>1 and njetSR[1]>0:
-    namePostFix+='-'+str(njetSR[1])
-#  genPtRWHisto = getObjFromFile('/data/schoef/results2014/T5Lnu_v5_refSelNoNJet_copy_reweightingHistos.root', 'recoPt_'+nameCR+namePostFix)
-
-  crYieldWMC = {}
-  crYieldRestMC = {}
-  crYieldData = {}
-  srYieldWMC = {}
-  srYieldRestMC = {}
-  srYieldData = {}
-  for mtb in mTBins:
-    print "At", mtb, 'SR:', cutSR, 'CR:',cutCR
-    mTCut = 'mT>'+str(mtb[0])
-    if mtb[1]>0:
-      mTCut+='&&mT<='+str(mtb[1])
-    mTCutCR = mTCut+'&&'+cutCR
-    mTCutSR = mTCut+'&&'+cutSR
-    crYWMC, crYWMCVar = getCutYieldFromChain(cWJets, mTCutCR, cutFunc=None, weight='weight', returnVar=True)
-    crYieldWMC[mtb] =  {#'recoPtRW':getCutYieldFromChain(cWJets, mTCutCR, cutFunc=None, weight='weight',weightFunc=lambda c:genPtRWHisto.GetBinContent(genPtRWHisto.FindBin(wRecoPt(c)))),
-                        'nominal': crYWMC, 'nominalVar':crYWMCVar}
-    crYRestMC, crYRestMCVar = getCutYieldFromChain(cRest, mTCutCR, cutFunc=None, weight='weight', returnVar=True)
-    crYieldRestMC[mtb] =  {#'recoPtRW':getCutYieldFromChain(cRest, mTCutCR, cutFunc=None, weight='weight',weightFunc=lambda c:genPtRWHisto.GetBinContent(genPtRWHisto.FindBin(wRecoPt(c)))),
-                           'nominal': crYRestMC, 'nominalVar':crYRestMCVar}
-    crYData, crYDataVar = getCutYieldFromChain(cDataAnalysis, mTCutCR, cutFunc=None, weight='weight', returnVar=True) 
-    crYieldData[mtb] =  {#'recoPtRW':getCutYieldFromChain(cDataAnalysis, mTCutCR, cutFunc=None, weight='weight',weightFunc=lambda c:genPtRWHisto.GetBinContent(genPtRWHisto.FindBin(wRecoPt(c)))),
-                         'nominal': crYData, 'nominalVar': crYDataVar}
-    srYWMC, srYWMCVar = getCutYieldFromChain(cWJets, mTCutSR, cutFunc=None, weight='weight', returnVar=True)
-    srYieldWMC[mtb] =  {#'recoPtRW':getCutYieldFromChain(cWJets, mTCutSR, cutFunc=None, weight='weight',weightFunc=lambda c:genPtRWHisto.GetBinContent(genPtRWHisto.FindBin(wRecoPt(c)))),
-                        'nominal': srYWMC, 'nominalVar':srYWMCVar}
-    srYRestMC, srYRestMCVar = getCutYieldFromChain(cRest, mTCutSR, cutFunc=None, weight='weight', returnVar=True)
-    srYieldRestMC[mtb] =  {#'recoPtRW':getCutYieldFromChain(cRest, mTCutSR, cutFunc=None, weight='weight',weightFunc=lambda c:genPtRWHisto.GetBinContent(genPtRWHisto.FindBin(wRecoPt(c)))),
-                           'nominal': srYRestMC, 'nominalVar':srYRestMCVar}
-    srYData, srYDataVar = getCutYieldFromChain(cDataAnalysis, mTCutSR, cutFunc=None, weight='weight', returnVar=True)
-    srYieldData[mtb] =  {#'recoPtRW':getCutYieldFromChain(cDataAnalysis, mTCutCR, cutFunc=None, weight='weight',weightFunc=lambda c:genPtRWHisto.GetBinContent(genPtRWHisto.FindBin(wRecoPt(c)))),
-                         'nominal': srYData, 'nominalVar':srYDataVar}
-
-  cutNorm = 'mT>'+str(mTBins[0][0])+'&&mT<='+str(mTBins[0][1])+'&&'+cutSR
-
-  normYWMC, normYWMCVar = getCutYieldFromChain(cWJets, cutNorm, cutFunc=None, weight='weight', returnVar=True)
-  normYieldWMC = {#'recoPtRW':getCutYieldFromChain(cWJets, cutNorm, cutFunc=None, weight='weight',weightFunc=lambda c:genPtRWHisto.GetBinContent(genPtRWHisto.FindBin(wRecoPt(c)))),
-                  'nominal': normYWMC, 'nominalVar':normYWMCVar}
-  normYRestMC, normYRestMCVar = getCutYieldFromChain(cRest, cutNorm, cutFunc=None, weight='weight', returnVar=True)
-  normYieldRestMC = {#'recoPtRW':getCutYieldFromChain(cRest, cutNorm, cutFunc=None, weight='weight',weightFunc=lambda c:genPtRWHisto.GetBinContent(genPtRWHisto.FindBin(wRecoPt(c)))),
-                     'nominal': normYRestMC, 'nominalVar':normYRestMCVar}
-  normYData, normYDataVar = getCutYieldFromChain(cDataAnalysis, cutNorm, cutFunc=None, weight='weight', returnVar=True) 
-  normYieldData = {#'recoPtRW':getCutYieldFromChain(cDataAnalysis, cutNorm, cutFunc=None, weight='weight',weightFunc=lambda c:genPtRWHisto.GetBinContent(genPtRWHisto.FindBin(wRecoPt(c)))),
-                   'nominal': normYData, 'nominalVar':normYDataVar}
-
-  hPred = ROOT.TH1D('pred', 'pred', len(binningCoarse) - 1, array('d',binningCoarse))
-  hPred.Reset()
-  for mtb in mTBins[1:]:
-    wMCSR = srYieldWMC[mtb]['nominal']*(normYieldData['nominal'] - normYieldRestMC['nominal']) / normYieldWMC['nominal']
-    wMCSRVar = wMCSR**2*(srYieldWMC[mtb]['nominalVar']/srYieldWMC[mtb]['nominal']**2 \
-                      + (normYieldData['nominalVar'] + normYieldRestMC['nominalVar'])/(normYieldData['nominalVar'] - normYieldRestMC['nominalVar'])**2 + 
-                      +normYieldWMC['nominalVar']/normYieldWMC['nominal']**2)
-#    print 'wMCSR',wMCSR, '+/-',sqrt(wMCSRVar)
-    wMCCR = crYieldWMC[mtb]['nominal']*(crYieldData[mTBins[0]]['nominal'] - crYieldRestMC[mTBins[0]]['nominal']) / crYieldWMC[mTBins[0]]['nominal']
-    wMCCRVar = wMCCR**2*(crYieldWMC[mtb]['nominalVar']/crYieldWMC[mtb]['nominal']**2 \
-                      + (crYieldData[mTBins[0]]['nominalVar'] + crYieldRestMC[mTBins[0]]['nominalVar'])/(crYieldData[mTBins[0]]['nominal'] - crYieldRestMC[mTBins[0]]['nominal'])**2 + 
-                      +crYieldWMC[mTBins[0]]['nominalVar']/crYieldWMC[mTBins[0]]['nominal']**2)
-#    print 'wMCCR',wMCCR, '+/-',sqrt(wMCCRVar)
-    predictedW = (crYieldData[mtb]['nominal'] - crYieldRestMC[mtb]['nominal']) * wMCSR/wMCCR
-#    print mtb, crYieldData[mtb]['nominal'],'+/-', sqrt(crYieldData[mtb]['nominalVar']), crYieldRestMC[mtb]['nominal'],sqrt(crYieldRestMC[mtb]['nominalVar'])
-#    print mtb, crYieldData[mtb]['nominal']-crYieldRestMC[mtb]['nominal'],'+/-', sqrt(crYieldData[mtb]['nominalVar']+crYieldRestMC[mtb]['nominalVar'])
-    predictedWVar = predictedW**2*((crYieldData[mtb]['nominalVar'] + crYieldRestMC[mtb]['nominalVar'])/(crYieldData[mtb]['nominal'] - crYieldRestMC[mtb]['nominal'])**2 \
-                      + wMCSRVar/wMCSR**2 + wMCCRVar/wMCCR**2)
-    predictedWRelErr = sqrt((crYieldData[mtb]['nominalVar'] + crYieldRestMC[mtb]['nominalVar'])/(crYieldData[mtb]['nominal'] - crYieldRestMC[mtb]['nominal'])**2 \
-                      + wMCSRVar/wMCSR**2 + wMCCRVar/wMCCR**2)
-    hPred.SetBinContent(hPred.FindBin(mtb[0]), predictedW)
-    hPred.SetBinError  (hPred.FindBin(mtb[0]), sqrt(predictedWVar))
-    print predictedW,'+/-',sqrt(predictedWVar), srYieldRestMC[mtb]['nominal'],"+/-",sqrt(srYieldRestMC[mtb]['nominalVar']), srYieldData[mtb]['nominal']
-    print "Tot.:", predictedW + srYieldRestMC[mtb]['nominal'] ,'+/-',sqrt(predictedWVar+srYieldRestMC[mtb]['nominalVar']),  srYieldData[mtb]['nominal']
-
-  return hPred
-
-btagRequirement = 'noloose'
-#btagRequirement = 'def'
-#metb = [150, 350]
-metb = [350, -1]
-htb  = [400, 750]
-#htb  = [750, -1]
-#njetCR = [2,3]
-#njetSR = [4, 4]
-useData = True
-for njetCR in [[2,3]]:
-#  for njetSR in [[4,4], [4,-1], [5,-1]]:
-  for njetSR in [[4,4]]:
-#    for lpdg in ['pos','neg','']:
-    for lpdg in ['pos','neg']:
-      print "\nMET/HT",metb,htb,"Estimating from njet ",njetCR,'to',njetSR,'for pdg',lpdg
-      getPrediction(metb, htb, njetCR, njetSR, lpdg, useData = useData, btagRequirement=btagRequirement)
+#mTBins = [ (binningCoarse[i], binningCoarse[i+1]) for i in range(len(binningCoarse)-2)]+[(binningCoarse[-2],-1)]
+#
+#def getPrediction(metb, htb, njetCR, njetSR, leptonPdg, btagRequirement='def', useData = False):
+#  if useData:
+#    cDataAnalysis = cData
+#  else:
+#    cDataAnalysis = cAllMC
+#
+#  nameCR, cutCR = nameAndCut(metb, htb, njetCR, leptonPdg, btagRequirement=btagRequirement)
+#  nameSR, cutSR = nameAndCut(metb, htb, njetSR, leptonPdg, btagRequirement=btagRequirement)
+#  namePostFix='_to_njet'+str(njetSR[0])
+#  if len(njetSR)>1 and njetSR[1]>0:
+#    namePostFix+='-'+str(njetSR[1])
+##  genPtRWHisto = getObjFromFile('/data/schoef/results2014/T5Lnu_v5_refSelNoNJet_copy_reweightingHistos.root', 'recoPt_'+nameCR+namePostFix)
+#
+#  crYieldWMC = {}
+#  crYieldRestMC = {}
+#  crYieldData = {}
+#  srYieldWMC = {}
+#  srYieldRestMC = {}
+#  srYieldData = {}
+#  for mtb in mTBins:
+#    print "At", mtb, 'SR:', cutSR, 'CR:',cutCR
+#    mTCut = 'mT>'+str(mtb[0])
+#    if mtb[1]>0:
+#      mTCut+='&&mT<='+str(mtb[1])
+#    mTCutCR = mTCut+'&&'+cutCR
+#    mTCutSR = mTCut+'&&'+cutSR
+#    crYWMC, crYWMCVar = getCutYieldFromChain(cWJets, mTCutCR, cutFunc=None, weight='weight', returnVar=True)
+#    crYieldWMC[mtb] =  {#'recoPtRW':getCutYieldFromChain(cWJets, mTCutCR, cutFunc=None, weight='weight',weightFunc=lambda c:genPtRWHisto.GetBinContent(genPtRWHisto.FindBin(wRecoPt(c)))),
+#                        'nominal': crYWMC, 'nominalVar':crYWMCVar}
+#    crYRestMC, crYRestMCVar = getCutYieldFromChain(cRest, mTCutCR, cutFunc=None, weight='weight', returnVar=True)
+#    crYieldRestMC[mtb] =  {#'recoPtRW':getCutYieldFromChain(cRest, mTCutCR, cutFunc=None, weight='weight',weightFunc=lambda c:genPtRWHisto.GetBinContent(genPtRWHisto.FindBin(wRecoPt(c)))),
+#                           'nominal': crYRestMC, 'nominalVar':crYRestMCVar}
+#    crYData, crYDataVar = getCutYieldFromChain(cDataAnalysis, mTCutCR, cutFunc=None, weight='weight', returnVar=True) 
+#    crYieldData[mtb] =  {#'recoPtRW':getCutYieldFromChain(cDataAnalysis, mTCutCR, cutFunc=None, weight='weight',weightFunc=lambda c:genPtRWHisto.GetBinContent(genPtRWHisto.FindBin(wRecoPt(c)))),
+#                         'nominal': crYData, 'nominalVar': crYDataVar}
+#    srYWMC, srYWMCVar = getCutYieldFromChain(cWJets, mTCutSR, cutFunc=None, weight='weight', returnVar=True)
+#    srYieldWMC[mtb] =  {#'recoPtRW':getCutYieldFromChain(cWJets, mTCutSR, cutFunc=None, weight='weight',weightFunc=lambda c:genPtRWHisto.GetBinContent(genPtRWHisto.FindBin(wRecoPt(c)))),
+#                        'nominal': srYWMC, 'nominalVar':srYWMCVar}
+#    srYRestMC, srYRestMCVar = getCutYieldFromChain(cRest, mTCutSR, cutFunc=None, weight='weight', returnVar=True)
+#    srYieldRestMC[mtb] =  {#'recoPtRW':getCutYieldFromChain(cRest, mTCutSR, cutFunc=None, weight='weight',weightFunc=lambda c:genPtRWHisto.GetBinContent(genPtRWHisto.FindBin(wRecoPt(c)))),
+#                           'nominal': srYRestMC, 'nominalVar':srYRestMCVar}
+#    srYData, srYDataVar = getCutYieldFromChain(cDataAnalysis, mTCutSR, cutFunc=None, weight='weight', returnVar=True)
+#    srYieldData[mtb] =  {#'recoPtRW':getCutYieldFromChain(cDataAnalysis, mTCutCR, cutFunc=None, weight='weight',weightFunc=lambda c:genPtRWHisto.GetBinContent(genPtRWHisto.FindBin(wRecoPt(c)))),
+#                         'nominal': srYData, 'nominalVar':srYDataVar}
+#
+#  cutNorm = 'mT>'+str(mTBins[0][0])+'&&mT<='+str(mTBins[0][1])+'&&'+cutSR
+#
+#  normYWMC, normYWMCVar = getCutYieldFromChain(cWJets, cutNorm, cutFunc=None, weight='weight', returnVar=True)
+#  normYieldWMC = {#'recoPtRW':getCutYieldFromChain(cWJets, cutNorm, cutFunc=None, weight='weight',weightFunc=lambda c:genPtRWHisto.GetBinContent(genPtRWHisto.FindBin(wRecoPt(c)))),
+#                  'nominal': normYWMC, 'nominalVar':normYWMCVar}
+#  normYRestMC, normYRestMCVar = getCutYieldFromChain(cRest, cutNorm, cutFunc=None, weight='weight', returnVar=True)
+#  normYieldRestMC = {#'recoPtRW':getCutYieldFromChain(cRest, cutNorm, cutFunc=None, weight='weight',weightFunc=lambda c:genPtRWHisto.GetBinContent(genPtRWHisto.FindBin(wRecoPt(c)))),
+#                     'nominal': normYRestMC, 'nominalVar':normYRestMCVar}
+#  normYData, normYDataVar = getCutYieldFromChain(cDataAnalysis, cutNorm, cutFunc=None, weight='weight', returnVar=True) 
+#  normYieldData = {#'recoPtRW':getCutYieldFromChain(cDataAnalysis, cutNorm, cutFunc=None, weight='weight',weightFunc=lambda c:genPtRWHisto.GetBinContent(genPtRWHisto.FindBin(wRecoPt(c)))),
+#                   'nominal': normYData, 'nominalVar':normYDataVar}
+#
+#  hPred = ROOT.TH1D('pred', 'pred', len(binningCoarse) - 1, array('d',binningCoarse))
+#  hPred.Reset()
+#  for mtb in mTBins[1:]:
+#    wMCSR = srYieldWMC[mtb]['nominal']*(normYieldData['nominal'] - normYieldRestMC['nominal']) / normYieldWMC['nominal']
+#    wMCSRVar = wMCSR**2*(srYieldWMC[mtb]['nominalVar']/srYieldWMC[mtb]['nominal']**2 \
+#                      + (normYieldData['nominalVar'] + normYieldRestMC['nominalVar'])/(normYieldData['nominalVar'] - normYieldRestMC['nominalVar'])**2 + 
+#                      +normYieldWMC['nominalVar']/normYieldWMC['nominal']**2)
+##    print 'wMCSR',wMCSR, '+/-',sqrt(wMCSRVar)
+#    wMCCR = crYieldWMC[mtb]['nominal']*(crYieldData[mTBins[0]]['nominal'] - crYieldRestMC[mTBins[0]]['nominal']) / crYieldWMC[mTBins[0]]['nominal']
+#    wMCCRVar = wMCCR**2*(crYieldWMC[mtb]['nominalVar']/crYieldWMC[mtb]['nominal']**2 \
+#                      + (crYieldData[mTBins[0]]['nominalVar'] + crYieldRestMC[mTBins[0]]['nominalVar'])/(crYieldData[mTBins[0]]['nominal'] - crYieldRestMC[mTBins[0]]['nominal'])**2 + 
+#                      +crYieldWMC[mTBins[0]]['nominalVar']/crYieldWMC[mTBins[0]]['nominal']**2)
+##    print 'wMCCR',wMCCR, '+/-',sqrt(wMCCRVar)
+#    predictedW = (crYieldData[mtb]['nominal'] - crYieldRestMC[mtb]['nominal']) * wMCSR/wMCCR
+##    print mtb, crYieldData[mtb]['nominal'],'+/-', sqrt(crYieldData[mtb]['nominalVar']), crYieldRestMC[mtb]['nominal'],sqrt(crYieldRestMC[mtb]['nominalVar'])
+##    print mtb, crYieldData[mtb]['nominal']-crYieldRestMC[mtb]['nominal'],'+/-', sqrt(crYieldData[mtb]['nominalVar']+crYieldRestMC[mtb]['nominalVar'])
+#    predictedWVar = predictedW**2*((crYieldData[mtb]['nominalVar'] + crYieldRestMC[mtb]['nominalVar'])/(crYieldData[mtb]['nominal'] - crYieldRestMC[mtb]['nominal'])**2 \
+#                      + wMCSRVar/wMCSR**2 + wMCCRVar/wMCCR**2)
+#    predictedWRelErr = sqrt((crYieldData[mtb]['nominalVar'] + crYieldRestMC[mtb]['nominalVar'])/(crYieldData[mtb]['nominal'] - crYieldRestMC[mtb]['nominal'])**2 \
+#                      + wMCSRVar/wMCSR**2 + wMCCRVar/wMCCR**2)
+#    hPred.SetBinContent(hPred.FindBin(mtb[0]), predictedW)
+#    hPred.SetBinError  (hPred.FindBin(mtb[0]), sqrt(predictedWVar))
+#    print predictedW,'+/-',sqrt(predictedWVar), srYieldRestMC[mtb]['nominal'],"+/-",sqrt(srYieldRestMC[mtb]['nominalVar']), srYieldData[mtb]['nominal']
+#    print "Tot.:", predictedW + srYieldRestMC[mtb]['nominal'] ,'+/-',sqrt(predictedWVar+srYieldRestMC[mtb]['nominalVar']),  srYieldData[mtb]['nominal']
+#
+#  return hPred
+#
+#btagRequirement = 'noloose'
+##btagRequirement = 'def'
+##metb = [150, 350]
+#metb = [350, -1]
+#htb  = [400, 750]
+##htb  = [750, -1]
+##njetCR = [2,3]
+##njetSR = [4, 4]
+#useData = True
+#for njetCR in [[2,3]]:
+##  for njetSR in [[4,4], [4,-1], [5,-1]]:
+#  for njetSR in [[4,4]]:
+##    for lpdg in ['pos','neg','']:
+#    for lpdg in ['pos','neg']:
+#      print "\nMET/HT",metb,htb,"Estimating from njet ",njetCR,'to',njetSR,'for pdg',lpdg
+#      getPrediction(metb, htb, njetCR, njetSR, lpdg, useData = useData, btagRequirement=btagRequirement)

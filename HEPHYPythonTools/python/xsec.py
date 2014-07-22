@@ -136,9 +136,10 @@ xsec["8TeV-QCD-Pt470to600-MuEnrichedPt5"]       =       115.2*0.1024
 xsec["8TeV-QCD-Pt600to800-MuEnrichedPt5"]       =       27.01*0.0996
 xsec["8TeV-QCD-Pt800to1000-MuEnrichedPt5"]      =       3.57*0.1033
 xsec["8TeV-QCD-Pt80to120-MuEnrichedPt5"]        =       1024000.0*0.0395
-xsec["8TeV-ZJetsToNuNu-HT50to100"] =  452.75 
+xsec["8TeV-ZJetsToNuNu-HT50to100"] =  452.75 #NNLO https://twiki.cern.ch/twiki/bin/viewauth/CMS/SUSYJetsMETTausAnalysis2012 
 xsec["8TeV-ZJetsToNuNu-HT100to200"] = 190.39
 xsec["8TeV-ZJetsToNuNu-HT200to400"] = 49.28
+xsec["8TeV-ZJetsToNuNu-HT200-400"] = 49.28
 xsec["8TeV-ZJetsToNuNu-HT400"] = 6.26
 
 xsec["8TeV-QCD_Pt-5to15"]                       =       4.2639499*(10**10)
@@ -169,10 +170,11 @@ xsec["8TeV-QCD_BCtoE_Pt_170_250"]              =        30980.0*0.0204
 xsec["8TeV-QCD_BCtoE_Pt_250_350"]              =        4250.0*0.0243
 xsec["8TeV-QCD_BCtoE_Pt_350"]                  =        811.0*0.0295
 
-xsec["8TeV-ZJetsToNuNu-HT50to100"] = 381.2
-xsec["8TeV-ZJetsToNuNu-HT100to200"] = 160.3
-xsec["8TeV-ZJetsToNuNu-HT200to400"] = 41.49
-xsec["8TeV-ZJetsToNuNu-HT400"] = 5.274
+#xsec["8TeV-ZJetsToNuNu-HT50to100"] = 381.2
+#xsec["8TeV-ZJetsToNuNu-HT100to200"] = 160.3
+#xsec["8TeV-ZJetsToNuNu-HT200to400"] = 41.49
+#xsec["8TeV-ZJetsToNuNu-HT200-400"] = 41.49
+#xsec["8TeV-ZJetsToNuNu-HT400"] = 5.274
 xsec["8TeV-WW"] = 54.838
 xsec["8TeV-WZ"] = 32.3 
 xsec["8TeV-ZZ"] = 7.7 

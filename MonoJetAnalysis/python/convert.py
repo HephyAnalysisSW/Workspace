@@ -2,7 +2,7 @@ import ROOT
 from DataFormats.FWLite import Events, Handle
 from PhysicsTools.PythonAnalysis import *
 from math import *
-import sys, os, copy, random
+import sys, os, copy, random, subprocess
 from datetime import datetime
 #from helpers import getVarValue, deltaPhi, minAbsDeltaPhi,  deltaR, invMass,
 from Workspace.HEPHYPythonTools.helpers import getVarValue, deltaPhi, minAbsDeltaPhi, invMassOfLightObjects, deltaR, closestMuJetDeltaR, invMass,  findClosestJet
@@ -23,6 +23,8 @@ parser.add_option("--smsMsqRange", dest="smsMsqRangeString", default="None", typ
 parser.add_option("--small", dest="small", action="store_true", help="Just do a small subset.")
 parser.add_option("--fromPercentage", dest="fromPercentage", default="0", type="int", action="store", help="from (% of tot. events)")
 parser.add_option("--toPercentage", dest="toPercentage", default="100", type="int", action="store", help="to (% of tot. events)")
+parser.add_option("--keepPDFWeights", dest="keepPDFWeights", action="store_true", help="keep PDF Weights?")
+ 
 
 (options, args) = parser.parse_args()
 print "options: chmode",options.chmode, "jermode",options.jermode, "jesmode",options.jesmode
@@ -81,7 +83,7 @@ def jerSigmaMCRel(pt, eta):
 
 from Workspace.HEPHYPythonTools.xsec import xsec
 
-subDir = "monoJetTuples_v7"
+subDir = "monoJetTuples_v8"
 
 
 if options.smsMsqRangeString!='None' and options.allsamples.lower()=='sms':
@@ -96,15 +98,15 @@ if options.smsMsqRangeString!='None' and options.allsamples.lower()=='sms':
 
     b = None 
     if msq>=100 and msq<=150:
-      b = "T2DegenerateStop_2J_mStop-100to150"
+      b = "T2DegenerateStop_2J_mStop-100to150-4"
     if msq>=175 and msq<=225:
-      b = "T2DegenerateStop_2J_mStop-175to225"
+      b = "T2DegenerateStop_2J_mStop-175to225-4"
     if msq>=250 and msq<=300:
       b = "T2DegenerateStop_2J_mStop-250to300-4"
     if msq>=325 and msq<=375:
-      b = "T2DegenerateStop_2J_mStop-325to375"
+      b = "T2DegenerateStop_2J_mStop-325to375-4"
     if msq>=400:
-      b = "T2DegenerateStop_2J_mStop-400-2"
+      b = "T2DegenerateStop_2J_mStop-400-4"
 
     if not b: 
       print "Don't know which bin on dpm for msq",msq
@@ -114,7 +116,7 @@ if options.smsMsqRangeString!='None' and options.allsamples.lower()=='sms':
 #    for deltaM in [100]:
       T2DegStop = {}  
       T2DegStop={}
-      T2DegStop["dirname"] = "/dpm/oeaw.ac.at/home/cms/store/user/schoef/pat_140314/"
+      T2DegStop["dirname"] = "/dpm/oeaw.ac.at/home/cms/store/user/schoef/pat_240614/"
       T2DegStop['newMETCollection'] = True
       T2DegStop["Chain"] = "Events"
       name = "T2DegStop_"+str(msq)+"_"+str(msq-deltaM)
@@ -437,23 +439,27 @@ for sample in allSamples:
         filelist = os.listdir(subdirname)
       else:
         filelist = []
-        allFiles = os.popen("rfdir %s | awk '{print $9}'" % (subdirname))
-        for file in allFiles.readlines():
-          file = file.rstrip()
-          filelist.append(file)
+        p = subprocess.Popen(["dpns-ls "+ subdirname], shell = True , stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        for line in p.stdout.readlines():
+          filelist.append(line[:-1])
+#        allFiles = os.popen("rfdir %s | awk '{print $9}'" % (subdirname))
+#        for file in allFiles.readlines():
+#          print file
+#          file = file.rstrip()
+#          filelist.append(file)
         prefix = "root://hephyse.oeaw.ac.at/"#+subdirname
       if options.small: filelist = filelist[:10]
       for tfile in filelist:
           sample['filenames'][bin].append(subdirname+tfile)
 
     if options.allsamples.lower()=='sms':
-      c = ROOT.TChain(sample['Chain'])
+      c_ = ROOT.TChain(sample['Chain'])
       for tfile in sample['filenames'][bin]:
         print "Adding",prefix+tfile
-        c.Add(prefix+tfile)
-      nevents = c.GetEntries(sample['additionalCut'])
-      print nevents, sample['additionalCut']
-      del c
+        c_.Add(prefix+tfile)
+      nevents = c_.GetEntries(sample['additionalCut'])
+      print nevents,'found with requirement', sample['additionalCut']
+      del c_
     else:
       d = ROOT.TChain('Runs')
       for tfile in sample['filenames'][bin]:
@@ -509,7 +515,6 @@ for isample, sample in enumerate(allSamples):
   jetvars = ["jetPt", "jetEta", "jetPhi", "jetPdg", "jetBtag", "jetCutBasedPUJetIDFlag","jetFull53XPUJetIDFlag","jetMET53XPUJetIDFlag", "jetChef", "jetNhef", "jetCeef", "jetNeef", "jetHFhef", "jetHFeef", "jetMuef", "jetElef", "jetPhef", "jetISRJetID", "jetUnc"]
   muvars = ["muPt", "muEta", "muPhi", "muPdg", "muRelIso", "muDxy", "muDz", "muNormChi2", "muNValMuonHits", "muNumMatchedStations", "muPixelHits", "muNumtrackerLayerWithMeasurement", 'muIsGlobal', 'muIsTracker', 'muWPt']
   muvars+= ["muMT", "muClosestJetDeltaR", "muClosestJetMass", "muPBoost3D", "muIgpMatch"]
-
   elvars = ["elPt", "elEta", "elPhi", "elPdg", "elRelIso", "elDxy", "elDz"]
   tavars = ["taPt", "taEta", "taPhi", "taPdg"]
   if not sample['name'].lower().count('data'):
@@ -524,23 +529,36 @@ for isample, sample in enumerate(allSamples):
 #  extraVariables += ["looseMuIndex", "mediumMuIndex", "tightMuIndex"]
   extraVariables += ["nSoftMuonsLooseWP","nHardMuonsLooseWP","nSoftMuonsMediumWP","nHardMuonsMediumWP","nSoftMuonsTightWP","nHardMuonsTightWP"]
   extraVariables += ["nHardbtags", "nSoftbtags"]
-
+  if bin.lower().count('singlemu'):
+    extraVariables+=['L1ETM40']
   if not bin.lower().count('run'):
     btagVars=[]
     for i in range(maxConsideredBTagWeight+1):
-      btagVars.append("weightBTag"+str(i)+"")
-      btagVars.append("weightBTag"+str(i)+"_SF")
-      btagVars.append("weightBTag"+str(i)+"_SF_b_Up")
-      btagVars.append("weightBTag"+str(i)+"_SF_b_Down")
-      btagVars.append("weightBTag"+str(i)+"_SF_light_Up")
-      btagVars.append("weightBTag"+str(i)+"_SF_light_Down")
+      btagVars.append("weightSBTag"+str(i)+"")
+      btagVars.append("weightSBTag"+str(i)+"_SF")
+      btagVars.append("weightSBTag"+str(i)+"_SF_b_Up")
+      btagVars.append("weightSBTag"+str(i)+"_SF_b_Down")
+      btagVars.append("weightSBTag"+str(i)+"_SF_light_Up")
+      btagVars.append("weightSBTag"+str(i)+"_SF_light_Down")
+      btagVars.append("weightHBTag"+str(i)+"")
+      btagVars.append("weightHBTag"+str(i)+"_SF")
+      btagVars.append("weightHBTag"+str(i)+"_SF_b_Up")
+      btagVars.append("weightHBTag"+str(i)+"_SF_b_Down")
+      btagVars.append("weightHBTag"+str(i)+"_SF_light_Up")
+      btagVars.append("weightHBTag"+str(i)+"_SF_light_Down")
       if i>0:
-        btagVars.append("weightBTag"+str(i)+"p")
-        btagVars.append("weightBTag"+str(i)+"p_SF")
-        btagVars.append("weightBTag"+str(i)+"p_SF_b_Up")
-        btagVars.append("weightBTag"+str(i)+"p_SF_b_Down")
-        btagVars.append("weightBTag"+str(i)+"p_SF_light_Up")
-        btagVars.append("weightBTag"+str(i)+"p_SF_light_Down")
+        btagVars.append("weightSBTag"+str(i)+"p")
+        btagVars.append("weightSBTag"+str(i)+"p_SF")
+        btagVars.append("weightSBTag"+str(i)+"p_SF_b_Up")
+        btagVars.append("weightSBTag"+str(i)+"p_SF_b_Down")
+        btagVars.append("weightSBTag"+str(i)+"p_SF_light_Up")
+        btagVars.append("weightSBTag"+str(i)+"p_SF_light_Down")
+        btagVars.append("weightHBTag"+str(i)+"p")
+        btagVars.append("weightHBTag"+str(i)+"p_SF")
+        btagVars.append("weightHBTag"+str(i)+"p_SF_b_Up")
+        btagVars.append("weightHBTag"+str(i)+"p_SF_b_Down")
+        btagVars.append("weightHBTag"+str(i)+"p_SF_light_Up")
+        btagVars.append("weightHBTag"+str(i)+"p_SF_light_Down")
     extraVariables+=btagVars
 
 #  extraVariables += ["softIsolatedMuPt", "softIsolatedMuEta", "softIsolatedMuPhi", "softIsolatedMuPdg", "softIsolatedMuRelIso", "softIsolatedMuDxy", "softIsolatedMuDz",  'softIsolatedMuNormChi2', 'softIsolatedMuNValMuonHits', 'softIsolatedMuNumMatchedStations', 'softIsolatedMuPixelHits', 'softIsolatedMuNumtrackerLayerWithMeasurement', 'softIsolatedMuIsTracker', 'softIsolatedMuIsGlobal']
@@ -569,6 +587,9 @@ for isample, sample in enumerate(allSamples):
       structString +="Int_t ngp;"
       for var in mcvars:
         structString +="Float_t "+var+"[30];"
+    if options.keepPDFWeights:
+      structString +="Float_t cteqWeights[45];Float_t mstwWeights[41];Float_t nnpdfWeights[101];"
+
   structString   +="};"
 #  print structString
 
@@ -587,7 +608,9 @@ for isample, sample in enumerate(allSamples):
   if os.path.isfile(ofile) and not overwrite:
     print ofile, "already there! Skipping!!!"
     continue
-  chain_gDir = ROOT.gDirectory.func() 
+  pyroot_gDir = ROOT.gDirectory.func()
+#  f = ROOT.TFile(ofile, "recreate")
+  chain_gDir = ROOT.gDirectory.func()
   t = ROOT.TTree( "Events", "Events", 1 )
   t.Branch("event",   ROOT.AddressOf(s,"event"), 'event/l')
   for var in variables:
@@ -623,6 +646,11 @@ for isample, sample in enumerate(allSamples):
       t.Branch("ngp",   ROOT.AddressOf(s,"ngp"), 'ngp/I')
       for var in mcvars:
         t.Branch(var,   ROOT.AddressOf(s,var), var+'[ngp]/F')
+    if options.keepPDFWeights:
+      t.Branch('cteqWeights',   ROOT.AddressOf(s,'cteqWeights'), 'cteqWeights[45]/F')
+      t.Branch('mstwWeights',   ROOT.AddressOf(s,'mstwWeights'), 'mstwWeights[41]/F')
+      t.Branch('nnpdfWeights',   ROOT.AddressOf(s,'nnpdfWeights'), 'nnpdfWeights[101]/F')
+  pyroot_gDir.cd()
 
   for bin_ in sample["bins"]:
     commoncf = ""
@@ -632,6 +660,8 @@ for isample, sample in enumerate(allSamples):
       commoncf = "(1)"
     if options.chmode[:7] == "copyMu":
       commoncf = "ngoodMuons==1"
+    if options.chmode[:8] == "copyDiMu":
+      commoncf = "ngoodMuons>1"
     #  storeVectors = False
     if type(bin_) == type([]):
       bin = bin_[0]
@@ -732,12 +762,11 @@ for isample, sample in enumerate(allSamples):
           for var in variables[1:]:
             getVar = var
             exec("s."+var+"="+str(getVarValue(c, getVar)).replace("nan","float('nan')"))
+          s.event = long(c.GetLeaf(c.GetAlias('event')).GetValue())
           if options.allsamples.lower()=='sms':
             s.osetMN, s.osetMC = s.osetMC, s.osetMN# swap, because I misinterpreted the model string
-            
-#            for var in ['osetMgl', 'osetMN', 'osetMC', 'osetMsq']:
-#              print s.event, var, getVarValue(c, var)
-          s.event = long(c.GetLeaf(c.GetAlias('event')).GetValue())
+#          for var in ['osetMgl', 'osetMN', 'osetMC', 'osetMsq']:
+#            print s.event, var, eval('s.'+var)
           if not sample['name'].lower().count('data'):
             nvtxWeightSysPlus, nvtxWeightSysMinus, nvtxWeight = 1.,1.,1.
             if sample.has_key('reweightingHistoFile'): 
@@ -779,15 +808,17 @@ for isample, sample in enumerate(allSamples):
           s.nSoftMuonsTightWP = len(filter(lambda m:hybridIso(m, 'tight'), softMuons)) 
           s.nHardMuonsTightWP = len(filter(lambda m:hybridIso(m, 'tight'), hardMuons)) 
 
-          s.looseMuIndex = next((i for i in range(len(muCandidates)) if hybridIso(muCandidates[i], 'loose')), -1) 
-          s.mediumMuIndex =next((i for i in range(len(muCandidates)) if hybridIso(muCandidates[i], 'medium')), -1) 
-          s.tightMuIndex = next((i for i in range(len(muCandidates)) if hybridIso(muCandidates[i], 'tight')), -1) 
+          s.looseMuIndex = next((i for i in range(len(allGoodMuons)) if (allGoodMuons[i]['Dxy']<0.02 and hybridIso(allGoodMuons[i], 'loose'))), -1) 
+          s.mediumMuIndex =next((i for i in range(len(allGoodMuons)) if (allGoodMuons[i]['Dxy']<0.02 and hybridIso(allGoodMuons[i], 'medium'))), -1) 
+          s.tightMuIndex = next((i for i in range(len(allGoodMuons)) if (allGoodMuons[i]['Dxy']<0.02 and hybridIso(allGoodMuons[i], 'tight'))), -1) 
 
           s.nSoftElectrons = len(softElectrons)
           s.nHardElectrons = len(hardElectrons)
           s.nSoftTaus = len(softTaus)
           s.nHardTaus = len(hardTaus)
 
+          if bin.lower().count('singlemu'):
+            s.L1ETM40 = getVarValue(c, 'l1DecisionWord', 79)
           if options.chmode.count("CleanedWithAllLeptons"):
             jResult = getGoodJets(c, allGoodMuons + allGoodElectrons, jermode=options.jermode, jesmode=options.jesmode)
           else:
@@ -897,7 +928,6 @@ for isample, sample in enumerate(allSamples):
               if not sample['name'].lower().count('data'):
                 s.muIgpMatch[i] = assignMuIgp(i,s)
 ###################
-             
 
             s.nelCount = min(10,s.nel)
             for i in xrange(s.nelCount):
@@ -915,16 +945,31 @@ for isample, sample in enumerate(allSamples):
               s.taEta[i] = allGoodTaus[i]['eta']
               s.taPhi[i] = allGoodTaus[i]['phi']
               s.taPdg[i] = allGoodTaus[i]['pdg']
+            if options.keepPDFWeights:
+              for i in range(45):
+                s.cteqWeights[i]=getVarValue(c, 'cteqWeights',i)
+              for i in range(41):
+                s.mstwWeights[i]=getVarValue(c, 'mstwWeights',i)
+              for i in range(101):
+                s.nnpdfWeights[i]=getVarValue(c, 'nnpdfWeights',i)
             if not bin.lower().count('run'):
               zeroTagWeight = 1.
-              bjetCandidates=filter(lambda j:abs(j['eta'])<2.4, idJets30)
-              mceff = getMCEfficiencyForBTagSF(bjetCandidates, sample['isFastSim'])
-              mceffW                = getTagWeightDict(mceff["mceffs"], maxConsideredBTagWeight)
-              mceffW_SF             = getTagWeightDict(mceff["mceffs_SF"], maxConsideredBTagWeight)
-              mceffW_SF_b_Up        = getTagWeightDict(mceff["mceffs_SF_b_Up"], maxConsideredBTagWeight)
-              mceffW_SF_b_Down      = getTagWeightDict(mceff["mceffs_SF_b_Down"], maxConsideredBTagWeight)
-              mceffW_SF_light_Up    = getTagWeightDict(mceff["mceffs_SF_light_Up"], maxConsideredBTagWeight)
-              mceffW_SF_light_Down  = getTagWeightDict(mceff["mceffs_SF_light_Down"], maxConsideredBTagWeight)
+              bjetSCandidates=filter(lambda j:abs(j['eta'])<2.4 and j['pt']<60, idJets30)
+              bjetHCandidates=filter(lambda j:abs(j['eta'])<2.4 and j['pt']>=60, idJets30)
+              mcSeff = getMCEfficiencyForBTagSF(bjetSCandidates, sample['isFastSim'])
+              mcSeffW                = getTagWeightDict(mcSeff["mceffs"], maxConsideredBTagWeight)
+              mcSeffW_SF             = getTagWeightDict(mcSeff["mceffs_SF"], maxConsideredBTagWeight)
+              mcSeffW_SF_b_Up        = getTagWeightDict(mcSeff["mceffs_SF_b_Up"], maxConsideredBTagWeight)
+              mcSeffW_SF_b_Down      = getTagWeightDict(mcSeff["mceffs_SF_b_Down"], maxConsideredBTagWeight)
+              mcSeffW_SF_light_Up    = getTagWeightDict(mcSeff["mceffs_SF_light_Up"], maxConsideredBTagWeight)
+              mcSeffW_SF_light_Down  = getTagWeightDict(mcSeff["mceffs_SF_light_Down"], maxConsideredBTagWeight)
+              mcHeff = getMCEfficiencyForBTagSF(bjetHCandidates, sample['isFastSim'])
+              mcHeffW                = getTagWeightDict(mcHeff["mceffs"], maxConsideredBTagWeight)
+              mcHeffW_SF             = getTagWeightDict(mcHeff["mceffs_SF"], maxConsideredBTagWeight)
+              mcHeffW_SF_b_Up        = getTagWeightDict(mcHeff["mceffs_SF_b_Up"], maxConsideredBTagWeight)
+              mcHeffW_SF_b_Down      = getTagWeightDict(mcHeff["mceffs_SF_b_Down"], maxConsideredBTagWeight)
+              mcHeffW_SF_light_Up    = getTagWeightDict(mcHeff["mceffs_SF_light_Up"], maxConsideredBTagWeight)
+              mcHeffW_SF_light_Down  = getTagWeightDict(mcHeff["mceffs_SF_light_Down"], maxConsideredBTagWeight)
 #              print "mceffW                 ", mceffW
 #              print "mceffW_SF              ", mceffW_SF
 #              print "mceffW_SF_b_Up       ", mceffW_SF_b_Up
@@ -933,35 +978,61 @@ for isample, sample in enumerate(allSamples):
 #              print "mceffW_SF_light_Down ", mceffW_SF_light_Down
 #              print
               for i in range(1, maxConsideredBTagWeight+1):
-                exec("s.weightBTag"+str(i)+"p=1")
-                exec("s.weightBTag"+str(i)+"p_SF=1")
-                exec("s.weightBTag"+str(i)+"p_SF_b_Up=1")
-                exec("s.weightBTag"+str(i)+"p_SF_b_Down=1")
-                exec("s.weightBTag"+str(i)+"p_SF_light_Up=1")
-                exec("s.weightBTag"+str(i)+"p_SF_light_Down=1")
+                exec("s.weightSBTag"+str(i)+"p=1")
+                exec("s.weightSBTag"+str(i)+"p_SF=1")
+                exec("s.weightSBTag"+str(i)+"p_SF_b_Up=1")
+                exec("s.weightSBTag"+str(i)+"p_SF_b_Down=1")
+                exec("s.weightSBTag"+str(i)+"p_SF_light_Up=1")
+                exec("s.weightSBTag"+str(i)+"p_SF_light_Down=1")
+                exec("s.weightHBTag"+str(i)+"p=1")
+                exec("s.weightHBTag"+str(i)+"p_SF=1")
+                exec("s.weightHBTag"+str(i)+"p_SF_b_Up=1")
+                exec("s.weightHBTag"+str(i)+"p_SF_b_Down=1")
+                exec("s.weightHBTag"+str(i)+"p_SF_light_Up=1")
+                exec("s.weightHBTag"+str(i)+"p_SF_light_Down=1")
               for i in range(maxConsideredBTagWeight+1):
-                exec("s.weightBTag"+str(i)+"="+str(mceffW[i]))
-                exec("s.weightBTag"+str(i)+"_SF="+str(mceffW_SF[i]))
-                exec("s.weightBTag"+str(i)+"_SF_b_Up="+str(mceffW_SF_b_Up[i]))
-                exec("s.weightBTag"+str(i)+"_SF_b_Down="+str(mceffW_SF_b_Down[i]))
-                exec("s.weightBTag"+str(i)+"_SF_light_Up="+str(mceffW_SF_light_Up[i]))
-                exec("s.weightBTag"+str(i)+"_SF_light_Down="+str(mceffW_SF_light_Down[i]))
+                exec("s.weightSBTag"+str(i)+"="+str(mcSeffW[i]))
+                exec("s.weightSBTag"+str(i)+"_SF="+str(mcSeffW_SF[i]))
+                exec("s.weightSBTag"+str(i)+"_SF_b_Up="+str(mcSeffW_SF_b_Up[i]))
+                exec("s.weightSBTag"+str(i)+"_SF_b_Down="+str(mcSeffW_SF_b_Down[i]))
+                exec("s.weightSBTag"+str(i)+"_SF_light_Up="+str(mcSeffW_SF_light_Up[i]))
+                exec("s.weightSBTag"+str(i)+"_SF_light_Down="+str(mcSeffW_SF_light_Down[i]))
+                exec("s.weightHBTag"+str(i)+"="+str(mcHeffW[i]))
+                exec("s.weightHBTag"+str(i)+"_SF="+str(mcHeffW_SF[i]))
+                exec("s.weightHBTag"+str(i)+"_SF_b_Up="+str(mcHeffW_SF_b_Up[i]))
+                exec("s.weightHBTag"+str(i)+"_SF_b_Down="+str(mcHeffW_SF_b_Down[i]))
+                exec("s.weightHBTag"+str(i)+"_SF_light_Up="+str(mcHeffW_SF_light_Up[i]))
+                exec("s.weightHBTag"+str(i)+"_SF_light_Down="+str(mcHeffW_SF_light_Down[i]))
                 for j in range(i+1, maxConsideredBTagWeight+1):
-                  exec("s.weightBTag"+str(j)+"p               -="+str(mceffW[i]))
-                  exec("s.weightBTag"+str(j)+"p_SF            -="+str(mceffW_SF[i]))
-                  exec("s.weightBTag"+str(j)+"p_SF_b_Up       -="+str(mceffW_SF_b_Up[i]))
-                  exec("s.weightBTag"+str(j)+"p_SF_b_Down     -="+str(mceffW_SF_b_Down[i]))
-                  exec("s.weightBTag"+str(j)+"p_SF_light_Up   -="+str(mceffW_SF_light_Up[i]))
-                  exec("s.weightBTag"+str(j)+"p_SF_light_Down -="+str(mceffW_SF_light_Down[i]))
+                  exec("s.weightSBTag"+str(j)+"p               -="+str(mcSeffW[i]))
+                  exec("s.weightSBTag"+str(j)+"p_SF            -="+str(mcSeffW_SF[i]))
+                  exec("s.weightSBTag"+str(j)+"p_SF_b_Up       -="+str(mcSeffW_SF_b_Up[i]))
+                  exec("s.weightSBTag"+str(j)+"p_SF_b_Down     -="+str(mcSeffW_SF_b_Down[i]))
+                  exec("s.weightSBTag"+str(j)+"p_SF_light_Up   -="+str(mcSeffW_SF_light_Up[i]))
+                  exec("s.weightSBTag"+str(j)+"p_SF_light_Down -="+str(mcSeffW_SF_light_Down[i]))
+                  exec("s.weightHBTag"+str(j)+"p               -="+str(mcHeffW[i]))
+                  exec("s.weightHBTag"+str(j)+"p_SF            -="+str(mcHeffW_SF[i]))
+                  exec("s.weightHBTag"+str(j)+"p_SF_b_Up       -="+str(mcHeffW_SF_b_Up[i]))
+                  exec("s.weightHBTag"+str(j)+"p_SF_b_Down     -="+str(mcHeffW_SF_b_Down[i]))
+                  exec("s.weightHBTag"+str(j)+"p_SF_light_Up   -="+str(mcHeffW_SF_light_Up[i]))
+                  exec("s.weightHBTag"+str(j)+"p_SF_light_Down -="+str(mcHeffW_SF_light_Down[i]))
 
 
-          tmpDir = ROOT.gDirectory.func()
-          chain_gDir.cd()
+#          tmpDir = ROOT.gDirectory.func()
+#          chain_gDir.cd()
 #          print s.type1phiMet
 #          if s.type1phiMet<150:
 #            print "Warning!!"
+          tmpDir = ROOT.gDirectory.func()
+          chain_gDir.cd()
           t.Fill()
           tmpDir.cd()
+
+#          dbf = ROOT.gDirectory.func()
+#          f.cd()
+#          print 'before',dbf,'now',ROOT.gDirectory.func(), 'go back to',pyroot_gDir
+#          t.Fill()
+#          pyroot_gDir.cd()
 #          if s.type1phiMet<150:
 #            print "Warning", s.type1phiMet
 #          else:
@@ -974,6 +1045,11 @@ for isample, sample in enumerate(allSamples):
     f = ROOT.TFile(ofile, "recreate")
     t.Write()
     f.Close()
+#    f.cd()
+#    t.Write()
+#    f.Close()
+#    pyroot_gDir.cd()
+#    if t:t.IsA().Destructor(t)
     print "Written",ofile
   else:
     print "No saving when small!"

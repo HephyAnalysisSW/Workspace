@@ -73,9 +73,9 @@ else:
 isMC = (options.mode.lower()=='sms' or options.mode.lower()=='mc')
 jec = []
 if isMC:
-  jec = ['L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual']
-else:
   jec = ['L1FastJet', 'L2Relative', 'L3Absolute']
+else:
+  jec = ['L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual']
 
 print "mode",options.mode,"isMC?",isMC, ", verbose?",options.verbose,'keepPFCandidates?', options.keepPFCandidates, ", JEC:",jec,", GT",options.GT, ", triggers", options.triggers, 'addPDFWeights?',options.addPDFWeights
 
