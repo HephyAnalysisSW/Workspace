@@ -11,7 +11,7 @@ JetTupelizer = cms.EDProducer ( "JetTupelizer",
         cms.untracked.PSet(accessTag = cms.untracked.string("vtxNtracks"), 
                            storeTag = cms.untracked.string("VtxNtracks")),
         cms.untracked.PSet(accessTag = cms.untracked.string("pileupJetId:fullDiscriminant"), 
-                 storeTag = cms.untracked.string("PUJetIDFull")),
+                           storeTag = cms.untracked.string("PUJetIDFull")),
     ),
 
     #jetBProbabilityBJetTags, jetProbabilityBJetTags, trackCountingHighPurBJetTags, 
