@@ -2,7 +2,7 @@ import ROOT
 from DataFormats.FWLite import Events, Handle
 from PhysicsTools.PythonAnalysis import *
 from math import *
-import sys, os, copy, random
+import sys, os, copy, random, subprocess
 from datetime import datetime
 #from helpers import getVarValue, deltaPhi, minAbsDeltaPhi,  deltaR, invMass,
 from Workspace.HEPHYPythonTools.helpers import getVarValue, deltaPhi, minAbsDeltaPhi, invMassOfLightObjects, deltaR, closestMuJetDeltaR, invMass,  findClosestJet
@@ -439,10 +439,14 @@ for sample in allSamples:
         filelist = os.listdir(subdirname)
       else:
         filelist = []
-        allFiles = os.popen("rfdir %s | awk '{print $9}'" % (subdirname))
-        for file in allFiles.readlines():
-          file = file.rstrip()
-          filelist.append(file)
+        p = subprocess.Popen(["dpns-ls "+ subdirname], shell = True , stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        for line in p.stdout.readlines():
+          filelist.append(line[:-1])
+#        allFiles = os.popen("rfdir %s | awk '{print $9}'" % (subdirname))
+#        for file in allFiles.readlines():
+#          print file
+#          file = file.rstrip()
+#          filelist.append(file)
         prefix = "root://hephyse.oeaw.ac.at/"#+subdirname
       if options.small: filelist = filelist[:10]
       for tfile in filelist:

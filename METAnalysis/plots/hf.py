@@ -4,7 +4,7 @@ import numpy as np
 import pickle, os
 from scipy import optimize
 from optparse import OptionParser
-from localInfo import userName
+from localInfo import userName, nfsName
 
 parser = OptionParser()
 parser.add_option("--sample", dest="sample", default="dy53X", type="string", action="store", help="samples:Which samples.")
