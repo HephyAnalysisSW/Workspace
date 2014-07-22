@@ -56,9 +56,4 @@
 </library>
 <library   file="multMETCorrInfoWriter.cc" name="multMETCorrInfoWriter">
   <flags   EDM_PLUGIN="1"/>
-<<<<<<< HEAD:HEPHYCMSSWTools/plugins/BuildFile.xml
 </library>
-=======
-  </library>
-
->>>>>>> master:HEPHYCommonTools/plugins/BuildFile.xml
