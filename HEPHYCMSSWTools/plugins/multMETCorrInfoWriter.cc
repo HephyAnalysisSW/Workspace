@@ -12,6 +12,7 @@ multMETCorrInfoWriter::multMETCorrInfoWriter( const edm::ParameterSet & cfg ): m
   pflowToken_ = consumes<std::vector<reco::PFCandidate> >(cfg.getParameter<edm::InputTag>("srcPFlow"));
 
   cfgCorrParameters_ = cfg.getParameter<std::vector<edm::ParameterSet> >("parameters");
+//  etaNBins_.clear();
   etaMin_.clear();
   etaMax_.clear();
   type_.clear();
@@ -20,11 +21,16 @@ multMETCorrInfoWriter::multMETCorrInfoWriter( const edm::ParameterSet & cfg ): m
   MEx_.clear();
   MEy_.clear();
   for (std::vector<edm::ParameterSet>::const_iterator v = cfgCorrParameters_.begin(); v!=cfgCorrParameters_.end(); v++) {
+    int etaNBins = v->getParameter<int>("etaNBins");
     double etaMin = v->getParameter<double>("etaMin");
     double etaMax = v->getParameter<double>("etaMax");
+    int phiNBins = v->getParameter<int>("phiNBins");
+    double phiMin = v->getParameter<double>("phiMin");
+    double phiMax = v->getParameter<double>("phiMax");
     int nMin = v->getParameter<int>("nMin");
     int nMax = v->getParameter<int>("nMax");
     int nbins = v->getParameter<double>("nbins");
+//    etaNBins_.push_back(etaNBins);
     etaMin_.push_back(etaMin);
     etaMax_.push_back(etaMax);
     nbins_.push_back(nbins);
@@ -36,6 +42,11 @@ multMETCorrInfoWriter::multMETCorrInfoWriter( const edm::ParameterSet & cfg ): m
     profile_x_.push_back(fs->make<TProfile>(std::string(moduleLabel_).append("_").append(v->getParameter<std::string>("name")).append("_Px").c_str(),"Px", nbins, nMin, nMax, -300,300));
     profile_y_.push_back(fs->make<TProfile>(std::string(moduleLabel_).append("_").append(v->getParameter<std::string>("name")).append("_Py").c_str(),"Py", nbins, nMin, nMax, -300,300));
 
+    occupancy_.push_back(fs->make<TH2F>(std::string(moduleLabel_).append("_").append(v->getParameter<std::string>("name")).append("_occupancy").c_str(),"occupancy",  etaNBins, etaMin, etaMax, phiNBins, phiMin, phiMax));
+    energy_.push_back(fs->make<TH2F>(std::string(moduleLabel_).append("_").append(v->getParameter<std::string>("name")).append("_energy").c_str(),"energy",           etaNBins, etaMin, etaMax, phiNBins, phiMin, phiMax));
+    pt_.push_back(fs->make<TH2F>(std::string(moduleLabel_).append("_").append(v->getParameter<std::string>("name")).append("_pt").c_str(),"pt",                       etaNBins, etaMin, etaMax, phiNBins, phiMin, phiMax));
+
+    multiplicity_.push_back(fs->make<TH1F>(std::string(moduleLabel_).append("_").append(v->getParameter<std::string>("name")).append("_multiplicity").c_str(),"multiplicity", nbins, nMin, nMax));
   }
 }
 
@@ -57,6 +68,10 @@ void multMETCorrInfoWriter::analyze( const edm::Event& evt, const edm::EventSetu
           counts_[j]+=1;
           MEx_[j]-=c.px();
           MEy_[j]-=c.py();
+
+          pt_[j]->Fill(c.eta(), c.phi(), c.pt()); 
+          energy_[j]->Fill(c.eta(), c.phi(), c.energy()); 
+          occupancy_[j]->Fill(c.eta(), c.phi()); 
         }
       }
     }
@@ -66,6 +81,7 @@ void multMETCorrInfoWriter::analyze( const edm::Event& evt, const edm::EventSetu
 //    std::cout<<"j "<<j<<" "<<v->getParameter<std::string>("name")<<" "<<counts_[j]<<" "<<MEx_[j]<<" "<<MEy_[j]<<std::endl;
     profile_x_[j]->Fill(counts_[j], MEx_[j]);
     profile_y_[j]->Fill(counts_[j], MEy_[j]);
+    multiplicity_[j]->Fill(counts_[j]);
   }
 }
 

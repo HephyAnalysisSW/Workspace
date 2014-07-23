@@ -16,6 +16,7 @@
 #include <string>
 #include <vector>
 #include <TProfile.h>
+#include <TH2F.h>
 
 class multMETCorrInfoWriter : public edm::EDAnalyzer {
 public:
@@ -29,9 +30,11 @@ private:
 
   std::vector<edm::ParameterSet> cfgCorrParameters_;
   std::vector<TProfile* > profile_x_ , profile_y_;
+  std::vector<TH2F* > occupancy_ , energy_, pt_;
+  std::vector<TH1F* > multiplicity_;
 
   std::vector<double> etaMin_, etaMax_, MEx_, MEy_;
-  std::vector<int> type_, nbins_, counts_;
+  std::vector<int> type_, nbins_, counts_, etaNBins_;
 
 
 };
