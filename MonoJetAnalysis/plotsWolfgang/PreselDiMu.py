@@ -17,6 +17,9 @@ class PreselDiMu:
         if math.isnan(isrJetPt) or isrJetPt<110.:
             return False
 
+        if eh.get("nHardElectrons")>0 or eh.get("nHardTaus")>0:
+            return False
+
         mupts = eh.get("muPt")
         muetas = eh.get("muEta")
         muphis = eh.get("muPhi")
@@ -26,7 +29,10 @@ class PreselDiMu:
         mu1p4.SetPtEtaPhiM(mupts[imu1],muetas[imu1],muphis[imu1],0.105)
         if (mu0p4+mu1p4).M()<55.:
             return False
-#        zpt = (mu0p4+mu1p4).Pt()
+        # match DY pt(Z) cut of 50 GeV
+        zpt = (mu0p4+mu1p4).Pt()
+        if zpt<100:
+            return False
 #        if not PreTools.passesHadronicSelection(eh,recalculatedMet=zpt):
 #            return False
 
