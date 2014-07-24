@@ -85,7 +85,7 @@ def hardestIsolatedElectron(eh,ptmin=7.,etamax=1.5,wp="medium"):
     return ieles[0]
   return None
 
-def diMuon(eh): 
+def diMuon(eh,veto3rd=False): 
   imus = [ ]
   nmu = int(eh.get("nmuCount")+0.5)
   if nmu<2:
@@ -98,8 +98,6 @@ def diMuon(eh):
     if mupts[i]>ptcut and abs(muetas[i])<2.1 and murelisos[i]<0.12:
       ptcut = 20.
       imus.append(i)
-      if len(imus)==2:
-        return ( imus[0], imus[1] )
-  return ( None, None )
-
-
+  if len(imus)<2 or ( veto3rd and len(imus)>2 ):
+    return ( None, None )
+  return ( imus[0], imus[1] )

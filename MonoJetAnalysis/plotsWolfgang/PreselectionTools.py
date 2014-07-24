@@ -70,16 +70,8 @@ def selectedLepton(eh,leptonPdg,mode="all"):
                                      etamax=softIsolatedEtaMax[leptonIndex])
 
     if len(ileptons)==0:
-        leptonPts = eh.get(leptonPrefix+"Pt")
-        mediumMuIndex = int(eh.get("mediumMuIndex"))
-        if ( mediumMuIndex>-1 and ( leptonPts[mediumMuIndex]<20 or int(eh.get("nHardMuonsMediumWP"))==1 ) ):
-            print "***** inconsistency A ",eh.tree.GetCurrentFile().GetName(),eh.get("run"), \
-                eh.get("lumi"),eh.get("event"),ilepton,mediumMuIndex,eh.get("nHardMuonsMediumWP")
-        return None
-
-        
+        return None        
     ilepton = ileptons[0]
-
 
     leptonEtas = eh.get(leptonPrefix+"Eta")
     if abs(leptonEtas[ilepton])>softIsolatedEtaMax[leptonIndex]:
@@ -89,62 +81,20 @@ def selectedLepton(eh,leptonPdg,mode="all"):
     leptonPt = leptonPts[ilepton]
     # require minimum Pt
     if leptonPt<softIsolatedPtMin[leptonIndex]:
-        mediumMuIndex = int(eh.get("mediumMuIndex"))
-        if ( mediumMuIndex>-1 and ( leptonPts[mediumMuIndex]<20 or int(eh.get("nHardMuonsMediumWP"))==1 ) ):
-            print "***** inconsistency B ",eh.tree.GetCurrentFile().GetName(),eh.get("run"), \
-                eh.get("lumi"),eh.get("event"),ilepton,mediumMuIndex,eh.get("nHardMuonsMediumWP")
         return None
 
-#    mediumsoft = [ ]
-#    mediumhard = [ ]
-#    for i in range(len(ileptons)):
-#        if leptonPts[i]<20:
-#            mediumsoft.append(i)
-#        if leptonPts[i]>20:
-#            mediumhard.append(i)
-#    if ( len(mediumsoft+mediumhard)==0 and eh.get("mediumMuIndex")>-1 ) or \
-#            ( len(mediumsoft+mediumhard)>0 and eh.get("mediumMuIndex")<0 ):
-#        print "***** inconsistency mediumMuIndex (soft)",eh.tree.GetCurrentFile().GetName(),eh.get("run"), \
-#            eh.get("lumi"),eh.get("event"),mediumsoft,eh.get("mediumMuIndex")
-#    if len(mediumhard)==0!=int(eh.get("nHardMuonsMediumWP")):
-#        print "***** inconsistency mediumMuIndex (hard)",eh.tree.GetCurrentFile().GetName(),eh.get("run"), \
-#            eh.get("lumi"),eh.get("event"),mediumhard,eh.get("nHardMuonsMediumWP")
-
     # veto other leptons above 20GeV
-    for i in range(len(ileptons)):
-        j = ileptons[i]
-        if j!=ilepton and leptonPts[j]>softIsolatedPtMax[leptonIndex]:
-            mediumMuIndex = int(eh.get("mediumMuIndex"))
-            if ( mediumMuIndex>-1 and ( leptonPts[mediumMuIndex]<20 or int(eh.get("nHardMuonsMediumWP"))==1 ) ):
-                print "***** inconsistency C ",eh.tree.GetCurrentFile().GetName(),eh.get("run"), \
-                    eh.get("lumi"),eh.get("event"),ilepton,mediumMuIndex,eh.get("nHardMuonsMediumWP"),i,j,ilepton,ileptons,leptonPts,leptonEtas,eh.get("muRelIso")
-            if int(eh.get("run"))==193336 and int(eh.get("lumi"))==925 and eh.get("event")==661128520:
-                print "Returning False"
+    for j in ileptons[1:]:
+        if leptonPts[j]>softIsolatedPtMax[leptonIndex]:
             return None
     
-    if int(eh.get("run"))==193336 and int(eh.get("lumi"))==925 and eh.get("event")==661128520:
-        mediumMuIndex = int(eh.get("mediumMuIndex"))
-        print "***** inconsistency AAA ",eh.tree.GetCurrentFile().GetName(),eh.get("run"), \
-            eh.get("lumi"),eh.get("event"),ilepton,mediumMuIndex,eh.get("nHardMuonsMediumWP"),ileptons,eh.get("muPt"),eh.get("muEta"),eh.get("muRelIso")
-
-
     if leptonSel=="soft":
         if leptonPt>softIsolatedPtMax[leptonIndex]:
             return None
     elif leptonSel=="hard":
         if leptonPt<hardIsolatedPtMin[leptonIndex]:
             return None
-#    else:
-#        mediumMuIndex = int(eh.get("mediumMuIndex"))
-#        if not ( mediumMuIndex>-1 and ( leptonPts[mediumMuIndex]<20 or int(eh.get("nHardMuonsMediumWP"))==1 ) ):
-#            print "***** inconsistency",eh.tree.GetCurrentFile().GetName(),eh.get("run"), \
-#                eh.get("lumi"),eh.get("event"),ilepton,mediumMuIndex,eh.get("nHardMuonsMediumWP")
             
-    mediumMuIndex = int(eh.get("mediumMuIndex"))
-    if ( mediumMuIndex<0 or ( leptonPts[mediumMuIndex]>20 and int(eh.get("nHardMuonsMediumWP"))>1 ) ):
-        print "***** inconsistency D ",eh.tree.GetCurrentFile().GetName(),eh.get("run"), \
-            eh.get("lumi"),eh.get("event"),ilepton,mediumMuIndex,eh.get("nHardMuonsMediumWP"),ilepton,ileptons,leptonPts,leptonEtas,eh.get("muRelIso")
-
     return ( ilepton, leptonPrefix )
 
 def bjetMultiplicity(eh):
