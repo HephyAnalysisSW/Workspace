@@ -17,7 +17,8 @@ if options.mode=="dpm":
   p = subprocess.Popen(["dpns-ls "+ options.dirname], shell = True , stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
   for line in p.stdout.readlines():
     line = line[:-1]
-    subdirnames.append(line)
+    if not line.count('joined'):
+      subdirnames.append(line)
 
 if options.mode=="nfs":
   subdirnames = os.listdir(options.dirname) 
@@ -25,13 +26,17 @@ if options.mode=="nfs":
 toBeRemovedGlobal=[]
 print "Going through:", subdirnames
 
+def diff(a, b):
+  b = set(b)
+  return [aa for aa in a if aa not in b]
+
 def readFileSize(f):
   p = subprocess.Popen(["dpns-ls -l "+ f], shell = True , stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
   line=""
   for line in p.stdout.readlines():
     line = line[:-1]
   return int(line.split()[4])
-
+onlyOnNameServer=[]
 for subdir in subdirnames:
   subdirname = options.dirname+"/"+subdir+"/"
   print  "At subdir ", subdirname
@@ -39,11 +44,19 @@ for subdir in subdirnames:
   if options.mode=='nfs':
     filenames = os.listdir(subdirname)
   if options.mode=='dpm':
+    filenamesNameServer = []
     p = subprocess.Popen(["dpns-ls -l "+ subdirname], shell = True , stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     for line in p.stdout.readlines():
       line = line[:-1].split()[-1]
       filenames.append(line)
 #      if line.count('_1429_'):print 'l', line
+    p = subprocess.Popen(["dpns-ls "+ subdirname], shell = True , stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    for line in p.stdout.readlines():
+      line = line[:-1].split()[-1]
+      filenamesNameServer.append(line)
+  for file in diff(filenamesNameServer , filenames):
+    print "Only on name server:", file  
+    onlyOnNameServer.append(subdirname+file)
   numbers=[]
   for file in filenames:
     sstring = file.split("_")
@@ -83,6 +96,7 @@ for subdir in subdirnames:
       print "Keep:", toBeKept, "Remove:", toBeRemoved
       toBeRemovedGlobal.extend(toBeRemoved)
 
+
 for f in toBeRemovedGlobal:
   if options.delete:
     print "Removing",f
@@ -93,3 +107,8 @@ for f in toBeRemovedGlobal:
   else:
     print "Would remove",f
 
+for f in onlyOnNameServer:
+  if not options.mode=='nfs':
+    print "Entry only in name server:",f,'--> Remove from db'
+    if options.delete:
+      os.system('dpns-rm -f '+f)

@@ -844,16 +844,3 @@ def getYieldFromChain(c, cut, weight = "weight"):
   del htmp
   return res
 
-def getCutYieldFromChain(c, cutString = "(1)", cutFunc = None, weight = "weight"):
-  c.Draw(">>eList", cutString)
-  elist = ROOT.gDirectory.Get("eList")
-  number_events = elist.GetN()
-  res = 0.
-  for i in range(number_events): #Loop over those events
-    c.GetEntry(elist.GetEntry(i))
-    if (not cutFunc) or cutFunc(c):
-      w = c.GetLeaf(weight).GetValue()
-      res += w
-  del elist
-  return res
-

@@ -206,6 +206,7 @@ SUSYTupelizer::SUSYTupelizer( const edm::ParameterSet & pset):
   addTriggerInfo_(pset.getUntrackedParameter<bool>("addTriggerInfo")),
   triggersToMonitor_(pset.getUntrackedParameter<std::vector<std::string> > ("triggersToMonitor") ), 
   metsToMonitor_(pset.getUntrackedParameter<std::vector<std::string> > ("metsToMonitor") ), 
+  addL1Info_(pset.getUntrackedParameter<bool>("addL1Info")),
   addMetUncertaintyInfo_(pset.getUntrackedParameter<bool>("addMetUncertaintyInfo")),
   addFullBTagInfo_(pset.getUntrackedParameter<bool>("addFullBTagInfo")),
   addFullJetInfo_(pset.getUntrackedParameter<bool>("addFullJetInfo")),
@@ -340,6 +341,23 @@ void SUSYTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup) {
         if (std::strstr(HLT_names_[i].c_str(), (triggersToMonitor_[j]+"_v").c_str())) {put(trigNames_[j], HLTR->accept(i));put(prescNames_[j], prescale( ev, setup, HLT_names_[i].c_str()));};
       }
     }
+  }
+
+  //L1-Triggers
+  if (addL1Info_) {
+    edm::ESHandle<L1GtTriggerMenu> L1Menu;
+    setup.get<L1GtTriggerMenuRcd>().get(L1Menu) ;
+    const L1GtTriggerMenu* trigmenu = L1Menu.product();
+
+    edm::Handle< L1GlobalTriggerReadoutRecord > gtResult;
+    ev.getByLabel( edm::InputTag("gtDigis"), gtResult);
+    const DecisionWord dWord = gtResult->decisionWord();
+    std::vector<int> i_dWord;
+    i_dWord.clear();
+    for (unsigned i=0;i<dWord.size();i++) {
+      i_dWord.push_back(dWord[i]);
+    }   
+    put("l1DecisionWord", i_dWord);
   }
 
   //BeamSpot
@@ -2012,6 +2030,9 @@ void SUSYTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup) {
 
 void SUSYTupelizer::addAllVars( )
 {
+  if (addL1Info_){
+    addVar("l1DecisionWord/I[]");
+  }
   if(addFullMuonInfo_)
   {
      addVar("nmuons/I");

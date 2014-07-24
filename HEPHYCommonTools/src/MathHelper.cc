@@ -179,7 +179,7 @@ bool MathHelper::splitVecHemi( const XYZTLorentzVector& lepton,
     }
     if (proper) {
       //split jets into leptonic & hadronic acc. to the Hemisphere they belong to
-      if (verbose) cout<<prefix<<"lepHemisphere "<<lepHemisphere<<" hadHemisphere "<<lepHemisphere<<endl;
+      if (verbose) cout<<prefix<<"lepHemisphere "<<lepHemisphere<<" hadHemisphere "<<hadHemisphere<<endl;
       for (vector<const pat::Jet*>::const_iterator it = jets.begin(); it!=jets.end();it++){
         if (MathHelper::findMember((*it)->p4(), hemisphereVecs[lepHemisphere])) {
           lepJets.push_back(*it);

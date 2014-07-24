@@ -1,13 +1,14 @@
-# parse the model string in the LHE event and return 
-#     stopMass()            stop mass [GeV]
-#     lspGeneratedMass()    LSP generated mass    
-#     runNumber()           run number
-#     lspMass()             LSP mass
-#     deltaMassStopLsp()    mass difference between stop and LSP
-#     processPrefix()       process prefix
-#     parseLheModelString   a list of [stopMass, lspGeneratedMass, runNumber, deltaMassStopLsp, processPrefix]
-#     lheFileNameUndecayed  name of the undecayed LHE file 
-#     lheFileNameMerged     name of the merged LHE file
+# File: parseLheModelString.py
+# parse the model string from the LHE event 
+#     stopMass(modelString)              stop mass [GeV]
+#     lspGeneratedMass(modelString)      LSP generated mass [GeV] - dummy, LSP not decayed in undecayed files  
+#     runNumber(modelString)             run number
+#     lspMass(modelString)               decay LSP mass [GeV] 
+#     deltaMassStopLsp(modelString)      mass difference between stop and LSP [GeV]
+#     processPrefix(modelString)         process prefix
+#     parseLheModelString(modelString)   a list of [stopMass, lspGeneratedMass, runNumber, deltaMassStopLsp, processPrefix]
+#     lheFileNameUndecayed(modelString)  name of the undecayed LHE file 
+#     lheFileNameMerged(modelString)     name of the merged LHE file
 
 # module imports
 #

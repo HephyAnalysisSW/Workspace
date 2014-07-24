@@ -1,5 +1,6 @@
 import ROOT
 from math import pi, sqrt, cos, sin, sinh
+from array import array
 
 def test():
   return 1
@@ -35,6 +36,45 @@ def getVarValue(c, var, n=0):
     l = c.GetLeaf(var)
     if l:return l.GetValue(n)
     return float('nan')
+
+def getCutYieldFromChain(c, cutString = "(1)", cutFunc = None, weight = "weight", weightFunc = None, returnVar=False):
+  c.Draw(">>eList", cutString)
+  elist = ROOT.gDirectory.Get("eList")
+  number_events = elist.GetN()
+  res = 0.
+  resVar=0.
+  for i in range(number_events): 
+    c.GetEntry(elist.GetEntry(i))
+    if (not cutFunc) or cutFunc(c):
+      w = c.GetLeaf(weight).GetValue()
+      if weightFunc:
+        w*=weightFunc(c)
+      res += w
+      resVar += w**2
+  del elist
+  if returnVar:
+    return res, resVar
+  return res
+
+def getCutPlotFromChain(c, var, binning, cutString = "(1)", weight = "weight", binningIsExplicit=False, addOverFlowBin=''):
+  if binningIsExplicit:
+    h = ROOT.TH1F('h_'+var, 'h_'+var, len(binning)-1, array('d', binning))
+#    h.SetBins(len(binning), array('d', binning))
+  else:
+    h = ROOT.TH1F('h_'+var, 'h_'+var, *binning)
+  c.Draw(var+">>h_"+var, weight+"*("+cutString+")", 'goff')
+  res = h.Clone()
+  del h
+  if addOverFlowBin.lower() == "upper" or addOverFlowBin.lower() == "both":
+    nbins = res.GetNbinsX()
+    print "Adding", res.GetBinContent(nbins + 1), res.GetBinError(nbins + 1)
+    res.SetBinContent(nbins , res.GetBinContent(nbins) + res.GetBinContent(nbins + 1))
+    res.SetBinError(nbins , sqrt(res.GetBinError(nbins)**2 + res.GetBinError(nbins + 1)**2))
+  if addOverFlowBin.lower() == "lower" or addOverFlowBin.lower() == "both":
+    res.SetBinContent(1 , res.GetBinContent(0) + res.GetBinContent(1))
+    res.SetBinError(1 , sqrt(res.GetBinError(0)**2 + res.GetBinError(1)**2))
+
+  return res
 
 #def getValue(chain, varname):
 #  alias = chain.GetAlias(varname)

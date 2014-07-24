@@ -52,6 +52,18 @@ options.register ('addRA4Info',True,
           VarParsing.VarParsing.multiplicity.singleton,
           VarParsing.VarParsing.varType.bool,
           "whether or not to add RA4 specific Info")
+options.register ('addL1Info',False,
+          VarParsing.VarParsing.multiplicity.singleton,
+          VarParsing.VarParsing.varType.bool,
+          "whether or not to add RA4 specific Info")
+options.register ('keepPFCandidates',False,
+          VarParsing.VarParsing.multiplicity.singleton,
+          VarParsing.VarParsing.varType.bool,
+          "whether or not to keep pf candidates")
+options.register ('addPDFWeights',False,
+          VarParsing.VarParsing.multiplicity.singleton,
+          VarParsing.VarParsing.varType.bool,
+          "whether or not to add pdfWeights")
 
 infiles = ['file:/data/schoef/local/TTJets-53X-syncfile-AODSIM.root']
 #  infiles = ['file:/data/jkancsar/pickevent/event4874249.root']
@@ -84,21 +96,24 @@ if options.files[0][:9] == 'load:stop':
 isMC = (options.mode.lower()=='sms' or options.mode.lower()=='mc')
 jec = []
 if isMC:
-  jec = ['L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual']
-else:
   jec = ['L1FastJet', 'L2Relative', 'L3Absolute']
+else:
+  jec = ['L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual']
 #  if options.mode=="Mu":
 #    triggers =  ['HLT_PFHT350_Mu15_PFMET45_v*','HLT_PFHT350_Mu15_PFMET50_v*','HLT_PFHT400_Mu5_PFMET45_v*','HLT_PFHT400_Mu5_PFMET50_v*']
 #  if options.mode=="Ele":
 #    triggers = ['HLT_CleanPFHT350_Ele5_CaloIdT_CaloIsoVL_TrkIdT_TrkIsoVL_PFMET45_v*','HLT_CleanPFHT350_Ele5_CaloIdT_CaloIsoVL_TrkIdT_TrkIsoVL_PFMET50_v*','HLT_CleanPFHT300_Ele15_CaloIdT_CaloIsoVL_TrkIdT_TrkIsoVL_PFMET45_v*','HLT_CleanPFHT300_Ele15_CaloIdT_CaloIsoVL_TrkIdT_TrkIsoVL_PFMET50_v*']
 
-print "mode",options.mode,"isMC?",isMC, ", verbose?",options.verbose,", add RA4 Info?",options.addRA4Info, ", JEC:",jec,", GT",options.GT, ", triggers", options.triggers
+print "mode",options.mode,"isMC?",isMC, ", verbose?",options.verbose,", add RA4 Info?",options.addRA4Info,'keepPFCandidates?', options.keepPFCandidates, ", JEC:",jec,", GT",options.GT, ", triggers", options.triggers, 'addPDFWeights?',options.addPDFWeights
 
 
 
 #-- Message Logger ------------------------------------------------------------
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
-process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(False) )
+process.options = cms.untracked.PSet(
+  SkipEvent = cms.untracked.vstring('ProductNotFound'),
+  wantSummary = cms.untracked.bool(False)
+)
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 process.MessageLogger.categories.append('PATSummaryTables')
 process.MessageLogger.cerr.PATSummaryTables = cms.untracked.PSet(
@@ -271,24 +286,23 @@ process.filterSequence = cms.Sequence(
     process.EventCounterAfterScraping*
       process.primaryVertexFilter*
     process.EventCounterAfterPV)
-if not options.mode.lower()=='sms':
-   process.filterSequence+= process.HBHENoiseFilter
-   process.filterSequence+= process.EventCounterAfterHBHE
 process.filterSequence+= process.goodVertices
-process.filterSequence+= process.trackingFailureFilter
-process.filterSequence+= process.EventCounterAfterTrackingFailure
 if not options.mode.lower()=='sms':
-   process.filterSequence+= process.hcalLaserEventFilter
-   process.filterSequence+= process.EventCounterAfterLaser
-   process.filterSequence+= process.CSCTightHaloFilter
-   process.filterSequence+= process.EventCounterAfterCSC
-   process.filterSequence+= process.eeBadScFilter
-   process.filterSequence+= process.EventCounterAfterEEBadSC
+  process.filterSequence+= process.HBHENoiseFilter
+  process.filterSequence+= process.EventCounterAfterHBHE
+  process.filterSequence+= process.trackingFailureFilter
+  process.filterSequence+= process.EventCounterAfterTrackingFailure
+  process.filterSequence+= process.hcalLaserEventFilter
+  process.filterSequence+= process.EventCounterAfterLaser
+  process.filterSequence+= process.CSCTightHaloFilter
+  process.filterSequence+= process.EventCounterAfterCSC
+  process.filterSequence+= process.eeBadScFilter
+  process.filterSequence+= process.EventCounterAfterEEBadSC
 process.filterSequence+= process.EcalDeadCellTriggerPrimitiveFilter
 process.filterSequence+= process.EventCounterAfterECALTP
 
 if options.mode.lower()=='sms':
-  print "\nFilter List:", "HLT, scraping, PV, trackingFailureFilter, EcalTP\n"
+  print "\nFilter List:", "HLT, scraping, PV, EcalTP\n"
 if options.mode.lower()=='mc':
   print "\nFilter List:", "HLT, scraping, PV, HBHE, trackingFailureFilter, hcalLaser, CSCTightHalo, eeBadSC, EcalTP\n"
 
@@ -348,7 +362,7 @@ process.p += process.patPFMETsTypeIPhicorrected
 process.p += process.patPFMETsTypeIType0PFCandcorrected
 process.p += process.rawpfMet
 process.p += process.patRAWPFMETs
-if options.mode.lower()=='sms':
+if options.mode.lower()=='sms' or options.addPDFWeights:
 #  process.pdfWeights = cms.EDProducer("PdfWeightProducer",
 #        # Fix POWHEG if buggy (this PDF set will also appear on output, 
 #        # so only two more PDF sets can be added in PdfSetNames if not "")
@@ -402,6 +416,7 @@ print "TriggersToMonitor:",process.SUSYTupelizer.triggersToMonitor
 process.SUSYTupelizer.triggerCollection = cms.untracked.string( options.hltName )
 process.SUSYTupelizer.patMETs = cms.untracked.InputTag("patPFMETsTypeIPhicorrected")
 process.SUSYTupelizer.addFullJetInfo = cms.untracked.bool(True)
+process.SUSYTupelizer.addL1Info = cms.untracked.bool(options.addL1Info)
 #process.SUSYTupelizer.addFullMETInfo = cms.untracked.bool(True)
 process.SUSYTupelizer.useForDefaultAlias = cms.untracked.bool(True)
 process.SUSYTupelizer.addTriggerInfo = cms.untracked.bool(True)
@@ -409,12 +424,12 @@ process.SUSYTupelizer.addFullLeptonInfo = cms.untracked.bool(True)
 process.SUSYTupelizer.addFullBTagInfo = cms.untracked.bool(True)
 process.SUSYTupelizer.addGeneratorInfo = cms.untracked.bool(isMC)
 process.SUSYTupelizer.addMSugraOSETInfo = cms.untracked.bool(options.mode.lower()=='sms')
-process.SUSYTupelizer.addPDFWeights = cms.untracked.bool(options.mode.lower()=='sms')
+process.SUSYTupelizer.addPDFWeights = cms.untracked.bool(options.mode.lower()=='sms' or options.addPDFWeights)
 process.SUSYTupelizer.verbose = cms.untracked.bool(options.verbose)
 process.SUSYTupelizer.addFullMuonInfo = cms.untracked.bool(True)
 process.SUSYTupelizer.addFullEleInfo = cms.untracked.bool(True)
 process.SUSYTupelizer.addFullTauInfo = cms.untracked.bool(True)
-process.SUSYTupelizer.addHEPHYCommonToolsInfo = cms.untracked.bool(options.addRA4Info)
+process.SUSYTupelizer.addRA4AnalysisInfo = cms.untracked.bool(options.addRA4Info)
 
 process.SUSYTupelizer.metsToMonitor = ["patPFMETsTypeIPhicorrected", "patPFMETsTypeIcorrected", "patPFMETsTypeIType0PFCandcorrected", "patRAWPFMETs"]
 process.p += process.SUSYTupelizer
@@ -427,6 +442,8 @@ process.p += process.SUSYTupelizer
 #)
 #process.p+=process.printTree
 process.out.outputCommands =  cms.untracked.vstring('drop *', 'keep *_*SUSYTupelizer*_*_*' , 'keep *_*EventCounter*_*_*', 'keep *_genParticles_*_*')
+if options.keepPFCandidates:
+  process.out.outputCommands =  cms.untracked.vstring('drop *', 'keep *_*SUSYTupelizer*_*_*' , 'keep *_*EventCounter*_*_*', 'keep *_genParticles_*_*', 'keep *_particleFlow__*')
 process.outpath = cms.EndPath(process.out)
 #-- Dump config ------------------------------------------------------------
 file = open('vienna_SusyPAT_cfg.py','w')

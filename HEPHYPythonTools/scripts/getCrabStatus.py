@@ -1,3 +1,4 @@
+#!/bin/env python
 import os, sys
 
 from optparse import OptionParser
@@ -22,10 +23,10 @@ p1.close()
 totNJobs = {}
 dataset={}
 for s in subDirs:
-  p1 = os.popen("grep 'total # of jobs' "+s+"/log/crab.log | tail -n1")
+  p1 = os.popen("grep --binary-files=text 'total # of jobs' "+s+"/log/crab.log | tail -n1")
   l=p1.readline()
   p1.close()
-  if l: 
+  if l:
     totNJobs[s] = int(l[:-1].split()[-1])
 
   p1 = os.popen("grep 'Requested dataset:' "+s+"/log/crab.log | tail -n1")
@@ -36,13 +37,12 @@ for s in subDirs:
 
 finishedJobs = {}
 for s in subDirs:
-  p1 = os.popen("dpns-ls "+options.dpmDir+"/"+(s.split('/')[-1])+"|wc -l")
+  p1 = os.popen("dpns-ls -l "+options.dpmDir+"/"+(s.split('/')[-1])+"|wc -l")
   l=p1.readline()
   p1.close()
   if not l: continue
   finishedJobs[s] = int(l[:-1].split()[-1])
 
-print totNJobs, finishedJobs, dataset
 tot=0 
 done=0
 for k in sorted(totNJobs.keys()):

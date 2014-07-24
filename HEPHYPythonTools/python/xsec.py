@@ -3,6 +3,7 @@ xsec={}
 #SUMMER 12
 #https://twiki.cern.ch/twiki/bin/viewauth/CMS/StandardModelCrossSectionsat8TeV
 xsec["8TeV-DYJetsToLL-M50"]                     =       3503.71
+xsec["Mu-DYJetsToLL-M50"]                       =       3503.71
 xsec["8TeV-DYJetsToLL-M10to50"]                 =       877.
 xsec["8TeV-DYToEE-M20"]                         =       1915.08333
 xsec["8TeV-DYToMuMu-M20"]                       =       1915.08333
@@ -22,6 +23,8 @@ xsec["8TeV-TTJets-53X"]                         =       225.197
 xsec["8TeV-TTJets-powheg-v1+2"]                 =       225.197
 xsec["8TeV-TTJets-powheg-v1"]                   =       225.197
 xsec["8TeV-TTJets-powheg-v2"]                   =       225.197
+xsec["8TeV-TTJets-powheg-v1-2"]                   =       225.197
+xsec["8TeV-TTJets-powheg-v2-2"]                   =       225.197
 xsec["8TeV-TTJets_scaledown_TuneZ2star"]        =       225.197
 xsec["8TeV-TTJets_scaleup_TuneZ2star"]          =       225.197
 xsec["8TeV-TTJets_matchingdown_TuneZ2star"]     =       225.197
@@ -128,9 +131,10 @@ xsec["8TeV-QCD-Pt470to600-MuEnrichedPt5"]       =       115.2*0.1024
 xsec["8TeV-QCD-Pt600to800-MuEnrichedPt5"]       =       27.01*0.0996
 xsec["8TeV-QCD-Pt800to1000-MuEnrichedPt5"]      =       3.57*0.1033
 xsec["8TeV-QCD-Pt80to120-MuEnrichedPt5"]        =       1024000.0*0.0395
-xsec["8TeV-ZJetsToNuNu-HT50to100"] =  452.75 
+xsec["8TeV-ZJetsToNuNu-HT50to100"] =  452.75 #NNLO https://twiki.cern.ch/twiki/bin/viewauth/CMS/SUSYJetsMETTausAnalysis2012 
 xsec["8TeV-ZJetsToNuNu-HT100to200"] = 190.39
 xsec["8TeV-ZJetsToNuNu-HT200to400"] = 49.28
+xsec["8TeV-ZJetsToNuNu-HT200-400"] = 49.28
 xsec["8TeV-ZJetsToNuNu-HT400"] = 6.26
 
 xsec["8TeV-QCD_Pt-5to15"]                       =       4.2639499*(10**10)
@@ -161,10 +165,11 @@ xsec["8TeV-QCD_BCtoE_Pt_170_250"]              =        30980.0*0.0204
 xsec["8TeV-QCD_BCtoE_Pt_250_350"]              =        4250.0*0.0243
 xsec["8TeV-QCD_BCtoE_Pt_350"]                  =        811.0*0.0295
 
-xsec["8TeV-ZJetsToNuNu-HT50to100"] = 381.2
-xsec["8TeV-ZJetsToNuNu-HT100to200"] = 160.3
-xsec["8TeV-ZJetsToNuNu-HT200to400"] = 41.49
-xsec["8TeV-ZJetsToNuNu-HT400"] = 5.274
+#xsec["8TeV-ZJetsToNuNu-HT50to100"] = 381.2
+#xsec["8TeV-ZJetsToNuNu-HT100to200"] = 160.3
+#xsec["8TeV-ZJetsToNuNu-HT200to400"] = 41.49
+#xsec["8TeV-ZJetsToNuNu-HT200-400"] = 41.49
+#xsec["8TeV-ZJetsToNuNu-HT400"] = 5.274
 xsec["8TeV-WW"] = 54.838
 xsec["8TeV-WZ"] = 32.3 
 xsec["8TeV-ZZ"] = 7.7 
@@ -179,6 +184,10 @@ xsec["8TeV-stop300lsp270g175"] = 1.99608
 xsec["8TeV-stop300lsp270"] = 1.99608
 xsec["8TeV-stop300lsp270g200"] = 1.99608
 
+
+#RA4 + 0b signals
+xsec["T5Full_1100_200_100-4"] = 0.0101744
+xsec["T5Full_1100_800_600-4"] = 0.0101744
 #OLD and 7TeV samples
 
 
