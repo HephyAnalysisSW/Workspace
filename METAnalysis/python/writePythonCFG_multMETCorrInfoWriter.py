@@ -19,8 +19,12 @@ for map in allMaps:
   ofile.write('      nbins=cms.double('+str(map['candBinning'][0])+'),\n')
   ofile.write('      nMin=cms.int32('+str(map['candBinning'][1])+'),\n')
   ofile.write('      nMax=cms.int32('+str(map['candBinning'][2])+'),\n')
+  ofile.write('      etaNBins=cms.int32('+str(map['binning'][0])+'),\n')
   ofile.write('      etaMin=cms.double('+str(map['binning'][1])+'),\n')
   ofile.write('      etaMax=cms.double('+str(map['binning'][2])+'),\n')
+  ofile.write('      phiNBins=cms.int32('+str(map['binning'][3])+'),\n')
+  ofile.write('      phiMin=cms.double('+str(map['binning'][4])+'),\n')
+  ofile.write('      phiMax=cms.double('+str(map['binning'][5])+'),\n')
   
   ofile.write('    ),\n')
 ofile.write(')\n')
