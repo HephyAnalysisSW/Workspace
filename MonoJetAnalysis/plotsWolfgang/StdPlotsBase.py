@@ -5,6 +5,7 @@ from PlotsBase import *
 from EventHelper import EventHelper
 from LeptonUtilities import *
 from KinematicUtilities import *
+from PreselectionTools import *
 
 # from viewWs import viewWs
 
@@ -118,6 +119,7 @@ class StdPlotsBase(PlotsBase):
         ROOT.gROOT.cd(name)
 
 
+        self.addVariable("preselection",1,0.,1.,"b")
         self.charges = [ "Minus", "Plus" ]
 #        self.charges = [ "" ]
         for sign in self.charges:
@@ -128,9 +130,13 @@ class StdPlotsBase(PlotsBase):
             self.addVariable("jetPtRatio"+sign,50,0.,1.,'u')
             self.addVariable("njet60"+sign,10,-0.5,9.5,'u')
             self.addVariable("njet"+sign,20,-0.5,19.5,'u')
+            self.addVariable("nel"+sign,20,-0.5,19.5,'u')
+            self.addVariable("nmu"+sign,20,-0.5,19.5,'u')
+            self.addVariable("nta"+sign,20,-0.5,19.5,'u')
             self.addVariable("met"+sign,100,0.,1000.,'l')
             self.addVariable("ht"+sign,100,0.,1000.,'l')
-            self.addVariable("metHtRatio"+sign,100,0.,2.5,'b')
+            self.addVariable("metHtRatio"+sign,100,0.,2.5,'u')
+            self.addVariable("metHtProd"+sign,100,0.,250000.,'l')
             self.addVariable("metIsrPtRatio"+sign,100,0.,5.0,'b')
             self.addVariable("htIsrPtRatio"+sign,100,0.,5.0,'b')
             self.addVariable("mt"+sign,50,0.,200.,'u')
@@ -163,6 +169,8 @@ class StdPlotsBase(PlotsBase):
             self.addVariable("etaW"+sign,125,0,2.5,'l')
             self.addVariable("costhPol"+sign,100,-1,1,'u')
             self.addVariable("phiPol"+sign,100,0,pi/2,'u')
+            self.addVariable("regionIndex"+sign,9,-1.,8.,'b')
+
             if self.hardLepton:
                 self.addVariablePair("ptGenTau",50,0.,1000.,"ptGen"+self.leptonPrefixCap+"",25,0.,250.,suffix=sign)
             else:
@@ -176,6 +184,16 @@ class StdPlotsBase(PlotsBase):
         curdir.cd()
 
     def fill(self,eh,downscale=1):
+
+        self.timers[0].start()
+        if self.name!="data":
+            w = eh.get("puWeight")*downscale
+        else:
+            w = 1
+        self.timers[0].stop()
+        self.fill1DBySign("preselection",0.,0.,w)
+#        if self.name=="data":
+#            print "Preselected ",int(eh.get("run")),int(eh.get("lumi")),eh.get("event")
 
         isrJetPt = eh.get("isrJetPt")
         if math.isnan(isrJetPt):
@@ -232,12 +250,15 @@ class StdPlotsBase(PlotsBase):
         jetBtags = eh.get("jetBtag")
         ib = None
         nb = 0
+        nbs = 0
         for i in range(njet):
 #            if jetPts[i]>30 and jetPts[i]<60 and jetBtags[i]>0.679:
             if jetPts[i]>30 and abs(jetEtas[i])<2.4 and jetBtags[i]>0.679:
                 if ib==None:
                     ib = i
                 nb += 1
+                if jetPts[i]<60:
+                    nbs += 1
         if ib!=None:
             return
         
@@ -249,13 +270,20 @@ class StdPlotsBase(PlotsBase):
 #        if mt<60 or mt>88:
 #            return
 
-        self.timers[0].start()
-        if self.name!="data":
-            w = eh.get("puWeight")*downscale
-        else:
-            w = 1
-        self.timers[0].stop()
+        region = -1
+        sr = signalRegion(eh,ilep,self.leptonPrefix)
+        if self.name=="data" and sr!=None:
+            return
+
         
+        if sr!=None:
+            region = regionIndices[sr]
+        else:
+            cr = controlRegion(eh,ilep,self.leptonPrefix)
+            if cr!=None:
+                region = regionIndices[cr]
+        self.fill1DBySign("regionIndex",pdg,region,w)
+
 #        ngp = int(eh.get("ngp"))
 #        pdgs = eh.get("gpPdg")
 #        igenmus = [ ]
@@ -296,6 +324,7 @@ class StdPlotsBase(PlotsBase):
             self.fill1DBySign("soft"+self.leptonPrefixCap+"NTk",pdg,softLepNTk,w)
 
         self.fill1DBySign("metHtRatio",pdg,met/ht,w)
+        self.fill1DBySign("metHtProd",pdg,met*ht,w)
         self.fill2DBySign("ht_vs_met",pdg,met,ht,w)
         self.fill2DBySign(self.leptonPrefix+"Pt_vs_met",pdg,met,softLepPt,w)
 
@@ -341,6 +370,10 @@ class StdPlotsBase(PlotsBase):
 
         self.fill1DBySign("njet60",pdg,eh.get("njet60"),w)
         self.fill1DBySign("njet",pdg,eh.get("njetCount"),w)
+
+        self.fill1DBySign("nel",pdg,eh.get("nel"),w)
+        self.fill1DBySign("nmu",pdg,eh.get("nmu"),w)
+        self.fill1DBySign("nta",pdg,eh.get("nta"),w)
 
         self.fill1DBySign("met",pdg,met,w)
 
