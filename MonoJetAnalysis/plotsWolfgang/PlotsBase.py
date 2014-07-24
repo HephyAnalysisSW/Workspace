@@ -56,12 +56,12 @@ class PlotsBase:
     def getVariables2D(self):
         return [ v for v in PlotsBase.variables.values() if v.is2D() ]
 
-    def addVariable(self,name,nbins,xmin,xmax,scut='l',uselog=True):
+    def addVariable(self,name,nbins,xmin,xmax,scut='l',uselog=True,binEdges=None):
         assert name.isalnum()
         assert not name in self.histogramList
         if not name in PlotsBase.variables:
             PlotsBase.variables[name] = Variable(name,nbins/self.rebin,xmin,xmax,scut,uselog)
-        h1d = PlotsBase.variables[name].createHistogram()
+        h1d = PlotsBase.variables[name].createHistogram(binEdges)
         self.histogramList[name] = h1d
         setattr(self,"h"+name,h1d)
 

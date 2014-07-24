@@ -1,5 +1,6 @@
 import ROOT
 from math import sqrt
+from array import array
 
 class Variable:
 
@@ -16,8 +17,13 @@ class Variable:
   def is2D(self):
     return False
 
-  def createHistogram(self):
-    return ROOT.TH1F(self.name,self.name,self.nbins,self.xmin,self.xmax)
+  def createHistogram(self,binEdges=None):
+    if binEdges:
+      assert len(binEdges)==(self.nbins+1)
+      edges = array('f',binEdges)
+      return ROOT.TH1F(self.name,self.name,self.nbins,edges)
+    else:
+      return ROOT.TH1F(self.name,self.name,self.nbins,self.xmin,self.xmax)
 
   def moveBinContent(self,h,i,j):
     ci = h.GetBinContent(i)
