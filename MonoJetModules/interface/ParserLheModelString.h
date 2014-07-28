@@ -2,18 +2,12 @@
  * \class ParserLheModelString
  *
  *
- * Description: class to retrieve the quantities from the LHE model string for degenerate stop.
+ * Description: class to retrieve the quantities from the LHE model string.
  *
  * Implementation:
- *     Methods to retrieve the following quantities:
- *         stopMass()              stop mass [GeV]
- *         lspGeneratedMass()      LSP generated mass [GeV] - dummy, LSP not decayed in undecayed files
- *         runNumber()             run number
- *         lspMass()               decay LSP mass [GeV]
- *         deltaMassStopLsp()      mass difference between stop and LSP [GeV]
- *         processPrefix()         process prefix
- *         lheFileNameUndecayed()  name of the undecayed LHE file
- *         lheFileNameMerged()     name of the merged LHE file
+ *     TODO: enter details
+ *
+ * Usage: see LheAnalysis
  *
  * \author: Vasile Mihai Ghete - HEPHY Vienna
  *
