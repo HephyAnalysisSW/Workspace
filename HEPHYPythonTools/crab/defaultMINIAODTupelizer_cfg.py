@@ -39,14 +39,14 @@ options.register ('verbose',False,
           VarParsing.VarParsing.varType.bool,
           "verbosity")
 
-options.register ('keepStatements','',
-          VarParsing.VarParsing.multiplicity.list,
+options.register ('keep','',
+          VarParsing.VarParsing.multiplicity.singleton,
           VarParsing.VarParsing.varType.string,
           "additional keep statements")
-options.register ('addPDFWeights',False,
-          VarParsing.VarParsing.multiplicity.singleton,
-          VarParsing.VarParsing.varType.bool,
-          "whether or not to add pdfWeights")
+#options.register ('addPDFWeights',False,
+#          VarParsing.VarParsing.multiplicity.singleton,
+#          VarParsing.VarParsing.varType.bool,
+#          "whether or not to add pdfWeights")
 
 #infiles = ['root://xrootd.unl.edu//store/mc/Spring14dr/WJetsToLNu_HT-100to200_Tune4C_13TeV-madgraph-tauola/AODSIM/PU20bx25_POSTLS170_V5-v1/00000/00165B45-82E6-E311-B68D-002590AC4FEC.root']
 infiles = ['file:/data/schoef/local/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola_PU20bx25_POSTLS170_V5-v1_MINIAODSIM.root']
@@ -62,8 +62,8 @@ else:
   print "No parsing of arguments!"
 
 isMC = (options.mode.lower()=='sms' or options.mode.lower()=='mc')
-
-print "mode",options.mode,"isMC?",isMC, ", verbose?",options.verbose,'keepStatements?', options.keepStatements, "GT",options.GT, ", triggers", options.triggers, 'addPDFWeights?',options.addPDFWeights
+toKeep = ['keep '+x for x in options.keep.split(',')]
+print "mode",options.mode,"isMC?",isMC, ", verbose?",options.verbose,'keep?', toKeep, "GT",options.GT, ", triggers", options.triggers#, 'addPDFWeights?',options.addPDFWeights
 
 #-- Message Logger ------------------------------------------------------------
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
@@ -286,5 +286,5 @@ process.p += process.BasicTupelizer
 #  src = cms.InputTag("genParticles")
 #)
 #process.p+=process.printTree
-process.out.outputCommands =  cms.untracked.vstring('drop *', 'keep *_*Tupelizer*_*_*' , 'keep *_*EventCounter*_*_*', *(options.triggersToMonitor))
+process.out.outputCommands =  cms.untracked.vstring('drop *', 'keep *_*Tupelizer*_*_*' , 'keep *_*EventCounter*_*_*', *(toKeep))
 process.outpath = cms.EndPath(process.out)

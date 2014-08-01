@@ -28,29 +28,29 @@ else:
   exec("maps = [" +options.maps+ "]")
 
 
-h['fitRange'] = [0,1500]
-h0Barrel['fitRange'] = [0,50]
-h0EndcapPlus['fitRange'] = [0,50]
-h0EndcapMinus['fitRange'] = [0,50]
-gammaBarrel['fitRange'] = [0,500]
-gammaEndcapPlus['fitRange'] = [0,150]
-gammaEndcapMinus['fitRange'] = [0,150]
+h['fitRange'] = [0,2000]
+h0Barrel['fitRange'] = [0,120]
+h0EndcapPlus['fitRange'] = [0,80]
+h0EndcapMinus['fitRange'] = [0,80]
+gammaBarrel['fitRange'] = [0,1200]
+gammaEndcapPlus['fitRange']   = [0,250]
+gammaEndcapMinus['fitRange']  = [0,250]
 gammaForwardPlus['fitRange'] = [0,10]
 gammaForwardMinus['fitRange'] = [0,10]
 e['fitRange'] = [0,10]
 mu['fitRange'] = [0,10]
-h_HF_Minus['fitRange'] = [10,250]
-h_HF_Plus['fitRange'] = [10,250]
+h_HF_Minus['fitRange'] = [0,300]
+h_HF_Plus['fitRange'] = [0,300]
 h_HF_InnerMostRingsMinus['fitRange'] = [0,50]
 h_HF_InnerMostRingsPlus['fitRange'] = [0,50]
-egamma_HF_Minus['fitRange'] = [0,250]
-egamma_HF_Plus['fitRange'] = [0,250]
+egamma_HF_Minus['fitRange'] = [0,300]
+egamma_HF_Plus['fitRange'] = [0,300]
 egamma_HF_InnerMostRingsMinus['fitRange'] = [0,50]
 egamma_HF_InnerMostRingsPlus['fitRange'] = [0,50]
 h_HF['fitRange'] = [0,500]
 egamma_HF['fitRange'] = [0,500]
 
-h['zoomRange'] = [-20,20]
+h['zoomRange'] = [-40,40]
 h0Barrel['zoomRange'] = [-2,2]
 h0EndcapPlus['zoomRange'] = [-5,5]
 h0EndcapMinus['zoomRange'] = [-5,5]
@@ -67,31 +67,50 @@ h_HF_InnerMostRingsMinus['zoomRange'] = [-5,5]
 h_HF_InnerMostRingsPlus['zoomRange'] = [-5,5]
 egamma_HF_Minus['zoomRange'] = [-5,5]
 egamma_HF_Plus['zoomRange'] = [-5,5]
-egamma_HF_InnerMostRingsMinus['zoomRange'] = [-5,5]
-egamma_HF_InnerMostRingsPlus['zoomRange'] = [-5,5]
-h_HF['zoomRange'] = [-5,5]
-egamma_HF['zoomRange'] = [-5,5]
+egamma_HF_InnerMostRingsMinus['zoomRange'] = [-2,2]
+egamma_HF_InnerMostRingsPlus['zoomRange'] = [-2,2]
 
-makeN2Fit =  [m['name'] for m in maps] #[ h, h0EndcapPlus, h0EndcapMinus,  h_HF, h_HF_Minus, h_HF_Plus, h_HF_InnerMostRingsMinus, h_HF_InnerMostRingsPlus]]
-#makeN2Fit += [m['name'] for m in [ egamma_HF, egamma_HF_Minus, egamma_HF_Plus, egamma_HF_InnerMostRingsMinus, egamma_HF_InnerMostRingsPlus]]
+
+def getLinSquStr(f):
+  return  "10^{-6}#upoint ("+str(round(10**6*f.GetParameter(0),1))+'#pm '+str(round(10**6*abs(f.GetParError(0)),1))+") #upoint n^{2}+10^{-3}#upoint("+str(round(10**3*f.GetParameter(1),1))+'#pm '+str(round(10**3*abs(f.GetParError(1)),1))+") #upoint n"
+def getSquStr(f):
+  return  "10^{-6}#upoint ("+str(round(10**6*f.GetParameter(0),1))+'#pm '+str(round(10**6*abs(f.GetParError(0)),1))+") #upoint n^{2}"
+def getPropStr(f):
+  return "10^{-3} #upoint ("+str(round(10**3*f.GetParameter(0),1))+'#pm '+str(round(10**3*abs(f.GetParError(0)),1))+") #upoint n"
+def getLinStr(f):
+  return '('+str(round(f.GetParameter(0),1))+'#pm '+str(round(abs(f.GetParError(0)),1))+") + 10^{-3}#upoint("+str(round(10**3*f.GetParameter(1),1))+'#pm '+str(round(10**3*abs(f.GetParError(1)),1))+") #upoint n"
 
 for map in maps:
-  if map['name'] in makeN2Fit:
-    fx = ROOT.TF1('fx', '[0]*x**2+[1]*x',*(map['fitRange']))
-  else:
-    fx = ROOT.TF1('fx', '[0]*x',*(map['fitRange']))
+  map['func'] = '[0]*x**2+[1]*x'
+  map['strFunc'] = getLinSquStr
+
+egamma_HF_Plus['func'] = '[0] + [1]*x'
+egamma_HF_Plus['strFunc'] = getLinStr
+egamma_HF_Minus['func'] = '[0] + [1]*x'
+egamma_HF_Minus['strFunc'] = getLinStr
+h_HF_InnerMostRingsPlus['func'] = '[0]*x**2'
+h_HF_InnerMostRingsPlus['strFunc'] = getSquStr
+h_HF_InnerMostRingsMinus['func'] = '[0]*x**2'
+h_HF_InnerMostRingsMinus['strFunc'] = getSquStr
+egamma_HF_InnerMostRingsPlus['func'] = '[0]*x'
+egamma_HF_InnerMostRingsPlus['strFunc'] = getPropStr
+egamma_HF_InnerMostRingsMinus['func'] = '[0]*x'
+egamma_HF_InnerMostRingsMinus['strFunc'] = getPropStr
+gammaEndcapPlus['func'] = '[0] + [1]*x'
+gammaEndcapPlus['strFunc'] = getLinStr
+gammaEndcapMinus['func'] = '[0] + [1]*x'
+gammaEndcapMinus['strFunc'] = getLinStr
+
+for map in maps:
+  fx = ROOT.TF1('fx', map['func'], *(map['fitRange']))
   px = getObjFromFile(options.infile, 'pfMEtMultCorrInfoWriter/pfMEtMultCorrInfoWriter_'+map['name'].replace('h_HF','hHF').replace('egamma_HF','egammaHF')+'_Px') 
   px.Fit(fx, 'R')
 
-  if map['name'] in makeN2Fit:
-    fy = ROOT.TF1('fy', '[0]*x**2+[1]*x',*(map['fitRange']))
-  else:
-    fy = ROOT.TF1('fy', '[0]*x',*(map['fitRange']))
+  fy = ROOT.TF1('fy', map['func'], *(map['fitRange']))
   py = getObjFromFile(options.infile, 'pfMEtMultCorrInfoWriter/pfMEtMultCorrInfoWriter_'+map['name'].replace('h_HF','hHF').replace('egamma_HF','egammaHF')+'_Py') 
   py.Fit(fy,'R')
 
   result = {'fx':fx.Clone(),'fy':fy.Clone()}
-  
 
   c1 = ROOT.TCanvas()  
   ROOT.gStyle.SetOptStat(0)
@@ -103,6 +122,10 @@ for map in maps:
   px.GetXaxis().SetTitleSize(0.05)
   px.GetXaxis().SetTitleOffset(1.1)
   px.GetYaxis().SetRangeUser(*(map['zoomRange']))
+  if map.has_key('plotRange'):
+    px.GetXaxis().SetRangeUser(*(map['plotRange']))
+  else:
+    px.GetXaxis().SetRangeUser(*(map['fitRange']))
   px.SetLineColor(ROOT.kBlue)
   px.SetLineStyle(0)
   px.SetLineWidth(2)
@@ -115,12 +138,14 @@ for map in maps:
   py.SetMarkerStyle(0)
   py.SetMarkerSize(0)
   py.Draw('hsame')
-  if map['name'] in makeN2Fit:
-    lines = [ [0.18, 0.78,  "<#slash{E}_{x}> = 10^{-6}#upoint ("+str(round(10**6*fx.GetParameter(0),1))+'#pm '+str(round(10**6*abs(fx.GetParError(0)),1))+") #upoint n^{2}+10^{-3}#upoint("+str(round(10**3*fx.GetParameter(1),1))+'#pm '+str(round(10**3*abs(fx.GetParError(1)),1))+") #upoint n"],
-              [0.18, 0.73,  "<#slash{E}_{y}> = 10^{-6}#upoint ("+str(round(10**6*fy.GetParameter(0),1))+'#pm '+str(round(10**6*abs(fy.GetParError(0)),1))+") #upoint n^{2}+10^{-3}#upoint("+str(round(10**3*fy.GetParameter(1),1))+'#pm '+str(round(10**3*abs(fy.GetParError(1)),1))+") #upoint n"]]
-  else:
-    lines = [ [0.4, 0.78,  "<#slash{E}_{x}> = 10^{-3} #upoint ("+str(round(10**3*fx.GetParameter(0),1))+'#pm '+str(round(10**3*abs(fx.GetParError(0)),1))+") #upoint n"],
-              [0.4, 0.73,  "<#slash{E}_{y}> = 10^{-3} #upoint ("+str(round(10**3*fy.GetParameter(0),1))+'#pm '+str(round(10**3*abs(fy.GetParError(0)),1))+") #upoint n"]]
+  lines = [ [0.18, 0.78,  "<#slash{E}_{x}> = "+map['strFunc'](fx)],
+            [0.18, 0.73,  "<#slash{E}_{y}> = "+map['strFunc'](fy)]
+      ]
+#    lines = [ [0.18, 0.78,  "<#slash{E}_{x}> = 10^{-6}#upoint ("+str(round(10**6*fx.GetParameter(0),1))+'#pm '+str(round(10**6*abs(fx.GetParError(0)),1))+") #upoint n^{2}+10^{-3}#upoint("+str(round(10**3*fx.GetParameter(1),1))+'#pm '+str(round(10**3*abs(fx.GetParError(1)),1))+") #upoint n"],
+#              [0.18, 0.73,  "<#slash{E}_{y}> = 10^{-6}#upoint ("+str(round(10**6*fy.GetParameter(0),1))+'#pm '+str(round(10**6*abs(fy.GetParError(0)),1))+") #upoint n^{2}+10^{-3}#upoint("+str(round(10**3*fy.GetParameter(1),1))+'#pm '+str(round(10**3*abs(fy.GetParError(1)),1))+") #upoint n"]]
+#  else:
+#    lines = [ [0.4, 0.78,  "<#slash{E}_{x}> = 10^{-3} #upoint ("+str(round(10**3*fx.GetParameter(0),1))+'#pm '+str(round(10**3*abs(fx.GetParError(0)),1))+") #upoint n"],
+#              [0.4, 0.73,  "<#slash{E}_{y}> = 10^{-3} #upoint ("+str(round(10**3*fy.GetParameter(0),1))+'#pm '+str(round(10**3*abs(fy.GetParError(0)),1))+") #upoint n"]]
 
   latex = ROOT.TLatex();
   latex.SetNDC();

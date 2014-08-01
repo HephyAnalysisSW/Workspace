@@ -1,13 +1,22 @@
 #!/bin/env python
 import os, sys, re
-infile=""
-if len(sys.argv)==1:
-  print "No input file"
-#  infile = "status.txt"
-  sys.exit()
-else:
-  infile = sys.argv[1]
-print "Input File", infile
+
+from optparse import OptionParser
+parser = OptionParser()
+parser.add_option("--nmax", dest="nmax", default=500, type="int", action="store", help="take 500 if you don't know what to do.")
+parser.add_option("--infile", dest="infile", default="", type="string", action="store", help="")
+parser.add_option("--cmd", dest="cmd", default="", type="string", action="store", help="")
+(options, args) = parser.parse_args()
+
+infile=options.infile
+#infile=""
+#if len(sys.argv)==1:
+#  print "No input file"
+##  infile = "status.txt"
+#  sys.exit()
+#else:
+#  infile = sys.argv[1]
+#print "Input File", infile
 lines = file(infile).readlines()
 resubmitjobs = {}
 latestwdir = "None"
@@ -64,10 +73,11 @@ outfile.write('#!/bin/sh\n')
 for key in resubmitjobs:
   if len(resubmitjobs[key])>0:
     prestring = "crab -forceResubmit "
-    for n in range(len(resubmitjobs[key])/500+1):
-      sstring = prestring + ','.join([str(j) for j in resubmitjobs[key][500*n:500*(n+1)]])+' -c ' +key
+    for n in range(len(resubmitjobs[key])/options.nmax+1):
+      sstring = prestring + ','.join([str(j) for j in resubmitjobs[key][options.nmax*n:options.nmax*(n+1)]])+' -c ' +key
       outfile.write(sstring+'\n') 
       print sstring
+      if options.cmd!="":outfile.write(options.cmd+'\n')
 print "Written resubmit.sh"
 outfile.close()
 os.system("chmod +x resubmit.sh")
