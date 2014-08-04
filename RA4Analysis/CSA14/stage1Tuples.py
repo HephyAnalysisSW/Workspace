@@ -1,8 +1,8 @@
 import copy, os, sys
 
-={}
+ttJetsCSA14={}
 ttJetsCSA14["name"]     = "ttJets";
-ttJetsCSA14["dirname"] = "stage1CSA14"
+ttJetsCSA14["dirname"] = "/data/schoef/stage1CSA14"
 ttJetsCSA14["Chain"] = "Events"
 #ttJetsCSA14['reweightingHistoFile'] = S10rwHisto 
 #ttJetsCSA14['reweightingHistoFileSysPlus'] = S10rwPlusHisto
@@ -10,7 +10,22 @@ ttJetsCSA14["Chain"] = "Events"
 ttJetsCSA14["bins"] = ["TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola_Spring14miniaod-PU20bx25_POSTLS170_V5-v1__3"]
 
 
+#testSample={}
+#testSample["name"]     = "ttJets";
+#testSample["dirname"] = "/data/schoef/stage1CSA14"
+#testSample["Chain"] = "Events"
+#testSample["bins"] = ["testBin"]
 
+testSample={}
+testSample["name"]     = "tmp";
+testSample["dirname"] = "/afs/hephy.at/scratch/s/schoefbeck/CMS/CMSSW_7_0_6_patch1/src/Workspace/"
+testSample["Chain"] = "Events"
+testSample["bins"] = ["tmp"]
+
+ttbarTest = {}
+ttbarTest["name"]     = "ttbarTest";
+ttbarTest["dirname"] = "/data/schoef/miniAOD"
+ttbarTest["bins"]    = [ 'ttbarTest']
 
 
 #from Workspace.HEPHYPythonTools.createPUReweightingHisto import getPUReweightingUncertainty

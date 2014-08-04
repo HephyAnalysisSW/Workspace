@@ -46,7 +46,7 @@ public:
   double ptThreshold_;
   edm::InputTag vertices_;
 
-//  bool   elePFRelIsoAreaCorrected_;
+  bool   elePFRelIsoAreaCorrected_;
   edm::InputTag   eleRho_;
   std::vector<edm::ParameterSet> eleIDs_;
 

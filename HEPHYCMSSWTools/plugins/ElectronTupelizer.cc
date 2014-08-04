@@ -20,7 +20,7 @@ ElectronTupelizer::ElectronTupelizer( const edm::ParameterSet & pset):
   input_ ( pset.getUntrackedParameter< edm::InputTag >("input") ),
   ptThreshold_ (pset.getUntrackedParameter< double >("ptThreshold") ),
   vertices_ ( pset.getUntrackedParameter< edm::InputTag >("vertices") ),
-//  elePFRelIsoAreaCorrected_ ( pset.getUntrackedParameter< bool >("elePFRelIsoAreaCorrected") ),
+  elePFRelIsoAreaCorrected_ ( pset.getUntrackedParameter< bool >("elePFRelIsoAreaCorrected") ),
   eleRho_ ( pset.getUntrackedParameter< edm::InputTag >("eleRho") ),
   eleIDs_ ( pset.getUntrackedParameter< std::vector<edm::ParameterSet> >("eleIDs") )
  
@@ -48,7 +48,7 @@ void ElectronTupelizer::beginRun ( edm::Run & iRun, edm::EventSetup const & iSet
 void ElectronTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup) {
   ev_ = &ev;
   vector<pat::Electron> electrons (EdmHelper::getObjs<pat::Electron>(ev, input_));
-//  bool isData (ev.eventAuxiliary().isRealData());
+  bool isData (ev.eventAuxiliary().isRealData());
   //BeamSpot
   math::XYZPoint beamSpotPosition;
   beamSpotPosition.SetCoordinates(0,0,0);
@@ -91,7 +91,7 @@ void ElectronTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup)
   ev.getByLabel(eleRho_, eleRho);
   put("eleRho", *eleRho);
 //  std::vector<float> elesPt, elesEta, elesPhi, elesAeff, eles03ChargedHadronIso, eles03NeutralHadronIso, eles03GammaIso, elesOneOverEMinusOneOverP, elesPfRelIso, elesSigmaIEtaIEta, elesHoE, elesDPhi, elesDEta, elesDxy, elesDz;//, elesPFDeltaPT;
-  std::vector<float> elesPt, elesEta, elesPhi, elesOneOverEMinusOneOverP, elesSigmaIEtaIEta, elesHoE, elesDPhi, elesDEta, elesDxy, elesDz;//, elesPFDeltaPT;
+  std::vector<float> elesPt, elesEta, elesPhi, elesOneOverEMinusOneOverP, elesSigmaIEtaIEta, elesHoE, elesDPhi, elesDEta, elesDxy, elesDz, elesPfRelIso;//, elesPFDeltaPT;
 
   std::vector<int> elesPdg, elesMissingHits;
   std::vector<int> elesPassConversionRejection, elesPassPATConversionVeto;
@@ -136,27 +136,30 @@ void ElectronTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup)
     }
 
 //    bool passConversionRejection = gsfel.isNull() ? false : !ConversionTools::hasMatchedConversion(*gsfel,hConversions,beamSpotPosition);
-//    double charged = (*(*electronIsoVals)[0])[gsfel];
-//    double photon = (*(*electronIsoVals)[1])[gsfel];
-//    double neutral = (*(*electronIsoVals)[2])[gsfel];
+    double charged = ele->pfIsolationVariables().sumChargedHadronPt;
+    double photon = ele->pfIsolationVariables().sumPhotonEt;
+    double neutral =ele->pfIsolationVariables().sumNeutralHadronEt;
     //cout<<charged<<" "<<photon<<" "<<neutral<<endl;
 //    cout<<""<<ele->isoDeposit(pat::PfChargedHadronIso)<<" "<<ele->isoDeposit(pat::PfNeutralHadronIso)<<" "<<ele->isoDeposit(pat::PfGammaIso)<<endl;
+
+//      cout<<ele->pfIsolationR03().sumChargedHadronPt<<" "<< ele->pfIsolationR03().sumNeutralHadronEt<<" "<< ele->pfIsolationR03().sumPhotonEt<<" "<<ele->pfIsolationR03().sumPUPt<<endl;
+
 //    double charged = ele->isoDeposit(pat::PfChargedHadronIso)->depositWithin(0.3);
 //    double neutral = ele->isoDeposit(pat::PfNeutralHadronIso)->depositWithin(0.3);
 //    double photon = ele->isoDeposit(pat::PfGammaIso)->depositWithin(0.3);
 //    ele->isoDeposit(pat::PfPUChargedHadronIso)->depositWithin(0.3);
     
-//    double Aeff= isData ? ElectronEffectiveArea::GetElectronEffectiveArea(ElectronEffectiveArea::kEleGammaAndNeutralHadronIso03, eta, ElectronEffectiveArea::kEleEAData2011):
-//                   ElectronEffectiveArea::GetElectronEffectiveArea(ElectronEffectiveArea::kEleGammaAndNeutralHadronIso03, eta, ElectronEffectiveArea::kEleEAFall11MC);
-//
-//    double pfRelIso = elePFRelIsoAreaCorrected_?( charged + max (0., photon + neutral - (*eleRho)*Aeff) ) / pt : ( charged + photon + neutral ) / pt;
+    double Aeff= isData ? ElectronEffectiveArea::GetElectronEffectiveArea(ElectronEffectiveArea::kEleGammaAndNeutralHadronIso03, eta, ElectronEffectiveArea::kEleEAData2011):
+                   ElectronEffectiveArea::GetElectronEffectiveArea(ElectronEffectiveArea::kEleGammaAndNeutralHadronIso03, eta, ElectronEffectiveArea::kEleEAFall11MC);
 
+    double pfRelIso = elePFRelIsoAreaCorrected_?( charged + max (0., photon + neutral - (*eleRho)*Aeff) ) / pt : ( charged + photon + neutral ) / pt;
+//    cout<<"Aeff "<<Aeff<<" rho "<<*eleRho<<" pfRelIso "<<pfRelIso<<endl;
     if (verbose_) {
       cout<<"[ele "<< ele - electrons.begin()<<"] "<<endl;//<<boolalpha<<"isBarrel? "<<isBarrel<<" isEndcap? "<<isEndcap<<" isGood "<<isGood<<" isGoodVeto "<<isGoodVeto<<endl;
 //      cout<<" pt "<<ele->pt()<<" eta "<<ele->superCluster()->eta()<<" phi "<<ele->phi()<<" oneOverEMinusOneOverP "<<oneOverEMinusOneOverP<<" sigmaIEtaIEta "<<sigmaIEtaIEta <<" pfRelIso "<<pfRelIso<<" HoE "<<HoE<<endl;
       cout<<" pt "<<ele->pt()<<" eta "<<eta<<" phi "<<ele->phi()<<" oneOverEMinusOneOverP "<<oneOverEMinusOneOverP<<" sigmaIEtaIEta "<<sigmaIEtaIEta <<" HoE "<<HoE<<endl;
       cout<<" DPhi "<<DPhi<<" DEta "<<DEta<<" missingHits "<<missingHits<<" elesPassPATConversionVeto "<<ele->passConversionVeto()<<" dxy "<<dxy<<" dz "<<dz<<endl;//" pfDeltaPT "<<deltapT<<endl;
-//      cout<<" chargedHadronIso03 "<<charged<<" neutralHadronIso03 "<<neutral<<" gammaIso03 "<< photon<<" Aeff "<<Aeff<<" rho "<<*eleRho<<endl;
+      cout<<" chargedHadron "<<charged<<" neutralHadron "<<neutral<<" gamma "<< photon<<" Aeff "<<Aeff<<" rho "<<*eleRho<<endl;
 //      cout<<" chargedHadronIso03 "<<charged<<" neutralHadronIso03 "<<neutral<<" gammaIso03 "<< photon<<" rho "<<*eleRho<<endl;
       cout<<" ecalIso "<<ele->ecalIso()<<" hcalIso "<<ele->hcalIso()<<" trackIso "<<ele->trackIso()<<endl;
     }
@@ -168,7 +171,7 @@ void ElectronTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup)
         elesPhi.push_back(ele->phi());
         elesPdg.push_back(ele->pdgId());
         elesOneOverEMinusOneOverP.push_back(oneOverEMinusOneOverP);
-//        elesPfRelIso.push_back(pfRelIso);
+        elesPfRelIso.push_back(pfRelIso);
 //        elesAeff.push_back(Aeff);
 //        eles03ChargedHadronIso.push_back(charged);
 //        eles03NeutralHadronIso.push_back(neutral);
@@ -191,7 +194,7 @@ void ElectronTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup)
   put("elesPhi", elesPhi);
   put("elesPdg", elesPdg);
   put("elesOneOverEMinusOneOverP", elesOneOverEMinusOneOverP);
-//  put("elesPfRelIso", elesPfRelIso);
+  put("elesPfRelIso", elesPfRelIso);
 //  put("eles03ChargedHadronIso", eles03ChargedHadronIso);
 //  put("eles03NeutralHadronIso", eles03NeutralHadronIso);
 //  put("eles03GammaIso", eles03GammaIso);
@@ -221,7 +224,7 @@ void ElectronTupelizer::addAllVars( )
   addVar("elesPhi/F[]");
   addVar("elesPdg/I[]");
   addVar("elesOneOverEMinusOneOverP/F[]");
-//  addVar("elesPfRelIso/F[]");
+  addVar("elesPfRelIso/F[]");
 //  addVar("eles03ChargedHadronIso/F[]");
 //  addVar("eles03NeutralHadronIso/F[]");
 //  addVar("eles03GammaIso/F[]");

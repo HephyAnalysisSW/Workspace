@@ -49,12 +49,13 @@ options.register ('keep','',
 #          "whether or not to add pdfWeights")
 
 #infiles = ['root://xrootd.unl.edu//store/mc/Spring14dr/WJetsToLNu_HT-100to200_Tune4C_13TeV-madgraph-tauola/AODSIM/PU20bx25_POSTLS170_V5-v1/00000/00165B45-82E6-E311-B68D-002590AC4FEC.root']
-infiles = ['file:/data/schoef/local/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola_PU20bx25_POSTLS170_V5-v1_MINIAODSIM.root']
-
+#infiles = ['file:/data/schoef/local/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola_PU20bx25_POSTLS170_V5-v1_MINIAODSIM.root']
+#infiles = ['root://eoscms.cern.ch//eos/cms/store/relval/CMSSW_7_0_5/RelValTTbar_13/GEN-SIM-RECO/POSTLS170_V6-v3/00000/0423767B-B5DD-E311-A1E0-02163E00E5B5.root']
+infiles = ['file:/afs/hephy.at/scratch/s/schoefbeck/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola_PU20bx25_POSTLS170_V5-v1_MINIAODSIM.root']
 options.files=infiles
 
 options.mode = 'mc'
-options.maxEvents=100
+options.maxEvents=1000
 
 if not 'ipython' in VarParsing.sys.argv[0]:
   options.parseArguments()
@@ -62,7 +63,10 @@ else:
   print "No parsing of arguments!"
 
 isMC = (options.mode.lower()=='sms' or options.mode.lower()=='mc')
-toKeep = ['keep '+x for x in options.keep.split(',')]
+if options.keep!='':
+  toKeep = ['keep '+x for x in options.keep.split(',')]
+else:
+  toKeep=[]
 print "mode",options.mode,"isMC?",isMC, ", verbose?",options.verbose,'keep?', toKeep, "GT",options.GT, ", triggers", options.triggers#, 'addPDFWeights?',options.addPDFWeights
 
 #-- Message Logger ------------------------------------------------------------
@@ -144,7 +148,7 @@ process.out = cms.OutputModule("PoolOutputModule",
 #process.load('RecoMET.METFilters.EcalDeadCellTriggerPrimitiveFilter_cfi')
 #process.load('RecoMET.METFilters.trackingFailureFilter_cfi')
 #
-#process.load('Workspace.HEPHYCMSSWTools.EventCounter')
+process.load('Workspace.HEPHYCMSSWTools.EventCounter')
 #
 #process.EventCounterAfterHLT = process.EventCounter.clone()
 #process.EventCounterAfterScraping = process.EventCounter.clone()
@@ -156,14 +160,15 @@ process.out = cms.OutputModule("PoolOutputModule",
 #process.EventCounterAfterEEBadSC = process.EventCounter.clone()
 #process.EventCounterAfterECALTP = process.EventCounter.clone()
 #
-#process.filterSequence = cms.Sequence(
-#    process.EventCounter*
-#      process.hltFilter *
+process.filterSequence = cms.Sequence(
+    process.EventCounter
+#      *process.hltFilter *
 #    process.EventCounterAfterHLT*
 #      process.scrapingVeto *
 #    process.EventCounterAfterScraping*
 #      process.primaryVertexFilter*
-#    process.EventCounterAfterPV)
+#    process.EventCounterAfterPV
+)
 #process.filterSequence+= process.goodVertices
 #if not options.mode.lower()=='sms':
 #  process.filterSequence+= process.HBHENoiseFilter
@@ -195,6 +200,36 @@ process.out = cms.OutputModule("PoolOutputModule",
 #  process.filterSequence+=process.EventCounterafterECalLaserCorrectionFilter
 #
 #  print "\nFilter List:", "HLT, scraping, PV, HBHE, trackingFailureFilter, hcalLaser, CSCTightHalo, eeBadSC, EcalTP, hcalLaser2012, ecalLaserCorr\n"
+from RecoMET.METProducers.PFMET_cfi import pfMet
+process.pfMet = pfMet.clone(src = "packedPFCandidates")
+process.pfMet.calculateSignificance = False # this can't be easily implemented on packed PF candidates at the moment
+
+#process.load('RecoMET.Configuration.GenMETParticles_cff')
+#process.genParticlesForMETAllVisible.src=cms.InputTag("packedGenParticles")
+
+from RecoMET.Configuration.GenMETParticles_cff import genParticlesForMETAllVisible
+#process.genParticlesForMETAllVisible = genParticlesForMETAllVisible.clone(src = cms.InputTag( "packedGenParticles"))
+#from RecoMET.METProducers.genMetTrue_cfi import genMetTrue
+#process.genMetTrue = genMetTrue.clone()
+#process.genMETSequence = cms.Sequence(process.genParticlesForMETAllVisible * process.genMetTrue)
+
+#leptons = cms.EDProducer("PdgIdAndStatusCandViewSelector",
+#  src = cms.InputTag("genParticles"), 
+#  pdgId = cms.vint32( 11, 13 ),
+#  status = cms.vint32( )
+#)
+# PdgIdAndStatusCandViewSelector
+
+process.packedCandidatesForGenMET = cms.EDProducer("PdgIdCandViewExcluder",
+    src = cms.InputTag("packedGenParticles"), 
+    pdgId =  genParticlesForMETAllVisible.ignoreParticleIDs 
+  )
+
+
+from RecoMET.METProducers.genMetTrue_cfi import genMetTrue
+process.genMetTrue = genMetTrue.clone(src = cms.InputTag('packedGenParticles'))
+
+process.genMETSequence = cms.Sequence( process.packedCandidatesForGenMET * process.genMetTrue)
 
 process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
 process.printTree = cms.EDAnalyzer("ParticleTreeDrawer",
@@ -215,7 +250,6 @@ process.printTree = cms.EDAnalyzer("ParticleTreeDrawer",
 #-- Execution path ------------------------------------------------------------
 
 #process.load('CommonTools.ParticleFlow.goodOfflinePrimaryVertices_cfi') #FIXME Added R.S.
-process.p = cms.Path()
 ##process.p += process.printTree
 #if options.mode.lower()=='sms' or options.addPDFWeights:
 #  process.pdfWeights = cms.EDProducer("PdfWeightProducer",
@@ -248,25 +282,25 @@ process.p = cms.Path()
 #process.kt6PFJetsForIsolation2011 = kt4PFJets.clone( rParam = 0.6, doRhoFastjet = True )
 #process.kt6PFJetsForIsolation2011.Rho_EtaMax = cms.double(2.5)
 #process.p+=process.kt6PFJetsForIsolation2011
-
+process.miniAODTupelizerSequence = cms.Sequence()
 process.load('Workspace.HEPHYCMSSWTools.JetTupelizer_miniAOD_cfi')
 process.JetTupelizer.useForDefaultAlias = cms.untracked.bool(True)
-process.p += process.JetTupelizer
+process.miniAODTupelizerSequence += process.JetTupelizer
 process.load('Workspace.HEPHYCMSSWTools.MuonTupelizer_miniAOD_cfi')
 process.MuonTupelizer.useForDefaultAlias = cms.untracked.bool(True)
-process.p += process.MuonTupelizer
+process.miniAODTupelizerSequence += process.MuonTupelizer
 process.load('Workspace.HEPHYCMSSWTools.ElectronTupelizer_miniAOD_cfi')
 process.ElectronTupelizer.useForDefaultAlias = cms.untracked.bool(True)
-process.p += process.ElectronTupelizer
+process.miniAODTupelizerSequence += process.ElectronTupelizer
 process.load('Workspace.HEPHYCMSSWTools.TauTupelizer_miniAOD_cfi')
 process.TauTupelizer.useForDefaultAlias = cms.untracked.bool(True)
-process.p += process.TauTupelizer
+process.miniAODTupelizerSequence += process.TauTupelizer
 process.load('Workspace.HEPHYCMSSWTools.TriggerTupelizer_cfi')
 process.TriggerTupelizer.useForDefaultAlias = cms.untracked.bool(True)
-process.p += process.TriggerTupelizer
+process.miniAODTupelizerSequence += process.TriggerTupelizer
 process.load('Workspace.HEPHYCMSSWTools.BasicTupelizer_miniAOD_cfi')
 process.BasicTupelizer.useForDefaultAlias = cms.untracked.bool(True)
-process.p += process.BasicTupelizer
+process.miniAODTupelizerSequence += process.BasicTupelizer
 
 #process.SUSYTupelizer.triggerCollection = cms.untracked.InputTag( options.hltName )
 #process.SUSYTupelizer.addTriggerInfo = cms.untracked.bool(True)
@@ -277,6 +311,9 @@ process.p += process.BasicTupelizer
 #process.SUSYTupelizer.addEleVector = cms.untracked.bool(True)
 #process.SUSYTupelizer.addTauiVector = cms.untracked.bool(True)
 #process.SUSYTupelizer.metsToMonitor = []
+
+process.p = cms.Path(process.filterSequence + process.genMETSequence + process.miniAODTupelizerSequence)
+#process.p = cms.Path(process.miniAODTupelizerSequence)
 
 
 #process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
