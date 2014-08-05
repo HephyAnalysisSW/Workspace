@@ -211,7 +211,7 @@ from RecoMET.Configuration.GenMETParticles_cff import genParticlesForMETAllVisib
 #process.genParticlesForMETAllVisible = genParticlesForMETAllVisible.clone(src = cms.InputTag( "packedGenParticles"))
 #from RecoMET.METProducers.genMetTrue_cfi import genMetTrue
 #process.genMetTrue = genMetTrue.clone()
-#process.genMETSequence = cms.Sequence(process.genParticlesForMETAllVisible * process.genMetTrue)
+#process.metSequence = cms.Sequence(process.genParticlesForMETAllVisible * process.genMetTrue)
 
 #leptons = cms.EDProducer("PdgIdAndStatusCandViewSelector",
 #  src = cms.InputTag("genParticles"), 
@@ -230,7 +230,7 @@ from RecoMET.METProducers.genMetTrue_cfi import genMetTrue
 #process.genMetTrue = genMetTrue.clone(src = cms.InputTag('packedGenParticles'))
 process.genMetTrue = genMetTrue.clone(src = cms.InputTag('packedGenParticlesForGenMET'))
 
-process.genMETSequence = cms.Sequence( process.packedGenParticlesForGenMET * process.genMetTrue)
+process.metSequence = cms.Sequence( process.packedGenParticlesForGenMET * process.genMetTrue *process.pfMet)
 
 process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
 process.printTree = cms.EDAnalyzer("ParticleTreeDrawer",
@@ -313,7 +313,7 @@ process.miniAODTupelizerSequence += process.BasicTupelizer
 #process.SUSYTupelizer.addTauiVector = cms.untracked.bool(True)
 #process.SUSYTupelizer.metsToMonitor = []
 
-process.p = cms.Path(process.filterSequence + process.genMETSequence + process.miniAODTupelizerSequence)
+process.p = cms.Path(process.filterSequence + process.metSequence + process.miniAODTupelizerSequence)
 #process.p = cms.Path(process.miniAODTupelizerSequence)
 
 
