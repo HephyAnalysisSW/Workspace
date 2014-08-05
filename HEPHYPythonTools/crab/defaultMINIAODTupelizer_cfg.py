@@ -219,13 +219,22 @@ from RecoMET.Configuration.GenMETParticles_cff import genParticlesForMETAllVisib
 #  status = cms.vint32( )
 #)
 # PdgIdAndStatusCandViewSelector
-vList = list(genParticlesForMETAllVisible.ignoreParticleIDs) + [-x for x in list(genParticlesForMETAllVisible.ignoreParticleIDs)]
-process.packedGenParticlesForGenMET = cms.EDFilter("PdgIdCandViewExcluder",
-    src = cms.InputTag("packedGenParticles"), 
-#    pdgId =  genParticlesForMETAllVisible.ignoreParticleIDs 
-    pdgId = cms.vint32(vList) 
-  )
 
+vList = [abs(x) for x in list(genParticlesForMETAllVisible.ignoreParticleIDs)]
+print "status==1&("+("&".join(["abs(pdgId)!="+str(x) for x in vList]))+")"
+process.packedGenParticlesForGenMET = cms.EDFilter(
+    "CandViewRefSelector",
+    src = cms.InputTag("packedGenParticles"),
+    cut = cms.string("status==1&("+("&".join(["abs(pdgId)!="+str(x) for x in vList]))+")"),
+    noSeqChain = cms.bool(True), # Don't "chain" these sequence and update [src]
+)
+
+#process.packedGenParticlesForGenMET = cms.EDFilter("PdgIdCandViewExcluder",
+#    src = cms.InputTag("packedGenParticles"), 
+##    pdgId =  genParticlesForMETAllVisible.ignoreParticleIDs 
+#    pdgId = cms.vint32(vList) 
+#  )
+#
 from RecoMET.METProducers.genMetTrue_cfi import genMetTrue
 #process.genMetTrue = genMetTrue.clone(src = cms.InputTag('packedGenParticles'))
 process.genMetTrue = genMetTrue.clone(src = cms.InputTag('packedGenParticlesForGenMET'))
