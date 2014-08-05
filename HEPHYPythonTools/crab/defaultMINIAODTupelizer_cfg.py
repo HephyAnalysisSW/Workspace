@@ -219,17 +219,18 @@ from RecoMET.Configuration.GenMETParticles_cff import genParticlesForMETAllVisib
 #  status = cms.vint32( )
 #)
 # PdgIdAndStatusCandViewSelector
-
-process.packedCandidatesForGenMET = cms.EDProducer("PdgIdCandViewExcluder",
+vList = list(genParticlesForMETAllVisible.ignoreParticleIDs) + [-x for x in list(genParticlesForMETAllVisible.ignoreParticleIDs)]
+process.packedGenParticlesForGenMET = cms.EDFilter("PdgIdCandViewExcluder",
     src = cms.InputTag("packedGenParticles"), 
-    pdgId =  genParticlesForMETAllVisible.ignoreParticleIDs 
+#    pdgId =  genParticlesForMETAllVisible.ignoreParticleIDs 
+    pdgId = cms.vint32(vList) 
   )
 
-
 from RecoMET.METProducers.genMetTrue_cfi import genMetTrue
-process.genMetTrue = genMetTrue.clone(src = cms.InputTag('packedGenParticles'))
+#process.genMetTrue = genMetTrue.clone(src = cms.InputTag('packedGenParticles'))
+process.genMetTrue = genMetTrue.clone(src = cms.InputTag('packedGenParticlesForGenMET'))
 
-process.genMETSequence = cms.Sequence( process.packedCandidatesForGenMET * process.genMetTrue)
+process.genMETSequence = cms.Sequence( process.packedGenParticlesForGenMET * process.genMetTrue)
 
 process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
 process.printTree = cms.EDAnalyzer("ParticleTreeDrawer",
