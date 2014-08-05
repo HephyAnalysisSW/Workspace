@@ -23,6 +23,6 @@ config.Data.unitsPerJob = 2
 #config.Data.totalUnits = 
 
 config.section_("Site")
-config.Site.storageSite = 'T2_AT_Vienna'
+config.Site.storageSite = 'T2_AT_Legarno'
 
 

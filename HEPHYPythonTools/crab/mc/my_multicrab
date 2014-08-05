@@ -1,7 +1,7 @@
 #! /bin/sh -x 
 #for name in `ls -d 8TeV-WJetsToLNu_HT-* 8TeV*TTJets*`
 #for name in `ls -d 8TeV-Wplus* 8TeV-Wminus* 8TeV-WJetsToLNu_HT-*`
-for name in `ls -d *POST*`
+for name in `ls -d TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola_Spring14miniaod-PU20bx25_POSTLS170_V5-v1`
 do
   tokens
   crab $1 $2 -c $name 
