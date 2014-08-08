@@ -157,11 +157,11 @@ def calcHTRatio(jets, metPhi):
 def findClosestJet(jets, obj):
 ##  jets = getJets(c)
   res=[]
-  for j in jets:
-    res.append([sqrt((j['phi'] - obj['phi'])**2 + (j['eta'] - obj['eta'])**2), j])
+  for i,j in enumerate(jets):
+    res.append([sqrt((j['phi'] - obj['phi'])**2 + (j['eta'] - obj['eta'])**2), j, i])
   res.sort()
   if len(res)>0:
-    return {'deltaR':res[0][0], 'jet':res[0][1]}
+    return {'deltaR':res[0][0], 'jet':res[0][1], 'index':res[0][2]}
 
 def closestMuJetDeltaR(c):
   return findClosestJet(c, getSoftIsolatedMu(c))['deltaR']
