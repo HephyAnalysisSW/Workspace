@@ -41,7 +41,6 @@ def getAllElectronsStage1(c, neles ):
   res = sorted(res, key=lambda k: -k['pt'])
   return res
 
-
 def tightPOGEleID(ele):
   return ele['pt']>20 and abs(ele['eta'])<2.5 and ele['relIso']<0.15 and ele['ConvRejection'] and ele['MissingHits']<=1 and abs(ele['Dxy'])<0.02  and ele['OneOverEMinusOneOverP']<0.05\
     and abs(ele['Dz'])<0.1 and (\
@@ -64,14 +63,12 @@ def getLooseMuStage1(c, imu ):
   if isPF and (isGlobal or isTracker) and pt>5. and abs(eta)<2.5 and abs(dz)<0.5:
     return {'pt':pt, 'phi':getVarValue(c, 'muonsPhi', imu), 'eta':eta, 'IsGlobal':isGlobal, 'IsTracker':isTracker, 'IsPF':isPF, 'relIso':getVarValue(c, 'muonsPFRelIso', imu), 'Dz':dz}
 
-
 def tightPOGMuID(mu):
   return mu['IsGlobal'] and mu['IsPF'] and mu['pt']>20 and abs(mu['eta'])<2.1 and mu['relIso']<0.12 and mu['NormChi2']<=10 and mu['NValMuonHits']>0\
      and mu['NumMatchedStations']>1 and mu['PixelHits']>0 and mu['NumtrackerLayerWithMeasurement']>5 and abs(mu['Dxy'])<0.02 and abs(mu['Dz'])<0.5
 
 def vetoMuID(mu):
   return (mu['IsTracker'] or mu['IsGlobal']) and mu['IsPF'] and mu['pt']>15 and abs(mu['eta'])<2.5 and mu['relIso']<0.2  and abs(mu['Dxy'])<0.2 and abs(mu['Dz'])<0.5
-
 
 def getAllMuonsStage1(c, nmuons ):
   res=[]
@@ -84,10 +81,8 @@ def getAllMuonsStage1(c, nmuons ):
   res = sorted(res, key=lambda k: -k['pt'])
   return res
 
-
 def getTauStage1(c, itau ):
 #  print getVarValue(c, 'tausisPF', itau),          getVarValue(c, 'tausDecayModeFinding', itau),          getVarValue(c, 'tausAgainstMuonLoose', itau),          getVarValue(c, 'tausAgainstElectronLoose', itau),          getVarValue(c, '
-
 #  return getVarValue(c, 'tausisPF', itau) and \
   return getVarValue(c, 'tausDecayModeFinding', itau) and \
          getVarValue(c, 'tausAgainstMuonLoose3', itau) and \
@@ -104,4 +99,14 @@ def getAllTausStage1(c, ntaus ):
       'Pdg':getVarValue(c, 'tausPdg', i)})
   res = sorted(res, key=lambda k: -k['pt'])
   return res
+
+def splitListOfObjects(var, val, s):
+  resLow = []
+  resHigh = []
+  for x in s:
+    if x[var]<val:
+      resLow.append(x)
+    else:
+      resHigh.append(x)
+  return resLow, resHigh
 

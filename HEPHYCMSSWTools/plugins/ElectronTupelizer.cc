@@ -90,8 +90,7 @@ void ElectronTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup)
   edm::Handle<double> eleRho;
   ev.getByLabel(eleRho_, eleRho);
   put("eleRho", *eleRho);
-//  std::vector<float> elesPt, elesEta, elesPhi, elesAeff, eles03ChargedHadronIso, eles03NeutralHadronIso, eles03GammaIso, elesOneOverEMinusOneOverP, elesPfRelIso, elesSigmaIEtaIEta, elesHoE, elesDPhi, elesDEta, elesDxy, elesDz;//, elesPFDeltaPT;
-  std::vector<float> elesPt, elesEta, elesPhi, elesOneOverEMinusOneOverP, elesSigmaIEtaIEta, elesHoE, elesDPhi, elesDEta, elesDxy, elesDz, elesPfRelIso;//, elesPFDeltaPT;
+  std::vector<float> elesPt, elesEta, elesSCEta, elesPhi, elesOneOverEMinusOneOverP, elesSigmaIEtaIEta, elesHoE, elesDPhi, elesDEta, elesDxy, elesDz, elesPfRelIso;//, elesPFDeltaPT;
 
   std::vector<int> elesPdg, elesMissingHits;
   std::vector<int> elesPassConversionRejection, elesPassPATConversionVeto;
@@ -115,7 +114,8 @@ void ElectronTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup)
 
   for (vector<pat::Electron>::const_iterator ele = electrons.begin(); ele!=electrons.end();ele++){
     double pt = ele->pt();
-    double eta = fabs(ele->superCluster()->eta());
+    double scEta = ele->superCluster()->eta();
+    double eta = ele->eta();
     double oneOverEMinusOneOverP = fabs(1./ele->ecalEnergy() - 1./ele->trackMomentumAtVtx().R());
     double sigmaIEtaIEta = ele->scSigmaIEtaIEta();
     double HoE = ele->hadronicOverEm();
@@ -149,15 +149,15 @@ void ElectronTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup)
 //    double photon = ele->isoDeposit(pat::PfGammaIso)->depositWithin(0.3);
 //    ele->isoDeposit(pat::PfPUChargedHadronIso)->depositWithin(0.3);
     
-    double Aeff= isData ? ElectronEffectiveArea::GetElectronEffectiveArea(ElectronEffectiveArea::kEleGammaAndNeutralHadronIso03, eta, ElectronEffectiveArea::kEleEAData2011):
-                   ElectronEffectiveArea::GetElectronEffectiveArea(ElectronEffectiveArea::kEleGammaAndNeutralHadronIso03, eta, ElectronEffectiveArea::kEleEAFall11MC);
+    double Aeff= isData ? ElectronEffectiveArea::GetElectronEffectiveArea(ElectronEffectiveArea::kEleGammaAndNeutralHadronIso03, fabs(scEta), ElectronEffectiveArea::kEleEAData2011):
+                   ElectronEffectiveArea::GetElectronEffectiveArea(ElectronEffectiveArea::kEleGammaAndNeutralHadronIso03, fabs(scEta), ElectronEffectiveArea::kEleEAFall11MC);
 
     double pfRelIso = elePFRelIsoAreaCorrected_?( charged + max (0., photon + neutral - (*eleRho)*Aeff) ) / pt : ( charged + photon + neutral ) / pt;
 //    cout<<"Aeff "<<Aeff<<" rho "<<*eleRho<<" pfRelIso "<<pfRelIso<<endl;
     if (verbose_) {
       cout<<"[ele "<< ele - electrons.begin()<<"] "<<endl;//<<boolalpha<<"isBarrel? "<<isBarrel<<" isEndcap? "<<isEndcap<<" isGood "<<isGood<<" isGoodVeto "<<isGoodVeto<<endl;
 //      cout<<" pt "<<ele->pt()<<" eta "<<ele->superCluster()->eta()<<" phi "<<ele->phi()<<" oneOverEMinusOneOverP "<<oneOverEMinusOneOverP<<" sigmaIEtaIEta "<<sigmaIEtaIEta <<" pfRelIso "<<pfRelIso<<" HoE "<<HoE<<endl;
-      cout<<" pt "<<ele->pt()<<" eta "<<eta<<" phi "<<ele->phi()<<" oneOverEMinusOneOverP "<<oneOverEMinusOneOverP<<" sigmaIEtaIEta "<<sigmaIEtaIEta <<" HoE "<<HoE<<endl;
+      cout<<" pt "<<ele->pt()<<" scEta "<<scEta<<" phi "<<ele->phi()<<" oneOverEMinusOneOverP "<<oneOverEMinusOneOverP<<" sigmaIEtaIEta "<<sigmaIEtaIEta <<" HoE "<<HoE<<endl;
       cout<<" DPhi "<<DPhi<<" DEta "<<DEta<<" missingHits "<<missingHits<<" elesPassPATConversionVeto "<<ele->passConversionVeto()<<" dxy "<<dxy<<" dz "<<dz<<endl;//" pfDeltaPT "<<deltapT<<endl;
       cout<<" chargedHadron "<<charged<<" neutralHadron "<<neutral<<" gamma "<< photon<<" Aeff "<<Aeff<<" rho "<<*eleRho<<endl;
 //      cout<<" chargedHadronIso03 "<<charged<<" neutralHadronIso03 "<<neutral<<" gammaIso03 "<< photon<<" rho "<<*eleRho<<endl;
@@ -167,6 +167,7 @@ void ElectronTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup)
     {
         eleCounter++; // increment number of electrons in event
         elesPt.push_back(pt);
+        elesSCEta.push_back(scEta);
         elesEta.push_back(eta);
         elesPhi.push_back(ele->phi());
         elesPdg.push_back(ele->pdgId());
@@ -190,6 +191,7 @@ void ElectronTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup)
   }
   put("neles", eleCounter);
   put("elesPt", elesPt);
+  put("elesSCEta", elesSCEta);
   put("elesEta", elesEta);
   put("elesPhi", elesPhi);
   put("elesPdg", elesPdg);
@@ -221,6 +223,7 @@ void ElectronTupelizer::addAllVars( )
   addVar("neles/I");
   addVar("elesPt/F[]");
   addVar("elesEta/F[]");
+  addVar("elesSCEta/F[]");
   addVar("elesPhi/F[]");
   addVar("elesPdg/I[]");
   addVar("elesOneOverEMinusOneOverP/F[]");

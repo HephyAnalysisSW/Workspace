@@ -49,21 +49,6 @@ exec('allSamples=['+options.allsamples+']')
 #            tlvaux.SetPtEtaPhiM(e.gpPt[igp],e.gpEta[igp],e.gpPhi[igp],e.gpM[igp])
 #            sumtlv += tlvaux
 #    return sumtlv.Pt()
-
-
-# -------------------------------------------
-
-
-
-def splitListOfObjects(var, val, s):
-  resLow = []
-  resHigh = []
-  for x in s:
-    if x[var]<val:
-      resLow.append(x)
-    else:
-      resHigh.append(x)
-  return resLow, resHigh
   
 def getGoodJets(c, crosscleanobjects):#, jermode=options.jermode, jesmode=options.jesmode):
   njets = getVarValue(c, 'nJets')   # jet.pt() > 10.
@@ -165,7 +150,6 @@ for sample in allSamples:
       for tfile in filelist:
 #        print "Adding",subdirname+tfile
         sample['filenames'][bin].append(subdirname+tfile)
-
 #    if options.allsamples.lower()=='sms':
 #      c_ = ROOT.TChain(sample['Chain'])
 #      for tfile in sample['filenames'][bin]:
@@ -225,7 +209,7 @@ for isample, sample in enumerate(allSamples):
   extraVariables += ['pfMet', 'pfMetphi','genMet', 'genMetphi']
   jetvars = ["jetPt", "jetEta", "jetPhi", "jetPdg", "jetBtag", "jetChef", "jetNhef", "jetCeef", "jetNeef", "jetHFhef", "jetHFeef", "jetMuef", "jetElef", "jetPhef", "jetUnc"]#, "jetCutBasedPUJetIDFlag","jetFull53XPUJetIDFlag","jetMET53XPUJetIDFlag"
   muvars = ["muPt", "muEta", "muPhi", "muPdg", "muRelIso", "muDxy", "muDz", "muNormChi2", "muNValMuonHits", "muNumMatchedStations", "muPixelHits", "muNumtrackerLayerWithMeasurement", 'muIsGlobal', 'muIsTracker']
-  elvars = ["elePt", "eleEta", "elePhi", "elePdg", "eleRelIso", "eleDxy", "eleDz"]
+  elvars = ["elePt", "eleEta", "elePhi", "elePdg", "eleRelIso", "eleDxy", "eleDz", ]
   tavars = ["tauPt", "tauEta", "tauPhi", "tauPdg", 'tauJetInd', 'tauJetDR']
   if not sample['name'].lower().count('data'):
     extraVariables+=["ngNuEFromW","ngNuMuFromW","ngNuTauFromW"]
@@ -603,6 +587,13 @@ for isample, sample in enumerate(allSamples):
             s.eleRelIso[i] = allGoodElectrons[i]['relIso']
             s.eleDxy[i] = allGoodElectrons[i]['Dxy']
             s.eleDz[i] = allGoodElectrons[i]['Dz']
+
+#    return { 'sIEtaIEta':sietaieta, 'DPhi':dphi, \ #FIXME
+#            'DEta':deta, 'HoE':HoE, 'OneOverEMinusOneOverP':oneOverEMinusOneOverP, 'ConvRejection':convRej, 'MissingHits':missingHits,\
+#            'isEB':isEB, 'isEE':isEE, 'relIso':relIso, 'Dxy':dxy, 'Dz':dz}
+
+
+
 #              print "Electron pt's:",i,allGoodElectrons[i]['pt']
           s.ntauCount = min(10,s.ntau)
           for i in xrange(s.ntauCount):
