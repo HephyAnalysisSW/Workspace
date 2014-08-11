@@ -6,7 +6,7 @@ import sys, os, copy, random
 from datetime import datetime
 #from helpers import getVarValue, deltaPhi, minAbsDeltaPhi,  deltaR, invMass,
 from Workspace.HEPHYPythonTools.helpers import getVarValue, deltaPhi, minAbsDeltaPhi, invMassOfLightObjects, deltaR, closestMuJetDeltaR, invMass,  findClosestJet
-from helpers import getLooseEleStage1,getAllElectronsStage1, tightPOGEleID, vetoEleID, getLooseMuStage1, getAllMuonsStage1, tightPOGMuID, vetoMuID, getAllTausStage1, getTauStage1
+from objectSelection import getLooseEleStage1,getAllElectronsStage1, tightPOGEleID, vetoEleID, getLooseMuStage1, getAllMuonsStage1, tightPOGMuID, vetoMuID, getAllTausStage1, getTauStage1
 
 from stage1Tuples import *
 
@@ -358,14 +358,14 @@ for isample, sample in enumerate(allSamples):
       elist = ROOT.gDirectory.Get("eList")
       number_events = elist.GetN()
       if options.small:
-        if number_events>1001:
-          number_events=1001
+        if number_events>10001:
+          number_events=10001
       start = int(options.fromPercentage/100.*number_events)
       stop  = int(options.toPercentage/100.*number_events)
       print "Reading: ", sample["name"], bin, "with",number_events,"Events using cut", commoncf
       print "Reading percentage ",options.fromPercentage, "to",options.toPercentage, "which is range",start,"to",stop,"of",number_events
       for i in range(start, stop):
-        if (i%10000 == 0) and i>0 :
+        if (i%1000 == 0) and i>0 :
           print i
   #      # Update all the Tuples
         if elist.GetN()>0 and ntot>0:
@@ -458,13 +458,13 @@ for isample, sample in enumerate(allSamples):
           s.ntau = len(allGoodTaus)
 ### MC specific part
           if not sample['name'].lower().count('data'):
+            genTaus = []
             s.ngNuEFromW=0
             s.ngNuMuFromW=0
             s.ngNuTauFromW=0
             events.getByLabel(gpLabel,gpHandle)
             gps =gpHandle.product()
             lgps = list(gps)
-            genTaus = []
             for igp,gp in enumerate(gps):
               pdgId = abs(gp.pdgId())
               if pdgId==12 or pdgId==14 or pdgId==16:
@@ -473,8 +473,10 @@ for isample, sample in enumerate(allSamples):
                   if pdgId==14:s.ngNuMuFromW+=1 
                   if pdgId==16:s.ngNuTauFromW+=1 
               if pdgId==15:
-#                print i, "Tau",gp.pt(),gp.eta(),gp.phi(), gp.status(), gp.numberOfDaughters()
+                if not (gp.numberOfMothers()>0  and abs(gp.mother(0).pdgId())==24): continue
                 tau = {'pt':gp.pt(),'phi':gp.phi(),'eta':gp.eta(),'Pdg':gp.pdgId(),'gTauNENu':0, 'gTauNMuNu':0, 'gTauNTauNu':0}
+                if s.ngNuMuFromW==2:
+                  print "Taus?" 
                 MEx = 0.
                 MEy = 0.
                 justARadiation=False
@@ -522,6 +524,8 @@ for isample, sample in enumerate(allSamples):
                 if not justARadiation:
                   genTaus.append(tau)
 #              print genTaus
+            if s.ngNuMuFromW==2:
+              if len(genTaus)>0:print genTaus
 ####################
 
           s.njetCount = min(30,s.njets)

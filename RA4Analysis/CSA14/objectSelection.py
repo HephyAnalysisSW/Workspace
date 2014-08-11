@@ -63,6 +63,19 @@ def getLooseMuStage1(c, imu ):
   if isPF and (isGlobal or isTracker) and pt>5. and abs(eta)<2.5 and abs(dz)<0.5:
     return {'pt':pt, 'phi':getVarValue(c, 'muonsPhi', imu), 'eta':eta, 'IsGlobal':isGlobal, 'IsTracker':isTracker, 'IsPF':isPF, 'relIso':getVarValue(c, 'muonsPFRelIso', imu), 'Dz':dz}
 
+def getLooseMuStage2(c, imu ):
+  isPF = True #FIXME->Should be added @stage1 anyways 
+  isGlobal = getVarValue(c, 'muIsGlobal', imu)
+  isTracker = getVarValue(c, 'muIsTracker', imu)
+  pt = getVarValue(c, 'muPt', imu)
+  dz = getVarValue(c, 'muDz', imu)
+  eta=getVarValue(c, 'muEta', imu)
+  cand={'pt':pt, 'phi':getVarValue(c, 'muPhi', imu), 'eta':eta, 'IsGlobal':isGlobal, 'IsTracker':isTracker, 'IsPF':isPF, 'relIso':getVarValue(c, 'muRelIso', imu), 'Dz':dz}
+  for v in ['Pdg', 'Dxy', 'NormChi2', 'NValMuonHits', 'NumMatchedStations', 'PixelHits', 'NumtrackerLayerWithMeasurement']:
+    cand[v] = getVarValue(c, 'mu'+v, imu)
+  if isPF and (isGlobal or isTracker) and pt>5. and abs(eta)<2.5 and abs(dz)<0.5:
+    return cand 
+
 def tightPOGMuID(mu):
   return mu['IsGlobal'] and mu['IsPF'] and mu['pt']>20 and abs(mu['eta'])<2.1 and mu['relIso']<0.12 and mu['NormChi2']<=10 and mu['NValMuonHits']>0\
      and mu['NumMatchedStations']>1 and mu['PixelHits']>0 and mu['NumtrackerLayerWithMeasurement']>5 and abs(mu['Dxy'])<0.02 and abs(mu['Dz'])<0.5
