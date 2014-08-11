@@ -6,6 +6,7 @@ import sys, os, copy, random
 from datetime import datetime
 #from helpers import getVarValue, deltaPhi, minAbsDeltaPhi,  deltaR, invMass,
 from Workspace.HEPHYPythonTools.helpers import getVarValue, deltaPhi, minAbsDeltaPhi, invMassOfLightObjects, deltaR, closestMuJetDeltaR, invMass,  findClosestJet
+from helpers import getLooseEleStage1,getAllElectronsStage1, tightPOGEleID, vetoEleID, getLooseMuStage1, getAllMuonsStage1, tightPOGMuID, vetoMuID, getAllTausStage1, getTauStage1
 
 from stage1Tuples import *
 
@@ -37,7 +38,6 @@ parser.add_option("--toPercentage", dest="toPercentage", default="100", type="in
 parser.add_option("--keepPDFWeights", dest="keepPDFWeights", action="store_true", help="keep PDF Weights?")
  
 (options, args) = parser.parse_args()
-#options.small=True
 print "options: chmode",options.chmode, 'samples',options.allsamples
 exec('allSamples=['+options.allsamples+']')
 
@@ -53,115 +53,6 @@ exec('allSamples=['+options.allsamples+']')
 
 # -------------------------------------------
 
-def getLooseEle(c, iele): # POG Ele veto https://twiki.cern.ch/twiki/bin/viewauth/CMS/EgammaCutBasedIdentification
-  eta = getVarValue(c, 'elesEta', iele)
-  pdg = getVarValue(c, 'elesPdg', iele)
-  sietaieta = getVarValue(c, 'elesSigmaIEtaIEta', iele)
-  dphi = getVarValue(c, 'elesDPhi', iele)
-  deta = getVarValue(c, 'elesDEta', iele)
-  HoE  = getVarValue(c, 'elesHoE', iele)
-  isEB = abs(eta) < 1.479
-  isEE = abs(eta) > 1.479 and abs(eta) < 2.5
-  relIso = getVarValue(c, 'elesPfRelIso', iele)
-  pt = getVarValue(c, 'elesPt', iele)
-  dxy = getVarValue(c, 'elesDxy', iele)
-  dz = getVarValue(c, 'elesDz', iele)
-  oneOverEMinusOneOverP = getVarValue(c, 'elesOneOverEMinusOneOverP', iele)
-  convRej = getVarValue(c, 'elesPassPATConversionveto', iele)
-  missingHits = getVarValue(c, 'elesMissingHits', iele)
-  relIsoCut = 0.15
-  if ( isEE or isEB)\
-    and ((isEB and dphi < 0.8) or (isEE and dphi < 0.7)) and ( (isEB and deta < 0.007) or (isEE and deta < 0.01) )\
-    and ((isEB and sietaieta < 0.01 ) or (isEE and sietaieta < 0.03))\
-    and ( isEB and HoE < 0.15 )\
-    and abs(dxy) < 0.04 and abs(dz) < 0.2 \
-    and ( relIso < relIsoCut ) \
-    and pt>10.:
-    return {'pt':pt, 'phi':getVarValue(c, 'elesPhi', iele), 'Pdg':pdg, 'eta':eta, 'sIEtaIEta':sietaieta, 'DPhi':dphi, \
-            'DEta':deta, 'HoE':HoE, 'OneOverEMinusOneOverP':oneOverEMinusOneOverP, 'ConvRejection':convRej, 'MissingHits':missingHits,\
-            'isEB':isEB, 'isEE':isEE, 'relIso':relIso, 'Dxy':dxy, 'Dz':dz}
-
-#  else: print {'pt':pt, 'phi':getVarValue(c, 'elesPhi', iele), 'Pdg':pdg, 'eta':eta, 'sIEtaIEta':sietaieta, 'DPhi':dphi, \
-#          'DEta':deta, 'HoE':HoE, 'OneOverEMinusOneOverP':oneOverEMinusOneOverP, 'ConvRejection':convRej, 'MissingHits':missingHits,\
-#          'isEB':isEB, 'isEE':isEE, 'relIso':relIso, 'Dxy':dxy, 'Dz':dz}
-#
-def tightEleID(ele):
-  return ele['pt']>20 and abs(ele['eta'])<2.5 and ele['relIso']<0.15 and ele['ConvRejection'] and ele['MissingHits']<=1 and abs(ele['Dxy'])<0.02 and abs(ele['Dz'])<0.1 and (\
-    (ele['isEB'] and ele['DPhi']<0.06 and ele['DEta']<0.004 and ele['sIEtaIEta']<0.01) or
-    (ele['isEE'] and ele['DPhi']<0.03 and ele['DEta']<0.007 and ele['sIEtaIEta']<0.03))
-
-def vetoEleID(ele):
-  return ele['pt']>15
-
-def getAllElectrons(c, neles ):
-  res=[]
-  for i in range(0, int(neles)):
-    cand =  getLooseEle(c, i)
-    if cand:
-      res.append(cand)
-  res = sorted(res, key=lambda k: -k['pt'])
-  return res
-
-def getLooseMu(c, imu ):
-  isPF = getVarValue(c, 'muonsisPF', imu)
-  isGlobal = getVarValue(c, 'muonsisGlobal', imu)
-  isTracker = getVarValue(c, 'muonsisTracker', imu)
-  pt = getVarValue(c, 'muonsPt', imu)
-  dz = getVarValue(c, 'muonsDz', imu)
-  eta=getVarValue(c, 'muonsEta', imu)
-  if isPF and (isGlobal or isTracker) and pt>5. and abs(eta)<2.5 and abs(dz)<0.5:
-    return {'pt':pt, 'phi':getVarValue(c, 'muonsPhi', imu), 'eta':eta, 'IsGlobal':isGlobal, 'IsTracker':isTracker, 'IsPF':isPF, 'relIso':getVarValue(c, 'muonsPFRelIso', imu), 'Dz':dz} 
-
-def getAllMuons(c, nmuons ):
-  res=[]
-  for i in range(0, int(nmuons)):
-    cand = getLooseMu(c, i)
-    if cand:
-      for v in ['Pdg', 'Dxy', 'NormChi2', 'NValMuonHits', 'NumMatchedStations', 'PixelHits', 'NumtrackerLayerWithMeasurement']:
-        cand[v] = getVarValue(c, 'muons'+v, i)
-      res.append(cand)
-  res = sorted(res, key=lambda k: -k['pt'])
-  return res
-
-def tightMuID(mu):
-  return mu['IsGlobal'] and mu['IsPF'] and mu['pt']>20 and abs(mu['eta'])<2.1 and mu['relIso']<0.12 and mu['NormChi2']<=10 and mu['NValMuonHits']>0\
-     and mu['NumMatchedStations']>1 and mu['PixelHits']>0 and mu['NumtrackerLayerWithMeasurement']>5 and abs(mu['Dxy'])<0.02 and abs(mu['Dz'])<0.5
-def vetoMuID(mu):
-  return (mu['IsTracker'] or mu['IsGlobal']) and mu['IsPF'] and mu['pt']>15 and abs(mu['eta'])<2.5 and mu['relIso']<0.2  and abs(mu['Dxy'])<0.2 and abs(mu['Dz'])<0.5
-
-
-def getAllMuons(c, nmuons ):
-  res=[]
-  for i in range(0, int(nmuons)):
-    cand = getLooseMu(c, i)
-    if cand:
-      for v in ['Pdg', 'Dxy', 'NormChi2', 'NValMuonHits', 'NumMatchedStations', 'PixelHits', 'NumtrackerLayerWithMeasurement']:
-        cand[v] = getVarValue(c, 'muons'+v, i)
-      res.append(cand)
-  res = sorted(res, key=lambda k: -k['pt'])
-  return res
-
-
-def getTau(c, itau ):
-#  print getVarValue(c, 'tausisPF', itau),          getVarValue(c, 'tausDecayModeFinding', itau),          getVarValue(c, 'tausAgainstMuonLoose', itau),          getVarValue(c, 'tausAgainstElectronLoose', itau),          getVarValue(c, 'tausByCombinedIsolationDeltaBetaCorrRaw3Hits', itau),          getVarValue(c, 'tausPt', itau)>5.
- 
-#  return getVarValue(c, 'tausisPF', itau) and \
-  return getVarValue(c, 'tausDecayModeFinding', itau) and \
-         getVarValue(c, 'tausAgainstMuonLoose3', itau) and \
-         getVarValue(c, 'tausAgainstElectronLooseMVA5', itau) and \
-         getVarValue(c, 'tausByLooseCombinedIsolationDeltaBetaCorr3Hits', itau) and \
-         getVarValue(c, 'tausPt', itau)>20. and \
-         abs(getVarValue(c, 'tausEta', itau))<2.3
-         
-
-def getAllTaus(c, ntaus ):
-  res=[]
-  for i in range(0, int(ntaus)):
-    if getTau(c, i):
-      res.append({'pt':getVarValue(c, 'tausPt', i),'eta':getVarValue(c, 'tausEta', i), 'phi':getVarValue(c, 'tausPhi', i),\
-      'Pdg':getVarValue(c, 'tausPdg', i)})
-  res = sorted(res, key=lambda k: -k['pt'])
-  return res
 
 
 def splitListOfObjects(var, val, s):
@@ -337,7 +228,8 @@ for isample, sample in enumerate(allSamples):
   elvars = ["elePt", "eleEta", "elePhi", "elePdg", "eleRelIso", "eleDxy", "eleDz"]
   tavars = ["tauPt", "tauEta", "tauPhi", "tauPdg", 'tauJetInd', 'tauJetDR']
   if not sample['name'].lower().count('data'):
-    genTauvars = ["gTauPdg", "gTauPt", "gTauEta", "gTauPhi", "gTauMetPar", "gTauMetPerp", "gTauNENu", "gTauNMuNu", 'gTauNTauNu', 'gTauJetInd', 'gTauJetDR']
+    extraVariables+=["ngNuEFromW","ngNuMuFromW","ngNuTauFromW"]
+    genTauvars = ["gTauPdg", "gTauPt", "gTauEta", "gTauPhi", "gTauMetPar", "gTauMetPerp", "gTauNENu", "gTauNMuNu", 'gTauNTauNu', 'gTauJetInd', 'gTauJetDR', 'gTauTauDR', 'gTauTauInd']
 #  if options.allsamples.lower()=='sms':
 #    variables+=['osetMgl', 'osetMN', 'osetMC', 'osetMsq', 'ptISR']
 #  if not bin.lower().count('run') and maxConsideredBTagWeight>0:
@@ -391,8 +283,8 @@ for isample, sample in enumerate(allSamples):
     postfix="_small"
   if options.fromPercentage!=0 or options.toPercentage!=100:
     postfix += "_from"+str(options.fromPercentage)+"To"+str(options.toPercentage)
-#  ofile = outputDir+"/"+outSubDir+"/"+sample["name"]+"/histo_"+sample["name"]+postfix+".root"
-  ofile = "histo_"+sample["name"]+postfix+".root"
+  ofile = outputDir+"/"+outSubDir+"/"+sample["name"]+"/histo_"+sample["name"]+postfix+".root"
+#  ofile = "histo_"+sample["name"]+postfix+".root"
   if os.path.isfile(ofile) and overwrite:
     print "Warning! will overwrite",ofile
   if os.path.isfile(ofile) and not overwrite:
@@ -436,8 +328,8 @@ for isample, sample in enumerate(allSamples):
 
   for bin_ in sample["bins"]:
     commoncf = ""
-    if options.chmode[:4]=="copyMET":
-      commoncf = "slimmedMETs>=0"
+    if options.chmode[:7]=="copyMET":
+      commoncf = "slimmedMETs>=100"
     if options.chmode[:7] == "copyInc":
       commoncf = "(1)"
     if type(bin_) == type([]):
@@ -482,8 +374,8 @@ for isample, sample in enumerate(allSamples):
       elist = ROOT.gDirectory.Get("eList")
       number_events = elist.GetN()
       if options.small:
-        if number_events>101:
-          number_events=101
+        if number_events>1001:
+          number_events=1001
       start = int(options.fromPercentage/100.*number_events)
       stop  = int(options.toPercentage/100.*number_events)
       print "Reading: ", sample["name"], bin, "with",number_events,"Events using cut", commoncf
@@ -532,14 +424,14 @@ for isample, sample in enumerate(allSamples):
           nmuons = getVarValue(c, 'nmuons')   #Number of muons in Muon Vec
           neles  = getVarValue(c, 'neles')    #Number of eles in Ele Vec
           ntaus  = getVarValue(c, 'ntaus')    #Number of eles in Ele Vec
-          allGoodElectrons = getAllElectrons(c, neles)
-          allGoodTaus = getAllTaus(c, ntaus)
-          allGoodMuons = getAllMuons(c,nmuons) #Loose ID without relIso and Dxy<0.02
+          allGoodElectrons = getAllElectronsStage1(c, neles)
+          allGoodTaus = getAllTausStage1(c, ntaus)
+          allGoodMuons = getAllMuonsStage1(c,nmuons) #Loose ID without relIso and Dxy<0.02
 #          print "muons",nmuons, allGoodMuons, 
 #          print "eles", neles, allGoodElectrons, 
 #          print "taus", ntaus, allGoodTaus
-          electrons = filter(lambda e:tightEleID(e), allGoodElectrons)
-          muons = filter(lambda e:tightMuID(e), allGoodMuons)
+          electrons = filter(lambda e:tightPOGEleID(e), allGoodElectrons)
+          muons = filter(lambda e:tightPOGMuID(e), allGoodMuons)
           taus = allGoodTaus 
           vetoElectrons = filter(lambda e:vetoEleID(e), allGoodElectrons)
           vetoMuons = filter(lambda e:vetoMuID(e), allGoodMuons)
@@ -582,12 +474,21 @@ for isample, sample in enumerate(allSamples):
           s.ntau = len(allGoodTaus)
 ### MC specific part
           if not sample['name'].lower().count('data'):
+            s.ngNuEFromW=0
+            s.ngNuMuFromW=0
+            s.ngNuTauFromW=0
             events.getByLabel(gpLabel,gpHandle)
             gps =gpHandle.product()
             lgps = list(gps)
             genTaus = []
             for igp,gp in enumerate(gps):
-              if abs(gp.pdgId())==15:
+              pdgId = abs(gp.pdgId())
+              if pdgId==12 or pdgId==14 or pdgId==16:
+                if gp.numberOfMothers()>0 and abs(gp.mother(0).pdgId())==24:
+                  if pdgId==12:s.ngNuEFromW+=1 
+                  if pdgId==14:s.ngNuMuFromW+=1 
+                  if pdgId==16:s.ngNuTauFromW+=1 
+              if pdgId==15:
 #                print i, "Tau",gp.pt(),gp.eta(),gp.phi(), gp.status(), gp.numberOfDaughters()
                 tau = {'pt':gp.pt(),'phi':gp.phi(),'eta':gp.eta(),'Pdg':gp.pdgId(),'gTauNENu':0, 'gTauNMuNu':0, 'gTauNTauNu':0}
                 MEx = 0.
@@ -603,20 +504,32 @@ for isample, sample in enumerate(allSamples):
                 else:
                   tau['gTauJetInd']=-1
                   tau['gTauJetDR']=float('nan')
+                ctau = findClosestJet(allGoodTaus, {'phi':tau['phi'], 'eta':tau['eta']})
+                if ctau and ctau['index']<10:
+                  tau['gTauTauInd']=ctau['index']
+                  tau['gTauTauDR']=ctau['deltaR']
+                else:
+                  tau['gTauTauInd']=-1
+                  tau['gTauTauDR']=float('nan')
+#                if len(allGoodTaus)>0:
+#                  print allGoodTaus, tau,ctau,justARadiation
+#                  for id in range(gp.numberOfDaughters()):
+#                    gd = gp.daughter(id)
+#                    print id, gd.pdgId()
               
                 for id in range(gp.numberOfDaughters()):
                   gd = gp.daughter(id)
 #                  tx-=gd.px()
 #                  ty-=gd.py()
 #                  print id, "d",gd.pdgId(),gd.pt()
-                  pdgId = abs(gd.pdgId())
-                  if pdgId==15:
+                  dpdgId = abs(gd.pdgId())
+                  if dpdgId==15:
                     justARadiation=True
                     break
-                  if pdgId==12:tau['gTauNENu']+=1
-                  if pdgId==14:tau['gTauNMuNu']+=1
-                  if pdgId==16:tau['gTauNTauNu']+=1
-                  if pdgId==12 or pdgId==14 or pdgId==16:
+                  if dpdgId==12:tau['gTauNENu']+=1
+                  if dpdgId==14:tau['gTauNMuNu']+=1
+                  if dpdgId==16:tau['gTauNTauNu']+=1
+                  if dpdgId==12 or dpdgId==14 or dpdgId==16:
                     MEx+=gd.px()
                     MEy+=gd.py()
                   tau['gTauMetPar']=cos(tau['phi'])*MEx+sin(tau['phi'])*MEy
@@ -719,6 +632,8 @@ for isample, sample in enumerate(allSamples):
               s.gTauNTauNu[i] = genTaus[i]['gTauNTauNu']
               s.gTauJetInd[i]  = genTaus[i]['gTauJetInd']
               s.gTauJetDR[i]  = genTaus[i]['gTauJetDR']
+              s.gTauTauInd[i]  = genTaus[i]['gTauTauInd']
+              s.gTauTauDR[i]  = genTaus[i]['gTauTauDR']
 #          if options.keepPDFWeights:
 #            for i in range(45):
 #              s.cteqWeights[i]=getVarValue(c, 'cteqWeights',i)
