@@ -333,5 +333,9 @@ process.p = cms.Path(process.filterSequence + process.metSequence + process.mini
 #  src = cms.InputTag("genParticles")
 #)
 #process.p+=process.printTree
-process.out.outputCommands =  cms.untracked.vstring('drop *', 'keep *_*Tupelizer*_*_*' , 'keep *_*EventCounter*_*_*', *(toKeep))
+
+##############I commend out it#######
+###process.out.outputCommands =  cms.untracked.vstring('drop *', 'keep *_*Tupelizer*_*_*' , 'keep *_*EventCounter*_*_*', *(toKeep))
+###############
+
 process.outpath = cms.EndPath(process.out)
