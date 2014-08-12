@@ -5,7 +5,7 @@ from PhysicsTools.PythonAnalysis import *
 from math import *
 import sys, os, copy, random, array
 from datetime import datetime
-from Workspace.HEPHYPythonTools.helpers import getVarValue, deltaPhi, minAbsDeltaPhi,  deltaR, invMass, findClosestJet
+from Workspace.HEPHYPythonTools.helpers import getVarValue, deltaPhi, minAbsDeltaPhi,  deltaR, invMass, findClosestObjectDR
 from defaultSamples import *
 from getReweightingHistos import getReweightingHistos
 ROOT.gROOT.ProcessLine(".L ../../HEPHYPythonTools/scripts/root/Thrust.C+")

@@ -5,7 +5,7 @@ from math import *
 import sys, os, copy, random
 from datetime import datetime
 #from helpers import getVarValue, deltaPhi, minAbsDeltaPhi,  deltaR, invMass,
-from Workspace.HEPHYPythonTools.helpers import getVarValue, deltaPhi, minAbsDeltaPhi, invMassOfLightObjects, deltaR, closestMuJetDeltaR, invMass,  findClosestJet
+from Workspace.HEPHYPythonTools.helpers import getVarValue, deltaPhi, minAbsDeltaPhi, invMassOfLightObjects, deltaR, closestMuJetDeltaR, invMass,  findClosestObjectDR
 from objectSelection import getLooseEleStage1,getAllElectronsStage1, tightPOGEleID, vetoEleID, getLooseMuStage1, getAllMuonsStage1, tightPOGMuID, vetoMuID, getAllTausStage1, getTauStage1
 
 from stage1Tuples import *
@@ -38,6 +38,7 @@ parser.add_option("--toPercentage", dest="toPercentage", default="100", type="in
 parser.add_option("--keepPDFWeights", dest="keepPDFWeights", action="store_true", help="keep PDF Weights?")
  
 (options, args) = parser.parse_args()
+options.small=True
 print "options: chmode",options.chmode, 'samples',options.allsamples
 exec('allSamples=['+options.allsamples+']')
 
@@ -208,12 +209,13 @@ for isample, sample in enumerate(allSamples):
   extraVariables += ["leptonPt", 'leptonEta', 'leptonPhi', 'leptonPdg', 'singleMuonic', 'singleElectronic', 'singleLeptonic']
   extraVariables += ['pfMet', 'pfMetphi','genMet', 'genMetphi']
   jetvars = ["jetPt", "jetEta", "jetPhi", "jetPdg", "jetBtag", "jetChef", "jetNhef", "jetCeef", "jetNeef", "jetHFhef", "jetHFeef", "jetMuef", "jetElef", "jetPhef", "jetUnc"]#, "jetCutBasedPUJetIDFlag","jetFull53XPUJetIDFlag","jetMET53XPUJetIDFlag"
-  muvars = ["muPt", "muEta", "muPhi", "muPdg", "muRelIso", "muDxy", "muDz", "muNormChi2", "muNValMuonHits", "muNumMatchedStations", "muPixelHits", "muNumtrackerLayerWithMeasurement", 'muIsGlobal', 'muIsTracker']
+  muvars = ["muPt", "muEta", "muPhi", "muPdg", "muRelIso", "muDxy", "muDz", "muNormChi2", "muNValMuonHits", "muNumMatchedStations", "muPixelHits", "muNumtrackerLayerWithMeasurement", 'muIsGlobal', 'muIsTracker','muIsPF']
   elvars = ["elePt", "eleEta", "elePhi", "elePdg", "eleRelIso", "eleDxy", "eleDz", ]
   tavars = ["tauPt", "tauEta", "tauPhi", "tauPdg", 'tauJetInd', 'tauJetDR']
   if not sample['name'].lower().count('data'):
     extraVariables+=["ngNuEFromW","ngNuMuFromW","ngNuTauFromW"]
     genTauvars = ["gTauPdg", "gTauPt", "gTauEta", "gTauPhi", "gTauMetPar", "gTauMetPerp", "gTauNENu", "gTauNMuNu", 'gTauNTauNu', 'gTauJetInd', 'gTauJetDR', 'gTauTauDR', 'gTauTauInd']
+    genLepvars = ["gLepPdg", "gLepPt", "gLepEta", "gLepPhi", 'gLepInd', 'gLepDR']
 #  if options.allsamples.lower()=='sms':
 #    variables+=['osetMgl', 'osetMN', 'osetMC', 'osetMsq', 'ptISR']
 #  if not bin.lower().count('run') and maxConsideredBTagWeight>0:
@@ -249,8 +251,10 @@ for isample, sample in enumerate(allSamples):
   for var in tavars:
     structString +="Float_t "+var+"[10];"
   if not sample['name'].lower().count('data'):
-    structString +="Int_t ngTaus;"
+    structString +="Int_t ngTaus, ngLep;"
     for var in genTauvars:
+      structString +="Float_t "+var+"[10];"
+    for var in genLepvars:
       structString +="Float_t "+var+"[10];"
 #  if options.keepPDFWeights:
 #    structString +="Float_t cteqWeights[45];Float_t mstwWeights[41];Float_t nnpdfWeights[101];"
@@ -302,8 +306,11 @@ for isample, sample in enumerate(allSamples):
     t.Branch(var,   ROOT.AddressOf(s,var), var+'[ntauCount]/F')
   if not sample['name'].lower().count('data'):
     t.Branch("ngTaus",   ROOT.AddressOf(s,"ngTaus"), 'ngTaus/I')
+    t.Branch("ngLep",   ROOT.AddressOf(s,"ngLep"), 'ngLep/I')
     for var in genTauvars:
       t.Branch(var,   ROOT.AddressOf(s,var), var+'[ngTaus]/F')
+    for var in genLepvars:
+      t.Branch(var,   ROOT.AddressOf(s,var), var+'[ngLep]/F')
 #  if options.keepPDFWeights:
 #    t.Branch('cteqWeights',   ROOT.AddressOf(s,'cteqWeights'), 'cteqWeights[45]/F')
 #    t.Branch('mstwWeights',   ROOT.AddressOf(s,'mstwWeights'), 'mstwWeights[41]/F')
@@ -365,7 +372,7 @@ for isample, sample in enumerate(allSamples):
       print "Reading: ", sample["name"], bin, "with",number_events,"Events using cut", commoncf
       print "Reading percentage ",options.fromPercentage, "to",options.toPercentage, "which is range",start,"to",stop,"of",number_events
       for i in range(start, stop):
-        if (i%1000 == 0) and i>0 :
+        if (i%10000 == 0) and i>0 :
           print i
   #      # Update all the Tuples
         if elist.GetN()>0 and ntot>0:
@@ -459,6 +466,7 @@ for isample, sample in enumerate(allSamples):
 ### MC specific part
           if not sample['name'].lower().count('data'):
             genTaus = []
+            genLeps = []
             s.ngNuEFromW=0
             s.ngNuMuFromW=0
             s.ngNuTauFromW=0
@@ -471,7 +479,21 @@ for isample, sample in enumerate(allSamples):
                 if gp.numberOfMothers()>0 and abs(gp.mother(0).pdgId())==24:
                   if pdgId==12:s.ngNuEFromW+=1 
                   if pdgId==14:s.ngNuMuFromW+=1 
-                  if pdgId==16:s.ngNuTauFromW+=1 
+                  if pdgId==16:s.ngNuTauFromW+=1
+              if pdgId==12 or pdgId==14: 
+                if not (gp.numberOfMothers()>0  and abs(gp.mother(0).pdgId())==24): continue
+                lep = {'pt':gp.pt(),'phi':gp.phi(),'eta':gp.eta(),'Pdg':gp.pdgId(),}
+                if pdgId==12:
+                  rlep=findClosestObjectDR(allGoodElectrons, {'phi':lep['phi'], 'eta':lep['eta']})
+                if pdgId==14:
+                  rlep=findClosestObjectDR(allGoodMuons, {'phi':lep['phi'], 'eta':lep['eta']})
+                if rlep:
+                  lep['gLepDR'] = rlep['deltaR']
+                  lep['gLepInd']= rlep['index']
+                else:
+                  lep['gLepDR'] = float('nan')
+                  lep['gLepInd']= -1
+        
               if pdgId==15:
                 if not (gp.numberOfMothers()>0  and abs(gp.mother(0).pdgId())==24): continue
                 tau = {'pt':gp.pt(),'phi':gp.phi(),'eta':gp.eta(),'Pdg':gp.pdgId(),'gTauNENu':0, 'gTauNMuNu':0, 'gTauNTauNu':0}
@@ -482,7 +504,7 @@ for isample, sample in enumerate(allSamples):
                 justARadiation=False
 #                tx=gp.px()
 #                ty=gp.py() 
-                cjet = findClosestJet(idJets30, {'phi':tau['phi'], 'eta':tau['eta']})
+                cjet = findClosestObjectDR(idJets30, {'phi':tau['phi'], 'eta':tau['eta']})
                 if cjet and cjet['index']<10:
 #                  print cjet
                   tau['gTauJetInd']=cjet['index']
@@ -490,7 +512,7 @@ for isample, sample in enumerate(allSamples):
                 else:
                   tau['gTauJetInd']=-1
                   tau['gTauJetDR']=float('nan')
-                ctau = findClosestJet(allGoodTaus, {'phi':tau['phi'], 'eta':tau['eta']})
+                ctau = findClosestObjectDR(allGoodTaus, {'phi':tau['phi'], 'eta':tau['eta']})
                 if ctau and ctau['index']<10:
                   tau['gTauTauInd']=ctau['index']
                   tau['gTauTauDR']=ctau['deltaR']
@@ -518,8 +540,8 @@ for isample, sample in enumerate(allSamples):
                   if dpdgId==12 or dpdgId==14 or dpdgId==16:
                     MEx+=gd.px()
                     MEy+=gd.py()
-                  tau['gTauMetPar']=cos(tau['phi'])*MEx+sin(tau['phi'])*MEy
-                  tau['gTauMetPerp']=cos(tau['phi'])*MEy-sin(tau['phi'])*MEx
+                tau['gTauMetPar']=cos(tau['phi'])*MEx+sin(tau['phi'])*MEy
+                tau['gTauMetPerp']=cos(tau['phi'])*MEy-sin(tau['phi'])*MEx
 #                print tx, ty
                 if not justARadiation:
                   genTaus.append(tau)
@@ -565,9 +587,10 @@ for isample, sample in enumerate(allSamples):
             s.muNumtrackerLayerWithMeasurement[i] = allGoodMuons[i]['NumtrackerLayerWithMeasurement']
             s.muIsGlobal[i] = allGoodMuons[i]['IsGlobal']
             s.muIsTracker[i] = allGoodMuons[i]['IsTracker']
+            s.muIsPF[i] = allGoodMuons[i]['IsPF']
 #            s.muMT[i]    = sqrt(2.0*s.muPt[i]*s.met*(1-cos(s.muPhi[i] - s.metphi)))
 #            if len(idJets30)>0:
-#              cjet = findClosestJet(idJets30, {'phi':s.muPhi[i], 'eta':s.muEta[i]})
+#              cjet = findClosestObjectDR(idJets30, {'phi':s.muPhi[i], 'eta':s.muEta[i]})
 #              s.muClosestJetDeltaR[i] = cjet['deltaR']
 #              s.muClosestJetMass[i] = invMass(cjet['jet'], {'phi':s.muPhi[i], 'pt':s.muPt[i], 'eta':s.muEta[i]})
 #            else:
@@ -605,7 +628,7 @@ for isample, sample in enumerate(allSamples):
             s.tauEta[i] = allGoodTaus[i]['eta']
             s.tauPhi[i] = allGoodTaus[i]['phi']
             s.tauPdg[i] = allGoodTaus[i]['Pdg']
-            cjet = findClosestJet(idJets30, {'phi':s.tauPhi[i], 'eta':s.tauEta[i]})
+            cjet = findClosestObjectDR(idJets30, {'phi':s.tauPhi[i], 'eta':s.tauEta[i]})
             if cjet and cjet['index']<10:
               s.tauJetInd[i]=cjet['index']
               s.tauJetDR[i]=cjet['deltaR']
@@ -629,6 +652,15 @@ for isample, sample in enumerate(allSamples):
               s.gTauJetDR[i]  = genTaus[i]['gTauJetDR']
               s.gTauTauInd[i]  = genTaus[i]['gTauTauInd']
               s.gTauTauDR[i]  = genTaus[i]['gTauTauDR']
+            s.ngLep = min(10,len(genLeps))
+            genLeps = sorted(genLeps, key=lambda k: -k['pt'])
+            for i in xrange(s.ngLep):
+              s.gLepPt[i]  = genLeps[i]['pt']
+              s.gLepEta[i] = genLeps[i]['eta']
+              s.gLepPhi[i] = genLeps[i]['phi']
+              s.gLepPdg[i] = genLeps[i]['Pdg']
+              s.gLepDR[i]  = genLeps[i]['gLepDR']
+              s.gLepInd[i]  = genLeps[i]['gLepInd']
 #          if options.keepPDFWeights:
 #            for i in range(45):
 #              s.cteqWeights[i]=getVarValue(c, 'cteqWeights',i)

@@ -6,7 +6,7 @@ import os, copy, sys
 ROOT.TH1F().SetDefaultSumw2()
 
 from monoJetEventShapeVars import thrust, foxWolframMoments, circularity2D
-from Workspace.HEPHYPythonTools.helpers import getObjFromFile, passPUJetID, getISRweight, minDeltaRLeptonJets#, findClosestJet, invMass 
+from Workspace.HEPHYPythonTools.helpers import getObjFromFile, passPUJetID, getISRweight, minDeltaRLeptonJets#, findClosestObjectDR, invMass 
 #simplePUreweightHisto = getObjFromFile('/data/schoef/monoJetStuff/simpPUreweighting.root', "ngoodVertices_Data")
 from Workspace.RA4Analysis.mvaFuncs import cosDeltaPhiLepW
 from Workspace.RA4Analysis.simplePlotsCommon import *

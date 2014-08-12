@@ -4,7 +4,7 @@ from PhysicsTools.PythonAnalysis import *
 from math import *
 import sys, os, copy, random, array
 from datetime import datetime
-from Workspace.HEPHYPythonTools.helpers import getVarValue, deltaPhi, minAbsDeltaPhi,  deltaR, invMass, findClosestJet
+from Workspace.HEPHYPythonTools.helpers import getVarValue, deltaPhi, minAbsDeltaPhi,  deltaR, invMass, findClosestObjectDR
 from defaultSamples import *
 from  Workspace.RA4Analysis import eventShape, mt2w
 

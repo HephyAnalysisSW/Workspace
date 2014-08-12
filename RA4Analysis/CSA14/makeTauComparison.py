@@ -1,9 +1,9 @@
 import ROOT
 from stage2Tuples import ttJetsCSA14
 
-htCut     = 300
-metCut    = 150
-minNJets  =   4
+htCut     = 500
+metCut    = 250
+minNJets  =   2
 
 c = ROOT.TChain('Events')
 for b in ttJetsCSA14['bins']:
@@ -13,12 +13,15 @@ hMT = ROOT.TH1F('hMT', 'hMT',40,0,800)
 oneHadTau="ngoodMuons==1&&nvetoMuons==1&&Sum$(gTauPt>15&&abs(gTauEta)<2.5&&gTauNENu+gTauNMuNu==0&&gTauNTauNu==1)==1"
 c.Draw('sqrt(2.*met*leptonPt*(1-cos(leptonPhi-metphi)))>>hMT','weight*('+oneHadTau+'&&ht>'+str(htCut)+'&&njets>='+str(minNJets)+'&&met>'+str(metCut)+')')
 
-
 cPred = ROOT.TChain('Events')
 hMTPred = ROOT.TH1F('hMTPred', 'hMTPred',40,0,800)
 cPred.Add('/data/schoef/results2014/tauTuples/CSA14_TTJets_genTau.root')
 cPred.Draw('mTPred>>hMTPred','weight*(htPred>'+str(htCut)+'&&njetsPred>='+str(minNJets)+'&&metPred>'+str(metCut)+')','goff')
 
-hMT.Draw()
+c1=ROOT.TCanvas()
 hMTPred.SetLineColor(ROOT.kRed)
-hMTPred.Draw('same')
+hMTPred.Scale(hMT.Integral()/hMTPred.Integral())
+hMTPred.Draw()
+hMT.Draw('same')
+c1.SetLogy()
+c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngCSA14/comp.png')

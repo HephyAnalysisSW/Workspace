@@ -154,7 +154,7 @@ def calcHTRatio(jets, metPhi):
     htRatio = num/den
   return htRatio
 
-def findClosestJet(jets, obj):
+def findClosestObjectDR(jets, obj):
 ##  jets = getJets(c)
   res=[]
   for i,j in enumerate(jets):
@@ -164,7 +164,7 @@ def findClosestJet(jets, obj):
     return {'deltaR':res[0][0], 'jet':res[0][1], 'index':res[0][2]}
 
 def closestMuJetDeltaR(c):
-  return findClosestJet(c, getSoftIsolatedMu(c))['deltaR']
+  return findClosestObjectDR(c, getSoftIsolatedMu(c))['deltaR']
 
 def invMass(p1 , p2):
 

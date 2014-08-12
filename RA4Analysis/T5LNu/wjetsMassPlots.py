@@ -5,7 +5,7 @@ import os, copy, sys
 from helpers import wRecoPt, wGenPt
 ROOT.TH1F().SetDefaultSumw2()
 
-from Workspace.HEPHYPythonTools.helpers import getObjFromFile, passPUJetID, getISRweight, minDeltaRLeptonJets#, findClosestJet, invMass 
+from Workspace.HEPHYPythonTools.helpers import getObjFromFile, passPUJetID, getISRweight, minDeltaRLeptonJets#, findClosestObjectDR, invMass 
 
 from Workspace.RA4Analysis.simplePlotsCommon import *
 #from monoJetFuncs import *

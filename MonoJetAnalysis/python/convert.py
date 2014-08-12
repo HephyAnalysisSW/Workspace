@@ -5,7 +5,7 @@ from math import *
 import sys, os, copy, random, subprocess
 from datetime import datetime
 #from helpers import getVarValue, deltaPhi, minAbsDeltaPhi,  deltaR, invMass,
-from Workspace.HEPHYPythonTools.helpers import getVarValue, deltaPhi, minAbsDeltaPhi, invMassOfLightObjects, deltaR, closestMuJetDeltaR, invMass,  findClosestJet
+from Workspace.HEPHYPythonTools.helpers import getVarValue, deltaPhi, minAbsDeltaPhi, invMassOfLightObjects, deltaR, closestMuJetDeltaR, invMass,  findClosestObjectDR
 from monoJetFuncs import softIsolatedMT, pmuboost3d
 
 from Workspace.HEPHYPythonTools.btagEff import getMCEff, getTagWeightDict, getSF, partonName 
@@ -914,7 +914,7 @@ for isample, sample in enumerate(allSamples):
               s.muIsTracker[i] = allGoodMuons[i]['IsTracker']
               s.muMT[i]    = sqrt(2.0*s.muPt[i]*s.type1phiMet*(1-cos(s.muPhi[i] - s.type1phiMetphi)))
               if len(idJets30)>0:
-                cjet = findClosestJet(idJets30, {'phi':s.muPhi[i], 'eta':s.muEta[i]})
+                cjet = findClosestObjectDR(idJets30, {'phi':s.muPhi[i], 'eta':s.muEta[i]})
                 s.muClosestJetDeltaR[i] = cjet['deltaR']
                 s.muClosestJetMass[i] = invMass(cjet['jet'], {'phi':s.muPhi[i], 'pt':s.muPt[i], 'eta':s.muEta[i]})
               else:
