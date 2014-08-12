@@ -319,7 +319,7 @@ for isample, sample in enumerate(allSamples):
 
   for bin_ in sample["bins"]:
     commoncf = ""
-    if options.chmode[:7]=="copyMET":
+    if options.chmode=="copyMET":
       commoncf = "slimmedMETs>=100"
     if options.chmode[:7] == "copyInc":
       commoncf = "(1)"
@@ -365,8 +365,8 @@ for isample, sample in enumerate(allSamples):
       elist = ROOT.gDirectory.Get("eList")
       number_events = elist.GetN()
       if options.small:
-        if number_events>10001:
-          number_events=10001
+        if number_events>1001:
+          number_events=1001
       start = int(options.fromPercentage/100.*number_events)
       stop  = int(options.toPercentage/100.*number_events)
       print "Reading: ", sample["name"], bin, "with",number_events,"Events using cut", commoncf
