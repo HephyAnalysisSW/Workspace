@@ -10,7 +10,7 @@
  */
 
 // this class header
-#include "Workspace/MonoJetModules/interface/LheAnalysis.h"
+#include "Workspace/HEPHYCMSSWTools/interface/LheAnalysis.h"
 
 // system include files
 #include <memory>

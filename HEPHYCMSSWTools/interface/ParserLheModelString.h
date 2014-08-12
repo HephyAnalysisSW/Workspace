@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef Workspace_MonoJetModules_ParserLheModelString_h
-#define Workspace_MonoJetModules_ParserLheModelString_h
+#ifndef Workspace_HEPHYCMSSWTools_ParserLheModelString_h
+#define Workspace_HEPHYCMSSWTools_ParserLheModelString_h
 
 // system include files
 #include <string>
@@ -200,5 +200,5 @@ const QuantityType ParserLheModelString::getQuantityValue(
 }
 
 
-#endif /* Workspace_MonoJetModules_ParserLheModelString_h */
+#endif /* Workspace_HEPHYCMSSWTools_ParserLheModelString_h */
 

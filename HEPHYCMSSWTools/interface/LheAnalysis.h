@@ -1,5 +1,5 @@
-#ifndef Workspace_MonoJetAnalysis_LheAnalysis_h
-#define Workspace_MonoJetAnalysis_LheAnalysis_h
+#ifndef Workspace_HEPHYCMSSWTools_LheAnalysis_h
+#define Workspace_HEPHYCMSSWTools_LheAnalysis_h
 
 /**
  * \class LheAnalysis
@@ -31,7 +31,7 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/Utilities/interface/InputTag.h"
 
-#include "Workspace/MonoJetModules/interface/ParserLheModelString.h"
+#include "Workspace/HEPHYCMSSWTools/interface/ParserLheModelString.h"
 
 // forward declarations
 
@@ -90,4 +90,4 @@ private:
 
 };
 
-#endif /*Workspace_MonoJetAnalysis_LheAnalysis_h*/
+#endif /*Workspace_HEPHYCMSSWTools_LheAnalysis_h*/

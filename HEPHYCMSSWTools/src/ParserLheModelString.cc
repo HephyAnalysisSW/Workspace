@@ -11,7 +11,7 @@
  */
 
 // this class header
-#include "Workspace/MonoJetModules/interface/ParserLheModelString.h"
+#include "Workspace/HEPHYCMSSWTools/interface/ParserLheModelString.h"
 
 // system include files
 #include <iostream>
