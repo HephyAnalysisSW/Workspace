@@ -24,8 +24,13 @@ testSample["bins"] = ["tmp"]
 
 ttbarTest = {}
 ttbarTest["name"]     = "ttbarTest";
-ttbarTest["dirname"] = "/data/schoef/miniAOD"
-ttbarTest["bins"]    = [ 'ttbarTest']
+##ttbarTest["dirname"] = "/data/schoef/miniAOD"
+##ttbarTest["dirname"] = "/data/schoef/miniAODTuples_v1/copy/"
+
+ttbarTest["dirname"] = "/data/schoef/stage1CSA14"
+ttbarTest["Chain"] = "Events"
+##ttbarTest["bins"]    = [ 'ttbarTest']
+ttbarTest["bins"] = ["TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola_Spring14miniaod-PU20bx25_POSTLS170_V5-v1"]
 
 
 #from Workspace.HEPHYPythonTools.createPUReweightingHisto import getPUReweightingUncertainty
