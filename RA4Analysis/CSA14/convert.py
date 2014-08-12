@@ -210,7 +210,7 @@ for isample, sample in enumerate(allSamples):
   extraVariables += ['pfMet', 'pfMetphi','genMet', 'genMetphi']
   jetvars = ["jetPt", "jetEta", "jetPhi", "jetPdg", "jetBtag", "jetChef", "jetNhef", "jetCeef", "jetNeef", "jetHFhef", "jetHFeef", "jetMuef", "jetElef", "jetPhef", "jetUnc"]#, "jetCutBasedPUJetIDFlag","jetFull53XPUJetIDFlag","jetMET53XPUJetIDFlag"
   muvars = ["muPt", "muEta", "muPhi", "muPdg", "muRelIso", "muDxy", "muDz", "muNormChi2", "muNValMuonHits", "muNumMatchedStations", "muPixelHits", "muNumtrackerLayerWithMeasurement", 'muIsGlobal', 'muIsTracker','muIsPF']
-  elvars = ["elePt", "eleEta", "elePhi", "elePdg", "eleRelIso", "eleDxy", "eleDz", ]
+  elvars = ["elePt", "eleEta", "elePhi", "elePdg", "eleRelIso", "eleDxy", "eleDz", "eleOneOverEMinusOneOverP", "elePfRelIso", "eleSigmaIEtaIEta", "eleHoE", "eleDPhi", "eleDEta", "eleMissingHits", "elePassPATConversionVeto"]
   tavars = ["tauPt", "tauEta", "tauPhi", "tauPdg", 'tauJetInd', 'tauJetDR']
   if not sample['name'].lower().count('data'):
     extraVariables+=["ngNuEFromW","ngNuMuFromW","ngNuTauFromW"]
@@ -480,7 +480,7 @@ for isample, sample in enumerate(allSamples):
                   if pdgId==12:s.ngNuEFromW+=1 
                   if pdgId==14:s.ngNuMuFromW+=1 
                   if pdgId==16:s.ngNuTauFromW+=1
-              if pdgId==12 or pdgId==14: 
+              if pdgId==12 or pdgId==14:
                 if not (gp.numberOfMothers()>0  and abs(gp.mother(0).pdgId())==24): continue
                 lep = {'pt':gp.pt(),'phi':gp.phi(),'eta':gp.eta(),'Pdg':gp.pdgId(),}
                 if pdgId==12:
@@ -493,6 +493,7 @@ for isample, sample in enumerate(allSamples):
                 else:
                   lep['gLepDR'] = float('nan')
                   lep['gLepInd']= -1
+                genLeps.append(lep)
         
               if pdgId==15:
                 if not (gp.numberOfMothers()>0  and abs(gp.mother(0).pdgId())==24): continue
@@ -614,12 +615,14 @@ for isample, sample in enumerate(allSamples):
             s.eleRelIso[i] = allGoodElectrons[i]['relIso']
             s.eleDxy[i] = allGoodElectrons[i]['Dxy']
             s.eleDz[i] = allGoodElectrons[i]['Dz']
-
-#    return { 'sIEtaIEta':sietaieta, 'DPhi':dphi, \ #FIXME
-#            'DEta':deta, 'HoE':HoE, 'OneOverEMinusOneOverP':oneOverEMinusOneOverP, 'ConvRejection':convRej, 'MissingHits':missingHits,\
-#            'isEB':isEB, 'isEE':isEE, 'relIso':relIso, 'Dxy':dxy, 'Dz':dz}
-
-
+            s.eleOneOverEMinusOneOverP[i] = allGoodElectrons[i]['OneOverEMinusOneOverP']
+            s.elePfRelIso[i] = allGoodElectrons[i]['relIso']
+            s.eleSigmaIEtaIEta[i] = allGoodElectrons[i]['sIEtaIEta']
+            s.eleHoE[i] = allGoodElectrons[i]['HoE']
+            s.eleDPhi[i] = allGoodElectrons[i]['DPhi']
+            s.eleDEta[i] = allGoodElectrons[i]['DEta']
+            s.eleMissingHits[i] = allGoodElectrons[i]['MissingHits']
+            s.elePassPATConversionVeto[i] = allGoodElectrons[i]['ConvRejection']
 
 #              print "Electron pt's:",i,allGoodElectrons[i]['pt']
           s.ntauCount = min(10,s.ntau)

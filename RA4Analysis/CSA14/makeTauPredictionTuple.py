@@ -87,8 +87,8 @@ for i in range(number_events):
   muons = getTwoMuons(c)
   assert len(muons)==2
  
-  for iperm, m12 in enumerate([muons, reversed(muons)]):
-    m,m2=m12
+  for perm in [muons, reversed(muons)]:
+    m,m2 = perm
     if m2['isTight']:
 #      print iperm, m['isTight'],m2['isTight']
 #      print "pt",m['pt'],m['phi'],m['eta']
