@@ -4,7 +4,8 @@ from array import array
 #ROOT.gROOT.ForceStyle()
 ROOT.gROOT.ProcessLine(".L ../../HEPHYPythonTools/scripts/root/tdrstyle.C")
 ROOT.setTDRStyle()
-from Workspace.RA4Analysis.simplePlotsLocals import *
+from localInfo import username
+defaultWWWPath = '/afs/hephy.at/user/'+username[0]+'/'+username+'/'
 dataColor =   ROOT.kBlack
 caloColor =  ROOT.kYellow
 typeIColor =  ROOT.kYellow

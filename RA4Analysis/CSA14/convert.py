@@ -424,12 +424,12 @@ for isample, sample in enumerate(allSamples):
           muons = filter(lambda e:tightPOGMuID(e), allGoodMuons)
           taus = allGoodTaus 
           vetoElectrons = filter(lambda e:vetoEleID(e), allGoodElectrons)
-          vetoMuons = filter(lambda e:vetoMuID(e), allGoodMuons)
+          vetoMuons = filter(lambda mu:vetoMuID(mu), allGoodMuons)
           
           leptons = sorted(electrons+muons, key=lambda k: -k['pt'])
           s.singleLeptonic = len(leptons)==1
-          s.singleMuonic = len(leptons)==1 and abs(leptons[0]['Pdg'])==11
-          s.singleElectronic = len(leptons)==1 and abs(leptons[0]['Pdg'])==13
+          s.singleElectronic = len(leptons)==1 and abs(leptons[0]['Pdg'])==11
+          s.singleMuonic = len(leptons)==1 and abs(leptons[0]['Pdg'])==13
           if len(leptons)>0:
             s.leptonPt=leptons[0]['pt']
             s.leptonPhi=leptons[0]['phi']
