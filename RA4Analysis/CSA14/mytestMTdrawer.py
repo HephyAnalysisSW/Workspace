@@ -19,8 +19,10 @@ doubleLeptonPreselection = "ngoodMuons>=1&&nvetoMuons==2"
 
 
 ##ofile =                      '/data/schoef/results2014/tauTuples/CSA14_TTJets_genTau.root'
-ofile =  '/data/easilar/convertedTuples_v23/resuls/CSA14_DiLep_noPred_hT.root'
+##ofile =  '/data/easilar/convertedTuples_v23/resuls/CSA14_DiLep_noPred_hT.root'
 
+from localInfo import username
+ofile = "/data/"+username+"/results2014/CSA14_DiLep.root"
 
 def getTwoMuons(c):
   nmuCount = int(getVarValue(c, 'nmuCount' ))
