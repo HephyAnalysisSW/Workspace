@@ -38,7 +38,6 @@ parser.add_option("--toPercentage", dest="toPercentage", default="100", type="in
 parser.add_option("--keepPDFWeights", dest="keepPDFWeights", action="store_true", help="keep PDF Weights?")
  
 (options, args) = parser.parse_args()
-#options.small=True
 print "options: chmode",options.chmode, 'samples',options.allsamples
 exec('allSamples=['+options.allsamples+']')
 
@@ -480,12 +479,12 @@ for isample, sample in enumerate(allSamples):
                   if pdgId==12:s.ngNuEFromW+=1 
                   if pdgId==14:s.ngNuMuFromW+=1 
                   if pdgId==16:s.ngNuTauFromW+=1
-              if pdgId==12 or pdgId==14:
+              if pdgId==11 or pdgId==13:
                 if not (gp.numberOfMothers()>0  and abs(gp.mother(0).pdgId())==24): continue
-                lep = {'pt':gp.pt(),'phi':gp.phi(),'eta':gp.eta(),'Pdg':gp.pdgId(),}
-                if pdgId==12:
+                lep = {'pt':gp.pt(),'phi':gp.phi(),'eta':gp.eta(),'Pdg':gp.pdgId()}
+                if pdgId==11:
                   rlep=findClosestObjectDR(allGoodElectrons, {'phi':lep['phi'], 'eta':lep['eta']})
-                if pdgId==14:
+                if pdgId==13:
                   rlep=findClosestObjectDR(allGoodMuons, {'phi':lep['phi'], 'eta':lep['eta']})
                 if rlep:
                   lep['gLepDR'] = rlep['deltaR']
@@ -493,8 +492,9 @@ for isample, sample in enumerate(allSamples):
                 else:
                   lep['gLepDR'] = float('nan')
                   lep['gLepInd']= -1
+
                 genLeps.append(lep)
-        
+ 
               if pdgId==15:
                 if not (gp.numberOfMothers()>0  and abs(gp.mother(0).pdgId())==24): continue
                 tau = {'pt':gp.pt(),'phi':gp.phi(),'eta':gp.eta(),'Pdg':gp.pdgId(),'gTauNENu':0, 'gTauNMuNu':0, 'gTauNTauNu':0}
