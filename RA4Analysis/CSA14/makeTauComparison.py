@@ -18,9 +18,11 @@ hMTPred = ROOT.TH1F('hMTPred', 'hMTPred',40,0,800)
 cPred.Add('/data/schoef/results2014/tauTuples/CSA14_TTJets_genTau.root')
 cPred.Draw('mTPred>>hMTPred','weight*(htPred>'+str(htCut)+'&&njetsPred>='+str(minNJets)+'&&metPred>'+str(metCut)+')','goff')
 
+scaleF = (1-0.1741-0.1783)*0.1125/(0.1057+0.1075)
+
 c1=ROOT.TCanvas()
 hMTPred.SetLineColor(ROOT.kRed)
-hMTPred.Scale(hMT.Integral()/hMTPred.Integral())
+hMTPred.Scale(scaleF)
 hMTPred.Draw()
 hMT.Draw('same')
 c1.SetLogy()

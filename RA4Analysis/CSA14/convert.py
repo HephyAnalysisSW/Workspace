@@ -18,7 +18,7 @@ xsec['tmp']=100.
 subDir = "convertedTuples_v23"
 
 overwrite = True
-target_lumi = 19700 #pb-1
+target_lumi = 2000 #pb-1
 
 from localInfo import username
 outputDir = "/data/"+username+"/"+subDir+"/"
@@ -38,7 +38,7 @@ parser.add_option("--toPercentage", dest="toPercentage", default="100", type="in
 parser.add_option("--keepPDFWeights", dest="keepPDFWeights", action="store_true", help="keep PDF Weights?")
  
 (options, args) = parser.parse_args()
-options.small=True
+#options.small=True
 print "options: chmode",options.chmode, 'samples',options.allsamples
 exec('allSamples=['+options.allsamples+']')
 

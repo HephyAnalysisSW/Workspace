@@ -127,7 +127,6 @@ void BasicTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup) {
     } catch ( cms::Exception & e ) {
       cout <<prefix<<"error: " << e.what() << endl;
     }
-
     put(metName, (*met)[0].pt());
     put(metName+"Phi", (*met)[0].phi());
     put(metName+"SumEt", (*met)[0].sumEt());
@@ -140,52 +139,52 @@ void BasicTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup) {
     put("osetMC", modelParameters_.get ( "mC", ev ));
     put("osetMN", modelParameters_.get ( "mN", ev ));
 
-    edm::InputTag genParticleTag = edm::InputTag("genParticles");
-    edm::Handle< vector< reco::GenParticle > > genParticleHandle;
-    try {
-      ev.getByLabel(genParticleTag, genParticleHandle );
-      if (!genParticleHandle.isValid() || genParticleHandle.failedToGet()) {
-  // if (verbose_) cout << prefix << "GenParticles not valid!." << endl;
-      }
-    } catch (exception & e) {
-      cout << prefix << "error (GenParticles): " << e.what() << endl;
-    }
-
-    vector< const reco::GenParticle *> gluinos;
-    if ( genParticleHandle.isValid() and (!genParticleHandle.failedToGet())) {
-      for( unsigned i = 0; i < genParticleHandle->size(); i++ ) {
-        if (((*genParticleHandle)[i].pdgId() == 1000021) && ( (*genParticleHandle)[i].status() == 3)) gluinos.push_back( &( (*genParticleHandle)[i] ));
-      }
-    }
-    std::vector<int> selectedIds;
-    for (unsigned int i=0; i<genParticleHandle->size(); ++i) {
-      const reco::GenParticle& p = (*genParticleHandle)[i];
-       if (p.status() != 3) continue;
-       if (abs(p.pdgId()) < 1000000) continue;
-
-       bool hasSMMother(true);
-       for (unsigned int j=0; j<p.numberOfMothers(); ++j) {
-         if ( !(abs(p.mother(j)->pdgId())<1000000) ) {
-           hasSMMother = false;
-           break;
-         }
-       }
-       if ( hasSMMother ) selectedIds.push_back(p.pdgId());
-    }
-    sort(selectedIds.begin(),selectedIds.end());
-    put("sparticles", selectedIds);
-    if (gluinos.size()>0) {
-      put("gluino0Pt", gluinos[0]->pt());
-      put("gluino0Eta", gluinos[0]->eta());
-      put("gluino0Phi", gluinos[0]->phi());
-      put("gluino0Pdg", gluinos[0]->pdgId());
-    }
-    if (gluinos.size()>1) {
-      put("gluino1Pt", gluinos[1]->pt());
-      put("gluino1Eta", gluinos[1]->eta());
-      put("gluino1Phi", gluinos[1]->phi());
-      put("gluino1Pdg", gluinos[1]->pdgId());
-    }
+//    edm::InputTag genParticleTag = edm::InputTag("genParticles");
+//    edm::Handle< vector< reco::GenParticle > > genParticleHandle;
+//    try {
+//      ev.getByLabel(genParticleTag, genParticleHandle );
+//      if (!genParticleHandle.isValid() || genParticleHandle.failedToGet()) {
+//  // if (verbose_) cout << prefix << "GenParticles not valid!." << endl;
+//      }
+//    } catch (exception & e) {
+//      cout << prefix << "error (GenParticles): " << e.what() << endl;
+//    }
+//
+//    vector< const reco::GenParticle *> gluinos;
+//    if ( genParticleHandle.isValid() and (!genParticleHandle.failedToGet())) {
+//      for( unsigned i = 0; i < genParticleHandle->size(); i++ ) {
+//        if (((*genParticleHandle)[i].pdgId() == 1000021) && ( (*genParticleHandle)[i].status() == 3)) gluinos.push_back( &( (*genParticleHandle)[i] ));
+//      }
+//    }
+//    std::vector<int> selectedIds;
+//    for (unsigned int i=0; i<genParticleHandle->size(); ++i) {
+//      const reco::GenParticle& p = (*genParticleHandle)[i];
+//       if (p.status() != 3) continue;
+//       if (abs(p.pdgId()) < 1000000) continue;
+//
+//       bool hasSMMother(true);
+//       for (unsigned int j=0; j<p.numberOfMothers(); ++j) {
+//         if ( !(abs(p.mother(j)->pdgId())<1000000) ) {
+//           hasSMMother = false;
+//           break;
+//         }
+//       }
+//       if ( hasSMMother ) selectedIds.push_back(p.pdgId());
+//    }
+//    sort(selectedIds.begin(),selectedIds.end());
+//    put("sparticles", selectedIds);
+//    if (gluinos.size()>0) {
+//      put("gluino0Pt", gluinos[0]->pt());
+//      put("gluino0Eta", gluinos[0]->eta());
+//      put("gluino0Phi", gluinos[0]->phi());
+//      put("gluino0Pdg", gluinos[0]->pdgId());
+//    }
+//    if (gluinos.size()>1) {
+//      put("gluino1Pt", gluinos[1]->pt());
+//      put("gluino1Eta", gluinos[1]->eta());
+//      put("gluino1Phi", gluinos[1]->phi());
+//      put("gluino1Pdg", gluinos[1]->pdgId());
+//    }
 // put("osetType", modelParameters_.get ( "type", ev ));
   }
 
@@ -243,15 +242,15 @@ void BasicTupelizer::addAllVars( )
 
 
   if (addMSugraOSETInfo_) {
-    addVar("sparticles/I[]");
-    addVar("gluino0Pt/F");
-    addVar("gluino0Eta/F");
-    addVar("gluino0Phi/F");
-    addVar("gluino0Pdg/I");
-    addVar("gluino1Pt/F");
-    addVar("gluino1Eta/F");
-    addVar("gluino1Phi/F");
-    addVar("gluino1Pdg/I");
+//    addVar("sparticles/I[]");
+//    addVar("gluino0Pt/F");
+//    addVar("gluino0Eta/F");
+//    addVar("gluino0Phi/F");
+//    addVar("gluino0Pdg/I");
+//    addVar("gluino1Pt/F");
+//    addVar("gluino1Eta/F");
+//    addVar("gluino1Phi/F");
+//    addVar("gluino1Pdg/I");
     addVar("osetMgl/F"); // NAN);
     addVar("osetMsq/F"); // NAN);
     addVar("osetMC/F"); // NAN);
