@@ -916,7 +916,7 @@ for isample, sample in enumerate(allSamples):
               if len(idJets30)>0:
                 cjet = findClosestObjectDR(idJets30, {'phi':s.muPhi[i], 'eta':s.muEta[i]})
                 s.muClosestJetDeltaR[i] = cjet['deltaR']
-                s.muClosestJetMass[i] = invMass(cjet['jet'], {'phi':s.muPhi[i], 'pt':s.muPt[i], 'eta':s.muEta[i]})
+                s.muClosestJetMass[i] = invMass(cjet['obj'], {'phi':s.muPhi[i], 'pt':s.muPt[i], 'eta':s.muEta[i]})
               else:
                 s.muClosestJetDeltaR[i] =float('nan') 
                 s.muClosestJetMass[i] =  float('nan') 

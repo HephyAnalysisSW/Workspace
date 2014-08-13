@@ -38,7 +38,7 @@ parser.add_option("--toPercentage", dest="toPercentage", default="100", type="in
 parser.add_option("--keepPDFWeights", dest="keepPDFWeights", action="store_true", help="keep PDF Weights?")
  
 (options, args) = parser.parse_args()
-#options.small=True
+options.small=True
 print "options: chmode",options.chmode, 'samples',options.allsamples
 exec('allSamples=['+options.allsamples+']')
 
@@ -493,6 +493,12 @@ for isample, sample in enumerate(allSamples):
                 else:
                   lep['gLepDR'] = float('nan')
                   lep['gLepInd']= -1
+                if pdgId==14: 
+                  print "allGoodMuons", allGoodMuons
+                  print "(g) lep", lep
+                  print "r", rlep
+                  print
+
                 genLeps.append(lep)
         
               if pdgId==15:
