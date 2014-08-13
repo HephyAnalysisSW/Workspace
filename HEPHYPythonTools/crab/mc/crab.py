@@ -5,8 +5,8 @@ config = Configuration()
 #config.<section-name>.<parameter-name> = <parameter-value>
 
 config.section_("General")
-config.General.requestName = "miniAODTuple_110814"
-#config.General.workArea = "" #full or relative path to working directory
+config.General.requestName = "miniAODTuple_130814"
+config.General.workArea = "miniAODTuple_e" #full or relative path to working directory
 config.General.transferOutput = True #whether to transfer
 config.General.saveLogs = False #1MB still available
 #config.General.failureLimit =  #0.1 or 10% (which?) fraction of tolerated failures
@@ -18,6 +18,7 @@ config.JobType.pyCfgParams   = [ 'keep=*_genMetTrue_*_*,*_pfMet_*_*,*_packedPFCa
 
 config.section_("Data")
 config.Data.inputDataset   = '/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/Spring14miniaod-PU20bx25_POSTLS170_V5-v2/MINIAODSIM'
+#config.Data.inputDataset   = '/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/Spring14miniaod-PU20bx25_POSTLS170_V5-v1/MINIAODSIM'
 config.Data.splitting   = 'FileBased'
 config.Data.unitsPerJob = 1
 #config.Data.totalUnits = 
