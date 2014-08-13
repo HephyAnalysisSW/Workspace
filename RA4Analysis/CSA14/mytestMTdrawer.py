@@ -18,6 +18,8 @@ for b in ttJetsCSA14['bins']:
 #small = False
 #maxN=1001
 
+print "Greetings from Robert"
+
 doubleLeptonPreselection = "ngoodMuons>=1&&nvetoMuons==2"
 
 ofile =                      '/data/schoef/results2014/tauTuples/CSA14_TTJets_genTau.root'
