@@ -292,6 +292,7 @@ process.printTree = cms.EDAnalyzer("ParticleTreeDrawer",
 #process.kt6PFJetsForIsolation2011 = kt4PFJets.clone( rParam = 0.6, doRhoFastjet = True )
 #process.kt6PFJetsForIsolation2011.Rho_EtaMax = cms.double(2.5)
 #process.p+=process.kt6PFJetsForIsolation2011
+
 process.miniAODTupelizerSequence = cms.Sequence()
 process.load('Workspace.HEPHYCMSSWTools.JetTupelizer_miniAOD_cfi')
 process.JetTupelizer.useForDefaultAlias = cms.untracked.bool(True)
@@ -310,6 +311,7 @@ process.TriggerTupelizer.useForDefaultAlias = cms.untracked.bool(True)
 process.miniAODTupelizerSequence += process.TriggerTupelizer
 process.load('Workspace.HEPHYCMSSWTools.BasicTupelizer_miniAOD_cfi')
 process.BasicTupelizer.useForDefaultAlias = cms.untracked.bool(True)
+process.BasicTupelizer.addMSugraOSETInfo = cms.untracked.bool(options.mode.lower()=='sms')
 process.miniAODTupelizerSequence += process.BasicTupelizer
 
 #process.SUSYTupelizer.triggerCollection = cms.untracked.InputTag( options.hltName )
@@ -323,8 +325,6 @@ process.miniAODTupelizerSequence += process.BasicTupelizer
 #process.SUSYTupelizer.metsToMonitor = []
 
 process.p = cms.Path(process.filterSequence + process.metSequence + process.miniAODTupelizerSequence)
-#process.p = cms.Path(process.miniAODTupelizerSequence)
-
 
 #process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
 #process.printTree = cms.EDAnalyzer("ParticleListDrawer",

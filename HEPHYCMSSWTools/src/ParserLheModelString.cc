@@ -314,6 +314,52 @@ void ParserLheModelString::initialize() {
         return;
 
     }
+    if (m_lheSample == "T1tttt") {
+
+        m_isValid = true;
+
+        // 8TeV_T2tt_2j_175_25_run16892_merged_175_115
+
+//        m_delimiter = "_";
+//        const unsigned int lheModelSubstrings = 9;
+//
+//        m_lheModelPatterns.reserve(lheModelSubstrings);
+//        m_patternIndices.reserve(lheModelSubstrings);
+//
+//        addPattern("Energy", INT);
+//        addPattern("TeV", FIXED_STRING);
+//        addPattern(m_delimiter, DELIMITER);
+//
+//        addPattern("MadModel", STRING);
+//        addPattern(m_delimiter, DELIMITER);
+//
+//        addPattern("MadNrJets", STRING);
+//        addPattern(m_delimiter, DELIMITER);
+//
+//        addPattern("GenStopMass", INT);
+//        addPattern(m_delimiter, DELIMITER);
+//
+//        addPattern("GenLspMass", INT);
+//        addPattern(m_delimiter, DELIMITER);
+//
+//        addPattern("run", FIXED_STRING);
+//        addPattern("RunNumber", INT);
+//        addPattern(m_delimiter, DELIMITER);
+//
+//        addPattern("merged", FIXED_STRING);
+//        addPattern(m_delimiter, DELIMITER);
+//
+//        addPattern("DecayStopMass", INT);
+//        addPattern(m_delimiter, DELIMITER);
+//
+//        addPattern("DecayLspMass", INT);
+//
+//        m_patternStartPosition.resize(m_lheModelPatterns.size());
+//        m_patternEndPosition.resize(m_lheModelPatterns.size());
+//
+//        return;
+
+    }
 
     m_isValid = false;
 }

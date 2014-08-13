@@ -7,7 +7,7 @@ ttJetsCSA14["Chain"] = "Events"
 #ttJetsCSA14['reweightingHistoFile'] = S10rwHisto 
 #ttJetsCSA14['reweightingHistoFileSysPlus'] = S10rwPlusHisto
 #ttJetsCSA14['reweightingHistoFileSysMinus'] = S10rwMinusHisto
-ttJetsCSA14["bins"] = ["TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola_Spring14miniaod-PU20bx25_POSTLS170_V5-v1"]
+ttJetsCSA14["bins"] = ["TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola_Spring14miniaod-PU20bx25_POSTLS170_V5-v1__2"]
 
 
 #testSample={}
