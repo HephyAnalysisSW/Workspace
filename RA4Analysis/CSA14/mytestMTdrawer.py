@@ -2,7 +2,7 @@ import ROOT
 import pickle
 from array import array
 ##from helpers import gTauAbsEtaBins, gTauPtBins, metParRatioBins, jetRatioBins
-##from Workspace.HEPHYPythonTools.helpers import getVarValue
+from Workspace.HEPHYPythonTools.helpers import getVarValue
 from objectSelection import getLooseMuStage2, tightPOGMuID, vetoMuID
 from stage2Tuples import ttJetsCSA14
 from math import sqrt, cos, sin, atan2
@@ -19,6 +19,8 @@ for b in ttJetsCSA14['bins']:
 #maxN=1001
 
 doubleLeptonPreselection = "ngoodMuons>=1&&nvetoMuons==2"
+
+ofile =                      '/data/schoef/results2014/tauTuples/CSA14_TTJets_genTau.root'
 
 hMT = ROOT.TH1F('hMT', 'hMT',40,0,800)
 

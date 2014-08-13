@@ -1,7 +1,0 @@
-<use name="FWCore/Framework"/>
-<use name="FWCore/ParameterSet"/>
-<use name="DataFormats/Common"/>
-<use name="SimDataFormats/GeneratorProducts"/>
-<export>
-  <lib   name="1"/>
-</export>
