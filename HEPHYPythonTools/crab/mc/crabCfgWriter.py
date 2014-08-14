@@ -7,7 +7,7 @@ samples=[\
 #  "/WJetsToLNu_HT-200to400_Tune4C_13TeV-madgraph-tauola/Spring14miniaod-PU20bx25_POSTLS170_V5-v1/MINIAODSIM",
 #  "/WJetsToLNu_HT-400to600_Tune4C_13TeV-madgraph-tauola/Spring14miniaod-PU20bx25_POSTLS170_V5-v1/MINIAODSIM",
 #  "/WJetsToLNu_HT-600toInf_Tune4C_13TeV-madgraph-tauola/Spring14miniaod-PU20bx25_POSTLS170_V5-v1/MINIAODSIM",
-#  "/WJetsToLNu_13TeV-madgraph-pythia8-tauola/Spring14miniaod-PU20bx25_POSTLS170_V5-v1/MINIAODSIM",
+  "/WJetsToLNu_13TeV-madgraph-pythia8-tauola/Spring14miniaod-PU20bx25_POSTLS170_V5-v1/MINIAODSIM",
 #  "/DYJetsToLL_M-50_HT-200to400_Tune4C_13TeV-madgraph-tauola/Spring14miniaod-PU20bx25_POSTLS170_V5-v1/MINIAODSIM",
 #  "/DYJetsToLL_M-50_HT-400to600_Tune4C_13TeV-madgraph-tauola/Spring14miniaod-PU20bx25_POSTLS170_V5-v1/MINIAODSIM",
 #  "/DYJetsToLL_M-50_HT-600toInf_Tune4C_13TeV-madgraph-tauola/Spring14miniaod-PU20bx25_POSTLS170_V5-v1/MINIAODSIM",
@@ -31,8 +31,9 @@ samples=[\
 ]
 
 for s in samples:
-  pySampleName = s[1:].replace('/','_')
-  cfgFileName = 'crab_'+pySampleName+'.py'
+  #pySampleName = s[1:].replace('/','_')
+  pySampleName = s[1:].replace('/','').replace('_','').replace('-','')
+  cfgFileName = 'crab'+pySampleName+'.py'
   print "Sample",s
   print "Using template",templateFile
   if os.path.isfile(cfgFileName) :
@@ -45,7 +46,7 @@ for s in samples:
     break
   ifile = open(templateFile,'r')
 
-  replacements = [["DPMDIRECTORY", pySampleName], ["WORKINGDIRECTORY", pySampleName]]
+  replacements = [["DPMDIRECTORY", pySampleName], ["WORKINGDIRECTORY", pySampleName], ["SAMPLENAME", s]]
 
   for line in ifile.readlines():
 #    print line
