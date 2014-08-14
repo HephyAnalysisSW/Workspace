@@ -9,7 +9,7 @@ for b in ttJetsCSA14['bins']:
 stuff=[]
 hadTauReq = 'gTauNENu+gTauNMuNu==0&&gTauNTauNu==1'
 
-from helpers import gTauAbsEtaBins, gTauPtBins, metParRatioBins, jetRatioBins
+from objectSelection import gTauAbsEtaBins, gTauPtBins, metParRatioBins, jetRatioBins
 
 colors = [ROOT.kGray, ROOT.kBlack, ROOT.kBlue, ROOT.kRed, ROOT.kGreen, ROOT.kMagenta, ROOT.kCyan]
 
@@ -237,4 +237,7 @@ for etab in gTauAbsEtaBins+[(0,-1)]:
     templates[b][etab]=genTauTemplatePt[b]
     c1.SetLogz()
     c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngCSA14/genTauTemplate_'+s+'.png')
-pickle.dump(templates, file('/data/schoef/results2014/tauTemplates/CSA14_TTJets_genTau.pkl','w'))
+ofile = '/data/schoef/results2014/tauTemplates/CSA14_TTJets_genTau.pkl'
+pickle.dump(templates, file(ofile,'w'))
+print "Written", ofile 
+

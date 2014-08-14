@@ -71,6 +71,7 @@ for h in reversed(histos):
   h.Draw('same')
 #hPresel.Draw('same')
 l.Draw()
+c1.RedrawAxis()
 c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngCSA14/mt.png')
 
 #hPresel_l_H = getCutPlotFromChain(c, 'sqrt(2*leptonPt*met*(1-cos(metphi-leptonPhi)))', [20,0,800], presel+"&&"+l_H, 'weight')

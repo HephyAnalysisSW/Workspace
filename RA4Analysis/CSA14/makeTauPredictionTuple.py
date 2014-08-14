@@ -11,15 +11,20 @@ c = ROOT.TChain('Events')
 for b in ttJetsCSA14['bins']:
   c.Add(ttJetsCSA14['dirname']+'/'+b+'/h*.root')
 
+mode='lep'
+
 small = False
 maxN=1001
-
 doubleLeptonPreselection = "ngoodMuons>=1&&nvetoMuons==2&&nvetoElectrons==0"
 
-templates = pickle.load(file('/data/schoef/results2014/tauTemplates/CSA14_TTJets_genTau.pkl'))
 leptonEffMap = pickle.load(file('/data/schoef/results2014/tauTemplates/CSA14_TTJets_vetoLeptonEfficiencyMap.pkl'))
+if mode=='had':
+  templates = pickle.load(file('/data/schoef/results2014/tauTemplates/CSA14_TTJets_genTau.pkl'))
+  ofile =                      '/data/schoef/results2014/tauTuples/CSA14_TTJets_hadGenTau.root'
+if mode=='lep':
+  templates = pickle.load(file('/data/schoef/results2014/tauTemplates/CSA14_TTJets_lepGenTau.pkl'))
+  ofile =                      '/data/schoef/results2014/tauTuples/CSA14_TTJets_lepGenTau.root'
 
-ofile =                      '/data/schoef/results2014/tauTuples/CSA14_TTJets_genTau.root'
 
 for ptk in templates.keys():
   for etak in templates[ptk].keys():
@@ -52,7 +57,7 @@ def getTypeStr(s):
   if s=='F': return 'Float_t'
   if s=='I': return 'Int_t'
 
-copyVars  = ['event/l', 'njets/I', 'ht/F', 'met/F', 'metphi/F']
+copyVars  = ['event/l', 'njets/I', 'ht/F', 'met/F', 'metphi/F', 'nvetoMuons/I']
 newVars   = ['njetsPred/I', 'htPred/F', 'metPred/F', 'metphiPred/F','weightPred/F', 'mTPred/F', 'weight/F', 'scaleLEff/F']
 vars      = copyVars+newVars  
 
@@ -122,21 +127,49 @@ for i in range(number_events):
       
       for p in template:
         metpar    = p['frac']*m['pt']
-        s.weightPred = p['weight']*s.weight#*combFac
         MEx = s.met*cos(s.metphi)+cos(m['phi'])*metpar
         MEy = s.met*sin(s.metphi)+sin(m['phi'])*metpar
 
-        s.metPred = sqrt(MEx**2+MEy**2)
-        s.metphiPred = atan2(MEy,MEx)
-        jetpt =  (1.-p['frac'])*m['pt']
-        if jetpt>30.:
-          s.njetsPred = s.njets+1
-          s.htPred   = s.ht+jetpt
-        else:
+        if mode=='had':
+          s.weightPred = p['weight']*s.weight
+#          s.nvetoMuonsPred = s.nvetoMuons 
+          jetpt =  (1.-p['frac'])*m['pt']
+          if jetpt>30.:
+            s.njetsPred = s.njets+1
+            s.htPred   = s.ht+jetpt
+          else:
+            s.njetsPred = s.njets
+            s.htPred   = s.ht
+          s.metPred = sqrt(MEx**2+MEy**2)
+          s.metphiPred = atan2(MEy,MEx)
+          s.mTPred = sqrt(2.*s.metPred*m2['pt']*(1-cos(m2['phi']-s.metphiPred)))
+          t.Fill()
+        if mode=='lep':
           s.njetsPred = s.njets
           s.htPred   = s.ht
-        s.mTPred = sqrt(2.*s.metPred*m2['pt']*(1-cos(m2['phi']-s.metphiPred)))
-        t.Fill()
+          leppt =  (1.-p['frac'])*m['pt']
+          if leppt>15.:
+            nlEffb = leptonEffMap.FindBin( leppt, m['eta'])
+            nlEff = leptonEffMap.GetBinContent(nlEffb) #Consider the event not contributing if the lepton from the tau hits the lepton veto
+          else:
+            nlEff = 0.
+          s.weightPred = p['weight']*s.weight*(1-nlEff)
+          MEx += leppt*cos(m['phi'])
+          MEy += leppt*sin(m['phi'])
+          s.metPred = sqrt(MEx**2+MEy**2)
+          s.metphiPred = atan2(MEy,MEx)
+          s.mTPred = sqrt(2.*s.metPred*m2['pt']*(1-cos(m2['phi']-s.metphiPred)))
+          t.Fill()
+#            #lepton reconstructed ->not filled
+##            s.nvetoMuonsPred = s.nvetoMuons + 1 
+#            s.weightPred = p['weight']*s.weight*nlEff
+#            s.metPred = sqrt(MEx**2+MEy**2)
+#            s.metphiPred = atan2(MEy,MEx)
+#            s.mTPred = sqrt(2.*s.metPred*m2['pt']*(1-cos(m2['phi']-s.metphiPred)))
+#            t.Fill()
+            #lepton lost
+#            s.nvetoMuonsPred = s.nvetoMuons  
+
 
 f.cd()
 t.Write()
