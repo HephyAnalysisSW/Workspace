@@ -14,7 +14,7 @@ for b in ttJetsCSA14['bins']:
 small = False
 maxN=1001
 
-doubleLeptonPreselection = "ngoodMuons>=1&&nvetoMuons==2"
+doubleLeptonPreselection = "ngoodMuons>=1&&nvetoMuons==2&&nvetoElectrons==0"
 
 templates = pickle.load(file('/data/schoef/results2014/tauTemplates/CSA14_TTJets_genTau.pkl'))
 leptonEffMap = pickle.load(file('/data/schoef/results2014/tauTemplates/CSA14_TTJets_vetoLeptonEfficiencyMap.pkl'))
@@ -78,6 +78,7 @@ if small:
   if number_events>maxN:
     number_events=maxN
 number_events=min(number_events, eList.GetN())
+countLeptons=0
 for i in range(number_events):
   if (i%10000 == 0) and i>0 :
     print i,"/",number_events
@@ -88,14 +89,18 @@ for i in range(number_events):
     exec('s.'+n+'='+str(c.GetLeaf(n).GetValue()))
   muons = getTwoMuons(c)
   assert len(muons)==2
- 
+  if muons[0]['isTight'] and muons[1]['isTight']:
+    combFac=0.5
+  else:
+    combFac=1.
   for perm in [muons, reversed(muons)]:
     m,m2 = perm
     if m2['isTight']:
 #      print iperm, m['isTight'],m2['isTight']
 #      print "pt",m['pt'],m['phi'],m['eta']
       abseta=abs(m['eta'])
-      if abseta>2.3:continue
+      if abseta>2.1:continue
+      countLeptons+=1
       template=None
       for ptb in gTauPtBins:
         if m['pt']>=ptb[0] and (m['pt']<ptb[1] or ptb[1]<0):
@@ -106,7 +111,7 @@ for i in range(number_events):
           if template:break
       assert template, "No template found for muon: %r" % repr(m)
 #      print template 
-      s.weight=c.GetLeaf('weight').GetValue()/len(template)
+      s.weight=c.GetLeaf('weight').GetValue()
       lEffb = leptonEffMap.FindBin( m['pt'], m['eta'])
       lEff = leptonEffMap.GetBinContent(lEffb)
 #      print  m['pt'], m['eta'], lEff
@@ -117,7 +122,7 @@ for i in range(number_events):
       
       for p in template:
         metpar    = p['frac']*m['pt']
-        s.weightPred = p['weight']*s.weight
+        s.weightPred = p['weight']*s.weight#*combFac
         MEx = s.met*cos(s.metphi)+cos(m['phi'])*metpar
         MEy = s.met*sin(s.metphi)+sin(m['phi'])*metpar
 
