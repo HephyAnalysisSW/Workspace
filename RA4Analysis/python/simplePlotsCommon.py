@@ -26,7 +26,7 @@ def pload(varstr, sfile):
   if not globals().has_key(varstr):
     globals()[varstr] = pickle.load(open(sfile))
 
-ROOT_colors = [ROOT.kBlack, ROOT.kRed+1, ROOT.kBlue+1, ROOT.kMagenta+1, ROOT.kOrange+1,ROOT.kRed-3, ROOT.kAzure+6, ROOT.kViolet-5, ROOT.kOrange , ROOT.kRed-10]
+ROOT_colors = [ROOT.kBlack, ROOT.kRed-7, ROOT.kBlue-2, ROOT.kGreen+3, ROOT.kOrange+1,ROOT.kRed-3, ROOT.kAzure+6, ROOT.kCyan+3, ROOT.kOrange , ROOT.kRed-10]
 
 def getVarValue(c, var, n=0):
   varNameHisto = var

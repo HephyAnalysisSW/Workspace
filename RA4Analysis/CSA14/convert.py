@@ -38,6 +38,7 @@ parser.add_option("--toPercentage", dest="toPercentage", default="100", type="in
 parser.add_option("--keepPDFWeights", dest="keepPDFWeights", action="store_true", help="keep PDF Weights?")
  
 (options, args) = parser.parse_args()
+#options.small=True
 print "options: chmode",options.chmode, 'samples',options.allsamples
 exec('allSamples=['+options.allsamples+']')
 
@@ -502,7 +503,6 @@ for isample, sample in enumerate(allSamples):
                   print "Taus?" 
                 MEx = 0.
                 MEy = 0.
-                justARadiation=False
 #                tx=gp.px()
 #                ty=gp.py() 
                 cjet = findClosestObjectDR(idJets30, {'phi':tau['phi'], 'eta':tau['eta']})
@@ -525,16 +525,25 @@ for isample, sample in enumerate(allSamples):
 #                  for id in range(gp.numberOfDaughters()):
 #                    gd = gp.daughter(id)
 #                    print id, gd.pdgId()
-              
+#                ind=0
+                done=False
+                while not done:
+                  for id in range(gp.numberOfDaughters()):
+                    if abs(gp.daughter(id).pdgId())==15:
+                      gp = gp.daughter(id)
+#                      ind+=1
+                      break
+                    done=True
+
                 for id in range(gp.numberOfDaughters()):
                   gd = gp.daughter(id)
 #                  tx-=gd.px()
 #                  ty-=gd.py()
 #                  print id, "d",gd.pdgId(),gd.pt()
                   dpdgId = abs(gd.pdgId())
-                  if dpdgId==15:
-                    justARadiation=True
-                    break
+#                  if dpdgId==15:
+#                    justARadiation=True
+#                    break
                   if dpdgId==12:tau['gTauNENu']+=1
                   if dpdgId==14:tau['gTauNMuNu']+=1
                   if dpdgId==16:tau['gTauNTauNu']+=1
@@ -544,8 +553,8 @@ for isample, sample in enumerate(allSamples):
                 tau['gTauMetPar']=cos(tau['phi'])*MEx+sin(tau['phi'])*MEy
                 tau['gTauMetPerp']=cos(tau['phi'])*MEy-sin(tau['phi'])*MEx
 #                print tx, ty
-                if not justARadiation:
-                  genTaus.append(tau)
+#                if not justARadiation:
+                genTaus.append(tau)
 #              print genTaus
             if s.ngNuMuFromW==2:
               if len(genTaus)>0:print genTaus
