@@ -101,8 +101,9 @@ for i in range(number_events):
       MEy = s.met*sin(s.metphi)+sin(m['phi'])*metpar
       s.metPred = sqrt(MEx**2+MEy**2)
       s.metphiPred = atan2(MEy,MEx)
-      #if s.ht>400 and s.met>150 and s.njets>=4:
       s.mTPred = sqrt(2.*s.metPred*m2['pt']*(1-cos(m2['phi']-s.metphiPred)))
+      s.htPred=c.GetLeaf('ht').GetValue()
+      s.njetsPred=c.GetLeaf('njets').GetValue()
       t.Fill()
 
 f.cd()

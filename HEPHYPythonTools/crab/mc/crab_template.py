@@ -17,7 +17,7 @@ config.JobType.psetName   = '../defaultMINIAODTupelizer_cfg.py'
 config.JobType.pyCfgParams   = [ 'keep=*_genMetTrue_*_*,*_pfMet_*_*,*_packedPFCandidates_*_*,*_prunedGenParticles_*_*,*_packedGenParticles_*_*', 'GT=POSTLS170_V5::All']
 
 config.section_("Data")
-config.Data.inputDataset   = '/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/Spring14miniaod-PU20bx25_POSTLS170_V5-v2/MINIAODSIM'
+config.Data.inputDataset   = 'SAMPLENAME'#'/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/Spring14miniaod-PU20bx25_POSTLS170_V5-v2/MINIAODSIM'
 #config.Data.inputDataset   = '/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/Spring14miniaod-PU20bx25_POSTLS170_V5-v1/MINIAODSIM'
 config.Data.splitting   = 'FileBased'
 config.Data.unitsPerJob = 1
