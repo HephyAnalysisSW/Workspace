@@ -14,9 +14,7 @@ for b in ttJetsCSA14['bins']:
 small = False
 maxN=1001
 
-
 doubleLeptonPreselection = "ngoodMuons>=1&&nvetoMuons==2"
-
 
 ##ofile =                      '/data/schoef/results2014/tauTuples/CSA14_TTJets_genTau.root'
 ##ofile =  '/data/easilar/convertedTuples_v23/resuls/CSA14_DiLep_noPred_hT.root'
@@ -83,7 +81,6 @@ for i in range(number_events):
     exec('s.'+n+'='+str(c.GetLeaf(n).GetValue()))
   muons = getTwoMuons(c)
   assert len(muons)==2
-
  
   for perm in [muons, reversed(muons)]:
     m,m2 = perm

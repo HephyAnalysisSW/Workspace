@@ -1,9 +1,9 @@
 import ROOT
 from stage2Tuples import ttJetsCSA14
 
-htCut     = 750
+htCut     = 400
 metCut    = 150
-minNJets  =   6
+minNJets  =   4
 
 #htCut     = 0
 #metCut    = 0
@@ -16,11 +16,14 @@ for b in ttJetsCSA14['bins']:
 cPred = ROOT.TChain('Events')
 cPred.Add('/data/schoef/results2014/tauTuples/CSA14_TTJets_lepGenTau.root')
 
-oneLepTau     ="ngoodMuons==1&&nvetoMuons==1&&nvetoElectrons==0&&Sum$(gTauPt>15&&abs(gTauEta)<2.5&&gTauNENu+gTauNMuNu==1&&gTauNTauNu==1)==1"
-oneLepTauOpen ="ngoodMuons==1&&nvetoMuons==1&&nvetoElectrons==0&&Sum$(gTauNENu+gTauNMuNu==1&&gTauNTauNu==1)==1"
+#oneLepTau     ="ngoodMuons==1&&nvetoMuons==1&&nvetoElectrons==0&&Sum$(gTauPt>15&&abs(gTauEta)<2.5&&gTauNENu+gTauNMuNu==1&&gTauNTauNu==1)==1"
+#oneLepTauOpen ="ngoodMuons==1&&nvetoMuons==1&&nvetoElectrons==0&&Sum$(gTauNENu+gTauNMuNu==1&&gTauNTauNu==1)==1"
+oneLepTau     ="ngNuMuFromW==1&&ngNuEFromW==0&&ngNuTauFromW==1&&ngoodMuons==1&&nvetoMuons==1&&nvetoElectrons==0&&Sum$(gTauPt>15&&abs(gTauEta)<2.1&&gTauNENu==0&&gTauNMuNu==1&&gTauNTauNu==1)==1"
+oneLepTauOpen ="ngNuMuFromW==1&&ngNuEFromW==0&&ngNuTauFromW==1&&ngoodMuons==1&&nvetoMuons==1&&nvetoElectrons==0&&Sum$(gTauNENu==0&&gTauNMuNu==1&&gTauNTauNu==1)==1"
 
 #scaleF = (1-0.1741-0.1783)*0.1125/(0.1057+0.1075)
-scaleF = (0.1741+0.1783)*0.1125/(0.1057)
+#scaleF = (0.1741+0.1783)*0.1125/(0.1057)
+scaleF = (0.1741)*0.1125/(0.1057)
 
 hMT = ROOT.TH1F('hMT', 'hMT',20,0,800)
 c.Draw('sqrt(2.*met*leptonPt*(1-cos(leptonPhi-metphi)))>>hMT','weight*('+oneLepTau+'&&ht>'+str(htCut)+'&&njets>='+str(minNJets)+'&&met>'+str(metCut)+')','goff')
@@ -72,4 +75,4 @@ hNJetPred.Scale(scaleF)
 hNJetPred.Draw()
 hNJet.Draw('same')
 c1.SetLogy()
-c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngCSA14/compNJet.png')
+c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngCSA14/compNJet_lepTau.png')

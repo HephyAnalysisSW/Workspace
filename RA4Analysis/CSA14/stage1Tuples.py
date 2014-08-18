@@ -1,13 +1,24 @@
 import copy, os, sys
 
-ttJetsCSA14={}
-ttJetsCSA14["name"]     = "ttJetsCSA14";
-ttJetsCSA14["dirname"] = "/data/schoef/stage1CSA14"
-ttJetsCSA14["Chain"] = "Events"
-#ttJetsCSA14['reweightingHistoFile'] = S10rwHisto 
-#ttJetsCSA14['reweightingHistoFileSysPlus'] = S10rwPlusHisto
-#ttJetsCSA14['reweightingHistoFileSysMinus'] = S10rwMinusHisto
-ttJetsCSA14["bins"] = ["TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola_Spring14miniaod-PU20bx25_POSTLS170_V5-v1__2"]
+ttJetsCSA1425ns={}
+ttJetsCSA1425ns["name"]     = "ttJetsCSA1425ns";
+ttJetsCSA1425ns["Chain"] = "Events"
+#ttJetsCSA1425ns['reweightingHistoFile'] = S10rwHisto 
+#ttJetsCSA1425ns['reweightingHistoFileSysPlus'] = S10rwPlusHisto
+#ttJetsCSA1425ns['reweightingHistoFileSysMinus'] = S10rwMinusHisto
+ttJetsCSA1425ns["bins"] = [{'dir':"/data/schoef/stage1CSA14/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola_Spring14miniaod-PU20bx25_POSTLS170_V5-v1__2", 
+                        'dbsName':'/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/Spring14miniaod-PU20bx25_POSTLS170_V5-v1/MINIAODSIM'}]
+
+ttJetsCSA1450ns={}
+ttJetsCSA1450ns["name"]     = "ttJetsCSA1450ns";
+ttJetsCSA1450ns["Chain"] = "Events"
+#ttJetsCSA1450ns['reweightingHistoFile'] = S10rwHisto 
+#ttJetsCSA1450ns['reweightingHistoFileSysPlus'] = S10rwPlusHisto
+#ttJetsCSA1450ns['reweightingHistoFileSysMinus'] = S10rwMinusHisto
+#ttJetsCSA1450ns["bins"] = [{'dir':"/dpm/oeaw.ac.at/home/cms/store/user/easilar/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/crab_MiniAODTupleTT1/140814_133324/0000", 
+#                        'dbsName':'/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/Spring14miniaod-PU_S14_POSTLS170_V6-v1/MINIAODSIM'}]
+ttJetsCSA1450ns["bins"] = [{'dir':"/dpm/oeaw.ac.at/home/cms/store/user/schoef/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/crab_TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola_Spring14miniaod-PU_S14_POSTLS170_V6-v1_MINIAODSIM/140817_063637/0000", 
+                        'dbsName':'/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/Spring14miniaod-PU_S14_POSTLS170_V6-v1/MINIAODSIM'}]
 
 
 #testSample={}
@@ -20,17 +31,8 @@ testSample={}
 testSample["name"]     = "tmp";
 testSample["dirname"] = "/afs/hephy.at/scratch/s/schoefbeck/CMS/CMSSW_7_0_6_patch1/src/Workspace/"
 testSample["Chain"] = "Events"
-testSample["bins"] = ["tmp"]
+testSample["bins"] = [{'dir':'/afs/hephy.at/scratch/s/schoefbeck/CMS/CMSSW_7_0_6_patch1/src/Workspace/tmp','dbsName':None}]
 
-ttbarTest = {}
-ttbarTest["name"]     = "ttbarTest";
-##ttbarTest["dirname"] = "/data/schoef/miniAOD"
-##ttbarTest["dirname"] = "/data/schoef/miniAODTuples_v1/copy/"
-
-ttbarTest["dirname"] = "/data/schoef/stage1CSA14"
-ttbarTest["Chain"] = "Events"
-##ttbarTest["bins"]    = [ 'ttbarTest']
-ttbarTest["bins"] = ["TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola_Spring14miniaod-PU20bx25_POSTLS170_V5-v1"]
 
 
 #from Workspace.HEPHYPythonTools.createPUReweightingHisto import getPUReweightingUncertainty

@@ -83,6 +83,18 @@ def tightPOGMuID(mu):
 def vetoMuID(mu):
   return (mu['IsTracker'] or mu['IsGlobal']) and mu['IsPF'] and mu['pt']>15 and abs(mu['eta'])<2.5 and mu['relIso']<0.2  and abs(mu['Dxy'])<0.2 and abs(mu['Dz'])<0.5
 
+
+def hybridIso(m, wp):
+  if wp=='loose':
+    return  (m['pt']<25 and m['relIso']*m['pt']<10) or (m['pt']>=25 and m['relIso']<0.4)
+  if wp=='medium':
+    return  (m['pt']<25 and m['relIso']*m['pt']<5) or (m['pt']>=25 and m['relIso']<0.2)
+  if wp=='tight':
+    return  (m['pt']<25 and m['relIso']*m['pt']<3) or (m['pt']>=25 and m['relIso']<0.12)
+
+def hybridMuID(mu, wp):
+  return (mu['IsTracker'] or mu['IsGlobal']) and mu['IsPF'] and mu['pt']>10 and abs(mu['eta'])<2.5 and hybridIso(mu, wp)  and abs(mu['Dxy'])<0.2 and abs(mu['Dz'])<0.5
+
 def getAllMuonsStage1(c, nmuons ):
   res=[]
   for i in range(0, int(nmuons)):

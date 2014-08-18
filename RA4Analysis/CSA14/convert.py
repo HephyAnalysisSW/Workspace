@@ -2,18 +2,15 @@ import ROOT
 from DataFormats.FWLite import Events, Handle
 from PhysicsTools.PythonAnalysis import *
 from math import *
-import sys, os, copy, random
+import sys, os, copy, random, subprocess
 from datetime import datetime
 #from helpers import getVarValue, deltaPhi, minAbsDeltaPhi,  deltaR, invMass,
 from Workspace.HEPHYPythonTools.helpers import getVarValue, deltaPhi, minAbsDeltaPhi, invMassOfLightObjects, deltaR, closestMuJetDeltaR, invMass,  findClosestObjectDR
-from objectSelection import getLooseEleStage1,getAllElectronsStage1, tightPOGEleID, vetoEleID, getLooseMuStage1, getAllMuonsStage1, tightPOGMuID, vetoMuID, getAllTausStage1, getTauStage1
+from objectSelection import getLooseEleStage1,getAllElectronsStage1, tightPOGEleID, vetoEleID, getLooseMuStage1, getAllMuonsStage1, tightPOGMuID, vetoMuID, getAllTausStage1, getTauStage1, hybridMuID
 
 from stage1Tuples import *
 
 from Workspace.HEPHYPythonTools.xsec import xsec
-xsec['testBin']=100.
-xsec['ttbarCSA14']=100.
-xsec['tmp']=100.
 
 subDir = "convertedTuples_v23"
 
@@ -31,14 +28,13 @@ parser = OptionParser()
 parser.add_option("--chmode", dest="chmode", default="copyInc", type="string", action="store", help="chmode: What to do.")
 #parser.add_option("--jermode", dest="jermode", default="none", type="string", action="store", help="jermode: up/down/central/none")
 #parser.add_option("--jesmode", dest="jesmode", default="none", type="string", action="store", help="jesmode: up/down/none")
-parser.add_option("--samples", dest="allsamples", default="testSample", type="string", action="store", help="samples:Which samples.")
+parser.add_option("--samples", dest="allsamples", default="ttJetsCSA1450ns", type="string", action="store", help="samples:Which samples.")
 parser.add_option("--small", dest="small", action="store_true", help="Just do a small subset.")
 parser.add_option("--fromPercentage", dest="fromPercentage", default="0", type="int", action="store", help="from (% of tot. events)")
 parser.add_option("--toPercentage", dest="toPercentage", default="100", type="int", action="store", help="to (% of tot. events)")
 parser.add_option("--keepPDFWeights", dest="keepPDFWeights", action="store_true", help="keep PDF Weights?")
  
 (options, args) = parser.parse_args()
-#options.small=True
 print "options: chmode",options.chmode, 'samples',options.allsamples
 exec('allSamples=['+options.allsamples+']')
 
@@ -50,6 +46,14 @@ exec('allSamples=['+options.allsamples+']')
 #            tlvaux.SetPtEtaPhiM(e.gpPt[igp],e.gpEta[igp],e.gpPhi[igp],e.gpM[igp])
 #            sumtlv += tlvaux
 #    return sumtlv.Pt()
+
+def isIsolated(obj, objs, dR=0.3):
+  isolated=True
+  for o in objs:   #Jet cross-cleaning
+    if deltaR(o, obj) < 0.3: 
+      isolated = False
+      break
+  return isolated
   
 def getGoodJets(c, crosscleanobjects):#, jermode=options.jermode, jesmode=options.jesmode):
   njets = getVarValue(c, 'nJets')   # jet.pt() > 10.
@@ -98,14 +102,14 @@ def getGoodJets(c, crosscleanobjects):#, jermode=options.jermode, jesmode=option
 #      'jetCutBasedPUJetIDFlag':getVarValue(c, 'jetsCutBasedPUJetIDFlag', i),'jetMET53XPUJetIDFlag':getVarValue(c, 'jetsMET53XPUJetIDFlag', i),'jetFull53XPUJetIDFlag':getVarValue(c, 'jetsFull53XPUJetIDFlag', i), 
       'btag': getVarValue(c, 'jetsBtag', i), 'unc': unc 
       }
-      isolated = True
-      for obj in crosscleanobjects:   #Jet cross-cleaning
-        if deltaR(jet, obj) < 0.3:# and  obj['relIso']< relIsoCleaningRequ: #(obj['pt']/jet['pt']) > 0.4:  
-          isolated = False
-#          print "Cleaned", 'deltaR', deltaR(jet, obj), 'maxfrac', max([jet['muef'],jet['elef']]), 'pt:jet/obj', jet['pt'], obj['pt'], "relIso",  obj['relIso'], 'btag',getVarValue(c, 'jetsBtag', i), "parton", parton
-  #          print 'Not this one!', jet, obj, deltaR(jet, obj)
-          break
-      jet['isolated'] = isolated
+#      isolated = True
+#      for obj in crosscleanobjects:   #Jet cross-cleaning
+#        if deltaR(jet, obj) < 0.3:# and  obj['relIso']< relIsoCleaningRequ: #(obj['pt']/jet['pt']) > 0.4:  
+#          isolated = False
+##          print "Cleaned", 'deltaR', deltaR(jet, obj), 'maxfrac', max([jet['muef'],jet['elef']]), 'pt:jet/obj', jet['pt'], obj['pt'], "relIso",  obj['relIso'], 'btag',getVarValue(c, 'jetsBtag', i), "parton", parton
+#  #          print 'Not this one!', jet, obj, deltaR(jet, obj)
+#          break
+      jet['isolated'] = isIsolated(jet, crosscleanobjects)
       res.append(jet)
   res  = sorted(res,  key=lambda k: -k['pt'])
   return {'jets':res,'met_dx':met_dx, 'met_dy':met_dy}
@@ -122,68 +126,50 @@ def find(x,lp):
 for sample in allSamples:
   sample['filenames'] = {}
   sample['weight'] = {}
-  for bin_ in sample['bins']:
-    if type(bin_) == type([]):
-      bin = bin_[0]
-      subdirs = bin_[1]
+  for bin in sample['bins']:
+    print "Looping over subdir",bin['dir']
+    prefix = ""
+    if bin['dir'][0:5] != "/dpm/":
+      filelist = os.listdir(bin['dir'])
     else:
-      subdirs = [bin_]
-      bin=bin_
-    sample['filenames'][bin] = []
-    for dir in subdirs:
-      subdirname = sample['dirname']+'/'+dir+'/'
-      print "Looping over subdir",subdirname
-      prefix = ""
-      if subdirname[0:5] != "/dpm/":
-        filelist = os.listdir(subdirname)
-      else:
-        filelist = []
-        p = subprocess.Popen(["dpns-ls "+ subdirname], shell = True , stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        for line in p.stdout.readlines():
-          filelist.append(line[:-1])
-#        allFiles = os.popen("rfdir %s | awk '{print $9}'" % (subdirname))
-#        for file in allFiles.readlines():
-#          print file
-#          file = file.rstrip()
-#          filelist.append(file)
-        prefix = "root://hephyse.oeaw.ac.at/"#+subdirname
-      if options.small: filelist = filelist[:1]
-      for tfile in filelist:
-#        print "Adding",subdirname+tfile
-        sample['filenames'][bin].append(subdirname+tfile)
-#    if options.allsamples.lower()=='sms':
-#      c_ = ROOT.TChain(sample['Chain'])
-#      for tfile in sample['filenames'][bin]:
-#        print "Adding",prefix+tfile
-#        c_.Add(prefix+tfile)
-#      nevents = c_.GetEntries(sample['additionalCut'])
-#      print nevents,'found with requirement', sample['additionalCut']
-#      del c_
-#    else:
-#    d = ROOT.TChain('Runs')
-#    for tfile in sample['filenames'][bin]:
-#      d.Add(prefix+tfile)
-#    nevents = 0
-#    nruns = d.GetEntries()
-#    for i in range(0, nruns):
-#      d.GetEntry(i)
-#      nevents += getVarValue(d,'uint_EventCounter_runCounts_PAT.obj')
-#    del d
+      filelist = []
+      p = subprocess.Popen(["dpns-ls -l "+ bin['dir']], shell = True , stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+      for line in p.stdout.readlines():
+        if not line.count('histo'):continue
+        line=line[:-1]
+        fname = line.split()[-1]
+        size = line.split()[4]
+        if int(size)!=0:
+          filelist.append(fname)
+        else:
+          print "Omitting file", fname, 'with size', size
+      prefix = "root://hephyse.oeaw.ac.at/"#+subdirname
+    if options.small: filelist = filelist[:1]
+    bin['filenames'] = []
+    for tfile in filelist:
+      bin['filenames'].append(bin['dir']+'/'+tfile)
+
     c = ROOT.TChain('Events')
-    for tfile in sample['filenames'][bin]:
+    for tfile in bin['filenames']:
       c.Add(prefix+tfile)
     nevents= c.GetEntries()
     del c
-    if not bin.lower().count('run'):
+    if bin['dbsName'] and  bin['dbsName'].lower().count('run'):
+      weight = 1.
+      print 'Sample', sample['name'], 'bin', bin, 'n-events',nevents,'weight',weight, '(is data!)'
+    else:
       if nevents>0:
-        weight = xsec[bin]*target_lumi/nevents
+        if bin['dbsName']:
+          weight = xsec[bin['dbsName']]*target_lumi/nevents
+          bin['xsec']=xsec[bin['dbsName']]
+        else:
+          print "Warning! Sample ",sample['name'], 'bin',bin, 'has no dbsName! -> Use weight 1.'
+          weight=1
+          bin['xsec']=None
       else:
         weight=0
-      print 'Sample', sample['name'], 'bin', bin,'xsec',xsec[bin], 'n-events',nevents,'weight',weight
-    else:
-      weight = 1.
-      print 'Sample', sample['name'], 'bin', bin, 'n-events',nevents,'weight',weight
-    sample["weight"][bin]=weight
+      print 'Sample', sample['name'], 'bin', bin['dbsName'],'xsec',bin['xsec'], 'n-events',nevents,'weight',weight
+    bin['weight']=weight
 
 if not os.path.isdir(outputDir):
   os.system('mkdir -p '+outputDir)
@@ -205,13 +191,14 @@ for isample, sample in enumerate(allSamples):
   variables = ["weight", "run", "lumi", "ngoodVertices"]
   if not sample['name'].lower().count('data'):
     variables.extend(["nTrueGenVertices"])#, "puWeight", "puWeightSysPlus", "puWeightSysMinus"])
-  extraVariables = ["ngoodMuons","nvetoMuons",'nvetoLeptons',"ngoodElectrons","nvetoElectrons","ngoodTaus","met","metphi","ht"] 
+  extraVariables = ["ngoodMuons","nvetoMuons",'nHybridLooseMuons','nHybridMediumMuons', 'nHybridTightMuons','nvetoLeptons',"ngoodElectrons","nvetoElectrons","ngoodTaus","met","metphi","ht"] 
   extraVariables += ["leptonPt", 'leptonEta', 'leptonPhi', 'leptonPdg', 'singleMuonic', 'singleElectronic', 'singleLeptonic']
   extraVariables += ['pfMet', 'pfMetphi','genMet', 'genMetphi']
   jetvars = ["jetPt", "jetEta", "jetPhi", "jetPdg", "jetBtag", "jetChef", "jetNhef", "jetCeef", "jetNeef", "jetHFhef", "jetHFeef", "jetMuef", "jetElef", "jetPhef", "jetUnc"]#, "jetCutBasedPUJetIDFlag","jetFull53XPUJetIDFlag","jetMET53XPUJetIDFlag"
   muvars = ["muPt", "muEta", "muPhi", "muPdg", "muRelIso", "muDxy", "muDz", "muNormChi2", "muNValMuonHits", "muNumMatchedStations", "muPixelHits", "muNumtrackerLayerWithMeasurement", 'muIsGlobal', 'muIsTracker','muIsPF']
   elvars = ["elePt", "eleEta", "elePhi", "elePdg", "eleRelIso", "eleDxy", "eleDz", "eleOneOverEMinusOneOverP", "elePfRelIso", "eleSigmaIEtaIEta", "eleHoE", "eleDPhi", "eleDEta", "eleMissingHits", "elePassPATConversionVeto"]
   tavars = ["tauPt", "tauEta", "tauPhi", "tauPdg", 'tauJetInd', 'tauJetDR']
+  trackVars = ["trackPdg", "trackPt", "trackEta", "trackPhi", "trackRelIso","trackPassVetoMuSel","trackPassVetoEleSel","trackPassHybridLooseMuons","trackPassHybridMediumMuons","trackPassHybridTightMuons"]
   if not sample['name'].lower().count('data'):
     extraVariables+=["ngNuEFromW","ngNuMuFromW","ngNuTauFromW"]
     genTauvars = ["gTauPdg", "gTauPt", "gTauEta", "gTauPhi", "gTauMetPar", "gTauMetPerp", "gTauNENu", "gTauNMuNu", 'gTauNTauNu', 'gTauJetInd', 'gTauJetDR', 'gTauTauDR', 'gTauTauInd']
@@ -241,7 +228,7 @@ for isample, sample in enumerate(allSamples):
   structString = "struct MyStruct_"+str(nc)+"_"+str(isample)+"{ULong64_t event;"
   structString+="Float_t "+",".join(variables+extraVariables)+";"
   structString +="Int_t nmu, nele, ntau, njets, nbtags,  njetsFailID;"
-  structString +="Int_t njetCount, nmuCount, neleCount, ntauCount;"
+  structString +="Int_t njetCount, nmuCount, neleCount, ntauCount, ntrackCount;"
   for var in jetvars:
     structString +="Float_t "+var+"[30];"
   for var in muvars:
@@ -249,6 +236,8 @@ for isample, sample in enumerate(allSamples):
   for var in elvars:
     structString +="Float_t "+var+"[10];"
   for var in tavars:
+    structString +="Float_t "+var+"[10];"
+  for var in trackVars:
     structString +="Float_t "+var+"[10];"
   if not sample['name'].lower().count('data'):
     structString +="Int_t ngTaus, ngLep;"
@@ -296,6 +285,7 @@ for isample, sample in enumerate(allSamples):
   t.Branch("neleCount",   ROOT.AddressOf(s,"neleCount"), 'neleCount/I')
   t.Branch("nmuCount",   ROOT.AddressOf(s,"nmuCount"), 'nmuCount/I')
   t.Branch("ntauCount",   ROOT.AddressOf(s,"ntauCount"), 'ntauCount/I')
+  t.Branch("ntrackCount",   ROOT.AddressOf(s,"ntrackCount"), 'ntrackCount/I')
   for var in jetvars:
     t.Branch(var,   ROOT.AddressOf(s,var), var+'[njetCount]/F')
   for var in muvars:
@@ -304,6 +294,8 @@ for isample, sample in enumerate(allSamples):
     t.Branch(var,   ROOT.AddressOf(s,var), var+'[neleCount]/F')
   for var in tavars:
     t.Branch(var,   ROOT.AddressOf(s,var), var+'[ntauCount]/F')
+  for var in trackVars:
+    t.Branch(var,   ROOT.AddressOf(s,var), var+'[ntrackCount]/F')
   if not sample['name'].lower().count('data'):
     t.Branch("ngTaus",   ROOT.AddressOf(s,"ngTaus"), 'ngTaus/I')
     t.Branch("ngLep",   ROOT.AddressOf(s,"ngLep"), 'ngLep/I')
@@ -317,21 +309,16 @@ for isample, sample in enumerate(allSamples):
 #    t.Branch('nnpdfWeights',   ROOT.AddressOf(s,'nnpdfWeights'), 'nnpdfWeights[101]/F')
   chain_gDir.cd()
 
-  for bin_ in sample["bins"]:
+  for bin in sample["bins"]:
     commoncf = ""
     if options.chmode=="copyMET":
       commoncf = "slimmedMETs>=100"
     if options.chmode[:7] == "copyInc":
       commoncf = "(1)"
-    if type(bin_) == type([]):
-      bin = bin_[0]
-    else:
-      bin=bin_
     c = ROOT.TChain(sample["Chain"])
-    for thisfile in sample["filenames"][bin]:
+    for thisfile in bin["filenames"]:
       prefix = ""
       if thisfile[0:5] == "/dpm/":
-#        prefix = "rfio:"
         prefix = "root://hephyse.oeaw.ac.at/"#+subdirname
       c.Add(prefix+thisfile)
     ntot = c.GetEntries()
@@ -347,9 +334,11 @@ for isample, sample in enumerate(allSamples):
 
     gpLabel = ("prunedGenParticles")
     gpHandle = Handle("vector<reco::GenParticle>")
+    pfLabel = ("packedPFCandidates")
+    pfHandle = Handle("vector<pat::PackedCandidate>")
 
     mclist = []
-    for thisfile in sample["filenames"][bin]:
+    for thisfile in bin["filenames"]:
       mclist.append(prefix+thisfile)
     events = Events(mclist)
     events.toBegin()
@@ -369,16 +358,16 @@ for isample, sample in enumerate(allSamples):
           number_events=1001
       start = int(options.fromPercentage/100.*number_events)
       stop  = int(options.toPercentage/100.*number_events)
-      print "Reading: ", sample["name"], bin, "with",number_events,"Events using cut", commoncf
+      print "Reading: ", sample["name"], bin['dbsName'], "with",number_events,"Events using cut", commoncf
       print "Reading percentage ",options.fromPercentage, "to",options.toPercentage, "which is range",start,"to",stop,"of",number_events
       for i in range(start, stop):
-        if (i%10000 == 0) and i>0 :
+        if (i%1000 == 0) and i>0 :
           print i
   #      # Update all the Tuples
         if elist.GetN()>0 and ntot>0:
           c.GetEntry(elist.GetEntry(i))
           events.to(elist.GetEntry(i))
-          s.weight = sample["weight"][bin]
+          s.weight = bin['weight']
           for var in variables[1:]:
             getVar = var
             exec("s."+var+"="+str(getVarValue(c, getVar)).replace("nan","float('nan')"))
@@ -426,6 +415,9 @@ for isample, sample in enumerate(allSamples):
           taus = allGoodTaus 
           vetoElectrons = filter(lambda e:vetoEleID(e), allGoodElectrons)
           vetoMuons = filter(lambda mu:vetoMuID(mu), allGoodMuons)
+          hybridLooseMuons = filter(lambda mu:hybridMuID(mu, 'loose'), allGoodMuons)
+          hybridMediumMuons = filter(lambda mu:hybridMuID(mu, 'medium'), allGoodMuons)
+          hybridTightMuons = filter(lambda mu:hybridMuID(mu, 'tight'), allGoodMuons)
           
           leptons = sorted(electrons+muons, key=lambda k: -k['pt'])
           s.singleLeptonic = len(leptons)==1
@@ -439,6 +431,9 @@ for isample, sample in enumerate(allSamples):
  
           s.ngoodMuons = len(muons)
           s.nvetoMuons = len(vetoMuons)
+          s.nHybridLooseMuons = len(hybridLooseMuons)
+          s.nHybridMediumMuons = len(hybridMediumMuons)
+          s.nHybridTightMuons = len(hybridTightMuons)
           s.ngoodElectrons = len(electrons)
           s.nvetoElectrons=len(vetoElectrons)
           s.nvetoLeptons=s.nvetoElectrons+s.nvetoMuons
@@ -556,8 +551,36 @@ for isample, sample in enumerate(allSamples):
 #                if not justARadiation:
                 genTaus.append(tau)
 #              print genTaus
-            if s.ngNuMuFromW==2:
-              if len(genTaus)>0:print genTaus
+          events.getByLabel(pfLabel,pfHandle)
+          pfcH =pfHandle.product()
+          pfc = list(pfcH)
+          isoCands = [{'c':cand,'iso':0.} for cand in filter(lambda c:c.pt()>10 and c.fromPV()==c.PVTight and abs(c.pdgId()) in [11, 13, 211], pfc)]
+          for p in pfc:
+            phi=p.phi()
+            eta=p.eta()
+            for ic in isoCands:
+              dR= deltaR({'phi':phi,'eta':eta},{'phi':ic['c'].phi(),'eta':ic['c'].eta()})
+              if dR>0.02 and dR<0.3:
+                ic['iso']+=p.pt()
+          for ic in isoCands:
+            ic['relIso']=ic['iso']/ic['c'].pt()
+#          isoCands = filter(lambda c:c.pt()>10 and abs(c.dz())<0.1 and c.fromPV()==c.PVTight and abs(c.dxy())<0.02 and abs(c.pdgId()) in [11, 13, 211], pfc)
+          isoCands=filter(lambda ic:ic['relIso']<0.2, isoCands)
+#          for ic in isoCands:
+#            print ic['c'].pdgId(), ic['c'].pt(), ic['relIso']
+#          print "len",len(pfc), len(isoCands)
+          s.ntrackCount=min(10,len(isoCands))
+          for i in xrange(s.ntrackCount):
+            s.trackPdg[i] = isoCands[i]['c'].pdgId()
+            s.trackPt[i] = isoCands[i]['c'].pt()
+            s.trackEta[i] = isoCands[i]['c'].eta()
+            s.trackPhi[i] = isoCands[i]['c'].phi()
+            s.trackRelIso[i] = isoCands[i]['relIso']
+            s.trackPassVetoMuSel[i]=isIsolated({'phi':s.trackPhi[i],'eta':s.trackEta[i]}, vetoMuons, dR=0.1)
+            s.trackPassVetoEleSel[i]=isIsolated({'phi':s.trackPhi[i],'eta':s.trackEta[i]}, vetoElectrons, dR=0.1)
+            s.trackPassHybridLooseMuons[i]=isIsolated({'phi':s.trackPhi[i],'eta':s.trackEta[i]}, hybridLooseMuons, dR=0.1)
+            s.trackPassHybridMediumMuons[i]=isIsolated({'phi':s.trackPhi[i],'eta':s.trackEta[i]}, hybridMediumMuons, dR=0.1)
+            s.trackPassHybridTightMuons[i]=isIsolated({'phi':s.trackPhi[i],'eta':s.trackEta[i]}, hybridTightMuons, dR=0.1)
 ####################
 
           s.njetCount = min(30,s.njets)
