@@ -138,7 +138,7 @@ def splitListOfObjects(var, val, s):
 def isIsolated(obj, objs, dR=0.3):
   isolated=True
   for o in objs:   #Jet cross-cleaning
-    if deltaR(o, obj) < 0.3:
+    if deltaR(o, obj) < dR:
       isolated = False
       break
   return isolated
@@ -188,7 +188,7 @@ def getGoodJetsStage1(c, crosscleanobjects):#, jermode=options.jermode, jesmode=
 ##          print "Cleaned", 'deltaR', deltaR(jet, obj), 'maxfrac', max([jet['muef'],jet['elef']]), 'pt:jet/obj', jet['pt'], obj['pt'], "relIso",  obj['relIso'], 'btag',getVarValue(c, 'jetsBtag', i), "parton", parton
 #  #          print 'Not this one!', jet, obj, deltaR(jet, obj)
 #          break
-      jet['isolated'] = isIsolated(jet, crosscleanobjects)
+      jet['isolated'] = isIsolated(jet, crosscleanobjects, dR=0.4)
       res.append(jet)
   res  = sorted(res,  key=lambda k: -k['pt'])
   return {'jets':res,'met_dx':met_dx, 'met_dy':met_dy}
