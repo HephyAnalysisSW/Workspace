@@ -13,7 +13,7 @@ config.General.saveLogs = False #1MB still available
 
 config.section_("JobType")
 config.JobType.pluginName = 'Analysis'
-config.JobType.psetName   = '../defaultMINIAODTupelizer_cfg.py'
+config.JobType.psetName   = '../../defaultMINIAODTupelizer_cfg.py'
 config.JobType.pyCfgParams   = [ 'keep=*_genMetTrue_*_*,*_pfMet_*_*,*_packedPFCandidates_*_*,*_prunedGenParticles_*_*,*_packedGenParticles_*_*', 'GT=POSTLS170_V5::All']
 
 config.section_("Data")

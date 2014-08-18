@@ -6,7 +6,7 @@ import sys, os, copy, random, subprocess
 from datetime import datetime
 #from helpers import getVarValue, deltaPhi, minAbsDeltaPhi,  deltaR, invMass,
 from Workspace.HEPHYPythonTools.helpers import getVarValue, deltaPhi, minAbsDeltaPhi, invMassOfLightObjects, deltaR, closestMuJetDeltaR, invMass,  findClosestObjectDR
-from objectSelection import getLooseEleStage1,getAllElectronsStage1, tightPOGEleID, vetoEleID, getLooseMuStage1, getAllMuonsStage1, tightPOGMuID, vetoMuID, getAllTausStage1, getTauStage1, hybridMuID, getGoodJetsStage1, isIsolated 
+from objectSelection import getLooseEleStage1,getAllElectronsStage1, tightPOGEleID, vetoEleID, getLooseMuStage1, getAllMuonsStage1, tightPOGMuID, vetoMuID, getAllTausStage1, getTauStage1, hybridMuID, getGoodJetsStage1, isIsolated
 
 from stage1Tuples import *
 
@@ -35,7 +35,6 @@ parser.add_option("--toPercentage", dest="toPercentage", default="100", type="in
 parser.add_option("--keepPDFWeights", dest="keepPDFWeights", action="store_true", help="keep PDF Weights?")
  
 (options, args) = parser.parse_args()
-options.small=True
 print "options: chmode",options.chmode, 'samples',options.allsamples
 exec('allSamples=['+options.allsamples+']')
 
@@ -96,6 +95,7 @@ for sample in allSamples:
       print 'Sample', sample['name'], 'bin', bin['dbsName'],'xsec',bin['xsec'], 'n-events',nevents,'weight',weight
     bin['weight']=weight
 
+
 if not os.path.isdir(outputDir):
   os.system('mkdir -p '+outputDir)
 outSubDir = options.chmode
@@ -120,7 +120,7 @@ for isample, sample in enumerate(allSamples):
   extraVariables += ["leptonPt", 'leptonEta', 'leptonPhi', 'leptonPdg', 'singleMuonic', 'singleElectronic', 'singleLeptonic']
   extraVariables += ['pfMet', 'pfMetphi','genMet', 'genMetphi']
   jetvars = ["jetPt", "jetEta", "jetPhi", "jetPdg", "jetBTag", "jetChef", "jetNhef", "jetCeef", "jetNeef", "jetHFhef", "jetHFeef", "jetMuef", "jetElef", "jetPhef", "jetUnc"]#, "jetCutBasedPUJetIDFlag","jetFull53XPUJetIDFlag","jetMET53XPUJetIDFlag"
-  muvars = ["muPt", "muEta", "muPhi", "muPdg", "muRelIso", "muDxy", "muDz", "muNormChi2", "muNValMuonHits", "muNumMatchedStations", "muPixelHits", "muNumtrackerLayerWithMeasurement", 'muIsGlobal', 'muIsTracker','muIsPF']
+  muvars = ["muPt", "muEta", "muPhi", "muPdg", "muRelIso", "muDxy", "muDz", "muNormChi2", "muNValMuonHits", "muNumMatchedStations", "muPixelHits", "muNumtrackerLayerWithMeasurement", 'muIsGlobal', 'muIsTracker','muIsPF', "muIso03sumChargedHadronPt", "muIso03sumNeutralHadronEt", "muIso03sumPhotonEt", "muIso03sumPUChargedHadronPt"] 
   elvars = ["elePt", "eleEta", "elePhi", "elePdg", "eleRelIso", "eleDxy", "eleDz", "eleOneOverEMinusOneOverP", "elePfRelIso", "eleSigmaIEtaIEta", "eleHoE", "eleDPhi", "eleDEta", "eleMissingHits", "elePassPATConversionVeto"]
   tavars = ["tauPt", "tauEta", "tauPhi", "tauPdg", 'tauJetInd', 'tauJetDR']
   trackVars = ["trackPdg", "trackPt", "trackEta", "trackPhi", "trackRelIso","trackPassVetoMuSel","trackPassVetoEleSel","trackPassHybridLooseMuons","trackPassHybridMediumMuons","trackPassHybridTightMuons"]
@@ -546,6 +546,10 @@ for isample, sample in enumerate(allSamples):
             s.muIsGlobal[i] = allGoodMuons[i]['IsGlobal']
             s.muIsTracker[i] = allGoodMuons[i]['IsTracker']
             s.muIsPF[i] = allGoodMuons[i]['IsPF']
+            s.muIso03sumChargedHadronPt[i] = allGoodMuons[i]['Iso03sumChargedHadronPt']
+            s.muIso03sumNeutralHadronEt[i] = allGoodMuons[i]['Iso03sumNeutralHadronEt']
+            s.muIso03sumPhotonEt[i] = allGoodMuons[i]['Iso03sumPhotonEt']
+            s.muIso03sumPUChargedHadronPt[i] = allGoodMuons[i]['Iso03sumPUChargedHadronPt']
 #            s.muMT[i]    = sqrt(2.0*s.muPt[i]*s.met*(1-cos(s.muPhi[i] - s.metphi)))
 #            if len(idJets30)>0:
 #              cjet = findClosestObjectDR(idJets30, {'phi':s.muPhi[i], 'eta':s.muEta[i]})
