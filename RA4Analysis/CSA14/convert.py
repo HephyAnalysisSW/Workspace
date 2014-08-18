@@ -364,7 +364,7 @@ for isample, sample in enumerate(allSamples):
           s.nvetoLeptons=s.nvetoElectrons+s.nvetoMuons
           s.ngoodTaus = len(taus)
           
-          jResult = getGoodJetsStage1(c,muons+electrons)#, jermode=options.jermode, jesmode=options.jesmode)
+          jResult = getGoodJetsStage1(c,vetoMuons+vetoElectrons)#, jermode=options.jermode, jesmode=options.jesmode)
           jetResult = jResult['jets']
           s.met = getVarValue(c, 'slimmedMETs')
           s.metphi = getVarValue(c, 'slimmedMETsPhi')
