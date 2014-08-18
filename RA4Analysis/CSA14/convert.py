@@ -6,7 +6,7 @@ import sys, os, copy, random, subprocess
 from datetime import datetime
 #from helpers import getVarValue, deltaPhi, minAbsDeltaPhi,  deltaR, invMass,
 from Workspace.HEPHYPythonTools.helpers import getVarValue, deltaPhi, minAbsDeltaPhi, invMassOfLightObjects, deltaR, closestMuJetDeltaR, invMass,  findClosestObjectDR
-from objectSelection import getLooseEleStage1,getAllElectronsStage1, tightPOGEleID, vetoEleID, getLooseMuStage1, getAllMuonsStage1, tightPOGMuID, vetoMuID, getAllTausStage1, getTauStage1, hybridMuID
+from objectSelection import getLooseEleStage1,getAllElectronsStage1, tightPOGEleID, vetoEleID, getLooseMuStage1, getAllMuonsStage1, tightPOGMuID, vetoMuID, getAllTausStage1, getTauStage1, hybridMuID, getGoodJetsStage1, isIsolated 
 
 from stage1Tuples import *
 
@@ -35,6 +35,7 @@ parser.add_option("--toPercentage", dest="toPercentage", default="100", type="in
 parser.add_option("--keepPDFWeights", dest="keepPDFWeights", action="store_true", help="keep PDF Weights?")
  
 (options, args) = parser.parse_args()
+options.small=True
 print "options: chmode",options.chmode, 'samples',options.allsamples
 exec('allSamples=['+options.allsamples+']')
 
@@ -46,82 +47,6 @@ exec('allSamples=['+options.allsamples+']')
 #            tlvaux.SetPtEtaPhiM(e.gpPt[igp],e.gpEta[igp],e.gpPhi[igp],e.gpM[igp])
 #            sumtlv += tlvaux
 #    return sumtlv.Pt()
-
-def isIsolated(obj, objs, dR=0.3):
-  isolated=True
-  for o in objs:   #Jet cross-cleaning
-    if deltaR(o, obj) < 0.3: 
-      isolated = False
-      break
-  return isolated
-  
-def getGoodJets(c, crosscleanobjects):#, jermode=options.jermode, jesmode=options.jesmode):
-  njets = getVarValue(c, 'nJets')   # jet.pt() > 10.
-  res = []
-  bres = []
-  ht = 0.
-  met_dx = 0.
-  met_dy = 0.
-#  if jesmode.lower()!="none":
-#    if jesmode.lower()=='up':
-#      sign=+1
-#    if jesmode.lower()=='down':
-#      sign=-1
-#    delta_met_x_unclustered = getVarValue(c, 'deltaMETxUnclustered')
-#    delta_met_y_unclustered = getVarValue(c, 'deltaMETyUnclustered')
-#    met_dx+=0.1*delta_met_x_unclustered
-#    met_dy+=0.1*delta_met_y_unclustered
-  for i in range(int(njets)):
-    eta = getVarValue(c, 'jetsEta', i)
-    pt  = getVarValue(c, 'jetsPt', i)
-    unc = getVarValue(c, 'jetsUnc', i)
-    id =  getVarValue(c, 'jetsID', i)
-    phi = getVarValue(c, 'jetsPhi', i)
-##      if max([jet['muef'],jet['elef']]) > 0.6 : print jet
-#    if jermode.lower()!="none":
-#      c_jet = jerDifferenceScaleFactor(eta, jermode)
-#      sigmaMCRel = jerSigmaMCRel(pt, eta)
-#      sigma = sqrt(c_jet**2 - 1)*sigmaMCRel
-#      scale = random.gauss(1,sigma)
-#      met_dx+=(1-scale)*cos(phi)*pt
-#      met_dy+=(1-scale)*sin(phi)*pt
-#      pt*=scale
-#    if jesmode.lower()!="none":
-#      scale = 1. + sign*unc
-#      met_dx+=(1-scale)*cos(phi)*pt
-#      met_dy+=(1-scale)*sin(phi)*pt
-#      pt*=scale
-    if pt>30 and abs(eta)<4.5:
-      parton = int(abs(getVarValue(c, 'jetsParton', i)))
-      jet = {'pt':pt, 'eta':eta,'phi':phi, 'pdg':parton,\
-      'id':id,
-      'chef':getVarValue(c, 'jetsChargedHadronEnergyFraction', i), 'nhef':getVarValue(c, 'jetsNeutralHadronEnergyFraction', i),\
-      'ceef':getVarValue(c, 'jetsChargedEmEnergyFraction', i), 'neef':getVarValue(c, 'jetsNeutralEmEnergyFraction', i), 'id':id,\
-      'hfhef':getVarValue(c, 'jetsHFHadronEnergyFraction', i), 'hfeef':getVarValue(c, 'jetsHFEMEnergyFraction', i),\
-      'muef':getVarValue(c, 'jetsMuonEnergyFraction', i), 'elef':getVarValue(c, 'jetsElectronEnergyFraction', i), 'phef':getVarValue(c, 'jetsPhotonEnergyFraction', i),\
-#      'jetCutBasedPUJetIDFlag':getVarValue(c, 'jetsCutBasedPUJetIDFlag', i),'jetMET53XPUJetIDFlag':getVarValue(c, 'jetsMET53XPUJetIDFlag', i),'jetFull53XPUJetIDFlag':getVarValue(c, 'jetsFull53XPUJetIDFlag', i), 
-      'btag': getVarValue(c, 'jetsBtag', i), 'unc': unc 
-      }
-#      isolated = True
-#      for obj in crosscleanobjects:   #Jet cross-cleaning
-#        if deltaR(jet, obj) < 0.3:# and  obj['relIso']< relIsoCleaningRequ: #(obj['pt']/jet['pt']) > 0.4:  
-#          isolated = False
-##          print "Cleaned", 'deltaR', deltaR(jet, obj), 'maxfrac', max([jet['muef'],jet['elef']]), 'pt:jet/obj', jet['pt'], obj['pt'], "relIso",  obj['relIso'], 'btag',getVarValue(c, 'jetsBtag', i), "parton", parton
-#  #          print 'Not this one!', jet, obj, deltaR(jet, obj)
-#          break
-      jet['isolated'] = isIsolated(jet, crosscleanobjects)
-      res.append(jet)
-  res  = sorted(res,  key=lambda k: -k['pt'])
-  return {'jets':res,'met_dx':met_dx, 'met_dy':met_dy}
-
-
-## helpers for GenParticle searching and matching
-def find(x,lp):
-  if x in lp:
-    return lp.index(x)
-  else:
-    return -1
-
 
 for sample in allSamples:
   sample['filenames'] = {}
@@ -194,7 +119,7 @@ for isample, sample in enumerate(allSamples):
   extraVariables = ["ngoodMuons","nvetoMuons",'nHybridLooseMuons','nHybridMediumMuons', 'nHybridTightMuons','nvetoLeptons',"ngoodElectrons","nvetoElectrons","ngoodTaus","met","metphi","ht"] 
   extraVariables += ["leptonPt", 'leptonEta', 'leptonPhi', 'leptonPdg', 'singleMuonic', 'singleElectronic', 'singleLeptonic']
   extraVariables += ['pfMet', 'pfMetphi','genMet', 'genMetphi']
-  jetvars = ["jetPt", "jetEta", "jetPhi", "jetPdg", "jetBtag", "jetChef", "jetNhef", "jetCeef", "jetNeef", "jetHFhef", "jetHFeef", "jetMuef", "jetElef", "jetPhef", "jetUnc"]#, "jetCutBasedPUJetIDFlag","jetFull53XPUJetIDFlag","jetMET53XPUJetIDFlag"
+  jetvars = ["jetPt", "jetEta", "jetPhi", "jetPdg", "jetBTag", "jetChef", "jetNhef", "jetCeef", "jetNeef", "jetHFhef", "jetHFeef", "jetMuef", "jetElef", "jetPhef", "jetUnc"]#, "jetCutBasedPUJetIDFlag","jetFull53XPUJetIDFlag","jetMET53XPUJetIDFlag"
   muvars = ["muPt", "muEta", "muPhi", "muPdg", "muRelIso", "muDxy", "muDz", "muNormChi2", "muNValMuonHits", "muNumMatchedStations", "muPixelHits", "muNumtrackerLayerWithMeasurement", 'muIsGlobal', 'muIsTracker','muIsPF']
   elvars = ["elePt", "eleEta", "elePhi", "elePdg", "eleRelIso", "eleDxy", "eleDz", "eleOneOverEMinusOneOverP", "elePfRelIso", "eleSigmaIEtaIEta", "eleHoE", "eleDPhi", "eleDEta", "eleMissingHits", "elePassPATConversionVeto"]
   tavars = ["tauPt", "tauEta", "tauPhi", "tauPdg", 'tauJetInd', 'tauJetDR']
@@ -439,7 +364,7 @@ for isample, sample in enumerate(allSamples):
           s.nvetoLeptons=s.nvetoElectrons+s.nvetoMuons
           s.ngoodTaus = len(taus)
           
-          jResult = getGoodJets(c,muons+electrons)#, jermode=options.jermode, jesmode=options.jesmode)
+          jResult = getGoodJetsStage1(c,muons+electrons)#, jermode=options.jermode, jesmode=options.jesmode)
           jetResult = jResult['jets']
           s.met = getVarValue(c, 'slimmedMETs')
           s.metphi = getVarValue(c, 'slimmedMETsPhi')
@@ -590,7 +515,7 @@ for isample, sample in enumerate(allSamples):
             s.jetEta[i]   = idJets30[i]['eta']
             s.jetPhi[i]   = idJets30[i]['phi']
             s.jetPdg[i]   = idJets30[i]['pdg']
-            s.jetBtag[i]  = idJets30[i]['btag']
+            s.jetBTag[i]  = idJets30[i]['btag']
             s.jetChef[i]  = idJets30[i]['chef']
             s.jetNhef[i]  = idJets30[i]['nhef']
             s.jetCeef[i]  = idJets30[i]['ceef']

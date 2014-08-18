@@ -12,22 +12,26 @@ for b in ttJetsCSA14['bins']:
   c.Add(ttJetsCSA14['dirname']+'/'+b+'/h*.root')
 
 mode='dilep'
+relIso = 0.3
 
 small = False
 maxN=1001
 
-leptonEffMap = pickle.load(file('/data/schoef/results2014/tauTemplates/CSA14_TTJets_vetoLeptonEfficiencyMap.pkl'))
 if mode=='had':
+  leptonEffMap = pickle.load(file('/data/schoef/results2014/tauTemplates/CSA14_TTJets_vetoLeptonEfficiencyMap.pkl'))
   doubleLeptonPreselection = "ngoodMuons>=1&&nvetoMuons==2&&nvetoElectrons==0"
   templates = pickle.load(file('/data/schoef/results2014/tauTemplates/CSA14_TTJets_genTau.pkl'))
   ofile =                      '/data/schoef/results2014/tauTuples/CSA14_TTJets_hadGenTau.root'
 if mode=='lep':
+  leptonEffMap = pickle.load(file('/data/schoef/results2014/tauTemplates/CSA14_TTJets_vetoLeptonEfficiencyMap.pkl'))
   doubleLeptonPreselection = "ngoodMuons>=1&&nvetoMuons==2&&nvetoElectrons==0"
   templates = pickle.load(file('/data/schoef/results2014/tauTemplates/CSA14_TTJets_lepGenTau.pkl'))
   ofile =                      '/data/schoef/results2014/tauTuples/CSA14_TTJets_lepGenTau.root'
 if mode=='dilep':
+  leptonEffMap = pickle.load(file('CSA14_TTJets_efficiencyMap_vetoMuIDPt15_ttJetsCSA1450ns_relIso'+str(relIso)+'.pkl'))
+  leptonID = "muIsPF&&(muIsGlobal||muIsTracker)&&muPt>15&&abs(muEta)<2.1&&abs(muDxy)<0.02&&abs(muDz)<0.5&&muRelIso<"+str(relIso)
   doubleLeptonPreselection = "ngoodMuons>=1&&nvetoMuons==2&&nvetoElectrons==0"
-  ofile =                      '/data/schoef/results2014/tauTuples/CSA14_TTJets_dilep.root'
+  ofile =                    '/data/schoef/results2014/tauTuples/CSA14_TTJets_dilep.root'
 
 if mode=='had' or mode=='lep':
   for ptk in templates.keys():

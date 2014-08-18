@@ -15,11 +15,14 @@ ttJetsCSA1450ns["Chain"] = "Events"
 #ttJetsCSA1450ns['reweightingHistoFile'] = S10rwHisto 
 #ttJetsCSA1450ns['reweightingHistoFileSysPlus'] = S10rwPlusHisto
 #ttJetsCSA1450ns['reweightingHistoFileSysMinus'] = S10rwMinusHisto
-#ttJetsCSA1450ns["bins"] = [{'dir':"/dpm/oeaw.ac.at/home/cms/store/user/easilar/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/crab_MiniAODTupleTT1/140814_133324/0000", 
-#                        'dbsName':'/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/Spring14miniaod-PU_S14_POSTLS170_V6-v1/MINIAODSIM'}]
 ttJetsCSA1450ns["bins"] = [{'dir':"/dpm/oeaw.ac.at/home/cms/store/user/schoef/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/crab_TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola_Spring14miniaod-PU_S14_POSTLS170_V6-v1_MINIAODSIM/140817_063637/0000", 
                         'dbsName':'/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/Spring14miniaod-PU_S14_POSTLS170_V6-v1/MINIAODSIM'}]
 
+ece_ttJetsCSA1450ns={}
+ece_ttJetsCSA1450ns["name"]     = "ttJetsCSA1450ns";
+ece_ttJetsCSA1450ns["Chain"] = "Events"
+ece_ttJetsCSA1450ns["bins"] = [{'dir':"/dpm/oeaw.ac.at/home/cms/store/user/easilar/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/crab_TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola_Spring14miniaod-PU_S14_POSTLS170_V6-v1_MINIAODSIM/140814_095845/0000", 
+                        'dbsName':'/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/Spring14miniaod-PU_S14_POSTLS170_V6-v1/MINIAODSIM'}]
 
 #testSample={}
 #testSample["name"]     = "ttJets";

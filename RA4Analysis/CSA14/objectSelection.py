@@ -1,4 +1,4 @@
-from Workspace.HEPHYPythonTools.helpers import getVarValue
+from Workspace.HEPHYPythonTools.helpers import getVarValue, deltaR
 
 gTauAbsEtaBins = [(0,0.5), (0.5,1),(1,1.5),(1.5,2.3)]
 gTauPtBins = [(10,20), (20,30), (30,40), (40, 80), (80, 160), (160, 320), (320,-1)]
@@ -135,3 +135,72 @@ def splitListOfObjects(var, val, s):
       resHigh.append(x)
   return resLow, resHigh
 
+def isIsolated(obj, objs, dR=0.3):
+  isolated=True
+  for o in objs:   #Jet cross-cleaning
+    if deltaR(o, obj) < 0.3:
+      isolated = False
+      break
+  return isolated
+
+def getGoodJetsStage1(c, crosscleanobjects):#, jermode=options.jermode, jesmode=options.jesmode):
+  njets = getVarValue(c, 'nJets')   # jet.pt() > 10.
+  res = []
+  bres = []
+  ht = 0.
+  met_dx=0
+  met_dy=0.
+  for i in range(int(njets)):
+    eta = getVarValue(c, 'jetsEta', i)
+    pt  = getVarValue(c, 'jetsPt', i)
+    unc = getVarValue(c, 'jetsUnc', i)
+    id =  getVarValue(c, 'jetsID', i)
+    phi = getVarValue(c, 'jetsPhi', i)
+##      if max([jet['muef'],jet['elef']]) > 0.6 : print jet
+#    if jermode.lower()!="none":
+#      c_jet = jerDifferenceScaleFactor(eta, jermode)
+#      sigmaMCRel = jerSigmaMCRel(pt, eta)
+#      sigma = sqrt(c_jet**2 - 1)*sigmaMCRel
+#      scale = random.gauss(1,sigma)
+#      met_dx+=(1-scale)*cos(phi)*pt
+#      met_dy+=(1-scale)*sin(phi)*pt
+#      pt*=scale
+#    if jesmode.lower()!="none":
+#      scale = 1. + sign*unc
+#      met_dx+=(1-scale)*cos(phi)*pt
+#      met_dy+=(1-scale)*sin(phi)*pt
+#      pt*=scale
+    if pt>30 and abs(eta)<4.5:
+      parton = int(abs(getVarValue(c, 'jetsParton', i)))
+      jet = {'pt':pt, 'eta':eta,'phi':phi, 'pdg':parton,\
+      'id':id,
+      'chef':getVarValue(c, 'jetsChargedHadronEnergyFraction', i), 'nhef':getVarValue(c, 'jetsNeutralHadronEnergyFraction', i),\
+      'ceef':getVarValue(c, 'jetsChargedEmEnergyFraction', i), 'neef':getVarValue(c, 'jetsNeutralEmEnergyFraction', i), 'id':id,\
+      'hfhef':getVarValue(c, 'jetsHFHadronEnergyFraction', i), 'hfeef':getVarValue(c, 'jetsHFEMEnergyFraction', i),\
+      'muef':getVarValue(c, 'jetsMuonEnergyFraction', i), 'elef':getVarValue(c, 'jetsElectronEnergyFraction', i), 'phef':getVarValue(c, 'jetsPhotonEnergyFraction', i),\
+#      'jetCutBasedPUJetIDFlag':getVarValue(c, 'jetsCutBasedPUJetIDFlag', i),'jetMET53XPUJetIDFlag':getVarValue(c, 'jetsMET53XPUJetIDFlag', i),'jetFull53XPUJetIDFlag':getVarValue(c, 'jetsFull53XPUJetIDFlag', i), 
+      'btag': getVarValue(c, 'jetsBTag', i), 'unc': unc
+      }
+#      isolated = True
+#      for obj in crosscleanobjects:   #Jet cross-cleaning
+#        if deltaR(jet, obj) < 0.3:# and  obj['relIso']< relIsoCleaningRequ: #(obj['pt']/jet['pt']) > 0.4:  
+#          isolated = False
+##          print "Cleaned", 'deltaR', deltaR(jet, obj), 'maxfrac', max([jet['muef'],jet['elef']]), 'pt:jet/obj', jet['pt'], obj['pt'], "relIso",  obj['relIso'], 'btag',getVarValue(c, 'jetsBtag', i), "parton", parton
+#  #          print 'Not this one!', jet, obj, deltaR(jet, obj)
+#          break
+      jet['isolated'] = isIsolated(jet, crosscleanobjects)
+      res.append(jet)
+  res  = sorted(res,  key=lambda k: -k['pt'])
+  return {'jets':res,'met_dx':met_dx, 'met_dy':met_dy}
+
+def getGoodJetsStage2(c):#, jermode=options.jermode, jesmode=options.jesmode):
+  njets = getVarValue(c, 'njetCount')   # jet.pt() > 10.
+  res = []
+  for i in range(int(njets)):
+    res.append( {"eta":getVarValue(c, 'jetEta', i),\
+          "pt" :getVarValue(c, 'jetPt', i),
+          "phi":getVarValue(c, 'jetPhi', i), 
+          'muef':getVarValue(c, 'jetMuef', i)
+      })
+  
+  return res 
