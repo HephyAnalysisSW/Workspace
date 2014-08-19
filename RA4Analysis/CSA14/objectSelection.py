@@ -139,7 +139,7 @@ def isIsolated(obj, objs, dR=0.3):
   if dR<0:return True
   isolated=True
   for o in objs:   #Jet cross-cleaning
-    if deltaR(o, obj) < dR:
+    if deltaR(o, obj) < 0.3:
       isolated = False
       break
   return isolated

@@ -85,6 +85,16 @@ for sample in allSamples:
     c = ROOT.TChain('Events')
     for tfile in bin['filenames']:
       c.Add(prefix+tfile)
+      print "Testing",prefix+tfile
+      d = ROOT.TChain('Events')
+      d.Add(prefix+tfile)
+      nev = d.GetEntries()
+      print "Found",nev,'events'
+      if nev>0:
+        d.GetEntry(0)
+      print "-->Not yet segfaulted"
+      del d
+      
     nevents= c.GetEntries()
     del c
     if bin['dbsName'] and  bin['dbsName'].lower().count('run'):
@@ -101,7 +111,7 @@ for sample in allSamples:
           bin['xsec']=None
       else:
         weight=0
-      print 'Sample', sample['name'], 'bin', bin['dbsName'],'xsec',bin['xsec'], 'n-events',nevents,'weight',weight
+      print 'Sample', sample['name'], 'bin', bin['dbsName'], 'nevents:',nevents,'xsec',bin['xsec'], 'n-events',nevents,'weight',weight
     bin['weight']=weight
 
 
