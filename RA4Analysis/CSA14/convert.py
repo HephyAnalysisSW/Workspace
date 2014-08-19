@@ -2,11 +2,12 @@ import ROOT
 from DataFormats.FWLite import Events, Handle
 from PhysicsTools.PythonAnalysis import *
 from math import *
-import sys, os, copy, random, subprocess
-from datetime import datetime
+import sys, os, copy, random, subprocess, datetime
 #from helpers import getVarValue, deltaPhi, minAbsDeltaPhi,  deltaR, invMass,
 from Workspace.HEPHYPythonTools.helpers import getVarValue, deltaPhi, minAbsDeltaPhi, invMassOfLightObjects, deltaR, closestMuJetDeltaR, invMass,  findClosestObjectDR
 from objectSelection import getLooseEleStage1,getAllElectronsStage1, tightPOGEleID, vetoEleID, getLooseMuStage1, getAllMuonsStage1, tightPOGMuID, vetoMuID, getAllTausStage1, getTauStage1, hybridMuID, getGoodJetsStage1, isIsolated
+
+monthConv = {'Jan':1, 'Feb':2,'Mar':3,'Apr':4,"May":5, "Jun":6,"Jul":7,"Aug":8, "Sep":9, "Oct":10, "Nov":11, "Dec":12}
 
 from stage1Tuples import *
 
@@ -29,13 +30,14 @@ parser.add_option("--chmode", dest="chmode", default="copyInc", type="string", a
 #parser.add_option("--jermode", dest="jermode", default="none", type="string", action="store", help="jermode: up/down/central/none")
 #parser.add_option("--jesmode", dest="jesmode", default="none", type="string", action="store", help="jesmode: up/down/none")
 parser.add_option("--samples", dest="allsamples", default="ttJetsCSA1450ns", type="string", action="store", help="samples:Which samples.")
+parser.add_option("--DR", dest="DR", default="0.4", type="float", action="store", help="samples:Which samples.")
 parser.add_option("--small", dest="small", action="store_true", help="Just do a small subset.")
 parser.add_option("--fromPercentage", dest="fromPercentage", default="0", type="int", action="store", help="from (% of tot. events)")
 parser.add_option("--toPercentage", dest="toPercentage", default="100", type="int", action="store", help="to (% of tot. events)")
 parser.add_option("--keepPDFWeights", dest="keepPDFWeights", action="store_true", help="keep PDF Weights?")
  
 (options, args) = parser.parse_args()
-print "options: chmode",options.chmode, 'samples',options.allsamples
+print "options: chmode",options.chmode, 'samples',options.allsamples,'DR',options.DR
 exec('allSamples=['+options.allsamples+']')
 
 #def getPtISR(e):
@@ -61,10 +63,17 @@ for sample in allSamples:
       for line in p.stdout.readlines():
         if not line.count('histo'):continue
         line=line[:-1]
-        fname = line.split()[-1]
-        size = line.split()[4]
+        sline = line.split()
+        fname = sline[-1]
+        size = sline[4]
         if int(size)!=0:
-          filelist.append(fname)
+          month, day = sline[5:7]
+          hour, minute = sline[7].split(':')
+          age = (datetime.datetime.now() - datetime.datetime(2014, monthConv[month], int(day), int(hour), int(minute))).seconds/3600
+          if age>=12:
+            filelist.append(fname)
+          else:
+            print "Omitting",fname,'too young:',str(age)+'h'
         else:
           print "Omitting file", fname, 'with size', size
       prefix = "root://hephyse.oeaw.ac.at/"#+subdirname
@@ -99,6 +108,7 @@ for sample in allSamples:
 if not os.path.isdir(outputDir):
   os.system('mkdir -p '+outputDir)
 outSubDir = options.chmode
+outSubDir+='_DR'+str(options.DR)
 #if options.jermode.lower()!='none':
 #  outSubDir = outSubDir+"_JER"+options.jermode.lower()
 #if options.jesmode.lower()!='none':
@@ -364,7 +374,7 @@ for isample, sample in enumerate(allSamples):
           s.nvetoLeptons=s.nvetoElectrons+s.nvetoMuons
           s.ngoodTaus = len(taus)
           
-          jResult = getGoodJetsStage1(c,vetoMuons+vetoElectrons)#, jermode=options.jermode, jesmode=options.jesmode)
+          jResult = getGoodJetsStage1(c,vetoMuons+vetoElectrons, options.DR)#, jermode=options.jermode, jesmode=options.jesmode)
           jetResult = jResult['jets']
           s.met = getVarValue(c, 'slimmedMETs')
           s.metphi = getVarValue(c, 'slimmedMETsPhi')

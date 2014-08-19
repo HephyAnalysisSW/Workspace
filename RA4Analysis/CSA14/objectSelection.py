@@ -100,7 +100,7 @@ def getAllMuonsStage1(c, nmuons ):
   for i in range(0, int(nmuons)):
     cand = getLooseMuStage1(c, i)
     if cand:
-      for v in ['Pdg', 'Dxy', 'NormChi2', 'NValMuonHits', 'NumMatchedStations', 'PixelHits', 'NumtrackerLayerWithMeasurement']:
+      for v in ['Pdg', 'Dxy', 'NormChi2', 'NValMuonHits', 'NumMatchedStations', 'PixelHits', 'NumtrackerLayerWithMeasurement', 'Iso03sumChargedHadronPt','Iso03sumNeutralHadronEt','Iso03sumPhotonEt','Iso03sumPUChargedHadronPt']:
         cand[v] = getVarValue(c, 'muons'+v, i)
       res.append(cand)
   res = sorted(res, key=lambda k: -k['pt'])
@@ -136,6 +136,7 @@ def splitListOfObjects(var, val, s):
   return resLow, resHigh
 
 def isIsolated(obj, objs, dR=0.3):
+  if dR<0:return True
   isolated=True
   for o in objs:   #Jet cross-cleaning
     if deltaR(o, obj) < dR:
@@ -143,7 +144,7 @@ def isIsolated(obj, objs, dR=0.3):
       break
   return isolated
 
-def getGoodJetsStage1(c, crosscleanobjects):#, jermode=options.jermode, jesmode=options.jesmode):
+def getGoodJetsStage1(c, crosscleanobjects, dR=0.4):#, jermode=options.jermode, jesmode=options.jesmode):
   njets = getVarValue(c, 'nJets')   # jet.pt() > 10.
   res = []
   bres = []
@@ -188,7 +189,7 @@ def getGoodJetsStage1(c, crosscleanobjects):#, jermode=options.jermode, jesmode=
 ##          print "Cleaned", 'deltaR', deltaR(jet, obj), 'maxfrac', max([jet['muef'],jet['elef']]), 'pt:jet/obj', jet['pt'], obj['pt'], "relIso",  obj['relIso'], 'btag',getVarValue(c, 'jetsBtag', i), "parton", parton
 #  #          print 'Not this one!', jet, obj, deltaR(jet, obj)
 #          break
-      jet['isolated'] = isIsolated(jet, crosscleanobjects, dR=0.4)
+      jet['isolated'] = isIsolated(jet, crosscleanobjects, dR=dR)
       res.append(jet)
   res  = sorted(res,  key=lambda k: -k['pt'])
   return {'jets':res,'met_dx':met_dx, 'met_dy':met_dy}
@@ -200,7 +201,8 @@ def getGoodJetsStage2(c):#, jermode=options.jermode, jesmode=options.jesmode):
     res.append( {"eta":getVarValue(c, 'jetEta', i),\
           "pt" :getVarValue(c, 'jetPt', i),
           "phi":getVarValue(c, 'jetPhi', i), 
-          'muef':getVarValue(c, 'jetMuef', i)
+          'muef':getVarValue(c, 'jetMuef', i),
+          'btag':getVarValue(c, 'jetBTag', i)
       })
   
   return res 
