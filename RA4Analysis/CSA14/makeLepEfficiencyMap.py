@@ -1,10 +1,10 @@
 import ROOT
 import pickle
-from stage2Tuples import ttJetsCSA1450ns, ttJetsCSA1450ns
+from stage2Tuples import ttJetsCSA1450ns, ttJetsCSA1425ns
 from array import array
 c = ROOT.TChain('Events')
-for b in ttJetsCSA1450ns['bins']:
-  c.Add(ttJetsCSA1450ns['dirname']+'/'+b+'/h*.root')
+for b in ttJetsCSA1425ns['bins']:
+  c.Add(ttJetsCSA1425ns['dirname']+'/'+b+'/h*.root')
 
 ROOT.gStyle.SetOptStat(0)
 
@@ -16,12 +16,12 @@ etaBinsCoarse = array('d', [float(x)/10. for x in [-30,-25]+range(-21,22,6)+[25,
 
 hadPresel="ht>400&&met>150"
 
-for relIso in [0.1,0.15,0.2,0.25,0.3,0.35]:
+for relIso in [0.2,0.1,0.15,0.25,0.3,0.35]:
   ptCut=15
   leptonID = "muIsPF[gLepInd]&&(muIsGlobal[gLepInd]||muIsTracker[gLepInd])&&muPt[gLepInd]>"+str(ptCut)+"&&abs(muEta[gLepInd])<2.1"\
             +"&&abs(muDxy[gLepInd])<0.02&&abs(muDz[gLepInd])<0.5"\
             +"&&muRelIso[gLepInd]<"+str(relIso)
-  prefix = 'vetoMuIDPt15_ttJetsCSA1450ns_relIso'+str(relIso)
+  prefix = 'vetoMuIDPt15_ttJetsCSA1425ns_relIso'+str(relIso)
 
   ##hybridLoose
   #ptCut=15

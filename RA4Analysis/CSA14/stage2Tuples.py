@@ -9,3 +9,8 @@ ttJetsCSA1450ns={}
 ttJetsCSA1450ns["name"]     = "ttJetsCSA1450ns"
 ttJetsCSA1450ns["bins"]     = ["ttJetsCSA1450ns"]
 ttJetsCSA1450ns["dirname"] = "/data/schoef/convertedTuples_v23/copyMET"
+
+vetoCC_ttJetsCSA1450ns={}
+vetoCC_ttJetsCSA1450ns["name"]     = "ttJetsCSA1450ns"
+vetoCC_ttJetsCSA1450ns["bins"]     = ["ttJetsCSA1450ns"]
+vetoCC_ttJetsCSA1450ns["dirname"] = "/data/easilar/convertedTuples_v23/copyMET"

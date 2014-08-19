@@ -4,15 +4,15 @@ from array import array
 from objectSelection import gTauAbsEtaBins, gTauPtBins, metParRatioBins, jetRatioBins
 from Workspace.HEPHYPythonTools.helpers import getVarValue, getObjFromFile
 from objectSelection import getLooseMuStage2, tightPOGMuID, vetoMuID
-from stage2Tuples import ttJetsCSA14
 from math import sqrt, cos, sin, atan2
 
+from stage2Tuples import *
 c = ROOT.TChain('Events')
-for b in ttJetsCSA14['bins']:
-  c.Add(ttJetsCSA14['dirname']+'/'+b+'/h*.root')
+for b in ttJetsCSA1450ns['bins']:
+  c.Add(ttJetsCSA1450ns['dirname']+'/'+b+'/h*.root')
 
 mode='dilep'
-relIso = 0.3
+relIso = 0.2
 
 small = False
 maxN=1001
@@ -28,10 +28,10 @@ if mode=='lep':
   templates = pickle.load(file('/data/schoef/results2014/tauTemplates/CSA14_TTJets_lepGenTau.pkl'))
   ofile =                      '/data/schoef/results2014/tauTuples/CSA14_TTJets_lepGenTau.root'
 if mode=='dilep':
-  leptonEffMap = pickle.load(file('CSA14_TTJets_efficiencyMap_vetoMuIDPt15_ttJetsCSA1450ns_relIso'+str(relIso)+'.pkl'))
-  leptonID = "muIsPF&&(muIsGlobal||muIsTracker)&&muPt>15&&abs(muEta)<2.1&&abs(muDxy)<0.02&&abs(muDz)<0.5&&muRelIso<"+str(relIso)
-  doubleLeptonPreselection = "ngoodMuons>=1&&nvetoMuons==2&&nvetoElectrons==0"
-  ofile =                    '/data/schoef/results2014/tauTuples/CSA14_TTJets_dilep.root'
+  leptonEffMap = pickle.load(file('/data/schoef/results2014/tauTemplates/CSA14_TTJets_efficiencyMap_vetoMuIDPt15_ttJetsCSA1450ns_relIso'+str(relIso)+'.pkl'))
+  leptonID = "muIsPF&&(muIsGlobal||muIsTracker)&&muPt>15&&abs(muEta)<2.5&&abs(muDxy)<0.2&&abs(muDz)<0.5&&muRelIso<"+str(relIso)
+  doubleLeptonPreselection = "ngoodMuons>=1&&Sum$("+leptonID+")==2&&nvetoElectrons==0"
+  ofile =                    '/data/schoef/results2014/tauTuples/CSA14_TTJets_dilep_relIso'+str(relIso)+'.root'
 
 if mode=='had' or mode=='lep':
   for ptk in templates.keys():
@@ -50,13 +50,15 @@ def getTwoMuons(c):
   for i in range(nmuCount):
     l=getLooseMuStage2(c, i)
     isTight=tightPOGMuID(l)
-    isLoose=vetoMuID(l)
+    isLoose=vetoMuID(l, relIso=relIso)
     l['isTight'] = isTight 
     l['isLoose'] = isLoose
     if isTight:nt+=1
     if isLoose:nl+=1
     if isTight or isLoose: res.append(l)
-  if len(res)!=2: print "Warning: found",len(l),'muons -> inconsistent with preselection!!'
+    if isTight and not isLoose:
+      print "Warning!! Tight but not loose!!",l
+  if len(res)!=2: print "Warning: found",len(res),'muons -> inconsistent with preselection!!'
   if not (nt>=1 and nl==2):print "Warning! Not >=1 tight and ==2 loose -> Inconsistent w/ preselection"
   return res
 
@@ -101,7 +103,7 @@ for i in range(number_events):
     n=v.split('/')[0]
     exec('s.'+n+'='+str(c.GetLeaf(n).GetValue()))
   muons = getTwoMuons(c)
-  assert len(muons)==2
+  assert len(muons)==2, "Problem in event "+str(int(c.GetLeaf('event').GetValue()))
   if muons[0]['isTight'] and muons[1]['isTight']:
     combFac=0.5
   else:
