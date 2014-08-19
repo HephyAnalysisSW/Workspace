@@ -69,11 +69,12 @@ for sample in allSamples:
         if int(size)!=0:
           month, day = sline[5:7]
           hour, minute = sline[7].split(':')
-          age = (datetime.datetime.now() - datetime.datetime(2014, monthConv[month], int(day), int(hour), int(minute))).seconds/3600
+          age = (datetime.datetime.now() - datetime.datetime(2014, monthConv[month], int(day), int(hour), int(minute))).total_seconds()/3600
           if age>=12:
             filelist.append(fname)
           else:
             print "Omitting",fname,'too young:',str(age)+'h'
+
         else:
           print "Omitting file", fname, 'with size', size
       prefix = "root://hephyse.oeaw.ac.at/"#+subdirname
@@ -85,15 +86,15 @@ for sample in allSamples:
     c = ROOT.TChain('Events')
     for tfile in bin['filenames']:
       c.Add(prefix+tfile)
-      print "Testing",prefix+tfile
-      d = ROOT.TChain('Events')
-      d.Add(prefix+tfile)
-      nev = d.GetEntries()
-      print "Found",nev,'events'
-      if nev>0:
-        d.GetEntry(0)
-      print "-->Not yet segfaulted"
-      del d
+#      print "Testing",prefix+tfile
+#      d = ROOT.TChain('Events')
+#      d.Add(prefix+tfile)
+#      nev = d.GetEntries()
+#      print "Found",nev,'events'
+#      if nev>0:
+#        d.GetEntry(0)
+#      print "-->Not yet segfaulted"
+#      del d
       
     nevents= c.GetEntries()
     del c
