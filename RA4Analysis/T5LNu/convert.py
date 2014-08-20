@@ -6,7 +6,7 @@ import sys, os, copy, random, array
 from datetime import datetime
 from Workspace.HEPHYPythonTools.helpers import getVarValue, deltaPhi, minAbsDeltaPhi,  deltaR, invMass, findClosestJet
 from defaultSamples import *
-from  Workspace.RA4Analysis import eventShape, mt2w
+from  Workspace.RA4Analysis import eventShape, mt2w, mt2
 
 ROOT.gROOT.ProcessLine(".L ../../HEPHYPythonTools/scripts/root/Thrust.C+")
 
@@ -429,7 +429,7 @@ for isample, sample in enumerate(allSamples):
   if sample['newMETCollection']:
     extraVariables+=["type1phiMet", "type1phiMetphi"]
   extraVariables+=["thrust", "thrustPhi", "thrustEta", "htThrustLepSideRatio", "htThrustMetSideRatio", "htThrustWSideRatio"]
-  extraVariables+=['mt2w', "S3D", "C3D", "C2D", "linS3D", "linC3D", "linC2D", "FWMT1", "FWMT2", "FWMT3", "FWMT4","linC2DLepMET", "c2DLepMET", "FWMT1LepMET", "FWMT2LepMET", "FWMT3LepMET", "FWMT4LepMET"]
+  extraVariables+=['mt2w', 'mt2b', "S3D", "C3D", "C2D", "linS3D", "linC3D", "linC2D", "FWMT1", "FWMT2", "FWMT3", "FWMT4","linC2DLepMET", "c2DLepMET", "FWMT1LepMET", "FWMT2LepMET", "FWMT3LepMET", "FWMT4LepMET"]
   extraVariables+=["leptonPt", "leptonPhi", "leptonEta", "leptonPdg", "mT", 'WPt', 'WPhi', "cosDeltaPhi", "lepton2Pt", "lepton2Phi", "lepton2Eta", "lepton2Pdg"]
 
   if storeVectors: 
@@ -810,6 +810,9 @@ for isample, sample in enumerate(allSamples):
               s.mt2w = mt2w.mt2w(met = {'pt':s.type1phiMet, 'phi':s.type1phiMetphi}, l={'pt':s.leptonPt, 'phi':s.leptonPhi, 'eta':s.leptonEta}, ljets=lightJets, bjets=bJets)
               if not s.mt2w<float('inf') and len(jets)>0 and len(allTightLeptons)>0:
                 print "Warning -> Why can't I compute mt2w?", s.mt2w, len(jets), len(bJets), len(allTightLeptons),lightJets,bJets, {'pt':s.type1phiMet, 'phi':s.type1phiMetphi}, {'pt':s.leptonPt, 'phi':s.leptonPhi, 'eta':s.leptonEta}
+              s.mt2b = mt2.mt2(met = {'pt':s.type1phiMet, 'phi':s.type1phiMetphi}, l={'pt':s.leptonPt, 'phi':s.leptonPhi, 'eta':s.leptonEta}, ljets=lightJets, bjets=bJets)
+              if not s.mt2b<float('inf') and len(jets)>0 and len(allTightLeptons)>0:
+                print "Warning -> Why can't I compute mt2b?", s.mt2b, len(jets), len(bJets), len(allTightLeptons),lightJets,bJets, {'pt':s.type1phiMet, 'phi':s.type1phiMetphi}, {'pt':s.leptonPt, 'phi':s.leptonPhi, 'eta':s.leptonEta}
 
           tmpDir = ROOT.gDirectory.func()
           chain_gDir.cd()

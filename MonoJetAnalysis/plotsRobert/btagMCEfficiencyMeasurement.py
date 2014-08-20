@@ -102,3 +102,19 @@ def getMCEff(parton, pt, eta, year = 2012):
           if abs(parton)>5 or abs(parton)<4:  res["mcEff"] = mcEff[tuple(ptBin)][tuple(etaBin)]["other"]
           return res 
 
+
+b_def = pickle.load(file("/data/schoef/results2012/btagEff/btagEffPowHegHT400MET150_Moriond2013.pkl"))
+b_tt  = pickle.load(file("/data/schoef/results2014/btagEff/btagEff_ttJetsPowHeg.pkl"))
+b_w   = pickle.load(file("/data/schoef/results2014/btagEff/btagEff_wJetsHT150v2.pkl"))
+
+pt_keys=b_def.keys()
+pt_keys.sort()
+
+for pt_k in pt_keys:
+  e_keys = b_def[pt_k].keys()
+  e_keys.sort()
+  for e_key in e_keys:
+    strings=[]
+    for f in ['b','c','other']:
+     strings.append( f+':'+"/".join([str(x) for x in [round(b_def[pt_k][e_key][f],3),round(b_tt[pt_k][e_key][f],3),round(b_w[pt_k][e_key][f],3)]]))
+    print pt_k, [str(x) for x in e_key]," ".join(strings)
