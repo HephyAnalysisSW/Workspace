@@ -24,6 +24,12 @@ ece_ttJetsCSA1450ns["Chain"] = "Events"
 ece_ttJetsCSA1450ns["bins"] = [{'dir':"/dpm/oeaw.ac.at/home/cms/store/user/easilar/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/crab_TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola_Spring14miniaod-PU_S14_POSTLS170_V6-v1_MINIAODSIM/140814_095845/0000", 
                         'dbsName':'/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/Spring14miniaod-PU_S14_POSTLS170_V6-v1/MINIAODSIM'}]
 
+WJetsToLNu25ns={}
+WJetsToLNu25ns["name"]   = "WJetsToLNu25ns";
+WJetsToLNu25ns["Chain"] = "Events"
+WJetsToLNu25ns["bins"] = [{'dir':"/dpm/oeaw.ac.at/home/cms/store/user/easilar/WJetsToLNu_13TeV-madgraph-pythia8-tauola/crab_WJetsToLNu_13TeV-madgraph-pythia8-tauola_Spring14miniaod-PU20bx25_POSTLS170_V5-v1_MINIAODSIM/140814_112652/0000",
+                       'dbsName':'/WJetsToLNu_13TeV-madgraph-pythia8-tauola/Spring14miniaod-PU20bx25_POSTLS170_V5-v1/MINIAODSIM'}] 
+
 #testSample={}
 #testSample["name"]     = "ttJets";
 #testSample["dirname"] = "/data/schoef/stage1CSA14"
