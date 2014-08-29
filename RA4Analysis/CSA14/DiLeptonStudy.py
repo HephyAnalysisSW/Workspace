@@ -3,6 +3,7 @@ from stage2Tuples import ttJetsCSA1450ns , ttJetsCSA1425ns
 from localInfo import username
 from objectSelection import tightPOGMuID , vetoMuID
 from math import sqrt, cos, sin, atan2
+from array import array
 
 def getMu(c,j):
   IsGlobal = c.GetLeaf('muIsGlobal').GetValue(j)
@@ -26,9 +27,9 @@ def getMu(c,j):
   PhotonEt = c.GetLeaf('muIso03sumPhotonEt').GetValue(j)
   PUChargedHadronPt = c.GetLeaf('muIso03sumPUChargedHadronPt').GetValue(j)
   RelIsoPred = (ChargedHadronPt+max(0,(NeutralHadronEt+PhotonEt-(0.5*PUChargedHadronPt))))/pt
-  isTight = False
-  isLoose = False
-  cand={'isLoose':isLoose, 'isTight':isTight, 'NumMatchedStations':NumMatchedStations,'PixelHits':PixelHits, 'NumtrackerLayerWithMeasurement':NumtrackerLayerWithMeasurement,'Dxy':Dxy, 'NValMuonHits':NValMuonHits ,'NormChi2':NormChi2, 'IsPF':IsPF, 'IsGlobal':IsGlobal, 'RelIsoPred':RelIsoPred, 'ChargedHadronPt':ChargedHadronPt,'NeutralHadronEt':NeutralHadronEt,'PhotonEt':PhotonEt,'PUChargedHadronPt':PUChargedHadronPt,'IsGlobal':IsGlobal, 'IsTracker':IsTracker, 'Dz':Dz, 'pt':pt, 'eta':eta, 'phi':phi, 'Pdg':Pdg, 'gLepDR':gLepDR, 'relIso':relIso}
+  isTight = None
+  isLoose = None
+  cand={'isLoose':isLoose, 'isTight':isTight, 'NumMatchedStations':NumMatchedStations,'PixelHits':PixelHits, 'NumtrackerLayerWithMeasurement':NumtrackerLayerWithMeasurement,'Dxy':Dxy, 'NValMuonHits':NValMuonHits ,'NormChi2':NormChi2, 'IsPF':IsPF, 'RelIsoPred':RelIsoPred, 'ChargedHadronPt':ChargedHadronPt,'NeutralHadronEt':NeutralHadronEt,'PhotonEt':PhotonEt,'PUChargedHadronPt':PUChargedHadronPt,'IsGlobal':IsGlobal, 'IsTracker':IsTracker, 'Dz':Dz, 'pt':pt, 'eta':eta, 'phi':phi, 'Pdg':Pdg, 'gLepDR':gLepDR, 'relIso':relIso}
   #if pt>5 and (muIsGlobal or  muIsTracker) and abs(eta)<2.5 and abs(dz)< 0.5 and gLepDR<0.5:
   if pt>5 and abs(eta)<2.5 and abs(Dz)<0.5 and (IsGlobal or  IsTracker):
    return cand
@@ -36,8 +37,8 @@ def getMu(c,j):
 
 diLep     ="ngoodMuons>=1&&nvetoMuons==2&&ngNuEFromW==0&&nvetoElectrons==0"
 
-'''  
-def Get2Mu(c):
+  
+'''def Get2Mu(c):
   nmuCount = int(c.GetLeaf('nmuCount').GetValue())
   ntmuons = 0
   nlmuons = 0
@@ -54,17 +55,16 @@ def Get2Mu(c):
     if isLoose:  nlmuons+=1
     temp=lep
     #print temp['isTight']
-  return temp
-'''
+  return temp '''
 
-File = ROOT.TFile('DiLeptonMt.root','RECREATE')
+File = ROOT.TFile('DiLeptonMtnew.root','RECREATE')
 h_MTDilepton = ROOT.TH1F('MT', 'MT',100,0,800)
 
 c50 = ROOT.TChain('Events')
 #for b in ttJetsCSA1450ns['bins']:
 #  c.Add(ttJetsCSA1450ns['dirname']+'/'+b+'/h*.root')
-#c50.Add('/data/easilar/convertedTuples_v23/copyMET/ttJetsCSA1450ns/histo_ttJetsCSA1450ns_from0To10.root')
-c50.Add('/data/easilar/convertedTuples_v23/copyMET/ttJetsCSA1450ns/*')
+c50.Add('/data/easilar/convertedTuples_v23/copyMET/ttJetsCSA1450ns/histo_ttJetsCSA1450ns_from0To10.root')
+#c50.Add('/data/easilar/convertedTuples_v23/copyMET/ttJetsCSA1450ns/*')
 
 c25 = ROOT.TChain('Events')
 #for b in ttJetsCSA1425ns['bins']:
@@ -80,29 +80,49 @@ for i in range(number_events50):
   nmuCount = int(c50.GetLeaf('nmuCount').GetValue())
   ntmuons = 0
   nlmuons = 0
+  met = c50.GetLeaf('met').GetValue()
+  metphi = c50.GetLeaf('metphi').GetValue()
+  muons=[] 
   for j in range(nmuCount):
-    met = c50.GetLeaf('met').GetValue(j)
-    metphi = c50.GetLeaf('metphi').GetValue(j)
-    muons50=getMu(c50,j)
-    isTight=tightPOGMuID(muons50)
-    isLoose=vetoMuID(muons50)
-    #print isTight
-    muons50['isTight'] = isTight
-    #print lep['isTight']
-    muons50['isLoose'] = isLoose
-    if isTight: ntmuons+=1
-    if isLoose:  nlmuons+=1
-  if ntmuons>=1 and nlmuons==2 and ngNuMuFromW==2 and ngNuEFromW==0:
-    print 'Dilepton:)'
-    if muons50['isLoose']:
-      Lmuons=muons50
-      metAdd=Lmuons['pt']
-      Metx = met*cos(metphi)+cos(Lmuons['pt'])*metAdd
-      Mety = met*sin(metphi)+sin(Lmuons['pt'])*metAdd
-    if muons50['isTight']:
-      Tmuons=muons50
-      mtPred = sqrt(2*metPred*Tmuons['pt']*(1-cos(Tmuons['phi']-metphiPred)))
-      if mtPred!=0: h_MTDilepton.Fill(mtPred)
+    muon=getMu(c50,j)
+    if muon:
+      #print tightPOGMuID(muon)
+      #if tightPOGMuID(muon)==0. or vetoMuID(muon)==0.: print 'Tight or loose is zero!'
+      #if tightPOGMuID(muon)!=0:
+      isTight=tightPOGMuID(muon)
+      #if vetoMuID(muon)!=0:
+      isLoose=vetoMuID(muon)
+      #print isTight
+      muon['isTight'] = isTight
+      #print lep['isTight']
+      muon['isLoose'] = isLoose
+      if isTight: ntmuons+=1
+      if isLoose:  nlmuons+=1
+      muons.append(muon)
+  print "Found",len(muons),'muons'
+  if len(muons)<2: continue
+  if len(muons)==2 and ntmuons>=1 and ngNuMuFromW==2 and ngNuEFromW==0 and muons[0]['gLepDR']<0.5 and muons[1]['gLepDR']<0.5:
+    for perm in [muons, reversed(muons)]:
+      m,m2 = perm
+      if m2['isTight']:
+        #if muons[0]['gLepDR']<0.5 and muons[1]['gLepDR']<0.5: 
+        #if ntmuons>=1 and nlmuons==2 and ngNuMuFromW==2 and ngNuEFromW==0: ##For Dilepton
+        print 'Dilepton:)'
+        #if muons[0]['isTight']:
+        metAdd=m['pt']
+        Metx = met*cos(metphi)+cos(m['phi'])*metAdd
+        Mety = met*sin(metphi)+sin(m['phi'])*metAdd
+        metPred = sqrt(Metx**2+Mety**2)
+        metphiPred = atan2(Mety,Metx)
+        mtPred = sqrt(2*metPred*m2['pt']*(1-cos(m2['phi']-metphiPred)))
+        # if muons[1]['isTight']:
+         # metAdd=muons[0]['pt']
+         # Metx = met*cos(metphi)+cos(muons[0]['pt'])*metAdd
+         # Mety = met*sin(metphi)+sin(muons[0]['pt'])*metAdd
+         # metPred = sqrt(Metx**2+Mety**2)
+         # metphiPred = atan2(Mety,Metx)     
+         # mtPred = sqrt(2*metPred*muons[1]['pt']*(1-cos(muons[1]['phi']-metphiPred)))
+        h_MTDilepton.Fill(mtPred)
 
 File.cd() 
 can = ROOT.TCanvas('MTPlotDiLepton')
@@ -114,4 +134,4 @@ h_MTDilepton.Draw()
 can.Write()
 
 File.Write()
-File.Close() 
+File.Close()
