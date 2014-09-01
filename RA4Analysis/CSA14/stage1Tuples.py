@@ -30,6 +30,21 @@ WJetsToLNu25ns["Chain"] = "Events"
 WJetsToLNu25ns["bins"] = [{'dir':"/dpm/oeaw.ac.at/home/cms/store/user/easilar/WJetsToLNu_13TeV-madgraph-pythia8-tauola/crab_WJetsToLNu_13TeV-madgraph-pythia8-tauola_Spring14miniaod-PU20bx25_POSTLS170_V5-v1_MINIAODSIM/140814_112652/0000",
                        'dbsName':'/WJetsToLNu_13TeV-madgraph-pythia8-tauola/Spring14miniaod-PU20bx25_POSTLS170_V5-v1/MINIAODSIM'}] 
 
+WJetsHTToLNu={}
+WJetsHTToLNu["name"]   = "WJetsHTToLNu";
+WJetsHTToLNu["Chain"] = "Events"
+WJetsHTToLNu["bins"] = [
+                        {'dir':"/dpm/oeaw.ac.at/home/cms/store/user/schoef/pat_310814/WJetsToLNu_HT-100to200_Tune4C_13TeV-madgraph-tauola/schoef-WJetsToLNu_HT-100to200_Tune4C_13TeV-madgraph-tauola_Spring14dr-PU_S14_POSTLS170_V6-v1",
+                        'dbsName':'/WJetsToLNu_HT-100to200_Tune4C_13TeV-madgraph-tauola/Spring14dr-PU_S14_POSTLS170_V6-v1/AODSIM'},
+                        {'dir':"/dpm/oeaw.ac.at/home/cms/store/user/schoef/pat_310814/WJetsToLNu_HT-200to400_Tune4C_13TeV-madgraph-tauola/schoef-WJetsToLNu_HT-200to400_Tune4C_13TeV-madgraph-tauola_Spring14dr-PU_S14_POSTLS170_V6-v1",
+                        'dbsName':'/WJetsToLNu_HT-200to400_Tune4C_13TeV-madgraph-tauola/Spring14dr-PU_S14_POSTLS170_V6-v1/AODSIM'},
+                        {'dir':"/dpm/oeaw.ac.at/home/cms/store/user/schoef/pat_310814/WJetsToLNu_HT-400to600_Tune4C_13TeV-madgraph-tauola/schoef-WJetsToLNu_HT-400to600_Tune4C_13TeV-madgraph-tauola_Spring14dr-PU_S14_POSTLS170_V6-v1",
+                        'dbsName':'/WJetsToLNu_HT-400to600_Tune4C_13TeV-madgraph-tauola/Spring14dr-PU_S14_POSTLS170_V6-v1/AODSIM'},
+                        {'dir':"/dpm/oeaw.ac.at/home/cms/store/user/schoef/pat_310814/WJetsToLNu_HT-600toInf_Tune4C_13TeV-madgraph-tauola/schoef-WJetsToLNu_HT-600toInf_Tune4C_13TeV-madgraph-tauola_Spring14dr-PU_S14_POSTLS170_V6-v1",
+                        'dbsName':'/WJetsToLNu_HT-600toInf_Tune4C_13TeV-madgraph-tauola/Spring14dr-PU_S14_POSTLS170_V6-v1/AODSIM'},
+                        ] 
+
+
 #testSample={}
 #testSample["name"]     = "ttJets";
 #testSample["dirname"] = "/data/schoef/stage1CSA14"

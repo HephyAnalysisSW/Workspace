@@ -135,11 +135,11 @@ def splitListOfObjects(var, val, s):
       resHigh.append(x)
   return resLow, resHigh
 
-def isIsolated(obj, objs, dR=0.3):
+def isIsolated(obj, objs, dR=0.4):
   if dR<0:return True
   isolated=True
   for o in objs:   #Jet cross-cleaning
-    if deltaR(o, obj) < 0.3:
+    if deltaR(o, obj) < dR:
       isolated = False
       break
   return isolated
@@ -202,7 +202,8 @@ def getGoodJetsStage2(c):#, jermode=options.jermode, jesmode=options.jesmode):
           "pt" :getVarValue(c, 'jetPt', i),
           "phi":getVarValue(c, 'jetPhi', i), 
           'muef':getVarValue(c, 'jetMuef', i),
-          'btag':getVarValue(c, 'jetBTag', i)
+          'btag':getVarValue(c, 'jetBTag', i),
+          'pdg':getVarValue(c, 'jetPdg', i)
       })
   
   return res 

@@ -14,3 +14,13 @@ vetoCC_ttJetsCSA1450ns={}
 vetoCC_ttJetsCSA1450ns["name"]     = "ttJetsCSA1450ns"
 vetoCC_ttJetsCSA1450ns["bins"]     = ["ttJetsCSA1450ns"]
 vetoCC_ttJetsCSA1450ns["dirname"] = "/data/easilar/convertedTuples_v23/copyMET"
+
+noCC_ttJetsCSA1450ns={}
+noCC_ttJetsCSA1450ns["name"]     = "ttJetsCSA1450ns"
+noCC_ttJetsCSA1450ns["bins"]     = ["ttJetsCSA1450ns"]
+noCC_ttJetsCSA1450ns["dirname"] = "/data/schoef/convertedTuples_v23/copyMET_DR-1.0"
+
+DR4CC_ttJetsCSA1450ns={}
+DR4CC_ttJetsCSA1450ns["name"]     = "ttJetsCSA1450ns"
+DR4CC_ttJetsCSA1450ns["bins"]     = ["ttJetsCSA1450ns"]
+DR4CC_ttJetsCSA1450ns["dirname"] = "/data/schoef/convertedTuples_v23/copyMET_DR0.4"
