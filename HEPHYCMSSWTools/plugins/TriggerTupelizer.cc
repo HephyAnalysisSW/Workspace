@@ -94,11 +94,12 @@ void TriggerTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup) 
 //    std::cout << "HLT Results with label: " << triggerLabel_
 //              << " not found" << std::endl;
 //    }
+//  cout<<triggerCollection_.label().c_str()<<endl;
   edm::Handle<edm::TriggerResults> HLTR;
 //  edm::InputTag HLTTag = edm::InputTag(triggerLabel_, "", triggerCollection_.label().c_str());
   ev.getByLabel(triggerCollection_, HLTR);
+//  cout << "Init HLT info valid? " <<boolalpha<< HLTR.isValid()<<endl;
   if (HLTR.isValid()) {
-// cout << "Init HLT info" << endl;
     edm::TriggerNames triggerNames = ev.triggerNames(*HLTR);
     HLT_names_ = triggerNames.triggerNames();
     if (! this->hlt_initialized_ ) {
@@ -109,8 +110,6 @@ void TriggerTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup) 
       TriggerTupelizer::hlt_initialized_ = true;
     }
   }
-// bool muonTriggerUnprescaled = false;
-// bool electronTriggerUnprescaled = false;
   for (unsigned i=0; i<HLT_names_.size(); ++i){
     for (unsigned j = 0; j< triggersToMonitor_.size(); j++) {
       if (std::strstr(HLT_names_[i].c_str(), (triggersToMonitor_[j]+"_v").c_str())) {

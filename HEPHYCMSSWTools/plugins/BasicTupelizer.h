@@ -58,6 +58,7 @@ public:
   ModelParameters modelParameters_;
 
   std::vector<std::string> metsToMonitor_;
+  edm::InputTag genMetContainer_;
   bool addMSugraOSETInfo_;
   bool addPDFWeights_;
 

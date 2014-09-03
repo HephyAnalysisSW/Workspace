@@ -204,42 +204,20 @@ from RecoMET.METProducers.PFMET_cfi import pfMet
 process.pfMet = pfMet.clone(src = "packedPFCandidates")
 process.pfMet.calculateSignificance = False # this can't be easily implemented on packed PF candidates at the moment
 
-#process.load('RecoMET.Configuration.GenMETParticles_cff')
-#process.genParticlesForMETAllVisible.src=cms.InputTag("packedGenParticles")
-
-from RecoMET.Configuration.GenMETParticles_cff import genParticlesForMETAllVisible
-#process.genParticlesForMETAllVisible = genParticlesForMETAllVisible.clone(src = cms.InputTag( "packedGenParticles"))
-#from RecoMET.METProducers.genMetTrue_cfi import genMetTrue
-#process.genMetTrue = genMetTrue.clone()
-#process.metSequence = cms.Sequence(process.genParticlesForMETAllVisible * process.genMetTrue)
-
-#leptons = cms.EDProducer("PdgIdAndStatusCandViewSelector",
-#  src = cms.InputTag("genParticles"), 
-#  pdgId = cms.vint32( 11, 13 ),
-#  status = cms.vint32( )
+#from RecoMET.Configuration.GenMETParticles_cff import genParticlesForMETAllVisible
+#vList = [abs(x) for x in list(genParticlesForMETAllVisible.ignoreParticleIDs)]
+#print "status==1&("+("&".join(["abs(pdgId)!="+str(x) for x in vList]))+")"
+#process.packedGenParticlesForGenMET = cms.EDFilter(
+#    "CandViewRefSelector",
+#    src = cms.InputTag("packedGenParticles"),
+#    cut = cms.string("status==1&("+("&".join(["abs(pdgId)!="+str(x) for x in vList]))+")"),
+#    noSeqChain = cms.bool(True), # Don't "chain" these sequence and update [src]
 #)
-# PdgIdAndStatusCandViewSelector
+#from RecoMET.METProducers.genMetTrue_cfi import genMetTrue
+#process.genMetTrue = genMetTrue.clone(src = cms.InputTag('packedGenParticlesForGenMET'))
+#process.metSequence = cms.Sequence( process.packedGenParticlesForGenMET * process.genMetTrue *process.pfMet)
 
-vList = [abs(x) for x in list(genParticlesForMETAllVisible.ignoreParticleIDs)]
-print "status==1&("+("&".join(["abs(pdgId)!="+str(x) for x in vList]))+")"
-process.packedGenParticlesForGenMET = cms.EDFilter(
-    "CandViewRefSelector",
-    src = cms.InputTag("packedGenParticles"),
-    cut = cms.string("status==1&("+("&".join(["abs(pdgId)!="+str(x) for x in vList]))+")"),
-    noSeqChain = cms.bool(True), # Don't "chain" these sequence and update [src]
-)
-
-#process.packedGenParticlesForGenMET = cms.EDFilter("PdgIdCandViewExcluder",
-#    src = cms.InputTag("packedGenParticles"), 
-##    pdgId =  genParticlesForMETAllVisible.ignoreParticleIDs 
-#    pdgId = cms.vint32(vList) 
-#  )
-#
-from RecoMET.METProducers.genMetTrue_cfi import genMetTrue
-#process.genMetTrue = genMetTrue.clone(src = cms.InputTag('packedGenParticles'))
-process.genMetTrue = genMetTrue.clone(src = cms.InputTag('packedGenParticlesForGenMET'))
-
-process.metSequence = cms.Sequence( process.packedGenParticlesForGenMET * process.genMetTrue *process.pfMet)
+process.metSequence = cms.Sequence(process.pfMet)
 
 process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
 process.printTree = cms.EDAnalyzer("ParticleTreeDrawer",
@@ -309,6 +287,9 @@ process.miniAODTupelizerSequence += process.TauTupelizer
 process.load('Workspace.HEPHYCMSSWTools.TriggerTupelizer_cfi')
 process.TriggerTupelizer.useForDefaultAlias = cms.untracked.bool(True)
 process.miniAODTupelizerSequence += process.TriggerTupelizer
+process.load('Workspace.HEPHYCMSSWTools.FilterTupelizer_cfi')
+process.FilterTupelizer.useForDefaultAlias = cms.untracked.bool(True)
+process.miniAODTupelizerSequence += process.FilterTupelizer
 process.load('Workspace.HEPHYCMSSWTools.BasicTupelizer_miniAOD_cfi')
 process.BasicTupelizer.useForDefaultAlias = cms.untracked.bool(True)
 process.BasicTupelizer.addMSugraOSETInfo = cms.untracked.bool(options.mode.lower()=='sms')

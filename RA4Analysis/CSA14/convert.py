@@ -4,10 +4,8 @@ from PhysicsTools.PythonAnalysis import *
 from math import *
 import sys, os, copy, random, subprocess, datetime
 #from helpers import getVarValue, deltaPhi, minAbsDeltaPhi,  deltaR, invMass,
-from Workspace.HEPHYPythonTools.helpers import getVarValue, deltaPhi, minAbsDeltaPhi, invMassOfLightObjects, deltaR, closestMuJetDeltaR, invMass,  findClosestObjectDR
+from Workspace.HEPHYPythonTools.helpers import getVarValue, deltaPhi, minAbsDeltaPhi, invMassOfLightObjects, deltaR, closestMuJetDeltaR, invMass,  findClosestObjectDR, getFileList
 from objectSelection import getLooseEleStage1,getAllElectronsStage1, tightPOGEleID, vetoEleID, getLooseMuStage1, getAllMuonsStage1, tightPOGMuID, vetoMuID, getAllTausStage1, getTauStage1, hybridMuID, getGoodJetsStage1, isIsolated
-
-monthConv = {'Jan':1, 'Feb':2,'Mar':3,'Apr':4,"May":5, "Jun":6,"Jul":7,"Aug":8, "Sep":9, "Oct":10, "Nov":11, "Dec":12}
 
 from stage1Tuples import *
 
@@ -54,48 +52,15 @@ for sample in allSamples:
   sample['weight'] = {}
   for bin in sample['bins']:
     print "Looping over subdir",bin['dir']
-    prefix = ""
-    if bin['dir'][0:5] != "/dpm/":
-      filelist = os.listdir(bin['dir'])
-    else:
-      filelist = []
-      p = subprocess.Popen(["dpns-ls -l "+ bin['dir']], shell = True , stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-      for line in p.stdout.readlines():
-        if not line.count('histo'):continue
-        line=line[:-1]
-        sline = line.split()
-        fname = sline[-1]
-        size = sline[4]
-        if int(size)!=0:
-          month, day = sline[5:7]
-          hour, minute = sline[7].split(':')
-          age = (datetime.datetime.now() - datetime.datetime(2014, monthConv[month], int(day), int(hour), int(minute))).total_seconds()/3600
-          if age>=12:
-            filelist.append(fname)
-          else:
-            print "Omitting",fname,'too young:',str(age)+'h'
-
-        else:
-          print "Omitting file", fname, 'with size', size
-      prefix = "root://hephyse.oeaw.ac.at/"#+subdirname
+    filelist = getFileList(bin['dir'], minAgeDPM=12, histname='histo', xrootPrefix='root://hephyse.oeaw.ac.at/')
     if options.small: filelist = filelist[:1]
     bin['filenames'] = []
     for tfile in filelist:
-      bin['filenames'].append(bin['dir']+'/'+tfile)
+      bin['filenames'] = filelist
 
     c = ROOT.TChain('Events')
-    for tfile in bin['filenames']:
-      c.Add(prefix+tfile)
-#      print "Testing",prefix+tfile
-#      d = ROOT.TChain('Events')
-#      d.Add(prefix+tfile)
-#      nev = d.GetEntries()
-#      print "Found",nev,'events'
-#      if nev>0:
-#        d.GetEntry(0)
-#      print "-->Not yet segfaulted"
-#      del d
-      
+    for f in bin['filenames']:
+      c.Add(f)
     nevents= c.GetEntries()
     del c
     if bin['dbsName'] and  bin['dbsName'].lower().count('run'):
@@ -140,7 +105,7 @@ for isample, sample in enumerate(allSamples):
   extraVariables = ["ngoodMuons","nvetoMuons",'nHybridLooseMuons','nHybridMediumMuons', 'nHybridTightMuons','nvetoLeptons',"ngoodElectrons","nvetoElectrons","ngoodTaus","met","metphi","ht"] 
   extraVariables += ["leptonPt", 'leptonEta', 'leptonPhi', 'leptonPdg', 'singleMuonic', 'singleElectronic', 'singleLeptonic']
   extraVariables += ['pfMet', 'pfMetphi','genMet', 'genMetphi']
-  jetvars = ["jetPt", "jetEta", "jetPhi", "jetPdg", "jetBTag", "jetChef", "jetNhef", "jetCeef", "jetNeef", "jetHFhef", "jetHFeef", "jetMuef", "jetElef", "jetPhef", "jetUnc"]#, "jetCutBasedPUJetIDFlag","jetFull53XPUJetIDFlag","jetMET53XPUJetIDFlag"
+  jetvars = ["jetPt", "jetEta", "jetPhi", "jetPdg", "jetBTag", "jetChef", "jetNhef", "jetCeef", "jetNeef", "jetHFhef", "jetHFeef", "jetMuef", "jetElef", "jetPhef", "jetUnc", 'jetId']#, "jetCutBasedPUJetIDFlag","jetFull53XPUJetIDFlag","jetMET53XPUJetIDFlag"
   muvars = ["muPt", "muEta", "muPhi", "muPdg", "muRelIso", "muDxy", "muDz", "muNormChi2", "muNValMuonHits", "muNumMatchedStations", "muPixelHits", "muNumtrackerLayerWithMeasurement", 'muIsGlobal', 'muIsTracker','muIsPF', "muIso03sumChargedHadronPt", "muIso03sumNeutralHadronEt", "muIso03sumPhotonEt", "muIso03sumPUChargedHadronPt"] 
   elvars = ["elePt", "eleEta", "elePhi", "elePdg", "eleRelIso", "eleDxy", "eleDz", "eleOneOverEMinusOneOverP", "elePfRelIso", "eleSigmaIEtaIEta", "eleHoE", "eleDPhi", "eleDEta", "eleMissingHits", "elePassPATConversionVeto"]
   tavars = ["tauPt", "tauEta", "tauPhi", "tauPdg", 'tauJetInd', 'tauJetDR']
@@ -261,12 +226,9 @@ for isample, sample in enumerate(allSamples):
       commoncf = "slimmedMETs>=100"
     if options.chmode[:7] == "copyInc":
       commoncf = "(1)"
-    c = ROOT.TChain(sample["Chain"])
-    for thisfile in bin["filenames"]:
-      prefix = ""
-      if thisfile[0:5] == "/dpm/":
-        prefix = "root://hephyse.oeaw.ac.at/"#+subdirname
-      c.Add(prefix+thisfile)
+    c = ROOT.TChain('Events')
+    for f in bin['filenames']:
+      c.Add(f)
     ntot = c.GetEntries()
 
     pfMetLabel = ("pfMet")
@@ -285,7 +247,7 @@ for isample, sample in enumerate(allSamples):
 
     mclist = []
     for thisfile in bin["filenames"]:
-      mclist.append(prefix+thisfile)
+      mclist.append(thisfile)
     events = Events(mclist)
     events.toBegin()
   
@@ -546,6 +508,7 @@ for isample, sample in enumerate(allSamples):
             s.jetMuef[i]  = idJets30[i]['muef']
             s.jetElef[i]  = idJets30[i]['elef']
             s.jetPhef[i]  = idJets30[i]['phef']
+            s.jetId[i]    = idJets30[i]['id']
 #            s.jetCutBasedPUJetIDFlag[i] = idJets30[i]['jetCutBasedPUJetIDFlag']
 #            s.jetFull53XPUJetIDFlag[i]  = idJets30[i]['jetFull53XPUJetIDFlag']
 #            s.jetMET53XPUJetIDFlag[i]   = idJets30[i]['jetMET53XPUJetIDFlag']

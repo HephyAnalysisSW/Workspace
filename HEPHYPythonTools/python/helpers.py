@@ -2,8 +2,35 @@ import ROOT
 from math import pi, sqrt, cos, sin, sinh
 from array import array
 
+
 def test():
   return 1
+
+def getFileList(dir, minAgeDPM=0, histname='histo', xrootPrefix='root://hephyse.oeaw.ac.at/'):
+  monthConv = {'Jan':1, 'Feb':2,'Mar':3,'Apr':4,"May":5, "Jun":6,"Jul":7,"Aug":8, "Sep":9, "Oct":10, "Nov":11, "Dec":12}
+  import os, subprocess, datetime
+  if dir[0:5] != "/dpm/":
+    filelist = os.listdir(dir)
+    filelist = [dir+'/'+f for f in filelist]
+  else:
+    filelist = []
+    p = subprocess.Popen(["dpns-ls -l "+ dir], shell = True , stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    for line in p.stdout.readlines():
+      if not line.count(histname):continue
+      line=line[:-1]
+      sline = line.split()
+      fname = sline[-1]
+      size = sline[4]
+      if int(size)!=0:
+        month, day = sline[5:7]
+        hour, minute = sline[7].split(':')
+        age = (datetime.datetime.now() - datetime.datetime(2014, monthConv[month], int(day), int(hour), int(minute))).total_seconds()/3600
+        if age>=minAgeDPM:
+          filelist.append(fname)
+        else:
+          print "Omitting",fname,'too young:',str(age)+'h'
+    filelist = [xrootPrefix+dir+'/'+f for f in filelist]
+  return filelist
 
 def getObjFromFile(fname, hname):
   f = ROOT.TFile(fname)
