@@ -8,6 +8,8 @@ from datetime import datetime
 from Workspace.HEPHYPythonTools.helpers import getVarValue, deltaPhi, minAbsDeltaPhi, invMassOfLightObjects, deltaR, closestMuJetDeltaR, invMass,  findClosestJet
 from monoJetFuncs import softIsolatedMT, pmuboost3d
 
+debug = False
+
 from Workspace.HEPHYPythonTools.btagEff import getMCEff, getTagWeightDict, getSF, partonName 
 maxConsideredBTagWeight = 3 
 
@@ -85,6 +87,10 @@ from Workspace.HEPHYPythonTools.xsec import xsec
 
 subDir = "monoJetTuples_v8"
 
+if debug:
+  options.allsamples='sms'
+  options.smsMsqRangeString='300-325'
+  options.small=True
 
 if options.smsMsqRangeString!='None' and options.allsamples.lower()=='sms':
   from Workspace.HEPHYPythonTools.xsecSMS import stop8TeV_NLONLL
@@ -113,6 +119,7 @@ if options.smsMsqRangeString!='None' and options.allsamples.lower()=='sms':
       continue
 
     for deltaM in range(0,110,10):
+      if debug and not deltaM==40:continue
 #    for deltaM in [100]:
       T2DegStop = {}  
       T2DegStop={}
@@ -441,6 +448,7 @@ for sample in allSamples:
         filelist = []
         p = subprocess.Popen(["dpns-ls "+ subdirname], shell = True , stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         for line in p.stdout.readlines():
+          if debug and not line.count('histo_875_1_yFe'):continue
           filelist.append(line[:-1])
 #        allFiles = os.popen("rfdir %s | awk '{print $9}'" % (subdirname))
 #        for file in allFiles.readlines():
@@ -662,6 +670,8 @@ for isample, sample in enumerate(allSamples):
       commoncf = "ngoodMuons==1"
     if options.chmode[:8] == "copyDiMu":
       commoncf = "ngoodMuons>1"
+    if debug:
+      commoncf='event==127625&&run==1&&lumi==331277'
     #  storeVectors = False
     if type(bin_) == type([]):
       bin = bin_[0]
@@ -956,6 +966,9 @@ for isample, sample in enumerate(allSamples):
               zeroTagWeight = 1.
               bjetSCandidates=filter(lambda j:abs(j['eta'])<2.4 and j['pt']<60, idJets30)
               bjetHCandidates=filter(lambda j:abs(j['eta'])<2.4 and j['pt']>=60, idJets30)
+              if debug: 
+                print 'bjetSCandidates', bjetSCandidates
+                print 'bjetHCandidates', bjetHCandidates
               mcSeff = getMCEfficiencyForBTagSF(bjetSCandidates, sample['isFastSim'])
               mcSeffW                = getTagWeightDict(mcSeff["mceffs"], maxConsideredBTagWeight)
               mcSeffW_SF             = getTagWeightDict(mcSeff["mceffs_SF"], maxConsideredBTagWeight)

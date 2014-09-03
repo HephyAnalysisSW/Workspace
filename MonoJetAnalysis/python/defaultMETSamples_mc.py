@@ -323,57 +323,57 @@ ttw['reweightingHistoFileSysPlus'] = S10rwPlusHisto
 ttw['reweightingHistoFileSysMinus'] = S10rwMinusHisto
 
 
-#stop200lsp170g100FastSim = copy.deepcopy(mc)
-#stop200lsp170g100FastSim["dirname"] = "/data/schoef/monoJetSignals/SUSYTupelizer/FastSim"
-#stop200lsp170g100FastSim["bins"] = ["8TeV-stop200lsp170g100"]
-#stop200lsp170g100FastSim["name"] = "stop200lsp170g100FastSim"
-#
-#stop300lsp240g150FastSim = copy.deepcopy(mc)
-#stop300lsp240g150FastSim["dirname"] = "/data/schoef/monoJetSignals/SUSYTupelizer/FastSim"
-#stop300lsp240g150FastSim["bins"] = ["8TeV-stop300lsp240g150"]
-#stop300lsp240g150FastSim["name"] = "stop300lsp240g150FastSim"
-#
-#stop300lsp270g175FastSim = copy.deepcopy(mc)
-#stop300lsp270g175FastSim["dirname"] = "/data/schoef/monoJetSignals/SUSYTupelizer/FastSim"
-#stop300lsp270g175FastSim["bins"] = ["8TeV-stop300lsp270g175"]
-#stop300lsp270g175FastSim["name"] = "stop300lsp270g175FastSim"
-#
-#stop300lsp270FastSim = copy.deepcopy(mc)
-#stop300lsp270FastSim["dirname"] = "/data/schoef/monoJetSignals/SUSYTupelizer/FastSim"
-#stop300lsp270FastSim["bins"] = ["8TeV-stop300lsp270"]
-#stop300lsp270FastSim["name"] = "stop300lsp270FastSim"
-#
-#stop300lsp270g200FastSim = copy.deepcopy(mc)
-#stop300lsp270g200FastSim["dirname"] = "/data/schoef/monoJetSignals/SUSYTupelizer/FastSim"
-#stop300lsp270g200FastSim["bins"] = ["8TeV-stop300lsp270g200"]
-#stop300lsp270g200FastSim["name"] = "stop300lsp270g200FastSim"
-#
-#stop200lsp170g100FullSim = copy.deepcopy(mc)
-#stop200lsp170g100FullSim["dirname"] = "/data/schoef/monoJetSignals/SUSYTupelizer/FullSim"
-#stop200lsp170g100FullSim["bins"] = ["8TeV-stop200lsp170g100"]
-#stop200lsp170g100FullSim["name"] = "stop200lsp170g100FullSim"
-#
-#stop300lsp240g150FullSim = copy.deepcopy(mc)
-#stop300lsp240g150FullSim["dirname"] = "/data/schoef/monoJetSignals/SUSYTupelizer/FullSim"
-#stop300lsp240g150FullSim["bins"] = ["8TeV-stop300lsp240g150"]
-#stop300lsp240g150FullSim["name"] = "stop300lsp240g150FullSim"
-#
-#stop300lsp270g175FullSim = copy.deepcopy(mc)
-#stop300lsp270g175FullSim["dirname"] = "/data/schoef/monoJetSignals/SUSYTupelizer/FullSim"
-#stop300lsp270g175FullSim["bins"] = ["8TeV-stop300lsp270g175"]
-#stop300lsp270g175FullSim["name"] = "stop300lsp270g175FullSim"
-#
-#stop300lsp270FullSim = copy.deepcopy(mc)
-#stop300lsp270FullSim["dirname"] = "/data/schoef/monoJetSignals/SUSYTupelizer/FullSim"
-#stop300lsp270FullSim["bins"] = ["8TeV-stop300lsp270"]
-#stop300lsp270FullSim["name"] = "stop300lsp270FullSim"
-#
-#stop300lsp270g200FullSim = copy.deepcopy(mc)
-#stop300lsp270g200FullSim["dirname"] = "/data/schoef/monoJetSignals/SUSYTupelizer/FullSim"
-#stop300lsp270g200FullSim["bins"] = ["8TeV-stop300lsp270g200"]
-#stop300lsp270g200FullSim["name"] = "stop300lsp270g200FullSim"
-#
-#for s in [stop200lsp170g100FastSim, stop300lsp240g150FastSim, stop300lsp270g175FastSim, stop300lsp270FastSim, stop300lsp270g200FastSim, stop200lsp170g100FullSim, stop300lsp240g150FullSim, stop300lsp270g175FullSim, stop300lsp270FullSim, stop300lsp270g200FullSim]:
-#  s['reweightingHistoFile'] = S10rwHisto
-#  s['reweightingHistoFileSysPlus'] = S10rwPlusHisto
-#  s['reweightingHistoFileSysMinus'] = S10rwMinusHisto
+stop200lsp170g100FastSim = copy.deepcopy(mc)
+stop200lsp170g100FastSim["dirname"] = "/data/schoef/monoJetSignals/SUSYTupelizer/FastSim"
+stop200lsp170g100FastSim["bins"] = ["8TeV-stop200lsp170g100"]
+stop200lsp170g100FastSim["name"] = "stop200lsp170g100FastSim"
+
+stop300lsp240g150FastSim = copy.deepcopy(mc)
+stop300lsp240g150FastSim["dirname"] = "/data/schoef/monoJetSignals/SUSYTupelizer/FastSim"
+stop300lsp240g150FastSim["bins"] = ["8TeV-stop300lsp240g150"]
+stop300lsp240g150FastSim["name"] = "stop300lsp240g150FastSim"
+
+stop300lsp270g175FastSim = copy.deepcopy(mc)
+stop300lsp270g175FastSim["dirname"] = "/data/schoef/monoJetSignals/SUSYTupelizer/FastSim"
+stop300lsp270g175FastSim["bins"] = ["8TeV-stop300lsp270g175"]
+stop300lsp270g175FastSim["name"] = "stop300lsp270g175FastSim"
+
+stop300lsp270FastSim = copy.deepcopy(mc)
+stop300lsp270FastSim["dirname"] = "/data/schoef/monoJetSignals/SUSYTupelizer/FastSim"
+stop300lsp270FastSim["bins"] = ["8TeV-stop300lsp270"]
+stop300lsp270FastSim["name"] = "stop300lsp270FastSim"
+
+stop300lsp270g200FastSim = copy.deepcopy(mc)
+stop300lsp270g200FastSim["dirname"] = "/data/schoef/monoJetSignals/SUSYTupelizer/FastSim"
+stop300lsp270g200FastSim["bins"] = ["8TeV-stop300lsp270g200"]
+stop300lsp270g200FastSim["name"] = "stop300lsp270g200FastSim"
+
+stop200lsp170g100FullSim = copy.deepcopy(mc)
+stop200lsp170g100FullSim["dirname"] = "/data/schoef/monoJetSignals/SUSYTupelizer/FullSim"
+stop200lsp170g100FullSim["bins"] = ["8TeV-stop200lsp170g100"]
+stop200lsp170g100FullSim["name"] = "stop200lsp170g100FullSim"
+
+stop300lsp240g150FullSim = copy.deepcopy(mc)
+stop300lsp240g150FullSim["dirname"] = "/data/schoef/monoJetSignals/SUSYTupelizer/FullSim"
+stop300lsp240g150FullSim["bins"] = ["8TeV-stop300lsp240g150"]
+stop300lsp240g150FullSim["name"] = "stop300lsp240g150FullSim"
+
+stop300lsp270g175FullSim = copy.deepcopy(mc)
+stop300lsp270g175FullSim["dirname"] = "/data/schoef/monoJetSignals/SUSYTupelizer/FullSim"
+stop300lsp270g175FullSim["bins"] = ["8TeV-stop300lsp270g175"]
+stop300lsp270g175FullSim["name"] = "stop300lsp270g175FullSim"
+
+stop300lsp270FullSim = copy.deepcopy(mc)
+stop300lsp270FullSim["dirname"] = "/data/schoef/monoJetSignals/SUSYTupelizer/FullSim"
+stop300lsp270FullSim["bins"] = ["8TeV-stop300lsp270"]
+stop300lsp270FullSim["name"] = "stop300lsp270FullSim"
+
+stop300lsp270g200FullSim = copy.deepcopy(mc)
+stop300lsp270g200FullSim["dirname"] = "/data/schoef/monoJetSignals/SUSYTupelizer/FullSim"
+stop300lsp270g200FullSim["bins"] = ["8TeV-stop300lsp270g200"]
+stop300lsp270g200FullSim["name"] = "stop300lsp270g200FullSim"
+
+for s in [stop200lsp170g100FastSim, stop300lsp240g150FastSim, stop300lsp270g175FastSim, stop300lsp270FastSim, stop300lsp270g200FastSim, stop200lsp170g100FullSim, stop300lsp240g150FullSim, stop300lsp270g175FullSim, stop300lsp270FullSim, stop300lsp270g200FullSim]:
+  s['reweightingHistoFile'] = S10rwHisto
+  s['reweightingHistoFileSysPlus'] = S10rwPlusHisto
+  s['reweightingHistoFileSysMinus'] = S10rwMinusHisto
