@@ -2,8 +2,8 @@
 #include "Workspace/HEPHYCMSSWTools/plugins/ElectronTupelizer.h"
 #include "Workspace/HEPHYCMSSWTools/interface/EdmHelper.h"
 #include "Workspace/HEPHYCMSSWTools/interface/ElectronEffectiveArea.h"
-//#include "PhysicsTools/PatAlgos/plugins/PATElectronProducer.h"
 #include "RecoEgamma/EgammaTools/interface/ConversionTools.h"
+#include "DataFormats/TrackReco/interface/HitPattern.h"
 
 using namespace std;
 
@@ -126,7 +126,8 @@ void ElectronTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup)
     if (!ele->gsfTrack().isNull()){
       dxy = fabs(ele->gsfTrack()->dxy(vertexPosition));
       dz = fabs(ele->gsfTrack()->dz(vertexPosition));
-      missingHits = ele->gsfTrack()->trackerExpectedHitsInner().numberOfHits();
+//      missingHits = ele->gsfTrack()->trackerExpectedHitsInner().numberOfHits();
+      missingHits = ele->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS);
     }
 
     edm::Ptr< reco::GsfElectron > gsfel = (edm::Ptr< reco::GsfElectron >) ele->originalObjectRef();

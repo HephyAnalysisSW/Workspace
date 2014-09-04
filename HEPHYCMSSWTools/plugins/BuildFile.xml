@@ -24,9 +24,6 @@
 <use   name="RecoEgamma/EgammaTools"/>
 <use   name="MagneticField/Engine"/>
 <use   name="Workspace/HEPHYCMSSWTools"/>
-<library   file="SUSYTupelizer.cc" name="SUSYTupelizer">
-  <flags   EDM_PLUGIN="1"/>
-</library>
 <library   file="JetTupelizer.cc" name="JetTupelizer">
   <flags   EDM_PLUGIN="1"/>
 </library>
