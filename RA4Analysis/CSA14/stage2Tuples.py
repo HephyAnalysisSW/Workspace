@@ -1,5 +1,4 @@
 import copy, os, sys
-
 ttJetsCSA1425ns={}
 ttJetsCSA1425ns["name"]     = "ttJetsCSA1425ns"
 ttJetsCSA1425ns["bins"]     = ["ttJetsCSA1425ns"]

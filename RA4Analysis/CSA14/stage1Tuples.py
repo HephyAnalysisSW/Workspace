@@ -1,7 +1,14 @@
 import copy, os, sys
 
+
+debug={}
+debug["name"]     = "debug"
+debug["Chain"]     = "Events"
+debug["bins"] = [{'dir':"/afs/hephy.at/scratch/s/schoefbeck/CMS/CMSSW_7_0_6_patch1/src/Workspace/HEPHYPythonTools/crab/pickEvents/miniAOD/",'dbsName':None}]
+
+
 ttJetsCSA1425ns={}
-ttJetsCSA1425ns["name"]     = "ttJetsCSA1425ns";
+ttJetsCSA1425ns["name"]     = "ttJetsCSA1425ns"
 ttJetsCSA1425ns["Chain"] = "Events"
 #ttJetsCSA1425ns['reweightingHistoFile'] = S10rwHisto 
 #ttJetsCSA1425ns['reweightingHistoFileSysPlus'] = S10rwPlusHisto
@@ -10,7 +17,7 @@ ttJetsCSA1425ns["bins"] = [{'dir':"/data/schoef/stage1CSA14/TTJets_MSDecaysCKM_c
                         'dbsName':'/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/Spring14miniaod-PU20bx25_POSTLS170_V5-v1/MINIAODSIM'}]
 
 ttJetsCSA1450ns={}
-ttJetsCSA1450ns["name"]     = "ttJetsCSA1450ns";
+ttJetsCSA1450ns["name"]     = "ttJetsCSA1450ns"
 ttJetsCSA1450ns["Chain"] = "Events"
 #ttJetsCSA1450ns['reweightingHistoFile'] = S10rwHisto 
 #ttJetsCSA1450ns['reweightingHistoFileSysPlus'] = S10rwPlusHisto
@@ -19,19 +26,19 @@ ttJetsCSA1450ns["bins"] = [{'dir':"/dpm/oeaw.ac.at/home/cms/store/user/schoef/TT
                         'dbsName':'/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/Spring14miniaod-PU_S14_POSTLS170_V6-v1/MINIAODSIM'}]
 
 ece_ttJetsCSA1450ns={}
-ece_ttJetsCSA1450ns["name"]     = "ttJetsCSA1450ns";
+ece_ttJetsCSA1450ns["name"]     = "ttJetsCSA1450ns"
 ece_ttJetsCSA1450ns["Chain"] = "Events"
 ece_ttJetsCSA1450ns["bins"] = [{'dir':"/dpm/oeaw.ac.at/home/cms/store/user/easilar/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/crab_TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola_Spring14miniaod-PU_S14_POSTLS170_V6-v1_MINIAODSIM/140814_095845/0000", 
                         'dbsName':'/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/Spring14miniaod-PU_S14_POSTLS170_V6-v1/MINIAODSIM'}]
 
 WJetsToLNu25ns={}
-WJetsToLNu25ns["name"]   = "WJetsToLNu25ns";
+WJetsToLNu25ns["name"]   = "WJetsToLNu25ns"
 WJetsToLNu25ns["Chain"] = "Events"
 WJetsToLNu25ns["bins"] = [{'dir':"/dpm/oeaw.ac.at/home/cms/store/user/easilar/WJetsToLNu_13TeV-madgraph-pythia8-tauola/crab_WJetsToLNu_13TeV-madgraph-pythia8-tauola_Spring14miniaod-PU20bx25_POSTLS170_V5-v1_MINIAODSIM/140814_112652/0000",
                        'dbsName':'/WJetsToLNu_13TeV-madgraph-pythia8-tauola/Spring14miniaod-PU20bx25_POSTLS170_V5-v1/MINIAODSIM'}] 
 
 WJetsHTToLNu={}
-WJetsHTToLNu["name"]   = "WJetsHTToLNu";
+WJetsHTToLNu["name"]   = "WJetsHTToLNu"
 WJetsHTToLNu["Chain"] = "Events"
 WJetsHTToLNu["bins"] = [
                         {'dir':"/dpm/oeaw.ac.at/home/cms/store/user/schoef/pat_310814/WJetsToLNu_HT-100to200_Tune4C_13TeV-madgraph-tauola/schoef-WJetsToLNu_HT-100to200_Tune4C_13TeV-madgraph-tauola_Spring14dr-PU_S14_POSTLS170_V6-v1",
@@ -46,13 +53,13 @@ WJetsHTToLNu["bins"] = [
 
 
 #testSample={}
-#testSample["name"]     = "ttJets";
+#testSample["name"]     = "ttJets"
 #testSample["dirname"] = "/data/schoef/stage1CSA14"
 #testSample["Chain"] = "Events"
 #testSample["bins"] = ["testBin"]
 
 testSample={}
-testSample["name"]     = "tmp";
+testSample["name"]     = "tmp"
 testSample["dirname"] = "/afs/hephy.at/scratch/s/schoefbeck/CMS/CMSSW_7_0_6_patch1/src/Workspace/"
 testSample["Chain"] = "Events"
 testSample["bins"] = [{'dir':'/afs/hephy.at/scratch/s/schoefbeck/CMS/CMSSW_7_0_6_patch1/src/Workspace/tmp','dbsName':None}]
@@ -66,7 +73,7 @@ testSample["bins"] = [{'dir':'/afs/hephy.at/scratch/s/schoefbeck/CMS/CMSSW_7_0_6
 #S10rwMinusHisto = getPUReweightingUncertainty("S10", dataFile = "/data/schoef/tools/PU/MyDataPileupHistogram_Run2012ABCD_60max_true_pixelcorr_SysMinus5.root")
 
 #data={}
-#data["name"]     = "data";
+#data["name"]     = "data"
 #data["dirname"] = "/dpm/oeaw.ac.at/home/cms/store/user/schoef/pat_240614/"
 #data['newMETCollection'] = True
 #data["bins"]    = ["MET-Run2012A-22Jan2013-3", "MET-Run2012B-22Jan2013", "MET-Run2012C-22Jan2013", "MET-Run2012D-22Jan2013"]
@@ -75,7 +82,7 @@ testSample["bins"] = [{'dir':'/afs/hephy.at/scratch/s/schoefbeck/CMS/CMSSW_7_0_6
 #allSamples.append(data)
 #
 #dataSingleMu={}
-#dataSingleMu["name"]     = "data";
+#dataSingleMu["name"]     = "data"
 #dataSingleMu['newMETCollection'] = True
 #dataSingleMu["dirname"] = "/dpm/oeaw.ac.at/home/cms/store/user/schoef/pat_240614/"
 #dataSingleMu["bins"]    = ["SingleMu-Run2012A-22Jan2013", "SingleMu-Run2012B-22Jan2013", "SingleMu-Run2012C-22Jan2013", "SingleMu-Run2012D-22Jan2013"]
@@ -84,7 +91,7 @@ testSample["bins"] = [{'dir':'/afs/hephy.at/scratch/s/schoefbeck/CMS/CMSSW_7_0_6
 #allSamples.append(dataSingleMu)
 #
 #mc={}
-#mc["name"]     = "mc";
+#mc["name"]     = "mc"
 #mc["dirname"] = "/dpm/oeaw.ac.at/home/cms/store/user/schoef/pat_240614"
 #mc['newMETCollection'] = True
 #mc["Chain"] = "Events"

@@ -12,7 +12,7 @@ from stage1Tuples import *
 from Workspace.HEPHYPythonTools.xsec import xsec
 
 subDir = "convertedTuples_v23"
-
+newGenMet = True
 overwrite = True
 target_lumi = 2000 #pb-1
 
@@ -74,7 +74,7 @@ for sample in allSamples:
         else:
           print "Warning! Sample ",sample['name'], 'bin',bin, 'has no dbsName! -> Use weight 1.'
           weight=1
-          bin['xsec']=None
+          bin['xsec']=float('nan')
       else:
         weight=0
       print 'Sample', sample['name'], 'bin', bin['dbsName'], 'nevents:',nevents,'xsec',bin['xsec'], 'n-events',nevents,'weight',weight
@@ -104,7 +104,7 @@ for isample, sample in enumerate(allSamples):
     variables.extend(["nTrueGenVertices"])#, "puWeight", "puWeightSysPlus", "puWeightSysMinus"])
   extraVariables = ["ngoodMuons","nvetoMuons",'nHybridLooseMuons','nHybridMediumMuons', 'nHybridTightMuons','nvetoLeptons',"ngoodElectrons","nvetoElectrons","ngoodTaus","met","metphi","ht"] 
   extraVariables += ["leptonPt", 'leptonEta', 'leptonPhi', 'leptonPdg', 'singleMuonic', 'singleElectronic', 'singleLeptonic']
-  extraVariables += ['pfMet', 'pfMetphi','genMet', 'genMetphi']
+  extraVariables += ['pfMet', 'pfMetphi','genMet', 'genMetPhi']
   jetvars = ["jetPt", "jetEta", "jetPhi", "jetPdg", "jetBTag", "jetChef", "jetNhef", "jetCeef", "jetNeef", "jetHFhef", "jetHFeef", "jetMuef", "jetElef", "jetPhef", "jetUnc", 'jetId']#, "jetCutBasedPUJetIDFlag","jetFull53XPUJetIDFlag","jetMET53XPUJetIDFlag"
   muvars = ["muPt", "muEta", "muPhi", "muPdg", "muRelIso", "muDxy", "muDz", "muNormChi2", "muNValMuonHits", "muNumMatchedStations", "muPixelHits", "muNumtrackerLayerWithMeasurement", 'muIsGlobal', 'muIsTracker','muIsPF', "muIso03sumChargedHadronPt", "muIso03sumNeutralHadronEt", "muIso03sumPhotonEt", "muIso03sumPUChargedHadronPt"] 
   elvars = ["elePt", "eleEta", "elePhi", "elePdg", "eleRelIso", "eleDxy", "eleDz", "eleOneOverEMinusOneOverP", "elePfRelIso", "eleSigmaIEtaIEta", "eleHoE", "eleDPhi", "eleDEta", "eleMissingHits", "elePassPATConversionVeto"]
@@ -234,8 +234,9 @@ for isample, sample in enumerate(allSamples):
     pfMetLabel = ("pfMet")
     pfMetHandle = Handle("vector<reco::PFMET>")
 
-    genMetLabel = ("genMetTrue")
-    genMetHandle = Handle("vector<reco::GenMET>")
+    if not newGenMet:
+      genMetLabel = ("genMetTrue")
+      genMetHandle = Handle("vector<reco::GenMET>")
 
 #    gpLabel = ("packedGenParticles")
 #    gpHandle = Handle("vector<pat::PackedGenParticle>")
@@ -295,10 +296,14 @@ for isample, sample in enumerate(allSamples):
           for var in extraVariables:
             exec("s."+var+"=float('nan')")
 
-          events.getByLabel(genMetLabel,genMetHandle)
-          genMet =genMetHandle.product()
-          s.genMet = genMet[0].pt()
-          s.genMetphi = genMet[0].phi()
+          if not newGenMet:
+            events.getByLabel(genMetLabel,genMetHandle)
+            genMet =genMetHandle.product()
+            s.genMet = genMet[0].pt()
+            s.genMetPhi = genMet[0].phi()
+          else:
+            s.genMet = getVarValue(c, 'genMet')
+            s.genMetPhi = getVarValue(c, 'genMetPhi')
           events.getByLabel(pfMetLabel,pfMetHandle)
           pfMet =pfMetHandle.product()
           s.pfMet = pfMet[0].pt()
@@ -464,6 +469,9 @@ for isample, sample in enumerate(allSamples):
           pfc = list(pfcH)
           isoCands = [{'c':cand,'iso':0.} for cand in filter(lambda c:c.pt()>10 and c.fromPV()==c.PVTight and abs(c.pdgId()) in [11, 13, 211], pfc)]
           for p in pfc:
+            if debug:
+              if p.pt()>100:
+                print s.event, p.pt(), p.pdgId() 
             phi=p.phi()
             eta=p.eta()
             for ic in isoCands:
