@@ -110,7 +110,12 @@ void JetTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup) {
       jetsHFEMEnergyFraction.push_back(jet.HFEMEnergyFraction());
     }
     
-    if ((verbose_) and (jet.pt() > ptThreshold_)) cout<<"[jet "<<i<<"] "<<" pt "<<jet.pt()<<" eta "<<jet.eta()<<" phi "<<jet.phi()<<boolalpha<<" jetID? "<<jetID<<endl;//" jetID+pt+eta cut?"<< jet_is_good <<endl;//" passes Ele c.c? "<<jetPassesEleCleaning<<" passes Mu c.c? "<<jetPassesMuCleaning<<endl;
+    if ((verbose_) and (jet.pt() > ptThreshold_)) {
+        cout<<"[jet "<<i<<"] "<<" pt (uncorr) "<<jet.pt()<<" "<<jet.correctedJet("Uncorrected").pt()<<" eta "<<jet.eta()<<" phi "<<jet.phi()<<boolalpha<<" jetID? "<<jetID<<endl;//" jetID+pt+eta cut?"<< jet_is_good <<endl;//" passes Ele c.c? "<<jetPassesEleCleaning<<" passes Mu c.c? "<<jetPassesMuCleaning<<endl;
+        cout<<"CHEF "<<jet.chargedHadronEnergyFraction()<<" NHEF "<<jet.neutralHadronEnergyFraction()<<" ChEmEF "<<jet.chargedEmEnergyFraction()<<" NEmEF "<<jet.neutralEmEnergyFraction()<<" PhEF "<<jet.photonEnergyFraction()<<" ElEF "<<jet.electronEnergyFraction()<<" MuEF "<<jet.muonEnergyFraction()<<endl;
+        cout<<"HFHadEF "<<jet.HFHadronEnergyFraction()<<" HFEmEF "<<jet.HFEMEnergyFraction()<<endl;
+
+    }
     jecUnc->setJetEta(jet.eta());
     jecUnc->setJetPt(jet.pt()); // here you must use the CORRECTED jet pt
     double unc = (jet.pt() > 10. && fabs(jet.eta()<5)) ? jecUnc->getUncertainty(true) : 0.1;

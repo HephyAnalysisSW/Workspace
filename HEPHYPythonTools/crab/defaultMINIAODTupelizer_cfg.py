@@ -272,28 +272,35 @@ process.printTree = cms.EDAnalyzer("ParticleTreeDrawer",
 #process.p+=process.kt6PFJetsForIsolation2011
 
 process.miniAODTupelizerSequence = cms.Sequence()
+process.load('Workspace.HEPHYCMSSWTools.BasicTupelizer_miniAOD_cfi')
+process.BasicTupelizer.useForDefaultAlias = cms.untracked.bool(True)
+process.BasicTupelizer.addMSugraOSETInfo = cms.untracked.bool(options.mode.lower()=='sms')
+process.BasicTupelizer.verbose = cms.untracked.bool(options.verbose)
+process.miniAODTupelizerSequence += process.BasicTupelizer
 process.load('Workspace.HEPHYCMSSWTools.JetTupelizer_miniAOD_cfi')
 process.JetTupelizer.useForDefaultAlias = cms.untracked.bool(True)
+process.JetTupelizer.verbose = cms.untracked.bool(options.verbose)
 process.miniAODTupelizerSequence += process.JetTupelizer
 process.load('Workspace.HEPHYCMSSWTools.MuonTupelizer_miniAOD_cfi')
 process.MuonTupelizer.useForDefaultAlias = cms.untracked.bool(True)
 process.miniAODTupelizerSequence += process.MuonTupelizer
+process.MuonTupelizer.verbose = cms.untracked.bool(options.verbose)
 process.load('Workspace.HEPHYCMSSWTools.ElectronTupelizer_miniAOD_cfi')
 process.ElectronTupelizer.useForDefaultAlias = cms.untracked.bool(True)
+process.ElectronTupelizer.verbose = cms.untracked.bool(options.verbose)
 process.miniAODTupelizerSequence += process.ElectronTupelizer
 process.load('Workspace.HEPHYCMSSWTools.TauTupelizer_miniAOD_cfi')
 process.TauTupelizer.useForDefaultAlias = cms.untracked.bool(True)
+process.TauTupelizer.verbose = cms.untracked.bool(options.verbose)
 process.miniAODTupelizerSequence += process.TauTupelizer
 process.load('Workspace.HEPHYCMSSWTools.TriggerTupelizer_cfi')
 process.TriggerTupelizer.useForDefaultAlias = cms.untracked.bool(True)
+#process.TriggerTupelizer.verbose = cms.untracked.bool(options.verbose)
 process.miniAODTupelizerSequence += process.TriggerTupelizer
 process.load('Workspace.HEPHYCMSSWTools.FilterTupelizer_cfi')
 process.FilterTupelizer.useForDefaultAlias = cms.untracked.bool(True)
+#process.FilterTupelizer.verbose = cms.untracked.bool(options.verbose)
 process.miniAODTupelizerSequence += process.FilterTupelizer
-process.load('Workspace.HEPHYCMSSWTools.BasicTupelizer_miniAOD_cfi')
-process.BasicTupelizer.useForDefaultAlias = cms.untracked.bool(True)
-process.BasicTupelizer.addMSugraOSETInfo = cms.untracked.bool(options.mode.lower()=='sms')
-process.miniAODTupelizerSequence += process.BasicTupelizer
 
 #process.SUSYTupelizer.triggerCollection = cms.untracked.InputTag( options.hltName )
 #process.SUSYTupelizer.addTriggerInfo = cms.untracked.bool(True)
