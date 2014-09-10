@@ -11,8 +11,8 @@ from stage1Tuples import *
 
 from Workspace.HEPHYPythonTools.xsec import xsec
 
-subDir = "convertedTuples_v23"
-newGenMet = True
+subDir = "convertedTuples_v24"
+newGenMet = False
 overwrite = True
 target_lumi = 2000 #pb-1
 
@@ -84,7 +84,7 @@ for sample in allSamples:
 if not os.path.isdir(outputDir):
   os.system('mkdir -p '+outputDir)
 outSubDir = options.chmode
-outSubDir+='_DR'+str(options.DR)
+#outSubDir+='_DR'+str(options.DR)
 #if options.jermode.lower()!='none':
 #  outSubDir = outSubDir+"_JER"+options.jermode.lower()
 #if options.jesmode.lower()!='none':
@@ -113,7 +113,7 @@ for isample, sample in enumerate(allSamples):
   if not sample['name'].lower().count('data'):
     extraVariables+=["ngNuEFromW","ngNuMuFromW","ngNuTauFromW"]
     genTauvars = ["gTauPdg", "gTauPt", "gTauEta", "gTauPhi", "gTauMetPar", "gTauMetPerp", "gTauNENu", "gTauNMuNu", 'gTauNTauNu', 'gTauJetInd', 'gTauJetDR', 'gTauTauDR', 'gTauTauInd']
-    genLepvars = ["gLepPdg", "gLepPt", "gLepEta", "gLepPhi", 'gLepInd', 'gLepDR']
+    genLepvars = ["gLepPdg", "gLepPt", "gLepEta", "gLepPhi", 'gLepInd', 'gLepDR', 'gLepMMass']
 #  if options.allsamples.lower()=='sms':
 #    variables+=['osetMgl', 'osetMN', 'osetMC', 'osetMsq', 'ptISR']
 #  if not bin.lower().count('run') and maxConsideredBTagWeight>0:
@@ -223,7 +223,7 @@ for isample, sample in enumerate(allSamples):
   for bin in sample["bins"]:
     commoncf = ""
     if options.chmode=="copyMET":
-      commoncf = "slimmedMETs>=100"
+      commoncf = "slimmedMETs>=100&&Sum$((muonsDz>0.05||muonsDxy>0.02)&&muonsPt>20)==0"
     if options.chmode[:7] == "copyInc":
       commoncf = "(1)"
     c = ROOT.TChain('Events')
@@ -263,8 +263,8 @@ for isample, sample in enumerate(allSamples):
       elist = ROOT.gDirectory.Get("eList")
       number_events = elist.GetN()
       if options.small:
-        if number_events>1001:
-          number_events=1001
+        if number_events>10001:
+          number_events=10001
       start = int(options.fromPercentage/100.*number_events)
       stop  = int(options.toPercentage/100.*number_events)
       print "Reading: ", sample["name"], bin['dbsName'], "with",number_events,"Events using cut", commoncf
@@ -368,7 +368,7 @@ for isample, sample in enumerate(allSamples):
           s.njets    = len(idJets30)
           s.njetsFailID = len(filter(lambda j:not j['id'] and j['isolated'], jetResult))
           s.nbtags      = len(filter(lambda j:j['btag']>0.679 and abs(j['eta'])<2.4, idJets30))
-          s.nmu = len(allGoodMuons)
+          s.nmu  = len(allGoodMuons)
           s.nele = len(allGoodElectrons)
           s.ntau = len(allGoodTaus)
 ### MC specific part
@@ -390,7 +390,8 @@ for isample, sample in enumerate(allSamples):
                   if pdgId==16:s.ngNuTauFromW+=1
               if pdgId==11 or pdgId==13:
                 if not (gp.numberOfMothers()>0  and abs(gp.mother(0).pdgId())==24): continue
-                lep = {'pt':gp.pt(),'phi':gp.phi(),'eta':gp.eta(),'Pdg':gp.pdgId()}
+                gpm = gp.mother(0)
+                lep = {'pt':gp.pt(),'phi':gp.phi(),'eta':gp.eta(),'Pdg':gp.pdgId(), 'MMass':gpm.mass()}
                 if pdgId==11:
                   rlep=findClosestObjectDR(allGoodElectrons, {'phi':lep['phi'], 'eta':lep['eta']})
                 if pdgId==13:
@@ -469,9 +470,9 @@ for isample, sample in enumerate(allSamples):
           pfc = list(pfcH)
           isoCands = [{'c':cand,'iso':0.} for cand in filter(lambda c:c.pt()>10 and c.fromPV()==c.PVTight and abs(c.pdgId()) in [11, 13, 211], pfc)]
           for p in pfc:
-            if debug:
-              if p.pt()>100:
-                print s.event, p.pt(), p.pdgId() 
+#            if debug:
+#              if p.pt()>100:
+#                print s.event, p.pt(), p.pdgId() 
             phi=p.phi()
             eta=p.eta()
             for ic in isoCands:
@@ -615,6 +616,7 @@ for isample, sample in enumerate(allSamples):
               s.gLepEta[i] = genLeps[i]['eta']
               s.gLepPhi[i] = genLeps[i]['phi']
               s.gLepPdg[i] = genLeps[i]['Pdg']
+              s.gLepMMass[i] = genLeps[i]['MMass']
               s.gLepDR[i]  = genLeps[i]['gLepDR']
               s.gLepInd[i]  = genLeps[i]['gLepInd']
 #          if options.keepPDFWeights:

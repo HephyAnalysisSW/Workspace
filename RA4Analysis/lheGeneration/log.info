@@ -1,0 +1,5 @@
+1. Find undecayed madgraph files, probably from user directory on eos
+2. perl merge-pl /data/schoef/lhe/undecayed_gluino_gluino_13TeV/gluino_1500_xqcut30_*.lhe 13TeV_GoGo_run1_1500_800_100.lhe.gz template_param_card_T5Full_1500_800_100_AllDecays.dat
+where template_param_card_T5Full_1500_800_100_AllDecays.dat has the decay data
+3. run the decay and check -> submit with crab + publish
+4. run fastsim

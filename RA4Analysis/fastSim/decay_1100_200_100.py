@@ -21,7 +21,7 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 10000
 
 process.source = cms.Source("LHESource",
 fileNames = cms.untracked.vstring(
-'root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/schoef/lhe/8TeV_GoGo_2j_1100_100_run1_400000evnt.lhe',
+'root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/schoef/lhe/13TeV_GoGo_run1_1200_1000_800.lhe',
 )
 )
 
