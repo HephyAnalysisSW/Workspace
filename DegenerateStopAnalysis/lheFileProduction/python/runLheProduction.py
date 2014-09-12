@@ -464,7 +464,7 @@ def madgraphDecayParticle (lheFile, decayParticleValue, madGraphDir, workingDir,
     debug = False
 
     # cards directory, relative to production directory
-    workspaceCardDirectory = 'Workspace/MonoJetAnalysis/lheFileProduction/data/Cards'
+    workspaceCardDirectory = 'Workspace/DegenerateStopAnalysis/lheFileProduction/data/Cards'
     
     param_card_TEMPLATE = 'official_param_card_TEMPLATE.dat'
     param_card_TEMPLATE_wpath = workingDir + '/' + workspaceCardDirectory  + '/' + param_card_TEMPLATE

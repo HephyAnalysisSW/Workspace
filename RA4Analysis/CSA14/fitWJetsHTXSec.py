@@ -1,10 +1,9 @@
 import ROOT
 from math import *
 #from helpers import getVarValue, deltaPhi, minAbsDeltaPhi,  deltaR, invMass,
-from Workspace.HEPHYPythonTools.helpers import getVarValue, getFileList
+from Workspace.HEPHYPythonTools.helpers import getVarValue, getChain
 
-from stage1Tuples import WJetsHTToLNu, WJetsToLNu25ns
-small = True
+from stage2Tuples import WJetsHTToLNu, WJetsToLNu25ns
 smallNumber = 50
 
 prefix = 'ht'
@@ -23,16 +22,14 @@ binningStr = ','.join([str(x) for x in binning])
 cInc = ROOT.TChain('Events')
 for b in WJetsToLNu25ns['bins']:
   l = getFileList(b['dir'])
-  if small:
-    l=l[:smallNumber]
+  l=l[:smallNumber]
   print "Adding ", len(l), "files from", b['dbsName']
   for f in l:
     cInc.Add(f)
 for b in WJetsHTToLNu['bins']:
   c = ROOT.TChain('Events')
   l = getFileList(b['dir'])
-  if small:
-    l=l[:smallNumber]
+  l=l[:smallNumber]
   print "Adding ", len(l), "files from", b['dbsName']
   for f in l:
     c.Add(f)
@@ -75,3 +72,29 @@ if status==0:
   result.Draw("same")
 
   c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngCSA14/'+prefix+'_wjetsHTNormalized_fitResult.png')
+
+  cIncFull = ROOT.TChain('Events')
+  for b in WJetsToLNu25ns['bins']:
+    l = getFileList(b['dir'])
+    print "Adding ", len(l), "files from", b['dbsName']
+    for f in l:
+      cIncFull.Add(f)
+  for b in WJetsHTToLNu['bins']:
+    c = ROOT.TChain('Events')
+    l = getFileList(b['dir'])
+    print "Adding ", len(l), "files from", b['dbsName']
+    for f in l:
+      c.Add(f)
+    b['chainFull']=c
+  nInc    = float(cIncFull.GetEntries('Sum$(jetsPt)>=2&&Sum$(jetsPt*(jetsPt>30))>150'))
+  nIncAll = float(cIncFull.GetEntries())
+
+  for i, b in enumerate(WJetsHTToLNu['bins']):
+    d = ROOT.Double()
+    e = ROOT.Double()
+    fit.GetResult(i,d,e)
+    nHTb    = b['chainFull'].GetEntries('Sum$(jetsPt)>=2&&Sum$(jetsPt*(jetsPt>30))>150')
+    nHTbAll = b['chainFull'].GetEntries('')
+    print "Scale bin ",i,'by',d*(nHTbAll/float(nHTb))*(nInc/float(nIncAll))
+
+#print "Scale factor",cInc.GetEntries('Sum$(jetsPt)>=2&&Sum$(jetsPt*(jetsPt>30))>150')/float(cInc.GetEntries())

@@ -1,7 +1,7 @@
 import ROOT
 import pickle
 from stage2Tuples import ttJetsCSA14
-from Workspace.HEPHYPythonTools.helpers import getCutPlotFromChain
+from Workspace.HEPHYPythonTools.helpers import getPlotFromChain
 from Workspace.RA4Analysis.simplePlotsCommon import ROOT_colors
 
 c = ROOT.TChain('Events')
@@ -28,11 +28,11 @@ prefix='EffAcc_nHybridMediumSel'
 presel="ngoodMuons==1&&ngoodElectrons==0&&nHybridMediumMuons==1&&nvetoElectrons==0&&ht>400&&met>150"
 
 c1 = ROOT.TCanvas()
-hPresel = getCutPlotFromChain(c, 'sqrt(2*leptonPt*met*(1-cos(metphi-leptonPhi)))', [20,0,800], presel, 'weight')
+hPresel = getPlotFromChain(c, 'sqrt(2*leptonPt*met*(1-cos(metphi-leptonPhi)))', [20,0,800], presel, 'weight')
 hPresel.SetLineColor(ROOT.kBlack)
 hPresel.Draw()
 
-#hPresel_sum = getCutPlotFromChain(c, 'sqrt(2*leptonPt*met*(1-cos(metphi-leptonPhi)))', [20,0,800], 
+#hPresel_sum = getPlotFromChain(c, 'sqrt(2*leptonPt*met*(1-cos(metphi-leptonPhi)))', [20,0,800], 
 #                presel+"&&("+"||".join([l_H, lTau_H, hTau_l, diLep, lTau_l, diTau, allHad])+")", 'weight')
 #hPresel_sum.SetLineColor(ROOT.kMagenta)
 #hPresel_sum.Draw('same')
@@ -58,7 +58,7 @@ for i, [cut,name,col] in enumerate([\
       [hTau_l,'W#rightarrow#tau#nu#rightarrow had.+2#nu | W#rightarrow e/#mu+#nu', ROOT.kAzure+6], 
       [l_H, 'single lep. (e/#mu)',ROOT.kCyan+3],  
     ]):
-  hPresel_cut = getCutPlotFromChain(c, 'sqrt(2*leptonPt*met*(1-cos(metphi-leptonPhi)))', [20,0,800], presel+"&&"+cut, 'weight')
+  hPresel_cut = getPlotFromChain(c, 'sqrt(2*leptonPt*met*(1-cos(metphi-leptonPhi)))', [20,0,800], presel+"&&"+cut, 'weight')
   if previous:  
     hPresel_cut.Add(previous)
   previous=hPresel_cut.Clone()
@@ -82,31 +82,31 @@ c1.RedrawAxis()
 l.Draw()
 c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngCSA14/mt_'+prefix+'.png')
 
-#hPresel_l_H = getCutPlotFromChain(c, 'sqrt(2*leptonPt*met*(1-cos(metphi-leptonPhi)))', [20,0,800], presel+"&&"+l_H, 'weight')
+#hPresel_l_H = getPlotFromChain(c, 'sqrt(2*leptonPt*met*(1-cos(metphi-leptonPhi)))', [20,0,800], presel+"&&"+l_H, 'weight')
 #hPresel_l_H.SetLineColor(ROOT.kRed)
 #hPresel_l_H.Draw('same')
 #
-#hPresel_lTau_H = getCutPlotFromChain(c, 'sqrt(2*leptonPt*met*(1-cos(metphi-leptonPhi)))', [20,0,800], presel+"&&"+lTau_H, 'weight')
+#hPresel_lTau_H = getPlotFromChain(c, 'sqrt(2*leptonPt*met*(1-cos(metphi-leptonPhi)))', [20,0,800], presel+"&&"+lTau_H, 'weight')
 #hPresel_lTau_H.SetLineColor(ROOT.kBlue)
 #hPresel_lTau_H.Draw('same')
 #
-#hPresel_hTau_l = getCutPlotFromChain(c, 'sqrt(2*leptonPt*met*(1-cos(metphi-leptonPhi)))', [20,0,800], presel+"&&"+hTau_l, 'weight')
+#hPresel_hTau_l = getPlotFromChain(c, 'sqrt(2*leptonPt*met*(1-cos(metphi-leptonPhi)))', [20,0,800], presel+"&&"+hTau_l, 'weight')
 #hPresel_hTau_l.SetLineColor(ROOT.kBlue)
 #hPresel_hTau_l.Draw('same')
 #
-#hPresel_diLep = getCutPlotFromChain(c, 'sqrt(2*leptonPt*met*(1-cos(metphi-leptonPhi)))', [20,0,800], presel+"&&"+diLep, 'weight')
+#hPresel_diLep = getPlotFromChain(c, 'sqrt(2*leptonPt*met*(1-cos(metphi-leptonPhi)))', [20,0,800], presel+"&&"+diLep, 'weight')
 #hPresel_diLep.SetLineColor(ROOT.kGreen)
 #hPresel_diLep.Draw('same')
 #
-#hPresel_lTau_l = getCutPlotFromChain(c, 'sqrt(2*leptonPt*met*(1-cos(metphi-leptonPhi)))', [20,0,800], presel+"&&"+lTau_l, 'weight')
+#hPresel_lTau_l = getPlotFromChain(c, 'sqrt(2*leptonPt*met*(1-cos(metphi-leptonPhi)))', [20,0,800], presel+"&&"+lTau_l, 'weight')
 #hPresel_lTau_l.SetLineColor(ROOT.kBlue)
 #hPresel_lTau_l.Draw('same')
 #
-#hPresel_diTau = getCutPlotFromChain(c, 'sqrt(2*leptonPt*met*(1-cos(metphi-leptonPhi)))', [20,0,800], presel+"&&"+diTau, 'weight')
+#hPresel_diTau = getPlotFromChain(c, 'sqrt(2*leptonPt*met*(1-cos(metphi-leptonPhi)))', [20,0,800], presel+"&&"+diTau, 'weight')
 ##hPresel_diTau.SetLineColor(ROOT.kGreen)
 #hPresel_diTau.Draw('same')
 #
-#hPresel_diHad = getCutPlotFromChain(c, 'sqrt(2*leptonPt*met*(1-cos(metphi-leptonPhi)))', [20,0,800], presel+"&&"+diHad, 'weight')
+#hPresel_diHad = getPlotFromChain(c, 'sqrt(2*leptonPt*met*(1-cos(metphi-leptonPhi)))', [20,0,800], presel+"&&"+diHad, 'weight')
 ##hPresel_diHad.SetLineColor(ROOT.kGreen)
 #hPresel_diHad.Draw('same')
 #

@@ -13,7 +13,7 @@ from Workspace.HEPHYPythonTools.xsec import xsec
 
 subDir = "convertedTuples_v24"
 newGenMet = False
-overwrite = True
+overwrite = False
 target_lumi = 2000 #pb-1
 
 from localInfo import username

@@ -2,11 +2,10 @@ import ROOT
 from math import pi, sqrt, cos, sin, sinh
 from array import array
 
-
 def test():
   return 1
 
-def getFileList(dir, minAgeDPM=0, histname='histo', xrootPrefix='root://hephyse.oeaw.ac.at/'):
+def getFileList(dir, minAgeDPM=0, histname='histo', xrootPrefix='root://hephyse.oeaw.ac.at/', maxN=-1):
   monthConv = {'Jan':1, 'Feb':2,'Mar':3,'Apr':4,"May":5, "Jun":6,"Jul":7,"Aug":8, "Sep":9, "Oct":10, "Nov":11, "Dec":12}
   import os, subprocess, datetime
   if dir[0:5] != "/dpm/":
@@ -30,7 +29,27 @@ def getFileList(dir, minAgeDPM=0, histname='histo', xrootPrefix='root://hephyse.
         else:
           print "Omitting",fname,'too young:',str(age)+'h'
     filelist = [xrootPrefix+dir+'/'+f for f in filelist]
+  if maxN>=0:
+    filelist = filelist[:maxN]
   return filelist
+
+def getChain(s, minAgeDPM=0, histname='histo', xrootPrefix='root://hephyse.oeaw.ac.at/', maxN=-1):
+  c = ROOT.TChain('Events')
+  if type(s)==type(""):
+    i=0
+    for f in getFileList(s, minAgeDPM, histname, xrootPrefix, maxN):
+      i+=1
+      c.Add(f)
+    print "Added ",i,'files from dir',s
+    return c
+  if type(s)==type({}):
+    i=0
+    for b in s['bins']:
+      for f in getFileList(s['dirname']+'/'+b, minAgeDPM, histname, xrootPrefix, maxN):
+        i+=1
+        c.Add(f)
+    print "Added ",i,'files from sample',s['name'],'dir',s['dirname'],'bins',s['bins']
+    return c
 
 def getObjFromFile(fname, hname):
   f = ROOT.TFile(fname)
@@ -83,7 +102,7 @@ def getCutYieldFromChain(c, cutString = "(1)", cutFunc = None, weight = "weight"
     return res, resVar
   return res
 
-def getCutPlotFromChain(c, var, binning, cutString = "(1)", weight = "weight", binningIsExplicit=False, addOverFlowBin=''):
+def getPlotFromChain(c, var, binning, cutString = "(1)", weight = "weight", binningIsExplicit=False, addOverFlowBin=''):
   if binningIsExplicit:
     h = ROOT.TH1F('h_tmp', 'h_tmp', len(binning)-1, array('d', binning))
 #    h.SetBins(len(binning), array('d', binning))

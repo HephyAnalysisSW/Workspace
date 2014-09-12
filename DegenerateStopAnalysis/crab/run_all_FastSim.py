@@ -22,7 +22,7 @@ while True:
   
   sstring = "mkdir "+uniqueDirname+";cd "+uniqueDirname+";"
 
-  sstring+="cmsRun /afs/hephy.at/scratch/s/schoefbeck/CMS/CMSSW_5_3_11_patch6/src/Workspace/MonoJetAnalysis/crab/run_Hadronizer_SMS_Scans_2jets_Qcut44_TuneZ2star_8TeV_madgraph_tauola_cff_py_GEN_FASTSIM_HLT_PU.py"
+  sstring+="cmsRun /afs/hephy.at/scratch/s/schoefbeck/CMS/CMSSW_5_3_11_patch6/src/Workspace/DegenerateStopAnalysis/crab/run_Hadronizer_SMS_Scans_2jets_Qcut44_TuneZ2star_8TeV_madgraph_tauola_cff_py_GEN_FASTSIM_HLT_PU.py"
   sstring+=" infile=file:"+ifile+" maxEvents="+str(maxEvents)+" skipEvents="+str(skipEvents)+";"
   sstring+="cd ..; rm -rf "+uniqueDirname
   print sstring

@@ -148,7 +148,7 @@ def muRequirement(mu):
 #
 #  print 'sign(pdg)==',pdgSign, "yields:",round(res[0]['v'],2),"+/-",round(res[0]['sigma']),'(HT150v2)',round(res[1]['v'],2),"+/-",round(res[1]['sigma'],2),'(WNJets)',"Ratio",round(r,2),"+/-",round(rErr,2),"(deviation:",round((1-r)/rErr,2),"sigma)"
 
-from Workspace.MonoJetAnalysis.polSys import calcPolWeights
+from Workspace.DegenerateStopAnalysis.polSys import calcPolWeights
 print selection
 for pdgSign in [-1,+1]:
   cut = selection

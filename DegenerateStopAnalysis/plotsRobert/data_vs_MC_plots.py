@@ -14,7 +14,7 @@ small = False
 
 targetLumi = 19700.
 
-from Workspace.MonoJetAnalysis.defaultConvertedTuples import * 
+from Workspace.DegenerateStopAnalysis.defaultConvertedTuples import * 
 
 #wjetsSample = wJetsToLNuInc
 #wjetsSample = wJetsHT150v2

@@ -1,6 +1,6 @@
 import ROOT
 from math import sqrt
-from Workspace.HEPHYPythonTools.helpers import getCutPlotFromChain, getCutYieldFromChain, getObjFromFile
+from Workspace.HEPHYPythonTools.helpers import getPlotFromChain, getCutYieldFromChain, getObjFromFile
 from array import array
 from helpers import nameAndCut, nameAndCutLShape, wRecoPt
 
@@ -68,8 +68,8 @@ def getPDFRelUncertaintyPlot(chain, var, binning, cut, weight='weight'):
   return res
 
 def  getJESRelUncertaintyPlot(chains, hRef, var, binning, cut, weight):
-  hPlus = getCutPlotFromChain(chains[0], 'mT', binning, cut, weight, binningIsExplicit=True, addOverFlowBin='upper')
-  hMinus = getCutPlotFromChain(chains[1], 'mT', binning, cut, weight, binningIsExplicit=True, addOverFlowBin='upper')
+  hPlus = getPlotFromChain(chains[0], 'mT', binning, cut, weight, binningIsExplicit=True, addOverFlowBin='upper')
+  hMinus = getPlotFromChain(chains[1], 'mT', binning, cut, weight, binningIsExplicit=True, addOverFlowBin='upper')
   res = hPlus.Clone()
   res.Reset()
   hPlus.Scale(hRef.GetBinContent(1)/hPlus.GetBinContent(1))
@@ -88,9 +88,9 @@ def  getJESRelUncertaintyPlot(chains, hRef, var, binning, cut, weight):
   return res 
 
 def  getJERRelUncertaintyPlot(chains, var, binning, cut, weight):
-  hRef = getCutPlotFromChain(chains[0], 'mT', binning, cut, weight, binningIsExplicit=True, addOverFlowBin='upper')
-  hPlus = getCutPlotFromChain(chains[1], 'mT', binning, cut, weight, binningIsExplicit=True, addOverFlowBin='upper')
-  hMinus = getCutPlotFromChain(chains[2], 'mT', binning, cut, weight, binningIsExplicit=True, addOverFlowBin='upper')
+  hRef = getPlotFromChain(chains[0], 'mT', binning, cut, weight, binningIsExplicit=True, addOverFlowBin='upper')
+  hPlus = getPlotFromChain(chains[1], 'mT', binning, cut, weight, binningIsExplicit=True, addOverFlowBin='upper')
+  hMinus = getPlotFromChain(chains[2], 'mT', binning, cut, weight, binningIsExplicit=True, addOverFlowBin='upper')
   res = hPlus.Clone()
   res.Reset()
   hPlus.Scale(hRef.GetBinContent(1)/hPlus.GetBinContent(1))
@@ -109,7 +109,7 @@ def  getJERRelUncertaintyPlot(chains, var, binning, cut, weight):
   return res 
 
 def makeMTPlotWithUncertainties(c,  binning, cut, weight, doPDF = doPDF):
-  hMT = getCutPlotFromChain(c, 'mT', binning, cut, weight, binningIsExplicit=True, addOverFlowBin='upper')
+  hMT = getPlotFromChain(c, 'mT', binning, cut, weight, binningIsExplicit=True, addOverFlowBin='upper')
   hPDF = None
   if doPDF:
     cPDF = ROOT.TChain('Events')
@@ -403,10 +403,10 @@ for postFix, binning in [['_binningCoarse', binningCoarse], ['_binningFine', bin
   for plotName, cut, addData in plots:
     print "At", plotName, cut,'addData', addData
     mTRes = makeMTPlotWithUncertainties(cWJets, binning, cut, 'weight', doPDF = doPDF)
-    hRest = getCutPlotFromChain(cRest, 'mT', binning, cut, 'weight', binningIsExplicit=True, addOverFlowBin='upper')
+    hRest = getPlotFromChain(cRest, 'mT', binning, cut, 'weight', binningIsExplicit=True, addOverFlowBin='upper')
     mTRes['hist'].Add(hRest)
     if addData:
-      hData = getCutPlotFromChain(cData, 'mT', binning, cut, 'weight', binningIsExplicit=True, addOverFlowBin='upper')
+      hData = getPlotFromChain(cData, 'mT', binning, cut, 'weight', binningIsExplicit=True, addOverFlowBin='upper')
       scaleF = hData.GetBinContent(1)/mTRes['hist'].GetBinContent(1)
       mTRes['hist'].Scale(scaleF)
       hRest.Scale(scaleF)
@@ -549,7 +549,7 @@ for postFix, binning in [['_binningCoarse', binningCoarse], ['_binningFine', bin
     for s in signals:
       cS = ROOT.TChain('Events')
       cS.Add(s['dirname']+'/'+s['name']+'/h*.root')
-      hcS = getCutPlotFromChain(cS, 'mT', binning, cut, 'weight', binningIsExplicit=True, addOverFlowBin='upper')
+      hcS = getPlotFromChain(cS, 'mT', binning, cut, 'weight', binningIsExplicit=True, addOverFlowBin='upper')
 #      print 'signalInt',hcS.Integral()
       hcS.SetLineColor(s['color'])
       hcS.SetMarkerSize(0)

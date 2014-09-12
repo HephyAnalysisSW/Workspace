@@ -1,7 +1,7 @@
 import ROOT
 from ROOT import RooFit as rf
 
-from Workspace.HEPHYPythonTools.helpers import getCutPlotFromChain,getCutYieldFromChain,getObjFromFile
+from Workspace.HEPHYPythonTools.helpers import getPlotFromChain,getCutYieldFromChain,getObjFromFile
 from helpers import nameAndCut
 
 cWJets=ROOT.TChain('Events')
@@ -23,11 +23,11 @@ njetb=[2,3]
 lpdg=''
 mTCut='mT>20&&mT<120'
 
-template_WJets_PosPdg=getCutPlotFromChain(cWJets,'nbtags',[0,1,2,3],mTCut+'&&'+nameAndCut(metb,htb,njetb,'pos',btagRequirement='None')[1],'weight',binningIsExplicit=True,addOverFlowBin='upper')
-template_WJets_NegPdg=getCutPlotFromChain(cWJets,'nbtags',[0,1,2,3],mTCut+'&&'+nameAndCut(metb,htb,njetb,'neg',btagRequirement='None')[1],'weight',binningIsExplicit=True,addOverFlowBin='upper')
-template_TTJets=getCutPlotFromChain(cTTJets,'nbtags',[0,1,2,3],mTCut+'&&'+nameAndCut(metb,htb,njetb,'',btagRequirement='None')[1],'weight',binningIsExplicit=True,addOverFlowBin='upper')
-template_Rest_PosPdg=getCutPlotFromChain(cRest,'nbtags',[0,1,2,3],mTCut+'&&'+nameAndCut(metb,htb,njetb,'pos',btagRequirement='None')[1],'weight',binningIsExplicit=True,addOverFlowBin='upper')
-template_Rest_NegPdg=getCutPlotFromChain(cRest,'nbtags',[0,1,2,3],mTCut+'&&'+nameAndCut(metb,htb,njetb,'neg',btagRequirement='None')[1],'weight',binningIsExplicit=True,addOverFlowBin='upper')
+template_WJets_PosPdg=getPlotFromChain(cWJets,'nbtags',[0,1,2,3],mTCut+'&&'+nameAndCut(metb,htb,njetb,'pos',btagRequirement='None')[1],'weight',binningIsExplicit=True,addOverFlowBin='upper')
+template_WJets_NegPdg=getPlotFromChain(cWJets,'nbtags',[0,1,2,3],mTCut+'&&'+nameAndCut(metb,htb,njetb,'neg',btagRequirement='None')[1],'weight',binningIsExplicit=True,addOverFlowBin='upper')
+template_TTJets=getPlotFromChain(cTTJets,'nbtags',[0,1,2,3],mTCut+'&&'+nameAndCut(metb,htb,njetb,'',btagRequirement='None')[1],'weight',binningIsExplicit=True,addOverFlowBin='upper')
+template_Rest_PosPdg=getPlotFromChain(cRest,'nbtags',[0,1,2,3],mTCut+'&&'+nameAndCut(metb,htb,njetb,'pos',btagRequirement='None')[1],'weight',binningIsExplicit=True,addOverFlowBin='upper')
+template_Rest_NegPdg=getPlotFromChain(cRest,'nbtags',[0,1,2,3],mTCut+'&&'+nameAndCut(metb,htb,njetb,'neg',btagRequirement='None')[1],'weight',binningIsExplicit=True,addOverFlowBin='upper')
 
 print "Nominal yields TT:",template_TTJets.Integral(),'WJets_PosPdg',template_WJets_PosPdg.Integral(),'WJets_NegPdg',template_WJets_NegPdg.Integral()
 print "Nominal yields:",'Rest_PosPdg',template_Rest_PosPdg.Integral(),'Rest_NegPdg',template_Rest_NegPdg.Integral()
@@ -36,8 +36,8 @@ print "Nominal yields:",'Rest_PosPdg',template_Rest_PosPdg.Integral(),'Rest_NegP
 #template_WJets_NegPdg.Scale(1./template_WJets_NegPdg.GetBinContent(1))
 #template_TTJets.Scale(1./template_TTJets.GetBinContent(1))
 
-hData_PosPdg=getCutPlotFromChain(cData,'nbtags',[0,1,2,3],mTCut+'&&'+nameAndCut(metb,htb,njetb,'pos',btagRequirement='None')[1],'weight',binningIsExplicit=True,addOverFlowBin='upper')
-hData_NegPdg=getCutPlotFromChain(cData,'nbtags',[0,1,2,3],mTCut+'&&'+nameAndCut(metb,htb,njetb,'neg',btagRequirement='None')[1],'weight',binningIsExplicit=True,addOverFlowBin='upper')
+hData_PosPdg=getPlotFromChain(cData,'nbtags',[0,1,2,3],mTCut+'&&'+nameAndCut(metb,htb,njetb,'pos',btagRequirement='None')[1],'weight',binningIsExplicit=True,addOverFlowBin='upper')
+hData_NegPdg=getPlotFromChain(cData,'nbtags',[0,1,2,3],mTCut+'&&'+nameAndCut(metb,htb,njetb,'neg',btagRequirement='None')[1],'weight',binningIsExplicit=True,addOverFlowBin='upper')
 
 
 x=ROOT.RooRealVar("nbtags","nbtags",0.,3.)

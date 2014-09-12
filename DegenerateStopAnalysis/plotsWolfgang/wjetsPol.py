@@ -31,7 +31,7 @@ def muRequirement(mu):
   return mu['pt']>5 and abs(mu['eta'])<1.5
 
 
-from Workspace.MonoJetAnalysis.polSys import calcPolWeights
+from Workspace.DegenerateStopAnalysis.polSys import calcPolWeights
 print selection
 for pdgSign in [-1,+1]:
   cut = selection
