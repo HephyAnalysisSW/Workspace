@@ -19,6 +19,11 @@ labellist = ('packedGenParticles','packedPFCandidates',('puppi','Puppi'),'pfMet'
 handlelist = ("vector<pat::PackedGenParticle>", "vector<pat::PackedCandidate>","vector<reco::PFCandidate>","vector<reco::PFMET>","vector<reco::PFMET>")
 #cuts are made based on the first element of the label and handlelist
 
+provide = [\
+       {'type':"vector<pat::PackedGenParticle>", 'label':'packedGenParticles', 'localName':'pfCandidates'}, 
+#       {'handle':"vector<pat::PackedGenParticle>", 'label':'packedGenParticles', 'localName':'pfCanditates'}, 
+          ]
+
 metD = []
 def calcMet(labels,handles,filelist=['histo.root']):
 
@@ -28,19 +33,25 @@ def calcMet(labels,handles,filelist=['histo.root']):
   for f in filelist:
     c.Add(f)
 
-  nEvents=10 #events.size()
+  nEvents=100 #events.size()
   sumPy = sumPx = 0
 
   for s in range (0,len(labels)):
     metD.append(0)
     metD[s] = ROOT.TH1F(str(s),str(s),100,0,100)
 
+  for p in provide:
+    p['handle'] = Handle(p['type'])
+
   for iEvent in range(nEvents):
     c.GetEntry(iEvent)
     events.to(iEvent)
-
+    
+#    for p in provide:
+#      events.getByLabel(p['label'], p['handle'])
+#      exec(p['localName'] +"= p['handle'].product()")
+#    print pfCandidates
     ## Filter Hadronic events
-     
     gps = Handle(handles[0])
     lgp = labels[0]
     events.getByLabel(lgp,gps)
@@ -49,12 +60,15 @@ def calcMet(labels,handles,filelist=['histo.root']):
     isHad=True
     for igp,gp in enumerate(gps):
       pdgId = abs(gp.pdgId())
+#      if pdgId<20:print pdgId
       if pdgId==12 or pdgId==14 or pdgId==16:
-        if gp.numberOfMothers()>0 and abs(gp.mother(0).pdgId())==24:
+#        print 'here', gp.numberOfMothers(), gp.mother(0).pdgId()
+        if abs(gp.mother(0).pdgId())==24:
           isHad=False
-          break
+          break 
+    print "isHad", isHad
     if not isHad:continue
-
+    print c.GetLeaf(c.GetAlias('genMet')).GetValue()
     for s in range (1,len(labels)):
       hndl = Handle(handles[s]) 
       lbl = labels[s]
