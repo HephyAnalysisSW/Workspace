@@ -12,7 +12,6 @@ from stage1Tuples import *
 from Workspace.HEPHYPythonTools.xsec import xsec
 
 subDir = "convertedTuples_v24"
-newGenMet = False
 overwrite = False
 target_lumi = 2000 #pb-1
 
@@ -28,57 +27,53 @@ parser.add_option("--chmode", dest="chmode", default="copyInc", type="string", a
 #parser.add_option("--jermode", dest="jermode", default="none", type="string", action="store", help="jermode: up/down/central/none")
 #parser.add_option("--jesmode", dest="jesmode", default="none", type="string", action="store", help="jesmode: up/down/none")
 parser.add_option("--samples", dest="allsamples", default="ttJetsCSA1450ns", type="string", action="store", help="samples:Which samples.")
+parser.add_option("--file", dest="file", default="", type="string", action="store", help="file:Which file.")
 parser.add_option("--DR", dest="DR", default="0.4", type="float", action="store", help="samples:Which samples.")
 parser.add_option("--small", dest="small", action="store_true", help="Just do a small subset.")
+parser.add_option("--newGenMet", dest="newGenMet", action="store_true", help="new genmet?")
 parser.add_option("--fromPercentage", dest="fromPercentage", default="0", type="int", action="store", help="from (% of tot. events)")
 parser.add_option("--toPercentage", dest="toPercentage", default="100", type="int", action="store", help="to (% of tot. events)")
 parser.add_option("--keepPDFWeights", dest="keepPDFWeights", action="store_true", help="keep PDF Weights?")
  
 (options, args) = parser.parse_args()
-print "options: chmode",options.chmode, 'samples',options.allsamples,'DR',options.DR
-exec('allSamples=['+options.allsamples+']')
+if options.file:
+  print "options: chmode",options.chmode, 'file',options.file, 'DR',options.DR
+  allSamples = [{'name':'file', 'bins':[{'dbsName':None,'dir':None,'filenames':[options.file], 'xsec':-1, 'weight':1}], 'Chain':'Events'}]
+else:
+  print "options: chmode",options.chmode, 'samples',options.allsamples,'DR',options.DR
+  exec('allSamples=['+options.allsamples+']')
+  for sample in allSamples:
+    sample['filenames'] = {}
+    sample['weight'] = {}
+    for bin in sample['bins']:
+      print "Looping over subdir",bin['dir']
+      filelist = getFileList(bin['dir'], minAgeDPM=12, histname='histo', xrootPrefix='root://hephyse.oeaw.ac.at/')
+      if options.small: filelist = filelist[:1]
+      bin['filenames'] = []
+      for tfile in filelist:
+        bin['filenames'] = filelist
 
-#def getPtISR(e):
-#    sumtlv = ROOT.TLorentzVector(1.e-9,1.e-9,1.e-9,1.e-9)
-#    for igp in range(e.ngp):
-#        if(abs(e.gpPdg[igp])==1000021 and e.gpSta[igp]==3):
-#            tlvaux = ROOT.TLorentzVector(0.,0.,0.,0.)
-#            tlvaux.SetPtEtaPhiM(e.gpPt[igp],e.gpEta[igp],e.gpPhi[igp],e.gpM[igp])
-#            sumtlv += tlvaux
-#    return sumtlv.Pt()
-
-for sample in allSamples:
-  sample['filenames'] = {}
-  sample['weight'] = {}
-  for bin in sample['bins']:
-    print "Looping over subdir",bin['dir']
-    filelist = getFileList(bin['dir'], minAgeDPM=12, histname='histo', xrootPrefix='root://hephyse.oeaw.ac.at/')
-    if options.small: filelist = filelist[:1]
-    bin['filenames'] = []
-    for tfile in filelist:
-      bin['filenames'] = filelist
-
-    c = ROOT.TChain('Events')
-    for f in bin['filenames']:
-      c.Add(f)
-    nevents= c.GetEntries()
-    del c
-    if bin['dbsName'] and  bin['dbsName'].lower().count('run'):
-      weight = 1.
-      print 'Sample', sample['name'], 'bin', bin, 'n-events',nevents,'weight',weight, '(is data!)'
-    else:
-      if nevents>0:
-        if bin['dbsName']:
-          weight = xsec[bin['dbsName']]*target_lumi/nevents
-          bin['xsec']=xsec[bin['dbsName']]
-        else:
-          print "Warning! Sample ",sample['name'], 'bin',bin, 'has no dbsName! -> Use weight 1.'
-          weight=1
-          bin['xsec']=float('nan')
+      c = ROOT.TChain('Events')
+      for f in bin['filenames']:
+        c.Add(f)
+      nevents= c.GetEntries()
+      del c
+      if bin['dbsName'] and  bin['dbsName'].lower().count('run'):
+        weight = 1.
+        print 'Sample', sample['name'], 'bin', bin, 'n-events',nevents,'weight',weight, '(is data!)'
       else:
-        weight=0
-      print 'Sample', sample['name'], 'bin', bin['dbsName'], 'nevents:',nevents,'xsec',bin['xsec'], 'n-events',nevents,'weight',weight
-    bin['weight']=weight
+        if nevents>0:
+          if bin['dbsName']:
+            weight = xsec[bin['dbsName']]*target_lumi/nevents
+            bin['xsec']=xsec[bin['dbsName']]
+          else:
+            print "Warning! Sample ",sample['name'], 'bin',bin, 'has no dbsName! -> Use weight 1.'
+            weight=1
+            bin['xsec']=float('nan')
+        else:
+          weight=0
+        print 'Sample', sample['name'], 'bin', bin['dbsName'], 'nevents:',nevents,'xsec',bin['xsec'], 'n-events',nevents,'weight',weight
+      bin['weight']=weight
 
 
 if not os.path.isdir(outputDir):
@@ -172,6 +167,8 @@ for isample, sample in enumerate(allSamples):
   if options.fromPercentage!=0 or options.toPercentage!=100:
     postfix += "_from"+str(options.fromPercentage)+"To"+str(options.toPercentage)
   ofile = outputDir+"/"+outSubDir+"/"+sample["name"]+"/histo_"+sample["name"]+postfix+".root"
+  if options.file:
+    ofile=options.file.replace('.root','_converted.root')
 #  ofile = "histo_"+sample["name"]+postfix+".root"
   if os.path.isfile(ofile) and overwrite:
     print "Warning! will overwrite",ofile
@@ -234,7 +231,7 @@ for isample, sample in enumerate(allSamples):
     pfMetLabel = ("pfMet")
     pfMetHandle = Handle("vector<reco::PFMET>")
 
-    if not newGenMet:
+    if not options.newGenMet:
       genMetLabel = ("genMetTrue")
       genMetHandle = Handle("vector<reco::GenMET>")
 
@@ -296,7 +293,7 @@ for isample, sample in enumerate(allSamples):
           for var in extraVariables:
             exec("s."+var+"=float('nan')")
 
-          if not newGenMet:
+          if not options.newGenMet:
             events.getByLabel(genMetLabel,genMetHandle)
             genMet =genMetHandle.product()
             s.genMet = genMet[0].pt()
