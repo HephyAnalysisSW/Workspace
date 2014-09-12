@@ -12,7 +12,7 @@ from stage1Tuples import *
 from Workspace.HEPHYPythonTools.xsec import xsec
 
 subDir = "convertedTuples_v24"
-overwrite = False
+overwrite = True
 target_lumi = 2000 #pb-1
 
 from localInfo import username
@@ -30,6 +30,7 @@ parser.add_option("--samples", dest="allsamples", default="ttJetsCSA1450ns", typ
 parser.add_option("--file", dest="file", default="", type="string", action="store", help="file:Which file.")
 parser.add_option("--DR", dest="DR", default="0.4", type="float", action="store", help="samples:Which samples.")
 parser.add_option("--small", dest="small", action="store_true", help="Just do a small subset.")
+parser.add_option("--puppi", dest="puppi", action="store_true", help="Just do a puppi subset.")
 parser.add_option("--newGenMet", dest="newGenMet", action="store_true", help="new genmet?")
 parser.add_option("--fromPercentage", dest="fromPercentage", default="0", type="int", action="store", help="from (% of tot. events)")
 parser.add_option("--toPercentage", dest="toPercentage", default="100", type="int", action="store", help="to (% of tot. events)")
@@ -105,6 +106,9 @@ for isample, sample in enumerate(allSamples):
   elvars = ["elePt", "eleEta", "elePhi", "elePdg", "eleRelIso", "eleDxy", "eleDz", "eleOneOverEMinusOneOverP", "elePfRelIso", "eleSigmaIEtaIEta", "eleHoE", "eleDPhi", "eleDEta", "eleMissingHits", "elePassPATConversionVeto"]
   tavars = ["tauPt", "tauEta", "tauPhi", "tauPdg", 'tauJetInd', 'tauJetDR']
   trackVars = ["trackPdg", "trackPt", "trackEta", "trackPhi", "trackRelIso","trackPassVetoMuSel","trackPassVetoEleSel","trackPassHybridLooseMuons","trackPassHybridMediumMuons","trackPassHybridTightMuons"]
+  if options.puppi:
+    puppiVars = ["puppiPdg", "puppiPt", "puppiEta", "puppiPhi"]
+    pfVars = ["pfPdg", "pfPt", "pfEta", "pfPhi"]
   if not sample['name'].lower().count('data'):
     extraVariables+=["ngNuEFromW","ngNuMuFromW","ngNuTauFromW"]
     genTauvars = ["gTauPdg", "gTauPt", "gTauEta", "gTauPhi", "gTauMetPar", "gTauMetPerp", "gTauNENu", "gTauNMuNu", 'gTauNTauNu', 'gTauJetInd', 'gTauJetDR', 'gTauTauDR', 'gTauTauInd']
@@ -145,6 +149,10 @@ for isample, sample in enumerate(allSamples):
     structString +="Float_t "+var+"[10];"
   for var in trackVars:
     structString +="Float_t "+var+"[10];"
+  if options.puppi:
+    structString +="Int_t pfCount, puppiCount;"
+    for var in puppiVars+pfVars:
+      structString +="Float_t "+var+"[3000];"
   if not sample['name'].lower().count('data'):
     structString +="Int_t ngTaus, ngLep;"
     for var in genTauvars:
@@ -204,6 +212,13 @@ for isample, sample in enumerate(allSamples):
     t.Branch(var,   ROOT.AddressOf(s,var), var+'[ntauCount]/F')
   for var in trackVars:
     t.Branch(var,   ROOT.AddressOf(s,var), var+'[ntrackCount]/F')
+  if options.puppi:
+    t.Branch("pfCount",   ROOT.AddressOf(s,"pfCount"), 'pfCount/I')
+    t.Branch("puppiCount",   ROOT.AddressOf(s,"puppiCount"), 'puppiCount/I')
+    for var in puppiVars:
+      t.Branch(var,   ROOT.AddressOf(s,var), var+'[puppiCount]/F')
+    for var in pfVars:
+      t.Branch(var,   ROOT.AddressOf(s,var), var+'[pfCount]/F')
   if not sample['name'].lower().count('data'):
     t.Branch("ngTaus",   ROOT.AddressOf(s,"ngTaus"), 'ngTaus/I')
     t.Branch("ngLep",   ROOT.AddressOf(s,"ngLep"), 'ngLep/I')
@@ -242,7 +257,8 @@ for isample, sample in enumerate(allSamples):
     gpHandle = Handle("vector<reco::GenParticle>")
     pfLabel = ("packedPFCandidates")
     pfHandle = Handle("vector<pat::PackedCandidate>")
-
+    puppiLabel = ("puppi","Puppi")
+    puppiHandle = Handle("vector<reco::PFCandidate>")
     mclist = []
     for thisfile in bin["filenames"]:
       mclist.append(thisfile)
@@ -266,13 +282,13 @@ for isample, sample in enumerate(allSamples):
       stop  = int(options.toPercentage/100.*number_events)
       print "Reading: ", sample["name"], bin['dbsName'], "with",number_events,"Events using cut", commoncf
       print "Reading percentage ",options.fromPercentage, "to",options.toPercentage, "which is range",start,"to",stop,"of",number_events
-      for i in range(start, stop):
-        if (i%1000 == 0) and i>0 :
-          print i
+      for nev in range(start, stop):
+        if (nev%1000 == 0) and nev>0 :
+          print nev
   #      # Update all the Tuples
         if elist.GetN()>0 and ntot>0:
-          c.GetEntry(elist.GetEntry(i))
-          events.to(elist.GetEntry(i))
+          c.GetEntry(elist.GetEntry(nev))
+          events.to(elist.GetEntry(nev))
           s.weight = bin['weight']
           for var in variables[1:]:
             getVar = var
@@ -496,7 +512,21 @@ for isample, sample in enumerate(allSamples):
             s.trackPassHybridMediumMuons[i]=isIsolated({'phi':s.trackPhi[i],'eta':s.trackEta[i]}, hybridMediumMuons, dR=0.1)
             s.trackPassHybridTightMuons[i]=isIsolated({'phi':s.trackPhi[i],'eta':s.trackEta[i]}, hybridTightMuons, dR=0.1)
 ####################
-
+          if options.puppi:
+            events.getByLabel(puppiLabel,puppiHandle)
+            puppi = list(puppiHandle.product())
+            s.puppiCount=min(3000, len(puppi))
+            for i in range(s.puppiCount):
+              s.puppiPt[i] = puppi[i].pt() 
+              s.puppiEta[i] = puppi[i].eta() 
+              s.puppiPhi[i] = puppi[i].phi() 
+              s.puppiPdg[i] = puppi[i].pdgId() 
+            s.pfCount=min(3000, len(pfc))
+            for i in range(s.pfCount):
+              s.pfPt[i]  = pfc[i].pt() 
+              s.pfEta[i] = pfc[i].eta() 
+              s.pfPhi[i] = pfc[i].phi() 
+              s.pfPdg[i] = pfc[i].pdgId() 
           s.njetCount = min(30,s.njets)
           for i in xrange(s.njetCount):
             s.jetPt[i]    = idJets30[i]['pt']
