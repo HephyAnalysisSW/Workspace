@@ -17,23 +17,24 @@ pfMetPuppiHandle = Handle("vector<reco::PFMET>")
 
 labellist = ('packedGenParticles','packedPFCandidates',('puppi','Puppi'),'pfMet','pfMetPuppi')
 handlelist = ("vector<pat::PackedGenParticle>", "vector<pat::PackedCandidate>","vector<reco::PFCandidate>","vector<reco::PFMET>","vector<reco::PFMET>")
+#labellist = ('packedGenParticles','packedPFCandidates','pfMet')
+#handlelist = ("vector<pat::PackedGenParticle>", "vector<pat::PackedCandidate>","vector<reco::PFMET>")
 #cuts are made based on the first element of the label and handlelist
 
 provide = [\
        {'type':"vector<pat::PackedGenParticle>", 'label':'packedGenParticles', 'localName':'pfCandidates'}, 
 #       {'handle':"vector<pat::PackedGenParticle>", 'label':'packedGenParticles', 'localName':'pfCanditates'}, 
           ]
-
+mothers =[]
 metD = []
-def calcMet(labels,handles,filelist=['histo.root']):
-
+def calcMet(labels,handles,filelist=['/data/schoef/puppi/histo.root']):
   events = Events(filelist)
   events.toBegin()
   c = ROOT.TChain('Events')
   for f in filelist:
     c.Add(f)
 
-  nEvents=100 #events.size()
+  nEvents=10 #events.size()
   sumPy = sumPx = 0
 
   for s in range (0,len(labels)):
@@ -60,15 +61,18 @@ def calcMet(labels,handles,filelist=['histo.root']):
     isHad=True
     for igp,gp in enumerate(gps):
       pdgId = abs(gp.pdgId())
-#      if pdgId<20:print pdgId
+#      if abs(gp.mother(0).pdgId())==24: print 'from W'
+#      if gp.pt() > 100 : print 'p ', pdgId  , 'pt= ', gp.pt(), 'mother is: ', gp.mother(0).pdgId()
       if pdgId==12 or pdgId==14 or pdgId==16:
-#        print 'here', gp.numberOfMothers(), gp.mother(0).pdgId()
+#        if gp.mother(0).pdgId() not in mothers: mothers.append(gp.mother(0).pdgId())
+ #       print 'here', gp.numberOfMothers(), gp.mother(0).pdgId()
         if abs(gp.mother(0).pdgId())==24:
+         # print 'from W', pdgId, gp.pt()
           isHad=False
           break 
-    print "isHad", isHad
+#    print "isHad", isHad
     if not isHad:continue
-    print c.GetLeaf(c.GetAlias('genMet')).GetValue()
+#    print c.GetLeaf(c.GetAlias('genMet')).GetValue()
     for s in range (1,len(labels)):
       hndl = Handle(handles[s]) 
       lbl = labels[s]
@@ -97,3 +101,5 @@ def calcMet(labels,handles,filelist=['histo.root']):
     metD[s].Draw(drawOpt)   
 
   leg.Draw()
+
+calcMet(labellist,handlelist)
