@@ -85,7 +85,7 @@ def jerSigmaMCRel(pt, eta):
 
 from Workspace.HEPHYPythonTools.xsec import xsec
 
-subDir = "monoJetTuples_v8"
+subDir = "monoJetTuples_v9"
 
 if debug:
   options.allsamples='sms'
