@@ -200,14 +200,14 @@ dy['reweightingHistoFileSysMinus'] = S10rwMinusHisto
 #dyJetsToLLPtZ50['reweightingHistoFileSysPlus'] = S10rwPlusHisto
 #dyJetsToLLPtZ50['reweightingHistoFileSysMinus'] = S10rwMinusHisto
 #
-#dyJetsToLLPtZ50Ext = copy.deepcopy(mc)
-#dyJetsToLLPtZ50Ext['newMETCollection'] = True
-#dyJetsToLLPtZ50Ext["dirname"] = "/dpm/oeaw.ac.at/home/cms/store/user/schoef/pat_240614"
-#dyJetsToLLPtZ50Ext["bins"] = ["8TeV-DYJetsToLL_PtZ-50To70_TuneZ2star_8TeV_ext-madgraph-tarball", "8TeV-DYJetsToLL_PtZ-70To100_TuneZ2star_8TeV_ext-madgraph-tarball", "8TeV-DYJetsToLL_PtZ-100_TuneZ2star_8TeV_ext-madgraph-tarball"] 
-#dyJetsToLLPtZ50Ext["name"] = "8TeV-DYJetsToLL_PtZ-50_TuneZ2star_8TeV_ext-madgraph-tarball" 
-#dyJetsToLLPtZ50Ext['reweightingHistoFile'] = S10rwHisto
-#dyJetsToLLPtZ50Ext['reweightingHistoFileSysPlus'] = S10rwPlusHisto
-#dyJetsToLLPtZ50Ext['reweightingHistoFileSysMinus'] = S10rwMinusHisto
+dyJetsToLLPtZ50Ext = copy.deepcopy(mc)
+dyJetsToLLPtZ50Ext['newMETCollection'] = True
+dyJetsToLLPtZ50Ext["dirname"] = "/dpm/oeaw.ac.at/home/cms/store/user/schoef/pat_240614"
+dyJetsToLLPtZ50Ext["bins"] = ["8TeV-DYJetsToLL_PtZ-50To70_TuneZ2star_8TeV_ext-madgraph-tarball", "8TeV-DYJetsToLL_PtZ-70To100_TuneZ2star_8TeV_ext-madgraph-tarball", "8TeV-DYJetsToLL_PtZ-100_TuneZ2star_8TeV_ext-madgraph-tarball"] 
+dyJetsToLLPtZ50Ext["name"] = "8TeV-DYJetsToLL_PtZ-50_TuneZ2star_8TeV_ext-madgraph-tarball" 
+dyJetsToLLPtZ50Ext['reweightingHistoFile'] = S10rwHisto
+dyJetsToLLPtZ50Ext['reweightingHistoFileSysPlus'] = S10rwPlusHisto
+dyJetsToLLPtZ50Ext['reweightingHistoFileSysMinus'] = S10rwMinusHisto
 #
 
 zinv = copy.deepcopy(mc)

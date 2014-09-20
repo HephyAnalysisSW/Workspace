@@ -144,7 +144,7 @@ if options.smsMsqRangeString!='None' and options.allsamples.lower()=='sms':
 else:
   exec("allSamples = [" +options.allsamples+ "]")
 
-overwrite = True
+overwrite = False
 target_lumi = 19700 #pb-1
 
 from localInfo import username
@@ -313,6 +313,11 @@ def getGoodJets(c, crosscleanobjects, jermode=options.jermode, jesmode=options.j
   res  = sorted(res,  key=lambda k: -k['pt'])
   return {'jets':res,'met_dx':met_dx, 'met_dy':met_dy}
 
+def effLimit(e):
+  if e>=1.:return 1.
+  if e<0.:return 0
+  return e
+
 def getMCEfficiencyForBTagSF(jets, isFastSim=False):
   for jet in jets:
     r = getMCEff(parton=jet['pdg'], pt=jet['pt'], eta=jet['eta'], year=2012)#getEfficiencyAndMistagRate(jPt, jEta, jParton )
@@ -333,18 +338,18 @@ def getMCEfficiencyForBTagSF(jets, isFastSim=False):
       fsim_SF = 1.
       fsim_SF_up = 1.
       fsim_SF_down = 1.
-    mceffs += (jet['effData']["mcEff"],)
-    mceffs_SF += (jet['effData']["mcEff"]*jet['effData']["SF"]*fsim_SF,)
+    mceffs +=                     (effLimit(jet['effData']["mcEff"]),)
+    mceffs_SF +=                  (effLimit(jet['effData']["mcEff"]*jet['effData']["SF"]*fsim_SF),)
     if abs(jet['pdg'])==5 or abs(jet['pdg'])==4:
-      mceffs_SF_b_Up   += (jet['effData']["mcEff"]*jet['effData']["SF_up"]*fsim_SF_up,)
-      mceffs_SF_b_Down += (jet['effData']["mcEff"]*jet['effData']["SF_down"]*fsim_SF_down,)
-      mceffs_SF_light_Up   += (jet['effData']["mcEff"]*jet['effData']["SF"],)
-      mceffs_SF_light_Down += (jet['effData']["mcEff"]*jet['effData']["SF"],)
+      mceffs_SF_b_Up   +=         (effLimit(jet['effData']["mcEff"]*jet['effData']["SF_up"]*fsim_SF_up),)
+      mceffs_SF_b_Down +=         (effLimit(jet['effData']["mcEff"]*jet['effData']["SF_down"]*fsim_SF_down),)
+      mceffs_SF_light_Up   +=     (effLimit(jet['effData']["mcEff"]*jet['effData']["SF"]),)
+      mceffs_SF_light_Down +=     (effLimit(jet['effData']["mcEff"]*jet['effData']["SF"]),)
     else:
-      mceffs_SF_b_Up   += (jet['effData']["mcEff"]*jet['effData']["SF"],)
-      mceffs_SF_b_Down += (jet['effData']["mcEff"]*jet['effData']["SF"],)
-      mceffs_SF_light_Up   += (jet['effData']["mcEff"]*jet['effData']["SF_up"]*fsim_SF_up,)
-      mceffs_SF_light_Down += (jet['effData']["mcEff"]*jet['effData']["SF_down"]*fsim_SF_down,)
+      mceffs_SF_b_Up   +=         (effLimit(jet['effData']["mcEff"]*jet['effData']["SF"]),)
+      mceffs_SF_b_Down +=         (effLimit(jet['effData']["mcEff"]*jet['effData']["SF"]),)
+      mceffs_SF_light_Up   +=     (effLimit(jet['effData']["mcEff"]*jet['effData']["SF_up"]*fsim_SF_up),)
+      mceffs_SF_light_Down +=     (effLimit(jet['effData']["mcEff"]*jet['effData']["SF_down"]*fsim_SF_down),)
 
   return {"mceffs":mceffs, "mceffs_SF":mceffs_SF, "mceffs_SF_b_Up":mceffs_SF_b_Up, "mceffs_SF_b_Down":mceffs_SF_b_Down, "mceffs_SF_light_Up":mceffs_SF_light_Up, "mceffs_SF_light_Down":mceffs_SF_light_Down}
 
