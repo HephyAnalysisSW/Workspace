@@ -112,7 +112,7 @@ ROOT.gROOT.SetStyle("Plain")
 #ROOT.RooMinuit(nll).minos()#optional
 
 #model.fitTo(data)#ItisthisfitTocommandthatgivesthestatisticaloutput
-nllComponents = ROOT.RooArgSet("nllComponents")
+nllComponents = ROOT.RooArgList("nllComponents")
 nll_PosPdg=model_PosPdg.createNLL(data_PosPdg,rf.NumCPU(1))
 nll_NegPdg=model_NegPdg.createNLL(data_NegPdg,rf.NumCPU(1))
 nllComponents.add(nll_PosPdg)

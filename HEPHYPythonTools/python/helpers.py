@@ -5,6 +5,26 @@ from array import array
 def test():
   return 1
 
+def bStr(s): 
+  "make string bold."
+  assert type(s)==type(""), "bStr needs string, got %s" % str(type(s))
+  return "\033[1m"+s+"\033[0;0m"
+
+def wrapStr(s="", char="#", maxL = 100):
+  "Wrap a string with a char"
+  assert type(s)==type(""), "wrapStr needs string, got %s" % str(type(s))
+  assert type(char)==type(""), "wrapStr needs character, got %s" % str(type(char))
+  if s=="":
+    return char.join(["" for i in range(maxL+1)])
+  char=char[:1]
+  l = len(s) 
+  if l>=maxL:
+    return s
+  frontL = (maxL - l )/2
+  backL  = maxL-l-frontL
+  return char.join(["" for i in range(frontL)]) + " "+s+" "+char.join(["" for i in range(backL)])
+
+
 def getFileList(dir, minAgeDPM=0, histname='histo', xrootPrefix='root://hephyse.oeaw.ac.at/', maxN=-1):
   monthConv = {'Jan':1, 'Feb':2,'Mar':3,'Apr':4,"May":5, "Jun":6,"Jul":7,"Aug":8, "Sep":9, "Oct":10, "Nov":11, "Dec":12}
   import os, subprocess, datetime

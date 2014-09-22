@@ -152,7 +152,7 @@ for isample, sample in enumerate(allSamples):
   if options.puppi:
     structString +="Int_t pfCount, puppiCount;"
     for var in puppiVars+pfVars:
-      structString +="Float_t "+var+"[3000];"
+      structString +="Float_t "+var+"[10000];"
   if not sample['name'].lower().count('data'):
     structString +="Int_t ngTaus, ngLep;"
     for var in genTauvars:
@@ -515,13 +515,13 @@ for isample, sample in enumerate(allSamples):
           if options.puppi:
             events.getByLabel(puppiLabel,puppiHandle)
             puppi = list(puppiHandle.product())
-            s.puppiCount=min(3000, len(puppi))
+            s.puppiCount=min(10000, len(puppi))
             for i in range(s.puppiCount):
               s.puppiPt[i] = puppi[i].pt() 
               s.puppiEta[i] = puppi[i].eta() 
               s.puppiPhi[i] = puppi[i].phi() 
               s.puppiPdg[i] = puppi[i].pdgId() 
-            s.pfCount=min(3000, len(pfc))
+            s.pfCount=min(10000, len(pfc))
             for i in range(s.pfCount):
               s.pfPt[i]  = pfc[i].pt() 
               s.pfEta[i] = pfc[i].eta() 
