@@ -51,7 +51,8 @@ options.register ('keep','',
 #infiles = ['root://xrootd.unl.edu//store/mc/Spring14dr/WJetsToLNu_HT-100to200_Tune4C_13TeV-madgraph-tauola/AODSIM/PU20bx25_POSTLS170_V5-v1/00000/00165B45-82E6-E311-B68D-002590AC4FEC.root']
 #infiles = ['file:/data/schoef/local/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola_PU20bx25_POSTLS170_V5-v1_MINIAODSIM.root']
 #infiles = ['root://eoscms.cern.ch//eos/cms/store/relval/CMSSW_7_0_5/RelValTTbar_13/GEN-SIM-RECO/POSTLS170_V6-v3/00000/0423767B-B5DD-E311-A1E0-02163E00E5B5.root']
-infiles = ['file:/afs/hephy.at/scratch/s/schoefbeck/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola_PU20bx25_POSTLS170_V5-v1_MINIAODSIM.root']
+#infiles = ['file:/afs/hephy.at/scratch/s/schoefbeck/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola_PU20bx25_POSTLS170_V5-v1_MINIAODSIM.root']
+infiles = ['file:/data/nrad/local/WJetsToLNu_HT-100to200_Tune4C_13TeV-madgraph-tauola_PU20bx25_POSTLS170_V5-v1_AODSIMPuppiMiniAOD.root']
 options.files=infiles
 
 options.mode = 'mc'
@@ -104,7 +105,8 @@ process.load("Configuration.StandardSequences.MagneticField_cff")
 process.out = cms.OutputModule("PoolOutputModule",
      #verbose = cms.untracked.bool(True),
      SelectEvents   = cms.untracked.PSet( SelectEvents = cms.vstring('p') ),
-     fileName = cms.untracked.string(options.outfile),
+     #fileName = cms.untracked.string(options.outfile),
+     fileName = cms.untracked.string(process.source.fileNames[0][0:-5]+'Tupel.root'),
      outputCommands = cms.untracked.vstring() 
 #     outputCommands = cms.untracked.vstring('keep *') 
 )

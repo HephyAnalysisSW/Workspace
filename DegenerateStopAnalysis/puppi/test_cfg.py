@@ -58,7 +58,9 @@ options.register ('keep','',
 #infiles = ['root://xrootd.unl.edu//store/mc/Spring14dr/WJetsToLNu_HT-100to200_Tune4C_13TeV-madgraph-tauola/AODSIM/PU20bx25_POSTLS170_V5-v1/00000/00165B45-82E6-E311-B68D-002590AC4FEC.root']
 #infiles = ['file:/data/schoef/local/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola_PU20bx25_POSTLS170_V5-v1_MINIAODSIM.root']
 #infiles = ['root://eoscms.cern.ch//eos/cms/store/relval/CMSSW_7_0_5/RelValTTbar_13/GEN-SIM-RECO/POSTLS170_V6-v3/00000/0423767B-B5DD-E311-A1E0-02163E00E5B5.root']
-infiles = ['file:/afs/hephy.at/scratch/s/schoefbeck/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola_PU20bx25_POSTLS170_V5-v1_MINIAODSIM.root']
+
+#infiles = ['file:/afs/hephy.at/scratch/s/schoefbeck/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola_PU20bx25_POSTLS170_V5-v1_MINIAODSIM.root']
+infiles = ['file:/afs/hephy.at/scratch/n/nrad/TTJets-53X-syncfile-AODSIM.root']
 options.files=infiles
 
 options.mode = 'mc'
