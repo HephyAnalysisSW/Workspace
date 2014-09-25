@@ -1,12 +1,12 @@
 import ROOT
 import pickle
 from array import array
-from objectSelection import gTauAbsEtaBins, gTauPtBins, metParRatioBins, jetRatioBins
+from Workspace.RA4Analysis.objectSelection import gTauAbsEtaBins, gTauPtBins, metParRatioBins, jetRatioBins
 from Workspace.HEPHYPythonTools.helpers import getVarValue, getObjFromFile
-from objectSelection import getLooseMuStage2, tightPOGMuID, vetoMuID
+from Workspace.RA4Analysis.objectSelection import getLooseMuStage2, tightPOGMuID, vetoMuID
 from math import sqrt, cos, sin, atan2
 
-from stage2Tuples import *
+from Workspace.RA4Analysis.stage2Tuples import *
 c = ROOT.TChain('Events')
 for b in ttJetsCSA1450ns['bins']:
   c.Add(ttJetsCSA1450ns['dirname']+'/'+b+'/h*.root')

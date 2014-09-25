@@ -1,6 +1,6 @@
 import ROOT
 import pickle
-from stage2Tuples import ttJetsCSA14
+from Workspace.RA4Analysis.stage2Tuples import ttJetsCSA14
 from array import array
 c = ROOT.TChain('Events')
 for b in ttJetsCSA14['bins']:
@@ -9,7 +9,7 @@ for b in ttJetsCSA14['bins']:
 stuff=[]
 hadTauReq = 'gTauNENu+gTauNMuNu==0&&gTauNTauNu==1'
 
-from objectSelection import gTauAbsEtaBins, gTauPtBins, metParRatioBins, jetRatioBins
+from Workspace.RA4Analysis.objectSelection import gTauAbsEtaBins, gTauPtBins, metParRatioBins, jetRatioBins
 
 colors = [ROOT.kGray, ROOT.kBlack, ROOT.kBlue, ROOT.kRed, ROOT.kGreen, ROOT.kMagenta, ROOT.kCyan]
 

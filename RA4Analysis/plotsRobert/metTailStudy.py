@@ -1,5 +1,5 @@
 import ROOT
-from stage1Tuples import *
+from Workspace.RA4Analysis.stage1Tuples import *
 from Workspace.HEPHYPythonTools.helpers import getFileList
 #sample = WJetsToLNu25ns 
 sample = WJetsHTToLNu

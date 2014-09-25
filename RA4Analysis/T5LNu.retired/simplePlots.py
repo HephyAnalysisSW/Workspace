@@ -32,7 +32,7 @@ chmode = "copy"
 presel = "refSel"
 ver = "v5"
 region = "signal6j"
-scaleTo13TeV = True
+scaleTo13TeV = False
 preprefixes=[]
 if scaleTo13TeV:
   preprefixes.append("scaleTo13TeV")
@@ -140,7 +140,8 @@ prefix = "T5Full_"+preprefix+"_"+presel+"_"+chmode+"_"
 T5Full_1100_200_100['color'] = ROOT.kBlue + 3
 T5Full_1100_800_600['color'] = ROOT.kRed + 3
 
-signals=[T5Full_1100_200_100, T5Full_1100_800_600]
+#signals=[T5Full_1100_200_100, T5Full_1100_800_600]
+signals=[T5Full_1100_800_600]
 for s in [T5Full_1100_200_100, T5Full_1100_800_600]:
   s['kFac13TeV'] = gluino13TeV_NLONLL[1100]/gluino8TeV_NLONLL[1100]
 if addSignals:
