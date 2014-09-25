@@ -1,10 +1,10 @@
 import ROOT
 import pickle
 from array import array
-from objectSelection import gTauAbsEtaBins, gTauPtBins, metParRatioBins, jetRatioBins
+from Workspace.RA4Analysis.objectSelection import gTauAbsEtaBins, gTauPtBins, metParRatioBins, jetRatioBins
 from Workspace.HEPHYPythonTools.helpers import getVarValue, getObjFromFile, findClosestObjectDR
-from objectSelection import getLooseMuStage2, tightPOGMuID, vetoMuID, getGoodJetsStage2
-from stage2Tuples import *
+from Workspace.RA4Analysis.objectSelection import getLooseMuStage2, tightPOGMuID, vetoMuID, getGoodJetsStage2
+from Workspace.RA4Analysis.stage2Tuples import *
 from math import sqrt, cos, sin, atan2
 
 presel = 'ht>400&&met>150&&nmuCount>0'

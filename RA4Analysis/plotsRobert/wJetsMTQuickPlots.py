@@ -3,7 +3,7 @@ from math import *
 from Workspace.HEPHYPythonTools.helpers import getVarValue, getChain, getPlotFromChain
 from Workspace.RA4Analysis.simplePlotHelpers import plot, stack, loopAndFill, drawNMStacks
 
-from stage2Tuples import WJetsHTToLNu, WJetsToLNu25ns
+from Workspace.RA4Analysis.stage2Tuples import WJetsHTToLNu, WJetsToLNu25ns
 
 #cInc = getChain(WJetsToLNu25ns)
 c = getChain(WJetsHTToLNu)

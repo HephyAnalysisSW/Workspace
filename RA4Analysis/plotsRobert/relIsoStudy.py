@@ -1,5 +1,5 @@
 import ROOT
-from stage2Tuples import ttJetsCSA1450ns , ttJetsCSA1425ns
+from Workspace.RA4Analysis.stage2Tuples import ttJetsCSA1450ns , ttJetsCSA1425ns
 from localInfo import username
 
 

@@ -1,6 +1,6 @@
 import ROOT
 import pickle
-from stage2Tuples import ttJetsCSA1450ns, ttJetsCSA1425ns
+from Workspace.RA4Analysis.stage2Tuples import ttJetsCSA1450ns, ttJetsCSA1425ns
 from array import array
 c = ROOT.TChain('Events')
 for b in ttJetsCSA1450ns['bins']:

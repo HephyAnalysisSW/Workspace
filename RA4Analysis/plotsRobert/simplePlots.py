@@ -9,7 +9,7 @@ from Workspace.HEPHYPythonTools.helpers import getObjFromFile
 #from Workspace.RA4Analysis.simplePlotsCommon import *
 from Workspace.RA4Analysis.simplePlotHelpers import plot, stack, loopAndFill, drawNMStacks
 from helpers import *
-from stage2Tuples import ttJetsCSA1450ns, WJetsHTToLNu
+from Workspace.RA4Analysis.stage2Tuples import ttJetsCSA1450ns, WJetsHTToLNu
 
 subdir = "/pngTMP/"
 prefix = 'looseVeto'

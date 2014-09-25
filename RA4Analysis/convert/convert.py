@@ -9,12 +9,12 @@ from Workspace.RA4Analysis.convertHelpers import compileClass, readVar, printHea
 
 from Workspace.HEPHYPythonTools.helpers import bStr, wrapStr, getFileList, getVarValue
 from Workspace.HEPHYPythonTools.helpers import deltaPhi, minAbsDeltaPhi, invMassOfLightObjects, deltaR, closestMuJetDeltaR, invMass,  findClosestObjectDR
-from objectSelection import getLooseEleStage1,getAllElectronsStage1, tightPOGEleID, vetoEleID, getLooseMuStage1, getAllMuonsStage1, tightPOGMuID, vetoMuID, getAllTausStage1, getTauStage1, hybridMuID, getGoodJetsStage1, isIsolated
+from Workspace.RA4Analysis.objectSelection import getLooseEleStage1,getAllElectronsStage1, tightPOGEleID, vetoEleID, getLooseMuStage1, getAllMuonsStage1, tightPOGMuID, vetoMuID, getAllTausStage1, getTauStage1, hybridMuID, getGoodJetsStage1, isIsolated
 
 #def getVarValue(chain, bname):
 #  return getattr(chain, bname)
 
-from stage1Tuples import *
+from Workspace.RA4Analysis.stage1Tuples import *
 
 from Workspace.HEPHYPythonTools.xsec import xsec
 
@@ -179,13 +179,13 @@ for isample, sample in enumerate(allSamples):
   writeClassName = "ClassToWrite_"+str(nc)+"_"+str(isample) 
   writeClassString = createClassString(className=writeClassName, vars=copyVars + newVars, vectors=newVectors, nameKey = 'stage2Name')
   printHeader("Class to Write")
-  print writeClassString
+#  print writeClassString
   s = compileClass(className=writeClassName, classString=writeClassString, tmpDir='/data/'+username+'/tmp/')
 
   readClassName = "ClassToRead_"+str(nc)+"_"+str(isample) 
   readClassString = createClassString(className=readClassName, vars=readVars, vectors=readVectors, nameKey = 'stage1Name', stdVectors=True)
   printHeader("Class to Read")
-  print readClassString
+#  print readClassString
   r = compileClass(className=readClassName, classString=readClassString, tmpDir='/data/'+username+'/tmp/')
 
   nc+=1

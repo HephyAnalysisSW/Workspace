@@ -1,5 +1,5 @@
 import ROOT
-from stage2Tuples import *
+from Workspace.RA4Analysis.stage2Tuples import *
 
 relIso=0.3
 ptCut = 15

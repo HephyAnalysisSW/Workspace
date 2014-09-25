@@ -1,5 +1,5 @@
 import ROOT
-from stage2Tuples import ttJetsCSA14
+from Workspace.RA4Analysis.stage2Tuples import ttJetsCSA14
 
 htCut     = 750
 metCut    = 150

@@ -3,7 +3,7 @@ from math import *
 #from helpers import getVarValue, deltaPhi, minAbsDeltaPhi,  deltaR, invMass,
 from Workspace.HEPHYPythonTools.helpers import getVarValue, getChain
 
-from stage2Tuples import WJetsHTToLNu, WJetsToLNu25ns
+from Workspace.RA4Analysis.stage2Tuples import WJetsHTToLNu, WJetsToLNu25ns
 smallNumber = 50
 
 prefix = 'ht'

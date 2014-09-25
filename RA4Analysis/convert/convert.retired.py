@@ -5,9 +5,9 @@ from math import *
 import sys, os, copy, random, subprocess, datetime
 #from helpers import getVarValue, deltaPhi, minAbsDeltaPhi,  deltaR, invMass,
 from Workspace.HEPHYPythonTools.helpers import getVarValue, deltaPhi, minAbsDeltaPhi, invMassOfLightObjects, deltaR, closestMuJetDeltaR, invMass,  findClosestObjectDR, getFileList
-from objectSelection import getLooseEleStage1,getAllElectronsStage1, tightPOGEleID, vetoEleID, getLooseMuStage1, getAllMuonsStage1, tightPOGMuID, vetoMuID, getAllTausStage1, getTauStage1, hybridMuID, getGoodJetsStage1, isIsolated
+from Workspace.RA4Analysis.objectSelection import getLooseEleStage1,getAllElectronsStage1, tightPOGEleID, vetoEleID, getLooseMuStage1, getAllMuonsStage1, tightPOGMuID, vetoMuID, getAllTausStage1, getTauStage1, hybridMuID, getGoodJetsStage1, isIsolated
 
-from stage1Tuples import *
+from Workspace.RA4Analysis.stage1Tuples import *
 
 from Workspace.HEPHYPythonTools.xsec import xsec
 

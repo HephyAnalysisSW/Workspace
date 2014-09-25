@@ -4,12 +4,12 @@ ROOT.gROOT.LoadMacro("../../HEPHYPythonTools/scripts/root/tdrstyle.C")
 #ROOT.gROOT.LoadMacro("../../HEPHYPythonTools/scripts/root/CMS_lumi.C")
 ROOT.setTDRStyle()
 ROOT.TH1F.SetDefaultSumw2()
-def setupLumiPlotInfo():
-  ROOT.gROOT.ProcessLine('writeExtraText = true;      ') # if extra text
-  ROOT.gROOT.ProcessLine('extraText  = "Preliminary"; ') # default extra text is "Preliminary"
-  ROOT.gROOT.ProcessLine('lumi_8TeV  = "19.1 fb^{-1}";') # default is "19.7 fb^{-1}"
-  ROOT.gROOT.ProcessLine('lumi_7TeV  = "4.9 fb^{-1}"; ') # default is "5.1 fb^{-1}"
-  ROOT.gROOT.ProcessLine('int iPeriod = 3;')
+#def setupLumiPlotInfo():
+#  ROOT.gROOT.ProcessLine('writeExtraText = true;      ') # if extra text
+#  ROOT.gROOT.ProcessLine('extraText  = "Preliminary"; ') # default extra text is "Preliminary"
+#  ROOT.gROOT.ProcessLine('lumi_8TeV  = "19.1 fb^{-1}";') # default is "19.7 fb^{-1}"
+#  ROOT.gROOT.ProcessLine('lumi_7TeV  = "4.9 fb^{-1}"; ') # default is "5.1 fb^{-1}"
+#  ROOT.gROOT.ProcessLine('int iPeriod = 3;')
 
 from Workspace.HEPHYPythonTools.helpers import getFileList, getVarValue
 
@@ -203,7 +203,6 @@ def drawStack(stk):
       hcopy = p.histo.Clone()
       if p.style.has_key('errorBars') and not p.style['errorBars']:
         for nbin in range(0, hcopy.GetNbinsX()+1):
-          print 'Deleting'
           hcopy.SetBinError(nbin, 0.)
 #      if stk.options.has_key('labels'):
       try:
@@ -327,7 +326,7 @@ def drawNMStacks(intn, intm, stacks, filename, path = defaultWWWPath):
       thisPad = c1.cd(istack+1)
     else:
       thisPad = c1
-    setupLumiPlotInfo()
+#    setupLumiPlotInfo()
 #    ROOT.CMS_lumi(thisPad, 3, 22 )
 
     if stk.options.has_key('ratio') and stk.options['ratio']:
@@ -381,7 +380,6 @@ def drawNMStacks(intn, intm, stacks, filename, path = defaultWWWPath):
         thisPad.SetLogx(stk.options['logX'])
       stuff += drawStack(stk)
   if filename[-4:] not in [".png", ".pdf", "root"]:
-    print path,filename,".png"
     c1.Print(path+filename+".png")
     c1.Print(path+filename+".root")
     c1.Print(path+filename+".pdf")

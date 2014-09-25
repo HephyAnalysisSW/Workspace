@@ -1,13 +1,13 @@
 import ROOT
 import pickle
-from stage2Tuples import ttJetsCSA14
+from Workspace.RA4Analysis.stage2Tuples import ttJetsCSA1450ns
 from Workspace.HEPHYPythonTools.helpers import getPlotFromChain
 from Workspace.RA4Analysis.simplePlotsCommon import ROOT_colors
 
 c = ROOT.TChain('Events')
-for b in ttJetsCSA14['bins']:
-  c.Add(ttJetsCSA14['dirname']+'/'+b+'/h*.root')
-#c.Add('histo_ttJetsCSA14_from0To10.root')
+for b in ttJetsCSA1450ns['bins']:
+  c.Add(ttJetsCSA1450ns['dirname']+'/'+b+'/h*.root')
+#c.Add('histo_ttJetsCSA1450ns_from0To10.root')
 
 #lTau_H  = "ngNuEFromW+ngNuMuFromW==0&&ngNuTauFromW==1"
 lTau_H  = "ngNuEFromW+ngNuMuFromW==0&&ngNuTauFromW==1&&Sum$(gTauNENu+gTauNMuNu==1&&gTauNTauNu==1)==1"
