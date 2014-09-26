@@ -4,7 +4,6 @@ from localInfo import username
 from objectSelection import tightPOGMuID , vetoMuID , getLooseMuStage2
 from math import sqrt, cos, sin, atan2
 from array import array
-from getmuon import getMu
 
 Lumi=2000 #pb-1
 xsec=689.1 #pb ?
@@ -18,12 +17,13 @@ ptBinsCoarse  = array('d', [float(x) for x in range(10, 20)+range(20,50,5)+range
 etaBinsCoarse = array('d', [float(x)/10. for x in [-30,-25]+range(-21,22,6)+[25,30]])
 
 
-File = ROOT.TFile('EffMapDiLep02OO.root','RECREATE')
+File = ROOT.TFile('LetsSee.root','RECREATE')
+
+
 NoIsoPtEff = ROOT.TH1F('NoIsoPtEff', 'NoIsoPtEff',len(ptBins)-1,ptBins)
-#NoIsoPtEff = ROOT.TH1F('NoIsoPtEff', 'NoIsoPtEff',25,0,800)
 NoIsoPtNum = ROOT.TH1F('NoIsoPtNum', 'NoIsoPtNum',len(ptBins)-1,ptBins)
 NoIsoPtDen = ROOT.TH1F('NoIsoPtDen', 'NoIsoPtDen',len(ptBins)-1,ptBins)
-#NoIsoPtDen = ROOT.TH1F('NoIsoPtDen', 'NoIsoPtDen',25,0,800)
+
 NoIsoEtaEff = ROOT.TH1F('NoIsoEtaEff', 'NoIsoEtaEff',len(etaBins)-1,etaBins)
 NoIsoEtaNum = ROOT.TH1F('NoIsoEtaNum', 'NoIsoEtaNum',len(etaBins)-1,etaBins)
 NoIsoEtaDen = ROOT.TH1F('NoIsoEtaDen', 'NoIsoEtaDen',len(etaBins)-1,etaBins)
@@ -31,6 +31,11 @@ NoIsoEtaDen = ROOT.TH1F('NoIsoEtaDen', 'NoIsoEtaDen',len(etaBins)-1,etaBins)
 NoIsoPtDenDiLep = ROOT.TH1F('NoIsoPtDenDiLep', 'NoIsoPtDenDiLep',len(ptBins)-1,ptBins)
 NoIsoEtaDenDiLep = ROOT.TH1F('NoIsoEtaDenDiLep', 'NoIsoEtaDenDiLep',len(etaBins)-1,etaBins) 
 
+NoIsoPtNumDiLep = ROOT.TH1F('NoIsoPtNumDiLep', 'NoIsoPtNumDiLep',len(ptBins)-1,ptBins)
+NoIsoEtaNumDiLep = ROOT.TH1F('NoIsoEtaNumDiLep', 'NoIsoEtaNumDiLep',len(etaBins)-1,etaBins) 
+
+NoIsoPtEffDiLep = ROOT.TH1F('NoIsoPtEffDiLep', 'NoIsoPtEffDiLep',len(ptBins)-1,ptBins)
+NoIsoEtaEffDiLep = ROOT.TH1F('NoIsoEtaEffDiLep', 'NoIsoEtaEffDiLep',len(etaBins)-1,etaBins) 
 
 Iso01PtEff = ROOT.TH1F('Iso01PtEff', 'Iso01PtEff',len(ptBins)-1,ptBins)
 Iso01PtNum = ROOT.TH1F('Iso01PtNum', 'Iso01PtNum',len(ptBins)-1,ptBins)
@@ -53,15 +58,31 @@ Iso03PtNumDiLep = ROOT.TH1F('Iso03PtNumDiLep', 'Iso03PtNumDiLep',len(ptBins)-1,p
 Iso03EtaEffDiLep = ROOT.TH1F('Iso03EtaEffDiLep', 'Iso03EtaEffDiLep',len(etaBins)-1,etaBins)
 Iso03EtaNumDiLep = ROOT.TH1F('Iso03EtaNumDiLep', 'Iso03EtaNumDiLep',len(etaBins)-1,etaBins)
 
+Iso02PtEffDiLep = ROOT.TH1F('Iso02PtEffDiLep', 'Iso02PtEffDiLep',len(ptBins)-1,ptBins)
+Iso02PtNumDiLep = ROOT.TH1F('Iso02PtNumDiLep', 'Iso02PtNumDiLep',len(ptBins)-1,ptBins)
+
+Iso02EtaEffDiLep = ROOT.TH1F('Iso02EtaEffDiLep', 'Iso02EtaEffDiLep',len(etaBins)-1,etaBins)
+Iso02EtaNumDiLep = ROOT.TH1F('Iso02EtaNumDiLep', 'Iso02EtaNumDiLep',len(etaBins)-1,etaBins)
+
+Iso01PtEffDiLep = ROOT.TH1F('Iso01PtEffDiLep', 'Iso01PtEffDiLep',len(ptBins)-1,ptBins)
+Iso01PtNumDiLep = ROOT.TH1F('Iso01PtNumDiLep', 'Iso01PtNumDiLep',len(ptBins)-1,ptBins)
+
+Iso01EtaEffDiLep = ROOT.TH1F('Iso01EtaEffDiLep', 'Iso01EtaEffDiLep',len(etaBins)-1,etaBins)
+Iso01EtaNumDiLep = ROOT.TH1F('Iso01EtaNumDiLep', 'Iso01EtaNumDiLep',len(etaBins)-1,etaBins)
 
 NoIsoPtEtaEff = ROOT.TH2F('NoIsoPtEtaEff', 'NoIsoPtEtaEff',len(ptBinsCoarse)-1,ptBinsCoarse,len(etaBinsCoarse)-1,etaBinsCoarse)
 NoIsoPtEtaNum = ROOT.TH2F('NoIsoPtEtaNum', 'NoIsoPtEtaNum',len(ptBinsCoarse)-1,ptBinsCoarse,len(etaBinsCoarse)-1,etaBinsCoarse)
 NoIsoPtEtaDen = ROOT.TH2F('NoIsoPtEtaDen', 'NoIsoPtEtaDen',len(ptBinsCoarse)-1,ptBinsCoarse,len(etaBinsCoarse)-1,etaBinsCoarse)
-#NoIsoPtEtaDen = ROOT.TH2F('NoIsoPtEtaDenbin', 'NoIsoPtEtaDenbin',25,0,800,25,-3,3)
+
 NoIsoPtEtaDenDiLep = ROOT.TH2F('NoIsoPtEtaDenDiLep', 'NoIsoPtEtaDenDiLep',len(ptBinsCoarse)-1,ptBinsCoarse,len(etaBinsCoarse)-1,etaBinsCoarse)
+NoIsoPtEtaNumDiLep = ROOT.TH2F('NoIsoPtEtaNumDiLep', 'NoIsoPtEtaNumDiLep',len(ptBinsCoarse)-1,ptBinsCoarse,len(etaBinsCoarse)-1,etaBinsCoarse)
+NoIsoPtEtaEffDiLep = ROOT.TH2F('NoIsoPtEtaEffDiLep', 'NoIsoPtEtaEffDiLep',len(ptBinsCoarse)-1,ptBinsCoarse,len(etaBinsCoarse)-1,etaBinsCoarse)
 
 Iso01PtEtaEff = ROOT.TH2F('Iso01PtEtaEff', 'Iso01PtEtaEff',len(ptBinsCoarse)-1,ptBinsCoarse,len(etaBinsCoarse)-1,etaBinsCoarse)
 Iso01PtEtaNum = ROOT.TH2F('Iso01PtEtaNum', 'Iso01PtEtaNum',len(ptBinsCoarse)-1,ptBinsCoarse,len(etaBinsCoarse)-1,etaBinsCoarse)
+
+Iso01PtEtaEffDiLep = ROOT.TH2F('Iso01PtEtaEffDiLep', 'Iso01PtEtaEffDiLep',len(ptBinsCoarse)-1,ptBinsCoarse,len(etaBinsCoarse)-1,etaBinsCoarse)
+Iso01PtEtaNumDiLep = ROOT.TH2F('Iso01PtEtaNumDiLep', 'Iso01PtEtaNumDiLep',len(ptBinsCoarse)-1,ptBinsCoarse,len(etaBinsCoarse)-1,etaBinsCoarse)
 
 Iso02PtEtaEff = ROOT.TH2F('Iso02PtEtaEff', 'Iso02PtEtaEff',len(ptBinsCoarse)-1,ptBinsCoarse,len(etaBinsCoarse)-1,etaBinsCoarse)
 Iso02PtEtaNum = ROOT.TH2F('Iso02PtEtaNum', 'Iso02PtEtaNum',len(ptBinsCoarse)-1,ptBinsCoarse,len(etaBinsCoarse)-1,etaBinsCoarse)
@@ -69,12 +90,13 @@ Iso02PtEtaNum = ROOT.TH2F('Iso02PtEtaNum', 'Iso02PtEtaNum',len(ptBinsCoarse)-1,p
 Iso03PtEtaEff = ROOT.TH2F('Iso03PtEtaEff', 'Iso03PtEtaEff',len(ptBinsCoarse)-1,ptBinsCoarse,len(etaBinsCoarse)-1,etaBinsCoarse)
 Iso03PtEtaNum = ROOT.TH2F('Iso03PtEtaNum', 'Iso03PtEtaNum',len(ptBinsCoarse)-1,ptBinsCoarse,len(etaBinsCoarse)-1,etaBinsCoarse)
 
-#Iso03PtEtaEff = ROOT.TH2F('Iso03PtEtaEff', 'Iso03PtEtaEff',25,0,800,25,-3,3)
-#Iso03PtEtaNum = ROOT.TH2F('Iso03PtEtaNum', 'Iso03PtEtaNum',25,0,800,25,-3,3)
-
 Iso03PtEtaEffDiLep = ROOT.TH2F('Iso03PtEtaEffDiLep', 'Iso03PtEtaEffDiLep',len(ptBinsCoarse)-1,ptBinsCoarse,len(etaBinsCoarse)-1,etaBinsCoarse)
 Iso03PtEtaNumDiLep = ROOT.TH2F('Iso03PtEtaNumDiLep', 'Iso03PtEtaNumDiLep',len(ptBinsCoarse)-1,ptBinsCoarse,len(etaBinsCoarse)-1,etaBinsCoarse)
-Iso03PtEtaEffFindDiLep = ROOT.TH2F('Iso03PtEtaEffFindDiLep', 'Iso03PtEtaEffFindDiLep',len(ptBinsCoarse)-1,ptBinsCoarse,len(etaBinsCoarse)-1,etaBinsCoarse)
+
+Iso02PtEtaEffDiLep = ROOT.TH2F('Iso02PtEtaEffDiLep', 'Iso02PtEtaEffDiLep',len(ptBinsCoarse)-1,ptBinsCoarse,len(etaBinsCoarse)-1,etaBinsCoarse)
+Iso02PtEtaNumDiLep = ROOT.TH2F('Iso02PtEtaNumDiLep', 'Iso02PtEtaNumDiLep',len(ptBinsCoarse)-1,ptBinsCoarse,len(etaBinsCoarse)-1,etaBinsCoarse)
+
+num = ROOT.TH2F('num', 'num',20,0,4,20,0,4)
 
 EffCount = ROOT.TH1F('EffCount','Cuts',16,0,20)
 EffCount.GetXaxis().SetBinLabel(1,'all')
@@ -82,7 +104,6 @@ EffCount.GetXaxis().SetBinLabel(2,'noIso')
 EffCount.GetXaxis().SetBinLabel(3,'Iso01')
 EffCount.GetXaxis().SetBinLabel(4,'Iso02')
 EffCount.GetXaxis().SetBinLabel(5,'Iso03')
-
 
 c50 = ROOT.TChain('Events')
 #for b in ttJetsCSA1450ns['bins']:
@@ -132,6 +153,7 @@ for i in range(number_events50):
   numerator = 0
   denominator = 0
   #print 'enter ngLep loop'
+  num.Fill(nvetoMuons,ngoodMuons)
   for p in range(int(ngLep)):
     gLepPdg = c50.GetLeaf('gLepPdg').GetValue(p)
     gLepDR = c50.GetLeaf('gLepDR').GetValue(p)
@@ -162,24 +184,29 @@ for i in range(number_events50):
              Iso01PtNum.Fill(muons[k]['pt'])
              Iso01EtaNum.Fill(muons[k]['eta']) 
              Iso01PtEtaNum.Fill(muons[k]['pt'],muons[k]['eta'])
-             #if ngNuMuFromW==2 and ngNuEFromW==0 and ngoodMuons==1 and nvetoMuons==1 and nvetoElectrons==0:
-             #  Iso03PtEtaNumDiLep.Fill(muons[k]['pt'],muons[k]['eta'])
-             #  Iso03EtaNumDiLep.Fill(muons[k]['eta'])
-             #  Iso03PtNumDiLep.Fill(muons[k]['pt'])               
+             if ngNuMuFromW==2 and ngNuEFromW==0 and ngoodMuons==1 and nvetoMuons==1 and nvetoElectrons==0:
+               Iso01PtEtaNumDiLep.Fill(muons[k]['pt'],muons[k]['eta'])
+               Iso01EtaNumDiLep.Fill(muons[k]['eta'])
+               Iso01PtNumDiLep.Fill(muons[k]['pt'])               
           if muons[k]['relIso']<0.2:
              EffCount.Fill(4)
              Iso02PtNum.Fill(muons[k]['pt'])
              Iso02EtaNum.Fill(muons[k]['eta']) 
              Iso02PtEtaNum.Fill(muons[k]['pt'],muons[k]['eta'])
              if ngNuMuFromW==2 and ngNuEFromW==0 and ngoodMuons==1 and nvetoMuons==1 and nvetoElectrons==0:
-               Iso03PtEtaNumDiLep.Fill(muons[k]['pt'],muons[k]['eta'])
-               Iso03EtaNumDiLep.Fill(muons[k]['eta'])
-               Iso03PtNumDiLep.Fill(muons[k]['pt'])               
+               Iso02PtEtaNumDiLep.Fill(muons[k]['pt'],muons[k]['eta'])
+               Iso02EtaNumDiLep.Fill(muons[k]['eta'])
+               Iso02PtNumDiLep.Fill(muons[k]['pt'])               
           if muons[k]['relIso']<0.3:
              Iso03PtNum.Fill(muons[k]['pt'])
              Iso03EtaNum.Fill(muons[k]['eta'])
              Iso03PtEtaNum.Fill(muons[k]['pt'],muons[k]['eta'])
              EffCount.Fill(5)
+             if ngNuMuFromW==2 and ngNuEFromW==0 and ngoodMuons==1 and nvetoMuons==1 and nvetoElectrons==0:
+               Iso03PtEtaNumDiLep.Fill(muons[k]['pt'],muons[k]['eta'])
+               Iso03EtaNumDiLep.Fill(muons[k]['eta'])
+               Iso03PtNumDiLep.Fill(muons[k]['pt']) 
+
 print 'Number of events passing only cuts for denominator:', EffCount.GetBinContent(1)
 print 'Number of events passing cuts without Isolation for Numerator:', EffCount.GetBinContent(2)
 print 'Number of events passing cuts with Isolation 0.1 for Numerator:', EffCount.GetBinContent(3)
@@ -198,6 +225,8 @@ for j in range(len(ptBins)):
   numIso03Pt = Iso03PtNum.GetBinContent(j)
   denNoIsoPtDiLep = NoIsoPtDenDiLep.GetBinContent(j)
   numIso03PtDiLep = Iso03PtNumDiLep.GetBinContent(j)
+  numIso02PtDiLep = Iso02PtNumDiLep.GetBinContent(j)
+  numIso01PtDiLep = Iso01PtNumDiLep.GetBinContent(j)
   if denNoIsoPt != 0:
     effnoIsoPt=float(numNoIsoPt)/denNoIsoPt
     NoIsoPtEff.SetBinContent(j,effnoIsoPt)
@@ -210,6 +239,10 @@ for j in range(len(ptBins)):
   if denNoIsoPtDiLep != 0:
     effIso03PtDiLep=float(numIso03PtDiLep)/denNoIsoPtDiLep
     Iso03PtEffDiLep.SetBinContent(j,effIso03PtDiLep)
+    effIso02PtDiLep=float(numIso02PtDiLep)/denNoIsoPtDiLep
+    Iso02PtEffDiLep.SetBinContent(j,effIso02PtDiLep)
+    effIso01PtDiLep=float(numIso01PtDiLep)/denNoIsoPtDiLep
+    Iso01PtEffDiLep.SetBinContent(j,effIso01PtDiLep)
 for i in range(len(etaBins)):
   denNoIsoEta = NoIsoEtaDen.GetBinContent(i)
   numNoIsoEta = NoIsoEtaNum.GetBinContent(i)
@@ -218,6 +251,8 @@ for i in range(len(etaBins)):
   numIso03Eta = Iso03EtaNum.GetBinContent(i)
   denNoIsoEtaDiLep = NoIsoEtaDenDiLep.GetBinContent(i)
   numIso03EtaDiLep = Iso03EtaNumDiLep.GetBinContent(i)
+  numIso02EtaDiLep = Iso02EtaNumDiLep.GetBinContent(i)
+  numIso01EtaDiLep = Iso01EtaNumDiLep.GetBinContent(i)
   if denNoIsoEta != 0:
     effnoIsoEta=float(numNoIsoEta)/denNoIsoEta
     NoIsoEtaEff.SetBinContent(i,effnoIsoEta)
@@ -230,6 +265,10 @@ for i in range(len(etaBins)):
   if denNoIsoEtaDiLep !=0:
     effIso03EtaDiLep=float(numIso03EtaDiLep)/denNoIsoEtaDiLep
     Iso03EtaEffDiLep.SetBinContent(i,effIso03EtaDiLep)
+    effIso02EtaDiLep=float(numIso02EtaDiLep)/denNoIsoEtaDiLep
+    Iso02EtaEffDiLep.SetBinContent(i,effIso02EtaDiLep)
+    effIso01EtaDiLep=float(numIso01EtaDiLep)/denNoIsoEtaDiLep
+    Iso01EtaEffDiLep.SetBinContent(i,effIso01EtaDiLep)
 ##2Dcalculation
 for p in range(len(ptBinsCoarse)):
   for k in range(len(etaBinsCoarse)):
@@ -240,6 +279,8 @@ for p in range(len(ptBinsCoarse)):
     Iso03PtEtanum = Iso03PtEtaNum.GetBinContent(p,k)
     NoIsoPtEtadenDiLep = NoIsoPtEtaDenDiLep.GetBinContent(p,k)
     Iso03PtEtanumDiLep = Iso03PtEtaNumDiLep.GetBinContent(p,k)
+    Iso02PtEtanumDiLep = Iso02PtEtaNumDiLep.GetBinContent(p,k)
+    Iso01PtEtanumDiLep = Iso01PtEtaNumDiLep.GetBinContent(p,k)
     if NoIsoPtEtaden != 0:
       effnoIsoPtEta=float(NoIsoPtEtanum)/NoIsoPtEtaden
       NoIsoPtEtaEff.SetBinContent(p,k,effnoIsoPtEta)
@@ -249,11 +290,13 @@ for p in range(len(ptBinsCoarse)):
       Iso02PtEtaEff.SetBinContent(p,k,effIso02PtEta)
       effIso03PtEta=float(Iso03PtEtanum)/NoIsoPtEtaden
       Iso03PtEtaEff.SetBinContent(p,k,effIso03PtEta)
-      effIso03PtEtaFindDilep=float(Iso03PtEtanumDiLep)/NoIsoPtEtaden
-      Iso03PtEtaEffFindDiLep.SetBinContent(p,k,effIso03PtEtaFindDilep)
     if NoIsoPtEtadenDiLep != 0:
       effIso03PtEtaDiLep=float(Iso03PtEtanumDiLep)/NoIsoPtEtadenDiLep
       Iso03PtEtaEffDiLep.SetBinContent(p,k,effIso03PtEtaDiLep)
+      effIso02PtEtaDiLep=float(Iso02PtEtanumDiLep)/NoIsoPtEtadenDiLep
+      Iso02PtEtaEffDiLep.SetBinContent(p,k,effIso02PtEtaDiLep)
+      effIso01PtEtaDiLep=float(Iso01PtEtanumDiLep)/NoIsoPtEtadenDiLep
+      Iso01PtEtaEffDiLep.SetBinContent(p,k,effIso01PtEtaDiLep)
 
 File.cd() 
           
@@ -271,6 +314,13 @@ NoIsoEtaEff.Draw('p')
 canEta01 = ROOT.TCanvas('Eta')
 canEta01.cd()
 Iso01EtaEff.Draw('p')
+
+cannum = ROOT.TCanvas('num')
+cannum.cd()
+num.GetXaxis().SetTitle("# Of vetoMuons")
+num.GetYaxis().SetTitle("# Of goodMuons")
+num.Draw('colz')
+cannum.Write()
 
 can2D = ROOT.TCanvas('2dNoIso')
 can2D.cd()
