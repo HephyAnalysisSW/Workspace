@@ -1,212 +1,288 @@
 import ROOT
-from Workspace.RA4Analysis.stage2Tuples import ttJetsCSA1450ns , ttJetsCSA1425ns
+from Workspace.RA4Analysis.stage2Tuples import ttJetsCSA1450ns
 from localInfo import username
-from Workspace.RA4Analysis.objectSelection import tightPOGMuID , vetoMuID
+from objectSelection import tightPOGMuID , vetoMuID , getLooseMuStage2
 from math import sqrt, cos, sin, atan2
 from array import array
+from getmuon import getMu
 
-def getMu(c,j):
-  IsGlobal = c.GetLeaf('muIsGlobal').GetValue(j)
-  IsPF = c.GetLeaf('muIsPF').GetValue(j)
-  IsTracker = c.GetLeaf('muIsTracker').GetValue(j)
-  Dz = c.GetLeaf('muDz').GetValue(j)
-  pt = c.GetLeaf('muPt').GetValue(j)
-  eta= c.GetLeaf('muEta').GetValue(j)
-  phi= c.GetLeaf('muPhi').GetValue(j)
-  relIso = c.GetLeaf('muRelIso').GetValue(j)
-  NormChi2 = c.GetLeaf('muNormChi2').GetValue(j)
-  NValMuonHits = c.GetLeaf('muNValMuonHits').GetValue(j)
-  Dxy = c.GetLeaf('muDxy').GetValue(j)
-  NumtrackerLayerWithMeasurement = c.GetLeaf('muNumtrackerLayerWithMeasurement').GetValue(j)
-  ChargedHadronPt = c.GetLeaf('muIso03sumChargedHadronPt').GetValue(j)
-  NeutralHadronEt = c.GetLeaf('muIso03sumNeutralHadronEt').GetValue(j)
-  PixelHits = c.GetLeaf('muPixelHits').GetValue(j)
-  NumMatchedStations = c.GetLeaf('muNumMatchedStations').GetValue(j)
-  PhotonEt = c.GetLeaf('muIso03sumPhotonEt').GetValue(j)
-  PUChargedHadronPt = c.GetLeaf('muIso03sumPUChargedHadronPt').GetValue(j)
-  RelIsoPred = (ChargedHadronPt+max(0,(NeutralHadronEt+PhotonEt-(0.5*PUChargedHadronPt))))/pt
-  isTight = None
-  isLoose = None
-  cand={'isLoose':isLoose, 'isTight':isTight, 'NumMatchedStations':NumMatchedStations,'PixelHits':PixelHits, 'NumtrackerLayerWithMeasurement':NumtrackerLayerWithMeasurement,'Dxy':Dxy, 'NValMuonHits':NValMuonHits ,'NormChi2':NormChi2, 'IsPF':IsPF, 'RelIsoPred':RelIsoPred, 'ChargedHadronPt':ChargedHadronPt,'NeutralHadronEt':NeutralHadronEt,'PhotonEt':PhotonEt,'PUChargedHadronPt':PUChargedHadronPt,'IsGlobal':IsGlobal, 'IsTracker':IsTracker, 'Dz':Dz, 'pt':pt, 'eta':eta, 'phi':phi, 'relIso':relIso}
-  if pt>5 and abs(eta)<2.5 and abs(Dz)<0.5 and (IsGlobal or  IsTracker):
-   return cand
+Lumi=2000 #pb-1
+xsec=689.1 #pb ?
+#nevents is later
 
+ptBins  = array('d', [float(x) for x in range(10, 20)+range(20,50,3)+range(50,100,10)+range(100,300,30)])
+#etaBins = array('d', [int(x)+30 for x in range(-30,32,2)])
+etaBins = array('d', [float(x)/10. for x in range(-30,32,2)])
 
-diLep     ="ngoodMuons>=1&&nvetoMuons==2&&ngNuEFromW==0&&nvetoElectrons==0"
+ptBinsCoarse  = array('d', [float(x) for x in range(10, 20)+range(20,50,5)+range(50,100,20)+range(100,310,50)])
+etaBinsCoarse = array('d', [float(x)/10. for x in [-30,-25]+range(-21,22,6)+[25,30]])
+##################OPENFile to take EFF######
+Filetake = ROOT.TFile('LetsSee.root')
+h_Eff03 = Filetake.Get('Iso03PtEtaEff')
+h_Eff02 = Filetake.Get('Iso02PtEtaEff')
+h_Eff01 = Filetake.Get('Iso01PtEtaEff')
 
-  
-#def Get2Mu(c):
-#  nmuCount = int(c.GetLeaf('nmuCount').GetValue())
-#  ntmuons = 0
-#  nlmuons = 0
-#  temp=[]
-#  for i in range(nmuCount):
-#    lep=getMu(c,i)
-#    isTight=tightPOGMuID(lep)
-#    isLoose=vetoMuID(lep)
-#    #print isTight
-#    lep['isTight'] = isTight
-#    #print lep['isTight']
-#    lep['isLoose'] = isLoose
-#    if isTight: ntmuons+=1
-#    if isLoose:  nlmuons+=1
-#    temp=lep
-#    #print temp['isTight']
-#  return temp
+h_EffinDiLep03 = Filetake.Get('Iso03PtEtaEffDiLep') #Finding eff in DiLep Events
+h_EffinDiLep02 = Filetake.Get('Iso02PtEtaEffDiLep') #Finding eff in DiLep Events
+h_EffinDiLep01 = Filetake.Get('Iso01PtEtaEffDiLep') #Finding eff in DiLep Events
 
-File = ROOT.TFile('DiLeptonMtnew.root','RECREATE')
-h_MTDilepton = ROOT.TH1F('h_MTDilepton', 'h_MTDilepton',100,0,800)
-h_MTGen = ROOT.TH1F('h_MTGen', 'h_MTGen',100,0,800)
-ProfilePt = ROOT.TProfile('ProfilePt','muonID vs gen Lep Pt',100,0,800,0,1)
-ProfileEta = ROOT.TProfile('ProfileEta','muonID vs gen Lep Eta',100,-5,5,0,1)
-ProfilePt01 = ROOT.TProfile('ProfilePt01','muonID vs gen Lep Pt',100,0,800,0,1)
-ProfilePt02 = ROOT.TProfile('ProfilePt02','muonID vs gen Lep Pt',100,0,800,0,1)
-ProfileEta01 = ROOT.TProfile('ProfileEta01','muonID vs gen Lep Eta',100,-5,5,0,1)
-ProfilePt03 = ROOT.TProfile('ProfilePt03','muonID vs gen Lep Pt',100,0,800,0,1)
-ProfileEta02 = ROOT.TProfile('ProfileEta02','muonID vs gen Lep Eta',100,-5,5,0,1)
-ProfileEta03 = ROOT.TProfile('ProfileEta03','muonID vs gen Lep Eta',100,-5,5,0,1)
+###################HISTOGRAMS to FILL########
+File = ROOT.TFile('MTFriday.root','RECREATE')
+h_GenPt = ROOT.TH1F('h_GenPt', 'h_GenPt',25,0,800)
+h_GenMet = ROOT.TH1F('h_GenMet', 'h_GenMet',25,0,800)
+
+h_Pt03 = ROOT.TH1F('h_Pt03', 'h_Pt03',25,0,800)
+h_Pt02 = ROOT.TH1F('h_Pt02', 'h_Pt02',25,0,800)
+h_Pt01 = ROOT.TH1F('h_Pt01', 'h_Pt01',25,0,800)
+
+h_Met03 = ROOT.TH1F('h_Met03', 'h_Met03',25,0,800)
+h_Met02 = ROOT.TH1F('h_Met02', 'h_Met02',25,0,800)
+h_Met01 = ROOT.TH1F('h_Met01', 'h_Met01',25,0,800)
+
+h_MTDilepton03 = ROOT.TH1F('h_MTDilepton03', 'h_MTDilepton03',25,0,800)
+h_MTDilepton02 = ROOT.TH1F('h_MTDilepton02', 'h_MTDilepton02',25,0,800)
+h_MTDilepton01 = ROOT.TH1F('h_MTDilepton01', 'h_MTDilepton01',25,0,800)
+
+h_MTGen = ROOT.TH1F('h_MTGen', 'h_MTGen',25,0,800)
 
 c50 = ROOT.TChain('Events')
-#for b in ttJetsCSA1450ns['bins']:
-#  c.Add(ttJetsCSA1450ns['dirname']+'/'+b+'/h*.root')
 c50.Add('/data/easilar/convertedTuples_v23/copyMET/ttJetsCSA1450ns/histo_ttJetsCSA1450ns_from0To10.root')
 #c50.Add('/data/easilar/convertedTuples_v23/copyMET/ttJetsCSA1450ns/*')
 
-
-c25 = ROOT.TChain('Events')
-#for b in ttJetsCSA1425ns['bins']:
-#  c2.Add(ttJetsCSA1425ns['dirname']+'/'+b+'/h*.root')
-c25.Add('/data/easilar/convertedTuples_v23/copyMET_DR0.4/ttJetsCSA1425ns/histo_ttJetsCSA1425ns_from0To10.root')
-
 number_events50 = c50.GetEntries()
+
+#weight = Lumi*xsec/number_events50
+weight = 0.436738650483
+print 'weight is:', weight
 print number_events50
-for i in range(1000):
+for i in range(number_events50):
+#for i in range(3000):
   c50.GetEntry(i)
   nmuCount = int(c50.GetLeaf('nmuCount').GetValue())
-  ntmuons = 0
-  nlmuons = 0
+  ngoodMuons = c50.GetLeaf('ngoodMuons').GetValue()
+  nvetoMuons = c50.GetLeaf('nvetoMuons').GetValue()
+  nvetoElectrons = c50.GetLeaf('nvetoElectrons').GetValue()
+  njets = c50.GetLeaf('njets').GetValue()
   met = c50.GetLeaf('met').GetValue()
+  genMet = c50.GetLeaf('genMet').GetValue()
+  ht = c50.GetLeaf('ht').GetValue()
   metphi = c50.GetLeaf('metphi').GetValue()
-  muons=[] 
+  genMetphi = c50.GetLeaf('genMetphi').GetValue()
+  ngLep = int(c50.GetLeaf('ngLep').GetValue())
+  ngNuMuFromW = c50.GetLeaf('ngNuMuFromW').GetValue() 
+  ngNuEFromW = c50.GetLeaf('ngNuEFromW').GetValue()
+  relIso = 200  ##no Cut
+  ntmuons=0
+  nlmuons=0
+  muons=[]
   for j in range(nmuCount):
-    muon=getMu(c50,j)
-    muon['index'] = -1
+    #muon=getMu(c50,j)
+    muon=getLooseMuStage2(c50,j)
     if muon:
-      #print tightPOGMuID(muon)
-      #if tightPOGMuID(muon)==0. or vetoMuID(muon)==0.: print 'Tight or loose is zero!'
-      #if tightPOGMuID(muon)!=0:
       isTight=tightPOGMuID(muon)
-      #if vetoMuID(muon)!=0:
-      isLoose=vetoMuID(muon)
-      #print isTight
+      isLoose=vetoMuID(muon,relIso)
       muon['isTight'] = isTight
-      #print lep['isTight']
       muon['isLoose'] = isLoose
       if isTight: ntmuons+=1
       if isLoose: nlmuons+=1
-      muons.append(muon)  
-  
-  ngLep = int(c50.GetLeaf('ngLep').GetValue()) 
+      muons.append(muon)
+  numerator = 0
+  denominator = 0
+  #print 'enter ngLep loop'
+  for p in range(int(ngLep)):
+    gLepPdg = c50.GetLeaf('gLepPdg').GetValue(p)
+    gLepDR = c50.GetLeaf('gLepDR').GetValue(p)
+    gLepPt = c50.GetLeaf('gLepPt').GetValue(p)
+    gLepEta = c50.GetLeaf('gLepEta').GetValue(p)
+    gLepInd = c50.GetLeaf('gLepInd').GetValue(p)
+    gLepPhi = c50.GetLeaf('gLepPhi').GetValue(p)
+    if gLepInd>=0:
+      k=int(gLepInd)
+      #print k
+      #for k in range(len(muons)): 
+      if abs(gLepPdg) == 13 and muons[k]['pt']>20 and gLepPt>20 and abs(gLepEta)<2.1 and ht>300 and met>150 and njets>=3: ###in ttjet sample we have more jets then Wjets sample
+        if muons[k]['isLoose'] == 1 and gLepDR<0.4: # and abs(1-muons[k]['pt']/gLepPt)<0.9:
+          if muons[k]['relIso']<0.3:
+             if ngNuMuFromW==2 and ngNuEFromW==0 and ngoodMuons==1 and nvetoMuons==1 and nvetoElectrons==0:
+               #h_MTGen.Fill(sqrt(2*genMet*gLepPt*(1-cos(gLepPhi-genMetphi))))
+               h_MTGen.Fill(sqrt(2*met*muons[k]['pt']*(1-cos(muons[k]['phi']-metphi))))
+               h_GenMet.Fill(met)
+               h_GenPt.Fill(muons[k]['pt'])
   if len(muons)<2: continue
   if len(muons)==2 and ntmuons>=1:
-    #print "Found two muons",len(muons),'muons'
-    #print muons[0]['index']
-    #print muons[1]['index']
+    #print "Found two muons",len(muons)
     for perm in [muons, reversed(muons)]:
       m,m2 = perm
-      if m2['isTight']:
-        #if muons[0]['gLepDR']<0.5 and muons[1]['gLepDR']<0.5: 
-        #if ntmuons>=1 and nlmuons==2 and ngNuMuFromW==2 and ngNuEFromW==0: ##For Dilepton
-        #print 'Dilepton:)'
-        metAdd=m['pt']
-        Metx = met*cos(metphi)+cos(m['phi'])*metAdd
-        Mety = met*sin(metphi)+sin(m['phi'])*metAdd
-        metPred = sqrt(Metx**2+Mety**2)
-        metphiPred = atan2(Mety,Metx)
-        mtPred = sqrt(2*metPred*m2['pt']*(1-cos(m2['phi']-metphiPred)))
-        h_MTDilepton.Fill(mtPred)
-      ngLep = int(c50.GetLeaf('ngLep').GetValue()) 
-      for j in range(int(ngLep)):
-        gLepPt = c50.GetLeaf('gLepPt').GetValue(j)
-        gLepEta = c50.GetLeaf('gLepEta').GetValue(j)
-        #if m2['index']>=0:
-        print int(m2['isLoose']) , gLepPt
-        ProfilePt.Fill(gLepPt,m2['isLoose'],1)
-        ProfileEta.Fill(gLepEta,m2['isLoose'],1)
-        if m2['relIso']<0.1:
-          ProfilePt01.Fill(gLepPt,m2['isLoose'],1)
-          ProfileEta01.Fill(gLepEta,m2['isLoose'],1)
-        if m2['relIso']<0.2:
-          ProfilePt02.Fill(gLepPt,m2['isLoose'],1)
-          ProfileEta02.Fill(gLepEta,m2['isLoose'],1)
-        if m2['relIso']<0.3:
-          ProfilePt03.Fill(gLepPt,m2['isLoose'],1)
-          ProfileEta03.Fill(gLepEta,m2['isLoose'],1)
+      if m2['isTight']==1:
+        Eff03 = h_Eff03.GetBinContent(h_Eff03.FindBin(m['pt'],m['eta']))
+        Eff02 = h_Eff02.GetBinContent(h_Eff02.FindBin(m['pt'],m['eta']))
+        Eff01 = h_Eff01.GetBinContent(h_Eff01.FindBin(m['pt'],m['eta']))
+        EffDiLep03 = h_EffinDiLep03.GetBinContent(h_EffinDiLep03.FindBin(m['pt'],m['eta']))
+        EffDiLep02 = h_EffinDiLep02.GetBinContent(h_EffinDiLep02.FindBin(m['pt'],m['eta']))
+        EffDiLep01 = h_EffinDiLep01.GetBinContent(h_EffinDiLep01.FindBin(m['pt'],m['eta']))
+        if m['relIso']<0.3 and abs(m['eta'])<2.1 and m['pt']>20 and ht>300 and njets>=3:
+          metAdd=m['pt']
+          Metx = met*cos(metphi)+cos(m['phi'])*metAdd
+          Mety = met*sin(metphi)+sin(m['phi'])*metAdd
+          metPred = sqrt(Metx**2+Mety**2)
+          metphiPred = atan2(Mety,Metx)
+          mtPred = sqrt(2*metPred*m2['pt']*(1-cos(m2['phi']-metphiPred)))
+          if metPred >150:
+            if Eff03 !=0:
+              Seff =  (1-Eff03)/Eff03
+              h_MTDilepton03.Fill(mtPred,weight*Seff)
+              h_Met03.Fill(metPred,weight*Seff)
+              h_Pt03.Fill(m2['pt'],weight*Seff)
+            if Eff02 !=0:
+              Seff =  (1-Eff02)/Eff02
+              h_MTDilepton02.Fill(mtPred,weight*Seff)
+              h_Met02.Fill(metPred,weight*Seff)
+              h_Pt02.Fill(m2['pt'],weight*Seff)
+            if Eff01 !=0:
+              Seff =  (1-Eff01)/Eff01
+              h_MTDilepton01.Fill(mtPred,weight*Seff)
+              h_Met01.Fill(metPred,weight*Seff)
+              h_Pt01.Fill(m2['pt'],weight*Seff)
 
-#c50.Draw('sqrt(2*genMet*gLepPt*(1-cos(gLepPhi-genMetphi)))>>h_MTGen', 'ngNuMuFromW==2&&gLepPdg==13&&gLepPt>20&&gLepEta<2.1&&gLepDR<0.4' )
+File.cd() 
 
-#File.cd() 
-          
-canPt = ROOT.TCanvas('Iso')
-canPt.cd()
-#h_MTDilepton.SetLineColor(ROOT.kBlue)
-#h_MTDilepton.Draw()
-#h_MTGen.SetLineColor(ROOT.kRed)
-#h_MTGen.Draw('same')
-ProfilePt.SetLineColor(ROOT.kBlue)
-ProfilePt.Draw()
-ProfilePt01.SetLineColor(ROOT.kRed)
-ProfilePt01.Draw('same')
-ProfilePt02.SetLineColor(ROOT.kGreen)
-ProfilePt02.Draw('same')
-ProfilePt03.SetLineColor(ROOT.kYellow)
-ProfilePt03.Draw('same')
-
+canMT = ROOT.TCanvas('MT03')
+canMT.cd()
+h_MTDilepton03.SetLineColor(ROOT.kBlue)
+#h_MTDilepton.Scale(h_MTGen.Integral()/h_MTDilepton.Integral())
+h_MTDilepton03.Draw()
+h_MTGen.SetLineColor(ROOT.kRed)
+h_MTGen.Draw('same')
 leg = ROOT.TLegend(0.6,0.6,0.9,0.7)
-leg.AddEntry(ProfilePt, "NoIso","l")
-leg.AddEntry(ProfilePt01, "Iso:0.1","l")
-leg.AddEntry(ProfilePt02, "Iso:0.2","l")
-leg.AddEntry(ProfilePt03, "Iso:0.3","l")
+leg.AddEntry(h_MTDilepton03, "Calculated","l")
+leg.AddEntry(h_MTGen, "MtGen","l")
 leg.SetFillColor(0)
 leg.Draw()
-canPt.Update()
-canPt.Print('/afs/hephy.at/user/e/easilar/www/LastCSA14/LooseIndexVsgLepPtIsoComp.png')
+canMT.SetLogy()
+canMT.Write()
 
-canEta = ROOT.TCanvas('iso02')
-canEta.cd()
-ProfileEta.SetLineColor(ROOT.kBlue)
-#ProfileEta.SetLineWidth(1.8)
-ProfileEta.Draw()
-#ProfileEta01.SetLineWidth(1.8)
-ProfileEta01.SetLineColor(ROOT.kRed)
-ProfileEta01.Draw('same')
-#ProfileEta02.SetLineWidth(1.8)
-ProfileEta02.SetLineColor(ROOT.kGreen)
-ProfileEta02.Draw('same')
-#ProfileEta03.SetLineWidth(1.8)
-ProfileEta03.SetLineColor(ROOT.kYellow)
-ProfileEta03.Draw('same')
+canMT02 = ROOT.TCanvas('MT02')
+canMT02.cd()
+h_MTDilepton02.SetLineColor(ROOT.kBlue)
+#h_MTDilepton.Scale(h_MTGen.Integral()/h_MTDilepton.Integral())
+h_MTDilepton02.Draw()
+h_MTGen.SetLineColor(ROOT.kRed)
+h_MTGen.Draw('same')
+leg = ROOT.TLegend(0.6,0.6,0.9,0.7)
+leg.AddEntry(h_MTDilepton02, "Calculated","l")
+leg.AddEntry(h_MTGen, "MtGen","l")
+leg.SetFillColor(0)
+leg.Draw()
+canMT02.SetLogy()
+canMT02.Write()
 
-leg1 = ROOT.TLegend(0.8,0.6,0.9,0.7)
-leg1.AddEntry(ProfileEta, "NoIso","l")
-leg1.AddEntry(ProfileEta01, "Iso:0.1","l")
-leg1.AddEntry(ProfileEta02, "Iso:0.2","l")
-leg1.AddEntry(ProfileEta03, "Iso:0.3","l")
-leg1.SetFillColor(0)
-leg1.Draw()
+canMT01 = ROOT.TCanvas('MT01')
+canMT01.cd()
+h_MTDilepton01.SetLineColor(ROOT.kBlue)
+#h_MTDilepton.Scale(h_MTGen.Integral()/h_MTDilepton.Integral())
+h_MTDilepton01.Draw()
+h_MTGen.SetLineColor(ROOT.kRed)
+h_MTGen.Draw('same')
+leg = ROOT.TLegend(0.6,0.6,0.9,0.7)
+leg.AddEntry(h_MTDilepton01, "Calculated","l")
+leg.AddEntry(h_MTGen, "MtGen","l")
+leg.SetFillColor(0)
+leg.Draw()
+canMT01.SetLogy()
+canMT01.Write()
 
-canEta.Update()
-canEta.Print('/afs/hephy.at/user/e/easilar/www/LastCSA14/LooseIndexVsgLepEtaIsoComp.png')
 
-#leg = ROOT.TLegend(0.6,0.6,0.9,0.7)
-#leg.AddEntry(h_MTDilepton, "Calculated","l")
-#leg.AddEntry(h_MTGen, "MTGen","l")
-#leg.SetFillColor(0)
-#leg.Draw()
-#can.SetLogy()
-#can.Update()
-#can.Print('/afs/hephy.at/user/e/easilar/www/LastCSA14/LooseIndexVsgLepEtaIso03.png')
-#can.Write()
+canPT = ROOT.TCanvas('PT')
+canPT.cd()
+h_Pt03.SetLineColor(ROOT.kBlue)
+h_Pt03.Draw()
+h_GenPt.SetLineColor(ROOT.kRed)
+h_GenPt.Draw('same')
+leg = ROOT.TLegend(0.6,0.6,0.9,0.7)
+leg.AddEntry(h_Pt03, "Calculated","l")
+leg.AddEntry(h_GenPt, "PtGen","l")
+leg.SetFillColor(0)
+leg.Draw()
+canPT.SetLogy()
+canPT.Update()
+canPT.Write()
 
-#File.Write()
-#File.Close()
+canPT02 = ROOT.TCanvas('PT02')
+canPT02.cd()
+h_Pt02.SetLineColor(ROOT.kBlue)
+h_Pt02.Draw()
+h_GenPt.SetLineColor(ROOT.kRed)
+h_GenPt.Draw('same')
+leg = ROOT.TLegend(0.6,0.6,0.9,0.7)
+leg.AddEntry(h_Pt02, "Calculated","l")
+leg.AddEntry(h_GenPt, "PtGen","l")
+leg.SetFillColor(0)
+leg.Draw()
+canPT02.SetLogy()
+canPT02.Update()
+canPT02.Write()
+
+canPT01 = ROOT.TCanvas('PT01')
+canPT01.cd()
+h_Pt01.SetLineColor(ROOT.kBlue)
+h_Pt01.Draw()
+h_GenPt.SetLineColor(ROOT.kRed)
+h_GenPt.Draw('same')
+leg = ROOT.TLegend(0.6,0.6,0.9,0.7)
+leg.AddEntry(h_Pt01, "Calculated","l")
+leg.AddEntry(h_GenPt, "PtGen","l")
+leg.SetFillColor(0)
+leg.Draw()
+canPT01.SetLogy()
+canPT01.Update()
+canPT01.Write()
+
+
+canMet03 = ROOT.TCanvas('Met03')
+canMet03.cd()
+h_Met03.SetLineColor(ROOT.kBlue)
+h_Met03.Draw()
+h_GenMet.SetLineColor(ROOT.kRed)
+h_GenMet.Draw('same')
+leg = ROOT.TLegend(0.6,0.6,0.9,0.7)
+leg.AddEntry(h_Met03, "Calculated","l")
+leg.AddEntry(h_GenMet, "MetGen","l")
+leg.SetFillColor(0)
+leg.Draw()
+canMet03.SetLogy()
+canMet03.Update()
+canMet03.Write()
+
+canMet02 = ROOT.TCanvas('Met02')
+canMet02.cd()
+h_Met02.SetLineColor(ROOT.kBlue)
+h_Met02.Draw()
+h_GenMet.SetLineColor(ROOT.kRed)
+h_GenMet.Draw('same')
+leg = ROOT.TLegend(0.6,0.6,0.9,0.7)
+leg.AddEntry(h_Met02, "Calculated","l")
+leg.AddEntry(h_GenMet, "MetGen","l")
+leg.SetFillColor(0)
+leg.Draw()
+canMet02.SetLogy()
+canMet02.Update()
+canMet02.Write()
+
+canMet01 = ROOT.TCanvas('Met01')
+canMet01.cd()
+h_Met01.SetLineColor(ROOT.kBlue)
+h_Met01.Draw()
+h_GenMet.SetLineColor(ROOT.kRed)
+h_GenMet.Draw('same')
+leg = ROOT.TLegend(0.6,0.6,0.9,0.7)
+leg.AddEntry(h_Met01, "Calculated","l")
+leg.AddEntry(h_GenMet, "MetGen","l")
+leg.SetFillColor(0)
+leg.Draw()
+canMet01.SetLogy()
+canMet01.Update()
+canMet01.Write()
+
+File.Write()
+File.Close()
+
