@@ -40,7 +40,7 @@ process.generator = cms.EDFilter("Pythia6HadronizerFilter",
 'MSEL=0',
 'IMSS(1)=11',
 #'IMSS(22)=33',##FIXME
-'MSTJ(1)=0       ! Fragmentation/hadronization on or off',
+'MSTJ(1)=1       ! Fragmentation/hadronization on or off',
 'MSTP(161)=67',
 'MSTP(162)=68',
 'MSTP(163)=69',
@@ -53,7 +53,20 @@ process.generator = cms.EDFilter("Pythia6HadronizerFilter",
         ),
         parameterSets = cms.vstring('pythiaUESettings', 
             'processParameters','SLHAParameters')
+    ),
+   jetMatching = cms.untracked.PSet(
+        MEMAIN_nqmatch = cms.int32(5),
+        MEMAIN_showerkt = cms.double(0),
+        MEMAIN_minjets = cms.int32(0),
+        MEMAIN_qcut = cms.double(50),
+        MEMAIN_excres = cms.string(''),
+        MEMAIN_etaclmax = cms.double(5),
+        outTree_flag = cms.int32(0),
+        scheme = cms.string('Madgraph'),
+        MEMAIN_maxjets = cms.int32(2),
+        mode = cms.string('auto')
     )
+
 )
 
 #from IOMC.RandomEngine.RandomServiceHelper import  RandomNumberServiceHelper
@@ -98,7 +111,7 @@ process.printGenParticles = cms.EDAnalyzer("ParticleListDrawer",
 
 process.out = cms.OutputModule("PoolOutputModule",
      #verbose = cms.untracked.bool(True),
-#     SelectEvents   = cms.untracked.PSet( SelectEvents = cms.vstring('p') ),
+     SelectEvents   = cms.untracked.PSet( SelectEvents = cms.vstring('pp') ),
      fileName = cms.untracked.string('histo.root'),
 #     outputCommands = cms.untracked.vstring()
      outputCommands = cms.untracked.vstring('keep *') 
