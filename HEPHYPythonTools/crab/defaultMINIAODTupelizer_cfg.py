@@ -105,8 +105,8 @@ process.load("Configuration.StandardSequences.MagneticField_cff")
 process.out = cms.OutputModule("PoolOutputModule",
      #verbose = cms.untracked.bool(True),
      SelectEvents   = cms.untracked.PSet( SelectEvents = cms.vstring('p') ),
-     #fileName = cms.untracked.string(options.outfile),
-     fileName = cms.untracked.string(process.source.fileNames[0][0:-5]+'Tupel.root'),
+     fileName = cms.untracked.string(options.outfile),
+     #fileName = cms.untracked.string(process.source.fileNames[0][0:-5]+'Tupel.root'),
      outputCommands = cms.untracked.vstring() 
 #     outputCommands = cms.untracked.vstring('keep *') 
 )
