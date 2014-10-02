@@ -4,41 +4,51 @@ from localInfo import username
 from objectSelection import tightPOGMuID , vetoMuID , getLooseMuStage2
 from math import sqrt, cos, sin, atan2
 from array import array
-from getmuon import getMu
+from getmuon import getMu , getGenLep
 
 Lumi=2000 #pb-1
 xsec=689.1 #pb ?
 #nevents is later
 
 c50 = ROOT.TChain('Events')
-c50.Add('/data/easilar/convertedTuples_v23/copyMET/ttJetsCSA1450ns/histo_ttJetsCSA1450ns_from0To10.root')
-#c50.Add('/data/easilar/convertedTuples_v23/copyMET/ttJetsCSA1450ns/*')
+#c50.Add('/data/easilar/convertedTuples_v23/copyMET/ttJetsCSA1450ns/histo_ttJetsCSA1450ns_from0To10.root')
+c50.Add('/data/easilar/convertedTuples_v23/copyMET/ttJetsCSA1450ns/*')
 
 #number_events50 = c50.GetEntries()
 
 #weight = Lumi*xsec/number_events50
-weight = 0.436738650483
-preselection = "ht>300 && njets>=3"    ##no met cut !!
-c50.Draw(">>List",preselection)
+#weight = 0.436738650483
+preselection = "ht>300 && njets>=3"
+selection1="&&ngNuMuFromW==2&&ngNuEFromW==0"
+selection2="&&ntauCount==0"
+
+c50.Draw(">>List",preselection+selection1)
 List = ROOT.gDirectory.Get("List")
 number_events = List.GetN()
 
-Filetake = ROOT.TFile('EffSmall.root')
-File = ROOT.TFile('MtSmall.root','RECREATE')
+Filetake = ROOT.TFile('Eff.root')
+File = ROOT.TFile('MtT1V1.root','RECREATE')
 
 h_GenPt = ROOT.TH1F('h_GenPt', 'h_GenPt',25,0,800)
 h_GenMet = ROOT.TH1F('h_GenMet', 'h_GenMet',25,0,800)
 h_GenMt = ROOT.TH1F('h_GenMt', 'h_GenMt',25,0,800)
+h_GenDeltaPhi = ROOT.TH1F('h_GenDeltaPhi', 'h_GenDeltaPhi',25,-3,3)
 
 h_Pt = ROOT.TH1F('h_Pt', 'h_Pt',25,0,800)
 h_Met = ROOT.TH1F('h_Met', 'h_Met',25,0,800)
 h_MtPred = ROOT.TH1F('h_MtPred', 'h_MtPred',25,0,800)
+h_DeltaPhi = ROOT.TH1F('h_DeltaPhi', 'h_DeltaPhi',25,-3,3)
 
 for relIso in [0.12,0.2,0.3]:
+#for relIso in [0.3]:
   h_EffinDiLep = Filetake.Get("2D"+str(relIso)) #Finding eff in DiLep Events
-
+  print 'For relIso:',"2D"+str(relIso)
   for i in range(number_events):
+    weight = c50.GetLeaf('weight').GetValue()
     c50.GetEntry(List.GetEntry(i))
+    print number_events-i,'events left'
+    ntauCount = c50.GetLeaf('ntauCount').GetValue()
+    #print 'ntauCount before: ',ntauCount 
     nmuCount = int(c50.GetLeaf('nmuCount').GetValue())
     ngoodMuons = c50.GetLeaf('ngoodMuons').GetValue()
     nvetoMuons = c50.GetLeaf('nvetoMuons').GetValue()
@@ -55,9 +65,15 @@ for relIso in [0.12,0.2,0.3]:
     ntmuons=0
     nlmuons=0
     muons=[]
+    gLeps=[]
+    #Get all genLeps
+    for p in range(int(ngLep)):
+      genLep = getGenLep(c50,p)
+      if genLep:
+        gLeps.append(genLep)  
     for j in range(nmuCount):
-      #muon=getMu(c50,j)
-      muon=getLooseMuStage2(c50,j)
+      muon=getMu(c50,j)
+      #muon=getLooseMuStage2(c50,j)
       if muon:
         isTight=tightPOGMuID(muon)
         isLoose=vetoMuID(muon,relIso)
@@ -65,32 +81,41 @@ for relIso in [0.12,0.2,0.3]:
         muon['isLoose'] = isLoose
         if isTight: ntmuons+=1
         if isLoose: nlmuons+=1
+        hasMatch = False
+        # for gl in genLepts: 
+        #  if gl['gLepInd']==j:
+        #    hasMatch=True
+        # muon['hasMatch']=hasMatch
+        for gl in gLeps:
+          if gl['gLepInd']==j and gl['gLepDR']<0.4: hasMatch=True
+        muon['hasMatch']=hasMatch  
         muons.append(muon)
     #print 'enter ngLep loop'
     if met>150:
-      for p in range(int(ngLep)):
-        gLepPdg = c50.GetLeaf('gLepPdg').GetValue(p)
-        gLepDR = c50.GetLeaf('gLepDR').GetValue(p)
-        gLepPt = c50.GetLeaf('gLepPt').GetValue(p)
-        gLepEta = c50.GetLeaf('gLepEta').GetValue(p)
-        gLepInd = c50.GetLeaf('gLepInd').GetValue(p)
-        gLepPhi = c50.GetLeaf('gLepPhi').GetValue(p)
-        if abs(gLepPdg) == 13 and gLepPt>20 and abs(gLepEta)<2.1:
-          if gLepInd>=0 and gLepDR<0.4 and ngNuMuFromW==2 and ngNuEFromW==0:
-            k=int(gLepInd)
-            if muons[k]['isLoose'] == 1 and muons[k]['pt']>20 and abs(1-muons[k]['pt']/gLepPt)<0.9:
-              if ngoodMuons==1 and nvetoMuons==1 and nvetoElectrons==0:
-                #h_MTGen.Fill(sqrt(2*genMet*gLepPt*(1-cos(gLepPhi-genMetphi))))
-                h_GenMt.Fill(sqrt(2*met*muons[k]['pt']*(1-cos(muons[k]['phi']-metphi))))
-                h_GenMet.Fill(met)
-                h_GenPt.Fill(muons[k]['pt'])
+      # for truth (1 tight mu reco'd, 1 gen mu not reco'd, ngMuNuFromW==2<->gendiLep ):
+      # 1. get all reco muons, store loose/tight -> Done
+      # 2. require ntmuons==1->tightMuon, nlmuons==1 
+      #    tightMatchedMuons = filter(lambda x:x['hasMatch'] and x['isTight'], muons) 
+      #    muon = tightMatchedMuons[0]
+      #     if len(tightMatchedMuons!=1) print "Warning"
+      # 3. calculate mT(met, tightMuon)
+      # for genlepmatch: require also tightMuon['hasMatch'] 
+      tightMatchedMuons = filter(lambda x:x['hasMatch'] and x['isTight'], muons)
+      if ntmuons==1 and nlmuons==1 and len(tightMatchedMuons)==1:
+        if len(tightMatchedMuons) >1 : print "Warning"
+        TightMatchedMuon = tightMatchedMuons[0]
+        h_GenMt.Fill(sqrt(2*met*TightMatchedMuon['pt']*(1-cos(TightMatchedMuon['phi']-metphi))), weight)
+        h_GenMet.Fill(met, weight)
+        h_GenPt.Fill(TightMatchedMuon['pt'], weight)
+        h_GenDeltaPhi.Fill(cos(TightMatchedMuon['phi']-metphi), weight)
+
     if len(muons)<2: continue
     if len(muons)==2 and ntmuons>=1:
       for perm in [muons, reversed(muons)]:
         m,m2 = perm
         if m2['isTight']==1:
           EffDiLep = h_EffinDiLep.GetBinContent(h_EffinDiLep.FindBin(m['pt'],m['eta']))
-          if abs(m['eta'])<2.1 and m['pt']>20:
+          if abs(m['eta'])<2.5 and m['pt']>15:
             metAdd=m['pt']
             Metx = met*cos(metphi)+cos(m['phi'])*metAdd
             Mety = met*sin(metphi)+sin(m['phi'])*metAdd
@@ -103,16 +128,17 @@ for relIso in [0.12,0.2,0.3]:
                 h_MtPred.Fill(mtPred,weight*Seff)
                 h_Met.Fill(metPred,weight*Seff)
                 h_Pt.Fill(m2['pt'],weight*Seff)
+                h_DeltaPhi.Fill(cos(m2['phi']-metphiPred),weight*Seff)
 
   canMT = ROOT.TCanvas("MT"+str(relIso))
   canMT.cd()
   Pad1 = ROOT.TPad("Pad1", "Pad1", 0, 0.1, 1, 1.0)
   Pad1.Draw()
   Pad1.cd()
-  h_MtPred.SetLineColor(ROOT.kBlue)
-  h_MtPred.Draw()
   h_GenMt.SetLineColor(ROOT.kRed)
-  h_GenMt.Draw('same')
+  h_GenMt.Draw()
+  h_MtPred.SetLineColor(ROOT.kBlue)
+  h_MtPred.Draw('same')
   leg = ROOT.TLegend(0.6,0.6,0.9,0.7)
   leg.AddEntry(h_MtPred, "Calculated","l")
   leg.AddEntry(h_GenMt, "MtGen","l")
@@ -133,10 +159,10 @@ for relIso in [0.12,0.2,0.3]:
 
   canPT = ROOT.TCanvas("PT"+str(relIso))
   canPT.cd()
-  h_Pt.SetLineColor(ROOT.kBlue)
-  h_Pt.Draw()
   h_GenPt.SetLineColor(ROOT.kRed)
-  h_GenPt.Draw('same')
+  h_GenPt.Draw()
+  h_Pt.SetLineColor(ROOT.kBlue)
+  h_Pt.Draw('same')
   leg = ROOT.TLegend(0.6,0.6,0.9,0.7)
   leg.AddEntry(h_Pt, "Calculated","l")
   leg.AddEntry(h_GenPt, "PtGen","l")
@@ -148,10 +174,10 @@ for relIso in [0.12,0.2,0.3]:
 
   canMet = ROOT.TCanvas("Met"+str(relIso))
   canMet.cd()
-  h_Met.SetLineColor(ROOT.kBlue)
-  h_Met.Draw()
   h_GenMet.SetLineColor(ROOT.kRed)
-  h_GenMet.Draw('same')
+  h_GenMet.Draw()
+  h_Met.SetLineColor(ROOT.kBlue)
+  h_Met.Draw('same')
   leg = ROOT.TLegend(0.6,0.6,0.9,0.7)
   leg.AddEntry(h_Met, "Calculated","l")
   leg.AddEntry(h_GenMet, "MetGen","l")
@@ -161,6 +187,20 @@ for relIso in [0.12,0.2,0.3]:
   canMet.Update()
   canMet.Write()
 
+  canDeltaPhi = ROOT.TCanvas("DeltaPhi"+str(relIso))
+  canDeltaPhi.cd()
+  h_GenDeltaPhi.SetLineColor(ROOT.kRed)
+  h_GenDeltaPhi.Draw()
+  h_DeltaPhi.SetLineColor(ROOT.kBlue)
+  h_DeltaPhi.Draw('same')
+  leg = ROOT.TLegend(0.6,0.6,0.9,0.7)
+  leg.AddEntry(h_DeltaPhi, "Calculated","l")
+  leg.AddEntry(h_GenDeltaPhi, "DeltaPhiGen","l")
+  leg.SetFillColor(0)
+  leg.Draw()
+  canDeltaPhi.SetLogy()
+  canDeltaPhi.Update()
+  canDeltaPhi.Write()
 
 File.Write()
 File.Close()

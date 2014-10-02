@@ -12,7 +12,7 @@ etaBins = array('d', [float(x)/10. for x in range(-30,32,2)])
 ptBins2D  = array('d', [float(x) for x in range(10, 20)+range(20,50,5)+range(50,100,20)+range(100,310,50)])
 etaBins2D = array('d', [float(x)/10. for x in [-30,-25]+range(-21,22,6)+[25,30]])
 
-File = ROOT.TFile('EffSmall.root','RECREATE')
+File = ROOT.TFile('Eff.root','RECREATE')
 File.cd()
 
 PtDenDiLep = ROOT.TH1F('PtDenDiLep', 'PtDenDiLep',len(ptBins)-1,ptBins)
@@ -32,8 +32,8 @@ preselection = "ht>300 && met>150 && njets>=3"
 c50 = ROOT.TChain('Events')
 #for b in ttJetsCSA1450ns['bins']:
 #  c.Add(ttJetsCSA1450ns['dirname']+'/'+b+'/h*.root')
-c50.Add('/data/easilar/convertedTuples_v23/copyMET/ttJetsCSA1450ns/histo_ttJetsCSA1450ns_from0To10.root')
-#c50.Add('/data/easilar/convertedTuples_v23/copyMET/ttJetsCSA1450ns/*')
+#c50.Add('/data/easilar/convertedTuples_v23/copyMET/ttJetsCSA1450ns/histo_ttJetsCSA1450ns_from0To10.root')
+c50.Add('/data/easilar/convertedTuples_v23/copyMET/ttJetsCSA1450ns/*')
 
 c50.Draw(">>List",preselection)
 List = ROOT.gDirectory.Get("List")
@@ -56,20 +56,7 @@ for relIso in [0.12,0.2,0.3]:
     ngLep = int(c50.GetLeaf('ngLep').GetValue())
     ngNuMuFromW = c50.GetLeaf('ngNuMuFromW').GetValue() 
     ngNuEFromW = c50.GetLeaf('ngNuEFromW').GetValue()
-    ntmuons=0
-    nlmuons=0
-    muons=[]
-    for j in range(nmuCount):
-      #muon=getMu(c50,j)
-      muon=getLooseMuStage2(c50,j)
-      if muon:
-        isTight=tightPOGMuID(muon)
-        isLoose=vetoMuID(muon,relIso)
-        muon['isTight'] = isTight
-        muon['isLoose'] = isLoose
-        if isTight: ntmuons+=1
-        if isLoose: nlmuons+=1
-        muons.append(muon)
+
     for p in range(int(ngLep)):
       gLepPdg = c50.GetLeaf('gLepPdg').GetValue(p)
       gLepDR = c50.GetLeaf('gLepDR').GetValue(p)
@@ -83,7 +70,10 @@ for relIso in [0.12,0.2,0.3]:
         PtDenDiLep.Fill(gLepPt)
         if gLepInd>=0 and  gLepDR<0.4:
           k=int(gLepInd)
-          if muons[k]['isLoose'] == 1 and abs(1-muons[k]['pt']/gLepPt)<0.9:
+          muon = getLooseMuStage2(c50,k)
+          muon['isTight'] = tightPOGMuID(muon) 
+          muon['isLoose'] = vetoMuID(muon,relIso)
+          if muon['isLoose'] == 1 and abs(1-muon['pt']/gLepPt)<0.9:
               PtEtaNumDiLep.Fill(gLepPt,gLepEta)
               EtaNumDiLep.Fill(gLepEta)
               PtNumDiLep.Fill(gLepPt)
@@ -101,10 +91,10 @@ for relIso in [0.12,0.2,0.3]:
   EffPtEta.Divide(PtEtaDenDiLep) 
   EffPtEta.Write("2D"+str(relIso))
   
-  can2D3 = ROOT.TCanvas("2DCol"+str(relIso))
-  can2D3.cd()
+  can2D = ROOT.TCanvas("2DCol"+str(relIso))
+  can2D.cd()
   EffPtEta.Draw('colz')
-  can2D3.Write()
+  can2D.Write()
 
 
 File.Write()
