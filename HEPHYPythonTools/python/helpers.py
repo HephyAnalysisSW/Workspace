@@ -112,7 +112,10 @@ def getCutYieldFromChain(c, cutString = "(1)", cutFunc = None, weight = "weight"
   for i in range(number_events): 
     c.GetEntry(elist.GetEntry(i))
     if (not cutFunc) or cutFunc(c):
-      w = c.GetLeaf(weight).GetValue()
+      if weight:
+        w = c.GetLeaf(weight).GetValue()
+      else:
+        w=1.
       if weightFunc:
         w*=weightFunc(c)
       res += w

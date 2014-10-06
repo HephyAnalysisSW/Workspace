@@ -63,7 +63,7 @@ else:
     for bin in sample['bins']:
       print "Input files from:",bin['dir']
       filelist = getFileList(bin['dir'], minAgeDPM=0, histname='histo', xrootPrefix='root://hephyse.oeaw.ac.at/')
-      if options.small: filelist = filelist[:2]
+      if options.small: filelist = filelist[:1]
       bin['filenames'] = []
       for tfile in filelist:
         bin['filenames'] = filelist
@@ -131,7 +131,7 @@ for isample, sample in enumerate(allSamples):
   ]
 
   #Anything that is copied from stage1 -> stage2. Syntax 'OldVar/Type:NewVar'. OldVar needs to be an alias.
-  copyVariables = [ 'event/l', 'run/I', 'lumi/I', 'ngoodVertices/I', 'bx/I:bunchCrossing', 'slimmedMETs/F:met', 'slimmedMETsPhi/F:metPhi']
+  copyVariables = ['event/l', 'run/I', 'lumi/I', 'ngoodVertices/I', 'bx/I:bunchCrossing', 'slimmedMETs/F:met', 'slimmedMETsPhi/F:metPhi']
   #new variables
   newVariables = ['weight/F'] 
 
@@ -238,9 +238,13 @@ for isample, sample in enumerate(allSamples):
     c.SetAutoDelete(1)
     c.SetMakeClass(1)
     c.SetBranchStatus("*", 0)
+    c.LoadTree(0)
     c.GetEntry(0)
     for v in copyVars+readVars:
       c.SetBranchStatus(c.GetAlias(v['stage1Name']), 1)
+    for v in readVectors:
+      for var in v['vars']:
+        c.SetBranchStatus(c.GetAlias(var['stage1Name']), 1)
     for v in copyVars:
       c.SetBranchAddress(c.GetAlias(v['stage1Name']), ROOT.AddressOf(s, v['stage2Name']))
     for v in readVars:
@@ -249,7 +253,6 @@ for isample, sample in enumerate(allSamples):
     for v in readVectors:
       for var in v['vars']:
 #        print var['stage1Name'], c.GetAlias(var['stage1Name'])
-        c.SetBranchStatus(c.GetAlias(var['stage1Name']), 1)
 #        print (c.GetAlias(var['stage1Name']), var['stage1Name'])
         c.SetBranchAddress(c.GetAlias(var['stage1Name']), ROOT.AddressOf(r, var['stage1Name']))
 
@@ -272,12 +275,8 @@ for isample, sample in enumerate(allSamples):
     mclist = []
     for thisfile in bin["filenames"]:
       mclist.append(thisfile)
-    print "Here1"
     events = Events(mclist)
-    print "Here2"
     events.toBegin()
-    print "Here3"
-    print "Here4"
     if options.small:
       if number_events>11:
         number_events=11
@@ -292,9 +291,10 @@ for isample, sample in enumerate(allSamples):
       if elist.GetN()>0 and ntot>0:
         s.init()
         r.init()
-#        print "Before", c.GetCurrentFile()
+        print "Before", nev, c.GetFile()
+        c.LoadTree(elist.GetEntry(nev))
         c.GetEntry(elist.GetEntry(nev))
-#        print "After", c.GetCurrentFile()
+        print "After", c.GetFile()
         
         events.to(elist.GetEntry(nev))
         s.weight = bin['weight']
