@@ -9,7 +9,7 @@ from Workspace.RA4Analysis.convertHelpers import compileClass, readVar, printHea
 
 from Workspace.HEPHYPythonTools.helpers import bStr, wrapStr, getFileList, getVarValue
 from Workspace.HEPHYPythonTools.helpers import deltaPhi, minAbsDeltaPhi, invMassOfLightObjects, deltaR, closestMuJetDeltaR, invMass,  findClosestObjectDR
-from Workspace.RA4Analysis.objectSelection import getAllElectronsStage1, tightPOGEleID, vetoEleID, getAllMuonsStage1, tightPOGMuID, vetoMuID, getAllTausStage1, hybridMuID, getGoodJetsStage1, isIsolated
+from Workspace.RA4Analysis.objectSelection import getLooseEleStage1,getAllElectronsStage1, tightPOGEleID, vetoEleID, getLooseMuStage1, getAllMuonsStage1, tightPOGMuID, vetoMuID, getAllTausStage1, getTauStage1, hybridMuID, getGoodJetsStage1, isIsolated
 
 #def getVarValue(chain, bname):
 #  return getattr(chain, bname)
@@ -18,7 +18,7 @@ from Workspace.RA4Analysis.stage1Tuples import *
 
 from Workspace.HEPHYPythonTools.xsec import xsec
 
-subDir = "convertedTuples_v25"
+subDir = "convertedTuples_v24"
 target_lumi = 2000 #pb-1
 
 from localInfo import username
@@ -32,13 +32,13 @@ parser = OptionParser()
 parser.add_option("--chmode", dest="chmode", default="copyMET", type="string", action="store", help="chmode: What to do.")
 #parser.add_option("--jermode", dest="jermode", default="none", type="string", action="store", help="jermode: up/down/central/none")
 #parser.add_option("--jesmode", dest="jesmode", default="none", type="string", action="store", help="jesmode: up/down/none")
-parser.add_option("--samples", dest="allsamples", default="ttJetsCSA1450ns", type="string", action="store", help="samples:Which samples.")
+parser.add_option("--samples", dest="allsamples", default="T5Full_1200_1000_800", type="string", action="store", help="samples:Which samples.")
 parser.add_option("--file", dest="file", default="", type="string", action="store", help="file:Which file.")
 parser.add_option("--DR", dest="DR", default="0.4", type="float", action="store", help="samples:Which samples.")
-parser.add_option("--small", dest="small", default = False, action="store_true", help="Just do a small subset.")
+parser.add_option("--small", dest="small", action="store_true", help="Just do a small subset.")
 parser.add_option("--overwrite", dest="overwrite", action="store_true", help="Overwrite?", default=True)
 parser.add_option("--puppi", dest="puppi", action="store_true", help="Just do a puppi subset.")
-parser.add_option("--newGenMet", dest="newGenMet", default = False, action="store_true", help="new genmet?")
+parser.add_option("--newGenMet", dest="newGenMet", action="store_true", help="new genmet?")
 parser.add_option("--fromPercentage", dest="fromPercentage", default="0", type="int", action="store", help="from (% of tot. events)")
 parser.add_option("--toPercentage", dest="toPercentage", default="100", type="int", action="store", help="to (% of tot. events)")
 parser.add_option("--keepPDFWeights", dest="keepPDFWeights", action="store_true", help="keep PDF Weights?")
@@ -121,34 +121,24 @@ for isample, sample in enumerate(allSamples):
   else:
     print "Subdir", outputDir+"/"+outSubDir, "already found."
 
-#  #Variables that are needed but won't be written
-  loadProducts = ["nmuons/int","neles/int","ntaus/int", "nJets/int"]
-  loadVectors = [\
-    {'prefix':'eles',  'vars':['Pt/float', 'Eta/float', 'Phi/float', 'Pdg/int', 'PfRelIso/float', 'Dxy/float', 'Dz/float', 'OneOverEMinusOneOverP/float',  'SigmaIEtaIEta/float', 'HoE/float', 'DPhi/float', 'DEta/float', 'MissingHits/int', 'PassPATConversionVeto/int']},
-    {'prefix':'muons', 'vars':['Pt/float', 'Eta/float', 'Phi/float', 'Pdg/int', 'PFRelIso/float', 'Dxy/float', 'Dz/float', 'NormChi2/float', 'NValMuonHits/int', 'NumMatchedStations/int', 'PixelHits/int', 'NumtrackerLayerWithMeasurement/int', 'isGlobal/int', 'isTracker/int','isPF/int', 'Iso03sumChargedHadronPt/float', 'Iso03sumNeutralHadronEt/float', 'Iso03sumPhotonEt/float', 'Iso03sumPUChargedHadronPt/float']},
-    {'prefix':'taus',  'vars':['Pt/float', 'Eta/float', 'Phi/float', 'Pdg/int', 'DecayModeFinding/int', 'AgainstMuonLoose3/int', 'AgainstElectronLooseMVA5/int', 'ByLooseCombinedIsolationDeltaBetaCorr3Hits/int']},
-    {'prefix':'jets',  'vars':['Pt/float', 'Eta/float', 'Phi/float', 'Parton/int', 'Unc/float', 'ID/int', 'BTag/float', "ChargedHadronEnergyFraction/float", "NeutralHadronEnergyFraction/float", "ChargedEmEnergyFraction/float", "NeutralEmEnergyFraction/float", "HFHadronEnergyFraction/float", "HFEMEnergyFraction/float", "MuonEnergyFraction/float", "ElectronEnergyFraction/float", "PhotonEnergyFraction/float"]},
+  #Variables that are needed but won't be written
+  readVariables = ["nmuons/I","neles/I","ntaus/I", "nJets/I"]
+  readVectors = [\
+    {'prefix':'eles',  'nMax':10, 'vars':['Pt/F', 'Eta/F', 'Phi/F', 'Pdg/I', 'PfRelIso/F', 'Dxy/F', 'Dz/F', 'OneOverEMinusOneOverP/F',  'SigmaIEtaIEta/F', 'HoE/F', 'DPhi/F', 'DEta/F', 'MissingHits/I', 'PassPATConversionVeto/I']},
+    {'prefix':'muons', 'nMax':10, 'vars':['Pt/F', 'Eta/F', 'Phi/F', 'Pdg/I', 'PFRelIso/F', 'Dxy/F', 'Dz/F', 'NormChi2/F', 'NValMuonHits/I', 'NumMatchedStations/I', 'PixelHits/I', 'NumtrackerLayerWithMeasurement/I', 'isGlobal/I', 'isTracker/I','isPF/I', 'Iso03sumChargedHadronPt/F', 'Iso03sumNeutralHadronEt/F', 'Iso03sumPhotonEt/F', 'Iso03sumPUChargedHadronPt/F']},
+    {'prefix':'taus',  'nMax':10, 'vars':['Pt/F', 'Eta/F', 'Phi/F', 'Pdg/I', 'DecayModeFinding/I', 'AgainstMuonLoose3/I', 'AgainstElectronLooseMVA5/I', 'ByLooseCombinedIsolationDeltaBetaCorr3Hits/I']},
+    {'prefix':'jets',  'nMax':30, 'vars':['Pt/F', 'Eta/F', 'Phi/F', 'Parton/I', 'Unc/F', 'ID/I', 'BTag/F', "ChargedHadronEnergyFraction/F", "NeutralHadronEnergyFraction/F", "ChargedEmEnergyFraction/F", "NeutralEmEnergyFraction/F", "HFHadronEnergyFraction/F", "HFEMEnergyFraction/F", "MuonEnergyFraction/F", "ElectronEnergyFraction/F", "PhotonEnergyFraction/F"]},
   ]
 
-  loadEDMCollections = [ {'name':'pfMet', 'label':("pfMet"), 'edmType':"vector<reco::PFMET>"} ]
-  loadEDMCollections.append({'name':'pf', 'label':("packedPFCandidates"), 'edmType':"vector<pat::PackedCandidate>"})
-  if not sample['isData']:
-    loadEDMCollections.append( {'name':'gps', 'label':("prunedGenParticles"), 'edmType':"vector<reco::GenParticle>"})
-  if options.puppi:
-    loadEDMCollections.append({'name':'puppi', 'label':("puppi","Puppi"), 'edmType':"vector<reco::PFCandidate>"})
-  if not options.newGenMet:
-    loadEDMCollections.append({'name':'genMet', 'label':("genMetTrue"), 'edmType':"vector<reco::GenMET>"})
-
   #Anything that is copied from stage1 -> stage2. Syntax 'OldVar/Type:NewVar'. OldVar needs to be an alias.
-#  copyVariables = ['event/ULong64_t:event/l', 'run/int:run/I', 'lumi/int:lumi/I', 'ngoodVertices/int:ngoodVertices/I', 'bx/int:bunchCrossing/I', 'slimmedMETs/float:met/F', 'slimmedMETsPhi/float:metPhi/F']
-  copyVariables = ['run/int:run/I', 'lumi/int:lumi/I', 'ngoodVertices/int:ngoodVertices/I', 'bx/int:bunchCrossing/I', 'slimmedMETs/float:met/F', 'slimmedMETsPhi/float:metPhi/F']
+  copyVariables = ['event/l', 'run/I', 'lumi/I', 'ngoodVertices/I', 'bx/I:bunchCrossing', 'slimmedMETs/F:met', 'slimmedMETsPhi/F:metPhi']
   #new variables
   newVariables = ['weight/F'] 
 
   if options.newGenMet:
-    copyVariables.extend(['genMet/float:genMet/F', 'genMetPhi/float:genMetPhi/F'])
+    copyVariables.extend(['genMet/F', 'genMetPhi/F'])
   if not sample['isData']:
-    copyVariables.extend(['nTrueGenVertices/float:nTrueGenVertices/I'])
+    copyVariables.extend(['nTrueGenVertices/I'])
 
   newVariables.extend( ['pfMet/F', 'pfMetPhi/F'] )
   if not options.newGenMet:
@@ -170,13 +160,13 @@ for isample, sample in enumerate(allSamples):
    gLepVec =  {'prefix':'gLep', 'nMax':10, 'vars':['Pt/F', 'Eta/F', 'Phi/F', 'Pdg/I', 'Ind/I', 'DR/F', 'MMass/F']}
    newVectors+=[gTauVec, gLepVec]
   if options.puppi:
-    pfVec =    {'prefix':'pf',    'nMax':10000,  'vars':['Pt/F', 'Eta/F', 'Phi/F', 'Pdg/I']}
     puppiVec = {'prefix':'puppi', 'nMax':10000,  'vars':['Pt/F', 'Eta/F', 'Phi/F', 'Pdg/I']}
+    pfVec =    {'prefix':'pf',    'nMax':10000,  'vars':['Pt/F', 'Eta/F', 'Phi/F', 'Pdg/I']}
     newVectors+= [puppiVec, pfVec]
 
-  loadProds = [readVar(v, allowRenaming=True, isWritten=False, isRead=True) for v in loadProducts]
-  for v in loadVectors:
-    v['vars'] = [readVar(vvar, allowRenaming=False, isWritten=False, isRead=True, makeVecType=True) for vvar in v['vars']]
+  readVars = [readVar(v, allowRenaming=False, isWritten=False, isRead=True) for v in readVariables]
+  for v in readVectors:
+    v['vars'] = [readVar(v['prefix']+vvar, allowRenaming=False, isWritten=False, isRead=True) for vvar in v['vars']]
 
   copyVars   = [readVar(v, allowRenaming=True, isWritten=True, isRead=True) for v in copyVariables]
   for v in newVectors:
@@ -184,18 +174,19 @@ for isample, sample in enumerate(allSamples):
     newVariables.append(v['varNameCount']+'/i')
     v['vars'] = [readVar(v['prefix']+vvar, allowRenaming=False, isWritten=True, isRead=False) for vvar in v['vars']]
   newVars = [readVar(v, allowRenaming=False, isWritten = True, isRead=False) for v in newVariables]
+
  
   writeClassName = "ClassToWrite_"+str(nc)+"_"+str(isample) 
-  writeClassString = createClassString(className=writeClassName, vars=copyVars + newVars, vectors=newVectors, nameKey = 'stage2Name', typeKey = 'stage2Type')
+  writeClassString = createClassString(className=writeClassName, vars=copyVars + newVars, vectors=newVectors, nameKey = 'stage2Name')
   printHeader("Class to Write")
 #  print writeClassString
   s = compileClass(className=writeClassName, classString=writeClassString, tmpDir='/data/'+username+'/tmp/')
 
-#  readClassName = "ClassToRead_"+str(nc)+"_"+str(isample) 
-#  readClassString = createClassString(className=readClassName, vars=readVars, vectors=readVectors, nameKey = 'stage1Name', stdVectors=True)
-#  printHeader("Class to Read")
-##  print readClassString
-#  r = compileClass(className=readClassName, classString=readClassString, tmpDir='/data/'+username+'/tmp/')
+  readClassName = "ClassToRead_"+str(nc)+"_"+str(isample) 
+  readClassString = createClassString(className=readClassName, vars=readVars, vectors=readVectors, nameKey = 'stage1Name', stdVectors=True)
+  printHeader("Class to Read")
+#  print readClassString
+  r = compileClass(className=readClassName, classString=readClassString, tmpDir='/data/'+username+'/tmp/')
 
   nc+=1
   postfix=""
@@ -214,10 +205,10 @@ for isample, sample in enumerate(allSamples):
   chain_gDir = ROOT.gDirectory.func()
   t = ROOT.TTree( "Events", "Events", 1 )
   for v in copyVars+newVars:
-    t.Branch(v['stage2Name'], ROOT.AddressOf(s,v['stage2Name']), v['stage2Name']+'/'+v['stage2Type'])
+    t.Branch(v['stage2Name'], ROOT.AddressOf(s,v['stage2Name']), v['stage2Name']+'/'+v['type'])
   for v in newVectors:
     for var in v['vars']:
-      t.Branch(var['stage2Name'], ROOT.AddressOf(s,var['stage2Name']), var['stage2Name']+'['+v['varNameCount']+']/'+var['stage2Type'])
+      t.Branch(var['stage2Name'], ROOT.AddressOf(s,var['stage2Name']), var['stage2Name']+'['+v['varNameCount']+']/'+var['type'])
 
   chain_gDir.cd()
 
@@ -243,35 +234,55 @@ for isample, sample in enumerate(allSamples):
     if ntot==0:
       print "Zero entries in", bin, sample["name"]
       continue
-    del c
 
-    handles={}
-    products={} 
-    for v in copyVars + loadProds:
-      handles[v['stage1Name']] = Handle(v['stage1Type'])
-    for v in loadEDMCollections:
-      handles[v['name']] = Handle(v['edmType'])
-    for v in loadVectors:
-      for vvar in v['vars']:
-        handles[v['prefix']+vvar['stage1Name']] = Handle(vvar['stage1Type'])
+    c.SetAutoDelete(1)
+    c.SetMakeClass(1)
+    c.SetBranchStatus("*", 0)
+    c.LoadTree(0)
+    c.GetEntry(0)
+    for v in copyVars+readVars:
+      c.SetBranchStatus(c.GetAlias(v['stage1Name']), 1)
+    for v in readVectors:
+      for var in v['vars']:
+        c.SetBranchStatus(c.GetAlias(var['stage1Name']), 1)
+    for v in copyVars:
+      c.SetBranchAddress(c.GetAlias(v['stage1Name']), ROOT.AddressOf(s, v['stage2Name']))
+    for v in readVars:
+#      print c.GetAlias(v['stage1Name']), v['stage1Name']
+      c.SetBranchAddress(c.GetAlias(v['stage1Name']), ROOT.AddressOf(r, v['stage1Name']))
+    for v in readVectors:
+      for var in v['vars']:
+#        print var['stage1Name'], c.GetAlias(var['stage1Name'])
+#        print (c.GetAlias(var['stage1Name']), var['stage1Name'])
+        c.SetBranchAddress(c.GetAlias(var['stage1Name']), ROOT.AddressOf(r, var['stage1Name']))
 
-    events = Events(bin["filenames"])
-    events.to(0)
+    pfMetLabel = ("pfMet")
+    pfMetHandle = Handle("vector<reco::PFMET>")
 
-    #Get Branch descriptions
-    bds = events._event.getBranchDescriptions()
-    labels={}
-    for i in range(bds.size()):
-      labels[bds[i].productInstanceName()] = tuple(bds[i].branchName().replace('.','').split('_')[1:3])
-       
+    if not options.newGenMet:
+      genMetLabel = ("genMetTrue")
+      genMetHandle = Handle("vector<reco::GenMET>")
+
+#    gpLabel = ("packedGenParticles")
+#    gpHandle = Handle("vector<pat::PackedGenParticle>")
+
+    gpLabel = ("prunedGenParticles")
+    gpHandle = Handle("vector<reco::GenParticle>")
+    pfLabel = ("packedPFCandidates")
+    pfHandle = Handle("vector<pat::PackedCandidate>")
+    puppiLabel = ("puppi","Puppi")
+    puppiHandle = Handle("vector<reco::PFCandidate>")
+    mclist = []
+    for thisfile in bin["filenames"]:
+      mclist.append(thisfile)
+    events = Events(mclist)
+    events.toBegin()
     if options.small:
-      if number_events>1001:
-        number_events=1001
+      if number_events>11:
+        number_events=11
     start = int(options.fromPercentage/100.*number_events)
     stop  = int(options.toPercentage/100.*number_events)
-    print "Reading: ", sample["name"]
-    print "bin    : ", bin['dbsName']
-    print "with",number_events,"events using cut", commoncf
+    print "Reading: ", sample["name"], bin['dbsName'], "with",number_events,"Events using cut", commoncf
     print "Reading percentage ",options.fromPercentage, "to",options.toPercentage, "which is range",start,"to",stop,"of",number_events
     for nev in range(start, stop):
       if (nev%1000 == 0) and nev>0 :
@@ -279,39 +290,33 @@ for isample, sample in enumerate(allSamples):
 #      # Update all the Tuples
       if elist.GetN()>0 and ntot>0:
         s.init()
+        r.init()
+        print "Before", nev, c.GetFile()
+        c.LoadTree(elist.GetEntry(nev))
+        c.GetEntry(elist.GetEntry(nev))
+        print "After", c.GetFile()
+        
         events.to(elist.GetEntry(nev))
         s.weight = bin['weight']
-
-        for v in loadEDMCollections:
-          events.getByLabel(v['label'],handles[v['name']])
-          products[v['name']] =handles[v['name']].product()
-
-        for v in copyVars + loadProds:
-          events.getByLabel(labels[v['stage1Name']], handles[v['stage1Name']])
-          products[v["stage1Name"]]=handles[v['stage1Name']].product()[0]
-        for v in loadVectors:
-          products[v['prefix']]={}
-          for vvar in v['vars']:
-            events.getByLabel(labels[v['prefix']+vvar['stage1Name']], handles[v['prefix']+vvar['stage1Name']])
-            products[v['prefix']][vvar["stage1Name"]]=handles[v['prefix']+vvar['stage1Name']].product()
-            
-        for v in copyVars:
-          exec('s.'+v['stage2Name']+'=products[v["stage1Name"]]')
-
-        s.pfMet = products['pfMet'][0].pt()
-        s.pfMetPhi = products['pfMet'][0].phi()
         if not options.newGenMet:
-          s.genMet = products['genMet'][0].pt()
-          s.genMetPhi = products['genMet'][0].phi()
+          events.getByLabel(genMetLabel,genMetHandle)
+          genMet =genMetHandle.product()
+          s.genMet = genMet[0].pt()
+          s.genMetPhi = genMet[0].phi()
+        else:
+          s.genMet = getVarValue(c, 'genMet')
+          s.genMetPhi = getVarValue(c, 'genMetPhi')
+        events.getByLabel(pfMetLabel,pfMetHandle)
+        pfMet =pfMetHandle.product()
+        s.pfMet = pfMet[0].pt()
+        s.pfMetPhi = pfMet[0].phi()
 
-        allGoodMuons = getAllMuonsStage1(products['muons'], products['nmuons'])
-        allGoodElectrons = getAllElectronsStage1(products['eles'], products['neles'])
-        allGoodTaus = getAllTausStage1(products['taus'], products['ntaus'])
-
-#        print 'mu',allGoodMuons, products['ntaus']
-#        print 'ele',allGoodElectrons,  products['neles']
-#        print 'tau',allGoodTaus, products['nmuons']
- 
+        allGoodElectrons = getAllElectronsStage1(r, r.neles)
+        allGoodTaus = getAllTausStage1(r, r.ntaus)
+        allGoodMuons = getAllMuonsStage1(r, r.nmuons) 
+#          print "muons",nmuons, allGoodMuons, 
+#          print "eles", neles, allGoodElectrons, 
+#          print "taus", ntaus, allGoodTaus
         electrons = filter(lambda e:tightPOGEleID(e), allGoodElectrons)
         muons = filter(lambda e:tightPOGMuID(e), allGoodMuons)
         taus = allGoodTaus 
@@ -341,7 +346,7 @@ for isample, sample in enumerate(allSamples):
         s.nvetoLeptons=s.nvetoElectrons+s.nvetoMuons
         s.ngoodTaus = len(taus)
         
-        jResult = getGoodJetsStage1(jets=products['jets'], njets = products['nJets'], crossCleanObjects = vetoMuons+vetoElectrons, dR = options.DR)#, jermode=options.jermode, jesmode=options.jesmode)
+        jResult = getGoodJetsStage1(r, vetoMuons+vetoElectrons, options.DR)#, jermode=options.jermode, jesmode=options.jesmode)
         jetResult = jResult['jets']
 #          met_dx = jResult['met_dx']
 #          met_dy = jResult['met_dy']
@@ -359,14 +364,16 @@ for isample, sample in enumerate(allSamples):
         s.nele = len(allGoodElectrons)
         s.ntau = len(allGoodTaus)
 ### MC specific part
-        if not sample['isData']:
+        if not sample['name'].lower().count('data'):
           genTaus = []
           genLeps = []
           s.ngNuEFromW=0
           s.ngNuMuFromW=0
           s.ngNuTauFromW=0
-          lgps = list(products['gps'])
-          for igp,gp in enumerate(lgps):
+          events.getByLabel(gpLabel,gpHandle)
+          gps =gpHandle.product()
+          lgps = list(gps)
+          for igp,gp in enumerate(gps):
             pdgId = abs(gp.pdgId())
             if pdgId==12 or pdgId==14 or pdgId==16:
               if gp.numberOfMothers()>0 and abs(gp.mother(0).pdgId())==24:
@@ -450,7 +457,9 @@ for isample, sample in enumerate(allSamples):
 #                if not justARadiation:
               genTaus.append(tau)
 #              print genTaus
-        pfc = list(products['pf'])
+        events.getByLabel(pfLabel,pfHandle)
+        pfcH =pfHandle.product()
+        pfc = list(pfcH)
         isoCands = [{'c':cand,'iso':0.} for cand in filter(lambda c:c.pt()>10 and c.fromPV()==c.PVTight and abs(c.pdgId()) in [11, 13, 211], pfc)]
         for p in pfc:
 #            if debug:
@@ -483,7 +492,9 @@ for isample, sample in enumerate(allSamples):
           s.trackPassHybridTightMuons[i]=isIsolated({'phi':s.trackPhi[i],'eta':s.trackEta[i]}, hybridTightMuons, dR=0.1)
 ####################
         if options.puppi:
-          s.puppiCount=min(puppiVec['nMax'], len(products['puppi']))
+          events.getByLabel(puppiLabel,puppiHandle)
+          puppi = list(puppiHandle.product())
+          s.puppiCount=min(puppiVec['nMax'], len(puppi))
           for i in range(s.puppiCount):
             s.puppiPt[i] = puppi[i].pt() 
             s.puppiEta[i] = puppi[i].eta() 
@@ -551,6 +562,8 @@ for isample, sample in enumerate(allSamples):
 #                             + (allGoodMuons[i]['pt']*sin(allGoodMuons[i]['phi']) + s.met*sin(s.metphi))**2)
 #            s.muIgpMatch[i] = -1
 ## MC specific part
+#            if not sample['name'].lower().count('data'):
+#              s.muIgpMatch[i] = assignMuIgp(i,s)
 ####################
 #
         s.eleCount = min(eleVec['nMax'],s.nele)
@@ -584,7 +597,7 @@ for isample, sample in enumerate(allSamples):
           else:
             s.tauJetInd[i]=-1
             s.tauJetDR[i]=float('nan')
-        if not sample['isData']:
+        if not sample['name'].lower().count('data'):
           s.gTauCount = min(gTauVec['nMax'],len(genTaus))
           genTaus = sorted(genTaus, key=lambda k: -k['pt'])
           for i in xrange(s.gTauCount):
@@ -611,13 +624,13 @@ for isample, sample in enumerate(allSamples):
             s.gLepMMass[i] = genLeps[i]['MMass']
             s.gLepDR[i]  = genLeps[i]['gLepDR']
             s.gLepInd[i]  = genLeps[i]['gLepInd']
-          if options.keepPDFWeights:
-            for i in range(45):
-              s.cteqWeights[i]=getVarValue(c, 'cteqWeights',i)
-            for i in range(41):
-              s.mstwWeights[i]=getVarValue(c, 'mstwWeights',i)
-            for i in range(101):
-              s.nnpdfWeights[i]=getVarValue(c, 'nnpdfWeights',i)
+#          if options.keepPDFWeights:
+#            for i in range(45):
+#              s.cteqWeights[i]=getVarValue(c, 'cteqWeights',i)
+#            for i in range(41):
+#              s.mstwWeights[i]=getVarValue(c, 'mstwWeights',i)
+#            for i in range(101):
+#              s.nnpdfWeights[i]=getVarValue(c, 'nnpdfWeights',i)
         tmpDir = ROOT.gDirectory.func()
         chain_gDir.cd()
         t.Fill()
@@ -629,6 +642,7 @@ for isample, sample in enumerate(allSamples):
 #          t.Fill()
 #          pyroot_gDir.cd()
     del elist
+  del c
   if True or not options.small: #FIXME
     f = ROOT.TFile(ofile, "recreate")
     t.Write()

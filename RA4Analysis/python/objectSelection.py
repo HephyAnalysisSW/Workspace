@@ -31,22 +31,25 @@ jetRatioBins = [0,0.01,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,1.2,1.5,2.0,3.0]
 #    return {'pt':pt, 'phi':getVarValue(c, 'elesPhi', iele), 'Pdg':pdg, 'eta':eta, 'sIEtaIEta':sietaieta, 'DPhi':dphi, \
 #            'DEta':deta, 'HoE':HoE, 'OneOverEMinusOneOverP':oneOverEMinusOneOverP, 'ConvRejection':convRej, 'MissingHits':missingHits,\
 #            'isEB':isEB, 'isEE':isEE, 'relIso':relIso, 'Dxy':dxy, 'Dz':dz}
-def getLooseEleStage1(s, iele): # POG Ele veto https://twiki.cern.ch/twiki/bin/viewauth/CMS/EgammaCutBasedIdentification
-  eta = s.elesEta[iele]#getVarValue(c, 'elesEta', iele)
-  pdg = s.elesPdg[iele]#getVarValue(c, 'elesPdg', iele)
-  sietaieta = s.elesSigmaIEtaIEta[iele]#getVarValue(c, 'elesSigmaIEtaIEta', iele)
-  dphi = s.elesDPhi[iele]
-  deta = s.elesDEta[iele]
-  HoE  = s.elesHoE[iele]
+def getLooseEleStage1(eles, iele): # POG Ele veto https://twiki.cern.ch/twiki/bin/viewauth/CMS/EgammaCutBasedIdentification
+  eta = eles['Eta'][iele]#getVarValue(c, 'elesEta', iele)
+  pdg = eles['Pdg'][iele]#getVarValue(c, 'elesPdg', iele)
+  sietaieta = eles['SigmaIEtaIEta'][iele]#getVarValue(c, 'elesSigmaIEtaIEta', iele)
+  dphi = eles['DPhi'][iele]
+  deta = eles['DEta'][iele]
+  HoE  = eles['HoE'][iele]
   isEB = abs(eta) < 1.479
   isEE = abs(eta) > 1.479 and abs(eta) < 2.5
-  relIso = s.elesPfRelIso[iele]
-  pt =  s.elesPt[iele]
-  dxy = s.elesDxy[iele]
-  dz =  s.elesDz[iele]
-  oneOverEMinusOneOverP = s.elesOneOverEMinusOneOverP[iele]
-  convRej               = s.elesPassPATConversionVeto[iele]
-  missingHits           = s.elesMissingHits[iele]
+  relIso = eles['PfRelIso'][iele]
+  pt =  eles['Pt'][iele]
+  dxy = eles['Dxy'][iele]
+  dz =  eles['Dz'][iele]
+  oneOverEMinusOneOverP = eles['OneOverEMinusOneOverP'][iele]
+  convRej               = eles['PassPATConversionVeto'][iele]
+  missingHits           = eles['MissingHits'][iele]
+#  print {'pt':pt, 'phi':eles['Phi'][iele], 'Pdg':pdg, 'eta':eta, 'sIEtaIEta':sietaieta, 'DPhi':dphi, \
+#            'DEta':deta, 'HoE':HoE, 'OneOverEMinusOneOverP':oneOverEMinusOneOverP, 'ConvRejection':convRej, 'MissingHits':missingHits,\
+#            'isEB':isEB, 'isEE':isEE, 'relIso':relIso, 'Dxy':dxy, 'Dz':dz}
   if ( isEE or isEB)\
     and ((isEB and dphi < 0.8) or (isEE and dphi < 0.7)) and ( (isEB and deta < 0.007) or (isEE and deta < 0.01) )\
     and ((isEB and sietaieta < 0.01 ) or (isEE and sietaieta < 0.03))\
@@ -54,14 +57,14 @@ def getLooseEleStage1(s, iele): # POG Ele veto https://twiki.cern.ch/twiki/bin/v
     and abs(dxy) < 0.04 and abs(dz) < 0.2 \
     and ( relIso < 0.15 ) \
     and pt>10.:
-    return {'pt':pt, 'phi':s.elesPhi[iele], 'Pdg':pdg, 'eta':eta, 'sIEtaIEta':sietaieta, 'DPhi':dphi, \
+    return {'pt':pt, 'phi':eles['Phi'][iele], 'Pdg':pdg, 'eta':eta, 'sIEtaIEta':sietaieta, 'DPhi':dphi, \
             'DEta':deta, 'HoE':HoE, 'OneOverEMinusOneOverP':oneOverEMinusOneOverP, 'ConvRejection':convRej, 'MissingHits':missingHits,\
             'isEB':isEB, 'isEE':isEE, 'relIso':relIso, 'Dxy':dxy, 'Dz':dz}
 
-def getAllElectronsStage1(s, neles ):
+def getAllElectronsStage1(eles, neles ):
   res=[]
   for i in range(0, int(neles)):
-    cand =  getLooseEleStage1(s, i)
+    cand =  getLooseEleStage1(eles, i)
     if cand:
       res.append(cand)
   res = sorted(res, key=lambda k: -k['pt'])
@@ -88,32 +91,33 @@ def vetoEleID(ele):
 #  eta=getVarValue(c, 'muonsEta', imu)
 #  if isPF and (isGlobal or isTracker) and pt>5. and abs(eta)<2.5 and abs(dz)<0.5:
 #    return {'pt':pt, 'phi':getVarValue(c, 'muonsPhi', imu), 'eta':eta, 'IsGlobal':isGlobal, 'IsTracker':isTracker, 'IsPF':isPF, 'relIso':getVarValue(c, 'muonsPFRelIso', imu), 'Dz':dz}
-def getLooseMuStage1(s, imu ):
-  isPF = s.muonsisPF[imu]
-  isGlobal = s.muonsisGlobal[imu]
-  isTracker = s.muonsisTracker[imu]
-  pt = s.muonsPt[imu]
-  dz = s.muonsDz[imu]
-  eta =s.muonsEta[imu]
+def getLooseMuStage1(muons, imu ):
+  isPF = muons['isPF'][imu]
+  isGlobal = muons['isGlobal'][imu]
+  isTracker = muons['isTracker'][imu]
+  pt = muons['Pt'][imu]
+  dz = muons['Dz'][imu]
+  eta =muons['Eta'][imu]
+#  print 'mu',imu,{'pt':pt, 'phi':muons['Phi'][imu], 'eta':eta, 'IsGlobal':isGlobal, 'IsTracker':isTracker, 'IsPF':isPF, 'relIso':muons['PFRelIso'][imu], 'Dz':dz}
   if isPF and (isGlobal or isTracker) and pt>5. and abs(eta)<2.5 and abs(dz)<0.5:
-    return {'pt':pt, 'phi':s.muonsPhi[imu], 'eta':eta, 'IsGlobal':isGlobal, 'IsTracker':isTracker, 'IsPF':isPF, 'relIso':s.muonsPFRelIso[imu], 'Dz':dz}
+    return {'pt':pt, 'phi':muons['Phi'][imu], 'eta':eta, 'IsGlobal':isGlobal, 'IsTracker':isTracker, 'IsPF':isPF, 'relIso':muons['PFRelIso'][imu], 'Dz':dz}
 
-def getAllMuonsStage1(s, nmuons ):
+def getAllMuonsStage1(muons, nmuons ):
   res=[]
   for i in range(0, int(nmuons)):
-    cand = getLooseMuStage1(s, i)
+    cand = getLooseMuStage1(muons, i)
     if cand:
-      cand["Pdg"]                            = s.muonsPdg[i]
-      cand["Dxy"]                            = s.muonsDxy[i]
-      cand["NormChi2"]                       = s.muonsNormChi2[i]
-      cand["NValMuonHits"]                   = s.muonsNValMuonHits[i]
-      cand["NumMatchedStations"]             = s.muonsNumMatchedStations[i]
-      cand["PixelHits"]                      = s.muonsPixelHits[i]
-      cand["NumtrackerLayerWithMeasurement"] = s.muonsNumtrackerLayerWithMeasurement[i]
-      cand["Iso03sumChargedHadronPt"]        = s.muonsIso03sumChargedHadronPt[i]
-      cand["Iso03sumNeutralHadronEt"]        = s.muonsIso03sumNeutralHadronEt[i]
-      cand["Iso03sumPhotonEt"]               = s.muonsIso03sumPhotonEt[i]
-      cand["Iso03sumPUChargedHadronPt"]      = s.muonsIso03sumPUChargedHadronPt[i]
+      cand["Pdg"]                            = muons['Pdg'][i]
+      cand["Dxy"]                            = muons['Dxy'][i]
+      cand["NormChi2"]                       = muons['NormChi2'][i]
+      cand["NValMuonHits"]                   = muons['NValMuonHits'][i]
+      cand["NumMatchedStations"]             = muons['NumMatchedStations'][i]
+      cand["PixelHits"]                      = muons['PixelHits'][i]
+      cand["NumtrackerLayerWithMeasurement"] = muons['NumtrackerLayerWithMeasurement'][i]
+      cand["Iso03sumChargedHadronPt"]        = muons['Iso03sumChargedHadronPt'][i]
+      cand["Iso03sumNeutralHadronEt"]        = muons['Iso03sumNeutralHadronEt'][i]
+      cand["Iso03sumPhotonEt"]               = muons['Iso03sumPhotonEt'][i]
+      cand["Iso03sumPUChargedHadronPt"]      = muons['Iso03sumPUChargedHadronPt'][i]
       res.append(cand)
   res = sorted(res, key=lambda k: -k['pt'])
   return res
@@ -157,20 +161,19 @@ def hybridMuID(mu, wp):
 #         getVarValue(c, 'tausByLooseCombinedIsolationDeltaBetaCorr3Hits', itau) and \
 #         getVarValue(c, 'tausPt', itau)>20. and \
 #         abs(getVarValue(c, 'tausEta', itau))<2.3
-def getTauStage1(s, itau ):
-  return s.tausDecayModeFinding[itau] and \
-         s.tausAgainstMuonLoose3[itau] and \
-         s.tausAgainstElectronLooseMVA5[itau] and \
-         s.tausByLooseCombinedIsolationDeltaBetaCorr3Hits[itau] and \
-         s.tausPt[itau]>20. and \
-         abs(s.tausEta[itau])<2.3
+def getTauStage1(taus, itau ):
+  return taus['DecayModeFinding'][itau] and \
+         taus['AgainstMuonLoose3'][itau] and \
+         taus['AgainstElectronLooseMVA5'][itau] and \
+         taus['ByLooseCombinedIsolationDeltaBetaCorr3Hits'][itau] and \
+         taus['Pt'][itau]>20. and \
+         abs(taus['Eta'][itau])<2.3
 
-def getAllTausStage1(s, ntaus ):
+def getAllTausStage1(taus, ntaus ):
   res=[]
   for i in range(0, int(ntaus)):
-    if getTauStage1(s, i):
-      res.append({'pt':s.tausPt[i],'eta':s.tausEta[i], 'phi':s.tausPhi[i],\
-      'Pdg':s.tausPdg[i]})
+    if getTauStage1(taus, i):
+      res.append({'pt':taus['Pt'][i],'eta':taus['Eta'][i], 'phi':taus['Phi'][i], 'Pdg':taus['Pdg'][i]})
   res = sorted(res, key=lambda k: -k['pt'])
   return res
 
@@ -242,18 +245,18 @@ def isIsolated(obj, objs, dR=0.4):
 #      res.append(jet)
 #  res  = sorted(res,  key=lambda k: -k['pt'])
 #  return {'jets':res,'met_dx':met_dx, 'met_dy':met_dy}
-def getGoodJetsStage1(s, crosscleanobjects, dR=0.4):#, jermode=options.jermode, jesmode=options.jesmode):
+def getGoodJetsStage1(jets, njets, crossCleanObjects=None, dR=0.4):#, jermode=options.jermode, jesmode=options.jesmode):
   res = []
   bres = []
   ht = 0.
   met_dx=0
   met_dy=0.
-  for i in range(s.nJets):
-    eta = s.jetsEta[i]
-    pt  = s.jetsPt[i]
-    unc = s.jetsUnc[i]
-    id =  s.jetsID[i]
-    phi = s.jetsPhi[i]
+  for i in range(njets):
+    eta = jets['Eta'][i]
+    pt  = jets['Pt'][i]
+    unc = jets['Unc'][i]
+    id =  jets['ID'][i]
+    phi = jets['Phi'][i]
 ##      if max([jet['muef'],jet['elef']]) > 0.6 : print jet
 #    if jermode.lower()!="none":
 #      c_jet = jerDifferenceScaleFactor(eta, jermode)
@@ -269,15 +272,15 @@ def getGoodJetsStage1(s, crosscleanobjects, dR=0.4):#, jermode=options.jermode, 
 #      met_dy+=(1-scale)*sin(phi)*pt
 #      pt*=scale
     if pt>30 and abs(eta)<4.5:
-      parton = s.jetsParton[i]
+      parton = jets['Parton'][i]
       jet = {'pt':pt, 'eta':eta,'phi':phi, 'pdg':parton,\
       'id':id,
-      'chef':s.jetsChargedHadronEnergyFraction[i], 'nhef':s.jetsNeutralHadronEnergyFraction[i],\
-      'ceef':s.jetsChargedEmEnergyFraction[i], 'neef':s.jetsNeutralEmEnergyFraction[i], 'id':id,\
-      'hfhef':s.jetsHFHadronEnergyFraction[i], 'hfeef':s.jetsHFEMEnergyFraction[i],\
-      'muef':s.jetsMuonEnergyFraction[i], 'elef':s.jetsElectronEnergyFraction[i], 'phef':s.jetsPhotonEnergyFraction[i],\
-#      'jetCutBasedPUJetIDFlag':s.jetsCutBasedPUJetIDFlag[i],'jetMET53XPUJetIDFlag':getVarValue(c, 'jetsMET53XPUJetIDFlag', i),'jetFull53XPUJetIDFlag':getVarValue(c, 'jetsFull53XPUJetIDFlag', i), 
-      'btag': s.jetsBTag[i], 'unc': unc
+      'chef':jets['ChargedHadronEnergyFraction'][i], 'nhef':jets['NeutralHadronEnergyFraction'][i],\
+      'ceef':jets['ChargedEmEnergyFraction'][i], 'neef':jets['NeutralEmEnergyFraction'][i], 'id':id,\
+      'hfhef':jets['HFHadronEnergyFraction'][i], 'hfeef':jets['HFEMEnergyFraction'][i],\
+      'muef':jets['MuonEnergyFraction'][i], 'elef':jets['ElectronEnergyFraction'][i], 'phef':jets['PhotonEnergyFraction'][i],\
+#      'jetCutBasedPUJetIDFlag':jetsCutBasedPUJetIDFlag[i],'jetMET53XPUJetIDFlag':getVarValue(c, 'jetsMET53XPUJetIDFlag', i),'jetFull53XPUJetIDFlag':getVarValue(c, 'jetsFull53XPUJetIDFlag', i), 
+      'btag': jets['BTag'][i], 'unc': unc
       }
 #      isolated = True
 #      for obj in crosscleanobjects:   #Jet cross-cleaning
@@ -286,7 +289,7 @@ def getGoodJetsStage1(s, crosscleanobjects, dR=0.4):#, jermode=options.jermode, 
 ##          print "Cleaned", 'deltaR', deltaR(jet, obj), 'maxfrac', max([jet['muef'],jet['elef']]), 'pt:jet/obj', jet['pt'], obj['pt'], "relIso",  obj['relIso'], 'btag',getVarValue(c, 'jetsBtag', i), "parton", parton
 #  #          print 'Not this one!', jet, obj, deltaR(jet, obj)
 #          break
-      jet['isolated'] = isIsolated(jet, crosscleanobjects, dR=dR)
+      jet['isolated'] = isIsolated(jet, crossCleanObjects, dR=dR)
       res.append(jet)
   res  = sorted(res,  key=lambda k: -k['pt'])
   return {'jets':res,'met_dx':met_dx, 'met_dy':met_dy}

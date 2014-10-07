@@ -19,18 +19,18 @@ def printHeader(s):
 #  except:
 #    raise Exception("Can not find type from branchname "+name)
 edmVecTypes = {'Float_t':'float', 'Int_t':'int', 'F':'float', 'I':'int'} 
-def createClassString(className, vars, vectors, nameKey, stdVectors=False):
+def createClassString(className, vars, vectors, nameKey, typeKey, stdVectors=False):
   classString =  "#ifndef __"+className+"__\n#define __"+className+'__\n\n#include<vector>\n#include<TMath.h>\n\n'
   classString += "class "+className+"{\n"
   classString += "public:\n"
   for var in vars:
-    classString+="  "+typeStr(var['type'])+" "+var[nameKey]+";\n"
+    classString+="  "+typeStr(var[typeKey])+" "+var[nameKey]+";\n"
   for v in vectors:
     for var in v['vars']:
       if stdVectors:
-        classString+="  std::vector<"+edmVecTypes[var['type']]+"> "+var[nameKey]+";\n"
+        classString+="  std::vector<"+edmVecTypes[var[typeKey]]+"> "+var[nameKey]+";\n"
       else:
-        classString+="  "+typeStr(var['type'])+" "+var[nameKey]+"["+str(v['nMax'])+"];\n"
+        classString+="  "+typeStr(var[typeKey])+" "+var[nameKey]+"["+str(v['nMax'])+"];\n"
   classString +="\n  void init(){\n"
   for var in vars:
     classString+="    "+var[nameKey]+" = "+var['default']+";\n"
@@ -65,36 +65,46 @@ def compileClass(className, classString, tmpDir):
   print " -> done."
   return s
 
-def readVar(v, allowRenaming, isWritten, isRead):
+def readVar(v, allowRenaming, isWritten, isRead, makeVecType=False):
   assert allowRenaming or not v.count(":"), "Renaming syntax not allowed here (var: %s )"%v
   nSlash = v.count('/')
   assert nSlash>0 and nSlash<=2, "Found %i '/' characters->Don't know what to do with %s."%(nSlash, v)
   if not type(v)==type(""):
     print "Var",v
     raise Exception("Var not a string")
-  try:
+  res={}
+  if isRead:
     if v.count(':'):
-      stage1, stage2Name = v.split(":")
-      assert stage2Name.count('/')==0, "Found '/' after : in %s"%v
+      stage1 = v.split(":")[0]
     else:
       stage1 = v
-      stage2Name = None
-    nSlash =  stage1.count('/')
-    if nSlash ==2: 
-      stage1Name, tp, defStr = stage1.split('/')
-    elif nSlash == 1:
-      stage1Name, tp = stage1.split('/')
-      defStr = typeDefaults(tp)
+    assert stage1.count('/')==1, "Frow %s want to read %s but did not find a slash in stage1 part. Syntax: 'stage1/typeStage1[:stage2/typeStage2] or stage1/typeStage1[:stage2/typeStage2/default]"%(v, stage1)
+    if stage1.count('/')==1:
+      stage1Name, stage1Type = stage1.split('/')
     else:
-      raise Exception("Should never happen :-). No '/' found.")
-    if not stage2Name:stage2Name=stage1Name
-  except:
-    raise Exception( "Var '"+v+"' not of the form 'var/type', '/var/type/default', 'varStage1/type:varStage2, or  'varStage1/type/default:varStage2'" )
-  res={'type':tp, 'default':defStr}
-  if isWritten: 
-    res['stage2Name']=stage2Name
-  if isRead:
+      stage1Name, stage1Type, defString = stage1.split('/')
+    res['stage1Type']=stage1Type
+    if makeVecType:
+      res['stage1Type']='vector<'+res['stage1Type']+'>'
     res['stage1Name']=stage1Name
+  if isWritten:
+    if v.count(':'):
+      stage2 = v.split(":")[1]
+    else:
+      stage2 = v
+    assert stage2.count('/')==1 or stage2.count('/')==2, "Frow %s want to write %s but did not find one or two '/' in stage2part. Syntax: 'stage1/typestage1[:stage2/typeStage2] or stage1/typestage1[:stage2/typeStage2/default]"%(v, stage2)
+    defString=None
+    if stage2.count('/')==1:
+      stage2Name, stage2Type = stage2.split('/')
+    else:
+      stage2Name, stage2Type, defString = stage2.split('/')
+    stage2Name, stage2Type = stage2.split('/')
+    res['stage2Type']=stage2Type
+    res['stage2Name']=stage2Name
+    if defString:
+      res['default']=defString
+    else:
+      res['default']=typeDefaults(stage2Type)
   return res
   
 
