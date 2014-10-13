@@ -44,6 +44,8 @@ parser.add_option("--toPercentage", dest="toPercentage", default="100", type="in
 parser.add_option("--keepPDFWeights", dest="keepPDFWeights", action="store_true", help="keep PDF Weights?")
  
 (options, args) = parser.parse_args()
+if sys.argv[0].count('ipython'):
+  options.small=True
 
 if options.file:
   print "options: chmode",options.chmode, 'file',options.file, 'DR',options.DR
@@ -121,7 +123,7 @@ for isample, sample in enumerate(allSamples):
   else:
     print "Subdir", outputDir+"/"+outSubDir, "already found."
 
-#  #Variables that are needed but won't be written
+#  Variables and vectors to be loaded
   loadProducts = ["nmuons/int","neles/int","ntaus/int", "nJets/int"]
   loadVectors = [\
     {'prefix':'eles',  'vars':['Pt/float', 'Eta/float', 'Phi/float', 'Pdg/int', 'PfRelIso/float', 'Dxy/float', 'Dz/float', 'OneOverEMinusOneOverP/float',  'SigmaIEtaIEta/float', 'HoE/float', 'DPhi/float', 'DEta/float', 'MissingHits/int', 'PassPATConversionVeto/int']},
@@ -129,7 +131,7 @@ for isample, sample in enumerate(allSamples):
     {'prefix':'taus',  'vars':['Pt/float', 'Eta/float', 'Phi/float', 'Pdg/int', 'DecayModeFinding/int', 'AgainstMuonLoose3/int', 'AgainstElectronLooseMVA5/int', 'ByLooseCombinedIsolationDeltaBetaCorr3Hits/int']},
     {'prefix':'jets',  'vars':['Pt/float', 'Eta/float', 'Phi/float', 'Parton/int', 'Unc/float', 'ID/int', 'BTag/float', "ChargedHadronEnergyFraction/float", "NeutralHadronEnergyFraction/float", "ChargedEmEnergyFraction/float", "NeutralEmEnergyFraction/float", "HFHadronEnergyFraction/float", "HFEMEnergyFraction/float", "MuonEnergyFraction/float", "ElectronEnergyFraction/float", "PhotonEnergyFraction/float"]},
   ]
-
+# edm collections to be loaded
   loadEDMCollections = [ {'name':'pfMet', 'label':("pfMet"), 'edmType':"vector<reco::PFMET>"} ]
   loadEDMCollections.append({'name':'pf', 'label':("packedPFCandidates"), 'edmType':"vector<pat::PackedCandidate>"})
   if not sample['isData']:
@@ -143,7 +145,7 @@ for isample, sample in enumerate(allSamples):
 #  copyVariables = ['event/ULong64_t:event/l', 'run/int:run/I', 'lumi/int:lumi/I', 'ngoodVertices/int:ngoodVertices/I', 'bx/int:bunchCrossing/I', 'slimmedMETs/float:met/F', 'slimmedMETsPhi/float:metPhi/F']
   copyVariables = ['run/int:run/I', 'lumi/int:lumi/I', 'ngoodVertices/int:ngoodVertices/I', 'bx/int:bunchCrossing/I', 'slimmedMETs/float:met/F', 'slimmedMETsPhi/float:metPhi/F']
   #new variables
-  newVariables = ['weight/F'] 
+  newVariables = ['weight/F', 'event/l'] 
 
   if options.newGenMet:
     copyVariables.extend(['genMet/float:genMet/F', 'genMetPhi/float:genMetPhi/F'])
@@ -185,9 +187,9 @@ for isample, sample in enumerate(allSamples):
     v['vars'] = [readVar(v['prefix']+vvar, allowRenaming=False, isWritten=True, isRead=False) for vvar in v['vars']]
   newVars = [readVar(v, allowRenaming=False, isWritten = True, isRead=False) for v in newVariables]
  
+  printHeader("Compiling class")
   writeClassName = "ClassToWrite_"+str(nc)+"_"+str(isample) 
   writeClassString = createClassString(className=writeClassName, vars=copyVars + newVars, vectors=newVectors, nameKey = 'stage2Name', typeKey = 'stage2Type')
-  printHeader("Class to Write")
 #  print writeClassString
   s = compileClass(className=writeClassName, classString=writeClassString, tmpDir='/data/'+username+'/tmp/')
 
@@ -265,8 +267,8 @@ for isample, sample in enumerate(allSamples):
       labels[bds[i].productInstanceName()] = tuple(bds[i].branchName().replace('.','').split('_')[1:3])
        
     if options.small:
-      if number_events>1001:
-        number_events=1001
+      if number_events>101:
+        number_events=101
     start = int(options.fromPercentage/100.*number_events)
     stop  = int(options.toPercentage/100.*number_events)
     print "Reading: ", sample["name"]
@@ -297,7 +299,7 @@ for isample, sample in enumerate(allSamples):
             
         for v in copyVars:
           exec('s.'+v['stage2Name']+'=products[v["stage1Name"]]')
-
+        s.event = events._event.id().event()
         s.pfMet = products['pfMet'][0].pt()
         s.pfMetPhi = products['pfMet'][0].phi()
         if not options.newGenMet:
@@ -622,7 +624,7 @@ for isample, sample in enumerate(allSamples):
         chain_gDir.cd()
         t.Fill()
         tmpDir.cd()
-
+    del events
 #          dbf = ROOT.gDirectory.func()
 #          f.cd()
 #          print 'before',dbf,'now',ROOT.gDirectory.func(), 'go back to',pyroot_gDir
@@ -630,15 +632,11 @@ for isample, sample in enumerate(allSamples):
 #          pyroot_gDir.cd()
     del elist
   if True or not options.small: #FIXME
+    print "Now writing",ofile
     f = ROOT.TFile(ofile, "recreate")
     t.Write()
     f.Close()
-#    f.cd()
-#    t.Write()
-#    f.Close()
-#    pyroot_gDir.cd()
-#    if t:t.IsA().Destructor(t)
-    print "Written",ofile
+    print "Done with writing",ofile
   else:
-    print "No saving when small!"
+    print "Results not written!"
   del t

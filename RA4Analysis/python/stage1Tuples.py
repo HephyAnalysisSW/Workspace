@@ -36,15 +36,15 @@ WJetsHTToLNu={}
 WJetsHTToLNu["name"]   = "WJetsHTToLNu"
 WJetsHTToLNu["Chain"] = "Events"
 WJetsHTToLNu["bins"] = [
-                        {'dir':"/dpm/oeaw.ac.at/home/cms/store/user/schoef/pat_310814/WJetsToLNu_HT-100to200_Tune4C_13TeV-madgraph-tauola/schoef-WJetsToLNu_HT-100to200_Tune4C_13TeV-madgraph-tauola_Spring14dr-PU_S14_POSTLS170_V6-v1",
-                        'dbsName':'/WJetsToLNu_HT-100to200_Tune4C_13TeV-madgraph-tauola/Spring14dr-PU_S14_POSTLS170_V6-v1/AODSIM'},
-                        {'dir':"/dpm/oeaw.ac.at/home/cms/store/user/schoef/pat_310814/WJetsToLNu_HT-200to400_Tune4C_13TeV-madgraph-tauola/schoef-WJetsToLNu_HT-200to400_Tune4C_13TeV-madgraph-tauola_Spring14dr-PU_S14_POSTLS170_V6-v1",
-                        'dbsName':'/WJetsToLNu_HT-200to400_Tune4C_13TeV-madgraph-tauola/Spring14dr-PU_S14_POSTLS170_V6-v1/AODSIM'},
-                        {'dir':"/dpm/oeaw.ac.at/home/cms/store/user/schoef/pat_310814/WJetsToLNu_HT-400to600_Tune4C_13TeV-madgraph-tauola/schoef-WJetsToLNu_HT-400to600_Tune4C_13TeV-madgraph-tauola_Spring14dr-PU_S14_POSTLS170_V6-v1",
-                        'dbsName':'/WJetsToLNu_HT-400to600_Tune4C_13TeV-madgraph-tauola/Spring14dr-PU_S14_POSTLS170_V6-v1/AODSIM'},
-                        {'dir':"/dpm/oeaw.ac.at/home/cms/store/user/schoef/pat_310814/WJetsToLNu_HT-600toInf_Tune4C_13TeV-madgraph-tauola/schoef-WJetsToLNu_HT-600toInf_Tune4C_13TeV-madgraph-tauola_Spring14dr-PU_S14_POSTLS170_V6-v1",
-                        'dbsName':'/WJetsToLNu_HT-600toInf_Tune4C_13TeV-madgraph-tauola/Spring14dr-PU_S14_POSTLS170_V6-v1/AODSIM'},
-                        ] 
+  {'dir':"/dpm/oeaw.ac.at/home/cms/store/user/schoef/stage1_071014/WJetsToLNu_HT-100to200_Tune4C_13TeV-madgraph-tauola/schoef-WJetsToLNu_HT-100to200_Tune4C_13TeV-madgraph-tauola_Spring14dr-PU_S14_POSTLS170_V6-v1",
+  'dbsName':'/WJetsToLNu_HT-100to200_Tune4C_13TeV-madgraph-tauola/Spring14dr-PU_S14_POSTLS170_V6-v1/AODSIM'},
+  {'dir':"/dpm/oeaw.ac.at/home/cms/store/user/schoef/stage1_071014/WJetsToLNu_HT-200to400_Tune4C_13TeV-madgraph-tauola/schoef-WJetsToLNu_HT-200to400_Tune4C_13TeV-madgraph-tauola_Spring14dr-PU_S14_POSTLS170_V6-v1",
+  'dbsName':'/WJetsToLNu_HT-200to400_Tune4C_13TeV-madgraph-tauola/Spring14dr-PU_S14_POSTLS170_V6-v1/AODSIM'},
+  {'dir':"/dpm/oeaw.ac.at/home/cms/store/user/schoef/stage1_071014/WJetsToLNu_HT-400to600_Tune4C_13TeV-madgraph-tauola/schoef-WJetsToLNu_HT-400to600_Tune4C_13TeV-madgraph-tauola_Spring14dr-PU_S14_POSTLS170_V6-v1",
+  'dbsName':'/WJetsToLNu_HT-400to600_Tune4C_13TeV-madgraph-tauola/Spring14dr-PU_S14_POSTLS170_V6-v1/AODSIM'},
+  {'dir':"/dpm/oeaw.ac.at/home/cms/store/user/schoef/stage1_071014/WJetsToLNu_HT-600toInf_Tune4C_13TeV-madgraph-tauola/schoef-WJetsToLNu_HT-600toInf_Tune4C_13TeV-madgraph-tauola_Spring14dr-PU_S14_POSTLS170_V6-v1",
+  'dbsName':'/WJetsToLNu_HT-600toInf_Tune4C_13TeV-madgraph-tauola/Spring14dr-PU_S14_POSTLS170_V6-v1/AODSIM'},
+  ] 
 T5Full_1200_1000_800={}
 T5Full_1200_1000_800["name"]     = "T5Full_1200_1000_800"
 T5Full_1200_1000_800["Chain"] = "Events"
