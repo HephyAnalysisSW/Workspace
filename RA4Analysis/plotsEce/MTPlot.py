@@ -41,7 +41,7 @@ plots = [
 
 for p in plots:
   print p['varname']
-  File = ROOT.TFile('/afs/hephy.at/user/e/easilar/CMSSW_7_0_6_patch1/src/Workspace/RA4Analysis/rootfiles/moreTrySignal_Bkg0'+p['varname']+'.root','RECREATE')
+  File = ROOT.TFile('/data/easilar/results2014/rootfiles/Signal_Bkg0'+p['varname']+'.root','RECREATE')
   File.cd()
   for s in samples:
     chain = 'c'+s['chain']
