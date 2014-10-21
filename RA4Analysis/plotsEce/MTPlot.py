@@ -12,7 +12,7 @@ StLep = 'sqrt(('+WPT+')**2+('+Mt+')**2)'
 njets = 'njets'
 ht = 'ht'
 met = 'met'
-muCharge = 'muPdg/abs(muPdg)'
+muCharge = '-(muPdg/abs(muPdg))'
 
 htCut = 500
 Stmin = 250
