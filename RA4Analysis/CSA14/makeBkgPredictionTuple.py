@@ -5,23 +5,26 @@ from Workspace.RA4Analysis.objectSelection import gTauAbsEtaBins, gTauPtBins, me
 from Workspace.HEPHYPythonTools.helpers import getVarValue, getObjFromFile
 from Workspace.RA4Analysis.objectSelection import getLooseMuStage2, tightPOGMuID, vetoMuID
 from math import sqrt, cos, sin, atan2
+from Workspace.RA4Analysis.helpers import deltaPhi
 
 from Workspace.RA4Analysis.stage2Tuples import *
 c = ROOT.TChain('Events')
 for b in ttJetsCSA1450ns['bins']:
   c.Add(ttJetsCSA1450ns['dirname']+'/'+b+'/h*.root')
-
-mode='dilep'
+#c.Add('/data/schoef/convertedTuples_v25/copyMET/ttJetsCSA1450ns/histo_ttJetsCSA1450ns_from*.root')
+#mode='dilep'
+mode='had'
 relIso = 0.2
 
-small = False
-maxN=1001
+small = True
+maxN=50000
 
 if mode=='had':
   leptonEffMap = pickle.load(file('/data/schoef/results2014/tauTemplates/CSA14_TTJets_vetoLeptonEfficiencyMap.pkl'))
+  #leptonEffMap = pickle.load(file('/data/easilar/results2014/tauTemplates/CSA14_TTJets_efficiencyMap_vetoMuIDPt15_ttJetsCSA1450ns_relIso0.3.pkl'))
   doubleLeptonPreselection = "ngoodMuons>=1&&nvetoMuons==2&&nvetoElectrons==0"
   templates = pickle.load(file('/data/schoef/results2014/tauTemplates/CSA14_TTJets_genTau.pkl'))
-  ofile =                      '/data/schoef/results2014/tauTuples/CSA14_TTJets_hadGenTau.root'
+  ofile =                      '/data/easilar/results2014/tauTuples/CSA14_TTJets_hadGenTau.root'
 if mode=='lep':
   leptonEffMap = pickle.load(file('/data/schoef/results2014/tauTemplates/CSA14_TTJets_vetoLeptonEfficiencyMap.pkl'))
   doubleLeptonPreselection = "ngoodMuons>=1&&nvetoMuons==2&&nvetoElectrons==0"
@@ -68,7 +71,7 @@ def getTypeStr(s):
   if s=='I': return 'Int_t'
 
 copyVars  = ['event/l', 'njets/I', 'ht/F', 'met/F', 'metphi/F', 'nvetoMuons/I']
-newVars   = ['njetsPred/I', 'htPred/F', 'metPred/F', 'metphiPred/F','weightPred/F', 'mTPred/F', 'weight/F', 'scaleLEff/F']
+newVars   = ['njetsPred/I', 'htPred/F', 'metPred/F', 'metphiPred/F','weightPred/F', 'mTPred/F', 'weight/F', 'scaleLEff/F','WPt/F','WPhi/F','DeltaPhi/F']
 vars      = copyVars+newVars  
 
 structString = "struct MyStruct{"
@@ -150,7 +153,8 @@ for i in range(number_events):
           metpar    = p['frac']*m['pt']
           MEx = s.met*cos(s.metphi)+cos(m['phi'])*metpar
           MEy = s.met*sin(s.metphi)+sin(m['phi'])*metpar
-             
+          Wx = MEx+cos(m2['phi'])*m2['pt']
+          Wy = MEy+sin(m2['phi'])*m2['pt'] 
           if mode=='had':
             s.weightPred = p['weight']*s.weight
   #          s.nvetoMuonsPred = s.nvetoMuons 
@@ -164,6 +168,9 @@ for i in range(number_events):
             s.metPred = sqrt(MEx**2+MEy**2)
             s.metphiPred = atan2(MEy,MEx)
             s.mTPred = sqrt(2.*s.metPred*m2['pt']*(1-cos(m2['phi']-s.metphiPred)))
+            s.WPt = sqrt(Wx**2+Wy**2)
+            s.WPhi = atan2(Wy,Wx)
+            s.DeltaPhi = deltaPhi(s.WPhi,m2['phi'])
             t.Fill()
           if mode=='lep':
             s.njetsPred = s.njets
