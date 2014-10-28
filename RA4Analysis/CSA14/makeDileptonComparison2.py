@@ -10,7 +10,7 @@ leptonID = "muIsPF&&(muIsGlobal||muIsTracker)&&muPt>"+str(ptCut)+"&&abs(muEta)<2
 
 htCut     = 150
 metCut    = 150
-minNJets  =   3
+minNJets  =  3
 
 #htCut     = 0
 #metCut    = 0
@@ -46,7 +46,7 @@ cLost.Add('/data/easilar/results2014/muonTuples/CSA14_TTJets_Lost_relIso'+str(re
 
 hMT = ROOT.TH1F('hMT', 'hMT',20,0,800)
 #cLost.Draw('GenMt>>hMT','GenWeight*(ht>'+str(htCut)+'&&njets>='+str(minNJets)+'&&met>'+str(metCut)+')')
-cLost.Draw('GenMt>>hMT','GenWeight*(met>'+str(metCut)+')')
+cLost.Draw('GenMt>>hMT','GenWeight*(met>'+str(metCut)+'&&ht>'+str(htCut)+')','goff')
 #c.Draw('sqrt(2.*met*leptonPt*(1-cos(leptonPhi-metphi)))>>hMT','weight*('+diLep+'&&ht>'+str(htCut)+'&&njets>='+str(minNJets)+'&&met>'+str(metCut)+')','goff')
 
 #hMTOpen = ROOT.TH1F('hMTOpen', 'hMTOpen',20,0,800)
@@ -61,7 +61,7 @@ cLost.Draw('GenMt>>hMT','GenWeight*(met>'+str(metCut)+')')
 #diLep   =  "ngNuEFromW==0&&ngNuMuFromW==2&&ngNuTauFromW==0&&ngoodMuons==1&&nvetoMuons==1&&nvetoElectrons==0&&Sum$(gLepPt>"+str(ptCut)+"&&abs(gLepEta)<2.5&&abs(gLepPdg)==13)==2"
 hMTPred = ROOT.TH1F('hMTPred', 'hMTPred',20,0,800)
 #cPred.Draw('mTPred>>hMTPred','weightPred*scaleLEff*(htPred>'+str(htCut)+'&&njetsPred>='+str(minNJets)+'&&metPred>'+str(metCut)+')','goff')
-cPred.Draw('mTPred>>hMTPred','weightPred*scaleLEff*(metPred>'+str(metCut)+')','goff')
+cPred.Draw('mTPred>>hMTPred','weightPred*scaleLEff*(metPred>'+str(metCut)+'&&ht>'+str(htCut)+')','goff')
 
 c1=ROOT.TCanvas()
 hMT.Draw()

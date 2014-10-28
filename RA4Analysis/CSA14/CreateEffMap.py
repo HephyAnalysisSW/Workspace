@@ -13,7 +13,7 @@ etaBins = array('d', [float(x)/10. for x in range(-30,32,2)])
 ptBins2D  = array('d', [float(x) for x in range(10, 20)+range(20,50,5)+range(50,100,20)+range(100,310,50)])
 etaBins2D = array('d', [float(x)/10. for x in [-30,-25]+range(-21,22,6)+[25,30]])
 
-File = ROOT.TFile('Eff03.root','RECREATE')
+File = ROOT.TFile('/data/easilar/results2014/rootfiles/Eff01.root','RECREATE')
 File.cd()
 
 PtDenDiLep = ROOT.TH1F('PtDenDiLep', 'PtDenDiLep',len(ptBins)-1,ptBins)
@@ -45,11 +45,11 @@ List = ROOT.gDirectory.Get("List")
 number_events = List.GetN()
 #number_events = c50.GetEntries()
 #for relIso in [0.12,0.2,0.3]:
-for relIso in [0.3]:
+for relIso in [0.12]:
   for i in range(number_events):
     c50.GetEntry(List.GetEntry(i))
     #print number_events-i, 'events left'
-    nmuCount = int(c50.GetLeaf('nmuCount').GetValue())
+    nmuCount = int(c50.GetLeaf('muCount').GetValue())
     ngoodMuons = c50.GetLeaf('ngoodMuons').GetValue()
     nvetoMuons = c50.GetLeaf('nvetoMuons').GetValue()
     nvetoElectrons = c50.GetLeaf('nvetoElectrons').GetValue()
@@ -57,9 +57,9 @@ for relIso in [0.3]:
     met = c50.GetLeaf('met').GetValue()
     genMet = c50.GetLeaf('genMet').GetValue()
     ht = c50.GetLeaf('ht').GetValue()
-    metphi = c50.GetLeaf('metphi').GetValue()
-    genMetphi = c50.GetLeaf('genMetPhi').GetValue()
-    ngLep = int(c50.GetLeaf('ngLep').GetValue())
+    metPhi = c50.GetLeaf('metPhi').GetValue()
+    genmetPhi = c50.GetLeaf('genMetPhi').GetValue()
+    ngLep = int(c50.GetLeaf('gLepCount').GetValue())
     ngNuMuFromW = c50.GetLeaf('ngNuMuFromW').GetValue() 
     ngNuEFromW = c50.GetLeaf('ngNuEFromW').GetValue()
     print 'nmuCount:' , nmuCount

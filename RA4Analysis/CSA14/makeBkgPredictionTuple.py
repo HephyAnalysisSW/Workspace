@@ -9,12 +9,13 @@ from Workspace.RA4Analysis.helpers import deltaPhi
 
 from Workspace.RA4Analysis.stage2Tuples import *
 c = ROOT.TChain('Events')
-for b in ttJetsCSA1450ns['bins']:
-  c.Add(ttJetsCSA1450ns['dirname']+'/'+b+'/h*.root')
+#for b in ttJetsCSA1450ns['bins']:
+#  c.Add(ttJetsCSA1450ns['dirname']+'/'+b+'/histo_ttJetsCSA1450ns_from*.root')
 #c.Add('/data/schoef/convertedTuples_v25/copyMET/ttJetsCSA1450ns/histo_ttJetsCSA1450ns_from*.root')
 #mode='dilep'
-mode='had'
-relIso = 0.2
+c.Add('/data/schoef/convertedTuples_v24/copyInc/ttJetsCSA1450ns/histo_ttJetsCSA1450ns_from*')
+mode='dilep'
+relIso = 0.3
 
 small = True
 maxN=50000
@@ -24,7 +25,7 @@ if mode=='had':
   #leptonEffMap = pickle.load(file('/data/easilar/results2014/tauTemplates/CSA14_TTJets_efficiencyMap_vetoMuIDPt15_ttJetsCSA1450ns_relIso0.3.pkl'))
   doubleLeptonPreselection = "ngoodMuons>=1&&nvetoMuons==2&&nvetoElectrons==0"
   templates = pickle.load(file('/data/schoef/results2014/tauTemplates/CSA14_TTJets_genTau.pkl'))
-  ofile =                      '/data/easilar/results2014/tauTuples/CSA14_TTJets_hadGenTau.root'
+  ofile =                      '/data/easilar/results2014/tauTuples/CSA14_TTJets_hadGenTauTryBtag110.root'
 if mode=='lep':
   leptonEffMap = pickle.load(file('/data/schoef/results2014/tauTemplates/CSA14_TTJets_vetoLeptonEfficiencyMap.pkl'))
   doubleLeptonPreselection = "ngoodMuons>=1&&nvetoMuons==2&&nvetoElectrons==0"
@@ -34,7 +35,7 @@ if mode=='dilep':
   leptonEffMap = pickle.load(file('/data/schoef/results2014/tauTemplates/CSA14_TTJets_efficiencyMap_vetoMuIDPt15_ttJetsCSA1450ns_relIso'+str(relIso)+'.pkl'))
   leptonID = "muIsPF&&(muIsGlobal||muIsTracker)&&muPt>15&&abs(muEta)<2.5&&abs(muDxy)<0.2&&abs(muDz)<0.5&&muRelIso<"+str(relIso)
   doubleLeptonPreselection = "ngoodMuons>=1&&Sum$("+leptonID+")==2&&nvetoElectrons==0"
-  ofile =                    '/data/schoef/results2014/tauTuples/CSA14_TTJets_dilep_relIso'+str(relIso)+'.root'
+  ofile =                    '/data/easilar/results2014/muonTuples/CSA14_TTJets_dilep_relIso'+str(relIso)+'.root'
 
 if mode=='had' or mode=='lep':
   for ptk in templates.keys():
@@ -70,7 +71,7 @@ def getTypeStr(s):
   if s=='F': return 'Float_t'
   if s=='I': return 'Int_t'
 
-copyVars  = ['event/l', 'njets/I', 'ht/F', 'met/F', 'metphi/F', 'nvetoMuons/I']
+copyVars  = ['event/l','nbtags/I', 'njets/I', 'ht/F', 'met/F', 'metphi/F', 'nvetoMuons/I']
 newVars   = ['njetsPred/I', 'htPred/F', 'metPred/F', 'metphiPred/F','weightPred/F', 'mTPred/F', 'weight/F', 'scaleLEff/F','WPt/F','WPhi/F','DeltaPhi/F']
 vars      = copyVars+newVars  
 
@@ -122,8 +123,10 @@ for i in range(number_events):
 #      print template 
       s.weight=c.GetLeaf('weight').GetValue()
       lEffb = leptonEffMap.FindBin( m['pt'], m['eta'])
-      lEff = leptonEffMap.GetBinContent(lEffb)
-
+      lEffi = leptonEffMap.GetBinContent(lEffb)
+      #lEff = min(1.1*lEffi,1)
+      #lEff = 0.9*lEffi
+      lEff = lEffi
       if mode=='dilep':
         s.scaleLEff = (1-lEff)/lEff
         MEx = s.met*cos(s.metphi)+cos(m['phi'])*m['pt']
@@ -135,7 +138,7 @@ for i in range(number_events):
         s.metphiPred = atan2(MEy,MEx)
         s.mTPred = sqrt(2.*s.metPred*m2['pt']*(1-cos(m2['phi']-s.metphiPred)))
         t.Fill()
-      if mode=='had' or mode=='lep': 
+      if mode=='had' or mode=='lep':
         template=None
         for ptb in gTauPtBins:
           if m['pt']>=ptb[0] and (m['pt']<ptb[1] or ptb[1]<0):
