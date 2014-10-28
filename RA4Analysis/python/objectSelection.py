@@ -5,6 +5,47 @@ gTauPtBins = [(10,20), (20,30), (30,40), (40, 80), (80, 160), (160, 320), (320,-
 metParRatioBins = [x/10. for x in range(0,11)]
 jetRatioBins = [0,0.01,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,1.2,1.5,2.0,3.0]
 
+def getLooseMuons(c,relIso,gLeps):
+  nmuCount = int(c.GetLeaf('nmuCount').GetValue())
+  ntmuons=0
+  nlmuons=0
+  muons = []
+  for j in range(nmuCount):
+    muon=getLooseMuStage2(c,j)
+    if muon:
+      isTight=tightPOGMuID(muon)
+      isLoose=vetoMuID(muon,relIso)
+      muon['isTight'] = isTight
+      muon['isLoose'] = isLoose
+      if isTight: ntmuons+=1
+      if isLoose: nlmuons+=1
+      hasMatch = False
+      for gl in gLeps:
+        if gl['gLepInd']==j and gl['gLepDR']<0.4: hasMatch=True
+      muon['hasMatch']=hasMatch
+      muons.append(muon)
+  return muons
+
+def getGenLep(c,p):
+  gLepPdg = c.GetLeaf('gLepPdg').GetValue(p)
+  gLepDR  = c.GetLeaf('gLepDR').GetValue(p)
+  gLepPt  = c.GetLeaf('gLepPt').GetValue(p)
+  gLepEta = c.GetLeaf('gLepEta').GetValue(p)
+  gLepInd = c.GetLeaf('gLepInd').GetValue(p)
+  gLepPhi = c.GetLeaf('gLepPhi').GetValue(p)
+  cand={'gLepPdg':gLepPdg,'gLepDR':gLepDR,'gLepPt':gLepPt,'gLepEta':gLepEta,'gLepInd':gLepInd,'gLepPhi':gLepPhi}
+  return cand
+
+def getGenLeps(c):
+  ngLep = c.GetLeaf('ngLep').GetValue()
+  gLeps=[]
+  for p in range(int(ngLep)):
+      genLep = getGenLep(c,p)
+      if genLep:
+        gLeps.append(genLep)
+  return gLeps
+
+
 #def getLooseEleStage1(c, iele): # POG Ele veto https://twiki.cern.ch/twiki/bin/viewauth/CMS/EgammaCutBasedIdentification
 #  eta = getVarValue(c, 'elesEta', iele)
 #  pdg = getVarValue(c, 'elesPdg', iele)
