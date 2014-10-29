@@ -5,7 +5,7 @@ from math import *
 import sys, os, copy, random, subprocess, datetime
 #from helpers import getVarValue, deltaPhi, minAbsDeltaPhi,  deltaR, invMass,
 from Workspace.HEPHYPythonTools.helpers import getVarValue, deltaPhi, minAbsDeltaPhi, invMassOfLightObjects, deltaR, closestMuJetDeltaR, invMass,  findClosestObjectDR, getFileList
-from Workspace.RA4Analysis.objectSelection import getLooseEleStage1,getAllElectronsStage1, tightPOGEleID, vetoEleID, getLooseMuStage1, getAllMuonsStage1, tightPOGMuID, vetoMuID, getAllTausStage1, getTauStage1, hybridMuID, getGoodJetsStage1, isIsolated
+from Workspace.RA4Analysis.objectSelection_retired import getLooseEleStage1,getAllElectronsStage1, tightPOGEleID, vetoEleID, getLooseMuStage1, getAllMuonsStage1, tightPOGMuID, vetoMuID, getAllTausStage1, getTauStage1, hybridMuID, getGoodJetsStage1, isIsolated
 
 from Workspace.RA4Analysis.stage1Tuples import *
 
@@ -105,7 +105,7 @@ for isample, sample in enumerate(allSamples):
   muvars = ["muPt", "muEta", "muPhi", "muPdg", "muRelIso", "muDxy", "muDz", "muNormChi2", "muNValMuonHits", "muNumMatchedStations", "muPixelHits", "muNumtrackerLayerWithMeasurement", 'muIsGlobal', 'muIsTracker','muIsPF', "muIso03sumChargedHadronPt", "muIso03sumNeutralHadronEt", "muIso03sumPhotonEt", "muIso03sumPUChargedHadronPt"] 
   elvars = ["elePt", "eleEta", "elePhi", "elePdg", "eleRelIso", "eleDxy", "eleDz", "eleOneOverEMinusOneOverP", "elePfRelIso", "eleSigmaIEtaIEta", "eleHoE", "eleDPhi", "eleDEta", "eleMissingHits", "elePassPATConversionVeto"]
   tavars = ["tauPt", "tauEta", "tauPhi", "tauPdg", 'tauJetInd', 'tauJetDR']
-  trackVars = ["trackPdg", "trackPt", "trackEta", "trackPhi", "trackRelIso","trackPassVetoMuSel","trackPassVetoEleSel","trackPassHybridLooseMuons","trackPassHybridMediumMuons","trackPassHybridTightMuons"]
+#  trackVars = ["trackPdg", "trackPt", "trackEta", "trackPhi", "trackRelIso","trackPassVetoMuSel","trackPassVetoEleSel","trackPassHybridLooseMuons","trackPassHybridMediumMuons","trackPassHybridTightMuons"]
   if options.puppi:
     puppiVars = ["puppiPdg", "puppiPt", "puppiEta", "puppiPhi"]
     pfVars = ["pfPdg", "pfPt", "pfEta", "pfPhi"]
@@ -138,7 +138,7 @@ for isample, sample in enumerate(allSamples):
   structString = "struct MyStruct_"+str(nc)+"_"+str(isample)+"{ULong64_t event;"
   structString+="Float_t "+",".join(variables+extraVariables)+";"
   structString +="Int_t nmu, nele, ntau, njets, nbtags,  njetsFailID;"
-  structString +="Int_t njetCount, nmuCount, neleCount, ntauCount, ntrackCount;"
+  structString +="Int_t njetCount, nmuCount, neleCount, ntauCount;"#, ntrackCount;"
   for var in jetvars:
     structString +="Float_t "+var+"[30];"
   for var in muvars:
@@ -147,8 +147,8 @@ for isample, sample in enumerate(allSamples):
     structString +="Float_t "+var+"[10];"
   for var in tavars:
     structString +="Float_t "+var+"[10];"
-  for var in trackVars:
-    structString +="Float_t "+var+"[10];"
+#  for var in trackVars:
+#    structString +="Float_t "+var+"[10];"
   if options.puppi:
     structString +="Int_t pfCount, puppiCount;"
     for var in puppiVars+pfVars:
@@ -201,7 +201,7 @@ for isample, sample in enumerate(allSamples):
   t.Branch("neleCount",   ROOT.AddressOf(s,"neleCount"), 'neleCount/I')
   t.Branch("nmuCount",   ROOT.AddressOf(s,"nmuCount"), 'nmuCount/I')
   t.Branch("ntauCount",   ROOT.AddressOf(s,"ntauCount"), 'ntauCount/I')
-  t.Branch("ntrackCount",   ROOT.AddressOf(s,"ntrackCount"), 'ntrackCount/I')
+#  t.Branch("ntrackCount",   ROOT.AddressOf(s,"ntrackCount"), 'ntrackCount/I')
   for var in jetvars:
     t.Branch(var,   ROOT.AddressOf(s,var), var+'[njetCount]/F')
   for var in muvars:
@@ -210,8 +210,8 @@ for isample, sample in enumerate(allSamples):
     t.Branch(var,   ROOT.AddressOf(s,var), var+'[neleCount]/F')
   for var in tavars:
     t.Branch(var,   ROOT.AddressOf(s,var), var+'[ntauCount]/F')
-  for var in trackVars:
-    t.Branch(var,   ROOT.AddressOf(s,var), var+'[ntrackCount]/F')
+#  for var in trackVars:
+#    t.Branch(var,   ROOT.AddressOf(s,var), var+'[ntrackCount]/F')
   if options.puppi:
     t.Branch("pfCount",   ROOT.AddressOf(s,"pfCount"), 'pfCount/I')
     t.Branch("puppiCount",   ROOT.AddressOf(s,"puppiCount"), 'puppiCount/I')
@@ -237,7 +237,7 @@ for isample, sample in enumerate(allSamples):
     if options.chmode=="copyMET":
       commoncf = "slimmedMETs>=100&&Sum$((muonsDz>0.05||muonsDxy>0.02)&&muonsPt>20)==0"
     if options.chmode[:7] == "copyInc":
-      commoncf = "(1)"
+      commoncf = "Sum$((muonsDz>0.05||muonsDxy>0.02)&&muonsPt>20)==0"
     c = ROOT.TChain('Events')
     for f in bin['filenames']:
       c.Add(f)
@@ -478,39 +478,39 @@ for isample, sample in enumerate(allSamples):
 #                if not justARadiation:
                 genTaus.append(tau)
 #              print genTaus
-          events.getByLabel(pfLabel,pfHandle)
-          pfcH =pfHandle.product()
-          pfc = list(pfcH)
-          isoCands = [{'c':cand,'iso':0.} for cand in filter(lambda c:c.pt()>10 and c.fromPV()==c.PVTight and abs(c.pdgId()) in [11, 13, 211], pfc)]
-          for p in pfc:
-#            if debug:
-#              if p.pt()>100:
-#                print s.event, p.pt(), p.pdgId() 
-            phi=p.phi()
-            eta=p.eta()
-            for ic in isoCands:
-              dR= deltaR({'phi':phi,'eta':eta},{'phi':ic['c'].phi(),'eta':ic['c'].eta()})
-              if dR>0.02 and dR<0.3:
-                ic['iso']+=p.pt()
-          for ic in isoCands:
-            ic['relIso']=ic['iso']/ic['c'].pt()
+#          events.getByLabel(pfLabel,pfHandle)
+#          pfcH =pfHandle.product()
+#          pfc = list(pfcH)
+#          isoCands = [{'c':cand,'iso':0.} for cand in filter(lambda c:c.pt()>10 and c.fromPV()==c.PVTight and abs(c.pdgId()) in [11, 13, 211], pfc)]
+#          for p in pfc:
+##            if debug:
+##              if p.pt()>100:
+##                print s.event, p.pt(), p.pdgId() 
+#            phi=p.phi()
+#            eta=p.eta()
+#            for ic in isoCands:
+#              dR= deltaR({'phi':phi,'eta':eta},{'phi':ic['c'].phi(),'eta':ic['c'].eta()})
+#              if dR>0.02 and dR<0.3:
+#                ic['iso']+=p.pt()
+#          for ic in isoCands:
+#            ic['relIso']=ic['iso']/ic['c'].pt()
 #          isoCands = filter(lambda c:c.pt()>10 and abs(c.dz())<0.1 and c.fromPV()==c.PVTight and abs(c.dxy())<0.02 and abs(c.pdgId()) in [11, 13, 211], pfc)
-          isoCands=filter(lambda ic:ic['relIso']<0.2, isoCands)
+#          isoCands=filter(lambda ic:ic['relIso']<0.2, isoCands)
 #          for ic in isoCands:
 #            print ic['c'].pdgId(), ic['c'].pt(), ic['relIso']
 #          print "len",len(pfc), len(isoCands)
-          s.ntrackCount=min(10,len(isoCands))
-          for i in xrange(s.ntrackCount):
-            s.trackPdg[i] = isoCands[i]['c'].pdgId()
-            s.trackPt[i] = isoCands[i]['c'].pt()
-            s.trackEta[i] = isoCands[i]['c'].eta()
-            s.trackPhi[i] = isoCands[i]['c'].phi()
-            s.trackRelIso[i] = isoCands[i]['relIso']
-            s.trackPassVetoMuSel[i]=isIsolated({'phi':s.trackPhi[i],'eta':s.trackEta[i]}, vetoMuons, dR=0.1)
-            s.trackPassVetoEleSel[i]=isIsolated({'phi':s.trackPhi[i],'eta':s.trackEta[i]}, vetoElectrons, dR=0.1)
-            s.trackPassHybridLooseMuons[i]=isIsolated({'phi':s.trackPhi[i],'eta':s.trackEta[i]}, hybridLooseMuons, dR=0.1)
-            s.trackPassHybridMediumMuons[i]=isIsolated({'phi':s.trackPhi[i],'eta':s.trackEta[i]}, hybridMediumMuons, dR=0.1)
-            s.trackPassHybridTightMuons[i]=isIsolated({'phi':s.trackPhi[i],'eta':s.trackEta[i]}, hybridTightMuons, dR=0.1)
+#          s.ntrackCount=min(10,len(isoCands))
+#          for i in xrange(s.ntrackCount):
+#            s.trackPdg[i] = isoCands[i]['c'].pdgId()
+#            s.trackPt[i] = isoCands[i]['c'].pt()
+#            s.trackEta[i] = isoCands[i]['c'].eta()
+#            s.trackPhi[i] = isoCands[i]['c'].phi()
+#            s.trackRelIso[i] = isoCands[i]['relIso']
+#            s.trackPassVetoMuSel[i]=isIsolated({'phi':s.trackPhi[i],'eta':s.trackEta[i]}, vetoMuons, dR=0.1)
+#            s.trackPassVetoEleSel[i]=isIsolated({'phi':s.trackPhi[i],'eta':s.trackEta[i]}, vetoElectrons, dR=0.1)
+#            s.trackPassHybridLooseMuons[i]=isIsolated({'phi':s.trackPhi[i],'eta':s.trackEta[i]}, hybridLooseMuons, dR=0.1)
+#            s.trackPassHybridMediumMuons[i]=isIsolated({'phi':s.trackPhi[i],'eta':s.trackEta[i]}, hybridMediumMuons, dR=0.1)
+#            s.trackPassHybridTightMuons[i]=isIsolated({'phi':s.trackPhi[i],'eta':s.trackEta[i]}, hybridTightMuons, dR=0.1)
 ####################
           if options.puppi:
             events.getByLabel(puppiLabel,puppiHandle)

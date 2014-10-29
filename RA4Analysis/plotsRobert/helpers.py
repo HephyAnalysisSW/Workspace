@@ -1,14 +1,22 @@
 import ROOT
 from Workspace.HEPHYPythonTools.helpers import getVarValue
-from math import cos, sin, sqrt
+from math import cos, sin, sqrt, acos
 
 def stage2MT(c):
   met=c.GetLeaf('met').GetValue()
   leptonPt=c.GetLeaf('leptonPt').GetValue()
-  metphi=c.GetLeaf('metphi').GetValue()
+  metphi=c.GetLeaf('metPhi').GetValue()
   leptonPt=c.GetLeaf('leptonPt').GetValue()
   leptonPhi=c.GetLeaf('leptonPhi').GetValue()
   return sqrt(2.*leptonPt*met*(1.-cos(leptonPhi-metphi)))
+def stage2DPhi(c):
+  met=c.GetLeaf('met').GetValue()
+  leptonPt=c.GetLeaf('leptonPt').GetValue()
+  metphi=c.GetLeaf('metPhi').GetValue()
+  leptonPt=c.GetLeaf('leptonPt').GetValue()
+  leptonPhi=c.GetLeaf('leptonPhi').GetValue()
+  cdp  = cos(leptonPhi-metphi)
+  return acos((leptonPt+met*cdp)/sqrt(leptonPt**2+met**2+2*met*leptonPt*cdp)) 
   
 
 #def nameAndCut(metb, htb, njetb, pdg, btagRequirement='def'):

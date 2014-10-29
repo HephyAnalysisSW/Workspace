@@ -113,11 +113,12 @@ def loopAndFill(stacks):
 
       c = ROOT.TChain('Events')
       counter=0
-      for f in getFileList(s['dirname']+'/'+b):#, minAgeDPM, histname, xrootPrefix, maxN):
+      dir = s['dirname'] if s.has_key('dirname') else s['dir']
+      for f in getFileList(dir+'/'+b):#, minAgeDPM, histname, xrootPrefix, maxN):
         counter+=1
         c.Add(f)
       ntot = c.GetEntries()
-      print "Added ",counter,'files from sample',s['name'],'dir',s['dirname'],'bin',b,'ntot',ntot
+      print "Added ",counter,'files from sample',s['name'],'dir',dir,'bin',b,'ntot',ntot
       if ntot==0:
         print "Warning! Found zero events in",s['name'],'bin',b," -> do nothing"
         continue
@@ -244,7 +245,7 @@ def drawStack(stk):
         hcopy.SetLineStyle(2)
 #      if p.style.has_key('thickNess') and  p.style['thickNess']:
       try:
-        hcopy.SetLineWidth(p.style['thickNess'])
+        hcopy.SetLineWidth(p.style['lineThickness'])
       except:pass
       stuff.append(hcopy)
       if stk.options.has_key('logY') and stk.options['logY']:

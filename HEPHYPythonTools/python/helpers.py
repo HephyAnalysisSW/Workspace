@@ -65,10 +65,11 @@ def getChain(s, minAgeDPM=0, histname='histo', xrootPrefix='root://hephyse.oeaw.
   if type(s)==type({}):
     i=0
     for b in s['bins']:
-      for f in getFileList(s['dirname']+'/'+b, minAgeDPM, histname, xrootPrefix, maxN):
+      dir = s['dirname'] if s.has_key('dirname') else s['dir']
+      for f in getFileList(dir+'/'+b, minAgeDPM, histname, xrootPrefix, maxN):
         i+=1
         c.Add(f)
-    print "Added ",i,'files from sample',s['name'],'dir',s['dirname'],'bins',s['bins']
+    print "Added ",i,'files from sample',s['name'],'dir',dir,'bins',s['bins']
     return c
 
 def getObjFromFile(fname, hname):
