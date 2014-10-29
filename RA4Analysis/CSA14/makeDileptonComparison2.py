@@ -5,7 +5,7 @@ from localInfo import username
 relIso=0.3
 ptCut=15
 deltaPhiCut = '>1' ##larger than 1
-htCut     = 500
+htCut     = 150
 metCut    = 150
 minNJets  =  3
 
@@ -13,78 +13,64 @@ leptonID = "muIsPF&&(muIsGlobal||muIsTracker)&&muPt>"+str(ptCut)+"&&abs(muEta)<2
           +"&&abs(muDxy)<0.2&&abs(muDz)<0.5"\
           +"&&muRelIso<"+str(relIso)
 
+plots = [
+        {'varname':'MT',         'var':'mT',         'bin':25  ,   'lowlimit':0,  'limit':800},\
+        {'varname':'ST',         'var':'st',         'bin':25  ,   'lowlimit':0,  'limit':1400},\
+        {'varname':'NJets',      'var':'njets',      'bin':16  ,   'lowlimit':0,  'limit':16},\
+        {'varname':'MET',        'var':'met',        'bin':25  ,   'lowlimit':0,  'limit':800},\
+        {'varname':'HT',         'var':'ht',         'bin':25  ,   'lowlimit':0,  'limit':2000},\
+        {'varname':'PT',         'var':'muPt',       'bin':25  ,   'lowlimit':0,  'limit':800},\
+        {'varname':'DeltaPhi',   'var':'deltaPhi',   'bin':25  ,   'lowlimit':0,  'limit':3.14},\
+        ]
+
+truthSelection = 'weightTruth*(htTruth>'+str(htCut)+'&&njetsTruth>='+str(minNJets)+'&&metTruth>'+str(metCut)+')'
+predSelection = 'weightPred*scaleLEff*(htPred>'+str(htCut)+'&&njetsPred>='+str(minNJets)+'&&metPred>'+str(metCut)+')'
+predSelectionUp = 'weightPred*scaleLEffUp*(htPred>'+str(htCut)+'&&njetsPred>='+str(minNJets)+'&&metPred>'+str(metCut)+')'
+predSelectionDown = 'weightPred*scaleLEffDown*(htPred>'+str(htCut)+'&&njetsPred>='+str(minNJets)+'&&metPred>'+str(metCut)+')'
+
 cPred = ROOT.TChain('Events')
-cPred.Add('/data/easilar/results2014/muonTuples/CSA14_TTJets_dilep_relIso'+str(relIso)+'.root')
+cPred.Add('/data/easilar/results2014/muonTuples/CSA14_TTJets_dilep_New_relIso'+str(relIso)+'.root')
 
 cLost = ROOT.TChain('Events')
-cLost.Add('/data/easilar/results2014/muonTuples/CSA14_TTJets_Lost_relIso'+str(relIso)+'.root')
+cLost.Add('/data/easilar/results2014/muonTuples/CSA14_TTJets_Lost_New_relIso'+str(relIso)+'.root')
 
-hMT = ROOT.TH1F('hMT', 'hMT',20,0,800)
-cLost.Draw('mTTruth>>hMT','weightTruth*(htTruth>'+str(htCut)+'&&njetsTruth>='+str(minNJets)+'&&metTruth>'+str(metCut)+')','goff')
-hMTPred = ROOT.TH1F('hMTPred', 'hMTPred',20,0,800)
-cPred.Draw('mTPred>>hMTPred','weightPred*scaleLEff*(htPred>'+str(htCut)+'&&njetsPred>='+str(minNJets)+'&&metPred>'+str(metCut)+')','goff')
-hMTPredUp = ROOT.TH1F('hMTPredUp', 'hMTPredUp',20,0,800)
-cPred.Draw('mTPred>>hMTPredUp','weightPred*scaleLEffUp*(htPred>'+str(htCut)+'&&njetsPred>='+str(minNJets)+'&&metPred>'+str(metCut)+')','goff')
-hMTPredDown = ROOT.TH1F('hMTPredDown', 'hMTPredDown',20,0,800)
-cPred.Draw('mTPred>>hMTPredDown','weightPred*scaleLEffDown*(htPred>'+str(htCut)+'&&njetsPred>='+str(minNJets)+'&&metPred>'+str(metCut)+')','goff')
+for p in plots:
+  histo = 'h'+p['varname']
+  histoPred = 'h'+p['varname']+'Pred'
+  histoPredUp = 'h'+p['varname']+'PredUp'
+  histoPredDown = 'h'+p['varname']+'PredDown'
+  histoname = histo
+  histonamePred = histoPred
+  histonamePredUp = histoPredUp
+  histonamePredDown = histoPredDown
 
-DrawClosure(hMT,hMTPred,hMTPredUp,hMTPredDown,'MT')
+  histo = ROOT.TH1F(str(histo) ,str(histo),20,p['lowlimit'],p['limit'])
+  cLost.Draw(p['var']+'Truth>>'+str(histoname),truthSelection,'goff')
 
-hHT = ROOT.TH1F('hHT', 'hHT',20,0,2000)
-cLost.Draw('ht>>hHT','weightTruth*(htTruth>'+str(htCut)+'&&njetsTruth>='+str(minNJets)+'&&metTruth>'+str(metCut)+')','goff')
-hHTPred = ROOT.TH1F('hHTPred', 'hHTPred',20,0,2000)
-cPred.Draw('htPred>>hHTPred','weightPred*scaleLEff*(htPred>'+str(htCut)+'&&njetsPred>='+str(minNJets)+'&&metPred>'+str(metCut)+')','goff')
-hHTPredUp = ROOT.TH1F('hHTPredUp', 'hHTPredUp',20,0,2000)
-cPred.Draw('htPred>>hHTPredUp','weightPred*scaleLEffUp*(htPred>'+str(htCut)+'&&njetsPred>='+str(minNJets)+'&&metPred>'+str(metCut)+')','goff')
-hHTPredDown = ROOT.TH1F('hHTPredDown', 'hHTPredDown',20,0,2000)
-cPred.Draw('htPred>>hHTPredDown','weightPred*scaleLEffDown*(htPred>'+str(htCut)+'&&njetsPred>='+str(minNJets)+'&&metPred>'+str(metCut)+')','goff')
+  histoPred = ROOT.TH1F(str(histoPred) ,str(histoPred),20,p['lowlimit'],p['limit'])
+  cPred.Draw(p['var']+'Pred>>'+str(histonamePred),predSelection,'goff')
 
-DrawClosure(hHT,hHTPred,hHTPredUp,hHTPredDown,'HT')
+  histoPredUp = ROOT.TH1F(str(histoPredUp) ,str(histoPredUp),20,p['lowlimit'],p['limit'])
+  cPred.Draw(p['var']+'Pred>>'+str(histonamePredUp),predSelectionUp,'goff')
 
-hNJets = ROOT.TH1F('hNJets', 'hNJets',20,0,20)
-cLost.Draw('njetsTruth>>hNJets','weightTruth*(htTruth>'+str(htCut)+'&&njetsTruth>='+str(minNJets)+'&&metTruth>'+str(metCut)+')','goff')
-hNJetsPred = ROOT.TH1F('hNJetsPred', 'hNJetsPred',20,0,20)
-cPred.Draw('njetsPred>>hNJetsPred','weightPred*scaleLEff*(htPred>'+str(htCut)+'&&njetsPred>='+str(minNJets)+'&&metPred>'+str(metCut)+')','goff')
-hNJetsPredUp = ROOT.TH1F('hNJetsPredUp', 'hNJetsPredUp',20,0,20)
-cPred.Draw('njetsPred>>hNJetsPredUp','weightPred*scaleLEffUp*(htPred>'+str(htCut)+'&&njetsPred>='+str(minNJets)+'&&metPred>'+str(metCut)+')','goff')
-hNJetsPredDown = ROOT.TH1F('hNJetsPredDown', 'hNJetsPredDown',20,0,20)
-cPred.Draw('njetsPred>>hNJetsPredDown','weightPred*scaleLEffDown*(htPred>'+str(htCut)+'&&njetsPred>='+str(minNJets)+'&&metPred>'+str(metCut)+')','goff')
+  histoPredDown = ROOT.TH1F(str(histoPredDown) ,str(histoPredDown),20,p['lowlimit'],p['limit'])
+  cPred.Draw(p['var']+'Pred>>'+str(histonamePredDown),predSelectionDown,'goff')
 
-DrawClosure(hNJets,hNJetsPred,hNJetsPredUp,hNJetsPredDown,'NJets')
+  DrawClosure(histoPred,histo,histoPredUp,histoPredDown,p['varname'])
 
-hMET = ROOT.TH1F('hMET', 'hMET',20,0,800)
-cLost.Draw('metTruth>>hMET','weightTruth*(htTruth>'+str(htCut)+'&&njetsTruth>='+str(minNJets)+'&&metTruth>'+str(metCut)+')','goff')
-hMETPred = ROOT.TH1F('hMETPred', 'hMETPred',20,0,800)
-cPred.Draw('metPred>>hMETPred','weightPred*scaleLEff*(htPred>'+str(htCut)+'&&njetsPred>='+str(minNJets)+'&&metPred>'+str(metCut)+')','goff')
-hMETPredUp = ROOT.TH1F('hMETPredUp', 'hMETPredUp',20,0,800)
-cPred.Draw('metPred>>hMETPredUp','weightPred*scaleLEffUp*(htPred>'+str(htCut)+'&&njetsPred>='+str(minNJets)+'&&metPred>'+str(metCut)+')','goff')
-hMETPredDown = ROOT.TH1F('hMETPredDown', 'hMETPredDown',20,0,800)
-cPred.Draw('metPred>>hMETPredDown','weightPred*scaleLEffDown*(htPred>'+str(htCut)+'&&njetsPred>='+str(minNJets)+'&&metPred>'+str(metCut)+')','goff')
 
-DrawClosure(hMET,hMETPred,hMETPredUp,hMETPredDown,'MET')
-
-hST = ROOT.TH1F('hST', 'hST',20,0,2000)
-cLost.Draw('stTruth>>hST','weightTruth*(htTruth>'+str(htCut)+'&&njetsTruth>='+str(minNJets)+'&&metTruth>'+str(metCut)+')','goff')
-hSTPred = ROOT.TH1F('hSTPred', 'hSTPred',20,0,2000)
-cPred.Draw('stPred>>hSTPred','weightPred*scaleLEff*(htPred>'+str(htCut)+'&&njetsPred>='+str(minNJets)+'&&metPred>'+str(metCut)+')','goff')
-hSTPredUp = ROOT.TH1F('hSTPredUp', 'hSTPredUp',20,0,2000)
-cPred.Draw('stPred>>hSTPredUp','weightPred*scaleLEffUp*(htPred>'+str(htCut)+'&&njetsPred>='+str(minNJets)+'&&metPred>'+str(metCut)+')','goff')
-hSTPredDown = ROOT.TH1F('hSTPredDown', 'hSTPredDown',20,0,2000)
-cPred.Draw('stPred>>hSTPredDown','weightPred*scaleLEffDown*(htPred>'+str(htCut)+'&&njetsPred>='+str(minNJets)+'&&metPred>'+str(metCut)+')','goff')
-
-DrawClosure(hST,hSTPred,hSTPredUp,hSTPredDown,'ST')
-
-hDeltaPhi = ROOT.TH1F('hDeltaPhi', 'hDeltaPhi',25,0,3.14)
-cLost.Draw('deltaPhiTruth>>hDeltaPhi','weightTruth*(htTruth>'+str(htCut)+'&&njetsTruth>='+str(minNJets)+'&&metTruth>'+str(metCut)+')','goff')
-hDeltaPhiPred = ROOT.TH1F('hDeltaPhiPred', 'hDeltaPhiPred',25,0,3.14)
-cPred.Draw('deltaPhiPred>>hDeltaPhiPred','weightPred*scaleLEff*(htPred>'+str(htCut)+'&&njetsPred>='+str(minNJets)+'&&metPred>'+str(metCut)+')','goff')
-hDeltaPhiPredUp = ROOT.TH1F('hDeltaPhiPredUp', 'hDeltaPhiPredUp',25,0,3.14)
-cPred.Draw('deltaPhiPred>>hDeltaPhiPredUp','weightPred*scaleLEffUp*(htPred>'+str(htCut)+'&&njetsPred>='+str(minNJets)+'&&metPred>'+str(metCut)+')','goff')
-hDeltaPhiPredDown = ROOT.TH1F('hDeltaPhiPredDown', 'hDeltaPhiPredDown',25,0,3.14)
-cPred.Draw('deltaPhiPred>>hDeltaPhiPredDown','weightPred*scaleLEffDown*(htPred>'+str(htCut)+'&&njetsPred>='+str(minNJets)+'&&metPred>'+str(metCut)+')','goff')
-
-DrawClosure(hDeltaPhi,hDeltaPhiPred,hDeltaPhiPredUp,hDeltaPhiPredDown,'DeltaPhi')
-
+#
+# hPTLost = ROOT.TH1F('hPTLost', 'hPTLost',25,0,1000)
+# cLost.Draw('ptLostTruth>>hPTLost','weightTruth*(htTruth>'+str(htCut)+'&&njetsTruth>='+str(minNJets)+'&&metTruth>'+str(metCut)+')','goff')
+# hPTLostPred = ROOT.TH1F('hPTLostPred', 'hPTLostPred',25,0,1000)
+# cPred.Draw('muPtLoose>>hPTLostPred','weightPred*scaleLEff*(htPred>'+str(htCut)+'&&njetsPred>='+str(minNJets)+'&&metPred>'+str(metCut)+')','goff')
+# hPTLostPredUp = ROOT.TH1F('hPTLostPredUp', 'hPTLostPredUp',25,0,1000)
+# cPred.Draw('muPtLoose>>hPTLostPredUp','weightPred*scaleLEffUp*(htPred>'+str(htCut)+'&&njetsPred>='+str(minNJets)+'&&metPred>'+str(metCut)+')','goff')
+# hPTLostPredDown = ROOT.TH1F('hPTLostPredDown', 'hPTLostPredDown',25,0,1000)
+# cPred.Draw('muPtLoose>>hPTLostPredDown','weightPred*scaleLEffDown*(htPred>'+str(htCut)+'&&njetsPred>='+str(minNJets)+'&&metPred>'+str(metCut)+')','goff')
+#
+# DrawClosure(hPTLostPred,hPTLost,hPTLostPredUp,hPTLostPredDown,'PTLost')
+#
 ##For Statistics##
 hDeltaPhiStat = ROOT.TH1F('hDeltaPhiStat', 'hDeltaPhiStat',20,0,3.14)
 hDeltaPhiStat.Sumw2() 

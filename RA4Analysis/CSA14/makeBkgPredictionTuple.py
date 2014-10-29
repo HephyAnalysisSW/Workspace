@@ -35,8 +35,8 @@ if mode=='lep':
 if mode=='dilep':
   leptonEffMap = pickle.load(file('/data/schoef/results2014/tauTemplates/CSA14_TTJets_efficiencyMap_vetoMuIDPt15_ttJetsCSA1450ns_relIso'+str(relIso)+'.pkl'))
   leptonID = "muIsPF&&(muIsGlobal||muIsTracker)&&muPt>15&&abs(muEta)<2.5&&abs(muDxy)<0.2&&abs(muDz)<0.5&&muRelIso<"+str(relIso)
-  doubleLeptonPreselection = "ngoodMuons>=1&&Sum$("+leptonID+")==2&&nvetoElectrons==0"
-  ofile =                    '/data/easilar/results2014/muonTuples/CSA14_TTJets_dilep_relIso'+str(relIso)+'.root'
+  doubleLeptonPreselection = "ngNuMuFromW==2&&ngNuEFromW==0&&ngoodMuons>=1&&Sum$("+leptonID+")==2&&nvetoElectrons==0"
+  ofile =                    '/data/easilar/results2014/muonTuples/CSA14_TTJets_dilep_New_relIso'+str(relIso)+'.root'
 
 if mode=='had' or mode=='lep':
   for ptk in templates.keys():
@@ -73,7 +73,7 @@ def getTypeStr(s):
   if s=='I': return 'Int_t'
 
 copyVars  = ['event/l','nbtags/I', 'njets/I', 'ht/F', 'met/F', 'metphi/F', 'nvetoMuons/I']
-newVars   = ['njetsPred/I', 'htPred/F','muPtPred/F','muPhiPred/F','wPhiPred/F','wPtPred/F','stPred/F' ,'metPred/F', 'metphiPred/F','weightPred/F', 'mTPred/F', 'weight/F', 'scaleLEff/F','scaleLEffUp/F','scaleLEffDown/F','deltaPhiPred/F']
+newVars   = ['njetsPred/I', 'muPtLoose/F','muPhiLoose/F','htPred/F','muPtPred/F','muPhiPred/F','wPhiPred/F','wPtPred/F','stPred/F' ,'metPred/F', 'metphiPred/F','weightPred/F', 'mTPred/F', 'weight/F', 'scaleLEff/F','scaleLEffUp/F','scaleLEffDown/F','deltaPhiPred/F']
 vars      = copyVars+newVars  
 
 structString = "struct MyStruct{"
@@ -125,31 +125,34 @@ for i in range(number_events):
       s.weight=c.GetLeaf('weight').GetValue()
       lEffb = leptonEffMap.FindBin( m['pt'], m['eta'])
       lEffi = leptonEffMap.GetBinContent(lEffb)
-      lEffUp = max((lEffi*effUp)-(effUp-1),0)
-      lEffDown = min((lEffi*effDown)+(1-effDown),1)
-      lEff = lEffi
-      if mode=='dilep':
-        s.scaleLEff = (1-lEff)/lEff
-        s.scaleLEffUp = (1-lEffUp)/lEffUp
-        #print s.scaleLEffUp
-        s.scaleLEffDown = (1-lEffDown)/lEffDown 
-        metx = s.met*cos(s.metphi)+cos(m['phi'])*m['pt']
-        mety = s.met*sin(s.metphi)+sin(m['phi'])*m['pt']
-        s.njetsPred = s.njets
-        s.htPred   = s.ht
-        s.muPtPred     = m2['pt']  
-        s.muPhiPred    = m2['phi']
-        s.weightPred = s.weight
-        s.metPred = sqrt(metx**2+mety**2)
-        s.metphiPred = atan2(mety,metx)
-        s.mTPred = sqrt(2.*s.metPred*m2['pt']*(1-cos(m2['phi']-s.metphiPred)))
-        wx = s.metPred*cos(s.metphiPred) + m2['pt']*cos(m2['phi'])
-        wy = s.metPred*sin(s.metphiPred) + m2['pt']*sin(m2['phi'])
-        s.wPhiPred     = atan2(wy,wx)
-        s.wPtPred      = sqrt((wx)**2+(wy)**2)
-        s.stPred       = sqrt((s.wPtPred)**2+(s.mTPred)**2) 
-        s.deltaPhiPred = deltaPhi(s.wPhiPred,m2['phi'])
-        t.Fill()
+      if lEffi>0.5:
+        lEffUp = max((lEffi*effUp)-(effUp-1),0)
+        lEffDown = min((lEffi*effDown)+(1-effDown),1)
+        lEff = lEffi
+        if mode=='dilep':
+          s.scaleLEff = (1-lEff)/lEff
+          s.scaleLEffUp = (1-lEffUp)/lEffUp
+          #print s.scaleLEffUp
+          s.scaleLEffDown = (1-lEffDown)/lEffDown 
+          metx = s.met*cos(s.metphi)+cos(m['phi'])*m['pt']
+          mety = s.met*sin(s.metphi)+sin(m['phi'])*m['pt']
+          s.njetsPred = s.njets
+          s.htPred   = s.ht
+          s.muPtPred     = m2['pt']  
+          s.muPhiPred    = m2['phi']
+          s.muPtLoose    = m['pt']
+          s.muPhiLoose   = m['phi']
+          s.weightPred = s.weight
+          s.metPred = sqrt(metx**2+mety**2)
+          s.metphiPred = atan2(mety,metx)
+          s.mTPred = sqrt(2.*s.metPred*m2['pt']*(1-cos(m2['phi']-s.metphiPred)))
+          wx = s.metPred*cos(s.metphiPred) + m2['pt']*cos(m2['phi'])
+          wy = s.metPred*sin(s.metphiPred) + m2['pt']*sin(m2['phi'])
+          s.wPhiPred     = atan2(wy,wx)
+          s.wPtPred      = sqrt((wx)**2+(wy)**2)
+          s.stPred       = sqrt((s.wPtPred)**2+(s.mTPred)**2) 
+          s.deltaPhiPred = deltaPhi(s.wPhiPred,m2['phi'])
+          t.Fill()
       if mode=='had' or mode=='lep':
         template=None
         for ptb in gTauPtBins:
@@ -206,15 +209,15 @@ for i in range(number_events):
             s.metphiPred = atan2(MEy,MEx)
             s.mTPred = sqrt(2.*s.metPred*m2['pt']*(1-cos(m2['phi']-s.metphiPred)))
             t.Fill()
-  #            #lepton reconstructed ->not filled
-  ##            s.nvetoMuonsPred = s.nvetoMuons + 1 
-  #            s.weightPred = p['weight']*s.weight*nlEff
-  #            s.metPred = sqrt(MEx**2+MEy**2)
-  #            s.metphiPred = atan2(MEy,MEx)
-  #            s.mTPred = sqrt(2.*s.metPred*m2['pt']*(1-cos(m2['phi']-s.metphiPred)))
-  #            t.Fill()
-              #lepton lost
-  #            s.nvetoMuonsPred = s.nvetoMuons  
+  #              #lepton reconstructed ->not filled
+  ##              s.nvetoMuonsPred = s.nvetoMuons + 1 
+  #              s.weightPred = p['weight']*s.weight*nlEff
+  #              s.metPred = sqrt(MEx**2+MEy**2)
+  #              s.metphiPred = atan2(MEy,MEx)
+  #              s.mTPred = sqrt(2.*s.metPred*m2['pt']*(1-cos(m2['phi']-s.metphiPred)))
+  #              t.Fill()
+                #lepton lost
+  #              s.nvetoMuonsPred = s.nvetoMuons  
 
 
 f.cd()

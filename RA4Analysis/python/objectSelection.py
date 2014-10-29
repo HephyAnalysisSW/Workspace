@@ -33,8 +33,9 @@ def getGenLep(c,p):
   gLepEta = c.GetLeaf('gLepEta').GetValue(p)
   gLepInd = c.GetLeaf('gLepInd').GetValue(p)
   gLepPhi = c.GetLeaf('gLepPhi').GetValue(p)
-  cand={'gLepPdg':gLepPdg,'gLepDR':gLepDR,'gLepPt':gLepPt,'gLepEta':gLepEta,'gLepInd':gLepInd,'gLepPhi':gLepPhi}
-  return cand
+  if gLepPt >15 and abs(gLepEta)<2.5:
+    cand={'gLepPdg':gLepPdg,'gLepDR':gLepDR,'gLepPt':gLepPt,'gLepEta':gLepEta,'gLepInd':gLepInd,'gLepPhi':gLepPhi}
+    return cand
 
 def getGenLeps(c):
   ngLep = c.GetLeaf('ngLep').GetValue()
