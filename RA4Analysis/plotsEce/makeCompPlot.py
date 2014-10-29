@@ -1,5 +1,7 @@
 import ROOT
-
+import sys
+print 'Number of arguments:', len(sys.argv), 'arguments.'
+print 'Argument List:', str(sys.argv)
 filename1 = '/data/easilar/results2014/rootfiles/PhiSil.root'
 #filename1 = '/data/easilar/results2014/rootfiles/DiLepEffht500met250njet3.root'
 #filename2 = '/data/easilar/results2014/rootfiles/DiLepEff110ht500met250njet3.root'
