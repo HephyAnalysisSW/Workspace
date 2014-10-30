@@ -17,69 +17,50 @@ def stage2DPhi(c):
   leptonPhi=c.GetLeaf('leptonPhi').GetValue()
   cdp  = cos(leptonPhi-metphi)
   return acos((leptonPt+met*cdp)/sqrt(leptonPt**2+met**2+2*met*leptonPt*cdp)) 
+def cmgMT(c):
+  met=c.GetLeaf('met_pt').GetValue()
+  leptonPt=c.GetLeaf('leptonPt').GetValue()
+  metphi=c.GetLeaf('met_phi').GetValue()
+  leptonPt=c.GetLeaf('leptonPt').GetValue()
+  leptonPhi=c.GetLeaf('leptonPhi').GetValue()
+  return sqrt(2.*leptonPt*met*(1.-cos(leptonPhi-metphi)))
+def cmgDPhi(c):
+  met=c.GetLeaf('met_pt').GetValue()
+  leptonPt=c.GetLeaf('leptonPt').GetValue()
+  metphi=c.GetLeaf('met_phi').GetValue()
+  leptonPhi=c.GetLeaf('leptonPhi').GetValue()
+  cdp  = cos(leptonPhi-metphi)
+  return acos((leptonPt+met*cdp)/sqrt(leptonPt**2+met**2+2*met*leptonPt*cdp)) 
+def cmgST(c):
+  met=c.GetLeaf('met_pt').GetValue()
+  leptonPt=c.GetLeaf('leptonPt').GetValue()
+  return  met+leptonPt 
   
 
-#def nameAndCut(metb, htb, njetb, pdg, btagRequirement='def'):
-#  cut='nbtags==0'
-#  if btagRequirement.lower()=='none':
-#    cut='(1)'
-#  if btagRequirement.lower()=='noloose':
-#    cut='(Sum$(jetBtag>0.244)==0)'
-#  if btagRequirement.lower()=='notight':
-#    cut='(Sum$(jetBtag>0.898)==0)'
-#  cut+='&&nTightMuons+nTightElectrons==1'
-#  cut+='&&type1phiMet>='+str(metb[0])
-#  name='met'+str(metb[0])
-#  if metb[1]>0:
-#    cut+='&&type1phiMet<'+str(metb[1])
-#    name+='-'+str(metb[1])
-#  cut+='&&ht>='+str(htb[0])
-#  name+='_ht'+str(htb[0])
-#  if htb[1]>0:
-#    cut+='&&ht<'+str(htb[1])
-#    name+='-'+str(htb[1])
-#  cut+='&&njets>='+str(njetb[0])
-#  name+='_njet'+str(njetb[0])
-#  if len(njetb)>1 and njetb[1]>0:
-#    cut+='&&njets<='+str(njetb[1])
-#    name+='-'+str(njetb[1])
-#  if pdg.lower()=='pos':
-#    cut+='&&leptonPdg>0'
-#    name+='_posPdg'
-#  if pdg.lower()=='neg':
-#    cut+='&&leptonPdg<0'
-#    name+='_negPdg'
-#  return [name, cut]
-#
-#def nameAndCutLShape(shape, njetb, pdg, btagRequirement='def'):
-#  cut='nbtags==0'
-#  if btagRequirement.lower()=='none':
-#    cut='(1)'
-#  if btagRequirement.lower()=='noloose':
-#    cut='(Sum$(jetBtag>0.244)==0)'
-#  if btagRequirement.lower()=='notight':
-#    cut='(Sum$(jetBtag>0.898)==0)'
-#  cut+='&&nTightMuons+nTightElectrons==1'
-#  if not shape[0]=="L":return
-#  n = int(shape[1])
-#  htL = 400+n*70
-#  htH = 400+(n+1)*70
-#  metL =150 +n*40
-#  metH =150 +(n+1)*40
-#  cut+='&&(ht>='+str(htL)+'&&type1phiMet>'+str(metL)+')&&(!(ht>='+str(htH)+'&&type1phiMet>='+str(metH)+'))'
-#  name=shape
-#  name+='_njet'+str(njetb[0])
-#  cut+='&&njets>='+str(njetb[0])
-#  if len(njetb)>1 and njetb[1]>0:
-#    cut+='&&njets<='+str(njetb[1])
-#    name+='-'+str(njetb[1])
-#  if pdg.lower()=='pos':
-#    cut+='&&leptonPdg>0'
-#    name+='_posPdg'
-#  if pdg.lower()=='neg':
-#    cut+='&&leptonPdg<0'
-#    name+='_negPdg'
-#  return [name, cut]
+def nameAndCut(stb, htb, njetb, presel, charge=""):
+  cut=presel+'&&st>='+str(stb[0])
+  name='st'+str(stb[0])
+  if stb[1]>0:
+    cut+='&&st<'+str(stb[1])
+    name+='-'+str(stb[1])
+  cut+='&&htJet40ja>='+str(htb[0])
+  name+='_ht'+str(htb[0])
+  if htb[1]>0:
+    cut+='&&htJet40ja<'+str(htb[1])
+    name+='-'+str(htb[1])
+  cut+='&&nJet40a>='+str(njetb[0])
+  name+='_njet'+str(njetb[0])
+  if len(njetb)>1 and njetb[1]>0:
+    cut+='&&nJet40a<='+str(njetb[1])
+    name+='-'+str(njetb[1])
+  if charge.lower()=='pos':
+    cut+='&&leptonPdg<0'
+    name+='_posCharge'
+  if charge.lower()=='neg':
+    cut+='&&leptonPdg>0'
+    name+='_negCharge'
+  return [name, cut]
+
 
 #def wRecoPt(chain):
 #  lPt = getVarValue(chain, "leptonPt")

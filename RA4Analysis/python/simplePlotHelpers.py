@@ -128,7 +128,7 @@ def loopAndFill(stacks):
         c.Draw(">>eList",cutString)
         elist = ROOT.gDirectory.Get("eList")
         number_events = elist.GetN()
-        print "Reading: ", s["name"], b, "with",number_events,"events passing cutString", cutString, 'and will fill these vars:',[(v.name, v) for v in varsToFill]
+        print "Reading: ", s["name"], b, "with",number_events,"events passing cutString", cutString, 'and will fill these vars: '+" ".join([v.name for v in varsToFill])
         for v in varsToFill:
           if not (v.cut.has_key('func') and v.cut['func']):
             v.cut['func']=None
@@ -252,14 +252,12 @@ def drawStack(stk):
         defaultYRange = [0.7, 1.5*hcopy.GetMaximum()]
       else:
         defaultYRange = [0, 1.2*hcopy.GetMaximum()]
-      try:
-        if not isinstance(stk.options['yRange'][0], numbers.Number):stk.options['yRange'][0]=defaultYRange[0]#If yRange contains 'None' use default
-        if not isinstance(stk.options['yRange'][1], numbers.Number):stk.options['yRange'][1]=defaultYRange[1]#If yRange contains 'None' use default
-      except:pass
+      hcopy.GetYaxis().SetRangeUser(*defaultYRange)
+      if not isinstance(stk.options['yRange'][0], numbers.Number):stk.options['yRange'][0]=defaultYRange[0]#If yRange contains 'None' use default
+      if not isinstance(stk.options['yRange'][1], numbers.Number):stk.options['yRange'][1]=defaultYRange[1]#If yRange contains 'None' use default
       try:
         hcopy.GetYaxis().SetRangeUser(*(stk.options['yRange']) )
-      except:
-        hcopy.GetYaxis().SetRangeUser(*defaultYRange)
+      except:pass
       if first:
         if p.style['style'] == "e":
           hcopy.Draw("e1")

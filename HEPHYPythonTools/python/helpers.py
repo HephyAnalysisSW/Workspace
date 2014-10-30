@@ -94,11 +94,21 @@ def passPUJetID(flag, level="Tight"): #Medium, #Loose,  kTight  = 0,   kMedium =
     l=2
   return ( flag & (1 << l) ) != 0
 
+def getVar(c, var, n=0):
+    l = c.GetLeaf(var)
+    try:
+       return l.GetValue(n)
+    except:
+      raise Exception("Unsuccessful getVarValue for leaf %s and index %i"%(var, n))
+
 def getVarValue(c, var, n=0):
   varNameHisto = var
   leaf = c.GetAlias(varNameHisto)
   if leaf!='':
-    return c.GetLeaf(leaf).GetValue(n)
+    try:
+      return c.GetLeaf(leaf).GetValue(n)
+    except:
+      raise Exception("Unsuccessful getVarValue for leaf %s and index %i"%(leaf, n))
   else:
     l = c.GetLeaf(var)
     if l:return l.GetValue(n)
