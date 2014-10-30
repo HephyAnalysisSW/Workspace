@@ -1,26 +1,33 @@
 import ROOT
-from math import sqrt, cos, sin, atan2
+from math import sqrt, cos, sin, atan2, acos
 
 ###Control Parameters###
-Mt = 'sqrt(2*leptonPt*met*(1-cos(metPhi-leptonPhi)))'
+mT = 'sqrt(2*leptonPt*met*(1-cos(metPhi-leptonPhi)))'
 Wx = 'met*cos(metPhi)+leptonPt*cos(leptonPhi)'
 Wy = 'met*sin(metPhi)+leptonPt*sin(leptonPhi)'
-WPhi = 'atan2('+Wy+','+Wx+')'
-WPT = 'sqrt(('+Wx+')**2+('+Wy+')**2)'
-StLep = 'sqrt(('+WPT+')**2+('+Mt+')**2)'
-#deltaPhi = 'abs(leptonPhi-'+WPhi+')'
+lx = 'leptonPt*cos(leptonPhi)'
+ly = 'leptonPt*sin(leptonPhi)'
+wPhi = 'atan2(('+Wy+'),('+Wx+'))'
+wPt = 'sqrt(('+Wx+')**2+('+Wy+')**2)'
+sTLep = 'sqrt(('+wPt+')**2+('+mT+')**2)'
+num = '(('+Wx+')*('+lx+'))+(('+Wy+')*('+ly+'))'
+den = '('+wPt+')*leptonPt'
+cosDPhi = '('+num+')/('+den+')'
+DPhi = 'acos(('+cosDPhi+'))'
 njets = 'njets'
 ht = 'ht'
 met = 'met'
 muCharge = '-(muPdg/abs(muPdg))'
 
-htCut = 500
-Stmin = 250
+htCut = 750
+Stmin = 350
 Stmax = 350
-
-presel = 'ht>'+str(htCut)+'&&'+str(StLep)+'>='+str(Stmin)+'&&'+str(StLep)+'<'+str(Stmax)+'&&njets>=6&&singleMuonic==1&&nbtags==0'
-#presel = 'ht>'+str(htCut)+'&&'+str(StLep)+'>='+str(Stmax)+'&&njets>=3&&singleMuonic==1&&nbtags==0'
+StCut1 = str(sTLep)+'>='+str(Stmin)+'&&'+str(sTLep)+'<'+str(Stmax)
+StCut2 = str(sTLep)+'>='+str(Stmax)
+#presel = 'ht>'+str(htCut)+'&&'+StCut1+'&&njets>=3&&singleMuonic==1&&nbtags==0'
+presel = 'ht>'+str(htCut)+'&&'+StCut2+'&&njets>=6&&singleMuonic==1&&nbtags==0'
 name = presel[0:].replace('&&','_')+'BkgStack_weighted_csvm0.679'
+Sel ='Int04Ht750St350njets6'
 
 samples = [
 {'chain':'WJets','path': '/data/schoef/convertedTuples_v25/copyMET/WJetsHTToLNu/histo_WJetsHTToLNu_from*'},\
@@ -30,18 +37,19 @@ samples = [
 ]
 
 plots = [ 
-  {'varname':'Mt',         'var':Mt,          'lowlimit':0,  'limit':1400},\
-  {'varname':'WPT',        'var':WPT,         'lowlimit':0,  'limit':1400},\
-  {'varname':'StLep',      'var':StLep,       'lowlimit':0,  'limit':1400},\
+  {'varname':'mT',         'var':mT,          'lowlimit':0,  'limit':1400},\
+  {'varname':'wPt',        'var':wPt,         'lowlimit':0,  'limit':1400},\
+  {'varname':'sTLep',      'var':sTLep,       'lowlimit':0,  'limit':1400},\
   {'varname':'njets',      'var':njets,       'lowlimit':0,  'limit':16},\
   {'varname':'met',        'var':met,         'lowlimit':0,  'limit':1400},\
   {'varname':'ht',         'var':ht,          'lowlimit':0,  'limit':2000},\
   {'varname':'muCharge',   'var':muCharge,    'lowlimit':-2, 'limit':2},\
+  {'varname':'DPhi',       'var':DPhi,        'lowlimit':0, 'limit':3.14},\
   ]
 
 for p in plots:
   print p['varname']
-  File = ROOT.TFile('/data/easilar/results2014/rootfiles/Signal_Bkg0'+p['varname']+'.root','RECREATE')
+  File = ROOT.TFile('/data/easilar/results2014/rootfiles/Signal_Bkg'+Sel+p['varname']+'.root','RECREATE')
   File.cd()
   for s in samples:
     chain = 'c'+s['chain']

@@ -1,6 +1,6 @@
 import ROOT
 import pickle
-from Workspace.RA4Analysis.stage2Tuples import ttJetsCSA1450ns, ttJetsCSA1425ns
+from Workspace.RA4Analysis.stage2Tuples import ttJetsCSA1450ns #, ttJetsCSA1425ns
 from array import array
 from localInfo import username
 import os, sys

@@ -1,101 +1,93 @@
 import ROOT
-from Workspace.RA4Analysis.stage2Tuples import *
+from Workspace.RA4Analysis.makeCompPlotDilep import DrawClosure
 from localInfo import username
 
 relIso=0.3
-ptCut = 15
+ptCut=15
+deltaPhiCut = '>1' ##larger than 1
+htCut     = 150
+metCut    = 150
+minNJets  =  3
+
 leptonID = "muIsPF&&(muIsGlobal||muIsTracker)&&muPt>"+str(ptCut)+"&&abs(muEta)<2.5"\
           +"&&abs(muDxy)<0.2&&abs(muDz)<0.5"\
           +"&&muRelIso<"+str(relIso)
 
-htCut     = 150
-metCut    = 150
-minNJets  =   3
+plots = [
+        {'varname':'MT',         'var':'mT',         'bin':25  ,   'lowlimit':0,  'limit':800},\
+        {'varname':'ST',         'var':'st',         'bin':25  ,   'lowlimit':0,  'limit':1400},\
+        {'varname':'NJets',      'var':'njets',      'bin':16  ,   'lowlimit':0,  'limit':16},\
+        {'varname':'MET',        'var':'met',        'bin':25  ,   'lowlimit':0,  'limit':800},\
+        {'varname':'HT',         'var':'ht',         'bin':25  ,   'lowlimit':0,  'limit':2000},\
+        {'varname':'PT',         'var':'muPt',       'bin':25  ,   'lowlimit':0,  'limit':800},\
+        {'varname':'DeltaPhi',   'var':'deltaPhi',   'bin':25  ,   'lowlimit':0,  'limit':3.14},\
+        ]
 
-#htCut     = 0
-#metCut    = 0
-#minNJets  =   0
-
-c = ROOT.TChain('Events')
-for b in ttJetsCSA1450ns['bins']:
-  c.Add(ttJetsCSA1450ns['dirname']+'/'+b+'/h*.root')
+truthSelection = 'weightTruth*(htTruth>'+str(htCut)+'&&njetsTruth>='+str(minNJets)+'&&metTruth>'+str(metCut)+')'
+predSelection = 'weightPred*scaleLEff*(htPred>'+str(htCut)+'&&njetsPred>='+str(minNJets)+'&&metPred>'+str(metCut)+')'
+predSelectionUp = 'weightPred*scaleLEffUp*(htPred>'+str(htCut)+'&&njetsPred>='+str(minNJets)+'&&metPred>'+str(metCut)+')'
+predSelectionDown = 'weightPred*scaleLEffDown*(htPred>'+str(htCut)+'&&njetsPred>='+str(minNJets)+'&&metPred>'+str(metCut)+')'
 
 cPred = ROOT.TChain('Events')
-cPred.Add('/data/easilar/results2014/muonTuples/CSA14_TTJets_diLep_relIso'+str(relIso)+'.root')
+cPred.Add('/data/easilar/results2014/muonTuples/CSA14_TTJets_dilep_New_relIso'+str(relIso)+'.root')
 
 cLost = ROOT.TChain('Events')
-cLost.Add('/data/easilar/results2014/muonTuples/CSA14_TTJets_Lost_relIso'+str(relIso)+'.root')
+cLost.Add('/data/easilar/results2014/muonTuples/CSA14_TTJets_Lost_New_relIso'+str(relIso)+'.root')
 
-#diLep     ="ngoodMuons==1&&nvetoMuons==1&&nvetoElectrons==0&&Sum$(gTauPt>15&&abs(gTauEta)<2.5&&gTauNENu+gTauNMuNu==1&&gTauNTauNu==1)==1"
-#diLepOpen ="ngoodMuons==1&&nvetoMuons==1&&nvetoElectrons==0&&Sum$(gTauNENu+gTauNMuNu==1&&gTauNTauNu==1)==1"
-#diLep   = "ngNuEFromW+ngNuMuFromW==2&&ngNuTauFromW==0"
+for p in plots:
+  histo = 'h'+p['varname']
+  histoPred = 'h'+p['varname']+'Pred'
+  histoPredUp = 'h'+p['varname']+'PredUp'
+  histoPredDown = 'h'+p['varname']+'PredDown'
+  histoname = histo
+  histonamePred = histoPred
+  histonamePredUp = histoPredUp
+  histonamePredDown = histoPredDown
 
-#Eff
-#diLep   =  "ngNuEFromW==0&&ngNuMuFromW==2&&ngNuTauFromW==0&&ngoodMuons==1&&nvetoMuons==1&&nvetoElectrons==0&&Sum$(gLepPt>15&&(abs(gLepEta)<2.1&&abs(gLepPdg)==13||abs(gLepEta)<2.4&&abs(gLepPdg)==11))==2"
-#diLep   =  "ngNuEFromW==0&&ngNuMuFromW==2&&ngNuTauFromW==0&&ngoodMuons==1&&nvetoMuons==1&&nvetoElectrons==0&&Sum$(gLepPt>"+str(ptCut)+"&&abs(gLepEta)<2.5&&abs(gLepPdg)==13)==2"
-#diLep   =  "ngNuEFromW==0&&ngNuMuFromW==2&&ngNuTauFromW==0&&ngoodMuons==1&&Sum$("+leptonID+")==1&&nvetoElectrons==0&&Sum$(gLepPt>"+str(ptCut)+"&&abs(gLepEta)<2.1&&abs(gLepPdg)==13)==2"
-#Acc
-#diLep   = "ngNuEFromW+ngNuMuFromW==2&&ngNuTauFromW==0&&Sum$(gLepPt>10&&(abs(gLepEta)<2.1&&abs(gLepPdg)==13||abs(gLepEta)<2.4&&abs(gLepPdg)==11))!=2"
-#diLepLost = "ngNuEFromW==0&&ngNuMuFromW==2"
-#diLep     ="ngNuMuFromW==2&&ngNuEFromW==0&&ngNuTauFromW==0&&ngoodMuons==1&&nvetoMuons==1&&nvetoElectrons==0&&Sum$(abs(gLepPdg)==13&&gLepPt>15&&abs(gLepEta)<2.1)==2"
-#diLepOpen ="ngNuEFromW==0&&ngNuMuFromW==2&&ngNuTauFromW==0&&ngoodMuons==1&&nvetoMuons==1&&nvetoElectrons==0"
+  histo = ROOT.TH1F(str(histo) ,str(histo),20,p['lowlimit'],p['limit'])
+  cLost.Draw(p['var']+'Truth>>'+str(histoname),truthSelection,'goff')
 
-#scaleF = (1-0.1741-0.1783)*0.1125/(0.1057+0.1075)
-#scaleF = (0.1741+0.1783)*0.1125/(0.1057)
-#scaleF = 1
+  histoPred = ROOT.TH1F(str(histoPred) ,str(histoPred),20,p['lowlimit'],p['limit'])
+  cPred.Draw(p['var']+'Pred>>'+str(histonamePred),predSelection,'goff')
 
-hMT = ROOT.TH1F('hMT', 'hMT',20,0,800)
-#cLost.Draw('GenMt>>hMT','GenWeight*(ht>'+str(htCut)+'&&njets>='+str(minNJets)+'&&met>'+str(metCut)+')')
-cLost.Draw('GenMt>>hMT','GenWeight*(met>'+str(metCut)+')')
-#c.Draw('sqrt(2.*met*leptonPt*(1-cos(leptonPhi-metphi)))>>hMT','weight*('+diLep+'&&ht>'+str(htCut)+'&&njets>='+str(minNJets)+'&&met>'+str(metCut)+')','goff')
+  histoPredUp = ROOT.TH1F(str(histoPredUp) ,str(histoPredUp),20,p['lowlimit'],p['limit'])
+  cPred.Draw(p['var']+'Pred>>'+str(histonamePredUp),predSelectionUp,'goff')
 
-#hMTOpen = ROOT.TH1F('hMTOpen', 'hMTOpen',20,0,800)
-#c.Draw('sqrt(2.*met*leptonPt*(1-cos(leptonPhi-metphi)))>>hMTOpen','weight*('+diLepOpen+'&&ht>'+str(htCut)+'&&njets>='+str(minNJets)+'&&met>'+str(metCut)+')','goff')
+  histoPredDown = ROOT.TH1F(str(histoPredDown) ,str(histoPredDown),20,p['lowlimit'],p['limit'])
+  cPred.Draw(p['var']+'Pred>>'+str(histonamePredDown),predSelectionDown,'goff')
 
-#diLep     ="ngoodMuons==1&&nvetoMuons==1&&nvetoElectrons==0&&Sum$(gTauPt>15&&abs(gTauEta)<2.5&&gTauNENu+gTauNMuNu==1&&gTauNTauNu==1)==1"
-#diLepOpen ="ngoodMuons==1&&nvetoMuons==1&&nvetoElectrons==0&&Sum$(gTauNENu+gTauNMuNu==1&&gTauNTauNu==1)==1"
-#diLep   = "ngNuEFromW+ngNuMuFromW==2&&ngNuTauFromW==0"
+  DrawClosure(histoPred,histo,histoPredUp,histoPredDown,p['varname'])
 
-#Eff
-#diLep   =  "ngNuEFromW==0&&ngNuMuFromW==2&&ngNuTauFromW==0&&ngoodMuons==1&&nvetoMuons==1&&nvetoElectrons==0&&Sum$(gLepPt>15&&(abs(gLepEta)<2.1&&abs(gLepPdg)==13||abs(gLepEta)<2.4&&abs(gLepPdg)==11))==2"
-#diLep   =  "ngNuEFromW==0&&ngNuMuFromW==2&&ngNuTauFromW==0&&ngoodMuons==1&&nvetoMuons==1&&nvetoElectrons==0&&Sum$(gLepPt>"+str(ptCut)+"&&abs(gLepEta)<2.5&&abs(gLepPdg)==13)==2"
-hMTPred = ROOT.TH1F('hMTPred', 'hMTPred',20,0,800)
-#cPred.Draw('mTPred>>hMTPred','weightPred*scaleLEff*(htPred>'+str(htCut)+'&&njetsPred>='+str(minNJets)+'&&metPred>'+str(metCut)+')','goff')
-cPred.Draw('mTPred>>hMTPred','weightPred*scaleLEff*(metPred>'+str(metCut)+')','goff')
 
-c1=ROOT.TCanvas()
-hMT.Draw()
-hMTPred.SetLineColor(ROOT.kRed)
-#hMTPred.Scale(scaleF)
-#hMTPred.Scale(hMT.Integral()/hMTPred.Integral())
-hMTPred.Draw('same')
-#hMTOpen.SetLineStyle(2)
-#hMTOpen.Draw('same')
-c1.SetLogy()
-c1.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/pngCSA14/compMT_diLep_relIso'+str(relIso)+'.png')
-
-#hHT = ROOT.TH1F('hHT', 'hHT',25,0,2500)
-#c.Draw('ht>>hHT','weight*('+diLep+'&&ht>'+str(htCut)+'&&njets>='+str(minNJets)+'&&met>'+str(metCut)+')','goff')
-#hHTPred = ROOT.TH1F('hHTPred', 'hHTPred',25,0,2500)
-#cPred.Draw('htPred>>hHTPred','weightPred*scaleLEff*(htPred>'+str(htCut)+'&&njetsPred>='+str(minNJets)+'&&metPred>'+str(metCut)+')','goff')
-#c1=ROOT.TCanvas()
-#hHTPred.SetLineColor(ROOT.kRed)
-#hHTPred.Scale(scaleF)
-##hHTPred.Scale(hHT.Integral()/hHTPred.Integral())
-#hHTPred.Draw()
-#hHT.Draw('same')
-#c1.SetLogy()
-#c1.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/pngCSA14/compHT_diLep_relIso'+str(relIso)+'.png')
 #
-#hNJet = ROOT.TH1F('hNJet', 'hNJet',12,0,12)
-#c.Draw('njets>>hNJet','weight*('+diLep+'&&ht>'+str(htCut)+'&&njets>='+str(minNJets)+'&&met>'+str(metCut)+')','goff')
-#hNJetPred = ROOT.TH1F('hNJetPred', 'hNJetPred',12,0,12)
-#cPred.Draw('njetsPred>>hNJetPred','weightPred*scaleLEff*(htPred>'+str(htCut)+'&&njetsPred>='+str(minNJets)+'&&metPred>'+str(metCut)+')','goff')
-#c1=ROOT.TCanvas()
-#hNJetPred.SetLineColor(ROOT.kRed)
-#hNJetPred.Scale(scaleF)
-##hNJetPred.Scale(hNJet.Integral()/hNJetPred.Integral())
-#hNJetPred.Draw()
-#hNJet.Draw('same')
-#c1.SetLogy()
-#c1.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/pngCSA14/compNJet_diLep_relIso'+str(relIso)+'.png')
+# hPTLost = ROOT.TH1F('hPTLost', 'hPTLost',25,0,1000)
+# cLost.Draw('ptLostTruth>>hPTLost','weightTruth*(htTruth>'+str(htCut)+'&&njetsTruth>='+str(minNJets)+'&&metTruth>'+str(metCut)+')','goff')
+# hPTLostPred = ROOT.TH1F('hPTLostPred', 'hPTLostPred',25,0,1000)
+# cPred.Draw('muPtLoose>>hPTLostPred','weightPred*scaleLEff*(htPred>'+str(htCut)+'&&njetsPred>='+str(minNJets)+'&&metPred>'+str(metCut)+')','goff')
+# hPTLostPredUp = ROOT.TH1F('hPTLostPredUp', 'hPTLostPredUp',25,0,1000)
+# cPred.Draw('muPtLoose>>hPTLostPredUp','weightPred*scaleLEffUp*(htPred>'+str(htCut)+'&&njetsPred>='+str(minNJets)+'&&metPred>'+str(metCut)+')','goff')
+# hPTLostPredDown = ROOT.TH1F('hPTLostPredDown', 'hPTLostPredDown',25,0,1000)
+# cPred.Draw('muPtLoose>>hPTLostPredDown','weightPred*scaleLEffDown*(htPred>'+str(htCut)+'&&njetsPred>='+str(minNJets)+'&&metPred>'+str(metCut)+')','goff')
+#
+# DrawClosure(hPTLostPred,hPTLost,hPTLostPredUp,hPTLostPredDown,'PTLost')
+#
+##For Statistics##
+hDeltaPhiStat = ROOT.TH1F('hDeltaPhiStat', 'hDeltaPhiStat',20,0,3.14)
+hDeltaPhiStat.Sumw2() 
+cLost.Draw('deltaPhiTruth>>hDeltaPhiStat','weightTruth*(deltaPhiTruth'+deltaPhiCut+'&&htTruth>'+str(htCut)+'&&njetsTruth>='+str(minNJets)+'&&metTruth>'+str(metCut)+')','goff')
+hDeltaPhiPredStat = ROOT.TH1F('hDeltaPhiPredStat', 'hDeltaPhiPredStat',20,0,3.14)
+hDeltaPhiPredStat.Sumw2()
+cPred.Draw('deltaPhiPred>>hDeltaPhiPredStat','weightPred*scaleLEff*(deltaPhiPred'+deltaPhiCut+'&&htPred>'+str(htCut)+'&&njetsPred>='+str(minNJets)+'&&metPred>'+str(metCut)+')','goff')
+hDeltaPhiPredUpStat = ROOT.TH1F('hDeltaPhiPredUpStat', 'hDeltaPhiPredUpStat',20,0,3.14)
+hDeltaPhiPredUp.Sumw2()
+cPred.Draw('deltaPhiPred>>hDeltaPhiPredUpStat','weightPred*scaleLEffUp*(deltaPhiPred'+deltaPhiCut+'&&htPred>'+str(htCut)+'&&njetsPred>='+str(minNJets)+'&&metPred>'+str(metCut)+')','goff')
+
+ePred = ROOT.Double()
+eTruth = ROOT.Double()
+predYield = hDeltaPhiPredStat.IntegralAndError(0,hDeltaPhiPredStat.GetNbinsX(),ePred)
+truthYield = hDeltaPhiStat.IntegralAndError(0,hDeltaPhiStat.GetNbinsX(),eTruth)
+
+print 'ht:', htCut,'met:',metCut,'njets:',minNJets
+print 'deltaPhi>1:', 'Prediction yield:', predYield, 'ePred :', ePred, 'Truth yield:', truthYield,'eTruth:', eTruth, '%10Leff:', abs(hDeltaPhiPredUpStat.Integral()-predYield)
+
+

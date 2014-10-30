@@ -1,9 +1,10 @@
 import ROOT
 from math import *
-parameter = ['Mt','WPT','StLep','njets','met','ht','muCharge']
+Sel = 'Int04Ht750St350njets6'
+parameter = ['Mt','WPT','StLep','njets','met','ht','muCharge','DPhi']
 for p in range(len(parameter)):
   print 'Parameter',parameter[p]
-  filename = '/data/easilar/results2014/rootfiles/Signal_Bkg0'+str(parameter[p])+'.root'
+  filename = '/data/easilar/results2014/rootfiles/Signal_Bkg'+Sel+str(parameter[p])+'.root'
   plot1 = 'h_ttJets'
   plot2 = 'h_WJets'
   plot3 = 'h_T51200'
@@ -43,10 +44,11 @@ for p in range(len(parameter)):
   leg.Draw()
   can.SetLogy()
   can.Update()
-  can.SaveAs("/afs/hephy.at/user/e/easilar/www/21"+parameter[p]+plot1name+plot2name+plot3name+plot4name+"0.png")
+  #can.SaveAs("/afs/hephy.at/user/e/easilar/www/"+Sel+parameter[p]+plot1name+plot2name+plot3name+plot4name+".png")
+  can.SaveAs("/afs/hephy.at/user/e/easilar/www/"+Sel+parameter[p]+".png")
 
   relUncert = 0.2
-  Signal_Yield = histo4.Integral()
+  Signal_Yield = histo3.Integral()
   Bkg_Yield = histo2.Integral() + histo1.Integral() 
   FOM = Signal_Yield/sqrt((relUncert*Bkg_Yield)**2+Bkg_Yield) 
   print 'Signal:', Signal_Yield
