@@ -2,7 +2,7 @@
 #for name in `ls -d 8TeV-WJetsToLNu_HT-* 8TeV*TTJets*`
 #for name in `ls -d TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola_Spring14miniaod-PU20bx25_POSTLS170_V5-v1`
 #for name in `ls -d T5Full*`
-for name in `ls -d WJetsToLNu_HT*tauola/*`
+for name in `ls -d ZJetsToNuNu_HT*tauola/*`
 do
   tokens
   crab $1 $2 -c $name 

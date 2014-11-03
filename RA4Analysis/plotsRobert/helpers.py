@@ -38,27 +38,33 @@ def cmgST(c):
   
 
 def nameAndCut(stb, htb, njetb, presel, charge=""):
-  cut=presel+'&&st>='+str(stb[0])
-  name='st'+str(stb[0])
-  if stb[1]>0:
-    cut+='&&st<'+str(stb[1])
-    name+='-'+str(stb[1])
-  cut+='&&htJet40ja>='+str(htb[0])
-  name+='_ht'+str(htb[0])
-  if htb[1]>0:
-    cut+='&&htJet40ja<'+str(htb[1])
-    name+='-'+str(htb[1])
-  cut+='&&nJet40a>='+str(njetb[0])
-  name+='_njet'+str(njetb[0])
-  if len(njetb)>1 and njetb[1]>0:
-    cut+='&&nJet40a<='+str(njetb[1])
-    name+='-'+str(njetb[1])
+  cut=presel
+  name=""
+  if stb:
+    cut+='&&st>='+str(stb[0])
+    name+='st'+str(stb[0])
+    if stb[1]>0:
+      cut+='&&st<'+str(stb[1])
+      name+='-'+str(stb[1])
+  if htb:
+    cut+='&&htJet40ja>='+str(htb[0])
+    name+='_ht'+str(htb[0])
+    if htb[1]>0:
+      cut+='&&htJet40ja<'+str(htb[1])
+      name+='-'+str(htb[1])
+  if njetb:
+    cut+='&&nJet40a>='+str(njetb[0])
+    name+='_njet'+str(njetb[0])
+    if len(njetb)>1 and njetb[1]>0:
+      cut+='&&nJet40a<='+str(njetb[1])
+      name+='-'+str(njetb[1])
   if charge.lower()=='pos':
     cut+='&&leptonPdg<0'
     name+='_posCharge'
   if charge.lower()=='neg':
     cut+='&&leptonPdg>0'
     name+='_negCharge'
+  if name.startswith('_'):name=name[1:]
   return [name, cut]
 
 
