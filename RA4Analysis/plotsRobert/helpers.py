@@ -37,7 +37,7 @@ def cmgST(c):
   return  met+leptonPt 
   
 
-def nameAndCut(stb, htb, njetb, presel, charge=""):
+def nameAndCut(stb, htb, njetb, btb, presel="(1)", charge=""):
   cut=presel
   name=""
   if stb:
@@ -58,6 +58,12 @@ def nameAndCut(stb, htb, njetb, presel, charge=""):
     if len(njetb)>1 and njetb[1]>0:
       cut+='&&nJet40a<='+str(njetb[1])
       name+='-'+str(njetb[1])
+  if btb:
+    cut+='&&nBJetMedium40>='+str(btb[0])
+    name+='_nbtag'+str(btb[0])
+    if len(btb)>1 and btb[1]>0:
+      cut+='&&nBJetMedium40<='+str(btb[1])
+      name+='-'+str(btb[1])
   if charge.lower()=='pos':
     cut+='&&leptonPdg<0'
     name+='_posCharge'

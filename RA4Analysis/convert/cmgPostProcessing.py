@@ -18,10 +18,10 @@ ROOT.AutoLibraryLoader.enable()
 
 #defSampleStr = "WJetsToLNu_HT100to200,WJetsToLNu_HT200to400,WJetsToLNu_HT400to600,WJetsToLNu_HT600toInf"
 #defSampleStr = "WJetsToLNu_HT200to400,WJetsToLNu_HT400to600,WJetsToLNu_HT600toInf"
-defSampleStr = "WJetsToLNu_HT600toInf"
+#defSampleStr = "WJetsToLNu_HT600toInf"
 #defSampleStr = "ttJetsCSA1450ns"
 #defSampleStr = "T5Full_1200_1000_800,T5Full_1500_800_100"
-
+defSampleStr = "T1qqqq_1400_325_300"
 from optparse import OptionParser
 parser = OptionParser()
 parser.add_option("--samples", dest="allsamples", default=defSampleStr, type="string", action="store", help="samples:Which samples.")

@@ -1,4 +1,10 @@
 import copy, os, sys
+T1qqqq_1400_325_300={\
+"name" : "T1qqqq_1400_325_300",
+"chunkString": "T1qqqq_1400_325_300",
+'dir' : "/data/schoef/cmgTuples/v0/",
+'dbsName':'T1qqqq_1400_325_300'
+}
 
 T5Full_1200_1000_800={\
 "name" : "T5Full_1200_1000_800",

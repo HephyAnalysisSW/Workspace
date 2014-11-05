@@ -53,24 +53,29 @@ def getFileList(dir, minAgeDPM=0, histname='histo', xrootPrefix='root://hephyse.
     filelist = filelist[:maxN]
   return filelist
 
-def getChain(s, minAgeDPM=0, histname='histo', xrootPrefix='root://hephyse.oeaw.ac.at/', maxN=-1):
+def getChain(sL, minAgeDPM=0, histname='histo', xrootPrefix='root://hephyse.oeaw.ac.at/', maxN=-1):
+  if not type(sL)==type([]):
+    sList = [sL]
+  else:
+    sList= sL 
   c = ROOT.TChain('Events')
-  if type(s)==type(""):
-    i=0
-    for f in getFileList(s, minAgeDPM, histname, xrootPrefix, maxN):
-      i+=1
-      c.Add(f)
-    print "Added ",i,'files from dir',s
-    return c
-  if type(s)==type({}):
-    i=0
-    for b in s['bins']:
-      dir = s['dirname'] if s.has_key('dirname') else s['dir']
-      for f in getFileList(dir+'/'+b, minAgeDPM, histname, xrootPrefix, maxN):
+  for s in sList:
+    if type(s)==type(""):
+      i=0
+      for f in getFileList(s, minAgeDPM, histname, xrootPrefix, maxN):
         i+=1
         c.Add(f)
-    print "Added ",i,'files from sample',s['name'],'dir',dir,'bins',s['bins']
-    return c
+      print "Added ",i,'files from dir',s
+      return c
+    if type(s)==type({}):
+      i=0
+      for b in s['bins']:
+        dir = s['dirname'] if s.has_key('dirname') else s['dir']
+        for f in getFileList(dir+'/'+b, minAgeDPM, histname, xrootPrefix, maxN):
+          i+=1
+          c.Add(f)
+      print "Added ",i,'files from sample',s['name'],'dir',dir,'bins',s['bins']
+  return c
 
 def getObjFromFile(fname, hname):
   f = ROOT.TFile(fname)
@@ -136,6 +141,18 @@ def getCutYieldFromChain(c, cutString = "(1)", cutFunc = None, weight = "weight"
     return res, resVar
   return res
 
+def getYieldFromChain(c, cutString = "(1)", weight = "weight", returnError=False):
+  h = ROOT.TH1F('h_tmp', 'h_tmp', 1,0,2)
+  h.Sumw2()
+  c.Draw("1>>h_tmp", weight+"*("+cutString+")", 'goff')
+  res = h.GetBinContent(1)
+  resErr = h.GetBinError(1)
+#  print "1>>h_tmp", weight+"*("+cutString+")",res,resErr
+  del h
+  if returnError:
+    return res, resErr
+  return res 
+
 def getPlotFromChain(c, var, binning, cutString = "(1)", weight = "weight", binningIsExplicit=False, addOverFlowBin=''):
   if binningIsExplicit:
     h = ROOT.TH1F('h_tmp', 'h_tmp', len(binning)-1, array('d', binning))
@@ -153,7 +170,6 @@ def getPlotFromChain(c, var, binning, cutString = "(1)", weight = "weight", binn
   if addOverFlowBin.lower() == "lower" or addOverFlowBin.lower() == "both":
     res.SetBinContent(1 , res.GetBinContent(0) + res.GetBinContent(1))
     res.SetBinError(1 , sqrt(res.GetBinError(0)**2 + res.GetBinError(1)**2))
-
   return res
 
 #def getValue(chain, varname):

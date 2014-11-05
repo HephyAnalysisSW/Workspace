@@ -35,6 +35,7 @@ xsec['/WJetsToLNu_HT-600toInf_Tune4C_13TeV-madgraph-tauola/Spring14dr-PU_S14_POS
 from xsecSMS import gluino13TeV_NLONLL
 xsec['/T5Full_T5Full-1200-1000-800-Decay-MGMMatch50/schoef-T5Full_T5Full-1200-1000-800-Decay-MGMMatch50-miniAOD-92bfc1aa0ef8c674e0edabb945b19298/USER'] = gluino13TeV_NLONLL[1200] 
 xsec['/T5Full_T5Full-1500-800-100-Decay-MGMMatch50/schoef-T5Full_T5Full-1500-800-100-Decay-MGMMatch50-miniAOD-92bfc1aa0ef8c674e0edabb945b19298/USER'] = gluino13TeV_NLONLL[1500]
+xsec['T1qqqq_1400_325_300'] = gluino13TeV_NLONLL[1400]
 
 ##------------------------------------------------------------
 ##SUMMER 12
