@@ -35,11 +35,11 @@ WJetsHTToLNu["dirname"] = "/data/schoef/convertedTuples_v25/copyMET/"
 
 T5Full_1200_1000_800={}
 T5Full_1200_1000_800["name"]     = "T5Full_1200_1000_800"
-T5Full_1200_1000_800["bins"]     = "T5Full_1200_1000_800"
+T5Full_1200_1000_800["bins"]     = ["T5Full_1200_1000_800"]
 T5Full_1200_1000_800["dirname"] = "/data/schoef/convertedTuples_v25/copyMET/" 
 
 T5Full_1500_800_100={}
 T5Full_1500_800_100["name"]     = "T5Full_1500_800_100"
-T5Full_1500_800_100["bins"]     = "T5Full_1500_800_100"
+T5Full_1500_800_100["bins"]     = ["T5Full_1500_800_100"]
 T5Full_1500_800_100["dirname"] = "/data/schoef/convertedTuples_v25/copyMET/" 
 

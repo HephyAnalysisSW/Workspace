@@ -79,6 +79,7 @@ def readVar(v, allowRenaming, isWritten, isRead, makeVecType=False):
     else:
       stage1 = v
     assert stage1.count('/')==1, "Frow %s want to read %s but did not find a slash in stage1 part. Syntax: 'stage1/typeStage1[:stage2/typeStage2] or stage1/typeStage1[:stage2/typeStage2/default]"%(v, stage1)
+    defString=None
     if stage1.count('/')==1:
       stage1Name, stage1Type = stage1.split('/')
     else:
@@ -87,6 +88,10 @@ def readVar(v, allowRenaming, isWritten, isRead, makeVecType=False):
     if makeVecType:
       res['stage1Type']='vector<'+res['stage1Type']+'>'
     res['stage1Name']=stage1Name
+    if defString:
+      res['default']=defString
+    else:
+      res['default']=typeDefaults(stage1Type)
   if isWritten:
     if v.count(':'):
       stage2 = v.split(":")[1]
@@ -98,7 +103,6 @@ def readVar(v, allowRenaming, isWritten, isRead, makeVecType=False):
       stage2Name, stage2Type = stage2.split('/')
     else:
       stage2Name, stage2Type, defString = stage2.split('/')
-    stage2Name, stage2Type = stage2.split('/')
     res['stage2Type']=stage2Type
     res['stage2Name']=stage2Name
     if defString:

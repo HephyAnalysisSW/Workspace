@@ -113,11 +113,12 @@ def loopAndFill(stacks):
 
       c = ROOT.TChain('Events')
       counter=0
-      for f in getFileList(s['dirname']+'/'+b):#, minAgeDPM, histname, xrootPrefix, maxN):
+      dir = s['dirname'] if s.has_key('dirname') else s['dir']
+      for f in getFileList(dir+'/'+b):#, minAgeDPM, histname, xrootPrefix, maxN):
         counter+=1
         c.Add(f)
       ntot = c.GetEntries()
-      print "Added ",counter,'files from sample',s['name'],'dir',s['dirname'],'bin',b,'ntot',ntot
+      print "Added ",counter,'files from sample',s['name'],'dir',dir,'bin',b,'ntot',ntot
       if ntot==0:
         print "Warning! Found zero events in",s['name'],'bin',b," -> do nothing"
         continue
@@ -127,7 +128,7 @@ def loopAndFill(stacks):
         c.Draw(">>eList",cutString)
         elist = ROOT.gDirectory.Get("eList")
         number_events = elist.GetN()
-        print "Reading: ", s["name"], b, "with",number_events,"events passing cutString", cutString, 'and will fill these vars:',[(v.name, v) for v in varsToFill]
+        print "Reading: ", s["name"], b, "with",number_events,"events passing cutString", cutString, 'and will fill these vars: '+" ".join([v.name for v in varsToFill])
         for v in varsToFill:
           if not (v.cut.has_key('func') and v.cut['func']):
             v.cut['func']=None
@@ -244,21 +245,19 @@ def drawStack(stk):
         hcopy.SetLineStyle(2)
 #      if p.style.has_key('thickNess') and  p.style['thickNess']:
       try:
-        hcopy.SetLineWidth(p.style['thickNess'])
+        hcopy.SetLineWidth(p.style['lineThickness'])
       except:pass
       stuff.append(hcopy)
       if stk.options.has_key('logY') and stk.options['logY']:
         defaultYRange = [0.7, 1.5*hcopy.GetMaximum()]
       else:
         defaultYRange = [0, 1.2*hcopy.GetMaximum()]
-      try:
-        if not isinstance(stk.options['yRange'][0], numbers.Number):stk.options['yRange'][0]=defaultYRange[0]#If yRange contains 'None' use default
-        if not isinstance(stk.options['yRange'][1], numbers.Number):stk.options['yRange'][1]=defaultYRange[1]#If yRange contains 'None' use default
-      except:pass
+      hcopy.GetYaxis().SetRangeUser(*defaultYRange)
+      if not isinstance(stk.options['yRange'][0], numbers.Number):stk.options['yRange'][0]=defaultYRange[0]#If yRange contains 'None' use default
+      if not isinstance(stk.options['yRange'][1], numbers.Number):stk.options['yRange'][1]=defaultYRange[1]#If yRange contains 'None' use default
       try:
         hcopy.GetYaxis().SetRangeUser(*(stk.options['yRange']) )
-      except:
-        hcopy.GetYaxis().SetRangeUser(*defaultYRange)
+      except:pass
       if first:
         if p.style['style'] == "e":
           hcopy.Draw("e1")
