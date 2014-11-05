@@ -6,11 +6,12 @@ from localInfo import username
 import os, sys
 
 c = ROOT.TChain('Events')
-for b in ttJetsCSA1450ns['bins']:
-  c.Add(ttJetsCSA1450ns['dirname']+'/'+b+'/histo_ttJetsCSA1450ns_from*.root')
+#for b in ttJetsCSA1450ns['bins']:
+#  c.Add(ttJetsCSA1450ns['dirname']+'/'+b+'/histo_ttJetsCSA1450ns_from*.root')
 #c.Add('/data/schoef/convertedTuples_v25/copyMET/ttJetsCSA1450ns/histo_ttJetsCSA1450ns_from*')
+c.Add('/data/schoef/convertedTuples_v24/copyInc/ttJetsCSA1450ns/histo_ttJetsCSA1450ns_from*')
 
-Lepton = {'muon':False,'electron': False, 'tau': True}
+Lepton = {'muon':True,'electron': False, 'tau': False}
 
 ROOT.gStyle.SetOptStat(0)
 
@@ -21,10 +22,11 @@ ptBinsCoarse  = array('d', [float(x) for x in range(10, 20)+range(20,50,5)+range
 etaBinsCoarse = array('d', [float(x)/10. for x in [-30,-25]+range(-21,22,6)+[25,30]])
 
 
-hadPresel="ht>150&&njets>=3"    ##Met condition removed because for prediction I need Met<150 also.   
-diLepSelection ="&&ngNuMuFromW==2&&ngNuEFromW==0"
+#hadPresel="ht>150&&njets>=3"    ##Met condition removed because for prediction I need Met<150 also.   
+hadPresel=""    ##Met condition removed because for prediction I need Met<150 also.   
+diLepSelection ="ngNuMuFromW==2&&ngNuEFromW==0"
 #for relIso in [0.2,0.1,0.15,0.25,0.3,0.35]:
-for relIso in [0.3]:
+for relIso in [0.1,0.3]:
   ptCut=15
   leptonID = "muIsPF[gLepInd]&&(muIsGlobal[gLepInd]||muIsTracker[gLepInd])&&muPt[gLepInd]>"+str(ptCut)+"&&abs(muEta[gLepInd])<2.5"\
             +"&&abs(muDxy[gLepInd])<0.2&&abs(muDz[gLepInd])<0.5"\
