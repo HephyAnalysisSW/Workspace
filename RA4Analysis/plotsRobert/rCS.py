@@ -5,7 +5,7 @@ cWJets  = getChain(WJetsHTToLNu)
 cTTJets = getChain(ttJetsCSA1450ns)
 cSignal1200 = getChain(T5Full_1200_1000_800)
 cSignal1500 = getChain(T5Full_1500_800_100)
-from helpers import nameAndCut
+from helpers import nameAndCut, nJetBinName,nBTagBinName,varBinName
 from math import pi, sqrt
 
 ROOT_colors = [ROOT.kBlack, ROOT.kRed-7, ROOT.kBlue-2, ROOT.kGreen+3, ROOT.kOrange+1,ROOT.kRed-3, ROOT.kAzure+6, ROOT.kCyan+3, ROOT.kOrange , ROOT.kRed-10]
@@ -30,21 +30,6 @@ htreg = [(400,500),(500,750),(750, -1)]
 njreg = [(2,2),(3,3),(4,4),(5,-1),(6,-1)]
 
 
-def nJetBinName(njb):
-  n=str(list(njb)[0])+"#leq n_{jet}"
-  if len(njb)>1 and njb[1]>-1:
-    n+='#leq '+str(njb[1])
-  return n
-def nBTagBinName(btb):
-  n=str(list(btb)[0])+"#leq n_{b-tag}"
-  if len(btb)>1 and btb[1]>-1:
-    n+='#leq '+str(btb[1])
-  return n
-def varBinName(vb, var):
-  n=str(list(vb)[0])+"< "+var
-  if len(vb)>1 and vb[1]>0:
-    n+='< '+str(vb[1])
-  return n
 
 #prefix = 'reduced'
 #presel="singleMuonic&&nVetoMuons==1&&nVetoElectrons==0&&nBJetMedium40==1"

@@ -35,9 +35,25 @@ def cmgST(c):
   met=c.GetLeaf('met_pt').GetValue()
   leptonPt=c.GetLeaf('leptonPt').GetValue()
   return  met+leptonPt 
+
+def nJetBinName(njb):
+  n=str(list(njb)[0])+"#leq n_{jet}"
+  if len(njb)>1 and njb[1]>-1:
+    n+='#leq '+str(njb[1])
+  return n
+def nBTagBinName(btb):
+  n=str(list(btb)[0])+"#leq n_{b-tag}"
+  if len(btb)>1 and btb[1]>-1:
+    n+='#leq '+str(btb[1])
+  return n
+def varBinName(vb, var):
+  n=str(list(vb)[0])+"< "+var
+  if len(vb)>1 and vb[1]>0:
+    n+='< '+str(vb[1])
+  return n
   
 
-def nameAndCut(stb, htb, njetb, btb, presel="(1)", charge=""):
+def nameAndCut(stb, htb, njetb, btb=None, presel="(1)", charge="", btagVar = 'nBJetMedium40'):
   cut=presel
   name=""
   if stb:
@@ -55,14 +71,14 @@ def nameAndCut(stb, htb, njetb, btb, presel="(1)", charge=""):
   if njetb:
     cut+='&&nJet40a>='+str(njetb[0])
     name+='_njet'+str(njetb[0])
-    if len(njetb)>1 and njetb[1]>0:
+    if len(njetb)>1 and njetb[1]>=0:
       cut+='&&nJet40a<='+str(njetb[1])
       name+='-'+str(njetb[1])
   if btb:
-    cut+='&&nBJetMedium40>='+str(btb[0])
+    cut+='&&'+btagVar+'>='+str(btb[0])
     name+='_nbtag'+str(btb[0])
-    if len(btb)>1 and btb[1]>0:
-      cut+='&&nBJetMedium40<='+str(btb[1])
+    if len(btb)>1 and btb[1]>=0:
+      cut+='&&'+btagVar+'<='+str(btb[1])
       name+='-'+str(btb[1])
   if charge.lower()=='pos':
     cut+='&&leptonPdg<0'

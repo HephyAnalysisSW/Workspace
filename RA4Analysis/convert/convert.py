@@ -228,7 +228,7 @@ for isample, sample in enumerate(allSamples):
     if options.chmode=="copyMET":
       commoncf = "slimmedMETs>=100&&Sum$((muonsDz>0.05||muonsDxy>0.02)&&muonsPt>20)==0"
     if options.chmode[:7] == "copyInc":
-      commoncf = "(1)"
+      commoncf = "Sum$((muonsDz>0.05||muonsDxy>0.02)&&muonsPt>20)==0"
     if sample.has_key("additionalCut"):
       if type(sample["additionalCut"])==type({}):
         if sample["additionalCut"].has_key(bin):
@@ -267,8 +267,8 @@ for isample, sample in enumerate(allSamples):
       labels[bds[i].productInstanceName()] = tuple(bds[i].branchName().replace('.','').split('_')[1:3])
        
     if options.small:
-      if number_events>101:
-        number_events=101
+      if number_events>1001:
+        number_events=1001
     start = int(options.fromPercentage/100.*number_events)
     stop  = int(options.toPercentage/100.*number_events)
     print "Reading: ", sample["name"]
