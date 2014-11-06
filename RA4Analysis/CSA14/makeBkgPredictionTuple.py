@@ -15,7 +15,7 @@ c = ROOT.TChain('Events')
 #mode='dilep'
 c.Add('/data/schoef/convertedTuples_v24/copyInc/ttJetsCSA1450ns/histo_ttJetsCSA1450ns_from*')
 mode='dilep'
-relIso = 0.1
+relIso = 0.12
 effUp = 1.1
 effDown = 0.9
 small = False
@@ -73,7 +73,7 @@ def getTypeStr(s):
   if s=='I': return 'Int_t'
 
 copyVars  = ['event/l','nbtags/I', 'njets/I', 'ht/F', 'met/F', 'metphi/F', 'nvetoMuons/I']
-newVars   = ['njetsPred/I','looserelIsoPred','relIsoPred/F','hardestJetPtPred/F','nbtagsPred/F','eff/F','combFac/I' ,'lostPtPred/F','lostEtaPred/F','lostPhiPred/F','htPred/F','ptPred/F','etaPred/F','phiPred/F','wPhiPred/F','wPtPred/F','stPred/F' ,'metPred/F', 'metphiPred/F','weightPred/F', 'mTPred/F', 'weight/F', 'scaleLEff/F','scaleLEffUp/F','scaleLEffDown/F','deltaPhiPred/F']
+newVars   = ['njetsPred/I','lostRelIsoPred/F','relIsoPred/F','hardestJetPtPred/F','nbtagsPred/F','eff/F','combFac/I' ,'lostPtPred/F','lostEtaPred/F','lostPhiPred/F','htPred/F','ptPred/F','etaPred/F','phiPred/F','wPhiPred/F','wPtPred/F','stPred/F' ,'metPred/F', 'metphiPred/F','weightPred/F', 'mTPred/F', 'weight/F', 'scaleLEff/F','scaleLEffUp/F','scaleLEffDown/F','deltaPhiPred/F']
 vars      = copyVars+newVars  
 
 structString = "struct MyStruct{"
@@ -120,7 +120,7 @@ for i in range(number_events):
   looseMuons = filter(lambda x:x['isLoose'], allMuons) 
   #2.2 Get loose and tight matched muons
   looseMatchedMuons = filter(lambda x:x['isLoose'] and x['hasMatch'], allMuons) 
-
+  tightMatchedMuons = filter(lambda x:x['isTight'] and x['hasMatch'], allMuons)
   ##Get Jets
   njets = getVarValue(c, 'njetCount')
   jets = getGoodJetsStage2(c)
@@ -131,7 +131,7 @@ for i in range(number_events):
     jetsPt.append(jetPt)
   if njets >0: hardestJetPt = max(jetsPt)
 
-  if (len(allMuons)==2 and len(looseMatchedMuons)==2 and len(gLepsInAcc)==2) :
+  if (len(allMuons)==2 and len(looseMatchedMuons)==2 and len(tightMatchedMuons)>=1 and len(gLepsInAcc)==2) :
     assert len(looseMatchedMuons)==2, "Problem in event "+str(int(c.GetLeaf('event').GetValue()))
     if looseMuons[0]['isTight'] and looseMuons[1]['isTight']:
       s.combFac = 0.5
@@ -181,7 +181,7 @@ for i in range(number_events):
             s.deltaPhiPred = deltaPhi(s.wPhiPred,m2['phi'])
             s.hardestJetPtPred = hardestJetPt
             s.relIsoPred = m2['relIso']
-            s.looserelIsoPred = m['relIso']
+            s.lostRelIsoPred = m['relIso']
             t.Fill()
             if small:
               print 'met:' , s.metPred

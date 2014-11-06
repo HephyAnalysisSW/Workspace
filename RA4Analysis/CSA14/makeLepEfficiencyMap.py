@@ -26,7 +26,7 @@ etaBinsCoarse = array('d', [float(x)/10. for x in [-30,-25]+range(-21,22,6)+[25,
 hadPresel=""    ##Met condition removed because for prediction I need Met<150 also.   
 diLepSelection ="ngNuMuFromW==2&&ngNuEFromW==0"
 #for relIso in [0.2,0.1,0.15,0.25,0.3,0.35]:
-for relIso in [0.1,0.3]:
+for relIso in [0.12]:
   ptCut=15
   leptonID = "muIsPF[gLepInd]&&(muIsGlobal[gLepInd]||muIsTracker[gLepInd])&&muPt[gLepInd]>"+str(ptCut)+"&&abs(muEta[gLepInd])<2.5"\
             +"&&abs(muDxy[gLepInd])<0.2&&abs(muDz[gLepInd])<0.5"\

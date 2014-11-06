@@ -2,7 +2,7 @@ import ROOT
 from Workspace.RA4Analysis.makeCompPlotDilep import DrawClosure
 from localInfo import username
 
-relIso=0.1
+relIso=0.12
 ptCut=15
 deltaPhiCut = '>1' ##larger than 1
 htCut     = 0
@@ -35,6 +35,7 @@ plots = [
         {'var':'wPt',          'bin':100  ,   'lowlimit':0,  'limit':1000},\
         {'var':'hardestJetPt', 'bin':100  ,   'lowlimit':0,  'limit':1000},\
         {'var':'relIso',       'bin':100  ,   'lowlimit':0,  'limit':0.2},\
+        {'var':'lostRelIso',       'bin':100  ,   'lowlimit':0,  'limit':0.4},\
         ]
 
 
