@@ -1,6 +1,6 @@
 import ROOT
 from math import *
-#from helpers import getVarValue, deltaPhi, minAbsDeltaPhi,  deltaR, invMass,
+#from Workspace.RA4Analysis.helpers import getVarValue, deltaPhi, minAbsDeltaPhi,  deltaR, invMass,
 from Workspace.HEPHYPythonTools.helpers import getVarValue, getChain
 
 from Workspace.RA4Analysis.stage2Tuples import WJetsHTToLNu, WJetsToLNu25ns

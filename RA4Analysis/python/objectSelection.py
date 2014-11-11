@@ -219,7 +219,7 @@ def tightPOGMuID(mu):
   return mu['IsGlobal'] and mu['IsPF'] and mu['pt']>20 and abs(mu['eta'])<2.1 and mu['relIso']<0.12 and mu['NormChi2']<=10 and mu['NValMuonHits']>0\
      and mu['NumMatchedStations']>1 and mu['PixelHits']>0 and mu['NumtrackerLayerWithMeasurement']>5 and abs(mu['Dxy'])<0.02 and abs(mu['Dz'])<0.5
 
-def vetoMuID(mu, relIso=0.2):
+def vetoMuID(mu, relIso=0.3):
   return (mu['IsTracker'] or mu['IsGlobal']) and mu['IsPF'] and mu['pt']>15 and abs(mu['eta'])<2.5 and mu['relIso']<relIso  and abs(mu['Dxy'])<0.2 and abs(mu['Dz'])<0.5
 
 

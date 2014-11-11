@@ -164,7 +164,7 @@ def getPlotFromChain(c, var, binning, cutString = "(1)", weight = "weight", binn
   del h
   if addOverFlowBin.lower() == "upper" or addOverFlowBin.lower() == "both":
     nbins = res.GetNbinsX()
-    print "Adding", res.GetBinContent(nbins + 1), res.GetBinError(nbins + 1)
+#    print "Adding", res.GetBinContent(nbins + 1), res.GetBinError(nbins + 1)
     res.SetBinContent(nbins , res.GetBinContent(nbins) + res.GetBinContent(nbins + 1))
     res.SetBinError(nbins , sqrt(res.GetBinError(nbins)**2 + res.GetBinError(nbins + 1)**2))
   if addOverFlowBin.lower() == "lower" or addOverFlowBin.lower() == "both":
