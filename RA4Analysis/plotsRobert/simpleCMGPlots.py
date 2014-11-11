@@ -8,7 +8,7 @@ ROOT.TH1F().SetDefaultSumw2()
 from Workspace.HEPHYPythonTools.helpers import getObjFromFile
 #from Workspace.RA4Analysis.simplePlotsCommon import *
 from Workspace.RA4Analysis.simplePlotHelpers import plot, stack, loopAndFill, drawNMStacks
-from helpers import *
+from Workspace.RA4Analysis.helpers import *
 from Workspace.RA4Analysis.cmgTuplesPostProcessed import ttJetsCSA1450ns, WJetsHTToLNu, T5Full_1200_1000_800, T5Full_1500_800_100
 
 subdir = "/pngCMG/"

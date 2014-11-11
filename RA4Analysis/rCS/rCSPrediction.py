@@ -1,7 +1,9 @@
 import ROOT
 import pickle
 from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYieldFromChain
-from Workspace.RA4Analysis.cmgTuplesPostProcessed import * 
+from Workspace.RA4Analysis.cmgTuplesPostProcessed import *
+from localInfo import username
+ 
 cWJets  = getChain(WJetsHTToLNu)
 cTTJets = getChain(ttJetsCSA1450ns)
 cBkg = getChain([WJetsHTToLNu, ttJetsCSA1450ns])
@@ -13,7 +15,7 @@ signals=[
 for s in signals:
   s['chain']=getChain(s['sample'])
 
-from helpers import nameAndCut, nJetBinName,nBTagBinName,varBinName
+from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,varBinName
 from binnedNBTagsFit import binnedNBTagsFit
 from math import pi, sqrt
 
@@ -193,9 +195,9 @@ for i_htb, htb in enumerate(htreg):
                   'tot_truth':truth_TT+truth_W,'tot_truth_err':sqrt(truth_TT_var + truth_W_var)})
       res[htb][stb][srNJet] = rd
 
-pickle.dump(res, file('/data/schoef/results2014/rCS_0b/'+prefix+'_estimationResults_pkl','w'))
+pickle.dump(res, file('/data/'+username+'/results2014/rCS_0b/'+prefix+'_estimationResults_pkl','w'))
 
-res = pickle.load(file('/data/schoef/results2014/rCS_0b/'+prefix+'_estimationResults_pkl'))
+res = pickle.load(file('/data/'+username+'/results2014/rCS_0b/'+prefix+'_estimationResults_pkl'))
 
 
 def getNumString(n,ne, acc=2):
