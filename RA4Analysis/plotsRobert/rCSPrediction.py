@@ -80,12 +80,12 @@ for i_htb, htb in enumerate(htreg):
       
 #      print "Check: TT yield for W-correction: lowDPhi, ",fit_crNJet_lowDPhi['TT_AllPdg']['yield']*fit_crNJet_lowDPhi['TT_AllPdg']['template'].GetBinContent(1), getYieldFromChain(cTTJets, fit_crCut+"&&"+dPhiStr+"<"+str(dPhiCut)+"&&nBJetMedium25==0", weight = "weight")
 
-      rCS_crName_1b, rCS_crCut_1b = nameAndCut(stb,htb,crNJet,btb=(1,1), presel=presel, btagVar = 'nBJetMedium25') 
-      rCS_crName_0b, rCS_crCut_0b = nameAndCut(stb,htb,crNJet,btb=(0,0), presel=presel, btagVar = 'nBJetMedium25') 
-      rCS_crNJet_1b = getRCS(cBkg, rCS_crCut_1b,  dPhiCut) 
-      rCS_crNJet_1b_onlyTT = getRCS(cTTJets, rCS_crCut_1b,  dPhiCut) 
-      rCS_crNJet_0b_onlyTT = getRCS(cTTJets, rCS_crCut_0b,  dPhiCut) 
-#      print "Check: rCS(TT) for W-correction: all samples, ",rCS_crNJet_1b,"only TT",rCS_crNJet_1b_onlyTT,'cut',rCS_crCut_1b
+      rCS_cr_Name_1b, rCS_cr_Cut_1b = nameAndCut(stb,htb,crNJet,btb=(1,1), presel=presel, btagVar = 'nBJetMedium25') 
+      rCS_cr_Name_0b, rCS_cr_Cut_0b = nameAndCut(stb,htb,crNJet,btb=(0,0), presel=presel, btagVar = 'nBJetMedium25') 
+      rCS_crNJet_1b = getRCS(cBkg, rCS_cr_Cut_1b,  dPhiCut) 
+      rCS_crNJet_1b_onlyTT = getRCS(cTTJets, rCS_cr_Cut_1b,  dPhiCut) 
+      rCS_crNJet_0b_onlyTT = getRCS(cTTJets, rCS_cr_Cut_0b,  dPhiCut) 
+#      print "Check: rCS(TT) for W-correction: all samples, ",rCS_crNJet_1b,"only TT",rCS_crNJet_1b_onlyTT,'cut',rCS_cr_Cut_1b
       rd['rCS_crNJet_1b'] = rCS_crNJet_1b
       rd['rCS_crNJet_1b_onlyTT'] = rCS_crNJet_1b_onlyTT
       rd['rCS_crNJet_0b_onlyTT'] = rCS_crNJet_0b_onlyTT
@@ -147,15 +147,15 @@ for i_htb, htb in enumerate(htreg):
                             +  fit_srNJet_lowDPhi['W_NegPdg']['yield']*fit_srNJet_lowDPhi['W_NegPdg']['template'].GetBinContent(1)
       yW_Var_srNJet_0b_lowDPhi  =  fit_srNJet_lowDPhi['W_PosPdg']['yieldVar']*fit_srNJet_lowDPhi['W_PosPdg']['template'].GetBinContent(1)**2\
                             +  fit_srNJet_lowDPhi['W_NegPdg']['yieldVar']*fit_srNJet_lowDPhi['W_NegPdg']['template'].GetBinContent(1)**2#FIXME I add that uncorrelated
-      rCS_srName_1b, rCS_srCut_1b = nameAndCut(stb,htb,srNJet,btb=(1,1), presel=presel, btagVar = 'nBJetMedium25') 
-      rCS_crLowNJet_1b_name, rCS_crLowNJet_1b = nameAndCut(stb,htb,(4,5),btb=(1,1), presel=presel, btagVar = 'nBJetMedium25') 
-      rCS_srName_0b, rCS_srCut_0b = nameAndCut(stb,htb,srNJet,btb=(0,0), presel=presel, btagVar = 'nBJetMedium25')#for Check 
-      rCS_srNJet_1b = getRCS(cBkg, rCS_srCut_1b,  dPhiCut) 
-      rCS_crLowNJet_1b = getRCS(cBkg, rCS_crLowNJet_1b,  dPhiCut) #Low njet tt-jets CR to be orthoganl to DPhi 
-      rCS_srNJet_1b_onlyTT = getRCS(cTTJets, rCS_srCut_1b,  dPhiCut) 
-      rCS_crLowNJet_1b_onlyTT = getRCS(cTTJets, rCS_crLowNJet_1b,  dPhiCut) 
-      rCS_srNJet_0b_onlyTT = getRCS(cTTJets, rCS_srCut_0b,  dPhiCut) #for check
-      rCS_srNJet_0b_onlyW = getRCS(cWJets, rCS_srCut_0b,  dPhiCut) #for check
+      rCS_sr_Name_1b, rCS_sr_Cut_1b = nameAndCut(stb,htb,srNJet,btb=(1,1), presel=presel, btagVar = 'nBJetMedium25') 
+      rCS_crLowNJet_Name_1b, rCS_crLowNJet_Cut_1b = nameAndCut(stb,htb,(4,5),btb=(1,1), presel=presel, btagVar = 'nBJetMedium25') 
+      rCS_sr_Name_0b, rCS_sr_Cut_0b = nameAndCut(stb,htb,srNJet,btb=(0,0), presel=presel, btagVar = 'nBJetMedium25')#for Check 
+      rCS_srNJet_1b = getRCS(cBkg, rCS_sr_Cut_1b,  dPhiCut) 
+      rCS_crLowNJet_1b = getRCS(cBkg, rCS_crLowNJet_Cut_1b,  dPhiCut) #Low njet tt-jets CR to be orthoganl to DPhi 
+      rCS_srNJet_1b_onlyTT = getRCS(cTTJets, rCS_sr_Cut_1b,  dPhiCut) 
+      rCS_crLowNJet_1b_onlyTT = getRCS(cTTJets, rCS_crLowNJet_Cut_1b,  dPhiCut) 
+      rCS_srNJet_0b_onlyTT = getRCS(cTTJets, rCS_sr_Cut_0b,  dPhiCut) #for check
+      rCS_srNJet_0b_onlyW = getRCS(cWJets, rCS_sr_Cut_0b,  dPhiCut) #for check
       rd['yTT_srNJet_0b_lowDPhi'] = yTT_srNJet_0b_lowDPhi
       rd['yTT_Var_srNJet_0b_lowDPhi'] = yTT_Var_srNJet_0b_lowDPhi
       rd['yW_srNJet_0b_lowDPhi'] = yW_srNJet_0b_lowDPhi  
@@ -168,17 +168,19 @@ for i_htb, htb in enumerate(htreg):
       rd['rCS_srNJet_0b_onlyW'] = rCS_srNJet_0b_onlyW
       print "Check: rCS(TT) for TT estimate: all samples, ",rCS_srNJet_1b['rCS'],"only TT",rCS_srNJet_1b_onlyTT['rCS'],'onlyTT and 0b',rCS_srNJet_0b_onlyTT['rCS']
 
-      pred_TT    = yTT_srNJet_0b_lowDPhi*rCS_srNJet_1b['rCS']
-      pred_Var_TT= yTT_Var_srNJet_0b_lowDPhi*rCS_srNJet_1b['rCS']**2 + yTT_srNJet_0b_lowDPhi**2*rCS_srNJet_1b['rCSE_pred']**2
+#      ttJetsCRForRCS = rCS_srNJet_1b   #Version as of Nov. 11th 
+      ttJetsCRForRCS = rCS_crLowNJet_1b #New version, orthogonal to DPhi (lower njet region in 1b-tag bin)
+      pred_TT    = yTT_srNJet_0b_lowDPhi*ttJetsCRForRCS['rCS']
+      pred_Var_TT= yTT_Var_srNJet_0b_lowDPhi*ttJetsCRForRCS['rCS']**2 + yTT_srNJet_0b_lowDPhi**2*ttJetsCRForRCS['rCSE_pred']**2
       pred_W     = yW_srNJet_0b_lowDPhi*rCS_W_crNJet_0b_corr
       pred_Var_W = yW_Var_srNJet_0b_lowDPhi*rCS_W_crNJet_0b_corr**2 + yW_srNJet_0b_lowDPhi**2*rCS_Var_W_crNJet_0b_corr
       pred_total = pred_TT + pred_W
       pred_Var_total = pred_Var_TT + pred_Var_W
  
-      truth_TT      = getYieldFromChain(cTTJets, rCS_srCut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight")
-      truth_TT_var  = getYieldFromChain(cTTJets, rCS_srCut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight*weight")
-      truth_W      = getYieldFromChain(cWJets, rCS_srCut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight")
-      truth_W_var  = getYieldFromChain(cWJets, rCS_srCut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight*weight")
+      truth_TT      = getYieldFromChain(cTTJets, rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight")
+      truth_TT_var  = getYieldFromChain(cTTJets, rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight*weight")
+      truth_W      = getYieldFromChain(cWJets, rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight")
+      truth_W_var  = getYieldFromChain(cWJets, rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight*weight")
       print "TT",pred_TT,sqrt(pred_Var_TT),'truth',truth_TT
       print "W",pred_W,sqrt(pred_Var_W),'truth',truth_W
       print "Total",pred_total,sqrt(pred_Var_total),'truth',truth_TT+truth_W
@@ -199,76 +201,70 @@ res = pickle.load(file('/data/schoef/results2014/rCS_0b/'+prefix+'_estimationRes
 def getNumString(n,ne, acc=2):
   return str(round(n,acc))+'&$\pm$&'+str(round(ne,acc))
 
-#print
-#for i_htb, htb in enumerate(htreg):
-#  if i_htb!=0:print '\\hline'
+print "Results"
+print
+for i_htb, htb in enumerate(htreg):
+  if i_htb!=0:print '\\hline'
+  print '& & \multicolumn{6}{c|}{$t\overline{t}$+Jets}&\multicolumn{6}{c|}{$W$+Jets}&\multicolumn{6}{c}{total}\\\\'
+  print '\multicolumn{2}{c|}{$'+varBinName(htb, 'H_{T}')+\
+        '$} & \multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c}{simulation}\\\\\\hline'
+  for stb, dPhiCut in streg:
+    for srNJet in njreg:
+      print '$'+nJetBinName(srNJet)+'$ & $'+varBinName(stb, 'S_{T}')+'$'+' & '+getNumString(res[htb][stb][srNJet]['TT_pred'], res[htb][stb][srNJet]['TT_pred_err'])\
+           +' & '+getNumString(res[htb][stb][srNJet]['TT_truth'], res[htb][stb][srNJet]['TT_truth_err'])\
+           +' & '+getNumString(res[htb][stb][srNJet]['W_pred'], res[htb][stb][srNJet]['W_pred_err'])\
+           +' & '+getNumString(res[htb][stb][srNJet]['W_truth'], res[htb][stb][srNJet]['W_truth_err'])\
+           +' & '+getNumString(res[htb][stb][srNJet]['tot_pred'], res[htb][stb][srNJet]['tot_pred_err'])\
+           +' & '+getNumString(res[htb][stb][srNJet]['tot_truth'], res[htb][stb][srNJet]['tot_truth_err']) +'\\\\'
+print
+print "signal yields"
+print
+for i_htb, htb in enumerate(htreg):
+  for stb, dPhiCut in streg:
+    for srNJet in njreg:
+      rCS_sr_Name_0b, rCS_sr_Cut_0b = nameAndCut(stb,htb,srNJet,btb=(0,0), presel=presel, btagVar = 'nBJetMedium25')#for Check 
+      strings=[]
+      for s in signals:
+        sig =     getYieldFromChain(s['chain'], rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight")
+        sigErr  = getYieldFromChain(s['chain'], rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight*weight")
+        strings.append( getNumString(sig, sigErr) )
+      print " , ".join(strings), rCS_sr_Name_0b, rCS_sr_Cut_0b
+print
+print "rCS(TT) comparison used for rCS(W) correction"
+print
+for i_htb, htb in enumerate(htreg):
+  for stb, dPhiCut in streg:
+    for srNJet in njreg[:1]:
+      print '$'+varBinName(htb, 'H_{T}')+'$&$'+varBinName(stb, 'S_{T}')+'$ & '+\
+          ' & '.join([getNumString(res[htb][stb][srNJet]['rCS_crNJet_1b']['rCS'], res[htb][stb][srNJet]['rCS_crNJet_1b']['rCSE_sim']), \
+                      getNumString(res[htb][stb][srNJet]['rCS_crNJet_1b_onlyTT']['rCS'], res[htb][stb][srNJet]['rCS_crNJet_1b_onlyTT']['rCSE_sim']),\
+                      getNumString(res[htb][stb][srNJet]['rCS_crNJet_0b_onlyTT']['rCS'], res[htb][stb][srNJet]['rCS_crNJet_0b_onlyTT']['rCSE_sim'])])+'\\\\'
+print
+
+print "RCS corr comparison" 
+print
+for i_htb, htb in enumerate(htreg):
+  for stb, dPhiCut in streg:
+    print '$'+varBinName(htb, 'H_{T}')+'$&$'+varBinName(stb, 'S_{T}')+'$ & '+\
+        ' & '.join([getNumString(res[htb][stb][njreg[0]]['rCS_W_crNJet_0b_corr'],sqrt(res[htb][stb][njreg[0]]['rCS_Var_W_crNJet_0b_corr']),4), \
+#                    getNumString(res[htb][stb][njreg[0]]['rCS_W_crNJet_0b_notcorr'],sqrt(res[htb][stb][njreg[0]]['rCS_Var_W_crNJet_0b_notcorr']),4),\
+                    getNumString(res[htb][stb][njreg[0]]['rCS_srNJet_0b_onlyW']['rCS'], res[htb][stb][njreg[0]]['rCS_srNJet_0b_onlyW']['rCSE_sim'],4),\
+                    getNumString(res[htb][stb][njreg[1]]['rCS_srNJet_0b_onlyW']['rCS'], res[htb][stb][njreg[1]]['rCS_srNJet_0b_onlyW']['rCSE_sim'],4)])+'\\\\'
+print
+
+
+print "rCS(TT) comparison used for tt estimation"
+print
+for i_htb, htb in enumerate(htreg):
+  if i_htb!=0:print '\\hline'
 #  print '& & \multicolumn{6}{c|}{$t\overline{t}$+Jets}&\multicolumn{6}{c|}{$W$+Jets}&\multicolumn{6}{c}{total}\\\\'
-#  print '\multicolumn{2}{c|}{$'+varBinName(htb, 'H_{T}')+\
-#        '$} & \multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c}{simulation}\\\\\\hline'
-#  for stb, dPhiCut in streg:
-#    for srNJet in njreg:
-#      print '$'+nJetBinName(srNJet)+'$ & $'+varBinName(stb, 'S_{T}')+'$'+' & '+getNumString(res[htb][stb][srNJet]['TT_pred'], res[htb][stb][srNJet]['TT_pred_err'])\
-#           +' & '+getNumString(res[htb][stb][srNJet]['TT_truth'], res[htb][stb][srNJet]['TT_truth_err'])\
-#           +' & '+getNumString(res[htb][stb][srNJet]['W_pred'], res[htb][stb][srNJet]['W_pred_err'])\
-#           +' & '+getNumString(res[htb][stb][srNJet]['W_truth'], res[htb][stb][srNJet]['W_truth_err'])\
-#           +' & '+getNumString(res[htb][stb][srNJet]['tot_pred'], res[htb][stb][srNJet]['tot_pred_err'])\
-#           +' & '+getNumString(res[htb][stb][srNJet]['tot_truth'], res[htb][stb][srNJet]['tot_truth_err']) +'\\\\'
-#print
+  print '\multicolumn{2}{c|}{$'+varBinName(htb, 'H_{T}')+"$}&"\
+      + "\multicolumn{3}{c|}{$R_{CS}(1b)$}&\multicolumn{3}{c|}{$R_{CS,\\ttbar }(1b)$}&\multicolumn{3}{c}{$R_{CS,\\ttbar }(0b)$}\\\\\\hline"
 
-#for i_htb, htb in enumerate(htreg):
-#  for stb, dPhiCut in streg:
-#    for srNJet in njreg:
-#      rCS_srName_0b, rCS_srCut_0b = nameAndCut(stb,htb,srNJet,btb=(0,0), presel=presel, btagVar = 'nBJetMedium25')#for Check 
-#      strings=[]
-#      for s in signals:
-#        sig =     getYieldFromChain(s['chain'], rCS_srCut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight")
-#        sigErr  = getYieldFromChain(s['chain'], rCS_srCut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight*weight")
-#        strings.append( getNumString(sig, sigErr) )
-#      print " , ".join(strings), rCS_srName_0b, rCS_srCut_0b
-#print "rCS(TT) comparison used for rCS(W) correction"
-#print
-#for i_htb, htb in enumerate(htreg):
-#  for stb, dPhiCut in streg:
-#    for srNJet in njreg[:1]:
-#      print '$'+varBinName(htb, 'H_{T}')+'$&$'+varBinName(stb, 'S_{T}')+'$ & '+\
-#          ' & '.join([getNumString(res[htb][stb][srNJet]['rCS_crNJet_1b']['rCS'], res[htb][stb][srNJet]['rCS_crNJet_1b']['rCSE_sim']), \
-#                      getNumString(res[htb][stb][srNJet]['rCS_crNJet_1b_onlyTT']['rCS'], res[htb][stb][srNJet]['rCS_crNJet_1b_onlyTT']['rCSE_sim']),\
-#                      getNumString(res[htb][stb][srNJet]['rCS_crNJet_0b_onlyTT']['rCS'], res[htb][stb][srNJet]['rCS_crNJet_0b_onlyTT']['rCSE_sim'])])+'\\\\'
-#print
+  for stb, dPhiCut in streg:
+    for srNJet in njreg:
+      print '$'+nJetBinName(srNJet)+'$ & $'+varBinName(stb, 'S_{T}')+'$'+' & '+\
+          ' & '.join([getNumString(res[htb][stb][srNJet]['rCS_srNJet_1b']['rCS'], res[htb][stb][srNJet]['rCS_srNJet_1b']['rCSE_sim'],acc=3), \
+                      getNumString(res[htb][stb][srNJet]['rCS_srNJet_1b_onlyTT']['rCS'], res[htb][stb][srNJet]['rCS_srNJet_1b_onlyTT']['rCSE_sim'],acc=3),\
+                      getNumString(res[htb][stb][srNJet]['rCS_srNJet_0b_onlyTT']['rCS'], res[htb][stb][srNJet]['rCS_srNJet_0b_onlyTT']['rCSE_sim'],acc=3)])+'\\\\'
 
-#print "RCS corr comparison" 
-#print
-#for i_htb, htb in enumerate(htreg):
-#  for stb, dPhiCut in streg:
-#    print '$'+varBinName(htb, 'H_{T}')+'$&$'+varBinName(stb, 'S_{T}')+'$ & '+\
-#        ' & '.join([getNumString(res[htb][stb][njreg[0]]['rCS_W_crNJet_0b_corr'],sqrt(res[htb][stb][njreg[0]]['rCS_Var_W_crNJet_0b_corr']),4), \
-##                    getNumString(res[htb][stb][njreg[0]]['rCS_W_crNJet_0b_notcorr'],sqrt(res[htb][stb][njreg[0]]['rCS_Var_W_crNJet_0b_notcorr']),4),\
-#                    getNumString(res[htb][stb][njreg[0]]['rCS_srNJet_0b_onlyW']['rCS'], res[htb][stb][njreg[0]]['rCS_srNJet_0b_onlyW']['rCSE_sim'],4),\
-#                    getNumString(res[htb][stb][njreg[1]]['rCS_srNJet_0b_onlyW']['rCS'], res[htb][stb][njreg[1]]['rCS_srNJet_0b_onlyW']['rCSE_sim'],4)])+'\\\\'
-#print
-
-
-#print "rCS(TT) comparison used for tt estimation"
-#print
-#for i_htb, htb in enumerate(htreg):
-#  for stb, dPhiCut in streg:
-#    for srNJet in njreg:
-#      print '$'+varBinName(htb, 'H_{T}')+'$&$'+varBinName(stb, 'S_{T}')+'$ & '+\
-#          ' & '.join([getNumString(res[htb][stb][srNJet]['rCS_srNJet_1b']['rCS'], res[htb][stb][srNJet]['rCS_srNJet_1b']['rCSE_sim'],acc=3), \
-#                      getNumString(res[htb][stb][srNJet]['rCS_srNJet_1b_onlyTT']['rCS'], res[htb][stb][srNJet]['rCS_srNJet_1b_onlyTT']['rCSE_sim'],acc=3),\
-#                      getNumString(res[htb][stb][srNJet]['rCS_srNJet_0b_onlyTT']['rCS'], res[htb][stb][srNJet]['rCS_srNJet_0b_onlyTT']['rCSE_sim'],acc=3)])+'\\\\'
-#print
-#print
-#for i_htb, htb in enumerate(htreg):
-#  if i_htb!=0:print '\\hline'
-##  print '& & \multicolumn{6}{c|}{$t\overline{t}$+Jets}&\multicolumn{6}{c|}{$W$+Jets}&\multicolumn{6}{c}{total}\\\\'
-#  print '\multicolumn{2}{c|}{$'+varBinName(htb, 'H_{T}')+"$}&"\
-#      + "\multicolumn{3}{c|}{$R_{CS}(1b)$}&\multicolumn{3}{c|}{$R_{CS,\\ttbar }(1b)$}&\multicolumn{3}{c}{$R_{CS,\\ttbar }(0b)$}\\\\\\hline"
-#
-#  for stb, dPhiCut in streg:
-#    for srNJet in njreg:
-#      print '$'+nJetBinName(srNJet)+'$ & $'+varBinName(stb, 'S_{T}')+'$'+' & '+\
-#          ' & '.join([getNumString(res[htb][stb][srNJet]['rCS_srNJet_1b']['rCS'], res[htb][stb][srNJet]['rCS_srNJet_1b']['rCSE_sim'],acc=3), \
-#                      getNumString(res[htb][stb][srNJet]['rCS_srNJet_1b_onlyTT']['rCS'], res[htb][stb][srNJet]['rCS_srNJet_1b_onlyTT']['rCSE_sim'],acc=3),\
-#                      getNumString(res[htb][stb][srNJet]['rCS_srNJet_0b_onlyTT']['rCS'], res[htb][stb][srNJet]['rCS_srNJet_0b_onlyTT']['rCSE_sim'],acc=3)])+'\\\\'
-#
