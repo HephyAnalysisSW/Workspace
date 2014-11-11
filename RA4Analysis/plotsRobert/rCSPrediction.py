@@ -148,9 +148,12 @@ for i_htb, htb in enumerate(htreg):
       yW_Var_srNJet_0b_lowDPhi  =  fit_srNJet_lowDPhi['W_PosPdg']['yieldVar']*fit_srNJet_lowDPhi['W_PosPdg']['template'].GetBinContent(1)**2\
                             +  fit_srNJet_lowDPhi['W_NegPdg']['yieldVar']*fit_srNJet_lowDPhi['W_NegPdg']['template'].GetBinContent(1)**2#FIXME I add that uncorrelated
       rCS_srName_1b, rCS_srCut_1b = nameAndCut(stb,htb,srNJet,btb=(1,1), presel=presel, btagVar = 'nBJetMedium25') 
+      rCS_crLowNJet_1b_name, rCS_crLowNJet_1b = nameAndCut(stb,htb,(4,5),btb=(1,1), presel=presel, btagVar = 'nBJetMedium25') 
       rCS_srName_0b, rCS_srCut_0b = nameAndCut(stb,htb,srNJet,btb=(0,0), presel=presel, btagVar = 'nBJetMedium25')#for Check 
       rCS_srNJet_1b = getRCS(cBkg, rCS_srCut_1b,  dPhiCut) 
+      rCS_crLowNJet_1b = getRCS(cBkg, rCS_crLowNJet_1b,  dPhiCut) #Low njet tt-jets CR to be orthoganl to DPhi 
       rCS_srNJet_1b_onlyTT = getRCS(cTTJets, rCS_srCut_1b,  dPhiCut) 
+      rCS_crLowNJet_1b_onlyTT = getRCS(cTTJets, rCS_crLowNJet_1b,  dPhiCut) 
       rCS_srNJet_0b_onlyTT = getRCS(cTTJets, rCS_srCut_0b,  dPhiCut) #for check
       rCS_srNJet_0b_onlyW = getRCS(cWJets, rCS_srCut_0b,  dPhiCut) #for check
       rd['yTT_srNJet_0b_lowDPhi'] = yTT_srNJet_0b_lowDPhi
@@ -159,6 +162,8 @@ for i_htb, htb in enumerate(htreg):
       rd['yW_Var_srNJet_0b_lowDPhi'] = yW_Var_srNJet_0b_lowDPhi 
       rd['rCS_srNJet_1b'] = rCS_srNJet_1b
       rd['rCS_srNJet_1b_onlyTT'] = rCS_srNJet_1b_onlyTT
+      rd['rCS_crLowNJet_1b'] = rCS_crLowNJet_1b
+      rd['rCS_crLowNJet_1b_onlyTT'] = rCS_crLowNJet_1b_onlyTT
       rd['rCS_srNJet_0b_onlyTT'] = rCS_srNJet_0b_onlyTT
       rd['rCS_srNJet_0b_onlyW'] = rCS_srNJet_0b_onlyW
       print "Check: rCS(TT) for TT estimate: all samples, ",rCS_srNJet_1b['rCS'],"only TT",rCS_srNJet_1b_onlyTT['rCS'],'onlyTT and 0b',rCS_srNJet_0b_onlyTT['rCS']
