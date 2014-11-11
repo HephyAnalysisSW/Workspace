@@ -141,6 +141,7 @@ for i in range(number_events):
   jets = getGoodJetsStage2(c)
   sorted(jets, key= lambda x: -x['pt'])
   bjets = filter(lambda j:j['btag']>0.679 and abs(j['eta'])<2.4, jets)
+  bjets = filter(lambda j:j['btag']>0.679 and abs(j['eta'])<2.4, jets)
   sorted(bjets, key=lambda x: -x['pt'])   
 
   if small :

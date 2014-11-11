@@ -1,9 +1,9 @@
 import ROOT
 import pickle
 from array import array
-from Workspace.RA4Analysis.objectSelection import gTauAbsEtaBins, gTauPtBins, metParRatioBins, jetRatioBins
-from Workspace.HEPHYPythonTools.helpers import getVarValue, getObjFromFile
-from Workspace.RA4Analysis.objectSelection import getGenLeps, getMuons, getLooseMuStage2, getGenLep ,tightPOGMuID, vetoMuID
+from Workspace.RA4Analysis.objectSelection import getGoodJetsStage2,gTauAbsEtaBins, gTauPtBins, metParRatioBins, jetRatioBins
+from Workspace.HEPHYPythonTools.helpers import deltaR,getVarValue, getObjFromFile
+from Workspace.RA4Analysis.objectSelection import getGenLepsWithMatchInfo,getGenLeps, getMuons, getLooseMuStage2, getGenLep ,tightPOGMuID, vetoMuID
 from math import sqrt, cos, sin, atan2
 from Workspace.RA4Analysis.stage2Tuples import *
 from localInfo import username
@@ -18,20 +18,35 @@ c = ROOT.TChain('Events')
 #for b in ttJetsCSA1450ns['bins']:
 #  c.Add(ttJetsCSA1450ns['dirname']+'/'+b+'/histo_ttJetsCSA1450ns_from*.root')
 #c.Add('/data/easilar/convertedTuples_v23/copyMET/ttJetsCSA1450ns/*')
-c.Add('/data/schoef/convertedTuples_v24/copyInc/ttJetsCSA1450ns/histo_ttJetsCSA1450ns_from*')
-
-relIso = 0.3
+#c.Add('/data/schoef/convertedTuples_v24/copyInc/ttJetsCSA1450ns/histo_ttJetsCSA1450ns_from*')
+c.Add('/data/schoef/convertedTuples_v26/copyInc/ttJetsCSA1450ns/histo_ttJetsCSA1450ns_from*.root')
 small = True
-max =100
+n_max = 100
+relIso = 0.3
+doubleLeptonPreselection = "gLepCount==2&&ngNuMuFromW==2&&ngNuEFromW==0"
 
-leptonEffMap = pickle.load(file('/data/'+username+'/results2014/muonTemplates/CSA14_TTJets_efficiencyMap_vetoMuIDPt15_ttJetsCSA1450ns_relIso'+str(relIso)+'.pkl'))
+leptonEffMap = pickle.load(file('/data/'+username+'/results2014/muonTemplates/CSA14_TTJets_efficiencyMap_v26_vetoMuIDPt15_ttJetsCSA1450ns_v26_relIso'+str(relIso)+'.pkl'))
 leptonID = "muIsPF&&(muIsGlobal||muIsTracker)&&muPt>15&&abs(muEta)<2.5&&abs(muDxy)<0.2&&abs(muDz)<0.5&&muRelIso<"+str(relIso) 
 
-doubleLeptonPreselection = "ngLep==2&&ngNuMuFromW==2&&ngNuEFromW==0"
-copyVars  = ['event/l', 'njets/I','nbtags/F' ,'ht/F', 'met/F', 'metphi/F', 'nvetoMuons/F','ngoodMuons/F','nvetoElectrons/F','gTauPt/F','gTauEta/F','gTauNENu/I','gTauNMuNu/I','gTauNTauNu/I']
+ofile ='/data/'+username+'/results2014/muonTuples/CSA14_TTJets_Lost_v26_2_relIso'+str(relIso)+'.root'
+if small: ofile ='/data/'+username+'/results2014/muonTuples/CSA14_TTJets_Lost_small_relIso'+str(relIso)+'.root'
 
-ofile ='/data/'+username+'/results2014/muonTuples/CSA14_TTJets_Lost_New_New_relIso'+str(relIso)+'.root'
-truthVars   = ['wPhiTruth/F','weightTruth/F','metTruth/F','wPtTruth/F','stTruth/F','htTruth/F','njetsTruth/I' ,'metPhiTruth/F', 'mTTruth/F', 'muPtTruth/F','ptLostTruth/F','muPhiTruth/F','deltaPhiTruth/F']
+copyVars  = ['event/l','weight/F', 'njets/I','nbtags/F' ,'ht/F', 'met/F', 'metPhi/F', 'nvetoMuons/F','ngoodMuons/F','nvetoElectrons/F','gTauPt/F','gTauEta/F','gTauNENu/I','gTauNMuNu/I','gTauNTauNu/I']
+truthVars   = ['htCalc/F','wPhi/F','lostminDeltaR/F','minDeltaR/F','hardestJetPt0/F','hardestJetPt1/F','hardestJetPt2/F','hardestJetPt3/F','wPt/F','st/F','relIso/F', 'mT/F', 'pt/F','eta/F','lostPt/F','lostEta/F','phi/F','lostPhi/F','deltaPhi/F', \
+ 'hardestJetEta0/F', \
+ 'hardestJetEta1/F', \
+ 'hardestJetEta2/F', \
+ 'hardestJetEta3/F', \
+ 'hardestJetPhi0/F', \
+ 'hardestJetPhi1/F', \
+ 'hardestJetPhi2/F', \
+ 'hardestJetPhi3/F', \
+ 'hardestbJetPt0/F', \
+ 'hardestbJetPt1/F', \
+ 'hardestbJetPt2/F', \
+ 'hardestbJetPt3/F', \
+
+]
 vars      = copyVars+truthVars
 
 structString = "struct MyStruct{"
@@ -48,74 +63,173 @@ t = ROOT.TTree( "Events", "Events", 1 )
 for v in vars:
  t.Branch(v.split('/')[0],   ROOT.AddressOf(s,v.split('/')[0]), v)
 dir.cd()
-#eList = ROOT.TList()
+#cut = "&&".join([doubleLeptonPreselection, hadPresel])
 c.Draw(">>eList", doubleLeptonPreselection)
 #c.Draw(">>eList", hadPresel)
 elist = ROOT.gDirectory.Get("eList")
 number_events = elist.GetN()
-if small: number_events = max
+if small : number_events = n_max
 for i in range(number_events):
   c.GetEntry(elist.GetEntry(i))
-  #if (i%10000 == 0) and i>0 :
-    #print i,"/",number_events
+  if (i%10000 == 0) and i>0 :
+    print i,"/",number_events
   s.event = long(c.GetLeaf('event').GetValue())
-  print s.event
+  if small: print s.event
   for v in copyVars[1:]:
     n=v.split('/')[0]
     #print n
     exec('s.'+n+'='+str(c.GetLeaf(n).GetValue()))
-  gLeps = getGenLeps(c)
-  muons = getMuons(c,relIso,gLeps)
+  
+  #2 gen lep in acceptance
+  #1 tight reco matched to a gen lepton
+  #no further loose muon
 
-  lostGenLeps = filter(lambda gl:not(gl['gLepInd']>=0 and gl['gLepDR']<0.4) and gl['gLepPt']>15 and abs(gl['gLepEta'])<2.5, gLeps)
-  lostRecoMuons = filter(lambda x:x['hasMatch'] and (not(x['isLoose'])), muons)
-  tightMatchedRecoMuons = filter(lambda x:x['hasMatch'] and x['isTight'], muons)        
-  tightRecoMuons = filter(lambda x:x['isTight'], muons)
-  looseRecoMuons = filter(lambda x:x['isLoose'], muons)
-  #lostLeptons = filter(lambda x:not(x['hasMatch'] and x['isLoose']), muons)        
-  #nLostMuons = len(lostLeptons)
-  #if nLostMuons>0: print lostLeptons
-  nLostMuons = len(lostGenLeps) + len(lostRecoMuons)
-  if nLostMuons >0:
-    print 'nLostMuons:', nLostMuons
-    print 'number of lost muons because no reconstruction at all:',len(lostGenLeps)
-    print 'number of lost muons because there is reconstruction but the recomuons are not loose at all:', len(lostRecoMuons)
-  s.weight=c.GetLeaf('weight').GetValue()
+  #1. get all gen leps:
+  gLeps = getGenLepsWithMatchInfo(c,relIso)
+  #1.1 get gen leps in acceptance:
+  gLepsInAcc = filter(lambda x:x['gLepPt']>=15 and abs(x['gLepEta'])<2.1, gLeps)
+  #2. get loose muons and match to gen-leps in acceptance
+  allMuons = getMuons(c,relIso,gLeps)
+  looseMuons = filter(lambda x:x['isLoose'], allMuons) 
+  looseMatchedMuons = filter(lambda x:x['hasMatch'], looseMuons)
+  looseMuonsInAcc = filter(lambda x:x['pt']>=15 and abs(x['eta'])<2.1, looseMuons)
+  #3. get tight muons that are matched
+  tightMuons = filter(lambda x:x['isTight'], allMuons)
+  tightMatchedMuons = filter(lambda x:x['isTight'] and x['hasMatch'], looseMuons)
+  #4. get Lost muons 
+  #4.1 get generated muon has no match to a reco muon
+  lostGenMuons = filter(lambda x:not x['hasMatchInd'], gLeps)
+  lostGenMuonsInAcc = filter(lambda x:x['gLepPt']>=15 and abs(x['gLepEta'])<2.1, lostGenMuons)
+  #4.2 get reco muon has match but fails looseID
+  lostRecoMuons = filter(lambda x:(not(x['isLoose']) and x['hasMatch']), allMuons)
+  lostRecoMuonsInAcc = filter(lambda x:x['pt']>=15 and abs(x['eta'])<2.1, lostRecoMuons)
 
-  if len(muons)==2 or len(muons)==1:
-    if len(tightMatchedRecoMuons)==1 and len(looseRecoMuons)==1:
-      if not nLostMuons==1: continue
-      if len(lostGenLeps)==1:
-        #lostGenMuon = lostGenLeps[0]
-        s.ptLostTruth =(lostGenLeps[0]['gLepPt'])
-      if len(lostRecoMuons)==1:
-        #lostGenMuon = lostRecoMuons[0]
-        s.ptLostTruth = lostRecoMuons[0]['pt']
-      if len(tightMatchedRecoMuons) >1 : print "Warning"
-      print 'genLeps:' , gLeps
-      print 'numebr of reco muons:', len(muons)
-      print 'number of loose reco muons:', len(looseRecoMuons)
-      print 'number of tight reco muons:' , len(tightRecoMuons)
-      print 'n tight matched muons:', len(tightMatchedRecoMuons)
-      print 'tight matched muons:', tightMatchedRecoMuons
-      print 'lost gen leps:', lostGenLeps
-      print 'lostRecoMuons:', lostRecoMuons 
-      tightMatchedRecoMuon = tightMatchedRecoMuons[0]
-      s.weightTruth = s.weight
-      s.mTTruth=(sqrt(2*s.met*tightMatchedRecoMuon['pt']*(1-cos(tightMatchedRecoMuon['phi']-s.metphi))))
-      wx = s.met*cos(s.metphi) + tightMatchedRecoMuon['pt']*cos(tightMatchedRecoMuon['phi'])
-      wy = s.met*sin(s.metphi) + tightMatchedRecoMuon['pt']*sin(tightMatchedRecoMuon['phi'])
-      s.wPhiTruth     = atan2(wy,wx)
-      s.wPtTruth      = sqrt((wx)**2+(wy)**2) 
-      s.stTruth       = sqrt((s.wPtTruth)**2+(s.mTTruth)**2)
-      s.metTruth      = s.met
-      s.htTruth       = s.ht
-      s.njetsTruth    = s.njets
-      s.muPtTruth     = (tightMatchedRecoMuon['pt'])
-      s.muPhiTruth    = (tightMatchedRecoMuon['phi'])
-      s.metPhiTruth   = s.metphi
-      s.deltaPhiTruth = (deltaPhi(tightMatchedRecoMuon['phi'],s.wPhiTruth))
-      t.Fill()
+  ##Get Jets
+  njets = getVarValue(c, 'njets')
+  jets = getGoodJetsStage2(c)
+  sorted(jets, key= lambda x: -x['pt'])
+  bjets = filter(lambda j:j['btag']>0.679 and abs(j['eta'])<2.4, jets)
+  sorted(bjets, key=lambda x: -x['pt'])
+  nLostMuons = len(lostGenMuonsInAcc) + len(lostRecoMuonsInAcc)
+  #if s.event == 26671039:
+
+  if len(gLepsInAcc)==2 and  len(looseMuonsInAcc)==1 and len(tightMatchedMuons) == 1:
+
+    tightMatchedMuon = tightMatchedMuons[0]
+ 
+    ##take lost leptons:
+    if len(lostGenMuonsInAcc)==1 :
+      s.lostPt = lostGenMuonsInAcc[0]['gLepPt']
+      s.lostEta = lostGenMuonsInAcc[0]['gLepEta']
+      s.lostPhi =  lostGenMuonsInAcc[0]['gLepPhi']
+    if len(lostRecoMuonsInAcc)==1 : 
+      s.lostPt = lostRecoMuonsInAcc[0]['pt']
+      s.lostEta = lostRecoMuonsInAcc[0]['eta']
+      s.lostPhi = lostRecoMuonsInAcc[0]['phi']
+
+    if small:
+      print 'met:', s.met
+      print 'number of all reco muons:', len(allMuons) 
+      print 'number of all generated muons:', len(gLeps)
+      print 'gLeps', gLeps
+      print 'all muons', allMuons
+      print 'relIso: ' , tightMatchedMuon['relIso']
+      print 'lost reco muons fails loose ID:' , lostRecoMuonsInAcc
+      print 'lost gen muons:' , lostGenMuonsInAcc
+    ##Get hardest jet Pt
+    jetsPt = []
+    deltaRs = []
+    lostDeltaRs = []
+    for j in range(int(njets)):
+      jet = jets[j]
+      if jet:
+        jetPt = jet['pt']
+        jetsPt.append(jetPt)
+        deltaRs.append(deltaR(tightMatchedMuon,jet))
+        if len(lostGenMuonsInAcc)==1 : lostDeltaRs.append(deltaR({'phi':lostGenMuonsInAcc[0]['gLepPhi'],'eta':lostGenMuonsInAcc[0]['gLepEta']},jet))
+        #if small: print 'lostDeltaRs:' , lostDeltaRs
+        if len(lostRecoMuonsInAcc)==1 : lostDeltaRs.append(deltaR(lostRecoMuonsInAcc[0],jet))
+        #if small: print 'lostDeltaRs:' , lostDeltaRs
+    htCalc =  sum(jetsPt)    
+
+    hardestJetPt0 = -1
+    hardestJetPt1 = -1
+    hardestJetPt2 = -1
+    hardestJetPt3 = -1
+    hardestJetEta0 = -100
+    hardestJetEta1 = -100
+    hardestJetEta2 = -100
+    hardestJetEta3 = -100
+    hardestJetPhi0 = -100
+    hardestJetPhi1 = -100
+    hardestJetPhi2 = -100
+    hardestJetPhi3 = -100
+    hardestbJetPt0 = -1
+    hardestbJetPt1 = -1
+    hardestbJetPt2 = -1
+    hardestbJetPt3 = -1
+    if njets>0: 
+      hardestJetPt0 = jets[0]['pt']
+      mindeltaR = min(deltaRs)
+      hardestJetEta0 = jets[0]['eta']
+      hardestJetPhi0 = jets[0]['phi']
+      if s.nbtags > 0: hardestbJetPt0 = bjets[0]['pt']
+      if nLostMuons>0 : lostmindeltaR = min(lostDeltaRs) 
+      if njets >1:
+        hardestJetPt1 = jets[1]['pt']
+        hardestJetEta1 = jets[1]['eta']
+        hardestJetPhi1 = jets[1]['phi']
+        if s.nbtags > 1: hardestbJetPt1 = bjets[1]['pt']
+        if njets >2:
+          hardestJetPt2 = jets[2]['pt']
+          hardestJetEta2 = jets[2]['eta']
+          hardestJetPhi2 = jets[2]['phi']
+          if s.nbtags > 2: hardestbJetPt2 = bjets[2]['pt']
+          if njets>3:
+            hardestJetPt3 = jets[3]['pt']
+            hardestJetEta3 = jets[3]['eta']
+            hardestJetPhi3 = jets[3]['phi']
+            if s.nbtags > 3: hardestbJetPt3 = bjets[3]['pt']
+    if small:
+      print 'hardest Jet Pt:' , hardestJetPt0
+      print 'min DeltaR:' , mindeltaR
+
+    
+    #jetsCleaned = [jet for jet in jets if min([deltaR(jet, muon) for muon in looseMuons])>0.4]
+    #if small: print 'number of cleaned jets', len(jetsCleaned)
+    s.njets = njets 
+    s.mT=(sqrt(2*s.met*tightMatchedMuon['pt']*(1-cos(tightMatchedMuon['phi']-s.metPhi))))
+    wx = s.met*cos(s.metPhi) + tightMatchedMuon['pt']*cos(tightMatchedMuon['phi'])
+    wy = s.met*sin(s.metPhi) + tightMatchedMuon['pt']*sin(tightMatchedMuon['phi'])
+    s.wPhi     = atan2(wy,wx)
+    s.wPt      = sqrt((wx)**2+(wy)**2) 
+#    s.st       = sqrt((s.wPt)**2+(s.mT)**2)
+    s.st       = s.met + tightMatchedMuon['pt'] 
+    s.pt     = (tightMatchedMuon['pt'])
+    s.eta    = (tightMatchedMuon['eta'])
+    s.phi    = (tightMatchedMuon['phi'])
+    s.deltaPhi = (deltaPhi(tightMatchedMuon['phi'],s.wPhi))
+    s.hardestJetPt0 = hardestJetPt0
+    s.hardestJetPt1 = hardestJetPt1
+    s.hardestJetPt2 = hardestJetPt2
+    s.hardestJetPt3 = hardestJetPt3
+    s.hardestJetEta0 = hardestJetEta0
+    s.hardestJetEta1 = hardestJetEta1
+    s.hardestJetEta2 = hardestJetEta2
+    s.hardestJetEta3 = hardestJetEta3
+    s.hardestJetPhi0 = hardestJetPhi0
+    s.hardestJetPhi1 = hardestJetPhi1
+    s.hardestJetPhi2 = hardestJetPhi2
+    s.hardestJetPhi3 = hardestJetPhi3
+    s.hardestbJetPt0 = hardestbJetPt0
+    s.hardestbJetPt1 = hardestbJetPt1
+    s.hardestbJetPt2 = hardestbJetPt2
+    s.hardestbJetPt3 = hardestbJetPt3
+    s.htCalc = htCalc
+    s.minDeltaR = mindeltaR
+    s.lostminDeltaR = lostmindeltaR  
+    s.relIso = tightMatchedMuon['relIso']
+    t.Fill()
 
 f.cd()
 t.Write()

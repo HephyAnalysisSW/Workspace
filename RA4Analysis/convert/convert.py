@@ -389,8 +389,8 @@ for isample, sample in enumerate(allSamples):
               else:
                 lep['gLepDR'] = float('nan')
                 lep['gLepInd']= -1
-              print igp, gp.mother(0).pdgId()
-              genLeps.append(lep)
+#              print igp, gp.mother(0).pdgId()
+#              genLeps.append(lep)
 
             if pdgId==15:
               if not (gp.numberOfMothers()>0  and abs(gp.mother(0).pdgId())==24): continue
