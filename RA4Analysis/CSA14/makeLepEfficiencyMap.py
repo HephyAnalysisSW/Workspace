@@ -9,8 +9,8 @@ c = ROOT.TChain('Events')
 #for b in ttJetsCSA1450ns['bins']:
 #  c.Add(ttJetsCSA1450ns['dirname']+'/'+b+'/histo_ttJetsCSA1450ns_from*.root')
 #c.Add('/data/schoef/convertedTuples_v25/copyMET/ttJetsCSA1450ns/histo_ttJetsCSA1450ns_from*')
-c.Add('/data/schoef/convertedTuples_v24/copyInc/ttJetsCSA1450ns/histo_ttJetsCSA1450ns_from*')
-
+#c.Add('/data/schoef/convertedTuples_v24/copyInc/ttJetsCSA1450ns/histo_ttJetsCSA1450ns_from*')
+c.Add('/data/schoef/convertedTuples_v26/copyInc/ttJetsCSA1450ns/histo_ttJetsCSA1450ns_from*')
 Lepton = {'muon':True,'electron': False, 'tau': False}
 
 ROOT.gStyle.SetOptStat(0)
@@ -26,13 +26,13 @@ etaBinsCoarse = array('d', [float(x)/10. for x in [-30,-25]+range(-21,22,6)+[25,
 hadPresel=""    ##Met condition removed because for prediction I need Met<150 also.   
 diLepSelection ="ngNuMuFromW==2&&ngNuEFromW==0"
 #for relIso in [0.2,0.1,0.15,0.25,0.3,0.35]:
-for relIso in [0.12]:
+for relIso in [0.3]:
   ptCut=15
   leptonID = "muIsPF[gLepInd]&&(muIsGlobal[gLepInd]||muIsTracker[gLepInd])&&muPt[gLepInd]>"+str(ptCut)+"&&abs(muEta[gLepInd])<2.5"\
             +"&&abs(muDxy[gLepInd])<0.2&&abs(muDz[gLepInd])<0.5"\
             +"&&muRelIso[gLepInd]<"+str(relIso)
-  prefix = 'vetoMuIDPt15_ttJetsCSA1450ns_relIso'+str(relIso)
-
+  prefix = 'vetoMuIDPt15_ttJetsCSA1450ns_v26_relIso'+str(relIso)
+  print 'It is ok I am in the for statement'
   ##hybridLoose
   #ptCut=15
   #leptonID = "muIsPF[gLepInd]&&(muIsGlobal[gLepInd]||muIsTracker[gLepInd])&&muPt[gLepInd]>"+str(ptCut)+"&&abs(muEta[gLepInd])<2.1&&muRelIso[gLepInd]<0.2&&abs(muDxy[gLepInd])<0.02&&abs(muDz[gLepInd])<0.5"
@@ -95,6 +95,6 @@ for relIso in [0.12]:
       Path='/data/'+username+'/results2014/'+l+'Templates/'
       if not os.path.exists(Path):
         os.makedirs(Path)
-      fname='CSA14_TTJets_efficiencyMap_'+prefix+'.pkl'
+      fname='CSA14_TTJets_efficiencyMap_v26_'+prefix+'.pkl'
       pickle.dump(muPtEta2DEff, file(Path+fname,'w'))
       print "Written",  Path+fname 

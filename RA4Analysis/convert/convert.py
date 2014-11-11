@@ -389,7 +389,7 @@ for isample, sample in enumerate(allSamples):
               else:
                 lep['gLepDR'] = float('nan')
                 lep['gLepInd']= -1
-
+              print igp, gp.mother(0).pdgId()
               genLeps.append(lep)
 
             if pdgId==15:

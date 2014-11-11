@@ -2,7 +2,7 @@ import ROOT
 import pickle
 from array import array
 from Workspace.RA4Analysis.objectSelection import getGenLepsWithMatchInfo,getGenLeps, getMuons, gTauAbsEtaBins, gTauPtBins, metParRatioBins, jetRatioBins
-from Workspace.HEPHYPythonTools.helpers import getVarValue, getObjFromFile
+from Workspace.HEPHYPythonTools.helpers import deltaR,getVarValue, getObjFromFile
 from Workspace.RA4Analysis.objectSelection import getGoodJetsStage2,getLooseMuStage2, tightPOGMuID, vetoMuID
 from math import sqrt, cos, sin, atan2
 from Workspace.RA4Analysis.helpers import deltaPhi
@@ -13,9 +13,10 @@ c = ROOT.TChain('Events')
 #  c.Add(ttJetsCSA1450ns['dirname']+'/'+b+'/histo_ttJetsCSA1450ns_from*.root')
 #c.Add('/data/schoef/convertedTuples_v25/copyMET/ttJetsCSA1450ns/histo_ttJetsCSA1450ns_from*.root')
 #mode='dilep'
-c.Add('/data/schoef/convertedTuples_v24/copyInc/ttJetsCSA1450ns/histo_ttJetsCSA1450ns_from*')
+#c.Add('/data/schoef/convertedTuples_v24/copyInc/ttJetsCSA1450ns/histo_ttJetsCSA1450ns_from*')
+c.Add('/data/schoef/convertedTuples_v26/copyInc/ttJetsCSA1450ns/histo_ttJetsCSA1450ns_from*.root')
 mode='dilep'
-relIso = 0.12
+relIso = 0.3
 effUp = 1.1
 effDown = 0.9
 small = False
@@ -35,8 +36,8 @@ if mode=='lep':
 if mode=='dilep':
   leptonEffMap = pickle.load(file('/data/easilar/results2014/muonTemplates/CSA14_TTJets_efficiencyMap_vetoMuIDPt15_ttJetsCSA1450ns_relIso'+str(relIso)+'.pkl'))
   leptonID = "muIsPF&&(muIsGlobal||muIsTracker)&&muPt>15&&abs(muEta)<2.5&&abs(muDxy)<0.2&&abs(muDz)<0.5&&muRelIso<"+str(relIso)
-  doubleLeptonPreselection = "ngLep==2&&ngNuMuFromW==2&&ngNuEFromW==0" #&&ngoodMuons>=1&&Sum$("+leptonID+")==2&&nvetoElectrons==0"
-  ofile =                    '/data/easilar/results2014/muonTuples/CSA14_TTJets_diLep_newEff_relIso'+str(relIso)+'.root'
+  doubleLeptonPreselection = "gLepCount==2&&ngNuMuFromW==2&&ngNuEFromW==0" #&&ngoodMuons>=1&&Sum$("+leptonID+")==2&&nvetoElectrons==0"
+  ofile =                    '/data/easilar/results2014/muonTuples/CSA14_TTJets_diLep_v26_2_relIso'+str(relIso)+'.root'
   if small : ofile = '/data/easilar/results2014/muonTuples/CSA14_TTJets_diLep_Small_relIso'+str(relIso)+'.root'
 if mode=='had' or mode=='lep':
   for ptk in templates.keys():
@@ -48,7 +49,7 @@ if mode=='had' or mode=='lep':
       templates[ptk][etak]=res
 
 def getTwoMuons(c):
-  nmuCount = int(getVarValue(c, 'nmuCount' ))
+  nmuCount = int(getVarValue(c, 'muCount' ))
   res=[]
   nt=0
   nl=0
@@ -72,8 +73,22 @@ def getTypeStr(s):
   if s=='F': return 'Float_t'
   if s=='I': return 'Int_t'
 
-copyVars  = ['event/l','nbtags/I', 'njets/I', 'ht/F', 'met/F', 'metphi/F', 'nvetoMuons/I']
-newVars   = ['njetsPred/I','lostRelIsoPred/F','relIsoPred/F','hardestJetPtPred/F','nbtagsPred/F','eff/F','combFac/I' ,'lostPtPred/F','lostEtaPred/F','lostPhiPred/F','htPred/F','ptPred/F','etaPred/F','phiPred/F','wPhiPred/F','wPtPred/F','stPred/F' ,'metPred/F', 'metphiPred/F','weightPred/F', 'mTPred/F', 'weight/F', 'scaleLEff/F','scaleLEffUp/F','scaleLEffDown/F','deltaPhiPred/F']
+copyVars  = ['event/l','nbtags/I', 'njets/I', 'ht/F', 'met/F', 'metPhi/F', 'nvetoMuons/I']
+newVars   = ['htCalcPred/F','njetsPred/I','lostRelIsoPred/F','relIsoPred/F','lostminDeltaRPred/F','minDeltaRPred/F','hardestJetPt0Pred/F','hardestJetPt1Pred/F','hardestJetPt2Pred/F','hardestJetPt3Pred/F','nbtagsPred/F','eff/F','combFac/I' ,'lostPtPred/F','lostEtaPred/F','lostPhiPred/F','htPred/F','ptPred/F','etaPred/F','phiPred/F','wPhiPred/F','wPtPred/F','stPred/F' ,'metPred/F', 'metPhiPred/F','weightPred/F', 'mTPred/F', 'weight/F', 'scaleLEff/F','scaleLEffUp/F','scaleLEffDown/F','deltaPhiPred/F', \
+ 'hardestJetEta0Pred/F', \
+ 'hardestJetEta1Pred/F', \
+ 'hardestJetEta2Pred/F', \
+ 'hardestJetEta3Pred/F', \
+ 'hardestJetPhi0Pred/F', \
+ 'hardestJetPhi1Pred/F', \
+ 'hardestJetPhi2Pred/F', \
+ 'hardestJetPhi3Pred/F', \
+ 'hardestbJetPt0Pred/F', \
+ 'hardestbJetPt1Pred/F', \
+ 'hardestbJetPt2Pred/F', \
+ 'hardestbJetPt3Pred/F', \
+
+]
 vars      = copyVars+newVars  
 
 structString = "struct MyStruct{"
@@ -122,16 +137,20 @@ for i in range(number_events):
   looseMatchedMuons = filter(lambda x:x['isLoose'] and x['hasMatch'], allMuons) 
   tightMatchedMuons = filter(lambda x:x['isTight'] and x['hasMatch'], allMuons)
   ##Get Jets
-  njets = getVarValue(c, 'njetCount')
+  njets = getVarValue(c, 'njets')
   jets = getGoodJetsStage2(c)
-  ##Get hardest jet Pt 
-  jetsPt = []
-  for j in range(int(njets)):
-    jetPt = jets[j]['pt']
-    jetsPt.append(jetPt)
-  if njets >0: hardestJetPt = max(jetsPt)
+  sorted(jets, key= lambda x: -x['pt'])
+  bjets = filter(lambda j:j['btag']>0.679 and abs(j['eta'])<2.4, jets)
+  sorted(bjets, key=lambda x: -x['pt'])   
 
-  if (len(allMuons)==2 and len(looseMatchedMuons)==2 and len(tightMatchedMuons)>=1 and len(gLepsInAcc)==2) :
+  if small :
+    print 'njets', len(jets)
+    print 'nloosemuons' , len(looseMuons)
+  #if len(looseMuons) >0: 
+  #   jetsCleaned = [jet for jet in jets if min([deltaR(jet, muon) for muon in looseMuons])>0.4]
+  #   if small: print 'number of cleaned jets', len(jetsCleaned)
+
+  if (len(looseMatchedMuons)==2 and len(tightMatchedMuons)>=1 and len(gLepsInAcc)==2) :
     assert len(looseMatchedMuons)==2, "Problem in event "+str(int(c.GetLeaf('event').GetValue()))
     if looseMuons[0]['isTight'] and looseMuons[1]['isTight']:
       s.combFac = 0.5
@@ -146,6 +165,61 @@ for i in range(number_events):
         if abseta>2.5:continue
         #countLeptons+=1
 #        print template 
+
+        ##Get hardest jet Pt 
+        jetsPt = []
+        deltaRs = []
+        jetsIncMuPt = []
+        lostdeltaRs = []
+        hardestJetPt0 = -1
+        hardestJetPt1 = -1
+        hardestJetPt2 = -1
+        hardestJetPt3 = -1
+        hardestJetEta0 = -100
+        hardestJetEta1 = -100
+        hardestJetEta2 = -100
+        hardestJetEta3 = -100
+        hardestJetPhi0 = -100
+        hardestJetPhi1 = -100
+        hardestJetPhi2 = -100
+        hardestJetPhi3 = -100
+        hardestbJetPt0 = -1
+        hardestbJetPt1 = -1
+        hardestbJetPt2 = -1
+        hardestbJetPt3 = -1
+        for j in range(int(njets)):
+          jet = jets[j]
+          if jet:
+            jetPt = jet['pt']
+            jetsPt.append(jetPt)
+            deltaRs.append(deltaR(m2,jet))
+            lostdeltaRs.append(deltaR(m,jet))
+        htCalc = sum(jetsPt)
+        jetsIncMu = jets
+        jetsIncMu.append(m) 
+        sorted(jetsIncMu, key=lambda x: -x['pt'])
+        if njets > 0:
+          hardestJetPt0 = jetsIncMu[0]['pt']
+          hardestJetEta0 = jetsIncMu[0]['eta']
+          hardestJetPhi0 = jetsIncMu[0]['phi']
+          if s.nbtags > 0: hardestbJetPt0 = bjets[0]['pt']
+          mindeltaR = min(deltaRs)
+          lostmindeltaR = min(lostdeltaRs)
+          if njets >1:
+            hardestJetPt1 = jetsIncMu[1]['pt']
+            hardestJetEta1 = jetsIncMu[1]['eta']
+            hardestJetPhi1 = jetsIncMu[1]['phi']
+            if s.nbtags > 1: hardestbJetPt1 = bjets[1]['pt']
+            if njets >2:
+              hardestJetPt2 = jetsIncMu[2]['pt']
+              hardestJetEta2 = jetsIncMu[2]['eta']
+              hardestJetPhi2 = jetsIncMu[2]['phi']
+              if s.nbtags > 2: hardestbJetPt2 = bjets[2]['pt']
+              if njets>3:
+                hardestJetPt3 = jetsIncMu[3]['pt']
+                hardestJetEta3 = jetsIncMu[3]['eta']
+                hardestJetPhi3 = jetsIncMu[3]['phi']
+                if s.nbtags > 3: hardestbJetPt3 = bjets[3]['pt']
         s.weight=c.GetLeaf('weight').GetValue()
         lEffb = leptonEffMap.FindBin( m['pt'], m['eta'])
         lEffi = leptonEffMap.GetBinContent(lEffb)
@@ -158,11 +232,13 @@ for i in range(number_events):
             s.scaleLEff = (1-lEff)/lEff
             s.scaleLEffUp = (1-lEffUp)/lEffUp
             s.scaleLEffDown = (1-lEffDown)/lEffDown 
-            metx = s.met*cos(s.metphi)+cos(m['phi'])*m['pt']
-            mety = s.met*sin(s.metphi)+sin(m['phi'])*m['pt']
+            metx = s.met*cos(s.metPhi)+cos(m['phi'])*m['pt']
+            mety = s.met*sin(s.metPhi)+sin(m['phi'])*m['pt']
             s.nbtagsPred = s.nbtags
-            s.njetsPred = s.njets
-            s.htPred   = s.ht
+            if m['pt'] > 30:
+              s.njetsPred = njets + 1
+              s.htPred   = s.ht + m['pt']
+              
             s.ptPred     = m2['pt'] 
             s.etaPred    = m2['eta']
             s.phiPred    = m2['phi']
@@ -171,15 +247,33 @@ for i in range(number_events):
             s.lostPhiPred   = m['phi']
             s.weightPred = s.weight
             s.metPred = sqrt(metx**2+mety**2)
-            s.metphiPred = atan2(mety,metx)
-            s.mTPred = sqrt(2.*s.metPred*m2['pt']*(1-cos(m2['phi']-s.metphiPred)))
-            wx = s.metPred*cos(s.metphiPred) + m2['pt']*cos(m2['phi'])
-            wy = s.metPred*sin(s.metphiPred) + m2['pt']*sin(m2['phi'])
+            s.metPhiPred = atan2(mety,metx)
+            s.mTPred = sqrt(2.*s.metPred*m2['pt']*(1-cos(m2['phi']-s.metPhiPred)))
+            wx = s.metPred*cos(s.metPhiPred) + m2['pt']*cos(m2['phi'])
+            wy = s.metPred*sin(s.metPhiPred) + m2['pt']*sin(m2['phi'])
             s.wPhiPred     = atan2(wy,wx)
             s.wPtPred      = sqrt((wx)**2+(wy)**2)
             s.stPred       = m2['pt'] + s.metPred 
             s.deltaPhiPred = deltaPhi(s.wPhiPred,m2['phi'])
-            s.hardestJetPtPred = hardestJetPt
+            s.hardestJetPt0Pred = hardestJetPt0
+            s.hardestJetPt1Pred = hardestJetPt1
+            s.hardestJetPt2Pred = hardestJetPt2
+            s.hardestJetPt3Pred = hardestJetPt3
+            s.hardestJetEta0Pred = hardestJetEta0
+            s.hardestJetEta1Pred = hardestJetEta1
+            s.hardestJetEta2Pred = hardestJetEta2
+            s.hardestJetEta3Pred = hardestJetEta3
+            s.hardestJetPhi0Pred = hardestJetPhi0
+            s.hardestJetPhi1Pred = hardestJetPhi1
+            s.hardestJetPhi2Pred = hardestJetPhi2
+            s.hardestJetPhi3Pred = hardestJetPhi3
+            s.hardestbJetPt0Pred = hardestbJetPt0
+            s.hardestbJetPt1Pred = hardestbJetPt1
+            s.hardestbJetPt2Pred = hardestbJetPt2
+            s.hardestbJetPt3Pred = hardestbJetPt3
+            s.htCalcPred = htCalc
+            s.minDeltaRPred = mindeltaR
+            s.lostminDeltaRPred = lostmindeltaR
             s.relIsoPred = m2['relIso']
             s.lostRelIsoPred = m['relIso']
             t.Fill()
@@ -189,72 +283,72 @@ for i in range(number_events):
               print 'nloose matched muons:' , len(looseMatchedMuons)
               print 'generated leps in acc:', gLepsInAcc
               print 'loose matched muons:', looseMatchedMuons
-              print 'hardest Jet Pt:', s.hardestJetPt
-        if mode=='had' or mode=='lep':
-          template=None
-          for ptb in gTauPtBins:
-            if m['pt']>=ptb[0] and (m['pt']<ptb[1] or ptb[1]<0):
-              for etab in gTauAbsEtaBins:
-                if abseta>=etab[0] and abseta<etab[1]:
-                  template=templates[ptb][etab]
-                  break
-              if template:break
-          assert template, "No template found for muon: %r" % repr(m)
-#          if lEff>0:
-          s.scaleLEff = 1./lEff
-#          else:
-#            s.scaleLEff = 1.
-          for p in template:
-            metpar    = p['frac']*m['pt']
-            MEx = s.met*cos(s.metphi)+cos(m['phi'])*metpar
-            MEy = s.met*sin(s.metphi)+sin(m['phi'])*metpar
-            wx = MEx+cos(m2['phi'])*m2['pt']
-            wy = MEy+sin(m2['phi'])*m2['pt'] 
-            if mode=='had':
-              s.weightPred = p['weight']*s.weight
-    #          s.nvetoMuonsPred = s.nvetoMuons 
-              jetpt =  (1.-p['frac'])*m['pt']
-              if jetpt>30.:
-                s.njetsPred = s.njets+1
-                s.htPred    = s.ht+jetpt
-              else:
+              print 'hardest Jet Pt:', s.hardestJetPt0Pred
+          if mode=='had' or mode=='lep':
+            template=None
+            for ptb in gTauPtBins:
+              if m['pt']>=ptb[0] and (m['pt']<ptb[1] or ptb[1]<0):
+                for etab in gTauAbsEtaBins:
+                  if abseta>=etab[0] and abseta<etab[1]:
+                    template=templates[ptb][etab]
+                    break
+                if template:break
+            assert template, "No template found for muon: %r" % repr(m)
+#            if lEff>0:
+            s.scaleLEff = 1./lEff
+#            else:
+#              s.scaleLEff = 1.
+            for p in template:
+              metpar    = p['frac']*m['pt']
+              MEx = s.met*cos(s.metPhi)+cos(m['phi'])*metpar
+              MEy = s.met*sin(s.metPhi)+sin(m['phi'])*metpar
+              wx = MEx+cos(m2['phi'])*m2['pt']
+              wy = MEy+sin(m2['phi'])*m2['pt'] 
+              if mode=='had':
+                s.weightPred = p['weight']*s.weight
+    #            s.nvetoMuonsPred = s.nvetoMuons 
+                jetpt =  (1.-p['frac'])*m['pt']
+                if jetpt>30.:
+                  s.njetsPred = s.njets+1
+                  s.htPred    = s.ht+jetpt
+                else:
+                  s.njetsPred = s.njets
+                  s.htPred    = s.ht
+                s.metPred      = sqrt(MEx**2+MEy**2)
+                s.metPhiPred   = atan2(MEy,MEx)
+                s.mTPred       = sqrt(2.*s.metPred*m2['pt']*(1-cos(m2['phi']-s.metPhiPred)))
+                s.wPtPred      = sqrt(wx**2+wy**2)
+                s.wPhiPred     = atan2(wy,wx)
+                s.stPred       = sqrt((s.wPtPred)**2+(s.mTPred)**2)
+                s.deltaPhiPred = deltaPhi(s.wPhiPred,m2['phi'])
+                t.Fill()
+              if mode=='lep':
                 s.njetsPred = s.njets
-                s.htPred    = s.ht
-              s.metPred      = sqrt(MEx**2+MEy**2)
-              s.metphiPred   = atan2(MEy,MEx)
-              s.mTPred       = sqrt(2.*s.metPred*m2['pt']*(1-cos(m2['phi']-s.metphiPred)))
-              s.wPtPred      = sqrt(wx**2+wy**2)
-              s.wPhiPred     = atan2(wy,wx)
-              s.stPred       = sqrt((s.wPtPred)**2+(s.mTPred)**2)
-              s.deltaPhiPred = deltaPhi(s.wPhiPred,m2['phi'])
-              t.Fill()
-            if mode=='lep':
-              s.njetsPred = s.njets
-              s.htPred   = s.ht
-              leppt =  (1.-p['frac'])*m['pt']
-              if leppt>15.:
-                nlEffb = leptonEffMap.FindBin(leppt, m['eta'])
-                nlEff = leptonEffMap.GetBinContent(nlEffb) #Consider the event not contributing if the lepton from the tau hits the lepton veto
-                weightFac = 1-nlEff
-              else:
-                weightFac = 1.
-                
-              s.weightPred = p['weight']*s.weight*weightFac
-              MEx += leppt*cos(m['phi'])
-              MEy += leppt*sin(m['phi'])
-              s.metPred = sqrt(MEx**2+MEy**2)
-              s.metphiPred = atan2(MEy,MEx)
-              s.mTPred = sqrt(2.*s.metPred*m2['pt']*(1-cos(m2['phi']-s.metphiPred)))
-              t.Fill()
-    #              #lepton reconstructed ->not filled
-    ##              s.nvetoMuonsPred = s.nvetoMuons + 1 
-    #              s.weightPred = p['weight']*s.weight*nlEff
-    #              s.metPred = sqrt(MEx**2+MEy**2)
-    #              s.metphiPred = atan2(MEy,MEx)
-    #              s.mTPred = sqrt(2.*s.metPred*m2['pt']*(1-cos(m2['phi']-s.metphiPred)))
-    #              t.Fill()
-                  #lepton lost
-    #              s.nvetoMuonsPred = s.nvetoMuons  
+                s.htPred   = s.ht
+                leppt =  (1.-p['frac'])*m['pt']
+                if leppt>15.:
+                  nlEffb = leptonEffMap.FindBin(leppt, m['eta'])
+                  nlEff = leptonEffMap.GetBinContent(nlEffb) #Consider the event not contributing if the lepton from the tau hits the lepton veto
+                  weightFac = 1-nlEff
+                else:
+                  weightFac = 1.
+                  
+                s.weightPred = p['weight']*s.weight*weightFac
+                MEx += leppt*cos(m['phi'])
+                MEy += leppt*sin(m['phi'])
+                s.metPred = sqrt(MEx**2+MEy**2)
+                s.metPhiPred = atan2(MEy,MEx)
+                s.mTPred = sqrt(2.*s.metPred*m2['pt']*(1-cos(m2['phi']-s.metPhiPred)))
+                t.Fill()
+    #                #lepton reconstructed ->not filled
+    ##                s.nvetoMuonsPred = s.nvetoMuons + 1 
+    #                s.weightPred = p['weight']*s.weight*nlEff
+    #                s.metPred = sqrt(MEx**2+MEy**2)
+    #                s.metPhiPred = atan2(MEy,MEx)
+    #                s.mTPred = sqrt(2.*s.metPred*m2['pt']*(1-cos(m2['phi']-s.metPhiPred)))
+    #                t.Fill()
+                    #lepton lost
+    #                s.nvetoMuonsPred = s.nvetoMuons  
 
 
 f.cd()
