@@ -1,5 +1,12 @@
 import copy, os, sys
 
+T1qqqq_1400_325_300={\
+"name" : "T1qqqq_1400_325_300",
+"bins": ["T1qqqq_1400_325_300"],
+'dir' : "/data/schoef/cmgTuples/postProcessed_v0/singleLepton/",
+'dbsName':'T1qqqq_1400_325_300'
+}
+
 T5Full_1200_1000_800={\
 "name" : "T5Full_1200_1000_800",
 "bins": ["T5Full_1200_1000_800"],

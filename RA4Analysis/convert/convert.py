@@ -18,7 +18,7 @@ from Workspace.RA4Analysis.stage1Tuples import *
 
 from Workspace.HEPHYPythonTools.xsec import xsec
 
-subDir = "convertedTuples_v25"
+subDir = "convertedTuples_v26"
 target_lumi = 2000 #pb-1
 
 from localInfo import username
