@@ -2,7 +2,7 @@ import ROOT
 import pickle
 from array import array
 from Workspace.RA4Analysis.objectSelection import getGoodJetsStage2,gTauAbsEtaBins, gTauPtBins, metParRatioBins, jetRatioBins
-from Workspace.HEPHYPythonTools.helpers import deltaR,getVarValue, getObjFromFile
+from Workspace.HEPHYPythonTools.helpers import findClosestObjectDR, deltaR,getVarValue, getObjFromFile
 from Workspace.RA4Analysis.objectSelection import getGenLepsWithMatchInfo,getGenLeps, getMuons, getLooseMuStage2, getGenLep ,tightPOGMuID, vetoMuID
 from math import sqrt, cos, sin, atan2
 from Workspace.RA4Analysis.stage2Tuples import *
@@ -15,46 +15,69 @@ def getTypeStr(s):
   if s=='I': return 'Int_t'
 
 c = ROOT.TChain('Events')
-#for b in ttJetsCSA1450ns['bins']:
-#  c.Add(ttJetsCSA1450ns['dirname']+'/'+b+'/histo_ttJetsCSA1450ns_from*.root')
-#c.Add('/data/easilar/convertedTuples_v23/copyMET/ttJetsCSA1450ns/*')
-#c.Add('/data/schoef/convertedTuples_v24/copyInc/ttJetsCSA1450ns/histo_ttJetsCSA1450ns_from*')
 c.Add('/data/schoef/convertedTuples_v26/copyInc/ttJetsCSA1450ns/histo_ttJetsCSA1450ns_from*.root')
-small = True
-n_max = 100
+
+small = False
+n_max = 20000
 relIso = 0.3
 doubleLeptonPreselection = "gLepCount==2&&ngNuMuFromW==2&&ngNuEFromW==0"
 
 leptonEffMap = pickle.load(file('/data/'+username+'/results2014/muonTemplates/CSA14_TTJets_efficiencyMap_v26_vetoMuIDPt15_ttJetsCSA1450ns_v26_relIso'+str(relIso)+'.pkl'))
 leptonID = "muIsPF&&(muIsGlobal||muIsTracker)&&muPt>15&&abs(muEta)<2.5&&abs(muDxy)<0.2&&abs(muDz)<0.5&&muRelIso<"+str(relIso) 
 
-ofile ='/data/'+username+'/results2014/muonTuples/CSA14_TTJets_Lost_v26_2_relIso'+str(relIso)+'.root'
+ofile ='/data/'+username+'/results2014/muonTuples/CSA14_TTJets_Lost_v26_relIso'+str(relIso)+'.root'
 if small: ofile ='/data/'+username+'/results2014/muonTuples/CSA14_TTJets_Lost_small_relIso'+str(relIso)+'.root'
 
 copyVars  = ['event/l','weight/F', 'njets/I','nbtags/F' ,'ht/F', 'met/F', 'metPhi/F', 'nvetoMuons/F','ngoodMuons/F','nvetoElectrons/F','gTauPt/F','gTauEta/F','gTauNENu/I','gTauNMuNu/I','gTauNTauNu/I']
-truthVars   = ['htCalc/F','wPhi/F','lostminDeltaR/F','minDeltaR/F','hardestJetPt0/F','hardestJetPt1/F','hardestJetPt2/F','hardestJetPt3/F','wPt/F','st/F','relIso/F', 'mT/F', 'pt/F','eta/F','lostPt/F','lostEta/F','phi/F','lostPhi/F','deltaPhi/F', \
- 'hardestJetEta0/F', \
- 'hardestJetEta1/F', \
- 'hardestJetEta2/F', \
- 'hardestJetEta3/F', \
- 'hardestJetPhi0/F', \
- 'hardestJetPhi1/F', \
- 'hardestJetPhi2/F', \
- 'hardestJetPhi3/F', \
- 'hardestbJetPt0/F', \
- 'hardestbJetPt1/F', \
- 'hardestbJetPt2/F', \
- 'hardestbJetPt3/F', \
-
+truthVars   = ['wPhi/F', 'wPt/F','st/F','relIso/F', 'mT/F', 'pt/F','eta/F','lostPt/F','lostEta/F', \
+'phi/F','lostPhi/F','deltaPhi/F', \
+'mindeltaRBM/F', \
+'mindeltaRBL/F', \
+'mindeltaRNonBM/F', \
+'mindeltaRNonBL/F', \
+'mindeltaRAllJets/F', \
+'minlostdeltaRBM/F', \
+'minlostdeltaRBL/F', \
+'minlostdeltaRNonBM/F', \
+'minlostdeltaRNonBL/F', \
+'minlostdeltaRAllJets/F', \
+'closestJetPt/F', \
+'closestJetPdg/F', \
+'closestJetPhi/F', \
+'closestJetEta/F', \
+]
+vectorVars = [
+'jetPt[16]/F', \
+'jetEta[16]/F', \
+'jetPhi[16]/F', \
+'jetPdg[16]/F', \
+'bJetCSVMPt[16]/F', \
+'bJetCSVMEta[16]/F', \
+'bJetCSVMPhi[16]/F', \
+'bJetCSVMPdg[16]/F', \
+'bJetCSVLPt[16]/F', \
+'bJetCSVLEta[16]/F', \
+'bJetCSVLPhi[16]/F', \
+'bJetCSVLPdg[16]/F', \
+'nonbJetCSVMPt[16]/F', \
+'nonbJetCSVMEta[16]/F', \
+'nonbJetCSVMPhi[16]/F', \
+'nonbJetCSVMPdg[16]/F', \
+'nonbJetCSVLPt[16]/F', \
+'nonbJetCSVLEta[16]/F', \
+'nonbJetCSVLPhi[16]/F', \
+'nonbJetCSVLPdg[16]/F', \
 ]
 vars      = copyVars+truthVars
 
 structString = "struct MyStruct{"
 structString+= "".join([getTypeStr(v.split('/')[1])+" "+v.split('/')[0]+";" for v in vars])
+structString+= "".join([getTypeStr(v.split('/')[1])+" "+v.split('/')[0]+";" for v in vectorVars])
 structString+="}"
 ROOT.gROOT.ProcessLine(structString)
 exec("from ROOT import MyStruct")
 exec("s = MyStruct()")
+print structString
 dir=ROOT.gDirectory.func()
 
 f=ROOT.TFile(ofile, 'recreate')
@@ -62,6 +85,8 @@ f.cd()
 t = ROOT.TTree( "Events", "Events", 1 )
 for v in vars:
  t.Branch(v.split('/')[0],   ROOT.AddressOf(s,v.split('/')[0]), v)
+for v in vectorVars:
+  t.Branch(v.split('[')[0], ROOT.AddressOf(s,v.split('[')[0]),v) 
 dir.cd()
 #cut = "&&".join([doubleLeptonPreselection, hadPresel])
 c.Draw(">>eList", doubleLeptonPreselection)
@@ -97,137 +122,102 @@ for i in range(number_events):
   tightMuons = filter(lambda x:x['isTight'], allMuons)
   tightMatchedMuons = filter(lambda x:x['isTight'] and x['hasMatch'], looseMuons)
   #4. get Lost muons 
-  #4.1 get generated muon has no match to a reco muon
   lostGenMuons = filter(lambda x:not x['hasMatchInd'], gLeps)
   lostGenMuonsInAcc = filter(lambda x:x['gLepPt']>=15 and abs(x['gLepEta'])<2.1, lostGenMuons)
-  #4.2 get reco muon has match but fails looseID
-  lostRecoMuons = filter(lambda x:(not(x['isLoose']) and x['hasMatch']), allMuons)
-  lostRecoMuonsInAcc = filter(lambda x:x['pt']>=15 and abs(x['eta'])<2.1, lostRecoMuons)
 
+  nLostMuons = len(lostGenMuonsInAcc) 
+  if small: print nLostMuons
   ##Get Jets
   njets = getVarValue(c, 'njets')
+  nbtags = getVarValue(c, 'nbtags')
   jets = getGoodJetsStage2(c)
   sorted(jets, key= lambda x: -x['pt'])
-  bjets = filter(lambda j:j['btag']>0.679 and abs(j['eta'])<2.4, jets)
-  sorted(bjets, key=lambda x: -x['pt'])
-  nLostMuons = len(lostGenMuonsInAcc) + len(lostRecoMuonsInAcc)
-  #if s.event == 26671039:
+  bjetsCSVM = filter(lambda j:j['btag']>0.679 and abs(j['eta'])<2.4, jets)
+  sorted(bjetsCSVM, key=lambda x: -x['pt'])
+  bjetsCSVL = filter(lambda j:j['btag']>0.246 and abs(j['eta'])<2.4, jets)
+  sorted(bjetsCSVL, key=lambda x: -x['pt'])
+  nonbjetsCSVM = filter(lambda j:not (j['btag']>0.679 and abs(j['eta']<2.4)), jets)
+  sorted(nonbjetsCSVM, key=lambda x: -x['pt'])
+  nonbjetsCSVL = filter(lambda j: not (j['btag']>0.246 and abs(j['eta']<2.4)), jets)
+  sorted(nonbjetsCSVL, key=lambda x: -x['pt'])
 
-  if len(gLepsInAcc)==2 and  len(looseMuonsInAcc)==1 and len(tightMatchedMuons) == 1:
-
-    tightMatchedMuon = tightMatchedMuons[0]
- 
-    ##take lost leptons:
-    if len(lostGenMuonsInAcc)==1 :
-      s.lostPt = lostGenMuonsInAcc[0]['gLepPt']
-      s.lostEta = lostGenMuonsInAcc[0]['gLepEta']
-      s.lostPhi =  lostGenMuonsInAcc[0]['gLepPhi']
-    if len(lostRecoMuonsInAcc)==1 : 
-      s.lostPt = lostRecoMuonsInAcc[0]['pt']
-      s.lostEta = lostRecoMuonsInAcc[0]['eta']
-      s.lostPhi = lostRecoMuonsInAcc[0]['phi']
-
+  if len(gLepsInAcc)==2 and  len(looseMuons)==1 and len(tightMatchedMuons) == 1:
+  #if len(gLepsInAcc)==2 and  len(looseMatchedMuons)==1 and len(tightMatchedMuons) == 1:
     if small:
+      print nLostMuons
       print 'met:', s.met
       print 'number of all reco muons:', len(allMuons) 
       print 'number of all generated muons:', len(gLeps)
       print 'gLeps', gLeps
       print 'all muons', allMuons
-      print 'relIso: ' , tightMatchedMuon['relIso']
-      print 'lost reco muons fails loose ID:' , lostRecoMuonsInAcc
       print 'lost gen muons:' , lostGenMuonsInAcc
-    ##Get hardest jet Pt
-    jetsPt = []
-    deltaRs = []
-    lostDeltaRs = []
+      print 'jets:',jets
+
+    tightMatchedMuon = tightMatchedMuons[0]
+    lostLep = lostGenMuonsInAcc[0] 
+    lostLep_ = {'phi':lostLep['gLepPhi'],'eta':lostLep['gLepEta']} 
+    s.lostPt = lostLep['gLepPt']
+    s.lostEta = lostLep['gLepEta']
+    s.lostPhi =  lostLep['gLepPhi']
+
+    #sortedList  = [[deltaR(lostLep_, jet), jet] for jet in jets]sort( key=lambda x:-x[0])
+    if len(jets)>0:
+      closestObj = findClosestObjectDR(jets,lostLep_)
+      closestJet = closestObj['obj']
+      s.closestJetPt  = closestJet['pt']
+      s.closestJetPdg = closestJet['pdg']
+      s.closestJetPhi = closestJet['phi']
+      s.closestJetEta = closestJet['eta']
+      s.minlostdeltaRAllJets = closestObj['deltaR']
+    if len(bjetsCSVM)>0:    s.mindeltaRBM          =findClosestObjectDR(bjetsCSVM,tightMatchedMuon)['deltaR']   
+    if len(bjetsCSVL)>0:    s.mindeltaRBL          =findClosestObjectDR(bjetsCSVL,tightMatchedMuon)['deltaR']   
+    if len(nonbjetsCSVM)>0: s.mindeltaRNonBM       =findClosestObjectDR(nonbjetsCSVM,tightMatchedMuon)['deltaR']
+    if len(nonbjetsCSVL)>0: s.mindeltaRNonBL       =findClosestObjectDR(nonbjetsCSVL,tightMatchedMuon)['deltaR']
+    if len(bjetsCSVM)>0:    s.minlostdeltaRBM      =findClosestObjectDR(bjetsCSVM,lostLep_)['deltaR']   
+    if len(bjetsCSVL)>0:    s.minlostdeltaRBL      =findClosestObjectDR(bjetsCSVL,lostLep_)['deltaR']   
+    if len(nonbjetsCSVM)>0: s.minlostdeltaRNonBM   =findClosestObjectDR(nonbjetsCSVM,lostLep_)['deltaR']
+    if len(nonbjetsCSVL)>0: s.minlostdeltaRNonBL   =findClosestObjectDR(nonbjetsCSVL,lostLep_)['deltaR']
+
     for j in range(int(njets)):
       jet = jets[j]
       if jet:
-        jetPt = jet['pt']
-        jetsPt.append(jetPt)
-        deltaRs.append(deltaR(tightMatchedMuon,jet))
-        if len(lostGenMuonsInAcc)==1 : lostDeltaRs.append(deltaR({'phi':lostGenMuonsInAcc[0]['gLepPhi'],'eta':lostGenMuonsInAcc[0]['gLepEta']},jet))
-        #if small: print 'lostDeltaRs:' , lostDeltaRs
-        if len(lostRecoMuonsInAcc)==1 : lostDeltaRs.append(deltaR(lostRecoMuonsInAcc[0],jet))
-        #if small: print 'lostDeltaRs:' , lostDeltaRs
-    htCalc =  sum(jetsPt)    
+        s.jetPt[j] = jet['pt']
+        s.jetEta[j] = jet['eta']
+        s.jetPhi[j] = jet['phi']
+        s.jetPdg[j] = jet['pdg']
+    for j in range(int(len(bjetsCSVM))):
+      s.bJetCSVMPt[j]  = bjetsCSVM[j]['pt']
+      s.bJetCSVMEta[j] = bjetsCSVM[j]['eta']
+      s.bJetCSVMPhi[j] = bjetsCSVM[j]['phi']
+      s.bJetCSVMPdg[j] = bjetsCSVM[j]['pdg']
+    for j in range(int(len(bjetsCSVL))):
+      s.bJetCSVLPt[j]  = bjetsCSVL[j]['pt']
+      s.bJetCSVLEta[j] = bjetsCSVL[j]['eta']
+      s.bJetCSVLPhi[j] = bjetsCSVL[j]['phi']
+      s.bJetCSVLPdg[j] = bjetsCSVL[j]['pdg']
+    for j in range(int(len(nonbjetsCSVM))):
+      s.nonbJetCSVMPt[j]  = nonbjetsCSVM[j]['pt']
+      s.nonbJetCSVMEta[j] = nonbjetsCSVM[j]['eta']
+      s.nonbJetCSVMPhi[j] = nonbjetsCSVM[j]['phi']
+      s.nonbJetCSVMPdg[j] = nonbjetsCSVM[j]['pdg']
+    for j in range(int(len(nonbjetsCSVL))):
+      s.nonbJetCSVLPt[j]  = nonbjetsCSVL[j]['pt']
+      s.nonbJetCSVLEta[j] = nonbjetsCSVL[j]['eta']
+      s.nonbJetCSVLPhi[j] = nonbjetsCSVL[j]['phi']
+      s.nonbJetCSVLPdg[j] = nonbjetsCSVL[j]['pdg']
 
-    hardestJetPt0 = -1
-    hardestJetPt1 = -1
-    hardestJetPt2 = -1
-    hardestJetPt3 = -1
-    hardestJetEta0 = -100
-    hardestJetEta1 = -100
-    hardestJetEta2 = -100
-    hardestJetEta3 = -100
-    hardestJetPhi0 = -100
-    hardestJetPhi1 = -100
-    hardestJetPhi2 = -100
-    hardestJetPhi3 = -100
-    hardestbJetPt0 = -1
-    hardestbJetPt1 = -1
-    hardestbJetPt2 = -1
-    hardestbJetPt3 = -1
-    if njets>0: 
-      hardestJetPt0 = jets[0]['pt']
-      mindeltaR = min(deltaRs)
-      hardestJetEta0 = jets[0]['eta']
-      hardestJetPhi0 = jets[0]['phi']
-      if s.nbtags > 0: hardestbJetPt0 = bjets[0]['pt']
-      if nLostMuons>0 : lostmindeltaR = min(lostDeltaRs) 
-      if njets >1:
-        hardestJetPt1 = jets[1]['pt']
-        hardestJetEta1 = jets[1]['eta']
-        hardestJetPhi1 = jets[1]['phi']
-        if s.nbtags > 1: hardestbJetPt1 = bjets[1]['pt']
-        if njets >2:
-          hardestJetPt2 = jets[2]['pt']
-          hardestJetEta2 = jets[2]['eta']
-          hardestJetPhi2 = jets[2]['phi']
-          if s.nbtags > 2: hardestbJetPt2 = bjets[2]['pt']
-          if njets>3:
-            hardestJetPt3 = jets[3]['pt']
-            hardestJetEta3 = jets[3]['eta']
-            hardestJetPhi3 = jets[3]['phi']
-            if s.nbtags > 3: hardestbJetPt3 = bjets[3]['pt']
-    if small:
-      print 'hardest Jet Pt:' , hardestJetPt0
-      print 'min DeltaR:' , mindeltaR
-
-    
     #jetsCleaned = [jet for jet in jets if min([deltaR(jet, muon) for muon in looseMuons])>0.4]
     #if small: print 'number of cleaned jets', len(jetsCleaned)
-    s.njets = njets 
     s.mT=(sqrt(2*s.met*tightMatchedMuon['pt']*(1-cos(tightMatchedMuon['phi']-s.metPhi))))
     wx = s.met*cos(s.metPhi) + tightMatchedMuon['pt']*cos(tightMatchedMuon['phi'])
     wy = s.met*sin(s.metPhi) + tightMatchedMuon['pt']*sin(tightMatchedMuon['phi'])
     s.wPhi     = atan2(wy,wx)
     s.wPt      = sqrt((wx)**2+(wy)**2) 
-#    s.st       = sqrt((s.wPt)**2+(s.mT)**2)
     s.st       = s.met + tightMatchedMuon['pt'] 
     s.pt     = (tightMatchedMuon['pt'])
     s.eta    = (tightMatchedMuon['eta'])
     s.phi    = (tightMatchedMuon['phi'])
     s.deltaPhi = (deltaPhi(tightMatchedMuon['phi'],s.wPhi))
-    s.hardestJetPt0 = hardestJetPt0
-    s.hardestJetPt1 = hardestJetPt1
-    s.hardestJetPt2 = hardestJetPt2
-    s.hardestJetPt3 = hardestJetPt3
-    s.hardestJetEta0 = hardestJetEta0
-    s.hardestJetEta1 = hardestJetEta1
-    s.hardestJetEta2 = hardestJetEta2
-    s.hardestJetEta3 = hardestJetEta3
-    s.hardestJetPhi0 = hardestJetPhi0
-    s.hardestJetPhi1 = hardestJetPhi1
-    s.hardestJetPhi2 = hardestJetPhi2
-    s.hardestJetPhi3 = hardestJetPhi3
-    s.hardestbJetPt0 = hardestbJetPt0
-    s.hardestbJetPt1 = hardestbJetPt1
-    s.hardestbJetPt2 = hardestbJetPt2
-    s.hardestbJetPt3 = hardestbJetPt3
-    s.htCalc = htCalc
-    s.minDeltaR = mindeltaR
-    s.lostminDeltaR = lostmindeltaR  
     s.relIso = tightMatchedMuon['relIso']
     t.Fill()
 

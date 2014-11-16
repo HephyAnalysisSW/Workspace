@@ -21,7 +21,7 @@ def getMuons(c,relIso,gLeps):
       if isLoose: nlmuons+=1
       hasMatch = False
       for gl in gLeps:
-        if gl['gLepInd']==j and gl['gLepDR']<0.4 and abs(gl['gLepPdg'])==13 and (abs(muon['pt']-gl['gLepPt'])/gl['gLepPt'])<0.2 : hasMatch=True
+        if gl['gLepInd']==j and gl['gLepDR']<0.4 and (abs(muon['pt']-gl['gLepPt'])/gl['gLepPt'])<0.05 : hasMatch=True # and abs(gl['gLepPdg'])==13 
       muon['hasMatch']=hasMatch
       muons.append(muon)
   return muons
@@ -58,7 +58,10 @@ def getGenLepsWithMatchInfo(c,relIso):
       for j in range(nmuCount):  
         muon=getLooseMuStage2(c,j)
         if muon:
-          if gl['gLepInd']==j and gl['gLepDR']<0.4 and (abs(muon['pt']-gl['gLepPt'])/gl['gLepPt'])<0.2: hasMatchInd = True
+          isLoose=vetoMuID(muon,relIso)
+          if isLoose:
+           # print 'in objectselection j and glepind' ,j ,gl['gLepInd']
+            if gl['gLepInd']==j and gl['gLepDR']<0.4 and (abs(muon['pt']-gl['gLepPt'])/gl['gLepPt'])<0.05 : hasMatchInd = True #
       gl['hasMatchInd']=hasMatchInd
       gLeps.append(gl)
   return gLeps
