@@ -4,7 +4,7 @@ from ROOT import RooFit as rf
 import ROOT
 from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain
 from Workspace.RA4Analysis.cmgTuplesPostProcessed import *
-from helpers import nameAndCut, nJetBinName,nBTagBinName,varBinName
+from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,varBinName
 
 from math import pi, sqrt
 def binnedNBTagsFit(cut, samples, nBTagVar = 'nBJetMedium25', prefix="", printDir='/afs/hephy.at/user/s/schoefbeck/www/pngCMG/'):

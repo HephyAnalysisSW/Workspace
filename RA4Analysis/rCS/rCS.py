@@ -5,7 +5,7 @@ cWJets  = getChain(WJetsHTToLNu)
 cTTJets = getChain(ttJetsCSA1450ns)
 cSignal1200 = getChain(T5Full_1200_1000_800)
 cSignal1500 = getChain(T5Full_1500_800_100)
-from helpers import nameAndCut, nJetBinName,nBTagBinName,varBinName
+from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,varBinName
 from math import pi, sqrt
 
 ROOT_colors = [ROOT.kBlack, ROOT.kRed-7, ROOT.kBlue-2, ROOT.kGreen+3, ROOT.kOrange+1,ROOT.kRed-3, ROOT.kAzure+6, ROOT.kCyan+3, ROOT.kOrange , ROOT.kRed-10]

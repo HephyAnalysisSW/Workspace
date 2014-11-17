@@ -5,8 +5,8 @@ gTauPtBins = [(10,20), (20,30), (30,40), (40, 80), (80, 160), (160, 320), (320,-
 metParRatioBins = [x/10. for x in range(0,11)]
 jetRatioBins = [0,0.01,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,1.2,1.5,2.0,3.0]
 
-def getLooseMuons(c,relIso,gLeps):
-  nmuCount = int(c.GetLeaf('nmuCount').GetValue())
+def getMuons(c,relIso,gLeps):
+  nmuCount = int(c.GetLeaf('muCount').GetValue())
   ntmuons=0
   nlmuons=0
   muons = []
@@ -21,10 +21,51 @@ def getLooseMuons(c,relIso,gLeps):
       if isLoose: nlmuons+=1
       hasMatch = False
       for gl in gLeps:
-        if gl['gLepInd']==j and gl['gLepDR']<0.4: hasMatch=True
+        if gl['gLepInd']==j and gl['gLepDR']<0.4 and (abs(muon['pt']-gl['gLepPt'])/gl['gLepPt'])<0.05 : hasMatch=True # and abs(gl['gLepPdg'])==13 
       muon['hasMatch']=hasMatch
       muons.append(muon)
   return muons
+
+def getLooseMuons(c,relIso):
+  nmuCount = int(c.GetLeaf('muCount').GetValue())
+  muons = []
+  for j in range(nmuCount):
+    muon=getLooseMuStage2(c,j)
+    if muon:
+      isLoose=vetoMuID(muon,relIso)
+      muon['isLoose'] = isLoose
+      if muon['isLoose'] : muons.append(muon)
+  return muons
+
+#def hasMatchInCollection(lep,coll):
+#  match = False
+#  for p in coll:
+#    if deltaR(p, coll)<0.4:
+#      match =True
+#      break
+#  return match
+
+
+## need to upgrade (c,muon,glep)
+def getGenLepsWithMatchInfo(c,relIso):
+  nmuCount = int(c.GetLeaf('muCount').GetValue())
+  ngLep = c.GetLeaf('gLepCount').GetValue()
+  gLeps = []  
+  for p in range(int(ngLep)):
+    gl = getGenLep(c,p) 
+    if gl:
+      hasMatchInd = False
+      for j in range(nmuCount):  
+        muon=getLooseMuStage2(c,j)
+        if muon:
+          isLoose=vetoMuID(muon,relIso)
+          if isLoose:
+           # print 'in objectselection j and glepind' ,j ,gl['gLepInd']
+            if gl['gLepInd']==j and gl['gLepDR']<0.4 and (abs(muon['pt']-gl['gLepPt'])/gl['gLepPt'])<0.05 : hasMatchInd = True #
+      gl['hasMatchInd']=hasMatchInd
+      gLeps.append(gl)
+  return gLeps
+
 
 def getGenLep(c,p):
   gLepPdg = c.GetLeaf('gLepPdg').GetValue(p)
@@ -33,12 +74,12 @@ def getGenLep(c,p):
   gLepEta = c.GetLeaf('gLepEta').GetValue(p)
   gLepInd = c.GetLeaf('gLepInd').GetValue(p)
   gLepPhi = c.GetLeaf('gLepPhi').GetValue(p)
-  if gLepPt >15 and abs(gLepEta)<2.5:
-    cand={'gLepPdg':gLepPdg,'gLepDR':gLepDR,'gLepPt':gLepPt,'gLepEta':gLepEta,'gLepInd':gLepInd,'gLepPhi':gLepPhi}
-    return cand
+  #if gLepPt >15 and abs(gLepEta)<2.5:
+  cand={'gLepPdg':gLepPdg,'gLepDR':gLepDR,'gLepPt':gLepPt,'gLepEta':gLepEta,'gLepInd':gLepInd,'gLepPhi':gLepPhi}
+  return cand
 
 def getGenLeps(c):
-  ngLep = c.GetLeaf('ngLep').GetValue()
+  ngLep = c.GetLeaf('gLepCount').GetValue()
   gLeps=[]
   for p in range(int(ngLep)):
       genLep = getGenLep(c,p)
@@ -337,7 +378,7 @@ def getGoodJetsStage1(jets, njets, crossCleanObjects=None, dR=0.4):#, jermode=op
   return {'jets':res,'met_dx':met_dx, 'met_dy':met_dy}
 
 def getGoodJetsStage2(c):#, jermode=options.jermode, jesmode=options.jesmode):
-  njets = getVarValue(c, 'njetCount')   # jet.pt() > 10.
+  njets = getVarValue(c, 'njets')   # jet.pt() > 10.
   res = []
   for i in range(int(njets)):
     res.append( {"eta":getVarValue(c, 'jetEta', i),\

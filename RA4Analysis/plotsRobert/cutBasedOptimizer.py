@@ -4,7 +4,7 @@ from Workspace.RA4Analysis.cmgTuplesPostProcessed import *
 cBkg  = getChain([st250Skim_WJetsHTToLNu, st250Skim_ttJetsCSA1450ns])
 cSignal1200 = getChain(st250Skim_T5Full_1200_1000_800)
 cSignal1500 = getChain(st250Skim_T5Full_1500_800_100)
-from helpers import nameAndCut
+from Workspace.RA4Analysis.helpers import nameAndCut
 from math import pi, sqrt
 
 import numpy as np
