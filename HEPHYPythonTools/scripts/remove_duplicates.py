@@ -103,7 +103,8 @@ for f in toBeRemovedGlobal:
     if options.mode=='nfs':
       os.system('rm '+f)
     else:
-      os.system('rfrm '+f)
+      os.system('$LCG_LOCATION/bin/rfrm '+f)
+#      os.system('dpns-rm '+f)
   else:
     print "Would remove",f
 

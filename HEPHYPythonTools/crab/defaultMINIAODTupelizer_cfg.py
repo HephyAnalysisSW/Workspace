@@ -51,7 +51,8 @@ options.register ('keep','',
 #infiles = ['root://xrootd.unl.edu//store/mc/Spring14dr/WJetsToLNu_HT-100to200_Tune4C_13TeV-madgraph-tauola/AODSIM/PU20bx25_POSTLS170_V5-v1/00000/00165B45-82E6-E311-B68D-002590AC4FEC.root']
 #infiles = ['file:/data/schoef/local/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola_PU20bx25_POSTLS170_V5-v1_MINIAODSIM.root']
 #infiles = ['root://eoscms.cern.ch//eos/cms/store/relval/CMSSW_7_0_5/RelValTTbar_13/GEN-SIM-RECO/POSTLS170_V6-v3/00000/0423767B-B5DD-E311-A1E0-02163E00E5B5.root']
-infiles = ['file:/afs/hephy.at/scratch/s/schoefbeck/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola_PU20bx25_POSTLS170_V5-v1_MINIAODSIM.root']
+#infiles = ['file:/afs/hephy.at/scratch/s/schoefbeck/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola_PU20bx25_POSTLS170_V5-v1_MINIAODSIM.root']
+infiles = ['file:/data/nrad/local/WJetsToLNu_HT-100to200_Tune4C_13TeV-madgraph-tauola_PU20bx25_POSTLS170_V5-v1_AODSIMPuppiMiniAOD.root']
 options.files=infiles
 
 options.mode = 'mc'
@@ -105,6 +106,7 @@ process.out = cms.OutputModule("PoolOutputModule",
      #verbose = cms.untracked.bool(True),
      SelectEvents   = cms.untracked.PSet( SelectEvents = cms.vstring('p') ),
      fileName = cms.untracked.string(options.outfile),
+#     fileName = cms.untracked.string(process.source.fileNames[0][0:-5]+'Tupel.root'),
      outputCommands = cms.untracked.vstring() 
 #     outputCommands = cms.untracked.vstring('keep *') 
 )
@@ -272,28 +274,35 @@ process.printTree = cms.EDAnalyzer("ParticleTreeDrawer",
 #process.p+=process.kt6PFJetsForIsolation2011
 
 process.miniAODTupelizerSequence = cms.Sequence()
+process.load('Workspace.HEPHYCMSSWTools.BasicTupelizer_miniAOD_cfi')
+process.BasicTupelizer.useForDefaultAlias = cms.untracked.bool(True)
+process.BasicTupelizer.addMSugraOSETInfo = cms.untracked.bool(options.mode.lower()=='sms')
+process.BasicTupelizer.verbose = cms.untracked.bool(options.verbose)
+process.miniAODTupelizerSequence += process.BasicTupelizer
 process.load('Workspace.HEPHYCMSSWTools.JetTupelizer_miniAOD_cfi')
 process.JetTupelizer.useForDefaultAlias = cms.untracked.bool(True)
+process.JetTupelizer.verbose = cms.untracked.bool(options.verbose)
 process.miniAODTupelizerSequence += process.JetTupelizer
 process.load('Workspace.HEPHYCMSSWTools.MuonTupelizer_miniAOD_cfi')
 process.MuonTupelizer.useForDefaultAlias = cms.untracked.bool(True)
 process.miniAODTupelizerSequence += process.MuonTupelizer
+process.MuonTupelizer.verbose = cms.untracked.bool(options.verbose)
 process.load('Workspace.HEPHYCMSSWTools.ElectronTupelizer_miniAOD_cfi')
 process.ElectronTupelizer.useForDefaultAlias = cms.untracked.bool(True)
+process.ElectronTupelizer.verbose = cms.untracked.bool(options.verbose)
 process.miniAODTupelizerSequence += process.ElectronTupelizer
 process.load('Workspace.HEPHYCMSSWTools.TauTupelizer_miniAOD_cfi')
 process.TauTupelizer.useForDefaultAlias = cms.untracked.bool(True)
+process.TauTupelizer.verbose = cms.untracked.bool(options.verbose)
 process.miniAODTupelizerSequence += process.TauTupelizer
 process.load('Workspace.HEPHYCMSSWTools.TriggerTupelizer_cfi')
 process.TriggerTupelizer.useForDefaultAlias = cms.untracked.bool(True)
+#process.TriggerTupelizer.verbose = cms.untracked.bool(options.verbose)
 process.miniAODTupelizerSequence += process.TriggerTupelizer
 process.load('Workspace.HEPHYCMSSWTools.FilterTupelizer_cfi')
 process.FilterTupelizer.useForDefaultAlias = cms.untracked.bool(True)
+#process.FilterTupelizer.verbose = cms.untracked.bool(options.verbose)
 process.miniAODTupelizerSequence += process.FilterTupelizer
-process.load('Workspace.HEPHYCMSSWTools.BasicTupelizer_miniAOD_cfi')
-process.BasicTupelizer.useForDefaultAlias = cms.untracked.bool(True)
-process.BasicTupelizer.addMSugraOSETInfo = cms.untracked.bool(options.mode.lower()=='sms')
-process.miniAODTupelizerSequence += process.BasicTupelizer
 
 #process.SUSYTupelizer.triggerCollection = cms.untracked.InputTag( options.hltName )
 #process.SUSYTupelizer.addTriggerInfo = cms.untracked.bool(True)
