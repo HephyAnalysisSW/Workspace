@@ -1,12 +1,14 @@
 import ROOT
 import pickle
-from Workspace.RA4Analysis.stage2Tuples import ttJetsCSA1450ns, T5Full_1200_1000_800, T5Full_1500_800_100
+from Workspace.RA4Analysis.stage2Tuples import ttJetsCSA1450nsInc, T5Full_1200_1000_800, T5Full_1500_800_100, ttJetsCSA1450ns
 from Workspace.HEPHYPythonTools.helpers import getPlotFromChain
 ROOT_colors = [ROOT.kBlack, ROOT.kRed-7, ROOT.kBlue-2, ROOT.kGreen+3, ROOT.kOrange+1,ROOT.kRed-3, ROOT.kAzure+6, ROOT.kCyan+3, ROOT.kOrange , ROOT.kRed-10]
 from math import pi
 c = ROOT.TChain('Events')
-for b in ttJetsCSA1450ns['bins']:
-  c.Add(ttJetsCSA1450ns['dirname']+'/'+b+'/h*.root')
+ttJetsample = ttJetsCSA1450nsInc
+for b in ttJetsample['bins']:
+  c.Add(ttJetsample['dirname']+'/'+b+'/h*0To10.root')
+#  c.Add(ttJetsample['dirname']+'/'+b+'/h*.root')
 
 T5Full_1200_1000_800['color'] = ROOT.kBlue
 #T5Full_1500_800_100['color'] = ROOT.kBlue
@@ -31,13 +33,14 @@ l_H     = "ngNuEFromW+ngNuMuFromW==1&&ngNuTauFromW==0"
 
 diHad   = "ngNuEFromW+ngNuMuFromW==0&&ngNuTauFromW==0"
 hTau_H  = "ngNuEFromW+ngNuMuFromW==0&&ngNuTauFromW==1&&Sum$(gTauNENu+gTauNMuNu==0&&gTauNTauNu==1)==1"
+#hTau_H  = "ngNuEFromW+ngNuMuFromW==0&&ngNuTauFromW==1"
 allHad = '('+diHad+'||'+hTau_H+')'
-prefix='EffAcc_nHybridMediumSel'
-presel="ngoodMuons==1&&ngoodElectrons==0&&nHybridMediumMuons==1&&nvetoElectrons==0&&ht>500&&met>250&&nbtags==0&&njets>=4"
+prefix='EffAcc_nHybridMediumSel_st250'
+presel="ngoodMuons==1&&ngoodElectrons==0&&nHybridMediumMuons==1&&nvetoElectrons==0&&ht>500&&met+leptonPt>250&&nbtags==0&&njets>=4"
 
 plots = [ 
-#          ['sqrt(2*leptonPt*met*(1-cos(metPhi-leptonPhi)))', [20,0,800], 'mt'],\
-          ['acos((leptonPt + met*cos(leptonPhi - metPhi))/sqrt(leptonPt**2 + met**2+2*met*leptonPt*cos(leptonPhi-metPhi)))', [16,0,3.2], 'dphi']
+          ['sqrt(2*leptonPt*met*(1-cos(metPhi-leptonPhi)))', [20,0,800], 'mt'],\
+#          ['acos((leptonPt + met*cos(leptonPhi - metPhi))/sqrt(leptonPt**2 + met**2+2*met*leptonPt*cos(leptonPhi-metPhi)))', [16,0,3.2], 'dphi']
     ]
 
 for var, binning, fname in plots:
@@ -78,9 +81,11 @@ for var, binning, fname in plots:
         [hTau_l,'W#rightarrow#tau#nu#rightarrow had.+2#nu | W#rightarrow e/#mu+#nu', ROOT.kAzure+6], 
         [l_H, 'single lep. (e/#mu)',ROOT.kCyan+3],  
       ]):
+    print (c, var, binning, presel+"&&"+cut, 'weight')
     hPresel_cut = getPlotFromChain(c, var, binning, presel+"&&"+cut, 'weight')
     if previous:  
       hPresel_cut.Add(previous)
+
     previous=hPresel_cut.Clone()
     hPresel_cut.SetLineColor(ROOT.kBlack)
     hPresel_cut.SetLineStyle(0)

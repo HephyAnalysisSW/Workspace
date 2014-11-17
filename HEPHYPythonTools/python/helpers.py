@@ -161,6 +161,7 @@ def getPlotFromChain(c, var, binning, cutString = "(1)", weight = "weight", binn
     h = ROOT.TH1F('h_tmp', 'h_tmp', *binning)
   c.Draw(var+">>h_tmp", weight+"*("+cutString+")", 'goff')
   res = h.Clone()
+  h.Delete()
   del h
   if addOverFlowBin.lower() == "upper" or addOverFlowBin.lower() == "both":
     nbins = res.GetNbinsX()

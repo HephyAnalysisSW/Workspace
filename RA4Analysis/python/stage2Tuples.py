@@ -8,6 +8,10 @@ ttJetsCSA1450ns={}
 ttJetsCSA1450ns["name"]     = "ttJetsCSA1450ns"
 ttJetsCSA1450ns["bins"]     = ["ttJetsCSA1450ns"]
 ttJetsCSA1450ns["dirname"] = "/data/schoef/convertedTuples_v25/copyMET"
+ttJetsCSA1450nsInc={}
+ttJetsCSA1450nsInc["name"]     = "ttJetsCSA1450ns"
+ttJetsCSA1450nsInc["bins"]     = ["ttJetsCSA1450ns"]
+ttJetsCSA1450nsInc["dirname"] = "/data/schoef/convertedTuples_v26/copyInc"
 
 #vetoCC_ttJetsCSA1450ns={}
 #vetoCC_ttJetsCSA1450ns["name"]     = "ttJetsCSA1450ns"
