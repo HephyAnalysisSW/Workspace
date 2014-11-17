@@ -74,6 +74,10 @@ switchJetCollection(process,
                     jetSource = cms.InputTag('ak4PFJetsCHS'),
                     jetCorrections = ('AK4PFchs',['L1FastJet','L2Relative', 'L3Absolute'] ,''), #,'Uncertainty'
                     )
+#switchJetCollection(process, 
+#                    jetSource = cms.InputTag('ak4PFJets'),
+#                    jetCorrections = ('AK4PF',['L1FastJet','L2Relative', 'L3Absolute'] ,''), #,'Uncertainty'
+#                    )
 
 ##
 ## Tune for MET correction : data needs residual corrections
@@ -93,8 +97,8 @@ process.dummy = cms.EDAnalyzer("Dummy")
 process.out = cms.OutputModule(
     "PoolOutputModule",
     splitLevel = cms.untracked.int32(0),
-    outputCommands = cms.untracked.vstring('keep *_*_*_*',),
-    fileName = cms.untracked.string('outCHS.root')
+    outputCommands = cms.untracked.vstring('keep *_*_*_PAT',),
+    fileName = cms.untracked.string('histo.root')
 )
 
 
@@ -174,5 +178,5 @@ process.p = cms.Path(
 
 # storage
 process.outpath = cms.EndPath(process.out) #dummy
-
+print process.patPFMetT1NoSmear
   
