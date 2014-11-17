@@ -8,7 +8,7 @@ from Workspace.HEPHYPythonTools.xsec import xsec
 from Workspace.HEPHYPythonTools.helpers import getObjFromFile
 from Workspace.RA4Analysis.convertHelpers import compileClass, readVar, printHeader, typeStr, createClassString
 
-subDir = "postProcessed_v0"
+subDir = "postProcessed_v1"
 target_lumi = 1000 #pb-1
 
 from localInfo import username
@@ -16,23 +16,23 @@ from localInfo import username
 ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 
-#defSampleStr = "WJetsToLNu_HT100to200,WJetsToLNu_HT200to400,WJetsToLNu_HT400to600,WJetsToLNu_HT600toInf"
+defSampleStr = "ttJetsCSA1450ns,WJetsToLNu_HT100to200,WJetsToLNu_HT200to400,WJetsToLNu_HT400to600,WJetsToLNu_HT600toInf"
 #defSampleStr = "WJetsToLNu_HT200to400,WJetsToLNu_HT400to600,WJetsToLNu_HT600toInf"
 #defSampleStr = "WJetsToLNu_HT600toInf"
 #defSampleStr = "ttJetsCSA1450ns"
 #defSampleStr = "T5Full_1200_1000_800,T5Full_1500_800_100"
-defSampleStr = "T1qqqq_1400_325_300"
+#defSampleStr = "T1qqqq_1400_325_300"
 from optparse import OptionParser
 parser = OptionParser()
 parser.add_option("--samples", dest="allsamples", default=defSampleStr, type="string", action="store", help="samples:Which samples.")
 parser.add_option("--producerName", dest="producerName", default="treeProducerSusySingleLepton", type="string", action="store", help="samples:Which samples.")
-parser.add_option("--targetDir", dest="targetDir", default="/data/"+username+"/cmgTuples/postProcessed_v0/", type="string", action="store", help="target directory.")
-parser.add_option("--skim", dest="skim", default="singleLepton", type="string", action="store", help="target directory.")
+parser.add_option("--targetDir", dest="targetDir", default="/data/"+username+"/cmgTuples/postProcessed_v1/", type="string", action="store", help="target directory.")
+parser.add_option("--skim", dest="skim", default="inc", type="string", action="store", help="target directory.")
 
 #parser.add_option("--small", dest="small", default = False, action="store_true", help="Just do a small subset.")
 #parser.add_option("--overwrite", dest="overwrite", action="store_true", help="Overwrite?", default=True)
 (options, args) = parser.parse_args()
-if options.skim=='singleLepton':
+if options.skim=='inc':
   skimCond = "(1)"
 if options.skim.startswith('met'):
   skimCond = "met_pt>"+str(float(options.skim[3:]))
@@ -67,8 +67,10 @@ def getTreeFromChunk(c, skimCond):
   tc = rf.Get(options.producerName)
   ROOT.gDirectory.cd('PyROOT:/')
   t = tc.CopyTree(skimCond)
+  tc.Delete()
   del tc
   rf.Close()
+  del rf
   return t
     
 exec('allSamples=['+options.allsamples+']')
@@ -89,7 +91,7 @@ for isample, sample in enumerate(allSamples):
   newVariables.extend( ['leptonPt/F', 'leptonEta/F', 'leptonPhi/F', 'leptonPdg/I/0', 'leptonInd/I/-1', 'leptonMass/F'] )
   newVars = [readVar(v, allowRenaming=False, isWritten = True, isRead=False) for v in newVariables]
 
-  aliases = ["st:leptonPt+met_pt", "met:met_pt", "metPhi:met_phi","genmet:met_genPt", "genmetPhi:met_genPhi"]
+  aliases = ["st:leptonPt+met_pt", "met:met_pt", "metPhi:met_phi","genMet:met_genPt", "genMetPhi:met_genPhi"]
 
   readVectors = [\
     {'prefix':'LepGood',  'nMax':2, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I', 'relIso03/F', 'tightId/I', 'mass/F']},
@@ -160,6 +162,10 @@ for isample, sample in enumerate(allSamples):
     t.Write()
     f.Close()
     print "Written",tmpDir+'/'+newFileName
+    del f
+    for v in newVars:
+      del v['branch']
+    t.Delete()
     del t
   
   size=0
