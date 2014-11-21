@@ -7,13 +7,13 @@ from math import pi
 c = ROOT.TChain('Events')
 ttJetsample = ttJetsCSA1450nsInc
 for b in ttJetsample['bins']:
-  c.Add(ttJetsample['dirname']+'/'+b+'/h*0To10.root')
-#  c.Add(ttJetsample['dirname']+'/'+b+'/h*.root')
+#  c.Add(ttJetsample['dirname']+'/'+b+'/h*0To10.root')
+  c.Add(ttJetsample['dirname']+'/'+b+'/h*.root')
 
 T5Full_1200_1000_800['color'] = ROOT.kBlue
-#T5Full_1500_800_100['color'] = ROOT.kBlue
+T5Full_1500_800_100['color'] = ROOT.kRed
 
-signals = [T5Full_1200_1000_800]
+signals = [T5Full_1200_1000_800,T5Full_1500_800_100]
 for sig in signals:
   sig['c'] = ROOT.TChain('Events')
   for b in sig['bins']:
@@ -35,12 +35,14 @@ diHad   = "ngNuEFromW+ngNuMuFromW==0&&ngNuTauFromW==0"
 hTau_H  = "ngNuEFromW+ngNuMuFromW==0&&ngNuTauFromW==1&&Sum$(gTauNENu+gTauNMuNu==0&&gTauNTauNu==1)==1"
 #hTau_H  = "ngNuEFromW+ngNuMuFromW==0&&ngNuTauFromW==1"
 allHad = '('+diHad+'||'+hTau_H+')'
+#prefix='EffAcc_nHybridMediumSel_met250'
+#presel="ngoodMuons==1&&ngoodElectrons==0&&nvetoElectrons==0&&ht>500&&met>250&&nbtags==0&&njets>=4"
 prefix='EffAcc_nHybridMediumSel_st250'
-presel="ngoodMuons==1&&ngoodElectrons==0&&nHybridMediumMuons==1&&nvetoElectrons==0&&ht>500&&met+leptonPt>250&&nbtags==0&&njets>=4"
+presel="ngoodMuons==1&&ngoodElectrons==0&&nvetoElectrons==0&&ht>500&&met+leptonPt>250&&nbtags==0&&njets>=4"
 
 plots = [ 
           ['sqrt(2*leptonPt*met*(1-cos(metPhi-leptonPhi)))', [20,0,800], 'mt'],\
-#          ['acos((leptonPt + met*cos(leptonPhi - metPhi))/sqrt(leptonPt**2 + met**2+2*met*leptonPt*cos(leptonPhi-metPhi)))', [16,0,3.2], 'dphi']
+          ['acos((leptonPt + met*cos(leptonPhi - metPhi))/sqrt(leptonPt**2 + met**2+2*met*leptonPt*cos(leptonPhi-metPhi)))', [16,0,3.2], 'dphi']
     ]
 
 for var, binning, fname in plots:

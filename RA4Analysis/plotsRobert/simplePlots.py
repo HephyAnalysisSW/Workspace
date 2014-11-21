@@ -9,28 +9,30 @@ from Workspace.HEPHYPythonTools.helpers import getObjFromFile
 #from Workspace.RA4Analysis.simplePlotsCommon import *
 from Workspace.RA4Analysis.simplePlotHelpers import plot, stack, loopAndFill, drawNMStacks
 from Workspace.RA4Analysis.helpers import *
-from Workspace.RA4Analysis.stage2Tuples import ttJetsCSA1450ns, WJetsHTToLNu, T5Full_1200_1000_800, T5Full_1500_800_100
+from Workspace.RA4Analysis.stage2Tuples import ttJetsCSA1450ns, WJetsHTToLNu, T5Full_1200_1000_800, T5Full_1500_800_100, ttJetsCSA1450nsInc
 
 subdir = "/pngTMP/"
 
-prefix = 'mediumVeto-ht500-met250-4j'
-presel="met>250&&ht>500&&singleMuonic&&nbtags==0&&njets>=4"
+#prefix = 'mediumVeto-ht500-st250-4j'
+#presel="met+leptonPt>250&&ht>500&&singleMuonic&&nbtags==0&&njets>=4"
+#prefix = 'mediumVeto-ht500-met250-4j'
+#presel="met>250&&ht>500&&singleMuonic&&nbtags==0&&njets>=4"
 
 #prefix = 'looseVeto-ht500-met250-4j'
 #presel="met>250&&ht>500&&singleMuonic&&nbtags==0&&njets>=4&&Sum$(jetBTag>0.244&&abs(jetEta)<2.4)<1"
 
-prefix = 'mediumVeto-ht500-met250-6j'
-presel="met>250&&ht>500&&singleMuonic&&nbtags==0&&njets>=6"
-#
-prefix = 'looseVeto-ht500-met250-6j'
-presel="met>250&&ht>500&&singleMuonic&&nbtags==0&&njets>=6&&Sum$(jetBTag>0.244&&abs(jetEta)<2.4)<1"
+#prefix = 'mediumVeto-ht500-met250-6j'
+#presel="met>250&&ht>500&&singleMuonic&&nbtags==0&&njets>=6"
+##
+#prefix = 'looseVeto-ht500-met250-6j'
+#presel="met>250&&ht>500&&singleMuonic&&nbtags==0&&njets>=6&&Sum$(jetBTag>0.244&&abs(jetEta)<2.4)<1"
 
 #prefix = 'mediumVeto'
 #presel="met>250&&ht>750&&singleMuonic&&nbtags==0&&njets>=3"
 
 cutString=presel
 wjetsSample = WJetsHTToLNu
-ttJetsPowHeg = ttJetsCSA1450ns
+ttJetsPowHeg = ttJetsCSA1450nsInc
 
 T5Full_1200_1000_800['style'] = {'legendText':T5Full_1200_1000_800['name'],   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kBlue, 'markerStyle':None, 'markerSize':None}
 T5Full_1500_800_100['style']  = {'legendText':T5Full_1500_800_100['name'],   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kBlack, 'markerStyle':None, 'markerSize':None}

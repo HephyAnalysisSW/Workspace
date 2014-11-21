@@ -253,8 +253,9 @@ def drawStack(stk):
       else:
         defaultYRange = [0, 1.2*hcopy.GetMaximum()]
       hcopy.GetYaxis().SetRangeUser(*defaultYRange)
-      if not isinstance(stk.options['yRange'][0], numbers.Number):stk.options['yRange'][0]=defaultYRange[0]#If yRange contains 'None' use default
-      if not isinstance(stk.options['yRange'][1], numbers.Number):stk.options['yRange'][1]=defaultYRange[1]#If yRange contains 'None' use default
+      if stk.options and stk.options.has_key('yRange') and type(stk.options['yRange'])==type([]) and len(stk.options['yRange'])==2:
+        if not isinstance(stk.options['yRange'][0], numbers.Number):stk.options['yRange'][0]=defaultYRange[0]#If yRange contains 'None' use default
+        if not isinstance(stk.options['yRange'][1], numbers.Number):stk.options['yRange'][1]=defaultYRange[1]#If yRange contains 'None' use default
       try:
         hcopy.GetYaxis().SetRangeUser(*(stk.options['yRange']) )
       except:pass
@@ -364,7 +365,7 @@ def drawNMStacks(intn, intm, stacks, filename, path = defaultWWWPath):
 #      rp.histo.GetYaxis().SetTitle(stack[0].ratioVarName)
       rs = stack([[rp]], options = {'labels':{'x':stk.options['labels']['x'],'y':rops['yLabel']}, \
                                     'logX':stk.options['logX'], 'logY':rops['logY'], 'legend':None, 
-                                    'texLines':None, 'yRange':rops['yRange'], 'yTitleOffset':1./scaleFacBottomPad}) 
+                                    'texLines':None, 'yRange':rops['yRange'] if rops.has_key('yRange') else [0.3,1.7], 'yTitleOffset':1./scaleFacBottomPad}) 
       line = ROOT.TPolyLine(2)
       line.SetPoint(0, rp.histo.GetXaxis().GetXmin(), 1.)
       line.SetPoint(1, rp.histo.GetXaxis().GetXmax(), 1.)
