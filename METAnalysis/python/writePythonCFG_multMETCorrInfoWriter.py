@@ -3,7 +3,7 @@ import pickle
 from commons import label
 from Workspace.HEPHYPythonTools.helpers import getVarValue
 from math import pi, cos, sin, sqrt, atan2
-postfix = 'CSA14'
+postfix = 'PHYS14'
 
 from commons import *
   

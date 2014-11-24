@@ -25,32 +25,44 @@ gammaForwardMinus = {'name':'gammaForwardMinus', 'type':'gamma',  'binning':[20,
 e             = {'name':'e', 'type':'e',  'binning':[108/4,-2.7,2.7,160/4,-pi,pi]}
 mu            = {'name':'mu','type':'mu', 'binning':[108/4,-2.4,2.4,160/4,-pi,pi]}
 
-etaMaxDepth1 = 4.78
-etaMinDepth1 = 2.901376
-nEtaBinsHF = 11
-h_HF_Minus        = {'name':'h_HFMinus', 'type':'h_HF',  'binning':[nEtaBinsHF,-etaMaxDepth1,-etaMinDepth1,18,-pi,pi]}
-h_HF_Plus         = {'name':'h_HFPlus', 'type':'h_HF',   'binning':[nEtaBinsHF,etaMinDepth1,etaMaxDepth1,18,-pi,pi]}
-
 etaMaxDepth1 = 5.2
-etaMinDepth1 = 4.78
-nEtaBinsHF = 2
-h_HF_InnerMostRingsMinus        = {'name':'h_HFInnerMostRingsMinus', 'type':'h_HF', 'binning':[nEtaBinsHF,-etaMaxDepth1,-etaMinDepth1,18,-3.15,3]}
-h_HF_InnerMostRingsPlus         = {'name':'h_HFInnerMostRingsPlus', 'type':'h_HF',  'binning':[nEtaBinsHF,etaMinDepth1,etaMaxDepth1,18,-3.15,3]}
-
-etaMaxDepth1 = 4.78
 etaMinDepth1 = 2.901376
-nEtaBinsHF = 11
+nEtaBinsHF = 13
 egamma_HF_Minus        = {'name':'egamma_HFMinus', 'type':'egamma_HF',  'binning':[nEtaBinsHF,-etaMaxDepth1,-etaMinDepth1,18,-pi,pi]}
 egamma_HF_Plus         = {'name':'egamma_HFPlus', 'type':'egamma_HF',   'binning':[nEtaBinsHF,etaMinDepth1,etaMaxDepth1,18,-pi,pi]}
 
-h_HF         = {'name':'h_HF', 'type':'h_HF',   'binning':[-1,-5.5,5.5,18,-pi,pi]}
-egamma_HF         = {'name':'egamma_HF', 'type':'egamma_HF',   'binning':[-1,-5.5,5.5,18,-pi,pi]}
-
 etaMaxDepth1 = 5.2
-etaMinDepth1 = 4.78
-nEtaBinsHF = 2
-egamma_HF_InnerMostRingsMinus        = {'name':'egamma_HFInnerMostRingsMinus', 'type':'egamma_HF', 'binning':[nEtaBinsHF,-etaMaxDepth1,-etaMinDepth1,9,-pi-.1,pi]}
-egamma_HF_InnerMostRingsPlus         = {'name':'egamma_HFInnerMostRingsPlus', 'type':'egamma_HF',  'binning':[nEtaBinsHF,etaMinDepth1,etaMaxDepth1,9,-pi-.1,pi]}
+etaMinDepth1 = 2.901376
+nEtaBinsHF = 13
+h_HF_Minus        = {'name':'h_HFMinus', 'type':'h_HF',  'binning':[nEtaBinsHF,-etaMaxDepth1,-etaMinDepth1,18,-pi,pi]}
+h_HF_Plus         = {'name':'h_HFPlus', 'type':'h_HF',   'binning':[nEtaBinsHF,etaMinDepth1,etaMaxDepth1,18,-pi,pi]}
+
+#etaMaxDepth1 = 4.78
+#etaMinDepth1 = 2.901376
+#nEtaBinsHF = 11
+#h_HF_Minus        = {'name':'h_HFMinus', 'type':'h_HF',  'binning':[nEtaBinsHF,-etaMaxDepth1,-etaMinDepth1,18,-pi,pi]}
+#h_HF_Plus         = {'name':'h_HFPlus', 'type':'h_HF',   'binning':[nEtaBinsHF,etaMinDepth1,etaMaxDepth1,18,-pi,pi]}
+#
+#etaMaxDepth1 = 5.2
+#etaMinDepth1 = 4.78
+#nEtaBinsHF = 2
+#h_HF_InnerMostRingsMinus        = {'name':'h_HFInnerMostRingsMinus', 'type':'h_HF', 'binning':[nEtaBinsHF,-etaMaxDepth1,-etaMinDepth1,18,-3.15,3]}
+#h_HF_InnerMostRingsPlus         = {'name':'h_HFInnerMostRingsPlus', 'type':'h_HF',  'binning':[nEtaBinsHF,etaMinDepth1,etaMaxDepth1,18,-3.15,3]}
+#
+#etaMaxDepth1 = 4.78
+#etaMinDepth1 = 2.901376
+#nEtaBinsHF = 11
+#egamma_HF_Minus        = {'name':'egamma_HFMinus', 'type':'egamma_HF',  'binning':[nEtaBinsHF,-etaMaxDepth1,-etaMinDepth1,18,-pi,pi]}
+#egamma_HF_Plus         = {'name':'egamma_HFPlus', 'type':'egamma_HF',   'binning':[nEtaBinsHF,etaMinDepth1,etaMaxDepth1,18,-pi,pi]}
+
+#h_HF         = {'name':'h_HF', 'type':'h_HF',   'binning':[-1,-5.5,5.5,18,-pi,pi]}
+#egamma_HF         = {'name':'egamma_HF', 'type':'egamma_HF',   'binning':[-1,-5.5,5.5,18,-pi,pi]}
+
+#etaMaxDepth1 = 5.2
+#etaMinDepth1 = 4.78
+#nEtaBinsHF = 2
+#egamma_HF_InnerMostRingsMinus        = {'name':'egamma_HFInnerMostRingsMinus', 'type':'egamma_HF', 'binning':[nEtaBinsHF,-etaMaxDepth1,-etaMinDepth1,9,-pi-.1,pi]}
+#egamma_HF_InnerMostRingsPlus         = {'name':'egamma_HFInnerMostRingsPlus', 'type':'egamma_HF',  'binning':[nEtaBinsHF,etaMinDepth1,etaMaxDepth1,9,-pi-.1,pi]}
 
 h['candBinning']                              = [5*50,0,5*1500]
 h0Barrel['candBinning']                       = [5*50,0,5*50]
@@ -65,18 +77,22 @@ e['candBinning']                              = [5*10,0,5*10]
 mu['candBinning']                             = [5*10,0,5*10]
 h_HF_Minus['candBinning']                     = [5*25,0,5*250]
 h_HF_Plus['candBinning']                      = [5*25,0,5*250]
-h_HF_InnerMostRingsMinus['candBinning']       = [5*25,0,5*50]
-h_HF_InnerMostRingsPlus['candBinning']        = [5*25,0,5*50]
+#h_HF_InnerMostRingsMinus['candBinning']       = [5*25,0,5*50]
+#h_HF_InnerMostRingsPlus['candBinning']        = [5*25,0,5*50]
 egamma_HF_Minus['candBinning']                = [5*25,0,5*250]
 egamma_HF_Plus['candBinning']                 = [5*25,0,5*250]
-egamma_HF_InnerMostRingsMinus['candBinning']  = [5*25,0,5*50]
-egamma_HF_InnerMostRingsPlus['candBinning']   = [5*25,0,5*50]
-h_HF['candBinning']                           = [5*25,0,5*500]
-egamma_HF['candBinning']                      = [5*25,0,5*500]
+#egamma_HF_InnerMostRingsMinus['candBinning']  = [5*25,0,5*50]
+#egamma_HF_InnerMostRingsPlus['candBinning']   = [5*25,0,5*50]
+#h_HF['candBinning']                           = [5*25,0,5*500]
+#egamma_HF['candBinning']                      = [5*25,0,5*500]
 
 
-allMaps = [h, h0Barrel, h0EndcapPlus, h0EndcapMinus, gammaBarrel, gammaEndcapPlus, gammaEndcapMinus, gammaForwardPlus, gammaForwardMinus, e, h_HF_Minus, h_HF_Plus, \
-           h_HF_InnerMostRingsMinus, h_HF_InnerMostRingsPlus, egamma_HF_Minus, egamma_HF_Plus, egamma_HF_InnerMostRingsMinus, egamma_HF_InnerMostRingsPlus]
+allMaps = [h, h0Barrel, h0EndcapPlus, h0EndcapMinus, gammaBarrel, gammaEndcapPlus, gammaEndcapMinus, gammaForwardPlus, gammaForwardMinus, e, 
+           h_HF_Minus, h_HF_Plus, \
+#           h_HF_InnerMostRingsMinus, h_HF_InnerMostRingsPlus, 
+           egamma_HF_Minus, egamma_HF_Plus, 
+#           egamma_HF_InnerMostRingsMinus, egamma_HF_InnerMostRingsPlus
+          ]
 
 #categories = {\
 #  "gamma":[ ["gamma_mE", -99, -1.4  ],
