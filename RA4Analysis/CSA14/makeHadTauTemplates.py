@@ -217,36 +217,10 @@ def getCut(var, bin):
 #    c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngCSA14/recoTauGenTauTemplate_'+s+'.png')
 #pickle.dump(templates, file('/data/schoef/results2014/tauTemplates/CSA14_TTJets_recoTauGenTau.pkl','w'))
 
-##gTauMetPar/gTauPt VS. restJet/genTau templates in bins of gTauPt and gTauEta
-#c1 = ROOT.TCanvas()
-#templates={}
-#for etab in gTauAbsEtaBins+[(0,-1)]:
-#  etaCut, seta = getCut('abs(gTauEta)', etab)
-#  seta=seta.replace('abs(gTauEta)','eta') 
-#  genTauTemplatePt={}
-#  for i, b in enumerate(gTauPtBins+[(10,-1)]):
-#    if not templates.has_key(b):
-#      templates[b]={}
-#    cut,s = getCut('gTauPt',b)
-#    cut+='&&'+etaCut
-#    s+="_"+seta
-#    genTauTemplatePt[b] = ROOT.TH1F('genTauTemplate_'+s, 'genTauTemplate_'+s,len(metParRatioBins)-1, array('d',metParRatioBins))
-#    c.Draw('gTauMetPar/gTauPt>>genTauTemplate_'+s,  cut+"&&"+hadTauReq,'goff')
-#    genTauTemplatePt[b].Scale(1./genTauTemplatePt[b].Integral())
-#    genTauTemplatePt[b].Draw()
-#    templates[b][etab]=genTauTemplatePt[b]
-#    c1.SetLogz()
-#    c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngCSA14/genTauTemplate_'+s+'.png')
-#ofile = '/data/schoef/results2014/tauTemplates/CSA14_TTJets_genTau.pkl'
-#pickle.dump(templates, file(ofile,'w'))
-#print "Written", ofile 
-
-
-###BELOW IS JUST FOR QUICK PLOT!!
 #gTauMetPar/gTauPt VS. restJet/genTau templates in bins of gTauPt and gTauEta
 c1 = ROOT.TCanvas()
 templates={}
-for etab in [(0,0.5)]:
+for etab in gTauAbsEtaBins+[(0,-1)]:
   etaCut, seta = getCut('abs(gTauEta)', etab)
   seta=seta.replace('abs(gTauEta)','eta') 
   genTauTemplatePt={}
@@ -263,27 +237,53 @@ for etab in [(0,0.5)]:
     templates[b][etab]=genTauTemplatePt[b]
     c1.SetLogz()
     c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngCSA14/genTauTemplate_'+s+'.png')
+ofile = '/data/schoef/results2014/tauTemplates/CSA14_TTJets_genTau.pkl'
+pickle.dump(templates, file(ofile,'w'))
+print "Written", ofile 
 
-c1 = ROOT.TCanvas()
-l=ROOT.TLegend(0.7,0.5,1.0,1.0)
-l.SetFillColor(ROOT.kWhite)
-l.SetShadowColor(ROOT.kWhite)
-l.SetBorderSize(1)
 
-ROOT.gStyle.SetOptStat(0)
-etab = gTauAbsEtaBins[0]
-etaCut, seta = getCut('abs(gTauEta)', etab)
-seta=seta.replace('abs(gTauEta)','eta') 
-first = True
-templates[(10,-1)][etab].GetYaxis().SetRangeUser(0, 0.3)
-templates[(10,-1)][etab].SetTitle("")
-templates[(10,-1)][etab].SetLineWidth(3)
-templates[(10,-1)][etab].Draw('goff')
-c1.SetLogz()
-for i, b in enumerate(gTauPtBins):
-  l.AddEntry(templates[b][etab], getCut('pT(tau)', b)[0])
-  templates[b][etab].SetLineColor(colors[i])
-  templates[b][etab].Draw('same')
-
-l.Draw()
-c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngCSA14/genTauTemplate_'+seta+'.png')
+####BELOW IS JUST FOR QUICK PLOT!!
+##gTauMetPar/gTauPt VS. restJet/genTau templates in bins of gTauPt and gTauEta
+#c1 = ROOT.TCanvas()
+#templates={}
+#for etab in [(0,0.5)]:
+#  etaCut, seta = getCut('abs(gTauEta)', etab)
+#  seta=seta.replace('abs(gTauEta)','eta') 
+#  genTauTemplatePt={}
+#  for i, b in enumerate(gTauPtBins+[(10,-1)]):
+#    if not templates.has_key(b):
+#      templates[b]={}
+#    cut,s = getCut('gTauPt',b)
+#    cut+='&&'+etaCut
+#    s+="_"+seta
+#    genTauTemplatePt[b] = ROOT.TH1F('genTauTemplate_'+s, 'genTauTemplate_'+s,len(metParRatioBins)-1, array('d',metParRatioBins))
+#    c.Draw('gTauMetPar/gTauPt>>genTauTemplate_'+s,  cut+"&&"+hadTauReq,'goff')
+#    genTauTemplatePt[b].Scale(1./genTauTemplatePt[b].Integral())
+#    genTauTemplatePt[b].Draw()
+#    templates[b][etab]=genTauTemplatePt[b]
+#    c1.SetLogz()
+#    c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngCSA14/genTauTemplate_'+s+'.png')
+#
+#c1 = ROOT.TCanvas()
+#l=ROOT.TLegend(0.7,0.5,1.0,1.0)
+#l.SetFillColor(ROOT.kWhite)
+#l.SetShadowColor(ROOT.kWhite)
+#l.SetBorderSize(1)
+#
+#ROOT.gStyle.SetOptStat(0)
+#etab = gTauAbsEtaBins[0]
+#etaCut, seta = getCut('abs(gTauEta)', etab)
+#seta=seta.replace('abs(gTauEta)','eta') 
+#first = True
+#templates[(10,-1)][etab].GetYaxis().SetRangeUser(0, 0.3)
+#templates[(10,-1)][etab].SetTitle("")
+#templates[(10,-1)][etab].SetLineWidth(3)
+#templates[(10,-1)][etab].Draw('goff')
+#c1.SetLogz()
+#for i, b in enumerate(gTauPtBins):
+#  l.AddEntry(templates[b][etab], getCut('pT(tau)', b)[0])
+#  templates[b][etab].SetLineColor(colors[i])
+#  templates[b][etab].Draw('same')
+#
+#l.Draw()
+#c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngCSA14/genTauTemplate_'+seta+'.png')
