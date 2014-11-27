@@ -1,7 +1,19 @@
 import ROOT
 import pickle
 from commons import label
-from Workspace.HEPHYPythonTools.helpers import getVarValue, getObjFromFile
+
+#from Workspace.HEPHYPythonTools.helpers import getVarValue, getObjFromFile
+def getObjFromFile(fname, hname):
+  f = ROOT.TFile(fname)
+  assert not f.IsZombie()
+  f.cd()
+  htmp = f.Get(hname)
+  if not htmp:  return htmp
+  ROOT.gDirectory.cd('PyROOT:/')
+  res = htmp.Clone()
+  f.Close()
+  return res
+
 from math import pi, cos, sin, sqrt, atan2
 ROOT.gROOT.ProcessLine(".L ../../HEPHYPythonTools/scripts/root/tdrstyle.C")
 ROOT.setTDRStyle()
@@ -12,6 +24,7 @@ parser = OptionParser()
 parser.add_option("--prefix", dest="prefix", default="13TeV-WJetsToLNu_HT-100to200-Spring14dr-PU20bx25_POSTLS170_V5", type="string", action="store", help="prefix:Which prefix.")
 parser.add_option("--maps", dest="maps", default='all', type="string", action="store", help="Which maps.")
 parser.add_option("--infile", dest="infile", default='/data/schoef/metCorr_140605/13TeV-WJetsToLNu_HT-100to200-Spring14dr-PU20bx25_POSTLS170_V5.root', type="string", action="store", help="Which infile.")
+parser.add_option("--plotDir", dest="plotDir", default='/afs/hephy.at/user/s/schoefbeck/www/pngPF/', type="string", action="store", help="Which plotDir.")
 
 (options, args) = parser.parse_args()
 prefixes=[]
@@ -41,14 +54,14 @@ e['fitRange'] = [0,10]
 mu['fitRange'] = [0,10]
 h_HF_Minus['fitRange'] = [0,300]
 h_HF_Plus['fitRange'] = [0,300]
-h_HF_InnerMostRingsMinus['fitRange'] = [0,50]
-h_HF_InnerMostRingsPlus['fitRange'] = [0,50]
+#h_HF_InnerMostRingsMinus['fitRange'] = [0,50]
+#h_HF_InnerMostRingsPlus['fitRange'] = [0,50]
 egamma_HF_Minus['fitRange'] = [0,300]
 egamma_HF_Plus['fitRange'] = [0,300]
-egamma_HF_InnerMostRingsMinus['fitRange'] = [0,50]
-egamma_HF_InnerMostRingsPlus['fitRange'] = [0,50]
-h_HF['fitRange'] = [0,500]
-egamma_HF['fitRange'] = [0,500]
+#egamma_HF_InnerMostRingsMinus['fitRange'] = [0,50]
+#egamma_HF_InnerMostRingsPlus['fitRange'] = [0,50]
+#h_HF['fitRange'] = [0,500]
+#egamma_HF['fitRange'] = [0,500]
 
 h['zoomRange'] = [-40,40]
 h0Barrel['zoomRange'] = [-2,2]
@@ -63,12 +76,12 @@ e['zoomRange'] = [-20,20]
 mu['zoomRange'] = [-20,20]
 h_HF_Minus['zoomRange'] = [-5,5]
 h_HF_Plus['zoomRange'] = [-5,5]
-h_HF_InnerMostRingsMinus['zoomRange'] = [-5,5]
-h_HF_InnerMostRingsPlus['zoomRange'] = [-5,5]
+#h_HF_InnerMostRingsMinus['zoomRange'] = [-5,5]
+#h_HF_InnerMostRingsPlus['zoomRange'] = [-5,5]
 egamma_HF_Minus['zoomRange'] = [-5,5]
 egamma_HF_Plus['zoomRange'] = [-5,5]
-egamma_HF_InnerMostRingsMinus['zoomRange'] = [-2,2]
-egamma_HF_InnerMostRingsPlus['zoomRange'] = [-2,2]
+#egamma_HF_InnerMostRingsMinus['zoomRange'] = [-2,2]
+#egamma_HF_InnerMostRingsPlus['zoomRange'] = [-2,2]
 
 
 def getLinSquStr(f):
@@ -88,14 +101,14 @@ egamma_HF_Plus['func'] = '[0] + [1]*x'
 egamma_HF_Plus['strFunc'] = getLinStr
 egamma_HF_Minus['func'] = '[0] + [1]*x'
 egamma_HF_Minus['strFunc'] = getLinStr
-h_HF_InnerMostRingsPlus['func'] = '[0]*x**2'
-h_HF_InnerMostRingsPlus['strFunc'] = getSquStr
-h_HF_InnerMostRingsMinus['func'] = '[0]*x**2'
-h_HF_InnerMostRingsMinus['strFunc'] = getSquStr
-egamma_HF_InnerMostRingsPlus['func'] = '[0]*x'
-egamma_HF_InnerMostRingsPlus['strFunc'] = getPropStr
-egamma_HF_InnerMostRingsMinus['func'] = '[0]*x'
-egamma_HF_InnerMostRingsMinus['strFunc'] = getPropStr
+#h_HF_InnerMostRingsPlus['func'] = '[0]*x**2'
+#h_HF_InnerMostRingsPlus['strFunc'] = getSquStr
+#h_HF_InnerMostRingsMinus['func'] = '[0]*x**2'
+#h_HF_InnerMostRingsMinus['strFunc'] = getSquStr
+#egamma_HF_InnerMostRingsPlus['func'] = '[0]*x'
+#egamma_HF_InnerMostRingsPlus['strFunc'] = getPropStr
+#egamma_HF_InnerMostRingsMinus['func'] = '[0]*x'
+#egamma_HF_InnerMostRingsMinus['strFunc'] = getPropStr
 gammaEndcapPlus['func'] = '[0] + [1]*x'
 gammaEndcapPlus['strFunc'] = getLinStr
 gammaEndcapMinus['func'] = '[0] + [1]*x'
@@ -161,8 +174,8 @@ for map in maps:
   l.SetShadowColor(ROOT.kWhite)
   l.SetBorderSize(1)
   l.Draw()
-  c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngPF/'+prefix+'candidateBasedFromFiled_MExy_'+map['name']+'.png')
-  c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngPF/'+prefix+'candidateBasedFromFiled_MExy_'+map['name']+'.root')
+  c1.Print(options.plotDir+'/'+prefix+'candidateBasedFromFiled_MExy_'+map['name']+'.png')
+  c1.Print(options.plotDir+'/'+prefix+'candidateBasedFromFiled_MExy_'+map['name']+'.root')
   del px, py, l, c1
 
 
