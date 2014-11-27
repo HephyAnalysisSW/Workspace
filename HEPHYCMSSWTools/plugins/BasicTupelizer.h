@@ -59,6 +59,7 @@ public:
 
   std::vector<std::string> metsToMonitor_;
   edm::InputTag genMetContainer_;
+  bool storeGenMet_;
   bool addMSugraOSETInfo_;
   bool addPDFWeights_;
 

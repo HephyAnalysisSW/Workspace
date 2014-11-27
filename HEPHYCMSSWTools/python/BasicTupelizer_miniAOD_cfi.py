@@ -8,6 +8,7 @@ BasicTupelizer = cms.EDProducer ( "BasicTupelizer",
     addPDFWeights = cms.untracked.bool(False),
     metsToMonitor = cms.untracked.vstring(["slimmedMETs"]),
     genMetContainer = cms.untracked.InputTag("slimmedMETs"),
+    storeGenMet = cms.untracked.bool(True),
     useForDefaultAlias = cms.untracked.bool(False)
 
 ) 

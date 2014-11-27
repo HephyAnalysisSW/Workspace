@@ -27,6 +27,7 @@ BasicTupelizer::BasicTupelizer( const edm::ParameterSet & pset):
 
   metsToMonitor_(pset.getUntrackedParameter<std::vector<std::string> > ("metsToMonitor") ),
   genMetContainer_(pset.getUntrackedParameter<edm::InputTag > ("genMetContainer") ),
+  storeGenMet_(pset.getUntrackedParameter<bool > ("storeGenMet") ),
   addMSugraOSETInfo_(pset.getUntrackedParameter<bool>("addMSugraOSETInfo")),
   addPDFWeights_(pset.getUntrackedParameter<bool>("addPDFWeights"))
 
@@ -119,16 +120,17 @@ void BasicTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup) {
   if (goodVertices.size()>0) {
     vertexPosition = goodVertices[0].position();
   }
-
-  edm::Handle<vector<pat::MET> > gmc;
-  try {
-    ev.getByLabel( genMetContainer_, gmc );
-  } catch ( cms::Exception & e ) {
-    cout <<prefix<<"error: " << e.what() << endl;
+  
+  if (storeGenMet_) {
+    edm::Handle<vector<pat::MET> > gmc;
+    try {
+      ev.getByLabel( genMetContainer_, gmc );
+    } catch ( cms::Exception & e ) {
+      cout <<prefix<<"error: " << e.what() << endl;
+    }
+    put("genMet", (*gmc)[0].genMET()->pt());
+    put("genMetPhi", (*gmc)[0].genMET()->phi());
   }
-  put("genMet", (*gmc)[0].genMET()->pt());
-  put("genMetPhi", (*gmc)[0].genMET()->phi());
-
   for (std::vector<std::string>::iterator s = metsToMonitor_.begin(); s != metsToMonitor_.end(); s++) {
     std::string metName = *s;
     edm::Handle<vector<pat::MET> > met;
@@ -248,10 +250,11 @@ void BasicTupelizer::addAllVars( )
   addVar("ngenVertices/I"); // -1);
   addVar("nTrueGenVertices/F"); // -1);
 
-  addVar("ngoodVertices/I"); 
-  addVar("genMet/F");
-  addVar("genMetPhi/F");
-
+  addVar("ngoodVertices/I");
+  if (storeGenMet_) { 
+    addVar("genMet/F");
+    addVar("genMetPhi/F");
+  }
 
   if (addMSugraOSETInfo_) {
 //    addVar("sparticles/I[]");
