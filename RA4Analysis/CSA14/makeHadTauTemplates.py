@@ -218,6 +218,7 @@ def getCut(var, bin):
 #pickle.dump(templates, file('/data/schoef/results2014/tauTemplates/CSA14_TTJets_recoTauGenTau.pkl','w'))
 
 ##gTauMetPar/gTauPt VS. restJet/genTau templates in bins of gTauPt and gTauEta
+#gTauMetPar/gTauPt VS. restJet/genTau templates in bins of gTauPt and gTauEta
 c1 = ROOT.TCanvas()
 templates={}
 for etab in gTauAbsEtaBins+[(0,-1)]:
@@ -238,12 +239,14 @@ for etab in gTauAbsEtaBins+[(0,-1)]:
     c1.SetLogz()
     c1.Print('/afs/hephy.at/user/e/easilar/www/pngCSA14/genTauTemplate_'+s+'.png')
 ofile = '/data/easilar/results2014/tauTemplates/CSA14_TTJets_genTau.pkl'
+#    c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngCSA14/genTauTemplate_'+s+'.png')
+#ofile = '/data/schoef/results2014/tauTemplates/CSA14_TTJets_genTau.pkl'
 pickle.dump(templates, file(ofile,'w'))
 print "Written", ofile 
 
 
-###BELOW IS JUST FOR QUICK PLOT!!
-#gTauMetPar/gTauPt VS. restJet/genTau templates in bins of gTauPt and gTauEta
+####BELOW IS JUST FOR QUICK PLOT!!
+##gTauMetPar/gTauPt VS. restJet/genTau templates in bins of gTauPt and gTauEta
 #c1 = ROOT.TCanvas()
 #templates={}
 #for etab in [(0,0.5)]:
@@ -263,6 +266,7 @@ print "Written", ofile
 #    templates[b][etab]=genTauTemplatePt[b]
 #    c1.SetLogz()
 #    c1.Print('/afs/hephy.at/user/e/easilar/www/pngCSA14/genTauTemplate_'+s+'.png')
+#    c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngCSA14/genTauTemplate_'+s+'.png')
 #
 #c1 = ROOT.TCanvas()
 #l=ROOT.TLegend(0.7,0.5,1.0,1.0)
@@ -287,3 +291,4 @@ print "Written", ofile
 #
 #l.Draw()
 #c1.Print('/afs/hephy.at/user/e/easilar/www/pngCSA14/genTauTemplate_'+seta+'.png')
+#c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngCSA14/genTauTemplate_'+seta+'.png')

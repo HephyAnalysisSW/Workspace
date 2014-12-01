@@ -13,10 +13,12 @@ from Workspace.RA4Analysis.cmgTuplesPostProcessed import ttJetsCSA1450ns, WJetsH
 
 subdir = "/pngCMG/"
 
-prefix = 'mTSel_ht500-met250-6j-0b-diLepVeto'
-presel="singleMuonic&&nVetoMuons==1&&nVetoElectrons==0&&met_pt>250&&htJet40ja>500&&nBJetMedium25==0&&nJet40a>=6"
-#prefix = 'ht400-st350-6j-0b-diLepVeto'
-#presel="singleMuonic&&nVetoMuons==1&&nVetoElectrons==0&&st>350&&htJet40ja>400&&nBJetMedium25==0&&nJet40a>=6"
+#prefix = 'mTSel_ht500-met250-6j-0b-diLepVeto'
+#presel="singleMuonic&&nVetoMuons==1&&nVetoElectrons==0&&met_pt>250&&htJet40ja>500&&nBJetMedium25==0&&nJet40a>=6"
+prefix = 'ht400-st250-6j-0b-diLepVeto'
+presel="singleMuonic&&nVetoMuons==1&&nVetoElectrons==0&&st>250&&htJet40ja>400&&nBJetMedium25==0&&nJet40a>=6"
+#prefix = 'ht400-st250-1j-0b-diLepVeto'
+#presel="singleMuonic&&nVetoMuons==1&&nVetoElectrons==0&&st>250&&htJet40ja>400&&nBJetMedium25==0&&nJet40a>=1"
 
 cutString=presel
 wjetsSample = WJetsHTToLNu

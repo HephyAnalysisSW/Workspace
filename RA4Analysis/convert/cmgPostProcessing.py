@@ -1,14 +1,15 @@
 import ROOT
 import sys, os, copy, random, subprocess, datetime
 from array import array
-from Workspace.RA4Analysis.cmgTuples import *
 from Workspace.RA4Analysis.cmgObjectSelection import cmgLooseLepIndices, cmgLooseLepID, cmgGoodLepID
 
 from Workspace.HEPHYPythonTools.xsec import xsec
 from Workspace.HEPHYPythonTools.helpers import getObjFromFile
 from Workspace.RA4Analysis.convertHelpers import compileClass, readVar, printHeader, typeStr, createClassString
 
-subDir = "postProcessed_v1"
+subDir = "postProcessed_v2"
+from Workspace.RA4Analysis.cmgTuples import *
+
 target_lumi = 1000 #pb-1
 
 from localInfo import username
@@ -16,17 +17,17 @@ from localInfo import username
 ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 
-defSampleStr = "ttJetsCSA1450ns,WJetsToLNu_HT100to200,WJetsToLNu_HT200to400,WJetsToLNu_HT400to600,WJetsToLNu_HT600toInf"
+#defSampleStr = "ttJetsCSA1450ns,WJetsToLNu_HT100to200,WJetsToLNu_HT200to400,WJetsToLNu_HT400to600,WJetsToLNu_HT600toInf"
 #defSampleStr = "WJetsToLNu_HT200to400,WJetsToLNu_HT400to600,WJetsToLNu_HT600toInf"
 #defSampleStr = "WJetsToLNu_HT600toInf"
 #defSampleStr = "ttJetsCSA1450ns"
-#defSampleStr = "T5Full_1200_1000_800,T5Full_1500_800_100"
+defSampleStr = "T5Full_1200_1000_800,T5Full_1500_800_100"
 #defSampleStr = "T1qqqq_1400_325_300"
 from optparse import OptionParser
 parser = OptionParser()
 parser.add_option("--samples", dest="allsamples", default=defSampleStr, type="string", action="store", help="samples:Which samples.")
 parser.add_option("--producerName", dest="producerName", default="treeProducerSusySingleLepton", type="string", action="store", help="samples:Which samples.")
-parser.add_option("--targetDir", dest="targetDir", default="/data/"+username+"/cmgTuples/postProcessed_v1/", type="string", action="store", help="target directory.")
+parser.add_option("--targetDir", dest="targetDir", default="/data/"+username+"/cmgTuples/"+subDir+'/', type="string", action="store", help="target directory.")
 parser.add_option("--skim", dest="skim", default="inc", type="string", action="store", help="target directory.")
 
 #parser.add_option("--small", dest="small", default = False, action="store_true", help="Just do a small subset.")
