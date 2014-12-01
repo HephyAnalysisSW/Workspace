@@ -1,7 +1,7 @@
 import ROOT
 import sys
-print 'Number of arguments:', len(sys.argv), 'arguments.'
-print 'Argument List:', str(sys.argv)
+#print 'Number of arguments:', len(sys.argv), 'arguments.'
+#print 'Argument List:', str(sys.argv)
 filename1 = '/data/easilar/results2014/rootfiles/PhiSil.root'
 #filename1 = '/data/easilar/results2014/rootfiles/DiLepEffht500met250njet3.root'
 #filename2 = '/data/easilar/results2014/rootfiles/DiLepEff110ht500met250njet3.root'
@@ -99,20 +99,20 @@ h_ratio.GetXaxis().SetTitleFont(43)
 h_ratio.GetXaxis().SetTitleOffset(4.)
 h_ratio.GetXaxis().SetLabelFont(43)
 h_ratio.GetXaxis().SetLabelSize(15)
-#can.SetGridx()
+can.SetGridx()
 #can.Update()
-#can.SaveAs("/afs/hephy.at/user/e/easilar/www/27Oct/HadTau_HT750_met250_njets_3_NoBtagCut"+plot1name+".png")
+can.SaveAs("/afs/hephy.at/user/e/easilar/www/27Oct/HadTau_HT500_met200_njets_3_"+plot1name+".png")
                                               
-ePred = ROOT.Double()
-eTruth = ROOT.Double()
-ePred110 = ROOT.Double()
-Pred = histo2.IntegralAndError(0,histo2.GetNbinsX(),ePred)
-Truth = histo1.IntegralAndError(0,histo1.GetNbinsX(),eTruth)
-Pred110 = histo3.IntegralAndError(0,histo3.GetNbinsX(),eTruth)
-print 'Prediction yield:', Pred
-print 'Truth yield:', Truth
-print 'ePred :', ePred
-print 'eTruth:', eTruth                  
-print 'Pred:' , Pred, '+-',ePred,'(stat)+-', Pred110-Pred,'Leff' 
-print 'Truth:' , Truth, '+-',eTruth,'(stat)+-'
+# ePred = ROOT.Double()
+# eTruth = ROOT.Double()
+# ePred110 = ROOT.Double()
+# Pred = histo2.IntegralAndError(0,histo2.GetNbinsX(),ePred)
+# Truth = histo1.IntegralAndError(0,histo1.GetNbinsX(),eTruth)
+# Pred110 = histo3.IntegralAndError(0,histo3.GetNbinsX(),eTruth)
+# print 'Prediction yield:', Pred
+# print 'Truth yield:', Truth
+# print 'ePred :', ePred
+# print 'eTruth:', eTruth                  
+# print 'Pred:' , Pred, '+-',ePred,'(stat)+-', Pred110-Pred,'Leff' 
+# print 'Truth:' , Truth, '+-',eTruth,'(stat)+-'
                            

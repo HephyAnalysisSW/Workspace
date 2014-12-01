@@ -21,7 +21,7 @@ def getMuons(c,relIso,gLeps):
       if isLoose: nlmuons+=1
       hasMatch = False
       for gl in gLeps:
-        if gl['gLepInd']==j and gl['gLepDR']<0.4 and (abs(muon['pt']-gl['gLepPt'])/gl['gLepPt'])<0.05 : hasMatch=True # and abs(gl['gLepPdg'])==13 
+        if gl['gLepInd']==j and gl['gLepDR']<0.4 and gl['gLepPdg']==muon['Pdg'] and (abs(muon['pt']-gl['gLepPt'])/gl['gLepPt'])<0.07 : hasMatch=True # and abs(gl['gLepPdg'])==13 
       muon['hasMatch']=hasMatch
       muons.append(muon)
   return muons
@@ -57,11 +57,12 @@ def getGenLepsWithMatchInfo(c,relIso):
       hasMatchInd = False
       for j in range(nmuCount):  
         muon=getLooseMuStage2(c,j)
+        #print muon
         if muon:
           isLoose=vetoMuID(muon,relIso)
           if isLoose:
            # print 'in objectselection j and glepind' ,j ,gl['gLepInd']
-            if gl['gLepInd']==j and gl['gLepDR']<0.4 and (abs(muon['pt']-gl['gLepPt'])/gl['gLepPt'])<0.05 : hasMatchInd = True #
+            if gl['gLepInd']==j and gl['gLepDR']<0.4 and gl['gLepPdg']==muon['Pdg'] and (abs(muon['pt']-gl['gLepPt'])/gl['gLepPt'])<0.07 : hasMatchInd = True #
       gl['hasMatchInd']=hasMatchInd
       gLeps.append(gl)
   return gLeps
@@ -385,6 +386,12 @@ def getGoodJetsStage2(c):#, jermode=options.jermode, jesmode=options.jesmode):
           "pt" :getVarValue(c, 'jetPt', i),
           "phi":getVarValue(c, 'jetPhi', i), 
           'muef':getVarValue(c, 'jetMuef', i),
+          'chef':getVarValue(c,  'jetChef', i),
+          'nhef':getVarValue(c,  'jetNhef', i),
+          'hFhef':getVarValue(c, 'jethFhef', i),
+          'hFeef':getVarValue(c, 'jetHFeef', i),
+          'elef':getVarValue(c,  'jetElef', i),
+          'phef':getVarValue(c,  'jetPhef', i),
           'btag':getVarValue(c, 'jetBTag', i),
           'pdg':getVarValue(c, 'jetPdg', i)
       })
