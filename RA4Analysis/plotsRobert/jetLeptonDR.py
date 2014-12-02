@@ -2,7 +2,7 @@ import ROOT
 import pickle
 from array import array
 from Workspace.RA4Analysis.objectSelection import gTauAbsEtaBins, gTauPtBins, metParRatioBins, jetRatioBins
-from Workspace.HEPHYPythonTools.helpers import getVarValue, getObjFromFile, findClosestObjectDR, deltaR
+from Workspace.HEPHYPythonTools.helpers import getVarValue, getObjFromFile, findClosestObject, deltaR, deltaR2
 from Workspace.RA4Analysis.objectSelection import getLooseMuStage2, tightPOGMuID, vetoMuID, getGoodJetsStage2
 from Workspace.RA4Analysis.stage2Tuples import *
 from math import sqrt, cos, sin, atan2, sinh, cosh
@@ -98,7 +98,7 @@ for i in range(number_events):
     l=getLooseMuStage2(c, i)
     if vetoMuID(l) and l['pt']>15:
       vetoMuons.append(l)
-      closestJet = findClosestObjectDR(jets, l)
+      closestJet = findClosestObject(jets, l)
       jet = closestJet['obj']
 
       cosPhi3D = (cos(l['phi'] - jet['phi']) + sinh(l['eta'])*sinh(jet['eta']))/(cosh(jet['eta'])*cosh(l['eta']))
@@ -106,7 +106,7 @@ for i in range(number_events):
 
       isB = abs(jet['pdg'])==5
       isTight = tightPOGMuID(l)
-      isNear = closestJet['deltaR']<0.4
+      isNear = sqrt(closestJet['distance'])<0.4)
 
       nKeys=['All']
       if isNear:
@@ -128,17 +128,17 @@ for i in range(number_events):
         for nK in nKeys:
           for bK in bKeys:
             plot['muef'][idK][nK][bK].Fill(jet['muef'])
-            plot['dR'][idK][nK][bK].Fill(closestJet['deltaR'])
+            plot['dR'][idK][nK][bK].Fill(sqrt(closestJet['distance']))
             plot['ptRatio'][idK][nK][bK].Fill(l['pt']/jet['pt'])
             plot['ptRel'][idK][nK][bK].Fill(ptRel)
 
-      ptRatioVSdRLoose.Fill(closestJet['deltaR'], l['pt']/jet['pt'])
+      ptRatioVSdRLoose.Fill(sqrt(closestJet['distance']), l['pt']/jet['pt'])
       if isTight:
-        ptRatioVSdRTight.Fill(closestJet['deltaR'], l['pt']/jet['pt'])
+        ptRatioVSdRTight.Fill(sqrt(closestJet['distance']), l['pt']/jet['pt'])
       if isB:
-        ptRatioVSdRLoose_b.Fill(closestJet['deltaR'], l['pt']/jet['pt'])
+        ptRatioVSdRLoose_b.Fill(sqrt(closestJet['distance']), l['pt']/jet['pt'])
       else:
-        ptRatioVSdRLoose_nob.Fill(closestJet['deltaR'], l['pt']/jet['pt'])
+        ptRatioVSdRLoose_nob.Fill(sqrt(closestJet['distance']), l['pt']/jet['pt'])
       ptRatioVSptRelLoose.Fill(ptRel, l['pt']/jet['pt'])
       if isTight:
         ptRatioVSptRelTight.Fill(ptRel, l['pt']/jet['pt'])
@@ -153,7 +153,7 @@ for i in range(number_events):
     else:
       nLightJet +=1
     for m in vetoMuons:
-      if deltaR(j, m)<0.4:
+      if deltaR2(j, m)<0.4**2:
         if j['btag']>0.679:
           nBJetLost +=1
         else:

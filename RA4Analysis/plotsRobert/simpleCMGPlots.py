@@ -15,8 +15,8 @@ subdir = "/pngCMG/"
 
 #prefix = 'mTSel_ht500-met250-6j-0b-diLepVeto'
 #presel="singleMuonic&&nVetoMuons==1&&nVetoElectrons==0&&met_pt>250&&htJet40ja>500&&nBJetMedium25==0&&nJet40a>=6"
-prefix = 'ht400-st250-6j-0b-diLepVeto'
-presel="singleMuonic&&nVetoMuons==1&&nVetoElectrons==0&&st>250&&htJet40ja>400&&nBJetMedium25==0&&nJet40a>=6"
+prefix = 'ht500-st250-5j-0b-diLepVeto'
+presel="singleMuonic&&nVetoMuons==1&&nVetoElectrons==0&&st>250&&htJet40ja>400&&nBJetMedium25==0&&nJet40a>=5"
 #prefix = 'ht400-st250-1j-0b-diLepVeto'
 #presel="singleMuonic&&nVetoMuons==1&&nVetoElectrons==0&&st>250&&htJet40ja>400&&nBJetMedium25==0&&nJet40a>=1"
 
@@ -58,7 +58,6 @@ def getStack(labels, var, binning, cut, options={}):
     options['texLines'] = [{'pos':(0.16, 0.965), 'text':'CMS Simulation',       'options':{'size':0.038}},\
                            {'pos':(0.7, 0.965),  'text':'L=1fb{}^{-1} (13 TeV)','options':{'size':0.038}}]
     options['legend'] = {'coordinates':[0.6,0.95 - len(plotLists)*0.1,.95,.95],'boxed':True}
-
 
   for k in options.keys():
     assert opt.has_key(k),"Stack option %s unknown!" %k

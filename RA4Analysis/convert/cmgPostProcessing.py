@@ -18,10 +18,10 @@ ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 
 #defSampleStr = "ttJetsCSA1450ns,WJetsToLNu_HT100to200,WJetsToLNu_HT200to400,WJetsToLNu_HT400to600,WJetsToLNu_HT600toInf"
-#defSampleStr = "WJetsToLNu_HT200to400,WJetsToLNu_HT400to600,WJetsToLNu_HT600toInf"
+defSampleStr = "WJetsToLNu_HT200to400,WJetsToLNu_HT400to600,WJetsToLNu_HT600toInf"
 #defSampleStr = "WJetsToLNu_HT600toInf"
-#defSampleStr = "ttJetsCSA1450ns"
-defSampleStr = "T5Full_1200_1000_800,T5Full_1500_800_100"
+defSampleStr += ",ttJetsCSA1450ns"
+defSampleStr += ",T5Full_1200_1000_800,T5Full_1500_800_100"
 #defSampleStr = "T1qqqq_1400_325_300"
 from optparse import OptionParser
 parser = OptionParser()
@@ -33,7 +33,7 @@ parser.add_option("--skim", dest="skim", default="inc", type="string", action="s
 #parser.add_option("--small", dest="small", default = False, action="store_true", help="Just do a small subset.")
 #parser.add_option("--overwrite", dest="overwrite", action="store_true", help="Overwrite?", default=True)
 (options, args) = parser.parse_args()
-if options.skim=='inc':
+if options.skim=='inc' or options.skim=='singleLeptonic':
   skimCond = "(1)"
 if options.skim.startswith('met'):
   skimCond = "met_pt>"+str(float(options.skim[3:]))
@@ -85,14 +85,14 @@ for isample, sample in enumerate(allSamples):
   os.system('rm -rf '+tmpDir+'/*')
 
   lumiWeight = xsec[sample['dbsName']]*target_lumi/float(nTotEvents)
-  readVariables = []
+  readVariables = ['met_pt/F']
 
   newVariables = ['weight/F']
   newVariables += ['nVetoMuons/I', 'nVetoElectrons/I', 'nGoodMuons/I', 'nGoodElectrons/I', 'singleMuonic/I', 'singleElectronic/I', 'singleLeptonic/I']
-  newVariables.extend( ['leptonPt/F', 'leptonEta/F', 'leptonPhi/F', 'leptonPdg/I/0', 'leptonInd/I/-1', 'leptonMass/F'] )
+  newVariables.extend( ['st/F', 'leptonPt/F', 'leptonEta/F', 'leptonPhi/F', 'leptonPdg/I/0', 'leptonInd/I/-1', 'leptonMass/F'] )
   newVars = [readVar(v, allowRenaming=False, isWritten = True, isRead=False) for v in newVariables]
 
-  aliases = ["st:leptonPt+met_pt", "met:met_pt", "metPhi:met_phi","genMet:met_genPt", "genMetPhi:met_genPhi"]
+  aliases = [ "met:met_pt", "metPhi:met_phi","genMet:met_genPt", "genMetPhi:met_genPhi"]
 
   readVectors = [\
     {'prefix':'LepGood',  'nMax':2, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I', 'relIso03/F', 'tightId/I', 'mass/F']},
@@ -145,6 +145,7 @@ for isample, sample in enumerate(allSamples):
       s.singleMuonic      = s.nGoodMuons==1 and s.nGoodElectrons==0
       s.singleElectronic  = s.nGoodMuons==0 and s.nGoodElectrons==1
       s.singleLeptonic    = s.singleMuonic or s.singleElectronic
+      if options.skim=='singleLeptonic' and not s.singleLeptonic:continue
       leadingLepInd = -1
       leadingLepInd = goodMuInd[0] if len(goodMuInd)>0 else -1
       leadingLepInd = goodEleInd[0] if len(goodEleInd)>0 and (leadingLepInd<0 or r.LepGood_pt[leadingLepInd]<r.LepGood_pt[goodEleInd[0]]) else leadingLepInd
@@ -155,6 +156,7 @@ for isample, sample in enumerate(allSamples):
         s.leptonPhi = r.LepGood_phi[leadingLepInd]
         s.leptonPdg = r.LepGood_pdgId[leadingLepInd]
         s.leptonMass= r.LepGood_mass[leadingLepInd]
+        s.st = r.met_pt + s.leptonPt 
       for v in newVars:
         v['branch'].Fill()
     newFileName = sample['name']+'_'+chunk['name']+'.root'

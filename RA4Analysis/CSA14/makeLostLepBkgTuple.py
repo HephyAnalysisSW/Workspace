@@ -2,7 +2,7 @@ import ROOT
 import pickle
 from array import array
 from Workspace.RA4Analysis.objectSelection import getGoodJetsStage2,gTauAbsEtaBins, gTauPtBins, metParRatioBins, jetRatioBins
-from Workspace.HEPHYPythonTools.helpers import findClosestObjectDR, deltaR,getVarValue, getObjFromFile
+from Workspace.HEPHYPythonTools.helpers import findClosestObject, deltaR,getVarValue, getObjFromFile
 from Workspace.RA4Analysis.objectSelection import getGenLepsWithMatchInfo,getGenLeps, getMuons, getLooseMuStage2, getGenLep ,tightPOGMuID, vetoMuID
 from math import sqrt, cos, sin, atan2
 from Workspace.RA4Analysis.stage2Tuples import *
@@ -162,21 +162,21 @@ for i in range(number_events):
 
     #sortedList  = [[deltaR(lostLep_, jet), jet] for jet in jets]sort( key=lambda x:-x[0])
     if len(jets)>0:
-      closestObj = findClosestObjectDR(jets,lostLep_)
+      closestObj = findClosestObject(jets,lostLep_)
       closestJet = closestObj['obj']
       s.closestJetPt  = closestJet['pt']
       s.closestJetPdg = closestJet['pdg']
       s.closestJetPhi = closestJet['phi']
       s.closestJetEta = closestJet['eta']
-      s.minlostdeltaRAllJets = closestObj['deltaR']
-    if len(bjetsCSVM)>0:    s.mindeltaRBM          =findClosestObjectDR(bjetsCSVM,tightMatchedMuon)['deltaR']   
-    if len(bjetsCSVL)>0:    s.mindeltaRBL          =findClosestObjectDR(bjetsCSVL,tightMatchedMuon)['deltaR']   
-    if len(nonbjetsCSVM)>0: s.mindeltaRNonBM       =findClosestObjectDR(nonbjetsCSVM,tightMatchedMuon)['deltaR']
-    if len(nonbjetsCSVL)>0: s.mindeltaRNonBL       =findClosestObjectDR(nonbjetsCSVL,tightMatchedMuon)['deltaR']
-    if len(bjetsCSVM)>0:    s.minlostdeltaRBM      =findClosestObjectDR(bjetsCSVM,lostLep_)['deltaR']   
-    if len(bjetsCSVL)>0:    s.minlostdeltaRBL      =findClosestObjectDR(bjetsCSVL,lostLep_)['deltaR']   
-    if len(nonbjetsCSVM)>0: s.minlostdeltaRNonBM   =findClosestObjectDR(nonbjetsCSVM,lostLep_)['deltaR']
-    if len(nonbjetsCSVL)>0: s.minlostdeltaRNonBL   =findClosestObjectDR(nonbjetsCSVL,lostLep_)['deltaR']
+      s.minlostdeltaRAllJets = sqrt(closestObj['distance'])
+    if len(bjetsCSVM)>0:    s.mindeltaRBM          = sqrt(findClosestObject(bjetsCSVM,tightMatchedMuon)['distance'])
+    if len(bjetsCSVL)>0:    s.mindeltaRBL          = sqrt(findClosestObject(bjetsCSVL,tightMatchedMuon)['distance'])
+    if len(nonbjetsCSVM)>0: s.mindeltaRNonBM       = sqrt(findClosestObject(nonbjetsCSVM,tightMatchedMuon)['distance'])
+    if len(nonbjetsCSVL)>0: s.mindeltaRNonBL       = sqrt(findClosestObject(nonbjetsCSVL,tightMatchedMuon)['distance'])
+    if len(bjetsCSVM)>0:    s.minlostdeltaRBM      = sqrt(findClosestObject(bjetsCSVM,lostLep_)['distance'])
+    if len(bjetsCSVL)>0:    s.minlostdeltaRBL      = sqrt(findClosestObject(bjetsCSVL,lostLep_)['distance'])
+    if len(nonbjetsCSVM)>0: s.minlostdeltaRNonBM   = sqrt(findClosestObject(nonbjetsCSVM,lostLep_)['distance'])
+    if len(nonbjetsCSVL)>0: s.minlostdeltaRNonBL   = sqrt(findClosestObject(nonbjetsCSVL,lostLep_)['distance'])
 
     for j in range(int(njets)):
       jet = jets[j]

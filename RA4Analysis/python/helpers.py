@@ -25,6 +25,7 @@ def stage2DPhi(c):
   leptonPhi=c.GetLeaf('leptonPhi').GetValue()
   cdp  = cos(leptonPhi-metphi)
   return acos((leptonPt+met*cdp)/sqrt(leptonPt**2+met**2+2*met*leptonPt*cdp)) 
+
 def cmgMT(c):
   met=c.GetLeaf('met_pt').GetValue()
   leptonPt=c.GetLeaf('leptonPt').GetValue()
