@@ -256,7 +256,7 @@ def findClosestObject(jets, obj, sortFunc=deltaR2):
 ##  jets = getJets(c)
   res=[]
   for i,j in enumerate(jets):
-    res.append(sortFunc(j, obj), j, i])
+    res.append([sortFunc(j, obj), j, i])
   res.sort()
   if len(res)>0:
     return {'distance':res[0][0], 'obj':res[0][1], 'index':res[0][2]}
