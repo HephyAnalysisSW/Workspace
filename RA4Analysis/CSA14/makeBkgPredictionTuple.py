@@ -6,7 +6,7 @@ from Workspace.HEPHYPythonTools.helpers import findClosestObject,deltaR,getVarVa
 from Workspace.RA4Analysis.objectSelection import getGoodJetsStage2,getLooseMuStage2, tightPOGMuID, vetoMuID
 from math import sqrt, cos, sin, atan2
 from Workspace.RA4Analysis.helpers import deltaPhi
-
+from localInfo import username
 from Workspace.RA4Analysis.stage2Tuples import *
 c = ROOT.TChain('Events')
 #for b in ttJetsCSA1450ns['bins']:
@@ -34,10 +34,12 @@ if mode=='lep':
   templates = pickle.load(file('/data/schoef/results2014/tauTemplates/CSA14_TTJets_lepGenTau.pkl'))
   ofile =                      '/data/schoef/results2014/tauTuples/CSA14_TTJets_lepGenTau.root'
 if mode=='dilep':
-  leptonEffMap = pickle.load(file('/data/easilar/results2014/muonTemplates/CSA14_TTJets_efficiencyMap_vetoMuIDPt15_ttJetsCSA1450ns_relIso'+str(relIso)+'.pkl'))
+  leptonEffMap = pickle.load(file('/data/'+username+'/results2014/muonTemplates/CSA14_TTJets_efficiencyMap_v26_vetoMuIDPt15_ttJetsCSA1450ns_v26_relIso'+str(relIso)+'.pkl'))
+  #leptonEffMap = pickle.load(file('/data/easilar/results2014/muonTemplates/CSA14_TTJets_efficiencyMap_vetoMuIDPt15_ttJetsCSA1450ns_relIso'+str(relIso)+'.pkl'))
   leptonID = "muIsPF&&(muIsGlobal||muIsTracker)&&muPt>15&&abs(muEta)<2.5&&abs(muDxy)<0.2&&abs(muDz)<0.5&&muRelIso<"+str(relIso)
   doubleLeptonPreselection = "gLepCount==2&&ngNuMuFromW==2&&ngNuEFromW==0" #&&ngoodMuons>=1&&Sum$("+leptonID+")==2&&nvetoElectrons==0"
-  ofile =                    '/data/easilar/results2014/muonTuples/CSA14_TTJets_diLep_v26_4_relIso'+str(relIso)+'.root'
+  #ofile =                    '/data/easilar/results2014/muonTuples/CSA14_TTJets_diLep_v26_relIso'+str(relIso)+'.root'
+  ofile =                    '/data/easilar/results2014/muonTuples/deneme_diLep.root'
   if small : ofile = '/data/easilar/results2014/muonTuples/CSA14_TTJets_diLep_Small_relIso'+str(relIso)+'.root'
 if mode=='had' or mode=='lep':
   for ptk in templates.keys():
@@ -75,21 +77,42 @@ def getTypeStr(s):
 
 copyVars  = ['event/l','nbtags/I', 'njets/I', 'ht/F', 'met/F', 'metPhi/F', 'nvetoMuons/I']
 newVars   = ['njetsPred/I','lostRelIso/F','relIso/F',\
-'eff/F','combFac/I' ,'lostPt/F','lostEta/F','lostPhi/F','htPred/F','pt/F','eta/F','phi/F','wPhi/F','wPt/F','st/F' ,'metPred/F', 'metPhiPred/F','weight/F', 'mT/F', 'weight/F', 'scaleLEff/F','scaleLEffUp/F','scaleLEffDown/F','deltaPhi/F', \
+'eff/F','combFac/I' ,'lostPt/F','lostEta/F','lostPhi/F','htPred/F','pt/F','eta/F','phi/F','wPhi/F','wPt/F','st/F' ,'wPhiPred/F','wPtPred/F','stPred/F' ,'metPred/F', 'metPhiPred/F','weight/F', 'mT/F', 'mTPred/F', 'scaleLEff/F','scaleLEffUp/F','scaleLEffDown/F','deltaPhi/F','deltaPhiPred/F', \
 'mindeltaRBM/F', \
 'mindeltaRBL/F', \
 'mindeltaRNonBM/F', \
 'mindeltaRNonBL/F', \
+'mindeltaRAllJets/F', \
 'minlostdeltaRBM/F', \
 'minlostdeltaRBL/F', \
 'minlostdeltaRNonBM/F', \
 'minlostdeltaRNonBL/F', \
+'minlostdeltaRAllJets/F', \
+'closestJetPt/F', \
+'closestJetPdg/F', \
+'closestJetPhi/F', \
+'closestJetEta/F', \
+'closestJetChef/F', \
+'closestJetNhef/F', \
+'closestJetHFhef/F', \
+'closestJetHFeef/F', \
+'closestJetMuef/F', \
+'closestJetElef/F', \
+'closestJetPhef/F', \
+'effTight/F'\
 ]
 vectorVars = [
 'jetPt[16]/F', \
 'jetEta[16]/F', \
 'jetPhi[16]/F', \
 'jetPdg[16]/F', \
+'jetChef[16]/F', \
+'jetNhef[16]/F', \
+'jetHFhef[16]/F', \
+'jetHFeef[16]/F', \
+'jetMuef[16]/F', \
+'jetElef[16]/F', \
+'jetPhef[16]/F', \
 'bJetCSVMPt[16]/F', \
 'bJetCSVMEta[16]/F', \
 'bJetCSVMPhi[16]/F', \
@@ -165,6 +188,14 @@ for i in range(number_events):
   for v in copyVars[1:]:
     n=v.split('/')[0]
     exec('s.'+n+'='+str(c.GetLeaf(n).GetValue()))
+  for v in newVars[:]:
+   n=v.split('/')[0]
+   exec('s.'+n+'='+str(-1000))
+  for v in vectorVars[:]:
+    n=v.split('[')[0]
+    for i in range(16):
+      exec('s.'+n+'['+str(i)+']='+str(-1000))
+
   #muons = getTwoMuons(c)
 
   #1.Get All gen Leps
@@ -184,13 +215,14 @@ for i in range(number_events):
   nbtags = getVarValue(c, 'nbtags')
   jets = getGoodJetsStage2(c)
   sorted(jets, key= lambda x: -x['pt'])
+  if small: print 'ALL JETS: ', jets
   bjetsCSVM = filter(lambda j:j['btag']>0.679 and abs(j['eta'])<2.4, jets)
   sorted(bjetsCSVM, key=lambda x: -x['pt'])
   bjetsCSVL = filter(lambda j:j['btag']>0.246 and abs(j['eta'])<2.4, jets)
   sorted(bjetsCSVL, key=lambda x: -x['pt'])
-  nonbjetsCSVM = filter(lambda j:j['btag']<0.679, jets)
+  nonbjetsCSVM = filter(lambda j:not(j['btag']>0.679 and abs(j['eta'])<2.4), jets)
   sorted(nonbjetsCSVM, key=lambda x: -x['pt'])
-  nonbjetsCSVL = filter(lambda j:j['btag']<0.246, jets)
+  nonbjetsCSVL = filter(lambda j:not (j['btag']>0.246 and abs(j['eta'])<2.4), jets)
   sorted(nonbjetsCSVL, key=lambda x: -x['pt'])
 
 
@@ -216,31 +248,40 @@ for i in range(number_events):
         if abseta>2.5:continue
 
         s.weight=c.GetLeaf('weight').GetValue()
-        lEffb = leptonEffMap.FindBin( m['pt'], m['eta'])
-        lEffi = leptonEffMap.GetBinContent(lEffb)
-        if lEffi>0.5:
+        lEffL = leptonEffMap.FindBin( m['pt'], m['eta'])
+        lEffT = leptonEffMap.FindBin( m2['pt'], m2['eta'])
+        lEffi = leptonEffMap.GetBinContent(lEffL)
+        lEfft = leptonEffMap.GetBinContent(lEffT)
+        if lEffi>0.5 and lEfft>0.5:
           lEffUp = max((lEffi*effUp)-(effUp-1),0)
           lEffDown = min((lEffi*effDown)+(1-effDown),1)
           lEff = lEffi
-          c.eff = lEff 
           if mode=='dilep':
             ##Jet Staff 
 
             if len(jets)>0:
               closestObj = findClosestObject(jets,m)
               closestJet = closestObj['obj']
+              if small: print closestJet
               s.closestJetPt  = closestJet['pt']
               s.closestJetPdg = closestJet['pdg']
               s.closestJetPhi = closestJet['phi']
               s.closestJetEta = closestJet['eta']
-
+              s.closestJetChef  = closestJet['chef']
+              s.closestJetNhef  = closestJet['nhef']
+              s.closestJetHFhef = closestJet['hFhef']
+              s.closestJetHFeef = closestJet['hFeef']
+              s.closestJetMuef  = closestJet['muef']
+              s.closestJetElef  = closestJet['elef']
+              s.closestJetPhef  = closestJet['phef']
+              s.mindeltaRAllJets = sqrt(findClosestObject(jets,m2)['distance'])
               s.minlostdeltaRAllJets = sqrt(closestObj['distance'])
-            if len(bjetsCSVM)>0:    s.mindeltaRBM          = sqrt(findClosestObject(bjetsCSVM,m2)['distance']) 
-            if len(bjetsCSVL)>0:    s.mindeltaRBL          = sqrt(findClosestObject(bjetsCSVL,m2)['distance'])  
+            if len(bjetsCSVM)>0:    s.mindeltaRBM          = sqrt(findClosestObject(bjetsCSVM,m2)['distance'])
+            if len(bjetsCSVL)>0:    s.mindeltaRBL          = sqrt(findClosestObject(bjetsCSVL,m2)['distance'])
             if len(nonbjetsCSVM)>0: s.mindeltaRNonBM       = sqrt(findClosestObject(nonbjetsCSVM,m2)['distance'])
             if len(nonbjetsCSVL)>0: s.mindeltaRNonBL       = sqrt(findClosestObject(nonbjetsCSVL,m2)['distance'])
             if len(bjetsCSVM)>0:    s.minlostdeltaRBM      = sqrt(findClosestObject(bjetsCSVM,m)['distance'])
-            if len(bjetsCSVL)>0:    s.minlostdeltaRBL      = sqrt(findClosestObject(bjetsCSVL,m)['distance'])  
+            if len(bjetsCSVL)>0:    s.minlostdeltaRBL      = sqrt(findClosestObject(bjetsCSVL,m)['distance'])
             if len(nonbjetsCSVM)>0: s.minlostdeltaRNonBM   = sqrt(findClosestObject(nonbjetsCSVM,m)['distance'])
             if len(nonbjetsCSVL)>0: s.minlostdeltaRNonBL   = sqrt(findClosestObject(nonbjetsCSVL,m)['distance'])
 
@@ -251,6 +292,14 @@ for i in range(number_events):
                 s.jetEta[j] = jet['eta']
                 s.jetPhi[j] = jet['phi']
                 s.jetPdg[j] = jet['pdg']
+                s.jetPdg[j] = jet['pdg']
+                s.jetChef[j]  = jet['chef']
+                s.jetNhef[j]  = jet['nhef']
+                s.jetHFhef[j] = jet['hFhef']
+                s.jetHFeef[j] = jet['hFeef']
+                s.jetMuef[j]  = jet['muef']
+                s.jetElef[j]  = jet['elef']
+                s.jetPhef[j]  = jet['phef']
             for j in range(int(len(bjetsCSVM))):
               s.bJetCSVMPt[j]  = bjetsCSVM[j]['pt']
               s.bJetCSVMEta[j] = bjetsCSVM[j]['eta']
@@ -275,48 +324,12 @@ for i in range(number_events):
 
             ##Add loose muon to jet collections
             
-            if m['pt'] > 30:
+            if m['pt'] > 30 :
               s.njetsPred = njets + 1
               s.htPred   = s.ht + m['pt']
-           #  jetsIncMu = jets
-           #  bjetsIncMuCSVM  =  bjetsCSVM
-           #  bjetsIncMuCSVL  =  bjetsCSVL
-           #  nonbjetsIncMuCSVM  =  nonbjetsCSVM
-           #  nonbjetsIncMuCSVL  =  nonbjetsCSVL
-           #  jetsIncMu.append(m) 
-           #  bjetsIncMuCSVM.append(m) 
-           #  bjetsIncMuCSVL.append(m) 
-           #  nonbjetsIncMuCSVM.append(m) 
-           #  nonbjetsIncMuCSVL.append(m)             
-           #  sorted(jetsIncMu, key=lambda x: -x['pt'])
-           #  sorted(bjetsIncMuCSVM,key=lambda x: -x['pt'])
-           #  sorted(bjetsIncMuCSVL,key=lambda x: -x['pt'])
-           #  sorted(nonbjetsIncMuCSVM,key=lambda x: -x['pt'])
-           #  sorted(nonbjetsIncMuCSVL,key=lambda x: -x['pt'])
-  
-           #  for j in range(int(len(jetsIncMu))):
-           #    jet = jetsIncMu[j]
-           #    if jet:
-           #      s.jetIncMuPt[j] = jet['pt']
-           #      s.jetIncMuEta[j] = jet['eta']
-           #      s.jetIncMuPhi[j] = jet['phi']
-           #  for j in range(int(len(bjetsIncMuCSVM))):
-           #    s.bJetIncMuCSVMPt[j]  = bjetsIncMuCSVM[j]['pt']
-           #    s.bJetIncMuCSVMEta[j] = bjetsIncMuCSVM[j]['eta']
-           #    s.bJetIncMuCSVMPhi[j] = bjetsIncMuCSVM[j]['phi']
-           #  for j in range(int(len(bjetsIncMuCSVL))):
-           #    s.bJetIncMuCSVLPt[j]  = bjetsIncMuCSVL[j]['pt']
-           #    s.bJetIncMuCSVLEta[j] = bjetsIncMuCSVL[j]['eta']
-           #    s.bJetIncMuCSVLPhi[j] = bjetsIncMuCSVL[j]['phi']
-           #  for j in range(int(len(nonbjetsIncMuCSVM))):
-           #    s.nonbJetIncMuCSVMPt[j]  = nonbjetsIncMuCSVM[j]['pt']
-           #    s.nonbJetIncMuCSVMEta[j] = nonbjetsIncMuCSVM[j]['eta']
-           #    s.nonbJetIncMuCSVMPhi[j] = nonbjetsIncMuCSVM[j]['phi']
-           #  for j in range(int(len(nonbjetsIncMuCSVL))):
-           #    s.nonbJetIncMuCSVLPt[j]  = nonbjetsIncMuCSVL[j]['pt']
-           #    s.nonbJetIncMuCSVLEta[j] = nonbjetsIncMuCSVL[j]['eta']
-           #    s.nonbJetIncMuCSVLPhi[j] = nonbjetsIncMuCSVL[j]['phi']
 
+            s.eff = lEff
+            s.effTight = lEfft 
             s.scaleLEff = (1-lEff)/lEff
             s.scaleLEffUp = (1-lEffUp)/lEffUp
             s.scaleLEffDown = (1-lEffDown)/lEffDown 
@@ -333,12 +346,19 @@ for i in range(number_events):
             s.weight = s.weight
             s.metPred = sqrt(metx**2+mety**2)
             s.metPhiPred = atan2(mety,metx)
-            s.mT = sqrt(2.*s.metPred*m2['pt']*(1-cos(m2['phi']-s.metPhiPred)))
+            s.mTPred = sqrt(2.*s.metPred*m2['pt']*(1-cos(m2['phi']-s.metPhiPred)))
+            s.mT = sqrt(2.*s.met*m2['pt']*(1-cos(m2['phi']-s.metPhi)))
             wx = s.metPred*cos(s.metPhiPred) + m2['pt']*cos(m2['phi'])
             wy = s.metPred*sin(s.metPhiPred) + m2['pt']*sin(m2['phi'])
-            s.wPhi     = atan2(wy,wx)
-            s.wPt      = sqrt((wx)**2+(wy)**2)
-            s.st       = m2['pt'] + s.metPred 
+            wx_ = s.met*cos(s.metPhi) + m2['pt']*cos(m2['phi'])
+            wy_ = s.met*sin(s.metPhi) + m2['pt']*sin(m2['phi'])
+            s.wPhiPred     = atan2(wy,wx)
+            s.wPhi     = atan2(wy_,wx_)
+            s.wPtPred      = sqrt((wx)**2+(wy)**2)
+            s.wPt    = sqrt((wx_)**2+(wy_)**2)
+            s.stPred       = m2['pt'] + s.metPred 
+            s.st       = m2['pt'] + s.met 
+            s.deltaPhiPred = deltaPhi(s.wPhiPred,m2['phi'])
             s.deltaPhi = deltaPhi(s.wPhi,m2['phi'])
             s.relIso = m2['relIso']
             s.lostRelIso = m['relIso']

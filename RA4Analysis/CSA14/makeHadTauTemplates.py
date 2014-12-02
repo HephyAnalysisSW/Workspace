@@ -3,9 +3,9 @@ import pickle
 from Workspace.RA4Analysis.stage2Tuples import ttJetsCSA1450ns
 from array import array
 c = ROOT.TChain('Events')
-for b in ttJetsCSA1450ns['bins']:
-  c.Add(ttJetsCSA1450ns['dirname']+'/'+b+'/h*.root')
-
+#for b in ttJetsCSA1450ns['bins']:
+#  c.Add(ttJetsCSA1450ns['dirname']+'/'+b+'/h*.root')
+c.Add('/data/schoef/convertedTuples_v26/copyInc/ttJetsCSA1450ns/histo_ttJetsCSA1450ns_from*.root')
 stuff=[]
 hadTauReq = 'gTauNENu+gTauNMuNu==0&&gTauNTauNu==1'
 
@@ -217,6 +217,7 @@ def getCut(var, bin):
 #    c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngCSA14/recoTauGenTauTemplate_'+s+'.png')
 #pickle.dump(templates, file('/data/schoef/results2014/tauTemplates/CSA14_TTJets_recoTauGenTau.pkl','w'))
 
+##gTauMetPar/gTauPt VS. restJet/genTau templates in bins of gTauPt and gTauEta
 #gTauMetPar/gTauPt VS. restJet/genTau templates in bins of gTauPt and gTauEta
 c1 = ROOT.TCanvas()
 templates={}
@@ -236,8 +237,10 @@ for etab in gTauAbsEtaBins+[(0,-1)]:
     genTauTemplatePt[b].Draw()
     templates[b][etab]=genTauTemplatePt[b]
     c1.SetLogz()
-    c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngCSA14/genTauTemplate_'+s+'.png')
-ofile = '/data/schoef/results2014/tauTemplates/CSA14_TTJets_genTau.pkl'
+    c1.Print('/afs/hephy.at/user/e/easilar/www/pngCSA14/genTauTemplate_'+s+'.png')
+ofile = '/data/easilar/results2014/tauTemplates/CSA14_TTJets_genTau.pkl'
+#    c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngCSA14/genTauTemplate_'+s+'.png')
+#ofile = '/data/schoef/results2014/tauTemplates/CSA14_TTJets_genTau.pkl'
 pickle.dump(templates, file(ofile,'w'))
 print "Written", ofile 
 
@@ -262,6 +265,7 @@ print "Written", ofile
 #    genTauTemplatePt[b].Draw()
 #    templates[b][etab]=genTauTemplatePt[b]
 #    c1.SetLogz()
+#    c1.Print('/afs/hephy.at/user/e/easilar/www/pngCSA14/genTauTemplate_'+s+'.png')
 #    c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngCSA14/genTauTemplate_'+s+'.png')
 #
 #c1 = ROOT.TCanvas()
@@ -286,4 +290,5 @@ print "Written", ofile
 #  templates[b][etab].Draw('same')
 #
 #l.Draw()
+#c1.Print('/afs/hephy.at/user/e/easilar/www/pngCSA14/genTauTemplate_'+seta+'.png')
 #c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngCSA14/genTauTemplate_'+seta+'.png')
