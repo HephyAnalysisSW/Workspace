@@ -1,9 +1,11 @@
 import ROOT
 from Workspace.RA4Analysis.stage2Tuples import ttJetsCSA1450ns
-from Workspace.RA4Analysis.helpers import deltaPhi
+from Workspace.HEPHYPythonTools.helpers import findClosestObject, deltaR,getVarValue, getObjFromFile
 from Workspace.RA4Analysis.objectSelection import getGoodJetsStage2
 from Workspace.RA4Analysis.makeCompPlotDilep import DrawClosure
+from Workspace.RA4Analysis.makeNicePlot import DrawNicePlot
 from math import *
+from array import array
 import os, sys
 
 
@@ -21,16 +23,18 @@ oneHadTauOpen ="ngoodMuons==1&&nvetoMuons==1&&nvetoElectrons==0&&Sum$(gTauNENu+g
 
 ##Fakerate calculation##
 ptBins  = array('d', [float(x) for x in range(10, 20)+range(20,50,3)+range(50,100,10)+range(100,310,30)])
-leptonID = 'gTauPt>15&&abs(gTauEta)<2.1&&gTauNENu+gTauNMuNu==0&&gTauNTauNu==1'
+leptonID = 'gTauPt>15&&abs(gTauEta)<2.1&&(gTauNENu+gTauNMuNu)==0&&gTauNTauNu==1'
 #GetJets
-sqrt(findClosestObject(getGoodJetsStage2(c),tau)['distance'])<0.4
+mindeltaR = sqrt(findClosestObject(getGoodJetsStage2(c),{'phi':gTauPhi,'eta':gTauEta})['distance'])<0.4
 
 fakeRatePre = ROOT.TProfile('fakeRatePre','fakeRatePre', len(ptBins)-1,ptBins,-2,2)
-c.Draw(':gTauPt>>fakeRatePre',oneHadTau, 'goff')
+c.Draw('gTauJetInd>=0:gTauPt>>fakeRatePre',oneHadTau, 'goff')
 fakeRate = ROOT.TProfile('fakeRate','fakeRate', len(ptBins)-1,ptBins,-2,2)
-c.Draw(leptonID+':gTauPt>>fakeRate',oneHadTau, 'goff')
+c.Draw('gTauJetDR<0.4&&jetBTag[gTauJetInd]>0.679&&abs(jetEta[gTauJetInd])<2.4:gTauPt>>fakeRate',oneHadTau, 'goff')
 fakeRate=fakeRate.ProjectionX()
 fakeRate.Multiply(fakeRatePre.ProjectionX())
+path = '/afs/hephy.at/user/e/easilar/www/hadronicTau/'
+DrawNicePlot(fakeRate,'tau fake Rate','fake Rate','gen Tau Pt',path,'FakeRate.png')
 ####
 
 
