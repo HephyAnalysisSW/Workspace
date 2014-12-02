@@ -34,8 +34,8 @@ njreg = [(2,2),(3,3),(4,4),(5,-1),(6,-1)]
 
 
 prefix = 'reduced'
-presel="singleMuonic&&nVetoMuons==1&&nVetoElectrons==0&&nBJetMedium40==1"
-#presel="singleMuonic&&nVetoMuons==1&&nVetoElectrons==0&&nBJetMedium25==0"
+#presel="singleMuonic&&nVetoMuons==1&&nVetoElectrons==0&&nBJetMedium40==1"
+presel="singleMuonic&&nVetoMuons==1&&nVetoElectrons==0&&nBJetMedium25==0"
 
 ##2D plots of yields
 #c1 = ROOT.TCanvas()
@@ -115,7 +115,7 @@ for name, c in [ ["W",cWJets], ["TT", cTTJets] ]:
         h_nj[name][stb][htb].GetXaxis().SetBinLabel(i+1, nJetBinName(njreg[i]))
       for i_njb, njb in enumerate(njreg):
         cname, cut = nameAndCut(stb,htb,njb, btb=None,presel=presel) 
-        res, resErr = getRCS(cWJets, cut,  dPhiCut)
+        res, resErr = getRCS(c, cut,  dPhiCut)
         print res,resErr, name, cname
         if res:
           h_nj[name][stb][htb].SetBinContent(i_njb+1, res)
@@ -232,7 +232,7 @@ for name, c in [ ["W",cWJets], ["TT", cTTJets]]:
 #          h_btb[name][stb][htb][njb].GetXaxis().SetBinLabel(i+1, nBTagBinName(btreg[i]))
 #        for i_btb, btb in enumerate(btreg):
 #          cname, cut = nameAndCut(stb,htb,njb,btb=btb, presel=presel) 
-#          res, resErr = getRCS(cWJets, cut,  dPhiCut)
+#          res, resErr = getRCS(c, cut,  dPhiCut)
 #          print res,resErr, name, cname
 #          if res:
 #            h_btb[name][stb][htb][njb].SetBinContent(i_btb+1, res)
