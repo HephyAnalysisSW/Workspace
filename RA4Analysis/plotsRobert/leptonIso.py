@@ -2,7 +2,7 @@ import ROOT
 import pickle
 from array import array
 from Workspace.RA4Analysis.objectSelection import gTauAbsEtaBins, gTauPtBins, metParRatioBins, jetRatioBins
-from Workspace.HEPHYPythonTools.helpers import getVarValue, getObjFromFile, findClosestObjectDR
+from Workspace.HEPHYPythonTools.helpers import getVarValue, getObjFromFile, findClosestObject
 from Workspace.RA4Analysis.objectSelection import getLooseMuStage2, tightPOGMuID, vetoMuID, getGoodJetsStage2
 from Workspace.RA4Analysis.stage2Tuples import *
 from math import sqrt, cos, sin, atan2
@@ -48,17 +48,17 @@ c.Draw("","abs(gLepPdg)==13&&gLepPt>15&&"+presel)
 #  for i in range(nmuCount):
 #    l=getLooseMuStage2(c, i)
 #    if vetoMuID(l) and l['pt']>30:
-#      closestJet = findClosestObjectDR(jets, l)
+#      closestJet = findClosestObject(jets, l)
 #      jet = closestJet['obj']
-#      dRLoose.Fill(closestJet['deltaR'])
-#      if closestJet['deltaR']<0.4:
+#      dRLoose.Fill(closestJet['distance'])
+#      if closestJet['distance']<0.4**2:
 #        ptRatioLoose.Fill(l['pt']/jet['pt'])
 #        muefNearLoose.Fill(jet['muef'])
 #      else:
 #        muefFarLoose.Fill(jet['muef'])
 #      if tightPOGMuID(l):
-#        dRTight.Fill(closestJet['deltaR'])
-#        if closestJet['deltaR']<0.4:
+#        dRTight.Fill(closestJet['distance'])
+#        if closestJet['distance']<0.4**2:
 #          ptRatioTight.Fill(l['pt']/jet['pt'])
 #          muefNearTight.Fill(jet['muef'])
 #        else:

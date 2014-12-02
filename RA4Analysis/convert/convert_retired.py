@@ -4,7 +4,7 @@ from PhysicsTools.PythonAnalysis import *
 from math import *
 import sys, os, copy, random, subprocess, datetime
 #from helpers import getVarValue, deltaPhi, minAbsDeltaPhi,  deltaR, invMass,
-from Workspace.HEPHYPythonTools.helpers import getVarValue, deltaPhi, minAbsDeltaPhi, invMassOfLightObjects, deltaR, closestMuJetDeltaR, invMass,  findClosestObjectDR, getFileList
+from Workspace.HEPHYPythonTools.helpers import getVarValue, deltaPhi, minAbsDeltaPhi, invMassOfLightObjects, deltaR, closestMuJetDeltaR, invMass,  findClosestObject, getFileList
 from Workspace.RA4Analysis.objectSelection_retired import getLooseEleStage1,getAllElectronsStage1, tightPOGEleID, vetoEleID, getLooseMuStage1, getAllMuonsStage1, tightPOGMuID, vetoMuID, getAllTausStage1, getTauStage1, hybridMuID, getGoodJetsStage1, isIsolated
 
 from Workspace.RA4Analysis.stage1Tuples import *
@@ -406,11 +406,11 @@ for isample, sample in enumerate(allSamples):
                 gpm = gp.mother(0)
                 lep = {'pt':gp.pt(),'phi':gp.phi(),'eta':gp.eta(),'Pdg':gp.pdgId(), 'MMass':gpm.mass()}
                 if pdgId==11:
-                  rlep=findClosestObjectDR(allGoodElectrons, {'phi':lep['phi'], 'eta':lep['eta']})
+                  rlep=findClosestObject(allGoodElectrons, {'phi':lep['phi'], 'eta':lep['eta']})
                 if pdgId==13:
-                  rlep=findClosestObjectDR(allGoodMuons, {'phi':lep['phi'], 'eta':lep['eta']})
+                  rlep=findClosestObject(allGoodMuons, {'phi':lep['phi'], 'eta':lep['eta']})
                 if rlep:
-                  lep['gLepDR'] = rlep['deltaR']
+                  lep['gLepDR'] = sqrt(rlep['distance'])
                   lep['gLepInd']= rlep['index']
                 else:
                   lep['gLepDR'] = float('nan')
@@ -427,18 +427,18 @@ for isample, sample in enumerate(allSamples):
                 MEy = 0.
 #                tx=gp.px()
 #                ty=gp.py() 
-                cjet = findClosestObjectDR(idJets30, {'phi':tau['phi'], 'eta':tau['eta']})
+                cjet = findClosestObject(idJets30, {'phi':tau['phi'], 'eta':tau['eta']})
                 if cjet and cjet['index']<10:
 #                  print cjet
                   tau['gTauJetInd']=cjet['index']
-                  tau['gTauJetDR']=cjet['deltaR']
+                  tau['gTauJetDR']=sqrt(cjet['distance'])
                 else:
                   tau['gTauJetInd']=-1
                   tau['gTauJetDR']=float('nan')
-                ctau = findClosestObjectDR(allGoodTaus, {'phi':tau['phi'], 'eta':tau['eta']})
+                ctau = findClosestObject(allGoodTaus, {'phi':tau['phi'], 'eta':tau['eta']})
                 if ctau and ctau['index']<10:
                   tau['gTauTauInd']=ctau['index']
-                  tau['gTauTauDR']=ctau['deltaR']
+                  tau['gTauTauDR']=sqrt(ctau['distance'])
                 else:
                   tau['gTauTauInd']=-1
                   tau['gTauTauDR']=float('nan')
@@ -572,8 +572,8 @@ for isample, sample in enumerate(allSamples):
             s.muIso03sumPUChargedHadronPt[i] = allGoodMuons[i]['Iso03sumPUChargedHadronPt']
 #            s.muMT[i]    = sqrt(2.0*s.muPt[i]*s.met*(1-cos(s.muPhi[i] - s.metphi)))
 #            if len(idJets30)>0:
-#              cjet = findClosestObjectDR(idJets30, {'phi':s.muPhi[i], 'eta':s.muEta[i]})
-#              s.muClosestJetDeltaR[i] = cjet['deltaR']
+#              cjet = findClosestObject(idJets30, {'phi':s.muPhi[i], 'eta':s.muEta[i]})
+#              s.muClosestJetDeltaR[i] = sqrt(cjet['distance'])
 #              s.muClosestJetMass[i] = invMass(cjet['jet'], {'phi':s.muPhi[i], 'pt':s.muPt[i], 'eta':s.muEta[i]})
 #            else:
 #              s.muClosestJetDeltaR[i] =float('nan') 
@@ -612,10 +612,10 @@ for isample, sample in enumerate(allSamples):
             s.tauEta[i] = allGoodTaus[i]['eta']
             s.tauPhi[i] = allGoodTaus[i]['phi']
             s.tauPdg[i] = allGoodTaus[i]['Pdg']
-            cjet = findClosestObjectDR(idJets30, {'phi':s.tauPhi[i], 'eta':s.tauEta[i]})
+            cjet = findClosestObject(idJets30, {'phi':s.tauPhi[i], 'eta':s.tauEta[i]})
             if cjet and cjet['index']<10:
               s.tauJetInd[i]=cjet['index']
-              s.tauJetDR[i]=cjet['deltaR']
+              s.tauJetDR[i]=sqrt(cjet['distance'])
             else:
               s.tauJetInd[i]=-1
               s.tauJetDR[i]=float('nan')
