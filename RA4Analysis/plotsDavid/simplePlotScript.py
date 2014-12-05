@@ -19,11 +19,11 @@ SIGNAL1500_800 = getChain(T5Full_1500_800_100)
 #cut = "singleMuonic&&htJet40ja>400&&nBJetLoose25==0&&nJet>=6"
 
 #prefix = 'singleMuonic_ht>400_nBJetLoose_0_nJet>5'
-isoTrackPrefix = 'isoTrpt<15_isoTrpdg_211_isoTrdz<05_nJet>5_ht>750_350<st<450'
+isoTrackPrefix = 'isoTrpt<15_isoTrpdg_211_isoTrdz<05_nJet_5_500<ht<750_250<st<350'
 
-ht = 'htJet40ja>750'#&&htJet40ja<750'
-st = '(met_pt+leptonPt)>350&&(met_pt+leptonPt)<450'
-cut = 'singleMuonic==1&&nBJetLoose25==0&&nJet>=6&&'+ht+'&&'+st
+ht = 'htJet40ja>500&&htJet40ja<750'
+st = '(met_pt+leptonPt)>250&&(met_pt+leptonPt)<350'
+cut = 'singleMuonic==1&&nBJetLoose25==0&&nJet==5&&'+ht+'&&'+st
 
 wwwDir = 'isoTrack/'
 

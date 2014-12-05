@@ -3,6 +3,9 @@ import pickle
 from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYieldFromChain
 from Workspace.RA4Analysis.cmgTuplesPostProcessed import *
 from localInfo import username
+
+import os, copy, sys
+sys.path.append('/afs/hephy.at/scratch/d/dhandl/CMSSW_7_0_6_patch1/src/Workspace/RA4Analysis/plotsDavid')
  
 cWJets  = getChain(WJetsHTToLNu)
 cTTJets = getChain(ttJetsCSA1450ns)
@@ -16,6 +19,7 @@ for s in signals:
   s['chain']=getChain(s['sample'])
 
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,varBinName
+#from Workspace.RA4Analysis.plotsDavid.binnedNBTagsFit import binnedNBTagsFit
 from binnedNBTagsFit import binnedNBTagsFit
 from math import pi, sqrt
 
@@ -39,12 +43,18 @@ def getRCS(c, cut, dPhiCut):
 
 prefix = 'reduced_lowNj1bCR'
 streg = [[(250, 350), 1.], [(350, -1), 1.]] 
-htreg = [(500,750),(750, -1)]
+htreg = [(500,750),(750,-1)]
 njreg = [(5,5),(6,-1)]
 
+#small = True
+#if small:
+#  streg = [(250,350),1.]
+#  htreg = (500,750)
+#  njreg = (6,-1)
 
 presel   ="singleMuonic&&nVetoMuons==1&&nVetoElectrons==0"
 presel_0b="singleMuonic&&nVetoMuons==1&&nVetoElectrons==0&&nBJetMedium25==0"
+
 def nJetBinName(njb):
   if njb[0]==njb[1]:
     return "n_{jet}="+str(njb[0])
@@ -60,7 +70,6 @@ def varBinName(vb, var):
 
 
 #1D and 2D plots of RCS
-#cBkg = cWJets
 #crNJet = (3,4)
 crNJet = (2,3)
 res = {}
@@ -249,7 +258,7 @@ for i_htb, htb in enumerate(htreg):
   for stb, dPhiCut in streg:
     print '$'+varBinName(htb, 'H_{T}')+'$&$'+varBinName(stb, 'S_{T}')+'$ & '+\
         ' & '.join([getNumString(res[htb][stb][njreg[0]]['rCS_W_crNJet_0b_corr'],sqrt(res[htb][stb][njreg[0]]['rCS_Var_W_crNJet_0b_corr']),4), \
-#                    getNumString(res[htb][stb][njreg[0]]['rCS_W_crNJet_0b_notcorr'],sqrt(res[htb][stb][njreg[0]]['rCS_Var_W_crNJet_0b_notcorr']),4),\
+                    getNumString(res[htb][stb][njreg[0]]['rCS_W_crNJet_0b_notcorr'],sqrt(res[htb][stb][njreg[0]]['rCS_Var_W_crNJet_0b_notcorr']),4),\
                     getNumString(res[htb][stb][njreg[0]]['rCS_srNJet_0b_onlyW']['rCS'], res[htb][stb][njreg[0]]['rCS_srNJet_0b_onlyW']['rCSE_sim'],4),\
                     getNumString(res[htb][stb][njreg[1]]['rCS_srNJet_0b_onlyW']['rCS'], res[htb][stb][njreg[1]]['rCS_srNJet_0b_onlyW']['rCSE_sim'],4)])+'\\\\'
 print
@@ -266,7 +275,7 @@ for i_htb, htb in enumerate(htreg):
   for stb, dPhiCut in streg:
     for srNJet in njreg:
       print '$'+nJetBinName(srNJet)+'$ & $'+varBinName(stb, 'S_{T}')+'$'+' & '+\
-          ' & '.join([getNumString(res[htb][stb][srNJet]['rCS_srNJet_1b']['rCS'], res[htb][stb][srNJet]['rCS_srNJet_1b']['rCSE_sim'],acc=3), \
-                      getNumString(res[htb][stb][srNJet]['rCS_srNJet_1b_onlyTT']['rCS'], res[htb][stb][srNJet]['rCS_srNJet_1b_onlyTT']['rCSE_sim'],acc=3),\
+          ' & '.join([getNumString(res[htb][stb][srNJet]['rCS_crLowNJet_1b']['rCS'], res[htb][stb][srNJet]['rCS_crLowNJet_1b']['rCSE_sim'],acc=3), \
+                      getNumString(res[htb][stb][srNJet]['rCS_crLowNJet_1b_onlyTT']['rCS'], res[htb][stb][srNJet]['rCS_crLowNJet_1b_onlyTT']['rCSE_sim'],acc=3),\
                       getNumString(res[htb][stb][srNJet]['rCS_srNJet_0b_onlyTT']['rCS'], res[htb][stb][srNJet]['rCS_srNJet_0b_onlyTT']['rCSE_sim'],acc=3)])+'\\\\'
 
