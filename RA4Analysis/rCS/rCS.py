@@ -118,7 +118,7 @@ for name, c in [ ["W",cWJets], ["TT", cTTJets] ]:
         h_nj[name][stb][htb].GetXaxis().SetBinLabel(i+1, nJetBinName(njreg[i]))
       for i_njb, njb in enumerate(njreg):
         cname, cut = nameAndCut(stb,htb,njb, btb=None,presel=presel) 
-        res, resErr = getRCS(cWJets, cut,  dPhiCut)
+        res, resErr = getRCS(c, cut,  dPhiCut)
         print res,resErr, name, cname
         if res:
           h_nj[name][stb][htb].SetBinContent(i_njb+1, res)
@@ -235,7 +235,7 @@ for name, c in [ ["W",cWJets], ["TT", cTTJets]]:
 #          h_btb[name][stb][htb][njb].GetXaxis().SetBinLabel(i+1, nBTagBinName(btreg[i]))
 #        for i_btb, btb in enumerate(btreg):
 #          cname, cut = nameAndCut(stb,htb,njb,btb=btb, presel=presel) 
-#          res, resErr = getRCS(cWJets, cut,  dPhiCut)
+#          res, resErr = getRCS(c, cut,  dPhiCut)
 #          print res,resErr, name, cname
 #          if res:
 #            h_btb[name][stb][htb][njb].SetBinContent(i_btb+1, res)

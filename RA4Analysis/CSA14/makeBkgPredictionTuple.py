@@ -19,7 +19,7 @@ mode='dilep'
 relIso = 0.3
 effUp = 1.1
 effDown = 0.9
-small = False
+small = True
 maxN=1000
 
 if mode=='had':
