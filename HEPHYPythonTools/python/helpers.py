@@ -173,14 +173,6 @@ def getPlotFromChain(c, var, binning, cutString = "(1)", weight = "weight", binn
     res.SetBinError(1 , sqrt(res.GetBinError(0)**2 + res.GetBinError(1)**2))
   return res
 
-#def getValue(chain, varname):
-#  alias = chain.GetAlias(varname)
-#  if alias!='':
-#    return chain.GetLeaf( alias ).GetValue()
-#  else:
-#    return chain.GetLeaf( varname ).GetValue()
-#
-
 def deltaPhi(phi1, phi2):
   dphi = phi2-phi1
   if  dphi > pi:
@@ -214,6 +206,9 @@ def deltaR2(l1, l2):
   return deltaPhi(l1['phi'], l2['phi'])**2 + (l1['eta'] - l2['eta'])**2
 def deltaR(l1, l2):
   return sqrt(deltaR2(l1,l2))
+#Get an object with name-prefix (e.g. LepGood) as a dictionary by specifying index i and variables ['pt','eta',...]
+def getObjDict(c, prefix, variables, i):
+ return {var: c.GetLeaf(prefix+'_'+var).GetValue(i) for var in variables}
 
 #FIXME: Move this selection specific stuff to the analysis directory (Deg stop)
 #def getJets(c):

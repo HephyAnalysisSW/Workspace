@@ -1,14 +1,14 @@
 import ROOT
 import sys, os, copy, random, subprocess, datetime
 from array import array
-from Workspace.RA4Analysis.cmgObjectSelection import cmgLooseLepIndices, cmgLooseLepID, cmgGoodLepID
+from Workspace.RA4Analysis.cmgObjectSelection import cmgLooseLepIndices, splitIndList
 
 from Workspace.HEPHYPythonTools.xsec import xsec
 from Workspace.HEPHYPythonTools.helpers import getObjFromFile
 from Workspace.RA4Analysis.convertHelpers import compileClass, readVar, printHeader, typeStr, createClassString
 
-subDir = "postProcessed_v2"
-from Workspace.RA4Analysis.cmgTuples import *
+subDir = "postProcessed_v3"
+from Workspace.RA4Analysis.cmgTuples_v3 import *
 
 target_lumi = 1000 #pb-1
 
@@ -18,25 +18,36 @@ ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 
 #defSampleStr = "ttJetsCSA1450ns,WJetsToLNu_HT100to200,WJetsToLNu_HT200to400,WJetsToLNu_HT400to600,WJetsToLNu_HT600toInf"
-defSampleStr = "WJetsToLNu_HT200to400,WJetsToLNu_HT400to600,WJetsToLNu_HT600toInf"
+#defSampleStr = "WJetsToLNu_HT200to400,WJetsToLNu_HT400to600,WJetsToLNu_HT600toInf"
 #defSampleStr = "WJetsToLNu_HT600toInf"
-defSampleStr += ",ttJetsCSA1450ns"
-defSampleStr += ",T5Full_1200_1000_800,T5Full_1500_800_100"
+#defSampleStr += ",ttJetsCSA1450ns"
+#defSampleStr = "T5Full_1200_1000_800,T5Full_1500_800_100"
+#defSampleStr = "SMS_T1qqqq_2J_mGl1400_mLSP100_PU_S14_POSTLS170"
+defSampleStr = "SMS_T1qqqq_2J_mGl1400_mLSP100_PU_S14_POSTLS170"
 #defSampleStr = "T1qqqq_1400_325_300"
+#defSampleStr = ','.join(allSignalStrings[26:])
+
 from optparse import OptionParser
 parser = OptionParser()
 parser.add_option("--samples", dest="allsamples", default=defSampleStr, type="string", action="store", help="samples:Which samples.")
-parser.add_option("--producerName", dest="producerName", default="treeProducerSusySingleLepton", type="string", action="store", help="samples:Which samples.")
+parser.add_option("--producerName", dest="producerName", default="treeProducerSusySingleSoftLepton", type="string", action="store", help="samples:Which samples.")
 parser.add_option("--targetDir", dest="targetDir", default="/data/"+username+"/cmgTuples/"+subDir+'/', type="string", action="store", help="target directory.")
-parser.add_option("--skim", dest="skim", default="inc", type="string", action="store", help="target directory.")
+parser.add_option("--skim", dest="skim", default="", type="string", action="store", help="any skim condition?")
+parser.add_option("--leptonSelection", dest="leptonSelection", default="inc", type="string", action="store", help="which lepton selection? 'soft' or 'hard' or 'none'?")
 
 #parser.add_option("--small", dest="small", default = False, action="store_true", help="Just do a small subset.")
 #parser.add_option("--overwrite", dest="overwrite", action="store_true", help="Overwrite?", default=True)
 (options, args) = parser.parse_args()
-if options.skim=='inc' or options.skim=='singleLeptonic':
+if options.skim=='inc' or options.skim=="":
   skimCond = "(1)"
 if options.skim.startswith('met'):
   skimCond = "met_pt>"+str(float(options.skim[3:]))
+
+#In case a lepton selection is required, loop only over events where there is one 
+if options.leptonSelection.lower()=='soft':
+  skimCond += "Sum$(LepGood_pt>5&&LepGood_pt<25&&(LepGood_relIso03*LepGood_pt<7.5)&&abs(LepGood_eta)<2.4)>=1"
+if options.leptonSelection.lower()=='hard':
+  skimCond += "Sum$(LepGood_pt>25&&LepGood_relIso03>0.3&&abs(LepGood_eta)<2.4)>=1"
 
 if sys.argv[0].count('ipython'):
   options.small=True
@@ -46,7 +57,7 @@ def getChunks(sample):
   nTotEvents=0
   allFiles=[]
   for i, s in enumerate(chunks):
-    try:
+#    try:
       logfile = sample['dir']+'/'+s['name']+'/log.txt'
       line = [x for x in subprocess.check_output(["cat", logfile]).split('\n') if x.count('number of events processed')]
       assert len(line)==1,"Didn't find event number in file %s"%logfile
@@ -56,7 +67,7 @@ def getChunks(sample):
         nTotEvents+=n
         allFiles.append(inputFilename)
         chunks[i]['file']=inputFilename
-    except: print "Chunk",s,"could not be added"
+#    except: print "Chunk",s,"could not be added"
   print "Found",len(chunks),"chunks for sample",sample["name"]
   return chunks, nTotEvents
 
@@ -73,12 +84,13 @@ def getTreeFromChunk(c, skimCond):
   rf.Close()
   del rf
   return t
-    
+   
 exec('allSamples=['+options.allsamples+']')
 for isample, sample in enumerate(allSamples):
   chunks, nTotEvents = getChunks(sample)
   chunks = chunks
-  outDir = options.targetDir+'/'+"/".join([options.skim, sample['name']])
+  
+  outDir = options.targetDir+'/'+"/".join([options.skim, options.leptonSelection, sample['name']])
   tmpDir = outDir+'/tmp/'
   os.system('mkdir -p ' + outDir) 
   os.system('mkdir -p '+tmpDir)
@@ -88,8 +100,9 @@ for isample, sample in enumerate(allSamples):
   readVariables = ['met_pt/F']
 
   newVariables = ['weight/F']
-  newVariables += ['nVetoMuons/I', 'nVetoElectrons/I', 'nGoodMuons/I', 'nGoodElectrons/I', 'singleMuonic/I', 'singleElectronic/I', 'singleLeptonic/I']
-  newVariables.extend( ['st/F', 'leptonPt/F', 'leptonEta/F', 'leptonPhi/F', 'leptonPdg/I/0', 'leptonInd/I/-1', 'leptonMass/F'] )
+  newVariables += ['nLooseSoftLeptons/I', 'nLooseSoftPt10Leptons/I', 'nLooseHardLeptons/I', 'nTightSoftLeptons/I', 'nTightHardLeptons/I']
+  if options.leptonSelection.lower()!='none':
+    newVariables.extend( ['st/F', 'leptonPt/F', 'leptonEta/F', 'leptonPhi/F', 'leptonPdg/I/0', 'leptonInd/I/-1', 'leptonMass/F', 'singleMuonic/I', 'singleElectronic/I', 'singleLeptonic/I'] )
   newVars = [readVar(v, allowRenaming=False, isWritten = True, isRead=False) for v in newVariables]
 
   aliases = [ "met:met_pt", "metPhi:met_phi","genMet:met_genPt", "genMetPhi:met_genPhi"]
@@ -135,28 +148,59 @@ for isample, sample in enumerate(allSamples):
       r.init()
       t.GetEntry(i)
       s.weight = lumiWeight
-      vetoLepInd = cmgLooseLepIndices(r, ptCut=10, absEtaCut=2.4, relIso03Cut=0.3)
-      s.nVetoMuons      = len(filter(lambda i : abs(r.LepGood_pdgId[i])==13, vetoLepInd))
-      s.nVetoElectrons  = len(filter(lambda i : abs(r.LepGood_pdgId[i])==11, vetoLepInd))
-      goodMuInd =  [i for i in vetoLepInd if abs(r.LepGood_pdgId[i])==13 and cmgGoodLepID(r, i, ptCut=15, absEtaCut=2.4, relIso03Cut=0.12)]
-      goodEleInd = [i for i in vetoLepInd if abs(r.LepGood_pdgId[i])==11 and cmgGoodLepID(r, i, ptCut=15, absEtaCut=2.4, relIso03Cut=0.14)]
-      s.nGoodMuons = len(goodMuInd) 
-      s.nGoodElectrons = len(goodEleInd) 
-      s.singleMuonic      = s.nGoodMuons==1 and s.nGoodElectrons==0
-      s.singleElectronic  = s.nGoodMuons==0 and s.nGoodElectrons==1
-      s.singleLeptonic    = s.singleMuonic or s.singleElectronic
-      if options.skim=='singleLeptonic' and not s.singleLeptonic:continue
-      leadingLepInd = -1
-      leadingLepInd = goodMuInd[0] if len(goodMuInd)>0 else -1
-      leadingLepInd = goodEleInd[0] if len(goodEleInd)>0 and (leadingLepInd<0 or r.LepGood_pt[leadingLepInd]<r.LepGood_pt[goodEleInd[0]]) else leadingLepInd
-      if leadingLepInd>=0:
-        s.leptonPt  = r.LepGood_pt[leadingLepInd]
-        s.leptonInd = leadingLepInd 
-        s.leptonEta = r.LepGood_eta[leadingLepInd]
-        s.leptonPhi = r.LepGood_phi[leadingLepInd]
-        s.leptonPdg = r.LepGood_pdgId[leadingLepInd]
-        s.leptonMass= r.LepGood_mass[leadingLepInd]
-        s.st = r.met_pt + s.leptonPt 
+
+      #get all >=loose lepton indices
+      looseLepInd = cmgLooseLepIndices(r, ptCuts=(10,5), absEtaCuts=(2.4,2.1), hybridIso03=(0.3, 25.,7.5) )
+      #split into soft and hard leptons
+      looseSoftLepInd, looseHardLepInd = splitIndList(r.LepGood_pt, looseLepInd, 25.)
+      #select soft leptons above 10 GeV (for vetoing in the hard lepton selection)
+      looseSoftPt10LepInd = filter(lambda i:r.LepGood_pt[i]>10, looseSoftLepInd) 
+      #select tight soft leptons (no special tight ID for now)
+      tightSoftLepInd = looseSoftLepInd #No tight loose selection as of yet 
+      #select tight hard leptons (use POG ID)
+      tightHardLepInd = filter(lambda i:r.LepGood_tightId[i], looseHardLepInd)
+
+      s.nLooseSoftLeptons = len(looseSoftLepInd)
+      s.nLooseSoftPt10Leptons = len(looseSoftPt10LepInd)
+      s.nLooseHardLeptons = len(looseHardLepInd)
+      s.nTightSoftLeptons = len(tightSoftLepInd)
+      s.nTightHardLeptons = len(tightHardLepInd)
+
+      leadingLepInd = None
+      if options.leptonSelection=='hard':
+        #Select hardest tight lepton among hard leptons
+        if s.nTightHardLeptons>=1:
+          leadingLepInd = tightHardLepInd[0]
+        s.singleLeptonic = s.nTightHardLeptons==1
+        if s.singleLeptonic:
+          s.singleMuonic      =  abs(s.leptonPdg)==13
+          s.singleElectronic  =  abs(s.leptonPdg)==11
+        else:
+          s.singleMuonic      = False 
+          s.singleElectronic  = False 
+
+      if options.leptonSelection=='soft':
+        #Select hardest tight lepton among soft leptons
+        if s.nTightSoftLeptons>=1:
+          leadingLepInd = tightSoftLepInd[0]
+        s.singleLeptonic = nTightSoftLeptons==1
+        if s.singleLeptonic:
+          s.singleMuonic      =  abs(s.leptonPdg)==13
+          s.singleElectronic  =  abs(s.leptonPdg)==11
+        else:
+          s.singleMuonic      = False 
+          s.singleElectronic  = False 
+
+      #Continue with the identified 'single' lepton, either soft or hard
+      if leadingLepInd: 
+          s.leptonPt  = r.LepGood_pt[leadingLepInd]
+          s.leptonInd = leadingLepInd 
+          s.leptonEta = r.LepGood_eta[leadingLepInd]
+          s.leptonPhi = r.LepGood_phi[leadingLepInd]
+          s.leptonPdg = r.LepGood_pdgId[leadingLepInd]
+          s.leptonMass= r.LepGood_mass[leadingLepInd]
+          s.st = r.met_pt + s.leptonPt
+
       for v in newVars:
         v['branch'].Fill()
     newFileName = sample['name']+'_'+chunk['name']+'.root'

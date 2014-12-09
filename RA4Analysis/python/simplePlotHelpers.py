@@ -109,8 +109,10 @@ def loopAndFill(stacks):
     s['cuts'] = cutVars
 
   for s in allSamples:
+    sampleScaleFac = 1 if not s.has_key('scale') else s['scale']
+    if sampleScaleFac!=1:
+      print "Using sampleScaleFac", sampleScaleFac ,"for sample",s["name"]
     for b in s['bins']:
-
       c = ROOT.TChain('Events')
       counter=0
       dir = s['dirname'] if s.has_key('dirname') else s['dir']
@@ -122,7 +124,6 @@ def loopAndFill(stacks):
       if ntot==0:
         print "Warning! Found zero events in",s['name'],'bin',b," -> do nothing"
         continue
-          
       for cutString in s['cuts'].keys():
         varsToFill = s['cuts'][cutString]
         c.Draw(">>eList",cutString)
@@ -145,6 +146,7 @@ def loopAndFill(stacks):
           for v in varsToFill:
             if (not v.cut['func']) or  v.cut['func'](c):
               weight = getVarValue(c, v.weight['string'])
+              
               if type(v.var)==type(""):
                 val =  getVarValue(c, v.var, v.ind)
               elif type(v.var)==type(ROOT.TTreeFormula()):
@@ -152,7 +154,7 @@ def loopAndFill(stacks):
                 val = v.var.EvalInstance()
               else:
                 val = v.var(c)
-              v.histo.Fill(val, weight)
+              v.histo.Fill(val, weight*sampleScaleFac)
         del elist
       del c
   for s in stacks:
@@ -198,7 +200,6 @@ def drawStack(stk):
     stuff.append(l)
   except:pass
   first=True
-  rescale=1
   for s in stk.stackLists:
     for p in s:
       hcopy = p.histo.Clone()
@@ -249,9 +250,11 @@ def drawStack(stk):
       except:pass
       stuff.append(hcopy)
       if stk.options.has_key('logY') and stk.options['logY']:
-        defaultYRange = [0.7, 1.5*hcopy.GetMaximum()]
+        yHeadRoomFac = 1.5 if not  stk.options.has_key('yHeadRoomFac') else stk.options['yHeadRoomFac']
+        defaultYRange = [0.7, yHeadRoomFac*hcopy.GetMaximum()]
       else:
-        defaultYRange = [0, 1.2*hcopy.GetMaximum()]
+        yHeadRoomFac = 1.2 if not  stk.options.has_key('yHeadRoomFac') else stk.options['yHeadRoomFac']
+        defaultYRange = [0, yHeadRoomFac*hcopy.GetMaximum()]
       hcopy.GetYaxis().SetRangeUser(*defaultYRange)
       if stk.options and stk.options.has_key('yRange') and type(stk.options['yRange'])==type([]) and len(stk.options['yRange'])==2:
         if not isinstance(stk.options['yRange'][0], numbers.Number):stk.options['yRange'][0]=defaultYRange[0]#If yRange contains 'None' use default
