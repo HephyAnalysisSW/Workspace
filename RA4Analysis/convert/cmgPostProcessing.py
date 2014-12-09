@@ -33,7 +33,7 @@ parser.add_option("--samples", dest="allsamples", default=defSampleStr, type="st
 parser.add_option("--producerName", dest="producerName", default="treeProducerSusySingleSoftLepton", type="string", action="store", help="samples:Which samples.")
 parser.add_option("--targetDir", dest="targetDir", default="/data/"+username+"/cmgTuples/"+subDir+'/', type="string", action="store", help="target directory.")
 parser.add_option("--skim", dest="skim", default="", type="string", action="store", help="any skim condition?")
-parser.add_option("--leptonSelection", dest="leptonSelection", default="inc", type="string", action="store", help="which lepton selection? 'soft' or 'hard' or 'none'?")
+parser.add_option("--leptonSelection", dest="leptonSelection", default="hard", type="string", action="store", help="which lepton selection? 'soft' or 'hard' or 'none'?")
 
 #parser.add_option("--small", dest="small", default = False, action="store_true", help="Just do a small subset.")
 #parser.add_option("--overwrite", dest="overwrite", action="store_true", help="Overwrite?", default=True)
@@ -45,9 +45,9 @@ if options.skim.startswith('met'):
 
 #In case a lepton selection is required, loop only over events where there is one 
 if options.leptonSelection.lower()=='soft':
-  skimCond += "Sum$(LepGood_pt>5&&LepGood_pt<25&&(LepGood_relIso03*LepGood_pt<7.5)&&abs(LepGood_eta)<2.4)>=1"
+  skimCond += "&&Sum$(LepGood_pt>5&&LepGood_pt<25&&(LepGood_relIso03*LepGood_pt<7.5)&&abs(LepGood_eta)<2.4)>=1"
 if options.leptonSelection.lower()=='hard':
-  skimCond += "Sum$(LepGood_pt>25&&LepGood_relIso03>0.3&&abs(LepGood_eta)<2.4)>=1"
+  skimCond += "&&Sum$(LepGood_pt>25&&LepGood_relIso03>0.3&&abs(LepGood_eta)<2.4)>=1"
 
 if sys.argv[0].count('ipython'):
   options.small=True
@@ -166,13 +166,19 @@ for isample, sample in enumerate(allSamples):
       s.nTightSoftLeptons = len(tightSoftLepInd)
       s.nTightHardLeptons = len(tightHardLepInd)
 
-      eceLeptons = [getObjDict(t, 'LepGood', ['pt', 'eta', 'phi', 'relIso03'], i) for i in tightHardLepInd]
-      print eceLeptons
-
+      vars = ['pt', 'eta', 'phi', 'relIso03']
+      allLeptons = [getObjDict(t, 'LepGood', vars, i) for i in looseLepInd]
+      looseSoftLep = [getObjDict(t, 'LepGood', vars, i) for i in looseSoftLepInd] 
+      looseHardLep = [getObjDict(t, 'LepGood', vars, i) for i in looseHardLepInd]
+      looseSoftPt10Lep = [getObjDict(t, 'LepGood', vars, i) for i in looseSoftPt10LepInd]
+      tightSoftLep = [getObjDict(t, 'LepGood', vars, i) for i in tightSoftLepInd]
+      tightHardLep =  [getObjDict(t, 'LepGood', vars, i) for i in tightHardLepInd]
+      
       leadingLepInd = None
       if options.leptonSelection=='hard':
         #Select hardest tight lepton among hard leptons
         if s.nTightHardLeptons>=1:
+          print allLeptons
           leadingLepInd = tightHardLepInd[0]
           s.leptonPt  = r.LepGood_pt[leadingLepInd]
           s.leptonInd = leadingLepInd 
