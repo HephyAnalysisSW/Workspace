@@ -1,8 +1,11 @@
 import ROOT
 from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain
-from Workspace.RA4Analysis.cmgTuplesPostProcessed import * 
-cWJets  = getChain(WJetsHTToLNu)
-cTTJets = getChain(ttJetsCSA1450ns)
+from Workspace.RA4Analysis.cmgTuplesPostProcessed import *
+small = False
+maxN = -1 if not small else 1 
+
+cWJets  = getChain(WJetsHTToLNu,maxN=maxN)
+cTTJets = getChain(ttJetsCSA1450ns,maxN=maxN)
 cSignal1200 = getChain(T5Full_1200_1000_800)
 cSignal1500 = getChain(T5Full_1500_800_100)
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,varBinName
@@ -30,10 +33,10 @@ def getRCS(c, cut, dPhiCut):
 
 streg = [[(250, 350), 1.], [(350, -1), 1.]]
 htreg = [(400,500),(500,750),(750, -1)]
-njreg = [(2,2),(3,3),(4,4),(5,-1),(6,-1)]
+njreg = [(2,2),(3,3),(4,4),(5,5),(6,-1)]
 
 
-prefix = 'reduced'
+prefix = 'reduced_0b'
 #presel="singleMuonic&&nVetoMuons==1&&nVetoElectrons==0&&nBJetMedium40==1"
 presel="singleMuonic&&nVetoMuons==1&&nVetoElectrons==0&&nBJetMedium25==0"
 
@@ -169,7 +172,7 @@ for name, c in [ ["W",cWJets], ["TT", cTTJets]]:
       else:
         h_nj[name][stb][htb].Draw('same')
     l.Draw()
-    c1.Print('/afs/hephy.at/user/'+uDir+'/www/'+subDir+'/'+prefix+'_rCS_njet_'+name+'_'+nameAndCut(stb=None,htb=htb,njetb=None, btb=None presel=presel)[0]+".png")
+    c1.Print('/afs/hephy.at/user/'+uDir+'/www/'+subDir+'/'+prefix+'_rCS_njet_'+name+'_'+nameAndCut(stb=None,htb=htb,njetb=None, btb=None, presel=presel)[0]+".png")
 for name, c in [ ["W",cWJets], ["TT", cTTJets]]:
   for stb, dPhiCut in streg:
     c1 = ROOT.TCanvas()
