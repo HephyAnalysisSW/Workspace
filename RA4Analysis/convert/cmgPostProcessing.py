@@ -23,7 +23,7 @@ ROOT.AutoLibraryLoader.enable()
 #defSampleStr += ",ttJetsCSA1450ns"
 #defSampleStr = "T5Full_1200_1000_800,T5Full_1500_800_100"
 #defSampleStr = "SMS_T1qqqq_2J_mGl1400_mLSP100_PU_S14_POSTLS170"
-defSampleStr = "SMS_T1qqqq_2J_mGl1400_mLSP100_PU_S14_POSTLS170"
+defSampleStr = "T1tttt_2J_mGo1300_mStop300_mCh285_mChi280"
 #defSampleStr = "T1qqqq_1400_325_300"
 #defSampleStr = ','.join(allSignalStrings[26:])
 
