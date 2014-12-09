@@ -153,6 +153,8 @@ for isample, sample in enumerate(allSamples):
       looseLepInd = cmgLooseLepIndices(r, ptCuts=(10,5), absEtaCuts=(2.4,2.1), hybridIso03=(0.3, 25.,7.5) )
       #split into soft and hard leptons
       looseSoftLepInd, looseHardLepInd = splitIndList(r.LepGood_pt, looseLepInd, 25.)
+      print "LOOSESOFTLEPIND" , looseSoftLepInd
+      print "LOOSEHARDLEPIND" , looseHardLepInd
       #select soft leptons above 10 GeV (for vetoing in the hard lepton selection)
       looseSoftPt10LepInd = filter(lambda i:r.LepGood_pt[i]>10, looseSoftLepInd) 
       #select tight soft leptons (no special tight ID for now)
