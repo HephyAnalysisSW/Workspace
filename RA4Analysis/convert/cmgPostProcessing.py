@@ -4,7 +4,7 @@ from array import array
 from Workspace.RA4Analysis.cmgObjectSelection import cmgLooseLepIndices, splitIndList
 
 from Workspace.HEPHYPythonTools.xsec import xsec
-from Workspace.HEPHYPythonTools.helpers import getObjFromFile
+from Workspace.HEPHYPythonTools.helpers import getObjFromFile, getObjDict
 from Workspace.RA4Analysis.convertHelpers import compileClass, readVar, printHeader, typeStr, createClassString
 
 subDir = "postProcessed_v3"
@@ -165,6 +165,9 @@ for isample, sample in enumerate(allSamples):
       s.nLooseHardLeptons = len(looseHardLepInd)
       s.nTightSoftLeptons = len(tightSoftLepInd)
       s.nTightHardLeptons = len(tightHardLepInd)
+
+      eceLeptons = [getObjDict(t, 'LepGood', ['pt', 'eta', 'phi', 'relIso03'], i) for i in tightHardLepInd]
+      print eceLeptons
 
       leadingLepInd = None
       if options.leptonSelection=='hard':
