@@ -23,7 +23,7 @@ ROOT.AutoLibraryLoader.enable()
 #defSampleStr += ",ttJetsCSA1450ns"
 #defSampleStr = "T5Full_1200_1000_800,T5Full_1500_800_100"
 #defSampleStr = "SMS_T1qqqq_2J_mGl1400_mLSP100_PU_S14_POSTLS170"
-defSampleStr = "T1tttt_2J_mGo1300_mStop300_mCh285_mChi280"
+defSampleStr = "SMS_T1tttt_2J_mGl1500_mLSP100_PU_S14_POSTLS170"
 #defSampleStr = "T1qqqq_1400_325_300"
 #defSampleStr = ','.join(allSignalStrings[26:])
 
@@ -33,7 +33,7 @@ parser.add_option("--samples", dest="allsamples", default=defSampleStr, type="st
 parser.add_option("--producerName", dest="producerName", default="treeProducerSusySingleSoftLepton", type="string", action="store", help="samples:Which samples.")
 parser.add_option("--targetDir", dest="targetDir", default="/data/"+username+"/cmgTuples/"+subDir+'/', type="string", action="store", help="target directory.")
 parser.add_option("--skim", dest="skim", default="", type="string", action="store", help="any skim condition?")
-parser.add_option("--leptonSelection", dest="leptonSelection", default="soft", type="string", action="store", help="which lepton selection? 'soft' or 'hard' or 'none'?")
+parser.add_option("--leptonSelection", dest="leptonSelection", default="hard", type="string", action="store", help="which lepton selection? 'soft' or 'hard' or 'none'?")
 
 #parser.add_option("--small", dest="small", default = False, action="store_true", help="Just do a small subset.")
 #parser.add_option("--overwrite", dest="overwrite", action="store_true", help="Overwrite?", default=True)
@@ -177,6 +177,15 @@ for isample, sample in enumerate(allSamples):
       leadingLepInd = None
       if options.leptonSelection=='hard':
         #Select hardest tight lepton among hard leptons
+#        if s.nLooseHardLeptons>=1 and s.nLooseSoftLeptons>=1:
+#          print 
+#          print "all", len(allLeptons),looseLepInd,allLeptons
+#          print "nLooseSoftLeptons     n=", s.nLooseSoftLeptons,    "which?",  looseSoftLepInd,  looseSoftLep
+#          print "nLooseHardLeptons     n=", s.nLooseHardLeptons,    "which?",  looseHardLepInd, looseHardLep 
+#          print "nLooseSoftPt10Leptons n=", s.nLooseSoftPt10Leptons,"which?",  looseSoftPt10LepInd, looseSoftPt10Lep
+#          print "nTightSoftLeptons     n=", s.nTightSoftLeptons,    "which?",  tightSoftLepInd, tightSoftLep
+#          print "nTightHardLeptons     n=", s.nTightHardLeptons,    "which?",  tightHardLepInd, tightHardLep
+#          print
         if s.nTightHardLeptons>=1:
           leadingLepInd = tightHardLepInd[0]
           s.leptonPt  = r.LepGood_pt[leadingLepInd]
@@ -197,13 +206,6 @@ for isample, sample in enumerate(allSamples):
       if options.leptonSelection=='soft':
         #Select hardest tight lepton among soft leptons
         if s.nTightSoftLeptons>=1:
-          print 
-          print "all", len(allLeptons),looseLepInd,allLeptons
-          print "nLooseSoftLeptons     n=", s.nLooseSoftLeptons,    "which?",  looseSoftLepInd,  looseSoftLep
-          print "nLooseHardLeptons     n=", s.nLooseHardLeptons,    "which?",  looseHardLepInd, looseHardLep 
-          print "nLooseSoftPt10Leptons n=", s.nLooseSoftPt10Leptons,"which?",  looseSoftPt10LepInd, looseSoftPt10Lep
-          print "nTightSoftLeptons     n=", s.nTightSoftLeptons,    "which?",  tightSoftLepInd, tightSoftLep
-          print "nTightHardLeptons     n=", s.nTightHardLeptons,    "which?",  tightHardLepInd, tightHardLep
 
           leadingLepInd = tightSoftLepInd[0]
           s.leptonPt  = r.LepGood_pt[leadingLepInd]
@@ -221,6 +223,7 @@ for isample, sample in enumerate(allSamples):
           s.singleMuonic      = False 
           s.singleElectronic  = False 
 
+#      print "Selected",s.leptonPt
 
       for v in newVars:
         v['branch'].Fill()
