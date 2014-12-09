@@ -166,7 +166,7 @@ for isample, sample in enumerate(allSamples):
       s.nTightSoftLeptons = len(tightSoftLepInd)
       s.nTightHardLeptons = len(tightHardLepInd)
 
-      vars = ['pt', 'eta', 'phi', 'relIso03']
+      vars = ['pt', 'eta', 'phi', 'relIso03', 'pdgId']
       allLeptons = [getObjDict(t, 'LepGood', vars, i) for i in looseLepInd]
       looseSoftLep = [getObjDict(t, 'LepGood', vars, i) for i in looseSoftLepInd] 
       looseHardLep = [getObjDict(t, 'LepGood', vars, i) for i in looseHardLepInd]
@@ -197,7 +197,14 @@ for isample, sample in enumerate(allSamples):
       if options.leptonSelection=='soft':
         #Select hardest tight lepton among soft leptons
         if s.nTightSoftLeptons>=1:
-          print allLeptons
+          print 
+          print "all", len(allLeptons),looseLepInd,allLeptons
+          print "nLooseSoftLeptons    ", s.nLooseSoftLeptons, looseSoftLepInd,  looseSoftLep
+          print "nLooseHardLeptons    ", s.nLooseHardLeptons, looseHardLepInd, looseHardLep 
+          print "nLooseSoftPt10Leptons", s.nLooseSoftPt10Leptons, looseSoftPt10LepInd, looseSoftPt10Lep
+          print "nTightSoftLeptons    ", s.nTightSoftLeptons, tightSoftLepInd, tightSoftLep
+          print "nTightHardLeptons    ", s.nTightHardLeptons, tightHardLepInd, tightHardLep
+
           leadingLepInd = tightSoftLepInd[0]
           s.leptonPt  = r.LepGood_pt[leadingLepInd]
           s.leptonInd = leadingLepInd 
