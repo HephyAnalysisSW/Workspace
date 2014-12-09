@@ -33,7 +33,7 @@ parser.add_option("--samples", dest="allsamples", default=defSampleStr, type="st
 parser.add_option("--producerName", dest="producerName", default="treeProducerSusySingleSoftLepton", type="string", action="store", help="samples:Which samples.")
 parser.add_option("--targetDir", dest="targetDir", default="/data/"+username+"/cmgTuples/"+subDir+'/', type="string", action="store", help="target directory.")
 parser.add_option("--skim", dest="skim", default="", type="string", action="store", help="any skim condition?")
-parser.add_option("--leptonSelection", dest="leptonSelection", default="hard", type="string", action="store", help="which lepton selection? 'soft' or 'hard' or 'none'?")
+parser.add_option("--leptonSelection", dest="leptonSelection", default="soft", type="string", action="store", help="which lepton selection? 'soft' or 'hard' or 'none'?")
 
 #parser.add_option("--small", dest="small", default = False, action="store_true", help="Just do a small subset.")
 #parser.add_option("--overwrite", dest="overwrite", action="store_true", help="Overwrite?", default=True)
@@ -150,7 +150,7 @@ for isample, sample in enumerate(allSamples):
       s.weight = lumiWeight
 
       #get all >=loose lepton indices
-      looseLepInd = cmgLooseLepIndices(r, ptCuts=(10,5), absEtaCuts=(2.4,2.1), hybridIso03=(0.3, 25.,7.5) )
+      looseLepInd = cmgLooseLepIndices(r, ptCuts=(10,5), absEtaCuts=(2.4,2.1), hybridIso03={'ptSwitch':25, 'absIso':7.5, 'relIso':0.3} )
       #split into soft and hard leptons
       looseSoftLepInd, looseHardLepInd = splitIndList(r.LepGood_pt, looseLepInd, 25.)
       print "LOOSESOFTLEPIND" , looseSoftLepInd
@@ -168,7 +168,7 @@ for isample, sample in enumerate(allSamples):
       s.nTightSoftLeptons = len(tightSoftLepInd)
       s.nTightHardLeptons = len(tightHardLepInd)
 
-      vars = ['pt', 'eta', 'phi', 'relIso03']
+      vars = ['pt', 'eta', 'phi', 'relIso03', 'pdgId']
       allLeptons = [getObjDict(t, 'LepGood', vars, i) for i in looseLepInd]
       looseSoftLep = [getObjDict(t, 'LepGood', vars, i) for i in looseSoftLepInd] 
       looseHardLep = [getObjDict(t, 'LepGood', vars, i) for i in looseHardLepInd]
@@ -180,7 +180,6 @@ for isample, sample in enumerate(allSamples):
       if options.leptonSelection=='hard':
         #Select hardest tight lepton among hard leptons
         if s.nTightHardLeptons>=1:
-          print allLeptons
           leadingLepInd = tightHardLepInd[0]
           s.leptonPt  = r.LepGood_pt[leadingLepInd]
           s.leptonInd = leadingLepInd 
@@ -200,6 +199,14 @@ for isample, sample in enumerate(allSamples):
       if options.leptonSelection=='soft':
         #Select hardest tight lepton among soft leptons
         if s.nTightSoftLeptons>=1:
+          print 
+          print "all", len(allLeptons),looseLepInd,allLeptons
+          print "nLooseSoftLeptons    ", s.nLooseSoftLeptons, looseSoftLepInd,  looseSoftLep
+          print "nLooseHardLeptons    ", s.nLooseHardLeptons, looseHardLepInd, looseHardLep 
+          print "nLooseSoftPt10Leptons", s.nLooseSoftPt10Leptons, looseSoftPt10LepInd, looseSoftPt10Lep
+          print "nTightSoftLeptons    ", s.nTightSoftLeptons, tightSoftLepInd, tightSoftLep
+          print "nTightHardLeptons    ", s.nTightHardLeptons, tightHardLepInd, tightHardLep
+
           leadingLepInd = tightSoftLepInd[0]
           s.leptonPt  = r.LepGood_pt[leadingLepInd]
           s.leptonInd = leadingLepInd 
@@ -208,7 +215,7 @@ for isample, sample in enumerate(allSamples):
           s.leptonPdg = r.LepGood_pdgId[leadingLepInd]
           s.leptonMass= r.LepGood_mass[leadingLepInd]
           s.st = r.met_pt + s.leptonPt
-        s.singleLeptonic = nTightSoftLeptons==1
+        s.singleLeptonic = s.nTightSoftLeptons==1
         if s.singleLeptonic:
           s.singleMuonic      =  abs(s.leptonPdg)==13
           s.singleElectronic  =  abs(s.leptonPdg)==11
