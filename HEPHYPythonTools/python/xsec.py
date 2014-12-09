@@ -67,6 +67,17 @@ xsec["T6ttWW_2J_mSbot600_mCh425_mChi50"] = 0.174599
 xsec["T6ttWW_2J_mSbot650_mCh150_mChi50"] = 0.107045
 xsec["T1ttbb_2J_mGo1500_mChi100"] = gluino13TeV_NLONLL[1500] 
 
+xsec["T1ttbbWW_2J_mGo1000_mCh725_mChi715_3bodydec"] = gluino13TeV_NLONLL[1000] 
+xsec["T1ttbbWW_2J_mGo1000_mCh725_mChi720_3bodydec"] = gluino13TeV_NLONLL[1000]
+xsec["T1ttbbWW_2J_mGo1300_mCh300_mChi290_3bodydec"] = gluino13TeV_NLONLL[1300]
+xsec["T1ttbbWW_2J_mGo1300_mCh300_mChi295_3bodydec"] = gluino13TeV_NLONLL[1300]
+xsec["T1tttt_gluino_1300_LSP_100"] = gluino13TeV_NLONLL[1300]
+xsec["T1tttt_gluino_800_LSP_450"] = gluino13TeV_NLONLL[800]
+xsec["T5qqqqWW_Gl_1400_LSP_100_Chi_325"] = gluino13TeV_NLONLL[1400]
+xsec["T5qqqqWW_Gl_1400_LSP_300_Chi_315"] = gluino13TeV_NLONLL[1400]
+#https://twiki.cern.ch/twiki/bin/view/LHCPhysics/SUSYCrossSections13TeVsquarkantisquark
+xsec["T6qqWW_Sq_950_LSP_300_Chi_350"] = 0.0898112
+
 
 ##------------------------------------------------------------
 ##SUMMER 12

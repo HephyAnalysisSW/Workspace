@@ -21,9 +21,11 @@ ROOT.AutoLibraryLoader.enable()
 #defSampleStr = "WJetsToLNu_HT200to400,WJetsToLNu_HT400to600,WJetsToLNu_HT600toInf"
 #defSampleStr = "WJetsToLNu_HT600toInf"
 #defSampleStr += ",ttJetsCSA1450ns"
+defSampleStr = "T5Full_1200_1000_800"
 #defSampleStr = "T5Full_1200_1000_800,T5Full_1500_800_100"
+#defSampleStr = "T1ttbbWW_2J_mGo1000_mCh725_mChi715_3bodydec"
 #defSampleStr = "SMS_T1qqqq_2J_mGl1400_mLSP100_PU_S14_POSTLS170"
-defSampleStr = "SMS_T1tttt_2J_mGl1500_mLSP100_PU_S14_POSTLS170"
+#defSampleStr = "T1ttbbWW_2J_mGo1000_mCh725_mChi715_3bodydec"
 #defSampleStr = "T1qqqq_1400_325_300"
 #defSampleStr = ','.join(allSignalStrings[26:])
 
@@ -43,17 +45,18 @@ if options.skim=='inc' or options.skim=="":
 if options.skim.startswith('met'):
   skimCond = "met_pt>"+str(float(options.skim[3:]))
 
-#In case a lepton selection is required, loop only over events where there is one 
-if options.leptonSelection.lower()=='soft':
-  skimCond += "&&Sum$(LepGood_pt>5&&LepGood_pt<25&&(LepGood_relIso03*LepGood_pt<7.5)&&abs(LepGood_eta)<2.4)>=1"
-if options.leptonSelection.lower()=='hard':
-  skimCond += "&&Sum$(LepGood_pt>25&&LepGood_relIso03>0.3&&abs(LepGood_eta)<2.4)>=1"
+#FIXME-> This condition reduces good muons by a factor 100 or so. Why does it not work?
+##In case a lepton selection is required, loop only over events where there is one 
+#if options.leptonSelection.lower()=='soft':
+#  skimCond += "&&Sum$(LepGood_pt>5&&LepGood_pt<25&&(LepGood_relIso03*LepGood_pt<7.5)&&abs(LepGood_eta)<2.4)>=1"
+#if options.leptonSelection.lower()=='hard':
+#  skimCond += "&&Sum$(LepGood_pt>25&&LepGood_relIso03>0.3&&abs(LepGood_eta)<2.4)>=1"
 
 if sys.argv[0].count('ipython'):
   options.small=True
 
 def getChunks(sample):
-  chunks = [{'name':x} for x in os.listdir(sample['dir']) if x.startswith(sample['chunkString'])]
+  chunks = [{'name':x} for x in os.listdir(sample['dir']) if x.startswith(sample['name']+'_Chunk') or x==sample['name']]
   nTotEvents=0
   allFiles=[]
   for i, s in enumerate(chunks):
