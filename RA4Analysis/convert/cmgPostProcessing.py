@@ -199,11 +199,11 @@ for isample, sample in enumerate(allSamples):
         if s.nTightSoftLeptons>=1:
           print 
           print "all", len(allLeptons),looseLepInd,allLeptons
-          print "nLooseSoftLeptons    ", s.nLooseSoftLeptons, looseSoftLepInd,  looseSoftLep
-          print "nLooseHardLeptons    ", s.nLooseHardLeptons, looseHardLepInd, looseHardLep 
-          print "nLooseSoftPt10Leptons", s.nLooseSoftPt10Leptons, looseSoftPt10LepInd, looseSoftPt10Lep
-          print "nTightSoftLeptons    ", s.nTightSoftLeptons, tightSoftLepInd, tightSoftLep
-          print "nTightHardLeptons    ", s.nTightHardLeptons, tightHardLepInd, tightHardLep
+          print "nLooseSoftLeptons     n=", s.nLooseSoftLeptons,    "which?",  looseSoftLepInd,  looseSoftLep
+          print "nLooseHardLeptons     n=", s.nLooseHardLeptons,    "which?",  looseHardLepInd, looseHardLep 
+          print "nLooseSoftPt10Leptons n=", s.nLooseSoftPt10Leptons,"which?",  looseSoftPt10LepInd, looseSoftPt10Lep
+          print "nTightSoftLeptons     n=", s.nTightSoftLeptons,    "which?",  tightSoftLepInd, tightSoftLep
+          print "nTightHardLeptons     n=", s.nTightHardLeptons,    "which?",  tightHardLepInd, tightHardLep
 
           leadingLepInd = tightSoftLepInd[0]
           s.leptonPt  = r.LepGood_pt[leadingLepInd]
