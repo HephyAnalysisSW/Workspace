@@ -171,6 +171,13 @@ for isample, sample in enumerate(allSamples):
         #Select hardest tight lepton among hard leptons
         if s.nTightHardLeptons>=1:
           leadingLepInd = tightHardLepInd[0]
+          s.leptonPt  = r.LepGood_pt[leadingLepInd]
+          s.leptonInd = leadingLepInd 
+          s.leptonEta = r.LepGood_eta[leadingLepInd]
+          s.leptonPhi = r.LepGood_phi[leadingLepInd]
+          s.leptonPdg = r.LepGood_pdgId[leadingLepInd]
+          s.leptonMass= r.LepGood_mass[leadingLepInd]
+          s.st = r.met_pt + s.leptonPt
         s.singleLeptonic = s.nTightHardLeptons==1
         if s.singleLeptonic:
           s.singleMuonic      =  abs(s.leptonPdg)==13
@@ -183,6 +190,13 @@ for isample, sample in enumerate(allSamples):
         #Select hardest tight lepton among soft leptons
         if s.nTightSoftLeptons>=1:
           leadingLepInd = tightSoftLepInd[0]
+          s.leptonPt  = r.LepGood_pt[leadingLepInd]
+          s.leptonInd = leadingLepInd 
+          s.leptonEta = r.LepGood_eta[leadingLepInd]
+          s.leptonPhi = r.LepGood_phi[leadingLepInd]
+          s.leptonPdg = r.LepGood_pdgId[leadingLepInd]
+          s.leptonMass= r.LepGood_mass[leadingLepInd]
+          s.st = r.met_pt + s.leptonPt
         s.singleLeptonic = nTightSoftLeptons==1
         if s.singleLeptonic:
           s.singleMuonic      =  abs(s.leptonPdg)==13
@@ -191,15 +205,6 @@ for isample, sample in enumerate(allSamples):
           s.singleMuonic      = False 
           s.singleElectronic  = False 
 
-      #Continue with the identified 'single' lepton, either soft or hard
-      if leadingLepInd: 
-          s.leptonPt  = r.LepGood_pt[leadingLepInd]
-          s.leptonInd = leadingLepInd 
-          s.leptonEta = r.LepGood_eta[leadingLepInd]
-          s.leptonPhi = r.LepGood_phi[leadingLepInd]
-          s.leptonPdg = r.LepGood_pdgId[leadingLepInd]
-          s.leptonMass= r.LepGood_mass[leadingLepInd]
-          s.st = r.met_pt + s.leptonPt
 
       for v in newVars:
         v['branch'].Fill()
