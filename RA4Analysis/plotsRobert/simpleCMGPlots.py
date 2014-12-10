@@ -9,31 +9,40 @@ from Workspace.HEPHYPythonTools.helpers import getObjFromFile
 #from Workspace.RA4Analysis.simplePlotsCommon import *
 from Workspace.RA4Analysis.simplePlotHelpers import plot, stack, loopAndFill, drawNMStacks
 from Workspace.RA4Analysis.helpers import *
-from Workspace.RA4Analysis.cmgTuplesPostProcessed import ttJetsCSA1450ns, WJetsHTToLNu, T5Full_1200_1000_800, T5Full_1500_800_100
+from Workspace.RA4Analysis.cmgTuplesPostProcessed_v3 import * 
 
-subdir = "/pngCMG/"
+subdir = "/pngCMGSoft/"
 
 #prefix = 'mTSel_ht500-met250-6j-0b-diLepVeto'
 #presel="singleMuonic&&nVetoMuons==1&&nVetoElectrons==0&&met_pt>250&&htJet40ja>500&&nBJetMedium25==0&&nJet40a>=6"
 
-prefix = 'ht500-st250-4j-0b-diLepVeto'
-presel="singleMuonic&&nVetoMuons==1&&nVetoElectrons==0&&st>250&&htJet40ja>500&&nBJetMedium25==0&&nJet40a>=4"
+#prefix = 'ht500-st250-4j-0b-diLepVeto'
+#presel="singleMuonic&&nVetoMuons==1&&nVetoElectrons==0&&st>250&&htJet40ja>500&&nBJetMedium25==0&&nJet40a>=4"
 
 #prefix = 'ht500-st250-4j-geq1b-diLepVeto'
 #presel="singleMuonic&&nVetoMuons==1&&nVetoElectrons==0&&st>250&&htJet40ja>500&&nBJetMedium25>=1&&nJet40a>=4"
 
-signalScale=10
+signalScale=1
 #prefix = 'ht400-st250-1j-0b-diLepVeto'
 #presel="singleMuonic&&nVetoMuons==1&&nVetoElectrons==0&&st>250&&htJet40ja>400&&nBJetMedium25==0&&nJet40a>=1"
 
+prefix = 'soft_ht500-st250-4j-0b-diLepVeto'
+presel="singleMuonic&&nLooseSoftLeptons==1&&nTightSoftLeptons==1&&nTightHardLeptons==0&&st>250&&htJet40ja>500&&nBJetMedium25==0&&nJet40a>=4"
+
 cutString=presel
-wjetsSample = WJetsHTToLNu
-ttJetsPowHeg = ttJetsCSA1450ns
+wjetsSample = soft_WJetsHTToLNu
+ttJetsPowHeg = soft_ttJetsCSA1450ns
 
 signalPrefix="" if signalScale==1 else str(signalScale)+"x "
-T5Full_1200_1000_800['style'] = {'legendText':signalPrefix+T5Full_1200_1000_800['name'],   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kBlue, 'markerStyle':None, 'markerSize':None}
-T5Full_1500_800_100['style']  = {'legendText':signalPrefix+T5Full_1500_800_100['name'],   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kBlack, 'markerStyle':None, 'markerSize':None}
-signals = [T5Full_1200_1000_800, T5Full_1500_800_100]
+
+#T5Full_1200_1000_800['style'] = {'legendText':signalPrefix+T5Full_1200_1000_800['name'],   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kBlue, 'markerStyle':None, 'markerSize':None}
+#T5Full_1500_800_100['style']  = {'legendText':signalPrefix+T5Full_1500_800_100['name'],   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kBlack, 'markerStyle':None, 'markerSize':None}
+#signals = [T5Full_1200_1000_800, T5Full_1500_800_100]
+
+soft_T6qqWW_Sq_950_LSP_300_Chi_350['style'] = {'legendText':signalPrefix+soft_T6qqWW_Sq_950_LSP_300_Chi_350['name'],   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kBlue, 'markerStyle':None, 'markerSize':None}
+soft_T5qqqqWW_Gl_1400_LSP_300_Chi_315['style']  = {'legendText':signalPrefix+soft_T5qqqqWW_Gl_1400_LSP_300_Chi_315['name'],   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kBlack, 'markerStyle':None, 'markerSize':None}
+signals = [soft_T6qqWW_Sq_950_LSP_300_Chi_350, soft_T5qqqqWW_Gl_1400_LSP_300_Chi_315]
+
 for s in signals:
   s['scale'] = signalScale
 #ratioOps = {'yLabel':'A/B', 'numIndex':0, 'denIndex':1 ,'yRange':None, 'logY':False, 'color':ROOT.kBlack, 'yRange':(0.5,1.5)}
@@ -47,10 +56,10 @@ def getStack(labels, var, binning, cut, options={}):
   style_WJets   = {'legendText':'W + Jets',         'style':"f", 'lineThickness':0, 'errorBars':False, 'color':ROOT.kYellow, 'markerStyle':None, 'markerSize':None}
   style_TTJets =  {'legendText':'t#bar{t} + Jets',  'style':"f", 'linethickNess':0, 'errorBars':False, 'color':ROOT.kRed-3, 'markerStyle':None, 'markerSize':None}
   MC_WJETS   = plot(var, binning, cut, sample=wjetsSample, style=style_WJets, weight={'string':'weight'}) 
-  MC_TTJETS  = plot(var, binning, cut, sample=ttJetsPowHeg, style=style_TTJets, weight={'string':'weight'})
+#  MC_TTJETS  = plot(var, binning, cut, sample=ttJetsPowHeg, style=style_TTJets, weight={'string':'weight'})
   
-#  plotLists = [[MC_WJETS, MC_TTJETS]]
-  plotLists = [[MC_TTJETS, MC_WJETS]]
+  plotLists = [[MC_WJETS]]
+#  plotLists = [[MC_TTJETS, MC_WJETS]]
   for s in signals:
     plotLists.append([plot(var, binning, cut, sample=s, style=s['style'], weight={'string':'weight'})])
 
@@ -103,6 +112,13 @@ leptonPt_stack  = getStack(
     binning={'binning':[750/20,0,760]}, 
     cut={'string':cutString,'func':None})
 allStacks.append(leptonPt_stack)
+
+softleptonPt_stack  = getStack(
+    labels={'x':'p_{T}(l) (GeV)','y':'Number of Events / 20 GeV'}, 
+    var={'name':'softleptonPt','var':'leptonPt', 'overFlow':'upper'}, 
+    binning={'binning':[20,0,100]}, 
+    cut={'string':cutString,'func':None})
+allStacks.append(softleptonPt_stack)
 
 jet0pt_stack  = getStack(
     labels={'x':'p_{T}(leading jet) (GeV)','y':'Number of Events / 10 GeV'}, 

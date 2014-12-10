@@ -18,16 +18,16 @@ ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 
 #defSampleStr = "ttJetsCSA1450ns,WJetsToLNu_HT100to200,WJetsToLNu_HT200to400,WJetsToLNu_HT400to600,WJetsToLNu_HT600toInf"
-#defSampleStr = "WJetsToLNu_HT200to400,WJetsToLNu_HT400to600,WJetsToLNu_HT600toInf"
-#defSampleStr = "WJetsToLNu_HT600toInf"
-#defSampleStr += ",ttJetsCSA1450ns"
-defSampleStr = "T5Full_1200_1000_800"
+defSampleStr = "WJetsToLNu_HT200to400,WJetsToLNu_HT400to600,WJetsToLNu_HT600toInf"
+defSampleStr += ",WJetsToLNu_HT600toInf"
+defSampleStr += ",ttJetsCSA1450ns"
+#defSampleStr = "T5Full_1200_1000_800"
 #defSampleStr = "T5Full_1200_1000_800,T5Full_1500_800_100"
 #defSampleStr = "T1ttbbWW_2J_mGo1000_mCh725_mChi715_3bodydec"
 #defSampleStr = "SMS_T1qqqq_2J_mGl1400_mLSP100_PU_S14_POSTLS170"
 #defSampleStr = "T1ttbbWW_2J_mGo1000_mCh725_mChi715_3bodydec"
 #defSampleStr = "T1qqqq_1400_325_300"
-#defSampleStr = ','.join(allSignalStrings[26:])
+#defSampleStr = ','.join(allSignalStrings)
 
 from optparse import OptionParser
 parser = OptionParser()
@@ -35,7 +35,7 @@ parser.add_option("--samples", dest="allsamples", default=defSampleStr, type="st
 parser.add_option("--producerName", dest="producerName", default="treeProducerSusySingleSoftLepton", type="string", action="store", help="samples:Which samples.")
 parser.add_option("--targetDir", dest="targetDir", default="/data/"+username+"/cmgTuples/"+subDir+'/', type="string", action="store", help="target directory.")
 parser.add_option("--skim", dest="skim", default="", type="string", action="store", help="any skim condition?")
-parser.add_option("--leptonSelection", dest="leptonSelection", default="hard", type="string", action="store", help="which lepton selection? 'soft' or 'hard' or 'none'?")
+parser.add_option("--leptonSelection", dest="leptonSelection", default="soft", type="string", action="store", help="which lepton selection? 'soft' or 'hard' or 'none'?")
 
 #parser.add_option("--small", dest="small", default = False, action="store_true", help="Just do a small subset.")
 #parser.add_option("--overwrite", dest="overwrite", action="store_true", help="Overwrite?", default=True)
@@ -56,7 +56,8 @@ if sys.argv[0].count('ipython'):
   options.small=True
 
 def getChunks(sample):
-  chunks = [{'name':x} for x in os.listdir(sample['dir']) if x.startswith(sample['name']+'_Chunk') or x==sample['name']]
+  pre = sample['chunkString'] if sample.has_key('chunkString') else sample['name']
+  chunks = [{'name':x} for x in os.listdir(sample['dir']) if x.startswith(sample['chunkString']+'_Chunk') or x==sample['name']]
   nTotEvents=0
   allFiles=[]
   for i, s in enumerate(chunks):
@@ -111,7 +112,7 @@ for isample, sample in enumerate(allSamples):
   aliases = [ "met:met_pt", "metPhi:met_phi","genMet:met_genPt", "genMetPhi:met_genPhi"]
 
   readVectors = [\
-    {'prefix':'LepGood',  'nMax':2, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I', 'relIso03/F', 'tightId/I', 'mass/F']},
+    {'prefix':'LepGood',  'nMax':8, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I', 'relIso03/F', 'tightId/I', 'mass/F']},
   ]
   readVars = [readVar(v, allowRenaming=False, isWritten=False, isRead=True) for v in readVariables]
   for v in readVectors:
