@@ -17,6 +17,17 @@ import copy, os, sys
 #"bins": ["T5Full_1500_800_100"],
 #'dir' : "/data/schoef/cmgTuples/postProcessed_v0/singleLepton/",
 #}
+hard_ttJetsCSA1450ns={\
+"name" : "ttJetsCSA1450ns",
+"bins" : ["ttJetsCSA1450ns"],
+'dir' : "/data/schoef/cmgTuples/postProcessed_v3/hard/",
+}
+
+hard_WJetsHTToLNu={\
+"name" : "WJetsHTToLNu",
+"bins" : ["WJetsToLNu_HT100to200", "WJetsToLNu_HT200to400", "WJetsToLNu_HT400to600", "WJetsToLNu_HT600toInf"],
+'dir' : "/data/schoef/cmgTuples/postProcessed_v3/hard/",
+}
 
 soft_ttJetsCSA1450ns={\
 "name" : "ttJetsCSA1450ns",

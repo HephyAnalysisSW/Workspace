@@ -17,10 +17,10 @@ from localInfo import username
 ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 
-#defSampleStr = "ttJetsCSA1450ns,WJetsToLNu_HT100to200,WJetsToLNu_HT200to400,WJetsToLNu_HT400to600,WJetsToLNu_HT600toInf"
-defSampleStr = "WJetsToLNu_HT200to400,WJetsToLNu_HT400to600,WJetsToLNu_HT600toInf"
-defSampleStr += ",WJetsToLNu_HT600toInf"
-defSampleStr += ",ttJetsCSA1450ns"
+defSampleStr = "ttJetsCSA1450ns,WJetsToLNu_HT100to200,WJetsToLNu_HT200to400,WJetsToLNu_HT400to600,WJetsToLNu_HT600toInf"
+#defSampleStr = "WJetsToLNu_HT100to200"
+#defSampleStr = "WJetsToLNu_HT200to400,WJetsToLNu_HT400to600,WJetsToLNu_HT600toInf"
+#defSampleStr = "ttJetsCSA1450ns"
 #defSampleStr = "T5Full_1200_1000_800"
 #defSampleStr = "T5Full_1200_1000_800,T5Full_1500_800_100"
 #defSampleStr = "T1ttbbWW_2J_mGo1000_mCh725_mChi715_3bodydec"
