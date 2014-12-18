@@ -349,14 +349,14 @@ def drawStack(stk, maskedArea=None):
 from localInfo import afsuser
 defaultWWWPath = '/afs/hephy.at/user/'+afsuser[0]+'/'+afsuser+'/www/'
 
-def bound01(x):
-  return max(0,min(1,x))
+def bracket(x, interval=[0,1]):
+  return max(interval[0],min(interval[1],x))
 
 def calcTLegendMaskedArea(legendC, margins):
   return {
-    'yLow': bound01(1.-(1.-legendC[1] - margins['top'])/(1.-margins['top']-margins['bottom'])),
-    'xLow': bound01((legendC[0] - margins['right'])/(1.-margins['right']-margins['left'])),
-    'xHigh':bound01((legendC[2] - margins['right'])/(1.-margins['right']-margins['left']))
+    'yLow': bracket(1.-(1.-legendC[1] - margins['top'])/(1.-margins['top']-margins['bottom']), interval=[0.3, 1]),
+    'xLow': bracket((legendC[0] - margins['right'])/(1.-margins['right']-margins['left'])),
+    'xHigh':bracket((legendC[2] - margins['right'])/(1.-margins['right']-margins['left']))
     }
 
 
