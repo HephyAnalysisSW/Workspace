@@ -28,17 +28,17 @@ signalScale=1
 cutBranches = ["single*", "nLoose*", "nTight*", "leptonPt", "met_phi", "htJet40ja", "nBJetMedium25", "nJet40a",'st','met']
 
 for i in range(1):
-  if i==1:
-    prefix = 'soft_ht500-st250-6j-0b-diLepVeto'
-    presel="singleMuonic&&nLooseSoftLeptons==1&&nTightSoftLeptons==1&&nTightHardLeptons==0&&st>250&&htJet40ja>500&&nBJetMedium25==0&&nJet40a>=6"
-
   if i==0:
-    prefix = 'soft_ht500-st250-4j-0b-diLepVeto'
-    presel="singleMuonic&&nLooseSoftLeptons==1&&nTightSoftLeptons==1&&nTightHardLeptons==0&&st>250&&htJet40ja>500&&nBJetMedium25==0&&nJet40a>=4"
-
-  if i==2:
-    prefix = 'soft_ht500-st250-2j-0b-diLepVeto'
-    presel="singleMuonic&&nLooseSoftLeptons==1&&nTightSoftLeptons==1&&nTightHardLeptons==0&&st>250&&htJet40ja>500&&nBJetMedium25==0&&nJet40a>=2"
+    prefix = 'soft_ht750-met500-3j-0b-diLepVeto'
+    presel="singleMuonic&&nLooseSoftLeptons==1&&nTightSoftLeptons==1&&nTightHardLeptons==0&&met>500&&htJet40ja>750&&nBJetMedium25==0&&nJet40a>=3"
+#  if i==1:
+#    prefix = 'soft_ht500-st250-6j-0b-diLepVeto'
+#    presel="singleMuonic&&nLooseSoftLeptons==1&&nTightSoftLeptons==1&&nTightHardLeptons==0&&st>250&&htJet40ja>500&&nBJetMedium25==0&&nJet40a>=6"
+#
+#
+#  if i==2:
+#    prefix = 'soft_ht500-st250-2j-0b-diLepVeto'
+#    presel="singleMuonic&&nLooseSoftLeptons==1&&nTightSoftLeptons==1&&nTightHardLeptons==0&&st>250&&htJet40ja>500&&nBJetMedium25==0&&nJet40a>=2"
 
 #  if i==3:
 #    prefix = 'soft_ht500-st250-6j-geq2b-diLepVeto'
@@ -136,187 +136,190 @@ for i in range(1):
       labels={'x':'#slash{E}_{T} (GeV)','y':'Number of Events / 50 GeV'}, 
       var={'name':'met','leaf':'met', 'overFlow':'upper'}, 
       binning={'binning':[1050/50,0,1050]}, 
-      cut={'string':cutString,'func':None})
+      cut={'string':cutString,'func':None},
+      options={'yRange':[0.007,"auto"]}
+      )
   allStacks.append(met_stack)
 
-  ht_stack  = getStack(
-      labels={'x':'H_{T} (GeV)','y':'Number of Events / 50 GeV'}, 
-      var={'name':'ht','leaf':'htJet40ja', 'overFlow':'upper'}, 
-      binning={'binning':[1650/50,0,1650]}, 
-      cut={'string':cutString,'func':None})
-  allStacks.append(ht_stack)
-
-  st_stack  = getStack(
-      labels={'x':'S_{T} (GeV)','y':'Number of Events / 50 GeV'}, 
-      var={'name':'st','func':cmgST, 'branches':cmgST('branches'), 'overFlow':'upper'}, 
-      binning={'binning':[750/50,0,750]}, 
-      cut={'string':cutString,'func':None})
-  allStacks.append(st_stack)
-
-  leptonPt_stack  = getStack(
-      labels={'x':'p_{T}(l) (GeV)','y':'Number of Events / 20 GeV'}, 
-      var={'name':'leptonPt','leaf':'leptonPt', 'overFlow':'upper'}, 
-      binning={'binning':[750/20,0,760]}, 
-      cut={'string':cutString,'func':None})
-  allStacks.append(leptonPt_stack)
-
-  softleptonPt_stack  = getStack(
-      labels={'x':'p_{T}(l) (GeV)','y':'Number of Events / 20 GeV'}, 
-      var={'name':'softleptonPt','leaf':'leptonPt', 'overFlow':'upper'}, 
-      binning={'binning':[20,0,100]}, 
-      cut={'string':cutString,'func':None})
-  allStacks.append(softleptonPt_stack)
-
-  jet0pt_stack  = getStack(
-      labels={'x':'p_{T}(leading jet) (GeV)','y':'Number of Events / 10 GeV'}, 
-      var={'name':'jet0pt','leaf':'Jet_pt','ind':0, 'overFlow':'upper'}, 
-      binning={'binning':[16,0,1600]}, 
-      cut={'string':cutString,'func':None})
-  allStacks.append(jet0pt_stack)
-  jet1pt_stack  = getStack(
-      labels={'x':'p_{T}(2^{nd.} leading jet) (GeV)','y':'Number of Events / 10 GeV'}, 
-      var={'name':'jet1pt','leaf':'Jet_pt','ind':1, 'overFlow':'upper'}, 
-      binning={'binning':[16,0,1600]}, 
-      cut={'string':cutString,'func':None})
-  allStacks.append(jet1pt_stack)
-  jet2pt_stack  = getStack(
-      labels={'x':'p_{T}(3^{rd.} leading jet) (GeV)','y':'Number of Events / 10 GeV'}, 
-      var={'name':'jet2pt','leaf':'Jet_pt','ind':2, 'overFlow':'upper'}, 
-      binning={'binning':[16,0,1600]}, 
-      cut={'string':cutString,'func':None})
-  allStacks.append(jet2pt_stack)
-  jet3pt_stack  = getStack(
-      labels={'x':'p_{T}(4^{th.} leading jet) (GeV)','y':'Number of Events / 10 GeV'}, 
-      var={'name':'jet3pt','leaf':'Jet_pt','ind':3, 'overFlow':'upper'}, 
-      binning={'binning':[16,0,1600]}, 
-      cut={'string':cutString,'func':None})
-  allStacks.append(jet3pt_stack)
-  jet4pt_stack  = getStack(
-      labels={'x':'p_{T}(5^{th.} leading jet) (GeV)','y':'Number of Events / 10 GeV'}, 
-      var={'name':'jet4pt','leaf':'Jet_pt','ind':4, 'overFlow':'upper'}, 
-      binning={'binning':[16,0,1600]}, 
-      cut={'string':cutString,'func':None})
-  allStacks.append(jet4pt_stack)
-
-  test_stack  = getStack(
-      labels={'x':'test','y':'Number of Events'},
-      var={'name':'nMediumBTags','TTreeFormula':"Sum$(Jet_pt>100)", 'overFlow':'upper'},
-      binning={'binning':[10,0,10]},
-      cut={'string':cutString,'func':None},
-      options={'yRange':[0.07,None]})
-
-  binningMTCoarse = [0,120,220,320,420,800]
-  mT_stack  = getStack(
-      labels={'x':'m_{T} (GeV)','y':'Number of Events / 10 GeV'}, 
-      var={'name':'mT','func':cmgMT, 'branches':cmgMT('branches'), 'overFlow':'upper'}, 
-      binning={'binning':binningMTCoarse, 'isExplicit':True}, 
-      cut={'string':cutString,'func':None})
-  allStacks.append(mT_stack)
-  mT_stack_zoomed  = getStack(
-      labels={'x':'m_{T} (GeV)','y':'Number of Events / 10 GeV'}, 
-      var={'name':'mTzoomed','func':cmgMT, 'branches':cmgMT('branches'), 'overFlow':'upper'}, 
-      binning={'binning':[15,0,300], 'isExplicit':False}, 
-      cut={'string':cutString,'func':None})
-  allStacks.append(mT_stack_zoomed)
-
-  dPhi_stack  = getStack(
-      labels={'x':'#Delta#Phi(W,l)','y':'Number of Events'}, 
-      var={'name':'dPhi','func':cmgDPhi, 'branches':cmgDPhi('branches'), 'overFlow':'both'}, 
-      binning={'binning':[0,0.5,1,1.5,pi], 'isExplicit':True}, 
-      cut={'string':cutString,'func':None})
-  dPhi_stack.options['yRange']=[0.007, 10**2.7]
-  allStacks.append(dPhi_stack)
-
-  nbtags_stack  = getStack(
-      labels={'x':'number of b-tags (CSVM)','y':'Number of Events'}, 
-      var={'name':'nMediumBTags','leaf':"nBJetMedium25", 'overFlow':'upper'}, 
-      binning={'binning':[10,0,10]}, 
-      cut={'string':cutString,'func':None})
-  allStacks.append(nbtags_stack)
-
-  njets_stack  = getStack(
-      labels={'x':'number of jets','y':'Number of Events'}, 
-      var={'name':'njets','leaf':"nJet40a", 'overFlow':'upper'}, 
-      binning={'binning':[18,0,18]}, 
-      cut={'string':cutString,'func':None})
-  allStacks.append(njets_stack)
-
-  nLooseBTags_stack  = getStack(
-      labels={'x':'number of b-tags (CSVL)','y':'Number of Events'}, 
-      var={'name':'nLooseBTags','leaf':"nBJetLoose25", 'overFlow':'upper'}, 
-      binning={'binning':[10,0,10]}, 
-      cut={'string':cutString,'func':None})
-  allStacks.append(nLooseBTags_stack)
-
-  mTClosestJetMET_stack  = getStack(
-      labels={'x':'m_{T, closest jet, #slash{E}_{T}} (GeV)','y':'Number of Events / 10 GeV'}, 
-      var={'name':'mTClosestJetMET','func':cmgMTClosestJetMET, 'overFlow':'upper'}, 
-      binning={'binning':(20,0,800), 'isExplicit':False}, 
-      cut={'string':cutString,'func':None})
-  allStacks.append(mTClosestJetMET_stack)
-
-  mTClosestJetMET_zoomed_stack  = getStack(
-      labels={'x':'m_{T, closest jet, #slash{E}_{T}} (GeV)','y':'Number of Events / 10 GeV'}, 
-      var={'name':'mTClosestJetMET_zoomed','func':cmgMTClosestJetMET, 'branches':cmgMTClosestJetMET('branches'),'overFlow':'upper'}, 
-      binning={'binning':(40,0,400), 'isExplicit':False}, 
-      cut={'string':cutString,'func':None})
-  allStacks.append(mTClosestJetMET_zoomed_stack)
-
-  mTClosestBJetMET_stack  = getStack(
-      labels={'x':'m_{T, closest b-jet, #slash{E}_{T}} (GeV)','y':'Number of Events / 10 GeV'}, 
-      var={'name':'mTClosestBJetMET','func':cmgMTClosestBJetMET,'branches':cmgMTClosestBJetMET('branches'), 'overFlow':'upper'}, 
-      binning={'binning':binningMTCoarse, 'isExplicit':True}, 
-      cut={'string':cutString,'func':None})
-  allStacks.append(mTClosestBJetMET_stack)
-
-  mTClosestBJetMET_zoomed_stack  = getStack(
-      labels={'x':'m_{T, closest b-jet, #slash{E}_{T}} (GeV)','y':'Number of Events / 10 GeV'}, 
-      var={'name':'mTClosestBJetMET_zoomed','func':cmgMTClosestBJetMET,'branches':cmgMTClosestBJetMET('branches'), 'overFlow':'upper'}, 
-      binning={'binning':(40,0,400), 'isExplicit':False}, 
-      cut={'string':cutString,'func':None})
-  allStacks.append(mTClosestBJetMET_zoomed_stack)
-
-  mTTopClosestJetMET_stack  = getStack(
-      labels={'x':'m_{T, closest jet, #slash{E}_{T}}^{top} (GeV)','y':'Number of Events / 10 GeV'}, 
-      var={'name':'mTTopClosestJetMET','func':cmgMTTopClosestJetMET, 'branches':cmgMTTopClosestJetMET('branches'), 'overFlow':'upper'}, 
-      binning={'binning':[20,0,2000], 'isExplicit':False}, 
-      cut={'string':cutString,'func':None})
-  allStacks.append(mTTopClosestJetMET_stack)
-
-  mTTopClosestJetMET_zoomed_stack  = getStack(
-      labels={'x':'m_{T, closest jet, #slash{E}_{T}}^{top} (GeV)','y':'Number of Events / 10 GeV'}, 
-      var={'name':'mTTopClosestJetMET_zoomed','func':cmgMTTopClosestJetMET, 'branches':cmgMTTopClosestJetMET('branches'), 'overFlow':'upper'}, 
-      binning={'binning':[40,0,400], 'isExplicit':False}, 
-      cut={'string':cutString,'func':None})
-  allStacks.append(mTTopClosestJetMET_zoomed_stack)
-
-  mTTopClosestBJetMET_stack  = getStack(
-      labels={'x':'m_{T, closest b-jet, #slash{E}_{T}}^{top} (GeV)','y':'Number of Events / 10 GeV'}, 
-      var={'name':'mTTopClosestBJetMET','func':cmgMTTopClosestBJetMET, 'branches':cmgMTTopClosestBJetMET('branches'), 'overFlow':'upper'}, 
-      binning={'binning':[20,0,2000], 'isExplicit':False}, 
-      cut={'string':cutString,'func':None})
-  allStacks.append(mTTopClosestBJetMET_stack)
-
-  mTTopClosestBJetMET_zoomed_stack  = getStack(
-      labels={'x':'m_{T, closest b-jet, #slash{E}_{T}}^{top} (GeV)','y':'Number of Events / 10 GeV'}, 
-      var={'name':'mTTopClosestBJetMET_zoomed','func':cmgMTTopClosestBJetMET, 'branches':cmgMTTopClosestBJetMET('branches'), 'overFlow':'upper'}, 
-      binning={'binning':[20,0,400], 'isExplicit':False}, 
-      cut={'string':cutString,'func':None})
-  allStacks.append(mTTopClosestBJetMET_zoomed_stack)
-
-  minDPhiBJet_stack  = getStack(
-      labels={'x':'min#Delta#Phi(#slash{E}_{T},b-j_{1})','y':'Number of Events'}, 
-      var={'name':'minDPhiBJet','func':cmgMinDPhiBJet, 'branches':cmgMinDPhiJet('branches'), 'overFlow':'both'}, 
-      binning={'binning':[20,0,pi], 'isExplicit':False}, 
-      cut={'string':cutString,'func':None})
-  allStacks.append(minDPhiBJet_stack)
-
-  minDPhi3Jet_stack  = getStack(
-      labels={'x':'min#Delta#Phi(#slash{E}_{T},j_{1,2,3})','y':'Number of Events'}, 
-      var={'name':'minDPhi3Jet','func':cmgMinDPhiJet, 'branches':cmgMinDPhiJet('branches'), 'overFlow':'both'}, 
-      binning={'binning':[20,0,pi], 'isExplicit':False}, 
-      cut={'string':cutString,'func':None})
-  allStacks.append(minDPhi3Jet_stack)
+#  ht_stack  = getStack(
+#      labels={'x':'H_{T} (GeV)','y':'Number of Events / 50 GeV'}, 
+#      var={'name':'ht','leaf':'htJet40ja', 'overFlow':'upper'}, 
+#      binning={'binning':[1650/50,0,1650]}, 
+#      cut={'string':cutString,'func':None})
+#  allStacks.append(ht_stack)
+#
+#  st_stack  = getStack(
+#      labels={'x':'S_{T} (GeV)','y':'Number of Events / 50 GeV'}, 
+#      var={'name':'st','func':cmgST, 'branches':cmgST('branches'), 'overFlow':'upper'}, 
+#      binning={'binning':[750/50,0,750]}, 
+#      cut={'string':cutString,'func':None})
+#  allStacks.append(st_stack)
+#
+#  leptonPt_stack  = getStack(
+#      labels={'x':'p_{T}(l) (GeV)','y':'Number of Events / 20 GeV'}, 
+#      var={'name':'leptonPt','leaf':'leptonPt', 'overFlow':'upper'}, 
+#      binning={'binning':[750/20,0,760]}, 
+#      cut={'string':cutString,'func':None})
+#  allStacks.append(leptonPt_stack)
+#
+#  softleptonPt_stack  = getStack(
+#      labels={'x':'p_{T}(l) (GeV)','y':'Number of Events / 20 GeV'}, 
+#      var={'name':'softleptonPt','leaf':'leptonPt', 'overFlow':'upper'}, 
+#      binning={'binning':[20,0,100]}, 
+#      cut={'string':cutString,'func':None})
+#  allStacks.append(softleptonPt_stack)
+#
+#  jet0pt_stack  = getStack(
+#      labels={'x':'p_{T}(leading jet) (GeV)','y':'Number of Events / 10 GeV'}, 
+#      var={'name':'jet0pt','leaf':'Jet_pt','ind':0, 'overFlow':'upper'}, 
+#      binning={'binning':[16,0,1600]}, 
+#      cut={'string':cutString,'func':None})
+#  allStacks.append(jet0pt_stack)
+#  jet1pt_stack  = getStack(
+#      labels={'x':'p_{T}(2^{nd.} leading jet) (GeV)','y':'Number of Events / 10 GeV'}, 
+#      var={'name':'jet1pt','leaf':'Jet_pt','ind':1, 'overFlow':'upper'}, 
+#      binning={'binning':[16,0,1600]}, 
+#      cut={'string':cutString,'func':None})
+#  allStacks.append(jet1pt_stack)
+#  jet2pt_stack  = getStack(
+#      labels={'x':'p_{T}(3^{rd.} leading jet) (GeV)','y':'Number of Events / 10 GeV'}, 
+#      var={'name':'jet2pt','leaf':'Jet_pt','ind':2, 'overFlow':'upper'}, 
+#      binning={'binning':[16,0,1600]}, 
+#      cut={'string':cutString,'func':None})
+#  allStacks.append(jet2pt_stack)
+#  jet3pt_stack  = getStack(
+#      labels={'x':'p_{T}(4^{th.} leading jet) (GeV)','y':'Number of Events / 10 GeV'}, 
+#      var={'name':'jet3pt','leaf':'Jet_pt','ind':3, 'overFlow':'upper'}, 
+#      binning={'binning':[16,0,1600]}, 
+#      cut={'string':cutString,'func':None})
+#  allStacks.append(jet3pt_stack)
+#  jet4pt_stack  = getStack(
+#      labels={'x':'p_{T}(5^{th.} leading jet) (GeV)','y':'Number of Events / 10 GeV'}, 
+#      var={'name':'jet4pt','leaf':'Jet_pt','ind':4, 'overFlow':'upper'}, 
+#      binning={'binning':[16,0,1600]}, 
+#      cut={'string':cutString,'func':None})
+#  allStacks.append(jet4pt_stack)
+#
+#  test_stack  = getStack(
+#      labels={'x':'test','y':'Number of Events'},
+#      var={'name':'nMediumBTags','TTreeFormula':"Sum$(Jet_pt>100)", 'overFlow':'upper'},
+#      binning={'binning':[10,0,10]},
+#      cut={'string':cutString,'func':None},
+#      options={'yRange':[0.07,None]})
+#
+#  binningMTCoarse = [0,120,220,320,420,800]
+#  mT_stack  = getStack(
+#      labels={'x':'m_{T} (GeV)','y':'Number of Events / 10 GeV'}, 
+#      var={'name':'mT','func':cmgMT, 'branches':cmgMT('branches'), 'overFlow':'upper'}, 
+#      binning={'binning':binningMTCoarse, 'isExplicit':True}, 
+#      cut={'string':cutString,'func':None})
+#  allStacks.append(mT_stack)
+#  mT_stack_zoomed  = getStack(
+#      labels={'x':'m_{T} (GeV)','y':'Number of Events / 10 GeV'}, 
+#      var={'name':'mTzoomed','func':cmgMT, 'branches':cmgMT('branches'), 'overFlow':'upper'}, 
+#      binning={'binning':[15,0,300], 'isExplicit':False}, 
+#      cut={'string':cutString,'func':None})
+#  allStacks.append(mT_stack_zoomed)
+#
+#  dPhi_stack  = getStack(
+#      labels={'x':'#Delta#Phi(W,l)','y':'Number of Events'}, 
+#      var={'name':'dPhi','func':cmgDPhi, 'branches':cmgDPhi('branches'), 'overFlow':'both'}, 
+#      binning={'binning':[0,0.5,1,1.5,pi], 'isExplicit':True}, 
+#      cut={'string':cutString,'func':None})
+#  dPhi_stack.options['yRange']=[0.007, 10**2.7]
+#  allStacks.append(dPhi_stack)
+#
+#  nbtags_stack  = getStack(
+#      labels={'x':'number of b-tags (CSVM)','y':'Number of Events'}, 
+#      var={'name':'nMediumBTags','leaf':"nBJetMedium25", 'overFlow':'upper'}, 
+#      binning={'binning':[10,0,10]}, 
+#      cut={'string':cutString,'func':None})
+#  allStacks.append(nbtags_stack)
+#
+#  njets_stack  = getStack(
+#      labels={'x':'number of jets','y':'Number of Events'}, 
+#      var={'name':'njets','leaf':"nJet40a", 'overFlow':'upper'}, 
+#      binning={'binning':[18,0,18]}, 
+#      cut={'string':cutString,'func':None})
+#  allStacks.append(njets_stack)
+#
+#  nLooseBTags_stack  = getStack(
+#      labels={'x':'number of b-tags (CSVL)','y':'Number of Events'}, 
+#      var={'name':'nLooseBTags','leaf':"nBJetLoose25", 'overFlow':'upper'}, 
+#      binning={'binning':[10,0,10]}, 
+#      cut={'string':cutString,'func':None})
+#  allStacks.append(nLooseBTags_stack)
+#
+#  mTClosestJetMET_stack  = getStack(
+#      labels={'x':'m_{T, closest jet, #slash{E}_{T}} (GeV)','y':'Number of Events / 10 GeV'}, 
+#      var={'name':'mTClosestJetMET','func':cmgMTClosestJetMET, 'overFlow':'upper'}, 
+#      binning={'binning':(20,0,800), 'isExplicit':False}, 
+#      cut={'string':cutString,'func':None})
+#  allStacks.append(mTClosestJetMET_stack)
+#
+#  mTClosestJetMET_zoomed_stack  = getStack(
+#      labels={'x':'m_{T, closest jet, #slash{E}_{T}} (GeV)','y':'Number of Events / 10 GeV'}, 
+#      var={'name':'mTClosestJetMET_zoomed','func':cmgMTClosestJetMET, 'branches':cmgMTClosestJetMET('branches'),'overFlow':'upper'}, 
+#      binning={'binning':(40,0,400), 'isExplicit':False}, 
+#      cut={'string':cutString,'func':None})
+#  allStacks.append(mTClosestJetMET_zoomed_stack)
+#
+#  mTClosestBJetMET_stack  = getStack(
+#      labels={'x':'m_{T, closest b-jet, #slash{E}_{T}} (GeV)','y':'Number of Events / 10 GeV'}, 
+#      var={'name':'mTClosestBJetMET','func':cmgMTClosestBJetMET,'branches':cmgMTClosestBJetMET('branches'), 'overFlow':'upper'}, 
+#      binning={'binning':binningMTCoarse, 'isExplicit':True}, 
+#      cut={'string':cutString,'func':None})
+#  allStacks.append(mTClosestBJetMET_stack)
+#
+#  mTClosestBJetMET_zoomed_stack  = getStack(
+#      labels={'x':'m_{T, closest b-jet, #slash{E}_{T}} (GeV)','y':'Number of Events / 10 GeV'}, 
+#      var={'name':'mTClosestBJetMET_zoomed','func':cmgMTClosestBJetMET,'branches':cmgMTClosestBJetMET('branches'), 'overFlow':'upper'}, 
+#      binning={'binning':(40,0,400), 'isExplicit':False}, 
+#      cut={'string':cutString,'func':None})
+#  allStacks.append(mTClosestBJetMET_zoomed_stack)
+#
+#  mTTopClosestJetMET_stack  = getStack(
+#      labels={'x':'m_{T, closest jet, #slash{E}_{T}}^{top} (GeV)','y':'Number of Events / 10 GeV'}, 
+#      var={'name':'mTTopClosestJetMET','func':cmgMTTopClosestJetMET, 'branches':cmgMTTopClosestJetMET('branches'), 'overFlow':'upper'}, 
+#      binning={'binning':[20,0,2000], 'isExplicit':False}, 
+#      cut={'string':cutString,'func':None})
+#  allStacks.append(mTTopClosestJetMET_stack)
+#
+#  mTTopClosestJetMET_zoomed_stack  = getStack(
+#      labels={'x':'m_{T, closest jet, #slash{E}_{T}}^{top} (GeV)','y':'Number of Events / 10 GeV'}, 
+#      var={'name':'mTTopClosestJetMET_zoomed','func':cmgMTTopClosestJetMET, 'branches':cmgMTTopClosestJetMET('branches'), 'overFlow':'upper'}, 
+#      binning={'binning':[40,0,400], 'isExplicit':False}, 
+#      cut={'string':cutString,'func':None})
+#  allStacks.append(mTTopClosestJetMET_zoomed_stack)
+#
+#  mTTopClosestBJetMET_stack  = getStack(
+#      labels={'x':'m_{T, closest b-jet, #slash{E}_{T}}^{top} (GeV)','y':'Number of Events / 10 GeV'}, 
+#      var={'name':'mTTopClosestBJetMET','func':cmgMTTopClosestBJetMET, 'branches':cmgMTTopClosestBJetMET('branches'), 'overFlow':'upper'}, 
+#      binning={'binning':[20,0,2000], 'isExplicit':False}, 
+#      cut={'string':cutString,'func':None})
+#  allStacks.append(mTTopClosestBJetMET_stack)
+#
+#  mTTopClosestBJetMET_zoomed_stack  = getStack(
+#      labels={'x':'m_{T, closest b-jet, #slash{E}_{T}}^{top} (GeV)','y':'Number of Events / 10 GeV'}, 
+#      var={'name':'mTTopClosestBJetMET_zoomed','func':cmgMTTopClosestBJetMET, 'branches':cmgMTTopClosestBJetMET('branches'), 'overFlow':'upper'}, 
+#      binning={'binning':[20,0,400], 'isExplicit':False}, 
+#      cut={'string':cutString,'func':None})
+#  allStacks.append(mTTopClosestBJetMET_zoomed_stack)
+#
+#  minDPhiBJet_stack  = getStack(
+#      labels={'x':'min#Delta#Phi(#slash{E}_{T},b-j_{1})','y':'Number of Events'}, 
+#      var={'name':'minDPhiBJet','func':cmgMinDPhiBJet, 'branches':cmgMinDPhiJet('branches'), 'overFlow':'both'}, 
+#      binning={'binning':[20,0,pi], 'isExplicit':False}, 
+#      cut={'string':cutString,'func':None})
+#  allStacks.append(minDPhiBJet_stack)
+#
+#  minDPhi3Jet_stack  = getStack(
+#      labels={'x':'min#Delta#Phi(#slash{E}_{T},j_{1,2,3})','y':'Number of Events'}, 
+#      var={'name':'minDPhi3Jet','func':cmgMinDPhiJet, 'branches':cmgMinDPhiJet('branches'), 'overFlow':'both'}, 
+#      binning={'binning':[20,0,pi], 'isExplicit':False}, 
+#      cut={'string':cutString,'func':None},
+#      options={'yRange':(0.07, 'auto')})
+#  allStacks.append(minDPhi3Jet_stack)
 
 
   loopAndFill(allStacks)

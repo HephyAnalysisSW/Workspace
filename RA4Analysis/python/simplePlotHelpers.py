@@ -11,7 +11,7 @@ ROOT.TH1F.SetDefaultSumw2()
 #  ROOT.gROOT.ProcessLine('lumi_8TeV  = "19.1 fb^{-1}";') # default is "19.7 fb^{-1}"
 #  ROOT.gROOT.ProcessLine('lumi_7TeV  = "4.9 fb^{-1}"; ') # default is "5.1 fb^{-1}"
 #  ROOT.gROOT.ProcessLine('int iPeriod = 3;')
-
+topMargin = 0.07
 from Workspace.HEPHYPythonTools.helpers import getFileList, getVarValue
 
 #ROOT_colors = [ROOT.kBlack, ROOT.kRed-7, ROOT.kBlue-2, ROOT.kGreen+3, ROOT.kOrange+1,ROOT.kRed-3, ROOT.kAzure+6, ROOT.kCyan+3, ROOT.kOrange , ROOT.kRed-10]
@@ -206,7 +206,8 @@ def sumStackHistos(stack):
       for j in range(i+1,n):
         l[i].histo.Add(l[j].histo)
 
-def drawStack(stk):
+def drawStack(stk, maskedArea=None):
+  print "maskedArea",maskedArea
   stuff=[]
   try:
     l = ROOT.TLegend(*(stk.options['legend']['coordinates']))
@@ -219,6 +220,22 @@ def drawStack(stk):
     stuff.append(l)
   except:pass
   first=True
+  print stk.options
+  try:
+    autoAdjustY = stk.options['yRange'][1].lower()=='auto' and isinstance(stk.options['yRange'][0], numbers.Number)
+  except:
+    autoAdjustY = False
+  if autoAdjustY and  stk.options.has_key('logY') and stk.options['logY']:
+    for s in stk.stackLists:
+      for p in s:
+        for bin in range(1, 1 + p.histo.GetNbinsX()):
+          xLowAbs, xHighAbs = p.histo.GetBinLowEdge(bin), p.histo.GetBinLowEdge(bin)+p.histo.GetBinWidth(bin)
+          xLow = (xLowAbs -  p.histo.GetXaxis().GetXmin())/(p.histo.GetXaxis().GetXmax() - p.histo.GetXaxis().GetXmin())
+          xHigh = (xHighAbs -  p.histo.GetXaxis().GetXmin())/(p.histo.GetXaxis().GetXmax() - p.histo.GetXaxis().GetXmin())
+          yFracMax =  maskedArea['yLow'] if xHigh>maskedArea['xLow'] and xLow<maskedArea['xHigh'] else 1
+          y =  p.histo.GetBinContent(bin)
+          print y, yFracMax
+ 
   for s in stk.stackLists:
     for p in s:
       hcopy = p.histo.Clone()
@@ -274,13 +291,17 @@ def drawStack(stk):
       else:
         yHeadRoomFac = 1.2 if not  stk.options.has_key('yHeadRoomFac') else stk.options['yHeadRoomFac']
         defaultYRange = [0, yHeadRoomFac*hcopy.GetMaximum()]
-      hcopy.GetYaxis().SetRangeUser(*defaultYRange)
       if stk.options and stk.options.has_key('yRange') and type(stk.options['yRange'])==type([]) and len(stk.options['yRange'])==2:
-        if not isinstance(stk.options['yRange'][0], numbers.Number):stk.options['yRange'][0]=defaultYRange[0]#If yRange contains 'None' use default
-        if not isinstance(stk.options['yRange'][1], numbers.Number):stk.options['yRange'][1]=defaultYRange[1]#If yRange contains 'None' use default
+        stk.options['yRange'][0]=defaultYRange[0] if not isinstance(stk.options['yRange'][0], numbers.Number) else stk.options['yRange'][0]#If yRange is 'None' use default
+        stk.options['yRange'][1]=defaultYRange[1] if not isinstance(stk.options['yRange'][1], numbers.Number) else stk.options['yRange'][1]#If yRange is 'None' use default
+
+      
+      hcopy.GetYaxis().SetRangeUser(*defaultYRange)
       try:
         hcopy.GetYaxis().SetRangeUser(*(stk.options['yRange']) )
       except:pass
+
+      
       if first:
         if p.style['style'] == "e":
           hcopy.Draw("e1")
@@ -322,6 +343,17 @@ def drawStack(stk):
 from localInfo import afsuser
 defaultWWWPath = '/afs/hephy.at/user/'+afsuser[0]+'/'+afsuser+'/www/'
 
+def bound01(x):
+  return max(0,min(1,x))
+
+def calcTLegendMaskedArea(legendC, margins):
+  return {
+    'yLow': bound01(1.-(1.-legendC[1] - margins['top'])/(1.-margins['top']-margins['bottom'])),
+    'xLow': bound01((legendC[0] - margins['right'])/(1.-margins['right']-margins['left'])),
+    'xHigh':bound01((legendC[2] - margins['right'])/(1.-margins['right']-margins['left']))
+    }
+
+
 def drawNMStacks(intn, intm, stacks, filename, path = defaultWWWPath):
   stuff=[]
   yswidth = 500
@@ -361,11 +393,13 @@ def drawNMStacks(intn, intm, stacks, filename, path = defaultWWWPath):
         toppad.SetLogx(stk.options['logX'])
       toppad.SetBottomMargin(0)
       toppad.SetLeftMargin(0.15)
-      toppad.SetTopMargin(0.07)
+      toppad.SetTopMargin(topMargin)
       toppad.SetRightMargin(0.02)
       toppad.SetPad(toppad.GetX1(), yBorder, toppad.GetX2(), toppad.GetY2())
       stk.options['yTitleOffset'] = 1.
-      stuff += drawStack(stk)
+
+      maskedArea = calcTLegendMaskedArea(stk.options['legend']['coordinates'], margins={'top':topMargin, 'bottom':0.13,'right':0.02,'left':0.15}) if stk.options.has_key('legend') else None
+      stuff += drawStack(stk, maskedArea=maskedArea)
       bottompad = thisPad.cd(2)
       bottompad.SetTopMargin(0)
       bottompad.SetRightMargin(0.02)
@@ -400,7 +434,8 @@ def drawNMStacks(intn, intm, stacks, filename, path = defaultWWWPath):
         thisPad.SetLogy(stk.options['logY'])
       if stk.options.has_key('logX'):
         thisPad.SetLogx(stk.options['logX'])
-      stuff += drawStack(stk)
+      maskedArea = calcTLegendMaskedArea(stk.options['legend']['coordinates'], margins={'top':topMargin, 'bottom':0.13,'right':0.02,'left':0.15}) if stk.options.has_key('legend') else None
+      stuff += drawStack(stk, maskedArea=maskedArea)
   if filename[-4:] not in [".png", ".pdf", "root"]:
     c1.Print(path+filename+".png")
     c1.Print(path+filename+".root")
