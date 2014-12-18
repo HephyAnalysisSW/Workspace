@@ -1,4 +1,5 @@
 import ROOT, copy, numbers
+import types
 from array import array
 ROOT.gROOT.LoadMacro("../../HEPHYPythonTools/scripts/root/tdrstyle.C")
 #ROOT.gROOT.LoadMacro("../../HEPHYPythonTools/scripts/root/CMS_lumi.C")
@@ -21,23 +22,27 @@ from Workspace.HEPHYPythonTools.helpers import getFileList, getVarValue
 
 class plot:
   def __init__(self, var, binning, cut, sample, style, weight = {'string':'weight'}, options=None):
-    try: 
-      self.var = var['var']
-      if type(self.var)==type(""):
-        self.title=self.var
-      else:
-        self.title="Functor"
-      self.name = self.title+'_'+sample['name']
-    except:pass
-    try:
-      self.ind = var['ind']
-    except:
-      self.ind = 0
-#    if var.has_key('overFlow'):
-    try:
-      self.overFlow = var['overFlow']
-    except:
-      self.overFlow=None
+
+    self.leaf = var['leaf'] if var.has_key('leaf') else None
+    self.func = var['func'] if var.has_key('func') else None
+    self.TTreeFormula = var['TTreeFormula'] if var.has_key('TTreeFormula') else None
+    self.usedBranches = var['branches'] if var.has_key('branches') else []
+    assert sum(bool(x) for x in [self.leaf, self.func, self.TTreeFormula])==1, "Error: Should specify exactly one of 'leaf', 'func' or 'TTreeFormula' in var %s" % repr(var)
+    if self.leaf:
+      assert type(self.leaf) == types.StringType, "Error: 'leaf' should be StringType in var %s" % repr(var)
+      self.title=self.leaf 
+    if self.func:
+      assert type(self.func) == types.FunctionType, "Error: 'func' should be FunctionType in var %s" % repr(var)
+      self.title="Functor_"+self.func.func_name
+    if self.TTreeFormula:
+      assert type(self.TTreeFormula) == types.StringType, "Error: 'TTreeFormula' should be StringType in var %s" % repr(var)
+      self.title="TTreeFormula"
+    self.name = "_".join([var['name'], self.title, sample['name']])
+
+    self.ind = var['ind'] if var.has_key('ind') else 0
+    assert not (self.ind and not self.leaf) , "Error: Use 'ind' with other than 'leaf' in var: %s" % repr(var)
+   
+    self.overFlow = var['overFlow'] if var.has_key('overFlow') else None
 
 #    self.additionalCutFunc=additionalCutFunc #Not yet implemented
     self.binning=binning
@@ -47,26 +52,16 @@ class plot:
     self.weight=weight
     try:
       if type(self.histo)==type(ROOT.TH1F()):
+        self.Reset()
         del self.histo
     except:
       pass
-    try:
-       isProfile = options['isProfile']
-    except:isProfile=False
-    if isProfile:
-      rClass = ROOT.TProfile
-    else:
-      rClass = ROOT.TH1F
-    try:  
-      if self.binning.has_key('isExplicit') and self.binning['isExplicit']:
-        self.histo = rClass(self.name, self.title,len(binning['binning']) - 1, array('d',binning['binning']))
-        self.histo.Sumw2()
-        self.histo.Reset()
-      else:
-        self.histo = rClass(self.name,self.title,*binning['binning'])
-        self.histo.Sumw2()
-        self.histo.Reset()
-    except:pass
+
+    rClass = ROOT.TProfile if options and options.has_key('isProfile') and options['isProfile'] else ROOT.TH1F
+    binninArgs = binning['binning'] if not (self.binning.has_key('isExplicit') and self.binning['isExplicit']) else [len(binning['binning']) - 1, array('d',binning['binning'])]
+    self.histo = rClass(self.name, self.name, *binninArgs)
+    self.histo.Sumw2()
+    self.histo.Reset()
 
   @staticmethod
   def fromHisto(histo,style,options=None):
@@ -78,36 +73,59 @@ class stack:
   def __init__(self, stackLists, options):
     self.stackLists = stackLists
     self.options = options
+    self.usedBranches = []
   def __getitem__(self, p):return self.stackLists[p]
 
+def switchOnBranches(c, usedBranches):
+      c.SetBranchStatus("*", 0)
+#      print usedBranches
+      for br in usedBranches:
+        if "*" in br:
+          c.SetBranchStatus(br, 1)
+        else:
+          if c.GetBranch(br):
+#            print "Turning on branch", b
+            c.SetBranchStatus(br, 1)
+          else:
+            br2 = c.GetAlias(br)
+#            print "Not a branch",b,"alias",alias
+            if br2:
+#              br = c.GetBranch(alias)
+              c.SetBranchStatus(br2, 1)
+#              print "Turning on branch", br,"(aliased from",b, ")"
 
 def loopAndFill(stacks):
   allSamples=[]
   allSampleNames=[]
   allPlots = []
+  usedBranches = []
   for s in stacks:
+    usedBranches = list(set(usedBranches+s.usedBranches))
     for l in s.stackLists:
       for p in l:
         allPlots.append(p)
-        if p.sample['name'] in allSampleNames:
-          assert allSamples.count(p.sample) == 1, "Different sample with same name %s already found in allSamples!" % p.sample['name']
-        else: 
-          allSampleNames.append(p.sample['name'])
+        if p.leaf:
+          if not p.leaf in usedBranches:
+            usedBranches.append(p.leaf)
+          if p.weight  and p.weight.has_key('string') and p.weight['string'] and not p.weight['string'] in usedBranches:
+            usedBranches.append(p.weight['string'])
+        else:
+          usedBranches = list(set(usedBranches+p.usedBranches))
+        if not p.sample in allSamples:
           allSamples.append(p.sample)
   
-  print "Found",len(allSamples),'different samples'
+  print "Found",len(allSamples),'different samples:',", ".join(s['name'] for s in allSamples)
   for s in allSamples:
-    allCuts=[]
-    cutVars={}
+    cutStringForSample=[]
+    plotsPerCutForSample={}
     for p in allPlots:
       if p.sample==s:
-        if not p.cut['string'] in allCuts:
-          allCuts.append(p.cut['string'])
-          cutVars[p.cut['string']]=[]
-        if not p in cutVars[p.cut['string']]:
-          cutVars[p.cut['string']].append(p)
-    s['cuts'] = cutVars
-
+        if not p.cut['string'] in cutStringForSample:
+          cutStringForSample.append(p.cut['string'])
+          plotsPerCutForSample[p.cut['string']]=[]
+        if not p in plotsPerCutForSample[p.cut['string']]:
+          plotsPerCutForSample[p.cut['string']].append(p)
+    s['plotsPerCutForSample'] = plotsPerCutForSample
   for s in allSamples:
     sampleScaleFac = 1 if not s.has_key('scale') else s['scale']
     if sampleScaleFac!=1:
@@ -116,45 +134,46 @@ def loopAndFill(stacks):
       c = ROOT.TChain('Events')
       counter=0
       dir = s['dirname'] if s.has_key('dirname') else s['dir']
-      for f in getFileList(dir+'/'+b):#, minAgeDPM, histname, xrootPrefix, maxN):
+      for f in getFileList(dir+'/'+b, maxN = -1 if not (s.has_key('small') and s['small']) else 1):#, minAgeDPM, histname, xrootPrefix, maxN):
         counter+=1
         c.Add(f)
       ntot = c.GetEntries()
       print "Added ",counter,'files from sample',s['name'],'dir',dir,'bin',b,'ntot',ntot
+      switchOnBranches(c, usedBranches)
+         
       if ntot==0:
         print "Warning! Found zero events in",s['name'],'bin',b," -> do nothing"
         continue
-      for cutString in s['cuts'].keys():
-        varsToFill = s['cuts'][cutString]
+      for cutString in s['plotsPerCutForSample'].keys():
+        plotsToFill = s['plotsPerCutForSample'][cutString]
         c.Draw(">>eList",cutString)
         elist = ROOT.gDirectory.Get("eList")
-        number_events = elist.GetN()
-        print "Reading: ", s["name"], b, "with",number_events,"events passing cutString", cutString, 'and will fill these vars: '+" ".join([v.name for v in varsToFill])
-        for v in varsToFill:
-          if not (v.cut.has_key('func') and v.cut['func']):
-            v.cut['func']=None
-          assert not (v.ind!=0 and not type(v.var)==type("")) , "Can't use index with function! var: %s" % v['name']
-          try:  #If TTreeFormula occurs in string create that object
-            if v.var.count('TTreeFormula'):
-              exec('v.var='+v.var)
-              print "Created TTreeFormula:",v.var
-          except:pass
+        number_events = elist.GetN() if not (s.has_key('small')  and s['small']) else min(elist.GetN(), 100)
+        print "Reading: ", s["name"], b, "with",number_events,"events passing cutString", cutString, 'and will fill', len([p.name for p in plotsToFill]),'vars.'
+        for p in plotsToFill:
+          if not (p.cut.has_key('func') and p.cut['func']):
+            p.cut['func']=None
+          if p.TTreeFormula:
+            fString='ROOT.TTreeFormula('+p['name']+','+p.var+',c)'
+            exec('p.ttreeFormula='+fString)
+            print "Created TTreeFormula:",fString
         for i in range(0, number_events):
           if (i%10000 == 0) and i>0 :
             print i
           c.GetEntry(elist.GetEntry(i))
-          for v in varsToFill:
-            if (not v.cut['func']) or  v.cut['func'](c):
-              weight = getVarValue(c, v.weight['string'])
-              
-              if type(v.var)==type(""):
-                val =  getVarValue(c, v.var, v.ind)
-              elif type(v.var)==type(ROOT.TTreeFormula()):
-                v.var.UpdateFormulaLeaves()
-                val = v.var.EvalInstance()
-              else:
-                val = v.var(c)
-              v.histo.Fill(val, weight*sampleScaleFac)
+          for p in plotsToFill:
+            if (not p.cut['func']) or p.cut['func'](c):
+              weight = c.GetLeaf(p.weight['string']).GetValue()#getVarValue(c, p.weight['string'])
+               
+              if p.leaf:
+                val =  getVarValue(c, p.leaf, p.ind)
+#                print "Fill leaf",p.leaf, p.ind, val, weight,sampleScaleFac
+              if p.TTreeFormula:
+                p.ttreeFormula.UpdateFormulaLeaves()
+                val = p.ttreeFormula.EvalInstance()
+              if p.func:
+                val = p.func(c)
+              p.histo.Fill(val, weight*sampleScaleFac)
         del elist
       del c
   for s in stacks:
