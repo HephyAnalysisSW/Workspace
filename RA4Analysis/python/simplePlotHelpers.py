@@ -226,16 +226,22 @@ def drawStack(stk, maskedArea=None):
   except:
     autoAdjustY = False
   if autoAdjustY and  stk.options.has_key('logY') and stk.options['logY']:
+    ymin = stk.options['yRange'][0]
+    logYMaxGlobal = log(ymin,10)
     for s in stk.stackLists:
       for p in s:
-        for bin in range(1, 1 + p.histo.GetNbinsX()):
-          xLowAbs, xHighAbs = p.histo.GetBinLowEdge(bin), p.histo.GetBinLowEdge(bin)+p.histo.GetBinWidth(bin)
+        for iBin in range(1, 1 + p.histo.GetNbinsX()):
+          xLowAbs, xHighAbs = p.histo.GetbinLowEdge(iBin), p.histo.GetbinLowEdge(iBin)+p.histo.GetbinWidth(iBin)
           xLow = (xLowAbs -  p.histo.GetXaxis().GetXmin())/(p.histo.GetXaxis().GetXmax() - p.histo.GetXaxis().GetXmin())
           xHigh = (xHighAbs -  p.histo.GetXaxis().GetXmin())/(p.histo.GetXaxis().GetXmax() - p.histo.GetXaxis().GetXmin())
           yFracMax =  maskedArea['yLow'] if xHigh>maskedArea['xLow'] and xLow<maskedArea['xHigh'] else 1
-          y =  p.histo.GetBinContent(bin)
-          print y, yFracMax
- 
+          deltaLogY = log(1.5, 10) if yFracMax==1 else log(1.2,10)
+          y =  p.histo.GetbinContent(iBin)
+          logyMax = (log(y/ymin, 10) + deltaLogY)/yFracMax
+          logYMaxGlobal = logyMax if logyMax>logYMaxGlobal else logYMaxGlobal
+          print iBin, y, logyMax, logYMaxGlobal
+  else:
+    logYMaxGlobal=None 
   for s in stk.stackLists:
     for p in s:
       hcopy = p.histo.Clone()
@@ -294,9 +300,9 @@ def drawStack(stk, maskedArea=None):
       if stk.options and stk.options.has_key('yRange') and type(stk.options['yRange'])==type([]) and len(stk.options['yRange'])==2:
         stk.options['yRange'][0]=defaultYRange[0] if not isinstance(stk.options['yRange'][0], numbers.Number) else stk.options['yRange'][0]#If yRange is 'None' use default
         stk.options['yRange'][1]=defaultYRange[1] if not isinstance(stk.options['yRange'][1], numbers.Number) else stk.options['yRange'][1]#If yRange is 'None' use default
-
-      
       hcopy.GetYaxis().SetRangeUser(*defaultYRange)
+      if logYMaxGlobal:
+        stk.options['yRange'][1]=10**logYMaxGlobal
       try:
         hcopy.GetYaxis().SetRangeUser(*(stk.options['yRange']) )
       except:pass
