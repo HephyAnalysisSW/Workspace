@@ -41,28 +41,28 @@ for relIso in [0.3]:
   muPtPresEff = ROOT.TProfile('muPtPresEff','muPtPresEff', len(ptBins)-1,ptBins,-2,2)
   c.Draw('gLepInd>=0:gLepPt>>muPtPresEff','abs(gLepPdg)==13&&gLepPt>'+str(ptCut)+"&&abs(gLepEta)<2.5&&"+hadPresel+diLepSelection, 'goff')
   muPtIDEff = ROOT.TProfile('muPtIDEff','muPtIDEff', len(ptBins)-1,ptBins,-2,2)
-  c.Draw('gLepDR<0.4&&abs(1-muPt[gLepInd]/gLepPt)<0.05&&'+leptonID+':gLepPt>>muPtIDEff','abs(gLepPdg)==13&&gLepPt>'+str(ptCut)+'&&abs(gLepEta)<2.5&&gLepInd>=0'+"&&"+hadPresel+diLepSelection, 'goff')
+  c.Draw('gLepDR<0.4&&abs(1-muPt[gLepInd]/gLepPt)<0.07&&'+leptonID+':gLepPt>>muPtIDEff','abs(gLepPdg)==13&&gLepPt>'+str(ptCut)+'&&abs(gLepEta)<2.5&&gLepInd>=0'+"&&"+hadPresel+diLepSelection, 'goff')
   muPtIDEff=muPtIDEff.ProjectionX()
   muPtIDEff.Multiply(muPtPresEff.ProjectionX())
 
   muEtaPresEff = ROOT.TProfile('muEtaPresEff','muEtaPresEff', len(etaBins)-1,etaBins,-2,2)
   c.Draw('gLepInd>=0:gLepEta>>muEtaPresEff','abs(gLepPdg)==13&&gLepPt>'+str(ptCut)+"&&"+hadPresel+diLepSelection, 'goff')
   muEtaIDEff = ROOT.TProfile('muEtaIDEff','muEtaIDEff', len(etaBins)-1,etaBins,-2,2)
-  c.Draw('gLepDR<0.4&&abs(1-muPt[gLepInd]/gLepPt)<0.05&&'+leptonID+':gLepEta>>muEtaIDEff','abs(gLepPdg)==13&&gLepPt>'+str(ptCut)+'&&gLepInd>=0'+"&&"+hadPresel+diLepSelection, 'goff')
+  c.Draw('gLepDR<0.4&&abs(1-muPt[gLepInd]/gLepPt)<0.07&&'+leptonID+':gLepEta>>muEtaIDEff','abs(gLepPdg)==13&&gLepPt>'+str(ptCut)+'&&gLepInd>=0'+"&&"+hadPresel+diLepSelection, 'goff')
   muEtaIDEff=muEtaIDEff.ProjectionX()
   muEtaIDEff.Multiply(muEtaPresEff.ProjectionX())
 
   munVtxPresEff = ROOT.TProfile('munVtxPresEff','munVtxPresEff', 50,0,50,-2,2)
   c.Draw('gLepInd>=0:ngoodVertices>>munVtxPresEff','abs(gLepPdg)==13&&gLepPt>'+str(ptCut)+"&&abs(gLepEta)<2.5&&"+hadPresel+diLepSelection, 'goff')
   munVtxIDEff = ROOT.TProfile('munVtxIDEff','munVtxIDEff', 50,0,50,-2,2)
-  c.Draw('gLepDR<0.4&&abs(1-muPt[gLepInd]/gLepPt)<0.05&&'+leptonID+':ngoodVertices>>munVtxIDEff','abs(gLepPdg)==13&&gLepPt>'+str(ptCut)+'&&abs(gLepEta)<2.5&&gLepInd>=0'+"&&"+hadPresel+diLepSelection, 'goff')
+  c.Draw('gLepDR<0.4&&abs(1-muPt[gLepInd]/gLepPt)<0.07&&'+leptonID+':ngoodVertices>>munVtxIDEff','abs(gLepPdg)==13&&gLepPt>'+str(ptCut)+'&&abs(gLepEta)<2.5&&gLepInd>=0'+"&&"+hadPresel+diLepSelection, 'goff')
   munVtxIDEff=munVtxIDEff.ProjectionX()
   munVtxIDEff.Multiply(munVtxPresEff.ProjectionX())
 
   muPtEta2DPresEff = ROOT.TProfile2D('muPtEta2DPresEff','muPtEta2DPresEff',len(ptBinsCoarse)-1,ptBinsCoarse, len(etaBinsCoarse)-1,etaBinsCoarse)
   c.Draw('gLepInd>=0:gLepEta:gLepPt>>muPtEta2DPresEff','abs(gLepPdg)==13&&gLepPt>'+str(ptCut)+"&&"+hadPresel+diLepSelection, 'goff')
   muPtEta2DEff = ROOT.TProfile2D('muPtEta2DEff','muPtEta2DEff',len(ptBinsCoarse)-1,ptBinsCoarse, len(etaBinsCoarse)-1,etaBinsCoarse)
-  c.Draw('gLepDR<0.4&&abs(1-muPt[gLepInd]/gLepPt)<0.05&&'+leptonID+':gLepEta:gLepPt>>muPtEta2DEff','abs(gLepPdg)==13&&gLepPt>'+str(ptCut)+'&&abs(gLepEta)<2.5&&gLepInd>=0'+"&&"+hadPresel+diLepSelection, 'goff')
+  c.Draw('gLepDR<0.4&&abs(1-muPt[gLepInd]/gLepPt)<0.07&&'+leptonID+':gLepEta:gLepPt>>muPtEta2DEff','abs(gLepPdg)==13&&gLepPt>'+str(ptCut)+'&&abs(gLepEta)<2.5&&gLepInd>=0'+"&&"+hadPresel+diLepSelection, 'goff')
   muPtEta2DEff=muPtEta2DEff.ProjectionXY()
   muPtEta2DEff.Multiply(muPtEta2DPresEff.ProjectionXY())
 
@@ -97,4 +97,5 @@ for relIso in [0.3]:
         os.makedirs(Path)
       fname='CSA14_TTJets_efficiencyMap_v26_'+prefix+'.pkl'
       pickle.dump(muPtEta2DEff, file(Path+fname,'w'))
-      print "Written",  Path+fname 
+      print "Written",  Path+fname
+

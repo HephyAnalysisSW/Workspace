@@ -1,31 +1,27 @@
 import ROOT
-from Workspace.HEPHYPythonTools.helpers import getVarValue
-from math import cos, sin, sqrt, acos, pi
-
-def deltaPhi( phi1, phi2):
-  dphi = phi2-phi1
-  if  dphi > pi:
-    dphi -= 2.0*pi
-  if dphi <= -pi:
-    dphi += 2.0*pi
-  return abs(dphi)
+from Workspace.HEPHYPythonTools.helpers import getVarValue, findClosestObject, deltaPhi, deltaR, deltaR2, getObjDict
+from math import cos, sin, sqrt, acos, pi, atan2, cosh
 
 def stage2MT(c):
+  if c=="branches":return ['met_pt','leptonPt','met_phi','leptonPhi']
   met=c.GetLeaf('met').GetValue()
   leptonPt=c.GetLeaf('leptonPt').GetValue()
-  metphi=c.GetLeaf('metPhi').GetValue()
+  metphi=c.GetLeaf('met_phi').GetValue()
   leptonPt=c.GetLeaf('leptonPt').GetValue()
   leptonPhi=c.GetLeaf('leptonPhi').GetValue()
   return sqrt(2.*leptonPt*met*(1.-cos(leptonPhi-metphi)))
 def stage2DPhi(c):
+  if c=="branches":return ['met_pt','met_phi','leptonPt','leptonPhi']
   met=c.GetLeaf('met').GetValue()
   leptonPt=c.GetLeaf('leptonPt').GetValue()
-  metphi=c.GetLeaf('metPhi').GetValue()
+  metphi=c.GetLeaf('met_phi').GetValue()
   leptonPt=c.GetLeaf('leptonPt').GetValue()
   leptonPhi=c.GetLeaf('leptonPhi').GetValue()
   cdp  = cos(leptonPhi-metphi)
   return acos((leptonPt+met*cdp)/sqrt(leptonPt**2+met**2+2*met*leptonPt*cdp)) 
+
 def cmgMT(c):
+  if c=="branches":return ['met_pt','met_phi','leptonPt']
   met=c.GetLeaf('met_pt').GetValue()
   leptonPt=c.GetLeaf('leptonPt').GetValue()
   metphi=c.GetLeaf('met_phi').GetValue()
@@ -33,6 +29,7 @@ def cmgMT(c):
   leptonPhi=c.GetLeaf('leptonPhi').GetValue()
   return sqrt(2.*leptonPt*met*(1.-cos(leptonPhi-metphi)))
 def cmgDPhi(c):
+  if c=="branches":return ['met_pt','met_phi','leptonPt','leptonPhi']
   met=c.GetLeaf('met_pt').GetValue()
   leptonPt=c.GetLeaf('leptonPt').GetValue()
   metphi=c.GetLeaf('met_phi').GetValue()
@@ -40,9 +37,81 @@ def cmgDPhi(c):
   cdp  = cos(leptonPhi-metphi)
   return acos((leptonPt+met*cdp)/sqrt(leptonPt**2+met**2+2*met*leptonPt*cdp)) 
 def cmgST(c):
+  if c=="branches":return ['leptonPt','met_phi']
   met=c.GetLeaf('met_pt').GetValue()
   leptonPt=c.GetLeaf('leptonPt').GetValue()
   return  met+leptonPt 
+
+def cmgGetJets(c, ptMin=40., etaMax=999.):
+  addJetVars =  ['phi', 'mcFlavour', 'mcMatchId', 'mcMatchFlav', 'btagCSV']
+  if c=="branches":return ['nJet','Jet_pt','Jet_eta'] + ['Jet_'+x for x in addJetVars]
+  nJet = int(getVarValue(c, 'nJet'))
+  jets=[]
+  for i in range(nJet):
+    jet = getObjDict(c, 'Jet', ['pt','eta'], i)
+    if jet['pt']>ptMin and abs(jet['eta']<etaMax):
+      jet.update(getObjDict(c, 'Jet', addJetVars, i))
+      jets.append(jet)
+  return jets
+
+def cmgMTClosestJetMET(c):
+  if c=="branches":return cmgGetJets("branches")+['met_pt', 'met_phi'] 
+  jets = cmgGetJets(c,  ptMin=40., etaMax=999.)
+  met = {'pt':c.GetLeaf('met_pt').GetValue(), 'phi':c.GetLeaf('met_phi').GetValue()}
+  closestJet = findClosestObject(jets, met, sortFunc=lambda o1, o2: deltaPhi(o1['phi'], o2['phi']))['obj']
+  return sqrt(2.*met['pt']*closestJet['pt']*(1-cos(met['phi']-closestJet['phi'])))
+def cmgMTClosestBJetMET(c):
+  if c=="branches":return cmgGetJets("branches")+['met_pt', 'met_phi'] 
+  bjets = filter(lambda j:j['btagCSV']>0.679, cmgGetJets(c,  ptMin=40., etaMax=999.))
+  met = {'pt':c.GetLeaf('met_pt').GetValue(), 'phi':c.GetLeaf('met_phi').GetValue()}
+  if len(bjets)>0:
+    closestBJet = findClosestObject(bjets, met, sortFunc=lambda o1, o2: deltaPhi(o1['phi'], o2['phi']))['obj']
+    return sqrt(2.*met['pt']*closestBJet['pt']*(1-cos(met['phi']-closestBJet['phi'])))
+  else:
+   return float('nan')
+def cmgMinDPhiJet(c, nJets=3):
+  if c=="branches":return cmgGetJets("branches")+['met_phi'] 
+  leadingNJets = cmgGetJets(c,  ptMin=40., etaMax=999.)[:nJets]
+  met = {'phi':c.GetLeaf('met_phi').GetValue()}
+  closestJet = findClosestObject(leadingNJets, met, sortFunc=lambda o1,o2: deltaPhi(o1['phi'], o2['phi']))
+  return closestJet['distance'] 
+def cmgMinDPhiBJet(c):
+  if c=="branches":return cmgGetJets("branches")+['met_phi'] 
+  bjets = filter(lambda j:j['btagCSV']>0.679, cmgGetJets(c,  ptMin=40., etaMax=999.))
+  met = {'phi':c.GetLeaf('met_phi').GetValue()}
+  if len(bjets)>0:
+    closestJet = findClosestObject(bjets, met, sortFunc=lambda o1,o2: deltaPhi(o1['phi'], o2['phi']))
+    return closestJet['distance'] 
+  else:
+   return float('nan')
+
+def cmgMTTopClosestJetMET(c):
+  if c=="branches":return cmgGetJets("branches")+['met_phi','met_pt','leptonPt','leptonPhi','leptonEta'] 
+  jets = cmgGetJets(c,  ptMin=40., etaMax=999.)
+  met = {'pt':c.GetLeaf('met_pt').GetValue(), 'phi':c.GetLeaf('met_phi').GetValue()}
+  lepton = {'pt':c.GetLeaf('leptonPt').GetValue(), 'phi':c.GetLeaf('leptonPhi').GetValue(), 'eta':c.GetLeaf('leptonEta').GetValue()}
+  W = {'phi':atan2(met['pt']*sin(met['phi']) + lepton['pt']*sin(lepton['phi']), met['pt']*cos(met['phi']) + lepton['pt']*cos(lepton['phi']) )}
+  closestJet = findClosestObject(jets, W, sortFunc=lambda o1,o2: deltaPhi(o1['phi'], o2['phi']))['obj']
+  return sqrt(\
+    2.*met['pt']*closestJet['pt']*(1-cos(met['phi']-closestJet['phi'])) +\
+    2.*met['pt']*lepton['pt']*(1-cos(met['phi']-lepton['phi'])) + \
+    2.*lepton['pt']*closestJet['pt']*(cosh(lepton['eta'] - closestJet['eta'])-cos(lepton['phi']-closestJet['phi']))\
+    )
+def cmgMTTopClosestBJetMET(c):
+  if c=="branches":return cmgGetJets("branches")+['met_phi','met_pt','leptonPt','leptonPhi','leptonEta'] 
+  bjets = filter(lambda j:j['btagCSV']>0.679, cmgGetJets(c,  ptMin=40., etaMax=999.))
+  if len(bjets)>0:
+    met = {'pt':c.GetLeaf('met_pt').GetValue(), 'phi':c.GetLeaf('met_phi').GetValue()}
+    lepton = {'pt':c.GetLeaf('leptonPt').GetValue(), 'phi':c.GetLeaf('leptonPhi').GetValue(), 'eta':c.GetLeaf('leptonEta').GetValue()}
+    W = {'phi':atan2(met['pt']*sin(met['phi']) + lepton['pt']*sin(lepton['phi']), met['pt']*cos(met['phi']) + lepton['pt']*cos(lepton['phi']) )}
+    closestBJet = findClosestObject(bjets, W, sortFunc=lambda o1,o2: deltaPhi(o1['phi'], o2['phi']))['obj']
+    return sqrt(\
+      2.*met['pt']*closestBJet['pt']*(1-cos(met['phi']-closestBJet['phi'])) +\
+      2.*met['pt']*lepton['pt']*(1-cos(met['phi']-lepton['phi'])) + \
+      2.*lepton['pt']*closestBJet['pt']*(cosh(lepton['eta'] - closestBJet['eta'])-cos(lepton['phi']-closestBJet['phi']))\
+      )
+  else:
+    return float('nan')
 
 def nJetBinName(njb):
   n=str(list(njb)[0])+"#leq n_{jet}"
