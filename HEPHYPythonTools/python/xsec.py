@@ -37,6 +37,48 @@ xsec['/T5Full_T5Full-1200-1000-800-Decay-MGMMatch50/schoef-T5Full_T5Full-1200-10
 xsec['/T5Full_T5Full-1500-800-100-Decay-MGMMatch50/schoef-T5Full_T5Full-1500-800-100-Decay-MGMMatch50-miniAOD-92bfc1aa0ef8c674e0edabb945b19298/USER'] = gluino13TeV_NLONLL[1500]
 xsec['T1qqqq_1400_325_300'] = gluino13TeV_NLONLL[1400]
 
+xsec["T5Full_1200_1000_800"] = gluino13TeV_NLONLL[1200]
+xsec["T5Full_1500_800_100"]  =  gluino13TeV_NLONLL[1500]
+xsec["SMS_T1qqqq_2J_mGl1000_mLSP800_PU_S14_POSTLS170"] =  gluino13TeV_NLONLL[1000]
+xsec["SMS_T1qqqq_2J_mGl1400_mLSP100_PU_S14_POSTLS170"] =  gluino13TeV_NLONLL[1400]
+xsec["SMS_T1bbbb_2J_mGl1000_mLSP900_PU_S14_POSTLS170"] =  gluino13TeV_NLONLL[1000]
+xsec["SMS_T1bbbb_2J_mGl1500_mLSP100_PU_S14_POSTLS170"] =  gluino13TeV_NLONLL[1500]
+xsec["SMS_T1tttt_2J_mGl1200_mLSP800_PU_S14_POSTLS170"] =  gluino13TeV_NLONLL[1200]
+xsec["SMS_T1tttt_2J_mGl1500_mLSP100_PU_S14_POSTLS170"] =  gluino13TeV_NLONLL[1500]
+#https://twiki.cern.ch/twiki/bin/view/LHCPhysics/SUSYCrossSections13TeVstopsbottom
+xsec["SMS_T2tt_2J_mStop425_mLSP325_PU_S14_POSTLS170"] =  1.31169
+xsec["SMS_T2tt_2J_mStop500_mLSP325_PU_S14_POSTLS170"] = 0.51848
+xsec["SMS_T2tt_2J_mStop650_mLSP325_PU_S14_POSTLS170"] = 0.107045
+xsec["SMS_T2tt_2J_mStop850_mLSP100_PU_S14_POSTLS170"] = 0.0189612
+xsec["SMS_T2bb_2J_mStop600_mLSP580_PU_S14_POSTLS170"] = 0.174599
+xsec["SMS_T2bb_2J_mStop900_mLSP100_PU_S14_POSTLS170"] = 0.0128895
+#CMGTools/TTHAnalysis/python/samples/samples_13TeV_CSA14.py
+#and  https://twiki.cern.ch/twiki/bin/view/LHCPhysics/SUSYCrossSections13TeVstopsbottom
+xsec["SMS_T2qq_2J_mStop600_mLSP550_PU_S14_POSTLS170"] = 1.76645
+xsec["SMS_T2qq_2J_mStop1200_mLSP100_PU_S14_POSTLS170"] = 0.0162846
+xsec["T5WW_2J_mGo1200_mCh1000_mChi800"] = gluino13TeV_NLONLL[1200]
+xsec["T5WW_2J_mGo1500_mCh800_mChi100"] = gluino13TeV_NLONLL[1500]
+xsec["T5WW_2J_mGo1400_mCh315_mChi300"] = gluino13TeV_NLONLL[1400]
+xsec["T1tttt_2J_mGo1300_mStop300_mCh285_mChi280"] = gluino13TeV_NLONLL[1300]
+xsec["T1tttt_2J_mGo1300_mStop300_mChi280"] = gluino13TeV_NLONLL[1300]
+xsec["T1tttt_2J_mGo800_mStop300_mCh285_mChi280"] = gluino13TeV_NLONLL[800]
+xsec["T1tttt_2J_mGo800_mStop300_mChi280"] = gluino13TeV_NLONLL[800]
+xsec["T6ttWW_2J_mSbot600_mCh425_mChi50"] = 0.174599
+xsec["T6ttWW_2J_mSbot650_mCh150_mChi50"] = 0.107045
+xsec["T1ttbb_2J_mGo1500_mChi100"] = gluino13TeV_NLONLL[1500] 
+
+xsec["T1ttbbWW_2J_mGo1000_mCh725_mChi715_3bodydec"] = gluino13TeV_NLONLL[1000] 
+xsec["T1ttbbWW_2J_mGo1000_mCh725_mChi720_3bodydec"] = gluino13TeV_NLONLL[1000]
+xsec["T1ttbbWW_2J_mGo1300_mCh300_mChi290_3bodydec"] = gluino13TeV_NLONLL[1300]
+xsec["T1ttbbWW_2J_mGo1300_mCh300_mChi295_3bodydec"] = gluino13TeV_NLONLL[1300]
+xsec["T1tttt_gluino_1300_LSP_100"] = gluino13TeV_NLONLL[1300]
+xsec["T1tttt_gluino_800_LSP_450"] = gluino13TeV_NLONLL[800]
+xsec["T5qqqqWW_Gl_1400_LSP_100_Chi_325"] = gluino13TeV_NLONLL[1400]
+xsec["T5qqqqWW_Gl_1400_LSP_300_Chi_315"] = gluino13TeV_NLONLL[1400]
+#https://twiki.cern.ch/twiki/bin/view/LHCPhysics/SUSYCrossSections13TeVsquarkantisquark
+xsec["T6qqWW_Sq_950_LSP_300_Chi_350"] = 0.0898112
+
+
 ##------------------------------------------------------------
 ##SUMMER 12
 ##https://twiki.cern.ch/twiki/bin/viewauth/CMS/StandardModelCrossSectionsat8TeV

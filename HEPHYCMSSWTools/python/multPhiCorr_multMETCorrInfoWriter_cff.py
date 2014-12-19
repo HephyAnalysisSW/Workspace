@@ -6,6 +6,7 @@ from Workspace.HEPHYCMSSWTools.multPhiCorr_multMETCorrInfoWriter_PHYS14_cfi impo
 ##____________________________________________________________________________||
 
 pfMEtMultCorrInfoWriter = cms.EDAnalyzer("multMETCorrInfoWriter",
+    vertexCollection = cms.InputTag('offlinePrimaryVertices'),
     srcPFlow = cms.InputTag('particleFlow', ''),
     parameters = multPhiCorr_multMETCorrInfoWriter
 )

@@ -2,10 +2,13 @@
 #include "DataFormats/TrackReco/interface/Track.h"
 #include "DataFormats/TrackReco/interface/TrackFwd.h"
 #include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
+#include "DataFormats/VertexReco/interface/Vertex.h"
 
 #include <string>
 
-multMETCorrInfoWriter::multMETCorrInfoWriter( const edm::ParameterSet & cfg ): moduleLabel_(cfg.getParameter<std::string>("@module_label"))
+multMETCorrInfoWriter::multMETCorrInfoWriter( const edm::ParameterSet & cfg ): 
+  vertices_ ( cfg.getUntrackedParameter< edm::InputTag >("vertexCollection") ),
+  moduleLabel_(cfg.getParameter<std::string>("@module_label"))
 {
   edm::Service<TFileService> fs;
 
@@ -16,8 +19,10 @@ multMETCorrInfoWriter::multMETCorrInfoWriter( const edm::ParameterSet & cfg ): m
   etaMin_.clear();
   etaMax_.clear();
   type_.clear();
+  varType_.clear();
   nbins_.clear();
   counts_.clear();
+  sumPt_.clear();
   MEx_.clear();
   MEy_.clear();
   for (std::vector<edm::ParameterSet>::const_iterator v = cfgCorrParameters_.begin(); v!=cfgCorrParameters_.end(); v++) {
@@ -34,8 +39,9 @@ multMETCorrInfoWriter::multMETCorrInfoWriter( const edm::ParameterSet & cfg ): m
     etaMin_.push_back(etaMin);
     etaMax_.push_back(etaMax);
     nbins_.push_back(nbins);
-    type_.push_back(v->getParameter<int>("type"));
+    varType_.push_back(v->getParameter<int>("varType"));
     counts_.push_back(0);
+    sumPt_.push_back(0.);
     MEx_.push_back(0.);
     MEy_.push_back(0.);
 //    std::cout<<" n/min/max "<<nbins<<" "<<etaMin<<" "<<etaMax<<std::endl;
@@ -52,6 +58,22 @@ multMETCorrInfoWriter::multMETCorrInfoWriter( const edm::ParameterSet & cfg ): m
 
 void multMETCorrInfoWriter::analyze( const edm::Event& evt, const edm::EventSetup& setup) {
 
+  //get primary vertices
+  edm::Handle<std::vector<reco::Vertex> > hpv;
+  try {
+    evt.getByLabel( vertices_, hpv );
+  } catch ( cms::Exception & e ) {
+    std::cout <<"[multMETCorrInfoWriter] error: " << e.what() << std::endl;
+  }
+  std::vector<reco::Vertex> goodVertices;
+  for (unsigned i = 0; i < hpv->size(); i++) {
+    if ( (*hpv)[i].ndof() > 4 &&
+       ( fabs((*hpv)[i].z()) <= 24. ) &&
+       ( fabs((*hpv)[i].position().rho()) <= 2.0 ) )
+       goodVertices.push_back((*hpv)[i]);
+  }
+  int ngoodVertices = goodVertices.size();
+
   for (unsigned i=0;i<counts_.size();i++) {
     counts_[i]=0;
     MEx_[i]=0.;
@@ -66,6 +88,7 @@ void multMETCorrInfoWriter::analyze( const edm::Event& evt, const edm::EventSetu
       if (c.particleId()==type_[j]) {
         if ((c.eta()>etaMin_[j]) and(c.eta()<etaMax_[j])) {
           counts_[j]+=1;
+          sumPt_[j]+=c.pt();
           MEx_[j]-=c.px();
           MEy_[j]-=c.py();
 
@@ -79,9 +102,19 @@ void multMETCorrInfoWriter::analyze( const edm::Event& evt, const edm::EventSetu
   for (std::vector<edm::ParameterSet>::const_iterator v = cfgCorrParameters_.begin(); v!=cfgCorrParameters_.end(); v++) {
     unsigned j=v-cfgCorrParameters_.begin();
 //    std::cout<<"j "<<j<<" "<<v->getParameter<std::string>("name")<<" "<<counts_[j]<<" "<<MEx_[j]<<" "<<MEy_[j]<<std::endl;
-    profile_x_[j]->Fill(counts_[j], MEx_[j]);
-    profile_y_[j]->Fill(counts_[j], MEy_[j]);
-    multiplicity_[j]->Fill(counts_[j]);
+    if (varType_[j]==0) {
+      profile_x_[j]->Fill(counts_[j], MEx_[j]);
+      profile_y_[j]->Fill(counts_[j], MEy_[j]);
+      multiplicity_[j]->Fill(counts_[j]);
+    } else if (varType_[j]==1) {
+      profile_x_[j]->Fill(ngoodVertices, MEx_[j]);
+      profile_y_[j]->Fill(ngoodVertices, MEy_[j]);
+      multiplicity_[j]->Fill(ngoodVertices);
+    } else {
+      profile_x_[j]->Fill(sumPt_[j], MEx_[j]);
+      profile_y_[j]->Fill(sumPt_[j], MEy_[j]);
+      multiplicity_[j]->Fill(sumPt_[j]);
+    }
   }
 }
 

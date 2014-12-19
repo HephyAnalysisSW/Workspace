@@ -5,8 +5,8 @@ from math import sqrt
 
 small = True
 c = ROOT.TChain('Events')
-c.Add(' ~/data/ttJetsCSA1450ns_*.root')
-
+#c.Add(' ~/data/ttJetsCSA1450ns_*.root')
+c.Add('/data/schoef/convertedTuples_v26/copyInc/ttJetsCSA1450ns/histo_ttJetsCSA1450ns_from*.root')
 def getVarValue(c, var, i=0):
   return c.GetLeaf(var).GetValue(i)
 
@@ -109,7 +109,8 @@ def getJets(c):
 #if not small:
 #  pickle.dump(looseMuPtEta2DEff, file('/Users/robertschoefbeck/CloudStation/Workspace/RA4Analysis/plotsRobert/looseMuPtEta2DEff.pkl', 'w'))
 
-looseMuPtEta2DEff = pickle.load(file('/Users/robertschoefbeck/CloudStation/Workspace/RA4Analysis/plotsRobert/looseMuPtEta2DEff.pkl'))
+#looseMuPtEta2DEff = pickle.load(file('/Users/robertschoefbeck/CloudStation/Workspace/RA4Analysis/plotsRobert/looseMuPtEta2DEff.pkl'))
+looseMuPtEta2DEff = pickle.load(file('/data/easilar/results2014/muonTemplates/CSA14_TTJets_efficiencyMap_vetoMuIDPt15_ttJetsCSA1450ns_relIso0.12.pkl'))
 #prefix="njet4"
 
 def matchCollections(coll1, coll2, matchId):
@@ -268,4 +269,5 @@ for h in [h_met, h_ht, h_jet0pt,h_jet0pt_mu,\
   h['prediction'].GetXaxis().SetTitle(h['name'])
   h['truth'].SetLineColor(ROOT.kBlack)
   h['truth'].Draw('same')
-  c1.Print('~/Desktop/plots/'+h['name']+'.png')
+#  c1.Print('~/Desktop/plots/'+h['name']+'.png')
+  c1.Print('/afs/hephy.at/user/e/easilar/www/pngCSA14/ClosureTest/RelIso0_12/'+h['name']+'.png')

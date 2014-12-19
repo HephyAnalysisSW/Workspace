@@ -35,7 +35,7 @@ def getFileList(dir, minAgeDPM=0, histname='histo', xrootPrefix='root://hephyse.
     filelist = []
     p = subprocess.Popen(["dpns-ls -l "+ dir], shell = True , stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     for line in p.stdout.readlines():
-      if not line.count(histname):continue
+      if not (histname=="" or line.count(histname)):continue
       line=line[:-1]
       sline = line.split()
       fname = sline[-1]
@@ -173,14 +173,6 @@ def getPlotFromChain(c, var, binning, cutString = "(1)", weight = "weight", binn
     res.SetBinError(1 , sqrt(res.GetBinError(0)**2 + res.GetBinError(1)**2))
   return res
 
-#def getValue(chain, varname):
-#  alias = chain.GetAlias(varname)
-#  if alias!='':
-#    return chain.GetLeaf( alias ).GetValue()
-#  else:
-#    return chain.GetLeaf( varname ).GetValue()
-#
-
 def deltaPhi(phi1, phi2):
   dphi = phi2-phi1
   if  dphi > pi:
@@ -210,22 +202,38 @@ def invMassOfLightObjects(p31, p32):
   p = sqrt(px*px+py*py+pz*pz)
   return   sqrt((p1 + p2)*(p1 + p2) - p*p)
 
+def deltaR2(l1, l2):
+  return deltaPhi(l1['phi'], l2['phi'])**2 + (l1['eta'] - l2['eta'])**2
 def deltaR(l1, l2):
-  return sqrt(deltaPhi(l1['phi'], l2['phi'])**2 + (l1['eta'] - l2['eta'])**2)
+  return sqrt(deltaR2(l1,l2))
+#Get an object with name-prefix (e.g. LepGood) as a dictionary by specifying index i and variables ['pt','eta',...]
+def getObjDict(c, prefix, variables, i):
+ return {var: c.GetLeaf(prefix+'_'+var).GetValue(i) for var in variables}
 
-def getJets(c):
-  njets = int(c.GetLeaf('njetCount').GetValue())
-  jets =[]
-  for i in range(njets):
-    jets.append({'pt':getVarValue(c, 'jetPt', i), 'eta':getVarValue(c, 'jetEta', i), 'phi':getVarValue(c, 'jetPhi', i)})
-  return jets
+#FIXME: Move this selection specific stuff to the analysis directory (Deg stop)
+#def getJets(c):
+#  njets = int(c.GetLeaf('njetCount').GetValue())
+#  jets =[]
+#  for i in range(njets):
+#    jets.append({'pt':getVarValue(c, 'jetPt', i), 'eta':getVarValue(c, 'jetEta', i), 'phi':getVarValue(c, 'jetPhi', i)})
+#  return jets
+#
+#def minDeltaRLeptonJets(c):
+#  jets = getJets(c)
+#  return min([deltaR(j, {'phi':getVarValue(c, 'softIsolatedMuPhi'), 'eta':getVarValue(c, 'softIsolatedMuEta')}) for j in jets])
+#
+##def getSoftIsolatedMu(c):
+##  return {'pt':c.GetLeaf('softIsolatedMuPt').GetValue(), 'eta':c.GetLeaf('softIsolatedMuEta').GetValue(), 'phi':c.GetLeaf('softIsolatedMuPhi').GetValue()}
+#def htRatio(c):
+#  jets = getJets(c)
+#  metPhi = c.GetLeaf('type1phiMetphi').GetValue()
+##  print calcHTRatio(jets, metPhi)
+#  return calcHTRatio(jets, metPhi)
+#def getISRweightString(mode="Central", var="ptISR"):
+#    if mode.lower()=="down"   : return "(1.*("+var+"<120) + "+".90*( "+var+">120&&"+var+"<150) + "+".80*( "+var+">150&&"+var+"<250) + "+".60*( "+var+">250))"
+#    if mode.lower()=="up": return "(1)"
+#    return "(1.*("+var+"<120) + "+".95*( "+var+">120&&"+var+"<150) + "+".90*( "+var+">150&&"+var+"<250) + "+".80*( "+var+">250))"
 
-def minDeltaRLeptonJets(c):
-  jets = getJets(c)
-  return min([deltaR(j, {'phi':getVarValue(c, 'softIsolatedMuPhi'), 'eta':getVarValue(c, 'softIsolatedMuEta')}) for j in jets])
-
-#def getSoftIsolatedMu(c):
-#  return {'pt':c.GetLeaf('softIsolatedMuPt').GetValue(), 'eta':c.GetLeaf('softIsolatedMuEta').GetValue(), 'phi':c.GetLeaf('softIsolatedMuPhi').GetValue()}
 
 def calcHTRatio(jets, metPhi):
   htRatio = -1
@@ -239,20 +247,19 @@ def calcHTRatio(jets, metPhi):
     htRatio = num/den
   return htRatio
 
-def findClosestObjectDR(jets, obj):
+def findClosestObject(jets, obj, sortFunc=deltaR2):
 ##  jets = getJets(c)
   res=[]
   for i,j in enumerate(jets):
-    res.append([sqrt((j['phi'] - obj['phi'])**2 + (j['eta'] - obj['eta'])**2), j, i])
+    res.append([sortFunc(j, obj), j, i])
   res.sort()
   if len(res)>0:
-    return {'deltaR':res[0][0], 'obj':res[0][1], 'index':res[0][2]}
+    return {'distance':res[0][0], 'obj':res[0][1], 'index':res[0][2]}
 
-def closestMuJetDeltaR(c):
-  return findClosestObjectDR(c, getSoftIsolatedMu(c))['deltaR']
+#def closestMuJetDeltaR(c):
+#  return findClosestObject(c, getSoftIsolatedMu(c))['deltaR']
 
 def invMass(p1 , p2):
-
   pxp1 = p1['pt']*cos(p1['phi']) 
   pyp1 = p1['pt']*sin(p1['phi']) 
   pzp1 = p1['pt']*sinh(p1['eta'])
@@ -264,12 +271,6 @@ def invMass(p1 , p2):
   Ep2 = sqrt(pxp2**2 + pyp2**2 + pzp2**2)
 
   return sqrt( (Ep1 + Ep2)**2 - (pxp1 + pxp2)**2 - (pyp1 + pyp2)**2 - (pzp1 + pzp2)**2)
-
-def htRatio(c):
-  jets = getJets(c)
-  metPhi = c.GetLeaf('type1phiMetphi').GetValue()
-#  print calcHTRatio(jets, metPhi)
-  return calcHTRatio(jets, metPhi)
 
 def KolmogorovDistance(s0, s1): #Kolmogorov distance from two list of values (unbinned, discrete)
   from fractions import Fraction, gcd
@@ -320,22 +321,6 @@ def getISRweight(c, mode="Central"):
   if mode.lower()=='up':
     return 1.0
 
-def getISRweightString(mode="Central", var="ptISR"):
-    if mode.lower()=="down"   : return "(1.*("+var+"<120) + "+".90*( "+var+">120&&"+var+"<150) + "+".80*( "+var+">150&&"+var+"<250) + "+".60*( "+var+">250))"
-    if mode.lower()=="up": return "(1)"
-    return "(1.*("+var+"<120) + "+".95*( "+var+">120&&"+var+"<150) + "+".90*( "+var+">150&&"+var+"<250) + "+".80*( "+var+">250))"
-
-#def goodMuID(c, imu ):
-#  if isPF and (isGlobal or isTracker) and pt>5. and abs(eta)<2.1 and abs(dz)<0.5:
-#    return {'pt':pt, 'phi':getVarValue(c, 'muonsPhi', imu), 'eta':eta, 'IsGlobal':isGlobal, 'IsTracker':isTracker, 'IsPF':isPF, 'relIso':getVarValue(c, 'muonsPFRelIso', imu), 'Dz':dz}
-#
-#
-#def getHardestMuon(c):
-#  for imu in reversed(range(int(getVarValue(c, 'nmuCount')))):
-#    relIso = getVarValue(c, 'muRelIso', imu)
-#    pt = getVarValue(c, 'muPt', imu)
-#    if (pt<20. and pt*relIso<10) or (pt>20. and relIso<0.2):
-#      return {'pt':getVarValue(c, 'muPt', imu), 'eta':getVarValue(c, 'muEta', imu), 'phi':getVarValue(c, 'muPhi', imu), 'pdg':getVarValue(c, 'muPdg', imu)}
 def calcMT(lepton, met):
   if lepton and met:
     return sqrt(2.*met['pt']*lepton['pt']*(1-cos(lepton['phi'] - met['phi'])))
