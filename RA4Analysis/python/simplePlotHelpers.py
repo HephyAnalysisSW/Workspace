@@ -212,7 +212,7 @@ def sumStackHistos(stack):
         l[i].histo.Add(l[j].histo)
 
 def drawStack(stk, maskedArea=None):
-  print "maskedArea",maskedArea
+#  print "maskedArea",maskedArea
   stuff=[]
   try:
     l = ROOT.TLegend(*(stk.options['legend']['coordinates']))
@@ -245,7 +245,7 @@ def drawStack(stk, maskedArea=None):
           if y>0:
             logyMax = log(ymin,10) + (log(y/ymin, 10) + deltaLogY)/yFracMax
             logYMaxGlobal = logyMax if logyMax>logYMaxGlobal else logYMaxGlobal
-            print iBin, y, logyMax, logYMaxGlobal
+#            print iBin, y, logyMax, logYMaxGlobal
   else:
     logYMaxGlobal=None
   if logYMaxGlobal: logYMaxGlobal = None if logYMaxGlobal == log(ymin,10) else logYMaxGlobal
