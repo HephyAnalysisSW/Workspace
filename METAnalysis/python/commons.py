@@ -131,7 +131,6 @@ egamma_HF_Plus['sumETBinning']                 = [5*25,0,5*250]
 #h_HF['sumETBinning']                           = [5*25,0,5*500]
 #egamma_HF['sumETBinning']                      = [5*25,0,5*500]
 
-
 allMaps = [h, h0Barrel, h0EndcapPlus, h0EndcapMinus, gammaBarrel, gammaEndcapPlus, gammaEndcapMinus, gammaForwardPlus, gammaForwardMinus, e, 
            h_HF_Minus, h_HF_Plus, \
 #           h_HF_InnerMostRingsMinus, h_HF_InnerMostRingsPlus, 

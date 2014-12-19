@@ -54,9 +54,9 @@ for subdir in subdirnames:
     for line in p.stdout.readlines():
       line = line[:-1].split()[-1]
       filenamesNameServer.append(line)
-  for file in diff(filenamesNameServer , filenames):
-    print "Only on name server:", file  
-    onlyOnNameServer.append(subdirname+file)
+    for file in diff(filenamesNameServer , filenames):
+      print "Only on name server:", file  
+      onlyOnNameServer.append(subdirname+file)
   numbers=[]
   for file in filenames:
     sstring = file.split("_")
