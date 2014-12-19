@@ -29,8 +29,8 @@ cutBranches = ["single*", "nLoose*", "nTight*", "leptonPt", "met_phi", "htJet40j
 
 for i in range(1):
   if i==0:
-    prefix = 'soft_ht750-met500-3j-0b-diLepVeto'
-    presel="singleMuonic&&nLooseSoftLeptons==1&&nTightSoftLeptons==1&&nTightHardLeptons==0&&met>500&&htJet40ja>750&&nBJetMedium25==0&&nJet40a>=3"
+    prefix = 'soft_ht500-met500-3j-0b-diLepVeto-2j200'
+    presel="singleMuonic&&nLooseSoftLeptons==1&&nTightSoftLeptons==1&&nTightHardLeptons==0&&met>500&&htJet40ja>500&&nBJetMedium25==0&&nJet40a>=3&&Jet_pt[1]>200"
 #  if i==1:
 #    prefix = 'soft_ht500-st250-6j-0b-diLepVeto'
 #    presel="singleMuonic&&nLooseSoftLeptons==1&&nTightSoftLeptons==1&&nTightHardLeptons==0&&st>250&&htJet40ja>500&&nBJetMedium25==0&&nJet40a>=6"
@@ -199,13 +199,6 @@ for i in range(1):
       cut={'string':cutString,'func':None})
   allStacks.append(jet4pt_stack)
 
-  test_stack  = getStack(
-      labels={'x':'test','y':'Number of Events'},
-      var={'name':'nMediumBTags','TTreeFormula':"Sum$(Jet_pt>100)", 'overFlow':'upper'},
-      binning={'binning':[10,0,10]},
-      cut={'string':cutString,'func':None},
-      options={'yRange':[0.07,None]})
-
   binningMTCoarse = [0,120,220,320,420,800]
   mT_stack  = getStack(
       labels={'x':'m_{T} (GeV)','y':'Number of Events / 10 GeV'}, 
@@ -263,19 +256,19 @@ for i in range(1):
       cut={'string':cutString,'func':None})
   allStacks.append(mTClosestJetMET_zoomed_stack)
 
-  mTClosestBJetMET_stack  = getStack(
-      labels={'x':'m_{T, closest b-jet, #slash{E}_{T}} (GeV)','y':'Number of Events / 10 GeV'}, 
-      var={'name':'mTClosestBJetMET','func':cmgMTClosestBJetMET,'branches':cmgMTClosestBJetMET('branches'), 'overFlow':'upper'}, 
-      binning={'binning':binningMTCoarse, 'isExplicit':True}, 
-      cut={'string':cutString,'func':None})
-  allStacks.append(mTClosestBJetMET_stack)
-
-  mTClosestBJetMET_zoomed_stack  = getStack(
-      labels={'x':'m_{T, closest b-jet, #slash{E}_{T}} (GeV)','y':'Number of Events / 10 GeV'}, 
-      var={'name':'mTClosestBJetMET_zoomed','func':cmgMTClosestBJetMET,'branches':cmgMTClosestBJetMET('branches'), 'overFlow':'upper'}, 
-      binning={'binning':(40,0,400), 'isExplicit':False}, 
-      cut={'string':cutString,'func':None})
-  allStacks.append(mTClosestBJetMET_zoomed_stack)
+#  mTClosestBJetMET_stack  = getStack(
+#      labels={'x':'m_{T, closest b-jet, #slash{E}_{T}} (GeV)','y':'Number of Events / 10 GeV'}, 
+#      var={'name':'mTClosestBJetMET','func':cmgMTClosestBJetMET,'branches':cmgMTClosestBJetMET('branches'), 'overFlow':'upper'}, 
+#      binning={'binning':binningMTCoarse, 'isExplicit':True}, 
+#      cut={'string':cutString,'func':None})
+#  allStacks.append(mTClosestBJetMET_stack)
+#
+#  mTClosestBJetMET_zoomed_stack  = getStack(
+#      labels={'x':'m_{T, closest b-jet, #slash{E}_{T}} (GeV)','y':'Number of Events / 10 GeV'}, 
+#      var={'name':'mTClosestBJetMET_zoomed','func':cmgMTClosestBJetMET,'branches':cmgMTClosestBJetMET('branches'), 'overFlow':'upper'}, 
+#      binning={'binning':(40,0,400), 'isExplicit':False}, 
+#      cut={'string':cutString,'func':None})
+#  allStacks.append(mTClosestBJetMET_zoomed_stack)
 
   mTTopClosestJetMET_stack  = getStack(
       labels={'x':'m_{T, closest jet, #slash{E}_{T}}^{top} (GeV)','y':'Number of Events / 10 GeV'}, 
@@ -291,34 +284,64 @@ for i in range(1):
       cut={'string':cutString,'func':None})
   allStacks.append(mTTopClosestJetMET_zoomed_stack)
 
-  mTTopClosestBJetMET_stack  = getStack(
-      labels={'x':'m_{T, closest b-jet, #slash{E}_{T}}^{top} (GeV)','y':'Number of Events / 10 GeV'}, 
-      var={'name':'mTTopClosestBJetMET','func':cmgMTTopClosestBJetMET, 'branches':cmgMTTopClosestBJetMET('branches'), 'overFlow':'upper'}, 
-      binning={'binning':[20,0,2000], 'isExplicit':False}, 
-      cut={'string':cutString,'func':None})
-  allStacks.append(mTTopClosestBJetMET_stack)
+#  mTTopClosestBJetMET_stack  = getStack(
+#      labels={'x':'m_{T, closest b-jet, #slash{E}_{T}}^{top} (GeV)','y':'Number of Events / 10 GeV'}, 
+#      var={'name':'mTTopClosestBJetMET','func':cmgMTTopClosestBJetMET, 'branches':cmgMTTopClosestBJetMET('branches'), 'overFlow':'upper'}, 
+#      binning={'binning':[20,0,2000], 'isExplicit':False}, 
+#      cut={'string':cutString,'func':None})
+#  allStacks.append(mTTopClosestBJetMET_stack)
+#
+#  mTTopClosestBJetMET_zoomed_stack  = getStack(
+#      labels={'x':'m_{T, closest b-jet, #slash{E}_{T}}^{top} (GeV)','y':'Number of Events / 10 GeV'}, 
+#      var={'name':'mTTopClosestBJetMET_zoomed','func':cmgMTTopClosestBJetMET, 'branches':cmgMTTopClosestBJetMET('branches'), 'overFlow':'upper'}, 
+#      binning={'binning':[20,0,400], 'isExplicit':False}, 
+#      cut={'string':cutString,'func':None})
+#  allStacks.append(mTTopClosestBJetMET_zoomed_stack)
 
-  mTTopClosestBJetMET_zoomed_stack  = getStack(
-      labels={'x':'m_{T, closest b-jet, #slash{E}_{T}}^{top} (GeV)','y':'Number of Events / 10 GeV'}, 
-      var={'name':'mTTopClosestBJetMET_zoomed','func':cmgMTTopClosestBJetMET, 'branches':cmgMTTopClosestBJetMET('branches'), 'overFlow':'upper'}, 
-      binning={'binning':[20,0,400], 'isExplicit':False}, 
-      cut={'string':cutString,'func':None})
-  allStacks.append(mTTopClosestBJetMET_zoomed_stack)
+#  minDPhiBJet_stack  = getStack(
+#      labels={'x':'min#Delta#Phi(#slash{E}_{T},b-j_{1})','y':'Number of Events'}, 
+#      var={'name':'minDPhiBJet','func':cmgMinDPhiBJet, 'branches':cmgMinDPhiJet('branches'), 'overFlow':'both'}, 
+#      binning={'binning':[20,0,pi], 'isExplicit':False}, 
+#      cut={'string':cutString,'func':None})
+#  allStacks.append(minDPhiBJet_stack)
 
-  minDPhiBJet_stack  = getStack(
-      labels={'x':'min#Delta#Phi(#slash{E}_{T},b-j_{1})','y':'Number of Events'}, 
-      var={'name':'minDPhiBJet','func':cmgMinDPhiBJet, 'branches':cmgMinDPhiJet('branches'), 'overFlow':'both'}, 
+  dPhiLeadingJet_stack  = getStack(
+      labels={'x':'#Delta#Phi(#slash{E}_{T},j_{1})','y':'Number of Events'}, 
+      var={'name':'dPhiLeadingJet','func':lambda c:cmgMinDPhiJet(c,1), 'branches':cmgMinDPhiJet('branches'), 'overFlow':'both'}, 
       binning={'binning':[20,0,pi], 'isExplicit':False}, 
       cut={'string':cutString,'func':None})
-  allStacks.append(minDPhiBJet_stack)
-
+  allStacks.append(dPhiLeadingJet_stack)
+  minDPhi2Jet_stack  = getStack(
+      labels={'x':'min#Delta#Phi(#slash{E}_{T},j_{1,2})','y':'Number of Events'}, 
+      var={'name':'minDPhi2Jet','func':lambda c:cmgMinDPhiJet(c,2), 'branches':cmgMinDPhiJet('branches'), 'overFlow':'both'}, 
+      binning={'binning':[20,0,pi], 'isExplicit':False}, 
+      cut={'string':cutString,'func':None})
+  allStacks.append(minDPhi2Jet_stack)
   minDPhi3Jet_stack  = getStack(
       labels={'x':'min#Delta#Phi(#slash{E}_{T},j_{1,2,3})','y':'Number of Events'}, 
-      var={'name':'minDPhi3Jet','func':cmgMinDPhiJet, 'branches':cmgMinDPhiJet('branches'), 'overFlow':'both'}, 
+      var={'name':'minDPhi3Jet','func':lambda c:cmgMinDPhiJet(c,3), 'branches':cmgMinDPhiJet('branches'), 'overFlow':'both'}, 
       binning={'binning':[20,0,pi], 'isExplicit':False}, 
       cut={'string':cutString,'func':None})
   allStacks.append(minDPhi3Jet_stack)
+  minDPhi4Jet_stack  = getStack(
+      labels={'x':'min#Delta#Phi(#slash{E}_{T},j_{1-4})','y':'Number of Events'}, 
+      var={'name':'minDPhi4Jet','func':lambda c:cmgMinDPhiJet(c,4), 'branches':cmgMinDPhiJet('branches'), 'overFlow':'both'}, 
+      binning={'binning':[40,0,pi], 'isExplicit':False}, 
+      cut={'string':cutString,'func':None})
+  allStacks.append(minDPhi4Jet_stack)
 
+  htOrthMET_stack  = getStack(
+      labels={'x':'H_{T} (GeV)','y':'Number of Events / 50 GeV'}, 
+      var={'name':'htOrthMET','func':cmgHTOrthMET, 'overFlow':'upper'}, 
+      binning={'binning':[1650/50,0,1650]}, 
+      cut={'string':cutString,'func':None})
+  allStacks.append(htOrthMET_stack)
+  htRatio_stack  = getStack(
+      labels={'x':'H_{T} (GeV)','y':'Number of Events / 50 GeV'}, 
+      var={'name':'htRatio','func':cmgHTRatio, 'overFlow':'upper'}, 
+      binning={'binning':[20,0.4,1]}, 
+      cut={'string':cutString,'func':None})
+  allStacks.append(htRatio_stack)
 
   loopAndFill(allStacks)
 

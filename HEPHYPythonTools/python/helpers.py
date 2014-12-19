@@ -247,7 +247,7 @@ def calcHTRatio(jets, metPhi):
     htRatio = num/den
   return htRatio
 
-def findClosestObject(jets, obj, sortFunc=deltaR2):
+def findClosestObject(jets, obj, sortFunc=lambda o1, o2: deltaR2(o1,o2)):
 ##  jets = getJets(c)
   res=[]
   for i,j in enumerate(jets):
