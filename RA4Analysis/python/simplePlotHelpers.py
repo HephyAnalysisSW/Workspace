@@ -1,4 +1,5 @@
 import ROOT, copy, numbers
+from math import log
 import types
 from array import array
 ROOT.gROOT.LoadMacro("../../HEPHYPythonTools/scripts/root/tdrstyle.C")
@@ -73,6 +74,10 @@ class stack:
   def __init__(self, stackLists, options):
     self.stackLists = stackLists
     self.options = options
+    try:
+      self.options['yRange'] = list(self.options['yRange'])
+    except:
+      pass
     self.usedBranches = []
   def __getitem__(self, p):return self.stackLists[p]
 
@@ -220,7 +225,7 @@ def drawStack(stk, maskedArea=None):
     stuff.append(l)
   except:pass
   first=True
-  print stk.options
+#  print stk.options
   try:
     autoAdjustY = stk.options['yRange'][1].lower()=='auto' and isinstance(stk.options['yRange'][0], numbers.Number)
   except:
@@ -231,17 +236,19 @@ def drawStack(stk, maskedArea=None):
     for s in stk.stackLists:
       for p in s:
         for iBin in range(1, 1 + p.histo.GetNbinsX()):
-          xLowAbs, xHighAbs = p.histo.GetbinLowEdge(iBin), p.histo.GetbinLowEdge(iBin)+p.histo.GetbinWidth(iBin)
+          xLowAbs, xHighAbs = p.histo.GetBinLowEdge(iBin), p.histo.GetBinLowEdge(iBin)+p.histo.GetBinWidth(iBin)
           xLow = (xLowAbs -  p.histo.GetXaxis().GetXmin())/(p.histo.GetXaxis().GetXmax() - p.histo.GetXaxis().GetXmin())
           xHigh = (xHighAbs -  p.histo.GetXaxis().GetXmin())/(p.histo.GetXaxis().GetXmax() - p.histo.GetXaxis().GetXmin())
           yFracMax =  maskedArea['yLow'] if xHigh>maskedArea['xLow'] and xLow<maskedArea['xHigh'] else 1
-          deltaLogY = log(1.5, 10) if yFracMax==1 else log(1.2,10)
-          y =  p.histo.GetbinContent(iBin)
-          logyMax = (log(y/ymin, 10) + deltaLogY)/yFracMax
-          logYMaxGlobal = logyMax if logyMax>logYMaxGlobal else logYMaxGlobal
-          print iBin, y, logyMax, logYMaxGlobal
+          deltaLogY = 0.5 if yFracMax==1 else 0.3
+          y =  p.histo.GetBinContent(iBin)
+          if y>0:
+            logyMax = log(ymin,10) + (log(y/ymin, 10) + deltaLogY)/yFracMax
+            logYMaxGlobal = logyMax if logyMax>logYMaxGlobal else logYMaxGlobal
+            print iBin, y, logyMax, logYMaxGlobal
   else:
-    logYMaxGlobal=None 
+    logYMaxGlobal=None
+  if logYMaxGlobal: logYMaxGlobal = None if logYMaxGlobal == log(ymin,10) else logYMaxGlobal
   for s in stk.stackLists:
     for p in s:
       hcopy = p.histo.Clone()
