@@ -6,6 +6,14 @@
 
 #include <string>
 
+std::string namePostFix (int varType) {
+
+  if (varType==0) return std::string("multiplicity");
+  if (varType==1) return std::string("ngoodVertices");
+  if (varType==2) return std::string("sumPt");
+  return std::string("unknown");
+}
+
 multMETCorrInfoWriter::multMETCorrInfoWriter( const edm::ParameterSet & cfg ): 
   vertices_ ( cfg.getUntrackedParameter< edm::InputTag >("vertexCollection") ),
   moduleLabel_(cfg.getParameter<std::string>("@module_label"))
@@ -45,14 +53,14 @@ multMETCorrInfoWriter::multMETCorrInfoWriter( const edm::ParameterSet & cfg ):
     MEx_.push_back(0.);
     MEy_.push_back(0.);
 //    std::cout<<" n/min/max "<<nbins<<" "<<etaMin<<" "<<etaMax<<std::endl;
-    profile_x_.push_back(fs->make<TProfile>(std::string(moduleLabel_).append("_").append(v->getParameter<std::string>("name")).append("_Px").c_str(),"Px", nbins, nMin, nMax, -300,300));
-    profile_y_.push_back(fs->make<TProfile>(std::string(moduleLabel_).append("_").append(v->getParameter<std::string>("name")).append("_Py").c_str(),"Py", nbins, nMin, nMax, -300,300));
+    profile_x_.push_back(fs->make<TProfile>(std::string(moduleLabel_).append("_").namePostFix(varType_).append("_").append(v->getParameter<std::string>("name")).append("_Px").c_str(),"Px", nbins, nMin, nMax, -300,300));
+    profile_y_.push_back(fs->make<TProfile>(std::string(moduleLabel_).append("_").namePostFix(varType_).append("_").append(v->getParameter<std::string>("name")).append("_Py").c_str(),"Py", nbins, nMin, nMax, -300,300));
 
-    occupancy_.push_back(fs->make<TH2F>(std::string(moduleLabel_).append("_").append(v->getParameter<std::string>("name")).append("_occupancy").c_str(),"occupancy",  etaNBins, etaMin, etaMax, phiNBins, phiMin, phiMax));
-    energy_.push_back(fs->make<TH2F>(std::string(moduleLabel_).append("_").append(v->getParameter<std::string>("name")).append("_energy").c_str(),"energy",           etaNBins, etaMin, etaMax, phiNBins, phiMin, phiMax));
-    pt_.push_back(fs->make<TH2F>(std::string(moduleLabel_).append("_").append(v->getParameter<std::string>("name")).append("_pt").c_str(),"pt",                       etaNBins, etaMin, etaMax, phiNBins, phiMin, phiMax));
+    occupancy_.push_back(fs->make<TH2F>(std::string(moduleLabel_).append("_").namePostFix(varType_).append("_").append(v->getParameter<std::string>("name")).append("_occupancy").c_str(),"occupancy",  etaNBins, etaMin, etaMax, phiNBins, phiMin, phiMax));
+    energy_.push_back(fs->make<TH2F>(std::string(moduleLabel_).append("_").namePostFix(varType_).append("_").append(v->getParameter<std::string>("name")).append("_energy").c_str(),"energy",           etaNBins, etaMin, etaMax, phiNBins, phiMin, phiMax));
+    pt_.push_back(fs->make<TH2F>(std::string(moduleLabel_).append("_").namePostFix(varType_).append("_").append(v->getParameter<std::string>("name")).append("_pt").c_str(),"pt",                       etaNBins, etaMin, etaMax, phiNBins, phiMin, phiMax));
 
-    multiplicity_.push_back(fs->make<TH1F>(std::string(moduleLabel_).append("_").append(v->getParameter<std::string>("name")).append("_multiplicity").c_str(),"multiplicity", nbins, nMin, nMax));
+    multiplicity_.push_back(fs->make<TH1F>(std::string(moduleLabel_).append("_").namePostFix(varType_).append("_").append(v->getParameter<std::string>("name")).append("_multiplicity").c_str(),"multiplicity", nbins, nMin, nMax));
   }
 }
 
