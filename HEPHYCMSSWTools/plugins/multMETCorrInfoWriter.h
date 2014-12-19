@@ -31,7 +31,7 @@ private:
   std::vector<edm::ParameterSet> cfgCorrParameters_;
   std::vector<TProfile* > profile_x_ , profile_y_;
   std::vector<TH2F* > occupancy_ , energy_, pt_;
-  std::vector<TH1F* > multiplicity_;
+  std::vector<TH1F* > variable_;
 
   std::vector<double> etaMin_, etaMax_, MEx_, MEy_, sumPt_;
   std::vector<int> type_, varType_, nbins_, counts_, etaNBins_;

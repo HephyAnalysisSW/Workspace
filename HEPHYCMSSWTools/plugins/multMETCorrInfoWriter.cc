@@ -49,6 +49,7 @@ multMETCorrInfoWriter::multMETCorrInfoWriter( const edm::ParameterSet & cfg ):
     nbins_.push_back(nbins);
     int varType(v->getParameter<int>("varType"));
     varType_.push_back(varType);
+    type_.push_back(v->getParameter<int>("type"));
     counts_.push_back(0);
     sumPt_.push_back(0.);
     MEx_.push_back(0.);
@@ -61,7 +62,7 @@ multMETCorrInfoWriter::multMETCorrInfoWriter( const edm::ParameterSet & cfg ):
     energy_.push_back(fs->make<TH2F>(std::string(moduleLabel_).append("_").append(namePostFix(varType)).append("_").append(v->getParameter<std::string>("name")).append("_energy").c_str(),"energy",           etaNBins, etaMin, etaMax, phiNBins, phiMin, phiMax));
     pt_.push_back(fs->make<TH2F>(std::string(moduleLabel_).append("_").append(namePostFix(varType)).append("_").append(v->getParameter<std::string>("name")).append("_pt").c_str(),"pt",                       etaNBins, etaMin, etaMax, phiNBins, phiMin, phiMax));
 
-    multiplicity_.push_back(fs->make<TH1F>(std::string(moduleLabel_).append("_").append(namePostFix(varType)).append("_").append(v->getParameter<std::string>("name")).append("_multiplicity").c_str(),"multiplicity", nbins, nMin, nMax));
+    variable_.push_back(fs->make<TH1F>(std::string(moduleLabel_).append("_").append(namePostFix(varType)).append("_").append(v->getParameter<std::string>("name")).append("_variable").c_str(),"variable", nbins, nMin, nMax));
   }
 }
 
@@ -85,6 +86,7 @@ void multMETCorrInfoWriter::analyze( const edm::Event& evt, const edm::EventSetu
 
   for (unsigned i=0;i<counts_.size();i++) {
     counts_[i]=0;
+    sumPt_[i]=0;
     MEx_[i]=0.;
     MEy_[i]=0.;
   } 
@@ -95,7 +97,7 @@ void multMETCorrInfoWriter::analyze( const edm::Event& evt, const edm::EventSetu
     const reco::PFCandidate& c = particleFlow->at(i);
     for (unsigned j=0; j<type_.size(); j++) {
       if (c.particleId()==type_[j]) {
-        if ((c.eta()>etaMin_[j]) and(c.eta()<etaMax_[j])) {
+        if ((c.eta()>etaMin_[j]) and (c.eta()<etaMax_[j])) {
           counts_[j]+=1;
           sumPt_[j]+=c.pt();
           MEx_[j]-=c.px();
@@ -110,19 +112,21 @@ void multMETCorrInfoWriter::analyze( const edm::Event& evt, const edm::EventSetu
   }
   for (std::vector<edm::ParameterSet>::const_iterator v = cfgCorrParameters_.begin(); v!=cfgCorrParameters_.end(); v++) {
     unsigned j=v-cfgCorrParameters_.begin();
-//    std::cout<<"j "<<j<<" "<<v->getParameter<std::string>("name")<<" "<<counts_[j]<<" "<<MEx_[j]<<" "<<MEy_[j]<<std::endl;
+//    std::cout<<"j "<<j<<" "<<v->getParameter<std::string>("name")<<" varType "<<varType_[j]<<" counts "<<counts_[j]<<" sumPt "<<sumPt_[j]<<" nvtx "<<ngoodVertices<<" "<<MEx_[j]<<" "<<MEy_[j]<<std::endl;
     if (varType_[j]==0) {
       profile_x_[j]->Fill(counts_[j], MEx_[j]);
       profile_y_[j]->Fill(counts_[j], MEy_[j]);
-      multiplicity_[j]->Fill(counts_[j]);
-    } else if (varType_[j]==1) {
+      variable_[j]->Fill(counts_[j]);
+    } 
+    if (varType_[j]==1) {
       profile_x_[j]->Fill(ngoodVertices, MEx_[j]);
       profile_y_[j]->Fill(ngoodVertices, MEy_[j]);
-      multiplicity_[j]->Fill(ngoodVertices);
-    } else {
+      variable_[j]->Fill(ngoodVertices);
+    } 
+    if (varType_[j]==2) {
       profile_x_[j]->Fill(sumPt_[j], MEx_[j]);
       profile_y_[j]->Fill(sumPt_[j], MEy_[j]);
-      multiplicity_[j]->Fill(sumPt_[j]);
+      variable_[j]->Fill(sumPt_[j]);
     }
   }
 }
