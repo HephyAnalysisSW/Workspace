@@ -1,18 +1,6 @@
 import ROOT
-import pickle
-from commons import label
-
-#from Workspace.HEPHYPythonTools.helpers import getVarValue, getObjFromFile
-def getObjFromFile(fname, hname):
-  f = ROOT.TFile(fname)
-  assert not f.IsZombie()
-  f.cd()
-  htmp = f.Get(hname)
-  if not htmp:  return htmp
-  ROOT.gDirectory.cd('PyROOT:/')
-  res = htmp.Clone()
-  f.Close()
-  return res
+import pickle, os
+from Workspace.HEPHYPythonTools.helpers import getChain, getObjFromFile
 
 from math import pi, cos, sin, sqrt, atan2
 ROOT.gROOT.ProcessLine(".L ../../HEPHYPythonTools/scripts/root/tdrstyle.C")
@@ -23,45 +11,77 @@ from optparse import OptionParser
 parser = OptionParser()
 parser.add_option("--prefix", dest="prefix", default="13TeV-WJetsToLNu_HT-100to200-Spring14dr-PU20bx25_POSTLS170_V5", type="string", action="store", help="prefix:Which prefix.")
 parser.add_option("--maps", dest="maps", default='all', type="string", action="store", help="Which maps.")
-parser.add_option("--infile", dest="infile", default='/data/schoef/metCorr_140605/13TeV-WJetsToLNu_HT-100to200-Spring14dr-PU20bx25_POSTLS170_V5.root', type="string", action="store", help="Which infile.")
+parser.add_option("--small", dest="small", action="store_true", help="Just do a small subset.")
+parser.add_option("--input", dest="input", default='/data/schoef/pfCand_271114/TT_Tune4C_13TeV-pythia8-tauola_Phys14DR-PU20bx25_tsg_PHYS14_25_V1-v1_AODSIM/', type="string", action="store", help="Which input.")
 parser.add_option("--plotDir", dest="plotDir", default='/afs/hephy.at/user/s/schoefbeck/www/pngPF/', type="string", action="store", help="Which plotDir.")
 
 (options, args) = parser.parse_args()
 prefixes=[]
 if options.prefix!='':
   prefixes.append(options.prefix)
-
+if options.small:
+  prefixes.append('small')
 prefix = '_'.join(prefixes)
 if prefix!='':
   prefix+='_'
-print 'maps', options.maps,'prefix',options.prefix, 'infile', options.infile
+print 'maps', options.maps,'prefix',options.prefix, 'input', options.input
 if options.maps=='all':
   maps = allMaps
 else:
   exec("maps = [" +options.maps+ "]")
+if os.path.isdir(options.input):
+  c = getChain(options.input, maxN=1) if options.small else getChain(options.input)
+else:
+  c=None
+#nvtx
+h['fitRange'] = [0,50]
+h0Barrel['fitRange'] = [0,50]
+h0EndcapPlus['fitRange'] = [0,50]
+h0EndcapMinus['fitRange'] = [0,50]
+gammaBarrel['fitRange'] = [0,50]
+gammaEndcapPlus['fitRange']   = [0,50]
+gammaEndcapMinus['fitRange']  = [0,50]
+gammaForwardPlus['fitRange'] = [0,50]
+gammaForwardMinus['fitRange'] = [0,50]
+e['fitRange'] = [0,50]
+mu['fitRange'] = [0,50]
+h_HF_Minus['fitRange'] = [0,50]
+h_HF_Plus['fitRange'] = [0,50]
+egamma_HF_Minus['fitRange'] = [0,50]
+egamma_HF_Plus['fitRange'] = [0,50]
+##pt
+#h['fitRange'] = [0,2000]
+#h0Barrel['fitRange'] = [0,150]
+#h0EndcapPlus['fitRange'] = [0,250]
+#h0EndcapMinus['fitRange'] = [0,250]
+#gammaBarrel['fitRange'] = [0,600]
+#gammaEndcapPlus['fitRange']   = [0,250]
+#gammaEndcapMinus['fitRange']  = [0,250]
+#gammaForwardPlus['fitRange'] = [0,20]
+#gammaForwardMinus['fitRange'] = [0,20]
+#e['fitRange'] = [0,150]
+#mu['fitRange'] = [0,150]
+#h_HF_Minus['fitRange'] = [0,300]
+#h_HF_Plus['fitRange'] = [0,300]
+#egamma_HF_Minus['fitRange'] = [0,100]
+#egamma_HF_Plus['fitRange'] = [0,100]
 
-
-h['fitRange'] = [0,2000]
-h0Barrel['fitRange'] = [0,120]
-h0EndcapPlus['fitRange'] = [0,80]
-h0EndcapMinus['fitRange'] = [0,80]
-gammaBarrel['fitRange'] = [0,1200]
-gammaEndcapPlus['fitRange']   = [0,250]
-gammaEndcapMinus['fitRange']  = [0,250]
-gammaForwardPlus['fitRange'] = [0,10]
-gammaForwardMinus['fitRange'] = [0,10]
-e['fitRange'] = [0,10]
-mu['fitRange'] = [0,10]
-h_HF_Minus['fitRange'] = [0,300]
-h_HF_Plus['fitRange'] = [0,300]
-#h_HF_InnerMostRingsMinus['fitRange'] = [0,50]
-#h_HF_InnerMostRingsPlus['fitRange'] = [0,50]
-egamma_HF_Minus['fitRange'] = [0,300]
-egamma_HF_Plus['fitRange'] = [0,300]
-#egamma_HF_InnerMostRingsMinus['fitRange'] = [0,50]
-#egamma_HF_InnerMostRingsPlus['fitRange'] = [0,50]
-#h_HF['fitRange'] = [0,500]
-#egamma_HF['fitRange'] = [0,500]
+#multiplicity
+#h['fitRange'] = [0,2000]
+#h0Barrel['fitRange'] = [0,120]
+#h0EndcapPlus['fitRange'] = [0,80]
+#h0EndcapMinus['fitRange'] = [0,80]
+#gammaBarrel['fitRange'] = [0,1200]
+#gammaEndcapPlus['fitRange']   = [0,250]
+#gammaEndcapMinus['fitRange']  = [0,250]
+#gammaForwardPlus['fitRange'] = [0,10]
+#gammaForwardMinus['fitRange'] = [0,10]
+#e['fitRange'] = [0,10]
+#mu['fitRange'] = [0,10]
+#h_HF_Minus['fitRange'] = [0,300]
+#h_HF_Plus['fitRange'] = [0,300]
+#egamma_HF_Minus['fitRange'] = [0,300]
+#egamma_HF_Plus['fitRange'] = [0,300]
 
 h['zoomRange'] = [-40,40]
 h0Barrel['zoomRange'] = [-2,2]
@@ -76,16 +96,14 @@ e['zoomRange'] = [-20,20]
 mu['zoomRange'] = [-20,20]
 h_HF_Minus['zoomRange'] = [-5,5]
 h_HF_Plus['zoomRange'] = [-5,5]
-#h_HF_InnerMostRingsMinus['zoomRange'] = [-5,5]
-#h_HF_InnerMostRingsPlus['zoomRange'] = [-5,5]
 egamma_HF_Minus['zoomRange'] = [-5,5]
 egamma_HF_Plus['zoomRange'] = [-5,5]
-#egamma_HF_InnerMostRingsMinus['zoomRange'] = [-2,2]
-#egamma_HF_InnerMostRingsPlus['zoomRange'] = [-2,2]
 
 
 def getLinSquStr(f):
   return  "10^{-6}#upoint ("+str(round(10**6*f.GetParameter(0),1))+'#pm '+str(round(10**6*abs(f.GetParError(0)),1))+") #upoint n^{2}+10^{-3}#upoint("+str(round(10**3*f.GetParameter(1),1))+'#pm '+str(round(10**3*abs(f.GetParError(1)),1))+") #upoint n"
+def getLinSquStrNoFac(f):
+  return  "("+str(round(f.GetParameter(0),1))+'#pm '+str(round(abs(f.GetParError(0)),1))+") #upoint n^{2}+("+str(round(f.GetParameter(1),1))+'#pm '+str(round(abs(f.GetParError(1)),1))+") #upoint n"
 def getSquStr(f):
   return  "10^{-6}#upoint ("+str(round(10**6*f.GetParameter(0),1))+'#pm '+str(round(10**6*abs(f.GetParError(0)),1))+") #upoint n^{2}"
 def getPropStr(f):
@@ -95,33 +113,45 @@ def getLinStr(f):
 
 for map in maps:
   map['func'] = '[0]*x**2+[1]*x'
-  map['strFunc'] = getLinSquStr
+#  map['candFunc'] = '(1)' #multiplicity
+#  map['candFunc'] = 'candPt' #pt
+#  map['strFunc'] = getLinSquStr
+  map['strFunc'] = getLinSquStrNoFac
 
-egamma_HF_Plus['func'] = '[0] + [1]*x'
-egamma_HF_Plus['strFunc'] = getLinStr
-egamma_HF_Minus['func'] = '[0] + [1]*x'
-egamma_HF_Minus['strFunc'] = getLinStr
-#h_HF_InnerMostRingsPlus['func'] = '[0]*x**2'
-#h_HF_InnerMostRingsPlus['strFunc'] = getSquStr
-#h_HF_InnerMostRingsMinus['func'] = '[0]*x**2'
-#h_HF_InnerMostRingsMinus['strFunc'] = getSquStr
-#egamma_HF_InnerMostRingsPlus['func'] = '[0]*x'
-#egamma_HF_InnerMostRingsPlus['strFunc'] = getPropStr
-#egamma_HF_InnerMostRingsMinus['func'] = '[0]*x'
-#egamma_HF_InnerMostRingsMinus['strFunc'] = getPropStr
-gammaEndcapPlus['func'] = '[0] + [1]*x'
-gammaEndcapPlus['strFunc'] = getLinStr
-gammaEndcapMinus['func'] = '[0] + [1]*x'
-gammaEndcapMinus['strFunc'] = getLinStr
+#egamma_HF_Plus['func'] = '[0] + [1]*x'
+#egamma_HF_Plus['strFunc'] = getLinStr
+#egamma_HF_Minus['func'] = '[0] + [1]*x'
+#egamma_HF_Minus['strFunc'] = getLinStr
+#gammaEndcapPlus['func'] = '[0] + [1]*x'
+#gammaEndcapPlus['strFunc'] = getLinStr
+#gammaEndcapMinus['func'] = '[0] + [1]*x'
+#gammaEndcapMinus['strFunc'] = getLinStr
 
 for map in maps:
   fx = ROOT.TF1('fx', map['func'], *(map['fitRange']))
-  px = getObjFromFile(options.infile, 'pfMEtMultCorrInfoWriter/pfMEtMultCorrInfoWriter_'+map['name'].replace('h_HF','hHF').replace('egamma_HF','egammaHF')+'_Px') 
-  px.Fit(fx, 'R')
-
   fy = ROOT.TF1('fy', map['func'], *(map['fitRange']))
-  py = getObjFromFile(options.infile, 'pfMEtMultCorrInfoWriter/pfMEtMultCorrInfoWriter_'+map['name'].replace('h_HF','hHF').replace('egamma_HF','egammaHF')+'_Py') 
-  py.Fit(fy,'R')
+
+  candSelCut = 'candId=='+str(label[map['type']])+'&&candEta>'+str(map['binning'][1])+'&&candEta<='+str(map['binning'][2])
+  print "candSelCut", candSelCut
+  
+  if c:
+#    binning=map['candBinning']
+    binning=[50]+map['fitRange']
+    px=ROOT.TProfile("p_MEx_"+map['name'],"p_MEx"+map['name'],*(binning+[-200,200,'i']))
+    py=ROOT.TProfile("p_MEy_"+map['name'],"p_MEy"+map['name'],*(binning+[-200,200,'i']))
+#    c.Draw('Sum$(-('+candSelCut+')*candPt*cos(candPhi)):Sum$(('+map['candFunc']+')*('+candSelCut+'))>>p_MEx_'+map['name'],'','goff')
+#    c.Draw('Sum$(-('+candSelCut+')*candPt*sin(candPhi)):Sum$(('+map['candFunc']+')*('+candSelCut+'))>>p_MEy_'+map['name'],'','goff')
+    c.Draw('Sum$(-('+candSelCut+')*candPt*cos(candPhi)):ngoodVertices>>p_MEx_'+map['name'],'','goff')
+    c.Draw('Sum$(-('+candSelCut+')*candPt*sin(candPhi)):ngoodVertices>>p_MEy_'+map['name'],'','goff')
+  else:
+    px = getObjFromFile(options.input, 'pfMEtMultCorrInfoWriter/pfMEtMultCorrInfoWriter_'+map['name'].replace('h_HF','hHF').replace('egamma_HF','egammaHF')+'_Px')
+    py = getObjFromFile(options.input, 'pfMEtMultCorrInfoWriter/pfMEtMultCorrInfoWriter_'+map['name'].replace('h_HF','hHF').replace('egamma_HF','egammaHF')+'_Py')
+  if px and py:
+    px.Fit(fx, 'R')
+    py.Fit(fy,'R')
+  else:
+    print "Problem with input",options.input
+    continue
 
   result = {'fx':fx.Clone(),'fy':fy.Clone()}
 
@@ -129,7 +159,9 @@ for map in maps:
   ROOT.gStyle.SetOptStat(0)
   ROOT.gStyle.SetOptFit(0)
   px.Draw('h')
-  px.GetXaxis().SetTitle("multiplicity in "+map['name'])
+#  px.GetXaxis().SetTitle("multiplicity in "+map['name'])
+#  px.GetXaxis().SetTitle("#Sum p_{T} of "+map['name'])
+  px.GetXaxis().SetTitle("ngoodVertices")
   px.GetYaxis().SetTitle("<#slash{E}_{x,y}> (GeV)")
 #    px.GetXaxis().SetLabelSize(0.04)
   px.GetXaxis().SetTitleSize(0.05)
@@ -174,8 +206,8 @@ for map in maps:
   l.SetShadowColor(ROOT.kWhite)
   l.SetBorderSize(1)
   l.Draw()
-  c1.Print(options.plotDir+'/'+prefix+'candidateBasedFromFiled_MExy_'+map['name']+'.png')
-  c1.Print(options.plotDir+'/'+prefix+'candidateBasedFromFiled_MExy_'+map['name']+'.root')
+  c1.Print(options.plotDir+'/'+prefix+'ngoodVertices_singleFit_MExy_'+map['name']+'.png')
+  c1.Print(options.plotDir+'/'+prefix+'ngoodVertices_singleFit_MExy_'+map['name']+'.root')
   del px, py, l, c1
 
 
