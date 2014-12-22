@@ -1,19 +1,19 @@
 import ROOT
-from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYieldFromChain
-from Workspace.RA4Analysis.cmgTuplesPostProcessed_v3 import *
-cBkg  = getChain([soft_WJetsHTToLNu, soft_ttJetsCSA1450ns])
-cSignal = getChain(soft_T5qqqqWW_Gl_1400_LSP_100_Chi_325)
+#from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYieldFromChain
+#from Workspace.RA4Analysis.cmgTuplesPostProcessed_v3 import *
+#cBkg  = getChain([soft_WJetsHTToLNu, soft_ttJetsCSA1450ns])
+#cSignal = getChain(soft_T5qqqqWW_Gl_1400_LSP_100_Chi_325)
 #cSignal = getChain(soft_T6qqWW_Sq_950_LSP_300_Chi_350)
 from math import pi, sqrt
 
-import numpy as np
-from scipy import optimize
+#import numpy as np
+#from scipy import optimize
 
 cuts = [
-  {'name':'jet1pt', 'var':'Jet_pt[1]',    'min': 40, 'max':320, 'step':40},\
-  {'name':'njet', 'var':'nJet40a',        'min': 2, 'max':6, 'step':1},\
-  {'name':'ht', 'var':'htJet40ja',        'min': 500, 'max':1200, 'step':100},\
-  {'name':'met', 'var':'met',             'min':200, 'max':700, 'step':100  },\
+  {'name':'jet1pt',   'var':'Jet_pt[1]',  'min': 80, 'max':320, 'step':80},\
+  {'name':'njet',     'var':'nJet40a',    'min': 3, 'max':6, 'step':1},\
+  {'name':'ht',       'var':'htJet40ja',  'min': 500, 'max':1200, 'step':100},\
+  {'name':'met',      'var':'met',        'min':200, 'max':700, 'step':100  },\
   ]
 
 prepreprefix = 'cutBasedOptimizer_'
@@ -23,16 +23,17 @@ presel+= "&&"+dPhi+">1"
 
 prefix = ''
 results=[]
+
 def loop_rec(sel, remainingCuts, appliedCuts=[]):
-  if len(cuts)==0:
-    fom = getFom(sel, relSysErr=0.20)
-    print fom, appliedCuts
-#    results+=[fom, appliedCuts]
+  if len(remainingCuts)==0:
+    fom = 1.# getFom(sel, relSysErr=0.20)
+    print sel
+    results.append( [fom, appliedCuts])
   else:
-    cut=cuts[0]
+    cut=remainingCuts[0]
     for c in range(cut['min'], cut['max']+cut['step'],cut['step']): 
       s=sel+"&&"+cut['var']+">="+str(c)
-      loop_rec(s, cuts[1:], appliedCuts+[[cut['var'], c]])
+      loop_rec(s, remainingCuts[1:], appliedCuts+[[cut['var'], c]])
 
 
 def getFom(cut, relSysErr=0.20, verbose=False):
