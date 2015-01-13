@@ -1,0 +1,165 @@
+\documentclass[12pt]{paper}
+\usepackage{a4}
+%\usepackage[usenames,dvipnames]{color}
+\usepackage{amssymb,amsmath}
+\usepackage{amsfonts}
+\usepackage{epsfig,graphics,graphicx,graphpap,color}
+\usepackage{slashed,xspace,setspace}
+\usepackage{caption}
+\usepackage{rotating}
+\usepackage{fullpage}
+\usepackage[top=0.83in]{geometry}
+
+\begin{document}
+
+\begin{sidewaystable}[ht]
+\begin{center}
+\begin{tabular}{cc|rrr|rrr|rrr|rrr|rrr|rrr}
+& & \multicolumn{6}{c|}{$t\overline{t}$+Jets}&\multicolumn{6}{c|}{$W$+Jets}&\multicolumn{6}{c}{total}\\
+\multicolumn{2}{c|}{$500< H_{T}< 750$} & \multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c}{simulation}\\\hline
+$n_{jet}=5$ & $250< S_{T}< 350$ & 1.83&$\pm$&0.23 & 1.73&$\pm$&0.22 & 0.33&$\pm$&0.14 & 0.27&$\pm$&0.04 & 2.15&$\pm$&0.21 & 2.0&$\pm$&0.22\\
+$6\leq n_{jet}$ & $250< S_{T}< 350$ & 1.42&$\pm$&0.19 & 1.41&$\pm$&0.2 & 0.11&$\pm$&0.07 & 0.16&$\pm$&0.03 & 1.53&$\pm$&0.15 & 1.57&$\pm$&0.2\\
+$n_{jet}=5$ & $350< S_{T}$ & 0.62&$\pm$&0.19 & 0.54&$\pm$&0.12 & 0.06&$\pm$&0.04 & 0.1&$\pm$&0.02 & 0.68&$\pm$&0.14 & 0.64&$\pm$&0.12\\
+$6\leq n_{jet}$ & $350< S_{T}$ & 0.35&$\pm$&0.11 & 0.22&$\pm$&0.08 & 0.02&$\pm$&0.02 & 0.02&$\pm$&0.01 & 0.37&$\pm$&0.08 & 0.24&$\pm$&0.08\\
+\hline
+& & \multicolumn{6}{c|}{$t\overline{t}$+Jets}&\multicolumn{6}{c|}{$W$+Jets}&\multicolumn{6}{c}{total}\\
+\multicolumn{2}{c|}{$750< H_{T}$} & \multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c}{simulation}\\\hline
+$n_{jet}=5$ & $250< S_{T}< 350$ & 0.63&$\pm$&0.23 & 0.89&$\pm$&0.16 & 0.22&$\pm$&0.19 & 0.19&$\pm$&0.02 & 0.86&$\pm$&0.25 & 1.08&$\pm$&0.16\\
+$6\leq n_{jet}$ & $250< S_{T}< 350$ & 0.98&$\pm$&0.34 & 0.89&$\pm$&0.16 & 0.16&$\pm$&0.15 & 0.14&$\pm$&0.02 & 1.14&$\pm$&0.28 & 1.04&$\pm$&0.16\\
+$n_{jet}=5$ & $350< S_{T}$ & 0.36&$\pm$&0.19 & 0.46&$\pm$&0.11 & 0.12&$\pm$&0.11 & 0.06&$\pm$&0.01 & 0.48&$\pm$&0.17 & 0.52&$\pm$&0.11\\
+$6\leq n_{jet}$ & $350< S_{T}$ & 0.54&$\pm$&0.28 & 0.35&$\pm$&0.1 & 0.07&$\pm$&0.07 & 0.04&$\pm$&0.01 & 0.61&$\pm$&0.21 & 0.4&$\pm$&0.1\\
+\end{tabular}
+\end{center}
+\end{sidewaystable}
+
+\begin{sidewaystable}[ht]
+\begin{center}
+\begin{tabular}{cc|rrr|rrr|rrr|rrr|rrr|rrr}
+& & \multicolumn{6}{c|}{$W+$ Jets}&\multicolumn{6}{c|}{$W-$ Jets}&\multicolumn{6}{c}{$W$ Jets}\\
+\multicolumn{2}{c|}{$500< H_{T}< 750$} & \multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c}{simulation}\\\hline
+$n_{jet}=5$ & $250< S_{T}< 350$ & 0.25&$\pm$&0.12 & 0.2&$\pm$&0.03 & 0.08&$\pm$&0.07 & 0.07&$\pm$&0.02 & 0.33&$\pm$&0.14 & 0.27&$\pm$&0.04\\
+$6\leq n_{jet}$ & $250< S_{T}< 350$ & 0.09&$\pm$&0.08 & 0.09&$\pm$&0.02 & 0.03&$\pm$&0.03 & 0.07&$\pm$&0.02 & 0.11&$\pm$&0.07 & 0.16&$\pm$&0.03\\
+$n_{jet}=5$ & $350< S_{T}$ & 0.04&$\pm$&0.03 & 0.06&$\pm$&0.02 & 0.02&$\pm$&0.03 & 0.04&$\pm$&0.01 & 0.06&$\pm$&0.04 & 0.1&$\pm$&0.02\\
+$6\leq n_{jet}$ & $350< S_{T}$ & 0.01&$\pm$&0.01 & 0.02&$\pm$&0.01 & 0.01&$\pm$&0.01 & 0.0&$\pm$&0.0 & 0.02&$\pm$&0.02 & 0.02&$\pm$&0.01\\
+\hline
+& & \multicolumn{6}{c|}{$W+$ Jets}&\multicolumn{6}{c|}{$W-$ Jets}&\multicolumn{6}{c}{$W$ Jets}\\
+\multicolumn{2}{c|}{$750< H_{T}$} & \multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c}{simulation}\\\hline
+$n_{jet}=5$ & $250< S_{T}< 350$ & 0.13&$\pm$&0.13 & 0.14&$\pm$&0.01 & 0.09&$\pm$&0.14 & 0.04&$\pm$&0.01 & 0.22&$\pm$&0.19 & 0.19&$\pm$&0.02\\
+$6\leq n_{jet}$ & $250< S_{T}< 350$ & 0.09&$\pm$&0.11 & 0.11&$\pm$&0.01 & 0.07&$\pm$&0.09 & 0.04&$\pm$&0.01 & 0.16&$\pm$&0.15 & 0.14&$\pm$&0.02\\
+$n_{jet}=5$ & $350< S_{T}$ & 0.08&$\pm$&0.08 & 0.05&$\pm$&0.01 & 0.04&$\pm$&0.08 & 0.01&$\pm$&0.0 & 0.12&$\pm$&0.11 & 0.06&$\pm$&0.01\\
+$6\leq n_{jet}$ & $350< S_{T}$ & 0.05&$\pm$&0.06 & 0.04&$\pm$&0.01 & 0.02&$\pm$&0.05 & 0.01&$\pm$&0.0 & 0.07&$\pm$&0.07 & 0.04&$\pm$&0.01\\
+\end{tabular}
+\end{center}
+\end{sidewaystable}
+
+\begin{sidewaystable}[ht]
+\begin{center}
+\begin{tabular}{cc|rrr|rrr|rrr|rrr|rrr|rrr}
+& & \multicolumn{6}{c|}{total (+ charge)}&\multicolumn{6}{c|}{total (- charge)}&\multicolumn{6}{c}{total}\\
+\multicolumn{2}{c|}{$500< H_{T}< 750$} & \multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c}{simulation}\\\hline
+$n_{jet}=5$ & $250< S_{T}< 350$ & 1.16&$\pm$&0.2 & 1.06&$\pm$&0.15 & 0.99&$\pm$&0.18 & 0.94&$\pm$&0.15 & 2.15&$\pm$&0.21 & 2.0&$\pm$&0.22\\
+$6\leq n_{jet}$ & $250< S_{T}< 350$ & 0.8&$\pm$&0.15 & 0.79&$\pm$&0.14 & 0.74&$\pm$&0.14 & 0.78&$\pm$&0.14 & 1.53&$\pm$&0.15 & 1.57&$\pm$&0.2\\
+$n_{jet}=5$ & $350< S_{T}$ & 0.35&$\pm$&0.13 & 0.33&$\pm$&0.09 & 0.33&$\pm$&0.13 & 0.31&$\pm$&0.09 & 0.68&$\pm$&0.14 & 0.64&$\pm$&0.12\\
+$6\leq n_{jet}$ & $350< S_{T}$ & 0.19&$\pm$&0.08 & 0.13&$\pm$&0.05 & 0.18&$\pm$&0.08 & 0.11&$\pm$&0.05 & 0.37&$\pm$&0.08 & 0.24&$\pm$&0.08\\
+\hline
+& & \multicolumn{6}{c|}{total (+ charge)}&\multicolumn{6}{c|}{total (- charge)}&\multicolumn{6}{c}{total}\\
+\multicolumn{2}{c|}{$750< H_{T}$} & \multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c}{simulation}\\\hline
+$n_{jet}=5$ & $250< S_{T}< 350$ & 0.45&$\pm$&0.21 & 0.59&$\pm$&0.11 & 0.41&$\pm$&0.21 & 0.49&$\pm$&0.11 & 0.86&$\pm$&0.25 & 1.08&$\pm$&0.16\\
+$6\leq n_{jet}$ & $250< S_{T}< 350$ & 0.58&$\pm$&0.26 & 0.55&$\pm$&0.11 & 0.56&$\pm$&0.26 & 0.48&$\pm$&0.11 & 1.14&$\pm$&0.28 & 1.04&$\pm$&0.16\\
+$n_{jet}=5$ & $350< S_{T}$ & 0.26&$\pm$&0.16 & 0.28&$\pm$&0.08 & 0.22&$\pm$&0.15 & 0.24&$\pm$&0.08 & 0.48&$\pm$&0.17 & 0.52&$\pm$&0.11\\
+$6\leq n_{jet}$ & $350< S_{T}$ & 0.32&$\pm$&0.2 & 0.21&$\pm$&0.07 & 0.29&$\pm$&0.2 & 0.18&$\pm$&0.07 & 0.61&$\pm$&0.21 & 0.4&$\pm$&0.1\\
+\end{tabular}
+\end{center}
+\end{sidewaystable}
+
+\begin{sidewaystable}[ht]
+\begin{center}
+\begin{tabular}{cc|r|r|r|r}
+& & \multicolumn{2}{c|}{T5WW 1200/1000/800}&\multicolumn{2}{c}{T5WW 1500/800/100}\\
+\multicolumn{2}{c|}{$500< H_{T}< 750$} & + charge & - charge & + charge & - charge \\\hline
+$n_{jet}=5$ & $250< S_{T}< 350$ & 0.068 & 0.068 & 0.0 & 0.0\\
+$6\leq n_{jet}$ & $250< S_{T}< 350$ & 0.109 & 0.12 & 0.0 & 0.0\\
+$n_{jet}=5$ & $350< S_{T}$ & 0.104 & 0.116 & 0.001 & 0.001\\
+$6\leq n_{jet}$ & $350< S_{T}$ & 0.19 & 0.171 & 0.001 & 0.001\\
+\hline
+& & \multicolumn{2}{c|}{T5WW 1200/1000/800}&\multicolumn{2}{c}{T5WW 1500/800/100}\\
+\multicolumn{2}{c|}{$750< H_{T}$} & + charge & - charge & + charge & - charge \\\hline
+$n_{jet}=5$ & $250< S_{T}< 350$ & 0.005 & 0.017 & 0.004 & 0.003\\
+$6\leq n_{jet}$ & $250< S_{T}< 350$ & 0.077 & 0.078 & 0.016 & 0.017\\
+$n_{jet}=5$ & $350< S_{T}$ & 0.038 & 0.047 & 0.064 & 0.063\\
+$6\leq n_{jet}$ & $350< S_{T}$ & 0.245 & 0.24 & 0.226 & 0.239\\
+\end{tabular}
+\end{center}
+\end{sidewaystable}
+
+%rCS(TT) comparison used for rCS(W) correction
+%
+%$500< H_{T}< 750$&$250< S_{T}< 350$ & 0.07&$\pm$&0.01 & 0.09&$\pm$&0.01 & 0.07&$\pm$&0.01\\
+%$500< H_{T}< 750$&$350< S_{T}$ & 0.03&$\pm$&0.0 & 0.05&$\pm$&0.01 & 0.04&$\pm$&0.01\\
+%$750< H_{T}$&$250< S_{T}< 350$ & 0.07&$\pm$&0.01 & 0.09&$\pm$&0.02 & 0.06&$\pm$&0.02\\
+%$750< H_{T}$&$350< S_{T}$ & 0.03&$\pm$&0.01 & 0.04&$\pm$&0.01 & 0.05&$\pm$&0.01\\
+%
+%RCS corr comparison
+%
+%$500< H_{T}< 750$&$250< S_{T}< 350$ & 0.0129&$\pm$&0.0035 & 0.0209&$\pm$&0.0015 & 0.0106&$\pm$&0.0014 & 0.0182&$\pm$&0.0034\\
+%$500< H_{T}< 750$&$350< S_{T}$ & 0.0043&$\pm$&0.0022 & 0.0072&$\pm$&0.0007 & 0.007&$\pm$&0.0015 & 0.0057&$\pm$&0.0021\\
+%$750< H_{T}$&$250< S_{T}< 350$ & 0.0228&$\pm$&0.0161 & 0.0307&$\pm$&0.0031 & 0.0191&$\pm$&0.0017 & 0.0209&$\pm$&0.0023\\
+%$750< H_{T}$&$350< S_{T}$ & 0.0106&$\pm$&0.0089 & 0.0127&$\pm$&0.0019 & 0.0057&$\pm$&0.001 & 0.0067&$\pm$&0.0012\\
+
+\begin{sidewaystable}[ht]
+\begin{center}
+\begin{tabular}{cc|rrr|rrr|rrr}
+& & \multicolumn{3}{c|}{$R^{corr.}_{CS}(0b,2/3j)$ (- charge)}&\multicolumn{3}{c|}{$R_{CS,W^{-}_{jets}}(0b,==5j)$}&\multicolumn{3}{c}{$R_{CS,W^{-}_{jets}}(0b,>=6j)$}\\\hline
+$500< H_{T}< 750$&$250< S_{T}< 350$ & 0.007&$\pm$&0.0059 & 0.0068&$\pm$&0.0017 & 0.0199&$\pm$&0.0057\\
+$500< H_{T}< 750$&$350< S_{T}$ & 0.0034&$\pm$&0.0041 & 0.0064&$\pm$&0.0023 & 0.0009&$\pm$&0.0009\\
+$750< H_{T}$&$250< S_{T}< 350$ & 0.0246&$\pm$&0.0298 & 0.0117&$\pm$&0.0022 & 0.0135&$\pm$&0.0035\\
+$750< H_{T}$&$350< S_{T}$ & 0.0093&$\pm$&0.0175 & 0.0028&$\pm$&0.001 & 0.0029&$\pm$&0.0013\\
+\end{tabular}
+\end{center}
+\end{sidewaystable}
+
+\begin{sidewaystable}[ht]
+\begin{center}
+\begin{tabular}{cc|rrr|rrr|rrr}
+& & \multicolumn{3}{c|}{$R^{corr.}_{CS}(0b,2/3j)$ (+ charge)}&\multicolumn{3}{c|}{$R_{CS,W^{+}_{jets}}(0b,==5j)$}&\multicolumn{3}{c}{$R_{CS,W^{+}_{jets}}(0b,>=6j)$}\\\hline
+$500< H_{T}< 750$&$250< S_{T}< 350$ & 0.017&$\pm$&0.0044 & 0.0135&$\pm$&0.0021 & 0.0171&$\pm$&0.0043\\
+$500< H_{T}< 750$&$350< S_{T}$ & 0.0048&$\pm$&0.0025 & 0.0074&$\pm$&0.0019 & 0.0087&$\pm$&0.0033\\
+$750< H_{T}$&$250< S_{T}< 350$ & 0.0217&$\pm$&0.0184 & 0.0236&$\pm$&0.0024 & 0.0255&$\pm$&0.003\\
+$750< H_{T}$&$350< S_{T}$ & 0.0113&$\pm$&0.0098 & 0.0073&$\pm$&0.0015 & 0.0089&$\pm$&0.0018\\
+\end{tabular}
+\end{center}
+\end{sidewaystable}
+
+\begin{table}[ht]
+\begin{center}
+\begin{tabular}{cc|rrr|rrr|rrr}
+&&\multicolumn{3}{c|}{$R_{CS}(1b,2/3j)$}&\multicolumn{3}{c|}{$R_{CS,t\bar{t}}(1b,2/3j)$}&\multicolumn{3}{c}{$R_{CS,t\bar{t}}(0b,2/3j)$}\\\hline
+$500< H_{T}< 750$ & $250< S_{T}< 350$ & 0.07&$\pm$&0.005 & 0.09&$\pm$&0.007 & 0.07&$\pm$&0.01\\
+$500< H_{T}< 750$ & $350< S_{T}$ & 0.033&$\pm$&0.004 & 0.05&$\pm$&0.006 & 0.036&$\pm$&0.007\\
+$750< H_{T}$ & $250< S_{T}< 350$ & 0.071&$\pm$&0.0011 & 0.09&$\pm$&0.017 & 0.061&$\pm$&0.018\\
+$750< H_{T}$ & $350< S_{T}$ & 0.025&$\pm$&0.005 & 0.037&$\pm$&0.009 & 0.051&$\pm$&0.013\\
+\end{tabular}
+\end{center}
+\end{table}
+
+%rCS(TT) comparison used for tt estimation
+
+\begin{table}[ht]
+\begin{center}
+\begin{tabular}{cc|rrr|rrr|rrr}
+\multicolumn{2}{c|}{$500< H_{T}< 750$}&\multicolumn{3}{c|}{$R_{CS}(1b)$}&\multicolumn{3}{c|}{$R_{CS,t\bar{t}}(1b)$}&\multicolumn{3}{c}{$R_{CS,t\bar{t}}(0b)$}\\\hline
+$n_{jet}=5$ & $250< S_{T}< 350$ & 0.057&$\pm$&0.003 & 0.061&$\pm$&0.003 & 0.054&$\pm$&0.007\\
+$6\leq n_{jet}$ & $250< S_{T}< 350$ & 0.057&$\pm$&0.003 & 0.061&$\pm$&0.003 & 0.057&$\pm$&0.008\\
+$n_{jet}=5$ & $350< S_{T}$ & 0.049&$\pm$&0.004 & 0.056&$\pm$&0.005 & 0.043&$\pm$&0.01\\
+$6\leq n_{jet}$ & $350< S_{T}$ & 0.049&$\pm$&0.004 & 0.056&$\pm$&0.005 & 0.03&$\pm$&0.011\\
+\hline
+\multicolumn{2}{c|}{$750< H_{T}$}&\multicolumn{3}{c|}{$R_{CS}(1b)$}&\multicolumn{3}{c|}{$R_{CS,t\bar{t}}(1b)$}&\multicolumn{3}{c}{$R_{CS,t\bar{t}}(0b)$}\\\hline
+$n_{jet}=5$ & $250< S_{T}< 350$ & 0.055&$\pm$&0.005 & 0.059&$\pm$&0.006 & 0.078&$\pm$&0.014\\
+$6\leq n_{jet}$ & $250< S_{T}< 350$ & 0.055&$\pm$&0.005 & 0.059&$\pm$&0.006 & 0.05&$\pm$&0.009\\
+$n_{jet}=5$ & $350< S_{T}$ & 0.043&$\pm$&0.005 & 0.05&$\pm$&0.006 & 0.055&$\pm$&0.014\\
+$6\leq n_{jet}$ & $350< S_{T}$ & 0.043&$\pm$&0.005 & 0.05&$\pm$&0.006 & 0.028&$\pm$&0.008\\
+\end{tabular}
+\end{center}
+\end{table}
+
+\end{document}
