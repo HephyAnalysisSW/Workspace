@@ -28,9 +28,9 @@ signalScale=1
 cutBranches = ["single*", "nLoose*", "nTight*", "leptonPt", "met_phi", "htJet40ja", "nBJetMedium25", "nJet40a",'st','met']
 
 for i in range(1):
-  if i==0:
-    prefix = 'soft_ht500-met500-3j-0b-diLepVeto-2j200'
-    presel="singleMuonic&&nLooseSoftLeptons==1&&nTightSoftLeptons==1&&nTightHardLeptons==0&&met>500&&htJet40ja>500&&nBJetMedium25==0&&nJet40a>=3&&Jet_pt[1]>200"
+#  if i==0:
+#    prefix = 'soft_ht500-met700-2j-0b-diLepVeto-2j80'
+#    presel="singleMuonic&&nLooseSoftLeptons==1&&nTightSoftLeptons==1&&nTightHardLeptons==0&&met>700&&htJet40ja>500&&nBJetMedium25==0&&nJet40a>=2&&Jet_pt[1]>80"
 #  if i==1:
 #    prefix = 'soft_ht500-st250-6j-0b-diLepVeto'
 #    presel="singleMuonic&&nLooseSoftLeptons==1&&nTightSoftLeptons==1&&nTightHardLeptons==0&&st>250&&htJet40ja>500&&nBJetMedium25==0&&nJet40a>=6"
@@ -55,39 +55,40 @@ for i in range(1):
 #  if i==1:
 #    prefix = 'hard2_ht500-st250-6j-0b-diLepVeto'
 #    presel="singleMuonic&&nLooseSoftLeptons==0&&nTightHardLeptons==1&&nLooseHardLeptons==1&&st>250&&htJet40ja>500&&nBJetMedium25==0&&nJet40a>=6"
-#  if i==0:
-#    prefix = 'hard2_ht500-st250-4j-0b-diLepVeto'
-#    presel="singleMuonic&&nLooseSoftLeptons==0&&nTightHardLeptons==1&&nLooseHardLeptons==1&&st>250&&htJet40ja>500&&nBJetMedium25==0&&nJet40a>=4"
+  if i==0:
+    prefix = 'hard_ht500-st450-6j-0b-diLepVeto'
+    presel="singleMuonic&&nLooseSoftLeptons==0&&nTightHardLeptons==1&&nLooseHardLeptons==1&&st>450&&htJet40ja>500&&nBJetMedium25==0&&nJet40a>=6"
 #
 #  if i==2:
 #    prefix = 'hard2_ht500-st250-2j-0b-diLepVeto'
 #    presel="singleMuonic&&nLooseSoftLeptons==0&&nTightHardLeptons==1&&nLooseHardLeptons==1&&st>250&&htJet40ja>500&&nBJetMedium25==0&&nJet40a>=2"
 
   cutString=presel
-  wjetsSample  = soft_WJetsHTToLNu
-  ttJetsPowHeg = soft_ttJetsCSA1450ns
-#  wjetsSample  = hard_WJetsHTToLNu
-#  ttJetsPowHeg = hard_ttJetsCSA1450ns
+#  wjetsSample  = soft_WJetsHTToLNu
+#  ttJetsPowHeg = soft_ttJetsCSA1450ns
+  wjetsSample  = hard_WJetsHTToLNu
+  ttJetsPowHeg = hard_ttJetsCSA1450ns
 
   wjetsSample .update({'small':small}) 
   ttJetsPowHeg.update({'small':small}) 
 
   signalPrefix="" if signalScale==1 else str(signalScale)+"x "
 #  #HARD
-##  hard_T5Full_1200_1000_800['style'] = {'legendText':signalPrefix+hard_T5Full_1200_1000_800['name'],   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kBlue, 'markerStyle':None, 'markerSize':None}
-##  hard_T5Full_1500_800_100['style']  = {'legendText':signalPrefix+hard_T5Full_1500_800_100['name'],   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kBlack, 'markerStyle':None, 'markerSize':None}
-##  hard_T1tttt_2J_mGo1300_mStop300_mCh285_mChi280['style']  = {'legendText':signalPrefix+hard_T1tttt_2J_mGo1300_mStop300_mCh285_mChi280['name'],   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kGreen, 'markerStyle':None, 'markerSize':None}
-##  signals = [hard_T5Full_1200_1000_800, hard_T5Full_1500_800_100, hard_T1tttt_2J_mGo1300_mStop300_mCh285_mChi280]
+  hard_T5Full_1200_1000_800['style'] = {'legendText':signalPrefix+hard_T5Full_1200_1000_800['name'],   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kBlue, 'markerStyle':None, 'markerSize':None}
+  hard_T5Full_1500_800_100['style']  = {'legendText':signalPrefix+hard_T5Full_1500_800_100['name'],   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kBlack, 'markerStyle':None, 'markerSize':None}
+#  hard_T1tttt_2J_mGo1300_mStop300_mCh285_mChi280['style']  = {'legendText':signalPrefix+hard_T1tttt_2J_mGo1300_mStop300_mCh285_mChi280['name'],   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kGreen, 'markerStyle':None, 'markerSize':None}
+#  signals = [hard_T5Full_1200_1000_800, hard_T5Full_1500_800_100, hard_T1tttt_2J_mGo1300_mStop300_mCh285_mChi280]
+  signals = [hard_T5Full_1200_1000_800, hard_T5Full_1500_800_100]
 #
 #  hard_T6qqWW_Sq_950_LSP_300_Chi_350['style'] = {'legendText':signalPrefix+hard_T6qqWW_Sq_950_LSP_300_Chi_350['name'],   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kBlue, 'markerStyle':None, 'markerSize':None}
 #  hard_T5qqqqWW_Gl_1400_LSP_300_Chi_315['style']  = {'legendText':signalPrefix+hard_T5qqqqWW_Gl_1400_LSP_300_Chi_315['name'],   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kBlack, 'markerStyle':None, 'markerSize':None}
 #  hard_T1tttt_2J_mGo1300_mStop300_mCh285_mChi280['style']  = {'legendText':signalPrefix+hard_T1tttt_2J_mGo1300_mStop300_mCh285_mChi280['name'],   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kGreen, 'markerStyle':None, 'markerSize':None}
 #  signals = [hard_T6qqWW_Sq_950_LSP_300_Chi_350, hard_T5qqqqWW_Gl_1400_LSP_300_Chi_315, hard_T1tttt_2J_mGo1300_mStop300_mCh285_mChi280]
 
-  soft_T6qqWW_Sq_950_LSP_300_Chi_350['style'] = {'legendText':signalPrefix+soft_T6qqWW_Sq_950_LSP_300_Chi_350['name'],   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kBlue, 'markerStyle':None, 'markerSize':None}
-  soft_T5qqqqWW_Gl_1400_LSP_300_Chi_315['style']  = {'legendText':signalPrefix+soft_T5qqqqWW_Gl_1400_LSP_300_Chi_315['name'],   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kBlack, 'markerStyle':None, 'markerSize':None}
-  soft_T1tttt_2J_mGo1300_mStop300_mCh285_mChi280['style']  = {'legendText':signalPrefix+soft_T1tttt_2J_mGo1300_mStop300_mCh285_mChi280['name'],   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kGreen, 'markerStyle':None, 'markerSize':None}
-  signals = [soft_T6qqWW_Sq_950_LSP_300_Chi_350, soft_T5qqqqWW_Gl_1400_LSP_300_Chi_315, soft_T1tttt_2J_mGo1300_mStop300_mCh285_mChi280]
+#  soft_T6qqWW_Sq_950_LSP_300_Chi_350['style'] = {'legendText':signalPrefix+soft_T6qqWW_Sq_950_LSP_300_Chi_350['name'],   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kBlue, 'markerStyle':None, 'markerSize':None}
+#  soft_T5qqqqWW_Gl_1400_LSP_300_Chi_315['style']  = {'legendText':signalPrefix+soft_T5qqqqWW_Gl_1400_LSP_300_Chi_315['name'],   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kBlack, 'markerStyle':None, 'markerSize':None}
+#  soft_T1tttt_2J_mGo1300_mStop300_mCh285_mChi280['style']  = {'legendText':signalPrefix+soft_T1tttt_2J_mGo1300_mStop300_mCh285_mChi280['name'],   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kGreen, 'markerStyle':None, 'markerSize':None}
+#  signals = [soft_T6qqWW_Sq_950_LSP_300_Chi_350, soft_T5qqqqWW_Gl_1400_LSP_300_Chi_315, soft_T1tttt_2J_mGo1300_mStop300_mCh285_mChi280]
 
   for s in signals:
     s['scale'] = signalScale
@@ -161,6 +162,13 @@ for i in range(1):
       cut={'string':cutString,'func':None})
   allStacks.append(leptonPt_stack)
 
+  leptonEta_stack  = getStack(
+      labels={'x':'#eta(l)','y':'Number of Events'}, 
+      var={'name':'leptonEta','leaf':'leptonEta', 'overFlow':'both'}, 
+      binning={'binning':[24,-2.4,2.4]}, 
+      cut={'string':cutString,'func':None})
+  allStacks.append(leptonEta_stack)
+
   softleptonPt_stack  = getStack(
       labels={'x':'p_{T}(l) (GeV)','y':'Number of Events / 20 GeV'}, 
       var={'name':'softleptonPt','leaf':'leptonPt', 'overFlow':'upper'}, 
@@ -220,6 +228,13 @@ for i in range(1):
       cut={'string':cutString,'func':None})
   dPhi_stack.options['yRange']=[0.007, 10**2.7]
   allStacks.append(dPhi_stack)
+
+  dPhiZoomed_stack  = getStack(
+      labels={'x':'#Delta#Phi(W,l)','y':'Number of Events'}, 
+      var={'name':'dPhizoomed','func':cmgDPhi, 'branches':cmgDPhi('branches'), 'overFlow':'both'}, 
+      binning={'binning':[20, 0,pi], 'isExplicit':False}, 
+      cut={'string':cutString,'func':None})
+  allStacks.append(dPhiZoomed_stack)
 
   nbtags_stack  = getStack(
       labels={'x':'number of b-tags (CSVM)','y':'Number of Events'}, 
