@@ -74,6 +74,9 @@ def cmgMinDPhiJet(c, nJets=3):
   leadingNJets = cmgGetJets(c,  ptMin=40., etaMax=999.)[:nJets]
   met = {'phi':c.GetLeaf('met_phi').GetValue()}
   closestJet = findClosestObject(leadingNJets, met, sortFunc=lambda o1,o2: deltaPhi(o1['phi'], o2['phi']))
+#  print "jets", leadingNJets
+#  print "met",met
+#  print "found closest",closestJet
   return closestJet['distance'] 
 def cmgMinDPhiBJet(c):
   if c=="branches":return cmgGetJets("branches")+['met_phi'] 
@@ -112,6 +115,22 @@ def cmgMTTopClosestBJetMET(c):
       )
   else:
     return float('nan')
+
+def cmgHTOrthMET(c):
+  """ scalar sum of  jet pt projected on the axis orthogonal to MET
+  """
+  if c=="branches":return cmgGetJets("branches")+['met_phi'] 
+  jets = cmgGetJets(c,  ptMin=40., etaMax=999.)
+  met_phi_orth = c.GetLeaf('met_phi').GetValue()+pi/2.
+  return sum([j['pt']*abs(cos(met_phi_orth - j['phi'])) for j in jets])
+
+def cmgHTRatio(c):
+  """ fraction of HT in the hemisphere opposite to MET
+  """
+  if c=="branches":return cmgGetJets("branches")+['met_phi'] 
+  jets = cmgGetJets(c,  ptMin=40., etaMax=999.)
+  met_phi = c.GetLeaf('met_phi').GetValue()
+  return sum([j['pt'] for j in jets if cos(met_phi - j['phi'])<0.])/sum([j['pt'] for j in jets])
 
 def nJetBinName(njb):
   n=str(list(njb)[0])+"#leq n_{jet}"
