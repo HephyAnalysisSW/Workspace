@@ -18,20 +18,9 @@ from localInfo import username
 ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 
-defSampleStr = "ttJets_PU20bx25"
-#defSampleStr = "WJetsToLNu_HT200to400_PU20bx25"
-#defSampleStr = "WJetsToLNu_HT100to200,WJetsToLNu_HT200to400,WJetsToLNu_HT400to600,WJetsToLNu_HT600toInf"
-#defSampleStr = "WJetsToLNu_HT100to200"
-#defSampleStr = "WJetsToLNu_HT200to400,WJetsToLNu_HT400to600,WJetsToLNu_HT600toInf"
-#defSampleStr = "ttJetsCSA1450ns"
-#defSampleStr = "T5Full_1200_1000_800"
-#defSampleStr = "T5Full_1200_1000_800,T5Full_1500_800_100"
-#defSampleStr = "T1ttbbWW_2J_mGo1000_mCh725_mChi715_3bodydec"
-#defSampleStr = "SMS_T1qqqq_2J_mGl1400_mLSP100_PU_S14_POSTLS170"
-#defSampleStr = "T1ttbbWW_2J_mGo1000_mCh725_mChi715_3bodydec"
-#defSampleStr = "T1qqqq_1400_325_300"
-#defSampleStr = ','.join(allSignalStrings)
-#defSampleStr = "SMS_T1tttt_2J_mGl1500_mLSP100_PU_S14_POSTLS170,ttJetsCSA1450ns"
+#defSampleStr = "ttJets_PU20bx25"
+defSampleStr = "ttWJets_PU20bx25,ttZJets_PU20bx25,ttHJets_PU20bx25"
+defSampleStr = "ttH_PU20bx25"
 
 branchKeepStrings = ["run", "lumi", "evt", "isData", "xsec", "puWeight", "nTrueInt", "genWeight", "rho", "nVert", "nJet25", "nBJetLoose25", "nBJetMedium25", "nBJetTight25", "nJet40", "nJet40a", "nBJetLoose40", "nBJetMedium40", "nBJetTight40", 
                      "nLepGood20", "nLepGood15", "nLepGood10",  
@@ -81,23 +70,25 @@ def getChunksFromNFS(sample):
   chunks = [{'name':x} for x in os.listdir(sample['dir']) if x.startswith(sample['chunkString']+'_Chunk') or x==sample['name']]
   nTotEvents=0
   allFiles=[]
+  failedChunks=[]
   for i, s in enumerate(chunks):
 #      logfile = sample['dir']+'/'+s['name']+'/log.txt'
 #      line = [x for x in subprocess.check_output(["cat", logfile]).split('\n') if x.count('number of events processed')]
 #      assert len(line)==1,"Didn't find event number in file %s"%logfile
 #      n = int(line[0].split()[-1])
       logfile = sample['dir']+'/'+s['name']+'/skimAnalyzerCount/SkimReport.txt'
-      line = [x for x in subprocess.check_output(["cat", logfile]).split('\n') if x.count('All Events')]
-      assert len(line)==1,"Didn't find event number in file %s"%logfile
-      n = int(line[0].split()[2])
-      inputFilename = sample['dir']+'/'+s['name']+'/'+options.inputTreeName+'/tree.root'
-      print inputFilename
-      if os.path.isfile(inputFilename):
-        nTotEvents+=n
-        allFiles.append(inputFilename)
-        chunks[i]['file']=inputFilename
+      if os.path.isfile(logfile):
+        line = [x for x in subprocess.check_output(["cat", logfile]).split('\n') if x.count('All Events')]
+        assert len(line)==1,"Didn't find event number in file %s"%logfile
+        n = int(line[0].split()[2])
+        inputFilename = sample['dir']+'/'+s['name']+'/'+options.inputTreeName+'/tree.root'
+        if os.path.isfile(inputFilename):
+          nTotEvents+=n
+          allFiles.append(inputFilename)
+          chunks[i]['file']=inputFilename
+      else:failedChunks.append(chunks[i])
 #    except: print "Chunk",s,"could not be added"
-  print "Found",len(chunks),"chunks for sample",sample["name"],'with a total of',nTotEvents,"events"
+  print "Found",len(chunks),"chunks for sample",sample["name"],'with a total of',nTotEvents,"events. Failed for:",",".join([c['name'] for c in failedChunks]),"(",round(100*len(failedChunks)/float(len(chunks)),1),")%"
   return chunks, nTotEvents
 
 def getChunksFromDPM(sample):
