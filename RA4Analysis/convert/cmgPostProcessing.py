@@ -18,9 +18,9 @@ from localInfo import username
 ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 
-#defSampleStr = "ttJets_PU20bx25"
-defSampleStr = "ttWJets_PU20bx25,ttZJets_PU20bx25,ttHJets_PU20bx25"
-defSampleStr = "ttH_PU20bx25"
+defSampleStr = "ttJets_PU20bx25"
+#defSampleStr = "ttWJets_PU20bx25,ttZJets_PU20bx25,ttHJets_PU20bx25"
+#defSampleStr = "QCD_HT_250To500_PU20bx25"
 
 branchKeepStrings = ["run", "lumi", "evt", "isData", "xsec", "puWeight", "nTrueInt", "genWeight", "rho", "nVert", "nJet25", "nBJetLoose25", "nBJetMedium25", "nBJetTight25", "nJet40", "nJet40a", "nBJetLoose40", "nBJetMedium40", "nBJetTight40", 
                      "nLepGood20", "nLepGood15", "nLepGood10",  
@@ -39,7 +39,7 @@ parser.add_option("--targetDir", dest="targetDir", default="/data/"+username+"/c
 parser.add_option("--skim", dest="skim", default="", type="string", action="store", help="any skim condition?")
 parser.add_option("--leptonSelection", dest="leptonSelection", default="hard", type="string", action="store", help="which lepton selection? 'soft' or 'hard' or 'none'?")
 
-#parser.add_option("--small", dest="small", default = False, action="store_true", help="Just do a small subset.")
+parser.add_option("--small", dest="small", default = False, action="store_true", help="Just do a small subset.")
 #parser.add_option("--overwrite", dest="overwrite", action="store_true", help="Overwrite?", default=True)
 (options, args) = parser.parse_args()
 if options.skim=='inc' or options.skim=="":
@@ -65,7 +65,6 @@ def getChunks(sample):
   else:
     return getChunksFromNFS(sample)
     
-
 def getChunksFromNFS(sample):
   chunks = [{'name':x} for x in os.listdir(sample['dir']) if x.startswith(sample['chunkString']+'_Chunk') or x==sample['name']]
   nTotEvents=0
@@ -130,7 +129,6 @@ exec('allSamples=['+options.allsamples+']')
 for isample, sample in enumerate(allSamples):
   
   chunks, nTotEvents = getChunks(sample)
-  chunks = chunks
   
   outDir = options.targetDir+'/'+"/".join([options.skim, options.leptonSelection, sample['name']])
   tmpDir = outDir+'/tmp/'
@@ -139,7 +137,7 @@ for isample, sample in enumerate(allSamples):
   os.system('rm -rf '+tmpDir+'/*')
 
   lumiWeight = xsec[sample['dbsName']]*target_lumi/float(nTotEvents)
-  readVariables = ['met_pt/F']
+  readVariables = ['met_pt/D']
 
   newVariables = ['weight/F']
   newVariables += ['nLooseSoftLeptons/I', 'nLooseSoftPt10Leptons/I', 'nLooseHardLeptons/I', 'nTightSoftLeptons/I', 'nTightHardLeptons/I']
@@ -150,7 +148,7 @@ for isample, sample in enumerate(allSamples):
   aliases = [ "met:met_pt", "metPhi:met_phi","genMet:met_genPt", "genMetPhi:met_genPhi"]
 
   readVectors = [\
-    {'prefix':'LepGood',  'nMax':8, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I', 'relIso03/F', 'tightId/I', 'mass/F']},
+    {'prefix':'LepGood',  'nMax':8, 'vars':['pt/D', 'eta/D', 'phi/D', 'pdgId/I', 'relIso03/D', 'tightId/I', 'mass/D']},
   ]
   readVars = [readVar(v, allowRenaming=False, isWritten=False, isRead=True) for v in readVariables]
   for v in readVectors:
@@ -170,6 +168,7 @@ for isample, sample in enumerate(allSamples):
   r = compileClass(className=readClassName, classString=readClassString, tmpDir='/data/'+username+'/tmp/')
 
   filesForHadd=[]
+  if options.small: chunks=chunks[:1]
   for chunk in chunks:
     t = getTreeFromChunk(chunk, skimCond)
     if not t:continue
@@ -232,6 +231,7 @@ for isample, sample in enumerate(allSamples):
         if s.nTightHardLeptons>=1:
           leadingLepInd = tightHardLepInd[0]
           s.leptonPt  = r.LepGood_pt[leadingLepInd]
+#          print s.leptonPt, 'met', r.met_pt, r.nLepGood, r.LepGood_pt[leadingLepInd],r.LepGood_eta[leadingLepInd], r.LepGood_phi[leadingLepInd] , r.LepGood_pdgId[leadingLepInd], r.LepGood_relIso03[leadingLepInd], r.LepGood_tightId[leadingLepInd], r.LepGood_mass[leadingLepInd]
           s.leptonInd = leadingLepInd 
           s.leptonEta = r.LepGood_eta[leadingLepInd]
           s.leptonPhi = r.LepGood_phi[leadingLepInd]
@@ -249,8 +249,8 @@ for isample, sample in enumerate(allSamples):
       if options.leptonSelection=='soft':
         #Select hardest tight lepton among soft leptons
         if s.nTightSoftLeptons>=1:
-
           leadingLepInd = tightSoftLepInd[0]
+#          print s.leptonPt, r.LepGood_pt[leadingLepInd],r.LepGood_eta[leadingLepInd], leadingLepInd
           s.leptonPt  = r.LepGood_pt[leadingLepInd]
           s.leptonInd = leadingLepInd 
           s.leptonEta = r.LepGood_eta[leadingLepInd]
@@ -265,41 +265,41 @@ for isample, sample in enumerate(allSamples):
         else:
           s.singleMuonic      = False 
           s.singleElectronic  = False 
-
 #      print "Selected",s.leptonPt
-
       for v in newVars:
         v['branch'].Fill()
     newFileName = sample['name']+'_'+chunk['name']+'.root'
     filesForHadd.append(newFileName)
-    f = ROOT.TFile(tmpDir+'/'+newFileName, 'recreate')
-    t.SetBranchStatus("*",0)
-    for b in branchKeepStrings + [v['stage2Name'] for v in newVars] +  [v.split(':')[1] for v in aliases]:
-      t.SetBranchStatus(b, 1)
-    t2 = t.CloneTree()
-    t2.Write()
-    f.Close()
-    print "Written",tmpDir+'/'+newFileName
-    del f
+    if not options.small:
+      f = ROOT.TFile(tmpDir+'/'+newFileName, 'recreate')
+      t.SetBranchStatus("*",0)
+      for b in branchKeepStrings + [v['stage2Name'] for v in newVars] +  [v.split(':')[1] for v in aliases]:
+        t.SetBranchStatus(b, 1)
+      t2 = t.CloneTree()
+      t2.Write()
+      f.Close()
+      print "Written",tmpDir+'/'+newFileName
+      del f
     for v in newVars:
       del v['branch']
     del t2
     t.Delete()
     del t
-  
-  size=0
-  counter=0
-  files=[]
-  for f in filesForHadd:
-    size+=os.path.getsize(tmpDir+'/'+f)
-    files.append(f)
-    if size>10**9 or f==filesForHadd[-1]:
-      ofile = outDir+'/'+sample['name']+'_'+str(counter)+'.root'
-      print "Running hadd on", tmpDir, files
-      os.system('cd '+tmpDir+';hadd -f '+ofile+' '+' '.join(files))
-      print "Written", ofile
-      size=0
-      counter+=1
-      files=[]
-  os.system("rm -rf "+tmpDir)
+
+  if not options.small: 
+    size=0
+    counter=0
+    files=[]
+    for f in filesForHadd:
+      size+=os.path.getsize(tmpDir+'/'+f)
+      files.append(f)
+      if size>10**9 or f==filesForHadd[-1]:
+        ofile = outDir+'/'+sample['name']+'_'+str(counter)+'.root'
+        print "Running hadd on", tmpDir, files
+        os.system('cd '+tmpDir+';hadd -f '+ofile+' '+' '.join(files))
+        print "Written", ofile
+        size=0
+        counter+=1
+        files=[]
+    os.system("rm -rf "+tmpDir)
 
