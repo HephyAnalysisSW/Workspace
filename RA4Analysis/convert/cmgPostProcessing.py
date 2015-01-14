@@ -7,8 +7,9 @@ from Workspace.HEPHYPythonTools.xsec import xsec
 from Workspace.HEPHYPythonTools.helpers import getObjFromFile, getObjDict, getFileList
 from Workspace.RA4Analysis.convertHelpers import compileClass, readVar, printHeader, typeStr, createClassString
 
-subDir = "postProcessed_v5"
-from Workspace.RA4Analysis.cmgTuples_v3 import *
+subDir = "postProcessed_v4_PHYS14V1"
+#from Workspace.RA4Analysis.cmgTuples_v3 import *
+from Workspace.RA4Analysis.cmgTuples_v4_PHYS14 import *
 
 target_lumi = 1000 #pb-1
 
@@ -17,8 +18,8 @@ from localInfo import username
 ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 
-#defSampleStr = "ttJetsCSA1450ns,WJetsToLNu_HT100to200,WJetsToLNu_HT200to400,WJetsToLNu_HT400to600,WJetsToLNu_HT600toInf"
-#defSampleStr = "WJetsToLNu_HT600toInf"
+defSampleStr = "ttJets_PU20bx25"
+#defSampleStr = "WJetsToLNu_HT200to400_PU20bx25"
 #defSampleStr = "WJetsToLNu_HT100to200,WJetsToLNu_HT200to400,WJetsToLNu_HT400to600,WJetsToLNu_HT600toInf"
 #defSampleStr = "WJetsToLNu_HT100to200"
 #defSampleStr = "WJetsToLNu_HT200to400,WJetsToLNu_HT400to600,WJetsToLNu_HT600toInf"
@@ -30,20 +31,21 @@ ROOT.AutoLibraryLoader.enable()
 #defSampleStr = "T1ttbbWW_2J_mGo1000_mCh725_mChi715_3bodydec"
 #defSampleStr = "T1qqqq_1400_325_300"
 #defSampleStr = ','.join(allSignalStrings)
-defSampleStr = "SMS_T1tttt_2J_mGl1500_mLSP100_PU_S14_POSTLS170,ttJetsCSA1450ns"
+#defSampleStr = "SMS_T1tttt_2J_mGl1500_mLSP100_PU_S14_POSTLS170,ttJetsCSA1450ns"
 
 branchKeepStrings = ["run", "lumi", "evt", "isData", "xsec", "puWeight", "nTrueInt", "genWeight", "rho", "nVert", "nJet25", "nBJetLoose25", "nBJetMedium25", "nBJetTight25", "nJet40", "nJet40a", "nBJetLoose40", "nBJetMedium40", "nBJetTight40", 
                      "nLepGood20", "nLepGood15", "nLepGood10",  
                      "GenSusyMScan1", "GenSusyMScan2", "GenSusyMScan3", "GenSusyMScan4", "GenSusyMGluino", "GenSusyMGravitino", "GenSusyMStop", "GenSusyMSbottom", "GenSusyMStop2", "GenSusyMSbottom2", "GenSusyMSquark", "GenSusyMNeutralino", "GenSusyMNeutralino2", "GenSusyMNeutralino3", "GenSusyMNeutralino4", "GenSusyMChargino", "GenSusyMChargino2", 
                      "htJet25", "mhtJet25", "htJet40j", "htJet40ja", "htJet40", "htJet40a", "mhtJet40", "mhtJet40a", "nSoftBJetLoose25", "nSoftBJetMedium25", "nSoftBJetTight25", 
                      "met_*", 
-                     "nLepOther", "LepOther_*", "nLepGood", "LepGood_*", "nGenP6StatusThree", "GenP6StatusThree_*", "ngenLep", "genLep_*", "nTauGood", "TauGood_*", 
-                     "ngenPart", "genPart_*", "ngenTau", "genTau_*", "nGenTop", "GenTop_*", "nJet", "Jet_*", "ngenLepFromTau", "genLepFromTau_*"]
+                     "nLepOther", "LepOther_*", "nLepGood", "LepGood_*", "ngenLep", "genLep_*", "nTauGood", "TauGood_*", 
+                     "ngenPart", "genPart_*", "ngenTau", "genTau_*", "nJet", "Jet_*", "ngenLepFromTau", "genLepFromTau_*"]
+#"nGenP6StatusThree", "GenP6StatusThree_*", "nGenTop", "GenTop_*"
 
 from optparse import OptionParser
 parser = OptionParser()
 parser.add_option("--samples", dest="allsamples", default=defSampleStr, type="string", action="store", help="samples:Which samples.")
-parser.add_option("--producerName", dest="producerName", default="treeProducerSusySingleSoftLepton", type="string", action="store", help="samples:Which samples.")
+parser.add_option("--inputTreeName", dest="inputTreeName", default="treeProducerSusySingleLepton", type="string", action="store", help="samples:Which samples.")
 parser.add_option("--targetDir", dest="targetDir", default="/data/"+username+"/cmgTuples/"+subDir+'/', type="string", action="store", help="target directory.")
 parser.add_option("--skim", dest="skim", default="", type="string", action="store", help="any skim condition?")
 parser.add_option("--leptonSelection", dest="leptonSelection", default="hard", type="string", action="store", help="which lepton selection? 'soft' or 'hard' or 'none'?")
@@ -69,6 +71,8 @@ if sys.argv[0].count('ipython'):
 def getChunks(sample):
   if '/dpm/' in sample['dir']:
     return getChunksFromDPM(sample)
+#  elif '/eoscms.cern.ch/' in sample['dir']:
+#    return getSampleFromEOS(sample)
   else:
     return getChunksFromNFS(sample)
     
@@ -78,18 +82,22 @@ def getChunksFromNFS(sample):
   nTotEvents=0
   allFiles=[]
   for i, s in enumerate(chunks):
-#    try:
-      logfile = sample['dir']+'/'+s['name']+'/log.txt'
-      line = [x for x in subprocess.check_output(["cat", logfile]).split('\n') if x.count('number of events processed')]
+#      logfile = sample['dir']+'/'+s['name']+'/log.txt'
+#      line = [x for x in subprocess.check_output(["cat", logfile]).split('\n') if x.count('number of events processed')]
+#      assert len(line)==1,"Didn't find event number in file %s"%logfile
+#      n = int(line[0].split()[-1])
+      logfile = sample['dir']+'/'+s['name']+'/skimAnalyzerCount/SkimReport.txt'
+      line = [x for x in subprocess.check_output(["cat", logfile]).split('\n') if x.count('All Events')]
       assert len(line)==1,"Didn't find event number in file %s"%logfile
-      n = int(line[0].split()[-1])
-      inputFilename = sample['dir']+'/'+s['name']+'/'+options.producerName+'/'+options.producerName+'_tree.root'
+      n = int(line[0].split()[2])
+      inputFilename = sample['dir']+'/'+s['name']+'/'+options.inputTreeName+'/tree.root'
+      print inputFilename
       if os.path.isfile(inputFilename):
         nTotEvents+=n
         allFiles.append(inputFilename)
         chunks[i]['file']=inputFilename
 #    except: print "Chunk",s,"could not be added"
-  print "Found",len(chunks),"chunks for sample",sample["name"]
+  print "Found",len(chunks),"chunks for sample",sample["name"],'with a total of',nTotEvents,"events"
   return chunks, nTotEvents
 
 def getChunksFromDPM(sample):
@@ -102,12 +110,23 @@ def getChunksFromDPM(sample):
   print "Found",len(chunks),"chunks for sample",sample["name"]
   return chunks, nTotEvents
 
+#def getSampleFromEOS(sample):
+#  fn = sample['dir'].rstrip('/')+'/'+sample['name']+'/'+options.inputTreeName+'/tree.root'
+#  chunks = [{'file':fn,'name':fn.split('/')[-1].replace('.root','')}]
+#  nTotEvents=0
+##  for c in chunks:
+##    c.update({'nEvents':int(c['name'].split('nEvents')[-1])})
+##    nTotEvents+=c['nEvents']
+##  print "Found",len(chunks),"chunks for sample",sample["name"]
+#  print chunks
+#  return chunks, nTotEvents
+
 def getTreeFromChunk(c, skimCond):
   if not c.has_key('file'):return
   rf = ROOT.TFile.Open(c['file'])
   assert not rf.IsZombie()
   rf.cd()
-  tc = rf.Get(options.producerName)
+  tc = rf.Get("tree")
   ROOT.gDirectory.cd('PyROOT:/')
   t = tc.CopyTree(skimCond)
   tc.Delete()
