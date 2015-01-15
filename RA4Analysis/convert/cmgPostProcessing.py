@@ -18,8 +18,8 @@ from localInfo import username
 ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 
-defSampleStr = "ttJets_PU20bx25"
-#defSampleStr = "ttWJets_PU20bx25,ttZJets_PU20bx25,ttHJets_PU20bx25"
+#defSampleStr = "ttJets_PU20bx25"
+defSampleStr = "ttWJets_PU20bx25,ttZJets_PU20bx25,ttHJets_PU20bx25"
 #defSampleStr = "QCD_HT_250To500_PU20bx25"
 
 branchKeepStrings = ["run", "lumi", "evt", "isData", "xsec", "puWeight", "nTrueInt", "genWeight", "rho", "nVert", "nJet25", "nBJetLoose25", "nBJetMedium25", "nBJetTight25", "nJet40", "nJet40a", "nBJetLoose40", "nBJetMedium40", "nBJetTight40", 
@@ -280,11 +280,11 @@ for isample, sample in enumerate(allSamples):
       f.Close()
       print "Written",tmpDir+'/'+newFileName
       del f
+      del t2
+      t.Delete()
+      del t
     for v in newVars:
       del v['branch']
-    del t2
-    t.Delete()
-    del t
 
   if not options.small: 
     size=0
