@@ -46,19 +46,19 @@ WJetsToLNu_HT100to200_PU20bx25={\
 WJetsToLNu_HT200to400_PU20bx25={\
 "name" : "WJetsToLNu_HT200to400",
 "chunkString": "",
-'dir' : "/dpm/oeaw.ac.at/home/cms/store/user/schoef/Phys14_4/WJetsToLNu_HT100to200",
+'dir' : "/dpm/oeaw.ac.at/home/cms/store/user/schoef/Phys14_4/WJetsToLNu_HT200to400",
 'dbsName':'/WJetsToLNu_HT-200to400_Tune4C_13TeV-madgraph-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'
 }
 WJetsToLNu_HT400to600_PU20bx25={\
 "name" : "WJetsToLNu_HT400to600",
 "chunkString": "",
-'dir' : "/dpm/oeaw.ac.at/home/cms/store/user/schoef/Phys14_4/WJetsToLNu_HT100to200",
+'dir' : "/dpm/oeaw.ac.at/home/cms/store/user/schoef/Phys14_4/WJetsToLNu_HT400to600",
 'dbsName':'/WJetsToLNu_HT-400to600_Tune4C_13TeV-madgraph-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'
 }
 WJetsToLNu_HT600toInf_PU20bx25={\
 "name" : "WJetsToLNu_HT600toInf",
 "chunkString": "",
-'dir' : "/dpm/oeaw.ac.at/home/cms/store/user/schoef/Phys14_4/WJetsToLNu_HT100to200",
+'dir' : "/dpm/oeaw.ac.at/home/cms/store/user/schoef/Phys14_4/WJetsToLNu_HT600toInf",
 'dbsName':'/WJetsToLNu_HT-600toInf_Tune4C_13TeV-madgraph-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'
 }
 DYJetsToLL_M50_HT100to200_PU20bx25={\
