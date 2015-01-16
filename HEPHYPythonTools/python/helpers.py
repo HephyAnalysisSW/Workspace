@@ -5,6 +5,36 @@ from array import array
 def test():
   return 1
 
+def scatterOnTH2(data, h, ofile, markerType):
+  assert type(h)==type(ROOT.TH2F()) or type(h)==type(ROOT.TH2D()), "Wrong type of histogram! %s" % repr(type(h))
+  for d in data:
+    h.Fill(d[0], d[1], 0) 
+  c1 = ROOT.TCanvas()
+  xmin = h.GetXaxis().GetXmin()
+  xmax = h.GetXaxis().GetXmax()
+  ymin = h.GetYaxis().GetXmin()
+  ymax = h.GetYaxis().GetXmax()
+  data.sort(key=lambda x:x[2])
+  zvals = [d[2] for d in data] 
+  zmin, zmax = min(zvals), max(zvals)
+#  h.Reset()
+  h.GetZaxis().SetRangeUser(zmin,zmax)
+  c1.SetLogz()
+  h.Draw("COLZ")
+  c1.Update()
+  zPaletteAxis=h.GetListOfFunctions().FindObject("palette")
+  stuff=[]
+  for d in data:
+    if d[0]>xmin and d[0]<xmax and d[1]>ymin and d[1]<ymax:
+      e = ROOT.TMarker(d[0], d[1], markerType) 
+      e.SetMarkerColor(zPaletteAxis.GetValueColor(d[2])) 
+      stuff.append(e)
+    h.Fill(d[0], d[1], 0) 
+  for s in stuff:
+    s.Draw()
+  c1.Print(ofile)
+  
+
 def bStr(s): 
   "make string bold."
   assert type(s)==type(""), "bStr needs string, got %s" % str(type(s))
