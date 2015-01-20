@@ -50,9 +50,7 @@ def getTotalBranching(slha, particle1, particle2, sumCharges=True):
     if particle2 in ids: totBR+=d.br 
   return totBR
 
-#ROOT.gROOT.ProcessLine(".L nullPtr.C+")
-
-def scatterOnTH2(data, h, ofile, markerType):
+def scatterOnTH2(data, h, ofile, markerType, markerSize=1.):
   assert type(h)==type(ROOT.TH2F()) or type(h)==type(ROOT.TH2D()), "Wrong type of histogram! %s" % repr(type(h))
   h.Reset()
   for d in data:
@@ -64,34 +62,26 @@ def scatterOnTH2(data, h, ofile, markerType):
   ymax = h.GetYaxis().GetXmax()
   zvals = [d[2] for d in data] 
   zmin, zmax = min(zvals), max(zvals)
-  h.GetZaxis().SetRangeUser(min(zmax*10**-1.5, max(zmin, zmax*10**-4)),max(1.5,zmax))
+  zmin, zmax = min(zmax*10**-1.5, max(zmin, zmax*10**-4)),zmax
+  h.GetZaxis().SetRangeUser(zmin, zmax)
   c1.SetLogz()
-  #ROOT.gStyle.SetPalette(55)#,ROOT.null_Int_t_Pointer())
   h.Draw("COLZ")
+#  palette = h.GetListOfFunctions().FindObject("palette")
   c1.Update()
-#  zPaletteAxis=h.GetListOfFunctions().FindObject("palette")
-#  print zPaletteAxis.GetX1NDC()
-#  print zPaletteAxis.GetY1NDC()
-#  print zPaletteAxis.GetX2NDC()
-#  print zPaletteAxis.GetY2NDC()
-#  ROOT.gStyle.SetPalette(53)
-  zPaletteAxis = ROOT.TPaletteAxis(0.90499999404,0.10000000596,0.94999999404,0.49999999404, h)
-#  zPaletteAxis.SetRangeUser(min(zmax*10**-1.5, max(zmin, zmax*10**-4)),zmax)
   stuff=[]
   for d in data:
-    if d[0]>xmin and d[0]<xmax and d[1]>ymin and d[1]<ymax:
+    if d[0]>xmin*1.02 and d[0]<xmax*0.98 and d[1]>ymin*1.02 and d[1]<ymax*0.98:
       if d[2]>0: 
         e = ROOT.TMarker(d[0], d[1], markerType)
-#        e.SetMarkerColor(zPaletteAxis.GetValueColor(log(d[2],10))) 
-        e.SetMarkerColor(zPaletteAxis.GetValueColor(d[2])) 
-        print ofile, zPaletteAxis
-        print d[2], zPaletteAxis.GetValueColor(d[2]) 
+        zRatio = (log(d[2])-log(zmin))/(log(zmax) - log(zmin))
+        color = ROOT.gStyle.GetColorPalette(int(round(zRatio*(ROOT.gStyle.GetNumberOfColors()-1))))
+        e.SetMarkerColor(color)
+        e.SetMarkerSize(markerSize)
         stuff.append(e)
 #    h.Fill(d[0], d[1], 0) 
   for s in stuff:
     s.Draw()
   c1.Print(ofile)
-  del zPaletteAxis
   del h
 
 dataPath = "/Users/robertschoefbeck//CloudStation/data/LFT/"
@@ -130,7 +120,7 @@ def vec(res, key):
 
 files = os.listdir(dataPath+'/slha/')
 #files = ['9902.txt','9904.txt']
-files = files[:10]
+#files = files[:10]
 res=[]
 for i, f in enumerate(files):
   if i%100==0:
@@ -139,8 +129,8 @@ for i, f in enumerate(files):
 
 #  exclR = exclusions['cmsSUS_r']
   exclR = exclusions['maxR']
-#  if exclR>1:
-#    continue
+  if exclR>1:
+    continue
 #  print 'maxR',exclR, 'newMaxR',exclusions['newMaxR']
   slha=pyslha.readSLHAFile(dataPath+'/slha/'+f, ignoreblocks=['XSECTION'])
   mgl = slha.blocks['MASS'][1000021]
@@ -189,30 +179,30 @@ prefix='test2'
 for zVar in [\
     'xsec_gluinoPair', 
     'xsecBR_tbWtbW', 'BR_tbWtbW', 'br_gluinoToStop', 'br_gluinoToSbottom', 'br_stopToCha', 'br_sbotToCha', 
-    'br_ChaToNeu'
+#    'br_ChaToNeu'
     ]:
   allJobs = [ 
     {'firstVar':'mgl','firstBinning':[900,600,1500], 'secondBinning':[400,0,400], 'secondVar':'mneu1'}, 
-#    {'firstVar':'mgl','firstBinning':[900,600,1500], 'secondBinning':[400,0,400], 'secondVar':'mcha1'}, 
-#    {'firstVar':'mgl','firstBinning':[900,600,1500], 'secondBinning':[1000,250,1250], 'secondVar':'mstop1'}, 
-#    {'firstVar':'mgl','firstBinning':[900,600,1500], 'secondBinning':[1000,250,1250], 'secondVar':'msbot1'},
-#    {'secondVar':'mneu1','secondBinning':[400,0,400], 'firstBinning':[300,100,400], 'firstVar':'mcha1'},
+    {'firstVar':'mgl','firstBinning':[900,600,1500], 'secondBinning':[400,0,400], 'secondVar':'mcha1'}, 
+    {'firstVar':'mgl','firstBinning':[900,600,1500], 'secondBinning':[1000,250,1250], 'secondVar':'mstop1'}, 
+    {'firstVar':'mgl','firstBinning':[900,600,1500], 'secondBinning':[1000,250,1250], 'secondVar':'msbot1'},
+    {'secondVar':'mneu1','secondBinning':[400,0,400], 'firstBinning':[300,100,400], 'firstVar':'mcha1'},
   ]
 
   for job in allJobs:
     data = [(r[job['firstVar']], r[job['secondVar']], r[zVar]) for r in res if r[zVar]>0]
     if len(data)>0:
       data.sort(key=lambda x:x[2])
-#      h=ROOT.TH2F(zVar, '', *(job['firstBinning']+job['secondBinning']))
-#      h.Reset()
-#      h.GetXaxis().SetTitle("")
-#      h.GetYaxis().SetTitle("")
-#      ROOT.gStyle.SetOptStat(0)
-#      scatterOnTH2(data, h, '/Users/robertschoefbeck/Desktop/plots/'+prefix+'_'+job['firstVar']+'_'+job['secondVar']+'_'+zVar+'.png', 20)
+      h=ROOT.TH2F(zVar, '', *(job['firstBinning']+job['secondBinning']))
+      h.Reset()
+      h.GetXaxis().SetTitle("")
+      h.GetYaxis().SetTitle("")
+      ROOT.gStyle.SetOptStat(0)
+      scatterOnTH2(data, h, '/Users/robertschoefbeck/Desktop/plots/'+prefix+'_'+job['firstVar']+'_'+job['secondVar']+'_'+zVar+'.png', 20, 0.5)
 
-      h=ROOT.TGraph2D('xsec', 'xsec', len(res), vec(res,'mgl'), vec(res, 'mneu1'), vec(res, zVar))
-      c1=ROOT.TCanvas()
-      h.Draw()
-      c1.SetLogz()
-      c1.Print('/Users/robertschoefbeck/Desktop/plots/th2f_'+prefix+'_'+job['firstVar']+'_'+job['secondVar']+'_'+zVar+'.png')
+#      h=ROOT.TGraph2D('xsec', 'xsec', len(res), vec(res,'mgl'), vec(res, 'mneu1'), vec(res, zVar))
+#      c1=ROOT.TCanvas()
+#      h.Draw()
+#      c1.SetLogz()
+#      c1.Print('/Users/robertschoefbeck/Desktop/plots/th2f_'+prefix+'_'+job['firstVar']+'_'+job['secondVar']+'_'+zVar+'.png')
 
