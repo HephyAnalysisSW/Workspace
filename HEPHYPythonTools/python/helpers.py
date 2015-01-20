@@ -1,5 +1,5 @@
 import ROOT
-from math import pi, sqrt, cos, sin, sinh
+from math import pi, sqrt, cos, sin, sinh, log
 from array import array
 
 def test():
@@ -17,17 +17,18 @@ def scatterOnTH2(data, h, ofile, markerType):
   data.sort(key=lambda x:x[2])
   zvals = [d[2] for d in data] 
   zmin, zmax = min(zvals), max(zvals)
-#  h.Reset()
   h.GetZaxis().SetRangeUser(zmin,zmax)
-  c1.SetLogz()
-  h.Draw("COLZ")
   c1.Update()
-  zPaletteAxis=h.GetListOfFunctions().FindObject("palette")
+  h.Draw("COLZ")
+  c1.SetLogz()
   stuff=[]
   for d in data:
     if d[0]>xmin and d[0]<xmax and d[1]>ymin and d[1]<ymax:
+      zRatio = (log(d[2])-log(zmin))/(log(zmax) - log(zmin))
+      color = ROOT.gStyle.GetColorPalette(int(round(zRatio*(ROOT.gStyle.GetNumberOfColors()-1))))
+      print 'zR', zRatio, 'color',color
       e = ROOT.TMarker(d[0], d[1], markerType) 
-      e.SetMarkerColor(zPaletteAxis.GetValueColor(d[2])) 
+      e.SetMarkerColor(color) 
       stuff.append(e)
     h.Fill(d[0], d[1], 0) 
   for s in stuff:
