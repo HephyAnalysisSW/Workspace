@@ -61,7 +61,7 @@ def getFileList(dir, minAgeDPM=0, histname='histo', xrootPrefix='root://hephyse.
   import os, subprocess, datetime
   if dir[0:5] != "/dpm/":
     filelist = os.listdir(dir)
-    filelist = [dir+'/'+f for f in filelist]
+    filelist = [dir+'/'+f for f in filelist if histname in f]
   else:
     filelist = []
     p = subprocess.Popen(["dpns-ls -l "+ dir], shell = True , stdout=subprocess.PIPE, stderr=subprocess.STDOUT)

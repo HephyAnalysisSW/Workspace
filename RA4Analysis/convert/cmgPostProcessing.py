@@ -7,19 +7,19 @@ from Workspace.HEPHYPythonTools.xsec import xsec
 from Workspace.HEPHYPythonTools.helpers import getObjFromFile, getObjDict, getFileList
 from Workspace.RA4Analysis.convertHelpers import compileClass, readVar, printHeader, typeStr, createClassString
 
-subDir = "postProcessed_v4_PHYS14V1"
+subDir = "postProcessed_v5_Phys14V1"
 #from Workspace.RA4Analysis.cmgTuples_v3 import *
-from Workspace.RA4Analysis.cmgTuples_v4_PHYS14 import *
+from Workspace.RA4Analysis.cmgTuples_v5_Phys14 import *
 
-target_lumi = 1000 #pb-1
+target_lumi = 4000 #pb-1
 
 from localInfo import username
 
 ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 
-#defSampleStr = "ttJets_PU20bx25"
-defSampleStr = "ttWJets_PU20bx25,ttZJets_PU20bx25,ttHJets_PU20bx25"
+defSampleStr = "ttJets_PU20bx25"
+#defSampleStr = "ttWJets_PU20bx25,ttZJets_PU20bx25,ttHJets_PU20bx25"
 #defSampleStr = "QCD_HT_250To500_PU20bx25"
 
 branchKeepStrings = ["run", "lumi", "evt", "isData", "xsec", "puWeight", "nTrueInt", "genWeight", "rho", "nVert", "nJet25", "nBJetLoose25", "nBJetMedium25", "nBJetTight25", "nJet40", "nJet40a", "nBJetLoose40", "nBJetMedium40", "nBJetTight40", 
@@ -46,6 +46,8 @@ if options.skim=='inc' or options.skim=="":
   skimCond = "(1)"
 if options.skim.startswith('met'):
   skimCond = "met_pt>"+str(float(options.skim[3:]))
+if options.skim=='HT400ST150':
+  skimCond = "LepGood_pt[0]+met_pt>150&&Sum$(Jet_pt)>400"
 
 ##In case a lepton selection is required, loop only over events where there is one 
 if options.leptonSelection.lower()=='soft':
@@ -200,7 +202,8 @@ for isample, sample in enumerate(allSamples):
       #select tight soft leptons (no special tight ID for now)
       tightSoftLepInd = looseSoftLepInd #No tight loose selection as of yet 
       #select tight hard leptons (use POG ID)
-      tightHardLepInd = filter(lambda i:(abs(r.LepGood_pdgId[i])==11 and r.LepGood_tightId[i]==3) or (abs(r.LepGood_pdgId[i])==13 and r.LepGood_tightId[i]), looseHardLepInd)
+      tightHardLepInd = filter(lambda i:(abs(r.LepGood_pdgId[i])==11 and r.LepGood_relIso03[i]<0.14 and r.LepGood_tightId[i]>=3) \
+                                     or (abs(r.LepGood_pdgId[i])==13 and r.LepGood_relIso03[i]<0.12 and r.LepGood_tightId[i]), looseHardLepInd)
 
       s.nLooseSoftLeptons = len(looseSoftLepInd)
       s.nLooseSoftPt10Leptons = len(looseSoftPt10LepInd)

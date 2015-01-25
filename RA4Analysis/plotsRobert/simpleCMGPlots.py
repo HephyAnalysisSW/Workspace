@@ -11,7 +11,7 @@ from Workspace.RA4Analysis.simplePlotHelpers import plot, stack, loopAndFill, dr
 from Workspace.RA4Analysis.helpers import *
 from Workspace.RA4Analysis.cmgTuplesPostProcessed_v4_PHYS14V1 import * 
 small = True
-mode = 'soft'
+mode = 'hard'
 
 #prefix = 'mTSel_ht500-met250-6j-0b-diLepVeto'
 #presel="singleMuonic&&nVetoMuons==1&&nVetoElectrons==0&&met_pt>250&&htJet40ja>500&&nBJetMedium25==0&&nJet40a>=6"
@@ -32,8 +32,8 @@ subdir = "/pngCMG2/"+mode+'/'
 ####SOFT
 #    prefix = mode+'_ht500-met700-2j-0b-diLepVeto-2j80'
 #    presel="singleMuonic&&nLooseSoftLeptons==1&&nTightSoftLeptons==1&&nTightHardLeptons==0&&met>700&&htJet40ja>500&&nBJetMedium25==0&&nJet40a>=2&&Jet_pt[1]>80"
-prefix = mode+'_ht500-st250-6j-0b-diLepVeto'
-presel="singleMuonic&&nLooseSoftLeptons==1&&nTightSoftLeptons==1&&nTightHardLeptons==0&&st>250&&htJet40ja>500&&nBJetMedium25==0&&nJet40a>=6"
+#prefix = mode+'_ht500-st250-6j-0b-diLepVeto'
+#presel="singleMuonic&&nLooseSoftLeptons==1&&nTightSoftLeptons==1&&nTightHardLeptons==0&&st>250&&htJet40ja>500&&nBJetMedium25==0&&nJet40a>=6"
 #    prefix = mode+'_ht500-st250-2j-0b-diLepVeto'
 #    presel="singleMuonic&&nLooseSoftLeptons==1&&nTightSoftLeptons==1&&nTightHardLeptons==0&&st>250&&htJet40ja>500&&nBJetMedium25==0&&nJet40a>=2"
 #    prefix = mode+'_ht500-st250-6j-geq2b-diLepVeto'
@@ -43,28 +43,29 @@ presel="singleMuonic&&nLooseSoftLeptons==1&&nTightSoftLeptons==1&&nTightHardLept
 #    prefix = mode+'_ht500-st250-2j-geq2b-diLepVeto'
 #    presel="singleMuonic&&nLooseSoftLeptons==1&&nTightSoftLeptons==1&&nTightHardLeptons==0&&st>250&&htJet40ja>500&&nBJetMedium25>=2&&nJet40a>=2"
 ###HARD
-#    prefix = 'hard2_ht500-st250-6j-0b-diLepVeto'
+#    prefix = 'hard_ht500-st250-6j-0b-diLepVeto'
 #    presel="singleMuonic&&nLooseSoftLeptons==0&&nTightHardLeptons==1&&nLooseHardLeptons==1&&st>250&&htJet40ja>500&&nBJetMedium25==0&&nJet40a>=6"
 #prefix = mode+'_ht500-st450-6j-0b-diLepVeto'
 #presel="singleMuonic&&nLooseSoftLeptons==0&&nTightHardLeptons==1&&nLooseHardLeptons==1&&st>450&&htJet40ja>500&&nBJetMedium25==0&&nJet40a>=6"
-#    prefix = 'hard2_ht500-st250-2j-0b-diLepVeto'
-#    presel="singleMuonic&&nLooseSoftLeptons==0&&nTightHardLeptons==1&&nLooseHardLeptons==1&&st>250&&htJet40ja>500&&nBJetMedium25==0&&nJet40a>=2"
+prefix = mode+'_ht400-st150-2j-0b-diLepVeto'
+presel="singleMuonic&&nLooseSoftLeptons==0&&nTightHardLeptons==1&&nLooseHardLeptons==1&&st>150&&htJet40ja>400&&nBJetMedium25==0&&nJet40a>=2"
 
 cutString=presel
 
-#signalPrefix="" if signalScale==1 else str(signalScale)+"x "
-##  #HARD
-#hard_T5Full_1200_1000_800['style'] = {'legendText':signalPrefix+hard_T5Full_1200_1000_800['name'],   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kBlue, 'markerStyle':None, 'markerSize':None}
-#hard_T5Full_1500_800_100['style']  = {'legendText':signalPrefix+hard_T5Full_1500_800_100['name'],   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kBlack, 'markerStyle':None, 'markerSize':None}
-##  hard_T1tttt_2J_mGo1300_mStop300_mCh285_mChi280['style']  = {'legendText':signalPrefix+hard_T1tttt_2J_mGo1300_mStop300_mCh285_mChi280['name'],   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kGreen, 'markerStyle':None, 'markerSize':None}
-##  signals = [hard_T5Full_1200_1000_800, hard_T5Full_1500_800_100, hard_T1tttt_2J_mGo1300_mStop300_mCh285_mChi280]
-#signals = [hard_T5Full_1200_1000_800, hard_T5Full_1500_800_100]
-signals=[]
+signalPrefix="" if signalScale==1 else str(signalScale)+"x "
+#  #HARD
+if mode=='hard':
+  hard_SMS_T5qqqqWW_Gl1200_Chi1000_LSP800['style'] = {'legendText':signalPrefix+hard_SMS_T5qqqqWW_Gl1200_Chi1000_LSP800['name'],   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kBlue, 'markerStyle':None, 'markerSize':None}
+  hard_SMS_T5qqqqWW_Gl1500_Chi800_LSP100['style']  = {'legendText':signalPrefix+hard_SMS_T5qqqqWW_Gl1500_Chi800_LSP100['name'],   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kBlack, 'markerStyle':None, 'markerSize':None}
+  #  hard_T1tttt_2J_mGo1300_mStop300_mCh285_mChi280['style']  = {'legendText':signalPrefix+hard_T1tttt_2J_mGo1300_mStop300_mCh285_mChi280['name'],   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kGreen, 'markerStyle':None, 'markerSize':None}
+  #  signals = [hard_SMS_T5qqqqWW_Gl1200_Chi1000_LSP800, hard_SMS_T5qqqqWW_Gl1500_Chi800_LSP100, hard_T1tttt_2J_mGo1300_mStop300_mCh285_mChi280]
+  signals = [hard_SMS_T5qqqqWW_Gl1200_Chi1000_LSP800, hard_SMS_T5qqqqWW_Gl1500_Chi800_LSP100]
 #  hard_T6qqWW_Sq_950_LSP_300_Chi_350['style'] = {'legendText':signalPrefix+hard_T6qqWW_Sq_950_LSP_300_Chi_350['name'],   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kBlue, 'markerStyle':None, 'markerSize':None}
 #  hard_T5qqqqWW_Gl_1400_LSP_300_Chi_315['style']  = {'legendText':signalPrefix+hard_T5qqqqWW_Gl_1400_LSP_300_Chi_315['name'],   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kBlack, 'markerStyle':None, 'markerSize':None}
 #  hard_T1tttt_2J_mGo1300_mStop300_mCh285_mChi280['style']  = {'legendText':signalPrefix+hard_T1tttt_2J_mGo1300_mStop300_mCh285_mChi280['name'],   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kGreen, 'markerStyle':None, 'markerSize':None}
 #  signals = [hard_T6qqWW_Sq_950_LSP_300_Chi_350, hard_T5qqqqWW_Gl_1400_LSP_300_Chi_315, hard_T1tttt_2J_mGo1300_mStop300_mCh285_mChi280]
-
+if mode=='soft':
+  signals=[]
 #  soft_T6qqWW_Sq_950_LSP_300_Chi_350['style'] = {'legendText':signalPrefix+soft_T6qqWW_Sq_950_LSP_300_Chi_350['name'],   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kBlue, 'markerStyle':None, 'markerSize':None}
 #  soft_T5qqqqWW_Gl_1400_LSP_300_Chi_315['style']  = {'legendText':signalPrefix+soft_T5qqqqWW_Gl_1400_LSP_300_Chi_315['name'],   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kBlack, 'markerStyle':None, 'markerSize':None}
 #  soft_T1tttt_2J_mGo1300_mStop300_mCh285_mChi280['style']  = {'legendText':signalPrefix+soft_T1tttt_2J_mGo1300_mStop300_mCh285_mChi280['name'],   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kGreen, 'markerStyle':None, 'markerSize':None}
