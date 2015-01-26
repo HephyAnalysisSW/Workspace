@@ -65,7 +65,11 @@ def getChunks(sample):
 #  elif '/eoscms.cern.ch/' in sample['dir']:
 #    return getSampleFromEOS(sample)
   else:
-    return getChunksFromNFS(sample)
+    fromDPM =  sample.has_key('fromDPM') and sample.has_key('fromDPM')
+    if fromDPM:
+      return getChunksFromDPM(sample, fromDPM=fromDPM)
+    else:
+      return getChunksFromNFS(sample)
     
 def getChunksFromNFS(sample):
   chunks = [{'name':x} for x in os.listdir(sample['dir']) if x.startswith(sample['chunkString']+'_Chunk') or x==sample['name']]
@@ -92,15 +96,25 @@ def getChunksFromNFS(sample):
   print "Found",len(chunks),"chunks for sample",sample["name"],'with a total of',nTotEvents,"events. Failed for:",",".join([c['name'] for c in failedChunks]),"(",round(100*len(failedChunks)/float(len(chunks)),1),")%"
   return chunks, nTotEvents
 
-def getChunksFromDPM(sample):
-  fileList = getFileList(sample['dir'], minAgeDPM=0, histname='', xrootPrefix='root://hephyse.oeaw.ac.at/')
+def getChunksFromDPM(sample, fromDPM=False):
+  fileList = getFileList(sample['dir'], minAgeDPM=0, histname='', xrootPrefix='root://hephyse.oeaw.ac.at/' if not fromDPM else '')
   chunks = [{'file':x,'name':x.split('/')[-1].replace('.root','')} for x in fileList]
   nTotEvents=0
+  failedChunks=[]
+  goodChunks=[]
   for c in chunks:
-    c.update({'nEvents':int(c['name'].split('nEvents')[-1])})
-    nTotEvents+=c['nEvents']
-  print "Found",len(chunks),"chunks for sample",sample["name"]
-  return chunks, nTotEvents
+    try:
+      nEvents=int(c['name'].split('nEvents')[-1])
+    except:
+      nEvents=-1
+    if nEvents>0:
+      c.update({'nEvents':int(c['name'].split('nEvents')[-1])})
+      nTotEvents+=c['nEvents']
+      goodChunks.append(c)
+    else:
+      failedChunks.append(c['name'])
+  print "Found",len(chunks),"chunks for sample",sample["name"],"failed:",len(failedChunks),",".join(failedChunks)
+  return goodChunks, nTotEvents
 
 #def getSampleFromEOS(sample):
 #  fn = sample['dir'].rstrip('/')+'/'+sample['name']+'/'+options.inputTreeName+'/tree.root'

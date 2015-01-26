@@ -9,7 +9,7 @@ from Workspace.HEPHYPythonTools.helpers import getObjFromFile
 #from Workspace.RA4Analysis.simplePlotsCommon import *
 from Workspace.RA4Analysis.simplePlotHelpers import plot, stack, loopAndFill, drawNMStacks
 from Workspace.RA4Analysis.helpers import *
-from Workspace.RA4Analysis.cmgTuplesPostProcessed_v4_PHYS14V1 import * 
+from Workspace.RA4Analysis.cmgTuplesPostProcessed_v4_Phys14V1 import * 
 small = True
 mode = 'hard'
 
