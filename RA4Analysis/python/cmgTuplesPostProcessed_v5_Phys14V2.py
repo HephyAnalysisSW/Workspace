@@ -15,27 +15,27 @@ ttJets=bookSample({\
 WJetsHTToLNu=bookSample({\
 "name" : "WJetsHTToLNu",
 "bins" : ["WJetsToLNu_HT100to200", "WJetsToLNu_HT200to400", "WJetsToLNu_HT400to600", "WJetsToLNu_HT600toInf"],
-'dir' : "/data/schoef/cmgTuples/postProcessed_v5_PHYS14V1/",
+'dir' : "/data/schoef/cmgTuples/postProcessed_v5_Phys14V1/",
 })
 #TTVH=bookSample({\
 #"name" : "TTVH",
 #"bins" : ["TTH", "TTWJets", "TTZJets"],
-#'dir' : "/data/schoef/cmgTuples/postProcessed_v4_PHYS14V1/",
+#'dir' : "/data/schoef/cmgTuples/postProcessed_v4_Phys14V1/",
 #})
 #singleTop=bookSample({\
 #"name" : "singleTop",
 #"bins" : ["TBarToLeptons_sChannel", "TBarToLeptons_tChannel", "TBar_tWChannel", "TToLeptons_sChannel", "TToLeptons_tChannel", "T_tWChannel"],
-#'dir' : "/data/schoef/cmgTuples/postProcessed_v4_PHYS14V1/",
+#'dir' : "/data/schoef/cmgTuples/postProcessed_v4_Phys14V1/",
 #})
 #DY=bookSample({\
 #"name" : "DY",
 #"bins" : ["DYJetsToLL_M50_HT100to200", "DYJetsToLL_M50_HT200to400", "DYJetsToLL_M50_HT400to600", "DYJetsToLL_M50_HT600toInf"],
-#'dir' : "/data/schoef/cmgTuples/postProcessed_v4_PHYS14V1/",
+#'dir' : "/data/schoef/cmgTuples/postProcessed_v4_Phys14V1/",
 #})
 #QCD=bookSample({\
 #"name" : "QCD",
 #"bins" : ["QCD_HT_250To500", "QCD_HT_500To1000", "QCD_HT_1000ToInf"],
-#'dir' : "/data/schoef/cmgTuples/postProcessed_v4_PHYS14V1/",
+#'dir' : "/data/schoef/cmgTuples/postProcessed_v4_Phys14V1/",
 #})
 
 
@@ -111,7 +111,7 @@ WJetsHTToLNu=bookSample({\
 #    return {\
 #      "name" : signal,
 ##      "chunkString": signal,
-#      'dir' : "/data/schoef/cmgTuples/postProcessed_v5_PHYS14V1/",
+#      'dir' : "/data/schoef/cmgTuples/postProcessed_v5_Phys14V1/",
 #      'bins':[signal]
 #      }
 #  else:
