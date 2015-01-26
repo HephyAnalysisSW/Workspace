@@ -1,42 +1,42 @@
 import copy, os, sys
 
-def getBkgSample(sample):
+def bookSample(sample):
   h = copy.deepcopy(sample)
   h['dir']=h['dir']+'/hard/'
   s = copy.deepcopy(sample)
   s['dir']=s['dir']+'/soft/'
   return {'hard':h, 'soft':s}
 
-ttJets=getBkgSample({\
-"name" : "ttJets",
-"bins" : ["TTJets"],
-'dir' : "/data/schoef/cmgTuples/postProcessed_v4_PHYS14V1/",
-})
-WJetsHTToLNu=getBkgSample({\
+#ttJets=bookSample({\
+#"name" : "ttJets",
+#"bins" : ["TTJets"],
+#'dir' : "/data/schoef/cmgTuples/postProcessed_v5_PHYS14V1/",
+#})
+WJetsHTToLNu=bookSample({\
 "name" : "WJetsHTToLNu",
 "bins" : ["WJetsToLNu_HT100to200", "WJetsToLNu_HT200to400", "WJetsToLNu_HT400to600", "WJetsToLNu_HT600toInf"],
-'dir' : "/data/schoef/cmgTuples/postProcessed_v4_PHYS14V1/",
+'dir' : "/data/schoef/cmgTuples/postProcessed_v5_PHYS14V1/",
 })
-TTVH=getBkgSample({\
-"name" : "TTVH",
-"bins" : ["TTH", "TTWJets", "TTZJets"],
-'dir' : "/data/schoef/cmgTuples/postProcessed_v4_PHYS14V1/",
-})
-singleTop=getBkgSample({\
-"name" : "singleTop",
-"bins" : ["TBarToLeptons_sChannel", "TBarToLeptons_tChannel", "TBar_tWChannel", "TToLeptons_sChannel", "TToLeptons_tChannel", "T_tWChannel"],
-'dir' : "/data/schoef/cmgTuples/postProcessed_v4_PHYS14V1/",
-})
-DY=getBkgSample({\
-"name" : "DY",
-"bins" : ["DYJetsToLL_M50_HT100to200", "DYJetsToLL_M50_HT200to400", "DYJetsToLL_M50_HT400to600", "DYJetsToLL_M50_HT600toInf"],
-'dir' : "/data/schoef/cmgTuples/postProcessed_v4_PHYS14V1/",
-})
-QCD=getBkgSample({\
-"name" : "QCD",
-"bins" : ["QCD_HT_250To500", "QCD_HT_500To1000", "QCD_HT_1000ToInf"],
-'dir' : "/data/schoef/cmgTuples/postProcessed_v4_PHYS14V1/",
-})
+#TTVH=bookSample({\
+#"name" : "TTVH",
+#"bins" : ["TTH", "TTWJets", "TTZJets"],
+#'dir' : "/data/schoef/cmgTuples/postProcessed_v4_PHYS14V1/",
+#})
+#singleTop=bookSample({\
+#"name" : "singleTop",
+#"bins" : ["TBarToLeptons_sChannel", "TBarToLeptons_tChannel", "TBar_tWChannel", "TToLeptons_sChannel", "TToLeptons_tChannel", "T_tWChannel"],
+#'dir' : "/data/schoef/cmgTuples/postProcessed_v4_PHYS14V1/",
+#})
+#DY=bookSample({\
+#"name" : "DY",
+#"bins" : ["DYJetsToLL_M50_HT100to200", "DYJetsToLL_M50_HT200to400", "DYJetsToLL_M50_HT400to600", "DYJetsToLL_M50_HT600toInf"],
+#'dir' : "/data/schoef/cmgTuples/postProcessed_v4_PHYS14V1/",
+#})
+#QCD=bookSample({\
+#"name" : "QCD",
+#"bins" : ["QCD_HT_250To500", "QCD_HT_500To1000", "QCD_HT_1000ToInf"],
+#'dir' : "/data/schoef/cmgTuples/postProcessed_v4_PHYS14V1/",
+#})
 
 
 #T1qqqq_1400_325_300={\
@@ -98,12 +98,20 @@ QCD=getBkgSample({\
 #  "T6qqWW_Sq_950_LSP_300_Chi_350",
 #]
 #
-#def getSignalSample(signal, subDir='soft'):
+
+#allSignalStrings=[\
+#"SMS_T1tttt_2J_mGl1500_mLSP100",
+#"SMS_T1tttt_2J_mGl1200_mLSP800",
+#"SMS_T5qqqqWW_Gl1500_Chi800_LSP100",
+#"SMS_T5qqqqWW_Gl1200_Chi1000_LSP800"]
+#
+#
+#def getSignalSample(signal):
 #  if signal in allSignalStrings:
 #    return {\
 #      "name" : signal,
 ##      "chunkString": signal,
-#      'dir' : "/data/schoef/cmgTuples/postProcessed_v4_PHYS14V1/"+subDir+'/',
+#      'dir' : "/data/schoef/cmgTuples/postProcessed_v5_PHYS14V1/",
 #      'bins':[signal]
 #      }
 #  else:
@@ -111,8 +119,9 @@ QCD=getBkgSample({\
 #
 #allSignals=[]
 #for s in allSignalStrings:
-#  exec("soft_"+s+"=getSignalSample('"+s+"', 'soft')")
-#  exec("allSignals.append(soft_"+s+")")
-#  exec("hard_"+s+"=getSignalSample('"+s+"', 'hard')")
-#  exec("allSignals.append(hard_"+s+")")
+#  bookSample(getSignalSample(s))
+##  exec("soft_"+s+"=getSignalSample('"+s+"', 'soft')")
+##  exec("allSignals.append(soft_"+s+")")
+##  exec("hard_"+s+"=getSignalSample('"+s+"', 'hard')")
+##  exec("allSignals.append(hard_"+s+")")
 #  

@@ -7,19 +7,19 @@ from Workspace.HEPHYPythonTools.xsec import xsec
 from Workspace.HEPHYPythonTools.helpers import getObjFromFile, getObjDict, getFileList
 from Workspace.RA4Analysis.convertHelpers import compileClass, readVar, printHeader, typeStr, createClassString
 
-subDir = "postProcessed_v4_PHYS14V1"
+subDir = "postProcessed_v5_Phys14V1"
 #from Workspace.RA4Analysis.cmgTuples_v3 import *
-from Workspace.RA4Analysis.cmgTuples_v4_PHYS14 import *
+from Workspace.RA4Analysis.cmgTuples_v5_Phys14 import *
 
-target_lumi = 1000 #pb-1
+target_lumi = 4000 #pb-1
 
 from localInfo import username
 
 ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 
-#defSampleStr = "ttJets_PU20bx25"
-defSampleStr = "ttWJets_PU20bx25,ttZJets_PU20bx25,ttHJets_PU20bx25"
+defSampleStr = "ttJets_PU20bx25"
+#defSampleStr = "ttWJets_PU20bx25,ttZJets_PU20bx25,ttHJets_PU20bx25"
 #defSampleStr = "QCD_HT_250To500_PU20bx25"
 
 branchKeepStrings = ["run", "lumi", "evt", "isData", "xsec", "puWeight", "nTrueInt", "genWeight", "rho", "nVert", "nJet25", "nBJetLoose25", "nBJetMedium25", "nBJetTight25", "nJet40", "nJet40a", "nBJetLoose40", "nBJetMedium40", "nBJetTight40", 
@@ -46,6 +46,8 @@ if options.skim=='inc' or options.skim=="":
   skimCond = "(1)"
 if options.skim.startswith('met'):
   skimCond = "met_pt>"+str(float(options.skim[3:]))
+if options.skim=='HT400ST150':
+  skimCond = "LepGood_pt[0]+met_pt>150&&Sum$(Jet_pt)>400"
 
 ##In case a lepton selection is required, loop only over events where there is one 
 if options.leptonSelection.lower()=='soft':
@@ -63,7 +65,11 @@ def getChunks(sample):
 #  elif '/eoscms.cern.ch/' in sample['dir']:
 #    return getSampleFromEOS(sample)
   else:
-    return getChunksFromNFS(sample)
+    fromDPM =  sample.has_key('fromDPM') and sample.has_key('fromDPM')
+    if fromDPM:
+      return getChunksFromDPM(sample, fromDPM=fromDPM)
+    else:
+      return getChunksFromNFS(sample)
     
 def getChunksFromNFS(sample):
   chunks = [{'name':x} for x in os.listdir(sample['dir']) if x.startswith(sample['chunkString']+'_Chunk') or x==sample['name']]
@@ -90,15 +96,25 @@ def getChunksFromNFS(sample):
   print "Found",len(chunks),"chunks for sample",sample["name"],'with a total of',nTotEvents,"events. Failed for:",",".join([c['name'] for c in failedChunks]),"(",round(100*len(failedChunks)/float(len(chunks)),1),")%"
   return chunks, nTotEvents
 
-def getChunksFromDPM(sample):
-  fileList = getFileList(sample['dir'], minAgeDPM=0, histname='', xrootPrefix='root://hephyse.oeaw.ac.at/')
+def getChunksFromDPM(sample, fromDPM=False):
+  fileList = getFileList(sample['dir'], minAgeDPM=0, histname='', xrootPrefix='root://hephyse.oeaw.ac.at/' if not fromDPM else '')
   chunks = [{'file':x,'name':x.split('/')[-1].replace('.root','')} for x in fileList]
   nTotEvents=0
+  failedChunks=[]
+  goodChunks=[]
   for c in chunks:
-    c.update({'nEvents':int(c['name'].split('nEvents')[-1])})
-    nTotEvents+=c['nEvents']
-  print "Found",len(chunks),"chunks for sample",sample["name"]
-  return chunks, nTotEvents
+    try:
+      nEvents=int(c['name'].split('nEvents')[-1])
+    except:
+      nEvents=-1
+    if nEvents>0:
+      c.update({'nEvents':int(c['name'].split('nEvents')[-1])})
+      nTotEvents+=c['nEvents']
+      goodChunks.append(c)
+    else:
+      failedChunks.append(c['name'])
+  print "Found",len(chunks),"chunks for sample",sample["name"],"failed:",len(failedChunks),",".join(failedChunks)
+  return goodChunks, nTotEvents
 
 #def getSampleFromEOS(sample):
 #  fn = sample['dir'].rstrip('/')+'/'+sample['name']+'/'+options.inputTreeName+'/tree.root'
@@ -192,7 +208,7 @@ for isample, sample in enumerate(allSamples):
       s.weight = lumiWeight
 
       #get all >=loose lepton indices
-      looseLepInd = cmgLooseLepIndices(r, ptCuts=(10,5), absEtaCuts=(2.4,2.1), hybridIso03={'ptSwitch':0, 'absIso':0, 'relIso':0.4} )
+      looseLepInd = cmgLooseLepIndices(r, ptCuts=(7,5), absEtaCuts=(2.4,2.1), hybridIso03={'ptSwitch':0, 'absIso':0, 'relIso':0.4} )
       #split into soft and hard leptons
       looseSoftLepInd, looseHardLepInd = splitIndList(r.LepGood_pt, looseLepInd, 25.)
       #select soft leptons above 10 GeV (for vetoing in the hard lepton selection)
@@ -200,7 +216,8 @@ for isample, sample in enumerate(allSamples):
       #select tight soft leptons (no special tight ID for now)
       tightSoftLepInd = looseSoftLepInd #No tight loose selection as of yet 
       #select tight hard leptons (use POG ID)
-      tightHardLepInd = filter(lambda i:r.LepGood_tightId[i], looseHardLepInd)
+      tightHardLepInd = filter(lambda i:(abs(r.LepGood_pdgId[i])==11 and r.LepGood_relIso03[i]<0.14 and r.LepGood_tightId[i]>=3) \
+                                     or (abs(r.LepGood_pdgId[i])==13 and r.LepGood_relIso03[i]<0.12 and r.LepGood_tightId[i]), looseHardLepInd)
 
       s.nLooseSoftLeptons = len(looseSoftLepInd)
       s.nLooseSoftPt10Leptons = len(looseSoftPt10LepInd)

@@ -1,9 +1,40 @@
 import ROOT
-from math import pi, sqrt, cos, sin, sinh
+from math import pi, sqrt, cos, sin, sinh, log
 from array import array
 
 def test():
   return 1
+
+def scatterOnTH2(data, h, ofile, markerType):
+  assert type(h)==type(ROOT.TH2F()) or type(h)==type(ROOT.TH2D()), "Wrong type of histogram! %s" % repr(type(h))
+  for d in data:
+    h.Fill(d[0], d[1], 0) 
+  c1 = ROOT.TCanvas()
+  xmin = h.GetXaxis().GetXmin()
+  xmax = h.GetXaxis().GetXmax()
+  ymin = h.GetYaxis().GetXmin()
+  ymax = h.GetYaxis().GetXmax()
+  data.sort(key=lambda x:x[2])
+  zvals = [d[2] for d in data] 
+  zmin, zmax = min(zvals), max(zvals)
+  h.GetZaxis().SetRangeUser(zmin,zmax)
+  c1.Update()
+  h.Draw("COLZ")
+  c1.SetLogz()
+  stuff=[]
+  for d in data:
+    if d[0]>xmin and d[0]<xmax and d[1]>ymin and d[1]<ymax:
+      zRatio = (log(d[2])-log(zmin))/(log(zmax) - log(zmin))
+      color = ROOT.gStyle.GetColorPalette(int(round(zRatio*(ROOT.gStyle.GetNumberOfColors()-1))))
+      print 'zR', zRatio, 'color',color
+      e = ROOT.TMarker(d[0], d[1], markerType) 
+      e.SetMarkerColor(color) 
+      stuff.append(e)
+    h.Fill(d[0], d[1], 0) 
+  for s in stuff:
+    s.Draw()
+  c1.Print(ofile)
+  
 
 def bStr(s): 
   "make string bold."
@@ -30,7 +61,7 @@ def getFileList(dir, minAgeDPM=0, histname='histo', xrootPrefix='root://hephyse.
   import os, subprocess, datetime
   if dir[0:5] != "/dpm/":
     filelist = os.listdir(dir)
-    filelist = [dir+'/'+f for f in filelist]
+    filelist = [dir+'/'+f for f in filelist if histname in f]
   else:
     filelist = []
     p = subprocess.Popen(["dpns-ls -l "+ dir], shell = True , stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
