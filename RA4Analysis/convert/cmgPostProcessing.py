@@ -9,8 +9,8 @@ from Workspace.RA4Analysis.convertHelpers import compileClass, readVar, printHea
 
 subDir = "postProcessed_v5_Phys14V2"
 #from Workspace.RA4Analysis.cmgTuples_v3 import *
+from Workspace.HEPHYPythonTools.helpers import getChunksFromNFS, getChunksFromDPM, getChunks
 from Workspace.RA4Analysis.cmgTuples_v5_Phys14 import *
-
 target_lumi = 4000 #pb-1
 
 from localInfo import username
@@ -59,62 +59,6 @@ if options.leptonSelection.lower()=='hard':
 if sys.argv[0].count('ipython'):
   options.small=True
 
-def getChunks(sample):
-  if '/dpm/' in sample['dir']:
-    return getChunksFromDPM(sample)
-#  elif '/eoscms.cern.ch/' in sample['dir']:
-#    return getSampleFromEOS(sample)
-  else:
-    fromDPM =  sample.has_key('fromDPM') and sample.has_key('fromDPM')
-    if fromDPM:
-      return getChunksFromDPM(sample, fromDPM=fromDPM)
-    else:
-      return getChunksFromNFS(sample)
-    
-def getChunksFromNFS(sample):
-  chunks = [{'name':x} for x in os.listdir(sample['dir']) if x.startswith(sample['chunkString']+'_Chunk') or x==sample['name']]
-  nTotEvents=0
-  allFiles=[]
-  failedChunks=[]
-  for i, s in enumerate(chunks):
-#      logfile = sample['dir']+'/'+s['name']+'/log.txt'
-#      line = [x for x in subprocess.check_output(["cat", logfile]).split('\n') if x.count('number of events processed')]
-#      assert len(line)==1,"Didn't find event number in file %s"%logfile
-#      n = int(line[0].split()[-1])
-      logfile = sample['dir']+'/'+s['name']+'/skimAnalyzerCount/SkimReport.txt'
-      if os.path.isfile(logfile):
-        line = [x for x in subprocess.check_output(["cat", logfile]).split('\n') if x.count('All Events')]
-        assert len(line)==1,"Didn't find event number in file %s"%logfile
-        n = int(line[0].split()[2])
-        inputFilename = sample['dir']+'/'+s['name']+'/'+options.inputTreeName+'/tree.root'
-        if os.path.isfile(inputFilename):
-          nTotEvents+=n
-          allFiles.append(inputFilename)
-          chunks[i]['file']=inputFilename
-      else:failedChunks.append(chunks[i])
-#    except: print "Chunk",s,"could not be added"
-  print "Found",len(chunks),"chunks for sample",sample["name"],'with a total of',nTotEvents,"events. Failed for:",",".join([c['name'] for c in failedChunks]),"(",round(100*len(failedChunks)/float(len(chunks)),1),")%"
-  return chunks, nTotEvents
-
-def getChunksFromDPM(sample, fromDPM=False):
-  fileList = getFileList(sample['dir'], minAgeDPM=0, histname='', xrootPrefix='root://hephyse.oeaw.ac.at/' if not fromDPM else '')
-  chunks = [{'file':x,'name':x.split('/')[-1].replace('.root','')} for x in fileList]
-  nTotEvents=0
-  failedChunks=[]
-  goodChunks=[]
-  for c in chunks:
-    try:
-      nEvents=int(c['name'].split('nEvents')[-1])
-    except:
-      nEvents=-1
-    if nEvents>0:
-      c.update({'nEvents':int(c['name'].split('nEvents')[-1])})
-      nTotEvents+=c['nEvents']
-      goodChunks.append(c)
-    else:
-      failedChunks.append(c['name'])
-  print "Found",len(chunks),"chunks for sample",sample["name"],"failed:",len(failedChunks),",".join(failedChunks)
-  return goodChunks, nTotEvents
 
 #def getSampleFromEOS(sample):
 #  fn = sample['dir'].rstrip('/')+'/'+sample['name']+'/'+options.inputTreeName+'/tree.root'
@@ -144,7 +88,7 @@ def getTreeFromChunk(c, skimCond):
 exec('allSamples=['+options.allsamples+']')
 for isample, sample in enumerate(allSamples):
   
-  chunks, nTotEvents = getChunks(sample)
+  chunks, nTotEvents = getChunks(sample, options.inputTreeName)
   
   outDir = options.targetDir+'/'+"/".join([options.skim, options.leptonSelection, sample['name']])
   tmpDir = outDir+'/tmp/'

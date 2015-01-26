@@ -36,14 +36,14 @@
 #python cmgPostProcessing.py --leptonSelection=$1 --samples=ttH_PU20bx25                         $2  #--skim=HT400ST150 
 #python cmgPostProcessing.py --leptonSelection=$1 --samples=DYJetsToLL_M50_HT100to200_PU20bx25   $2  #--skim=HT400ST150 
 #python cmgPostProcessing.py --leptonSelection=$1 --samples=DYJetsToLL_M50_HT200to400_PU20bx25   $2  #--skim=HT400ST150 
-python cmgPostProcessing.py --leptonSelection=$1 --samples=DYJetsToLL_M50_HT400to600_PU20bx25   $2 #&  #--skim=HT400ST150 
-python cmgPostProcessing.py --leptonSelection=$1 --samples=DYJetsToLL_M50_HT600toInf_PU20bx25   $2 #&  #--skim=HT400ST150 
-python cmgPostProcessing.py --leptonSelection=$1 --samples=QCD_HT_250To500_PU20bx25             $2 #&  #--skim=HT400ST150 
-python cmgPostProcessing.py --leptonSelection=$1 --samples=QCD_HT_500To1000_PU20bx25            $2 #&  #--skim=HT400ST150 
-python cmgPostProcessing.py --leptonSelection=$1 --samples=QCD_HT_1000ToInf_PU20bx25            $2 #&  #--skim=HT400ST150 
-python cmgPostProcessing.py --leptonSelection=$1 --samples=TBarToLeptons_sChannel_PU20bx25      $2 #&  #--skim=HT400ST150 
-python cmgPostProcessing.py --leptonSelection=$1 --samples=TBarToLeptons_tChannel_PU20bx25      $2 #&  #--skim=HT400ST150 
-python cmgPostProcessing.py --leptonSelection=$1 --samples=TToLeptons_sChannel_PU20bx25         $2 #&  #--skim=HT400ST150 
-python cmgPostProcessing.py --leptonSelection=$1 --samples=TToLeptons_tChannel_PU20bx25         $2 #&  #--skim=HT400ST150 
-python cmgPostProcessing.py --leptonSelection=$1 --samples=T_tWChannel_PU20bx25                 $2 #&  #--skim=HT400ST150 
-python cmgPostProcessing.py --leptonSelection=$1 --samples=TBar_tWChannel_PU20bx25              $2 #&  #--skim=HT400ST150 
+python cmgPostProcessing.py --leptonSelection=$1 --samples=DYJetsToLL_M50_HT400to600_PU20bx25   $2 &  #--skim=HT400ST150 
+python cmgPostProcessing.py --leptonSelection=$1 --samples=DYJetsToLL_M50_HT600toInf_PU20bx25   $2 &  #--skim=HT400ST150 
+python cmgPostProcessing.py --leptonSelection=$1 --samples=QCD_HT_250To500_PU20bx25             $2 &  #--skim=HT400ST150 
+python cmgPostProcessing.py --leptonSelection=$1 --samples=QCD_HT_500To1000_PU20bx25            $2 &  #--skim=HT400ST150 
+python cmgPostProcessing.py --leptonSelection=$1 --samples=QCD_HT_1000ToInf_PU20bx25            $2 &  #--skim=HT400ST150 
+python cmgPostProcessing.py --leptonSelection=$1 --samples=TBarToLeptons_sChannel_PU20bx25      $2 &  #--skim=HT400ST150 
+python cmgPostProcessing.py --leptonSelection=$1 --samples=TBarToLeptons_tChannel_PU20bx25      $2 &  #--skim=HT400ST150 
+python cmgPostProcessing.py --leptonSelection=$1 --samples=TToLeptons_sChannel_PU20bx25         $2 &  #--skim=HT400ST150 
+python cmgPostProcessing.py --leptonSelection=$1 --samples=TToLeptons_tChannel_PU20bx25         $2 &  #--skim=HT400ST150 
+python cmgPostProcessing.py --leptonSelection=$1 --samples=T_tWChannel_PU20bx25                 $2 &  #--skim=HT400ST150 
+python cmgPostProcessing.py --leptonSelection=$1 --samples=TBar_tWChannel_PU20bx25              $2 &  #--skim=HT400ST150 

@@ -11,19 +11,25 @@ ttJets_PU20bx25={\
 }
 ttWJets_PU20bx25={\
 "name" : "TTWJets",
-'dir' : "/dpm/oeaw.ac.at/home/cms/store/user/schoef/phys14_BkgsAndSig/TTWJets",
+#'dir' : "/dpm/oeaw.ac.at/home/cms/store/user/schoef/phys14_BkgsAndSig/TTWJets",
+'dir': '/data/schoef/cmgTuples/v5_Phys14V2_fromDPM/TTWJets',
+'fromDPM':True,
 'chunkString' : '',
 'dbsName':'/TTWJets_Tune4C_13TeV-madgraph-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'
 }
 ttZJets_PU20bx25={\
 "name" : "TTZJets",
-'dir' : "/dpm/oeaw.ac.at/home/cms/store/user/schoef/phys14_BkgsAndSig/TTZJets",
+#'dir' : "/dpm/oeaw.ac.at/home/cms/store/user/schoef/phys14_BkgsAndSig/TTZJets",
+'dir': '/data/schoef/cmgTuples/v5_Phys14V2_fromDPM/TTZJets',
+'fromDPM':True,
 'chunkString' : '',
 'dbsName':'/TTZJets_Tune4C_13TeV-madgraph-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'
 }
 ttH_PU20bx25={\
 "name" : "TTH",
-'dir' : "/dpm/oeaw.ac.at/home/cms/store/user/schoef/phys14_BkgsAndSig/TTH",
+#'dir' : "/dpm/oeaw.ac.at/home/cms/store/user/schoef/phys14_BkgsAndSig/TTH",
+'dir': '/data/schoef/cmgTuples/v5_Phys14V2_fromDPM/TTH/',
+'fromDPM':True,
 'chunkString' : '',
 'dbsName':'/TTbarH_M-125_13TeV_amcatnlo-pythia8-tauola/Phys14DR-PU40bx25_PHYS14_25_V1-v1/MINIAODSIM'
 }
@@ -54,80 +60,131 @@ WJetsToLNu_HT600toInf_PU20bx25={\
 DYJetsToLL_M50_HT100to200_PU20bx25={\
 "name" : "DYJetsToLL_M50_HT100to200",
 "chunkString": "",
-'dir' : "/dpm/oeaw.ac.at/home/cms/store/user/schoef/phys14_BkgsAndSig/DYJetsToLL_M50_HT100to200",
+#'dir' : "/dpm/oeaw.ac.at/home/cms/store/user/schoef/phys14_BkgsAndSig/DYJetsToLL_M50_HT100to200",
+'dir': '/data/schoef/cmgTuples/v5_Phys14V2_fromDPM/DYJetsToLL_M50_HT100to200/',
+'fromDPM':True,
 'dbsName':'/DYJetsToLL_M-50_HT-100to200_Tune4C_13TeV-madgraph-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'
 }
 DYJetsToLL_M50_HT200to400_PU20bx25={\
 "name" : "DYJetsToLL_M50_HT200to400",
 "chunkString": "",
-'dir' : "/dpm/oeaw.ac.at/home/cms/store/user/schoef/phys14_BkgsAndSig/DYJetsToLL_M50_HT200to400",
+#'dir' : "/dpm/oeaw.ac.at/home/cms/store/user/schoef/phys14_BkgsAndSig/DYJetsToLL_M50_HT200to400",
+'dir': '/data/schoef/cmgTuples/v5_Phys14V2_fromDPM/DYJetsToLL_M50_HT200to400_PU20bx25/',
+'fromDPM':True,
 'dbsName':'/DYJetsToLL_M-50_HT-200to400_Tune4C_13TeV-madgraph-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'
 }
 DYJetsToLL_M50_HT400to600_PU20bx25={\
 "name" : "DYJetsToLL_M50_HT400to600",
 "chunkString": "",
-'dir' : "/dpm/oeaw.ac.at/home/cms/store/user/schoef/phys14_BkgsAndSig/DYJetsToLL_M50_HT400to600",
+#'dir' : "/dpm/oeaw.ac.at/home/cms/store/user/schoef/phys14_BkgsAndSig/DYJetsToLL_M50_HT400to600",
+'dir': '/data/schoef/cmgTuples/v5_Phys14V2_fromDPM/DYJetsToLL_M50_HT400to600/',
+'fromDPM':True,
 'dbsName':'/DYJetsToLL_M-50_HT-400to600_Tune4C_13TeV-madgraph-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'
 }
 DYJetsToLL_M50_HT600toInf_PU20bx25={\
 "name" : "DYJetsToLL_M50_HT600toInf",
 "chunkString": "",
-'dir' : "/dpm/oeaw.ac.at/home/cms/store/user/schoef/phys14_BkgsAndSig/DYJetsToLL_M50_HT600toInf",
+#'dir' : "/dpm/oeaw.ac.at/home/cms/store/user/schoef/phys14_BkgsAndSig/DYJetsToLL_M50_HT600toInf",
+'dir': '/data/schoef/cmgTuples/v5_Phys14V2_fromDPM/DYJetsToLL_M50_HT600toInf/',
+'fromDPM':True,
 'dbsName':'/DYJetsToLL_M-50_HT-600toInf_Tune4C_13TeV-madgraph-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'
 }
 QCD_HT_250To500_PU20bx25={\
 "name" : "QCD_HT_250To500",
 "chunkString": "",
-'dir' : "/dpm/oeaw.ac.at/home/cms/store/user/schoef/phys14_BkgsAndSig/QCD_HT_250To500",
+#'dir' : "/dpm/oeaw.ac.at/home/cms/store/user/schoef/phys14_BkgsAndSig/QCD_HT_250To500",
+'dir': '/data/schoef/cmgTuples/v5_Phys14V2_fromDPM/QCD_HT_250To500/',
+'fromDPM':True,
 'dbsName':'/QCD_HT_250To500_13TeV-madgraph/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'
 }
 QCD_HT_500To1000_PU20bx25={\
 "name" : "QCD_HT_500To1000",
 "chunkString": "",
-'dir' : "/dpm/oeaw.ac.at/home/cms/store/user/schoef/phys14_BkgsAndSig/QCD_HT_500To1000",
+#'dir' : "/dpm/oeaw.ac.at/home/cms/store/user/schoef/phys14_BkgsAndSig/QCD_HT_500To1000",
+'dir': '/data/schoef/cmgTuples/v5_Phys14V2_fromDPM/QCD_HT_500To1000/',
+'fromDPM':True,
 'dbsName':'/QCD_HT_500To1000_13TeV-madgraph/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'
 }
 QCD_HT_1000ToInf_PU20bx25={\
 "name" : "QCD_HT_1000ToInf",
 "chunkString": "",
-'dir' : "/dpm/oeaw.ac.at/home/cms/store/user/schoef/phys14_BkgsAndSig/QCD_HT_1000ToInf",
+#'dir' : "/dpm/oeaw.ac.at/home/cms/store/user/schoef/phys14_BkgsAndSig/QCD_HT_1000ToInf",
+'dir': '/data/schoef/cmgTuples/v5_Phys14V2_fromDPM/QCD_HT_1000ToInf/',
+'fromDPM':True,
 'dbsName':'/QCD_HT_1000ToInf_13TeV-madgraph/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'
 }
 TBarToLeptons_sChannel_PU20bx25={\
 "name" : "TBarToLeptons_sChannel",
 "chunkString": "",
-'dir' : "/dpm/oeaw.ac.at/home/cms/store/user/schoef/phys14_BkgsAndSig/TBarToLeptons_sch",
+#'dir' : "/dpm/oeaw.ac.at/home/cms/store/user/schoef/phys14_BkgsAndSig/TBarToLeptons_sch",
+'dir': '/data/schoef/cmgTuples/v5_Phys14V2_fromDPM/TBarToLeptons_sch/',
+'fromDPM':True,
 'dbsName':'/TBarToLeptons_s-channel-CSA14_Tune4C_13TeV-aMCatNLO-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'
 }
 TBarToLeptons_tChannel_PU20bx25={\
 "name" : "TBarToLeptons_tChannel",
 "chunkString": "",
-'dir' : "/dpm/oeaw.ac.at/home/cms/store/user/schoef/phys14_BkgsAndSig/TBarToLeptons_tch",
+#'dir' : "/dpm/oeaw.ac.at/home/cms/store/user/schoef/phys14_BkgsAndSig/TBarToLeptons_tch",
+'dir': '/data/schoef/cmgTuples/v5_Phys14V2_fromDPM/TBarToLeptons_tch/',
+'fromDPM':True,
 'dbsName':'/TBarToLeptons_t-channel_Tune4C_CSA14_13TeV-aMCatNLO-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'
 }
 TToLeptons_sChannel_PU20bx25={\
 "name" : "TToLeptons_sChannel",
 "chunkString": "",
-'dir' : "/dpm/oeaw.ac.at/home/cms/store/user/schoef/phys14_BkgsAndSig/TToLeptons_sch",
+#'dir' : "/dpm/oeaw.ac.at/home/cms/store/user/schoef/phys14_BkgsAndSig/TToLeptons_sch",
+'dir': '/data/schoef/cmgTuples/v5_Phys14V2_fromDPM/TToLeptons_sch/',
+'fromDPM':True,
 'dbsName':'/TToLeptons_s-channel-CSA14_Tune4C_13TeV-aMCatNLO-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'
 }
 TToLeptons_tChannel_PU20bx25={\
 "name" : "TToLeptons_tChannel",
 "chunkString": "",
-'dir' : "/dpm/oeaw.ac.at/home/cms/store/user/schoef/phys14_BkgsAndSig/TToLeptons_tch",
+#'dir' : "/dpm/oeaw.ac.at/home/cms/store/user/schoef/phys14_BkgsAndSig/TToLeptons_tch",
+'dir': '/data/schoef/cmgTuples/v5_Phys14V2_fromDPM/TToLeptons_tch/',
+'fromDPM':True,
 'dbsName':'/TToLeptons_t-channel_Tune4C_CSA14_13TeV-aMCatNLO-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'
 }
 T_tWChannel_PU20bx25={\
 "name" : "",
 "chunkString": "T_tWch",
-'dir' : "/dpm/oeaw.ac.at/home/cms/store/user/schoef/phys14_BkgsAndSig/T_tWch",
+#'dir' : "/dpm/oeaw.ac.at/home/cms/store/user/schoef/phys14_BkgsAndSig/T_tWch",
+'dir': '/data/schoef/cmgTuples/v5_Phys14V2_fromDPM/T_tWch/',
+'fromDPM':True,
 'dbsName':'/T_tW-channel-DR_Tune4C_13TeV-CSA14-powheg-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'
 }
 TBar_tWChannel_PU20bx25={\
 "name" : "TBar_tWChannel",
 "chunkString": "",
-'dir' : "/dpm/oeaw.ac.at/home/cms/store/user/schoef/phys14_BkgsAndSig/TBar_tWch",
+#'dir' : "/dpm/oeaw.ac.at/home/cms/store/user/schoef/phys14_BkgsAndSig/TBar_tWch",
+'dir': '/data/schoef/cmgTuples/v5_Phys14V2_fromDPM/TBar_tWch/',
+'fromDPM':True,
 'dbsName':'/Tbar_tW-channel-DR_Tune4C_13TeV-CSA14-powheg-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'
+}
+
+WJetsToLNu_HT100to200_fromEOS={\
+"name" : "WJetsToLNu_HT100to200",
+"chunkString": "WJetsToLNu_HT100to200",
+'dir' : "/data/schoef/cmgTuples/v5_Phys14V1_fromEOS/",
+'dbsName':'/WJetsToLNu_HT-100to200_Tune4C_13TeV-madgraph-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'
+}
+WJetsToLNu_HT200to400_fromEOS={\
+"name" : "WJetsToLNu_HT200to400",
+"chunkString": "WJetsToLNu_HT200to400",
+'dir' : "/data/schoef/cmgTuples/v5_Phys14V1_fromEOS/",
+'dbsName':'/WJetsToLNu_HT-200to400_Tune4C_13TeV-madgraph-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'
+}
+WJetsToLNu_HT400to600_fromEOS={\
+"name" : "WJetsToLNu_HT400to600",
+"chunkString": "WJetsToLNu_HT400to600",
+'dir' : "/data/schoef/cmgTuples/v5_Phys14V1_fromEOS/",
+'dbsName':'/WJetsToLNu_HT-400to600_Tune4C_13TeV-madgraph-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'
+}
+WJetsToLNu_HT600toInf_fromEOS={\
+"name" : "WJetsToLNu_HT600toInf",
+"chunkString": "WJetsToLNu_HT600toInf",
+'dir' : "/data/schoef/cmgTuples/v5_Phys14V1_fromEOS/",
+'dbsName':'/WJetsToLNu_HT-600toInf_Tune4C_13TeV-madgraph-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'
 }
 #
 #allSignalData=[\
