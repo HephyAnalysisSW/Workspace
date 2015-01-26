@@ -7,7 +7,7 @@ from Workspace.HEPHYPythonTools.xsec import xsec
 from Workspace.HEPHYPythonTools.helpers import getObjFromFile, getObjDict, getFileList
 from Workspace.RA4Analysis.convertHelpers import compileClass, readVar, printHeader, typeStr, createClassString
 
-subDir = "postProcessed_v5_Phys14V1"
+subDir = "postProcessed_v5_Phys14V2"
 #from Workspace.RA4Analysis.cmgTuples_v3 import *
 from Workspace.RA4Analysis.cmgTuples_v5_Phys14 import *
 
