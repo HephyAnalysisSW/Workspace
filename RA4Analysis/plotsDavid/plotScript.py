@@ -5,16 +5,23 @@ from math import *
 import os, copy, sys
 from array import array
 from Workspace.HEPHYPythonTools.helpers import getVarValue, getChain, deltaPhi, getYieldFromChain
-from Workspace.RA4Analysis.cmgTuplesPostProcessed_v3 import *
+from Workspace.RA4Analysis.cmgTuplesPostProcessed_v4_PHYS14V1 import *
 from Workspace.RA4Analysis.helpers import *
+
+lepSel = 'hard'
 
 #Bkg chains 
 allBkg=[
-        {'name':'TTJets_hard',  'sample':'hard_ttJetsCSA1450ns',  'chain_hard':getChain(hard_ttJetsCSA1450ns), 'weight':'weight',   'color':ROOT.kRed-3},
-        #{'name':'TTJets_soft',  'sample':'soft_ttJetsCSA1450ns',  'chain_soft':getChain(soft_ttJetsCSA1450ns), 'weight':'weight',   'color':ROOT.kRed-3},
-        {'name':'WJets_hard',   'sample':'hard_WJetsHTToLNu',     'chain_hard':getChain(hard_WJetsHTToLNu),    'weight':'weight',   'color':ROOT.kYellow},
-        #{'name':'WJets_soft',   'sample':'soft_WJetsHTToLNu',     'chain_soft':getChain(soft_WJetsHTToLNu),    'weight':'weight',   'color':ROOT.kYellow}
+        {'name':'QCD',       'sample':QCD[lepSel],           'weight':'weight',   'color':ROOT.kBlue-2},
+        {'name':'DY',        'sample':DY[lepSel],            'weight':'weight',   'color':ROOT.kAzure+2},
+        {'name':'singleTop', 'sample':singleTop[lepSel],     'weight':'weight',   'color':ROOT.kRed-7},
+        {'name':'TTVH',      'sample':TTVH[lepSel],          'weight':'weight',   'color':ROOT.kRed-10},
+        {'name':'TTJets',    'sample':ttJets[lepSel],        'weight':'weight',   'color':ROOT.kRed-3},
+        {'name':'WJets',     'sample':WJetsHTToLNu[lepSel],  'weight':'weight',   'color':ROOT.kYellow},
       ]
+
+for bkg in allBkg:
+  bkg['chain']=getChain(bkg['sample'])
 
 #Signal chains
 allSignals=[
@@ -33,8 +40,8 @@ allSignals=[
             #{'name':'SMS_T2bb_2J_mStop900_mLSP100_PU_S14_POSTLS170'},
             #{'name':'SMS_T2qq_2J_mStop600_mLSP550_PU_S14_POSTLS170'},
             #{'name':'SMS_T2qq_2J_mStop1200_mLSP100_PU_S14_POSTLS170'},
-            {'name':'T5WW_2J_mGo1200_mCh1000_mChi800','weight':'weight', 'color':ROOT.kBlack, 'LegendName':'T5WW_1200_1000_800' },
-            {'name':'T5WW_2J_mGo1500_mCh800_mChi100','weight':'weight', 'color':ROOT.kBlue, 'LegendName':'T5WW_1500_800_100'},
+            #{'name':'T5WW_2J_mGo1200_mCh1000_mChi800','weight':'weight', 'color':ROOT.kBlack, 'LegendName':'T5WW_1200_1000_800' },
+            #{'name':'T5WW_2J_mGo1500_mCh800_mChi100','weight':'weight', 'color':ROOT.kBlue, 'LegendName':'T5WW_1500_800_100'},
             #{'name':'T5WW_2J_mGo1400_mCh315_mChi300'},
             #{'name':'T1tttt_2J_mGo1300_mStop300_mCh285_mChi280'},
             #{'name':'T1tttt_2J_mGo1300_mStop300_mChi280',  'weight':'weight', 'color':ROOT.kBlack},
@@ -54,8 +61,8 @@ allSignals=[
             #{'name':'T6qqWW_Sq_950_LSP_300_Chi_350',  'weight':'weight', 'color':ROOT.kMagenta+3}
             ]
 
-for s in allSignals:
-  s['chain_hard']=getChain(getSignalSample(s['name'],'hard'))
+#for s in allSignals:
+#  s['chain_hard']=getChain(getSignalSample(s['name'],'hard'))
 #for s in allSignals:
 #  s['chain_soft']=getChain(getSignalSample(s['name'],'soft'))
 
@@ -73,8 +80,8 @@ htreg = [(500,750),(750,-1)]
 njreg = [(5,5),(6,-1)]
 dPhiStr = "acos((leptonPt+met*cos(leptonPhi-metPhi))/sqrt(leptonPt**2+met**2+2*met*leptonPt*cos(leptonPhi-metPhi)))"
 presel='singleMuonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0'
-preprefix = 'hardMuonic_0b_ht500_st450_nj6'
-wwwDir = '/afs/hephy.at/user/d/dhandl/www/pngCMG/'+preprefix+'/'
+preprefix = 'singleMuonic_0b_ht500_st250_nj6'
+wwwDir = '/afs/hephy.at/user/d/dhandl/www/pngCMG2/'+lepSel+'/'+preprefix+'/'
 
 if not os.path.exists(wwwDir):
   os.makedirs(wwwDir)
@@ -83,7 +90,7 @@ if not os.path.exists(wwwDir):
 small = 1
 #small = 0
 if small == 1:
-  streg = [(450,-1)]
+  streg = [(250,-1)]
   htreg = [(500,-1)]
   njreg = [(6,-1)]
 
@@ -227,21 +234,21 @@ for i_htb, htb in enumerate(htreg):
           if type(sample['addcut'])==type(''):
             cut = cut + sample["addcut"]
   
-        sample["chain_hard"].Draw(">>eList",cut) #Get the event list 'eList' which has all the events satisfying the cut
+        sample["chain"].Draw(">>eList",cut) #Get the event list 'eList' which has all the events satisfying the cut
         elist = ROOT.gDirectory.Get("eList")
         number_events = elist.GetN()
         print "Sample ",sample["name"],": Will loop over", number_events,"events" #Number of events satisfying the cut
         
         #Event loop
         for i in range(number_events): #Loop over those events
-          sample["chain_hard"].GetEntry(elist.GetEntry(i))  #Set the chain to the current event (it's the i-th event of the eList). This is the central line in this file!
+          sample["chain"].GetEntry(elist.GetEntry(i))  #Set the chain to the current event (it's the i-th event of the eList). This is the central line in this file!
           for var in allVariables:
             assert (var.has_key('varString') or var.has_key('varFunc')), "Error: Did not specify 'varString' or 'varFunc' for var %s" % repr(var)
             assert not (var.has_key('varString') and var.has_key('varFunc')), "Error: Specified both 'varString' and 'varFunc' for var %s" % repr(var)
             #if var['name'] == 'myminDPhiMetJet12':
             #  varValue = getVarValue(sample["chain_soft"], var['varString']) if var.has_key('varString') else var['varFunc'](sample["chain_soft"],nJets=2)
             #else:
-            varValue = getVarValue(sample["chain_hard"], var['varString']) if var.has_key('varString') else var['varFunc'](sample["chain_hard"])
+            varValue = getVarValue(sample["chain"], var['varString']) if var.has_key('varString') else var['varFunc'](sample["chain"])
 #            if var == dPhi:
 #              #WPhi = getWPhi(sample['chain'])
 #              #lPhi = getVarValue(sample['chain'],'leptonPhi')
@@ -255,7 +262,7 @@ for i_htb, htb in enumerate(htreg):
             weight = 1
             if sample.has_key('weight'):
               if type(sample['weight'])==type(''):
-                weight = getVarValue(sample['chain_hard'], sample['weight'])
+                weight = getVarValue(sample['chain'], sample['weight'])
               else:
                 weight = sample['weight']
             histos[sample['name']][var['name']].Fill(varValue, weight)

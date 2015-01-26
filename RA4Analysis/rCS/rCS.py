@@ -1,20 +1,26 @@
 import ROOT
+#ROOT.gROOT.ProcessLine('.L /afs/hephy.at/scratch/d/dhandl/CMSSW_7_2_3/src/Workspace/HEPHYPythonTools/scripts/root/tdrstyle.C')
+#ROOT.setTDRStyle()
 from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain
-from Workspace.RA4Analysis.cmgTuplesPostProcessed import *
+from Workspace.RA4Analysis.cmgTuplesPostProcessed_v3 import *
+from Workspace.RA4Analysis.cmgTuplesPostProcessed_v4_PHYS14V1 import *
 small = False
 maxN = -1 if not small else 1 
 
-cWJets  = getChain(WJetsHTToLNu,maxN=maxN)
-cTTJets = getChain(ttJetsCSA1450ns,maxN=maxN)
-cSignal1200 = getChain(T5Full_1200_1000_800)
-cSignal1500 = getChain(T5Full_1500_800_100)
+cWJets  = getChain(soft_WJetsHTToLNu,maxN=maxN)
+cTTJets = getChain(soft_ttJetsCSA1450ns,maxN=maxN)
+#cSignal1200 = getChain(T5Full_1200_1000_800)
+#cSignal1500 = getChain(T5Full_1500_800_100)
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,varBinName
 from math import pi, sqrt
 from localInfo import username
 uDir = username[0]+'/'+username
-subDir = 'pngCMG'
+subDir = 'pngCMG2/rCS'
 
 ROOT_colors = [ROOT.kBlack, ROOT.kRed-7, ROOT.kBlue-2, ROOT.kGreen+3, ROOT.kOrange+1,ROOT.kRed-3, ROOT.kAzure+6, ROOT.kCyan+3, ROOT.kOrange , ROOT.kRed-10]
+
+#no stat box
+ROOT.gStyle.SetOptStat(0)
 
 ROOT.TH1F().SetDefaultSumw2()
 def getRCS(c, cut, dPhiCut):
@@ -27,18 +33,19 @@ def getRCS(c, cut, dPhiCut):
   del h
   return None, None
 
-#streg = [[(250, 350), 1.], [(350, 450), 1.], [(450, -1), 0.5]]
+#streg = [[(250, 350), 1.], [(350, 450), 1.], [(450, -1), 1.]]
 #htreg = [(400,500),(500,750),(750, 1000),(1000,-1)]
 #njreg = [(1,1), (2,2),(3,3),(4,4),(5,5),(6,-1)]
 
 streg = [[(250, 350), 1.], [(350, -1), 1.]]
-htreg = [(400,500),(500,750),(750, -1)]
+htreg = [(500,750),(750, -1)]
 njreg = [(2,2),(3,3),(4,4),(5,5),(6,-1)]
 
 
-prefix = 'reduced_0b'
+prefix = 'CSA14_softSingleMuonic_0b'
 #presel="singleMuonic&&nVetoMuons==1&&nVetoElectrons==0&&nBJetMedium40==1"
-presel="singleMuonic&&nVetoMuons==1&&nVetoElectrons==0&&nBJetMedium25==0"
+#presel="singleMuonic&&nVetoMuons==1&&nVetoElectrons==0&&nBJetMedium25==0"
+presel='singleMuonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0'
 
 ##2D plots of yields
 #c1 = ROOT.TCanvas()
@@ -134,7 +141,7 @@ for name, c in [ ["W",cWJets], ["TT", cTTJets]]:
     c1.SetGridx()
     c1.SetGridy()
     first = True 
-    l = ROOT.TLegend(0.1,0.75,0.4,0.9)
+    l = ROOT.TLegend(0.6,0.7,0.9,0.9)
     l.SetFillColor(ROOT.kWhite)
     l.SetShadowColor(ROOT.kWhite)
     l.SetBorderSize(1)
@@ -143,6 +150,7 @@ for name, c in [ ["W",cWJets], ["TT", cTTJets]]:
 #      h_nj[name][stb][htb].GetYaxis().SetRangeUser(0, 1.2*h_nj[name][stb][htb].GetBinContent(h_nj[name][stb][htb].GetMaximumBin()))
       h_nj[name][stb][htb].GetYaxis().SetRangeUser(0, 0.1)
       h_nj[name][stb][htb].SetLineColor(ROOT_colors[ihtb])
+      h_nj[name][stb][htb].SetLineWidth(2)
       l.AddEntry(h_nj[name][stb][htb], varBinName(htb, 'H_{T}'))
       if first:
         first = False
@@ -156,15 +164,16 @@ for name, c in [ ["W",cWJets], ["TT", cTTJets]]:
   for htb in htreg:
     c1 = ROOT.TCanvas()
     first = True 
-    l = ROOT.TLegend(0.1,0.75,0.4,0.9)
+    l = ROOT.TLegend(0.6,0.7,0.9,0.9)
     l.SetFillColor(ROOT.kWhite)
     l.SetShadowColor(ROOT.kWhite)
     l.SetBorderSize(1)
     for istb, [stb, dPhiCut] in enumerate(streg):
       h_nj[name][stb][htb].GetXaxis().SetLabelSize(0.07)
 #      h_nj[name][stb][htb].GetYaxis().SetRangeUser(0, 1.2*h_nj[name][stb][htb].GetBinContent(h_nj[name][stb][htb].GetMaximumBin()))
-      h_nj[name][stb][htb].GetYaxis().SetRangeUser(0, 0.1)
+#      h_nj[name][stb][htb].GetYaxis().SetRangeUser(0, 0.1)
       h_nj[name][stb][htb].SetLineColor(ROOT_colors[istb])
+      h_nj[name][stb][htb].SetLineWidth(2)
       l.AddEntry(h_nj[name][stb][htb], varBinName(stb, 'S_{T}'))
       if first:
         first = False
@@ -177,15 +186,16 @@ for name, c in [ ["W",cWJets], ["TT", cTTJets]]:
   for stb, dPhiCut in streg:
     c1 = ROOT.TCanvas()
     first = True 
-    l = ROOT.TLegend(0.1,0.9-0.05*len(njreg),0.4,0.9)
+    l = ROOT.TLegend(0.6,0.7,0.9,0.9)
     l.SetFillColor(ROOT.kWhite)
     l.SetShadowColor(ROOT.kWhite)
     l.SetBorderSize(1)
     for injb, njb in enumerate(njreg):
       h_ht[name][stb][njb].GetXaxis().SetLabelSize(0.05)
 #      h_ht[name][stb][njb].GetYaxis().SetRangeUser(0, 1.2*h_ht[name][stb][njb].GetBinContent(h_ht[name][stb][njb].GetMaximumBin()))
-      h_ht[name][stb][njb].GetYaxis().SetRangeUser(0, 0.1)
+#      h_ht[name][stb][njb].GetYaxis().SetRangeUser(0, 0.1)
       h_ht[name][stb][njb].SetLineColor(ROOT_colors[injb])
+      h_nj[name][stb][htb].SetLineWidth(2)
       l.AddEntry(h_ht[name][stb][njb], nJetBinName(njb))
       if first:
         first = False
@@ -197,15 +207,16 @@ for name, c in [ ["W",cWJets], ["TT", cTTJets]]:
   for njb in njreg:
     c1 = ROOT.TCanvas()
     first = True 
-    l = ROOT.TLegend(0.1,0.9-0.05*len(streg),0.4,0.9)
+    l = ROOT.TLegend(0.6,0.7,0.9,0.9)
     l.SetFillColor(ROOT.kWhite)
     l.SetShadowColor(ROOT.kWhite)
     l.SetBorderSize(1)
     for istb, [stb, dPhiCut] in enumerate(streg):
       h_ht[name][stb][njb].GetXaxis().SetLabelSize(0.05)
 #      h_ht[name][stb][njb].GetYaxis().SetRangeUser(0, 1.2*h_ht[name][stb][njb].GetBinContent(h_ht[name][stb][njb].GetMaximumBin()))
-      h_ht[name][stb][njb].GetYaxis().SetRangeUser(0, 0.1)
+#      h_ht[name][stb][njb].GetYaxis().SetRangeUser(0, 0.1)
       h_ht[name][stb][njb].SetLineColor(ROOT_colors[istb])
+      h_nj[name][stb][htb].SetLineWidth(2)
       l.AddEntry(h_ht[name][stb][njb], varBinName(stb, 'S_{T}'))
       if first:
         first = False
