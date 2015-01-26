@@ -7,11 +7,11 @@ def bookSample(sample):
   s['dir']=s['dir']+'/soft/'
   return {'hard':h, 'soft':s}
 
-#ttJets=bookSample({\
-#"name" : "ttJets",
-#"bins" : ["TTJets"],
-#'dir' : "/data/schoef/cmgTuples/postProcessed_v5_PHYS14V1/",
-#})
+ttJets=bookSample({\
+"name" : "ttJets",
+"bins" : ["TTJets"],
+'dir' : "/data/schoef/cmgTuples/postProcessed_v5_PHYS14V1/",
+})
 WJetsHTToLNu=bookSample({\
 "name" : "WJetsHTToLNu",
 "bins" : ["WJetsToLNu_HT100to200", "WJetsToLNu_HT200to400", "WJetsToLNu_HT400to600", "WJetsToLNu_HT600toInf"],
