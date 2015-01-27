@@ -161,73 +161,70 @@ TBar_tWChannel_PU20bx25={\
 'fromDPM':True,
 'dbsName':'/Tbar_tW-channel-DR_Tune4C_13TeV-CSA14-powheg-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'
 }
-
 WJetsToLNu_HT100to200_fromEOS={\
 "name" : "WJetsToLNu_HT100to200",
 "chunkString": "WJetsToLNu_HT100to200",
-'dir' : "/data/schoef/cmgTuples/v5_Phys14V1_fromEOS/",
+'dir' : "/data/schoef/cmgTuples/v5_Phys14V2_fromEOS/",
 'dbsName':'/WJetsToLNu_HT-100to200_Tune4C_13TeV-madgraph-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'
 }
 WJetsToLNu_HT200to400_fromEOS={\
 "name" : "WJetsToLNu_HT200to400",
 "chunkString": "WJetsToLNu_HT200to400",
-'dir' : "/data/schoef/cmgTuples/v5_Phys14V1_fromEOS/",
+'dir' : "/data/schoef/cmgTuples/v5_Phys14V2_fromEOS/",
 'dbsName':'/WJetsToLNu_HT-200to400_Tune4C_13TeV-madgraph-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'
 }
 WJetsToLNu_HT400to600_fromEOS={\
 "name" : "WJetsToLNu_HT400to600",
 "chunkString": "WJetsToLNu_HT400to600",
-'dir' : "/data/schoef/cmgTuples/v5_Phys14V1_fromEOS/",
+'dir' : "/data/schoef/cmgTuples/v5_Phys14V2_fromEOS/",
 'dbsName':'/WJetsToLNu_HT-400to600_Tune4C_13TeV-madgraph-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'
 }
 WJetsToLNu_HT600toInf_fromEOS={\
 "name" : "WJetsToLNu_HT600toInf",
 "chunkString": "WJetsToLNu_HT600toInf",
-'dir' : "/data/schoef/cmgTuples/v5_Phys14V1_fromEOS/",
+'dir' : "/data/schoef/cmgTuples/v5_Phys14V2_fromEOS/",
 'dbsName':'/WJetsToLNu_HT-600toInf_Tune4C_13TeV-madgraph-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'
 }
 #
-#allSignalData=[\
-##["/data/schoef/cmgTuples/postProcessed_v5_PHYS14V1/", "SMS_T1tttt_2J_mGl1500_mLSP100"],
-##["/data/schoef/cmgTuples/postProcessed_v5_PHYS14V1/", "SMS_T1tttt_2J_mGl1200_mLSP800"],
-#["/data/schoef/cmgTuples/v4_Phys14V1/", "SMS_T5qqqqWW_Gl1500_Chi800_LSP100"],
-#["/data/schoef/cmgTuples/v4_Phys14V1/", "SMS_T5qqqqWW_Gl1200_Chi1000_LSP800"],
-#["/data/schoef/cmgTuples/v4_Phys14V1/ACDV1lCentralProduction/","SMS_T1tttt_2J_mGl1200_mLSP800"], 
-#["/data/schoef/cmgTuples/v4_Phys14V1/ACDV1lCentralProduction/","SMS_T1tttt_2J_mGl1300_mLSP100"], 
-#["/data/schoef/cmgTuples/v4_Phys14V1/ACDV1lCentralProduction/","SMS_T1tttt_2J_mGl1500_mLSP100"], 
-#["/data/schoef/cmgTuples/v4_Phys14V1/ACDV1lCentralProduction/","SMS_T1tttt_2J_mGl800_mLSP450"], 
-#["/data/schoef/cmgTuples/v4_Phys14V1/ACDV1lCentralProduction/","SMS_T2tt_2J_mStop425_mLSP325"], 
-#["/data/schoef/cmgTuples/v4_Phys14V1/ACDV1lCentralProduction/","SMS_T2tt_2J_mStop500_mLSP325"], 
-#["/data/schoef/cmgTuples/v4_Phys14V1/ACDV1lCentralProduction/","SMS_T2tt_2J_mStop650_mLSP325"], 
-#["/data/schoef/cmgTuples/v4_Phys14V1/ACDV1lCentralProduction/","SMS_T2tt_2J_mStop850_mLSP100"], 
-#["/data/schoef/cmgTuples/v4_Phys14V1/ACDV1lCentralProduction/","SMS_T5qqqqWW_2J_mGo1400_mCh315_mChi300"], 
-#["/data/schoef/cmgTuples/v4_Phys14V1/ACDV1lCentralProduction/","SMS_T6qqWW_mSq950_mChi325_mLSP300"], 
-#["/data/schoef/cmgTuples/v4_Phys14V1/ACDV1lCentralProduction/","T1ttbb_mGo1500_mChi100"], 
-#["/data/schoef/cmgTuples/v4_Phys14V1/ACDV1lCentralProduction/","T1ttbbWW_mGo1000_mCh725_mChi715"], 
-#["/data/schoef/cmgTuples/v4_Phys14V1/ACDV1lCentralProduction/","T1ttbbWW_mGo1000_mCh725_mChi720"], 
-#["/data/schoef/cmgTuples/v4_Phys14V1/ACDV1lCentralProduction/","T1ttbbWW_mGo1300_mCh300_mChi290"], 
-#["/data/schoef/cmgTuples/v4_Phys14V1/ACDV1lCentralProduction/","T1ttbbWW_mGo1300_mCh300_mChi295"], 
-#["/data/schoef/cmgTuples/v4_Phys14V1/ACDV1lCentralProduction/","T5ttttDeg_mGo1000_mStop300_mCh285_mChi280"], 
-#["/data/schoef/cmgTuples/v4_Phys14V1/ACDV1lCentralProduction/","T5ttttDeg_mGo1000_mStop300_mChi280"], 
-#["/data/schoef/cmgTuples/v4_Phys14V1/ACDV1lCentralProduction/","T5ttttDeg_mGo1300_mStop300_mCh285_mChi280"], 
-#["/data/schoef/cmgTuples/v4_Phys14V1/ACDV1lCentralProduction/","T5ttttDeg_mGo1300_mStop300_mChi280"], 
-#["/data/schoef/cmgTuples/v4_Phys14V1/ACDV1lCentralProduction/","T6ttWW_mSbot600_mCh425_mChi50"], 
-#["/data/schoef/cmgTuples/v4_Phys14V1/ACDV1lCentralProduction/","T6ttWW_mSbot650_mCh150_mChi50"], 
-#]
-#allSignalStrings = [s[1] for s in allSignalData]
-#def getSignalSample(dir, signal):
-#  if signal in allSignalStrings:
-#    return {\
-#      "name" : signal,
-#      "chunkString": signal,
-#      'dir' : dir,
-#      'dbsName':signal
-#      }
-#  else:
-#    print "Signal",signal,"unknown. Available: ",", ".join(allSignalStrings)
-#
-#allSignals=[]
-#for d,s in allSignalData:
-#  exec(s+"=getSignalSample('"+d+"','"+s+"')")
-#  exec("allSignals.append("+s+")")
+allSignalData=[\
+["/data/schoef/cmgTuples/v5_Phys14V2/", "SMS_T5qqqqWW_Gl1500_Chi800_LSP100"],
+["/data/schoef/cmgTuples/v5_Phys14V2/", "SMS_T5qqqqWW_Gl1200_Chi1000_LSP800"],
+["/data/schoef/cmgTuples/v5_Phys14V2_fromEOS/","SMS_T1tttt_2J_mGl1500_mLSP100"], 
+["/data/schoef/cmgTuples/v5_Phys14V2_fromEOS/","SMS_T1tttt_2J_mGl1200_mLSP800"], 
+#["/data/schoef/cmgTuples/v5_Phys14V2/","SMS_T1tttt_2J_mGl1300_mLSP100"], 
+#["/data/schoef/cmgTuples/v5_Phys14V2/","SMS_T1tttt_2J_mGl800_mLSP450"], 
+["/data/schoef/cmgTuples/v5_Phys14V2/","SMS_T2tt_2J_mStop425_mLSP325"], 
+["/data/schoef/cmgTuples/v5_Phys14V2/","SMS_T2tt_2J_mStop500_mLSP325"], 
+["/data/schoef/cmgTuples/v5_Phys14V2/","SMS_T2tt_2J_mStop650_mLSP325"], 
+["/data/schoef/cmgTuples/v5_Phys14V2/","SMS_T2tt_2J_mStop850_mLSP100"], 
+#["/data/schoef/cmgTuples/v5_Phys14V2_fromEOS/","SMS_T5qqqqWW_2J_mGo1400_mCh315_mChi300"], 
+#["/data/schoef/cmgTuples/v5_Phys14V2_fromEOS/","SMS_T6qqWW_mSq950_mChi325_mLSP300"], 
+#["/data/schoef/cmgTuples/v5_Phys14V2_fromEOS/","T1ttbb_mGo1500_mChi100"], 
+["/data/schoef/cmgTuples/v5_Phys14V2_fromEOS/","T1ttbbWW_mGo1000_mCh725_mChi715"], 
+["/data/schoef/cmgTuples/v5_Phys14V2_fromEOS/","T1ttbbWW_mGo1000_mCh725_mChi720"], 
+["/data/schoef/cmgTuples/v5_Phys14V2_fromEOS/","T1ttbbWW_mGo1300_mCh300_mChi290"], 
+["/data/schoef/cmgTuples/v5_Phys14V2_fromEOS/","T1ttbbWW_mGo1300_mCh300_mChi295"], 
+["/data/schoef/cmgTuples/v5_Phys14V2_fromEOS/","T5ttttDeg_mGo1000_mStop300_mCh285_mChi280"], 
+["/data/schoef/cmgTuples/v5_Phys14V2_fromEOS/","T5ttttDeg_mGo1000_mStop300_mChi280"], 
+["/data/schoef/cmgTuples/v5_Phys14V2_fromEOS/","T5ttttDeg_mGo1300_mStop300_mCh285_mChi280"], 
+["/data/schoef/cmgTuples/v5_Phys14V2_fromEOS/","T5ttttDeg_mGo1300_mStop300_mChi280"], 
+#["/data/schoef/cmgTuples/v5_Phys14V2_fromEOS/","T6ttWW_mSbot600_mCh425_mChi50"], 
+#["/data/schoef/cmgTuples/v5_Phys14V2_fromEOS/","T6ttWW_mSbot650_mCh150_mChi50"], 
+]
+allSignalStrings = [s[1] for s in allSignalData]
+def getSignalSample(dir, signal):
+  if signal in allSignalStrings:
+    return {\
+      "name" : signal,
+      "chunkString": signal,
+      'dir' : dir,
+      'dbsName':signal
+      }
+  else:
+    print "Signal",signal,"unknown. Available: ",", ".join(allSignalStrings)
+
+allSignals=[]
+for d,s in allSignalData:
+  exec(s+"=getSignalSample('"+d+"','"+s+"')")
+  exec("allSignals.append("+s+")")
   
