@@ -35,7 +35,7 @@ def getFileList(dir, minAgeDPM=0, histname='histo', xrootPrefix='root://hephyse.
     filelist = []
     p = subprocess.Popen(["dpns-ls -l "+ dir], shell = True , stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     for line in p.stdout.readlines():
-      if not line.count(histname):continue
+      if not (histname=="" or line.count(histname)):continue
       line=line[:-1]
       sline = line.split()
       fname = sline[-1]
@@ -247,7 +247,7 @@ def calcHTRatio(jets, metPhi):
     htRatio = num/den
   return htRatio
 
-def findClosestObject(jets, obj, sortFunc=deltaR2):
+def findClosestObject(jets, obj, sortFunc=lambda o1, o2: deltaR2(o1,o2)):
 ##  jets = getJets(c)
   res=[]
   for i,j in enumerate(jets):

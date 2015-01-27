@@ -3,32 +3,32 @@ import copy, os, sys
 ttJetsCSA1450ns={\
 "name" : "ttJetsCSA1450ns",
 "chunkString": "TTJets_PUS14",
-'dir' : "/data/schoef/cmgTuples/v2/IncProd/",
+'dir' : "/dpm/oeaw.ac.at/home/cms/store/user/schoef/cmg121214_6/TTJets_PUS14",
 'dbsName':'/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/Spring14miniaod-PU_S14_POSTLS170_V6-v1/MINIAODSIM'
 }
 
 WJetsToLNu_HT100to200={\
 "name" : "WJetsToLNu_HT100to200",
-"chunkString": "WJetsToLNu_HT100to200_PU_S14_POSTLS170",
-'dir' : "/data/schoef/cmgTuples/v2/IncProd/",
+#"chunkString": "WJetsToLNu_HT100to200_PU_S14_POSTLS170",
+'dir' : "/dpm/oeaw.ac.at/home/cms/store/user/schoef/cmg121214_5/WJetsToLNu_HT100to200_PU_S14_POSTLS170",
 'dbsName':'/WJetsToLNu_HT-100to200_Tune4C_13TeV-madgraph-tauola/Spring14dr-PU_S14_POSTLS170_V6-v1/AODSIM'
 }
 WJetsToLNu_HT200to400={\
 "name" : "WJetsToLNu_HT200to400",
-"chunkString": "WJetsToLNu_HT200to400_PU_S14_POSTLS170",
-'dir' : "/data/schoef/cmgTuples/v2/IncProd/",
+#"chunkString": "WJetsToLNu_HT200to400_PU_S14_POSTLS170",
+'dir' : "/dpm/oeaw.ac.at/home/cms/store/user/schoef/cmg121214_5/WJetsToLNu_HT200to400_PU_S14_POSTLS170",
 'dbsName':'/WJetsToLNu_HT-200to400_Tune4C_13TeV-madgraph-tauola/Spring14dr-PU_S14_POSTLS170_V6-v1/AODSIM'
 }
 WJetsToLNu_HT400to600={\
 "name" : "WJetsToLNu_HT400to600",
-"chunkString": "WJetsToLNu_HT400to600_PU_S14_POSTLS170",
-'dir' : "/data/schoef/cmgTuples/v2/IncProd/",
+#"chunkString": "WJetsToLNu_HT400to600_PU_S14_POSTLS170",
+'dir' : "/dpm/oeaw.ac.at/home/cms/store/user/schoef/cmg121214_5/WJetsToLNu_HT400to600_PU_S14_POSTLS170",
 'dbsName':'/WJetsToLNu_HT-400to600_Tune4C_13TeV-madgraph-tauola/Spring14dr-PU_S14_POSTLS170_V6-v1/AODSIM'
 }
 WJetsToLNu_HT600toInf={\
 "name" : "WJetsToLNu_HT600toInf",
-"chunkString": "WJetsToLNu_HT600toInf_PU_S14_POSTLS170",
-'dir' : "/data/schoef/cmgTuples/v2/IncProd/",
+#"chunkString": "WJetsToLNu_HT600toInf_PU_S14_POSTLS170",
+'dir' : "/dpm/oeaw.ac.at/home/cms/store/user/schoef/cmg121214_5/WJetsToLNu_HT600toInf_PU_S14_POSTLS170",
 'dbsName':'/WJetsToLNu_HT-600toInf_Tune4C_13TeV-madgraph-tauola/Spring14dr-PU_S14_POSTLS170_V6-v1/AODSIM'
 }
 #
@@ -91,7 +91,7 @@ def getSignalSample(signal):
   if signal in allSignalStrings:
     return {\
       "name" : signal,
-#      "chunkString": signal,
+      "chunkString": signal,
       'dir' : "/data/schoef/cmgTuples/v3/signals/",
       'dbsName':signal
       }
