@@ -52,12 +52,12 @@ for relIso in [0.3]:
   muEtaIDEff=muEtaIDEff.ProjectionX()
   muEtaIDEff.Multiply(muEtaPresEff.ProjectionX())
 
-  munVtxPresEff = ROOT.TProfile('munVtxPresEff','munVtxPresEff', 50,0,50,-2,2)
-  c.Draw('gLepInd>=0:ngoodVertices>>munVtxPresEff','abs(gLepPdg)==13&&gLepPt>'+str(ptCut)+"&&abs(gLepEta)<2.5&&"+hadPresel+diLepSelection, 'goff')
-  munVtxIDEff = ROOT.TProfile('munVtxIDEff','munVtxIDEff', 50,0,50,-2,2)
-  c.Draw('gLepDR<0.4&&abs(1-muPt[gLepInd]/gLepPt)<0.07&&'+leptonID+':ngoodVertices>>munVtxIDEff','abs(gLepPdg)==13&&gLepPt>'+str(ptCut)+'&&abs(gLepEta)<2.5&&gLepInd>=0'+"&&"+hadPresel+diLepSelection, 'goff')
-  munVtxIDEff=munVtxIDEff.ProjectionX()
-  munVtxIDEff.Multiply(munVtxPresEff.ProjectionX())
+ # munVtxPresEff = ROOT.TProfile('munVtxPresEff','munVtxPresEff', 50,0,50,-2,2)
+ # c.Draw('gLepInd>=0:ngoodVertices>>munVtxPresEff','abs(gLepPdg)==13&&gLepPt>'+str(ptCut)+"&&abs(gLepEta)<2.5&&"+hadPresel+diLepSelection, 'goff')
+ # munVtxIDEff = ROOT.TProfile('munVtxIDEff','munVtxIDEff', 50,0,50,-2,2)
+ # c.Draw('gLepDR<0.4&&abs(1-muPt[gLepInd]/gLepPt)<0.07&&'+leptonID+':ngoodVertices>>munVtxIDEff','abs(gLepPdg)==13&&gLepPt>'+str(ptCut)+'&&abs(gLepEta)<2.5&&gLepInd>=0'+"&&"+hadPresel+diLepSelection, 'goff')
+ # munVtxIDEff=munVtxIDEff.ProjectionX()
+ # munVtxIDEff.Multiply(munVtxPresEff.ProjectionX())
 
   muPtEta2DPresEff = ROOT.TProfile2D('muPtEta2DPresEff','muPtEta2DPresEff',len(ptBinsCoarse)-1,ptBinsCoarse, len(etaBinsCoarse)-1,etaBinsCoarse)
   c.Draw('gLepInd>=0:gLepEta:gLepPt>>muPtEta2DPresEff','abs(gLepPdg)==13&&gLepPt>'+str(ptCut)+"&&"+hadPresel+diLepSelection, 'goff')
@@ -72,22 +72,22 @@ for relIso in [0.3]:
     
   c1 = ROOT.TCanvas()
   muPtIDEff.Draw()
-  c1.Print(PngPath+'muPtIDEff_'+prefix+'.png')
+  c1.Print(PngPath+'muPtIDEff_'+prefix+'E.png')
 #  muPtPresEff.Draw()
 #  c1.Print(PngPath+'muPtPresEff_'+prefix+'.png')
   muEtaIDEff.Draw()
-  c1.Print(PngPath+'muEtaIDEff_'+prefix+'.png')
+  c1.Print(PngPath+'muEtaIDEff_'+prefix+'E.png')
 #  muEtaPresEff.Draw()
 #  c1.Print(PngPath+'muEtaPresEff_'+prefix+'.png')
-  munVtxIDEff.Draw()
-  c1.Print(PngPath+'munVtxIDEff_'+prefix+'.png')
+#  munVtxIDEff.Draw()
+#  c1.Print(PngPath+'munVtxIDEff_'+prefix+'.png')
 #  munVtxPresEff.Draw()
 #  c1.Print('/afs/hephy.at/user/s/'+username+'/www/pngCSA14/munVtxPresEff_'+prefix+'.png')
 
   #c1.SetLogz()
   muPtEta2DEff.Draw('COLZ')
-  c1.Print(PngPath+'muPtEta2DEff_'+prefix+'.png')
-  c1.Print(PngPath+'muPtEta2DEff_'+prefix+'.root')
+  c1.Print(PngPath+'muPtEta2DEff_'+prefix+'E.png')
+  c1.Print(PngPath+'muPtEta2DEff_'+prefix+'E.root')
 #  muPtEta2DPresEff.Draw('COLZ')
 #  c1.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/pngCSA14/muPtEta2DPresEff_'+prefix+'.png')
   for l in Lepton:
@@ -95,7 +95,7 @@ for relIso in [0.3]:
       Path='/data/'+username+'/results2014/'+l+'Templates/'
       if not os.path.exists(Path):
         os.makedirs(Path)
-      fname='CSA14_TTJets_efficiencyMap_v26_'+prefix+'.pkl'
+      fname='CSA14_TTJets_efficiencyMap_v26_'+prefix+'E.pkl'
       pickle.dump(muPtEta2DEff, file(Path+fname,'w'))
       print "Written",  Path+fname
 

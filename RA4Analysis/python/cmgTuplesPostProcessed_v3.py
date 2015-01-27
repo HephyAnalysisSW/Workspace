@@ -1,50 +1,46 @@
 import copy, os, sys
 
-ttJetsCSA1450ns={\
-"name" : "ttJetsCSA1450ns",
-"chunkString": "TTJets_PUS14",
-'dir' : "/data/schoef/cmgTuples/v2/IncProd/",
-'dbsName':'/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/Spring14miniaod-PU_S14_POSTLS170_V6-v1/MINIAODSIM'
-}
-
-WJetsToLNu_HT100to200={\
-"name" : "WJetsToLNu_HT100to200",
-"chunkString": "WJetsToLNu_HT100to200_PU_S14_POSTLS170",
-'dir' : "/data/schoef/cmgTuples/v2/IncProd/",
-'dbsName':'/WJetsToLNu_HT-100to200_Tune4C_13TeV-madgraph-tauola/Spring14dr-PU_S14_POSTLS170_V6-v1/AODSIM'
-}
-WJetsToLNu_HT200to400={\
-"name" : "WJetsToLNu_HT200to400",
-"chunkString": "WJetsToLNu_HT200to400_PU_S14_POSTLS170",
-'dir' : "/data/schoef/cmgTuples/v2/IncProd/",
-'dbsName':'/WJetsToLNu_HT-200to400_Tune4C_13TeV-madgraph-tauola/Spring14dr-PU_S14_POSTLS170_V6-v1/AODSIM'
-}
-WJetsToLNu_HT400to600={\
-"name" : "WJetsToLNu_HT400to600",
-"chunkString": "WJetsToLNu_HT400to600_PU_S14_POSTLS170",
-'dir' : "/data/schoef/cmgTuples/v2/IncProd/",
-'dbsName':'/WJetsToLNu_HT-400to600_Tune4C_13TeV-madgraph-tauola/Spring14dr-PU_S14_POSTLS170_V6-v1/AODSIM'
-}
-WJetsToLNu_HT600toInf={\
-"name" : "WJetsToLNu_HT600toInf",
-"chunkString": "WJetsToLNu_HT600toInf_PU_S14_POSTLS170",
-'dir' : "/data/schoef/cmgTuples/v2/IncProd/",
-'dbsName':'/WJetsToLNu_HT-600toInf_Tune4C_13TeV-madgraph-tauola/Spring14dr-PU_S14_POSTLS170_V6-v1/AODSIM'
-}
+#T1qqqq_1400_325_300={\
+#"name" : "T1qqqq_1400_325_300",
+#"bins": ["T1qqqq_1400_325_300"],
+#'dir' : "/data/schoef/cmgTuples/postProcessed_v0/singleLepton/",
+#}
 #
 #T5Full_1200_1000_800={\
 #"name" : "T5Full_1200_1000_800",
-#"chunkString": "T5Full-1200-1000-800_",
-#'dir' : "/data/schoef/cmgTuples/v3/signals/",
-#'dbsName':'/T5Full_T5Full-1200-1000-800-Decay-MGMMatch50/schoef-T5Full_T5Full-1200-1000-800-Decay-MGMMatch50-miniAOD-92bfc1aa0ef8c674e0edabb945b19298/USER'
+#"bins": ["T5Full_1200_1000_800"],
+#'dir' : "/data/schoef/cmgTuples/postProcessed_v0/singleLepton/",
 #}
 #
 #T5Full_1500_800_100={\
 #"name" : "T5Full_1500_800_100",
-#"chunkString": "T5Full-1500-800-100_",
-#'dir' : "/data/schoef/cmgTuples/v3/signals/",
-#'dbsName':'/T5Full_T5Full-1500-800-100-Decay-MGMMatch50/schoef-T5Full_T5Full-1500-800-100-Decay-MGMMatch50-miniAOD-92bfc1aa0ef8c674e0edabb945b19298/USER'
+#"bins": ["T5Full_1500_800_100"],
+#'dir' : "/data/schoef/cmgTuples/postProcessed_v0/singleLepton/",
 #}
+hard_ttJetsCSA1450ns={\
+"name" : "ttJetsCSA1450ns",
+"bins" : ["ttJetsCSA1450ns"],
+'dir' : "/data/schoef/cmgTuples/postProcessed_v3/hard/",
+}
+
+hard_WJetsHTToLNu={\
+"name" : "WJetsHTToLNu",
+"bins" : ["WJetsToLNu_HT100to200", "WJetsToLNu_HT200to400", "WJetsToLNu_HT400to600", "WJetsToLNu_HT600toInf"],
+'dir' : "/data/schoef/cmgTuples/postProcessed_v3/hard/",
+}
+
+soft_ttJetsCSA1450ns={\
+"name" : "ttJetsCSA1450ns",
+"bins" : ["ttJetsCSA1450ns"],
+'dir' : "/data/schoef/cmgTuples/postProcessed_v3/soft/",
+}
+
+soft_WJetsHTToLNu={\
+"name" : "WJetsHTToLNu",
+"bins" : ["WJetsToLNu_HT100to200", "WJetsToLNu_HT200to400", "WJetsToLNu_HT400to600", "WJetsToLNu_HT600toInf"],
+'dir' : "/data/schoef/cmgTuples/postProcessed_v3/soft/",
+}
+
 allSignalStrings=[\
   "T5Full_1200_1000_800",
   "T5Full_1500_800_100",
@@ -84,24 +80,23 @@ allSignalStrings=[\
   "T5qqqqWW_Gl_1400_LSP_100_Chi_325",
   "T5qqqqWW_Gl_1400_LSP_300_Chi_315",
   "T6qqWW_Sq_950_LSP_300_Chi_350",
-
 ]
 
-def getSignalSample(signal):
+def getSignalSample(signal, subDir='soft'):
   if signal in allSignalStrings:
     return {\
       "name" : signal,
 #      "chunkString": signal,
-      'dir' : "/data/schoef/cmgTuples/v3/signals/",
-      'dbsName':signal
+      'dir' : "/data/schoef/cmgTuples/postProcessed_v3/"+subDir+'/',
+      'bins':[signal]
       }
   else:
     print "Signal",signal,"unknown. Available: ",", ".join(allSignalStrings)
 
 allSignals=[]
 for s in allSignalStrings:
-  exec(s+"=getSignalSample('"+s+"')")
-  exec("allSignals.append("+s+")")
+  exec("soft_"+s+"=getSignalSample('"+s+"', 'soft')")
+  exec("allSignals.append(soft_"+s+")")
+  exec("hard_"+s+"=getSignalSample('"+s+"', 'hard')")
+  exec("allSignals.append(hard_"+s+")")
   
-
-

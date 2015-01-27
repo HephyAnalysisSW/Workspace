@@ -24,8 +24,6 @@ oneHadTauOpen ="ngoodMuons==1&&nvetoMuons==1&&nvetoElectrons==0&&Sum$(gTauNENu+g
 ##Fakerate calculation##
 ptBins  = array('d', [float(x) for x in range(10, 20)+range(20,50,3)+range(50,100,10)+range(100,310,30)])
 leptonID = 'gTauPt>15&&abs(gTauEta)<2.1&&(gTauNENu+gTauNMuNu)==0&&gTauNTauNu==1'
-#GetJets
-mindeltaR = sqrt(findClosestObject(getGoodJetsStage2(c),{'phi':gTauPhi,'eta':gTauEta})['distance'])<0.4
 
 fakeRatePre = ROOT.TProfile('fakeRatePre','fakeRatePre', len(ptBins)-1,ptBins,-2,2)
 c.Draw('gTauJetInd>=0:gTauPt>>fakeRatePre',oneHadTau, 'goff')

@@ -2,13 +2,26 @@ import ROOT
 import pickle
 from Workspace.RA4Analysis.stage2Tuples import ttJetsCSA1450ns
 from array import array
-c = ROOT.TChain('Events')
 #for b in ttJetsCSA1450ns['bins']:
 #  c.Add(ttJetsCSA1450ns['dirname']+'/'+b+'/h*.root')
+##cmg begin###
+#from Workspace.RA4Analysis.cmgTuplesPostProcessed_v3 import *
+#from Workspace.RA4Analysis.helpers import *
+#from Workspace.HEPHYPythonTools.helpers import getChain
+
+#c = getChain(hard_ttJetsCSA1450ns)
+##cmg end###
+
+c = ROOT.TChain('Events')
 c.Add('/data/schoef/convertedTuples_v26/copyInc/ttJetsCSA1450ns/histo_ttJetsCSA1450ns_from*.root')
 stuff=[]
 hadTauReq = 'gTauNENu+gTauNMuNu==0&&gTauNTauNu==1'
 
+##cmg begin####
+#hadTauReq = 'ngenTau==1&&genTau_nMuNu+genTau_nMuE+genTau_nMuTau==0'
+#hadTauReq = 'genTau_nMuNu+genTau_nMuE+genTau_nMuTau==0'
+
+####cmg end####
 from Workspace.RA4Analysis.objectSelection import gTauAbsEtaBins, gTauPtBins, metParRatioBins, jetRatioBins
 
 colors = [ROOT.kGray, ROOT.kBlack, ROOT.kBlue, ROOT.kRed, ROOT.kGreen, ROOT.kMagenta, ROOT.kCyan]
@@ -20,6 +33,64 @@ def getCut(var, bin):
       cut+="&&"+var+"<"+str(bin[1])
       s+='_'+str(bin[1])
   return cut, s
+
+###cmg begin#####
+
+# c1 = ROOT.TCanvas()
+# templates={}
+# for etab in gTauAbsEtaBins+[(0,-1)]:
+#   etaCut, seta = getCut('abs(genTau_eta)', etab)
+#   seta=seta.replace('abs(genTau_eta)','eta') 
+#   genTauTemplatePt={}
+#   for i, b in enumerate(gTauPtBins+[(10,-1)]):
+#     if not templates.has_key(b):
+#       templates[b]={}
+#     cut,s = getCut('genTau_pt',b)
+#     cut+='&&'+etaCut
+#     s+="_"+seta
+#     print "cut:" , cut , "s:" , s
+#  
+#     genTauTemplatePt[b] = ROOT.TH1F('genTauTemplate_'+s, 'genTauTemplate_'+s,len(metParRatioBins)-1, array('d',metParRatioBins))
+#     genTau_metPar = '(cos(genTau_phi)*genTau_MEx + sin(genTau_phi)*genTau_MEy)'
+#     c.Draw(genTau_metPar)
+#     c.Draw('('+genTau_metPar+'/genTau_pt)>>genTauTemplate_'+s,  cut+"&&"+hadTauReq,'goff')
+#     genTauTemplatePt[b].Scale(1./genTauTemplatePt[b].Integral())
+#     genTauTemplatePt[b].Draw()
+#     templates[b][etab]=genTauTemplatePt[b]
+#     c1.SetLogz()
+#     c1.Print('/afs/hephy.at/user/e/easilar/www/pngCSA14/cmg_genTauTemplate_'+s+'.png')
+# ofile = '/data/easilar/results2014/tauTemplates/CSA14_TTJets_genTau_cmg.pkl'
+# #    c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngCSA14/genTauTemplate_'+s+'.png')
+# #ofile = '/data/schoef/results2014/tauTemplates/CSA14_TTJets_genTau.pkl'
+# pickle.dump(templates, file(ofile,'w'))
+# print "Written", ofile 
+#
+#
+#######cmg End##########
+c1 = ROOT.TCanvas()
+templates={}
+for etab in gTauAbsEtaBins+[(0,-1)]:
+  etaCut, seta = getCut('abs(gTauEta)', etab)
+  seta=seta.replace('abs(gTauEta)','eta') 
+  genTauTemplatePt={}
+  for i, b in enumerate(gTauPtBins+[(10,-1)]):
+    if not templates.has_key(b):
+      templates[b]={}
+    cut,s = getCut('gTauPt',b)
+    cut+='&&'+etaCut
+    s+="_"+seta
+    genTauTemplatePt[b] = ROOT.TH1F('genTauTemplate_'+s, 'genTauTemplate_'+s,len(metParRatioBins)-1, array('d',metParRatioBins))
+    c.Draw('gTauMetPar/gTauPt>>genTauTemplate_'+s,  cut+"&&"+hadTauReq,'goff')
+    genTauTemplatePt[b].Scale(1./genTauTemplatePt[b].Integral())
+    genTauTemplatePt[b].Draw()
+    templates[b][etab]=genTauTemplatePt[b]
+    c1.SetLogz()
+    c1.Print('/afs/hephy.at/user/e/easilar/www/pngCSA14/genTauTemplate_trial'+s+'.png')
+ofile = '/data/easilar/results2014/tauTemplates/CSA14_TTJets_genTau-trial.pkl'
+#    c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngCSA14/genTauTemplate_'+s+'.png')
+#ofile = '/data/schoef/results2014/tauTemplates/CSA14_TTJets_genTau.pkl'
+pickle.dump(templates, file(ofile,'w'))
+print "Written", ofile 
 
 ##Taus: Pt
 #c1 = ROOT.TCanvas()
@@ -219,30 +290,31 @@ def getCut(var, bin):
 
 ##gTauMetPar/gTauPt VS. restJet/genTau templates in bins of gTauPt and gTauEta
 #gTauMetPar/gTauPt VS. restJet/genTau templates in bins of gTauPt and gTauEta
-c1 = ROOT.TCanvas()
-templates={}
-for etab in gTauAbsEtaBins+[(0,-1)]:
-  etaCut, seta = getCut('abs(gTauEta)', etab)
-  seta=seta.replace('abs(gTauEta)','eta') 
-  genTauTemplatePt={}
-  for i, b in enumerate(gTauPtBins+[(10,-1)]):
-    if not templates.has_key(b):
-      templates[b]={}
-    cut,s = getCut('gTauPt',b)
-    cut+='&&'+etaCut
-    s+="_"+seta
-    genTauTemplatePt[b] = ROOT.TH1F('genTauTemplate_'+s, 'genTauTemplate_'+s,len(metParRatioBins)-1, array('d',metParRatioBins))
-    c.Draw('gTauMetPar/gTauPt>>genTauTemplate_'+s,  cut+"&&"+hadTauReq,'goff')
-    genTauTemplatePt[b].Scale(1./genTauTemplatePt[b].Integral())
-    genTauTemplatePt[b].Draw()
-    templates[b][etab]=genTauTemplatePt[b]
-    c1.SetLogz()
-    c1.Print('/afs/hephy.at/user/e/easilar/www/pngCSA14/genTauTemplate_'+s+'.png')
-ofile = '/data/easilar/results2014/tauTemplates/CSA14_TTJets_genTau.pkl'
-#    c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngCSA14/genTauTemplate_'+s+'.png')
-#ofile = '/data/schoef/results2014/tauTemplates/CSA14_TTJets_genTau.pkl'
-pickle.dump(templates, file(ofile,'w'))
-print "Written", ofile 
+#c1 = ROOT.TCanvas()
+#templates={}
+#for etab in gTauAbsEtaBins+[(0,-1)]:
+#  etaCut, seta = getCut('abs(gTauEta)', etab)
+#  seta=seta.replace('abs(gTauEta)','eta') 
+#  genTauTemplatePt={}
+#  for i, b in enumerate(gTauPtBins+[(10,-1)]):
+#    if not templates.has_key(b):
+#      templates[b]={}
+#    cut,s = getCut('gTauPt',b)
+#    cut+='&&'+etaCut
+#    s+="_"+seta
+#    genTauTemplatePt[b] = ROOT.TH1F('genTauTemplate_'+s, 'genTauTemplate_'+s,len(metParRatioBins)-1, array('d',metParRatioBins))
+#    c.Draw('gTauMetPar/gTauPt>>genTauTemplate_'+s,  cut+"&&"+hadTauReq,'goff')
+#    genTauTemplatePt[b].Scale(1./genTauTemplatePt[b].Integral())
+#    genTauTemplatePt[b].Draw()
+#    templates[b][etab]=genTauTemplatePt[b]
+#    c1.SetLogz()
+#    c1.Print('/afs/hephy.at/user/e/easilar/www/pngCSA14/genTauTemplate_'+s+'.png')
+#ofile = '/data/easilar/results2014/tauTemplates/CSA14_TTJets_genTau.pkl'
+##    c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngCSA14/genTauTemplate_'+s+'.png')
+##ofile = '/data/schoef/results2014/tauTemplates/CSA14_TTJets_genTau.pkl'
+#pickle.dump(templates, file(ofile,'w'))
+#print "Written", ofile 
+
 
 
 ####BELOW IS JUST FOR QUICK PLOT!!

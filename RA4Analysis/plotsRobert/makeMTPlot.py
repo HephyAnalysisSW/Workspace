@@ -38,8 +38,8 @@ allHad = '('+diHad+'||'+hTau_H+')'
 #prefix='EffAcc_nHybridMediumSel_met250'
 #presel="ngoodMuons==1&&ngoodElectrons==0&&nvetoElectrons==0&&ht>500&&met>250&&nbtags==0&&njets>=4"
 prefix='EffAcc_nHybridMediumSel_st250'
-presel="ngoodMuons==1&&ngoodElectrons==0&&nvetoElectrons==0&&ht>500&&met+leptonPt>250&&nbtags==0&&njets>=4"
-
+#presel="ngoodMuons==1&&ngoodElectrons==0&&nvetoElectrons==0&&ht>500&&met+leptonPt>250&&nbtags==1&&njets>=4"
+presel="ngoodMuons==1&&ngoodElectrons==0&&nvetoElectrons==0&&ht>500&&met+leptonPt>250&&nbtags==1&&njets>=2&&njets<4"
 plots = [ 
           ['sqrt(2*leptonPt*met*(1-cos(metPhi-leptonPhi)))', [20,0,800], 'mt'],\
           ['acos((leptonPt + met*cos(leptonPhi - metPhi))/sqrt(leptonPt**2 + met**2+2*met*leptonPt*cos(leptonPhi-metPhi)))', [16,0,3.2], 'dphi']
@@ -111,33 +111,4 @@ for var, binning, fname in plots:
   #hPresel.Draw('same')
   c1.RedrawAxis()
   l.Draw()
-  c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngCSA14/'+fname+'_'+prefix+'.png')
-
-#hPresel_l_H = getPlotFromChain(c, 'sqrt(2*leptonPt*met*(1-cos(metphi-leptonPhi)))', [20,0,800], presel+"&&"+l_H, 'weight')
-#hPresel_l_H.SetLineColor(ROOT.kRed)
-#hPresel_l_H.Draw('same')
-#
-#hPresel_lTau_H = getPlotFromChain(c, 'sqrt(2*leptonPt*met*(1-cos(metphi-leptonPhi)))', [20,0,800], presel+"&&"+lTau_H, 'weight')
-#hPresel_lTau_H.SetLineColor(ROOT.kBlue)
-#hPresel_lTau_H.Draw('same')
-#
-#hPresel_hTau_l = getPlotFromChain(c, 'sqrt(2*leptonPt*met*(1-cos(metphi-leptonPhi)))', [20,0,800], presel+"&&"+hTau_l, 'weight')
-#hPresel_hTau_l.SetLineColor(ROOT.kBlue)
-#hPresel_hTau_l.Draw('same')
-#
-#hPresel_diLep = getPlotFromChain(c, 'sqrt(2*leptonPt*met*(1-cos(metphi-leptonPhi)))', [20,0,800], presel+"&&"+diLep, 'weight')
-#hPresel_diLep.SetLineColor(ROOT.kGreen)
-#hPresel_diLep.Draw('same')
-#
-#hPresel_lTau_l = getPlotFromChain(c, 'sqrt(2*leptonPt*met*(1-cos(metphi-leptonPhi)))', [20,0,800], presel+"&&"+lTau_l, 'weight')
-#hPresel_lTau_l.SetLineColor(ROOT.kBlue)
-#hPresel_lTau_l.Draw('same')
-#
-#hPresel_diTau = getPlotFromChain(c, 'sqrt(2*leptonPt*met*(1-cos(metphi-leptonPhi)))', [20,0,800], presel+"&&"+diTau, 'weight')
-##hPresel_diTau.SetLineColor(ROOT.kGreen)
-#hPresel_diTau.Draw('same')
-#
-#hPresel_diHad = getPlotFromChain(c, 'sqrt(2*leptonPt*met*(1-cos(metphi-leptonPhi)))', [20,0,800], presel+"&&"+diHad, 'weight')
-##hPresel_diHad.SetLineColor(ROOT.kGreen)
-#hPresel_diHad.Draw('same')
-#
+  c1.Print('/afs/hephy.at/user/e/easilar/www/pngCSA14/'+fname+'_'+prefix+'2or3.png')

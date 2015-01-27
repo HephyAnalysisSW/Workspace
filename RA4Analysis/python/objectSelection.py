@@ -397,3 +397,16 @@ def getGoodJetsStage2(c):#, jermode=options.jermode, jesmode=options.jesmode):
       })
   
   return res 
+
+def getGood_cmg_JetsStage2(c):#, jermode=options.jermode, jesmode=options.jesmode):
+  njets = getVarValue(c, 'nJet')   # jet.pt() > 10.
+  res = []
+  for i in range(int(njets)):
+    res.append( {"eta":getVarValue(c, 'Jet_eta', i),\
+          "pt" :getVarValue(c, 'Jet_pt', i),
+          "phi":getVarValue(c, 'Jet_phi', i),
+          'btag':getVarValue(c, 'Jet_btagCSV', i),
+          'partonId':getVarValue(c, 'Jet_partonId', i)
+      })
+
+  return res

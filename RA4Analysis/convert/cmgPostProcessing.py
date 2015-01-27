@@ -17,15 +17,17 @@ from localInfo import username
 ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 
-#defSampleStr = "ttJetsCSA1450ns,WJetsToLNu_HT100to200,WJetsToLNu_HT200to400,WJetsToLNu_HT400to600,WJetsToLNu_HT600toInf"
+defSampleStr = "ttJetsCSA1450ns,WJetsToLNu_HT100to200,WJetsToLNu_HT200to400,WJetsToLNu_HT400to600,WJetsToLNu_HT600toInf"
+#defSampleStr = "WJetsToLNu_HT100to200"
 #defSampleStr = "WJetsToLNu_HT200to400,WJetsToLNu_HT400to600,WJetsToLNu_HT600toInf"
-#defSampleStr = "WJetsToLNu_HT600toInf"
-#defSampleStr += ",ttJetsCSA1450ns"
+#defSampleStr = "ttJetsCSA1450ns"
+#defSampleStr = "T5Full_1200_1000_800"
 #defSampleStr = "T5Full_1200_1000_800,T5Full_1500_800_100"
+#defSampleStr = "T1ttbbWW_2J_mGo1000_mCh725_mChi715_3bodydec"
 #defSampleStr = "SMS_T1qqqq_2J_mGl1400_mLSP100_PU_S14_POSTLS170"
-defSampleStr = "T1tttt_2J_mGo1300_mStop300_mCh285_mChi280"
+#defSampleStr = "T1ttbbWW_2J_mGo1000_mCh725_mChi715_3bodydec"
 #defSampleStr = "T1qqqq_1400_325_300"
-#defSampleStr = ','.join(allSignalStrings[26:])
+#defSampleStr = ','.join(allSignalStrings)
 
 from optparse import OptionParser
 parser = OptionParser()
@@ -43,17 +45,19 @@ if options.skim=='inc' or options.skim=="":
 if options.skim.startswith('met'):
   skimCond = "met_pt>"+str(float(options.skim[3:]))
 
-#In case a lepton selection is required, loop only over events where there is one 
-if options.leptonSelection.lower()=='soft':
-  skimCond += "&&Sum$(LepGood_pt>5&&LepGood_pt<25&&(LepGood_relIso03*LepGood_pt<7.5)&&abs(LepGood_eta)<2.4)>=1"
-if options.leptonSelection.lower()=='hard':
-  skimCond += "&&Sum$(LepGood_pt>25&&LepGood_relIso03>0.3&&abs(LepGood_eta)<2.4)>=1"
+#FIXME-> This condition reduces good muons by a factor 100 or so. Why does it not work?
+##In case a lepton selection is required, loop only over events where there is one 
+#if options.leptonSelection.lower()=='soft':
+#  skimCond += "&&Sum$(LepGood_pt>5&&LepGood_pt<25&&(LepGood_relIso03*LepGood_pt<7.5)&&abs(LepGood_eta)<2.4)>=1"
+#if options.leptonSelection.lower()=='hard':
+#  skimCond += "&&Sum$(LepGood_pt>25&&LepGood_relIso03>0.3&&abs(LepGood_eta)<2.4)>=1"
 
 if sys.argv[0].count('ipython'):
   options.small=True
 
 def getChunks(sample):
-  chunks = [{'name':x} for x in os.listdir(sample['dir']) if x.startswith(sample['chunkString'])]
+  pre = sample['chunkString'] if sample.has_key('chunkString') else sample['name']
+  chunks = [{'name':x} for x in os.listdir(sample['dir']) if x.startswith(sample['chunkString']+'_Chunk') or x==sample['name']]
   nTotEvents=0
   allFiles=[]
   for i, s in enumerate(chunks):
@@ -180,6 +184,15 @@ for isample, sample in enumerate(allSamples):
       leadingLepInd = None
       if options.leptonSelection=='hard':
         #Select hardest tight lepton among hard leptons
+#        if s.nLooseHardLeptons>=1 and s.nLooseSoftLeptons>=1:
+#          print 
+#          print "all", len(allLeptons),looseLepInd,allLeptons
+#          print "nLooseSoftLeptons     n=", s.nLooseSoftLeptons,    "which?",  looseSoftLepInd,  looseSoftLep
+#          print "nLooseHardLeptons     n=", s.nLooseHardLeptons,    "which?",  looseHardLepInd, looseHardLep 
+#          print "nLooseSoftPt10Leptons n=", s.nLooseSoftPt10Leptons,"which?",  looseSoftPt10LepInd, looseSoftPt10Lep
+#          print "nTightSoftLeptons     n=", s.nTightSoftLeptons,    "which?",  tightSoftLepInd, tightSoftLep
+#          print "nTightHardLeptons     n=", s.nTightHardLeptons,    "which?",  tightHardLepInd, tightHardLep
+#          print
         if s.nTightHardLeptons>=1:
           if s.nTightHardLeptons==1 and s.nLooseHardLeptons==1 and s.nLooseSoftLeptons==0:
             print 
@@ -235,6 +248,7 @@ for isample, sample in enumerate(allSamples):
           s.singleMuonic      = False 
           s.singleElectronic  = False 
 
+#      print "Selected",s.leptonPt
 
       for v in newVars:
         v['branch'].Fill()
