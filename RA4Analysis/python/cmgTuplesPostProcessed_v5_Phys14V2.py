@@ -1,38 +1,38 @@
 import copy, os, sys
 
-def bookSample(sample):
+def makeSample(sample):
   h = copy.deepcopy(sample)
   h['dir']=h['dir']+'/hard/'
   s = copy.deepcopy(sample)
   s['dir']=s['dir']+'/soft/'
   return {'hard':h, 'soft':s}
 
-ttJets=bookSample({\
+ttJets=makeSample({\
 "name" : "ttJets",
 "bins" : ["TTJets"],
 'dir' : "/data/schoef/cmgTuples/postProcessed_v5_Phys14V2/",
 })
-WJetsHTToLNu=bookSample({\
+WJetsHTToLNu=makeSample({\
 "name" : "WJetsHTToLNu",
 "bins" : ["WJetsToLNu_HT100to200", "WJetsToLNu_HT200to400", "WJetsToLNu_HT400to600", "WJetsToLNu_HT600toInf"],
 'dir' : "/data/schoef/cmgTuples/postProcessed_v5_Phys14V2/",
 })
-TTVH=bookSample({\
+TTVH=makeSample({\
 "name" : "TTVH",
 "bins" : ["TTH", "TTWJets", "TTZJets"],
 'dir' : "/data/schoef/cmgTuples/postProcessed_v5_Phys14V2/",
 })
-singleTop=bookSample({\
+singleTop=makeSample({\
 "name" : "singleTop",
 "bins" : ["TBarToLeptons_sChannel", "TBarToLeptons_tChannel", "TBar_tWChannel", "TToLeptons_sChannel", "TToLeptons_tChannel", "T_tWChannel"],
 'dir' : "/data/schoef/cmgTuples/postProcessed_v5_Phys14V2/",
 })
-DY=bookSample({\
+DY=makeSample({\
 "name" : "DY",
 "bins" : ["DYJetsToLL_M50_HT100to200", "DYJetsToLL_M50_HT200to400", "DYJetsToLL_M50_HT400to600", "DYJetsToLL_M50_HT600toInf"],
 'dir' : "/data/schoef/cmgTuples/postProcessed_v5_Phys14V2/",
 })
-QCD=bookSample({\
+QCD=makeSample({\
 "name" : "QCD",
 "bins" : ["QCD_HT_250To500", "QCD_HT_500To1000", "QCD_HT_1000ToInf"],
 'dir' : "/data/schoef/cmgTuples/postProcessed_v5_Phys14V2/",
@@ -81,20 +81,17 @@ allSignalStrings=[\
 
 def getSignalSample(signal):
   if signal in allSignalStrings:
-    return {\
+    return {
       "name" : signal,
 #      "chunkString": signal,
       'dir' : "/data/schoef/cmgTuples/postProcessed_v5_Phys14V2/",
-      'bins':[signal]
-      }
+      'bins':[signal]}
   else:
     print "Signal",signal,"unknown. Available: ",", ".join(allSignalStrings)
 
 allSignals=[]
 for s in allSignalStrings:
-  bookSample(getSignalSample(s))
-#  exec("soft_"+s+"=getSignalSample('"+s+"', 'soft')")
-#  exec("allSignals.append(soft_"+s+")")
-#  exec("hard_"+s+"=getSignalSample('"+s+"', 'hard')")
-#  exec("allSignals.append(hard_"+s+")")
+  sm = makeSample(getSignalSample(s))
+  exec(s+"=sm")
+  exec("allSignals.append(s)")
   
