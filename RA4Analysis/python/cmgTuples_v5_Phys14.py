@@ -146,8 +146,8 @@ TToLeptons_tChannel_PU20bx25={\
 'dbsName':'/TToLeptons_t-channel_Tune4C_CSA14_13TeV-aMCatNLO-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'
 }
 T_tWChannel_PU20bx25={\
-"name" : "",
-"chunkString": "T_tWch",
+"name" : "T_tWChannel",
+"chunkString": "",
 #'dir' : "/dpm/oeaw.ac.at/home/cms/store/user/schoef/phys14_BkgsAndSig/T_tWch",
 'dir': '/data/schoef/cmgTuples/v5_Phys14V2_fromDPM/T_tWch/',
 'fromDPM':True,
@@ -193,10 +193,10 @@ allSignalData=[\
 ["/data/schoef/cmgTuples/v5_Phys14V2_fromEOS/","SMS_T1tttt_2J_mGl1200_mLSP800"], 
 #["/data/schoef/cmgTuples/v5_Phys14V2/","SMS_T1tttt_2J_mGl1300_mLSP100"], 
 #["/data/schoef/cmgTuples/v5_Phys14V2/","SMS_T1tttt_2J_mGl800_mLSP450"], 
-["/data/schoef/cmgTuples/v5_Phys14V2/","SMS_T2tt_2J_mStop425_mLSP325"], 
-["/data/schoef/cmgTuples/v5_Phys14V2/","SMS_T2tt_2J_mStop500_mLSP325"], 
-["/data/schoef/cmgTuples/v5_Phys14V2/","SMS_T2tt_2J_mStop650_mLSP325"], 
-["/data/schoef/cmgTuples/v5_Phys14V2/","SMS_T2tt_2J_mStop850_mLSP100"], 
+["/dpm/oeaw.ac.at/home/cms/store/user/schoef/phys14_BkgsAndSig/SMS_T2tt_2J_mStop425_mLSP325","SMS_T2tt_2J_mStop425_mLSP325"], 
+["/dpm/oeaw.ac.at/home/cms/store/user/schoef/phys14_BkgsAndSig/SMS_T2tt_2J_mStop500_mLSP325","SMS_T2tt_2J_mStop500_mLSP325"], 
+["/dpm/oeaw.ac.at/home/cms/store/user/schoef/phys14_BkgsAndSig/SMS_T2tt_2J_mStop650_mLSP325","SMS_T2tt_2J_mStop650_mLSP325"], 
+["/dpm/oeaw.ac.at/home/cms/store/user/schoef/phys14_BkgsAndSig/SMS_T2tt_2J_mStop850_mLSP100","SMS_T2tt_2J_mStop850_mLSP100"], 
 #["/data/schoef/cmgTuples/v5_Phys14V2_fromEOS/","SMS_T5qqqqWW_2J_mGo1400_mCh315_mChi300"], 
 #["/data/schoef/cmgTuples/v5_Phys14V2_fromEOS/","SMS_T6qqWW_mSq950_mChi325_mLSP300"], 
 #["/data/schoef/cmgTuples/v5_Phys14V2_fromEOS/","T1ttbb_mGo1500_mChi100"], 
