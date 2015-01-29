@@ -185,6 +185,13 @@ WJetsToLNu_HT600toInf_fromEOS={\
 'dir' : "/data/schoef/cmgTuples/v5_Phys14V2_fromEOS/",
 'dbsName':'/WJetsToLNu_HT-600toInf_Tune4C_13TeV-madgraph-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'
 }
+ttJets_fromEOS={\
+"name" : "TTJets",
+'chunkString' : 'TTJets',
+#'dir' : "/dpm/oeaw.ac.at/home/cms/store/user/schoef/phys14_TTJets/TTJets",
+'dir' : "/data/schoef/cmgTuples/v5_Phys14V2_fromEOS/",
+'dbsName':'/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'
+}
 #
 allSignalData=[\
 ["/data/schoef/cmgTuples/v5_Phys14V2/", "SMS_T5qqqqWW_Gl1500_Chi800_LSP100"],
