@@ -1,7 +1,7 @@
 import ROOT
 from localInfo import username
 
-def DrawClosure(plot1,plot2,plot3,plot4,plot1name,path):
+def DrawClosure(plot1,plot2,plot3,plot4,plot1name,xaxis,path):
 
   can = ROOT.TCanvas("c",plot1name,800,800)
   Pad1 = ROOT.TPad("Pad1", "Pad1", 0, 0.3, 1, 1.0)
@@ -10,11 +10,14 @@ def DrawClosure(plot1,plot2,plot3,plot4,plot1name,path):
   Pad1.SetGridx()
   Pad1.Draw()
   Pad1.cd()
+  #text = ROOT.TLatex()
+  #text.DrawLatex(0.15,0.93, plot1name+" #sqrt{s} = 13 TeV")
   plot1.SetTitle(plot1name)
+  plot1.SetTitleSize(5)
   plot1.SetStats(0)
   plot1.SetLineColor(ROOT.kBlack)
   plot1.SetLineWidth(2)
-  plot1.SetAxisRange(0.1,(plot1.GetMaximum())*(plot1.GetMaximum())*10,"Y")
+  plot1.SetAxisRange(0.1,(plot1.GetMaximum())*(plot1.GetMaximum())*2,"Y")
   plot1.Draw()
   plot2.SetStats(0)
   plot2.SetLineColor(ROOT.kRed+1)
@@ -65,13 +68,14 @@ def DrawClosure(plot1,plot2,plot3,plot4,plot1name,path):
   h_ratio.Draw("ep")
   Func.Draw('same')
   h_ratio.SetTitle("")
-  h_ratio.GetYaxis().SetTitle("ratio Truth/Pred ")
+  h_ratio.GetYaxis().SetTitle("Truth/Pred ")
   h_ratio.GetYaxis().SetNdivisions(505)
   h_ratio.GetYaxis().SetTitleSize(20)
   h_ratio.GetYaxis().SetTitleFont(43)
   h_ratio.GetYaxis().SetTitleOffset(1.55)
   h_ratio.GetYaxis().SetLabelFont(43)
   h_ratio.GetYaxis().SetLabelSize(15)
+  h_ratio.GetXaxis().SetTitle(xaxis)
   h_ratio.GetXaxis().SetTitleSize(20)
   h_ratio.GetXaxis().SetTitleFont(43)
   h_ratio.GetXaxis().SetTitleOffset(4.)

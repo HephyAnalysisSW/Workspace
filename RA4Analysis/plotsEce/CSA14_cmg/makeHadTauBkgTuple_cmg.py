@@ -11,12 +11,6 @@ from Workspace.RA4Analysis.cmgTuplesPostProcessed_v3 import *
 from Workspace.HEPHYPythonTools.helpers import getChain
 from Workspace.RA4Analysis.stage2Tuples import *
 
-#c = ROOT.TChain('Events')
-#for b in ttJetsCSA1450ns['bins']:
-#  c.Add(ttJetsCSA1450ns['dirname']+'/'+b+'/h*.root')
-#c.Add('/data/schoef/convertedTuples_v26/copyInc/ttJetsCSA1450ns/histo_ttJetsCSA1450ns_from*.root')
-#c.Add('/data/schoef/convertedTuples_v25/copyMET/ttJetsCSA1450ns/histo_ttJetsCSA1450ns_from*.root')
-#mode='dilep'
 c = getChain(hard_ttJetsCSA1450ns)
 
 mode='had'
@@ -26,18 +20,18 @@ small = False
 maxN=10000
 
 if mode=='had':
-  #leptonEffMap = pickle.load(file('/data/easilar/results2014/muonTemplates/CSA14_TTJets_efficiencyMap_v26_vetoMuIDPt15_ttJetsCSA1450ns_v26_relIso'+str(relIso)+'.pkl'))
   leptonEffMap = pickle.load(file('/afs/hephy.at/user/e/easilar/www/hadronicTau_cmg/lepton_Efficiency_Results/CSA14_TTJet_LepEff_cmg_Large.pkl'))
-  #tauFrMap = pickle.load(file('/data/easilar/results2014/tauTemplates/tauToBfakeRate.pkl'))
   tauFrMap = pickle.load(file('/afs/hephy.at/user/e/easilar/www/hadronicTau_cmg/fakeRate_Results/CSA14_TTJet_tauToBfakeRate_cmg.pkl'))
-  #leptonEffMap = pickle.load(file('/data/schoef/results2014/tauTemplates/CSA14_TTJets_vetoLeptonEfficiencyMap.pkl'))
-  #leptonEffMap = pickle.load(file('/data/easilar/results2014/tauTemplates/CSA14_TTJets_efficiencyMap_vetoMuIDPt15_ttJetsCSA1450ns_relIso0.3.pkl'))
   #doubleLeptonPreselection = "ngoodMuons>=1&&nvetoMuons==2&&nvetoElectrons==0"
-  doubleLeptonPreselection = "nLooseHardLeptons==2&&nTightHardLeptons>=1&&nLepGood==2&&Sum$(abs(LepGood_pdgId)==13)==2&&Sum$(LepGood_tightId==1)>=1&&Sum$(abs(LepGood_pdgId)==11)==0"
-  #print doubleLeptonPreselection
-  #templates = pickle.load(file('/data/easilar/results2014/tauTemplates/CSA14_TTJets_genTau.pkl'))
+  doubleLeptonPreselection = "nLooseHardLeptons==2&&nTightHardLeptons>=1&&nLepGood==2\
+  &&Sum$(abs(LepGood_pdgId)==13 && LepGood_looseIdSusy==1 && abs(LepGood_eta)<2.4 && LepGood_relIso03 < 0.3)==2\
+  &&Sum$(abs(LepGood_pdgId)==13 && LepGood_tightId==1 && abs(LepGood_eta)<2.1 && LepGood_relIso03 < 0.12)>=1\
+  &&Sum$(abs(LepGood_pdgId)==11)==0\
+  &&nLepOther==0"
+  gendoubleLeptonPreselection = "Sum$(abs(genPart_pdgId)==14&&abs(genPart_motherId)==24)==2&&Sum$(abs(genPart_pdgId)==12)==0&&Sum$(abs(genPart_pdgId)==16)==0"
+  print doubleLeptonPreselection
   templates = pickle.load(file('/data/easilar/results2014/tauTemplates/CSA14_TTJets_genTau_cmg.pkl'))
-  ofile =                      '/data/easilar/results2014/tauTuples/CSA14_TTJets_hadTauEstimate_cmg_large.root'
+  ofile =                      '/data/easilar/results2014/tauTuples/CSA14_TTJets_hadTauEstimate_cmg_large_reduced_lepother.root'
 
   #doubleLeptonPreselection = "ngoodMuons>=1&&nvetoMuons==2&&nvetoElectrons==0"
   #templates = pickle.load(file('/data/schoef/results2014/tauTemplates/CSA14_TTJets_lepGenTau.pkl'))
@@ -86,7 +80,7 @@ for v in vars:
  t.Branch(v.split('/')[0],   ROOT.AddressOf(s,v.split('/')[0]), v) 
 dir.cd()
 
-c.Draw(">>eList", doubleLeptonPreselection)
+c.Draw(">>eList", doubleLeptonPreselection+"&&"+gendoubleLeptonPreselection)
 eList = ROOT.gDirectory.Get("eList")
 number_events = eList.GetN()
 #print number_events
