@@ -2,6 +2,24 @@ import ROOT
 from Workspace.HEPHYPythonTools.helpers import getVarValue, findClosestObject, deltaPhi, deltaR, deltaR2, getObjDict
 from math import cos, sin, sqrt, acos, pi, atan2, cosh
 
+
+# h_1200_800  = kBlack
+# h_1500_100  = kMagenta
+def color(S):
+  s=S.lower()
+  if "qcd" in s:
+    return ROOT.kCyan-6 
+  if "singletop" in s:
+    return ROOT.kViolet+5
+  if ("ttjets" in s) or ("ttbar" in s):
+    return ROOT.kBlue-2
+  if ("wjets" in s):
+    return ROOT.kGreen-2
+  if "ttv" in s or "ttz" in s or "ttw" in s or "tth" in s:
+    return ROOT.kOrange-3
+  if 'dy' in s:
+    return ROOT.kRed-6
+
 def stage2MT(c):
   if c=="branches":return ['met_pt','leptonPt','met_phi','leptonPhi']
   met=c.GetLeaf('met').GetValue()
@@ -133,6 +151,8 @@ def cmgHTRatio(c):
   return sum([j['pt'] for j in jets if cos(met_phi - j['phi'])<0.])/sum([j['pt'] for j in jets])
 
 def nJetBinName(njb):
+  if len(njb)==2 and njb[0]==njb[1]:
+    return "n_{jet}="+str(njb[0])
   n=str(list(njb)[0])+"#leq n_{jet}"
   if len(njb)>1 and njb[1]>-1:
     n+='#leq '+str(njb[1])
@@ -145,9 +165,8 @@ def nBTagBinName(btb):
 def varBinName(vb, var):
   n=str(list(vb)[0])+"< "+var
   if len(vb)>1 and vb[1]>0:
-    n+='< '+str(vb[1])
+    n+='#leq '+str(vb[1])
   return n
-  
 
 def nameAndCut(stb, htb, njetb, btb=None, presel="(1)", charge="", btagVar = 'nBJetMedium40'):
   cut=presel

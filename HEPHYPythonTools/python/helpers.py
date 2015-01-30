@@ -84,45 +84,51 @@ def getFileList(dir, minAgeDPM=0, histname='histo', xrootPrefix='root://hephyse.
     filelist = filelist[:maxN]
   return filelist
 
-def getChain(sL, minAgeDPM=0, histname='histo', xrootPrefix='root://hephyse.oeaw.ac.at/', maxN=-1):
+def getChain(sL, minAgeDPM=0, histname='histo', xrootPrefix='root://hephyse.oeaw.ac.at/', maxN=-1, treeName="Events"):
   if not type(sL)==type([]):
     sList = [sL]
   else:
     sList= sL 
-  c = ROOT.TChain('Events')
+  c = ROOT.TChain(treeName)
+  i=0
   for s in sList:
     if type(s)==type(""):
-      i=0
       for f in getFileList(s, minAgeDPM, histname, xrootPrefix, maxN):
         i+=1
         c.Add(f)
-      print "Added ",i,'files from dir',s
-      return c
     if type(s)==type({}):
-      i=0
-      for b in s['bins']:
-        dir = s['dirname'] if s.has_key('dirname') else s['dir']
-        for f in getFileList(dir+'/'+b, minAgeDPM, histname, xrootPrefix, maxN):
+      if s.has_key('file'):
+        c.Add(s['file'])
+        i+=1
+      if s.has_key('fromDPM') and s['fromDPM']:
+        for f in getFileList(s['dir'], minAgeDPM, histname, xrootPrefix, maxN):
           i+=1
           c.Add(f)
-      print "Added ",i,'files from sample',s['name'],'dir',dir,'bins',s['bins']
+      if s.has_key('bins'):
+        for b in s['bins']:
+          dir = s['dirname'] if s.has_key('dirname') else s['dir']
+          for f in getFileList(dir+'/'+b, minAgeDPM, histname, xrootPrefix, maxN):
+            i+=1
+            c.Add(f)
+  print "Added ",i,'files from sample',s['name']
   return c
 
-def getChunks(sample, treeName):
+def getChunks(sample, treeName, maxN):
   if '/dpm/' in sample['dir']:
-    return getChunksFromDPM(sample)
+    return getChunksFromDPM(sample, maxN=maxN)
 #  elif '/eoscms.cern.ch/' in sample['dir']:
 #    return getSampleFromEOS(sample)
   else:
     fromDPM =  sample.has_key('fromDPM') and sample.has_key('fromDPM')
     if fromDPM:
-      return getChunksFromDPM(sample, fromDPM=fromDPM)
+      return getChunksFromDPM(sample, fromDPM=fromDPM, maxN=maxN)
     else:
-      return getChunksFromNFS(sample, treeName)
+      return getChunksFromNFS(sample, treeName,maxN=maxN)
     
-def getChunksFromNFS(sample, treeName):
+def getChunksFromNFS(sample, treeName, maxN=-1):
   import os, subprocess, datetime
   chunks = [{'name':x} for x in os.listdir(sample['dir']) if x.startswith(sample['chunkString']+'_Chunk') or x==sample['name']]
+  chunks=chunks[:maxN] if maxN>0 else chunks
   nTotEvents=0
   allFiles=[]
   failedChunks=[]
@@ -140,15 +146,18 @@ def getChunksFromNFS(sample, treeName):
         if os.path.isfile(inputFilename):
           nTotEvents+=n
           allFiles.append(inputFilename)
-          chunks[i]['file']=inputFilename
+          s['file']=inputFilename
+        else:
+          failedChunks.append(chunks[i])
       else:failedChunks.append(chunks[i])
 #    except: print "Chunk",s,"could not be added"
   print "Found",len(chunks),"chunks for sample",sample["name"],'with a total of',nTotEvents,"events. Failed for:",",".join([c['name'] for c in failedChunks]),"(",round(100*len(failedChunks)/float(len(chunks)),1),")%"
   return chunks, nTotEvents
 
-def getChunksFromDPM(sample, fromDPM=False):
+def getChunksFromDPM(sample, fromDPM=False, maxN=-1):
   fileList = getFileList(sample['dir'], minAgeDPM=0, histname='', xrootPrefix='root://hephyse.oeaw.ac.at/' if not fromDPM else '')
   chunks = [{'file':x,'name':x.split('/')[-1].replace('.root','')} for x in fileList]
+  chunks=chunks[:maxN] if maxN>0 else chunks
   nTotEvents=0
   failedChunks=[]
   goodChunks=[]
