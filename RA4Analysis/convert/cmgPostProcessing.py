@@ -219,16 +219,6 @@ for isample, sample in enumerate(allSamples):
       
       leadingLepInd = None
       if options.leptonSelection=='hard':
-        #Select hardest tight lepton among hard leptons
-#        if s.nLooseHardLeptons>=1 and s.nLooseSoftLeptons>=1:
-#          print 
-#          print "all", len(allLeptons),looseLepInd,allLeptons
-#          print "nLooseSoftLeptons     n=", s.nLooseSoftLeptons,    "which?",  looseSoftLepInd,  looseSoftLep
-#          print "nLooseHardLeptons     n=", s.nLooseHardLeptons,    "which?",  looseHardLepInd, looseHardLep 
-#          print "nLooseSoftPt10Leptons n=", s.nLooseSoftPt10Leptons,"which?",  looseSoftPt10LepInd, looseSoftPt10Lep
-#          print "nTightSoftLeptons     n=", s.nTightSoftLeptons,    "which?",  tightSoftLepInd, tightSoftLep
-#          print "nTightHardLeptons     n=", s.nTightHardLeptons,    "which?",  tightHardLepInd, tightHardLep
-#          print
         if s.nTightHardLeptons>=1:
           leadingLepInd = tightHardLepInd[0]
           s.leptonPt  = r.LepGood_pt[leadingLepInd]
