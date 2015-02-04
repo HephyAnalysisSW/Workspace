@@ -140,7 +140,9 @@ def cmgHTOrthMET(c):
   if c=="branches":return cmgGetJets("branches")+['met_phi'] 
   jets = cmgGetJets(c,  ptMin=40., etaMax=999.)
   met_phi_orth = c.GetLeaf('met_phi').GetValue()+pi/2.
-  return sum([j['pt']*abs(cos(met_phi_orth - j['phi'])) for j in jets])
+  res = sum([j['pt']*abs(cos(met_phi_orth - j['phi'])) for j in jets])
+#  print res, met_phi_orth, jets, cmgGetJets("branches")
+  return res 
 
 def cmgHTRatio(c):
   """ fraction of HT in the hemisphere opposite to MET
@@ -167,6 +169,10 @@ def varBinName(vb, var):
   if len(vb)>1 and vb[1]>0:
     n+='#leq '+str(vb[1])
   return n
+
+def getBinBorders(l, max=10**4):
+  return [x[0] for x in l ] + [max]
+
 
 def nameAndCut(stb, htb, njetb, btb=None, presel="(1)", charge="", btagVar = 'nBJetMedium40'):
   cut=presel

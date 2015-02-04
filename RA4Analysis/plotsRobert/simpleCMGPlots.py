@@ -9,8 +9,8 @@ from Workspace.HEPHYPythonTools.helpers import getObjFromFile
 #from Workspace.RA4Analysis.simplePlotsCommon import *
 from Workspace.RA4Analysis.simplePlotHelpers import plot, stack, loopAndFill, drawNMStacks
 from Workspace.RA4Analysis.helpers import *
-from Workspace.RA4Analysis.cmgTuplesPostProcessed_v4_Phys14V1 import * 
-small = True
+from Workspace.RA4Analysis.cmgTuplesPostProcessed_v5_Phys14V2 import * 
+small = False
 mode = 'hard'
 
 #prefix = 'mTSel_ht500-met250-6j-0b-diLepVeto'
@@ -26,50 +26,30 @@ signalScale=1
 #prefix = 'ht400-st250-1j-0b-diLepVeto'
 #presel="singleMuonic&&nVetoMuons==1&&nVetoElectrons==0&&st>250&&htJet40ja>400&&nBJetMedium25==0&&nJet40a>=1"
 
-cutBranches = ["single*", "nLoose*", "nTight*", "leptonPt", "met_phi", "htJet40ja", "nBJetMedium25", "nJet40a",'st','met']
+cutBranches = ["weight", "single*", "nLoose*", "nTight*", "leptonPt", "met_phi", "htJet40ja", "nBJetMedium25", "nJet40a",'st','met', 'Jet_pt']
 subdir = "/pngCMG2/"+mode+'/'
 
-####SOFT
-#    prefix = mode+'_ht500-met700-2j-0b-diLepVeto-2j80'
-#    presel="singleMuonic&&nLooseSoftLeptons==1&&nTightSoftLeptons==1&&nTightHardLeptons==0&&met>700&&htJet40ja>500&&nBJetMedium25==0&&nJet40a>=2&&Jet_pt[1]>80"
-#prefix = mode+'_ht500-st250-6j-0b-diLepVeto'
-#presel="singleMuonic&&nLooseSoftLeptons==1&&nTightSoftLeptons==1&&nTightHardLeptons==0&&st>250&&htJet40ja>500&&nBJetMedium25==0&&nJet40a>=6"
-#    prefix = mode+'_ht500-st250-2j-0b-diLepVeto'
-#    presel="singleMuonic&&nLooseSoftLeptons==1&&nTightSoftLeptons==1&&nTightHardLeptons==0&&st>250&&htJet40ja>500&&nBJetMedium25==0&&nJet40a>=2"
-#    prefix = mode+'_ht500-st250-6j-geq2b-diLepVeto'
-#    presel="singleMuonic&&nLooseSoftLeptons==1&&nTightSoftLeptons==1&&nTightHardLeptons==0&&st>250&&htJet40ja>500&&nBJetMedium25>=2&&nJet40a>=6"
-#    prefix = mode+'_ht500-st250-4j-geq2b-diLepVeto'
-#    presel="singleMuonic&&nLooseSoftLeptons==1&&nTightSoftLeptons==1&&nTightHardLeptons==0&&st>250&&htJet40ja>500&&nBJetMedium25>=2&&nJet40a>=4"
-#    prefix = mode+'_ht500-st250-2j-geq2b-diLepVeto'
-#    presel="singleMuonic&&nLooseSoftLeptons==1&&nTightSoftLeptons==1&&nTightHardLeptons==0&&st>250&&htJet40ja>500&&nBJetMedium25>=2&&nJet40a>=2"
-###HARD
-#    prefix = 'hard_ht500-st250-6j-0b-diLepVeto'
-#    presel="singleMuonic&&nLooseSoftLeptons==0&&nTightHardLeptons==1&&nLooseHardLeptons==1&&st>250&&htJet40ja>500&&nBJetMedium25==0&&nJet40a>=6"
-#prefix = mode+'_ht500-st450-6j-0b-diLepVeto'
-#presel="singleMuonic&&nLooseSoftLeptons==0&&nTightHardLeptons==1&&nLooseHardLeptons==1&&st>450&&htJet40ja>500&&nBJetMedium25==0&&nJet40a>=6"
 prefix = mode+'_ht400-st150-2j-0b-diLepVeto'
 presel="singleMuonic&&nLooseSoftLeptons==0&&nTightHardLeptons==1&&nLooseHardLeptons==1&&st>150&&htJet40ja>400&&nBJetMedium25==0&&nJet40a>=2"
+prefix = mode+'_ht500-st20-6j-2j80-0b-diLepVeto'
+presel="singleMuonic&&nLooseSoftLeptons==0&&nTightHardLeptons==1&&nLooseHardLeptons==1&&st>200&&htJet40ja>500&&nBJetMedium25==0&&nJet40a>=6&&Jet_pt[1]>80"
 
 cutString=presel
 
 signalPrefix="" if signalScale==1 else str(signalScale)+"x "
 #  #HARD
 if mode=='hard':
-  hard_SMS_T5qqqqWW_Gl1200_Chi1000_LSP800['style'] = {'legendText':signalPrefix+hard_SMS_T5qqqqWW_Gl1200_Chi1000_LSP800['name'],   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kBlue, 'markerStyle':None, 'markerSize':None}
-  hard_SMS_T5qqqqWW_Gl1500_Chi800_LSP100['style']  = {'legendText':signalPrefix+hard_SMS_T5qqqqWW_Gl1500_Chi800_LSP100['name'],   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kBlack, 'markerStyle':None, 'markerSize':None}
-  #  hard_T1tttt_2J_mGo1300_mStop300_mCh285_mChi280['style']  = {'legendText':signalPrefix+hard_T1tttt_2J_mGo1300_mStop300_mCh285_mChi280['name'],   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kGreen, 'markerStyle':None, 'markerSize':None}
-  #  signals = [hard_SMS_T5qqqqWW_Gl1200_Chi1000_LSP800, hard_SMS_T5qqqqWW_Gl1500_Chi800_LSP100, hard_T1tttt_2J_mGo1300_mStop300_mCh285_mChi280]
-  signals = [hard_SMS_T5qqqqWW_Gl1200_Chi1000_LSP800, hard_SMS_T5qqqqWW_Gl1500_Chi800_LSP100]
+  SMS_T5qqqqWW_Gl1200_Chi1000_LSP800['hard']['style'] \
+      = {'legendText':"T5q^{4} (1.2/1/0.8)",   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kBlue, 'markerStyle':None, 'markerSize':None}
+  SMS_T5qqqqWW_Gl1500_Chi800_LSP100['hard']['style']  \
+      = {'legendText':"T5q^{4} (1.5/0.8/0.1)",   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kBlack, 'markerStyle':None, 'markerSize':None}
+  #  T1tttt_2J_mGo1300_mStop300_mCh285_mChi280['style']  = {'legendText':signalPrefix+T1tttt_2J_mGo1300_mStop300_mCh285_mChi280['name'],   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kGreen, 'markerStyle':None, 'markerSize':None}
+  #  signals = [SMS_T5qqqqWW_Gl1200_Chi1000_LSP800['hard'], SMS_T5qqqqWW_Gl1500_Chi800_LSP100['hard'], T1tttt_2J_mGo1300_mStop300_mCh285_mChi280]
+  signals = [SMS_T5qqqqWW_Gl1200_Chi1000_LSP800['hard'], SMS_T5qqqqWW_Gl1500_Chi800_LSP100['hard']]
 #  hard_T6qqWW_Sq_950_LSP_300_Chi_350['style'] = {'legendText':signalPrefix+hard_T6qqWW_Sq_950_LSP_300_Chi_350['name'],   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kBlue, 'markerStyle':None, 'markerSize':None}
 #  hard_T5qqqqWW_Gl_1400_LSP_300_Chi_315['style']  = {'legendText':signalPrefix+hard_T5qqqqWW_Gl_1400_LSP_300_Chi_315['name'],   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kBlack, 'markerStyle':None, 'markerSize':None}
 #  hard_T1tttt_2J_mGo1300_mStop300_mCh285_mChi280['style']  = {'legendText':signalPrefix+hard_T1tttt_2J_mGo1300_mStop300_mCh285_mChi280['name'],   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kGreen, 'markerStyle':None, 'markerSize':None}
 #  signals = [hard_T6qqWW_Sq_950_LSP_300_Chi_350, hard_T5qqqqWW_Gl_1400_LSP_300_Chi_315, hard_T1tttt_2J_mGo1300_mStop300_mCh285_mChi280]
-if mode=='soft':
-  signals=[]
-#  soft_T6qqWW_Sq_950_LSP_300_Chi_350['style'] = {'legendText':signalPrefix+soft_T6qqWW_Sq_950_LSP_300_Chi_350['name'],   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kBlue, 'markerStyle':None, 'markerSize':None}
-#  soft_T5qqqqWW_Gl_1400_LSP_300_Chi_315['style']  = {'legendText':signalPrefix+soft_T5qqqqWW_Gl_1400_LSP_300_Chi_315['name'],   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kBlack, 'markerStyle':None, 'markerSize':None}
-#  soft_T1tttt_2J_mGo1300_mStop300_mCh285_mChi280['style']  = {'legendText':signalPrefix+soft_T1tttt_2J_mGo1300_mStop300_mCh285_mChi280['name'],   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kGreen, 'markerStyle':None, 'markerSize':None}
-#  signals = [soft_T6qqWW_Sq_950_LSP_300_Chi_350, soft_T5qqqqWW_Gl_1400_LSP_300_Chi_315, soft_T1tttt_2J_mGo1300_mStop300_mCh285_mChi280]
 
 for s in signals:
   s['scale'] = signalScale
@@ -81,34 +61,39 @@ def cutFunc(c):
 
 def getStack(labels, var, binning, cut, options={}):
   
-  style_WJetsHTToLNu = {'legendText':'W + Jets',         'style':"f", 'lineThickness':0, 'errorBars':False, 'color':ROOT.kYellow, 'markerStyle':None, 'markerSize':None}
-  style_TTJets       = {'legendText':'t#bar{t} + Jets',  'style':"f", 'linethickNess':0, 'errorBars':False, 'color':ROOT.kRed-3, 'markerStyle':None, 'markerSize':None}
-  style_DY           = {'legendText':'DY + Jets',  'style':"f", 'linethickNess':0, 'errorBars':False, 'color':ROOT.kGreen+3, 'markerStyle':None, 'markerSize':None}
-  style_QCD          = {'legendText':'QCD',  'style':"f", 'linethickNess':0, 'errorBars':False, 'color':38, 'markerStyle':None, 'markerSize':None}
-  style_singleTop    = {'legendText':'single top',  'style':"f", 'linethickNess':0, 'errorBars':False, 'color':ROOT.kOrange + 4, 'markerStyle':None, 'markerSize':None}
+  style_WJetsHTToLNu = {'legendText':'W + Jets',         'style':"f", 'lineThickness':0, 'errorBars':False, 'color':color("WJetsHTToLNu"), 'markerStyle':None, 'markerSize':None}
+  style_TTJets       = {'legendText':'t#bar{t} + Jets',  'style':"f", 'linethickNess':0, 'errorBars':False, 'color':color("TTJets"), 'markerStyle':None, 'markerSize':None}
+  style_DY           = {'legendText':'DY + Jets',  'style':"f", 'linethickNess':0, 'errorBars':False,       'color':color("DY"), 'markerStyle':None, 'markerSize':None}
+  style_TTVH         = {'legendText':'t#bar{t} + W/Z/H',  'style':"f", 'linethickNess':0, 'errorBars':False, 'color':color("TTVH"), 'markerStyle':None, 'markerSize':None}
+  style_QCD          = {'legendText':'QCD',  'style':"f", 'linethickNess':0, 'errorBars':False,             'color':color("QCD"), 'markerStyle':None, 'markerSize':None}
+  style_singleTop    = {'legendText':'single top',  'style':"f", 'linethickNess':0, 'errorBars':False,      'color':color("singleTop"), 'markerStyle':None, 'markerSize':None}
   MC_TTJets          = plot(var, binning, cut, sample=ttJets[mode], style=style_TTJets, weight={'string':'weight'}) 
   MC_WJetsHTToLNu    = plot(var, binning, cut, sample=WJetsHTToLNu[mode], style=style_WJetsHTToLNu, weight={'string':'weight'})
   MC_DY              = plot(var, binning, cut, sample=DY[mode], style=style_DY, weight={'string':'weight'}) 
+  MC_TTVH              = plot(var, binning, cut, sample=TTVH[mode], style=style_TTVH, weight={'string':'weight'}) 
   MC_singleTop       = plot(var, binning, cut, sample=singleTop[mode], style=style_singleTop, weight={'string':'weight'}) 
   MC_QCD             = plot(var, binning, cut, sample=QCD[mode], style=style_QCD, weight={'string':'weight'})
   
-  plotLists = [[MC_TTJets, MC_WJetsHTToLNu, MC_singleTop, MC_DY, MC_QCD]]
+  plotLists = [[MC_TTJets, MC_singleTop, MC_WJetsHTToLNu, MC_DY, MC_TTVH,  MC_QCD]]
   for s in signals:
     plotLists.append([plot(var, binning, cut, sample=s, style=s['style'], weight={'string':'weight'})])
 
-  opt = {'small':small, 'yHeadRoomFac':12, 'labels':labels, 'logX':False, 'logY':True, 'yRange':[0.007, "auto"], 'ratio':ratioOps, 'fileName':var['name']}
-  opt['texLines'] = [{'pos':(0.15, 0.95),'text':'CMS Simulation',        'options':{'size':0.045}},\
-                     {'pos':(0.7, 0.95), 'text':'L=1fb{}^{-1} (13 TeV)', 'options':{'size':0.045}}]
-  opt['legend'] = {'coordinates':[0.42,0.95 - len(plotLists)*0.08,.98,.93],'boxed':True}
+  for pL in plotLists:
+    for p in pL:
+      p.sample['small']=small
 
+  opt = {'small':small, 'yHeadRoomFac':12, 'labels':labels, 'logX':False, 'logY':True, 'yRange':[0.007, "auto"], 'ratio':ratioOps, 'fileName':var['name']}
+#  opt['texLines'] = [{'pos':(0.15, 0.95),'text':'CMS Simulation',        'options':{'size':0.045}},\
+#                     {'pos':(0.7, 0.95), 'text':'L=4fb{}^{-1} (13 TeV)', 'options':{'size':0.045}}]
+#  opt['legend'] = {'coordinates':[0.6,0.95 - len(plotLists)*0.09,.98,.93],'boxed':True}
   if options.has_key('ratio') and options['ratio']:
-    options['texLines'] = [{'pos':(0.15, 0.95),'text':'CMS Simulation',        'options':{'size':0.045}},\
-                           {'pos':(0.7, 0.95), 'text':'L=1fb{}^{-1} (13 TeV)', 'options':{'size':0.045}}]
-    options['legend'] = {'coordinates':[0.42,0.95 - len(plotLists)*0.08,.98,.93],'boxed':True}
+    opt['texLines'] = [{'pos':(0.15, 0.95),'text':'CMS Simulation',        'options':{'size':0.045}},\
+                       {'pos':(0.7, 0.95), 'text':'L=4fb{}^{-1} (13 TeV)', 'options':{'size':0.045}}]
+    opt['legend'] = {'coordinates':[0.55,0.95 - len(plotLists)*0.09,.98,.93],'boxed':True}
   else:
-    options['texLines'] = [{'pos':(0.16, 0.965), 'text':'CMS Simulation',       'options':{'size':0.038}},\
-                           {'pos':(0.7, 0.965),  'text':'L=1fb{}^{-1} (13 TeV)','options':{'size':0.038}}]
-    options['legend'] = {'coordinates':[0.42,0.95 - len(plotLists)*0.08,.95,.95],'boxed':True}
+    opt['texLines'] = [{'pos':(0.16, 0.965), 'text':'CMS Simulation',       'options':{'size':0.038}},\
+                       {'pos':(0.7, 0.965),  'text':'L=4fb{}^{-1} (13 TeV)','options':{'size':0.038}}]
+    opt['legend'] = {'coordinates':[0.55,0.95 - len(plotLists)*0.09,.95,.95],'boxed':True}
 
   for k in options.keys():
     assert opt.has_key(k),"Stack option %s unknown!" %k
@@ -245,7 +230,7 @@ allStacks.append(nLooseBTags_stack)
 
 mTClosestJetMET_stack  = getStack(
     labels={'x':'m_{T, closest jet, #slash{E}_{T}} (GeV)','y':'Number of Events / 10 GeV'}, 
-    var={'name':'mTClosestJetMET','func':cmgMTClosestJetMET, 'overFlow':'upper'}, 
+    var={'name':'mTClosestJetMET','func':cmgMTClosestJetMET, 'overFlow':'upper', 'branches':cmgMTClosestJetMET('branches')}, 
     binning={'binning':(20,0,800), 'isExplicit':False}, 
     cut={'string':cutString,'func':None})
 allStacks.append(mTClosestJetMET_stack)
@@ -271,20 +256,6 @@ allStacks.append(mTClosestJetMET_zoomed_stack)
 #      cut={'string':cutString,'func':None})
 #  allStacks.append(mTClosestBJetMET_zoomed_stack)
 
-mTTopClosestJetMET_stack  = getStack(
-    labels={'x':'m_{T, closest jet, #slash{E}_{T}}^{top} (GeV)','y':'Number of Events / 10 GeV'}, 
-    var={'name':'mTTopClosestJetMET','func':cmgMTTopClosestJetMET, 'branches':cmgMTTopClosestJetMET('branches'), 'overFlow':'upper'}, 
-    binning={'binning':[20,0,2000], 'isExplicit':False}, 
-    cut={'string':cutString,'func':None})
-allStacks.append(mTTopClosestJetMET_stack)
-
-mTTopClosestJetMET_zoomed_stack  = getStack(
-    labels={'x':'m_{T, closest jet, #slash{E}_{T}}^{top} (GeV)','y':'Number of Events / 10 GeV'}, 
-    var={'name':'mTTopClosestJetMET_zoomed','func':cmgMTTopClosestJetMET, 'branches':cmgMTTopClosestJetMET('branches'), 'overFlow':'upper'}, 
-    binning={'binning':[40,0,400], 'isExplicit':False}, 
-    cut={'string':cutString,'func':None})
-allStacks.append(mTTopClosestJetMET_zoomed_stack)
-
 #  mTTopClosestBJetMET_stack  = getStack(
 #      labels={'x':'m_{T, closest b-jet, #slash{E}_{T}}^{top} (GeV)','y':'Number of Events / 10 GeV'}, 
 #      var={'name':'mTTopClosestBJetMET','func':cmgMTTopClosestBJetMET, 'branches':cmgMTTopClosestBJetMET('branches'), 'overFlow':'upper'}, 
@@ -305,6 +276,20 @@ allStacks.append(mTTopClosestJetMET_zoomed_stack)
 #      binning={'binning':[20,0,pi], 'isExplicit':False}, 
 #      cut={'string':cutString,'func':None})
 #  allStacks.append(minDPhiBJet_stack)
+
+mTTopClosestJetMET_stack  = getStack(
+    labels={'x':'m_{T, closest jet, #slash{E}_{T}}^{top} (GeV)','y':'Number of Events / 10 GeV'}, 
+    var={'name':'mTTopClosestJetMET','func':cmgMTTopClosestJetMET, 'branches':cmgMTTopClosestJetMET('branches'), 'overFlow':'upper'}, 
+    binning={'binning':[20,0,2000], 'isExplicit':False}, 
+    cut={'string':cutString,'func':None})
+allStacks.append(mTTopClosestJetMET_stack)
+
+mTTopClosestJetMET_zoomed_stack  = getStack(
+    labels={'x':'m_{T, closest jet, #slash{E}_{T}}^{top} (GeV)','y':'Number of Events / 10 GeV'}, 
+    var={'name':'mTTopClosestJetMET_zoomed','func':cmgMTTopClosestJetMET, 'branches':cmgMTTopClosestJetMET('branches'), 'overFlow':'upper'}, 
+    binning={'binning':[40,0,400], 'isExplicit':False}, 
+    cut={'string':cutString,'func':None})
+allStacks.append(mTTopClosestJetMET_zoomed_stack)
 
 dPhiLeadingJet_stack  = getStack(
     labels={'x':'#Delta#Phi(#slash{E}_{T},j_{1})','y':'Number of Events'}, 
@@ -333,13 +318,14 @@ allStacks.append(minDPhi4Jet_stack)
 
 htOrthMET_stack  = getStack(
     labels={'x':'H_{T} (GeV)','y':'Number of Events / 50 GeV'}, 
-    var={'name':'htOrthMET','func':cmgHTOrthMET, 'overFlow':'upper'}, 
+    var={'name':'htOrthMET','func':cmgHTOrthMET, 'overFlow':'upper', 'branches':cmgHTOrthMET('branches')}, 
     binning={'binning':[1650/50,0,1650]}, 
     cut={'string':cutString,'func':None})
 allStacks.append(htOrthMET_stack)
+
 htRatio_stack  = getStack(
     labels={'x':'H_{T} (GeV)','y':'Number of Events / 50 GeV'}, 
-    var={'name':'htRatio','func':cmgHTRatio, 'overFlow':'upper'}, 
+    var={'name':'htRatio','func':cmgHTRatio, 'overFlow':'upper', 'branches':cmgHTRatio('branches')}, 
     binning={'binning':[20,0.4,1]}, 
     cut={'string':cutString,'func':None})
 allStacks.append(htRatio_stack)

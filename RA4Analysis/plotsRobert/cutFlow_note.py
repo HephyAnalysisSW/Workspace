@@ -38,7 +38,7 @@ for s in samples:
  
 from draw_helpers import *
 oneMu     = exactlyOneTightMuon(minPt=25, maxEta=2.4, minID=1, minRelIso=0.12)
-looseLep  = looseLeptonVeto(minPt=10, muMultiplicity=1, eleMultiplicity=0)
+looseLep  = looseLeptonVeto(lepton="muon", minPt=10)
 nj2       = nJetCut(2, minPt=30, maxEta=2.4) 
 nj6       = nJetCut(6, minPt=30, maxEta=2.4) 
 nj2_80    = nJetCut(2, minPt=80, maxEta=2.4)

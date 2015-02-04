@@ -113,7 +113,7 @@ def getChain(sL, minAgeDPM=0, histname='histo', xrootPrefix='root://hephyse.oeaw
   print "Added ",i,'files from sample',s['name']
   return c
 
-def getChunks(sample, treeName, maxN):
+def getChunks(sample, treeName, maxN=-1):
   if '/dpm/' in sample['dir']:
     return getChunksFromDPM(sample, maxN=maxN)
 #  elif '/eoscms.cern.ch/' in sample['dir']:
