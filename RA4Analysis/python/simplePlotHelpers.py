@@ -5,7 +5,7 @@ from array import array
 ROOT.gROOT.LoadMacro("../../HEPHYPythonTools/scripts/root/tdrstyle.C")
 #ROOT.gROOT.LoadMacro("../../HEPHYPythonTools/scripts/root/CMS_lumi.C")
 ROOT.setTDRStyle()
-ROOT.TH1F.SetDefaultSumw2()
+ROOT.TH1D.SetDefaultSumw2()
 #def setupLumiPlotInfo():
 #  ROOT.gROOT.ProcessLine('writeExtraText = true;      ') # if extra text
 #  ROOT.gROOT.ProcessLine('extraText  = "Preliminary"; ') # default extra text is "Preliminary"
@@ -27,6 +27,7 @@ class plot:
     self.leaf = var['leaf'] if var.has_key('leaf') else None
     self.func = var['func'] if var.has_key('func') else None
     self.TTreeFormula = var['TTreeFormula'] if var.has_key('TTreeFormula') else None
+    assert not ( var.has_key('func') and not var.has_key('branches')), "Error: Need(!) to specify used branches in case of function in var %s" %repr(var)
     self.usedBranches = var['branches'] if var.has_key('branches') else []
     assert sum(bool(x) for x in [self.leaf, self.func, self.TTreeFormula])==1, "Error: Should specify exactly one of 'leaf', 'func' or 'TTreeFormula' in var %s" % repr(var)
     if self.leaf:
@@ -51,14 +52,12 @@ class plot:
     self.style=style
     self.sample=sample
     self.weight=weight
-    try:
-      if type(self.histo)==type(ROOT.TH1F()):
+    if hasattr(self, 'histo'):
+      if type(self.histo)==type(ROOT.TH1D()):
         self.Reset()
-        del self.histo
-    except:
-      pass
+      del self.histo
 
-    rClass = ROOT.TProfile if options and options.has_key('isProfile') and options['isProfile'] else ROOT.TH1F
+    rClass = ROOT.TProfile if options and options.has_key('isProfile') and options['isProfile'] else ROOT.TH1D
     binninArgs = binning['binning'] if not (self.binning.has_key('isExplicit') and self.binning['isExplicit']) else [len(binning['binning']) - 1, array('d',binning['binning'])]
     self.histo = rClass(self.name, self.name, *binninArgs)
     self.histo.Sumw2()
@@ -139,7 +138,7 @@ def loopAndFill(stacks):
       c = ROOT.TChain('Events')
       counter=0
       dir = s['dirname'] if s.has_key('dirname') else s['dir']
-      for f in getFileList(dir+'/'+b, maxN = -1 if not (s.has_key('small') and s['small']) else 1):#, minAgeDPM, histname, xrootPrefix, maxN):
+      for f in getFileList(dir+'/'+b, maxN = -1 if not (s.has_key('small') and s['small']) else 1, histname=""):#, minAgeDPM, histname, xrootPrefix, maxN):
         counter+=1
         c.Add(f)
       ntot = c.GetEntries()
@@ -162,14 +161,13 @@ def loopAndFill(stacks):
             fString='ROOT.TTreeFormula('+p['name']+','+p.var+',c)'
             exec('p.ttreeFormula='+fString)
             print "Created TTreeFormula:",fString
-        for i in range(0, number_events):
+        for i in range(0,number_events):
           if (i%10000 == 0) and i>0 :
             print i
           c.GetEntry(elist.GetEntry(i))
           for p in plotsToFill:
             if (not p.cut['func']) or p.cut['func'](c):
               weight = c.GetLeaf(p.weight['string']).GetValue()#getVarValue(c, p.weight['string'])
-               
               if p.leaf:
                 val =  getVarValue(c, p.leaf, p.ind)
 #                print "Fill leaf",p.leaf, p.ind, val, weight,sampleScaleFac
@@ -179,6 +177,7 @@ def loopAndFill(stacks):
               if p.func:
                 val = p.func(c)
               p.histo.Fill(val, weight*sampleScaleFac)
+#              print p.histo.GetName(), b, val, weight*sampleScaleFac
         del elist
       del c
   for s in stacks:
@@ -212,18 +211,14 @@ def sumStackHistos(stack):
         l[i].histo.Add(l[j].histo)
 
 def drawStack(stk, maskedArea=None):
-#  print "maskedArea",maskedArea
   stuff=[]
-  try:
+  if stk.options.has_key('legend'):
     l = ROOT.TLegend(*(stk.options['legend']['coordinates']))
     l.SetFillColor(0)
     l.SetShadowColor(ROOT.kWhite)
     l.SetBorderSize(0)
-    try:
-      l.SetBorderSize(1)
-    except:pass
+    l.SetBorderSize(1)
     stuff.append(l)
-  except:pass
   first=True
 #  print stk.options
   try:
@@ -231,6 +226,7 @@ def drawStack(stk, maskedArea=None):
   except:
     autoAdjustY = False
   if autoAdjustY and  stk.options.has_key('logY') and stk.options['logY']:
+    print "maskedArea",maskedArea
     ymin = stk.options['yRange'][0]
     logYMaxGlobal = log(ymin,10)
     for s in stk.stackLists:
@@ -242,16 +238,17 @@ def drawStack(stk, maskedArea=None):
           yFracMax =  maskedArea['yLow'] if xHigh>maskedArea['xLow'] and xLow<maskedArea['xHigh'] else 1
           deltaLogY = 0.5 if yFracMax==1 else 0.3
           y =  p.histo.GetBinContent(iBin)
+#          print 'masked X:', maskedArea['xLow'], maskedArea['xHigh'], 'yFracMax', yFracMax, 'iBin',iBin, 'XHigh/Low', xHigh, xLow,  'y', y, logYMaxGlobal
           if y>0:
             logyMax = log(ymin,10) + (log(y/ymin, 10) + deltaLogY)/yFracMax
             logYMaxGlobal = logyMax if logyMax>logYMaxGlobal else logYMaxGlobal
-#            print iBin, y, logyMax, logYMaxGlobal
   else:
     logYMaxGlobal=None
   if logYMaxGlobal: logYMaxGlobal = None if logYMaxGlobal == log(ymin,10) else logYMaxGlobal
   for s in stk.stackLists:
     for p in s:
       hcopy = p.histo.Clone()
+#      print p.histo,p.histo.Integral()
       if p.style.has_key('errorBars') and not p.style['errorBars']:
         for nbin in range(0, hcopy.GetNbinsX()+1):
           hcopy.SetBinError(nbin, 0.)
@@ -327,9 +324,8 @@ def drawStack(stk, maskedArea=None):
         if p.style['style'] == "f" or p.style['style'] == "l" or p.style['style'] == "d":
           hcopy.Draw("eh1same")
 #      if p.style.has_key('legendText') and stk.options.has_key('legend') and stk.options['legend']:
-      try:
+      if stk.options.has_key('legend'):
         l.AddEntry(hcopy, p.style['legendText'])
-      except:pass
   ROOT.gPad.RedrawAxis()
 #  if  stk.options.has_key('legend') and stk.options['legend']:
   try:
@@ -362,8 +358,8 @@ def bracket(x, interval=[0,1]):
 def calcTLegendMaskedArea(legendC, margins):
   return {
     'yLow': bracket(1.-(1.-legendC[1] - margins['top'])/(1.-margins['top']-margins['bottom']), interval=[0.3, 1]),
-    'xLow': bracket((legendC[0] - margins['right'])/(1.-margins['right']-margins['left'])),
-    'xHigh':bracket((legendC[2] - margins['right'])/(1.-margins['right']-margins['left']))
+    'xLow': bracket((legendC[0] - margins['left'])/(1.-margins['right']-margins['left'])),
+    'xHigh':bracket((legendC[2] - margins['left'])/(1.-margins['right']-margins['left']))
     }
 
 
@@ -470,7 +466,7 @@ def drawNMStacks(intn, intm, stacks, filename, path = defaultWWWPath):
 #      print "Warning! Overriding var2.sample!!"
 #    self.sample = var1.sample
 #    try:
-#      if type(self.histo)==type(ROOT.TH1F()):
+#      if type(self.histo)==type(ROOT.TH1D()):
 #        del self.histo
 #    except:
 #      pass

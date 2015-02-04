@@ -1,80 +1,61 @@
 import ROOT
-ROOT.gROOT.ProcessLine('.L /afs/hephy.at/scratch/d/dhandl/CMSSW_7_0_6_patch1/src/Workspace/HEPHYPythonTools/scripts/root/tdrstyle.C')
+ROOT.gROOT.LoadMacro("../../HEPHYPythonTools/scripts/root/tdrstyle.C")
+#ROOT.gROOT.processLine('.L /afs/hephy.at/scratch/d/dhandl/CMSSW_7_2_3/src/Workspace/HEPHYPythonTools/scripts/root/tdrstyle.C')
 ROOT.setTDRStyle()
 from math import *
 import os, copy, sys
 from array import array
 from Workspace.HEPHYPythonTools.helpers import getVarValue, getChain, deltaPhi, getYieldFromChain
-from Workspace.RA4Analysis.cmgTuplesPostProcessed_v3 import *
+from Workspace.RA4Analysis.cmgTuplesPostProcessed_v5_Phys14V2 import *
 from Workspace.RA4Analysis.helpers import *
+
+lepSel = 'hard'
 
 #Bkg chains 
 allBkg=[
-        {'name':'TTJets_hard',  'sample':'hard_ttJetsCSA1450ns',  'chain_hard':getChain(hard_ttJetsCSA1450ns), 'weight':'weight',   'color':ROOT.kRed-3},
-        #{'name':'TTJets_soft',  'sample':'soft_ttJetsCSA1450ns',  'chain_soft':getChain(soft_ttJetsCSA1450ns), 'weight':'weight',   'color':ROOT.kRed-3},
-        {'name':'WJets_hard',   'sample':'hard_WJetsHTToLNu',     'chain_hard':getChain(hard_WJetsHTToLNu),    'weight':'weight',   'color':ROOT.kYellow},
-        #{'name':'WJets_soft',   'sample':'soft_WJetsHTToLNu',     'chain_soft':getChain(soft_WJetsHTToLNu),    'weight':'weight',   'color':ROOT.kYellow}
+        {'name':'QCD',       'sample':QCD[lepSel],           'weight':'weight'   },
+        {'name':'DY',        'sample':DY[lepSel],            'weight':'weight'   },
+        {'name':'TTV',       'sample':TTVH[lepSel],          'weight':'weight'   },
+        {'name':'singleTop', 'sample':singleTop[lepSel],     'weight':'weight'   },
+        {'name':'WJets',     'sample':WJetsHTToLNu[lepSel],  'weight':'weight'   },
+        {'name':'TTJets',    'sample':ttJets[lepSel],        'weight':'weight'   },
       ]
+
+for bkg in allBkg:
+  bkg['chain']=getChain(bkg['sample'],histname='')
+  bkg['color'] =color(bkg['name'])
 
 #Signal chains
 allSignals=[
-            #{'name':'T5Full_1200_1000_800'}, 
-            #{'name':'T5Full_1500_800_100'},
-            #{'name':'SMS_T1qqqq_2J_mGl1400_mLSP100_PU_S14_POSTLS170'},
-            #{'name':'SMS_T1bbbb_2J_mGl1000_mLSP900_PU_S14_POSTLS170'},
-            #{'name':'SMS_T1bbbb_2J_mGl1500_mLSP100_PU_S14_POSTLS170'},
-            #{'name':'SMS_T1tttt_2J_mGl1200_mLSP800_PU_S14_POSTLS170'},
-            #{'name':'SMS_T1tttt_2J_mGl1500_mLSP100_PU_S14_POSTLS170'},
-            #{'name':'SMS_T2tt_2J_mStop425_mLSP325_PU_S14_POSTLS170'},
-            #{'name':'SMS_T2tt_2J_mStop500_mLSP325_PU_S14_POSTLS170'},
-            #{'name':'SMS_T2tt_2J_mStop650_mLSP325_PU_S14_POSTLS170'},
-            #{'name':'SMS_T2tt_2J_mStop850_mLSP100_PU_S14_POSTLS170'},
-            #{'name':'SMS_T2bb_2J_mStop600_mLSP580_PU_S14_POSTLS170'},
-            #{'name':'SMS_T2bb_2J_mStop900_mLSP100_PU_S14_POSTLS170'},
-            #{'name':'SMS_T2qq_2J_mStop600_mLSP550_PU_S14_POSTLS170'},
-            #{'name':'SMS_T2qq_2J_mStop1200_mLSP100_PU_S14_POSTLS170'},
-            {'name':'T5WW_2J_mGo1200_mCh1000_mChi800','weight':'weight', 'color':ROOT.kBlack, 'LegendName':'T5WW_1200_1000_800' },
-            {'name':'T5WW_2J_mGo1500_mCh800_mChi100','weight':'weight', 'color':ROOT.kBlue, 'LegendName':'T5WW_1500_800_100'},
-            #{'name':'T5WW_2J_mGo1400_mCh315_mChi300'},
-            #{'name':'T1tttt_2J_mGo1300_mStop300_mCh285_mChi280'},
-            #{'name':'T1tttt_2J_mGo1300_mStop300_mChi280',  'weight':'weight', 'color':ROOT.kBlack},
-            #{'name':'T1tttt_2J_mGo800_mStop300_mCh285_mChi280'},
-            #{'name':'T1tttt_2J_mGo800_mStop300_mChi280',   'weight':'weight', 'color':ROOT.kBlue},
-            #{'name':'T6ttWW_2J_mSbot600_mCh425_mChi50'},
-            #{'name':'T6ttWW_2J_mSbot650_mCh150_mChi50'},
-            #{'name':'T1ttbb_2J_mGo1500_mChi100'},
-            #{'name':'T1ttbbWW_2J_mGo1000_mCh725_mChi715_3bodydec'},
-            #{'name':'T1ttbbWW_2J_mGo1000_mCh725_mChi720_3bodydec'},
-            #{'name':'T1ttbbWW_2J_mGo1300_mCh300_mChi290_3bodydec'},
-            #{'name':'T1ttbbWW_2J_mGo1300_mCh300_mChi295_3bodydec'},
-            #{'name':'T1tttt_gluino_1300_LSP_100'},
-            #{'name':'T1tttt_gluino_800_LSP_450'},
-            #{'name':'T5qqqqWW_Gl_1400_LSP_100_Chi_325'},
-            #{'name':'T5qqqqWW_Gl_1400_LSP_300_Chi_315',  'weight':'weight', 'color':ROOT.kGreen+4},
-            #{'name':'T6qqWW_Sq_950_LSP_300_Chi_350',  'weight':'weight', 'color':ROOT.kMagenta+3}
-            ]
+            #"SMS_T1tttt_2J_mGl1200_mLSP800",
+            #"SMS_T1tttt_2J_mGl1500_mLSP100",
+            #"SMS_T2tt_2J_mStop425_mLSP325",
+            #"SMS_T2tt_2J_mStop500_mLSP325",
+            #"SMS_T2tt_2J_mStop650_mLSP325",
+            #"SMS_T2tt_2J_mStop850_mLSP100",
+            {'name':'T5WW_1200_1000_800', 'sample':SMS_T5qqqqWW_Gl1200_Chi1000_LSP800[lepSel], 'weight':'weight', 'color':ROOT.kBlack},
+            {'name':'T5WW_1500_800_100',  'sample':SMS_T5qqqqWW_Gl1500_Chi800_LSP100[lepSel],  'weight':'weight', 'color':ROOT.kMagenta},
+            #"T1ttbbWW_mGo1000_mCh725_mChi715",
+            #"T1ttbbWW_mGo1000_mCh725_mChi720",
+            #"T1ttbbWW_mGo1300_mCh300_mChi290",
+            #"T1ttbbWW_mGo1300_mCh300_mChi295",
+            #"T5ttttDeg_mGo1000_mStop300_mCh285_mChi280",
+            #"T5ttttDeg_mGo1000_mStop300_mChi280",
+            #"T5ttttDeg_mGo1300_mStop300_mCh285_mChi280",
+            #"T5ttttDeg_mGo1300_mStop300_mChi280",
+]
 
 for s in allSignals:
-  s['chain_hard']=getChain(getSignalSample(s['name'],'hard'))
-#for s in allSignals:
-#  s['chain_soft']=getChain(getSignalSample(s['name'],'soft'))
-
-#Create Chain with MC
-#WJETS_MC = getChain(WJetsHTToLNu)
-#TTJETSCSA14_MC = getChain(ttJetsCSA1450ns)
-
-#Create Chain with Signal
-#SIGNAL1200_1000 = getChain(T5Full_1200_1000_800)
-#SIGNAL1500_800 = getChain(T5Full_1500_800_100)
+  s['chain']=getChain(s['sample'],histname='')
 
 #defining ht, st and njets for SR
-streg = [(250, 350), (350,-1)]                         
-htreg = [(500,750),(750,-1)]
-njreg = [(5,5),(6,-1)]
+streg = [(200,-1), (250, 350), (350,-1)]                         
+htreg = [(500,-1), (500,750),(750,-1)]
+njreg = [(4,4), (5,5), (6,-1)]
 dPhiStr = "acos((leptonPt+met*cos(leptonPhi-metPhi))/sqrt(leptonPt**2+met**2+2*met*leptonPt*cos(leptonPhi-metPhi)))"
 presel='singleMuonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0'
-preprefix = 'hardMuonic_0b_ht500_st450_nj6'
-wwwDir = '/afs/hephy.at/user/d/dhandl/www/pngCMG/'+preprefix+'/'
+preprefix = 'singleMuonic_0b_ht500-750_st250-350_nj6'
+wwwDir = '/afs/hephy.at/user/d/dhandl/www/pngCMG2/'+lepSel+'/'+preprefix+'/'
 
 if not os.path.exists(wwwDir):
   os.makedirs(wwwDir)
@@ -83,8 +64,8 @@ if not os.path.exists(wwwDir):
 small = 1
 #small = 0
 if small == 1:
-  streg = [(450,-1)]
-  htreg = [(500,-1)]
+  streg = [(250,350)]
+  htreg = [(500,750)]
   njreg = [(6,-1)]
 
 allVariables = []
@@ -182,21 +163,6 @@ allVariables.append(mt)
 #    n+='< '+str(vb[1])
 #  return n
 
-#Define two samples; I used dicts. Adapt as you need.
-#data        = {"name":"Data",          "chain":data,                    "weight":1,        "color":ROOT.kBlack}
-#qcd_mc      = {"name":"QCD",           "chain":QCD_MC,                  "weight":"weight", "color":ROOT.kBlue - 4}
-#singletop_mc     = {"name":"singleTop",     "chain":SINGLETOP_MC,            "weight":"weight", "color":ROOT.kOrange + 4}
-#wjets_pos_mc = {"name":"W^{+} Jets", "chain":WJETS_MC,        "weight":"weight", "color":ROOT.kYellow, "addcut":"&&leptonPdg<0"}
-#wjets_neg_mc = {"name":"W^{-} Jets", "chain":WJETS_MC,        "weight":"weight", "color":ROOT.kYellow-9, "addcut":"&&leptonPdg>0"}
-#ttjets_mc  = {"name":"TTJets", "chain":TTJETSCSA14_MC,         "weight":"weight", "color":ROOT.kRed - 3}
-#wjets_mc = {"name":"W+Jets", "chain":WJETS_MC,        "weight":"weight", "color":ROOT.kYellow}
-#signal1200 = {'name':'T5Full_1200_1000_800', 'chain':SIGNAL1200_1000, 'weight':'weight', 'color':ROOT.kBlack}
-#signal1500 = {'name':'T5Full_1500_800_100', 'chain':SIGNAL1500_800, 'weight':'weight', 'color':ROOT.kBlue+2}
-
-#bkgSamples = [wjets_mc, ttjets_mc]
-#extraSamples = [data]
-#signals = [signal1200, signal1500]
-
 histos = {}
 h_ratio = {}
 
@@ -227,21 +193,21 @@ for i_htb, htb in enumerate(htreg):
           if type(sample['addcut'])==type(''):
             cut = cut + sample["addcut"]
   
-        sample["chain_hard"].Draw(">>eList",cut) #Get the event list 'eList' which has all the events satisfying the cut
+        sample["chain"].Draw(">>eList",cut) #Get the event list 'eList' which has all the events satisfying the cut
         elist = ROOT.gDirectory.Get("eList")
         number_events = elist.GetN()
         print "Sample ",sample["name"],": Will loop over", number_events,"events" #Number of events satisfying the cut
         
         #Event loop
         for i in range(number_events): #Loop over those events
-          sample["chain_hard"].GetEntry(elist.GetEntry(i))  #Set the chain to the current event (it's the i-th event of the eList). This is the central line in this file!
+          sample["chain"].GetEntry(elist.GetEntry(i))  #Set the chain to the current event (it's the i-th event of the eList). This is the central line in this file!
           for var in allVariables:
             assert (var.has_key('varString') or var.has_key('varFunc')), "Error: Did not specify 'varString' or 'varFunc' for var %s" % repr(var)
             assert not (var.has_key('varString') and var.has_key('varFunc')), "Error: Specified both 'varString' and 'varFunc' for var %s" % repr(var)
             #if var['name'] == 'myminDPhiMetJet12':
             #  varValue = getVarValue(sample["chain_soft"], var['varString']) if var.has_key('varString') else var['varFunc'](sample["chain_soft"],nJets=2)
             #else:
-            varValue = getVarValue(sample["chain_hard"], var['varString']) if var.has_key('varString') else var['varFunc'](sample["chain_hard"])
+            varValue = getVarValue(sample["chain"], var['varString']) if var.has_key('varString') else var['varFunc'](sample["chain"])
 #            if var == dPhi:
 #              #WPhi = getWPhi(sample['chain'])
 #              #lPhi = getVarValue(sample['chain'],'leptonPhi')
@@ -255,7 +221,7 @@ for i_htb, htb in enumerate(htreg):
             weight = 1
             if sample.has_key('weight'):
               if type(sample['weight'])==type(''):
-                weight = getVarValue(sample['chain_hard'], sample['weight'])
+                weight = getVarValue(sample['chain'], sample['weight'])
               else:
                 weight = sample['weight']
             histos[sample['name']][var['name']].Fill(varValue, weight)
@@ -274,17 +240,19 @@ for i_htb, htb in enumerate(htreg):
         pad1.SetLogy()
         pad1.Draw()
         pad1.cd()
-        l = ROOT.TLegend(0.6,0.7,0.95,0.95)
+        l = ROOT.TLegend(0.65,0.75,0.95,0.95)
         l.SetFillColor(0)
         l.SetBorderSize(1)
         l.SetShadowColor(ROOT.kWhite)
         stack = ROOT.THStack('stack','Stacked Histograms')
        
+#        lines = [{'pos':(0.15, 0.95),'text':'CMS Simulation',        'options':{'size':0.045}},\
+#                 {'pos':(0.7, 0.95), 'text':'L=4fb{}^{-1} (13 TeV)', 'options':{'size':0.045}}]
         text = ROOT.TLatex()
-        #text.SetTextAlign(12)
         text.SetNDC()
-        #text.SetTextSizePixels(15) 
-       
+        text.SetTextSize(0.045)
+        text.SetTextAlign(11) 
+
         for sample in allBkg:
           histos[sample['name']][var['name']].SetLineColor(ROOT.kBlack)
           histos[sample['name']][var['name']].SetFillColor(sample['color'])
@@ -299,7 +267,7 @@ for i_htb, htb in enumerate(htreg):
         stack.Draw()
         stack.GetXaxis().SetTitle(var['legendName'])
         stack.GetYaxis().SetTitle(var['Ytitle'])# / '+ str( (var['binning'][2] - var['binning'][1])/var['binning'][0])+'GeV')
-        stack.SetMinimum(10**(-3))
+        stack.SetMinimum(10**(-1))
         #stack.SetMaximum(10)
  
         #for extra in extraSamples:
@@ -313,12 +281,18 @@ for i_htb, htb in enumerate(htreg):
           histos[sig['name']][var['name']].SetFillColor(0)
           histos[sig['name']][var['name']].SetMarkerStyle(0)
           histos[sig['name']][var['name']].Draw('same')
-          l.AddEntry(histos[sig['name']][var['name']], sig['LegendName'])
+          l.AddEntry(histos[sig['name']][var['name']], sig['name'])
        
         l.Draw()
-        
+
+#        for line in lines:
+#          text.SetTextSize(0.04)
+#          try:
+#            text.SetTextSize(line['options']['size'])
+#          except:pass
+#          text.DrawLatex(line['pos'][0],line['pos'][1],line['text'])
         text.DrawLatex(0.15,.96,"CMS Simulation")
-        text.DrawLatex(0.65,0.96,"L=1 fb^{-1} (13 TeV)")
+        text.DrawLatex(0.65,0.96,"L=4 fb^{-1} (13 TeV)")
         
 #        canvas.cd()
 #        pad2 = ROOT.TPad(var['name']+" Ratio",var['name']+" Ratio",0.,0.,1.,0.3)

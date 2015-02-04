@@ -1,9 +1,40 @@
 import ROOT
-from math import pi, sqrt, cos, sin, sinh
+from math import pi, sqrt, cos, sin, sinh, log
 from array import array
 
 def test():
   return 1
+
+def scatterOnTH2(data, h, ofile, markerType):
+  assert type(h)==type(ROOT.TH2F()) or type(h)==type(ROOT.TH2D()), "Wrong type of histogram! %s" % repr(type(h))
+  for d in data:
+    h.Fill(d[0], d[1], 0) 
+  c1 = ROOT.TCanvas()
+  xmin = h.GetXaxis().GetXmin()
+  xmax = h.GetXaxis().GetXmax()
+  ymin = h.GetYaxis().GetXmin()
+  ymax = h.GetYaxis().GetXmax()
+  data.sort(key=lambda x:x[2])
+  zvals = [d[2] for d in data] 
+  zmin, zmax = min(zvals), max(zvals)
+  h.GetZaxis().SetRangeUser(zmin,zmax)
+  c1.Update()
+  h.Draw("COLZ")
+  c1.SetLogz()
+  stuff=[]
+  for d in data:
+    if d[0]>xmin and d[0]<xmax and d[1]>ymin and d[1]<ymax:
+      zRatio = (log(d[2])-log(zmin))/(log(zmax) - log(zmin))
+      color = ROOT.gStyle.GetColorPalette(int(round(zRatio*(ROOT.gStyle.GetNumberOfColors()-1))))
+      print 'zR', zRatio, 'color',color
+      e = ROOT.TMarker(d[0], d[1], markerType) 
+      e.SetMarkerColor(color) 
+      stuff.append(e)
+    h.Fill(d[0], d[1], 0) 
+  for s in stuff:
+    s.Draw()
+  c1.Print(ofile)
+  
 
 def bStr(s): 
   "make string bold."
@@ -26,11 +57,11 @@ def wrapStr(s="", char="#", maxL = 100):
 
 
 def getFileList(dir, minAgeDPM=0, histname='histo', xrootPrefix='root://hephyse.oeaw.ac.at/', maxN=-1):
-  monthConv = {'Jan':1, 'Feb':2,'Mar':3,'Apr':4,"May":5, "Jun":6,"Jul":7,"Aug":8, "Sep":9, "Oct":10, "Nov":11, "Dec":12}
   import os, subprocess, datetime
+  monthConv = {'Jan':1, 'Feb':2,'Mar':3,'Apr':4,"May":5, "Jun":6,"Jul":7,"Aug":8, "Sep":9, "Oct":10, "Nov":11, "Dec":12}
   if dir[0:5] != "/dpm/":
     filelist = os.listdir(dir)
-    filelist = [dir+'/'+f for f in filelist]
+    filelist = [dir+'/'+f for f in filelist if histname in f]
   else:
     filelist = []
     p = subprocess.Popen(["dpns-ls -l "+ dir], shell = True , stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
@@ -53,29 +84,96 @@ def getFileList(dir, minAgeDPM=0, histname='histo', xrootPrefix='root://hephyse.
     filelist = filelist[:maxN]
   return filelist
 
-def getChain(sL, minAgeDPM=0, histname='histo', xrootPrefix='root://hephyse.oeaw.ac.at/', maxN=-1):
+def getChain(sL, minAgeDPM=0, histname='histo', xrootPrefix='root://hephyse.oeaw.ac.at/', maxN=-1, treeName="Events"):
   if not type(sL)==type([]):
     sList = [sL]
   else:
     sList= sL 
-  c = ROOT.TChain('Events')
+  c = ROOT.TChain(treeName)
+  i=0
   for s in sList:
     if type(s)==type(""):
-      i=0
       for f in getFileList(s, minAgeDPM, histname, xrootPrefix, maxN):
         i+=1
         c.Add(f)
-      print "Added ",i,'files from dir',s
-      return c
     if type(s)==type({}):
-      i=0
-      for b in s['bins']:
-        dir = s['dirname'] if s.has_key('dirname') else s['dir']
-        for f in getFileList(dir+'/'+b, minAgeDPM, histname, xrootPrefix, maxN):
+      if s.has_key('file'):
+        c.Add(s['file'])
+        i+=1
+      if s.has_key('fromDPM') and s['fromDPM']:
+        for f in getFileList(s['dir'], minAgeDPM, histname, xrootPrefix, maxN):
           i+=1
           c.Add(f)
-      print "Added ",i,'files from sample',s['name'],'dir',dir,'bins',s['bins']
+      if s.has_key('bins'):
+        for b in s['bins']:
+          dir = s['dirname'] if s.has_key('dirname') else s['dir']
+          for f in getFileList(dir+'/'+b, minAgeDPM, histname, xrootPrefix, maxN):
+            i+=1
+            c.Add(f)
+  print "Added ",i,'files from sample',s['name']
   return c
+
+def getChunks(sample, treeName, maxN=-1):
+  if '/dpm/' in sample['dir']:
+    return getChunksFromDPM(sample, maxN=maxN)
+#  elif '/eoscms.cern.ch/' in sample['dir']:
+#    return getSampleFromEOS(sample)
+  else:
+    fromDPM =  sample.has_key('fromDPM') and sample.has_key('fromDPM')
+    if fromDPM:
+      return getChunksFromDPM(sample, fromDPM=fromDPM, maxN=maxN)
+    else:
+      return getChunksFromNFS(sample, treeName,maxN=maxN)
+    
+def getChunksFromNFS(sample, treeName, maxN=-1):
+  import os, subprocess, datetime
+  chunks = [{'name':x} for x in os.listdir(sample['dir']) if x.startswith(sample['chunkString']+'_Chunk') or x==sample['name']]
+  chunks=chunks[:maxN] if maxN>0 else chunks
+  nTotEvents=0
+  allFiles=[]
+  failedChunks=[]
+  for i, s in enumerate(chunks):
+#      logfile = sample['dir']+'/'+s['name']+'/log.txt'
+#      line = [x for x in subprocess.check_output(["cat", logfile]).split('\n') if x.count('number of events processed')]
+#      assert len(line)==1,"Didn't find event number in file %s"%logfile
+#      n = int(line[0].split()[-1])
+      logfile = sample['dir']+'/'+s['name']+'/skimAnalyzerCount/SkimReport.txt'
+      if os.path.isfile(logfile):
+        line = [x for x in subprocess.check_output(["cat", logfile]).split('\n') if x.count('All Events')]
+        assert len(line)==1,"Didn't find event number in file %s"%logfile
+        n = int(line[0].split()[2])
+        inputFilename = sample['dir']+'/'+s['name']+'/'+treeName+'/tree.root'
+        if os.path.isfile(inputFilename):
+          nTotEvents+=n
+          allFiles.append(inputFilename)
+          s['file']=inputFilename
+        else:
+          failedChunks.append(chunks[i])
+      else:failedChunks.append(chunks[i])
+#    except: print "Chunk",s,"could not be added"
+  print "Found",len(chunks),"chunks for sample",sample["name"],'with a total of',nTotEvents,"events. Failed for:",",".join([c['name'] for c in failedChunks]),"(",round(100*len(failedChunks)/float(len(chunks)),1),")%"
+  return chunks, nTotEvents
+
+def getChunksFromDPM(sample, fromDPM=False, maxN=-1):
+  fileList = getFileList(sample['dir'], minAgeDPM=0, histname='', xrootPrefix='root://hephyse.oeaw.ac.at/' if not fromDPM else '')
+  chunks = [{'file':x,'name':x.split('/')[-1].replace('.root','')} for x in fileList]
+  chunks=chunks[:maxN] if maxN>0 else chunks
+  nTotEvents=0
+  failedChunks=[]
+  goodChunks=[]
+  for c in chunks:
+    try:
+      nEvents=int(c['name'].split('nEvents')[-1])
+    except:
+      nEvents=-1
+    if nEvents>0:
+      c.update({'nEvents':int(c['name'].split('nEvents')[-1])})
+      nTotEvents+=c['nEvents']
+      goodChunks.append(c)
+    else:
+      failedChunks.append(c)
+  print "Found",len(goodChunks),"chunks for sample",sample["name"],'with a total of',nTotEvents,"events. Failed for:",",".join([c['name'] for c in failedChunks]),"(",round(100*len(failedChunks)/float(len(chunks)),1),")%"
+  return goodChunks, nTotEvents
 
 def getObjFromFile(fname, hname):
   f = ROOT.TFile(fname)
@@ -144,7 +242,7 @@ def getCutYieldFromChain(c, cutString = "(1)", cutFunc = None, weight = "weight"
 def getYieldFromChain(c, cutString = "(1)", weight = "weight", returnError=False):
   h = ROOT.TH1F('h_tmp', 'h_tmp', 1,0,2)
   h.Sumw2()
-  c.Draw("1>>h_tmp", weight+"*("+cutString+")", 'goff')
+  c.Draw("1>>h_tmp", "("+weight+")*("+cutString+")", 'goff')
   res = h.GetBinContent(1)
   resErr = h.GetBinError(1)
 #  print "1>>h_tmp", weight+"*("+cutString+")",res,resErr

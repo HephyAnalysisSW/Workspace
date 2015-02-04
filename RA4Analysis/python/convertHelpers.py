@@ -56,11 +56,12 @@ def compileClass(className, classString, tmpDir):
   tmpFileName = tmpDir+'/'+uniqueFilename+'.C'
   print "Compiling class",tmpFileName,
   f = file(tmpFileName,'w')
-  f.write(classString)
+  newClassName = className+'_'+uniqueFilename.replace('-','_')
+  f.write(classString.replace(className, newClassName))
   f.close()
   ROOT.gROOT.ProcessLine('.L '+tmpFileName+'+')
-  exec("from ROOT import "+className)
-  exec("s = "+className+"()")
+  exec("from ROOT import "+newClassName)
+  exec("s = "+newClassName+"()")
 #  os.system('rm '+tmpFileName)
   print " -> done."
   return s

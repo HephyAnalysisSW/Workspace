@@ -7,20 +7,20 @@ from Workspace.HEPHYPythonTools.xsec import xsec
 from Workspace.HEPHYPythonTools.helpers import getObjFromFile, getObjDict, getFileList
 from Workspace.RA4Analysis.convertHelpers import compileClass, readVar, printHeader, typeStr, createClassString
 
-subDir = "postProcessed_v4_PHYS14V1"
+subDir = "postProcessed_v5_Phys14V2"
 #from Workspace.RA4Analysis.cmgTuples_v3 import *
-from Workspace.RA4Analysis.cmgTuples_v4_PHYS14 import *
-
-target_lumi = 1000 #pb-1
+from Workspace.HEPHYPythonTools.helpers import getChunksFromNFS, getChunksFromDPM, getChunks
+from Workspace.RA4Analysis.cmgTuples_v5_Phys14 import *
+target_lumi = 4000 #pb-1
 
 from localInfo import username
 
 ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 
-#defSampleStr = "ttJets_PU20bx25"
-defSampleStr = "ttWJets_PU20bx25,ttZJets_PU20bx25,ttHJets_PU20bx25"
-defSampleStr = "ttH_PU20bx25"
+defSampleStr = "ttJets_PU20bx25"
+#defSampleStr = "ttWJets_PU20bx25,ttZJets_PU20bx25,ttHJets_PU20bx25"
+#defSampleStr = "QCD_HT_250To500_PU20bx25"
 
 branchKeepStrings = ["run", "lumi", "evt", "isData", "xsec", "puWeight", "nTrueInt", "genWeight", "rho", "nVert", "nJet25", "nBJetLoose25", "nBJetMedium25", "nBJetTight25", "nJet40", "nJet40a", "nBJetLoose40", "nBJetMedium40", "nBJetTight40", 
                      "nLepGood20", "nLepGood15", "nLepGood10",  
@@ -39,67 +39,28 @@ parser.add_option("--targetDir", dest="targetDir", default="/data/"+username+"/c
 parser.add_option("--skim", dest="skim", default="", type="string", action="store", help="any skim condition?")
 parser.add_option("--leptonSelection", dest="leptonSelection", default="hard", type="string", action="store", help="which lepton selection? 'soft' or 'hard' or 'none'?")
 
-#parser.add_option("--small", dest="small", default = False, action="store_true", help="Just do a small subset.")
+parser.add_option("--small", dest="small", default = False, action="store_true", help="Just do a small subset.")
 #parser.add_option("--overwrite", dest="overwrite", action="store_true", help="Overwrite?", default=True)
 (options, args) = parser.parse_args()
-if options.skim=='inc' or options.skim=="":
-  skimCond = "(1)"
+
+skimCond = "(1)"
 if options.skim.startswith('met'):
   skimCond = "met_pt>"+str(float(options.skim[3:]))
+if options.skim=='HT400ST150':
+  skimCond = "LepGood_pt[0]+met_pt>150&&Sum$(Jet_pt)>400"
 
 ##In case a lepton selection is required, loop only over events where there is one 
 if options.leptonSelection.lower()=='soft':
-#  skimCond += "&&Sum$(LepGood_pt>5&&LepGood_pt<25&&(LepGood_relIso03*LepGood_pt<7.5)&&abs(LepGood_eta)<2.4)>=1"
   skimCond += "&&Sum$(LepGood_pt>5&&LepGood_pt<25&&LepGood_relIso03<0.4&&abs(LepGood_eta)<2.4)>=1"
 if options.leptonSelection.lower()=='hard':
   skimCond += "&&Sum$(LepGood_pt>25&&LepGood_relIso03<0.4&&abs(LepGood_eta)<2.4)>=1"
 
+if options.skim=='inc':
+  skimCond = "(1)"
+
 if sys.argv[0].count('ipython'):
   options.small=True
 
-def getChunks(sample):
-  if '/dpm/' in sample['dir']:
-    return getChunksFromDPM(sample)
-#  elif '/eoscms.cern.ch/' in sample['dir']:
-#    return getSampleFromEOS(sample)
-  else:
-    return getChunksFromNFS(sample)
-    
-
-def getChunksFromNFS(sample):
-  chunks = [{'name':x} for x in os.listdir(sample['dir']) if x.startswith(sample['chunkString']+'_Chunk') or x==sample['name']]
-  nTotEvents=0
-  allFiles=[]
-  failedChunks=[]
-  for i, s in enumerate(chunks):
-#      logfile = sample['dir']+'/'+s['name']+'/log.txt'
-#      line = [x for x in subprocess.check_output(["cat", logfile]).split('\n') if x.count('number of events processed')]
-#      assert len(line)==1,"Didn't find event number in file %s"%logfile
-#      n = int(line[0].split()[-1])
-      logfile = sample['dir']+'/'+s['name']+'/skimAnalyzerCount/SkimReport.txt'
-      if os.path.isfile(logfile):
-        line = [x for x in subprocess.check_output(["cat", logfile]).split('\n') if x.count('All Events')]
-        assert len(line)==1,"Didn't find event number in file %s"%logfile
-        n = int(line[0].split()[2])
-        inputFilename = sample['dir']+'/'+s['name']+'/'+options.inputTreeName+'/tree.root'
-        if os.path.isfile(inputFilename):
-          nTotEvents+=n
-          allFiles.append(inputFilename)
-          chunks[i]['file']=inputFilename
-      else:failedChunks.append(chunks[i])
-#    except: print "Chunk",s,"could not be added"
-  print "Found",len(chunks),"chunks for sample",sample["name"],'with a total of',nTotEvents,"events. Failed for:",",".join([c['name'] for c in failedChunks]),"(",round(100*len(failedChunks)/float(len(chunks)),1),")%"
-  return chunks, nTotEvents
-
-def getChunksFromDPM(sample):
-  fileList = getFileList(sample['dir'], minAgeDPM=0, histname='', xrootPrefix='root://hephyse.oeaw.ac.at/')
-  chunks = [{'file':x,'name':x.split('/')[-1].replace('.root','')} for x in fileList]
-  nTotEvents=0
-  for c in chunks:
-    c.update({'nEvents':int(c['name'].split('nEvents')[-1])})
-    nTotEvents+=c['nEvents']
-  print "Found",len(chunks),"chunks for sample",sample["name"]
-  return chunks, nTotEvents
 
 #def getSampleFromEOS(sample):
 #  fn = sample['dir'].rstrip('/')+'/'+sample['name']+'/'+options.inputTreeName+'/tree.root'
@@ -129,8 +90,7 @@ def getTreeFromChunk(c, skimCond):
 exec('allSamples=['+options.allsamples+']')
 for isample, sample in enumerate(allSamples):
   
-  chunks, nTotEvents = getChunks(sample)
-  chunks = chunks
+  chunks, nTotEvents = getChunks(sample, options.inputTreeName)
   
   outDir = options.targetDir+'/'+"/".join([options.skim, options.leptonSelection, sample['name']])
   tmpDir = outDir+'/tmp/'
@@ -139,7 +99,7 @@ for isample, sample in enumerate(allSamples):
   os.system('rm -rf '+tmpDir+'/*')
 
   lumiWeight = xsec[sample['dbsName']]*target_lumi/float(nTotEvents)
-  readVariables = ['met_pt/F']
+  readVariables = ['met_pt/D']
 
   newVariables = ['weight/F']
   newVariables += ['nLooseSoftLeptons/I', 'nLooseSoftPt10Leptons/I', 'nLooseHardLeptons/I', 'nTightSoftLeptons/I', 'nTightHardLeptons/I']
@@ -150,7 +110,7 @@ for isample, sample in enumerate(allSamples):
   aliases = [ "met:met_pt", "metPhi:met_phi","genMet:met_genPt", "genMetPhi:met_genPhi"]
 
   readVectors = [\
-    {'prefix':'LepGood',  'nMax':8, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I', 'relIso03/F', 'tightId/I', 'mass/F']},
+    {'prefix':'LepGood',  'nMax':8, 'vars':['pt/D', 'eta/D', 'phi/D', 'pdgId/I', 'relIso03/D', 'tightId/I', 'mass/D']},
   ]
   readVars = [readVar(v, allowRenaming=False, isWritten=False, isRead=True) for v in readVariables]
   for v in readVectors:
@@ -170,6 +130,7 @@ for isample, sample in enumerate(allSamples):
   r = compileClass(className=readClassName, classString=readClassString, tmpDir='/data/'+username+'/tmp/')
 
   filesForHadd=[]
+  if options.small: chunks=chunks[:1]
   for chunk in chunks:
     t = getTreeFromChunk(chunk, skimCond)
     if not t:continue
@@ -193,7 +154,7 @@ for isample, sample in enumerate(allSamples):
       s.weight = lumiWeight
 
       #get all >=loose lepton indices
-      looseLepInd = cmgLooseLepIndices(r, ptCuts=(10,5), absEtaCuts=(2.4,2.1), hybridIso03={'ptSwitch':0, 'absIso':0, 'relIso':0.4} )
+      looseLepInd = cmgLooseLepIndices(r, ptCuts=(7,5), absEtaCuts=(2.4,2.1), hybridIso03={'ptSwitch':0, 'absIso':0, 'relIso':0.4} )
       #split into soft and hard leptons
       looseSoftLepInd, looseHardLepInd = splitIndList(r.LepGood_pt, looseLepInd, 25.)
       #select soft leptons above 10 GeV (for vetoing in the hard lepton selection)
@@ -201,7 +162,8 @@ for isample, sample in enumerate(allSamples):
       #select tight soft leptons (no special tight ID for now)
       tightSoftLepInd = looseSoftLepInd #No tight loose selection as of yet 
       #select tight hard leptons (use POG ID)
-      tightHardLepInd = filter(lambda i:r.LepGood_tightId[i], looseHardLepInd)
+      tightHardLepInd = filter(lambda i:(abs(r.LepGood_pdgId[i])==11 and r.LepGood_relIso03[i]<0.14 and r.LepGood_tightId[i]>=3) \
+                                     or (abs(r.LepGood_pdgId[i])==13 and r.LepGood_relIso03[i]<0.12 and r.LepGood_tightId[i]), looseHardLepInd)
 
       s.nLooseSoftLeptons = len(looseSoftLepInd)
       s.nLooseSoftPt10Leptons = len(looseSoftPt10LepInd)
@@ -222,6 +184,7 @@ for isample, sample in enumerate(allSamples):
         if s.nTightHardLeptons>=1:
           leadingLepInd = tightHardLepInd[0]
           s.leptonPt  = r.LepGood_pt[leadingLepInd]
+#          print s.leptonPt, 'met', r.met_pt, r.nLepGood, r.LepGood_pt[leadingLepInd],r.LepGood_eta[leadingLepInd], r.LepGood_phi[leadingLepInd] , r.LepGood_pdgId[leadingLepInd], r.LepGood_relIso03[leadingLepInd], r.LepGood_tightId[leadingLepInd], r.LepGood_mass[leadingLepInd]
           s.leptonInd = leadingLepInd 
           s.leptonEta = r.LepGood_eta[leadingLepInd]
           s.leptonPhi = r.LepGood_phi[leadingLepInd]
@@ -239,8 +202,8 @@ for isample, sample in enumerate(allSamples):
       if options.leptonSelection=='soft':
         #Select hardest tight lepton among soft leptons
         if s.nTightSoftLeptons>=1:
-
           leadingLepInd = tightSoftLepInd[0]
+#          print s.leptonPt, r.LepGood_pt[leadingLepInd],r.LepGood_eta[leadingLepInd], leadingLepInd
           s.leptonPt  = r.LepGood_pt[leadingLepInd]
           s.leptonInd = leadingLepInd 
           s.leptonEta = r.LepGood_eta[leadingLepInd]
@@ -255,41 +218,41 @@ for isample, sample in enumerate(allSamples):
         else:
           s.singleMuonic      = False 
           s.singleElectronic  = False 
-
 #      print "Selected",s.leptonPt
-
       for v in newVars:
         v['branch'].Fill()
     newFileName = sample['name']+'_'+chunk['name']+'.root'
     filesForHadd.append(newFileName)
-    f = ROOT.TFile(tmpDir+'/'+newFileName, 'recreate')
-    t.SetBranchStatus("*",0)
-    for b in branchKeepStrings + [v['stage2Name'] for v in newVars] +  [v.split(':')[1] for v in aliases]:
-      t.SetBranchStatus(b, 1)
-    t2 = t.CloneTree()
-    t2.Write()
-    f.Close()
-    print "Written",tmpDir+'/'+newFileName
-    del f
+    if not options.small:
+      f = ROOT.TFile(tmpDir+'/'+newFileName, 'recreate')
+      t.SetBranchStatus("*",0)
+      for b in branchKeepStrings + [v['stage2Name'] for v in newVars] +  [v.split(':')[1] for v in aliases]:
+        t.SetBranchStatus(b, 1)
+      t2 = t.CloneTree()
+      t2.Write()
+      f.Close()
+      print "Written",tmpDir+'/'+newFileName
+      del f
+      del t2
+      t.Delete()
+      del t
     for v in newVars:
       del v['branch']
-    del t2
-    t.Delete()
-    del t
-  
-  size=0
-  counter=0
-  files=[]
-  for f in filesForHadd:
-    size+=os.path.getsize(tmpDir+'/'+f)
-    files.append(f)
-    if size>10**9 or f==filesForHadd[-1]:
-      ofile = outDir+'/'+sample['name']+'_'+str(counter)+'.root'
-      print "Running hadd on", tmpDir, files
-      os.system('cd '+tmpDir+';hadd -f '+ofile+' '+' '.join(files))
-      print "Written", ofile
-      size=0
-      counter+=1
-      files=[]
-  os.system("rm -rf "+tmpDir)
+
+  if not options.small: 
+    size=0
+    counter=0
+    files=[]
+    for f in filesForHadd:
+      size+=os.path.getsize(tmpDir+'/'+f)
+      files.append(f)
+      if size>10**9 or f==filesForHadd[-1]:
+        ofile = outDir+'/'+sample['name']+'_'+str(counter)+'.root'
+        print "Running hadd on", tmpDir, files
+        os.system('cd '+tmpDir+';hadd -f '+ofile+' '+' '.join(files))
+        print "Written", ofile
+        size=0
+        counter+=1
+        files=[]
+    os.system("rm -rf "+tmpDir)
 
