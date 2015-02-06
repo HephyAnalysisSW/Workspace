@@ -4,7 +4,7 @@ from array import array
 from Workspace.RA4Analysis.objectSelection import gTauAbsEtaBins, gTauPtBins, metParRatioBins, jetRatioBins
 from Workspace.HEPHYPythonTools.helpers import getVarValue, getObjFromFile
 from Workspace.RA4Analysis.objectSelection import getLooseMuStage2, tightPOGMuID, vetoMuID
-from Workspace.RA4Analysis.cmgObjectSelection import get_cmg_recoMuons
+from Workspace.RA4Analysis.cmgObjectSelection import get_cmg_recoMuons , getGood_cmg_JetsStage2
 from math import sqrt, cos, sin, atan2
 from Workspace.RA4Analysis.helpers import deltaPhi
 from Workspace.RA4Analysis.cmgTuplesPostProcessed_v3 import *
@@ -34,7 +34,7 @@ if mode=='had':
   gendoubleLeptonPreselection = "Sum$(abs(genPart_pdgId)==14&&abs(genPart_motherId)==24)==2&&Sum$(abs(genPart_pdgId)==12)==0&&Sum$(abs(genPart_pdgId)==16)==0"
   print doubleLeptonPreselection
   templates = pickle.load(file('/data/easilar/results2014/tauTemplates/CSA14_TTJets_genTau_cmg_PHYS14_inc.pkl'))
-  ofile =                      '/data/easilar/results2014/tauTuples/CSA14_TTJets_hadTauEstimate_cmg_large_PHYS14_inc.root'
+  ofile =                      '/data/easilar/results2014/tauTuples/CSA14_TTJets_hadTauEstimate_cmg_large_PHYS14_inc_new.root'
 
   #doubleLeptonPreselection = "ngoodMuons>=1&&nvetoMuons==2&&nvetoElectrons==0"
   #templates = pickle.load(file('/data/schoef/results2014/tauTemplates/CSA14_TTJets_lepGenTau.pkl'))
@@ -65,7 +65,7 @@ def getTypeStr(s):
 #copyVars  = ['event/l','nbtags/I', 'njets/I', 'ht/F', 'met/F', 'metPhi/F', 'nvetoMuons/I']
 copyVars  = ['evt/l','xsec/I','lumi/I','nBJetMedium25/I', 'nBJetMedium40/I','nJet40a/I', 'htJet40ja/F','st/F','LepGood_pt/F','LepGood_phi/F','LepGood_eta/F', 'met_pt/F', 'met_phi/F','met_eta/F', 'nLepGood/I','nLepOther/I']
 #newVars   = ['nbtagsPred/I','njetsPred/I','effTauToB/F','scaleLEffUp/F','scaleLEffDown/F', 'htPred/F', 'metPred/F', 'metphiPred/F','weightPred/F', 'mTPred/F', 'weight/F', 'scaleLEff/F','wPt/F','wPhi/F','deltaPhiPred/F']
-newVars   = ['nbtagsPred/I','njetsPred/I','effTauToB/F','scaleLEffUp/F','scaleLEffDown/F', 'htPred/F', 'metPred/F', 'metphiPred/F','weightPred/F', 'mTPred/F', 'weight/F', 'scaleLEff/F','wPt/F','wPhi/F','deltaPhiPred/F']
+newVars   = ['njets30Pred/I','nbtagsCMVAPred/I','nbtagsPred/I','njetsPred/I','effTauToB/F','scaleLEffUp/F','scaleLEffDown/F', 'htPred/F', 'metPred/F', 'metphiPred/F','weightPredOld/F','weightPred/F', 'mTPred/F', 'weight/F', 'scaleLEff/F','wPt/F','wPhi/F','deltaPhiPred/F']
 vars      = copyVars+newVars  
 #print vars
 structString = "struct MyStruct{"
@@ -105,6 +105,14 @@ for i in range(number_events):
     n=v.split('/')[0]
     exec('s.'+n+'='+str(c.GetLeaf(n).GetValue()))
   muons = getTwoMuons(c)
+  jets = getGood_cmg_JetsStage2(c)
+  nbtagCMVA = 0
+  njet30 = 0
+  for jet in jets :
+    if jet:
+      if jet['pt']>30 and abs(jet['eta'])<2.4 and jet['jetId'] and jet['btag']>0.732: nbtagCMVA = nbtagCMVA+1
+      if jet['pt']>30 and abs(jet['eta'])<2.4 and jet['jetId'] : njet30 = njet30+1
+  #print "nbtag CMVA" , nbtagCMVA
   #if len(muons) != 2 : continue
   #print muons
   #print 'len muons' , len(muons)
@@ -159,11 +167,14 @@ for i in range(number_events):
             s.wPhi = atan2(wy,wx)
             s.deltaPhiPred = deltaPhi(s.wPhi,m2['phi'])
             s.effTauToB = tauFrMap.GetBinContent(tauFrMap.FindBin(jetpt))
+            s.weightPredOld = p['weight']*s.weight
             if jetpt>30.:
               s.njetsPred = s.nJet40a+1
+              s.njets30Pred = njet30 +1
               s.htPred   = s.htJet40ja+jetpt
 
               s.nbtagsPred = s.nBJetMedium40+1
+              s.nbtagsCMVAPred = nbtagCMVA+1 
               s.weightPred = p['weight']*s.weight*s.effTauToB
               t.Fill()
               s.nbtagsPred = s.nBJetMedium40
@@ -172,7 +183,9 @@ for i in range(number_events):
             else:
               s.weightPred = p['weight']*s.weight
               s.njetsPred = s.nJet40a
+              s.njets30Pred = njet30
               s.nbtagsPred = s.nBJetMedium40
+              s.nbtagsCMVAPred = nbtagCMVA
               s.htPred   = s.htJet40ja
               t.Fill()
           if mode=='lep':

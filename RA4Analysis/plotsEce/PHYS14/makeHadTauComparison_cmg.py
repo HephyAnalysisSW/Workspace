@@ -10,12 +10,20 @@ import os, sys
 from Workspace.RA4Analysis.cmgTuplesPostProcessed_v3 import *
 from Workspace.HEPHYPythonTools.helpers import getChain
 
-ROOT.gROOT.LoadMacro("../../../HEPHYPythonTools/scripts/root/tdrstyle.C")
-ROOT.setTDRStyle()
+ROOT.gROOT.Reset()
+#ROOT.gROOT.LoadMacro("../../../HEPHYPythonTools/scripts/root/tdrstyle.C")
+#ROOT.setTDRStyle()
 ROOT.TH1F.SetDefaultSumw2()
 #topMargin = 0.07
 
-def DrawClosure(plot1,plot2,plot3,plot4,xaxis,path):
+def DrawClosure(plot1,plot2,plot3,xaxis,path):
+
+  eplus = plot2.Clone("eplus") 
+  eminus = plot2.Clone("minus") 
+  for i in range(plot2.GetNbinsX()):
+    err = sqrt((plot3.GetBinContent(i) - plot2.GetBinContent(i))**2+plot2.GetBinError(i)**2)
+    eplus.SetBinContent(i,plot2.GetBinContent(i)+err)
+    eminus.SetBinContent(i,plot2.GetBinContent(i)-err)
 
   #ROOT.setTDRStyle()
   can = ROOT.TCanvas("c",xaxis,600,600)
@@ -42,43 +50,51 @@ def DrawClosure(plot1,plot2,plot3,plot4,xaxis,path):
   Pad1.cd()
   #text = ROOT.TLatex()
   #text.DrawLatex(0.15,0.93, plot1name+" #sqrt{s} = 13 TeV")
-  plot3.SetTitle("")
-  plot3.SetAxisRange(0.0101,(plot1.GetMaximum())*(plot1.GetMaximum())*100,"Y")
-  plot3.SetStats(0)
-  plot3.SetLineColor(ROOT.kAzure)
-  plot3.SetMarkerColor(ROOT.kAzure)
-  plot3.SetLineWidth(3)
-  plot3.GetXaxis().SetLabelSize(0.)
-  plot3.Draw()
-  plot4.SetStats(0)
-  plot4.SetLineColor(ROOT.kAzure)
-  plot4.SetMarkerColor(ROOT.kAzure)
-  plot4.SetLineWidth(3)
-  plot4.Draw('same')
+  eplus.SetTitle("")
+  eplus.SetAxisRange(0.0101,(plot1.GetMaximum())*(plot1.GetMaximum())*100,"Y")
+  eplus.SetStats(0)
+  eplus.SetLineColor(ROOT.kAzure)
+  #eplus.SetFillColor(ROOT.kGray)
+  #eplus.SetMarkerColor(ROOT.kAzure)
+  eplus.SetMarkerSize(0.1)
+  eplus.SetLineWidth(2)
+  eplus.GetXaxis().SetLabelSize(0.)
+  eplus.Draw('HIST')
+  eminus.SetStats(0)
+  #eminus.SetFillColor(10)
+  eminus.SetLineColor(ROOT.kAzure)
+  #eminus.SetMarkerColor(ROOT.kAzure)
+  eminus.GetXaxis().SetLabelSize(0.)
+  eminus.SetMarkerSize(0.1)
+  eminus.SetLineWidth(2)
+  eminus.Draw('HISTsame')
   #plot1.SetTitleSize(5)
   plot1.SetStats(0)
   plot1.SetLineColor(ROOT.kBlack)
+  plot1.SetLineColor(ROOT.kBlack)
   plot1.SetMarkerColor(ROOT.kBlack)
-  plot1.SetLineWidth(3)
-  plot1.Draw('same')
+  plot1.SetMarkerSize(0.6)
+  plot1.SetLineWidth(2)
+  plot1.Draw('eh1same')
   plot2.SetStats(0)
   plot2.SetLineColor(ROOT.kRed+1)
   plot2.SetMarkerColor(ROOT.kRed+1)
-  plot2.SetLineWidth(3)
-  plot2.Draw('same')
-  #plot4.GetYaxis().SetLabelSize(0.)
-  #plot3.GetYaxis().SetTitle("Number of Events / 50 GeV")
-  plot3.GetYaxis().SetTitle("Number of Events / Bin ")
-  plot3.GetYaxis().SetTitleSize(0.08)
+  plot2.SetMarkerSize(0.6)
+  plot2.SetLineWidth(2)
+  plot2.Draw('HISTsame')
+  #eminus.GetYaxis().SetLabelSize(0.)
+  #eplus.GetYaxis().SetTitle("Number of Events / 50 GeV")
+  eplus.GetYaxis().SetTitle("Number of Events / Bin ")
+  eplus.GetYaxis().SetTitleSize(0.08)
   #plot1.GetYaxis().SetTitleFont(43)
-  plot3.GetYaxis().SetTitleOffset(0.7)
-  #plot3.GetYaxis().SetLabelFont(43)
-  plot3.GetYaxis().SetLabelSize(0.08)
-  leg = ROOT.TLegend(0.2,0.6,0.9,0.9)
-  leg.AddEntry(plot2, "Prediction from MC","l")
-  leg.AddEntry(plot1, "Hadronic Tau Expectation from MC","l")
-  leg.AddEntry(plot3, "#pm 10% Efficiency","l")
-  #leg.AddEntry(plot4, "0.9*(Eff) Pred","l")
+  eplus.GetYaxis().SetTitleOffset(0.7)
+  #eplus.GetYaxis().SetLabelFont(43)
+  eplus.GetYaxis().SetLabelSize(0.08)
+  leg = ROOT.TLegend(0.6,0.65,0.95,0.98)
+  leg.AddEntry(plot2, "Prediction")
+  leg.AddEntry(plot1, "MC truth")
+  leg.AddEntry(eplus, "#pm 10% sys + stat")
+  #leg.AddEntry(eminus, "0.9*(Eff) Pred","l")
   leg.SetTextSize(0.06)
   leg.SetFillColor(0)
   leg.SetShadowColor( ROOT.kWhite )
@@ -102,7 +118,7 @@ def DrawClosure(plot1,plot2,plot3,plot4,xaxis,path):
   Func.SetParameter(0,1)
   Func.SetLineColor(2)
   h_ratio = plot2.Clone("h_ratio")
-  h_ratio.SetLineColor(ROOT.kBlack)
+  h_ratio.SetLineColor(ROOT.kRed+1)
   h_ratio.SetLineWidth(2)
   h_ratio.SetMinimum(0.0)
   h_ratio.SetMaximum(1.99)
@@ -110,12 +126,13 @@ def DrawClosure(plot1,plot2,plot3,plot4,xaxis,path):
   h_ratio.SetStats(0)
   h_ratio.Divide(plot1)
   h_ratio.SetMarkerStyle(21)
-  h_ratio.SetMarkerColor(ROOT.kBlack)
-  #h_ratio.SetMarkerSize(0.5)
+  h_ratio.SetMarkerColor(ROOT.kRed+1)
+  h_ratio.SetMarkerSize(0.7)
   #h_ratio.SetTitle(";;Truth/Pred;")
   h_ratio.SetTitle("")
   h_ratio.GetYaxis().SetTitle("Pred/Sim ")
   h_ratio.GetYaxis().SetNdivisions(505)
+  h_ratio.GetXaxis().SetNdivisions(505)
   h_ratio.GetYaxis().SetTitleSize(0.15)   #0.12
   h_ratio.GetYaxis().SetTitleFont(42)
   h_ratio.GetYaxis().SetTitleOffset(0.38)
@@ -130,7 +147,7 @@ def DrawClosure(plot1,plot2,plot3,plot4,xaxis,path):
   h_ratio.GetXaxis().SetTitleOffset(0.8)  # 0.9
   #h_ratio.GetXaxis().SetLabelFont(43)
   h_ratio.GetXaxis().SetLabelSize(0.17)
-  h_ratio.Draw("ep")
+  h_ratio.Draw("eh1")
   Func.Draw("same")
   #can.SetGridx()
   #Pad2.Update()
@@ -140,41 +157,16 @@ def DrawClosure(plot1,plot2,plot3,plot4,xaxis,path):
 
 
 c = ROOT.TChain('Events')
-#c.Add('/data/schoef/convertedTuples_v26/copyInc/ttJetsCSA1450ns/histo_ttJetsCSA1450ns_from*.root')
 #c = getChain(hard_ttJetsCSA1450ns)
-#c.Add('/data/schoef/cmgTuples/postProcessed_v5_Phys14V2/hard/TTJets/*.root')
 c.Add('/data/schoef/cmgTuples/postProcessed_v5_Phys14V2//inc/hard/TTJets/*.root')
-print c
+
 cPred = ROOT.TChain('Events')
-#cPred.Add('/data/easilar/results2014/tauTuples/CSA14_TTJets_hadGenTau_Nov24.root')
-#cPred.Add('/data/easilar/results2014/tauTuples/CSA14_TTJets_hadGenTau_Nov24_NewTemp.root')
-#cPred.Add('/data/easilar/results2014/tauTuples/CSA14_TTJets_hadTauEstimate_cmg_large_reduced_lepother.root')
-#cPred.Add('/data/easilar/results2014/tauTuples/CSA14_TTJets_hadTauEstimate_cmg_large_reduced_lepother_PHYS14.root')
-cPred.Add('/data/easilar/results2014/tauTuples/CSA14_TTJets_hadTauEstimate_cmg_large_PHYS14_inc.root')
-#oneHadTau     ="ngoodMuons==1&&nvetoMuons==1&&nvetoElectrons==0&&Sum$(gTauPt>15&&abs(gTauEta)<2.1&&gTauNENu+gTauNMuNu==0&&gTauNTauNu==1)==1"
+cPred.Add('/data/easilar/results2014/tauTuples/CSA14_TTJets_hadTauEstimate_cmg_large_PHYS14_inc_new.root')
+
+
 #oneHadTau     ="Sum$(abs(LepGood_pdgId)==13)==1&&Sum$(abs(LepGood_pdgId==13)&&LepGood_tightId==1)==1&&Sum$(abs(LepGood_pdgId)==11)==0&&Sum$(genTau_pt>15&&abs(genTau_eta)<2.1&&(genTau_nMuNu+genTau_nMuE==0)&&genTau_nMuTau==1"
 oneHadTau     = "genTau_nNuE+genTau_nNuMu==0&&genTau_nNuTau==1\
         &&Sum$(abs(LepGood_pdgId)==13 && LepGood_tightId==1 && abs(LepGood_eta)<2.1 && LepGood_relIso03 < 0.12)==1" #&&Sum$(abs(LepGood_pdgId)==11)==0" #\
-#&&Sum$(abs(LepGood_pdgId)==13 && abs(LepGood_eta)<2.4 && LepGood_relIso03 < 0.3)==1 \
-#&&Sum$(abs(LepGood_pdgId)==11)==0"
-# &&Sum$(abs(LepGood_pdgId)==11)==0"  #nLooseHardLeptons==1&&nTightHardLeptons==1)\
-#oneHadTauOpen ="ngoodMuons==1&&nvetoMuons==1&&nvetoElectrons==0&&Sum$(gTauNENu+gTauNMuNu==0&&gTauNTauNu==1)==1"
-#oneHadTau     ="ngNuMuFromW==1&&ngoodMuons==1&&nvetoMuons==1&&nvetoElectrons==0&&Sum$(gTauPt>15&&abs(gTauEta)<2.5&&gTauNENu+gTauNMuNu==0&&gTauNTauNu==1)==1"
-#oneHadTauOpen ="ngNuMuFromW==1&&ngoodMuons==1&&nvetoMuons==1&&nvetoElectrons==0&&Sum$(gTauNENu+gTauNMuNu==0&&gTauNTauNu==1)==1"
-
-##Fakerate calculation##
-#ptBins  = array('d', [float(x) for x in range(10, 20)+range(20,50,3)+range(50,100,10)+range(100,310,30)])
-#leptonID = 'gTauPt>15&&abs(gTauEta)<2.1&&(gTauNENu+gTauNMuNu)==0&&gTauNTauNu==1'
-#
-#fakeRatePre = ROOT.TProfile('fakeRatePre','fakeRatePre', len(ptBins)-1,ptBins,-2,2)
-#c.Draw('gTauJetInd>=0:gTauPt>>fakeRatePre',oneHadTau, 'goff')
-#fakeRate = ROOT.TProfile('fakeRate','fakeRate', len(ptBins)-1,ptBins,-2,2)
-#c.Draw('gTauJetDR<0.4&&jetBTag[gTauJetInd]>0.679&&abs(jetEta[gTauJetInd])<2.4:gTauPt>>fakeRate',oneHadTau, 'goff')
-#fakeRate=fakeRate.ProjectionX()
-#fakeRate.Multiply(fakeRatePre.ProjectionX())
-#path = '/afs/hephy.at/user/e/easilar/www/hadronicTau/'
-#DrawNicePlot(fakeRate,'tau fake Rate','fake Rate','gen Tau Pt',path,'FakeRate.png')
-####
 
 
 #scaleF = (1-0.1741-0.1783)*0.1125/(0.1057+0.1095)
@@ -201,7 +193,7 @@ cosDPhi = '('+num+')/('+den+')'
 #dPhi = 'acos(('+cosDPhi+'))'
 dPhi='acos((LepGood_pt+met_pt*cos(LepGood_phi-met_phi))/sqrt(LepGood_pt**2+met_pt**2+2*met_pt*LepGood_pt*cos(LepGood_phi-met_phi)))'
 #c.Draw(dPhi)
-
+nBtagCMVA = 'Sum$(Jet_id&&Jet_pt>30&&abs(Jet_eta)<2.4&&Jet_btagCMVA>0.732)'
 minNJetCut = 2
 maxNJetCut = 4
 for htCut in [400]:
@@ -211,11 +203,13 @@ for htCut in [400]:
       print 'ht:', htCut, 'st:',stCut ,'njet:',minNJetCut,maxNJetCut-1 , 'nbtags >= ' , nbtagsCut
       #genSel= oneHadTau+'&&htJet40ja>'+str(htCut)+'&&nBJetMedium40>='+str(nbtagsCut)+'&&nJet40a>='+str(minNJetCut)+'&&nJet40a<'+str(maxNJetCut)+'&&'+stLep+'>'+str(stCut) 
       #predSel = 'htPred>'+str(htCut)+'&&nbtagsPred>='+str(nbtagsCut)+'&&njetsPred>='+str(minNJetCut)+'&&njetsPred<'+str(maxNJetCut)+'&&'+stLepPred+'>'+str(stCut)
-      genSel= oneHadTau+'&&htJet40ja>'+str(htCut)+'&&nBJetMedium40>='+str(nbtagsCut)+'&&nJet40a>='+str(minNJetCut)+'&&nJet40a<'+str(maxNJetCut)+'&& st>'+str(stCut) 
-      predSel = 'htPred>'+str(htCut)+'&&nbtagsPred>='+str(nbtagsCut)+'&&njetsPred>='+str(minNJetCut)+'&&njetsPred<'+str(maxNJetCut)+'&& st >'+str(stCut)
+      ###genSel= oneHadTau+'&&htJet40ja>'+str(htCut)+'&&nBJetMedium40>='+str(nbtagsCut)+'&&nJet40a>='+str(minNJetCut)+'&&nJet40a<'+str(maxNJetCut)+'&& st>'+str(stCut) 
+      ###predSel = 'htPred>'+str(htCut)+'&&nbtagsPred>='+str(nbtagsCut)+'&&njetsPred>='+str(minNJetCut)+'&&njetsPred<'+str(maxNJetCut)+'&& st >'+str(stCut)
+      genSel= oneHadTau+'&&htJet40ja>'+str(htCut)+'&&nJet40a>='+str(minNJetCut)+'&&nJet40a<'+str(maxNJetCut)+'&& st>'+str(stCut) 
+      predSel = 'htPred>'+str(htCut)+'&&nbtagsCMVAPred>='+str(nbtagsCut)+'&&njetsPred>='+str(minNJetCut)+'&&njetsPred<'+str(maxNJetCut)+'&& st >'+str(stCut)
       #genSel = oneHadTau
       #predSel = 'htPred>'+str(htCut)
-      Path='/afs/hephy.at/user/e/easilar/www/hadronicTau_PHYS14_inc/comparison_Results/ht_'+str(htCut)+'_st_'+str(stCut)+'_njet_'+str(minNJetCut)+'or'+str(maxNJetCut-1)+'_nbtag_lt_'+str(nbtagsCut)+'_DiffBin/' ##'+str(nbtagsCut)+'/'
+      Path='/afs/hephy.at/user/e/easilar/www/hadronicTau_PHYS14_inc_CMVA/comparison_Results/ht_'+str(htCut)+'_st_'+str(stCut)+'_njet_'+str(minNJetCut)+'or'+str(maxNJetCut-1)+'_nbtag_lt_'+str(nbtagsCut)+'/' ##'+str(nbtagsCut)+'/'
       #Path='/afs/hephy.at/user/e/easilar/www/hadronicTau_28Jan/ht_'+str(htCut)+'_st_'+str(stCut)+'_njet_'+str(minNJetCut)+'or'+str(maxNJetCut-1)+'_nbtag_>_'+str(nbtagsCut)+'/' ##'+str(nbtagsCut)+'/'
       if not os.path.exists(Path):
         os.makedirs(Path)
@@ -223,17 +217,17 @@ for htCut in [400]:
       c.Draw('sqrt(2.*met_pt*LepGood_pt*(1-cos(LepGood_phi-met_phi)))>>hMT','weight*('+genSel+')','goff')
       #hMTOpen = ROOT.TH1F('hMTOpen', 'hMTOpen',30,0,800)
       #c.Draw('sqrt(2.*met_pt*LepGood_pt*(1-cos(LepGood_phi-met_phi)))>>hMTOpen','weight*('+oneHadTauOpen+'&&ht>'+str(htCut)+'&&nbtags=='+str(nbtagsCut)+'&&njets>='+str(minNJets)+'&&met_pt>'+str(metCut)+')','goff')
-  
-     #hMTPred = ROOT.TH1F('hMTPred', 'hMTPred',30,0,800)
-     #cPred.Draw('mTPred>>hMTPred','weightPred*scaleLEff*('+str(scaleF)+')*('+predSel+')','goff')
-     #hMTPred110 = ROOT.TH1F('hMTPred110', 'hMTPred110',30,0,800)
-     #cPred.Draw('mTPred>>hMTPred110','weightPred*scaleLEffUp*('+str(scaleF)+')*('+predSel+')','goff')
-     #hMTPred09 = ROOT.TH1F('hMTPred09', 'hMTPred09',30,0,800)
-     #cPred.Draw('mTPred>>hMTPred09','weightPred*scaleLEffDown*('+str(scaleF)+')*('+predSel+')','goff')
-  
-     #DrawClosure(hMT,hMTPred,hMTPred110,hMTPred09,"M_{T}(GeV)",Path+'mT.png')
-     #DrawClosure(hMT,hMTPred,hMTPred110,hMTPred09,"M_{T}(GeV)",Path+'mT.pdf')
-     #DrawClosure(hMT,hMTPred,hMTPred110,hMTPred09,"M_{T}(GeV)",Path+'mT.root')
+   
+      hMTPred = ROOT.TH1F('hMTPred', 'hMTPred',30,0,800)
+      cPred.Draw('mTPred>>hMTPred','weightPred*scaleLEff*('+str(scaleF)+')*('+predSel+')','goff')
+      hMTPred110 = ROOT.TH1F('hMTPred110', 'hMTPred110',30,0,800)
+      cPred.Draw('mTPred>>hMTPred110','weightPred*scaleLEffUp*('+str(scaleF)+')*('+predSel+')','goff')
+      #hMTPred09 = ROOT.TH1F('hMTPred09', 'hMTPred09',30,0,800)
+      #cPred.Draw('mTPred>>hMTPred09','weightPred*scaleLEffDown*('+str(scaleF)+')*('+predSel+')','goff')
+   
+      DrawClosure(hMT,hMTPred,hMTPred110,"M_{T}(GeV)",Path+'mT.png')
+      DrawClosure(hMT,hMTPred,hMTPred110,"M_{T}(GeV)",Path+'mT.pdf')
+      DrawClosure(hMT,hMTPred,hMTPred110,"M_{T}(GeV)",Path+'mT.root')
 
       hDeltaPhi = ROOT.TH1F('hDeltaPhi', 'hDeltaPhi',30,0,3.14)
       c.Draw(dPhi+'>>hDeltaPhi','weight*('+genSel+')','goff')
@@ -245,10 +239,10 @@ for htCut in [400]:
       cPred.Draw('deltaPhiPred>>hDeltaPhiPred110','weightPred*scaleLEffUp*('+str(scaleF)+')*('+predSel+')','goff')
       hDeltaPhiPred09 = ROOT.TH1F('hDeltaPhiPred09', 'hDeltaPhiPred09',30,0,3.14)
       cPred.Draw('deltaPhiPred>>hDeltaPhiPred09','weightPred*scaleLEffDown*('+str(scaleF)+')*('+predSel+')','goff')
-  
-      DrawClosure(hDeltaPhi,hDeltaPhiPred,hDeltaPhiPred110,hDeltaPhiPred09,'#Delta#phi(#mu,W)',Path+'deltaPhi.png')
-      DrawClosure(hDeltaPhi,hDeltaPhiPred,hDeltaPhiPred110,hDeltaPhiPred09,'#Delta#phi(#mu,W)',Path+'deltaPhi.pdf')
-      DrawClosure(hDeltaPhi,hDeltaPhiPred,hDeltaPhiPred110,hDeltaPhiPred09,'#Delta#phi(#mu,W)',Path+'deltaPhi.root')
+   
+      DrawClosure(hDeltaPhi,hDeltaPhiPred,hDeltaPhiPred110,'#Delta#phi(#mu,W)',Path+'deltaPhi.png')
+      DrawClosure(hDeltaPhi,hDeltaPhiPred,hDeltaPhiPred110,'#Delta#phi(#mu,W)',Path+'deltaPhi.pdf')
+      DrawClosure(hDeltaPhi,hDeltaPhiPred,hDeltaPhiPred110,'#Delta#phi(#mu,W)',Path+'deltaPhi.root')
 
       hHT = ROOT.TH1F('hHT', 'hHT',30,0,2000)
       c.Draw('htJet40ja>>hHT','weight*('+genSel+')','goff')
@@ -256,12 +250,12 @@ for htCut in [400]:
       cPred.Draw('htPred>>hHTPred','weightPred*scaleLEff*('+str(scaleF)+')*('+predSel+')','goff')
       hHTPred110 = ROOT.TH1F('hHTPred110', 'hHTPred110',30,0,2000)
       cPred.Draw('htPred>>hHTPred110','weightPred*scaleLEffUp*('+str(scaleF)+')*('+predSel+')','goff')
-      hHTPred09 = ROOT.TH1F('hHTPred09', 'hHTPred09',30,0,2000)
-      cPred.Draw('htPred>>hHTPred09','weightPred*scaleLEffDown*('+str(scaleF)+')*('+predSel+')','goff')
+      #hHTPred09 = ROOT.TH1F('hHTPred09', 'hHTPred09',30,0,2000)
+      #cPred.Draw('htPred>>hHTPred09','weightPred*scaleLEffDown*('+str(scaleF)+')*('+predSel+')','goff')
   
-      DrawClosure(hHT,hHTPred,hHTPred110,hHTPred09,'H_{T}(GeV)',Path+'ht.png')
-      DrawClosure(hHT,hHTPred,hHTPred110,hHTPred09,'H_{T}(GeV)',Path+'ht.pdf')
-      DrawClosure(hHT,hHTPred,hHTPred110,hHTPred09,'H_{T}(GeV)',Path+'ht.root')
+      DrawClosure(hHT,hHTPred,hHTPred110,'H_{T}(GeV)',Path+'ht.png')
+      DrawClosure(hHT,hHTPred,hHTPred110,'H_{T}(GeV)',Path+'ht.pdf')
+      DrawClosure(hHT,hHTPred,hHTPred110,'H_{T}(GeV)',Path+'ht.root')
   
       #hST = ROOT.TH1F('hST', 'hST',30,0,800)
       #c.Draw(stLep+'>>hST','weight*('+genSel+')','goff')
@@ -278,12 +272,12 @@ for htCut in [400]:
       cPred.Draw('st>>hSTPred','weightPred*scaleLEff*('+str(scaleF)+')*('+predSel+')','goff')
       hSTPred110 = ROOT.TH1F('hSTPred110', 'hSTPred110',30,0,800)
       cPred.Draw('st>>hSTPred110','weightPred*scaleLEffUp*('+str(scaleF)+')*('+predSel+')','goff')
-      hSTPred09 = ROOT.TH1F('hSTPred09', 'hSTPred09',30,0,800)
-      cPred.Draw('st>>hSTPred09','weightPred*scaleLEffDown*('+str(scaleF)+')*('+predSel+')','goff')
+      #hSTPred09 = ROOT.TH1F('hSTPred09', 'hSTPred09',30,0,800)
+      #cPred.Draw('st>>hSTPred09','weightPred*scaleLEffDown*('+str(scaleF)+')*('+predSel+')','goff')
 
-      DrawClosure(hST,hSTPred,hSTPred110,hSTPred09,'S_{T}(GeV)',Path+'ST.png')
-      DrawClosure(hST,hSTPred,hSTPred110,hSTPred09,'S_{T}(GeV)',Path+'ST.pdf')
-      DrawClosure(hST,hSTPred,hSTPred110,hSTPred09,'S_{T}(GeV)',Path+'ST.root')
+      DrawClosure(hST,hSTPred,hSTPred110,'S_{T}(GeV)',Path+'ST.png')
+      DrawClosure(hST,hSTPred,hSTPred110,'S_{T}(GeV)',Path+'ST.pdf')
+      DrawClosure(hST,hSTPred,hSTPred110,'S_{T}(GeV)',Path+'ST.root')
 
      #hMET = ROOT.TH1F('hMET', 'hMET',30,0,800)
      #c.Draw('met_pt>>hMET','weight*('+genSel+')','goff')
@@ -305,12 +299,12 @@ for htCut in [400]:
       cPred.Draw('njetsPred>>hNJetPred','weightPred*scaleLEff*('+str(scaleF)+')*('+predSel+')','goff')
       hNJetPred110 = ROOT.TH1F('hNJetPred110', 'hNJetPred110',10,0,10)
       cPred.Draw('njetsPred>>hNJetPred110','weightPred*scaleLEffUp*('+str(scaleF)+')*('+predSel+')','goff')
-      hNJetPred09 = ROOT.TH1F('hNJetPred09', 'hNJetPred09',10,0,10)
-      cPred.Draw('njetsPred>>hNJetPred09','weightPred*scaleLEffDown*('+str(scaleF)+')*('+predSel+')','goff')
+      #hNJetPred09 = ROOT.TH1F('hNJetPred09', 'hNJetPred09',10,0,10)
+      #cPred.Draw('njetsPred>>hNJetPred09','weightPred*scaleLEffDown*('+str(scaleF)+')*('+predSel+')','goff')
   
-      DrawClosure(hNJet,hNJetPred,hNJetPred110,hNJetPred09,'N(JETS)',Path+'njets.png')
-      DrawClosure(hNJet,hNJetPred,hNJetPred110,hNJetPred09,'N(JETS)',Path+'njets.pdf')
-      DrawClosure(hNJet,hNJetPred,hNJetPred110,hNJetPred09,'N(JETS)',Path+'njets.root')
+      DrawClosure(hNJet,hNJetPred,hNJetPred110,'n_{jet}',Path+'njets.png')
+      DrawClosure(hNJet,hNJetPred,hNJetPred110,'n_{jet}',Path+'njets.pdf')
+      DrawClosure(hNJet,hNJetPred,hNJetPred110,'n_{jet}',Path+'njets.root')
   
       hNBtag = ROOT.TH1F('hNBtag', 'hNBtag',10,0,10)
       c.Draw('nBJetMedium40>>hNBtag','weight*('+genSel+')','goff')
@@ -319,13 +313,26 @@ for htCut in [400]:
       cPred.Draw('nbtagsPred>>hNBtagPred','weightPred*scaleLEff*('+str(scaleF)+')*('+predSel+')','goff')
       hNBtagPred110 = ROOT.TH1F('hNBtagPred110', 'hNBtagPred110',10,0,10)
       cPred.Draw('nbtagsPred>>hNBtagPred110','weightPred*scaleLEffUp*('+str(scaleF)+')*('+predSel+')','goff')
-      hNBtagPred09 = ROOT.TH1F('hNBtagPred09', 'hNBtagPred09',10,0,10)
-      cPred.Draw('nbtagsPred>>hNBtagPred09','weightPred*scaleLEffDown*('+str(scaleF)+')*('+predSel+')','goff')
+      #hNBtagPred09 = ROOT.TH1F('hNBtagPred09', 'hNBtagPred09',10,0,10)
+      #cPred.Draw('nbtagsPred>>hNBtagPred09','weightPred*scaleLEffDown*('+str(scaleF)+')*('+predSel+')','goff')
   
-      DrawClosure(hNBtag,hNBtagPred,hNBtagPred110,hNBtagPred09,'N(Btags)',Path+'nbtags.png')
-      DrawClosure(hNBtag,hNBtagPred,hNBtagPred110,hNBtagPred09,'N(Btags)',Path+'nbtags.pdf')
-      DrawClosure(hNBtag,hNBtagPred,hNBtagPred110,hNBtagPred09,'N(Btags)',Path+'nbtags.root')
+      DrawClosure(hNBtag,hNBtagPred,hNBtagPred110,'n_{b-tag}',Path+'nbtags.png')
+      DrawClosure(hNBtag,hNBtagPred,hNBtagPred110,'n_{b-tag}',Path+'nbtags.pdf')
+      DrawClosure(hNBtag,hNBtagPred,hNBtagPred110,'n_{b-tag}',Path+'nbtags.root')
+ 
+      hNBtag = ROOT.TH1F('hNBtag', 'hNBtag',10,0,10)
+      c.Draw('nBJetMedium40>>hNBtag','weight*('+genSel+')','goff')
   
+      hNBtagPred = ROOT.TH1F('hNBtagPred', 'hNBtagPred',10,0,10)
+      cPred.Draw('nbtagsPred>>hNBtagPred','weightPredOld*scaleLEff*('+str(scaleF)+')*('+predSel+')','goff')
+      hNBtagPred110 = ROOT.TH1F('hNBtagPred110', 'hNBtagPred110',10,0,10)
+      cPred.Draw('nbtagsPred>>hNBtagPred110','weightPredOld*scaleLEffUp*('+str(scaleF)+')*('+predSel+')','goff')
+      #hNBtagPred09 = ROOT.TH1F('hNBtagPred09', 'hNBtagPred09',10,0,10)
+      #cPred.Draw('nbtagsPred>>hNBtagPred09','weightPredOld*scaleLEffDown*('+str(scaleF)+')*('+predSel+')','goff')
+  
+      DrawClosure(hNBtag,hNBtagPred,hNBtagPred110,'n_{b-tag}',Path+'nbtags_old.png')
+      DrawClosure(hNBtag,hNBtagPred,hNBtagPred110,'n_{b-tag}',Path+'nbtags_old.pdf')
+      DrawClosure(hNBtag,hNBtagPred,hNBtagPred110,'n_{b-tag}',Path+'nbtags_old.root')
 
 
       print 'DELTA PHI >1: '
@@ -349,3 +356,4 @@ for htCut in [400]:
       print 'Hadronic Tau ($ \\triangle\phi<$',1,'  ) &Prediction & Truth  \\\ \hline'
       print 'ht$>$',htCut ,'and st$>$',stCut,'  and njet$=$',minNJetCut,'or',maxNJetCut-1,'  and nbtags$==$',nbtagsCut,'& $',format(predYieldS, '.2f'),'\pm',format(ePredS, '.2f'),'(Stat)\pm',format(abs(hDeltaPhiPred110.Integral(0,hDeltaPhiPred110.FindBin(1))-predYieldS),'.2f'),'(\%10Leff)$ & $',format(truthYieldS,'.2f'),'\pm',format(eTruthS,'.2f'),'(Stat)$ \\\ \hline '
       print '\end{tabular}\end{center}\end{document}'
+
