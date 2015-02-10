@@ -158,7 +158,8 @@ def loopAndFill(stacks):
           if not (p.cut.has_key('func') and p.cut['func']):
             p.cut['func']=None
           if p.TTreeFormula:
-            fString='ROOT.TTreeFormula('+p['name']+','+p.var+',c)'
+            assert p.TTreeFormula and not (p.TTreeFormula==""), "Problem in TTreeFormula %s" % p.TTreeFormula
+            fString='ROOT.TTreeFormula("'+p.name+'","'+p.TTreeFormula+'",c)'
             exec('p.ttreeFormula='+fString)
             print "Created TTreeFormula:",fString
         for i in range(0,number_events):
@@ -166,6 +167,7 @@ def loopAndFill(stacks):
             print i
           c.GetEntry(elist.GetEntry(i))
           for p in plotsToFill:
+#            print p.cut['func'],  p.cut['func'](c)
             if (not p.cut['func']) or p.cut['func'](c):
               weight = c.GetLeaf(p.weight['string']).GetValue()#getVarValue(c, p.weight['string'])
               if p.leaf:
@@ -226,7 +228,7 @@ def drawStack(stk, maskedArea=None):
   except:
     autoAdjustY = False
   if autoAdjustY and  stk.options.has_key('logY') and stk.options['logY']:
-    print "maskedArea",maskedArea
+#    print "maskedArea",maskedArea
     ymin = stk.options['yRange'][0]
     logYMaxGlobal = log(ymin,10)
     for s in stk.stackLists:

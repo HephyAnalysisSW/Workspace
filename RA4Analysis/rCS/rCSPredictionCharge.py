@@ -66,6 +66,7 @@ njreg = [(5,5),(6,-1)]
 
 #presel   ="singleMuonic&&nVetoMuons==1&&nVetoElectrons==0"
 #presel_0b="singleMuonic&&nVetoMuons==1&&nVetoElectrons==0&&nBJetMedium25==0"
+#presel    ="singleMuonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0"
 presel    ="singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0"
 
 def nJetBinName(njb):
@@ -344,35 +345,7 @@ for i_htb, htb in enumerate(htreg):
            +' & '+getNumString(res[htb][stb][srNJet]['tot_pred'], res[htb][stb][srNJet]['tot_pred_err'])\
            +' & '+getNumString(res[htb][stb][srNJet]['tot_truth'], res[htb][stb][srNJet]['tot_truth_err']) +'\\\\'
 print
-############################################################
-#nice table for AN
-print 'Results tt,W,total'
-print '$H_{T}$&$n_{jet}$&$S^{lep}_{T}$& \multicolumn{6}{c|}{$t\overline{t}$}&\multicolumn{6}{c|}{$W$}&\multicolumn{6}{c|}{total bkg.}\\\hline'
-print '$[GeV]$& &$[GeV]$&\multicolumn{3}{c|}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c|}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c|}{prediction}&\multicolumn{3}{c|}{simulation}\\\hline'
-print '\hline'
-for i_htb, htb in enumerate(htreg):
-  if i_htb!=0:print '\\hline'
-  for srNJet in njreg:
-    for stb, dPhiCut in streg:
-        print 'htb:',htb,'njet:',srNJet,'stb:',stb,'||'\
-           +' & '+getNumString(res[htb][stb][srNJet]['TT_pred'], res[htb][stb][srNJet]['TT_pred_err'])\
-           +' & '+getNumString(res[htb][stb][srNJet]['TT_truth'], res[htb][stb][srNJet]['TT_truth_err'])\
-           +' & '+getNumString(res[htb][stb][srNJet]['W_pred'], res[htb][stb][srNJet]['W_pred_err'])\
-           +' & '+getNumString(res[htb][stb][srNJet]['W_truth'], res[htb][stb][srNJet]['W_truth_err'])\
-           +' & '+getNumString(res[htb][stb][srNJet]['tot_pred'], res[htb][stb][srNJet]['tot_pred_err'])\
-           +' & '+getNumString(res[htb][stb][srNJet]['tot_truth'], res[htb][stb][srNJet]['tot_truth_err']) +'\\\\'
-print
 
-#\multirow{4}{*}{\begin{sideways}$[500,750]$\end{sideways}}&\multirow{2}{*}{5}&[250,350]&11.94&$\pm$&0.38 & 12.87&$\pm$&1.29 & 5.92&$\pm$&0.48 & 5.25&$\pm$&0.66 & 19.04&$\pm$&0.68 & 19.29&$\pm$&1.48\\\cline{3-21}
-#                                                                              & &$>350$& 4.43&$\pm$&0.28 &  3.64&$\pm$&0.69 & 1.26&$\pm$&0.13 & 1.71&$\pm$&0.28 &  6.09&$\pm$&0.35 &  5.74&$\pm$&0.76\\\cline{2-21}
-#                                                    &\multirow{2}{*}{$\geq6$}&[250,350]& 8.41&$\pm$&0.29 &  8.45&$\pm$&1.05 & 2.01&$\pm$&0.26 & 2.02&$\pm$&0.31 & 11.35&$\pm$&0.46 & 11.39&$\pm$&1.12\\\cline{3-21}
-#                                                                              & &$>350$& 2.08&$\pm$&0.16 &  1.43&$\pm$&0.43 & 0.33&$\pm$&0.06 & 0.55&$\pm$&0.17 &  2.78&$\pm$&0.19 &  2.35&$\pm$&0.47\\\hline
-#\hline
-#\multirow{4}{*}{\begin{sideways}$> 750$\end{sideways}}&\multirow{2}{*}{$5$}&[250,350]&5.14&$\pm$&0.29 & 6.11&$\pm$&0.89 & 6.05&$\pm$&0.57 & 4.18&$\pm$&0.38 & 11.92&$\pm$&0.65 & 11.02&$\pm$&0.97\\\cline{3-21}
-#                                                                            & &$>350$&2.33&$\pm$&0.18 & 3.25&$\pm$&0.65 & 2.22&$\pm$&0.24 & 1.59&$\pm$&0.24 &  5.39&$\pm$&0.4 &   5.68&$\pm$&0.74\\\cline{2-21}
-#                                                  &\multirow{2}{*}{$\geq6$}&[250,350]&7.77&$\pm$&0.35 & 6.5 &$\pm$&0.92 & 4.29&$\pm$&0.51 & 3.61&$\pm$&0.36 & 12.88&$\pm$&0.64 & 10.93&$\pm$&1.0\\\cline{3-21}
-#                                                                            & &$>350$&2.94&$\pm$&0.2 &  2.08&$\pm$&0.52 & 1.32&$\pm$&0.17 & 1.2 &$\pm$&0.21 &  5.41&$\pm$&0.43 &  4.43&$\pm$&0.65\\\cline{2-21}
-############################################################
 for i_htb, htb in enumerate(htreg):
   if i_htb!=0:print '\\hline'
   print '& & \multicolumn{6}{c|}{$W+$ Jets}&\multicolumn{6}{c|}{$W-$ Jets}&\multicolumn{6}{c}{$W$ Jets}\\\\'
