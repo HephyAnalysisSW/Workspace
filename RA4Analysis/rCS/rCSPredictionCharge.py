@@ -61,6 +61,7 @@ njreg = [(5,5),(6,-1)]
 #presel   ="singleMuonic&&nVetoMuons==1&&nVetoElectrons==0"
 #presel_0b="singleMuonic&&nVetoMuons==1&&nVetoElectrons==0&&nBJetMedium25==0"
 presel    ="singleMuonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0"
+presel    ="singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0"
 
 def nJetBinName(njb):
   if njb[0]==njb[1]:
