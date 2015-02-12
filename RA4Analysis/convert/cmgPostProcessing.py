@@ -13,6 +13,9 @@ from Workspace.HEPHYPythonTools.helpers import getChunksFromNFS, getChunksFromDP
 from Workspace.RA4Analysis.cmgTuples_v5_Phys14 import *
 target_lumi = 4000 #pb-1
 
+from  Workspace.RA4Analysis import mt2w
+
+
 from localInfo import username
 
 ROOT.gSystem.Load("libFWCoreFWLite.so")
@@ -99,12 +102,12 @@ for isample, sample in enumerate(allSamples):
   os.system('rm -rf '+tmpDir+'/*')
 
   lumiWeight = xsec[sample['dbsName']]*target_lumi/float(nTotEvents)
-  readVariables = ['met_pt/D']
+  readVariables = ['met_pt/D', 'met_phi/D']
 
   newVariables = ['weight/F']
   newVariables += ['nLooseSoftLeptons/I', 'nLooseSoftPt10Leptons/I', 'nLooseHardLeptons/I', 'nTightSoftLeptons/I', 'nTightHardLeptons/I']
   if options.leptonSelection.lower()!='none':
-    newVariables.extend( ['st/F', 'leptonPt/F', 'leptonEta/F', 'leptonPhi/F', 'leptonPdg/I/0', 'leptonInd/I/-1', 'leptonMass/F', 'singleMuonic/I', 'singleElectronic/I', 'singleLeptonic/I'] )
+    newVariables.extend( ['st/F', 'leptonPt/F', 'leptonEta/F', 'leptonPhi/F', 'leptonPdg/I/0', 'leptonInd/I/-1', 'leptonMass/F', 'singleMuonic/I', 'singleElectronic/I', 'singleLeptonic/I', 'mt2w/F'] )
   newVars = [readVar(v, allowRenaming=False, isWritten = True, isRead=False) for v in newVariables]
 
   aliases = [ "met:met_pt", "metPhi:met_phi","genMet:met_genPt", "genMetPhi:met_genPhi"]
@@ -219,6 +222,10 @@ for isample, sample in enumerate(allSamples):
           s.singleMuonic      = False 
           s.singleElectronic  = False 
 #      print "Selected",s.leptonPt
+      if options.leptonSelection!='':
+        s.mt2w = mt2w.mt2w(met = {'pt':s.met_pt, 'phi':s.met_phi}, l={'pt':s.leptonPt, 'phi':s.leptonPhi, 'eta':s.leptonEta}, ljets=lightJets, bjets=bJets)
+        print s.mt2w
+#          print "Warning -> Why can't I compute mt2w?", s.mt2w, len(jets), len(bJets), len(allTightLeptons),lightJets,bJets, {'pt':s.type1phiMet, 'phi':s.type1phiMetphi}, {'pt':s.leptonPt, 'phi':s.leptonPhi, 'eta':s.leptonEta}
       for v in newVars:
         v['branch'].Fill()
     newFileName = sample['name']+'_'+chunk['name']+'.root'

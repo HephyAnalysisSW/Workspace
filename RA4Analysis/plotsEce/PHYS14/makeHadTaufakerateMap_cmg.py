@@ -2,7 +2,7 @@ import ROOT
 from Workspace.RA4Analysis.makeCompPlotDilep import DrawClosure
 from Workspace.RA4Analysis.makeNicePlot import DrawNicePlot
 from Workspace.RA4Analysis.objectSelection import getGoodJetsStage2,gTauAbsEtaBins, gTauPtBins, metParRatioBins, jetRatioBins
-from Workspace.RA4Analysis.cmgObjectSelection import getGood_cmg_JetsStage2, get_cmg_index_and_DR
+from Workspace.RA4Analysis.cmgObjectSelection import get_cmg_jets, get_cmg_index_and_DR
 from Workspace.HEPHYPythonTools.helpers import findClosestObject, deltaR, deltaR2,getVarValue, getObjFromFile
 from Workspace.RA4Analysis.objectSelection import getGenLepsWithMatchInfo,getGenLeps, getMuons, getLooseMuStage2, getGenLep
 from Workspace.RA4Analysis.stage2Tuples import *
@@ -62,7 +62,7 @@ for i in range(number_events):
   c.GetEntry(eList.GetEntry(i))
 
   #jets = getGoodJetsStage2(c)
-  jets = getGood_cmg_JetsStage2(c)
+  jets = get_cmg_jets(c)
   ngTaus = c.GetLeaf('ngenTau').GetValue()
   for p in range(int(ngTaus)):
       gTauPdg = c.GetLeaf('genTau_pdgId').GetValue(p)

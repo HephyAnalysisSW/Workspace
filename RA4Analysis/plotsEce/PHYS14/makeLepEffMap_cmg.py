@@ -1,7 +1,7 @@
 import ROOT
 from Workspace.RA4Analysis.makeCompPlotDilep import DrawClosure
 from Workspace.RA4Analysis.makeNicePlot import DrawNicePlot
-from Workspace.RA4Analysis.cmgObjectSelection import getGood_cmg_JetsStage2, get_cmg_index_and_DR, get_cmg_genLeps, get_cmg_recoMuons
+from Workspace.RA4Analysis.cmgObjectSelection import get_cmg_jets, get_cmg_index_and_DR, get_cmg_genLeps, get_cmg_recoMuons
 from Workspace.RA4Analysis.objectSelection import getGoodJetsStage2,gTauAbsEtaBins, gTauPtBins, metParRatioBins, jetRatioBins
 from Workspace.HEPHYPythonTools.helpers import findClosestObject, deltaR,getVarValue, getObjFromFile
 from Workspace.RA4Analysis.objectSelection import getGenLepsWithMatchInfo,getGenLeps, getMuons, getLooseMuStage2, getGenLep
@@ -63,7 +63,7 @@ for i in range(number_events):
     print i,"/",number_events
   c.GetEntry(eList.GetEntry(i))
 
-  #jets = getGood_cmg_JetsStage2(c)
+  #jets = get_cmg_jets(c)
   genLeps = get_cmg_genLeps(c)
   recoMuons = get_cmg_recoMuons(c)   
   #print "reco muons" , recoMuons
