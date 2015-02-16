@@ -9,7 +9,7 @@ from Workspace.HEPHYPythonTools.helpers import getObjFromFile
 #from Workspace.RA4Analysis.simplePlotsCommon import *
 from Workspace.RA4Analysis.simplePlotHelpers import plot, stack, loopAndFill, drawNMStacks
 from Workspace.RA4Analysis.helpers import *
-from Workspace.RA4Analysis.cmgTuplesPostProcessed_v5_Phys14V2 import *
+from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2 import *
 small = False
 mode = 'hard'
 
@@ -32,23 +32,23 @@ subdir = "/pngCMG2/"+mode+'/'
 
 def dPhi1(c): return cmgDPhi(c)>1.
 
-cutFunc=None
-prefix = mode+'_mu_ht500-st200-6j-2j80-0b-diLepVeto'
-presel="singleMuonic&&nLooseSoftLeptons==0&&nTightHardLeptons==1&&nLooseHardLeptons==1&&st>200"\
-      +"&&Sum$(Jet_pt>30&&abs(Jet_eta)<2.4&&Jet_id&&Jet_btagCMVA>0.732)==0"\
-      +"&&Sum$(Jet_pt>30&&abs(Jet_eta)<2.4&&Jet_id)>=6"\
-      +"&&Sum$(Jet_pt>80&&abs(Jet_eta)<2.4&&Jet_id)>=2"\
-      +"&&Sum$(Jet_pt*(Jet_pt>30&&abs(Jet_eta)<2.4&&Jet_id))>=500"\
-#      +"&&Sum$(Jet_pt*(Jet_pt>30&&abs(Jet_eta)<2.4&&Jet_id))<1000"\
-
-#cutFunc=dPhi1
-#prefix = mode+'_eleMu_ht500-750-st200-6j-2j80-0b-dPhi1-diLepVeto'
+#cutFunc=None
+#prefix = mode+'_mu_ht500-st200-6j-2j80-0b-diLepVeto'
 #presel="singleMuonic&&nLooseSoftLeptons==0&&nTightHardLeptons==1&&nLooseHardLeptons==1&&st>200"\
 #      +"&&Sum$(Jet_pt>30&&abs(Jet_eta)<2.4&&Jet_id&&Jet_btagCMVA>0.732)==0"\
 #      +"&&Sum$(Jet_pt>30&&abs(Jet_eta)<2.4&&Jet_id)>=6"\
 #      +"&&Sum$(Jet_pt>80&&abs(Jet_eta)<2.4&&Jet_id)>=2"\
-#      +"&&Sum$(Jet_pt*(Jet_pt>30&&abs(Jet_eta)<2.4&&Jet_id))>=1000"\
-##      +"&&Sum$(Jet_pt*(Jet_pt>30&&abs(Jet_eta)<2.4&&Jet_id))<750"\
+#      +"&&Sum$(Jet_pt*(Jet_pt>30&&abs(Jet_eta)<2.4&&Jet_id))>=500"\
+##      +"&&Sum$(Jet_pt*(Jet_pt>30&&abs(Jet_eta)<2.4&&Jet_id))<1000"\
+
+cutFunc=dPhi1
+prefix = mode+'_mu_ht750-st200-6j-2j80-2b-dPhi1-diLepVeto'
+presel="singleMuonic&&nLooseSoftLeptons==0&&nTightHardLeptons==1&&nLooseHardLeptons==1&&st>200"\
+      +"&&Sum$(Jet_pt>30&&abs(Jet_eta)<2.4&&Jet_id&&Jet_btagCMVA>0.732)>=2"\
+      +"&&Sum$(Jet_pt>30&&abs(Jet_eta)<2.4&&Jet_id)>=6"\
+      +"&&Sum$(Jet_pt>80&&abs(Jet_eta)<2.4&&Jet_id)>=2"\
+      +"&&Sum$(Jet_pt*(Jet_pt>30&&abs(Jet_eta)<2.4&&Jet_id))>=750"\
+#      +"&&Sum$(Jet_pt*(Jet_pt>30&&abs(Jet_eta)<2.4&&Jet_id))<750"\
 
 #cutFunc=dPhi1
 #prefix = mode+'_eleMu_ht1000-st200-6j-2j80-0b-dPhi1-diLepVeto'
@@ -73,18 +73,16 @@ cutString=presel
 signalPrefix="" if signalScale==1 else str(signalScale)+"x "
 #  #HARD
 if mode=='hard':
-  SMS_T5qqqqWW_Gl1200_Chi1000_LSP800['hard']['style'] \
-      = {'legendText':"T5q^{4} (1.2/1/0.8)",   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kRed, 'markerStyle':None, 'markerSize':None}
-  SMS_T5qqqqWW_Gl1500_Chi800_LSP100['hard']['style']  \
-      = {'legendText':"T5q^{4} (1.5/0.8/0.1)",   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kBlack, 'markerStyle':None, 'markerSize':None}
-  #  T1tttt_2J_mGo1300_mStop300_mCh285_mChi280['style']  = {'legendText':signalPrefix+T1tttt_2J_mGo1300_mStop300_mCh285_mChi280['name'],   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kGreen, 'markerStyle':None, 'markerSize':None}
-  #  signals = [SMS_T5qqqqWW_Gl1200_Chi1000_LSP800['hard'], SMS_T5qqqqWW_Gl1500_Chi800_LSP100['hard'], T1tttt_2J_mGo1300_mStop300_mCh285_mChi280]
-  signals = [SMS_T5qqqqWW_Gl1200_Chi1000_LSP800['hard'], SMS_T5qqqqWW_Gl1500_Chi800_LSP100['hard']]
-#  hard_T6qqWW_Sq_950_LSP_300_Chi_350['style'] = {'legendText':signalPrefix+hard_T6qqWW_Sq_950_LSP_300_Chi_350['name'],   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kBlue, 'markerStyle':None, 'markerSize':None}
-#  hard_T5qqqqWW_Gl_1400_LSP_300_Chi_315['style']  = {'legendText':signalPrefix+hard_T5qqqqWW_Gl_1400_LSP_300_Chi_315['name'],   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kBlack, 'markerStyle':None, 'markerSize':None}
-#  hard_T1tttt_2J_mGo1300_mStop300_mCh285_mChi280['style']  = {'legendText':signalPrefix+hard_T1tttt_2J_mGo1300_mStop300_mCh285_mChi280['name'],   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kGreen, 'markerStyle':None, 'markerSize':None}
-#  signals = [hard_T6qqWW_Sq_950_LSP_300_Chi_350, hard_T5qqqqWW_Gl_1400_LSP_300_Chi_315, hard_T1tttt_2J_mGo1300_mStop300_mCh285_mChi280]
-
+#  SMS_T5qqqqWW_Gl1200_Chi1000_LSP800[mode]['style'] \
+#      = {'legendText':"T5q^{4} (1.2/1/0.8)",   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kRed, 'markerStyle':None, 'markerSize':None}
+#  SMS_T5qqqqWW_Gl1500_Chi800_LSP100[mode]['style']  \
+#      = {'legendText':"T5q^{4} (1.5/0.8/0.1)",   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kBlack, 'markerStyle':None, 'markerSize':None}
+#  signals = [ SMS_T5qqqqWW_Gl1200_Chi1000_LSP800[mode], SMS_T5qqqqWW_Gl1500_Chi800_LSP100[mode]]
+  SMS_T1tttt_2J_mGl1200_mLSP800[mode]['style'] \
+      = {'legendText':"T1t^{4} (1.2/1)",   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kRed, 'markerStyle':None, 'markerSize':None}
+  SMS_T1tttt_2J_mGl1500_mLSP100[mode]['style']  \
+      = {'legendText':"T1t^{4} (1.5/0.1)",   'style':"l", 'lineThickness':2, 'errorBars':False, 'color':ROOT.kBlack, 'markerStyle':None, 'markerSize':None}
+  signals = [SMS_T1tttt_2J_mGl1200_mLSP800[mode], SMS_T1tttt_2J_mGl1500_mLSP100[mode]]
 for s in signals:
   s['scale'] = signalScale
 #ratioOps = {'yLabel':'A/B', 'numIndex':0, 'denIndex':1 ,'yRange':None, 'logY':False, 'color':ROOT.kBlack, 'yRange':(0.5,1.5)}
@@ -218,6 +216,12 @@ mT_stack  = getStack(
     binning={'binning':binningMTCoarse, 'isExplicit':True},
     cut={'string':cutString,'func':cutFunc})
 allStacks.append(mT_stack)
+mt2w_stack  = getStack(
+    labels={'x':'m_{T2}^{W} (GeV)','y':'Number of Events / 10 GeV'},
+    var={'name':'mt2w','leaf':'mt2w', 'overFlow':'upper'},
+    binning={'binning':[50,0,500], 'isExplicit':False},
+    cut={'string':cutString,'func':cutFunc})
+allStacks.append(mt2w_stack)
 mT_stack_zoomed  = getStack(
     labels={'x':'m_{T} (GeV)','y':'Number of Events / 10 GeV'},
     var={'name':'mTzoomed','func':cmgMT, 'branches':cmgMT('branches'), 'overFlow':'upper'},

@@ -26,11 +26,23 @@ def splitIndList(var, l, val):
       resLow.append(x)
   return resLow, resHigh
 
+def splitListOfObjects(var, val, s):
+  resLow = []
+  resHigh = []
+  for x in s:
+    if x[var]<val:
+      resLow.append(x)
+    else:
+      resHigh.append(x)
+  return resLow, resHigh
+
 def getObjDict(c, prefix, variables, i):
  return {var: c.GetLeaf(prefix+'_'+var).GetValue(i) for var in variables}
 
 def get_cmg_jets(c):
   return [getObjDict(c, 'Jet', ['eta','pt','phi','btagCMVA', 'partonId', 'id'], i) for i in range(getVarValue(c, 'nJet'))]
+def get_cmg_jets_fromStruct(r):
+  return [{p:getattr(r, 'Jet'+'_'+p)[i] for p in ['eta','pt','phi','btagCMVA', 'partonId', 'id']} for i in range(r.nJet)]
 
 def get_cmg_index_and_DR(objs,leptonPhi,leptonEta):
   obj = findClosestObject(objs,{'phi':leptonPhi, 'eta':leptonEta})

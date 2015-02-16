@@ -1,13 +1,12 @@
 import ROOT
 import sys, os, copy, random, subprocess, datetime
 from array import array
-from Workspace.RA4Analysis.cmgObjectSelection import cmgLooseLepIndices, splitIndList
-
+from Workspace.RA4Analysis.cmgObjectSelection import cmgLooseLepIndices, splitIndList, get_cmg_jets_fromStruct, splitListOfObjects
 from Workspace.HEPHYPythonTools.xsec import xsec
 from Workspace.HEPHYPythonTools.helpers import getObjFromFile, getObjDict, getFileList
 from Workspace.RA4Analysis.convertHelpers import compileClass, readVar, printHeader, typeStr, createClassString
 
-subDir = "postProcessed_v5_Phys14V2"
+subDir = "postProcessed_v6_Phys14V2"
 #from Workspace.RA4Analysis.cmgTuples_v3 import *
 from Workspace.HEPHYPythonTools.helpers import getChunksFromNFS, getChunksFromDPM, getChunks
 from Workspace.RA4Analysis.cmgTuples_v5_Phys14 import *
@@ -114,6 +113,7 @@ for isample, sample in enumerate(allSamples):
 
   readVectors = [\
     {'prefix':'LepGood',  'nMax':8, 'vars':['pt/D', 'eta/D', 'phi/D', 'pdgId/I', 'relIso03/D', 'tightId/I', 'mass/D']},
+    {'prefix':'Jet',  'nMax':100, 'vars':['pt/D', 'eta/D', 'phi/D', 'id/I', 'btagCMVA/D', 'partonId/I']},
   ]
   readVars = [readVar(v, allowRenaming=False, isWritten=False, isRead=True) for v in readVariables]
   for v in readVectors:
@@ -223,8 +223,9 @@ for isample, sample in enumerate(allSamples):
           s.singleElectronic  = False 
 #      print "Selected",s.leptonPt
       if options.leptonSelection!='':
-        s.mt2w = mt2w.mt2w(met = {'pt':s.met_pt, 'phi':s.met_phi}, l={'pt':s.leptonPt, 'phi':s.leptonPhi, 'eta':s.leptonEta}, ljets=lightJets, bjets=bJets)
-        print s.mt2w
+        jets = filter(lambda j:j['pt']>30 and abs(j['eta'])<2.4 and j['id'], get_cmg_jets_fromStruct(r))
+        lightJets, bJets = splitListOfObjects('btagCMVA', 0.732, jets) 
+        s.mt2w = mt2w.mt2w(met = {'pt':r.met_pt, 'phi':r.met_phi}, l={'pt':s.leptonPt, 'phi':s.leptonPhi, 'eta':s.leptonEta}, ljets=lightJets, bjets=bJets)
 #          print "Warning -> Why can't I compute mt2w?", s.mt2w, len(jets), len(bJets), len(allTightLeptons),lightJets,bJets, {'pt':s.type1phiMet, 'phi':s.type1phiMetphi}, {'pt':s.leptonPt, 'phi':s.leptonPhi, 'eta':s.leptonEta}
       for v in newVars:
         v['branch'].Fill()
