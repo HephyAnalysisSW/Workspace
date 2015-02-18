@@ -15,9 +15,12 @@ from localInfo import username
 from Workspace.RA4Analysis.cmgTuplesPostProcessed_v3 import *
 
 ROOT.TH1F.SetDefaultSumw2()
-c = ROOT.TChain('Events')
+#c = ROOT.TChain('Events')
+c = ROOT.TChain('tree')
+#c.Add('/data/schoef/cmgTuples/v5_Phys14V2_fromDPM_lateProcessingTauFix/TTJets/tree_Chunk49*.root')
+c.Add('/data/schoef/cmgTuples/v5_Phys14V2_fromDPM_lateProcessingTauFix/TTJets/*.root')
 #c.Add('/data/schoef/cmgTuples/postProcessed_v5_Phys14V2/hard/TTJets/*.root')
-c.Add('/data/schoef/cmgTuples/postProcessed_v5_Phys14V2//inc/hard/TTJets/*.root')
+#c.Add('/data/schoef/cmgTuples/postProcessed_v5_Phys14V2//inc/hard/TTJets/*.root')
 #from Workspace.HEPHYPythonTools.helpers import getChain
 #c = getChain(hard_ttJetsCSA1450ns)
 
@@ -25,13 +28,13 @@ small = False
 maxN = 10000
 
 pdgId_Cut = 13
-pt_Cut = 15
-eta_Cut = 2.5
+pt_Cut = 25
+eta_Cut = 2.4
 dz_Cut = 0.5
 dxy_Cut = 0.2
 relIso_Cut = 0.3
-presel = "Sum$(abs(genPart_pdgId)==14&&abs(genPart_motherId)==24)==2&&Sum$(abs(genPart_pdgId)==12)==0" #&&Sum$(abs(genPart_pdgId)==16)==0"
-path = '/afs/hephy.at/user/e/easilar/www/hadronicTau_PHYS14_inc/lepton_Efficiency_Results/'
+presel = "Sum$(abs(genPart_pdgId)==14&&abs(genPart_motherId)==24)==2&&Sum$(abs(genPart_pdgId)==12&&abs(genPart_motherId)==24)==0" #&&Sum$(abs(genPart_pdgId)==16)==0"
+path = '/afs/hephy.at/user/e/easilar/www/hadronicTau_PHYS14_fixed_/lepton_Efficiency_Results/'
 if not os.path.exists(path):
   os.makedirs(path)
 
@@ -113,6 +116,6 @@ EffMap.SaveAs(path+'LepEff_cmg_2D.root')
 #DrawNicePlot(EffMap,'lep Eff','Eff','ptvseta',path,'LepEff_cmg_2D.pdf')
 #DrawNicePlot(EffMap,'lep Eff','Eff','ptvseta',path,'LepEff_cmg_2D.root')
 
-fname='CSA14_TTJet_LepEff_cmg_Large.pkl'
+fname='CSA14_TTJet_LepEff_PHYS14_Large.pkl'
 pickle.dump(EffMap, file(path+fname,'w'))
 print "Written",  path+fname

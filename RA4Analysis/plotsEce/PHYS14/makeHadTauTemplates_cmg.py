@@ -9,10 +9,12 @@ from Workspace.RA4Analysis.cmgTuplesPostProcessed_v3 import *
 from Workspace.RA4Analysis.helpers import *
 from Workspace.HEPHYPythonTools.helpers import getChain
 
-c = ROOT.TChain('Events')
+#c = ROOT.TChain('Events')
 #c.Add('/data/schoef/cmgTuples/postProcessed_v5_Phys14V2/hard/TTJets/*.root')
-c.Add('/data/schoef/cmgTuples/postProcessed_v5_Phys14V2//inc/hard/TTJets/*.root')
-
+#c.Add('/data/schoef/cmgTuples/postProcessed_v5_Phys14V2//inc/hard/TTJets/*.root')
+c = ROOT.TChain('tree')
+c.Add('/data/schoef/cmgTuples/v5_Phys14V2_fromDPM_lateProcessingTauFix/TTJets/*.root')
+#c.Add('/afs/cern.ch/work/e/easilar/Corrected_ttjets_2/TTJets/treeProducerSusySingleLepton/tree.root')
 #c = getChain(hard_ttJetsCSA1450ns)
 ##cmg end###
 ###old###
@@ -23,7 +25,11 @@ c.Add('/data/schoef/cmgTuples/postProcessed_v5_Phys14V2//inc/hard/TTJets/*.root'
 ###old end####
 
 ##cmg begin####
-hadTauReq = 'genTau_nNuE+genTau_nNuMu==0&&genTau_nNuTau==1'
+#hadTauReq = 'genTau_nNuE+genTau_nNuMu==0&&genTau_nNuTau==1'
+#hadTauReq = 'genTau_nNuTau==1'
+hadTauReq = "Sum$((abs(genPart_pdgId)==14||abs(genPart_pdgId)==12)&&abs(genPart_motherId)==24)==1"\
+            +"&&Sum$(abs(genPart_pdgId)==16&&abs(genPart_motherId)==24)==1"\
+            +"&&Sum$(genTau_nNuE+genTau_nNuMu==0&&genTau_nNuTau==1)==1"
 nBtagCMVA = 'Sum$(Jet_id&&Jet_pt>30&&abs(Jet_eta)<2.4&&Jet_btagCMVA>0.732)'
 #hadTauReq = 'genTau_nMuNu+genTau_nMuE+genTau_nMuTau==0'
 
@@ -42,64 +48,64 @@ def getCut(var, bin):
 ##############################################
 ###cmg begin##################################
 ##############################################
-genTau_metPar = '(cos(genTau_phi)*genTau_MEx + sin(genTau_phi)*genTau_MEy)'
-genTau_metPerp = '(cos(genTau_phi)*genTau_MEx - sin(genTau_phi)*genTau_MEy)'
+#genTau_metPar = '(cos(genTau_phi)*genTau_MEx + sin(genTau_phi)*genTau_MEy)'
+#genTau_MEperp = '(cos(genTau_phi)*genTau_MEy - sin(genTau_phi)*genTau_MEx)'
 
 ############Draw tau templates#################
-# c1 = ROOT.TCanvas()
-# templates={}
-# for etab in gTauAbsEtaBins+[(0,-1)]:
-#   etaCut, seta = getCut('abs(genTau_eta)', etab)
-#   seta=seta.replace('abs(genTau_eta)','eta') 
-#   genTauTemplatePt={}
-#   for i, b in enumerate(gTauPtBins+[(10,-1)]):
-#     if not templates.has_key(b):
-#       templates[b]={}
-#     cut,s = getCut('genTau_pt',b)
-#     cut+='&&'+etaCut
-#     s+="_"+seta
-#     print "cut:" , cut , "s:" , s
-#  
-#     genTauTemplatePt[b] = ROOT.TH1F('genTauTemplate_'+s, 'genTauTemplate_'+s,len(metParRatioBins)-1, array('d',metParRatioBins))
-#     c.Draw(genTau_metPar)
-#     c.Draw('('+genTau_metPar+'/genTau_pt)>>genTauTemplate_'+s,  cut+"&&"+hadTauReq,'goff')
-#     if genTauTemplatePt[b].Integral() > 0 : genTauTemplatePt[b].Scale(1./genTauTemplatePt[b].Integral())
-#     genTauTemplatePt[b].Draw()
-#     templates[b][etab]=genTauTemplatePt[b]
-#     c1.SetLogz()
-#     c1.Print('/afs/hephy.at/user/e/easilar/www/pngCSA14/cmg_genTauTemplate_'+s+'_PHYS14_inc.png')
-# ofile = '/data/easilar/results2014/tauTemplates/CSA14_TTJets_genTau_cmg_PHYS14_inc.pkl'
-# #    c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngCSA14/genTauTemplate_'+s+'.png')
-# #ofile = '/data/schoef/results2014/tauTemplates/CSA14_TTJets_genTau.pkl'
-# pickle.dump(templates, file(ofile,'w'))
-# print "Written", ofile 
+c1 = ROOT.TCanvas()
+templates={}
+for etab in gTauAbsEtaBins+[(0,-1)]:
+  etaCut, seta = getCut('abs(genTau_eta)', etab)
+  seta=seta.replace('abs(genTau_eta)','eta') 
+  genTauTemplatePt={}
+  for i, b in enumerate(gTauPtBins+[(10,-1)]):
+    if not templates.has_key(b):
+      templates[b]={}
+    cut,s = getCut('genTau_pt',b)
+    cut+='&&'+etaCut
+    s+="_"+seta
+    print "cut:" , cut , "s:" , s
+ 
+    genTauTemplatePt[b] = ROOT.TH1F('genTauTemplate_'+s, 'genTauTemplate_'+s,len(metParRatioBins)-1, array('d',metParRatioBins))
+    c.Draw('genTau_MEpar')
+    c.Draw('(genTau_MEpar/genTau_pt)>>genTauTemplate_'+s,  cut+"&&"+hadTauReq,'goff')
+    if genTauTemplatePt[b].Integral() > 0 : genTauTemplatePt[b].Scale(1./genTauTemplatePt[b].Integral())
+    genTauTemplatePt[b].Draw()
+    templates[b][etab]=genTauTemplatePt[b]
+    c1.SetLogz()
+    c1.Print('/afs/hephy.at/user/e/easilar/www/pngCSA14/cmg_genTauTemplate_'+s+'_PHYS14_inc_bugFixed.png')
+ofile = '/data/easilar/results2014/tauTemplates/CSA14_TTJets_genTau_PHYS14_inc_Large.pkl'
+#    c1.Print('/afs/hephy.at/user/s/schoefbeck/www/pngCSA14/genTauTemplate_'+s+'.png')
+#ofile = '/data/schoef/results2014/tauTemplates/CSA14_TTJets_genTau.pkl'
+pickle.dump(templates, file(ofile,'w'))
+print "Written", ofile 
 
 
 ##Perp vs Par ratio in bins of gTauPt
-c1 = ROOT.TCanvas()
-#c.Draw(genTau_metPerp+':'+genTau_metPar+'>>hgTauMetPerp','genTau_pt>10.&&'+hadTauReq)
-c.Draw(genTau_metPerp+':'+genTau_metPar+'>>hgTauMet2D','genTau_pt<100&&genTau_pt>75.&&genTau_eta<0.4&&nJet>=1&&'+nBtagCMVA+'>=1&&'+hadTauReq)
-hgTauMetPerp=ROOT.gDirectory.Get('hgTauMet2D')
-c1.SetLogz()
-c1.Print('/afs/hephy.at/user/e/easilar/www/pngCSA14/hgTauMetPerpvsPar.png')
-c1.Print('/afs/hephy.at/user/e/easilar/www/pngCSA14/hgTauMetPerpvsPar.root')
+### c1 = ROOT.TCanvas()
+### #c.Draw('genTau_MEperp'+':'+'genTau_MEpar'+'>>hgTauMetPerp','genTau_pt>10.&&'+hadTauReq)
+### c.Draw('genTau_MEperp'+':'+'genTau_MEpar'+'>>hgTauMet2D','genTau_pt<100&&genTau_pt>75.&&genTau_eta<0.4&&nJet>=1&&'+nBtagCMVA+'>=1&&'+hadTauReq)
+### hgTauMetPerp=ROOT.gDirectory.Get('hgTauMet2D')
+### c1.SetLogz()
+### c1.Print('/afs/hephy.at/user/e/easilar/www/pngCSA14/hgTauMetPerpvsPar.png')
+### c1.Print('/afs/hephy.at/user/e/easilar/www/pngCSA14/hgTauMetPerpvsPar.root')
 #c1.Print('/afs/hephy.at/user/e/easilar/www/pngCSA14/hgTauMetPerpvsPar.pdf')
 # c1 = ROOT.TCanvas()
-# c.Draw(genTau_metPerp+'/genTau_pt>>hgTauMetPerp(100,-.1,.1)','genTau_pt>10.&&'+hadTauReq)
+# c.Draw('genTau_MEperp'+'/genTau_pt>>hgTauMetPerp(100,-.1,.1)','genTau_pt>10.&&'+hadTauReq)
 # hgTauMetPerp=ROOT.gDirectory.Get('hgTauMetPerp')
 # c1.SetLogz()
 # c1.Print('/afs/hephy.at/user/e/easilar/www/pngCSA14/hgTauMetPerpRatio.png')
 # c1.Print('/afs/hephy.at/user/e/easilar/www/pngCSA14/hgTauMetPerpRatio.root')
 # c1.Print('/afs/hephy.at/user/e/easilar/www/pngCSA14/hgTauMetPerpRatio.pdf')
 # del hgTauMetPerp
-# c.Draw(genTau_metPar+'/genTau_pt>>hgTauMetPar(120,-.1,1.1)','genTau_pt>10.&&'+hadTauReq)
+# c.Draw('genTau_MEpar'+'/genTau_pt>>hgTauMetPar(120,-.1,1.1)','genTau_pt>10.&&'+hadTauReq)
 # hgTauMetPar=ROOT.gDirectory.Get('hgTauMetPar')
 # hgTauMetParPt={}
 # for i, b in enumerate(gTauPtBins):
 #   cut,s = getCut('genTau_pt',b)
 #   hgTauMetParPt[b] = ROOT.TH1F('hgTauMetPar_'+s, 'hgTauMetPar_'+s,120,-.1,1.1)
 #   hgTauMetParPt[b].SetLineColor(colors[i])
-#   c.Draw(genTau_metPar+'/genTau_pt>>hgTauMetPar_'+s,cut+"&&"+hadTauReq,'goff')
+#   c.Draw('genTau_MEpar'+'/genTau_pt>>hgTauMetPar_'+s,cut+"&&"+hadTauReq,'goff')
 # hgTauMetPar.Draw()
 # for b in gTauPtBins:
 #   hgTauMetParPt[b].Scale(hgTauMetParPt[gTauPtBins[0]].Integral()/hgTauMetParPt[b].Integral())
