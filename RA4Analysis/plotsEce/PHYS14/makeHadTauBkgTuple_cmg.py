@@ -4,7 +4,7 @@ from array import array
 from Workspace.RA4Analysis.objectSelection import gTauAbsEtaBins, gTauPtBins, metParRatioBins, jetRatioBins
 from Workspace.HEPHYPythonTools.helpers import getVarValue, getObjFromFile
 from Workspace.RA4Analysis.objectSelection import getLooseMuStage2, tightPOGMuID, vetoMuID
-from Workspace.RA4Analysis.cmgObjectSelection import get_cmg_recoMuons , getGood_cmg_JetsStage2
+from Workspace.RA4Analysis.cmgObjectSelection import get_cmg_recoMuons , get_cmg_jets
 from math import sqrt, cos, sin, atan2
 from Workspace.RA4Analysis.helpers import deltaPhi
 from Workspace.RA4Analysis.cmgTuplesPostProcessed_v3 import *
@@ -109,7 +109,7 @@ for i in range(number_events):
     n=v.split('/')[0]
     exec('s.'+n+'='+str(c.GetLeaf(n).GetValue()))
   muons = getTwoMuons(c)
-  jets = getGood_cmg_JetsStage2(c)
+  jets = get_cmg_jets(c)
   nbtagCMVA = 0
   njet30 = 0
   for jet in jets :

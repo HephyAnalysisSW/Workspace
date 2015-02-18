@@ -51,9 +51,6 @@
 <library   file="PFCandTupelizer.cc" name="PFCandTupelizer">
   <flags   EDM_PLUGIN="1"/>
 </library>
-<library   file="multMETCorrInfoWriter.cc" name="multMETCorrInfoWriter">
-  <flags   EDM_PLUGIN="1"/>
-</library>
 <library file="Module.cc" name="WorkspaceHEPHYCMSSWToolsLheAnalysisPlugins">
   <flags EDM_PLUGIN="1"/>
 </library>

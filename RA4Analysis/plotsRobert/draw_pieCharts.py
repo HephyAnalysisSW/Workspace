@@ -40,6 +40,7 @@ lepton = options.lepton
 print "lepton", lepton, "ST:",stb, 'htb',htb, "btb", btb
 
 htreg = [(400,500),(500,750),(750, 1000),(1000,-1)]
+#htreg = [(500,750),(750, -1)]
 njreg = [(2,2),(3,3),(4,4),(5,5),(6,-1)]
 nbtreg = [(0,0),(1,1),(2,2),(3,-1)]
 

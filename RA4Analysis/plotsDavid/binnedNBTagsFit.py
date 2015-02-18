@@ -13,11 +13,11 @@ def binnedNBTagsFit(cut, samples, nBTagVar = 'nBJetMedium25', prefix="", printDi
   cWJets = samples['W']
   cTTJets = samples['TT']
   cRest = samples['Rest']
-  template_WJets_PosPdg=getPlotFromChain(cWJets, nBTagVar, [0,1,2,3], cut+"&&leptonPdg>0", 'weight', binningIsExplicit=True,addOverFlowBin='upper')
-  template_WJets_NegPdg=getPlotFromChain(cWJets, nBTagVar, [0,1,2,3], cut+"&&leptonPdg<0", 'weight', binningIsExplicit=True,addOverFlowBin='upper')
+  template_WJets_PosPdg=getPlotFromChain(cWJets, nBTagVar, [0,1,2,3], 'leptonPdg>0&&'+cut, 'weight', binningIsExplicit=True,addOverFlowBin='upper')
+  template_WJets_NegPdg=getPlotFromChain(cWJets, nBTagVar, [0,1,2,3], 'leptonPdg<0&&'+cut, 'weight', binningIsExplicit=True,addOverFlowBin='upper')
   template_TTJets=      getPlotFromChain(cTTJets,nBTagVar, [0,1,2,3], cut,                 'weight', binningIsExplicit=True,addOverFlowBin='upper')
-  template_Rest_PosPdg= getPlotFromChain(cRest,  nBTagVar, [0,1,2,3], cut+'&&leptonPdg>0', 'weight', binningIsExplicit=True,addOverFlowBin='upper')
-  template_Rest_NegPdg= getPlotFromChain(cRest,  nBTagVar, [0,1,2,3], cut+'&&leptonPdg<0', 'weight', binningIsExplicit=True,addOverFlowBin='upper')
+  template_Rest_PosPdg= getPlotFromChain(cRest,  nBTagVar, [0,1,2,3], 'leptonPdg>0&&'+cut, 'weight', binningIsExplicit=True,addOverFlowBin='upper')
+  template_Rest_NegPdg= getPlotFromChain(cRest,  nBTagVar, [0,1,2,3], 'leptonPdg<0&&'+cut, 'weight', binningIsExplicit=True,addOverFlowBin='upper')
 
   print "Nominal yields TT:",template_TTJets.Integral(),'WJets_PosPdg',template_WJets_PosPdg.Integral(),'WJets_NegPdg',template_WJets_NegPdg.Integral()
   print "Nominal yields:",'Rest_PosPdg',template_Rest_PosPdg.Integral(),'Rest_NegPdg',template_Rest_NegPdg.Integral()
@@ -36,6 +36,8 @@ def binnedNBTagsFit(cut, samples, nBTagVar = 'nBJetMedium25', prefix="", printDi
   template_TTJets.Scale(1./template_TTJets.Integral())
   template_WJets_PosPdg.Scale(1./template_WJets_PosPdg.Integral())
   template_WJets_NegPdg.Scale(1./template_WJets_NegPdg.Integral())
+  y_Rest_PosPdg = template_Rest_PosPdg.Integral()
+  y_Rest_NegPdg = template_Rest_NegPdg.Integral()
   template_Rest_PosPdg.Scale(1./template_Rest_PosPdg.Integral())
   template_Rest_NegPdg.Scale(1./template_Rest_NegPdg.Integral())
 
@@ -57,8 +59,8 @@ def binnedNBTagsFit(cut, samples, nBTagVar = 'nBJetMedium25', prefix="", printDi
   yield_WJets_NegPdg = ROOT.RooRealVar("yield_WJets_NegPdg","yield_WJets_NegPdg",0.1,0,10**5)
 #  yield_Rest_PosPdg = ROOT.RooRealVar("yield_Rest_PosPdg","yield_Rest_PosPdg",0.1,0,10**5)
 #  yield_Rest_NegPdg = ROOT.RooRealVar("yield_Rest_NegPdg","yield_Rest_NegPdg",0.1,0,10**5)
-  yield_Rest_PosPdg = ROOT.RooRealVar("yield_Rest_PosPdg","yield_Rest_PosPdg",1,1,1)
-  yield_Rest_NegPdg = ROOT.RooRealVar("yield_Rest_NegPdg","yield_Rest_NegPdg",1,1,1)
+  yield_Rest_PosPdg = ROOT.RooRealVar("yield_Rest_PosPdg","yield_Rest_PosPdg",y_Rest_PosPdg,y_Rest_PosPdg,y_Rest_PosPdg)
+  yield_Rest_NegPdg = ROOT.RooRealVar("yield_Rest_NegPdg","yield_Rest_NegPdg",y_Rest_NegPdg,y_Rest_NegPdg,y_Rest_NegPdg)
   yield_Rest_PosPdg.setConstant()
   yield_Rest_NegPdg.setConstant()
 
@@ -132,8 +134,9 @@ def binnedNBTagsFit(cut, samples, nBTagVar = 'nBJetMedium25', prefix="", printDi
   ROOT.RooMinuit(sumNLL).hesse()
   ROOT.RooMinuit(sumNLL).minos()#optional
 
+  #myPdf->paramOn(frame,Layout(xmin,ymin,ymax))
   fitFrame_PosPdg=x.frame(rf.Bins(50),rf.Title("FitModel"))
-  model_PosPdg.paramOn(fitFrame_PosPdg)
+  model_PosPdg.paramOn(fitFrame_PosPdg,rf.Layout(0.42,0.9,0.9))
   data_PosPdg.plotOn(fitFrame_PosPdg,rf.LineColor(ROOT.kRed))
   model_PosPdg.plotOn(fitFrame_PosPdg,rf.LineStyle(ROOT.kDashed))
   model_PosPdg.plotOn(fitFrame_PosPdg,rf.Components("model_WJets_PosPdg"),rf.LineColor(ROOT.kGreen))
@@ -141,13 +144,14 @@ def binnedNBTagsFit(cut, samples, nBTagVar = 'nBJetMedium25', prefix="", printDi
   model_PosPdg.plotOn(fitFrame_PosPdg,rf.Components("model_Rest_PosPdg"),rf.LineColor(ROOT.kOrange+7))
 
   fitFrame_NegPdg=x.frame(rf.Bins(50),rf.Title("FitModel"))
-  model_NegPdg.paramOn(fitFrame_NegPdg)
+  model_NegPdg.paramOn(fitFrame_NegPdg,rf.Layout(0.42,0.9,0.9))
   data_NegPdg.plotOn(fitFrame_NegPdg,rf.LineColor(ROOT.kRed))
   model_NegPdg.plotOn(fitFrame_NegPdg,rf.LineStyle(ROOT.kDashed))
   model_NegPdg.plotOn(fitFrame_NegPdg,rf.Components("model_WJets_NegPdg"),rf.LineColor(ROOT.kGreen))
   model_NegPdg.plotOn(fitFrame_NegPdg,rf.Components("model_TTJets"),rf.LineColor(ROOT.kBlue))
   model_NegPdg.plotOn(fitFrame_NegPdg,rf.Components("model_Rest_NegPdg"),rf.LineColor(ROOT.kOrange+7))
-
+ 
+ 
   c1=ROOT.TCanvas("c1","FitModel",800,1200)
   ROOT.gROOT.SetStyle("Plain")
   c1.Divide(1,2)
@@ -155,14 +159,19 @@ def binnedNBTagsFit(cut, samples, nBTagVar = 'nBJetMedium25', prefix="", printDi
   ROOT.gROOT.SetStyle("Plain")#Removesgraybackgroundfromplots
   ROOT.gPad.SetLeftMargin(0.15)
   fitFrame_PosPdg.GetYaxis().SetTitleOffset(1.4)
+  fitFrame_PosPdg.GetXaxis().SetTitle('nBJetCMVA')
   fitFrame_PosPdg.Draw()
 
   c1.cd(2)
   ROOT.gROOT.SetStyle("Plain")#Removesgraybackgroundfromplots
   ROOT.gPad.SetLeftMargin(0.15)
   fitFrame_NegPdg.GetYaxis().SetTitleOffset(1.4)
+  fitFrame_NegPdg.GetXaxis().SetTitle('nBJetCMVA')
   fitFrame_NegPdg.Draw()
+
   c1.Print(printDir+'/'+prefix+'_nBTagFitRes.png')
+  c1.Print(printDir+'/'+prefix+'_nBTagFitRes.pdf')
+  c1.Print(printDir+'/'+prefix+'_nBTagFitRes.root')
   del c1
   del nllComponents
 

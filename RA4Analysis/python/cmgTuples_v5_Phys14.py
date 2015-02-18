@@ -1,11 +1,11 @@
 import copy, os, sys
 
-
 ttJets_PU20bx25={\
 "name" : "TTJets",
 'chunkString' : '',
 #'dir' : "/dpm/oeaw.ac.at/home/cms/store/user/schoef/phys14_TTJets/TTJets",
-'dir' : "/data/schoef/cmgTuples/v5_Phys14V2/TTJets",
+#'dir' : "/data/schoef/cmgTuples/v5_Phys14V2/TTJets",
+'dir' : "/data/schoef/cmgTuples/v5_Phys14V2_fromDPM_lateProcessingTauFix/TTJets",
 'fromDPM':True,
 'dbsName':'/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'
 }

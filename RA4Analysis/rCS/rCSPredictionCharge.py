@@ -15,10 +15,13 @@ from math import pi, sqrt
 
 lepSel = 'hard'
  
+nBTagCMVA = 'Sum$(Jet_pt>30&&abs(Jet_eta)<2.4&&Jet_id&&Jet_btagCMVA>0.732)' 
 cWJets  = getChain(WJetsHTToLNu[lepSel],histname='')
 cTTJets = getChain(ttJets[lepSel],histname='')
-cRest = getChain([QCD[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]],histname='')
-cBkg = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], QCD[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]],histname='')
+cRest = getChain([DY[lepSel], singleTop[lepSel], TTVH[lepSel]],histname='')#no QCD 
+cBkg = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]],histname='')#no QCD
+for c in [cWJets, cTTJets, cRest, cBkg]:
+  c.SetAlias('nBTagCMVA', nBTagCMVA)
 
 signals=[
           {'name':"T5qqqq_1200_1000_800", 'sample':SMS_T5qqqqWW_Gl1200_Chi1000_LSP800[lepSel]} , 
@@ -32,6 +35,9 @@ for s in signals:
 ROOT_colors = [ROOT.kBlack, ROOT.kRed-7, ROOT.kBlue-2, ROOT.kGreen+3, ROOT.kOrange+1,ROOT.kRed-3, ROOT.kAzure+6, ROOT.kCyan+3, ROOT.kOrange , ROOT.kRed-10]
 dPhiStr = "acos((leptonPt+met*cos(leptonPhi-metPhi))/sqrt(leptonPt**2+met**2+2*met*leptonPt*cos(leptonPhi-metPhi)))"
 
+#def nBTagStr(minPt=30, maxEta=2.4, minCMVATag=0.732):
+#  return "Sum$(Jet_pt>"+str(minPt)+"&&abs(Jet_eta)<"+str(maxEta)+"&&Jet_id&&Jet_btagCMVA>"+str(minCMVATag)+")"
+
 ROOT.TH1F().SetDefaultSumw2()
 def getRCS(c, cut, dPhiCut):
   h = getPlotFromChain(c, dPhiStr, [0,dPhiCut,pi], cutString=cut, binningIsExplicit=True)
@@ -43,11 +49,32 @@ def getRCS(c, cut, dPhiCut):
     return {'rCS':rcs, 'rCSE_pred':rCSE_pred, 'rCSE_sim':rCSE_sim}
   del h
 
+def getTTcorr(stb,htb,filename='hardSingleLeptonic_TTfitnjet_', dir='/afs/hephy.at/user/d/dhandl/www/pngCMG2/rCS/'):
+  binreg = nameAndCut(stb,htb,njetb=None)[0]
+  f0 = ROOT.TFile(dir+filename+binreg+'.root')
+  f1 = ROOT.TFile(dir+'hardSingleLeptonic_fullBkgFitnjet_'+binreg+'.root')
+  can0 = f0.Get('c1_n2')
+  can1 = f1.Get('c1_n2')
+  assert can0, 'Error: could not find TCanvas in '+str(f0)+str(f0.ls())
+  Profile_0b = can0.GetPrimitive('profile_rCS_njet_bTag0')
+  Profile_1b = can1.GetPrimitive('profile_rCS_njet_bTag1')
+  assert Profile_0b and Profile_1b,'Error: could not find TProfile'
+  FitPar0b = Profile_0b.GetFunction('pol0').GetParameter(0)
+  FitPar1b = Profile_1b.GetFunction('pol0').GetParameter(0)
+  FitParError0b = Profile_0b.GetFunction('pol0').GetParError(0)
+  FitParError1b = Profile_1b.GetFunction('pol0').GetParError(0)
+  assert Profile_0b.GetFunction('pol0') and Profile_1b.GetFunction('pol0'), 'Error: could not find Function'
+  k = FitPar0b/FitPar1b
+  k_E = k* sqrt(FitParError0b**2/FitPar0b**2 + FitParError1b**2/FitPar1b**2)
+  del f0
+  del f1
+  return {'k':k, 'k_Error':k_E}
+
 #streg = [[(250, 350), 1.], [(350, 450), 1.], [(450, -1), 0.5]]
 #htreg = [(400,500),(500,750),(750, 1000),(1000,-1)]
 #njreg = [(1,1), (2,2),(3,3),(4,4),(5,5),(6,-1)]
 
-prefix = 'chargeSep_singleMuonicPHYS14V2_fullBkg'
+prefix = 'chargeSep_singleLeptonic_20150213'
 streg = [[(250, 350), 1.], [(350, -1), 1.]] 
 htreg = [(500,750),(750,-1)]
 njreg = [(5,5),(6,-1)]
@@ -60,20 +87,9 @@ njreg = [(5,5),(6,-1)]
 
 #presel   ="singleMuonic&&nVetoMuons==1&&nVetoElectrons==0"
 #presel_0b="singleMuonic&&nVetoMuons==1&&nVetoElectrons==0&&nBJetMedium25==0"
-presel    ="singleMuonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0"
+#presel    ="singleMuonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0"
+presel    ="singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0"
 
-def nJetBinName(njb):
-  if njb[0]==njb[1]:
-    return "n_{jet}="+str(njb[0])
-  n=str(list(njb)[0])+"\leq n_{jet}"
-  if len(njb)>1 and njb[1]>0:
-    n+='\leq '+str(njb[1])
-  return n
-def varBinName(vb, var):
-  n=str(list(vb)[0])+"< "+var
-  if len(vb)>1 and vb[1]>0:
-    n+='< '+str(vb[1])
-  return n
 
 #crNJet = (3,4)
 crNJet = (2,3)
@@ -90,15 +106,15 @@ for i_htb, htb in enumerate(htreg):
 #      srYieldErr = sqrt(getYieldFromChain(cWJets, srCut+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight*weight"))
 
       #TT Jets yield in crNJet, no b-tag cut, low DPhi
-      fit_crName, fit_crCut = nameAndCut(stb,htb,crNJet,btb=None, presel=presel,btagVar = 'nBJetMedium25') 
-      fit_crNJet_lowDPhi = binnedNBTagsFit(fit_crCut+"&&"+dPhiStr+"<"+str(dPhiCut), samples = {'W':cWJets, 'TT':cTTJets, 'Rest':cRest}, nBTagVar = 'nBJetMedium25', prefix=fit_crName)
+      fit_crName, fit_crCut = nameAndCut(stb,htb,crNJet,btb=None, presel=presel,btagVar = 'nBTagCMVA') 
+      fit_crNJet_lowDPhi = binnedNBTagsFit(fit_crCut+"&&"+dPhiStr+"<"+str(dPhiCut), samples = {'W':cWJets, 'TT':cTTJets, 'Rest':cRest}, nBTagVar = 'nBTagCMVA' , prefix=fit_crName)
 #      fit_crNJet_lowDPhi = binnedNBTagsFit(fit_crCut+"&&"+dPhiStr+"<"+str(dPhiCut), samples = {'W':cWJets, 'TT':cTTJets}, nBTagVar = 'nBJetMedium25', prefix=fit_crName)
       rd['fit_crNJet_lowDPhi'] = fit_crNJet_lowDPhi
       
 #      print "Check: TT yield for W-correction: lowDPhi, ",fit_crNJet_lowDPhi['TT_AllPdg']['yield']*fit_crNJet_lowDPhi['TT_AllPdg']['template'].GetBinContent(1), getYieldFromChain(cTTJets, fit_crCut+"&&"+dPhiStr+"<"+str(dPhiCut)+"&&nBJetMedium25==0", weight = "weight")
 
-      rCS_cr_Name_1b, rCS_cr_Cut_1b = nameAndCut(stb,htb,crNJet,btb=(1,1), presel=presel, btagVar = 'nBJetMedium25') 
-      rCS_cr_Name_0b, rCS_cr_Cut_0b = nameAndCut(stb,htb,crNJet,btb=(0,0), presel=presel, btagVar = 'nBJetMedium25') 
+      rCS_cr_Name_1b, rCS_cr_Cut_1b = nameAndCut(stb,htb,crNJet,btb=(1,1), presel=presel, btagVar = 'nBTagCMVA') 
+      rCS_cr_Name_0b, rCS_cr_Cut_0b = nameAndCut(stb,htb,crNJet,btb=(0,0), presel=presel, btagVar = 'nBTagCMVA') 
       rCS_crNJet_1b = getRCS(cBkg, rCS_cr_Cut_1b,  dPhiCut) 
       rCS_crNJet_1b_onlyTT = getRCS(cTTJets, rCS_cr_Cut_1b,  dPhiCut) 
       rCS_crNJet_0b_onlyTT = getRCS(cTTJets, rCS_cr_Cut_0b,  dPhiCut) 
@@ -108,7 +124,7 @@ for i_htb, htb in enumerate(htreg):
       rd['rCS_crNJet_0b_onlyTT'] = rCS_crNJet_0b_onlyTT
 
       #low njet CR: crNJet, 0-btags, low DPhi
-      crName, crCut = nameAndCut(stb,htb,crNJet,btb=(0,0), presel=presel, btagVar = 'nBJetMedium25') 
+      crName, crCut = nameAndCut(stb,htb,crNJet,btb=(0,0), presel=presel, btagVar='nBTagCMVA') 
 
       yTT_crNJet_0b_lowDPhi         = fit_crNJet_lowDPhi['TT_AllPdg']['yield']*fit_crNJet_lowDPhi['TT_AllPdg']['template'].GetBinContent(1)
       yTT_Var_crNJet_0b_lowDPhi     = fit_crNJet_lowDPhi['TT_AllPdg']['yieldVar']*fit_crNJet_lowDPhi['TT_AllPdg']['template'].GetBinContent(1)**2
@@ -128,42 +144,42 @@ for i_htb, htb in enumerate(htreg):
 #      print "Subtract denominator", yTT_crNJet_0b_lowDPhi,'true', yTT_crNJet_0b_lowDPhi_truth
     
       #calculate corrected rCS for W
-      y_crNJet_0b_highDPhi = getYieldFromChain(cBkg, crCut+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight")
+      y_crNJet_0b_highDPhi     = getYieldFromChain(cBkg, crCut+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight")
       y_Var_crNJet_0b_highDPhi = getYieldFromChain(cBkg, crCut+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight*weight")
-      y_crNJet_0b_lowDPhi = getYieldFromChain(cBkg, crCut+"&&"+dPhiStr+"<"+str(dPhiCut), weight = "weight")
-      y_Var_crNJet_0b_lowDPhi = getYieldFromChain(cBkg, crCut+"&&"+dPhiStr+"<"+str(dPhiCut), weight = "weight*weight")
-      rCS_W_crNJet_0b_corr = (y_crNJet_0b_highDPhi - yTT_crNJet_0b_highDPhi)/(y_crNJet_0b_lowDPhi - yTT_crNJet_0b_lowDPhi)
+      y_crNJet_0b_lowDPhi      = getYieldFromChain(cBkg, crCut+"&&"+dPhiStr+"<"+str(dPhiCut), weight = "weight")
+      y_Var_crNJet_0b_lowDPhi  = getYieldFromChain(cBkg, crCut+"&&"+dPhiStr+"<"+str(dPhiCut), weight = "weight*weight")
+      rCS_W_crNJet_0b_corr     = (y_crNJet_0b_highDPhi - yTT_crNJet_0b_highDPhi)/(y_crNJet_0b_lowDPhi - yTT_crNJet_0b_lowDPhi)
       rCS_Var_W_crNJet_0b_corr = rCS_W_crNJet_0b_corr**2*(\
           (y_Var_crNJet_0b_highDPhi + yTT_Var_crNJet_0b_highDPhi)/(y_crNJet_0b_highDPhi - yTT_crNJet_0b_highDPhi)**2 
          +(y_Var_crNJet_0b_lowDPhi + yTT_Var_crNJet_0b_lowDPhi)/(y_crNJet_0b_lowDPhi - yTT_crNJet_0b_lowDPhi)**2
           )
-      rCS_W_crNJet_0b_notcorr = (y_crNJet_0b_highDPhi )/(y_crNJet_0b_lowDPhi )
+      rCS_W_crNJet_0b_notcorr     = (y_crNJet_0b_highDPhi )/(y_crNJet_0b_lowDPhi )
       rCS_Var_W_crNJet_0b_notcorr = rCS_W_crNJet_0b_notcorr**2*( (y_Var_crNJet_0b_highDPhi )/(y_crNJet_0b_highDPhi)**2 + (y_Var_crNJet_0b_lowDPhi)/(y_crNJet_0b_lowDPhi)**2 )
 
       #calculate corrected rCS(+-) for W(+-) [because of yTT is symmetric in charge one have to subtract 0.5*yTT]
       #PosPdg
-      y_crNJet_0b_highDPhi_PosPdg = getYieldFromChain(cBkg, crCut+"&&"+dPhiStr+">"+str(dPhiCut)+'&&leptonPdg>0', weight = "weight")
-      y_Var_crNJet_0b_highDPhi_PosPdg = getYieldFromChain(cBkg, crCut+"&&"+dPhiStr+">"+str(dPhiCut)+'&&leptonPdg>0', weight = "weight*weight")
-      y_crNJet_0b_lowDPhi_PosPdg = getYieldFromChain(cBkg, crCut+"&&"+dPhiStr+"<"+str(dPhiCut)+'&&leptonPdg>0', weight = "weight")
-      y_Var_crNJet_0b_lowDPhi_PosPdg = getYieldFromChain(cBkg, crCut+"&&"+dPhiStr+"<"+str(dPhiCut)+'&&leptonPdg>0', weight = "weight*weight")
-      rCS_W_PosPdg_crNJet_0b_corr = (y_crNJet_0b_highDPhi_PosPdg - (0.5*yTT_crNJet_0b_highDPhi))/(y_crNJet_0b_lowDPhi_PosPdg - (0.5*yTT_crNJet_0b_lowDPhi))
+      y_crNJet_0b_highDPhi_PosPdg     = getYieldFromChain(cBkg, 'leptonPdg>0&&'+crCut+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight")
+      y_Var_crNJet_0b_highDPhi_PosPdg = getYieldFromChain(cBkg, 'leptonPdg>0&&'+crCut+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight*weight")
+      y_crNJet_0b_lowDPhi_PosPdg      = getYieldFromChain(cBkg, 'leptonPdg>0&&'+crCut+"&&"+dPhiStr+"<"+str(dPhiCut), weight = "weight")
+      y_Var_crNJet_0b_lowDPhi_PosPdg  = getYieldFromChain(cBkg, 'leptonPdg>0&&'+crCut+"&&"+dPhiStr+"<"+str(dPhiCut), weight = "weight*weight")
+      rCS_W_PosPdg_crNJet_0b_corr     = (y_crNJet_0b_highDPhi_PosPdg - (0.5*yTT_crNJet_0b_highDPhi))/(y_crNJet_0b_lowDPhi_PosPdg - (0.5*yTT_crNJet_0b_lowDPhi))
       rCS_Var_W_PosPdg_crNJet_0b_corr = rCS_W_PosPdg_crNJet_0b_corr**2*(\
           (y_Var_crNJet_0b_highDPhi_PosPdg + (0.5*yTT_Var_crNJet_0b_highDPhi))/(y_crNJet_0b_highDPhi_PosPdg - (0.5*yTT_crNJet_0b_highDPhi))**2 
          +(y_Var_crNJet_0b_lowDPhi_PosPdg + (0.5*yTT_Var_crNJet_0b_lowDPhi))/(y_crNJet_0b_lowDPhi_PosPdg - (0.5*yTT_crNJet_0b_lowDPhi))**2
           )
-      rCS_W_PosPdg_crNJet_0b_notcorr = (y_crNJet_0b_highDPhi_PosPdg )/(y_crNJet_0b_lowDPhi_PosPdg )
+      rCS_W_PosPdg_crNJet_0b_notcorr     = (y_crNJet_0b_highDPhi_PosPdg )/(y_crNJet_0b_lowDPhi_PosPdg )
       rCS_Var_W_PosPdg_crNJet_0b_notcorr = rCS_W_PosPdg_crNJet_0b_notcorr**2*( (y_Var_crNJet_0b_highDPhi_PosPdg )/(y_crNJet_0b_highDPhi_PosPdg)**2 + (y_Var_crNJet_0b_lowDPhi_PosPdg)/(y_crNJet_0b_lowDPhi_PosPdg)**2 )
       #NegPdg
-      y_crNJet_0b_highDPhi_NegPdg = getYieldFromChain(cBkg, crCut+"&&"+dPhiStr+">"+str(dPhiCut)+'&&leptonPdg<0', weight = "weight")
-      y_Var_crNJet_0b_highDPhi_NegPdg = getYieldFromChain(cBkg, crCut+"&&"+dPhiStr+">"+str(dPhiCut)+'&&leptonPdg<0', weight = "weight*weight")
-      y_crNJet_0b_lowDPhi_NegPdg = getYieldFromChain(cBkg, crCut+"&&"+dPhiStr+"<"+str(dPhiCut)+'&&leptonPdg<0', weight = "weight")
-      y_Var_crNJet_0b_lowDPhi_NegPdg = getYieldFromChain(cBkg, crCut+"&&"+dPhiStr+"<"+str(dPhiCut)+'&&leptonPdg<0', weight = "weight*weight")
-      rCS_W_NegPdg_crNJet_0b_corr = (y_crNJet_0b_highDPhi_NegPdg - (0.5*yTT_crNJet_0b_highDPhi))/(y_crNJet_0b_lowDPhi_NegPdg - (0.5*yTT_crNJet_0b_lowDPhi))
+      y_crNJet_0b_highDPhi_NegPdg     = getYieldFromChain(cBkg, 'leptonPdg<0&&'+crCut+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight")
+      y_Var_crNJet_0b_highDPhi_NegPdg = getYieldFromChain(cBkg, 'leptonPdg<0&&'+crCut+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight*weight")
+      y_crNJet_0b_lowDPhi_NegPdg      = getYieldFromChain(cBkg, 'leptonPdg<0&&'+crCut+"&&"+dPhiStr+"<"+str(dPhiCut), weight = "weight")
+      y_Var_crNJet_0b_lowDPhi_NegPdg  = getYieldFromChain(cBkg, 'leptonPdg<0&&'+crCut+"&&"+dPhiStr+"<"+str(dPhiCut), weight = "weight*weight")
+      rCS_W_NegPdg_crNJet_0b_corr     = (y_crNJet_0b_highDPhi_NegPdg - (0.5*yTT_crNJet_0b_highDPhi))/(y_crNJet_0b_lowDPhi_NegPdg - (0.5*yTT_crNJet_0b_lowDPhi))
       rCS_Var_W_NegPdg_crNJet_0b_corr = rCS_W_NegPdg_crNJet_0b_corr**2*(\
           (y_Var_crNJet_0b_highDPhi_NegPdg + (0.5*yTT_Var_crNJet_0b_highDPhi))/(y_crNJet_0b_highDPhi_NegPdg - (0.5*yTT_crNJet_0b_highDPhi))**2
          +(y_Var_crNJet_0b_lowDPhi_NegPdg + (0.5*yTT_Var_crNJet_0b_lowDPhi))/(y_crNJet_0b_lowDPhi_NegPdg - (0.5*yTT_crNJet_0b_lowDPhi))**2
           )
-      rCS_W_NegPdg_crNJet_0b_notcorr = (y_crNJet_0b_highDPhi_NegPdg )/(y_crNJet_0b_lowDPhi_NegPdg )
+      rCS_W_NegPdg_crNJet_0b_notcorr     = (y_crNJet_0b_highDPhi_NegPdg )/(y_crNJet_0b_lowDPhi_NegPdg )
       rCS_Var_W_NegPdg_crNJet_0b_notcorr = rCS_W_NegPdg_crNJet_0b_notcorr**2*( (y_Var_crNJet_0b_highDPhi_NegPdg )/(y_crNJet_0b_highDPhi_NegPdg)**2 + (y_Var_crNJet_0b_lowDPhi_NegPdg)/(y_crNJet_0b_lowDPhi_NegPdg)**2 )
 
       rd['y_crNJet_0b_highDPhi']       = y_crNJet_0b_highDPhi
@@ -184,7 +200,7 @@ for i_htb, htb in enumerate(htreg):
       rd['rCS_Var_W_PosPdg_crNJet_0b_corr']   = rCS_Var_W_PosPdg_crNJet_0b_corr
       rd['rCS_W_PosPdg_crNJet_0b_notcorr']       = rCS_W_PosPdg_crNJet_0b_notcorr
       rd['rCS_Var_W_PosPdg_crNJet_0b_notcorr']   = rCS_Var_W_PosPdg_crNJet_0b_notcorr
-      rd['rCS_W_PosPdg_crNJet_0b_truth']  = getRCS(cWJets, crCut+'&&leptonPdg>0', dPhiCut)
+      rd['rCS_W_PosPdg_crNJet_0b_truth']  = getRCS(cWJets, 'leptonPdg>0&&'+crCut, dPhiCut)
       #NegPdg
       rd['y_crNJet_0b_highDPhi_NegPdg']       = y_crNJet_0b_highDPhi_NegPdg
       rd['y_Var_crNJet_0b_highDPhi_NegPdg']   = y_Var_crNJet_0b_highDPhi_NegPdg
@@ -194,13 +210,13 @@ for i_htb, htb in enumerate(htreg):
       rd['rCS_Var_W_NegPdg_crNJet_0b_corr']   = rCS_Var_W_NegPdg_crNJet_0b_corr
       rd['rCS_W_NegPdg_crNJet_0b_notcorr']       = rCS_W_NegPdg_crNJet_0b_notcorr
       rd['rCS_Var_W_NegPdg_crNJet_0b_notcorr']   = rCS_Var_W_NegPdg_crNJet_0b_notcorr
-      rd['rCS_W_NegPdg_crNJet_0b_truth']  = getRCS(cWJets, crCut+'&&leptonPdg<0', dPhiCut)
+      rd['rCS_W_NegPdg_crNJet_0b_truth']  = getRCS(cWJets, 'leptonPdg<0&&'+crCut, dPhiCut)
 
 #      print "Check RCS for W (corrected for TT):",rCS_W_crNJet_0b_corr,"true",getRCS(cWJets, crCut,  dPhiCut)['rCS'],'uncorrected',getRCS(cBkg, crCut,  dPhiCut)['rCS']
 
       #TT Jets yield in srNJet, no b-tag cut, low DPhi
-      fit_srName, fit_srCut = nameAndCut(stb,htb,srNJet,btb=None, presel=presel,btagVar = 'nBJetMedium25') 
-      fit_srNJet_lowDPhi = binnedNBTagsFit(fit_srCut+"&&"+dPhiStr+"<"+str(dPhiCut), samples = {'W':cWJets, 'TT':cTTJets, 'Rest':cRest}, nBTagVar = 'nBJetMedium25', prefix=fit_srName)
+      fit_srName, fit_srCut = nameAndCut(stb,htb,srNJet,btb=None, presel=presel,btagVar = 'nBTagCMVA') 
+      fit_srNJet_lowDPhi = binnedNBTagsFit(fit_srCut+"&&"+dPhiStr+"<"+str(dPhiCut), samples = {'W':cWJets, 'TT':cTTJets, 'Rest':cRest}, nBTagVar = 'nBTagCMVA', prefix=fit_srName)
 #      fit_srNJet_lowDPhi = binnedNBTagsFit(fit_srCut+"&&"+dPhiStr+"<"+str(dPhiCut), samples = {'W':cWJets, 'TT':cTTJets}, nBTagVar = 'nBJetMedium25', prefix=fit_srName)
 
       rd['fit_srNJet_lowDPhi'] = fit_srNJet_lowDPhi
@@ -219,17 +235,17 @@ for i_htb, htb in enumerate(htreg):
       yW_PosPdg_Var_srNJet_0b_lowDPhi = fit_srNJet_lowDPhi['W_PosPdg']['yieldVar']*fit_srNJet_lowDPhi['W_PosPdg']['template'].GetBinContent(1)**2
       yW_NegPdg_Var_srNJet_0b_lowDPhi = fit_srNJet_lowDPhi['W_NegPdg']['yieldVar']*fit_srNJet_lowDPhi['W_NegPdg']['template'].GetBinContent(1)**2
 
-      rCS_sr_Name_1b, rCS_sr_Cut_1b = nameAndCut(stb,htb,srNJet,btb=(1,1), presel=presel, btagVar = 'nBJetMedium25') 
-      rCS_crLowNJet_Name_1b, rCS_crLowNJet_Cut_1b = nameAndCut(stb,htb,(4,5),btb=(1,1), presel=presel, btagVar = 'nBJetMedium25') 
-      rCS_sr_Name_0b, rCS_sr_Cut_0b = nameAndCut(stb,htb,srNJet,btb=(0,0), presel=presel, btagVar = 'nBJetMedium25')#for Check 
+      rCS_sr_Name_1b, rCS_sr_Cut_1b = nameAndCut(stb,htb,srNJet,btb=(1,1), presel=presel, btagVar = 'nBTagCMVA') 
+      rCS_crLowNJet_Name_1b, rCS_crLowNJet_Cut_1b = nameAndCut(stb,htb,(4,5),btb=(1,1), presel=presel, btagVar = 'nBTagCMVA') 
+      rCS_sr_Name_0b, rCS_sr_Cut_0b = nameAndCut(stb,htb,srNJet,btb=(0,0), presel=presel, btagVar = 'nBTagCMVA')#for Check 
       rCS_srNJet_1b = getRCS(cBkg, rCS_sr_Cut_1b,  dPhiCut) 
       rCS_crLowNJet_1b = getRCS(cBkg, rCS_crLowNJet_Cut_1b,  dPhiCut) #Low njet tt-jets CR to be orthoganl to DPhi 
       rCS_srNJet_1b_onlyTT = getRCS(cTTJets, rCS_sr_Cut_1b,  dPhiCut) 
       rCS_crLowNJet_1b_onlyTT = getRCS(cTTJets, rCS_crLowNJet_Cut_1b,  dPhiCut) 
       rCS_srNJet_0b_onlyTT = getRCS(cTTJets, rCS_sr_Cut_0b,  dPhiCut) #for check
       rCS_srNJet_0b_onlyW = getRCS(cWJets, rCS_sr_Cut_0b,  dPhiCut) #for check
-      rCS_srNJet_0b_onlyW_PosPdg = getRCS(cWJets, rCS_sr_Cut_0b+'&&leptonPdg>0',  dPhiCut) #for check
-      rCS_srNJet_0b_onlyW_NegPdg = getRCS(cWJets, rCS_sr_Cut_0b+'&&leptonPdg<0',  dPhiCut) #for check
+      rCS_srNJet_0b_onlyW_PosPdg = getRCS(cWJets, 'leptonPdg>0&&'+rCS_sr_Cut_0b,  dPhiCut) #for check
+      rCS_srNJet_0b_onlyW_NegPdg = getRCS(cWJets, 'leptonPdg<0&&'+rCS_sr_Cut_0b,  dPhiCut) #for check
       rd['yTT_srNJet_0b_lowDPhi'] = yTT_srNJet_0b_lowDPhi
       rd['yTT_Var_srNJet_0b_lowDPhi'] = yTT_Var_srNJet_0b_lowDPhi
       rd['yW_srNJet_0b_lowDPhi'] = yW_srNJet_0b_lowDPhi  
@@ -257,20 +273,23 @@ for i_htb, htb in enumerate(htreg):
       truth_Rest      = getYieldFromChain(cRest,   rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight")
       truth_Rest_var  = getYieldFromChain(cRest,   rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight*weight")
 
-      truth_W_PosPdg         = getYieldFromChain(cWJets, rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut)+'&&leptonPdg>0', weight = "weight")
-      truth_W_var_PosPdg     = getYieldFromChain(cWJets, rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut)+'&&leptonPdg>0', weight = "weight*weight")
-      truth_W_NegPdg         = getYieldFromChain(cWJets, rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut)+'&&leptonPdg<0', weight = "weight")
-      truth_W_var_NegPdg     = getYieldFromChain(cWJets, rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut)+'&&leptonPdg<0', weight = "weight*weight")
-      truth_Rest_PosPdg      = getYieldFromChain(cRest,  rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut)+'&&leptonPdg>0', weight = "weight")
-      truth_Rest_var_PosPdg  = getYieldFromChain(cRest,  rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut)+'&&leptonPdg>0', weight = "weight*weight")
-      truth_Rest_NegPdg      = getYieldFromChain(cRest,  rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut)+'&&leptonPdg<0', weight = "weight")
-      truth_Rest_var_NegPdg  = getYieldFromChain(cRest,  rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut)+'&&leptonPdg<0', weight = "weight*weight")
+      truth_W_PosPdg         = getYieldFromChain(cWJets, 'leptonPdg>0&&'+rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight")
+      truth_W_var_PosPdg     = getYieldFromChain(cWJets, 'leptonPdg>0&&'+rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight*weight")
+      truth_W_NegPdg         = getYieldFromChain(cWJets, 'leptonPdg<0&&'+rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight")
+      truth_W_var_NegPdg     = getYieldFromChain(cWJets, 'leptonPdg<0&&'+rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight*weight")
+      truth_Rest_PosPdg      = getYieldFromChain(cRest,  'leptonPdg>0&&'+rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight")
+      truth_Rest_var_PosPdg  = getYieldFromChain(cRest,  'leptonPdg>0&&'+rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight*weight")
+      truth_Rest_NegPdg      = getYieldFromChain(cRest,  'leptonPdg<0&&'+rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight")
+      truth_Rest_var_NegPdg  = getYieldFromChain(cRest,  'leptonPdg<0&&'+rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight*weight")
 
       #predicted yields with RCS method
       #ttJetsCRForRCS = rCS_srNJet_1b   #Version as of Nov. 11th 
       ttJetsCRForRCS = rCS_crLowNJet_1b #New version, orthogonal to DPhi (lower njet region in 1b-tag bin)
-      pred_TT    = yTT_srNJet_0b_lowDPhi*ttJetsCRForRCS['rCS']
-      pred_Var_TT= yTT_Var_srNJet_0b_lowDPhi*ttJetsCRForRCS['rCS']**2 + yTT_srNJet_0b_lowDPhi**2*ttJetsCRForRCS['rCSE_pred']**2
+      kFactor = getTTcorr(stb,htb)
+      pred_TT    = yTT_srNJet_0b_lowDPhi*ttJetsCRForRCS['rCS']*kFactor['k']
+      pred_Var_TT= yTT_Var_srNJet_0b_lowDPhi*ttJetsCRForRCS['rCS']**2*kFactor['k']**2 + yTT_srNJet_0b_lowDPhi**2*ttJetsCRForRCS['rCSE_pred']**2*kFactor['k']**2 + yTT_srNJet_0b_lowDPhi**2*ttJetsCRForRCS['rCS']**2*kFactor['k_Error']**2
+#      pred_TT    = yTT_srNJet_0b_lowDPhi*ttJetsCRForRCS['rCS']
+#      pred_Var_TT= yTT_Var_srNJet_0b_lowDPhi*ttJetsCRForRCS['rCS']**2 + yTT_srNJet_0b_lowDPhi**2*ttJetsCRForRCS['rCSE_pred']**2
       pred_W     = yW_srNJet_0b_lowDPhi*rCS_W_crNJet_0b_corr
       pred_Var_W = yW_Var_srNJet_0b_lowDPhi*rCS_W_crNJet_0b_corr**2 + yW_srNJet_0b_lowDPhi**2*rCS_Var_W_crNJet_0b_corr
 
@@ -295,7 +314,8 @@ for i_htb, htb in enumerate(htreg):
       print "Total NegPdg",pred_total_NegPdg,sqrt(pred_Var_total_NegPdg),'truth',(0.5*truth_TT)+truth_W_NegPdg+truth_Rest_NegPdg
 
 #Attention: Variances of Total Pos/NegPdg are not yet included!!! I calculated it with total TT Bkg
-      rd.update( {'TT_pred':pred_TT,"TT_pred_err":sqrt(pred_Var_TT),\
+      rd.update( {'kFactorTT':kFactor,\
+                  'TT_pred':pred_TT,"TT_pred_err":sqrt(pred_Var_TT),
                   "TT_truth":truth_TT,"TT_truth_err":sqrt(truth_TT_var),
                   "W_pred":pred_W,"W_pred_err":sqrt(pred_Var_W), 
                   "W_truth":truth_W,"W_truth_err":sqrt(truth_W_var), 
@@ -338,7 +358,6 @@ for i_htb, htb in enumerate(htreg):
            +' & '+getNumString(res[htb][stb][srNJet]['tot_pred'], res[htb][stb][srNJet]['tot_pred_err'])\
            +' & '+getNumString(res[htb][stb][srNJet]['tot_truth'], res[htb][stb][srNJet]['tot_truth_err']) +'\\\\'
 print
-           #+' & '+getNumString(res[htb][stb][srNJet]['Rest_truth'], res[htb][stb][srNJet]['Rest_truth_err'])\
 
 for i_htb, htb in enumerate(htreg):
   if i_htb!=0:print '\\hline'
@@ -382,19 +401,6 @@ for i_htb, htb in enumerate(htreg):
            +' & '+getNumString(res[htb][stb][srNJet]['Rest_truth'], res[htb][stb][srNJet]['Rest_truth_err']) +'\\\\'
 print
 
-print "signal yields"
-print
-for i_htb, htb in enumerate(htreg):
-  for stb, dPhiCut in streg:
-    for srNJet in njreg:
-      rCS_sr_Name_0b, rCS_sr_Cut_0b = nameAndCut(stb,htb,srNJet,btb=(0,0), presel=presel, btagVar = 'nBJetMedium25')#for Check 
-      strings=[]
-      for s in signals:
-        sig =     getYieldFromChain(s['chain'], rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight")
-        sigErr  = getYieldFromChain(s['chain'], rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight*weight")
-        strings.append( getNumString(sig, sigErr, 3) )
-      print " , ".join(strings), rCS_sr_Name_0b, rCS_sr_Cut_0b
-print
 print "rCS(TT) comparison used for rCS(W) correction"
 print
 for i_htb, htb in enumerate(htreg):
@@ -447,4 +453,31 @@ for i_htb, htb in enumerate(htreg):
           ' & '.join([getNumString(res[htb][stb][srNJet]['rCS_crLowNJet_1b']['rCS'], res[htb][stb][srNJet]['rCS_crLowNJet_1b']['rCSE_sim'],acc=3), \
                       getNumString(res[htb][stb][srNJet]['rCS_crLowNJet_1b_onlyTT']['rCS'], res[htb][stb][srNJet]['rCS_crLowNJet_1b_onlyTT']['rCSE_sim'],acc=3),\
                       getNumString(res[htb][stb][srNJet]['rCS_srNJet_0b_onlyTT']['rCS'], res[htb][stb][srNJet]['rCS_srNJet_0b_onlyTT']['rCSE_sim'],acc=3)])+'\\\\'
+
+print "signal yields (+charge)"
+print
+for i_htb, htb in enumerate(htreg):
+  for stb, dPhiCut in streg:
+    for srNJet in njreg:
+      rCS_sr_Name_0b = nameAndCut(stb,htb,srNJet,btb=(0,0), presel=presel, btagVar = 'nBTagCMVA')#for Check 
+      strings=[]
+      for s in signals:
+        sig =     getYieldFromChain(s['chain'], 'leptonPdg<0&&'+rCS_sr_Cut_0b+"&&"+dPhiStr+'>'+str(dPhiCut), weight = "weight")
+        sigErr  = getYieldFromChain(s['chain'], 'leptonPdg<0&&'+rCS_sr_Cut_0b+"&&"+dPhiStr+'>'+str(dPhiCut), weight = "weight*weight")
+        strings.append( getNumString(sig, sigErr, 3) )
+      print " , ".join(strings), rCS_sr_Name_0b
+print
+print "signal yields (-charge)"
+print
+for i_htb, htb in enumerate(htreg):
+  for stb in streg:
+    for srNJet in njreg:
+      rCS_sr_Name_0b = nameAndCut(stb,htb,srNJet,btb=(0,0), presel=presel, btagVar = 'nBTagCMVA')#for Check 
+      strings=[]
+      for s in signals:
+        sig =     getYieldFromChain(s['chain'], 'leptonPdg>0&&'+rCS_sr_Cut_0b+"&&"+dPhiStr+'>'+str(dPhiCut), weight = "weight")
+        sigErr  = getYieldFromChain(s['chain'], 'leptonPdg>0&&'+rCS_sr_Cut_0b+"&&"+dPhiStr+'>'+str(dPhiCut), weight = "weight*weight")
+        strings.append( getNumString(sig, sigErr, 3) )
+      print " , ".join(strings), rCS_sr_Name_0b
+print
 

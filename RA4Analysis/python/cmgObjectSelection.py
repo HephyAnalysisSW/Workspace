@@ -26,21 +26,23 @@ def splitIndList(var, l, val):
       resLow.append(x)
   return resLow, resHigh
 
-def getGood_cmg_JetsStage2(c):
-  njets = getVarValue(c, 'nJet')
-  res = []
-  for i in range(int(njets)):
-    res.append( {"eta":getVarValue(c, 'Jet_eta', i),\
-          "pt" :getVarValue(c, 'Jet_pt', i),
-          "eta" :getVarValue(c, 'Jet_eta', i),
-          "phi":getVarValue(c, 'Jet_phi', i),
-          #'btag':getVarValue(c, 'Jet_btagCSV', i),
-          'btag':getVarValue(c, 'Jet_btagCMVA', i),
-          'partonId':getVarValue(c, 'Jet_partonId', i),
-          'jetId':getVarValue(c, 'Jet_id', i)
-      })
+def splitListOfObjects(var, val, s):
+  resLow = []
+  resHigh = []
+  for x in s:
+    if x[var]<val:
+      resLow.append(x)
+    else:
+      resHigh.append(x)
+  return resLow, resHigh
 
-  return res
+def getObjDict(c, prefix, variables, i):
+ return {var: c.GetLeaf(prefix+'_'+var).GetValue(i) for var in variables}
+
+def get_cmg_jets(c):
+  return [getObjDict(c, 'Jet', ['eta','pt','phi','btagCMVA', 'partonId', 'id'], i) for i in range(getVarValue(c, 'nJet'))]
+def get_cmg_jets_fromStruct(r):
+  return [{p:getattr(r, 'Jet'+'_'+p)[i] for p in ['eta','pt','phi','btagCMVA', 'partonId', 'id']} for i in range(r.nJet)]
 
 def get_cmg_index_and_DR(objs,leptonPhi,leptonEta):
   obj = findClosestObject(objs,{'phi':leptonPhi, 'eta':leptonEta})
@@ -53,38 +55,11 @@ def get_cmg_index_and_DR(objs,leptonPhi,leptonEta):
   return index , dr
 
 def get_cmg_genLeps(c):
-  ngenLep = getVarValue(c, 'ngenLep')
-  res = []
-  for i in range(int(ngenLep)):
-    res.append( {"eta":getVarValue(c, 'genLep_eta', i),\
-        "pt" :getVarValue(c, 'genLep_pt', i),
-        "phi":getVarValue(c, 'genLep_phi', i),
-        'charge':getVarValue(c, 'genLep_charge', i),
-        'pdgId':getVarValue(c, 'genLep_pdgId', i),
-        'sourceId':getVarValue(c, 'genLep_sourceId', i)
-    })
-  return res
+  return [getObjDict(c, 'genLep', ['eta','pt','phi','charge', 'pdgId', 'sourceId'], i) for i in range(getVarValue(c, 'ngenLep'))]
 
 def get_cmg_recoMuons(c):
-  nLepGood = getVarValue(c, 'nLepGood')
-  res = []
-  for i in range(int(nLepGood)):
-    id = getVarValue(c, 'LepGood_pdgId', i)
-    if abs(id) == 13:
-      res.append( {"eta":getVarValue(c, 'LepGood_eta', i),\
-          "pt" :getVarValue(c, 'LepGood_pt', i),
-          "phi":getVarValue(c, 'LepGood_phi', i),
-          'charge':getVarValue(c, 'LepGood_charge', i),
-          'dxy':getVarValue(c, 'LepGood_dxy', i),
-          'dz':getVarValue(c, 'LepGood_dz', i),
-          'relIso03':getVarValue(c, 'LepGood_relIso03', i),
-          'pdgId':getVarValue(c, 'LepGood_pdgId', i),
-          #'isLoose': getVarValue(c, 'LepGood_looseIdSusy', i),
-          'isTight': getVarValue(c, 'LepGood_tightId', i)
-        })
-  return res
-
-
+  res = [getObjDict(c, 'LepGood', ['eta','pt','phi','charge', 'dxy', 'dz', 'relIso03','tightId', 'pdgId'], i) for i in range(getVarValue(c, 'nLepGood'))]
+  return filter(lambda m:abs(m['pdgId'])==13, res)
 
 
 

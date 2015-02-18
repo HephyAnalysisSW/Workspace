@@ -10,6 +10,7 @@ from Workspace.RA4Analysis.cmgTuplesPostProcessed_v5_Phys14V2 import *
 from Workspace.RA4Analysis.helpers import *
 
 lepSel = 'hard'
+nBTagCMVA = 'Sum$(Jet_pt>30&&abs(Jet_eta)<2.4&&Jet_id&&Jet_btagCMVA>0.732)'
 
 #Bkg chains 
 allBkg=[
@@ -24,6 +25,9 @@ allBkg=[
 for bkg in allBkg:
   bkg['chain']=getChain(bkg['sample'],histname='')
   bkg['color'] =color(bkg['name'])
+for c in allBkg:
+  c['chain'].SetAlias('nBTagCMVA', nBTagCMVA)
+
 
 #Signal chains
 allSignals=[
@@ -47,14 +51,16 @@ allSignals=[
 
 for s in allSignals:
   s['chain']=getChain(s['sample'],histname='')
+for c in allSignals:
+ c['chain'].SetAlias('nBTagCMVA', nBTagCMVA)
 
 #defining ht, st and njets for SR
 streg = [(200,-1), (250, 350), (350,-1)]                         
 htreg = [(500,-1), (500,750),(750,-1)]
 njreg = [(4,4), (5,5), (6,-1)]
 dPhiStr = "acos((leptonPt+met*cos(leptonPhi-metPhi))/sqrt(leptonPt**2+met**2+2*met*leptonPt*cos(leptonPhi-metPhi)))"
-presel='singleMuonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0'
-preprefix = 'singleMuonic_0b_ht500-750_st250-350_nj6'
+presel='singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0'
+preprefix = 'singleLeptonic_0b_ht750_st250-350_nj5'
 wwwDir = '/afs/hephy.at/user/d/dhandl/www/pngCMG2/'+lepSel+'/'+preprefix+'/'
 
 if not os.path.exists(wwwDir):
@@ -65,11 +71,11 @@ small = 1
 #small = 0
 if small == 1:
   streg = [(250,350)]
-  htreg = [(500,750)]
-  njreg = [(6,-1)]
+  htreg = [(750,-1)]
+  njreg = [(5,5)]
+  btb   = (0,0)
 
 allVariables = []
-
 
 def getdPhiMetJet(c):
   met = c.GetLeaf('met_pt').GetValue()
@@ -186,7 +192,7 @@ for i_htb, htb in enumerate(htreg):
           #sample['chain'].Draw("Sum$(isoTrack_pt<15&&abs(isoTrack_pdgId)==211&&abs(isoTrack_dz)<0.05)"+">>"+sample["name"]+"_"+var["name"])
           #sample['chain'].Draw(var['varString']+">>"+sample['name']+'_'+var['name'], sample["weight"]+"*("+cut+")")
           
-        namestr, cut = nameAndCut(stb, htb, srNJet, btb=(0,0), presel=presel, btagVar = 'nBJetMedium25')
+        namestr, cut = nameAndCut(stb, htb, srNJet, btb=btb, presel=presel, btagVar = 'nBTagCMVA')
         print cut
         
         if sample.has_key('addcut'):
@@ -346,7 +352,7 @@ for i_htb, htb in enumerate(htreg):
           #h_ratio2.Draw("same")
          
         canvas.cd()
-        canvas.Print(wwwDir+preprefix+'_'+namestr+'_'+var['name']+'.png')
-        canvas.Print(wwwDir+preprefix+'_'+namestr+'_'+var['name']+'.root')
-        canvas.Print(wwwDir+preprefix+'_'+namestr+'_'+var['name']+'.pdf')
+        canvas.Print(wwwDir+'_'+namestr+'_'+var['name']+'.png')
+        canvas.Print(wwwDir+'_'+namestr+'_'+var['name']+'.root')
+        canvas.Print(wwwDir+'_'+namestr+'_'+var['name']+'.pdf')
 
