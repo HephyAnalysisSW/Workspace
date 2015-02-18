@@ -13,11 +13,11 @@ def binnedNBTagsFit(cut, samples, nBTagVar = 'nBJetMedium25', prefix="", printDi
   cWJets = samples['W']
   cTTJets = samples['TT']
   cRest = samples['Rest']
-  template_WJets_PosPdg=getPlotFromChain(cWJets, nBTagVar, [0,1,2,3], cut+"&&leptonPdg>0", 'weight', binningIsExplicit=True,addOverFlowBin='upper')
-  template_WJets_NegPdg=getPlotFromChain(cWJets, nBTagVar, [0,1,2,3], cut+"&&leptonPdg<0", 'weight', binningIsExplicit=True,addOverFlowBin='upper')
+  template_WJets_PosPdg=getPlotFromChain(cWJets, nBTagVar, [0,1,2,3], 'leptonPdg>0&&'+cut, 'weight', binningIsExplicit=True,addOverFlowBin='upper')
+  template_WJets_NegPdg=getPlotFromChain(cWJets, nBTagVar, [0,1,2,3], 'leptonPdg<0&&'+cut, 'weight', binningIsExplicit=True,addOverFlowBin='upper')
   template_TTJets=      getPlotFromChain(cTTJets,nBTagVar, [0,1,2,3], cut,                 'weight', binningIsExplicit=True,addOverFlowBin='upper')
-  template_Rest_PosPdg= getPlotFromChain(cRest,  nBTagVar, [0,1,2,3], cut+'&&leptonPdg>0', 'weight', binningIsExplicit=True,addOverFlowBin='upper')
-  template_Rest_NegPdg= getPlotFromChain(cRest,  nBTagVar, [0,1,2,3], cut+'&&leptonPdg<0', 'weight', binningIsExplicit=True,addOverFlowBin='upper')
+  template_Rest_PosPdg= getPlotFromChain(cRest,  nBTagVar, [0,1,2,3], 'leptonPdg>0&&'+cut, 'weight', binningIsExplicit=True,addOverFlowBin='upper')
+  template_Rest_NegPdg= getPlotFromChain(cRest,  nBTagVar, [0,1,2,3], 'leptonPdg<0&&'+cut, 'weight', binningIsExplicit=True,addOverFlowBin='upper')
 
   print "Nominal yields TT:",template_TTJets.Integral(),'WJets_PosPdg',template_WJets_PosPdg.Integral(),'WJets_NegPdg',template_WJets_NegPdg.Integral()
   print "Nominal yields:",'Rest_PosPdg',template_Rest_PosPdg.Integral(),'Rest_NegPdg',template_Rest_NegPdg.Integral()

@@ -49,11 +49,32 @@ def getRCS(c, cut, dPhiCut):
     return {'rCS':rcs, 'rCSE_pred':rCSE_pred, 'rCSE_sim':rCSE_sim}
   del h
 
+def getTTcorr(stb,htb,filename='hardSingleLeptonic_TTfitnjet_', dir='/afs/hephy.at/user/d/dhandl/www/pngCMG2/rCS/'):
+  binreg = nameAndCut(stb,htb,njetb=None)[0]
+  f0 = ROOT.TFile(dir+filename+binreg+'.root')
+  f1 = ROOT.TFile(dir+'hardSingleLeptonic_fullBkgFitnjet_'+binreg+'.root')
+  can0 = f0.Get('c1_n2')
+  can1 = f1.Get('c1_n2')
+  assert can0, 'Error: could not find TCanvas in '+str(f0)+str(f0.ls())
+  Profile_0b = can0.GetPrimitive('profile_rCS_njet_bTag0')
+  Profile_1b = can1.GetPrimitive('profile_rCS_njet_bTag1')
+  assert Profile_0b and Profile_1b,'Error: could not find TProfile'
+  FitPar0b = Profile_0b.GetFunction('pol0').GetParameter(0)
+  FitPar1b = Profile_1b.GetFunction('pol0').GetParameter(0)
+  FitParError0b = Profile_0b.GetFunction('pol0').GetParError(0)
+  FitParError1b = Profile_1b.GetFunction('pol0').GetParError(0)
+  assert Profile_0b.GetFunction('pol0') and Profile_1b.GetFunction('pol0'), 'Error: could not find Function'
+  k = FitPar0b/FitPar1b
+  k_E = k* sqrt(FitParError0b**2/FitPar0b**2 + FitParError1b**2/FitPar1b**2)
+  del f0
+  del f1
+  return {'k':k, 'k_Error':k_E}
+
 #streg = [[(250, 350), 1.], [(350, 450), 1.], [(450, -1), 0.5]]
 #htreg = [(400,500),(500,750),(750, 1000),(1000,-1)]
 #njreg = [(1,1), (2,2),(3,3),(4,4),(5,5),(6,-1)]
 
-prefix = 'chargeSep_singleLeptonicPHYS14V2_fullBkg'
+prefix = 'chargeSep_singleLeptonic_20150213'
 streg = [[(250, 350), 1.], [(350, -1), 1.]] 
 htreg = [(500,750),(750,-1)]
 njreg = [(5,5),(6,-1)]
@@ -69,18 +90,6 @@ njreg = [(5,5),(6,-1)]
 #presel    ="singleMuonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0"
 presel    ="singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0"
 
-def nJetBinName(njb):
-  if njb[0]==njb[1]:
-    return "n_{jet}="+str(njb[0])
-  n=str(list(njb)[0])+"\leq n_{jet}"
-  if len(njb)>1 and njb[1]>0:
-    n+='\leq '+str(njb[1])
-  return n
-def varBinName(vb, var):
-  n=str(list(vb)[0])+"< "+var
-  if len(vb)>1 and vb[1]>0:
-    n+='< '+str(vb[1])
-  return n
 
 #crNJet = (3,4)
 crNJet = (2,3)
@@ -276,8 +285,11 @@ for i_htb, htb in enumerate(htreg):
       #predicted yields with RCS method
       #ttJetsCRForRCS = rCS_srNJet_1b   #Version as of Nov. 11th 
       ttJetsCRForRCS = rCS_crLowNJet_1b #New version, orthogonal to DPhi (lower njet region in 1b-tag bin)
-      pred_TT    = yTT_srNJet_0b_lowDPhi*ttJetsCRForRCS['rCS']
-      pred_Var_TT= yTT_Var_srNJet_0b_lowDPhi*ttJetsCRForRCS['rCS']**2 + yTT_srNJet_0b_lowDPhi**2*ttJetsCRForRCS['rCSE_pred']**2
+      kFactor = getTTcorr(stb,htb)
+      pred_TT    = yTT_srNJet_0b_lowDPhi*ttJetsCRForRCS['rCS']*kFactor['k']
+      pred_Var_TT= yTT_Var_srNJet_0b_lowDPhi*ttJetsCRForRCS['rCS']**2*kFactor['k']**2 + yTT_srNJet_0b_lowDPhi**2*ttJetsCRForRCS['rCSE_pred']**2*kFactor['k']**2 + yTT_srNJet_0b_lowDPhi**2*ttJetsCRForRCS['rCS']**2*kFactor['k_Error']**2
+#      pred_TT    = yTT_srNJet_0b_lowDPhi*ttJetsCRForRCS['rCS']
+#      pred_Var_TT= yTT_Var_srNJet_0b_lowDPhi*ttJetsCRForRCS['rCS']**2 + yTT_srNJet_0b_lowDPhi**2*ttJetsCRForRCS['rCSE_pred']**2
       pred_W     = yW_srNJet_0b_lowDPhi*rCS_W_crNJet_0b_corr
       pred_Var_W = yW_Var_srNJet_0b_lowDPhi*rCS_W_crNJet_0b_corr**2 + yW_srNJet_0b_lowDPhi**2*rCS_Var_W_crNJet_0b_corr
 
@@ -302,7 +314,8 @@ for i_htb, htb in enumerate(htreg):
       print "Total NegPdg",pred_total_NegPdg,sqrt(pred_Var_total_NegPdg),'truth',(0.5*truth_TT)+truth_W_NegPdg+truth_Rest_NegPdg
 
 #Attention: Variances of Total Pos/NegPdg are not yet included!!! I calculated it with total TT Bkg
-      rd.update( {'TT_pred':pred_TT,"TT_pred_err":sqrt(pred_Var_TT),\
+      rd.update( {'kFactorTT':kFactor,\
+                  'TT_pred':pred_TT,"TT_pred_err":sqrt(pred_Var_TT),
                   "TT_truth":truth_TT,"TT_truth_err":sqrt(truth_TT_var),
                   "W_pred":pred_W,"W_pred_err":sqrt(pred_Var_W), 
                   "W_truth":truth_W,"W_truth_err":sqrt(truth_W_var), 
@@ -388,19 +401,6 @@ for i_htb, htb in enumerate(htreg):
            +' & '+getNumString(res[htb][stb][srNJet]['Rest_truth'], res[htb][stb][srNJet]['Rest_truth_err']) +'\\\\'
 print
 
-print "signal yields"
-print
-for i_htb, htb in enumerate(htreg):
-  for stb, dPhiCut in streg:
-    for srNJet in njreg:
-      rCS_sr_Name_0b, rCS_sr_Cut_0b = nameAndCut(stb,htb,srNJet,btb=(0,0), presel=presel, btagVar = 'nBTagCMVA')#for Check 
-      strings=[]
-      for s in signals:
-        sig =     getYieldFromChain(s['chain'], rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight")
-        sigErr  = getYieldFromChain(s['chain'], rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight*weight")
-        strings.append( getNumString(sig, sigErr, 3) )
-      print " , ".join(strings), rCS_sr_Name_0b, rCS_sr_Cut_0b
-print
 print "rCS(TT) comparison used for rCS(W) correction"
 print
 for i_htb, htb in enumerate(htreg):
@@ -453,4 +453,31 @@ for i_htb, htb in enumerate(htreg):
           ' & '.join([getNumString(res[htb][stb][srNJet]['rCS_crLowNJet_1b']['rCS'], res[htb][stb][srNJet]['rCS_crLowNJet_1b']['rCSE_sim'],acc=3), \
                       getNumString(res[htb][stb][srNJet]['rCS_crLowNJet_1b_onlyTT']['rCS'], res[htb][stb][srNJet]['rCS_crLowNJet_1b_onlyTT']['rCSE_sim'],acc=3),\
                       getNumString(res[htb][stb][srNJet]['rCS_srNJet_0b_onlyTT']['rCS'], res[htb][stb][srNJet]['rCS_srNJet_0b_onlyTT']['rCSE_sim'],acc=3)])+'\\\\'
+
+print "signal yields (+charge)"
+print
+for i_htb, htb in enumerate(htreg):
+  for stb, dPhiCut in streg:
+    for srNJet in njreg:
+      rCS_sr_Name_0b = nameAndCut(stb,htb,srNJet,btb=(0,0), presel=presel, btagVar = 'nBTagCMVA')#for Check 
+      strings=[]
+      for s in signals:
+        sig =     getYieldFromChain(s['chain'], 'leptonPdg<0&&'+rCS_sr_Cut_0b+"&&"+dPhiStr+'>'+str(dPhiCut), weight = "weight")
+        sigErr  = getYieldFromChain(s['chain'], 'leptonPdg<0&&'+rCS_sr_Cut_0b+"&&"+dPhiStr+'>'+str(dPhiCut), weight = "weight*weight")
+        strings.append( getNumString(sig, sigErr, 3) )
+      print " , ".join(strings), rCS_sr_Name_0b
+print
+print "signal yields (-charge)"
+print
+for i_htb, htb in enumerate(htreg):
+  for stb in streg:
+    for srNJet in njreg:
+      rCS_sr_Name_0b = nameAndCut(stb,htb,srNJet,btb=(0,0), presel=presel, btagVar = 'nBTagCMVA')#for Check 
+      strings=[]
+      for s in signals:
+        sig =     getYieldFromChain(s['chain'], 'leptonPdg>0&&'+rCS_sr_Cut_0b+"&&"+dPhiStr+'>'+str(dPhiCut), weight = "weight")
+        sigErr  = getYieldFromChain(s['chain'], 'leptonPdg>0&&'+rCS_sr_Cut_0b+"&&"+dPhiStr+'>'+str(dPhiCut), weight = "weight*weight")
+        strings.append( getNumString(sig, sigErr, 3) )
+      print " , ".join(strings), rCS_sr_Name_0b
+print
 
