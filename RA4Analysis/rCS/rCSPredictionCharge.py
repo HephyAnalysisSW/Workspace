@@ -7,7 +7,7 @@ from Workspace.RA4Analysis.cmgTuplesPostProcessed_v5_Phys14V2 import *
 from localInfo import username
 
 import os, copy, sys
-sys.path.append('/afs/hephy.at/scratch/d/dhandl/CMSSW_7_2_3/src/Workspace/RA4Analysis/plotsDavid')
+sys.path.append('/afs/hephy.at/scratch/'+username[0]+'/'+username+'/newWorkDir/CMSSW_7_2_3/src/Workspace/RA4Analysis/plotsEce')
 
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,varBinName
 from binnedNBTagsFit import binnedNBTagsFit
@@ -31,7 +31,7 @@ signals=[
 
 for s in signals:
   s['chain']=getChain(s['sample'],histname='')
-
+  s['chain'].SetAlias('nBTagCMVA', nBTagCMVA)
 ROOT_colors = [ROOT.kBlack, ROOT.kRed-7, ROOT.kBlue-2, ROOT.kGreen+3, ROOT.kOrange+1,ROOT.kRed-3, ROOT.kAzure+6, ROOT.kCyan+3, ROOT.kOrange , ROOT.kRed-10]
 dPhiStr = "acos((leptonPt+met*cos(leptonPhi-metPhi))/sqrt(leptonPt**2+met**2+2*met*leptonPt*cos(leptonPhi-metPhi)))"
 
@@ -49,26 +49,26 @@ def getRCS(c, cut, dPhiCut):
     return {'rCS':rcs, 'rCSE_pred':rCSE_pred, 'rCSE_sim':rCSE_sim}
   del h
 
-def getTTcorr(stb,htb,filename='hardSingleLeptonic_TTfitnjet_', dir='/afs/hephy.at/user/d/dhandl/www/pngCMG2/rCS/'):
-  binreg = nameAndCut(stb,htb,njetb=None)[0]
-  f0 = ROOT.TFile(dir+filename+binreg+'.root')
-  f1 = ROOT.TFile(dir+'hardSingleLeptonic_fullBkgFitnjet_'+binreg+'.root')
-  can0 = f0.Get('c1_n2')
-  can1 = f1.Get('c1_n2')
-  assert can0, 'Error: could not find TCanvas in '+str(f0)+str(f0.ls())
-  Profile_0b = can0.GetPrimitive('profile_rCS_njet_bTag0')
-  Profile_1b = can1.GetPrimitive('profile_rCS_njet_bTag1')
-  assert Profile_0b and Profile_1b,'Error: could not find TProfile'
-  FitPar0b = Profile_0b.GetFunction('pol0').GetParameter(0)
-  FitPar1b = Profile_1b.GetFunction('pol0').GetParameter(0)
-  FitParError0b = Profile_0b.GetFunction('pol0').GetParError(0)
-  FitParError1b = Profile_1b.GetFunction('pol0').GetParError(0)
-  assert Profile_0b.GetFunction('pol0') and Profile_1b.GetFunction('pol0'), 'Error: could not find Function'
-  k = FitPar0b/FitPar1b
-  k_E = k* sqrt(FitParError0b**2/FitPar0b**2 + FitParError1b**2/FitPar1b**2)
-  del f0
-  del f1
-  return {'k':k, 'k_Error':k_E}
+#def getTTcorr(stb,htb,filename='hardSingleLeptonic_TTfitnjet_', dir='/afs/hephy.at/user/d/dhandl/www/pngCMG2/rCS/'):
+#  binreg = nameAndCut(stb,htb,njetb=None)[0]
+#  f0 = ROOT.TFile(dir+filename+binreg+'.root')
+#  f1 = ROOT.TFile(dir+'hardSingleLeptonic_fullBkgFitnjet_'+binreg+'.root')
+#  can0 = f0.Get('c1_n2')
+#  can1 = f1.Get('c1_n2')
+#  assert can0, 'Error: could not find TCanvas in '+str(f0)+str(f0.ls())
+#  Profile_0b = can0.GetPrimitive('profile_rCS_njet_bTag0')
+#  Profile_1b = can1.GetPrimitive('profile_rCS_njet_bTag1')
+#  assert Profile_0b and Profile_1b,'Error: could not find TProfile'
+#  FitPar0b = Profile_0b.GetFunction('pol0').GetParameter(0)
+#  FitPar1b = Profile_1b.GetFunction('pol0').GetParameter(0)
+#  FitParError0b = Profile_0b.GetFunction('pol0').GetParError(0)
+#  FitParError1b = Profile_1b.GetFunction('pol0').GetParError(0)
+#  assert Profile_0b.GetFunction('pol0') and Profile_1b.GetFunction('pol0'), 'Error: could not find Function'
+#  k = FitPar0b/FitPar1b
+#  k_E = k* sqrt(FitParError0b**2/FitPar0b**2 + FitParError1b**2/FitPar1b**2)
+#  del f0
+#  del f1
+#  return {'k':k, 'k_Error':k_E}
 
 #streg = [[(250, 350), 1.], [(350, 450), 1.], [(450, -1), 0.5]]
 #htreg = [(400,500),(500,750),(750, 1000),(1000,-1)]
@@ -285,11 +285,11 @@ for i_htb, htb in enumerate(htreg):
       #predicted yields with RCS method
       #ttJetsCRForRCS = rCS_srNJet_1b   #Version as of Nov. 11th 
       ttJetsCRForRCS = rCS_crLowNJet_1b #New version, orthogonal to DPhi (lower njet region in 1b-tag bin)
-      kFactor = getTTcorr(stb,htb)
-      pred_TT    = yTT_srNJet_0b_lowDPhi*ttJetsCRForRCS['rCS']*kFactor['k']
-      pred_Var_TT= yTT_Var_srNJet_0b_lowDPhi*ttJetsCRForRCS['rCS']**2*kFactor['k']**2 + yTT_srNJet_0b_lowDPhi**2*ttJetsCRForRCS['rCSE_pred']**2*kFactor['k']**2 + yTT_srNJet_0b_lowDPhi**2*ttJetsCRForRCS['rCS']**2*kFactor['k_Error']**2
-#      pred_TT    = yTT_srNJet_0b_lowDPhi*ttJetsCRForRCS['rCS']
-#      pred_Var_TT= yTT_Var_srNJet_0b_lowDPhi*ttJetsCRForRCS['rCS']**2 + yTT_srNJet_0b_lowDPhi**2*ttJetsCRForRCS['rCSE_pred']**2
+      #kFactor = getTTcorr(stb,htb)
+     # pred_TT    = yTT_srNJet_0b_lowDPhi*ttJetsCRForRCS['rCS']*kFactor['k']
+     # pred_Var_TT= yTT_Var_srNJet_0b_lowDPhi*ttJetsCRForRCS['rCS']**2*kFactor['k']**2 + yTT_srNJet_0b_lowDPhi**2*ttJetsCRForRCS['rCSE_pred']**2*kFactor['k']**2 + yTT_srNJet_0b_lowDPhi**2*ttJetsCRForRCS['rCS']**2*kFactor['k_Error']**2
+      pred_TT    = yTT_srNJet_0b_lowDPhi*ttJetsCRForRCS['rCS']
+      pred_Var_TT= yTT_Var_srNJet_0b_lowDPhi*ttJetsCRForRCS['rCS']**2 + yTT_srNJet_0b_lowDPhi**2*ttJetsCRForRCS['rCSE_pred']**2
       pred_W     = yW_srNJet_0b_lowDPhi*rCS_W_crNJet_0b_corr
       pred_Var_W = yW_Var_srNJet_0b_lowDPhi*rCS_W_crNJet_0b_corr**2 + yW_srNJet_0b_lowDPhi**2*rCS_Var_W_crNJet_0b_corr
 
@@ -314,30 +314,32 @@ for i_htb, htb in enumerate(htreg):
       print "Total NegPdg",pred_total_NegPdg,sqrt(pred_Var_total_NegPdg),'truth',(0.5*truth_TT)+truth_W_NegPdg+truth_Rest_NegPdg
 
 #Attention: Variances of Total Pos/NegPdg are not yet included!!! I calculated it with total TT Bkg
-      rd.update( {'kFactorTT':kFactor,\
-                  'TT_pred':pred_TT,"TT_pred_err":sqrt(pred_Var_TT),
-                  "TT_truth":truth_TT,"TT_truth_err":sqrt(truth_TT_var),
-                  "W_pred":pred_W,"W_pred_err":sqrt(pred_Var_W), 
-                  "W_truth":truth_W,"W_truth_err":sqrt(truth_W_var), 
-                  "W_PosPdg_pred":pred_W_PosPdg,"W_PosPdg_pred_err":sqrt(pred_Var_W_PosPdg),
-                  "W_PosPdg_truth":truth_W_PosPdg,"W_PosPdg_truth_err":sqrt(truth_W_var_PosPdg),
-                  "W_NegPdg_pred":pred_W_NegPdg,"W_NegPdg_pred_err":sqrt(pred_Var_W_NegPdg),
-                  "W_NegPdg_truth":truth_W_NegPdg,"W_NegPdg_truth_err":sqrt(truth_W_var_NegPdg),
-                  'Rest_truth':truth_Rest,'Rest_truth_err':sqrt(truth_Rest_var),
-                  'Rest_PosPdg_truth':truth_Rest_PosPdg,'Rest_PosPdg_truth_err':sqrt(truth_Rest_var_PosPdg),
-                  'Rest_NegPdg_truth':truth_Rest_NegPdg,'Rest_NegPdg_truth_err':sqrt(truth_Rest_var_NegPdg),
-                  'tot_pred':pred_total,'tot_pred_err':sqrt(pred_Var_total),
-                  'tot_PosPdg_pred':pred_total_PosPdg,'tot_PosPdg_pred_err':sqrt(pred_Var_total_PosPdg),
-                  'tot_NegPdg_pred':pred_total_NegPdg,'tot_NegPdg_pred_err':sqrt(pred_Var_total_NegPdg),
-                  'tot_truth':truth_TT+truth_W+truth_Rest,'tot_truth_err':sqrt(truth_TT_var + truth_W_var + truth_Rest_var),
-                  'tot_PosPdg_truth':(0.5*truth_TT)+truth_W_PosPdg+truth_Rest_PosPdg,'tot_PosPdg_truth_err':sqrt((0.5*truth_TT_var) + truth_W_var_PosPdg + truth_Rest_var_PosPdg),
+      rd.update( {#'kFactorTT':kFactor,\
+                  'TT_pred':pred_TT,"TT_pred_err":sqrt(pred_Var_TT),\
+                  "TT_truth":truth_TT,"TT_truth_err":sqrt(truth_TT_var),\
+                  "W_pred":pred_W,"W_pred_err":sqrt(pred_Var_W),\
+                  "W_truth":truth_W,"W_truth_err":sqrt(truth_W_var),\
+                  "W_PosPdg_pred":pred_W_PosPdg,"W_PosPdg_pred_err":sqrt(pred_Var_W_PosPdg),\
+                  "W_PosPdg_truth":truth_W_PosPdg,"W_PosPdg_truth_err":sqrt(truth_W_var_PosPdg),\
+                  "W_NegPdg_pred":pred_W_NegPdg,"W_NegPdg_pred_err":sqrt(pred_Var_W_NegPdg),\
+                  "W_NegPdg_truth":truth_W_NegPdg,"W_NegPdg_truth_err":sqrt(truth_W_var_NegPdg),\
+                  'Rest_truth':truth_Rest,'Rest_truth_err':sqrt(truth_Rest_var),\
+                  'Rest_PosPdg_truth':truth_Rest_PosPdg,'Rest_PosPdg_truth_err':sqrt(truth_Rest_var_PosPdg),\
+                  'Rest_NegPdg_truth':truth_Rest_NegPdg,'Rest_NegPdg_truth_err':sqrt(truth_Rest_var_NegPdg),\
+                  'tot_pred':pred_total,'tot_pred_err':sqrt(pred_Var_total),\
+                  'tot_PosPdg_pred':pred_total_PosPdg,'tot_PosPdg_pred_err':sqrt(pred_Var_total_PosPdg),\
+                  'tot_NegPdg_pred':pred_total_NegPdg,'tot_NegPdg_pred_err':sqrt(pred_Var_total_NegPdg),\
+                  'tot_truth':truth_TT+truth_W+truth_Rest,'tot_truth_err':sqrt(truth_TT_var + truth_W_var + truth_Rest_var),\
+                  'tot_PosPdg_truth':(0.5*truth_TT)+truth_W_PosPdg+truth_Rest_PosPdg,'tot_PosPdg_truth_err':sqrt((0.5*truth_TT_var) + truth_W_var_PosPdg + truth_Rest_var_PosPdg),\
                   'tot_NegPdg_truth':(0.5*truth_TT)+truth_W_NegPdg+truth_Rest_NegPdg,'tot_NegPdg_truth_err':sqrt((0.5*truth_TT_var) + truth_W_var_NegPdg + truth_Rest_var_NegPdg)})
       res[htb][stb][srNJet] = rd
 
+pathEce = '/data/'+username+'/results2014/rCS_0b/'
+if not os.path.exists(pathEce):
+  os.makedirs(pathEce)
+pickle.dump(res, file(pathEce+prefix+'_estimationResults_pkl','w'))
 
-pickle.dump(res, file('/data/'+username+'/results2014/rCS_0b/'+prefix+'_estimationResults_pkl','w'))
-
-res = pickle.load(file('/data/'+username+'/results2014/rCS_0b/'+prefix+'_estimationResults_pkl'))
+res = pickle.load(file(pathEce+prefix+'_estimationResults_pkl'))
 
 def getNumString(n,ne, acc=2):
   return str(round(n,acc))+'&$\pm$&'+str(round(ne,acc))
