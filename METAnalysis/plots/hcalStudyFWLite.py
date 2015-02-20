@@ -8,20 +8,17 @@ import pickle
 ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 
-
 ROOT.gROOT.ProcessLine(".L ../../HEPHYPythonTools/scripts/root/tdrstyle.C")
 ROOT.gROOT.ProcessLine(".L ../../HEPHYPythonTools/scripts/root/useNiceColorPalette.C")
 
 ROOT.gStyle.SetOptStat(0)
 ROOT.setTDRStyle()
-#ROOT.gStyle.SetPadRightMargin(0.10);
+ROOT.tdrStyle.SetPadRightMargin(0.18)
 if type(ROOT.tdrStyle)!=type(ROOT.gStyle):
   del ROOT.tdrStyle
   ROOT.setTDRStyle()
 
-ROOT.tdrStyle.SetPadRightMargin(0.18)
 ROOT.useNiceColorPalette(255)
-
 
 maxEvts=-1
 
@@ -60,34 +57,48 @@ files_73X=['root://eoscms.cern.ch//store/relval/CMSSW_7_3_2_patch1/JetHT/RECO/GR
 from vetoed import vetoed as vetoedEvents
 
 edmCollections = [ \
-  ("vector<reco::PFMET>", "pfMet", "")#, "RECO")
+  ("vector<reco::PFMET>", "pfMet", ""), #, "RECO")
+  ("vector<reco::PFCandidate>", "particleFlow", "")
 ] 
 
-handles={v[1]:Handle(v[0]) for v in edmCollections}
+label = {"X":0,"h":1, "e":2, "mu":3,"gamma":4, 'h0':5, 'h_HF':6, 'egamma_HF':7, 0:"X",1:"h", 2:"e", 3:"mu",4:"gamma", 5:'h0', 6:'h_HF', 7:'egamma_HF'}
+pfTypes = ["X", "h", "e", "mu", "gamma", "h0", "h_HF", "egamma_HF"]
 
-res={}
-for files, ver in [[files_53X, "53X"],[files_73X,"73X"]]:
-  print "Reading",ver,"files",files
-  res[ver]={}
-  events = Events(files)
-  events.toBegin()
-  fileNames=events._filenames
-  usedFiles=[]
-  runs=[]
-  products={}
-  size=events.size()
-  for nev in range(size):
-    if nev%10000==0:print nev,'/',size
-    events.to(nev)
-    eaux=events.eventAuxiliary()
-    run=eaux.run()            
-    if run==208352:
-      event=eaux.event()
-      lumi=eaux.luminosityBlock()
-      for v in edmCollections:
-        events.getByLabel(v[1:],handles[v[1]])
-        products[v[1]] =handles[v[1]].product()
-      res[ver][":".join(str(x) for x in [run,lumi,event])] = {'met':products["pfMet"][0].pt(),  'sumEt':products["pfMet"][0].sumEt(), 'metPhi':products["pfMet"][0].phi()}
+#handles={v[1]:Handle(v[0]) for v in edmCollections}
+#res={}
+#for files, ver in [[files_53X, "53X"],[files_73X,"73X"]]:
+#  print "Reading",ver,"files",files
+#  res[ver]={}
+#  events = Events(files)
+#  events.toBegin()
+#  fileNames=events._filenames
+#  usedFiles=[]
+#  runs=[]
+#  products={}
+#  size=events.size()
+#  for nev in range(size):
+#    if nev%10000==0:print nev,'/',size
+#    events.to(nev)
+#    eaux=events.eventAuxiliary()
+#    run=eaux.run()            
+#    if run==208352:
+#      event=eaux.event()
+#      lumi=eaux.luminosityBlock()
+#      k = ":".join(str(x) for x in [run,lumi,event])
+#      if k in vetoedEvents:continue
+#      for v in edmCollections:
+#        events.getByLabel(v[1:],handles[v[1]])
+#        products[v[1]] =handles[v[1]].product()
+#      sumPt={t:0. for t in pfTypes}
+#      for p in range(products['particleFlow'].size()):
+#        cand = products['particleFlow'][p]
+#        sumPt[label[cand.particleId()]]+=cand.pt() 
+#      d={'met':products["pfMet"][0].pt(),  'sumEt':products["pfMet"][0].sumEt(), 'metPhi':products["pfMet"][0].phi()}
+#      d.update(sumPt)
+#      res[ver][k] = d
+#pickle.dump(res, file('res.pkl', 'w'))
+
+res = pickle.load(file('res.pkl'))
 
 commonKeys =  [val for val in res['53X'].keys() if val in res['73X'].keys()]
 print "Have",len(commonKeys),"events in common"
@@ -96,19 +107,21 @@ import ROOT
 sumEt = ROOT.TH2F('sumEt','sumEt',100,0,5000,100,0,5000)
 met = ROOT.TH2F('met','met',100,0,500,100,0,500)
 metPhi = ROOT.TH2F('met','met',100,-pi,pi,100,-pi,pi)
+sumEts={}
+for p in pfTypes:
+  sumEts[p] = ROOT.TH2F('sumEt','sumEt',500,0,5000,500,0,5000)
+ 
 for k in commonKeys:
-  if k in vetoedEvents:
-    print "Vetoed",k
-  else:
-    met.Fill(res['53X'][k]['met'], res['73X'][k]['met'])
-    sumEt.Fill(res['53X'][k]['sumEt'], res['73X'][k]['sumEt'])
-    metPhi.Fill(res['53X'][k]['metPhi'], res['73X'][k]['metPhi'])
+  met.Fill(res['53X'][k]['met'], res['73X'][k]['met'])
+  sumEt.Fill(res['53X'][k]['sumEt'], res['73X'][k]['sumEt'])
+  metPhi.Fill(res['53X'][k]['metPhi'], res['73X'][k]['metPhi'])
+  for p in pfTypes:
+    sumEts[p].Fill(res['53X'][k][p], res['73X'][k][p])
 
 metPhi.GetXaxis().SetTitle("53X #phi(MET)")
 metPhi.GetXaxis().SetLabelSize(0.04)
-metPhi.GetYaxis().SetLabelSize(0.04)
 metPhi.GetYaxis().SetTitle("73X #phi(MET)")
-
+metPhi.GetYaxis().SetLabelSize(0.04)
 met.GetXaxis().SetTitle("53X MET")
 met.GetXaxis().SetLabelSize(0.04)
 met.GetYaxis().SetLabelSize(0.04)
@@ -119,6 +132,14 @@ sumEt.GetYaxis().SetLabelSize(0.04)
 sumEt.GetXaxis().SetLabelSize(0.04)
 sumEt.GetXaxis().SetRangeUser(0,3000)
 sumEt.GetYaxis().SetRangeUser(0,3000)
+
+for p in sumEts.keys():
+  sumEts[p].GetXaxis().SetTitle("53X sumEt "+p)
+  sumEts[p].GetYaxis().SetTitle("73X sumEt "+p)
+  sumEts[p].GetYaxis().SetLabelSize(0.04)
+  sumEts[p].GetXaxis().SetLabelSize(0.04)
+  sumEts[p].GetXaxis().SetRangeUser(0,1000)
+  sumEts[p].GetYaxis().SetRangeUser(0,1000)
 
 c1 = ROOT.TCanvas()
 met.Draw('colz')
@@ -131,14 +152,14 @@ sumEt.Draw('colz')
 c1.Print('sumEt.png')
 c1.Print('sumEt.pdf')
 
-
-#  if run not in runs:
-#    runs.append(run)
-#    print "Added run",run
-#  if run==208352:
-#    nf = fileNames[events.fileIndex()]
-#    if nf not in usedFiles:
-#      print "Found file",run,nf
-#      usedFiles.append(nf)
-
-#  print ":".join([str(x) for x in [event, run, lumi]] ),products['pfMet'][0].pt(),  products['pfMet'][0].sumEt()
+#
+##  if run not in runs:
+##    runs.append(run)
+##    print "Added run",run
+##  if run==208352:
+##    nf = fileNames[events.fileIndex()]
+##    if nf not in usedFiles:
+##      print "Found file",run,nf
+##      usedFiles.append(nf)
+#
+##  print ":".join([str(x) for x in [event, run, lumi]] ),products['pfMet'][0].pt(),  products['pfMet'][0].sumEt()
