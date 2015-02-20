@@ -8,17 +8,17 @@ import pickle
 ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 
-ROOT.gROOT.ProcessLine(".L ../../HEPHYPythonTools/scripts/root/tdrstyle.C")
-ROOT.gROOT.ProcessLine(".L ../../HEPHYPythonTools/scripts/root/useNiceColorPalette.C")
-
-ROOT.gStyle.SetOptStat(0)
-ROOT.setTDRStyle()
-ROOT.tdrStyle.SetPadRightMargin(0.18)
-if type(ROOT.tdrStyle)!=type(ROOT.gStyle):
-  del ROOT.tdrStyle
-  ROOT.setTDRStyle()
-
-ROOT.useNiceColorPalette(255)
+#ROOT.gROOT.ProcessLine(".L ../../HEPHYPythonTools/scripts/root/tdrstyle.C")
+#ROOT.gROOT.ProcessLine(".L ../../HEPHYPythonTools/scripts/root/useNiceColorPalette.C")
+#
+#ROOT.gStyle.SetOptStat(0)
+#ROOT.setTDRStyle()
+#ROOT.tdrStyle.SetPadRightMargin(0.18)
+#if type(ROOT.tdrStyle)!=type(ROOT.gStyle):
+#  del ROOT.tdrStyle
+#  ROOT.setTDRStyle()
+#
+#ROOT.useNiceColorPalette(255)
 
 maxEvts=-1
 
@@ -62,7 +62,7 @@ edmCollections = [ \
 ] 
 
 label = {"X":0,"h":1, "e":2, "mu":3,"gamma":4, 'h0':5, 'h_HF':6, 'egamma_HF':7, 0:"X",1:"h", 2:"e", 3:"mu",4:"gamma", 5:'h0', 6:'h_HF', 7:'egamma_HF'}
-pfTypes = ["X", "h", "e", "mu", "gamma", "h0", "h_HF", "egamma_HF"]
+pfTypes = ["h", "h0", "gamma","e", "h_HF", "egamma_HF", "mu"]
 
 #handles={v[1]:Handle(v[0]) for v in edmCollections}
 #res={}
@@ -85,81 +85,154 @@ pfTypes = ["X", "h", "e", "mu", "gamma", "h0", "h_HF", "egamma_HF"]
 #      event=eaux.event()
 #      lumi=eaux.luminosityBlock()
 #      k = ":".join(str(x) for x in [run,lumi,event])
-#      if k in vetoedEvents:continue
+#      if k in vetoedEvents:
+#        print "Event vetoed!"
+#        continue
 #      for v in edmCollections:
 #        events.getByLabel(v[1:],handles[v[1]])
 #        products[v[1]] =handles[v[1]].product()
-#      sumPt={t:0. for t in pfTypes}
+#      sumPt={"sumPt_"+t:0. for t in pfTypes}
+#      MEx={"MEx_"+t:0. for t in pfTypes}
+#      MEy={"MEy_"+t:0. for t in pfTypes}
+#      mult={"mult_"+t:0 for t in pfTypes}
 #      for p in range(products['particleFlow'].size()):
 #        cand = products['particleFlow'][p]
-#        sumPt[label[cand.particleId()]]+=cand.pt() 
+#        sumPt["sumPt_"+label[cand.particleId()]]+=cand.pt() 
+#        mult["mult_"+label[cand.particleId()]]+=1 
+#        MEx["MEx_"+label[cand.particleId()]]+=cand.px() 
+#        MEy["MEy_"+label[cand.particleId()]]+=cand.py() 
 #      d={'met':products["pfMet"][0].pt(),  'sumEt':products["pfMet"][0].sumEt(), 'metPhi':products["pfMet"][0].phi()}
 #      d.update(sumPt)
+#      d.update(MEx)
+#      d.update(MEy)
+#      d.update(mult)
 #      res[ver][k] = d
+#for m in ['53X','73X']:
+#  for k in res[m].keys():
+#    for p in pfTypes:
+#      res[m][k]["MET_"+p] = sqrt( res[m][k]["MEx_"+p]**2+ res[m][k]["MEy_"+p]**2)
 #pickle.dump(res, file('res.pkl', 'w'))
 
 res = pickle.load(file('res.pkl'))
 
 commonKeys =  [val for val in res['53X'].keys() if val in res['73X'].keys()]
 print "Have",len(commonKeys),"events in common"
-
-import ROOT
-sumEt = ROOT.TH2F('sumEt','sumEt',100,0,5000,100,0,5000)
-met = ROOT.TH2F('met','met',100,0,500,100,0,500)
-metPhi = ROOT.TH2F('met','met',100,-pi,pi,100,-pi,pi)
-sumEts={}
-for p in pfTypes:
-  sumEts[p] = ROOT.TH2F('sumEt','sumEt',500,0,5000,500,0,5000)
- 
+outliers={'met':[], 'sumEt':[]}
+outliers.update({"sumPt_"+p:[] for p in pfTypes})
+outliers.update({"MET_"+p:[] for p in pfTypes})
 for k in commonKeys:
-  met.Fill(res['53X'][k]['met'], res['73X'][k]['met'])
-  sumEt.Fill(res['53X'][k]['sumEt'], res['73X'][k]['sumEt'])
-  metPhi.Fill(res['53X'][k]['metPhi'], res['73X'][k]['metPhi'])
+  outliers['met'].append(   [res['73X'][k]['met'] - res['53X'][k]['met'],k,res['73X'][k]['met'],  res['53X'][k]['met']] )
+  outliers['sumEt'].append( [res['73X'][k]['sumEt'] - res['53X'][k]['sumEt'],k, res['73X'][k]['sumEt'], res['53X'][k]['sumEt']] )
   for p in pfTypes:
-    sumEts[p].Fill(res['53X'][k][p], res['73X'][k][p])
+    outliers["sumPt_"+p].append([res['73X'][k]["sumPt_"+p] -  res['53X'][k]["sumPt_"+p], k, res['73X'][k]["sumPt_"+p], res['73X'][k]['mult_'+p], res['53X'][k]["sumPt_"+p], res['53X'][k]['mult_'+p]])
+    outliers["MET_"+p].append([sqrt(res['73X'][k]["MEx_"+p]**2 +res['73X'][k]["MEy_"+p]**2) - sqrt(res['53X'][k]["MEx_"+p]**2 +res['53X'][k]["MEy_"+p]**2),k,sqrt(res['73X'][k]["MEx_"+p]**2 +res['73X'][k]["MEy_"+p]**2), res['73X'][k]['mult_'+p], sqrt(res['53X'][k]["MEx_"+p]**2 +res['53X'][k]["MEy_"+p]**2), res['53X'][k]['mult_'+p]])
 
-metPhi.GetXaxis().SetTitle("53X #phi(MET)")
-metPhi.GetXaxis().SetLabelSize(0.04)
-metPhi.GetYaxis().SetTitle("73X #phi(MET)")
-metPhi.GetYaxis().SetLabelSize(0.04)
-met.GetXaxis().SetTitle("53X MET")
-met.GetXaxis().SetLabelSize(0.04)
-met.GetYaxis().SetLabelSize(0.04)
-met.GetYaxis().SetTitle("73X MET")
-sumEt.GetXaxis().SetTitle("53X sumEt")
-sumEt.GetYaxis().SetTitle("73X sumEt")
-sumEt.GetYaxis().SetLabelSize(0.04)
-sumEt.GetXaxis().SetLabelSize(0.04)
-sumEt.GetXaxis().SetRangeUser(0,3000)
-sumEt.GetYaxis().SetRangeUser(0,3000)
+outliers['sumEt'].sort()
+outliers['met'].sort()
+for p in pfTypes:
+  outliers['sumPt_'+p].sort()
+  outliers['MET_'+p].sort()
 
-for p in sumEts.keys():
-  sumEts[p].GetXaxis().SetTitle("53X sumEt "+p)
-  sumEts[p].GetYaxis().SetTitle("73X sumEt "+p)
-  sumEts[p].GetYaxis().SetLabelSize(0.04)
-  sumEts[p].GetXaxis().SetLabelSize(0.04)
-  sumEts[p].GetXaxis().SetRangeUser(0,1000)
-  sumEts[p].GetYaxis().SetRangeUser(0,1000)
+print "*************************"
+print "** Outliers: total met **"
+print "*************************"
+for o in outliers['met'][:10]+outliers['met'][-10:]:
+  if abs(o[0])>100:
+    print "met(73X-53X) %8.1f id %20s 73X: %8.1f 53X: %8.1f"%tuple(o)+ " Details:"+" ".join([("sumPt_"+p2+"%8.1f (53X) %8.1f (73X)  MET_"+p2+"%8.1f (53X) %8.1f (73X)") %(res['53X'][o[1]]['sumPt_'+p2],res['73X'][o[1]]['sumPt_'+p2],res['53X'][o[1]]['MET_'+p2],res['73X'][o[1]]['MET_'+p2]) for p2 in pfTypes ]) 
+print "****************************"
+print "** Outliers: total sumET **"
+print "****************************"
+for o in outliers['sumEt'][:10]+outliers['sumEt'][-10:]:
+  if abs(o[0])>100:
+    print "sumEt(73X-53X) %8.1f id %20s %8.1f (53X) %8.1f (73X)"%tuple(o) + " Details:"+" ".join([("sumPt_"+p2+"%8.1f (53X) %8.1f (73X)  MET_"+p2+"%8.1f (53X) %8.1f (73X)") %(res['53X'][o[1]]['sumPt_'+p2],res['73X'][o[1]]['sumPt_'+p2],res['53X'][o[1]]['MET_'+p2],res['73X'][o[1]]['MET_'+p2]) for p2 in pfTypes ])
+print "***************************************"
+print "** Outliers sub-sums (MET and sumET) **"
+print "***************************************"
+for p in pfTypes:
+  print "Outliers: Met "+p
+  for o in outliers['MET_'+p][:10]+outliers['MET_'+p][-10:]:
+    if abs(o[0])>100:
+      print "MET "+p+" (73X-53X) %8.1f id %20s 73X: %8.1f (n=%4i) 53X: %8.1f (n=%4i)"%tuple(o)+ " Details:"+" ".join([("sumPt_"+p2+"%8.1f (53X) %8.1f (73X)  MET_"+p2+"%8.1f (53X) %8.1f (73X)") %(res['53X'][o[1]]['sumPt_'+p2],res['73X'][o[1]]['sumPt_'+p2],res['53X'][o[1]]['MET_'+p2],res['73X'][o[1]]['MET_'+p2]) for p2 in pfTypes ]) 
+  print "Outliers: sumPt "+p
+  for o in outliers['sumPt_'+p][:10]+outliers['sumPt_'+p][-10:]:
+    if abs(o[0])>100:
+      print "sumPt "+p+" (73X-53X) %8.1f id %20s 73X: %8.1f (n=%4i) 53X: %8.1f (n=%4i)"%tuple(o) + " Details:"+" ".join([("sumPt_"+p2+"%8.1f (53X) %8.1f (73X)  MET_"+p2+"%8.1f (53X) %8.1f (73X)") %(res['53X'][o[1]]['sumPt_'+p2],res['73X'][o[1]]['sumPt_'+p2],res['53X'][o[1]]['MET_'+p2],res['73X'][o[1]]['MET_'+p2]) for p2 in pfTypes ])
 
-c1 = ROOT.TCanvas()
-met.Draw('colz')
-c1.Print('met.png')
-c1.Print('met.pdf')
-metPhi.Draw('colz')
-c1.Print('metPhi.png')
-c1.Print('metPhi.pdf')
-sumEt.Draw('colz')
-c1.Print('sumEt.png')
-c1.Print('sumEt.pdf')
-
+#import ROOT
+#sumEt = ROOT.TH2F('sumEt','sumEt',100,0,5000,100,0,5000)
+#met = ROOT.TH2F('met','met',100,0,500,100,0,500)
+#metPhi = ROOT.TH2F('met','met',100,-pi,pi,100,-pi,pi)
+#sumEts={}
+#METs={}
+#for p in pfTypes:
+#  sumEts[p] = ROOT.TH2F('sumEt','sumEt',500,0,5000,500,0,5000)
+#  METs[p] = ROOT.TH2F('MET','MET',500,0,5000,500,0,5000)
+# 
+#for k in commonKeys:
+#  met.Fill(res['53X'][k]['met'], res['73X'][k]['met'])
+#  sumEt.Fill(res['53X'][k]['sumEt'], res['73X'][k]['sumEt'])
+#  metPhi.Fill(res['53X'][k]['metPhi'], res['73X'][k]['metPhi'])
+#  for p in pfTypes:
+#    sumEts[p].Fill(res['53X'][k]["sumPt_"+p], res['73X'][k]["sumPt_"+p])
+#    METs[p].Fill(sqrt(res['53X'][k]["MEx_"+p]**2 +res['53X'][k]["MEy_"+p]**2) , sqrt(res['73X'][k]["MEx_"+p]**2 +res['73X'][k]["MEy_"+p]**2))
 #
-##  if run not in runs:
-##    runs.append(run)
-##    print "Added run",run
-##  if run==208352:
-##    nf = fileNames[events.fileIndex()]
-##    if nf not in usedFiles:
-##      print "Found file",run,nf
-##      usedFiles.append(nf)
+#metPhi.GetXaxis().SetTitle("53X #phi(MET)")
+#metPhi.GetXaxis().SetLabelSize(0.04)
+#metPhi.GetYaxis().SetTitle("73X #phi(MET)")
+#metPhi.GetYaxis().SetLabelSize(0.04)
+#met.GetXaxis().SetTitle("53X MET")
+#met.GetXaxis().SetLabelSize(0.04)
+#met.GetYaxis().SetLabelSize(0.04)
+#met.GetYaxis().SetTitle("73X MET")
+#sumEt.GetXaxis().SetTitle("53X sumEt")
+#sumEt.GetYaxis().SetTitle("73X sumEt")
+#sumEt.GetYaxis().SetLabelSize(0.04)
+#sumEt.GetXaxis().SetLabelSize(0.04)
+#sumEt.GetXaxis().SetRangeUser(0,3000)
+#sumEt.GetYaxis().SetRangeUser(0,3000)
 #
-##  print ":".join([str(x) for x in [event, run, lumi]] ),products['pfMet'][0].pt(),  products['pfMet'][0].sumEt()
+#for p in sumEts.keys():
+#  sumEts[p].GetXaxis().SetTitle("53X sumEt "+p)
+#  sumEts[p].GetYaxis().SetTitle("73X sumEt "+p)
+#  sumEts[p].GetYaxis().SetLabelSize(0.04)
+#  sumEts[p].GetXaxis().SetLabelSize(0.04)
+#  sumEts[p].GetXaxis().SetRangeUser(0,1000)
+#  sumEts[p].GetYaxis().SetRangeUser(0,1000)
+#for p in METs.keys():
+#  METs[p].GetXaxis().SetTitle("53X MET from "+p)
+#  METs[p].GetYaxis().SetTitle("73X MET from "+p)
+#  METs[p].GetYaxis().SetLabelSize(0.04)
+#  METs[p].GetXaxis().SetLabelSize(0.04)
+#  METs[p].GetXaxis().SetRangeUser(0,800)
+#  METs[p].GetYaxis().SetRangeUser(0,800)
+#
+#c1 = ROOT.TCanvas()
+#met.Draw('colz')
+#c1.Print('met.png')
+#c1.Print('met.pdf')
+#metPhi.Draw('colz')
+#c1.Print('metPhi.png')
+#c1.Print('metPhi.pdf')
+#sumEt.Draw('colz')
+#c1.Print('sumEt.png')
+#c1.Print('sumEt.pdf')
+#for p in sumEts:
+#  sumEts[p].Draw('COLZ')
+#  c1.Print(p+'_sumEt.png')
+#  c1.Print(p+'_sumEt.pdf')
+#for p in METs:
+#  METs[p].Draw('COLZ')
+#  c1.Print(p+'_MET.png')
+#  c1.Print(p+'_MET.pdf')
+#
+##
+###  if run not in runs:
+###    runs.append(run)
+###    print "Added run",run
+###  if run==208352:
+###    nf = fileNames[events.fileIndex()]
+###    if nf not in usedFiles:
+###      print "Found file",run,nf
+###      usedFiles.append(nf)
+##
+###  print ":".join([str(x) for x in [event, run, lumi]] ),products['pfMet'][0].pt(),  products['pfMet'][0].sumEt()
