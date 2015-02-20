@@ -135,10 +135,11 @@ def loopAndFill(stacks):
     if sampleScaleFac!=1:
       print "Using sampleScaleFac", sampleScaleFac ,"for sample",s["name"]
     for b in s['bins']:
-      c = ROOT.TChain('Events')
+      c = ROOT.TChain('Events' if not s.has_key('treeName') else s['treeName'])
       counter=0
       dir = s['dirname'] if s.has_key('dirname') else s['dir']
       for f in getFileList(dir+'/'+b, maxN = -1 if not (s.has_key('small') and s['small']) else 1, histname=""):#, minAgeDPM, histname, xrootPrefix, maxN):
+        if not f[-5:]=='.root':continue
         counter+=1
         c.Add(f)
       ntot = c.GetEntries()
@@ -148,10 +149,12 @@ def loopAndFill(stacks):
       if ntot==0:
         print "Warning! Found zero events in",s['name'],'bin',b," -> do nothing"
         continue
-      for cutString in s['plotsPerCutForSample'].keys():
+      for ics, cutString in enumerate(s['plotsPerCutForSample'].keys()):
         plotsToFill = s['plotsPerCutForSample'][cutString]
-        c.Draw(">>eList",cutString)
-        elist = ROOT.gDirectory.Get("eList")
+        elistName = "eList_"+s['name']+'_'+b+'_'+str(ics)
+        elist = ROOT.TEventList(elistName)
+        c.Draw(">>"+elistName,cutString)
+#        print "elist",elist,elist.GetN(),cutString,'plots',plotsToFill
         number_events = elist.GetN() if not (s.has_key('small')  and s['small']) else min(elist.GetN(), 100)
         print "Reading: ", s["name"], b, "with",number_events,"events passing cutString", cutString, 'and will fill', len([p.name for p in plotsToFill]),'vars.'
         for p in plotsToFill:
@@ -169,7 +172,7 @@ def loopAndFill(stacks):
           for p in plotsToFill:
 #            print p.cut['func'],  p.cut['func'](c)
             if (not p.cut['func']) or p.cut['func'](c):
-              weight = c.GetLeaf(p.weight['string']).GetValue()#getVarValue(c, p.weight['string'])
+              weight = c.GetLeaf(p.weight['string']).GetValue() if (hasattr(p,"weight") and p.weight) else 1.
               if p.leaf:
                 val =  getVarValue(c, p.leaf, p.ind)
 #                print "Fill leaf",p.leaf, p.ind, val, weight,sampleScaleFac
@@ -180,7 +183,7 @@ def loopAndFill(stacks):
                 val = p.func(c)
               p.histo.Fill(val, weight*sampleScaleFac)
 #              print p.histo.GetName(), b, val, weight*sampleScaleFac
-        del elist
+        print "Deleting"
       del c
   for s in stacks:
     sumStackHistos(s)   
