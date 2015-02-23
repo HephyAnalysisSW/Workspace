@@ -5,14 +5,15 @@ from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYi
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v4_PHYS14V1 import *
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v5_Phys14V2 import *
 from Workspace.RA4Analysis.cmgTuplesPostProcessed_v5_Phys14V2 import *
+from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,varBinName
 from localInfo import username
+from math import pi, sqrt
 
 import os, copy, sys
-sys.path.append('/afs/hephy.at/scratch/'+username[0]+'/'+username+'/newWorkDir/CMSSW_7_2_3/src/Workspace/RA4Analysis/plotsEce')
+sys.path.append('/afs/hephy.at/scratch/d/dhandl/CMSSW_7_2_3/src/Workspace/RA4Analysis/plotsDavid')
 
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,varBinName
 from binnedNBTagsFit import binnedNBTagsFit
-from math import pi, sqrt
 
 lepSel = 'hard'
  

@@ -174,7 +174,7 @@ def getBinBorders(l, max=10**4):
   return [x[0] for x in l ] + [max]
 
 
-def nameAndCut(stb, htb, njetb, btb=None, presel="(1)", charge="", btagVar = 'nBJetMedium40'):
+def nameAndCut(stb, htb, njetb, btb=None, presel="(1)", charge="", btagVar = 'nBJetMediumCMVA30'):
   cut=presel
   name=""
   if stb:
@@ -184,16 +184,16 @@ def nameAndCut(stb, htb, njetb, btb=None, presel="(1)", charge="", btagVar = 'nB
       cut+='&&st<'+str(stb[1])
       name+='-'+str(stb[1])
   if htb:
-    cut+='&&htJet40ja>='+str(htb[0])
+    cut+='&&htJet30j>='+str(htb[0])
     name+='_ht'+str(htb[0])
     if htb[1]>0:
-      cut+='&&htJet40ja<'+str(htb[1])
+      cut+='&&htJet30j<'+str(htb[1])
       name+='-'+str(htb[1])
   if njetb:
-    cut+='&&nJet40a>='+str(njetb[0])
+    cut+='&&nJet30>='+str(njetb[0])
     name+='_njet'+str(njetb[0])
     if len(njetb)>1 and njetb[1]>=0:
-      cut+='&&nJet40a<='+str(njetb[1])
+      cut+='&&nJet30<='+str(njetb[1])
       name+='-'+str(njetb[1])
   if btb:
     cut+='&&'+btagVar+'>='+str(btb[0])
