@@ -58,40 +58,39 @@ QCD=makeSample({\
 #}
 
 
-####No signal for now###They will come soon####
-# allSignalStrings=[\
-# "SMS_T1tttt_2J_mGl1200_mLSP800",
-# "SMS_T1tttt_2J_mGl1500_mLSP100",
-# "SMS_T2tt_2J_mStop425_mLSP325",
-# "SMS_T2tt_2J_mStop500_mLSP325",
-# "SMS_T2tt_2J_mStop650_mLSP325",
-# "SMS_T2tt_2J_mStop850_mLSP100",
-# "SMS_T5qqqqWW_Gl1200_Chi1000_LSP800",
-# "SMS_T5qqqqWW_Gl1500_Chi800_LSP100",
-# "T1ttbbWW_mGo1000_mCh725_mChi715",
-# "T1ttbbWW_mGo1000_mCh725_mChi720",
-# "T1ttbbWW_mGo1300_mCh300_mChi290",
-# "T1ttbbWW_mGo1300_mCh300_mChi295",
-# "T5ttttDeg_mGo1000_mStop300_mCh285_mChi280",
-# "T5ttttDeg_mGo1000_mStop300_mChi280",
-# "T5ttttDeg_mGo1300_mStop300_mCh285_mChi280",
-# "T5ttttDeg_mGo1300_mStop300_mChi280",
-# ]
-#
-#
-# def getSignalSample(signal):
-#   if signal in allSignalStrings:
-#     return {
-#       "name" : signal,
-# #      "chunkString": signal,
-#       'dir' : "/data/easilar/cmgTuples/postProcessed_v6_Phys14V2/",
-#       'bins':[signal]}
-#   else:
-#     print "Signal",signal,"unknown. Available: ",", ".join(allSignalStrings)
-#
-# allSignals=[]
-# for s in allSignalStrings:
-#   sm = makeSample(getSignalSample(s))
-#   exec(s+"=sm")
-#   exec("allSignals.append(s)")
-#   
+allSignalStrings=[\
+"SMS_T1tttt_2J_mGl1200_mLSP800",
+"SMS_T1tttt_2J_mGl1500_mLSP100",
+#"SMS_T2tt_2J_mStop425_mLSP325",
+#"SMS_T2tt_2J_mStop500_mLSP325",
+#"SMS_T2tt_2J_mStop650_mLSP325",
+#"SMS_T2tt_2J_mStop850_mLSP100",
+"SMS_T5qqqqWW_Gl1200_Chi1000_LSP800",
+"SMS_T5qqqqWW_Gl1500_Chi800_LSP100",
+"T1ttbbWW_mGo1000_mCh725_mChi715",
+"T1ttbbWW_mGo1000_mCh725_mChi720",
+"T1ttbbWW_mGo1300_mCh300_mChi290",
+"T1ttbbWW_mGo1300_mCh300_mChi295",
+"T5ttttDeg_mGo1000_mStop300_mCh285_mChi280",
+"T5ttttDeg_mGo1000_mStop300_mChi280",
+"T5ttttDeg_mGo1300_mStop300_mCh285_mChi280",
+"T5ttttDeg_mGo1300_mStop300_mChi280",
+]
+
+
+def getSignalSample(signal):
+  if signal in allSignalStrings:
+    return {
+      "name" : signal,
+#      "chunkString": signal,
+      'dir' : "/data/easilar/cmgTuples/postProcessed_v6_Phys14V2/HT400ST150/",
+      'bins':[signal]}
+  else:
+    print "Signal",signal,"unknown. Available: ",", ".join(allSignalStrings)
+
+allSignals=[]
+for s in allSignalStrings:
+  sm = makeSample(getSignalSample(s))
+  exec(s+"=sm")
+  exec("allSignals.append(s)")
+  
