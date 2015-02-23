@@ -1,19 +1,12 @@
 import ROOT
 from ROOT import RooFit as rf
 
-import ROOT
 from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain
-#from Workspace.RA4Analysis.cmgTuplesPostProcessed_v3 import *
-#from Workspace.RA4Analysis.cmgTuplesPostProcessed_v4_PHYS14V1 import *
-#from Workspace.RA4Analysis.cmgTuplesPostProcessed_v5_PHYS14V1 import *
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,varBinName
 from localInfo import username
 from math import pi, sqrt
-import os, sys, copy
 
-def binnedNBTagsFit(cut, samples, nBTagVar = 'nBJetMedium25', prefix="", printDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/pngCMG2/templateFit'):
-  if not os.path.exists(printDir):
-    os.makedirs(printDir)  
+def binnedNBTagsFit(cut, samples, nBTagVar = 'nBJetMediumCMVA30', prefix="", printDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/pngCMG2/templateFit'):
   cWJets = samples['W']
   cTTJets = samples['TT']
   cRest = samples['Rest']
