@@ -40,7 +40,7 @@ def getObjDict(c, prefix, variables, i):
  return {var: c.GetLeaf(prefix+'_'+var).GetValue(i) for var in variables}
 
 def get_cmg_jets(c):
-  return [getObjDict(c, 'Jet', ['eta','pt','phi','btagCMVA', 'partonId', 'id'], i) for i in range(getVarValue(c, 'nJet'))]
+  return [getObjDict(c, 'Jet', ['eta','pt','phi','btagCMVA', 'partonId', 'id'], i) for i in range(int(getVarValue(c, 'nJet')))]
 def get_cmg_jets_fromStruct(r):
   return [{p:getattr(r, 'Jet'+'_'+p)[i] for p in ['eta','pt','phi','btagCMVA', 'partonId', 'id']} for i in range(r.nJet)]
 
@@ -55,10 +55,10 @@ def get_cmg_index_and_DR(objs,leptonPhi,leptonEta):
   return index , dr
 
 def get_cmg_genLeps(c):
-  return [getObjDict(c, 'genLep', ['eta','pt','phi','charge', 'pdgId', 'sourceId'], i) for i in range(getVarValue(c, 'ngenLep'))]
+  return [getObjDict(c, 'genLep', ['eta','pt','phi','charge', 'pdgId', 'sourceId'], i) for i in range(int(getVarValue(c, 'ngenLep')))]
 
 def get_cmg_recoMuons(c):
-  res = [getObjDict(c, 'LepGood', ['eta','pt','phi','charge', 'dxy', 'dz', 'relIso03','tightId', 'pdgId'], i) for i in range(getVarValue(c, 'nLepGood'))]
+  res = [getObjDict(c, 'LepGood', ['eta','pt','phi','charge', 'dxy', 'dz', 'relIso03','tightId', 'pdgId'], i) for i in range(int(getVarValue(c, 'nLepGood')))]
   return filter(lambda m:abs(m['pdgId'])==13, res)
 
 
