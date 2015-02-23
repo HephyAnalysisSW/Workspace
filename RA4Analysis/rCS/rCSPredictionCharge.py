@@ -3,6 +3,7 @@ import pickle
 from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYieldFromChain
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v3 import *
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v4_PHYS14V1 import *
+#from Workspace.RA4Analysis.cmgTuplesPostProcessed_v5_Phys14V2 import *
 from Workspace.RA4Analysis.cmgTuplesPostProcessed_v5_Phys14V2 import *
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,varBinName
 from localInfo import username
@@ -10,6 +11,8 @@ from math import pi, sqrt
 
 import os, copy, sys
 sys.path.append('/afs/hephy.at/scratch/d/dhandl/CMSSW_7_2_3/src/Workspace/RA4Analysis/plotsDavid')
+
+from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,varBinName
 from binnedNBTagsFit import binnedNBTagsFit
 
 lepSel = 'hard'
@@ -30,7 +33,7 @@ signals=[
 
 for s in signals:
   s['chain']=getChain(s['sample'],histname='')
-
+  s['chain'].SetAlias('nBTagCMVA', nBTagCMVA)
 ROOT_colors = [ROOT.kBlack, ROOT.kRed-7, ROOT.kBlue-2, ROOT.kGreen+3, ROOT.kOrange+1,ROOT.kRed-3, ROOT.kAzure+6, ROOT.kCyan+3, ROOT.kOrange , ROOT.kRed-10]
 dPhiStr = "acos((leptonPt+met*cos(leptonPhi-metPhi))/sqrt(leptonPt**2+met**2+2*met*leptonPt*cos(leptonPhi-metPhi)))"
 
@@ -284,9 +287,9 @@ for i_htb, htb in enumerate(htreg):
       #predicted yields with RCS method
       #ttJetsCRForRCS = rCS_srNJet_1b   #Version as of Nov. 11th 
       ttJetsCRForRCS = rCS_crLowNJet_1b #New version, orthogonal to DPhi (lower njet region in 1b-tag bin)
-#      kFactor = getTTcorr(stb,htb)
-#      pred_TT    = yTT_srNJet_0b_lowDPhi*ttJetsCRForRCS['rCS']*kFactor['k']
-#      pred_Var_TT= yTT_Var_srNJet_0b_lowDPhi*ttJetsCRForRCS['rCS']**2*kFactor['k']**2 + yTT_srNJet_0b_lowDPhi**2*ttJetsCRForRCS['rCSE_pred']**2*kFactor['k']**2 + yTT_srNJet_0b_lowDPhi**2*ttJetsCRForRCS['rCS']**2*kFactor['k_Error']**2
+      #kFactor = getTTcorr(stb,htb)
+     # pred_TT    = yTT_srNJet_0b_lowDPhi*ttJetsCRForRCS['rCS']*kFactor['k']
+     # pred_Var_TT= yTT_Var_srNJet_0b_lowDPhi*ttJetsCRForRCS['rCS']**2*kFactor['k']**2 + yTT_srNJet_0b_lowDPhi**2*ttJetsCRForRCS['rCSE_pred']**2*kFactor['k']**2 + yTT_srNJet_0b_lowDPhi**2*ttJetsCRForRCS['rCS']**2*kFactor['k_Error']**2
       pred_TT    = yTT_srNJet_0b_lowDPhi*ttJetsCRForRCS['rCS']
       pred_Var_TT= yTT_Var_srNJet_0b_lowDPhi*ttJetsCRForRCS['rCS']**2 + yTT_srNJet_0b_lowDPhi**2*ttJetsCRForRCS['rCSE_pred']**2
       pred_W     = yW_srNJet_0b_lowDPhi*rCS_W_crNJet_0b_corr
@@ -316,7 +319,7 @@ for i_htb, htb in enumerate(htreg):
       rd.update( {#'kFactorTT':kFactor,\
                   'TT_pred':pred_TT,"TT_pred_err":sqrt(pred_Var_TT),\
                   "TT_truth":truth_TT,"TT_truth_err":sqrt(truth_TT_var),\
-                  "W_pred":pred_W,"W_pred_err":sqrt(pred_Var_W), \
+                  "W_pred":pred_W,"W_pred_err":sqrt(pred_Var_W),\
                   "W_truth":truth_W,"W_truth_err":sqrt(truth_W_var),\
                   "W_PosPdg_pred":pred_W_PosPdg,"W_PosPdg_pred_err":sqrt(pred_Var_W_PosPdg),\
                   "W_PosPdg_truth":truth_W_PosPdg,"W_PosPdg_truth_err":sqrt(truth_W_var_PosPdg),\
@@ -333,10 +336,12 @@ for i_htb, htb in enumerate(htreg):
                   'tot_NegPdg_truth':(0.5*truth_TT)+truth_W_NegPdg+truth_Rest_NegPdg,'tot_NegPdg_truth_err':sqrt((0.5*truth_TT_var) + truth_W_var_NegPdg + truth_Rest_var_NegPdg)})
       res[htb][stb][srNJet] = rd
 
+pathEce = '/data/'+username+'/results2014/rCS_0b/'
+if not os.path.exists(pathEce):
+  os.makedirs(pathEce)
+pickle.dump(res, file(pathEce+prefix+'_estimationResults_pkl','w'))
 
-pickle.dump(res, file('/data/'+username+'/results2014/rCS_0b/'+prefix+'_estimationResults_pkl','w'))
-
-res = pickle.load(file('/data/'+username+'/results2014/rCS_0b/'+prefix+'_estimationResults_pkl'))
+res = pickle.load(file(pathEce+prefix+'_estimationResults_pkl'))
 
 def getNumString(n,ne, acc=2):
   return str(round(n,acc))+'&$\pm$&'+str(round(ne,acc))

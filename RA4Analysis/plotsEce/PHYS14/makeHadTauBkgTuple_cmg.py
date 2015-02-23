@@ -13,28 +13,31 @@ from Workspace.RA4Analysis.stage2Tuples import *
 
 #c = getChain(hard_ttJetsCSA1450ns)
 ROOT.TH1F.SetDefaultSumw2()
-c = ROOT.TChain('Events')
-c.Add('/data/schoef/cmgTuples/postProcessed_v5_Phys14V2/hard/TTJets/*.root')
+#c = ROOT.TChain('Events')
+#c.Add('/data/schoef/cmgTuples/postProcessed_v5_Phys14V2/hard/TTJets/*.root')
+
+c = ROOT.TChain('tree')
+c.Add('/data/schoef/cmgTuples/v5_Phys14V2_fromDPM_lateProcessingTauFix/TTJets/*.root')
 
 mode='had'
 relIso = 0.3
 
 small = False
-maxN=10000
+maxN=1000
 
 if mode=='had':
-  leptonEffMap = pickle.load(file('/afs/hephy.at/user/e/easilar/www/hadronicTau_PHYS14_inc/lepton_Efficiency_Results/CSA14_TTJet_LepEff_cmg_Large.pkl'))
-  tauFrMap = pickle.load(file('/afs/hephy.at/user/e/easilar/www/hadronicTau_PHYS14_inc/fakeRate_Results/CSA14_TTJet_tauToBfakeRate_cmg_Phys14_inc.pkl'))
+  leptonEffMap = pickle.load(file('/afs/hephy.at/user/e/easilar/www/hadronicTau_PHYS14_fixed_/lepton_Efficiency_Results/CSA14_TTJet_LepEff_PHYS14_Large.pkl'))
+  #tauFrMap = pickle.load(file('/afs/hephy.at/user/e/easilar/www/hadronicTau_PHYS14_fixed_/fakeRate_Results/CSA14_TTJet_tauToBCMVAfakeRate_cmg_Phys14_inc.pkl'))
   #doubleLeptonPreselection = "ngoodMuons>=1&&nvetoMuons==2&&nvetoElectrons==0"
-  doubleLeptonPreselection = "nLooseHardLeptons==2&&nTightHardLeptons>=1&&nLepGood==2\
-  &&Sum$(abs(LepGood_pdgId)==13 && LepGood_tightId==1 && abs(LepGood_eta)<2.4 && LepGood_relIso03 < 0.3)==2\
-  &&Sum$(abs(LepGood_pdgId)==13 && LepGood_tightId==1 && abs(LepGood_eta)<2.1 && LepGood_relIso03 < 0.12)>=1\
+  tauFrMap = pickle.load(file('/afs/hephy.at/user/e/easilar/www/hadronicTau_PHYS14_fixed_/fakeRate_Results/CSA14_TTJet_tauToBCMVAfakeRate_cmg_Phys14_gentauPt_jetId_removed.pkl'))
+  doubleLeptonPreselection = "nLepGood==2&&Sum$(abs(LepGood_pdgId)==13 && LepGood_tightId==1 && abs(LepGood_eta)<2.3 && LepGood_pt>25 && LepGood_relIso03 < 0.3)==2\
+  &&Sum$(abs(LepGood_pdgId)==13 && LepGood_tightId==1 && abs(LepGood_eta)<2.1 && LepGood_pt>25 && LepGood_relIso03 < 0.12)>=1\
   &&Sum$(abs(LepGood_pdgId)==11)==0\
-  &&nLepOther==0"
+  &&nLepOther==0"  #"nLooseHardLeptons==2&&nTightHardLeptons>=1&&nLepGood==2\
   gendoubleLeptonPreselection = "Sum$(abs(genPart_pdgId)==14&&abs(genPart_motherId)==24)==2&&Sum$(abs(genPart_pdgId)==12)==0&&Sum$(abs(genPart_pdgId)==16)==0"
   print doubleLeptonPreselection
-  templates = pickle.load(file('/data/easilar/results2014/tauTemplates/CSA14_TTJets_genTau_cmg_PHYS14_inc.pkl'))
-  ofile =                      '/data/easilar/results2014/tauTuples/CSA14_TTJets_hadTauEstimate_cmg_large_PHYS14_inc_new.root'
+  templates = pickle.load(file('/data/easilar/results2014/tauTemplates/CSA14_TTJets_genTau_PHYS14_inc_Large.pkl'))
+  ofile =                      '/data/easilar/results2014/tauTuples/PHYS14_TTJets_hadTauEstimate_cmg_large_CMVA.root'
 
   #doubleLeptonPreselection = "ngoodMuons>=1&&nvetoMuons==2&&nvetoElectrons==0"
   #templates = pickle.load(file('/data/schoef/results2014/tauTemplates/CSA14_TTJets_lepGenTau.pkl'))
@@ -63,9 +66,9 @@ def getTypeStr(s):
   if s=='I': return 'Int_t'
 
 #copyVars  = ['event/l','nbtags/I', 'njets/I', 'ht/F', 'met/F', 'metPhi/F', 'nvetoMuons/I']
-copyVars  = ['evt/l','xsec/I','lumi/I','nBJetMedium25/I', 'nBJetMedium40/I','nJet40a/I', 'htJet40ja/F','st/F','LepGood_pt/F','LepGood_phi/F','LepGood_eta/F', 'met_pt/F', 'met_phi/F','met_eta/F', 'nLepGood/I','nLepOther/I']
+copyVars  = ['evt/l','xsec/I','lumi/I','nBJetMedium25/I', 'nBJetMedium40/I','nJet40a/I', 'htJet40ja/F','LepGood_pt/F','LepGood_phi/F','LepGood_eta/F', 'met_pt/F', 'met_phi/F','met_eta/F', 'nLepGood/I','nLepOther/I']
 #newVars   = ['nbtagsPred/I','njetsPred/I','effTauToB/F','scaleLEffUp/F','scaleLEffDown/F', 'htPred/F', 'metPred/F', 'metphiPred/F','weightPred/F', 'mTPred/F', 'weight/F', 'scaleLEff/F','wPt/F','wPhi/F','deltaPhiPred/F']
-newVars   = ['njets30Pred/I','nbtagsCMVAPred/I','nbtagsPred/I','njetsPred/I','effTauToB/F','scaleLEffUp/F','scaleLEffDown/F', 'htPred/F', 'metPred/F', 'metphiPred/F','weightPredOld/F','weightPred/F', 'mTPred/F', 'weight/F', 'scaleLEff/F','wPt/F','wPhi/F','deltaPhiPred/F']
+newVars   = ['njets30Pred/I','nbtagsCMVAPred/I','nbtagsPred/I','njetsPred/I','effTauToB/F','scaleLEffUp/F','scaleLEffDown/F', 'htPred/F', 'metPred/F', 'stPred/F','metphiPred/F','weightPredOld/F','weightPred/F', 'mTPred/F', 'weight/F', 'scaleLEff/F','wPt/F','wPhi/F','deltaPhiPred/F']
 vars      = copyVars+newVars  
 #print vars
 structString = "struct MyStruct{"
@@ -82,8 +85,9 @@ t = ROOT.TTree( "Events", "Events", 1 )
 for v in vars:
  t.Branch(v.split('/')[0],   ROOT.AddressOf(s,v.split('/')[0]), v) 
 dir.cd()
-
-c.Draw(">>eList", doubleLeptonPreselection+"&&"+gendoubleLeptonPreselection)
+number_All_events = c.GetEntries()
+tot_lumi = 4000 
+c.Draw(">>eList", doubleLeptonPreselection) #+"&&"+gendoubleLeptonPreselection)
 eList = ROOT.gDirectory.Get("eList")
 number_events = eList.GetN()
 #print number_events
@@ -130,7 +134,10 @@ for i in range(number_events):
       if abseta>2.1 and m['pt']<10: continue
       countLeptons+=1
 #      #print template 
-      s.weight=c.GetLeaf('weight').GetValue()
+      #s.weight=c.GetLeaf('weight').GetValue()
+      s.xsec = c.GetLeaf('xsec').GetValue()
+      s.weight= float(tot_lumi * s.xsec) / float(number_All_events)
+      #print tot_lumi ,s.xsec ,number_All_events ,tot_lumi*s.xsec/number_All_events , s.weight
       lEffb = leptonEffMap.FindBin( m['pt'], m['eta'])
       lEff = leptonEffMap.GetBinContent(lEffb)
 
@@ -161,6 +168,7 @@ for i in range(number_events):
   #          s.nvetoMuonsPred = s.nvetoMuons 
             jetpt =  (1.-p['frac'])*m['pt']
             s.metPred = sqrt(mEx**2+mEy**2)
+            s.stPred = s.metPred + m2['pt']
             s.metphiPred = atan2(mEy,mEx)
             s.mTPred = sqrt(2.*s.metPred*m2['pt']*(1-cos(m2['phi']-s.metphiPred)))
             s.wPt = sqrt(wx**2+wy**2)
@@ -177,6 +185,7 @@ for i in range(number_events):
               s.nbtagsCMVAPred = nbtagCMVA+1 
               s.weightPred = p['weight']*s.weight*s.effTauToB
               t.Fill()
+              s.nbtagsCMVAPred = nbtagCMVA
               s.nbtagsPred = s.nBJetMedium40
               s.weightPred = p['weight']*s.weight*(1-s.effTauToB)
               t.Fill()

@@ -106,7 +106,7 @@ for isample, sample in enumerate(allSamples):
   newVariables = ['weight/F']
   newVariables += ['nLooseSoftLeptons/I', 'nLooseSoftPt10Leptons/I', 'nLooseHardLeptons/I', 'nTightSoftLeptons/I', 'nTightHardLeptons/I']
   if options.leptonSelection.lower()!='none':
-    newVariables.extend( ['st/F', 'leptonPt/F', 'leptonEta/F', 'leptonPhi/F', 'leptonPdg/I/0', 'leptonInd/I/-1', 'leptonMass/F', 'singleMuonic/I', 'singleElectronic/I', 'singleLeptonic/I', 'mt2w/F'] )
+    newVariables.extend( ['nBJetMediumCMVA30/I','nJet30/I','htJet30j/F','st/F', 'leptonPt/F', 'leptonEta/F', 'leptonPhi/F', 'leptonPdg/I/0', 'leptonInd/I/-1', 'leptonMass/F', 'singleMuonic/I', 'singleElectronic/I', 'singleLeptonic/I', 'mt2w/F'] )
   newVars = [readVar(v, allowRenaming=False, isWritten = True, isRead=False) for v in newVariables]
 
   aliases = [ "met:met_pt", "metPhi:met_phi","genMet:met_genPt", "genMetPhi:met_genPhi"]
@@ -225,6 +225,9 @@ for isample, sample in enumerate(allSamples):
       if options.leptonSelection!='':
         jets = filter(lambda j:j['pt']>30 and abs(j['eta'])<2.4 and j['id'], get_cmg_jets_fromStruct(r))
         lightJets, bJets = splitListOfObjects('btagCMVA', 0.732, jets) 
+        s.htJet30j = sum([x['pt'] for x in jets])
+        s.nJet30 = len(jets)
+        s.nBJetMediumCMVA30 = len(bJets)
         s.mt2w = mt2w.mt2w(met = {'pt':r.met_pt, 'phi':r.met_phi}, l={'pt':s.leptonPt, 'phi':s.leptonPhi, 'eta':s.leptonEta}, ljets=lightJets, bjets=bJets)
 #          print "Warning -> Why can't I compute mt2w?", s.mt2w, len(jets), len(bJets), len(allTightLeptons),lightJets,bJets, {'pt':s.type1phiMet, 'phi':s.type1phiMetphi}, {'pt':s.leptonPt, 'phi':s.leptonPhi, 'eta':s.leptonEta}
       for v in newVars:
@@ -232,6 +235,7 @@ for isample, sample in enumerate(allSamples):
     newFileName = sample['name']+'_'+chunk['name']+'.root'
     filesForHadd.append(newFileName)
     if not options.small:
+    #if options.small:
       f = ROOT.TFile(tmpDir+'/'+newFileName, 'recreate')
       t.SetBranchStatus("*",0)
       for b in branchKeepStrings + [v['stage2Name'] for v in newVars] +  [v.split(':')[1] for v in aliases]:
@@ -246,6 +250,7 @@ for isample, sample in enumerate(allSamples):
       del t
     for v in newVars:
       del v['branch']
+
 
   if not options.small: 
     size=0
