@@ -23,7 +23,7 @@ for i_htb, htb in enumerate(htreg):
   print '\multirow{4}{*}{\\begin{sideways}$'+varBin(htb)+'$\end{sideways}}'
   #print '& & \multicolumn{6}{c|}{$t\overline{t}$+Jets}&\multicolumn{6}{c|}{$W$+Jets}&\multicolumn{6}{c}{total}\\\\'
   #print '\multicolumn{2}{c|}{$'+varBinName(htb, 'H_{T}')+\
-        '$} & \multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c}{simulation}\\\\\\hline'
+  #      '$} & \multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c}{simulation}\\\\\\hline'
   for srNJet in njreg:
     print '&\multirow{2}{*}{'+varBin(srNJet)+'}'
     for stb, dPhiCut in streg:
