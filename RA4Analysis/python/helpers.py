@@ -170,6 +170,11 @@ def varBinName(vb, var):
     n+='#leq '+str(vb[1])
   return n
 
+def varBin(vb):
+  if vb[0] < vb[1] : return '[' + str(vb[0]) + ',' +str(vb[1]) + ']' 
+  if vb[1]==-1 : return '$\geq'+ str(vb[0])+'$'
+  if vb[0]==vb[1] : return str(vb[0])
+
 def getBinBorders(l, max=10**4):
   return [x[0] for x in l ] + [max]
 
