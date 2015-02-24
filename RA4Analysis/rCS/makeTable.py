@@ -6,7 +6,7 @@ from rCShelpers import *
 from math import sqrt, pi
 from localInfo import username
 
-prefix = 'wJets'
+prefix = 'singleLeptonic_fullBkg'
 res = pickle.load(file('/data/'+username+'/results2014/rCS_0b/'+prefix+'_estimationResults_pkl'))
 
 streg = [[(250, 350), 1.], [(350, -1), 1.]]
@@ -158,7 +158,7 @@ print
 print "rCS(TT) comparison used for tt estimation"
 print
 print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrr|rrr|}\\hline'
-print ' \HT$[$GeV$]$     & \ST$[$GeV$]$     &\multicolumn{3}{c|}{1b,2/3j}&\multicolumn{3}{c|}{1b,tt,2/3j}&\multicolumn{3}{c|}{0b,tt,2/3j}\\\\\hline'
+print ' \HT$[$GeV$]$     & \ST$[$GeV$]$     &\multicolumn{3}{c|}{1b,4/5j}&\multicolumn{3}{c|}{1b,tt,4/5j}&\multicolumn{3}{c|}{0b,tt,4/5j}\\\\\hline'
 for i_htb, htb in enumerate(htreg):
   if i_htb!=0:print '\\hline'
   print '\multirow{2}{*}{$'+varBin(htb)+'$}'
