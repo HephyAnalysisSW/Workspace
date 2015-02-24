@@ -153,21 +153,30 @@ for i_htb, htb in enumerate(htreg):
 print
 print '\end{tabular}}\end{center}\caption{YYY}\label{tab:0b_rcscorr_Wbkg}\end{table}'
 
-# print "rCS(TT) comparison used for tt estimation"
-# print
-# for i_htb, htb in enumerate(htreg):
-#   if i_htb!=0:print '\\hline'
-# #  print '& & \multicolumn{6}{c|}{$t\overline{t}$+Jets}&\multicolumn{6}{c|}{$W$+Jets}&\multicolumn{6}{c}{total}\\\\'
-#   print '\multicolumn{2}{c|}{$'+varBinName(htb, 'H_{T}')+"$}&"\
-#       + "\multicolumn{3}{c|}{$R_{CS}(1b,4/5j)$}&\multicolumn{3}{c|}{$R_{CS,t\overline{t}}(1b,4/5j)$}&\multicolumn{3}{c}{$R_{CS,t\overline{t}}(0b)$}\\\\\\hline"
-#
-#   for stb, dPhiCut in streg:
-#     for srNJet in njreg:
-#       print '$'+nJetBinName(srNJet)+'$ & $'+varBinName(stb, 'S_{T}')+'$'+' & '+\
-#           ' & '.join([getNumString(res[htb][stb][srNJet]['rCS_crLowNJet_1b']['rCS'], res[htb][stb][srNJet]['rCS_crLowNJet_1b']['rCSE_sim'],acc=3), \
-#                       getNumString(res[htb][stb][srNJet]['rCS_crLowNJet_1b_onlyTT']['rCS'], res[htb][stb][srNJet]['rCS_crLowNJet_1b_onlyTT']['rCSE_sim'],acc=3),\
-#                       getNumString(res[htb][stb][srNJet]['rCS_srNJet_0b_onlyTT']['rCS'], res[htb][stb][srNJet]['rCS_srNJet_0b_onlyTT']['rCSE_sim'],acc=3)])+'\\\\'
-#
+
+print 
+print "rCS(TT) comparison used for tt estimation"
+print
+print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrr|rrr|}\\hline'
+print ' \HT$[$GeV$]$     & \ST$[$GeV$]$     &\multicolumn{3}{c|}{1b,2/3j}&\multicolumn{3}{c|}{1b,tt,2/3j}&\multicolumn{3}{c|}{0b,tt,2/3j}\\\\\hline'
+for i_htb, htb in enumerate(htreg):
+  if i_htb!=0:print '\\hline'
+  print '\multirow{2}{*}{$'+varBin(htb)+'$}'
+#  print '& & \multicolumn{6}{c|}{$t\overline{t}$+Jets}&\multicolumn{6}{c|}{$W$+Jets}&\multicolumn{6}{c}{total}\\\\'
+  #print '\multicolumn{2}{c|}{$'+varBinName(htb, 'H_{T}')+"$}&"\
+  #    + "\multicolumn{3}{c|}{$R_{CS}(1b,4/5j)$}&\multicolumn{3}{c|}{$R_{CS,t\overline{t}}(1b,4/5j)$}&\multicolumn{3}{c}{$R_{CS,t\overline{t}}(0b)$}\\\\\\hline"
+  for srNJet in njreg:
+    print '&\multirow{2}{*}{'+varBin(srNJet)+'}'
+    for stb, dPhiCut in streg:
+      print '&$'+varBin(stb)+'$&'
+      #print '$'+nJetBinName(srNJet)+'$ & $'+varBinName(stb, 'S_{T}')+'$'+' & '+\
+      print   ' & '.join([getNumString(res[htb][stb][srNJet]['rCS_crLowNJet_1b']['rCS'], res[htb][stb][srNJet]['rCS_crLowNJet_1b']['rCSE_sim'],acc=3), \
+                      getNumString(res[htb][stb][srNJet]['rCS_crLowNJet_1b_onlyTT']['rCS'], res[htb][stb][srNJet]['rCS_crLowNJet_1b_onlyTT']['rCSE_sim'],acc=3),\
+                      getNumString(res[htb][stb][srNJet]['rCS_srNJet_0b_onlyTT']['rCS'], res[htb][stb][srNJet]['rCS_srNJet_0b_onlyTT']['rCSE_sim'],acc=3)])+'\\\\'
+      if stb[1] == -1 : print '\\hline'
+
+print '\end{tabular}}\end{center}\caption{rCS(TT) comparison used for tt estimation}\label{tab:0b_rcscorr_Wbkg}\end{table}'
+
 # print "signal yields (+charge)"
 # print
 # for i_htb, htb in enumerate(htreg):
