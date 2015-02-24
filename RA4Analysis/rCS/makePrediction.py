@@ -1,5 +1,6 @@
 import ROOT
 import pickle
+import os,sys
 from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYieldFromChain
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,varBinName
 from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2_HT400ST150 import *
@@ -21,16 +22,16 @@ samples={'W':cWJets, 'TT':cTTJets, 'Rest':cRest, 'Bkg':cBkg}
 
 ROOT.TH1F().SetDefaultSumw2()
 
-prefix = 'singleLeptonic_20150223'
+prefix = 'wJets'
 presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0"
 
 streg = [[(250, 350), 1.], [(350, -1), 1.]] 
 htreg = [(500,750),(750,-1)]
 njreg = [(5,5),(6,-1)]
 
-small = 1
+small = False
 #small = 0
-if small == 1:
+if small:
   streg = [(250,350),1.]
   htreg = (500,750)
   njreg = (6,-1)
@@ -44,35 +45,37 @@ for i_htb, htb in enumerate(htreg):
 
       rd={}
       #join TT estimation results to dict
-      makeTTPrediction(rd, samples, htb, stb, srNJet, presel, dPhiCut=1.0)
+#      makeTTPrediction(rd, samples, htb, stb, srNJet, presel, dPhiCut=1.0)
       #join W estimation results to dict
       makeWPrediction(rd, samples, htb, stb, srNJet, presel, dPhiCut=1.0)
-
+      ##If you want to make prediction of one of the bkgs, comment out all the estimation of total Bkgs
       #estimate total background
-      pred_total = rd['TT_pred'] + rd['W_pred'] + rd['Rest_truth']
-      pred_total_PosPdg = 0.5*(rd['TT_pred']) + rd['W_PosPdg_pred'] + rd['Rest_PosPdg_truth']
-      pred_total_NegPdg = 0.5*(rd['TT_pred']) + rd['W_NegPdg_pred'] + rd['Rest_NegPdg_truth']
-      pred_total_err = rd['TT_pred_err'] + rd['W_pred_err'] + rd['Rest_truth_err']
-      pred_total_PosPdg_err = 0.5*(rd['TT_pred_err']) + rd['W_PosPdg_pred_err'] + rd['Rest_PosPdg_truth_err']
-      pred_total_NegPdg_err = 0.5*(rd['TT_pred_err']) + rd['W_NegPdg_pred_err'] + rd['Rest_NegPdg_truth_err']
-      truth_total = rd['TT_truth'] + rd['W_truth'] + rd['Rest_truth']
-      truth_total_PosPdg = 0.5*(rd['TT_truth']) + rd['W_PosPdg_truth'] + rd['Rest_PosPdg_truth']
-      truth_total_NegPdg = 0.5*(rd['TT_truth']) + rd['W_NegPdg_truth'] + rd['Rest_NegPdg_truth']
-      truth_total_err = rd['TT_truth_err'] + rd['W_truth_err'] + rd['Rest_truth_err']
-      truth_total_PosPdg_err = 0.5*(rd['TT_truth_err']) + rd['W_PosPdg_truth_err'] + rd['Rest_PosPdg_truth_err']
-      truth_total_NegPdg_err = 0.5*(rd['TT_truth_err']) + rd['W_NegPdg_truth_err'] + rd['Rest_NegPdg_truth_err']
-      rd.update({\
-                'tot_pred':pred_total,'tot_pred_err':pred_total_err,\
-                'tot_PosPdg_pred':pred_total_PosPdg,'tot_PosPdg_pred_err':pred_total_PosPdg_err,\
-                'tot_NegPdg_pred':pred_total_NegPdg,'tot_NegPdg_pred_err':pred_total_NegPdg_err,\
-                'tot_truth':truth_total,'tot_truth_err':truth_total_err,\
-                'tot_PosPdg_truth':truth_total_PosPdg,'tot_PosPdg_truth_err':truth_total_PosPdg_err,\
-                'tot_NegPdg_truth':truth_total_NegPdg,'tot_NegPdg_truth_err':truth_total_NegPdg_err,\
-
-                })
+#     pred_total = rd['TT_pred'] + rd['W_pred'] + rd['Rest_truth']
+#     pred_total_PosPdg = 0.5*(rd['TT_pred']) + rd['W_PosPdg_pred'] + rd['Rest_PosPdg_truth']
+#     pred_total_NegPdg = 0.5*(rd['TT_pred']) + rd['W_NegPdg_pred'] + rd['Rest_NegPdg_truth']
+#     pred_total_err = rd['TT_pred_err'] + rd['W_pred_err'] + rd['Rest_truth_err']
+#     pred_total_PosPdg_err = 0.5*(rd['TT_pred_err']) + rd['W_PosPdg_pred_err'] + rd['Rest_PosPdg_truth_err']
+#     pred_total_NegPdg_err = 0.5*(rd['TT_pred_err']) + rd['W_NegPdg_pred_err'] + rd['Rest_NegPdg_truth_err']
+#     truth_total = rd['TT_truth'] + rd['W_truth'] + rd['Rest_truth']
+#     truth_total_PosPdg = 0.5*(rd['TT_truth']) + rd['W_PosPdg_truth'] + rd['Rest_PosPdg_truth']
+#     truth_total_NegPdg = 0.5*(rd['TT_truth']) + rd['W_NegPdg_truth'] + rd['Rest_NegPdg_truth']
+#     truth_total_err = rd['TT_truth_err'] + rd['W_truth_err'] + rd['Rest_truth_err']
+#     truth_total_PosPdg_err = 0.5*(rd['TT_truth_err']) + rd['W_PosPdg_truth_err'] + rd['Rest_PosPdg_truth_err']
+#     truth_total_NegPdg_err = 0.5*(rd['TT_truth_err']) + rd['W_NegPdg_truth_err'] + rd['Rest_NegPdg_truth_err']
+#     rd.update({\
+#               'tot_pred':pred_total,'tot_pred_err':pred_total_err,\
+#               'tot_PosPdg_pred':pred_total_PosPdg,'tot_PosPdg_pred_err':pred_total_PosPdg_err,\
+#               'tot_NegPdg_pred':pred_total_NegPdg,'tot_NegPdg_pred_err':pred_total_NegPdg_err,\
+#               'tot_truth':truth_total,'tot_truth_err':truth_total_err,\
+#               'tot_PosPdg_truth':truth_total_PosPdg,'tot_PosPdg_truth_err':truth_total_PosPdg_err,\
+#               'tot_NegPdg_truth':truth_total_NegPdg,'tot_NegPdg_truth_err':truth_total_NegPdg_err,\
+#
+#               })
 
       dict[htb][stb][srNJet]=rd
-
-pickle.dump(dict, file('/data/'+username+'/results2014/rCS_0b/'+prefix+'_estimationResults_pkl','w'))
+path = '/data/'+username+'/results2014/rCS_0b/'
+if not os.path.exists(path):
+  os.makedirs(path)
+pickle.dump(dict, file(path+prefix+'_estimationResults_pkl','w'))
 
 

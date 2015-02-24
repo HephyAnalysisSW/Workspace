@@ -7,7 +7,8 @@ from math import sqrt, pi
 dPhiStr = "acos((leptonPt+met*cos(leptonPhi-metPhi))/sqrt(leptonPt**2+met**2+2*met*leptonPt*cos(leptonPhi-metPhi)))"
 
 ROOT.TH1F().SetDefaultSumw2()
-def getRCS(c, cut, dPhiCut):
+
+def getRCS(c, cut, dPhiCut):   
 #  dPhiStr = "acos((leptonPt+met*cos(leptonPhi-metPhi))/sqrt(leptonPt**2+met**2+2*met*leptonPt*cos(leptonPhi-metPhi)))"
   h = getPlotFromChain(c, dPhiStr, [0,dPhiCut,pi], cutString=cut, binningIsExplicit=True)
   if h.GetBinContent(1)>0 and h.GetBinContent(2)>0:
@@ -40,7 +41,7 @@ def getRCS(c, cut, dPhiCut):
 #  del f1
 #  return {'k':k, 'k_Error':k_E}
 
-def getNumString(n,ne, acc=2):
+def getNumString(n,ne, acc=2):    ##For printing table 
   return str(round(n,acc))+'&$\pm$&'+str(round(ne,acc))
 
 
