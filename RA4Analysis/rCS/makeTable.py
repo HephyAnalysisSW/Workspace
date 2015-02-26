@@ -6,38 +6,38 @@ from rCShelpers import *
 from math import sqrt, pi
 from localInfo import username
 
-prefix = 'wJets'
+prefix = 'singleLeptonic_fullBkg'
 res = pickle.load(file('/data/'+username+'/results2014/rCS_0b/'+prefix+'_estimationResults_pkl'))
 
 streg = [[(250, 350), 1.], [(350, -1), 1.]]
 htreg = [(500,750),(750,-1)]
 njreg = [(5,5),(6,-1)]
 
-# print "Results"
-# print
-# print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrr|rrr|rrr|rrr|rrr|}\\hline'
-# print ' \HT     & \\njet & \ST     &\multicolumn{6}{c|}{$tt+$Jets}&\multicolumn{6}{c|}{$W+$ Jets}&\multicolumn{6}{c|}{total bkg.}\\\%\hline'
-# print '$[$GeV$]$&        &$[$GeV$]$&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}          \\\\\hline'
-# for i_htb, htb in enumerate(htreg):
-#   if i_htb!=0:print '\\hline'
-#   print '\multirow{4}{*}{\\begin{sideways}$'+varBin(htb)+'$\end{sideways}}'
-#   #print '& & \multicolumn{6}{c|}{$t\overline{t}$+Jets}&\multicolumn{6}{c|}{$W$+Jets}&\multicolumn{6}{c}{total}\\\\'
-#   #print '\multicolumn{2}{c|}{$'+varBinName(htb, 'H_{T}')+\
-#   #      '$} & \multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c}{simulation}\\\\\\hline'
-#   for srNJet in njreg:
-#     print '&\multirow{2}{*}{'+varBin(srNJet)+'}'
-#     for stb, dPhiCut in streg:
-#       if stb[1] == -1 : print '&'
-#       print '&$'+varBin(stb)+'$'
-#       print '$'+nJetBinName(srNJet)+'$ & $'+varBinName(stb, 'S_{T}')+'$'+' & '+getNumString(res[htb][stb][srNJet]['TT_pred'], res[htb][stb][srNJet]['TT_pred_err'])\
-#            +' & '+getNumString(res[htb][stb][srNJet]['TT_truth'], res[htb][stb][srNJet]['TT_truth_err'])\
-#            +' & '+getNumString(res[htb][stb][srNJet]['W_pred'], res[htb][stb][srNJet]['W_pred_err'])\
-#            +' & '+getNumString(res[htb][stb][srNJet]['W_truth'], res[htb][stb][srNJet]['W_truth_err'])\
-#            +' & '+getNumString(res[htb][stb][srNJet]['tot_pred'], res[htb][stb][srNJet]['tot_pred_err'])\
-#            +' & '+getNumString(res[htb][stb][srNJet]['tot_truth'], res[htb][stb][srNJet]['tot_truth_err']) +'\\\\'
-#       if stb[1] == -1 : print '\\cline{2-21}' 
-#
-# print '\\hline\end{tabular}}\end{center}\caption{ABCD}\label{tab:0b_rcscorr_Wbkg}\end{table}'
+print "Results"
+print
+print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrr|rrr|rrr|rrr|rrr|}\\hline'
+print ' \HT     & \\njet & \ST     &\multicolumn{6}{c|}{$tt+$Jets}&\multicolumn{6}{c|}{$W+$ Jets}&\multicolumn{6}{c|}{total bkg.}\\\%\hline'
+print '$[$GeV$]$&        &$[$GeV$]$&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}          \\\\\hline'
+for i_htb, htb in enumerate(htreg):
+  if i_htb!=0:print '\\hline'
+  print '\multirow{4}{*}{\\begin{sideways}$'+varBin(htb)+'$\end{sideways}}'
+  #print '& & \multicolumn{6}{c|}{$t\overline{t}$+Jets}&\multicolumn{6}{c|}{$W$+Jets}&\multicolumn{6}{c}{total}\\\\'
+  #print '\multicolumn{2}{c|}{$'+varBinName(htb, 'H_{T}')+\
+  #      '$} & \multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c}{simulation}\\\\\\hline'
+  for srNJet in njreg:
+    print '&\multirow{2}{*}{'+varBin(srNJet)+'}'
+    for stb, dPhiCut in streg:
+      if stb[1] == -1 : print '&'
+      print '&$'+varBin(stb)+'$'
+#      print '$'+nJetBinName(srNJet)+'$ & $'+varBinName(stb, 'S_{T}')+'$'+' & '+getNumString(res[htb][stb][srNJet]['TT_pred'], res[htb][stb][srNJet]['TT_pred_err'])\
+      print ' & '+getNumString(res[htb][stb][srNJet]['TT_truth'], res[htb][stb][srNJet]['TT_truth_err'])\
+           +' & '+getNumString(res[htb][stb][srNJet]['W_pred'], res[htb][stb][srNJet]['W_pred_err'])\
+           +' & '+getNumString(res[htb][stb][srNJet]['W_truth'], res[htb][stb][srNJet]['W_truth_err'])\
+           +' & '+getNumString(res[htb][stb][srNJet]['tot_pred'], res[htb][stb][srNJet]['tot_pred_err'])\
+           +' & '+getNumString(res[htb][stb][srNJet]['tot_truth'], res[htb][stb][srNJet]['tot_truth_err']) +'\\\\'
+      if stb[1] == -1 : print '\\cline{2-21}' 
+
+print '\\hline\end{tabular}}\end{center}\caption{ABCD}\label{tab:0b_rcscorr_Wbkg}\end{table}'
 
 
 print
@@ -154,29 +154,28 @@ print
 print '\end{tabular}}\end{center}\caption{YYY}\label{tab:0b_rcscorr_Wbkg}\end{table}'
 
 
-# print 
-# print "rCS(TT) comparison used for tt estimation"
-# print
-# print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrr|rrr|}\\hline'
-# print ' \HT$[$GeV$]$     & \ST$[$GeV$]$     &\multicolumn{3}{c|}{1b,2/3j}&\multicolumn{3}{c|}{1b,tt,2/3j}&\multicolumn{3}{c|}{0b,tt,2/3j}\\\\\hline'
-# for i_htb, htb in enumerate(htreg):
-#   if i_htb!=0:print '\\hline'
-#   print '\multirow{2}{*}{$'+varBin(htb)+'$}'
-# #  print '& & \multicolumn{6}{c|}{$t\overline{t}$+Jets}&\multicolumn{6}{c|}{$W$+Jets}&\multicolumn{6}{c}{total}\\\\'
-#   #print '\multicolumn{2}{c|}{$'+varBinName(htb, 'H_{T}')+"$}&"\
-#   #    + "\multicolumn{3}{c|}{$R_{CS}(1b,4/5j)$}&\multicolumn{3}{c|}{$R_{CS,t\overline{t}}(1b,4/5j)$}&\multicolumn{3}{c}{$R_{CS,t\overline{t}}(0b)$}\\\\\\hline"
-#   for srNJet in njreg:
-#     print '&\multirow{2}{*}{'+varBin(srNJet)+'}'
-#     for stb, dPhiCut in streg:
-#       print '&$'+varBin(stb)+'$&'
-#       #print '$'+nJetBinName(srNJet)+'$ & $'+varBinName(stb, 'S_{T}')+'$'+' & '+\
-#       print   ' & '.join([getNumString(res[htb][stb][srNJet]['rCS_crLowNJet_1b']['rCS'], res[htb][stb][srNJet]['rCS_crLowNJet_1b']['rCSE_sim'],acc=3), \
-#                       getNumString(res[htb][stb][srNJet]['rCS_crLowNJet_1b_onlyTT']['rCS'], res[htb][stb][srNJet]['rCS_crLowNJet_1b_onlyTT']['rCSE_sim'],acc=3),\
-#                       getNumString(res[htb][stb][srNJet]['rCS_srNJet_0b_onlyTT']['rCS'], res[htb][stb][srNJet]['rCS_srNJet_0b_onlyTT']['rCSE_sim'],acc=3)])+'\\\\'
-#       if stb[1] == -1 : print '\\hline'
-#
-# print '\end{tabular}}\end{center}\caption{rCS(TT) comparison used for tt estimation}\label{tab:0b_rcscorr_Wbkg}\end{table}'
-#
+print 
+print "rCS(TT) comparison used for tt estimation"
+print
+print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrr|rrr|}\\hline'
+print ' \HT$[$GeV$]$     & \ST$[$GeV$]$     &\multicolumn{3}{c|}{1b,4/5j}&\multicolumn{3}{c|}{1b,tt,4/5j}&\multicolumn{3}{c|}{0b,tt,4/5j}\\\\\hline'
+for i_htb, htb in enumerate(htreg):
+  if i_htb!=0:print '\\hline'
+  print '\multirow{2}{*}{$'+varBin(htb)+'$}'
+#  print '& & \multicolumn{6}{c|}{$t\overline{t}$+Jets}&\multicolumn{6}{c|}{$W$+Jets}&\multicolumn{6}{c}{total}\\\\'
+  #print '\multicolumn{2}{c|}{$'+varBinName(htb, 'H_{T}')+"$}&"\
+  #    + "\multicolumn{3}{c|}{$R_{CS}(1b,4/5j)$}&\multicolumn{3}{c|}{$R_{CS,t\overline{t}}(1b,4/5j)$}&\multicolumn{3}{c}{$R_{CS,t\overline{t}}(0b)$}\\\\\\hline"
+  for srNJet in njreg:
+    print '&\multirow{2}{*}{'+varBin(srNJet)+'}'
+    for stb, dPhiCut in streg:
+      print '&$'+varBin(stb)+'$&'
+      #print '$'+nJetBinName(srNJet)+'$ & $'+varBinName(stb, 'S_{T}')+'$'+' & '+\
+      print   ' & '.join([getNumString(res[htb][stb][srNJet]['rCS_crLowNJet_1b']['rCS'], res[htb][stb][srNJet]['rCS_crLowNJet_1b']['rCSE_sim'],acc=3), \
+                      getNumString(res[htb][stb][srNJet]['rCS_crLowNJet_1b_onlyTT']['rCS'], res[htb][stb][srNJet]['rCS_crLowNJet_1b_onlyTT']['rCSE_sim'],acc=3),\
+                      getNumString(res[htb][stb][srNJet]['rCS_srNJet_0b_onlyTT']['rCS'], res[htb][stb][srNJet]['rCS_srNJet_0b_onlyTT']['rCSE_sim'],acc=3)])+'\\\\'
+      if stb[1] == -1 : print '\\hline'
+print '\end{tabular}}\end{center}\caption{rCS(TT) comparison used for tt estimation}\label{tab:0b_rcscorr_Wbkg}\end{table}'
+
 # print "signal yields (+charge)"
 # print
 # for i_htb, htb in enumerate(htreg):
