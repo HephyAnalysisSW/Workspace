@@ -51,19 +51,20 @@ for s in allSignals:
   s['chain'].SetAlias('dPhi',dPhiStr)
 
 #defining ht, st and njets for SR
-streg = [(200,-1), (250, 350), (350,-1)]                         
-htreg = [(500,-1), (500,750),(750,-1)]
-njreg = [(4,4), (5,5), (6,-1)]
-presel='singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&mt2w>200&&'+'('+dPhiStr+')>1.0'
-preprefix = 'singleLeptonic_0b_ht500-750_st350_mt2w200_6j_2J80_dPhi1'
+streg = [(250,350), (350, 450), (450,-1)]                         
+htreg = [(500,750), (750,1000),(1000,1250), (1250,-1)]
+njreg = [(5,5), (6,-1)]
+btb = (0,0)
+presel='singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80'
+preprefix = 'singleLeptonic_0b_2J80_extended_SR'
 wwwDir = '/afs/hephy.at/user/d/dhandl/www/pngCMG2/'+lepSel+'/'+preprefix+'/'
 
 if not os.path.exists(wwwDir):
   os.makedirs(wwwDir)
 
 #use small to check some changes faster
-small = 1
-#small = 0
+#small = 1
+small = 0
 if small == 1:
   streg = [(350,-1)]
   htreg = [(500,750)]
