@@ -3,12 +3,10 @@ from array import array
 from math import *
 import os, copy, sys
 
+from Workspace.METAnalysis.cmgTuples_hcalStudy import *
 ROOT.TH1F().SetDefaultSumw2()
 
 from Workspace.RA4Analysis.simplePlotHelpers import plot, stack, loopAndFill, drawNMStacks
-
-from Workspace.METAnalysis.cmgTuples_hcalStudy import *
-
 from localInfo import afsuser
 subdir = "/pngHCAL/"
 small = False

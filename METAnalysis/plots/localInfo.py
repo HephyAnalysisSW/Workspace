@@ -1,0 +1,2 @@
+username="schoef"
+afsuser = "schoefbeck"
