@@ -45,7 +45,8 @@ def getRCS(c, cut, dPhiCut):
 #  return {'k':k, 'k_Error':k_E}
 
 def getNumString(n,ne, acc=2):    ##For printing table 
-  #if type(n) is float and type(ne) is float:
-  return str(round(n,acc))+'&$\pm$&'+str(round(ne,acc))
-   
-
+  if type(n) is float and type(ne) is float:
+    return str(round(n,acc))+'&$\pm$&'+str(round(ne,acc))
+  #if type(n) is str and type(ne) is str: 
+  else:
+    return n +'&$\pm$&'+ ne
