@@ -17,7 +17,7 @@ def getRCS(c, cut, dPhiCut):
     rCSE_pred = rcs*sqrt(1./h.GetBinContent(2)**2 + 1./h.GetBinContent(1)**2)
     del h
     return {'rCS':rcs, 'rCSE_pred':rCSE_pred, 'rCSE_sim':rCSE_sim}
-  else
+  else:
     del h
     return {'rCS':'NaN', 'rCSE_pred':'NaN', 'rCSE_sim':'NaN'}
   

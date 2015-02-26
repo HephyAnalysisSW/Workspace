@@ -159,7 +159,7 @@ print
 print "rCS(TT) comparison used for tt estimation"
 print
 print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrr|rrr|}\\hline'
-print ' \HT$[$GeV$]$ &   & \ST$[$GeV$]$     &\multicolumn{3}{c|}{1b,4/5j}&\multicolumn{3}{c|}{1b,tt,4/5j}&\multicolumn{3}{c|}{0b,tt,4/5j}\\\\\hline'
+print ' \HT$[$GeV$]$ & $n_{jet}$  & \ST$[$GeV$]$     &\multicolumn{3}{c|}{1b,4/5j}&\multicolumn{3}{c|}{1b,tt,4/5j}&\multicolumn{3}{c|}{0b,tt,4/5j}\\\\\hline'
 for i_htb, htb in enumerate(htreg):
   if i_htb!=0:print '\\hline'
   print '\multirow{'+str(nSTbins)+'}{*}{$'+varBin(htb)+'$}'
