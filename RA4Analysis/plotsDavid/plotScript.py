@@ -52,7 +52,7 @@ for s in allSignals:
 
 #defining ht, st and njets for SR
 streg = [(250,350), (350, 450), (450,-1)]                         
-htreg = [(500,750), (750,1000),(1000,1250), (1250,-1)]
+htreg = [(1000,1250), (1250,-1)]
 njreg = [(5,5), (6,-1)]
 btb = (0,0)
 presel='singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80'

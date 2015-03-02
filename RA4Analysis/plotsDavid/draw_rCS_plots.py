@@ -25,12 +25,12 @@ import Workspace.HEPHYPythonTools.xsec as xsec
 from Workspace.RA4Analysis.helpers import *
 from localInfo import username
 from draw_helpers import *
-from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2_HT400ST150 import *
+from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2_HT400ST150_withDF import *
 
 ROOT_colors = [ROOT.kBlack, ROOT.kRed, ROOT.kBlue, ROOT.kGreen, ROOT.kCyan]
 
 lepSel = 'hard'
-dPhiStr = 'acos((leptonPt+met*cos(leptonPhi-metPhi))/sqrt(leptonPt**2+met**2+2*met*leptonPt*cos(leptonPhi-metPhi)))'
+#dPhiStr = 'acos((leptonPt+met*cos(leptonPhi-metPhi))/sqrt(leptonPt**2+met**2+2*met*leptonPt*cos(leptonPhi-metPhi)))'
 cWJets  = getChain(WJetsHTToLNu[lepSel],histname='')
 cTTJets = getChain(ttJets[lepSel],histname='')
 cBkg    = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], QCD[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]],histname='')
@@ -53,7 +53,7 @@ subDir = 'pngCMG2/rCS'
 #  print s["name"],"xsec",xsec.xsec[s['dbsName']],"NSim",cs[1],"nEntry",nEntry, "yield:",4000*xsec.xsec[s['dbsName']]/float(cs[1])*nEntry
 #print "totalYield", totalYield
 
-htbins = [(500,750), (750,-1)]
+htbins = [(500,750), (750,1000), (1000,1250), (1250,-1)]
 #prefix=None
 njCorr=0.
 
@@ -67,7 +67,7 @@ for lepton in ["both"]:# ["muon", "electron"]: #["both"]:
      leptonMinPt=(25,25); minID=(3,1); minRelIso=(0.14,0.12); leptonMaxEta = (2.4, 2.4)
   for htb in htbins:
     res[htb] = {}
-    for stb in [(250,350), (350,-1)]:#, (350,450), (450,-1)]:
+    for stb in [(250,350), (350,450), (450,-1)]:
       res[htb][stb] = {}
   
       fname = nameAndCut(stb, htb, njetb=None, btb=None)[0]
@@ -87,7 +87,7 @@ for lepton in ["both"]:# ["muon", "electron"]: #["both"]:
         rCS_vs_nbtag = ROOT.TProfile('profile_rCS_nbtag','', len(nbtag_bins)-1, array('d',nbtag_bins), 0, 1)
         print "htb", htb, "stb", stb, "njb", njb, "cut:", cut
         #rCS_vs_nbtag.Reset()
-        cTTJets.Draw('(Sum$(('+dPhiStr+')*('+presel+')>1==1)):Sum$(nBJetMediumCMVA30)>>profile_rCS_nbtag',cut,'goff')
+        cTTJets.Draw('(Sum$((deltaPhi_Wl)*('+presel+')>1==1)):Sum$(nBJetMediumCMVA30)>>profile_rCS_nbtag',cut,'goff')
 #        ttJets_fromEOS['chain'].Draw(dPhiCut(minDPhi=1, lepton=lepton,minPt=leptonMinPt, maxEta=leptonMaxEta, minID=minID, minRelIso=minRelIso)+":"+nBTagStr(minPt=30, maxEta=2.4, minCMVATag=0.732)+'>>profile_rCS_nbtag',cut,'goff') 
 #        cTTJets.Draw(dPhiCut(minDPhi=1, lepton=lepton,minPt=leptonMinPt, maxEta=leptonMaxEta, minID=minID, minRelIso=minRelIso)+":"+nBTagStr(minPt=30, maxEta=2.4, minCMVATag=0.732)+'>>profile_rCS_nbtag',cut,'goff') 
         plots[njb]=ROOT.gDirectory.Get('profile_rCS_nbtag').Clone()
@@ -133,7 +133,7 @@ for lepton in ["both"]:# ["muon", "electron"]: #["both"]:
         rCS_vs_njet = ROOT.TProfile('profile_rCS_njet_bTag'+str(btb[0]),'', len(njet_bins)-1, array('d',njet_bins), 0, 1)
         print "htb", htb, "stb", stb, "btb", btb, "cut:", cut
         #rCS_vs_nbtag.Reset()
-        cTTJets.Draw('(Sum$(('+dPhiStr+')*('+presel+')>1==1)):nJet30>>profile_rCS_njet_bTag'+str(btb[0]),cut,'goff')
+        cTTJets.Draw('(Sum$((deltaPhi_Wl)*('+presel+')>1==1)):nJet30>>profile_rCS_njet_bTag'+str(btb[0]),cut,'goff')
 #        ttJets_fromEOS['chain'].Draw(dPhiCut(minDPhi=1, lepton=lepton,minPt=leptonMinPt, maxEta=leptonMaxEta, minID=minID, minRelIso=minRelIso)+":"+nJetStr(minPt=30, maxEta=2.4)+'>>profile_rCS_njet',cut,'goff') 
 #        cWJets.Draw(dPhiCut(minDPhi=1, lepton=lepton,minPt=leptonMinPt, maxEta=leptonMaxEta, minID=minID, minRelIso=minRelIso)+":"+nJetStr(minPt=30, maxEta=2.4)+'>>profile_rCS_njet_bTag'+str(btb[0]),cut,'goff') 
         plots[btb]=ROOT.gDirectory.Get('profile_rCS_njet_bTag'+str(btb[0])).Clone()

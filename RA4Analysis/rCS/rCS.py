@@ -47,16 +47,16 @@ def getRCS(c, cut, dPhiCut):
     return rcs, rcsE 
     del h
 
-#streg = [[(250, 350), 1.], [(350, 450), 1.], [(450, -1), 1.]]
-#htreg = [(400,500),(500,750),(750, 1000),(1000,-1)]
-#njreg = [(1,1), (2,2),(3,3),(4,4),(5,5),(6,-1)]
-
-streg = [[(250, 350), 1.], [(350, -1), 1.]]
-htreg = [(500,750),(750, -1)]
+streg = [[(250, 350), 1.], [(350, 450), 1.], [(450, -1), 1.]]
+htreg = [(500,750),(750, 1000),(1000,-1)]
 njreg = [(2,2),(3,3),(4,4),(5,5),(6,-1)]
 
+#streg = [[(250, 350), 1.], [(350, -1), 1.]]
+#htreg = [(500,750),(750, -1)]
+#njreg = [(2,2),(3,3),(4,4),(5,5),(6,-1)]
 
-prefix = 'Phys14_hardSingleMuonic_'
+
+prefix = 'hys14_hardSingleMuonic_'
 #presel="singleMuonic&&nVetoMuons==1&&nVetoElectrons==0&&nBJetMedium40==1"
 #presel="singleMuonic&&nVetoMuons==1&&nVetoElectrons==0&&nBJetMedium25==0"
 presel='singleMuonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0'

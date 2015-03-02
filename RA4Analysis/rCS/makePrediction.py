@@ -22,8 +22,8 @@ samples={'W':cWJets, 'TT':cTTJets, 'Rest':cRest, 'Bkg':cBkg}
 
 ROOT.TH1F().SetDefaultSumw2()
 
-prefix = 'singleLeptonic_fullBkg'
-presel = "mt2w>200&&singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0"
+prefix = 'singleMuonic_fullBkg'
+presel = "singleMuonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0"
 
 streg = [[(250, 350), 1.], [(350, 450), 1.], [(450, -1), 1.]] 
 htreg = [(500,750), (750,1000), (1000,1250), (1250,-1)]

@@ -6,7 +6,7 @@ from rCShelpers import *
 from math import sqrt, pi
 from localInfo import username
 
-prefix = 'singleLeptonic_fullBkg'
+prefix = 'singleMuonic_fullBkg'
 res = pickle.load(file('/data/'+username+'/results2014/rCS_0b/'+prefix+'_estimationResults_pkl'))
 
 streg = [[(250, 350), 1.], [(350, 450), 1.], [(450,-1), 1.]]
