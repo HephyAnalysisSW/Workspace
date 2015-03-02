@@ -53,16 +53,16 @@ for i_htb, htb in enumerate(htreg):
   if i_htb!=0:print '\\hline'
   print '\multirow{'+str(2*nSTbins)+'}{*}{\\begin{sideways}$'+varBin(htb)+'$\end{sideways}}'
   for srNJet in njreg:
-    print '&\multirow{'+str(nSTbins)+'}{*}{'+varBin(srNJet)+'}'
+    print '&\multirow{'+str(nSTbins)+'}{*}{'+varBin(srNJet)+'}&'
     for stb, dPhiCut in streg:
-      if stb[1] == -1 : print '&'
-      print '&$'+varBin(stb)+'$'
+      print '$'+varBin(stb)+'$'
       name, cut =  nameAndCut(stb, htb, srNJet, btb=(0,0), presel=presel, btagVar = 'nBJetMediumCMVA30')
       for s in allSignals:
         s['yield_NegPdg']     = getYieldFromChain(s['chain'], 'leptonPdg<0&&'+cut+"&&deltaPhi_Wl>1.0", weight = "weight")
         s['yield_NegPdg_Var'] = getYieldFromChain(s['chain'], 'leptonPdg<0&&'+cut+"&&deltaPhi_Wl>1.0", weight = "weight*weight")
         print ' & '+getNumString(s['yield_NegPdg'], sqrt(s['yield_NegPdg_Var']), acc=3)
       print '\\\\'
+      if stb[1] != -1 :print '&&'
       if stb[1] == -1 : print '\\cline{2-9}'
 print '\\hline\end{tabular}}\end{center}\caption{+ charge}\end{table}'
 
@@ -75,15 +75,15 @@ for i_htb, htb in enumerate(htreg):
   if i_htb!=0:print '\\hline'
   print '\multirow{'+str(2*nSTbins)+'}{*}{\\begin{sideways}$'+varBin(htb)+'$\end{sideways}}'
   for srNJet in njreg:
-    print '&\multirow{'+str(nSTbins)+'}{*}{'+varBin(srNJet)+'}'
+    print '&\multirow{'+str(nSTbins)+'}{*}{'+varBin(srNJet)+'}&'
     for stb, dPhiCut in streg:
-      if stb[1] == -1 : print '&'
-      print '&$'+varBin(stb)+'$'
+      print '$'+varBin(stb)+'$'
       name, cut =  nameAndCut(stb, htb, srNJet, btb=(0,0), presel=presel, btagVar = 'nBJetMediumCMVA30')
       for s in allSignals:
         s['yield_PosPdg']     = getYieldFromChain(s['chain'], 'leptonPdg>0&&'+cut+"&&deltaPhi_Wl>1.0", weight = "weight")
         s['yield_PosPdg_Var'] = getYieldFromChain(s['chain'], 'leptonPdg>0&&'+cut+"&&deltaPhi_Wl>1.0", weight = "weight*weight")
         print ' & '+getNumString(s['yield_PosPdg'], sqrt(s['yield_PosPdg_Var']), acc=3)
       print '\\\\'
+      if stb[1] != -1 :print '&&'
       if stb[1] == -1 : print '\\cline{2-9}'
 print '\\hline\end{tabular}}\end{center}\caption{- charge}\end{table}'
