@@ -1,18 +1,20 @@
 import ROOT
 import sys, os, copy, random, subprocess, datetime
 from array import array
-from Workspace.RA4Analysis.cmgObjectSelection import cmgLooseLepIndices, splitIndList
-
+from Workspace.RA4Analysis.cmgObjectSelection import cmgLooseLepIndices, splitIndList, get_cmg_jets_fromStruct, splitListOfObjects
 from Workspace.HEPHYPythonTools.xsec import xsec
 from Workspace.HEPHYPythonTools.helpers import getObjFromFile, getObjDict, getFileList
 from Workspace.RA4Analysis.convertHelpers import compileClass, readVar, printHeader, typeStr, createClassString
 
-subDir = "postProcessed_v5_Phys14V2"
+subDir = "postProcessed_v6_Phys14V2_withDF"
 #from Workspace.RA4Analysis.cmgTuples_v3 import *
 from Workspace.HEPHYPythonTools.helpers import getChunksFromNFS, getChunksFromDPM, getChunks
 from Workspace.RA4Analysis.cmgTuples_v5_Phys14 import *
 target_lumi = 4000 #pb-1
 
+from  Workspace.RA4Analysis import mt2w
+
+from math import *
 from localInfo import username
 
 ROOT.gSystem.Load("libFWCoreFWLite.so")
@@ -42,8 +44,8 @@ parser.add_option("--leptonSelection", dest="leptonSelection", default="hard", t
 parser.add_option("--small", dest="small", default = False, action="store_true", help="Just do a small subset.")
 #parser.add_option("--overwrite", dest="overwrite", action="store_true", help="Overwrite?", default=True)
 (options, args) = parser.parse_args()
-if options.skim=='inc' or options.skim=="":
-  skimCond = "(1)"
+
+skimCond = "(1)"
 if options.skim.startswith('met'):
   skimCond = "met_pt>"+str(float(options.skim[3:]))
 if options.skim=='HT400ST150':
@@ -51,10 +53,12 @@ if options.skim=='HT400ST150':
 
 ##In case a lepton selection is required, loop only over events where there is one 
 if options.leptonSelection.lower()=='soft':
-#  skimCond += "&&Sum$(LepGood_pt>5&&LepGood_pt<25&&(LepGood_relIso03*LepGood_pt<7.5)&&abs(LepGood_eta)<2.4)>=1"
   skimCond += "&&Sum$(LepGood_pt>5&&LepGood_pt<25&&LepGood_relIso03<0.4&&abs(LepGood_eta)<2.4)>=1"
 if options.leptonSelection.lower()=='hard':
   skimCond += "&&Sum$(LepGood_pt>25&&LepGood_relIso03<0.4&&abs(LepGood_eta)<2.4)>=1"
+
+if options.skim=='inc':
+  skimCond = "(1)"
 
 if sys.argv[0].count('ipython'):
   options.small=True
@@ -97,18 +101,19 @@ for isample, sample in enumerate(allSamples):
   os.system('rm -rf '+tmpDir+'/*')
 
   lumiWeight = xsec[sample['dbsName']]*target_lumi/float(nTotEvents)
-  readVariables = ['met_pt/D']
+  readVariables = ['met_pt/D', 'met_phi/D']
 
   newVariables = ['weight/F']
   newVariables += ['nLooseSoftLeptons/I', 'nLooseSoftPt10Leptons/I', 'nLooseHardLeptons/I', 'nTightSoftLeptons/I', 'nTightHardLeptons/I']
   if options.leptonSelection.lower()!='none':
-    newVariables.extend( ['st/F', 'leptonPt/F', 'leptonEta/F', 'leptonPhi/F', 'leptonPdg/I/0', 'leptonInd/I/-1', 'leptonMass/F', 'singleMuonic/I', 'singleElectronic/I', 'singleLeptonic/I'] )
+    newVariables.extend( ['deltaPhi_Wl/F','nBJetMediumCMVA30/I','nJet30/I','htJet30j/F','st/F', 'leptonPt/F', 'leptonEta/F', 'leptonPhi/F', 'leptonPdg/I/0', 'leptonInd/I/-1', 'leptonMass/F', 'singleMuonic/I', 'singleElectronic/I', 'singleLeptonic/I', 'mt2w/F'] )
   newVars = [readVar(v, allowRenaming=False, isWritten = True, isRead=False) for v in newVariables]
 
   aliases = [ "met:met_pt", "metPhi:met_phi","genMet:met_genPt", "genMetPhi:met_genPhi"]
 
   readVectors = [\
     {'prefix':'LepGood',  'nMax':8, 'vars':['pt/D', 'eta/D', 'phi/D', 'pdgId/I', 'relIso03/D', 'tightId/I', 'mass/D']},
+    {'prefix':'Jet',  'nMax':100, 'vars':['pt/D', 'eta/D', 'phi/D', 'id/I', 'btagCMVA/D', 'partonId/I']},
   ]
   readVars = [readVar(v, allowRenaming=False, isWritten=False, isRead=True) for v in readVariables]
   for v in readVectors:
@@ -179,16 +184,6 @@ for isample, sample in enumerate(allSamples):
       
       leadingLepInd = None
       if options.leptonSelection=='hard':
-        #Select hardest tight lepton among hard leptons
-#        if s.nLooseHardLeptons>=1 and s.nLooseSoftLeptons>=1:
-#          print 
-#          print "all", len(allLeptons),looseLepInd,allLeptons
-#          print "nLooseSoftLeptons     n=", s.nLooseSoftLeptons,    "which?",  looseSoftLepInd,  looseSoftLep
-#          print "nLooseHardLeptons     n=", s.nLooseHardLeptons,    "which?",  looseHardLepInd, looseHardLep 
-#          print "nLooseSoftPt10Leptons n=", s.nLooseSoftPt10Leptons,"which?",  looseSoftPt10LepInd, looseSoftPt10Lep
-#          print "nTightSoftLeptons     n=", s.nTightSoftLeptons,    "which?",  tightSoftLepInd, tightSoftLep
-#          print "nTightHardLeptons     n=", s.nTightHardLeptons,    "which?",  tightHardLepInd, tightHardLep
-#          print
         if s.nTightHardLeptons>=1:
           leadingLepInd = tightHardLepInd[0]
           s.leptonPt  = r.LepGood_pt[leadingLepInd]
@@ -227,11 +222,22 @@ for isample, sample in enumerate(allSamples):
           s.singleMuonic      = False 
           s.singleElectronic  = False 
 #      print "Selected",s.leptonPt
+      if options.leptonSelection!='':
+        jets = filter(lambda j:j['pt']>30 and abs(j['eta'])<2.4 and j['id'], get_cmg_jets_fromStruct(r))
+        lightJets, bJets = splitListOfObjects('btagCMVA', 0.732, jets) 
+        s.htJet30j = sum([x['pt'] for x in jets])
+        s.nJet30 = len(jets)
+        s.nBJetMediumCMVA30 = len(bJets)
+        s.mt2w = mt2w.mt2w(met = {'pt':r.met_pt, 'phi':r.met_phi}, l={'pt':s.leptonPt, 'phi':s.leptonPhi, 'eta':s.leptonEta}, ljets=lightJets, bjets=bJets)
+        s.deltaPhi_Wl = acos((s.leptonPt+r.met_pt*cos(s.leptonPhi-r.met_phi))/sqrt(s.leptonPt**2+r.met_pt**2+2*r.met_pt*s.leptonPt*cos(s.leptonPhi-r.met_phi))) 
+        #print "deltaPhi:" , s.deltaPhi_Wl
+#          print "Warning -> Why can't I compute mt2w?", s.mt2w, len(jets), len(bJets), len(allTightLeptons),lightJets,bJets, {'pt':s.type1phiMet, 'phi':s.type1phiMetphi}, {'pt':s.leptonPt, 'phi':s.leptonPhi, 'eta':s.leptonEta}
       for v in newVars:
         v['branch'].Fill()
     newFileName = sample['name']+'_'+chunk['name']+'.root'
     filesForHadd.append(newFileName)
     if not options.small:
+    #if options.small:
       f = ROOT.TFile(tmpDir+'/'+newFileName, 'recreate')
       t.SetBranchStatus("*",0)
       for b in branchKeepStrings + [v['stage2Name'] for v in newVars] +  [v.split(':')[1] for v in aliases]:
@@ -246,6 +252,7 @@ for isample, sample in enumerate(allSamples):
       del t
     for v in newVars:
       del v['branch']
+
 
   if not options.small: 
     size=0
