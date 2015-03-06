@@ -3,6 +3,9 @@
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
 # with command line options: step1 --filein file:GENSIM.root --fileout file:step1.root --pileup_input dbs:/MinBias_TuneA2MB_13TeV-pythia8/Fall13-POSTLS162_V1-v1/GEN-SIM --mc --eventcontent RAWSIM --inputEventContent REGEN --pileup AVE_40_BX_25ns --customise SLHCUpgradeSimulations/Configuration/postLS1Customs.customisePostLS1 --datatier GEN-SIM-RAW --conditions PHYS14_25_V1 --step GEN:fixGenInfo,DIGI,L1,DIGI2RAW,HLT:GRun --magField 38T_PostLS1 -n -1 --no_exec
+
+#To be used in CMSSW_7_2_0_patch1
+
 import FWCore.ParameterSet.Config as cms
 
 process = cms.Process('HLT')
@@ -26,13 +29,13 @@ process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(-1)
+    input = cms.untracked.int32(10)
 )
 
 # Input source
 process.source = cms.Source("PoolSource",
     secondaryFileNames = cms.untracked.vstring(),
-    fileNames = cms.untracked.vstring('file:GENSIM.root'),
+    fileNames = cms.untracked.vstring(['root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/nrad/T2DegStop2j_300_270_GENSIM/T2DegStop2j_300_270_GENSIM/edbe023d17b99f8a8fbdf4e576e17580/T2DegStop2j_300_270_GENSIM_1_1_cYt.root']),
     inputCommands = cms.untracked.vstring('keep *', 
         'drop *_genParticles_*_*', 
         'drop *_genParticlesForJets_*_*', 
@@ -68,7 +71,7 @@ process.RAWSIMoutput = cms.OutputModule("PoolOutputModule",
     splitLevel = cms.untracked.int32(0),
     eventAutoFlushCompressedSize = cms.untracked.int32(5242880),
     outputCommands = process.RAWSIMEventContent.outputCommands,
-    fileName = cms.untracked.string('file:step1.root'),
+    fileName = cms.untracked.string('T2DegStop2j_300_270_GEN-DIGI-L1-DIGI2RAW-HLT-PU40.root'),
     dataset = cms.untracked.PSet(
         filterName = cms.untracked.string(''),
         dataTier = cms.untracked.string('GEN-SIM-RAW')
@@ -95,22 +98,22 @@ process.mix.input.fileNames = cms.untracked.vstring([
                                   '/store/mc/Fall13/MinBias_TuneA2MB_13TeV-pythia8/GEN-SIM/POSTLS162_V1-v1/10000/021E1B53-101D-E311-886F-00145EDD7569.root', 
                                   '/store/mc/Fall13/MinBias_TuneA2MB_13TeV-pythia8/GEN-SIM/POSTLS162_V1-v1/10000/022A782D-A51C-E311-9856-80000048FE80.root', 
                                   '/store/mc/Fall13/MinBias_TuneA2MB_13TeV-pythia8/GEN-SIM/POSTLS162_V1-v1/10000/026FE678-BA1C-E311-BEF5-00D0680BF90A.root', 
-                                  '/store/mc/Fall13/MinBias_TuneA2MB_13TeV-pythia8/GEN-SIM/POSTLS162_V1-v1/10000/02A10BDE-B21C-E311-AB59-00266CF327C0.root'
-                                  '/store/mc/Fall13/MinBias_TuneA2MB_13TeV-pythia8/GEN-SIM/POSTLS162_V1-v1/10000/06DEEAAD-A91C-E311-BE39-CDFB7D0D7CF5.root' 
-                                  '/store/mc/Fall13/MinBias_TuneA2MB_13TeV-pythia8/GEN-SIM/POSTLS162_V1-v1/10000/0820822D-031D-E311-BD5C-00266CF9B5D0.root'
-                                  '/store/mc/Fall13/MinBias_TuneA2MB_13TeV-pythia8/GEN-SIM/POSTLS162_V1-v1/10000/0829009E-101D-E311-9FDE-001EC9B0B2E6.root'
-                                  '/store/mc/Fall13/MinBias_TuneA2MB_13TeV-pythia8/GEN-SIM/POSTLS162_V1-v1/10000/083B4724-B41C-E311-879C-002481CFD184.root'
-                                  '/store/mc/Fall13/MinBias_TuneA2MB_13TeV-pythia8/GEN-SIM/POSTLS162_V1-v1/10000/083FF7C5-FE1C-E311-B729-C8600032C755.root'
-                                  '/store/mc/Fall13/MinBias_TuneA2MB_13TeV-pythia8/GEN-SIM/POSTLS162_V1-v1/10000/08924A82-A91E-E311-AFBA-001517E73360.root'
-                                  '/store/mc/Fall13/MinBias_TuneA2MB_13TeV-pythia8/GEN-SIM/POSTLS162_V1-v1/10000/08B0ED89-A91E-E311-BEAA-D4AE527EE0EB.root'
-                                  '/store/mc/Fall13/MinBias_TuneA2MB_13TeV-pythia8/GEN-SIM/POSTLS162_V1-v1/10000/0A263BCB-591C-E311-B896-003048F1DBB0.root'
-                                  '/store/mc/Fall13/MinBias_TuneA2MB_13TeV-pythia8/GEN-SIM/POSTLS162_V1-v1/10000/0A492201-511C-E311-82CA-00259021A03A.root'
-                                  '/store/mc/Fall13/MinBias_TuneA2MB_13TeV-pythia8/GEN-SIM/POSTLS162_V1-v1/10000/0A6E3C85-A91E-E311-863E-001E6724840D.root'
-                                  '/store/mc/Fall13/MinBias_TuneA2MB_13TeV-pythia8/GEN-SIM/POSTLS162_V1-v1/10000/0A744658-AA1C-E311-A390-6805CA083D10.root'
-                                  '/store/mc/Fall13/MinBias_TuneA2MB_13TeV-pythia8/GEN-SIM/POSTLS162_V1-v1/10000/0A96E4A2-A91C-E311-B303-03C3B4223E73.root'
-                                  '/store/mc/Fall13/MinBias_TuneA2MB_13TeV-pythia8/GEN-SIM/POSTLS162_V1-v1/10000/0A999210-121D-E311-9DEC-0019B9E7CCC9.root'
-                                  '/store/mc/Fall13/MinBias_TuneA2MB_13TeV-pythia8/GEN-SIM/POSTLS162_V1-v1/10000/0A9CFAEE-501C-E311-8CCD-002590D0AFDC.root'
-                                  '/store/mc/Fall13/MinBias_TuneA2MB_13TeV-pythia8/GEN-SIM/POSTLS162_V1-v1/10000/0ABEFB3A-A51C-E311-A0F7-1CC1DE0590E8.root'
+                                  '/store/mc/Fall13/MinBias_TuneA2MB_13TeV-pythia8/GEN-SIM/POSTLS162_V1-v1/10000/02A10BDE-B21C-E311-AB59-00266CF327C0.root', 
+                                  '/store/mc/Fall13/MinBias_TuneA2MB_13TeV-pythia8/GEN-SIM/POSTLS162_V1-v1/10000/06DEEAAD-A91C-E311-BE39-CDFB7D0D7CF5.root', 
+                                  '/store/mc/Fall13/MinBias_TuneA2MB_13TeV-pythia8/GEN-SIM/POSTLS162_V1-v1/10000/0820822D-031D-E311-BD5C-00266CF9B5D0.root',
+                                  '/store/mc/Fall13/MinBias_TuneA2MB_13TeV-pythia8/GEN-SIM/POSTLS162_V1-v1/10000/0829009E-101D-E311-9FDE-001EC9B0B2E6.root',
+                                  '/store/mc/Fall13/MinBias_TuneA2MB_13TeV-pythia8/GEN-SIM/POSTLS162_V1-v1/10000/083B4724-B41C-E311-879C-002481CFD184.root',
+                                  '/store/mc/Fall13/MinBias_TuneA2MB_13TeV-pythia8/GEN-SIM/POSTLS162_V1-v1/10000/083FF7C5-FE1C-E311-B729-C8600032C755.root',
+                                  '/store/mc/Fall13/MinBias_TuneA2MB_13TeV-pythia8/GEN-SIM/POSTLS162_V1-v1/10000/08924A82-A91E-E311-AFBA-001517E73360.root',
+                                  '/store/mc/Fall13/MinBias_TuneA2MB_13TeV-pythia8/GEN-SIM/POSTLS162_V1-v1/10000/08B0ED89-A91E-E311-BEAA-D4AE527EE0EB.root',
+                                  '/store/mc/Fall13/MinBias_TuneA2MB_13TeV-pythia8/GEN-SIM/POSTLS162_V1-v1/10000/0A263BCB-591C-E311-B896-003048F1DBB0.root',
+                                  '/store/mc/Fall13/MinBias_TuneA2MB_13TeV-pythia8/GEN-SIM/POSTLS162_V1-v1/10000/0A492201-511C-E311-82CA-00259021A03A.root',
+                                  '/store/mc/Fall13/MinBias_TuneA2MB_13TeV-pythia8/GEN-SIM/POSTLS162_V1-v1/10000/0A6E3C85-A91E-E311-863E-001E6724840D.root',
+                                  '/store/mc/Fall13/MinBias_TuneA2MB_13TeV-pythia8/GEN-SIM/POSTLS162_V1-v1/10000/0A744658-AA1C-E311-A390-6805CA083D10.root',
+                                  '/store/mc/Fall13/MinBias_TuneA2MB_13TeV-pythia8/GEN-SIM/POSTLS162_V1-v1/10000/0A96E4A2-A91C-E311-B303-03C3B4223E73.root',
+                                  '/store/mc/Fall13/MinBias_TuneA2MB_13TeV-pythia8/GEN-SIM/POSTLS162_V1-v1/10000/0A999210-121D-E311-9DEC-0019B9E7CCC9.root',
+                                  '/store/mc/Fall13/MinBias_TuneA2MB_13TeV-pythia8/GEN-SIM/POSTLS162_V1-v1/10000/0A9CFAEE-501C-E311-8CCD-002590D0AFDC.root',
+                                  '/store/mc/Fall13/MinBias_TuneA2MB_13TeV-pythia8/GEN-SIM/POSTLS162_V1-v1/10000/0ABEFB3A-A51C-E311-A0F7-1CC1DE0590E8.root',
                                   '/store/mc/Fall13/MinBias_TuneA2MB_13TeV-pythia8/GEN-SIM/POSTLS162_V1-v1/10000/0AC7D876-A91E-E311-B9D8-001E68A9941A.root'
 
                                                   ])
