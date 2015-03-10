@@ -3,7 +3,7 @@ import pickle
 import os,sys
 from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYieldFromChain
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,varBinName
-from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2_HT400ST150 import *
+from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2_HT400ST150_withDF import *
 from makeTTPrediction import makeTTPrediction
 from makeWPrediction import makeWPrediction
 from localInfo import username
@@ -22,11 +22,11 @@ samples={'W':cWJets, 'TT':cTTJets, 'Rest':cRest, 'Bkg':cBkg}
 
 ROOT.TH1F().SetDefaultSumw2()
 
-prefix = 'singleLeptonic_fullBkg'
-presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0"
+prefix = 'singleMuonic_fullBkg'
+presel = "singleMuonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0"
 
-streg = [[(250, 350), 1.], [(350, -1), 1.]] 
-htreg = [(500,750),(750,-1)]
+streg = [[(250, 350), 1.], [(350, 450), 1.], [(450, -1), 1.]] 
+htreg = [(500,750), (750,1000), (1000,1250), (1250,-1)]
 njreg = [(5,5),(6,-1)]
 
 small = False
