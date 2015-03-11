@@ -21,6 +21,14 @@ def getRCS(c, cut, dPhiCut):
     del h
     return {'rCS':'NaN', 'rCSE_pred':'NaN', 'rCSE_sim':'NaN'}
   
+def getFOM(Ysig ,Ysig_Err , Ybkg,  Ybkg_Err):
+  if Ybkg>0.0:
+    FOM = Ysig/sqrt(Ybkg)
+    FOM_Err = sqrt(Ysig_Err**2/Ybkg + ((Ysig*Ybkg_Err)/(2*Ybkg**(3/2)))**2)
+    return {'FOM':FOM, 'FOM_Err':FOM_Err}
+  else:
+    return {'FOM':'NaN', 'FOM_Err':'NaN'}
+
 
 #don't use k_factor calculation right now it has to be optimized
 #def getTTcorr(stb,htb,filename='hardSingleLeptonic_TTfitnjet_', dir='/afs/hephy.at/user/d/dhandl/www/pngCMG2/rCS/'):
