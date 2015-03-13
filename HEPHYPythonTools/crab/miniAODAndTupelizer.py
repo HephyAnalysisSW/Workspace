@@ -25,7 +25,7 @@ process.maxEvents = cms.untracked.PSet(
 # Input source
 process.source = cms.Source("PoolSource",
     secondaryFileNames = cms.untracked.vstring(),
-    fileNames = cms.untracked.vstring('file:/data/schoef/local/WJetsToLNu_HT-400to600_Tune4C_13TeV-madgraph-tauola_AODSIM_PU20bx25_PHYS14_25_V1-v1.root')
+    fileNames = cms.untracked.vstring('file:/data/schoef/local/CMSSW_7_2_0_pre4_RelValZMM_13_GEN-SIM-RECO_PU25ns_POSTLS172_V3-v3.root')
 )
 
 process.options = cms.untracked.PSet(
@@ -134,7 +134,7 @@ process.miniAODTupelizerSequence += process.FilterTupelizer
 process.load('Workspace.HEPHYCMSSWTools.PFCandTupelizer_cff')
 process.miniAODTupelizerSequence += process.PFCandTupelizer
 process.PFCandTupelizer.useForDefaultAlias = cms.untracked.bool(True)
-
+process.PFCandTupelizer.fillIsolatedChargedHadrons = cms.untracked.bool(True)
 #process.p += process.filterSequence 
 #process.p += process.metSequence
 #process.p += process.miniAODTupelizerSequence
