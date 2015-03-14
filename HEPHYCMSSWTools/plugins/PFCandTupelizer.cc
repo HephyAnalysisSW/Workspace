@@ -46,8 +46,8 @@ void PFCandTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup) {
   int nCand(0);
   std::vector<float> c_pt, c_eta, c_phi,c_energy, c_ecalRawE, c_hcalRawE;
   std::vector<float> c_trackPt, c_trackEta, c_trackPhi;
-  std::vector<float> c_ecalPt, c_ecalEta, c_ecalPhi;
-  std::vector<float> c_hcalPt, c_hcalEta, c_hcalPhi;
+  std::vector<float> c_ecalE;//, c_ecalEta, c_ecalPhi;
+  std::vector<float> c_hcalE;//, c_hcalEta, c_hcalPhi;
   std::vector<int> c_id, c_charge;
 
   edm::Handle<std::vector<reco::PFCandidate> > particleFlow;
@@ -101,38 +101,43 @@ void PFCandTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup) {
         c_trackPt.push_back(et.trackRef()->pt());
         c_trackEta.push_back(et.trackRef()->eta());
         c_trackPhi.push_back(et.trackRef()->phi());
-        if ((iECAL.size()>1) or (iHCAL.size()>1)) cout<<" ES "<<iECAL.size()<<" HS "<<iHCAL.size()<<endl;
+        c_ecalE.push_back(0.);
+//        c_ecalEta.push_back(0.);
+//        c_ecalPhi.push_back(0.);
+        c_hcalE.push_back(0.);
+//        c_hcalEta.push_back(0.);
+//        c_hcalPhi.push_back(0.);
         //ECAL element
-        if (iECAL.size()>0) {
-          const reco::PFBlockElementCluster& eecal = dynamic_cast<const reco::PFBlockElementCluster &>( elements[ iECAL[0] ] );
-          c_ecalPt.push_back(eecal.clusterRef()->pt());
-          c_ecalEta.push_back(eecal.clusterRef()->eta());
-          c_ecalPhi.push_back(eecal.clusterRef()->phi());
-        } else {
-          c_ecalPt.push_back(NAN);
-          c_ecalEta.push_back(NAN);
-          c_ecalPhi.push_back(NAN);
+        for(unsigned ii=0;ii<iECAL.size();ii++) {
+          const reco::PFBlockElementCluster& eecal = dynamic_cast<const reco::PFBlockElementCluster &>( elements[ iECAL[ii] ] );
+          c_ecalE.back()+=eecal.clusterRef()->E();
+//          c_ecalEta.push_back(eecal.clusterRef()->eta());
+//          c_ecalPhi.push_back(eecal.clusterRef()->phi());
+//        } else {
+//          c_ecalE.push_back(NAN);
+//          c_ecalEta.push_back(NAN);
+//          c_ecalPhi.push_back(NAN);
         }
-        if (iHCAL.size()>0) {
-          const reco::PFBlockElementCluster& ehcal = dynamic_cast<const reco::PFBlockElementCluster &>( elements[ iHCAL[0] ] );
-          c_hcalPt.push_back(ehcal.clusterRef()->pt());
-          c_hcalEta.push_back(ehcal.clusterRef()->eta());
-          c_hcalPhi.push_back(ehcal.clusterRef()->phi());
-        } else {
-          c_hcalPt.push_back(NAN);
-          c_hcalEta.push_back(NAN);
-          c_hcalPhi.push_back(NAN);
+        for(unsigned ii=0;ii<iHCAL.size();ii++) {
+          const reco::PFBlockElementCluster& ehcal = dynamic_cast<const reco::PFBlockElementCluster &>( elements[ iHCAL[ii] ] );
+          c_hcalE.back()+=ehcal.clusterRef()->E();
+//          c_hcalEta.push_back(ehcal.clusterRef()->eta());
+//          c_hcalPhi.push_back(ehcal.clusterRef()->phi());
+//        } else {
+//          c_hcalE.push_back(NAN);
+//          c_hcalEta.push_back(NAN);
+//          c_hcalPhi.push_back(NAN);
         }
       } else {
         c_trackPt.push_back(NAN);
         c_trackEta.push_back(NAN);
         c_trackPhi.push_back(NAN);
-        c_ecalPt.push_back(NAN);
-        c_ecalEta.push_back(NAN);
-        c_ecalPhi.push_back(NAN);
-        c_hcalPt.push_back(NAN);
-        c_hcalEta.push_back(NAN);
-        c_hcalPhi.push_back(NAN);
+        c_ecalE.push_back(NAN);
+//        c_ecalEta.push_back(NAN);
+//        c_ecalPhi.push_back(NAN);
+        c_hcalE.push_back(NAN);
+//        c_hcalEta.push_back(NAN);
+//        c_hcalPhi.push_back(NAN);
       }
     } 
   }
@@ -149,12 +154,12 @@ void PFCandTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup) {
     put("candTrackPt",c_trackPt);
     put("candTrackEta",c_trackEta);
     put("candTrackPhi",c_trackPhi);
-    put("candECalPt",c_ecalPt);
-    put("candECalEta",c_ecalEta);
-    put("candECalPhi",c_ecalPhi);
-    put("candHCalPt",c_hcalPt);
-    put("candHCalEta",c_hcalEta);
-    put("candHCalPhi",c_hcalPhi);
+    put("candECalClusterE",c_ecalE);
+//    put("candECalClusterEta",c_ecalEta);
+//    put("candECalClusterPhi",c_ecalPhi);
+    put("candHCalClusterE",c_hcalE);
+//    put("candHCalClusterEta",c_hcalEta);
+//    put("candHCalClusterPhi",c_hcalPhi);
   }
 }
 
@@ -173,12 +178,12 @@ void PFCandTupelizer::addAllVars( )
     addVar("candTrackPt/F[]");
     addVar("candTrackEta/F[]");
     addVar("candTrackPhi/F[]");
-    addVar("candECalPt/F[]");
-    addVar("candECalEta/F[]");
-    addVar("candECalPhi/F[]");
-    addVar("candHCalPt/F[]");
-    addVar("candHCalEta/F[]");
-    addVar("candHCalPhi/F[]");
+    addVar("candECalClusterE/F[]");
+//    addVar("candECalClusterEta/F[]");
+//    addVar("candECalClusterPhi/F[]");
+    addVar("candHCalClusterE/F[]");
+//    addVar("candHCalClusterEta/F[]");
+//    addVar("candHCalClusterPhi/F[]");
   }
 }
 
