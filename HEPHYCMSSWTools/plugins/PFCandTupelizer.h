@@ -35,7 +35,7 @@ public:
 
   private:
   edm::EDGetTokenT<std::vector<reco::PFCandidate> > pflowToken_;
-  bool fillIsolatedChargedHadrons_;
+//  bool fillIsolatedChargedHadrons_;
 };
 #endif
 
