@@ -177,29 +177,55 @@ for i_htb, htb in enumerate(htreg):
       if stb[1] == -1 : print '\\hline'
 print '\end{tabular}}\end{center}\caption{rCS(TT) comparison used for tt estimation}\label{tab:0b_rcscorr_Wbkg}\end{table}'
 
-# print "signal yields (+charge)"
-# print
-# for i_htb, htb in enumerate(htreg):
-#   for stb, dPhiCut in streg:
-#     for srNJet in njreg:
-#       rCS_sr_Name_0b = nameAndCut(stb,htb,srNJet,btb=(0,0), presel=presel, btagVar = 'nBTagCMVA')#for Check 
-#       strings=[]
-#       for s in signals:
-#         sig =     getYieldFromChain(s['chain'], 'leptonPdg<0&&'+rCS_sr_Cut_0b+"&&"+dPhiStr+'>'+str(dPhiCut), weight = "weight")
-#         sigErr  = getYieldFromChain(s['chain'], 'leptonPdg<0&&'+rCS_sr_Cut_0b+"&&"+dPhiStr+'>'+str(dPhiCut), weight = "weight*weight")
-#         strings.append( getNumString(sig, sigErr, 3) )
-#       print " , ".join(strings), rCS_sr_Name_0b
-# print
-# print "signal yields (-charge)"
-# print
-# for i_htb, htb in enumerate(htreg):
-#   for stb in streg:
-#     for srNJet in njreg:
-#       rCS_sr_Name_0b = nameAndCut(stb,htb,srNJet,btb=(0,0), presel=presel, btagVar = 'nBTagCMVA')#for Check 
-#       strings=[]
-#       for s in signals:
-#         sig =     getYieldFromChain(s['chain'], 'leptonPdg>0&&'+rCS_sr_Cut_0b+"&&"+dPhiStr+'>'+str(dPhiCut), weight = "weight")
-#         sigErr  = getYieldFromChain(s['chain'], 'leptonPdg>0&&'+rCS_sr_Cut_0b+"&&"+dPhiStr+'>'+str(dPhiCut), weight = "weight*weight")
-#         strings.append( getNumString(sig, sigErr, 3) )
-#       print " , ".join(strings), rCS_sr_Name_0b
-# print
+
+
+print "signal yields (+charge)"
+print
+print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrr|rrr|rrr|}\\hline'
+print ' \HT     & \\njet & \ST     & \multicolumn{6}{c|}{\TFiveqqqqHM (+ charge)} & \multicolumn{6}{c|}{\TFiveqqqqHL (+ charge)}\\\\ %\hline'
+print '[GeV]&        &[GeV]&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c|}{FOM} &\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c|}{FOM} \\\\\hline'
+for i_htb, htb in enumerate(htreg):
+  if i_htb!=0:print '\\hline'
+  print '\multirow{'+str(2*nSTbins)+'}{*}{\\begin{sideways}$'+varBin(htb)+'$\end{sideways}}'
+  for srNJet in njreg:
+    print '&\multirow{'+str(nSTbins)+'}{*}{'+varBin(srNJet)+'}&'
+    for stb, dPhiCut in streg:
+      print '$'+varBin(stb)+'$'
+#      name, cut =  nameAndCut(stb, htb, srNJet, btb=(0,0), presel=presel, btagVar = 'nBJetMediumCMVA30')
+#      for s in allSignals:
+#        s['yield_NegPdg']     = getYieldFromChain(s['chain'], 'leptonPdg<0&&'+cut+"&&deltaPhi_Wl>1.0", weight = "weight")
+#        s['yield_NegPdg_Var'] = getYieldFromChain(s['chain'], 'leptonPdg<0&&'+cut+"&&deltaPhi_Wl>1.0", weight = "weight*weight")
+      print ' & '.join([getNumString(res[htb][stb][srNJet]['T5q^{4} 1.2/1.0/0.8_yield_NegPdg'], sqrt(res[htb][stb][srNJet]['T5q^{4} 1.2/1.0/0.8_yield_NegPdg_Var']), acc=3),
+                          getNumString(res[htb][stb][srNJet]['T5q^{4} 1.2/1.0/0.8_FOM_NegPdg']['FOM'], res[htb][stb][srNJet]['T5q^{4} 1.2/1.0/0.8_FOM_NegPdg']['FOM_Err'], acc=3),
+                          getNumString(res[htb][stb][srNJet]['T5q^{4} 1.5/0.8/0.1_yield_NegPdg'], sqrt(res[htb][stb][srNJet]['T5q^{4} 1.5/0.8/0.1_yield_NegPdg_Var']), acc=3),
+                          getNumString(res[htb][stb][srNJet]['T5q^{4} 1.5/0.8/0.1_FOM_NegPdg']['FOM'], res[htb][stb][srNJet]['T5q^{4} 1.5/0.8/0.1_FOM_NegPdg']['FOM_Err'], acc=3)])+'\\\\'
+#      print '\\\\'
+      if stb[1] != -1 :print '&&'
+      if stb[1] == -1 : print '\\cline{2-15}'
+print '\\hline\end{tabular}}\end{center}\caption{+ charge}\end{table}'
+
+print "signal yields (-charge)"
+print
+print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrr|rrr|rrr|}\\hline'
+print ' \HT     & \\njet & \ST     &\multicolumn{6}{c|}{\TFiveqqqqHM (- charge)}&\multicolumn{6}{c|}{\TFiveqqqqHL (- charge)}\\\%\hline'
+print '[GeV]&        &[GeV]&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c|}{FOM} &\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c|}{FOM} \\\\\hline'
+for i_htb, htb in enumerate(htreg):
+  if i_htb!=0:print '\\hline'
+  print '\multirow{'+str(2*nSTbins)+'}{*}{\\begin{sideways}$'+varBin(htb)+'$\end{sideways}}'
+  for srNJet in njreg:
+    print '&\multirow{'+str(nSTbins)+'}{*}{'+varBin(srNJet)+'}&'
+    for stb, dPhiCut in streg:
+      print '$'+varBin(stb)+'$'
+#      name, cut =  nameAndCut(stb, htb, srNJet, btb=(0,0), presel=presel, btagVar = 'nBJetMediumCMVA30')
+#      for s in allSignals:
+#        s['yield_PosPdg']     = getYieldFromChain(s['chain'], 'leptonPdg>0&&'+cut+"&&deltaPhi_Wl>1.0", weight = "weight")
+#        s['yield_PosPdg_Var'] = getYieldFromChain(s['chain'], 'leptonPdg>0&&'+cut+"&&deltaPhi_Wl>1.0", weight = "weight*weight")
+      print ' & '.join([getNumString(res[htb][stb][srNJet]['T5q^{4} 1.2/1.0/0.8_yield_PosPdg'], sqrt(res[htb][stb][srNJet]['T5q^{4} 1.2/1.0/0.8_yield_PosPdg_Var']), acc=3),
+                          getNumString(res[htb][stb][srNJet]['T5q^{4} 1.2/1.0/0.8_FOM_PosPdg']['FOM'], res[htb][stb][srNJet]['T5q^{4} 1.2/1.0/0.8_FOM_PosPdg']['FOM_Err'], acc=3),
+                          getNumString(res[htb][stb][srNJet]['T5q^{4} 1.5/0.8/0.1_yield_PosPdg'], sqrt(res[htb][stb][srNJet]['T5q^{4} 1.5/0.8/0.1_yield_PosPdg_Var']), acc=3),
+                          getNumString(res[htb][stb][srNJet]['T5q^{4} 1.5/0.8/0.1_FOM_PosPdg']['FOM'], res[htb][stb][srNJet]['T5q^{4} 1.5/0.8/0.1_FOM_PosPdg']['FOM_Err'], acc=3)])+'\\\\'
+#      print '\\\\'
+      if stb[1] != -1 :print '&&'
+      if stb[1] == -1 : print '\\cline{2-15}'
+print '\\hline\end{tabular}}\end{center}\caption{- charge}\end{table}'
+

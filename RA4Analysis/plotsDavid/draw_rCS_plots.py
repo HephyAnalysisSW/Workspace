@@ -35,8 +35,8 @@ cWJets  = getChain(WJetsHTToLNu[lepSel],histname='')
 cTTJets = getChain(ttJets[lepSel],histname='')
 cBkg    = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], QCD[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]],histname='')
 
-prefix = 'hardSingleLeptonic_ttJetsFit'
-presel='singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0'
+prefix = 'hardSingleLeptonic_ttJetsFit_MET200'
+presel='singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&met_pt>200'
 #presel = exactlyOneTightLepton(lepton="both")+'&&'+looseLeptonVeto(lepton='both')
 uDir = username[0]+'/'+username
 subDir = 'pngCMG2/rCS'
