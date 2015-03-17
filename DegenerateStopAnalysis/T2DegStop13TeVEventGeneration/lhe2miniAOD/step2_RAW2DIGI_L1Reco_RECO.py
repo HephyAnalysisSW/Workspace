@@ -2,7 +2,7 @@
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: step2 --filein file:./lhe2miniAOD/T2DegStop2j_300_270_GENSIMHLT_step1.root --fileout file:T2DegStop2j_300_270_GEN-SIM-AOD.root --mc --eventcontent AODSIM --customise SLHCUpgradeSimulations/Configuration/postLS1Customs.customisePostLS1,Configuration/DataProcessing/Utils.addMonitoring --datatier AODSIM --conditions MCRUN2_73_V9 --step RAW2DIGI,L1Reco,RECO,EI --magField 38T_PostLS1 --python_filename step2_AOD.py --no_exec -n -1
+# with command line options: step2 --filein file:step1.root --fileout file:step2.root --mc --eventcontent AODSIM --customise SLHCUpgradeSimulations/Configuration/postLS1Customs.customisePostLS1 --datatier AODSIM --conditions PHYS14_25_V1 --step RAW2DIGI,L1Reco,RECO,EI --magField 38T_PostLS1 --no_exec
 import FWCore.ParameterSet.Config as cms
 
 process = cms.Process('RECO')
@@ -23,13 +23,14 @@ process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(-1)
+    input = cms.untracked.int32(1)
 )
 
 # Input source
 process.source = cms.Source("PoolSource",
     secondaryFileNames = cms.untracked.vstring(),
-    fileNames = cms.untracked.vstring('file:./lhe2miniAOD/T2DegStop2j_300_270_GENSIMHLT_step1.root')
+    #fileNames = cms.untracked.vstring('root://xrootd.unl.edu//store/user/nrad/T2DegStop2j_300_270_GENSIM/T2DegStop2j_300_270_GEN-DIGI-L1-DIGI2RAW-HLT-PU40/d065fd20afeab0487c05d89037cc39c1/T2DegStop2j_300_270_GEN-DIGI-L1-DIGI2RAW-HLT-PU40_1000_8_T1l.root')
+    fileNames = cms.untracked.vstring('root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/nrad/T2DegStop2j_300_270_GENSIM/T2DegStop2j_300_270_GEN-DIGI-L1-DIGI2RAW-HLT-PU40/d065fd20afeab0487c05d89037cc39c1/T2DegStop2j_300_270_GEN-DIGI-L1-DIGI2RAW-HLT-PU40_1000_8_T1l.root ')
 )
 
 process.options = cms.untracked.PSet(
@@ -39,7 +40,7 @@ process.options = cms.untracked.PSet(
 # Production Info
 process.configurationMetadata = cms.untracked.PSet(
     version = cms.untracked.string('$Revision: 1.19 $'),
-    annotation = cms.untracked.string('step2 nevts:-1'),
+    annotation = cms.untracked.string('step2 nevts:1'),
     name = cms.untracked.string('Applications')
 )
 
@@ -50,7 +51,7 @@ process.AODSIMoutput = cms.OutputModule("PoolOutputModule",
     compressionAlgorithm = cms.untracked.string('LZMA'),
     eventAutoFlushCompressedSize = cms.untracked.int32(15728640),
     outputCommands = process.AODSIMEventContent.outputCommands,
-    fileName = cms.untracked.string('file:T2DegStop2j_300_270_GEN-SIM-AOD.root'),
+    fileName = cms.untracked.string('T2DegStop2j_300_270_RECO.root'),
     dataset = cms.untracked.PSet(
         filterName = cms.untracked.string(''),
         dataTier = cms.untracked.string('AODSIM')
@@ -61,7 +62,7 @@ process.AODSIMoutput = cms.OutputModule("PoolOutputModule",
 
 # Other statements
 from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
-process.GlobalTag = GlobalTag(process.GlobalTag, 'MCRUN2_73_V9', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, 'PHYS14_25_V1', '')
 
 # Path and EndPath definitions
 process.raw2digi_step = cms.Path(process.RawToDigi)
@@ -75,12 +76,6 @@ process.AODSIMoutput_step = cms.EndPath(process.AODSIMoutput)
 process.schedule = cms.Schedule(process.raw2digi_step,process.L1Reco_step,process.reconstruction_step,process.eventinterpretaion_step,process.endjob_step,process.AODSIMoutput_step)
 
 # customisation of the process.
-
-# Automatic addition of the customisation function from Configuration.DataProcessing.Utils
-from Configuration.DataProcessing.Utils import addMonitoring 
-
-#call to customisation function addMonitoring imported from Configuration.DataProcessing.Utils
-process = addMonitoring(process)
 
 # Automatic addition of the customisation function from SLHCUpgradeSimulations.Configuration.postLS1Customs
 from SLHCUpgradeSimulations.Configuration.postLS1Customs import customisePostLS1 
