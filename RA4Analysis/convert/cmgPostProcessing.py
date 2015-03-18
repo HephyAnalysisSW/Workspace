@@ -175,12 +175,12 @@ for isample, sample in enumerate(allSamples):
       s.nTightHardLeptons = len(tightHardLepInd)
 
       vars = ['pt', 'eta', 'phi', 'relIso03', 'pdgId']
-      allLeptons = [getObjDict(t, 'LepGood', vars, i) for i in looseLepInd]
-      looseSoftLep = [getObjDict(t, 'LepGood', vars, i) for i in looseSoftLepInd] 
-      looseHardLep = [getObjDict(t, 'LepGood', vars, i) for i in looseHardLepInd]
-      looseSoftPt10Lep = [getObjDict(t, 'LepGood', vars, i) for i in looseSoftPt10LepInd]
-      tightSoftLep = [getObjDict(t, 'LepGood', vars, i) for i in tightSoftLepInd]
-      tightHardLep =  [getObjDict(t, 'LepGood', vars, i) for i in tightHardLepInd]
+      allLeptons = [getObjDict(t, 'LepGood_', vars, i) for i in looseLepInd]
+      looseSoftLep = [getObjDict(t, 'LepGood_', vars, i) for i in looseSoftLepInd] 
+      looseHardLep = [getObjDict(t, 'LepGood_', vars, i) for i in looseHardLepInd]
+      looseSoftPt10Lep = [getObjDict(t, 'LepGood_', vars, i) for i in looseSoftPt10LepInd]
+      tightSoftLep = [getObjDict(t, 'LepGood_', vars, i) for i in tightSoftLepInd]
+      tightHardLep =  [getObjDict(t, 'LepGood_', vars, i) for i in tightHardLepInd]
       
       leadingLepInd = None
       if options.leptonSelection=='hard':

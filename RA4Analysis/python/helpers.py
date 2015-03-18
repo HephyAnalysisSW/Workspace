@@ -66,9 +66,9 @@ def cmgGetJets(c, ptMin=40., etaMax=999.):
   nJet = int(getVarValue(c, 'nJet'))
   jets=[]
   for i in range(nJet):
-    jet = getObjDict(c, 'Jet', ['pt','eta'], i)
+    jet = getObjDict(c, 'Jet_', ['pt','eta'], i)
     if jet['pt']>ptMin and abs(jet['eta']<etaMax):
-      jet.update(getObjDict(c, 'Jet', addJetVars, i))
+      jet.update(getObjDict(c, 'Jet_', addJetVars, i))
       jets.append(jet)
   return jets
 
