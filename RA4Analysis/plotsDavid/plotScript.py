@@ -56,19 +56,19 @@ htreg = [(1000,1250), (1250,-1)]
 njreg = [(5,5), (6,-1)]
 btb = (0,0)
 presel='singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80'
-preprefix = 'singleLeptonic_0b_2J80_extended_SR'
+preprefix = 'singleLeptonic_0b_extended_SR'
 wwwDir = '/afs/hephy.at/user/d/dhandl/www/pngCMG2/'+lepSel+'/'+preprefix+'/'
 
 if not os.path.exists(wwwDir):
   os.makedirs(wwwDir)
 
 #use small to check some changes faster
-#small = 1
-small = 0
+small = 1
+#small = 0
 if small == 1:
-  streg = [(350,-1)]
-  htreg = [(500,750)]
-  njreg = [(6,-1)]
+  streg = [(None)]
+  htreg = [(500,-1)]
+  njreg = [(None)]
   btb   = (0,0)
 
 allVariables = []
@@ -112,7 +112,7 @@ St = {'name':'myst', 'varString':"st", 'legendName':'S_{T}', 'Ytitle':'# of Even
 nJets = {'name':'mynJets', 'varString':'nJet30', 'legendName':'Jets', 'Ytitle':'# of Events', 'binning':[17,-0.5,16.5]}
 #nBJets = {'name':'mynBJets', 'varString':'nBJetMediumCMVA30', 'legendName':'B Jets', 'Ytitle':'# of Events', 'binning':[17,-0.5,16.5]}
 dPhi = {'name':'mydeltaPhi', 'varFunc':cmgDPhi, 'legendName':'#Delta#Phi(W,l)','binning':[20,0,pi], 'Ytitle':'# of Events'}#, 'binningIsExplicit':True} 
-lMomentum = {'name':'myleptonPt', 'varString':'leptonPt', 'legendName':'p_{T}(l)', 'Ytitle':'# of Events / 50GeV', 'binning':[20,0,1000]}
+lMomentum = {'name':'myleptonPt', 'varString':'leptonPt', 'legendName':'p_{T}(l)', 'Ytitle':'# of Events / 5GeV', 'binning':[200,0,1000]}
 #htratio = {'name':'myhtratio', 'varFunc':gethtRatio, 'legendName':'H_{T,ratio}', 'Ytitle':'# of Events', 'binning':[25,0,2.5]}
 #jetratio = {'name':'myjetratio', 'varFunc':getJetRatio, 'legendName':'2^{nd}Jet/1^{st}Jet', 'Ytitle':'# of Events', 'binning':[15,0,1.5]}
 mt = {'name':'mymt', 'varFunc':cmgMT, 'legendName':'M_{T}', 'Ytitle':'# of Events / 10GeV', 'binning':[35,0,350]}
