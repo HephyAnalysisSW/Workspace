@@ -52,11 +52,12 @@ options.register ('keep','',
 #infiles = ['file:/data/schoef/local/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola_PU20bx25_POSTLS170_V5-v1_MINIAODSIM.root']
 #infiles = ['root://eoscms.cern.ch//eos/cms/store/relval/CMSSW_7_0_5/RelValTTbar_13/GEN-SIM-RECO/POSTLS170_V6-v3/00000/0423767B-B5DD-E311-A1E0-02163E00E5B5.root']
 #infiles = ['file:/afs/hephy.at/scratch/s/schoefbeck/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola_PU20bx25_POSTLS170_V5-v1_MINIAODSIM.root']
-infiles = ['file:/data/nrad/local/WJetsToLNu_HT-100to200_Tune4C_13TeV-madgraph-tauola_PU20bx25_POSTLS170_V5-v1_AODSIMPuppiMiniAOD.root']
+#infiles = ['file:/data/nrad/local/WJetsToLNu_HT-100to200_Tune4C_13TeV-madgraph-tauola_PU20bx25_POSTLS170_V5-v1_AODSIMPuppiMiniAOD.root']
+infiles=['root://xrootd.unl.edu//store/mc/Phys14DR/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/MINIAODSIM/PU30bx50_PHYS14_25_V1-v1/00000/003B6371-8D81-E411-8467-003048F0E826.root']
 options.files=infiles
 
 options.mode = 'mc'
-options.maxEvents=1000
+options.maxEvents=10
 
 if not 'ipython' in VarParsing.sys.argv[0]:
   options.parseArguments()
@@ -111,113 +112,14 @@ process.out = cms.OutputModule("PoolOutputModule",
 #     outputCommands = cms.untracked.vstring('keep *') 
 )
 
-#import HLTrigger.HLTfilters.hltHighLevel_cfi as hlt
-#process.hltFilter = hlt.hltHighLevel.clone(
-#             HLTPaths = cms.vstring(options.triggers),
-#             TriggerResultsTag = cms.InputTag("TriggerResults","",options.hltName),
-#             throw = False
-#         )
-#
-#process.scrapingVeto = cms.EDFilter("FilterOutScraping",
-#                                             applyfilter = cms.untracked.bool(True),
-#                                             debugOn = cms.untracked.bool(False),
-#                                             numtrack = cms.untracked.uint32(10),
-#                                             thresh = cms.untracked.double(0.25)
-#                                             )
-#
-#process.primaryVertexFilter = cms.EDFilter("GoodVertexFilter",
-#                      vertexCollection = cms.InputTag('offlinePrimaryVertices'),
-#                      minimumNDOF = cms.uint32(4) ,
-#                      maxAbsZ = cms.double(24),
-#                      maxd0 = cms.double(2))
-#
-#process.load('CommonTools/RecoAlgos/HBHENoiseFilter_cfi')
-#
-#
-#process.goodVertices = cms.EDFilter(
-#            "VertexSelector",
-#            filter = cms.bool(False),
-#            src = cms.InputTag("offlinePrimaryVertices"),
-#            cut = cms.string("!isFake && ndof > 4 && abs(z) <= 24 && position.Rho <= 2")
-#          )
-#
-#if not options.mode.lower()=='sms':
-#  process.load("RecoMET.METFilters.hcalLaserEventFilter_cfi")
-#  process.hcalLaserEventFilter.vetoByRunEventNumber=cms.untracked.bool(False)
-#  process.hcalLaserEventFilter.vetoByHBHEOccupancy=cms.untracked.bool(True)
-#  process.load('RecoMET.METFilters.eeBadScFilter_cfi')
-#  process.load('RecoMET.METFilters.CSCTightHaloFilter_cfi')
-#process.load('RecoMET.METFilters.EcalDeadCellTriggerPrimitiveFilter_cfi')
-#process.load('RecoMET.METFilters.trackingFailureFilter_cfi')
-#
 process.load('Workspace.HEPHYCMSSWTools.EventCounter')
-#
-#process.EventCounterAfterHLT = process.EventCounter.clone()
-#process.EventCounterAfterScraping = process.EventCounter.clone()
-#process.EventCounterAfterPV = process.EventCounter.clone()
-#process.EventCounterAfterHBHE = process.EventCounter.clone()
-#process.EventCounterAfterTrackingFailure = process.EventCounter.clone()
-#process.EventCounterAfterLaser = process.EventCounter.clone()
-#process.EventCounterAfterCSC = process.EventCounter.clone()
-#process.EventCounterAfterEEBadSC = process.EventCounter.clone()
-#process.EventCounterAfterECALTP = process.EventCounter.clone()
 #
 process.filterSequence = cms.Sequence(
     process.EventCounter
-#      *process.hltFilter *
-#    process.EventCounterAfterHLT*
-#      process.scrapingVeto *
-#    process.EventCounterAfterScraping*
-#      process.primaryVertexFilter*
-#    process.EventCounterAfterPV
 )
-#process.filterSequence+= process.goodVertices
-#if not options.mode.lower()=='sms':
-#  process.filterSequence+= process.HBHENoiseFilter
-#  process.filterSequence+= process.EventCounterAfterHBHE
-#  process.filterSequence+= process.trackingFailureFilter
-#  process.filterSequence+= process.EventCounterAfterTrackingFailure
-#  process.filterSequence+= process.hcalLaserEventFilter
-#  process.filterSequence+= process.EventCounterAfterLaser
-#  process.filterSequence+= process.CSCTightHaloFilter
-#  process.filterSequence+= process.EventCounterAfterCSC
-#  process.filterSequence+= process.eeBadScFilter
-#  process.filterSequence+= process.EventCounterAfterEEBadSC
-#process.filterSequence+= process.EcalDeadCellTriggerPrimitiveFilter
-#process.filterSequence+= process.EventCounterAfterECALTP
-#
-#if options.mode.lower()=='sms':
-#  print "\nFilter List:", "HLT, scraping, PV, EcalTP\n"
-#if options.mode.lower()=='mc':
-#  print "\nFilter List:", "HLT, scraping, PV, HBHE, trackingFailureFilter, hcalLaser, CSCTightHalo, eeBadSC, EcalTP\n"
-#
-#if options.mode.lower()=='data':
-#  process.load("EventFilter.HcalRawToDigi.hcallasereventfilter2012_cfi")
-#  process.filterSequence+=process.hcallasereventfilter2012
-#  process.EventCounterAfterHCALLaser2012 = process.EventCounter.clone()
-#  process.filterSequence+=process.EventCounterAfterHCALLaser2012
-#  process.load('RecoMET.METFilters.ecalLaserCorrFilter_cfi')
-#  process.filterSequence+= process.ecalLaserCorrFilter
-#  process.EventCounterafterECalLaserCorrectionFilter = process.EventCounter.clone()
-#  process.filterSequence+=process.EventCounterafterECalLaserCorrectionFilter
-#
-#  print "\nFilter List:", "HLT, scraping, PV, HBHE, trackingFailureFilter, hcalLaser, CSCTightHalo, eeBadSC, EcalTP, hcalLaser2012, ecalLaserCorr\n"
 from RecoMET.METProducers.PFMET_cfi import pfMet
 process.pfMet = pfMet.clone(src = "packedPFCandidates")
 process.pfMet.calculateSignificance = False # this can't be easily implemented on packed PF candidates at the moment
-
-#from RecoMET.Configuration.GenMETParticles_cff import genParticlesForMETAllVisible
-#vList = [abs(x) for x in list(genParticlesForMETAllVisible.ignoreParticleIDs)]
-#print "status==1&("+("&".join(["abs(pdgId)!="+str(x) for x in vList]))+")"
-#process.packedGenParticlesForGenMET = cms.EDFilter(
-#    "CandViewRefSelector",
-#    src = cms.InputTag("packedGenParticles"),
-#    cut = cms.string("status==1&("+("&".join(["abs(pdgId)!="+str(x) for x in vList]))+")"),
-#    noSeqChain = cms.bool(True), # Don't "chain" these sequence and update [src]
-#)
-#from RecoMET.METProducers.genMetTrue_cfi import genMetTrue
-#process.genMetTrue = genMetTrue.clone(src = cms.InputTag('packedGenParticlesForGenMET'))
-#process.metSequence = cms.Sequence( process.packedGenParticlesForGenMET * process.genMetTrue *process.pfMet)
 
 process.metSequence = cms.Sequence(process.pfMet)
 
@@ -231,47 +133,6 @@ process.printTree = cms.EDAnalyzer("ParticleTreeDrawer",
                                    printIndex = cms.untracked.bool(False),
                                    status = cms.untracked.vint32( [1,2,3] )
                                    )
-#process.printTree = cms.EDAnalyzer("ParticleListDrawer",
-#    printVertex = cms.untracked.bool(False),
-#    src = cms.InputTag("genParticles"),
-#    maxEventsToPrint = cms.untracked.int32(-1)
-#)
-
-#-- Execution path ------------------------------------------------------------
-
-#process.load('CommonTools.ParticleFlow.goodOfflinePrimaryVertices_cfi') #FIXME Added R.S.
-##process.p += process.printTree
-#if options.mode.lower()=='sms' or options.addPDFWeights:
-#  process.pdfWeights = cms.EDProducer("PdfWeightProducer",
-#              PdfInfoTag = cms.untracked.InputTag("generator"),
-#              PdfSetNames = cms.untracked.vstring(
-#    "cteq66.LHgrid"
-#    , "MSTW2008nlo68cl.LHgrid"
-#    , "NNPDF20_100.LHgrid"
-#    ))
-#  process.p += process.pdfWeights
-#
-#process.load("PhysicsTools.HepMCCandAlgos.flavorHistoryProducer_cfi")
-#process.load("PhysicsTools.HepMCCandAlgos.flavorHistoryFilter_cfi")
-#if isMC:
-#  process.p +=      process.bFlavorHistoryProducer
-#  process.p +=      process.cFlavorHistoryProducer
-#  process.p +=      process.flavorHistoryFilter
-
-#if options.triggersToMonitor!='':
-#  options.triggersToMonitor+=options.triggers
-#else:
-#  options.triggersToMonitor = options.triggers
-#for t in options.triggersToMonitor:
-#  ts = t.replace("_v*","")
-#  if ts != "*":
-#    process.SUSYTupelizer.triggersToMonitor.append(ts)
-#process.SUSYTupelizer.triggersToMonitor = list(set(process.SUSYTupelizer.triggersToMonitor)) #remove duplicates
-#print "TriggersToMonitor:",process.SUSYTupelizer.triggersToMonitor
-#from RecoJets.JetProducers.kt4PFJets_cfi import *
-#process.kt6PFJetsForIsolation2011 = kt4PFJets.clone( rParam = 0.6, doRhoFastjet = True )
-#process.kt6PFJetsForIsolation2011.Rho_EtaMax = cms.double(2.5)
-#process.p+=process.kt6PFJetsForIsolation2011
 
 process.miniAODTupelizerSequence = cms.Sequence()
 process.load('Workspace.HEPHYCMSSWTools.BasicTupelizer_miniAOD_cfi')
@@ -304,24 +165,8 @@ process.FilterTupelizer.useForDefaultAlias = cms.untracked.bool(True)
 #process.FilterTupelizer.verbose = cms.untracked.bool(options.verbose)
 process.miniAODTupelizerSequence += process.FilterTupelizer
 
-#process.SUSYTupelizer.triggerCollection = cms.untracked.InputTag( options.hltName )
-#process.SUSYTupelizer.addTriggerInfo = cms.untracked.bool(True)
-#process.SUSYTupelizer.addMSugraOSETInfo = cms.untracked.bool(options.mode.lower()=='sms')
-#process.SUSYTupelizer.addPDFWeights = cms.untracked.bool(options.mode.lower()=='sms' or options.addPDFWeights)
-#process.SUSYTupelizer.verbose = cms.untracked.bool(options.verbose)
-#process.SUSYTupelizer.addMuonVector = cms.untracked.bool(True)
-#process.SUSYTupelizer.addEleVector = cms.untracked.bool(True)
-#process.SUSYTupelizer.addTauiVector = cms.untracked.bool(True)
-#process.SUSYTupelizer.metsToMonitor = []
-
 process.p = cms.Path(process.filterSequence + process.metSequence + process.miniAODTupelizerSequence)
 
-#process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
-#process.printTree = cms.EDAnalyzer("ParticleListDrawer",
-#  maxEventsToPrint = cms.untracked.int32(-1),
-#  printVertex = cms.untracked.bool(False),
-#  src = cms.InputTag("genParticles")
-#)
 #process.p+=process.printTree
 
 process.out.outputCommands =  cms.untracked.vstring('drop *', 'keep *_*Tupelizer*_*_*' , 'keep *_*EventCounter*_*_*', *(toKeep))

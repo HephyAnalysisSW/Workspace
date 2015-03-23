@@ -42,14 +42,16 @@ process.out = cms.OutputModule(
     outputCommands = cms.untracked.vstring(
         'drop *',
         'keep recoPFMETs_*_*_*',
-        'keep *_*_*_TEST'
+#        'keep *_*_*_TEST',
+        'keep recoMuons_muons_*_*'  
+
         )
     )
 
 ##____________________________________________________________________________||
 process.options   = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))
 process.MessageLogger.cerr.FwkReport.reportEvery = 50
-process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(10))
+process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(1000))
 
 ##____________________________________________________________________________||
 process.p = cms.Path(
