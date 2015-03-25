@@ -51,12 +51,12 @@ for s in allSignals:
   s['chain'].SetAlias('dPhi',dPhiStr)
 
 #defining ht, st and njets for SR
-streg = [(200,-1)]                         
+streg = [(450,-1)]                         
 htreg = [(400,-1)]
 njreg = [(None)]
 btb = (0,0)
-presel='singleMuonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80'
-preprefix = 'singleMuonic_0b_ht400_2J80'
+presel='singleMuonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&deltaPhi_Wl>1.0'
+preprefix = 'singleMuonic_0b_ht400_st450_2J80_dPhi1'
 wwwDir = '/afs/hephy.at/user/d/dhandl/www/pngCMG2/'+lepSel+'/'+preprefix+'/'
 
 if not os.path.exists(wwwDir):
@@ -66,9 +66,9 @@ if not os.path.exists(wwwDir):
 small = 1
 #small = 0
 if small == 1:
-  streg = [(None)]
+  streg = [(450,-1)]
   htreg = [(400,-1)]
-  njreg = [(None)]
+  njreg = [(8,-1)]
   btb   = (0,0)
 
 allVariables = []
@@ -76,8 +76,8 @@ allVariables = []
 def getdPhiMetJet(c):
   met = c.GetLeaf('met_pt').GetValue()
   metPhi = c.GetLeaf('met_phi').GetValue()
-  JetPt = c.GetLeaf('leptonPt').GetValue(0)
-  JetPhi = c.GetLeaf('leptonPhi').GetValue(0)
+  JetPt = c.GetLeaf('Jet_pt').GetValue(0)
+  JetPhi = c.GetLeaf('Jet_phi').GetValue(0)
 #  dPhi = acos((met*JetPt*cos(metPhi-JetPhi))/(met*JetPt))
   dPhi = deltaPhi(metPhi,JetPhi)
   return dPhi
@@ -86,7 +86,7 @@ def gethtRatio(c):
   ht = c.GetLeaf('htJet30j').GetValue()
   Jet0 = c.GetLeaf('Jet_pt').GetValue(0)
   Jet1 = c.GetLeaf('Jet_pt').GetValue(1)
-  ratio = (ht-Jet0-Jet1)/(Jet0+Jet1)
+  ratio = (Jet0+Jet1)/(ht-Jet0-Jet1)
   return ratio
 
 def getJetRatio(c):
@@ -102,6 +102,23 @@ def getleadingJet(c):
 def getsecondJet(c):
   Jet1 = c.GetLeaf('Jet_pt').GetValue(1)
   return Jet1
+
+def getdPhiJetJet(c):
+  leadJetPt = c.GetLeaf('Jet_pt').GetValue(0)
+  leadJetPhi = c.GetLeaf('Jet_phi').GetValue(0)
+  subJetPt = c.GetLeaf('Jet_pt').GetValue(1)
+  subJetPhi = c.GetLeaf('Jet_phi').GetValue(1)
+#  dPhi = acos((met*JetPt*cos(metPhi-JetPhi))/(met*JetPt))
+  dPhi = deltaPhi(subJetPhi,leadJetPhi)
+  return dPhi
+
+def getJetMagnitude(c):
+  leadJetPt = c.GetLeaf('Jet_pt').GetValue(0)
+  subJetPt = c.GetLeaf('Jet_pt').GetValue(1)
+  ht = c.GetLeaf('htJet30j').GetValue()
+  nJ = c.GetLeaf('nJet30').GetValue()
+  res = (ht-leadJetPt-subJetPt)/(nJ-2)
+  return res
 
 met = {'name':'mymet', 'varString':"met_pt", 'legendName':'#slash{E}_{T}', 'Ytitle':'# of Events / 25GeV', 'binning':[64,0,1600]}
 ht = {'name':'myht', 'varString':"htJet30j", 'legendName':'H_{T}', 'Ytitle':'# of Events / 25GeV', 'binning':[64,0,1600]}
@@ -122,8 +139,9 @@ secondJet = {'name':'mysecondJet', 'varFunc':getsecondJet, 'legendName':'p_{T}(J
 htOppRatio = {'name':'myhtOppRatio', 'varFunc':cmgHTRatio, 'legendName':'H^{opp. to #slash{E}_{T}}_{T}/H_{T}', 'Ytitle':'# of Events', 'binning':[20,0,1]}
 #minDPhiMetJettwo = {'name':'myminDPhiMetJet12', 'varFunc':cmgMinDPhiJet, 'legendName':'min #Delta#Phi(#slash{E}_{T},J_{1,2})', 'Ytitle':'# of Events', 'binning':[20,0,pi]}#, 'binningIsExplicit':True}
 minDPhiMetJetthree = {'name':'myminDPhiMetJet123', 'varFunc':cmgMinDPhiJet, 'legendName':'min #Delta#Phi(#slash{E}_{T},J_{1,2,3})', 'Ytitle':'# of Events', 'binning':[20,0,pi]}#, 'binningIsExplicit':True}
-htOrthMet = {'name':'myhtOrthMet', 'varFunc':cmgHTOrthMET, 'legendName':'H^{orth. to #slash{E}_{T}}_{T}', 'Ytitle':'# of Events', 'binning':[20,0,1]}
 MTclosestJetMet = {'name':'myMTClosestJetMET', 'varFunc':cmgMTClosestJetMET, 'legendName':'M_{T} (closest Jet,#slash{E}_{T})', 'Ytitle':'# of Events / 10GeV', 'binning':[35,0,350]}
+dphijetjet = {'name':'mydPhijetjet', 'varFunc':getdPhiJetJet, 'legendName':'#Delta#Phi(J_{1},J_{0})', 'Ytitle':'# of Events', 'binning':[20,0,pi]}#, 'binningIsExplicit':True}
+jetMag = {'name':'myjetmag', 'varFunc':getJetMagnitude, 'legendName':'#drac{H_{T}-2^{nd}Jet-1^{st}Jet}{nJets-2}', 'Ytitle':'# of Events', 'binning':[35,0,350]}
 
 allVariables.append(met)
 allVariables.append(ht)
@@ -137,15 +155,16 @@ allVariables.append(lMomentum)
 allVariables.append(htratio)
 allVariables.append(jetratio)
 allVariables.append(mt)
-#allVariables.append(MT2W)
+allVariables.append(MT2W)
 allVariables.append(dphimetjet)
 allVariables.append(leadingJet)
 allVariables.append(secondJet)
 allVariables.append(htOppRatio)
 #allVariables.append(minDPhiMetJettwo)
 allVariables.append(minDPhiMetJetthree)
-allVariables.append(htOrthMet)
 allVariables.append(MTclosestJetMet)
+allVariables.append(dphijetjet)
+allVariables.append(jetMag)
 
 histos = {}
 h_ratio = {}
