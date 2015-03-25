@@ -62,8 +62,8 @@ def cmgST(c):
 
 def cmgGetJets(c, ptMin=30., etaMax=999.):
   addJetVars =  ['phi', 'mcFlavour', 'mcMatchId', 'mcMatchFlav', 'btagCSV', 'btagCMVA']
-  if c=="branches":return ['nJet','Jet_pt','Jet_eta'] + ['Jet_'+x for x in addJetVars]
-  nJet = int(getVarValue(c, 'nJet'))
+  if c=="branches":return ['nJet30','Jet_pt','Jet_eta'] + ['Jet_'+x for x in addJetVars]
+  nJet = int(getVarValue(c, 'nJet30'))
   jets=[]
   for i in range(nJet):
     jet = getObjDict(c, 'Jet_', ['pt','eta'], i)
@@ -182,10 +182,10 @@ def nameAndCut(stb, htb, njetb, btb=None, presel="(1)", charge="", btagVar = 'nB
   cut=presel
   name=""
   if stb:
-    cut+='&&'+stVar+'>='+str(stb[0])
-    name+=stVar+str(stb[0])
+    cut+='&&st>='+str(stb[0])
+    name+='st'+str(stb[0])
     if stb[1]>0:
-      cut+='&&'+stVar+'<'+str(stb[1])
+      cut+='&&st<'+str(stb[1])
       name+='-'+str(stb[1])
   if htb:
     cut+='&&htJet30j>='+str(htb[0])

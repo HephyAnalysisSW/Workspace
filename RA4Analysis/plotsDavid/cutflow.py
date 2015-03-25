@@ -7,6 +7,9 @@ from Workspace.RA4Analysis.cmgTuplesPostProcessed_v3 import *
 import os, copy, sys
 sys.path.append('/afs/hephy.at/scratch/d/dhandl/CMSSW_7_0_6_patch1/src/Workspace/RA4Analysis/plotsDavid')
 
+print "HELLO ECE was here"
+
+
 #Bkg chains 
 allBkg=[
         {'name':'WJets_hard',   'sample':'hard_WJetsHTToLNu',     'chain_hard':getChain(hard_WJetsHTToLNu)},
