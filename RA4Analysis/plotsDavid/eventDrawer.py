@@ -1,12 +1,22 @@
 import ROOT
 from math import pi, cos, sin, atan2, sqrt
-#ifile = '/data/schoef/convertedTuples_v22/copy/T5LNu_1000_0/histo_T5LNu_1000_0.root'
-#name = 'T5LNu_1000_0'
 from Workspace.HEPHYPythonTools.helpers import getChain
-from Workspace.RA4Analysis.cmgTuplesPostProcessed_v3 import *
+#from Workspace.RA4Analysis.cmgTuplesPostProcessed_v3 import *
+from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2_HT400_withDF import *
 
-c = getChain(soft_WJetsHTToLNu)
-name = 'WJets'
+lepSel = 'hard'
+
+#c = getChain(WJetsHTToLNu[lepSel],histname='')
+#name = 'WJets'
+
+c = getChain(ttJets[lepSel],histname='')
+name = 'TTJets'
+
+#c = getChain(SMS_T5qqqqWW_Gl1200_Chi1000_LSP800[lepSel],histname='')
+#name = 'T5qqqqWW_Gl1200_Chi1000_LSP800'
+
+#c = getChain(SMS_T5qqqqWW_Gl1500_Chi800_LSP100[lepSel],histname='')
+#name = 'T5qqqqWW_Gl1500_Chi800_LSP100'
 
 #  "T5qqqqWW_Gl_1400_LSP_300_Chi_315",
 #  "T6qqWW_Sq_950_LSP_300_Chi_350",
@@ -17,7 +27,10 @@ name = 'WJets'
 #c = getChain(soft_T6qqWW_Sq_950_LSP_300_Chi_350)
 #name = 'soft_T6qqWW_Sq_950_LSP_300_Chi_350'
 
-commoncf = "singleMuonic&&nLooseSoftLeptons==1&&nTightSoftLeptons==1&&nTightHardLeptons==0&&met>500&&htJet40ja>400&&nBJetMedium25==0&&nJet40a>=3"
+
+
+commoncf = "singleMuonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&htJet30j>400&&nBJetMediumCMVA30==0&&deltaPhi_Wl>1.0&&nJet30>=5"
+#commoncf = "singleMuonic&&nLooseSoftLeptons==1&&nTightSoftLeptons==1&&nTightHardLeptons==0&&met>500&&htJet40ja>400&&nBJetMedium25==0&&nJet40a>=3"
 c.Draw('>>eList', commoncf)
 eList = ROOT.gDirectory.Get('eList')
 
@@ -25,7 +38,7 @@ n=100
 for e in range(min([n, eList.GetN()])):
   stuff=[]
   c.GetEntry(eList.GetEntry(e))
-  jets = [ [c.Jet_pt[i], c.Jet_phi[i], ROOT.kRed]  for i in range(c.nJet) if c.Jet_pt[i]>40 ]
+  jets = [ [c.Jet_pt[i], c.Jet_phi[i], ROOT.kRed]  for i in range(c.nJet) if c.Jet_pt[i]>30 ]
   lepton = [c.leptonPt, c.leptonPhi, ROOT.kBlue]
   met = [c.met_pt, c.met_phi, ROOT.kGreen]
 
