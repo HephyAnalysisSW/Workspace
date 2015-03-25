@@ -3,7 +3,8 @@ import os,sys
 #ROOT.gROOT.LoadMacro('/afs/hephy.at/scratch/d/dhandl/CMSSW_7_2_3/src/Workspace/HEPHYPythonTools/scripts/root/tdrstyle.C')
 #ROOT.setTDRStyle()
 from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain
-from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2_HT400_withDF import *
+#from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2_HT400_withDF import *
+from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2_HT400ST150_withDF import *
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,varBinName
 from math import pi, sqrt
 small = False
@@ -45,7 +46,7 @@ def getRCS(c, cut, dPhiCut):
 streg = [[(250, 350), 1.], [(350, 450), 1.], [(450, -1), 1.]]
 htreg = [(400,500),(500,750),(750, 1000),(1000,1250),(1250,-1)]
 #njreg = [(2,3),(4,5),(5,5),(6,-1)]
-btreg = (1,1)
+btreg = (0,0)
 #streg = [[(250, 350), 1.], [(350, -1), 1.]]
 #htreg = [(500,750),(750, -1)]
 njreg = [(2,2),(3,3),(4,4),(5,5),(6,-1)]
