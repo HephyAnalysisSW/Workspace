@@ -6,10 +6,10 @@ from Workspace.HEPHYPythonTools.xsec import xsec
 from Workspace.HEPHYPythonTools.helpers import getObjFromFile, getObjDict, getFileList
 from Workspace.RA4Analysis.convertHelpers import compileClass, readVar, printHeader, typeStr, createClassString
 
-subDir = "postProcessed_v6_Phys14V2_withDF"
+subDir = "postProcessed_v6_Phys14_WJets"
 #from Workspace.RA4Analysis.cmgTuples_v3 import *
 from Workspace.HEPHYPythonTools.helpers import getChunksFromNFS, getChunksFromDPM, getChunks
-from Workspace.RA4Analysis.cmgTuples_v5_Phys14 import *
+from Workspace.RA4Analysis.cmgTuples_v6_PHYS14 import *
 target_lumi = 4000 #pb-1
 
 from  Workspace.RA4Analysis import mt2w
@@ -20,7 +20,8 @@ from localInfo import username
 ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 
-defSampleStr = "ttJets_PU20bx25"
+#defSampleStr = "ttJets_PU20bx25"
+defSampleStr = "WJetsToLNu_HT400to600"
 #defSampleStr = "ttWJets_PU20bx25,ttZJets_PU20bx25,ttHJets_PU20bx25"
 #defSampleStr = "QCD_HT_250To500_PU20bx25"
 
@@ -155,7 +156,8 @@ for isample, sample in enumerate(allSamples):
       r.init()
       t.GetEntry(i)
       s.weight = lumiWeight
-
+      print "r" , r
+      print "r lepgood pt: " ,r.LepGood_pt[0]
       #get all >=loose lepton indices
       looseLepInd = cmgLooseLepIndices(r, ptCuts=(7,5), absEtaCuts=(2.4,2.1), hybridIso03={'ptSwitch':0, 'absIso':0, 'relIso':0.4} )
       #split into soft and hard leptons
@@ -167,13 +169,13 @@ for isample, sample in enumerate(allSamples):
       #select tight hard leptons (use POG ID)
       tightHardLepInd = filter(lambda i:(abs(r.LepGood_pdgId[i])==11 and r.LepGood_relIso03[i]<0.14 and r.LepGood_tightId[i]>=3) \
                                      or (abs(r.LepGood_pdgId[i])==13 and r.LepGood_relIso03[i]<0.12 and r.LepGood_tightId[i]), looseHardLepInd)
-
+      #print "s lepgood pt: " ,s.LepGood_pt[0]
       s.nLooseSoftLeptons = len(looseSoftLepInd)
       s.nLooseSoftPt10Leptons = len(looseSoftPt10LepInd)
       s.nLooseHardLeptons = len(looseHardLepInd)
       s.nTightSoftLeptons = len(tightSoftLepInd)
       s.nTightHardLeptons = len(tightHardLepInd)
-
+      print "tightHardLepInd:" , tightHardLepInd
       vars = ['pt', 'eta', 'phi', 'relIso03', 'pdgId']
       allLeptons = [getObjDict(t, 'LepGood_', vars, i) for i in looseLepInd]
       looseSoftLep = [getObjDict(t, 'LepGood_', vars, i) for i in looseSoftLepInd] 
@@ -181,13 +183,14 @@ for isample, sample in enumerate(allSamples):
       looseSoftPt10Lep = [getObjDict(t, 'LepGood_', vars, i) for i in looseSoftPt10LepInd]
       tightSoftLep = [getObjDict(t, 'LepGood_', vars, i) for i in tightSoftLepInd]
       tightHardLep =  [getObjDict(t, 'LepGood_', vars, i) for i in tightHardLepInd]
-      
+      print "tightHardLep" , tightHardLep 
       leadingLepInd = None
       if options.leptonSelection=='hard':
         if s.nTightHardLeptons>=1:
           leadingLepInd = tightHardLepInd[0]
+          print "highest pt: " , r.LepGood_pt[0]
           s.leptonPt  = r.LepGood_pt[leadingLepInd]
-#          print s.leptonPt, 'met', r.met_pt, r.nLepGood, r.LepGood_pt[leadingLepInd],r.LepGood_eta[leadingLepInd], r.LepGood_phi[leadingLepInd] , r.LepGood_pdgId[leadingLepInd], r.LepGood_relIso03[leadingLepInd], r.LepGood_tightId[leadingLepInd], r.LepGood_mass[leadingLepInd]
+          print s.leptonPt, 'met:', r.met_pt, r.nLepGood, r.LepGood_pt[leadingLepInd],r.LepGood_eta[leadingLepInd], r.LepGood_phi[leadingLepInd] , r.LepGood_pdgId[leadingLepInd], r.LepGood_relIso03[leadingLepInd], r.LepGood_tightId[leadingLepInd], r.LepGood_mass[leadingLepInd]
           s.leptonInd = leadingLepInd 
           s.leptonEta = r.LepGood_eta[leadingLepInd]
           s.leptonPhi = r.LepGood_phi[leadingLepInd]
@@ -224,7 +227,9 @@ for isample, sample in enumerate(allSamples):
 #      print "Selected",s.leptonPt
       if options.leptonSelection!='':
         jets = filter(lambda j:j['pt']>30 and abs(j['eta'])<2.4 and j['id'], get_cmg_jets_fromStruct(r))
+        print "jets:" , jets
         lightJets, bJets = splitListOfObjects('btagCMVA', 0.732, jets) 
+        print "bjets:" , bJets
         s.htJet30j = sum([x['pt'] for x in jets])
         s.nJet30 = len(jets)
         s.nBJetMediumCMVA30 = len(bJets)
