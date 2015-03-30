@@ -8,7 +8,8 @@ from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,v
 from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2_HT400ST150_withDF import *
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2_HT400_withDF import *
 from localInfo import username
-from binnedNBTagsFit import binnedNBTagsFit
+
+#from binnedNBTagsFit import binnedNBTagsFit
 ROOT.gROOT.Reset()
 #ROOT.gROOT.LoadMacro("/afs/hephy.at/scratch/e/easilar/newWorkDir/CMSSW_7_2_3/src/Workspace/HEPHYPythonTools/scripts/root/tdrstyle.C")
 #ROOT.setTDRStyle()
@@ -49,16 +50,16 @@ signal_samples = [
 
 plots = [
   {'var':'mt2w',                        'varname':'mt2w',                   'bin':30,       'lowlimit':50, 'limit':500},\
-  {'var':'st',                          'varname':'st',                     'bin':30,       'lowlimit':0,  'limit':1400},\
-  {'var':'htJet30j',                    'varname':'htJet30j',               'bin':30,       'lowlimit':0,  'limit':2000},\
-  {'var':'nJet30',                      'varname':'nJet30',                 'bin':15,       'lowlimit':0,  'limit':15},\
-  {'var':'nBJetMediumCMVA30',           'varname':'nBJetMediumCMVA30',      'bin':15,       'lowlimit':0,  'limit':15},\
-  {'var':'nTauGood',                    'varname':'nTau',                   'bin':5,       'lowlimit':0,  'limit':5},\
-  {'var':'deltaPhi_Wl',                 'varname':'deltaPhi_Wl',            'bin':30,       'lowlimit':0,  'limit':pi},\
-  {'var':'met',                         'varname':'met',                    'bin':30,       'lowlimit':0,  'limit':1400},\
-  {'var':'leptonPt[0]',                 'varname':'leptonPt[0]',            'bin':100,       'lowlimit':0,  'limit':1000},\
-  {'var':'Jet_pt[0]+Jet_pt[1]',         'varname':'Jet_pt[0]+Jet_pt[1]',    'bin':30,       'lowlimit':0,  'limit':2000},\
-  {'var':'Jet_eta[0]*Jet_eta[1]',       'varname':'Jet_eta[0]*Jet_eta[1]',  'bin':30,       'lowlimit':-8,  'limit':8},\
+# {'var':'st',                          'varname':'st',                     'bin':30,       'lowlimit':0,  'limit':1400},\
+# {'var':'htJet30j',                    'varname':'htJet30j',               'bin':30,       'lowlimit':0,  'limit':2000},\
+# {'var':'nJet30',                      'varname':'nJet30',                 'bin':15,       'lowlimit':0,  'limit':15},\
+# {'var':'nBJetMediumCMVA30',           'varname':'nBJetMediumCMVA30',      'bin':15,       'lowlimit':0,  'limit':15},\
+# {'var':'nTauGood',                    'varname':'nTau',                   'bin':5,       'lowlimit':0,  'limit':5},\
+# {'var':'deltaPhi_Wl',                 'varname':'deltaPhi_Wl',            'bin':30,       'lowlimit':0,  'limit':pi},\
+# {'var':'met',                         'varname':'met',                    'bin':30,       'lowlimit':0,  'limit':1400},\
+# {'var':'leptonPt[0]',                 'varname':'leptonPt[0]',            'bin':100,       'lowlimit':0,  'limit':1000},\
+# {'var':'Jet_pt[0]+Jet_pt[1]',         'varname':'Jet_pt[0]+Jet_pt[1]',    'bin':30,       'lowlimit':0,  'limit':2000},\
+# {'var':'Jet_eta[0]*Jet_eta[1]',       'varname':'Jet_eta[0]*Jet_eta[1]',  'bin':30,       'lowlimit':-8,  'limit':8},\
 ]
 #p = plots[0]
 #print p 
