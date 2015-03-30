@@ -20,8 +20,11 @@ from localInfo import username
 ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 
-#defSampleStr = "ttJets_PU20bx25"
-defSampleStr = "WJetsToLNu_HT400to600"
+#defSampleStr = "ttJets_PU20bx25_small"
+#defSampleStr = "WJetsToLNu_HT400to600"
+#defSampleStr = "WJetsToLNu_HT200to400"
+defSampleStr = "WJetsToLNu_HT100to200"
+#defSampleStr = "WJetsToLNu_HT600toInf"
 #defSampleStr = "ttWJets_PU20bx25,ttZJets_PU20bx25,ttHJets_PU20bx25"
 #defSampleStr = "QCD_HT_250To500_PU20bx25"
 
@@ -94,6 +97,7 @@ exec('allSamples=['+options.allsamples+']')
 for isample, sample in enumerate(allSamples):
   
   chunks, nTotEvents = getChunks(sample, options.inputTreeName)
+  #chunks, nTotEvents = getChunksFromDPM(sample, options.inputTreeName)
   
   outDir = options.targetDir+'/'+"/".join([options.skim, options.leptonSelection, sample['name']])
   tmpDir = outDir+'/tmp/'
@@ -102,7 +106,7 @@ for isample, sample in enumerate(allSamples):
   os.system('rm -rf '+tmpDir+'/*')
 
   lumiWeight = xsec[sample['dbsName']]*target_lumi/float(nTotEvents)
-  readVariables = ['met_pt/D', 'met_phi/D']
+  readVariables = ['met_pt/F', 'met_phi/F']
 
   newVariables = ['weight/F']
   newVariables += ['nLooseSoftLeptons/I', 'nLooseSoftPt10Leptons/I', 'nLooseHardLeptons/I', 'nTightSoftLeptons/I', 'nTightHardLeptons/I']
@@ -113,8 +117,8 @@ for isample, sample in enumerate(allSamples):
   aliases = [ "met:met_pt", "metPhi:met_phi","genMet:met_genPt", "genMetPhi:met_genPhi"]
 
   readVectors = [\
-    {'prefix':'LepGood',  'nMax':8, 'vars':['pt/D', 'eta/D', 'phi/D', 'pdgId/I', 'relIso03/D', 'tightId/I', 'mass/D']},
-    {'prefix':'Jet',  'nMax':100, 'vars':['pt/D', 'eta/D', 'phi/D', 'id/I', 'btagCMVA/D', 'partonId/I']},
+    {'prefix':'LepGood',  'nMax':8, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I', 'relIso03/F', 'tightId/I', 'mass/F']},
+    {'prefix':'Jet',  'nMax':100, 'vars':['pt/F', 'eta/F', 'phi/F', 'id/I', 'btagCMVA/F', 'partonId/I']},
   ]
   readVars = [readVar(v, allowRenaming=False, isWritten=False, isRead=True) for v in readVariables]
   for v in readVectors:
@@ -156,8 +160,8 @@ for isample, sample in enumerate(allSamples):
       r.init()
       t.GetEntry(i)
       s.weight = lumiWeight
-      print "r" , r
-      print "r lepgood pt: " ,r.LepGood_pt[0]
+      #print "r" , r
+      #print "r lepgood pt: " ,r.LepGood_pt[0]
       #get all >=loose lepton indices
       looseLepInd = cmgLooseLepIndices(r, ptCuts=(7,5), absEtaCuts=(2.4,2.1), hybridIso03={'ptSwitch':0, 'absIso':0, 'relIso':0.4} )
       #split into soft and hard leptons
@@ -175,7 +179,7 @@ for isample, sample in enumerate(allSamples):
       s.nLooseHardLeptons = len(looseHardLepInd)
       s.nTightSoftLeptons = len(tightSoftLepInd)
       s.nTightHardLeptons = len(tightHardLepInd)
-      print "tightHardLepInd:" , tightHardLepInd
+      #print "tightHardLepInd:" , tightHardLepInd
       vars = ['pt', 'eta', 'phi', 'relIso03', 'pdgId']
       allLeptons = [getObjDict(t, 'LepGood_', vars, i) for i in looseLepInd]
       looseSoftLep = [getObjDict(t, 'LepGood_', vars, i) for i in looseSoftLepInd] 
@@ -183,14 +187,14 @@ for isample, sample in enumerate(allSamples):
       looseSoftPt10Lep = [getObjDict(t, 'LepGood_', vars, i) for i in looseSoftPt10LepInd]
       tightSoftLep = [getObjDict(t, 'LepGood_', vars, i) for i in tightSoftLepInd]
       tightHardLep =  [getObjDict(t, 'LepGood_', vars, i) for i in tightHardLepInd]
-      print "tightHardLep" , tightHardLep 
+      #print "tightHardLep" , tightHardLep 
       leadingLepInd = None
       if options.leptonSelection=='hard':
         if s.nTightHardLeptons>=1:
           leadingLepInd = tightHardLepInd[0]
-          print "highest pt: " , r.LepGood_pt[0]
+          #print "highest pt: " , r.LepGood_pt[0]
           s.leptonPt  = r.LepGood_pt[leadingLepInd]
-          print s.leptonPt, 'met:', r.met_pt, r.nLepGood, r.LepGood_pt[leadingLepInd],r.LepGood_eta[leadingLepInd], r.LepGood_phi[leadingLepInd] , r.LepGood_pdgId[leadingLepInd], r.LepGood_relIso03[leadingLepInd], r.LepGood_tightId[leadingLepInd], r.LepGood_mass[leadingLepInd]
+          #print s.leptonPt, 'met:', r.met_pt, r.nLepGood, r.LepGood_pt[leadingLepInd],r.LepGood_eta[leadingLepInd], r.LepGood_phi[leadingLepInd] , r.LepGood_pdgId[leadingLepInd], r.LepGood_relIso03[leadingLepInd], r.LepGood_tightId[leadingLepInd], r.LepGood_mass[leadingLepInd]
           s.leptonInd = leadingLepInd 
           s.leptonEta = r.LepGood_eta[leadingLepInd]
           s.leptonPhi = r.LepGood_phi[leadingLepInd]
@@ -227,9 +231,9 @@ for isample, sample in enumerate(allSamples):
 #      print "Selected",s.leptonPt
       if options.leptonSelection!='':
         jets = filter(lambda j:j['pt']>30 and abs(j['eta'])<2.4 and j['id'], get_cmg_jets_fromStruct(r))
-        print "jets:" , jets
+        #print "jets:" , jets
         lightJets, bJets = splitListOfObjects('btagCMVA', 0.732, jets) 
-        print "bjets:" , bJets
+        #print "bjets:" , bJets
         s.htJet30j = sum([x['pt'] for x in jets])
         s.nJet30 = len(jets)
         s.nBJetMediumCMVA30 = len(bJets)
