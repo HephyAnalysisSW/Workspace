@@ -4,10 +4,11 @@ from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYi
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName, nBTagBinName, varBinName
 from math import sqrt, pi
 
-dPhiStr = "acos((leptonPt+met*cos(leptonPhi-metPhi))/sqrt(leptonPt**2+met**2+2*met*leptonPt*cos(leptonPhi-metPhi)))"
+dPhiStr = 'deltaPhi_Wl' #= "acos((leptonPt+met*cos(leptonPhi-metPhi))/sqrt(leptonPt**2+met**2+2*met*leptonPt*cos(leptonPhi-metPhi)))"
 
 ROOT.TH1F().SetDefaultSumw2()
-def getRCS(c, cut, dPhiCut):
+
+def getRCS(c, cut, dPhiCut):   
 #  dPhiStr = "acos((leptonPt+met*cos(leptonPhi-metPhi))/sqrt(leptonPt**2+met**2+2*met*leptonPt*cos(leptonPhi-metPhi)))"
   h = getPlotFromChain(c, dPhiStr, [0,dPhiCut,pi], cutString=cut, binningIsExplicit=True)
   if h.GetBinContent(1)>0 and h.GetBinContent(2)>0:
@@ -16,7 +17,18 @@ def getRCS(c, cut, dPhiCut):
     rCSE_pred = rcs*sqrt(1./h.GetBinContent(2)**2 + 1./h.GetBinContent(1)**2)
     del h
     return {'rCS':rcs, 'rCSE_pred':rCSE_pred, 'rCSE_sim':rCSE_sim}
-  del h
+  else:
+    del h
+    return {'rCS':'NaN', 'rCSE_pred':'NaN', 'rCSE_sim':'NaN'}
+  
+def getFOM(Ysig ,Ysig_Err , Ybkg,  Ybkg_Err):
+  if Ybkg>0.0:
+    FOM = Ysig/sqrt(Ybkg)
+    FOM_Err = sqrt(Ysig_Err**2/Ybkg + ((Ysig*Ybkg_Err)/(2*Ybkg**(3/2)))**2)
+    return {'FOM':FOM, 'FOM_Err':FOM_Err}
+  else:
+    return {'FOM':'NaN', 'FOM_Err':'NaN'}
+
 
 #don't use k_factor calculation right now it has to be optimized
 #def getTTcorr(stb,htb,filename='hardSingleLeptonic_TTfitnjet_', dir='/afs/hephy.at/user/d/dhandl/www/pngCMG2/rCS/'):
@@ -40,7 +52,9 @@ def getRCS(c, cut, dPhiCut):
 #  del f1
 #  return {'k':k, 'k_Error':k_E}
 
-def getNumString(n,ne, acc=2):
-  return str(round(n,acc))+'&$\pm$&'+str(round(ne,acc))
-
-
+def getNumString(n,ne, acc=2):    ##For printing table 
+  if type(n) is float and type(ne) is float:
+    return str(round(n,acc))+'&$\pm$&'+str(round(ne,acc))
+  #if type(n) is str and type(ne) is str: 
+  else:
+    return n +'&$\pm$&'+ ne

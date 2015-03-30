@@ -306,7 +306,7 @@ def deltaR(l1, l2):
   return sqrt(deltaR2(l1,l2))
 #Get an object with name-prefix (e.g. LepGood) as a dictionary by specifying index i and variables ['pt','eta',...]
 def getObjDict(c, prefix, variables, i):
- return {var: c.GetLeaf(prefix+'_'+var).GetValue(i) for var in variables}
+ return {var: c.GetLeaf(prefix+var).GetValue(i) for var in variables}
 
 #FIXME: Move this selection specific stuff to the analysis directory (Deg stop)
 #def getJets(c):

@@ -1,16 +1,15 @@
 import ROOT
 ROOT.gROOT.LoadMacro("../../HEPHYPythonTools/scripts/root/tdrstyle.C")
-#ROOT.gROOT.processLine('.L /afs/hephy.at/scratch/d/dhandl/CMSSW_7_2_3/src/Workspace/HEPHYPythonTools/scripts/root/tdrstyle.C')
 ROOT.setTDRStyle()
 from math import *
 import os, copy, sys
 from array import array
 from Workspace.HEPHYPythonTools.helpers import getVarValue, getChain, deltaPhi, getYieldFromChain
-from Workspace.RA4Analysis.cmgTuplesPostProcessed_v5_Phys14V2 import *
+from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2_HT400_withDF import *
 from Workspace.RA4Analysis.helpers import *
 
 lepSel = 'hard'
-nBTagCMVA = 'Sum$(Jet_pt>30&&abs(Jet_eta)<2.4&&Jet_id&&Jet_btagCMVA>0.732)'
+dPhiStr = "acos((leptonPt+met*cos(leptonPhi-metPhi))/sqrt(leptonPt**2+met**2+2*met*leptonPt*cos(leptonPhi-metPhi)))"
 
 #Bkg chains 
 allBkg=[
@@ -23,11 +22,9 @@ allBkg=[
       ]
 
 for bkg in allBkg:
-  bkg['chain']=getChain(bkg['sample'],histname='')
-  bkg['color'] =color(bkg['name'])
-for c in allBkg:
-  c['chain'].SetAlias('nBTagCMVA', nBTagCMVA)
-
+  bkg['chain'] = getChain(bkg['sample'],histname='')
+  bkg['color'] = color(bkg['name'])
+  bkg['chain'].SetAlias('dPhi',dPhiStr)
 
 #Signal chains
 allSignals=[
@@ -37,8 +34,8 @@ allSignals=[
             #"SMS_T2tt_2J_mStop500_mLSP325",
             #"SMS_T2tt_2J_mStop650_mLSP325",
             #"SMS_T2tt_2J_mStop850_mLSP100",
-            {'name':'T5WW_1200_1000_800', 'sample':SMS_T5qqqqWW_Gl1200_Chi1000_LSP800[lepSel], 'weight':'weight', 'color':ROOT.kBlack},
-            {'name':'T5WW_1500_800_100',  'sample':SMS_T5qqqqWW_Gl1500_Chi800_LSP100[lepSel],  'weight':'weight', 'color':ROOT.kMagenta},
+            {'name':'T5q^{4} 1.2/1.0/0.8', 'sample':SMS_T5qqqqWW_Gl1200_Chi1000_LSP800[lepSel], 'weight':'weight', 'color':ROOT.kBlack},
+            {'name':'T5q^{4} 1.5/0.8/0.1',  'sample':SMS_T5qqqqWW_Gl1500_Chi800_LSP100[lepSel],  'weight':'weight', 'color':ROOT.kMagenta},
             #"T1ttbbWW_mGo1000_mCh725_mChi715",
             #"T1ttbbWW_mGo1000_mCh725_mChi720",
             #"T1ttbbWW_mGo1300_mCh300_mChi290",
@@ -50,17 +47,16 @@ allSignals=[
 ]
 
 for s in allSignals:
-  s['chain']=getChain(s['sample'],histname='')
-for c in allSignals:
- c['chain'].SetAlias('nBTagCMVA', nBTagCMVA)
+  s['chain'] = getChain(s['sample'],histname='')
+  s['chain'].SetAlias('dPhi',dPhiStr)
 
 #defining ht, st and njets for SR
-streg = [(200,-1), (250, 350), (350,-1)]                         
-htreg = [(500,-1), (500,750),(750,-1)]
-njreg = [(4,4), (5,5), (6,-1)]
-dPhiStr = "acos((leptonPt+met*cos(leptonPhi-metPhi))/sqrt(leptonPt**2+met**2+2*met*leptonPt*cos(leptonPhi-metPhi)))"
-presel='singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0'
-preprefix = 'singleLeptonic_0b_ht750_st250-350_nj5'
+streg = [(450,-1)]                         
+htreg = [(400,-1)]
+njreg = [(None)]
+btb = (0,0)
+presel='singleMuonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&deltaPhi_Wl>1.0'
+preprefix = 'singleMuonic_0b_ht400_st450_2J80_dPhi1'
 wwwDir = '/afs/hephy.at/user/d/dhandl/www/pngCMG2/'+lepSel+'/'+preprefix+'/'
 
 if not os.path.exists(wwwDir):
@@ -70,9 +66,9 @@ if not os.path.exists(wwwDir):
 small = 1
 #small = 0
 if small == 1:
-  streg = [(250,350)]
-  htreg = [(750,-1)]
-  njreg = [(5,5)]
+  streg = [(450,-1)]
+  htreg = [(400,-1)]
+  njreg = [(8,-1)]
   btb   = (0,0)
 
 allVariables = []
@@ -80,17 +76,17 @@ allVariables = []
 def getdPhiMetJet(c):
   met = c.GetLeaf('met_pt').GetValue()
   metPhi = c.GetLeaf('met_phi').GetValue()
-  JetPt = c.GetLeaf('leptonPt').GetValue(0)
-  JetPhi = c.GetLeaf('leptonPhi').GetValue(0)
+  JetPt = c.GetLeaf('Jet_pt').GetValue(0)
+  JetPhi = c.GetLeaf('Jet_phi').GetValue(0)
 #  dPhi = acos((met*JetPt*cos(metPhi-JetPhi))/(met*JetPt))
   dPhi = deltaPhi(metPhi,JetPhi)
   return dPhi
 
 def gethtRatio(c):
-  ht = c.GetLeaf('htJet40ja').GetValue()
+  ht = c.GetLeaf('htJet30j').GetValue()
   Jet0 = c.GetLeaf('Jet_pt').GetValue(0)
   Jet1 = c.GetLeaf('Jet_pt').GetValue(1)
-  ratio = (ht-Jet0-Jet1)/(Jet0+Jet1)
+  ratio = (Jet0+Jet1)/(ht-Jet0-Jet1)
   return ratio
 
 def getJetRatio(c):
@@ -107,25 +103,45 @@ def getsecondJet(c):
   Jet1 = c.GetLeaf('Jet_pt').GetValue(1)
   return Jet1
 
-met = {'name':'mymet', 'varString':"met_pt", 'legendName':'#slash{E}_{T}', 'Ytitle':'# of Events / 50GeV', 'binning':[32,0,1600]}
-ht = {'name':'myht', 'varString':"htJet40ja", 'legendName':'H_{T}', 'Ytitle':'# of Events / 50GeV', 'binning':[32,0,1600]}
-St = {'name':'myst', 'varString':"st", 'legendName':'S_{T}', 'Ytitle':'# of Events / 50GeV', 'binning':[32,0,1600]}
+def getdPhiJetJet(c):
+  leadJetPt = c.GetLeaf('Jet_pt').GetValue(0)
+  leadJetPhi = c.GetLeaf('Jet_phi').GetValue(0)
+  subJetPt = c.GetLeaf('Jet_pt').GetValue(1)
+  subJetPhi = c.GetLeaf('Jet_phi').GetValue(1)
+#  dPhi = acos((met*JetPt*cos(metPhi-JetPhi))/(met*JetPt))
+  dPhi = deltaPhi(subJetPhi,leadJetPhi)
+  return dPhi
+
+def getJetMagnitude(c):
+  leadJetPt = c.GetLeaf('Jet_pt').GetValue(0)
+  subJetPt = c.GetLeaf('Jet_pt').GetValue(1)
+  ht = c.GetLeaf('htJet30j').GetValue()
+  nJ = c.GetLeaf('nJet30').GetValue()
+  res = (ht-leadJetPt-subJetPt)/(nJ-2)
+  return res
+
+met = {'name':'mymet', 'varString':"met_pt", 'legendName':'#slash{E}_{T}', 'Ytitle':'# of Events / 25GeV', 'binning':[64,0,1600]}
+ht = {'name':'myht', 'varString':"htJet30j", 'legendName':'H_{T}', 'Ytitle':'# of Events / 25GeV', 'binning':[64,0,1600]}
+St = {'name':'myst', 'varString':"st", 'legendName':'S_{T}', 'Ytitle':'# of Events / 25GeV', 'binning':[64,0,1600]}
 #isoTrack = {'name':'myisoTrack', 'legendName':'isoTrack', 'binning':[10,0,10]}
 #relIso = {'name':'myrelIso', 'legendName':'relIso', 'binning':[100,0,1.0]}
-#dPhi = {'name':'mydeltaPhi','legendName':'#Delta#Phi(W,l)','binning':[6,0,3.2]} 
-nJets = {'name':'mynJets', 'varString':'nJet40a', 'legendName':'Jets', 'Ytitle':'# of Events', 'binning':[17,-0.5,16.5]}
-#nBJets = {'name':'mynBJets', 'varString':'nBJetMedium25', 'legendName':'B Jets', 'Ytitle':'# of Events', 'binning':[17,-0.5,16.5]}
+nJets = {'name':'mynJets', 'varString':'nJet30', 'legendName':'Jets', 'Ytitle':'# of Events', 'binning':[17,-0.5,16.5]}
+#nBJets = {'name':'mynBJets', 'varString':'nBJetMediumCMVA30', 'legendName':'B Jets', 'Ytitle':'# of Events', 'binning':[17,-0.5,16.5]}
 dPhi = {'name':'mydeltaPhi', 'varFunc':cmgDPhi, 'legendName':'#Delta#Phi(W,l)','binning':[20,0,pi], 'Ytitle':'# of Events'}#, 'binningIsExplicit':True} 
-lMomentum = {'name':'myleptonPt', 'varString':'leptonPt', 'legendName':'p_{T}(l)', 'Ytitle':'# of Events / 50GeV', 'binning':[20,0,1000]}
-#htratio = {'name':'myhtratio', 'varFunc':gethtRatio, 'legendName':'H_{T,ratio}', 'Ytitle':'# of Events', 'binning':[25,0,2.5]}
-#jetratio = {'name':'myjetratio', 'varFunc':getJetRatio, 'legendName':'2^{nd}Jet/1^{st}Jet', 'Ytitle':'# of Events', 'binning':[15,0,1.5]}
+lMomentum = {'name':'myleptonPt', 'varString':'leptonPt', 'legendName':'p_{T}(l)', 'Ytitle':'# of Events / 5GeV', 'binning':[200,0,1000]}
+htratio = {'name':'myhtratio', 'varFunc':gethtRatio, 'legendName':'H_{T,ratio}', 'Ytitle':'# of Events', 'binning':[25,0,2.5]}
+jetratio = {'name':'myjetratio', 'varFunc':getJetRatio, 'legendName':'2^{nd}Jet/1^{st}Jet', 'Ytitle':'# of Events', 'binning':[15,0,1.5]}
 mt = {'name':'mymt', 'varFunc':cmgMT, 'legendName':'M_{T}', 'Ytitle':'# of Events / 10GeV', 'binning':[35,0,350]}
-#dphimetjet = {'name':'mydPhimetjet', 'varFunc':getdPhiMetJet, 'legendName':'#Delta#Phi(#slash{E}_{T},J_{1})', 'Ytitle':'# of Events', 'binning':[20,0,pi]}#, 'binningIsExplicit':True}
-#leadingJet = {'name':'myleadingJet', 'varFunc':getleadingJet, 'legendName':'p_{T}(leading Jet)', 'Ytitle':'# of Events / 50GeV', 'binning':[32,0,1600]}
-#secondJet = {'name':'mysecondJet', 'varFunc':getsecondJet, 'legendName':'p_{T}(J_{2})', 'Ytitle':'# of Events / 50GeV', 'binning':[32,0,1600]}
-#htOppRatio = {'name':'myhtOppRatio', 'varFunc':cmgHTRatio, 'legendName':'H^{opp. to #slash{E}_{T}}_{T}/H_{T}', 'Ytitle':'# of Events', 'binning':[20,0,1]}
+MT2W = {'name':'mymt2w', 'varString':'mt2w', 'legendName':'M^{W}_{T2}', 'Ytitle':'# of Events / 10GeV', 'binning':[45,0,450]}
+dphimetjet = {'name':'mydPhimetjet', 'varFunc':getdPhiMetJet, 'legendName':'#Delta#Phi(#slash{E}_{T},J_{1})', 'Ytitle':'# of Events', 'binning':[20,0,pi]}#, 'binningIsExplicit':True}
+leadingJet = {'name':'myleadingJet', 'varFunc':getleadingJet, 'legendName':'p_{T}(leading Jet)', 'Ytitle':'# of Events / 50GeV', 'binning':[32,0,1600]}
+secondJet = {'name':'mysecondJet', 'varFunc':getsecondJet, 'legendName':'p_{T}(J_{2})', 'Ytitle':'# of Events / 50GeV', 'binning':[32,0,1600]}
+htOppRatio = {'name':'myhtOppRatio', 'varFunc':cmgHTRatio, 'legendName':'H^{opp. to #slash{E}_{T}}_{T}/H_{T}', 'Ytitle':'# of Events', 'binning':[20,0,1]}
 #minDPhiMetJettwo = {'name':'myminDPhiMetJet12', 'varFunc':cmgMinDPhiJet, 'legendName':'min #Delta#Phi(#slash{E}_{T},J_{1,2})', 'Ytitle':'# of Events', 'binning':[20,0,pi]}#, 'binningIsExplicit':True}
-#minDPhiMetJetthree = {'name':'myminDPhiMetJet123', 'varFunc':cmgMinDPhiJet, 'legendName':'min #Delta#Phi(#slash{E}_{T},J_{1,2,3})', 'Ytitle':'# of Events', 'binning':[20,0,pi]}#, 'binningIsExplicit':True}
+minDPhiMetJetthree = {'name':'myminDPhiMetJet123', 'varFunc':cmgMinDPhiJet, 'legendName':'min #Delta#Phi(#slash{E}_{T},J_{1,2,3})', 'Ytitle':'# of Events', 'binning':[20,0,pi]}#, 'binningIsExplicit':True}
+MTclosestJetMet = {'name':'myMTClosestJetMET', 'varFunc':cmgMTClosestJetMET, 'legendName':'M_{T} (closest Jet,#slash{E}_{T})', 'Ytitle':'# of Events / 10GeV', 'binning':[35,0,350]}
+dphijetjet = {'name':'mydPhijetjet', 'varFunc':getdPhiJetJet, 'legendName':'#Delta#Phi(J_{1},J_{0})', 'Ytitle':'# of Events', 'binning':[20,0,pi]}#, 'binningIsExplicit':True}
+jetMag = {'name':'myjetmag', 'varFunc':getJetMagnitude, 'legendName':'#drac{H_{T}-2^{nd}Jet-1^{st}Jet}{nJets-2}', 'Ytitle':'# of Events', 'binning':[35,0,350]}
 
 allVariables.append(met)
 allVariables.append(ht)
@@ -136,38 +152,19 @@ allVariables.append(St)
 allVariables.append(dPhi)
 allVariables.append(nJets)
 allVariables.append(lMomentum)
-#allVariables.append(htratio)
-#allVariables.append(jetratio)
+allVariables.append(htratio)
+allVariables.append(jetratio)
 allVariables.append(mt)
-#allVariables.append(dphimetjet)
-#allVariables.append(leadingJet)
-#allVariables.append(secondJet)
-#allVariables.append(htOppRatio)
+allVariables.append(MT2W)
+allVariables.append(dphimetjet)
+allVariables.append(leadingJet)
+allVariables.append(secondJet)
+allVariables.append(htOppRatio)
 #allVariables.append(minDPhiMetJettwo)
-#allVariables.append(minDPhiMetJetthree)
-
-#def getWPhi(c):
-#  metPt = c.GetLeaf('met_pt').GetValue()
-#  metPhi = c.GetLeaf('met_phi').GetValue()
-#  lepPt = c.GetLeaf('leptonPt').GetValue()
-#  lepPhi = c.GetLeaf('leptonPhi').GetValue()
-#  X = metPt*cos(metPhi)+lepPt*cos(lepPhi)
-#  Y = metPt*sin(metPhi)+lepPt*sin(lepPhi)
-#  return atan2(Y,X)
-
-#def nJetBinName(njb):
-#  if njb[0]==njb[1]:
-#    return "n_{jet}="+str(njb[0])
-#  n=str(list(njb)[0])+"\leq n_{jet}"
-#  if len(njb)>1 and njb[1]>0:
-#    n+='\leq '+str(njb[1])
-#  return n
-#
-#def varBinName(vb, var):
-#  n=str(list(vb)[0])+"< "+var
-#  if len(vb)>1 and vb[1]>0:
-#    n+='< '+str(vb[1])
-#  return n
+allVariables.append(minDPhiMetJetthree)
+allVariables.append(MTclosestJetMet)
+allVariables.append(dphijetjet)
+allVariables.append(jetMag)
 
 histos = {}
 h_ratio = {}
@@ -192,7 +189,7 @@ for i_htb, htb in enumerate(htreg):
           #sample['chain'].Draw("Sum$(isoTrack_pt<15&&abs(isoTrack_pdgId)==211&&abs(isoTrack_dz)<0.05)"+">>"+sample["name"]+"_"+var["name"])
           #sample['chain'].Draw(var['varString']+">>"+sample['name']+'_'+var['name'], sample["weight"]+"*("+cut+")")
           
-        namestr, cut = nameAndCut(stb, htb, srNJet, btb=btb, presel=presel, btagVar = 'nBTagCMVA')
+        namestr, cut = nameAndCut(stb, htb, srNJet, btb=btb, presel=presel, btagVar = 'nBJetMediumCMVA30')
         print cut
         
         if sample.has_key('addcut'):
@@ -352,7 +349,7 @@ for i_htb, htb in enumerate(htreg):
           #h_ratio2.Draw("same")
          
         canvas.cd()
-        canvas.Print(wwwDir+'_'+namestr+'_'+var['name']+'.png')
-        canvas.Print(wwwDir+'_'+namestr+'_'+var['name']+'.root')
-        canvas.Print(wwwDir+'_'+namestr+'_'+var['name']+'.pdf')
+        canvas.Print(wwwDir+namestr+'_'+var['name']+'.png')
+        canvas.Print(wwwDir+namestr+'_'+var['name']+'.root')
+        canvas.Print(wwwDir+namestr+'_'+var['name']+'.pdf')
 

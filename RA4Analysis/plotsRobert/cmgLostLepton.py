@@ -3,6 +3,8 @@ from array import array
 import pickle
 from math import sqrt
 
+from Workspace.HEPHYPythonTools.helpers import getObjDict
+
 small = True
 c = ROOT.TChain('Events')
 #c.Add(' ~/data/ttJetsCSA1450ns_*.root')
@@ -10,9 +12,6 @@ c.Add('/data/schoef/convertedTuples_v26/copyInc/ttJetsCSA1450ns/histo_ttJetsCSA1
 def getVarValue(c, var, i=0):
   return c.GetLeaf(var).GetValue(i)
 
-#Get an object with name-prefix (e.g. LepGood) as a dictionary by specifying index i and variables ['pt','eta',...]
-def getObjDict(c, prefix, variables, i):
- return {var: c.GetLeaf(prefix+'_'+var).GetValue(i) for var in variables}
 
 #boolean function for acceptance
 def acceptance(lep):
@@ -50,9 +49,9 @@ def getGenMuonsInAcceptance(c):
   ngenLep = int(getVarValue(c, 'ngenLep'))
   gleps=[] 
   for i in range(ngenLep):
-    glep = getObjDict(c, 'genLep', ['pt','eta', 'pdgId'], i)
+    glep = getObjDict(c, 'genLep_', ['pt','eta', 'pdgId'], i)
     if abs(glep['pdgId'])==13 and acceptance(glep):
-      glep.update(getObjDict(c, 'genLep', ['sourceId', 'phi'], i))
+      glep.update(getObjDict(c, 'genLep_', ['sourceId', 'phi'], i))
       gleps.append(glep)
   return gleps   
 
@@ -61,9 +60,9 @@ def getLooseMuonsInAcceptance(c):
   nLepGood = int(getVarValue(c, 'nLepGood'))
   mus=[] 
   for i in range(nLepGood):
-    mu = getObjDict(c, 'LepGood', ['pt','eta', 'pdgId'], i)
+    mu = getObjDict(c, 'LepGood_', ['pt','eta', 'pdgId'], i)
     if abs(mu['pdgId'])==13 and acceptance(mu):
-      mu.update(getObjDict(c, 'LepGood', ['tightId', 'relIso03', 'dxy','dz', 'phi', 'jetPtRatio', 'jetBTagCSV', 'jetDR', 'mcMatchId', 'mcMatchAny'], i))
+      mu.update(getObjDict(c, 'LepGood_', ['tightId', 'relIso03', 'dxy','dz', 'phi', 'jetPtRatio', 'jetBTagCSV', 'jetDR', 'mcMatchId', 'mcMatchAny'], i))
       mus.append(mu)
   return mus   
 
@@ -71,9 +70,9 @@ def getJets(c):
   nJet = int(getVarValue(c, 'nJet'))
   jets=[] 
   for i in range(nJet):
-    jet = getObjDict(c, 'Jet', ['pt','eta'], i)
+    jet = getObjDict(c, 'Jet_', ['pt','eta'], i)
     if True:
-      jet.update(getObjDict(c, 'Jet', ['phi', 'mcFlavour', 'mcMatchId', 'mcMatchFlav'], i))
+      jet.update(getObjDict(c, 'Jet_', ['phi', 'mcFlavour', 'mcMatchId', 'mcMatchFlav'], i))
     jets.append(jet)
   return jets   
 

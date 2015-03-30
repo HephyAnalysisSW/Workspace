@@ -1,4 +1,4 @@
-from Workspace.HEPHYPythonTools.helpers import findClosestObject, deltaR, deltaR2,getVarValue, getObjFromFile
+from Workspace.HEPHYPythonTools.helpers import findClosestObject, deltaR, deltaR2,getVarValue, getObjFromFile,getObjDict
 from math import *
 def hybridIso03ID(r, nLep, hybridIso03):
   return (r.LepGood_pt[nLep]>=hybridIso03['ptSwitch'] and r.LepGood_relIso03[nLep]<hybridIso03['relIso']) or (r.LepGood_pt[nLep]<hybridIso03['ptSwitch'] and r.LepGood_relIso03[nLep]*r.LepGood_pt[nLep]<hybridIso03['absIso'])
@@ -36,11 +36,8 @@ def splitListOfObjects(var, val, s):
       resHigh.append(x)
   return resLow, resHigh
 
-def getObjDict(c, prefix, variables, i):
- return {var: c.GetLeaf(prefix+'_'+var).GetValue(i) for var in variables}
-
 def get_cmg_jets(c):
-  return [getObjDict(c, 'Jet', ['eta','pt','phi','btagCMVA', 'partonId', 'id'], i) for i in range(getVarValue(c, 'nJet'))]
+  return [getObjDict(c, 'Jet_', ['eta','pt','phi','btagCMVA', 'partonId', 'id'], i) for i in range(int(getVarValue(c, 'nJet')))]
 def get_cmg_jets_fromStruct(r):
   return [{p:getattr(r, 'Jet'+'_'+p)[i] for p in ['eta','pt','phi','btagCMVA', 'partonId', 'id']} for i in range(r.nJet)]
 
@@ -55,10 +52,10 @@ def get_cmg_index_and_DR(objs,leptonPhi,leptonEta):
   return index , dr
 
 def get_cmg_genLeps(c):
-  return [getObjDict(c, 'genLep', ['eta','pt','phi','charge', 'pdgId', 'sourceId'], i) for i in range(getVarValue(c, 'ngenLep'))]
+  return [getObjDict(c, 'genLep_', ['eta','pt','phi','charge', 'pdgId', 'sourceId'], i) for i in range(int(getVarValue(c, 'ngenLep')))]
 
 def get_cmg_recoMuons(c):
-  res = [getObjDict(c, 'LepGood', ['eta','pt','phi','charge', 'dxy', 'dz', 'relIso03','tightId', 'pdgId'], i) for i in range(getVarValue(c, 'nLepGood'))]
+  res = [getObjDict(c, 'LepGood_', ['eta','pt','phi','charge', 'dxy', 'dz', 'relIso03','tightId', 'pdgId'], i) for i in range(int(getVarValue(c, 'nLepGood')))]
   return filter(lambda m:abs(m['pdgId'])==13, res)
 
 

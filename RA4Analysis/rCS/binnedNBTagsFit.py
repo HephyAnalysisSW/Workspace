@@ -1,4 +1,5 @@
 import ROOT
+import os, sys
 from ROOT import RooFit as rf
 
 from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain
@@ -7,6 +8,8 @@ from localInfo import username
 from math import pi, sqrt
 
 def binnedNBTagsFit(cut, samples, nBTagVar = 'nBJetMediumCMVA30', prefix="", printDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/pngCMG2/templateFit'):
+  if not os.path.exists(printDir):
+     os.makedirs(printDir) 
   cWJets = samples['W']
   cTTJets = samples['TT']
   cRest = samples['Rest']

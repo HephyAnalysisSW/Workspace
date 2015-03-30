@@ -52,11 +52,12 @@ options.register ('keep','',
 #infiles = ['file:/data/schoef/local/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola_PU20bx25_POSTLS170_V5-v1_MINIAODSIM.root']
 #infiles = ['root://eoscms.cern.ch//eos/cms/store/relval/CMSSW_7_0_5/RelValTTbar_13/GEN-SIM-RECO/POSTLS170_V6-v3/00000/0423767B-B5DD-E311-A1E0-02163E00E5B5.root']
 #infiles = ['file:/afs/hephy.at/scratch/s/schoefbeck/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola_PU20bx25_POSTLS170_V5-v1_MINIAODSIM.root']
-infiles = ['file:/data/nrad/local/WJetsToLNu_HT-100to200_Tune4C_13TeV-madgraph-tauola_PU20bx25_POSTLS170_V5-v1_AODSIMPuppiMiniAOD.root']
+#infiles = ['file:/data/nrad/local/WJetsToLNu_HT-100to200_Tune4C_13TeV-madgraph-tauola_PU20bx25_POSTLS170_V5-v1_AODSIMPuppiMiniAOD.root']
+infiles=['root://xrootd.unl.edu//store/mc/Phys14DR/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/MINIAODSIM/PU30bx50_PHYS14_25_V1-v1/00000/003B6371-8D81-E411-8467-003048F0E826.root']
 options.files=infiles
 
 options.mode = 'mc'
-options.maxEvents=1000
+options.maxEvents=10
 
 if not 'ipython' in VarParsing.sys.argv[0]:
   options.parseArguments()
@@ -111,16 +112,16 @@ process.out = cms.OutputModule("PoolOutputModule",
 #     outputCommands = cms.untracked.vstring('keep *') 
 )
 
-#
 process.load('Workspace.HEPHYCMSSWTools.EventCounter')
+#
 process.filterSequence = cms.Sequence(
     process.EventCounter
+)
+from RecoMET.METProducers.PFMET_cfi import pfMet
+process.pfMet = pfMet.clone(src = "packedPFCandidates")
+process.pfMet.calculateSignificance = False # this can't be easily implemented on packed PF candidates at the moment
 
-#FIXME from RecoMET.METProducers.PFMET_cfi import pfMet
-#FIXME process.pfMet = pfMet.clone(src = "packedPFCandidates")
-#FIXME process.pfMet.calculateSignificance = False # this can't be easily implemented on packed PF candidates at the moment
-#FIXME 
-#FIXME process.metSequence = cms.Sequence(process.pfMet)
+process.metSequence = cms.Sequence(process.pfMet)
 
 process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
 process.printTree = cms.EDAnalyzer("ParticleTreeDrawer",
@@ -132,13 +133,6 @@ process.printTree = cms.EDAnalyzer("ParticleTreeDrawer",
                                    printIndex = cms.untracked.bool(False),
                                    status = cms.untracked.vint32( [1,2,3] )
                                    )
-#process.printTree = cms.EDAnalyzer("ParticleListDrawer",
-#    printVertex = cms.untracked.bool(False),
-#    src = cms.InputTag("genParticles"),
-#    maxEventsToPrint = cms.untracked.int32(-1)
-#)
-
-#-- Execution path ------------------------------------------------------------
 
 process.miniAODTupelizerSequence = cms.Sequence()
 process.load('Workspace.HEPHYCMSSWTools.BasicTupelizer_miniAOD_cfi')

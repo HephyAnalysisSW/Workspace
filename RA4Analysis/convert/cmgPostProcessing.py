@@ -6,7 +6,7 @@ from Workspace.HEPHYPythonTools.xsec import xsec
 from Workspace.HEPHYPythonTools.helpers import getObjFromFile, getObjDict, getFileList
 from Workspace.RA4Analysis.convertHelpers import compileClass, readVar, printHeader, typeStr, createClassString
 
-subDir = "postProcessed_v6_Phys14V2"
+subDir = "postProcessed_v6_Phys14V2_withDF"
 #from Workspace.RA4Analysis.cmgTuples_v3 import *
 from Workspace.HEPHYPythonTools.helpers import getChunksFromNFS, getChunksFromDPM, getChunks
 from Workspace.RA4Analysis.cmgTuples_v5_Phys14 import *
@@ -14,7 +14,7 @@ target_lumi = 4000 #pb-1
 
 from  Workspace.RA4Analysis import mt2w
 
-
+from math import *
 from localInfo import username
 
 ROOT.gSystem.Load("libFWCoreFWLite.so")
@@ -106,7 +106,7 @@ for isample, sample in enumerate(allSamples):
   newVariables = ['weight/F']
   newVariables += ['nLooseSoftLeptons/I', 'nLooseSoftPt10Leptons/I', 'nLooseHardLeptons/I', 'nTightSoftLeptons/I', 'nTightHardLeptons/I']
   if options.leptonSelection.lower()!='none':
-    newVariables.extend( ['nBJetMediumCMVA30/I','nJet30/I','htJet30j/F','st/F', 'leptonPt/F', 'leptonEta/F', 'leptonPhi/F', 'leptonPdg/I/0', 'leptonInd/I/-1', 'leptonMass/F', 'singleMuonic/I', 'singleElectronic/I', 'singleLeptonic/I', 'mt2w/F'] )
+    newVariables.extend( ['deltaPhi_Wl/F','nBJetMediumCMVA30/I','nJet30/I','htJet30j/F','st/F', 'leptonPt/F', 'leptonEta/F', 'leptonPhi/F', 'leptonPdg/I/0', 'leptonInd/I/-1', 'leptonMass/F', 'singleMuonic/I', 'singleElectronic/I', 'singleLeptonic/I', 'mt2w/F'] )
   newVars = [readVar(v, allowRenaming=False, isWritten = True, isRead=False) for v in newVariables]
 
   aliases = [ "met:met_pt", "metPhi:met_phi","genMet:met_genPt", "genMetPhi:met_genPhi"]
@@ -175,12 +175,12 @@ for isample, sample in enumerate(allSamples):
       s.nTightHardLeptons = len(tightHardLepInd)
 
       vars = ['pt', 'eta', 'phi', 'relIso03', 'pdgId']
-      allLeptons = [getObjDict(t, 'LepGood', vars, i) for i in looseLepInd]
-      looseSoftLep = [getObjDict(t, 'LepGood', vars, i) for i in looseSoftLepInd] 
-      looseHardLep = [getObjDict(t, 'LepGood', vars, i) for i in looseHardLepInd]
-      looseSoftPt10Lep = [getObjDict(t, 'LepGood', vars, i) for i in looseSoftPt10LepInd]
-      tightSoftLep = [getObjDict(t, 'LepGood', vars, i) for i in tightSoftLepInd]
-      tightHardLep =  [getObjDict(t, 'LepGood', vars, i) for i in tightHardLepInd]
+      allLeptons = [getObjDict(t, 'LepGood_', vars, i) for i in looseLepInd]
+      looseSoftLep = [getObjDict(t, 'LepGood_', vars, i) for i in looseSoftLepInd] 
+      looseHardLep = [getObjDict(t, 'LepGood_', vars, i) for i in looseHardLepInd]
+      looseSoftPt10Lep = [getObjDict(t, 'LepGood_', vars, i) for i in looseSoftPt10LepInd]
+      tightSoftLep = [getObjDict(t, 'LepGood_', vars, i) for i in tightSoftLepInd]
+      tightHardLep =  [getObjDict(t, 'LepGood_', vars, i) for i in tightHardLepInd]
       
       leadingLepInd = None
       if options.leptonSelection=='hard':
@@ -229,6 +229,8 @@ for isample, sample in enumerate(allSamples):
         s.nJet30 = len(jets)
         s.nBJetMediumCMVA30 = len(bJets)
         s.mt2w = mt2w.mt2w(met = {'pt':r.met_pt, 'phi':r.met_phi}, l={'pt':s.leptonPt, 'phi':s.leptonPhi, 'eta':s.leptonEta}, ljets=lightJets, bjets=bJets)
+        s.deltaPhi_Wl = acos((s.leptonPt+r.met_pt*cos(s.leptonPhi-r.met_phi))/sqrt(s.leptonPt**2+r.met_pt**2+2*r.met_pt*s.leptonPt*cos(s.leptonPhi-r.met_phi))) 
+        #print "deltaPhi:" , s.deltaPhi_Wl
 #          print "Warning -> Why can't I compute mt2w?", s.mt2w, len(jets), len(bJets), len(allTightLeptons),lightJets,bJets, {'pt':s.type1phiMet, 'phi':s.type1phiMetphi}, {'pt':s.leptonPt, 'phi':s.leptonPhi, 'eta':s.leptonEta}
       for v in newVars:
         v['branch'].Fill()

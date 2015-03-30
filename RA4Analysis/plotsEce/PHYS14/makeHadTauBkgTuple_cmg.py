@@ -53,9 +53,19 @@ if mode=='had' or mode=='lep':
       templates[ptk][etak]=res
       #print res
 
+def get_cmg_recoMuons_withisTight(c):
+  muons=get_cmg_recoMuons(c)
+  mus = []
+  for m in muons:
+    isTight = False
+    if m['pt']>25 and abs(m['eta'])<2.1 and m['relIso03']<0.12 :
+     isTight = True  
+    m['isTight'] = isTight
+    mus.append(m)
+  return mus
 
 def getTwoMuons(c):
-  muons=get_cmg_recoMuons(c)
+  muons=get_cmg_recoMuons_withisTight(c)
   #print muons
   if len(muons) ==2 : return muons
   if len(muons) !=2 : print 'problematic event'
