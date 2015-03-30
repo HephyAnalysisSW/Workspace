@@ -439,41 +439,6 @@ def setupMVAFrameWork(setup, data, methods, prefix):
     print "Adding to factory variable", v, 'of type', varType[v] 
     factory.AddVariable(getVarName(v), varType[v])
 
-#  sigCut = ROOT.TCut("type==1&&"+setup['preselection'])
-#  bgCut = ROOT.TCut("type==0&&"+setup['preselection'])
-#  factory.PrepareTrainingAndTestTree(sigCut,bgCut,":".join(setup["datasetFactoryOptions"]))
-
-#  nEvents = data['simu'].GetEntries()
-#  nBkgTrain=0
-#  nSigTrain=0
-#  nBkgTest=0
-#  nSigTest=0
-#  for ievent in range(nEvents):
-#    data['simu'].GetEntry(ievent)
-#    isTraining =  int(data['simu'].GetLeaf('isTraining').GetValue())
-#    type =  int(data['simu'].GetLeaf('type').GetValue())
-##    print isTraining, type
-#    if (type == 0 and isTraining == 1):
-#      eventBookMethod = factory.AddBackgroundTrainingEvent
-#      nBkgTrain+=1
-#    if (type == 1 and isTraining ==1):
-#      eventBookMethod = factory.AddSignalTrainingEvent
-#      nSigTrain+=1
-#    if (type == 0 and isTraining ==0):
-#      eventBookMethod = factory.AddBackgroundTestEvent
-#      nBkgTest+=1
-#    if (type == 1 and isTraining ==0):
-#      eventBookMethod = factory.AddSignalTestEvent
-#      nSigTest+=1
-#    if (not ( (type == 1) or (type == 0)) ) or not ((isTraining == 1) or (isTraining == 0)):
-#      print "Warning!",isTraining,type
-#    vals = ROOT.std.vector('double')()
-#    for v in setup['mvaInputVars'] : vals.push_back(data['simu'].GetLeaf(v).GetValue())
-##    print eventBookMethod, vals,isTraining,type
-#    eventBookMethod(vals, data['simu'].GetLeaf('weightForMVA').GetValue()) 
-#    del vals
-#  print "Booked Events: Train(Bkg/Sig)", str(nBkgTrain)+"/"+str(nSigTrain),"Test(Bkg/Sig)",str(nBkgTest)+"/"+str(nSigTest)
-
   bkgTestTree =   data['simu'].CopyTree("isTraining==0&&type==0")
   sigTestTree =   data['simu'].CopyTree("isTraining==0&&type==1")
   bkgTrainTree =  data['simu'].CopyTree("isTraining==1&&type==0")
@@ -485,10 +450,6 @@ def setupMVAFrameWork(setup, data, methods, prefix):
   factory.SetBackgroundWeightExpression("weightForMVA")
   factory.SetSignalWeightExpression(    "weightForMVA")
 
-#  factory.AddSignalTree(data['simu'])
-#  factory.AddBackgroundTree(data['simu'])
-  
-  #Fill training/test dataset event by event  
 
   #Using all Methods:
   for m in methods:
