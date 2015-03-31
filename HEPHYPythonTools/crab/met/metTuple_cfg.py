@@ -19,7 +19,7 @@ process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(1000)
+    input = cms.untracked.int32(10)
 )
 
 # Input source
@@ -63,7 +63,7 @@ process.MINIAODSIMoutput = cms.OutputModule("PoolOutputModule",
 
 # Other statements
 from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
-process.GlobalTag = GlobalTag(process.GlobalTag, 'PHYS14_ST_V1', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, 'PHYS14_25_V3', '')
 
 # Path and EndPath definitions
 process.endjob_step = cms.EndPath(process.endOfProcess)
@@ -85,7 +85,7 @@ process = miniAOD_customizeAllMC(process)
 process.load('Workspace.HEPHYCMSSWTools.EventCounter')
 #
 process.filterSequence = cms.Sequence(
-    process.EventCounter
+#    process.EventCounter
 )
 
 process.patRAWMETs=process.patMETs.clone(metSource=cms.InputTag("pfMet"))
@@ -121,44 +121,44 @@ process.printTree = cms.EDAnalyzer("ParticleTreeDrawer",
                                    status = cms.untracked.vint32( [1,2,3] )
                                    )
 
-process.miniAODTupelizerSequence = cms.Sequence()
-process.load('Workspace.HEPHYCMSSWTools.BasicTupelizer_miniAOD_cfi')
-process.BasicTupelizer.useForDefaultAlias = cms.untracked.bool(True)
-process.BasicTupelizer.addMSugraOSETInfo = cms.untracked.bool(False)
-process.BasicTupelizer.verbose = cms.untracked.bool(False)
-process.BasicTupelizer.metsToMonitor =  cms.untracked.vstring('slimmedMETs', 'slimmedTxyMETs','slimmedRAWMETs','slimmedT1TxyMETs')
-process.miniAODTupelizerSequence += process.BasicTupelizer
-process.load('Workspace.HEPHYCMSSWTools.JetTupelizer_miniAOD_cfi')
-process.JetTupelizer.useForDefaultAlias = cms.untracked.bool(True)
-process.JetTupelizer.verbose = cms.untracked.bool(False)
-process.miniAODTupelizerSequence += process.JetTupelizer
-process.load('Workspace.HEPHYCMSSWTools.MuonTupelizer_miniAOD_cfi')
-process.MuonTupelizer.useForDefaultAlias = cms.untracked.bool(True)
-process.miniAODTupelizerSequence += process.MuonTupelizer
-process.MuonTupelizer.verbose = cms.untracked.bool(False)
-process.load('Workspace.HEPHYCMSSWTools.ElectronTupelizer_miniAOD_cfi')
-process.ElectronTupelizer.useForDefaultAlias = cms.untracked.bool(True)
-process.ElectronTupelizer.verbose = cms.untracked.bool(False)
-process.miniAODTupelizerSequence += process.ElectronTupelizer
-process.load('Workspace.HEPHYCMSSWTools.TauTupelizer_miniAOD_cfi')
-process.TauTupelizer.useForDefaultAlias = cms.untracked.bool(True)
-process.TauTupelizer.verbose = cms.untracked.bool(False)
-process.miniAODTupelizerSequence += process.TauTupelizer
-process.load('Workspace.HEPHYCMSSWTools.TriggerTupelizer_cfi')
-process.TriggerTupelizer.useForDefaultAlias = cms.untracked.bool(True)
-#process.TriggerTupelizer.verbose = cms.untracked.bool(options.verbose)
-process.miniAODTupelizerSequence += process.TriggerTupelizer
-process.load('Workspace.HEPHYCMSSWTools.FilterTupelizer_cfi')
-process.FilterTupelizer.useForDefaultAlias = cms.untracked.bool(True)
-#process.FilterTupelizer.verbose = cms.untracked.bool(options.verbose)
-process.miniAODTupelizerSequence += process.FilterTupelizer
-#process.load('Workspace.HEPHYCMSSWTools.PFCandTupelizer_cff')
-#process.miniAODTupelizerSequence += process.PFCandTupelizer
-#process.PFCandTupelizer.useForDefaultAlias = cms.untracked.bool(True)
-#process.PFCandTupelizer.fillIsolatedChargedHadrons = cms.untracked.bool(True)
+#process.miniAODTupelizerSequence = cms.Sequence()
+#process.load('Workspace.HEPHYCMSSWTools.BasicTupelizer_miniAOD_cfi')
+#process.BasicTupelizer.useForDefaultAlias = cms.untracked.bool(True)
+#process.BasicTupelizer.addMSugraOSETInfo = cms.untracked.bool(False)
+#process.BasicTupelizer.verbose = cms.untracked.bool(False)
+#process.BasicTupelizer.metsToMonitor =  cms.untracked.vstring('slimmedMETs', 'slimmedTxyMETs','slimmedRAWMETs','slimmedT1TxyMETs')
+#process.miniAODTupelizerSequence += process.BasicTupelizer
+#process.load('Workspace.HEPHYCMSSWTools.JetTupelizer_miniAOD_cfi')
+#process.JetTupelizer.useForDefaultAlias = cms.untracked.bool(True)
+#process.JetTupelizer.verbose = cms.untracked.bool(False)
+#process.miniAODTupelizerSequence += process.JetTupelizer
+#process.load('Workspace.HEPHYCMSSWTools.MuonTupelizer_miniAOD_cfi')
+#process.MuonTupelizer.useForDefaultAlias = cms.untracked.bool(True)
+#process.miniAODTupelizerSequence += process.MuonTupelizer
+#process.MuonTupelizer.verbose = cms.untracked.bool(False)
+#process.load('Workspace.HEPHYCMSSWTools.ElectronTupelizer_miniAOD_cfi')
+#process.ElectronTupelizer.useForDefaultAlias = cms.untracked.bool(True)
+#process.ElectronTupelizer.verbose = cms.untracked.bool(False)
+#process.miniAODTupelizerSequence += process.ElectronTupelizer
+#process.load('Workspace.HEPHYCMSSWTools.TauTupelizer_miniAOD_cfi')
+#process.TauTupelizer.useForDefaultAlias = cms.untracked.bool(True)
+#process.TauTupelizer.verbose = cms.untracked.bool(False)
+#process.miniAODTupelizerSequence += process.TauTupelizer
+#process.load('Workspace.HEPHYCMSSWTools.TriggerTupelizer_cfi')
+#process.TriggerTupelizer.useForDefaultAlias = cms.untracked.bool(True)
+##process.TriggerTupelizer.verbose = cms.untracked.bool(options.verbose)
+#process.miniAODTupelizerSequence += process.TriggerTupelizer
+#process.load('Workspace.HEPHYCMSSWTools.FilterTupelizer_cfi')
+#process.FilterTupelizer.useForDefaultAlias = cms.untracked.bool(True)
+##process.FilterTupelizer.verbose = cms.untracked.bool(options.verbose)
+#process.miniAODTupelizerSequence += process.FilterTupelizer
+##process.load('Workspace.HEPHYCMSSWTools.PFCandTupelizer_cff')
+##process.miniAODTupelizerSequence += process.PFCandTupelizer
+##process.PFCandTupelizer.useForDefaultAlias = cms.untracked.bool(True)
+##process.PFCandTupelizer.fillIsolatedChargedHadrons = cms.untracked.bool(True)
 
-process.p = cms.Path(process.filterSequence + process.metSequence + process.miniAODTupelizerSequence)
+process.p = cms.Path(process.filterSequence + process.metSequence 
+#  + process.miniAODTupelizerSequence
+  )
 
-#process.p+=process.printTree
-
-process.MINIAODSIMoutput.outputCommands =  cms.untracked.vstring('drop *', 'keep *_*Tupelizer*_*_*' , 'keep *_*EventCounter*_*_*')
+process.MINIAODSIMoutput.outputCommands +=  cms.untracked.vstring('keep patMETs_slimmedRAWMETs_*_PAT', 'keep patMETs_slimmedT1TxyMETs_*_PAT', 'keep patMETs_slimmedTxyMETs_*_PAT')

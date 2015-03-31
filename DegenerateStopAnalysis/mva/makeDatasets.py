@@ -1,43 +1,42 @@
 import os,sys,ROOT, pickle
 from math import sqrt, pi
 from localConfig import afsUser, nfsUser, wwwPlotDir
-
-#FIXME
-from cmgSamples import *
-signalModel = stopDeltaM30FastSim 
-backgroundModel = wJetsToLNu
-
-
+from Workspace.HEPHYPythonTools.helpers import getChain
 overWriteData = True 
 addAllTestEventsTree = True
 
+from Workspace.DegenerateStopAnalysis.cmgTuplesPostProcessed_v6_Phys14V2 import * #FIXME DegStop should of course have their own sample file
+signal         = SMS_T5qqqqWW_Gl1500_Chi800_LSP100
+backgrounds    = [ttJets, WJetsToLNu_HT100to200, WJetsToLNu_HT200to400, WJetsToLNu_HT400to600, WJetsToLNu_HT600toInf,TTH, TTWJets, TTZJets] 
+
+for s in backgrounds+[signal]:
+  assert len(s['bins'])==1, "Sample %s has more than one bin. Can't mix that."%s['name']
+
 seed = 1
-prefix = 'DegenerateStop_'+signalModel['name']+"_BkgMix_seed"+str(seed)
+prefix = 'test_DegenerateStop_'+signal['name']+"_BkgMix_seed"+str(seed)
 
 setup={}
 setup['dataFile'] = '/data/'+nfsUser+'/DegenerateStop/datasets/'+prefix+'.root'
-setup['preselection'] = 'FIXME CMG preselection'
+setup['preselection'] = 'met_pt>200&&htJet25>400&&nJet>=4&&singleLeptonic'
 
 assert overWriteData or not os.path.isfile(setup['dataFile']), "Error: %s exists"%setup['dataFile']
 
-setup['varsFromInput'] = ['type1phiMet', 'isrJetPt', 'isrJetBTBVetoPassed', 'softIsolatedMuPt', 'softIsolatedMuEta','ht', 'nHardElectrons', 'nHardMuons', 'njet60/I','njet/I', 'weight', 'isrJetPt']
+setup['varsFromInput'] = ['weight', 'met_pt', 'nBJetMedium25', 'htJet25', 'nJet', 'leptonPt', 'mt2w']
 #  setup['varsFromInput_Signal'] = [\
 #        ['mstop/I', getStopMassFromFilename],\
 #        ['mlsp/I', getLSPMassFromFilename]] 
 #
 setup['varsCalculated'] = [\
-                ['softIsolatedMT', softIsolatedMT],
-                ['deltaPhi', lambda c:acos(cosDeltaPhiLepW(c))],
-                ['softIsolatedMuCharge/I', lambda c:-c.GetLeaf('softIsolatedMuPdg').GetValue()/abs(c.GetLeaf('softIsolatedMuPdg').GetValue())],
-                ['htRatio', htRatio]
+                ['mT', lambda c:sqrt(c.GetLeaf('met_pt').GetValue()*c.GetLeaf('leptonPt').GetValue()*(1.-cos(c.GetLeaf('met_phi').GetValue()-c.GetLeaf('leptonPhi').GetValue())))],
   ]
 
+chains={s['name']:getChain(s) for s in backgrounds+[signal]}
 #nSigTraining, maxBkgFractionForTraining=0.5, [{'nMax':nBkg1Max,'y':yBkg1},...,{'nMax':nBkgNMax,'y':yBkgN}]]
 #finds nbBkg1,...,nBkgN such that nBkg1+...+nBkgN is maximal while respecting
 #nBkg1+nBkg2+...+nBkgN<=nSigTraining, nBkg1:nBkg2:...:nBkgN=yBkg1:yBkg2:...:yBkgN
 #and nBkg1<=maxBkgFractionForTraining*nBkg1Max, ...., maxBkgFractionForTraining*nBkgNMax<=nBkgNMax
-def findTrainingSamples(nSigTraining=nSigTraining, bkgs, maxBkgFractionForTraining=0.5):
-  maxBkgForTraining = [int(maxBkgFractionForTraining*b['nMax']) for b in bkgs ]
+#def getTrainingSampleSizes(nSigTraining=nSigTraining, bkgs=, maxBkgFractionForTraining=0.5):
+#  maxBkgForTraining = [int(maxBkgFractionForTraining*b['nMax']) for b in bkgs ]
 
 #  weightForSampleComposition = "weight"
 #  signal      = ROOT.TChain('Events')
