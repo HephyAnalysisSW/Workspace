@@ -60,10 +60,10 @@ def cmgST(c):
   leptonPt=c.GetLeaf('leptonPt').GetValue()
   return  met+leptonPt 
 
-def cmgGetJets(c, ptMin=40., etaMax=999.):
-  addJetVars =  ['phi', 'mcFlavour', 'mcMatchId', 'mcMatchFlav', 'btagCSV']
-  if c=="branches":return ['nJet','Jet_pt','Jet_eta'] + ['Jet_'+x for x in addJetVars]
-  nJet = int(getVarValue(c, 'nJet'))
+def cmgGetJets(c, ptMin=30., etaMax=999.):
+  addJetVars =  ['phi', 'mcFlavour', 'mcMatchId', 'mcMatchFlav', 'btagCSV', 'btagCMVA']
+  if c=="branches":return ['nJet30','Jet_pt','Jet_eta'] + ['Jet_'+x for x in addJetVars]
+  nJet = int(getVarValue(c, 'nJet30'))
   jets=[]
   for i in range(nJet):
     jet = getObjDict(c, 'Jet_', ['pt','eta'], i)
@@ -74,13 +74,13 @@ def cmgGetJets(c, ptMin=40., etaMax=999.):
 
 def cmgMTClosestJetMET(c):
   if c=="branches":return cmgGetJets("branches")+['met_pt', 'met_phi'] 
-  jets = cmgGetJets(c,  ptMin=40., etaMax=999.)
+  jets = cmgGetJets(c,  ptMin=30., etaMax=999.)
   met = {'pt':c.GetLeaf('met_pt').GetValue(), 'phi':c.GetLeaf('met_phi').GetValue()}
   closestJet = findClosestObject(jets, met, sortFunc=lambda o1, o2: deltaPhi(o1['phi'], o2['phi']))['obj']
   return sqrt(2.*met['pt']*closestJet['pt']*(1-cos(met['phi']-closestJet['phi'])))
 def cmgMTClosestBJetMET(c):
   if c=="branches":return cmgGetJets("branches")+['met_pt', 'met_phi'] 
-  bjets = filter(lambda j:j['btagCSV']>0.679, cmgGetJets(c,  ptMin=40., etaMax=999.))
+  bjets = filter(lambda j:j['btagCMVA']>0.732, cmgGetJets(c,  ptMin=30., etaMax=999.))
   met = {'pt':c.GetLeaf('met_pt').GetValue(), 'phi':c.GetLeaf('met_phi').GetValue()}
   if len(bjets)>0:
     closestBJet = findClosestObject(bjets, met, sortFunc=lambda o1, o2: deltaPhi(o1['phi'], o2['phi']))['obj']
@@ -89,7 +89,7 @@ def cmgMTClosestBJetMET(c):
    return float('nan')
 def cmgMinDPhiJet(c, nJets=3):
   if c=="branches":return cmgGetJets("branches")+['met_phi'] 
-  leadingNJets = cmgGetJets(c,  ptMin=40., etaMax=999.)[:nJets]
+  leadingNJets = cmgGetJets(c,  ptMin=30., etaMax=999.)[:nJets]
   met = {'phi':c.GetLeaf('met_phi').GetValue()}
   closestJet = findClosestObject(leadingNJets, met, sortFunc=lambda o1,o2: deltaPhi(o1['phi'], o2['phi']))
 #  print "jets", leadingNJets
@@ -98,7 +98,7 @@ def cmgMinDPhiJet(c, nJets=3):
   return closestJet['distance'] 
 def cmgMinDPhiBJet(c):
   if c=="branches":return cmgGetJets("branches")+['met_phi'] 
-  bjets = filter(lambda j:j['btagCSV']>0.679, cmgGetJets(c,  ptMin=40., etaMax=999.))
+  bjets = filter(lambda j:j['btagCMVA']>0.732, cmgGetJets(c,  ptMin=30., etaMax=999.))
   met = {'phi':c.GetLeaf('met_phi').GetValue()}
   if len(bjets)>0:
     closestJet = findClosestObject(bjets, met, sortFunc=lambda o1,o2: deltaPhi(o1['phi'], o2['phi']))
@@ -108,7 +108,7 @@ def cmgMinDPhiBJet(c):
 
 def cmgMTTopClosestJetMET(c):
   if c=="branches":return cmgGetJets("branches")+['met_phi','met_pt','leptonPt','leptonPhi','leptonEta'] 
-  jets = cmgGetJets(c,  ptMin=40., etaMax=999.)
+  jets = cmgGetJets(c,  ptMin=30., etaMax=999.)
   met = {'pt':c.GetLeaf('met_pt').GetValue(), 'phi':c.GetLeaf('met_phi').GetValue()}
   lepton = {'pt':c.GetLeaf('leptonPt').GetValue(), 'phi':c.GetLeaf('leptonPhi').GetValue(), 'eta':c.GetLeaf('leptonEta').GetValue()}
   W = {'phi':atan2(met['pt']*sin(met['phi']) + lepton['pt']*sin(lepton['phi']), met['pt']*cos(met['phi']) + lepton['pt']*cos(lepton['phi']) )}
@@ -120,7 +120,7 @@ def cmgMTTopClosestJetMET(c):
     )
 def cmgMTTopClosestBJetMET(c):
   if c=="branches":return cmgGetJets("branches")+['met_phi','met_pt','leptonPt','leptonPhi','leptonEta'] 
-  bjets = filter(lambda j:j['btagCSV']>0.679, cmgGetJets(c,  ptMin=40., etaMax=999.))
+  bjets = filter(lambda j:j['btagCMVA']>0.732, cmgGetJets(c,  ptMin=30., etaMax=999.))
   if len(bjets)>0:
     met = {'pt':c.GetLeaf('met_pt').GetValue(), 'phi':c.GetLeaf('met_phi').GetValue()}
     lepton = {'pt':c.GetLeaf('leptonPt').GetValue(), 'phi':c.GetLeaf('leptonPhi').GetValue(), 'eta':c.GetLeaf('leptonEta').GetValue()}
@@ -138,7 +138,7 @@ def cmgHTOrthMET(c):
   """ scalar sum of  jet pt projected on the axis orthogonal to MET
   """
   if c=="branches":return cmgGetJets("branches")+['met_phi'] 
-  jets = cmgGetJets(c,  ptMin=40., etaMax=999.)
+  jets = cmgGetJets(c,  ptMin=30., etaMax=999.)
   met_phi_orth = c.GetLeaf('met_phi').GetValue()+pi/2.
   res = sum([j['pt']*abs(cos(met_phi_orth - j['phi'])) for j in jets])
 #  print res, met_phi_orth, jets, cmgGetJets("branches")
@@ -148,7 +148,7 @@ def cmgHTRatio(c):
   """ fraction of HT in the hemisphere opposite to MET
   """
   if c=="branches":return cmgGetJets("branches")+['met_phi'] 
-  jets = cmgGetJets(c,  ptMin=40., etaMax=999.)
+  jets = cmgGetJets(c,  ptMin=30., etaMax=999.)
   met_phi = c.GetLeaf('met_phi').GetValue()
   return sum([j['pt'] for j in jets if cos(met_phi - j['phi'])<0.])/sum([j['pt'] for j in jets])
 
@@ -178,15 +178,14 @@ def varBin(vb):
 def getBinBorders(l, max=10**4):
   return [x[0] for x in l ] + [max]
 
-#Added a key option to switch between MET and ST!
-def nameAndCut(stb, htb, njetb, btb=None, presel="(1)", charge="", btagVar = 'nBJetMediumCMVA30', stVar='st'):
+def nameAndCut(stb, htb, njetb, btb=None, presel="(1)", charge="", btagVar = 'nBJetMediumCMVA30'):
   cut=presel
   name=""
   if stb:
-    cut+='&&'+stVar+'>='+str(stb[0])
-    name+=stVar+str(stb[0])
+    cut+='&&st>='+str(stb[0])
+    name+='st'+str(stb[0])
     if stb[1]>0:
-      cut+='&&'+stVar+'<'+str(stb[1])
+      cut+='&&st<'+str(stb[1])
       name+='-'+str(stb[1])
   if htb:
     cut+='&&htJet30j>='+str(htb[0])
