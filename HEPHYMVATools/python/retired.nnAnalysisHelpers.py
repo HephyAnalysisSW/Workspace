@@ -3,14 +3,13 @@ from array import array
 import ctypes, pickle, os, sys, copy
 from math import sqrt, cos, sin
 
-ROOT.gROOT.ProcessLine(".L ../../HEPHYPythonTools/scripts/root/tdrstyle.C")
+ROOT.gROOT.ProcessLine(".L $CMSSW_BASE/HEPHYPythonTools/scripts/root/tdrstyle.C")
 ROOT.setTDRStyle()
 
 stuff=[]
 p_c_float = ctypes.c_float * 1
-#p_c_int = ctypes.c_int * 1
 
-def getObjFromFile(fname,hname):
+def getAnyObjFromFile(fname,hname):
   olddir = ROOT.gDirectory.CurrentDirectory().GetName()+':/'
   if type(fname)==type(""):
     f = ROOT.TFile.Open(fname)
@@ -28,24 +27,24 @@ def getObjFromFile(fname,hname):
     f.Close()
   return obj
 
-def getVarValList( sample, variable, selection = ""):
-  l = sample.GetLeaf(variable)
-  res=[]
-  if type(selection)==type(ROOT.TEventList()):
-    for i in range(selection.GetN()) :
-      sample.GetEntry(selection.GetEntry(i))
-      val = l.GetValue()
-      res.append(val)
-  if type(selection)==type(""):
-    sample.Draw(">>eListTMP", selection)
-    eListTMP = ROOT.gDirectory.Get("eListTMP")
-    for i in range(eListTMP.GetN()) :
-      sample.GetEntry(eListTMP.GetEntry(i))
-      val = l.GetValue()
-      res.append(val)
-    del eListTMP
-  return res
-  del l
+#def getVarValList( sample, variable, selection = ""):
+#  l = sample.GetLeaf(variable)
+#  res=[]
+#  if type(selection)==type(ROOT.TEventList()):
+#    for i in range(selection.GetN()) :
+#      sample.GetEntry(selection.GetEntry(i))
+#      val = l.GetValue()
+#      res.append(val)
+#  if type(selection)==type(""):
+#    sample.Draw(">>eListTMP", selection)
+#    eListTMP = ROOT.gDirectory.Get("eListTMP")
+#    for i in range(eListTMP.GetN()) :
+#      sample.GetEntry(eListTMP.GetEntry(i))
+#      val = l.GetValue()
+#      res.append(val)
+#    del eListTMP
+#  return res
+#  del l
 
 
 def getEList(chain, cut, newname='eListTMP'):
@@ -397,10 +396,10 @@ def constructDataset(setup, signal, background, overWrite = False, addAllTestEve
   print 'Loading MVA dataset from', setup['dataFile']
   g = ROOT.gDirectory.Get("MonteCarlo")
   if g: del g
-  simu      = getObjFromFile(setup['dataFile'],'MonteCarlo')
-  test      = getObjFromFile(setup['dataFile'],'allTestEvents')
-  eListBkg      = getObjFromFile(setup['dataFile'],'eListBkg')
-  eListSig      = getObjFromFile(setup['dataFile'],'eListSig')
+  simu      = getAnyObjFromFile(setup['dataFile'],'MonteCarlo')
+  test      = getAnyObjFromFile(setup['dataFile'],'allTestEvents')
+  eListBkg      = getAnyObjFromFile(setup['dataFile'],'eListBkg')
+  eListSig      = getAnyObjFromFile(setup['dataFile'],'eListSig')
   print'Datasets and eLists:',simu, test, eListBkg,' ',eListSig
   print '...done.'
 #  return {'simu':simu, 'eListBkgTest':eListBkgTest, 'eListSigTest':eListSigTest, 'eListBkgTraining':eListBkgTraining, 'eListSigTraining':eListSigTraining, 'eListBkg':eListBkg, 'eListSig':eListSig, 'eListTest':eListTest, 'eListTraining':eListTraining}
@@ -480,7 +479,7 @@ def setupMVAFrameWork(setup, data, methods, prefix):
   for j, m in enumerate(methods):
     for i, treeName in enumerate(['Test', 'Train']):
       l = ROOT.TLegend(.65, .80, 0.99, 0.99)
-      t = getObjFromFile(setup['TMVAOutputFile'], treeName+'Tree')
+      t = getAnyObjFromFile(setup['TMVAOutputFile'], treeName+'Tree')
       mlpa_canvas.cd(1 + 2*(j+1)+i)
       l.SetFillColor(ROOT.kWhite)
       l.SetShadowColor(ROOT.kWhite)
@@ -525,7 +524,7 @@ def setupMVAFrameWork(setup, data, methods, prefix):
   l5 = ROOT.TLegend(.16, .13, 0.5, 0.35)
   opt=""
   for m in methods:
-    histFOM = getObjFromFile(setup['TMVAOutputFile'],'MVA_'+m['name']+'_rejBvsS')
+    histFOM = getAnyObjFromFile(setup['TMVAOutputFile'],'MVA_'+m['name']+'_rejBvsS')
 #   print 'histFOM (pad1):',histFOM
     stuff.append(histFOM)
     histFOM.SetStats(False)
@@ -560,7 +559,7 @@ def setupMVAFrameWork(setup, data, methods, prefix):
   l3.SetBorderSize(1)
   opt="AL"
   for m in methods:
-    m['FOMFromFile'] = getObjFromFile(setup['TMVAOutputFile'],'MVA_'+m['name']+'_rejBvsS')
+    m['FOMFromFile'] = getAnyObjFromFile(setup['TMVAOutputFile'],'MVA_'+m['name']+'_rejBvsS')
     m['FOMFromFile'].SetStats(False)
     m['FOMFromFile'].SetLineColor(m['lineColor'])
 
@@ -598,7 +597,7 @@ def setupMVAFrameWork(setup, data, methods, prefix):
 #  latex.SetTextAlign(11); # align right
 #  [latex.DrawLatex(*cArg) for cArg in latexArgs]
 #
-  t = getObjFromFile(setup['TMVAOutputFile'], 'TestTree')
+  t = getAnyObjFromFile(setup['TMVAOutputFile'], 'TestTree')
   fom_plots = {}
   for fom_var, fom_var_range, fom_var_color in setup['fom_plot_vars']:
     print fom_var, fom_var_range, fom_var_color
