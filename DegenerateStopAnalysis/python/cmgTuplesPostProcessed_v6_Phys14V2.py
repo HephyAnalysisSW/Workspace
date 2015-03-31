@@ -28,17 +28,17 @@ WJetsToLNu_HT600toInf={\
 }
 TTH={\
 "name" : "TTH",
-"bins" : ["TTH"] 
+"bins" : ["TTH"], 
 'dir' : "/data/schoef/cmgTuples/postProcessed_v6_Phys14V2/hard/",
 }
 TTWJets={\
 "name" : "TTWJets",
-"bins" : ["TTWJets"] 
+"bins" : ["TTWJets"],
 'dir' : "/data/schoef/cmgTuples/postProcessed_v6_Phys14V2/hard/",
 }
 TTZJets={\
 "name" : "TTZJets",
-"bins" : ["TTZJets"] 
+"bins" : ["TTZJets"], 
 'dir' : "/data/schoef/cmgTuples/postProcessed_v6_Phys14V2/hard/",
 }
 singleTop={\
@@ -56,26 +56,6 @@ QCD={\
 "bins" : ["QCD_HT_250To500", "QCD_HT_500To1000", "QCD_HT_1000ToInf"],
 'dir' : "/data/schoef/cmgTuples/postProcessed_v6_Phys14V2/hard/",
 }
-
-
-#T1qqqq_1400_325_300={\
-#"name" : "T1qqqq_1400_325_300",
-#"bins": ["T1qqqq_1400_325_300"],
-#'dir' : "/data/schoef/cmgTuples/postProcessed_v0/singleLepton/",
-#}
-#
-#T5Full_1200_1000_800={\
-#"name" : "T5Full_1200_1000_800",
-#"bins": ["T5Full_1200_1000_800"],
-#'dir' : "/data/schoef/cmgTuples/postProcessed_v0/singleLepton/",
-#}
-#
-#T5Full_1500_800_100={\
-#"name" : "T5Full_1500_800_100",
-#"bins": ["T5Full_1500_800_100"],
-#'dir' : "/data/schoef/cmgTuples/postProcessed_v0/singleLepton/",
-#}
-
 
 
 allSignalStrings=[\
@@ -110,7 +90,7 @@ def getSignalSample(signal):
 
 allSignals=[]
 for s in allSignalStrings:
-  sm = makeSample(getSignalSample(s))
+  sm = getSignalSample(s)
   exec(s+"=sm")
   exec("allSignals.append(s)")
   

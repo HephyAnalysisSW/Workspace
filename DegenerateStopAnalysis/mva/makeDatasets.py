@@ -1,126 +1,67 @@
 import os,sys,ROOT, pickle
 from math import sqrt, pi
 from localConfig import afsUser, nfsUser, wwwPlotDir
-from Workspace.HEPHYPythonTools.helpers import getChain
+from Workspace.HEPHYPythonTools.helpers import getChain, getYieldFromChain, getEList
+from Workspace.HEPHYMVATools.mvaHelpers import getTrainingSampleSizes
 overWriteData = True 
 addAllTestEventsTree = True
 
-from Workspace.DegenerateStopAnalysis.cmgTuplesPostProcessed_v6_Phys14V2 import * #FIXME DegStop should of course have their own sample file
+#define samples
+from Workspace.DegenerateStopAnalysis.cmgTuplesPostProcessed_v6_Phys14V2 import * 
 signal         = SMS_T5qqqqWW_Gl1500_Chi800_LSP100
-backgrounds    = [ttJets, WJetsToLNu_HT100to200, WJetsToLNu_HT200to400, WJetsToLNu_HT400to600, WJetsToLNu_HT600toInf,TTH, TTWJets, TTZJets] 
+backgrounds    = [ttJets, \
+      #WJetsToLNu_HT100to200, 
+#      WJetsToLNu_HT200to400, 
+      WJetsToLNu_HT400to600, WJetsToLNu_HT600toInf,
+#      TTH, TTWJets, TTZJets
+      ] 
 
 for s in backgrounds+[signal]:
   assert len(s['bins'])==1, "Sample %s has more than one bin. Can't mix that."%s['name']
 
-seed = 1
-prefix = 'test_DegenerateStop_'+signal['name']+"_BkgMix_seed"+str(seed)
+weight = 'weight'
+prefix = 'test_DegenerateStop_'+signal['name']+"_BkgMix"
 
 setup={}
 setup['dataFile'] = '/data/'+nfsUser+'/DegenerateStop/datasets/'+prefix+'.root'
-setup['preselection'] = 'met_pt>200&&htJet25>400&&nJet>=4&&singleLeptonic'
+setup['preselection'] = 'met_pt>200&&htJet25>500&&nJet>=4&&singleLeptonic'
 
-assert overWriteData or not os.path.isfile(setup['dataFile']), "Error: %s exists"%setup['dataFile']
+setup['varsFromInput'] = [weight, 'met_pt', 'nBJetMedium25/I', 'htJet25', 'nJet/I', 'leptonPt', 'mt2w']
 
-setup['varsFromInput'] = ['weight', 'met_pt', 'nBJetMedium25', 'htJet25', 'nJet', 'leptonPt', 'mt2w']
-#  setup['varsFromInput_Signal'] = [\
-#        ['mstop/I', getStopMassFromFilename],\
-#        ['mlsp/I', getLSPMassFromFilename]] 
-#
 setup['varsCalculated'] = [\
-                ['mT', lambda c:sqrt(c.GetLeaf('met_pt').GetValue()*c.GetLeaf('leptonPt').GetValue()*(1.-cos(c.GetLeaf('met_phi').GetValue()-c.GetLeaf('leptonPhi').GetValue())))],
-  ]
+  ['mT', lambda c:sqrt(c.GetLeaf('met_pt').GetValue()*c.GetLeaf('leptonPt').GetValue()*(1.-cos(c.GetLeaf('met_phi').GetValue()-c.GetLeaf('leptonPhi').GetValue())))],
+]
 
-chains={s['name']:getChain(s) for s in backgrounds+[signal]}
-#nSigTraining, maxBkgFractionForTraining=0.5, [{'nMax':nBkg1Max,'y':yBkg1},...,{'nMax':nBkgNMax,'y':yBkgN}]]
-#finds nbBkg1,...,nBkgN such that nBkg1+...+nBkgN is maximal while respecting
-#nBkg1+nBkg2+...+nBkgN<=nSigTraining, nBkg1:nBkg2:...:nBkgN=yBkg1:yBkg2:...:yBkgN
-#and nBkg1<=maxBkgFractionForTraining*nBkg1Max, ...., maxBkgFractionForTraining*nBkgNMax<=nBkgNMax
-#def getTrainingSampleSizes(nSigTraining=nSigTraining, bkgs=, maxBkgFractionForTraining=0.5):
-#  maxBkgForTraining = [int(maxBkgFractionForTraining*b['nMax']) for b in bkgs ]
+if overWriteData or not os.path.isfile(setup['dataFile']):
 
-#  weightForSampleComposition = "weight"
-#  signal      = ROOT.TChain('Events')
-#  for b in signalModel['bins']:
-#    fstring  = signalModel['dirname']+'/'+b+'/*.root'
-#    signal.Add(fstring)
-#    signalSampleSize = signal.GetEntries(setup['preselection'])
-#    signal.Draw(">>eList", setup['preselection'])
-#    signalModel['eListPreselection'] = ROOT.gDirectory.Get("eList").Clone('eListPreselectionSignal')
-#    print "Added bin ",b,"to signal, now",signal.GetEntries()," after preselection:",signalSampleSize,signalModel['eListPreselection'].GetN()
-#
-#  background      = ROOT.TChain('Events')
-#  counter=0
-#  backgroundModel['rangeInChain'] = {}
-#  backgroundModel['sumOfWeightsAfterPreselection'] = {}
-#  backgroundModel['countAfterPreselection'] = {}
-#  for bin in backgroundModel['bins']:
-#    lL = background.GetEntries()
-#    fstring  = backgroundModel['dirname']+'/'+bin+'/*.root'
-#    background.Add(fstring)
-#    uL = background.GetEntries()
-#    backgroundModel['rangeInChain'][bin] = [lL, uL]
-#    print "Added bin ",bin,"to background, now,",uL,"entries"
-#    backgroundModel['sumOfWeightsAfterPreselection'][bin] = 0.
-#    backgroundModel['countAfterPreselection'][bin] = 0
-#  print "Calculating Sum(weights) for sample composition"
-#  background.Draw(">>eList", setup['preselection'])
-#  backgroundModel['eListPreselection'] = ROOT.gDirectory.Get("eList").Clone('eListPreselectionBackground')
-#  for i in range(backgroundModel['eListPreselection'].GetN()):
-#    ev = backgroundModel['eListPreselection'].GetEntry(i)
-#    background.GetEntry(ev)
-#    for bin in backgroundModel['bins']: 
-#      if ev>=backgroundModel['rangeInChain'][bin][0] and ev<backgroundModel['rangeInChain'][bin][1]:
-#        backgroundModel['sumOfWeightsAfterPreselection'][bin]+=background.GetLeaf(weightForSampleComposition).GetValue()
-#        backgroundModel['countAfterPreselection'][bin] += 1
-#  
-#  maxSumW=max(backgroundModel['sumOfWeightsAfterPreselection'].values())
-#  backgroundModel['reductionFactor'] = {}
-#  for bin in backgroundModel['bins']:
-#    print "bin",bin,":",backgroundModel['countAfterPreselection'][bin]," events after preselection"
-#    backgroundModel['reductionFactor'][bin] = backgroundModel['sumOfWeightsAfterPreselection'][bin]/maxSumW
-#  maxBkgSampleSize = sum([backgroundModel['reductionFactor'][bin]*backgroundModel['countAfterPreselection'][bin] for bin in backgroundModel['bins']])
-#   
-#  if signalSampleSize>maxBkgSampleSize:
-#    print "Higher signal stat.!"
-#    totalFinalBkgSampleSize = sum([int(round(backgroundModel['reductionFactor'][bin]*backgroundModel['countAfterPreselection'][bin])) for bin in backgroundModel['bins']])
-#    totalFinalSignalSampleSize = finalBkgSampleSize
-#    signalModel['optimalSize'] = totalFinalSignalSampleSize
-#    backgroundModel['optimalSize'] = {}
-#    for b in backgroundModel['bins']:
-#      backgroundModel['optimalSize'][b] = int(round(backgroundModel['reductionFactor'][bin]*backgroundModel['countAfterPreselection'][bin]))
-#  else:
-#    print "Higher background stat.!"
-#    redFac = signalSampleSize/float(maxBkgSampleSize)
-#    for k in backgroundModel['reductionFactor'].keys():
-#      backgroundModel['reductionFactor'][k]*=redFac
-#    totalFinalBkgSampleSize = sum([int(round(backgroundModel['reductionFactor'][bin]*backgroundModel['countAfterPreselection'][bin])) for bin in backgroundModel['bins']])
-#    totalFinalSignalSampleSize = signalSampleSize
-#    signalModel['optimalSize'] = totalFinalSignalSampleSize
-#    backgroundModel['optimalSize'] = {}
-#    for b in backgroundModel['bins']:
-#      backgroundModel['optimalSize'][b] = int(round(backgroundModel['reductionFactor'][b]*backgroundModel['countAfterPreselection'][b]))
-#  print "Solution: Signal:",totalFinalSignalSampleSize, "Background:",totalFinalBkgSampleSize 
-#  print " ".join([ k+":"+str(int(round(backgroundModel['reductionFactor'][k]*backgroundModel['countAfterPreselection'][k]))) for k in backgroundModel['reductionFactor'].keys()])
-#
-#  #Constructing randomized samples
-#  random.seed(seed)
-#
-#  signalEvents = range(signalModel['eListPreselection'].GetN())
-#  random.shuffle(signalEvents)
-#  nTrainEvents = signalModel['optimalSize']/2
-#  setup["signalTrainEvents"] = []
-#  setup["signalTestEvents"] = []
-#  if addAllTestEventsTree:
-#    setup["signalAllTestEvents"] = []
-#  for i in signalEvents[:nTrainEvents]:
-#    setup["signalTrainEvents"].append(signalModel['eListPreselection'].GetEntry(i)) 
-#  for i in signalEvents[nTrainEvents:signalModel['optimalSize']]:
-#    setup["signalTestEvents"].append(signalModel['eListPreselection'].GetEntry(i))
-#  if addAllTestEventsTree:
-#    scaleToNominal = signalModel['eListPreselection'].GetN() / float(signalModel['eListPreselection'].GetN() - nTrainEvents) 
-#    for i in signalEvents[nTrainEvents:]:
-#      setup["signalAllTestEvents"].append([signalModel['eListPreselection'].GetEntry(i), scaleToNominal]) 
-#
+  chains={s['name']:getChain(s,histname='') for s in backgrounds+[signal]}
+  print "Get eLists..."
+  eLists={s['name']:getEList(chains[s['name']], setup['preselection']) for s in backgrounds+[signal]}
+  print "Get yields..."
+  yields={s['name']:getYieldFromChain(chains[s['name']], '('+weight+')*('+setup['preselection']+')') for s in backgrounds+[signal]}
+  for s in backgrounds+[signal]:
+    print "Have %i events (yield %f) for sample %s and pre-selection %s"%(eLists[s['name']].GetN(), yields[s['name']], s['name'], setup['preselection'] )
+
+  #calculate training sample sizes
+  trainingSampleSizes = getTrainingSampleSizes(countSignal=eLists[signal['name']].GetN(),\
+      bkgs=[{'count':eLists[b['name']].GetN(),'yield':yields[b['name']]} for b in backgrounds], 
+      fractionForTraining=0.5)
+
+  #determine training events
+  import random
+  random.seed(seed)
+  def getRandList(n):
+    l=range(n)
+    random.shuffle(l)
+    return l
+
+  signalTrainingEvents      = getRandList(eLists[signal['name']].GetN())[:trainingSampleSizes['sig']]
+  backgroundTrainingEvents  = {}
+  for i, b in enumerate(backgrounds):
+    backgroundTrainingEvents[b['name']] = getRandList(eLists[b['name']].GetN())[:trainingSampleSizes['bkgs'][i]]
+  
+  constructDataset(setup, signal={'chain':chains[signal['name'], 'events':signalTrainingEvents}, backgrounds=[{'chain':chains[b['name']], 'events':backgroundTrainingEvents[b['name']]} for b in backgrounds], overWrite=overWriteData)
+ 
 #  setup["backgroundTrainEvents"] = []
 #  setup["backgroundTestEvents"] = []
 #  if addAllTestEventsTree:
