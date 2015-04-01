@@ -135,6 +135,13 @@ xsec['/Tbar_tW-channel-DR_Tune4C_13TeV-CSA14-powheg-tauola/Phys14DR-PU20bx25_PHY
 xsec['/TTWJets_Tune4C_13TeV-madgraph-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'] =  0.6647 
 xsec['/TTZJets_Tune4C_13TeV-madgraph-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'] =  0.8565 
 xsec['/TTbarH_M-125_13TeV_amcatnlo-pythia8-tauola/Phys14DR-PU40bx25_PHYS14_25_V1-v1/MINIAODSIM'] =  0.5085 
+
+#https://wiki.hephy.at/index.php/CMS_Analyse_LightDegStops/13TeVDegStop
+#https://twiki.cern.ch/twiki/bin/view/LHCPhysics/SUSYCrossSections13TeVstopsbottom 8.51615 +- 13.9223%
+xsec['/T2DegStop2j_300_270_GENSIM/nrad-T2DegStop2j_300_270_MINIAOD-a279b5108ada7c3c0926210c2a95f22e/USER'] = 8.51615
+xsec['T2DegStop_300_270'] = 8.51615
+#xsec['T2DegStop_test'] = 8.51615
+
 ##------------------------------------------------------------
 ##SUMMER 12
 ##https://twiki.cern.ch/twiki/bin/viewauth/CMS/StandardModelCrossSectionsat8TeV

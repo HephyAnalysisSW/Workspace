@@ -37,7 +37,7 @@ def splitListOfObjects(var, val, s):
   return resLow, resHigh
 
 def get_cmg_jets(c):
-  return [getObjDict(c, 'Jet_', ['eta','pt','phi','btagCMVA', 'partonId', 'id'], i) for i in range(int(getVarValue(c, 'nJet')))]
+  return [getObjDict(c, 'Jet_', ['eta','pt','phi','btagCMVA','mcMatchFlav' ,'partonId', 'id'], i) for i in range(int(getVarValue(c, 'nJet')))]
 def get_cmg_jets_fromStruct(r):
   return [{p:getattr(r, 'Jet'+'_'+p)[i] for p in ['eta','pt','phi','btagCMVA', 'partonId', 'id']} for i in range(r.nJet)]
 

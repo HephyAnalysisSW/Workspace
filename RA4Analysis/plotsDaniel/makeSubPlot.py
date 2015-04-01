@@ -18,11 +18,11 @@ nbtagCut=0
 njetCut=2
 
 nBtagReg=[0,1,2]
-nJetReg=[2]
-stReg=[(150,250),(250,350),(350,450),(450,-1)]
-htReg=[(500,750),(750,1000),(1000,1250),(1250,-1)]
+nJetReg=[2,3,4,5,6]
+stReg=[(150,-1)]#250),(250,350),(350,450),(450,-1)]
+htReg=[(500,-1)]#750),(750,1000),(1000,1250),(1250,-1)]
 
-startpath = '/afs/hephy.at/user/d/dspitzbart/www/subBkgNB/'
+startpath = '/afs/hephy.at/user/d/dspitzbart/www/subBkgInclusive/'
 
 #Load the Background Chain
 c = getChain(ttJets[lepSel],histname='')
@@ -60,31 +60,31 @@ for i,bReg in enumerate(nBtagReg):
     nbtagPath='nBtagLEq'+str(bReg)+'/'
   for j, hReg in enumerate(htReg):
     if j < len(htReg)-1:
-      htCutString='&&htJet30j>'+str(hReg[0])+'&&htJet30j<='+str(hReg[1])
+      htCutString='&&htJet30j>='+str(hReg[0])+'&&htJet30j<'+str(hReg[1])
       htPath=str(hReg[0])+'htJet30j'+str(hReg[1])+'/'
     else:
-      htCutString='&&htJet30j>'+str(hReg[0])
+      htCutString='&&htJet30j>='+str(hReg[0])
       htPath='_'+str(hReg[0])+'htJet30j/'
     for k,sReg in enumerate(stReg):
       if k < len(stReg)-1:
-        stCutString='&&st>'+str(sReg[0])+'&&st<='+str(sReg[1])
+        stCutString='&&st>='+str(sReg[0])+'&&st<'+str(sReg[1])
         stPath=str(sReg[0])+'st'+str(sReg[1])+'/'
       else:
-        stCutString='&&st>'+str(sReg[0])
+        stCutString='&&st>='+str(sReg[0])
         stPath='_'+str(sReg[0])+'st/'  
       for l,jReg in enumerate(nJetReg):
         if l < len(nJetReg)-1:
-          njCutString='&&nJet=='+str(jReg)
-          njPath='nJetEq'+str(jReg)+'/'
+          njCutString='&&nJet30=='+str(jReg)
+          njPath='nJet30Eq'+str(jReg)+'/'
         else:
-          njCutString='&&nJet>='+str(jReg)
-          njPath='nJetLEq'+str(jReg)+'/'
+          njCutString='&&nJet30>='+str(jReg)
+          njPath='nJet30LEq'+str(jReg)+'/'
         path=startpath+nbtagPath+htPath+stPath+njPath
         if not os.path.exists(path):
           os.makedirs(path)
         
-        prepresel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0"
-        presel = prepresel+nbtagCutString+htCutString+stCutString+njCutString+'&&Jet_pt[1]>80'#"htJet30j>=750&&htJet30j<=1000&&st>=450&&"+njetCutString+"&&"+nbtagCutString+'&&Jet_pt[1]>80'
+        prepresel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80"
+        presel = prepresel+nbtagCutString+htCutString+stCutString+njCutString#"htJet30j>=750&&htJet30j<=1000&&st>=450&&"+njetCutString+"&&"+nbtagCutString+'&&Jet_pt[1]>80'
         prefix= ''.join(presel.split('&&')[5:]).replace("&&","_").replace(">=","le_").replace("==","eq_")
 
         can1 = ROOT.TCanvas(varstring,varstring,1200,1000)
@@ -96,7 +96,7 @@ for i,bReg in enumerate(nBtagReg):
         l.SetFillColor(ROOT.kWhite)
         l.SetShadowColor(ROOT.kWhite)
         l.SetBorderSize(1)
-        nothing=''
+        nothing='(1)'
         subBkg=[
           ##[allHad, 'all hadronic', ROOT.kRed-7, 'all hadronic'],
           [diHad,'two had.', ROOT.kRed-9,'diHad'],
@@ -110,7 +110,15 @@ for i,bReg in enumerate(nBtagReg):
           [l_H, 'single lep. (e/#mu)',ROOT.kCyan+3,'singleLep']
           #[nothing,'tt Jets',ROOT.kBlue,'ttJets']
         ]
-        
+        totalh=ROOT.TH1F('total','Total',*binning)
+        c.Draw(varstring+'>>total','weight*('+presel+')')
+        totalh.SetLineColor(ROOT.kBlue+3)
+        totalh.SetLineWidth(2)
+        totalh.SetMarkerSize(0)
+        totalh.SetMarkerStyle(0)
+        totalh.SetTitleSize(20)
+        totalh.SetFillColor(0)
+        l.AddEntry(totalh)
         for i, [cut,name,col,subname] in enumerate(subBkg):
           histo = 'h'+str(i)
           histoname = histo
@@ -134,17 +142,25 @@ for i,bReg in enumerate(nBtagReg):
           histo.GetYaxis().SetTitleSize(0.05)
           histo.SetFillColor(col)
           histo.SetFillStyle(1001)
-          histo.SetMinimum(.0008)
+          histo.SetMinimum(.08)
           
           h_Stack.Add(histo)
           l.AddEntry(histo, name)
-        
+          #RCS Backup calculation
+          twoBin=[0,1,pi]
+          rcsh=ROOT.TH1F('rcsh','rcsh',len(twoBin)-1, array('d', twoBin))
+          c.Draw(varstring+'>>rcsh','weight*('+wholeCut+')','goff')
+          rcsb=0
+          if rcsh.GetBinContent(1)>0 and rcsh.GetBinContent(2)>0:
+            rcsb=rcsh.GetBinContent(2)/rcsh.GetBinContent(1)
+          
           can2=ROOT.TCanvas('sub','sub',800,600)
           histo.Draw()
           latex2 = ROOT.TLatex()
           latex2.SetNDC()
           latex2.SetTextSize(0.035)
           latex2.SetTextAlign(11) # align right
+          latex2.DrawLatex(0.7,0.96,str(rcsb))
           latex2.DrawLatex(0.16,0.96,name)
           can2.SetGrid()
           can2.SetLogy()
@@ -154,7 +170,8 @@ for i,bReg in enumerate(nBtagReg):
         can1.cd()
         can1.SetGrid()
         h_Stack.Draw()
-        h_Stack.SetMinimum(0.0008)
+        totalh.Draw('same')
+        h_Stack.SetMinimum(0.08)
         l.Draw()
 
         #Calculation of RCS value, works only for cut at dPhi=1 atm
@@ -179,7 +196,7 @@ for i,bReg in enumerate(nBtagReg):
         latex1.SetTextSize(0.035)
         latex1.SetTextAlign(11) # align right
         latex1.DrawLatex(0.16,0.96,"Rcs="+str(rcs))
-        latex1.DrawLatex(0.7,0.96,"L=4 fb^{-1} (13 TeV)")
+        latex1.DrawLatex(0.7,0.96,"L=4 fb^{-1} (13TeV)")
         
         
         can1.SetLogy()

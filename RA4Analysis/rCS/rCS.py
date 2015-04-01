@@ -134,7 +134,7 @@ for name, c in [["TT", cTTJets] , ["W",cWJets] ]:
       for i in range(h_nj[name][stb][htb].GetNbinsX()):
         h_nj[name][stb][htb].GetXaxis().SetBinLabel(i+1, nJetBinName(njreg[i]))
       for i_njb, njb in enumerate(njreg):
-        cname, cut = nameAndCut(stb,htb,njb, btb=btreg ,presel=presel, stVar=VarStr) 
+        cname, cut = nameAndCut(stb,htb,njb, btb=btreg ,presel=presel) 
         res, resErr = getRCS(c, cut,  dPhiCut)
         print res,resErr, name, cname
         if res:
@@ -171,9 +171,9 @@ for name, c in [["TT", cTTJets] , ["W",cWJets] ]:
       else:
         h_nj[name][stb][htb].Draw('same')
     l.Draw()
-    c1.Print('/afs/hephy.at/user/'+uDir+'/www/'+subDir+'/'+prefix+'_rCS_njet_'+name+'_'+nameAndCut(stb,htb=None,njetb=None, btb=btreg, presel=presel, stVar=VarStr)[0]+".png")
+    c1.Print('/afs/hephy.at/user/'+uDir+'/www/'+subDir+'/'+prefix+'_rCS_njet_'+name+'_'+nameAndCut(stb,htb=None,njetb=None, btb=btreg, presel=presel)[0]+".png")
     h_2d[name][stb].Draw('COLZ TEXTE')
-    c1.Print('/afs/hephy.at/user/'+uDir+'/www/'+subDir+'/'+prefix+'_rCS_njet_vs_ht_'+name+'_'+nameAndCut(stb,htb=None,njetb=None, btb=btreg, presel=presel, stVar=VarStr)[0]+".png")
+    c1.Print('/afs/hephy.at/user/'+uDir+'/www/'+subDir+'/'+prefix+'_rCS_njet_vs_ht_'+name+'_'+nameAndCut(stb,htb=None,njetb=None, btb=btreg, presel=presel)[0]+".png")
   for htb in htreg:
     c1 = ROOT.TCanvas('c1','c1',600,600)
     pad1 = ROOT.TPad('Pad','Pad',0.,0.0,1.,1.)
@@ -210,7 +210,7 @@ for name, c in [["TT", cTTJets] , ["W",cWJets] ]:
         h_nj[name][stb][htb].Draw('same')
     l.Draw()
 #    c1.Print(path+prefix+'_rCS_njet_'+name+'_'+nameAndCut(stb,htb=htb,njetb=None, btb=None, presel=presel)[0]+".pdf")
-    c1.Print(path+prefix+'_rCS_njet_'+name+'_'+nameAndCut(stb,htb=htb,njetb=None, btb=btreg, presel=presel, stVar=VarStr)[0]+".png")
+    c1.Print(path+prefix+'_rCS_njet_'+name+'_'+nameAndCut(stb,htb=htb,njetb=None, btb=btreg, presel=presel)[0]+".png")
 #    c1.Print(path+prefix+'_rCS_njet_'+name+'_'+nameAndCut(stb,htb=htb,njetb=None, btb=None, presel=presel)[0]+".root")
 
 for name, c in [ ["W",cWJets], ["TT", cTTJets]]:
@@ -234,7 +234,7 @@ for name, c in [ ["W",cWJets], ["TT", cTTJets]]:
       else:
         h_ht[name][stb][njb].Draw('same')
     l.Draw()
-    c1.Print(path+prefix+'_rCS_ht_'+name+'_'+nameAndCut(stb,htb=None,njetb=None, btb=btreg,presel=presel, stVar=VarStr)[0]+".png")
+    c1.Print(path+prefix+'_rCS_ht_'+name+'_'+nameAndCut(stb,htb=None,njetb=None, btb=btreg,presel=presel)[0]+".png")
   for njb in njreg:
     c1 = ROOT.TCanvas()
     first = True 
@@ -255,7 +255,7 @@ for name, c in [ ["W",cWJets], ["TT", cTTJets]]:
       else:
         h_ht[name][stb][njb].Draw('same')
     l.Draw()
-    c1.Print(path+prefix+'_rCS_ht_'+name+'_'+nameAndCut(stb=None,htb=None,njetb=njb,btb=btreg, presel=presel, stVar=VarStr)[0]+".png")
+    c1.Print(path+prefix+'_rCS_ht_'+name+'_'+nameAndCut(stb=None,htb=None,njetb=njb,btb=btreg, presel=presel)[0]+".png")
 
 #1D and 2D plots of RCS vs nBTag for TTJets
 #prefix = 'Phys14_hardSingleMuonic' 
