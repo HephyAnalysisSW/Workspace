@@ -541,3 +541,38 @@ def setupMVAFrameWork(setup, data, methods, prefix):
   ROOT.gROOT.cd(rootGDirectory)
   return
 
+def getYield(tree, setup, readerInstance, method, cut, nnCutVal, weight='weight', weightFunc = None):
+  import ROOT
+  from Workspace.HEPHYPythonTools.helpers import getEList
+  res=0.
+  l = getEList(tree, cut)
+  for i in range(l.GetN()):
+    tree.GetEntry(l.GetEntry(i))
+    inputs = ROOT.std.vector('float')()
+    for var in setup['mvaInputObs']:
+      val = tree.GetLeaf(var).GetValue()
+#      vars[var][0] = val
+    #inputs = array('f', [tree.GetLeaf(var).GetValue() for var in setup['mvaInputVars']])
+      inputs.push_back(val)
+#    print inputs
+    if method['type']!=ROOT.TMVA.Types.kCuts:
+      nno =   readerInstance.EvaluateMVA(inputs,  method['name'])
+      if weightFunc:
+        w = weightFunc(tree)
+      else:
+        w = tree.GetLeaf(weight).GetValue()
+      if nno>=nnCutVal:
+        res+=w
+    else:
+      if nnCutVal<0:
+        nno=1
+      else:
+        nno =   readerInstance.EvaluateMVA(inputs,  method['name'], nnCutVal)
+      if weightFunc:
+        w = weightFunc(tree)
+      else:
+        w = tree.GetLeaf(weight).GetValue()
+      if nno:res+=w
+  del l
+  return res
+
