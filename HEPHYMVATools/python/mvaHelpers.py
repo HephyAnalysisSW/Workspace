@@ -24,7 +24,10 @@ def getTrainingSampleSizes(countSignal, bkgs, fractionForTraining=0.5):
     return {'bkgs':res, 'sig':maxSignalCount}
 
 def constructDataset(setup, signal, backgrounds, overWrite = False):
-  import os
+  """setup dictionary, signal: {'chain':ROOT.TChain, 'events':[ev1, ev2, ...]}
+  """
+  import os, ctypes
+  p_c_float = ctypes.c_float * 1
   def getVarName(v):
     return v.split('/')[0]
   def getVarType(v):
@@ -42,10 +45,10 @@ def constructDataset(setup, signal, backgrounds, overWrite = False):
 
     varType={}
 
-    for vn in setup['varsFromInputData']+[v[0] for v in setup['varsCalculated']]:
+    for vn in setup['varsFromInput']+[v[0] for v in setup['varsCalculated']]:
       varType[getVarName(vn)] = getVarType(vn)
     vars={}
-    for vn in setup['varsFromInputData']:
+    for vn in setup['varsFromInput']:
       n = getVarName(vn)
       if varType[n]=='F': vars[n] = p_c_float(0.)
       if varType[n]=='I': vars[n] = ctypes.c_int(0)

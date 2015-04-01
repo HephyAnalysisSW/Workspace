@@ -47,20 +47,29 @@ if overWriteData or not os.path.isfile(setup['dataFile']):
       bkgs=[{'count':eLists[b['name']].GetN(),'yield':yields[b['name']]} for b in backgrounds], 
       fractionForTraining=0.5)
 
-  #determine training events
+  #determine randomized training events
   import random
   random.seed(seed)
   def getRandList(n):
     l=range(n)
     random.shuffle(l)
     return l
-
-  signalTrainingEvents      = getRandList(eLists[signal['name']].GetN())[:trainingSampleSizes['sig']]
+  signalEvents = getRandList(eLists[signal['name']].GetN())
+  signalTrainingEvents      = [eLists[signal['name']].GetEntry(i) for i in signalEvents[:trainingSampleSizes['sig']]]
+  signalTestEvents          = [eLists[signal['name']].GetEntry(i) for i in signalEvents[trainingSampleSizes['sig']:]]
   backgroundTrainingEvents  = {}
+  backgroundTestEvents  = {}
   for i, b in enumerate(backgrounds):
-    backgroundTrainingEvents[b['name']] = getRandList(eLists[b['name']].GetN())[:trainingSampleSizes['bkgs'][i]]
-  
-  constructDataset(setup, signal={'chain':chains[signal['name'], 'events':signalTrainingEvents}, backgrounds=[{'chain':chains[b['name']], 'events':backgroundTrainingEvents[b['name']]} for b in backgrounds], overWrite=overWriteData)
+    backgroundEvents = getRandList(eLists[b['name']].GetN()) 
+    backgroundTrainingEvents[b['name']] = [eLists[b['name']].GetEntry(i) for i in backgroundEvents[:trainingSampleSizes['bkgs']]]
+    backgroundTestEvents[b['name']]     = [eLists[b['name']].GetEntry(i) for i in backgroundEvents[trainingSampleSizes['bkgs']:]]
+  #construct dataset
+  constructDataset(setup, \
+    signal={'chain':chains[signal['name'],   'trainingEvents':signalTrainingEvents,                'testEvents':signalTestEvents}, 
+    backgrounds=[{'chain':chains[b['name']], 'trainingEvents':backgroundTrainingEvents[b['name']], 'testEvents':backgroundTestEvents[b['name']] } 
+                    for b in backgrounds], 
+    overWrite=overWriteData
+  )
  
 #  setup["backgroundTrainEvents"] = []
 #  setup["backgroundTestEvents"] = []
