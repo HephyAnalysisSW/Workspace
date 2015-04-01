@@ -1,6 +1,6 @@
 def getAnyObjFromFile(fname,hname):
   import ROOT
-  olddir = ROOT.gDirectory.CurrentDirectory().GetName()+':/'
+  rootGDirectory = ROOT.gDirectory.CurrentDirectory().GetName()+':/'
   if type(fname)==type(""):
     f = ROOT.TFile.Open(fname)
   else: f=fname
@@ -8,7 +8,7 @@ def getAnyObjFromFile(fname,hname):
   if obj_t == None:
     print 'File ('+hname+') not found!'
     return
-  ROOT.gDirectory.cd(olddir)
+  ROOT.gDirectory.cd(rootGDirectory)
   if type(obj_t) == type(ROOT.TTree()):
     obj = obj_t.CloneTree()
   else:
@@ -243,7 +243,7 @@ def setupMVAFrameWork(setup, data, methods, prefix):
   if not os.path.exists(setup['weightDir']):
      os.makedirs(setup['weightDir'])
     
-  olddir = ROOT.gDirectory.CurrentDirectory().GetName()+':/'
+  rootGDirectory = ROOT.gDirectory.CurrentDirectory().GetName()+':/'
   vstring=''
   for v in setup['mvaInputObs']:
     vstring+=getObsName(v)+','
@@ -449,58 +449,57 @@ def setupMVAFrameWork(setup, data, methods, prefix):
   mlpa_canvas.Print(setup['plotDir']+'/'+setup['plotSubDir']+'/nnValidation'+'.png')
   mlpa_canvas.Print(setup['plotDir']+'/'+setup['plotSubDir']+'/nnValidation'+'.root')
   del mlpa_canvas
-#
-#  ROOT.gROOT.ProcessLine('.x ./../../HEPHYPythonTools/mva/tmvaMacros/correlations.C("'+setup['TMVAOutputFile']+'")')
-#  os.system('mv ./plots/CorrelationMatrix*.* '+setup['plotDir']+'/'+setup['plotSubDir']+'/')
-#  for s in setup['plotTransformations']:
-#    ROOT.gROOT.ProcessLine('.x ./../../HEPHYPythonTools/mva/tmvaMacros/variables.C("'+setup['TMVAOutputFile']+'", "InputVariables_'+s+'")')
-#    os.system('mv ./plots/variables_*  '+setup['plotDir']+'/'+setup['plotSubDir']+'/')
-#    if setup['makeCorrelationScatterPlots']:
-#      for v in setup['mvaInputObs']:
-#        ROOT.gROOT.ProcessLine('.x ./../../HEPHYPythonTools/mva/tmvaMacros/correlationscatters.C("'+setup['TMVAOutputFile']+'","'+v+'", "InputVariables_'+s+'")')
-#      os.system('mv ./plots/correlationscatter_* '+setup['plotDir']+'/'+setup['plotSubDir']+'/')
-#
-#  for m in methods:
-#    if m['type']!=ROOT.TMVA.Types.kCuts:
-#      ROOT.gROOT.ProcessLine('.x ./../../HEPHYPythonTools/mva/tmvaMacros/network.C("'+setup['TMVAOutputFile']+'")')
-#      os.system('mv ./plots/'+m['name']+'.png  '+setup['plotDir']+'/'+setup['plotSubDir']+'/netStructure_'+m['name']+'.png')
-#      os.system('mv ./plots/'+m['name']+'.pdf  '+setup['plotDir']+'/'+setup['plotSubDir']+'/netStructure_'+m['name']+'.pdf')
-#      os.system('mv ./plots/'+m['name']+'.root '+setup['plotDir']+'/'+setup['plotSubDir']+'/netStructure_'+m['name']+'.root')
-#      ROOT.gROOT.ProcessLine('.x ./../../HEPHYPythonTools/mva/tmvaMacros/efficiencies.C("'+setup['TMVAOutputFile']+'")')
-#      os.system('mv ./plots/rejBvsS.png  '+setup['plotDir']+'/'+setup['plotSubDir']+'/rejBvsS_'+m['name']+'.png')
-#      os.system('mv ./plots/rejBvsS.pdf  '+setup['plotDir']+'/'+setup['plotSubDir']+'/rejBvsS_'+m['name']+'.pdf')
-#      os.system('mv ./plots/rejBvsS.root '+setup['plotDir']+'/'+setup['plotSubDir']+'/rejBvsS_'+m['name']+'.root')
-#      if setup['plotMVAEffs']:
-#        ROOT.gROOT.ProcessLine('.L ./../../HEPHYPythonTools/mva/tmvaMacros/mvaeffs.C+')
-#        ROOT.gROOT.ProcessLine('mvaeffs("'+setup['TMVAOutputFile']+'")')
-#        os.system('mv ./plots/mvaeffs_'+m['name']+'.png  '+setup['plotDir']+'/'+setup['plotSubDir']+'/mvaeffs_'+m['name']+'.png')
-#        os.system('mv ./plots/mvaeffs_'+m['name']+'.pdf  '+setup['plotDir']+'/'+setup['plotSubDir']+'/mvaeffs_'+m['name']+'.pdf')
-#        os.system('mv ./plots/mvaeffs_'+m['name']+'.root '+setup['plotDir']+'/'+setup['plotSubDir']+'/mvaeffs_'+m['name']+'.root')
-#      for i, fname in enumerate(['mva', 'proba', 'rarity', 'overtrain']):
-##        print '.x ./../../HEPHYPythonTools/mva/tmvaMacros/mvas.C("'+setup['TMVAOutputFile']+','+str(i)+'")'
-#        ROOT.gROOT.ProcessLine('.x ./../../HEPHYPythonTools/mva/tmvaMacros/mvas.C("'+setup['TMVAOutputFile']+'",'+str(i)+')')
-#        os.system('mv ./plots/'+fname+'_'+m['name']+'.png  '+setup['plotDir']+'/'+setup['plotSubDir']+'/'+fname+'_'+m['name']+'.png')
-#        os.system('mv ./plots/'+fname+'_'+m['name']+'.pdf  '+setup['plotDir']+'/'+setup['plotSubDir']+'/'+fname+'_'+m['name']+'.pdf')
-#        os.system('mv ./plots/'+fname+'_'+m['name']+'.root '+setup['plotDir']+'/'+setup['plotSubDir']+'/'+fname+'_'+m['name']+'.root')
-#    if m['type']==ROOT.TMVA.Types.kMLP:
-#      ROOT.gROOT.ProcessLine('.x ./../../HEPHYPythonTools/mva/tmvaMacros/annconvergencetest.C("'+setup['TMVAOutputFile']+'")')
-#      os.system('mv ./plots/annconvergencetest.png  '+setup['plotDir']+'/'+setup['plotSubDir']+'/annconvergencetest_'+m['name']+'.png')
-#      os.system('mv ./plots/annconvergencetest.pdf  '+setup['plotDir']+'/'+setup['plotSubDir']+'/annconvergencetest_'+m['name']+'.pdf')
-#      os.system('mv ./plots/annconvergencetest.root '+setup['plotDir']+'/'+setup['plotSubDir']+'/annconvergencetest_'+m['name']+'.root')
-#    if m['type']==ROOT.TMVA.Types.kBDT:
-#      ROOT.gROOT.ProcessLine('.x ./../../HEPHYPythonTools/mva/tmvaMacros/BDTControlPlots.C("'+setup['TMVAOutputFile']+'")')
-#      os.system('mv ./plots/'+m['name']+'_ControlPlots.png  '+setup['plotDir']+'/'+setup['plotSubDir']+'/'+m['name']+'_ControlPlots.png')
-#      os.system('mv ./plots/'+m['name']+'_ControlPlots.pdf  '+setup['plotDir']+'/'+setup['plotSubDir']+'/'+m['name']+'_ControlPlots.pdf')
-#      os.system('mv ./plots/'+m['name']+'_ControlPlots.root '+setup['plotDir']+'/'+setup['plotSubDir']+'/'+m['name']+'_ControlPlots.root')
-##      ROOT.gROOT.ProcessLine('.x ./../../HEPHYPythonTools/mva/tmvaMacros/BoostControlPlots.C("'+setup['TMVAOutputFile']+'")')
-#
-#
-#  ROOT.gROOT.cd(olddir)
-#
-#  coord_canvas = ROOT.TCanvas('coord_canvas', 'Network Coordinates',1200, 400*(1+len(methods)))
-#  coord_canvas.SetFillColor(ROOT.kWhite)
-#  inp = ":".join(setup['mvaInputObs'])
-#
+
+  ROOT.gROOT.ProcessLine('.x $CMSSW_BASE/src/Workspace/HEPHYMVATools/tmvaMacros/correlations.C("'+setup['TMVAOutputFile']+'")')
+  os.system('mv ./plots/CorrelationMatrix*.* '+setup['plotDir']+'/'+setup['plotSubDir']+'/')
+  for s in setup['plotTransformations']:
+    ROOT.gROOT.ProcessLine('.x $CMSSW_BASE/src/Workspace/HEPHYMVATools/tmvaMacros/variables.C("'+setup['TMVAOutputFile']+'", "InputVariables_'+s+'")')
+    os.system('mv ./plots/variables_*  '+setup['plotDir']+'/'+setup['plotSubDir']+'/')
+    if setup['makeCorrelationScatterPlots']:
+      for v in setup['mvaInputObs']:
+        ROOT.gROOT.ProcessLine('.x $CMSSW_BASE/src/Workspace/HEPHYMVATools/tmvaMacros/correlationscatters.C("'+setup['TMVAOutputFile']+'","'+v+'", "InputVariables_'+s+'")')
+      os.system('mv ./plots/correlationscatter_* '+setup['plotDir']+'/'+setup['plotSubDir']+'/')
+
+  for m in methods:
+    if m['type']!=ROOT.TMVA.Types.kCuts:
+      ROOT.gROOT.ProcessLine('.x $CMSSW_BASE/src/Workspace/HEPHYMVATools/tmvaMacros/network.C("'+setup['TMVAOutputFile']+'")')
+      os.system('mv ./plots/'+m['name']+'.png  '+setup['plotDir']+'/'+setup['plotSubDir']+'/netStructure_'+m['name']+'.png')
+      os.system('mv ./plots/'+m['name']+'.pdf  '+setup['plotDir']+'/'+setup['plotSubDir']+'/netStructure_'+m['name']+'.pdf')
+      os.system('mv ./plots/'+m['name']+'.root '+setup['plotDir']+'/'+setup['plotSubDir']+'/netStructure_'+m['name']+'.root')
+      ROOT.gROOT.ProcessLine('.x $CMSSW_BASE/src/Workspace/HEPHYMVATools/tmvaMacros/efficiencies.C("'+setup['TMVAOutputFile']+'")')
+      os.system('mv ./plots/rejBvsS.png  '+setup['plotDir']+'/'+setup['plotSubDir']+'/rejBvsS_'+m['name']+'.png')
+      os.system('mv ./plots/rejBvsS.pdf  '+setup['plotDir']+'/'+setup['plotSubDir']+'/rejBvsS_'+m['name']+'.pdf')
+      os.system('mv ./plots/rejBvsS.root '+setup['plotDir']+'/'+setup['plotSubDir']+'/rejBvsS_'+m['name']+'.root')
+      if setup['plotMVAEffs']:
+        ROOT.gROOT.ProcessLine('.L $CMSSW_BASE/src/Workspace/HEPHYMVATools/tmvaMacros/mvaeffs.C+')
+        ROOT.gROOT.ProcessLine('mvaeffs("'+setup['TMVAOutputFile']+'")')
+        os.system('mv ./plots/mvaeffs_'+m['name']+'.png  '+setup['plotDir']+'/'+setup['plotSubDir']+'/mvaeffs_'+m['name']+'.png')
+        os.system('mv ./plots/mvaeffs_'+m['name']+'.pdf  '+setup['plotDir']+'/'+setup['plotSubDir']+'/mvaeffs_'+m['name']+'.pdf')
+        os.system('mv ./plots/mvaeffs_'+m['name']+'.root '+setup['plotDir']+'/'+setup['plotSubDir']+'/mvaeffs_'+m['name']+'.root')
+      for i, fname in enumerate(['mva', 'proba', 'rarity', 'overtrain']):
+#        print '.x $CMSSW_BASE/src/Workspace/HEPHYMVATools/tmvaMacros/mvas.C("'+setup['TMVAOutputFile']+','+str(i)+'")'
+        ROOT.gROOT.ProcessLine('.x $CMSSW_BASE/src/Workspace/HEPHYMVATools/tmvaMacros/mvas.C("'+setup['TMVAOutputFile']+'",'+str(i)+')')
+        os.system('mv ./plots/'+fname+'_'+m['name']+'.png  '+setup['plotDir']+'/'+setup['plotSubDir']+'/'+fname+'_'+m['name']+'.png')
+        os.system('mv ./plots/'+fname+'_'+m['name']+'.pdf  '+setup['plotDir']+'/'+setup['plotSubDir']+'/'+fname+'_'+m['name']+'.pdf')
+        os.system('mv ./plots/'+fname+'_'+m['name']+'.root '+setup['plotDir']+'/'+setup['plotSubDir']+'/'+fname+'_'+m['name']+'.root')
+    if m['type']==ROOT.TMVA.Types.kMLP:
+      ROOT.gROOT.ProcessLine('.x $CMSSW_BASE/src/Workspace/HEPHYMVATools/tmvaMacros/annconvergencetest.C("'+setup['TMVAOutputFile']+'")')
+      os.system('mv ./plots/annconvergencetest.png  '+setup['plotDir']+'/'+setup['plotSubDir']+'/annconvergencetest_'+m['name']+'.png')
+      os.system('mv ./plots/annconvergencetest.pdf  '+setup['plotDir']+'/'+setup['plotSubDir']+'/annconvergencetest_'+m['name']+'.pdf')
+      os.system('mv ./plots/annconvergencetest.root '+setup['plotDir']+'/'+setup['plotSubDir']+'/annconvergencetest_'+m['name']+'.root')
+    if m['type']==ROOT.TMVA.Types.kBDT:
+      ROOT.gROOT.ProcessLine('.x $CMSSW_BASE/src/Workspace/HEPHYMVATools/tmvaMacros/BDTControlPlots.C("'+setup['TMVAOutputFile']+'")')
+      os.system('mv ./plots/'+m['name']+'_ControlPlots.png  '+setup['plotDir']+'/'+setup['plotSubDir']+'/'+m['name']+'_ControlPlots.png')
+      os.system('mv ./plots/'+m['name']+'_ControlPlots.pdf  '+setup['plotDir']+'/'+setup['plotSubDir']+'/'+m['name']+'_ControlPlots.pdf')
+      os.system('mv ./plots/'+m['name']+'_ControlPlots.root '+setup['plotDir']+'/'+setup['plotSubDir']+'/'+m['name']+'_ControlPlots.root')
+#      ROOT.gROOT.ProcessLine('.x $CMSSW_BASE/src/Workspace/HEPHYMVATools/tmvaMacros/BoostControlPlots.C("'+setup['TMVAOutputFile']+'")')
+
+  ROOT.gROOT.cd(rootGDirectory)
+
+  coord_canvas = ROOT.TCanvas('coord_canvas', 'Network Coordinates',1200, 400*(1+len(methods)))
+  coord_canvas.SetFillColor(ROOT.kWhite)
+  inp = ":".join(setup['mvaInputObs'])
+
 #  namesOfDrawnMethods = []
 #  for m in methods:
 #    if m.has_key("drawInParallelCoord") and m["drawInParallelCoord"]:
@@ -536,11 +535,9 @@ def setupMVAFrameWork(setup, data, methods, prefix):
 #    selVars[nm].AddRange(ROOT.TParallelCoordRange(selVars[nm],0.7,2))
 #    para_bkg.AddSelection("highDisc")
 #    para_bkg.GetCurrentSelection().SetLineColor(ROOT.kViolet)
-#
-#
 #  coord_canvas.Print(setup['plotDir']+'/'+setup['plotSubDir']+'/nnCoord.png')
-#  t.IsA().Destructor(t)
-#  del t
-#  ROOT.gROOT.cd(olddir)
-#  return
+  t.IsA().Destructor(t)
+  del t
+  ROOT.gROOT.cd(rootGDirectory)
+  return
 
