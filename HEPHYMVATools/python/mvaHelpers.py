@@ -55,9 +55,9 @@ def constructDataset(setup, signal, backgrounds, overWrite = False):
 
     i_type      = ctypes.c_int(0)
     i_isTraining    = ctypes.c_int(0)
-    for sample in [signal, background]:
+    for c in [signal['chain']]+ [b['chain'] for b in backgrounds]:
       for k in vars.keys():
-        sample.SetBranchAddress(k, vars[k])
+        c.SetBranchAddress(k, vars[k])
 
     for k in vars.keys():
       tree.Branch(k, vars[k], k+'/'+varType[k])
