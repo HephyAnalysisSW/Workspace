@@ -26,9 +26,9 @@ setup={}
 setup['dataFile'] = '/data/'+nfsUser+'/DegenerateStop/datasets/'+prefix+'.root'
 setup['preselection'] = 'met_pt>200&&htJet25>500&&nJet>=4&&singleLeptonic'
 
-setup['varsFromInput'] = [weight, 'met_pt', 'nBJetMedium25/I', 'htJet25', 'nJet/I', 'leptonPt', 'mt2w']
-
-setup['varsCalculated'] = [\
+#specify all observables that are used by TMVA
+setup['obsFromInput'] = [weight, 'met_pt', 'nBJetMedium25/I', 'htJet25', 'nJet/I', 'leptonPt', 'mt2w']
+setup['obsCalculated'] = [\
   ['mT', lambda c:sqrt(c.GetLeaf('met_pt').GetValue()*c.GetLeaf('leptonPt').GetValue()*(1.-cos(c.GetLeaf('met_phi').GetValue()-c.GetLeaf('leptonPhi').GetValue())))],
 ]
 
@@ -99,13 +99,13 @@ if overWriteData or not os.path.isfile(setup['dataFile']):
 #  data = constructDataset(setup, signal, background, overWriteData, addAllTestEventsTree = addAllTestEventsTree)
 #    
 #  evList={}
-#  testVars=['type1phiMet', 'softIsolatedMT', 'deltaPhi', 'rand']
+#  testObs=['type1phiMet', 'softIsolatedMT', 'deltaPhi', 'rand']
 #  n = data['simu'].GetEntries()
 #  for i in range(n):
 #    data['simu'].GetEntry(i)
 #    type=data['simu'].GetLeaf('type').GetValue()
 #    isTraining=data['simu'].GetLeaf('isTraining').GetValue()
-#    for v in testVars:
+#    for v in testObs:
 #      if v=='rand':
 #        val = random.random()
 #      else:
@@ -120,7 +120,7 @@ if overWriteData or not os.path.isfile(setup['dataFile']):
 #  print prefix
 #  ksres = {}
 #  ksres[prefix] = {}
-#  for v in testVars:
+#  for v in testObs:
 #    s0 = evList[v][1][0]
 #    s1 = evList[v][1][1]
 #    TMathKSTest = ROOT.TMath.KolmogorovTest(len(s0), array('d', s0), len(s1), array('d',s1), '') 

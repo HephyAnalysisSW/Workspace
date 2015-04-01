@@ -1,9 +1,11 @@
 def getTrainingSampleSizes(countSignal, bkgs, fractionForTraining=0.5):
-  """countSignal: Total count of signal sample.
-  bkgs: [{'count':nBkg1,'yield':yBkg1},...,{'count':nBkgN,'yield':yBkgN}]]
+  """ 
   finds nbBkg1,...,nBkgN such that nBkg1+...+nBkgN is maximal while respecting
   nBkg1+nBkg2+...+nBkgN<=nSigTraining, nBkg1:nBkg2:...:nBkgN=yBkg1:yBkg2:...:yBkgN
   and nBkg1<=fractionForTraining*nBkg1Max, ...., fractionForTraining*nBkgNMax<=nBkgNMax
+  arguments:
+  countSignal: Total count of signal sample.
+  bkgs: [{'count':nBkg1,'yield':yBkg1},...,{'count':nBkgN,'yield':yBkgN}]]
   """
   maxSignalCount=int(fractionForTraining*countSignal)
   assert maxSignalCount>0, "Too few signal events. Training events: %i"%maxSignalCount
@@ -23,14 +25,20 @@ def getTrainingSampleSizes(countSignal, bkgs, fractionForTraining=0.5):
     print "Signal sample is limiting: Scaling down backgrounds accordingly. Maximally achievable background would be %i. Solution: Signal: %i, bkgs.: %s"%(sum(maxAchievableBkg),maxSignalCount,",".join([str(x) for x in res]))
     return {'bkgs':res, 'sig':maxSignalCount}
 
-def constructDataset(setup, signal, backgrounds, overWrite = False):
-  """setup dictionary, signal: {'chain':ROOT.TChain, 'events':[ev1, ev2, ...]}
+def createDatasetForTMVA(setup, signal, backgrounds, overWrite = False):
+  """
+  create ROOT::TTree objects from a signal (TChain and event lists for test and training) 
+  and a list of backgrounds. setup["obsFromInput"] and setup["obsCalculated"] specify the observables.
+  arguments:
+  setup dictionary, signal={'chain':ROOT.TChain, 'trainingEvents':[...], 'testEvents':[...]]}
+  backgrounds=[{'chain':ROOT.TChain, 'trainingEvents':[...], 'testEvents':[...]}, {....}],
+  overWrite = False
   """
   import os, ctypes
   p_c_float = ctypes.c_float * 1
-  def getVarName(v):
+  def getObsName(v):
     return v.split('/')[0]
-  def getVarType(v):
+  def getObsType(v):
     if v.count('/'): return v.split('/')[1]
     return 'F'
 
@@ -43,34 +51,34 @@ def constructDataset(setup, signal, backgrounds, overWrite = False):
       print 'Warning! File will be overwritten'
     tree = ROOT.TTree('Events', 'Filtered Monte Carlo Events')
 
-    varType={}
+    obsType={}
 
-    for vn in setup['varsFromInput']+[v[0] for v in setup['varsCalculated']]:
-      varType[getVarName(vn)] = getVarType(vn)
-    vars={}
-    for vn in setup['varsFromInput']:
-      n = getVarName(vn)
-      if varType[n]=='F': vars[n] = p_c_float(0.)
-      if varType[n]=='I': vars[n] = ctypes.c_int(0)
+    for vn in setup['obsFromInput']+[v[0] for v in setup['obsCalculated']]:
+      obsType[getObsName(vn)] = getObsType(vn)
+    observables={}
+    for vn in setup['obsFromInput']:
+      n = getObsName(vn)
+      if obsType[n]=='F': observables[n] = p_c_float(0.)
+      if obsType[n]=='I': observables[n] = ctypes.c_int(0)
 
     i_type      = ctypes.c_int(0)
     i_isTraining    = ctypes.c_int(0)
     for c in [signal['chain']]+ [b['chain'] for b in backgrounds]:
-      for k in vars.keys():
-        c.SetBranchAddress(k, vars[k])
+      for k in observables.keys():
+        c.SetBranchAddress(k, observables[k])
 
-    for k in vars.keys():
-      tree.Branch(k, vars[k], k+'/'+varType[k])
-#      print k, vars[k], k+'/'+varType[k], tree.GetBranch(k)
+    for k in observables.keys():
+      tree.Branch(k, observables[k], k+'/'+obsType[k])
+#      print k, obs[k], k+'/'+obsType[k], tree.GetBranch(k)
     tree.Branch('type'  ,   ctypes.addressof(i_type),     'type/I')
     tree.Branch('isTraining',   ctypes.addressof(i_isTraining),   'isTraining/I')
-    addVars = {}
-    for v in [getVarName(vn) for vn in  [v[0] for v in setup['varsCalculated']] ]:
-      if varType[v]=='F': addVars[v] = ctypes.c_float(0.)
-      if varType[v]=='I': addVars[v] = ctypes.c_int(0)
-      if not ( varType[v]=='F' or varType[v]=='I') : print "Warning! Unknown varType'"+varType[v]+"'for variable", v
-      tree.Branch(v,   ctypes.addressof(addVars[v]),   v+'/'+varType[v])
-#      print v,   ctypes.addressof(addVars[v]),   v+'/'+varType[v]
+    addObs = {}
+    for v in [getObsName(vn) for vn in  [v[0] for v in setup['obsCalculated']] ]:
+      if obsType[v]=='F': addObs[v] = ctypes.c_float(0.)
+      if obsType[v]=='I': addObs[v] = ctypes.c_int(0)
+      if not ( obsType[v]=='F' or obsType[v]=='I') : print "Warning! Unknown obsType'"+obsType[v]+"'for observable", v
+      tree.Branch(v,   ctypes.addressof(addObs[v]),   v+'/'+obsType[v])
+#      print v,   ctypes.addressof(addObs[v]),   v+'/'+obsType[v]
 #    eListSig = getEList(signal,        setup['preselection'], 'eListSig')
 #    eListBkg = getEList(background,    setup['preselection'], 'eListBkg')
 
@@ -98,13 +106,13 @@ def constructDataset(setup, signal, backgrounds, overWrite = False):
 #          sample.GetEntry(eList.GetEntry(ev))
           sample.GetEntry(ev)
 
-          for v in setup["varsCalculated"]:
-            vn = getVarName(v[0])
-            if varType[vn] =="I":
-              addVars[vn].value  = int(v[1](sample))
-            if varType[vn] =="F":
-              addVars[vn].value  = v[1](sample)
-  #          print vn, addVars[vn].value#,      tree.GetLeaf(getVarName(v[0])).GetValue()
+          for v in setup["obsCalculated"]:
+            vn = getObsName(v[0])
+            if obsType[vn] =="I":
+              addObs[vn].value  = int(v[1](sample))
+            if obsType[vn] =="F":
+              addObs[vn].value  = v[1](sample)
+  #          print vn, addObs[vn].value#,      tree.GetLeaf(getObsName(v[0])).GetValue()
           tree.Fill()
 
     eListBkg          = getEList(tree,   'type==0&&'+ setup['preselection']    ,'eListBkg')
@@ -118,7 +126,7 @@ def constructDataset(setup, signal, backgrounds, overWrite = False):
     print 'Written MVA dataset to', setup['dataFile']
     setup['dataSetConfigFile'] = setup['dataFile'].replace('.root', '.pkl')
     setupStripped = copy.deepcopy(setup)
-    setupStripped['varsCalculated'] = [v[:-1]+['removedFunction'] for v in setupStripped['varsCalculated']]
+    setupStripped['obsCalculated'] = [v[:-1]+['removedFunction'] for v in setupStripped['obsCalculated']]
 
     for v in ['backgroundTrainEvents', 'signalTrainEvents', 'backgroundTestEvents', 'backgroundTrainEvents',  'backgroundAllTestEvents', 'signalAllTestEvents']:
       setupStripped[v]='removed'
