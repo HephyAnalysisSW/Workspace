@@ -1,11 +1,12 @@
 import ROOT
-import os,sys,pickle
+import os,sys,pickle,copy
 from math import sqrt, pi
-from localConfig import afsUser, nfsUser, localPlotDir
+from localConfig import afsUser, nfsUser, wwwPlotDir
 
-from Workspace.HEPHYPythonTools.mvaHelpers import loadDatasetForTMVA, setupMVAFrameWork
-import copy
-import sys
+from Workspace.HEPHYMVATools.mvaHelpers import loadDatasetForTMVA, setupMVAFrameWork
+
+#RA4
+#from smsHelpers import *
 
 overWriteTMVAFrameWork = True
 
@@ -13,34 +14,29 @@ setup={}
 methodCutOpt={}
 methodMLP={}
 
-prepreprefix = 'RA4NNAnalysis_T1tttt_'+str(mgl)+"_"+str(mN)+"_BkgMix_"+str(seed)
-preprefix = prepreprefix
-prefix = preprefix
-datasetName = '/data/'+nfsUser+'/RA4NNAnalysis/datasets/EleMu_'+prefix
-
-setup = pickle.load(file(datasetName+'.pkl'))
+prefix = 'test_DegenerateStop_BkgMix'
+setup = pickle.load(file('/data/schoef/DegenerateStop/datasets/'+prefix+'.pkl'))
 
 setup['TMVAFactoryOptions'] = ["!V","!Silent","Color","DrawProgressBar","Transformations=I;D;P;G,D","AnalysisType=Classification"]
 setup['plotTransformations'] = ['Id', 'Deco', 'PCA', 'Gauss_Deco']
 setup['makeCorrelationScatterPlots'] = False
 setup['plotMVAEffs'] = False #needs active X-forwarding since a QT Object is involved
 
-setup['plotMVAEffs'] = False #needs active X-forwarding since a QT Object is involved
 setup['fomPlotZoomCoordinates'] = [0, 0.95, 0.2, 1.0]
-setup['mvaInputVars'] = ["mT", "type1phiMet", "mt2w","nbtags","njets",'minDeltaPhi', 'deltaPhi']
-prefix = '_'.join(setup['mvaInputVars'])
-prefix = preprefix+prefix
+setup['mvaInputObs'] = ['met_pt', 'nBJetMedium25', 'htJet25', 'nJet', 'leptonPt']
 
-setup['TMVAOutputFile'] = '/data/'+nfsUser+'/RA4NNAnalysis/MVA_Analyzer/'+prefix+'.root'
-setup['weightDir'] ='/data/'+nfsUser+'/RA4NNAnalysis/MVA_Analyzer/'+prefix+'/'
+obsPrefix = '_'.join(setup['mvaInputObs'])
 
-data = constructDataset(setup, None, None, False)
-if not data:
-  print "Could not load dataset -> do nothing"
+setup['TMVAOutputFile'] = '/data/'+nfsUser+'/DegenerateStop/TMVAAnalyzers/'+prefix+'.root'
+setup['weightDir'] = '/data/'+nfsUser+'/DegenerateStop/TMVAAnalyzers/'+prefix+'/'+obsPrefix+'/'
+
+data = loadDatasetForTMVA(setup['dataFile'])
+assert data, "Could not load dataset from %s"%setup['dataFile']
+
 if data and (overWriteTMVAFrameWork or not os.path.isfile(setup['TMVAOutputFile'])):
   setup['fom_plot_vars'] = []#[['mT', [0,1000] , ROOT.kGreen], ['type1phiMet', [0,1000] , ROOT.kMagenta], ['mt2w',[0,1000],ROOT.kGreen+4],['nbtags',[0,1000],ROOT.kYellow]]
 
-  setup['plotDir'] = '/afs/hephy.at/user/'+afsUser[0]+'/'+afsUser+'/www/'+localPlotDir
+  setup['plotDir'] = '/afs/hephy.at/user/'+afsUser[0]+'/'+afsUser+'/www/'+wwwPlotDir
   setup['plotSubDir'] = prefix
 
   methodCutOpt['type']=ROOT.TMVA.Types.kCuts
@@ -50,7 +46,7 @@ if data and (overWriteTMVAFrameWork or not os.path.isfile(setup['TMVAOutputFile'
   methodCutOpt['options'] =('!H','!V','VarTransform=None','CreateMVAPdfs=True','FitMethod=GA','EffMethod=EffSel','VarProp=NotEnforced','CutRangeMin=-1','CutRangeMax=-1')
 
   addNeurons = [2,1]
-  nn_layers = [len(setup['mvaInputVars'])+ i for i in addNeurons]
+  nn_layers = [len(setup['mvaInputObs'])+ i for i in addNeurons]
   hiddenLayers = ','.join([str(i) for i in nn_layers ])
   methodMLP['type']=ROOT.TMVA.Types.kMLP
   methodMLP['name']='MLP21'
