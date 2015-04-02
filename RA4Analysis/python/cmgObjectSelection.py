@@ -3,7 +3,7 @@ from math import *
 def hybridIso03ID(r, nLep, hybridIso03):
   return (r.LepGood_pt[nLep]>=hybridIso03['ptSwitch'] and r.LepGood_relIso03[nLep]<hybridIso03['relIso']) or (r.LepGood_pt[nLep]<hybridIso03['ptSwitch'] and r.LepGood_relIso03[nLep]*r.LepGood_pt[nLep]<hybridIso03['absIso'])
 
-
+   
 def ele_ID_eta(r,nLep,ele_MVAID_cuts):
   if abs(r.LepGood_eta[nLep]) < 0.8 and r.LepGood_mvaIdPhys14[nLep] > ele_MVAID_cuts['eta08'] : return True
   elif abs(r.LepGood_eta[nLep]) > 0.8 and abs(r.LepGood_eta[nLep]) < 1.44 and r.LepGood_mvaIdPhys14[nLep] > ele_MVAID_cuts['eta104'] : return True
@@ -19,7 +19,7 @@ def cmgLooseMuID(r, nLep, ptCut, absEtaCut):
 #  return r.LepGood_pt[nLep]>=ptCut and abs(r.LepGood_eta[nLep])<absEtaCut and hybridIso03ID(r,nLep,hybridIso03)
 
 def cmgLooseEleID(r, nLep, ptCut , absEtaCut, ele_MVAID_cuts):
-  return r.LepGood_pt[nLep]>=ptCut and (abs(r.LepGood_eta[nLep])<1.44 or abs(r.LepGood_eta[nLep])>1.57) and abs(r.LepGood_eta[nLep])<absEtaCut and r.LepGood_miniRelIso[nLep]<0.1 and ele_ID_eta(r,nLep,ele_MVAID_cuts) and r.LepGood_lostHits[nLep]<1 and LepGood_sip3d[nLep] < 4 
+  return r.LepGood_pt[nLep]>=ptCut and (abs(r.LepGood_eta[nLep])<1.44 or abs(r.LepGood_eta[nLep])>1.57) and abs(r.LepGood_eta[nLep])<absEtaCut and r.LepGood_miniRelIso[nLep]<0.1 and ele_ID_eta(r,nLep,ele_MVAID_cuts) and r.LepGood_lostHits[nLep]<1 and r.LepGood_sip3d[nLep] < 4 
 
 #def cmgLooseLepID(r, nLep, ptCuts, absEtaCuts, hybridIso03):
 #  if abs(r.LepGood_pdgId[nLep])==11: return cmgLooseEleID(r, nLep=nLep, ptCut=ptCuts[0], absEtaCut=absEtaCuts[0],hybridIso03=hybridIso03)
