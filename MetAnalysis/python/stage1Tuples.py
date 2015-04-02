@@ -24,7 +24,7 @@ TTJets["bins"] = [
   'dbsName':'/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/AODSIM'},
   ] 
 DYJetsToLL={}
-DYJetsToLL["name"]   = "DYJets"
+DYJetsToLL["name"]   = "DYJetsToLL"
 DYJetsToLL["Chain"] = "Events"
 DYJetsToLL["bins"] = [
   {'dir':"/data/schoef/metTuple2/DYJetsToLL_M-50_13TeV-madgraph-pythia8_Phys14DR-PU20bx25_PHYS14_25_V1-v1_AODSIM",

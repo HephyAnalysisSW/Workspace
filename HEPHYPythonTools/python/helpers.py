@@ -273,6 +273,13 @@ def getPlotFromChain(c, var, binning, cutString = "(1)", weight = "weight", binn
     res.SetBinError(1 , sqrt(res.GetBinError(0)**2 + res.GetBinError(1)**2))
   return res
 
+def getEList(chain, cut, newname='eListTMP'):
+  chain.Draw('>>eListTMP_t', cut)
+  elistTMP_t = ROOT.gROOT.Get('eListTMP_t')
+  elistTMP = elistTMP_t.Clone(newname)
+  del elistTMP_t
+  return elistTMP
+
 def deltaPhi(phi1, phi2):
   dphi = phi2-phi1
   if  dphi > pi:
