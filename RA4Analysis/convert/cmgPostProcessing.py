@@ -6,7 +6,7 @@ from Workspace.HEPHYPythonTools.xsec import xsec
 from Workspace.HEPHYPythonTools.helpers import getObjFromFile, getObjDict, getFileList
 from Workspace.RA4Analysis.convertHelpers import compileClass, readVar, printHeader, typeStr, createClassString
 
-subDir = "postProcessed_v6_Phys14_WJets"
+subDir = "postProcessed_v7_Phys14v3"
 #from Workspace.RA4Analysis.cmgTuples_v3 import *
 from Workspace.HEPHYPythonTools.helpers import getChunksFromNFS, getChunksFromDPM, getChunks
 from Workspace.RA4Analysis.cmgTuples_PHYS14V3 import *
@@ -20,7 +20,7 @@ from localInfo import username
 ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 
-defSampleStr = "TTJets"
+defSampleStr = "ttJets_PU20bx25"
 #defSampleStr = "WJetsToLNu_HT400to600"
 #defSampleStr = "WJetsToLNu_HT200to400"
 #defSampleStr = "WJetsToLNu_HT100to200"
@@ -54,6 +54,8 @@ if options.skim.startswith('met'):
   skimCond = "met_pt>"+str(float(options.skim[3:]))
 if options.skim=='HT400ST150':
   skimCond = "LepGood_pt[0]+met_pt>150&&Sum$(Jet_pt)>400"
+if options.skim=='HT400ST200':   ##tuples have already ST200 skim
+  skimCond = "Sum$(Jet_pt)>400"
 
 ##In case a lepton selection is required, loop only over events where there is one 
 if options.leptonSelection.lower()=='soft':
