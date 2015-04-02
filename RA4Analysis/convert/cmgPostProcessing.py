@@ -9,7 +9,7 @@ from Workspace.RA4Analysis.convertHelpers import compileClass, readVar, printHea
 subDir = "postProcessed_v6_Phys14_WJets"
 #from Workspace.RA4Analysis.cmgTuples_v3 import *
 from Workspace.HEPHYPythonTools.helpers import getChunksFromNFS, getChunksFromDPM, getChunks
-from Workspace.RA4Analysis.cmgTuples_v6_PHYS14 import *
+from Workspace.RA4Analysis.cmgTuples_PHYS14V3 import *
 target_lumi = 4000 #pb-1
 
 from  Workspace.RA4Analysis import mt2w
@@ -20,10 +20,10 @@ from localInfo import username
 ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 
-#defSampleStr = "ttJets_PU20bx25_small"
+defSampleStr = "TTJets"
 #defSampleStr = "WJetsToLNu_HT400to600"
 #defSampleStr = "WJetsToLNu_HT200to400"
-defSampleStr = "WJetsToLNu_HT100to200"
+#defSampleStr = "WJetsToLNu_HT100to200"
 #defSampleStr = "WJetsToLNu_HT600toInf"
 #defSampleStr = "ttWJets_PU20bx25,ttZJets_PU20bx25,ttHJets_PU20bx25"
 #defSampleStr = "QCD_HT_250To500_PU20bx25"
@@ -57,9 +57,11 @@ if options.skim=='HT400ST150':
 
 ##In case a lepton selection is required, loop only over events where there is one 
 if options.leptonSelection.lower()=='soft':
-  skimCond += "&&Sum$(LepGood_pt>5&&LepGood_pt<25&&LepGood_relIso03<0.4&&abs(LepGood_eta)<2.4)>=1"
+  #skimCond += "&&Sum$(LepGood_pt>5&&LepGood_pt<25&&LepGood_relIso03<0.4&&abs(LepGood_eta)<2.4)>=1"
+  skimCond += "&&Sum$(LepGood_pt>5&&LepGood_pt<25abs(LepGood_eta)<2.4)>=1"
 if options.leptonSelection.lower()=='hard':
-  skimCond += "&&Sum$(LepGood_pt>25&&LepGood_relIso03<0.4&&abs(LepGood_eta)<2.4)>=1"
+  #skimCond += "&&Sum$(LepGood_pt>25&&LepGood_relIso03<0.4&&abs(LepGood_eta)<2.4)>=1"
+  skimCond += "&&Sum$(LepGood_pt>25&&abs(LepGood_eta)<2.4)>=1"
 
 if options.skim=='inc':
   skimCond = "(1)"
@@ -117,7 +119,7 @@ for isample, sample in enumerate(allSamples):
   aliases = [ "met:met_pt", "metPhi:met_phi","genMet:met_genPt", "genMetPhi:met_genPhi"]
 
   readVectors = [\
-    {'prefix':'LepGood',  'nMax':8, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I', 'relIso03/F', 'tightId/I', 'mass/F']},
+    {'prefix':'LepGood',  'nMax':8, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I', 'relIso03/F', 'tightId/I', 'miniRelIso/F','mvaId/F','eleMVAId/I','mass/F']},
     {'prefix':'Jet',  'nMax':100, 'vars':['pt/F', 'eta/F', 'phi/F', 'id/I', 'btagCMVA/F', 'partonId/I']},
   ]
   readVars = [readVar(v, allowRenaming=False, isWritten=False, isRead=True) for v in readVariables]
@@ -163,7 +165,8 @@ for isample, sample in enumerate(allSamples):
       #print "r" , r
       #print "r lepgood pt: " ,r.LepGood_pt[0]
       #get all >=loose lepton indices
-      looseLepInd = cmgLooseLepIndices(r, ptCuts=(7,5), absEtaCuts=(2.4,2.1), hybridIso03={'ptSwitch':0, 'absIso':0, 'relIso':0.4} )
+      #looseLepInd = cmgLooseLepIndices(r, ptCuts=(7,5), absEtaCuts=(2.4,2.1), hybridIso03={'ptSwitch':0, 'absIso':0, 'relIso':0.4} )
+      looseLepInd = cmgLooseLepIndices(r, ptCuts=(7,5), absEtaCuts=(2.4,2.1), ele_MVAID_cuts={'eta08':0.35 , 'eta104':0.20,'eta204': -0.52} )    ##Tight ele_MVAID_cuts={'eta08':0.73 , 'eta104':0.57,'eta204':  0.05}
       #split into soft and hard leptons
       looseSoftLepInd, looseHardLepInd = splitIndList(r.LepGood_pt, looseLepInd, 25.)
       #select soft leptons above 10 GeV (for vetoing in the hard lepton selection)
@@ -171,8 +174,12 @@ for isample, sample in enumerate(allSamples):
       #select tight soft leptons (no special tight ID for now)
       tightSoftLepInd = looseSoftLepInd #No tight loose selection as of yet 
       #select tight hard leptons (use POG ID)
-      tightHardLepInd = filter(lambda i:(abs(r.LepGood_pdgId[i])==11 and r.LepGood_relIso03[i]<0.14 and r.LepGood_tightId[i]>=3) \
-                                     or (abs(r.LepGood_pdgId[i])==13 and r.LepGood_relIso03[i]<0.12 and r.LepGood_tightId[i]), looseHardLepInd)
+      ###tightHardLepInd = filter(lambda i:(abs(r.LepGood_pdgId[i])==11 and r.LepGood_relIso03[i]<0.14 and r.LepGood_tightId[i]>=3) \
+      ###                               or (abs(r.LepGood_pdgId[i])==13 and r.LepGood_relIso03[i]<0.12 and r.LepGood_tightId[i]), looseHardLepInd)
+      tightHardLepInd = filter(lambda i:(abs(r.LepGood_pdgId[i])==11  and r.LepGood_tightId[i]>=3) \
+                                     or (abs(r.LepGood_pdgId[i])==13  and r.LepGood_tightId[i]), looseHardLepInd)  ###needs to be mvatightid implemented 
+
+
       #print "s lepgood pt: " ,s.LepGood_pt[0]
       s.nLooseSoftLeptons = len(looseSoftLepInd)
       s.nLooseSoftPt10Leptons = len(looseSoftPt10LepInd)
@@ -194,6 +201,7 @@ for isample, sample in enumerate(allSamples):
           leadingLepInd = tightHardLepInd[0]
           #print "highest pt: " , r.LepGood_pt[0]
           s.leptonPt  = r.LepGood_pt[leadingLepInd]
+          s.leptonMiniRelIso = r.LepGood_miniRelIso[leadingLepInd]
           #print s.leptonPt, 'met:', r.met_pt, r.nLepGood, r.LepGood_pt[leadingLepInd],r.LepGood_eta[leadingLepInd], r.LepGood_phi[leadingLepInd] , r.LepGood_pdgId[leadingLepInd], r.LepGood_relIso03[leadingLepInd], r.LepGood_tightId[leadingLepInd], r.LepGood_mass[leadingLepInd]
           s.leptonInd = leadingLepInd 
           s.leptonEta = r.LepGood_eta[leadingLepInd]
