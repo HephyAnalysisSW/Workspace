@@ -11,7 +11,7 @@ for i in range(5):
   print "Bin"+str(i), y
   c.specifyObservation('Bin'+str(i), int(y))
   c.specifyExpectation('Bin'+str(i), 'bkg', y)
-  c.specifyExpectation('Bin'+str(i), 'signal', 0.00000001)
+  c.specifyExpectation('Bin'+str(i), 'signal', 3.5+i)
 
 c.addUncertainty('Lumi', 'lnN')
 c.specifyFlatUncertainty('Lumi', 1.044)
@@ -20,10 +20,10 @@ c.specifyFlatUncertainty('Lumi', 1.044)
 
 ##correlated large uncertainty
 #pf+="_corr100"
-#c.addUncertainty('ratio', 'lnN')
-#for i in range(5):
-#  c.specifyUncertainty('ratio', 'Bin'+str(i), 'bkg', 2)
-#
+c.addUncertainty('JES', 'lnN')
+for i in range(5):
+  c.specifyUncertainty('JES', 'Bin'+str(i), 'bkg', 1.1)
+
 ##uncorrelated large uncertainty
 #pf+="_uncorr100"
 #for i in range(5):
