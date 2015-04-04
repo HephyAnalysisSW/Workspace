@@ -92,68 +92,62 @@ QCD_HT_1000ToInf_PU20bx25={\
 'dbsName':'/QCD_HT_1000ToInf_13TeV-madgraph/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'
 }
 TBarToLeptons_sChannel_PU20bx25={\
-"name" : "TBarToLeptons_sChannel",
-"chunkString": "TBarToLeptons_sChannel",
+"name" : "TBarToLeptons_sch",
+"chunkString": "TBarToLeptons_sch",
 'dir' : "/data/easilar/Phys14_V3/",
 'dbsName':'/TBarToLeptons_s-channel-CSA14_Tune4C_13TeV-aMCatNLO-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'
 }
 TBarToLeptons_tChannel_PU20bx25={\
-"name" : "TBarToLeptons_tChannel",
-"chunkString": "TBarToLeptons_tChannel",
+"name" : "TBarToLeptons_tch",
+"chunkString": "TBarToLeptons_tch",
 'dir' : "/data/easilar/Phys14_V3/",
 'dbsName':'/TBarToLeptons_t-channel_Tune4C_CSA14_13TeV-aMCatNLO-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'
 }
 TToLeptons_sChannel_PU20bx25={\
-"name" : "TToLeptons_sChannel",
-"chunkString": "TToLeptons_sChannel",
+"name" : "TToLeptons_sch",
+"chunkString": "TToLeptons_sch",
 'dir' : "/data/easilar/Phys14_V3/",
 'dbsName':'/TToLeptons_s-channel-CSA14_Tune4C_13TeV-aMCatNLO-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'
 }
 TToLeptons_tChannel_PU20bx25={\
-"name" : "TToLeptons_tChannel",
-"chunkString": "TToLeptons_tChannel",
+"name" : "TToLeptons_tch",
+"chunkString": "TToLeptons_tch",
 'dir' : "/data/easilar/Phys14_V3/",
 'dbsName':'/TToLeptons_t-channel_Tune4C_CSA14_13TeV-aMCatNLO-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'
 }
 T_tWChannel_PU20bx25={\
-"name" : "T_tWChannel",
-"chunkString": "T_tWChannel",
+"name" : "T_tWch",
+"chunkString": "T_tWch",
 'dir' : "/data/easilar/Phys14_V3/",
 'dbsName':'/T_tW-channel-DR_Tune4C_13TeV-CSA14-powheg-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'
 }
 TBar_tWChannel_PU20bx25={\
-"name" : "TBar_tWChannel",
-"chunkString": "TBar_tWChannel",
+"name" : "TBar_tWch",
+"chunkString": "TBar_tWch",
 'dir' : "/data/easilar/Phys14_V3/",
 'dbsName':'/Tbar_tW-channel-DR_Tune4C_13TeV-CSA14-powheg-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'
 }
 
 allSignalData=[\
-#["/data/schoef/cmgTuples/postProcessed_v5_PHYS14V1/", "SMS_T1tttt_2J_mGl1500_mLSP100"],
-#["/data/schoef/cmgTuples/postProcessed_v5_PHYS14V1/", "SMS_T1tttt_2J_mGl1200_mLSP800"],
-["/data/easilar/Phys14_V3/", "SMS_T5qqqqWW_Gl1500_Chi800_LSP100"],
-["/data/easilar/Phys14_V3/", "SMS_T5qqqqWW_Gl1200_Chi1000_LSP800"],
-["/data/easilar/Phys14_V3/","SMS_T1tttt_2J_mGl1200_mLSP800"], 
-["/data/easilar/Phys14_V3/","SMS_T1tttt_2J_mGl1300_mLSP100"], 
-["/data/easilar/Phys14_V3/","SMS_T1tttt_2J_mGl1500_mLSP100"], 
-["/data/easilar/Phys14_V3/","SMS_T1tttt_2J_mGl800_mLSP450"], 
-["/data/easilar/Phys14_V3/","SMS_T2tt_2J_mStop425_mLSP325"], 
-["/data/easilar/Phys14_V3/","SMS_T2tt_2J_mStop500_mLSP325"], 
-["/data/easilar/Phys14_V3/","SMS_T2tt_2J_mStop650_mLSP325"], 
-["/data/easilar/Phys14_V3/","SMS_T2tt_2J_mStop850_mLSP100"], 
-["/data/easilar/Phys14_V3/","SMS_T5qqqqWW_2J_mGo1400_mCh315_mChi300"], 
-["/data/easilar/Phys14_V3/","SMS_T6qqWW_mSq950_mChi325_mLSP300"], 
-["/data/easilar/Phys14_V3/","T1ttbb_mGo1500_mChi100"], 
-["/data/easilar/Phys14_V3/","T1ttbbWW_mGo1000_mCh725_mChi715"], 
-["/data/easilar/Phys14_V3/","T1ttbbWW_mGo1000_mCh725_mChi720"], 
-["/data/easilar/Phys14_V3/","T1ttbbWW_mGo1300_mCh300_mChi290"], 
-["/data/easilar/Phys14_V3/","T1ttbbWW_mGo1300_mCh300_mChi295"], 
-["/data/easilar/Phys14_V3/","T5ttttDeg_mGo1000_mStop300_mCh285_mChi280"], 
-["/data/easilar/Phys14_V3/","T5ttttDeg_mGo1000_mStop300_mChi280"], 
-["/data/easilar/Phys14_V3/","T5ttttDeg_mGo1300_mStop300_mCh285_mChi280"], 
-["/data/easilar/Phys14_V3/","T5ttttDeg_mGo1300_mStop300_mChi280"], 
-["/data/easilar/Phys14_V3/","T6ttWW_mSbot600_mCh425_mChi50"], 
-["/data/easilar/Phys14_V3/","T6ttWW_mSbot650_mCh150_mChi50"], 
+["/data/easilar/Phys14_V3/","SMS_T1tttt_2J_mGl1200_mLSP800"],   ##OK 
+["/data/easilar/Phys14_V3/","SMS_T1tttt_2J_mGl1500_mLSP100"],   ##OK
+["/data/easilar/Phys14_V3/","T1ttbbWW_mGo1000_mCh725_mChi715"],  ##OK
+["/data/easilar/Phys14_V3/","T1ttbbWW_mGo1000_mCh725_mChi720"],  ##OK
+["/data/easilar/Phys14_V3/","T1ttbbWW_mGo1300_mCh300_mChi290"],  ##OK
+["/data/easilar/Phys14_V3/","T1ttbbWW_mGo1300_mCh300_mChi295"],  ##OK
+["/data/easilar/Phys14_V3/", "T5qqqqWW_mGo1000_mCh800_mChi700"], ##OK
+["/data/easilar/Phys14_V3/", "T5qqqqWW_mGo1000_mCh800_mChi700_dilep"], ##OK
+["/data/easilar/Phys14_V3/", "T5qqqqWW_mGo1200_mCh1000_mChi800"], ##OK
+["/data/easilar/Phys14_V3/", "T5qqqqWW_mGo1200_mCh1000_mChi800_cmg"], ##OK
+["/data/easilar/Phys14_V3/", "T5qqqqWW_mGo1200_mCh1000_mChi800_dilep"], ##OK
+["/data/easilar/Phys14_V3/", "T5qqqqWW_mGo1500_mCh800_mChi100"], ##OK
+["/data/easilar/Phys14_V3/", "T5ttttDeg_mGo1000_mStop300_mCh285_mChi280"], ##OK
+["/data/easilar/Phys14_V3/", "T5ttttDeg_mGo1000_mStop300_mCh285_mChi280_dil"], ##OK
+["/data/easilar/Phys14_V3/", "T5ttttDeg_mGo1000_mStop300_mChi280"], ##OK
+["/data/easilar/Phys14_V3/", "T5ttttDeg_mGo1300_mStop300_mCh285_mChi280"], ##OK
+["/data/easilar/Phys14_V3/", "T5ttttDeg_mGo1300_mStop300_mCh285_mChi280_dil"], ##OK
+["/data/easilar/Phys14_V3/", "T5ttttDeg_mGo1300_mStop300_mChi280"], ##OK
+ 
 ]
 allSignalStrings = [s[1] for s in allSignalData]
 def getSignalSample(dir, signal):
