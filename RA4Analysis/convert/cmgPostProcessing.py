@@ -156,7 +156,7 @@ for isample, sample in enumerate(allSamples):
   for chunk in chunks:
     sourceFileSize = os.path.getsize(chunk['file'])
     nSplit = 1+int(sourceFileSize/(300*10**6)) #split into 300MB
-    print "Chunk too large, will split into",nSplit,"of appox 300MB"
+    if nSplit>1: print "Chunk too large, will split into",nSplit,"of appox 300MB"
     for iSplit in range(nSplit):
       t = getTreeFromChunk(chunk, skimCond, iSplit, nSplit)
       print "tree:" , t
