@@ -85,14 +85,21 @@ if sys.argv[0].count('ipython'):
 #  return chunks, nTotEvents
 
 
-def getTreeFromChunk(c, skimCond):
+def getTreeFromChunk(c, skimCond, iSplit, nSplit):
   if not c.has_key('file'):return
   rf = ROOT.TFile.Open(c['file'])
   assert not rf.IsZombie()
   rf.cd()
   tc = rf.Get("tree")
+  nTot = tc.GetEntries()
+  fromFrac = iSplit/float(nSplit)
+  toFrac   = (iSplit+1)/float(nSplit)
+  start = int(fromFrac*nTot)
+  stop  = int(toFrac*nTot)
+#  firstEvent = nEvents*iSplit
   ROOT.gDirectory.cd('PyROOT:/')
-  t = tc.CopyTree(skimCond)
+  print "Copy tree from source: total number of events found:",nTot,"Split counter: ",iSplit,"<",nSplit,"first Event:",start,"nEvents:",stop-start
+  t = tc.CopyTree(skimCond,"",stop-start,start)
   tc.Delete()
   del tc
   rf.Close()
@@ -147,139 +154,143 @@ for isample, sample in enumerate(allSamples):
   if options.small: chunks=chunks[:1]
   print "CHUNKS:" , chunks
   for chunk in chunks:
-    t = getTreeFromChunk(chunk, skimCond)
-    print "tree:" , t
-    if not t:continue
-    t.SetName("Events")
-    nEvents = t.GetEntries()
-    for v in newVars:
-      print "new VAR:" , v
-      v['branch'] = t.Branch(v['stage2Name'], ROOT.AddressOf(s,v['stage2Name']), v['stage2Name']+'/'+v['stage2Type'])
-    for v in readVars:
-      print "read VAR:" , v
-      t.SetBranchAddress(v['stage1Name'], ROOT.AddressOf(r, v['stage1Name']))
-    for v in readVectors:
-      for var in v['vars']:
-        t.SetBranchAddress(var['stage1Name'], ROOT.AddressOf(r, var['stage1Name']))
-    for a in aliases:
-      t.SetAlias(*(a.split(":")))
-    print "File",chunk['file'],'chunk',chunk['name'],"found", nEvents, '(skim:',options.skim,') condition:', skimCond,' with weight',lumiWeight, 'in Chain -> post processing...'
-    
-    for i in range(nEvents):
-      if (i%10000 == 0) and i>0 :
-        print i,"/",nEvents , chunk['name']
-      s.init()
-      r.init()
-      t.GetEntry(i)
-      s.weight = lumiWeight
-      #print "r" , r
-      #print "r lepgood pt: " ,r.LepGood_pt[0]
-      #get all >=loose lepton indices
-      #looseLepInd = cmgLooseLepIndices(r, ptCuts=(7,5), absEtaCuts=(2.4,2.1), hybridIso03={'ptSwitch':0, 'absIso':0, 'relIso':0.4} )
-      looseLepInd = cmgLooseLepIndices(r, ptCuts=(7,5), absEtaCuts=(2.5,2.4), ele_MVAID_cuts={'eta08':0.35 , 'eta104':0.20,'eta204': -0.52} )    ##Tight ele_MVAID_cuts={'eta08':0.73 , 'eta104':0.57,'eta204':  0.05}
-      #split into soft and hard leptons
-      looseSoftLepInd, looseHardLepInd = splitIndList(r.LepGood_pt, looseLepInd, 25.)
-      #select soft leptons above 10 GeV (for vetoing in the hard lepton selection)
-      looseSoftPt10LepInd = filter(lambda i:r.LepGood_pt[i]>10, looseSoftLepInd) 
-      #select tight soft leptons (no special tight ID for now)
-      tightSoftLepInd = looseSoftLepInd #No tight loose selection as of yet 
-      #select tight hard leptons (use POG ID)
-      ###tightHardLepInd = filter(lambda i:(abs(r.LepGood_pdgId[i])==11 and r.LepGood_relIso03[i]<0.14 and r.LepGood_tightId[i]>=3) \
-      ###                               or (abs(r.LepGood_pdgId[i])==13 and r.LepGood_relIso03[i]<0.12 and r.LepGood_tightId[i]), looseHardLepInd)
-      tightHardLepInd = filter(lambda i:(abs(r.LepGood_pdgId[i])==11 and r.LepGood_miniRelIso[i]<0.1 and ele_ID_eta(r,nLep=i,ele_MVAID_cuts={'eta08':0.73 , 'eta104':0.57,'eta204':  0.05}) and r.LepGood_tightId[i]>=3) \
-                                     or (abs(r.LepGood_pdgId[i])==13 and r.LepGood_miniRelIso[i]<0.2  and r.LepGood_tightId[i]), looseHardLepInd)  
-
-
-      #print "s lepgood pt: " ,s.LepGood_pt[0]
-      s.nLooseSoftLeptons = len(looseSoftLepInd)
-      s.nLooseSoftPt10Leptons = len(looseSoftPt10LepInd)
-      s.nLooseHardLeptons = len(looseHardLepInd)
-      s.nTightSoftLeptons = len(tightSoftLepInd)
-      s.nTightHardLeptons = len(tightHardLepInd)
-      #print "tightHardLepInd:" , tightHardLepInd
-      vars = ['pt', 'eta', 'phi', 'miniRelIso','relIso03', 'pdgId']
-      allLeptons = [getObjDict(t, 'LepGood_', vars, i) for i in looseLepInd]
-      looseSoftLep = [getObjDict(t, 'LepGood_', vars, i) for i in looseSoftLepInd] 
-      looseHardLep = [getObjDict(t, 'LepGood_', vars, i) for i in looseHardLepInd]
-      looseSoftPt10Lep = [getObjDict(t, 'LepGood_', vars, i) for i in looseSoftPt10LepInd]
-      tightSoftLep = [getObjDict(t, 'LepGood_', vars, i) for i in tightSoftLepInd]
-      tightHardLep =  [getObjDict(t, 'LepGood_', vars, i) for i in tightHardLepInd]
-      #print "tightHardLep" , tightHardLep 
-      leadingLepInd = None
-      if options.leptonSelection=='hard':
-        if s.nTightHardLeptons>=1:
-          leadingLepInd = tightHardLepInd[0]
-          #print "highest pt: " , r.LepGood_pt[0]
-          s.leptonPt  = r.LepGood_pt[leadingLepInd]
-          s.leptonMiniRelIso = r.LepGood_miniRelIso[leadingLepInd]
-          s.leptonRelIso03 = r.LepGood_relIso03[leadingLepInd]
-          #print s.leptonMiniRelIso ,s.leptonPt, 'met:', r.met_pt, r.nLepGood, r.LepGood_pt[leadingLepInd],r.LepGood_eta[leadingLepInd], r.LepGood_phi[leadingLepInd] , r.LepGood_pdgId[leadingLepInd], r.LepGood_relIso03[leadingLepInd], r.LepGood_tightId[leadingLepInd], r.LepGood_mass[leadingLepInd]
-          s.leptonInd = leadingLepInd 
-          s.leptonEta = r.LepGood_eta[leadingLepInd]
-          s.leptonPhi = r.LepGood_phi[leadingLepInd]
-          s.leptonPdg = r.LepGood_pdgId[leadingLepInd]
-          s.leptonMass= r.LepGood_mass[leadingLepInd]
-          s.st = r.met_pt + s.leptonPt
-        s.singleLeptonic = s.nTightHardLeptons==1
-        if s.singleLeptonic:
-          s.singleMuonic      =  abs(s.leptonPdg)==13
-          s.singleElectronic  =  abs(s.leptonPdg)==11
-        else:
-          s.singleMuonic      = False 
-          s.singleElectronic  = False 
-
-      if options.leptonSelection=='soft':
-        #Select hardest tight lepton among soft leptons
-        if s.nTightSoftLeptons>=1:
-          leadingLepInd = tightSoftLepInd[0]
-#          print s.leptonPt, r.LepGood_pt[leadingLepInd],r.LepGood_eta[leadingLepInd], leadingLepInd
-          s.leptonPt  = r.LepGood_pt[leadingLepInd]
-          s.leptonInd = leadingLepInd 
-          s.leptonEta = r.LepGood_eta[leadingLepInd]
-          s.leptonPhi = r.LepGood_phi[leadingLepInd]
-          s.leptonPdg = r.LepGood_pdgId[leadingLepInd]
-          s.leptonMass= r.LepGood_mass[leadingLepInd]
-          s.st = r.met_pt + s.leptonPt
-        s.singleLeptonic = s.nTightSoftLeptons==1
-        if s.singleLeptonic:
-          s.singleMuonic      =  abs(s.leptonPdg)==13
-          s.singleElectronic  =  abs(s.leptonPdg)==11
-        else:
-          s.singleMuonic      = False 
-          s.singleElectronic  = False 
-#      print "Selected",s.leptonPt
-      if options.leptonSelection!='':
-        jets = filter(lambda j:j['pt']>30 and abs(j['eta'])<2.4 and j['id'], get_cmg_jets_fromStruct(r))
-        #print "jets:" , jets
-        lightJets, bJets = splitListOfObjects('btagCMVA', 0.732, jets) 
-        #print "bjets:" , bJets
-        s.htJet30j = sum([x['pt'] for x in jets])
-        s.nJet30 = len(jets)
-        s.nBJetMediumCMVA30 = len(bJets)
-        s.mt2w = mt2w.mt2w(met = {'pt':r.met_pt, 'phi':r.met_phi}, l={'pt':s.leptonPt, 'phi':s.leptonPhi, 'eta':s.leptonEta}, ljets=lightJets, bjets=bJets)
-        s.deltaPhi_Wl = acos((s.leptonPt+r.met_pt*cos(s.leptonPhi-r.met_phi))/sqrt(s.leptonPt**2+r.met_pt**2+2*r.met_pt*s.leptonPt*cos(s.leptonPhi-r.met_phi))) 
-        #print "deltaPhi:" , s.deltaPhi_Wl
-#          print "Warning -> Why can't I compute mt2w?", s.mt2w, len(jets), len(bJets), len(allTightLeptons),lightJets,bJets, {'pt':s.type1phiMet, 'phi':s.type1phiMetphi}, {'pt':s.leptonPt, 'phi':s.leptonPhi, 'eta':s.leptonEta}
+    sourceFileSize = os.path.getsize(chunk['file'])
+    nSplit = 1+int(sourceFileSize/(300*10**6)) #split into 300MB
+    if nSplit>1: print "Chunk too large, will split into",nSplit,"of appox 300MB"
+    for iSplit in range(nSplit):
+      t = getTreeFromChunk(chunk, skimCond, iSplit, nSplit)
+      print "tree:" , t
+      if not t:continue
+      t.SetName("Events")
+      nEvents = t.GetEntries()
       for v in newVars:
-        v['branch'].Fill()
-    newFileName = sample['name']+'_'+chunk['name']+'.root'
-    filesForHadd.append(newFileName)
-    if not options.small:
-    #if options.small:
-      f = ROOT.TFile(tmpDir+'/'+newFileName, 'recreate')
-      t.SetBranchStatus("*",0)
-      for b in branchKeepStrings + [v['stage2Name'] for v in newVars] +  [v.split(':')[1] for v in aliases]:
-        t.SetBranchStatus(b, 1)
-      t2 = t.CloneTree()
-      t2.Write()
-      f.Close()
-      print "Written",tmpDir+'/'+newFileName
-      del f
-      del t2
-      t.Delete()
-      del t
-    for v in newVars:
-      del v['branch']
+#        print "new VAR:" , v
+        v['branch'] = t.Branch(v['stage2Name'], ROOT.AddressOf(s,v['stage2Name']), v['stage2Name']+'/'+v['stage2Type'])
+      for v in readVars:
+#        print "read VAR:" , v
+        t.SetBranchAddress(v['stage1Name'], ROOT.AddressOf(r, v['stage1Name']))
+      for v in readVectors:
+        for var in v['vars']:
+          t.SetBranchAddress(var['stage1Name'], ROOT.AddressOf(r, var['stage1Name']))
+      for a in aliases:
+        t.SetAlias(*(a.split(":")))
+      print "File",chunk['file'],'chunk',chunk['name'],"found", nEvents, '(skim:',options.skim,') condition:', skimCond,' with weight',lumiWeight, 'in Chain -> post processing...'
+      
+      for i in range(nEvents):
+        if (i%10000 == 0) and i>0 :
+          print i,"/",nEvents
+        s.init()
+        r.init()
+        t.GetEntry(i)
+        s.weight = lumiWeight
+        #print "r" , r
+        #print "r lepgood pt: " ,r.LepGood_pt[0]
+        #get all >=loose lepton indices
+        #looseLepInd = cmgLooseLepIndices(r, ptCuts=(7,5), absEtaCuts=(2.4,2.1), hybridIso03={'ptSwitch':0, 'absIso':0, 'relIso':0.4} )
+        looseLepInd = cmgLooseLepIndices(r, ptCuts=(7,5), absEtaCuts=(2.5,2.4), ele_MVAID_cuts={'eta08':0.35 , 'eta104':0.20,'eta204': -0.52} )    ##Tight ele_MVAID_cuts={'eta08':0.73 , 'eta104':0.57,'eta204':  0.05}
+        #split into soft and hard leptons
+        looseSoftLepInd, looseHardLepInd = splitIndList(r.LepGood_pt, looseLepInd, 25.)
+        #select soft leptons above 10 GeV (for vetoing in the hard lepton selection)
+        looseSoftPt10LepInd = filter(lambda i:r.LepGood_pt[i]>10, looseSoftLepInd) 
+        #select tight soft leptons (no special tight ID for now)
+        tightSoftLepInd = looseSoftLepInd #No tight loose selection as of yet 
+        #select tight hard leptons (use POG ID)
+        ###tightHardLepInd = filter(lambda i:(abs(r.LepGood_pdgId[i])==11 and r.LepGood_relIso03[i]<0.14 and r.LepGood_tightId[i]>=3) \
+        ###                               or (abs(r.LepGood_pdgId[i])==13 and r.LepGood_relIso03[i]<0.12 and r.LepGood_tightId[i]), looseHardLepInd)
+        tightHardLepInd = filter(lambda i:(abs(r.LepGood_pdgId[i])==11 and r.LepGood_miniRelIso[i]<0.1 and ele_ID_eta(r,nLep=i,ele_MVAID_cuts={'eta08':0.73 , 'eta104':0.57,'eta204':  0.05}) and r.LepGood_tightId[i]>=3) \
+                                       or (abs(r.LepGood_pdgId[i])==13 and r.LepGood_miniRelIso[i]<0.2  and r.LepGood_tightId[i]), looseHardLepInd)  
+
+
+        #print "s lepgood pt: " ,s.LepGood_pt[0]
+        s.nLooseSoftLeptons = len(looseSoftLepInd)
+        s.nLooseSoftPt10Leptons = len(looseSoftPt10LepInd)
+        s.nLooseHardLeptons = len(looseHardLepInd)
+        s.nTightSoftLeptons = len(tightSoftLepInd)
+        s.nTightHardLeptons = len(tightHardLepInd)
+        #print "tightHardLepInd:" , tightHardLepInd
+        vars = ['pt', 'eta', 'phi', 'miniRelIso','relIso03', 'pdgId']
+        allLeptons = [getObjDict(t, 'LepGood_', vars, i) for i in looseLepInd]
+        looseSoftLep = [getObjDict(t, 'LepGood_', vars, i) for i in looseSoftLepInd] 
+        looseHardLep = [getObjDict(t, 'LepGood_', vars, i) for i in looseHardLepInd]
+        looseSoftPt10Lep = [getObjDict(t, 'LepGood_', vars, i) for i in looseSoftPt10LepInd]
+        tightSoftLep = [getObjDict(t, 'LepGood_', vars, i) for i in tightSoftLepInd]
+        tightHardLep =  [getObjDict(t, 'LepGood_', vars, i) for i in tightHardLepInd]
+        #print "tightHardLep" , tightHardLep 
+        leadingLepInd = None
+        if options.leptonSelection=='hard':
+          if s.nTightHardLeptons>=1:
+            leadingLepInd = tightHardLepInd[0]
+            #print "highest pt: " , r.LepGood_pt[0]
+            s.leptonPt  = r.LepGood_pt[leadingLepInd]
+            s.leptonMiniRelIso = r.LepGood_miniRelIso[leadingLepInd]
+            s.leptonRelIso03 = r.LepGood_relIso03[leadingLepInd]
+            #print s.leptonMiniRelIso ,s.leptonPt, 'met:', r.met_pt, r.nLepGood, r.LepGood_pt[leadingLepInd],r.LepGood_eta[leadingLepInd], r.LepGood_phi[leadingLepInd] , r.LepGood_pdgId[leadingLepInd], r.LepGood_relIso03[leadingLepInd], r.LepGood_tightId[leadingLepInd], r.LepGood_mass[leadingLepInd]
+            s.leptonInd = leadingLepInd 
+            s.leptonEta = r.LepGood_eta[leadingLepInd]
+            s.leptonPhi = r.LepGood_phi[leadingLepInd]
+            s.leptonPdg = r.LepGood_pdgId[leadingLepInd]
+            s.leptonMass= r.LepGood_mass[leadingLepInd]
+            s.st = r.met_pt + s.leptonPt
+          s.singleLeptonic = s.nTightHardLeptons==1
+          if s.singleLeptonic:
+            s.singleMuonic      =  abs(s.leptonPdg)==13
+            s.singleElectronic  =  abs(s.leptonPdg)==11
+          else:
+            s.singleMuonic      = False 
+            s.singleElectronic  = False 
+
+        if options.leptonSelection=='soft':
+          #Select hardest tight lepton among soft leptons
+          if s.nTightSoftLeptons>=1:
+            leadingLepInd = tightSoftLepInd[0]
+  #          print s.leptonPt, r.LepGood_pt[leadingLepInd],r.LepGood_eta[leadingLepInd], leadingLepInd
+            s.leptonPt  = r.LepGood_pt[leadingLepInd]
+            s.leptonInd = leadingLepInd 
+            s.leptonEta = r.LepGood_eta[leadingLepInd]
+            s.leptonPhi = r.LepGood_phi[leadingLepInd]
+            s.leptonPdg = r.LepGood_pdgId[leadingLepInd]
+            s.leptonMass= r.LepGood_mass[leadingLepInd]
+            s.st = r.met_pt + s.leptonPt
+          s.singleLeptonic = s.nTightSoftLeptons==1
+          if s.singleLeptonic:
+            s.singleMuonic      =  abs(s.leptonPdg)==13
+            s.singleElectronic  =  abs(s.leptonPdg)==11
+          else:
+            s.singleMuonic      = False 
+            s.singleElectronic  = False 
+  #      print "Selected",s.leptonPt
+        if options.leptonSelection!='':
+          jets = filter(lambda j:j['pt']>30 and abs(j['eta'])<2.4 and j['id'], get_cmg_jets_fromStruct(r))
+          #print "jets:" , jets
+          lightJets, bJets = splitListOfObjects('btagCMVA', 0.732, jets) 
+          #print "bjets:" , bJets
+          s.htJet30j = sum([x['pt'] for x in jets])
+          s.nJet30 = len(jets)
+          s.nBJetMediumCMVA30 = len(bJets)
+          s.mt2w = mt2w.mt2w(met = {'pt':r.met_pt, 'phi':r.met_phi}, l={'pt':s.leptonPt, 'phi':s.leptonPhi, 'eta':s.leptonEta}, ljets=lightJets, bjets=bJets)
+          s.deltaPhi_Wl = acos((s.leptonPt+r.met_pt*cos(s.leptonPhi-r.met_phi))/sqrt(s.leptonPt**2+r.met_pt**2+2*r.met_pt*s.leptonPt*cos(s.leptonPhi-r.met_phi))) 
+          #print "deltaPhi:" , s.deltaPhi_Wl
+  #          print "Warning -> Why can't I compute mt2w?", s.mt2w, len(jets), len(bJets), len(allTightLeptons),lightJets,bJets, {'pt':s.type1phiMet, 'phi':s.type1phiMetphi}, {'pt':s.leptonPt, 'phi':s.leptonPhi, 'eta':s.leptonEta}
+        for v in newVars:
+          v['branch'].Fill()
+      newFileName = sample['name']+'_'+chunk['name']+'_'+str(iSplit)+'.root'
+      filesForHadd.append(newFileName)
+      if not options.small:
+      #if options.small:
+        f = ROOT.TFile(tmpDir+'/'+newFileName, 'recreate')
+        t.SetBranchStatus("*",0)
+        for b in branchKeepStrings + [v['stage2Name'] for v in newVars] +  [v.split(':')[1] for v in aliases]:
+          t.SetBranchStatus(b, 1)
+        t2 = t.CloneTree()
+        t2.Write()
+        f.Close()
+        print "Written",tmpDir+'/'+newFileName
+        del f
+        del t2
+        t.Delete()
+        del t
+      for v in newVars:
+        del v['branch']
 
   print "Event loop end"
   if not options.small: 
