@@ -91,6 +91,8 @@ xsec['/T5Full_T5Full-1200-1000-800-Decay-MGMMatch50/schoef-T5Full_T5Full-1200-10
 xsec['/T5Full_T5Full-1500-800-100-Decay-MGMMatch50/schoef-T5Full_T5Full-1500-800-100-Decay-MGMMatch50-miniAOD-92bfc1aa0ef8c674e0edabb945b19298/USER'] = gluino13TeV_NLONLL[1500]
 xsec["T5Full_1200_1000_800"] = gluino13TeV_NLONLL[1200]
 xsec["T5Full_1500_800_100"]  =  gluino13TeV_NLONLL[1500]
+xsec["T5qqqqWW_mGo1500_mCh800_mChi100"] = gluino13TeV_NLONLL[1500]
+
 xsec["SMS_T5qqqqWW_Gl1200_Chi1000_LSP800"] = gluino13TeV_NLONLL[1200]       
 xsec["SMS_T5qqqqWW_Gl1500_Chi800_LSP100"]  =  gluino13TeV_NLONLL[1500]      
 xsec["T5qqqqWW_Gl_1400_LSP_100_Chi_325"] = gluino13TeV_NLONLL[1400]
@@ -101,6 +103,15 @@ xsec['T5ttttDeg_mGo1000_mStop300_mCh285_mChi280'] = gluino13TeV_NLONLL[1000]
 xsec['T5ttttDeg_mGo1000_mStop300_mChi280'] = gluino13TeV_NLONLL[1000]
 xsec['T5ttttDeg_mGo1300_mStop300_mCh285_mChi280'] = gluino13TeV_NLONLL[1300]
 xsec['T5ttttDeg_mGo1300_mStop300_mChi280'] = gluino13TeV_NLONLL[1300]
+
+xsec['T5qqqqWW_mGo1000_mCh800_mChi700'] = gluino13TeV_NLONLL[1000]
+xsec['T5qqqqWW_mGo1000_mCh800_mChi700_dilep'] = gluino13TeV_NLONLL[1000]
+xsec['T5qqqqWW_mGo1200_mCh1000_mChi800'] = gluino13TeV_NLONLL[1200]
+xsec['T5qqqqWW_mGo1200_mCh1000_mChi800_cmg'] = gluino13TeV_NLONLL[1200]
+xsec['T5qqqqWW_mGo1200_mCh1000_mChi800_dilep'] = gluino13TeV_NLONLL[1200]
+xsec['T5qqqqWW_mGo1500_mCh800_mChi100'] = gluino13TeV_NLONLL[1500]
+xsec['T5ttttDeg_mGo1000_mStop300_mCh285_mChi280_dil'] = gluino13TeV_NLONLL[1000] 
+xsec['T5ttttDeg_mGo1300_mStop300_mCh285_mChi280_dil'] = gluino13TeV_NLONLL[1300]
 
 #https://twiki.cern.ch/twiki/bin/view/LHCPhysics/SUSYCrossSections13TeVsquarkantisquark
 xsec["T6qqWW_Sq_950_LSP_300_Chi_350"] = 0.0898112
@@ -124,6 +135,7 @@ xsec["/DYJetsToLL_M-50_HT-100to200_Tune4C_13TeV-madgraph-tauola/Phys14DR-PU20bx2
 xsec["/DYJetsToLL_M-50_HT-200to400_Tune4C_13TeV-madgraph-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/AODSIM"] =  52.24*1.27 
 xsec["/DYJetsToLL_M-50_HT-400to600_Tune4C_13TeV-madgraph-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/AODSIM"] =  6.546*1.27 
 xsec["/DYJetsToLL_M-50_HT-600toInf_Tune4C_13TeV-madgraph-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/AODSIM"] =  2.179*1.27 
+xsec['/QCD_HT_100To250_13TeV-madgraph/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'] =  28730000.  
 xsec['/QCD_HT_250To500_13TeV-madgraph/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'] =  670500.  
 xsec['/QCD_HT_500To1000_13TeV-madgraph/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'] =  26740.
 xsec['/QCD_HT_1000ToInf_13TeV-madgraph/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'] =  769.7 

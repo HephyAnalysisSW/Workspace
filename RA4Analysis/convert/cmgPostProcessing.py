@@ -167,7 +167,7 @@ for isample, sample in enumerate(allSamples):
     
     for i in range(nEvents):
       if (i%10000 == 0) and i>0 :
-        print i,"/",nEvents
+        print i,"/",nEvents , chunk['name']
       s.init()
       r.init()
       t.GetEntry(i)
