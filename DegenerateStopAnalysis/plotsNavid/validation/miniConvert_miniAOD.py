@@ -9,14 +9,22 @@ import os
 rootFilesIn= lambda dir : [dir+fn for fn in os.listdir(dir) if any([fn.endswith(ext) for ext in ['.root'] ])];
 
 #Select item in stepDict
-step=0 
-doStuff = 0
+step=2
+doStuff = 1
+prefix="vtx"
+#nEvents -1 for all events
+nEvents=10000
 outputDir="./"
 
 
 stepDict=[
         #{'name':'test',               'filelist': rootFilesIn("/data/nrad/T2DegStop13TeV/GEN/t2degen1step/")  },
-        {'name':'stop',               'filelist': ['root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/nrad/T2DegStop2j_300_270_GENSIM/T2DegStop2j_300_270_MINIAOD/a279b5108ada7c3c0926210c2a95f22e/T2DegStop2j_300_270_miniAOD_2_1_yQN.root'] },
+        #{'name':'stop',               'filelist': ['root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/nrad/T2DegStop2j_300_270_GENSIM/T2DegStop2j_300_270_MINIAOD/a279b5108ada7c3c0926210c2a95f22e/T2DegStop2j_300_270_miniAOD_2_1_yQN.root'] },
+        #{'name':'WJets',              'filelist': ['root://xrootd.unl.edu//store/mc/Phys14DR/WJetsToLNu_13TeV-madgraph-pythia8-tauola/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/02215B44-2D70-E411-90A3-0025905A60B8.root']},
+        {'name':'stop',               'filelist': ['/data/nrad/T2DegStop13TeV/T2DegStop2j_sample_miniAOD.root']},
+        {'name':'WJets',              'filelist': ['../WJetsToLNu_13TeV_Phys14_miniAOD.root']},
+        {'name':'TT',                 'filelist': ['../TT_13TeV_Phys14PU40bx25_miniAOD.root']},
+
         #{'name':'test',               'filelist': ['root://xrootd.unl.edu//store/mc/Phys14DR/ADDmonoPhoton_MD-3_d-3_Tune4C_13TeV-pythia8/MINIAODSIM/AVE30BX50_tsg_PHYS14_ST_V1-v1/30000/38E6C54E-EF88-E411-A646-E0CB4E29C4DB.root']  },
         #{'name':'MG_GEN_qcut50',     'filelist': ["/data/nrad/T2DegStop13TeV/GEN/T2DegStop2j_300_270_GEN.root",] },
         #{'name':'MG_GEN_qcut44',     'filelist': ["/data/nrad/T2DegStop13TeV/GEN/T2DegStop_300_270_GEN_qcut44.root",] },
@@ -44,6 +52,7 @@ varList= [
 lepVarList= [
                { 'dataType' : ('Int_t','I')  , 'vars': (
                    {'varName':'pdgId', 'varFunc': lambda ev: ev.pdgId()},
+                   {'varName':'isLoose',  'varFunc': lambda ev: int(ev.isLooseMuon()) if abs(ev.pdgId()) == 13 else -11},  
                                                        )    
                } ,
                { 'dataType' : ('Float_t','F'), 'vars': (
@@ -55,9 +64,26 @@ lepVarList= [
                   {'varName':'trackIso',            'varFunc': lambda ev: ev.trackIso()         },      
                   {'varName':'neutralHadronIso',    'varFunc': lambda ev: ev.neutralHadronIso() },  
                   {'varName':'chargedHadronIso',    'varFunc': lambda ev: ev.chargedHadronIso() },  
-                  {'varName':'numberOfMothers',     'varFunc': lambda ev: ev.numberOfMothers()  },  
                   {'varName':'mass',                'varFunc': lambda ev: ev.mass()             },    
                   {'varName':'energy',              'varFunc': lambda ev: ev.energy()           },  
+
+                  {'varName':'vtx_x',              'varFunc': lambda ev: ev.vertex().x()           },  
+                  {'varName':'vtx_y',              'varFunc': lambda ev: ev.vertex().y()           },  
+                  {'varName':'vtx_z',              'varFunc': lambda ev: ev.vertex().z()           },  
+
+
+                  {'varName':'track_dxy',       'varFunc': lambda ev: ev.track().dxy() if ev.track().isNonnull() else -100                },  
+                  {'varName':'track_dxy_vtx',       'varFunc': lambda ev: ev.track().dxy(ev.vertex()) if ev.track().isNonnull() else -100     },  
+                  {'varName':'innerTrack_dxy',  'varFunc': lambda ev: ev.innerTrack().dxy() if ev.track().isNonnull() else -100           },  
+                  {'varName':'innerTrack_dxy_vtx',  'varFunc': lambda ev: ev.innerTrack().dxy(ev.vertex()) if ev.track().isNonnull() else -100},  
+
+                  {'varName':'track_dz',       'varFunc': lambda ev: ev.track().dz() if ev.track().isNonnull() else -100                },  
+                  {'varName':'track_dz_vtx',       'varFunc': lambda ev: ev.track().dz(ev.vertex()) if ev.track().isNonnull() else -100     },  
+                  {'varName':'innerTrack_dz',  'varFunc': lambda ev: ev.innerTrack().dz() if ev.track().isNonnull() else -100           },  
+                  {'varName':'innerTrack_dz_vtx',  'varFunc': lambda ev: ev.innerTrack().dz(ev.vertex()) if ev.track().isNonnull() else -100},  
+
+                  
+
                                                        ) 
                }
          ]
@@ -84,8 +110,60 @@ genVarList= [
                }
          ]
 
+
+
+
+
+vtxVarList= [
+               { 'dataType' : ('Int_t','I')  , 'vars': (
+  
+                   {'varName':'isGood',     'varFunc': lambda vtx: int(testGoodVertex(vtx))               },
+                   {'varName':'isFake',     'varFunc': lambda vtx: int(vtx.isFake())               },
+                   {'varName':'ndof',       'varFunc': lambda vtx: int(vtx.ndof())                 },
+                                                       )    
+               } ,
+               { 'dataType' : ('Float_t','F'), 'vars': (
+                  {'varName':'x',          'varFunc': lambda vtx: vtx.x()                     },
+                  {'varName':'y',          'varFunc': lambda vtx: vtx.y()                     },
+                  {'varName':'z',          'varFunc': lambda vtx: vtx.z()                     },
+                  {'varName':'rho',        'varFunc': lambda vtx: vtx.position().Rho()        },
+                                                       ) 
+               }
+         ]
+
+
+
+bsVarList= [
+               { 'dataType' : ('Int_t','I')  , 'vars': (
+                   {'varName':'type',     'varFunc': lambda vtx: int(vtx.type())               },
+                                                       )    
+               } ,
+               { 'dataType' : ('Float_t','F'), 'vars': (
+                  {'varName':'x',          'varFunc': lambda bs: bs.position().x()                     },
+                  {'varName':'y',          'varFunc': lambda bs: bs.position().y()                     },
+                  {'varName':'z',          'varFunc': lambda bs: bs.position().z()                     },
+                  {'varName':'rho',        'varFunc': lambda bs: bs.position().Rho()        },
+                                                       ) 
+               }
+         ]
+
+
+
+def testGoodVertex(vertex):
+    if vertex.isFake():
+        return False
+    if vertex.ndof()<=4:
+        return False
+    if abs(vertex.z())>24:
+        return False
+    if vertex.position().Rho()>2:
+        return False
+    return True
+
 #Label and Type for Handling
 labelTypeList = [\
+                  {'name':"bs"            , 'type':"<reco::BeamSpot>"              , 'label':"offlineBeamSpot", 'varCount':1       ,'varList': bsVarList },
+                  {'name':"vtx"           , 'type':"vector<reco::Vertex>"           ,'label':"offlineSlimmedPrimaryVertices", 'varCount':100       ,'varList': vtxVarList },
                   {'name':"jet"           , 'type':"vector<pat::Jet> ",               'label':"slimmedJets",   'varCount':100,              'varList': varList },  
                   {'name':"met"           , 'type':"vector<pat::MET> ",               'label':"slimmedMETs",   'varCount':100,              'varList': varList },  
                   {'name':"el"            , 'type':"vector<pat::Electron> ",           'label':"slimmedElectrons",   'varCount':100,     'varList': lepVarList },  
@@ -102,16 +180,23 @@ labelTypeList = [\
 #stepDict[step]['output'] = ROOT.TFile(stepDict[step]['filelist'][0].replace('.root','_miniConvert.root'),'RECREATE')
 
 
-
-events = Events(stepDict[step]['filelist'])
-events.toBegin()
-c = ROOT.TChain('Events')
-for f in stepDict[step]['filelist']:
-  c.Add(f)
+#events = Events(stepDict[step]['filelist'])
+#events.toBegin()
 
 
+trees = {}
+events = {}
+for s in stepDict:
+  events[s['name']] = Events(s['filelist'])  
+  events[s['name']].toBegin()
+  trees[s['name']] = ROOT.TChain('Events')
+  for f in stepDict[step]['filelist']:
+    trees[s['name']].Add(f)
 
 
+c=trees[stepDict[step]['name']]
+evt = events[stepDict[step]['name']]
+evt.toBegin()
 
 
 #################################################################
@@ -119,6 +204,8 @@ for f in stepDict[step]['filelist']:
 
 
 if doStuff:
+
+  print evt._filenames
 
   structString="struct MyStruct{ "
   structString+="Int_t " + ' , '.join(x['name']+'Count' for x in labelTypeList) + ';'
@@ -130,11 +217,12 @@ if doStuff:
   ROOT.gROOT.ProcessLine(structString)
   s = ROOT.MyStruct()
 
-  nEvents=c.GetEntries()
-  nEvents=500
+  if nEvents==-1:
+    nEvents=c.GetEntries()
+
   nVerbose=int(nEvents/100)
 
-  stepDict[step]['output'] = ROOT.TFile(outputDir + stepDict[step]['name'] + '_miniConvert.root','RECREATE')
+  stepDict[step]['output'] = ROOT.TFile(outputDir + stepDict[step]['name'] + '%s_miniConvert.root'%prefix,'RECREATE')
   ########
   print 'output: ',stepDict[step]['output']
   print 'total number of events', c.GetEntries()
@@ -164,24 +252,27 @@ if doStuff:
 
   for iEvent in range(nEvents):
 
-    if iEvent%500 == 0: print iEvent
+    if iEvent%100 == 0: print iEvent
     c.GetEntry(iEvent)
-    events.to(iEvent)
+    evt.to(iEvent)
 
     for item in labelTypeList:
       #if iEvent%100 == 0: print name 
       name = item['name']; typ = item['type'];  label = item['label'];  nameCount = name + 'Count'
       gps = Handle(typ)
       lgp = label
-      events.getByLabel(lgp,gps)
+      evt.getByLabel(lgp,gps)
       gps = gps.product()
-      lgp = list(gps)
+      try:
+        lgp = list(gps)
+      except TypeError:
+        lgp=[0]
+        lgp[0]=gps
       setattr(s,nameCount,len(lgp))
       for j in range(len(lgp)):
         for v in item['varList']:
           for vvar in v['vars']:
             varName = name+'_'+vvar['varName']
-            
             #getattr(s, varName)[j] = getattr(lgp[j],vvar)()
             getattr(s, varName)[j] = vvar['varFunc'](lgp[j])
 
@@ -191,20 +282,23 @@ if doStuff:
 
     
 
-def getHandle(iTree,iEvent,iTyp,iLabel):
+def getHandle(iTree,fwEvt,iEvent,iTyp,iLabel):
 
   #events = Events(iTree)
   #events.toBegin()
 
   iTree.GetEntry(iEvent)
-  events.to(iEvent)
+  fwEvt.to(iEvent)
   gps = Handle(iTyp)
   lgp = iLabel
-  events.getByLabel(lgp,gps)
+  fwEvt.getByLabel(lgp,gps)
   gps = gps.product()
-  lgp = list(gps)
 
-  print lgp
-
-  return lgp 
+  try:
+    lgp = list(gps)
+    return lgp
+    print lgp
+  except TypeError:
+    return gps
+  #return gps 
 
