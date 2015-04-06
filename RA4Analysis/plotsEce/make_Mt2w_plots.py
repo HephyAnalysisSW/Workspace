@@ -5,7 +5,8 @@ from math import sqrt, cos, sin, atan2, acos, pi
 from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYieldFromChain
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,varBinName, cmgMTClosestJetMET, cmgMTClosestBJetMET,  cmgMinDPhiJet, cmgMinDPhiBJet , cmgMTTopClosestJetMET , cmgHTOrthMET 
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2_HT400ST150 import *
-from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2_HT400ST150_withDF import *
+#from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2_HT400ST150_withDF import *
+from Workspace.RA4Analysis.cmgTuplesPostProcessed_v1_Phys14V3_HT400ST200 import *
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2_HT400_withDF import *
 from localInfo import username
 
@@ -18,9 +19,9 @@ ROOT.gROOT.Reset()
 
 lepSel = 'hard'
 
-htCut = [500,10000000]
+htCut = [400,10000000]
 #stCut = [250,350]
-metCut = [450,10000000]
+stCut = [200,10000000]
 njetCut = [8,16]
 nbtagCut = 0
 mt2Cut = 0
@@ -28,9 +29,9 @@ jetPtCut = 80
 dfCut =0
 prepresel = 'singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&'
 #presel = prepresel+'mt2w>'+str(mt2Cut)+'&&deltaPhi_Wl>'+str(dfCut)+'&&htJet30j>='+str(htCut[0])+'&&htJet30j<'+str(htCut[1])+'&&st>='+str(stCut[0])+'&&st<'+str(stCut[1])+'&&nJet30>='+str(njetCut[0])+'&&nJet30<'+str(njetCut[1])+'&&nBJetMediumCMVA30=='+str(nbtagCut)
-#presel = prepresel+'deltaPhi_Wl>'+str(dfCut)+'&&Jet_pt[1]>='+str(jetPtCut)+'&&htJet30j>='+str(htCut[0])+'&&htJet30j<'+str(htCut[1])+'&&met>='+str(metCut[0])+'&&met<'+str(metCut[1])+'&&nJet30>='+str(njetCut[0])+'&&nJet30<'+str(njetCut[1])+'&&nBJetMediumCMVA30>='+str(nbtagCut)
-presel = prepresel+'deltaPhi_Wl>'+str(dfCut)+'&&Jet_pt[1]>='+str(jetPtCut)+'&&htJet30j>='+str(htCut[0])+'&&htJet30j<'+str(htCut[1])+'&&st>='+str(metCut[0])+'&&st<'+str(metCut[1])+'&&nJet30>='+str(njetCut[0])+'&&nJet30<'+str(njetCut[1])+'&&nBJetMediumCMVA30=='+str(nbtagCut)
-path = "/afs/hephy.at/user/e/easilar/www/signal_Bkg_taureject/"+"_".join(presel.split('&&')[4:])+"/"   #.replace('&&','_')+"/"
+#presel = prepresel+'deltaPhi_Wl>'+str(dfCut)+'&&Jet_pt[1]>='+str(jetPtCut)+'&&htJet30j>='+str(htCut[0])+'&&htJet30j<'+str(htCut[1])+'&&met>='+str(stCut[0])+'&&met<'+str(stCut[1])+'&&nJet30>='+str(njetCut[0])+'&&nJet30<'+str(njetCut[1])+'&&nBJetMediumCMVA30>='+str(nbtagCut)
+presel = prepresel+'deltaPhi_Wl>'+str(dfCut)+'&&Jet_pt[1]>='+str(jetPtCut)+'&&htJet30j>='+str(htCut[0])+'&&htJet30j<'+str(htCut[1])+'&&st>='+str(stCut[0])+'&&st<'+str(stCut[1])+'&&nJet30>='+str(njetCut[0])+'&&nJet30<'+str(njetCut[1])+'&&nBJetMediumCMVA30=='+str(nbtagCut)
+path = "/afs/hephy.at/user/e/easilar/www/PHYS14v3/"+"_".join(presel.split('&&')[4:])+"/"   #.replace('&&','_')+"/"
 if not os.path.exists(path):
   os.makedirs(path)
 
@@ -49,17 +50,18 @@ signal_samples = [
 ]
 
 plots = [
-  {'var':'mt2w',                        'varname':'mt2w',                   'bin':30,       'lowlimit':50, 'limit':500},\
-# {'var':'st',                          'varname':'st',                     'bin':30,       'lowlimit':0,  'limit':1400},\
-# {'var':'htJet30j',                    'varname':'htJet30j',               'bin':30,       'lowlimit':0,  'limit':2000},\
-# {'var':'nJet30',                      'varname':'nJet30',                 'bin':15,       'lowlimit':0,  'limit':15},\
-# {'var':'nBJetMediumCMVA30',           'varname':'nBJetMediumCMVA30',      'bin':15,       'lowlimit':0,  'limit':15},\
-# {'var':'nTauGood',                    'varname':'nTau',                   'bin':5,       'lowlimit':0,  'limit':5},\
-# {'var':'deltaPhi_Wl',                 'varname':'deltaPhi_Wl',            'bin':30,       'lowlimit':0,  'limit':pi},\
-# {'var':'met',                         'varname':'met',                    'bin':30,       'lowlimit':0,  'limit':1400},\
-# {'var':'leptonPt[0]',                 'varname':'leptonPt[0]',            'bin':100,       'lowlimit':0,  'limit':1000},\
-# {'var':'Jet_pt[0]+Jet_pt[1]',         'varname':'Jet_pt[0]+Jet_pt[1]',    'bin':30,       'lowlimit':0,  'limit':2000},\
-# {'var':'Jet_eta[0]*Jet_eta[1]',       'varname':'Jet_eta[0]*Jet_eta[1]',  'bin':30,       'lowlimit':-8,  'limit':8},\
+  {'var':'mt2w',                       'varname':'mt2w',                   'bin':30,       'lowlimit':50, 'limit':500},\
+ {'var':'st',                          'varname':'st',                     'bin':30,       'lowlimit':0,  'limit':1400},\
+ {'var':'st/htJet30j',                 'varname':'st/ht',                  'bin':30,       'lowlimit':0,  'limit':10},\
+ {'var':'htJet30j',                    'varname':'htJet30j',               'bin':30,       'lowlimit':0,  'limit':2000},\
+ {'var':'nJet30',                      'varname':'nJet30',                 'bin':15,       'lowlimit':0,  'limit':15},\
+ {'var':'nBJetMediumCMVA30',           'varname':'nBJetMediumCMVA30',      'bin':15,       'lowlimit':0,  'limit':15},\
+ {'var':'nTauGood',                    'varname':'nTau',                   'bin':5,       'lowlimit':0,  'limit':5},\
+ {'var':'deltaPhi_Wl',                 'varname':'deltaPhi_Wl',            'bin':30,       'lowlimit':0,  'limit':pi},\
+ {'var':'met',                         'varname':'met',                    'bin':30,       'lowlimit':0,  'limit':1400},\
+ {'var':'leptonPt[0]',                 'varname':'leptonPt[0]',            'bin':100,       'lowlimit':0,  'limit':1000},\
+ {'var':'Jet_pt[0]+Jet_pt[1]',         'varname':'Jet_pt[0]+Jet_pt[1]',    'bin':30,       'lowlimit':0,  'limit':2000},\
+ {'var':'Jet_eta[0]*Jet_eta[1]',       'varname':'Jet_eta[0]*Jet_eta[1]',  'bin':30,       'lowlimit':-8,  'limit':8},\
 ]
 #p = plots[0]
 #print p 
