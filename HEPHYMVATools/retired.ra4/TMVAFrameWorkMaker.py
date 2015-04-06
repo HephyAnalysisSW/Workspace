@@ -3,20 +3,10 @@ import os,sys,pickle
 from math import sqrt, pi
 from localConfig import afsUser, nfsUser, localPlotDir
 
-from Workspace.HEPHYPythonTools.nnAnalysisHelpers import getEList, constructDataset, setupMVAFrameWork
-from Workspace.HEPHYPythonTools.xsec import xsec
-from Workspace.HEPHYPythonTools.xsecSMS import gluino8TeV_NLONLL, gluino14TeV_NLO
+from Workspace.HEPHYPythonTools.mvaHelpers import loadDatasetForTMVA, setupMVAFrameWork
 import copy
 import sys
 
-#RA4
-#from smsHelpers import *
-model="T1tttt"
-mgl = 1300
-mN = 850
-seed=0
-
-overWriteData = True
 overWriteTMVAFrameWork = True
 
 setup={}

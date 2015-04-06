@@ -127,6 +127,7 @@ def getChunks(sample, treeName, maxN=-1):
     
 def getChunksFromNFS(sample, treeName, maxN=-1):
   import os, subprocess, datetime
+  print sample['dir']
   chunks = [{'name':x} for x in os.listdir(sample['dir']) if x.startswith(sample['chunkString']+'_Chunk') or x==sample['name']]
   chunks=chunks[:maxN] if maxN>0 else chunks
   nTotEvents=0
@@ -151,7 +152,8 @@ def getChunksFromNFS(sample, treeName, maxN=-1):
           failedChunks.append(chunks[i])
       else:failedChunks.append(chunks[i])
 #    except: print "Chunk",s,"could not be added"
-  print "Found",len(chunks),"chunks for sample",sample["name"],'with a total of',nTotEvents,"events. Failed for:",",".join([c['name'] for c in failedChunks]),"(",round(100*len(failedChunks)/float(len(chunks)),1),")%"
+  print "Found",len(chunks),"chunks for sample",sample["name"],'with a total of',nTotEvents,
+  if len(chunks) > 0: print "events. Failed for:",",".join([c['name'] for c in failedChunks]),"(",round(100*len(failedChunks)/float(len(chunks)),1),")%"
   return chunks, nTotEvents
 
 def getChunksFromDPM(sample, fromDPM=False, maxN=-1):
@@ -270,6 +272,13 @@ def getPlotFromChain(c, var, binning, cutString = "(1)", weight = "weight", binn
     res.SetBinContent(1 , res.GetBinContent(0) + res.GetBinContent(1))
     res.SetBinError(1 , sqrt(res.GetBinError(0)**2 + res.GetBinError(1)**2))
   return res
+
+def getEList(chain, cut, newname='eListTMP'):
+  chain.Draw('>>eListTMP_t', cut)
+  elistTMP_t = ROOT.gROOT.Get('eListTMP_t')
+  elistTMP = elistTMP_t.Clone(newname)
+  del elistTMP_t
+  return elistTMP
 
 def deltaPhi(phi1, phi2):
   dphi = phi2-phi1
