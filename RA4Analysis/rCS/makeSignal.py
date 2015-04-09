@@ -2,7 +2,7 @@ import ROOT
 import os,sys
 from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYieldFromChain
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,varBinName,varBin
-from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2_HT400ST150_withDF import *
+from Workspace.RA4Analysis.cmgTuplesPostProcessed_v1_Phys14V3_HT400ST200 import *
 from makeTTPrediction import makeTTPrediction
 from makeWPrediction import makeWPrediction
 from localInfo import username
