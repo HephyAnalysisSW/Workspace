@@ -30,20 +30,22 @@ lumi_origin = 4
 #bin_yields1 , bin_yields2 = pickle.load(file('/data/easilar/PHYS14v3/SRfinder/singleLeptonic_SRfinder_pkl'))
 #bin_yields1 , bin_yields2 = pickle.load(file('/data/dhandl/results2015/SRfinder/singleMuonic_SRfinder_Phys14V3_adddPhiJJcut_pkl'))
 #bin_yields1 , bin_yields2 = pickle.load(file('/data/dhandl/results2015/SRfinder/singleMuonic_SRfinder_Phys14V3_pkl'))
-bin_yields1 , bin_yields2 = pickle.load(file('/data/easilar/results2015/SRfinder/singleLeptonic_SRfinder_Phys14V3_pkl'))
+bin_yields1 , bin_yields2 , bin_yields3 = pickle.load(file('/data/easilar/results2015/SRfinder/singleLeptonic_SRfinder_Phys14V3_pkl'))
 
 search_bins = [\
              {'HT': (1250 , -1)   , 'ST': (450,-1) , 'nJet': (8,-1)},\
-             #{'HT': (1250 , -1)   , 'ST': (450,-1) , 'nJet': (6,7)},\
-             #{'HT': (1250 , -1)   , 'ST': (450,-1) , 'nJet': (5,5)},\
+             {'HT': (1250 , -1)   , 'ST': (450,-1) , 'nJet': (6,7)},\
+             {'HT': (1250 , -1)   , 'ST': (450,-1) , 'nJet': (5,5)},\
              ###{'HT': (1250 , -1)   , 'ST': (350,450) , 'nJet': (8,-1)},\
+             {'HT': (1250 , -1) , 'ST': (450,-1) , 'nJet': (5,5)},\
              #{'HT': (1000 , 1250) , 'ST': (450,-1) , 'nJet': (5,5)},\
-             #{'HT': (1000 , 1250) , 'ST': (450,-1) , 'nJet': (6,7)},\
+             {'HT': (1000 , 1250) , 'ST': (450,-1) , 'nJet': (6,7)},\
              ##{'HT': (1000 , 1250) , 'ST': (450,-1) , 'nJet': (8,-1)},\
-            {'HT': (750 , 1000) , 'ST': (450,-1) , 'nJet': (8,-1)},\
-            {'HT': (750 , 1000) , 'ST': (450,-1) , 'nJet': (6,7)},\
-            {'HT': (500 , 750) , 'ST': (450,-1) , 'nJet': (6,7)},\
-            {'HT': (500 , 750) , 'ST': (350,450) , 'nJet': (6,7)},\
+            #{'HT': (750 , 1000) , 'ST': (450,-1) , 'nJet': (8,-1)},\
+            #{'HT': (750 , 1000) , 'ST': (250,350) , 'nJet': (8,-1)},\
+            #{'HT': (750 , 1000) , 'ST': (450,-1) , 'nJet': (6,7)},\
+            #{'HT': (500 , 750) , 'ST': (450,-1) , 'nJet': (6,7)},\
+            #{'HT': (500 , 750) , 'ST': (350,450) , 'nJet': (6,7)},\
              ##{'HT': (750 , 1000) , 'ST': (350,450) , 'nJet': (8,-1)},\
             ]
 
@@ -54,8 +56,9 @@ print found_bin
 signals = [
           {'name': 'S1500' ,'label': 'T5q^{4} 1.5_0.8_0.1'}, \
           {'name': 'S1200' ,'label': 'T5q^{4} 1.2_1.0_0.8'}, \
+          {'name': 'S1000' ,'label': 'T5q^{4} 1.0_0.8_0.7'}, \
          ]
-signal = signals[1]
+signal = signals[0]
 print signal
 tot_b_Y = sum(bin['B'] for bin in found_bin)
 tot_s_Y = sum(bin[signal['name']] for bin in found_bin)
@@ -125,7 +128,7 @@ g_limit.SetLineWidth(2)
 g_limit.SetMarkerSize(1.5)
 g_limit.GetXaxis().SetTitle("Lumi fb^{-1}")
 g_limit.GetYaxis().SetTitle("#sigma")
-g_limit.GetYaxis().SetRangeUser(0,5)
+g_limit.GetYaxis().SetRangeUser(0,6)
 g_limit.Draw("AC*")
 leg.AddEntry(g_limit,signal['label'] ,"l")
 #leg.AddEntry(g_limit, "T5q^{4} 1.5_0.8_0.1" ,"l")
