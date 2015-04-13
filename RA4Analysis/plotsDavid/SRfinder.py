@@ -37,9 +37,13 @@ cBkg.SetAlias('dPhiJJ',dPhiJJStr)
 cS1200.SetAlias('dPhiJJ',dPhiJJStr)
 cS1500.SetAlias('dPhiJJ',dPhiJJStr)
 
-prefix = 'singleMuonic_SRfinder_adddPhiJJcut'
-presel = "singleMuonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&deltaPhi_Wl>1.0"
-path = '/data/'+username+'/results2015/SRfinder/'
+#flag = "singleMuonic"
+flag = "singleLeptonic"
+
+#prefix = flag+"_SRfinder_adddPhiJJcut"
+prefix = flag+"_SRfinder"
+presel = flag+"&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&deltaPhi_Wl>1.0"
+path = '/data/'+username+'/PHYS14v3/SRfinder/'
 if not os.path.exists(path):
   os.makedirs(path)
 
@@ -47,8 +51,8 @@ streg = [[(200,-1), 1.], [(250, -1), 1.], [(350, -1), 1.], [(450, -1), 1.], [(20
 htreg = [(400,-1), (500,-1), (750,-1), (1000,-1), (1250,-1), (500,750), (750,1000), (1000,1250)]
 njreg = [(5,5),(6,-1),(8,-1)]
 btreg = (0,0) 
-addCut = ['dPhiJJ<2.0','dPhiJJ<1.5']
-
+#addCut = ['dPhiJJ<2.0','dPhiJJ<1.5']
+addCut = ['']
 bestS1200 = []
 bestS1500 = []
 SR = []
@@ -92,7 +96,7 @@ bestS1500=filter(lambda x:not x['FOM1500']=='nan', bestS1500)
 
 pickle.dump((bestS1200,bestS1500), file(path+prefix+'_pkl','w'))
 
-bestS1200, bestS1500 = pickle.load(file('/data/'+username+'/results2015/SRfinder/'+prefix+'_pkl'))
+bestS1200, bestS1500 = pickle.load(file(path+prefix+'_pkl'))
 
 print "signal yields (T5q^{4} 1.2/1.0/0.8)"
 print

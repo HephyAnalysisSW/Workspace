@@ -4,7 +4,8 @@ import os,sys
 #ROOT.setTDRStyle()
 from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2_HT400_withDF import *
-from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2_HT400ST150_withDF import *
+#from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2_HT400ST150_withDF import *
+from Workspace.RA4Analysis.cmgTuplesPostProcessed_v1_Phys14V3_HT400ST200 import *
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,varBinName
 from math import pi, sqrt
 small = False
@@ -17,7 +18,7 @@ cTTJets = getChain(ttJets[lepSel],histname='',maxN=maxN)
 
 from localInfo import username
 uDir = username[0]+'/'+username
-subDir = 'pngCMG2/rCS/singleLeptonic_extendedSR_MET-ST'
+subDir = 'PHYS14v3/rCS/singleLeptonic'
 
 path = '/afs/hephy.at/user/'+uDir+'/www/'+subDir+'/'
 if not os.path.exists(path):
