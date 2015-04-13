@@ -37,25 +37,15 @@ cBkg.SetAlias('dPhiJJ',dPhiJJStr)
 cS1200.SetAlias('dPhiJJ',dPhiJJStr)
 cS1500.SetAlias('dPhiJJ',dPhiJJStr)
 
-<<<<<<< HEAD
-#flag = "singleMuonic"
-flag = "singleLeptonic"
-
-#prefix = flag+"_SRfinder_adddPhiJJcut"
-prefix = flag+"_SRfinder"
-presel = flag+"&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&deltaPhi_Wl>1.0"
-path = '/data/'+username+'/PHYS14v3/SRfinder/'
-=======
 prefix = 'singleMuonic_SRfinder_Phys14V3'
 presel = "singleMuonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&deltaPhi_Wl>1.0"
 path = '/data/'+username+'/results2015/SRfinder/'
->>>>>>> 6e0b816e278ca0693193cc48ab69d36593553b89
 if not os.path.exists(path):
   os.makedirs(path)
 
-streg = [[(200,-1), 1.], [(250, -1), 1.], [(350, -1), 1.], [(450, -1), 1.], [(200,250), 1.], [(250, 350), 1.], [(350, 450), 1.]]
-htreg = [(400,-1), (500,-1), (750,-1), (1000,-1), (1250,-1), (500,750), (750,1000), (1000,1250)]
-njreg = [(5,5),(6,7),(6,-1),(8,-1)]
+streg = [[(250, 350), 1.], [(350, 450), 1.]]
+htreg = [(500,750), (750,1000), (1000,1250)]
+njreg = [(5,5),(6,7),(8,-1)]
 btreg = (0,0) 
 addCut = ['dPhiJJ<2.0','dPhiJJ<1.5']
 
@@ -67,19 +57,19 @@ for i_htb, htb in enumerate(htreg):
     for srNJet in njreg:
       #for add in addCut:
 
-      #name, cut = nameAndCut(stb, htb, srNJet, btb=btreg, presel=presel+'&&'+add, btagVar = 'nBJetMediumCMVA30')
-      name, cut = nameAndCut(stb, htb, srNJet, btb=btreg, presel=presel, btagVar = 'nBJetMediumCMVA30')
-      print 'HT: ',htb,'|ST: ',stb,'|nJets: ',srNJet#, '|additional: ',add
-      B = getYieldFromChain(cBkg, cut, weight = "weight")
-      B_Var = getYieldFromChain(cBkg, cut, weight = "weight*weight")
-      S1200 = getYieldFromChain(cS1200, cut, weight = "weight")
-      S1200_Var = getYieldFromChain(cS1200, cut, weight = "weight*weight")
-      S1500 = getYieldFromChain(cS1500, cut, weight = "weight")
-      S1500_Var = getYieldFromChain(cS1500, cut, weight = "weight*weight")
-      FOM1200 = getFOM(S1200,S1200_Var, B, B_Var)
-      FOM1500 = getFOM(S1500,S1500_Var, B, B_Var)
+        #name, cut = nameAndCut(stb, htb, srNJet, btb=btreg, presel=presel+'&&'+add, btagVar = 'nBJetMediumCMVA30')
+        name, cut = nameAndCut(stb, htb, srNJet, btb=btreg, presel=presel, btagVar = 'nBJetMediumCMVA30')
+        print 'HT: ',htb,'|ST: ',stb,'|nJets: ',srNJet#, '|additional: ',add
+        B = getYieldFromChain(cBkg, cut, weight = "weight")
+        B_Var = getYieldFromChain(cBkg, cut, weight = "weight*weight")
+        S1200 = getYieldFromChain(cS1200, cut, weight = "weight")
+        S1200_Var = getYieldFromChain(cS1200, cut, weight = "weight*weight")
+        S1500 = getYieldFromChain(cS1500, cut, weight = "weight")
+        S1500_Var = getYieldFromChain(cS1500, cut, weight = "weight*weight")
+        FOM1200 = getFOM(S1200,S1200_Var, B, B_Var)
+        FOM1500 = getFOM(S1500,S1500_Var, B, B_Var)
 
-      SR.append({'FOM1200':FOM1200, 'FOM1500':FOM1500, 'S1200':S1200, 'S1200_Var':S1200_Var, 'S1500':S1500, 'S1500_Var':S1500_Var, 'B':B, 'B_Var':B_Var, 'ST':stb, 'HT':htb, 'nJet':srNJet})#, 'additional':add})
+        SR.append({'FOM1200':FOM1200, 'FOM1500':FOM1500, 'S1200':S1200, 'S1200_Var':S1200_Var, 'S1500':S1500, 'S1500_Var':S1500_Var, 'B':B, 'B_Var':B_Var, 'ST':stb, 'HT':htb, 'nJet':srNJet})#, 'additional':add})
 
 #htBins = list(set([s['HT'] for s in SR]))
 #stBins = list(set([s['ST'] for s in SR]))
@@ -103,7 +93,7 @@ bestS1500=filter(lambda x:not x['FOM1500']=='nan', bestS1500)
 
 pickle.dump((bestS1200,bestS1500), file(path+prefix+'_pkl','w'))
 
-bestS1200, bestS1500 = pickle.load(file(path+prefix+'_pkl'))
+bestS1200, bestS1500 = pickle.load(file('/data/'+username+'/results2015/SRfinder/'+prefix+'_pkl'))
 
 print "signal yields (T5q^{4} 1.2/1.0/0.8)"
 print

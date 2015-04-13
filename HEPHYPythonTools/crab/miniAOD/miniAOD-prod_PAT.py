@@ -2,7 +2,7 @@
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: miniAOD-prod -s PAT --eventcontent MINIAODSIM --runUnscheduled --mc --filein /data/schoef/local/Fall14DR73_DYToMuMu_M_20_TuneCUETP8M1_13TeV_pythia8_GEN-SIM-RECO_Flat20to50bx50_MCRUN2_73_V9-v1.root --conditions MCRUN2_73_V9 --no_exec
+# with command line options: miniAOD-prod -s PAT --eventcontent MINIAODSIM --runUnscheduled --mc --filein /data/schoef/local/WJetsToLNu_HT-400to600_Tune4C_13TeV-madgraph-tauola_AODSIM_PU20bx25_PHYS14_25_V1-v1.root --conditions PHYS14_25_V1::All --no_exec
 import FWCore.ParameterSet.Config as cms
 
 process = cms.Process('PAT')
@@ -19,15 +19,13 @@ process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(30)
+    input = cms.untracked.int32(1)
 )
 
 # Input source
 process.source = cms.Source("PoolSource",
     secondaryFileNames = cms.untracked.vstring(),
-
-
-    fileNames = cms.untracked.vstring('root://eoscms.cern.ch//eos/cms/store/mc/Fall14DR73/Single_Pion_gun_13TeV_pythia8/GEN-SIM-RAW-RECO/NoPU_MCRUN2_73_V9-v1/00000/FEE3C6C9-8788-E411-A7D6-0025905B85AA.root')
+    fileNames = cms.untracked.vstring('/data/schoef/local/WJetsToLNu_HT-400to600_Tune4C_13TeV-madgraph-tauola_AODSIM_PU20bx25_PHYS14_25_V1-v1.root')
 )
 
 process.options = cms.untracked.PSet(
@@ -62,7 +60,7 @@ process.MINIAODSIMoutput = cms.OutputModule("PoolOutputModule",
 
 # Other statements
 from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
-process.GlobalTag = GlobalTag(process.GlobalTag, 'MCRUN2_73_V9', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, 'PHYS14_25_V1::All', '')
 
 # Path and EndPath definitions
 process.endjob_step = cms.EndPath(process.endOfProcess)

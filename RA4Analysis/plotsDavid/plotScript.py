@@ -5,10 +5,10 @@ from math import *
 import os, copy, sys
 from array import array
 from Workspace.HEPHYPythonTools.helpers import getVarValue, getChain, deltaPhi, getYieldFromChain
-from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2_HT400_withDF import *
+from Workspace.RA4Analysis.cmgTuplesPostProcessed_v1_Phys14V3_HT400ST200 import *
 from Workspace.RA4Analysis.helpers import *
-from Workspace.RA4Analysis.eventShape import px, pz 
-from getJetHem import missingHT, dPhiMHTMET
+from Workspace.RA4Analysis.eventShape import * 
+from getJetHem import *
 
 lepSel = 'hard'
 dPhiStr = "acos((leptonPt+met*cos(leptonPhi-metPhi))/sqrt(leptonPt**2+met**2+2*met*leptonPt*cos(leptonPhi-metPhi)))"
@@ -53,24 +53,24 @@ for s in allSignals:
   s['chain'].SetAlias('dPhi',dPhiStr)
 
 #defining ht, st and njets for SR
-streg = [(450,-1)]                         
-htreg = [(400,-1)]
-njreg = [(None)]
+streg = [(250,350),(350,450),(450,-1)]                         
+htreg = [(500,750)]#,(750,1000),(1000,1250),(1250,-1)]
+njreg = [(5,5),(6,-1),(6,7),(8,-1)]
 btb = (0,0)
-presel='singleMuonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&deltaPhi_Wl>1.0'
-preprefix = 'singleMuonic_0b_ht400_2J80_dPhi1'
-wwwDir = '/afs/hephy.at/user/d/dhandl/www/pngCMG2/'+lepSel+'/'+preprefix+'/'
+presel='singleMuonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80'
+preprefix = 'singleMuonic_0b_extended_SR'
+wwwDir = '/afs/hephy.at/user/d/dhandl/www/pngCMG2/'+lepSel+'/Phys14V3/'+preprefix+'/'
 
 if not os.path.exists(wwwDir):
   os.makedirs(wwwDir)
 
 #use small to check some changes faster
-small = 1
-#small = 0
+#small = True
+small = 0 
 if small == 1:
-  streg = [(None)]
+  streg = [(200,-1)]
   htreg = [(400,-1)]
-  njreg = [(8,-1)]
+  njreg = [(2,-1)]
   btb   = (0,0)
 
 allVariables = []
@@ -130,6 +130,25 @@ def getStSig(c):
   res = (met+lepton)/sqrt(ht)
   return res
 
+def getFWMT2(c):
+  jets = cmgGetJets(c)
+  rd = foxWolframMoments(jets)
+  return rd['FWMT2']
+
+def getFWMT4(c):
+  jets = cmgGetJets(c)
+  rd = foxWolframMoments(jets)
+  return rd['FWMT4']
+
+def getCirc2D(c):
+  jets = cmgGetJets(c)
+  rd = circularity2D(jets)
+  return rd['c2D']
+
+def getlinCirc2D(c):
+  jets = cmgGetJets(c)
+  rd = circularity2D(jets)
+  return rd['linC2D']
 
 met = {'name':'mymet', 'varString':"met_pt", 'legendName':'#slash{E}_{T}', 'Ytitle':'# of Events / 25GeV', 'binning':[64,0,1600]}
 ht = {'name':'myht', 'varString':"htJet30j", 'legendName':'H_{T}', 'Ytitle':'# of Events / 25GeV', 'binning':[64,0,1600]}
@@ -139,7 +158,7 @@ St = {'name':'myst', 'varString':"st", 'legendName':'S_{T}', 'Ytitle':'# of Even
 nJets = {'name':'mynJets', 'varString':'nJet30', 'legendName':'Jets', 'Ytitle':'# of Events', 'binning':[17,-0.5,16.5]}
 #nBJets = {'name':'mynBJets', 'varString':'nBJetMediumCMVA30', 'legendName':'B Jets', 'Ytitle':'# of Events', 'binning':[17,-0.5,16.5]}
 dPhi = {'name':'mydeltaPhi', 'varFunc':cmgDPhi, 'legendName':'#Delta#Phi(W,l)','binning':[20,0,pi], 'Ytitle':'# of Events'}#, 'binningIsExplicit':True} 
-lMomentum = {'name':'myleptonPt', 'varString':'leptonPt', 'legendName':'p_{T}(l)', 'Ytitle':'# of Events / 5GeV', 'binning':[200,0,1000]}
+lMomentum = {'name':'myleptonPt', 'varString':'leptonPt', 'legendName':'p_{T}(l)', 'Ytitle':'# of Events / 25GeV', 'binning':[40,0,1000]}
 htratio = {'name':'myhtratio', 'varFunc':gethtRatio, 'legendName':'H_{T,ratio}', 'Ytitle':'# of Events', 'binning':[25,0,2.5]}
 jetratio = {'name':'myjetratio', 'varFunc':getJetRatio, 'legendName':'2^{nd}Jet/1^{st}Jet', 'Ytitle':'# of Events', 'binning':[15,0,1.5]}
 mt = {'name':'mymt', 'varFunc':cmgMT, 'legendName':'M_{T}', 'Ytitle':'# of Events / 10GeV', 'binning':[35,0,350]}
@@ -156,7 +175,11 @@ jetMag = {'name':'myjetmag', 'varFunc':getJetMagnitude, 'legendName':'#frac{H_{T
 mht = {'name':'mymht', 'varFunc':missingHT, 'legendName':'#slash{H}_{T}', 'Ytitle':'# of Events / 25GeV', 'binning':[40,0,1000]}
 dphimhtmet = {'name':'mydphimhtmet', 'varFunc':dPhiMHTMET, 'legendName':'#Delta#Phi(#slash{H}_{T},#slash{E}_{T})', 'Ytitle':'# of Events', 'binning':[20,0,pi]}
 stSig = {'name':'mystsig', 'varFunc':getStSig, 'legendName':'#frac{S_{T}}{#sqrt{H_{T}}}', 'Ytitle':'# of Events', 'binning':[40,0,40]}
-
+thrust = {'name':'mythrust', 'varFunc':calcThrust, 'legendName':'Thrust', 'Ytitle':'# of Events ', 'binning':[20,0,1]}
+circ = {'name':'mycirc', 'varFunc':getCirc2D, 'legendName':'Circularity', 'Ytitle':'# of Events ', 'binning':[20,0,1]}
+lincirc = {'name':'mylincirc', 'varFunc':getlinCirc2D, 'legendName':'lin. Circularity', 'Ytitle':'# of Events ', 'binning':[20,0,1]}
+fwmt2 = {'name':'myfwmt2', 'varFunc':getFWMT2, 'legendName':'FWMT2', 'Ytitle':'# of Events ', 'binning':[20,0,1]}
+fwmt4 = {'name':'myfwmt4', 'varFunc':getFWMT4, 'legendName':'FWMT4', 'Ytitle':'# of Events ', 'binning':[20,0,1]}
 
 allVariables.append(met)
 allVariables.append(ht)
@@ -181,8 +204,13 @@ allVariables.append(MTclosestJetMet)
 allVariables.append(dphijetjet)
 allVariables.append(jetMag)
 allVariables.append(mht)
-allVariables.append(dphimhtmet)
+#allVariables.append(dphimhtmet)
 allVariables.append(stSig)
+allVariables.append(thrust)
+allVariables.append(circ)
+allVariables.append(lincirc)
+allVariables.append(fwmt2)
+allVariables.append(fwmt4)
 
 histos = {}
 h_ratio = {}
@@ -288,8 +316,8 @@ for i_htb, htb in enumerate(htreg):
         stack.Draw()
         stack.GetXaxis().SetTitle(var['legendName'])
         stack.GetYaxis().SetTitle(var['Ytitle'])# / '+ str( (var['binning'][2] - var['binning'][1])/var['binning'][0])+'GeV')
-        stack.SetMinimum(10**(-1))
-        #stack.SetMaximum(10)
+        stack.SetMinimum(10**(-2))
+        #stack.SetMaximum(10**(5))
  
         #for extra in extraSamples:
         #  histos[extra['name']][var['name']].SetMarkerStyle(21)

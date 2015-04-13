@@ -7,10 +7,10 @@ from math import *
 import os, copy, sys
 from array import array
 from Workspace.HEPHYPythonTools.helpers import getVarValue, getChain, deltaPhi, getYieldFromChain
-from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2_HT400_withDF import *
+from Workspace.RA4Analysis.cmgTuplesPostProcessed_v1_Phys14V3_HT400ST200 import *
 from Workspace.RA4Analysis.helpers import *
 from Workspace.RA4Analysis.eventShape import px, pz 
-from getJetHem import missingHT, dPhiMHTMET
+from getJetHem import * 
 
 lepSel = 'hard'
 dPhiStr = "acos((leptonPt+met*cos(leptonPhi-metPhi))/sqrt(leptonPt**2+met**2+2*met*leptonPt*cos(leptonPhi-metPhi)))"
@@ -21,7 +21,7 @@ allBkg=[
         #{'name':'DY',        'sample':DY[lepSel],            'weight':'weight'   },
         #{'name':'TTV',       'sample':TTVH[lepSel],          'weight':'weight'   },
         #{'name':'singleTop', 'sample':singleTop[lepSel],     'weight':'weight'   },
-        #{'name':'WJets',     'sample':WJetsHTToLNu[lepSel],  'weight':'weight'   },
+        {'name':'WJets',     'sample':WJetsHTToLNu[lepSel],  'weight':'weight'   },
         {'name':'TTJets',    'sample':ttJets[lepSel],        'weight':'weight'   },
       ]
 
@@ -38,8 +38,8 @@ allSignals=[
             #"SMS_T2tt_2J_mStop500_mLSP325",
             #"SMS_T2tt_2J_mStop650_mLSP325",
             #"SMS_T2tt_2J_mStop850_mLSP100",
-            {'name':'T5q^{4} 1.2/1.0/0.8', 'sample':SMS_T5qqqqWW_Gl1200_Chi1000_LSP800[lepSel], 'weight':'weight', 'color':ROOT.kBlack},
-            #{'name':'T5q^{4} 1.5/0.8/0.1',  'sample':SMS_T5qqqqWW_Gl1500_Chi800_LSP100[lepSel],  'weight':'weight', 'color':ROOT.kMagenta},
+            {'name':'T5qqqq1200-1000-800', 'sample':SMS_T5qqqqWW_Gl1200_Chi1000_LSP800[lepSel], 'weight':'weight', 'color':ROOT.kBlack},
+            {'name':'T5qqqq1500-800-100',  'sample':SMS_T5qqqqWW_Gl1500_Chi800_LSP100[lepSel],  'weight':'weight', 'color':ROOT.kMagenta},
             #"T1ttbbWW_mGo1000_mCh725_mChi715",
             #"T1ttbbWW_mGo1000_mCh725_mChi720",
             #"T1ttbbWW_mGo1300_mCh300_mChi290",
@@ -55,24 +55,24 @@ for s in allSignals:
   s['chain'].SetAlias('dPhi',dPhiStr)
 
 #defining ht, st and njets for SR
-streg = [(450,-1)]                         
-htreg = [(400,-1)]
-njreg = [(None)]
-btb = (0,0)
+streg = [(250,350),(350,450),(450,-1)]
+htreg = [(500,750),(750,1000),(1000,1250),(1250,-1)]
+njreg = [(5,5),(6,-1),(8,-1)]
+btb   = (0,0)
+
 presel='singleMuonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&deltaPhi_Wl>1.0'
-preprefix = 'singleMuonic_0b_ht400_2J80_dPhi1'
-wwwDir = '/afs/hephy.at/user/d/dhandl/www/pngCMG2/'+lepSel+'/'+preprefix+'/'
+preprefix = 'singleMuonic_0b_ht400_st200_dPhi1'
+wwwDir = '/afs/hephy.at/user/d/dhandl/www/pngCMG2/'+lepSel+'/Phys14V3/'+preprefix+'/'
 
 if not os.path.exists(wwwDir):
   os.makedirs(wwwDir)
 
 #use small to check some changes faster
 small = 1
-#small = 0
 if small == 1:
-  streg = [(None)]
+  streg = [(200,-1)]
   htreg = [(400,-1)]
-  njreg = [(8,-1)]
+  njreg = [(2,-1)]
   btb   = (0,0)
 
 allVariables = []
@@ -132,6 +132,21 @@ def getStSig(c):
   res = (met+lepton)/sqrt(ht)
   return res
 
+def getFWMT2(c):
+  jets = cmgGetJets(c)
+  rd = foxWolframMoments(jets)
+  return rd['FWMT2']
+
+def getFWMT4(c):
+  jets = cmgGetJets(c)
+  rd = foxWolframMoments(jets)
+  return rd['FWMT4']
+
+def getCirc2D(c):
+  jets = cmgGetJets(c)
+  rd = circularity2D(jets)
+  return rd['c2D']
+
 met = {'name':'mymet', 'varString':"met_pt", 'legendName':'#slash{E}_{T}', 'Ytitle':'# of Events / 25GeV', 'binning':[64,0,1600]}
 ht = {'name':'myht', 'varString':"htJet30j", 'legendName':'H_{T}', 'Ytitle':'# of Events / 25GeV', 'binning':[64,0,1600]}
 St = {'name':'myst', 'varString':"st", 'legendName':'S_{T}', 'Ytitle':'# of Events / 25GeV', 'binning':[64,0,1600]}
@@ -157,6 +172,10 @@ jetMag = {'name':'myjetmag', 'varFunc':getJetMagnitude, 'legendName':'#frac{H_{T
 mht = {'name':'mymht', 'varFunc':missingHT, 'legendName':'#slash{H}_{T}', 'Ytitle':'# of Events / 25GeV', 'binning':[40,0,1000]}
 dphimhtmet = {'name':'mydphimhtmet', 'varFunc':dPhiMHTMET, 'legendName':'#Delta#Phi(#slash{H}_{T},#slash{E}_{T})', 'Ytitle':'# of Events', 'binning':[20,0,pi]}
 stSig = {'name':'mystsig', 'varFunc':getStSig, 'legendName':'#frac{S_{T}}{#sqrt{H_{T}}}', 'Ytitle':'# of Events', 'binning':[40,0,40]}
+thrust = {'name':'mythrust', 'varFunc':calcThrust, 'legendName':'Thrust', 'Ytitle':'# of Events / 20GeV', 'binning':[20,0,1]}
+circ = {'name':'mycirc', 'varFunc':getCirc2D, 'legendName':'Circularity', 'Ytitle':'# of Events ', 'binning':[20,0,1]}
+fwmt2 = {'name':'myfwmt2', 'varFunc':getFWMT2, 'legendName':'FWMT 2', 'Ytitle':'# of Events ', 'binning':[20,0,1]}
+fwmt4 = {'name':'myfwmt4', 'varFunc':getFWMT4, 'legendName':'FWMT 4', 'Ytitle':'# of Events ', 'binning':[20,0,1]}
 
 allVariables.append(met)
 allVariables.append(ht)
@@ -170,7 +189,7 @@ allVariables.append(lMomentum)
 allVariables.append(htratio)
 allVariables.append(jetratio)
 allVariables.append(mt)
-#allVariables.append(MT2W)
+allVariables.append(MT2W)
 allVariables.append(dphimetjet)
 allVariables.append(leadingJet)
 allVariables.append(secondJet)
@@ -183,6 +202,10 @@ allVariables.append(jetMag)
 allVariables.append(mht)
 allVariables.append(dphimhtmet)
 allVariables.append(stSig)
+allVariables.append(thrust)
+allVariables.append(circ)
+allVariables.append(fwmt2)
+allVariables.append(fwmt4)
 
 histos = {}
 histos2D = {}
@@ -384,7 +407,7 @@ for i_htb, htb in enumerate(htreg):
           for i_var2, var2 in enumerate(allVariables):
             corr2D.SetBinContent(i_var2+1, i_var+1, abs(100*round(histos2D[sample['name']][var['name']+'_vs_'+var2['name']]['corrFac'],3)))
         corr2D.Draw('COLZ TEXT')
-        #corrCanvas.Print(wwwDir+namestr+'_'+sample['name'].root)
-        #corrCanvas.Print(wwwDir+namestr+'_'+sample['name'].png)
-        #corrCanvas.Print(wwwDir+namestr+'_'+sample['name'].pdf)
+        corrCanvas.Print(wwwDir+sample['name']+'_'+nameAndCut(stb, htb, srNJet, btb=btb, presel=presel, btagVar = 'nBJetMediumCMVA30')[0]+'.root')
+        corrCanvas.Print(wwwDir+sample['name']+'_'+nameAndCut(stb, htb, srNJet, btb=btb, presel=presel, btagVar = 'nBJetMediumCMVA30')[0]+'.png')
+        corrCanvas.Print(wwwDir+sample['name']+'_'+nameAndCut(stb, htb, srNJet, btb=btb, presel=presel, btagVar = 'nBJetMediumCMVA30')[0]+'.pdf')
 
