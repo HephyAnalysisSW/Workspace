@@ -19,10 +19,10 @@ ROOT.gROOT.Reset()
 
 lepSel = 'hard'
 
-htCut = [1250,10000000]
+htCut = [500,10000000000]
 #stCut = [250,350]
-stCut = [350,10000000]
-njetCut = [2,16]
+stCut = [250,10000000000]
+njetCut = [2,20]
 nbtagCut = 0
 mt2Cut = 0
 jetPtCut = 80
@@ -47,12 +47,12 @@ bkg_samples = [
 signal_samples = [
 {'cname':'SMS_T5qqqqWW_Gl1200_Chi1000_LSP800','color':ROOT.kBlack  ,'chain':getChain(SMS_T5qqqqWW_Gl1200_Chi1000_LSP800[lepSel],histname='')},\
 {'cname':'SMS_T5qqqqWW_Gl1500_Chi800_LSP100','color':ROOT.kRed    ,'chain':getChain(SMS_T5qqqqWW_Gl1500_Chi800_LSP100[lepSel],histname='')},\
+{'cname':'T5qqqqWW_mGo1000_mCh800_mChi700','color':ROOT.kYellow    ,'chain':getChain(T5qqqqWW_mGo1000_mCh800_mChi700[lepSel],histname='')},\
 ]
 
 plots = [
   {'var':'mt2w',                       'varname':'mt2w',                   'bin':30,       'lowlimit':50, 'limit':500},\
  {'var':'st',                          'varname':'st',                     'bin':30,       'lowlimit':0,  'limit':1400},\
- {'var':'st/htJet30j',                 'varname':'st/ht',                  'bin':30,       'lowlimit':0,  'limit':10},\
  {'var':'htJet30j',                    'varname':'htJet30j',               'bin':30,       'lowlimit':0,  'limit':2000},\
  {'var':'nJet30',                      'varname':'nJet30',                 'bin':15,       'lowlimit':0,  'limit':15},\
  {'var':'nBJetMediumCMVA30',           'varname':'nBJetMediumCMVA30',      'bin':15,       'lowlimit':0,  'limit':15},\
