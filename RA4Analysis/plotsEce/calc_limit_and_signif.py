@@ -142,4 +142,5 @@ latex.DrawLatex(0.55,0.39,"#sigma:"+str(round(sigma,2)))
 #can.SaveAs(path+"significance_"+signal['name']+".root")
 #can.SaveAs(path+"significance_"+signal['name']+".png")
 can.SaveAs(path+option+signal['label'].split('}')[1].replace(' ','_')+"_"+str(len(search_bins))+".png")
+can.SaveAs(path+option+signal['label'].split('}')[1].replace(' ','_')+"_"+str(len(search_bins))+".root")
 
