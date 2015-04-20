@@ -1,4 +1,5 @@
 from DataFormats.FWLite import Events, Handle
+from Workspace.DegenerateStopAnalysis.navidValidationTools import getHandle, calcDeltaR
 #from PhysicsTools.PythonAnalysis import *
 from math import *
 import ROOT
@@ -9,12 +10,196 @@ import os
 rootFilesIn= lambda dir : [dir+fn for fn in os.listdir(dir) if any([fn.endswith(ext) for ext in ['.root'] ])];
 
 #Select item in stepDict
-step=2
-doStuff = 1
-prefix="vtx"
+step=0
+doStuff = 0
+prefix="_vtx_genMatch_IP_wrt_0___"
 #nEvents -1 for all events
 nEvents=10000
 outputDir="./"
+
+
+
+#recM=getHandle(trees['stop'],events['stop'],labelTypeList[5]['type'],labelTypeList[5]['label'],iEvent=517)
+#genP=getHandle(trees['stop'],events['stop'],labelTypeList[6]['type'],labelTypeList[6]['label'],iEvent=517)
+#genMu=[ig for ig in genP if (abs(ig.pdgId())==13 and abs(ig.mother(0).pdgId())==1000006) ]
+#
+#[(ig,jr, calcDeltaR(i.phi(),j.phi(),i.eta(),j.eta())) for (ig,i) in enumerate(genMu) for (jr,j) in enumerate(recM)  ]
+
+
+def isGenMatchedFromSUSY(tree, fwlEvt, iEvt,Mother=1000006):
+  maxDeltaR=0.4
+  pdgId=13
+  p1='mu'
+  p2='genP'
+  recoMu = getHandle(tree, fwlEvt, "vector<pat::Muon>",                "slimmedMuons",         iEvent=iEvt)
+  genP   = getHandle(tree, fwlEvt, "vector<pat::PackedGenParticle>",   "packedGenParticles",   iEvent=iEvt)
+  nRecoMu=len(recoMu)
+  ret = [ 0 for i in range(nRecoMu)]
+  nGenP=len(genP)
+  #genMu=[]
+  #genMu= [ (i,igp) for i,igp in enumerate(genP) if abs(igp.pdgId())==13]
+  #genMuFromStop= [ (i,iGenMu) for (i,iGenMu) in genMu if abs(iGenMu.mother(0).pdgId())==Mother if len(genMu)!=0]
+  #print genMuFromStop
+  #for gMu in range(len(igmfsDict):
+  best_dR=100
+  dRList=[]
+  first=1
+  #print 'n gp', nGenP, ' nRecoMu', nRecoMu
+  if nGenP > 0:
+    for ig,igp in enumerate(genP):
+      if abs(igp.pdgId()) == pdgId and abs(igp.mother(0).pdgId()) == Mother:
+        #print 'genP is Mu', igp
+        if nRecoMu  > 0:
+          dRList=[]
+          for ir,iRecoMu in enumerate(recoMu):
+            #if first:
+            #  ret = [ 0 for i in range(nRecoMu)] 
+            #  first = 0
+            dR = calcDeltaR( igp.phi(), iRecoMu.phi(), igp.eta(), iRecoMu.eta() )
+            if dR < maxDeltaR:
+              dRList.append(dR)
+            else:
+              dRList.append(99999)
+          minDr, iMinDr = min((val, idx) for (idx, val) in enumerate(dRList))
+          if minDr != 99999:
+            ret[iMinDr]=1
+          #print ig, ir
+           #ret.append(match)
+  return ret
+
+
+def isGenMatched(tree, fwlEvt, iEvt):
+  maxDeltaR=0.4
+  pdgId=13
+  p1='mu'
+  p2='genP'
+  recoMu = getHandle(tree, fwlEvt, "vector<pat::Muon>",                "slimmedMuons",         iEvent=iEvt)
+  genP   = getHandle(tree, fwlEvt, "vector<pat::PackedGenParticle>",   "packedGenParticles",   iEvent=iEvt)
+  nRecoMu=len(recoMu)
+  ret = [ 0 for i in range(nRecoMu)]
+  nGenP=len(genP)
+  #genMu=[]
+  #genMu= [ (i,igp) for i,igp in enumerate(genP) if abs(igp.pdgId())==13]
+  #genMuFromStop= [ (i,iGenMu) for (i,iGenMu) in genMu if abs(iGenMu.mother(0).pdgId())==Mother if len(genMu)!=0]
+  #print genMuFromStop
+  #for gMu in range(len(igmfsDict):
+  best_dR=100
+  dRList=[]
+  first=1
+  #print 'n gp', nGenP, ' nRecoMu', nRecoMu
+  if nGenP > 0:
+    for ig,igp in enumerate(genP):
+      if abs(igp.pdgId()) == pdgId:
+        #print 'genP is Mu', igp
+        if nRecoMu  > 0:
+          dRList=[]
+          for ir,iRecoMu in enumerate(recoMu):
+            #if first:
+            #  ret = [ 0 for i in range(nRecoMu)] 
+            #  first = 0
+            dR = calcDeltaR( igp.phi(), iRecoMu.phi(), igp.eta(), iRecoMu.eta() )
+            if dR < maxDeltaR:
+              dRList.append(dR)
+            else:
+              dRList.append(99999)
+          minDr, iMinDr = min((val, idx) for (idx, val) in enumerate(dRList))
+          if minDr != 99999:
+            ret[iMinDr]=1
+          #print ig, ir
+           #ret.append(match)
+  return ret
+
+def testGoodVertex(vertex):
+    if vertex.isFake():
+        return False
+    if vertex.ndof()<=4:
+        return False
+    if abs(vertex.z())>24:
+        return False
+    if vertex.position().Rho()>2:
+        return False
+    return True
+
+def innerTrack_dz_PV(tree, fwlEvt, iEvt):
+  recoMu = getHandle(tree, fwlEvt, "vector<pat::Muon>",            "slimmedMuons",                          iEvent=iEvt)
+  vtx    = getHandle(tree, fwlEvt, "vector<reco::Vertex>",         "offlineSlimmedPrimaryVertices",         iEvent=iEvt)
+  nRecoMu=len(recoMu)
+  ret = [ -1000 for i in range(nRecoMu)]
+  for ir,iRecoMu in enumerate(recoMu):
+    if iRecoMu.innerTrack().isNonnull():
+      if testGoodVertex(vtx[0]):
+        vertex=vtx[0]
+      else: vertex=vtx[1]
+      ret[ir]= iRecoMu.innerTrack().dz( vertex.position() )
+    else: ret[ir]=-1000
+  return ret
+
+def innerTrack_dxy_PV(tree, fwlEvt, iEvt):
+  recoMu = getHandle(tree, fwlEvt, "vector<pat::Muon>",            "slimmedMuons",                          iEvent=iEvt)
+  vtx    = getHandle(tree, fwlEvt, "vector<reco::Vertex>",         "offlineSlimmedPrimaryVertices",         iEvent=iEvt)
+  nRecoMu=len(recoMu)
+  ret = [ -1000 for i in range(nRecoMu)]
+  for ir,iRecoMu in enumerate(recoMu):
+    if iRecoMu.innerTrack().isNonnull():
+      if testGoodVertex(vtx[0]):
+        vertex=vtx[0]
+      else: vertex=vtx[1]
+      ret[ir]= iRecoMu.innerTrack().dxy( vertex.position() )
+    else: ret[ir]=-1000
+  return ret
+
+def innerTrack_dz_BS(tree, fwlEvt, iEvt):
+  recoMu = getHandle(tree, fwlEvt, "vector<pat::Muon>",            "slimmedMuons",                          iEvent=iEvt)
+  bs    = getHandle(tree, fwlEvt, "<reco::BeamSpot>",         "offlineBeamSpot",         iEvent=iEvt)
+  nRecoMu=len(recoMu)
+  ret = [ -1000 for i in range(nRecoMu)]
+  for ir,iRecoMu in enumerate(recoMu):
+    if iRecoMu.innerTrack().isNonnull():
+      ret[ir]= iRecoMu.innerTrack().dz( bs[0].position() )
+    else: ret[ir]=-1000
+  return ret
+
+
+def innerTrack_dxy_BS(tree, fwlEvt, iEvt): 
+  recoMu = getHandle(tree, fwlEvt, "vector<pat::Muon>",            "slimmedMuons",                          iEvent=iEvt)
+  bs    = getHandle(tree, fwlEvt, "<reco::BeamSpot>",         "offlineBeamSpot",         iEvent=iEvt)
+  nRecoMu=len(recoMu)
+  ret = [-1000 for i in range(nRecoMu)]
+  for ir,iRecoMu in enumerate(recoMu):
+    if iRecoMu.innerTrack().isNonnull():
+      ret[ir]= iRecoMu.innerTrack().dxy( bs[0].position() ) 
+    else: ret[ir]=-1000
+  return ret
+
+
+
+
+
+#def innerTrack_dxy_0(tree, fwlEvt, iEvt): 
+#  recoMu = getHandle(tree, fwlEvt, "vector<pat::Muon>",            "slimmedMuons",                          iEvent=iEvt)
+#  bs    = getHandle(tree, fwlEvt, "<reco::BeamSpot>",         "offlineBeamSpot",         iEvent=iEvt)
+#  nRecoMu=len(recoMu)
+#  ret = [-1000 for i in range(nRecoMu)]
+#  for ir,iRecoMu in enumerate(recoMu):
+#    if iRecoMu.innerTrack().isNonnull():
+#      ret[ir]= iRecoMu.innerTrack().dxy(  ) 
+#    else: ret[ir]=-1000
+#  return ret
+#
+#
+#def innerTrack_dz_0(tree, fwlEvt, iEvt): 
+#  recoMu = getHandle(tree, fwlEvt, "vector<pat::Muon>",            "slimmedMuons",                          iEvent=iEvt)
+#  bs    = getHandle(tree, fwlEvt, "<reco::BeamSpot>",         "offlineBeamSpot",         iEvent=iEvt)
+#  nRecoMu=len(recoMu)
+#  ret = [-1000 for i in range(nRecoMu)]
+#  for ir,iRecoMu in enumerate(recoMu):
+#    if iRecoMu.innerTrack().isNonnull():
+#      ret[ir]= iRecoMu.innerTrack().dz( bs[0].position() ) 
+#    else: ret[ir]=-1000
+#  return ret
+
+
+
 
 
 stepDict=[
@@ -51,8 +236,10 @@ varList= [
 
 lepVarList= [
                { 'dataType' : ('Int_t','I')  , 'vars': (
-                   {'varName':'pdgId', 'varFunc': lambda ev: ev.pdgId()},
-                   {'varName':'isLoose',  'varFunc': lambda ev: int(ev.isLooseMuon()) if abs(ev.pdgId()) == 13 else -11},  
+                   {'varName':'pdgId',               'varFunc': lambda ev: ev.pdgId()},
+                   {'varName':'isLoose',             'varFunc': lambda ev: int(ev.isLooseMuon()) if abs(ev.pdgId()) == 13 else -11},  
+                   {'varName':'isGenMatched',        'varCompFunc': isGenMatched    }, 
+                   {'varName':'isGenMatchedSUSY',        'varCompFunc': isGenMatchedFromSUSY    }, 
                                                        )    
                } ,
                { 'dataType' : ('Float_t','F'), 'vars': (
@@ -72,18 +259,25 @@ lepVarList= [
                   {'varName':'vtx_z',              'varFunc': lambda ev: ev.vertex().z()           },  
 
 
-                  {'varName':'track_dxy',       'varFunc': lambda ev: ev.track().dxy() if ev.track().isNonnull() else -100                },  
-                  {'varName':'track_dxy_vtx',       'varFunc': lambda ev: ev.track().dxy(ev.vertex()) if ev.track().isNonnull() else -100     },  
-                  {'varName':'innerTrack_dxy',  'varFunc': lambda ev: ev.innerTrack().dxy() if ev.track().isNonnull() else -100           },  
-                  {'varName':'innerTrack_dxy_vtx',  'varFunc': lambda ev: ev.innerTrack().dxy(ev.vertex()) if ev.track().isNonnull() else -100},  
+                  {'varName':'track_dxy',       'varFunc': lambda ev: ev.track().dxy() if ev.track().isNonnull() else -1000                },  
+                  {'varName':'track_dxy_vtx',       'varFunc': lambda ev: ev.track().dxy(ev.vertex()) if ev.track().isNonnull() else -1000     },  
+                  {'varName':'innerTrack_dxy',  'varFunc': lambda ev: ev.innerTrack().dxy() if ev.track().isNonnull() else -1000           },  
+                  {'varName':'innerTrack_dxy_vtx',  'varFunc': lambda ev: ev.innerTrack().dxy(ev.vertex()) if ev.track().isNonnull() else -1000},  
 
-                  {'varName':'track_dz',       'varFunc': lambda ev: ev.track().dz() if ev.track().isNonnull() else -100                },  
-                  {'varName':'track_dz_vtx',       'varFunc': lambda ev: ev.track().dz(ev.vertex()) if ev.track().isNonnull() else -100     },  
-                  {'varName':'innerTrack_dz',  'varFunc': lambda ev: ev.innerTrack().dz() if ev.track().isNonnull() else -100           },  
-                  {'varName':'innerTrack_dz_vtx',  'varFunc': lambda ev: ev.innerTrack().dz(ev.vertex()) if ev.track().isNonnull() else -100},  
+                  {'varName':'track_dz',       'varFunc': lambda ev: ev.track().dz() if ev.track().isNonnull() else -1000                },  
+                  {'varName':'track_dz_vtx',       'varFunc': lambda ev: ev.track().dz(ev.vertex()) if ev.track().isNonnull() else -1000     },  
+                  {'varName':'innerTrack_dz',  'varFunc': lambda ev: ev.innerTrack().dz() if ev.track().isNonnull() else -1000           },  
+                  {'varName':'innerTrack_dz_vtx',  'varFunc': lambda ev: ev.innerTrack().dz(ev.vertex()) if ev.track().isNonnull() else -1000}, 
 
-                  
+                  {'varName':'innerTrack_dz_PV',  'varCompFunc': innerTrack_dz_PV}, 
+                  {'varName':'innerTrack_dxy_PV',  'varCompFunc': innerTrack_dxy_PV}, 
+                  {'varName':'innerTrack_dz_BS',  'varCompFunc': innerTrack_dz_BS}, 
+                  {'varName':'innerTrack_dxy_BS',  'varCompFunc': innerTrack_dxy_BS}, 
 
+
+                  {'varName':'innerTrack_dxy_0',  'varFunc': lambda ev: ev.innerTrack().dxy(ROOT.Math.XYZPoint(0.0,0.0,0.0)) if ev.track().isNonnull() else -1000 }, 
+                  {'varName':'innerTrack_dz_0',  'varFunc': lambda ev: ev.innerTrack().dz(ROOT.Math.XYZPoint(0.0,0.0,0.0)) if ev.track().isNonnull() else -1000 }, 
+ 
                                                        ) 
                }
          ]
@@ -149,16 +343,6 @@ bsVarList= [
 
 
 
-def testGoodVertex(vertex):
-    if vertex.isFake():
-        return False
-    if vertex.ndof()<=4:
-        return False
-    if abs(vertex.z())>24:
-        return False
-    if vertex.position().Rho()>2:
-        return False
-    return True
 
 #Label and Type for Handling
 labelTypeList = [\
@@ -166,7 +350,7 @@ labelTypeList = [\
                   {'name':"vtx"           , 'type':"vector<reco::Vertex>"           ,'label':"offlineSlimmedPrimaryVertices", 'varCount':100       ,'varList': vtxVarList },
                   {'name':"jet"           , 'type':"vector<pat::Jet> ",               'label':"slimmedJets",   'varCount':100,              'varList': varList },  
                   {'name':"met"           , 'type':"vector<pat::MET> ",               'label':"slimmedMETs",   'varCount':100,              'varList': varList },  
-                  {'name':"el"            , 'type':"vector<pat::Electron> ",           'label':"slimmedElectrons",   'varCount':100,     'varList': lepVarList },  
+                  #{'name':"el"            , 'type':"vector<pat::Electron> ",           'label':"slimmedElectrons",   'varCount':100,     'varList': lepVarList },  
                   {'name':"mu"            , 'type':"vector<pat::Muon> ",               'label':"slimmedMuons",   'varCount':100,             'varList': lepVarList },  
                   {'name':"genP"          ,'type':"vector<pat::PackedGenParticle>"   ,'label':"packedGenParticles", 'varCount':2000       ,'varList': genVarList },
                   #{'name':"ak4Jets",  'type':"vector<reco::GenJet> ",       'label':"ak4GenJets",   'varCount':100,              'varList': varList },  
@@ -259,46 +443,55 @@ if doStuff:
     for item in labelTypeList:
       #if iEvent%100 == 0: print name 
       name = item['name']; typ = item['type'];  label = item['label'];  nameCount = name + 'Count'
-      gps = Handle(typ)
-      lgp = label
-      evt.getByLabel(lgp,gps)
-      gps = gps.product()
-      try:
-        lgp = list(gps)
-      except TypeError:
-        lgp=[0]
-        lgp[0]=gps
+      lgp=getHandle(c,evt,typ,label)
+      #print lgp
+      #gps = Handle(typ)
+      #lgp = label
+      #evt.getByLabel(lgp,gps)
+      #gps = gps.product()
+      #try:
+      #  lgp = list(gps)
+      #except TypeError:
+      #  lgp=[0]
+      #  lgp[0]=gps
       setattr(s,nameCount,len(lgp))
       for j in range(len(lgp)):
         for v in item['varList']:
           for vvar in v['vars']:
             varName = name+'_'+vvar['varName']
-            #getattr(s, varName)[j] = getattr(lgp[j],vvar)()
-            getattr(s, varName)[j] = vvar['varFunc'](lgp[j])
-
+            #getattr(s, varName)[j] = getattr(lgp[j],vvar)()i
+            if vvar.has_key('varFunc'):
+              getattr(s, varName)[j] = vvar['varFunc'](lgp[j])
+            elif vvar.has_key('varCompFunc'):
+              if j==0:
+                #getattr(s,varName)[j] = vvar['varCompFunc'](c,evt,iEvent)[j]
+              
+                outList = vvar['varCompFunc'](c,evt,iEvent)
+                #print j,vvar['varName'], iEvent, outList
+                for jj in range(len(lgp)):
+                  getattr(s,varName)[jj] = outList[jj]
+              else: pass
+  
     treeDict['tree'].Fill()
   stepDict[step]['output'].Write()
   stepDict[step]['output'].Close()
 
     
 
-def getHandle(iTree,fwEvt,iEvent,iTyp,iLabel):
-
-  #events = Events(iTree)
-  #events.toBegin()
-
-  iTree.GetEntry(iEvent)
-  fwEvt.to(iEvent)
-  gps = Handle(iTyp)
-  lgp = iLabel
-  fwEvt.getByLabel(lgp,gps)
-  gps = gps.product()
-
-  try:
-    lgp = list(gps)
-    return lgp
-    print lgp
-  except TypeError:
-    return gps
-  #return gps 
+#def getHandle(iTree,fwEvt,iEvent,iTyp,iLabel):
+#  #events = Events(iTree)
+#  #events.toBegin()
+#  iTree.GetEntry(iEvent)
+#  fwEvt.to(iEvent)
+#  gps = Handle(iTyp)
+#  lgp = iLabel
+#  fwEvt.getByLabel(lgp,gps)
+#  gps = gps.product()
+#  try:
+#    lgp = list(gps)
+#    return lgp
+#    print lgp
+#  except TypeError:
+#    return gps
+#  #return gps 
 

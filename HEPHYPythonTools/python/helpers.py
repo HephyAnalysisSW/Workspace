@@ -258,7 +258,10 @@ def getPlotFromChain(c, var, binning, cutString = "(1)", weight = "weight", binn
     h = ROOT.TH1F('h_tmp', 'h_tmp', len(binning)-1, array('d', binning))
 #    h.SetBins(len(binning), array('d', binning))
   else:
-    h = ROOT.TH1F('h_tmp', 'h_tmp', *binning)
+    if len(binning)==6:
+      h = ROOT.TH2F('h_tmp', 'h_tmp', *binning)
+    else:
+      h = ROOT.TH1F('h_tmp', 'h_tmp', *binning)
   c.Draw(var+">>h_tmp", weight+"*("+cutString+")", 'goff')
   res = h.Clone()
   h.Delete()
