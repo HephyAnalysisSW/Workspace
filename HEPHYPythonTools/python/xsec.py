@@ -110,6 +110,13 @@ xsec['T5qqqqWW_mGo1200_mCh1000_mChi800'] = gluino13TeV_NLONLL[1200]
 xsec['T5qqqqWW_mGo1200_mCh1000_mChi800_cmg'] = gluino13TeV_NLONLL[1200]
 xsec['T5qqqqWW_mGo1200_mCh1000_mChi800_dilep'] = gluino13TeV_NLONLL[1200]
 xsec['T5qqqqWW_mGo1500_mCh800_mChi100'] = gluino13TeV_NLONLL[1500]
+xsec['T5qqqqWWDeg_mGo1000_mCh310_mChi300'] = gluino13TeV_NLONLL[1000]
+xsec['T5qqqqWWDeg_mGo1000_mCh315_mChi300'] = gluino13TeV_NLONLL[1000]
+xsec['T5qqqqWWDeg_mGo1000_mCh325_mChi300'] = gluino13TeV_NLONLL[1000]
+xsec['T5qqqqWWDeg_mGo1400_mCh315_mChi300'] = gluino13TeV_NLONLL[1400]
+xsec['T5qqqqWWDeg_mGo800_mCh305_mChi300'] = gluino13TeV_NLONLL[800]
+
+
 xsec['T5ttttDeg_mGo1000_mStop300_mCh285_mChi280_dil'] = gluino13TeV_NLONLL[1000] 
 xsec['T5ttttDeg_mGo1300_mStop300_mCh285_mChi280_dil'] = gluino13TeV_NLONLL[1300]
 
