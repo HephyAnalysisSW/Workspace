@@ -13,12 +13,15 @@ from Workspace.RA4Analysis.cmgTuplesPostProcessed_softLepton import *
 from Workspace.RA4Analysis.helpers import *
 from Workspace.RA4Analysis.eventShape import * 
 
-binning=[30,0,600]
+binning=[16,0,3.2]
+histMin = 0.08
+histMax = 100
+
 
 #prepresel = 'singleLeptonic==1&&'#&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&'
 #presel = prepresel + 'Jet_pt[1]>80&&nJet30>=2&&nBJetMediumCMVA30==0&&st>=150&&st<=250'#&&htJet30j>500&&htJet30j<750'#&&htJet30j>=500&&st>=200&&deltaPhi_Wl>1&&mt2w>350'
 
-prepresel = 'singleLeptonic==1&&htJet30j>500&&st>250&&nJet30>=4&&nBJetMediumCMVA30==0&&Jet_pt[1]>100&&Jet_pt[2]>60'
+prepresel = 'singleLeptonic==1&&htJet30j>500&&st>250&&nJet30>=4&&nBJetMediumCMVA30==0&&Jet_pt[1]>100&&Jet_pt[2]>80'
 presel = prepresel
 
 
@@ -185,9 +188,10 @@ met = {'name':'mymet', 'varString':"met_pt", 'legendName':'#slash{E}_{T}', 'Ytit
 ht = {'name':'myht', 'varString':"htJet30j", 'legendName':'H_{T}', 'Ytitle':'# of Events / 25GeV', 'binning':[64,0,1600]}
 St = {'name':'myst', 'varString':"st", 'legendName':'S_{T}', 'Ytitle':'# of Events / 25GeV', 'binning':[64,0,1600]}
 nJets = {'name':'mynJets', 'varString':'nJet30', 'legendName':'Jets', 'Ytitle':'# of Events', 'binning':[17,-0.5,16.5]}
+nbJets = {'name':'mynbtaggedJets', 'varString':'nBJetMediumCMVA30', 'legendName':'b-tagged Jets', 'Ytitle':'# of Events', 'binning':[17,-0.5,16.5]}
 Jet_pt_1 = {'name':'myJetPt1', 'varFunc':getLeadingJet, 'legendName': 'leading Jet p_{T}', 'Ytitle':'# of Events', 'binning':[20,0,1000]}
 Jet_pt_2 = {'name':'myJetPt2', 'varFunc':getNLJet, 'legendName': 'next-to-leading Jet p_{T}', 'Ytitle':'# of Events', 'binning':[20,0,1000]}
-deltaPhi = {'name':'mydeltaPhi', 'varString':'deltaPhi_Wl', 'legendName':'#Delta #Phi', 'Ytitle':'# of Events', 'binning':[16,0,3.2]}
+deltaPhi = {'name':'mydeltaPhi', 'varString':'deltaPhi_Wl', 'legendName':'#Delta #Phi (W,l)', 'Ytitle':'# of Events', 'binning':[16,0,3.2]}
 
 allVariables = []
 #jets = cmgGetJets(c)
@@ -197,12 +201,20 @@ allVariables.append(minDPhiMetJetthree)
 
 cutVar = noAdCut
 adCut = 0.
-varNew = MT2W
+varNew = deltaPhi
 
-h_Stack = ROOT.THStack('h_Stack',varstring)
-h_Stack_S = ROOT.THStack('h_Stack_S',varstring)
 
-can1 = ROOT.TCanvas(varstring,varstring,800,600)
+stReg=[(250,350),(350,450),(450,-1)]#250),(250,350),(350,450),(450,-1)]
+htReg=[(500,750),(750,1000),(1000,1250),(1250,-1)]#750),(750,1000),(1000,1250),(1250,-1)]
+jetReg = [(4,-1),(6,-1),(8,-1)]
+btb = (0,0)
+
+#presel = prepresel + ht['varstring'] + ">=" + str(bins[0]) + ht['varstring'] + '<' + str(bins[1])
+
+#h_Stack = ROOT.THStack('h_Stack',signalString)
+#h_Stack_S = ROOT.THStack('h_Stack_S',signalString)
+
+can1 = ROOT.TCanvas(signalString,signalString,800,600)
 
 h1=ROOT.TH1F("MCDataCombined","MCDataCombined", *binning)
 h3=ROOT.TH1F("MCDataCombined","MCDataCombined", *binning)
@@ -212,190 +224,199 @@ l.SetFillColor(0)
 l.SetShadowColor(ROOT.kWhite)
 l.SetBorderSize(1)
 
-for sample in bkgSamples:
-  chain = sample["chain"]
-  print chain
-  histo = 'h_'+sample["name"]
-  histoname = histo
-  print histoname
-  histo = ROOT.TH1F(str(histo) ,str(histo),*binning)
-  print histo
-  color = sample["color"]
-  print color
-  
-  chain.Draw('>>eList',presel)#insert 'weight*('+
-  elist = ROOT.gDirectory.Get("eList")
-  number_events = elist.GetN()
-  print "Looping over " + str(number_events) + " events"
-  #Event Loop starts here
-  first = True
-  for i in range(number_events):
-    if i>0 and (i%10000)==0:
-      print "Filled ",i
-    sample['chain'].GetEntry(elist.GetEntry(i))
-    if sample["weight"]=="weight":
-      thisweight=getVarValue(sample["chain"],"weight")
-    else:
-      thisweight=sample["weight"]
-    if first:
-      print 'Weight: ',thisweight
-      first = False
-    #varvalue = getVarValue(sample['chain'],varstring)
-    varvalue = getVarValue(sample["chain"], varNew['varString']) if varNew.has_key('varString') else varNew['varFunc'](sample["chain"])
-    #varvalue = varNew['varFunc'](sample['chain'])
-    adValueToCut = getVarValue(sample["chain"], cutVar['varString']) if cutVar.has_key('varString') else cutVar['varFunc'](sample["chain"])
-    if adValueToCut > adCut:
-      histo.Fill(varvalue,thisweight)
-
-  histo.SetLineColor(ROOT.kBlack)
-  histo.SetLineWidth(1)
-  histo.SetMarkerSize(0)
-  histo.SetMarkerStyle(0)
-  histo.SetTitleSize(20)
-  histo.GetXaxis().SetTitle(varNew['legendName'])
-  histo.GetYaxis().SetTitle("Events / "+str( (binning[2] - binning[1])/binning[0])+" GeV")
-  histo.GetXaxis().SetLabelSize(0.04)
-  histo.GetYaxis().SetLabelSize(0.04)
-  histo.GetYaxis().SetTitleOffset(0.8)
-  histo.GetYaxis().SetTitleSize(0.05)
-  histo.SetFillColor(sample["color"])
-  histo.SetFillStyle(1001)
-  histo.SetMinimum(.8)
-  h_Stack.Add(histo)
-  h1.Add(histo)
-  l.AddEntry(histo, sample["name"])
-
-for sample in sigSamples:
-  chain = sample["chain"]
-  print chain
-  histo = 'h_'+sample["name"]
-  histoname = histo
-  print histoname
-  histo = ROOT.TH1F(str(histo) ,str(histo),*binning)
-  print histo
-  color = sample["color"]
-  print color
-
-  chain.Draw('>>eList',presel)#insert 'weight*('+
-  elist = ROOT.gDirectory.Get("eList")
-  number_events = elist.GetN()
-  print "Looping over " + str(number_events) + " events"
-  #Event Loop starts here
-  first = True
-  for i in range(number_events):
-    if i>0 and (i%1000)==0:
-      print "Filled ",i
-    sample['chain'].GetEntry(elist.GetEntry(i))
-    if sample["weight"]=="weight":
-      thisweight=getVarValue(sample["chain"],"weight")
-    else:
-      thisweight=sample["weight"]
-    if first:
-      print 'Weight: ',thisweight
-      first = False
-    #varvalue = getVarValue(sample['chain'],varstring)
-    varvalue = getVarValue(sample["chain"], varNew['varString']) if varNew.has_key('varString') else varNew['varFunc'](sample["chain"])
-    #varvalue = varNew['varFunc'](sample['chain'])
-    adValueToCut = getVarValue(sample["chain"], cutVar['varString']) if cutVar.has_key('varString') else cutVar['varFunc'](sample["chain"])
-    if adValueToCut > adCut:
-      histo.Fill(varvalue,thisweight)
-  histo.SetLineColor(color)
-  histo.SetLineWidth(2)
-  histo.SetMarkerSize(0)
-  histo.SetMarkerStyle(0)
-  histo.SetTitleSize(20)
-  histo.GetXaxis().SetTitle(varNew['legendName'])
-  histo.GetXaxis().SetLabelSize(0.04)
-  histo.GetXaxis().SetTitleOffset(0.3)
-  histo.GetXaxis().SetTitleSize(0.06)
-  histo.GetYaxis().SetTitle("Events")
-  histo.GetYaxis().SetLabelSize(0.04)
-  histo.GetYaxis().SetTitleOffset(0.3)
-  histo.GetYaxis().SetTitleSize(0.06)
-  histo.SetFillColor(0)
-  histo.SetMinimum(.8)
-  h_Stack_S.Add(histo)
-  h3.Add(histo)
-  l.AddEntry(histo, sample["name"])
-  #signalString+=sample["name"]
-
-#pad1=ROOT.TPad("pad1","MyTitle",0,0.3,1,1.0)
-#pad1.SetBottomMargin(0)
-#pad1.SetLeftMargin(0.1)
-#pad1.SetGrid()
-#pad1.SetLogy()
-#pad1.Draw()
-#pad1.cd()
-
-#when not using pads
-can1.SetGrid()
-can1.SetLogy()
-
-histo.GetXaxis().SetTitle(varNew['legendName'])
-histo.GetXaxis().SetLabelSize(0.04)
-histo.GetXaxis().SetTitleOffset(0.3)
-histo.GetXaxis().SetTitleSize(0.15)
-
-histo.GetYaxis().SetTitle("Events")
-histo.GetYaxis().SetLabelSize(0.04)
-histo.GetYaxis().SetTitleOffset(0.3)
-histo.GetYaxis().SetTitleSize(0.15)
-
-
-
-h_Stack.Draw()
-h_Stack.SetMinimum(0.8)
-h_Stack_S.Draw('noStacksame')
-#h_Stack_S.Draw('noStack')
-h_Stack.GetYaxis().SetTitle("Events") #add _S if no bkg
-h_Stack.GetYaxis().SetLabelSize(0.04)
-h_Stack.GetYaxis().SetTitleOffset(1.1)
-h_Stack.GetYaxis().SetTitleSize(0.04)
-h_Stack.GetXaxis().SetTitle(varNew['legendName'])
-h_Stack.GetXaxis().SetLabelSize(0.04)
-h_Stack.GetXaxis().SetTitleOffset(1.3)
-h_Stack.GetXaxis().SetTitleSize(0.04)
-#h_Stack_S.Draw('noStack')
-l.Draw()
-
-##Draw ratio MC/Data
-#can1.cd()
-#pad2=ROOT.TPad("pad2","pad2",0,0.05,1.,0.3)
-#pad2.SetGrid()
-#pad2.Draw()
-#pad2.cd()
-#pad2.SetTopMargin(0)
-#pad2.SetBottomMargin(0.3)
-#pad2.SetLeftMargin(0.1)
-#
-#h3.Divide(h1)
-#h3.SetMaximum(1.35)
-#h3.SetMinimum(0.)
-#h3.GetXaxis().SetLabelSize(0.10)
-#h3.GetXaxis().SetTitle(varstring)
-#h3.GetXaxis().SetTitleSize(0.15)
-#
-#h3.GetYaxis().SetLabelSize(0.10)
-#h3.GetYaxis().SetTitle("Signal / BG")
-#h3.GetYaxis().SetNdivisions(505)
-#h3.GetYaxis().SetTitleSize(0.15)
-#h3.GetYaxis().SetTitleOffset(0.3)
-#h3.SetLineColor(ROOT.kBlack)
-#h3.Draw("E1P")
-
-#Draw Title
-#can1.cd()
-#pad1.cd()
-#t1=ROOT.TLatex()
-#t1.SetTextFont(22)
-#t1.DrawLatex(150,600,"CMS preliminary")
-#t1.DrawLatex(150,300,"L=19.4 fb^{-1}, #sqrt{s}=8TeV")
-
-can1.Print(plotDir+varNew['name']+'_'+cutVar['name']+'_'+presel+signalString+'.png')
-can1.Print(plotDir+varNew['name']+'_'+cutVar['name']+'_'+presel+signalString+'.pdf')
-can1.Print(plotDir+varNew['name']+'_'+cutVar['name']+'_'+presel+signalString+'.root')
-
-
-
-#can1.SetLogy()
-
+for st in stReg:
+  for ht in htReg:
+    for jet in jetReg:
+      cutname, cut = nameAndCut(st, ht, jet, btb=btb, presel=presel, btagVar = 'nBJetMediumCMVA30')
+      h_Stack = ROOT.THStack('h_Stack',signalString)
+      h_Stack_S = ROOT.THStack('h_Stack_S',signalString)
+      for sample in bkgSamples:
+        chain = sample["chain"]
+        print chain
+        histo = 'h_'+sample["name"]
+        histoname = histo
+        print histoname
+        histo = ROOT.TH1F(str(histo) ,str(histo),*binning)
+        print histo
+        color = sample["color"]
+        print color
+        
+        chain.Draw('>>eList',cut)#insert 'weight*('+
+        elist = ROOT.gDirectory.Get("eList")
+        number_events = elist.GetN()
+        print "Looping over " + str(number_events) + " events"
+        #Event Loop starts here
+        first = True
+        for i in range(number_events):
+          if i>0 and (i%10000)==0:
+            print "Filled ",i
+          sample['chain'].GetEntry(elist.GetEntry(i))
+          if sample["weight"]=="weight":
+            thisweight=getVarValue(sample["chain"],"weight")
+          else:
+            thisweight=sample["weight"]
+          if first:
+            print 'Weight: ',thisweight
+            first = False
+          #varvalue = getVarValue(sample['chain'],varstring)
+          varvalue = getVarValue(sample["chain"], varNew['varString']) if varNew.has_key('varString') else varNew['varFunc'](sample["chain"])
+          #varvalue = varNew['varFunc'](sample['chain'])
+          adValueToCut = getVarValue(sample["chain"], cutVar['varString']) if cutVar.has_key('varString') else cutVar['varFunc'](sample["chain"])
+          if adValueToCut > adCut:
+            histo.Fill(varvalue,thisweight)
+      
+        histo.SetLineColor(ROOT.kBlack)
+        histo.SetLineWidth(1)
+        histo.SetMarkerSize(0)
+        histo.SetMarkerStyle(0)
+        histo.SetTitleSize(20)
+        histo.GetXaxis().SetTitle(varNew['legendName'])
+        histo.GetYaxis().SetTitle("Events / "+str( (binning[2] - binning[1])/binning[0])+" GeV")
+        histo.GetXaxis().SetLabelSize(0.04)
+        histo.GetYaxis().SetLabelSize(0.04)
+        histo.GetYaxis().SetTitleOffset(0.8)
+        histo.GetYaxis().SetTitleSize(0.05)
+        histo.SetFillColor(sample["color"])
+        histo.SetFillStyle(1001)
+        histo.SetMinimum(histMin)
+        histo.SetMaximum(histMax)
+        h_Stack.Add(histo)
+        h1.Add(histo)
+        l.AddEntry(histo, sample["name"])
+      
+      for sample in sigSamples:
+        chain = sample["chain"]
+        print chain
+        histo = 'h_'+sample["name"]
+        histoname = histo
+        print histoname
+        histo = ROOT.TH1F(str(histo) ,str(histo),*binning)
+        print histo
+        color = sample["color"]
+        print color
+      
+        chain.Draw('>>eList',cut)#insert 'weight*('+
+        elist = ROOT.gDirectory.Get("eList")
+        number_events = elist.GetN()
+        print "Looping over " + str(number_events) + " events"
+        #Event Loop starts here
+        first = True
+        for i in range(number_events):
+          if i>0 and (i%1000)==0:
+            print "Filled ",i
+          sample['chain'].GetEntry(elist.GetEntry(i))
+          if sample["weight"]=="weight":
+            thisweight=getVarValue(sample["chain"],"weight")
+          else:
+            thisweight=sample["weight"]
+          if first:
+            print 'Weight: ',thisweight
+            first = False
+          #varvalue = getVarValue(sample['chain'],varstring)
+          varvalue = getVarValue(sample["chain"], varNew['varString']) if varNew.has_key('varString') else varNew['varFunc'](sample["chain"])
+          #varvalue = varNew['varFunc'](sample['chain'])
+          adValueToCut = getVarValue(sample["chain"], cutVar['varString']) if cutVar.has_key('varString') else cutVar['varFunc'](sample["chain"])
+          if adValueToCut > adCut:
+            histo.Fill(varvalue,thisweight)
+        histo.SetLineColor(color)
+        histo.SetLineWidth(2)
+        histo.SetMarkerSize(0)
+        histo.SetMarkerStyle(0)
+        histo.SetTitleSize(20)
+        histo.GetXaxis().SetTitle(varNew['legendName'])
+        histo.GetXaxis().SetLabelSize(0.04)
+        histo.GetXaxis().SetTitleOffset(0.3)
+        histo.GetXaxis().SetTitleSize(0.06)
+        histo.GetYaxis().SetTitle("Events")
+        histo.GetYaxis().SetLabelSize(0.04)
+        histo.GetYaxis().SetTitleOffset(0.3)
+        histo.GetYaxis().SetTitleSize(0.06)
+        histo.SetFillColor(0)
+        histo.SetMinimum(histMin)
+        histo.SetMaximum(histMax)
+        h_Stack_S.Add(histo)
+        h3.Add(histo)
+        l.AddEntry(histo, sample["name"])
+        #signalString+=sample["name"]
+      
+      #pad1=ROOT.TPad("pad1","MyTitle",0,0.3,1,1.0)
+      #pad1.SetBottomMargin(0)
+      #pad1.SetLeftMargin(0.1)
+      #pad1.SetGrid()
+      #pad1.SetLogy()
+      #pad1.Draw()
+      #pad1.cd()
+      
+      #when not using pads
+      can1.SetGrid()
+      can1.SetLogy()
+      
+      histo.GetXaxis().SetTitle(varNew['legendName'])
+      histo.GetXaxis().SetLabelSize(0.04)
+      histo.GetXaxis().SetTitleOffset(0.3)
+      histo.GetXaxis().SetTitleSize(0.15)
+      
+      histo.GetYaxis().SetTitle("Events")
+      histo.GetYaxis().SetLabelSize(0.04)
+      histo.GetYaxis().SetTitleOffset(0.3)
+      histo.GetYaxis().SetTitleSize(0.15)
+      
+      
+      
+      h_Stack.Draw()
+      h_Stack.SetMinimum(histMin)
+      h_Stack.SetMaximum(histMax)
+      h_Stack_S.Draw('noStacksame')
+      #h_Stack_S.Draw('noStack')
+      h_Stack.GetYaxis().SetTitle("Events") #add _S if no bkg
+      h_Stack.GetYaxis().SetLabelSize(0.04)
+      h_Stack.GetYaxis().SetTitleOffset(1.1)
+      h_Stack.GetYaxis().SetTitleSize(0.04)
+      h_Stack.GetXaxis().SetTitle(varNew['legendName'])
+      h_Stack.GetXaxis().SetLabelSize(0.04)
+      h_Stack.GetXaxis().SetTitleOffset(1.3)
+      h_Stack.GetXaxis().SetTitleSize(0.04)
+      #h_Stack_S.Draw('noStack')
+      l.Draw()
+      
+      ##Draw ratio MC/Data
+      #can1.cd()
+      #pad2=ROOT.TPad("pad2","pad2",0,0.05,1.,0.3)
+      #pad2.SetGrid()
+      #pad2.Draw()
+      #pad2.cd()
+      #pad2.SetTopMargin(0)
+      #pad2.SetBottomMargin(0.3)
+      #pad2.SetLeftMargin(0.1)
+      #
+      #h3.Divide(h1)
+      #h3.SetMaximum(1.35)
+      #h3.SetMinimum(0.)
+      #h3.GetXaxis().SetLabelSize(0.10)
+      #h3.GetXaxis().SetTitle(varstring)
+      #h3.GetXaxis().SetTitleSize(0.15)
+      #
+      #h3.GetYaxis().SetLabelSize(0.10)
+      #h3.GetYaxis().SetTitle("Signal / BG")
+      #h3.GetYaxis().SetNdivisions(505)
+      #h3.GetYaxis().SetTitleSize(0.15)
+      #h3.GetYaxis().SetTitleOffset(0.3)
+      #h3.SetLineColor(ROOT.kBlack)
+      #h3.Draw("E1P")
+      
+      #Draw Title
+      #can1.cd()
+      #pad1.cd()
+      #t1=ROOT.TLatex()
+      #t1.SetTextFont(22)
+      #t1.DrawLatex(150,600,"CMS preliminary")
+      #t1.DrawLatex(150,300,"L=19.4 fb^{-1}, #sqrt{s}=8TeV")
+      
+      can1.Print(plotDir+varNew['name']+'_'+cutVar['name']+'_'+cutname+signalString+'.png')
+      can1.Print(plotDir+varNew['name']+'_'+cutVar['name']+'_'+cutname+signalString+'.pdf')
+      can1.Print(plotDir+varNew['name']+'_'+cutVar['name']+'_'+cutname+signalString+'.root')
+      l.Clear()
+      del h_Stack
+      del h_Stack_S
+      h3.Reset()
+      histo.Reset()
