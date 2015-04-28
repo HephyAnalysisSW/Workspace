@@ -11,10 +11,10 @@ rootFilesIn= lambda dir : [dir+fn for fn in os.listdir(dir) if any([fn.endswith(
 
 #Select item in stepDict
 step=0
-doStuff = 0
-prefix="_vtx_genMatch_IP_wrt_0___"
+doStuff = 1
+prefix="RUNII_vtx_genMatch_IP_wrt_0_"
 #nEvents -1 for all events
-nEvents=10000
+nEvents=1000
 outputDir="./"
 
 
@@ -206,7 +206,8 @@ stepDict=[
         #{'name':'test',               'filelist': rootFilesIn("/data/nrad/T2DegStop13TeV/GEN/t2degen1step/")  },
         #{'name':'stop',               'filelist': ['root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/nrad/T2DegStop2j_300_270_GENSIM/T2DegStop2j_300_270_MINIAOD/a279b5108ada7c3c0926210c2a95f22e/T2DegStop2j_300_270_miniAOD_2_1_yQN.root'] },
         #{'name':'WJets',              'filelist': ['root://xrootd.unl.edu//store/mc/Phys14DR/WJetsToLNu_13TeV-madgraph-pythia8-tauola/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/02215B44-2D70-E411-90A3-0025905A60B8.root']},
-        {'name':'stop',               'filelist': ['/data/nrad/T2DegStop13TeV/T2DegStop2j_sample_miniAOD.root']},
+        #{'name':'stop',               'filelist': ['/data/nrad/T2DegStop13TeV/T2DegStop2j_sample_miniAOD.root']},
+        {'name':'stop',               'filelist': ['/data/nrad/T2DegStop13TeV/RunII/step3_PAT.root']},
         {'name':'WJets',              'filelist': ['../WJetsToLNu_13TeV_Phys14_miniAOD.root']},
         {'name':'TT',                 'filelist': ['../TT_13TeV_Phys14PU40bx25_miniAOD.root']},
 
