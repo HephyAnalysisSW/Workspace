@@ -49,7 +49,7 @@ treeProducerName="treeProducerSusySingleLepton"
 #  os.system("mkdir -p "+oDir)
 
 #lsNFS = os.listdir(oDir)
-debug =1 
+debug =0 
 p = subprocess.Popen(["ls -l "+ directory], shell = True , stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
 
