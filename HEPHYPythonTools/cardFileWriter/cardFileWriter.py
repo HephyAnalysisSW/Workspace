@@ -206,4 +206,31 @@ class cardFileWriter:
     return res
 
 
+  def calcSignif(self, fname="", options=""):
+    import uuid, os 
+    uniqueDirname=""
+    unique=False
+    if fname=="":
+      uniqueDirname = str(uuid.uuid4())
+      unique=True
+      os.system('mkdir '+uniqueDirname)
+      fname = str(uuid.uuid4())+".txt"
+      self.writeToFile(uniqueDirname+"/"+fname)
+    else:
+      self.writeToFile(fname)
+    os.system("cd "+uniqueDirname+";combine --saveWorkspace  -M ProfileLikelihood --significance "+fname+" -t -1 --expectSignal=1 ")
+    try:
+      res= self.readResFile(uniqueDirname+"/higgsCombineTest.ProfileLikelihood.mH120.root")
+    except:
+      res=None
+      print "Did not succeed."
+    os.system("rm -rf roostats-*")
+    if unique:
+       os.system("rm -rf "+uniqueDirname)
+    else:
+      if res:
+        print res
+        os.system("cp higgsCombineTest.ProfileLikelihood.mH120.root "+fname.replace('.txt','')+'.root')
+
+    return res
 

@@ -3,7 +3,9 @@ import os,sys
 #ROOT.gROOT.LoadMacro('/afs/hephy.at/scratch/d/dhandl/CMSSW_7_2_3/src/Workspace/HEPHYPythonTools/scripts/root/tdrstyle.C')
 #ROOT.setTDRStyle()
 from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain
-from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2_HT400_withDF import *
+#from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2_HT400_withDF import *
+#from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2_HT400ST150_withDF import *
+from Workspace.RA4Analysis.cmgTuplesPostProcessed_v1_Phys14V3_HT400ST200 import *
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,varBinName
 from math import pi, sqrt
 small = False
@@ -16,7 +18,7 @@ cTTJets = getChain(ttJets[lepSel],histname='',maxN=maxN)
 
 from localInfo import username
 uDir = username[0]+'/'+username
-subDir = 'pngCMG2/rCS/singleLeptonic_extendedSR_MET-ST'
+subDir = 'PHYS14v3/rCS/singleLeptonic'
 
 path = '/afs/hephy.at/user/'+uDir+'/www/'+subDir+'/'
 if not os.path.exists(path):
@@ -45,7 +47,7 @@ def getRCS(c, cut, dPhiCut):
 streg = [[(250, 350), 1.], [(350, 450), 1.], [(450, -1), 1.]]
 htreg = [(400,500),(500,750),(750, 1000),(1000,1250),(1250,-1)]
 #njreg = [(2,3),(4,5),(5,5),(6,-1)]
-btreg = (1,1)
+btreg = (0,0)
 #streg = [[(250, 350), 1.], [(350, -1), 1.]]
 #htreg = [(500,750),(750, -1)]
 njreg = [(2,2),(3,3),(4,4),(5,5),(6,-1)]
@@ -133,7 +135,7 @@ for name, c in [["TT", cTTJets] , ["W",cWJets] ]:
       for i in range(h_nj[name][stb][htb].GetNbinsX()):
         h_nj[name][stb][htb].GetXaxis().SetBinLabel(i+1, nJetBinName(njreg[i]))
       for i_njb, njb in enumerate(njreg):
-        cname, cut = nameAndCut(stb,htb,njb, btb=btreg ,presel=presel, stVar=VarStr) 
+        cname, cut = nameAndCut(stb,htb,njb, btb=btreg ,presel=presel) 
         res, resErr = getRCS(c, cut,  dPhiCut)
         print res,resErr, name, cname
         if res:
@@ -170,9 +172,9 @@ for name, c in [["TT", cTTJets] , ["W",cWJets] ]:
       else:
         h_nj[name][stb][htb].Draw('same')
     l.Draw()
-    c1.Print('/afs/hephy.at/user/'+uDir+'/www/'+subDir+'/'+prefix+'_rCS_njet_'+name+'_'+nameAndCut(stb,htb=None,njetb=None, btb=btreg, presel=presel, stVar=VarStr)[0]+".png")
+    c1.Print('/afs/hephy.at/user/'+uDir+'/www/'+subDir+'/'+prefix+'_rCS_njet_'+name+'_'+nameAndCut(stb,htb=None,njetb=None, btb=btreg, presel=presel)[0]+".png")
     h_2d[name][stb].Draw('COLZ TEXTE')
-    c1.Print('/afs/hephy.at/user/'+uDir+'/www/'+subDir+'/'+prefix+'_rCS_njet_vs_ht_'+name+'_'+nameAndCut(stb,htb=None,njetb=None, btb=btreg, presel=presel, stVar=VarStr)[0]+".png")
+    c1.Print('/afs/hephy.at/user/'+uDir+'/www/'+subDir+'/'+prefix+'_rCS_njet_vs_ht_'+name+'_'+nameAndCut(stb,htb=None,njetb=None, btb=btreg, presel=presel)[0]+".png")
   for htb in htreg:
     c1 = ROOT.TCanvas('c1','c1',600,600)
     pad1 = ROOT.TPad('Pad','Pad',0.,0.0,1.,1.)
@@ -209,7 +211,7 @@ for name, c in [["TT", cTTJets] , ["W",cWJets] ]:
         h_nj[name][stb][htb].Draw('same')
     l.Draw()
 #    c1.Print(path+prefix+'_rCS_njet_'+name+'_'+nameAndCut(stb,htb=htb,njetb=None, btb=None, presel=presel)[0]+".pdf")
-    c1.Print(path+prefix+'_rCS_njet_'+name+'_'+nameAndCut(stb,htb=htb,njetb=None, btb=btreg, presel=presel, stVar=VarStr)[0]+".png")
+    c1.Print(path+prefix+'_rCS_njet_'+name+'_'+nameAndCut(stb,htb=htb,njetb=None, btb=btreg, presel=presel)[0]+".png")
 #    c1.Print(path+prefix+'_rCS_njet_'+name+'_'+nameAndCut(stb,htb=htb,njetb=None, btb=None, presel=presel)[0]+".root")
 
 for name, c in [ ["W",cWJets], ["TT", cTTJets]]:
@@ -233,7 +235,7 @@ for name, c in [ ["W",cWJets], ["TT", cTTJets]]:
       else:
         h_ht[name][stb][njb].Draw('same')
     l.Draw()
-    c1.Print(path+prefix+'_rCS_ht_'+name+'_'+nameAndCut(stb,htb=None,njetb=None, btb=btreg,presel=presel, stVar=VarStr)[0]+".png")
+    c1.Print(path+prefix+'_rCS_ht_'+name+'_'+nameAndCut(stb,htb=None,njetb=None, btb=btreg,presel=presel)[0]+".png")
   for njb in njreg:
     c1 = ROOT.TCanvas()
     first = True 
@@ -254,7 +256,7 @@ for name, c in [ ["W",cWJets], ["TT", cTTJets]]:
       else:
         h_ht[name][stb][njb].Draw('same')
     l.Draw()
-    c1.Print(path+prefix+'_rCS_ht_'+name+'_'+nameAndCut(stb=None,htb=None,njetb=njb,btb=btreg, presel=presel, stVar=VarStr)[0]+".png")
+    c1.Print(path+prefix+'_rCS_ht_'+name+'_'+nameAndCut(stb=None,htb=None,njetb=njb,btb=btreg, presel=presel)[0]+".png")
 
 #1D and 2D plots of RCS vs nBTag for TTJets
 #prefix = 'Phys14_hardSingleMuonic' 

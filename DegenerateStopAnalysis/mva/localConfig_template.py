@@ -1,3 +1,3 @@
 afsUser = 'schoefbeck'
 nfsUser = 'schoef'
-localPlotDir = '/pngNN/'
+wwwPlotDir = '/pngNN/'

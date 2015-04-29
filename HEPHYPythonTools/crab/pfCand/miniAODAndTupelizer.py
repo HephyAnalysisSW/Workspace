@@ -25,7 +25,8 @@ process.maxEvents = cms.untracked.PSet(
 # Input source
 process.source = cms.Source("PoolSource",
     secondaryFileNames = cms.untracked.vstring(),
-    fileNames = cms.untracked.vstring('file:/data/schoef/local/CMSSW_7_2_0_pre4_RelValZMM_13_GEN-SIM-RECO_PU25ns_POSTLS172_V3-v3.root')
+#    fileNames = cms.untracked.vstring('file:/data/schoef/local/CMSSW_7_2_0_pre4_RelValZMM_13_GEN-SIM-RECO_PU25ns_POSTLS172_V3-v3.root')
+    fileNames = cms.untracked.vstring('root://xrootd.unl.edu//store/mc/Phys14DR/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/MINIAODSIM/PU30bx50_PHYS14_25_V1-v1/00000/003B6371-8D81-E411-8467-003048F0E826.root')
 )
 
 process.options = cms.untracked.PSet(

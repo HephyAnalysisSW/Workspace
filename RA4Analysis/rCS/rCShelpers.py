@@ -19,15 +19,14 @@ def getRCS(c, cut, dPhiCut):
     return {'rCS':rcs, 'rCSE_pred':rCSE_pred, 'rCSE_sim':rCSE_sim}
   else:
     del h
-    return {'rCS':'NaN', 'rCSE_pred':'NaN', 'rCSE_sim':'NaN'}
+    return {'rCS':'nan', 'rCSE_pred':'nan', 'rCSE_sim':'nan'}
   
 def getFOM(Ysig ,Ysig_Err , Ybkg,  Ybkg_Err):
   if Ybkg>0.0:
-    FOM = Ysig/sqrt(Ybkg)
-    FOM_Err = sqrt(Ysig_Err**2/Ybkg + ((Ysig*Ybkg_Err)/(2*Ybkg**(3/2)))**2)
-    return {'FOM':FOM, 'FOM_Err':FOM_Err}
+    FOM = Ysig/sqrt(Ybkg+(0.2*Ybkg)**2)
+    return FOM
   else:
-    return {'FOM':'NaN', 'FOM_Err':'NaN'}
+    return 'nan'
 
 
 #don't use k_factor calculation right now it has to be optimized

@@ -92,8 +92,10 @@ def readLimit(f):
   maxR=None
   cmsSUS_theoryT1tttt = None
   cmsSUS_experimentalLimit = None
-  missingTopos = ["[[[b,t],[W]],[[t,b],[W]]]","[[[b,t],[W]],[[b,t],[W]]]","[[[t,b],[W]],[[t,b],[W]]]"]
-  missingToposXSecBR=0.
+  missingToposONs = ["[[[b,t],[W]],[[t,b],[W]]]","[[[b,t],[W]],[[b,t],[W]]]","[[[t,b],[W]],[[t,b],[W]]]"]
+  missingToposONsXSecBR=0.
+  missingToposOFFs = ["[[[b,t],[jet,jet]],[[t,b],[jet,jet]]]","[[[b,t],[jet,jet]],[[b,t],[jet,jet]]]","[[[t,b],[jet,jet]],[[t,b],[jet,jet]]]"]
+  missingToposOFFsXSecBR=0.
   cmsSUS_r = 0.
   for l in file(f).readlines():
     if stringArg in l:
@@ -102,16 +104,20 @@ def readLimit(f):
       cmsSUS_theoryT1tttt = float(l.split()[-3])
       cmsSUS_experimentalLimit = float(l.split()[-2])
       cmsSUS_r = float(l.split()[-1])
-    for m in missingTopos:
+    for m in missingToposONs:
       if m in l:
-        missingToposXSecBR+=float(l.split()[1])
+        missingToposONsXSecBR+=float(l.split()[1])
+    for m in missingToposOFFs:
+      if m in l:
+        missingToposOFFsXSecBR+=float(l.split()[1])
 #  print "cmsSUS_experimentalLimit", cmsSUS_experimentalLimit
-#  newMaxR = (cmsSUS_theoryT1tttt + missingToposXSecBR)/cmsSUS_experimentalLimit if cmsSUS_experimentalLimit else 0.
+  newMaxR = (cmsSUS_theoryT1tttt + missingToposONsXSecBR)/cmsSUS_experimentalLimit if cmsSUS_experimentalLimit else 0.
   return {'maxR':maxR,\
           'cmsSUS_theoryT1tttt':cmsSUS_theoryT1tttt,\
           'cmsSUS_experimentalLimit':cmsSUS_experimentalLimit,\
-          'missingToposXSecBR':missingToposXSecBR,\
-#         'newMaxR':newMaxR, \
+          'missingToposONsXSecBR':missingToposONsXSecBR,\
+          'missingToposOFFsXSecBR':missingToposOFFsXSecBR*(4./9.)**2,\
+         'newMaxR':newMaxR, \
          'cmsSUS_r':cmsSUS_r,\
     }
  
@@ -119,18 +125,20 @@ def vec(res, key):
   return array.array('d', [r[key] for r in res])
 
 files = os.listdir(dataPath+'/slha/')
-#files = ['9902.txt','9904.txt']
+#files = ['9902.txt']
 #files = files[:10]
+#prefix='mneu1_gr_70'
+prefix='newExcl'
 res=[]
 for i, f in enumerate(files):
   if i%100==0:
     print i,'/',len(files)
   exclusions=readLimit(dataPath+'/smodelsOutputRun3/'+f)
-
 #  exclR = exclusions['cmsSUS_r']
   exclR = exclusions['maxR']
   if exclR>1:
     continue
+  if 'newExcl' in prefix and exclusions['newMaxR']>1:continue
 #  print 'maxR',exclR, 'newMaxR',exclusions['newMaxR']
   slha=pyslha.readSLHAFile(dataPath+'/slha/'+f, ignoreblocks=['XSECTION'])
   mgl = slha.blocks['MASS'][1000021]
@@ -147,7 +155,10 @@ for i, f in enumerate(files):
           "order",xsecFromPythia_gluinoPair.info.order if xsecFromPythia_gluinoPair else "n.c."
 
   mneu1 = abs(slha.blocks['MASS'][1000022])
-#  if mneu1>70:continue
+  if 'mneu1_gr_70' in prefix and mneu1<70:continue
+  if mgl<700:
+    print f
+    print exclusions['missingToposOFFsXSecBR']
   mcha1 = abs(slha.blocks['MASS'][1000024])
   mstop1 = abs(slha.blocks['MASS'][1000006])
   msbot1 = abs(slha.blocks['MASS'][1000005])
@@ -175,7 +186,16 @@ for i, f in enumerate(files):
     'BR_tbWtbW':BR_tbWtbW,
     'br_gluinoToStop':br_gluinoToStop,'br_gluinoToSbottom':br_gluinoToSbottom,'br_stopToCha':br_stopToCha,'br_sbotToCha':br_sbotToCha,'br_gluinoToCha':br_gluinoToCha,'br_ChaToNeu':br_ChaToNeu})
 
-prefix='test2'
+
+h = ROOT.TH1F('','',20,0,200)
+for r in res:
+  h.Fill(r['mcha1']-r['mneu1'])
+c1 = ROOT.TCanvas()
+h.Draw()
+args=['dMEwkino']
+if prefix!='':args=[prefix]+args
+c1.Print('/Users/robertschoefbeck/Desktop/plots/'+'_'.join(args)+'.png')  
+
 for zVar in [\
     'xsec_gluinoPair', 
     'xsecBR_tbWtbW', 'BR_tbWtbW', 'br_gluinoToStop', 'br_gluinoToSbottom', 'br_stopToCha', 'br_sbotToCha', 
@@ -188,7 +208,7 @@ for zVar in [\
     {'firstVar':'mgl','firstBinning':[900,600,1500], 'secondBinning':[1000,250,1250], 'secondVar':'msbot1'},
     {'secondVar':'mneu1','secondBinning':[400,0,400], 'firstBinning':[300,100,400], 'firstVar':'mcha1'},
   ]
-
+  
   for job in allJobs:
     data = [(r[job['firstVar']], r[job['secondVar']], r[zVar]) for r in res if r[zVar]>0]
     if len(data)>0:
@@ -198,11 +218,7 @@ for zVar in [\
       h.GetXaxis().SetTitle("")
       h.GetYaxis().SetTitle("")
       ROOT.gStyle.SetOptStat(0)
-      scatterOnTH2(data, h, '/Users/robertschoefbeck/Desktop/plots/'+prefix+'_'+job['firstVar']+'_'+job['secondVar']+'_'+zVar+'.png', 20, 0.5)
-
-#      h=ROOT.TGraph2D('xsec', 'xsec', len(res), vec(res,'mgl'), vec(res, 'mneu1'), vec(res, zVar))
-#      c1=ROOT.TCanvas()
-#      h.Draw()
-#      c1.SetLogz()
-#      c1.Print('/Users/robertschoefbeck/Desktop/plots/th2f_'+prefix+'_'+job['firstVar']+'_'+job['secondVar']+'_'+zVar+'.png')
-
+      args=[job['firstVar'],job['secondVar'],zVar]
+      if prefix!='':args=[prefix]+args
+      scatterOnTH2(data, h, '/Users/robertschoefbeck/Desktop/plots/'+'_'.join(args)+'.png', 20, 0.5)
+  

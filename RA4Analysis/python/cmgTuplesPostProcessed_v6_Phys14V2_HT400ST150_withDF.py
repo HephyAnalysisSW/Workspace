@@ -12,10 +12,16 @@ ttJets=makeSample({\
 "bins" : ["TTJets"],
 'dir' : "/data/easilar/cmgTuples/postProcessed_v6_Phys14V2_withDF/HT400ST150/",
 })
+#WJetsHTToLNu=makeSample({\
+#"name" : "WJetsHTToLNu",
+#"bins" : ["WJetsToLNu_HT100to200", "WJetsToLNu_HT200to400", "WJetsToLNu_HT400to600", "WJetsToLNu_HT600toInf"],
+#'dir' : "/data/easilar/cmgTuples/postProcessed_v6_Phys14V2_withDF/HT400ST150/",
+#})
+
 WJetsHTToLNu=makeSample({\
 "name" : "WJetsHTToLNu",
 "bins" : ["WJetsToLNu_HT100to200", "WJetsToLNu_HT200to400", "WJetsToLNu_HT400to600", "WJetsToLNu_HT600toInf"],
-'dir' : "/data/easilar/cmgTuples/postProcessed_v6_Phys14V2_withDF/HT400ST150/",
+'dir' : "/data/easilar/cmgTuples/postProcessed_v6_Phys14_WJets//HT400ST150/",
 })
 TTVH=makeSample({\
 "name" : "TTVH",
