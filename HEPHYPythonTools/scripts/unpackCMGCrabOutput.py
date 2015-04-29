@@ -64,6 +64,7 @@ print "and root files in ", directory+sampleName+"_Chunk*"+"/"+treeProducerName+
 
 for line in p.stdout.readlines():
   linePart=line[:-1].split(" ")
+  print linePart
   #print "#### ", linePart
   if linePart[0]=='total':
     print line
@@ -76,13 +77,13 @@ for line in p.stdout.readlines():
       cmgChunks = directory+'/'+sampleName +"_Chunk" + fileNum
       rootFileName=treeName+"_"+fileNum+'.root'
       #print "##", linePart[-5]
-      size = int(linePart[-5]) 
+      #size = int(linePart[-5]) 
       os.system("mkdir %s"%cmgChunks)
       os.system("tar -xf %s --directory=%s --strip-components=1"%(directory+"/"+filename,cmgChunks))
       os.system( "mv %s %s"%(directory + '/' + rootFileName,cmgChunks+'/'+treeProducerName+'/'+finalTreeName))
       os.system("rm -rf %s"%(directory+"/"+filename) )
       if debug:
-        print filename, fileNum , sampleName, cmgChunks, size 
+        print filename, fileNum , sampleName, cmgChunks #, size 
         print "mkdir %s"%cmgChunks     
         print "tar -xf %s --directory=%s --strip-components=1"%(directory+"/"+filename,cmgChunks)
         print "rm -rf %s"%(directory+"/"+filename) 
