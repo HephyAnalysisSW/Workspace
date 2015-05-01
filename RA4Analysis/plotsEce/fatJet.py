@@ -20,7 +20,7 @@ def getChain(path_files):
 #presel = '1'
 singleLeptonic = 'nLepGood==1&&nLepOther==0'
 #presel = 'htJet40j>500&&nJet40>0&&Jet_pt[1]>80&&LepGood_pt[0]+met_pt>200&&sum$(Jet_btagCMVA<0.732&&abs(Jet_eta)<2.4)==0'+'&&'+singleLeptonic
-presel = 'Sum$(Jet_pt)>500&&Jet_pt>30&&nJet30>6&&Sum$(Jet_btagCMVA>0.732)==0&&Jet_pt[1]>80&&LepGood_pt[0]+met_pt>200'+'&&'+singleLeptonic
+presel = 'Sum$(Jet_pt)>500&&nJet30>6&&Sum$(Jet_btagCMVA>0.732)==0&&Jet_pt[1]>80&&LepGood_pt[0]+met_pt>200'+'&&'+singleLeptonic
 
 path = '/afs/hephy.at/user/e/easilar/www/fatJet/tests/'
 if not os.path.exists(path):
@@ -50,6 +50,8 @@ plots = [
 {'logy':'True' , 'var':'FatJet_tau3/FatJet_tau1',    'varname':'FatJet_tau3_1',          'bin':100,       'lowlimit':0,  'limit':1},\
 {'logy':'True' , 'var':'FatJet_tau3/FatJet_tau2',    'varname':'FatJet_tau3_2',          'bin':100,       'lowlimit':0,  'limit':1},\
 {'logy':'True' , 'var':'FatJet_tau2/FatJet_tau1',    'varname':'FatJet_tau2_1',          'bin':100,       'lowlimit':0,  'limit':1},\
+{'logy':'False' , 'var':'Sum$(FatJet_prunedMass>70&&FatJet_prunedMass<100&&(FatJet_tau2/FatJet_tau1)<0.5)',    'varname':'nWtagged',          'bin':5,       'lowlimit':0,  'limit':5},\
+
 ]
 
 

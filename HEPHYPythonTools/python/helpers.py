@@ -120,15 +120,19 @@ def getChunks(sample, treeName, maxN=-1):
 #    return getSampleFromEOS(sample)
   else:
     fromDPM =  sample.has_key('fromDPM') and sample.has_key('fromDPM')
+    #print "from dpm:" , fromDPM 
     if fromDPM:
       return getChunksFromDPM(sample, fromDPM=fromDPM, maxN=maxN)
     else:
+      #print "not from DPM"
       return getChunksFromNFS(sample, treeName,maxN=maxN)
     
 def getChunksFromNFS(sample, treeName, maxN=-1):
+  #print "sample , treename , maxN" , sample , treeName , maxN
   import os, subprocess, datetime
-  print sample['dir']
+  #print "sample dir:" , sample['dir']
   chunks = [{'name':x} for x in os.listdir(sample['dir']) if x.startswith(sample['chunkString']+'_Chunk') or x==sample['name']]
+  #print chunks
   chunks=chunks[:maxN] if maxN>0 else chunks
   nTotEvents=0
   allFiles=[]
