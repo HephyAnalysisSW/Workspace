@@ -1,0 +1,225 @@
+\documentclass[12pt]{paper}
+\usepackage{a4}
+%\usepackage[usenames,dvipnames]{color}
+\usepackage{amssymb,amsmath}
+\usepackage{amsfonts}
+\usepackage{epsfig,graphics,graphicx,graphpap,color}
+\usepackage{slashed,xspace,setspace}
+\usepackage{caption}
+\usepackage{rotating}
+\usepackage{fullpage}
+\usepackage[top=0.83in]{geometry}
+\usepackage{longtable}
+
+\newcommand{\TOnettttHL}{\ensuremath{\textrm{T1t}^{4} 1.5/0.1}\xspace}
+\newcommand{\TOnettttHM}{\ensuremath{\textrm{T1t}^{4} 1.2/0.8}\xspace}
+\newcommand{\TFiveqqqqHM}{\ensuremath{\textrm{T5q}^{4} 1.2/1/0.8}\xspace}
+\newcommand{\TFiveqqqqHL}{\ensuremath{\textrm{T5q}^{4} 1.5/0.8/0.1}\xspace}
+\newcommand{\TOnettttSqGl}{\ensuremath{\textrm{T1t}^{4}_{\widetilde{q}\widetilde{g}} 1.5/2.0/0.1}\xspace}
+
+\newcommand{\ST}{\ensuremath{S_{\rm T}}\xspace}
+\newcommand{\HT}{\ensuremath{H_{\rm T}\xspace}}
+\newcommand{\DF}{\ensuremath{\Delta \Phi}\xspace}
+\newcommand{\Rcs}{\ensuremath{R_{\rm CS}}\xspace}
+\newcommand{\nbjet}{\ensuremath{n_{\rm b-jet}}\xspace}
+\newcommand{\nbtag}{\ensuremath{n_{\rm b-tag}}\xspace}
+\newcommand{\njet}{\ensuremath{n_{\rm jet}}\xspace}
+\newcommand{\nino}{\ensuremath{\widetilde{\chi}}\xspace} % neutralino
+\newcommand{\ninozero}{\ensuremath{\widetilde{\chi}^0}\xspace} % neutralino with superscript 0
+\newcommand{\ninoone}{\ensuremath{\widetilde{\chi}^0_1}\xspace} % neutralino with superscript 0 and subscript 1
+\newcommand{\ninotwo}{\ensuremath{\widetilde{\chi}^0_2}\xspace} % neutralino with superscript 0 and subscript 2
+\newcommand{\ninothree}{\ensuremath{\widetilde{\chi}^0_3}\xspace} % neutralino with superscript 0 and subscript 3
+\newcommand{\ninofour}{\ensuremath{\widetilde{\chi}^0_4}\xspace} % neutralino with superscript 0 and subscript 4
+\newcommand{\chipmone}{\ensuremath{\widetilde{\chi}^{\pm}_1}\xspace} % chargino with superscript pm and subscript 1
+\newcommand{\chipone}{\ensuremath{\widetilde{\chi}^{+}_1}\xspace} % chargino with superscript p and subscript 1
+
+%used by Vienna (feel free...)
+\newcommand{\btag}{\ensuremath{{\rm b-tag}}\xspace}
+\newcommand{\zeroTag}{\ensuremath{0\textrm{-tag}}\xspace}
+\newcommand{\oneTag}{\ensuremath{1\textrm{-tag}}\xspace}
+\newcommand{\twoTag}{\ensuremath{\ge\hspace{-0.08em}2\textrm{-tag}}\xspace}
+\newcommand{\onePlusTag}{\ensuremath{\ge\hspace{-0.08em}1\textrm{-tag}}\xspace}
+\newcommand{\wJets}{\PW+jets\xspace}
+\newcommand{\Rcscorr}{\ensuremath{R_{\textrm{CS}}^{\textrm{corr.}}}}
+\newcommand{\ttJets}{\ensuremath{t\bar{t}+\textrm{jets}}\xspace}
+\newcommand{\wpJets}{\PWp+jets\xspace}
+\newcommand{\wmJets}{\PWm+jets\xspace}
+\newcommand{\yFit}{\ensuremath{y^{\textrm{fit}}}}
+\newcommand{\yPred}{\ensuremath{y^{\textrm{pred.}}}}
+\newcommand{\yMC}{\ensuremath{y^{\textrm{MC}}}}
+\newcommand{\MPF}{\ensuremath{\textrm{MPF}}}
+
+\begin{document}
+
+\begin{table}[ht]\begin{center}\resizebox{\textwidth}{!}{\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}\hline
+ \ttJets     & 0b & 1b  & 1b/0b & 0b($\Delta\Phi<0$) & 0b($\Delta\Phi>0$) & 1b($\Delta\Phi<0$) & 1b($\Delta\Phi>0$) & \Rcs(0b) & \Rcs(1b)\\\hline
+dihadronic & 0.0 & 0.14 & 1.0 & 0.0 & 0.0 & 0.14 & 0.0 & nan & 0.0\\\hline
+di $\tau$ & 1.26 & 3.08 & 2.44 & 0.7 & 0.56 & 2.66 & 0.42 & 0.8 & 0.1579\\\hline
+$W\rightarrow \tau + \nu \rightarrow \textrm{had.}+2\nu ~|~ W \rightarrow \textrm{had.}$ & 0.56 & 0.56 & 1.0 & 0.56 & 0.0 & 0.56 & 0.0 & 0.0 & 0.0\\\hline
+$W\rightarrow \tau + \nu \rightarrow \textrm{had.}+2\nu ~|~ W \rightarrow e/\mu + \nu$ & 10.08 & 20.17 & 2.0 & 7.56 & 2.52 & 14.71 & 5.46 & 0.3333 & 0.3714\\\hline
+$W\rightarrow \tau + \nu \rightarrow e/\mu+3\nu ~|~ W \rightarrow e/\mu + \nu$ & 4.34 & 12.33 & 2.84 & 2.94 & 1.4 & 9.52 & 2.8 & 0.4762 & 0.2941\\\hline
+$W\rightarrow \tau + \nu \rightarrow e/\mu+3\nu ~|~ W \rightarrow \textrm{had.}$ & 8.26 & 13.87 & 1.68 & 8.26 & 0.0 & 13.87 & 0.0 & 0.0 & 0.0\\\hline
+dileptonic & 11.77 & 33.05 & 2.81 & 9.24 & 2.52 & 25.35 & 7.7 & 0.2727 & 0.3039\\\hline
+single lep. $(e/\mu)$ & 79.84 & 129.98 & 1.63 & 77.03 & 2.8 & 126.06 & 3.92 & 0.0364 & 0.0311\\\hline
+total & 116.11 & 213.17 & 1.84 & 106.31 & 9.8 & 192.86 & 20.31 & 0.0922 & 0.1053\\\hline
+\end{tabular}}\end{center}\caption{\ttJets, inclusive, njets=2}\end{table}
+
+\begin{table}[ht]\begin{center}\resizebox{\textwidth}{!}{\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}\hline
+ \ttJets     & 0b & 1b  & 1b/0b & 0b($\Delta\Phi<0$) & 0b($\Delta\Phi>0$) & 1b($\Delta\Phi<0$) & 1b($\Delta\Phi>0$) & \Rcs(0b) & \Rcs(1b)\\\hline
+dihadronic & 0.98 & 0.7 & 0.71 & 0.98 & 0.0 & 0.7 & 0.0 & 0.0 & 0.0\\\hline
+di $\tau$ & 4.34 & 12.47 & 2.87 & 3.5 & 0.84 & 9.94 & 2.52 & 0.24 & 0.2535\\\hline
+$W\rightarrow \tau + \nu \rightarrow \textrm{had.}+2\nu ~|~ W \rightarrow \textrm{had.}$ & 1.26 & 2.94 & 2.33 & 1.26 & 0.0 & 2.66 & 0.28 & 0.0 & 0.1053\\\hline
+$W\rightarrow \tau + \nu \rightarrow \textrm{had.}+2\nu ~|~ W \rightarrow e/\mu + \nu$ & 43.84 & 114.57 & 2.61 & 29.41 & 14.43 & 78.44 & 36.14 & 0.4905 & 0.4607\\\hline
+$W\rightarrow \tau + \nu \rightarrow e/\mu+3\nu ~|~ W \rightarrow e/\mu + \nu$ & 14.15 & 51.54 & 3.64 & 9.8 & 4.34 & 34.74 & 16.81 & 0.4429 & 0.4839\\\hline
+$W\rightarrow \tau + \nu \rightarrow e/\mu+3\nu ~|~ W \rightarrow \textrm{had.}$ & 39.78 & 84.74 & 2.13 & 39.36 & 0.42 & 83.9 & 0.84 & 0.0107 & 0.01\\\hline
+dileptonic & 41.88 & 117.37 & 2.8 & 31.65 & 10.22 & 86.14 & 31.23 & 0.323 & 0.3626\\\hline
+single lep. $(e/\mu)$ & 410.95 & 886.65 & 2.16 & 394.15 & 16.81 & 847.99 & 38.66 & 0.0426 & 0.0456\\\hline
+total & 557.19 & 1270.96 & 2.28 & 510.13 & 47.06 & 1144.48 & 126.48 & 0.0923 & 0.1105\\\hline
+\end{tabular}}\end{center}\caption{\ttJets, inclusive, njets=3}\end{table}
+
+\begin{table}[ht]\begin{center}\resizebox{\textwidth}{!}{\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}\hline
+ \ttJets     & 0b & 1b  & 1b/0b & 0b($\Delta\Phi<0$) & 0b($\Delta\Phi>0$) & 1b($\Delta\Phi<0$) & 1b($\Delta\Phi>0$) & \Rcs(0b) & \Rcs(1b)\\\hline
+dihadronic & 1.68 & 5.04 & 3.0 & 1.68 & 0.0 & 5.04 & 0.0 & 0.0 & 0.0\\\hline
+di $\tau$ & 8.96 & 21.43 & 2.39 & 7.0 & 1.96 & 16.25 & 5.18 & 0.28 & 0.319\\\hline
+$W\rightarrow \tau + \nu \rightarrow \textrm{had.}+2\nu ~|~ W \rightarrow \textrm{had.}$ & 1.82 & 7.84 & 4.31 & 1.82 & 0.0 & 7.14 & 0.7 & 0.0 & 0.098\\\hline
+$W\rightarrow \tau + \nu \rightarrow \textrm{had.}+2\nu ~|~ W \rightarrow e/\mu + \nu$ & 72.13 & 227.74 & 3.16 & 51.96 & 20.17 & 150.99 & 76.75 & 0.3881 & 0.5084\\\hline
+$W\rightarrow \tau + \nu \rightarrow e/\mu+3\nu ~|~ W \rightarrow e/\mu + \nu$ & 22.27 & 69.89 & 3.14 & 15.41 & 6.86 & 48.04 & 21.85 & 0.4455 & 0.4548\\\hline
+$W\rightarrow \tau + \nu \rightarrow e/\mu+3\nu ~|~ W \rightarrow \textrm{had.}$ & 84.74 & 201.83 & 2.38 & 83.62 & 1.12 & 198.47 & 3.36 & 0.0134 & 0.0169\\\hline
+dileptonic & 52.94 & 173.12 & 3.27 & 38.1 & 14.85 & 124.66 & 48.46 & 0.3897 & 0.3888\\\hline
+single lep. $(e/\mu)$ & 902.34 & 2368.56 & 2.62 & 854.58 & 47.76 & 2234.66 & 133.9 & 0.0559 & 0.0599\\\hline
+total & 1146.89 & 3075.74 & 2.68 & 1054.17 & 92.72 & 2785.53 & 290.21 & 0.088 & 0.1042\\\hline
+\end{tabular}}\end{center}\caption{\ttJets, inclusive, njets=4}\label{tab:0b_rcscorr_Wbkg}\end{table}
+
+\begin{table}[ht]\begin{center}\resizebox{\textwidth}{!}{\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}\hline
+ \ttJets     & 0b & 1b  & 1b/0b & 0b($\Delta\Phi<0$) & 0b($\Delta\Phi>0$) & 1b($\Delta\Phi<0$) & 1b($\Delta\Phi>0$) & \Rcs(0b) & \Rcs(1b)\\\hline
+dihadronic & 3.36 & 7.42 & 2.21 & 3.08 & 0.28 & 7.14 & 0.28 & 0.0909 & 0.0392\\\hline
+di $\tau$ & 7.14 & 22.13 & 3.1 & 5.32 & 1.82 & 15.27 & 6.86 & 0.3421 & 0.4495\\\hline
+$W\rightarrow \tau + \nu \rightarrow \textrm{had.}+2\nu ~|~ W \rightarrow \textrm{had.}$ & 2.66 & 9.1 & 3.42 & 2.38 & 0.28 & 8.26 & 0.84 & 0.1176 & 0.1017\\\hline
+$W\rightarrow \tau + \nu \rightarrow \textrm{had.}+2\nu ~|~ W \rightarrow e/\mu + \nu$ & 72.83 & 226.34 & 3.11 & 50.7 & 22.13 & 150.85 & 75.49 & 0.4365 & 0.5005\\\hline
+$W\rightarrow \tau + \nu \rightarrow e/\mu+3\nu ~|~ W \rightarrow e/\mu + \nu$ & 15.41 & 59.39 & 3.85 & 9.66 & 5.74 & 40.76 & 18.63 & 0.5942 & 0.457\\\hline
+$W\rightarrow \tau + \nu \rightarrow e/\mu+3\nu ~|~ W \rightarrow \textrm{had.}$ & 88.94 & 262.9 & 2.96 & 88.1 & 0.84 & 259.25 & 3.64 & 0.0095 & 0.014\\\hline
+dileptonic & 47.34 & 156.17 & 3.3 & 33.62 & 13.73 & 109.81 & 46.36 & 0.4083 & 0.4222\\\hline
+single lep. $(e/\mu)$ & 1022.8 & 3077.05 & 3.01 & 960.89 & 61.91 & 2871.72 & 205.33 & 0.0644 & 0.0715\\\hline
+total & 1260.45 & 3820.82 & 3.03 & 1153.72 & 106.73 & 3463.37 & 357.45 & 0.0925 & 0.1032\\\hline
+\end{tabular}}\end{center}\caption{\ttJets, inclusive, njets=5}\label{tab:0b_rcscorr_Wbkg2}\end{table}
+
+\begin{table}[ht]\begin{center}\resizebox{\textwidth}{!}{\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}\hline
+ \ttJets     & 0b & 1b  & 1b/0b & 0b($\Delta\Phi<0$) & 0b($\Delta\Phi>0$) & 1b($\Delta\Phi<0$) & 1b($\Delta\Phi>0$) & \Rcs(0b) & \Rcs(1b)\\\hline
+dihadronic & 8.82 & 19.89 & 2.25 & 8.4 & 0.42 & 19.05 & 0.84 & 0.05 & 0.0441\\\hline
+di $\tau$ & 7.98 & 24.23 & 3.04 & 6.02 & 1.96 & 16.95 & 7.28 & 0.3256 & 0.4298\\\hline
+$W\rightarrow \tau + \nu \rightarrow \textrm{had.}+2\nu ~|~ W \rightarrow \textrm{had.}$ & 4.9 & 13.73 & 2.8 & 3.92 & 0.98 & 11.91 & 1.82 & 0.25 & 0.1529\\\hline
+$W\rightarrow \tau + \nu \rightarrow \textrm{had.}+2\nu ~|~ W \rightarrow e/\mu + \nu$ & 73.39 & 256.87 & 3.5 & 48.46 & 24.93 & 171.72 & 85.16 & 0.5144 & 0.4959\\\hline
+$W\rightarrow \tau + \nu \rightarrow e/\mu+3\nu ~|~ W \rightarrow e/\mu + \nu$ & 17.65 & 66.81 & 3.79 & 13.31 & 4.34 & 46.78 & 20.03 & 0.3263 & 0.4281\\\hline
+$W\rightarrow \tau + \nu \rightarrow e/\mu+3\nu ~|~ W \rightarrow \textrm{had.}$ & 116.53 & 359.55 & 3.09 & 114.99 & 1.54 & 352.12 & 7.42 & 0.0134 & 0.0211\\\hline
+dileptonic & 47.9 & 153.23 & 3.2 & 33.62 & 14.29 & 109.11 & 44.12 & 0.425 & 0.4044\\\hline
+single lep. $(e/\mu)$ & 1303.99 & 4381.11 & 3.36 & 1214.63 & 89.36 & 4064.56 & 316.54 & 0.0736 & 0.0779\\\hline
+total & 1581.09 & 5275.81 & 3.34 & 1443.27 & 137.82 & 4792.57 & 483.23 & 0.0955 & 0.1008\\\hline
+\end{tabular}}\end{center}\caption{\ttJets, inclusive, $njets\geq6$}\end{table}
+
+\begin{table}[ht]\begin{center}\resizebox{\textwidth}{!}{\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}\hline
+ W+jets     & 0b & 1b  & 1b/0b & 0b($\Delta\Phi<0$) & 0b($\Delta\Phi>0$) & 1b($\Delta\Phi<0$) & 1b($\Delta\Phi>0$) & \Rcs(0b) & \Rcs(1b)\\\hline
+$W\rightarrow \tau + \nu \rightarrow \textrm{had.}+2\nu$ & 6.01 & 0.88 & 0.15 & 5.94 & 0.08 & 0.88 & 0.0 & 0.0129 & 0.0\\\hline
+$W\rightarrow \tau + \nu \rightarrow e/\mu+3\nu$ & 150.79 & 16.95 & 0.11 & 149.0 & 1.79 & 16.78 & 0.17 & 0.012 & 0.01\\\hline
+single lep. $(e/\mu)$ & 1484.98 & 166.04 & 0.11 & 1411.81 & 73.18 & 156.68 & 9.36 & 0.0518 & 0.0597\\\hline
+total & 1641.89 & 183.86 & 0.11 & 1566.85 & 75.04 & 174.33 & 9.53 & 0.0479 & 0.0547\\\hline
+\end{tabular}}\end{center}\caption{W+jets, inclusive, njets=2}\label{tab:0b_rcscorr_Wbkgasd}\end{table}
+
+\begin{table}[ht]\begin{center}\resizebox{\textwidth}{!}{\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}\hline
+ W+jets     & 0b & 1b  & 1b/0b & 0b($\Delta\Phi<0$) & 0b($\Delta\Phi>0$) & 1b($\Delta\Phi<0$) & 1b($\Delta\Phi>0$) & \Rcs(0b) & \Rcs(1b)\\\hline
+$W\rightarrow \tau + \nu \rightarrow \textrm{had.}+2\nu$ & 8.6 & 1.36 & 0.16 & 8.5 & 0.1 & 1.31 & 0.05 & 0.0122 & 0.0351\\\hline
+$W\rightarrow \tau + \nu \rightarrow e/\mu+3\nu$ & 214.74 & 32.7 & 0.15 & 211.91 & 2.84 & 32.26 & 0.44 & 0.0134 & 0.0137\\\hline
+single lep. $(e/\mu)$ & 2163.15 & 344.07 & 0.16 & 2056.69 & 106.46 & 325.19 & 18.88 & 0.0518 & 0.0581\\\hline
+total & 2385.25 & 378.14 & 0.16 & 2275.85 & 109.4 & 358.78 & 19.37 & 0.0481 & 0.054\\\hline
+\end{tabular}}\end{center}\caption{W+jets, inclusive, njets=3}\label{tab:0b_rcscorr_Wbkga}\end{table}
+
+\begin{table}[ht]\begin{center}\resizebox{\textwidth}{!}{\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}\hline
+ W+jets     & 0b & 1b  & 1b/0b & 0b($\Delta\Phi<0$) & 0b($\Delta\Phi>0$) & 1b($\Delta\Phi<0$) & 1b($\Delta\Phi>0$) & \Rcs(0b) & \Rcs(1b)\\\hline
+$W\rightarrow \tau + \nu \rightarrow \textrm{had.}+2\nu$ & 6.7 & 1.39 & 0.21 & 6.55 & 0.15 & 1.34 & 0.06 & 0.0228 & 0.043\\\hline
+$W\rightarrow \tau + \nu \rightarrow e/\mu+3\nu$ & 171.21 & 34.51 & 0.2 & 169.1 & 2.11 & 33.96 & 0.55 & 0.0125 & 0.0162\\\hline
+single lep. $(e/\mu)$ & 1763.96 & 369.39 & 0.21 & 1673.8 & 90.16 & 348.15 & 21.24 & 0.0539 & 0.061\\\hline
+total & 1941.99 & 405.31 & 0.21 & 1849.57 & 92.42 & 383.46 & 21.85 & 0.05 & 0.057\\\hline
+\end{tabular}}\end{center}\caption{W+jets, inclusive, njets=4}\label{tab:0b_rcscorr_Wbkg4}\end{table}
+
+\begin{table}[ht]\begin{center}\resizebox{\textwidth}{!}{\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}\hline
+ W+jets     & 0b & 1b  & 1b/0b & 0b($\Delta\Phi<0$) & 0b($\Delta\Phi>0$) & 1b($\Delta\Phi<0$) & 1b($\Delta\Phi>0$) & \Rcs(0b) & \Rcs(1b)\\\hline
+$W\rightarrow \tau + \nu \rightarrow \textrm{had.}+2\nu$ & 3.56 & 1.44 & 0.41 & 3.28 & 0.28 & 1.39 & 0.06 & 0.0853 & 0.0414\\\hline
+$W\rightarrow \tau + \nu \rightarrow e/\mu+3\nu$ & 87.89 & 22.92 & 0.26 & 86.79 & 1.1 & 22.5 & 0.43 & 0.0127 & 0.0189\\\hline
+single lep. $(e/\mu)$ & 933.68 & 239.57 & 0.26 & 885.35 & 48.33 & 226.42 & 13.16 & 0.0546 & 0.0581\\\hline
+total & 1025.15 & 263.93 & 0.26 & 975.43 & 49.72 & 250.29 & 13.64 & 0.051 & 0.0545\\\hline
+\end{tabular}}\end{center}\caption{W+jets, inclusive, njets=5}\label{tab:0b_rcscorr_Wbkg6}\end{table}
+
+\begin{table}[ht]\begin{center}\resizebox{\textwidth}{!}{\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}\hline
+ W+jets     & 0b & 1b  & 1b/0b & 0b($\Delta\Phi<0$) & 0b($\Delta\Phi>0$) & 1b($\Delta\Phi<0$) & 1b($\Delta\Phi>0$) & \Rcs(0b) & \Rcs(1b)\\\hline
+$W\rightarrow \tau + \nu \rightarrow \textrm{had.}+2\nu$ & 2.22 & 0.57 & 0.26 & 2.03 & 0.19 & 0.56 & 0.02 & 0.0944 & 0.0345\\\hline
+$W\rightarrow \tau + \nu \rightarrow e/\mu+3\nu$ & 48.13 & 15.16 & 0.32 & 47.3 & 0.83 & 15.01 & 0.15 & 0.0175 & 0.0102\\\hline
+single lep. $(e/\mu)$ & 511.62 & 170.41 & 0.33 & 484.17 & 27.44 & 159.8 & 10.61 & 0.0567 & 0.0664\\\hline
+total & 561.99 & 186.14 & 0.33 & 533.52 & 28.46 & 175.36 & 10.79 & 0.0534 & 0.0615\\\hline
+\end{tabular}}\end{center}\caption{W+jets, inclusive, $njets\geq6$}\label{tab:0b_rcscorr_Wbkg12}\end{table}
+
+\begin{table}[ht]\begin{center}\resizebox{\textwidth}{!}{\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}\hline
+ \ttJets     & 0b & 1b  & 1b/0b & 0b($\Delta\Phi<0$) & 0b($\Delta\Phi>0$) & 1b($\Delta\Phi<0$) & 1b($\Delta\Phi>0$) & \Rcs(0b) & \Rcs(1b)\\\hline
+dihadronic & 0.0 & 0.0 & 1.0 & 0.0 & 0.0 & 0.0 & 0.0 & nan & nan\\\hline
+di $\tau$ & 0.28 & 0.98 & 3.5 & 0.28 & 0.0 & 0.84 & 0.14 & 0.0 & 0.1667\\\hline
+$W\rightarrow \tau + \nu \rightarrow \textrm{had.}+2\nu ~|~ W \rightarrow \textrm{had.}$ & 0.28 & 0.56 & 2.0 & 0.28 & 0.0 & 0.56 & 0.0 & 0.0 & 0.0\\\hline
+$W\rightarrow \tau + \nu \rightarrow \textrm{had.}+2\nu ~|~ W \rightarrow e/\mu + \nu$ & 5.04 & 8.54 & 1.69 & 3.64 & 1.4 & 7.0 & 1.54 & 0.3846 & 0.22\\\hline
+$W\rightarrow \tau + \nu \rightarrow e/\mu+3\nu ~|~ W \rightarrow e/\mu + \nu$ & 2.1 & 6.44 & 3.07 & 1.4 & 0.7 & 5.18 & 1.26 & 0.5 & 0.2432\\\hline
+$W\rightarrow \tau + \nu \rightarrow e/\mu+3\nu ~|~ W \rightarrow \textrm{had.}$ & 3.92 & 7.14 & 1.82 & 3.92 & 0.0 & 7.14 & 0.0 & 0.0 & 0.0\\\hline
+dileptonic & 5.32 & 13.31 & 2.5 & 4.62 & 0.7 & 11.06 & 2.24 & 0.1515 & 0.2025\\\hline
+single lep. $(e/\mu)$ & 36.7 & 57.15 & 1.56 & 36.42 & 0.28 & 57.15 & 0.0 & 0.0077 & 0.0\\\hline
+total & 53.64 & 94.12 & 1.75 & 50.56 & 3.08 & 88.94 & 5.18 & 0.0609 & 0.0583\\\hline
+\end{tabular}}\end{center}\caption{\ttJets, $S_{T}\geq250,~500\leq H_{T} \leq 750,~njets=2$}\label{tab:0b_rcscorr_Wbkgasd}\end{table}
+
+\begin{table}[ht]\begin{center}\resizebox{\textwidth}{!}{\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}\hline
+ \ttJets     & 0b & 1b  & 1b/0b & 0b($\Delta\Phi<0$) & 0b($\Delta\Phi>0$) & 1b($\Delta\Phi<0$) & 1b($\Delta\Phi>0$) & \Rcs(0b) & \Rcs(1b)\\\hline
+dihadronic & 0.42 & 0.14 & 0.33 & 0.42 & 0.0 & 0.14 & 0.0 & 0.0 & 0.0\\\hline
+di $\tau$ & 2.24 & 4.76 & 2.13 & 2.1 & 0.14 & 3.92 & 0.84 & 0.0667 & 0.2143\\\hline
+$W\rightarrow \tau + \nu \rightarrow \textrm{had.}+2\nu ~|~ W \rightarrow \textrm{had.}$ & 0.28 & 1.4 & 5.0 & 0.28 & 0.0 & 1.26 & 0.14 & 0.0 & 0.1111\\\hline
+$W\rightarrow \tau + \nu \rightarrow \textrm{had.}+2\nu ~|~ W \rightarrow e/\mu + \nu$ & 17.65 & 43.56 & 2.47 & 12.89 & 4.76 & 29.13 & 14.43 & 0.3696 & 0.4952\\\hline
+$W\rightarrow \tau + \nu \rightarrow e/\mu+3\nu ~|~ W \rightarrow e/\mu + \nu$ & 4.9 & 20.45 & 4.17 & 3.78 & 1.12 & 13.87 & 6.58 & 0.2963 & 0.4747\\\hline
+$W\rightarrow \tau + \nu \rightarrow e/\mu+3\nu ~|~ W \rightarrow \textrm{had.}$ & 14.57 & 33.19 & 2.28 & 14.57 & 0.0 & 33.19 & 0.0 & 0.0 & 0.0\\\hline
+dileptonic & 15.55 & 39.64 & 2.55 & 11.91 & 3.64 & 29.83 & 9.8 & 0.3059 & 0.3286\\\hline
+single lep. $(e/\mu)$ & 144.54 & 288.25 & 1.99 & 143.28 & 1.26 & 286.57 & 1.68 & 0.0088 & 0.0059\\\hline
+total & 200.15 & 431.4 & 2.16 & 189.22 & 10.92 & 397.93 & 33.47 & 0.0577 & 0.0841\\\hline
+\end{tabular}}\end{center}\caption{\ttJets, $S_{T}\geq250,~500\leq H_{T} \leq 750,~njets=3$}\label{tab:0b_rcadscorr_Wbkg}\end{table}
+
+\begin{table}[ht]\begin{center}\resizebox{\textwidth}{!}{\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}\hline
+ \ttJets     & 0b & 1b  & 1b/0b & 0b($\Delta\Phi<0$) & 0b($\Delta\Phi>0$) & 1b($\Delta\Phi<0$) & 1b($\Delta\Phi>0$) & \Rcs(0b) & \Rcs(1b)\\\hline
+dihadronic & 0.84 & 1.12 & 1.33 & 0.84 & 0.0 & 1.12 & 0.0 & 0.0 & 0.0\\\hline
+di $\tau$ & 3.5 & 6.72 & 1.92 & 3.22 & 0.28 & 5.74 & 0.98 & 0.087 & 0.1707\\\hline
+$W\rightarrow \tau + \nu \rightarrow \textrm{had.}+2\nu ~|~ W \rightarrow \textrm{had.}$ & 0.42 & 2.66 & 6.33 & 0.42 & 0.0 & 2.38 & 0.28 & 0.0 & 0.1176\\\hline
+$W\rightarrow \tau + \nu \rightarrow \textrm{had.}+2\nu ~|~ W \rightarrow e/\mu + \nu$ & 24.79 & 66.53 & 2.68 & 18.49 & 6.3 & 43.7 & 22.83 & 0.3409 & 0.5224\\\hline
+$W\rightarrow \tau + \nu \rightarrow e/\mu+3\nu ~|~ W \rightarrow e/\mu + \nu$ & 7.42 & 20.03 & 2.7 & 5.74 & 1.68 & 13.31 & 6.72 & 0.2927 & 0.5053\\\hline
+$W\rightarrow \tau + \nu \rightarrow e/\mu+3\nu ~|~ W \rightarrow \textrm{had.}$ & 29.97 & 66.67 & 2.22 & 29.97 & 0.0 & 66.67 & 0.0 & 0.0 & 0.0\\\hline
+dileptonic & 16.67 & 50.0 & 3.0 & 12.75 & 3.92 & 36.0 & 14.01 & 0.3077 & 0.3891\\\hline
+single lep. $(e/\mu)$ & 248.05 & 647.4 & 2.61 & 246.65 & 1.4 & 644.04 & 3.36 & 0.0057 & 0.0052\\\hline
+total & 331.67 & 861.15 & 2.6 & 318.09 & 13.59 & 812.97 & 48.18 & 0.0427 & 0.0593\\\hline
+\end{tabular}}\end{center}\caption{\ttJets, $S_{T}\geq250,~500\leq H_{T} \leq 750,~njets=4$}\end{table}
+
+\begin{table}[ht]\begin{center}\resizebox{\textwidth}{!}{\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}\hline
+ \ttJets     & 0b & 1b  & 1b/0b & 0b($\Delta\Phi<0$) & 0b($\Delta\Phi>0$) & 1b($\Delta\Phi<0$) & 1b($\Delta\Phi>0$) & \Rcs(0b) & \Rcs(1b)\\\hline
+dihadronic & 0.7 & 1.4 & 2.0 & 0.7 & 0.0 & 1.4 & 0.0 & 0.0 & 0.0\\\hline
+di $\tau$ & 2.38 & 6.3 & 2.65 & 1.68 & 0.7 & 4.62 & 1.68 & 0.4167 & 0.3636\\\hline
+$W\rightarrow \tau + \nu \rightarrow \textrm{had.}+2\nu ~|~ W \rightarrow \textrm{had.}$ & 0.42 & 1.82 & 4.33 & 0.42 & 0.0 & 1.68 & 0.14 & 0.0 & 0.0833\\\hline
+$W\rightarrow \tau + \nu \rightarrow \textrm{had.}+2\nu ~|~ W \rightarrow e/\mu + \nu$ & 20.31 & 61.35 & 3.02 & 13.17 & 7.14 & 39.36 & 21.99 & 0.5426 & 0.5587\\\hline
+$W\rightarrow \tau + \nu \rightarrow e/\mu+3\nu ~|~ W \rightarrow e/\mu + \nu$ & 5.18 & 14.99 & 2.89 & 3.78 & 1.4 & 10.5 & 4.48 & 0.3704 & 0.4267\\\hline
+$W\rightarrow \tau + \nu \rightarrow e/\mu+3\nu ~|~ W \rightarrow \textrm{had.}$ & 24.93 & 72.69 & 2.92 & 24.93 & 0.0 & 72.69 & 0.0 & 0.0 & 0.0\\\hline
+dileptonic & 13.45 & 39.22 & 2.92 & 9.94 & 3.5 & 28.85 & 10.36 & 0.3521 & 0.3592\\\hline
+single lep. $(e/\mu)$ & 241.61 & 662.95 & 2.74 & 239.78 & 1.82 & 659.45 & 3.5 & 0.0076 & 0.0053\\\hline
+total & 308.98 & 860.73 & 2.79 & 294.41 & 14.57 & 818.58 & 42.16 & 0.0495 & 0.0515\\\hline
+\end{tabular}}\end{center}\caption{\ttJets, $S_{T}\geq250,~500\leq H_{T} \leq 750,~njets=5$}\end{table}
+
+\begin{table}[ht]\begin{center}\resizebox{\textwidth}{!}{\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}\hline
+ \ttJets     & 0b & 1b  & 1b/0b & 0b($\Delta\Phi<0$) & 0b($\Delta\Phi>0$) & 1b($\Delta\Phi<0$) & 1b($\Delta\Phi>0$) & \Rcs(0b) & \Rcs(1b)\\\hline
+dihadronic & 0.98 & 2.38 & 2.43 & 0.84 & 0.14 & 2.38 & 0.0 & 0.1667 & 0.0\\\hline
+di $\tau$ & 1.4 & 4.76 & 3.4 & 1.4 & 0.0 & 3.22 & 1.54 & 0.0 & 0.4783\\\hline
+$W\rightarrow \tau + \nu \rightarrow \textrm{had.}+2\nu ~|~ W \rightarrow \textrm{had.}$ & 0.7 & 2.38 & 3.4 & 0.7 & 0.0 & 1.96 & 0.42 & 0.0 & 0.2143\\\hline
+$W\rightarrow \tau + \nu \rightarrow \textrm{had.}+2\nu ~|~ W \rightarrow e/\mu + \nu$ & 13.03 & 55.18 & 4.24 & 8.4 & 4.62 & 35.16 & 20.03 & 0.55 & 0.5697\\\hline
+$W\rightarrow \tau + \nu \rightarrow e/\mu+3\nu ~|~ W \rightarrow e/\mu + \nu$ & 4.2 & 14.29 & 3.4 & 2.94 & 1.26 & 10.36 & 3.92 & 0.4286 & 0.3784\\\hline
+$W\rightarrow \tau + \nu \rightarrow e/\mu+3\nu ~|~ W \rightarrow \textrm{had.}$ & 23.11 & 60.23 & 2.61 & 23.11 & 0.0 & 60.09 & 0.14 & 0.0 & 0.0023\\\hline
+dileptonic & 12.19 & 25.63 & 2.1 & 8.96 & 3.22 & 17.37 & 8.26 & 0.3594 & 0.4758\\\hline
+single lep. $(e/\mu)$ & 200.99 & 638.44 & 3.18 & 199.87 & 1.12 & 634.8 & 3.64 & 0.0056 & 0.0057\\\hline
+total & 256.59 & 803.3 & 3.13 & 246.23 & 10.36 & 765.35 & 37.96 & 0.0421 & 0.0496\\\hline
+\end{tabular}}\end{center}\caption{\ttJets, $S_{T}\geq250,~500\leq H_{T} \leq 750,~njets\geq6$}\end{table}
+
+\end{document}
+
