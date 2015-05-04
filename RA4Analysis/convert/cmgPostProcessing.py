@@ -6,10 +6,11 @@ from Workspace.HEPHYPythonTools.xsec import xsec
 from Workspace.HEPHYPythonTools.helpers import getObjFromFile, getObjDict, getFileList
 from Workspace.RA4Analysis.convertHelpers import compileClass, readVar, printHeader, typeStr, createClassString
 
-subDir = "postProcessed_v1_Phys14V3"
+subDir = "postProcessed_v2_Phys14V3"
 #from Workspace.RA4Analysis.cmgTuples_v3 import *
 from Workspace.HEPHYPythonTools.helpers import getChunksFromNFS, getChunksFromDPM, getChunks
-from Workspace.RA4Analysis.cmgTuples_PHYS14V3 import *
+#from Workspace.RA4Analysis.cmgTuples_PHYS14V3 import *
+from Workspace.RA4Analysis.cmgTuples_v1_PHYS14V3 import *
 target_lumi = 4000 #pb-1
 
 from  Workspace.RA4Analysis import mt2w
@@ -20,7 +21,9 @@ from localInfo import username
 ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 
+
 defSampleStr = "WJetsToLNu_HT600toInf_PU20bx25"
+#defSampleStr = "T5qqqqWW_mGo1200_mCh1000_mChi800"
 #defSampleStr = "ttJets_PU20bx25"
 #defSampleStr = "WJetsToLNu_HT400to600"
 #defSampleStr = "WJetsToLNu_HT200to400"
@@ -33,7 +36,8 @@ branchKeepStrings = ["run", "lumi", "evt", "isData", "xsec", "puWeight", "nTrueI
                      "nLepGood20", "nLepGood15", "nLepGood10",  
                      "GenSusyMScan1", "GenSusyMScan2", "GenSusyMScan3", "GenSusyMScan4", "GenSusyMGluino", "GenSusyMGravitino", "GenSusyMStop", "GenSusyMSbottom", "GenSusyMStop2", "GenSusyMSbottom2", "GenSusyMSquark", "GenSusyMNeutralino", "GenSusyMNeutralino2", "GenSusyMNeutralino3", "GenSusyMNeutralino4", "GenSusyMChargino", "GenSusyMChargino2", 
                      "htJet25", "mhtJet25", "htJet40j", "htJet40", "mhtJet40", "nSoftBJetLoose25", "nSoftBJetMedium25", "nSoftBJetTight25", 
-                     "met_*", 
+                     "met_*",
+                     "nFatJet","FatJet_*", 
                      "nLepOther", "LepOther_*", "nLepGood", "LepGood_*", "ngenLep", "genLep_*", "nTauGood", "TauGood_*", 
                      "nGenPart", "GenPart_*", "ngenTau", "genTau_*", "nJet", "Jet_*", "ngenLepFromTau", "genLepFromTau_*"]
 #"nGenP6StatusThree", "GenP6StatusThree_*", "nGenTop", "GenTop_*"
@@ -124,14 +128,14 @@ for isample, sample in enumerate(allSamples):
   newVariables = ['weight/F']
   newVariables += ['nLooseSoftLeptons/I', 'nLooseSoftPt10Leptons/I', 'nLooseHardLeptons/I', 'nTightSoftLeptons/I', 'nTightHardLeptons/I']
   if options.leptonSelection.lower()!='none':
-    newVariables.extend( ['deltaPhi_Wl/F','nBJetMediumCMVA30/I','nJet30/I','htJet30j/F','st/F', 'leptonPt/F','leptonMiniRelIso/F','leptonRelIso03/F' ,'leptonEta/F', 'leptonPhi/F', 'leptonPdg/I/0', 'leptonInd/I/-1', 'leptonMass/F', 'singleMuonic/I', 'singleElectronic/I', 'singleLeptonic/I', 'mt2w/F'] )
+    newVariables.extend( ['deltaPhi_Wl/F','nBJetMediumCMVA30/I','nBJetMediumCSV30/I','nJet30/I','htJet30j/F','st/F', 'leptonPt/F','leptonMiniRelIso/F','leptonRelIso03/F' ,'leptonEta/F', 'leptonPhi/F', 'leptonPdg/I/0', 'leptonInd/I/-1', 'leptonMass/F', 'singleMuonic/I', 'singleElectronic/I', 'singleLeptonic/I', 'mt2w/F'] )
   newVars = [readVar(v, allowRenaming=False, isWritten = True, isRead=False) for v in newVariables]
 
   aliases = [ "met:met_pt", "metPhi:met_phi","genMet:met_genPt", "genMetPhi:met_genPhi"]
   
   readVectors = [\
     {'prefix':'LepGood',  'nMax':8, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I', 'relIso03/F', 'tightId/I', 'miniRelIso/F','mvaId/F','eleMVAId/I','mass/F','sip3d/F','mediumMuonId/I', 'mvaIdPhys14/F','lostHits/I', 'convVeto/I']},
-    {'prefix':'Jet',  'nMax':100, 'vars':['pt/F', 'eta/F', 'phi/F', 'id/I', 'btagCMVA/F', 'partonId/I']},
+    {'prefix':'Jet',  'nMax':100, 'vars':['pt/F', 'eta/F', 'phi/F', 'id/I','btagCSV/F' ,'btagCMVA/F', 'partonId/I']},
   ]
   readVars = [readVar(v, allowRenaming=False, isWritten=False, isRead=True) for v in readVariables]
   for v in readVectors:
@@ -152,7 +156,7 @@ for isample, sample in enumerate(allSamples):
 
   filesForHadd=[]
   if options.small: chunks=chunks[:1]
-  print "CHUNKS:" , chunks
+  #print "CHUNKS:" , chunks
   for chunk in chunks:
     sourceFileSize = os.path.getsize(chunk['file'])
     nSplit = 1+int(sourceFileSize/(300*10**6)) #split into 300MB
@@ -178,7 +182,7 @@ for isample, sample in enumerate(allSamples):
       
       for i in range(nEvents):
         if (i%10000 == 0) and i>0 :
-          print i,"/",nEvents
+          print i,"/",nEvents  , "name:" , chunk['name']
         s.init()
         r.init()
         t.GetEntry(i)
@@ -262,12 +266,15 @@ for isample, sample in enumerate(allSamples):
         if options.leptonSelection!='':
           jets = filter(lambda j:j['pt']>30 and abs(j['eta'])<2.4 and j['id'], get_cmg_jets_fromStruct(r))
           #print "jets:" , jets
-          lightJets, bJets = splitListOfObjects('btagCMVA', 0.732, jets) 
-          #print "bjets:" , bJets
+          lightJets, bJetsCMVA = splitListOfObjects('btagCMVA', 0.732, jets) 
+          bJetsCSV = filter(lambda j:j['btagCSV']<0.814 , jets)
+          #print "bjetsCMVA:" , bJetsCMVA , "bjetsCSV:" ,  bJetsCSV
           s.htJet30j = sum([x['pt'] for x in jets])
           s.nJet30 = len(jets)
-          s.nBJetMediumCMVA30 = len(bJets)
-          s.mt2w = mt2w.mt2w(met = {'pt':r.met_pt, 'phi':r.met_phi}, l={'pt':s.leptonPt, 'phi':s.leptonPhi, 'eta':s.leptonEta}, ljets=lightJets, bjets=bJets)
+          s.nBJetMediumCMVA30 = len(bJetsCMVA)
+          s.nBJetMediumCSV30 = len(bJetsCSV)
+          #print "nbjetsCMVA:" , s.nBJetMediumCMVA30  ,"nbjetsCSV:" ,  s.nBJetMediumCSV30
+          s.mt2w = mt2w.mt2w(met = {'pt':r.met_pt, 'phi':r.met_phi}, l={'pt':s.leptonPt, 'phi':s.leptonPhi, 'eta':s.leptonEta}, ljets=lightJets, bjets=bJetsCSV)
           s.deltaPhi_Wl = acos((s.leptonPt+r.met_pt*cos(s.leptonPhi-r.met_phi))/sqrt(s.leptonPt**2+r.met_pt**2+2*r.met_pt*s.leptonPt*cos(s.leptonPhi-r.met_phi))) 
           #print "deltaPhi:" , s.deltaPhi_Wl
   #          print "Warning -> Why can't I compute mt2w?", s.mt2w, len(jets), len(bJets), len(allTightLeptons),lightJets,bJets, {'pt':s.type1phiMet, 'phi':s.type1phiMetphi}, {'pt':s.leptonPt, 'phi':s.leptonPhi, 'eta':s.leptonEta}
