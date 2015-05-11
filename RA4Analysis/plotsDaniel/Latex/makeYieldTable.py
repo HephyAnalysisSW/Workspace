@@ -7,7 +7,10 @@ from math import sqrt, pi
 #from localInfo import username
 
 prefix = 'singleMuonic_fullBkg'
-res = pickle.load(file('/afs/hephy.at/user/d/dspitzbart/www/subBkgTTShape1bvs0binclRCS/500htJet30j/150st/2nJet30Eq2/yields.pkl'))
+res = pickle.load(file('/afs/hephy.at/user/d/dspitzbart/www/softLepYields/yields_withLimitAndSig.pkl'))
+
+signal = 5
+
 
 streg = [[(250, 350), 1.], [(350, 450), 1.], [(450,-1), 1.]]
 htreg = [(500,750),(750,1000),(1000,1250),(1250,-1)]
@@ -39,23 +42,71 @@ print "Results"
 #
 #print '\\hline\end{tabular}}\end{center}\caption{ABCD}\label{tab:0b_rcscorr_Wbkg}\end{table}'
 
-print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}\\hline'
-print ' \\ttJets     & 0b & 1b  & 1b/0b & 0b($\\Delta\Phi<0$) & 0b($\\Delta\Phi>0$) & 1b($\\Delta\Phi<0$) & 1b($\\Delta\Phi>0$) & \\Rcs(0b) & \\Rcs(1b)\\\\\hline'
-#print '$[$GeV$]$&        &$[$GeV$]$&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}     
+#print '\\begin{center}\\begin{longtable}{| p{2cm} | p{2.2cm} | p{1.6cm} | p{1.8cm} | p{2.cm} | p{2.2cm} | p{2.2cm} |}\\hline'
+#print '\\ST & \\HT & \\njet & BackGND & ','\\multicolumn{3}{|c|}{$',res[0]['signalSampleNames'][signal],'$} \\\ \\hline'
+#print '$[$GeV$]$ & $[$GeV$]$ & & Yield & Yield & Significance & Limit \\\ \\hline'
+#print '\\endfirsthead'
+#print '\\multicolumn{7}{c}'
+#print '{\\tablename\\ \\thetable\\ -- \\textit{Continued from previous page}} \\\ \\hline'
+#print '\\ST & \\HT & \\njet & BackGND & ','\\multicolumn{3}{|c|}{$',res[0]['signalSampleNames'][signal],'$} \\\ \\hline'
+#print '$[$GeV$]$ & $[$GeV$]$ & & Yield & Yield & Significance & Limit \\\ \\hline'
+#print '\\endhead'
+#print '\\hline \\multicolumn{7}{r}{\\textit{Continued on next page}} \\\ '
+#print '\\endfoot \\hline \\endlastfoot'
 
-for bkg in res:
-  print bkg['title']\
-    +' & ' +str(round(bkg['yield0bTotal'],2))\
-    +' & ' +str(round(bkg['yield1bTotal'],2))\
-    +' & ' +str(round(bkg['norm'],2))\
-    +' & ' +str(round(bkg['yield0bC'],2))\
-    +' & ' +str(round(bkg['yield0bS'],2))\
-    +' & ' +str(round(bkg['yield1bC'],2))\
-    +' & ' +str(round(bkg['yield1bS'],2))\
-    +' & ' +str(round(bkg['rcs0b'],4))\
-    +' & ' +str(round(bkg['rcs1b'],4))+'\\\\\hline'
+print '\\begin{center}\\begin{sidewaystable}\\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|}\\hline'
+print '\\ST & \\HT & \\njet & BackGND & ','\\multicolumn{3}{|c|}{1000/325/300} & \\multicolumn{3}{|c|}{1000/315/300} & \\multicolumn{3}{|c|}{1000/310/300}  \\\ \\hline'
+print '$[$GeV$]$ & $[$GeV$]$ & & Yield & Yield & Signif. & Limit & Yield & Signif. & Limit & Yield & Signif. & Limit \\\ \\hline'
 
-print '\end{tabular}}\end{center}\caption{ABCD}\end{table}'
+for sample in res:
+  print str(sample['st'])\
+    +' & ' +str(sample['ht'])\
+    +' & ' +str(sample['njet'])\
+    +' & ' +str(round(sample['bkgYield'],3))
+  for i in range(3):
+    print ' & ' +str(round(sample['signalYields'][i],3))\
+    +' & ' +str(round(sample['Significances'][i],3))\
+    +' & ' +str(round(sample['Limits'][i],3))#+ '\\\ \\hline'
+  print '\\\ \\hline'
+print '\\end{tabular}\\caption{Yields, Significance and Limits for compressed Signals with $'+res[0]['variable']+' \geq '+str(res[0]['signalCut'])+'$}\\end{sidewaystable}\\end{center}'
+
+print '\\begin{center}\\begin{sidewaystable}\\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|}\\hline'
+print '\\ST & \\HT & \\njet & BackGND & ','\\multicolumn{3}{|c|}{1400/315/300} & \\multicolumn{3}{|c|}{1000/800/700} & \\multicolumn{3}{|c|}{800/305/300}  \\\ \\hline'
+print '$[$GeV$]$ & $[$GeV$]$ & & Yield & Yield & Signif. & Limit & Yield & Signif. & Limit & Yield & Signif. & Limit \\\ \\hline'
+
+for sample in res:
+  print str(sample['st'])\
+    +' & ' +str(sample['ht'])\
+    +' & ' +str(sample['njet'])\
+    +' & ' +str(round(sample['bkgYield'],3))
+  for i in range(3,6):
+    print ' & ' +str(round(sample['signalYields'][i],3))\
+    +' & ' +str(round(sample['Significances'][i],3))\
+    +' & ' +str(round(sample['Limits'][i],3))#+ '\\\ \\hline'
+  print '\\\ \\hline'
+print '\\end{tabular}\\caption{Yields, Significance and Limits for compressed Signals with $'+res[0]['variable']+' \geq '+str(res[0]['signalCut'])+'$}\\end{sidewaystable}\\end{center}'
+
+#print '\\caption{$'+res[0]['signalSampleNames'][signal]+'$ with $'+res[0]['variable']+' \geq '+str(res[0]['signalCut'])+'$}\\end{longtable}\\end{center}'
+
+
+
+#print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}\\hline'
+#print ' \\ttJets     & 0b & 1b  & 1b/0b & 0b($\\Delta\Phi<0$) & 0b($\\Delta\Phi>0$) & 1b($\\Delta\Phi<0$) & 1b($\\Delta\Phi>0$) & \\Rcs(0b) & \\Rcs(1b)\\\\\hline'
+##print '$[$GeV$]$&        &$[$GeV$]$&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}     
+#
+#for bkg in res:
+#  print bkg['title']\
+#    +' & ' +str(round(bkg['yield0bTotal'],2))\
+#    +' & ' +str(round(bkg['yield1bTotal'],2))\
+#    +' & ' +str(round(bkg['norm'],2))\
+#    +' & ' +str(round(bkg['yield0bC'],2))\
+#    +' & ' +str(round(bkg['yield0bS'],2))\
+#    +' & ' +str(round(bkg['yield1bC'],2))\
+#    +' & ' +str(round(bkg['yield1bS'],2))\
+#    +' & ' +str(round(bkg['rcs0b'],4))\
+#    +' & ' +str(round(bkg['rcs1b'],4))+'\\\\\hline'
+#
+#print '\\end{tabular}}\\end{center}\\caption{ABCD}\\end{table}'
 
 
 
