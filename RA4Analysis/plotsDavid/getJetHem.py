@@ -7,7 +7,7 @@ from Workspace.RA4Analysis.helpers import *
 from Workspace.RA4Analysis.eventShape import *
 
 def getJetHem(c):
-  jets = cmgGetJets(c)
+  jets = cmgGetJets(c,ptMin=30,etaMax=2.4)
   jetList = []
   for i in jets:
     rd = {}
@@ -24,7 +24,7 @@ def getJetHem(c):
   return jetList
 
 def missingHT(c):
-  jets = cmgGetJets(c)
+  jets = cmgGetJets(c,ptMin=30,etaMax=2.4)
   jetX = sum([px(j) for j in jets])
   jetY = sum([py(j) for j in jets])
 
@@ -32,15 +32,15 @@ def missingHT(c):
 
 def dPhiMHTMET(c):
   jets = cmgGetJets(c)
-  jetX = sum([px(j) for j in jets])
-  jetY = sum([py(j) for j in jets])
+  jetX = sum([cos(j['phi'])*j['pt'] for j in jets])
+  jetY = sum([sin(j['phi'])*j['pt'] for j in jets])
   mhtPhi = atan2(jetX,jetY)
   metPhi = c.GetLeaf('met_phi').GetValue()
   return deltaPhi(mhtPhi,metPhi)
 
 ROOT.gROOT.ProcessLine(".L ../../HEPHYPythonTools/scripts/root/Thrust.C+")
 def calcThrust(c):
-  jets = cmgGetJets(c)
+  jets = cmgGetJets(c,ptMin=30,etaMax=2.4)
   lPhi = c.GetLeaf('leptonPhi').GetValue()
   lPt = c.GetLeaf('leptonPt').GetValue()
   mPhi = c.GetLeaf('met_phi').GetValue()
