@@ -2,7 +2,7 @@ import ROOT
 import pickle
 from cardFileWriter import cardFileWriter
 
-yieldTable = pickle.load(file('/afs/hephy.at/user/d/dspitzbart/www/softLepYields/yields.pkl'))
+yieldTable = pickle.load(file('/afs/hephy.at/user/d/dspitzbart/www/softLepYields/yieldsmymt2w_mymt2w199.pkl'))
 
 plotDir='/afs/hephy.at/user/d/dspitzbart/www/softLepYields/'
 
@@ -15,6 +15,7 @@ c.specifyFlatUncertainty('Lumi', 1.20)
 c.addUncertainty('JES', 'lnN')
 
 median = '0.500'
+signif = '-1.000'
 
 for yields in yieldTable:
   c = cardFileWriter()
@@ -32,14 +33,20 @@ for yields in yieldTable:
       
     c.addBin('1', ['bkg'], '1')
     c.specifyObservation('1', int(bY+sY))
-    c.specifyExpectation('1', 'bkg', bY)
-    c.specifyExpectation('1', 'signal', sY)
+    if bY > 0.:
+      c.specifyExpectation('1', 'bkg', bY)
+    else:
+      c.specifyExpectation('1', 'bkg', 0.001)
+    if sY > 0.:
+      c.specifyExpectation('1', 'signal', sY)
+    else:
+      c.specifyExpectation('1', 'signal', 0.001)
     c.specifyUncertainty('JES', '1', 'bkg', 1.3)
     c.writeToFile('significance.txt')
     
     sigAll = c.calcSignif()
-    if median in sigAll:
-      sigMed = sigAll[median]
+    if signif in sigAll:
+      sigMed = sigAll[signif]
       sig.append(sigMed)
       print 'Significance:',sigMed
     else:
@@ -49,8 +56,14 @@ for yields in yieldTable:
 
     c.addBin('1', ['bkg'], '1')
     c.specifyObservation('1', int(bY))
-    c.specifyExpectation('1', 'bkg', bY)
-    c.specifyExpectation('1', 'signal', sY)
+    if bY > 0.:
+      c.specifyExpectation('1', 'bkg', bY)
+    else:
+      c.specifyExpectation('1', 'bkg', 0.001)
+    if sY > 0.:
+      c.specifyExpectation('1', 'signal', sY)
+    else:
+      c.specifyExpectation('1', 'signal', 0.001)
     c.specifyUncertainty('JES', '1', 'bkg', 1.3)
     c.writeToFile('limit.txt')
     
