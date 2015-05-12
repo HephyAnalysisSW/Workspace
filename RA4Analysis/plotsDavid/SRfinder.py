@@ -28,28 +28,20 @@ def getNumString(n,ne, acc=2, systematic=False):    ##For printing table
     return n +'&$\pm$&'+ ne
 
 lepSel = 'hard'
-dPhiJJStr='acos((Jet_pt[1]+Jet_pt[0]*cos(Jet_phi[1]-Jet_phi[0]))/sqrt(Jet_pt[1]**2+Jet_pt[0]**2+2*Jet_pt[0]*Jet_pt[1]*cos(Jet_phi[1]-Jet_phi[0])))'
 
 cBkg = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel]],histname='')
+cS1000 = getChain(T5qqqqWW_mGo1000_mCh800_mChi700[lepSel],histname='')
 cS1200 = getChain(SMS_T5qqqqWW_Gl1200_Chi1000_LSP800[lepSel],histname='')
 cS1500 = getChain(SMS_T5qqqqWW_Gl1500_Chi800_LSP100[lepSel],histname='')
-cBkg.SetAlias('dPhiJJ',dPhiJJStr)
-cS1200.SetAlias('dPhiJJ',dPhiJJStr)
-cS1500.SetAlias('dPhiJJ',dPhiJJStr)
 
-<<<<<<< HEAD
-#flag = "singleMuonic"
-flag = "singleLeptonic"
+flag = "singleMuonic"
+#flag = "singleLeptonic"
 
 #prefix = flag+"_SRfinder_adddPhiJJcut"
-prefix = flag+"_SRfinder"
+prefix = flag+"_SRfinder_Phys14V3"
 presel = flag+"&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&deltaPhi_Wl>1.0"
-path = '/data/'+username+'/PHYS14v3/SRfinder/'
-=======
-prefix = 'singleMuonic_SRfinder_Phys14V3'
-presel = "singleMuonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&deltaPhi_Wl>1.0"
 path = '/data/'+username+'/results2015/SRfinder/'
->>>>>>> 6e0b816e278ca0693193cc48ab69d36593553b89
+
 if not os.path.exists(path):
   os.makedirs(path)
 
@@ -57,8 +49,8 @@ streg = [[(200,-1), 1.], [(250, -1), 1.], [(350, -1), 1.], [(450, -1), 1.], [(20
 htreg = [(400,-1), (500,-1), (750,-1), (1000,-1), (1250,-1), (500,750), (750,1000), (1000,1250)]
 njreg = [(5,5),(6,7),(6,-1),(8,-1)]
 btreg = (0,0) 
-addCut = ['dPhiJJ<2.0','dPhiJJ<1.5']
 
+bestS1000 = []
 bestS1200 = []
 bestS1500 = []
 SR = []
@@ -72,14 +64,17 @@ for i_htb, htb in enumerate(htreg):
       print 'HT: ',htb,'|ST: ',stb,'|nJets: ',srNJet#, '|additional: ',add
       B = getYieldFromChain(cBkg, cut, weight = "weight")
       B_Var = getYieldFromChain(cBkg, cut, weight = "weight*weight")
+      S1000 = getYieldFromChain(cS1000, cut, weight = "weight")
+      S1000_Var = getYieldFromChain(cS1000, cut, weight = "weight*weight")
       S1200 = getYieldFromChain(cS1200, cut, weight = "weight")
       S1200_Var = getYieldFromChain(cS1200, cut, weight = "weight*weight")
       S1500 = getYieldFromChain(cS1500, cut, weight = "weight")
       S1500_Var = getYieldFromChain(cS1500, cut, weight = "weight*weight")
+      FOM1000 = getFOM(S1000,S1000_Var, B, B_Var)
       FOM1200 = getFOM(S1200,S1200_Var, B, B_Var)
       FOM1500 = getFOM(S1500,S1500_Var, B, B_Var)
 
-      SR.append({'FOM1200':FOM1200, 'FOM1500':FOM1500, 'S1200':S1200, 'S1200_Var':S1200_Var, 'S1500':S1500, 'S1500_Var':S1500_Var, 'B':B, 'B_Var':B_Var, 'ST':stb, 'HT':htb, 'nJet':srNJet})#, 'additional':add})
+      SR.append({'FOM1000':FOM1000, 'FOM1200':FOM1200, 'FOM1500':FOM1500, 'S1000':S1000, 'S1000_Var':S1000_Var,  'S1200':S1200, 'S1200_Var':S1200_Var, 'S1500':S1500, 'S1500_Var':S1500_Var, 'B':B, 'B_Var':B_Var, 'ST':stb, 'HT':htb, 'nJet':srNJet})#, 'additional':add})
 
 #htBins = list(set([s['HT'] for s in SR]))
 #stBins = list(set([s['ST'] for s in SR]))
@@ -92,6 +87,9 @@ for i_htb, htb in enumerate(htreg):
 #    result[htb][stb]={}
 #    for njb in nJetBins:
 #      result[htb][stb][njb]={'yield':find...
+bestS1000 = SR
+bestS1000.sort(key=operator.itemgetter('FOM1000'), reverse=True)
+bestS1000=filter(lambda x:not x['FOM1000']=='nan', bestS1000)
 
 bestS1200 = SR
 bestS1200.sort(key=operator.itemgetter('FOM1200'), reverse=True)
@@ -101,25 +99,34 @@ bestS1500 = SR
 bestS1500.sort(key=operator.itemgetter('FOM1500'), reverse=True)
 bestS1500=filter(lambda x:not x['FOM1500']=='nan', bestS1500)
 
-pickle.dump((bestS1200,bestS1500), file(path+prefix+'_pkl','w'))
+pickle.dump((bestS1000,bestS1200,bestS1500), file(path+prefix+'_pkl','w'))
 
-bestS1200, bestS1500 = pickle.load(file(path+prefix+'_pkl'))
+bestS1000, bestS1200, bestS1500 = pickle.load(file(path+prefix+'_pkl'))
+
+print "signal yields (T5q^{4} 1.0/0.8/0.7)"
+print
+print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrr|c|}\\hline'
+print ' \HT     & \\njet & \ST   & \multicolumn{3}{c|}{\TFiveqqqqHM} & \multicolumn{3}{c|}{B (only W, tt)}&\multicolumn{1}{c|}{FOM}\\\\ %\hline'
+print '$[$GeV$]$    &        &$[$GeV$]$  & \multicolumn{3}{c|}{}             & \multicolumn{3}{c|}{}              &\multicolumn{1}{c|}{\frac{S}{\sqrt{B+(0.2B)^2}}} \\\\\hline'
+for dict in bestS1000:
+  print str(dict['HT'])+'&'+str(dict['nJet'])+'&'+str(dict['ST'])+'&'+getNumString(dict['S1000'],sqrt(dict['S1000_Var']),acc=3)+'&'+getNumString(dict['B'],sqrt(dict['B_Var']),acc=3,systematic=False)+'&'+str(round(dict['FOM1000'],3))+'\\\\\hline'
+print '\end{tabular}}\end{center}\caption{\TFiveqqqqHM}\end{table}'
 
 print "signal yields (T5q^{4} 1.2/1.0/0.8)"
 print
-print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrrrr|c|}\\hline'
-print ' \HT     & \\njet & \ST   & \multicolumn{3}{c|}{\TFiveqqqqHM} & \multicolumn{5}{c|}{B (only W, tt)}&\multicolumn{1}{c|}{FOM}\\\\ %\hline'
-print '$[$GeV$]$    &        &$[$GeV$]$  & \multicolumn{3}{c|}{}             & \multicolumn{5}{c|}{}              &\multicolumn{1}{c|}{\frac{S}{\sqrt{B+(0.2B)^2}}} \\\\\hline'
+print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrr|c|}\\hline'
+print ' \HT     & \\njet & \ST   & \multicolumn{3}{c|}{\TFiveqqqqHM} & \multicolumn{3}{c|}{B (only W, tt)}&\multicolumn{1}{c|}{FOM}\\\\ %\hline'
+print '$[$GeV$]$    &        &$[$GeV$]$  & \multicolumn{3}{c|}{}             & \multicolumn{3}{c|}{}              &\multicolumn{1}{c|}{\frac{S}{\sqrt{B+(0.2B)^2}}} \\\\\hline'
 for dict in bestS1200:
-  print str(dict['HT'])+'&'+str(dict['nJet'])+'&'+str(dict['ST'])+'&'+getNumString(dict['S1200'],sqrt(dict['S1200_Var']),acc=3)+'&'+getNumString(dict['B'],sqrt(dict['B_Var']),acc=3,systematic=True)+'&'+str(round(dict['FOM1200'],3))+'\\\\\hline'
+  print str(dict['HT'])+'&'+str(dict['nJet'])+'&'+str(dict['ST'])+'&'+getNumString(dict['S1200'],sqrt(dict['S1200_Var']),acc=3)+'&'+getNumString(dict['B'],sqrt(dict['B_Var']),acc=3,systematic=False)+'&'+str(round(dict['FOM1200'],3))+'\\\\\hline'
 print '\end{tabular}}\end{center}\caption{\TFiveqqqqHM}\end{table}'
 
 print "signal yields (T5q^{4} 1.5/0.8/0.1)"
 print
-print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrrrr|c|}\\hline'
-print ' \HT     & \\njet & \ST     & \multicolumn{3}{c|}{\TFiveqqqqHL} & \multicolumn{5}{c|}{B (only W, tt)}&\multicolumn{1}{c|}{FOM}\\\\ %\hline'
-print '$[$GeV$]$    &        &$[$GeV$]$  & \multicolumn{3}{c|}{}             & \multicolumn{5}{c|}{}              &\multicolumn{1}{c|}{\frac{S}{\sqrt{B+(0.2B)^2}}} \\\\\hline'
+print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrr|c|}\\hline'
+print ' \HT     & \\njet & \ST     & \multicolumn{3}{c|}{\TFiveqqqqHL} & \multicolumn{3}{c|}{B (only W, tt)}&\multicolumn{1}{c|}{FOM}\\\\ %\hline'
+print '$[$GeV$]$    &        &$[$GeV$]$  & \multicolumn{3}{c|}{}             & \multicolumn{3}{c|}{}              &\multicolumn{1}{c|}{\frac{S}{\sqrt{B+(0.2B)^2}}} \\\\\hline'
 for dict in bestS1500:
-  print str(dict['HT'])+'&'+str(dict['nJet'])+'&'+str(dict['ST'])+'&'+getNumString(dict['S1500'],sqrt(dict['S1500_Var']),acc=3)+'&'+getNumString(dict['B'],sqrt(dict['B_Var']),acc=3,systematic=True)+'&'+str(round(dict['FOM1500'],3))+'\\\\\hline'
+  print str(dict['HT'])+'&'+str(dict['nJet'])+'&'+str(dict['ST'])+'&'+getNumString(dict['S1500'],sqrt(dict['S1500_Var']),acc=3)+'&'+getNumString(dict['B'],sqrt(dict['B_Var']),acc=3,systematic=False)+'&'+str(round(dict['FOM1500'],3))+'\\\\\hline'
 print '\end{tabular}}\end{center}\caption{\TFiveqqqqHL}\end{table}'
 

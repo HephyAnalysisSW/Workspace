@@ -28,8 +28,6 @@ directory= "/data/"+options.userNameNFS+'/'+options.dir
 suf = options.suffix
 
 print options.dir.split("/")
-print options.dir.split("/")[-1]
-print options.dir.split("/")[-2]
 
 if not options.dir.endswith("/"):
   sampleName = options.dir.split("/")[-1]
@@ -55,16 +53,15 @@ p = subprocess.Popen(["ls -l "+ directory], shell = True , stdout=subprocess.PIP
 
 
 
-print "sample:           ", sampleName
+print "Unpacking sample:  ", sampleName
 #print "processing directories to: ", directory+"/../"+sampleName
-print "with chunks:      ", directory+sampleName+"_Chunk*"
-print "and root files in ", directory+sampleName+"_Chunk*"+"/"+treeProducerName+"/"+finalTreeName
+print "To CMG Chunks:     ", directory+sampleName+"_Chunk*"
+print "And root files in  ", directory+sampleName+"_Chunk*"+"/"+treeProducerName+"/"+finalTreeName
 
 
 
 for line in p.stdout.readlines():
-  linePart=line[:-1].split(" ")
-  print linePart
+  linePart=line[:-1].split()
   #print "#### ", linePart
   if linePart[0]=='total':
     print line

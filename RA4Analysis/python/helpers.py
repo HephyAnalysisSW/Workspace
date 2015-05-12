@@ -62,12 +62,12 @@ def cmgST(c):
 
 def cmgGetJets(c, ptMin=30., etaMax=999.):
   addJetVars =  ['phi', 'mcFlavour', 'mcMatchId', 'mcMatchFlav', 'btagCSV', 'btagCMVA']
-  if c=="branches":return ['nJet30','Jet_pt','Jet_eta'] + ['Jet_'+x for x in addJetVars]
-  nJet = int(getVarValue(c, 'nJet30'))
+  if c=="branches":return ['nJet','Jet_pt','Jet_eta'] + ['Jet_'+x for x in addJetVars]
+  nJet = int(getVarValue(c, 'nJet'))
   jets=[]
   for i in range(nJet):
-    jet = getObjDict(c, 'Jet_', ['pt','eta'], i)
-    if jet['pt']>ptMin and abs(jet['eta']<etaMax):
+    jet = getObjDict(c, 'Jet_', ['pt','eta', 'id'], i)
+    if jet['pt']>ptMin and abs(jet['eta'])<etaMax and jet['id']:
       jet.update(getObjDict(c, 'Jet_', addJetVars, i))
       jets.append(jet)
   return jets
