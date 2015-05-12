@@ -4,6 +4,8 @@
 #include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
 
 using namespace std;
+#include <stdio.h>
+#include<iostream>
 
 std::vector<std::string> &splitToVec(const std::string &s, char delim, std::vector<std::string> &elems) {
     std::stringstream ss(s);
@@ -27,9 +29,9 @@ void ModelParameters::lheMSUGRA ( const std::string & t )
   size_t found = t.find("msugra");
   // size_t found_ = t.find("_");
   /*
-  cout << "[ModelParameters] interpreting ``"<< t << "'' as an MSUGRA model string"
-       << endl;
-  cout << "                  msugra=" << found << " _=" << found_ << endl;
+  //cout << "[ModelParameters] interpreting ``"<< t << "'' as an MSUGRA model string"
+  //     << endl;
+  //cout << "                  msugra=" << found << " _=" << found_ << endl;
   */
 
   std::string smaller = t.substr(found+1,foundLength);
