@@ -60,9 +60,11 @@ def get_cmg_jets(c):
   return [getObjDict(c, 'Jet_', ['eta','pt','phi','btagCMVA','btagCSV','mcMatchFlav' ,'partonId', 'id'], i) for i in range(int(getVarValue(c, 'nJet')))]
 def get_cmg_jets_fromStruct(r):
   return [{p:getattr(r, 'Jet'+'_'+p)[i] for p in ['eta','pt','phi','btagCMVA', 'btagCSV','partonId', 'id']} for i in range(r.nJet)]
+def get_cmg_fatJets(c):
+  return [getObjDict(c, 'FatJet_', ['eta','pt','phi','btagCMVA','btagCSV','mcPt','mcFlavour' ,'prunedMass','tau2', 'tau1'], i) for i in range(int(getVarValue(c, 'nFatJet')))]
 
-def get_cmg_index_and_DR(objs,leptonPhi,leptonEta):
-  obj = findClosestObject(objs,{'phi':leptonPhi, 'eta':leptonEta})
+def get_cmg_index_and_DR(objs,objPhi,objEta):
+  obj = findClosestObject(objs,{'phi':objPhi, 'eta':objEta})
   if obj and obj['index']<10:
     index = obj['index']
     dr =sqrt(obj['distance'])
@@ -73,6 +75,12 @@ def get_cmg_index_and_DR(objs,leptonPhi,leptonEta):
 
 def get_cmg_genLeps(c):
   return [getObjDict(c, 'genLep_', ['eta','pt','phi','charge', 'pdgId', 'sourceId'], i) for i in range(int(getVarValue(c, 'ngenLep')))]
+
+def get_cmg_genParts(c):
+  return [getObjDict(c, 'GenPart_', ['eta','pt','phi','charge', 'pdgId', 'motherId', 'grandmotherId'], i) for i in range(int(getVarValue(c, 'nGenPart')))]
+
+def get_cmg_genPartsAll(c):
+  return [getObjDict(c, 'genPartAll_', ['eta','pt','phi','charge', 'pdgId', 'motherId', 'grandmotherId'], i) for i in range(int(getVarValue(c, 'ngenPartAll')))]
 
 def get_cmg_recoMuons(c):
   res = [getObjDict(c, 'LepGood_', ['eta','pt','phi','charge', 'dxy', 'dz', 'relIso03','tightId', 'pdgId'], i) for i in range(int(getVarValue(c, 'nLepGood')))]
