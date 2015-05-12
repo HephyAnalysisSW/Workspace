@@ -7,23 +7,38 @@ ROOT.setTDRStyle()
 from math import *
 from array import array
 
-from Workspace.HEPHYPythonTools.helpers import getVarValue, getChain, deltaPhi, getYieldFromChain
+from Workspace.HEPHYPythonTools.helpers import *#getVarValue, getChain, deltaPhi, getYieldFromChain
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2_HT400ST150_withDF import *
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2 import *
 from Workspace.RA4Analysis.cmgTuplesPostProcessed_softLepton import *
 from Workspace.RA4Analysis.helpers import *
 from Workspace.RA4Analysis.eventShape import * 
 
+#from Workspace.RA4Analysis.convertHelpers import compileClass, readVar, printHeader, typeStr, createClassString
+#from Workspace.RA4Analysis import mt2bl
+#from Workspace.RA4Analysis import mt2w
+
+from getJetHem import *
+
+
 binning=[18,50,500]
 histMin = 0.08
-histMax = 120
+histMax = 20
 
 
 #prepresel = 'singleLeptonic==1&&'#&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&'
 #presel = prepresel + 'Jet_pt[1]>80&&nJet30>=2&&nBJetMediumCMVA30==0&&st>=150&&st<=250'#&&htJet30j>500&&htJet30j<750'#&&htJet30j>=500&&st>=200&&deltaPhi_Wl>1&&mt2w>350'
 
-prepresel = 'singleLeptonic==1&&nLooseSoftLeptons==1&&nLooseHardLeptons==0&&nTightHardLeptons==0&&htJet30j>500&&st>250&&nJet30>=2&&nBJetMediumCMVA30==0&&Jet_pt[1]>100&&Jet_pt[2]>80'
+prepresel = 'singleLeptonic==1&&nLooseSoftLeptons==1&&nLooseHardLeptons==0&&nTightHardLeptons==0&&htJet30j>500&&st>250&&nJet30>=2&&Jet_pt[1]>100&&Jet_pt[2]>80'
 presel = prepresel
+
+def gethtRatio(c):
+  ht = c.GetLeaf('htJet30j').GetValue()
+  Jet0 = c.GetLeaf('Jet_pt').GetValue(0)
+  Jet1 = c.GetLeaf('Jet_pt').GetValue(1)
+  ratio = (ht-Jet0-Jet1)/(Jet0+Jet1)
+  return ratio
+
 
 
 def getdPhiMetJet(c):
@@ -44,6 +59,42 @@ def getFWMT4(c):
   jets = cmgGetJets(c)
   rd = foxWolframMoments(jets)
   return rd['FWMT4']
+
+def getJetRatio(c):
+  Jet0 = c.GetLeaf('Jet_pt').GetValue(0)
+  Jet1 = c.GetLeaf('Jet_pt').GetValue(1)
+  Jet2 = c.GetLeaf('Jet_pt').GetValue(2)
+  Jet3 = c.GetLeaf('Jet_pt').GetValue(3)
+  ratio = (Jet2+Jet3)/(Jet0+Jet1)
+  return ratio
+
+def getAdJetRatio(c):
+  leadingNJets = cmgGetJets(c, ptMin=30., etaMax=999.)[:4]
+  leadingJet = leadingNJets.pop(0)
+  closeToLeading = findClosestObject(leadingNJets, leadingJet, sortFunc=lambda o1,o2: deltaPhi(o1['phi'], o2['phi']))
+  leadingNJets.pop(closeToLeading['index'])
+  nextToLeading = leadingNJets.pop(0)
+  closeToNextToLeading = findClosestObject(leadingNJets, nextToLeading, sortFunc=lambda o1,o2: deltaPhi(o1['phi'], o2['phi']))
+  return (nextToLeading['pt']+closeToNextToLeading['obj']['pt'])/(leadingJet['pt']+closeToLeading['obj']['pt'])
+
+def getJetDistance(c):
+  leadingNJets = cmgGetJets(c, ptMin=30., etaMax=999.)[:6]
+  leadingJet = leadingNJets.pop(0)
+  closeToLeading = findClosestObject(leadingNJets, leadingJet, sortFunc=lambda o1,o2: deltaPhi(o1['phi'], o2['phi']))
+  return closeToLeading['distance']
+
+def getDeltaPhiJet(c):
+  leadingNJets = cmgGetJets(c, ptMin=30., etaMax=999.)[:2]
+  return deltaPhi(leadingNJets[0]['phi'],leadingNJets[1]['phi'])
+
+def getAdJetDistance(c):
+  leadingNJets = cmgGetJets(c, ptMin=30., etaMax=999.)[:4]
+  leadingJet = leadingNJets.pop(0)
+  closeToLeading = findClosestObject(leadingNJets, leadingJet, sortFunc=lambda o1,o2: deltaPhi(o1['phi'], o2['phi']))
+  leadingNJets.pop(closeToLeading['index'])
+  nextToLeading = leadingNJets.pop(0)
+  closeToNextToLeading = findClosestObject(leadingNJets, nextToLeading, sortFunc=lambda o1,o2: deltaPhi(o1['phi'], o2['phi']))
+  return closeToLeading['distance']/closeToNextToLeading['distance']
 
 def getJetMagnitude(c):
   leadJetPt = c.GetLeaf('Jet_pt').GetValue(0)
@@ -208,13 +259,13 @@ dphimetjet = {'name':'mydPhimetjet', 'varFunc':getdPhiMetJet, 'legendName':'#Del
 minDPhiMetJetthree = {'name':'myminDPhiMetJet123', 'varFunc':cmgMinDPhiJet, 'legendName':'min #Delta#Phi(#slash{E}_{T},J_{1,2,3})', 'Ytitle':'# of Events', 'binning':[20,0,pi]}#, 'binningIsExplicit':True}
 fwmt2 = {'name':'myfwmt2', 'varFunc':getFWMT2, 'legendName':'FWMT2', 'Ytitle':'# of Events ', 'binning':[20,0,1]}
 fwmt4 = {'name':'myfwmt4', 'varFunc':getFWMT4, 'legendName':'FWMT4', 'Ytitle':'# of Events ', 'binning':[20,0,1]}
-MT2W = {'name':'mymt2w', 'varString':'mt2w', 'legendName':'M^{W}_{T2}', 'Ytitle':'# of Events / 10GeV', 'binning':[45,0,450]}
+MT2W = {'name':'mymt2w', 'varString':'mt2w', 'legendName':'M^{W}_{T2}', 'Ytitle':'# of Events / 10GeV', 'binning':[18,50,500]}
 jetMag = {'name':'myjetmag', 'varFunc':getJetMagnitude, 'legendName':'#frac{H_{T}}{nJets}', 'Ytitle':'# of Events', 'binning':[35,0,350]}
 lincirc = {'name':'mylincirc', 'varFunc':getlinCirc2D, 'legendName':'lin. Circularity', 'Ytitle':'# of Events ', 'binning':[20,0,1]}
 mt = {'name':'mymt', 'varFunc':cmgMT, 'legendName':'M_{T}', 'Ytitle':'# of Events / 10GeV', 'binning':[35,0,350]}
 
 met = {'name':'mymet', 'varString':"met_pt", 'legendName':'#slash{E}_{T}', 'Ytitle':'# of Events / 25GeV', 'binning':[64,0,1600]}
-ht = {'name':'myht', 'varString':"htJet30j", 'legendName':'H_{T}', 'Ytitle':'# of Events / 25GeV', 'binning':[64,0,1600]}
+ht = {'name':'myht', 'varString':"htJet30j", 'legendName':'H_{T}', 'Ytitle':'# of Events / 25GeV', 'binning':[20,500,2500]}
 St = {'name':'myst', 'varString':"st", 'legendName':'S_{T}', 'Ytitle':'# of Events / 25GeV', 'binning':[64,0,1600]}
 nJets = {'name':'mynJets', 'varString':'nJet30', 'legendName':'Jets', 'Ytitle':'# of Events', 'binning':[17,-0.5,16.5]}
 nbJets = {'name':'mynbtaggedJets', 'varString':'nBJetMediumCMVA30', 'legendName':'b-tagged Jets', 'Ytitle':'# of Events', 'binning':[17,-0.5,16.5]}
@@ -224,7 +275,21 @@ deltaPhiWl = {'name':'mydeltaPhi', 'varString':'deltaPhi_Wl', 'legendName':'#Del
 mediumJetPT = {'name':'mediumJetPT', 'varFunc':getMediumJetPT, 'legendName': 'H_{T} / Jets', 'Ytitle':'# of Events', 'binning':[16,0,3.2]}
 mediumDeltaPhi = {'name':'mediumDeltaPhi', 'varFunc':getMedDPhiJetMet, 'legendName': '#Delta #Phi (medJet3, #slash{E}_{T})', 'Ytitle':'# of Events', 'binning':[16,0,3.2]}
 MTclosestJetMet = {'name':'myMTClosestJetMET', 'varFunc':cmgMTClosestJetMET, 'legendName':'M_{T} (closest Jet,#slash{E}_{T})', 'Ytitle':'# of Events / 10GeV', 'binning':[35,0,350]}
+jetRatio = {'name':'myJetRatio', 'varFunc':getJetRatio, 'legendName':'(Jet3+Jet4)/(Jet1+Jet2)', 'Ytitle':'# of Events / 10GeV', 'binning':[35,0,350]}
+adJetRatio = {'name':'myAdvancedJetRatio', 'varFunc':getAdJetRatio, 'legendName':'(nLJet+closest)/(leadingJet+closest)', 'Ytitle':'# of Events / 10GeV', 'binning':[35,0,350]}
+jetDistance = {'name':'myJetDistance', 'varFunc':getJetDistance, 'legendName':'dPhi(LJ+cl)', 'Ytitle':'# of Events / 10GeV', 'binning':[35,0,350]}
+adJetDistance = {'name':'myAdvancedJetDistance', 'varFunc':getAdJetDistance, 'legendName':'dPhi(LJ+cl)/dPhi(NLJ+cl)', 'Ytitle':'# of Events / 10GeV', 'binning':[35,0,350]}
+jetDeltaPhi = {'name':'myJetDeltaPhi', 'varFunc':getDeltaPhiJet, 'legendName':'dPhi(Jet1,Jet2)', 'Ytitle':'# of Events / 10GeV', 'binning':[35,0,350]}
 
+htratio = {'name':'myhtratio', 'varFunc':gethtRatio, 'legendName':'H_{T,ratio}', 'Ytitle':'# of Events', 'binning':[25,0,2.5]}
+dphimetjet = {'name':'mydPhimetjet', 'varFunc':getdPhiMetJet, 'legendName':'#Delta#Phi(#slash{E}_{T},J_{1})', 'Ytitle':'# of Events', 'binning':[20,0,pi]}#, 'binningIsExplicit':True}
+htOppRatio = {'name':'myhtOppRatio', 'varFunc':cmgHTRatio, 'legendName':'H^{opp. to #slash{E}_{T}}_{T}/H_{T}', 'Ytitle':'# of Events', 'binning':[20,0,1]}
+mht = {'name':'mymht', 'varFunc':missingHT, 'legendName':'#slash{H}_{T}', 'Ytitle':'# of Events / 25GeV', 'binning':[20,100,1100]}
+thrust = {'name':'mythrust', 'varFunc':calcThrust, 'legendName':'Thrust', 'Ytitle':'# of Events ', 'binning':[20,0.5,1.5]}
+
+#MT2W = {'name':'mymt2w', 'varFunc':mt2w, 'legendName':'M^{W}_{T2}', 'Ytitle':'# of Events / 10GeV', 'binning':[18,50,500]}
+#MT2BL = {'name':'mymt2bl', 'varFunc':mt2bl, 'legendName':'M^{bl}_{T2}', 'Ytitle':'# of Events / 10GeV', 'binning':[20,0,500]}
+#does not work that way, needs to be postprocessed
 
 allVariables = []
 #jets = cmgGetJets(c)
@@ -235,11 +300,11 @@ allVariables.append(minDPhiMetJetthree)
 cutVar = MT2W
 adCut = 200
 varNew = MT2W
+binning = varNew['binning']
 
-
-stReg=[(250,350),(350,450),(450,-1)]#,(350,450),(450,-1)]#250),(250,350),(350,450),(450,-1)]
-htReg=[(500,750),(750,1000),(1000,1250),(1250,-1)]#,(1000,-1)]#,(1250,-1)]#,(1000,-1)]#,(800,-1),(900,-1),(1000,-1),(1100,-1),(1200,-1),(1300,-1)]#,(750,1000),(1000,1250),(1250,-1)]#750),(750,1000),(1000,1250),(1250,-1)]
-jetReg = [(2,3),(4,5),(6,7),(8,-1)]#,(6,-1),(8,-1)]
+stReg=[(450,-1)]#,(450,-1)]#,(350,450),(450,-1)]#250),(250,350),(350,450),(450,-1)]
+htReg=[(500,750),(750,1000),(1000,1250),(1250,-1)]#,(1250,-1)]
+jetReg = [(4,5),(6,7),(8,-1)]#,(8,-1)]#,(6,-1)]#,(8,-1)]#,(6,-1),(8,-1)]
 btb = (0,0)
 
 #presel = prepresel + ht['varstring'] + ">=" + str(bins[0]) + ht['varstring'] + '<' + str(bins[1])
@@ -479,11 +544,11 @@ for st in stReg:
       h3.Reset()
       histo.Reset()
 
-yieldFile=open(plotDir+"yields.pkl","w")
+yieldFile=open(plotDir+"yields"+varNew['name']+'_'+cutVar['name']+str(adCut)+".pkl","w")
 pickle.dump(yieldTable,yieldFile)
 yieldFile.close()
 
-print 'Dumped yields to pickle file: ', plotDir, 'yields.pkl'
+print 'Dumped yields to pickle file: ', plotDir, 'yields'+varNew['name']+'_'+cutVar['name']+str(adCut)+'.pkl'
 
 #    can2.cd()
 #    print 'Now Plotting total Bkg'
