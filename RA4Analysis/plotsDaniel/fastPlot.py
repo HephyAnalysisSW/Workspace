@@ -12,7 +12,7 @@ from Workspace.HEPHYPythonTools.helpers import getVarValue, getChain, deltaPhi
 from Workspace.RA4Analysis.cmgTuplesPostProcessed_softLepton import *
 from Workspace.RA4Analysis.helpers import *
 
-binning=[100,0,1000]
+binning=[40,0,1000]
 
 #prepresel = 'singleLeptonic==1&&'#&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&'
 #presel = prepresel + 'Jet_pt[1]>80&&nJet30>=2&&nBJetMediumCMVA30==0&&st>=150&&st<=250'#&&htJet30j>500&&htJet30j<750'#&&htJet30j>=500&&st>=200&&deltaPhi_Wl>1&&mt2w>350'
@@ -20,7 +20,7 @@ binning=[100,0,1000]
 #prepresel = 'singleLeptonic==1'#&&htJet30j>400&&st>200&&nJet30>=4&&nBJetMediumCMVA30==0'#&&Jet_pt[1]>80&&deltaPhi_Wl>0.5'
 #presel = prepresel
 
-presel='(abs(genPartAll_pdgId)==11||abs(genPartAll_pdgId)==13)&&(abs(genPartAll_motherId)==24||abs(genPartAll_motherId)==1000024)'
+presel='htJet25>400&&(abs(genPartAll_pdgId)==11||abs(genPartAll_pdgId)==13)&&(abs(genPartAll_motherId)==24||abs(genPartAll_motherId)==1000024)'
 #presel='(abs(genLep_pdgId)==11||abs(genLep_pdgId)==13)&&(abs(genLep_motherId)==24||abs(genLep_motherId)==1000024)'
 
 #presel='abs(genPartAll_pdgId)==1000022&&abs(genPartAll_motherId)==1000024'
@@ -156,12 +156,12 @@ sigSamples.append(t5qqqq5)
 
 
 bkgSamples=[]
-bkgSamples.append(qcd)
-bkgSamples.append(ttvh)
-bkgSamples.append(dy)
-bkgSamples.append(singletop)
-bkgSamples.append(wjets)
-bkgSamples.append(ttjets)
+#bkgSamples.append(qcd)
+#bkgSamples.append(ttvh)
+#bkgSamples.append(dy)
+#bkgSamples.append(singletop)
+#bkgSamples.append(wjets)
+#bkgSamples.append(ttjets)
 
 h_Stack = ROOT.THStack('h_Stack',varstring)
 h_Stack_S = ROOT.THStack('h_Stack_S',varstring)
@@ -271,16 +271,16 @@ histo.GetYaxis().SetTitleSize(0.15)
 
 h_Stack.Draw()
 h_Stack.SetMinimum(0.8)
-h_Stack_S.Draw('noStacksame')
-#h_Stack_S.Draw('noStack')
-h_Stack.GetYaxis().SetTitle("Events") #add _S if no bkg
-h_Stack.GetYaxis().SetLabelSize(0.04)
-h_Stack.GetYaxis().SetTitleOffset(1.1)
-h_Stack.GetYaxis().SetTitleSize(0.04)
-h_Stack.GetXaxis().SetTitle(varstring)
-h_Stack.GetXaxis().SetLabelSize(0.04)
-h_Stack.GetXaxis().SetTitleOffset(1.3)
-h_Stack.GetXaxis().SetTitleSize(0.04)
+#h_Stack_S.Draw('noStacksame')
+h_Stack_S.Draw('noStack')
+h_Stack_S.GetYaxis().SetTitle("Events") #add _S if no bkg
+h_Stack_S.GetYaxis().SetLabelSize(0.04)
+h_Stack_S.GetYaxis().SetTitleOffset(1.1)
+h_Stack_S.GetYaxis().SetTitleSize(0.04)
+h_Stack_S.GetXaxis().SetTitle(varstring)
+h_Stack_S.GetXaxis().SetLabelSize(0.04)
+h_Stack_S.GetXaxis().SetTitleOffset(1.3)
+h_Stack_S.GetXaxis().SetTitleSize(0.04)
 #h_Stack_S.Draw('noStack')
 l.Draw()
 

@@ -1,5 +1,6 @@
 import ROOT
 import os, sys, copy
+import pickle
 
 ROOT.gROOT.LoadMacro('../../HEPHYPythonTools/scripts/root/tdrstyle.C')
 ROOT.setTDRStyle()
@@ -13,15 +14,15 @@ from Workspace.RA4Analysis.cmgTuplesPostProcessed_softLepton import *
 from Workspace.RA4Analysis.helpers import *
 from Workspace.RA4Analysis.eventShape import * 
 
-binning=[16,0,3.2]
+binning=[18,50,500]
 histMin = 0.08
-histMax = 100
+histMax = 120
 
 
 #prepresel = 'singleLeptonic==1&&'#&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&'
 #presel = prepresel + 'Jet_pt[1]>80&&nJet30>=2&&nBJetMediumCMVA30==0&&st>=150&&st<=250'#&&htJet30j>500&&htJet30j<750'#&&htJet30j>=500&&st>=200&&deltaPhi_Wl>1&&mt2w>350'
 
-prepresel = 'singleLeptonic==1&&htJet30j>500&&st>250&&nJet30>=4&&nBJetMediumCMVA30==0&&Jet_pt[1]>100&&Jet_pt[2]>80'
+prepresel = 'singleLeptonic==1&&nLooseSoftLeptons==1&&nLooseHardLeptons==0&&nTightHardLeptons==0&&htJet30j>500&&st>250&&nJet30>=2&&nBJetMediumCMVA30==0&&Jet_pt[1]>100&&Jet_pt[2]>80'
 presel = prepresel
 
 
@@ -65,6 +66,24 @@ def getNLJet(c):
   Jet1 = c.GetLeaf('Jet_pt').GetValue(1)
   return Jet1
 
+def getMedDPhiJetMet(c, nJets=4):
+  if c=="branches":return cmgGetJets("branches")+['met_phi']
+  leadingNJets = cmgGetJets(c, ptMin=30., etaMax=999.)[:nJets]
+  met = {'phi':c.GetLeaf('met_phi').GetValue()}
+  jetPhi=0.
+  for j in leadingNJets:
+    jetPhi+=j['phi']
+  return deltaPhi(met['phi'],jetPhi/nJets)
+  #closestJet = findClosestObject(leadingNJets, met, sortFunc=lambda o1,o2: deltaPhi(o1['phi'], o2['phi']))
+  #return closestJet['distance']
+
+def getMediumJetPT(c):
+  ht = c.GetLeaf('htJet30j').GetValue()
+  nJ = c.GetLeaf('nJet30').GetValue()
+  return ht/nJ
+
+
+
 #presel='(abs(genPartAll_pdgId)==11||abs(genPartAll_pdgId)==13)&&(abs(genPartAll_motherId)==24||abs(genPartAll_motherId)==1000024)'
 #presel='(abs(genLep_pdgId)==11||abs(genLep_pdgId)==13)&&(abs(genLep_motherId)==24||abs(genLep_motherId)==1000024)'
 
@@ -75,7 +94,11 @@ def getNLJet(c):
 signalString='T5qqqqWW_softLep'
 
 varstring="deltaPhi_Wl"
-plotDir='/afs/hephy.at/user/d/dspitzbart/www/softLep/'
+plotDir='/afs/hephy.at/user/d/dspitzbart/www/softLepYields/'
+
+if not os.path.exists(plotDir):
+  os.makedirs(plotDir)
+
 
 lepSel='soft'
 
@@ -114,9 +137,11 @@ QCD = getChain(QCD[lepSel],histname='')
 
 #SIG Samples
 SIG1 = getChain(T5qqqqWWDeg_mGo1000_mCh325_mChi300[lepSel],histname='')
-SIG2 = getChain(T5qqqqWWDeg_mGo1000_mCh310_mChi300[lepSel],histname='')
-SIG3 = getChain(T5qqqqWW_mGo1000_mCh800_mChi700[lepSel],histname='')
-SIG4 = getChain(T5qqqqWWDeg_mGo800_mCh305_mChi300[lepSel],histname='')
+SIG2 = getChain(T5qqqqWWDeg_mGo1000_mCh315_mChi300[lepSel],histname='')
+SIG3 = getChain(T5qqqqWWDeg_mGo1000_mCh310_mChi300[lepSel],histname='')
+SIG4 = getChain(T5qqqqWWDeg_mGo1400_mCh315_mChi300[lepSel],histname='')
+SIG5 = getChain(T5qqqqWW_mGo1000_mCh800_mChi700[lepSel],histname='')
+SIG6 = getChain(T5qqqqWWDeg_mGo800_mCh305_mChi300[lepSel],histname='')
 
 
 wjets = {
@@ -134,10 +159,12 @@ qcd = {
 
 
 
-signal1 = {'name':'T5qqqqWWDeg_mGo1000_mCh325_mChi300', 'chain':SIG1, 'weight':'weight', 'color':ROOT.kBlack, "histo":ROOT.TH1F("Signal 1", "sqrt(s)", *binning)}
-signal2 = {'name':'T5qqqqWWDeg_mGo1000_mCh310_mChi300', 'chain':SIG2, 'weight':'weight', 'color':ROOT.kRed+1, "histo":ROOT.TH1F("Signal 2", "sqrt(s)", *binning)}
-signal3 = {'name':'T5qqqqWW_mGo1000_mCh800_mChi700', 'chain':SIG3, 'weight':'weight', 'color':ROOT.kMagenta+1, "histo":ROOT.TH1F("Signal 3", "sqrt(s)", *binning)}
-signal4 = {'name':'T5qqqqWWDeg_mGo800_mCh305_mChi300', 'chain':SIG4, 'weight':'weight', 'color':ROOT.kCyan+3, "histo":ROOT.TH1F("Signal 4", "sqrt(s)", *binning)}
+signal1 = {'name':'T5qqqqWWDeg_mGo1000_mCh325_mChi300', 'chain':SIG1, 'weight':'weight', 'color':ROOT.kRed-7, "histo":ROOT.TH1F("Signal 1", "sqrt(s)", *binning), 'niceName':'T5qqqqWW m_{\\tilde{g}}=1000, m_{\\tilde{\\chi}_{1}^{+}}=325, m_{\\tilde{\\chi}_{1}^{0}}=300'}
+signal2 = {'name':'T5qqqqWWDeg_mGo1000_mCh315_mChi300', 'chain':SIG2, 'weight':'weight', 'color':ROOT.kRed-3, "histo":ROOT.TH1F("Signal 2", "sqrt(s)", *binning), 'niceName':'T5qqqqWW m_{\\tilde{g}}=1000, m_{\\tilde{\\chi}_{1}^{+}}=315, m_{\\tilde{\\chi}_{1}^{0}}=300'}
+signal3 = {'name':'T5qqqqWWDeg_mGo1000_mCh310_mChi300', 'chain':SIG3, 'weight':'weight', 'color':ROOT.kRed+2, "histo":ROOT.TH1F("Signal 3", "sqrt(s)", *binning), 'niceName':'T5qqqqWW m_{\\tilde{g}}=1000, m_{\\tilde{\\chi}_{1}^{+}}=310, m_{\\tilde{\\chi}_{1}^{0}}=300'}
+signal4 = {'name':'T5qqqqWWDeg_mGo1400_mCh315_mChi300', 'chain':SIG4, 'weight':'weight', 'color':ROOT.kBlack, "histo":ROOT.TH1F("Signal 4", "sqrt(s)", *binning), 'niceName':'T5qqqqWW m_{\\tilde{g}}=1400, m_{\\tilde{\\chi}_{1}^{+}}=315, m_{\\tilde{\\chi}_{1}^{0}}=300'}
+signal5 = {'name':'T5qqqqWW_mGo1000_mCh800_mChi700', 'chain':SIG5, 'weight':'weight', 'color':ROOT.kMagenta+1, "histo":ROOT.TH1F("Signal 5", "sqrt(s)", *binning),'niceName':'T5qqqqWW m_{\\tilde{g}}=1000, m_{\\tilde{\\chi}_{1}^{+}}=800, m_{\\tilde{\\chi}_{1}^{0}}=700'}
+signal6 = {'name':'T5qqqqWWDeg_mGo800_mCh305_mChi300', 'chain':SIG6, 'weight':'weight', 'color':ROOT.kCyan+3, "histo":ROOT.TH1F("Signal 6", "sqrt(s)", *binning), 'niceName':'T5qqqqWW m_{\\tilde{g}}=800,  m_{\\tilde{\\chi}_{1}^{+}}=305, m_{\\tilde{\\chi}_{1}^{0}}=300'}
 
 
 #t5qqqq1 = {'name':'T5qqqqWW_Gl1400_Chi315_LSP300', 'chain':t5qqqq1400_315_300, 'weight':'(1)', 'color':ROOT.kBlue, "histo":ROOT.TH1F("Signal 1", "sqrt(s)", *binning)}
@@ -155,7 +182,8 @@ sigSamples.append(signal1)
 sigSamples.append(signal2)
 sigSamples.append(signal3)
 sigSamples.append(signal4)
-
+sigSamples.append(signal5)
+sigSamples.append(signal6)
 
 #sigSamples.append(t5qqqq6)
 #sigSamples.append(t5qqqq7)
@@ -183,6 +211,7 @@ fwmt4 = {'name':'myfwmt4', 'varFunc':getFWMT4, 'legendName':'FWMT4', 'Ytitle':'#
 MT2W = {'name':'mymt2w', 'varString':'mt2w', 'legendName':'M^{W}_{T2}', 'Ytitle':'# of Events / 10GeV', 'binning':[45,0,450]}
 jetMag = {'name':'myjetmag', 'varFunc':getJetMagnitude, 'legendName':'#frac{H_{T}}{nJets}', 'Ytitle':'# of Events', 'binning':[35,0,350]}
 lincirc = {'name':'mylincirc', 'varFunc':getlinCirc2D, 'legendName':'lin. Circularity', 'Ytitle':'# of Events ', 'binning':[20,0,1]}
+mt = {'name':'mymt', 'varFunc':cmgMT, 'legendName':'M_{T}', 'Ytitle':'# of Events / 10GeV', 'binning':[35,0,350]}
 
 met = {'name':'mymet', 'varString':"met_pt", 'legendName':'#slash{E}_{T}', 'Ytitle':'# of Events / 25GeV', 'binning':[64,0,1600]}
 ht = {'name':'myht', 'varString':"htJet30j", 'legendName':'H_{T}', 'Ytitle':'# of Events / 25GeV', 'binning':[64,0,1600]}
@@ -191,7 +220,11 @@ nJets = {'name':'mynJets', 'varString':'nJet30', 'legendName':'Jets', 'Ytitle':'
 nbJets = {'name':'mynbtaggedJets', 'varString':'nBJetMediumCMVA30', 'legendName':'b-tagged Jets', 'Ytitle':'# of Events', 'binning':[17,-0.5,16.5]}
 Jet_pt_1 = {'name':'myJetPt1', 'varFunc':getLeadingJet, 'legendName': 'leading Jet p_{T}', 'Ytitle':'# of Events', 'binning':[20,0,1000]}
 Jet_pt_2 = {'name':'myJetPt2', 'varFunc':getNLJet, 'legendName': 'next-to-leading Jet p_{T}', 'Ytitle':'# of Events', 'binning':[20,0,1000]}
-deltaPhi = {'name':'mydeltaPhi', 'varString':'deltaPhi_Wl', 'legendName':'#Delta #Phi (W,l)', 'Ytitle':'# of Events', 'binning':[16,0,3.2]}
+deltaPhiWl = {'name':'mydeltaPhi', 'varString':'deltaPhi_Wl', 'legendName':'#Delta #Phi (W,l)', 'Ytitle':'# of Events', 'binning':[16,0,3.2]}
+mediumJetPT = {'name':'mediumJetPT', 'varFunc':getMediumJetPT, 'legendName': 'H_{T} / Jets', 'Ytitle':'# of Events', 'binning':[16,0,3.2]}
+mediumDeltaPhi = {'name':'mediumDeltaPhi', 'varFunc':getMedDPhiJetMet, 'legendName': '#Delta #Phi (medJet3, #slash{E}_{T})', 'Ytitle':'# of Events', 'binning':[16,0,3.2]}
+MTclosestJetMet = {'name':'myMTClosestJetMET', 'varFunc':cmgMTClosestJetMET, 'legendName':'M_{T} (closest Jet,#slash{E}_{T})', 'Ytitle':'# of Events / 10GeV', 'binning':[35,0,350]}
+
 
 allVariables = []
 #jets = cmgGetJets(c)
@@ -199,14 +232,14 @@ allVariables = []
 #allVariables.append(dphimetjet)
 allVariables.append(minDPhiMetJetthree)
 
-cutVar = noAdCut
-adCut = 0.
-varNew = deltaPhi
+cutVar = MT2W
+adCut = 200
+varNew = MT2W
 
 
-stReg=[(250,350),(350,450),(450,-1)]#250),(250,350),(350,450),(450,-1)]
-htReg=[(500,750),(750,1000),(1000,1250),(1250,-1)]#750),(750,1000),(1000,1250),(1250,-1)]
-jetReg = [(4,-1),(6,-1),(8,-1)]
+stReg=[(250,350),(350,450),(450,-1)]#,(350,450),(450,-1)]#250),(250,350),(350,450),(450,-1)]
+htReg=[(500,750),(750,1000),(1000,1250),(1250,-1)]#,(1000,-1)]#,(1250,-1)]#,(1000,-1)]#,(800,-1),(900,-1),(1000,-1),(1100,-1),(1200,-1),(1300,-1)]#,(750,1000),(1000,1250),(1250,-1)]#750),(750,1000),(1000,1250),(1250,-1)]
+jetReg = [(2,3),(4,5),(6,7),(8,-1)]#,(6,-1),(8,-1)]
 btb = (0,0)
 
 #presel = prepresel + ht['varstring'] + ">=" + str(bins[0]) + ht['varstring'] + '<' + str(bins[1])
@@ -216,6 +249,9 @@ btb = (0,0)
 
 can1 = ROOT.TCanvas(signalString,signalString,800,600)
 
+#can2 = ROOT.TCanvas('total','total',800,600)
+#can2.SetLogy()
+
 h1=ROOT.TH1F("MCDataCombined","MCDataCombined", *binning)
 h3=ROOT.TH1F("MCDataCombined","MCDataCombined", *binning)
 
@@ -224,12 +260,20 @@ l.SetFillColor(0)
 l.SetShadowColor(ROOT.kWhite)
 l.SetBorderSize(1)
 
+firstTotal = True
+yieldTable = []
+
+
 for st in stReg:
   for ht in htReg:
     for jet in jetReg:
+      can1.cd()
+      background = ROOT.TH1F('background','background',*binning)
       cutname, cut = nameAndCut(st, ht, jet, btb=btb, presel=presel, btagVar = 'nBJetMediumCMVA30')
       h_Stack = ROOT.THStack('h_Stack',signalString)
       h_Stack_S = ROOT.THStack('h_Stack_S',signalString)
+      dictToAdd = {'st':st,'ht':ht,'njet':jet,'variable':varNew['legendName'], 'signalCut':adCut, 'cut':cut, 'numberOfSignals':len(sigSamples)}
+
       for sample in bkgSamples:
         chain = sample["chain"]
         print chain
@@ -262,9 +306,10 @@ for st in stReg:
           varvalue = getVarValue(sample["chain"], varNew['varString']) if varNew.has_key('varString') else varNew['varFunc'](sample["chain"])
           #varvalue = varNew['varFunc'](sample['chain'])
           adValueToCut = getVarValue(sample["chain"], cutVar['varString']) if cutVar.has_key('varString') else cutVar['varFunc'](sample["chain"])
+          histo.Fill(varvalue,thisweight)
           if adValueToCut > adCut:
-            histo.Fill(varvalue,thisweight)
-      
+            background.Fill(varvalue,thisweight)
+        
         histo.SetLineColor(ROOT.kBlack)
         histo.SetLineWidth(1)
         histo.SetMarkerSize(0)
@@ -284,7 +329,15 @@ for st in stReg:
         h1.Add(histo)
         l.AddEntry(histo, sample["name"])
       
+      bkgYield = background.GetSumOfWeights()
+      dictToAdd.update({'bkgYield':bkgYield})
+      
+      signalYields = []
+      signalSampleNames = []
+      
       for sample in sigSamples:
+        signal = ROOT.TH1F('signal','signal',*binning)
+
         chain = sample["chain"]
         print chain
         histo = 'h_'+sample["name"]
@@ -315,9 +368,10 @@ for st in stReg:
           #varvalue = getVarValue(sample['chain'],varstring)
           varvalue = getVarValue(sample["chain"], varNew['varString']) if varNew.has_key('varString') else varNew['varFunc'](sample["chain"])
           #varvalue = varNew['varFunc'](sample['chain'])
+          histo.Fill(varvalue,thisweight)
           adValueToCut = getVarValue(sample["chain"], cutVar['varString']) if cutVar.has_key('varString') else cutVar['varFunc'](sample["chain"])
           if adValueToCut > adCut:
-            histo.Fill(varvalue,thisweight)
+            signal.Fill(varvalue,thisweight)
         histo.SetLineColor(color)
         histo.SetLineWidth(2)
         histo.SetMarkerSize(0)
@@ -338,7 +392,11 @@ for st in stReg:
         h3.Add(histo)
         l.AddEntry(histo, sample["name"])
         #signalString+=sample["name"]
-      
+        signalYields.append(signal.GetSumOfWeights())
+        signalSampleNames.append(sample['niceName'])
+  
+      dictToAdd.update({'signalYields':signalYields, 'signalSampleNames':signalSampleNames})
+      yieldTable.append(dictToAdd)
       #pad1=ROOT.TPad("pad1","MyTitle",0,0.3,1,1.0)
       #pad1.SetBottomMargin(0)
       #pad1.SetLeftMargin(0.1)
@@ -412,11 +470,29 @@ for st in stReg:
       #t1.DrawLatex(150,600,"CMS preliminary")
       #t1.DrawLatex(150,300,"L=19.4 fb^{-1}, #sqrt{s}=8TeV")
       
-      can1.Print(plotDir+varNew['name']+'_'+cutVar['name']+'_'+cutname+signalString+'.png')
-      can1.Print(plotDir+varNew['name']+'_'+cutVar['name']+'_'+cutname+signalString+'.pdf')
-      can1.Print(plotDir+varNew['name']+'_'+cutVar['name']+'_'+cutname+signalString+'.root')
+      can1.Print(plotDir+varNew['name']+'_'+cutVar['name']+str(adCut)+'_'+cutname+signalString+'.png')
+      can1.Print(plotDir+varNew['name']+'_'+cutVar['name']+str(adCut)+'_'+cutname+signalString+'.pdf')
+      can1.Print(plotDir+varNew['name']+'_'+cutVar['name']+str(adCut)+'_'+cutname+signalString+'.root')
       l.Clear()
       del h_Stack
       del h_Stack_S
       h3.Reset()
       histo.Reset()
+
+yieldFile=open(plotDir+"yields.pkl","w")
+pickle.dump(yieldTable,yieldFile)
+yieldFile.close()
+
+print 'Dumped yields to pickle file: ', plotDir, 'yields.pkl'
+
+#    can2.cd()
+#    print 'Now Plotting total Bkg'
+#    totCol = ROOT.kBlue+4
+#    h1.SetLineColor(totCol)
+#    totCol=totCol-1
+#    if firstTotal:
+#      h1.Draw()
+#      firstTotal = False
+#    else:
+#      h1.Draw('same')
+#    h1.Reset()
