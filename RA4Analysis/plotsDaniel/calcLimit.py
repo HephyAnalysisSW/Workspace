@@ -1,8 +1,10 @@
+#needs to run in a supported CMSSW release
+
 import ROOT
 import pickle
 from cardFileWriter import cardFileWriter
 
-yieldTable = pickle.load(file('/afs/hephy.at/user/d/dspitzbart/www/softLepYields/yieldsmymt2w_mymt2w199.pkl'))
+yieldTable = pickle.load(file('/afs/hephy.at/user/d/dspitzbart/www/softLepYields/yieldsmymt2w_mymt2w200.pkl'))
 
 plotDir='/afs/hephy.at/user/d/dspitzbart/www/softLepYields/'
 

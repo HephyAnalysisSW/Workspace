@@ -6,7 +6,7 @@ from Workspace.HEPHYPythonTools.xsec import xsec
 from Workspace.HEPHYPythonTools.helpers import getObjFromFile, getObjDict, getFileList
 from Workspace.RA4Analysis.convertHelpers import compileClass, readVar, printHeader, typeStr, createClassString
 
-subDir = "postProcessed_v2_Phys14V3"
+subDir = "postProcessed_v2_Phys14V3_signals"
 #from Workspace.RA4Analysis.cmgTuples_v3 import *
 from Workspace.HEPHYPythonTools.helpers import getChunksFromNFS, getChunksFromDPM, getChunks
 #from Workspace.RA4Analysis.cmgTuples_PHYS14V3 import *
@@ -39,7 +39,7 @@ branchKeepStrings = ["run", "lumi", "evt", "isData", "xsec", "puWeight", "nTrueI
                      "met_*",
                      "nFatJet","FatJet_*", 
                      "nLepOther", "LepOther_*", "nLepGood", "LepGood_*", "ngenLep", "genLep_*", "nTauGood", "TauGood_*", 
-                     "nGenPart", "GenPart_*", "ngenTau", "genTau_*", "nJet", "Jet_*", "ngenLepFromTau", "genLepFromTau_*"]
+                     "nGenPart", "GenPart_*","ngenPartAll","genPartAll_*" ,"ngenTau", "genTau_*", "nJet", "Jet_*", "ngenLepFromTau", "genLepFromTau_*"]
 #"nGenP6StatusThree", "GenP6StatusThree_*", "nGenTop", "GenTop_*"
 
 from optparse import OptionParser
@@ -57,8 +57,8 @@ parser.add_option("--small", dest="small", default = False, action="store_true",
 skimCond = "(1)"
 if options.skim.startswith('met'):
   skimCond = "met_pt>"+str(float(options.skim[3:]))
-if options.skim=='HT400ST150':
-  skimCond = "LepGood_pt[0]+met_pt>150&&Sum$(Jet_pt)>400"
+if options.skim=='HT400':
+  skimCond = "Sum$(Jet_pt)>400"
 if options.skim=='HT400ST200':   ##tuples have already ST200 skim
   skimCond = "Sum$(Jet_pt)>400&&(LepGood_pt[0]+met_pt)>200"
 
@@ -159,8 +159,8 @@ for isample, sample in enumerate(allSamples):
   #print "CHUNKS:" , chunks
   for chunk in chunks:
     sourceFileSize = os.path.getsize(chunk['file'])
-    nSplit = 1+int(sourceFileSize/(300*10**6)) #split into 300MB
-    if nSplit>1: print "Chunk too large, will split into",nSplit,"of appox 300MB"
+    nSplit = 1+int(sourceFileSize/(200*10**6)) #split into 200MB
+    if nSplit>1: print "Chunk too large, will split into",nSplit,"of appox 200MB"
     for iSplit in range(nSplit):
       t = getTreeFromChunk(chunk, skimCond, iSplit, nSplit)
       print "tree:" , t
@@ -265,9 +265,11 @@ for isample, sample in enumerate(allSamples):
   #      print "Selected",s.leptonPt
         if options.leptonSelection!='':
           jets = filter(lambda j:j['pt']>30 and abs(j['eta'])<2.4 and j['id'], get_cmg_jets_fromStruct(r))
+          jetscopy = jets
           #print "jets:" , jets
           lightJets, bJetsCMVA = splitListOfObjects('btagCMVA', 0.732, jets) 
-          bJetsCSV = filter(lambda j:j['btagCSV']<0.814 , jets)
+          lightJets,  bJetsCSV = splitListOfObjects('btagCSV', 0.814, jetscopy)
+          #lightJets,  bJetsCSV = filter(lambda j:j['btagCSV']<0.814 and -1<j['btagCSV'] , jetscopy)
           #print "bjetsCMVA:" , bJetsCMVA , "bjetsCSV:" ,  bJetsCSV
           s.htJet30j = sum([x['pt'] for x in jets])
           s.nJet30 = len(jets)
@@ -307,7 +309,7 @@ for isample, sample in enumerate(allSamples):
     for f in filesForHadd:
       size+=os.path.getsize(tmpDir+'/'+f)
       files.append(f)
-      if size>10**9 or f==filesForHadd[-1]:
+      if size>(0.5*(10**9)) or f==filesForHadd[-1]:
         ofile = outDir+'/'+sample['name']+'_'+str(counter)+'.root'
         print "Running hadd on", tmpDir, files
         os.system('cd '+tmpDir+';hadd -f '+ofile+' '+' '.join(files))
