@@ -17,14 +17,15 @@ from Workspace.RA4Analysis.helpers import *
 
 deltaPhiCut=1.
 varstring='deltaPhi_Wl'
+vartex = '#Delta#Phi(W,l)'
 binning=[16,0,3.2]
 twoBin=[0,deltaPhiCut,3.2]
 lepSel = 'hard'
 
 nBtagReg=[(0,0),(1,1)]#,(2,-1)]
-nJetReg=[(4,-1)]#,(3,3),(4,4),(5,5),(6,-1)]
-stReg=[(250,-1)]#,(350,450),(450,-1)]
-htReg=[(500,-1)]#,(750,1000),(1000,1250),(1250,-1)]
+nJetReg=[(4,5),(6,-1)]#,(3,3),(4,4),(5,5),(6,-1)]
+stReg=[(150,250),(250,-1)]#,(350,450),(450,-1)]
+htReg=[(500,750),(750,-1)]#,(750,1000),(1000,1250),(1250,-1)]
 
 colorList=[ROOT.kCyan+2, ROOT.kMagenta+2, ROOT.kOrange+2,ROOT.kMagenta+2]
 
@@ -143,6 +144,7 @@ compHist.SetMarkerSize(0)
 compHist.SetMarkerStyle(0)
 compHist.SetFillColor(0)
 
+rcsHist.SetMarkerStyle(2)
 rcsHist.SetMarkerSize(0)
 rcsHist.SetLineWidth(1)
 rcsHist.SetMinimum(0.)
@@ -153,6 +155,8 @@ rcsHist.GetXaxis().SetLabelSize(0.07)
 rcsHist.GetYaxis().SetLabelSize(0.04)
 rcsHist.GetYaxis().SetTitleOffset(0.9)
 rcsHist.GetYaxis().SetTitleSize(0.05)
+
+allYields = []
 
 
 for hReg in htReg:
@@ -201,7 +205,7 @@ for hReg in htReg:
         histoname = histo
         #print histoname
         binning = [16,0,3.2]
-        histo = ROOT.TH1F(str(histo) ,subname,*binning)
+        histo = ROOT.TH1F(str(histo) ,name,*binning)
         for bs in nBtagReg:
           #normHist.Reset()
           cutname,cut=nameAndCut(sReg, hReg, jReg, btb=bs, presel=prepresel)
@@ -216,8 +220,9 @@ for hReg in htReg:
           else:
             rcs=0.
           print jReg, bs, rcs, totalYield
+          allYields.append({'name':subname, 'nbjets':bs,'st':sReg, 'ht':hReg, 'njets':jReg, 'totalYield':totalYield,'controlYield':controlYield,'signalYield':signalYield,'rcs':rcs})
           subYields.append({'nbjets':bs,'totalYield':totalYield,'controlYield':controlYield,'signalYield':signalYield,'rcs':rcs})
-        
+
         #make sub plots
         subCan.cd()
         
@@ -270,7 +275,7 @@ for hReg in htReg:
           print jReg, bs, norm
         
         l.AddEntry(histo)
-        histo.GetYaxis().SetTitleOffset(0.7)
+        histo.GetYaxis().SetTitleOffset(0.8)
         histo.GetYaxis().SetTitle('Events')
         histo.Draw('hist')
         for hists in compHists:
@@ -279,12 +284,12 @@ for hReg in htReg:
           l.AddEntry(hists)
         l.Draw()
 
-        latex2 = ROOT.TLatex()
-        latex2.SetNDC()
-        latex2.SetTextSize(0.035)
-        latex2.SetTextAlign(11) # align right
-        latex2.DrawLatex(0.16,0.96,"CMS simulation")
-        latex2.DrawLatex(0.7,0.96,"L=4 fb^{-1} (13TeV)")
+        latex1 = ROOT.TLatex()
+        latex1.SetNDC()
+        latex1.SetTextSize(0.035)
+        latex1.SetTextAlign(11) # align right
+        latex1.DrawLatex(0.16,0.96,"CMS simulation")
+        latex1.DrawLatex(0.7,0.96,"L=4 fb^{-1} (13TeV)")
         
         
         subCan.cd()
@@ -312,7 +317,7 @@ for hReg in htReg:
         ratio.GetXaxis().SetLabelSize(0.1)
         ratio.GetXaxis().SetTitleSize(0.1)
         ratio.GetXaxis().SetTitleOffset(1.1)
-        ratio.GetXaxis().SetTitle(varstring)
+        ratio.GetXaxis().SetTitle(vartex)
         
         ratio.Draw('e1p')
         
@@ -322,7 +327,7 @@ for hReg in htReg:
         #write yields to list for pickle
         
                
-      #Total stuff
+      #RCS stuff
       rcsCan.cd()
       totalYields = []
       for bs in nBtagReg:
@@ -337,7 +342,7 @@ for hReg in htReg:
           rcs=signalYield/controlYield
         else:
           rcs=0.
-        
+        rcsHist.SetBinContent(ijReg+1,rcs)
         if normHist.GetBinContent(1)>0 and normHist.GetBinContent(2)>0:
           rcsHist.SetBinError(ijReg+1, rcs*sqrt(normHist.GetBinError(2)**2/normHist.GetBinContent(2)**2 + normHist.GetBinError(1)**2/normHist.GetBinContent(1)**2))
         else:
@@ -349,14 +354,14 @@ for hReg in htReg:
         else:
           rcsHist.Draw('e same')
         
+        allYields.append({'name':'total', 'nbjets':bs,'st':sReg, 'ht':hReg, 'njets':jReg, 'totalYield':totalYield,'controlYield':controlYield,'signalYield':signalYield,'rcs':rcs})
         totalYields.append({'nbjets':bs,'totalYield':totalYield,'controlYield':controlYield,'signalYield':signalYield,'rcs':rcs})
         
 
-      
+      #Total plot
       totalCan.cd()
       totalCan.SetGrid()
       h_Stack.SetMinimum(0.08)
-      
       pad3 = ROOT.TPad('pad1','pad1',0,0.3,1.,1.)
       pad3.SetBottomMargin(0)
       pad3.SetLeftMargin(0.1)
@@ -376,6 +381,7 @@ for hReg in htReg:
         compHist.SetMarkerSize(0)
         compHist.SetMarkerStyle(0)
         compHist.SetFillColor(0)
+        compHist.Sumw2()
         if totalYields[ibs]['totalYield']>0:
           norm=totalYields[0]['totalYield']/totalYields[ibs]['totalYield']
         else:
@@ -385,16 +391,16 @@ for hReg in htReg:
         compHist.SetLineColor(colorList[ibs])
         compHists.append(compHist)
       
-      h_Stack.Draw('hist same')
+      h_Stack.Draw('hist')
       for hists in compHists:
         hists.Draw('hist same')
+        hists.Draw('e1 same')
         hists.SetMinimum(0.08)
-      
 
-      latex1 = ROOT.TLatex()
-      latex1.SetNDC()
-      latex1.SetTextSize(0.035)
-      latex1.SetTextAlign(11) # align right
+      h_Stack.GetYaxis().SetTitle("Events  ")
+      h_Stack.GetYaxis().SetTitleSize(0.06)
+      h_Stack.GetYaxis().SetTitleOffset(0.8)
+
       latex1.DrawLatex(0.16,0.96,"CMS simulation")
       latex1.DrawLatex(0.7,0.96,"L=4 fb^{-1} (13TeV)")
       
@@ -425,7 +431,7 @@ for hReg in htReg:
       ratio.GetXaxis().SetLabelSize(0.1)
       ratio.GetXaxis().SetTitleSize(0.1)
       ratio.GetXaxis().SetTitleOffset(1.1)
-      ratio.GetXaxis().SetTitle(varstring)
+      ratio.GetXaxis().SetTitle(vartex)
       
       ratio.Draw('e1p')      
 
