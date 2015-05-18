@@ -17,16 +17,17 @@ from Workspace.RA4Analysis.helpers import *
 
 deltaPhiCut=1.
 varstring='deltaPhi_Wl'
+vartex = '#Delta#Phi(W,l)'
 binning=[16,0,3.2]
 twoBin=[0,deltaPhiCut,3.2]
 lepSel = 'hard'
 
-nBtagReg=[(0,0),(1,1),(2,-1)]
-nJetReg=[(4,4)]#,(3,3),(4,4),(5,5),(6,-1)]
-stReg=[(250,-1)]#,(350,450),(450,-1)]
-htReg=[(500,750)]#,(750,1000),(1000,1250),(1250,-1)]
+nBtagReg=[(0,0),(1,1)]#,(2,-1)]
+nJetReg=[(4,5),(6,-1)]#,(3,3),(4,4),(5,5),(6,-1)]
+stReg=[(150,250),(250,-1)]#,(350,450),(450,-1)]
+htReg=[(500,750),(750,-1)]#,(750,1000),(1000,1250),(1250,-1)]
 
-colorList=[ROOT.kBlack, ROOT.kOrange+2,ROOT.kMagenta+2]
+colorList=[ROOT.kCyan+2, ROOT.kMagenta+2, ROOT.kOrange+2,ROOT.kMagenta+2]
 
 startpath = '/afs/hephy.at/user/d/dspitzbart/www/subBkgFinalCodeTest/'
 
@@ -36,21 +37,21 @@ c = getChain(ttJets[lepSel],histname='')
 #c = getChain(WJetsHTToLNu[lepSel],histname='')
 
 #Sub Background Definitions
-ngNuEFromW = "Sum$(abs(genPart_pdgId)==12&&abs(genPart_motherId)==24)"
-ngNuMuFromW = "Sum$(abs(genPart_pdgId)==14&&abs(genPart_motherId)==24)"
-ngNuTauFromW = "Sum$(abs(genPart_pdgId)==16&&abs(genPart_motherId)==24)"
-lTau_H  = ngNuEFromW+"+"+ngNuMuFromW+"==0&&"+ngNuTauFromW+"==1&&Sum$(genTau_nNuE+genTau_nNuMu==1&&genTau_nNuTau==1)==1"
-lTau_l  = ngNuEFromW+"+"+ngNuMuFromW+"==1&&"+ngNuTauFromW+"==1&&Sum$(genTau_nNuE+genTau_nNuMu==1&&genTau_nNuTau==1)==1"
-hTau_H  = ngNuEFromW+"+"+ngNuMuFromW+"==0&&"+ngNuTauFromW+"==1&&Sum$(genTau_nNuE+genTau_nNuMu==0&&genTau_nNuTau==1)==1"
-hTau_l  = ngNuEFromW+'+'+ngNuMuFromW+"==1&&"+ngNuTauFromW+"==1&&Sum$(genTau_nNuE+genTau_nNuMu==0&&genTau_nNuTau==1)==1"
-diLepEff   = ngNuEFromW+"+"+ngNuMuFromW+"==2&&"+ngNuTauFromW+"==0&&Sum$(genLep_pt>10&&(abs(genLep_eta)<2.1&&abs(genLep_pdgId)==13||abs(genLep_eta)<2.4&&abs(genLep_pdgId)==11))==2"
-diLepAcc   = ngNuEFromW+"+"+ngNuMuFromW+"==2&&"+ngNuTauFromW+"==0&&Sum$(genLep_pt>10&&(abs(genLep_eta)<2.1&&abs(genLep_pdgId)==13||abs(genLep_eta)<2.4&&abs(genLep_pdgId)==11))!=2"
-diTau   = ngNuEFromW+"+"+ngNuMuFromW+"==0&&"+ngNuTauFromW+"==2"
-diHad   = ngNuEFromW+"+"+ngNuMuFromW+"==0&&"+ngNuTauFromW+"==0"
-l_H     = ngNuEFromW+"+"+ngNuMuFromW+"==1&&"+ngNuTauFromW+"==0"
+ngNuEFromW = "(Sum$(abs(genPart_pdgId)==12&&abs(genPart_motherId)==24))"
+ngNuMuFromW = "(Sum$(abs(genPart_pdgId)==14&&abs(genPart_motherId)==24))"
+ngNuTauFromW = "(Sum$(abs(genPart_pdgId)==16&&abs(genPart_motherId)==24))"
+lTau_H  = '('+ngNuEFromW+"+"+ngNuMuFromW+")==0&&"+ngNuTauFromW+"==1&&(Sum$(genTau_nNuE+genTau_nNuMu==1&&genTau_nNuTau==1))==1"
+lTau_l  = '('+ngNuEFromW+"+"+ngNuMuFromW+")==1&&"+ngNuTauFromW+"==1&&(Sum$(genTau_nNuE+genTau_nNuMu==1&&genTau_nNuTau==1))==1"
+hTau_H  = '('+ngNuEFromW+"+"+ngNuMuFromW+")==0&&"+ngNuTauFromW+"==1&&(Sum$(genTau_nNuE+genTau_nNuMu==0&&genTau_nNuTau==1))==1"
+hTau_l  = '('+ngNuEFromW+'+'+ngNuMuFromW+")==1&&"+ngNuTauFromW+"==1&&(Sum$(genTau_nNuE+genTau_nNuMu==0&&genTau_nNuTau==1))==1"
+diLepEff   = ngNuEFromW+"+"+ngNuMuFromW+"==2&&"+ngNuTauFromW+"==0&&(Sum$(genLep_pt>10&&(abs(genLep_eta)<2.1&&abs(genLep_pdgId)==13||abs(genLep_eta)<2.4&&abs(genLep_pdgId)==11)))==2"
+diLepAcc   = ngNuEFromW+"+"+ngNuMuFromW+"==2&&"+ngNuTauFromW+"==0&&(Sum$(genLep_pt>10&&(abs(genLep_eta)<2.1&&abs(genLep_pdgId)==13||abs(genLep_eta)<2.4&&abs(genLep_pdgId)==11)))!=2"
+diTau   = '('+ngNuEFromW+"+"+ngNuMuFromW+")==0&&"+ngNuTauFromW+"==2"
+diHad   = '('+ngNuEFromW+"+"+ngNuMuFromW+")==0&&"+ngNuTauFromW+"==0"
+l_H     = '('+ngNuEFromW+"+"+ngNuMuFromW+")==1&&"+ngNuTauFromW+"==0"
 #combined SubBkgs
 allHad = "(("+diHad+")||("+hTau_H+"))"
-allDiLep = ngNuEFromW+"+"+ngNuMuFromW+"==2&&"+ngNuTauFromW+"==0&&Sum$(genLep_pt>10)"
+allDiLep = '('+ngNuEFromW+"+"+ngNuMuFromW+")==2&&"+ngNuTauFromW+"==0"#&&Sum$(genLep_pt>10)"#should not be necessary
 #in Progress
 jetFromW = ngNuEFromW+"+"+ngNuMuFromW+"==0&&Sum$(genTau_nNuE+genTau_nNuMu>=0&&genTau_nNuTau==1)==1&&Sum$(genTau_nNuE+genTau_nNuMu<=1&&genTau_nNuTau==1)==1"
 lepFromW = ngNuEFromW+"+"+ngNuMuFromW+"==1&&Sum$(genTau_nNuE+genTau_nNuMu>=0&&genTau_nNuTau==1)==1&&Sum$(genTau_nNuE+genTau_nNuMu<=1&&genTau_nNuTau==1)==1"
@@ -64,13 +65,13 @@ presel = prepresel
 nothing='(1)'
 subBkgTT=[
   ##[allHad, 'all hadronic', ROOT.kRed-7, 'all hadronic','placeholder'],
-#  [diHad,'two had.', ROOT.kRed-9,'diHad','dihadronic'],
-#  [diTau,'two #tau leptons', ROOT.kGreen+2,'diTau','di $\\tau$'],
-#  [hTau_H,'W#rightarrow#tau#nu#rightarrow had.+2#nu | W#rightarrow had.', ROOT.kRed-7, 'hadTau','$W\\rightarrow \\tau + \\nu \\rightarrow \\textrm{had.}+2\\nu ~|~ W \\rightarrow \\textrm{had.}$'],
-#  [hTau_l,'W#rightarrow#tau#nu#rightarrow had.+2#nu | W#rightarrow e/#mu+#nu', ROOT.kAzure+6,'hTau_l','$W\\rightarrow \\tau + \\nu \\rightarrow \\textrm{had.}+2\\nu ~|~ W \\rightarrow e/\\mu + \\nu$'],
-#  [lTau_l,'W#rightarrow#tau#nu#rightarrow e/#mu+3#nu | W#rightarrow e/#mu+#nu', ROOT.kOrange+1,'lTau_l','$W\\rightarrow \\tau + \\nu \\rightarrow e/\\mu+3\\nu ~|~ W \\rightarrow e/\\mu + \\nu$'],
-#  [lTau_H,'W#rightarrow#tau#nu#rightarrow e/#mu+3#nu | W#rightarrow had.', ROOT.kBlue-2, 'lepTau_H','$W\\rightarrow \\tau + \\nu \\rightarrow e/\\mu+3\\nu ~|~ W \\rightarrow \\textrm{had.}$'],
-#  [allDiLep,'dileptonic (e/#mu)',ROOT.kRed-3,'diLep','dileptonic'],
+  [diHad,'two had.', ROOT.kRed-9,'diHad','dihadronic'],
+  [diTau,'two #tau leptons', ROOT.kGreen+2,'diTau','di $\\tau$'],
+  [hTau_H,'W#rightarrow#tau#nu#rightarrow had.+2#nu | W#rightarrow had.', ROOT.kRed-7, 'hadTau','$W\\rightarrow \\tau + \\nu \\rightarrow \\textrm{had.}+2\\nu ~|~ W \\rightarrow \\textrm{had.}$'],
+  [hTau_l,'W#rightarrow#tau#nu#rightarrow had.+2#nu | W#rightarrow e/#mu+#nu', ROOT.kAzure+6,'hTau_l','$W\\rightarrow \\tau + \\nu \\rightarrow \\textrm{had.}+2\\nu ~|~ W \\rightarrow e/\\mu + \\nu$'],
+  [lTau_l,'W#rightarrow#tau#nu#rightarrow e/#mu+3#nu | W#rightarrow e/#mu+#nu', ROOT.kOrange+1,'lTau_l','$W\\rightarrow \\tau + \\nu \\rightarrow e/\\mu+3\\nu ~|~ W \\rightarrow e/\\mu + \\nu$'],
+  [lTau_H,'W#rightarrow#tau#nu#rightarrow e/#mu+3#nu | W#rightarrow had.', ROOT.kBlue-2, 'lepTau_H','$W\\rightarrow \\tau + \\nu \\rightarrow e/\\mu+3\\nu ~|~ W \\rightarrow \\textrm{had.}$'],
+  [allDiLep,'dileptonic (e/#mu)',ROOT.kRed-3,'diLep','dileptonic'],
   #[diLepAcc,'dileptonic (e/#mu) Acc.',ROOT.kRed-3,'diLepAcc','placeholder'],
   #[diLepEff,'dileptonic (e/#mu) Eff.',ROOT.kRed-4,'diLepEff','placeholder'],
   #[jetFromW,'W#rightarrow#tau#rightarrow had./l | W#rightarrow h',ROOT.kBlue-2,'jetFromW','placeholder'],
@@ -105,9 +106,9 @@ subBkgW=[
 #  path+=nbtagPath
 #  presel+=nbtagCutString
 
-totalCan = ROOT.TCanvas('total','total',1200,1000)
-subCan = ROOT.TCanvas('sub','sub',800,600)
-rcsCan = ROOT.TCanvas('rcs','rcs',800,600)
+totalCan = ROOT.TCanvas('total','total',1000,1000)
+subCan = ROOT.TCanvas('sub','sub',800,800)
+rcsCan = ROOT.TCanvas('rcs','rcs',800,800)
 
 totalCan.SetLogy()
 totalCan.SetGrid()
@@ -143,6 +144,7 @@ compHist.SetMarkerSize(0)
 compHist.SetMarkerStyle(0)
 compHist.SetFillColor(0)
 
+rcsHist.SetMarkerStyle(2)
 rcsHist.SetMarkerSize(0)
 rcsHist.SetLineWidth(1)
 rcsHist.SetMinimum(0.)
@@ -153,6 +155,8 @@ rcsHist.GetXaxis().SetLabelSize(0.07)
 rcsHist.GetYaxis().SetLabelSize(0.04)
 rcsHist.GetYaxis().SetTitleOffset(0.9)
 rcsHist.GetYaxis().SetTitleSize(0.05)
+
+allYields = []
 
 
 for hReg in htReg:
@@ -188,14 +192,25 @@ for hReg in htReg:
       
       h_Stack = ROOT.THStack('h_Stack',varstring)
       
+      totalL = ROOT.TLegend(0.7,0.7,0.95,0.95)
+      totalL.SetFillColor(ROOT.kWhite)
+      totalL.SetShadowColor(ROOT.kWhite)
+      totalL.SetBorderSize(1)
+
       #Get yields for norm & rcs
       for i, [subcut,name,col,subname,texString] in enumerate(subBkgTT):
         print 'Processing ' + subname        
         subYields=[]
+        histo = 'h'+str(i)
+        histoname = histo
+        #print histoname
+        binning = [16,0,3.2]
+        histo = ROOT.TH1F(str(histo) ,name,*binning)
         for bs in nBtagReg:
-          normHist.Reset()
+          #normHist.Reset()
           cutname,cut=nameAndCut(sReg, hReg, jReg, btb=bs, presel=prepresel)
-          wholecut=cut+'&&'+subcut
+          wholecut = cut + '&&' + subcut
+          print wholecut
           c.Draw(varstring+'>>normHist','weight*('+wholecut+')','goff')
           totalYield=normHist.GetSumOfWeights()
           signalYield=normHist.GetBinContent(2)
@@ -205,41 +220,120 @@ for hReg in htReg:
           else:
             rcs=0.
           print jReg, bs, rcs, totalYield
-          subYields.append((totalYield,controlYield,signalYield,rcs))
-        
-        #make sub plots
-        #make legend!!
-        subCan.cd()
-        cutname,cut=nameAndCut(sReg, hReg, jReg, btb=nBtagReg[0], presel=prepresel)
-        wholecut=cut+'&&'+subcut
-        c.Draw(varstring+'>>mainHist','weight*('+wholecut+')')
-        mainHist.Draw('hist')
-        mainHist.SetFillColor(col)
-        h_Stack.Add(mainHist)
+          allYields.append({'name':subname, 'nbjets':bs,'st':sReg, 'ht':hReg, 'njets':jReg, 'totalYield':totalYield,'controlYield':controlYield,'signalYield':signalYield,'rcs':rcs})
+          subYields.append({'nbjets':bs,'totalYield':totalYield,'controlYield':controlYield,'signalYield':signalYield,'rcs':rcs})
 
+        #make sub plots
+        subCan.cd()
+        
+        pad1 = ROOT.TPad('pad1','pad1',0,0.3,1.,1.)
+        pad1.SetBottomMargin(0)
+        pad1.SetLeftMargin(0.1)
+        pad1.SetGrid()
+        pad1.SetLogy()
+        pad1.Draw()
+        pad1.cd()
+        
+        l = ROOT.TLegend(0.7,0.8,0.95,0.95)
+        l.SetFillColor(ROOT.kWhite)
+        l.SetShadowColor(ROOT.kWhite)
+        l.SetBorderSize(1)
+
+        cutname,cut=nameAndCut(sReg, hReg, jReg, btb=nBtagReg[0], presel=prepresel)
+        wholecut = cut + '&&' + subcut
+        c.Draw(varstring+'>>'+str(histoname),'weight*('+wholecut+')')
+        histo.SetFillColor(col)
+        histo.SetLineColor(col+2)
+        histo.SetMarkerSize(0)
+        h_Stack.Add(histo)
+        totalL.AddEntry(histo)
+        compHists = []
+        first = True
+        
         for ibs,bs in enumerate(nBtagReg):
           namecut,cut=nameAndCut(sReg, hReg, jReg, btb=bs, presel=prepresel)
           wholecut=cut+'&&'+subcut
-          if subYields[ibs][0]>0:
-            norm=subYields[0][0]/subYields[ibs][0]
+          compHist = 'ch'+str(i)
+          histoname = compHist
+          compHist = ROOT.TH1F(str(histoname),str(bs) + ' b-tags',*binning)
+          compHist.SetLineWidth(2)
+          compHist.SetMarkerSize(0)
+          compHist.SetMarkerStyle(0)
+          compHist.SetFillColor(0)
+          compHist.Sumw2()
+          if subYields[ibs]['totalYield']>0:
+            norm=subYields[0]['totalYield']/subYields[ibs]['totalYield']
           else:
             norm=1
-          c.Draw(varstring+'>>compHist',str(norm)+'*weight*('+wholecut+')')
-          compHist.SetLineColor(colorList[ibs])
-          compHist.Draw('hist same')
-          compHist.Draw('e1 same')
+          c.Draw(varstring+'>>'+str(histoname),str(norm)+'*weight*('+wholecut+')')
+          if first:
+            compHist.SetLineColor(col+2)
+            first = False
+          else:
+            compHist.SetLineColor(colorList[ibs])
+          compHists.append(compHist)
           print jReg, bs, norm
+        
+        l.AddEntry(histo)
+        histo.GetYaxis().SetTitleOffset(0.8)
+        histo.GetYaxis().SetTitle('Events')
+        histo.Draw('hist')
+        for hists in compHists:
+          hists.Draw('hist same')
+          hists.Draw('e1 same')
+          l.AddEntry(hists)
+        l.Draw()
 
+        latex1 = ROOT.TLatex()
+        latex1.SetNDC()
+        latex1.SetTextSize(0.035)
+        latex1.SetTextAlign(11) # align right
+        latex1.DrawLatex(0.16,0.96,"CMS simulation")
+        latex1.DrawLatex(0.7,0.96,"L=4 fb^{-1} (13TeV)")
+        
+        
+        subCan.cd()
+        
+        pad2 = ROOT.TPad('pad2','pad2',0,0,1.,.3)
+        pad2.SetTopMargin(0)
+        pad2.SetBottomMargin(0.3)
+        pad2.SetLeftMargin(0.1)
+        pad2.SetGrid()
+        pad2.Draw()
+        pad2.cd()
+        
+        ratio = compHists[0].Clone()
+        ratio.Divide(compHists[1])
+        ratio.SetMaximum(2)
+        ratio.SetMinimum(0)
+        ratio.SetMarkerStyle(9)
+        ratio.SetMarkerSize(1)
+        ratio.SetLineColor(ROOT.kBlack)
+        ratio.GetYaxis().SetLabelSize(0.1)
+        ratio.GetYaxis().SetTitleOffset(0.4)
+        ratio.GetYaxis().SetTitleSize(0.1)
+        ratio.GetYaxis().SetTitle('Ratio')
+        ratio.GetYaxis().SetNdivisions(5)
+        ratio.GetXaxis().SetLabelSize(0.1)
+        ratio.GetXaxis().SetTitleSize(0.1)
+        ratio.GetXaxis().SetTitleOffset(1.1)
+        ratio.GetXaxis().SetTitle(vartex)
+        
+        ratio.Draw('e1p')
+        
         subCan.Print(path+subname+cutname+'.png')
-        subCan.Print(path+subname+cutname+'.root')
+        subCan.Print(path+subname+cutname+'.root')        
+
         #write yields to list for pickle
         
-      #Total stuff
+               
+      #RCS stuff
       rcsCan.cd()
+      totalYields = []
       for bs in nBtagReg:
         cutname,cut=nameAndCut(sReg, hReg, jReg, btb=bs, presel=prepresel)
-        wholecut=cut
-        c.Draw(varstring+'>>normHist','weight*('+wholecut+')','goff')
+        print cut
+        c.Draw(varstring+'>>normHist','weight*('+cut+')','goff')
         totalYield=normHist.GetSumOfWeights()
         signalYield=normHist.GetBinContent(2)
         controlYield=normHist.GetBinContent(1)
@@ -248,7 +342,7 @@ for hReg in htReg:
           rcs=signalYield/controlYield
         else:
           rcs=0.
-        
+        rcsHist.SetBinContent(ijReg+1,rcs)
         if normHist.GetBinContent(1)>0 and normHist.GetBinContent(2)>0:
           rcsHist.SetBinError(ijReg+1, rcs*sqrt(normHist.GetBinError(2)**2/normHist.GetBinContent(2)**2 + normHist.GetBinError(1)**2/normHist.GetBinContent(1)**2))
         else:
@@ -260,35 +354,91 @@ for hReg in htReg:
         else:
           rcsHist.Draw('e same')
         
-        subYields.append((totalYield,controlYield,signalYield,rcs))
+        allYields.append({'name':'total', 'nbjets':bs,'st':sReg, 'ht':hReg, 'njets':jReg, 'totalYield':totalYield,'controlYield':controlYield,'signalYield':signalYield,'rcs':rcs})
+        totalYields.append({'nbjets':bs,'totalYield':totalYield,'controlYield':controlYield,'signalYield':signalYield,'rcs':rcs})
         
-      
+
+      #Total plot
       totalCan.cd()
-      h_Stack.Draw()
+      totalCan.SetGrid()
       h_Stack.SetMinimum(0.08)
+      pad3 = ROOT.TPad('pad1','pad1',0,0.3,1.,1.)
+      pad3.SetBottomMargin(0)
+      pad3.SetLeftMargin(0.1)
+      pad3.SetGrid()
+      pad3.SetLogy()
+      pad3.Draw()
+      pad3.cd()
+      
+      compHists = []
       for ibs,bs in enumerate(nBtagReg):
         cutname,cut=nameAndCut(sReg, hReg, jReg, btb=bs, presel=prepresel)
-        wholecut=cut+'&&'+subcut
-        if subYields[ibs][0]>0:
-          norm=subYields[0][0]/subYields[ibs][0]
+        compHist = 'ch'+str(i)
+        histoname = compHist
+        binning = [16,0,3.2]
+        compHist = ROOT.TH1F(str(histoname),str(bs) + ' b-tags',*binning)
+        compHist.SetLineWidth(2)
+        compHist.SetMarkerSize(0)
+        compHist.SetMarkerStyle(0)
+        compHist.SetFillColor(0)
+        compHist.Sumw2()
+        if totalYields[ibs]['totalYield']>0:
+          norm=totalYields[0]['totalYield']/totalYields[ibs]['totalYield']
         else:
           norm=1
-        c.Draw(varstring+'>>compHist',str(norm)+'*weight*('+wholecut+')')
+        print norm
+        c.Draw(varstring+'>>'+str(histoname),str(norm)+'*weight*('+cut+')')
         compHist.SetLineColor(colorList[ibs])
-        compHist.Draw('hist same')
-        compHist.Draw('e1 same')
+        compHists.append(compHist)
       
-      latex1 = ROOT.TLatex()
-      latex1.SetNDC()
-      latex1.SetTextSize(0.035)
-      latex1.SetTextAlign(11) # align right
+      h_Stack.Draw('hist')
+      for hists in compHists:
+        hists.Draw('hist same')
+        hists.Draw('e1 same')
+        hists.SetMinimum(0.08)
+
+      h_Stack.GetYaxis().SetTitle("Events  ")
+      h_Stack.GetYaxis().SetTitleSize(0.06)
+      h_Stack.GetYaxis().SetTitleOffset(0.8)
+
       latex1.DrawLatex(0.16,0.96,"CMS simulation")
-      latex1.DrawLatex(0.7,0.96,"L=4 fb^{-1} (13TeV)")      
+      latex1.DrawLatex(0.7,0.96,"L=4 fb^{-1} (13TeV)")
       
+      totalL.Draw()
+      
+      totalCan.cd()
+      
+      pad4 = ROOT.TPad('pad2','pad2',0,0,1.,.3)
+      pad4.SetTopMargin(0)
+      pad4.SetBottomMargin(0.3)
+      pad4.SetLeftMargin(0.1)
+      pad4.SetGrid()
+      pad4.Draw()
+      pad4.cd()
+      
+      ratio = compHists[0].Clone()
+      ratio.Divide(compHists[1])
+      ratio.SetMaximum(2)
+      ratio.SetMinimum(0)
+      ratio.SetMarkerStyle(9)
+      ratio.SetMarkerSize(1)
+      ratio.SetLineColor(ROOT.kBlack)
+      ratio.GetYaxis().SetLabelSize(0.1)
+      ratio.GetYaxis().SetTitleOffset(0.4)
+      ratio.GetYaxis().SetTitleSize(0.1)
+      ratio.GetYaxis().SetTitle('Ratio')
+      ratio.GetYaxis().SetNdivisions(5)
+      ratio.GetXaxis().SetLabelSize(0.1)
+      ratio.GetXaxis().SetTitleSize(0.1)
+      ratio.GetXaxis().SetTitleOffset(1.1)
+      ratio.GetXaxis().SetTitle(vartex)
+      
+      ratio.Draw('e1p')      
+
       totalCan.Print(path+cutname+'.png')
       totalCan.Print(path+cutname+'.root')
       
-      del h_Stack
+      #del h_Stack
     
     rcsCan.Print(path+'RCS.png')
     rcsCan.Print(path+'RCS.root')

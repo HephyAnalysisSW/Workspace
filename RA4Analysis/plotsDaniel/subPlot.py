@@ -20,7 +20,7 @@ nJetReg=[(4,5)]#,(3,3),(4,4),(5,5),(6,-1)]
 stReg=[(250,-1)]#,(350,450),(450,-1)]
 htReg=[(500,750)]#,(750,1000),(1000,1250),(1250,-1)]
 
-startpath = '/afs/hephy.at/user/d/dspitzbart/www/subBkgttJetCorF/'
+startpath = '/afs/hephy.at/user/d/dspitzbart/www/subBkgFinalCodeTest/'
 
 #Load the Background Chain
 c = getChain(ttJets[lepSel],histname='')
@@ -95,6 +95,7 @@ for nb in nBtagReg:
           njPath=str(nj[0])+'nj'+str(nj[1])+'/'
         else:
           njPath='_'+str(nj[0])+'nj/'
+
         path=startpath+nbPath+htPath+stPath+njPath
         if not os.path.exists(path):
           os.makedirs(path)
@@ -118,7 +119,7 @@ for nb in nBtagReg:
           histo = ROOT.TH1F(str(histo) ,str(histo),*binning)
           print histo
           print col
-          wholeCut=cut+'&&'+subcut
+          wholeCut=subcut+'&&'+cut
           c.Draw(varstring+'>>'+str(histoname),'weight*('+wholeCut+')')
           histo.SetLineColor(ROOT.kBlack)
           histo.SetLineWidth(1)

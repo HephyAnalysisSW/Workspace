@@ -9,9 +9,9 @@ from math import *
 from array import array
 
 from Workspace.HEPHYPythonTools.helpers import getVarValue, getChain, deltaPhi
-#from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2_HT400ST150_withDF import *
+from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2_HT400ST150_withDF import *
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2 import *
-from Workspace.RA4Analysis.cmgTuplesPostProcessed_softLepton import *
+#from Workspace.RA4Analysis.cmgTuplesPostProcessed_softLepton import *
 
 from Workspace.RA4Analysis.helpers import *
 
@@ -20,46 +20,24 @@ from Workspace.RA4Analysis.helpers import *
 deltaPhiCut=1.
 varstring='deltaPhi_Wl'
 binning=[16,0,3.2]
-lepSel = 'soft'
+lepSel = 'hard'
 
 nBtagReg=[0,1,2]
 nJetReg=[(6,-1)]#,(3,3),(4,4),(5,5),(6,-1)]
 stReg=[(250,-1)]#,(350,450),(450,-1)]
 htReg=[(500,-1)]#,(750,1000),(1000,1250),(1250,-1)]
 
-startpath = '/afs/hephy.at/user/d/dspitzbart/www/subBkgTTsoft/'
+startpath = '/afs/hephy.at/user/d/dspitzbart/www/subBkgFinalCodeTest/'
 
 
 #Load the Background Chain
 c = getChain(ttJets[lepSel],histname='')
 #c = getChain(WJetsHTToLNu[lepSel],histname='')
 
-##Sub Background Definitions
-#ngNuEFromW = "Sum$(abs(genPart_pdgId)==12&&abs(genPart_motherId)==24)"
-#ngNuMuFromW = "Sum$(abs(genPart_pdgId)==14&&abs(genPart_motherId)==24)"
-#ngNuTauFromW = "Sum$(abs(genPart_pdgId)==16&&abs(genPart_motherId)==24)"
-#lTau_H  = ngNuEFromW+"+"+ngNuMuFromW+"==0&&"+ngNuTauFromW+"==1&&Sum$(genTau_nNuE+genTau_nNuMu==1&&genTau_nNuTau==1)==1"
-#lTau_l  = ngNuEFromW+"+"+ngNuMuFromW+"==1&&"+ngNuTauFromW+"==1&&Sum$(genTau_nNuE+genTau_nNuMu==1&&genTau_nNuTau==1)==1"
-#hTau_H  = ngNuEFromW+"+"+ngNuMuFromW+"==0&&"+ngNuTauFromW+"==1&&Sum$(genTau_nNuE+genTau_nNuMu==0&&genTau_nNuTau==1)==1"
-#hTau_l  = ngNuEFromW+'+'+ngNuMuFromW+"==1&&"+ngNuTauFromW+"==1&&Sum$(genTau_nNuE+genTau_nNuMu==0&&genTau_nNuTau==1)==1"
-#diLepEff   = ngNuEFromW+"+"+ngNuMuFromW+"==2&&"+ngNuTauFromW+"==0&&Sum$(genLep_pt>10&&(abs(genLep_eta)<2.1&&abs(genLep_pdgId)==13||abs(genLep_eta)<2.4&&abs(genLep_pdgId)==11))==2"
-#diLepAcc   = ngNuEFromW+"+"+ngNuMuFromW+"==2&&"+ngNuTauFromW+"==0&&Sum$(genLep_pt>10&&(abs(genLep_eta)<2.1&&abs(genLep_pdgId)==13||abs(genLep_eta)<2.4&&abs(genLep_pdgId)==11))!=2"
-#diTau   = ngNuEFromW+"+"+ngNuMuFromW+"==0&&"+ngNuTauFromW+"==2"
-#diHad   = ngNuEFromW+"+"+ngNuMuFromW+"==0&&"+ngNuTauFromW+"==0"
-#l_H     = ngNuEFromW+"+"+ngNuMuFromW+"==1&&"+ngNuTauFromW+"==0"
-##combined SubBkgs
-#allHad = "(("+diHad+")||("+hTau_H+"))"
-#allDiLep = ngNuEFromW+"+"+ngNuMuFromW+"==2&&"+ngNuTauFromW+"==0&&Sum$(genLep_pt>10)"
-##in Progress
-#jetFromW = ngNuEFromW+"+"+ngNuMuFromW+"==0&&Sum$(genTau_nNuE+genTau_nNuMu>=0&&genTau_nNuTau==1)==1&&Sum$(genTau_nNuE+genTau_nNuMu<=1&&genTau_nNuTau==1)==1"
-#lepFromW = ngNuEFromW+"+"+ngNuMuFromW+"==1&&Sum$(genTau_nNuE+genTau_nNuMu>=0&&genTau_nNuTau==1)==1&&Sum$(genTau_nNuE+genTau_nNuMu<=1&&genTau_nNuTau==1)==1"
-#hadTau = "("+ngNuEFromW+"+"+ngNuMuFromW+")<=1&&("+ngNuEFromW+"+"+ngNuMuFromW+")>=0&&Sum$(genTau_nNuE+genTau_nNuMu==0&&genTau_nNuTau==1)==1"#not working
-#lepTau = "("+ngNuEFromW+"+"+ngNuMuFromW+")<=1&&("+ngNuEFromW+"+"+ngNuMuFromW+")>=0&&Sum$(genTau_nNuE+genTau_nNuMu==1&&genTau_nNuTau==1)==1"#not working
-
 #Sub Background Definitions
-ngNuEFromW = "Sum$(abs(genLep_pdgId)==11&&abs(genLep_motherId)==24)"
-ngNuMuFromW = "Sum$(abs(genLep_pdgId)==13&&abs(genLep_motherId)==24)"
-ngNuTauFromW = "Sum$(abs(genLep_pdgId)==15&&abs(genLep_motherId)==24)"
+ngNuEFromW = "Sum$(abs(genPart_pdgId)==12&&abs(genPart_motherId)==24)"
+ngNuMuFromW = "Sum$(abs(genPart_pdgId)==14&&abs(genPart_motherId)==24)"
+ngNuTauFromW = "Sum$(abs(genPart_pdgId)==16&&abs(genPart_motherId)==24)"
 lTau_H  = ngNuEFromW+"+"+ngNuMuFromW+"==0&&"+ngNuTauFromW+"==1&&Sum$(genTau_nNuE+genTau_nNuMu==1&&genTau_nNuTau==1)==1"
 lTau_l  = ngNuEFromW+"+"+ngNuMuFromW+"==1&&"+ngNuTauFromW+"==1&&Sum$(genTau_nNuE+genTau_nNuMu==1&&genTau_nNuTau==1)==1"
 hTau_H  = ngNuEFromW+"+"+ngNuMuFromW+"==0&&"+ngNuTauFromW+"==1&&Sum$(genTau_nNuE+genTau_nNuMu==0&&genTau_nNuTau==1)==1"
@@ -71,13 +49,37 @@ diHad   = ngNuEFromW+"+"+ngNuMuFromW+"==0&&"+ngNuTauFromW+"==0"
 l_H     = ngNuEFromW+"+"+ngNuMuFromW+"==1&&"+ngNuTauFromW+"==0"
 #combined SubBkgs
 allHad = "(("+diHad+")||("+hTau_H+"))"
-allDiLep = ngNuEFromW+"+"+ngNuMuFromW+"==2&&"+ngNuTauFromW+"==0&&Sum$(genLep_pt>5)"
+allDiLep = ngNuEFromW+"+"+ngNuMuFromW+"==2&&"+ngNuTauFromW+"==0&&Sum$(genLep_pt>10)"
+#in Progress
+jetFromW = ngNuEFromW+"+"+ngNuMuFromW+"==0&&Sum$(genTau_nNuE+genTau_nNuMu>=0&&genTau_nNuTau==1)==1&&Sum$(genTau_nNuE+genTau_nNuMu<=1&&genTau_nNuTau==1)==1"
+lepFromW = ngNuEFromW+"+"+ngNuMuFromW+"==1&&Sum$(genTau_nNuE+genTau_nNuMu>=0&&genTau_nNuTau==1)==1&&Sum$(genTau_nNuE+genTau_nNuMu<=1&&genTau_nNuTau==1)==1"
+hadTau = "("+ngNuEFromW+"+"+ngNuMuFromW+")<=1&&("+ngNuEFromW+"+"+ngNuMuFromW+")>=0&&Sum$(genTau_nNuE+genTau_nNuMu==0&&genTau_nNuTau==1)==1"#not working
+lepTau = "("+ngNuEFromW+"+"+ngNuMuFromW+")<=1&&("+ngNuEFromW+"+"+ngNuMuFromW+")>=0&&Sum$(genTau_nNuE+genTau_nNuMu==1&&genTau_nNuTau==1)==1"#not working
 
+##Sub Background Definitions
+#ngNuEFromW = "Sum$(abs(genLep_pdgId)==11&&abs(genLep_motherId)==24)"
+#ngNuMuFromW = "Sum$(abs(genLep_pdgId)==13&&abs(genLep_motherId)==24)"
+#ngNuTauFromW = "Sum$(abs(genLep_pdgId)==15&&abs(genLep_motherId)==24)"
+#lTau_H  = ngNuEFromW+"+"+ngNuMuFromW+"==0&&"+ngNuTauFromW+"==1&&Sum$(genTau_nNuE+genTau_nNuMu==1&&genTau_nNuTau==1)==1"
+#lTau_l  = ngNuEFromW+"+"+ngNuMuFromW+"==1&&"+ngNuTauFromW+"==1&&Sum$(genTau_nNuE+genTau_nNuMu==1&&genTau_nNuTau==1)==1"
+#hTau_H  = ngNuEFromW+"+"+ngNuMuFromW+"==0&&"+ngNuTauFromW+"==1&&Sum$(genTau_nNuE+genTau_nNuMu==0&&genTau_nNuTau==1)==1"
+#hTau_l  = ngNuEFromW+'+'+ngNuMuFromW+"==1&&"+ngNuTauFromW+"==1&&Sum$(genTau_nNuE+genTau_nNuMu==0&&genTau_nNuTau==1)==1"
+#diLepEff   = ngNuEFromW+"+"+ngNuMuFromW+"==2&&"+ngNuTauFromW+"==0&&Sum$(genLep_pt>10&&(abs(genLep_eta)<2.1&&abs(genLep_pdgId)==13||abs(genLep_eta)<2.4&&abs(genLep_pdgId)==11))==2"
+#diLepAcc   = ngNuEFromW+"+"+ngNuMuFromW+"==2&&"+ngNuTauFromW+"==0&&Sum$(genLep_pt>10&&(abs(genLep_eta)<2.1&&abs(genLep_pdgId)==13||abs(genLep_eta)<2.4&&abs(genLep_pdgId)==11))!=2"
+#diTau   = ngNuEFromW+"+"+ngNuMuFromW+"==0&&"+ngNuTauFromW+"==2"
+#diHad   = ngNuEFromW+"+"+ngNuMuFromW+"==0&&"+ngNuTauFromW+"==0"
+#l_H     = ngNuEFromW+"+"+ngNuMuFromW+"==1&&"+ngNuTauFromW+"==0"
+##combined SubBkgs
+#allHad = "(("+diHad+")||("+hTau_H+"))"
+#allDiLep = ngNuEFromW+"+"+ngNuMuFromW+"==2&&"+ngNuTauFromW+"==0&&Sum$(genLep_pt>5)"
+
+
+#'(singleLeptonic )&&( nLooseHardLeptons==1 )&&( nTightHardLeptons==1 )&&( nLooseSoftPt10Leptons==0 )&&( Jet_pt[1]>80 )&&( st>=150 )&&( st<250 )&&( htJet30j>=500 )&&( htJet30j<750 )&&( nJet30>=4 )&&( nJet30<=4 )&&( nBJetMediumCMVA30>=1 )&&( nBJetMediumCMVA30<=1 )&&( Sum$(abs(genPart_pdgId)==12 )&&( abs(genPart_motherId)==24)+Sum$(abs(genPart_pdgId)==14 )&&( abs(genPart_motherId)==24)==0 )&&( Sum$(abs(genPart_pdgId)==16 )&&( abs(genPart_motherId)==24)==1 )&&( Sum$(genTau_nNuE+genTau_nNuMu==1 )&&( genTau_nNuTau==1)==1 )&&( Jet_pt[2]>=80 )'
 
 
 path=startpath
-#prepresel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80"
-prepresel = "singleLeptonic==1&&Jet_pt[1]>100&&Jet_pt[2]>80"
+prepresel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80"
+#prepresel = "singleLeptonic==1&&Jet_pt[1]>100&&Jet_pt[2]>80"
 presel = prepresel
 
 nothing='(1)'
@@ -150,8 +152,8 @@ for hReg in htReg:
       if not os.path.exists(path):
         os.makedirs(path)
 
-      #prepresel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80"
-      prepresel = "singleLeptonic==1&&Jet_pt[1]>100&&Jet_pt[1]>80"
+      prepresel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80"
+      #prepresel = "singleLeptonic==1&&Jet_pt[1]>100&&Jet_pt[1]>80"
       presel = prepresel+htCutString+stCutString+njCutString#"htJet30j>=750&&htJet30j<=1000&&st>=450&&"+njetCutString+"&&"+nbtagCutString+'&&Jet_pt[1]>80'
       prefix= ''.join(presel.split('&&')[5:]).replace("&&","_").replace(">=","le_").replace("==","eq_")
 
@@ -170,8 +172,8 @@ for hReg in htReg:
       totalh0b=ROOT.TH1F('total0b','Total 0b',*binning)
       totalh.Sumw2()
       totalh0b.Sumw2()
-      c.Draw(varstring+'>>total','weight*('+presel+'&&nBJetMediumCMVA30==0)')
-      c.Draw(varstring+'>>total0b','weight*('+presel+'&&nBJetMediumCMVA30==1)','goff')
+      c.Draw(varstring+'>>total','weight*('+presel+'&&nBJetMediumCMVA30==1)')
+      c.Draw(varstring+'>>total0b','weight*('+presel+'&&nBJetMediumCMVA30==0)','goff')
       ##First Bin Normalisation
       #if totalh.GetBinContent(1)>0 and totalh0b.GetBinContent(1)>0:
       #  totalNorm=totalh.GetBinContent(1)/totalh0b.GetBinContent(1)
@@ -182,7 +184,7 @@ for hReg in htReg:
         totalNorm=totalh.GetSumOfWeights()/totalh0b.GetSumOfWeights()
       else:
         totalNorm=1.
-      c.Draw(varstring+'>>total0b',str(totalNorm)+'*weight*('+presel+'&&nBJetMediumCMVA30==1)')
+      c.Draw(varstring+'>>total0b',str(totalNorm)+'*weight*('+presel+'&&nBJetMediumCMVA30==0)')
       totalh.SetLineColor(ROOT.kBlue+3)
       totalh.SetLineWidth(2)
       totalh.SetMarkerSize(0)
@@ -204,7 +206,7 @@ for hReg in htReg:
         histo = ROOT.TH1F(str(histo) ,str(histo),*binning)
         print histo
         print col
-        wholeCut=presel+'&&nBJetMediumCMVA30==0&&'+cut
+        wholeCut=presel+'&&nBJetMediumCMVA30==1&&'+cut
         print wholeCut
         c.Draw(varstring+'>>'+str(histoname),'weight*('+wholeCut+')')
         histo.SetLineColor(ROOT.kBlack)
@@ -269,9 +271,9 @@ for hReg in htReg:
         histo0b.SetMarkerStyle(0)
         histo0b.SetTitleSize(20)
         histo0b.SetFillColor(0)
-        wholeCut1 = wholeCut=presel+'&&nBJetMediumCMVA30==0&&'+cut
+        wholeCut1 = wholeCut=presel+'&&nBJetMediumCMVA30==1&&'+cut
         #c.Draw(varstring+'>>histo1b','weight*('+wholeCut1+')')
-        wholeCut0 = wholeCut=presel+'&&nBJetMediumCMVA30==1&&'+cut
+        wholeCut0 = wholeCut=presel+'&&nBJetMediumCMVA30==0&&'+cut
         #c.Draw(varstring+'>>histo0b','weight*('+wholeCut0+')','goff')
         norm=1
         ##First Bin Normalisation

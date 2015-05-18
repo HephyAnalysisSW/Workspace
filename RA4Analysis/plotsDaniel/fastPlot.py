@@ -12,15 +12,15 @@ from Workspace.HEPHYPythonTools.helpers import getVarValue, getChain, deltaPhi
 from Workspace.RA4Analysis.cmgTuplesPostProcessed_softLepton import *
 from Workspace.RA4Analysis.helpers import *
 
-binning=[40,0,1000]
+binning=[30,0,30]
 
 #prepresel = 'singleLeptonic==1&&'#&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&'
 #presel = prepresel + 'Jet_pt[1]>80&&nJet30>=2&&nBJetMediumCMVA30==0&&st>=150&&st<=250'#&&htJet30j>500&&htJet30j<750'#&&htJet30j>=500&&st>=200&&deltaPhi_Wl>1&&mt2w>350'
 
-#prepresel = 'singleLeptonic==1'#&&htJet30j>400&&st>200&&nJet30>=4&&nBJetMediumCMVA30==0'#&&Jet_pt[1]>80&&deltaPhi_Wl>0.5'
-#presel = prepresel
+prepresel = 'singleLeptonic==1&&nLooseSoftLeptons==1&&nLooseHardLeptons==0&&nTightHardLeptons==0&&htJet30j>500&&st>250&&nJet30>=4&&Jet_pt[1]>100&&Jet_pt[2]>80&&abs(LepGood_pdgId)==11'
+presel = prepresel
 
-presel='htJet25>400&&(abs(genPartAll_pdgId)==11||abs(genPartAll_pdgId)==13)&&(abs(genPartAll_motherId)==24||abs(genPartAll_motherId)==1000024)'
+#presel='htJet25>400&&(abs(genPartAll_pdgId)==11||abs(genPartAll_pdgId)==13)&&(abs(genPartAll_motherId)==24||abs(genPartAll_motherId)==1000024)'
 #presel='(abs(genLep_pdgId)==11||abs(genLep_pdgId)==13)&&(abs(genLep_motherId)==24||abs(genLep_motherId)==1000024)'
 
 #presel='abs(genPartAll_pdgId)==1000022&&abs(genPartAll_motherId)==1000024'
@@ -29,90 +29,94 @@ presel='htJet25>400&&(abs(genPartAll_pdgId)==11||abs(genPartAll_pdgId)==13)&&(ab
 
 signalString='T5qqqqWW_softLep'
 
-varstring="genPartAll_pt"
+#varstring="genPartAll_pt"
+varstring = "leptonPt"
 plotDir='/afs/hephy.at/user/d/dspitzbart/www/softLep/'
 
 lepSel='soft'
 
-##BKG Samples
-#WJETS = getChain(WJetsHTToLNu[lepSel],histname='')
-#TTJETS = getChain(ttJets[lepSel],histname='')
-#TTVH = getChain(TTVH[lepSel],histname='')
-#SINGLETOP = getChain(singleTop[lepSel],histname='')
-#DY = getChain(DY[lepSel],histname='')
-#QCD = getChain(QCD[lepSel],histname='')
+#BKG Samples
+WJETS = getChain(WJetsHTToLNu[lepSel],histname='')
+TTJETS = getChain(ttJets[lepSel],histname='')
+TTVH = getChain(TTVH[lepSel],histname='')
+SINGLETOP = getChain(singleTop[lepSel],histname='')
+DY = getChain(DY[lepSel],histname='')
+QCD = getChain(QCD[lepSel],histname='')
 
-##SIG Samples
-#SIG1 = getChain(T5qqqqWWDeg_mGo1000_mCh325_mChi300[lepSel],histname='')
-#SIG2 = getChain(T5qqqqWWDeg_mGo1000_mCh310_mChi300[lepSel],histname='')
-#SIG3 = getChain(T5qqqqWW_mGo1000_mCh800_mChi700[lepSel],histname='')
-#SIG4 = getChain(T5qqqqWWDeg_mGo800_mCh305_mChi300[lepSel],histname='')
+#SIG Samples
+SIG1 = getChain(T5qqqqWWDeg_mGo1000_mCh325_mChi300[lepSel],histname='')
+SIG2 = getChain(T5qqqqWWDeg_mGo1000_mCh315_mChi300[lepSel],histname='')
+SIG3 = getChain(T5qqqqWWDeg_mGo1000_mCh310_mChi300[lepSel],histname='')
+SIG4 = getChain(T5qqqqWWDeg_mGo1400_mCh315_mChi300[lepSel],histname='')
+SIG5 = getChain(T5qqqqWW_mGo1000_mCh800_mChi700[lepSel],histname='')
+SIG6 = getChain(T5qqqqWWDeg_mGo800_mCh305_mChi300[lepSel],histname='')
 
-#not post processed signal
-t5qqqq1400_315_300 = ROOT.TChain('tree')
-t5qqqq1400_315_300.Add('/data/dspitzbart/Phys14_V3/T5qqqqWWDeg_mGo1400_mCh315_mChi300/treeProducerSusySingleLepton/tree.root')
 
-t5qqqq1000_315_300 = ROOT.TChain('tree')
-t5qqqq1000_315_300.Add('/data/dspitzbart/Phys14_V3/T5qqqqWWDeg_mGo1000_mCh315_mChi300/treeProducerSusySingleLepton/tree.root')
-
-t5qqqq1000_325_300 = ROOT.TChain('tree')
-t5qqqq1000_325_300.Add('/data/dspitzbart/Phys14_V3/T5qqqqWWDeg_mGo1000_mCh325_mChi300/treeProducerSusySingleLepton/tree.root')
-
-t5qqqq1000_310_300 = ROOT.TChain('tree')
-t5qqqq1000_310_300.Add('/data/dspitzbart/Phys14_V3/T5qqqqWWDeg_mGo1000_mCh310_mChi300/treeProducerSusySingleLepton/tree.root')
-
-t5qqqq800_305_300 = ROOT.TChain('tree')
-t5qqqq800_305_300.Add('/data/dspitzbart/Phys14_V3/T5qqqqWWDeg_mGo800_mCh305_mChi300/treeProducerSusySingleLepton/tree.root')
-
-t5qqqq1000_800_700 = ROOT.TChain('tree')
-t5qqqq1000_800_700.Add('/data/easilar/Phys14_V3/T5qqqqWW_mGo1000_mCh800_mChi700/treeProducerSusySingleLepton/tree.root')
-
-t5qqqq1500_800_100 = ROOT.TChain('tree')
-t5qqqq1500_800_100.Add('/data/dspitzbart/Phys14_V3/T5qqqqWW_mGo1500_mCh800_mChi100/treeProducerSusySingleLepton/tree.root')
-
-t5qqqq1200_1000_800 = ROOT.TChain('tree')
-t5qqqq1200_1000_800.Add('/data/easilar/Phys14_V3/T5qqqqWW_mGo1200_mCh1000_mChi800/treeProducerSusySingleLepton/tree.root')
-
-#not post processed bkg
-#ttvh
-TTVH = ROOT.TChain('tree')
-TTVH.Add('/data/easilar/Phys14_V3/TTZJets/treeProducerSusySingleLepton/tree.root')
-TTVH.Add('/data/easilar/Phys14_V3/TTH/treeProducerSusySingleLepton/tree.root')
-TTVH.Add('/data/easilar/Phys14_V3/TTWJets/treeProducerSusySingleLepton/tree.root')
-
-#tt jets
-TTJETS = ROOT.TChain('tree')
-TTJETS.Add('/data/easilar/Phys14_V3/TTJets/treeProducerSusySingleLepton/tree.root')
-
-#w jets
-WJETS = ROOT.TChain('tree')
-WJETS.Add('/data/easilar/Phys14_V3/WJetsToLNu_HT100to200/treeProducerSusySingleLepton/tree.root')
-WJETS.Add('/data/easilar/Phys14_V3/WJetsToLNu_HT200to400/treeProducerSusySingleLepton/tree.root')
-WJETS.Add('/data/easilar/Phys14_V3/WJetsToLNu_HT400to600/treeProducerSusySingleLepton/tree.root')
-WJETS.Add('/data/easilar/Phys14_V3/WJetsToLNu_HT600toInf/treeProducerSusySingleLepton/tree.root')
-
-#qcd
-QCD = ROOT.TChain('tree')
-QCD.Add('/data/easilar/Phys14_V3/QCD_HT_100To250/treeProducerSusySingleLepton/tree.root')
-QCD.Add('/data/easilar/Phys14_V3/QCD_HT_250To500/treeProducerSusySingleLepton/tree.root')
-QCD.Add('/data/easilar/Phys14_V3/QCD_HT_500To1000/treeProducerSusySingleLepton/tree.root')
-QCD.Add('/data/easilar/Phys14_V3/QCD_HT_1000ToInf/treeProducerSusySingleLepton/tree.root')
-
-#drell yan
-DY = ROOT.TChain('tree')
-DY.Add('/data/easilar/Phys14_V3/DYJetsToLL_M50_HT100to200/treeProducerSusySingleLepton/tree.root')
-DY.Add('/data/easilar/Phys14_V3/DYJetsToLL_M50_HT200to400/treeProducerSusySingleLepton/tree.root')
-DY.Add('/data/easilar/Phys14_V3/DYJetsToLL_M50_HT400to600/treeProducerSusySingleLepton/tree.root')
-DY.Add('/data/easilar/Phys14_V3/DYJetsToLL_M50_HT600toInf/treeProducerSusySingleLepton/tree.root')
-
-#single top
-SINGLETOP = ROOT.TChain('tree')
-SINGLETOP.Add('/data/easilar/Phys14_V3/TBarToLeptons_sch/treeProducerSusySingleLepton/tree.root')
-SINGLETOP.Add('/data/easilar/Phys14_V3/TBarToLeptons_tch/treeProducerSusySingleLepton/tree.root')
-SINGLETOP.Add('/data/easilar/Phys14_V3/TBar_tWch/treeProducerSusySingleLepton/tree.root')
-SINGLETOP.Add('/data/easilar/Phys14_V3/TToLeptons_sch/treeProducerSusySingleLepton/tree.root')
-SINGLETOP.Add('/data/easilar/Phys14_V3/TToLeptons_tch/treeProducerSusySingleLepton/tree.root')
-SINGLETOP.Add('/data/easilar/Phys14_V3/T_tWch/treeProducerSusySingleLepton/tree.root')
+##not post processed signal
+#t5qqqq1400_315_300 = ROOT.TChain('tree')
+#t5qqqq1400_315_300.Add('/data/dspitzbart/Phys14_V3/T5qqqqWWDeg_mGo1400_mCh315_mChi300/treeProducerSusySingleLepton/tree.root')
+#
+#t5qqqq1000_315_300 = ROOT.TChain('tree')
+#t5qqqq1000_315_300.Add('/data/dspitzbart/Phys14_V3/T5qqqqWWDeg_mGo1000_mCh315_mChi300/treeProducerSusySingleLepton/tree.root')
+#
+#t5qqqq1000_325_300 = ROOT.TChain('tree')
+#t5qqqq1000_325_300.Add('/data/dspitzbart/Phys14_V3/T5qqqqWWDeg_mGo1000_mCh325_mChi300/treeProducerSusySingleLepton/tree.root')
+#
+#t5qqqq1000_310_300 = ROOT.TChain('tree')
+#t5qqqq1000_310_300.Add('/data/dspitzbart/Phys14_V3/T5qqqqWWDeg_mGo1000_mCh310_mChi300/treeProducerSusySingleLepton/tree.root')
+#
+#t5qqqq800_305_300 = ROOT.TChain('tree')
+#t5qqqq800_305_300.Add('/data/dspitzbart/Phys14_V3/T5qqqqWWDeg_mGo800_mCh305_mChi300/treeProducerSusySingleLepton/tree.root')
+#
+#t5qqqq1000_800_700 = ROOT.TChain('tree')
+#t5qqqq1000_800_700.Add('/data/easilar/Phys14_V3/T5qqqqWW_mGo1000_mCh800_mChi700/treeProducerSusySingleLepton/tree.root')
+#
+#t5qqqq1500_800_100 = ROOT.TChain('tree')
+#t5qqqq1500_800_100.Add('/data/dspitzbart/Phys14_V3/T5qqqqWW_mGo1500_mCh800_mChi100/treeProducerSusySingleLepton/tree.root')
+#
+#t5qqqq1200_1000_800 = ROOT.TChain('tree')
+#t5qqqq1200_1000_800.Add('/data/easilar/Phys14_V3/T5qqqqWW_mGo1200_mCh1000_mChi800/treeProducerSusySingleLepton/tree.root')
+#
+##not post processed bkg
+##ttvh
+#TTVH = ROOT.TChain('tree')
+#TTVH.Add('/data/easilar/Phys14_V3/TTZJets/treeProducerSusySingleLepton/tree.root')
+#TTVH.Add('/data/easilar/Phys14_V3/TTH/treeProducerSusySingleLepton/tree.root')
+#TTVH.Add('/data/easilar/Phys14_V3/TTWJets/treeProducerSusySingleLepton/tree.root')
+#
+##tt jets
+#TTJETS = ROOT.TChain('tree')
+#TTJETS.Add('/data/easilar/Phys14_V3/TTJets/treeProducerSusySingleLepton/tree.root')
+#
+##w jets
+#WJETS = ROOT.TChain('tree')
+#WJETS.Add('/data/easilar/Phys14_V3/WJetsToLNu_HT100to200/treeProducerSusySingleLepton/tree.root')
+#WJETS.Add('/data/easilar/Phys14_V3/WJetsToLNu_HT200to400/treeProducerSusySingleLepton/tree.root')
+#WJETS.Add('/data/easilar/Phys14_V3/WJetsToLNu_HT400to600/treeProducerSusySingleLepton/tree.root')
+#WJETS.Add('/data/easilar/Phys14_V3/WJetsToLNu_HT600toInf/treeProducerSusySingleLepton/tree.root')
+#
+##qcd
+#QCD = ROOT.TChain('tree')
+#QCD.Add('/data/easilar/Phys14_V3/QCD_HT_100To250/treeProducerSusySingleLepton/tree.root')
+#QCD.Add('/data/easilar/Phys14_V3/QCD_HT_250To500/treeProducerSusySingleLepton/tree.root')
+#QCD.Add('/data/easilar/Phys14_V3/QCD_HT_500To1000/treeProducerSusySingleLepton/tree.root')
+#QCD.Add('/data/easilar/Phys14_V3/QCD_HT_1000ToInf/treeProducerSusySingleLepton/tree.root')
+#
+##drell yan
+#DY = ROOT.TChain('tree')
+#DY.Add('/data/easilar/Phys14_V3/DYJetsToLL_M50_HT100to200/treeProducerSusySingleLepton/tree.root')
+#DY.Add('/data/easilar/Phys14_V3/DYJetsToLL_M50_HT200to400/treeProducerSusySingleLepton/tree.root')
+#DY.Add('/data/easilar/Phys14_V3/DYJetsToLL_M50_HT400to600/treeProducerSusySingleLepton/tree.root')
+#DY.Add('/data/easilar/Phys14_V3/DYJetsToLL_M50_HT600toInf/treeProducerSusySingleLepton/tree.root')
+#
+##single top
+#SINGLETOP = ROOT.TChain('tree')
+#SINGLETOP.Add('/data/easilar/Phys14_V3/TBarToLeptons_sch/treeProducerSusySingleLepton/tree.root')
+#SINGLETOP.Add('/data/easilar/Phys14_V3/TBarToLeptons_tch/treeProducerSusySingleLepton/tree.root')
+#SINGLETOP.Add('/data/easilar/Phys14_V3/TBar_tWch/treeProducerSusySingleLepton/tree.root')
+#SINGLETOP.Add('/data/easilar/Phys14_V3/TToLeptons_sch/treeProducerSusySingleLepton/tree.root')
+#SINGLETOP.Add('/data/easilar/Phys14_V3/TToLeptons_tch/treeProducerSusySingleLepton/tree.root')
+#SINGLETOP.Add('/data/easilar/Phys14_V3/T_tWch/treeProducerSusySingleLepton/tree.root')
 
 
 
@@ -123,45 +127,52 @@ singletop = {"name":"single top", "chain":SINGLETOP, "weight":"weight", "color":
 dy = {"name":"Drell Yan", "chain":DY, "weight":"weight", "color":color('dy')}
 qcd = {"name":"QCD", "chain":QCD, "weight":"weight", "color":color('qcd')}
 
+signal1 = {'name':'T5qqqqWWDeg_mGo1000_mCh325_mChi300', 'chain':SIG1, 'weight':'weight', 'color':ROOT.kRed-7, "histo":ROOT.TH1F("Signal 1", "sqrt(s)", *binning), 'niceName':'T5qqqqWW m_{\\tilde{g}}=1000, m_{\\tilde{\\chi}_{1}^{+}}=325, m_{\\tilde{\\chi}_{1}^{0}}=300'}
+signal2 = {'name':'T5qqqqWWDeg_mGo1000_mCh315_mChi300', 'chain':SIG2, 'weight':'weight', 'color':ROOT.kRed-3, "histo":ROOT.TH1F("Signal 2", "sqrt(s)", *binning), 'niceName':'T5qqqqWW m_{\\tilde{g}}=1000, m_{\\tilde{\\chi}_{1}^{+}}=315, m_{\\tilde{\\chi}_{1}^{0}}=300'}
+signal3 = {'name':'T5qqqqWWDeg_mGo1000_mCh310_mChi300', 'chain':SIG3, 'weight':'weight', 'color':ROOT.kRed+2, "histo":ROOT.TH1F("Signal 3", "sqrt(s)", *binning), 'niceName':'T5qqqqWW m_{\\tilde{g}}=1000, m_{\\tilde{\\chi}_{1}^{+}}=310, m_{\\tilde{\\chi}_{1}^{0}}=300'}
+signal4 = {'name':'T5qqqqWWDeg_mGo1400_mCh315_mChi300', 'chain':SIG4, 'weight':'weight', 'color':ROOT.kBlack, "histo":ROOT.TH1F("Signal 4", "sqrt(s)", *binning), 'niceName':'T5qqqqWW m_{\\tilde{g}}=1400, m_{\\tilde{\\chi}_{1}^{+}}=315, m_{\\tilde{\\chi}_{1}^{0}}=300'}
+signal5 = {'name':'T5qqqqWW_mGo1000_mCh800_mChi700', 'chain':SIG5, 'weight':'weight', 'color':ROOT.kMagenta+1, "histo":ROOT.TH1F("Signal 5", "sqrt(s)", *binning),'niceName':'T5qqqqWW m_{\\tilde{g}}=1000, m_{\\tilde{\\chi}_{1}^{+}}=800, m_{\\tilde{\\chi}_{1}^{0}}=700'}
+signal6 = {'name':'T5qqqqWWDeg_mGo800_mCh305_mChi300', 'chain':SIG6, 'weight':'weight', 'color':ROOT.kCyan+2, "histo":ROOT.TH1F("Signal 6", "sqrt(s)", *binning), 'niceName':'T5qqqqWW m_{\\tilde{g}}=800,  m_{\\tilde{\\chi}_{1}^{+}}=305, m_{\\tilde{\\chi}_{1}^{0}}=300'}
 
-#signal1 = {'name':'T5qqqqWWDeg_mGo1000_mCh325_mChi300', 'chain':SIG1, 'weight':'weight', 'color':ROOT.kBlack, "histo":ROOT.TH1F("Signal 1", "sqrt(s)", *binning)}
-#signal2 = {'name':'T5qqqqWWDeg_mGo1000_mCh310_mChi300', 'chain':SIG2, 'weight':'weight', 'color':ROOT.kRed+1, "histo":ROOT.TH1F("Signal 2", "sqrt(s)", *binning)}
-#signal3 = {'name':'T5qqqqWW_mGo1000_mCh800_mChi700', 'chain':SIG3, 'weight':'weight', 'color':ROOT.kMagenta+1, "histo":ROOT.TH1F("Signal 3", "sqrt(s)", *binning)}
-#signal4 = {'name':'T5qqqqWWDeg_mGo800_mCh305_mChi300', 'chain':SIG4, 'weight':'weight', 'color':ROOT.kCyan+3, "histo":ROOT.TH1F("Signal 4", "sqrt(s)", *binning)}
 
-t5qqqq1 = {'name':'T5qqqqWW_Gl1400_Chi315_LSP300', 'chain':t5qqqq1400_315_300, 'weight':'(1)', 'color':ROOT.kBlue, "histo":ROOT.TH1F("Signal 1", "sqrt(s)", *binning)}
-t5qqqq2 = {'name':'T5qqqqWW_Gl1000_Chi315_LSP300', 'chain':t5qqqq1000_315_300, 'weight':'(1)', 'color':ROOT.kBlack, "histo":ROOT.TH1F("Signal 2", "sqrt(s)", *binning)}
-t5qqqq3 = {'name':'T5qqqqWW_Gl1000_Chi325_LSP300', 'chain':t5qqqq1000_325_300, 'weight':'(1)', 'color':ROOT.kMagenta, "histo":ROOT.TH1F("Signal 3", "sqrt(s)", *binning)}
-t5qqqq4 = {'name':'T5qqqqWW_Gl1000_Chi310_LSP300', 'chain':t5qqqq1000_310_300, 'weight':'(1)', 'color':ROOT.kGreen+2, "histo":ROOT.TH1F("Signal 4", "sqrt(s)", *binning)}
-t5qqqq5 = {'name':'T5qqqqWW_Gl800_Chi305_LSP300', 'chain':t5qqqq800_305_300, 'weight':'(1)', 'color':ROOT.kOrange, "histo":ROOT.TH1F("Signal 5", "sqrt(s)", *binning)}
-t5qqqq6 = {'name':'T5qqqqWW_Gl1000_Chi800_LSP700', 'chain':t5qqqq1000_800_700, 'weight':'(1)', 'color':ROOT.kRed+1, "histo":ROOT.TH1F("Signal 6", "sqrt(s)", *binning)}
-t5qqqq7 = {'name':'T5qqqqWW_Gl1500_Chi800_LSP100', 'chain':t5qqqq1500_800_100, 'weight':'(1)', 'color':ROOT.kRed-1, "histo":ROOT.TH1F("Signal 7", "sqrt(s)", *binning)}
-t5qqqq8 = {'name':'T5qqqqWW_Gl1200_Chi1000_LSP800', 'chain':t5qqqq1200_1000_800, 'weight':'(1)', 'color':ROOT.kCyan+1, "histo":ROOT.TH1F("Signal 8", "sqrt(s)", *binning)}
+
+
+#t5qqqq1 = {'name':'T5qqqqWW_Gl1400_Chi315_LSP300', 'chain':t5qqqq1400_315_300, 'weight':'(1)', 'color':ROOT.kBlue, "histo":ROOT.TH1F("Signal 1", "sqrt(s)", *binning)}
+#t5qqqq2 = {'name':'T5qqqqWW_Gl1000_Chi315_LSP300', 'chain':t5qqqq1000_315_300, 'weight':'(1)', 'color':ROOT.kBlack, "histo":ROOT.TH1F("Signal 2", "sqrt(s)", *binning)}
+#t5qqqq3 = {'name':'T5qqqqWW_Gl1000_Chi325_LSP300', 'chain':t5qqqq1000_325_300, 'weight':'(1)', 'color':ROOT.kMagenta, "histo":ROOT.TH1F("Signal 3", "sqrt(s)", *binning)}
+#t5qqqq4 = {'name':'T5qqqqWW_Gl1000_Chi310_LSP300', 'chain':t5qqqq1000_310_300, 'weight':'(1)', 'color':ROOT.kGreen+2, "histo":ROOT.TH1F("Signal 4", "sqrt(s)", *binning)}
+#t5qqqq5 = {'name':'T5qqqqWW_Gl800_Chi305_LSP300', 'chain':t5qqqq800_305_300, 'weight':'(1)', 'color':ROOT.kOrange, "histo":ROOT.TH1F("Signal 5", "sqrt(s)", *binning)}
+#t5qqqq6 = {'name':'T5qqqqWW_Gl1000_Chi800_LSP700', 'chain':t5qqqq1000_800_700, 'weight':'(1)', 'color':ROOT.kRed+1, "histo":ROOT.TH1F("Signal 6", "sqrt(s)", *binning)}
+#t5qqqq7 = {'name':'T5qqqqWW_Gl1500_Chi800_LSP100', 'chain':t5qqqq1500_800_100, 'weight':'(1)', 'color':ROOT.kRed-1, "histo":ROOT.TH1F("Signal 7", "sqrt(s)", *binning)}
+#t5qqqq8 = {'name':'T5qqqqWW_Gl1200_Chi1000_LSP800', 'chain':t5qqqq1200_1000_800, 'weight':'(1)', 'color':ROOT.kCyan+1, "histo":ROOT.TH1F("Signal 8", "sqrt(s)", *binning)}
 
 
 sigSamples=[]
-#sigSamples.append(signal1)
-#sigSamples.append(signal2)
-#sigSamples.append(signal3)
-#sigSamples.append(signal4)
+sigSamples.append(signal1)
+sigSamples.append(signal2)
+sigSamples.append(signal3)
+sigSamples.append(signal4)
+sigSamples.append(signal5)
+sigSamples.append(signal6)
 
-sigSamples.append(t5qqqq6)
-sigSamples.append(t5qqqq7)
-sigSamples.append(t5qqqq8)
-sigSamples.append(t5qqqq1)
-sigSamples.append(t5qqqq3)
-sigSamples.append(t5qqqq2)
-sigSamples.append(t5qqqq4)
-sigSamples.append(t5qqqq5)
+
+#sigSamples.append(t5qqqq6)
+#sigSamples.append(t5qqqq7)
+#sigSamples.append(t5qqqq8)
+#sigSamples.append(t5qqqq1)
+#sigSamples.append(t5qqqq3)
+#sigSamples.append(t5qqqq2)
+#sigSamples.append(t5qqqq4)
+#sigSamples.append(t5qqqq5)
 
 
 bkgSamples=[]
-#bkgSamples.append(qcd)
-#bkgSamples.append(ttvh)
-#bkgSamples.append(dy)
-#bkgSamples.append(singletop)
-#bkgSamples.append(wjets)
-#bkgSamples.append(ttjets)
+bkgSamples.append(qcd)
+bkgSamples.append(ttvh)
+bkgSamples.append(dy)
+bkgSamples.append(singletop)
+bkgSamples.append(wjets)
+bkgSamples.append(ttjets)
 
 h_Stack = ROOT.THStack('h_Stack',varstring)
 h_Stack_S = ROOT.THStack('h_Stack_S',varstring)
@@ -188,9 +199,9 @@ for sample in bkgSamples:
   print color
   tot_lumi = 4000
   nevents = chain.GetEntries()
-  weight = "("+str(tot_lumi)+"*xsec)/"+str(nevents)
-  print 'Weight:', weight
-  chain.Draw(varstring+'>>'+str(histoname),weight+'*('+presel+')')#insert 'weight*('+
+  #weight = "("+str(tot_lumi)+"*xsec)/"+str(nevents)
+  #print 'Weight:', weight
+  chain.Draw(varstring+'>>'+str(histoname),'weight*('+presel+')')#insert 'weight*('+
   histo.SetLineColor(ROOT.kBlack)
   histo.SetLineWidth(1)
   histo.SetMarkerSize(0)
@@ -204,7 +215,7 @@ for sample in bkgSamples:
   histo.GetYaxis().SetTitleSize(0.05)
   histo.SetFillColor(sample["color"])
   histo.SetFillStyle(1001)
-  histo.SetMinimum(.8)
+  histo.SetMinimum(.08)
   h_Stack.Add(histo)
   print sample["name"], "Histogram has ", histo.GetSumOfWeights(), " entries"
   h1.Add(histo)
@@ -222,9 +233,9 @@ for sample in sigSamples:
   print color
   tot_lumi = 4000
   nevents = chain.GetEntries()
-  weight = "("+str(tot_lumi)+"*xsec)/"+str(nevents)
-  print 'Weight:', weight
-  chain.Draw(varstring+'>>'+str(histoname),weight+'*('+presel+')')#'weight*('+
+  #weight = "("+str(tot_lumi)+"*xsec)/"+str(nevents)
+  #print 'Weight:', weight
+  chain.Draw(varstring+'>>'+str(histoname),'weight*('+presel+')')#'weight*('+
   histo.SetLineColor(color)
   histo.SetLineWidth(2)
   histo.SetMarkerSize(0)
@@ -239,7 +250,7 @@ for sample in sigSamples:
   histo.GetYaxis().SetTitleOffset(0.3)
   histo.GetYaxis().SetTitleSize(0.06)
   histo.SetFillColor(0)
-  histo.SetMinimum(.8)
+  histo.SetMinimum(.08)
   h_Stack_S.Add(histo)
   h3.Add(histo)
   l.AddEntry(histo, sample["name"])
@@ -270,9 +281,9 @@ histo.GetYaxis().SetTitleSize(0.15)
 
 
 h_Stack.Draw()
-h_Stack.SetMinimum(0.8)
-#h_Stack_S.Draw('noStacksame')
-h_Stack_S.Draw('noStack')
+h_Stack.SetMinimum(0.08)
+h_Stack_S.Draw('noStacksame')
+#h_Stack_S.Draw('noStack')
 h_Stack_S.GetYaxis().SetTitle("Events") #add _S if no bkg
 h_Stack_S.GetYaxis().SetLabelSize(0.04)
 h_Stack_S.GetYaxis().SetTitleOffset(1.1)

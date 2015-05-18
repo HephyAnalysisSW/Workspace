@@ -62,8 +62,8 @@ allSignalStrings=[\
 "T5qqqqWW_mGo1000_mCh800_mChi700",\
 "T5qqqqWW_mGo1200_mCh1000_mChi800",\
 "T5qqqqWW_mGo1500_mCh800_mChi100",\
-"SMS_T1tttt_2J_mGl1500_mLSP100",\
-"SMS_T1tttt_2J_mGl1200_mLSP800",\
+#"SMS_T1tttt_2J_mGl1500_mLSP100",\
+#"SMS_T1tttt_2J_mGl1200_mLSP800",\
 ]
 
 
@@ -72,7 +72,7 @@ def getSignalSample(signal):
     return {
       "name" : signal,
 #      "chunkString": signal,
-      'dir' : "/data/easilar/cmgTuples/postProcessed_v2_Phys14V3/HT400ST200/",
+      'dir' : "/data/easilar/cmgTuples/postProcessed_v2_Phys14V3_signals/HT400ST200/",
       'bins':[signal]}
   else:
     print "Signal",signal,"unknown. Available: ",", ".join(allSignalStrings)

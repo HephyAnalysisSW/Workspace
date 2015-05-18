@@ -19,9 +19,9 @@ ROOT.setTDRStyle()
 
 lepSel = 'hard'
 
-htCut = [750,10000000000]
+htCut = [500,10000000000]
 #stCut = [250,350]
-stCut = [250,10000000000]
+stCut = [200,10000000000]
 njetCut = [6,20]
 nbtagCut = 0
 mt2Cut = 0
@@ -30,8 +30,9 @@ dfCut =1
 prepresel = 'singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&'
 #presel = prepresel+'mt2w>'+str(mt2Cut)+'&&deltaPhi_Wl>'+str(dfCut)+'&&htJet30j>='+str(htCut[0])+'&&htJet30j<'+str(htCut[1])+'&&st>='+str(stCut[0])+'&&st<'+str(stCut[1])+'&&nJet30>='+str(njetCut[0])+'&&nJet30<'+str(njetCut[1])+'&&nBJetMediumCMVA30=='+str(nbtagCut)
 #presel = prepresel+'deltaPhi_Wl>'+str(dfCut)+'&&Jet_pt[1]>='+str(jetPtCut)+'&&htJet30j>='+str(htCut[0])+'&&htJet30j<'+str(htCut[1])+'&&met>='+str(stCut[0])+'&&met<'+str(stCut[1])+'&&nJet30>='+str(njetCut[0])+'&&nJet30<'+str(njetCut[1])+'&&nBJetMediumCMVA30>='+str(nbtagCut)
+#prepresel = ""
 presel = prepresel+'deltaPhi_Wl>'+str(dfCut)+'&&Jet_pt[1]>='+str(jetPtCut)+'&&htJet30j>='+str(htCut[0])+'&&htJet30j<'+str(htCut[1])+'&&st>='+str(stCut[0])+'&&st<'+str(stCut[1])+'&&nJet30>='+str(njetCut[0])+'&&nJet30<'+str(njetCut[1])+'&&nBJetMediumCMVA30=='+str(nbtagCut)
-path = "/afs/hephy.at/user/e/easilar/www/PHYS14v3/fatJet/"+"_".join(presel.split('&&')[4:])+"/"   #.replace('&&','_')+"/"
+path = "/afs/hephy.at/user/e/easilar/www/PHYS14v3/fatJet/Wtagging/tests/"+"_".join(presel.split('&&')[4:])+"/"   #.replace('&&','_')+"/"
 if not os.path.exists(path):
   os.makedirs(path)
 
@@ -48,9 +49,17 @@ signal_samples = [
 {'cname':'T5qqqqWW_mGo1000_mCh800_mLSP700','color':ROOT.kBlack  ,'chain':getChain(T5qqqqWW_mGo1000_mCh800_mChi700[lepSel],histname='')},\
 {'cname':'T5qqqqWW_mGo1200_mCh1000_mLSP800','color':ROOT.kRed    ,'chain':getChain(T5qqqqWW_mGo1200_mCh1000_mChi800[lepSel],histname='')},\
 {'cname':'T5qqqqWW_mGo1500_mCh800_mLSP100','color':ROOT.kYellow    ,'chain':getChain(T5qqqqWW_mGo1500_mCh800_mChi100[lepSel],histname='')},\
-{'cname':'SMS_T1tttt_2J_mGl1500_mLSP100','color':ROOT.kMagenta    ,'chain':getChain(SMS_T1tttt_2J_mGl1500_mLSP100[lepSel],histname='')},\
-{'cname':'SMS_T1tttt_2J_mGl1200_mLSP800','color':ROOT.kCyan       ,'chain':getChain(SMS_T1tttt_2J_mGl1200_mLSP800[lepSel],histname='')},\
+#{'cname':'SMS_T1tttt_2J_mGl1500_mLSP100','color':ROOT.kMagenta    ,'chain':getChain(SMS_T1tttt_2J_mGl1500_mLSP100[lepSel],histname='')},\
+#{'cname':'SMS_T1tttt_2J_mGl1200_mLSP800','color':ROOT.kCyan       ,'chain':getChain(SMS_T1tttt_2J_mGl1200_mLSP800[lepSel],histname='')},\
 ]
+
+for b in bkg_samples:
+  print 'sample:' ,b['cname'],'nevents:', b['chain'].GetEntries()
+for s in signal_samples:
+  print 'sample:' ,s['cname'],'nevents:', s['chain'].GetEntries()
+
+
+
 
 plots = [
 #{'xaxis':'M_{T2W}','logy':'True' ,'var':'mt2w',                       'varname':'mt2w',                   'bin':30,       'lowlimit':50, 'limit':500},\
@@ -63,20 +72,22 @@ plots = [
 #{'xaxis':'#Delta#Phi','logy':'True' , 'var':'deltaPhi_Wl',                 'varname':'deltaPhi_Wl',            'bin':30,       'lowlimit':0,  'limit':pi},\
 #{'xaxis':'MET','logy':'True' , 'var':'met',                         'varname':'met',                    'bin':30,       'lowlimit':0,  'limit':1400},\
 #{'xaxis':'leading Lepton #P_{T}','logy':'True' , 'var':'leptonPt[0]',                 'varname':'leptonPt[0]',            'bin':100,       'lowlimit':0,  'limit':1000},\
-#{'xaxis':'','logy':'True' , 'var':'Jet_pt[0]+Jet_pt[1]',         'varname':'Jet_pt[0]+Jet_pt[1]',    'bin':30,       'lowlimit':0,  'limit':2000},\
-#{'xaxis':'',{'logy':'True' , 'var':'Jet_eta[0]*Jet_eta[1]',       'varname':'Jet_eta[0]*Jet_eta[1]',  'bin':30,       'lowlimit':-8,  'limit':8},\
-{'xaxis':'nFatJet','logy':'True' , 'var':'nFatJet',                    'varname':'nFatJets',                   'bin':20,       'lowlimit':0,  'limit':20},\
-{'xaxis':'FatJet_pt[0]','logy':'True' , 'var':'FatJet_pt[0]',               'varname':'FatJet_pt[0]',                'bin':100,       'lowlimit':0,  'limit':2000},\
-{'xaxis':'prunedMass','logy':'True' , 'var':'FatJet_prunedMass',          'varname':'FatJet_prunedMass',          'bin':100,       'lowlimit':0,  'limit':300},\
-{'xaxis':'trimmedMass','logy':'True' , 'var':'FatJet_trimmedMass',         'varname':'FatJet_trimmedMass',          'bin':100,       'lowlimit':0,  'limit':300},\
-{'xaxis':'filteredMass','logy':'True' , 'var':'FatJet_filteredMass',        'varname':'FatJet_filteredMass',          'bin':100,       'lowlimit':0,  'limit':300},\
-{'xaxis':'FatJet_tau1','logy':'True' , 'var':'FatJet_tau1',                'varname':'FatJet_tau1',          'bin':100,       'lowlimit':0,  'limit':1},\
-{'xaxis':'FatJet_tau2','logy':'True' , 'var':'FatJet_tau2',                'varname':'FatJet_tau2',          'bin':100,       'lowlimit':0,  'limit':1},\
-{'xaxis':'FatJet_tau3','logy':'True' , 'var':'FatJet_tau3',                'varname':'FatJet_tau3',          'bin':100,       'lowlimit':0,  'limit':1},\
-{'xaxis':'#tau3/#tau1','logy':'True' , 'var':'FatJet_tau3/FatJet_tau1',    'varname':'FatJet_tau3_1',          'bin':100,       'lowlimit':0,  'limit':1},\
-{'xaxis':'#tau3/#tau2','logy':'True' , 'var':'FatJet_tau3/FatJet_tau2',    'varname':'FatJet_tau3_2',          'bin':100,       'lowlimit':0,  'limit':1},\
-{'xaxis':'#tau2/#tau1','logy':'True' , 'var':'FatJet_tau2/FatJet_tau1',    'varname':'FatJet_tau2_1',          'bin':100,       'lowlimit':0,  'limit':1},\
-{'xaxis':'nWtagged','logy':'True' , 'var':'Sum$(FatJet_prunedMass>70&&FatJet_prunedMass<100&&(FatJet_tau2/FatJet_tau1)<0.5)',    'varname':'nWtagged',          'bin':5,       'lowlimit':0,  'limit':5},\
+##{'xaxis':'','logy':'True' , 'var':'Jet_pt[0]+Jet_pt[1]',         'varname':'Jet_pt[0]+Jet_pt[1]',    'bin':30,       'lowlimit':0,  'limit':2000},\
+##{'xaxis':'','logy':'True' , 'var':'Jet_eta[0]*Jet_eta[1]',       'varname':'Jet_eta[0]*Jet_eta[1]',  'bin':30,       'lowlimit':-8,  'limit':8},\
+#{'xaxis':'nFatJet','logy':'True' , 'var':'nFatJet',                    'varname':'nFatJets',                   'bin':20,       'lowlimit':0,  'limit':20},\
+#{'xaxis':'FatJet_pt[0]','logy':'True' , 'var':'FatJet_pt[0]',               'varname':'FatJet_pt[0]',                'bin':100,       'lowlimit':0,  'limit':2000},\
+#{'xaxis':'prunedMass','logy':'True' , 'var':'FatJet_prunedMass',          'varname':'FatJet_prunedMass',          'bin':100,       'lowlimit':0,  'limit':300},\
+#{'xaxis':'trimmedMass','logy':'True' , 'var':'FatJet_trimmedMass',         'varname':'FatJet_trimmedMass',          'bin':100,       'lowlimit':0,  'limit':300},\
+#{'xaxis':'filteredMass','logy':'True' , 'var':'FatJet_filteredMass',        'varname':'FatJet_filteredMass',          'bin':100,       'lowlimit':0,  'limit':300},\
+#{'xaxis':'FatJet_tau1','logy':'True' , 'var':'FatJet_tau1',                'varname':'FatJet_tau1',          'bin':100,       'lowlimit':0,  'limit':1},\
+#{'xaxis':'FatJet_tau2','logy':'True' , 'var':'FatJet_tau2',                'varname':'FatJet_tau2',          'bin':100,       'lowlimit':0,  'limit':1},\
+#{'xaxis':'FatJet_tau3','logy':'True' , 'var':'FatJet_tau3',                'varname':'FatJet_tau3',          'bin':100,       'lowlimit':0,  'limit':1},\
+#{'xaxis':'#tau3/#tau1','logy':'True' , 'var':'FatJet_tau3/FatJet_tau1',    'varname':'FatJet_tau3_1',          'bin':100,       'lowlimit':0,  'limit':1},\
+#{'xaxis':'#tau3/#tau2','logy':'True' , 'var':'FatJet_tau3/FatJet_tau2',    'varname':'FatJet_tau3_2',          'bin':100,       'lowlimit':0,  'limit':1},\
+#{'xaxis':'#tau2/#tau1','logy':'True' , 'var':'FatJet_tau2/FatJet_tau1',    'varname':'FatJet_tau2_1',          'bin':100,       'lowlimit':0,  'limit':1},\
+#{'xaxis':'nWtagged','logy':'True' , 'var':'Sum$(FatJet_prunedMass>60&&FatJet_prunedMass<100&&(FatJet_tau2/FatJet_tau1)<0.5)',    'varname':'nWtagged',          'bin':5,       'lowlimit':0,  'limit':5},\
+#{'xaxis':'nWdaughters','logy':'True' , 'var':'Sum$(abs(genPartAll_motherId)==24)',    'varname':'nWdaughters',          'bin':20,       'lowlimit':0,  'limit':20},\
+#{'xaxis':'WdaughtersPdgId','logy':'True' , 'var':'GenPart_pdgId',    'varname':'nWdaughtersPdgId',          'bin':61,       'lowlimit':-30,  'limit':30},\
 ]
 #p = plots[0]
 #print p 
@@ -110,9 +121,12 @@ for p in plots:
     print presel
     chain.Draw(p['var']+'>>'+str(histoname),'weight*('+presel+')')
     print histo
-    histo.SetFillColor(color)
+    #histo.SetFillColor(color)
+    histo.SetLineColor(color)
+    histo.SetLineWidth(2)
     histo.SetMinimum(.000001)
     histo.GetXaxis().SetTitle(p['xaxis'])
+    histo.GetYaxis().SetTitle('Events')
     h_Stack.Add(histo)
     leg.AddEntry(histo, b['label'],"f")
     del histo  
@@ -127,16 +141,16 @@ for p in plots:
     print histo
     histo.SetLineColor(color)
     histo.SetLineWidth(4)
-    histo.SetMinimum(.000001)
+    histo.SetMinimum(0.0001)
     h_Stack_S.Add(histo)
     #histo.Draw('same')
     leg.AddEntry(histo, s['cname'],"l")  
-  h_Stack.SetMaximum((h_Stack.GetMaximum())*5)
+  h_Stack.SetMaximum((h_Stack.GetMaximum())*100)
   h_Stack.SetMinimum(0.0001)
   #h_Stack_S.GetXaxis().SetTitle(p['xaxis'])
   #h_Stack_S.GetYaxis().SetTitle("Number of Events")
   #ROOT.gStyle.SetTitle(p['xaxis'],"x")
-  h_Stack.Draw() 
+  h_Stack.Draw('noStack') 
   h_Stack_S.Draw('noStacksame')
   leg.SetFillColor(0)
   leg.Draw()
@@ -145,8 +159,8 @@ for p in plots:
   latex.DrawLatex(0.8,0.05,p['xaxis'])
   if p['logy']=="True": can.SetLogy()
   #can.Update()
-  can.SaveAs(path+p['varname']+'.png')
-  can.SaveAs(path+p['varname']+'.pdf')
-  can.SaveAs(path+p['varname']+'.root')
+  can.SaveAs(path+p['varname']+'genPartAll.png')
+  can.SaveAs(path+p['varname']+'genPartAll.pdf')
+  can.SaveAs(path+p['varname']+'genPartAll.root')
   del can
 

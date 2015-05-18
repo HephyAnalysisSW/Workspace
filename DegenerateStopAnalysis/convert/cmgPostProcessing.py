@@ -1,12 +1,14 @@
 import ROOT
 import sys, os, copy, random, subprocess, datetime
 from array import array
-from Workspace.RA4Analysis.cmgObjectSelection import cmgLooseLepIndices,ele_ID_eta, splitIndList, get_cmg_jets_fromStruct, splitListOfObjects
 from Workspace.HEPHYPythonTools.xsec import xsec
 from Workspace.HEPHYPythonTools.helpers import getObjFromFile, getObjDict, getFileList
-from Workspace.RA4Analysis.convertHelpers import compileClass, readVar, printHeader, typeStr, createClassString
 
-subDir = "postProcessed_v1_Phys14V3"
+from Workspace.RA4Analysis.convertHelpers import compileClass, readVar, printHeader, typeStr, createClassString
+#from  Workspace.RA4Analysis import mt2w
+from Workspace.RA4Analysis.cmgObjectSelection import cmgLooseLepIndices,ele_ID_eta, splitIndList, get_cmg_jets_fromStruct, splitListOfObjects
+
+subDir = "postProcessed_v1_Phys14V5"
 
 #from Workspace.RA4Analysis.cmgTuples_v3 import *
 from Workspace.HEPHYPythonTools.helpers import getChunksFromNFS, getChunksFromDPM, getChunks
@@ -17,7 +19,6 @@ from Workspace.DegenerateStopAnalysis.cmgTuples_Phys14_v1 import *
 
 target_lumi = 4000 #pb-1
 
-from  Workspace.RA4Analysis import mt2w
 
 from math import *
 from localInfo import username
@@ -50,6 +51,7 @@ parser.add_option("--inputTreeName", dest="inputTreeName", default="treeProducer
 parser.add_option("--targetDir", dest="targetDir", default="/data/"+username+"/cmgTuples/"+subDir+'/', type="string", action="store", help="target directory.")
 parser.add_option("--skim", dest="skim", default="", type="string", action="store", help="any skim condition?")
 parser.add_option("--leptonSelection", dest="leptonSelection", default="hard", type="string", action="store", help="which lepton selection? 'soft' or 'hard' or 'none'?")
+parser.add_option("--dontClean", dest="dontClean", default="False", type="string", action="store", help="Don't clean the temp files")
 
 parser.add_option("--small", dest="small", default = False, action="store_true", help="Just do a small subset.")
 #parser.add_option("--overwrite", dest="overwrite", action="store_true", help="Overwrite?", default=True)
@@ -127,7 +129,9 @@ for isample, sample in enumerate(allSamples):
   readVariables = ['met_pt/F', 'met_phi/F']
 
   newVariables = ['weight/F']
-  newVariables += ['nLooseSoftLeptons/I', 'nLooseSoftPt10Leptons/I', 'nLooseHardLeptons/I', 'nTightSoftLeptons/I', 'nTightHardLeptons/I']
+
+  #newVariables += ['nLooseSoftLeptons/I', 'nLooseSoftPt10Leptons/I', 'nLooseHardLeptons/I', 'nTightSoftLeptons/I', 'nTightHardLeptons/I']
+
   if options.leptonSelection.lower()!='none':
     newVariables.extend( ['deltaPhi_Wl/F','nBJetMediumCMVA30/I','nJet30/I','htJet30j/F','st/F', 'leptonPt/F','leptonMiniRelIso/F','leptonRelIso03/F' ,'leptonEta/F', 'leptonPhi/F', 'leptonPdg/I/0', 'leptonInd/I/-1', 'leptonMass/F', 'singleMuonic/I', 'singleElectronic/I', 'singleLeptonic/I', 'mt2w/F'] )
   newVars = [readVar(v, allowRenaming=False, isWritten = True, isRead=False) for v in newVariables]
@@ -136,7 +140,7 @@ for isample, sample in enumerate(allSamples):
   
   readVectors = [\
     {'prefix':'LepGood',  'nMax':8, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I', 'relIso03/F', 'tightId/I', 'miniRelIso/F','mvaId/F','eleMVAId/I','mass/F','sip3d/F','mediumMuonId/I', 'mvaIdPhys14/F','lostHits/I', 'convVeto/I']},
-    {'prefix':'Jet',  'nMax':100, 'vars':['pt/F', 'eta/F', 'phi/F', 'id/I', 'btagCMVA/F', 'partonId/I']},
+    {'prefix':'Jet',  'nMax':100, 'vars':['pt/F', 'eta/F', 'phi/F', 'id/I','btagCSV/F' ,'btagCMVA/F', 'partonId/I']},
   ]
   readVars = [readVar(v, allowRenaming=False, isWritten=False, isRead=True) for v in readVariables]
   for v in readVectors:
@@ -168,6 +172,7 @@ for isample, sample in enumerate(allSamples):
       if not t:continue
       t.SetName("Events")
       nEvents = t.GetEntries()
+      #nEvents = 10
       for v in newVars:
 #        print "new VAR:" , v
         v['branch'] = t.Branch(v['stage2Name'], ROOT.AddressOf(s,v['stage2Name']), v['stage2Name']+'/'+v['stage2Type'])
@@ -194,75 +199,79 @@ for isample, sample in enumerate(allSamples):
         #looseLepInd = cmgLooseLepIndices(r, ptCuts=(7,5), absEtaCuts=(2.4,2.1), hybridIso03={'ptSwitch':0, 'absIso':0, 'relIso':0.4} )
         looseLepInd = cmgLooseLepIndices(r, ptCuts=(7,5), absEtaCuts=(2.5,2.4), ele_MVAID_cuts={'eta08':0.35 , 'eta104':0.20,'eta204': -0.52} )    ##Tight ele_MVAID_cuts={'eta08':0.73 , 'eta104':0.57,'eta204':  0.05}
         #split into soft and hard leptons
-        looseSoftLepInd, looseHardLepInd = splitIndList(r.LepGood_pt, looseLepInd, 25.)
+        #looseSoftLepInd, looseHardLepInd = splitIndList(r.LepGood_pt, looseLepInd, 25.)
         #select soft leptons above 10 GeV (for vetoing in the hard lepton selection)
-        looseSoftPt10LepInd = filter(lambda i:r.LepGood_pt[i]>10, looseSoftLepInd) 
+        #looseSoftPt10LepInd = filter(lambda i:r.LepGood_pt[i]>10, looseSoftLepInd) 
         #select tight soft leptons (no special tight ID for now)
-        tightSoftLepInd = looseSoftLepInd #No tight loose selection as of yet 
+        #tightSoftLepInd = looseSoftLepInd #No tight loose selection as of yet 
         #select tight hard leptons (use POG ID)
         ###tightHardLepInd = filter(lambda i:(abs(r.LepGood_pdgId[i])==11 and r.LepGood_relIso03[i]<0.14 and r.LepGood_tightId[i]>=3) \
         ###                               or (abs(r.LepGood_pdgId[i])==13 and r.LepGood_relIso03[i]<0.12 and r.LepGood_tightId[i]), looseHardLepInd)
-        tightHardLepInd = filter(lambda i:(abs(r.LepGood_pdgId[i])==11 and r.LepGood_miniRelIso[i]<0.1 and ele_ID_eta(r,nLep=i,ele_MVAID_cuts={'eta08':0.73 , 'eta104':0.57,'eta204':  0.05}) and r.LepGood_tightId[i]>=3) \
-                                       or (abs(r.LepGood_pdgId[i])==13 and r.LepGood_miniRelIso[i]<0.2  and r.LepGood_tightId[i]), looseHardLepInd)  
+        #tightHardLepInd = filter(lambda i:(abs(r.LepGood_pdgId[i])==11 and r.LepGood_miniRelIso[i]<0.1 and ele_ID_eta(r,nLep=i,ele_MVAID_cuts={'eta08':0.73 , 'eta104':0.57,'eta204':  0.05}) and r.LepGood_tightId[i]>=3) \
+        #                               or (abs(r.LepGood_pdgId[i])==13 and r.LepGood_miniRelIso[i]<0.2  and r.LepGood_tightId[i]), looseHardLepInd)  
 
 
         #print "s lepgood pt: " ,s.LepGood_pt[0]
-        s.nLooseSoftLeptons = len(looseSoftLepInd)
-        s.nLooseSoftPt10Leptons = len(looseSoftPt10LepInd)
-        s.nLooseHardLeptons = len(looseHardLepInd)
-        s.nTightSoftLeptons = len(tightSoftLepInd)
-        s.nTightHardLeptons = len(tightHardLepInd)
+        #s.nLooseSoftLeptons = len(looseSoftLepInd)
+        #s.nLooseSoftPt10Leptons = len(looseSoftPt10LepInd)
+        #s.nLooseHardLeptons = len(looseHardLepInd)
+        #s.nTightSoftLeptons = len(tightSoftLepInd)
+        #s.nTightHardLeptons = len(tightHardLepInd)
         #print "tightHardLepInd:" , tightHardLepInd
         vars = ['pt', 'eta', 'phi', 'miniRelIso','relIso03', 'pdgId']
-        allLeptons = [getObjDict(t, 'LepGood_', vars, i) for i in looseLepInd]
-        looseSoftLep = [getObjDict(t, 'LepGood_', vars, i) for i in looseSoftLepInd] 
-        looseHardLep = [getObjDict(t, 'LepGood_', vars, i) for i in looseHardLepInd]
-        looseSoftPt10Lep = [getObjDict(t, 'LepGood_', vars, i) for i in looseSoftPt10LepInd]
-        tightSoftLep = [getObjDict(t, 'LepGood_', vars, i) for i in tightSoftLepInd]
-        tightHardLep =  [getObjDict(t, 'LepGood_', vars, i) for i in tightHardLepInd]
+        allLeptons       = [getObjDict(t, 'LepGood_', vars, i) for i in looseLepInd]
+        #looseSoftLep     = [getObjDict(t, 'LepGood_', vars, i) for i in looseSoftLepInd] 
+        #looseHardLep     = [getObjDict(t, 'LepGood_', vars, i) for i in looseHardLepInd]
+        #looseSoftPt10Lep = [getObjDict(t, 'LepGood_', vars, i) for i in looseSoftPt10LepInd]
+        #tightSoftLep     = [getObjDict(t, 'LepGood_', vars, i) for i in tightSoftLepInd]
+        #tightHardLep     = [getObjDict(t, 'LepGood_', vars, i) for i in tightHardLepInd]
         #print "tightHardLep" , tightHardLep 
         leadingLepInd = None
         if options.leptonSelection=='hard':
-          if s.nTightHardLeptons>=1:
-            leadingLepInd = tightHardLepInd[0]
-            #print "highest pt: " , r.LepGood_pt[0]
-            s.leptonPt  = r.LepGood_pt[leadingLepInd]
-            s.leptonMiniRelIso = r.LepGood_miniRelIso[leadingLepInd]
-            s.leptonRelIso03 = r.LepGood_relIso03[leadingLepInd]
-            #print s.leptonMiniRelIso ,s.leptonPt, 'met:', r.met_pt, r.nLepGood, r.LepGood_pt[leadingLepInd],r.LepGood_eta[leadingLepInd], r.LepGood_phi[leadingLepInd] , r.LepGood_pdgId[leadingLepInd], r.LepGood_relIso03[leadingLepInd], r.LepGood_tightId[leadingLepInd], r.LepGood_mass[leadingLepInd]
-            s.leptonInd = leadingLepInd 
-            s.leptonEta = r.LepGood_eta[leadingLepInd]
-            s.leptonPhi = r.LepGood_phi[leadingLepInd]
-            s.leptonPdg = r.LepGood_pdgId[leadingLepInd]
-            s.leptonMass= r.LepGood_mass[leadingLepInd]
-            s.st = r.met_pt + s.leptonPt
-          s.singleLeptonic = s.nTightHardLeptons==1
+          print "UNDER CONSTRUCTION"
+          #if s.nTightHardLeptons>=1:
+          #  leadingLepInd = tightHardLepInd[0]
+          #  print "highest pt: " , r.LepGood_pt[0]
+          #  #s.leptonPt  = r.LepGood_pt[leadingLepInd]
+          #  #s.leptonMiniRelIso = r.LepGood_miniRelIso[leadingLepInd]
+          #  #s.leptonRelIso03 = r.LepGood_relIso03[leadingLepInd]
+          #  #print s.leptonMiniRelIso ,s.leptonPt, 'met:', r.met_pt, r.nLepGood, r.LepGood_pt[leadingLepInd],r.LepGood_eta[leadingLepInd], r.LepGood_phi[leadingLepInd] , r.LepGood_pdgId[leadingLepInd], r.LepGood_relIso03[leadingLepInd], r.LepGood_tightId[leadingLepInd], r.LepGood_mass[leadingLepInd]
+          #  #s.leptonInd = leadingLepInd 
+          #  #s.leptonEta = r.LepGood_eta[leadingLepInd]
+          #  #s.leptonPhi = r.LepGood_phi[leadingLepInd]
+          #  #s.leptonPdg = r.LepGood_pdgId[leadingLepInd]
+          #  #s.leptonMass= r.LepGood_mass[leadingLepInd]
+          #  #s.st = r.met_pt + s.leptonPt
+          #s.singleLeptonic = s.nTightHardLeptons==1
           if s.singleLeptonic:
-            s.singleMuonic      =  abs(s.leptonPdg)==13
-            s.singleElectronic  =  abs(s.leptonPdg)==11
+            pass
+            #s.singleMuonic      =  abs(s.leptonPdg)==13
+            #s.singleElectronic  =  abs(s.leptonPdg)==11
           else:
-            s.singleMuonic      = False 
-            s.singleElectronic  = False 
+            pass
+            #s.singleMuonic      = False 
+            #s.singleElectronic  = False 
 
         if options.leptonSelection=='soft':
+          print "UNDER CONSTRUCTION"
           #Select hardest tight lepton among soft leptons
-          if s.nTightSoftLeptons>=1:
-            leadingLepInd = tightSoftLepInd[0]
-  #          print s.leptonPt, r.LepGood_pt[leadingLepInd],r.LepGood_eta[leadingLepInd], leadingLepInd
-            s.leptonPt  = r.LepGood_pt[leadingLepInd]
-            s.leptonInd = leadingLepInd 
-            s.leptonEta = r.LepGood_eta[leadingLepInd]
-            s.leptonPhi = r.LepGood_phi[leadingLepInd]
-            s.leptonPdg = r.LepGood_pdgId[leadingLepInd]
-            s.leptonMass= r.LepGood_mass[leadingLepInd]
-            s.st = r.met_pt + s.leptonPt
-          s.singleLeptonic = s.nTightSoftLeptons==1
-          if s.singleLeptonic:
-            s.singleMuonic      =  abs(s.leptonPdg)==13
-            s.singleElectronic  =  abs(s.leptonPdg)==11
-          else:
-            s.singleMuonic      = False 
-            s.singleElectronic  = False 
+          #if s.nTightSoftLeptons>=1:
+          #  leadingLepInd = tightSoftLepInd[0]
+  #       #   print s.leptonPt, r.LepGood_pt[leadingLepInd],r.LepGood_eta[leadingLepInd], leadingLepInd
+          #  #s.leptonPt  = r.LepGood_pt[leadingLepInd]
+          #  s.leptonInd = leadingLepInd 
+          #  s.leptonEta = r.LepGood_eta[leadingLepInd]
+          #  s.leptonPhi = r.LepGood_phi[leadingLepInd]
+          #  s.leptonPdg = r.LepGood_pdgId[leadingLepInd]
+          #  s.leptonMass= r.LepGood_mass[leadingLepInd]
+          #  #s.st = r.met_pt + s.leptonPt
+          #s.singleLeptonic = s.nTightSoftLeptons==1
+          #if s.singleLeptonic:
+          #  s.singleMuonic      =  abs(s.leptonPdg)==13
+          #  s.singleElectronic  =  abs(s.leptonPdg)==11
+          #else:
+          #  s.singleMuonic      = False 
+          #  s.singleElectronic  = False 
   #      print "Selected",s.leptonPt
         if options.leptonSelection!='':
           jets = filter(lambda j:j['pt']>30 and abs(j['eta'])<2.4 and j['id'], get_cmg_jets_fromStruct(r))
@@ -272,8 +281,8 @@ for isample, sample in enumerate(allSamples):
           s.htJet30j = sum([x['pt'] for x in jets])
           s.nJet30 = len(jets)
           s.nBJetMediumCMVA30 = len(bJets)
-          s.mt2w = mt2w.mt2w(met = {'pt':r.met_pt, 'phi':r.met_phi}, l={'pt':s.leptonPt, 'phi':s.leptonPhi, 'eta':s.leptonEta}, ljets=lightJets, bjets=bJets)
-          s.deltaPhi_Wl = acos((s.leptonPt+r.met_pt*cos(s.leptonPhi-r.met_phi))/sqrt(s.leptonPt**2+r.met_pt**2+2*r.met_pt*s.leptonPt*cos(s.leptonPhi-r.met_phi))) 
+          #s.mt2w = mt2w.mt2w(met = {'pt':r.met_pt, 'phi':r.met_phi}, l={'pt':s.leptonPt, 'phi':s.leptonPhi, 'eta':s.leptonEta}, ljets=lightJets, bjets=bJets)
+          #s.deltaPhi_Wl = acos((s.leptonPt+r.met_pt*cos(s.leptonPhi-r.met_phi))/sqrt(s.leptonPt**2+r.met_pt**2+2*r.met_pt*s.leptonPt*cos(s.leptonPhi-r.met_phi))) 
           #print "deltaPhi:" , s.deltaPhi_Wl
   #          print "Warning -> Why can't I compute mt2w?", s.mt2w, len(jets), len(bJets), len(allTightLeptons),lightJets,bJets, {'pt':s.type1phiMet, 'phi':s.type1phiMetphi}, {'pt':s.leptonPt, 'phi':s.leptonPhi, 'eta':s.leptonEta}
         for v in newVars:
@@ -305,7 +314,7 @@ for isample, sample in enumerate(allSamples):
     for f in filesForHadd:
       size+=os.path.getsize(tmpDir+'/'+f)
       files.append(f)
-      if size>10**9 or f==filesForHadd[-1]:
+      if size>0.5*10**9 or f==filesForHadd[-1]:
         ofile = outDir+'/'+sample['name']+'_'+str(counter)+'.root'
         print "Running hadd on", tmpDir, files
         os.system('cd '+tmpDir+';hadd -f '+ofile+' '+' '.join(files))
@@ -313,5 +322,6 @@ for isample, sample in enumerate(allSamples):
         size=0
         counter+=1
         files=[]
-    os.system("rm -rf "+tmpDir)
+    if options.dontClean.lower()!="true":
+      os.system("rm -rf "+tmpDir)
 
