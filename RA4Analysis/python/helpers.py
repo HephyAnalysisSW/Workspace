@@ -178,7 +178,7 @@ def varBin(vb):
 def getBinBorders(l, max=10**4):
   return [x[0] for x in l ] + [max]
 
-def nameAndCut(stb, htb, njetb, btb=None, presel="(1)", charge="", btagVar = 'nBJetMediumCMVA30'):
+def nameAndCut(stb, htb, njetb, btb=None, presel="(1)", charge="", btagVar = 'nBJetMediumCSV30'):
   cut=presel
   name=""
   if stb:
