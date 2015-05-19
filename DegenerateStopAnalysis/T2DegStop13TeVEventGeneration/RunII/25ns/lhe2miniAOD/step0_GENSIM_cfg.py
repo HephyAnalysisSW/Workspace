@@ -7,28 +7,6 @@ import FWCore.ParameterSet.Config as cms
 
 process = cms.Process('SIM')
 
-fileDir="root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/nrad/T2DegStop2j/lhe/"
-#fileDir="file:/afs/cern.ch/work/n/nrad/public/T2DegStop/lhe_processed/T2DegStop2j/"
-fileNameList=[
-"T2DegStop2j_300.0_0_decayed_1000022_270.lhe",
-"T2DegStop2j_300.0_10_decayed_1000022_270.lhe",
-"T2DegStop2j_300.0_11_decayed_1000022_270.lhe",
-"T2DegStop2j_300.0_12_decayed_1000022_270.lhe",
-"T2DegStop2j_300.0_13_decayed_1000022_270.lhe",
-"T2DegStop2j_300.0_14_decayed_1000022_270.lhe",
-"T2DegStop2j_300.0_1_decayed_1000022_270.lhe",
-"T2DegStop2j_300.0_2_decayed_1000022_270.lhe",
-"T2DegStop2j_300.0_3_decayed_1000022_270.lhe",
-"T2DegStop2j_300.0_4_decayed_1000022_270.lhe",
-"T2DegStop2j_300.0_5_decayed_1000022_270.lhe",
-"T2DegStop2j_300.0_6_decayed_1000022_270.lhe",
-"T2DegStop2j_300.0_7_decayed_1000022_270.lhe",
-"T2DegStop2j_300.0_8_decayed_1000022_270.lhe",
-"T2DegStop2j_300.0_9_decayed_1000022_270.lhe",
-]
-fileList=[fileDir+x for x in fileNameList]
-
-
 
 
 # import of standard configurations
