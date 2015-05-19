@@ -7,7 +7,7 @@ from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,v
 from localInfo import username
 from math import pi, sqrt
 
-def binnedNBTagsFit(cut, samples, nBTagVar = 'nBJetMediumCMVA30', prefix="", printDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/pngCMG2/templateFit_Phys14V3'):
+def binnedNBTagsFit(cut, samples, nBTagVar = 'nBJetMediumCSV30', prefix="", printDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/pngCMG2/templateFit_Phys14V3'):
   if not os.path.exists(printDir):
      os.makedirs(printDir) 
   cWJets = samples['W']
