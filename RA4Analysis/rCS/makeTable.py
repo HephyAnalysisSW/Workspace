@@ -11,7 +11,7 @@ res = pickle.load(file('/data/'+username+'/results2015/rCS_0b/'+prefix+'_estimat
 
 streg = [[(250, 350), 1.], [(350, 450), 1.], [(450,-1), 1.]]
 htreg = [(500,750),(750,1000),(1000,1250),(1250,-1)]
-njreg = [(5,5),(6,-1),(8,-1)]
+njreg = [(5,5),(6,7),(8,-1)]
 nSTbins = len(streg)
 
 print "Results"
