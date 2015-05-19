@@ -47,11 +47,16 @@ if signal:
 ROOT.TH1F().SetDefaultSumw2()
 
 prefix = 'singleLeptonic_Phys14V3'
-presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0"
+presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[2]>80"
 
-streg = [[(250, 350), 1.], [(350, 450), 1.], [(450, -1), 1.]] 
+btagVarString = 'nBJetMediumCSV30'
+
+deltaPhiCut = 1.0
+streg = [[(250, 350), deltaPhiCut], [(350, 450), deltaPhiCut], [(450, -1), deltaPhiCut]] 
 htreg = [(500,750), (750,1000), (1000,1250), (1250,-1)]
-njreg = [(5,5),(6,-1),(8,-1)]
+njreg = [(5,5),(6,7),(8,-1)]
+bjreg = (0,0)
+
 
 small = False 
 #small = 0
@@ -60,19 +65,19 @@ if small:
   htreg = [(500,750)]
   njreg = [(5,5),(6,-1)]
 
-dict = {}
+bins = {}
 for i_htb, htb in enumerate(htreg):
-  dict[htb] = {}
+  bins[htb] = {}
   for stb, dPhiCut in streg:
-    dict[htb][stb] = {}
+    bins[htb][stb] = {}
     for srNJet in njreg:
 
       rd={}
       #join TT estimation results to dict
-      makeTTPrediction(rd, samples, htb, stb, srNJet, presel, dPhiCut=1.0)
+      makeTTPrediction(rd, samples, htb, stb, srNJet, presel, dPhiCut=deltaPhiCut, btagVarString)
 
       #join W estimation results to dict
-      makeWPrediction(rd, samples, htb, stb, srNJet, presel, dPhiCut=1.0)
+      makeWPrediction(rd, samples, htb, stb, srNJet, presel, dPhiCut=deltaPhiCut, btagVarString)
 
       ##If you want to make prediction of one of the bkgs, comment out all the estimation of total Bkgs
       #estimate total background
@@ -100,15 +105,15 @@ for i_htb, htb in enumerate(htreg):
       
                 })
 
-      name, cut =  nameAndCut(stb, htb, srNJet, btb=(0,0), presel=presel, btagVar = 'nBJetMediumCMVA30')
+      name, cut =  nameAndCut(stb, htb, srNJet, btb=bjreg, presel=presel, btagVar = btagVarString)
       if signal:
         for s in allSignals:
-          s['yield_NegPdg']     = getYieldFromChain(s['chain'], 'leptonPdg<0&&'+cut+"&&deltaPhi_Wl>1.0", weight = "weight")
-          s['yield_NegPdg_Var'] = getYieldFromChain(s['chain'], 'leptonPdg<0&&'+cut+"&&deltaPhi_Wl>1.0", weight = "weight*weight")
+          s['yield_NegPdg']     = getYieldFromChain(s['chain'], 'leptonPdg<0&&'+cut+"&&deltaPhi_Wl>"+str(deltaPhiCut), weight = "weight")
+          s['yield_NegPdg_Var'] = getYieldFromChain(s['chain'], 'leptonPdg<0&&'+cut+"&&deltaPhi_Wl>"+str(deltaPhiCut), weight = "weight*weight")
           s['FOM_NegPdg']       = getFOM(s['yield_NegPdg'],sqrt(s['yield_NegPdg_Var']),truth_total_NegPdg,truth_total_NegPdg_err) 
   
-          s['yield_PosPdg']     = getYieldFromChain(s['chain'], 'leptonPdg>0&&'+cut+"&&deltaPhi_Wl>1.0", weight = "weight")
-          s['yield_PosPdg_Var'] = getYieldFromChain(s['chain'], 'leptonPdg>0&&'+cut+"&&deltaPhi_Wl>1.0", weight = "weight*weight")
+          s['yield_PosPdg']     = getYieldFromChain(s['chain'], 'leptonPdg>0&&'+cut+"&&deltaPhi_Wl>"+str(deltaPhiCut), weight = "weight")
+          s['yield_PosPdg_Var'] = getYieldFromChain(s['chain'], 'leptonPdg>0&&'+cut+"&&deltaPhi_Wl>"+str(deltaPhiCut), weight = "weight*weight")
           s['FOM_PosPdg']       = getFOM(s['yield_PosPdg'],sqrt(s['yield_PosPdg_Var']),truth_total_PosPdg,truth_total_PosPdg_err)
 
           rd.update({\
@@ -120,10 +125,10 @@ for i_htb, htb in enumerate(htreg):
                       s['name']+'_FOM_PosPdg':s['FOM_PosPdg'],\
                     })
 
-      dict[htb][stb][srNJet]=rd
+      bins[htb][stb][srNJet]=rd
 path = '/data/'+username+'/results2015/rCS_0b/'
 if not os.path.exists(path):
   os.makedirs(path)
-pickle.dump(dict, file(path+prefix+'_estimationResults_pkl','w'))
+pickle.dump(bins, file(path+prefix+'_estimationResults_pkl','w'))
 
 
