@@ -5,7 +5,7 @@ eval `scramv1 runtime -sh`
 
 ##### MAKE SURE SAMPLE NAME IN SOURCE AND TARGET MATCH!!!! ####
 export SOURCE="/babies/CMGTools-from-CMSSW_7_2_3_LocalDevelopments/test1_REST_vienna_crab/SMS_T1tttt_2J_mGl1200_mLSP800/150425_201204/0000"
-export TARGET='cmgTuples/crab_cmg_v1/test2/SMS_T1tttt_2J_mGl1200_mLSP800/'
+export TARGET='cmgTuples/crab_cmg_v1/test2_test/SMS_T1tttt_2J_mGl1200_mLSP800/'
 export userNameDPM='easilar'
 export userNameNFS='nrad'
 #echo $userNameDPM
