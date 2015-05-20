@@ -10,7 +10,7 @@ def makeSample(sample):
 ttJets=makeSample({\
 "name" : "ttJets",
 "bins" : ["TTJets"],
-'dir' : "/data/easilar2/cmgTuples/postProcessed_v2_Phys14V3/HT400ST200/",
+'dir' : "/data/easilar2/cmgTuples/postProcessed_v3_Phys14V3/HT400ST200/",
 })
 WJetsHTToLNu=makeSample({\
 "name" : "WJetsHTToLNu",
@@ -30,12 +30,12 @@ singleTop=makeSample({\
 DY=makeSample({\
 "name" : "DY",
 "bins" : ["DYJetsToLL_M50_HT100to200", "DYJetsToLL_M50_HT200to400", "DYJetsToLL_M50_HT400to600", "DYJetsToLL_M50_HT600toInf"],
-'dir' : "/data/dspitzbart/cmgTuples/postProcessed_v3_Phys14V3/HT400ST200/",
+'dir' : "/data/dspitzbart/cmgTuples/postProcessed_Phys14V3/HT400ST200/",
 })
 QCD=makeSample({\
 "name" : "QCD",
 "bins" : ["QCD_HT_100To250","QCD_HT_250To500", "QCD_HT_500To1000", "QCD_HT_1000ToInf"],
-'dir' : "/data/easilar2/cmgTuples/postProcessed_v3_Phys14V3/HT400ST200/",
+'dir' : "/data/dspitzbart/cmgTuples/postProcessed_Phys14V3/HT400ST200/",
 })
 
 
@@ -72,7 +72,7 @@ def getSignalSample(signal):
     return {
       "name" : signal,
 #      "chunkString": signal,
-      'dir' : "/data/easilar/cmgTuples/postProcessed_v3_Phys14V3_signals/HT400ST200/",
+      'dir' : "/data/easilar2/cmgTuples/postProcessed_v3_Phys14V3/HT400ST200/",
       'bins':[signal]}
   else:
     print "Signal",signal,"unknown. Available: ",", ".join(allSignalStrings)
