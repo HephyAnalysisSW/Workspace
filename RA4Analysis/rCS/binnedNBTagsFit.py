@@ -159,14 +159,14 @@ def binnedNBTagsFit(cut, samples, nBTagVar = 'nBJetMediumCSV30', prefix="", prin
   ROOT.gROOT.SetStyle("Plain")#Removesgraybackgroundfromplots
   ROOT.gPad.SetLeftMargin(0.15)
   fitFrame_PosPdg.GetYaxis().SetTitleOffset(1.4)
-  fitFrame_PosPdg.GetXaxis().SetTitle('nBJetCMVA')
+  fitFrame_PosPdg.GetXaxis().SetTitle('nBJetMediumCSV30')
   fitFrame_PosPdg.Draw()
 
   c1.cd(2)
   ROOT.gROOT.SetStyle("Plain")#Removesgraybackgroundfromplots
   ROOT.gPad.SetLeftMargin(0.15)
   fitFrame_NegPdg.GetYaxis().SetTitleOffset(1.4)
-  fitFrame_NegPdg.GetXaxis().SetTitle('nBJetCMVA')
+  fitFrame_NegPdg.GetXaxis().SetTitle('nBJetMediumCSV30')
   fitFrame_NegPdg.Draw()
 
   c1.Print(printDir+'/'+prefix+'_nBTagFitRes.png')
