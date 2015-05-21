@@ -4,13 +4,13 @@ eval `scramv1 runtime -sh`
 
 
 ##### MAKE SURE SAMPLE NAME IN SOURCE AND TARGET MATCH!!!! ####
-export SOURCE="/babies/CMGTools-from-CMSSW_7_2_3_LocalDevelopments/test1_REST_vienna_crab/SMS_T1tttt_2J_mGl1200_mLSP800/150425_201204/0000"
-export TARGET='cmgTuples/crab_cmg_v1/test2/SMS_T1tttt_2J_mGl1200_mLSP800/'
+export SOURCE="/babies/CMGTools-from-CMSSW_7_2_3_LocalDevelopments/test2_RobertSignals_vienna_crab/SMS_T2tt_2J_mStop425_mLSP325/150511_194125/0000/"
+export TARGET='cmgTuples/crab_cmg_v1/SMS_T2tt_2J_mStop425_mLSP325'
 export userNameDPM='easilar'
-export userNameNFS='nrad'
+export userNameNFS='nrad2'
 #echo $userNameDPM
 getCMGCrabOutput.py     --userNameDPM=$userNameDPM --userNameNFS=$userNameNFS --source=$SOURCE --target=$TARGET --fileName='' --suffix=".root .tgz" 
-unpackCMGCrabOutput.py  --userNameNFS=$userNameNFS  --dir=$TARGET --suffix=".tgz" --hadd
+unpackCMGCrabOutput.py  --userNameNFS=$userNameNFS  --dir=$TARGET --suffix=".tgz"
 
 
 

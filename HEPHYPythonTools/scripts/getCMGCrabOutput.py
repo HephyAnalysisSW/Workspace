@@ -44,7 +44,8 @@ for line in p.stdout.readlines():
          continue
        print "Copying", dpmDir+"/"+filename, "to", oDir+"/"+filename
        if not options.onlyUpdate or not os.path.isfile(oDir+"/"+filename):
-         os.system("$LCG_LOCATION/bin/rfcp "+dpmDir+"/"+filename+" "+oDir+"/"+filename)
+         #os.system("$LCG_LOCATION/bin/rfcp "+dpmDir+"/"+filename+" "+oDir+"/"+filename)
+         os.system("rfcp "+dpmDir+"/"+filename+" "+oDir+"/"+filename)
        else:
          print "Not overwriting",oDir+"/"+filename
     
