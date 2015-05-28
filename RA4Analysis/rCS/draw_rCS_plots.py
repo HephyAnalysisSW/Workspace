@@ -34,6 +34,7 @@ lepSel = 'hard'
 #dPhiStr = 'acos((leptonPt+met*cos(leptonPhi-metPhi))/sqrt(leptonPt**2+met**2+2*met*leptonPt*cos(leptonPhi-metPhi)))'
 
 dPhiStr = 'deltaPhi_Wl'
+dPhiCut = 1.0
 
 cWJets  = getChain(WJetsHTToLNu[lepSel],histname='')
 cTTJets = getChain(ttJets[lepSel],histname='')
@@ -99,13 +100,20 @@ for lepton in ["both"]:# ["muon", "electron"]: #["both"]:
 #            htCut  (htb=htb, minPt=30, maxEta=2.4, njCorr=njCorr), \
 #            stCut(lepton=lepton, stb=stb, minPt=leptonMinPt, maxEta=leptonMaxEta, minID=minID, minRelIso=minRelIso), \
 #            ])
-        rCS_vs_nbtag = ROOT.TProfile('profile_rCS_nbtag','', len(nbtag_bins)-1, array('d',nbtag_bins), 0, 1)
+#        rCS_vs_nbtag = ROOT.TProfile('profile_rCS_nbtag','', len(nbtag_bins)-1, array('d',nbtag_bins), 0, 1)
+        rCSnum = ROOT.TH1F('rCSnum','rCSnum',len(nbtag_bins)-1,array('d',nbtag_bins))
+        rCSden = ROOT.TH1F('rCSden','rCSden',len(nbtag_bins)-1,array('d',nbtag_bins))
         print "htb", htb, "stb", stb, "njb", njb, "cut:", cut
         #rCS_vs_nbtag.Reset()
-        cTTJets.Draw('(Sum$(('+dPhiStr+')*('+presel+')>1==1)):Sum$('+btagVarString+')>>profile_rCS_nbtag',cut,'goff')
+#        cTTJets.Draw('(Sum$(('+dPhiStr+')*('+presel+')>1==1)):Sum$('+btagVarString+')>>profile_rCS_nbtag',cut,'goff')
+        cTTJets.Draw(btagVarString+'>>rCSnum','('+dPhiStr+'>='+str(dPhiCut)+'&&'+cut+')*weight','goff')
+        cTTJets.Draw(btagVarString+'>>rCSden','('+dPhiStr+'<'+str(dPhiCut)+'&&'+cut+')*weight','goff')
+        plots[njb] = rCSnum.Clone()
+        plots[njb].Divide(rCSden)
 #        ttJets_fromEOS['chain'].Draw(dPhiCut(minDPhi=1, lepton=lepton,minPt=leptonMinPt, maxEta=leptonMaxEta, minID=minID, minRelIso=minRelIso)+":"+nBTagStr(minPt=30, maxEta=2.4, minCMVATag=0.732)+'>>profile_rCS_nbtag',cut,'goff') 
 #        cTTJets.Draw(dPhiCut(minDPhi=1, lepton=lepton,minPt=leptonMinPt, maxEta=leptonMaxEta, minID=minID, minRelIso=minRelIso)+":"+nBTagStr(minPt=30, maxEta=2.4, minCMVATag=0.732)+'>>profile_rCS_nbtag',cut,'goff') 
-        plots[njb]=ROOT.gDirectory.Get('profile_rCS_nbtag').Clone()
+#        plots[njb]=ROOT.gDirectory.Get('profile_rCS_nbtag').Clone()
+        
       opt="eh1"
       c1 = ROOT.TCanvas()
       l=ROOT.TLegend(0.6,1.0-0.07*len(njet_bins),1.0,1.0)
@@ -145,16 +153,21 @@ for lepton in ["both"]:# ["muon", "electron"]: #["both"]:
 #            htCut  (htb=htb, minPt=30, maxEta=2.4, njCorr=njCorr), \
 #            stCut(lepton=lepton, stb=stb, minPt=leptonMinPt, maxEta=leptonMaxEta, minID=minID, minRelIso=minRelIso), \
 #            ])
-  
-        rCS_vs_njet = ROOT.TProfile('profile_rCS_njet_bTag'+str(btb[0]),'', len(njet_bins)-1, array('d',njet_bins), 0, 1)
+        rCSnum = ROOT.TH1F('rCSnum','rCSnum',len(njet_bins)-1,array('d',njet_bins))
+        rCSden = ROOT.TH1F('rCSden','rCSden',len(njet_bins)-1,array('d',njet_bins))
+#        rCS_vs_njet = ROOT.TProfile('profile_rCS_njet_bTag'+str(btb[0]),'', len(njet_bins)-1, array('d',njet_bins), 0, 1)
         print "htb", htb, "stb", stb, "btb", btb, "cut:", cut
         #rCS_vs_nbtag.Reset()
         #cTTJets.Draw('(Sum$(('+dPhiStr+')*('+presel+')>1==1)):nJet30>>profile_rCS_njet_bTag'+str(btb[0]),cut,'goff')
-        cWJets.Draw('(Sum$(('+dPhiStr+')*('+presel+')>1==1)):nJet30>>profile_rCS_njet_bTag'+str(btb[0]),'('+cut+')*weight','goff') #this is actually not the rcs value. it calculates (deltaPhi>1/all). feel free to fix it.
+        cWJets.Draw('nJet30>>rCSnum','('+dPhiStr+'>='+str(dPhiCut)+'&&'+cut+')*weight','goff')
+        cWJets.Draw('nJet30>>rCSden','('+dPhiStr+'<'+str(dPhiCut)+'&&'+cut+')*weight','goff')
+        plots[btb] = rCSnum.Clone()
+        plots[btb].Divide(rCSden)
+#        cWJets.Draw('(Sum$(('+dPhiStr+')*('+presel+')>1==1)):nJet30>>profile_rCS_njet_bTag'+str(btb[0]),'('+cut+')*weight','goff') #this is actually not the rcs value. it calculates (deltaPhi>1/all). feel free to fix it.
 #        ttJets_fromEOS['chain'].Draw(dPhiCut(minDPhi=1, lepton=lepton,minPt=leptonMinPt, maxEta=leptonMaxEta, minID=minID, minRelIso=minRelIso)+":"+nJetStr(minPt=30, maxEta=2.4)+'>>profile_rCS_njet',cut,'goff') 
 #        cWJets.Draw(dPhiCut(minDPhi=1, lepton=lepton,minPt=leptonMinPt, maxEta=leptonMaxEta, minID=minID, minRelIso=minRelIso)+":"+nJetStr(minPt=30, maxEta=2.4)+'>>profile_rCS_njet_bTag'+str(btb[0]),cut,'goff') 
-        plots[btb]=ROOT.gDirectory.Get('profile_rCS_njet_bTag'+str(btb[0])).Clone()
-        print 'RCS values:',plots[btb].GetBinContent(1),plots[btb].GetBinContent(2),plots[btb].GetBinContent(3)
+#        plots[btb]=ROOT.gDirectory.Get('profile_rCS_njet_bTag'+str(btb[0])).Clone()
+#        print 'RCS values:',plots[btb].GetBinContent(1),plots[btb].GetBinContent(2),plots[btb].GetBinContent(3)
   
       opt="eh1"
       c1 = ROOT.TCanvas()
