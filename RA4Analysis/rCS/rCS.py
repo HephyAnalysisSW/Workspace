@@ -3,11 +3,19 @@ import os,sys
 #ROOT.gROOT.LoadMacro('/afs/hephy.at/scratch/d/dhandl/CMSSW_7_2_3/src/Workspace/HEPHYPythonTools/scripts/root/tdrstyle.C')
 #ROOT.setTDRStyle()
 from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain
+
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2_HT400_withDF import *
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2_HT400ST150_withDF import *
-from Workspace.RA4Analysis.cmgTuplesPostProcessed_v1_Phys14V3_HT400ST200 import *
+from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,varBinName
-from math import pi, sqrt
+from rCShelpers import *
+import math
+#from math import pi, sqrt
+
+#ROOT.gROOT.LoadMacro('../../HEPHYPythonTools/scripts/root/tdrstyle.C')
+#ROOT.setTDRStyle()
+
+
 small = False
 maxN = -1 if not small else 1 
 
@@ -15,6 +23,8 @@ lepSel = 'hard'
 
 cWJets  = getChain(WJetsHTToLNu[lepSel],histname='',maxN=maxN)
 cTTJets = getChain(ttJets[lepSel],histname='',maxN=maxN)
+#cBkg    = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], QCD[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]],histname='')
+
 
 from localInfo import username
 uDir = username[0]+'/'+username
@@ -31,28 +41,24 @@ dPhiStr = 'deltaPhi_Wl'
 ROOT.gStyle.SetOptStat(0)
 
 ROOT.TH1F().SetDefaultSumw2()
-def getRCS(c, cut, dPhiCut):
-  h = getPlotFromChain(c, dPhiStr, [0,dPhiCut,pi], cutString=cut, binningIsExplicit=True)
-  if h.GetBinContent(1)>0 and h.GetBinContent(2)>0:
-    rcs = h.GetBinContent(2)/h.GetBinContent(1)
-    rcsE = rcs*sqrt(h.GetBinError(2)**2/h.GetBinContent(2)**2 + h.GetBinError(1)**2/h.GetBinContent(1)**2)
-    del h
-    return rcs, rcsE
-  else :
-    rcs =  0
-    rcsE = 0
-    return rcs, rcsE 
-    del h
+#def getRCS(c, cut, dPhiCut):
+#  h = getPlotFromChain(c, dPhiStr, [0,dPhiCut,pi], cutString=cut, binningIsExplicit=True)
+#  if h.GetBinContent(1)>0 and h.GetBinContent(2)>0:
+#    rcs = h.GetBinContent(2)/h.GetBinContent(1)
+#    rcsE = rcs*sqrt(h.GetBinError(2)**2/h.GetBinContent(2)**2 + h.GetBinError(1)**2/h.GetBinContent(1)**2)
+#    del h
+#    return rcs, rcsE
+#  else :
+#    rcs =  0
+#    rcsE = 0
+#    return rcs, rcsE 
+#    del h
 
 streg = [[(250, 350), 1.], [(350, 450), 1.], [(450, -1), 1.]]
-htreg = [(400,500),(500,750),(750, 1000),(1000,1250),(1250,-1)]
-#njreg = [(2,3),(4,5),(5,5),(6,-1)]
+htreg = [(500,750),(750, 1000),(1000,1250),(1250,-1)]
 btreg = (0,0)
-#streg = [[(250, 350), 1.], [(350, -1), 1.]]
-#htreg = [(500,750),(750, -1)]
-njreg = [(2,2),(3,3),(4,4),(5,5),(6,-1)]
-
-VarStr = 'st'
+njreg = [(2,2),(3,3),(4,4),(5,5),(6,6),(7,7),(8,8),(9,9)]
+nbjreg = [(0,0),(1,1),(2,2)]
 
 prefix = 'singleLeptonic_'
 #presel="singleMuonic&&nVetoMuons==1&&nVetoElectrons==0&&nBJetMedium40==1"
@@ -113,14 +119,17 @@ presel='singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt
 #1D and 2D plots of RCS
 h_nj = {}
 h_ht = {}
+h_nbj = {}
 h_2d = {}
 for name, c in [["TT", cTTJets] , ["W",cWJets] ]:
   h_nj[name] = {}
   h_ht[name] = {}
+  h_nbj[name] = {}
   h_2d[name] = {}
   for stb, dPhiCut in streg:
     h_nj[name][stb] = {}
     h_ht[name][stb] = {}
+    h_nbj[name][stb] = {}
     h_2d[name][stb] = {}
     h_2d[name][stb] = ROOT.TH2F("rcs_nj_ht", "",len(njreg),0,len(njreg), len(htreg),0,len(htreg) )
     for  i_njb, njb in enumerate(njreg):
@@ -130,25 +139,50 @@ for name, c in [["TT", cTTJets] , ["W",cWJets] ]:
         h_ht[name][stb][njb].GetXaxis().SetBinLabel(i+1, varBinName(htreg[i],"H_{T}"))
     print 
     for i_htb, htb in enumerate(htreg): 
+      h_nbj[name][stb][htb] = {}
       h_2d[name][stb].GetYaxis().SetBinLabel(i_htb+1, varBinName(htb,"H_{T}")) 
       h_nj[name][stb][htb] = ROOT.TH1F("rcs_nj", "",len(njreg),0,len(njreg))
       for i in range(h_nj[name][stb][htb].GetNbinsX()):
         h_nj[name][stb][htb].GetXaxis().SetBinLabel(i+1, nJetBinName(njreg[i]))
       for i_njb, njb in enumerate(njreg):
         cname, cut = nameAndCut(stb,htb,njb, btb=btreg ,presel=presel) 
-        res, resErr = getRCS(c, cut,  dPhiCut)
-        print res,resErr, name, cname
-        if res:
+        rcs = getRCS(c, cut, dPhiCut)
+        print rcs
+        res = rcs['rCS']
+        resErr = rcs['rCSE_sim']
+        #res, resErr = getRCS(c, cut,  dPhiCut)
+        #print res,resErr, name, cname
+        if not math.isnan(res):
           h_nj[name][stb][htb].SetBinContent(i_njb+1, res)
           h_nj[name][stb][htb].SetBinError(i_njb+1, resErr)
           h_ht[name][stb][njb].SetBinContent(i_htb+1, res)
           h_ht[name][stb][njb].SetBinError(i_htb+1, resErr)
           h_2d[name][stb].SetBinContent(i_njb+1, i_htb+1, res) 
           h_2d[name][stb].SetBinError(i_njb+1, i_htb+1, resErr) 
+      for i_nbjb, bjb in enumerate(nbjreg):
+        h_nbj[name][stb][htb][bjb] = ROOT.TH1F("rcs_nbj","rcs_nbj",len(njreg),0,len(njreg))
+        for i_njb, njb in enumerate(njreg):
+          cname, cut = nameAndCut(stb,htb,njb, btb=bjb ,presel=presel)
+          rcs = getRCS(c, cut, dPhiCut)
+          print rcs
+          res = rcs['rCS']
+          resErrPred = rcs['rCSE_pred']
+          resErr = rcs['rCSE_sim']
+          #res, resErr = getRCS(c, cut,  dPhiCut)
+          h_nbj[name][stb][htb][bjb].GetXaxis().SetBinLabel(i_njb+1, varBinName(njb,"n_{jets}"))
+          if not math.isnan(res):
+            h_nbj[name][stb][htb][bjb].SetBinContent(i_njb+1, res)
+            h_nbj[name][stb][htb][bjb].SetBinError(i_njb+1, resErr) #maybe should be changed to predicted error (estimated error for poisson distributed values)
 
+
+#Draw plots binned in njets for all ST and HT bins
 for name, c in [["TT", cTTJets] , ["W",cWJets] ]:
   for stb, dPhiCut in streg:
     c1 = ROOT.TCanvas('c1','c1',600,600)
+    pad1 = ROOT.TPad('Pad','Pad',0.,0.0,1.,1.)
+    pad1.SetLeftMargin(0.15)
+    pad1.Draw()
+    pad1.cd()
 #    c1.SetGridx()
 #    c1.SetGridy()
     first = True 
@@ -161,20 +195,29 @@ for name, c in [["TT", cTTJets] , ["W",cWJets] ]:
       print ihtb, htb
       h_nj[name][stb][htb].GetXaxis().SetLabelSize(0.06)
       h_nj[name][stb][htb].GetYaxis().SetLabelSize(0.04)
+      h_nj[name][stb][htb].GetYaxis().SetTitleSize(0.04)
+      h_nj[name][stb][htb].GetYaxis().SetTitleOffset(1.5)
+      h_nj[name][stb][htb].GetYaxis().SetTitle('R_{CS}')
       h_nj[name][stb][htb].GetYaxis().SetRangeUser(0, 3*h_nj[name][stb][htb].GetBinContent(h_nj[name][stb][htb].GetMaximumBin()))
 #      h_nj[name][stb][htb].GetYaxis().SetRangeUser(0, 0.1)
       h_nj[name][stb][htb].SetLineColor(ROOT_colors[ihtb])
       h_nj[name][stb][htb].SetLineWidth(2)
       l.AddEntry(h_nj[name][stb][htb], varBinName(htb, 'H_{T}'))
+      text=ROOT.TLatex()
+      text.SetNDC()
+      text.SetTextSize(0.04)
+      text.SetTextAlign(11)
+      text.DrawLatex(0.6,0.85,name+'+jets')
+      text.DrawLatex(0.6,0.8,varBinName(stb, 'S_{T}'))
       if first:
         first = False
         h_nj[name][stb][htb].Draw()
       else:
         h_nj[name][stb][htb].Draw('same')
     l.Draw()
-    c1.Print('/afs/hephy.at/user/'+uDir+'/www/'+subDir+'/'+prefix+'_rCS_njet_'+name+'_'+nameAndCut(stb,htb=None,njetb=None, btb=btreg, presel=presel)[0]+".png")
+    c1.Print(path+prefix+'_rCS_njet_'+name+'_'+nameAndCut(stb,htb=None,njetb=None, btb=btreg, presel=presel)[0]+".png")
     h_2d[name][stb].Draw('COLZ TEXTE')
-    c1.Print('/afs/hephy.at/user/'+uDir+'/www/'+subDir+'/'+prefix+'_rCS_njet_vs_ht_'+name+'_'+nameAndCut(stb,htb=None,njetb=None, btb=btreg, presel=presel)[0]+".png")
+    c1.Print(path+prefix+'_rCS_njet_vs_ht_'+name+'_'+nameAndCut(stb,htb=None,njetb=None, btb=btreg, presel=presel)[0]+".png")
   for htb in htreg:
     c1 = ROOT.TCanvas('c1','c1',600,600)
     pad1 = ROOT.TPad('Pad','Pad',0.,0.0,1.,1.)
@@ -214,6 +257,8 @@ for name, c in [["TT", cTTJets] , ["W",cWJets] ]:
     c1.Print(path+prefix+'_rCS_njet_'+name+'_'+nameAndCut(stb,htb=htb,njetb=None, btb=btreg, presel=presel)[0]+".png")
 #    c1.Print(path+prefix+'_rCS_njet_'+name+'_'+nameAndCut(stb,htb=htb,njetb=None, btb=None, presel=presel)[0]+".root")
 
+
+#Draw plots binned in HT for all ST and njet bins
 for name, c in [ ["W",cWJets], ["TT", cTTJets]]:
   for stb, dPhiCut in streg:
     c1 = ROOT.TCanvas()
@@ -257,6 +302,61 @@ for name, c in [ ["W",cWJets], ["TT", cTTJets]]:
         h_ht[name][stb][njb].Draw('same')
     l.Draw()
     c1.Print(path+prefix+'_rCS_ht_'+name+'_'+nameAndCut(stb=None,htb=None,njetb=njb,btb=btreg, presel=presel)[0]+".png")
+
+
+
+for name, c in [["TT", cTTJets] , ["W",cWJets] ]:
+  for stb, dPhiCut in streg:
+    for htb in htreg:
+      c1 = ROOT.TCanvas('c1','c1',600,600)
+      pad1 = ROOT.TPad('Pad','Pad',0.,0.0,1.,1.)
+      pad1.SetLeftMargin(0.15)
+      pad1.Draw()
+      pad1.cd()
+      first = True
+      l = ROOT.TLegend(0.6,0.65,0.9,0.78)#right aligned legend
+      l.SetFillColor(ROOT.kWhite)
+      l.SetShadowColor(ROOT.kWhite)
+      l.SetBorderSize(0)
+      for inbb, nbb in enumerate(nbjreg):
+        h_nbj[name][stb][htb][nbb].GetXaxis().SetLabelSize(0.06)
+        h_nbj[name][stb][htb][nbb].GetYaxis().SetLabelSize(0.04)
+        h_nbj[name][stb][htb][nbb].GetYaxis().SetTitleSize(0.04)
+        h_nbj[name][stb][htb][nbb].GetYaxis().SetTitleOffset(1.5)
+        h_nbj[name][stb][htb][nbb].GetYaxis().SetTitle('R_{CS}')
+        h_nbj[name][stb][htb][nbb].GetYaxis().SetRangeUser(0, 3*h_nbj[name][stb][htb][nbb].GetBinContent(h_nbj[name][stb][htb][nbb].GetMaximumBin()))
+#       h_nbj[name][stb][htb][nbb].GetYaxis().SetRangeUser(0, 0.1)
+        h_nbj[name][stb][htb][nbb].SetLineColor(ROOT_colors[inbb])
+        h_nbj[name][stb][htb][nbb].SetLineWidth(2)
+        l.AddEntry(h_nbj[name][stb][htb][nbb], varBinName(nbb, 'n_{b-jets}'))
+        text=ROOT.TLatex()
+        text.SetNDC()
+        text.SetTextSize(0.04)
+        text.SetTextAlign(11)
+        text.DrawLatex(0.3,0.85,name+'+jets')
+        text.DrawLatex(0.6,0.85,varBinName(htb, 'H_{T}'))
+        text.DrawLatex(0.6,0.8,varBinName(stb, 'S_{T}'))
+        h_nbj[name][stb][htb][nbb].Fit('pol0','','same')
+        FitFunc     = h_nbj[name][stb][htb][nbb].GetFunction('pol0')
+        FitPar      = FitFunc.GetParameter(0)
+        FitParError = FitFunc.GetParError(0)
+        FitFunc.SetLineColor(ROOT_colors[inbb])
+        FitFunc.SetLineStyle(2)
+        FitFunc.SetLineWidth(2)
+        #rd['FitFunction']  = FitFunc
+        #rd['FitParameter'] = FitPar
+        #rd['FitParError']  = FitParError
+        #res[htb][stb][btb] = rd        
+        if first:
+          first = False
+          h_nbj[name][stb][htb][nbb].Draw()
+        else:
+          h_nbj[name][stb][htb][nbb].Draw('same')
+      l.Draw()
+#      c1.Print(path+prefix+'_rCS_njet_'+name+'_'+nameAndCut(stb,htb=htb,njetb=None, btb=None, presel=presel)[0]+".pdf")
+      c1.Print(path+prefix+'_rCS_nbjet_'+name+'_'+nameAndCut(stb,htb=htb,njetb=None, btb=btreg, presel=presel)[0]+".png")
+#      c1.Print(path+prefix+'_rCS_njet_'+name+'_'+nameAndCut(stb,htb=htb,njetb=None, btb=None, presel=presel)[0]+".root")
+
 
 #1D and 2D plots of RCS vs nBTag for TTJets
 #prefix = 'Phys14_hardSingleMuonic' 

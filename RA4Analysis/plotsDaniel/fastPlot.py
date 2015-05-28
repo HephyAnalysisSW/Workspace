@@ -9,31 +9,56 @@ from array import array
 from Workspace.HEPHYPythonTools.helpers import getVarValue, getChain, deltaPhi
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2_HT400ST150_withDF import *
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2 import *
-from Workspace.RA4Analysis.cmgTuplesPostProcessed_softLepton import *
+from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
+#from Workspace.RA4Analysis.cmgTuplesPostProcessed_softLepton import *
 from Workspace.RA4Analysis.helpers import *
+from rCShelpers import *
 
-binning=[30,0,30]
+
+binning=[30,0,1500]
+
+#prepresel = 'singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&nBJetMediumCSV30==0&&htJet30j>500&&st>200&&nJet30>=6&&Jet_pt[2]>80'
+prepresel = 'singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[2]>80'
+
+lepGen = 'all'
+if lepGen == 'ele':
+  presel = prepresel+'&&abs(LepGood_pdgId)==11'
+elif lepGen == 'mu':
+  presel = prepresel+'&&abs(LepGood_pdgId)==13'
+else:
+  presel = prepresel
 
 #prepresel = 'singleLeptonic==1&&'#&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&'
 #presel = prepresel + 'Jet_pt[1]>80&&nJet30>=2&&nBJetMediumCMVA30==0&&st>=150&&st<=250'#&&htJet30j>500&&htJet30j<750'#&&htJet30j>=500&&st>=200&&deltaPhi_Wl>1&&mt2w>350'
-
-prepresel = 'singleLeptonic==1&&nLooseSoftLeptons==1&&nLooseHardLeptons==0&&nTightHardLeptons==0&&htJet30j>500&&st>250&&nJet30>=4&&Jet_pt[1]>100&&Jet_pt[2]>80&&abs(LepGood_pdgId)==11'
-presel = prepresel
-
+#prepresel = 'singleLeptonic==1&&nLooseSoftLeptons==1&&nLooseHardLeptons==0&&nTightHardLeptons==0&&nBJetMediumCSV30==0&&htJet30j>500&&st>200&&nJet30>=2&&Jet_pt[2]>80'#&&abs(LepGood_pdgId)==11'
 #presel='htJet25>400&&(abs(genPartAll_pdgId)==11||abs(genPartAll_pdgId)==13)&&(abs(genPartAll_motherId)==24||abs(genPartAll_motherId)==1000024)'
 #presel='(abs(genLep_pdgId)==11||abs(genLep_pdgId)==13)&&(abs(genLep_motherId)==24||abs(genLep_motherId)==1000024)'
-
 #presel='abs(genPartAll_pdgId)==1000022&&abs(genPartAll_motherId)==1000024'
-
 #presel='abs(genPartAll_pdgId)==1000024'
+
+st = {'varString': 'st','binning': [30,0,1500], 'name': 'S_{T} (GeV)', 'yLegend':"Number of Events / "+str( (binning[2] - binning[1])/binning[0])+" GeV"}
+met = {'varString': 'met_pt','binning': [20,0,1000], 'name': '#slash{E}_{T} (GeV)', 'yLegend':"Number of Events / "+str( (binning[2] - binning[1])/binning[0])+" GeV"}
+leptonPt = {'varString': 'leptonPt','binning': [40,0,800], 'name': 'p_{T}(l) (GeV)', 'yLegend':"Number of Events / "+str( (binning[2] - binning[1])/binning[0])+" GeV"}
+jetPt = {'varString': 'Jet_pt[1]','binning': [20,0,1600], 'name': 'p_{T}(leading Jet) (GeV)', 'yLegend':"Number of Events / "+str( (binning[2] - binning[1])/binning[0])+" GeV"}
+ht = {'varString': 'htJet30j','binning': [25,0,2500], 'name': 'H_{T} (GeV)', 'yLegend':"Number of Events / "+str( (binning[2] - binning[1])/binning[0])+" GeV"}
+deltaPhi = {'varString': 'deltaPhi_Wl','binning': [16,0,3.2], 'name': '#Delta#Phi(W,l)', 'yLegend':'Number of Events'}
+
+var = deltaPhi
 
 signalString='T5qqqqWW_softLep'
 
 #varstring="genPartAll_pt"
-varstring = "leptonPt"
-plotDir='/afs/hephy.at/user/d/dspitzbart/www/softLep/'
+legendName = var['name']
+binning = var['binning']
+varstring = var['varString']
+plotDir='/afs/hephy.at/user/d/dspitzbart/www/SRplots/'
 
-lepSel='soft'
+lepSel='hard'
+
+stReg=[(250,350)]#,(350,450),(450,-1)]#,(450,-1)]#,(350,450),(450,-1)]#250),(250,350),(350,450),(450,-1)]
+htReg=[(500,750)]#,(750,1000),(1000,1250),(1250,-1)]#,(1250,-1)]
+jetReg = [(2,2),(3,3),(4,4),(5,5),(6,6),(7,7),(8,8)]#,(8,-1)]#,(6,-1)]#,(8,-1)]#,(6,-1),(8,-1)]
+btb = (2,2)
 
 #BKG Samples
 WJETS = getChain(WJetsHTToLNu[lepSel],histname='')
@@ -44,12 +69,16 @@ DY = getChain(DY[lepSel],histname='')
 QCD = getChain(QCD[lepSel],histname='')
 
 #SIG Samples
-SIG1 = getChain(T5qqqqWWDeg_mGo1000_mCh325_mChi300[lepSel],histname='')
-SIG2 = getChain(T5qqqqWWDeg_mGo1000_mCh315_mChi300[lepSel],histname='')
-SIG3 = getChain(T5qqqqWWDeg_mGo1000_mCh310_mChi300[lepSel],histname='')
-SIG4 = getChain(T5qqqqWWDeg_mGo1400_mCh315_mChi300[lepSel],histname='')
-SIG5 = getChain(T5qqqqWW_mGo1000_mCh800_mChi700[lepSel],histname='')
-SIG6 = getChain(T5qqqqWWDeg_mGo800_mCh305_mChi300[lepSel],histname='')
+SIG1 = getChain(T5qqqqWW_mGo1000_mCh800_mChi700[lepSel],histname='')
+SIG2 = getChain(T5qqqqWW_mGo1200_mCh1000_mChi800[lepSel],histname='')
+SIG3 = getChain(T5qqqqWW_mGo1500_mCh800_mChi100[lepSel],histname='')
+
+#SIG1 = getChain(T5qqqqWWDeg_mGo1000_mCh325_mChi300[lepSel],histname='')
+#SIG2 = getChain(T5qqqqWWDeg_mGo1000_mCh315_mChi300[lepSel],histname='')
+#SIG3 = getChain(T5qqqqWWDeg_mGo1000_mCh310_mChi300[lepSel],histname='')
+#SIG4 = getChain(T5qqqqWWDeg_mGo1400_mCh315_mChi300[lepSel],histname='')
+#SIG5 = getChain(T5qqqqWW_mGo1000_mCh800_mChi700[lepSel],histname='')
+#SIG6 = getChain(T5qqqqWWDeg_mGo800_mCh305_mChi300[lepSel],histname='')
 
 
 ##not post processed signal
@@ -127,12 +156,17 @@ singletop = {"name":"single top", "chain":SINGLETOP, "weight":"weight", "color":
 dy = {"name":"Drell Yan", "chain":DY, "weight":"weight", "color":color('dy')}
 qcd = {"name":"QCD", "chain":QCD, "weight":"weight", "color":color('qcd')}
 
-signal1 = {'name':'T5qqqqWWDeg_mGo1000_mCh325_mChi300', 'chain':SIG1, 'weight':'weight', 'color':ROOT.kRed-7, "histo":ROOT.TH1F("Signal 1", "sqrt(s)", *binning), 'niceName':'T5qqqqWW m_{\\tilde{g}}=1000, m_{\\tilde{\\chi}_{1}^{+}}=325, m_{\\tilde{\\chi}_{1}^{0}}=300'}
-signal2 = {'name':'T5qqqqWWDeg_mGo1000_mCh315_mChi300', 'chain':SIG2, 'weight':'weight', 'color':ROOT.kRed-3, "histo":ROOT.TH1F("Signal 2", "sqrt(s)", *binning), 'niceName':'T5qqqqWW m_{\\tilde{g}}=1000, m_{\\tilde{\\chi}_{1}^{+}}=315, m_{\\tilde{\\chi}_{1}^{0}}=300'}
-signal3 = {'name':'T5qqqqWWDeg_mGo1000_mCh310_mChi300', 'chain':SIG3, 'weight':'weight', 'color':ROOT.kRed+2, "histo":ROOT.TH1F("Signal 3", "sqrt(s)", *binning), 'niceName':'T5qqqqWW m_{\\tilde{g}}=1000, m_{\\tilde{\\chi}_{1}^{+}}=310, m_{\\tilde{\\chi}_{1}^{0}}=300'}
-signal4 = {'name':'T5qqqqWWDeg_mGo1400_mCh315_mChi300', 'chain':SIG4, 'weight':'weight', 'color':ROOT.kBlack, "histo":ROOT.TH1F("Signal 4", "sqrt(s)", *binning), 'niceName':'T5qqqqWW m_{\\tilde{g}}=1400, m_{\\tilde{\\chi}_{1}^{+}}=315, m_{\\tilde{\\chi}_{1}^{0}}=300'}
-signal5 = {'name':'T5qqqqWW_mGo1000_mCh800_mChi700', 'chain':SIG5, 'weight':'weight', 'color':ROOT.kMagenta+1, "histo":ROOT.TH1F("Signal 5", "sqrt(s)", *binning),'niceName':'T5qqqqWW m_{\\tilde{g}}=1000, m_{\\tilde{\\chi}_{1}^{+}}=800, m_{\\tilde{\\chi}_{1}^{0}}=700'}
-signal6 = {'name':'T5qqqqWWDeg_mGo800_mCh305_mChi300', 'chain':SIG6, 'weight':'weight', 'color':ROOT.kCyan+2, "histo":ROOT.TH1F("Signal 6", "sqrt(s)", *binning), 'niceName':'T5qqqqWW m_{\\tilde{g}}=800,  m_{\\tilde{\\chi}_{1}^{+}}=305, m_{\\tilde{\\chi}_{1}^{0}}=300'}
+signal1 = {'name':'T5qqqqWW_mGo1000_mCh800_mChi700', 'legendName': 'T5qqqqWW (1.0/0.8/0.7)', 'chain':SIG1, 'weight':'weight', 'color':ROOT.kRed-7, "histo":ROOT.TH1F("Signal 1", "sqrt(s)", *binning), 'niceName':'T5qqqqWW m_{\\tilde{g}}=1000, m_{\\tilde{\\chi}_{1}^{+}}=800, m_{\\tilde{\\chi}_{1}^{0}}=700'}
+signal2 = {'name':'T5qqqqWW_mGo1200_mCh1000_mChi800', 'legendName': 'T5qqqqWW (1.2/1.0/0.8)', 'chain':SIG2, 'weight':'weight', 'color':ROOT.kRed-3, "histo":ROOT.TH1F("Signal 2", "sqrt(s)", *binning), 'niceName':'T5qqqqWW m_{\\tilde{g}}=1200, m_{\\tilde{\\chi}_{1}^{+}}=1000, m_{\\tilde{\\chi}_{1}^{0}}=800'}
+signal3 = {'name':'T5qqqqWW_mGo1500_mCh800_mChi100', 'legendName': 'T5qqqqWW (1.5/0.8/0.1)', 'chain':SIG3, 'weight':'weight', 'color':ROOT.kRed+2, "histo":ROOT.TH1F("Signal 3", "sqrt(s)", *binning), 'niceName':'T5qqqqWW m_{\\tilde{g}}=1500, m_{\\tilde{\\chi}_{1}^{+}}=800, m_{\\tilde{\\chi}_{1}^{0}}=100'}
+
+
+#signal1 = {'name':'T5qqqqWWDeg_mGo1000_mCh325_mChi300', 'chain':SIG1, 'weight':'weight', 'color':ROOT.kRed-7, "histo":ROOT.TH1F("Signal 1", "sqrt(s)", *binning), 'niceName':'T5qqqqWW m_{\\tilde{g}}=1000, m_{\\tilde{\\chi}_{1}^{+}}=325, m_{\\tilde{\\chi}_{1}^{0}}=300'}
+#signal2 = {'name':'T5qqqqWWDeg_mGo1000_mCh315_mChi300', 'chain':SIG2, 'weight':'weight', 'color':ROOT.kRed-3, "histo":ROOT.TH1F("Signal 2", "sqrt(s)", *binning), 'niceName':'T5qqqqWW m_{\\tilde{g}}=1000, m_{\\tilde{\\chi}_{1}^{+}}=315, m_{\\tilde{\\chi}_{1}^{0}}=300'}
+#signal3 = {'name':'T5qqqqWWDeg_mGo1000_mCh310_mChi300', 'chain':SIG3, 'weight':'weight', 'color':ROOT.kRed+2, "histo":ROOT.TH1F("Signal 3", "sqrt(s)", *binning), 'niceName':'T5qqqqWW m_{\\tilde{g}}=1000, m_{\\tilde{\\chi}_{1}^{+}}=310, m_{\\tilde{\\chi}_{1}^{0}}=300'}
+#signal4 = {'name':'T5qqqqWWDeg_mGo1400_mCh315_mChi300', 'chain':SIG4, 'weight':'weight', 'color':ROOT.kBlack, "histo":ROOT.TH1F("Signal 4", "sqrt(s)", *binning), 'niceName':'T5qqqqWW m_{\\tilde{g}}=1400, m_{\\tilde{\\chi}_{1}^{+}}=315, m_{\\tilde{\\chi}_{1}^{0}}=300'}
+#signal5 = {'name':'T5qqqqWW_mGo1000_mCh800_mChi700', 'chain':SIG5, 'weight':'weight', 'color':ROOT.kMagenta+1, "histo":ROOT.TH1F("Signal 5", "sqrt(s)", *binning),'niceName':'T5qqqqWW m_{\\tilde{g}}=1000, m_{\\tilde{\\chi}_{1}^{+}}=800, m_{\\tilde{\\chi}_{1}^{0}}=700'}
+#signal6 = {'name':'T5qqqqWWDeg_mGo800_mCh305_mChi300', 'chain':SIG6, 'weight':'weight', 'color':ROOT.kCyan+2, "histo":ROOT.TH1F("Signal 6", "sqrt(s)", *binning), 'niceName':'T5qqqqWW m_{\\tilde{g}}=800,  m_{\\tilde{\\chi}_{1}^{+}}=305, m_{\\tilde{\\chi}_{1}^{0}}=300'}
 
 
 
@@ -151,9 +185,9 @@ sigSamples=[]
 sigSamples.append(signal1)
 sigSamples.append(signal2)
 sigSamples.append(signal3)
-sigSamples.append(signal4)
-sigSamples.append(signal5)
-sigSamples.append(signal6)
+#sigSamples.append(signal4)
+#sigSamples.append(signal5)
+#sigSamples.append(signal6)
 
 
 #sigSamples.append(t5qqqq6)
@@ -170,169 +204,195 @@ bkgSamples=[]
 bkgSamples.append(qcd)
 bkgSamples.append(ttvh)
 bkgSamples.append(dy)
-bkgSamples.append(singletop)
 bkgSamples.append(wjets)
+bkgSamples.append(singletop)
 bkgSamples.append(ttjets)
 
-h_Stack = ROOT.THStack('h_Stack',varstring)
-h_Stack_S = ROOT.THStack('h_Stack_S',varstring)
-
-can1 = ROOT.TCanvas(varstring,varstring,800,600)
-
-h1=ROOT.TH1F("MCDataCombined","MCDataCombined", *binning)
-h3=ROOT.TH1F("MCDataCombined","MCDataCombined", *binning)
-
-l = ROOT.TLegend(0.7,0.75,1.,1.)
-l.SetFillColor(0)
-l.SetShadowColor(ROOT.kWhite)
-l.SetBorderSize(1)
-
-for sample in bkgSamples:
-  chain = sample["chain"]
-  print chain
-  histo = 'h_'+sample["name"]
-  histoname = histo
-  print histoname
-  histo = ROOT.TH1F(str(histo) ,str(histo),*binning)
-  print histo
-  color = sample["color"]
-  print color
-  tot_lumi = 4000
-  nevents = chain.GetEntries()
-  #weight = "("+str(tot_lumi)+"*xsec)/"+str(nevents)
-  #print 'Weight:', weight
-  chain.Draw(varstring+'>>'+str(histoname),'weight*('+presel+')')#insert 'weight*('+
-  histo.SetLineColor(ROOT.kBlack)
-  histo.SetLineWidth(1)
-  histo.SetMarkerSize(0)
-  histo.SetMarkerStyle(0)
-  histo.SetTitleSize(20)
-  histo.GetXaxis().SetTitle(varstring)
-  histo.GetYaxis().SetTitle("Events / "+str( (binning[2] - binning[1])/binning[0])+" GeV")
-  histo.GetXaxis().SetLabelSize(0.04)
-  histo.GetYaxis().SetLabelSize(0.04)
-  histo.GetYaxis().SetTitleOffset(0.8)
-  histo.GetYaxis().SetTitleSize(0.05)
-  histo.SetFillColor(sample["color"])
-  histo.SetFillStyle(1001)
-  histo.SetMinimum(.08)
-  h_Stack.Add(histo)
-  print sample["name"], "Histogram has ", histo.GetSumOfWeights(), " entries"
-  h1.Add(histo)
-  l.AddEntry(histo, sample["name"])
-
-for sample in sigSamples:
-  chain = sample["chain"]
-  print chain
-  histo = 'h_'+sample["name"]
-  histoname = histo
-  print histoname
-  histo = ROOT.TH1F(str(histo) ,str(histo),*binning)
-  print histo
-  color = sample["color"]
-  print color
-  tot_lumi = 4000
-  nevents = chain.GetEntries()
-  #weight = "("+str(tot_lumi)+"*xsec)/"+str(nevents)
-  #print 'Weight:', weight
-  chain.Draw(varstring+'>>'+str(histoname),'weight*('+presel+')')#'weight*('+
-  histo.SetLineColor(color)
-  histo.SetLineWidth(2)
-  histo.SetMarkerSize(0)
-  histo.SetMarkerStyle(0)
-  histo.SetTitleSize(20)
-  histo.GetXaxis().SetTitle(varstring)
-  histo.GetXaxis().SetLabelSize(0.04)
-  histo.GetXaxis().SetTitleOffset(0.3)
-  histo.GetXaxis().SetTitleSize(0.06)
-  histo.GetYaxis().SetTitle("Events")
-  histo.GetYaxis().SetLabelSize(0.04)
-  histo.GetYaxis().SetTitleOffset(0.3)
-  histo.GetYaxis().SetTitleSize(0.06)
-  histo.SetFillColor(0)
-  histo.SetMinimum(.08)
-  h_Stack_S.Add(histo)
-  h3.Add(histo)
-  l.AddEntry(histo, sample["name"])
-  #signalString+=sample["name"]
-
-#pad1=ROOT.TPad("pad1","MyTitle",0,0.3,1,1.0)
-#pad1.SetBottomMargin(0)
-#pad1.SetLeftMargin(0.1)
-#pad1.SetGrid()
-#pad1.SetLogy()
-#pad1.Draw()
-#pad1.cd()
-
-#when not using pads
-can1.SetGrid()
-can1.SetLogy()
-
-histo.GetXaxis().SetTitle(varstring)
-histo.GetXaxis().SetLabelSize(0.04)
-histo.GetXaxis().SetTitleOffset(0.3)
-histo.GetXaxis().SetTitleSize(0.15)
-
-histo.GetYaxis().SetTitle("Events")
-histo.GetYaxis().SetLabelSize(0.04)
-histo.GetYaxis().SetTitleOffset(0.3)
-histo.GetYaxis().SetTitleSize(0.15)
-
-
-
-h_Stack.Draw()
-h_Stack.SetMinimum(0.08)
-h_Stack_S.Draw('noStacksame')
-#h_Stack_S.Draw('noStack')
-h_Stack_S.GetYaxis().SetTitle("Events") #add _S if no bkg
-h_Stack_S.GetYaxis().SetLabelSize(0.04)
-h_Stack_S.GetYaxis().SetTitleOffset(1.1)
-h_Stack_S.GetYaxis().SetTitleSize(0.04)
-h_Stack_S.GetXaxis().SetTitle(varstring)
-h_Stack_S.GetXaxis().SetLabelSize(0.04)
-h_Stack_S.GetXaxis().SetTitleOffset(1.3)
-h_Stack_S.GetXaxis().SetTitleSize(0.04)
-#h_Stack_S.Draw('noStack')
-l.Draw()
-
-##Draw ratio MC/Data
-#can1.cd()
-#pad2=ROOT.TPad("pad2","pad2",0,0.05,1.,0.3)
-#pad2.SetGrid()
-#pad2.Draw()
-#pad2.cd()
-#pad2.SetTopMargin(0)
-#pad2.SetBottomMargin(0.3)
-#pad2.SetLeftMargin(0.1)
+#h_Stack = ROOT.THStack('h_Stack',varstring)
+#h_Stack_S = ROOT.THStack('h_Stack_S',varstring)
 #
-#h3.Divide(h1)
-#h3.SetMaximum(1.35)
-#h3.SetMinimum(0.)
-#h3.GetXaxis().SetLabelSize(0.10)
-#h3.GetXaxis().SetTitle(varstring)
-#h3.GetXaxis().SetTitleSize(0.15)
+#can1 = ROOT.TCanvas(varstring,varstring,800,700)
 #
-#h3.GetYaxis().SetLabelSize(0.10)
-#h3.GetYaxis().SetTitle("Signal / BG")
-#h3.GetYaxis().SetNdivisions(505)
-#h3.GetYaxis().SetTitleSize(0.15)
-#h3.GetYaxis().SetTitleOffset(0.3)
-#h3.SetLineColor(ROOT.kBlack)
-#h3.Draw("E1P")
+#h1=ROOT.TH1F("MCDataCombined","MCDataCombined", *binning)
+#h3=ROOT.TH1F("MCDataCombined","MCDataCombined", *binning)
+#
+#l = ROOT.TLegend(0.6,0.65,.95,.95)
+#l.SetFillColor(0)
+#l.SetShadowColor(ROOT.kWhite)
+#l.SetBorderSize(1)
 
-#Draw Title
-#can1.cd()
-#pad1.cd()
-#t1=ROOT.TLatex()
-#t1.SetTextFont(22)
-#t1.DrawLatex(150,600,"CMS preliminary")
-#t1.DrawLatex(150,300,"L=19.4 fb^{-1}, #sqrt{s}=8TeV")
+allRCS = []
 
-can1.Print(plotDir+varstring+'_'+presel+signalString+'.png')
-can1.Print(plotDir+varstring+'_'+presel+signalString+'.pdf')
-can1.Print(plotDir+varstring+'_'+presel+signalString+'.root')
-
-
-
-#can1.SetLogy()
-
+for st in stReg:
+  for ht in htReg:
+    for jet in jetReg:
+      
+      cutname, cut = nameAndCut(st, ht, jet, btb=btb, presel=presel, btagVar = 'nBJetMediumCSV30')
+      rcs = getRCS(WJETS,cut,1.0)
+      #print rcs
+      allRCS.append({'ST':st,'HT':ht,'njets':jet,'rcs':rcs['rCS']})
+      h_Stack = ROOT.THStack('h_Stack',varstring)
+      h_Stack_S = ROOT.THStack('h_Stack_S',varstring)
+      
+      can1 = ROOT.TCanvas(varstring,varstring,800,700)
+      
+      h1=ROOT.TH1F("MCDataCombined","MCDataCombined", *binning)
+      h3=ROOT.TH1F("MCDataCombined","MCDataCombined", *binning)
+      
+      l = ROOT.TLegend(0.6,0.65,.95,.95)
+      l.SetFillColor(0)
+      l.SetShadowColor(ROOT.kWhite)
+      l.SetBorderSize(1)
+      for sample in bkgSamples:
+        chain = sample["chain"]
+        print chain
+        histo = 'h_'+sample["name"]
+        histoname = histo
+        print histoname
+        histo = ROOT.TH1F(str(histo) ,str(histo),*binning)
+        print histo
+        color = sample["color"]
+        print color
+        tot_lumi = 4000
+        nevents = chain.GetEntries()
+        #weight = "("+str(tot_lumi)+"*xsec)/"+str(nevents)
+        #print 'Weight:', weight
+        chain.Draw(varstring+'>>'+str(histoname),'weight*('+cut+')')#insert 'weight*('+
+        histo.SetLineColor(ROOT.kBlack)
+        histo.SetLineWidth(1)
+        histo.SetMarkerSize(0)
+        histo.SetMarkerStyle(0)
+        histo.SetTitleSize(20)
+        histo.GetXaxis().SetTitle(legendName)
+        histo.GetYaxis().SetTitle("Events / "+str( (binning[2] - binning[1])/binning[0])+" GeV")
+        histo.GetXaxis().SetLabelSize(0.04)
+        histo.GetYaxis().SetLabelSize(0.04)
+        histo.GetYaxis().SetTitleOffset(0.8)
+        histo.GetYaxis().SetTitleSize(0.05)
+        histo.SetFillColor(sample["color"])
+        histo.SetFillStyle(1001)
+        histo.SetMinimum(.008)
+        h_Stack.Add(histo)
+        print sample["name"], "Histogram has ", histo.GetSumOfWeights(), " entries"
+        h1.Add(histo)
+        l.AddEntry(histo, sample["name"])
+      
+      for sample in sigSamples:
+        chain = sample["chain"]
+        print chain
+        histo = 'h_'+sample["name"]
+        histoname = histo
+        print histoname
+        histo = ROOT.TH1F(str(histo), sample['legendName'],*binning)
+        print histo
+        color = sample["color"]
+        print color
+        tot_lumi = 4000
+        nevents = chain.GetEntries()
+        #weight = "("+str(tot_lumi)+"*xsec)/"+str(nevents)
+        #print 'Weight:', weight
+        chain.Draw(varstring+'>>'+str(histoname),'weight*('+cut+')')#'weight*('+
+        histo.SetLineColor(color)
+        histo.SetLineWidth(2)
+        histo.SetMarkerSize(0)
+        histo.SetMarkerStyle(0)
+        histo.SetTitleSize(20)
+        histo.GetXaxis().SetTitle(legendName)
+        histo.GetXaxis().SetLabelSize(0.04)
+        histo.GetXaxis().SetTitleOffset(0.3)
+        histo.GetXaxis().SetTitleSize(0.06)
+        histo.GetYaxis().SetTitle("Events")
+        histo.GetYaxis().SetLabelSize(0.04)
+        histo.GetYaxis().SetTitleOffset(0.3)
+        histo.GetYaxis().SetTitleSize(0.06)
+        histo.SetFillColor(0)
+        histo.SetMinimum(.008)
+        h_Stack_S.Add(histo)
+        h3.Add(histo)
+        l.AddEntry(histo)
+        #signalString+=sample["name"]
+      
+      #pad1=ROOT.TPad("pad1","MyTitle",0,0.3,1,1.0)
+      #pad1.SetBottomMargin(0)
+      #pad1.SetLeftMargin(0.1)
+      #pad1.SetGrid()
+      #pad1.SetLogy()
+      #pad1.Draw()
+      #pad1.cd()
+      
+      #when not using pads
+      can1.SetGrid()
+      can1.SetLogy()
+      
+      histo.GetXaxis().SetTitle(legendName)
+      histo.GetXaxis().SetLabelSize(0.04)
+      histo.GetXaxis().SetTitleOffset(0.3)
+      histo.GetXaxis().SetTitleSize(0.15)
+      
+      histo.GetYaxis().SetTitle("Events / "+str( (binning[2] - binning[1])/binning[0])+" GeV")
+      histo.GetYaxis().SetLabelSize(0.04)
+      histo.GetYaxis().SetTitleOffset(0.3)
+      histo.GetYaxis().SetTitleSize(0.15)
+      
+      
+      
+      h_Stack.Draw()
+      h_Stack.SetMaximum(1100)
+      h_Stack.SetMinimum(0.008)
+      h_Stack_S.Draw('noStacksame')
+      #h_Stack_S.Draw('noStack')
+      h_Stack.GetYaxis().SetTitle(var['yLegend']) #add _S if no bkg
+      h_Stack.GetYaxis().SetLabelSize(0.05)
+      h_Stack.GetYaxis().SetTitleOffset(1.3)
+      h_Stack.GetYaxis().SetTitleSize(0.05)
+      h_Stack.GetXaxis().SetTitle(legendName)
+      h_Stack.GetXaxis().SetLabelSize(0.05)
+      h_Stack.GetXaxis().SetTitleOffset(1.1)
+      h_Stack.GetXaxis().SetTitleSize(0.05)
+      #h_Stack_S.Draw('noStack')
+      l.Draw()
+      
+      ##Draw ratio MC/Data
+      #can1.cd()
+      #pad2=ROOT.TPad("pad2","pad2",0,0.05,1.,0.3)
+      #pad2.SetGrid()
+      #pad2.Draw()
+      #pad2.cd()
+      #pad2.SetTopMargin(0)
+      #pad2.SetBottomMargin(0.3)
+      #pad2.SetLeftMargin(0.1)
+      #
+      #h3.Divide(h1)
+      #h3.SetMaximum(1.35)
+      #h3.SetMinimum(0.)
+      #h3.GetXaxis().SetLabelSize(0.10)
+      #h3.GetXaxis().SetTitle(varstring)
+      #h3.GetXaxis().SetTitleSize(0.15)
+      #
+      #h3.GetYaxis().SetLabelSize(0.10)
+      #h3.GetYaxis().SetTitle("Signal / BG")
+      #h3.GetYaxis().SetNdivisions(505)
+      #h3.GetYaxis().SetTitleSize(0.15)
+      #h3.GetYaxis().SetTitleOffset(0.3)
+      #h3.SetLineColor(ROOT.kBlack)
+      #h3.Draw("E1P")
+      
+      #Draw Title
+      #can1.cd()
+      #pad1.cd()
+      latex1 = ROOT.TLatex()
+      latex1.SetNDC()
+      latex1.SetTextSize(0.035)
+      latex1.SetTextAlign(11) # align right
+      latex1.DrawLatex(0.16,0.96,'CMS Simulation')
+      latex1.DrawLatex(0.75,0.96,'L=4fb^{-1} (13TeV)')
+      
+      
+      can1.Print(plotDir+varstring+'_'+cutname+'_'+lepGen+'.png')
+      can1.Print(plotDir+varstring+'_'+cutname+'_'+lepGen+'.pdf')
+      can1.Print(plotDir+varstring+'_'+cutname+'_'+lepGen+'.root')
+      
+      
+      
+      #can1.SetLogy()
+      

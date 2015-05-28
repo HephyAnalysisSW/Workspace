@@ -196,7 +196,7 @@ for i,bReg in enumerate(nBtagReg):
         latex1.SetTextSize(0.035)
         latex1.SetTextAlign(11) # align right
         latex1.DrawLatex(0.16,0.96,"Rcs="+str(rcs))
-        latex1.DrawLatex(0.7,0.96,"L=4 fb^{-1} (13TeV)")
+        latex1.DrawLatex(0.72,0.96,"L=4 fb^{-1} (13TeV)")
         
         
         can1.SetLogy()

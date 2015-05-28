@@ -6,11 +6,12 @@ from math import sqrt, pi
 
 dPhiStr = 'deltaPhi_Wl' #= "acos((leptonPt+met*cos(leptonPhi-metPhi))/sqrt(leptonPt**2+met**2+2*met*leptonPt*cos(leptonPhi-metPhi)))"
 
-ROOT.TH1F().SetDefaultSumw2()
+#ROOT.TH1F().SetDefaultSumw2()
 
 def getRCS(c, cut, dPhiCut):   
 #  dPhiStr = "acos((leptonPt+met*cos(leptonPhi-metPhi))/sqrt(leptonPt**2+met**2+2*met*leptonPt*cos(leptonPhi-metPhi)))"
   h = getPlotFromChain(c, dPhiStr, [0,dPhiCut,pi], cutString=cut, binningIsExplicit=True)
+  h.Sumw2()
   if h.GetBinContent(1)>0 and h.GetBinContent(2)>0:
     rcs = h.GetBinContent(2)/h.GetBinContent(1)
     rCSE_sim = rcs*sqrt(h.GetBinError(2)**2/h.GetBinContent(2)**2 + h.GetBinError(1)**2/h.GetBinContent(1)**2)
@@ -19,7 +20,7 @@ def getRCS(c, cut, dPhiCut):
     return {'rCS':rcs, 'rCSE_pred':rCSE_pred, 'rCSE_sim':rCSE_sim}
   else:
     del h
-    return {'rCS':'nan', 'rCSE_pred':'nan', 'rCSE_sim':'nan'}
+    return {'rCS':float('nan'), 'rCSE_pred':float('nan'), 'rCSE_sim':float('nan')}
   
 def getFOM(Ysig ,Ysig_Err , Ybkg,  Ybkg_Err):
   if Ybkg>0.0:
