@@ -7,7 +7,7 @@ from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,v
 from localInfo import username
 from math import pi, sqrt
 
-def binnedNBTagsFit(cut, samples, nBTagVar = 'nBJetMediumCMVA30', prefix="", printDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/pngCMG2/templateFit_Phys14V3'):
+def binnedNBTagsFit(cut, samples, nBTagVar = 'nBJetMediumCSV30', prefix="", printDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/pngCMG2/templateFit_Phys14V3'):
   if not os.path.exists(printDir):
      os.makedirs(printDir) 
   cWJets = samples['W']
@@ -159,14 +159,14 @@ def binnedNBTagsFit(cut, samples, nBTagVar = 'nBJetMediumCMVA30', prefix="", pri
   ROOT.gROOT.SetStyle("Plain")#Removesgraybackgroundfromplots
   ROOT.gPad.SetLeftMargin(0.15)
   fitFrame_PosPdg.GetYaxis().SetTitleOffset(1.4)
-  fitFrame_PosPdg.GetXaxis().SetTitle('nBJetCMVA')
+  fitFrame_PosPdg.GetXaxis().SetTitle('nBJetMediumCSV30')
   fitFrame_PosPdg.Draw()
 
   c1.cd(2)
   ROOT.gROOT.SetStyle("Plain")#Removesgraybackgroundfromplots
   ROOT.gPad.SetLeftMargin(0.15)
   fitFrame_NegPdg.GetYaxis().SetTitleOffset(1.4)
-  fitFrame_NegPdg.GetXaxis().SetTitle('nBJetCMVA')
+  fitFrame_NegPdg.GetXaxis().SetTitle('nBJetMediumCSV30')
   fitFrame_NegPdg.Draw()
 
   c1.Print(printDir+'/'+prefix+'_nBTagFitRes.png')

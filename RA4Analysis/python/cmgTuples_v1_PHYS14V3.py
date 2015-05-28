@@ -142,6 +142,11 @@ allSignalData=[\
 ["/data/easilar/cmgTuples/crab_cmg_v1/test2/T5qqqqWW_mGo1500_mCh800_mChi100", "T5qqqqWW_mGo1500_mCh800_mChi100"], ##OK 
 ["/data/easilar/cmgTuples/crab_cmg_v1/test2/SMS_T1tttt_2J_mGl1500_mLSP100", "SMS_T1tttt_2J_mGl1500_mLSP100"], ##OK 
 ["/data/easilar/cmgTuples/crab_cmg_v1/test2/SMS_T1tttt_2J_mGl1200_mLSP800", "SMS_T1tttt_2J_mGl1200_mLSP800"], ##OK 
+["/data/nrad2/cmgTuples/crab_cmg_v1/SMS_T2tt_2J_mStop425_mLSP325", "SMS_T2tt_2J_mStop425_mLSP325"], ##OK 
+["/data/nrad2/cmgTuples/crab_cmg_v1/SMS_T2tt_2J_mStop500_mLSP325", "SMS_T2tt_2J_mStop500_mLSP325"], ##OK 
+["/data/nrad2/cmgTuples/crab_cmg_v1/SMS_T2tt_2J_mStop650_mLSP325", "SMS_T2tt_2J_mStop650_mLSP325"], ##OK 
+["/data/nrad2/cmgTuples/crab_cmg_v1/SMS_T2tt_2J_mStop850_mLSP100", "SMS_T2tt_2J_mStop850_mLSP100"], ##OK 
+
 ]
 allSignalStrings = [s[1] for s in allSignalData]
 def getSignalSample(dir, signal):

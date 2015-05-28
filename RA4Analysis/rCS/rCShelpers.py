@@ -14,7 +14,7 @@ def getRCS(c, cut, dPhiCut):
   if h.GetBinContent(1)>0 and h.GetBinContent(2)>0:
     rcs = h.GetBinContent(2)/h.GetBinContent(1)
     rCSE_sim = rcs*sqrt(h.GetBinError(2)**2/h.GetBinContent(2)**2 + h.GetBinError(1)**2/h.GetBinContent(1)**2)
-    rCSE_pred = rcs*sqrt(1./h.GetBinContent(2)**2 + 1./h.GetBinContent(1)**2)
+    rCSE_pred = rcs*sqrt(1./h.GetBinContent(2) + 1./h.GetBinContent(1))
     del h
     return {'rCS':rcs, 'rCSE_pred':rCSE_pred, 'rCSE_sim':rCSE_sim}
   else:

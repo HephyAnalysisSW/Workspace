@@ -43,7 +43,7 @@ ROOT.TH1F().SetDefaultSumw2()
 #    res[htb][stb] = {}
 #    for srNJet in njreg:
       
-def makeWPrediction(dict, samples, htb, stb, srNJet, presel, dPhiCut=1.0):
+def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, btagVarString = 'nBJetMediumCSV30'):
   cWJets = samples['W']
   cTTJets = samples['TT']
   cRest = samples['Rest']
@@ -51,13 +51,13 @@ def makeWPrediction(dict, samples, htb, stb, srNJet, presel, dPhiCut=1.0):
   rd={}
 
   #TT Jets yield in crNJet, no b-tag cut, low DPhi
-  fit_crName, fit_crCut = nameAndCut(stb, htb, (2,3), btb=None, presel=presel, btagVar = 'nBJetMediumCMVA30') 
-  fit_crNJet_lowDPhi = binnedNBTagsFit(fit_crCut+"&&"+dPhiStr+"<"+str(dPhiCut), samples = {'W':cWJets, 'TT':cTTJets, 'Rest':cRest}, nBTagVar = 'nBJetMediumCMVA30' , prefix=fit_crName)
+  fit_crName, fit_crCut = nameAndCut(stb, htb, (2,3), btb=None, presel=presel, btagVar = btagVarString) 
+  fit_crNJet_lowDPhi = binnedNBTagsFit(fit_crCut+"&&"+dPhiStr+"<"+str(dPhiCut), samples = {'W':cWJets, 'TT':cTTJets, 'Rest':cRest}, nBTagVar = btagVarString , prefix=fit_crName)
 #  fit_crNJet_lowDPhi = binnedNBTagsFit(fit_crCut+"&&"+dPhiStr+"<"+str(dPhiCut), samples = {'W':cWJets, 'TT':cTTJets}, nBTagVar = 'nBJetMedium25', prefix=fit_crName)
   rd['fit_crNJet_lowDPhi'] = fit_crNJet_lowDPhi
   
-  rCS_cr_Name_1b, rCS_cr_Cut_1b = nameAndCut(stb, htb, (2,3), btb=(1,1), presel=presel, btagVar = 'nBJetMediumCMVA30') 
-  rCS_cr_Name_0b, rCS_cr_Cut_0b = nameAndCut(stb, htb, (2,3), btb=(0,0), presel=presel, btagVar = 'nBJetMediumCMVA30') 
+  rCS_cr_Name_1b, rCS_cr_Cut_1b = nameAndCut(stb, htb, (2,3), btb=(1,1), presel=presel, btagVar = btagVarString) 
+  rCS_cr_Name_0b, rCS_cr_Cut_0b = nameAndCut(stb, htb, (2,3), btb=(0,0), presel=presel, btagVar = btagVarString) 
   rCS_crNJet_1b = getRCS(cBkg, rCS_cr_Cut_1b,  dPhiCut) 
   rCS_crNJet_1b_onlyTT = getRCS(cTTJets, rCS_cr_Cut_1b,  dPhiCut) 
   rCS_crNJet_0b_onlyTT = getRCS(cTTJets, rCS_cr_Cut_0b,  dPhiCut) 
@@ -66,7 +66,7 @@ def makeWPrediction(dict, samples, htb, stb, srNJet, presel, dPhiCut=1.0):
   rd['rCS_crNJet_0b_onlyTT'] = rCS_crNJet_0b_onlyTT
 
   #low njet CR: crNJet, 0-btags, low DPhi
-  crName, crCut = nameAndCut(stb, htb, (2,3),btb=(0,0), presel=presel, btagVar='nBJetMediumCMVA30') 
+  crName, crCut = nameAndCut(stb, htb, (2,3),btb=(0,0), presel=presel, btagVar=btagVarString) 
 
   yTT_crNJet_0b_lowDPhi         = fit_crNJet_lowDPhi['TT_AllPdg']['yield']*fit_crNJet_lowDPhi['TT_AllPdg']['template'].GetBinContent(1)
   yTT_Var_crNJet_0b_lowDPhi     = fit_crNJet_lowDPhi['TT_AllPdg']['yieldVar']*fit_crNJet_lowDPhi['TT_AllPdg']['template'].GetBinContent(1)**2
@@ -154,8 +154,8 @@ def makeWPrediction(dict, samples, htb, stb, srNJet, presel, dPhiCut=1.0):
   rd['rCS_Var_W_NegPdg_crNJet_0b_notcorr']   = rCS_Var_W_NegPdg_crNJet_0b_notcorr
   rd['rCS_W_NegPdg_crNJet_0b_truth']  = getRCS(cWJets, 'leptonPdg<0&&'+crCut, dPhiCut)
 
-  fit_srName, fit_srCut = nameAndCut(stb, htb, srNJet, btb=None, presel=presel,btagVar = 'nBJetMediumCMVA30') 
-  fit_srNJet_lowDPhi = binnedNBTagsFit(fit_srCut+"&&"+dPhiStr+"<"+str(dPhiCut), samples = {'W':cWJets, 'TT':cTTJets, 'Rest':cRest}, nBTagVar = 'nBJetMediumCMVA30', prefix=fit_srName)
+  fit_srName, fit_srCut = nameAndCut(stb, htb, srNJet, btb=None, presel=presel,btagVar = btagVarString) 
+  fit_srNJet_lowDPhi = binnedNBTagsFit(fit_srCut+"&&"+dPhiStr+"<"+str(dPhiCut), samples = {'W':cWJets, 'TT':cTTJets, 'Rest':cRest}, nBTagVar = btagVarString, prefix=fit_srName)
 #  fit_srNJet_lowDPhi = binnedNBTagsFit(fit_srCut+"&&"+dPhiStr+"<"+str(dPhiCut), samples = {'W':cWJets, 'TT':cTTJets}, nBTagVar = 'nBJetMedium25', prefix=fit_srName)
 
   rd['fit_srNJet_lowDPhi'] = fit_srNJet_lowDPhi
@@ -172,7 +172,7 @@ def makeWPrediction(dict, samples, htb, stb, srNJet, presel, dPhiCut=1.0):
   yW_NegPdg_srNJet_0b_lowDPhi = fit_srNJet_lowDPhi['W_NegPdg']['yield']*fit_srNJet_lowDPhi['W_NegPdg']['template'].GetBinContent(1)
   yW_NegPdg_Var_srNJet_0b_lowDPhi = fit_srNJet_lowDPhi['W_NegPdg']['yieldVar']*fit_srNJet_lowDPhi['W_NegPdg']['template'].GetBinContent(1)**2
 
-  rCS_sr_Name_0b, rCS_sr_Cut_0b = nameAndCut(stb, htb, srNJet, btb=(0,0), presel=presel, btagVar = 'nBJetMediumCMVA30')#for Check 
+  rCS_sr_Name_0b, rCS_sr_Cut_0b = nameAndCut(stb, htb, srNJet, btb=(0,0), presel=presel, btagVar = btagVarString)#for Check 
   rCS_srNJet_0b_onlyW = getRCS(cWJets, rCS_sr_Cut_0b,  dPhiCut) #for check
   rCS_srNJet_0b_onlyW_PosPdg = getRCS(cWJets, 'leptonPdg>0&&'+rCS_sr_Cut_0b,  dPhiCut) #for check
   rCS_srNJet_0b_onlyW_NegPdg = getRCS(cWJets, 'leptonPdg<0&&'+rCS_sr_Cut_0b,  dPhiCut) #for check
@@ -237,7 +237,7 @@ def makeWPrediction(dict, samples, htb, stb, srNJet, presel, dPhiCut=1.0):
 #              'tot_PosPdg_truth':(0.5*truth_TT)+truth_W_PosPdg+truth_Rest_PosPdg,'tot_PosPdg_truth_err':sqrt((0.5*truth_TT_var) + truth_W_var_PosPdg + truth_Rest_var_PosPdg),\
 #              'tot_NegPdg_truth':(0.5*truth_TT)+truth_W_NegPdg+truth_Rest_NegPdg,'tot_NegPdg_truth_err':sqrt((0.5*truth_TT_var) + truth_W_var_NegPdg + truth_Rest_var_NegPdg)})
               })
-  dict.update(rd)
+  bins.update(rd)
   del rd
-  return dict
+  return bins
 
