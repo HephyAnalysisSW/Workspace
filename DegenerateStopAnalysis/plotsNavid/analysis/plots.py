@@ -13,7 +13,7 @@ import math
 #from Workspace.DegenerateStopAnalysis.cmgTuplesPostProcessed_v6_Phys14V3 import WJetsToLNu_HT100to200, WJetsToLNu_HT200to400, WJetsToLNu_HT400to600,  WJetsToLNu_HT600toInf, allSignals
 from Workspace.DegenerateStopAnalysis.cmgTuples_Phys14_v1 import *
 from Workspace.DegenerateStopAnalysis.cmgTuplesPostProcessed_v3_Phys14V1 import *
-from Workspace.DegenerateStopAnalysis.navidPlotTools import saveCanvas,decorate,decorateAxis
+from Workspace.DegenerateStopAnalysis.navidPlotTools import *
 
 
 targetLumi = 4000. #pb-1
