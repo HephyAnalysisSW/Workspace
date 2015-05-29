@@ -57,8 +57,7 @@ ROOT.TH1F().SetDefaultSumw2()
 streg = [[(250, 350), 1.], [(350, 450), 1.], [(450, 650), 1.],[(650,-1),1.]]
 htreg = [(500,750),(750, 1000),(1000,1250),(1250,-1)]
 btreg = (0,0)
-#njreg = [(2,2),(3,3),(4,4),(5,5),(6,6),(7,7),(8,8),(9,9)]
-njreg = [(2,2),(3,3),(4,4),(5,5),(6,7),(8,-1)]
+njreg = [(2,2),(3,3),(4,5),(6,7),(8,-1)]#,(7,7),(8,8),(9,9)]
 nbjreg = [(0,0),(1,1),(2,2)]
 
 prefix = 'singleLeptonic_'
@@ -161,7 +160,7 @@ for name, c in [["TT", cTTJets] , ["W",cWJets] ]:
           h_2d[name][stb].SetBinContent(i_njb+1, i_htb+1, res) 
           h_2d[name][stb].SetBinError(i_njb+1, i_htb+1, resErr) 
       for i_nbjb, bjb in enumerate(nbjreg):
-        h_nbj[name][stb][htb][bjb] = ROOT.TH1F("rcs_nbj","rcs_nbj",len(njreg),0,len(njreg))
+        h_nbj[name][stb][htb][bjb] = ROOT.TH1F("rcs_nbj","",len(njreg),0,len(njreg))
         for i_njb, njb in enumerate(njreg):
           cname, cut = nameAndCut(stb,htb,njb, btb=bjb ,presel=presel)
           rcs = getRCS(c, cut, dPhiCut)
@@ -170,7 +169,7 @@ for name, c in [["TT", cTTJets] , ["W",cWJets] ]:
           resErrPred = rcs['rCSE_pred']
           resErr = rcs['rCSE_sim']
           #res, resErr = getRCS(c, cut,  dPhiCut)
-          h_nbj[name][stb][htb][bjb].GetXaxis().SetBinLabel(i_njb+1, varBinName(njb,"n_{jets}"))
+          h_nbj[name][stb][htb][bjb].GetXaxis().SetBinLabel(i_njb+1, nJetBinName(njb))
           if not math.isnan(res):
             h_nbj[name][stb][htb][bjb].SetBinContent(i_njb+1, res)
             h_nbj[name][stb][htb][bjb].SetBinError(i_njb+1, resErr) #maybe should be changed to predicted error (estimated error for poisson distributed values)
@@ -329,7 +328,7 @@ for name, c in [["TT", cTTJets] , ["W",cWJets] ]:
 #       h_nbj[name][stb][htb][nbb].GetYaxis().SetRangeUser(0, 0.1)
         h_nbj[name][stb][htb][nbb].SetLineColor(ROOT_colors[inbb])
         h_nbj[name][stb][htb][nbb].SetLineWidth(2)
-        l.AddEntry(h_nbj[name][stb][htb][nbb], varBinName(nbb, 'n_{b-jets}'))
+        l.AddEntry(h_nbj[name][stb][htb][nbb], nBTagBinName(nbb))
         text=ROOT.TLatex()
         text.SetNDC()
         text.SetTextSize(0.04)
