@@ -28,7 +28,7 @@ cTTJets = getChain(ttJets[lepSel],histname='',maxN=maxN)
 
 from localInfo import username
 uDir = username[0]+'/'+username
-subDir = 'PHYS14v3/rCS/singleLeptonic'
+subDir = 'PHYS14v3/withCSV/rCS/'
 
 path = '/afs/hephy.at/user/'+uDir+'/www/'+subDir+'/'
 if not os.path.exists(path):
@@ -54,10 +54,11 @@ ROOT.TH1F().SetDefaultSumw2()
 #    return rcs, rcsE 
 #    del h
 
-streg = [[(250, 350), 1.], [(350, 450), 1.], [(450, -1), 1.]]
+streg = [[(250, 350), 1.], [(350, 450), 1.], [(450, 650), 1.],[(650,-1),1.]]
 htreg = [(500,750),(750, 1000),(1000,1250),(1250,-1)]
 btreg = (0,0)
-njreg = [(2,2),(3,3),(4,4),(5,5),(6,6),(7,7),(8,8),(9,9)]
+#njreg = [(2,2),(3,3),(4,4),(5,5),(6,6),(7,7),(8,8),(9,9)]
+njreg = [(2,2),(3,3),(4,4),(5,5),(6,7),(8,-1)]
 nbjreg = [(0,0),(1,1),(2,2)]
 
 prefix = 'singleLeptonic_'
