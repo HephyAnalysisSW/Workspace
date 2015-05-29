@@ -160,14 +160,16 @@ def nJetBinName(njb):
     n+='#leq '+str(njb[1])
   return n
 def nBTagBinName(btb):
+  if len(btb)==2 and btb[0]==btb[1]:
+    return "n_{b-tag}="+str(btb[0])
   n=str(list(btb)[0])+"#leq n_{b-tag}"
   if len(btb)>1 and btb[1]>-1:
     n+='#leq '+str(btb[1])
   return n
 def varBinName(vb, var):
-  n=str(list(vb)[0])+"< "+var
+  n=str(list(vb)[0])+"#leq "+var
   if len(vb)>1 and vb[1]>0:
-    n+='#leq '+str(vb[1])
+    n+='< '+str(vb[1])
   return n
 
 def varBin(vb):
