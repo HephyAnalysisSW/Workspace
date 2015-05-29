@@ -5,8 +5,8 @@ import ROOT
 import pickle
 import array
 import numpy as n
-ROOT.gROOT.LoadMacro("/afs/hephy.at/scratch/e/easilar/CMSSW_7_2_3/src/Workspace/HEPHYPythonTools/scripts/root/tdrstyle.C")
-ROOT.setTDRStyle()
+#ROOT.gROOT.LoadMacro("/afs/hephy.at/scratch/e/easilar/CMSSW_7_2_3/src/Workspace/HEPHYPythonTools/scripts/root/tdrstyle.C")
+#ROOT.setTDRStyle()
 
 path = "/afs/hephy.at/user/e/easilar/www/PHYS14v3/limit_results/singleLeptonic/combined_bin/"
 #path = "/afs/hephy.at/user/e/easilar/www/PHYS14v3/limit_results/singleMuonic/combined_bin_JJ/"
