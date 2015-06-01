@@ -3,6 +3,7 @@
 #include <algorithm>
 #include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
 
+#include  <iostream>
 using namespace std;
 
 std::vector<std::string> &splitToVec(const std::string &s, char delim, std::vector<std::string> &elems) {
