@@ -31,6 +31,7 @@ if signal:
             #"SMS_T2tt_2J_mStop850_mLSP100",
             {'name':'T5q^{4} 1.2/1.0/0.8', 'sample':T5qqqqWW_mGo1200_mCh1000_mChi800[lepSel], 'weight':'weight', 'color':ROOT.kBlack},
             {'name':'T5q^{4} 1.5/0.8/0.1', 'sample':T5qqqqWW_mGo1500_mCh800_mChi100[lepSel],  'weight':'weight', 'color':ROOT.kMagenta},
+            #{'name':'T5q^{4} 1.0/0.8/0.7', 'sample':T5qqqqWW_mGo1000_mCh800_mChi700[lepSel],  'weight':'weight', 'color':ROOT.kYellow},
             #"T1ttbbWW_mGo1000_mCh725_mChi715",
             #"T1ttbbWW_mGo1000_mCh725_mChi720",
             #"T1ttbbWW_mGo1300_mCh300_mChi290",
@@ -126,7 +127,7 @@ for i_htb, htb in enumerate(htreg):
                     })
 
       bins[htb][stb][srNJet]=rd
-path = '/data/'+username+'/results2015/rCS_0b/'
+path = '/data/'+username+'/PHYS14v3/withCSV/rCS_0b/'
 if not os.path.exists(path):
   os.makedirs(path)
 pickle.dump(bins, file(path+prefix+'_estimationResults_pkl','w'))
