@@ -28,7 +28,7 @@ cTTJets = getChain(ttJets[lepSel],histname='',maxN=maxN)
 
 from localInfo import username
 uDir = username[0]+'/'+username
-subDir = 'PHYS14v3/rCS/singleLeptonic'
+subDir = 'PHYS14v3/withCSV/rCS/'
 
 path = '/afs/hephy.at/user/'+uDir+'/www/'+subDir+'/'
 if not os.path.exists(path):
@@ -54,7 +54,7 @@ ROOT.TH1F().SetDefaultSumw2()
 #    return rcs, rcsE 
 #    del h
 
-streg = [[(250, 350), 1.], [(350, 450), 1.], [(450, -1), 1.]]
+streg = [[(250, 350), 1.], [(350, 450), 1.],  [(450, -1), 1.] ]
 htreg = [(500,750),(750, 1000),(1000,1250),(1250,-1)]
 btreg = (0,0)
 njreg = [(2,2),(3,3),(4,5),(6,7),(8,-1)]#,(7,7),(8,8),(9,9)]
@@ -63,7 +63,7 @@ nbjreg = [(0,0),(1,1),(2,2)]
 prefix = 'singleLeptonic_'
 #presel="singleMuonic&&nVetoMuons==1&&nVetoElectrons==0&&nBJetMedium40==1"
 #presel="singleMuonic&&nVetoMuons==1&&nVetoElectrons==0&&nBJetMedium25==0"
-presel='singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[2]>80'
+presel='singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80'
 
 ##2D plots of yields
 #c1 = ROOT.TCanvas()
