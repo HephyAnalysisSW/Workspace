@@ -9,7 +9,7 @@ from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain
 from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,varBinName
 from rCShelpers import *
-from slidingDeltaPhi import *
+#from slidingDeltaPhi import *
 import math
 #from math import pi, sqrt
 
