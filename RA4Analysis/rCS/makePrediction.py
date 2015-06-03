@@ -57,8 +57,9 @@ presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoft
 
 btagString = 'nBJetMediumCSV30'
 
-deltaPhiCut = 1.0
-streg = [[(250, 350), deltaPhiCut], [(350, 450), deltaPhiCut], [(450, -1), deltaPhiCut]] 
+defDeltaPhiCut = 1.0
+#streg = [[(250, 350), deltaPhiCut], [(350, 450), deltaPhiCut], [(450, -1), deltaPhiCut]] 
+streg = [(250, 350), (350, 450), (450, -1)]
 htreg = [(500,750), (750,1000), (1000,1250), (1250,-1)]
 njreg = [(5,5),(6,7),(8,-1)]
 bjreg = (0,0)
@@ -67,17 +68,17 @@ bjreg = (0,0)
 small = False 
 #small = 0
 if small:
-  streg = [[(250,350),1.]]
+  streg = [(250,350)]
   htreg = [(500,750)]
   njreg = [(5,5),(6,-1)]
 
 bins = {}
 for i_htb, htb in enumerate(htreg):
   bins[htb] = {}
-  for stb, dPhiCut in streg:
+  for stb in streg:
     bins[htb][stb] = {}
     for srNJet in njreg:
-
+      deltaPhiCut = dynDeltaPhi(defDeltaPhiCut, stb)
       rd={}
       #join TT estimation results to dict
       makeTTPrediction(rd, samples, htb, stb, srNJet, presel, dPhiCut=deltaPhiCut, btagVarString = btagString)

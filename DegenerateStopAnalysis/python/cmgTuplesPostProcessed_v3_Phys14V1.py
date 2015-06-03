@@ -1,7 +1,7 @@
 import copy, os, sys
 
-dir1="/afs/hephy.at/work/n/nrad/data/postProcessed_v3_Phys14V1/"
-
+#dir1="/afs/hephy.at/work/n/nrad/data/postProcessed_v3_Phys14V1/"
+dir1="/data/nrad/cmgTuples/postProcessed_v1_Phys14V5/"
 
 def makeSample(sample):
   n = copy.deepcopy(sample)
