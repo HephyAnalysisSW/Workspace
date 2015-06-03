@@ -18,7 +18,7 @@ from rCShelpers import *
 binning=[30,0,1500]
 
 #prepresel = 'singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&nBJetMediumCSV30==0&&htJet30j>500&&st>200&&nJet30>=6&&Jet_pt[2]>80'
-prepresel = 'singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[2]>80'
+prepresel = 'singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80'
 
 lepGen = 'all'
 if lepGen == 'ele':
