@@ -29,6 +29,17 @@ def getFOM(Ysig ,Ysig_Err , Ybkg,  Ybkg_Err):
   else:
     return 'nan'
 
+def dynDeltaPhi(dPhi=1.0, stb='def', htb='def', njb='def', nbjb='def'):
+
+  #deltaPhis = {'stb':{'htb':{'njb':{'nbjb':1.0}}}, }
+  #deltaPhiD = {nan:{nan:{nan:1.0}}, (250,350):{nan:{nan:1.0}}, (350,450):{nan:{nan:0.75}}, (450,-1):{nan:{nan:0.5}}}
+
+  deltaPhi = {}#(250,350):1.2, (350,450):0.9, (450,-1):0.8, (450,600):0.7, (600,-1):0.6}
+  if stb in deltaPhi: dPhi = deltaPhi[stb]
+  else: print 'Using default deltaPhi value:',dPhi
+
+  return dPhi
+
 
 #don't use k_factor calculation right now it has to be optimized
 #def getTTcorr(stb,htb,filename='hardSingleLeptonic_TTfitnjet_', dir='/afs/hephy.at/user/d/dhandl/www/pngCMG2/rCS/'):

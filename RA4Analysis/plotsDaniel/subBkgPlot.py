@@ -10,14 +10,14 @@ from array import array
 
 from Workspace.HEPHYPythonTools.helpers import getVarValue, getChain, deltaPhi
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v1_Phys14V3_HT400ST200 import *
-from Workspace.RA4Analysis.cmgTuplesPostProcessed_v3_Phys14V3_HT400ST200 import *
+from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2_HT400ST150_withDF import *
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2 import *
 from Workspace.RA4Analysis.helpers import *
 
 #ROOT.TH1F().SetDefaultSumw2()
 
-bVar = 'nBJetMediumCMVA30'
+bVar = 'nBJetMediumCSV30'
 
 deltaPhiCut=1.
 varstring='deltaPhi_Wl'
@@ -33,17 +33,17 @@ htReg=[(500,-1)]#,(750,1000),(500,-1)]#,(750,-1)]#,(750,1000),(1000,1250),(1250,
 
 colorList=[ROOT.kBlack, ROOT.kMagenta+2, ROOT.kOrange+2,ROOT.kMagenta+2]
 
-startpath = '/afs/hephy.at/user/d/dspitzbart/www/subBkgWhard/'
+startpath = '/afs/hephy.at/user/d/dspitzbart/www/subBkgTThard/'
 
 
 #Load the Background Chain
-#c = getChain(ttJets[lepSel],histname='')
-c = getChain(WJetsHTToLNu[lepSel],histname='')
+c = getChain(ttJets[lepSel],histname='')
+#c = getChain(WJetsHTToLNu[lepSel],histname='')
 
 #Sub Background Definitions
-ngNuEFromW = "Sum$(abs(genPart_pdgId)==12&&abs(genPart_motherId)==24)"
-ngNuMuFromW = "Sum$(abs(genPart_pdgId)==14&&abs(genPart_motherId)==24)"
-ngNuTauFromW = "Sum$(abs(genPart_pdgId)==16&&abs(genPart_motherId)==24)"
+ngNuEFromW = "Sum$(abs(GenPart_pdgId)==12&&abs(GenPart_motherId)==24)"
+ngNuMuFromW = "Sum$(abs(GenPart_pdgId)==14&&abs(GenPart_motherId)==24)"
+ngNuTauFromW = "Sum$(abs(GenPart_pdgId)==16&&abs(GenPart_motherId)==24)"
 lTau_H  = ngNuEFromW+"+"+ngNuMuFromW+"==0&&"+ngNuTauFromW+"==1&&Sum$(genTau_nNuE+genTau_nNuMu==1&&genTau_nNuTau==1)==1"
 lTau_l  = ngNuEFromW+"+"+ngNuMuFromW+"==1&&"+ngNuTauFromW+"==1&&Sum$(genTau_nNuE+genTau_nNuMu==1&&genTau_nNuTau==1)==1"
 hTau_H  = ngNuEFromW+"+"+ngNuMuFromW+"==0&&"+ngNuTauFromW+"==1&&Sum$(genTau_nNuE+genTau_nNuMu==0&&genTau_nNuTau==1)==1"
@@ -203,7 +203,7 @@ for hReg in htReg:
       totalL.SetBorderSize(1)
 
       #Get yields for norm & rcs
-      for i, [subcut,name,col,subname,texString] in enumerate(subBkgW):
+      for i, [subcut,name,col,subname,texString] in enumerate(subBkgTT):
         print 'Processing ' + subname        
         subYields=[]
         histo = 'h'+str(i)
