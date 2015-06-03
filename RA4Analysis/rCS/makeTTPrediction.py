@@ -18,8 +18,8 @@ from math import pi, sqrt
 
 ROOT.TH1F().SetDefaultSumw2()
 
-weight_str = 'weight_Up'
-weight_err_str = 'weight_Up*weight_Up'
+weight_str = 'weight'
+weight_err_str = 'weight*weight'
 
 #prefix = 'singleLeptonic_20150220'
 #presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0"

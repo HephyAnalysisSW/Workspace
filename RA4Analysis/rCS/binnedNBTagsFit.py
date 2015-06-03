@@ -8,13 +8,13 @@ from localInfo import username
 from math import pi, sqrt
 
 
-def binnedNBTagsFit(cut, samples, nBTagVar = 'nBJetMediumCSV30', prefix="", printDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/PHYS14v3/withCSV/templateFit_ttJets_unc/'):
+def binnedNBTagsFit(cut, samples, nBTagVar = 'nBJetMediumCSV30', prefix="", printDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/PHYS14v3/withCSV/templateFit/'):
   if not os.path.exists(printDir):
      os.makedirs(printDir) 
 
-  weight_str = 'weight_Up'
-  weight_err_str = 'weight_Up*weight_Up'
-   
+  weight_str = 'weight'
+  weight_err_str = 'weight*weight' 
+ 
   cWJets = samples['W']
   cTTJets = samples['TT']
   cRest = samples['Rest']
@@ -164,14 +164,14 @@ def binnedNBTagsFit(cut, samples, nBTagVar = 'nBJetMediumCSV30', prefix="", prin
   ROOT.gROOT.SetStyle("Plain")#Removesgraybackgroundfromplots
   ROOT.gPad.SetLeftMargin(0.15)
   fitFrame_PosPdg.GetYaxis().SetTitleOffset(1.4)
-  fitFrame_PosPdg.GetXaxis().SetTitle('nBJetMediumCSV30')
+  fitFrame_PosPdg.GetXaxis().SetTitle(nBTagVar)
   fitFrame_PosPdg.Draw()
 
   c1.cd(2)
   ROOT.gROOT.SetStyle("Plain")#Removesgraybackgroundfromplots
   ROOT.gPad.SetLeftMargin(0.15)
   fitFrame_NegPdg.GetYaxis().SetTitleOffset(1.4)
-  fitFrame_NegPdg.GetXaxis().SetTitle('nBJetMediumCSV30')
+  fitFrame_NegPdg.GetXaxis().SetTitle(nBTagVar)
   fitFrame_NegPdg.Draw()
 
   c1.Print(printDir+'/'+prefix+'_nBTagFitRes.png')

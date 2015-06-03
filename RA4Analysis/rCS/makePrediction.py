@@ -19,9 +19,11 @@ cTTJets = getChain(ttJets[lepSel],histname='')
 cRest = getChain([DY[lepSel], singleTop[lepSel], TTVH[lepSel]],histname='')#no QCD 
 cBkg = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]],histname='')#no QCD
 
-#weight_str = 'weight'
-weight_str = 'weight_Up'
-weight_err_str = 'weight_Up*weight_Up'
+weight_str = 'weight'
+weight_err_str = 'weight*weight'
+
+#weight_str = 'weight_Up'
+#weight_err_str = 'weight_Up*weight_Up'
 
 samples={'W':cWJets, 'TT':cTTJets, 'Rest':cRest, 'Bkg':cBkg}
 
@@ -135,6 +137,6 @@ for i_htb, htb in enumerate(htreg):
 path = '/data/'+username+'/PHYS14v3/withCSV/rCS_0b/'
 if not os.path.exists(path):
   os.makedirs(path)
-pickle.dump(bins, file(path+prefix+'_estimationResults_ttJet_unc_pkl','w'))
+pickle.dump(bins, file(path+prefix+'_estimationResults_pkl','w'))
 
 
