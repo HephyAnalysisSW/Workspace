@@ -7,11 +7,14 @@ from math import sqrt, pi
 from localInfo import username
 
 prefix = 'singleLeptonic_Phys14V3'
-res = pickle.load(file('/data/'+username+'/results2015/rCS_0b/'+prefix+'_estimationResults_pkl'))
+#res = pickle.load(file('/data/'+username+'/results2015/rCS_0b/'+prefix+'_estimationResults_pkl'))
+res = pickle.load(file('/data/'+username+'/PHYS14v3/withCSV/rCS_0b/'+prefix+'_estimationResults_ttJet_unc_pkl'))
 
 streg = [[(250, 350), 1.], [(350, 450), 1.], [(450,-1), 1.]]
 htreg = [(500,750),(750,1000),(1000,1250),(1250,-1)]
 njreg = [(5,5),(6,7),(8,-1)]
+
+
 nSTbins = len(streg)
 nJetBins = len(njreg)
 
@@ -44,6 +47,9 @@ for i_htb, htb in enumerate(htreg):
       if stb[1] == -1 : print '\\cline{2-21}'
   #print '\\hline'
 print '\\hline\end{tabular}}\end{center}\caption{ABCD}\label{tab:0b_rcscorr_Wbkg}\end{table}'
+
+
+
 
 print
 print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrr|rrr|rrr|rrr|rrr|}\\hline'

@@ -8,7 +8,8 @@ from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,v
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2_HT400ST150_withDF import *
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2_HT400_withDF import *
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v1_Phys14V3_HT400ST200 import *
-from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
+#from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
+from Workspace.RA4Analysis.cmgTuplesPostProcessed_v9_Phys14V3_HT400ST200_ForTTJetsUnc import *
 from localInfo import username
 
 #from binnedNBTagsFit import binnedNBTagsFit
@@ -26,10 +27,10 @@ njetCut = [6,20]
 nbtagCut = 0
 mt2Cut = 0
 jetPtCut = 80
-dfCut =1
+dfCut =0
 
-#prepresel = 'singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&'
-prepresel = 'singleMuonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&'
+prepresel = 'singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&'
+#prepresel = 'singleMuonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&'
 #presel = prepresel+'mt2w>'+str(mt2Cut)+'&&deltaPhi_Wl>'+str(dfCut)+'&&htJet30j>='+str(htCut[0])+'&&htJet30j<'+str(htCut[1])+'&&st>='+str(stCut[0])+'&&st<'+str(stCut[1])+'&&nJet30>='+str(njetCut[0])+'&&nJet30<'+str(njetCut[1])+'&&nBJetMediumCMVA30=='+str(nbtagCut)
 #presel = prepresel+'deltaPhi_Wl>'+str(dfCut)+'&&Jet_pt[1]>='+str(jetPtCut)+'&&htJet30j>='+str(htCut[0])+'&&htJet30j<'+str(htCut[1])+'&&met>='+str(stCut[0])+'&&met<'+str(stCut[1])+'&&nJet30>='+str(njetCut[0])+'&&nJet30<'+str(njetCut[1])+'&&nBJetMediumCMVA30>='+str(nbtagCut)
 #prepresel = ""
@@ -65,15 +66,15 @@ signal_samples = [
 
 plots = [
 #{'xaxis':'M_{T2W}','logy':'True' ,'var':'mt2w',                       'varname':'mt2w',                   'bin':30,       'lowlimit':50, 'limit':500},\
-#{'xaxis':'S_{T}','logy':'True' , 'var':'st',                          'varname':'st',                     'bin':30,       'lowlimit':0,  'limit':1400},\
-#{'xaxis':'H_{T}','logy':'True' , 'var':'htJet30j',                    'varname':'htJet30j',               'bin':30,       'lowlimit':0,  'limit':2000},\
-#{'xaxis':'N_{Jets}','logy':'True' , 'var':'nJet30',                      'varname':'nJet30',                 'bin':15,       'lowlimit':0,  'limit':15},\
+{'xaxis':'S_{T}','logy':'True' , 'var':'st',                          'varname':'st',                     'bin':30,       'lowlimit':0,  'limit':1400},\
+{'xaxis':'H_{T}','logy':'True' , 'var':'htJet30j',                    'varname':'htJet30j',               'bin':30,       'lowlimit':0,  'limit':2000},\
+{'xaxis':'N_{Jets}','logy':'True' , 'var':'nJet30',                      'varname':'nJet30',                 'bin':15,       'lowlimit':0,  'limit':15},\
 #{'xaxis':'N_{bJetsCMVA}','logy':'True' , 'var':'nBJetMediumCMVA30',           'varname':'nBJetMediumCMVA30',      'bin':15,       'lowlimit':0,  'limit':15},\
-#{'xaxis':'N_{bJetsCSV}','logy':'True' , 'var':'nBJetMediumCSV30',           'varname':'nBJetMediumCSV30',      'bin':15,       'lowlimit':0,  'limit':15},\
+{'xaxis':'N_{bJetsCSV}','logy':'True' , 'var':'nBJetMediumCSV30',           'varname':'nBJetMediumCSV30',      'bin':15,       'lowlimit':0,  'limit':15},\
 #{'xaxis':'N_{tau}','logy':'True' , 'var':'nTauGood',                    'varname':'nTau',                   'bin':5,       'lowlimit':0,  'limit':5},\
 {'xaxis':'#Delta#Phi','logy':'True' , 'var':'deltaPhi_Wl',                 'varname':'deltaPhi_Wl',            'bin':30,       'lowlimit':0,  'limit':pi},\
 #{'xaxis':'MET','logy':'True' , 'var':'met',                         'varname':'met',                    'bin':30,       'lowlimit':0,  'limit':1400},\
-#{'xaxis':'leading Lepton #P_{T}','logy':'True' , 'var':'leptonPt[0]',                 'varname':'leptonPt[0]',            'bin':100,       'lowlimit':0,  'limit':1000},\
+{'xaxis':'leading Lepton #P_{T}','logy':'True' , 'var':'leptonPt[0]',                 'varname':'leptonPt[0]',            'bin':100,       'lowlimit':0,  'limit':1000},\
 ##{'xaxis':'','logy':'True' , 'var':'Jet_pt[0]+Jet_pt[1]',         'varname':'Jet_pt[0]+Jet_pt[1]',    'bin':30,       'lowlimit':0,  'limit':2000},\
 ##{'xaxis':'','logy':'True' , 'var':'Jet_eta[0]*Jet_eta[1]',       'varname':'Jet_eta[0]*Jet_eta[1]',  'bin':30,       'lowlimit':-8,  'limit':8},\
 #{'xaxis':'nFatJet','logy':'True' , 'var':'nFatJet',                    'varname':'nFatJets',                   'bin':20,       'lowlimit':0,  'limit':20},\

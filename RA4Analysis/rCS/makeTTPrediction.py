@@ -18,6 +18,9 @@ from math import pi, sqrt
 
 ROOT.TH1F().SetDefaultSumw2()
 
+weight_str = 'weight_Up'
+weight_err_str = 'weight_Up*weight_Up'
+
 #prefix = 'singleLeptonic_20150220'
 #presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0"
 
@@ -68,8 +71,8 @@ def makeTTPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, btagV
   rd['rCS_srNJet_0b_onlyTT'] = rCS_srNJet_0b_onlyTT
 
   #true yields measured from MC samples
-  truth_TT        = getYieldFromChain(cTTJets, rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight")
-  truth_TT_var    = getYieldFromChain(cTTJets, rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight*weight")
+  truth_TT        = getYieldFromChain(cTTJets, rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = weight_str)
+  truth_TT_var    = getYieldFromChain(cTTJets, rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = weight_err_str)
 
   #predicted yields with RCS method
   ttJetsCRForRCS = rCS_crLowNJet_1b #New version, orthogonal to DPhi (lower njet region in 1b-tag bin)
