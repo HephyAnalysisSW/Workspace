@@ -48,7 +48,7 @@ if signal:
 ROOT.TH1F().SetDefaultSumw2()
 
 prefix = 'singleLeptonic_Phys14V3'
-presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[2]>80"
+presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80"
 
 btagString = 'nBJetMediumCSV30'
 
