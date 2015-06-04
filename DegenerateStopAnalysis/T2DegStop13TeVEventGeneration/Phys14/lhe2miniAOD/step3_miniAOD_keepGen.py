@@ -26,22 +26,9 @@ process.maxEvents = cms.untracked.PSet(
 process.source = cms.Source("PoolSource",
     secondaryFileNames = cms.untracked.vstring(),
     fileNames = cms.untracked.vstring('root://hephyse.oeaw.ac.at//store/user/nrad/T2DegStop2j_300_270_GENSIM/T2DegStop2j_300_270_GEN-SIM-RECO/33baaded7bf7310fcb763c45acba9836/T2DegStop2j_300_270_RECO_100_1_rxI.root'),
-    #inputCommands = cms.untracked.vstring('keep *', 
-    #    #'keep *_genParticles_*_*', 
-    #    #'drop *_genParticlesForJets_*_*', 
-    #    #'drop *_kt4GenJets_*_*',
-    #    #'drop *_kt6GenJets_*_*',
-    #    #'drop *_iterativeCone5GenJets_*_*',
-    #    #'drop *_ak4GenJets_*_*',
-    #    #'drop *_ak5GenJets_*_*',
-    #    #'drop *_ak7GenJets_*_*',
-    #    #'drop *_genCandidatesForMET_*_*',
-    #    #'drop *_genParticlesForMETAllVisible_*_*',
-    #    #'drop *_genMetCalo_*_*',
-    #    #'drop *_genMetCaloAndNonPrompt_*_*',
-    #    #'drop *_genMetTrue_*_*',
-    #    #'drop *_genMetIC5GenJs_*_*'
-    #      ),
+    inputCommands = cms.untracked.vstring('keep *', 
+         'keep *_genParticles_*_*', 
+          ),
     #dropDescendantsOfDroppedBranches = cms.untracked.bool(False) 
 )
 
