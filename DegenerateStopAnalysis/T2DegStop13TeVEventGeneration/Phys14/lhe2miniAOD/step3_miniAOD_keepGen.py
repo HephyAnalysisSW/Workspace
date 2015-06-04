@@ -60,7 +60,6 @@ process.MINIAODSIMoutput = cms.OutputModule("PoolOutputModule",
     ##dropDescendantsOfDroppedBranches = cms.untracked.bool(False) 
 )
 process.MINIAODSIMoutput.outputCommands += cms.untracked.vstring("keep *_genParticles_*_*")
-#process.Mini
 
 
 # Additional output definition
