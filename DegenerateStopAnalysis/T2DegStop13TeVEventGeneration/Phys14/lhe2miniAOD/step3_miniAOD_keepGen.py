@@ -26,10 +26,6 @@ process.maxEvents = cms.untracked.PSet(
 process.source = cms.Source("PoolSource",
     secondaryFileNames = cms.untracked.vstring(),
     fileNames = cms.untracked.vstring('root://hephyse.oeaw.ac.at//store/user/nrad/T2DegStop2j_300_270_GENSIM/T2DegStop2j_300_270_GEN-SIM-RECO/33baaded7bf7310fcb763c45acba9836/T2DegStop2j_300_270_RECO_100_1_rxI.root'),
-    inputCommands = cms.untracked.vstring('keep *', 
-         'keep *_genParticles_*_*', 
-          ),
-    #dropDescendantsOfDroppedBranches = cms.untracked.bool(False) 
 )
 
 process.options = cms.untracked.PSet(
@@ -49,16 +45,23 @@ process.MINIAODSIMoutput = cms.OutputModule("PoolOutputModule",
     compressionLevel = cms.untracked.int32(4),
     compressionAlgorithm = cms.untracked.string('LZMA'),
     eventAutoFlushCompressedSize = cms.untracked.int32(15728640),
-    outputCommands = process.MINIAODSIMEventContent.outputCommands,
-    fileName = cms.untracked.string('file:T2DegStop2j_300_270_miniAOD_nokeep.root'),
+    outputCommands = process.MINIAODSIMEventContent.outputCommands, 
+    fileName = cms.untracked.string('file:T2DegStop2j_300_270_miniAOD_keepGen.root'),
     dataset = cms.untracked.PSet(
         filterName = cms.untracked.string(''),
         dataTier = cms.untracked.string('MINIAODSIM')
     ),
     dropMetaData = cms.untracked.string('ALL'),
     fastCloning = cms.untracked.bool(False),
-    overrideInputFileSplitLevels = cms.untracked.bool(True)
+    overrideInputFileSplitLevels = cms.untracked.bool(True),
+    #outputCommands += cms.untracked.vstring( 
+    #     'keep *_genParticles_*_*', 
+    #      ),
+    ##dropDescendantsOfDroppedBranches = cms.untracked.bool(False) 
 )
+process.MINIAODSIMoutput.outputCommands += cms.untracked.vstring("keep *_genParticles_*_*")
+#process.Mini
+
 
 # Additional output definition
 
