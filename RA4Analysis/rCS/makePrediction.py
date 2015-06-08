@@ -10,6 +10,7 @@ from localInfo import username
 from binnedNBTagsFit import binnedNBTagsFit
 from rCShelpers import * 
 from math import pi, sqrt
+from Workspace.RA4Analysis.signalRegions import *
 
 lepSel = 'hard'
  
@@ -52,6 +53,8 @@ presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoft
 
 btagString = 'nBJetMediumCSV30'
 
+signalRegions = signalRegion2fb
+
 defDeltaPhiCut = 1.0
 #streg = [[(250, 350), deltaPhiCut], [(350, 450), deltaPhiCut], [(450, -1), deltaPhiCut]] 
 streg = [(250, 350), (350, 450), (450, -1)]
@@ -68,11 +71,17 @@ if small:
   njreg = [(5,5),(6,-1)]
 
 bins = {}
-for i_htb, htb in enumerate(htreg):
-  bins[htb] = {}
-  for stb in streg:
-    bins[htb][stb] = {}
-    for srNJet in njreg:
+
+for srNJet in signalRegions:
+  bins[srNJet] = {}
+  for stb in signalRegions[srNJet]:
+    bins[srNJet][stb] ={}
+    for htb in signalRegions[srNJet][stb]:
+#for i_htb, htb in enumerate(htreg):
+#  bins[htb] = {}
+#  for stb in streg:
+#    bins[htb][stb] = {}
+#    for srNJet in njreg:
       deltaPhiCut = dynDeltaPhi(defDeltaPhiCut, stb)
       rd={}
       #join TT estimation results to dict
@@ -127,8 +136,9 @@ for i_htb, htb in enumerate(htreg):
                       s['name']+'_FOM_PosPdg':s['FOM_PosPdg'],\
                     })
 
-      bins[htb][stb][srNJet]=rd
-path = '/data/'+username+'/PHYS14v3/withCSV/rCS_0b/'
+      #bins[htb][stb][srNJet]=rd
+      bins[srNJet][stb][htb] = rd
+path = '/data/'+username+'/PHYS14v3/withCSV/rCS_0b_2fb/'
 if not os.path.exists(path):
   os.makedirs(path)
 pickle.dump(bins, file(path+prefix+'_estimationResults_pkl','w'))
