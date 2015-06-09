@@ -10,6 +10,8 @@ from Workspace.RA4Analysis.signalRegions import *
 prefix = 'singleLeptonic_Phys14V3'
 res = pickle.load(file('/data/'+username+'/PHYS14v3/withCSV/rCS_0b_2fb/'+prefix+'_estimationResults_pkl'))
 
+signalRegions = signalRegion2fb
+
 #streg = [[(250, 350), 1.], [(350, 450), 1.], [(450,-1), 1.]]
 #htreg = [(500,750),(750,1000),(1000,1250),(1250,-1)]
 #njreg = [(5,5),(6,7),(8,-1)]
@@ -24,14 +26,14 @@ res = pickle.load(file('/data/'+username+'/PHYS14v3/withCSV/rCS_0b_2fb/'+prefix+
 
 rowsNJet = {}
 rowsSt = {}
-for srNJet in sorted(signalRegion2fb):
+for srNJet in sorted(signalRegions):
   rowsNJet[srNJet] = {}
   rowsSt[srNJet] = {}
   rows = 0
-  for stb in sorted(signalRegion2fb[srNJet]):
-    rows += len(signalRegion2fb[srNJet][stb])
-    rowsSt[srNJet][stb] = {'n':len(signalRegion2fb[srNJet][stb])}
-  rowsNJet[srNJet] = {'nST':len(signalRegion2fb[srNJet]), 'n':rows}
+  for stb in sorted(signalRegions[srNJet]):
+    rows += len(signalRegions[srNJet][stb])
+    rowsSt[srNJet][stb] = {'n':len(signalRegions[srNJet][stb])}
+  rowsNJet[srNJet] = {'nST':len(signalRegions[srNJet]), 'n':rows}
 
 print "Results"
 print
@@ -40,15 +42,15 @@ print ' \\njet     & \ST & \HT     &\multicolumn{6}{c|}{$tt+$Jets}&\multicolumn{
 print ' & $[$GeV$]$ &$[$GeV$]$&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation} \\\\\hline'
 
 secondLine = False
-for srNJet in sorted(signalRegion2fb):
+for srNJet in sorted(signalRegions):
   print '\\hline'
   if secondLine: print '\\hline'
   secondLine = True
   print '\multirow{'+str(rowsNJet[srNJet]['n'])+'}{*}{\\begin{sideways}$'+varBin(srNJet)+'$\end{sideways}}'
-  for stb in sorted(signalRegion2fb[srNJet]):
+  for stb in sorted(signalRegions[srNJet]):
     print '&\multirow{'+str(rowsSt[srNJet][stb]['n'])+'}{*}{$'+varBin(stb)+'$}'
     first = True
-    for htb in sorted(signalRegion2fb[srNJet][stb]):
+    for htb in sorted(signalRegions[srNJet][stb]):
       if not first: print '&'
       first = False
       print '&$'+varBin(htb)+'$' 
