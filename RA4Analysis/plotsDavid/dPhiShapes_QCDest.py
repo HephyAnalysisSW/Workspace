@@ -15,20 +15,21 @@ from LpTemplateFit import LpTemplateFit
 
 preprefix = 'QCDestimation'
 wwwDir = '/afs/hephy.at/user/d/dhandl/www/pngCMG2/hard/Phys14V3/'+preprefix+'/'
-presel = 'Lp_singleElectronic_'
+presel = 'dPhi_singleElectronic_'
 
 if not os.path.exists(wwwDir):
   os.makedirs(wwwDir)
 
-htreg = [(500,-1)]#, (500,750), (750,1000)]
-streg = [(200,-1)]#,(250,350), (350,450), (450,-1)]
-njreg = [(4,-1)]#, (2,4), (5,5), (6,7), (8,-1)]
+htreg = [(500,750)]#, (750,1000)]
+streg = [(250,350)]#, (350,450), (450,-1)]
+njreg = [(6,7)]#, (8,-1)]
 btreg = [(0,0)]
+dPhiBinning = [0,0.5,1.0,1.5,2.0,2.5,3.0,pi]
 
 #small = True
 small = False
-doFit = True
-#doFit = False
+#doFit = True
+doFit = False
 
 eleVarList = ['pt', 'eta', 'phi', 'pdgId', 'miniRelIso', 'convVeto', 'sip3d', 'mvaIdPhys14', 'charge']
 eleFromW = ['pt', 'eta', 'phi', 'pdgId', 'motherId', 'grandmotherId', 'charge', 'sourceId']
@@ -59,13 +60,12 @@ def sel(e):
     return (e['pt']>=25 and abs(e['pdgId'])==11 and e['miniRelIso']<0.1 and e['convVeto']==1 and e['sip3d']<4.0 and e['mvaIdPhys14']>=0.05)
   return False
 
-def getLp(met,metPhi,e):
+def getDPhi(met,metPhi,e):
 #  met = c.GetLeaf('met_pt').GetValue()
 #  metPhi = c.GetLeaf('met_phi').GetValue()
   
-  Lp = e['pt']/sqrt( (e['pt']*cos(e['phi']) + met*cos(metPhi))**2 + (e['pt']*sin(e['phi']) + met*sin(metPhi))**2 )\
-       * (e['pt']+met*cos(e['phi']-metPhi))/sqrt(e['pt']**2+met**2+2*met*e['pt']*cos(e['phi']-metPhi))
-  return Lp
+  dPhi = acos((e['pt']+met*cos(e['phi']-metPhi))/sqrt(e['pt']**2+met**2+2*met*e['pt']*cos(e['phi']-metPhi)))
+  return dPhi
 
 Bkg = [#{'name':'QCD_HT_100To250_PU20bx25', 'sample':QCD_HT_100To250_PU20bx25, 'legendName':'QCD HT100-250', 'color':ROOT.kCyan+3},
        {'name':'QCD_HT_250To500_PU20bx25', 'sample':QCD_HT_250To500_PU20bx25, 'legendName':'QCD HT250-500', 'color':ROOT.kCyan, 'merge':'QCD'},
@@ -118,16 +118,16 @@ for htb in htreg:
 
         histos['merged_QCD']={}
         histos['merged_EWK']={}
-        histos['merged_QCD']['antiSelection']=ROOT.TH1F('merged_QCD_antiSelection','merged_QCD_antiSelection',12,-0.7,1.7)
-        histos['merged_QCD']['Selection']=ROOT.TH1F('merged_QCD_Selection','merged_QCD_Selection',12,-0.7,1.7)
-        histos['merged_EWK']['antiSelection']=ROOT.TH1F('merged_EWK_antiSelection','merged_EWK_antiSelection',12,-0.7,1.7)
-        histos['merged_EWK']['Selection']=ROOT.TH1F('merged_EWK_Selection','merged_EWK_Selection',12,-0.7,1.7)
+        histos['merged_QCD']['antiSelection']=ROOT.TH1F('merged_QCD_antiSelection','merged_QCD_antiSelection',len(dPhiBinning)-1, array('d', dPhiBinning))
+        histos['merged_QCD']['Selection']=ROOT.TH1F('merged_QCD_Selection','merged_QCD_Selection',len(dPhiBinning)-1, array('d', dPhiBinning))
+        histos['merged_EWK']['antiSelection']=ROOT.TH1F('merged_EWK_antiSelection','merged_EWK_antiSelection',len(dPhiBinning)-1, array('d', dPhiBinning))
+        histos['merged_EWK']['Selection']=ROOT.TH1F('merged_EWK_Selection','merged_EWK_Selection',len(dPhiBinning)-1, array('d', dPhiBinning))
         
         
         for sample in Bkg:
           histos[sample['name']] = {}
-          histos[sample['name']]['antiSelection'] = ROOT.TH1F(sample['name']+'_antiSelection', sample['name']+'_antiSelection',12,-0.7,1.7)
-          histos[sample['name']]['Selection'] = ROOT.TH1F(sample['name']+'_Selection', sample['name']+'_Selection',12,-0.7,1.7)
+          histos[sample['name']]['antiSelection'] = ROOT.TH1F(sample['name']+'_antiSelection', sample['name']+'_antiSelection',len(dPhiBinning)-1, array('d', dPhiBinning))
+          histos[sample['name']]['Selection'] = ROOT.TH1F(sample['name']+'_Selection', sample['name']+'_Selection',len(dPhiBinning)-1, array('d', dPhiBinning))
         
           #Get the event list 'eList' which has all the events satisfying the cut
           sample["chain"].Draw(">>eList",cut)
@@ -194,24 +194,24 @@ for htb in htreg:
 #                  for gen in genEle:
 #                    if getMatch(gen,reco):
 #                      if reco["antiSel"]:
-#                        antiVal = getLp(met,metPhi,reco) 
+#                        antiVal = getDPhi(met,metPhi,reco) 
 #                        histos[sample['name']]['antiSelection'].Fill(antiVal,sample['weight'])
 #                      if sel(reco):
-#                        selVal = getLp(met,metPhi,reco)
+#                        selVal = getDPhi(met,metPhi,reco)
 #                        histos[sample['name']]['Selection'].Fill(selVal,sample['weight'])
 #                    hasMatch=True
 #        #          if not hasMatch:
 #        #            if antiSel(reco):
-#        #              antiVal = getLp(sample['chain'],reco)
+#        #              antiVal = getDPhi(sample['chain'],reco)
 #        #              histos[sample['name']]['antiSelection'].Fill(antiVal,sample['weight'])
 #        #            elif Sel(reco):
-#        #              selVal = getLp(sample['chain'],reco)
+#        #              selVal = getDPhi(sample['chain'],reco)
 #        #              histos[sample['name']]['Selection'].Fill(selVal,sample['weight'])  
 #        
 #            else:
         #      print len(eles)
 #            for reco in eles:
-            lp = getLp(met,metPhi,recoEle)
+            lp = getDPhi(met,metPhi,recoEle)
             if isSelected:
               histos[sample['name']]['Selection'].Fill(lp,sample['weight'])
             else: 
@@ -220,7 +220,7 @@ for htb in htreg:
           del elist 
         
         canv = ROOT.TCanvas('canv','canv',600,600)
-        #canv.SetLogy()
+        canv.SetLogy()
         l = ROOT.TLegend(0.65,0.75,0.95,0.95)
         l.SetFillColor(0)
         l.SetBorderSize(1)
@@ -239,11 +239,11 @@ for htb in htreg:
           histos[sample['name']]['antiSelection'].SetLineStyle(ROOT.kDashed)
           histos[sample['name']]['antiSelection'].SetLineWidth(2)
           histos[sample['name']]['antiSelection'].GetYaxis().SetTitle('# of Events')
-          histos[sample['name']]['antiSelection'].GetXaxis().SetTitle('L_{p}')
+          histos[sample['name']]['antiSelection'].GetXaxis().SetTitle('#Delta#Phi(W,l)')
           histos[sample['name']]['Selection'].SetLineColor(sample['color'])
           histos[sample['name']]['Selection'].SetLineWidth(2)
           histos[sample['name']]['Selection'].GetYaxis().SetTitle('# of Events')
-          histos[sample['name']]['Selection'].GetXaxis().SetTitle('L_{P}')
+          histos[sample['name']]['Selection'].GetXaxis().SetTitle('#Delta#Phi(W,l)')
           l.AddEntry(histos[sample['name']]['antiSelection'], sample['legendName']+' anti-selected')
           l.AddEntry(histos[sample['name']]['Selection'], sample['legendName']+' selected')
         
@@ -270,9 +270,9 @@ for htb in htreg:
         
         for sample in Bkg:
           histos[sample['name']]['antiSelection'].SetMaximum(1.5*antiMax)
-          histos[sample['name']]['antiSelection'].SetMinimum(0)
+          histos[sample['name']]['antiSelection'].SetMinimum(0.01)
           histos[sample['name']]['Selection'].SetMaximum(1.5*selMax)
-          histos[sample['name']]['Selection'].SetMinimum(0)
+          histos[sample['name']]['Selection'].SetMinimum(0.01)
         
         l.Draw() 
         text.DrawLatex(0.15,.96,"CMS Simulation")
@@ -284,7 +284,7 @@ for htb in htreg:
         canv.Print(wwwDir+presel+SRname+'_subBkg.pdf')
         
         mergeCanv = ROOT.TCanvas('merged Canv','merged Canv',600,600)
-        #mergeCanv.SetLogy()
+        mergeCanv.SetLogy()
         leg = ROOT.TLegend(0.65,0.75,0.95,0.95)
         leg.SetFillColor(0)
         leg.SetBorderSize(1)
@@ -293,7 +293,7 @@ for htb in htreg:
         for hist in [histos['merged_QCD']['antiSelection'],histos['merged_QCD']['Selection'],histos['merged_EWK']['antiSelection'],histos['merged_EWK']['Selection']]:
           hist.SetStats(0)
           hist.GetYaxis().SetTitle('# of Events')
-          hist.GetXaxis().SetTitle('L_{p}')
+          hist.GetXaxis().SetTitle('#Delta#Phi(W,l)')
           hist.SetLineWidth(2)
        
         NdataSel =  histos['merged_QCD']['Selection'].Integral() +  histos['merged_EWK']['Selection'].Integral() 
@@ -301,36 +301,40 @@ for htb in htreg:
         bins[htb][stb][srNJet][btb] = {'NdataSel':NdataSel, 'NdataAntiSel':NdataAntiSel}
   
         #do the template fit:
-        if doFit:
-          LpTemplates = {'EWKantiSel':histos['merged_EWK']['antiSelection'], 'EWKsel':histos['merged_EWK']['Selection'], 'QCDantiSel':histos['merged_QCD']['antiSelection'], 'QCDsel':histos['merged_QCD']['Selection']}
-          fit_QCD = LpTemplateFit(LpTemplates, prefix=presel+SRname, printDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/pngCMG2/templateFit_Phys14V3/QCDestimation')
-          bins[htb][stb][srNJet][btb].update(fit_QCD)
+#        if doFit:
+#          LpTemplates = {'EWKantiSel':histos['merged_EWK']['antiSelection'], 'EWKsel':histos['merged_EWK']['Selection'], 'QCDantiSel':histos['merged_QCD']['antiSelection'], 'QCDsel':histos['merged_QCD']['Selection']}
+#          fit_QCD = LpTemplateFit(LpTemplates, prefix=presel+SRname, printDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/pngCMG2/templateFit_Phys14V3/QCDestimation')
+#          bins[htb][stb][srNJet][btb].update(fit_QCD)
      
         mergeCanv.cd() 
-        if histos['merged_QCD']['antiSelection'].Integral()>0:
-          histos['merged_QCD']['antiSelection'].Scale(1./histos['merged_QCD']['antiSelection'].Integral())
+#        if histos['merged_QCD']['antiSelection'].Integral()>0:
+#          histos['merged_QCD']['antiSelection'].Scale(1./histos['merged_QCD']['antiSelection'].Integral())
         histos['merged_QCD']['antiSelection'].SetLineColor(ROOT.kRed)
         histos['merged_QCD']['antiSelection'].SetLineStyle(ROOT.kDashed)
-        histos['merged_QCD']['antiSelection'].SetMaximum(1)
+#        histos['merged_QCD']['antiSelection'].SetMaximum(1)
+        histos['merged_QCD']['antiSelection'].SetMinimum(0.01)
         leg.AddEntry(histos['merged_QCD']['antiSelection'],'QCD anti-selected','l')
  
-        if histos['merged_QCD']['Selection'].Integral()>0:
-          histos['merged_QCD']['Selection'].Scale(1./histos['merged_QCD']['Selection'].Integral())      
+#        if histos['merged_QCD']['Selection'].Integral()>0:
+#          histos['merged_QCD']['Selection'].Scale(1./histos['merged_QCD']['Selection'].Integral())      
         histos['merged_QCD']['Selection'].SetLineColor(ROOT.kRed)
-        histos['merged_QCD']['Selection'].SetMaximum(1)
+#        histos['merged_QCD']['Selection'].SetMaximum(1)
+        histos['merged_QCD']['Selection'].SetMinimum(0.01)
         leg.AddEntry(histos['merged_QCD']['Selection'],'QCD selected','l')
  
-        if histos['merged_EWK']['antiSelection'].Integral()>0:
-          histos['merged_EWK']['antiSelection'].Scale(1./histos['merged_EWK']['antiSelection'].Integral())       
+#        if histos['merged_EWK']['antiSelection'].Integral()>0:
+#          histos['merged_EWK']['antiSelection'].Scale(1./histos['merged_EWK']['antiSelection'].Integral())       
         histos['merged_EWK']['antiSelection'].SetLineColor(ROOT.kBlack)
         histos['merged_EWK']['antiSelection'].SetLineStyle(ROOT.kDashed)
-        histos['merged_EWK']['antiSelection'].SetMaximum(1)
+#        histos['merged_EWK']['antiSelection'].SetMaximum(1)
+        histos['merged_EWK']['antiSelection'].SetMinimum(0.01)
         leg.AddEntry(histos['merged_EWK']['antiSelection'],'EWK anti-selected','l')
  
-        if histos['merged_EWK']['Selection'].Integral()>0:
-          histos['merged_EWK']['Selection'].Scale(1./histos['merged_EWK']['Selection'].Integral())             
+#        if histos['merged_EWK']['Selection'].Integral()>0:
+#          histos['merged_EWK']['Selection'].Scale(1./histos['merged_EWK']['Selection'].Integral())             
         histos['merged_EWK']['Selection'].SetLineColor(ROOT.kBlack)
-        histos['merged_EWK']['Selection'].SetMaximum(1)
+#        histos['merged_EWK']['Selection'].SetMaximum(1)
+        histos['merged_EWK']['Selection'].SetMinimum(0.01)
         leg.AddEntry(histos['merged_EWK']['Selection'],'EWK selected','l')
         
         histos['merged_QCD']['antiSelection'].Draw()
@@ -348,7 +352,7 @@ for htb in htreg:
         mergeCanv.Print(wwwDir+presel+SRname+'.pdf')
 
 
-path = '/data/'+username+'/results2015/rCS_0b/'
-if not os.path.exists(path):
-  os.makedirs(path)
-pickle.dump(bins, file(path+'QCDyieldFromTemplateFit_inclusiveHTandST_pkl','w'))
+#path = '/data/'+username+'/results2015/rCS_0b/'
+#if not os.path.exists(path):
+#  os.makedirs(path)
+#pickle.dump(bins, file(path+'QCDyieldFromTemplateFit_inclusiveHTandST_pkl','w'))
