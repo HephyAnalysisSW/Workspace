@@ -26,7 +26,8 @@ fileNameList=[
 "T2DegStop2j_300.0_8_decayed_1000022_270.lhe",
 "T2DegStop2j_300.0_9_decayed_1000022_270.lhe",
 ]
-fileList=[fileDir+x for x in fileNameList]
+#fileList=[fileDir+x for x in fileNameList]
+fileList=["root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/nrad/lhe/merged/T2DegStop2j_300_270_merged.lhe"]
 
 
 
