@@ -8,7 +8,10 @@ from localInfo import username
 
 prefix = 'singleLeptonic_Phys14V3'
 #res = pickle.load(file('/data/'+username+'/results2015/rCS_0b/'+prefix+'_estimationResults_pkl'))
-res = pickle.load(file('/data/'+username+'/PHYS14v3/withCSV/rCS_0b/'+prefix+'_estimationResults_ttJet_unc_pkl'))
+#res = pickle.load(file('/data/'+username+'/PHYS14v3/withCSV/rCS_0b/'+prefix+'_estimationResults_ttJet_unc_pkl'))
+res = pickle.load(file('/data/'+username+'/PHYS14v3/withCSV/rCS_0b/'+prefix+'_estimationResults_pkl'))
+res1 = pickle.load(file('/data/'+username+'/PHYS14v3/withCSV/rCS_0b/'+prefix+'_ttjet_unc_estimationResults_pkl'))
+#res = pickle.load(file('/data/'+username+'/PHYS14v3/withCSV/rCS_0b/'+prefix+'_restIsTTVH_estimationResults_pkl'))
 
 streg = [[(250, 350), 1.], [(350, 450), 1.], [(450,-1), 1.]]
 htreg = [(500,750),(750,1000),(1000,1250),(1250,-1)]
@@ -48,6 +51,58 @@ for i_htb, htb in enumerate(htreg):
   #print '\\hline'
 print '\\hline\end{tabular}}\end{center}\caption{ABCD}\label{tab:0b_rcscorr_Wbkg}\end{table}'
 
+print
+print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrr|rrr|rrr|rrr|rrr|rrr|}\\hline'
+print ' \HT     & \\njet & \ST     &\multicolumn{6}{c|}{$tt+$Jets}&\multicolumn{6}{c|}{$W+$ Jets}&\multicolumn{3}{c|}{Other EW bkg.}&\multicolumn{6}{c|}{total bkg.}\\\%\hline'
+print '$[$GeV$]$&        &$[$GeV$]$&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation} \\\\\hline'
+for i_htb, htb in enumerate(htreg):
+  print '\\hline'
+  if i_htb!=0:print '\\hline'
+  print '\multirow{'+str(nJetBins*nSTbins)+'}{*}{\\begin{sideways}$'+varBin(htb)+'$\end{sideways}}'
+  #print '& & \multicolumn{6}{c|}{$t\overline{t}$+Jets}&\multicolumn{6}{c|}{$W$+Jets}&\multicolumn{6}{c}{total}\\\\'
+  #print '\multicolumn{2}{c|}{$'+varBinName(htb, 'H_{T}')+\
+  #      '$} & \multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c}{simulation}\\\\\\hline'
+  for srNJet in njreg:
+    print '&\multirow{'+str(nSTbins)+'}{*}{$'+varBin(srNJet)+'$}'
+    first = True
+    for stb, dPhiCut in streg:
+      if not first: print '&'
+      first = False
+      #if stb[1] == -1 : print '&'
+      print '&$'+varBin(stb)+'$'
+      print ' & '+getNumString(res[htb][stb][srNJet]['TT_pred'], res[htb][stb][srNJet]['TT_pred_err'])\
+           +' & '+getNumString(res[htb][stb][srNJet]['TT_truth'], res[htb][stb][srNJet]['TT_truth_err'])\
+           +' & '+getNumString(res[htb][stb][srNJet]['W_pred'], res[htb][stb][srNJet]['W_pred_err'])\
+           +' & '+getNumString(res[htb][stb][srNJet]['W_truth'], res[htb][stb][srNJet]['W_truth_err'])\
+           +' & '+getNumString(res[htb][stb][srNJet]['Rest_truth'], res[htb][stb][srNJet]['Rest_truth_err'])\
+           +' & '+getNumString(res[htb][stb][srNJet]['tot_pred'], res[htb][stb][srNJet]['tot_pred_err'])\
+           +' & '+getNumString(res[htb][stb][srNJet]['tot_truth'], res[htb][stb][srNJet]['tot_truth_err']) +'\\\\'
+      if stb[1] == -1 : print '\\cline{2-24}'
+  #print '\\hline'
+print '\\hline\end{tabular}}\end{center}\caption{ABCD}\label{tab:0b_rcscorr_Wbkg}\end{table}'
+
+print
+print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|c|c|}\\hline'
+print ' \HT     & \\njet & \ST     &$tt+$Jets&$W+$ Jets&'
+print '$[$GeV$]$&        &$[$GeV$]$&         &         &\\\\\hline'
+for i_htb, htb in enumerate(htreg):
+  print '\\hline'
+  if i_htb!=0:print '\\hline'
+  print '\multirow{'+str(nJetBins*nSTbins)+'}{*}{\\begin{sideways}$'+varBin(htb)+'$\end{sideways}}'
+  for srNJet in njreg:
+    print '&\multirow{'+str(nSTbins)+'}{*}{$'+varBin(srNJet)+'$}'
+    first = True
+    for stb, dPhiCut in streg:
+      if not first: print '&'
+      first = False
+      #if stb[1] == -1 : print '&'
+      print '&$'+varBin(stb)+'$'
+      print 'ohne:',res[htb][stb][srNJet]['W_pred'],res[htb][stb][srNJet]['W_truth'],'unc:', res1[htb][stb][srNJet]['W_pred'],res1[htb][stb][srNJet]['W_truth']
+      print ' & '+str(format(abs(abs(float(float(res1[htb][stb][srNJet]['TT_pred']-res1[htb][stb][srNJet]['TT_truth'])/float(res1[htb][stb][srNJet]['TT_pred']))/(float(float(res[htb][stb][srNJet]['TT_pred']-res[htb][stb][srNJet]['TT_truth'])/float(res[htb][stb][srNJet]['TT_pred']))))-1),'.5f'))\
+           +' & '+str(format(abs(abs(float(float(res1[htb][stb][srNJet]['W_pred']-res1[htb][stb][srNJet]['W_truth'])/float(res1[htb][stb][srNJet]['W_pred']))/(float(float(res[htb][stb][srNJet]['W_pred']-res[htb][stb][srNJet]['W_truth'])/float(res[htb][stb][srNJet]['W_pred']))))-1),'.5f')) +'\\\\'
+      if stb[1] == -1 : print '\\cline{2-5}'
+  #print '\\hline'
+print '\\hline\end{tabular}}\end{center}\caption{ttJets unc}\label{tab:ttJets unc}\end{table}'
 
 
 

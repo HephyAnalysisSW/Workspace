@@ -5,7 +5,7 @@ from localInfo import username
 from binnedNBTagsFit import binnedNBTagsFit
 from rCShelpers import * 
 from math import pi, sqrt
-
+from pred_helper import weight_str , weight_err_str
 #lepSel = 'hard'
  
 #nBTagCMVA = 'Sum$(Jet_pt>30&&abs(Jet_eta)<2.4&&Jet_id&&Jet_btagCMVA>0.732)' 
@@ -21,8 +21,6 @@ from math import pi, sqrt
 #dPhiStr = "acos((leptonPt+met*cos(leptonPhi-metPhi))/sqrt(leptonPt**2+met**2+2*met*leptonPt*cos(leptonPhi-metPhi)))"
 
 ROOT.TH1F().SetDefaultSumw2()
-weight_str = 'weight'
-weight_err_str = 'weight*weight'
 
 #prefix = 'singleLeptonic_20150220'
 #presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0"

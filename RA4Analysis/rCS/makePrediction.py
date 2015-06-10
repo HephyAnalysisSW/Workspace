@@ -11,16 +11,16 @@ from localInfo import username
 from binnedNBTagsFit import binnedNBTagsFit
 from rCShelpers import * 
 from math import pi, sqrt
+from pred_helper import weight_str , weight_err_str
 
 lepSel = 'hard'
  
 cWJets  = getChain(WJetsHTToLNu[lepSel],histname='')
 cTTJets = getChain(ttJets[lepSel],histname='')
 cRest = getChain([DY[lepSel], singleTop[lepSel], TTVH[lepSel]],histname='')#no QCD 
+#cRest = getChain(TTVH[lepSel],histname='')#no QCD 
 cBkg = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]],histname='')#no QCD
 
-weight_str = 'weight'
-weight_err_str = 'weight*weight'
 
 #weight_str = 'weight_Up'
 #weight_err_str = 'weight_Up*weight_Up'
@@ -54,7 +54,7 @@ if signal:
 
 ROOT.TH1F().SetDefaultSumw2()
 
-prefix = 'singleLeptonic_Phys14V3'
+prefix = 'singleLeptonic_Phys14V3_ttjet_unc'
 presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80"
 
 btagString = 'nBJetMediumCSV30'
@@ -138,5 +138,5 @@ path = '/data/'+username+'/PHYS14v3/withCSV/rCS_0b/'
 if not os.path.exists(path):
   os.makedirs(path)
 pickle.dump(bins, file(path+prefix+'_estimationResults_pkl','w'))
-
+print "written:" , path+prefix+'_estimationResults_pkl'
 

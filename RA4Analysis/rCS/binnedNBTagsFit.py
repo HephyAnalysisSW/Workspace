@@ -7,14 +7,12 @@ from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,v
 from localInfo import username
 from math import pi, sqrt
 
+from pred_helper import weight_str , weight_err_str
 
-def binnedNBTagsFit(cut, samples, nBTagVar = 'nBJetMediumCSV30', prefix="", printDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/PHYS14v3/withCSV/templateFit/'):
+def binnedNBTagsFit(cut, samples, nBTagVar = 'nBJetMediumCSV30', prefix="", printDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/PHYS14v3/withCSV/templateFit_ttJets_unc/'):
   if not os.path.exists(printDir):
      os.makedirs(printDir) 
 
-  weight_str = 'weight'
-  weight_err_str = 'weight*weight' 
- 
   cWJets = samples['W']
   cTTJets = samples['TT']
   cRest = samples['Rest']
