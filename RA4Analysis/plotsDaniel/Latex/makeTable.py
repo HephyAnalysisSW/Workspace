@@ -7,7 +7,7 @@ from math import sqrt, pi
 #from localInfo import username
 
 prefix = 'singleMuonic_fullBkg'
-res = pickle.load(file('/afs/hephy.at/user/d/dspitzbart/www/subBkgWhard/500htJet30j/150st/nJet30LEq8/yields.pkl'))
+res = pickle.load(file('/afs/hephy.at/user/d/dspitzbart/www/subBkgTThard/500htJet30j/250st350/nJet30LEq8/yields.pkl'))
 
 streg = [[(250, 350), 1.], [(350, 450), 1.], [(450,-1), 1.]]
 htreg = [(500,750),(750,1000),(1000,1250),(1250,-1)]
@@ -40,21 +40,25 @@ print "Results"
 #print '\\hline\end{tabular}}\end{center}\caption{ABCD}\label{tab:0b_rcscorr_Wbkg}\end{table}'
 
 print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|c|c|c|c|c|c|rrr|rrr|}\\hline'
-print ' \\njet & W+jets  & 0b & 1b  & 0b/1b & 0b($\\Delta\Phi<0$) & 0b($\\Delta\Phi>0$) & 1b($\\Delta\Phi<0$) & 1b($\\Delta\Phi>0$) & \multicolumn{3}{c|}{\\Rcs(0b)} & \multicolumn{3}{c|}{\\Rcs(1b)}\\\\\hline'
+print ' \\njet & \\ttJets  & 0b & 1b  & 0b/1b & 0b($\\Delta\Phi<0$) & 0b($\\Delta\Phi>0$) & 1b($\\Delta\Phi<0$) & 1b($\\Delta\Phi>0$) & \multicolumn{3}{c|}{\\Rcs(0b)} & \multicolumn{3}{c|}{\\Rcs(1b)}\\\\\hline'
 #print '$[$GeV$]$&        &$[$GeV$]$&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}     
 
-numberOfSubBkg = 3
+numberOfSubBkg = 8
 entries = len(res)
 i=0
 multiKey = 0
 
 while i < entries:
+  if res[i+1]['totalYield']>0:
+    norm = res[i]['totalYield']/res[i+1]['totalYield']
+  else:
+    norm = 1.
   if multiKey == 0:
     print '\\hline\multirow{'+str(numberOfSubBkg+1)+'}{*}{\\begin{sideways}$'+varBin(res[i]['njets'])+'$\end{sideways}}'
   print ' &' + res[i]['title']\
     +' & ' +str(round(res[i]['totalYield'],2))\
     +' & ' +str(round(res[i+1]['totalYield'],2))\
-    +' & ' +str(round(res[i]['totalYield']/res[i+1]['totalYield'],2))\
+    +' & ' +str(round(norm,2))\
     +' & ' +str(round(res[i]['controlYield'],2))\
     +' & ' +str(round(res[i]['signalYield'],2))\
     +' & ' +str(round(res[i+1]['controlYield'],2))\

@@ -29,17 +29,12 @@ nJetReg=[(5,5),(6,7),(8,-1)]
 stReg=[(250,350),(350,450),(450,-1)]
 htReg=[(500,750),(750,1000),(1000,1250),(1250,-1)]
 
-targetLumi = 10. #fb^-1
+targetLumi = 3. #fb^-1
 sampleLumi = 4. #fb^-1
-threshold = 0.
+threshold = 1.
 
 
 scaleFactor = targetLumi/sampleLumi
-
-colorList=[ROOT.kBlack, ROOT.kMagenta+2, ROOT.kOrange+2,ROOT.kMagenta+2]
-
-startpath = '/afs/hephy.at/user/d/dspitzbart/www/subBkgTThard/'
-
 
 #Load the Background Chain
 cBkg = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]],histname='')
