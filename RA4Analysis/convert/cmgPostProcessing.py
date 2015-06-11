@@ -112,9 +112,11 @@ for isample, sample in enumerate(allSamples):
   os.system('rm -rf '+tmpDir+'/*')
 
   lumiWeight = xsec[sample['dbsName']]*target_lumi/float(nTotEvents)
+  print "sample['dbsName']:" , sample['dbsName']
   readVariables = ['met_pt/F', 'met_phi/F']
 
-  newVariables = ['weight/F']
+  #newVariables = ['weight/F']
+  newVariables = ['weight/F','weight_Up/F','weight_Down/F']
   if options.leptonSelection.lower() in ['soft', 'hard']:
     newVariables += ['nLooseSoftLeptons/I', 'nLooseSoftPt10Leptons/I', 'nLooseHardLeptons/I', 'nTightSoftLeptons/I', 'nTightHardLeptons/I']
     newVariables.extend( ['deltaPhi_Wl/F','nBJetMediumCMVA30/I','nBJetMediumCSV30/I','nJet30/I','htJet30j/F','st/F', 'leptonPt/F','leptonMiniRelIso/F','leptonRelIso03/F' ,'leptonEta/F', 'leptonPhi/F', 'leptonPdg/I/0', 'leptonInd/I/-1', 'leptonMass/F', 'singleMuonic/I', 'singleElectronic/I', 'singleLeptonic/I', 'mt2w/F'] )
@@ -176,7 +178,15 @@ for isample, sample in enumerate(allSamples):
         s.init()
         r.init()
         t.GetEntry(i)
-        s.weight = lumiWeight
+        if sample['dbsName'].startswith('TTJets') :
+          weight =  {'weight': lumiWeight, 'weight_Up': lumiWeight*1.1 , 'weight_Up': lumiWeight*0.9 }
+        else :
+          weight =  {'weight': lumiWeight, 'weight_Up': lumiWeight , 'weight_Up': lumiWeight }
+
+        s.weight = weight['weight']
+        s.weight_Up = weight['weight_Up']
+        s.weight_Down = weight['weight_Down']
+        
         if options.leptonSelection.lower() in ['soft','hard']:
           #get all >=loose lepton indices
           looseLepInd = cmgLooseLepIndices(r, ptCuts=(7,5), absEtaCuts=(2.5,2.4), ele_MVAID_cuts={'eta08':0.35 , 'eta104':0.20,'eta204': -0.52} )    ##Tight ele_MVAID_cuts={'eta08':0.73 , 'eta104':0.57,'eta204':  0.05}
@@ -255,7 +265,7 @@ for isample, sample in enumerate(allSamples):
           jets = filter(lambda j:j['pt']>30 and abs(j['eta'])<2.4 and j['id'], get_cmg_jets_fromStruct(r))
           jetscopy = jets
           #print "jets:" , jets
-          lightJets, bJetsCMVA = splitListOfObjects('btagCMVA', 0.732, jets) 
+          lightJets_, bJetsCMVA = splitListOfObjects('btagCMVA', 0.732, jets) 
           lightJets,  bJetsCSV = splitListOfObjects('btagCSV', 0.814, jetscopy)
           #lightJets,  bJetsCSV = filter(lambda j:j['btagCSV']<0.814 and -1<j['btagCSV'] , jetscopy)
           #print "bjetsCMVA:" , bJetsCMVA , "bjetsCSV:" ,  bJetsCSV

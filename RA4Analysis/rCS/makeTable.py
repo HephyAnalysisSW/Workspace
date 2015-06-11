@@ -7,10 +7,18 @@ from math import sqrt, pi
 from localInfo import username
 from Workspace.RA4Analysis.signalRegions import *
 
-prefix = 'singleLeptonic_Phys14V3'
-res = pickle.load(file('/data/'+username+'/PHYS14v3/withCSV/rCS_0b_2fb/'+prefix+'_estimationResults_pkl'))
+prefix = 'singleLeptonic_Phys14V3_'
+#res = pickle.load(file('/data/'+username+'/results2015/rCS_0b/'+prefix+'_estimationResults_pkl'))
+#res = pickle.load(file('/data/'+username+'/PHYS14v3/withCSV/rCS_0b/'+prefix+'_estimationResults_ttJet_unc_pkl'))
+res = pickle.load(file('/data/'+username+'/PHYS14v3/withCSV/rCS_0b_3fb/'+prefix+'_estimationResults_pkl'))
+#res1 = pickle.load(file('/data/'+username+'/PHYS14v3/withCSV/rCS_0b/'+prefix+'_ttjet_unc_estimationResults_pkl'))
+#res = pickle.load(file('/data/'+username+'/PHYS14v3/withCSV/rCS_0b/'+prefix+'_restIsTTVH_estimationResults_pkl'))
 
-signalRegions = signalRegion2fb
+
+#nSTbins = len(streg)
+#nJetBins = len(njreg)
+
+signalRegions = signalRegion10fb
 
 #streg = [[(250, 350), 1.], [(350, 450), 1.], [(450,-1), 1.]]
 #htreg = [(500,750),(750,1000),(1000,1250),(1250,-1)]
@@ -99,6 +107,86 @@ for srNJet in sorted(signalRegions):
            +' & '+getNumString(res[srNJet][stb][htb]['W_truth'],        res[srNJet][stb][htb]['W_truth_err']) +'\\\\'
       if htb[1] == -1 : print '\\cline{2-21}'
 print '\\hline\end{tabular}}\end{center}\caption{EFGH}\label{tab:0b_rcscorr_Wbkg}\end{table}'
+
+#print
+#print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrr|rrr|rrr|rrr|rrr|rrr|}\\hline'
+#print ' \HT     & \\njet & \ST     &\multicolumn{6}{c|}{$tt+$Jets}&\multicolumn{6}{c|}{$W+$ Jets}&\multicolumn{3}{c|}{Other EW bkg.}&\multicolumn{6}{c|}{total bkg.}\\\%\hline'
+#print '$[$GeV$]$&        &$[$GeV$]$&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation} \\\\\hline'
+#secondLine = False
+#for srNJet in sorted(signalRegions):
+#  print '\\hline'
+#  if secondLine: print '\\hline'
+#  secondLine = True
+#  print '\multirow{'+str(rowsNJet[srNJet]['n'])+'}{*}{\\begin{sideways}$'+varBin(srNJet)+'$\end{sideways}}'
+#  for stb in sorted(signalRegions[srNJet]):
+#    print '&\multirow{'+str(rowsSt[srNJet][stb]['n'])+'}{*}{$'+varBin(stb)+'$}'
+#    first = True
+#    for htb in sorted(signalRegions[srNJet][stb]):
+#      if not first: print '&'
+#      first = False
+#      print '&$'+varBin(stb)+'$'
+#      print ' & '+getNumString(res[htb][stb][srNJet]['TT_pred'], res[htb][stb][srNJet]['TT_pred_err'])\
+#           +' & '+getNumString(res[htb][stb][srNJet]['TT_truth'], res[htb][stb][srNJet]['TT_truth_err'])\
+#           +' & '+getNumString(res[htb][stb][srNJet]['W_pred'], res[htb][stb][srNJet]['W_pred_err'])\
+#           +' & '+getNumString(res[htb][stb][srNJet]['W_truth'], res[htb][stb][srNJet]['W_truth_err'])\
+#           +' & '+getNumString(res[htb][stb][srNJet]['Rest_truth'], res[htb][stb][srNJet]['Rest_truth_err'])\
+#           +' & '+getNumString(res[htb][stb][srNJet]['tot_pred'], res[htb][stb][srNJet]['tot_pred_err'])\
+#           +' & '+getNumString(res[htb][stb][srNJet]['tot_truth'], res[htb][stb][srNJet]['tot_truth_err']) +'\\\\'
+#      if stb[1] == -1 : print '\\cline{2-24}'
+#  #print '\\hline'
+#print '\\hline\end{tabular}}\end{center}\caption{ABCD}\label{tab:0b_rcscorr_Wbkg}\end{table}'
+
+##print
+##print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|c|c|}\\hline'
+##print ' \HT     & \\njet & \ST     &$tt+$Jets&$W+$ Jets&'
+##print '$[$GeV$]$&        &$[$GeV$]$&         &         &\\\\\hline'
+##for i_htb, htb in enumerate(htreg):
+##  print '\\hline'
+##  if i_htb!=0:print '\\hline'
+##  print '\multirow{'+str(nJetBins*nSTbins)+'}{*}{\\begin{sideways}$'+varBin(htb)+'$\end{sideways}}'
+##  for srNJet in njreg:
+##    print '&\multirow{'+str(nSTbins)+'}{*}{$'+varBin(srNJet)+'$}'
+##    first = True
+##    for stb, dPhiCut in streg:
+##      if not first: print '&'
+##      first = False
+##      #if stb[1] == -1 : print '&'
+##      print '&$'+varBin(stb)+'$'
+##      print 'ohne:',res[htb][stb][srNJet]['W_pred'],res[htb][stb][srNJet]['W_truth'],'unc:', res1[htb][stb][srNJet]['W_pred'],res1[htb][stb][srNJet]['W_truth']
+##      print ' & '+str(format(abs(abs(float(float(res1[htb][stb][srNJet]['TT_pred']-res1[htb][stb][srNJet]['TT_truth'])/float(res1[htb][stb][srNJet]['TT_pred']))/(float(float(res[htb][stb][srNJet]['TT_pred']-res[htb][stb][srNJet]['TT_truth'])/float(res[htb][stb][srNJet]['TT_pred']))))-1),'.5f'))\
+##           +' & '+str(format(abs(abs(float(float(res1[htb][stb][srNJet]['W_pred']-res1[htb][stb][srNJet]['W_truth'])/float(res1[htb][stb][srNJet]['W_pred']))/(float(float(res[htb][stb][srNJet]['W_pred']-res[htb][stb][srNJet]['W_truth'])/float(res[htb][stb][srNJet]['W_pred']))))-1),'.5f')) +'\\\\'
+##      if stb[1] == -1 : print '\\cline{2-5}'
+##  #print '\\hline'
+##print '\\hline\end{tabular}}\end{center}\caption{ttJets unc}\label{tab:ttJets unc}\end{table}'
+##
+##
+##print
+##print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrr|rrr|rrr|rrr|rrr|}\\hline'
+##print ' \HT     & \\njet & \ST     &\multicolumn{6}{c|}{$W+$ Jets}&\multicolumn{6}{c|}{$W-$ Jets}&\multicolumn{6}{c|}{$W$ Jets}\\\%\hline'
+##print '$[$GeV$]$&        &$[$GeV$]$&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation} \\\\\hline'
+##secondLine = False
+##for srNJet in sorted(signalRegions):
+##  print '\\hline'
+##  if secondLine: print '\\hline'
+##  secondLine = True
+##  print '\multirow{'+str(rowsNJet[srNJet]['n'])+'}{*}{\\begin{sideways}$'+varBin(srNJet)+'$\end{sideways}}'
+##  for stb in sorted(signalRegions[srNJet]):
+##    print '&\multirow{'+str(rowsSt[srNJet][stb]['n'])+'}{*}{$'+varBin(stb)+'$}'
+##    first = True
+##    for htb in sorted(signalRegions[srNJet][stb]):
+##      if not first: print '&'
+##      first = False
+##      #if stb[1] == -1 : print '&'
+##      print '&$'+varBin(stb)+'$'
+##      print ' & '+getNumString(res[htb][stb][srNJet]['W_NegPdg_pred'], res[htb][stb][srNJet]['W_NegPdg_pred_err'])\
+##           +' & '+getNumString(res[htb][stb][srNJet]['W_NegPdg_truth'], res[htb][stb][srNJet]['W_NegPdg_truth_err'])\
+##           +' & '+getNumString(res[htb][stb][srNJet]['W_PosPdg_pred'], res[htb][stb][srNJet]['W_PosPdg_pred_err'])\
+##           +' & '+getNumString(res[htb][stb][srNJet]['W_PosPdg_truth'], res[htb][stb][srNJet]['W_PosPdg_truth_err'])\
+##           +' & '+getNumString(res[htb][stb][srNJet]['W_pred'], res[htb][stb][srNJet]['W_pred_err'])\
+##           +' & '+getNumString(res[htb][stb][srNJet]['W_truth'], res[htb][stb][srNJet]['W_truth_err']) +'\\\\'
+##      if stb[1] == -1 : print '\\cline{2-21}'
+##print '\\hline\end{tabular}}\end{center}\caption{EFGH}\label{tab:0b_rcscorr_Wbkg}\end{table}'
+
 
 #for i_htb, htb in enumerate(htreg):
 #  print '\\hline'
