@@ -63,7 +63,42 @@ for srNJet in sorted(signalRegions):
       if htb[1] == -1 : print '\\cline{2-21}'
 print '\\hline\end{tabular}}\end{center}\caption{ABCD}\label{tab:0b_rcscorr_Wbkg}\end{table}'
 
-
+print
+print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrr|rrr|rrr|rrr|rrr|}\\hline'
+print ' \\njet & \ST & \HT &\multicolumn{6}{c|}{$W+$ Jets}&\multicolumn{6}{c|}{$W-$ Jets}&\multicolumn{6}{c|}{$W$ Jets}\\\%\hline'
+print ' & $[$GeV$]$ &$[$GeV$]$&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation} \\\\\hline'
+secondLine = False
+for srNJet in sorted(signalRegions):
+  print '\\hline'
+  if secondLine: print '\\hline'
+  secondLine = True
+  print '\multirow{'+str(rowsNJet[srNJet]['n'])+'}{*}{\\begin{sideways}$'+varBin(srNJet)+'$\end{sideways}}'
+  for stb in sorted(signalRegions[srNJet]):
+    print '&\multirow{'+str(rowsSt[srNJet][stb]['n'])+'}{*}{$'+varBin(stb)+'$}'
+    first = True
+    for htb in sorted(signalRegions[srNJet][stb]):
+      if not first: print '&'
+      first = False
+#for i_htb, htb in enumerate(htreg):
+#  print '\\hline'
+#  if i_htb!=0:print '\\hline'
+#  print '\multirow{'+str(nJetBins*nSTbins)+'}{*}{\\begin{sideways}$'+varBin(htb)+'$\end{sideways}}'
+#  for srNJet in njreg:
+#    print '&\multirow{'+str(nSTbins)+'}{*}{$'+varBin(srNJet)+'$}'
+#    first = True
+#    for stb, dPhiCut in streg:
+#      if not first: print '&'
+#      first = False
+#      #if stb[1] == -1 : print '&'
+      print '&$'+varBin(htb)+'$'
+      print ' & '+getNumString(res[srNJet][stb][htb]['W_NegPdg_pred'],  res[srNJet][stb][htb]['W_NegPdg_pred_err'])\
+           +' & '+getNumString(res[srNJet][stb][htb]['W_NegPdg_truth'], res[srNJet][stb][htb]['W_NegPdg_truth_err'])\
+           +' & '+getNumString(res[srNJet][stb][htb]['W_PosPdg_pred'],  res[srNJet][stb][htb]['W_PosPdg_pred_err'])\
+           +' & '+getNumString(res[srNJet][stb][htb]['W_PosPdg_truth'], res[srNJet][stb][htb]['W_PosPdg_truth_err'])\
+           +' & '+getNumString(res[srNJet][stb][htb]['W_pred'],         res[srNJet][stb][htb]['W_pred_err'])\
+           +' & '+getNumString(res[srNJet][stb][htb]['W_truth'],        res[srNJet][stb][htb]['W_truth_err']) +'\\\\'
+      if htb[1] == -1 : print '\\cline{2-21}'
+print '\\hline\end{tabular}}\end{center}\caption{EFGH}\label{tab:0b_rcscorr_Wbkg}\end{table}'
 
 #for i_htb, htb in enumerate(htreg):
 #  print '\\hline'
