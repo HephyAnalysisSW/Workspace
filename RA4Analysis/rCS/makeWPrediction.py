@@ -5,7 +5,7 @@ from localInfo import username
 from binnedNBTagsFit import binnedNBTagsFit
 from rCShelpers import * 
 from math import pi, sqrt
-from pred_helper import weight_str , weight_err_str
+#from pred_helper import weight_str , weight_err_str
 #lepSel = 'hard'
  
 #nBTagCMVA = 'Sum$(Jet_pt>30&&abs(Jet_eta)<2.4&&Jet_id&&Jet_btagCMVA>0.732)' 

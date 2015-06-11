@@ -29,7 +29,7 @@ histMax = 20
 #prepresel = 'singleLeptonic==1&&'#&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&'
 #presel = prepresel + 'Jet_pt[1]>80&&nJet30>=2&&nBJetMediumCMVA30==0&&st>=150&&st<=250'#&&htJet30j>500&&htJet30j<750'#&&htJet30j>=500&&st>=200&&deltaPhi_Wl>1&&mt2w>350'
 
-prepresel = 'singleLeptonic==1&&nLooseSoftLeptons==1&&nLooseHardLeptons==0&&nTightHardLeptons==0&&htJet30j>500&&st>250&&nJet30>=2&&Jet_pt[1]>100&&Jet_pt[2]>80'
+prepresel = 'singleLeptonic==1&&nLooseSoftLeptons==1&&nLooseHardLeptons==0&&nTightHardLeptons==0&&htJet30j>500&&st>250&&nJet30>=2&&Jet_pt[0]>100&&Jet_pt[1]>80'
 presel = prepresel
 
 def gethtRatio(c):

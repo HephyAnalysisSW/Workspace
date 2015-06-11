@@ -21,6 +21,7 @@ def LpTemplateFit(LpTemplates, prefix="", printDir='/afs/hephy.at/user/'+usernam
 #Clone histograms from LpTemplates: EWK selected and QCD anti-selected
   template_EWK   = histoEWKsel.Clone()
   template_QCD   = histoQCDantiSel.Clone()
+  template_QCD.Add(histoEWKantiSel)
 
 #  template_WJets_PosPdg=getPlotFromChain(cWJets, nBTagVar, [0,1,2,3], 'leptonPdg>0&&'+cut, 'weight', binningIsExplicit=True,addOverFlowBin='upper')
 #  template_WJets_NegPdg=getPlotFromChain(cWJets, nBTagVar, [0,1,2,3], 'leptonPdg<0&&'+cut, 'weight', binningIsExplicit=True,addOverFlowBin='upper')
@@ -45,8 +46,10 @@ def LpTemplateFit(LpTemplates, prefix="", printDir='/afs/hephy.at/user/'+usernam
   hData = histoEWKsel.Clone()
   hData.Add(histoQCDsel)
 
-  template_EWK.Scale(1./template_EWK.Integral())
-  template_QCD.Scale(1./template_QCD.Integral())
+  if template_EWK.Integral()>0:
+    template_EWK.Scale(1./template_EWK.Integral())
+  if template_QCD.Integral()>0:
+    template_QCD.Scale(1./template_QCD.Integral())
 #  template_WJets_PosPdg.Scale(1./template_WJets_PosPdg.Integral())
 #  template_WJets_NegPdg.Scale(1./template_WJets_NegPdg.Integral())
 #  y_Rest_PosPdg = template_Rest_PosPdg.Integral()

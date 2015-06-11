@@ -5,7 +5,7 @@ from localInfo import username
 from binnedNBTagsFit import binnedNBTagsFit
 from rCShelpers import * 
 from math import pi, sqrt
-from pred_helper import weight_str , weight_err_str
+#from pred_helper import weight_str , weight_err_str
 #lepSel = 'hard'
  
 #cWJets  = getChain(WJetsHTToLNu[lepSel],histname='')

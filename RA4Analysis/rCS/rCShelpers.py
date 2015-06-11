@@ -5,6 +5,10 @@ from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName, nBTagBinName,
 from math import sqrt, pi
 
 dPhiStr = 'deltaPhi_Wl' #= "acos((leptonPt+met*cos(leptonPhi-metPhi))/sqrt(leptonPt**2+met**2+2*met*leptonPt*cos(leptonPhi-metPhi)))"
+lumi = 3 #fb-1 
+
+weight_str = '(((weight)/4)*'+str(lumi)+')'
+weight_err_str = '('+weight_str+'*'+weight_str+')'
 
 #ROOT.TH1F().SetDefaultSumw2()
 

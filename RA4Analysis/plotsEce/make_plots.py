@@ -186,7 +186,7 @@ for p in plots:
   leg.SetFillColor(0)
   leg.Draw()
   latex.DrawLatex(0.16,0.96,"CMS Simulation")
-  latex.DrawLatex(0.71,0.96,"L=4 fb^{-1} (13 TeV)")
+  latex.DrawLatex(0.71,0.96,"L=3 fb^{-1} (13 TeV)")
   #latex.DrawLatex(0.8,0.05,p['xaxis'])
   #can.Update()
   can.Draw()
