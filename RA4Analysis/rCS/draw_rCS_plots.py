@@ -49,8 +49,7 @@ presel='singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt
 #presel='singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0'
 #presel = exactlyOneTightLepton(lepton="both")+'&&'+looseLeptonVeto(lepton='both')
 uDir = username[0]+'/'+username
-subDir = 'pngCMG2/rCS_with_mt2w'
-#subDir = 'pngCMG2/rCS'
+subDir = 'PHYS14v3/withCSV/rCS'
 path = '/afs/hephy.at/user/'+uDir+'/www/'+subDir+'/'
 if not os.path.exists(path):
   os.makedirs(path)
@@ -67,9 +66,8 @@ if not os.path.exists(path):
 #  print s["name"],"xsec",xsec.xsec[s['dbsName']],"NSim",cs[1],"nEntry",nEntry, "yield:",4000*xsec.xsec[s['dbsName']]/float(cs[1])*nEntry
 #print "totalYield", totalYield
 
-htbins = [(500,750)]#, (750,1000),(1000,1250),(1250,-1)]
-stbins = [(250,350)]#,(350,450),(450,-1)]
-njbins = [2,3,4,5,6,7,8,9]
+htbins = [(500,750),(750,1000),(1000,1250),(1250,-1)]
+stbins = [(250,350),(350,450),(450,650),(650,-1)]
 #prefix=None
 njCorr=0.
 
@@ -89,7 +87,7 @@ for lepton in ["both"]:# ["muon", "electron"]: #["both"]:
       fname = nameAndCut(stb, htb, njetb=None, btb=None)[0]
   #    fname="_".join(([prefix] if prefix else [])+[lepton,name])
       plots={}
-      njet_bins = [(4,4),(5,5),(6,-1)]
+      njet_bins = [(4,4),(5,5),(6,7),(8,-1)]
       nbtag_bins = [0,1,2,3,4]
       for njb in njet_bins: 
         name, cut = nameAndCut(stb, htb, njb, btb=None, presel=presel)
@@ -189,7 +187,7 @@ for lepton in ["both"]:# ["muon", "electron"]: #["both"]:
         rd['FitParError']  = FitParError
         res[htb][stb][btb] = rd
         ROOT.gStyle.SetOptStat(0)
-        plots[btb].GetYaxis().SetRangeUser(0,0.1)
+        plots[btb].GetYaxis().SetRangeUser(0,0.3)
         plots[btb].GetYaxis().SetTitle("R_{CS}")
         plots[btb].GetXaxis().SetTitle("jet multiplicity")
         plots[btb].SetLineColor(ROOT_colors[i_btb])

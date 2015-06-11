@@ -10,13 +10,14 @@ from array import array
 
 from Workspace.HEPHYPythonTools.helpers import getVarValue, getChain, deltaPhi
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v1_Phys14V3_HT400ST200 import *
-from Workspace.RA4Analysis.cmgTuplesPostProcessed_v3_Phys14V3_HT400ST200 import *
-#from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2_HT400ST150_withDF import *
+#from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
+from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2_HT400ST150_withDF import *
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2 import *
 from Workspace.RA4Analysis.helpers import *
 
 #ROOT.TH1F().SetDefaultSumw2()
 
+#bVar = 'nBJetMediumCSV30'
 bVar = 'nBJetMediumCMVA30'
 
 deltaPhiCut=1.
@@ -27,20 +28,20 @@ twoBin=[0,deltaPhiCut,3.2]
 lepSel = 'hard'
 
 nBtagReg=[(0,0),(1,1)]#,(2,-1)]
-nJetReg=[(4,5),(6,7),(8,-1)]#,(5,5),(6,-1)]#,(6,7),(8,-1)]#,(6,-1)]#,(3,3),(4,4),(5,5),(6,-1)]
-stReg=[(200,-1)]#,(250,350)]#,(250,-1)]#,(350,450),(450,-1)]
-htReg=[(500,-1)]#,(750,1000),(500,-1)]#,(750,-1)]#,(750,1000),(1000,1250),(1250,-1)]
+nJetReg=[(2,3),(4,5),(6,7),(8,-1)]#,(5,5),(6,-1)]#,(6,7),(8,-1)]#,(6,-1)]#,(3,3),(4,4),(5,5),(6,-1)]
+stReg=[(150,-1)]#,(250,350),(350,450),(450,-1)]#,(250,-1)]#,(350,450),(450,-1)]
+htReg=[(500,1000),(1000,-1)]#,(1000,1250),(1250,-1)]#,(750,-1)]#,(750,1000),(1000,1250),(1250,-1)]
 
 colorList=[ROOT.kBlack, ROOT.kMagenta+2, ROOT.kOrange+2,ROOT.kMagenta+2]
 
-startpath = '/afs/hephy.at/user/d/dspitzbart/www/subBkgWhard/'
+startpath = '/afs/hephy.at/user/d/dspitzbart/www/subBkgTThard/'
 
 
 #Load the Background Chain
-#c = getChain(ttJets[lepSel],histname='')
-c = getChain(WJetsHTToLNu[lepSel],histname='')
+c = getChain(ttJets[lepSel],histname='')
+#c = getChain(WJetsHTToLNu[lepSel],histname='')
 
-#Sub Background Definitions
+#Sub Background Definitions #sometimes the variable is called genPart, sometimes GenPart, be aware of that
 ngNuEFromW = "Sum$(abs(genPart_pdgId)==12&&abs(genPart_motherId)==24)"
 ngNuMuFromW = "Sum$(abs(genPart_pdgId)==14&&abs(genPart_motherId)==24)"
 ngNuTauFromW = "Sum$(abs(genPart_pdgId)==16&&abs(genPart_motherId)==24)"
@@ -203,7 +204,7 @@ for hReg in htReg:
       totalL.SetBorderSize(1)
 
       #Get yields for norm & rcs
-      for i, [subcut,name,col,subname,texString] in enumerate(subBkgW):
+      for i, [subcut,name,col,subname,texString] in enumerate(subBkgTT):
         print 'Processing ' + subname        
         subYields=[]
         histo = 'h'+str(i)
@@ -224,8 +225,14 @@ for hReg in htReg:
             rcs=signalYield/controlYield
           else:
             rcs=0.
+          if normHist.GetBinContent(1)>0 and normHist.GetBinContent(2)>0:
+            rcsError = rcs*sqrt(normHist.GetBinError(2)**2/normHist.GetBinContent(2)**2 + normHist.GetBinError(1)**2/normHist.GetBinContent(1)**2)
+            #rcsHist.SetBinError(ijReg+1, rcs*sqrt(normHist.GetBinError(2)**2/normHist.GetBinContent(2)**2 + normHist.GetBinError(1)**2/normHist.GetBinContent(1)**2))
+          else:
+            rcsError = 0.
+            #rcsHist.SetBinError(ijReg+1,0)
           print jReg, bs, rcs, totalYield
-          allYields.append({'name':subname, 'nbjets':bs,'st':sReg, 'ht':hReg, 'njets':jReg, 'totalYield':totalYield,'controlYield':controlYield,'signalYield':signalYield,'rcs':rcs})
+          allYields.append({'name':subname, 'nbjets':bs,'st':sReg, 'ht':hReg, 'njets':jReg, 'totalYield':totalYield,'controlYield':controlYield,'signalYield':signalYield,'rcs':rcs, 'rcsError':rcsError, 'title':texString})
           subYields.append({'nbjets':bs,'totalYield':totalYield,'controlYield':controlYield,'signalYield':signalYield,'rcs':rcs})
 
         #make sub plots
@@ -323,7 +330,7 @@ for hReg in htReg:
         ratio.GetYaxis().SetLabelSize(0.1)
         ratio.GetYaxis().SetTitleOffset(0.4)
         ratio.GetYaxis().SetTitleSize(0.1)
-        ratio.GetYaxis().SetTitle('Ratio')
+        ratio.GetYaxis().SetTitle('Ratio 0b/1b')
         ratio.GetYaxis().SetNdivisions(5)
         ratio.GetXaxis().SetLabelSize(0.1)
         ratio.GetXaxis().SetTitleSize(0.1)
@@ -332,6 +339,7 @@ for hReg in htReg:
         
         ratio.Draw('e1p')
         
+        subCan.Print(path+subname+cutname+'.pdf')
         subCan.Print(path+subname+cutname+'.png')
         subCan.Print(path+subname+cutname+'.root')        
 
@@ -366,7 +374,7 @@ for hReg in htReg:
         else:
           rcsHist.Draw('e same')
         
-        allYields.append({'name':'total', 'nbjets':bs,'st':sReg, 'ht':hReg, 'njets':jReg, 'totalYield':totalYield,'controlYield':controlYield,'signalYield':signalYield,'rcs':rcs, 'rcsError':rcsError})
+        allYields.append({'name':'total', 'nbjets':bs,'st':sReg, 'ht':hReg, 'njets':jReg, 'totalYield':totalYield,'controlYield':controlYield,'signalYield':signalYield,'rcs':rcs, 'rcsError':rcsError, 'title':'total'})
         totalYields.append({'nbjets':bs,'totalYield':totalYield,'controlYield':controlYield,'signalYield':signalYield,'rcs':rcs})
         
 
@@ -444,7 +452,7 @@ for hReg in htReg:
       ratio.GetYaxis().SetLabelSize(0.1)
       ratio.GetYaxis().SetTitleOffset(0.4)
       ratio.GetYaxis().SetTitleSize(0.1)
-      ratio.GetYaxis().SetTitle('Ratio')
+      ratio.GetYaxis().SetTitle('Ratio 0b/1b')
       ratio.GetYaxis().SetNdivisions(5)
       ratio.GetXaxis().SetLabelSize(0.1)
       ratio.GetXaxis().SetTitleSize(0.1)
@@ -452,7 +460,7 @@ for hReg in htReg:
       ratio.GetXaxis().SetTitle(vartex)
       
       ratio.Draw('e1p')      
-
+      totalCan.Print(path+cutname+'.pdf')
       totalCan.Print(path+cutname+'.png')
       totalCan.Print(path+cutname+'.root')
       
@@ -462,7 +470,7 @@ for hReg in htReg:
     rcsCan.Print(path+'RCS.root')
     pickle.dump(allYields,yieldFile)
     yieldFile.close()
-
+    allYields = []
 
 #maybe delete all kinds of stuff
 

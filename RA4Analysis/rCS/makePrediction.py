@@ -10,6 +10,7 @@ from localInfo import username
 from binnedNBTagsFit import binnedNBTagsFit
 from rCShelpers import * 
 from math import pi, sqrt
+from Workspace.RA4Analysis.signalRegions import *
 
 lepSel = 'hard'
  
@@ -31,6 +32,7 @@ if signal:
             #"SMS_T2tt_2J_mStop850_mLSP100",
             {'name':'T5q^{4} 1.2/1.0/0.8', 'sample':T5qqqqWW_mGo1200_mCh1000_mChi800[lepSel], 'weight':'weight', 'color':ROOT.kBlack},
             {'name':'T5q^{4} 1.5/0.8/0.1', 'sample':T5qqqqWW_mGo1500_mCh800_mChi100[lepSel],  'weight':'weight', 'color':ROOT.kMagenta},
+            #{'name':'T5q^{4} 1.0/0.8/0.7', 'sample':T5qqqqWW_mGo1000_mCh800_mChi700[lepSel],  'weight':'weight', 'color':ROOT.kYellow},
             #"T1ttbbWW_mGo1000_mCh725_mChi715",
             #"T1ttbbWW_mGo1000_mCh725_mChi720",
             #"T1ttbbWW_mGo1300_mCh300_mChi290",
@@ -47,12 +49,15 @@ if signal:
 ROOT.TH1F().SetDefaultSumw2()
 
 prefix = 'singleLeptonic_Phys14V3'
-presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[2]>80"
+presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80"
 
 btagString = 'nBJetMediumCSV30'
 
-deltaPhiCut = 1.0
-streg = [[(250, 350), deltaPhiCut], [(350, 450), deltaPhiCut], [(450, -1), deltaPhiCut]] 
+signalRegions = signalRegion2fb
+
+defDeltaPhiCut = 1.0
+#streg = [[(250, 350), deltaPhiCut], [(350, 450), deltaPhiCut], [(450, -1), deltaPhiCut]] 
+streg = [(250, 350), (350, 450), (450, -1)]
 htreg = [(500,750), (750,1000), (1000,1250), (1250,-1)]
 njreg = [(5,5),(6,7),(8,-1)]
 bjreg = (0,0)
@@ -61,17 +66,23 @@ bjreg = (0,0)
 small = False 
 #small = 0
 if small:
-  streg = [[(250,350),1.]]
+  streg = [(250,350)]
   htreg = [(500,750)]
   njreg = [(5,5),(6,-1)]
 
 bins = {}
-for i_htb, htb in enumerate(htreg):
-  bins[htb] = {}
-  for stb, dPhiCut in streg:
-    bins[htb][stb] = {}
-    for srNJet in njreg:
 
+for srNJet in signalRegions:
+  bins[srNJet] = {}
+  for stb in signalRegions[srNJet]:
+    bins[srNJet][stb] ={}
+    for htb in signalRegions[srNJet][stb]:
+#for i_htb, htb in enumerate(htreg):
+#  bins[htb] = {}
+#  for stb in streg:
+#    bins[htb][stb] = {}
+#    for srNJet in njreg:
+      deltaPhiCut = dynDeltaPhi(defDeltaPhiCut, stb)
       rd={}
       #join TT estimation results to dict
       makeTTPrediction(rd, samples, htb, stb, srNJet, presel, dPhiCut=deltaPhiCut, btagVarString = btagString)
@@ -125,8 +136,9 @@ for i_htb, htb in enumerate(htreg):
                       s['name']+'_FOM_PosPdg':s['FOM_PosPdg'],\
                     })
 
-      bins[htb][stb][srNJet]=rd
-path = '/data/'+username+'/results2015/rCS_0b/'
+      #bins[htb][stb][srNJet]=rd
+      bins[srNJet][stb][htb] = rd
+path = '/data/'+username+'/PHYS14v3/withCSV/rCS_0b_2fb/'
 if not os.path.exists(path):
   os.makedirs(path)
 pickle.dump(bins, file(path+prefix+'_estimationResults_pkl','w'))

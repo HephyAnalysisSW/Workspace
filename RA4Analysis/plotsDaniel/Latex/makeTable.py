@@ -7,7 +7,7 @@ from math import sqrt, pi
 #from localInfo import username
 
 prefix = 'singleMuonic_fullBkg'
-res = pickle.load(file('/afs/hephy.at/user/d/dspitzbart/www/subBkgTTShape1bvs0binclRCS/500htJet30j/150st/2nJet30Eq2/yields.pkl'))
+res = pickle.load(file('/afs/hephy.at/user/d/dspitzbart/www/subBkgTThard/500htJet30j/250st350/nJet30LEq8/yields.pkl'))
 
 streg = [[(250, 350), 1.], [(350, 450), 1.], [(450,-1), 1.]]
 htreg = [(500,750),(750,1000),(1000,1250),(1250,-1)]
@@ -39,21 +39,52 @@ print "Results"
 #
 #print '\\hline\end{tabular}}\end{center}\caption{ABCD}\label{tab:0b_rcscorr_Wbkg}\end{table}'
 
-print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}\\hline'
-print ' \\ttJets     & 0b & 1b  & 1b/0b & 0b($\\Delta\Phi<0$) & 0b($\\Delta\Phi>0$) & 1b($\\Delta\Phi<0$) & 1b($\\Delta\Phi>0$) & \\Rcs(0b) & \\Rcs(1b)\\\\\hline'
+print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|c|c|c|c|c|c|rrr|rrr|}\\hline'
+print ' \\njet & \\ttJets  & 0b & 1b  & 0b/1b & 0b($\\Delta\Phi<0$) & 0b($\\Delta\Phi>0$) & 1b($\\Delta\Phi<0$) & 1b($\\Delta\Phi>0$) & \multicolumn{3}{c|}{\\Rcs(0b)} & \multicolumn{3}{c|}{\\Rcs(1b)}\\\\\hline'
 #print '$[$GeV$]$&        &$[$GeV$]$&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}     
 
-for bkg in res:
-  print bkg['title']\
-    +' & ' +str(round(bkg['yield0bTotal'],2))\
-    +' & ' +str(round(bkg['yield1bTotal'],2))\
-    +' & ' +str(round(bkg['norm'],2))\
-    +' & ' +str(round(bkg['yield0bC'],2))\
-    +' & ' +str(round(bkg['yield0bS'],2))\
-    +' & ' +str(round(bkg['yield1bC'],2))\
-    +' & ' +str(round(bkg['yield1bS'],2))\
-    +' & ' +str(round(bkg['rcs0b'],4))\
-    +' & ' +str(round(bkg['rcs1b'],4))+'\\\\\hline'
+numberOfSubBkg = 8
+entries = len(res)
+i=0
+multiKey = 0
+
+while i < entries:
+  if res[i+1]['totalYield']>0:
+    norm = res[i]['totalYield']/res[i+1]['totalYield']
+  else:
+    norm = 1.
+  if multiKey == 0:
+    print '\\hline\multirow{'+str(numberOfSubBkg+1)+'}{*}{\\begin{sideways}$'+varBin(res[i]['njets'])+'$\end{sideways}}'
+  print ' &' + res[i]['title']\
+    +' & ' +str(round(res[i]['totalYield'],2))\
+    +' & ' +str(round(res[i+1]['totalYield'],2))\
+    +' & ' +str(round(norm,2))\
+    +' & ' +str(round(res[i]['controlYield'],2))\
+    +' & ' +str(round(res[i]['signalYield'],2))\
+    +' & ' +str(round(res[i+1]['controlYield'],2))\
+    +' & ' +str(round(res[i+1]['signalYield'],2))\
+    +' & ' +str(round(res[i]['rcs'],3)) + ' & $\pm$ & ' + str(round(res[i]['rcsError'],3))\
+    +' & ' +str(round(res[i+1]['rcs'],3))+ ' & $\pm$ & ' + str(round(res[i+1]['rcsError'],3)) + '\\\\'    
+  i = i+2
+  multiKey = multiKey + 1
+  if multiKey == numberOfSubBkg+1:
+    multiKey = 0
+    print '\\hline'
+  else:
+    print '\\cline{2-15}'
+
+#
+#for bkg in res:
+#  print bkg['title']\
+#    +' & ' +str(round(bkg['yield0bTotal'],2))\
+#    +' & ' +str(round(bkg['yield1bTotal'],2))\
+#    +' & ' +str(round(bkg['norm'],2))\
+#    +' & ' +str(round(bkg['yield0bC'],2))\
+#    +' & ' +str(round(bkg['yield0bS'],2))\
+#    +' & ' +str(round(bkg['yield1bC'],2))\
+#    +' & ' +str(round(bkg['yield1bS'],2))\
+#    +' & ' +str(round(bkg['rcs0b'],4))\
+#    +' & ' +str(round(bkg['rcs1b'],4))+'\\\\\hline'
 
 print '\end{tabular}}\end{center}\caption{ABCD}\end{table}'
 
