@@ -3,8 +3,8 @@ import pickle
 import os,sys
 from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYieldFromChain
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,varBinName
-#from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
-from Workspace.RA4Analysis.cmgTuplesPostProcessed_v9_Phys14V3_HT400ST200_ForTTJetsUnc import *
+from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
+#from Workspace.RA4Analysis.cmgTuplesPostProcessed_v9_Phys14V3_HT400ST200_ForTTJetsUnc import *
 from makeTTPrediction import makeTTPrediction
 from makeWPrediction import makeWPrediction
 from localInfo import username
@@ -25,6 +25,11 @@ cBkg = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], DY[lepSel], singleTop[lep
 
 #weight_str = 'weight_Up'
 #weight_err_str = 'weight_Up*weight_Up'
+
+signalRegions = signalRegion10fb      ##because 10 one is full
+lumi = 10.
+
+weight_str, weight_err_str = makeWeight(lumi)
 
 samples={'W':cWJets, 'TT':cTTJets, 'Rest':cRest, 'Bkg':cBkg}
 
@@ -60,7 +65,6 @@ presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoft
 
 btagString = 'nBJetMediumCSV30'
 
-signalRegions = signalRegion10fb      ##because 10 one is full
 
 defDeltaPhiCut = 1.0
 #streg = [[(250, 350), deltaPhiCut], [(350, 450), deltaPhiCut], [(450, -1), deltaPhiCut]] 
@@ -89,13 +93,14 @@ for srNJet in signalRegions:
 #  for stb in streg:
 #    bins[htb][stb] = {}
 #    for srNJet in njreg:
-      deltaPhiCut = dynDeltaPhi(defDeltaPhiCut, stb)
+      deltaPhiCut = signalRegions[srNJet][stb][htb]['deltaPhi']
+      #deltaPhiCut = dynDeltaPhi(defDeltaPhiCut, stb)
       rd={}
       #join TT estimation results to dict
-      makeTTPrediction(rd, samples, htb, stb, srNJet, presel, dPhiCut=deltaPhiCut, btagVarString = btagString)
+      makeTTPrediction(rd, samples, htb, stb, srNJet, presel, dPhiCut=deltaPhiCut, btagVarString = btagString, lumi=lumi)
 
       #join W estimation results to dict
-      makeWPrediction(rd, samples, htb, stb, srNJet, presel, dPhiCut=deltaPhiCut, btagVarString = btagString)
+      makeWPrediction(rd, samples, htb, stb, srNJet, presel, dPhiCut=deltaPhiCut, btagVarString = btagString, lumi=lumi)
 
       ##If you want to make prediction of one of the bkgs, comment out all the estimation of total Bkgs
       #estimate total background

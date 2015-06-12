@@ -6,12 +6,12 @@ from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,varBinName
 from localInfo import username
 from math import pi, sqrt
-from rCShelpers import weight_str , weight_err_str , lumi
+from rCShelpers import *# weight_str , weight_err_str , lumi
 
-def binnedNBTagsFit(cut, samples, nBTagVar = 'nBJetMediumCSV30', prefix="", printDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/PHYS14v3/withCSV/templateFit_'+str(lumi)+'/'):
+def binnedNBTagsFit(cut, samples, nBTagVar = 'nBJetMediumCSV30', lumi=4., prefix="", printDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/PHYS14v3/withCSV/templateFit_'+str(lumi)+'/'):
   if not os.path.exists(printDir):
      os.makedirs(printDir) 
-
+  weight_str, weight_err_str = makeWeight(lumi)
   cWJets = samples['W']
   cTTJets = samples['TT']
   cRest = samples['Rest']

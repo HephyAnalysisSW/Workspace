@@ -10,7 +10,7 @@ from Workspace.RA4Analysis.signalRegions import *
 prefix = 'singleLeptonic_Phys14V3_'
 #res = pickle.load(file('/data/'+username+'/results2015/rCS_0b/'+prefix+'_estimationResults_pkl'))
 #res = pickle.load(file('/data/'+username+'/PHYS14v3/withCSV/rCS_0b/'+prefix+'_estimationResults_ttJet_unc_pkl'))
-res = pickle.load(file('/data/'+username+'/PHYS14v3/withCSV/rCS_0b_3fb/'+prefix+'_estimationResults_pkl'))
+res = pickle.load(file('/data/'+username+'/PHYS14v3/withCSV/rCS_0b_10.0fb/'+prefix+'_estimationResults_pkl'))
 #res1 = pickle.load(file('/data/'+username+'/PHYS14v3/withCSV/rCS_0b/'+prefix+'_ttjet_unc_estimationResults_pkl'))
 #res = pickle.load(file('/data/'+username+'/PHYS14v3/withCSV/rCS_0b/'+prefix+'_restIsTTVH_estimationResults_pkl'))
 

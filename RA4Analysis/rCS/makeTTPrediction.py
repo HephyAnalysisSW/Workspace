@@ -5,6 +5,7 @@ from localInfo import username
 from binnedNBTagsFit import binnedNBTagsFit
 from rCShelpers import * 
 from math import pi, sqrt
+from rCShelpers import *
 #from pred_helper import weight_str , weight_err_str
 #lepSel = 'hard'
  
@@ -41,7 +42,8 @@ ROOT.TH1F().SetDefaultSumw2()
 #    for srNJet in njreg:
 #      rd = {}
 
-def makeTTPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, btagVarString = "nBJetMediumCSV30"):
+def makeTTPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, btagVarString = "nBJetMediumCSV30", lumi=4.):
+  weight_str, weight_err_str = makeWeight(lumi)
   cWJets = samples['W']
   cTTJets = samples['TT']
   cRest = samples['Rest']
@@ -50,7 +52,7 @@ def makeTTPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, btagV
 
   #TT Jets yield in srNJet, no b-tag cut, low DPhi
   fit_srName, fit_srCut = nameAndCut(stb, htb, srNJet, btb=None, presel=presel, btagVar = btagVarString) 
-  fit_srNJet_lowDPhi = binnedNBTagsFit(fit_srCut+"&&"+dPhiStr+"<"+str(dPhiCut), samples = {'W':cWJets, 'TT':cTTJets, 'Rest':cRest}, nBTagVar = btagVarString, prefix=fit_srName)
+  fit_srNJet_lowDPhi = binnedNBTagsFit(fit_srCut+"&&"+dPhiStr+"<"+str(dPhiCut), samples = {'W':cWJets, 'TT':cTTJets, 'Rest':cRest}, nBTagVar = btagVarString, lumi=lumi, prefix=fit_srName)
 #  fit_srNJet_lowDPhi = binnedNBTagsFit(fit_srCut+"&&"+dPhiStr+"<"+str(dPhiCut), samples = {'W':cWJets, 'TT':cTTJets}, nBTagVar = 'nBJetMedium25', prefix=fit_srName)
   rd['fit_srNJet_lowDPhi'] = fit_srNJet_lowDPhi
 

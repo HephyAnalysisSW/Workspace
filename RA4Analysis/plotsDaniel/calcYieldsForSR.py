@@ -23,9 +23,9 @@ deltaPhiCut=1.
 varstring='deltaPhi_Wl'
 lepSel = 'hard'
 
-targetLumi = 10. #fb^-1
+targetLumi = 3. #fb^-1
 sampleLumi = 4. #fb^-1
-signalRegions = signalRegion10fb
+signalRegions = signalRegion3fb
 
 scaleFactor = targetLumi/sampleLumi
 
@@ -75,7 +75,7 @@ for njb in signalRegions:
       del sig1H, sig2H, sig3H, bkgH
 
 path = '/data/'+username+'/lumi'+str(targetLumi)
-yieldFile = open(path+'yields_pkl_test','w')
+yieldFile = open(path+'yields_pkl_nonSliding','w')
 pickle.dump(yields,yieldFile)
 yieldFile.close()
 

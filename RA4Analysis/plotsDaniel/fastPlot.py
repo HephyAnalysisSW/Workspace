@@ -13,7 +13,7 @@ from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import 
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_softLepton import *
 from Workspace.RA4Analysis.helpers import *
 from rCShelpers import *
-
+from Workspace.RA4Analysis.signalRegions import *
 
 binning=[30,0,1500]
 
@@ -51,7 +51,7 @@ signalString='T5qqqqWW_softLep'
 legendName = var['name']
 binning = var['binning']
 varstring = var['varString']
-plotDir='/afs/hephy.at/user/d/dspitzbart/www/SRplots/'
+plotDir='/afs/hephy.at/user/d/dspitzbart/www/SRplots3fb/'
 
 lepSel='hard'
 
@@ -223,10 +223,15 @@ bkgSamples.append(ttjets)
 
 allRCS = []
 
-for st in stReg:
-  for ht in htReg:
-    for jet in jetReg:
-      
+signalRegions = sideBand3fb
+
+for jet in signalRegions:
+  for st in signalRegions[jet]:
+    for ht in signalRegions[jet][st]:
+#for st in stReg:
+#  for ht in htReg:
+#    for jet in jetReg:
+#      
       cutname, cut = nameAndCut(st, ht, jet, btb=btb, presel=presel, btagVar = 'nBJetMediumCSV30')
       rcs = getRCS(WJETS,cut,1.0)
       #print rcs
