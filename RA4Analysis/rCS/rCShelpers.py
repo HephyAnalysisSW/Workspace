@@ -5,6 +5,13 @@ from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName, nBTagBinName,
 from math import sqrt, pi
 
 dPhiStr = 'deltaPhi_Wl' #= "acos((leptonPt+met*cos(leptonPhi-metPhi))/sqrt(leptonPt**2+met**2+2*met*leptonPt*cos(leptonPhi-metPhi)))"
+lumi = 3 #fb-1 
+
+def makeWeight(lumi=4.):
+  weight_str = '(((weight)/4)*'+str(lumi)+')'
+  weight_err_str = '('+weight_str+'*'+weight_str+')'
+  return weight_str, weight_err_str
+
 
 #ROOT.TH1F().SetDefaultSumw2()
 
@@ -28,6 +35,17 @@ def getFOM(Ysig ,Ysig_Err , Ybkg,  Ybkg_Err):
     return FOM
   else:
     return 'nan'
+
+def dynDeltaPhi(dPhi=1.0, stb='def', htb='def', njb='def', nbjb='def'):
+
+  #deltaPhis = {'stb':{'htb':{'njb':{'nbjb':1.0}}}, }
+  #deltaPhiD = {nan:{nan:{nan:1.0}}, (250,350):{nan:{nan:1.0}}, (350,450):{nan:{nan:0.75}}, (450,-1):{nan:{nan:0.5}}}
+
+  deltaPhi = {}#(250,350):1.2, (350,450):0.9, (450,-1):0.8, (450,600):0.7, (600,-1):0.6}
+  if stb in deltaPhi: dPhi = deltaPhi[stb]
+  else: print 'Using default deltaPhi value:',dPhi
+
+  return dPhi
 
 
 #don't use k_factor calculation right now it has to be optimized

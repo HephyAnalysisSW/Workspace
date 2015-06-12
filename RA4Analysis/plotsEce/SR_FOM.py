@@ -3,7 +3,7 @@ import pickle
 import operator
 from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYieldFromChain
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName, nBTagBinName, varBinName
-from Workspace.RA4Analysis.cmgTuplesPostProcessed_v1_Phys14V3_HT400ST200 import *
+from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
 from localInfo import username
 from math import sqrt, pi
 ROOT.TH1F().SetDefaultSumw2()
@@ -27,22 +27,17 @@ def getNumString(n,ne, acc=2, systematic=False):    ##For printing table
     return n +'&$\pm$&'+ ne
 
 lepSel = 'hard'
-dPhiJJStr='acos((Jet_pt[1]+Jet_pt[0]*cos(Jet_phi[1]-Jet_phi[0]))/sqrt(Jet_pt[1]**2+Jet_pt[0]**2+2*Jet_pt[0]*Jet_pt[1]*cos(Jet_phi[1]-Jet_phi[0])))'
-
+#dPhiJJStr='acos((Jet_pt[1]+Jet_pt[0]*cos(Jet_phi[1]-Jet_phi[0]))/sqrt(Jet_pt[1]**2+Jet_pt[0]**2+2*Jet_pt[0]*Jet_pt[1]*cos(Jet_phi[1]-Jet_phi[0])))'
+btag_str = 'nBJetMediumCSV30'
 cBkg = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel]],histname='')
 cS1200 = getChain(SMS_T5qqqqWW_Gl1200_Chi1000_LSP800[lepSel],histname='')
 cS1500 = getChain(SMS_T5qqqqWW_Gl1500_Chi800_LSP100[lepSel],histname='')
 cS1000 = getChain(T5qqqqWW_mGo1000_mCh800_mChi700[lepSel],histname='')
-cBkg.SetAlias('DFJJ',dPhiJJStr)
-cS1200.SetAlias('DFJJ',dPhiJJStr)
-cS1500.SetAlias('DFJJ',dPhiJJStr)
-cS1000.SetAlias('DFJJ',dPhiJJStr)
 
 presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&deltaPhi_Wl>1.0"
 prefix = presel.split('&&')[0]+'_SRfinder_Phys14V3'
-#prefix = presel.split('&&')[0]+'_SRfinder_Phys14V3_addCut'
 
-path = '/data/'+username+'/results2015/SRfinder/'
+path = '/data/'+username+'/PHYS14v3/SRfinder/'
 if not os.path.exists(path):
   os.makedirs(path)
 
@@ -50,7 +45,6 @@ streg = [[(250, 350), 1.], [(350, 450), 1.],[(450, -1), 1.]]
 htreg = [(500,750), (750,1000), (1000,1250), (1250,-1)]
 njreg = [(5,5),(6,7),(8,-1)]
 btreg = (0,0) 
-addCut = ['DFJJ<2.0','DFJJ<1.5']
 
 bestS1200 = []
 bestS1500 = []
@@ -58,10 +52,9 @@ SR = []
 for i_htb, htb in enumerate(htreg):
   for stb, dPhiCut in streg:
     for srNJet in njreg:
-      #for add in addCut:
 
         #name, cut = nameAndCut(stb, htb, srNJet, btb=btreg, presel=presel+'&&'+add, btagVar = 'nBJetMediumCMVA30')
-        name, cut = nameAndCut(stb, htb, srNJet, btb=btreg, presel=presel, btagVar = 'nBJetMediumCMVA30')
+        name, cut = nameAndCut(stb, htb, srNJet, btb=btreg, presel=presel, btagVar = btag_str)
         print 'HT: ',htb,'|ST: ',stb,'|nJets: ',srNJet#, '|additional: ',add
         B = getYieldFromChain(cBkg, cut, weight = "weight")
         B_Var = getYieldFromChain(cBkg, cut, weight = "weight*weight")
@@ -104,7 +97,7 @@ bestS1000=filter(lambda x:not x['FOM1000']=='nan', bestS1000)
 
 pickle.dump((bestS1200,bestS1500,bestS1000), file(path+prefix+'_pkl','w'))
 
-bestS1200, bestS1500 , bestS1000 = pickle.load(file('/data/'+username+'/results2015/SRfinder/'+prefix+'_pkl'))
+bestS1200, bestS1500 , bestS1000 = pickle.load(file(path+prefix+'_pkl'))
 
 print "signal yields (T5q^{4} 1.2/1.0/0.8)"
 print

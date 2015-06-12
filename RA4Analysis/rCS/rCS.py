@@ -9,6 +9,7 @@ from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain
 from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,varBinName
 from rCShelpers import *
+#from slidingDeltaPhi import *
 import math
 #from math import pi, sqrt
 
@@ -28,7 +29,7 @@ cTTJets = getChain(ttJets[lepSel],histname='',maxN=maxN)
 
 from localInfo import username
 uDir = username[0]+'/'+username
-subDir = 'PHYS14v3/rCS/singleLeptonic'
+subDir = 'PHYS14v3/withCSV/rCS/'
 
 path = '/afs/hephy.at/user/'+uDir+'/www/'+subDir+'/'
 if not os.path.exists(path):
@@ -54,16 +55,16 @@ ROOT.TH1F().SetDefaultSumw2()
 #    return rcs, rcsE 
 #    del h
 
-streg = [[(250, 350), 1.], [(350, 450), 1.], [(450, -1), 1.]]
+streg = [[(250, 350), 1.], [(350, 450), 1.],  [(450, -1), 1.] ]
 htreg = [(500,750),(750, 1000),(1000,1250),(1250,-1)]
 btreg = (0,0)
 njreg = [(2,2),(3,3),(4,5),(6,7),(8,-1)]#,(7,7),(8,8),(9,9)]
 nbjreg = [(0,0),(1,1),(2,2)]
 
-prefix = 'singleLeptonic_'
 #presel="singleMuonic&&nVetoMuons==1&&nVetoElectrons==0&&nBJetMedium40==1"
 #presel="singleMuonic&&nVetoMuons==1&&nVetoElectrons==0&&nBJetMedium25==0"
-presel='singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[2]>80'
+presel='singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80'
+prefix = presel.split('&&')[0]+'_'
 
 ##2D plots of yields
 #c1 = ROOT.TCanvas()
@@ -145,9 +146,10 @@ for name, c in [["TT", cTTJets] , ["W",cWJets] ]:
       for i in range(h_nj[name][stb][htb].GetNbinsX()):
         h_nj[name][stb][htb].GetXaxis().SetBinLabel(i+1, nJetBinName(njreg[i]))
       for i_njb, njb in enumerate(njreg):
-        cname, cut = nameAndCut(stb,htb,njb, btb=btreg ,presel=presel) 
+        cname, cut = nameAndCut(stb,htb,njb, btb=btreg ,presel=presel)
+        dPhiCut = dynDeltaPhi(1.0,stb)
         rcs = getRCS(c, cut, dPhiCut)
-        print rcs
+        print rcs, dPhiCut
         res = rcs['rCS']
         resErr = rcs['rCSE_sim']
         #res, resErr = getRCS(c, cut,  dPhiCut)
@@ -163,8 +165,9 @@ for name, c in [["TT", cTTJets] , ["W",cWJets] ]:
         h_nbj[name][stb][htb][bjb] = ROOT.TH1F("rcs_nbj","",len(njreg),0,len(njreg))
         for i_njb, njb in enumerate(njreg):
           cname, cut = nameAndCut(stb,htb,njb, btb=bjb ,presel=presel)
+          dPhiCut = dynDeltaPhi(1.0,stb)
           rcs = getRCS(c, cut, dPhiCut)
-          print rcs
+          print rcs, dPhiCut
           res = rcs['rCS']
           resErrPred = rcs['rCSE_pred']
           resErr = rcs['rCSE_sim']

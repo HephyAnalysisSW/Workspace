@@ -5,7 +5,8 @@ from localInfo import username
 from binnedNBTagsFit import binnedNBTagsFit
 from rCShelpers import * 
 from math import pi, sqrt
-
+from rCShelpers import *
+#from pred_helper import weight_str , weight_err_str
 #lepSel = 'hard'
  
 #nBTagCMVA = 'Sum$(Jet_pt>30&&abs(Jet_eta)<2.4&&Jet_id&&Jet_btagCMVA>0.732)' 
@@ -43,7 +44,8 @@ ROOT.TH1F().SetDefaultSumw2()
 #    res[htb][stb] = {}
 #    for srNJet in njreg:
       
-def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, btagVarString = 'nBJetMediumCSV30'):
+def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, btagVarString = 'nBJetMediumCSV30', lumi=4.0):
+  weight_str, weight_err_str = makeWeight(lumi)
   cWJets = samples['W']
   cTTJets = samples['TT']
   cRest = samples['Rest']
@@ -52,7 +54,7 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, btagVa
 
   #TT Jets yield in crNJet, no b-tag cut, low DPhi
   fit_crName, fit_crCut = nameAndCut(stb, htb, (2,3), btb=None, presel=presel, btagVar = btagVarString) 
-  fit_crNJet_lowDPhi = binnedNBTagsFit(fit_crCut+"&&"+dPhiStr+"<"+str(dPhiCut), samples = {'W':cWJets, 'TT':cTTJets, 'Rest':cRest}, nBTagVar = btagVarString , prefix=fit_crName)
+  fit_crNJet_lowDPhi = binnedNBTagsFit(fit_crCut+"&&"+dPhiStr+"<"+str(dPhiCut), samples = {'W':cWJets, 'TT':cTTJets, 'Rest':cRest}, nBTagVar = btagVarString , lumi=lumi, prefix=fit_crName)
 #  fit_crNJet_lowDPhi = binnedNBTagsFit(fit_crCut+"&&"+dPhiStr+"<"+str(dPhiCut), samples = {'W':cWJets, 'TT':cTTJets}, nBTagVar = 'nBJetMedium25', prefix=fit_crName)
   rd['fit_crNJet_lowDPhi'] = fit_crNJet_lowDPhi
   
@@ -72,8 +74,8 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, btagVa
   yTT_Var_crNJet_0b_lowDPhi     = fit_crNJet_lowDPhi['TT_AllPdg']['yieldVar']*fit_crNJet_lowDPhi['TT_AllPdg']['template'].GetBinContent(1)**2
   yTT_crNJet_0b_highDPhi        = rCS_crNJet_1b['rCS']*yTT_crNJet_0b_lowDPhi
   yTT_Var_crNJet_0b_highDPhi    = rCS_crNJet_1b['rCSE_pred']**2*yTT_crNJet_0b_lowDPhi**2 + rCS_crNJet_1b['rCS']**2*yTT_Var_crNJet_0b_lowDPhi
-  yTT_crNJet_0b_lowDPhi_truth   = getYieldFromChain(cTTJets, crCut+"&&"+dPhiStr+"<"+str(dPhiCut), weight = "weight")
-  yTT_crNJet_0b_highDPhi_truth  = getYieldFromChain(cTTJets, crCut+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight")
+  yTT_crNJet_0b_lowDPhi_truth   = getYieldFromChain(cTTJets, crCut+"&&"+dPhiStr+"<"+str(dPhiCut), weight = weight_str)
+  yTT_crNJet_0b_highDPhi_truth  = getYieldFromChain(cTTJets, crCut+"&&"+dPhiStr+">"+str(dPhiCut), weight = weight_str)
   rd['yTT_crNJet_0b_lowDPhi']          =  yTT_crNJet_0b_lowDPhi         
   rd['yTT_Var_crNJet_0b_lowDPhi']      =  yTT_Var_crNJet_0b_lowDPhi     
   rd['yTT_crNJet_0b_highDPhi']         =  yTT_crNJet_0b_highDPhi        
@@ -86,10 +88,10 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, btagVa
 #  print "Subtract denominator", yTT_crNJet_0b_lowDPhi,'true', yTT_crNJet_0b_lowDPhi_truth
   
   #calculate corrected rCS for W
-  y_crNJet_0b_highDPhi     = getYieldFromChain(cBkg, crCut+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight")
-  y_Var_crNJet_0b_highDPhi = getYieldFromChain(cBkg, crCut+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight*weight")
-  y_crNJet_0b_lowDPhi      = getYieldFromChain(cBkg, crCut+"&&"+dPhiStr+"<"+str(dPhiCut), weight = "weight")
-  y_Var_crNJet_0b_lowDPhi  = getYieldFromChain(cBkg, crCut+"&&"+dPhiStr+"<"+str(dPhiCut), weight = "weight*weight")
+  y_crNJet_0b_highDPhi     = getYieldFromChain(cBkg, crCut+"&&"+dPhiStr+">"+str(dPhiCut), weight = weight_str)
+  y_Var_crNJet_0b_highDPhi = getYieldFromChain(cBkg, crCut+"&&"+dPhiStr+">"+str(dPhiCut), weight = weight_err_str)
+  y_crNJet_0b_lowDPhi      = getYieldFromChain(cBkg, crCut+"&&"+dPhiStr+"<"+str(dPhiCut), weight = weight_str)
+  y_Var_crNJet_0b_lowDPhi  = getYieldFromChain(cBkg, crCut+"&&"+dPhiStr+"<"+str(dPhiCut), weight = weight_err_str)
   rCS_W_crNJet_0b_corr     = (y_crNJet_0b_highDPhi - yTT_crNJet_0b_highDPhi)/(y_crNJet_0b_lowDPhi - yTT_crNJet_0b_lowDPhi)
   rCS_Var_W_crNJet_0b_corr = rCS_W_crNJet_0b_corr**2*(\
       (y_Var_crNJet_0b_highDPhi + yTT_Var_crNJet_0b_highDPhi)/(y_crNJet_0b_highDPhi - yTT_crNJet_0b_highDPhi)**2 
@@ -100,10 +102,10 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, btagVa
 
   #calculate corrected rCS(+-) for W(+-) [because of yTT is symmetric in charge one have to subtract 0.5*yTT]
   #PosPdg
-  y_crNJet_0b_highDPhi_PosPdg     = getYieldFromChain(cBkg, 'leptonPdg>0&&'+crCut+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight")
-  y_Var_crNJet_0b_highDPhi_PosPdg = getYieldFromChain(cBkg, 'leptonPdg>0&&'+crCut+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight*weight")
-  y_crNJet_0b_lowDPhi_PosPdg      = getYieldFromChain(cBkg, 'leptonPdg>0&&'+crCut+"&&"+dPhiStr+"<"+str(dPhiCut), weight = "weight")
-  y_Var_crNJet_0b_lowDPhi_PosPdg  = getYieldFromChain(cBkg, 'leptonPdg>0&&'+crCut+"&&"+dPhiStr+"<"+str(dPhiCut), weight = "weight*weight")
+  y_crNJet_0b_highDPhi_PosPdg     = getYieldFromChain(cBkg, 'leptonPdg>0&&'+crCut+"&&"+dPhiStr+">"+str(dPhiCut), weight = weight_str)
+  y_Var_crNJet_0b_highDPhi_PosPdg = getYieldFromChain(cBkg, 'leptonPdg>0&&'+crCut+"&&"+dPhiStr+">"+str(dPhiCut), weight = weight_err_str)
+  y_crNJet_0b_lowDPhi_PosPdg      = getYieldFromChain(cBkg, 'leptonPdg>0&&'+crCut+"&&"+dPhiStr+"<"+str(dPhiCut), weight = weight_str)
+  y_Var_crNJet_0b_lowDPhi_PosPdg  = getYieldFromChain(cBkg, 'leptonPdg>0&&'+crCut+"&&"+dPhiStr+"<"+str(dPhiCut), weight = weight_err_str)
   rCS_W_PosPdg_crNJet_0b_corr     = (y_crNJet_0b_highDPhi_PosPdg - (0.5*yTT_crNJet_0b_highDPhi))/(y_crNJet_0b_lowDPhi_PosPdg - (0.5*yTT_crNJet_0b_lowDPhi))
   rCS_Var_W_PosPdg_crNJet_0b_corr = rCS_W_PosPdg_crNJet_0b_corr**2*(\
       (y_Var_crNJet_0b_highDPhi_PosPdg + (0.5*yTT_Var_crNJet_0b_highDPhi))/(y_crNJet_0b_highDPhi_PosPdg - (0.5*yTT_crNJet_0b_highDPhi))**2 
@@ -112,10 +114,10 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, btagVa
   rCS_W_PosPdg_crNJet_0b_notcorr     = (y_crNJet_0b_highDPhi_PosPdg )/(y_crNJet_0b_lowDPhi_PosPdg )
   rCS_Var_W_PosPdg_crNJet_0b_notcorr = rCS_W_PosPdg_crNJet_0b_notcorr**2*( (y_Var_crNJet_0b_highDPhi_PosPdg )/(y_crNJet_0b_highDPhi_PosPdg)**2 + (y_Var_crNJet_0b_lowDPhi_PosPdg)/(y_crNJet_0b_lowDPhi_PosPdg)**2 )
   #NegPdg
-  y_crNJet_0b_highDPhi_NegPdg     = getYieldFromChain(cBkg, 'leptonPdg<0&&'+crCut+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight")
-  y_Var_crNJet_0b_highDPhi_NegPdg = getYieldFromChain(cBkg, 'leptonPdg<0&&'+crCut+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight*weight")
-  y_crNJet_0b_lowDPhi_NegPdg      = getYieldFromChain(cBkg, 'leptonPdg<0&&'+crCut+"&&"+dPhiStr+"<"+str(dPhiCut), weight = "weight")
-  y_Var_crNJet_0b_lowDPhi_NegPdg  = getYieldFromChain(cBkg, 'leptonPdg<0&&'+crCut+"&&"+dPhiStr+"<"+str(dPhiCut), weight = "weight*weight")
+  y_crNJet_0b_highDPhi_NegPdg     = getYieldFromChain(cBkg, 'leptonPdg<0&&'+crCut+"&&"+dPhiStr+">"+str(dPhiCut), weight = weight_str)
+  y_Var_crNJet_0b_highDPhi_NegPdg = getYieldFromChain(cBkg, 'leptonPdg<0&&'+crCut+"&&"+dPhiStr+">"+str(dPhiCut), weight = weight_err_str)
+  y_crNJet_0b_lowDPhi_NegPdg      = getYieldFromChain(cBkg, 'leptonPdg<0&&'+crCut+"&&"+dPhiStr+"<"+str(dPhiCut), weight = weight_str)
+  y_Var_crNJet_0b_lowDPhi_NegPdg  = getYieldFromChain(cBkg, 'leptonPdg<0&&'+crCut+"&&"+dPhiStr+"<"+str(dPhiCut), weight = weight_err_str)
   rCS_W_NegPdg_crNJet_0b_corr     = (y_crNJet_0b_highDPhi_NegPdg - (0.5*yTT_crNJet_0b_highDPhi))/(y_crNJet_0b_lowDPhi_NegPdg - (0.5*yTT_crNJet_0b_lowDPhi))
   rCS_Var_W_NegPdg_crNJet_0b_corr = rCS_W_NegPdg_crNJet_0b_corr**2*(\
       (y_Var_crNJet_0b_highDPhi_NegPdg + (0.5*yTT_Var_crNJet_0b_highDPhi))/(y_crNJet_0b_highDPhi_NegPdg - (0.5*yTT_crNJet_0b_highDPhi))**2
@@ -155,7 +157,7 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, btagVa
   rd['rCS_W_NegPdg_crNJet_0b_truth']  = getRCS(cWJets, 'leptonPdg<0&&'+crCut, dPhiCut)
 
   fit_srName, fit_srCut = nameAndCut(stb, htb, srNJet, btb=None, presel=presel,btagVar = btagVarString) 
-  fit_srNJet_lowDPhi = binnedNBTagsFit(fit_srCut+"&&"+dPhiStr+"<"+str(dPhiCut), samples = {'W':cWJets, 'TT':cTTJets, 'Rest':cRest}, nBTagVar = btagVarString, prefix=fit_srName)
+  fit_srNJet_lowDPhi = binnedNBTagsFit(fit_srCut+"&&"+dPhiStr+"<"+str(dPhiCut), samples = {'W':cWJets, 'TT':cTTJets, 'Rest':cRest}, nBTagVar = btagVarString, lumi=lumi, prefix=fit_srName)
 #  fit_srNJet_lowDPhi = binnedNBTagsFit(fit_srCut+"&&"+dPhiStr+"<"+str(dPhiCut), samples = {'W':cWJets, 'TT':cTTJets}, nBTagVar = 'nBJetMedium25', prefix=fit_srName)
 
   rd['fit_srNJet_lowDPhi'] = fit_srNJet_lowDPhi
@@ -187,19 +189,19 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, btagVa
   rd['rCS_srNJet_0b_onlyW_NegPdg'] = rCS_srNJet_0b_onlyW_NegPdg
 
   #true yields measured from MC samples, residual background is also calculated here and added to the dict
-  truth_W         = getYieldFromChain(cWJets,  rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight")
-  truth_W_var     = getYieldFromChain(cWJets,  rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight*weight")
-  truth_Rest      = getYieldFromChain(cRest,   rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight")
-  truth_Rest_var  = getYieldFromChain(cRest,   rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight*weight")
+  truth_W         = getYieldFromChain(cWJets,  rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = weight_str)
+  truth_W_var     = getYieldFromChain(cWJets,  rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = weight_err_str)
+  truth_Rest      = getYieldFromChain(cRest,   rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = weight_str)
+  truth_Rest_var  = getYieldFromChain(cRest,   rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = weight_err_str)
 
-  truth_W_PosPdg         = getYieldFromChain(cWJets, 'leptonPdg>0&&'+rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight")
-  truth_W_var_PosPdg     = getYieldFromChain(cWJets, 'leptonPdg>0&&'+rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight*weight")
-  truth_W_NegPdg         = getYieldFromChain(cWJets, 'leptonPdg<0&&'+rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight")
-  truth_W_var_NegPdg     = getYieldFromChain(cWJets, 'leptonPdg<0&&'+rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight*weight")
-  truth_Rest_PosPdg      = getYieldFromChain(cRest,  'leptonPdg>0&&'+rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight")
-  truth_Rest_var_PosPdg  = getYieldFromChain(cRest,  'leptonPdg>0&&'+rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight*weight")
-  truth_Rest_NegPdg      = getYieldFromChain(cRest,  'leptonPdg<0&&'+rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight")
-  truth_Rest_var_NegPdg  = getYieldFromChain(cRest,  'leptonPdg<0&&'+rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = "weight*weight")
+  truth_W_PosPdg         = getYieldFromChain(cWJets, 'leptonPdg>0&&'+rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = weight_str)
+  truth_W_var_PosPdg     = getYieldFromChain(cWJets, 'leptonPdg>0&&'+rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = weight_err_str)
+  truth_W_NegPdg         = getYieldFromChain(cWJets, 'leptonPdg<0&&'+rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = weight_str)
+  truth_W_var_NegPdg     = getYieldFromChain(cWJets, 'leptonPdg<0&&'+rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = weight_err_str)
+  truth_Rest_PosPdg      = getYieldFromChain(cRest,  'leptonPdg>0&&'+rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = weight_str)
+  truth_Rest_var_PosPdg  = getYieldFromChain(cRest,  'leptonPdg>0&&'+rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = weight_err_str)
+  truth_Rest_NegPdg      = getYieldFromChain(cRest,  'leptonPdg<0&&'+rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = weight_str)
+  truth_Rest_var_NegPdg  = getYieldFromChain(cRest,  'leptonPdg<0&&'+rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = weight_err_str)
 
   #predicted yields with RCS method
   pred_W     = yW_srNJet_0b_lowDPhi*rCS_W_crNJet_0b_corr
