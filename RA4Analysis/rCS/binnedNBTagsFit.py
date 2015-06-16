@@ -6,24 +6,26 @@ from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,varBinName
 from localInfo import username
 from math import pi, sqrt
+from rCShelpers import *# weight_str , weight_err_str , lumi
 
-def binnedNBTagsFit(cut, samples, nBTagVar = 'nBJetMediumCSV30', prefix="", printDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/PHYS14v3/withCSV/templateFit/'):
+def binnedNBTagsFit(cut, samples, nBTagVar = 'nBJetMediumCSV30', lumi=4., prefix="", printDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/PHYS14v3/withCSV/templateFit_'+str(lumi)+'/'):
   if not os.path.exists(printDir):
      os.makedirs(printDir) 
+  weight_str, weight_err_str = makeWeight(lumi)
   cWJets = samples['W']
   cTTJets = samples['TT']
   cRest = samples['Rest']
-  template_WJets_PosPdg=getPlotFromChain(cWJets, nBTagVar, [0,1,2,3], 'leptonPdg>0&&'+cut, 'weight', binningIsExplicit=True,addOverFlowBin='upper')
-  template_WJets_NegPdg=getPlotFromChain(cWJets, nBTagVar, [0,1,2,3], 'leptonPdg<0&&'+cut, 'weight', binningIsExplicit=True,addOverFlowBin='upper')
-  template_TTJets=      getPlotFromChain(cTTJets,nBTagVar, [0,1,2,3], cut,                 'weight', binningIsExplicit=True,addOverFlowBin='upper')
-  template_Rest_PosPdg= getPlotFromChain(cRest,  nBTagVar, [0,1,2,3], 'leptonPdg>0&&'+cut, 'weight', binningIsExplicit=True,addOverFlowBin='upper')
-  template_Rest_NegPdg= getPlotFromChain(cRest,  nBTagVar, [0,1,2,3], 'leptonPdg<0&&'+cut, 'weight', binningIsExplicit=True,addOverFlowBin='upper')
+  template_WJets_PosPdg=getPlotFromChain(cWJets, nBTagVar, [0,1,2,3], 'leptonPdg>0&&'+cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
+  template_WJets_NegPdg=getPlotFromChain(cWJets, nBTagVar, [0,1,2,3], 'leptonPdg<0&&'+cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
+  template_TTJets=      getPlotFromChain(cTTJets,nBTagVar, [0,1,2,3], cut,                 weight_str, binningIsExplicit=True,addOverFlowBin='upper')
+  template_Rest_PosPdg= getPlotFromChain(cRest,  nBTagVar, [0,1,2,3], 'leptonPdg>0&&'+cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
+  template_Rest_NegPdg= getPlotFromChain(cRest,  nBTagVar, [0,1,2,3], 'leptonPdg<0&&'+cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
 
   print "Nominal yields TT:",template_TTJets.Integral(),'WJets_PosPdg',template_WJets_PosPdg.Integral(),'WJets_NegPdg',template_WJets_NegPdg.Integral()
   print "Nominal yields:",'Rest_PosPdg',template_Rest_PosPdg.Integral(),'Rest_NegPdg',template_Rest_NegPdg.Integral()
 
-  #hData_PosPdg=getPlotFromChain(cData,nBTagVar,[0,1,2,3],mTCut+'&&'+nameAndCut(metb,htb,njetb,'pos',btagRequirement='None')[1],'weight',binningIsExplicit=True,addOverFlowBin='upper')
-  #hData_NegPdg=getPlotFromChain(cData,nBTagVar,[0,1,2,3],mTCut+'&&'+nameAndCut(metb,htb,njetb,'neg',btagRequirement='None')[1],'weight',binningIsExplicit=True,addOverFlowBin='upper')
+  #hData_PosPdg=getPlotFromChain(cData,nBTagVar,[0,1,2,3],mTCut+'&&'+nameAndCut(metb,htb,njetb,'pos',btagRequirement='None')[1],weight_str,binningIsExplicit=True,addOverFlowBin='upper')
+  #hData_NegPdg=getPlotFromChain(cData,nBTagVar,[0,1,2,3],mTCut+'&&'+nameAndCut(metb,htb,njetb,'neg',btagRequirement='None')[1],weight_str,binningIsExplicit=True,addOverFlowBin='upper')
   hData_PosPdg = template_TTJets.Clone()
   hData_PosPdg.Scale(0.5)
   hData_PosPdg.Add(template_WJets_PosPdg)
@@ -159,14 +161,14 @@ def binnedNBTagsFit(cut, samples, nBTagVar = 'nBJetMediumCSV30', prefix="", prin
   ROOT.gROOT.SetStyle("Plain")#Removesgraybackgroundfromplots
   ROOT.gPad.SetLeftMargin(0.15)
   fitFrame_PosPdg.GetYaxis().SetTitleOffset(1.4)
-  fitFrame_PosPdg.GetXaxis().SetTitle('nBJetMediumCSV30')
+  fitFrame_PosPdg.GetXaxis().SetTitle(nBTagVar)
   fitFrame_PosPdg.Draw()
 
   c1.cd(2)
   ROOT.gROOT.SetStyle("Plain")#Removesgraybackgroundfromplots
   ROOT.gPad.SetLeftMargin(0.15)
   fitFrame_NegPdg.GetYaxis().SetTitleOffset(1.4)
-  fitFrame_NegPdg.GetXaxis().SetTitle('nBJetMediumCSV30')
+  fitFrame_NegPdg.GetXaxis().SetTitle(nBTagVar)
   fitFrame_NegPdg.Draw()
 
   c1.Print(printDir+'/'+prefix+'_nBTagFitRes.png')

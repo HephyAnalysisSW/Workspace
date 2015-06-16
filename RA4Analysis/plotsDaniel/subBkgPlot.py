@@ -29,8 +29,8 @@ lepSel = 'hard'
 
 nBtagReg=[(0,0),(1,1)]#,(2,-1)]
 nJetReg=[(2,3),(4,5),(6,7),(8,-1)]#,(5,5),(6,-1)]#,(6,7),(8,-1)]#,(6,-1)]#,(3,3),(4,4),(5,5),(6,-1)]
-stReg=[(150,-1)]#,(250,350),(350,450),(450,-1)]#,(250,-1)]#,(350,450),(450,-1)]
-htReg=[(500,1000),(1000,-1)]#,(1000,1250),(1250,-1)]#,(750,-1)]#,(750,1000),(1000,1250),(1250,-1)]
+stReg=[(150,-1)]#,(300,-1)]#,(350,450),(450,-1)]#,(250,-1)]#,(350,450),(450,-1)]
+htReg=[(500,-1)]#,(1000,-1)]#,(1000,1250),(1250,-1)]#,(750,-1)]#,(750,1000),(1000,1250),(1250,-1)]
 
 colorList=[ROOT.kBlack, ROOT.kMagenta+2, ROOT.kOrange+2,ROOT.kMagenta+2]
 
@@ -198,7 +198,7 @@ for hReg in htReg:
       
       h_Stack = ROOT.THStack('h_Stack',varstring)
       
-      totalL = ROOT.TLegend(0.7,0.7,0.95,0.95)
+      totalL = ROOT.TLegend(0.6,0.6,0.95,0.93)
       totalL.SetFillColor(ROOT.kWhite)
       totalL.SetShadowColor(ROOT.kWhite)
       totalL.SetBorderSize(1)
@@ -240,13 +240,14 @@ for hReg in htReg:
         
         pad1 = ROOT.TPad('pad1','pad1',0,0.3,1.,1.)
         pad1.SetBottomMargin(0)
-        pad1.SetLeftMargin(0.1)
+        pad1.SetTopMargin(0.07)
+        pad1.SetLeftMargin(0.12)
         pad1.SetGrid()
         pad1.SetLogy()
         pad1.Draw()
         pad1.cd()
         
-        l = ROOT.TLegend(0.7,0.8,0.95,0.95)
+        l = ROOT.TLegend(0.5,0.75,0.95,0.93)
         l.SetFillColor(ROOT.kWhite)
         l.SetShadowColor(ROOT.kWhite)
         l.SetBorderSize(1)
@@ -257,6 +258,7 @@ for hReg in htReg:
         histo.SetFillColor(col)
         histo.SetLineColor(ROOT.kBlack)#was col+2
         histo.SetMarkerSize(0)
+        histo.SetLineWidth(1)
         h_Stack.Add(histo)
         totalL.AddEntry(histo)
         compHists = []
@@ -272,6 +274,8 @@ for hReg in htReg:
           compHist.SetMarkerSize(0)
           compHist.SetMarkerStyle(0)
           compHist.SetFillColor(0)
+          compHist.SetMinimum(0.08)
+          compHist.SetLineWidth(3)
           compHist.Sumw2()
           if subYields[ibs]['totalYield']>0:
             norm=subYields[0]['totalYield']/subYields[ibs]['totalYield']
@@ -287,8 +291,11 @@ for hReg in htReg:
           print jReg, bs, norm
         
         l.AddEntry(histo)
-        histo.GetYaxis().SetTitleOffset(0.8)
+        histo.GetYaxis().SetTitleOffset(1.)
         histo.GetYaxis().SetTitle('Events')
+        histo.SetTitleSize(0.15)
+        histo.GetYaxis().SetLabelSize(0.07)
+        histo.SetMinimum(0.05)
         histo.Draw('hist')
         ks = []
         for hists in compHists:
@@ -304,37 +311,37 @@ for hReg in htReg:
         
         latex1 = ROOT.TLatex()
         latex1.SetNDC()
-        latex1.SetTextSize(0.035)
+        latex1.SetTextSize(0.055)
         latex1.SetTextAlign(11) # align right
-        latex1.DrawLatex(0.16,0.96,"CMS simulation")
-        latex1.DrawLatex(0.7,0.96,"L=4 fb^{-1} (13TeV)")
+        latex1.DrawLatex(0.12,0.94,"CMS simulation")
+        latex1.DrawLatex(0.7,0.94,"L=4 fb^{-1} (13TeV)")
         
         
         subCan.cd()
         
         pad2 = ROOT.TPad('pad2','pad2',0,0,1.,.3)
-        pad2.SetTopMargin(0)
+        pad2.SetTopMargin(0.)
         pad2.SetBottomMargin(0.3)
-        pad2.SetLeftMargin(0.1)
+        pad2.SetLeftMargin(0.12)
         pad2.SetGrid()
         pad2.Draw()
         pad2.cd()
         
         ratio = compHists[0].Clone()
         ratio.Divide(compHists[1])
-        ratio.SetMaximum(2)
-        ratio.SetMinimum(0)
+        ratio.SetMaximum(1.9)
+        ratio.SetMinimum(0.1)
         ratio.SetMarkerStyle(9)
         ratio.SetMarkerSize(1)
         ratio.SetLineColor(ROOT.kBlack)
-        ratio.GetYaxis().SetLabelSize(0.1)
-        ratio.GetYaxis().SetTitleOffset(0.4)
-        ratio.GetYaxis().SetTitleSize(0.1)
+        ratio.GetYaxis().SetLabelSize(0.15)
+        ratio.GetYaxis().SetTitleOffset(0.35)
+        ratio.GetYaxis().SetTitleSize(0.15)
         ratio.GetYaxis().SetTitle('Ratio 0b/1b')
         ratio.GetYaxis().SetNdivisions(5)
-        ratio.GetXaxis().SetLabelSize(0.1)
-        ratio.GetXaxis().SetTitleSize(0.1)
-        ratio.GetXaxis().SetTitleOffset(1.1)
+        ratio.GetXaxis().SetLabelSize(0.15)
+        ratio.GetXaxis().SetTitleSize(0.15)
+        ratio.GetXaxis().SetTitleOffset(1.05)
         ratio.GetXaxis().SetTitle(vartex)
         
         ratio.Draw('e1p')
@@ -384,7 +391,8 @@ for hReg in htReg:
       h_Stack.SetMinimum(0.08)
       pad3 = ROOT.TPad('pad1','pad1',0,0.3,1.,1.)
       pad3.SetBottomMargin(0)
-      pad3.SetLeftMargin(0.1)
+      pad3.SetLeftMargin(0.12)
+      pad3.SetTopMargin(0.07)
       pad3.SetGrid()
       pad3.SetLogy()
       pad3.Draw()
@@ -399,8 +407,10 @@ for hReg in htReg:
         compHist = ROOT.TH1F(str(histoname),str(bs) + ' b-tags',*binning)
         compHist.SetLineWidth(2)
         compHist.SetMarkerSize(0)
+        compHist.SetMinimum(0.08)
         compHist.SetMarkerStyle(0)
         compHist.SetFillColor(0)
+        compHist.SetLineWidth(3)
         compHist.Sumw2()
         if totalYields[ibs]['totalYield']>0:
           norm=totalYields[0]['totalYield']/totalYields[ibs]['totalYield']
@@ -424,11 +434,12 @@ for hReg in htReg:
           allYields[-(ik+1)].update({'KS-Test': k})
 
       h_Stack.GetYaxis().SetTitle("Events  ")
-      h_Stack.GetYaxis().SetTitleSize(0.06)
-      h_Stack.GetYaxis().SetTitleOffset(0.8)
+      h_Stack.GetYaxis().SetTitleSize(0.07)
+      h_Stack.GetYaxis().SetTitleOffset(.8)
+      h_Stack.GetYaxis().SetLabelSize(0.06)
 
-      latex1.DrawLatex(0.16,0.96,"CMS simulation")
-      latex1.DrawLatex(0.7,0.96,"L=4 fb^{-1} (13TeV)")
+      latex1.DrawLatex(0.12,0.94,"CMS simulation")
+      latex1.DrawLatex(0.7,0.94,"L=4 fb^{-1} (13TeV)")
       
       totalL.Draw()
       
@@ -437,26 +448,26 @@ for hReg in htReg:
       pad4 = ROOT.TPad('pad2','pad2',0,0,1.,.3)
       pad4.SetTopMargin(0)
       pad4.SetBottomMargin(0.3)
-      pad4.SetLeftMargin(0.1)
+      pad4.SetLeftMargin(0.12)
       pad4.SetGrid()
       pad4.Draw()
       pad4.cd()
       
       ratio = compHists[0].Clone()
       ratio.Divide(compHists[1])
-      ratio.SetMaximum(2)
-      ratio.SetMinimum(0)
+      ratio.SetMaximum(1.9)
+      ratio.SetMinimum(0.1)
       ratio.SetMarkerStyle(9)
       ratio.SetMarkerSize(1)
       ratio.SetLineColor(ROOT.kBlack)
-      ratio.GetYaxis().SetLabelSize(0.1)
+      ratio.GetYaxis().SetLabelSize(0.15)
       ratio.GetYaxis().SetTitleOffset(0.4)
-      ratio.GetYaxis().SetTitleSize(0.1)
+      ratio.GetYaxis().SetTitleSize(0.15)
       ratio.GetYaxis().SetTitle('Ratio 0b/1b')
       ratio.GetYaxis().SetNdivisions(5)
-      ratio.GetXaxis().SetLabelSize(0.1)
-      ratio.GetXaxis().SetTitleSize(0.1)
-      ratio.GetXaxis().SetTitleOffset(1.1)
+      ratio.GetXaxis().SetLabelSize(0.15)
+      ratio.GetXaxis().SetTitleSize(0.15)
+      ratio.GetXaxis().SetTitleOffset(1.05)
       ratio.GetXaxis().SetTitle(vartex)
       
       ratio.Draw('e1p')      
