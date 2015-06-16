@@ -23,9 +23,9 @@ deltaPhiCut=1.
 varstring='deltaPhi_Wl'
 lepSel = 'hard'
 
-targetLumi = 3. #fb^-1
+targetLumi = 10. #fb^-1
 sampleLumi = 4. #fb^-1
-signalRegions = signalRegion3fb
+signalRegions = signalRegion10fb
 
 scaleFactor = targetLumi/sampleLumi
 

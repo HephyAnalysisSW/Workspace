@@ -6,6 +6,7 @@ from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import 
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName, nBTagBinName, varBinName, varBin
 from rCShelpers import *
 import math
+import pickle
 from Workspace.RA4Analysis.signalRegions import *
 
 small = False
@@ -25,6 +26,10 @@ subDir = 'PHYS14v3/ANplots/rCSbtagmultiCompleteCorrection/'
 path = '/afs/hephy.at/user/'+uDir+'/www/'+subDir+'/'
 if not os.path.exists(path):
   os.makedirs(path)
+
+picklePath = '/data/'+username+'/YourFavoriteDir/'
+if not os.path.exists(picklePath):
+  os.makedirs(picklePath)
 
 ROOT_colors = [ROOT.kBlack, ROOT.kRed-7, ROOT.kAzure-1, ROOT.kGreen+3, ROOT.kOrange+1,ROOT.kRed-3, ROOT.kAzure+6, ROOT.kCyan+3, ROOT.kOrange , ROOT.kRed-10]
 dPhiStr = 'deltaPhi_Wl'
@@ -164,4 +169,5 @@ for stb in sorted(regions):
     print ' & '+getNumString(correctionFactors['tt'][stb][htb]['FitRatio'], correctionFactors['tt'][stb][htb]['FitRatioError'])+'\\\\ '
 print '\\hline\end{tabular}\end{center}\caption{Correction factors for \\ttJets background, 3$fb^{-1}$}\label{tab:0b_rcscorr_Wbkg}\end{table}'
 
+pickle.dump(correctionFactors, file(picklePath+'correction_pkl','w'))
 
