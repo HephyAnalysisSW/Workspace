@@ -26,8 +26,8 @@ cBkg = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], DY[lepSel], singleTop[lep
 #weight_str = 'weight_Up'
 #weight_err_str = 'weight_Up*weight_Up'
 
-signalRegions = signalRegion10fb      ##because 10 one is full
-lumi = 10.
+signalRegions = signalRegion3fb     ##because 10 one is full
+lumi = 3.
 
 weight_str, weight_err_str = makeWeight(lumi)
 
@@ -149,7 +149,7 @@ for srNJet in signalRegions:
 
       #bins[htb][stb][srNJet]=rd
       bins[srNJet][stb][htb] = rd
-path = '/data/'+username+'/PHYS14v3/withCSV/rCS_0b_'+str(lumi)+'fb/'
+path = '/data/'+username+'/PHYS14v3/withCSV/rCS_0b_'+str(lumi)+'fbSlidingWcorrectionMuonChannel/'
 if not os.path.exists(path):
   os.makedirs(path)
 pickle.dump(bins, file(path+prefix+'_estimationResults_pkl','w'))

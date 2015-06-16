@@ -75,7 +75,7 @@ for njb in signalRegions:
       del sig1H, sig2H, sig3H, bkgH
 
 path = '/data/'+username+'/lumi'+str(targetLumi)
-yieldFile = open(path+'yields_pkl_nonSliding','w')
+yieldFile = open(path+'yields_pkl_final','w')
 pickle.dump(yields,yieldFile)
 yieldFile.close()
 
