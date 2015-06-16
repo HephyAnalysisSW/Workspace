@@ -18,16 +18,15 @@ lepSel = 'hard'
  
 cWJets  = getChain(WJetsHTToLNu[lepSel],histname='')
 cTTJets = getChain(ttJets[lepSel],histname='')
-cRest = getChain([DY[lepSel], singleTop[lepSel], TTVH[lepSel]],histname='')#no QCD 
+#cRest = getChain([DY[lepSel], singleTop[lepSel], TTVH[lepSel]],histname='')#no QCD 
 #cRest = getChain(TTVH[lepSel],histname='')#no QCD 
-cBkg = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]],histname='')#no QCD
+#cBkg = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]],histname='')#no QCD
+#cSig = getChain(T5qqqqWW_mGo1000_mCh800_mChi700[lepSel],T5qqqqWW_mGo1200_mCh1000_mChi800[lepSel],T5qqqqWW_mGo1500_mCh800_mChi100[lepSel],histname='')  ##to calculate signal contamination
+cBkg = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]], T5qqqqWW_mGo1000_mCh800_mChi700[lepSel] , histname='')#no QCD , ##to calculate signal contamination
+cRest = getChain([DY[lepSel], singleTop[lepSel], TTVH[lepSel]],T5qqqqWW_mGo1000_mCh800_mChi700[lepSel],histname='')#no QCD 
 
-
-#weight_str = 'weight_Up'
-#weight_err_str = 'weight_Up*weight_Up'
-
-signalRegions = signalRegion10fb      ##because 10 one is full
-lumi = 10.
+signalRegions = signalRegion3fb     ##because 10 one is full
+lumi = 3.
 
 weight_str, weight_err_str = makeWeight(lumi)
 
@@ -44,7 +43,7 @@ if signal:
             #"SMS_T2tt_2J_mStop850_mLSP100",
             {'name':'T5q^{4} 1.2/1.0/0.8', 'sample':T5qqqqWW_mGo1200_mCh1000_mChi800[lepSel], 'weight':weight_str, 'color':ROOT.kBlack},
             {'name':'T5q^{4} 1.5/0.8/0.1', 'sample':T5qqqqWW_mGo1500_mCh800_mChi100[lepSel],  'weight':weight_str, 'color':ROOT.kMagenta},
-            #{'name':'T5q^{4} 1.0/0.8/0.7', 'sample':T5qqqqWW_mGo1000_mCh800_mChi700[lepSel],  'weight':weight_str, 'color':ROOT.kYellow},
+            {'name':'T5q^{4} 1.0/0.8/0.7', 'sample':T5qqqqWW_mGo1000_mCh800_mChi700[lepSel],  'weight':weight_str, 'color':ROOT.kYellow},
             #"T1ttbbWW_mGo1000_mCh725_mChi715",
             #"T1ttbbWW_mGo1000_mCh725_mChi720",
             #"T1ttbbWW_mGo1300_mCh300_mChi290",
@@ -149,7 +148,7 @@ for srNJet in signalRegions:
 
       #bins[htb][stb][srNJet]=rd
       bins[srNJet][stb][htb] = rd
-path = '/data/'+username+'/PHYS14v3/withCSV/rCS_0b_'+str(lumi)+'fb/'
+path = '/data/'+username+'/PHYS14v3/withCSV/rCS_0b_'+str(lumi)+'fbSlidingWcorrectionMuonChannel_signal1000/'
 if not os.path.exists(path):
   os.makedirs(path)
 pickle.dump(bins, file(path+prefix+'_estimationResults_pkl','w'))
