@@ -10,7 +10,7 @@ from Workspace.RA4Analysis.signalRegions import *
 prefix = 'singleLeptonic_Phys14V3_'
 #res = pickle.load(file('/data/'+username+'/results2015/rCS_0b/'+prefix+'_estimationResults_pkl'))
 #res = pickle.load(file('/data/'+username+'/PHYS14v3/withCSV/rCS_0b/'+prefix+'_estimationResults_ttJet_unc_pkl'))
-res = pickle.load(file('/data/'+username+'/PHYS14v3/withCSV/rCS_0b_10.0fb/'+prefix+'_estimationResults_pkl'))
+res = pickle.load(file('/data/'+username+'/PHYS14v3/withCSV/rCS_0b_3.0fb/'+prefix+'_estimationResults_pkl'))
 #res1 = pickle.load(file('/data/'+username+'/PHYS14v3/withCSV/rCS_0b/'+prefix+'_ttjet_unc_estimationResults_pkl'))
 #res = pickle.load(file('/data/'+username+'/PHYS14v3/withCSV/rCS_0b/'+prefix+'_restIsTTVH_estimationResults_pkl'))
 
@@ -18,7 +18,7 @@ res = pickle.load(file('/data/'+username+'/PHYS14v3/withCSV/rCS_0b_10.0fb/'+pref
 #nSTbins = len(streg)
 #nJetBins = len(njreg)
 
-signalRegions = signalRegion10fb
+signalRegions = signalRegion3fb
 
 #streg = [[(250, 350), 1.], [(350, 450), 1.], [(450,-1), 1.]]
 #htreg = [(500,750),(750,1000),(1000,1250),(1250,-1)]
