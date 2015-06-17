@@ -8,7 +8,7 @@ from localInfo import username
 from math import pi, sqrt
 from rCShelpers import *# weight_str , weight_err_str , lumi
 
-def binnedNBTagsFit(cut, samples, nBTagVar = 'nBJetMediumCSV30', lumi=4., prefix="", printDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/PHYS14v3/withCSV/templateFit_'+str(lumi)+'signal1000/'):
+def binnedNBTagsFit(cut, samples, nBTagVar = 'nBJetMediumCSV30', lumi=4., prefix="", printDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/PHYS14v3/withCSV/templateFit_'+str(lumi)+'/'):
   if not os.path.exists(printDir):
      os.makedirs(printDir) 
   weight_str, weight_err_str = makeWeight(lumi)

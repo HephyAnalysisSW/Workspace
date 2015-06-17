@@ -18,12 +18,12 @@ lepSel = 'hard'
  
 cWJets  = getChain(WJetsHTToLNu[lepSel],histname='')
 cTTJets = getChain(ttJets[lepSel],histname='')
-#cRest = getChain([DY[lepSel], singleTop[lepSel], TTVH[lepSel]],histname='')#no QCD 
+cRest = getChain([DY[lepSel], singleTop[lepSel], TTVH[lepSel]],histname='')#no QCD 
 #cRest = getChain(TTVH[lepSel],histname='')#no QCD 
-#cBkg = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]],histname='')#no QCD
+cBkg = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]],histname='')#no QCD
 #cSig = getChain(T5qqqqWW_mGo1000_mCh800_mChi700[lepSel],T5qqqqWW_mGo1200_mCh1000_mChi800[lepSel],T5qqqqWW_mGo1500_mCh800_mChi100[lepSel],histname='')  ##to calculate signal contamination
-cBkg = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]], T5qqqqWW_mGo1000_mCh800_mChi700[lepSel] , histname='')#no QCD , ##to calculate signal contamination
-cRest = getChain([DY[lepSel], singleTop[lepSel], TTVH[lepSel]],T5qqqqWW_mGo1000_mCh800_mChi700[lepSel],histname='')#no QCD 
+#cBkg = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]], T5qqqqWW_mGo1000_mCh800_mChi700[lepSel] , histname='')#no QCD , ##to calculate signal contamination
+#cRest = getChain([DY[lepSel], singleTop[lepSel], TTVH[lepSel]],T5qqqqWW_mGo1000_mCh800_mChi700[lepSel],histname='')#no QCD 
 
 signalRegions = signalRegion3fb     ##because 10 one is full
 lumi = 3.
@@ -67,9 +67,6 @@ btagString = 'nBJetMediumCSV30'
 
 defDeltaPhiCut = 1.0
 #streg = [[(250, 350), deltaPhiCut], [(350, 450), deltaPhiCut], [(450, -1), deltaPhiCut]] 
-streg = [(250, 350), (350, 450), (450, -1)]
-htreg = [(500,750), (750,1000), (1000,1250), (1250,-1)]
-njreg = [(5,5),(6,7),(8,-1)]
 bjreg = (0,0)
 
 
@@ -137,6 +134,10 @@ for srNJet in signalRegions:
           s['yield_PosPdg_Var'] = getYieldFromChain(s['chain'], 'leptonPdg>0&&'+cut+"&&deltaPhi_Wl>"+str(deltaPhiCut), weight = weight_err_str)
           s['FOM_PosPdg']       = getFOM(s['yield_PosPdg'],sqrt(s['yield_PosPdg_Var']),truth_total_PosPdg,truth_total_PosPdg_err)
 
+          s['yield']     = getYieldFromChain(s['chain'], cut+"&&deltaPhi_Wl>"+str(deltaPhiCut), weight = weight_str)
+          s['yield_Var'] = getYieldFromChain(s['chain'], cut+"&&deltaPhi_Wl>"+str(deltaPhiCut), weight = weight_err_str)
+          s['FOM']       = getFOM(s['yield'],sqrt(s['yield_Var']),truth_total_PosPdg,truth_total_PosPdg_err)
+
           rd.update({\
                       s['name']+'_yield_NegPdg':s['yield_NegPdg'],\
                       s['name']+'_yield_NegPdg_Var':s['yield_NegPdg_Var'],\
@@ -144,11 +145,14 @@ for srNJet in signalRegions:
                       s['name']+'_yield_PosPdg':s['yield_PosPdg'],\
                       s['name']+'_yield_PosPdg_Var':s['yield_PosPdg_Var'],\
                       s['name']+'_FOM_PosPdg':s['FOM_PosPdg'],\
+                      s['name']+'_yield':s['yield'],\
+                      s['name']+'_yield_Var':s['yield_Var'],\
+                      s['name']+'_FOM':s['FOM'],\
                     })
 
       #bins[htb][stb][srNJet]=rd
       bins[srNJet][stb][htb] = rd
-path = '/data/'+username+'/PHYS14v3/withCSV/rCS_0b_'+str(lumi)+'fbSlidingWcorrectionMuonChannel_signal1000/'
+path = '/data/'+username+'/PHYS14v3/withCSV/rCS_0b_'+str(lumi)+'fbSlidingWcorrectionMuonChannel/'
 if not os.path.exists(path):
   os.makedirs(path)
 pickle.dump(bins, file(path+prefix+'_estimationResults_pkl','w'))
