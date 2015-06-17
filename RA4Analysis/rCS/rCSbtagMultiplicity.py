@@ -172,4 +172,4 @@ for stb in sorted(regions):
 print '\\hline\end{tabular}\end{center}\caption{Correction factors for \\ttJets background, 3$fb^{-1}$}\label{tab:0b_rcscorr_Wbkg}\end{table}'
 
 pickle.dump(correctionFactors, file(picklePath+'correction_pkl','w'))
-
+print "correction pkl written here :" , picklePath+'correction_pkl'

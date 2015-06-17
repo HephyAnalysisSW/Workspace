@@ -13,7 +13,8 @@ prefix = 'singleLeptonic_Phys14V3_'
 
 path = '/data/'+username+'/PHYS14v3/withCSV/rCS_0b_3.0fbSlidingWcorrectionMuonChannel/' 
 res = pickle.load(file(path+prefix+'_estimationResults_pkl'))
-kcs = pickle.load(file(path+'correction_pkl'))
+#kcs = pickle.load(file(path+'correction_pkl'))
+kcs = pickle.load(file('/data/easilar/YourFavoriteDir/correction_pkl'))
 
 
 #res1 = pickle.load(file('/data/'+username+'/PHYS14v3/withCSV/rCS_0b/'+prefix+'_ttjet_unc_estimationResults_pkl'))
@@ -24,7 +25,6 @@ kcs = pickle.load(file(path+'correction_pkl'))
 #nJetBins = len(njreg)
 
 signalRegions = signalRegion3fb
-
 
 #streg = [[(250, 350), 1.], [(350, 450), 1.], [(450,-1), 1.]]
 #htreg = [(500,750),(750,1000),(1000,1250),(1250,-1)]
@@ -153,7 +153,44 @@ for srNJet in sorted(signalRegions):
       res[srNJet][stb][htb]['tot_NegPdg_pred_err'] = totalPredictionNegPdgError
       
 print '\\hline\end{tabular}}\end{center}\caption{Closure table for the background with applied correction factors for \\ttJets, 0-tag regions, 3$fb^{-1}$}\label{tab:0b_rcscorr_Wbkg}\end{table}'
+
 pickle.dump(res, file(path+prefix+'_estimationResults_pkl_updated','w'))
+print "written pkl :" , path+prefix+'_estimationResults_pkl_updated'
+
+print
+print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrr|rrr|rrr|rrr|rrr|rrr|}\\hline'
+print ' \\njet     & \ST & \HT     &\multicolumn{6}{c|}{$tt+$Jets}&\multicolumn{6}{c|}{$W+$ Jets}&\multicolumn{3}{c|}{Other EW bkg.}&\multicolumn{6}{c|}{total bkg.}\\\%\hline'
+print ' & $[$GeV$]$ &$[$GeV$]$&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation} \\\\\hline'
+
+secondLine = False
+for srNJet in sorted(signalRegions):
+  pred[srNJet] = {}
+  print '\\hline'
+  if secondLine: print '\\hline'
+  secondLine = True
+  print '\multirow{'+str(rowsNJet[srNJet]['n'])+'}{*}{\\begin{sideways}$'+varBin(srNJet)+'$\end{sideways}}'
+  for stb in sorted(signalRegions[srNJet]):
+    pred[srNJet][stb] = {}
+    print '&\multirow{'+str(rowsSt[srNJet][stb]['n'])+'}{*}{$'+varBin(stb)+'$}'
+    first = True
+    for htb in sorted(signalRegions[srNJet][stb]):
+      pred[srNJet][stb][htb] = {}
+      if not first: print '&'
+      first = False
+      print '&$'+varBin(htb)+'$'
+      print ' & '+getNumString(res[srNJet][stb][htb]['TT_pred']*kcs['tt'][stb][htb]['FitRatio'], sqrt(ttPredictionVar))\
+           +' & '+getNumString(res[srNJet][stb][htb]['TT_truth'], res[srNJet][stb][htb]['TT_truth_err'])\
+           +' & '+getNumString(res[srNJet][stb][htb]['W_pred'],   sqrt(WPredictionVar))\
+           +' & '+getNumString(res[srNJet][stb][htb]['W_truth'],  res[srNJet][stb][htb]['W_truth_err'])\
+           +' & '+getNumString(res[srNJet][stb][htb]['Rest_truth'], res[srNJet][stb][htb]['Rest_truth_err'])\
+           +' & '+getNumString(totalPrediction, totalPredictionError)\
+           +' & '+getNumString(res[srNJet][stb][htb]['tot_truth'],res[srNJet][stb][htb]['tot_truth_err']) +'\\\\'
+      if htb[1] == -1 : print '\\cline{2-24}'
+      pred[srNJet][stb][htb].update({'relClosureErrorTT':rCS_srPredErrorTT, 'relClosureErrorW':rCS_srPredErrorW, 'tot_pred':totalPrediction, 'tot_pred_err':totalPredictionError})
+print '\\hline\end{tabular}}\end{center}\caption{Closure table for the background with applied correction factors for \\ttJets, 0-tag regions, 3$fb^{-1}$}\label{tab:0b_rcscorr_Wbkg}\end{table}'
+
+
+
 
 
 # W closure table
