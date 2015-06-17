@@ -58,7 +58,7 @@ def LpTemplateFit(LpTemplates, prefix="", printDir='/afs/hephy.at/user/'+usernam
 #  template_Rest_NegPdg.Scale(1./template_Rest_NegPdg.Integral())
 
   #Observable
-  x=ROOT.RooRealVar('Lp','L_{P}',-0.7,1.7)
+  x=ROOT.RooRealVar('Lp','L_{P}',-0.5,2.5)
 
   #import the contents of 'data' ROOT histogram into a RooDataHist object 
   data=ROOT.RooDataHist("data","data",ROOT.RooArgList(x),hData)
@@ -71,8 +71,8 @@ def LpTemplateFit(LpTemplates, prefix="", printDir='/afs/hephy.at/user/'+usernam
 #  dh_Rest_PosPdg=ROOT.RooDataHist("mcRest","mcRest",ROOT.RooArgList(x),template_Rest_PosPdg)
 #  dh_Rest_NegPdg=ROOT.RooDataHist("mcRest","mcRest",ROOT.RooArgList(x),template_Rest_NegPdg)
 
-  yield_EWK=ROOT.RooRealVar("EWK_yield","yieldEWK",0.1,0,10**5)
-  yield_QCD=ROOT.RooRealVar("QCD_yield","yieldQCD",0.1,0,10**5)
+  yield_EWK=ROOT.RooRealVar("EWK_yield","yieldEWK",0.1,0,10**7)
+  yield_QCD=ROOT.RooRealVar("QCD_yield","yieldQCD",0.1,0,10**7)
 #  yield_WJets_PosPdg = ROOT.RooRealVar("yield_WJets_PosPdg","yield_WJets_PosPdg",0.1,0,10**5)
 #  yield_WJets_NegPdg = ROOT.RooRealVar("yield_WJets_NegPdg","yield_WJets_NegPdg",0.1,0,10**5)
 #  yield_Rest_PosPdg = ROOT.RooRealVar("yield_Rest_PosPdg","yield_Rest_PosPdg",0.1,0,10**5)
@@ -157,7 +157,7 @@ def LpTemplateFit(LpTemplates, prefix="", printDir='/afs/hephy.at/user/'+usernam
 
   #myPdf->paramOn(frame,Layout(xmin,ymin,ymax))
   fitFrame=x.frame(rf.Bins(50),rf.Title("FitModel"))
-  model.paramOn(fitFrame,rf.Layout(0.5,0.9,0.9))
+  model.paramOn(fitFrame,rf.Layout(0.55,0.95,0.95))
   data.plotOn(fitFrame,rf.LineColor(ROOT.kBlack))
   model.plotOn(fitFrame,rf.LineColor(ROOT.kRed))
   model.plotOn(fitFrame,rf.Components("model_QCD"),rf.LineColor(ROOT.kGreen),rf.LineStyle(ROOT.kDashed))

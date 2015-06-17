@@ -20,9 +20,9 @@ presel = 'dPhi_singleElectronic_'
 if not os.path.exists(wwwDir):
   os.makedirs(wwwDir)
 
-htreg = [(500,750)]#, (750,1000)]
-streg = [(250,350)]#, (350,450), (450,-1)]
-njreg = [(6,7)]#, (8,-1)]
+htreg = [(500,-1)]#, (750,1000)]
+streg = [(200,-1)]#, (350,450), (450,-1)]
+njreg = [(3,4)]#, (8,-1)]
 btreg = [(0,0)]
 dPhiBinning = [0,0.5,1.0,1.5,2.0,2.5,3.0,pi]
 
@@ -31,13 +31,13 @@ small = False
 #doFit = True
 doFit = False
 
-eleVarList = ['pt', 'eta', 'phi', 'pdgId', 'miniRelIso', 'convVeto', 'sip3d', 'mvaIdPhys14', 'charge']
+eleVarList = ['pt', 'eta', 'phi', 'pdgId', 'miniRelIso', 'convVeto', 'sip3d', 'mvaIdPhys14', 'charge', 'lostHits']
 eleFromW = ['pt', 'eta', 'phi', 'pdgId', 'motherId', 'grandmotherId', 'charge', 'sourceId']
 
 def getMatch(genLep,recoLep):
   return ( (genLep['charge']==recoLep['charge']) and deltaR(genLep,recoLep)<0.1 and (abs(genLep['pt']-recoLep['pt'])/genLep['pt'])<0.5)
 
-target_lumi = 2000 #pb-1
+target_lumi = 3000 #pb-1
 def getWeight(sample,nEvents,target_lumi):
   weight = xsec[sample['dbsName']] * target_lumi/nEvents
   return weight
@@ -53,11 +53,11 @@ def antiSel(e):
 
 def sel(e):
   if abs(e['eta'])<0.8:
-    return (e['pt']>=25 and abs(e['pdgId'])==11 and e['miniRelIso']<0.1 and e['convVeto']==1 and e['sip3d']<4.0 and e['mvaIdPhys14']>=0.73)
+    return (e['pt']>=25 and abs(e['pdgId'])==11 and e['miniRelIso']<0.1 and e['convVeto']==1 and e['sip3d']<4.0 and e['lostHits']==0 and e['mvaIdPhys14']>=0.73)
   if (abs(e['eta'])>=0.8 and abs(e['eta'])<1.4):
-    return (e['pt']>=25 and abs(e['pdgId'])==11 and e['miniRelIso']<0.1 and e['convVeto']==1 and e['sip3d']<4.0 and e['mvaIdPhys14']>=0.57)
+    return (e['pt']>=25 and abs(e['pdgId'])==11 and e['miniRelIso']<0.1 and e['convVeto']==1 and e['sip3d']<4.0 and e['lostHits']==0 and e['mvaIdPhys14']>=0.57)
   if (abs(e['eta'])>=1.4 and abs(e['eta'])<2.4):
-    return (e['pt']>=25 and abs(e['pdgId'])==11 and e['miniRelIso']<0.1 and e['convVeto']==1 and e['sip3d']<4.0 and e['mvaIdPhys14']>=0.05)
+    return (e['pt']>=25 and abs(e['pdgId'])==11 and e['miniRelIso']<0.1 and e['convVeto']==1 and e['sip3d']<4.0 and e['lostHits']==0 and e['mvaIdPhys14']>=0.05)
   return False
 
 def getDPhi(met,metPhi,e):
@@ -113,8 +113,8 @@ for htb in htreg:
         print 'Binning => ht: ',htb,'st: ',stb,'NJet: ',srNJet
         SRname = nameAndCut(stb, htb, srNJet, btb=btb, presel="(1)", charge="", btagVar = 'nBJetMediumCSV30')[0]#use this function only for the name string!!!
         #cut only includes very loose lepton selection, HT cut, NJet cut, Btagging and subleading JetPt>=80!!! St cut applied in the Event Loop!!!
-        cut = '(Sum$(abs(LepGood_pdgId)==11&&abs(LepGood_dxy)<=0.05&&abs(LepGood_dz)<=0.1)+Sum$(abs(LepOther_pdgId)==11&&abs(LepOther_dxy)<=0.05&&abs(LepOther_dz)<=0.1)>=1)&&'+htCut(htb, minPt=30, maxEta=2.4, njCorr=0.)+'&&'+ nBTagCut(btb, minPt=30, maxEta=2.4, minCSVTag=0.814)+'&&'+nJetCut(srNJet, minPt=30, maxEta=2.4)+'&&'+nJetCut(2, minPt=80, maxEta=2.4)
-#        cut = '(Sum$(abs(LepGood_pdgId)==11&&LepGood_dxy<=0.05&&LepGood_dz<=0.1)>=1)&&'+htCut(htb, minPt=30, maxEta=2.4, njCorr=0.)+'&&'+ nBTagCut(btb, minPt=30, maxEta=2.4, minCSVTag=0.814)+'&&'+nJetCut(srNJet, minPt=30, maxEta=2.4)+'&&'+nJetCut(2, minPt=80, maxEta=2.4)
+#        cut = '(Sum$(abs(LepGood_pdgId)==11&&abs(LepGood_dxy)<=0.05&&abs(LepGood_dz)<=0.1)+Sum$(abs(LepOther_pdgId)==11&&abs(LepOther_dxy)<=0.05&&abs(LepOther_dz)<=0.1)>=1)&&'+htCut(htb, minPt=30, maxEta=2.4, njCorr=0.)+'&&'+ nBTagCut(btb, minPt=30, maxEta=2.4, minCSVTag=0.814)+'&&'+nJetCut(srNJet, minPt=30, maxEta=2.4)+'&&'+nJetCut(2, minPt=80, maxEta=2.4)
+        cut = '(Sum$(abs(LepGood_pdgId)==11&&LepGood_pt>10)>=1)&&'+htCut(htb, minPt=30, maxEta=2.4, njCorr=0.)+'&&'+ nBTagCut(btb, minPt=30, maxEta=2.4, minCSVTag=0.814)+'&&'+nJetCut(srNJet, minPt=30, maxEta=2.4)+'&&'+nJetCut(2, minPt=80, maxEta=2.4)
 
         histos['merged_QCD']={}
         histos['merged_EWK']={}
@@ -141,8 +141,8 @@ for htb in htreg:
               print "At %i of %i for sample %s"%(i,number_events,sample['name'])
             sample['chain'].GetEntry(elist.GetEntry(i))
         
-            eles = [getObjDict(sample['chain'], 'LepGood_', eleVarList, j) for j in range(int(sample['chain'].GetLeaf('nLepGood').GetValue()))]\
-                 + [getObjDict(sample['chain'], 'LepOther_', eleVarList, j) for j in range(int(sample['chain'].GetLeaf('nLepOther').GetValue()))]
+            eles = [getObjDict(sample['chain'], 'LepGood_', eleVarList, j) for j in range(int(sample['chain'].GetLeaf('nLepGood').GetValue()))]
+#                 + [getObjDict(sample['chain'], 'LepOther_', eleVarList, j) for j in range(int(sample['chain'].GetLeaf('nLepOther').GetValue()))]
         
             genEle = [getObjDict(sample['chain'], 'genLep_', eleFromW, j) for j in range(int(sample['chain'].GetLeaf('ngenLep').GetValue()))] 
         
@@ -296,9 +296,9 @@ for htb in htreg:
           hist.GetXaxis().SetTitle('#Delta#Phi(W,l)')
           hist.SetLineWidth(2)
        
-        NdataSel =  histos['merged_QCD']['Selection'].Integral() +  histos['merged_EWK']['Selection'].Integral() 
-        NdataAntiSel =  histos['merged_QCD']['antiSelection'].Integral() +  histos['merged_EWK']['antiSelection'].Integral() 
-        bins[htb][stb][srNJet][btb] = {'NdataSel':NdataSel, 'NdataAntiSel':NdataAntiSel}
+#        NdataSel =  histos['merged_QCD']['Selection'].Integral() +  histos['merged_EWK']['Selection'].Integral() 
+#        NdataAntiSel =  histos['merged_QCD']['antiSelection'].Integral() +  histos['merged_EWK']['antiSelection'].Integral() 
+#        bins[htb][stb][srNJet][btb] = {'NdataSel':NdataSel, 'NdataAntiSel':NdataAntiSel}
   
         #do the template fit:
 #        if doFit:
@@ -326,14 +326,14 @@ for htb in htreg:
 #          histos['merged_EWK']['antiSelection'].Scale(1./histos['merged_EWK']['antiSelection'].Integral())       
         histos['merged_EWK']['antiSelection'].SetLineColor(ROOT.kBlack)
         histos['merged_EWK']['antiSelection'].SetLineStyle(ROOT.kDashed)
-#        histos['merged_EWK']['antiSelection'].SetMaximum(1)
+        histos['merged_EWK']['antiSelection'].SetMaximum(1)
         histos['merged_EWK']['antiSelection'].SetMinimum(0.01)
         leg.AddEntry(histos['merged_EWK']['antiSelection'],'EWK anti-selected','l')
  
 #        if histos['merged_EWK']['Selection'].Integral()>0:
 #          histos['merged_EWK']['Selection'].Scale(1./histos['merged_EWK']['Selection'].Integral())             
         histos['merged_EWK']['Selection'].SetLineColor(ROOT.kBlack)
-#        histos['merged_EWK']['Selection'].SetMaximum(1)
+        histos['merged_EWK']['Selection'].SetMaximum(1)
         histos['merged_EWK']['Selection'].SetMinimum(0.01)
         leg.AddEntry(histos['merged_EWK']['Selection'],'EWK selected','l')
         
