@@ -27,7 +27,7 @@ path = '/afs/hephy.at/user/'+uDir+'/www/'+subDir+'/'
 if not os.path.exists(path):
   os.makedirs(path)
 
-picklePath = '/data/'+username+'/YourFavoriteDir/'
+picklePath = '/data/'+username+'/PHYS14v3/withCSV/rCS_0b_10.0fbSlidingWcorrectionMuonChannel/'
 if not os.path.exists(picklePath):
   os.makedirs(picklePath)
 
@@ -47,7 +47,7 @@ nbjreg = [(0,0),(1,1)]#,(2,2)]
 presel='singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80'
 prefix = presel.split('&&')[0]+'_'
 
-regions = sideBand3fb.values()[0]
+regions = sideBand10fb.values()[0]
 
 h_nbj = {}
 for name, c in [["tt", cTTJets] , ["W",cWJets] ]:
@@ -147,6 +147,8 @@ for name, c in [["tt", cTTJets] , ["W",cWJets] ]:
       l.Draw()
       c1.Print(path+prefix+'_rCS_nbjet_'+name+'_'+nameAndCut(stb,htb=htb,njetb=None, btb=btreg, presel=presel)[0]+".pdf")
       c1.Print(path+prefix+'_rCS_nbjet_'+name+'_'+nameAndCut(stb,htb=htb,njetb=None, btb=btreg, presel=presel)[0]+".png")
+      c1.Print(path+prefix+'_rCS_nbjet_'+name+'_'+nameAndCut(stb,htb=htb,njetb=None, btb=btreg, presel=presel)[0]+".root")
+
 
 rowsSt = {}
 rows = 0
