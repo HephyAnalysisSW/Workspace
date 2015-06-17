@@ -26,8 +26,8 @@ cBkg = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], DY[lepSel], singleTop[lep
 #weight_str = 'weight_Up'
 #weight_err_str = 'weight_Up*weight_Up'
 
-signalRegions = signalRegion3fb     ##because 10 one is full
-lumi = 3.
+signalRegions = signalRegion10fb     ##because 10 one is full
+lumi = 10.
 
 weight_str, weight_err_str = makeWeight(lumi)
 
