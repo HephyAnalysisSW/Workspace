@@ -23,6 +23,9 @@ from localInfo import username
 uDir = username[0]+'/'+username
 subDir = 'PHYS14v3/ANplots/rCSbtagmultiCompleteCorrection/'
 
+### DEFINE SR
+regions = sideBand10fb.values()[0]
+
 path = '/afs/hephy.at/user/'+uDir+'/www/'+subDir+'/'
 if not os.path.exists(path):
   os.makedirs(path)
@@ -38,16 +41,12 @@ ROOT.gStyle.SetOptStat(0)
 
 ROOT.TH1F().SetDefaultSumw2()
 
-streg = [[(450, -1), 1.]]#, [(350, 450), 1.],  [(450, -1), 1.] ]
-htreg = [(750,1250)]#,(750,-1)]#,(750, 1000),(1000,1250),(1250,-1)]
 btreg = (0,0)
 njreg = [(2,2),(3,3),(4,4),(5,5),(6,7),(8,-1)]#,(7,7),(8,8),(9,9)]
 nbjreg = [(0,0),(1,1)]#,(2,2)]
 
 presel='singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80'
 prefix = presel.split('&&')[0]+'_'
-
-regions = sideBand10fb.values()[0]
 
 h_nbj = {}
 for name, c in [["tt", cTTJets] , ["W",cWJets] ]:
