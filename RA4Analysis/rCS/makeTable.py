@@ -13,7 +13,7 @@ prefix = 'singleLeptonic_Phys14V3_'
 #res = pickle.load(file('/data/'+username+'/PHYS14v3/withCSV/rCS_0b/'+prefix+'_estimationResults_ttJet_unc_pkl'))
 
 
-path = '/data/'+username+'/PHYS14v3/withCSV/rCS_0b_3.0fbSlidingWcorrectionMuonChannel/' 
+path = '/data/'+username+'/PHYS14v3/withCSV/rCS_0b_10.0fbSlidingWcorrectionMuonChannel/' 
 res = pickle.load(file(path+prefix+'_estimationResults_pkl'))
 #kcs = pickle.load(file(path+'correction_pkl'))
 kcs = pickle.load(file(path+'/correction_pkl'))
@@ -21,7 +21,7 @@ kcs = pickle.load(file(path+'/correction_pkl'))
 presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80"
 btagString = 'nBJetMediumCSV30'
 
-lumi = 3.
+lumi = 10.
 weight_str, weight_err_str = makeWeight(lumi)
 lepSel = 'hard'
 
@@ -58,7 +58,7 @@ if signal:
 #nSTbins = len(streg)
 #nJetBins = len(njreg)
 
-signalRegions = signalRegion3fb
+signalRegions = signalRegion10fb
 
 #streg = [[(250, 350), 1.], [(350, 450), 1.], [(450,-1), 1.]]
 #htreg = [(500,750),(750,1000),(1000,1250),(1250,-1)]
