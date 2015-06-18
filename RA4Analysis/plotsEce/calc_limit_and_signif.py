@@ -18,6 +18,10 @@ if not os.path.exists(path):
   os.makedirs(path)
 
 
+#bin_yields2 = pickle.load(file('/data/dspitzbart/lumi3.0yields_pkl_newOpt'))
+bin_yields2 = pickle.load(file('/data/dspitzbart/lumi3.0yields_pkl_final'))
+
+
 text_path = "text_files"
 if not os.path.exists(text_path):
   os.makedirs(text_path)
@@ -27,7 +31,7 @@ options = ['signif' , 'limit']
 
 #lumi_bins = [1,2,3,4,5,6,7,8,9,10]
 #lumi_bins = [1,2,3,4]
-lumi_bins = [100]
+lumi_bins = [3]
 lumi_origin = 3
 
 signals = [
@@ -36,7 +40,6 @@ signals = [
           {'color': ROOT.kBlack ,'name': 'S1000' ,'label': 'T5q^{4} 1.0/0.8/0.7'}, \
          ]
 
-bin_yields2 = pickle.load(file('/data/dspitzbart/lumi3.0yields_pkl_newOpt'))
 
 signal_bins = signal_bins_3fb_table()
 
@@ -114,6 +117,6 @@ for option in options:
 print "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
 print "Final :"  , signal_bins
 
-pickle.dump(signal_bins, file(path+option+str(lumi_origin)+'_lumi100_pkl','w'))
+pickle.dump(signal_bins, file(path+option+str(lumi_origin)+'_pkl','w'))
 
-print "wrtten:" , path+option+str(lumi_origin)+'_lumi100_pkl'
+print "wrtten:" , path+option+str(lumi_origin)+'_pkl'
