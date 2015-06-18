@@ -30,7 +30,7 @@ cTTJets = getChain(ttJets[lepSel],histname='',maxN=maxN)
 
 from localInfo import username
 uDir = username[0]+'/'+username
-subDir = 'PHYS14v3/ANplots/rCS/'
+subDir = 'PHYS14v3/ANplots/rCSfinal/'
 
 path = '/afs/hephy.at/user/'+uDir+'/www/'+subDir+'/'
 if not os.path.exists(path):
@@ -56,14 +56,14 @@ ROOT.TH1F().SetDefaultSumw2()
 #    return rcs, rcsE 
 #    del h
 
-channel = 'mu'
+channel = 'both'
 if channel == 'ele':
   pdgId = 11
 elif channel =='mu':
   pdgId = 13
 
 streg = [[(250, 350), 1.], [(350, 450), 1.],  [(450, -1), 1.] ]
-htreg = [(500,-1)]#,(1000,1250),(1250,-1)]#,(1250,-1)]
+htreg = [(500,-1),(500,750),(750,1000),(1000,-1),(750,-1)]#,(1000,1250),(1250,-1)]#,(1250,-1)]
 btreg = (0,0)
 njreg = [(2,2),(3,3),(4,4),(5,5),(6,7),(8,-1)]#,(7,7),(8,8),(9,9)]
 nbjreg = [(0,0),(1,1),(2,2)]
@@ -163,6 +163,9 @@ for name, c in [["tt", cTTJets] , ["W",cWJets] ]:
         h_nj[name][stb][htb].GetXaxis().SetBinLabel(i+1, nJetBinName(njreg[i]))
         h_nj_pos[name][stb][htb].GetXaxis().SetBinLabel(i+1, nJetBinName(njreg[i]))
         h_nj_neg[name][stb][htb].GetXaxis().SetBinLabel(i+1, nJetBinName(njreg[i]))
+        h_nj[name][stb][htb].SetMinimum(0.)
+        h_nj_pos[name][stb][htb].SetMinimum(0.)
+        h_nj_neg[name][stb][htb].SetMinimum(0.)
       for i_njb, njb in enumerate(njreg):
         cname, cut = nameAndCut(stb,htb,njb, btb=btreg ,presel=presel)
         if channel in ['ele','mu']:
@@ -252,7 +255,9 @@ for name, c in [["tt", cTTJets] , ["W",cWJets] ]:
       else:
         h_nj[name][stb][htb].Draw('same')
     l.Draw()
+    c1.Print(path+prefix+'_rCS_njet_'+name+'_'+nameAndCut(stb,htb=None,njetb=None, btb=btreg, presel=presel)[0]+".pdf")
     c1.Print(path+prefix+'_rCS_njet_'+name+'_'+nameAndCut(stb,htb=None,njetb=None, btb=btreg, presel=presel)[0]+".png")
+    c1.Print(path+prefix+'_rCS_njet_'+name+'_'+nameAndCut(stb,htb=None,njetb=None, btb=btreg, presel=presel)[0]+".root")
     h_2d[name][stb].Draw('COLZ TEXTE')
     c1.Print(path+prefix+'_rCS_njet_vs_ht_'+name+'_'+nameAndCut(stb,htb=None,njetb=None, btb=btreg, presel=presel)[0]+".png")
   for htb in htreg:
@@ -294,9 +299,9 @@ for name, c in [["tt", cTTJets] , ["W",cWJets] ]:
       else:
         h_nj[name][stb][htb].Draw('same')
     l.Draw()
-#    c1.Print(path+prefix+'_rCS_njet_'+name+'_'+nameAndCut(stb,htb=htb,njetb=None, btb=None, presel=presel)[0]+".pdf")
+    c1.Print(path+prefix+'_rCS_njet_'+channel+'_'+name+'_'+nameAndCut(stb,htb=htb,njetb=None, btb=btreg, presel=presel)[0]+".pdf")
     c1.Print(path+prefix+'_rCS_njet_'+channel+'_'+name+'_'+nameAndCut(stb,htb=htb,njetb=None, btb=btreg, presel=presel)[0]+".png")
-#    c1.Print(path+prefix+'_rCS_njet_'+name+'_'+nameAndCut(stb,htb=htb,njetb=None, btb=None, presel=presel)[0]+".root")
+    c1.Print(path+prefix+'_rCS_njet_'+channel+'_'+name+'_'+nameAndCut(stb,htb=htb,njetb=None, btb=btreg, presel=presel)[0]+".root")
 
 for name, c in [["tt", cTTJets] , ["W",cWJets] ]:
   for htb in htreg:
@@ -336,9 +341,9 @@ for name, c in [["tt", cTTJets] , ["W",cWJets] ]:
       else:
         h_nj_pos[name][stb][htb].Draw('same')
     l.Draw()
-#    c1.Print(path+prefix+'_rCS_njet_'+name+'_'+nameAndCut(stb,htb=htb,njetb=None, btb=None, presel=presel)[0]+".pdf")
+    c1.Print(path+prefix+'_rCS_njet_PosPDG_'+channel+'_'+name+'_'+nameAndCut(stb,htb=htb,njetb=None, btb=btreg, presel=presel)[0]+".pdf")
     c1.Print(path+prefix+'_rCS_njet_PosPDG_'+channel+'_'+name+'_'+nameAndCut(stb,htb=htb,njetb=None, btb=btreg, presel=presel)[0]+".png")
-#    c1.Print(path+prefix+'_rCS_njet_'+name+'_'+nameAndCut(stb,htb=htb,njetb=None, btb=None, presel=presel)[0]+".root")
+    c1.Print(path+prefix+'_rCS_njet_PosPDG_'+channel+'_'+name+'_'+nameAndCut(stb,htb=htb,njetb=None, btb=btreg, presel=presel)[0]+".root")
 
 for name, c in [["tt", cTTJets] , ["W",cWJets] ]:
   for htb in htreg:
@@ -377,9 +382,9 @@ for name, c in [["tt", cTTJets] , ["W",cWJets] ]:
       else:
         h_nj_neg[name][stb][htb].Draw('same')
     l.Draw()
-#    c1.Print(path+prefix+'_rCS_njet_'+name+'_'+nameAndCut(stb,htb=htb,njetb=None, btb=None, presel=presel)[0]+".pdf")
+    c1.Print(path+prefix+'_rCS_njet_NegPDG_'+channel+'_'+name+'_'+nameAndCut(stb,htb=htb,njetb=None, btb=btreg, presel=presel)[0]+".pdf")
     c1.Print(path+prefix+'_rCS_njet_NegPDG_'+channel+'_'+name+'_'+nameAndCut(stb,htb=htb,njetb=None, btb=btreg, presel=presel)[0]+".png")
-#    c1.Print(path+prefix+'_rCS_njet_'+name+'_'+nameAndCut(stb,htb=htb,njetb=None, btb=None, presel=presel)[0]+".root")
+    c1.Print(path+prefix+'_rCS_njet_NegPDG_'+channel+'_'+name+'_'+nameAndCut(stb,htb=htb,njetb=None, btb=btreg, presel=presel)[0]+".root")
 
 ##Draw plots binned in HT for all ST and njet bins
 #for name, c in [ ["W",cWJets], ["tt", cTTJets]]:

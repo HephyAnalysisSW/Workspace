@@ -6,6 +6,7 @@ from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import 
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName, nBTagBinName, varBinName, varBin
 from rCShelpers import *
 import math
+import pickle
 from Workspace.RA4Analysis.signalRegions import *
 
 small = False
@@ -22,9 +23,16 @@ from localInfo import username
 uDir = username[0]+'/'+username
 subDir = 'PHYS14v3/ANplots/rCSbtagmultiCompleteCorrection/'
 
+### DEFINE SR
+regions = sideBand10fb.values()[0]
+
 path = '/afs/hephy.at/user/'+uDir+'/www/'+subDir+'/'
 if not os.path.exists(path):
   os.makedirs(path)
+
+picklePath = '/data/'+username+'/PHYS14v3/withCSV/rCS_0b_10.0fbSlidingWcorrectionMuonChannel/'
+if not os.path.exists(picklePath):
+  os.makedirs(picklePath)
 
 ROOT_colors = [ROOT.kBlack, ROOT.kRed-7, ROOT.kAzure-1, ROOT.kGreen+3, ROOT.kOrange+1,ROOT.kRed-3, ROOT.kAzure+6, ROOT.kCyan+3, ROOT.kOrange , ROOT.kRed-10]
 dPhiStr = 'deltaPhi_Wl'
@@ -33,16 +41,12 @@ ROOT.gStyle.SetOptStat(0)
 
 ROOT.TH1F().SetDefaultSumw2()
 
-streg = [[(450, -1), 1.]]#, [(350, 450), 1.],  [(450, -1), 1.] ]
-htreg = [(750,1250)]#,(750,-1)]#,(750, 1000),(1000,1250),(1250,-1)]
 btreg = (0,0)
 njreg = [(2,2),(3,3),(4,4),(5,5),(6,7),(8,-1)]#,(7,7),(8,8),(9,9)]
 nbjreg = [(0,0),(1,1)]#,(2,2)]
 
 presel='singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80'
 prefix = presel.split('&&')[0]+'_'
-
-regions = sideBand3fb.values()[0]
 
 h_nbj = {}
 for name, c in [["tt", cTTJets] , ["W",cWJets] ]:
@@ -142,6 +146,8 @@ for name, c in [["tt", cTTJets] , ["W",cWJets] ]:
       l.Draw()
       c1.Print(path+prefix+'_rCS_nbjet_'+name+'_'+nameAndCut(stb,htb=htb,njetb=None, btb=btreg, presel=presel)[0]+".pdf")
       c1.Print(path+prefix+'_rCS_nbjet_'+name+'_'+nameAndCut(stb,htb=htb,njetb=None, btb=btreg, presel=presel)[0]+".png")
+      c1.Print(path+prefix+'_rCS_nbjet_'+name+'_'+nameAndCut(stb,htb=htb,njetb=None, btb=btreg, presel=presel)[0]+".root")
+
 
 rowsSt = {}
 rows = 0
@@ -164,4 +170,5 @@ for stb in sorted(regions):
     print ' & '+getNumString(correctionFactors['tt'][stb][htb]['FitRatio'], correctionFactors['tt'][stb][htb]['FitRatioError'])+'\\\\ '
 print '\\hline\end{tabular}\end{center}\caption{Correction factors for \\ttJets background, 3$fb^{-1}$}\label{tab:0b_rcscorr_Wbkg}\end{table}'
 
-
+pickle.dump(correctionFactors, file(picklePath+'correction_pkl','w'))
+print "correction pkl written here :" , picklePath+'correction_pkl'
