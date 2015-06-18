@@ -25,8 +25,8 @@ cBkg = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], DY[lepSel], singleTop[lep
 #cBkg = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]], T5qqqqWW_mGo1000_mCh800_mChi700[lepSel] , histname='')#no QCD , ##to calculate signal contamination
 #cRest = getChain([DY[lepSel], singleTop[lepSel], TTVH[lepSel]],T5qqqqWW_mGo1000_mCh800_mChi700[lepSel],histname='')#no QCD 
 
-signalRegions = signalRegion3fb     ##because 10 one is full
-lumi = 3.
+signalRegions = signalRegion10fb     ##because 10 one is full
+lumi = 10.
 
 weight_str, weight_err_str = makeWeight(lumi)
 
