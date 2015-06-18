@@ -7,7 +7,8 @@ c.precision=6
 
 for i in range(5):
   c.addBin('Bin'+str(i), ['bkg'], 'Bin'+str(i))
-  y = 1000*exp(-i/2.)*0.01**(i/4.)
+  #y = 1000*exp(-i/2.)*0.01**(i/4.)
+  y = 100000000*exp(-i/2.)*0.01**(i/4.)
   print "Bin"+str(i), y
   c.specifyObservation('Bin'+str(i), int(y))
   c.specifyExpectation('Bin'+str(i), 'bkg', y)
@@ -32,4 +33,5 @@ for i in range(5):
 
 c.writeToFile('test.txt')
 
-print c.calcLimit()
+#print c.calcLimit()
+#print c.calcSignif()
