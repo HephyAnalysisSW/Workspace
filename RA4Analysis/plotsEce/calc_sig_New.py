@@ -35,26 +35,28 @@ option = options[0]
 
 lumi_bins = [1,2,3,4,5,6,7,8,9,10]
 #lumi_bins = [3]
-lumi_origin = 3
+lumi_origin = 10
 
 
 #bin_yields2 = pickle.load(file('/data/dspitzbart/lumi3.0yields_pkl_final'))
 
 #res = pickle.load(file('/data/easilar/PHYS14v3/withCSV/rCS_0b_3.0fbSlidingWcorrectionMuonChannel/singleLeptonic_Phys14V3__estimationResults_pkl_updated'))
-res = pickle.load(file('/data/dspitzbart/PHYS14v3/withCSV/rCS_0b_3.0fbSlidingWcorrectionMuonChannel/singleLeptonic_Phys14V3__estimationResults_pkl_updated'))
+#res = pickle.load(file('/data/dspitzbart/PHYS14v3/withCSV/rCS_0b_3.0fbSlidingWcorrectionMuonChannel/singleLeptonic_Phys14V3__estimationResults_pkl_updated'))
+res = pickle.load(file('/data/dspitzbart/PHYS14v3/withCSV/rCS_0b_10.0fbSlidingWcorrectionMuonChannel/singleLeptonic_Phys14V3__estimationResults_pkl_updated'))
+
 
 #res = pickle.load(file('/data/dspitzbart/PHYS14v3/withCSV/rCS_0b_3.0fbSlidingWcorrectionMuonChannel/singleLeptonic_Phys14V3__estimationResults_pkl_updated'))
 
-search_bins = [\
-              {'HT': (500  ,1000)   , 'ST': (450,-1) , 'nJet': (6,7)},\
-              {'HT': (1000 , -1)  , 'ST': (450,-1) , 'nJet': (6,7)},\
-            ]
+#earch_bins = [\
+#             {'HT': (500  ,1000)   , 'ST': (450,-1) , 'nJet': (6,7)},\
+#             {'HT': (1000 , -1)  , 'ST': (450,-1) , 'nJet': (6,7)},\
+#           ]
 
 
 #search_bins = sigbins[5]
 #for search_bins in sigbins:
 
-print 'searching :' , search_bins
+#print 'searching :' , search_bins
 
 signals = [
           {'color': ROOT.kBlue ,'name': 'S1500' ,'label': 'T5q^{4} 1.5/0.8/0.1'}, \
@@ -62,7 +64,7 @@ signals = [
           {'color': ROOT.kBlack ,'name': 'S1000' ,'label': 'T5q^{4} 1.0/0.8/0.7'}, \
          ]
 #signal = signals[2]
-for pdg in ['pos','neg','both']:
+for pdg in ['split','both']:
   signal_signif = []
   for signal in signals:
     print signal
@@ -73,18 +75,17 @@ for pdg in ['pos','neg','both']:
     found_bin = []
     
     njets = res.keys()
-    for njet in njets:
-      for st in res[njet].keys():
-        for ht in res[njet][st].keys():
+    for njet in sorted(njets):
+      for st in sorted(res[njet].keys()):
+        for ht in sorted(res[njet][st].keys()):
             if pdg == 'both' :        
               found_bin.append(\
                 {'closure': res[njet][st][ht]['tot_clos']  ,'Berror':res[njet][st][ht]['tot_pred_err'] ,'B': res[njet][st][ht]['tot_pred'], 'nJet': njet, 'S1000': res[njet][st][ht]['T5q^{4} 1.0/0.8/0.7_yield'], 'HT': ht, 'ST': st, 'S1500': res[njet][st][ht]['T5q^{4} 1.5/0.8/0.1_yield'], 'deltaPhi': 0.75, 'S1200': res[njet][st][ht]['T5q^{4} 1.2/1.0/0.8_yield']},\
                           ) 
-            if pdg == 'pos' : 
+            if pdg == 'split' : 
               found_bin.append(\
                 {'closure': res[njet][st][ht]['tot_clos_PosPdg']  ,'Berror':res[njet][st][ht]['tot_PosPdg_pred_err'] ,'B': res[njet][st][ht]['tot_PosPdg_pred'], 'nJet': njet, 'S1000': res[njet][st][ht]['T5q^{4} 1.0/0.8/0.7_yield_PosPdg'], 'HT': ht, 'ST': st, 'S1500': res[njet][st][ht]['T5q^{4} 1.5/0.8/0.1_yield_PosPdg'], 'deltaPhi': 0.75, 'S1200': res[njet][st][ht]['T5q^{4} 1.2/1.0/0.8_yield_PosPdg']},\
                           ) 
-            if pdg == 'neg' : 
               found_bin.append(\
                 {'closure': res[njet][st][ht]['tot_clos_NegPdg']  ,'Berror':res[njet][st][ht]['tot_NegPdg_pred_err'] ,'B': res[njet][st][ht]['tot_NegPdg_pred'], 'nJet': njet, 'S1000': res[njet][st][ht]['T5q^{4} 1.0/0.8/0.7_yield_NegPdg'], 'HT': ht, 'ST': st, 'S1500': res[njet][st][ht]['T5q^{4} 1.5/0.8/0.1_yield_NegPdg'], 'deltaPhi': 0.75, 'S1200': res[njet][st][ht]['T5q^{4} 1.2/1.0/0.8_yield_NegPdg']},\
                           ) 
@@ -145,7 +146,7 @@ for pdg in ['pos','neg','both']:
         c.specifyUncertainty('SigAcc', bkg_Y['name'], 'signal', 1.2)
         #c.specifyUncertainty('closure', bkg_Y['name'], 'bkg', 1+bin['closure'])
       
-      if lum == 3: c.writeToFile('testfiletocheck.txt')
+      if lum == lumi_origin: c.writeToFile('testfiletocheck_'+str(lumi_origin)+signal['name']+'.txt')
 
       #####End of Bin loop######
 
@@ -167,5 +168,5 @@ for pdg in ['pos','neg','both']:
     signal_signif.append({'label':signal['label'] ,'name':signal['name'],'color':signal['color'] , 'y':y_s[1:] , 'x': x_s[1:] })
 
 
-  plotsignif(signal_signif,path,option+pdg+'fullsignalSR',lumi_origin)
+  plotsignif(signal_signif,path,option+pdg+'fullsignalSR'+str(lumi_origin),lumi_origin)
 
