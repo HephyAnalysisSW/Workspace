@@ -21,8 +21,8 @@ ROOT.setTDRStyle()
 
 lepSel = 'hard'
 
-#lumi = 3 #fb-1
-lumi = 0.1 #fb-1
+lumi = 3 #fb-1
+#lumi = 0.1 #fb-1
 weight_str = '((weight/4)*'+str(lumi)+')'
 
 htCut = [500,10000000000]
@@ -32,7 +32,7 @@ njetCut = [4,20]
 nbtagCut = 0
 mt2Cut = 0
 jetPtCut = 80
-dfCut =0
+dfCut =0.2
 
 #prepresel = 'singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&'
 #prepresel = 'singleElectronic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&'
@@ -43,7 +43,7 @@ prepresel = 'singleMuonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSof
 presel = prepresel+'deltaPhi_Wl>'+str(dfCut)+'&&Jet_pt[1]>='+str(jetPtCut)+'&&htJet30j>='+str(htCut[0])+'&&htJet30j<'+str(htCut[1])+'&&st>='+str(stCut[0])+'&&st<'+str(stCut[1])+'&&nJet30>='+str(njetCut[0])+'&&nJet30<'+str(njetCut[1])+'&&nBJetMediumCSV30=='+str(nbtagCut)
 #path = "/afs/hephy.at/user/e/easilar/www/PHYS14v3/tests/"+"_".join(presel.split('&&')[4:])+"/"   #.replace('&&','_')+"/"
 #path = "/afs/hephy.at/user/e/easilar/www/PHYS14v3/tests/"+prepresel.split('&&')[0]+"/"   #.replace('&&','_')+"/"
-path = "/afs/hephy.at/user/e/easilar/www/PHYS14v3/annote/plots/baseline_100pb/"+prepresel.split('&&')[0]+"/"    #.replace('&&','_')+"/"
+path = "/afs/hephy.at/user/e/easilar/www/PHYS14v3/annote/plots/baseline_dPhi0.2/"+prepresel.split('&&')[0]+"/"    #.replace('&&','_')+"/"
 if not os.path.exists(path):
   os.makedirs(path)
 
@@ -73,14 +73,14 @@ signal_samples = [
 
 
 plots = [
-{'ndiv':'False','yaxis':'Events','xaxis':'N_{Jets}','logy':'True' , 'var':'nJet30',                      'varname':'nJet30',                   'binlabel':1,  'bin':11,       'lowlimit':4,  'limit':15},\
-{'ndiv':'False','yaxis':'Events','xaxis':'N_{bJetsCSV}','logy':'True' , 'var':'nBJetMediumCSV30',           'varname':'nBJetMediumCSV30',      'binlabel':1,  'bin':8,       'lowlimit':0,  'limit':8},\
-{'ndiv':'False','yaxis':'Events','xaxis':'#Delta#Phi(W,l)','logy':'True' , 'var':'deltaPhi_Wl',                 'varname':'deltaPhi_Wl',       'binlabel':1,  'bin':30,       'lowlimit':0,  'limit':pi},\
-#{'ndiv':'True','yaxis':'Events /','xaxis':'S_{T}','logy':'True' , 'var':'st',                          'varname':'st',                  'binlabel':50,  'bin':36,       'lowlimit':200,  'limit':2000},\
-#{'ndiv':'True','yaxis':'Events /','xaxis':'H_{T}','logy':'True' , 'var':'htJet30j',                    'varname':'htJet30j',            'binlabel':50,  'bin':30,       'lowlimit':500,  'limit':2000},\
-#{'ndiv':'True','yaxis':'Events /','xaxis':'p_{T}(leading jet)','logy':'True' , 'var':'Jet_pt[0]',               'varname':'Jet_pt[0]',  'binlabel':30,  'bin':67,       'lowlimit':0,  'limit':2010},\
-#{'ndiv':'True','yaxis':'Events /','xaxis':'#slash{E}_{T}','logy':'True' , 'var':'met',                         'varname':'met',         'binlabel':50,  'bin':28,       'lowlimit':0,  'limit':1400},\
-#{'ndiv':'True','yaxis':'Events /','xaxis':'p_{T}(l)','logy':'True' , 'var':'leptonPt[0]',                 'varname':'leptonPt[0]',      'binlabel':25,  'bin':40,       'lowlimit':0,  'limit':1000},\
+#{'ndiv':'False','yaxis':'Events','xaxis':'N_{Jets}','logy':'True' , 'var':'nJet30',                      'varname':'nJet30',                   'binlabel':1,  'bin':11,       'lowlimit':4,  'limit':15},\
+#{'ndiv':'False','yaxis':'Events','xaxis':'N_{bJetsCSV}','logy':'True' , 'var':'nBJetMediumCSV30',           'varname':'nBJetMediumCSV30',      'binlabel':1,  'bin':8,       'lowlimit':0,  'limit':8},\
+#{'ndiv':'False','yaxis':'Events','xaxis':'#Delta#Phi(W,l)','logy':'True' , 'var':'deltaPhi_Wl',                 'varname':'deltaPhi_Wl',       'binlabel':1,  'bin':30,       'lowlimit':0.2,  'limit':pi},\
+{'ndiv':'True','yaxis':'Events /','xaxis':'S_{T}','logy':'True' , 'var':'st',                          'varname':'st',                  'binlabel':50,  'bin':36,       'lowlimit':200,  'limit':2000},\
+{'ndiv':'True','yaxis':'Events /','xaxis':'H_{T}','logy':'True' , 'var':'htJet30j',                    'varname':'htJet30j',            'binlabel':50,  'bin':30,       'lowlimit':500,  'limit':2000},\
+{'ndiv':'True','yaxis':'Events /','xaxis':'p_{T}(leading jet)','logy':'True' , 'var':'Jet_pt[0]',               'varname':'Jet_pt[0]',  'binlabel':30,  'bin':67,       'lowlimit':0,  'limit':2010},\
+{'ndiv':'True','yaxis':'Events /','xaxis':'#slash{E}_{T}','logy':'True' , 'var':'met',                         'varname':'met',         'binlabel':50,  'bin':28,       'lowlimit':0,  'limit':1400},\
+{'ndiv':'True','yaxis':'Events /','xaxis':'p_{T}(l)','logy':'True' , 'var':'leptonPt',                 'varname':'leptonPt',      'binlabel':25,  'bin':40,       'lowlimit':0,  'limit':1000},\
 
 
 #{'xaxis':'N_{bJetsCMVA}','logy':'True' , 'var':'nBJetMediumCMVA30',           'varname':'nBJetMediumCMVA30',                                  'binlabel':1,  'bin':15,       'lowlimit':0,  'limit':15},\
@@ -142,10 +142,10 @@ for p in plots:
     histo.SetMinimum(.1)
     histo.GetXaxis().SetTitle(p['xaxis'])
     #if p['ndiv']: 
-    #histo.GetXaxis().SetNdivisions(505)
-    #histo.GetYaxis().SetTitle(p['yaxis']+str(p['binlabel'])+'GeV')
+    histo.GetXaxis().SetNdivisions(505)
+    histo.GetYaxis().SetTitle(p['yaxis']+str(p['binlabel'])+'GeV')
     #if not p['ndiv']:
-    histo.GetYaxis().SetTitle(p['yaxis'])
+    #histo.GetYaxis().SetTitle(p['yaxis'])
     #print "integral" , histo.Integral()
     h_Stack.Add(histo)
     leg.AddEntry(histo, b['label'],"f")
@@ -164,10 +164,10 @@ for p in plots:
     histo.SetMinimum(0.1)
     histo.GetXaxis().SetTitle(p['xaxis'])
     #if p['ndiv']: 
-    #histo.GetXaxis().SetNdivisions(505)
-    #histo.GetYaxis().SetTitle(p['yaxis']+str(p['binlabel'])+'GeV')
+    histo.GetXaxis().SetNdivisions(505)
+    histo.GetYaxis().SetTitle(p['yaxis']+str(p['binlabel'])+'GeV')
     #if not p['ndiv']: 
-    histo.GetYaxis().SetTitle(p['yaxis'])
+    #histo.GetYaxis().SetTitle(p['yaxis'])
     #histo.GetYaxis().SetTitle('Events')
     h_Stack_S.Add(histo)
     #histo.Draw('same')
@@ -175,7 +175,7 @@ for p in plots:
     leg.AddEntry(histo, s['label'],"l") 
 
   #h_Stack.SetMaximum((h_Stack.GetMaximum())*50)
-  h_Stack.SetMaximum(500)
+  h_Stack.SetMaximum(5000)
   h_Stack.SetMinimum(0.1)
   #h_Stack_S.GetXaxis().SetTitle(p['xaxis'])
   #h_Stack_S.GetYaxis().SetTitle("Number of Events")
@@ -190,13 +190,13 @@ for p in plots:
   Xaxis1.SetTitle(p['xaxis'])
   Xaxis.SetTitle(p['xaxis'])
   #if p['ndiv']: 
-  #Xaxis1.SetNdivisions(505)
-  #Xaxis.SetNdivisions(505) 
-  #Yaxis1.SetTitle(p['yaxis']+str(p['binlabel'])+'GeV')
-  #Yaxis.SetTitle(p['yaxis']+str(p['binlabel'])+'GeV')
+  Xaxis1.SetNdivisions(505)
+  Xaxis.SetNdivisions(505) 
+  Yaxis1.SetTitle(p['yaxis']+str(p['binlabel'])+'GeV')
+  Yaxis.SetTitle(p['yaxis']+str(p['binlabel'])+'GeV')
   #if not p['ndiv']:
-  Yaxis1.SetTitle(p['yaxis'])
-  Yaxis.SetTitle(p['yaxis'])
+  #Yaxis1.SetTitle(p['yaxis'])
+  #Yaxis.SetTitle(p['yaxis'])
 
   #h_Stack_S.Draw('noStacksame')
   if p['logy']=="True": can.SetLogy()
@@ -206,8 +206,8 @@ for p in plots:
   #htmp.Draw('same')
   leg.SetFillColor(0)
   latex.DrawLatex(0.16,0.96,"CMS Simulation")
-  #latex.DrawLatex(0.71,0.96,"L=3 fb^{-1} (13 TeV)")
-  latex.DrawLatex(0.67,0.96,"L=100 pb^{-1} (13 TeV)")
+  latex.DrawLatex(0.71,0.96,"L=3 fb^{-1} (13 TeV)")
+  #latex.DrawLatex(0.67,0.96,"L=100 pb^{-1} (13 TeV)")
   #latex.DrawLatex(0.8,0.05,p['xaxis'])
   #can.Update()
   can.RedrawAxis()

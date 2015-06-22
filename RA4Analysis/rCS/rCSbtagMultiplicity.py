@@ -24,13 +24,14 @@ uDir = username[0]+'/'+username
 subDir = 'PHYS14v3/ANplots/rCSbtagmultiCompleteCorrection/'
 
 ### DEFINE SR
-regions = sideBand10fb.values()[0]
+#regions = sideBand10fb.values()[0]
+regions = sideBand3fb.values()[0]
 
 path = '/afs/hephy.at/user/'+uDir+'/www/'+subDir+'/'
 if not os.path.exists(path):
   os.makedirs(path)
 
-picklePath = '/data/'+username+'/PHYS14v3/withCSV/rCS_0b_10.0fbSlidingWcorrectionMuonChannel/'
+picklePath = '/data/'+username+'/PHYS14v3/withCSV/rCS_0b_3.0fbSlidingWcorrectionMuonChannel/'
 if not os.path.exists(picklePath):
   os.makedirs(picklePath)
 

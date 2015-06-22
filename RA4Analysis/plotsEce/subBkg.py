@@ -13,9 +13,11 @@ ROOT.gROOT.LoadMacro("../../HEPHYPythonTools/scripts/root/tdrstyle.C")
 ROOT.setTDRStyle()
 
 lepSel = 'hard'
-path = '/afs/hephy.at/user/e/easilar/www/pngPHYS14_taurejected/'
+path = '/afs/hephy.at/user/e/easilar/www/Phys14v3/toConvener/dilep_split/'
 if not os.path.exists(path):
   os.makedirs(path)
+
+
 
 c = getChain(ttJets[lepSel],histname='')
 s1200 = getChain(SMS_T5qqqqWW_Gl1200_Chi1000_LSP800[lepSel],histname='')

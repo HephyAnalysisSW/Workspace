@@ -8,14 +8,15 @@ from localInfo import username
 from math import pi, sqrt
 from rCShelpers import *# weight_str , weight_err_str , lumi
 
-def binnedNBTagsFit(cut, samples, nBTagVar = 'nBJetMediumCSV30', lumi=4., prefix="", printDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/PHYS14v3/withCSV/templateFit_'+str(lumi)+'/'):
+def binnedNBTagsFit(cut, samples, nBTagVar = 'nBJetMediumCSV30', lumi=4.0, prefix="", printDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/PHYS14v3/signal_contamination_tests/templateFit_'+str(lumi)+'_data_eql_bkg+signal/'):
+  print "LUMI:" , lumi
   if not os.path.exists(printDir):
      os.makedirs(printDir) 
   weight_str, weight_err_str = makeWeight(lumi)
   cWJets = samples['W']
   cTTJets = samples['TT']
   cRest = samples['Rest']
-  #cData = samples['Data']
+  cData = samples['Data']
 
   #Get histograms binned in b-tag multiplicity
   template_WJets_PosPdg=getPlotFromChain(cWJets, nBTagVar, [0,1,2,3], 'leptonPdg>0&&'+cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
@@ -27,18 +28,30 @@ def binnedNBTagsFit(cut, samples, nBTagVar = 'nBJetMediumCSV30', lumi=4., prefix
   print "Nominal yields TT:",template_TTJets.Integral(),'WJets_PosPdg',template_WJets_PosPdg.Integral(),'WJets_NegPdg',template_WJets_NegPdg.Integral()
   print "Nominal yields:",'Rest_PosPdg',template_Rest_PosPdg.Integral(),'Rest_NegPdg',template_Rest_NegPdg.Integral()
   
-  #hData_PosPdg = getPlotFromChain(cData, nBTagVar, [0,1,2,3], 'leptonPdg>0&&'+cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
-  #hData_NegPdg = getPlotFromChain(cData, nBTagVar, [0,1,2,3], 'leptonPdg<0&&'+cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
+  hData_PosPdg = getPlotFromChain(cData, nBTagVar, [0,1,2,3], 'leptonPdg>0&&'+cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
+  hData_NegPdg = getPlotFromChain(cData, nBTagVar, [0,1,2,3], 'leptonPdg<0&&'+cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
+
+  print "Nominal yields data Pos:", hData_PosPdg.Integral()
+  print "Nominal yields data Neg:", hData_NegPdg.Integral()
+
+
   ##hData_PosPdg=getPlotFromChain(cData,nBTagVar,[0,1,2,3],mTCut+'&&'+nameAndCut(metb,htb,njetb,'pos',btagRequirement='None')[1],weight_str,binningIsExplicit=True,addOverFlowBin='upper')
   ##hData_NegPdg=getPlotFromChain(cData,nBTagVar,[0,1,2,3],mTCut+'&&'+nameAndCut(metb,htb,njetb,'neg',btagRequirement='None')[1],weight_str,binningIsExplicit=True,addOverFlowBin='upper')
-  hData_PosPdg = template_TTJets.Clone()
-  hData_PosPdg.Scale(0.5)
-  hData_PosPdg.Add(template_WJets_PosPdg)
-  hData_PosPdg.Add(template_Rest_PosPdg)
-  hData_NegPdg = template_TTJets.Clone()
-  hData_NegPdg.Scale(0.5)
-  hData_NegPdg.Add(template_WJets_NegPdg)
-  hData_NegPdg.Add(template_Rest_NegPdg)
+  #hData_PosPdg = template_TTJets.Clone()
+  #hData_PosPdg.Scale(0.5)
+  #hData_PosPdg.Add(template_WJets_PosPdg)
+  #hData_PosPdg.Add(template_Rest_PosPdg)
+  #hData_NegPdg = template_TTJets.Clone()
+  #hData_NegPdg.Scale(0.5)
+  #hData_NegPdg.Add(template_WJets_NegPdg)
+  #hData_NegPdg.Add(template_Rest_NegPdg)
+
+  print "BEFORE FIT YIELDS Templates before scaling:"
+  print "template_WJets_NegPdg:" , template_WJets_NegPdg.Integral() 
+  print "template_WJets_PosPdg:" , template_WJets_PosPdg.Integral()
+  print "template_TTJets:" ,       template_TTJets.Integral()
+  print "template_Rest_PosPdg:" ,  template_Rest_PosPdg.Integral()
+  print "template_Rest_NegPdg:" ,  template_Rest_NegPdg.Integral()
 
   #Normalize histograms
   template_TTJets.Scale(1./template_TTJets.Integral())
@@ -48,7 +61,8 @@ def binnedNBTagsFit(cut, samples, nBTagVar = 'nBJetMediumCSV30', lumi=4., prefix
   y_Rest_NegPdg = template_Rest_NegPdg.Integral()
   template_Rest_PosPdg.Scale(1./template_Rest_PosPdg.Integral())
   template_Rest_NegPdg.Scale(1./template_Rest_NegPdg.Integral())
-
+  #hData_PosPdg.Scale(1./hData_PosPdg.Integral())
+  #hData_NegPdg.Scale(1./hData_NegPdg.Integral())
   #Observable
   x=ROOT.RooRealVar(nBTagVar,nBTagVar,0.,3.)
 
@@ -62,6 +76,14 @@ def binnedNBTagsFit(cut, samples, nBTagVar = 'nBJetMediumCSV30', lumi=4., prefix
   dh_Rest_PosPdg=ROOT.RooDataHist("mcRest","mcRest",ROOT.RooArgList(x),template_Rest_PosPdg)
   dh_Rest_NegPdg=ROOT.RooDataHist("mcRest","mcRest",ROOT.RooArgList(x),template_Rest_NegPdg)
 
+  rooDataHist_arr = [data_NegPdg , data_PosPdg , dh_WJets_PosPdg , dh_WJets_NegPdg , dh_TTJets , dh_Rest_PosPdg , dh_Rest_NegPdg]
+  print "write RooDataHist values bin by bin"
+  for hist in rooDataHist_arr:
+    print "roo data hist: " , hist.Print()
+    for i in range(hist.numEntries()): 
+      hist.get(i)
+      print "weight :" , hist.weight()
+
   #Define yields as variable
   yield_TTJets=ROOT.RooRealVar("ttJets_yield","yieldTTJets",0.1,0,10**5)
   yield_WJets_PosPdg = ROOT.RooRealVar("yield_WJets_PosPdg","yield_WJets_PosPdg",0.1,0,10**5)
@@ -73,6 +95,12 @@ def binnedNBTagsFit(cut, samples, nBTagVar = 'nBJetMediumCSV30', lumi=4., prefix
   yield_Rest_PosPdg.setConstant()
   yield_Rest_NegPdg.setConstant()
 
+  print "BEFORE FIT YIELDS:"
+  print "yield_WJets_NegPdg:" , yield_WJets_NegPdg.getVal()
+  print "yield_WJets_PosPdg:" , yield_WJets_PosPdg.getVal()
+  print "yield_TTJets:" , yield_TTJets.getVal()
+  print "yield_Rest_PosPdg:" , yield_Rest_PosPdg.getVal()
+  print "yield_Rest_NegPdg:" , yield_Rest_NegPdg.getVal()
   #Make PDF from MC histograms
   model_WJets_PosPdg=ROOT.RooHistPdf("model_WJets_PosPdg","model_WJets_PosPdg",ROOT.RooArgSet(x),dh_WJets_PosPdg)
   model_WJets_NegPdg=ROOT.RooHistPdf("model_WJets_NegPdg","model_WJets_NegPdg",ROOT.RooArgSet(x),dh_WJets_NegPdg)
@@ -105,6 +133,8 @@ def binnedNBTagsFit(cut, samples, nBTagVar = 'nBJetMediumCSV30', lumi=4., prefix
   frame_Rest_NegPdg=x.frame(rf.Title("Rest NegPdg"))
   model_Rest_NegPdg.plotOn(frame_Rest_NegPdg)
 
+  
+
 #  c=ROOT.TCanvas("roofit_example","RooFitFractionFitExample",800,1200)
 #  c.Divide(1,3)
 #  ROOT.gROOT.SetStyle("Plain")#Removes gray background from plots
@@ -129,6 +159,8 @@ def binnedNBTagsFit(cut, samples, nBTagVar = 'nBJetMediumCSV30', lumi=4., prefix
   #ROOT.RooMinuit(nll).migrad()
   #ROOT.RooMinuit(nll).hesse()
   #ROOT.RooMinuit(nll).minos()#optional
+  
+  print "starting to perform fit !!!!"
 
   #model.fitTo(data)#It is this fitTo command that gives the statistical output
   nllComponents = ROOT.RooArgList("nllComponents")
@@ -160,8 +192,22 @@ def binnedNBTagsFit(cut, samples, nBTagVar = 'nBJetMediumCSV30', lumi=4., prefix
   model_NegPdg.plotOn(fitFrame_NegPdg,rf.Components("model_WJets_NegPdg"),rf.LineColor(ROOT.kGreen))
   model_NegPdg.plotOn(fitFrame_NegPdg,rf.Components("model_TTJets"),rf.LineColor(ROOT.kBlue))
   model_NegPdg.plotOn(fitFrame_NegPdg,rf.Components("model_Rest_NegPdg"),rf.LineColor(ROOT.kOrange+7))
- 
- 
+
+  print "After Fitting:"
+  for data_hists in [data_NegPdg , data_PosPdg]:
+    print "data_hists:" , data_hists
+    for i in range(data_hists.numEntries()):
+      data_hists.get(i)
+      print  "weight :" , data_hists.weight() 
+
+  print "AFTER FIT YIELDS:"
+  print "yield_WJets_NegPdg:" , yield_WJets_NegPdg.getVal()
+  print "yield_WJets_PosPdg:" , yield_WJets_PosPdg.getVal()
+  print "yield_TTJets:" , yield_TTJets.getVal()
+  print "yield_Rest_PosPdg:" , yield_Rest_PosPdg.getVal()
+  print "yield_Rest_NegPdg:" , yield_Rest_NegPdg.getVal()
+
+
   c1=ROOT.TCanvas("c1","FitModel",800,1200)
   ROOT.gROOT.SetStyle("Plain")
   c1.Divide(1,2)
@@ -182,6 +228,8 @@ def binnedNBTagsFit(cut, samples, nBTagVar = 'nBJetMediumCSV30', lumi=4., prefix
   c1.Print(printDir+'/'+prefix+'_nBTagFitRes.png')
   c1.Print(printDir+'/'+prefix+'_nBTagFitRes.pdf')
   c1.Print(printDir+'/'+prefix+'_nBTagFitRes.root')
+
+  
   del c1
   del nllComponents
 
@@ -196,9 +244,9 @@ def binnedNBTagsFit(cut, samples, nBTagVar = 'nBJetMediumCSV30', lumi=4., prefix
          'Rest_NegPdg':{'template':template_Rest_NegPdg, 'yield':yield_Rest_NegPdg.getVal(), 'yield_high':yield_Rest_NegPdg.getVal()+yield_Rest_NegPdg.getErrorHi(), 'yield_low':yield_Rest_NegPdg.getVal()+yield_Rest_NegPdg.getErrorLo(),
                      'yieldVar':(0.5*(yield_Rest_NegPdg.getErrorHi()-yield_Rest_NegPdg.getErrorLo()))**2},
         }
-  del model_NegPdg, model_PosPdg, data_PosPdg, sumNLL
+  del model_NegPdg, model_PosPdg, data_PosPdg,  data_NegPdg,sumNLL
   return res
-
+  
 
 
 #cWJets  = getChain(WJetsHTToLNu)

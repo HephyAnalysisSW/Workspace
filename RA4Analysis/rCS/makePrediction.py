@@ -22,15 +22,18 @@ cRest = getChain([DY[lepSel], singleTop[lepSel], TTVH[lepSel]],histname='')#no Q
 #cRest = getChain(TTVH[lepSel],histname='')#no QCD 
 cBkg = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]],histname='')#no QCD
 #cSig = getChain(T5qqqqWW_mGo1000_mCh800_mChi700[lepSel],T5qqqqWW_mGo1200_mCh1000_mChi800[lepSel],T5qqqqWW_mGo1500_mCh800_mChi100[lepSel],histname='')  ##to calculate signal contamination
-#cBkg = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]], T5qqqqWW_mGo1000_mCh800_mChi700[lepSel] , histname='')#no QCD , ##to calculate signal contamination
+cData = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]], T5qqqqWW_mGo1000_mCh800_mChi700[lepSel] , histname='')#no QCD , ##to calculate signal contamination
+#cData = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]],  ttJets[lepSel] , histname='')#no QCD , ##to calculate signal contamination
+#cData = cBkg
 #cRest = getChain([DY[lepSel], singleTop[lepSel], TTVH[lepSel]],T5qqqqWW_mGo1000_mCh800_mChi700[lepSel],histname='')#no QCD 
 
-signalRegions = signalRegion10fb     ##because 10 one is full
-lumi = 10.
+#signalRegions = signalRegion3fb     ##because 10 one is full
+signalRegions = {(5, 5): {(250, 350): {(500, -1):   {'deltaPhi': 1.0}}}} 
+lumi = 3.
 
 weight_str, weight_err_str = makeWeight(lumi)
 
-samples={'W':cWJets, 'TT':cTTJets, 'Rest':cRest, 'Bkg':cBkg}
+samples={'W':cWJets, 'TT':cTTJets, 'Rest':cRest, 'Bkg':cBkg, 'Data': cData}
 
 signal = True
 if signal:
@@ -152,7 +155,7 @@ for srNJet in signalRegions:
 
       #bins[htb][stb][srNJet]=rd
       bins[srNJet][stb][htb] = rd
-path = '/data/'+username+'/PHYS14v3/withCSV/rCS_0b_'+str(lumi)+'fbSlidingWcorrectionMuonChannel/'
+path = '/data/'+username+'/PHYS14v3/signal_contamination_tests/rCS_0b_'+str(lumi)+'_data_eql_bkg+signal/'
 if not os.path.exists(path):
   os.makedirs(path)
 pickle.dump(bins, file(path+prefix+'_estimationResults_pkl','w'))
