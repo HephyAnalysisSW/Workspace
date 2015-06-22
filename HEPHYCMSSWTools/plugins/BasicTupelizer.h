@@ -22,8 +22,6 @@
 
 //#include "SimGeneral/HepPDTRecord/interface/ParticleDataTable.h"
 
-#include "Workspace/HEPHYCMSSWTools/interface/ModelParameters.h"
-
 #include "Workspace/HEPHYCMSSWTools/plugins/Tupelizer.h"
 
 #include "TNtuple.h"
@@ -55,7 +53,6 @@ public:
   edm::InputTag vertices_;
 
   private:
-  ModelParameters modelParameters_;
 
   std::vector<std::string> metsToMonitor_;
   edm::InputTag genMetContainer_;

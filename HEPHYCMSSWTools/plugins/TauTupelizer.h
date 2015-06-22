@@ -16,7 +16,6 @@
 
 #include "Workspace/HEPHYCMSSWTools/interface/RecoHelper.h"
 #include "Workspace/HEPHYCMSSWTools/interface/MathHelper.h"
-#include "Workspace/HEPHYCMSSWTools/interface/ModelParameters.h"
 
 #include "Workspace/HEPHYCMSSWTools/plugins/Tupelizer.h"
 
