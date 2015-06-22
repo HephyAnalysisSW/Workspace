@@ -15,6 +15,9 @@ def binnedNBTagsFit(cut, samples, nBTagVar = 'nBJetMediumCSV30', lumi=4., prefix
   cWJets = samples['W']
   cTTJets = samples['TT']
   cRest = samples['Rest']
+  #cData = samples['Data']
+
+  #Get histograms binned in b-tag multiplicity
   template_WJets_PosPdg=getPlotFromChain(cWJets, nBTagVar, [0,1,2,3], 'leptonPdg>0&&'+cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
   template_WJets_NegPdg=getPlotFromChain(cWJets, nBTagVar, [0,1,2,3], 'leptonPdg<0&&'+cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
   template_TTJets=      getPlotFromChain(cTTJets,nBTagVar, [0,1,2,3], cut,                 weight_str, binningIsExplicit=True,addOverFlowBin='upper')
@@ -23,9 +26,11 @@ def binnedNBTagsFit(cut, samples, nBTagVar = 'nBJetMediumCSV30', lumi=4., prefix
 
   print "Nominal yields TT:",template_TTJets.Integral(),'WJets_PosPdg',template_WJets_PosPdg.Integral(),'WJets_NegPdg',template_WJets_NegPdg.Integral()
   print "Nominal yields:",'Rest_PosPdg',template_Rest_PosPdg.Integral(),'Rest_NegPdg',template_Rest_NegPdg.Integral()
-
-  #hData_PosPdg=getPlotFromChain(cData,nBTagVar,[0,1,2,3],mTCut+'&&'+nameAndCut(metb,htb,njetb,'pos',btagRequirement='None')[1],weight_str,binningIsExplicit=True,addOverFlowBin='upper')
-  #hData_NegPdg=getPlotFromChain(cData,nBTagVar,[0,1,2,3],mTCut+'&&'+nameAndCut(metb,htb,njetb,'neg',btagRequirement='None')[1],weight_str,binningIsExplicit=True,addOverFlowBin='upper')
+  
+  #hData_PosPdg = getPlotFromChain(cData, nBTagVar, [0,1,2,3], 'leptonPdg>0&&'+cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
+  #hData_NegPdg = getPlotFromChain(cData, nBTagVar, [0,1,2,3], 'leptonPdg<0&&'+cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
+  ##hData_PosPdg=getPlotFromChain(cData,nBTagVar,[0,1,2,3],mTCut+'&&'+nameAndCut(metb,htb,njetb,'pos',btagRequirement='None')[1],weight_str,binningIsExplicit=True,addOverFlowBin='upper')
+  ##hData_NegPdg=getPlotFromChain(cData,nBTagVar,[0,1,2,3],mTCut+'&&'+nameAndCut(metb,htb,njetb,'neg',btagRequirement='None')[1],weight_str,binningIsExplicit=True,addOverFlowBin='upper')
   hData_PosPdg = template_TTJets.Clone()
   hData_PosPdg.Scale(0.5)
   hData_PosPdg.Add(template_WJets_PosPdg)
@@ -35,6 +40,7 @@ def binnedNBTagsFit(cut, samples, nBTagVar = 'nBJetMediumCSV30', lumi=4., prefix
   hData_NegPdg.Add(template_WJets_NegPdg)
   hData_NegPdg.Add(template_Rest_NegPdg)
 
+  #Normalize histograms
   template_TTJets.Scale(1./template_TTJets.Integral())
   template_WJets_PosPdg.Scale(1./template_WJets_PosPdg.Integral())
   template_WJets_NegPdg.Scale(1./template_WJets_NegPdg.Integral())
@@ -56,6 +62,7 @@ def binnedNBTagsFit(cut, samples, nBTagVar = 'nBJetMediumCSV30', lumi=4., prefix
   dh_Rest_PosPdg=ROOT.RooDataHist("mcRest","mcRest",ROOT.RooArgList(x),template_Rest_PosPdg)
   dh_Rest_NegPdg=ROOT.RooDataHist("mcRest","mcRest",ROOT.RooArgList(x),template_Rest_NegPdg)
 
+  #Define yields as variable
   yield_TTJets=ROOT.RooRealVar("ttJets_yield","yieldTTJets",0.1,0,10**5)
   yield_WJets_PosPdg = ROOT.RooRealVar("yield_WJets_PosPdg","yield_WJets_PosPdg",0.1,0,10**5)
   yield_WJets_NegPdg = ROOT.RooRealVar("yield_WJets_NegPdg","yield_WJets_NegPdg",0.1,0,10**5)
@@ -66,20 +73,21 @@ def binnedNBTagsFit(cut, samples, nBTagVar = 'nBJetMediumCSV30', lumi=4., prefix
   yield_Rest_PosPdg.setConstant()
   yield_Rest_NegPdg.setConstant()
 
-  #MakePDFfromMChistograms
+  #Make PDF from MC histograms
   model_WJets_PosPdg=ROOT.RooHistPdf("model_WJets_PosPdg","model_WJets_PosPdg",ROOT.RooArgSet(x),dh_WJets_PosPdg)
   model_WJets_NegPdg=ROOT.RooHistPdf("model_WJets_NegPdg","model_WJets_NegPdg",ROOT.RooArgSet(x),dh_WJets_NegPdg)
   model_TTJets=ROOT.RooHistPdf("model_TTJets","model_TTJets",ROOT.RooArgSet(x),dh_TTJets)
   model_Rest_PosPdg=ROOT.RooHistPdf("model_Rest_PosPdg","model_Rest_PosPdg",ROOT.RooArgSet(x),dh_Rest_PosPdg)
   model_Rest_NegPdg=ROOT.RooHistPdf("model_Rest_NegPdg","model_Rest_NegPdg",ROOT.RooArgSet(x),dh_Rest_NegPdg)
 
+  #Make combined PDF of all MC Backgrounds
 #  model_PosPdg=ROOT.RooAddPdf("model_PosPdg","model_PosPdg",ROOT.RooArgList(model_WJets_PosPdg, model_TTJets),ROOT.RooArgList(yield_WJets_PosPdg, yield_TTJets))
 #  model_NegPdg=ROOT.RooAddPdf("model_NegPdg","model_NegPdg",ROOT.RooArgList(model_WJets_NegPdg, model_TTJets),ROOT.RooArgList(yield_WJets_NegPdg, yield_TTJets))
   model_PosPdg=ROOT.RooAddPdf("model_PosPdg","model_PosPdg",ROOT.RooArgList(model_WJets_PosPdg, model_TTJets, model_Rest_PosPdg),ROOT.RooArgList(yield_WJets_PosPdg, yield_TTJets, yield_Rest_PosPdg))
   model_NegPdg=ROOT.RooAddPdf("model_NegPdg","model_NegPdg",ROOT.RooArgList(model_WJets_NegPdg, model_TTJets, model_Rest_NegPdg),ROOT.RooArgList(yield_WJets_NegPdg, yield_TTJets, yield_Rest_NegPdg))
   #CombinesmyMCsintoonePDFmodel
 
-  #Plottheimportedhistogram(s)
+  #Plot the imported histogram(s)
   dframe=x.frame(rf.Title("Data"))
   data_PosPdg.plotOn(dframe)
   data_NegPdg.plotOn(dframe)
@@ -99,7 +107,7 @@ def binnedNBTagsFit(cut, samples, nBTagVar = 'nBJetMediumCSV30', lumi=4., prefix
 
 #  c=ROOT.TCanvas("roofit_example","RooFitFractionFitExample",800,1200)
 #  c.Divide(1,3)
-#  ROOT.gROOT.SetStyle("Plain")#Removesgraybackgroundfromplots
+#  ROOT.gROOT.SetStyle("Plain")#Removes gray background from plots
 #  c.cd(1)
 #  ROOT.gPad.SetLeftMargin(0.15)
 #  dframe.GetYaxis().SetTitleOffset(1.4)
@@ -115,14 +123,14 @@ def binnedNBTagsFit(cut, samples, nBTagVar = 'nBJetMediumCSV30', lumi=4., prefix
 #  frame_TTJets.Draw()
 
 
-  #nll=model.createNLL(data,rf.NumCPU(1))#Fromotherexample,lookslike
-  ##pll_phi=nll.createProfile(ROOT.RooArgSet(mc1_yield))#anotherwayofdoingthefitTo
+  #nll=model.createNLL(data,rf.NumCPU(1)) #From other example, looks like
+  ##pll_phi=nll.createProfile(ROOT.RooArgSet(mc1_yield))#another way of doing the fitTo
   #
   #ROOT.RooMinuit(nll).migrad()
   #ROOT.RooMinuit(nll).hesse()
   #ROOT.RooMinuit(nll).minos()#optional
 
-  #model.fitTo(data)#ItisthisfitTocommandthatgivesthestatisticaloutput
+  #model.fitTo(data)#It is this fitTo command that gives the statistical output
   nllComponents = ROOT.RooArgList("nllComponents")
   nll_PosPdg=model_PosPdg.createNLL(data_PosPdg,rf.NumCPU(1))
   nll_NegPdg=model_NegPdg.createNLL(data_NegPdg,rf.NumCPU(1))
