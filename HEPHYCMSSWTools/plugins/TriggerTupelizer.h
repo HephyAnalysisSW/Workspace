@@ -22,8 +22,6 @@
 
 //#include "SimGeneral/HepPDTRecord/interface/ParticleDataTable.h"
 
-#include "Workspace/HEPHYCMSSWTools/interface/ModelParameters.h"
-
 #include "Workspace/HEPHYCMSSWTools/plugins/Tupelizer.h"
 
 #include "TNtuple.h"

@@ -403,36 +403,36 @@ print '\\hline\end{tabular}}\end{center}\caption{Closure table for the backgroun
 
 
 ## W Prediction table 1 not needed atm
-#print "rCS(TT) comparison used for rCS(W) correction"
-#print
-#print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrr|rrr|c|}\\hline'
-#print ' \\njet & \ST$[$GeV$]$     & \HT$[$GeV$]$     &\multicolumn{3}{c|}{$R_{CS}(1b,2/3j)$}&\multicolumn{3}{c|}{$R_{CS,tt}(1b,2/3j)$}&\multicolumn{3}{c|}{$R_{CS,tt}(0b,2/3j)$} & $\Delta\Phi(W,l)$\\\\\hline'
-#secondLine = False
-#for srNJet in sorted(signalRegions):
-#  print '\\hline'
-#  if secondLine: print '\\hline'
-#  secondLine = True
-#  print '\multirow{'+str(rowsNJet[srNJet]['n'])+'}{*}{\\begin{sideways}$'+varBin(srNJet)+'$\end{sideways}}'
-#  for stb in sorted(signalRegions[srNJet]):
-#    print '&\multirow{'+str(rowsSt[srNJet][stb]['n'])+'}{*}{$'+varBin(stb)+'$}'
-#    first = True
-#    for htb in sorted(signalRegions[srNJet][stb]):
-#      if not first: print '&'
-#      first = False
-#      print '&$'+varBin(htb)+'$&'
-##for i_htb, htb in enumerate(htreg):
-##  print '\multirow{'+str(nSTbins)+'}{*}{$'+varBin(htb)+'$}'
-##  for stb, dPhiCut in streg:
-##    print '&$'+varBin(stb)+'$&'
-##    for srNJet in njreg[:1]:
-#      #print '$'+varBinName(htb, 'H_{T}')+'$&$'+varBinName(stb, 'S_{T}')+'$ & '+\
-#      print   ' & '.join([getNumString(res[srNJet][stb][htb]['rCS_crNJet_1b']['rCS'],   res[srNJet][stb][htb]['rCS_crNJet_1b']['rCSE_sim'],3), \
-#                      getNumString(res[srNJet][stb][htb]['rCS_crNJet_1b_onlyTT']['rCS'], res[srNJet][stb][htb]['rCS_crNJet_1b_onlyTT']['rCSE_sim'],3),\
-#                      getNumString(res[srNJet][stb][htb]['rCS_crNJet_0b_onlyTT']['rCS'], res[srNJet][stb][htb]['rCS_crNJet_0b_onlyTT']['rCSE_sim'],3)]),\
-#                      '&',str(signalRegions[srNJet][stb][htb]['deltaPhi'])+'\\\\'
-#      if htb[1] == -1 : print '\\cline{2-13}'
-#print '\\hline\end{tabular}}\end{center}\caption{}\end{table}'
-#print
+print "rCS(TT) comparison used for rCS(W) correction"
+print
+print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrr|rrr|c|}\\hline'
+print ' \\njet & \ST$[$GeV$]$     & \HT$[$GeV$]$     &\multicolumn{3}{c|}{$R_{CS}(1b,2/3j)$}&\multicolumn{3}{c|}{$R_{CS,tt}(1b,2/3j)$}&\multicolumn{3}{c|}{$R_{CS,tt}(0b,2/3j)$} & $\Delta\Phi(W,l)$\\\\\hline'
+secondLine = False
+for srNJet in sorted(signalRegions):
+  print '\\hline'
+  if secondLine: print '\\hline'
+  secondLine = True
+  print '\multirow{'+str(rowsNJet[srNJet]['n'])+'}{*}{\\begin{sideways}$'+varBin(srNJet)+'$\end{sideways}}'
+  for stb in sorted(signalRegions[srNJet]):
+    print '&\multirow{'+str(rowsSt[srNJet][stb]['n'])+'}{*}{$'+varBin(stb)+'$}'
+    first = True
+    for htb in sorted(signalRegions[srNJet][stb]):
+      if not first: print '&'
+      first = False
+      print '&$'+varBin(htb)+'$&'
+#for i_htb, htb in enumerate(htreg):
+#  print '\multirow{'+str(nSTbins)+'}{*}{$'+varBin(htb)+'$}'
+#  for stb, dPhiCut in streg:
+#    print '&$'+varBin(stb)+'$&'
+#    for srNJet in njreg[:1]:
+      #print '$'+varBinName(htb, 'H_{T}')+'$&$'+varBinName(stb, 'S_{T}')+'$ & '+\
+      print   ' & '.join([getNumString(res[srNJet][stb][htb]['rCS_crNJet_1b']['rCS'],   res[srNJet][stb][htb]['rCS_crNJet_1b']['rCSE_sim'],3), \
+                      getNumString(res[srNJet][stb][htb]['rCS_crNJet_1b_onlyTT']['rCS'], res[srNJet][stb][htb]['rCS_crNJet_1b_onlyTT']['rCSE_sim'],3),\
+                      getNumString(res[srNJet][stb][htb]['rCS_crNJet_0b_onlyTT']['rCS'], res[srNJet][stb][htb]['rCS_crNJet_0b_onlyTT']['rCSE_sim'],3)]),\
+                      '&',str(signalRegions[srNJet][stb][htb]['deltaPhi'])+'\\\\'
+      if htb[1] == -1 : print '\\cline{2-13}'
+print '\\hline\end{tabular}}\end{center}\caption{}\end{table}'
+print
 
 
 ## W Prediction table 2
