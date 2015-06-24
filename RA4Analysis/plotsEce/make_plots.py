@@ -37,22 +37,17 @@ dfCut =0
 prepresel = 'singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&'
 #prepresel = 'singleElectronic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&'
 #prepresel = 'singleMuonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&'
-#presel = prepresel+'mt2w>'+str(mt2Cut)+'&&deltaPhi_Wl>'+str(dfCut)+'&&htJet30j>='+str(htCut[0])+'&&htJet30j<'+str(htCut[1])+'&&st>='+str(stCut[0])+'&&st<'+str(stCut[1])+'&&nJet30>='+str(njetCut[0])+'&&nJet30<'+str(njetCut[1])+'&&nBJetMediumCMVA30=='+str(nbtagCut)
-#presel = prepresel+'deltaPhi_Wl>'+str(dfCut)+'&&Jet_pt[1]>='+str(jetPtCut)+'&&htJet30j>='+str(htCut[0])+'&&htJet30j<'+str(htCut[1])+'&&met>='+str(stCut[0])+'&&met<'+str(stCut[1])+'&&nJet30>='+str(njetCut[0])+'&&nJet30<'+str(njetCut[1])+'&&nBJetMediumCMVA30>='+str(nbtagCut)
-#presel = prepresel+"(1)"
 presel = prepresel+'deltaPhi_Wl>'+str(dfCut)+'&&Jet_pt[1]>='+str(jetPtCut)+'&&htJet30j>='+str(htCut[0])+'&&htJet30j<'+str(htCut[1])+'&&st>='+str(stCut[0])+'&&st<'+str(stCut[1])+'&&nJet30>='+str(njetCut[0])+'&&nJet30<'+str(njetCut[1])+'&&nBJetMediumCSV30=='+str(nbtagCut)
-#path = "/afs/hephy.at/user/e/easilar/www/PHYS14v3/tests/"+"_".join(presel.split('&&')[4:])+"/"   #.replace('&&','_')+"/"
-#path = "/afs/hephy.at/user/e/easilar/www/PHYS14v3/tests/"+prepresel.split('&&')[0]+"/"   #.replace('&&','_')+"/"
 path = "/afs/hephy.at/user/e/easilar/www/PHYS14v3/toConvener/dilep_split_TT/draw_onlyTTJets/"+prepresel.split('&&')[0]+"/"    #.replace('&&','_')+"/"
 if not os.path.exists(path):
   os.makedirs(path)
 
 bkg_samples = [
-#{'cname':'QCD'      ,'label':'QCD'           ,'color':ROOT.kCyan-6      ,'chain':getChain(QCD[lepSel],histname='')         },\
-#{'cname':'TTVH'     ,'label':'t#bar{t}+W/Z/H','color':ROOT.kOrange-3    ,'chain':getChain(TTVH[lepSel],histname='')        },\
-#{'cname':'DY'       ,'label':'DY+Jets'       ,'color':ROOT.kRed-6       ,'chain':getChain(DY[lepSel],histname='')          },\
-#{'cname':'singleTop','label':'single top'    ,'color':ROOT.kViolet+5,'chain':getChain(singleTop[lepSel],histname='')   },\
-#{'cname':'WJets'    ,'label':'W+Jets'        ,'color':ROOT.kGreen-2 ,'chain':getChain(WJetsHTToLNu[lepSel],histname='')},\
+{'cname':'QCD'      ,'label':'QCD'           ,'color':ROOT.kCyan-6      ,'chain':getChain(QCD[lepSel],histname='')         },\
+{'cname':'TTVH'     ,'label':'t#bar{t}+W/Z/H','color':ROOT.kOrange-3    ,'chain':getChain(TTVH[lepSel],histname='')        },\
+{'cname':'DY'       ,'label':'DY+Jets'       ,'color':ROOT.kRed-6       ,'chain':getChain(DY[lepSel],histname='')          },\
+{'cname':'singleTop','label':'single top'    ,'color':ROOT.kViolet+5,'chain':getChain(singleTop[lepSel],histname='')   },\
+{'cname':'WJets'    ,'label':'W+Jets'        ,'color':ROOT.kGreen-2 ,'chain':getChain(WJetsHTToLNu[lepSel],histname='')},\
 {'cname':'TTJets'   ,'label':'t#bar{t}+Jets' ,'color':ROOT.kBlue-2 ,'chain':getChain(ttJets[lepSel],histname='')      },\
 
 ]
@@ -61,14 +56,8 @@ signal_samples = [
 {'label':'T5q^{4} 1.0/0.8/0.7','cname':'T5qqqqWW_mGo1000_mCh800_mLSP700','color':ROOT.kBlack  ,'chain':getChain(T5qqqqWW_mGo1000_mCh800_mChi700[lepSel],histname='')},\
 {'label':'T5q^{4} 1.2/1/0.8','cname':'T5qqqqWW_mGo1200_mCh1000_mLSP800','color':ROOT.kRed    ,'chain':getChain(T5qqqqWW_mGo1200_mCh1000_mChi800[lepSel],histname='')},\
 {'label':'T5q^{4} 1.5/0.8/0.1','cname':'T5qqqqWW_mGo1500_mCh800_mLSP100','color':ROOT.kYellow    ,'chain':getChain(T5qqqqWW_mGo1500_mCh800_mChi100[lepSel],histname='')},\
-#{'cname':'SMS_T1tttt_2J_mGl1500_mLSP100','color':ROOT.kMagenta    ,'chain':getChain(SMS_T1tttt_2J_mGl1500_mLSP100[lepSel],histname='')},\
-#{'cname':'SMS_T1tttt_2J_mGl1200_mLSP800','color':ROOT.kCyan       ,'chain':getChain(SMS_T1tttt_2J_mGl1200_mLSP800[lepSel],histname='')},\
 ]
 
-#for b in bkg_samples:
-#  print 'sample:' ,b['cname'],'nevents:', b['chain'].GetEntries()
-#for s in signal_samples:
-#  print 'sample:' ,s['cname'],'nevents:', s['chain'].GetEntries()
 
 ngNuEFromW = "Sum$(abs(genPartAll_pdgId)==12&&abs(genPartAll_motherId)==24)"
 ngNuMuFromW = "Sum$(abs(genPartAll_pdgId)==14&&abs(genPartAll_motherId)==24)"
