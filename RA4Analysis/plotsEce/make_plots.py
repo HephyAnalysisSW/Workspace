@@ -32,28 +32,29 @@ njetCut = [4,20]
 nbtagCut = 0
 mt2Cut = 0
 jetPtCut = 80
-dfCut =0.2
+dfCut =0
 
-#prepresel = 'singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&'
+prepresel = 'singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&'
 #prepresel = 'singleElectronic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&'
-prepresel = 'singleMuonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&'
+#prepresel = 'singleMuonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&'
 #presel = prepresel+'mt2w>'+str(mt2Cut)+'&&deltaPhi_Wl>'+str(dfCut)+'&&htJet30j>='+str(htCut[0])+'&&htJet30j<'+str(htCut[1])+'&&st>='+str(stCut[0])+'&&st<'+str(stCut[1])+'&&nJet30>='+str(njetCut[0])+'&&nJet30<'+str(njetCut[1])+'&&nBJetMediumCMVA30=='+str(nbtagCut)
 #presel = prepresel+'deltaPhi_Wl>'+str(dfCut)+'&&Jet_pt[1]>='+str(jetPtCut)+'&&htJet30j>='+str(htCut[0])+'&&htJet30j<'+str(htCut[1])+'&&met>='+str(stCut[0])+'&&met<'+str(stCut[1])+'&&nJet30>='+str(njetCut[0])+'&&nJet30<'+str(njetCut[1])+'&&nBJetMediumCMVA30>='+str(nbtagCut)
 #presel = prepresel+"(1)"
 presel = prepresel+'deltaPhi_Wl>'+str(dfCut)+'&&Jet_pt[1]>='+str(jetPtCut)+'&&htJet30j>='+str(htCut[0])+'&&htJet30j<'+str(htCut[1])+'&&st>='+str(stCut[0])+'&&st<'+str(stCut[1])+'&&nJet30>='+str(njetCut[0])+'&&nJet30<'+str(njetCut[1])+'&&nBJetMediumCSV30=='+str(nbtagCut)
 #path = "/afs/hephy.at/user/e/easilar/www/PHYS14v3/tests/"+"_".join(presel.split('&&')[4:])+"/"   #.replace('&&','_')+"/"
 #path = "/afs/hephy.at/user/e/easilar/www/PHYS14v3/tests/"+prepresel.split('&&')[0]+"/"   #.replace('&&','_')+"/"
-path = "/afs/hephy.at/user/e/easilar/www/PHYS14v3/annote/plots/baseline_dPhi0.2/"+prepresel.split('&&')[0]+"/"    #.replace('&&','_')+"/"
+path = "/afs/hephy.at/user/e/easilar/www/PHYS14v3/toConvener/dilep_split_TT/draw_onlyTTJets/"+prepresel.split('&&')[0]+"/"    #.replace('&&','_')+"/"
 if not os.path.exists(path):
   os.makedirs(path)
 
 bkg_samples = [
-{'cname':'QCD'      ,'label':'QCD'           ,'color':ROOT.kCyan-6  ,'chain':getChain(QCD[lepSel],histname='')         },\
-{'cname':'TTVH'     ,'label':'t#bar{t}+W/Z/H','color':ROOT.kOrange-3  ,'chain':getChain(TTVH[lepSel],histname='')        },\
-{'cname':'DY'       ,'label':'DY+Jets'       ,'color':ROOT.kRed-6 ,'chain':getChain(DY[lepSel],histname='')          },\
-{'cname':'singleTop','label':'single top'    ,'color':ROOT.kViolet+5,'chain':getChain(singleTop[lepSel],histname='')   },\
-{'cname':'WJets'    ,'label':'W+Jets'        ,'color':ROOT.kGreen-2 ,'chain':getChain(WJetsHTToLNu[lepSel],histname='')},\
+#{'cname':'QCD'      ,'label':'QCD'           ,'color':ROOT.kCyan-6      ,'chain':getChain(QCD[lepSel],histname='')         },\
+#{'cname':'TTVH'     ,'label':'t#bar{t}+W/Z/H','color':ROOT.kOrange-3    ,'chain':getChain(TTVH[lepSel],histname='')        },\
+#{'cname':'DY'       ,'label':'DY+Jets'       ,'color':ROOT.kRed-6       ,'chain':getChain(DY[lepSel],histname='')          },\
+#{'cname':'singleTop','label':'single top'    ,'color':ROOT.kViolet+5,'chain':getChain(singleTop[lepSel],histname='')   },\
+#{'cname':'WJets'    ,'label':'W+Jets'        ,'color':ROOT.kGreen-2 ,'chain':getChain(WJetsHTToLNu[lepSel],histname='')},\
 {'cname':'TTJets'   ,'label':'t#bar{t}+Jets' ,'color':ROOT.kBlue-2 ,'chain':getChain(ttJets[lepSel],histname='')      },\
+
 ]
 
 signal_samples = [
@@ -69,15 +70,34 @@ signal_samples = [
 #for s in signal_samples:
 #  print 'sample:' ,s['cname'],'nevents:', s['chain'].GetEntries()
 
+ngNuEFromW = "Sum$(abs(genPartAll_pdgId)==12&&abs(genPartAll_motherId)==24)"
+ngNuMuFromW = "Sum$(abs(genPartAll_pdgId)==14&&abs(genPartAll_motherId)==24)"
+ngNuTauFromW = "Sum$(abs(genPartAll_pdgId)==16&&abs(genPartAll_motherId)==24)"
 
+diLepEff   = ngNuEFromW+"+"+ngNuMuFromW+"==2&&"+ngNuTauFromW+"==0&&Sum$(genLep_pt>10&&(abs(genLep_eta)<2.1&&abs(genLep_pdgId)==13||abs(genLep_eta)<2.4&&abs(genLep_pdgId)==11))==2"
+diLepAcc   = ngNuEFromW+"+"+ngNuMuFromW+"==2&&"+ngNuTauFromW+"==0&&Sum$(genLep_pt>10&&(abs(genLep_eta)<2.1&&abs(genLep_pdgId)==13||abs(genLep_eta)<2.4&&abs(genLep_pdgId)==11))!=2"
+l_H     =  "(("+ngNuEFromW+"+"+ngNuMuFromW+"==1&&"+ngNuTauFromW+"==0))"
+
+diLep = "(("+ngNuEFromW+"+"+ngNuMuFromW+"==2&&"+ngNuTauFromW+"==0))"
+diLep_inv = "(!("+ngNuEFromW+"+"+ngNuMuFromW+"==2&&"+ngNuTauFromW+"==0))"
+rest = "(!("+diLep+"||"+l_H+"))"
+
+sels = [\
+{'label': 'TTJets Di-Leptonic'             , 'cut': presel+"&&"+diLep+'&&Jet_pt[1]>='+str(jetPtCut)     , 'color': ROOT.kAzure},\
+{'label': 'TTJets Rest'                    , 'cut': diLep_inv+"&&"+presel , 'color': ROOT.kBlue-2},\
+#{'label': 'Rest'                    , 'cut': presel+'&&'+rest+'&&'+'Jet_pt[1]>='+str(jetPtCut) , 'color': ROOT.kAzure},\
+#{'label': 'Single-Leptonic'         , 'cut': presel+"&&"+l_H+'&&Jet_pt[1]>='+str(jetPtCut)       , 'color': ROOT.kAzure+5},\
+]
 
 
 plots = [
 #{'ndiv':'False','yaxis':'Events','xaxis':'N_{Jets}','logy':'True' , 'var':'nJet30',                      'varname':'nJet30',                   'binlabel':1,  'bin':11,       'lowlimit':4,  'limit':15},\
 #{'ndiv':'False','yaxis':'Events','xaxis':'N_{bJetsCSV}','logy':'True' , 'var':'nBJetMediumCSV30',           'varname':'nBJetMediumCSV30',      'binlabel':1,  'bin':8,       'lowlimit':0,  'limit':8},\
-#{'ndiv':'False','yaxis':'Events','xaxis':'#Delta#Phi(W,l)','logy':'True' , 'var':'deltaPhi_Wl',                 'varname':'deltaPhi_Wl',       'binlabel':1,  'bin':30,       'lowlimit':0.2,  'limit':pi},\
+#{'ndiv':'False','yaxis':'Events','xaxis':'#Delta#Phi(W,l)','logy':'True' , 'var':'deltaPhi_Wl',                 'varname':'deltaPhi_Wl',       'binlabel':1,  'bin':30,       'lowlimit':0,  'limit':pi},\
+
+
 {'ndiv':'True','yaxis':'Events /','xaxis':'S_{T}','logy':'True' , 'var':'st',                          'varname':'st',                  'binlabel':50,  'bin':36,       'lowlimit':200,  'limit':2000},\
-{'ndiv':'True','yaxis':'Events /','xaxis':'H_{T}','logy':'True' , 'var':'htJet30j',                    'varname':'htJet30j',            'binlabel':50,  'bin':30,       'lowlimit':500,  'limit':2000},\
+{'ndiv':'True','yaxis':'Events /','xaxis':'H_{T}','logy':'True' , 'var':'htJet30j',                    'varname':'htJet30j',            'binlabel':50,  'bin':50,       'lowlimit':500,  'limit':3000},\
 {'ndiv':'True','yaxis':'Events /','xaxis':'p_{T}(leading jet)','logy':'True' , 'var':'Jet_pt[0]',               'varname':'Jet_pt[0]',  'binlabel':30,  'bin':67,       'lowlimit':0,  'limit':2010},\
 {'ndiv':'True','yaxis':'Events /','xaxis':'#slash{E}_{T}','logy':'True' , 'var':'met',                         'varname':'met',         'binlabel':50,  'bin':28,       'lowlimit':0,  'limit':1400},\
 {'ndiv':'True','yaxis':'Events /','xaxis':'p_{T}(l)','logy':'True' , 'var':'leptonPt',                 'varname':'leptonPt',      'binlabel':25,  'bin':40,       'lowlimit':0,  'limit':1000},\
@@ -125,31 +145,56 @@ for p in plots:
   leg.SetBorderSize(1) 
   print p['varname']
   for b in bkg_samples:
-    color = b['color']
-    print color
     print b['cname']  , b['chain']
-    histo = 'h_'+b['cname']
     chain = b['chain']
-    histoname = histo
-    print histoname
-    histo = ROOT.TH1F(str(histo) ,str(histo),p['bin'],p['lowlimit'],p['limit'])
-    print presel
-    chain.Draw(p['var']+'>>'+str(histoname),weight_str+'*('+presel+')')
-    print histo
-    histo.SetFillColor(color)
-    #histo.SetLineColor(color)
-    histo.SetLineWidth(2)
-    histo.SetMinimum(.1)
-    histo.GetXaxis().SetTitle(p['xaxis'])
-    #if p['ndiv']: 
-    histo.GetXaxis().SetNdivisions(505)
-    histo.GetYaxis().SetTitle(p['yaxis']+str(p['binlabel'])+'GeV')
-    #if not p['ndiv']:
-    #histo.GetYaxis().SetTitle(p['yaxis'])
-    #print "integral" , histo.Integral()
-    h_Stack.Add(histo)
-    leg.AddEntry(histo, b['label'],"f")
-    del histo  
+    if b['cname'] == 'TTJets' : 
+      for sel in sels:
+        histo = 'h_'+b['cname']+sel['label']
+        histoname = histo
+        print histoname
+        histo = ROOT.TH1F(str(histo) ,str(histo),p['bin'],p['lowlimit'],p['limit'])
+        print sel['cut']
+        chain.Draw(p['var']+'>>'+str(histoname),weight_str+'*('+sel['cut']+')')              
+        color = sel['color']
+        histo.SetFillColor(color)
+        histo.SetLineWidth(2)
+        histo.SetMinimum(.1)
+        histo.GetXaxis().SetTitle(p['xaxis'])
+        #if p['ndiv']: 
+        histo.GetXaxis().SetNdivisions(505)
+        histo.GetYaxis().SetTitle(p['yaxis']+str(p['binlabel'])+'GeV')
+        #if not p['ndiv']:
+        #histo.GetYaxis().SetTitle(p['yaxis'])
+        #print "integral" , histo.Integral()
+        h_Stack.Add(histo)
+        leg.AddEntry(histo, sel['label'],"f")
+        del histo
+    else:
+      color = b['color']
+      print color
+      print b['cname']  , b['chain']
+      histo = 'h_'+b['cname']
+      histoname = histo
+      print histoname
+      histo = ROOT.TH1F(str(histo) ,str(histo),p['bin'],p['lowlimit'],p['limit'])
+      print presel
+      chain.Draw(p['var']+'>>'+str(histoname),weight_str+'*('+presel+')')
+      print histo
+      histo.SetFillColor(color)
+      #histo.SetLineColor(color)      
+
+      histo.SetLineWidth(2)
+      histo.SetMinimum(.1)
+      histo.GetXaxis().SetTitle(p['xaxis'])
+      #if p['ndiv']: 
+      histo.GetXaxis().SetNdivisions(505)
+      histo.GetYaxis().SetTitle(p['yaxis']+str(p['binlabel'])+'GeV')
+      #if not p['ndiv']:
+      #histo.GetYaxis().SetTitle(p['yaxis'])
+      #print "integral" , histo.Integral()
+      h_Stack.Add(histo)
+      leg.AddEntry(histo, b['label'],"f")
+      del histo  
   for s in signal_samples: 
     color = s['color']
     histo = 'h_'+s['cname']
@@ -187,16 +232,16 @@ for p in plots:
   Yaxis1 = h_Stack.GetYaxis()
   Xaxis = h_Stack_S.GetXaxis()
   Yaxis = h_Stack_S.GetYaxis()
-  Xaxis1.SetTitle(p['xaxis'])
-  Xaxis.SetTitle(p['xaxis'])
+  #Xaxis1.SetTitle(p['xaxis'])
+  #Xaxis.SetTitle(p['xaxis'])
   #if p['ndiv']: 
   Xaxis1.SetNdivisions(505)
   Xaxis.SetNdivisions(505) 
   Yaxis1.SetTitle(p['yaxis']+str(p['binlabel'])+'GeV')
   Yaxis.SetTitle(p['yaxis']+str(p['binlabel'])+'GeV')
   #if not p['ndiv']:
-  #Yaxis1.SetTitle(p['yaxis'])
-  #Yaxis.SetTitle(p['yaxis'])
+  Yaxis1.SetTitle(p['yaxis'])
+  Yaxis.SetTitle(p['yaxis'])
 
   #h_Stack_S.Draw('noStacksame')
   if p['logy']=="True": can.SetLogy()

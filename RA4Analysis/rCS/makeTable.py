@@ -8,6 +8,8 @@ from localInfo import username
 from Workspace.RA4Analysis.signalRegions import *
 from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
 
+
+
 prefix = 'singleLeptonic_Phys14V3_'
 #res = pickle.load(file('/data/'+username+'/results2015/rCS_0b/'+prefix+'_estimationResults_pkl'))
 #res = pickle.load(file('/data/'+username+'/PHYS14v3/withCSV/rCS_0b/'+prefix+'_estimationResults_ttJet_unc_pkl'))
@@ -17,7 +19,9 @@ path = '/data/'+username+'/PHYS14v3/withCSV/rCS_0b_3.0fbSlidingWcorrectionMuonCh
 #res = pickle.load(file(path+prefix+'_estimationResults_pkl'))
 #res = pickle.load(file('/data/easilar/PHYS14v3/withCSV/rCS_0b_3.0fbSlidingWcorrectionMuonChannel_SignalCont_s1000/singleLeptonic_Phys14V3__estimationResults_pkl'))
 #res = pickle.load(file('/data/easilar/PHYS14v3/signal_contamination_tests/rCS_0b_3.0_data_eql_bkg/singleLeptonic_Phys14V3__estimationResults_pkl'))
-res = pickle.load(file('/data/easilar/PHYS14v3/signal_contamination_tests/rCS_0b_3.0_data_eql_bkg+ttjets/singleLeptonic_Phys14V3__estimationResults_pkl'))
+#res = pickle.load(file('/data/easilar/PHYS14v3/signal_contamination_tests/rCS_0b_3.0_data_eql_bkg+ttjets/singleLeptonic_Phys14V3__estimationResults_pkl'))
+#res = pickle.load(file('/data/easilar/PHYS14v3/signal_contamination/rCS_0b_3.0_data_eql_bkg+signal1000/singleLeptonic_Phys14V3__estimationResults_pkl')) 
+res = pickle.load(file('/data/easilar/PHYS14v3/signal_contamination_tests/rCS_0b_3.0_data_eql_bkg/singleLeptonic_Phys14V3__estimationResults_pkl')) 
 #kcs = pickle.load(file(path+'correction_pkl'))
 #kcs = pickle.load(file(path+'/correction_pkl'))
 #kcs = pickle.load(file('/data/easilar/PHYS14v3/withCSV/rCS_0b_10.0fbSlidingWcorrectionMuonChannel/correction_pkl'))
@@ -61,8 +65,8 @@ if signal:
 #nSTbins = len(streg)
 #nJetBins = len(njreg)
 
-#signalRegions = signalRegion3fb
-signalRegions = {(5, 5): {(250, 350): {(500, -1):   {'deltaPhi': 1.0}}}}
+signalRegions = signalRegion3fb
+#signalRegions = {(5, 5): {(250, 350): {(500, -1):   {'deltaPhi': 1.0}}}}
 #streg = [[(250, 350), 1.], [(350, 450), 1.], [(450,-1), 1.]]
 #htreg = [(500,750),(750,1000),(1000,1250),(1250,-1)]
 #njreg = [(5,5),(6,7),(8,-1)]
@@ -141,7 +145,7 @@ for srNJet in sorted(signalRegions):
       if not first: print '&'
       first = False
       print '&$'+varBin(htb)+'$'
-      rCS_srPredErrorCandidatesTT = [abs(1 - res[srNJet][stb][htb]['rCS_crLowNJet_1b']['rCS']*kcs['tt'][stb][htb]['FitRatio']/res[srNJet][stb][htb]['rCS_srNJet_0b_onlyTT']['rCS']),\
+      rCS_srPredErrorCandidatesTT = [abs(1 - (res[srNJet][stb][htb]['rCS_crLowNJet_1b']['rCS']*kcs['tt'][stb][htb]['FitRatio']/res[srNJet][stb][htb]['rCS_srNJet_0b_onlyTT']['rCS'])),\
             res[srNJet][stb][htb]['rCS_srNJet_0b_onlyTT']['rCSE_sim']/res[srNJet][stb][htb]['rCS_srNJet_0b_onlyTT']['rCS']]
       rCS_srPredErrorTT = max(rCS_srPredErrorCandidatesTT)
 
@@ -243,7 +247,7 @@ for srNJet in sorted(signalRegions):
                     })
 print '\\hline\end{tabular}}\end{center}\caption{Closure table for the background with applied correction factors for \\ttJets, 0-tag regions, 3$fb^{-1}$}\label{tab:0b_rcscorr_Wbkg}\end{table}'
 
-pickle.dump(res, file(path+prefix+'_estimationResults_pkl_updated','w'))
+pickle.dump(res, file(path+prefix+'_estimationResults_pkl_updatedBkg','w'))
 
 
 
@@ -308,10 +312,10 @@ print '\\hline\end{tabular}}\end{center}\caption{}\end{table}'
 print
 
 
-## W Prediction table 2
+# W Prediction table 2
 print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrr|rrr|rrr|c|}\\hline'
 print ' \\njet & \ST & \HT &\multicolumn{6}{c|}{$R^{corr.}_{CS}(0b,2/3j)$}&\multicolumn{6}{c|}{$R_{CS,W_{jets}}(0b)$} & $\Delta\Phi(W,l)$\\\%\hline'
-print '  & $[$GeV$]$ & $[$GeV$]$ & \multicolumn{3}{c}{pos. charge} & \multicolumn{3}{c|}{neg. charge} & \multicolumn{3}{c}{pos. charge} & \multicolumn{3}{c|}{neg. charge} & \\\\\hline '
+print '  & $[$GeV$]$ & $[$GeV$]$ & \multicolumn{3}{c}{neg. charge} & \multicolumn{3}{c|}{pos. charge} & \multicolumn{3}{c}{neg. charge} & \multicolumn{3}{c|}{pos. charge} & \\\\\hline '
 
 secondLine = False
 for srNJet in sorted(signalRegions):
@@ -326,12 +330,6 @@ for srNJet in sorted(signalRegions):
       if not first: print '&'
       first = False
       print '&$'+varBin(htb)+'$&'
-#for i_htb, htb in enumerate(htreg):
-#  print '\multirow{'+str(nSTbins)+'}{*}{$'+varBin(htb)+'$}'
-#  for stb, dPhiCut in streg:
-#    print '&$'+varBin(stb)+'$&'
-#    #print '& & \multicolumn{3}{c|}{$R^{corr.}_{CS}(0b,2/3j)$ (- charge)}&\multicolumn{3}{c|}{$R_{CS,W^{-}_{jets}}(0b,==5j)$}&\multicolumn{3}{c}{$R_{CS,W^{-}_{jets}}(0b,>=6j)$}\\\\hline'
-#    #print '$'+varBinName(htb, 'H_{T}')+'$&$'+varBinName(stb, 'S_{T}')+'$ & '+\
       print  ' & '.join([getNumString(res[srNJet][stb][htb]['rCS_W_PosPdg_crNJet_0b_corr'], sqrt(res[srNJet][stb][htb]['rCS_Var_W_PosPdg_crNJet_0b_corr']),4), \
                     getNumString(res[srNJet][stb][htb]['rCS_W_NegPdg_crNJet_0b_corr'],    sqrt(res[srNJet][stb][htb]['rCS_Var_W_NegPdg_crNJet_0b_corr']),4), \
                     getNumString(res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW_PosPdg']['rCS'],   res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW_PosPdg']['rCSE_sim'],4),\
@@ -342,7 +340,7 @@ print
 print '\\hline\end{tabular}}\end{center}\caption{hooli XYZ}\end{table}'
 
 
-print "written pkl :" , path+prefix+'_estimationResults_pkl_updated'
+print "written pkl :" , path+prefix+'_estimationResults_pkl_updated...'
 
 
 
