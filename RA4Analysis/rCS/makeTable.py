@@ -8,20 +8,29 @@ from localInfo import username
 from Workspace.RA4Analysis.signalRegions import *
 from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
 
+
+
 prefix = 'singleLeptonic_Phys14V3_'
 #res = pickle.load(file('/data/'+username+'/results2015/rCS_0b/'+prefix+'_estimationResults_pkl'))
 #res = pickle.load(file('/data/'+username+'/PHYS14v3/withCSV/rCS_0b/'+prefix+'_estimationResults_ttJet_unc_pkl'))
 
 
-path = '/data/'+username+'/PHYS14v3/withCSV/rCS_0b_10.0fbSlidingWcorrectionMuonChannel/' 
+path = '/data/'+username+'/PHYS14v3/withCSV/rCS_0b_3.0fbSlidingWcorrectionMuonChannel/' 
+#res = pickle.load(file(path+prefix+'_estimationResults_pkl'))
+#res = pickle.load(file('/data/easilar/PHYS14v3/withCSV/rCS_0b_3.0fbSlidingWcorrectionMuonChannel_SignalCont_s1000/singleLeptonic_Phys14V3__estimationResults_pkl'))
+#res = pickle.load(file('/data/easilar/PHYS14v3/signal_contamination_tests/rCS_0b_3.0_data_eql_bkg/singleLeptonic_Phys14V3__estimationResults_pkl'))
+#res = pickle.load(file('/data/easilar/PHYS14v3/signal_contamination_tests/rCS_0b_3.0_data_eql_bkg+ttjets/singleLeptonic_Phys14V3__estimationResults_pkl'))
+#res = pickle.load(file('/data/easilar/PHYS14v3/signal_contamination/rCS_0b_3.0_data_eql_bkg+signal1000/singleLeptonic_Phys14V3__estimationResults_pkl')) 
+#res = pickle.load(file('/data/easilar/PHYS14v3/signal_contamination_tests/rCS_0b_3.0_data_eql_bkg/singleLeptonic_Phys14V3__estimationResults_pkl')) 
 res = pickle.load(file(path+prefix+'_estimationResults_pkl'))
 #kcs = pickle.load(file(path+'correction_pkl'))
-kcs = pickle.load(file(path+'/correction_pkl'))
-
+#kcs = pickle.load(file(path+'/correction_pkl'))
+#kcs = pickle.load(file('/data/easilar/PHYS14v3/withCSV/rCS_0b_10.0fbSlidingWcorrectionMuonChannel/correction_pkl'))
+kcs = pickle.load(file('/data/easilar/PHYS14v3/withCSV/rCS_0b_3.0fbSlidingWcorrectionMuonChannel/correction_pkl'))
 presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80"
 btagString = 'nBJetMediumCSV30'
 
-lumi = 10.
+lumi = 3.
 weight_str, weight_err_str = makeWeight(lumi)
 lepSel = 'hard'
 
@@ -57,7 +66,8 @@ if signal:
 #nSTbins = len(streg)
 #nJetBins = len(njreg)
 
-signalRegions = signalRegion10fb
+signalRegions = signalRegion3fb
+#signalRegions = {(5, 5): {(250, 350): {(500, -1):   {'deltaPhi': 1.0}}}}
 
 #streg = [[(250, 350), 1.], [(350, 450), 1.], [(450,-1), 1.]]
 #htreg = [(500,750),(750,1000),(1000,1250),(1250,-1)]
@@ -137,7 +147,7 @@ for srNJet in sorted(signalRegions):
       if not first: print '&'
       first = False
       print '&$'+varBin(htb)+'$'
-      rCS_srPredErrorCandidatesTT = [abs(1 - res[srNJet][stb][htb]['rCS_crLowNJet_1b']['rCS']*kcs['tt'][stb][htb]['FitRatio']/res[srNJet][stb][htb]['rCS_srNJet_0b_onlyTT']['rCS']),\
+      rCS_srPredErrorCandidatesTT = [abs(1 - (res[srNJet][stb][htb]['rCS_crLowNJet_1b']['rCS']*kcs['tt'][stb][htb]['FitRatio']/res[srNJet][stb][htb]['rCS_srNJet_0b_onlyTT']['rCS'])),\
             res[srNJet][stb][htb]['rCS_srNJet_0b_onlyTT']['rCSE_sim']/res[srNJet][stb][htb]['rCS_srNJet_0b_onlyTT']['rCS']]
       rCS_srPredErrorTT = max(rCS_srPredErrorCandidatesTT)
 
@@ -157,13 +167,23 @@ for srNJet in sorted(signalRegions):
       ttPredictionNegPdgVar = ttPredictionPosPdgVar
       ratio = res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW_Ratio']
       if math.isnan(ratio): ratio = 0.
-      ratioPosPdg = res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW_PosPdg_Ratio']
+      ratioPosPdg = res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW_mu_PosPdg']['rCS']/res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW_PosPdg']['rCS']
       if math.isnan(ratioPosPdg): ratioPosPdg = 0.
       ratioNegPdg = res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW_NegPdg_Ratio']
       if math.isnan(ratioNegPdg): ratioNegPdg = 0.
-      WPredictionVar = res[srNJet][stb][htb]['W_pred_err']**2+(abs(1-ratio)*res[srNJet][stb][htb]['W_pred'])**2
-      WPredictionPosPdgVar = res[srNJet][stb][htb]['W_PosPdg_pred_err']**2+(abs(1-ratioPosPdg)*res[srNJet][stb][htb]['W_PosPdg_pred'])**2
-      WPredictionNegPdgVar = res[srNJet][stb][htb]['W_NegPdg_pred_err']**2+(abs(1-ratioNegPdg)*res[srNJet][stb][htb]['W_NegPdg_pred'])**2
+      
+      WratioErr = max([abs(1-ratio),res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW_mu']['rCSE_sim']/res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW_mu']['rCS']])
+      WratioPosPdgErr = max([abs(1-ratioPosPdg),res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW_mu_PosPdg']['rCSE_sim']/res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW_mu_PosPdg']['rCS']])
+      WratioNegPdgErr = max([abs(1-ratioNegPdg),res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW_mu_NegPdg']['rCSE_sim']/res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW_mu_NegPdg']['rCS']])
+      
+      #WPredictionVar = res[srNJet][stb][htb]['W_pred_err']**2+(abs(1-ratio)*res[srNJet][stb][htb]['W_pred'])**2
+      #WPredictionPosPdgVar = res[srNJet][stb][htb]['W_PosPdg_pred_err']**2+(abs(1-ratioPosPdg)*res[srNJet][stb][htb]['W_PosPdg_pred'])**2
+      #WPredictionNegPdgVar = res[srNJet][stb][htb]['W_NegPdg_pred_err']**2+(abs(1-ratioNegPdg)*res[srNJet][stb][htb]['W_NegPdg_pred'])**2
+      
+      WPredictionVar = res[srNJet][stb][htb]['W_pred_err']**2+(WratioErr*res[srNJet][stb][htb]['W_pred'])**2
+      WPredictionPosPdgVar = res[srNJet][stb][htb]['W_PosPdg_pred_err']**2+(WratioPosPdgErr*res[srNJet][stb][htb]['W_PosPdg_pred'])**2
+      WPredictionNegPdgVar = res[srNJet][stb][htb]['W_NegPdg_pred_err']**2+(WratioNegPdgErr*res[srNJet][stb][htb]['W_NegPdg_pred'])**2
+
       
       totalPrediction = res[srNJet][stb][htb]['TT_pred']*kcs['tt'][stb][htb]['FitRatio'] + res[srNJet][stb][htb]['W_pred'] + res[srNJet][stb][htb]['Rest_truth']
       totalPredictionPosPdg = 0.5*res[srNJet][stb][htb]['TT_pred']*kcs['tt'][stb][htb]['FitRatio'] + res[srNJet][stb][htb]['W_PosPdg_pred'] + res[srNJet][stb][htb]['Rest_PosPdg_truth']
@@ -197,7 +217,8 @@ for srNJet in sorted(signalRegions):
       #pred[srNJet][stb][htb].update({'relClosureErrorTT':rCS_srPredErrorTT, 'relClosureErrorW':rCS_srPredErrorW, 'tot_pred':totalPrediction, 'tot_pred_err':totalPredictionError, 'tot_PosPdg_pred': totalPredictionPosPdg,\
       #                                'tot_PosPdg_pred_err':totalPredictionPosPdgError, 'tot_NegPdg_pred':totalPredictionNegPdg, 'tot_NegPdg_pred_err':totalPredictionNegPdgError})
       res[srNJet][stb][htb].update({'relClosureErrorTT':rCS_srPredErrorTT, 'relClosureErrorW':rCS_srPredErrorW, 'tot_clos':totalClosure, 'tot_clos_PosPdg':totalClosurePosPdg, 'tot_clos_NegPdg':totalClosureNegPdg,\
-                                    'TT_clos':TTclosure, 'TT_clos_PosPdg':TTclosurePosPdg, 'TT_clos_NegPdg':TTclosureNegPdg, 'W_clos':Wclosure, 'W_clos_PosPdg':WclosurePosPdg, 'W_clos_NegPdg':WclosureNegPdg})
+                                    'TT_clos':TTclosure, 'TT_clos_PosPdg':TTclosurePosPdg, 'TT_clos_NegPdg':TTclosureNegPdg, 'W_clos':Wclosure, 'W_clos_PosPdg':WclosurePosPdg, 'W_clos_NegPdg':WclosureNegPdg,\
+                                    'W_ratio_err':WratioErr, 'W_ratio_PosPdg_err':WratioPosPdgErr, 'W_ratio_NegPdg_err':WratioNegPdgErr})
       res[srNJet][stb][htb]['tot_pred'] = totalPrediction
       res[srNJet][stb][htb]['tot_pred_err'] = totalPredictionError
       res[srNJet][stb][htb]['tot_PosPdg_pred'] = totalPredictionPosPdg
@@ -240,36 +261,155 @@ for srNJet in sorted(signalRegions):
 print '\\hline\end{tabular}}\end{center}\caption{Closure table for the background with applied correction factors for \\ttJets, 0-tag regions, 3$fb^{-1}$}\label{tab:0b_rcscorr_Wbkg}\end{table}'
 
 pickle.dump(res, file(path+prefix+'_estimationResults_pkl_updated','w'))
-print "written pkl :" , path+prefix+'_estimationResults_pkl_updated'
+#print "written pkl :" , path+prefix+'_estimationResults_pkl_updated'
 
 
 
 
-# tt Prediction table
+res = pickle.load(file(path+prefix+'_estimationResults_pkl_updated'))
+#
+##closure table with correction
+#print "Results"
+#print
+#print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrr|rrr|rrr|rrr|rrr|rrr|}\\hline'
+#print ' \\njet     & \ST & \HT     &\multicolumn{6}{c|}{total bkg.}&\multicolumn{3}{c|}{$T5q^4~1.0/0.8/0.7$}&\multicolumn{3}{c|}{$T5q^4~1.2/1.0/0.8$}&\multicolumn{3}{c|}{$T5q^4~1.5/0.8/0.1$}\\\%\hline'
+#print ' & $[$GeV$]$ &$[$GeV$]$&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c|}{simulation}&\multicolumn{3|}{c|}{simulation} \\\\\hline'
+#
+#pred = {}
+#
+#secondLine = False
+#for srNJet in sorted(signalRegions):
+#  pred[srNJet] = {}
+#  print '\\hline'
+#  if secondLine: print '\\hline'
+#  secondLine = True
+#  print '\multirow{'+str(rowsNJet[srNJet]['n'])+'}{*}{\\begin{sideways}$'+varBin(srNJet)+'$\end{sideways}}'
+#  for stb in sorted(signalRegions[srNJet]):
+#    pred[srNJet][stb] = {}
+#    print '&\multirow{'+str(rowsSt[srNJet][stb]['n'])+'}{*}{$'+varBin(stb)+'$}'
+#    first = True
+#    for htb in sorted(signalRegions[srNJet][stb]):
+#      pred[srNJet][stb][htb] = {}
+#      if not first: print '&'
+#      first = False
+#      print '&$'+varBin(htb)+'$'
+#      print ' & '+getNumString(res[srNJet][stb][htb]['tot_pred'], res[srNJet][stb][htb]['tot_pred_err'])\
+#           +' & '+getNumString(res[srNJet][stb][htb]['tot_truth'], res[srNJet][stb][htb]['tot_truth_err'])\
+#           +' & '+getNumString(res[srNJet][stb][htb]['T5q^{4} 1.0/0.8/0.7_yield'], sqrt(res[srNJet][stb][htb]['T5q^{4} 1.0/0.8/0.7_yield_Var']))\
+#           +' & '+getNumString(res[srNJet][stb][htb]['T5q^{4} 1.2/1.0/0.8_yield'], sqrt(res[srNJet][stb][htb]['T5q^{4} 1.2/1.0/0.8_yield_Var']))\
+#           +' & '+getNumString(res[srNJet][stb][htb]['T5q^{4} 1.5/0.8/0.1_yield'], sqrt(res[srNJet][stb][htb]['T5q^{4} 1.5/0.8/0.1_yield_Var'])) +'\\\\'
+#      if htb[1] == -1 : print '\\cline{2-18}'
+#print '\\hline\end{tabular}}\end{center}\caption{Closure table for the background with applied correction factors for \\ttJets, 0-tag regions, 3$fb^{-1}$}\label{tab:0b_rcscorr_Wbkg}\end{table}'
+#
+
+print "Results"
 print
-print "rCS(TT) comparison used for tt estimation"
-print
-print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrr|rrr|c|}\\hline'
-print ' $n_{jet}$  & \ST$[$GeV$]$ & \HT$[$GeV$]$   &\multicolumn{3}{c|}{$R_{CS}(1b,4/5j)$}&\multicolumn{3}{c|}{$R_{CS,tt}(1b,4/5j)$}&\multicolumn{3}{c|}{$R_{CS,tt}(0b)$}& $\Delta\Phi(W,l)$\\\\\hline'
+print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|c|c|c|}\\hline'
+print ' \\njet     & \ST & \HT     &\multicolumn{3}{c|}{sys. Unc., W est.}\\\%\hline'
+print ' & $[$GeV$]$ &$[$GeV$]$&\multicolumn{1}{c}{pos}&\multicolumn{1}{c}{neg}&total \\\\\hline'
+
+pred = {}
 secondLine = False
 for srNJet in sorted(signalRegions):
+  pred[srNJet] = {}
   print '\\hline'
   if secondLine: print '\\hline'
   secondLine = True
   print '\multirow{'+str(rowsNJet[srNJet]['n'])+'}{*}{\\begin{sideways}$'+varBin(srNJet)+'$\end{sideways}}'
   for stb in sorted(signalRegions[srNJet]):
+    pred[srNJet][stb] = {}
     print '&\multirow{'+str(rowsSt[srNJet][stb]['n'])+'}{*}{$'+varBin(stb)+'$}'
     first = True
     for htb in sorted(signalRegions[srNJet][stb]):
+      pred[srNJet][stb][htb] = {}
       if not first: print '&'
       first = False
-      print '&$'+varBin(htb)+'$&'
-      print   ' & '.join([getNumString(res[srNJet][stb][htb]['rCS_crLowNJet_1b']['rCS'],    res[srNJet][stb][htb]['rCS_crLowNJet_1b']['rCSE_sim'],acc=3), \
-                      getNumString(res[srNJet][stb][htb]['rCS_crLowNJet_1b_onlyTT']['rCS'], res[srNJet][stb][htb]['rCS_crLowNJet_1b_onlyTT']['rCSE_sim'],acc=3),\
-                      getNumString(res[srNJet][stb][htb]['rCS_srNJet_0b_onlyTT']['rCS'],    res[srNJet][stb][htb]['rCS_srNJet_0b_onlyTT']['rCSE_sim'],acc=3),\
-                      str(signalRegions[srNJet][stb][htb]['deltaPhi'])])+'\\\\'
-      if htb[1] == -1 : print '\\cline{2-13}'
-print '\\hline\end{tabular}}\end{center}\caption{rCS(TT) comparison used for tt estimation}\end{table}'
+      print '&$'+varBin(htb)+'$'
+      print ' & ' + str(round(res[srNJet][stb][htb]['W_ratio_NegPdg_err'],2)) + '&'  + str(round(res[srNJet][stb][htb]['W_ratio_PosPdg_err'],2)) + '&' + str(round(res[srNJet][stb][htb]['W_ratio_err'],2)) +'\\\\'
+      if htb[1] == -1 : print '\\cline{2-6}'
+print '\\hline\end{tabular}}\end{center}\caption{Closure table for the background with applied correction factors for \\ttJets, 0-tag regions, 3$fb^{-1}$}\label{tab:0b_rcscorr_Wbkg}\end{table}'
+
+
+
+## W closure table
+#print
+#print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrr|rrr|rrr|rrr|rrr|}\\hline'
+#print ' \\njet & \ST & \HT &\multicolumn{6}{c|}{$W+$ Jets}&\multicolumn{6}{c|}{$W-$ Jets}&\multicolumn{6}{c|}{$W$ Jets}\\\%\hline'
+#print ' & $[$GeV$]$ &$[$GeV$]$&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation} \\\\\hline'
+#secondLine = False
+#for srNJet in sorted(signalRegions):
+#  print '\\hline'
+#  if secondLine: print '\\hline'
+#  secondLine = True
+#  print '\multirow{'+str(rowsNJet[srNJet]['n'])+'}{*}{\\begin{sideways}$'+varBin(srNJet)+'$\end{sideways}}'
+#  for stb in sorted(signalRegions[srNJet]):
+#    print '&\multirow{'+str(rowsSt[srNJet][stb]['n'])+'}{*}{$'+varBin(stb)+'$}'
+#    first = True
+#    for htb in sorted(signalRegions[srNJet][stb]):
+#      if not first: print '&'
+#      first = False
+#      
+##      muToElePlusMuErrorPosPdg = (res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW_mu_PosPdg']['rCS']/res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW_PosPdg']['rCS'])\
+##                *sqrt(res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW_mu_PosPdg']['rCSE_sim']**2/res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW_mu_PosPdg']['rCS']**2\
+##                +res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW_PosPdg']['rCSE_sim']**2/res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW_PosPdg']['rCS']**2)
+##
+##      muToElePlusMuErrorNegPdg = (res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW_mu_NegPdg']['rCS']/res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW_NegPdg']['rCS'])\
+##                *sqrt(res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW_mu_NegPdg']['rCSE_sim']**2/res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW_mu_NegPdg']['rCS']**2\
+##                +res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW_NegPdg']['rCSE_sim']**2/res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW_NegPdg']['rCS']**2)
+##
+##      muToElePlusMuError = (res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW_mu']['rCS']/res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW']['rCS'])\
+##                *sqrt(res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW_mu']['rCSE_sim']**2/res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW_mu']['rCS']**2\
+##                +res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW']['rCSE_sim']**2/res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW']['rCS']**2)
+#      
+#      ratio = res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW_Ratio']
+#      if math.isnan(ratio): ratio = 0.
+#      ratioPosPdg = res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW_PosPdg_Ratio']
+#      if math.isnan(ratioPosPdg): ratioPosPdg = 0.
+#      ratioNegPdg = res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW_NegPdg_Ratio']
+#      if math.isnan(ratioNegPdg): ratioNegPdg = 0.
+#      WPredictionVar = res[srNJet][stb][htb]['W_pred_err']**2+(abs(1-ratio)*res[srNJet][stb][htb]['W_pred'])**2
+#      WPredictionPosPdgVar = res[srNJet][stb][htb]['W_PosPdg_pred_err']**2+(abs(1-ratioPosPdg)*res[srNJet][stb][htb]['W_PosPdg_pred'])**2
+#      WPredictionNegPdgVar = res[srNJet][stb][htb]['W_NegPdg_pred_err']**2+(abs(1-ratioNegPdg)*res[srNJet][stb][htb]['W_NegPdg_pred'])**2
+#      
+#      print '&$'+varBin(htb)+'$'
+#      print ' & '+getNumString(res[srNJet][stb][htb]['W_NegPdg_pred'],  sqrt(WPredictionNegPdgVar))\
+#           +' & '+getNumString(res[srNJet][stb][htb]['W_NegPdg_truth'], res[srNJet][stb][htb]['W_NegPdg_truth_err'])\
+#           +' & '+getNumString(res[srNJet][stb][htb]['W_PosPdg_pred'],  sqrt(WPredictionPosPdgVar))\
+#           +' & '+getNumString(res[srNJet][stb][htb]['W_PosPdg_truth'], res[srNJet][stb][htb]['W_PosPdg_truth_err'])\
+#           +' & '+getNumString(res[srNJet][stb][htb]['W_pred'],         sqrt(WPredictionVar))\
+#           +' & '+getNumString(res[srNJet][stb][htb]['W_truth'],        res[srNJet][stb][htb]['W_truth_err']) +'\\\\'
+#      if htb[1] == -1 : print '\\cline{2-21}'
+#print '\\hline\end{tabular}}\end{center}\caption{EFGH}\label{tab:0b_rcscorr_Wbkg}\end{table}'
+#
+
+
+
+
+## tt Prediction table
+#print
+#print "rCS(TT) comparison used for tt estimation"
+#print
+#print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrr|rrr|c|}\\hline'
+#print ' $n_{jet}$  & \ST$[$GeV$]$ & \HT$[$GeV$]$   &\multicolumn{3}{c|}{$R_{CS}(1b,4/5j)$}&\multicolumn{3}{c|}{$R_{CS,tt}(1b,4/5j)$}&\multicolumn{3}{c|}{$R_{CS,tt}(0b)$}& $\Delta\Phi(W,l)$\\\\\hline'
+#secondLine = False
+#for srNJet in sorted(signalRegions):
+#  print '\\hline'
+#  if secondLine: print '\\hline'
+#  secondLine = True
+#  print '\multirow{'+str(rowsNJet[srNJet]['n'])+'}{*}{\\begin{sideways}$'+varBin(srNJet)+'$\end{sideways}}'
+#  for stb in sorted(signalRegions[srNJet]):
+#    print '&\multirow{'+str(rowsSt[srNJet][stb]['n'])+'}{*}{$'+varBin(stb)+'$}'
+#    first = True
+#    for htb in sorted(signalRegions[srNJet][stb]):
+#      if not first: print '&'
+#      first = False
+#      print '&$'+varBin(htb)+'$&'
+#      print   ' & '.join([getNumString(res[srNJet][stb][htb]['rCS_crLowNJet_1b']['rCS'],    res[srNJet][stb][htb]['rCS_crLowNJet_1b']['rCSE_sim'],acc=3), \
+#                      getNumString(res[srNJet][stb][htb]['rCS_crLowNJet_1b_onlyTT']['rCS'], res[srNJet][stb][htb]['rCS_crLowNJet_1b_onlyTT']['rCSE_sim'],acc=3),\
+#                      getNumString(res[srNJet][stb][htb]['rCS_srNJet_0b_onlyTT']['rCS'],    res[srNJet][stb][htb]['rCS_srNJet_0b_onlyTT']['rCSE_sim'],acc=3),\
+#                      str(signalRegions[srNJet][stb][htb]['deltaPhi'])])+'\\\\'
+#      if htb[1] == -1 : print '\\cline{2-13}'
+#print '\\hline\end{tabular}}\end{center}\caption{rCS(TT) comparison used for tt estimation}\end{table}'
 
 
 ## W Prediction table 1 not needed atm
@@ -305,10 +445,75 @@ print '\\hline\end{tabular}}\end{center}\caption{}\end{table}'
 print
 
 
-# W Prediction table 2
-print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrr|rrr|rrr|c|}\\hline'
-print ' \\njet & \ST & \HT &\multicolumn{6}{c|}{$R^{corr.}_{CS}(0b,2/3j)$}&\multicolumn{6}{c|}{$R_{CS,W_{jets}}(0b)$} & $\Delta\Phi(W,l)$\\\%\hline'
-print '  & $[$GeV$]$ & $[$GeV$]$ & \multicolumn{3}{c}{neg. charge} & \multicolumn{3}{c|}{pos. charge} & \multicolumn{3}{c}{neg. charge} & \multicolumn{3}{c|}{pos. charge} & \\\\\hline '
+## W Prediction table 2
+#print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrr|rrr|rrr|c|}\\hline'
+#print ' \\njet & \ST & \HT &\multicolumn{6}{c|}{$R^{corr.}_{CS}(0b,2/3j)$}&\multicolumn{6}{c|}{$R_{CS,W_{jets}}(0b)$} & $\Delta\Phi(W,l)$\\\%\hline'
+#print '  & $[$GeV$]$ & $[$GeV$]$ & \multicolumn{3}{c}{neg. charge} & \multicolumn{3}{c|}{pos. charge} & \multicolumn{3}{c}{pos. charge} & \multicolumn{3}{c|}{neg. charge} & \\\\\hline '
+#
+#secondLine = False
+#for srNJet in sorted(signalRegions):
+#  print '\\hline'
+#  if secondLine: print '\\hline'
+#  secondLine = True
+#  print '\multirow{'+str(rowsNJet[srNJet]['n'])+'}{*}{\\begin{sideways}$'+varBin(srNJet)+'$\end{sideways}}'
+#  for stb in sorted(signalRegions[srNJet]):
+#    print '&\multirow{'+str(rowsSt[srNJet][stb]['n'])+'}{*}{$'+varBin(stb)+'$}'
+#    first = True
+#    for htb in sorted(signalRegions[srNJet][stb]):
+#      if not first: print '&'
+#      first = False
+#      print '&$'+varBin(htb)+'$&'
+##for i_htb, htb in enumerate(htreg):
+##  print '\multirow{'+str(nSTbins)+'}{*}{$'+varBin(htb)+'$}'
+##  for stb, dPhiCut in streg:
+##    print '&$'+varBin(stb)+'$&'
+##    #print '& & \multicolumn{3}{c|}{$R^{corr.}_{CS}(0b,2/3j)$ (- charge)}&\multicolumn{3}{c|}{$R_{CS,W^{-}_{jets}}(0b,==5j)$}&\multicolumn{3}{c}{$R_{CS,W^{-}_{jets}}(0b,>=6j)$}\\\\hline'
+##    #print '$'+varBinName(htb, 'H_{T}')+'$&$'+varBinName(stb, 'S_{T}')+'$ & '+\
+#      print  ' & '.join([getNumString(res[srNJet][stb][htb]['rCS_W_PosPdg_crNJet_0b_corr'], sqrt(res[srNJet][stb][htb]['rCS_Var_W_PosPdg_crNJet_0b_corr']),4), \
+#                    getNumString(res[srNJet][stb][htb]['rCS_W_NegPdg_crNJet_0b_corr'],    sqrt(res[srNJet][stb][htb]['rCS_Var_W_NegPdg_crNJet_0b_corr']),4), \
+#                    getNumString(res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW_PosPdg']['rCS'],   res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW_PosPdg']['rCSE_sim'],4),\
+#                    getNumString(res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW_NegPdg']['rCS'],   res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW_NegPdg']['rCSE_sim'],4),\
+#                    str(signalRegions[srNJet][stb][htb]['deltaPhi'])])+'\\\\'
+#      if htb[1] == -1 : print '\\cline{2-16}'
+#print
+#print '\\hline\end{tabular}}\end{center}\caption{hooli XYZ}\end{table}'
+
+## W Prediction RCS table stability check
+#print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrr|rrr|rrr|rrr|rrr|rrr|rrr|rrr|}\\hline'
+#print ' \\njet & \ST & \HT & \multicolumn{9}{c|}{pos. PDG} & \multicolumn{9}{c|}{neg. PDG} & \multicolumn{9}{c|}{all}\\\%\hline'
+#print '  & $[$GeV$]$ & $[$GeV$]$ & \multicolumn{3}{c}{ele} & \multicolumn{3}{c}{mu} & \multicolumn{3}{c|}{both} & \multicolumn{3}{c}{ele} & \multicolumn{3}{c}{mu} & \multicolumn{3}{c|}{both}& \multicolumn{3}{c}{ele} & \multicolumn{3}{c}{mu} & \multicolumn{3}{c|}{both} \\\\\hline '
+#
+#secondLine = False
+#for srNJet in sorted(signalRegions):
+#  print '\\hline'
+#  if secondLine: print '\\hline'
+#  secondLine = True
+#  print '\multirow{'+str(rowsNJet[srNJet]['n'])+'}{*}{\\begin{sideways}$'+varBin(srNJet)+'$\end{sideways}}'
+#  for stb in sorted(signalRegions[srNJet]):
+#    print '&\multirow{'+str(rowsSt[srNJet][stb]['n'])+'}{*}{$'+varBin(stb)+'$}'
+#    first = True
+#    for htb in sorted(signalRegions[srNJet][stb]):
+#      if not first: print '&'
+#      first = False
+#      print '&$'+varBin(htb)+'$&'
+##for i_htb, htb in enumerate(htreg):
+##  print '\multirow{'+str(nSTbins)+'}{*}{$'+varBin(htb)+'$}'
+##  for stb, dPhiCut in streg:
+##    print '&$'+varBin(stb)+'$&'
+##    #print '& & \multicolumn{3}{c|}{$R^{corr.}_{CS}(0b,2/3j)$ (- charge)}&\multicolumn{3}{c|}{$R_{CS,W^{-}_{jets}}(0b,==5j)$}&\multicolumn{3}{c}{$R_{CS,W^{-}_{jets}}(0b,>=6j)$}\\\\hline'
+##    #print '$'+varBinName(htb, 'H_{T}')+'$&$'+varBinName(stb, 'S_{T}')+'$ & '+\
+#      print  ' & '.join([getNumString(res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW_ele_PosPdg']['rCS'], res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW_ele_PosPdg']['rCSE_sim'],4), \
+#                         getNumString(res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW_mu_PosPdg']['rCS'],  res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW_mu_PosPdg']['rCSE_sim'],4), \
+#                         getNumString(res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW_PosPdg']['rCS'],     res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW_PosPdg']['rCSE_sim'],4),\
+#                         getNumString(res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW_ele_NegPdg']['rCS'], res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW_ele_NegPdg']['rCSE_sim'],4), \
+#                         getNumString(res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW_mu_NegPdg']['rCS'],  res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW_mu_NegPdg']['rCSE_sim'],4), \
+#                         getNumString(res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW_NegPdg']['rCS'],     res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW_NegPdg']['rCSE_sim'],4),\
+#                         getNumString(res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW_ele']['rCS'], res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW_ele']['rCSE_sim'],4), \
+#                         getNumString(res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW_mu']['rCS'],  res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW_mu']['rCSE_sim'],4), \
+#                         getNumString(res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW']['rCS'],     res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW']['rCSE_sim'],4)])+'\\\\'
+#      if htb[1] == -1 : print '\\cline{2-30}'
+#print
+#print '\\hline\end{tabular}}\end{center}\caption{RCS stability for W jets}\end{table}'
 
 secondLine = False
 for srNJet in sorted(signalRegions):
@@ -323,12 +528,6 @@ for srNJet in sorted(signalRegions):
       if not first: print '&'
       first = False
       print '&$'+varBin(htb)+'$&'
-#for i_htb, htb in enumerate(htreg):
-#  print '\multirow{'+str(nSTbins)+'}{*}{$'+varBin(htb)+'$}'
-#  for stb, dPhiCut in streg:
-#    print '&$'+varBin(stb)+'$&'
-#    #print '& & \multicolumn{3}{c|}{$R^{corr.}_{CS}(0b,2/3j)$ (- charge)}&\multicolumn{3}{c|}{$R_{CS,W^{-}_{jets}}(0b,==5j)$}&\multicolumn{3}{c}{$R_{CS,W^{-}_{jets}}(0b,>=6j)$}\\\\hline'
-#    #print '$'+varBinName(htb, 'H_{T}')+'$&$'+varBinName(stb, 'S_{T}')+'$ & '+\
       print  ' & '.join([getNumString(res[srNJet][stb][htb]['rCS_W_PosPdg_crNJet_0b_corr'], sqrt(res[srNJet][stb][htb]['rCS_Var_W_PosPdg_crNJet_0b_corr']),4), \
                     getNumString(res[srNJet][stb][htb]['rCS_W_NegPdg_crNJet_0b_corr'],    sqrt(res[srNJet][stb][htb]['rCS_Var_W_NegPdg_crNJet_0b_corr']),4), \
                     getNumString(res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW_PosPdg']['rCS'],   res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW_PosPdg']['rCSE_sim'],4),\
@@ -337,6 +536,11 @@ for srNJet in sorted(signalRegions):
       if htb[1] == -1 : print '\\cline{2-16}'
 print
 print '\\hline\end{tabular}}\end{center}\caption{hooli XYZ}\end{table}'
+
+
+print "written pkl :" , path+prefix+'_estimationResults_pkl_updated...'
+
+
 
 ##########################################################################
 ##########################################################################

@@ -14,7 +14,7 @@ from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,v
 from math import pi, sqrt
 from localInfo import username
 uDir = username[0]+'/'+username
-subDir = 'Piecharts'
+subDir = 'pngPie/forACD/'
 
 path = '/afs/hephy.at/user/'+uDir+'/www/'+subDir
 if not os.path.exists(path):
@@ -48,8 +48,10 @@ lepton = options.lepton
 print "lepton", lepton, "ST:",stb, 'htb',htb, "btb", btb
 
 
-htreg = [(500,750),(750, 1000),(1000,1250),(1250,-1)]
-njreg = [(2,2),(3,3),(4,4),(5,5),(6,7),(8,-1)]
+#htreg = [(500,750),(750, 1000),(1000,1250),(1250,-1)]
+htreg = [(500,750),(750,1250),(1250,-1)]
+#njreg = [(2,2),(3,3),(4,4),(5,5),(6,7),(8,-1)]
+njreg = [(2,2),(3,3),(4,4),(5,5),(6,8),(9,-1)]
 nbtreg = [(0,0),(1,1),(2,2),(3,-1)]
 
 plots={}
@@ -71,7 +73,7 @@ if btb and stb:
       looseLeptonVeto(lepton=lepton), \
   #            nJetCut(njb=njb, minPt=30, maxEta=2.4), \
   #            htCut  (htb=htb, minPt=30, maxEta=2.4), \
-      jet2Ptcut(),\
+      #jet2Ptcut(),\
       nBTagCut(btb),
       stCut(stb=stb), \
       dPhiCut(1)\
@@ -138,9 +140,9 @@ if htb and stb:
       exactlyOneTightLepton(lepton=lepton),\
       looseLeptonVeto(lepton=lepton), \
   #            nJetCut(njb=njb, minPt=30, maxEta=2.4), \
-      jet2Ptcut(),\
+      #jet2Ptcut(),\
       htCut  (htb=htb), \
-  #    nBTagCut(btb, minPt=30, maxEta=2.4, minCMVATag=0.732),
+  #   nBTagCut(btb, minPt=30, maxEta=2.4, minCMVATag=0.732),
       stCut(stb=stb), \
       dPhiCut(1)\
       #dPhiCut_r(1)\
