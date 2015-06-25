@@ -45,7 +45,7 @@ res = pickle.load(file('/data/dspitzbart/PHYS14v3/withCSV/rCS_0b_3.0fbSlidingWco
 #pdg = 'neg'
 #pdg = 'both'
 
-for pdg in ['pos','neg','both']:
+for pdg in ['split','both']:
 
   #sigbins = signal_bins_3fb()
 
@@ -92,12 +92,11 @@ for pdg in ['pos','neg','both']:
             {'closure': res[njet][st][ht]['tot_clos']  ,'Berror':res[njet][st][ht]['tot_pred_err'] ,'B': res[njet][st][ht]['tot_pred'], 'nJet': (6, 7), 'S1000': res[njet][st][ht]['T5q^{4} 1.0/0.8/0.7_yield'], 'HT': ht, 'ST': st, 'S1500': res[njet][st][ht]['T5q^{4} 1.5/0.8/0.1_yield'], 'deltaPhi': 0.75, 'S1200': res[njet][st][ht]['T5q^{4} 1.2/1.0/0.8_yield']},\
                           )
     
-          if pdg == 'pos' : 
+          if pdg == 'split' : 
               found_bin.append(\
                 {'closure': res[njet][st][ht]['tot_clos_PosPdg']  ,'Berror':res[njet][st][ht]['tot_PosPdg_pred_err'] ,'B': res[njet][st][ht]['tot_PosPdg_pred'], 'nJet': njet, 'S1000': res[njet][st][ht]['T5q^{4} 1.0/0.8/0.7_yield_PosPdg'], 'HT': ht, 'ST': st, 'S1500': res[njet][st][ht]['T5q^{4} 1.5/0.8/0.1_yield_PosPdg'], 'deltaPhi': 0.75, 'S1200': res[njet][st][ht]['T5q^{4} 1.2/1.0/0.8_yield_PosPdg']},\
                           ) 
-          if pdg == 'neg' : 
-            found_bin.append(\
+              found_bin.append(\
                 {'closure': res[njet][st][ht]['tot_clos_NegPdg']  ,'Berror':res[njet][st][ht]['tot_NegPdg_pred_err'] ,'B': res[njet][st][ht]['tot_NegPdg_pred'], 'nJet': njet, 'S1000': res[njet][st][ht]['T5q^{4} 1.0/0.8/0.7_yield_NegPdg'], 'HT': ht, 'ST': st, 'S1500': res[njet][st][ht]['T5q^{4} 1.5/0.8/0.1_yield_NegPdg'], 'deltaPhi': 0.75, 'S1200': res[njet][st][ht]['T5q^{4} 1.2/1.0/0.8_yield_NegPdg']},\
                           )
     
@@ -164,6 +163,6 @@ for pdg in ['pos','neg','both']:
   print signal_signif
 
   for signal in signal_signif:
-     plotLimit(signal,path,option+pdg+'_fullbin_with20mocksys',lumi_origin)
+     plotLimit(signal,path,option+pdg+'_fullbin_'+str(lumi_origin),lumi_origin)
 
 
