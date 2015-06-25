@@ -53,7 +53,7 @@ parser.add_option("--leptonSelection", dest="leptonSelection", default="hard", t
 parser.add_option("--small", dest="small", default = False, action="store_true", help="Just do a small subset.")
 #parser.add_option("--overwrite", dest="overwrite", action="store_true", help="Overwrite?", default=True)
 (options, args) = parser.parse_args()
-
+assert options.leptonSelection in ['soft', 'hard', 'none', 'dilep'], "Unknown leptonSelection: %s"%options.leptonSelection
 skimCond = "(1)"
 if options.skim.startswith('met'):
   skimCond = "met_pt>"+str(float(options.skim[3:]))
