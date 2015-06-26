@@ -45,23 +45,26 @@ ROOT.TH1F().SetDefaultSumw2()
 #    for srNJet in njreg:
       
 def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, btagVarString = 'nBJetMediumCSV30', lumi=4.0):
+  print "in W predition lumi is :"  , lumi
   weight_str, weight_err_str = makeWeight(lumi)
   cWJets = samples['W']
   cTTJets = samples['TT']
   cRest = samples['Rest']
   cBkg = samples['Bkg'] 
+  cData = samples['Data']
   rd={}
 
   #TT Jets yield in crNJet, no b-tag cut, low DPhi
   fit_crName, fit_crCut = nameAndCut(stb, htb, (2,3), btb=None, presel=presel+'&&abs(leptonPdg)==13', btagVar = btagVarString) 
-  fit_crNJet_lowDPhi = binnedNBTagsFit(fit_crCut+"&&"+dPhiStr+"<"+str(dPhiCut), samples = {'W':cWJets, 'TT':cTTJets, 'Rest':cRest}, nBTagVar = btagVarString , lumi=lumi, prefix=fit_crName)
+  fit_crNJet_lowDPhi = binnedNBTagsFit(fit_crCut+"&&"+dPhiStr+"<"+str(dPhiCut), samples=samples, nBTagVar = btagVarString , lumi=lumi, prefix=fit_crName)
 #  fit_crNJet_lowDPhi = binnedNBTagsFit(fit_crCut+"&&"+dPhiStr+"<"+str(dPhiCut), samples = {'W':cWJets, 'TT':cTTJets}, nBTagVar = 'nBJetMedium25', prefix=fit_crName)
   rd['fit_crNJet_lowDPhi'] = fit_crNJet_lowDPhi
   
   rCS_cr_Name_1b, rCS_cr_Cut_1b = nameAndCut(stb, htb, (2,3), btb=(1,1), presel=presel, btagVar = btagVarString) 
-  rCS_cr_Name_0b, rCS_cr_Cut_0b = nameAndCut(stb, htb, (2,4), btb=(0,0), presel=presel+'&&abs(leptonPdg)==13', btagVar = btagVarString) #THIS ONE GOT CHANGED FROM 2-3 TO 2-4!
+  rCS_cr_Name_0b, rCS_cr_Cut_0b = nameAndCut(stb, htb, (2,3), btb=(0,0), presel=presel+'&&abs(leptonPdg)==13', btagVar = btagVarString) #THIS ONE GOT CHANGED FROM 2-3 TO 2-4!
   #rCS_cr_Name_0b, rCS_cr_Cut_0b = nameAndCut(stb, htb, (2,3), btb=(0,0), presel=presel, btagVar = btagVarString)
-  rCS_crNJet_1b = getRCS(cBkg, rCS_cr_Cut_1b,  dPhiCut) 
+  #rCS_crNJet_1b = getRCS(cBkg, rCS_cr_Cut_1b,  dPhiCut) 
+  rCS_crNJet_1b = getRCS(cData, rCS_cr_Cut_1b,  dPhiCut) 
   rCS_crNJet_1b_onlyTT = getRCS(cTTJets, rCS_cr_Cut_1b,  dPhiCut) 
   rCS_crNJet_0b_onlyTT = getRCS(cTTJets, rCS_cr_Cut_0b,  dPhiCut) 
   rd['rCS_crNJet_1b'] = rCS_crNJet_1b
@@ -160,7 +163,7 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, btagVa
   rd['rCS_W_NegPdg_crNJet_0b_truth']  = getRCS(cWJets, 'leptonPdg<0&&'+crCut, dPhiCut)
 
   fit_srName, fit_srCut = nameAndCut(stb, htb, srNJet, btb=None, presel=presel,btagVar = btagVarString) 
-  fit_srNJet_lowDPhi = binnedNBTagsFit(fit_srCut+"&&"+dPhiStr+"<"+str(dPhiCut), samples = {'W':cWJets, 'TT':cTTJets, 'Rest':cRest}, nBTagVar = btagVarString, lumi=lumi, prefix=fit_srName)
+  fit_srNJet_lowDPhi = binnedNBTagsFit(fit_srCut+"&&"+dPhiStr+"<"+str(dPhiCut), samples = samples, nBTagVar = btagVarString, lumi=lumi, prefix=fit_srName)
 #  fit_srNJet_lowDPhi = binnedNBTagsFit(fit_srCut+"&&"+dPhiStr+"<"+str(dPhiCut), samples = {'W':cWJets, 'TT':cTTJets}, nBTagVar = 'nBJetMedium25', prefix=fit_srName)
 
   rd['fit_srNJet_lowDPhi'] = fit_srNJet_lowDPhi
@@ -177,13 +180,30 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, btagVa
   yW_NegPdg_srNJet_0b_lowDPhi = fit_srNJet_lowDPhi['W_NegPdg']['yield']*fit_srNJet_lowDPhi['W_NegPdg']['template'].GetBinContent(1)
   yW_NegPdg_Var_srNJet_0b_lowDPhi = fit_srNJet_lowDPhi['W_NegPdg']['yieldVar']*fit_srNJet_lowDPhi['W_NegPdg']['template'].GetBinContent(1)**2
 
+  # for systematics
+  rCS_crLowNJet_0b_onlyW = getRCS(cWJets, crCut, dPhiCut)
+  rCS_crLowNJet_0b_onlyW_PosPdg = getRCS(cWJets, 'leptonPdg>0&&'+crCut, dPhiCut)
+  rCS_crLowNJet_0b_onlyW_NegPdg = getRCS(cWJets, 'leptonPdg<0&&'+crCut, dPhiCut)
+  rCS_crLowNJet_0b_onlyW_mu = getRCS(cWJets, crCut+'&&abs(leptonPdg)==13', dPhiCut)
+  rCS_crLowNJet_0b_onlyW_mu_PosPdg = getRCS(cWJets, crCut+'&&leptonPdg>0&&abs(leptonPdg)==13', dPhiCut)
+  rCS_crLowNJet_0b_onlyW_mu_NegPdg = getRCS(cWJets, crCut+'&&leptonPdg<0&&abs(leptonPdg)==13', dPhiCut)  
+  rd['rCS_crLowNJet_0b_onlyW'] = rCS_crLowNJet_0b_onlyW
+  rd['rCS_crLowNJet_0b_onlyW_PosPdg'] = rCS_crLowNJet_0b_onlyW_PosPdg
+  rd['rCS_crLowNJet_0b_onlyW_NegPdg'] = rCS_crLowNJet_0b_onlyW_NegPdg
+  rd['rCS_crLowNJet_0b_onlyW_mu'] = rCS_crLowNJet_0b_onlyW_mu
+  rd['rCS_crLowNJet_0b_onlyW_mu_PosPdg'] = rCS_crLowNJet_0b_onlyW_mu_PosPdg
+  rd['rCS_crLowNJet_0b_onlyW_mu_NegPdg'] = rCS_crLowNJet_0b_onlyW_mu_NegPdg
+  
   rCS_sr_Name_0b, rCS_sr_Cut_0b = nameAndCut(stb, htb, srNJet, btb=(0,0), presel=presel, btagVar = btagVarString)#for Check 
   rCS_srNJet_0b_onlyW = getRCS(cWJets, rCS_sr_Cut_0b,  dPhiCut) #for check
   rCS_srNJet_0b_onlyW_mu = getRCS(cWJets, rCS_sr_Cut_0b+'&&abs(leptonPdg)==13',  dPhiCut) #for check
+  rCS_srNJet_0b_onlyW_ele = getRCS(cWJets, rCS_sr_Cut_0b+'&&abs(leptonPdg)==11',  dPhiCut) #for check
   rCS_srNJet_0b_onlyW_PosPdg = getRCS(cWJets, 'leptonPdg>0&&'+rCS_sr_Cut_0b,  dPhiCut) #for check
   rCS_srNJet_0b_onlyW_NegPdg = getRCS(cWJets, 'leptonPdg<0&&'+rCS_sr_Cut_0b,  dPhiCut) #for check
   rCS_srNJet_0b_onlyW_mu_PosPdg = getRCS(cWJets, 'leptonPdg>0&&abs(leptonPdg)==13&&'+rCS_sr_Cut_0b,  dPhiCut) #for check
   rCS_srNJet_0b_onlyW_mu_NegPdg = getRCS(cWJets, 'leptonPdg<0&&abs(leptonPdg)==13&&'+rCS_sr_Cut_0b,  dPhiCut) #for check
+  rCS_srNJet_0b_onlyW_ele_PosPdg = getRCS(cWJets, 'leptonPdg>0&&abs(leptonPdg)==11&&'+rCS_sr_Cut_0b,  dPhiCut) #for check
+  rCS_srNJet_0b_onlyW_ele_NegPdg = getRCS(cWJets, 'leptonPdg<0&&abs(leptonPdg)==11&&'+rCS_sr_Cut_0b,  dPhiCut) #for check
   rd['yW_srNJet_0b_lowDPhi'] = yW_srNJet_0b_lowDPhi  
   rd['yW_Var_srNJet_0b_lowDPhi'] = yW_Var_srNJet_0b_lowDPhi 
   rd['yW_PosPdg_srNJet_0b_lowDPhi'] = yW_PosPdg_srNJet_0b_lowDPhi
@@ -192,16 +212,19 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, btagVa
   rd['yW_NegPdg_Var_srNJet_0b_lowDPhi'] = yW_NegPdg_Var_srNJet_0b_lowDPhi
   rd['rCS_srNJet_0b_onlyW'] = rCS_srNJet_0b_onlyW
   rd['rCS_srNJet_0b_onlyW_mu'] = rCS_srNJet_0b_onlyW_mu
+  rd['rCS_srNJet_0b_onlyW_ele'] = rCS_srNJet_0b_onlyW_ele
   rd['rCS_srNJet_0b_onlyW_PosPdg'] = rCS_srNJet_0b_onlyW_PosPdg #Rcs in SR for ele+mu, pos PDG
   rd['rCS_srNJet_0b_onlyW_NegPdg'] = rCS_srNJet_0b_onlyW_NegPdg #Rcs in SR for ele+mu, neg PDG
   rd['rCS_srNJet_0b_onlyW_mu_PosPdg'] = rCS_srNJet_0b_onlyW_mu_PosPdg #Rcs in SR for mu, pos PDG
   rd['rCS_srNJet_0b_onlyW_mu_NegPdg'] = rCS_srNJet_0b_onlyW_mu_NegPdg #Rcs in SR for mu, neg PDG
+  rd['rCS_srNJet_0b_onlyW_ele_PosPdg'] = rCS_srNJet_0b_onlyW_ele_PosPdg #Rcs in SR for ele, pos PDG
+  rd['rCS_srNJet_0b_onlyW_ele_NegPdg'] = rCS_srNJet_0b_onlyW_ele_NegPdg #Rcs in SR for ele, neg PDG
 
   rd['rCS_srNJet_0b_onlyW_NegPdg_Ratio'] = rCS_srNJet_0b_onlyW_mu_NegPdg['rCS']/rCS_srNJet_0b_onlyW_NegPdg['rCS']
   rd['rCS_Var_srNJet_0b_onlyW_NegPdg_Ratio'] = rCS_srNJet_0b_onlyW_mu_NegPdg['rCS']**2/rCS_srNJet_0b_onlyW_NegPdg['rCS']**2*((rCS_srNJet_0b_onlyW_mu_NegPdg['rCSE_sim']/rCS_srNJet_0b_onlyW_mu_NegPdg['rCS'])**2+\
                                                 (rCS_srNJet_0b_onlyW_NegPdg['rCSE_sim']/rCS_srNJet_0b_onlyW_NegPdg['rCS'])**2)
 
-  rd['rCS_srNJet_0b_onlyW_PosPdg_Ratio'] = rCS_srNJet_0b_onlyW_mu_NegPdg['rCS']/rCS_srNJet_0b_onlyW_NegPdg['rCS']
+  rd['rCS_srNJet_0b_onlyW_PosPdg_Ratio'] = rCS_srNJet_0b_onlyW_mu_PosPdg['rCS']/rCS_srNJet_0b_onlyW_PosPdg['rCS']
   rd['rCS_Var_srNJet_0b_onlyW_PosPdg_Ratio'] = rCS_srNJet_0b_onlyW_mu_PosPdg['rCS']**2/rCS_srNJet_0b_onlyW_PosPdg['rCS']**2*((rCS_srNJet_0b_onlyW_mu_PosPdg['rCSE_sim']/rCS_srNJet_0b_onlyW_mu_PosPdg['rCS'])**2+\
                                                 (rCS_srNJet_0b_onlyW_PosPdg['rCSE_sim']/rCS_srNJet_0b_onlyW_PosPdg['rCS'])**2)
 

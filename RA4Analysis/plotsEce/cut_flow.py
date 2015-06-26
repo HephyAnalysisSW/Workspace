@@ -20,8 +20,8 @@ lumi = 3000 #pb-1
 
 lepSels = [
 #  {'cut':OneMu , 'veto':OneMu_lepveto, 'label':'_mu_', 'str':'1 $\\mu$'},\
-  {'cut':OneE ,  'veto':OneE_lepveto,  'label':'_ele_','str':'1 $e$'},\
-#  {'cut':OneLep ,'veto':OneLep_lepveto,'label':'_lep_','str':'1 $lepton$'},\
+#  {'cut':OneE ,  'veto':OneE_lepveto,  'label':'_ele_','str':'1 $e$'},\
+  {'cut':OneLep ,'veto':OneLep_lepveto,'label':'_lep_','str':'1 $lepton$'},\
 ]
 
 samples=[
@@ -42,14 +42,14 @@ for lepSel in lepSels:
     {'cut':'(1)', 'label':'no cut'},\
     {'cut':lepSel['cut'], 'label':lepSel['str']},\
     {'cut':"&&".join([lepSel['cut'],lepSel['veto']]), 'label':'lepton veto'},\
-    {'cut':"&&".join([lepSel['cut'],lepSel['veto'],njets_30_cut]), 'label':'6 jets ($\\geq$ 30 GeV)'},\
+    {'cut':"&&".join([lepSel['cut'],lepSel['veto'],njets_30_cut]), 'label':'4 jets ($\\geq$ 30 GeV)'},\
     {'cut':"&&".join([lepSel['cut'],lepSel['veto'],njets_30_cut,jets_2_80]), 'label':'2 jets ($\\geq$ 80 GeV)'},\
     {'cut':"&&".join([lepSel['cut'],lepSel['veto'],njets_30_cut,jets_2_80,ht_cut]), 'label':'$H_T >$ 500 GeV'},\
     {'cut':"&&".join([lepSel['cut'],lepSel['veto'],njets_30_cut,jets_2_80,ht_cut,st]), 'label':'$S_T >$ 200 GeV'},\
     {'cut':"&&".join([lepSel['cut'],lepSel['veto'],njets_30_cut,jets_2_80,ht_cut,st,nbjets_30_cut]), 'label':'0 b-jets (CSVv2)'},\
     {'cut':"&&".join([lepSel['cut'],lepSel['veto'],njets_30_cut,jets_2_80,ht_cut,st,nbjets_30_cut,dPhi_cut]), 'label':'$\\Delta\\Phi>1$'},\
   ]
-  ofile = file(path+'cut_flow_'+str(lumi)+'pb_'+lepSel['label']+'_qcd_.tex','w')
+  ofile = file(path+'cut_flow_'+str(lumi)+'pb_'+lepSel['label']+'_4jets_.tex','w')
   doc_header = '\\documentclass{article}\\usepackage[english]{babel}\\usepackage{graphicx}\\usepackage[margin=0.5in]{geometry}\\begin{document}'
   ofile.write(doc_header)
   ofile.write("\n")

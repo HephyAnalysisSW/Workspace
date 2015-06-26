@@ -146,10 +146,10 @@ void BasicTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup) {
   }
 
   if (addMSugraOSETInfo_) {
-    put("osetMgl", modelParameters_.get ( "mgl", ev ));
-    put("osetMsq", modelParameters_.get ( "msq", ev ));
-    put("osetMC", modelParameters_.get ( "mC", ev ));
-    put("osetMN", modelParameters_.get ( "mN", ev ));
+//    put("osetMgl", modelParameters_.get ( "mgl", ev ));
+//    put("osetMsq", modelParameters_.get ( "msq", ev ));
+//    put("osetMC", modelParameters_.get ( "mC", ev ));
+//    put("osetMN", modelParameters_.get ( "mN", ev ));
 
 //    edm::InputTag genParticleTag = edm::InputTag("genParticles");
 //    edm::Handle< vector< reco::GenParticle > > genParticleHandle;
