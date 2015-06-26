@@ -198,12 +198,12 @@ def nameAndCut(stb, htb, njetb, btb=None, presel="(1)", charge="", btagVar = 'nB
   if njetb:
     if len(njetb)>1 and njetb[0] == njetb[1]:
       cut+='&&nJet30=='+str(njetb[0])
-      name+='_njet30Eq'+str(njetb[0])
+      name+='_njetEq'+str(njetb[0])
     else:
       cut+='&&nJet30>='+str(njetb[0])
       name+='_njet'+str(njetb[0])
       if len(njetb)>1 and njetb[1]>=0:
-        cut+='&&nJet<='+str(njetb[1])
+        cut+='&&nJet30<='+str(njetb[1])
         name+='-'+str(njetb[1])
   if btb:
     if len(btb)>1 and btb[0] == btb[1]:
