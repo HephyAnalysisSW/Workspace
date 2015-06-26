@@ -4,12 +4,13 @@ import copy, os, sys
 ROOT.gROOT.LoadMacro("../../HEPHYPythonTools/scripts/root/tdrstyle.C")
 ROOT.TH1F().SetDefaultSumw2()
 ROOT.setTDRStyle()
+ROOT.gStyle.SetMarkerStyle(1)
 
 from Workspace.HEPHYPythonTools.helpers import *
 from Workspace.HEPHYPythonTools.xsec import *
 from Workspace.RA4Analysis.helpers import *
-#from Workspace.RA4Analysis.cmgTuples_v1_PHYS14V3 import *
-from Workspace.RA4Analysis.cmgTuples_PHYS14V3 import *
+from Workspace.RA4Analysis.cmgTuples_v1_PHYS14V3 import *
+#from Workspace.RA4Analysis.cmgTuples_PHYS14V3 import *
 from draw_helpers import *
 from math import *
 from localInfo import username
@@ -23,8 +24,8 @@ if not os.path.exists(wwwDir):
   os.makedirs(wwwDir)
 
 htreg = [(500,-1)]#, (500,750), (750,1250), (1250,-1)]
-streg = [(200,-1)]#,(250,350), (350,450), (450,-1)]
-njreg = [(3,4)]#, (5,5), (6,7), (8,-1)]
+streg = [(250,350)]#,(250,350), (350,450), (450,-1)]
+njreg = [(5,5)]#, (5,5), (6,7), (8,-1)]
 btreg = [(0,0)]
 
 #small = True
@@ -35,6 +36,32 @@ doFit = True
 eleVarList = ['pt', 'eta', 'phi', 'pdgId', 'miniRelIso', 'convVeto', 'sip3d', 'mvaIdPhys14', 'charge', 'lostHits']
 eleFromW = ['pt', 'eta', 'phi', 'pdgId', 'motherId', 'grandmotherId', 'charge', 'sourceId']
 
+QCD_HT_100To250_PU20bx25={\
+"name" : "QCD_HT_100To250",
+"chunkString": "QCD_HT_100To250",
+'dir' : "/data/easilar/Phys14_V3/",
+'dbsName':'/QCD_HT_100To250_13TeV-madgraph/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'
+}
+
+QCD_HT_250To500_PU20bx25={\
+"name" : "QCD_HT_250To500",
+"chunkString": "QCD_HT_250To500",
+'dir' : "/data/easilar/Phys14_V3/",
+'dbsName':'/QCD_HT_250To500_13TeV-madgraph/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'
+}
+QCD_HT_500To1000_PU20bx25={\
+"name" : "QCD_HT_500To1000",
+"chunkString": "QCD_HT_500To1000",
+'dir' : "/data/easilar/Phys14_V3/",
+'dbsName':'/QCD_HT_500To1000_13TeV-madgraph/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'
+}
+QCD_HT_1000ToInf_PU20bx25={\
+"name" : "QCD_HT_1000ToInf",
+"chunkString": "QCD_HT_1000ToInf",
+'dir' : "/data/easilar/Phys14_V3/",
+'dbsName':'/QCD_HT_1000ToInf_13TeV-madgraph/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'
+}
+
 def getMatch(genLep,recoLep):
   return ( (genLep['charge']==recoLep['charge']) and deltaR(genLep,recoLep)<0.1 and (abs(genLep['pt']-recoLep['pt'])/genLep['pt'])<0.5)
 
@@ -43,19 +70,6 @@ def getWeight(sample,nEvents,target_lumi):
   weight = xsec[sample['dbsName']] * target_lumi/nEvents
   return weight
 
-#eleMVAID_LooseWP={'eta08':0.35 , 'eta104':0.20,'eta204': -0.52}
-#eleMVAID_TightWP={'eta08':0.73 , 'eta104':0.57,'eta204':  0.05}
-#
-#eleMVAID_Loose= "((abs(LepGood_eta)<0.8&&LepGood_mvaIdPhys14>"+ str(eleMVAID_LooseWP['eta08'])+")"\
-#                       +"||((abs(LepGood_eta)>0.8&&abs(LepGood_eta)<1.479)&&LepGood_mvaIdPhys14>"+ str(eleMVAID_LooseWP['eta104'])+")"\
-#                       +"||((abs(LepGood_eta)>1.479&&abs(LepGood_eta)<2.4)&&LepGood_mvaIdPhys14>"+str(eleMVAID_LooseWP['eta204'])+"))"
-#
-#eleMVAID_Tight= "((abs(LepGood_eta)<0.8&&LepGood_mvaIdPhys14>"+ str(eleMVAID_TightWP['eta08'])+")"\
-#                       +"||((abs(LepGood_eta)>0.8&&abs(LepGood_eta)<1.479)&&LepGood_mvaIdPhys14>"+ str(eleMVAID_TightWP['eta104'])+")"\
-#                       +"||((abs(LepGood_eta)>1.479&&abs(LepGood_eta)<2.4)&&LepGood_mvaIdPhys14>"+str(eleMVAID_TightWP['eta204'])+"))"
-#
-#eleHard = '(abs(LepGood_pdgId)==11&&LepGood_pt>=25&&LepGood_miniRelIso<0.4&&abs(LepGood_eta)<2.4)'
-                     
 singleElectronVeto = '((Sum$(abs(LepGood_pdgId)==13&&LepGood_pt>=5))==0&&'\
                      +'(Sum$(abs(LepGood_pdgId)==11&&LepGood_pt>=10&&LepGood_miniRelIso<0.4&&((abs(LepGood_eta)<0.8&&LepGood_mvaIdPhys14>0.35)'\
                      +'||((abs(LepGood_eta)>0.8&&abs(LepGood_eta)<1.479)&&LepGood_mvaIdPhys14>0.2)'\
@@ -145,8 +159,10 @@ for htb in htreg:
         SRname = nameAndCut(stb, htb, srNJet, btb=btb, presel="(1)", charge="", btagVar = 'nBJetMediumCSV30')[0]#use this function only for the name string!!!
         #cut only includes very loose lepton selection, HT cut, NJet cut, Btagging and subleading JetPt>=80!!! St cut applied in the Event Loop!!!
 #        cut = '(Sum$(abs(LepGood_pdgId)==11&&abs(LepGood_dxy)<=0.05&&abs(LepGood_dz)<=0.1)+Sum$(abs(LepOther_pdgId)==11&&abs(LepOther_dxy)<=0.05&&abs(LepOther_dz)<=0.1)>=1)&&'+htCut(htb, minPt=30, maxEta=2.4, njCorr=0.)+'&&'+ nBTagCut(btb, minPt=30, maxEta=2.4, minCSVTag=0.814)+'&&'+nJetCut(srNJet, minPt=30, maxEta=2.4)+'&&'+nJetCut(2, minPt=80, maxEta=2.4)
-        SelCut = singleElectronVeto+'&&'+singleHardElectron+'&&(Sum$('+SelStr+')==1)&&'+stCutQCD(stb)+'&&'+htCut(htb, minPt=30, maxEta=2.4, njCorr=0.)+'&&'+ nBTagCut(btb, minPt=30, maxEta=2.4, minCSVTag=0.814)+'&&'+nJetCut(srNJet, minPt=30, maxEta=2.4)+'&&'+nJetCut(2, minPt=80, maxEta=2.4)
-        antiSelCut = singleElectronVetoAnti+'&&'+singleHardElectron+'&&(Sum$('+antiSelStr+')==1)&&'+stCutQCD(stb)+'&&'+htCut(htb, minPt=30, maxEta=2.4, njCorr=0.)+'&&'+ nBTagCut(btb, minPt=30, maxEta=2.4, minCSVTag=0.814)+'&&'+nJetCut(srNJet, minPt=30, maxEta=2.4)+'&&'+nJetCut(2, minPt=80, maxEta=2.4)
+        SelCut = singleElectronVeto+'&&'+singleHardElectron+'&&(Sum$('+SelStr+')==1)&&'+stCutQCD(stb)+'&&'+htCut(htb, minPt=30, maxEta=2.4, njCorr=0.)+'&&'+ nBTagCut(btb, minPt=30, maxEta=2.4, minCSVTag=0.814)\
+                 +'&&'+nJetCut(srNJet, minPt=30, maxEta=2.4)+'&&'+nJetCut(2, minPt=80, maxEta=2.4)
+        antiSelCut = singleElectronVetoAnti+'&&'+singleHardElectron+'&&(Sum$('+antiSelStr+')==1)&&'+stCutQCD(stb)+'&&'+htCut(htb, minPt=30, maxEta=2.4, njCorr=0.)+'&&'+ nBTagCut(btb, minPt=30, maxEta=2.4, minCSVTag=0.814)\
+                     +'&&'+nJetCut(srNJet, minPt=30, maxEta=2.4)+'&&'+nJetCut(2, minPt=80, maxEta=2.4)
 
         histos['merged_QCD']={}
         histos['merged_EWK']={}
@@ -222,10 +238,10 @@ for htb in htreg:
         text.DrawLatex(0.15,.96,"CMS Simulation")
         text.DrawLatex(0.65,0.96,"L="+str(target_lumi/1000)+" fb^{-1} (13 TeV)")
         
-#        canv.cd()
-#        canv.Print(wwwDir+presel+SRname+'_subBkg.png')
-#        canv.Print(wwwDir+presel+SRname+'_subBkg.root')
-#        canv.Print(wwwDir+presel+SRname+'_subBkg.pdf')
+        canv.cd()
+        canv.Print(wwwDir+presel+SRname+'_subBkg.png')
+        canv.Print(wwwDir+presel+SRname+'_subBkg.root')
+        canv.Print(wwwDir+presel+SRname+'_subBkg.pdf')
         
         mergeCanv = ROOT.TCanvas('merged Canv','merged Canv',600,600)
         #mergeCanv.SetLogy()
@@ -255,7 +271,8 @@ for htb in htreg:
 
         bins[htb][stb][srNJet][btb] = {'NdataSel':NdataSel, 'NdataSel_err':float(NdataSel_err),\
                                        'NdataAntiSel':NdataAntiSel, 'NdataAntiSel_err':float(NdataAntiSel_err),\
-                                       'NQCDdataSelMC':nQCDSel, 'NQCDdataSelMC_err':float(nQCDSel_err)}
+                                       'NQCDSelMC':nQCDSel, 'NQCDSelMC_err':float(nQCDSel_err),\
+                                       'NQCDAntiSelMC':nQCDAntiSel, 'NQCDAntiSelMC_err':float(nQCDAntiSel_err)}
         print bins[htb][stb][srNJet][btb]
 
         #do the template fit:
@@ -303,16 +320,16 @@ for htb in htreg:
         text.DrawLatex(0.15,.96,"CMS Simulation")
         text.DrawLatex(0.65,0.96,"L="+str(target_lumi/1000)+" fb^{-1} (13 TeV)")
         
-#        mergeCanv.cd()
-#        mergeCanv.Print(wwwDir+presel+SRname+'.png')
-#        mergeCanv.Print(wwwDir+presel+SRname+'.root')
-#        mergeCanv.Print(wwwDir+presel+SRname+'.pdf')
+        mergeCanv.cd()
+        mergeCanv.Print(wwwDir+presel+SRname+'.png')
+        mergeCanv.Print(wwwDir+presel+SRname+'.root')
+        mergeCanv.Print(wwwDir+presel+SRname+'.pdf')
 
 
-#        path = '/data/'+username+'/results2015/rCS_0b/'
-#        if not os.path.exists(path):
-#          os.makedirs(path)
-#        pickle.dump(bins, file(path+'QCDyieldFromTemplateFit_'+SRname+'_pkl','w'))
+        path = '/data/'+username+'/results2015/rCS_0b/'
+        if not os.path.exists(path):
+          os.makedirs(path)
+        pickle.dump(bins, file(path+'QCDyieldFromTemplateFit_'+SRname+'_pkl','w'))
 
 #          #Get the event list 'eList' which has all the events satisfying the cut
 #          sample["chain"].Draw(">>eList",cut)
