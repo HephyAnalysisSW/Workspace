@@ -198,7 +198,7 @@ def nameAndCut(stb, htb, njetb, btb=None, presel="(1)", charge="", btagVar = 'nB
   if njetb:
     if len(njetb)>1 and njetb[0] == njetb[1]:
       cut+='&&nJet30=='+str(njetb[0])
-      name+='_njet30Eq'+str(njetb[0])
+      name+='_njetEq'+str(njetb[0])
     else:
       cut+='&&nJet30>='+str(njetb[0])
       name+='_njet'+str(njetb[0])
@@ -223,7 +223,6 @@ def nameAndCut(stb, htb, njetb, btb=None, presel="(1)", charge="", btagVar = 'nB
     name+='_negCharge'
   if name.startswith('_'):name=name[1:]
   return [name, cut]
-
 
 #def wRecoPt(chain):
 #  lPt = getVarValue(chain, "leptonPt")
