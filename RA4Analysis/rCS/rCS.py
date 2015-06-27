@@ -3,6 +3,7 @@ import os,sys
 #ROOT.gROOT.LoadMacro('/afs/hephy.at/scratch/d/dhandl/CMSSW_7_2_3/src/Workspace/HEPHYPythonTools/scripts/root/tdrstyle.C')
 #ROOT.setTDRStyle()
 from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain
+from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName, nBTagBinName, varBinName, varBin
 
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2_HT400_withDF import *
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2_HT400ST150_withDF import *
@@ -65,9 +66,9 @@ elif channel =='mu':
   pdgId = 13
 
 streg = [[(250, 350), 1.], [(350, 450), 1.],  [(450, -1), 1.] ]
-htreg = [(500,750),(750,1000),(1000,-1)]#,(1000,1250),(1250,-1)]#,(1250,-1)]
+htreg = [(500,-1)]#,(750,1000),(1000,-1)]#,(1000,1250),(1250,-1)]#,(1250,-1)]
 btreg = (0,0)
-njreg = [(2,2),(3,3),(4,4),(5,5),(6,6),(7,7),(8,-1)]#,(7,7),(8,8),(9,9)]
+njreg = [(2,2),(3,3),(4,4),(5,5),(6,7),(8,-1)]#,(7,7),(8,8),(9,9)]
 nbjreg = [(0,0),(1,1),(2,2)]
 
 #presel="singleMuonic&&nVetoMuons==1&&nVetoElectrons==0&&nBJetMedium40==1"
@@ -199,14 +200,17 @@ for lep, pdgId in channels:
           #res, resErr = getRCS(c, cut,  dPhiCut)
           #print res,resErr, name, cname
           if not math.isnan(rcsPos['rCS']):
-            h_nj_pos[lep][name][stb][htb].SetBinContent(i_njb+1, rcsPos['rCS'])
-            h_nj_pos[lep][name][stb][htb].SetBinError(i_njb+1, rcsPos['rCSE_sim'])
+            if rcsPos['rCS']>0.:
+              h_nj_pos[lep][name][stb][htb].SetBinContent(i_njb+1, rcsPos['rCS'])
+              h_nj_pos[lep][name][stb][htb].SetBinError(i_njb+1, rcsPos['rCSE_sim'])
           if not math.isnan(rcsNeg['rCS']):
-            h_nj_neg[lep][name][stb][htb].SetBinContent(i_njb+1, rcsNeg['rCS'])
-            h_nj_neg[lep][name][stb][htb].SetBinError(i_njb+1, rcsNeg['rCSE_sim'])
+            if rcsNeg['rCS']>0.:
+              h_nj_neg[lep][name][stb][htb].SetBinContent(i_njb+1, rcsNeg['rCS'])
+              h_nj_neg[lep][name][stb][htb].SetBinError(i_njb+1, rcsNeg['rCSE_sim'])
           if not math.isnan(res):
-            h_nj[lep][name][stb][htb].SetBinContent(i_njb+1, res)
-            h_nj[lep][name][stb][htb].SetBinError(i_njb+1, resErr)
+            if res>0.:
+              h_nj[lep][name][stb][htb].SetBinContent(i_njb+1, res)
+              h_nj[lep][name][stb][htb].SetBinError(i_njb+1, resErr)
             #h_ht[name][stb][njb].SetBinContent(i_htb+1, res)
             #h_ht[name][stb][njb].SetBinError(i_htb+1, resErr)
             #h_2d[name][stb].SetBinContent(i_njb+1, i_htb+1, res) 
@@ -231,7 +235,7 @@ for lep, pdgId in channels:
 #Draw plots binned in njets for all ST and HT bins
 for lep, pdgId in channels:
   for name, c in [["tt", cTTJets] , ["W",cWJets] ]:
-    for stb, dPhiCut in streg:
+    for istb, [stb, dPhiCut] in enumerate(streg):
       c1 = ROOT.TCanvas('c1','c1',600,600)
       pad1 = ROOT.TPad('Pad','Pad',0.,0.0,1.,1.)
       pad1.SetLeftMargin(0.15)
@@ -253,10 +257,26 @@ for lep, pdgId in channels:
         h_nj[lep][name][stb][htb].GetYaxis().SetTitleOffset(1.5)
         h_nj[lep][name][stb][htb].GetYaxis().SetTitle('R_{CS}')
         h_nj[lep][name][stb][htb].GetYaxis().SetRangeUser(0, 3*h_nj[lep][name][stb][htb].GetBinContent(h_nj[lep][name][stb][htb].GetMaximumBin()))
+        upperbound = 0
+        for i_njb, njb in enumerate(njreg):
+          if h_nj[lep][name][stb][htb].GetBinContent(i_njb+1)>0.:
+            upperbound = i_njb+1
+          else:
+            break
+        h_nj[lep][name][stb][htb].Fit('pol1','','same',0,upperbound)
+        FitFunc     = h_nj[lep][name][stb][htb].GetFunction('pol1')
+        FitParD     = FitFunc.GetParameter(0)
+        FitParDError = FitFunc.GetParError(0)
+        FitParK = FitFunc.GetParameter(1)
+        FitParKError = FitFunc.GetParError(1)
+        FitFunc.SetLineColor(ROOT_colors[istb])
+        FitFunc.SetLineStyle(2)
+        FitFunc.SetLineWidth(2)
+        rcsDict[lep][name][stb][htb].update({'D':FitParD, 'DErr':FitParDError, 'K':FitParK, 'Kerr':FitParKError})
         if name == 'tt':
           h_nj[lep][name][stb][htb].SetMaximum(0.25)
         else:
-          h_nj[lep][name][stb][htb].SetMaximum(0.15)
+          h_nj[lep][name][stb][htb].SetMaximum(0.08)
   #      h_nj[name][stb][htb].GetYaxis().SetRangeUser(0, 0.1)
         h_nj[lep][name][stb][htb].SetLineColor(ROOT_colors[ihtb])
         h_nj[lep][name][stb][htb].SetLineWidth(2)
@@ -272,6 +292,7 @@ for lep, pdgId in channels:
           h_nj[lep][name][stb][htb].Draw()
         else:
           h_nj[lep][name][stb][htb].Draw('same')
+        FitFunc.Draw("same")
       l.Draw()
       c1.Print(path+prefix+'_rCS_njet_'+lep+'_'+name+'_'+nameAndCut(stb,htb=None,njetb=None, btb=btreg, presel=presel)[0]+".pdf")
       c1.Print(path+prefix+'_rCS_njet_'+lep+'_'+name+'_'+nameAndCut(stb,htb=None,njetb=None, btb=btreg, presel=presel)[0]+".png")
@@ -300,7 +321,7 @@ for lep, pdgId in channels:
         if name == 'tt':
           h_nj[lep][name][stb][htb].SetMaximum(0.25)
         else:
-          h_nj[lep][name][stb][htb].SetMaximum(0.15)
+          h_nj[lep][name][stb][htb].SetMaximum(0.08)
   #      h_nj[name][stb][htb].GetYaxis().SetRangeUser(0, 0.1)
         h_nj[lep][name][stb][htb].SetLineColor(ROOT_colors[istb])
         h_nj[lep][name][stb][htb].SetLineWidth(2)
@@ -342,7 +363,7 @@ for lep, pdgId in channels:
         if name == 'tt':
           h_nj_pos[lep][name][stb][htb].SetMaximum(0.25)
         else:
-          h_nj_pos[lep][name][stb][htb].SetMaximum(0.12)
+          h_nj_pos[lep][name][stb][htb].SetMaximum(0.08)
         h_nj_pos[lep][name][stb][htb].SetLineColor(ROOT_colors[istb])
         h_nj_pos[lep][name][stb][htb].SetLineWidth(2)
         l.AddEntry(h_nj_pos[lep][name][stb][htb], varBinName(stb, 'S_{T}'))
@@ -382,7 +403,7 @@ for lep, pdgId in channels:
         if name == 'tt':
           h_nj_neg[lep][name][stb][htb].SetMaximum(0.25)
         else:
-          h_nj_neg[lep][name][stb][htb].SetMaximum(0.12)
+          h_nj_neg[lep][name][stb][htb].SetMaximum(0.08)
         h_nj_neg[lep][name][stb][htb].SetLineColor(ROOT_colors[istb])
         h_nj_neg[lep][name][stb][htb].SetLineWidth(2)
         l.AddEntry(h_nj_neg[lep][name][stb][htb], varBinName(stb, 'S_{T}'))
@@ -581,32 +602,40 @@ for lep, pdgId in channels:
 #      c1.Print('/afs/hephy.at/user/'+uDir+'/www/'+subDir+'/'+prefix+'_rCS_nbtag_'+name+'_'+nameAndCut(stb,htb=htb,njetb=None, btb=None, presel=presel)[0]+".root")
 
 
-## W Prediction RCS table stability check
-#print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrr|rrr|rrr|rrr|rrr|rrr|rrr|rrr|}\\hline'
-#print ' \ST & \HT & \\njet & \multicolumn{9}{c|}{- charge} & \multicolumn{9}{c|}{+ charge} & \multicolumn{9}{c|}{all}\\\%\hline'
-#print '  $[$GeV$]$ & $[$GeV$]$ & & \multicolumn{3}{c}{e} & \multicolumn{3}{c}{$\mu$} & \multicolumn{3}{c|}{both} & \multicolumn{3}{c}{e} & \multicolumn{3}{c}{$\mu$} & \multicolumn{3}{c|}{both}& \multicolumn{3}{c}{e} & \multicolumn{3}{c}{$\mu$} & \multicolumn{3}{c|}{both} \\\\\hline '
-#secondLine = False
-#for stb, dPhiCut in streg:
-#  print '\\hline'
-#  if secondLine: print '\\hline'
-#  secondLine = True
-#  print '\multirow{21}{*}{\\begin{sideways}$'+varBin(stb)+'$\end{sideways}}'
-#  for ihtb, htb in enumerate(htreg):
-#    print '&\multirow{7}{*}{\\begin{sideways}$'+varBin(htb)+'$\end{sideways}}'
-#    first = True
-#    for injb, njb in enumerate(njreg):
-#      if not first: print '&'
-#      first = False
-#      print '&$'+varBin(njb)+'$&'
-#      print  ' & '.join([getNumString(rcsDict['ele']['W'][stb][htb][njb]['PosPdg'], rcsDict['ele']['W'][stb][htb][njb]['PosPdgE'],4), \
-#                         getNumString(rcsDict['mu']['W'][stb][htb][njb]['PosPdg'], rcsDict['mu']['W'][stb][htb][njb]['PosPdgE'],4), \
-#                         getNumString(rcsDict['both']['W'][stb][htb][njb]['PosPdg'], rcsDict['both']['W'][stb][htb][njb]['PosPdgE'],4),\
-#                         getNumString(rcsDict['ele']['W'][stb][htb][njb]['NegPdg'], rcsDict['ele']['W'][stb][htb][njb]['NegPdgE'],4), \
-#                         getNumString(rcsDict['mu']['W'][stb][htb][njb]['NegPdg'], rcsDict['mu']['W'][stb][htb][njb]['NegPdgE'],4), \
-#                         getNumString(rcsDict['both']['W'][stb][htb][njb]['NegPdg'], rcsDict['both']['W'][stb][htb][njb]['NegPdgE'],4),\
-#                         getNumString(rcsDict['ele']['W'][stb][htb][njb]['AllPdg'], rcsDict['ele']['W'][stb][htb][njb]['AllPdgE'],4), \
-#                         getNumString(rcsDict['mu']['W'][stb][htb][njb]['AllPdg'], rcsDict['mu']['W'][stb][htb][njb]['AllPdgE'],4), \
-#                         getNumString(rcsDict['both']['W'][stb][htb][njb]['AllPdg'], rcsDict['both']['W'][stb][htb][njb]['AllPdgE'],4)])+'\\\\'
-#      if njb[1] == -1 : print '\\cline{2-30}'
-#print '\\hline\end{tabular}}\end{center}\caption{RCS stability for W jets}\end{table}'
+# W Prediction RCS table stability check
+
+p = 'W'
+print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrr|rrr|rrr|rrr|rrr|rrr|rrr|rrr|c|c|}\\hline'
+print ' \ST & \HT & \\njet & \multicolumn{9}{c|}{- charge} & \multicolumn{9}{c|}{+ charge} & \multicolumn{9}{c|}{all} & \multicolumn{2}{c|}{Fit}\\\%\hline'
+print '  $[$GeV$]$ & $[$GeV$]$ & & \multicolumn{3}{c}{e} & \multicolumn{3}{c}{$\mu$} & \multicolumn{3}{c|}{both} & \multicolumn{3}{c}{e} & \multicolumn{3}{c}{$\mu$} & \multicolumn{3}{c|}{both}'\
+        + '& \multicolumn{3}{c}{e} & \multicolumn{3}{c}{$\mu$} & \multicolumn{3}{c|}{both} & \multicolumn{1}{c}{K} & \multicolumn{1}{c|}{D} \\\\\hline '
+secondLine = False
+for stb, dPhiCut in streg:
+  print '\\hline'
+  if secondLine: print '\\hline'
+  secondLine = True
+  print '\multirow{21}{*}{\\begin{sideways}$'+varBin(stb)+'$\end{sideways}}'
+  for ihtb, htb in enumerate(htreg):
+    print '&\multirow{7}{*}{\\begin{sideways}$'+varBin(htb)+'$\end{sideways}}'
+    first = True
+    for injb, njb in enumerate(njreg):
+      if not first: print '&'
+      print '&$'+varBin(njb)+'$&'
+      print  ' & '.join([getNumString(rcsDict['ele'][p][stb][htb][njb]['PosPdg'], rcsDict['ele'][p][stb][htb][njb]['PosPdgE'],4), \
+                         getNumString(rcsDict['mu'][p][stb][htb][njb]['PosPdg'], rcsDict['mu'][p][stb][htb][njb]['PosPdgE'],4), \
+                         getNumString(rcsDict['both'][p][stb][htb][njb]['PosPdg'], rcsDict['both'][p][stb][htb][njb]['PosPdgE'],4),\
+                         getNumString(rcsDict['ele'][p][stb][htb][njb]['NegPdg'], rcsDict['ele'][p][stb][htb][njb]['NegPdgE'],4), \
+                         getNumString(rcsDict['mu'][p][stb][htb][njb]['NegPdg'], rcsDict['mu'][p][stb][htb][njb]['NegPdgE'],4), \
+                         getNumString(rcsDict['both'][p][stb][htb][njb]['NegPdg'], rcsDict['both'][p][stb][htb][njb]['NegPdgE'],4),\
+                         getNumString(rcsDict['ele'][p][stb][htb][njb]['AllPdg'], rcsDict['ele'][p][stb][htb][njb]['AllPdgE'],4), \
+                         getNumString(rcsDict['mu'][p][stb][htb][njb]['AllPdg'], rcsDict['mu'][p][stb][htb][njb]['AllPdgE'],4), \
+                         getNumString(rcsDict['both'][p][stb][htb][njb]['AllPdg'], rcsDict['both'][p][stb][htb][njb]['AllPdgE'],4)])
+      if first:
+        print '&\multirow{7}{*}{$' + str(round(rcsDict['both'][p][stb][htb]['K']*1000,2)) + '\pm' + str(round(rcsDict['both'][p][stb][htb]['Kerr']*1000,2)) +'$}'
+        print '&\multirow{7}{*}{$' + str(round(rcsDict['both'][p][stb][htb]['D'],4)) + '\pm' + str(round(rcsDict['both'][p][stb][htb]['DErr'],4)) +'$} \\\\'
+      else:
+        print '&&\\\\'
+      first = False
+      if njb[1] == -1 : print '\\cline{2-32}'
+print '\\hline\end{tabular}}\end{center}\caption{RCS stability for tt jets}\end{table}'
       

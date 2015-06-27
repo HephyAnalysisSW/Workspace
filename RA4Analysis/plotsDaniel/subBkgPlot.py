@@ -28,18 +28,18 @@ twoBin=[0,deltaPhiCut,3.2]
 lepSel = 'hard'
 
 nBtagReg=[(0,0),(1,1)]#,(2,-1)]
-nJetReg=[(2,3),(4,5),(6,7),(8,-1)]#,(5,5),(6,-1)]#,(6,7),(8,-1)]#,(6,-1)]#,(3,3),(4,4),(5,5),(6,-1)]
-stReg=[(350,-1)]#,(300,-1)]#,(350,450),(450,-1)]#,(250,-1)]#,(350,450),(450,-1)]
-htReg=[(500,-1)]#,(1000,-1)]#,(1000,1250),(1250,-1)]#,(750,-1)]#,(750,1000),(1000,1250),(1250,-1)]
+nJetReg=[(2,-1)]#,(4,5),(6,7),(8,-1)]#,(5,5),(6,-1)]#,(6,7),(8,-1)]#,(6,-1)]#,(3,3),(4,4),(5,5),(6,-1)]
+stReg=[(250,350),(350,450),(450,-1)]#,(300,-1)]#,(350,450),(450,-1)]#,(250,-1)]#,(350,450),(450,-1)]
+htReg=[(500,750),(750,1000),(1000,-1)]#,(1000,-1)]#,(1000,1250),(1250,-1)]#,(750,-1)]#,(750,1000),(1000,1250),(1250,-1)]
 
 colorList=[ROOT.kBlack, ROOT.kMagenta+2, ROOT.kOrange+2,ROOT.kMagenta+2]
 
-startpath = '/afs/hephy.at/user/d/dspitzbart/www/subBkgTThard/'
+startpath = '/afs/hephy.at/user/d/dspitzbart/www/subBkgWhard/'
 
 
 #Load the Background Chain
-c = getChain(ttJets[lepSel],histname='')
-#c = getChain(WJetsHTToLNu[lepSel],histname='')
+#c = getChain(ttJets[lepSel],histname='')
+c = getChain(WJetsHTToLNu[lepSel],histname='')
 
 #Sub Background Definitions #sometimes the variable is called genPart, sometimes GenPart, be aware of that
 ngNuEFromW = "Sum$(abs(genPart_pdgId)==12&&abs(genPart_motherId)==24)"
@@ -204,7 +204,7 @@ for hReg in htReg:
       totalL.SetBorderSize(1)
 
       #Get yields for norm & rcs
-      for i, [subcut,name,col,subname,texString] in enumerate(subBkgTT):
+      for i, [subcut,name,col,subname,texString] in enumerate(subBkgW):
         print 'Processing ' + subname        
         subYields=[]
         histo = 'h'+str(i)
