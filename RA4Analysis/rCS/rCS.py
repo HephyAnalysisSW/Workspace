@@ -66,7 +66,7 @@ elif channel =='mu':
   pdgId = 13
 
 streg = [[(250, 350), 1.], [(350, 450), 1.],  [(450, -1), 1.] ]
-htreg = [(500,-1)]#,(750,1000),(1000,-1)]#,(1000,1250),(1250,-1)]#,(1250,-1)]
+htreg = [(500,750),(750,1000),(1000,-1)]#,(1000,1250),(1250,-1)]#,(1250,-1)]
 btreg = (0,0)
 njreg = [(2,2),(3,3),(4,4),(5,5),(6,7),(8,-1)]#,(7,7),(8,8),(9,9)]
 nbjreg = [(0,0),(1,1),(2,2)]
@@ -360,6 +360,22 @@ for lep, pdgId in channels:
         h_nj_pos[lep][name][stb][htb].GetYaxis().SetTitleOffset(1.5)
         h_nj_pos[lep][name][stb][htb].GetYaxis().SetTitle('R_{CS}')
         h_nj_pos[lep][name][stb][htb].GetYaxis().SetRangeUser(0, 3*h_nj[lep][name][stb][htb].GetBinContent(h_nj[lep][name][stb][htb].GetMaximumBin()))
+        upperbound = 0
+        for i_njb, njb in enumerate(njreg):
+          if h_nj_pos[lep][name][stb][htb].GetBinContent(i_njb+1)>0.:
+            upperbound = i_njb+1
+          else:
+            break
+        h_nj_pos[lep][name][stb][htb].Fit('pol1','','same',0,upperbound)
+        FitFunc     = h_nj_pos[lep][name][stb][htb].GetFunction('pol1')
+        FitParD     = FitFunc.GetParameter(0)
+        FitParDError = FitFunc.GetParError(0)
+        FitParK = FitFunc.GetParameter(1)
+        FitParKError = FitFunc.GetParError(1)
+        FitFunc.SetLineColor(ROOT_colors[istb])
+        FitFunc.SetLineStyle(2)
+        FitFunc.SetLineWidth(2)
+        #rcsDict[lep][name][stb][htb].update({'D':FitParD, 'DErr':FitParDError, 'K':FitParK, 'Kerr':FitParKError})
         if name == 'tt':
           h_nj_pos[lep][name][stb][htb].SetMaximum(0.25)
         else:
@@ -378,6 +394,7 @@ for lep, pdgId in channels:
           h_nj_pos[lep][name][stb][htb].Draw()
         else:
           h_nj_pos[lep][name][stb][htb].Draw('same')
+        FitFunc.Draw('same')
       l.Draw()
       c1.Print(path+prefix+'_rCS_njet_PosPDG_'+lep+'_'+name+'_'+nameAndCut(stb,htb=htb,njetb=None, btb=btreg, presel=presel)[0]+".pdf")
       c1.Print(path+prefix+'_rCS_njet_PosPDG_'+lep+'_'+name+'_'+nameAndCut(stb,htb=htb,njetb=None, btb=btreg, presel=presel)[0]+".png")
@@ -400,10 +417,27 @@ for lep, pdgId in channels:
         h_nj_neg[lep][name][stb][htb].GetYaxis().SetTitleSize(0.04)
         h_nj_neg[lep][name][stb][htb].GetYaxis().SetTitleOffset(1.5)
         h_nj_neg[lep][name][stb][htb].GetYaxis().SetTitle('R_{CS}')
+        h_nj_neg[lep][name][stb][htb].Fit('pol1','','same',0,upperbound)
+        upperbound = 0
+        for i_njb, njb in enumerate(njreg):
+          if h_nj_neg[lep][name][stb][htb].GetBinContent(i_njb+1)>0.:
+            upperbound = i_njb+1
+          else:
+            break
+        FitFunc     = h_nj_neg[lep][name][stb][htb].GetFunction('pol1')
+        FitParD     = FitFunc.GetParameter(0)
+        FitParDError = FitFunc.GetParError(0)
+        FitParK = FitFunc.GetParameter(1)
+        FitParKError = FitFunc.GetParError(1)
+        FitFunc.SetLineColor(ROOT_colors[istb])
+        FitFunc.SetLineStyle(2)
+        FitFunc.SetLineWidth(2)
+        rcsDict[lep][name][stb][htb].update({'D':FitParD, 'DErr':FitParDError, 'K':FitParK, 'Kerr':FitParKError})
         if name == 'tt':
           h_nj_neg[lep][name][stb][htb].SetMaximum(0.25)
         else:
           h_nj_neg[lep][name][stb][htb].SetMaximum(0.08)
+        FitFunc.Draw('same')
         h_nj_neg[lep][name][stb][htb].SetLineColor(ROOT_colors[istb])
         h_nj_neg[lep][name][stb][htb].SetLineWidth(2)
         l.AddEntry(h_nj_neg[lep][name][stb][htb], varBinName(stb, 'S_{T}'))
