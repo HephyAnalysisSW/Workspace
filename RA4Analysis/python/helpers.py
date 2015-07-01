@@ -5,6 +5,14 @@ from math import cos, sin, sqrt, acos, pi, atan2, cosh
 
 # h_1200_800  = kBlack
 # h_1500_100  = kMagenta
+
+def UncertaintyDivision(a,b):
+  try:
+    c = float(a) / b
+  except ZeroDivisionError:
+    c = a / 1.
+  return c
+
 def color(S):
   s=S.lower()
   if "qcd" in s:
