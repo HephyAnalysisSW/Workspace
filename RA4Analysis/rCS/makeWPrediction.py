@@ -220,17 +220,17 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, btagVa
   rd['rCS_srNJet_0b_onlyW_ele_PosPdg'] = rCS_srNJet_0b_onlyW_ele_PosPdg #Rcs in SR for ele, pos PDG
   rd['rCS_srNJet_0b_onlyW_ele_NegPdg'] = rCS_srNJet_0b_onlyW_ele_NegPdg #Rcs in SR for ele, neg PDG
 
-  rd['rCS_srNJet_0b_onlyW_NegPdg_Ratio'] = rCS_srNJet_0b_onlyW_mu_NegPdg['rCS']/rCS_srNJet_0b_onlyW_NegPdg['rCS']
-  rd['rCS_Var_srNJet_0b_onlyW_NegPdg_Ratio'] = rCS_srNJet_0b_onlyW_mu_NegPdg['rCS']**2/rCS_srNJet_0b_onlyW_NegPdg['rCS']**2*((rCS_srNJet_0b_onlyW_mu_NegPdg['rCSE_sim']/rCS_srNJet_0b_onlyW_mu_NegPdg['rCS'])**2+\
-                                                (rCS_srNJet_0b_onlyW_NegPdg['rCSE_sim']/rCS_srNJet_0b_onlyW_NegPdg['rCS'])**2)
+  #rd['rCS_srNJet_0b_onlyW_NegPdg_Ratio'] = rCS_srNJet_0b_onlyW_mu_NegPdg['rCS']/rCS_srNJet_0b_onlyW_NegPdg['rCS']
+  #rd['rCS_Var_srNJet_0b_onlyW_NegPdg_Ratio'] = rCS_srNJet_0b_onlyW_mu_NegPdg['rCS']**2/rCS_srNJet_0b_onlyW_NegPdg['rCS']**2*((rCS_srNJet_0b_onlyW_mu_NegPdg['rCSE_sim']/rCS_srNJet_0b_onlyW_mu_NegPdg['rCS'])**2+\
+  #                                              (rCS_srNJet_0b_onlyW_NegPdg['rCSE_sim']/rCS_srNJet_0b_onlyW_NegPdg['rCS'])**2)
 
-  rd['rCS_srNJet_0b_onlyW_PosPdg_Ratio'] = rCS_srNJet_0b_onlyW_mu_PosPdg['rCS']/rCS_srNJet_0b_onlyW_PosPdg['rCS']
-  rd['rCS_Var_srNJet_0b_onlyW_PosPdg_Ratio'] = rCS_srNJet_0b_onlyW_mu_PosPdg['rCS']**2/rCS_srNJet_0b_onlyW_PosPdg['rCS']**2*((rCS_srNJet_0b_onlyW_mu_PosPdg['rCSE_sim']/rCS_srNJet_0b_onlyW_mu_PosPdg['rCS'])**2+\
-                                                (rCS_srNJet_0b_onlyW_PosPdg['rCSE_sim']/rCS_srNJet_0b_onlyW_PosPdg['rCS'])**2)
+  #rd['rCS_srNJet_0b_onlyW_PosPdg_Ratio'] = rCS_srNJet_0b_onlyW_mu_PosPdg['rCS']/rCS_srNJet_0b_onlyW_PosPdg['rCS']
+  #rd['rCS_Var_srNJet_0b_onlyW_PosPdg_Ratio'] = rCS_srNJet_0b_onlyW_mu_PosPdg['rCS']**2/rCS_srNJet_0b_onlyW_PosPdg['rCS']**2*((rCS_srNJet_0b_onlyW_mu_PosPdg['rCSE_sim']/rCS_srNJet_0b_onlyW_mu_PosPdg['rCS'])**2+\
+  #                                              (rCS_srNJet_0b_onlyW_PosPdg['rCSE_sim']/rCS_srNJet_0b_onlyW_PosPdg['rCS'])**2)
 
-  rd['rCS_srNJet_0b_onlyW_Ratio'] = rCS_srNJet_0b_onlyW_mu['rCS']/rCS_srNJet_0b_onlyW['rCS']
-  rd['rCS_Var_srNJet_0b_onlyW_Ratio'] = rCS_srNJet_0b_onlyW_mu['rCS']**2/rCS_srNJet_0b_onlyW['rCS']**2*((rCS_srNJet_0b_onlyW_mu['rCSE_sim']/rCS_srNJet_0b_onlyW_mu['rCS'])**2+\
-                                                (rCS_srNJet_0b_onlyW['rCSE_sim']/rCS_srNJet_0b_onlyW['rCS'])**2)
+  #rd['rCS_srNJet_0b_onlyW_Ratio'] = rCS_srNJet_0b_onlyW_mu['rCS']/rCS_srNJet_0b_onlyW['rCS']
+  #rd['rCS_Var_srNJet_0b_onlyW_Ratio'] = rCS_srNJet_0b_onlyW_mu['rCS']**2/rCS_srNJet_0b_onlyW['rCS']**2*((rCS_srNJet_0b_onlyW_mu['rCSE_sim']/rCS_srNJet_0b_onlyW_mu['rCS'])**2+\
+  #                                              (rCS_srNJet_0b_onlyW['rCSE_sim']/rCS_srNJet_0b_onlyW['rCS'])**2)
 
   #true yields measured from MC samples, residual background is also calculated here and added to the dict
   truth_W         = getYieldFromChain(cWJets,  rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = weight_str)

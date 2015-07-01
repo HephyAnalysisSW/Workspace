@@ -141,7 +141,7 @@ for srNJet in signalRegions:
 
       #bins[htb][stb][srNJet]=rd
       bins[srNJet][stb][htb] = rd
-path = '/data/'+username+'/PHYS14v3/signal_contamination_tests/rCS_0b_'+str(lumi)+'_data/'
+path = '/data/'+username+'/PHYS14v3/fakeData/rCS_0b_'+str(lumi)+'_data/'
 if not os.path.exists(path):
   os.makedirs(path)
 pickle.dump(bins, file(path+prefix+'_estimationResults_pkl','w'))

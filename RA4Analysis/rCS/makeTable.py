@@ -176,6 +176,7 @@ for srNJet in sorted(signalRegions):
       #calculate total error for W jets with propagation
       W_PosPdg_pred_rcs = res[srNJet][stb][htb]['rCS_W_PosPdg_crNJet_0b_corr'] + Wrcs_corr_PosPdg[srNJet][stb][htb]['K'] * multiplier[srNJet]
       W_PosPdg_pred_rcs_Var = res[srNJet][stb][htb]['rCS_Var_W_PosPdg_crNJet_0b_corr'] + (Wrcs_corr_PosPdg[srNJet][stb][htb]['Kerr'] * multiplier[srNJet])**2
+      #W_PosPdg_pred = res[srNJet][stb][htb]['W_PosPdg_pred']
       W_PosPdg_pred = res[srNJet][stb][htb]['yW_PosPdg_srNJet_0b_lowDPhi'] * W_PosPdg_pred_rcs
       W_PosPdg_slope_Var = (res[srNJet][stb][htb]['W_PosPdg_pred'] - W_PosPdg_pred)**2
       W_PosPdg_pred_statVar = res[srNJet][stb][htb]['yW_PosPdg_Var_srNJet_0b_lowDPhi'] * W_PosPdg_pred_rcs**2 + W_PosPdg_pred_rcs_Var * res[srNJet][stb][htb]['yW_PosPdg_srNJet_0b_lowDPhi']**2
@@ -183,6 +184,7 @@ for srNJet in sorted(signalRegions):
 
       W_NegPdg_pred_rcs = res[srNJet][stb][htb]['rCS_W_NegPdg_crNJet_0b_corr'] + Wrcs_corr_NegPdg[srNJet][stb][htb]['K'] * multiplier[srNJet]
       W_NegPdg_pred_rcs_Var = res[srNJet][stb][htb]['rCS_Var_W_NegPdg_crNJet_0b_corr'] + (Wrcs_corr_NegPdg[srNJet][stb][htb]['Kerr'] * multiplier[srNJet])**2
+      #W_NegPdg_pred = res[srNJet][stb][htb]['W_NegPdg_pred']
       W_NegPdg_pred = res[srNJet][stb][htb]['yW_NegPdg_srNJet_0b_lowDPhi'] * W_NegPdg_pred_rcs
       W_NegPdg_slope_Var = (res[srNJet][stb][htb]['W_NegPdg_pred'] - W_NegPdg_pred)**2
       W_NegPdg_pred_statVar = res[srNJet][stb][htb]['yW_NegPdg_Var_srNJet_0b_lowDPhi'] * W_NegPdg_pred_rcs**2 + W_NegPdg_pred_rcs_Var * res[srNJet][stb][htb]['yW_NegPdg_srNJet_0b_lowDPhi']**2
@@ -190,6 +192,7 @@ for srNJet in sorted(signalRegions):
 
       W_pred_rcs = res[srNJet][stb][htb]['rCS_W_crNJet_0b_corr'] + Wrcs_corr[srNJet][stb][htb]['K'] * multiplier[srNJet]
       W_pred_rcs_Var = res[srNJet][stb][htb]['rCS_Var_W_crNJet_0b_corr'] + (Wrcs_corr[srNJet][stb][htb]['Kerr'] * multiplier[srNJet])**2
+      #W_pred = res[srNJet][stb][htb]['W_pred']
       W_pred = res[srNJet][stb][htb]['yW_srNJet_0b_lowDPhi'] * W_pred_rcs
       W_slope_Var = (res[srNJet][stb][htb]['W_pred'] - W_pred)**2
       W_pred_statVar = res[srNJet][stb][htb]['yW_Var_srNJet_0b_lowDPhi'] * W_pred_rcs**2 + W_pred_rcs_Var * res[srNJet][stb][htb]['yW_srNJet_0b_lowDPhi']**2
@@ -214,19 +217,19 @@ for srNJet in sorted(signalRegions):
            +' & '+getNumString(res[srNJet][stb][htb]['tot_truth'],res[srNJet][stb][htb]['tot_truth_err']) +'\\\\'
       if htb[1] == -1 : print '\\cline{2-24}'
       
-      TTclosure       = max([UncertaintyDivision((TT_pred - res[srNJet][stb][htb]['TT_truth']),TT_pred), UncertaintyDivision(res[srNJet][stb][htb]['TT_truth_err'],res[srNJet][stb][htb]['TT_truth'])])
+      TTclosure       = max([abs(UncertaintyDivision((TT_pred - res[srNJet][stb][htb]['TT_truth']),TT_pred)), UncertaintyDivision(res[srNJet][stb][htb]['TT_truth_err'],res[srNJet][stb][htb]['TT_truth'])])
       TTclosurePosPdg = TTclosure
       TTclosureNegPdg = TTclosure
       
-      Wclosure       = max([UncertaintyDivision((W_pred - res[srNJet][stb][htb]['W_truth']),W_pred), UncertaintyDivision(res[srNJet][stb][htb]['W_truth_err'],res[srNJet][stb][htb]['W_truth'])]) 
-      WclosurePosPdg = max([UncertaintyDivision((W_PosPdg_pred - res[srNJet][stb][htb]['W_PosPdg_truth']),W_PosPdg_pred), UncertaintyDivision(res[srNJet][stb][htb]['W_PosPdg_truth_err'],res[srNJet][stb][htb]['W_PosPdg_truth'])])
-      WclosureNegPdg = max([UncertaintyDivision((W_NegPdg_pred - res[srNJet][stb][htb]['W_NegPdg_truth']),W_NegPdg_pred), UncertaintyDivision(res[srNJet][stb][htb]['W_NegPdg_truth_err'],res[srNJet][stb][htb]['W_NegPdg_truth'])])
+      Wclosure       = max([abs(UncertaintyDivision((W_pred - res[srNJet][stb][htb]['W_truth']),W_pred)), UncertaintyDivision(res[srNJet][stb][htb]['W_truth_err'],res[srNJet][stb][htb]['W_truth'])]) 
+      WclosurePosPdg = max([abs(UncertaintyDivision((W_PosPdg_pred - res[srNJet][stb][htb]['W_PosPdg_truth']),W_PosPdg_pred)), UncertaintyDivision(res[srNJet][stb][htb]['W_PosPdg_truth_err'],res[srNJet][stb][htb]['W_PosPdg_truth'])])
+      WclosureNegPdg = max([abs(UncertaintyDivision((W_NegPdg_pred - res[srNJet][stb][htb]['W_NegPdg_truth']),W_NegPdg_pred)), UncertaintyDivision(res[srNJet][stb][htb]['W_NegPdg_truth_err'],res[srNJet][stb][htb]['W_NegPdg_truth'])])
       
-      totalClosure       = max([UncertaintyDivision((totalPrediction - res[srNJet][stb][htb]['tot_truth']),totalPrediction),\
+      totalClosure       = max([abs(UncertaintyDivision((totalPrediction - res[srNJet][stb][htb]['tot_truth']),totalPrediction)),\
                                 UncertaintyDivision(res[srNJet][stb][htb]['tot_truth_err'],res[srNJet][stb][htb]['tot_truth'])])
-      totalClosurePosPdg = max([UncertaintyDivision((totalPredictionPosPdg - res[srNJet][stb][htb]['tot_PosPdg_truth']),totalPredictionPosPdg),\
+      totalClosurePosPdg = max([abs(UncertaintyDivision((totalPredictionPosPdg - res[srNJet][stb][htb]['tot_PosPdg_truth']),totalPredictionPosPdg)),\
                                 UncertaintyDivision(res[srNJet][stb][htb]['tot_PosPdg_truth_err'],res[srNJet][stb][htb]['tot_PosPdg_truth'])])
-      totalClosureNegPdg = max([UncertaintyDivision((totalPredictionNegPdg - res[srNJet][stb][htb]['tot_NegPdg_truth']),totalPredictionNegPdg),\
+      totalClosureNegPdg = max([abs(UncertaintyDivision((totalPredictionNegPdg - res[srNJet][stb][htb]['tot_NegPdg_truth']),totalPredictionNegPdg)),\
                                 UncertaintyDivision(res[srNJet][stb][htb]['tot_NegPdg_truth_err'],res[srNJet][stb][htb]['tot_NegPdg_truth'])])
       
       res[srNJet][stb][htb].update({'tot_clos':totalClosure, 'tot_clos_PosPdg':totalClosurePosPdg, 'tot_clos_NegPdg':totalClosureNegPdg,\
