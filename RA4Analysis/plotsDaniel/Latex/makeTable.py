@@ -7,7 +7,7 @@ from math import sqrt, pi
 #from localInfo import username
 
 prefix = 'singleMuonic_fullBkg'
-res = pickle.load(file('/afs/hephy.at/user/d/dspitzbart/www/subBkgWhard/500htJet30j/150st/nJet30LEq8/yields.pkl'))
+res = pickle.load(file('/afs/hephy.at/user/d/dspitzbart/www/subBkgWhard/1000htJet30j/450st/nJet30LEq8/yields.pkl'))
 
 streg = [[(250, 350), 1.], [(350, 450), 1.], [(450,-1), 1.]]
 htreg = [(500,750),(750,1000),(1000,1250),(1250,-1)]

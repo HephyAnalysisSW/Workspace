@@ -28,7 +28,7 @@ twoBin=[0,deltaPhiCut,3.2]
 lepSel = 'hard'
 
 nBtagReg=[(0,0),(1,1)]#,(2,-1)]
-nJetReg=[(2,-1)]#,(4,5),(6,7),(8,-1)]#,(5,5),(6,-1)]#,(6,7),(8,-1)]#,(6,-1)]#,(3,3),(4,4),(5,5),(6,-1)]
+nJetReg=[(2,2),(3,3),(4,4),(5,5),(6,7),(8,-1)]#,(5,5),(6,-1)]#,(6,7),(8,-1)]#,(6,-1)]#,(3,3),(4,4),(5,5),(6,-1)]
 stReg=[(250,350),(350,450),(450,-1)]#,(300,-1)]#,(350,450),(450,-1)]#,(250,-1)]#,(350,450),(450,-1)]
 htReg=[(500,750),(750,1000),(1000,-1)]#,(1000,-1)]#,(1000,1250),(1250,-1)]#,(750,-1)]#,(750,1000),(1000,1250),(1250,-1)]
 
@@ -215,7 +215,7 @@ for hReg in htReg:
         for bs in nBtagReg:
           #normHist.Reset()
           cutname,cut=nameAndCut(sReg, hReg, jReg, btb=bs, presel=prepresel, btagVar = bVar)
-          wholecut = cut + '&&' + subcut
+          wholecut = cut + '&&' + subcut + '&&Jet_pt[1]>80'
           #print wholecut
           c.Draw(varstring+'>>normHist','weight*('+wholecut+')','goff')
           totalYield=normHist.GetSumOfWeights()
@@ -253,7 +253,7 @@ for hReg in htReg:
         l.SetBorderSize(1)
 
         cutname,cut=nameAndCut(sReg, hReg, jReg, btb=nBtagReg[0], presel=prepresel, btagVar = bVar)
-        wholecut = cut + '&&' + subcut
+        wholecut = cut + '&&' + subcut  + '&&Jet_pt[1]>80'
         c.Draw(varstring+'>>'+str(histoname),'weight*('+wholecut+')')
         histo.SetFillColor(col)
         histo.SetLineColor(ROOT.kBlack)#was col+2
@@ -266,7 +266,7 @@ for hReg in htReg:
         
         for ibs,bs in enumerate(nBtagReg):
           namecut,cut=nameAndCut(sReg, hReg, jReg, btb=bs, presel=prepresel, btagVar = bVar)
-          wholecut=cut+'&&'+subcut
+          wholecut=cut+'&&'+subcut + '&&Jet_pt[1]>80'
           compHist = 'ch'+str(i)
           histoname = compHist
           compHist = ROOT.TH1F(str(histoname),str(bs) + ' b-tags',*binning)
