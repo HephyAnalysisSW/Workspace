@@ -13,12 +13,12 @@ from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import 
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_softLepton import *
 from Workspace.RA4Analysis.helpers import *
 from rCShelpers import *
-
+from Workspace.RA4Analysis.signalRegions import *
 
 binning=[30,0,1500]
 
 #prepresel = 'singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&nBJetMediumCSV30==0&&htJet30j>500&&st>200&&nJet30>=6&&Jet_pt[2]>80'
-prepresel = 'singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[2]>80'
+prepresel = 'singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80'
 
 lepGen = 'all'
 if lepGen == 'ele':
@@ -41,7 +41,7 @@ met = {'varString': 'met_pt','binning': [20,0,1000], 'name': '#slash{E}_{T} (GeV
 leptonPt = {'varString': 'leptonPt','binning': [40,0,800], 'name': 'p_{T}(l) (GeV)', 'yLegend':"Number of Events / "+str( (binning[2] - binning[1])/binning[0])+" GeV"}
 jetPt = {'varString': 'Jet_pt[1]','binning': [20,0,1600], 'name': 'p_{T}(leading Jet) (GeV)', 'yLegend':"Number of Events / "+str( (binning[2] - binning[1])/binning[0])+" GeV"}
 ht = {'varString': 'htJet30j','binning': [25,0,2500], 'name': 'H_{T} (GeV)', 'yLegend':"Number of Events / "+str( (binning[2] - binning[1])/binning[0])+" GeV"}
-deltaPhi = {'varString': 'deltaPhi_Wl','binning': [16,0,3.2], 'name': '#Delta#Phi(W,l)', 'yLegend':'Number of Events'}
+deltaPhi = {'varString': 'deltaPhi_Wl','binning': [32,0,3.2], 'name': '#Delta#Phi(W,l)', 'yLegend':'Number of Events'}
 
 var = deltaPhi
 
@@ -51,14 +51,14 @@ signalString='T5qqqqWW_softLep'
 legendName = var['name']
 binning = var['binning']
 varstring = var['varString']
-plotDir='/afs/hephy.at/user/d/dspitzbart/www/SRplots/'
+plotDir='/afs/hephy.at/user/d/dspitzbart/www/SRplots3fb/'
 
 lepSel='hard'
 
-stReg=[(250,350)]#,(350,450),(450,-1)]#,(450,-1)]#,(350,450),(450,-1)]#250),(250,350),(350,450),(450,-1)]
-htReg=[(500,750)]#,(750,1000),(1000,1250),(1250,-1)]#,(1250,-1)]
-jetReg = [(2,2),(3,3),(4,4),(5,5),(6,6),(7,7),(8,8)]#,(8,-1)]#,(6,-1)]#,(8,-1)]#,(6,-1),(8,-1)]
-btb = (2,2)
+stReg=[(250,350),(350,450),(450,-1)]#,(600,-1)]#,(350,450),(450,-1)]#,(450,-1)]#,(350,450),(450,-1)]#250),(250,350),(350,450),(450,-1)]
+htReg=[(500,750),(750,1000),(1000,1250),(1250,-1)]#,(750,1000),(1000,1250),(1250,-1)]#,(1250,-1)]
+jetReg = [(2,3),(4,4),(5,5),(6,7),(8,-1)]#,(8,8)]#,(8,-1)]#,(6,-1)]#,(8,-1)]#,(6,-1),(8,-1)]
+btb = (0,0)
 
 #BKG Samples
 WJETS = getChain(WJetsHTToLNu[lepSel],histname='')
@@ -223,10 +223,15 @@ bkgSamples.append(ttjets)
 
 allRCS = []
 
-for st in stReg:
-  for ht in htReg:
-    for jet in jetReg:
-      
+signalRegions = sideBand3fb
+
+for jet in signalRegions:
+  for st in signalRegions[jet]:
+    for ht in signalRegions[jet][st]:
+#for st in stReg:
+#  for ht in htReg:
+#    for jet in jetReg:
+#      
       cutname, cut = nameAndCut(st, ht, jet, btb=btb, presel=presel, btagVar = 'nBJetMediumCSV30')
       rcs = getRCS(WJETS,cut,1.0)
       #print rcs

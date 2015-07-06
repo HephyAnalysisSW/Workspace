@@ -4,7 +4,6 @@ import copy, os, sys
 ROOT.gROOT.LoadMacro("../../HEPHYPythonTools/scripts/root/tdrstyle.C")
 ROOT.TH1F().SetDefaultSumw2()
 ROOT.setTDRStyle()
-ROOT.gStyle.SetMarkerStyle(1)
 
 from Workspace.HEPHYPythonTools.helpers import *
 from Workspace.HEPHYPythonTools.xsec import *
@@ -18,19 +17,20 @@ from LpTemplateFit import LpTemplateFit
 
 preprefix = 'QCDestimation'
 wwwDir = '/afs/hephy.at/user/d/dhandl/www/pngCMG2/hard/Phys14V3/'+preprefix+'/'
-presel = 'Lp_singleElectronic_'
+presel = 'dPhi_singleElectronic_'
 
 if not os.path.exists(wwwDir):
   os.makedirs(wwwDir)
 
 htreg = [(500,-1)]#, (500,750), (750,1250), (1250,-1)]
-streg = [(250,350)]#,(250,350), (350,450), (450,-1)]
-njreg = [(5,5)]#, (5,5), (6,7), (8,-1)]
+streg = [(350,450), (450,-1)]
+njreg = [(8,-1)]#, (5,5), (6,7), (8,-1)]
 btreg = [(0,0)]
+dPhiBinning = [0,0.25,0.5,0.75,1.0,1.25,1.5,1.75,2.0,2.25,2.5,2.75,3.0,pi]
 
 #small = True
 small = False
-doFit = True
+#doFit = True
 #doFit = False
 
 eleVarList = ['pt', 'eta', 'phi', 'pdgId', 'miniRelIso', 'convVeto', 'sip3d', 'mvaIdPhys14', 'charge', 'lostHits']
@@ -112,6 +112,8 @@ def getLp(met,metPhi,e):
 LpStr = '(LepGood_pt/sqrt((LepGood_pt*cos(LepGood_phi)+met_pt*cos(met_phi))**2+(LepGood_pt*sin(LepGood_phi)+met_pt*sin(met_phi))**2))'\
       +'*(LepGood_pt+met_pt*cos(LepGood_phi-met_phi))/sqrt(LepGood_pt**2+met_pt**2+2*met_pt*LepGood_pt*cos(LepGood_phi-met_phi))'
 
+dPhiStr = "acos((LepGood_pt+met_pt*cos(LepGood_phi-met_phi))/sqrt(LepGood_pt**2+met_pt**2+2*met_pt*LepGood_pt*cos(LepGood_phi-met_phi)))"
+
 Bkg = [{'name':'QCD_HT_100To250_PU20bx25', 'sample':QCD_HT_100To250_PU20bx25, 'legendName':'QCD HT100-250', 'color':ROOT.kCyan+3, 'merge':'QCD'},
        {'name':'QCD_HT_250To500_PU20bx25', 'sample':QCD_HT_250To500_PU20bx25, 'legendName':'QCD HT250-500', 'color':ROOT.kCyan, 'merge':'QCD'},
        {'name':'QCD_HT_500To1000_PU20bx25', 'sample':QCD_HT_500To1000_PU20bx25, 'legendName':'QCD HT500-1000', 'color':ROOT.kCyan-3, 'merge':'QCD'},
@@ -166,13 +168,13 @@ for htb in htreg:
 
         histos['merged_QCD']={}
         histos['merged_EWK']={}
-        histos['merged_QCD']['antiSelection']=ROOT.TH1F('merged_QCD_antiSelection','merged_QCD_antiSelection',30,-0.5,2.5)
-        histos['merged_QCD']['Selection']=ROOT.TH1F('merged_QCD_Selection','merged_QCD_Selection',30,-0.5,2.5)
-        histos['merged_EWK']['antiSelection']=ROOT.TH1F('merged_EWK_antiSelection','merged_EWK_antiSelection',30,-0.5,2.5)
-        histos['merged_EWK']['Selection']=ROOT.TH1F('merged_EWK_Selection','merged_EWK_Selection',30,-0.5,2.5)
+        histos['merged_QCD']['antiSelection']=ROOT.TH1F('merged_QCD_antiSelection','merged_QCD_antiSelection',len(dPhiBinning)-1, array('d', dPhiBinning))
+        histos['merged_QCD']['Selection']=ROOT.TH1F('merged_QCD_Selection','merged_QCD_Selection',len(dPhiBinning)-1, array('d', dPhiBinning))
+        histos['merged_EWK']['antiSelection']=ROOT.TH1F('merged_EWK_antiSelection','merged_EWK_antiSelection',len(dPhiBinning)-1, array('d', dPhiBinning))
+        histos['merged_EWK']['Selection']=ROOT.TH1F('merged_EWK_Selection','merged_EWK_Selection',len(dPhiBinning)-1, array('d', dPhiBinning))
         
         canv = ROOT.TCanvas('canv','canv',600,600)
-        #canv.SetLogy()
+        canv.SetLogy()
         l = ROOT.TLegend(0.65,0.75,0.95,0.95)
         l.SetFillColor(0)
         l.SetBorderSize(1)
@@ -189,21 +191,21 @@ for htb in htreg:
        
         for sample in Bkg:
           histos[sample['name']] = {}
-          histos[sample['name']]['antiSelection'] = ROOT.TH1F(sample['name']+'_antiSelection', sample['name']+'_antiSelection',30,-0.5,2.5)
-          histos[sample['name']]['Selection'] = ROOT.TH1F(sample['name']+'_Selection', sample['name']+'_Selection',30,-0.5,2.5)
+          histos[sample['name']]['antiSelection'] = ROOT.TH1F(sample['name']+'_antiSelection', sample['name']+'_antiSelection',len(dPhiBinning)-1, array('d', dPhiBinning))
+          histos[sample['name']]['Selection'] = ROOT.TH1F(sample['name']+'_Selection', sample['name']+'_Selection',len(dPhiBinning)-1, array('d', dPhiBinning))
 
-          sample['chain'].Draw(LpStr+'>>'+sample['name']+'_antiSelection',str(sample['weight'])+'*('+antiSelCut+')')
-          sample['chain'].Draw(LpStr+'>>'+sample['name']+'_Selection',str(sample['weight'])+'*('+SelCut+')')
+          sample['chain'].Draw(dPhiStr+'>>'+sample['name']+'_antiSelection',str(sample['weight'])+'*('+antiSelCut+')')
+          sample['chain'].Draw(dPhiStr+'>>'+sample['name']+'_Selection',str(sample['weight'])+'*('+SelCut+')')
           
           histos[sample['name']]['antiSelection'].SetLineColor(sample['color'])
           histos[sample['name']]['antiSelection'].SetLineStyle(ROOT.kDashed)
           histos[sample['name']]['antiSelection'].SetLineWidth(2)
           histos[sample['name']]['antiSelection'].GetYaxis().SetTitle('# of Events')
-          histos[sample['name']]['antiSelection'].GetXaxis().SetTitle('L_{p}')
+          histos[sample['name']]['antiSelection'].GetXaxis().SetTitle('#Delta#Phi(W,l)')
           histos[sample['name']]['Selection'].SetLineColor(sample['color'])
           histos[sample['name']]['Selection'].SetLineWidth(2)
           histos[sample['name']]['Selection'].GetYaxis().SetTitle('# of Events')
-          histos[sample['name']]['Selection'].GetXaxis().SetTitle('L_{P}')
+          histos[sample['name']]['Selection'].GetXaxis().SetTitle('#Delta#Phi(W,l)')
           l.AddEntry(histos[sample['name']]['antiSelection'], sample['legendName']+' anti-selected')
           l.AddEntry(histos[sample['name']]['Selection'], sample['legendName']+' selected')
         
@@ -230,21 +232,21 @@ for htb in htreg:
 
         for sample in Bkg:
           histos[sample['name']]['antiSelection'].SetMaximum(1.5*antiMax)
-          histos[sample['name']]['antiSelection'].SetMinimum(0)
+          histos[sample['name']]['antiSelection'].SetMinimum(0.01)
           histos[sample['name']]['Selection'].SetMaximum(1.5*selMax)
-          histos[sample['name']]['Selection'].SetMinimum(0)
+          histos[sample['name']]['Selection'].SetMinimum(0.01)
         
         l.Draw() 
         text.DrawLatex(0.15,.96,"CMS Simulation")
         text.DrawLatex(0.65,0.96,"L="+str(target_lumi/1000)+" fb^{-1} (13 TeV)")
         
-        canv.cd()
-        canv.Print(wwwDir+presel+SRname+'_subBkg.png')
-        canv.Print(wwwDir+presel+SRname+'_subBkg.root')
-        canv.Print(wwwDir+presel+SRname+'_subBkg.pdf')
+#        canv.cd()
+#        canv.Print(wwwDir+presel+SRname+'_subBkg.png')
+#        canv.Print(wwwDir+presel+SRname+'_subBkg.root')
+#        canv.Print(wwwDir+presel+SRname+'_subBkg.pdf')
         
         mergeCanv = ROOT.TCanvas('merged Canv','merged Canv',600,600)
-        #mergeCanv.SetLogy()
+        mergeCanv.SetLogy()
         leg = ROOT.TLegend(0.65,0.75,0.95,0.95)
         leg.SetFillColor(0)
         leg.SetBorderSize(1)
@@ -253,7 +255,7 @@ for htb in htreg:
         for hist in [histos['merged_QCD']['antiSelection'],histos['merged_QCD']['Selection'],histos['merged_EWK']['antiSelection'],histos['merged_EWK']['Selection']]:
           hist.SetStats(0)
           hist.GetYaxis().SetTitle('# of Events')
-          hist.GetXaxis().SetTitle('L_{p}')
+          hist.GetXaxis().SetTitle('#Delta#Phi(W,l)')
           hist.SetLineWidth(2)
 
         nEWKSel_err = ROOT.Double()
@@ -276,13 +278,13 @@ for htb in htreg:
         print bins[htb][stb][srNJet][btb]
 
         #do the template fit:
-        if doFit:
-          LpTemplates = {'EWKantiSel':histos['merged_EWK']['antiSelection'], 'EWKsel':histos['merged_EWK']['Selection'], 'QCDantiSel':histos['merged_QCD']['antiSelection'], 'QCDsel':histos['merged_QCD']['Selection']}
-          fit_QCD = LpTemplateFit(LpTemplates, prefix=presel+SRname, printDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/pngCMG2/templateFit_Phys14V3/QCDestimation')
-          bins[htb][stb][srNJet][btb].update(fit_QCD)
-          F_ratio = fit_QCD['QCD']['yield']/NdataAntiSel
-          F_ratio_err = F_ratio*sqrt(fit_QCD['QCD']['yieldVar']/fit_QCD['QCD']['yield']**2 + NdataAntiSel_err**2/NdataAntiSel**2)
-          bins[htb][stb][srNJet][btb].update({'F_seltoantisel':F_ratio, 'F_seltoantisel_err':F_ratio_err})
+#        if doFit:
+#          LpTemplates = {'EWKantiSel':histos['merged_EWK']['antiSelection'], 'EWKsel':histos['merged_EWK']['Selection'], 'QCDantiSel':histos['merged_QCD']['antiSelection'], 'QCDsel':histos['merged_QCD']['Selection']}
+#          fit_QCD = LpTemplateFit(LpTemplates, prefix=presel+SRname, printDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/pngCMG2/templateFit_Phys14V3/QCDestimation')
+#          bins[htb][stb][srNJet][btb].update(fit_QCD)
+#          F_ratio = fit_QCD['QCD']['yield']/NdataAntiSel
+#          F_ratio_err = F_ratio*sqrt(fit_QCD['QCD']['yieldVar']/fit_QCD['QCD']['yield']**2 + NdataAntiSel_err**2/NdataAntiSel**2)
+#          bins[htb][stb][srNJet][btb].update({'F_seltoantisel':F_ratio, 'F_seltoantisel_err':F_ratio_err})
 
         mergeCanv.cd() 
 #        if histos['merged_QCD']['antiSelection'].Integral()>0:
@@ -316,6 +318,11 @@ for htb in htreg:
         histos['merged_EWK']['antiSelection'].Draw('hist same')
         histos['merged_EWK']['Selection'].Draw('hist same')
           
+        histos['merged_QCD']['Selection'].SetMinimum(0.01)
+        histos['merged_QCD']['antiSelection'].SetMinimum(0.01)
+        histos['merged_EWK']['Selection'].SetMinimum(0.01)
+        histos['merged_EWK']['antiSelection'].SetMinimum(0.01)
+
         leg.Draw()
         text.DrawLatex(0.15,.96,"CMS Simulation")
         text.DrawLatex(0.65,0.96,"L="+str(target_lumi/1000)+" fb^{-1} (13 TeV)")
@@ -326,10 +333,10 @@ for htb in htreg:
         mergeCanv.Print(wwwDir+presel+SRname+'.pdf')
 
 
-        path = '/data/'+username+'/results2015/rCS_0b/'
-        if not os.path.exists(path):
-          os.makedirs(path)
-        pickle.dump(bins, file(path+'QCDyieldFromTemplateFit_'+SRname+'_pkl','w'))
+#        path = '/data/'+username+'/results2015/rCS_0b/'
+#        if not os.path.exists(path):
+#          os.makedirs(path)
+#        pickle.dump(bins, file(path+'QCDyieldFromTemplateFit_'+SRname+'_pkl','w'))
 
 #          #Get the event list 'eList' which has all the events satisfying the cut
 #          sample["chain"].Draw(">>eList",cut)
@@ -417,9 +424,9 @@ for htb in htreg:
 #            if isSelected:
 #              histos[sample['name']]['Selection'].Fill(lp,sample['weight'])
 #            else: 
-#              histos[sample['name']]['antiSelection'].Fill(lp,sample['weight'])
+##              histos[sample['name']]['antiSelection'].Fill(lp,sample['weight'])
+##        
+##          del elist 
 #        
-#          del elist 
-        
-        
-
+#        
+#

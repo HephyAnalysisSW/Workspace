@@ -9,25 +9,25 @@ class cardFileWriter:
     self.observation = {} 
     self.contamination = {} 
     self.niceNames = {}
-    self.defWidth = 10
+    self.defWidth = 30
     self.precision = 4
     self.maxUncNameWidth = 15
-    self.maxUncStrWidth = 10
+    self.maxUncStrWidth = 30
     self.hasContamination=False
 
   def reset(self):
     self.__init__()	
 
   def addBin(self, name, processes, niceName=""):
-    if len(name)>10:
-      print "Name for bin",name,"too long. Max. length is 10."
+    if len(name)>30:
+      print "Name for bin",name,"too long. Max. length is 30."
       return
     if self.niceNames.has_key(name):
       print "Bin already there! (",name,")"
       return
     for p in processes:
-      if len(p)>10:
-        print "Name for process", p, "in bin", name, "is too long. Max. length is 10."
+      if len(p)>30:
+        print "Name for process", p, "in bin", name, "is too long. Max. length is 30."
         return 
     self.niceNames[name]=niceName
     self.bins.append(name)

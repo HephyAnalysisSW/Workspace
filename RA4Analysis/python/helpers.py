@@ -5,6 +5,14 @@ from math import cos, sin, sqrt, acos, pi, atan2, cosh
 
 # h_1200_800  = kBlack
 # h_1500_100  = kMagenta
+
+def UncertaintyDivision(a,b):
+  try:
+    c = float(a) / b
+  except ZeroDivisionError:
+    c = a / 1.
+  return c
+
 def color(S):
   s=S.lower()
   if "qcd" in s:
@@ -198,7 +206,7 @@ def nameAndCut(stb, htb, njetb, btb=None, presel="(1)", charge="", btagVar = 'nB
   if njetb:
     if len(njetb)>1 and njetb[0] == njetb[1]:
       cut+='&&nJet30=='+str(njetb[0])
-      name+='_njet30Eq'+str(njetb[0])
+      name+='_njetEq'+str(njetb[0])
     else:
       cut+='&&nJet30>='+str(njetb[0])
       name+='_njet'+str(njetb[0])
@@ -223,7 +231,6 @@ def nameAndCut(stb, htb, njetb, btb=None, presel="(1)", charge="", btagVar = 'nB
     name+='_negCharge'
   if name.startswith('_'):name=name[1:]
   return [name, cut]
-
 
 #def wRecoPt(chain):
 #  lPt = getVarValue(chain, "leptonPt")

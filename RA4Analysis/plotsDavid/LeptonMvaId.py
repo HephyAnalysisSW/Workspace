@@ -15,16 +15,16 @@ wwwDir = '/afs/hephy.at/user/d/dhandl/www/pngCMG2/hard/Phys14V3/'+preprefix+'/'
 if not os.path.exists(wwwDir):
   os.makedirs(wwwDir)
 
-cut = '((nLepGood==1&&nLepOther==0)||(nLepGood==0&&nLepOther==1))&&(Sum$(Jet_pt>30&&abs(Jet_eta)<2.4&&Jet_id)>=3)&&(Sum$((Jet_pt)*(Jet_pt>30&&abs(Jet_eta)<2.4&&Jet_id))>500)&&(Sum$(Jet_pt>30&&abs(Jet_eta)<2.4&&Jet_id&&Jet_btagCSV>0.814)==0)'
-#cut = '((nLepGood==1&&nLepOther==0)||(nLepGood==0&&nLepOther==1))&&(Sum$(Jet_pt>30&&abs(Jet_eta)<2.4&&Jet_id)>=3)&&(Sum$((Jet_pt)*(Jet_pt>30&&abs(Jet_eta)<2.4&&Jet_id))>500)'
-#cut = '((nLepGood==1&&nLepOther==0)||(nLepGood==0&&nLepOther==1))'
-small = True
-#small = False
-eleVarList = ['pt', 'eta', 'phi', 'pdgId', 'miniRelIso', 'convVeto', 'sip3d', 'mvaIdPhys14']
-eleFromW = ['pt', 'eta', 'phi', 'pdgId', 'motherId', 'sourceId']
+#cut = '((nLepGood==1&&nLepOther==0)||(nLepGood==0&&nLepOther==1))&&(Sum$(Jet_pt>30&&abs(Jet_eta)<2.4&&Jet_id)>=3)&&(Sum$((Jet_pt)*(Jet_pt>30&&abs(Jet_eta)<2.4&&Jet_id))>500)&&(Sum$(Jet_pt>30&&abs(Jet_eta)<2.4&&Jet_id&&Jet_btagCSV>0.814)==0)'
+#cut = '((nLepGood==1&&nLepOther==0)||(nLepGood==0&&nLepOther==1))&&(Sum$(Jet_pt>30&&abs(Jet_eta)<2.4&&Jet_id&&Jet_btagCSV>0.814)==0)'
+cut = 'Sum$(abs(LepGood_pdgId)==11)+Sum$(abs(LepOther_pdgId)==11)>=1'
+#small = True
+small = False
+eleVarList = ['pt', 'eta', 'phi', 'pdgId', 'miniRelIso', 'convVeto', 'sip3d', 'mvaIdPhys14', 'charge']
+eleFromW = ['pt', 'eta', 'phi', 'pdgId', 'motherId', 'grandmotherId', 'charge', 'sourceId']
 
 def getMatch(genLep,recoLep):
-  return (deltaR(genLep,recoLep)<0.4 and ((genLep['pt']-recoLep['pt'])/genLep['pt'])<0.01)
+  return ( (genLep['charge']==recoLep['charge']) and deltaR(genLep,recoLep)<0.1 and (abs(genLep['pt']-recoLep['pt'])/genLep['pt'])<0.5)
 
 target_lumi = 2000 #pb-1
 def getWeight(sample,nEvents,target_lumi):
@@ -32,7 +32,6 @@ def getWeight(sample,nEvents,target_lumi):
   return weight
 
 def antiSel(e):
-# return (e['pt']>25 and abs(e['eta'])<2.4 and abs(e['pdgId'])==11 and e['miniRelIso']<0.4 and e['mvaIdPhys14']>(-0.52) and e['mvaIdPhys14']<0.05)
   if abs(e['eta'])<0.8:
     return (e['pt']>25 and abs(e['pdgId'])==11 and e['miniRelIso']<0.4 and e['mvaIdPhys14']>=0.35 and e['mvaIdPhys14']<0.73)
   if (abs(e['eta'])>=0.8 and abs(e['eta'])<1.4):
@@ -59,12 +58,14 @@ Bkg = [{'name':'QCD_HT_100To250_PU20bx25', 'sample':QCD_HT_100To250_PU20bx25},
        {'name':'QCD_HT_250To500_PU20bx25', 'sample':QCD_HT_250To500_PU20bx25},
        {'name':'QCD_HT_500To1000_PU20bx25', 'sample':QCD_HT_500To1000_PU20bx25},
        {'name':'QCD_HT_1000ToInf_PU20bx25', 'sample':QCD_HT_1000ToInf_PU20bx25}]
-Sig = [{'name':'ttJets_PU20bx25', 'sample':ttJets_PU20bx25}]
+Sig = [{'name':'ttJets_PU20bx25', 'sample':ttJets_PU20bx25, 'prompt':True}]
 
 histos = {}
 
+maxN=5 if small else -1
+
 for sample in Bkg + Sig:
-  sample['chunks'], sample['nEvents'] = getChunks(sample['sample'],treeName='treeProducerSusySingleLepton', maxN=-1)
+  sample['chunks'], sample['nEvents'] = getChunks(sample['sample'],treeName='treeProducerSusySingleLepton', maxN=maxN)
   sample['chain'] = ROOT.TChain('tree')
   for chunk in sample['chunks']:
     sample['chain'].Add(chunk['file'])
@@ -77,17 +78,15 @@ for sample in Bkg + Sig:
   histos[sample['name']]['mvaIdLEhisto'] = ROOT.TH1F(sample['name']+'_mvaIdLEhisto', sample['name']+'_mvaIdLEhisto',24,-1.2,1.2)
   #histos[sample['name']]['antiSelection'] = ROOT.TH1F(sample['name']+'_antiSelection', sample['name']+'_antiSelection',20,-1.5,2.5)
   #histos[sample['name']]['Selection'] = ROOT.TH1F(sample['name']+'_Selection', sample['name']+'_Selection',20,-1.5,2.5)
+  histos[sample['name']]['mvaIdSEhistofake'] = ROOT.TH1F(sample['name']+'_mvaIdSEhistofake', sample['name']+'_mvaIdSEhistofake',24,-1.2,1.2)
+  histos[sample['name']]['mvaIdMEhistofake'] = ROOT.TH1F(sample['name']+'_mvaIdMEhistofake', sample['name']+'_mvaIdMEhistofake',24,-1.2,1.2)
+  histos[sample['name']]['mvaIdLEhistofake'] = ROOT.TH1F(sample['name']+'_mvaIdLEhistofake', sample['name']+'_mvaIdLEhistofake',24,-1.2,1.2)
 
   sample["chain"].Draw(">>eList",cut) #Get the event list 'eList' which has all the events satisfying the cut
   elist = ROOT.gDirectory.Get("eList")
-  number_events = elist.GetN() if not small else 1000
+  number_events = elist.GetN() #if not small else 1000
   print "Sample ",sample['name'],": Will loop over", number_events,"events"
 
-#antihisto=ROOT.TH1F('antihisto','antihisto',12,-1,2)
-#selhisto=ROOT.TH1F('selhisto','selhisto',12,-1,2)
-#mvaIDhisto=ROOT.TH1F('mvaIDhisto','mvaIDhisto',24,-1.2,1.2)
-#mvaID2histo=ROOT.TH1F('mvaID2histo','mvaID2histo',24,-1.2,1.2)
-#mvaID3histo=ROOT.TH1F('mvaID3histo','mvaID3histo',24,-1.2,1.2)
 #leptons = []
 #  promptEl = []
 #  fakeEl = []
@@ -99,43 +98,55 @@ for sample in Bkg + Sig:
     sample['chain'].GetEntry(elist.GetEntry(i))
     #print i, getVarValue(cQCD,'nLepGood'), getVarValue(cQCD,'nLepOther')
 
-    ele = [getObjDict(sample['chain'], 'LepGood_', eleVarList, j) for j in range(int(sample['chain'].GetLeaf('nLepGood').GetValue()))]\
-        + [getObjDict(sample['chain'], 'LepOther_', eleVarList, j) for j in range(int(sample['chain'].GetLeaf('nLepOther').GetValue()))]
+    eles = [getObjDict(sample['chain'], 'LepGood_', eleVarList, j) for j in range(int(sample['chain'].GetLeaf('nLepGood').GetValue()))]\
+         + [getObjDict(sample['chain'], 'LepOther_', eleVarList, j) for j in range(int(sample['chain'].GetLeaf('nLepOther').GetValue()))]
 
-    genEle = [getObjDict(sample['chain'], 'genLep_', eleFromW, j) for j in range(int(sample['chain'].GetLeaf('ngenLep').GetValue()))]\
-    
-    ele = filter(lambda e:abs(e['pdgId'])==11, ele) 
-    ele = filter(lambda e:e['miniRelIso']<0.4, ele) #require relIso
-    ele = filter(lambda e:(e['pt']+sample['chain'].GetLeaf('met_pt').GetValue())>200, ele) 
+    genEle = [getObjDict(sample['chain'], 'genLep_', eleFromW, j) for j in range(int(sample['chain'].GetLeaf('ngenLep').GetValue()))]
 
-    genEle = filter(lambda e:abs(e['motherId'])==24, ele) 
-    for gen in genEle:
-      for reco in ele:
-        if getMatch(gen,reco):
-          prompt = ele
-        else:
-          fake = ele
-    
-#    weight = 1
-#    if sample.has_key('weight'):
-#      if type(sample['weight'])==type(''):
-#        weight = getVarValue(sample['chain'], sample['weight'])
-#      else:
-#        weight = sample['weight']
-#    else:
+    if i%10000==0:    
+      print len(eles), len(genEle)
 
-    for e in prompt:
-      if not (abs(e['eta'])>=1.4 and abs(e['eta'])<2.4):continue
-      mvaVal=e['mvaIdPhys14']
-      histos[sample['name']]['mvaIdLEhisto'].Fill(mvaVal,sample['weight'])
-    for e in prompt:
-      if not (abs(e['eta'])>=0.8 and abs(e['eta'])<1.4):continue
-      mvaVal2=e['mvaIdPhys14']
-      histos[sample['name']]['mvaIdMEhisto'].Fill(mvaVal2,sample['weight'])
-    for e in prompt:
-      if not abs(e['eta'])<0.8:continue
-      mvaVal3=e['mvaIdPhys14']
-      histos[sample['name']]['mvaIdSEhisto'].Fill(mvaVal3,sample['weight'])
+    eles = filter(lambda e:abs(e['pdgId'])==11, eles) 
+    eles = filter(lambda e:e['pt']>25, eles) 
+    eles = filter(lambda e:e['miniRelIso']<0.4, eles) #require relIso
+    eles = filter(lambda e:abs(e['eta'])<2.4, eles) 
+
+    genEle = filter(lambda e:abs(e['pdgId'])==11, genEle) 
+    genEle = filter(lambda e:e['pt']>10, genEle) 
+
+    if sample.has_key('prompt'):
+      if sample['prompt']:
+        for reco in eles:
+          hasMatch=False
+          for gen in genEle:
+            if getMatch(gen,reco):
+#               print "Found match",gen,reco
+#              prompt = ele
+    #          print 'prompt:',prompt
+#              for e in prompt:
+               if (abs(reco['eta'])>=1.4 and abs(reco['eta'])<2.4):
+                 histos[sample['name']]['mvaIdLEhisto'].Fill(reco['mvaIdPhys14'],sample['weight'])
+               elif (abs(reco['eta'])>=0.8 and abs(reco['eta'])<1.4):
+                 histos[sample['name']]['mvaIdMEhisto'].Fill(reco['mvaIdPhys14'],sample['weight'])
+               elif abs(reco['eta'])<0.8:
+                 histos[sample['name']]['mvaIdSEhisto'].Fill(reco['mvaIdPhys14'],sample['weight'])
+            hasMatch=True
+          if not hasMatch:
+            if (abs(reco['eta'])>=1.4 and abs(reco['eta'])<2.4):
+              histos[sample['name']]['mvaIdLEhistofake'].Fill(reco['mvaIdPhys14'],sample['weight'])
+            elif (abs(reco['eta'])>=0.8 and abs(reco['eta'])<1.4):
+              histos[sample['name']]['mvaIdMEhistofake'].Fill(reco['mvaIdPhys14'],sample['weight'])
+            elif abs(reco['eta'])<0.8:
+              histos[sample['name']]['mvaIdSEhistofake'].Fill(reco['mvaIdPhys14'],sample['weight'])
+
+    else:
+      for reco in eles:
+        if (abs(reco['eta'])>=1.4 and abs(reco['eta'])<2.4):
+          histos[sample['name']]['mvaIdLEhisto'].Fill(reco['mvaIdPhys14'],sample['weight'])
+        elif (abs(reco['eta'])>=0.8 and abs(reco['eta'])<1.4):
+          histos[sample['name']]['mvaIdMEhisto'].Fill(reco['mvaIdPhys14'],sample['weight'])
+        elif abs(reco['eta'])<0.8:
+          histos[sample['name']]['mvaIdSEhisto'].Fill(reco['mvaIdPhys14'],sample['weight'])
   
 #    antiSelected_e = filter(antiSel, ele)
 #    Selected_e = filter(Sel, ele)
@@ -170,13 +181,16 @@ text.SetNDC()
 text.SetTextSize(0.045)
 text.SetTextAlign(11)
 text.DrawLatex(0.15,.96,"CMS Simulation")
-#text.DrawLatex(0.65,0.96,"L=4 fb^{-1} (13 TeV)")
+text.DrawLatex(0.65,0.96,"L=2 fb^{-1} (13 TeV)")
 
+stackSE = ROOT.THStack('Stacked QCD small eta','Stacked QCD small eta')
+stackME = ROOT.THStack('Stacked QCD medium eta','Stacked QCD small eta')
+stackLE = ROOT.THStack('Stacked QCD large eta','Stacked QCD large eta')
 
 for b in Bkg:
 #  for hist in histos[b['name']]:
 #    hist.SetLineWidth(2)
-#    hist.GetYaxis().SetTitle('# of Events') 
+#    hist.GetXaxis().SetTitle('mvaIdPhys14') 
 #    hist.GetYaxis().SetTitle('# of Events') 
 #    hist.SetMaximum(10*hist.GetMaximum())
 
@@ -197,15 +211,36 @@ for b in Bkg:
   if histos[b['name']]['mvaIdLEhisto'].Integral()>1:
     histos[b['name']]['mvaIdLEhisto'].Scale(1./histos[b['name']]['mvaIdLEhisto'].Integral())
   
-  histos[b['name']]['mvaIdSEhisto'].Draw()
-  histos[b['name']]['mvaIdMEhisto'].Draw('same')
-  histos[b['name']]['mvaIdLEhisto'].Draw('same')
-  histos[b['name']]['mvaIdSEhisto'].SetMaximum(100*histos[b['name']]['mvaIdSEhisto'].GetMaximum())
-  histos[b['name']]['mvaIdMEhisto'].SetMaximum(100*histos[b['name']]['mvaIdMEhisto'].GetMaximum())
-  histos[b['name']]['mvaIdLEhisto'].SetMaximum(100*histos[b['name']]['mvaIdLEhisto'].GetMaximum())
-  l.AddEntry(histos[b['name']]['mvaIdSEhisto'], b['name'])
-  l.AddEntry(histos[b['name']]['mvaIdMEhisto'], b['name'])
-  l.AddEntry(histos[b['name']]['mvaIdLEhisto'], b['name'])
+  stackSE.Add(histos[b['name']]['mvaIdSEhisto'])
+  l.AddEntry(histos[b['name']]['mvaIdSEhisto'], b['name'], 'l')
+  stackME.Add(histos[b['name']]['mvaIdMEhisto'])
+#  l.AddEntry(histos[b['name']]['mvaIdMEhisto'], b['name'], 'l')
+  stackLE.Add(histos[b['name']]['mvaIdLEhisto'])
+#  l.AddEntry(histos[b['name']]['mvaIdLEhisto'], b['name'], 'l')
+  
+stackSE.Draw()
+stackSE.GetXaxis().SetTitle('mvaIdPhys14')
+stackSE.GetYaxis().SetTitle('# of Events')# / '+ str( (var['binning'][2] - var['binning'][1])/var['binning'][0])+'GeV')
+stackSE.SetMaximum(100*stackSE.GetMaximum())
+stackSE.SetMinimum(10**(-2))
+#stackME.Draw()
+#stackME.GetXaxis().SetTitle('mvaIdPhys14')
+#stackME.GetYaxis().SetTitle('# of Events')# / '+ str( (var['binning'][2] - var['binning'][1])/var['binning'][0])+'GeV')
+#stackME.SetMaximum(100*stackME.GetMaximum())
+#stackME.SetMinimum(10**(-2))
+#stackLE.Draw()
+#stackLE.GetXaxis().SetTitle('mvaIdPhys14')
+#stackLE.GetYaxis().SetTitle('# of Events')# / '+ str( (var['binning'][2] - var['binning'][1])/var['binning'][0])+'GeV')
+#stackLE.SetMaximum(100*stackLE.GetMaximum())
+#stackLE.SetMinimum(10**(-2))
+ 
+#  histos[b['name']]['mvaIdSEhisto'].Draw()
+#  histos[b['name']]['mvaIdMEhisto'].Draw('same')
+#  histos[b['name']]['mvaIdLEhisto'].Draw('same')
+#  histos[b['name']]['mvaIdSEhisto'].SetMaximum(100*histos[b['name']]['mvaIdSEhisto'].GetMaximum())
+#  histos[b['name']]['mvaIdSEhisto'].SetMinimum(10**(-3))
+#  histos[b['name']]['mvaIdMEhisto'].SetMaximum(100*histos[b['name']]['mvaIdMEhisto'].GetMaximum())
+#  histos[b['name']]['mvaIdLEhisto'].SetMaximum(100*histos[b['name']]['mvaIdLEhisto'].GetMaximum())
 
 #  histos[b['name']]['antiSelection'].SetLineColor(ROOT.kRed)
 #  histos[b['name']]['antiSelection'].SetLineWidth(2)
@@ -217,11 +252,6 @@ for b in Bkg:
 #  histos[b['name']]['Selection'].GetXaxis().SetTitle('L_{P}')
 #  l.AddEntry(histos[b['name']]['Selection'], 'selected')
 #  l.AddEntry(histos[b['name']]['antiSelection'], 'anti-selected')
-
-#  if histos[b['name']]['antiSelection'].Integral()>1:
-#    histos[b['name']]['antiSelection'].Scale(1./histos[b['name']]['antiSelection'].Integral())
-#  if histos[b['name']]['Selection'].Integral()>1:
-#    histos[b['name']]['Selection'].Scale(1./histos[b['name']]['Selection'].Integral())
 
 #  histos[b['name']]['antiSelection'].Draw()
 #  histos[b['name']]['Selection'].Draw('same')
@@ -247,14 +277,45 @@ for b in Sig:
     histos[b['name']]['mvaIdLEhisto'].Scale(1./histos[b['name']]['mvaIdLEhisto'].Integral())
 
   histos[b['name']]['mvaIdSEhisto'].Draw('same')
-  histos[b['name']]['mvaIdMEhisto'].Draw('same')
-  histos[b['name']]['mvaIdLEhisto'].Draw('same')
   histos[b['name']]['mvaIdSEhisto'].SetMaximum(100*histos[b['name']]['mvaIdSEhisto'].GetMaximum())
-  histos[b['name']]['mvaIdMEhisto'].SetMaximum(100*histos[b['name']]['mvaIdMEhisto'].GetMaximum())
-  histos[b['name']]['mvaIdLEhisto'].SetMaximum(100*histos[b['name']]['mvaIdLEhisto'].GetMaximum())  
-  l.AddEntry(histos[b['name']]['mvaIdSEhisto'], b['name'])
-  l.AddEntry(histos[b['name']]['mvaIdMEhisto'], b['name'])
-  l.AddEntry(histos[b['name']]['mvaIdLEhisto'], b['name']) 
+  l.AddEntry(histos[b['name']]['mvaIdSEhisto'], b['name']+' prompt')
+  #histos[b['name']]['mvaIdMEhisto'].Draw('same')
+  #histos[b['name']]['mvaIdMEhisto'].SetMaximum(100*histos[b['name']]['mvaIdMEhisto'].GetMaximum())
+  #l.AddEntry(histos[b['name']]['mvaIdMEhisto'], b['name']+' prompt')
+  #histos[b['name']]['mvaIdLEhisto'].Draw('same')
+  #histos[b['name']]['mvaIdLEhisto'].SetMaximum(100*histos[b['name']]['mvaIdLEhisto'].GetMaximum())  
+  #l.AddEntry(histos[b['name']]['mvaIdLEhisto'], b['name']+' prompt') 
+
+  #plot fakes
+  histos[b['name']]['mvaIdSEhistofake'].SetLineColor(ROOT.kRed)
+  histos[b['name']]['mvaIdSEhistofake'].SetLineStyle(ROOT.kDashed)
+  histos[b['name']]['mvaIdSEhistofake'].SetLineWidth(2)
+  histos[b['name']]['mvaIdSEhistofake'].GetYaxis().SetTitle('# of Events')
+  histos[b['name']]['mvaIdMEhistofake'].SetLineColor(ROOT.kRed)
+  histos[b['name']]['mvaIdMEhistofake'].SetLineStyle(ROOT.kDashed)
+  histos[b['name']]['mvaIdMEhistofake'].SetLineWidth(2)
+  histos[b['name']]['mvaIdMEhistofake'].GetYaxis().SetTitle('# of Events')
+  histos[b['name']]['mvaIdLEhistofake'].SetLineColor(ROOT.kRed)
+  histos[b['name']]['mvaIdLEhistofake'].SetLineStyle(ROOT.kDashed)
+  histos[b['name']]['mvaIdLEhistofake'].SetLineWidth(2)
+  histos[b['name']]['mvaIdLEhistofake'].GetYaxis().SetTitle('# of Events')
+
+  if histos[b['name']]['mvaIdSEhistofake'].Integral()>1:
+    histos[b['name']]['mvaIdSEhistofake'].Scale(1./histos[b['name']]['mvaIdSEhistofake'].Integral())
+  if histos[b['name']]['mvaIdMEhistofake'].Integral()>1:
+    histos[b['name']]['mvaIdMEhistofake'].Scale(1./histos[b['name']]['mvaIdMEhistofake'].Integral())
+  if histos[b['name']]['mvaIdLEhistofake'].Integral()>1:
+    histos[b['name']]['mvaIdLEhistofake'].Scale(1./histos[b['name']]['mvaIdLEhistofake'].Integral())
+
+  histos[b['name']]['mvaIdSEhistofake'].Draw('same')
+  histos[b['name']]['mvaIdSEhistofake'].SetMaximum(100*histos[b['name']]['mvaIdSEhistofake'].GetMaximum())
+  l.AddEntry(histos[b['name']]['mvaIdSEhistofake'], b['name']+' fake')
+  #histos[b['name']]['mvaIdMEhisto'].Draw('same')
+  #histos[b['name']]['mvaIdMEhisto'].SetMaximum(100*histos[b['name']]['mvaIdMEhisto'].GetMaximum())
+  #l.AddEntry(histos[b['name']]['mvaIdMEhisto'], b['name']+' fake')
+  #histos[b['name']]['mvaIdLEhisto'].Draw('same')
+  #histos[b['name']]['mvaIdLEhisto'].SetMaximum(100*histos[b['name']]['mvaIdLEhisto'].GetMaximum())  
+  #l.AddEntry(histos[b['name']]['mvaIdLEhisto'], b['name']+' fake') 
 
 l.Draw() 
 

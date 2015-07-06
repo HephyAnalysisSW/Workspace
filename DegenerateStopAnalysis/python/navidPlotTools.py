@@ -126,11 +126,15 @@ def getPlots(sampleDict,plotDict,treeList='',varList='',cut=''):
   print treeList
   print varList
   for s in treeList:
+    if sampleDict[s].has_key("weight") and sampleDict[s]["weight"]:
+      weight = str(sampleDict[s]["weight"])
+      print "For sample %s, using weight in sampleDict, weight= %s"%(s,weight) 
+    else: weight="weight"
     if not sampleDict[s].has_key('plots'):
       sampleDict[s]['plots']={}
     for p in varList:
       lineWidth=plotDict[p]['lineWidth']
-      if plotDict[p]['color'].lower()=="fill" and not sampleDict[s]['isSignal']:
+      if plotDict[p]['color'] == type("") and plotDict[p]['color'].lower()=="fill" and not sampleDict[s]['isSignal']:
         #color = ROOT.kBlack
         color = sampleDict[s]['color']
         fcolor = sampleDict[s]['color']
@@ -139,14 +143,18 @@ def getPlots(sampleDict,plotDict,treeList='',varList='',cut=''):
         fcolor = 0 
         if sampleDict[s]['isSignal']:
           lineWidth=2
-      print "Sample:" , s , "Getting Plot: ", p 
+      if cut:
+        cutString=cut
+      else:
+        cutString="(%s) && (%s)"%(plotDict[p]['presel'],plotDict[p]['cut'])
+      print "Sample:" , s , "Getting Plot: ", p, "with cut:  " , cutString
       sampleDict[s]['plots'][p] = getGoodPlotFromChain(sampleDict[s]['tree'] , plotDict[p]['var'], plotDict[p]['bin'],\
                                                        varName     = p  ,
-                                                       cutString   = "(%s) && (%s)"%(plotDict[p]['presel'],plotDict[p]['cut']),                      
+                                                       cutString   = cutString, 
                                                        color       = color,
                                                        fillColor   = fcolor,
                                                        lineWidth   = lineWidth,
-                                                       weight      = 'weight'
+                                                       weight      = weight
                                                        #weight      = str(sampleDict[s]['weight'])
                                                        )
   return
@@ -246,6 +254,7 @@ def getYieldsFromCutList(sampleDict,cutList,treeList='',returnError=True):
       print 'using weight value in sampleDict for:  ', t ,  sampleDict[t]['weight']
       weight = str(sampleDict[t]['weight'])
     else: weight= "weight"
+    print weight
     yieldDict[t]={}
     for cutName,cutString in cutList:
       #cutName=cut[0]
@@ -263,26 +272,28 @@ def getYieldsFromCutList(sampleDict,cutList,treeList='',returnError=True):
   #########################################################
   bkgList = [s for s in treeList if not sampleDict[s]['isSignal']]
   sigList = [s for s in treeList if sampleDict[s]['isSignal']]
-  yieldDict['bkg']={}
-  iBkg=0
-  for cutName, cutString in cutList:
-    yieldDict['bkg'][cutName] = sum([ yieldDict[bkg][cutName] for bkg in bkgList])
-    yieldDict['bkg'][cutName+"_Err"] = addSquareSum([ yieldDict[bkg][cutName+"_Err"] for bkg in bkgList])
-  iSig=0
-  for sig in sigList:
-    fomSig='fom_%s'%sig
-    yieldDict[fomSig]={}
-    for cut in cutList:
-      cutName=cut[0]
-      cutString=cut[1]
-      yieldDict[fomSig][cutName] = yieldDict[sig][cutName]/ math.sqrt(yieldDict['bkg'][cutName])
-      yieldDict[fomSig][cutName+"_Err"] = 0.0
-  #print "added", iBkg+1 , "to bkg"
+  if len(bkgList) > 0:
+    yieldDict['bkg']={}
+    iBkg=0
+    for cutName, cutString in cutList:
+      yieldDict['bkg'][cutName] = sum([ yieldDict[bkg][cutName] for bkg in bkgList])
+      yieldDict['bkg'][cutName+"_Err"] = addSquareSum([ yieldDict[bkg][cutName+"_Err"] for bkg in bkgList])
+    iSig=0
+    for sig in sigList:
+      fomSig='fom_%s'%sig
+      yieldDict[fomSig]={}
+      for cut in cutList:
+        cutName=cut[0]
+        cutString=cut[1]
+        yieldDict[fomSig][cutName] = yieldDict[sig][cutName]/ math.sqrt(yieldDict['bkg'][cutName])
+        yieldDict[fomSig][cutName+"_Err"] = 0.0
+    #print "added", iBkg+1 , "to bkg"
   return yieldDict     
 
 def makeTableFromYieldDict(yieldDict,cutList,output="test",saveDir="./"):
   #orderedYieldDictKeys=["TTJets","WJets","bkg","T2Deg300_270","fom_T2Deg300_270"]
   orderedYieldDictKeys=["TTJets","bkg","T2Deg300_270","fom_T2Deg300_270"]
+  orderedYieldDictKeys=["T2Deg"]
   #first_col= [ y for y in yieldDict.keys() ]
   first_col= [ y for y in orderedYieldDictKeys ]
   first_row= [ cut[0] for cut in cutList ]
