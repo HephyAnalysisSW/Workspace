@@ -667,14 +667,10 @@ c4.Modified()
 c4.Update() 
 
 #Write to file
-savedir = "/afs/hephy.at/work/m/mzarucki/plots/filter/filter_%s_%s"%(str(cuts["gMET"]),str(cuts["gISR"]))
-webdir = "/afs/hephy.at/user/m/mzarucki/www/plots/filter/filter_%s_%s"%(str(cuts["gMET"]),str(cuts["gISR"]))
+savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/filter/filter_%s_%s"%(str(cuts["gMET"]),str(cuts["gISR"])) #web directory http://www.hephy.at/user/mzarucki/plots/filter/
 
 if not os.path.exists(savedir):
    os.makedirs(savedir)
-
-if not os.path.exists(webdir):
-   os.makedirs(webdir)
 
 outfile = open(savedir + "/filterResults_%s_%s.txt"%(str(cuts["gMET"]),str(cuts["gISR"])), "w")
 print >> outfile, "Generator Filter Results", "\n", makeLine(), "\n", cutString, "\n", makeLine(), "\n", \
@@ -701,18 +697,20 @@ makeLine(), "\n", \
 "ISR Jet pT (2 cuts)  ", fit4[9], fit4[10], fit4[11], fit4[12], fit4[13], fit4[14], fit4[15], fit4[16]
 outfile.close()
 
-#outfile.write("") #.saveas()
+#outfile.write("")
 
-#outfile.
-
-#Save to file (.root)
+#Save to Web
 c1.SaveAs(savedir + "/MET_%s_%s.root"%( str(cuts['gMET']), str(cuts['gISR'])))
 c2.SaveAs(savedir + "/ISR_%s_%s.root"%(str(cuts['gMET']), str(cuts['gISR'])))
 c3.SaveAs(savedir + "/MET2_%s_%s.root"%(str(cuts['gMET']), str(cuts['gISR'])))
 c4.SaveAs(savedir + "/ISR2_%s_%s.root"%(str(cuts['gMET']), str(cuts['gISR'])))
 
-#Save to Web
-c1.SaveAs(webdir + "/MET_%s_%s.png"%(str(cuts['gMET']), str(cuts['gISR'])))
-c2.SaveAs(webdir + "/ISR_%s_%s.png"%(str(cuts['gMET']), str(cuts['gISR'])))
-c3.SaveAs(webdir + "/MET2_%s_%s.png"%(str(cuts['gMET']), str(cuts['gISR'])))
-c4.SaveAs(webdir + "/ISR2_%s_%s.png"%(str(cuts['gMET']), str(cuts['gISR'])))
+c1.SaveAs(savedir + "/MET_%s_%s.png"%(str(cuts['gMET']), str(cuts['gISR'])))
+c2.SaveAs(savedir + "/ISR_%s_%s.png"%(str(cuts['gMET']), str(cuts['gISR'])))
+c3.SaveAs(savedir + "/MET2_%s_%s.png"%(str(cuts['gMET']), str(cuts['gISR'])))
+c4.SaveAs(savedir + "/ISR2_%s_%s.png"%(str(cuts['gMET']), str(cuts['gISR'])))
+
+c1.SaveAs(savedir + "/MET_%s_%s.pdf"%(str(cuts['gMET']), str(cuts['gISR'])))
+c2.SaveAs(savedir + "/ISR_%s_%s.pdf"%(str(cuts['gMET']), str(cuts['gISR'])))
+c3.SaveAs(savedir + "/MET2_%s_%s.pdf"%(str(cuts['gMET']), str(cuts['gISR'])))
+c4.SaveAs(savedir + "/ISR2_%s_%s.pdf"%(str(cuts['gMET']), str(cuts['gISR'])))
