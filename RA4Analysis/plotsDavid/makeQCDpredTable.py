@@ -29,8 +29,12 @@ def getQCDfraction(Bkg, Bkg_err, QCD, QCD_err):
     res_err = float('nan')
   return res, res_err
 
+#side band for tt+jets estimation 4-5j, 1b
+ttCRbtb = (1,1)
+
 #get the ratios from the Lp template fit
-CR = (3,4)
+#side band for QCD estimation 3-4j, 0b
+CR = (3,4)  
 btb = (0,0)
 ratio={}
 for srNJet in sorted(signalRegion):
@@ -45,6 +49,7 @@ for srNJet in sorted(signalRegion):
                                  'NdataSel':res[htb][stb][CR][btb]['NdataSel'], 'NdataSel_err':res[htb][stb][CR][btb]['NdataSel_err']}
 
 nAntiSel = pickle.load(file(path+'RcsQCD3fb-1_pkl'))
+nCRAntiSel = pickle.load(file(path+'RcsQCD_4-5j_1b_3fb-1_pkl'))
 
 rowsNJet = {}
 rowsSt = {}
@@ -78,6 +83,58 @@ for njb in sorted(ratio):
            +' & '+getNumString(ratio[njb][stb][htb]['F_seltoantisel'],ratio[njb][stb][htb]['F_seltoantisel_err'])+'\\\\'
 print '\\hline'
 print '\\hline\end{tabular}}\end{center}\caption{Closure and Ratio for QCD background in the CR, 0-tag regions, 3$fb^{-1}$}\label{tab:0b_QCDpredCR}\end{table}'
+
+print 'Results QCD in 4-5j, 1b CR'
+print
+print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrr|rrr|}\\hline'
+print ' \\njet     & \ST & \HT     &\multicolumn{6}{c|}{QCD multijets in 4-5j,1b CR}&\multicolumn{3}{c|}{$N^{MC}_{Bkg.}/N^{MC}_{QCD}$}\\\%\hline'
+print ' & $[$GeV$]$ &$[$GeV$]$&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c|}{}\\\\\hline'
+#print yields in the CR 4-5j,1b
+print '\\hline'
+secondLine = False
+for srNJet in sorted(signalRegion):
+  print '\\hline'
+  if secondLine: print '\\hline'
+  secondLine = True
+  print '\multirow{13}{*}{\\begin{sideways}$[4,5]$\end{sideways}}'
+  for stb in sorted(signalRegion[srNJet]):
+    print '&\multirow{'+str(rowsSt[srNJet][stb]['n'])+'}{*}{$'+varBin(stb)+'$}'
+    first = True
+    for htb in sorted(signalRegion[srNJet][stb]):
+      if not first: print '&'
+      first = False
+      res, res_err = getQCDfraction(nCRAntiSel[srNJet][stb][htb][ttCRbtb]['NdataSel'],nCRAntiSel[srNJet][stb][htb][ttCRbtb]['NdataSel_err'],nCRAntiSel[srNJet][stb][htb][ttCRbtb]['NQCDSelMC'],nCRAntiSel[srNJet][stb][htb][ttCRbtb]['NQCDSelMC_err'])
+      print '&$'+varBin(htb)+'$'
+      print ' & '+getNumString(ratio[srNJet][stb][htb]['F_seltoantisel']*nCRAntiSel[srNJet][stb][htb][ttCRbtb]['NdataAntiSel'],\
+                 sqrt((ratio[srNJet][stb][htb]['F_seltoantisel_err']**2*nCRAntiSel[srNJet][stb][htb][ttCRbtb]['NdataAntiSel']**2)+(nCRAntiSel[srNJet][stb][htb][ttCRbtb]['NdataAntiSel_err']**2*ratio[srNJet][stb][htb]['F_seltoantisel']**2)))\
+           +' & '+getNumString(nCRAntiSel[srNJet][stb][htb][ttCRbtb]['NQCDSelMC'], nCRAntiSel[srNJet][stb][htb][ttCRbtb]['NQCDSelMC_err'])\
+           +' & '+getNumString(res,res_err)+'\\\\'
+print '\\hline\end{tabular}}\end{center}\caption{Closure table for QCD background , 0-tag regions, 3$fb^{-1}$}\label{tab:0b_QCDpred}\end{table}'
+
+#print RCS factors in the CR 4-5j, 1b
+print 'RCS in CR 4-5j,1b'
+print
+print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|c|rrr|rrr|}\\hline'
+print ' \\njet     & \ST & \HT & \DF    &\multicolumn{6}{c|}{Transfer factors in 4-5j,1b CR}\\\%\hline'
+print ' & $[$GeV$]$ &$[$GeV$]$& &\multicolumn{3}{c}{$R^{antiselected}_{CS}$}&\multicolumn{3}{c|}{$R^{selected}_{CS}$}\\\\\hline'
+print '\\hline'
+secondLine = False
+for srNJet in sorted(signalRegion):
+  print '\\hline'
+  if secondLine: print '\\hline'
+  secondLine = True
+  print '\multirow{13}{*}{\\begin{sideways}$[4,5]$\end{sideways}}'
+  for stb in sorted(signalRegion[srNJet]):
+    print '&\multirow{'+str(rowsSt[srNJet][stb]['n'])+'}{*}{$'+varBin(stb)+'$}'
+    first = True
+    for htb in sorted(signalRegion[srNJet][stb]):
+      if not first: print '&'
+      first = False
+#      res, res_err = getQCDfraction(nCRAntiSel[srNJet][stb][htb][ttCRbtb]['NdataSel'],nCRAntiSel[srNJet][stb][htb][ttCRbtb]['NdataSel_err'],nCRAntiSel[srNJet][stb][htb][ttCRbtb]['NQCDSelMC'],nCRAntiSel[srNJet][stb][htb][ttCRbtb]['NQCDSelMC_err'])
+      print '&$'+varBin(htb)+'$ &'+str(signalRegion[srNJet][stb][htb]['deltaPhi'])
+      print ' & '+getNumString(nCRAntiSel[srNJet][stb][htb][ttCRbtb]['RcsQCDantisel'], nCRAntiSel[srNJet][stb][htb][ttCRbtb]['RcsQCDantiselErr_sim'],3)\
+           +' & '+getNumString(nCRAntiSel[srNJet][stb][htb][ttCRbtb]['RcsSel'], nCRAntiSel[srNJet][stb][htb][ttCRbtb]['RcsSelErr_sim'],3)+'\\\\'
+print '\\hline\end{tabular}}\end{center}\caption{$R^{QCD}_{CS} $ factors from anti-selected Data in the 4-5j, 1b CR}\label{tab:1b_QCDrcs}\end{table}'
 
 print "Results QCD estimation"
 print
