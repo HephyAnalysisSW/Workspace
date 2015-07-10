@@ -31,7 +31,7 @@ cTTJets = getChain(ttJets[lepSel],histname='',maxN=maxN)
 
 from localInfo import username
 uDir = username[0]+'/'+username
-subDir = 'PHYS14v3/rCS/2-4jetPredStudy/'
+subDir = 'PHYS14v3/rCS/'
 
 path = '/afs/hephy.at/user/'+uDir+'/www/'+subDir+'/'
 if not os.path.exists(path):
@@ -44,18 +44,6 @@ dPhiStr = 'deltaPhi_Wl'
 ROOT.gStyle.SetOptStat(0)
 
 ROOT.TH1F().SetDefaultSumw2()
-#def getRCS(c, cut, dPhiCut):
-#  h = getPlotFromChain(c, dPhiStr, [0,dPhiCut,pi], cutString=cut, binningIsExplicit=True)
-#  if h.GetBinContent(1)>0 and h.GetBinContent(2)>0:
-#    rcs = h.GetBinContent(2)/h.GetBinContent(1)
-#    rcsE = rcs*sqrt(h.GetBinError(2)**2/h.GetBinContent(2)**2 + h.GetBinError(1)**2/h.GetBinContent(1)**2)
-#    del h
-#    return rcs, rcsE
-#  else :
-#    rcs =  0
-#    rcsE = 0
-#    return rcs, rcsE 
-#    del h
 
 channels = [['ele',11],['mu',13],['both',0]]
 
@@ -65,14 +53,18 @@ if channel == 'ele':
 elif channel =='mu':
   pdgId = 13
 
-streg = [[(250, 350), 1.], [(350, 450), 1.],  [(450, -1), 1.] ]
+streg = [[(350, 450), 1.],  [(450, -1), 1.] ]
 htreg = [(500,750),(750,1000),(1000,-1)]#,(1000,1250),(1250,-1)]#,(1250,-1)]
 btreg = (0,0)
-njreg = [(2,4),(5,5),(6,7),(8,-1)]#,(7,7),(8,8),(9,9)]
+njreg = [(2,2),(3,3),(4,4),(5,5),(6,7),(8,-1)]#,(7,7),(8,8),(9,9)]
 nbjreg = [(0,0),(1,1),(2,2)]
+
+#Usage of GenMet for deltaPhi / rCS
+GenMetSwitch = False
 
 #presel="singleMuonic&&nVetoMuons==1&&nVetoElectrons==0&&nBJetMedium40==1"
 #presel="singleMuonic&&nVetoMuons==1&&nVetoElectrons==0&&nBJetMedium25==0"
+#presel='singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&met_genPt>200'
 presel='singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80'
 prefix = presel.split('&&')[0]+'_'
 
@@ -190,9 +182,9 @@ for lep, pdgId in channels:
           poscut = 'leptonPdg>0&&'+cut
           negcut = 'leptonPdg<0&&'+cut
           dPhiCut = dynDeltaPhi(1.0,stb, htb, njb)
-          rcs = getRCS(c, cut, dPhiCut)
-          rcsPos = getRCS(c, poscut, dPhiCut)
-          rcsNeg = getRCS(c, negcut, dPhiCut)
+          rcs = getRCS(c, cut, dPhiCut, useGenMet=GenMetSwitch)
+          rcsPos = getRCS(c, poscut, dPhiCut, useGenMet=GenMetSwitch)
+          rcsNeg = getRCS(c, negcut, dPhiCut, useGenMet=GenMetSwitch)
           print rcs, dPhiCut
           res = rcs['rCS']
           resErr = rcs['rCSE_sim']
@@ -269,7 +261,7 @@ for lep, pdgId in channels:
         FitParDError = FitFunc.GetParError(0)
         FitParK = FitFunc.GetParameter(1)
         FitParKError = FitFunc.GetParError(1)
-        FitFunc.SetLineColor(ROOT_colors[istb])
+        FitFunc.SetLineColor(ROOT_colors[ihtb])
         FitFunc.SetLineStyle(2)
         FitFunc.SetLineWidth(2)
         rcsDict[lep][name][stb][htb].update({'D':FitParD, 'DErr':FitParDError, 'K':FitParK, 'Kerr':FitParKError})
@@ -292,7 +284,7 @@ for lep, pdgId in channels:
           h_nj[lep][name][stb][htb].Draw()
         else:
           h_nj[lep][name][stb][htb].Draw('same')
-        text.DrawLatex(0.4,0.75-0.05*istb,str(round(FitParK*1000,2))+'#pm'+str(round(FitParKError*1000,2)))
+        text.DrawLatex(0.4,0.75-0.05*ihtb,str(round(FitParK*1000,2))+'#pm'+str(round(FitParKError*1000,2)))
         FitFunc.Draw("same")
       l.Draw()
       c1.Print(path+prefix+'_rCS_njet_'+lep+'_'+name+'_'+nameAndCut(stb,htb=None,njetb=None, btb=btreg, presel=presel)[0]+".pdf")
@@ -307,7 +299,6 @@ for lep, pdgId in channels:
       pad1.Draw()
       pad1.cd()
       first = True 
-  #    l = ROOT.TLegend(0.15,0.65,0.4,0.78)#left aligned legend
       l = ROOT.TLegend(0.6,0.65,0.9,0.78)#right aligned legend
       l.SetFillColor(ROOT.kWhite)
       l.SetShadowColor(ROOT.kWhite)

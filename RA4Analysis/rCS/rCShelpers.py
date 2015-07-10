@@ -4,8 +4,6 @@ from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYi
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName, nBTagBinName, varBinName
 from math import sqrt, pi
 
-dPhiStr = 'deltaPhi_Wl' #= "acos((leptonPt+met*cos(leptonPhi-metPhi))/sqrt(leptonPt**2+met**2+2*met*leptonPt*cos(leptonPhi-metPhi)))"
-lumi = 3 #fb-1 
 
 def makeWeight(lumi=4.):
   weight_str = '(((weight)/4)*'+str(lumi)+')'
@@ -15,8 +13,10 @@ def makeWeight(lumi=4.):
 
 #ROOT.TH1F().SetDefaultSumw2()
 
-def getRCS(c, cut, dPhiCut):   
-#  dPhiStr = "acos((leptonPt+met*cos(leptonPhi-metPhi))/sqrt(leptonPt**2+met**2+2*met*leptonPt*cos(leptonPhi-metPhi)))"
+def getRCS(c, cut, dPhiCut, useGenMet=False, useAllGen=False):   
+  if useGenMet: dPhiStr = "acos((leptonPt+met_genPt*cos(leptonPhi-met_genPhi))/sqrt(leptonPt**2+met_genPt**2+2*met_genPt*leptonPt*cos(leptonPhi-met_genPhi)))"
+  else: dPhiStr = 'deltaPhi_Wl'
+  if useAllGen: dPhiStr = "acos((genLep_pt+met_genPt*cos(genLep_phi-met_genPhi))/sqrt(genLep_pt**2+met_genPt**2+2*met_genPt*genLep_pt*cos(genLep_phi-met_genPhi)))"
   h = getPlotFromChain(c, dPhiStr, [0,dPhiCut,pi], cutString=cut, binningIsExplicit=True)
   h.Sumw2()
   if h.GetBinContent(1)>0:

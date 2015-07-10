@@ -232,6 +232,16 @@ def nameAndCut(stb, htb, njetb, btb=None, presel="(1)", charge="", btagVar = 'nB
   if name.startswith('_'):name=name[1:]
   return [name, cut]
 
+def binToFileName(a):
+  if len(njetb)>1 and njetb[0] == njetb[1]:
+    name+='_njetEq'+str(njetb[0])
+  else:
+    cut+='&&nJet30>='+str(njetb[0])
+    name+='_njet'+str(njetb[0])
+    if len(njetb)>1 and njetb[1]>=0:
+      cut+='&&nJet30<='+str(njetb[1])
+      name+='-'+str(njetb[1])
+
 #def wRecoPt(chain):
 #  lPt = getVarValue(chain, "leptonPt")
 #  lPhi = getVarValue(chain, "leptonPhi")
