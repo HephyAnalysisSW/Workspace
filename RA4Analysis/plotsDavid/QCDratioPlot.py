@@ -10,6 +10,7 @@ from Workspace.HEPHYPythonTools.helpers import *
 from Workspace.HEPHYPythonTools.xsec import *
 from Workspace.RA4Analysis.helpers import *
 from Workspace.RA4Analysis.cmgTuples_v1_PHYS14V3 import *
+from Workspace.RA4Analysis.signalRegions import *
 from draw_helpers import *
 from math import *
 from localInfo import username
@@ -21,16 +22,22 @@ presel = 'QCDratio_singleElectronic_'
 
 if not os.path.exists(wwwDir):
   os.makedirs(wwwDir)
-
-htreg = [(500,1000),(1000,-1)]
+#define SR
+htreg = [(500, 750)]
 streg = [(250,350), (350,450), (450,-1)]
-njreg = [(3,4), (5,5), (6,7), (8,-1)]
+njreg = [(2,3), (3,4), (5,5), (6,7), (8,-1)]
 btreg = [(0,0)]
 
 #small = True
 small = False
 #doFit = True
 doFit = False
+
+if small:
+  htreg = [(500,750)]
+  streg = [(350,450)]
+  njreg = [(5,5)]
+  btreg = [(0,0)]
 
 eleVarList = ['pt', 'eta', 'phi', 'pdgId', 'miniRelIso', 'convVeto', 'sip3d', 'mvaIdPhys14', 'charge', 'lostHits']
 eleFromW = ['pt', 'eta', 'phi', 'pdgId', 'motherId', 'grandmotherId', 'charge', 'sourceId']
@@ -147,14 +154,14 @@ for sample in Bkg:
 
 histos = {}
 bins = {}
-for htb in htreg:
-  bins[htb] = {}
+for srNJet in njreg:
+  bins[srNJet] = {}
   for stb in streg:
-    bins[htb][stb] = {}
-    for srNJet in njreg:
-      bins[htb][stb][srNJet] = {}
+    bins[srNJet][stb] = {}
+    for htb in htreg:
+      bins[srNJet][stb][htb] = {}
       for btb in btreg:
-        bins[htb][stb][srNJet][btb]={}
+        bins[srNJet][stb][htb][btb]={}
 
         print 'Binning => ht: ',htb,'st: ',stb,'NJet: ',srNJet
         SRname = nameAndCut(stb, htb, srNJet, btb=btb, presel="(1)", charge="", btagVar = 'nBJetMediumCSV30')[0]#use this function only for the name string!!!
@@ -291,7 +298,7 @@ for htb in htreg:
           sample['nSelectedErr'] = nSampleSelectedErr
           sample['nAntiSelected'] = nSampleAntiSelected
           sample['nAntiSelectedErr'] = nSampleAntiSelectedErr
-          bins[htb][stb][srNJet][btb].update({sample['name']+'_nSelected':sample['nSelected'], sample['name']+'_nSelectedErr':sample['nSelectedErr'],\
+          bins[srNJet][stb][htb][btb].update({sample['name']+'_nSelected':sample['nSelected'], sample['name']+'_nSelectedErr':sample['nSelectedErr'],\
                                               sample['name']+'_nAntiSelected':sample['nAntiSelected'], sample['name']+'_nAntiSelectedErr':sample['nAntiSelectedErr']})
           nSelected += sample['nSelected'] 
           nSelectedVar += sample['nSelectedErr']**2 
@@ -303,7 +310,7 @@ for htb in htreg:
             nQCDAntiSelected += sample['nAntiSelected']
             nQCDAntiSelectedVar += sample['nAntiSelectedErr']**2
     
-          bins[htb][stb][srNJet][btb].update({'nSelected':nSelected, 'nSelectedVar':nSelectedVar,\
+          bins[srNJet][stb][htb][btb].update({'nSelected':nSelected, 'nSelectedVar':nSelectedVar,\
                                               'nAntiSelected':nAntiSelected, 'nAntiSelectedVar':nAntiSelectedVar,\
                                               'nQCDSelected':nQCDSelected, 'nQCDSelectedVar':nQCDSelectedVar,\
                                               'nQCDAntiSelected':nQCDAntiSelected, 'nQCDAntiSelectedVar':nQCDAntiSelectedVar})
@@ -314,7 +321,7 @@ text.SetNDC()
 text.SetTextSize(0.04)
 text.SetTextAlign(11)
 
-#plot F_sel-to-antisel binned in HT for all Njets
+##plot F_sel-to-antisel binned in HT for all Njets
 #ratio_ht={}
 #for stb in streg:
 #  ratio_ht[stb]={}
@@ -337,10 +344,10 @@ text.SetTextAlign(11)
 #      ratio_ht[stb][njb][btb].SetLineColor(ROOT_colors[i_njb])
 #      ratio_ht[stb][njb][btb].SetLineWidth(2)
 #      for i_htb, htb in enumerate(htreg):
-#        nQCDsel = bins[htb][stb][njb][btb]['nQCDSelected'] 
-#        nQCDselVar = bins[htb][stb][njb][btb]['nQCDSelectedVar'] 
-#        nQCDantisel = bins[htb][stb][njb][btb]['nAntiSelected'] 
-#        nQCDantiselVar = bins[htb][stb][njb][btb]['nAntiSelectedVar'] 
+#        nQCDsel = bins[njb][stb][htb][btb]['nQCDSelected'] 
+#        nQCDselVar = bins[njb][stb][htb][btb]['nQCDSelectedVar'] 
+#        nQCDantisel = bins[njb][stb][htb][btb]['nAntiSelected'] 
+#        nQCDantiselVar = bins[njb][stb][htb][btb]['nAntiSelectedVar'] 
 ##          print nQCDsel, nQCDantisel
 #        if nQCDantisel>0:
 #          F=nQCDsel/nQCDantisel
@@ -350,9 +357,10 @@ text.SetTextAlign(11)
 #            ratio_ht[stb][njb][btb].SetBinContent(i_htb+1,F)
 #            ratio_ht[stb][njb][btb].SetBinError(i_htb+1,F_err)
 #            print 'F_sel-to-anti-sel Error('+str(stb)+','+str(njb)+','+str(htb)+'):',F_err
-#            bins[htb][stb][njb][btb].update({'F_seltoantiselMC':F, 'F_err':F_err})
+#            bins[njb][stb][htb][btb].update({'F_seltoantiselMC':F, 'F_err':F_err})
 #        ratio_ht[stb][njb][btb].GetXaxis().SetBinLabel(i_htb+1, varBinName(htb,'H_{T}'))
 #        ratio_ht[stb][njb][btb].GetYaxis().SetTitle('F_{sel-to-antisel}')
+#        ratio_ht[stb][njb][btb].GetYaxis().SetRangeUser(0.0,1.0)
 ##        ratio_ht[stb][njb].GetXaxis().SetTitle('F_{sel-to-antisel}')
 #      l.AddEntry(ratio_ht[stb][njb][btb], nJetBinName(njb))
 #      if first:
@@ -367,6 +375,108 @@ text.SetTextAlign(11)
 #      canv.Print(wwwDir+presel+'Fsa_ht_'+nameAndCut(stb, None, None, btb=btb, presel="(1)", charge="", btagVar = 'nBJetMediumCSV30')[0]+'.png')
 #      canv.Print(wwwDir+presel+'Fsa_ht_'+nameAndCut(stb, None, None, btb=btb, presel="(1)", charge="", btagVar = 'nBJetMediumCSV30')[0]+'.pdf')
 #      canv.Print(wwwDir+presel+'Fsa_ht_'+nameAndCut(stb, None, None, btb=btb, presel="(1)", charge="", btagVar = 'nBJetMediumCSV30')[0]+'.root')
+#
+#
+##plot F_sel-to-antisel binned in ST for all Njets
+#ratio_st={}
+#for htb in htreg:
+#  ratio_st[htb]={}
+#  first = True
+#  canv2= ROOT.TCanvas('canv2','canv2',600,600)
+#  #canv.SetLogy()
+#  l2 = ROOT.TLegend(0.65,0.85,0.95,0.95)
+#  l2.SetFillColor(0)
+#  l2.SetBorderSize(1)
+#  l2.SetShadowColor(ROOT.kWhite)
+#  
+#  t=ROOT.TLatex()
+#  t.SetNDC()
+#  t.SetTextSize(0.04)
+#  t.SetTextAlign(11)
+#  for i_njb, njb in enumerate(njreg):
+#    ratio_st[htb][njb]={}
+#    for btb in btreg:
+#      ratio_st[htb][njb][btb]=ROOT.TH1F('ratio_stHist','ratio_stHist',len(streg),0,len(streg))
+#      ratio_st[htb][njb][btb].SetLineColor(ROOT_colors[i_njb])
+#      ratio_st[htb][njb][btb].SetLineWidth(2)
+#      for i_stb, stb in enumerate(streg):
+#        nQCDsel = bins[njb][stb][htb][btb]['nQCDSelected'] 
+#        nQCDselVar = bins[njb][stb][htb][btb]['nQCDSelectedVar'] 
+#        nQCDantisel = bins[njb][stb][htb][btb]['nAntiSelected'] 
+#        nQCDantiselVar = bins[njb][stb][htb][btb]['nAntiSelectedVar'] 
+##          print nQCDsel, nQCDantisel
+#        if nQCDantisel>0:
+#          F=nQCDsel/nQCDantisel
+#          print 'F_sel-to-anti-sel('+str(stb)+','+str(njb)+','+str(htb)+'):',F
+#          if F>0:
+#            F_err= F*sqrt(nQCDselVar/nQCDsel**2+nQCDantiselVar/nQCDantisel**2)
+#            ratio_st[htb][njb][btb].SetBinContent(i_stb+1,F)
+#            ratio_st[htb][njb][btb].SetBinError(i_stb+1,F_err)
+#            print 'F_sel-to-anti-sel Error('+str(stb)+','+str(njb)+','+str(htb)+'):',F_err
+#        ratio_st[htb][njb][btb].GetXaxis().SetBinLabel(i_stb+1, varBinName(stb,'S_{T}'))
+#        ratio_st[htb][njb][btb].GetYaxis().SetTitle('F_{sel-to-antisel}')
+#        ratio_st[htb][njb][btb].GetYaxis().SetRangeUser(0.0,1.0)
+##        ratio_st[htb][njb].GetXaxis().SetTitle('F_{sel-to-antisel}')
+#      l2.AddEntry(ratio_st[htb][njb][btb], nJetBinName(njb))
+#      if first:
+#        ratio_st[htb][njb][btb].Draw()
+#        first = False
+#      else:
+#        ratio_st[htb][njb][btb].Draw('same') 
+#      l2.Draw()
+#      t.DrawLatex(0.175,0.85,varBinName(htb,'H_{T}'))
+#      text.DrawLatex(0.15,.96,"CMS Simulation")
+#      text.DrawLatex(0.65,0.96,"L="+str(target_lumi/1000)+" fb^{-1} (13 TeV)")
+#      canv2.Print(wwwDir+presel+'Fsa_st_'+nameAndCut(None, htb, njetb=None, btb=btb, presel="(1)", charge="", btagVar = 'nBJetMediumCSV30')[0]+'.png')
+#      canv2.Print(wwwDir+presel+'Fsa_st_'+nameAndCut(None, htb, njetb=None, btb=btb, presel="(1)", charge="", btagVar = 'nBJetMediumCSV30')[0]+'.pdf')
+#      canv2.Print(wwwDir+presel+'Fsa_st_'+nameAndCut(None, htb, njetb=None, btb=btb, presel="(1)", charge="", btagVar = 'nBJetMediumCSV30')[0]+'.root')
+#
+##plot F_sel-to-antisel binned in ST vs HT
+#ratio_2d={}
+#for njb in njreg:
+#  ratio_2d[njb]={}
+#  canv3= ROOT.TCanvas('canv3','canv3',600,600)
+#  #canv.SetLogy()
+##  l3 = ROOT.TLegend(0.65,0.75,0.95,0.95)
+##  l3.SetFillColor(0)
+##  l3.SetBorderSize(1)
+##  l3.SetShadowColor(ROOT.kWhite)
+#  
+#  t=ROOT.TLatex()
+#  t.SetNDC()
+#  t.SetTextSize(0.04)
+#  t.SetTextAlign(11)
+#  for btb in btreg:
+#    ratio_2d[njb][btb]={}
+#    ratio_2d[njb][btb]=ROOT.TH2F('ratio_2dHist','ratio_2dHist',len(htreg),0,len(htreg),len(streg),0,len(streg))
+#    for i_htb, htb in enumerate(htreg):
+#      ratio_2d[njb][btb].GetXaxis().SetBinLabel(i_htb+1,varBinName(htb,'H_{T}'))
+#    for i_stb, stb in enumerate(streg):
+#      ratio_2d[njb][btb].GetYaxis().SetBinLabel(i_stb+1,varBinName(stb,'S_{T}'))
+#
+#    for i_htb, htb in enumerate(htreg):
+#      for i_stb, stb in enumerate(streg):
+#        nQCDsel = bins[njb][stb][htb][btb]['nQCDSelected'] 
+#        nQCDselVar = bins[njb][stb][htb][btb]['nQCDSelectedVar'] 
+#        nQCDantisel = bins[njb][stb][htb][btb]['nAntiSelected'] 
+#        nQCDantiselVar = bins[njb][stb][htb][btb]['nAntiSelectedVar'] 
+##          print nQCDsel, nQCDantisel
+#        if nQCDantisel>0:
+#          F=nQCDsel/nQCDantisel
+#          print 'F_sel-to-anti-sel('+str(stb)+','+str(njb)+','+str(htb)+'):',F
+#          if F>0:
+#            F_err= F*sqrt(nQCDselVar/nQCDsel**2+nQCDantiselVar/nQCDantisel**2)
+#            ratio_2d[njb][btb].SetBinContent(i_htb+1,i_stb+1,F)
+#            ratio_2d[njb][btb].SetBinError(i_htb+1,i_stb+1,F_err)
+#            print 'F_sel-to-anti-sel Error('+str(stb)+','+str(njb)+','+str(htb)+'):',F_err
+##      l.AddEntry(ratio_2d[htb][njb][btb], nJetBinName(njb))
+#        ratio_2d[njb][btb].Draw('COLZ TEXTE')
+#      t.DrawLatex(0.175,0.85,nJetBinName(njb))
+#      text.DrawLatex(0.15,.96,"CMS Simulation")
+#      text.DrawLatex(0.65,0.96,"L="+str(target_lumi/1000)+" fb^{-1} (13 TeV)") 
+#      canv3.Print(wwwDir+presel+'st_vs_ht_'+nameAndCut(None, None, njetb=njb, btb=btb, presel="(1)", charge="", btagVar = 'nBJetMediumCSV30')[0]+'.png')
+#      canv3.Print(wwwDir+presel+'st_vs_ht_'+nameAndCut(None, None, njetb=njb, btb=btb, presel="(1)", charge="", btagVar = 'nBJetMediumCSV30')[0]+'.pdf')
+#      canv3.Print(wwwDir+presel+'st_vs_ht_'+nameAndCut(None, None, njetb=njb, btb=btb, presel="(1)", charge="", btagVar = 'nBJetMediumCSV30')[0]+'.root')
 
 #plot F_sel-to-antisel binned in nJets for all ST bins
 ratio_nj={}
@@ -394,10 +504,10 @@ for htb in htreg:
       ratio_nj[htb][stb][btb].SetLineColor(ROOT_colors[i_stb])
       ratio_nj[htb][stb][btb].SetLineWidth(2)
       for i_njb, njb in enumerate(njreg):
-        nQCDsel = bins[htb][stb][njb][btb]['nQCDSelected'] 
-        nQCDselVar = bins[htb][stb][njb][btb]['nQCDSelectedVar'] 
-        nQCDantisel = bins[htb][stb][njb][btb]['nAntiSelected'] 
-        nQCDantiselVar = bins[htb][stb][njb][btb]['nAntiSelectedVar'] 
+        nQCDsel = bins[njb][stb][htb][btb]['nQCDSelected'] 
+        nQCDselVar = bins[njb][stb][htb][btb]['nQCDSelectedVar'] 
+        nQCDantisel = bins[njb][stb][htb][btb]['nAntiSelected'] 
+        nQCDantiselVar = bins[njb][stb][htb][btb]['nAntiSelectedVar'] 
 #          print nQCDsel, nQCDantisel
         if nQCDantisel>0:
           F=nQCDsel/nQCDantisel
@@ -409,6 +519,7 @@ for htb in htreg:
             print 'F_sel-to-anti-sel Error('+str(stb)+','+str(njb)+','+str(htb)+'):',F_err
         ratio_nj[htb][stb][btb].GetXaxis().SetBinLabel(i_njb+1, nJetBinName(njb))
         ratio_nj[htb][stb][btb].GetYaxis().SetTitle('F_{sel-to-antisel}')
+        ratio_nj[htb][stb][btb].GetYaxis().SetRangeUser(0.0,1.0)
 #        ratio_ht[stb][njb].GetXaxis().SetTitle('F_{sel-to-antisel}')
       l3.AddEntry(ratio_nj[htb][stb][btb], varBinName(stb,'S_{T}'))
       if first:
@@ -423,106 +534,6 @@ for htb in htreg:
       canv4.Print(wwwDir+presel+'Fsa_nj_'+nameAndCut(None, htb, None, btb=btb, presel="(1)", charge="", btagVar = 'nBJetMediumCSV30')[0]+'.png')
       canv4.Print(wwwDir+presel+'Fsa_nj_'+nameAndCut(None, htb, None, btb=btb, presel="(1)", charge="", btagVar = 'nBJetMediumCSV30')[0]+'.pdf')
       canv4.Print(wwwDir+presel+'Fsa_nj_'+nameAndCut(None, htb, None, btb=btb, presel="(1)", charge="", btagVar = 'nBJetMediumCSV30')[0]+'.root')
-
-#plot F_sel-to-antisel binned in ST for all Njets
-#ratio_st={}
-#for htb in htreg:
-#  ratio_st[htb]={}
-#  first = True
-#  canv2= ROOT.TCanvas('canv2','canv2',600,600)
-#  #canv.SetLogy()
-#  l2 = ROOT.TLegend(0.65,0.85,0.95,0.95)
-#  l2.SetFillColor(0)
-#  l2.SetBorderSize(1)
-#  l2.SetShadowColor(ROOT.kWhite)
-#  
-#  t=ROOT.TLatex()
-#  t.SetNDC()
-#  t.SetTextSize(0.04)
-#  t.SetTextAlign(11)
-#  for i_njb, njb in enumerate(njreg):
-#    ratio_st[htb][njb]={}
-#    for btb in btreg:
-#      ratio_st[htb][njb][btb]=ROOT.TH1F('ratio_stHist','ratio_stHist',len(streg),0,len(streg))
-#      ratio_st[htb][njb][btb].SetLineColor(ROOT_colors[i_njb])
-#      ratio_st[htb][njb][btb].SetLineWidth(2)
-#      for i_stb, stb in enumerate(streg):
-#        nQCDsel = bins[htb][stb][njb][btb]['nQCDSelected'] 
-#        nQCDselVar = bins[htb][stb][njb][btb]['nQCDSelectedVar'] 
-#        nQCDantisel = bins[htb][stb][njb][btb]['nAntiSelected'] 
-#        nQCDantiselVar = bins[htb][stb][njb][btb]['nAntiSelectedVar'] 
-##          print nQCDsel, nQCDantisel
-#        if nQCDantisel>0:
-#          F=nQCDsel/nQCDantisel
-#          print 'F_sel-to-anti-sel('+str(stb)+','+str(njb)+','+str(htb)+'):',F
-#          if F>0:
-#            F_err= F*sqrt(nQCDselVar/nQCDsel**2+nQCDantiselVar/nQCDantisel**2)
-#            ratio_st[htb][njb][btb].SetBinContent(i_stb+1,F)
-#            ratio_st[htb][njb][btb].SetBinError(i_stb+1,F_err)
-#            print 'F_sel-to-anti-sel Error('+str(stb)+','+str(njb)+','+str(htb)+'):',F_err
-#        ratio_st[htb][njb][btb].GetXaxis().SetBinLabel(i_stb+1, varBinName(stb,'S_{T}'))
-#        ratio_st[htb][njb][btb].GetYaxis().SetTitle('F_{sel-to-antisel}')
-##        ratio_st[htb][njb].GetXaxis().SetTitle('F_{sel-to-antisel}')
-#      l2.AddEntry(ratio_st[htb][njb][btb], nJetBinName(njb))
-#      if first:
-#        ratio_st[htb][njb][btb].Draw()
-#        first = False
-#      else:
-#        ratio_st[htb][njb][btb].Draw('same') 
-#      l2.Draw()
-#      t.DrawLatex(0.175,0.85,varBinName(htb,'H_{T}'))
-#      text.DrawLatex(0.15,.96,"CMS Simulation")
-#      text.DrawLatex(0.65,0.96,"L="+str(target_lumi/1000)+" fb^{-1} (13 TeV)")
-#      canv2.Print(wwwDir+presel+'Fsa_st_'+nameAndCut(None, htb, njetb=None, btb=btb, presel="(1)", charge="", btagVar = 'nBJetMediumCSV30')[0]+'.png')
-#      canv2.Print(wwwDir+presel+'Fsa_st_'+nameAndCut(None, htb, njetb=None, btb=btb, presel="(1)", charge="", btagVar = 'nBJetMediumCSV30')[0]+'.pdf')
-#      canv2.Print(wwwDir+presel+'Fsa_st_'+nameAndCut(None, htb, njetb=None, btb=btb, presel="(1)", charge="", btagVar = 'nBJetMediumCSV30')[0]+'.root')
-
-#plot F_sel-to-antisel binned in ST vs HT
-#ratio_2d={}
-#for njb in njreg:
-#  ratio_2d[njb]={}
-#  canv3= ROOT.TCanvas('canv3','canv3',600,600)
-#  #canv.SetLogy()
-##  l3 = ROOT.TLegend(0.65,0.75,0.95,0.95)
-##  l3.SetFillColor(0)
-##  l3.SetBorderSize(1)
-##  l3.SetShadowColor(ROOT.kWhite)
-#  
-#  t=ROOT.TLatex()
-#  t.SetNDC()
-#  t.SetTextSize(0.04)
-#  t.SetTextAlign(11)
-#  for btb in btreg:
-#    ratio_2d[njb][btb]={}
-#    ratio_2d[njb][btb]=ROOT.TH2F('ratio_2dHist','ratio_2dHist',len(htreg),0,len(htreg),len(streg),0,len(streg))
-#    for i_htb, htb in enumerate(htreg):
-#      ratio_2d[njb][btb].GetXaxis().SetBinLabel(i_htb+1,varBinName(htb,'H_{T}'))
-#    for i_stb, stb in enumerate(streg):
-#      ratio_2d[njb][btb].GetYaxis().SetBinLabel(i_stb+1,varBinName(stb,'S_{T}'))
-#
-#    for i_htb, htb in enumerate(htreg):
-#      for i_stb, stb in enumerate(streg):
-#        nQCDsel = bins[htb][stb][njb][btb]['nQCDSelected'] 
-#        nQCDselVar = bins[htb][stb][njb][btb]['nQCDSelectedVar'] 
-#        nQCDantisel = bins[htb][stb][njb][btb]['nAntiSelected'] 
-#        nQCDantiselVar = bins[htb][stb][njb][btb]['nAntiSelectedVar'] 
-##          print nQCDsel, nQCDantisel
-#        if nQCDantisel>0:
-#          F=nQCDsel/nQCDantisel
-#          print 'F_sel-to-anti-sel('+str(stb)+','+str(njb)+','+str(htb)+'):',F
-#          if F>0:
-#            F_err= F*sqrt(nQCDselVar/nQCDsel**2+nQCDantiselVar/nQCDantisel**2)
-#            ratio_2d[njb][btb].SetBinContent(i_htb+1,i_stb+1,F)
-#            ratio_2d[njb][btb].SetBinError(i_htb+1,i_stb+1,F_err)
-#            print 'F_sel-to-anti-sel Error('+str(stb)+','+str(njb)+','+str(htb)+'):',F_err
-##      l.AddEntry(ratio_2d[htb][njb][btb], nJetBinName(njb))
-#        ratio_2d[njb][btb].Draw('COLZ TEXTE')
-#      t.DrawLatex(0.175,0.85,nJetBinName(njb))
-#      text.DrawLatex(0.15,.96,"CMS Simulation")
-#      text.DrawLatex(0.65,0.96,"L="+str(target_lumi/1000)+" fb^{-1} (13 TeV)") 
-#      canv3.Print(wwwDir+presel+'st_vs_ht_'+nameAndCut(None, None, njetb=njb, btb=btb, presel="(1)", charge="", btagVar = 'nBJetMediumCSV30')[0]+'.png')
-#      canv3.Print(wwwDir+presel+'st_vs_ht_'+nameAndCut(None, None, njetb=njb, btb=btb, presel="(1)", charge="", btagVar = 'nBJetMediumCSV30')[0]+'.pdf')
-#      canv3.Print(wwwDir+presel+'st_vs_ht_'+nameAndCut(None, None, njetb=njb, btb=btb, presel="(1)", charge="", btagVar = 'nBJetMediumCSV30')[0]+'.root')
 
 #path = '/data/'+username+'/results2015/rCS_0b/'
 #if not os.path.exists(path):
