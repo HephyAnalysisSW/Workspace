@@ -28,7 +28,7 @@ if not os.path.exists(wwwDir):
 #streg = [(200,-1),(250,350), (350,450), (450,-1)]
 #njreg = [(4,5), (5,5), (6,7), (8,-1)]
 CRnjreg = (4,5)
-btreg = [(1,1)]
+btreg = [(0,0),(1,1),(2,2),(3,-1)]
 
 #small = True
 small = False
@@ -159,13 +159,13 @@ for njb in sorted(signalRegion3fb):
         dPhiCut = signalRegion3fb[njb][stb][htb]['deltaPhi']
         dPhiBinning = [0,dPhiCut,pi]
         print 'Binning => ht: ',htb,'st: ',stb,'NJet: ',njb,'dPhiCut: ',dPhiCut
-        SRname = nameAndCut(stb, htb, CRnjreg, btb=btb, presel="(1)", charge="", btagVar = 'nBJetMediumCSV30')[0]#use this function only for the name string!!!
+        SRname = nameAndCut(stb, htb, njb, btb=btb, presel="(1)", charge="", btagVar = 'nBJetMediumCSV30')[0]#use this function only for the name string!!!
         #cut only includes very loose lepton selection, HT cut, NJet cut, Btagging and subleading JetPt>=80!!! St cut applied in the Event Loop!!!
 #        cut = '(Sum$(abs(LepGood_pdgId)==11&&abs(LepGood_dxy)<=0.05&&abs(LepGood_dz)<=0.1)+Sum$(abs(LepOther_pdgId)==11&&abs(LepOther_dxy)<=0.05&&abs(LepOther_dz)<=0.1)>=1)&&'+htCut(htb, minPt=30, maxEta=2.4, njCorr=0.)+'&&'+ nBTagCut(btb, minPt=30, maxEta=2.4, minCSVTag=0.814)+'&&'+nJetCut(srNJet, minPt=30, maxEta=2.4)+'&&'+nJetCut(2, minPt=80, maxEta=2.4)
         SelCut = singleElectronVeto+'&&'+singleHardElectron+'&&(Sum$('+SelStr+')==1)&&'+stCutQCD(stb)+'&&'+htCut(htb, minPt=30, maxEta=2.4, njCorr=0.)+'&&'+ nBTagCut(btb, minPt=30, maxEta=2.4, minCSVTag=0.814)\
-                 +'&&'+nJetCut(CRnjreg, minPt=30, maxEta=2.4)+'&&'+nJetCut(2, minPt=80, maxEta=2.4)
+                 +'&&'+nJetCut(njb, minPt=30, maxEta=2.4)+'&&'+nJetCut(2, minPt=80, maxEta=2.4)
         antiSelCut = singleElectronVetoAnti+'&&'+singleHardElectron+'&&(Sum$('+antiSelStr+')==1)&&'+stCutQCD(stb)+'&&'+htCut(htb, minPt=30, maxEta=2.4, njCorr=0.)+'&&'+ nBTagCut(btb, minPt=30, maxEta=2.4, minCSVTag=0.814)\
-                     +'&&'+nJetCut(CRnjreg, minPt=30, maxEta=2.4)+'&&'+nJetCut(2, minPt=80, maxEta=2.4)
+                     +'&&'+nJetCut(njb, minPt=30, maxEta=2.4)+'&&'+nJetCut(2, minPt=80, maxEta=2.4)
 
         histos['merged_QCD']={}
         histos['merged_EWK']={}
@@ -203,12 +203,21 @@ for njb in sorted(signalRegion3fb):
         NdataAntiSel =  nEWKAntiSel + nQCDAntiSel
         NdataAntiSel_err = sqrt(nEWKAntiSel_err**2 + nQCDAntiSel_err**2)
 
-        rd = {'sideBand':CRnjreg,\
+        #Event yields in low and high dPhi region
+        nQCDSel_lowdPhi = histos['merged_QCD']['Selection'].GetBinContent(1)
+        nQCDSel_lowdPhi_err = histos['merged_QCD']['Selection'].GetBinError(1)
+        nQCDSel_highdPhi = histos['merged_QCD']['Selection'].GetBinContent(2)
+        nQCDSel_highdPhi_err = histos['merged_QCD']['Selection'].GetBinError(2)
+    
+
+        rd = {
               'NdataSel':NdataSel, 'NdataSel_err':float(NdataSel_err),\
               'NdataAntiSel':NdataAntiSel, 'NdataAntiSel_err':float(NdataAntiSel_err),\
               'NEWKSelMC':nEWKSel, 'NEWKSelMC_err':float(nEWKSel_err),\
               'NEWKAntiSelMC':nEWKAntiSel, 'NEWKAntiSelMC_err':float(nEWKAntiSel_err),\
               'NQCDSelMC':nQCDSel, 'NQCDSelMC_err':float(nQCDSel_err),\
+              'NQCDSelLowdPhi':nQCDSel_lowdPhi, 'NQCDSelLowdPhi_err':nQCDSel_lowdPhi_err,\
+              'NQCDSelHighdPhi':nQCDSel_highdPhi, 'NQCDSelHighdPhi_err':nQCDSel_highdPhi_err,\
               'NQCDAntiSelMC':nQCDAntiSel, 'NQCDAntiSelMC_err':float(nQCDAntiSel_err)}        
 
         if histos['merged_QCD']['Selection'].GetBinContent(1)>0 and histos['merged_QCD']['Selection'].GetBinContent(2)>0:
@@ -268,5 +277,5 @@ for njb in sorted(signalRegion3fb):
 path = '/data/'+username+'/results2015/rCS_0b/'
 if not os.path.exists(path):
   os.makedirs(path)
-pickle.dump(bins, file(path+'RcsQCD_4-5j_1b_'+str(target_lumi/1000)+'fb-1_pkl','w'))
+pickle.dump(bins, file(path+'RcsQCD_'+str(target_lumi/1000)+'fb-1_pkl','w'))
 

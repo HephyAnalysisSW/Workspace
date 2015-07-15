@@ -130,11 +130,40 @@ for srNJet in sorted(signalRegion):
     for htb in sorted(signalRegion[srNJet][stb]):
       if not first: print '&'
       first = False
-#      res, res_err = getQCDfraction(nCRAntiSel[srNJet][stb][htb][ttCRbtb]['NdataSel'],nCRAntiSel[srNJet][stb][htb][ttCRbtb]['NdataSel_err'],nCRAntiSel[srNJet][stb][htb][ttCRbtb]['NQCDSelMC'],nCRAntiSel[srNJet][stb][htb][ttCRbtb]['NQCDSelMC_err'])
       print '&$'+varBin(htb)+'$ &'+str(signalRegion[srNJet][stb][htb]['deltaPhi'])
       print ' & '+getNumString(nCRAntiSel[srNJet][stb][htb][ttCRbtb]['RcsQCDantisel'], nCRAntiSel[srNJet][stb][htb][ttCRbtb]['RcsQCDantiselErr_sim'],3)\
            +' & '+getNumString(nCRAntiSel[srNJet][stb][htb][ttCRbtb]['RcsSel'], nCRAntiSel[srNJet][stb][htb][ttCRbtb]['RcsSelErr_sim'],3)+'\\\\'
 print '\\hline\end{tabular}}\end{center}\caption{$R^{QCD}_{CS} $ factors from anti-selected Data in the 4-5j, 1b CR}\label{tab:1b_QCDrcs}\end{table}'
+
+#print QCD yields in low dPhi region to correct RCS_EWK in the CR 4-5j, 1b
+print '$N^{QCD}_{selected}(low \DF)$ in CR 4-5j,1b'
+print
+print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|c|rrr|rrr|}\\hline'
+print ' \\njet     & \ST & \HT & \DF    &\multicolumn{6}{c|}{$N^{QCD}_{selected}(low \DF)$ in 4-5j,1b CR}\\\%\hline'
+print ' & $[$GeV$]$ &$[$GeV$]$& &\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}\\\\\hline'
+print '\\hline'
+secondLine = False
+for srNJet in sorted(signalRegion):
+  print '\\hline'
+  if secondLine: print '\\hline'
+  secondLine = True
+  print '\multirow{13}{*}{\\begin{sideways}$[4,5]$\end{sideways}}'
+  for stb in sorted(signalRegion[srNJet]):
+    print '&\multirow{'+str(rowsSt[srNJet][stb]['n'])+'}{*}{$'+varBin(stb)+'$}'
+    first = True
+    for htb in sorted(signalRegion[srNJet][stb]):
+      if not first: print '&'
+      first = False
+      nQCDpred = ratio[srNJet][stb][htb]['F_seltoantisel']*nCRAntiSel[srNJet][stb][htb][ttCRbtb]['NdataAntiSel']
+      nQCDpred_err = sqrt((ratio[srNJet][stb][htb]['F_seltoantisel_err']**2*nCRAntiSel[srNJet][stb][htb][ttCRbtb]['NdataAntiSel']**2)\
+                         +(nCRAntiSel[srNJet][stb][htb][ttCRbtb]['NdataAntiSel_err']**2*ratio[srNJet][stb][htb]['F_seltoantisel']**2))
+      res = nQCDpred/(nCRAntiSel[srNJet][stb][htb][ttCRbtb]['RcsQCDantisel']+1)
+      res_err = res * sqrt(nQCDpred_err**2/nQCDpred**2 + nCRAntiSel[srNJet][stb][htb][ttCRbtb]['RcsQCDantiselErr_sim']**2/(nCRAntiSel[srNJet][stb][htb][ttCRbtb]['RcsQCDantisel']+1)**2)
+      print '&$'+varBin(htb)+'$ &'+str(signalRegion[srNJet][stb][htb]['deltaPhi'])
+      print ' & '+getNumString(res, res_err)\
+           +' & '+getNumString(nCRAntiSel[srNJet][stb][htb][ttCRbtb]['NQCDSelLowdPhi'], nCRAntiSel[srNJet][stb][htb][ttCRbtb]['NQCDSelLowdPhi_err'])+'\\\\'
+print '\\hline\end{tabular}}\end{center}\caption{$N^{QCD}_{selected}(low \DF)$ to correct $R^{EWK}_{CS}$  in the 4-5j, 1b CR}\label{tab:1b_QCDlowdPhi}\end{table}'
+
 
 print "Results QCD estimation"
 print
