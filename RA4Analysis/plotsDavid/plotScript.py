@@ -5,7 +5,7 @@ from math import *
 import os, copy, sys
 from array import array
 from Workspace.HEPHYPythonTools.helpers import getVarValue, getChain, deltaPhi, getYieldFromChain
-from Workspace.RA4Analysis.cmgTuplesPostProcessed_v1_Phys14V3_HT400ST200 import *
+from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
 from Workspace.RA4Analysis.helpers import *
 from Workspace.RA4Analysis.eventShape import * 
 from getJetHem import *
@@ -36,8 +36,8 @@ allSignals=[
             #"SMS_T2tt_2J_mStop500_mLSP325",
             #"SMS_T2tt_2J_mStop650_mLSP325",
             #"SMS_T2tt_2J_mStop850_mLSP100",
-            {'name':'T5q^{4} 1.2/1.0/0.8', 'sample':SMS_T5qqqqWW_Gl1200_Chi1000_LSP800[lepSel], 'weight':'weight', 'color':ROOT.kBlack},
-            {'name':'T5q^{4} 1.5/0.8/0.1',  'sample':SMS_T5qqqqWW_Gl1500_Chi800_LSP100[lepSel],  'weight':'weight', 'color':ROOT.kMagenta},
+            {'name':'T5q^{4} 1.2/1.0/0.8', 'sample':T5qqqqWW_mGo1200_mCh1000_mChi800[lepSel], 'weight':'weight', 'color':ROOT.kBlack},
+            {'name':'T5q^{4} 1.5/0.8/0.1',  'sample':T5qqqqWW_mGo1500_mCh800_mChi100[lepSel],  'weight':'weight', 'color':ROOT.kMagenta},
             {'name':'T5q^{4} 1.0/0.8/0.7', 'sample':T5qqqqWW_mGo1000_mCh800_mChi700[lepSel], 'weight':'weight', 'color':ROOT.kBlue},
             #"T1ttbbWW_mGo1000_mCh725_mChi715",
             #"T1ttbbWW_mGo1000_mCh725_mChi720",

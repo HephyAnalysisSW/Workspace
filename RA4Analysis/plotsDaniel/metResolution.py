@@ -72,8 +72,8 @@ def getU2(c, WPt, WPhi):
   metPt = c.GetLeaf('met_pt').GetValue()
   metGenPhi = c.GetLeaf('met_genPhi').GetValue()
   metGenPt = c.GetLeaf('met_genPt').GetValue()
-  x = -metGenPhi*cos(metGenPhi)+metPt*cos(metPhi)
-  y = -metGenPhi*sin(metGenPhi)+metPt*sin(metPhi)
+  x = -metGenPt*cos(metGenPhi)+metPt*cos(metPhi)
+  y = -metGenPt*sin(metGenPhi)+metPt*sin(metPhi)
   Upara = x*cos(WPhi)+y*sin(WPhi)
   Uperp = x*sin(WPhi)-y*cos(WPhi)
   return Upara, Uperp

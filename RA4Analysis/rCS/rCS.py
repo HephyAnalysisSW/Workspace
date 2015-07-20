@@ -31,7 +31,8 @@ cTTJets = getChain(ttJets[lepSel],histname='',maxN=maxN)
 
 from localInfo import username
 uDir = username[0]+'/'+username
-subDir = 'PHYS14v3/rCS/genMetCutL100'
+#subDir = 'PHYS14v3/rCS/'
+subDir = 'pngCMG2/rCS/PHYS14V3/useRecoMet'
 
 path = '/afs/hephy.at/user/'+uDir+'/www/'+subDir+'/'
 if not os.path.exists(path):
@@ -53,14 +54,16 @@ if channel == 'ele':
 elif channel =='mu':
   pdgId = 13
 
-streg = [[(250, 350), 1.]]#,  [(450, -1), 1.] ]
-htreg = [(500,750),(750,1000),(1000,-1)]#,(750,1000),(1000,-1)]#,(1000,1250),(1250,-1)]#,(1250,-1)]
+streg = [[(250,350), 1.], [(350, 450), 1.],  [(450, -1), 1.] ]
+htreg = [(500,750),(750,1000),(1000,-1)]#,(1000,1250),(1250,-1)]#,(1250,-1)]
 btreg = (0,0)
 njreg = [(2,2),(3,3),(4,4),(5,5),(6,7),(8,-1)]#,(7,7),(8,8),(9,9)]
 nbjreg = [(0,0),(1,1),(2,2)]
 
 #Usage of GenMet for deltaPhi / rCS
 GenMetSwitch = False
+useOnlyGenMetPt = False
+useOnlyGenMetPhi = False
 
 #presel="singleMuonic&&nVetoMuons==1&&nVetoElectrons==0&&nBJetMedium40==1"
 #presel="singleMuonic&&nVetoMuons==1&&nVetoElectrons==0&&nBJetMedium25==0"
@@ -120,108 +123,108 @@ prefix = presel.split('&&')[0]+'_'
   
 
 
-##1D and 2D plots of RCS
-#
-#h_nj_pos = {}
-#h_nj_neg = {}
-#h_nj = {}
-#h_ht = {}
-#h_nbj = {}
-#h_2d = {}
-#rcsDict = {}
-#
-#for lep, pdgId in channels:
-#  h_nj_pos[lep] = {}
-#  h_nj_neg[lep] = {}
-#  h_nj[lep] = {}
-#  h_ht[lep] = {}
-#  h_nbj[lep] = {}
-#  h_2d[lep] = {}
-#  rcsDict[lep] = {}
-#  for name, c in [["tt", cTTJets] , ["W",cWJets] ]:
-#    h_nj_pos[lep][name] = {}
-#    h_nj_neg[lep][name] = {}
-#    h_nj[lep][name] = {}
-#    h_ht[lep][name] = {}
-#    h_nbj[lep][name] = {}
-#    h_2d[lep][name] = {}
-#    rcsDict[lep][name] ={}
-#    for stb, dPhiCut in streg:
-#      h_nj_pos[lep][name][stb] = {}
-#      h_nj_neg[lep][name][stb] = {}
-#      h_nj[lep][name][stb] = {}
-#      h_ht[lep][name][stb] = {}
-#      h_nbj[lep][name][stb] = {}
-#      h_2d[lep][name][stb] = {}
-#      h_2d[lep][name][stb] = ROOT.TH2F("rcs_nj_ht", "",len(njreg),0,len(njreg), len(htreg),0,len(htreg) )
-#      rcsDict[lep][name][stb] = {}
-#      for  i_njb, njb in enumerate(njreg):
-#        h_ht[lep][name][stb][njb] = ROOT.TH1F("rcs_ht", "",len(htreg),0,len(htreg))
-#        h_2d[lep][name][stb].GetXaxis().SetBinLabel(i_njb+1, nJetBinName(njb)) 
-#        for i in range(h_ht[lep][name][stb][njb].GetNbinsX()):
-#          h_ht[lep][name][stb][njb].GetXaxis().SetBinLabel(i+1, varBinName(htreg[i],"H_{T}"))
-#      print 
-#      for i_htb, htb in enumerate(htreg): 
-#        h_nbj[lep][name][stb][htb] = {}
-#        h_2d[lep][name][stb].GetYaxis().SetBinLabel(i_htb+1, varBinName(htb,"H_{T}")) 
-#        h_nj_pos[lep][name][stb][htb] = ROOT.TH1F("rcs_nj_pos", "",len(njreg),0,len(njreg))
-#        h_nj_neg[lep][name][stb][htb] = ROOT.TH1F("rcs_nj_neg", "",len(njreg),0,len(njreg))
-#        h_nj[lep][name][stb][htb] = ROOT.TH1F("rcs_nj", "",len(njreg),0,len(njreg))
-#        rcsDict[lep][name][stb][htb] = {}
-#        for i in range(h_nj[lep][name][stb][htb].GetNbinsX()):
-#          h_nj[lep][name][stb][htb].GetXaxis().SetBinLabel(i+1, nJetBinName(njreg[i]))
-#          h_nj_pos[lep][name][stb][htb].GetXaxis().SetBinLabel(i+1, nJetBinName(njreg[i]))
-#          h_nj_neg[lep][name][stb][htb].GetXaxis().SetBinLabel(i+1, nJetBinName(njreg[i]))
-#          h_nj[lep][name][stb][htb].SetMinimum(0.)
-#          h_nj_pos[lep][name][stb][htb].SetMinimum(0.)
-#          h_nj_neg[lep][name][stb][htb].SetMinimum(0.)
-#        for i_njb, njb in enumerate(njreg):
-#          cname, cut = nameAndCut(stb,htb,njb, btb=btreg ,presel=presel)
-#          if lep in ['ele','mu']:
-#            cut = cut+'&&abs(leptonPdg)=='+str(pdgId)
-#          poscut = 'leptonPdg>0&&'+cut
-#          negcut = 'leptonPdg<0&&'+cut
-#          dPhiCut = dynDeltaPhi(1.0 ,stb, htb, njb)
-#          rcs = getRCS(c, cut, dPhiCut, useGenMet=GenMetSwitch)
-#          rcsPos = getRCS(c, poscut, dPhiCut, useGenMet=GenMetSwitch)
-#          rcsNeg = getRCS(c, negcut, dPhiCut, useGenMet=GenMetSwitch)
-#          print rcs, dPhiCut
-#          res = rcs['rCS']
-#          resErr = rcs['rCSE_sim']
-#          rcsDict[lep][name][stb][htb][njb] = {'PosPdg':rcsPos['rCS'], 'PosPdgE':rcsPos['rCSE_sim'], 'NegPdg':rcsNeg['rCS'], 'NegPdgE':rcsNeg['rCSE_sim'], 'AllPdg':res, 'AllPdgE':resErr}
-#          #res, resErr = getRCS(c, cut,  dPhiCut)
-#          #print res,resErr, name, cname
-#          if not math.isnan(rcsPos['rCS']):
-#            if rcsPos['rCS']>0.:
-#              h_nj_pos[lep][name][stb][htb].SetBinContent(i_njb+1, rcsPos['rCS'])
-#              h_nj_pos[lep][name][stb][htb].SetBinError(i_njb+1, rcsPos['rCSE_sim'])
-#          if not math.isnan(rcsNeg['rCS']):
-#            if rcsNeg['rCS']>0.:
-#              h_nj_neg[lep][name][stb][htb].SetBinContent(i_njb+1, rcsNeg['rCS'])
-#              h_nj_neg[lep][name][stb][htb].SetBinError(i_njb+1, rcsNeg['rCSE_sim'])
-#          if not math.isnan(res):
-#            if res>0.:
-#              h_nj[lep][name][stb][htb].SetBinContent(i_njb+1, res)
-#              h_nj[lep][name][stb][htb].SetBinError(i_njb+1, resErr)
-#            #h_ht[name][stb][njb].SetBinContent(i_htb+1, res)
-#            #h_ht[name][stb][njb].SetBinError(i_htb+1, resErr)
-#            #h_2d[name][stb].SetBinContent(i_njb+1, i_htb+1, res) 
-#            #h_2d[name][stb].SetBinError(i_njb+1, i_htb+1, resErr) 
-#        #for i_nbjb, bjb in enumerate(nbjreg):
-#        #  h_nbj[name][stb][htb][bjb] = ROOT.TH1F("rcs_nbj","",len(njreg),0,len(njreg))
-#        #  for i_njb, njb in enumerate(njreg):
-#        #    cname, cut = nameAndCut(stb,htb,njb, btb=bjb ,presel=presel)
-#        #    dPhiCut = dynDeltaPhi(1.0,stb, htb, njb)
-#        #    rcs = getRCS(c, cut, dPhiCut)
-#        #    print rcs, dPhiCut
-#        #    res = rcs['rCS']
-#        #    resErrPred = rcs['rCSE_pred']
-#        #    resErr = rcs['rCSE_sim']
-#        #    #res, resErr = getRCS(c, cut,  dPhiCut)
-#        #    h_nbj[name][stb][htb][bjb].GetXaxis().SetBinLabel(i_njb+1, nJetBinName(njb))
-#        #    if not math.isnan(res):
-#        #      h_nbj[name][stb][htb][bjb].SetBinContent(i_njb+1, res)
-#        #      h_nbj[name][stb][htb][bjb].SetBinError(i_njb+1, resErr) #maybe should be changed to predicted error (estimated error for poisson distributed values)
+#1D and 2D plots of RCS
+
+h_nj_pos = {}
+h_nj_neg = {}
+h_nj = {}
+h_ht = {}
+h_nbj = {}
+h_2d = {}
+rcsDict = {}
+
+for lep, pdgId in channels:
+  h_nj_pos[lep] = {}
+  h_nj_neg[lep] = {}
+  h_nj[lep] = {}
+  h_ht[lep] = {}
+  h_nbj[lep] = {}
+  h_2d[lep] = {}
+  rcsDict[lep] = {}
+  for name, c in [["tt", cTTJets] , ["W",cWJets] ]:
+    h_nj_pos[lep][name] = {}
+    h_nj_neg[lep][name] = {}
+    h_nj[lep][name] = {}
+    h_ht[lep][name] = {}
+    h_nbj[lep][name] = {}
+    h_2d[lep][name] = {}
+    rcsDict[lep][name] ={}
+    for stb, dPhiCut in streg:
+      h_nj_pos[lep][name][stb] = {}
+      h_nj_neg[lep][name][stb] = {}
+      h_nj[lep][name][stb] = {}
+      h_ht[lep][name][stb] = {}
+      h_nbj[lep][name][stb] = {}
+      h_2d[lep][name][stb] = {}
+      h_2d[lep][name][stb] = ROOT.TH2F("rcs_nj_ht", "",len(njreg),0,len(njreg), len(htreg),0,len(htreg) )
+      rcsDict[lep][name][stb] = {}
+      for  i_njb, njb in enumerate(njreg):
+        h_ht[lep][name][stb][njb] = ROOT.TH1F("rcs_ht", "",len(htreg),0,len(htreg))
+        h_2d[lep][name][stb].GetXaxis().SetBinLabel(i_njb+1, nJetBinName(njb)) 
+        for i in range(h_ht[lep][name][stb][njb].GetNbinsX()):
+          h_ht[lep][name][stb][njb].GetXaxis().SetBinLabel(i+1, varBinName(htreg[i],"H_{T}"))
+      print 
+      for i_htb, htb in enumerate(htreg): 
+        h_nbj[lep][name][stb][htb] = {}
+        h_2d[lep][name][stb].GetYaxis().SetBinLabel(i_htb+1, varBinName(htb,"H_{T}")) 
+        h_nj_pos[lep][name][stb][htb] = ROOT.TH1F("rcs_nj_pos", "",len(njreg),0,len(njreg))
+        h_nj_neg[lep][name][stb][htb] = ROOT.TH1F("rcs_nj_neg", "",len(njreg),0,len(njreg))
+        h_nj[lep][name][stb][htb] = ROOT.TH1F("rcs_nj", "",len(njreg),0,len(njreg))
+        rcsDict[lep][name][stb][htb] = {}
+        for i in range(h_nj[lep][name][stb][htb].GetNbinsX()):
+          h_nj[lep][name][stb][htb].GetXaxis().SetBinLabel(i+1, nJetBinName(njreg[i]))
+          h_nj_pos[lep][name][stb][htb].GetXaxis().SetBinLabel(i+1, nJetBinName(njreg[i]))
+          h_nj_neg[lep][name][stb][htb].GetXaxis().SetBinLabel(i+1, nJetBinName(njreg[i]))
+          h_nj[lep][name][stb][htb].SetMinimum(0.)
+          h_nj_pos[lep][name][stb][htb].SetMinimum(0.)
+          h_nj_neg[lep][name][stb][htb].SetMinimum(0.)
+        for i_njb, njb in enumerate(njreg):
+          cname, cut = nameAndCut(stb,htb,njb, btb=btreg ,presel=presel)
+          if lep in ['ele','mu']:
+            cut = cut+'&&abs(leptonPdg)=='+str(pdgId)
+          poscut = 'leptonPdg>0&&'+cut
+          negcut = 'leptonPdg<0&&'+cut
+          dPhiCut = dynDeltaPhi(1.0,stb, htb, njb)
+          rcs = getRCS(c, cut, dPhiCut, useGenMet=GenMetSwitch, useOnlyGenMetPt=useOnlyGenMetPt, useOnlyGenMetPhi=useOnlyGenMetPhi)
+          rcsPos = getRCS(c, poscut, dPhiCut, useGenMet=GenMetSwitch, useOnlyGenMetPt=useOnlyGenMetPt, useOnlyGenMetPhi=useOnlyGenMetPhi)
+          rcsNeg = getRCS(c, negcut, dPhiCut, useGenMet=GenMetSwitch, useOnlyGenMetPt=useOnlyGenMetPt, useOnlyGenMetPhi=useOnlyGenMetPhi)
+          print rcs, dPhiCut
+          res = rcs['rCS']
+          resErr = rcs['rCSE_sim']
+          rcsDict[lep][name][stb][htb][njb] = {'PosPdg':rcsPos['rCS'], 'PosPdgE':rcsPos['rCSE_sim'], 'NegPdg':rcsNeg['rCS'], 'NegPdgE':rcsNeg['rCSE_sim'], 'AllPdg':res, 'AllPdgE':resErr}
+          #res, resErr = getRCS(c, cut,  dPhiCut)
+          #print res,resErr, name, cname
+          if not math.isnan(rcsPos['rCS']):
+            if rcsPos['rCS']>0.:
+              h_nj_pos[lep][name][stb][htb].SetBinContent(i_njb+1, rcsPos['rCS'])
+              h_nj_pos[lep][name][stb][htb].SetBinError(i_njb+1, rcsPos['rCSE_sim'])
+          if not math.isnan(rcsNeg['rCS']):
+            if rcsNeg['rCS']>0.:
+              h_nj_neg[lep][name][stb][htb].SetBinContent(i_njb+1, rcsNeg['rCS'])
+              h_nj_neg[lep][name][stb][htb].SetBinError(i_njb+1, rcsNeg['rCSE_sim'])
+          if not math.isnan(res):
+            if res>0.:
+              h_nj[lep][name][stb][htb].SetBinContent(i_njb+1, res)
+              h_nj[lep][name][stb][htb].SetBinError(i_njb+1, resErr)
+            #h_ht[name][stb][njb].SetBinContent(i_htb+1, res)
+            #h_ht[name][stb][njb].SetBinError(i_htb+1, resErr)
+            #h_2d[name][stb].SetBinContent(i_njb+1, i_htb+1, res) 
+            #h_2d[name][stb].SetBinError(i_njb+1, i_htb+1, resErr) 
+        #for i_nbjb, bjb in enumerate(nbjreg):
+        #  h_nbj[name][stb][htb][bjb] = ROOT.TH1F("rcs_nbj","",len(njreg),0,len(njreg))
+        #  for i_njb, njb in enumerate(njreg):
+        #    cname, cut = nameAndCut(stb,htb,njb, btb=bjb ,presel=presel)
+        #    dPhiCut = dynDeltaPhi(1.0,stb, htb, njb)
+        #    rcs = getRCS(c, cut, dPhiCut)
+        #    print rcs, dPhiCut
+        #    res = rcs['rCS']
+        #    resErrPred = rcs['rCSE_pred']
+        #    resErr = rcs['rCSE_sim']
+        #    #res, resErr = getRCS(c, cut,  dPhiCut)
+        #    h_nbj[name][stb][htb][bjb].GetXaxis().SetBinLabel(i_njb+1, nJetBinName(njb))
+        #    if not math.isnan(res):
+        #      h_nbj[name][stb][htb][bjb].SetBinContent(i_njb+1, res)
+        #      h_nbj[name][stb][htb][bjb].SetBinError(i_njb+1, resErr) #maybe should be changed to predicted error (estimated error for poisson distributed values)
 
 
 #Draw plots binned in njets for all ST and HT bins
