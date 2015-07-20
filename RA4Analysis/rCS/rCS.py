@@ -31,7 +31,8 @@ cTTJets = getChain(ttJets[lepSel],histname='',maxN=maxN)
 
 from localInfo import username
 uDir = username[0]+'/'+username
-subDir = 'PHYS14v3/rCS/'
+#subDir = 'PHYS14v3/rCS/'
+subDir = 'pngCMG2/rCS/PHYS14V3/useRecoMet'
 
 path = '/afs/hephy.at/user/'+uDir+'/www/'+subDir+'/'
 if not os.path.exists(path):
@@ -53,7 +54,7 @@ if channel == 'ele':
 elif channel =='mu':
   pdgId = 13
 
-streg = [[(350, 450), 1.],  [(450, -1), 1.] ]
+streg = [[(250,350), 1.], [(350, 450), 1.],  [(450, -1), 1.] ]
 htreg = [(500,750),(750,1000),(1000,-1)]#,(1000,1250),(1250,-1)]#,(1250,-1)]
 btreg = (0,0)
 njreg = [(2,2),(3,3),(4,4),(5,5),(6,7),(8,-1)]#,(7,7),(8,8),(9,9)]
@@ -61,6 +62,8 @@ nbjreg = [(0,0),(1,1),(2,2)]
 
 #Usage of GenMet for deltaPhi / rCS
 GenMetSwitch = False
+useOnlyGenMetPt = False
+useOnlyGenMetPhi = False
 
 #presel="singleMuonic&&nVetoMuons==1&&nVetoElectrons==0&&nBJetMedium40==1"
 #presel="singleMuonic&&nVetoMuons==1&&nVetoElectrons==0&&nBJetMedium25==0"
@@ -182,9 +185,9 @@ for lep, pdgId in channels:
           poscut = 'leptonPdg>0&&'+cut
           negcut = 'leptonPdg<0&&'+cut
           dPhiCut = dynDeltaPhi(1.0,stb, htb, njb)
-          rcs = getRCS(c, cut, dPhiCut, useGenMet=GenMetSwitch)
-          rcsPos = getRCS(c, poscut, dPhiCut, useGenMet=GenMetSwitch)
-          rcsNeg = getRCS(c, negcut, dPhiCut, useGenMet=GenMetSwitch)
+          rcs = getRCS(c, cut, dPhiCut, useGenMet=GenMetSwitch, useOnlyGenMetPt=useOnlyGenMetPt, useOnlyGenMetPhi=useOnlyGenMetPhi)
+          rcsPos = getRCS(c, poscut, dPhiCut, useGenMet=GenMetSwitch, useOnlyGenMetPt=useOnlyGenMetPt, useOnlyGenMetPhi=useOnlyGenMetPhi)
+          rcsNeg = getRCS(c, negcut, dPhiCut, useGenMet=GenMetSwitch, useOnlyGenMetPt=useOnlyGenMetPt, useOnlyGenMetPhi=useOnlyGenMetPhi)
           print rcs, dPhiCut
           res = rcs['rCS']
           resErr = rcs['rCSE_sim']
