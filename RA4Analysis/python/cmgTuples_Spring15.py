@@ -16,7 +16,7 @@ data_mu={\
 #'dir'  :"/data/easilar/cmgTuples/SingleMuon_Run2015B/",
 }
 
-DYJetsToLL_M-50={\
+DYJetsToLL_M_50={\
 "name" : "DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8",
 "chunkString" : "DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8",
 'dir':"/data/easilar/cmgTuples/crab_Spring15/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8",

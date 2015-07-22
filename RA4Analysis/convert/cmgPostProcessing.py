@@ -11,6 +11,8 @@ subDir = "postProcessed_Phys14V3"
 from Workspace.HEPHYPythonTools.helpers import getChunksFromNFS, getChunksFromDPM, getChunks
 #from Workspace.RA4Analysis.cmgTuples_PHYS14V3 import *
 from Workspace.RA4Analysis.cmgTuples_v1_PHYS14V3 import *
+from Workspace.RA4Analysis.cmgTuples_Spring15 import *
+
 target_lumi = 3000 #pb-1
 
 from  Workspace.RA4Analysis import mt2w
@@ -21,16 +23,8 @@ from localInfo import username
 ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 
+defSampleStr = "WJetsToLNu_HT100to200"
 
-#defSampleStr = "WJetsToLNu_HT600toInf_PU20bx25"
-#defSampleStr = "T5qqqqWW_mGo1200_mCh1000_mChi800"
-defSampleStr = "ttJets_PU20bx25"
-#defSampleStr = "WJetsToLNu_HT400to600"
-#defSampleStr = "WJetsToLNu_HT200to400"
-#defSampleStr = "WJetsToLNu_HT100to200"
-#defSampleStr = "WJetsToLNu_HT600toInf"
-#defSampleStr = "ttWJets_PU20bx25,ttZJets_PU20bx25,ttHJets_PU20bx25"
-#defSampleStr = "QCD_HT_250To500_PU20bx25"
 
 branchKeepStrings = ["run", "lumi", "evt", "isData", "xsec", "puWeight", "nTrueInt", "genWeight", "rho", "nVert", "nJet25", "nBJetLoose25", "nBJetMedium25", "nBJetTight25", "nJet40", "nJet40a", "nBJetLoose40", "nBJetMedium40", "nBJetTight40", 
                      "nLepGood20", "nLepGood15", "nLepGood10",  
