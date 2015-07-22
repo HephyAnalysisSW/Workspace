@@ -60,6 +60,7 @@ def compileClass(className, classString, tmpDir):
   f.write(classString.replace(className, newClassName))
   f.close()
   ROOT.gROOT.ProcessLine('.L '+tmpFileName+'+')
+  print "new Class Name" , newClassName
   exec("from ROOT import "+newClassName)
   exec("s = "+newClassName+"()")
 #  os.system('rm '+tmpFileName)

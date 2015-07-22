@@ -6,11 +6,11 @@ from Workspace.HEPHYPythonTools.xsec import xsec
 from Workspace.HEPHYPythonTools.helpers import getObjFromFile, getObjDict, getFileList
 from Workspace.RA4Analysis.convertHelpers import compileClass, readVar, printHeader, typeStr, createClassString
 
-subDir = "postProcessed_Phys14V3"
+subDir = "postProcessed_Spring15"
 #from Workspace.RA4Analysis.cmgTuples_v3 import *
 from Workspace.HEPHYPythonTools.helpers import getChunksFromNFS, getChunksFromDPM, getChunks
 #from Workspace.RA4Analysis.cmgTuples_PHYS14V3 import *
-from Workspace.RA4Analysis.cmgTuples_v1_PHYS14V3 import *
+#from Workspace.RA4Analysis.cmgTuples_v1_PHYS14V3 import *
 from Workspace.RA4Analysis.cmgTuples_Spring15 import *
 
 target_lumi = 3000 #pb-1
@@ -105,7 +105,8 @@ for isample, sample in enumerate(allSamples):
   os.system('mkdir -p '+tmpDir)
   os.system('rm -rf '+tmpDir+'/*')
 
-  lumiWeight = xsec[sample['dbsName']]*target_lumi/float(nTotEvents)
+  prelumiWeight = xsec[sample['dbsName']]*target_lumi/float(nTotEvents)   ###nTotEvents is sum weight
+  
   print "sample['dbsName']:" , sample['dbsName']
   readVariables = ['met_pt/F', 'met_phi/F']
 
@@ -119,7 +120,7 @@ for isample, sample in enumerate(allSamples):
   aliases = [ "met:met_pt", "metPhi:met_phi","genMet:met_genPt", "genMetPhi:met_genPhi"]
   
   readVectors = [\
-    {'prefix':'LepGood',  'nMax':8, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I', 'relIso03/F', 'tightId/I', 'miniRelIso/F','mvaId/F','eleMVAId/I','mass/F','sip3d/F','mediumMuonId/I', 'mvaIdPhys14/F','lostHits/I', 'convVeto/I']},
+    {'prefix':'LepGood',  'nMax':8, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I', 'relIso03/F', 'tightId/I', 'miniRelIso/F','mass/F','sip3d/F','mediumMuonId/I', 'mvaIdPhys14/F','lostHits/I', 'convVeto/I']},
     {'prefix':'Jet',  'nMax':100, 'vars':['pt/F', 'eta/F', 'phi/F', 'id/I','btagCSV/F', 'btagCMVA/F', 'partonId/I']},
   ]
   readVars = [readVar(v, allowRenaming=False, isWritten=False, isRead=True) for v in readVariables]
@@ -164,7 +165,7 @@ for isample, sample in enumerate(allSamples):
           t.SetBranchAddress(var['stage1Name'], ROOT.AddressOf(r, var['stage1Name']))
       for a in aliases:
         t.SetAlias(*(a.split(":")))
-      print "File",chunk['file'],'chunk',chunk['name'],"found", nEvents, '(skim:',options.skim,') condition:', skimCond,' with weight',lumiWeight, 'in Chain -> post processing...'
+      print "File",chunk['file'],'chunk',chunk['name'],"found", nEvents, '(skim:',options.skim,') condition:', skimCond,' with weight',prelumiWeight, 'in Chain -> post processing...'
       
       for i in range(nEvents):
         if (i%10000 == 0) and i>0 :
@@ -172,13 +173,17 @@ for isample, sample in enumerate(allSamples):
         s.init()
         r.init()
         t.GetEntry(i)
-        s.weight = lumiWeight
+        genWeight = t.GetLeaf('genWeight').GetValue(i)
+        print genWeight
+        print "before reweight:" , prelumiWeight
+        s.weight = prelumiWeight*genWeight
+        print "reweighted:" , s.weight
         if "TTJets_" in sample['dbsName']:
-          s.weight_XSecTTBar1p1 = lumiWeight*1.1 
-          s.weight_XSecTTBar0p9 = lumiWeight*0.9
+          s.weight_XSecTTBar1p1 = s.weight*1.1 
+          s.weight_XSecTTBar0p9 = s.weight*0.9
         else :
-          s.weight_XSecTTBar1p1 = lumiWeight
-          s.weight_XSecTTBar0p9 = lumiWeight
+          s.weight_XSecTTBar1p1 = s.weight
+          s.weight_XSecTTBar0p9 = s.weight
 
         
         if options.leptonSelection.lower() in ['soft','hard']:

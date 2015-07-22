@@ -142,11 +142,15 @@ def getChunksFromNFS(sample, treeName, maxN=-1):
 #      line = [x for x in subprocess.check_output(["cat", logfile]).split('\n') if x.count('number of events processed')]
 #      assert len(line)==1,"Didn't find event number in file %s"%logfile
 #      n = int(line[0].split()[-1])
-      logfile = sample['dir']+'/'+s['name']+'/skimAnalyzerCount/SkimReport.txt'
+      #logfile = sample['dir']+'/'+s['name']+'/skimAnalyzerCount/SkimReport.txt'
+      logfile = sample['dir']+'/'+s['name']+'/SkimReport.txt'
       if os.path.isfile(logfile):
-        line = [x for x in subprocess.check_output(["cat", logfile]).split('\n') if x.count('All Events')]
+        #line = [x for x in subprocess.check_output(["cat", logfile]).split('\n') if x.count('All Events')]
+        #line = [x for x in subprocess.check_output(["cat", logfile]).split('\n') if x.count('Sum Weights')]
+        line = [x for x in subprocess.check_output(["cat", logfile]).split('\n') if x.count('Sum Weights')]
+        #print "LOOOKKKKK:" , line
         assert len(line)==1,"Didn't find event number in file %s"%logfile
-        n = int(line[0].split()[2])
+        n = int(float(line[0].split()[2]))
         inputFilename = sample['dir']+'/'+s['name']+'/'+treeName+'/tree.root'
         if os.path.isfile(inputFilename):
           nTotEvents+=n
