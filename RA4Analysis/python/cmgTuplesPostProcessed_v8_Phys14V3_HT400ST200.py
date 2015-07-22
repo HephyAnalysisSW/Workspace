@@ -7,6 +7,14 @@ def makeSample(sample):
   s['dir']=s['dir']+'/soft/'
   return {'hard':h, 'soft':s}
 
+######data should move a spring 15 post processed file... This is only for test.
+test_data_ele=makeSample({\
+"name": "SingleElectron_Run2015B",
+"bins" : ["SingleElectron_Run2015B"],
+"dir" : "/data/easilar/cmgTuples/postProcessed_data_single_Ele//HT400ST200/",
+})
+
+
 ttJets=makeSample({\
 "name" : "ttJets",
 "bins" : ["TTJets"],
