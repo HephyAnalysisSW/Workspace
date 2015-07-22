@@ -295,6 +295,14 @@ def deltaPhi(phi1, phi2):
     dphi += 2.0*pi
   return abs(dphi)
 
+def deltaPhiNA(phi1, phi2):
+  dphi = phi2-phi1
+  if  dphi > pi:
+    dphi -= 2.0*pi
+  if dphi <= -pi:
+    dphi += 2.0*pi
+  return dphi
+
 def minAbsDeltaPhi(phi, phis):
   if len(phis) > 0:
     return min([abs(deltaPhi(phi, x)) for x in phis])

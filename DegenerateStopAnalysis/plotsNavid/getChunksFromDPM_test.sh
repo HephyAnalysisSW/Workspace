@@ -1,6 +1,13 @@
 #!/bin/sh
 eval `scramv1 runtime -sh`
 
+export userNameDPM='easilar'
+export userNameNFS='nrad2'
+
+
+
+
+
 
 
 ##### MAKE SURE SAMPLE NAME IN SOURCE AND TARGET MATCH!!!! ####

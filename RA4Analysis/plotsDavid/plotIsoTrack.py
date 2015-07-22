@@ -62,7 +62,7 @@ for sample in bkgSamples + signals: #Loop over samples
   for var in allVariables:
 		histos[sample['name']][var['name']] = ROOT.TH1F(sample['name']+'_'+var['name'], sample['name']+'_'+var['name'], *var['binning'])
 		histos[sample['name']][var['name']].Reset()
-		#sample['chain'].Draw("Sum$(isoTrack_pt<15&&abs(isoTrack_pdgId)==211&&abs(isoTrack_dz)<0.05)"+">>"+sample["name"]+"_"+var["name"])
+		#sample['chain'].Draw("Sum$(isoTrack_pt<15&&abs(isoTrack_pdgId)==211&&abs(isoTrack_dz)<0.05)"+">>"+sample["name"]+"_"+var["name"])#weight missing!
 		#sample['chain'].Draw(var['varString']+">>"+sample['name']+'_'+var['name'], sample["weight"]+"*("+cut+")")
   	
   sample["chain"].Draw(">>eList",cut) #Get the event list 'eList' which has all the events satisfying the cut

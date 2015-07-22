@@ -8,9 +8,9 @@ from math import *
 from array import array
 
 from Workspace.HEPHYPythonTools.helpers import *#getVarValue, getChain, deltaPhi, getYieldFromChain
-#from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2_HT400ST150_withDF import *
+from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2_HT400ST150_withDF import *
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2 import *
-from Workspace.RA4Analysis.cmgTuplesPostProcessed_softLepton import *
+#from Workspace.RA4Analysis.cmgTuplesPostProcessed_softLepton import *
 from Workspace.RA4Analysis.helpers import *
 from Workspace.RA4Analysis.eventShape import * 
 
@@ -23,13 +23,14 @@ from getJetHem import *
 
 binning=[18,50,500]
 histMin = 0.08
-histMax = 20
+histMax = 1000
 
 
 #prepresel = 'singleLeptonic==1&&'#&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&'
 #presel = prepresel + 'Jet_pt[1]>80&&nJet30>=2&&nBJetMediumCMVA30==0&&st>=150&&st<=250'#&&htJet30j>500&&htJet30j<750'#&&htJet30j>=500&&st>=200&&deltaPhi_Wl>1&&mt2w>350'
 
-prepresel = 'singleLeptonic==1&&nLooseSoftLeptons==1&&nLooseHardLeptons==0&&nTightHardLeptons==0&&htJet30j>500&&st>250&&nJet30>=2&&Jet_pt[1]>100&&Jet_pt[2]>80'
+#prepresel = 'singleLeptonic==1&&nLooseSoftLeptons==1&&nLooseHardLeptons==0&&nTightHardLeptons==0&&htJet30j>500&&st>250&&nJet30>=2&&Jet_pt[0]>100&&Jet_pt[1]>80'
+prepresel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80"
 presel = prepresel
 
 def gethtRatio(c):
@@ -145,21 +146,21 @@ def getMediumJetPT(c):
 signalString='T5qqqqWW_softLep'
 
 varstring="deltaPhi_Wl"
-plotDir='/afs/hephy.at/user/d/dspitzbart/www/softLepYields/'
+plotDir='/afs/hephy.at/user/d/dspitzbart/www/WjetKin/'
 
 if not os.path.exists(plotDir):
   os.makedirs(plotDir)
 
 
-lepSel='soft'
+lepSel='hard'
 
 #BKG Samples
 WJETS = getChain(WJetsHTToLNu[lepSel],histname='')
-TTJETS = getChain(ttJets[lepSel],histname='')
-TTVH = getChain(TTVH[lepSel],histname='')
-SINGLETOP = getChain(singleTop[lepSel],histname='')
-DY = getChain(DY[lepSel],histname='')
-QCD = getChain(QCD[lepSel],histname='')
+#TTJETS = getChain(ttJets[lepSel],histname='')
+#TTVH = getChain(TTVH[lepSel],histname='')
+#SINGLETOP = getChain(singleTop[lepSel],histname='')
+#DY = getChain(DY[lepSel],histname='')
+#QCD = getChain(QCD[lepSel],histname='')
 
 #t5qqqq1400_315_300 = ROOT.TChain('tree')
 #t5qqqq1400_315_300.Add('/data/dspitzbart/Phys14_V3/T5qqqqWWDeg_mGo1400_mCh315_mChi300/treeProducerSusySingleLepton/tree.root')
@@ -187,35 +188,35 @@ QCD = getChain(QCD[lepSel],histname='')
 
 
 #SIG Samples
-SIG1 = getChain(T5qqqqWWDeg_mGo1000_mCh325_mChi300[lepSel],histname='')
-SIG2 = getChain(T5qqqqWWDeg_mGo1000_mCh315_mChi300[lepSel],histname='')
-SIG3 = getChain(T5qqqqWWDeg_mGo1000_mCh310_mChi300[lepSel],histname='')
-SIG4 = getChain(T5qqqqWWDeg_mGo1400_mCh315_mChi300[lepSel],histname='')
-SIG5 = getChain(T5qqqqWW_mGo1000_mCh800_mChi700[lepSel],histname='')
-SIG6 = getChain(T5qqqqWWDeg_mGo800_mCh305_mChi300[lepSel],histname='')
+#SIG1 = getChain(T5qqqqWWDeg_mGo1000_mCh325_mChi300[lepSel],histname='')
+#SIG2 = getChain(T5qqqqWWDeg_mGo1000_mCh315_mChi300[lepSel],histname='')
+#SIG3 = getChain(T5qqqqWWDeg_mGo1000_mCh310_mChi300[lepSel],histname='')
+#SIG4 = getChain(T5qqqqWWDeg_mGo1400_mCh315_mChi300[lepSel],histname='')
+SIG5 = getChain(SMS_T5qqqqWW_Gl1200_Chi1000_LSP800[lepSel],histname='')
+#SIG6 = getChain(T5qqqqWWDeg_mGo800_mCh305_mChi300[lepSel],histname='')
 
 
 wjets = {
   "name":"W + Jets", "chain":WJETS, "weight":"weight", "color":color('wjets')}
-ttjets = {
-  "name":"t#bar{t} + Jets", "chain":TTJETS, "weight":"weight", "color":color('ttjets')}
-ttvh = {
-  "name":"TTVH", "chain":TTVH, "weight":"weight", "color":color('ttvh')}
-singletop = {
-  "name":"single top", "chain":SINGLETOP, "weight":"weight", "color":color('singletop')}
-dy = {
-  "name":"Drell Yan", "chain":DY, "weight":"weight", "color":color('dy')}
-qcd = {
-  "name":"QCD", "chain":QCD, "weight":"weight", "color":color('qcd')}
+#ttjets = {
+#  "name":"t#bar{t} + Jets", "chain":TTJETS, "weight":"weight", "color":color('ttjets')}
+#ttvh = {
+#  "name":"TTVH", "chain":TTVH, "weight":"weight", "color":color('ttvh')}
+#singletop = {
+#  "name":"single top", "chain":SINGLETOP, "weight":"weight", "color":color('singletop')}
+#dy = {
+#  "name":"Drell Yan", "chain":DY, "weight":"weight", "color":color('dy')}
+#qcd = {
+#  "name":"QCD", "chain":QCD, "weight":"weight", "color":color('qcd')}
 
 
 
-signal1 = {'name':'T5qqqqWWDeg_mGo1000_mCh325_mChi300', 'chain':SIG1, 'weight':'weight', 'color':ROOT.kRed-7, "histo":ROOT.TH1F("Signal 1", "sqrt(s)", *binning), 'niceName':'T5qqqqWW m_{\\tilde{g}}=1000, m_{\\tilde{\\chi}_{1}^{+}}=325, m_{\\tilde{\\chi}_{1}^{0}}=300'}
-signal2 = {'name':'T5qqqqWWDeg_mGo1000_mCh315_mChi300', 'chain':SIG2, 'weight':'weight', 'color':ROOT.kRed-3, "histo":ROOT.TH1F("Signal 2", "sqrt(s)", *binning), 'niceName':'T5qqqqWW m_{\\tilde{g}}=1000, m_{\\tilde{\\chi}_{1}^{+}}=315, m_{\\tilde{\\chi}_{1}^{0}}=300'}
-signal3 = {'name':'T5qqqqWWDeg_mGo1000_mCh310_mChi300', 'chain':SIG3, 'weight':'weight', 'color':ROOT.kRed+2, "histo":ROOT.TH1F("Signal 3", "sqrt(s)", *binning), 'niceName':'T5qqqqWW m_{\\tilde{g}}=1000, m_{\\tilde{\\chi}_{1}^{+}}=310, m_{\\tilde{\\chi}_{1}^{0}}=300'}
-signal4 = {'name':'T5qqqqWWDeg_mGo1400_mCh315_mChi300', 'chain':SIG4, 'weight':'weight', 'color':ROOT.kBlack, "histo":ROOT.TH1F("Signal 4", "sqrt(s)", *binning), 'niceName':'T5qqqqWW m_{\\tilde{g}}=1400, m_{\\tilde{\\chi}_{1}^{+}}=315, m_{\\tilde{\\chi}_{1}^{0}}=300'}
-signal5 = {'name':'T5qqqqWW_mGo1000_mCh800_mChi700', 'chain':SIG5, 'weight':'weight', 'color':ROOT.kMagenta+1, "histo":ROOT.TH1F("Signal 5", "sqrt(s)", *binning),'niceName':'T5qqqqWW m_{\\tilde{g}}=1000, m_{\\tilde{\\chi}_{1}^{+}}=800, m_{\\tilde{\\chi}_{1}^{0}}=700'}
-signal6 = {'name':'T5qqqqWWDeg_mGo800_mCh305_mChi300', 'chain':SIG6, 'weight':'weight', 'color':ROOT.kCyan+3, "histo":ROOT.TH1F("Signal 6", "sqrt(s)", *binning), 'niceName':'T5qqqqWW m_{\\tilde{g}}=800,  m_{\\tilde{\\chi}_{1}^{+}}=305, m_{\\tilde{\\chi}_{1}^{0}}=300'}
+#signal1 = {'name':'T5qqqqWWDeg_mGo1000_mCh325_mChi300', 'chain':SIG1, 'weight':'weight', 'color':ROOT.kRed-7, "histo":ROOT.TH1F("Signal 1", "sqrt(s)", *binning), 'niceName':'T5qqqqWW m_{\\tilde{g}}=1000, m_{\\tilde{\\chi}_{1}^{+}}=325, m_{\\tilde{\\chi}_{1}^{0}}=300'}
+#signal2 = {'name':'T5qqqqWWDeg_mGo1000_mCh315_mChi300', 'chain':SIG2, 'weight':'weight', 'color':ROOT.kRed-3, "histo":ROOT.TH1F("Signal 2", "sqrt(s)", *binning), 'niceName':'T5qqqqWW m_{\\tilde{g}}=1000, m_{\\tilde{\\chi}_{1}^{+}}=315, m_{\\tilde{\\chi}_{1}^{0}}=300'}
+#signal3 = {'name':'T5qqqqWWDeg_mGo1000_mCh310_mChi300', 'chain':SIG3, 'weight':'weight', 'color':ROOT.kRed+2, "histo":ROOT.TH1F("Signal 3", "sqrt(s)", *binning), 'niceName':'T5qqqqWW m_{\\tilde{g}}=1000, m_{\\tilde{\\chi}_{1}^{+}}=310, m_{\\tilde{\\chi}_{1}^{0}}=300'}
+#signal4 = {'name':'T5qqqqWWDeg_mGo1400_mCh315_mChi300', 'chain':SIG4, 'weight':'weight', 'color':ROOT.kBlack, "histo":ROOT.TH1F("Signal 4", "sqrt(s)", *binning), 'niceName':'T5qqqqWW m_{\\tilde{g}}=1400, m_{\\tilde{\\chi}_{1}^{+}}=315, m_{\\tilde{\\chi}_{1}^{0}}=300'}
+signal5 = {'name':'T5qqqqWW_mGo1200_mCh1000_mChi800', 'chain':SIG5, 'weight':'weight', 'color':ROOT.kMagenta+1, "histo":ROOT.TH1F("Signal 5", "sqrt(s)", *binning),'niceName':'T5qqqqWW m_{\\tilde{g}}=1000, m_{\\tilde{\\chi}_{1}^{+}}=800, m_{\\tilde{\\chi}_{1}^{0}}=700'}
+#signal6 = {'name':'T5qqqqWWDeg_mGo800_mCh305_mChi300', 'chain':SIG6, 'weight':'weight', 'color':ROOT.kCyan+3, "histo":ROOT.TH1F("Signal 6", "sqrt(s)", *binning), 'niceName':'T5qqqqWW m_{\\tilde{g}}=800,  m_{\\tilde{\\chi}_{1}^{+}}=305, m_{\\tilde{\\chi}_{1}^{0}}=300'}
 
 
 #t5qqqq1 = {'name':'T5qqqqWW_Gl1400_Chi315_LSP300', 'chain':t5qqqq1400_315_300, 'weight':'(1)', 'color':ROOT.kBlue, "histo":ROOT.TH1F("Signal 1", "sqrt(s)", *binning)}
@@ -229,12 +230,12 @@ signal6 = {'name':'T5qqqqWWDeg_mGo800_mCh305_mChi300', 'chain':SIG6, 'weight':'w
 
 
 sigSamples=[]
-sigSamples.append(signal1)
-sigSamples.append(signal2)
-sigSamples.append(signal3)
-sigSamples.append(signal4)
+#sigSamples.append(signal1)
+#sigSamples.append(signal2)
+#sigSamples.append(signal3)
+#sigSamples.append(signal4)
 sigSamples.append(signal5)
-sigSamples.append(signal6)
+#sigSamples.append(signal6)
 
 #sigSamples.append(t5qqqq6)
 #sigSamples.append(t5qqqq7)
@@ -247,12 +248,12 @@ sigSamples.append(signal6)
 
 
 bkgSamples=[]
-bkgSamples.append(qcd)
-bkgSamples.append(ttvh)
-bkgSamples.append(dy)
-bkgSamples.append(singletop)
+#bkgSamples.append(qcd)
+#bkgSamples.append(ttvh)
+#bkgSamples.append(dy)
+#bkgSamples.append(singletop)
 bkgSamples.append(wjets)
-bkgSamples.append(ttjets)
+#bkgSamples.append(ttjets)
 
 noAdCut = {'name':'noAddCut', 'varString':'mt2w', 'legendName':'#Delta#Phi(#slash{E}_{T},J_{1})', 'Ytitle':'# of Events', 'binning':[20,0,pi]}#, 'binningIsExplicit':True}
 dphimetjet = {'name':'mydPhimetjet', 'varFunc':getdPhiMetJet, 'legendName':'#Delta#Phi(#slash{E}_{T},J_{1})', 'Ytitle':'# of Events', 'binning':[20,0,pi]}#, 'binningIsExplicit':True}
@@ -279,7 +280,7 @@ jetRatio = {'name':'myJetRatio', 'varFunc':getJetRatio, 'legendName':'(Jet3+Jet4
 adJetRatio = {'name':'myAdvancedJetRatio', 'varFunc':getAdJetRatio, 'legendName':'(nLJet+closest)/(leadingJet+closest)', 'Ytitle':'# of Events / 10GeV', 'binning':[35,0,350]}
 jetDistance = {'name':'myJetDistance', 'varFunc':getJetDistance, 'legendName':'dPhi(LJ+cl)', 'Ytitle':'# of Events / 10GeV', 'binning':[35,0,350]}
 adJetDistance = {'name':'myAdvancedJetDistance', 'varFunc':getAdJetDistance, 'legendName':'dPhi(LJ+cl)/dPhi(NLJ+cl)', 'Ytitle':'# of Events / 10GeV', 'binning':[35,0,350]}
-jetDeltaPhi = {'name':'myJetDeltaPhi', 'varFunc':getDeltaPhiJet, 'legendName':'dPhi(Jet1,Jet2)', 'Ytitle':'# of Events / 10GeV', 'binning':[35,0,350]}
+jetDeltaPhi = {'name':'myJetDeltaPhi', 'varFunc':getDeltaPhiJet, 'legendName':'dPhi(Jet1,Jet2)', 'Ytitle':'# of Events / 10GeV', 'binning':[16,0,3.2]}
 
 htratio = {'name':'myhtratio', 'varFunc':gethtRatio, 'legendName':'H_{T,ratio}', 'Ytitle':'# of Events', 'binning':[25,0,2.5]}
 dphimetjet = {'name':'mydPhimetjet', 'varFunc':getdPhiMetJet, 'legendName':'#Delta#Phi(#slash{E}_{T},J_{1})', 'Ytitle':'# of Events', 'binning':[20,0,pi]}#, 'binningIsExplicit':True}
@@ -295,16 +296,16 @@ allVariables = []
 #jets = cmgGetJets(c)
 
 #allVariables.append(dphimetjet)
-allVariables.append(minDPhiMetJetthree)
+allVariables.append(jetDeltaPhi)
 
-cutVar = MT2W
-adCut = 200
-varNew = MT2W
+cutVar = noAdCut
+adCut = 0.
+varNew = jetDeltaPhi
 binning = varNew['binning']
 
-stReg=[(450,-1)]#,(450,-1)]#,(350,450),(450,-1)]#250),(250,350),(350,450),(450,-1)]
-htReg=[(500,750),(750,1000),(1000,1250),(1250,-1)]#,(1250,-1)]
-jetReg = [(4,5),(6,7),(8,-1)]#,(8,-1)]#,(6,-1)]#,(8,-1)]#,(6,-1),(8,-1)]
+stReg=[(250,350),(350,450),(450,-1)]
+htReg=[(500,750),(750,1000),(1000,-1)]#,(1250,-1)]#,(1250,-1)]
+jetReg = [(2,3),(4,4),(5,5),(6,7),(8,-1)]#,(8,-1)]#,(6,-1)]#,(8,-1)]#,(6,-1),(8,-1)]
 btb = (0,0)
 
 #presel = prepresel + ht['varstring'] + ">=" + str(bins[0]) + ht['varstring'] + '<' + str(bins[1])

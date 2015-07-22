@@ -1,1 +1,0 @@
-/afs/hephy.at/scratch/d/dspitzbart/CMSSW_7_1_5/src/Workspace/HEPHYPythonTools/cardFileWriter/cardFileWriter.py

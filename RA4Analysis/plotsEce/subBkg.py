@@ -7,15 +7,18 @@ from Workspace.RA4Analysis.stage2Tuples import ttJetsCSA1450nsInc, T5Full_1200_1
 from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYieldFromChain
 
 from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2_HT400ST150_withDF import *
+import os,sys
 
 ROOT_colors = [ROOT.kBlack, ROOT.kRed-7, ROOT.kBlue-2, ROOT.kGreen+3, ROOT.kOrange+1,ROOT.kRed-3, ROOT.kAzure+6, ROOT.kCyan+3, ROOT.kOrange , ROOT.kRed-10]
 ROOT.gROOT.LoadMacro("../../HEPHYPythonTools/scripts/root/tdrstyle.C")
 ROOT.setTDRStyle()
 
 lepSel = 'hard'
-path = '/afs/hephy.at/user/e/easilar/www/pngPHYS14_taurejected/'
+path = '/afs/hephy.at/user/e/easilar/www/Phys14v3/toConvener/dilep_split/'
 if not os.path.exists(path):
   os.makedirs(path)
+
+
 
 c = getChain(ttJets[lepSel],histname='')
 s1200 = getChain(SMS_T5qqqqWW_Gl1200_Chi1000_LSP800[lepSel],histname='')
@@ -51,7 +54,7 @@ ngNuTauFromW = "Sum$(abs(genPart_pdgId)==16&&abs(genPart_motherId)==24)"
 #nBtagCMVA = "Sum$(Jet_id&&Jet_pt>40&&abs(Jet_eta)<2.4&&Jet_btagCMVA>0.732)"
 #ngoodMuons = 'Sum$(abs(LepGood_pdgId)==13)'
 #ngoodElectrons = 'Sum$(abs(LepGood_pdgId)==11)'
-tot_lumi = 4000
+tot_lumi = 3000
 nevents = c.GetEntries()
 weight = "("+str(tot_lumi)+"*xsec)/"+str(nevents)
 print weight
