@@ -4,22 +4,34 @@ from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYi
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName, nBTagBinName, varBinName
 from math import sqrt, pi
 
-dPhiStr = 'deltaPhi_Wl' #= "acos((leptonPt+met*cos(leptonPhi-metPhi))/sqrt(leptonPt**2+met**2+2*met*leptonPt*cos(leptonPhi-metPhi)))"
 
-ROOT.TH1F().SetDefaultSumw2()
+def makeWeight(lumi=4.):
+  weight_str = '(((weight)/4)*'+str(lumi)+')'
+  weight_err_str = '('+weight_str+'*'+weight_str+')'
+  return weight_str, weight_err_str
 
-def getRCS(c, cut, dPhiCut):   
-#  dPhiStr = "acos((leptonPt+met*cos(leptonPhi-metPhi))/sqrt(leptonPt**2+met**2+2*met*leptonPt*cos(leptonPhi-metPhi)))"
+
+#ROOT.TH1F().SetDefaultSumw2()
+
+def getRCS(c, cut, dPhiCut, useGenMet=False, useAllGen=False):   
+  if useGenMet: dPhiStr = "acos((leptonPt+met_genPt*cos(leptonPhi-met_genPhi))/sqrt(leptonPt**2+met_genPt**2+2*met_genPt*leptonPt*cos(leptonPhi-met_genPhi)))"
+  else: dPhiStr = 'deltaPhi_Wl'
+  if useAllGen: dPhiStr = "acos((genLep_pt+met_genPt*cos(genLep_phi-met_genPhi))/sqrt(genLep_pt**2+met_genPt**2+2*met_genPt*genLep_pt*cos(genLep_phi-met_genPhi)))"
   h = getPlotFromChain(c, dPhiStr, [0,dPhiCut,pi], cutString=cut, binningIsExplicit=True)
-  if h.GetBinContent(1)>0 and h.GetBinContent(2)>0:
+  h.Sumw2()
+  if h.GetBinContent(1)>0:
     rcs = h.GetBinContent(2)/h.GetBinContent(1)
-    rCSE_sim = rcs*sqrt(h.GetBinError(2)**2/h.GetBinContent(2)**2 + h.GetBinError(1)**2/h.GetBinContent(1)**2)
-    rCSE_pred = rcs*sqrt(1./h.GetBinContent(2)**2 + 1./h.GetBinContent(1)**2)
-    del h
-    return {'rCS':rcs, 'rCSE_pred':rCSE_pred, 'rCSE_sim':rCSE_sim}
+    if h.GetBinContent(2)>0:
+      rCSE_sim = rcs*sqrt(h.GetBinError(2)**2/h.GetBinContent(2)**2 + h.GetBinError(1)**2/h.GetBinContent(1)**2)
+      rCSE_pred = rcs*sqrt(1./h.GetBinContent(2) + 1./h.GetBinContent(1))
+      del h
+      return {'rCS':rcs, 'rCSE_pred':rCSE_pred, 'rCSE_sim':rCSE_sim}
+    else:
+      del h
+      return {'rCS':rcs, 'rCSE_pred':float('nan'), 'rCSE_sim':float('nan')}
   else:
     del h
-    return {'rCS':'nan', 'rCSE_pred':'nan', 'rCSE_sim':'nan'}
+    return {'rCS':float('nan'), 'rCSE_pred':float('nan'), 'rCSE_sim':float('nan')}
   
 def getFOM(Ysig ,Ysig_Err , Ybkg,  Ybkg_Err):
   if Ybkg>0.0:
@@ -27,6 +39,23 @@ def getFOM(Ysig ,Ysig_Err , Ybkg,  Ybkg_Err):
     return FOM
   else:
     return 'nan'
+
+def dynDeltaPhi(dPhi=1.0, stb='def', htb='def', njb='def', nbjb='def'):
+  if stb[0] >= 450:
+    if njb[0] >= 6:
+      dPhi = 0.75
+  elif stb[0]>=350:
+    if njb[0]>=8:
+      dPhi = 0.75
+  print 'Using deltaPhi value:',dPhi, 'with ST, HT, njet: ',stb, htb, njb 
+  #deltaPhis = {'stb':{'htb':{'njb':{'nbjb':1.0}}}, }
+  #deltaPhiD = {nan:{nan:{nan:1.0}}, (250,350):{nan:{nan:1.0}}, (350,450):{nan:{nan:0.75}}, (450,-1):{nan:{nan:0.5}}}
+
+  #deltaPhi = {}#(250,350):1.2, (350,450):0.9, (450,-1):0.8, (450,600):0.7, (600,-1):0.6}
+  #if stb in deltaPhi: dPhi = deltaPhi[stb]
+  #else: print 'Using default deltaPhi value:',dPhi
+
+  return dPhi
 
 
 #don't use k_factor calculation right now it has to be optimized

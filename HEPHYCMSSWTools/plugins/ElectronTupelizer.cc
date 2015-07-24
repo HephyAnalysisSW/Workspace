@@ -126,7 +126,7 @@ void ElectronTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup)
     if (!ele->gsfTrack().isNull()){
       dxy = fabs(ele->gsfTrack()->dxy(vertexPosition));
       dz = fabs(ele->gsfTrack()->dz(vertexPosition));
-//      missingHits = ele->gsfTrack()->trackerExpectedHitsInner().numberOfHits();
+      //missingHits = ele->gsfTrack()->trackerExpectedHitsInner().numberOfHits();
       missingHits = ele->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS);
     }
 

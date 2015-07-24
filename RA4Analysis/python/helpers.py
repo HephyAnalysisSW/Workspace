@@ -5,6 +5,14 @@ from math import cos, sin, sqrt, acos, pi, atan2, cosh
 
 # h_1200_800  = kBlack
 # h_1500_100  = kMagenta
+
+def UncertaintyDivision(a,b):
+  try:
+    c = float(a) / b
+  except ZeroDivisionError:
+    c = a / 1.
+  return c
+
 def color(S):
   s=S.lower()
   if "qcd" in s:
@@ -160,14 +168,16 @@ def nJetBinName(njb):
     n+='#leq '+str(njb[1])
   return n
 def nBTagBinName(btb):
+  if len(btb)==2 and btb[0]==btb[1]:
+    return "n_{b-tag}="+str(btb[0])
   n=str(list(btb)[0])+"#leq n_{b-tag}"
   if len(btb)>1 and btb[1]>-1:
     n+='#leq '+str(btb[1])
   return n
 def varBinName(vb, var):
-  n=str(list(vb)[0])+"< "+var
+  n=str(list(vb)[0])+"#leq "+var
   if len(vb)>1 and vb[1]>0:
-    n+='#leq '+str(vb[1])
+    n+='< '+str(vb[1])
   return n
 
 def varBin(vb):
@@ -178,7 +188,7 @@ def varBin(vb):
 def getBinBorders(l, max=10**4):
   return [x[0] for x in l ] + [max]
 
-def nameAndCut(stb, htb, njetb, btb=None, presel="(1)", charge="", btagVar = 'nBJetMediumCMVA30'):
+def nameAndCut(stb, htb, njetb, btb=None, presel="(1)", charge="", btagVar = 'nBJetMediumCSV30'):
   cut=presel
   name=""
   if stb:
@@ -194,17 +204,25 @@ def nameAndCut(stb, htb, njetb, btb=None, presel="(1)", charge="", btagVar = 'nB
       cut+='&&htJet30j<'+str(htb[1])
       name+='-'+str(htb[1])
   if njetb:
-    cut+='&&nJet30>='+str(njetb[0])
-    name+='_njet'+str(njetb[0])
-    if len(njetb)>1 and njetb[1]>=0:
-      cut+='&&nJet30<='+str(njetb[1])
-      name+='-'+str(njetb[1])
+    if len(njetb)>1 and njetb[0] == njetb[1]:
+      cut+='&&nJet30=='+str(njetb[0])
+      name+='_njetEq'+str(njetb[0])
+    else:
+      cut+='&&nJet30>='+str(njetb[0])
+      name+='_njet'+str(njetb[0])
+      if len(njetb)>1 and njetb[1]>=0:
+        cut+='&&nJet30<='+str(njetb[1])
+        name+='-'+str(njetb[1])
   if btb:
-    cut+='&&'+btagVar+'>='+str(btb[0])
-    name+='_nbtag'+str(btb[0])
-    if len(btb)>1 and btb[1]>=0:
-      cut+='&&'+btagVar+'<='+str(btb[1])
-      name+='-'+str(btb[1])
+    if len(btb)>1 and btb[0] == btb[1]:
+      cut+='&&'+btagVar+'=='+str(btb[0])
+      name+='_nbtagEq'+str(btb[0])
+    else:
+      cut+='&&'+btagVar+'>='+str(btb[0])
+      name+='_nbtag'+str(btb[0])
+      if len(btb)>1 and btb[1]>=0:
+        cut+='&&'+btagVar+'<='+str(btb[1])
+        name+='-'+str(btb[1])
   if charge.lower()=='pos':
     cut+='&&leptonPdg<0'
     name+='_posCharge'
@@ -214,6 +232,15 @@ def nameAndCut(stb, htb, njetb, btb=None, presel="(1)", charge="", btagVar = 'nB
   if name.startswith('_'):name=name[1:]
   return [name, cut]
 
+def binToFileName(a):
+  if len(njetb)>1 and njetb[0] == njetb[1]:
+    name+='_njetEq'+str(njetb[0])
+  else:
+    cut+='&&nJet30>='+str(njetb[0])
+    name+='_njet'+str(njetb[0])
+    if len(njetb)>1 and njetb[1]>=0:
+      cut+='&&nJet30<='+str(njetb[1])
+      name+='-'+str(njetb[1])
 
 #def wRecoPt(chain):
 #  lPt = getVarValue(chain, "leptonPt")

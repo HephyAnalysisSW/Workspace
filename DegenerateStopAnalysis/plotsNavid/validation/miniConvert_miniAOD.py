@@ -11,7 +11,7 @@ rootFilesIn= lambda dir : [dir+fn for fn in os.listdir(dir) if any([fn.endswith(
 
 #Select item in stepDict
 step=0
-doStuff = 1
+doStuff = 0
 prefix="RUNII_vtx_genMatch_IP_wrt_0_"
 #nEvents -1 for all events
 nEvents=1000
@@ -207,9 +207,11 @@ stepDict=[
         #{'name':'stop',               'filelist': ['root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/nrad/T2DegStop2j_300_270_GENSIM/T2DegStop2j_300_270_MINIAOD/a279b5108ada7c3c0926210c2a95f22e/T2DegStop2j_300_270_miniAOD_2_1_yQN.root'] },
         #{'name':'WJets',              'filelist': ['root://xrootd.unl.edu//store/mc/Phys14DR/WJetsToLNu_13TeV-madgraph-pythia8-tauola/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/02215B44-2D70-E411-90A3-0025905A60B8.root']},
         #{'name':'stop',               'filelist': ['/data/nrad/T2DegStop13TeV/T2DegStop2j_sample_miniAOD.root']},
-        {'name':'stop',               'filelist': ['/data/nrad/T2DegStop13TeV/RunII/step3_PAT.root']},
-        {'name':'WJets',              'filelist': ['../WJetsToLNu_13TeV_Phys14_miniAOD.root']},
-        {'name':'TT',                 'filelist': ['../TT_13TeV_Phys14PU40bx25_miniAOD.root']},
+        {'name':'stop',               'filelist': [' /afs/hephy.at/user/n/nrad/public/T2DegStop2j_300_270_miniAOD_withGenParticles.root '] }
+        #{'name':'stop',               'filelist': ['root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms//store/user/nrad/T2DegStop2j_300_270_GENSIM/T2DegStop2j_300_270_MINIAOD/a279b5108ada7c3c0926210c2a95f22e/T2DegStop2j_300_270_miniAOD_1_1_RGu.root']},
+        #{'name':'stop',               'filelist': ['/data/nrad/T2DegStop13TeV/RunII/step3_PAT.root']},
+        #{'name':'WJets',              'filelist': ['../WJetsToLNu_13TeV_Phys14_miniAOD.root']},
+        #{'name':'TT',                 'filelist': ['../TT_13TeV_Phys14PU40bx25_miniAOD.root']},
 
         #{'name':'test',               'filelist': ['root://xrootd.unl.edu//store/mc/Phys14DR/ADDmonoPhoton_MD-3_d-3_Tune4C_13TeV-pythia8/MINIAODSIM/AVE30BX50_tsg_PHYS14_ST_V1-v1/30000/38E6C54E-EF88-E411-A646-E0CB4E29C4DB.root']  },
         #{'name':'MG_GEN_qcut50',     'filelist': ["/data/nrad/T2DegStop13TeV/GEN/T2DegStop2j_300_270_GEN.root",] },
