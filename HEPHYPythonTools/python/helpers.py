@@ -150,7 +150,8 @@ def getChunksFromNFS(sample, treeName, maxN=-1):
         line = [x for x in subprocess.check_output(["cat", logfile]).split('\n') if x.count('Sum Weights')]
         #print "LOOOKKKKK:" , line
         assert len(line)==1,"Didn't find event number in file %s"%logfile
-        n = int(float(line[0].split()[2]))
+        #n = int(float(line[0].split()[2]))
+        n = float(line[0].split()[2])
         inputFilename = sample['dir']+'/'+s['name']+'/'+treeName+'/tree.root'
         if os.path.isfile(inputFilename):
           nTotEvents+=n

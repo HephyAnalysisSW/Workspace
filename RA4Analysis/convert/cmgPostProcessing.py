@@ -24,6 +24,7 @@ ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 
 defSampleStr = "WJetsToLNu_HT100to200"
+#defSampleStr = "data_mu"
 
 
 branchKeepStrings = ["run", "lumi", "evt", "isData", "xsec", "puWeight", "nTrueInt", "genWeight", "rho", "nVert", "nJet25", "nBJetLoose25", "nBJetMedium25", "nBJetTight25", "nJet40", "nJet40a", "nBJetLoose40", "nBJetMedium40", "nBJetTight40", 
@@ -105,9 +106,10 @@ for isample, sample in enumerate(allSamples):
   os.system('mkdir -p '+tmpDir)
   os.system('rm -rf '+tmpDir+'/*')
 
-  prelumiWeight = xsec[sample['dbsName']]*target_lumi/float(nTotEvents)   ###nTotEvents is sum weight
+  #prelumiWeight = xsec[sample['dbsName']]*target_lumi/float(nTotEvents)   ###nTotEvents is sum weight
+  prelumiWeight = 0.032 
   
-  print "sample['dbsName']:" , sample['dbsName']
+  #print "sample['dbsName']:" , sample['dbsName']
   readVariables = ['met_pt/F', 'met_phi/F']
 
   #newVariables = ['weight/F']
@@ -173,17 +175,18 @@ for isample, sample in enumerate(allSamples):
         s.init()
         r.init()
         t.GetEntry(i)
-        genWeight = t.GetLeaf('genWeight').GetValue(i)
-        print genWeight
-        print "before reweight:" , prelumiWeight
+        genWeight = t.GetLeaf('genWeight').GetValue()
+        #print genWeight
+        #print "before reweight:" , prelumiWeight
         s.weight = prelumiWeight*genWeight
-        print "reweighted:" , s.weight
-        if "TTJets_" in sample['dbsName']:
-          s.weight_XSecTTBar1p1 = s.weight*1.1 
-          s.weight_XSecTTBar0p9 = s.weight*0.9
-        else :
-          s.weight_XSecTTBar1p1 = s.weight
-          s.weight_XSecTTBar0p9 = s.weight
+        #s.weight = 1
+        #print "reweighted:" , s.weight
+        #if "TTJets_" in sample['dbsName']:
+        #  s.weight_XSecTTBar1p1 = s.weight*1.1 
+        #  s.weight_XSecTTBar0p9 = s.weight*0.9
+        #else :
+        #  s.weight_XSecTTBar1p1 = s.weight
+        #  s.weight_XSecTTBar0p9 = s.weight
 
         
         if options.leptonSelection.lower() in ['soft','hard']:
