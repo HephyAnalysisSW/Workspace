@@ -6,9 +6,10 @@ from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYi
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,varBinName, cmgMTClosestJetMET, cmgMTClosestBJetMET,  cmgMinDPhiJet, cmgMinDPhiBJet , cmgMTTopClosestJetMET , cmgHTOrthMET
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2_HT400_withDF import *
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v1_Phys14V3_HT400ST200 import *
-from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
+###from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v9_Phys14V3_HT400ST200_ForTTJetsUnc import *
 from localInfo import username
+from Workspace.RA4Analysis.cmgTuplesPostProcessed_Spring15_hard import *
 
 #from binnedNBTagsFit import binnedNBTagsFit
 ROOT.gROOT.Reset()
@@ -50,18 +51,18 @@ cut = nameAndCut(stb=stCut, htb=htCut, njetb=njetCut, btb=nbtagCut, presel=prepr
 presel = cut[1]+"&&Jet_pt[1]>="+str(jetPtCut)
 print presel
 
-path = "/afs/hephy.at/user/e/easilar/www/with_data/"+cut[0]+prepresel.split('&&')[0]+"/"    #.replace('&&','_')+"/"
+path = "/afs/hephy.at/user/e/easilar/www/tests/"+cut[0]+prepresel.split('&&')[0]+"/"    #.replace('&&','_')+"/"
 if not os.path.exists(path):
   os.makedirs(path)
 
 
 bkg_samples = [
-{'cname':'QCD'      ,'label':'QCD'           ,'color':ROOT.kCyan-6      ,'chain':getChain(QCD[lepSel],histname='')         },\
-{'cname':'TTVH'     ,'label':'t#bar{t}+W/Z/H','color':ROOT.kOrange-3    ,'chain':getChain(TTVH[lepSel],histname='')        },\
-{'cname':'DY'       ,'label':'DY+Jets'       ,'color':ROOT.kRed-6       ,'chain':getChain(DY[lepSel],histname='')          },\
-{'cname':'singleTop','label':'single top'    ,'color':ROOT.kViolet+5,'chain':getChain(singleTop[lepSel],histname='')   },\
+#{'cname':'QCD'      ,'label':'QCD'           ,'color':ROOT.kCyan-6      ,'chain':getChain(QCD[lepSel],histname='')         },\
+#{'cname':'TTVH'     ,'label':'t#bar{t}+W/Z/H','color':ROOT.kOrange-3    ,'chain':getChain(TTVH[lepSel],histname='')        },\
+#{'cname':'DY'       ,'label':'DY+Jets'       ,'color':ROOT.kRed-6       ,'chain':getChain(DY[lepSel],histname='')          },\
+#{'cname':'singleTop','label':'single top'    ,'color':ROOT.kViolet+5,'chain':getChain(singleTop[lepSel],histname='')   },\
 {'cname':'WJets'    ,'label':'W+Jets'        ,'color':ROOT.kGreen-2 ,'chain':getChain(WJetsHTToLNu[lepSel],histname='')},\
-{'cname':'TTJets'   ,'label':'t#bar{t}+Jets' ,'color':ROOT.kBlue-2 ,'chain':getChain(ttJets[lepSel],histname='')      },\
+#{'cname':'TTJets'   ,'label':'t#bar{t}+Jets' ,'color':ROOT.kBlue-2 ,'chain':getChain(ttJets[lepSel],histname='')      },\
 
 ]
 

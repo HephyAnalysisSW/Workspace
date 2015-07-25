@@ -1,5 +1,15 @@
 #!/bin/sh 
+########Spring15###############
+python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=WJetsToLNu_HT100to200 &
+python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=WJetsToLNu_HT200to400 &
+python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=WJetsToLNu_HT400to600 &
+python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=WJetsToLNu_HT600toInf &
 
+python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=DYJetsToLL_M_50  &
+
+
+
+#########Phys14###############
 #python cmgPostProcessing.py --leptonSelection=$1 --samples=SMS_T5qqqqWW_Gl1500_Chi800_LSP100  $2   &  #--skim=HT400ST150 
 #python cmgPostProcessing.py --leptonSelection=$1 --samples=SMS_T5qqqqWW_Gl1200_Chi1000_LSP800 $2    &   #--skim=HT400ST150 
 #python cmgPostProcessing.py --leptonSelection=$1 --samples=SMS_T1tttt_2J_mGl1500_mLSP100 $2          &   #--skim=HT400ST150 
@@ -51,7 +61,7 @@
 #python cmgPostProcessing.py --leptonSelection=$1 --samples=DYJetsToLL_M50_HT100to200_PU20bx25   $2  #--skim=HT400ST150 
 #python cmgPostProcessing.py --leptonSelection=$1 --samples=DYJetsToLL_M50_HT200to400_PU20bx25   $2  #--skim=HT400ST150 
 #python cmgPostProcessing.py --leptonSelection=$1 --samples=DYJetsToLL_M50_HT400to600_PU20bx25   $2   #--skim=HT400ST150 
-python cmgPostProcessing.py --leptonSelection=$1 --samples=DYJetsToLL_M50_HT600toInf_PU20bx25   $2   #--skim=HT400ST150 
+#python cmgPostProcessing.py --leptonSelection=$1 --samples=DYJetsToLL_M50_HT600toInf_PU20bx25   $2   #--skim=HT400ST150 
 #python cmgPostProcessing.py --leptonSelection=$1 --samples=QCD_HT_100To250_PU20bx25             $2   #--skim=HT400ST150 
 #python cmgPostProcessing.py --leptonSelection=$1 --samples=QCD_HT_250To500_PU20bx25             $2   #--skim=HT400ST150 
 #python cmgPostProcessing.py --leptonSelection=$1 --samples=QCD_HT_500To1000_PU20bx25            $2   #--skim=HT400ST150 
