@@ -106,8 +106,8 @@ for isample, sample in enumerate(allSamples):
   os.system('mkdir -p '+tmpDir)
   os.system('rm -rf '+tmpDir+'/*')
 
-  #prelumiWeight = xsec[sample['dbsName']]*target_lumi/float(nTotEvents)   ###nTotEvents is sum weight
-  prelumiWeight = 0.032 
+  prelumiWeight = xsec[sample['dbsName']]*target_lumi/float(nTotEvents)   ###nTotEvents is sum weight
+ 
   
   #print "sample['dbsName']:" , sample['dbsName']
   readVariables = ['met_pt/F', 'met_phi/F']
