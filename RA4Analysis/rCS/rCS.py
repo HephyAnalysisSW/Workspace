@@ -2,12 +2,14 @@ import ROOT
 import os,sys
 #ROOT.gROOT.LoadMacro('/afs/hephy.at/scratch/d/dhandl/CMSSW_7_2_3/src/Workspace/HEPHYPythonTools/scripts/root/tdrstyle.C')
 #ROOT.setTDRStyle()
-from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain
+from Workspace.HEPHYPythonTools.helpers import *
+#from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName, nBTagBinName, varBinName, varBin
 
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2_HT400_withDF import *
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2_HT400ST150_withDF import *
 from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
+#from Workspace.RA4Analysis.cmgTuplesPostProcessed_Spring15 import *
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,varBinName
 from rCShelpers import *
 #from slidingDeltaPhi import *
@@ -25,14 +27,14 @@ maxN = -1 if not small else 1
 lepSel = 'hard'
 
 cWJets  = getChain(WJetsHTToLNu[lepSel],histname='',maxN=maxN)
-cTTJets = getChain(ttJets[lepSel],histname='',maxN=maxN)
+#cTTJets = getChain(ttJets[lepSel],histname='',maxN=maxN)
 #cBkg    = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], QCD[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]],histname='')
 
 
 from localInfo import username
 uDir = username[0]+'/'+username
-#subDir = 'PHYS14v3/rCS/'
-subDir = 'pngCMG2/rCS/PHYS14V3/useRecoMet'
+subDir = 'PHYS14v3/rCS/GenMetGenStBinned'
+#subDir = 'pngCMG2/rCS/PHYS14V3/useRecoMet'
 
 path = '/afs/hephy.at/user/'+uDir+'/www/'+subDir+'/'
 if not os.path.exists(path):
@@ -46,7 +48,9 @@ ROOT.gStyle.SetOptStat(0)
 
 ROOT.TH1F().SetDefaultSumw2()
 
-channels = [['ele',11],['mu',13],['both',0]]
+#channels = [['ele',11],['mu',13],['both',0]]
+channels = [['both',0]]
+
 
 channel = 'ele'
 if channel == 'ele':
@@ -54,21 +58,29 @@ if channel == 'ele':
 elif channel =='mu':
   pdgId = 13
 
-streg = [[(250,350), 1.], [(350, 450), 1.],  [(450, -1), 1.] ]
+streg = [[(250,350),1.],[(350,450),1.],[(450,-1),1.]]#,[(350,450), 1.],[(450,-1),1.]]#, [(350, 450), 1.],  [(450, -1), 1.] ]
 htreg = [(500,750),(750,1000),(1000,-1)]#,(1000,1250),(1250,-1)]#,(1250,-1)]
 btreg = (0,0)
 njreg = [(2,2),(3,3),(4,4),(5,5),(6,7),(8,-1)]#,(7,7),(8,8),(9,9)]
 nbjreg = [(0,0),(1,1),(2,2)]
 
 #Usage of GenMet for deltaPhi / rCS
-GenMetSwitch = False
+GenMetSwitch = True
 useOnlyGenMetPt = False
 useOnlyGenMetPhi = False
 
+ngNuEFromW = "Sum$(abs(genPartAll_pdgId)==12&&abs(genPartAll_motherId)==24)"
+ngNuMuFromW = "Sum$(abs(genPartAll_pdgId)==14&&abs(genPartAll_motherId)==24)"
+ngNuTauFromW = "Sum$(abs(genPartAll_pdgId)==16&&abs(genPartAll_motherId)==24)"
+l_H     = ngNuEFromW+"+"+ngNuMuFromW+"==1&&"+ngNuTauFromW+"==0"
+
 #presel="singleMuonic&&nVetoMuons==1&&nVetoElectrons==0&&nBJetMedium40==1"
 #presel="singleMuonic&&nVetoMuons==1&&nVetoElectrons==0&&nBJetMedium25==0"
-presel='singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&met_genPt<100'
-#presel='singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80'
+#presel='singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&'+l_H
+#presel='singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&Max$(abs(Jet_pt-Jet_mcPt))<50'
+#presel='singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&(sqrt((-met_genPt*cos(met_genPhi)+met_pt*cos(met_phi))**2+(-met_genPt*sin(met_genPhi)+met_pt*sin(met_phi))**2)/met_genPt)<1'
+
+presel='singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80'
 prefix = presel.split('&&')[0]+'_'
 
 ##2D plots of yields
@@ -141,7 +153,7 @@ for lep, pdgId in channels:
   h_nbj[lep] = {}
   h_2d[lep] = {}
   rcsDict[lep] = {}
-  for name, c in [["tt", cTTJets] , ["W",cWJets] ]:
+  for name, c in [["W",cWJets] ]:# [["tt", cTTJets] , ["W",cWJets] ]:
     h_nj_pos[lep][name] = {}
     h_nj_neg[lep][name] = {}
     h_nj[lep][name] = {}
@@ -179,15 +191,18 @@ for lep, pdgId in channels:
           h_nj_pos[lep][name][stb][htb].SetMinimum(0.)
           h_nj_neg[lep][name][stb][htb].SetMinimum(0.)
         for i_njb, njb in enumerate(njreg):
-          cname, cut = nameAndCut(stb,htb,njb, btb=btreg ,presel=presel)
+          cname, cut = nameAndCut(stb,htb,njb, btb=btreg ,presel=presel, stVar='(leptonPt+met_genPt)')
           if lep in ['ele','mu']:
             cut = cut+'&&abs(leptonPdg)=='+str(pdgId)
           poscut = 'leptonPdg>0&&'+cut
           negcut = 'leptonPdg<0&&'+cut
           dPhiCut = dynDeltaPhi(1.0,stb, htb, njb)
-          rcs = getRCS(c, cut, dPhiCut, useGenMet=GenMetSwitch, useOnlyGenMetPt=useOnlyGenMetPt, useOnlyGenMetPhi=useOnlyGenMetPhi)
-          rcsPos = getRCS(c, poscut, dPhiCut, useGenMet=GenMetSwitch, useOnlyGenMetPt=useOnlyGenMetPt, useOnlyGenMetPhi=useOnlyGenMetPhi)
-          rcsNeg = getRCS(c, negcut, dPhiCut, useGenMet=GenMetSwitch, useOnlyGenMetPt=useOnlyGenMetPt, useOnlyGenMetPhi=useOnlyGenMetPhi)
+          #rcs = getRCSel(c, cut, dPhiCut)
+          #rcsPos = getRCSel(c, poscut, dPhiCut)
+          #rcsNeg = getRCSel(c, negcut, dPhiCut)
+          rcs = getRCS(c, cut, dPhiCut, useGenMet=GenMetSwitch, useOnlyGenMetPt=useOnlyGenMetPt, useOnlyGenMetPhi=useOnlyGenMetPhi, useWeight=False)
+          rcsPos = getRCS(c, poscut, dPhiCut, useGenMet=GenMetSwitch, useOnlyGenMetPt=useOnlyGenMetPt, useOnlyGenMetPhi=useOnlyGenMetPhi, useWeight=False)
+          rcsNeg = getRCS(c, negcut, dPhiCut, useGenMet=GenMetSwitch, useOnlyGenMetPt=useOnlyGenMetPt, useOnlyGenMetPhi=useOnlyGenMetPhi, useWeight=False)
           print rcs, dPhiCut
           res = rcs['rCS']
           resErr = rcs['rCSE_sim']
@@ -229,7 +244,7 @@ for lep, pdgId in channels:
 
 #Draw plots binned in njets for all ST and HT bins
 for lep, pdgId in channels:
-  for name, c in [["tt", cTTJets] , ["W",cWJets] ]:
+  for name, c in [["W",cWJets] ]:#[["tt", cTTJets] , ["W",cWJets] ]:
     for istb, [stb, dPhiCut] in enumerate(streg):
       c1 = ROOT.TCanvas('c1','c1',600,600)
       pad1 = ROOT.TPad('Pad','Pad',0.,0.0,1.,1.)

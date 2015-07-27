@@ -448,3 +448,9 @@ def calcMT(lepton, met):
     return sqrt(2.*met['pt']*lepton['pt']*(1-cos(lepton['phi'] - met['phi'])))
   else:
     return float('nan')
+
+def filterParticles(l, values, attribute):
+  for a in l:
+    for v in values:
+      if abs(a[attribute])==v: yield a
+

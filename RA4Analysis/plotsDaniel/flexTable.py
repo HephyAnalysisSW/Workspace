@@ -12,29 +12,63 @@ prefix = 'singleLeptonic_Phys14V3'
 #signalregions = 
 
 streg = [(250, 350), (350, 450), (450,-1)]
-htreg = [(500,750),(750,1000),(1000,1250),(1250,-1)]
-njreg = [(5,5),(6,7),(8,-1)]
+htreg = [(500,750),(750,1000),(1000,-1)]#,(1250,-1)]
+njreg = [(2,3),(4,4),(5,5),(6,7),(8,-1)]
 nSTbins = len(streg)
 nHTbins = len(htreg)
 nJetBins = len(njreg)
 
 
+#print "Results"
+#print
+#print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|c|c|c|c|}\\hline'
+#print ' \\njet     & \ST $[$GeV$]$ & \HT $[$GeV$]$ & Bkg & Model 1 & Model 2 & Model 3\\\ \\hline'
+##print '$[$GeV$]$&        &$[$GeV$]$&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation} \\\\\hline'
+#for i_njb, njb in enumerate(njreg):
+#  print '\\hline'
+#  if i_njb!=0:print '\\hline'
+#  print '\multirow{'+str(nHTbins*nSTbins)+'}{*}{\\begin{sideways}$'+varBin(njb)+'$\end{sideways}}'
+#  #print '& & \multicolumn{6}{c|}{$t\overline{t}$+Jets}&\multicolumn{6}{c|}{$W$+Jets}&\multicolumn{6}{c}{total}\\\\'
+#  #print '\multicolumn{2}{c|}{$'+varBinName(htb, 'H_{T}')+\
+#  #      '$} & \multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c}{simulation}\\\\\\hline'
+#  for stb in streg:
+#    print '&\multirow{'+str(nHTbins)+'}{*}{$'+varBin(stb)+'$}'
+#    first = True
+#    for htb in htreg:
+#      if not first: print '&'
+#      first = False
+#      ##if stb[1] == -1 : print '&'
+#      #flag = True
+#      #try:
+#      #  res[njb][stb][htb]
+#      #except Exception:
+#      #  flag = False
+#      print '&$'+varBin(htb)+'$'
+#      print ' & '+str(round(res[njb][htb][stb]['Bkg'],3))\
+#           +' & '+str(round(res[njb][htb][stb]['Model1'],3))\
+#           +' & '+str(round(res[njb][htb][stb]['Model2'],3))\
+#           +' & '+str(round(res[njb][htb][stb]['Model3'],3)) + '\\\\'
+#      if htb[1] == -1 : print '\\cline{2-7}'
+#  #print '\\hline'
+#print '\\hline\end{tabular}}\end{center}\caption{ABCD}\label{tab:0b_rcscorr_Wbkg}\end{table}'
+
+
 print "Results"
 print
-print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|c|c|c|c|}\\hline'
-print ' \\njet     & \ST $[$GeV$]$ & \HT $[$GeV$]$ & Bkg & Model 1 & Model 2 & Model 3\\\ \\hline'
+print '\\begin{table}[ht]\\begin{center}\\begin{tabular}{|c|c|c|c|c|c|}\\hline'
+print ' \ST $[$GeV$]$ & \HT $[$GeV$]$ & \\njet & righ low & total & fraction\\\ \\hline'
 #print '$[$GeV$]$&        &$[$GeV$]$&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation} \\\\\hline'
-for i_njb, njb in enumerate(njreg):
+for i_stb, stb in enumerate(streg):
   print '\\hline'
-  if i_njb!=0:print '\\hline'
-  print '\multirow{'+str(nHTbins*nSTbins)+'}{*}{\\begin{sideways}$'+varBin(njb)+'$\end{sideways}}'
+  if i_stb!=0:print '\\hline'
+  print '\multirow{'+str(nJetBins*nHTbins)+'}{*}{\\begin{sideways}$'+varBin(stb)+'$\end{sideways}}'
   #print '& & \multicolumn{6}{c|}{$t\overline{t}$+Jets}&\multicolumn{6}{c|}{$W$+Jets}&\multicolumn{6}{c}{total}\\\\'
   #print '\multicolumn{2}{c|}{$'+varBinName(htb, 'H_{T}')+\
   #      '$} & \multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c}{simulation}\\\\\\hline'
-  for stb in streg:
-    print '&\multirow{'+str(nHTbins)+'}{*}{$'+varBin(stb)+'$}'
+  for htb in htreg:
+    print '&\multirow{'+str(nJetBins)+'}{*}{$'+varBin(htb)+'$}'
     first = True
-    for htb in htreg:
+    for njb in njreg:
       if not first: print '&'
       first = False
       ##if stb[1] == -1 : print '&'
@@ -43,11 +77,13 @@ for i_njb, njb in enumerate(njreg):
       #  res[njb][stb][htb]
       #except Exception:
       #  flag = False
-      print '&$'+varBin(htb)+'$'
-      print ' & '+str(round(res[njb][htb][stb]['Bkg'],3))\
-           +' & '+str(round(res[njb][htb][stb]['Model1'],3))\
-           +' & '+str(round(res[njb][htb][stb]['Model2'],3))\
-           +' & '+str(round(res[njb][htb][stb]['Model3'],3)) + '\\\\'
-      if htb[1] == -1 : print '\\cline{2-7}'
+      print '&$'+varBin(njb)+'$'
+      print ' & '+str(round(res[stb][htb][njb]['rightLow'],3))\
+           +' & '+str(round(res[stb][htb][njb]['total'],3))\
+           +' & '+str(round(res[stb][htb][njb]['fraction'],3)) + '\\\\'
+      if njb[1] == -1 : print '\\cline{2-6}'
   #print '\\hline'
-print '\\hline\end{tabular}}\end{center}\caption{ABCD}\label{tab:0b_rcscorr_Wbkg}\end{table}'
+print '\\hline\end{tabular}\end{center}\caption{ABCD}\label{tab:0b_rcscorr_Wbkg}\end{table}'
+
+
+
