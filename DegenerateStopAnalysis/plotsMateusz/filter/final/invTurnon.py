@@ -82,7 +82,7 @@ def makeLegend():
    leg.SetHeader("#bf{Legend}")
    header = leg.GetListOfPrimitives().First()
    header.SetTextAlign(22)
-   return leg 
+   return leg
 
 #Creates Box 
 def makeBox():
@@ -208,7 +208,7 @@ box1.Draw()
 #MET Turnon Plot
 c1.cd(2)
 metTurnon1 = ROOT.TEfficiency(h2, h1) #(passed, total)
-metTurnon1.SetTitle("Inverse MET Turnon Plot (single generator cut) ; Generated Missing Transverse Energy #slash{E}_{T} / GeV ; Counts")
+metTurnon1.SetTitle("Inverse MET Turnon Plot (single reco cut) ; Generated Missing Transverse Energy #slash{E}_{T} / GeV ; Counts")
 metTurnon1.SetMarkerColor(ROOT.kBlue)
 metTurnon1.SetMarkerStyle(33)
 metTurnon1.SetMarkerSize(3)
@@ -221,6 +221,7 @@ metTurnon1.GetPaintedGraph().GetXaxis().CenterTitle()
 metTurnon1.GetPaintedGraph().GetYaxis().CenterTitle()
 
 #Fitting
+
 metTurnon1.Fit(fitFunc)
 
 #Fit Parameter Extraction
@@ -242,8 +243,9 @@ fit1.append(fitFunc.GetX(1))
 
 #box5 = makeBox()
 box5 = ROOT.TLegend(box1)
-box5.AddEntry("","              #bf{Plot:}","")
-box5.AddEntry(metTurnon1, "Inverse MET Turnon Fit (single cut)", "LP")
+#box5.AddEntry("","Efficiency at " + str(cuts['MET']) + " GeV (reco cut): " + str("%0.3f"%recoEff1),"")
+#box5.AddEntry("","              #bf{Plot:}","")
+#box5.AddEntry(metTurnon1, "Inverse MET Turnon Fit (single cut)", "LP")
 #box5.Copy(box1)
 box5.Draw()
 
@@ -306,7 +308,7 @@ box2.Draw()
 #Jet Turnon Plot
 c2.cd(2)
 jetTurnon1 = ROOT.TEfficiency(h4, h3)
-jetTurnon1.SetTitle("ISR Jet p_{T} Inverse Turnon Plot (single generator cut) ; Generated ISR Jet p_{T} / GeV ; Counts")
+jetTurnon1.SetTitle("ISR Jet p_{T} Inverse Turnon Plot (single reco cut) ; Generated ISR Jet p_{T} / GeV ; Counts")
 jetTurnon1.SetMarkerColor(ROOT.kBlue)
 jetTurnon1.SetMarkerStyle(33)
 jetTurnon1.SetMarkerSize(3)
@@ -341,8 +343,8 @@ fit2.append(fitFunc.GetX(1))
 
 #box6 = makeBox()
 box6 = ROOT.TLegend(box2)
-box6.AddEntry("","              #bf{Plot:}","")
-box6.AddEntry(jetTurnon1, "ISR Inverse Turnon Fit (single cut)", "LP")
+#box6.AddEntry("","              #bf{Plot:}","")
+#box6.AddEntry(jetTurnon1, "ISR Inverse Turnon Fit (single cut)", "LP")
 #box6.Copy(box1)
 box6.Draw()
 
@@ -404,7 +406,7 @@ box3.Draw()
 #MET Turnon Plot
 c3.cd(2)
 metTurnon2 = ROOT.TEfficiency(h6, h5) #(passed, total)
-metTurnon2.SetTitle("MET Inverse Turnon Plot (both generator cuts) ; Generated Missing Transverse Energy #slash{E}_{T} / GeV ; Counts")
+metTurnon2.SetTitle("MET Inverse Turnon Plot (both reco cuts) ; Generated Missing Transverse Energy #slash{E}_{T} / GeV ; Counts")
 metTurnon2.SetMarkerColor(ROOT.kBlue)
 metTurnon2.SetMarkerStyle(33)
 metTurnon2.SetMarkerSize(3)
@@ -438,8 +440,8 @@ fit3.append(fitFunc.GetX(1))
 
 #box7 = makeBox()
 box7 = ROOT.TLegend(box3)
-box7.AddEntry("","              #bf{Plot:}","")
-box7.AddEntry(jetTurnon1, "MET Inverse Turnon Fit (both cuts)", "LP")
+#box7.AddEntry("","              #bf{Plot:}","")
+#box7.AddEntry(jetTurnon1, "MET Inverse Turnon Fit (both cuts)", "LP")
 #box7.Copy(box1)
 box7.Draw()
 
@@ -535,8 +537,8 @@ fit4.append(fitFunc.GetX(1))
 
 #box8 = makeBox()
 box8 = ROOT.TLegend(box4)
-box8.AddEntry("","              #bf{Plot:}","")
-box8.AddEntry(jetTurnon1, "ISR Turnon Fit (both cuts)", "LP")
+#box8.AddEntry("","              #bf{Plot:}","")
+#box8.AddEntry(jetTurnon1, "ISR Turnon Fit (both cuts)", "LP")
 #box8.Copy(box1)
 box8.Draw()
 
@@ -580,10 +582,10 @@ makeLine(), "\n", \
 outfile.close()
 
 #Save to file (.root)
-c1.SaveAs(savedir + "/invMET_%s_%s.root"%( str(cuts['MET']), str(cuts['ISR'])))
-c2.SaveAs(savedir + "/invISR_%s_%s.root"%(str(cuts['MET']), str(cuts['ISR'])))
-c3.SaveAs(savedir + "/invMET2_%s_%s.root"%(str(cuts['MET']), str(cuts['ISR'])))
-c4.SaveAs(savedir + "/invISR2_%s_%s.root"%(str(cuts['MET']), str(cuts['ISR'])))
+c1.SaveAs(webdir + "/invMET_%s_%s.root"%( str(cuts['MET']), str(cuts['ISR'])))
+c2.SaveAs(webdir + "/invISR_%s_%s.root"%(str(cuts['MET']), str(cuts['ISR'])))
+c3.SaveAs(webdir + "/invMET2_%s_%s.root"%(str(cuts['MET']), str(cuts['ISR'])))
+c4.SaveAs(webdir + "/invISR2_%s_%s.root"%(str(cuts['MET']), str(cuts['ISR'])))
 
 #Save to Web
 c1.SaveAs(webdir + "/invMET_%s_%s.png"%(str(cuts['MET']), str(cuts['ISR'])))
@@ -591,3 +593,8 @@ c2.SaveAs(webdir + "/invISR_%s_%s.png"%(str(cuts['MET']), str(cuts['ISR'])))
 c3.SaveAs(webdir + "/invMET2_%s_%s.png"%(str(cuts['MET']), str(cuts['ISR'])))
 c4.SaveAs(webdir + "/invISR2_%s_%s.png"%(str(cuts['MET']), str(cuts['ISR'])))
 
+
+c1.SaveAs(webdir + "/invMET_%s_%s.pdf"%( str(cuts['MET']), str(cuts['ISR'])))
+c2.SaveAs(webdir + "/invISR_%s_%s.pdf"%(str(cuts['MET']), str(cuts['ISR'])))
+c3.SaveAs(webdir + "/invMET2_%s_%s.pdf"%(str(cuts['MET']), str(cuts['ISR'])))
+c4.SaveAs(webdir + "/invISR2_%s_%s.pdf"%(str(cuts['MET']), str(cuts['ISR'])))

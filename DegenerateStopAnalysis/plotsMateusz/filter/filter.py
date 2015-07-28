@@ -119,9 +119,9 @@ fitFunc.SetParNames("Normalisation", "Edge", "Resolution", "Y-Offset")
 #fitFunc.SetParameter(1, 150)
 #fitFunc.SetParameter(2, 50)  
 #fitFunc.SetParLimits(0, 0.4, 0.65) #keep fixed?
-fitFunc.SetParLimits(1, 0, 200)
-fitFunc.SetParLimits(2, 0, 60)
-fitFunc.SetParLimits(3, 0.45, 0.8)
+fitFunc.SetParLimits(1, 0, 200) #init: [0,200]
+fitFunc.SetParLimits(2, 0, 60) #init: [0,60]
+fitFunc.SetParLimits(3, 0.45, 0.8) #init: [0.45,0.8]
 
 #Selection
 #weight = 1
@@ -251,7 +251,7 @@ metTurnon1.GetPaintedGraph().GetXaxis().CenterTitle()
 metTurnon1.GetPaintedGraph().GetYaxis().CenterTitle()
 
 #Fitting
-fitFunc.SetParameters(0.5, 150, 40, 0.5)
+fitFunc.SetParameters(0.5, 140, 40, 0.5) #init: (0.5, 140, 40, 0.5)
 metTurnon1.Fit(fitFunc)
 
 print makeLine()
@@ -434,7 +434,7 @@ c2.cd(1)
 h3 = drawhist(T2DegSample, var, preSel2) #MET preselection cut
 h3.SetName("ISR 1")
 h3.SetTitle("Generated ISR Jet p_{T} Filter Effect on Reconstructed ISR Jet p_{T}")
-h3.GetXaxis().SetTitle("Jet p_{T} / GeV")
+h3.GetXaxis().SetTitle("ISR Jet p_{T} / GeV")
 h3.Draw()
 h3.SetFillColor(ROOT.kRed+1)
 h3.SetLineColor(ROOT.kBlack)
@@ -498,8 +498,8 @@ jetTurnon1.GetPaintedGraph().GetXaxis().CenterTitle()
 jetTurnon1.GetPaintedGraph().GetYaxis().CenterTitle()
 
 #Fitting
-fitFunc.SetParameters(0.45, 60, 20, 0.6)
-fitFunc.SetParLimits(1, 0, 120)
+fitFunc.SetParameters(0.45, 60, 20, 0.6) #init: (0.45,60,20,0.6)
+fitFunc.SetParLimits(1, 0, 120) #init: [0,120]
 jetTurnon1.Fit(fitFunc)
 
 print makeLine()
@@ -623,6 +623,8 @@ jetTurnon2.GetPaintedGraph().GetXaxis().CenterTitle()
 jetTurnon2.GetPaintedGraph().GetYaxis().CenterTitle()
 
 #Fitting
+fitFunc.SetParameters(0.45, 60, 16, 0.6) #init: (0.45,60,20,0.6)
+fitFunc.SetParLimits(2, 10, 16)
 jetTurnon2.Fit(fitFunc)
 
 print makeLine()
@@ -700,17 +702,17 @@ outfile.close()
 #outfile.write("")
 
 #Save to Web
-c1.SaveAs(savedir + "/MET_%s_%s.root"%( str(cuts['gMET']), str(cuts['gISR'])))
-c2.SaveAs(savedir + "/ISR_%s_%s.root"%(str(cuts['gMET']), str(cuts['gISR'])))
+c1.SaveAs(savedir + "/MET1_%s_%s.root"%( str(cuts['gMET']), str(cuts['gISR'])))
+c2.SaveAs(savedir + "/ISR1_%s_%s.root"%(str(cuts['gMET']), str(cuts['gISR'])))
 c3.SaveAs(savedir + "/MET2_%s_%s.root"%(str(cuts['gMET']), str(cuts['gISR'])))
 c4.SaveAs(savedir + "/ISR2_%s_%s.root"%(str(cuts['gMET']), str(cuts['gISR'])))
 
-c1.SaveAs(savedir + "/MET_%s_%s.png"%(str(cuts['gMET']), str(cuts['gISR'])))
-c2.SaveAs(savedir + "/ISR_%s_%s.png"%(str(cuts['gMET']), str(cuts['gISR'])))
+c1.SaveAs(savedir + "/MET1_%s_%s.png"%(str(cuts['gMET']), str(cuts['gISR'])))
+c2.SaveAs(savedir + "/ISR1_%s_%s.png"%(str(cuts['gMET']), str(cuts['gISR'])))
 c3.SaveAs(savedir + "/MET2_%s_%s.png"%(str(cuts['gMET']), str(cuts['gISR'])))
 c4.SaveAs(savedir + "/ISR2_%s_%s.png"%(str(cuts['gMET']), str(cuts['gISR'])))
 
-c1.SaveAs(savedir + "/MET_%s_%s.pdf"%(str(cuts['gMET']), str(cuts['gISR'])))
-c2.SaveAs(savedir + "/ISR_%s_%s.pdf"%(str(cuts['gMET']), str(cuts['gISR'])))
+c1.SaveAs(savedir + "/MET1_%s_%s.pdf"%(str(cuts['gMET']), str(cuts['gISR'])))
+c2.SaveAs(savedir + "/ISR1_%s_%s.pdf"%(str(cuts['gMET']), str(cuts['gISR'])))
 c3.SaveAs(savedir + "/MET2_%s_%s.pdf"%(str(cuts['gMET']), str(cuts['gISR'])))
 c4.SaveAs(savedir + "/ISR2_%s_%s.pdf"%(str(cuts['gMET']), str(cuts['gISR'])))
