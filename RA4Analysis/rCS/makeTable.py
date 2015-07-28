@@ -225,14 +225,21 @@ for srNJet in sorted(signalRegions):
       WclosurePosPdg = max([abs(UncertaintyDivision((W_PosPdg_pred - res[srNJet][stb][htb]['W_PosPdg_truth']),W_PosPdg_pred)), UncertaintyDivision(res[srNJet][stb][htb]['W_PosPdg_truth_err'],res[srNJet][stb][htb]['W_PosPdg_truth'])])
       WclosureNegPdg = max([abs(UncertaintyDivision((W_NegPdg_pred - res[srNJet][stb][htb]['W_NegPdg_truth']),W_NegPdg_pred)), UncertaintyDivision(res[srNJet][stb][htb]['W_NegPdg_truth_err'],res[srNJet][stb][htb]['W_NegPdg_truth'])])
       
-      totalClosure       = max([abs(UncertaintyDivision((totalPrediction - res[srNJet][stb][htb]['tot_truth']),totalPrediction)),\
-                                UncertaintyDivision(res[srNJet][stb][htb]['tot_truth_err'],res[srNJet][stb][htb]['tot_truth'])])
-      totalClosurePosPdg = max([abs(UncertaintyDivision((totalPredictionPosPdg - res[srNJet][stb][htb]['tot_PosPdg_truth']),totalPredictionPosPdg)),\
-                                UncertaintyDivision(res[srNJet][stb][htb]['tot_PosPdg_truth_err'],res[srNJet][stb][htb]['tot_PosPdg_truth'])])
-      totalClosureNegPdg = max([abs(UncertaintyDivision((totalPredictionNegPdg - res[srNJet][stb][htb]['tot_NegPdg_truth']),totalPredictionNegPdg)),\
-                                UncertaintyDivision(res[srNJet][stb][htb]['tot_NegPdg_truth_err'],res[srNJet][stb][htb]['tot_NegPdg_truth'])])
+      totNonClosure = abs(UncertaintyDivision((totalPrediction - res[srNJet][stb][htb]['tot_truth']),totalPrediction))
+      totStatUncSim = UncertaintyDivision(res[srNJet][stb][htb]['tot_truth_err'],res[srNJet][stb][htb]['tot_truth'])
+      totalClosure       = max([totNonClosure, totStatUncSim])
+
+      totNonClosurePosPdg = abs(UncertaintyDivision((totalPredictionPosPdg - res[srNJet][stb][htb]['tot_PosPdg_truth']),totalPredictionPosPdg))
+      totStatUncSimPosPdg = UncertaintyDivision(res[srNJet][stb][htb]['tot_PosPdg_truth_err'],res[srNJet][stb][htb]['tot_PosPdg_truth'])
+      totalClosurePosPdg = max([totNonClosurePosPdg, totStatUncSimPosPdg])
+      
+      totNonClosureNegPdg = abs(UncertaintyDivision((totalPredictionNegPdg - res[srNJet][stb][htb]['tot_NegPdg_truth']),totalPredictionNegPdg))
+      totStatUncSimNegPdg = UncertaintyDivision(res[srNJet][stb][htb]['tot_NegPdg_truth_err'],res[srNJet][stb][htb]['tot_NegPdg_truth'])
+      totalClosureNegPdg = max([totNonClosureNegPdg, totStatUncSimNegPdg])
       
       res[srNJet][stb][htb].update({'tot_clos':totalClosure, 'tot_clos_PosPdg':totalClosurePosPdg, 'tot_clos_NegPdg':totalClosureNegPdg,\
+                                    'tot_onlyNonClos':totNonClosure, 'tot_StatUncSim':totStatUncSim, 'tot_onlyNonClos_PosPdg':totNonClosurePosPdg, 'tot_StatUncSim_PosPdg':totStatUncSimPosPdg,\
+                                    'tot_onlyNonClos_NegPdg':totNonClosureNegPdg, 'tot_StatUncSim_NegPdg':totStatUncSimNegPdg,\
                                     'TT_clos':TTclosure, 'TT_clos_PosPdg':TTclosurePosPdg, 'TT_clos_NegPdg':TTclosureNegPdg, 'W_clos':Wclosure, 'W_clos_PosPdg':WclosurePosPdg, 'W_clos_NegPdg':WclosureNegPdg,\
                                     'W_ratio_err':WratioErr, 'W_ratio_PosPdg_err':WratioPosPdgErr, 'W_ratio_NegPdg_err':WratioNegPdgErr})
       res[srNJet][stb][htb]['tot_pred'] = totalPrediction
@@ -278,48 +285,78 @@ pickle.dump(res, file(path+prefix+'_estimationResults_pkl_updated','w'))
 
 res = pickle.load(file(path+prefix+'_estimationResults_pkl_updated'))
 
-#closure table with correction
-print 
-print
-print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrr|rrr|rrr|rrr|rrr|rrr|}\\hline'
-print ' \\njet     & \ST & \HT     &\multicolumn{6}{c|}{total bkg.}&\multicolumn{3}{c|}{$T5q^4~1.0/0.8/0.7$}&\multicolumn{3}{c|}{$T5q^4~1.2/1.0/0.8$}&\multicolumn{3}{c|}{$T5q^4~1.5/0.8/0.1$}\\\%\hline'
-print ' & $[$GeV$]$ &$[$GeV$]$&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c|}{simulation} \\\\\hline'
+##closure table with correction
+#print 
+#print
+#print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrr|rrr|rrr|rrr|rrr|rrr|}\\hline'
+#print ' \\njet     & \ST & \HT     &\multicolumn{6}{c|}{total bkg.}&\multicolumn{3}{c|}{$T5q^4~1.0/0.8/0.7$}&\multicolumn{3}{c|}{$T5q^4~1.2/1.0/0.8$}&\multicolumn{3}{c|}{$T5q^4~1.5/0.8/0.1$}\\\%\hline'
+#print ' & $[$GeV$]$ &$[$GeV$]$&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c|}{simulation} \\\\\hline'
+#
+#pred = {}
+#
+#secondLine = False
+#for srNJet in sorted(signalRegions):
+#  pred[srNJet] = {}
+#  print '\\hline'
+#  if secondLine: print '\\hline'
+#  secondLine = True
+#  print '\multirow{'+str(rowsNJet[srNJet]['n'])+'}{*}{\\begin{sideways}$'+varBin(srNJet)+'$\end{sideways}}'
+#  for stb in sorted(signalRegions[srNJet]):
+#    pred[srNJet][stb] = {}
+#    print '&\multirow{'+str(rowsSt[srNJet][stb]['n'])+'}{*}{$'+varBin(stb)+'$}'
+#    first = True
+#    for htb in sorted(signalRegions[srNJet][stb]):
+#      pred[srNJet][stb][htb] = {}
+#      if not first: print '&'
+#      first = False
+#      print '&$'+varBin(htb)+'$'
+#      print ' & '+getNumString(res[srNJet][stb][htb]['tot_pred'], res[srNJet][stb][htb]['tot_pred_err'])\
+#           +' & '+getNumString(res[srNJet][stb][htb]['tot_truth'], res[srNJet][stb][htb]['tot_truth_err'])\
+#           +' & '+getNumString(res[srNJet][stb][htb]['T5q^{4} 1.0/0.8/0.7_yield'], sqrt(res[srNJet][stb][htb]['T5q^{4} 1.0/0.8/0.7_yield_Var']))\
+#           +' & '+getNumString(res[srNJet][stb][htb]['T5q^{4} 1.2/1.0/0.8_yield'], sqrt(res[srNJet][stb][htb]['T5q^{4} 1.2/1.0/0.8_yield_Var']))\
+#           +' & '+getNumString(res[srNJet][stb][htb]['T5q^{4} 1.5/0.8/0.1_yield'], sqrt(res[srNJet][stb][htb]['T5q^{4} 1.5/0.8/0.1_yield_Var'])) +'\\\\'
+#      if htb[1] == -1 : print '\\cline{2-18}'
+#print '\\hline\end{tabular}}\end{center}\caption{Closure table for the background with applied correction factors for \\ttJets, 0-tag regions, 3$fb^{-1}$}\label{tab:0b_rcscorr_Wbkg}\end{table}'
 
-pred = {}
-
-secondLine = False
-for srNJet in sorted(signalRegions):
-  pred[srNJet] = {}
-  print '\\hline'
-  if secondLine: print '\\hline'
-  secondLine = True
-  print '\multirow{'+str(rowsNJet[srNJet]['n'])+'}{*}{\\begin{sideways}$'+varBin(srNJet)+'$\end{sideways}}'
-  for stb in sorted(signalRegions[srNJet]):
-    pred[srNJet][stb] = {}
-    print '&\multirow{'+str(rowsSt[srNJet][stb]['n'])+'}{*}{$'+varBin(stb)+'$}'
-    first = True
-    for htb in sorted(signalRegions[srNJet][stb]):
-      pred[srNJet][stb][htb] = {}
-      if not first: print '&'
-      first = False
-      print '&$'+varBin(htb)+'$'
-      print ' & '+getNumString(res[srNJet][stb][htb]['tot_pred'], res[srNJet][stb][htb]['tot_pred_err'])\
-           +' & '+getNumString(res[srNJet][stb][htb]['tot_truth'], res[srNJet][stb][htb]['tot_truth_err'])\
-           +' & '+getNumString(res[srNJet][stb][htb]['T5q^{4} 1.0/0.8/0.7_yield'], sqrt(res[srNJet][stb][htb]['T5q^{4} 1.0/0.8/0.7_yield_Var']))\
-           +' & '+getNumString(res[srNJet][stb][htb]['T5q^{4} 1.2/1.0/0.8_yield'], sqrt(res[srNJet][stb][htb]['T5q^{4} 1.2/1.0/0.8_yield_Var']))\
-           +' & '+getNumString(res[srNJet][stb][htb]['T5q^{4} 1.5/0.8/0.1_yield'], sqrt(res[srNJet][stb][htb]['T5q^{4} 1.5/0.8/0.1_yield_Var'])) +'\\\\'
-      if htb[1] == -1 : print '\\cline{2-18}'
-print '\\hline\end{tabular}}\end{center}\caption{Closure table for the background with applied correction factors for \\ttJets, 0-tag regions, 3$fb^{-1}$}\label{tab:0b_rcscorr_Wbkg}\end{table}'
 
 
+## W closure table
+#res = pickle.load(file(path+prefix+'_estimationResults_pkl_updated'))
+#multiplier = {(5,5):2, (6,7):3, (8,-1):4}
+#print
+#print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrr|rrr|rrr|rrr|rrr|}\\hline'
+#print ' \\njet & \ST & \HT &\multicolumn{6}{c|}{$W+$ Jets}&\multicolumn{6}{c|}{$W-$ Jets}&\multicolumn{6}{c|}{$W$ Jets}\\\%\hline'
+#print ' & $[$GeV$]$ &$[$GeV$]$&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation} \\\\\hline'
+#secondLine = False
+#for srNJet in sorted(signalRegions):
+#  print '\\hline'
+#  if secondLine: print '\\hline'
+#  secondLine = True
+#  print '\multirow{'+str(rowsNJet[srNJet]['n'])+'}{*}{\\begin{sideways}$'+varBin(srNJet)+'$\end{sideways}}'
+#  for stb in sorted(signalRegions[srNJet]):
+#    print '&\multirow{'+str(rowsSt[srNJet][stb]['n'])+'}{*}{$'+varBin(stb)+'$}'
+#    first = True
+#    for htb in sorted(signalRegions[srNJet][stb]):
+#      if not first: print '&'
+#      first = False  
+#      
+#      print '&$'+varBin(htb)+'$'
+#      print ' & '+getNumString(res[srNJet][stb][htb]['W_NegPdg_pred'], res[srNJet][stb][htb]['W_NegPdg_pred_err'])\
+#           +' & '+getNumString(res[srNJet][stb][htb]['W_NegPdg_truth'], res[srNJet][stb][htb]['W_NegPdg_truth_err'])\
+#           +' & '+getNumString(res[srNJet][stb][htb]['W_PosPdg_pred'], res[srNJet][stb][htb]['W_PosPdg_pred_err'])\
+#           +' & '+getNumString(res[srNJet][stb][htb]['W_PosPdg_truth'], res[srNJet][stb][htb]['W_PosPdg_truth_err'])\
+#           +' & '+getNumString(res[srNJet][stb][htb]['W_pred'],        res[srNJet][stb][htb]['W_pred_err'])\
+#           +' & '+getNumString(res[srNJet][stb][htb]['W_truth'],        res[srNJet][stb][htb]['W_truth_err']) +'\\\\'
+#      if htb[1] == -1 : print '\\cline{2-21}'
+#print '\\hline\end{tabular}}\end{center}\caption{EFGH}\label{tab:0b_rcscorr_Wbkg}\end{table}'
 
-# W closure table
+# Closure error table
 res = pickle.load(file(path+prefix+'_estimationResults_pkl_updated'))
 multiplier = {(5,5):2, (6,7):3, (8,-1):4}
 print
-print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrr|rrr|rrr|rrr|rrr|}\\hline'
-print ' \\njet & \ST & \HT &\multicolumn{6}{c|}{$W+$ Jets}&\multicolumn{6}{c|}{$W-$ Jets}&\multicolumn{6}{c|}{$W$ Jets}\\\%\hline'
-print ' & $[$GeV$]$ &$[$GeV$]$&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation} \\\\\hline'
+print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrr|rrr|rrr|}\\hline'
+print ' \\njet & \ST & \HT &\multicolumn{6}{c|}{total}&\multicolumn{6}{c|}{total}\\\%\hline'
+print ' & $[$GeV$]$ &$[$GeV$]$&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{non-closure}&\multicolumn{3}{c|}{stat. of sim} \\\\\hline'
 secondLine = False
 for srNJet in sorted(signalRegions):
   print '\\hline'
@@ -331,17 +368,16 @@ for srNJet in sorted(signalRegions):
     first = True
     for htb in sorted(signalRegions[srNJet][stb]):
       if not first: print '&'
-      first = False  
-      
+      first = False
+
       print '&$'+varBin(htb)+'$'
-      print ' & '+getNumString(res[srNJet][stb][htb]['W_NegPdg_pred'], res[srNJet][stb][htb]['W_NegPdg_pred_err'])\
-           +' & '+getNumString(res[srNJet][stb][htb]['W_NegPdg_truth'], res[srNJet][stb][htb]['W_NegPdg_truth_err'])\
-           +' & '+getNumString(res[srNJet][stb][htb]['W_PosPdg_pred'], res[srNJet][stb][htb]['W_PosPdg_pred_err'])\
-           +' & '+getNumString(res[srNJet][stb][htb]['W_PosPdg_truth'], res[srNJet][stb][htb]['W_PosPdg_truth_err'])\
-           +' & '+getNumString(res[srNJet][stb][htb]['W_pred'],        res[srNJet][stb][htb]['W_pred_err'])\
-           +' & '+getNumString(res[srNJet][stb][htb]['W_truth'],        res[srNJet][stb][htb]['W_truth_err']) +'\\\\'
-      if htb[1] == -1 : print '\\cline{2-21}'
-print '\\hline\end{tabular}}\end{center}\caption{EFGH}\label{tab:0b_rcscorr_Wbkg}\end{table}'
+      print ' & '+getNumString(res[srNJet][stb][htb]['tot_pred'], res[srNJet][stb][htb]['tot_pred_err'])\
+           +' & '+getNumString(res[srNJet][stb][htb]['tot_truth'], res[srNJet][stb][htb]['tot_truth_err'])\
+           +' & '+getNumString(1.0, res[srNJet][stb][htb]['tot_onlyNonClos'])\
+           +' & '+getNumString(1.0, res[srNJet][stb][htb]['tot_StatUncSim'])+'\\\\'
+      if htb[1] == -1 : print '\\cline{2-15}'
+print '\\hline\end{tabular}}\end{center}\caption{closure errors}\label{tab:0b_rcscorr_Wbkg}\end{table}'
+
 
 ##Table for systematics prediction for W jets as a result of mu/ele+mu differences
 #print "Results"

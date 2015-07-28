@@ -74,7 +74,7 @@ def cmgGetJets(c, ptMin=30., etaMax=999.):
   nJet = int(getVarValue(c, 'nJet'))
   jets=[]
   for i in range(nJet):
-    jet = getObjDict(c, 'Jet_', ['pt','eta', 'id'], i)
+    jet = getObjDict(c, 'Jet_', ['pt','eta', 'id','mcPt'], i)
     if jet['pt']>ptMin and abs(jet['eta'])<etaMax and jet['id']:
       jet.update(getObjDict(c, 'Jet_', addJetVars, i))
       jets.append(jet)
@@ -188,14 +188,14 @@ def varBin(vb):
 def getBinBorders(l, max=10**4):
   return [x[0] for x in l ] + [max]
 
-def nameAndCut(stb, htb, njetb, btb=None, presel="(1)", charge="", btagVar = 'nBJetMediumCSV30'):
+def nameAndCut(stb, htb, njetb, btb=None, presel="(1)", charge="", btagVar = 'nBJetMediumCSV30', stVar = 'st'):
   cut=presel
   name=""
   if stb:
-    cut+='&&st>='+str(stb[0])
+    cut+='&&'+stVar+'>='+str(stb[0])
     name+='st'+str(stb[0])
     if stb[1]>0:
-      cut+='&&st<'+str(stb[1])
+      cut+='&&'+stVar+'<'+str(stb[1])
       name+='-'+str(stb[1])
   if htb:
     cut+='&&htJet30j>='+str(htb[0])
@@ -231,6 +231,16 @@ def nameAndCut(stb, htb, njetb, btb=None, presel="(1)", charge="", btagVar = 'nB
     name+='_negCharge'
   if name.startswith('_'):name=name[1:]
   return [name, cut]
+
+def binToFileName(a):
+  if len(njetb)>1 and njetb[0] == njetb[1]:
+    name+='_njetEq'+str(njetb[0])
+  else:
+    cut+='&&nJet30>='+str(njetb[0])
+    name+='_njet'+str(njetb[0])
+    if len(njetb)>1 and njetb[1]>=0:
+      cut+='&&nJet30<='+str(njetb[1])
+      name+='-'+str(njetb[1])
 
 #def wRecoPt(chain):
 #  lPt = getVarValue(chain, "leptonPt")

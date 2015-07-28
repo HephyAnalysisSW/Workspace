@@ -23,13 +23,13 @@ presel = 'Lp_singleElectronic_'
 if not os.path.exists(wwwDir):
   os.makedirs(wwwDir)
 
-htreg = [(500,-1)]#, (500,750), (750,1250), (1250,-1)]
-streg = [(250,350)]#,(250,350), (350,450), (450,-1)]
-njreg = [(5,5)]#, (5,5), (6,7), (8,-1)]
+htreg = [(500,750), (750,1000), (1000,-1)]
+streg = [(250,350), (350,450), (450,-1)]
+njreg = [(2,3), (4,5), (6,-1)]
 btreg = [(0,0)]
 
-#small = True
-small = False
+small = True
+#small = False
 doFit = True
 #doFit = False
 
@@ -170,6 +170,7 @@ for htb in htreg:
         histos['merged_QCD']['Selection']=ROOT.TH1F('merged_QCD_Selection','merged_QCD_Selection',30,-0.5,2.5)
         histos['merged_EWK']['antiSelection']=ROOT.TH1F('merged_EWK_antiSelection','merged_EWK_antiSelection',30,-0.5,2.5)
         histos['merged_EWK']['Selection']=ROOT.TH1F('merged_EWK_Selection','merged_EWK_Selection',30,-0.5,2.5)
+#        histos['normTemplate_QCD']['Selection']=ROOT.TH1F('normTemplate_QCD_Selection','normTemplate_QCD_Selection',30,-0.5,2.5)
         
         canv = ROOT.TCanvas('canv','canv',600,600)
         #canv.SetLogy()
@@ -208,9 +209,15 @@ for htb in htreg:
           l.AddEntry(histos[sample['name']]['Selection'], sample['legendName']+' selected')
         
           if sample['merge']=='QCD':
+#            histos[sample['name']]['normTemplate'] = ROOT.TH1F(sample['name']+'_normTemplate',sample['name']+'_normTemplate',30,-0.5,2.5)
+            #normalized Template used for 'Pseudo-data': same as selected collection except an inclusive ST bin 
+#            normCut = singleElectronVeto+'&&'+singleHardElectron+'&&(Sum$('+SelStr+')==1)&&'+stCutQCD((200,-1))+'&&'+htCut(htb, minPt=30, maxEta=2.4, njCorr=0.)+'&&'+ nBTagCut(btb, minPt=30, maxEta=2.4, minCSVTag=0.814)\
+#                 +'&&'+nJetCut(srNJet, minPt=30, maxEta=2.4)+'&&'+nJetCut(2, minPt=80, maxEta=2.4)
+#           sample['chain'].Draw(LpStr+'>>'+sample['name']+'_normTemplate',str(sample['weight'])+'*('+normCut+')')
             histos['merged_QCD']['antiSelection'].Add(histos[sample['name']]['antiSelection'])
             histos['merged_QCD']['Selection'].Add(histos[sample['name']]['Selection'])
-        
+#            histos['normTemplate_QCD']['Selection'].Add(histos[sample['name']]['normTemplate'])        
+
           elif sample['merge']=='EWK':
             histos['merged_EWK']['antiSelection'].Add(histos[sample['name']]['antiSelection'])
             histos['merged_EWK']['Selection'].Add(histos[sample['name']]['Selection'])
@@ -218,10 +225,10 @@ for htb in htreg:
           if first:
             histos[sample['name']]['antiSelection'].Draw('hist')
             histos[sample['name']]['Selection'].Draw('hist same')
+            first = False
           else:
             histos[sample['name']]['antiSelection'].Draw('hist same')
             histos[sample['name']]['Selection'].Draw('hist same')
-          first = False
         
           if histos[sample['name']]['antiSelection'].GetMaximum() > antiMax:
             antiMax = histos[sample['name']]['antiSelection'].GetMaximum()
@@ -275,46 +282,38 @@ for htb in htreg:
                                        'NQCDAntiSelMC':nQCDAntiSel, 'NQCDAntiSelMC_err':float(nQCDAntiSel_err)}
         print bins[htb][stb][srNJet][btb]
 
-        #do the template fit:
-        if doFit:
-          LpTemplates = {'EWKantiSel':histos['merged_EWK']['antiSelection'], 'EWKsel':histos['merged_EWK']['Selection'], 'QCDantiSel':histos['merged_QCD']['antiSelection'], 'QCDsel':histos['merged_QCD']['Selection']}
-          fit_QCD = LpTemplateFit(LpTemplates, prefix=presel+SRname, printDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/pngCMG2/templateFit_Phys14V3/QCDestimation')
-          bins[htb][stb][srNJet][btb].update(fit_QCD)
-          F_ratio = fit_QCD['QCD']['yield']/NdataAntiSel
-          F_ratio_err = F_ratio*sqrt(fit_QCD['QCD']['yieldVar']/fit_QCD['QCD']['yield']**2 + NdataAntiSel_err**2/NdataAntiSel**2)
-          bins[htb][stb][srNJet][btb].update({'F_seltoantisel':F_ratio, 'F_seltoantisel_err':F_ratio_err})
-
         mergeCanv.cd() 
 #        if histos['merged_QCD']['antiSelection'].Integral()>0:
 #          histos['merged_QCD']['antiSelection'].Scale(1./histos['merged_QCD']['antiSelection'].Integral())
         histos['merged_QCD']['antiSelection'].SetLineColor(ROOT.kRed)
         histos['merged_QCD']['antiSelection'].SetLineStyle(ROOT.kDashed)
-#        histos['merged_QCD']['antiSelection'].SetMaximum(1)
         leg.AddEntry(histos['merged_QCD']['antiSelection'],'QCD anti-selected','l')
  
 #        if histos['merged_QCD']['Selection'].Integral()>0:
 #          histos['merged_QCD']['Selection'].Scale(1./histos['merged_QCD']['Selection'].Integral())      
         histos['merged_QCD']['Selection'].SetLineColor(ROOT.kRed)
-#        histos['merged_QCD']['Selection'].SetMaximum(1)
         leg.AddEntry(histos['merged_QCD']['Selection'],'QCD selected','l')
  
 #        if histos['merged_EWK']['antiSelection'].Integral()>0:
 #          histos['merged_EWK']['antiSelection'].Scale(1./histos['merged_EWK']['antiSelection'].Integral())       
         histos['merged_EWK']['antiSelection'].SetLineColor(ROOT.kBlack)
         histos['merged_EWK']['antiSelection'].SetLineStyle(ROOT.kDashed)
-#        histos['merged_EWK']['antiSelection'].SetMaximum(1)
         leg.AddEntry(histos['merged_EWK']['antiSelection'],'EWK anti-selected','l')
  
 #        if histos['merged_EWK']['Selection'].Integral()>0:
 #          histos['merged_EWK']['Selection'].Scale(1./histos['merged_EWK']['Selection'].Integral())             
         histos['merged_EWK']['Selection'].SetLineColor(ROOT.kBlack)
-#        histos['merged_EWK']['Selection'].SetMaximum(1)
         leg.AddEntry(histos['merged_EWK']['Selection'],'EWK selected','l')
         
         histos['merged_QCD']['antiSelection'].Draw('hist')
         histos['merged_QCD']['Selection'].Draw('hist same')
         histos['merged_EWK']['antiSelection'].Draw('hist same')
         histos['merged_EWK']['Selection'].Draw('hist same')
+
+        histos['merged_QCD']['antiSelection'].SetMaximum(1.5*histos['merged_QCD']['antiSelection'].GetMaximum())
+        histos['merged_QCD']['Selection'].SetMaximum(1.5*histos['merged_QCD']['Selection'].GetMaximum())
+        histos['merged_EWK']['antiSelection'].SetMaximum(1.5*histos['merged_EWK']['antiSelection'].GetMaximum())
+        histos['merged_EWK']['Selection'].SetMaximum(1.5*histos['merged_EWK']['Selection'].GetMaximum())
           
         leg.Draw()
         text.DrawLatex(0.15,.96,"CMS Simulation")
@@ -325,6 +324,18 @@ for htb in htreg:
         mergeCanv.Print(wwwDir+presel+SRname+'.root')
         mergeCanv.Print(wwwDir+presel+SRname+'.pdf')
 
+        #do the template fit:
+        #Scale normTemplate to the nominal yield in in the corresponding binning
+#        histos['normTemplate_QCD']['Selection'].Scale(1./histos['normTemplate_QCD'].Integral())
+#        histos['normTemplate_QCD']['Selection'].Scale(histos['merged_QCD']['Selection'].Integral())
+
+        if doFit:
+          LpTemplates = {'EWKantiSel':histos['merged_EWK']['antiSelection'], 'EWKsel':histos['merged_EWK']['Selection'], 'QCDantiSel':histos['merged_QCD']['antiSelection'], 'QCDsel':histos['merged_QCD']['Selection']}
+          fit_QCD = LpTemplateFit(LpTemplates, prefix=presel+SRname, printDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/pngCMG2/templateFit_Phys14V3/QCDestimation')
+          bins[htb][stb][srNJet][btb].update(fit_QCD)
+          F_ratio = fit_QCD['QCD']['yield']/NdataAntiSel
+          F_ratio_err = F_ratio*sqrt(fit_QCD['QCD']['yieldVar']/fit_QCD['QCD']['yield']**2 + NdataAntiSel_err**2/NdataAntiSel**2)
+          bins[htb][stb][srNJet][btb].update({'F_seltoantisel':F_ratio, 'F_seltoantisel_err':F_ratio_err})
 
         path = '/data/'+username+'/results2015/rCS_0b/'
         if not os.path.exists(path):

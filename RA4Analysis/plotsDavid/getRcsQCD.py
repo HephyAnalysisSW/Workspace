@@ -23,10 +23,12 @@ presel = 'RcsQCD_singleElectronic_'
 if not os.path.exists(wwwDir):
   os.makedirs(wwwDir)
 
+#choose bins
 #htreg = [(500,-1), (500,750), (750,-1), (500,1000), (1000,-1)]
 #streg = [(200,-1),(250,350), (350,450), (450,-1)]
-#njreg = [(3,4), (5,5), (6,7), (8,-1)]
-btreg = [(0,0)]
+#njreg = [(4,5), (5,5), (6,7), (8,-1)]
+CRnjreg = (4,5)
+btreg = [(0,0),(1,1),(2,2),(3,-1)]
 
 #small = True
 small = False
@@ -201,11 +203,21 @@ for njb in sorted(signalRegion3fb):
         NdataAntiSel =  nEWKAntiSel + nQCDAntiSel
         NdataAntiSel_err = sqrt(nEWKAntiSel_err**2 + nQCDAntiSel_err**2)
 
-        rd = {'NdataSel':NdataSel, 'NdataSel_err':float(NdataSel_err),\
+        #Event yields in low and high dPhi region
+        nQCDSel_lowdPhi = histos['merged_QCD']['Selection'].GetBinContent(1)
+        nQCDSel_lowdPhi_err = histos['merged_QCD']['Selection'].GetBinError(1)
+        nQCDSel_highdPhi = histos['merged_QCD']['Selection'].GetBinContent(2)
+        nQCDSel_highdPhi_err = histos['merged_QCD']['Selection'].GetBinError(2)
+    
+
+        rd = {
+              'NdataSel':NdataSel, 'NdataSel_err':float(NdataSel_err),\
               'NdataAntiSel':NdataAntiSel, 'NdataAntiSel_err':float(NdataAntiSel_err),\
               'NEWKSelMC':nEWKSel, 'NEWKSelMC_err':float(nEWKSel_err),\
               'NEWKAntiSelMC':nEWKAntiSel, 'NEWKAntiSelMC_err':float(nEWKAntiSel_err),\
               'NQCDSelMC':nQCDSel, 'NQCDSelMC_err':float(nQCDSel_err),\
+              'NQCDSelLowdPhi':nQCDSel_lowdPhi, 'NQCDSelLowdPhi_err':nQCDSel_lowdPhi_err,\
+              'NQCDSelHighdPhi':nQCDSel_highdPhi, 'NQCDSelHighdPhi_err':nQCDSel_highdPhi_err,\
               'NQCDAntiSelMC':nQCDAntiSel, 'NQCDAntiSelMC_err':float(nQCDAntiSel_err)}        
 
         if histos['merged_QCD']['Selection'].GetBinContent(1)>0 and histos['merged_QCD']['Selection'].GetBinContent(2)>0:
@@ -265,5 +277,5 @@ for njb in sorted(signalRegion3fb):
 path = '/data/'+username+'/results2015/rCS_0b/'
 if not os.path.exists(path):
   os.makedirs(path)
-pickle.dump(bins, file(path+'RcsQCD'+str(target_lumi/1000)+'fb-1_pkl','w'))
+pickle.dump(bins, file(path+'RcsQCD_'+str(target_lumi/1000)+'fb-1_pkl','w'))
 
