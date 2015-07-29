@@ -1,5 +1,5 @@
 import ROOT
-from localInfo import username
+from Workspace.HEPHYPythonTools.user import username
 from math import *
 
 def DrawClosure(plot1,plot2,plot3,xaxis,path):

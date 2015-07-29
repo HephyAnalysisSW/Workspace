@@ -1,6 +1,6 @@
 import ROOT
 from Workspace.RA4Analysis.makeCompPlotDilep import DrawClosure
-from localInfo import username
+from Workspace.HEPHYPythonTools.user import username
 
 relIso=0.3
 ptCut=15

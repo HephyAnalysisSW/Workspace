@@ -19,7 +19,7 @@ cTTJets = getChain(ttJets[lepSel],histname='',maxN=maxN)
 cEWK = getChain([WJetsHTToLNu[lepSel],ttJets[lepSel],TTVH[lepSel],singleTop[lepSel],DY[lepSel]],histname='')
 
 
-from localInfo import username
+from Workspace.HEPHYPythonTools.user import username
 uDir = username[0]+'/'+username
 subDir = 'PHYS14v3/ANplots/rCSbtagmultiCompleteCorrection/'
 

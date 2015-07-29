@@ -13,7 +13,7 @@ from Workspace.RA4Analysis.cmgTuples_v1_PHYS14V3 import *
 from Workspace.RA4Analysis.signalRegions import *
 from draw_helpers import *
 from math import *
-from localInfo import username
+from Workspace.HEPHYPythonTools.user import username
 from LpTemplateFit import LpTemplateFit
 
 preprefix = 'QCDestimation/ratioPlots'

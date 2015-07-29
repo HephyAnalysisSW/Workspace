@@ -4,7 +4,7 @@ import operator
 from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYieldFromChain
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName, nBTagBinName, varBinName
 from Workspace.RA4Analysis.cmgTuplesPostProcessed_v1_Phys14V3_HT400ST200 import *
-from localInfo import username
+from Workspace.HEPHYPythonTools.user import username
 from math import sqrt, pi
 
 ROOT.TH1F().SetDefaultSumw2()

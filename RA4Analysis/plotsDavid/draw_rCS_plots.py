@@ -23,7 +23,7 @@ from Workspace.HEPHYPythonTools.helpers import getObjFromFile, getChain, getChun
 import Workspace.HEPHYPythonTools.xsec as xsec
 #from Workspace.RA4Analysis.simplePlotsCommon import *
 from Workspace.RA4Analysis.helpers import *
-from localInfo import username
+from Workspace.HEPHYPythonTools.user import username
 from draw_helpers import *
 from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2_HT400ST150_withDF import *
 

@@ -21,7 +21,7 @@ from Workspace.HEPHYPythonTools.xsec import xsec
 subDir = "convertedTuples_v26"
 target_lumi = 2000 #pb-1
 
-from localInfo import username
+from Workspace.HEPHYPythonTools.user import username
 outputDir = "/data/"+username+"/"+subDir+"/"
 
 ROOT.gSystem.Load("libFWCoreFWLite.so")

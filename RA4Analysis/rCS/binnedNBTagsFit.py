@@ -4,7 +4,7 @@ from ROOT import RooFit as rf
 
 from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,varBinName
-from localInfo import username
+from Workspace.HEPHYPythonTools.user import username
 from math import pi, sqrt
 from rCShelpers import *# weight_str , weight_err_str , lumi
 

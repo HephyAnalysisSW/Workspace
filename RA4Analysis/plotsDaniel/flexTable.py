@@ -4,7 +4,7 @@ from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYi
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName, nBTagBinName, varBinName, varBin
 from rCShelpers import *
 from math import sqrt, pi
-#from localInfo import username
+#from Workspace.HEPHYPythonTools.user import username
 
 prefix = 'singleLeptonic_Phys14V3'
 #res = pickle.load(file('/data/'+username+'/results2015/rCS_0b/'+prefix+'_estimationResults_pkl'))

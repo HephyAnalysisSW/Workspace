@@ -10,7 +10,7 @@ ROOT.setTDRStyle()
 
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,varBinName, color, getBinBorders
 from math import pi, sqrt
-from localInfo import afsuser as username
+from Workspace.HEPHYPythonTools.user import afsuser as username
 uDir = username[0]+'/'+username
 subDir = 'pngPie'
 

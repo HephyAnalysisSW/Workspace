@@ -6,7 +6,7 @@ from Workspace.HEPHYPythonTools.helpers import findClosestObject,deltaR,getVarVa
 from Workspace.RA4Analysis.objectSelection import getGoodJetsStage2,getLooseMuStage2, tightPOGMuID, vetoMuID
 from math import sqrt, cos, sin, atan2
 from Workspace.RA4Analysis.helpers import deltaPhi
-from localInfo import username
+from Workspace.HEPHYPythonTools.user import username
 from Workspace.RA4Analysis.stage2Tuples import *
 c = ROOT.TChain('Events')
 #for b in ttJetsCSA1450ns['bins']:

@@ -8,7 +8,7 @@ from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,v
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v1_Phys14V3_HT400ST200 import *
 ###from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v9_Phys14V3_HT400ST200_ForTTJetsUnc import *
-from localInfo import username
+from Workspace.HEPHYPythonTools.user import username
 from Workspace.RA4Analysis.cmgTuplesPostProcessed_Spring15_hard import *
 
 #from binnedNBTagsFit import binnedNBTagsFit
