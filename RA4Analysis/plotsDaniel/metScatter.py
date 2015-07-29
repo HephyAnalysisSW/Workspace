@@ -9,8 +9,8 @@ from array import array
 
 from Workspace.HEPHYPythonTools.helpers import *#getVarValue, getChain, deltaPhi, getYieldFromChain
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2_HT400ST150_withDF import *
-from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
-#from Workspace.RA4Analysis.cmgTuplesPostProcessed_Spring15 import *
+#from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
+from Workspace.RA4Analysis.cmgTuplesPostProcessed_Spring15 import *
 
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2 import *
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_softLepton import *
@@ -18,7 +18,8 @@ from Workspace.RA4Analysis.helpers import *
 from Workspace.RA4Analysis.eventShape import *
 
 #presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&deltaPhi_Wl>1."
-presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80"
+#presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80"
+presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&Flag_EcalDeadCellTriggerPrimitiveFilter"
 
 
 ROOT.TH1F().SetDefaultSumw2()
@@ -70,15 +71,15 @@ def getZ(c):
 
 
 varstring="deltaPhi_Wl"
-plotDir='/afs/hephy.at/user/d/dspitzbart/www/PHYS14v3/ZjetKinScatter/'
+plotDir='/afs/hephy.at/user/d/dspitzbart/www/Spring15/WjetKinScatterEcalFilterRecoStBins/'
 
 if not os.path.exists(plotDir):
   os.makedirs(plotDir)
 
 
 lepSel='hard'
-c = getChain(DY[lepSel],histname='')
-#c = getChain(WJetsHTToLNu[lepSel],histname='')
+#c = getChain(DY[lepSel],histname='')
+c = getChain(WJetsHTToLNu[lepSel],histname='')
 
 
 
@@ -109,7 +110,7 @@ for st in stReg:
       #WPhiHist = ROOT.TH1F('WPhiHist','WPhiHist',32,-3.2,3.2)
       #WPtHist = ROOT.TH1F('WPtHist','WPtHist',50,0,500)
       print 'Processing njet',jet
-      cutname, cut = nameAndCut(st, ht, jet, btb=btb, presel=presel, btagVar = 'nBJetMediumCSV30')
+      cutname, cut = nameAndCut(st, ht, jet, btb=btb, presel=presel, btagVar = 'nBJetMediumCSV30')#, stVar='(leptonPt+met_genPt)')
       c.Draw('>>eList',cut)
       elist = ROOT.gDirectory.Get("eList")
       number_events = elist.GetN()
@@ -129,19 +130,19 @@ for st in stReg:
       for i in range(number_events):
         c.GetEntry(elist.GetEntry(i))
         weight=getVarValue(c,"weight")
-        fakeMet = getVarValue(c,"met_pt")
-        dPhi = getVarValue(c,"deltaPhi_Wl")
+        #fakeMet = getVarValue(c,"met_pt")
+        #dPhi = getVarValue(c,"deltaPhi_Wl")
         totWeight += weight
-        lepPt, lepPhi, met, metPhi, mass = getZ(c)
-        #met, fakeMet, dPhi = getMetPt(c)
+        #lepPt, lepPhi, met, metPhi, mass = getZ(c)
+        met, fakeMet, dPhi = getMetPt(c)
         #points.append(ROOT.TGraph())
         #print dPhi
         if met > 0.:
           points.append(ROOT.TGraph())
           if fakeMet/met>1.:
             low+=weight
-          if dPhi>0.:
-            print fakeMet, met, mass
+          if dPhi>1.:
+            #print fakeMet, met
             points[-1].SetPoint(0,fakeMet,met)
             points[-1].SetMarkerStyle(8)
             #pointSize = 0.2+weight*15

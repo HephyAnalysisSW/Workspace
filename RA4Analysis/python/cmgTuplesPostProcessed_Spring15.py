@@ -15,7 +15,7 @@ def makeSample(sample):
 WJetsHTToLNu=makeSample({\
 "name" : "WJetsHTToLNu",
 "bins" : ["WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8", "WJetsToLNu_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8", "WJetsToLNu_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8", "WJetsToLNu_HT-600ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"],
-'dir' : "/data/easilar/cmgTuples/postProcessed_Spring15/",
+'dir' : "/data/easilar/cmgTuples/postProcessed_Spring15_AllFlags/",
 })
 #TTVH=makeSample({\
 #"name" : "TTVH",
@@ -27,11 +27,11 @@ WJetsHTToLNu=makeSample({\
 #"bins" : ["TBarToLeptons_sChannel", "TBarToLeptons_tChannel", "TBar_tWChannel", "TToLeptons_sChannel", "TToLeptons_tChannel", "T_tWChannel"],
 #'dir' : "/data/easilar/cmgTuples/postProcessed_v6_Phys14V2_withDF/HT400/",
 #})
-#DY=makeSample({\
-#"name" : "DY",
-#"bins" : ["DYJetsToLL_M50_HT100to200", "DYJetsToLL_M50_HT200to400", "DYJetsToLL_M50_HT400to600", "DYJetsToLL_M50_HT600toInf"],
-#'dir' : "/data/easilar/cmgTuples/postProcessed_v6_Phys14V2_withDF/HT400/",
-#})
+DY=makeSample({\
+"name" : "DY",
+"bins" : ["DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8"],
+'dir' : "/data/easilar/cmgTuples/postProcessed_Spring15_AllFlags/",
+})
 #QCD=makeSample({\
 #"name" : "QCD",
 #"bins" : ["QCD_HT_250To500", "QCD_HT_500To1000", "QCD_HT_1000ToInf"],

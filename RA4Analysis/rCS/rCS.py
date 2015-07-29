@@ -3,15 +3,16 @@ import os,sys
 #ROOT.gROOT.LoadMacro('/afs/hephy.at/scratch/d/dhandl/CMSSW_7_2_3/src/Workspace/HEPHYPythonTools/scripts/root/tdrstyle.C')
 #ROOT.setTDRStyle()
 from Workspace.HEPHYPythonTools.helpers import *
-#from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain
-from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName, nBTagBinName, varBinName, varBin
-
+from Workspace.RA4Analysis.helpers import *
+from Workspace.HEPHYPythonTools.xsec import *
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2_HT400_withDF import *
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2_HT400ST150_withDF import *
-from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
-#from Workspace.RA4Analysis.cmgTuplesPostProcessed_Spring15 import *
-from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,varBinName
+#from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
+#from Workspace.RA4Analysis.cmgTuples_v1_PHYS14V3 import *
+
+from Workspace.RA4Analysis.cmgTuplesPostProcessed_Spring15 import *
 from rCShelpers import *
+from draw_helpers import *
 #from slidingDeltaPhi import *
 import math
 from Workspace.RA4Analysis.signalRegions import *
@@ -20,20 +21,51 @@ from Workspace.RA4Analysis.signalRegions import *
 #ROOT.gROOT.LoadMacro('../../HEPHYPythonTools/scripts/root/tdrstyle.C')
 #ROOT.setTDRStyle()
 
+#target_lumi = 3000 #pb-1
+#def getWeight(sample,nEvents,target_lumi):
+#  weight = xsec[sample['dbsName']] * target_lumi/nEvents
+#  return weight
+
 
 small = False
 maxN = -1 if not small else 1 
 
 lepSel = 'hard'
 
-cWJets  = getChain(WJetsHTToLNu[lepSel],histname='',maxN=maxN)
+#cWJets  = getChain(WJetsHTToLNu[lepSel],histname='',maxN=maxN)
+cWJets  = getChain(DY[lepSel],histname='',maxN=maxN)
+
+
+
+#WJets = [{'name':'WJetsToLNu_HT100to200_PU20bx25', 'sample':WJetsToLNu_HT100to200_PU20bx25, 'legendName':'W HT100-200'},
+#          {'name':'WJetsToLNu_HT200to400_PU20bx25', 'sample':WJetsToLNu_HT200to400_PU20bx25, 'legendName':'W HT200-400'},
+#          {'name':'WJetsToLNu_HT400to600_PU20bx25', 'sample':WJetsToLNu_HT400to600_PU20bx25, 'legendName':'W HT400-600'},
+#          {'name':'WJetsToLNu_HT600toInf_PU20bx25', 'sample':WJetsToLNu_HT600toInf_PU20bx25, 'legendName':'W HT600-Inf'}]
+#
+#small = False
+#maxN=1 if small else -1
+#
+#first=True
+#for sample in WJets:
+#  sample['chunks'], sample['nEvents'] = getChunks(sample['sample'],treeName='treeProducerSusySingleLepton', maxN=maxN)
+#  sample['chain'] = ROOT.TChain('tree')
+#  if first: 
+#    cWJets = sample['chain']
+#    first = False
+#  else: cWJets.Add(sample['chain'])
+#  for chunk in sample['chunks']:
+#    sample['chain'].Add(chunk['file'])
+#  sample['weight'] = getWeight(sample['sample'], sample['nEvents'], target_lumi)
+
+
+
 #cTTJets = getChain(ttJets[lepSel],histname='',maxN=maxN)
 #cBkg    = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], QCD[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]],histname='')
 
 
 from localInfo import username
 uDir = username[0]+'/'+username
-subDir = 'PHYS14v3/rCS/GenMetGenStBinned'
+subDir = 'Spring15/rCS/EcalFlag'
 #subDir = 'pngCMG2/rCS/PHYS14V3/useRecoMet'
 
 path = '/afs/hephy.at/user/'+uDir+'/www/'+subDir+'/'
@@ -65,9 +97,10 @@ njreg = [(2,2),(3,3),(4,4),(5,5),(6,7),(8,-1)]#,(7,7),(8,8),(9,9)]
 nbjreg = [(0,0),(1,1),(2,2)]
 
 #Usage of GenMet for deltaPhi / rCS
-GenMetSwitch = True
+GenMetSwitch = False
 useOnlyGenMetPt = False
 useOnlyGenMetPhi = False
+useLongCutString = False
 
 ngNuEFromW = "Sum$(abs(genPartAll_pdgId)==12&&abs(genPartAll_motherId)==24)"
 ngNuMuFromW = "Sum$(abs(genPartAll_pdgId)==14&&abs(genPartAll_motherId)==24)"
@@ -79,8 +112,9 @@ l_H     = ngNuEFromW+"+"+ngNuMuFromW+"==1&&"+ngNuTauFromW+"==0"
 #presel='singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&'+l_H
 #presel='singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&Max$(abs(Jet_pt-Jet_mcPt))<50'
 #presel='singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&(sqrt((-met_genPt*cos(met_genPhi)+met_pt*cos(met_phi))**2+(-met_genPt*sin(met_genPhi)+met_pt*sin(met_phi))**2)/met_genPt)<1'
-
-presel='singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80'
+presel='singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&Flag_EcalDeadCellTriggerPrimitiveFilter'
+#presel='Sum$(abs(LepGood_pdgId)==11&&LepGood_pt>25&&abs(LepGood_eta)<2.4&&LepGood_tightId>=3&&LepGood_miniRelIso<0.1||abs(LepGood_pdgId)==13&&LepGood_pt>25&&abs(LepGood_eta)<2.4&&LepGood_tightId>=1&&LepGood_miniRelIso<0.2)==1&&Jet_pt[1]>80&&Flag_EcalDeadCellTriggerPrimitiveFilter'
+#presel='singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80'
 prefix = presel.split('&&')[0]+'_'
 
 ##2D plots of yields
@@ -191,18 +225,20 @@ for lep, pdgId in channels:
           h_nj_pos[lep][name][stb][htb].SetMinimum(0.)
           h_nj_neg[lep][name][stb][htb].SetMinimum(0.)
         for i_njb, njb in enumerate(njreg):
-          cname, cut = nameAndCut(stb,htb,njb, btb=btreg ,presel=presel, stVar='(leptonPt+met_genPt)')
+          cname, cut = nameAndCut(stb,htb,njb, btb=btreg ,presel=presel)#, stVar='(leptonPt+met_genPt)')
+          #cut = presel+'&&'+stCut(stb, lepton='both')+'&&' +htCut(htb, minPt=30, maxEta=2.4, njCorr=0.)+'&&'+ nBTagCut((0,0), minPt=30, maxEta=2.4, minCMVATag=0.814)+'&&'+nJetCut(njb, minPt=30, maxEta=2.4)#build cut string for non post processed tuples
           if lep in ['ele','mu']:
             cut = cut+'&&abs(leptonPdg)=='+str(pdgId)
           poscut = 'leptonPdg>0&&'+cut
           negcut = 'leptonPdg<0&&'+cut
+          #poscut = negcut = cut
           dPhiCut = dynDeltaPhi(1.0,stb, htb, njb)
-          #rcs = getRCSel(c, cut, dPhiCut)
-          #rcsPos = getRCSel(c, poscut, dPhiCut)
-          #rcsNeg = getRCSel(c, negcut, dPhiCut)
-          rcs = getRCS(c, cut, dPhiCut, useGenMet=GenMetSwitch, useOnlyGenMetPt=useOnlyGenMetPt, useOnlyGenMetPhi=useOnlyGenMetPhi, useWeight=False)
-          rcsPos = getRCS(c, poscut, dPhiCut, useGenMet=GenMetSwitch, useOnlyGenMetPt=useOnlyGenMetPt, useOnlyGenMetPhi=useOnlyGenMetPhi, useWeight=False)
-          rcsNeg = getRCS(c, negcut, dPhiCut, useGenMet=GenMetSwitch, useOnlyGenMetPt=useOnlyGenMetPt, useOnlyGenMetPhi=useOnlyGenMetPhi, useWeight=False)
+          rcs = getRCSelZ(c, cut, dPhiCut)
+          rcsPos = getRCSelZ(c, poscut, dPhiCut)
+          rcsNeg = getRCSelZ(c, negcut, dPhiCut)
+          #rcs = getRCS(c, cut, dPhiCut, useGenMet=GenMetSwitch, useOnlyGenMetPt=useOnlyGenMetPt, useOnlyGenMetPhi=useOnlyGenMetPhi, useLongCutString=useLongCutString, useWeight=True)
+          #rcsPos = getRCS(c, poscut, dPhiCut, useGenMet=GenMetSwitch, useOnlyGenMetPt=useOnlyGenMetPt, useOnlyGenMetPhi=useOnlyGenMetPhi, useLongCutString=useLongCutString, useWeight=True)
+          #rcsNeg = getRCS(c, negcut, dPhiCut, useGenMet=GenMetSwitch, useOnlyGenMetPt=useOnlyGenMetPt, useOnlyGenMetPhi=useOnlyGenMetPhi, useLongCutString=useLongCutString, useWeight=True)
           print rcs, dPhiCut
           res = rcs['rCS']
           resErr = rcs['rCSE_sim']

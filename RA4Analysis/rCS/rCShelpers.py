@@ -13,11 +13,12 @@ def makeWeight(lumi=4.):
 
 #ROOT.TH1F().SetDefaultSumw2()
 
-def getRCS(c, cut, dPhiCut, useGenMet=False, useAllGen=False, useOnlyGenMetPt=False, useOnlyGenMetPhi=False, useWeight = True):   
+def getRCS(c, cut, dPhiCut, useGenMet=False, useAllGen=False, useOnlyGenMetPt=False, useOnlyGenMetPhi=False, useWeight = True, useLongCutString=False):   
   if useGenMet: dPhiStr = "acos((leptonPt+met_genPt*cos(leptonPhi-met_genPhi))/sqrt(leptonPt**2+met_genPt**2+2*met_genPt*leptonPt*cos(leptonPhi-met_genPhi)))"
   elif useAllGen: dPhiStr = "acos((genLep_pt+met_genPt*cos(genLep_phi-met_genPhi))/sqrt(genLep_pt**2+met_genPt**2+2*met_genPt*genLep_pt*cos(genLep_phi-met_genPhi)))"
   elif useOnlyGenMetPt: dPhiStr = "acos((leptonPt+met_genPt*cos(leptonPhi-met_phi))/sqrt(leptonPt**2+met_genPt**2+2*met_genPt*leptonPt*cos(leptonPhi-met_phi)))"
   elif useOnlyGenMetPhi: dPhiStr = "acos((leptonPt+met_pt*cos(leptonPhi-met_genPhi))/sqrt(leptonPt**2+met_pt**2+2*met_pt*leptonPt*cos(leptonPhi-met_genPhi)))"
+  elif useLongCutString: dPhiStr = "acos((LepGood_pt[0]+met_pt*cos(LepGood_phi[0]-met_genPhi))/sqrt(LepGood_pt[0]**2+met_pt**2+2*met_pt*LepGood_pt[0]*cos(LepGood_phi[0]-met_genPhi)))"
   else: dPhiStr = 'deltaPhi_Wl'
   if useWeight:
     h = getPlotFromChain(c, dPhiStr, [0,dPhiCut,pi], cutString=cut, binningIsExplicit=True)
@@ -67,6 +68,25 @@ def getWMass(c):
       WMass = sqrt(2*LeptonPt*NeutrinoPt*(cosh(LeptonEta-NeutrinoEta)-cos(LeptonPhi-NeutrinoPhi)))
   return WMass
 
+def getGenZ(c):
+  leadLepPt = c.GetLeaf('genLep_pt').GetValue(0)
+  leadLepPhi = c.GetLeaf('genLep_phi').GetValue(0)
+  leadLepEta = c.GetLeaf('genLep_eta').GetValue(0)
+  subLepPt = c.GetLeaf('genLep_pt').GetValue(1)
+  subLepPhi = c.GetLeaf('genLep_phi').GetValue(1)
+  subLepEta = c.GetLeaf('genLep_eta').GetValue(1)
+  x = leadLepPt*cos(leadLepPhi)+subLepPt*cos(subLepPhi)
+  y = leadLepPt*sin(leadLepPhi)+subLepPt*sin(subLepPhi)
+  invMass = sqrt(2.*leadLepPt*subLepPt*(cosh(leadLepEta-subLepEta)-cos(leadLepPhi-subLepPhi)))
+  ZPt = sqrt(x*x + y*y)
+  ZPhi = atan(y/x)
+  if x<0:
+    if y>0:
+      ZPhi = pi + ZPhi
+    if y<0:
+      ZPhi = ZPhi - pi
+  return ZPt, ZPhi, invMass, x, y, leadLepPt, leadLepPhi, subLepPt, subLepPhi
+
 def getNeutrino(c):
   para = ['pt','phi','eta','pdgId','motherId']
   genPartAll = [getObjDict(c, 'genPartAll_', para, j) for j in range(int(c.GetLeaf('ngenPartAll').GetValue()))]
@@ -87,6 +107,77 @@ def getNeutrino(c):
     NeutrinoPhi = NeutrinosFromW[0]['phi']
     return NeutrinoPt, NeutrinoPhi, metGenPt
   else: return 0., 0.
+
+def getRCSelZ(c, cut, dPhiCut):
+  c.Draw('>>eList',cut)
+  elist = ROOT.gDirectory.Get("eList")
+  number_events = elist.GetN()
+  twoBin=[0,dPhiCut,3.2]
+  h = ROOT.TH1F('h','h',len(twoBin)-1, array('d', twoBin))
+  h.Sumw2()
+  for i in range(number_events):
+    c.GetEntry(elist.GetEntry(i))
+    weight = getVarValue(c,"weight")
+    ZPt, ZPhi, invMass, qtx, qty, leadLepPt, leadLepPhi, subLepPt, subLepPhi = getGenZ(c)
+    if invMass>120 or invMass<60: continue
+    metPhi = c.GetLeaf('met_phi').GetValue()
+    metPt = c.GetLeaf('met_pt').GetValue()
+
+    a = randint(0,1)
+    if a:
+      #take the leading muon
+      genMetPt = leadLepPt
+      genMetPhi = leadLepPhi
+      lepPt = subLepPt
+      lepPhi = subLepPhi
+      metX = metPt*cos(metPhi) + genMetPt*cos(genMetPhi)
+      metY = metPt*sin(metPhi) + genMetPt*sin(genMetPhi)
+      qtWx_corr =metX + subLepPt*cos(subLepPhi)
+      qtWy_corr =metY + subLepPt*sin(subLepPhi)
+    else:
+      genMetPt = subLepPt
+      genMetPhi = subLepPhi
+      lepPt = leadLepPt
+      lepPhi = leadLepPhi
+      metX = metPt*cos(metPhi) + genMetPt*cos(genMetPhi)
+      metY = metPt*sin(metPhi) + genMetPt*sin(genMetPhi)
+      qtWx_corr =metX + leadLepPt*cos(leadLepPhi)
+      qtWy_corr =metY + leadLepPt*sin(leadLepPhi)
+
+    fakeMetPt = metPt
+    fakeMetPhi = metPhi
+
+    recoMetPt = sqrt(metX**2 + metY**2)
+    recoMetPhi = atan(metY/metX)
+    if metX<0:
+      if metY>0:
+        recoMetPhi = pi + recoMetPhi
+      if metY<0:
+        recoMetPhi = recoMetPhi - pi
+
+    #calculate the pt and phi of mimic boson 
+    WPt = sqrt(qtWx_corr**2 + qtWy_corr**2)
+    WPhi = atan(qtWy_corr/qtWx_corr)
+    if qtWx_corr<0:
+      if qtWy_corr>0:
+        WPhi = pi + WPhi
+      if qtWy_corr<0:
+        WPhi = WPhi - pi
+    deltaPhi = acos((lepPt+recoMetPt*cos(lepPhi-recoMetPhi))/sqrt(lepPt**2+recoMetPt**2+2*recoMetPt*lepPt*cos(lepPhi-recoMetPhi)))
+    h.Fill(deltaPhi,weight)
+  if h.GetBinContent(1)>0:
+    rcs = h.GetBinContent(2)/h.GetBinContent(1)
+    if h.GetBinContent(2)>0:
+      rCSE_sim = rcs*sqrt(h.GetBinError(2)**2/h.GetBinContent(2)**2 + h.GetBinError(1)**2/h.GetBinContent(1)**2)
+      rCSE_pred = rcs*sqrt(1./h.GetBinContent(2) + 1./h.GetBinContent(1))
+      del h
+      return {'rCS':rcs, 'rCSE_pred':rCSE_pred, 'rCSE_sim':rCSE_sim}
+    else:
+      del h
+      return {'rCS':rcs, 'rCSE_pred':float('nan'), 'rCSE_sim':float('nan')}
+  else:
+    del h
+    return {'rCS':float('nan'), 'rCSE_pred':float('nan'), 'rCSE_sim':float('nan')}
 
 def getRCSel(c, cut, dPhiCut):
   dPhiStr = 'deltaPhi_Wl'
