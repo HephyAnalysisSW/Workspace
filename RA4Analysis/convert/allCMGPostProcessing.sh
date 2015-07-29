@@ -1,11 +1,18 @@
 #!/bin/sh 
 ########Spring15###############
-python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=WJetsToLNu_HT100to200 &
-python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=WJetsToLNu_HT200to400 &
-python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=WJetsToLNu_HT400to600 &
-python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=WJetsToLNu_HT600toInf &
+#python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=WJetsToLNu_HT100to200 &
+#python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=WJetsToLNu_HT200to400 &
+#python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=WJetsToLNu_HT400to600 &
+#python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=WJetsToLNu_HT600toInf &
+#
+#python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=DYJetsToLL_M_50  &
+python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=TToLeptons_sch  &
+python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=TToLeptons_tch  &
+python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=TBar_tWch  &
+python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=T_tWch  &
 
-python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=DYJetsToLL_M_50  &
+#python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=data_mu  &
+#python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=data_ele  &
 
 
 
