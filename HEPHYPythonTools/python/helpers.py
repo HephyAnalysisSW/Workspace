@@ -113,78 +113,72 @@ def getChain(sL, minAgeDPM=0, histname='histo', xrootPrefix='root://hephyse.oeaw
   print "Added ",i,'files from sample',s['name']
   return c
 
-def getChunks(sample, treeName, maxN=-1):
+def getChunks(sample, maxN=-1):
   if '/dpm/' in sample['dir']:
     return getChunksFromDPM(sample, maxN=maxN)
 #  elif '/eoscms.cern.ch/' in sample['dir']:
 #    return getSampleFromEOS(sample)
   else:
-    fromDPM =  sample.has_key('fromDPM') and sample.has_key('fromDPM')
-    #print "from dpm:" , fromDPM 
-    if fromDPM:
-      return getChunksFromDPM(sample, fromDPM=fromDPM, maxN=maxN)
-    else:
+#    fromDPM =  sample.has_key('fromDPM') and sample.has_key('fromDPM')
+#    #print "from dpm:" , fromDPM 
+#    if fromDPM:
+#      return getChunksFromDPM(sample, fromDPM=fromDPM, maxN=maxN)
+#    else:
       #print "not from DPM"
-      return getChunksFromNFS(sample, treeName,maxN=maxN)
+      return getChunksFromNFS(sample, maxN=maxN)
     
-def getChunksFromNFS(sample, treeName, maxN=-1):
-  #print "sample , treename , maxN" , sample , treeName , maxN
+def getChunksFromNFS(sample,  maxN=-1):
+#  print "sample" , sample , maxN
   import os, subprocess, datetime
-  #print "sample dir:" , sample['dir']
+  print "sample dir:" , sample['dir']
   chunks = [{'name':x} for x in os.listdir(sample['dir']) if x.startswith(sample['chunkString']+'_Chunk') or x==sample['name']]
-  #print chunks
+  print chunks
   chunks=chunks[:maxN] if maxN>0 else chunks
-  nTotEvents=0
+  sumWeights=0
   allFiles=[]
   failedChunks=[]
+  const = 'All Events' if sample['isData'] else 'Sum Weights'
   for i, s in enumerate(chunks):
-#      logfile = sample['dir']+'/'+s['name']+'/log.txt'
-#      line = [x for x in subprocess.check_output(["cat", logfile]).split('\n') if x.count('number of events processed')]
-#      assert len(line)==1,"Didn't find event number in file %s"%logfile
-#      n = int(line[0].split()[-1])
-      #logfile = sample['dir']+'/'+s['name']+'/skimAnalyzerCount/SkimReport.txt'
       logfile = sample['dir']+'/'+s['name']+'/SkimReport.txt'
       if os.path.isfile(logfile):
-        #line = [x for x in subprocess.check_output(["cat", logfile]).split('\n') if x.count('All Events')]
-        #line = [x for x in subprocess.check_output(["cat", logfile]).split('\n') if x.count('Sum Weights')]
-        line = [x for x in subprocess.check_output(["cat", logfile]).split('\n') if x.count('Sum Weights')]
-        #print "LOOOKKKKK:" , line
-        assert len(line)==1,"Didn't find event number in file %s"%logfile
+        line = [x for x in subprocess.check_output(["cat", logfile]).split('\n') if x.count(const)]
+        assert len(line)==1,"Didn't find normalization constant '%s' in  number in file %s"%(const, logfile)
         #n = int(float(line[0].split()[2]))
-        n = float(line[0].split()[2])
-        inputFilename = sample['dir']+'/'+s['name']+'/'+treeName+'/tree.root'
+        sumW = float(line[0].split()[2])
+        inputFilename = sample['dir']+'/'+s['name']+'/'+sample['rootFileLocation']
+#        print sumW, inputFilename
         if os.path.isfile(inputFilename):
-          nTotEvents+=n
+          sumWeights+=sumW
           allFiles.append(inputFilename)
           s['file']=inputFilename
         else:
           failedChunks.append(chunks[i])
       else:failedChunks.append(chunks[i])
 #    except: print "Chunk",s,"could not be added"
-  print "Found",len(chunks),"chunks for sample",sample["name"],'with a total of',nTotEvents,
-  if len(chunks) > 0: print "events. Failed for:",",".join([c['name'] for c in failedChunks]),"(",round(100*len(failedChunks)/float(len(chunks)),1),")%"
-  return chunks, nTotEvents
+  print "Found",len(chunks),"chunks for sample",sample["name"],'with a normalization constant of',sumWeights,
+  if len(chunks) > 0: print ". Failed for:",",".join([c['name'] for c in failedChunks]),"(",round(100*len(failedChunks)/float(len(chunks)),1),")%"
+  return chunks, sumWeights
 
-def getChunksFromDPM(sample, fromDPM=False, maxN=-1):
-  fileList = getFileList(sample['dir'], minAgeDPM=0, histname='', xrootPrefix='root://hephyse.oeaw.ac.at/' if not fromDPM else '')
-  chunks = [{'file':x,'name':x.split('/')[-1].replace('.root','')} for x in fileList]
-  chunks=chunks[:maxN] if maxN>0 else chunks
-  nTotEvents=0
-  failedChunks=[]
-  goodChunks=[]
-  for c in chunks:
-    try:
-      nEvents=int(c['name'].split('nEvents')[-1])
-    except:
-      nEvents=-1
-    if nEvents>0:
-      c.update({'nEvents':int(c['name'].split('nEvents')[-1])})
-      nTotEvents+=c['nEvents']
-      goodChunks.append(c)
-    else:
-      failedChunks.append(c)
-  print "Found",len(goodChunks),"chunks for sample",sample["name"],'with a total of',nTotEvents,"events. Failed for:",",".join([c['name'] for c in failedChunks]),"(",round(100*len(failedChunks)/float(len(chunks)),1),")%"
-  return goodChunks, nTotEvents
+#def getChunksFromDPM(sample, fromDPM=False, maxN=-1):
+#  fileList = getFileList(sample['dir'], minAgeDPM=0, histname='', xrootPrefix='root://hephyse.oeaw.ac.at/' if not fromDPM else '')
+#  chunks = [{'file':x,'name':x.split('/')[-1].replace('.root','')} for x in fileList]
+#  chunks=chunks[:maxN] if maxN>0 else chunks
+#  nTotEvents=0
+#  failedChunks=[]
+#  goodChunks=[]
+#  for c in chunks:
+#    try:
+#      nEvents=int(c['name'].split('nEvents')[-1])
+#    except:
+#      nEvents=-1
+#    if nEvents>0:
+#      c.update({'nEvents':int(c['name'].split('nEvents')[-1])})
+#      nTotEvents+=c['nEvents']
+#      goodChunks.append(c)
+#    else:
+#      failedChunks.append(c)
+#  print "Found",len(goodChunks),"chunks for sample",sample["name"],'with a total of',nTotEvents,"events. Failed for:",",".join([c['name'] for c in failedChunks]),"(",round(100*len(failedChunks)/float(len(chunks)),1),")%"
+#  return goodChunks, nTotEvents
 
 def getObjFromFile(fname, hname):
   f = ROOT.TFile(fname)
