@@ -4,16 +4,19 @@ import copy, os, sys
 data_ele={\
 "name" : "SingleElectron_Run2015B",
 "chunkString" : "SingleElectron_Run2015B",
-#'chunkString' : 'test_data_singleEle',
-#'dir' : "/data/easilar/cmgTuples/test_data_singleEle/",
-'dir'  :"/data/easilar/cmgTuples/SingleElectron_Run2015B/",
+'dir'  :"/data/easilar/cmgTuples/crab_Spring15/SingleElectron_Run2015B/",
 }
 
 data_mu={\
 "name" : "SingleMuon_Run2015B",
 "chunkString" : "SingleMuon_Run2015B",
-'dir' : "/data/easilar/cmgTuples/test_data_singleMuon/",
-#'dir'  :"/data/easilar/cmgTuples/SingleMuon_Run2015B/",
+'dir'  :"/data/easilar/cmgTuples/crab_Spring15/SingleMuon_Run2015B/",
+}
+
+data_doubleMu={\
+"name" : "DoubleMuon_Run2015B",
+"chunkString" : "DoubleMuon_Run2015B",
+'dir'  :"/data/easilar/cmgTuples/crab_Spring15/DoubleMuon_Run2015B/",
 }
 
 DYJetsToLL_M_50={\
@@ -50,7 +53,5 @@ WJetsToLNu_HT600toInf={\
 'dir':'/data/easilar/cmgTuples/crab_Spring15/WJetsToLNu_HT-600ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8',
 'dbsName':'WJetsToLNu_HT-600ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM',
 }
-
-
 
 

@@ -6,7 +6,7 @@ from Workspace.HEPHYPythonTools.xsec import xsec
 from Workspace.HEPHYPythonTools.helpers import getObjFromFile, getObjDict, getFileList
 from Workspace.RA4Analysis.convertHelpers import compileClass, readVar, printHeader, typeStr, createClassString
 
-subDir = "postProcessed_Spring15"
+subDir = "postProcessed_Spring15_AllFlags_testdata"
 #from Workspace.RA4Analysis.cmgTuples_v3 import *
 from Workspace.HEPHYPythonTools.helpers import getChunksFromNFS, getChunksFromDPM, getChunks
 #from Workspace.RA4Analysis.cmgTuples_PHYS14V3 import *
@@ -23,15 +23,15 @@ from localInfo import username
 ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 
-defSampleStr = "WJetsToLNu_HT100to200"
+#defSampleStr = "WJetsToLNu_HT100to200"
 #defSampleStr = "data_mu"
-
+defSampleStr = "data_doubleMu"
 
 branchKeepStrings = ["run", "lumi", "evt", "isData", "xsec", "puWeight", "nTrueInt", "genWeight", "rho", "nVert", "nJet25", "nBJetLoose25", "nBJetMedium25", "nBJetTight25", "nJet40", "nJet40a", "nBJetLoose40", "nBJetMedium40", "nBJetTight40", 
                      "nLepGood20", "nLepGood15", "nLepGood10",  
                      "GenSusyMScan1", "GenSusyMScan2", "GenSusyMScan3", "GenSusyMScan4", "GenSusyMGluino", "GenSusyMGravitino", "GenSusyMStop", "GenSusyMSbottom", "GenSusyMStop2", "GenSusyMSbottom2", "GenSusyMSquark", "GenSusyMNeutralino", "GenSusyMNeutralino2", "GenSusyMNeutralino3", "GenSusyMNeutralino4", "GenSusyMChargino", "GenSusyMChargino2", 
                      "htJet25", "mhtJet25", "htJet40j", "htJet40", "mhtJet40", "nSoftBJetLoose25", "nSoftBJetMedium25", "nSoftBJetTight25", 
-                     "met_*",
+                     "met_*","Flag_*",
                      "nFatJet","FatJet_*", 
                      "nLepOther", "LepOther_*", "nLepGood", "LepGood_*", "ngenLep", "genLep_*", "nTauGood", "TauGood_*", 
                      "nGenPart", "GenPart_*","ngenPartAll","genPartAll_*" ,"ngenTau", "genTau_*", "nJet", "Jet_*", "ngenLepFromTau", "genLepFromTau_*"]
@@ -97,7 +97,7 @@ def getTreeFromChunk(c, skimCond, iSplit, nSplit):
 exec('allSamples=['+options.allsamples+']')
 for isample, sample in enumerate(allSamples):
   
-  chunks, nTotEvents = getChunks(sample, options.inputTreeName)
+  chunks, sumWeight = getChunks(sample, options.inputTreeName)
   #chunks, nTotEvents = getChunksFromDPM(sample, options.inputTreeName)
   
   outDir = options.targetDir+'/'+"/".join([options.skim, options.leptonSelection, sample['name']])
@@ -106,8 +106,7 @@ for isample, sample in enumerate(allSamples):
   os.system('mkdir -p '+tmpDir)
   os.system('rm -rf '+tmpDir+'/*')
 
-  #prelumiWeight = xsec[sample['dbsName']]*target_lumi/float(nTotEvents)   ###nTotEvents is sum weight
-  prelumiWeight = 0.032 
+  prelumiWeight = xsec[sample['dbsName']]*target_lumi/float(sumWeight)
   
   #print "sample['dbsName']:" , sample['dbsName']
   readVariables = ['met_pt/F', 'met_phi/F']
