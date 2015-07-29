@@ -14,7 +14,7 @@ from math import *
 import os, sys
 import pickle
 from array import array
-from localInfo import username
+from Workspace.HEPHYPythonTools.user import username
 ROOT.gROOT.LoadMacro("/afs/hephy.at/scratch/e/easilar/CMSSW_7_2_3/src/Workspace/HEPHYPythonTools/scripts/root/tdrstyle.C")
 ROOT.setTDRStyle()
 ROOT.TH1F.SetDefaultSumw2()

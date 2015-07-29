@@ -6,7 +6,7 @@ from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYi
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v5_Phys14V2 import *
 from Workspace.RA4Analysis.cmgTuplesPostProcessed_v5_Phys14V2 import *
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,varBinName
-from localInfo import username
+from Workspace.HEPHYPythonTools.user import username
 from math import pi, sqrt
 
 import os, copy, sys

@@ -354,8 +354,6 @@ def drawStack(stk, maskedArea=None):
   except:pass
   return stuff
 
-from localInfo import afsuser
-defaultWWWPath = '/afs/hephy.at/user/'+afsuser[0]+'/'+afsuser+'/www/'
 
 def bracket(x, interval=[0,1]):
   return max(interval[0],min(interval[1],x))
@@ -368,7 +366,8 @@ def calcTLegendMaskedArea(legendC, margins):
     }
 
 
-def drawNMStacks(intn, intm, stacks, filename, path = defaultWWWPath):
+from Workspace.HEPHYPythonTools.user import defaultPlotPath
+def drawNMStacks(intn, intm, stacks, filename, path = defaultPlotPath):
   stuff=[]
   yswidth = 500
   ylwidth = 700

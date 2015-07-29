@@ -5,7 +5,7 @@ import copy, os, sys
 from Workspace.HEPHYPythonTools.helpers import *
 from Workspace.RA4Analysis.helpers import *
 from Workspace.RA4Analysis.signalRegions import *
-from localInfo import username
+from Workspace.HEPHYPythonTools.user import username
 from math import *
 
 signalRegion = signalRegion3fb

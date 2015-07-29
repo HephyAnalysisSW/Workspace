@@ -18,7 +18,7 @@ target_lumi = 3000 #pb-1
 from  Workspace.RA4Analysis import mt2w
 
 from math import *
-from localInfo import username
+from Workspace.HEPHYPythonTools.user import username
 
 ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()

@@ -2,7 +2,7 @@ import ROOT
 import pickle
 from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYieldFromChain
 from Workspace.RA4Analysis.cmgTuplesPostProcessed import *
-from localInfo import username
+from Workspace.HEPHYPythonTools.user import username
 
 import os, copy, sys
 sys.path.append('/afs/hephy.at/scratch/d/dhandl/CMSSW_7_0_6_patch1/src/Workspace/RA4Analysis/plotsDavid')

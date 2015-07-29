@@ -1,7 +1,7 @@
 import ROOT
 import pickle
 import os,sys
-from localInfo import username
+from Workspace.HEPHYPythonTools.user import username
 import Workspace.HEPHYPythonTools.xsec as xsec
 from Workspace.HEPHYPythonTools.helpers import getObjFromFile, getChain, getChunks
 from Workspace.RA4Analysis.cmgTuples_v1_PHYS14V3 import *

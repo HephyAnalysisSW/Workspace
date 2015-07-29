@@ -29,7 +29,7 @@ cTTJets = getChain(ttJets[lepSel],histname='',maxN=maxN)
 #cBkg    = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], QCD[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]],histname='')
 
 
-from localInfo import username
+from Workspace.HEPHYPythonTools.user import username
 uDir = username[0]+'/'+username
 #subDir = 'PHYS14v3/rCS/'
 subDir = 'pngCMG2/rCS/PHYS14V3/useRecoMet'

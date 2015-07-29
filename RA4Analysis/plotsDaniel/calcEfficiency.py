@@ -11,7 +11,7 @@ from math import *
 import os, sys
 import pickle
 from array import array
-from localInfo import username
+from Workspace.HEPHYPythonTools.user import username
 
 
 ROOT.gROOT.LoadMacro('../../HEPHYPythonTools/scripts/root/tdrstyle.C')

@@ -1,6 +1,6 @@
 import ROOT
 from Workspace.RA4Analysis.stage2Tuples import ttJetsCSA1450ns , ttJetsCSA1425ns
-from localInfo import username
+from Workspace.HEPHYPythonTools.user import username
 
 
 def getMu(c,j):

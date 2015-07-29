@@ -5,7 +5,7 @@ from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,v
 from Workspace.RA4Analysis.cmgTuplesPostProcessed_v1_Phys14V3_HT400ST200 import *
 from makeTTPrediction import makeTTPrediction
 from makeWPrediction import makeWPrediction
-from localInfo import username
+from Workspace.HEPHYPythonTools.user import username
 from binnedNBTagsFit import binnedNBTagsFit
 from rCShelpers import *
 from math import pi, sqrt

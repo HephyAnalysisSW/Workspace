@@ -24,7 +24,7 @@ test_data_ele=makeSample({\
 WJetsHTToLNu=makeSample({\
 "name" : "WJetsHTToLNu",
 "bins" : ["WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8", "WJetsToLNu_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8", "WJetsToLNu_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8", "WJetsToLNu_HT-600ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"],
-'dir' : "/data/easilar/cmgTuples/postProcessed_Spring15/",
+'dir' : "/data/easilar/cmgTuples/postProcessed_Spring15_AllFlags/",
 })
 
 #TTVH=makeSample({\
@@ -40,7 +40,7 @@ WJetsHTToLNu=makeSample({\
 DY=makeSample({\
 "name" : "DY",
 "bins" : ["DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8"],
-'dir' : "/data/easilar/cmgTuples/postProcessed_Spring15/",
+'dir' : "/data/easilar/cmgTuples/postProcessed_Spring15_AllFlags/",
 })
 #QCD=makeSample({\
 #"name" : "QCD",

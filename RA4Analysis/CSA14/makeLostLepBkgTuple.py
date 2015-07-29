@@ -6,7 +6,7 @@ from Workspace.HEPHYPythonTools.helpers import findClosestObject, deltaR,getVarV
 from Workspace.RA4Analysis.objectSelection import getGenLepsWithMatchInfo,getGenLeps, getMuons, getLooseMuStage2, getGenLep ,tightPOGMuID, vetoMuID
 from math import sqrt, cos, sin, atan2
 from Workspace.RA4Analysis.stage2Tuples import *
-from localInfo import username
+from Workspace.HEPHYPythonTools.user import username
 from Workspace.RA4Analysis.helpers import deltaPhi
 
 def getTypeStr(s):

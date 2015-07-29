@@ -28,6 +28,12 @@ data_doubleMu={\
 'isData':True
 }
 
+data_doubleMu={\
+"name" : "DoubleMuon_Run2015B",
+"chunkString" : "DoubleMuon_Run2015B",
+'dir' : "/data/easilar/cmgTuples/",
+}
+
 DYJetsToLL_M_50={\
 "name" : "DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8",
 "chunkString" : "DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8",

@@ -11,7 +11,7 @@ from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import 
 from Workspace.RA4Analysis.helpers import *
 from rCShelpers import *
 from Workspace.RA4Analysis.signalRegions import *
-from localInfo import username
+from Workspace.HEPHYPythonTools.user import username
 
 binning=[30,0,1500]
 
