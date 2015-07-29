@@ -10,3 +10,8 @@ if os.environ['USER'] in ['easilar']:
 if os.environ['USER'] in ['schoef', 'rschoefbeck', 'schoefbeck']:
   defaultPlotPath = "/afs/hephy.at/user/r/rschoefbeck/www/"
   username = "rschoefbeck"
+
+if os.environ['USER'] in ['dspitzbart', 'dspitzba']:
+  defaultPlotPath = "/afs/hephy.at/user/d/dspitzbart/www/"
+  username = "dspitzbart"
+
