@@ -7,24 +7,28 @@ def makeSample(sample):
   s['dir']=s['dir']+'/soft/'
   return {'hard':h, 'soft':s}
 
-######data should move a spring 15 post processed file... This is only for test.
-test_data_ele=makeSample({\
+data_ele=makeSample({\
 "name": "SingleElectron_Run2015B",
 "bins" : ["SingleElectron_Run2015B"],
-"dir" : "/data/easilar/cmgTuples/postProcessed_data_single_Ele//HT400ST200/",
+'dir' : "/data/easilar/cmgTuples/postProcessed_Spring15_AllFlags/",
 })
 
+data_mu=makeSample({\
+"name": "SingleMuon_Run2015B",
+"bins" : ["SingleMuon_Run2015B"],
+'dir' : "/data/easilar/cmgTuples/postProcessed_Spring15_AllFlags/",
+})
 
-#ttJets=makeSample({\
-#"name" : "ttJets",
-#"bins" : ["TTJets"],
-#'dir' : "/data/easilar/cmgTuples/postProcessed_v8_Phys14v3/HT400ST200/",
-#})
+ttJets=makeSample({\
+"name" : "ttJets",
+"bins" : ["TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8"],
+'dir' : "/data/easilar/cmgTuples/postProcessed_Spring15_AllFlags/",
+})
 
 WJetsHTToLNu=makeSample({\
 "name" : "WJetsHTToLNu",
 "bins" : ["WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8", "WJetsToLNu_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8", "WJetsToLNu_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8", "WJetsToLNu_HT-600ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"],
-'dir' : "/data/easilar/cmgTuples/postProcessed_Spring15/",
+'dir' : "/data/easilar/cmgTuples/postProcessed_Spring15_AllFlags/",
 })
 
 #TTVH=makeSample({\
@@ -32,15 +36,16 @@ WJetsHTToLNu=makeSample({\
 #"bins" : ["TTH", "TTWJets", "TTZJets"],
 #'dir' : "/data/easilar/cmgTuples/postProcessed_v8_Phys14v3/HT400ST200/",
 #})
-#singleTop=makeSample({\
-#"name" : "singleTop",
+singleTop=makeSample({\
+"name" : "singleTop",
 #"bins" : ["TBarToLeptons_sch", "TBarToLeptons_tch", "TBar_tWch", "TToLeptons_sch", "TToLeptons_tch", "T_tWch"],
-#'dir' : "/data/easilar/cmgTuples/postProcessed_v8_Phys14v3/HT400ST200/",
-#})
+"bins" : ["ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1", "ST_t-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1", "ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1", "ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1"],
+'dir' : "/data/easilar/cmgTuples/postProcessed_Spring15_AllFlags/",
+})
 DY=makeSample({\
 "name" : "DY",
 "bins" : ["DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8"],
-'dir' : "/data/easilar/cmgTuples/postProcessed_Spring15/",
+'dir' : "/data/easilar/cmgTuples/postProcessed_Spring15_AllFlags/",
 })
 #QCD=makeSample({\
 #"name" : "QCD",

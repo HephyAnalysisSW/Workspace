@@ -114,11 +114,11 @@ def getChain(sL, minAgeDPM=0, histname='histo', xrootPrefix='root://hephyse.oeaw
   return c
 
 def getChunks(sample, maxN=-1):
-  if '/dpm/' in sample['dir']:
-    return getChunksFromDPM(sample, maxN=maxN)
+#  if '/dpm/' in sample['dir']:
+#    return getChunksFromDPM(sample, maxN=maxN)
 #  elif '/eoscms.cern.ch/' in sample['dir']:
 #    return getSampleFromEOS(sample)
-  else:
+#  else:
 #    fromDPM =  sample.has_key('fromDPM') and sample.has_key('fromDPM')
 #    #print "from dpm:" , fromDPM 
 #    if fromDPM:
