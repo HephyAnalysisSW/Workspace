@@ -27,9 +27,8 @@ lsNFS = os.listdir(oDir)
 p = subprocess.Popen(["dpns-ls -l "+ dpmDir], shell = True , stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 for line in p.stdout.readlines():
     line = line[:-1]
-    print line
-    filename = line.split(" ")[-1]
-    size = int(line.split(" ")[-5]) 
+    filename = line.split()[-1]
+    size = int(line.split()[-5]) 
     if  filename.startswith(options.fileName) and filename[-5:]==".root":
       sf = filename.split("_")
       tf = sf[0]+"_"+sf[1]+"_"
@@ -46,7 +45,7 @@ for line in p.stdout.readlines():
           continue
         print "Copying", dpmDir+"/"+filename, "to", oDir+"/"+filename
         if not options.onlyUpdate or not os.path.isfile(oDir+"/"+filename):
-          os.system("$LCG_LOCATION/bin/rfcp "+dpmDir+"/"+filename+" "+oDir+"/"+filename)
+          os.system("/usr/bin/rfcp "+dpmDir+"/"+filename+" "+oDir+"/"+filename)
         else:
           print "Not overwriting",oDir+"/"+filename
     
