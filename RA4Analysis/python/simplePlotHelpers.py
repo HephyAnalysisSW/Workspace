@@ -23,28 +23,28 @@ from Workspace.HEPHYPythonTools.helpers import getFileList, getVarValue
 
 class plot:
   def __init__(self, var, binning, cut, sample, style, weight = {'string':'weight'}, options=None):
+    if var:
+      self.leaf = var['leaf'] if var.has_key('leaf') else None
+      self.func = var['func'] if var.has_key('func') else None
+      self.TTreeFormula = var['TTreeFormula'] if var.has_key('TTreeFormula') else None
+      assert not ( var.has_key('func') and not var.has_key('branches')), "Error: Need(!) to specify used branches in case of function in var %s" %repr(var)
+      self.usedBranches = var['branches'] if var.has_key('branches') else []
+      assert sum(bool(x) for x in [self.leaf, self.func, self.TTreeFormula])==1, "Error: Should specify exactly one of 'leaf', 'func' or 'TTreeFormula' in var %s" % repr(var)
+      if self.leaf:
+        assert type(self.leaf) == types.StringType, "Error: 'leaf' should be StringType in var %s" % repr(var)
+        self.title=self.leaf 
+      if self.func:
+        assert type(self.func) == types.FunctionType, "Error: 'func' should be FunctionType in var %s" % repr(var)
+        self.title="Functor_"+self.func.func_name
+      if self.TTreeFormula:
+        assert type(self.TTreeFormula) == types.StringType, "Error: 'TTreeFormula' should be StringType in var %s" % repr(var)
+        self.title="TTreeFormula"
+      self.name = "_".join([var['name'], self.title, sample['name']])
 
-    self.leaf = var['leaf'] if var.has_key('leaf') else None
-    self.func = var['func'] if var.has_key('func') else None
-    self.TTreeFormula = var['TTreeFormula'] if var.has_key('TTreeFormula') else None
-    assert not ( var.has_key('func') and not var.has_key('branches')), "Error: Need(!) to specify used branches in case of function in var %s" %repr(var)
-    self.usedBranches = var['branches'] if var.has_key('branches') else []
-    assert sum(bool(x) for x in [self.leaf, self.func, self.TTreeFormula])==1, "Error: Should specify exactly one of 'leaf', 'func' or 'TTreeFormula' in var %s" % repr(var)
-    if self.leaf:
-      assert type(self.leaf) == types.StringType, "Error: 'leaf' should be StringType in var %s" % repr(var)
-      self.title=self.leaf 
-    if self.func:
-      assert type(self.func) == types.FunctionType, "Error: 'func' should be FunctionType in var %s" % repr(var)
-      self.title="Functor_"+self.func.func_name
-    if self.TTreeFormula:
-      assert type(self.TTreeFormula) == types.StringType, "Error: 'TTreeFormula' should be StringType in var %s" % repr(var)
-      self.title="TTreeFormula"
-    self.name = "_".join([var['name'], self.title, sample['name']])
-
-    self.ind = var['ind'] if var.has_key('ind') else 0
-    assert not (self.ind and not self.leaf) , "Error: Use 'ind' with other than 'leaf' in var: %s" % repr(var)
-   
-    self.overFlow = var['overFlow'] if var.has_key('overFlow') else None
+      self.ind = var['ind'] if var.has_key('ind') else 0
+      assert not (self.ind and not self.leaf) , "Error: Use 'ind' with other than 'leaf' in var: %s" % repr(var)
+     
+      self.overFlow = var['overFlow'] if var.has_key('overFlow') else None
 
 #    self.additionalCutFunc=additionalCutFunc #Not yet implemented
     self.binning=binning
@@ -58,14 +58,15 @@ class plot:
       del self.histo
 
     rClass = ROOT.TProfile if options and options.has_key('isProfile') and options['isProfile'] else ROOT.TH1D
-    binninArgs = binning['binning'] if not (self.binning.has_key('isExplicit') and self.binning['isExplicit']) else [len(binning['binning']) - 1, array('d',binning['binning'])]
-    self.histo = rClass(self.name, self.name, *binninArgs)
-    self.histo.Sumw2()
-    self.histo.Reset()
+    if binning:
+      binninArgs = binning['binning'] if not (self.binning.has_key('isExplicit') and self.binning['isExplicit']) else [len(binning['binning']) - 1, array('d',binning['binning'])]
+      self.histo = rClass(self.name, self.name, *binninArgs)
+      self.histo.Sumw2()
+      self.histo.Reset()
 
   @staticmethod
   def fromHisto(histo,style,options=None):
-    p = plot(var=None,binning=None,cut=None,sample=None,style=style,weight=None,options=options)
+    p = plot(var=None,binning=None,cut='',sample=None,style=style,weight=None,options=options)
     p.histo = histo
     return p
 

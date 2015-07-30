@@ -132,7 +132,7 @@ def getChunksFromNFS(sample,  maxN=-1):
   import os, subprocess, datetime
   print "sample dir:" , sample['dir']
   chunks = [{'name':x} for x in os.listdir(sample['dir']) if x.startswith(sample['chunkString']+'_Chunk') or x==sample['name']]
-  print chunks
+#  print chunks
   chunks=chunks[:maxN] if maxN>0 else chunks
   sumWeights=0
   allFiles=[]

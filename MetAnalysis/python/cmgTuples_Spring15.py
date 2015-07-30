@@ -17,6 +17,26 @@ DYJetsToLL_M_50={\
 'isData':False
 }
 
+METTuple_DYJetsToLL_M_50={\
+"name" : "DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8",
+"chunkString" : "DYJetsToLL_M50_50ns",
+"rootFileLocation":"METtree.root",
+"treeName":"METtree",
+'dir':"/data/rschoefbeck/cmgTuples/Spring15/",
+'dbsName':'DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISpring15DR74-AsymptFlat10to50bx25Raw_MCRUN2_74_V9-v1',
+'isData':False
+}
+
+METTuple_doubleMu_Run2015B = {\
+"name" : "DoubleMuon_Run2015B",
+"chunkString" : "DoubleMuon_Run2015B",
+"rootFileLocation":"METtree.root",
+"treeName":"METtree",
+'dir':"/data/rschoefbeck/cmgTuples/Spring15/",
+'isData':True
+}
+
+
 #WJetsToLNu_HT100to200={\
 #"name" : "WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8",
 #"chunkString" :"WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8",
