@@ -507,6 +507,7 @@ for ht in htReg:
   UparaMeanH = ROOT.TH1F('UparaMeanH','UparaMeanH',len(jetReg),0,len(jetReg))
   UperpRMSH = ROOT.TH1F('UperpRMSH','UperpRMSH',len(jetReg),0,len(jetReg))
   UperpMeanH = ROOT.TH1F('UperpMeanH','UperpMeanH',len(jetReg),0,len(jetReg))
+  rcsHist = ROOT.TH1F('rcsHist','rcsHist',len(jetReg),0,len(jetReg))
   print 'Processing HT bin',ht
   for i_jet, jet in enumerate(jetReg):
     UparaHist = ROOT.TH1F('UparaHist','UparaHist',100,-500,500)
@@ -518,6 +519,10 @@ for ht in htReg:
     invMassHist = ROOT.TH1F('invMassHist','invMassHist',60,60,120)
     absUtHist = ROOT.TH1F('absUtHist','absUtHist',50,0,500)
     RecoGenFracHist = ROOT.TH1F('RecoGenFracHist','RecogenFracHist',60,0,3)
+    dPhiHist = ROOT.TH1F('dPhiHist','dPhiHist',30,0,pi)
+    dPhiDummy = ROOT.TH1F('dPhiDummy','dPhiDummy',2, array('d', [0,1.0,pi]))
+    LtHist = ROOT.TH1F('LtHist','LtHist',50,0,500)
+    genLtHist = ROOT.TH1F('genLtHist','genLtHist',50,0,500)
     UperpVSUpara = ROOT.TH2F('UperpVSUpara','UperpVSUpara',100,-500,500,100,-500,500)
     genMetVSfakeMet = ROOT.TH2F('genMetVSfakeMet','genMetVSfakeMet',50,0,500,50,0,500)
     print 'Processing njet',jet
@@ -545,18 +550,22 @@ for ht in htReg:
         if a:
           #take the leading muon
           genMetPt = leadLepPt 
-          genMetPhi = leadLepPhi    
+          genMetPhi = leadLepPhi
+          lepPt = subLepPt
+          lepPhi = subLepPhi
           metX = metPt*cos(metPhi) + genMetPt*cos(genMetPhi)
           metY = metPt*sin(metPhi) + genMetPt*sin(genMetPhi)
-          qtWx_corr =metX + subLepPt*cos(subLepPhi)
-          qtWy_corr =metY + subLepPt*sin(subLepPhi)
+          qtWx_corr =metX + lepPt*cos(lepPhi)
+          qtWy_corr =metY + lepPt*sin(lepPhi)
         else:
           genMetPt = subLepPt
           genMetPhi = subLepPhi
+          lepPt = leadLepPt
+          lepPhi = leadLepPhi
           metX = metPt*cos(metPhi) + genMetPt*cos(genMetPhi)
           metY = metPt*sin(metPhi) + genMetPt*sin(genMetPhi)
-          qtWx_corr =metX + leadLepPt*cos(leadLepPhi)
-          qtWy_corr =metY + leadLepPt*sin(leadLepPhi)
+          qtWx_corr =metX + lepPt*cos(lepPhi)
+          qtWy_corr =metY + lepPt*sin(lepPhi)
 
         fakeMetPt = metPt
         fakeMetPhi = metPhi
@@ -591,6 +600,11 @@ for ht in htReg:
         Uperp = fakeMetPt*cos(fakeMetPhi)*sin(WPhi)-fakeMetPt*sin(fakeMetPhi)*cos(WPhi)
 #        absUt = sqrt(utX*utX+utY*utY)
         RecoGenFrac = recoMetPt/genMetPt
+        Lt = recoMetPt + lepPt
+        genLt = genMetPt + lepPt
+        dPhi = acos((lepPt+recoMetPt*cos(lepPhi-recoMetPhi))/sqrt(lepPt**2+recoMetPt**2+2*recoMetPt*lepPt*cos(lepPhi-recoMetPhi)))
+        dPhiHist.Fill(dPhi,DY['weight'])
+        dPhiDummy.Fill(dPhi,DY['weight'])
         ZPtHist.Fill(ZPt,DY['weight'])
         ZPhiHist.Fill(ZPhi,DY['weight'])
         WPtHist.Fill(WPt,DY['weight'])
@@ -600,9 +614,11 @@ for ht in htReg:
         UperpHist.Fill(Uperp,DY['weight'])
 #        absUtHist.Fill(absUt,DY['weight'])
         RecoGenFracHist.Fill(RecoGenFrac,DY['weight'])
+        LtHist.Fill(Lt,DY['weight'])
+        genLtHist.Fill(genLt,DY['weight'])
         genMetVSfakeMet.Fill(fakeMetPt,genMetPt,DY['weight'])
         UperpVSUpara.Fill(Upara,Uperp,DY['weight'])
-
+    
     UparaHist.Draw('e hist')
     UparaHist.Fit('gaus','','same')
     FitFunc = UparaHist.GetFunction('gaus')
@@ -639,17 +655,36 @@ for ht in htReg:
     RecoGenFracHist.Draw('hist')
     can1.Print(plotDir+prefix+'RecoGenFrac_'+cutname+'.png')
     can1.Print(plotDir+prefix+'RecoGenFrac_'+cutname+'.root')
-#    absUtHist.Draw('hist')
-#    can1.Print(plotDir+prefix+'absUt_'+cutname+'.png')
-#    can1.Print(plotDir+prefix+'absUt_'+cutname+'.root')
+    dPhiHist.Draw('hist')
+    can1.Print(plotDir+prefix+'dPhi_'+cutname+'.png')
+    can1.Print(plotDir+prefix+'dPhi_'+cutname+'.root')
+    LtHist.Draw('hist')
+    can1.Print(plotDir+prefix+'Lt_'+cutname+'.png')
+    can1.Print(plotDir+prefix+'Lt_'+cutname+'.root')
+    genLtHist.Draw('hist')
+    can1.Print(plotDir+prefix+'genLt_'+cutname+'.png')
+    can1.Print(plotDir+prefix+'genLt_'+cutname+'.root')
     UperpVSUpara.Draw('colz')
+    UperpVSUpara.GetXaxis().SetTitle('Upara')
+    UperpVSUpara.GetYaxis().SetTitle('Uperp')
     can1.SetLogz()
     can1.Print(plotDir+prefix+'UperpVSUpara_'+cutname+'.png')
     can1.Print(plotDir+prefix+'UperpVSUpara_'+cutname+'.root')
     genMetVSfakeMet.Draw('colz')
+    genMetVSfakeMet.GetXaxis().SetTitle('#slash{E}_{T}^{fake}')
+    genMetVSfakeMet.GetYaxis().SetTitle('#slash{E}_{T}^{gen}')
     can1.SetLogz()
     can1.Print(plotDir+prefix+'genMetVSfakeMet_'+cutname+'.png')
     can1.Print(plotDir+prefix+'genMetVSfakeMet_'+cutname+'.root')
+
+    if dPhiDummy.GetBinContent(1)>0:
+      rcs = dPhiDummy.GetBinContent(2)/dPhiDummy.GetBinContent(1)
+      if dPhiDummy.GetBinContent(2)>0:
+        rcsE = rcs*sqrt(dPhiDummy.GetBinError(2)**2/dPhiDummy.GetBinContent(2)**2 +dPhiDummy.GetBinError(1)**2/dPhiDummy.GetBinContent(1)**2)
+    rcsHist.SetBinContent(i_jet+1,rcs)
+    rcsHist.SetBinError(i_jet+1,rcsE)
+    rcsHist.GetXaxis().SetBinLabel(i_jet+1, nJetBinName(jet))
+
     UparaRMSH.SetBinContent(i_jet+1,UparaRMS)
     UparaRMSH.SetBinError(i_jet+1,UparaHist.GetRMSError())
     UparaRMSH.GetXaxis().SetBinLabel(i_jet+1, nJetBinName(jet))
@@ -662,7 +697,28 @@ for ht in htReg:
     UperpMeanH.SetBinContent(i_jet+1,UperpMean)
     UperpMeanH.SetBinError(i_jet+1,UperpHist.GetMeanError())
     UperpMeanH.GetXaxis().SetBinLabel(i_jet+1, nJetBinName(jet))
-    del UparaHist,UperpHist,ZPhiHist,ZPtHist
+    del UparaHist,UperpHist,ZPhiHist,ZPtHist, dPhiDummy
+
+  rcsHist.GetXaxis().SetTitle('jet multiplicity')
+  rcsHist.GetYaxis().SetTitle('R_{CS}')
+  rcsHist.SetMaximum(1.0)
+  rcsHist.SetMinimum(0.0)
+  rcsHist.SetMarkerSize(0)
+  rcsHist.SetLineColor(ROOT.kAzure)
+  rcsHist.SetLineWidth(2)
+  rcsHist.Fit('pol1','','same')
+  FitFunc     = rcsHist.GetFunction('pol1')
+  FitParD     = FitFunc.GetParameter(0)
+  FitParDError = FitFunc.GetParError(0)
+  FitParK = FitFunc.GetParameter(1)
+  FitParKError = FitFunc.GetParError(1)
+  FitFunc.SetLineColor(ROOT.kOrange+10)
+  FitFunc.SetLineStyle(2)
+  FitFunc.SetLineWidth(2)
+  rcsHist.Draw('e hist')
+  FitFunc.Draw('same')
+  can1.Print(plotDir+prefix+'rCS_'+cutname+'.png')
+  can1.Print(plotDir+prefix+'rCS_'+cutname+'.root')
 
   UparaRMSH.GetXaxis().SetTitle('jet multiplicity')
   UparaRMSH.GetYaxis().SetTitle('UparaRMS')
