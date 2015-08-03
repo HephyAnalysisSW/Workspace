@@ -10,8 +10,8 @@ from array import array
 from Workspace.HEPHYPythonTools.helpers import *#getVarValue, getChain, deltaPhi, getYieldFromChain
 from Workspace.HEPHYPythonTools.xsec import *
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2_HT400ST150_withDF import *
-#from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
-from Workspace.RA4Analysis.cmgTuples_v1_PHYS14V3 import *
+from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
+#from Workspace.RA4Analysis.cmgTuples_v1_PHYS14V3 import *
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2 import *
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_softLepton import *
 from Workspace.RA4Analysis.helpers import *
@@ -19,8 +19,8 @@ from Workspace.RA4Analysis.eventShape import *
 from localInfo import username
 from draw_helpers import *
 
-#presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80"
-presel = exactlyOneTightLepton(lepton='both', minPt=(25,25), maxEta=(2.4,2.4), minID=(3,1), minRelIso=(0.1,0.1))+'&&'+looseLeptonVeto(lepton='both', minPt=10)
+presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80"
+#presel = exactlyOneTightLepton(lepton='both', minPt=(25,25), maxEta=(2.4,2.4), minID=(3,1), minRelIso=(0.1,0.1))+'&&'+looseLeptonVeto(lepton='both', minPt=10)
 
 ROOT.TH1F().SetDefaultSumw2()
 ROOT.gStyle.SetPalette(1)
@@ -168,7 +168,7 @@ def getWeight(sample,nEvents,target_lumi):
   return weight
 
 varstring="deltaPhi_Wl"
-plotDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/pngCMG2/hard/Phys14V3/WjetKinFakeMetOnW/withoutLt_unskimmed/'
+plotDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/pngCMG2/hard/Phys14V3/WjetKinFakeMetOnW/'
 #pickleDir='/data/dhandl/results2015/metStudy/'
 prefix = 'recoW_'
 
@@ -178,25 +178,25 @@ if not os.path.exists(plotDir):
 #  os.makedirs(pickleDir)
 
 lepSel='hard'
-#WJETS = getChain(WJetsHTToLNu[lepSel],histname='')
-Bkg = [{'name':'WJetsToLNu_HT100to200_PU20bx25', 'sample':WJetsToLNu_HT100to200_PU20bx25, 'legendName':'W HT100-200'},
-       {'name':'WJetsToLNu_HT200to400_PU20bx25', 'sample':WJetsToLNu_HT200to400_PU20bx25, 'legendName':'W HT200-400'},
-       {'name':'WJetsToLNu_HT400to600_PU20bx25', 'sample':WJetsToLNu_HT400to600_PU20bx25, 'legendName':'W HT400-600'},
-       {'name':'WJetsToLNu_HT600toInf_PU20bx25', 'sample':WJetsToLNu_HT600toInf_PU20bx25, 'legendName':'W HT600-Inf'},
-      ]
+WJETS = getChain(WJetsHTToLNu[lepSel],histname='')
+#Bkg = [{'name':'WJetsToLNu_HT100to200_PU20bx25', 'sample':WJetsToLNu_HT100to200_PU20bx25, 'legendName':'W HT100-200'},
+#       {'name':'WJetsToLNu_HT200to400_PU20bx25', 'sample':WJetsToLNu_HT200to400_PU20bx25, 'legendName':'W HT200-400'},
+#       {'name':'WJetsToLNu_HT400to600_PU20bx25', 'sample':WJetsToLNu_HT400to600_PU20bx25, 'legendName':'W HT400-600'},
+#       {'name':'WJetsToLNu_HT600toInf_PU20bx25', 'sample':WJetsToLNu_HT600toInf_PU20bx25, 'legendName':'W HT600-Inf'},
+#      ]
 small = False
 #small = True
 maxN=1 if small else -1
 
-for sample in Bkg:
-  sample['chunks'], sample['nEvents'] = getChunks(sample['sample'],treeName='treeProducerSusySingleLepton', maxN=maxN)
-  sample['chain'] = ROOT.TChain('tree')
-  for chunk in sample['chunks']:
-    sample['chain'].Add(chunk['file'])
-  sample['weight'] = getWeight(sample['sample'], sample['nEvents'], target_lumi)
+#for sample in Bkg:
+#  sample['chunks'], sample['nEvents'] = getChunks(sample['sample'],treeName='treeProducerSusySingleLepton', maxN=maxN)
+#  sample['chain'] = ROOT.TChain('tree')
+#  for chunk in sample['chunks']:
+#    sample['chain'].Add(chunk['file'])
+#  sample['weight'] = getWeight(sample['sample'], sample['nEvents'], target_lumi)
 
-#stReg=[(250,350),(350,450),(450,-1)]#,(350,450),(450,-1)]
-stReg=[(None)]
+stReg=[(250,350),(350,450),(450,-1)]#,(350,450),(450,-1)]
+#stReg=[(None)]
 htReg=[(500,750),(750,1000),(1000,-1)]#,(750,1000),(1000,-1)]#,(1250,-1)]#,(1250,-1)]
 jetReg = [(2,3),(4,4),(5,5),(6,7),(8,-1)]#,(8,-1)]#,(6,-1)]#,(8,-1)]#,(6,-1),(8,-1)]
 btb = (0,0)
@@ -315,6 +315,8 @@ for st in stReg:
       WPhiHist = ROOT.TH1F('WPhiHist','WPhiHist',32,-3.2,3.2)
       WPtHist = ROOT.TH1F('WPtHist','WPtHist',50,0,500)
       fakeMetHist = ROOT.TH1F('fakeMetHist','fakeMetHist',50,0,500)
+      genMetHist = ROOT.TH1F('genMetHist','genMetHist',50,0,500)
+      recoMetHist = ROOT.TH1F('recoMetHist','recoMetHist',50,0,500)
       RecoGenFracHist = ROOT.TH1F('RecoGenFracHist','RecogenFracHist',60,0,3)
       UperpVSUpara = ROOT.TH2F('UperpVSUpara','UperpVSUpara',100,-500,500,100,-500,500)
       genMetVSfakeMet = ROOT.TH2F('genMetVSfakeMet','genMetVSfakeMet',50,0,500,50,0,500)
@@ -323,44 +325,46 @@ for st in stReg:
       LtHist = ROOT.TH1F('LtHist','LtHist',50,0,500)
       genLtHist = ROOT.TH1F('genLtHist','genLtHist',50,0,500)
       print 'Processing njet',jet
-#      cutname, cut = nameAndCut(st, ht, jet, btb=btb, presel=presel, btagVar = 'nBJetMediumCSV30')
-      cutname = nameAndCut(None, ht, jet, btb=btb, presel=presel, btagVar = 'nBJetMediumCSV30')[0]
-      cut = presel+'&&'+htCut(ht, minPt=30, maxEta=2.4, njCorr=0.)+'&&'+nBTagCut(btb, minPt=30, maxEta=2.4, minCSVTag=0.814)+'&&'+nJetCut(jet, minPt=30, maxEta=2.4)#+'&&'+nJetCut(2, minPt=80, maxEta=2.4)
-      for sample in Bkg:
-#        WJETS.Draw('>>eList',cut)
-        sample['chain'].Draw('>>eList',cut)
-        elist = ROOT.gDirectory.Get("eList")
-        number_events = elist.GetN()
-        for i in range(number_events):
-          if i%10000==0:
-            print "At %i of %i in Wjets "%(i,number_events)
-#          WJETS.GetEntry(elist.GetEntry(i))
-          sample['chain'].GetEntry(elist.GetEntry(i))
-#          weight=getVarValue(WJETS,"weight")
-          weight=sample['weight']
-#          WPt, WPhi, recoMetPt, recoMetPhi, lepPt, lepPhi = getRecoW(WJETS)
-          WPt, WPhi, recoMetPt, recoMetPhi, lepPt, lepPhi = getRecoWunskimmed(sample['chain'])
-          if WPt>0:
-            WPtHist.Fill(WPt,weight)
-            WPhiHist.Fill(WPhi,weight)
-#            Upara, Uperp, fakeMet = getU2(WJETS, WPt, WPhi)
-            Upara, Uperp, fakeMet = getU2(sample['chain'], WPt, WPhi)
-            UparaHist.Fill(Upara,weight)
-            UperpHist.Fill(Uperp,weight)
-            fakeMetHist.Fill(fakeMet,weight)
-            UperpVSUpara.Fill(Upara,Uperp,weight)
-#            genMet = WJETS.GetLeaf('met_genPt').GetValue()
-            genMet = sample['chain'].GetLeaf('met_genPt').GetValue()
-            RecoGenFrac = recoMetPt/genMet
-            RecoGenFracHist.Fill(RecoGenFrac,weight)
-            genMetVSfakeMet.Fill(fakeMet,genMet,weight)
-            Lt = recoMetPt + lepPt
-            genLt = genMet + lepPt
-            LtHist.Fill(Lt,weight)
-            genLtHist.Fill(genLt,weight)
-            dPhi = acos((lepPt+recoMetPt*cos(lepPhi-recoMetPhi))/sqrt(lepPt**2+recoMetPt**2+2*recoMetPt*lepPt*cos(lepPhi-recoMetPhi)))
-            dPhiHist.Fill(dPhi,weight)
-            dPhiDummy.Fill(dPhi,weight)
+      cutname, cut = nameAndCut(st, ht, jet, btb=btb, presel=presel, btagVar = 'nBJetMediumCSV30')
+#      cutname = nameAndCut(None, ht, jet, btb=btb, presel=presel, btagVar = 'nBJetMediumCSV30')[0]
+#      cut = presel+'&&'+htCut(ht, minPt=30, maxEta=2.4, njCorr=0.)+'&&'+nBTagCut(btb, minPt=30, maxEta=2.4, minCSVTag=0.814)+'&&'+nJetCut(jet, minPt=30, maxEta=2.4)#+'&&'+nJetCut(2, minPt=80, maxEta=2.4)
+#      for sample in Bkg:
+      WJETS.Draw('>>eList',cut)
+#      sample['chain'].Draw('>>eList',cut)
+      elist = ROOT.gDirectory.Get("eList")
+      number_events = elist.GetN()
+      for i in range(number_events):
+        if i%10000==0:
+          print "At %i of %i in Wjets "%(i,number_events)
+        WJETS.GetEntry(elist.GetEntry(i))
+#        sample['chain'].GetEntry(elist.GetEntry(i))
+        weight=getVarValue(WJETS,"weight")
+#        weight=sample['weight']
+        WPt, WPhi, recoMetPt, recoMetPhi, lepPt, lepPhi = getRecoW(WJETS)
+#        WPt, WPhi, recoMetPt, recoMetPhi, lepPt, lepPhi = getRecoWunskimmed(sample['chain'])
+        if WPt>0:
+          WPtHist.Fill(WPt,weight)
+          WPhiHist.Fill(WPhi,weight)
+          Upara, Uperp, fakeMet = getU2(WJETS, WPt, WPhi)
+#          Upara, Uperp, fakeMet = getU2(sample['chain'], WPt, WPhi)
+          UparaHist.Fill(Upara,weight)
+          UperpHist.Fill(Uperp,weight)
+          fakeMetHist.Fill(fakeMet,weight)
+          UperpVSUpara.Fill(Upara,Uperp,weight)
+          genMet = WJETS.GetLeaf('met_genPt').GetValue()
+#          genMet = sample['chain'].GetLeaf('met_genPt').GetValue()
+          RecoGenFrac = recoMetPt/genMet
+          RecoGenFracHist.Fill(RecoGenFrac,weight)
+          genMetVSfakeMet.Fill(fakeMet,genMet,weight)
+          genMetHist.Fill(genMet,weight)
+          recoMetHist.Fill(recoMetPt,weight)
+          Lt = recoMetPt + lepPt
+          genLt = genMet + lepPt
+          LtHist.Fill(Lt,weight)
+          genLtHist.Fill(genLt,weight)
+          dPhi = acos((lepPt+recoMetPt*cos(lepPhi-recoMetPhi))/sqrt(lepPt**2+recoMetPt**2+2*recoMetPt*lepPt*cos(lepPhi-recoMetPhi)))
+          dPhiHist.Fill(dPhi,weight)
+          dPhiDummy.Fill(dPhi,weight)
 
       UparaHist.Draw('e hist')
       UparaHist.Fit('gaus','','same')
@@ -391,6 +395,12 @@ for st in stReg:
       fakeMetHist.Draw('hist')
       can1.Print(plotDir+prefix+'fakeMet_'+cutname+'.png')
       can1.Print(plotDir+prefix+'fakeMet_'+cutname+'.root')
+      genMetHist.Draw('hist')
+      can1.Print(plotDir+prefix+'genMet_'+cutname+'.png')
+      can1.Print(plotDir+prefix+'genMet_'+cutname+'.root')
+      recoMetHist.Draw('hist')
+      can1.Print(plotDir+prefix+'recoMet_'+cutname+'.png')
+      can1.Print(plotDir+prefix+'recoMet_'+cutname+'.root')
       RecoGenFracHist.Draw('hist')
       can1.Print(plotDir+prefix+'RecoGenFrac_'+cutname+'.png')
       can1.Print(plotDir+prefix+'RecoGenFrac_'+cutname+'.root')
@@ -398,10 +408,14 @@ for st in stReg:
       can1.Print(plotDir+prefix+'dPhi_'+cutname+'.png')
       can1.Print(plotDir+prefix+'dPhi_'+cutname+'.root')
       UperpVSUpara.Draw('colz')
+      UperpVSUpara.GetXaxis().SetTitle('Upara')
+      UperpVSUpara.GetYaxis().SetTitle('Uperp')
       can1.SetLogz()
       can1.Print(plotDir+prefix+'UperpVSUpara_'+cutname+'.png')
       can1.Print(plotDir+prefix+'UperpVSUpara_'+cutname+'.root')
       genMetVSfakeMet.Draw('colz')
+      genMetVSfakeMet.GetXaxis().SetTitle('#slash{E}_{T}^{fake}')
+      genMetVSfakeMet.GetYaxis().SetTitle('#slash{E}_{T}^{gen}')
       can1.SetLogz()
       can1.Print(plotDir+prefix+'genMetVSfakeMet_'+cutname+'.png')
       can1.Print(plotDir+prefix+'genMetVSfakeMet_'+cutname+'.root')
