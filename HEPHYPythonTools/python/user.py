@@ -15,3 +15,13 @@ if os.environ['USER'] in ['dspitzbart', 'dspitzba']:
   defaultPlotPath = "/afs/hephy.at/user/d/dspitzbart/www/"
   username = "dspitzbart"
 
+if os.environ['USER'] in ['nrad']:
+  defaultPlotPath = "/afs/hephy.at/user/n/nrad/www/"
+  saveDir         = defaultPlotPath 
+  username = "nrad"
+
+if os.environ['USER'] in ['dhandl']:
+  defaultPlotPath = "/afs/hephy.at/user/d/dhandl/www/"
+  saveDir         = defaultPlotPath
+  username = "dhandl"
+
