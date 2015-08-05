@@ -12,9 +12,9 @@ c = getChain(WJetsHTToLNu[lepSel],histname='')
 
 
 
-c=ROOT.TChain('Events')
+#c=ROOT.TChain('Events')
 c1 = ROOT.TCanvas()
-c.Add('/data/easilar/cmgTuples/postProcessed_Spring15_bugfixed/hard/WJetsToLNu_HT-600ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/*.root')
+#c.Add('/data/easilar/cmgTuples/postProcessed_Spring15_bugfixed/hard/WJetsToLNu_HT-600ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/*.root')
 #c.Draw('Jet_phi:Jet_eta', 'abs(Jet_rawPt-Jet_mcPt)>50&&sqrt((met_genPt*cos(met_genPhi)-met_pt*cos(met_phi))**2+(met_genPt*sin(met_genPhi)-met_pt*sin(met_phi))**2)>150&&htJet30j>500&&htJet30j<750&&nBJetMediumCSV30==0&&st>250&&st<350&&met_genPt<50')
 #c.Draw('Jet_phi:Jet_eta', 'abs(Jet_rawPt-Jet_mcPt)>50&&sqrt((met_genPt*cos(met_genPhi)-met_pt*cos(met_phi))**2+(met_genPt*sin(met_genPhi)-met_pt*sin(met_phi))**2)>150&&htJet30j>500&&htJet30j<750&&st>250&&st<350&&met_genPt<100','colz')
 c.Draw('Jet_phi:Jet_eta', presel+'&&abs(Jet_rawPt-Jet_mcPt)*(abs(Jet_rawPt-Jet_mcPt)>100)','colz')

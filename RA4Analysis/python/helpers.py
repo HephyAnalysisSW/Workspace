@@ -188,7 +188,7 @@ def varBin(vb):
 def getBinBorders(l, max=10**4):
   return [x[0] for x in l ] + [max]
 
-def nameAndCut(stb, htb, njetb, btb=None, presel="(1)", charge="", btagVar = 'nBJetMediumCSV30', stVar = 'st'):
+def nameAndCut(stb, htb, njetb, btb=None, presel="(1)", charge="", btagVar = 'nBJetMediumCSV30', stVar = 'st', htVar = 'htJet30j', njetVar='nJet30'):
   cut=presel
   name=""
   if stb:
@@ -198,20 +198,20 @@ def nameAndCut(stb, htb, njetb, btb=None, presel="(1)", charge="", btagVar = 'nB
       cut+='&&'+stVar+'<'+str(stb[1])
       name+='-'+str(stb[1])
   if htb:
-    cut+='&&htJet30j>='+str(htb[0])
+    cut+='&&'+htVar+'>='+str(htb[0])
     name+='_ht'+str(htb[0])
     if htb[1]>0:
-      cut+='&&htJet30j<'+str(htb[1])
+      cut+='&&'+htVar+'<'+str(htb[1])
       name+='-'+str(htb[1])
   if njetb:
     if len(njetb)>1 and njetb[0] == njetb[1]:
-      cut+='&&nJet30=='+str(njetb[0])
+      cut+='&&'+njetVar+'=='+str(njetb[0])
       name+='_njetEq'+str(njetb[0])
     else:
-      cut+='&&nJet30>='+str(njetb[0])
+      cut+='&&'+njetVar+'>='+str(njetb[0])
       name+='_njet'+str(njetb[0])
       if len(njetb)>1 and njetb[1]>=0:
-        cut+='&&nJet30<='+str(njetb[1])
+        cut+='&&'+njetVar+'<='+str(njetb[1])
         name+='-'+str(njetb[1])
   if btb:
     if len(btb)>1 and btb[0] == btb[1]:

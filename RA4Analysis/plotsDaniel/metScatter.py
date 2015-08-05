@@ -9,8 +9,8 @@ from array import array
 
 from Workspace.HEPHYPythonTools.helpers import *#getVarValue, getChain, deltaPhi, getYieldFromChain
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2_HT400ST150_withDF import *
-from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
-#from Workspace.RA4Analysis.cmgTuplesPostProcessed_Spring15 import *
+#from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
+from Workspace.RA4Analysis.cmgTuplesPostProcessed_Spring15_hard import *
 
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2 import *
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_softLepton import *
@@ -18,8 +18,16 @@ from Workspace.RA4Analysis.helpers import *
 from Workspace.RA4Analysis.eventShape import *
 
 #presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&deltaPhi_Wl>1."
-presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80"
+presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&Flag_EcalDeadCellTriggerPrimitiveFilter"#&&Jet_pt[0]<800"
+#presel = "singleMuonic|singleElectronic&&njets>=2"
 
+#def getVarValue(c, var, n=0):         #A general method to get the value of a variable from a chain after chain.GetEntry(i) has been called
+#  varNameHisto = var
+#  leaf = c.GetAlias(varNameHisto)
+#  if leaf!='':
+#    return c.GetLeaf(leaf).GetValue(n)
+#  else:
+#    return c.GetLeaf(var).GetValue(n)
 
 ROOT.TH1F().SetDefaultSumw2()
 
@@ -35,7 +43,33 @@ def getMetPt(c):
   x = -metGenPt*cos(metGenPhi)+metPt*cos(metPhi)
   y = -metGenPt*sin(metGenPhi)+metPt*sin(metPhi)
   fakeMet = sqrt(x*x + y*y)
+  return metGenPt, fakeMet, dPhi, metPt, metPhi, metGenPhi
+
+def getMetPtOS(c):
+  metPhi = getVarValue(c, 'metphi')
+  metPt = getVarValue(c, 'met')
+  metGenPhi = getVarValue(c, 'genmetphi')
+  metGenPt = getVarValue(c, 'genmet')
+  lepPhi = getVarValue(c, 'leptonPhi')
+  lepPt = getVarValue(c, 'leptonPhi')
+  dPhi = acos((lepPt+metPt*cos(lepPhi-metPhi))/sqrt(lepPt**2+metPt**2+2*metPt*lepPt*cos(lepPhi-metPhi)))
+  x = -metGenPt*cos(metGenPhi)+metPt*cos(metPhi)
+  y = -metGenPt*sin(metGenPhi)+metPt*sin(metPhi)
+  fakeMet = sqrt(x*x + y*y)
   return metGenPt, fakeMet, dPhi
+
+
+
+
+def getdPhiMetJet(c):
+  jets = cmgGetJets(c,ptMin=30,etaMax=2.4)
+  met = c.GetLeaf('met_pt').GetValue()
+  metPhi = c.GetLeaf('met_phi').GetValue()
+  JetPt = jets[0]['pt']
+  JetPhi = jets[0]['phi']
+#  dPhi = acos((met*JetPt*cos(metPhi-JetPhi))/(met*JetPt))
+  dPhi = abs(cos(JetPhi-metPhi))
+  return dPhi
 
 def getZ(c):
   para = ['pt','phi','eta','pdgId','motherId']
@@ -70,16 +104,19 @@ def getZ(c):
 
 
 varstring="deltaPhi_Wl"
-plotDir='/afs/hephy.at/user/d/dspitzbart/www/PHYS14v3/ZjetKinScatter/'
+plotDir='/afs/hephy.at/user/d/dspitzbart/www/Spring15/WjetScatterDPhiJetMetCut/'
 
 if not os.path.exists(plotDir):
   os.makedirs(plotDir)
 
 
 lepSel='hard'
-c = getChain(DY[lepSel],histname='')
-#c = getChain(WJetsHTToLNu[lepSel],histname='')
+#c = getChain(DY[lepSel],histname='')
+c = getChain(WJetsHTToLNu[lepSel],histname='')
 
+## for old samples
+#c=ROOT.TChain('Events')
+#c.Add('/data/rschoefbeck/data/rschoefbeck/pat_240614/*.root')
 
 
 stReg=[(250,350)]#,(350,450),(450,-1)]#,(350,450),(450,-1)]
@@ -110,6 +147,7 @@ for st in stReg:
       #WPtHist = ROOT.TH1F('WPtHist','WPtHist',50,0,500)
       print 'Processing njet',jet
       cutname, cut = nameAndCut(st, ht, jet, btb=btb, presel=presel, btagVar = 'nBJetMediumCSV30')
+      #cutname, cut = nameAndCut(st, ht, jet, btb=btb, presel=presel, btagVar = 'nbtags', stVar='(leptonPt+met)', htVar='ht', njetVar='njets')
       c.Draw('>>eList',cut)
       elist = ROOT.gDirectory.Get("eList")
       number_events = elist.GetN()
@@ -120,28 +158,39 @@ for st in stReg:
       if st[0]>300:
         points[0].SetPoint(1,750.,750.)
       elif st[0]>400:
-        points[0].SetPoint(1,1000.,1000.)
+        points[ 0].SetPoint(1,1000.,1000.)
       else:
         points[0].SetPoint(1,500.,500.)
       points[0].GetXaxis().SetTitle('E_{T miss,fake}')
       points[0].GetYaxis().SetTitle('E_{T miss,gen}')
+      points[0].SetMarkerSize(0)
       points[0].Draw('ap')
+      print 'run, lumi, evt, fakeMet, genMet, genMetPhi, recoMet, recoMetPhi, leptonPt, leptonPhi, leptonEta, st, deltaPhi'
       for i in range(number_events):
         c.GetEntry(elist.GetEntry(i))
         weight=getVarValue(c,"weight")
-        fakeMet = getVarValue(c,"met_pt")
-        dPhi = getVarValue(c,"deltaPhi_Wl")
-        totWeight += weight
-        lepPt, lepPhi, met, metPhi, mass = getZ(c)
-        #met, fakeMet, dPhi = getMetPt(c)
+        run=getVarValue(c,"run")
+        lumi=getVarValue(c,"lumi")
+        evt=getVarValue(c,"evt")
+        leptonPt = getVarValue(c,"leptonPt")
+        leptonPhi = getVarValue(c,"leptonPhi")
+        leptonEta = getVarValue(c,"leptonEta")
+        stValue = getVarValue(c,"st")
+        #dPhiJetMet = getdPhiMetJet(c)
+        dPhiJetMet = cmgMinDPhiJet(c, nJets=2)
+        #dPhi = getVarValue(c,"deltaPhi_Wl")
+        #totWeight += weight
+        met, fakeMet, dPhi, metPt, metPhi, metGenPhi = getMetPt(c)
         #points.append(ROOT.TGraph())
         #print dPhi
         if met > 0.:
           points.append(ROOT.TGraph())
-          if fakeMet/met>1.:
-            low+=weight
-          if dPhi>0.:
-            print fakeMet, met, mass
+          if dPhi>1. and dPhiJetMet>0.45:# and dPhiJetMet<0.9:
+            totWeight += weight
+            if fakeMet/met>1.:# and fakeMet<50.:
+              low+=weight
+              #if dPhiJetMet<0.9:
+              print int(run), int(lumi), int(evt), fakeMet, met, metGenPhi, metPt, metPhi, leptonPt, leptonPhi, leptonEta, stValue, dPhi
             points[-1].SetPoint(0,fakeMet,met)
             points[-1].SetMarkerStyle(8)
             #pointSize = 0.2+weight*15
@@ -160,7 +209,7 @@ for st in stReg:
       can1.Print(plotDir+'scatter_'+cutname+'.root')
       #can1.Print(plotDir+'scatterDeltaPhiG1_'+cutname+'.png')
       #can1.Print(plotDir+'scatterDeltaPhiG1_'+cutname+'.root')
-      if number_events>0:
+      if totWeight>0:
         frac = 1.*low/totWeight
       else:
         frac = 1.
