@@ -2,32 +2,22 @@ import ROOT
 import os, sys, copy
 import pickle
 
-#ROOT.gROOT.LoadMacro('../../HEPHYPythonTools/scripts/root/tdrstyle.C')
-#ROOT.setTDRStyle()
+ROOT.gROOT.LoadMacro('../../HEPHYPythonTools/scripts/root/tdrstyle.C')
+ROOT.setTDRStyle()
 from math import *
 from array import array
 
-from Workspace.HEPHYPythonTools.helpers import *#getVarValue, getChain, deltaPhi, getYieldFromChain
+from Workspace.HEPHYPythonTools.helpers import *
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2_HT400ST150_withDF import *
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
 from Workspace.RA4Analysis.cmgTuplesPostProcessed_Spring15_hard import *
 
-#from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2 import *
-#from Workspace.RA4Analysis.cmgTuplesPostProcessed_softLepton import *
 from Workspace.RA4Analysis.helpers import *
 from Workspace.RA4Analysis.eventShape import *
 
 #presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&deltaPhi_Wl>1."
 presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&Flag_EcalDeadCellTriggerPrimitiveFilter"#&&Jet_pt[0]<800"
 #presel = "singleMuonic|singleElectronic&&njets>=2"
-
-#def getVarValue(c, var, n=0):         #A general method to get the value of a variable from a chain after chain.GetEntry(i) has been called
-#  varNameHisto = var
-#  leaf = c.GetAlias(varNameHisto)
-#  if leaf!='':
-#    return c.GetLeaf(leaf).GetValue(n)
-#  else:
-#    return c.GetLeaf(var).GetValue(n)
 
 ROOT.TH1F().SetDefaultSumw2()
 
@@ -58,16 +48,12 @@ def getMetPtOS(c):
   fakeMet = sqrt(x*x + y*y)
   return metGenPt, fakeMet, dPhi
 
-
-
-
 def getdPhiMetJet(c):
   jets = cmgGetJets(c,ptMin=30,etaMax=2.4)
   met = c.GetLeaf('met_pt').GetValue()
   metPhi = c.GetLeaf('met_phi').GetValue()
   JetPt = jets[0]['pt']
   JetPhi = jets[0]['phi']
-#  dPhi = acos((met*JetPt*cos(metPhi-JetPhi))/(met*JetPt))
   dPhi = abs(cos(JetPhi-metPhi))
   return dPhi
 
@@ -161,8 +147,8 @@ for st in stReg:
         points[ 0].SetPoint(1,1000.,1000.)
       else:
         points[0].SetPoint(1,500.,500.)
-      points[0].GetXaxis().SetTitle('E_{T miss,fake}')
-      points[0].GetYaxis().SetTitle('E_{T miss,gen}')
+      points[0].GetXaxis().SetTitle('#slash{E}_{T}^{fake}')
+      points[0].GetYaxis().SetTitle('#slash{E}_{T}^{gen}')
       points[0].SetMarkerSize(0)
       points[0].Draw('ap')
       print 'run, lumi, evt, fakeMet, genMet, genMetPhi, recoMet, recoMetPhi, leptonPt, leptonPhi, leptonEta, st, deltaPhi'
