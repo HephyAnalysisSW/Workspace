@@ -38,57 +38,8 @@ def getRCS(c, cut, dPhiCut, useGenMet=False, useAllGen=False, useOnlyGenMetPt=Fa
     del h
     return {'rCS':float('nan'), 'rCSE_pred':float('nan'), 'rCSE_sim':float('nan')}
 
-def getWMass(c):
-  para = ['pt','phi','eta','pdgId','motherId']
-  genPartAll = [getObjDict(c, 'genPartAll_', para, j) for j in range(int(c.GetLeaf('ngenPartAll').GetValue()))]
-  Neutrinos = []
-  Leptons = []
-  NeutrinosFromW = []
-  LeptonsFromW = []
-  for Neutrino in filterParticles(genPartAll, [12,14], 'pdgId'):
-    Neutrinos.append(Neutrino)
-  for NeutrinoFromW in filterParticles(Neutrinos, [24], 'motherId'):
-    NeutrinosFromW.append(NeutrinoFromW)
-  for Lepton in filterParticles(genPartAll, [11,13], 'pdgId'):
-    Leptons.append(Lepton)
-  for LeptonFromW in filterParticles(Leptons, [24], 'motherId'):
-    LeptonsFromW.append(LeptonFromW)
-  WMass = 0.
-  if len(NeutrinosFromW)>0:
-    if len(NeutrinosFromW)>1: print 'this should not have happened'
-    if len(LeptonsFromW)>0:
-      if len(LeptonsFromW)>1: print 'this should not have happened'
-      LeptonPt = LeptonsFromW[0]['pt']
-      LeptonPhi = LeptonsFromW[0]['phi']
-      LeptonEta = LeptonsFromW[0]['eta']
-      NeutrinoPt = NeutrinosFromW[0]['pt']
-      NeutrinoPhi = NeutrinosFromW[0]['phi']
-      NeutrinoEta = NeutrinosFromW[0]['eta']
-      WMass = sqrt(2*LeptonPt*NeutrinoPt*(cosh(LeptonEta-NeutrinoEta)-cos(LeptonPhi-NeutrinoPhi)))
-  return WMass
-
-def getNeutrino(c):
-  para = ['pt','phi','eta','pdgId','motherId']
-  genPartAll = [getObjDict(c, 'genPartAll_', para, j) for j in range(int(c.GetLeaf('ngenPartAll').GetValue()))]
-  #Neutrino = [i for i in genPartAll if (abs(i['pdgId'])==14 or abs(i['pdgId'])==12)]
-  Neutrinos = []
-  NeutrinosFromW = []
-  for Neutrino in filterParticles(genPartAll, [12,14], 'pdgId'):
-    Neutrinos.append(Neutrino)
-  for NeutrinoFromW in filterParticles(Neutrinos, [24], 'motherId'):
-    NeutrinosFromW.append(NeutrinoFromW)
-  #Neutrino = filter(lambda w:(abs(w['pdgId'])==14 or abs(w['pdgId'])==12), genPartAll)
-  #NeutrinoFromW = filter(lambda w:abs(w['motherId'])==24, Neutrino)
-  metGenPhi = c.GetLeaf('met_genPhi').GetValue()
-  metGenPt = c.GetLeaf('met_genPt').GetValue()
-  if len(NeutrinosFromW)>0:
-    if len(NeutrinosFromW)>1: print 'this should not have happened'
-    NeutrinoPt = NeutrinosFromW[0]['pt']
-    NeutrinoPhi = NeutrinosFromW[0]['phi']
-    return NeutrinoPt, NeutrinoPhi, metGenPt
-  else: return 0., 0.
-
-def getRCSel(c, cut, dPhiCut):
+#get Rcs value with event loop
+def getRCSel(c, cut, dPhiCut, dPhiMetJet=0.45):
   dPhiStr = 'deltaPhi_Wl'
   c.Draw('>>eList',cut)
   elist = ROOT.gDirectory.Get("eList")
@@ -99,13 +50,8 @@ def getRCSel(c, cut, dPhiCut):
   for i in range(number_events):
     c.GetEntry(elist.GetEntry(i))
     weight = getVarValue(c,"weight")
-    #neutrinoPt, neutrinoPhi, genMetPt = getNeutrino(c)
-    #WMass = getWMass(c)
     deltaPhi = c.GetLeaf(dPhiStr).GetValue()
-    #if abs(neutrinoPt-genMetPt)<5:
-    #  h.Fill(deltaPhi, weight)
-    #if WMass<120. and WMass > 1.:
-    if cmgMinDPhiJet(c, nJets=2)>0.45: #optimize this cut value
+    if cmgMinDPhiJet(c, nJets=2)>dPhiMetJet: #optimize this cut value
       h.Fill(deltaPhi, weight)
     else: continue
   if h.GetBinContent(1)>0:
