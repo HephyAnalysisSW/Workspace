@@ -8,7 +8,7 @@ from Workspace.HEPHYPythonTools.helpers import getObjFromFile, getObjDict, getFi
 from Workspace.HEPHYPythonTools.convertHelpers import compileClass, readVar, printHeader, typeStr, createClassString
 
 
-subDir = "postProcessed_Spring15_AllFlags"
+subDir = "postProcessed_Spring15_AllFlags2"
 #from Workspace.RA4Analysis.cmgTuples_v3 import *
 from Workspace.HEPHYPythonTools.helpers import getChunksFromNFS, getChunks
 #from Workspace.RA4Analysis.cmgTuples_PHYS14V3 import *
@@ -98,7 +98,7 @@ def getTreeFromChunk(c, skimCond, iSplit, nSplit):
    
 exec('allSamples=['+options.allsamples+']')
 for isample, sample in enumerate(allSamples):
-  
+  print sample 
   #chunks, sumWeight = getChunks(sample, options.inputTreeName)
   chunks, sumWeight = getChunks(sample)
   #chunks, nTotEvents = getChunksFromDPM(sample, options.inputTreeName)
