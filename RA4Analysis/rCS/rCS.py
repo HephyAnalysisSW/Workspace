@@ -29,7 +29,7 @@ cWJets  = getChain(WJetsHTToLNu[lepSel],histname='',maxN=maxN)
 
 from Workspace.HEPHYPythonTools.user import username
 uDir = username[0]+'/'+username
-subDir = 'Spring15/rCS/dPhiMetJetEcalHoleFlag'
+subDir = 'Spring15/rCS/dynamicdPhiMetJetEcalHoleFlag2'
 #subDir = 'pngCMG2/rCS/PHYS14V3/useRecoMet'
 
 path = '/afs/hephy.at/user/'+uDir+'/www/'+subDir+'/'
@@ -57,7 +57,7 @@ elif channel =='mu':
 streg = [[(250,350),1.],[(350,450),1.],[(450,-1),1.]]#,[(350,450), 1.],[(450,-1),1.]]#, [(350, 450), 1.],  [(450, -1), 1.] ]
 htreg = [(500,750),(750,1000),(1000,-1)]#,(1000,1250),(1250,-1)]#,(1250,-1)]
 btreg = (0,0)
-njreg = [(2,2),(3,3),(4,4),(5,5),(6,7),(8,-1)]#,(7,7),(8,8),(9,9)]
+njreg = [(3,3),(4,4),(5,5),(6,7),(8,-1)]#,(7,7),(8,8),(9,9)]
 nbjreg = [(0,0),(1,1),(2,2)]
 
 #Usage of GenMet for deltaPhi / rCS
@@ -193,9 +193,13 @@ for lep, pdgId in channels:
           poscut = 'leptonPdg>0&&'+cut
           negcut = 'leptonPdg<0&&'+cut
           dPhiCut = dynDeltaPhi(1.0,stb, htb, njb)
-          rcs = getRCSel(c, cut, dPhiCut)
-          rcsPos = getRCSel(c, poscut, dPhiCut)
-          rcsNeg = getRCSel(c, negcut, dPhiCut)
+          if njb[1]<5 and njb[1]>0:
+            dPhiJetMetCut = 0.6
+          else:
+            dPhiJetMetCut = 0.45
+          rcs = getRCSel(c, cut, dPhiCut, dPhiMetJet=dPhiJetMetCut)
+          rcsPos = getRCSel(c, poscut, dPhiCut, dPhiMetJet=dPhiJetMetCut)
+          rcsNeg = getRCSel(c, negcut, dPhiCut, dPhiMetJet=dPhiJetMetCut)
           #rcs = getRCS(c, cut, dPhiCut, useGenMet=GenMetSwitch, useOnlyGenMetPt=useOnlyGenMetPt, useOnlyGenMetPhi=useOnlyGenMetPhi, useWeight=False)
           #rcsPos = getRCS(c, poscut, dPhiCut, useGenMet=GenMetSwitch, useOnlyGenMetPt=useOnlyGenMetPt, useOnlyGenMetPhi=useOnlyGenMetPhi, useWeight=False)
           #rcsNeg = getRCS(c, negcut, dPhiCut, useGenMet=GenMetSwitch, useOnlyGenMetPt=useOnlyGenMetPt, useOnlyGenMetPhi=useOnlyGenMetPhi, useWeight=False)

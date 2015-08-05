@@ -3,8 +3,9 @@ import pickle
 import os,sys
 from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYieldFromChain
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,varBinName
-from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
+#from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v9_Phys14V3_HT400ST200_ForTTJetsUnc import *
+from Workspace.RA4Analysis.cmgTuplesPostProcessed_Spring15_hard import *
 from makeTTPrediction import makeTTPrediction
 from makeWPrediction import makeWPrediction
 from Workspace.HEPHYPythonTools.user import username
@@ -31,11 +32,11 @@ signalRegions = signalRegion3fb     ##because 10 one is full
 #signalRegions = {(5, 5): {(250, 350): {(500, -1):   {'deltaPhi': 1.0}}}} 
 lumi = 3.
 
-weight_str, weight_err_str = makeWeight(lumi)
+weight_str, weight_err_str = makeWeight(lumi, sampleLumi=3.)
 
 samples={'W':cWJets, 'TT':cTTJets, 'Rest':cRest, 'Bkg':cBkg, 'Data': cData}
 
-signal = True
+signal = False
 if signal:
   allSignals=[
             {'name':'T5q^{4} 1.2/1.0/0.8', 'sample':T5qqqqWW_mGo1200_mCh1000_mChi800[lepSel], 'weight':weight_str, 'color':ROOT.kBlack},
@@ -48,7 +49,7 @@ if signal:
 
 ROOT.TH1F().SetDefaultSumw2()
 
-prefix = 'singleLeptonic_Phys14V3_'
+prefix = 'singleLeptonic_Spring15_'
 presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80"
 
 btagString = 'nBJetMediumCSV30'
@@ -141,7 +142,7 @@ for srNJet in signalRegions:
 
       #bins[htb][stb][srNJet]=rd
       bins[srNJet][stb][htb] = rd
-path = '/data/'+username+'/PHYS14v3/fakeData/rCS_0b_'+str(lumi)+'_data/'
+path = '/data/'+username+'/Spring15/firstPrediction/rCS_0b_'+str(lumi)+'/'
 if not os.path.exists(path):
   os.makedirs(path)
 pickle.dump(bins, file(path+prefix+'_estimationResults_pkl','w'))
