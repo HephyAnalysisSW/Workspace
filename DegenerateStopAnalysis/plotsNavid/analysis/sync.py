@@ -1,42 +1,41 @@
-from Workspace.DegenerateStopAnalysis.navidPlotTools import *
-
 import ROOT
-from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYieldFromChain, getChunks
+from getSamples import *
+from cutLists import *
+from Workspace.DegenerateStopAnalysis.navidPlotTools import getPlots, getYieldTable, drawPlots,cutClass, makeTableFromYieldDict
 
-#from Workspace.HEPHYPythonTools.helpers import getChunksFromNFS, getChunksFromDPM, getChunks
-#from Workspace.DegenerateStopAnalysis.cmgTuples_v1_Phys14 import *
+saveDir = "/afs/hephy.at/user/n/nrad/www/T2Deg13TeV/analysis/RunII/"
+tableDir=saveDir+"/table"
 
-import os
-import math
-tableDir="/afs/hephy.at/user/n/nrad/www/T2Deg13TeV/analysis/postProcessed_v4/tables/"
 
-t = ROOT.TChain("tree")
-#t.Add("/afs/cern.ch/user/n/nrad/CMSSW/CMSSW_7_2_3/src/CMGTools/TTHAnalysis/cfg/sync/T2DegStop_300_270/treeProducerSusySingleLepton/tree.root")
-t.Add("/afs/cern.ch/work/n/nrad/delme/CMSSW_7_2_3/src/CMGTools/TTHAnalysis/cfg/sync/T2DegStop_300_270/treeProducerSusySingleLepton/tree.root")
-weight= 4000*8.5161504/t.GetEntries()
-
-sampleDict= {
-          'T2Deg': {'tree':t    , "weight":"(1)", 'color':31          ,'lineColor':1   , 'isSignal':1 , 'isData':0       }
-            }
+lumiConvertFactor = 20000./3000.
+for sample in sampleDict:
+  if sampleDict[sample].has_key("weight"):
+    sampleDict[sample]["weight"] = str(sampleDict[sample]["weight"])+"*%s"%lumiConvertFactor
+  else:
+    sampleDict[sample]["weight"] = "weight*%s"%lumiConvertFactor
 
 
 
-syncCutList=[
-      #["stCut"," (nLepGood[0]+met_pt > 200)"],
-      ["noCut","(1)"],
-      ["nMuon==1","(nLepGood==1)&&(abs(LepGood_pdgId[0])==13)"],
-      #["dxy0.02 dz0.5","(abs(LepGood_dxy[0])<0.02)&&(abs(LepGood_dz[0])<0.5)"],
-      ["pt30 eta2.1","(LepGood_pt[0]<30.)&&(abs(LepGood_eta[0]<2.1))"],
-      ["charge","LepGood_charge[0]<0."],
-      ["relIso","LepGood_relIso03[0]<0.2"],
-      ["met>200","met_pt>200"],
-      ["nJet25==2","nJet25==2"],
-      ["nBJetLoose25>0","nBJetLoose25>0"],
-      ["jetPt>110","Jet_pt[0]>110."],
-      #["isrJet","isrJet_pt[0]>300."],
-	]
 
-syncCutFlow=makeCutFlowList(syncCutList)
+#minAng = lambda x: minAngleString("Jet_phi[0]","Jet_phi[%s]"%x)
+#sampleDict['T2Deg300_270']['tree'].Scan("Jet_phi:%s:%s"%(minAng("1"),minAng("")), "(Sum$(Jet_pt>=60) >=1 ) && (TMath::Min( (2*pi) - abs(Jet_phi[0]-Jet_phi[]) , abs(Jet_phi[0]-Jet_phi[]) )<2.5)" )
 
-if 0:
-  makeTableFromYieldDict(sampleDict,syncCutList,output="sync",saveDir=tableDir)
+#lumiConvertFactor = 20000./4000
+#for sample in sampleDict:
+#  if sampleDict[sample].has_key("weight"):
+#    sampleDict[sample]["weight"] = str(sampleDict[sample]["weight"])+"*%s"%lumiConvertFactor
+#  else:
+#    sampleDict[sample]["weight"] = "weight*%s"%lumiConvertFactor
+
+#c=sampleDict['T2Deg300_270']['tree']
+#sampleDict['T2Deg300_270_RunII']['tree'].Scan("nJet:abs(Jet_phi[0]-Jet_phi[1])","nJet==1 || (nJet==2 )","COLZ")
+#sampleDict['T2Deg300_270_RunII']['tree'].Scan("nJet:abs(Jet_phi[0]-Jet_phi[1])","nJet==1 || (nJet==2 && (nJet==2 && abs(Jet_phi[1]-Jet_phi[0])) )","COLZ")
+#
+#sampleDict['T4Deg300_270_RunII']['tree'].Draw("nJet:abs(Jet_phi[0]-Jet_phi[1])>>(8,0,2*pi,5,0,5)","nJet==1 || (nJet==2)","COLZ") 
+def getSyncTable(cutList = sr1sync.list,output= "sr1sync" ):
+  syncYields=getYieldTable(sampleDict,  cutList , treeList="", orderedKeys=["TTJets", "WJets", "bkg", "T2Deg300_270","T2Deg300_270_RunII", "T2Deg350_330",  "fom_T2Deg300_270_RunII"  ], output=output ,saveDir=tableDir)
+  #getYieldTable(sampleDict,  sr1sync.list , treeList="", bkgs=["TTJets", "WJets"],sigs=["T2Deg350_330","T2Deg300_270", "T2Deg300_270_RunII"], output= "sync_antiQCDfix" ,saveDir=tableDir) 
+  return syncYields
+
+
+
