@@ -1,2 +1,0 @@
-gMET Cut   gISR Cut    MET 1 Red. Factor    MET 1 Reco Eff.    MET 2 Red. Factor    MET 2 Reco Eff.    ISR 1 Red. Factor    ISR 1 Reco Eff.    ISR 2 Red. Factor    ISR 2 Reco Eff.
-  140         80         4.70387958068      0.990349134261      5.21907696896      0.989781436276      3.07870489148      0.998013902681      5.21907696896      0.997020854022
