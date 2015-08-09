@@ -38,7 +38,7 @@ do
   #echo $i " / " ${arraylength} " : " ${array[$i-1]}
   echo $i " / " ${arraylength} " : " $SOURCE 
   echo $TARGET 
-  getCMGCrabOutput_cptmp.py --userNameDPM=$userNameDPM --userNameNFS=$userNameNFS --source=$SOURCE --target=$TARGET --fileName='' --suffix=".root .tgz" 
+  cp_CMGoutput_fromDPM_TolxTMP.py --userNameDPM=$userNameDPM --userNameNFS=$userNameNFS --source=$SOURCE --target=$TARGET --fileName='' --suffix=".root .tgz" 
   unpackCMGCrabOutput.py    --userNameNFS=$userNameNFS  --dir=$TARGET --suffix=".tgz"
 done
 
