@@ -1,6 +1,6 @@
 import ROOT
 from array import array
-from math import *
+from math import sqrt, cosh, cos, sin
 import os, copy, sys
 from Workspace.HEPHYPythonTools.helpers import getObjFromFile, getChain, getChunks, getObjDict
 from Workspace.HEPHYPythonTools.xsec import xsec
@@ -9,6 +9,7 @@ from Workspace.RA4Analysis.helpers import *
 from Workspace.RA4Analysis.cmgTuples_Spring15 import *
 
 lumi=100.
+small = True
 samples=[ 
   {"name":"DY", "bins":[DYJetsToLL_M_50], "title":"Drell-Yan"}
 ]
@@ -16,9 +17,22 @@ samples=[
 variables = [
   {"name":"nVert", "func":lambda c:getVarValue(c,"nVert"), "title":"vertex multiplicity", "binning":range(0,51)}
 ]
+metVariables = [
+  {'name':'type1','ptFunc':lambda c:getVarValue(c,"met_pt"), 'phiFunc':lambda c:getVarValue(c,"met_phi")}
+]
+
 for v in variables:
   v['bins']=[(v["binning"][i],v["binning"][i+1]) for i in range(len(v["binning"])-1)]
-
+  v['upara']={}
+  v['uerp']={}
+  for mv in metVariables:
+    v['upara'][mv['name']]={}
+    v['uerp'][mv['name']]={}
+    for b in v['bins']:
+      hname = v['name']+'_'.join([str(x) for x in b])
+      v['uperp'][mv['name']][b] = ROOT.TH2F(hname+'_'+mv['name']+'_uperp', hname+'_'+mv['name']+'_uperp', 400,-200,200) 
+      v['upara'][mv['name']][b] = ROOT.TH2F(hname+'_'+mv['name']+'_upara', hname+'_'+mv['name']+'_upara', 400,-200,200) 
+  
 for s in samples:
   totalYield=0
   for b in s["bins"]:
@@ -30,29 +44,51 @@ for s in samples:
     b["chain"]     = getChain(chunks,  histname="", treeName = b["treeName"])
     print b["name"],"xsec",xsec[b['dbsName']],"sumWeight",sumWeight
 
+def getMass(l0,l1):
+  return sqrt(2.*l0['pt']*l1['pt']*(cosh(l0['eta']-l1['eta']) - cos(l0['phi']-l1['phi'])))
+
 def looseMuID(l):
   return l["pt"]>=20 and l["eta"]<2.1 and l["mediumMuonId"]==1 and l["miniRelIso"]<0.4 and l["sip3d"]<4.0
 
-def ele_ID_eta(l):
-  if abs(l["eta"]) < 0.8 and r.LepGood_mvaIdPhys14[nLep] > ele_MVAID_cuts['eta08'] : return True
-  elif abs(l["eta"]) > 0.8 and abs(l["eta"]) < 1.44 and r.LepGood_mvaIdPhys14[nLep] > ele_MVAID_cuts['eta104'] : return True
-  elif abs(l["eta"]) > 1.57 and r.LepGood_mvaIdPhys14[nLep] > ele_MVAID_cuts['eta204'] : return True
-  return False
-
-def looseEleID(l):
-  return l["pt"]>=20 and (abs(l["eta"])<1.44 or abs(l["eta"])>1.57) and abs(l["eta"])<2.4 and l["miniRelIso"]<0.4 and ele_ID_eta(l) and l["lostHits"]<=1 and l["convVeto"] and l["sip3d"] < 4.0
+#def mvaEleIdEta(l):
+#  if abs(l["eta"]) < 0.8 and l["mvaIdPhys14"] > 0.35 : return True
+#  elif abs(l["eta"]) > 0.8 and abs(l["eta"]) < 1.44 and l["mvaIdPhys14"] > 0.20 : return True
+#  elif abs(l["eta"]) > 1.57 and l["mvaIdPhys14"] > -0.52 : return True
+#  return False
+#
+#def looseEleID(l):
+#  return l["pt"]>=20 and (abs(l["eta"])<1.44 or abs(l["eta"])>1.57) and abs(l["eta"])<2.4 and l["miniRelIso"]<0.4 and mvaEleIdEta(l) and l["lostHits"]<=1 and l["convVeto"] and l["sip3d"] < 4.0
 
 def getMuons(c):
-  getObjDict(c, "Lep", ["pt", "eta", "phi", "dxy", "dz", "relIso03", "mediumMuonId"])
-#          genWeight = t.GetLeaf('genWeight').GetValue()
-#          s.weight = prelumiWeight*genWeight
+  leptons = getObjDict(c, "Lep", ["pt", "eta", "phi", "dxy", "dz", "relIso03", "mediumMuonId", "pdgId", "miniRelIso", "sip3d"])
+  return [l for l in leptons if abs(l["pdgId"])==13 and looseMuID(l)]
 
-dilepton = "(1)" #her go the filters
+presel = "1"
+dilepton = "Sum$(LepGood_pt>20&&LepGood_mediumMuonId==1)>=2" 
 
+cut = "&&".join(['('+x+')' for x in [presel, dilepton]])
 for s in samples:
   for b in s['bins']:
-    b['chain'].Draw('>>eList', dilepton)
+    b['chain'].Draw('>>eList', cut)
     eList = ROOT.gDirectory.Get('eList')
+    for nev in range(eList.GetN()):
+      if small and nev>1000:break
+      b['chain'].GetEntry(eList.GetEntry(nev))
+      muons = getMuons(c)
+      if len(muons)!=2:continue
+      mll = getMass(muons[0],muons[1])
+      if not abs(mll-90.2)<15.:continue
+      qx = l0['pt']*cos(l0['phi']) + l1['pt']*cos(l1['phi'])  
+      qy = l0['pt']*sin(l0['phi']) + l1['pt']*cos(l1['phi']) 
+      qphi = atan2(qy, qx)
+      qt = sqrt(qx**2+qy**2)
+      for mv in metVariables:
+        mv['pt'] = mv['ptFunc'](b['chain']) 
+        mv['phi'] = mv['phiFunc'](b['chain'])
+        
+        upara =   
+         
+ 
 
   del eList
 # OBJ: TBranch LepOther_charge charge for Leptons after the preselection : 0 at: 0x4e11dc0
