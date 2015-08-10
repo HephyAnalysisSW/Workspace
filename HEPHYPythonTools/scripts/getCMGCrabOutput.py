@@ -30,9 +30,11 @@ if not os.path.isdir(oDir):
 lsNFS = os.listdir(oDir)
 
 p = subprocess.Popen(["dpns-ls -l "+ dpmDir], shell = True , stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-for line in p.stdout.readlines():
+lines=p.stdout.readlines()
+print len(lines) "Files in Directory"
+for line in lines:
    line = line[:-1]
-   print line
+   #print line
    filename = line.split(" ")[-1]
    size = int(line.split(" ")[-5]) 
    if "." in filename:
@@ -42,7 +44,7 @@ for line in p.stdout.readlines():
        if not size> 100:
          print "Skipping because file is too small (",filename, "size:", size,")"
          continue
-       print "Copying", dpmDir+"/"+filename, "to", oDir+"/"+filename
+       #print "Copying", dpmDir+"/"+filename, "to", oDir+"/"+filename
        if not options.onlyUpdate or not os.path.isfile(oDir+"/"+filename):
          #os.system("$LCG_LOCATION/bin/rfcp "+dpmDir+"/"+filename+" "+oDir+"/"+filename)
 #         os.system("rfcp "+dpmDir+"/"+filename+" "+oDir+"/"+filename)
