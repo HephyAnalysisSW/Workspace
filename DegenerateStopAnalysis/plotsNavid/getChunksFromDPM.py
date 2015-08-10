@@ -5,7 +5,7 @@ from os.path import basename, splitext
 from optparse import OptionParser
 
 
-test="" ## True will only print the commands and not actually run them
+test=False ## True will only print the commands and not actually run them
 
 
 verbose=True
@@ -61,7 +61,7 @@ sourceBaseDirDPMList=[
 "ZJetsToNuNu_HT-600ToInf_13TeV-madgraph",
 "ZZ_TuneCUETP8M1_13TeV-pythia8",
 ]
-
+#sourceBaseDirDPMList=sourceBaseDirDPMList[0:2]
 
 
 
@@ -169,7 +169,7 @@ for sourceBaseDirDPM in sourceBaseDirDPMList:
     #print sampleName
     
     allOptDicts.append(  {
-                          "sourceDirDPM":dir.replace(dpmDir,""),
+                          "sourceDirDPM":dir.replace(dpmDir,"").replace(userNameDPM,""),
                           "targetDirNFS":targetBaseDirNFS+"/"+sampleName,
                           "userNameNFS":userNameNFS,
                           "userNameDPM":userNameDPM,

@@ -31,7 +31,7 @@ lsNFS = os.listdir(oDir)
 
 p = subprocess.Popen(["dpns-ls -l "+ dpmDir], shell = True , stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 lines=p.stdout.readlines()
-print len(lines) "Files in Directory"
+print len(lines), "Files in Directory"
 for line in lines:
    line = line[:-1]
    #print line
