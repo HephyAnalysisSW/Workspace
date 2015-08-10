@@ -15,7 +15,7 @@ from Workspace.HEPHYPythonTools.helpers import getChunksFromNFS, getChunks
 #from Workspace.RA4Analysis.cmgTuples_v1_PHYS14V3 import *
 from Workspace.DegenerateStopAnalysis.cmgTuples_Spring15 import *
 
-target_lumi = 3000 #pb-1
+target_lumi = 10000 #pb-1
 lepton_soft_hard_cut  = 30
 
 #from  Workspace.RA4Analysis import mt2w
@@ -151,7 +151,7 @@ for isample, sample in enumerate(allSamples):
     newVariables.extend( ['nLooseSoftLeptons/I', 'nLooseSoftPt10Leptons/I', 'nLooseHardLeptons/I', 'nTightSoftLeptons/I', 'nTightHardLeptons/I'] )
     newVariables.extend( ['deltaPhi_Wl/F','nBJetMediumCSV30/I','nJet30/I','htJet30j/F',"nJet60/I","nJet110/I",'st/F', 'leptonPt/F','leptonMiniRelIso/F','leptonRelIso03/F' ,'leptonEta/F',\
                           'leptonPhi/F', 'leptonPdg/I/0', 'leptonInd/I/-1', 'leptonMass/F', 'singleMuonic/I', 'singleElectronic/I', 'singleLeptonic/I',
-                          'Q80/F','CosLMet/F','deltaPhi_J12/F','mt/F',
+                          'Q80/F','CosLMet/F','deltaPhi_j12/F','mt/F',
                           ]) #, 'mt2w/F'] )
   newVars = [readVar(v, allowRenaming=False, isWritten = True, isRead=False) for v in newVariables]
 
@@ -300,6 +300,11 @@ for isample, sample in enumerate(allSamples):
           lightJets,  bJetsCSV = splitListOfObjects('btagCSV', 0.814, jets)
           #lightJets,  bJetsCSV = filter(lambda j:j['btagCSV']<0.814 and -1<j['btagCSV'] , jetscopy)
           #print "bjetsCMVA:" , bJetsCMVA , "bjetsCSV:" ,  bJetsCSV
+
+          s.isrJetPt = jets[0]['pt']
+          s.isrJetPhi = jets[0]['phi']
+          s.isrJetId  =  jets[0]['id']
+
           s.htJet30j = sum([x['pt'] for x in jets])
           s.nJet30 = len(jets)
           jets60   = filter(lambda j:j['pt']>60 and abs(j['eta'])<2.4 and j['id'], get_cmg_jets_fromStruct(r,j_list))  ## maybe use jets instead
@@ -314,10 +319,14 @@ for isample, sample in enumerate(allSamples):
           s.CosLMet     = cos(s.leptonPhi-r.met_phi)
           s.mt          = sqrt( 2* s.leptonPt * r.met_pt *( 1- s.CosLMet  ))
           
-          if s.nJet60 in [0,1]:
-            s.deltaPhi_J12 = -1
+          if s.nJet60 == 0:
+            s.deltaPhi_j12 = 999
+            #print "#################################"
+            #print s.nJet60, s.deltaPhi_j12
+          elif s.nJet60 == 1:
+            s.deltaPhi_j12 = 0
           else:
-            s.deltaPhi_J12 = min( 2*pi- abs(jets60[1]['phi'] - jets60[0]['phi'] ) ,  abs(jets60[1]['phi'] - jets60[0]['phi'] ) )
+            s.deltaPhi_j12 = min( 2*pi- abs(jets60[1]['phi'] - jets60[0]['phi'] ) ,  abs(jets60[1]['phi'] - jets60[0]['phi'] ) )
           
                  
           #print "deltaPhi:" , s.deltaPhi_Wl
