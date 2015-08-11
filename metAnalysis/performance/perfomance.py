@@ -14,8 +14,11 @@ samples=[
   {"name":"DY", "bins":[DYJetsToLL_M_50], "title":"Drell-Yan"}
 ]
 
+nvtxBinning=[0,50]
+qtBinning=range(0,100,10)
 variables = [
-  {"name":"nVert", "func":lambda c:getVarValue(c,"nVert"), "title":"vertex multiplicity", "binning":range(0,51)}
+#  {"name":"nVert", "func":lambda c:getVarValue(c,"nVert"), "title":"vertex multiplicity", "binning":nvtxBinning},
+  {"name":"qt", "func":"qt", "title":"q_{T} (GeV)", "binning":qtBinning}
 ]
 metVariables = [
   {'name':'type1','ptFunc':lambda c:getVarValue(c,"met_pt"), 'phiFunc':lambda c:getVarValue(c,"met_phi")}
@@ -23,15 +26,23 @@ metVariables = [
 
 for v in variables:
   v['bins']=[(v["binning"][i],v["binning"][i+1]) for i in range(len(v["binning"])-1)]
+  v['uperp']={}
   v['upara']={}
-  v['uerp']={}
+  v['histo']={}
   for mv in metVariables:
+    hname = '_'.join(v['name'],mv['name'])
+    v['histo'][mv['name']]=ROOT.TH1D('histo_'+hname, 'histo_'+hname, len(v['binning'])-1, array('d',v['binning']))
+
     v['upara'][mv['name']]={}
-    v['uerp'][mv['name']]={}
+    v['uperp'][mv['name']]={}
+    v['upara'][mv['name']]["scale"] = ROOT.TH1D(hname+'_upara_scale', hname+'_upara_scale',len(v['binning'])-1, array('d',v['binning']))
+    v['upara'][mv['name']]["RMS"] = ROOT.TH1D(hname+'_upara_RMS', hname+'_upara_RMS',len(v['binning'])-1, array('d',v['binning']))
+#    v['upara'][mv['name']]["scale"] = ROOT.TH1D(hname+'_upara_scale', hname+'_upara_scale',len(v['binning'])-1, array('d',v['binning']))
+    v['uperp'][mv['name']]["RMS"] = ROOT.TH1D(hname+'_uperp_RMS', hname+'_uperp_RMS',len(v['binning'])-1, array('d',v['binning']))
     for b in v['bins']:
       hname = v['name']+'_'.join([str(x) for x in b])
-      v['uperp'][mv['name']][b] = ROOT.TH2F(hname+'_'+mv['name']+'_uperp', hname+'_'+mv['name']+'_uperp', 400,-200,200) 
-      v['upara'][mv['name']][b] = ROOT.TH2F(hname+'_'+mv['name']+'_upara', hname+'_'+mv['name']+'_upara', 400,-200,200) 
+      v['uperp'][mv['name']][b] = ROOT.TH1D(hname+'_'+mv['name']+'_uperp', hname+'_'+mv['name']+'_uperp', 400,-200,200) 
+      v['upara'][mv['name']][b] = ROOT.TH1D(hname+'_'+mv['name']+'_upara', hname+'_'+mv['name']+'_upara', 500,-400,100) 
   
 for s in samples:
   totalYield=0
@@ -43,6 +54,11 @@ for s in samples:
     b["lumiScale"] = lumiScale
     b["chain"]     = getChain(chunks,  histname="", treeName = b["treeName"])
     print b["name"],"xsec",xsec[b['dbsName']],"sumWeight",sumWeight
+
+def findBin(v, varValue):
+  for b in v['bins']:
+    if varValue>=b[0] and varValue<b[1]:
+      return b
 
 def getMass(l0,l1):
   return sqrt(2.*l0['pt']*l1['pt']*(cosh(l0['eta']-l1['eta']) - cos(l0['phi']-l1['phi'])))
@@ -60,7 +76,7 @@ def looseMuID(l):
 #  return l["pt"]>=20 and (abs(l["eta"])<1.44 or abs(l["eta"])>1.57) and abs(l["eta"])<2.4 and l["miniRelIso"]<0.4 and mvaEleIdEta(l) and l["lostHits"]<=1 and l["convVeto"] and l["sip3d"] < 4.0
 
 def getMuons(c):
-  leptons = getObjDict(c, "Lep", ["pt", "eta", "phi", "dxy", "dz", "relIso03", "mediumMuonId", "pdgId", "miniRelIso", "sip3d"])
+  leptons = [getObjDict(c, "LepGood_", ["pt", "eta", "phi", "dxy", "dz", "relIso03", "mediumMuonId", "pdgId", "miniRelIso", "sip3d"], i) for i in range(int(getVarValue(c,'nLepGood')))]
   return [l for l in leptons if abs(l["pdgId"])==13 and looseMuID(l)]
 
 presel = "1"
@@ -71,26 +87,57 @@ for s in samples:
   for b in s['bins']:
     b['chain'].Draw('>>eList', cut)
     eList = ROOT.gDirectory.Get('eList')
-    for nev in range(eList.GetN()):
-      if small and nev>1000:break
+    nEvents = eList.GetN() if not small else 10000
+    for nev in range(nEvents):
+      if nev%1000==0:print "At %i / %i"%(nev, nEvents)
       b['chain'].GetEntry(eList.GetEntry(nev))
-      muons = getMuons(c)
+      muons = getMuons(b['chain'])
       if len(muons)!=2:continue
-      mll = getMass(muons[0],muons[1])
+      l0, l1 = muons
+      mll = getMass(l0,l1)
       if not abs(mll-90.2)<15.:continue
       qx = l0['pt']*cos(l0['phi']) + l1['pt']*cos(l1['phi'])  
       qy = l0['pt']*sin(l0['phi']) + l1['pt']*cos(l1['phi']) 
-      qphi = atan2(qy, qx)
+#      qphi = atan2(qy, qx)
       qt = sqrt(qx**2+qy**2)
+#      print l0, l1
       for mv in metVariables:
         mv['pt'] = mv['ptFunc'](b['chain']) 
         mv['phi'] = mv['phiFunc'](b['chain'])
-        
-        upara =   
-         
- 
-
+        ux = -mv['pt']*cos(mv['phi']) - qx 
+        uy = -mv['pt']*sin(mv['phi']) - qy
+        upara = (ux*qx+uy*qy)/qt
+        uperp = (ux*qy-uy*qx)/qt
+        weight = getVarValue(b['chain'], 'genWeight')*lumiScale
+        for v in variables:
+          if v['func']=='qt':varValue=qt
+          else:
+            varValue = v['func'](b['chain'])
+          v['histo'][mv['name']].Fill(varValue, weight)         #Filling distribution of binning variable
+          varBin = findBin(v, varValue)
+          if varBin: 
+            v['uperp'][mv['name']][varBin].Fill(uperp, weight) 
+            v['upara'][mv['name']][varBin].Fill(upara, weight) 
   del eList
+
+for v in variables:
+  for mv in metVariables:
+    for b in v['bins']:
+      upara_mean      = v['upara'][mv['name']][b].GetMean()
+      upara_mean_err  = v['upara'][mv['name']][b].GetMeanError()
+      uperp_mean      = v['uperp'][mv['name']][b].GetMean()
+      uperp_mean_err  = v['uperp'][mv['name']][b].GetMeanError()
+      upara_RMS      = v['upara'][mv['name']][b].GetRMS()
+      upara_RMS_err  = v['upara'][mv['name']][b].GetRMSError()
+      uperp_RMS      = v['uperp'][mv['name']][b].GetRMS()
+      uperp_RMS_err  = v['uperp'][mv['name']][b].GetRMSError()
+
+      scale = - upara_mean /  
+      v['upara'][mv['name']]["scale"] = ROOT.TH1D(hname+'_upara_scale', hname+'_upara_scale',len(v['binning'])-1, array('d',v['binning']))
+      v['upara'][mv['name']]["RMS"] = ROOT.TH1D(hname+'_upara_RMS', hname+'_upara_RMS',len(v['binning'])-1, array('d',v['binning']))
+  #    v['upara'][mv['name']]["scale"] = ROOT.TH1D(hname+'_upara_scale', hname+'_upara_scale',len(v['binning'])-1, array('d',v['binning']))
+      v['uperp'][mv['name']]["RMS"] = ROOT.TH1D(hname+'_uperp_RMS', hname+'_uperp_RMS',len(v['binning'])-1, array('d',v['binning']))
+ 
 # OBJ: TBranch LepOther_charge charge for Leptons after the preselection : 0 at: 0x4e11dc0
 # OBJ: TBranch LepOther_tightId  POG Tight ID (for electrons it's configured in the analyzer) for Leptons after the preselection : 0 at: 0x4e129a0
 # OBJ: TBranch LepOther_eleCutIdCSA14_25ns_v1  Electron cut-based id (POG CSA14_25ns_v1): 0=none, 1=veto, 2=loose, 3=medium, 4=tight for Leptons after the preselection : 0 at: 0x4e135d0
