@@ -28,6 +28,7 @@ for v in variables:
   v['bins']=[(v["binning"][i],v["binning"][i+1]) for i in range(len(v["binning"])-1)]
   v['uperp']={}
   v['upara']={}
+  v['qt']={}
   v['histo']={}
   for mv in metVariables:
     hname = '_'.join(v['name'],mv['name'])
@@ -36,13 +37,16 @@ for v in variables:
     v['upara'][mv['name']]={}
     v['uperp'][mv['name']]={}
     v['upara'][mv['name']]["scale"] = ROOT.TH1D(hname+'_upara_scale', hname+'_upara_scale',len(v['binning'])-1, array('d',v['binning']))
-    v['upara'][mv['name']]["RMS"] = ROOT.TH1D(hname+'_upara_RMS', hname+'_upara_RMS',len(v['binning'])-1, array('d',v['binning']))
 #    v['upara'][mv['name']]["scale"] = ROOT.TH1D(hname+'_upara_scale', hname+'_upara_scale',len(v['binning'])-1, array('d',v['binning']))
+    v['upara'][mv['name']]["RMS"] = ROOT.TH1D(hname+'_upara_RMS', hname+'_upara_RMS',len(v['binning'])-1, array('d',v['binning']))
     v['uperp'][mv['name']]["RMS"] = ROOT.TH1D(hname+'_uperp_RMS', hname+'_uperp_RMS',len(v['binning'])-1, array('d',v['binning']))
+    v['upara'][mv['name']]["RMScorr"] = ROOT.TH1D(hname+'_upara_RMScorr', hname+'_upara_RMScorr',len(v['binning'])-1, array('d',v['binning']))
+    v['uperp'][mv['name']]["RMScorr"] = ROOT.TH1D(hname+'_uperp_RMScorr', hname+'_uperp_RMScorr',len(v['binning'])-1, array('d',v['binning']))
     for b in v['bins']:
       hname = v['name']+'_'.join([str(x) for x in b])
       v['uperp'][mv['name']][b] = ROOT.TH1D(hname+'_'+mv['name']+'_uperp', hname+'_'+mv['name']+'_uperp', 400,-200,200) 
       v['upara'][mv['name']][b] = ROOT.TH1D(hname+'_'+mv['name']+'_upara', hname+'_'+mv['name']+'_upara', 500,-400,100) 
+      v['qt'][mv['name']][b] = ROOT.TH1D(hname+'_'+mv['name']+'_qt', hname+'_'+mv['name']+'_qt', 500,0,500) 
   
 for s in samples:
   totalYield=0
@@ -118,6 +122,7 @@ for s in samples:
           if varBin: 
             v['uperp'][mv['name']][varBin].Fill(uperp, weight) 
             v['upara'][mv['name']][varBin].Fill(upara, weight) 
+            v['upara'][mv['name']][varBin].Fill(qt, weight) 
   del eList
 
 for v in variables:
@@ -131,12 +136,26 @@ for v in variables:
       upara_RMS_err  = v['upara'][mv['name']][b].GetRMSError()
       uperp_RMS      = v['uperp'][mv['name']][b].GetRMS()
       uperp_RMS_err  = v['uperp'][mv['name']][b].GetRMSError()
-
-      scale = - upara_mean /  
-      v['upara'][mv['name']]["scale"] = ROOT.TH1D(hname+'_upara_scale', hname+'_upara_scale',len(v['binning'])-1, array('d',v['binning']))
-      v['upara'][mv['name']]["RMS"] = ROOT.TH1D(hname+'_upara_RMS', hname+'_upara_RMS',len(v['binning'])-1, array('d',v['binning']))
-  #    v['upara'][mv['name']]["scale"] = ROOT.TH1D(hname+'_upara_scale', hname+'_upara_scale',len(v['binning'])-1, array('d',v['binning']))
-      v['uperp'][mv['name']]["RMS"] = ROOT.TH1D(hname+'_uperp_RMS', hname+'_uperp_RMS',len(v['binning'])-1, array('d',v['binning']))
+      qt_mean       = v['upara'][mv['name']][varBin].GetMean()
+      qt_mean_err   = v['upara'][mv['name']][varBin].GetMeanError()
+      scale         =  - upara_mean / qt_mean 
+      scale_err     =  upara_mean / qt_mean * sqrt(upara_mean_err**2/upara_mean**2 + qt_mean_err**2/qt_mean**2)
+      upara_RMS_scaleCorr       =  upara_RMS/scale
+      upara_RMS_scaleCorr_err   =  upara_RMS/scale*sqrt(upara_RMS_err**2/upara_RMS**2 + scale_err**2/scale**2)
+      uperp_RMS_scaleCorr       =  uperp_RMS/scale
+      uperp_RMS_scaleCorr_err   =  uperp_RMS/scale*sqrt(uperp_RMS_err**2/uperp_RMS**2 + scale_err**2/scale**2)
+      val = 0.5*(b[0]+b[1])
+      nbin = v['upara'][mv['name']]["scale"].FindBin(val)
+      v['upara'][mv['name']]["scale"].SetBinContent(nbin, scale)
+      v['upara'][mv['name']]["scale"].SetBinContentError(nbin, scale_err)
+      v['upara'][mv['name']]["RMS"].SetBinContent(nbin, upara_RMS)
+      v['upara'][mv['name']]["RMS"].SetBinContentError(nbin, upara_RMS_err)
+      v['upara'][mv['name']]["RMScorr"].SetBinContent(nbin, upara_RMS_scaleCorr)
+      v['upara'][mv['name']]["RMScorr"].SetBinContentError(nbin, upara_RMS_scaleCorr_err)
+      v['uperp'][mv['name']]["RMS"].SetBinContent(nbin, uperp_RMS)
+      v['uperp'][mv['name']]["RMS"].SetBinContentError(nbin, uperp_RMS_err)
+      v['uperp'][mv['name']]["RMScorr"].SetBinContent(nbin, uperp_RMS_scaleCorr)
+      v['uperp'][mv['name']]["RMScorr"].SetBinContentError(nbin, uperp_RMS_scaleCorr_err)
  
 # OBJ: TBranch LepOther_charge charge for Leptons after the preselection : 0 at: 0x4e11dc0
 # OBJ: TBranch LepOther_tightId  POG Tight ID (for electrons it's configured in the analyzer) for Leptons after the preselection : 0 at: 0x4e129a0
