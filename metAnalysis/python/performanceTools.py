@@ -6,9 +6,9 @@ from Workspace.HEPHYPythonTools.helpers import getObjFromFile, getChain, getChun
 
 
 def findBin(v, varValue):
-  for b in v['bins']:
-    if varValue>=b[0] and varValue<b[1]:
-      return b
+  for bin in v['bins']:
+    if varValue>=bin[0] and varValue<bin[1]:
+      return bin
 
 def makeMETPerformanceHistos(setup):
   small = True if setup.has_key('small') and setup['small'] else False
@@ -76,25 +76,25 @@ def makeMETPerformanceHistos(setup):
 
   for name, v in setup["variables"].iteritems():
     for mname, mv in setup["metVariables"].iteritems():
-      for b in v['bins']:
-        upara_mean      = v['upara'][mname][b].GetMean()
-        upara_mean_err  = v['upara'][mname][b].GetMeanError()
-        uperp_mean      = v['uperp'][mname][b].GetMean()
-        uperp_mean_err  = v['uperp'][mname][b].GetMeanError()
-        upara_RMS      = v['upara'][mname][b].GetRMS()
-        upara_RMS_err  = v['upara'][mname][b].GetRMSError()
-        uperp_RMS      = v['uperp'][mname][b].GetRMS()
-        uperp_RMS_err  = v['uperp'][mname][b].GetRMSError()
-        qt_mean       = v['qt'][mname][b].GetMean()
-        qt_mean_err   = v['qt'][mname][b].GetMeanError()
-        if not qt_mean>0:continue
+      for bin in v['bins']:
+        upara_mean      = v['upara'][mname][bin].GetMean()
+        upara_mean_err  = v['upara'][mname][bin].GetMeanError()
+        uperp_mean      = v['uperp'][mname][bin].GetMean()
+        uperp_mean_err  = v['uperp'][mname][bin].GetMeanError()
+        upara_RMS      = v['upara'][mname][bin].GetRMS()
+        upara_RMS_err  = v['upara'][mname][bin].GetRMSError()
+        uperp_RMS      = v['uperp'][mname][bin].GetRMS()
+        uperp_RMS_err  = v['uperp'][mname][bin].GetRMSError()
+        qt_mean       = v['qt'][mname][bin].GetMean()
+        qt_mean_err   = v['qt'][mname][bin].GetMeanError()
+        if (not qt_mean>0) or (not upara_RMS>0) or (not uperp_RMS>0):continue
         scale         =  - upara_mean / qt_mean 
         scale_err     =  upara_mean / qt_mean * sqrt(upara_mean_err**2/upara_mean**2 + qt_mean_err**2/qt_mean**2)
         upara_RMS_scaleCorr       =  upara_RMS/scale
         upara_RMS_scaleCorr_err   =  upara_RMS/scale*sqrt(upara_RMS_err**2/upara_RMS**2 + scale_err**2/scale**2)
         uperp_RMS_scaleCorr       =  uperp_RMS/scale
         uperp_RMS_scaleCorr_err   =  uperp_RMS/scale*sqrt(uperp_RMS_err**2/uperp_RMS**2 + scale_err**2/scale**2)
-        val = 0.5*(b[0]+b[1])
+        val = 0.5*(bin[0]+bin[1])
         nbin = v['upara'][mname]["scale"].FindBin(val)
         v['upara'][mname]["scale"].SetBinContent(nbin, scale)
         v['upara'][mname]["scale"].SetBinError(nbin, scale_err)
