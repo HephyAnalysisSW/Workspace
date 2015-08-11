@@ -21,9 +21,12 @@ cWJets  = getChain(WJetsHTToLNu[lepSel],histname='')
 cTTJets = getChain(ttJets[lepSel],histname='')
 cDY = getChain(DY[lepSel],histname='')
 cDY.GetEntries()
-cRest = getChain([DY[lepSel], singleTop[lepSel], TTVH[lepSel]],histname='')#no QCD 
-cBkg = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]],histname='')#no QCD
-cData = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]] , histname='')
+cRest = getChain([singleTop[lepSel]],histname='')#no QCD no TTVH no DY (too low statistics!)
+#cBkg = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]],histname='')#no QCD
+#cData = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]] , histname='')
+cBkg = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], singleTop[lepSel]],histname='')#no QCD, no TTVH, no DY
+cData = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], singleTop[lepSel]] , histname='')
+
 
 #cData = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]],  ttJets[lepSel] , histname='')#no QCD , ##to calculate signal contamination
 #cData = cBkg
@@ -50,7 +53,7 @@ if signal:
 ROOT.TH1F().SetDefaultSumw2()
 
 prefix = 'singleLeptonic_Spring15_'
-presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80"
+presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&Flag_EcalDeadCellTriggerPrimitiveFilter&&acos(cos(Jet_phi[0]-met_phi))>0.45&&acos(cos(Jet_phi[1]-met_phi))>0.45"
 
 btagString = 'nBJetMediumCSV30'
 
@@ -142,7 +145,7 @@ for srNJet in signalRegions:
 
       #bins[htb][stb][srNJet]=rd
       bins[srNJet][stb][htb] = rd
-path = '/data/'+username+'/Spring15/firstPrediction/rCS_0b_'+str(lumi)+'/'
+path = '/data/'+username+'/Spring15/PredictionWithCorrectionNoDY/rCS_0b_'+str(lumi)+'/'
 if not os.path.exists(path):
   os.makedirs(path)
 pickle.dump(bins, file(path+prefix+'_estimationResults_pkl','w'))

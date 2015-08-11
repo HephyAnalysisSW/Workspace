@@ -29,7 +29,7 @@ cWJets  = getChain(WJetsHTToLNu[lepSel],histname='',maxN=maxN)
 
 from Workspace.HEPHYPythonTools.user import username
 uDir = username[0]+'/'+username
-subDir = 'Spring15/rCS/dynamicdPhiMetJetEcalHoleFlag2'
+subDir = 'Spring15/rCS/dPhiMetJetEcalHoleFlagCutString'
 #subDir = 'pngCMG2/rCS/PHYS14V3/useRecoMet'
 
 path = '/afs/hephy.at/user/'+uDir+'/www/'+subDir+'/'
@@ -61,7 +61,7 @@ njreg = [(3,3),(4,4),(5,5),(6,7),(8,-1)]#,(7,7),(8,8),(9,9)]
 nbjreg = [(0,0),(1,1),(2,2)]
 
 #Usage of GenMet for deltaPhi / rCS
-GenMetSwitch = True
+GenMetSwitch = False
 useOnlyGenMetPt = False
 useOnlyGenMetPhi = False
 
@@ -76,7 +76,7 @@ l_H     = ngNuEFromW+"+"+ngNuMuFromW+"==1&&"+ngNuTauFromW+"==0"
 #presel='singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&Max$(abs(Jet_pt-Jet_mcPt))<50'
 #presel='singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&(sqrt((-met_genPt*cos(met_genPhi)+met_pt*cos(met_phi))**2+(-met_genPt*sin(met_genPhi)+met_pt*sin(met_phi))**2)/met_genPt)<1'
 
-presel='singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&Flag_EcalDeadCellTriggerPrimitiveFilter'
+presel='singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&Flag_EcalDeadCellTriggerPrimitiveFilter&&acos(cos(Jet_phi[0]-met_phi))>0.45&&acos(cos(Jet_phi[1]-met_phi))>0.45'
 prefix = presel.split('&&')[0]+'_'
 
 ##2D plots of yields
@@ -193,16 +193,17 @@ for lep, pdgId in channels:
           poscut = 'leptonPdg>0&&'+cut
           negcut = 'leptonPdg<0&&'+cut
           dPhiCut = dynDeltaPhi(1.0,stb, htb, njb)
-          if njb[1]<5 and njb[1]>0:
-            dPhiJetMetCut = 0.6
-          else:
-            dPhiJetMetCut = 0.45
-          rcs = getRCSel(c, cut, dPhiCut, dPhiMetJet=dPhiJetMetCut)
-          rcsPos = getRCSel(c, poscut, dPhiCut, dPhiMetJet=dPhiJetMetCut)
-          rcsNeg = getRCSel(c, negcut, dPhiCut, dPhiMetJet=dPhiJetMetCut)
-          #rcs = getRCS(c, cut, dPhiCut, useGenMet=GenMetSwitch, useOnlyGenMetPt=useOnlyGenMetPt, useOnlyGenMetPhi=useOnlyGenMetPhi, useWeight=False)
-          #rcsPos = getRCS(c, poscut, dPhiCut, useGenMet=GenMetSwitch, useOnlyGenMetPt=useOnlyGenMetPt, useOnlyGenMetPhi=useOnlyGenMetPhi, useWeight=False)
-          #rcsNeg = getRCS(c, negcut, dPhiCut, useGenMet=GenMetSwitch, useOnlyGenMetPt=useOnlyGenMetPt, useOnlyGenMetPhi=useOnlyGenMetPhi, useWeight=False)
+          #if njb[1]<5 and njb[1]>0:
+          #  dPhiJetMetCut = 0.6
+          #else:
+          #  dPhiJetMetCut = 0.45
+          dPhiJetMetCut = 0.45
+          #rcs = getRCSel(c, cut, dPhiCut, dPhiMetJet=dPhiJetMetCut)
+          #rcsPos = getRCSel(c, poscut, dPhiCut, dPhiMetJet=dPhiJetMetCut)
+          #rcsNeg = getRCSel(c, negcut, dPhiCut, dPhiMetJet=dPhiJetMetCut)
+          rcs = getRCS(c, cut, dPhiCut, useGenMet=GenMetSwitch, useOnlyGenMetPt=useOnlyGenMetPt, useOnlyGenMetPhi=useOnlyGenMetPhi, useWeight=False)
+          rcsPos = getRCS(c, poscut, dPhiCut, useGenMet=GenMetSwitch, useOnlyGenMetPt=useOnlyGenMetPt, useOnlyGenMetPhi=useOnlyGenMetPhi, useWeight=False)
+          rcsNeg = getRCS(c, negcut, dPhiCut, useGenMet=GenMetSwitch, useOnlyGenMetPt=useOnlyGenMetPt, useOnlyGenMetPhi=useOnlyGenMetPhi, useWeight=False)
           print rcs, dPhiCut
           res = rcs['rCS']
           resErr = rcs['rCSE_sim']

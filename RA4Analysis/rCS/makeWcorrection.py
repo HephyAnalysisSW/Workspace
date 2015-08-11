@@ -42,7 +42,8 @@ ROOT.gStyle.SetOptStat(0)
 ROOT.TH1F().SetDefaultSumw2()
 
 btreg = (0,0)
-njreg = [(2,3),(4,4),(5,5),(6,7),(8,-1)]
+#njreg = [(2,3),(4,4),(5,5),(6,7),(8,-1)]
+njreg = [(3,4),(5,5),(6,7),(8,-1)]
 
 presel='singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80'
 prefix = presel.split('&&')[0]+'_'
@@ -143,7 +144,15 @@ for srNJet in sorted(signalRegions):
       FitParK = FitFunc.GetParameter(1)
       FitParKError = FitFunc.GetParError(1)
       rcsDict_neg[srNJet][stb][htb].update({'D':FitParD, 'DErr':FitParDError, 'K':FitParK, 'Kerr':FitParKError})
-      
+
+picklePath = '/data/'+username+'/Spring15/firstPrediction/rCS_0b_3.0/'
+if not os.path.exists(picklePath):
+  os.makedirs(picklePath)
+pickle.dump(rcsDict_pos, file(picklePath+'correction_Wrcs_PosPdg_pkl','w'))
+pickle.dump(rcsDict_neg, file(picklePath+'correction_Wrcs_NegPdg_pkl','w'))
+pickle.dump(rcsDict, file(picklePath+'correction_Wrcs_pkl','w'))
+
+     
       #c1 = ROOT.TCanvas('c1','c1',600,600)
       #pad1 = ROOT.TPad('Pad','Pad',0.,0.0,1.,1.)
       #pad1.SetLeftMargin(0.15)

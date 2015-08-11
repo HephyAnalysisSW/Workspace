@@ -6,7 +6,7 @@ from math import sqrt, pi, cosh
 from array import array
 
 def makeWeight(lumi=4., sampleLumi=3.):
-  weight_str = '(((weight)/'+str(sampleLumi)'+)*'+str(lumi)+')'
+  weight_str = '(((weight)/'+str(sampleLumi)+')*'+str(lumi)+')'
   weight_err_str = '('+weight_str+'*'+weight_str+')'
   return weight_str, weight_err_str
 
