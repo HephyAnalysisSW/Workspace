@@ -1,5 +1,6 @@
 import copy, os, sys
-spring15_soft_sample_dir = "/data/nrad/cmgTuples/postProcessed_Spring15/"
+#spring15_soft_sample_dir = "/data/nrad/cmgTuples/postProcessed_Spring15/"
+spring15_soft_sample_dir = "/afs/hephy.at/work/n/nrad/cmgTuplesPostProcessed/Spring15_v0"
 
 
 
