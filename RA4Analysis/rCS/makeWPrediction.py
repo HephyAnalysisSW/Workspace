@@ -13,13 +13,15 @@ from rCShelpers import *
 
 #cWJets  = getChain(WJetsHTToLNu[lepSel],histname='')
 #cTTJets = getChain(ttJets[lepSel],histname='')
-#cRest = getChain([DY[lepSel], singleTop[lepSel], TTVH[lepSel]],histname='')#no QCD 
-#cBkg = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]],histname='')#no QCD
+#cBkg = getChain([DY[lepSel], singleTop[lepSel], TTVH[lepSel]],histname='')#no QCD 
+#cData = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]],histname='')#no QCD
 #for c in [cWJets, cTTJets, cRest, cBkg]:
 #  c.SetAlias('nBTagCMVA', nBTagCMVA)
 
 #ROOT_colors = [ROOT.kBlack, ROOT.kRed-7, ROOT.kBlue-2, ROOT.kGreen+3, ROOT.kOrange+1,ROOT.kRed-3, ROOT.kAzure+6, ROOT.kCyan+3, ROOT.kOrange , ROOT.kRed-10]
 #dPhiStr = "acos((leptonPt+met*cos(leptonPhi-metPhi))/sqrt(leptonPt**2+met**2+2*met*leptonPt*cos(leptonPhi-metPhi)))"
+
+dPhiStr = 'deltaPhi_Wl'
 
 ROOT.TH1F().SetDefaultSumw2()
 
@@ -53,15 +55,17 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, btagVa
   cBkg = samples['Bkg'] 
   cData = samples['Data']
   rd={}
-
+  
+  nJetCR = (3,4)
+  
   #TT Jets yield in crNJet, no b-tag cut, low DPhi
-  fit_crName, fit_crCut = nameAndCut(stb, htb, (2,3), btb=None, presel=presel+'&&abs(leptonPdg)==13', btagVar = btagVarString) 
+  fit_crName, fit_crCut = nameAndCut(stb, htb, nJetCR, btb=None, presel=presel+'&&abs(leptonPdg)==13', btagVar = btagVarString) 
   fit_crNJet_lowDPhi = binnedNBTagsFit(fit_crCut+"&&"+dPhiStr+"<"+str(dPhiCut), samples=samples, nBTagVar = btagVarString , lumi=lumi, prefix=fit_crName)
 #  fit_crNJet_lowDPhi = binnedNBTagsFit(fit_crCut+"&&"+dPhiStr+"<"+str(dPhiCut), samples = {'W':cWJets, 'TT':cTTJets}, nBTagVar = 'nBJetMedium25', prefix=fit_crName)
   rd['fit_crNJet_lowDPhi'] = fit_crNJet_lowDPhi
   
-  rCS_cr_Name_1b, rCS_cr_Cut_1b = nameAndCut(stb, htb, (2,3), btb=(1,1), presel=presel, btagVar = btagVarString) 
-  rCS_cr_Name_0b, rCS_cr_Cut_0b = nameAndCut(stb, htb, (2,3), btb=(0,0), presel=presel+'&&abs(leptonPdg)==13', btagVar = btagVarString) #THIS ONE GOT CHANGED FROM 2-3 TO 2-4!
+  rCS_cr_Name_1b, rCS_cr_Cut_1b = nameAndCut(stb, htb, nJetCR, btb=(1,1), presel=presel, btagVar = btagVarString) 
+  rCS_cr_Name_0b, rCS_cr_Cut_0b = nameAndCut(stb, htb, nJetCR, btb=(0,0), presel=presel+'&&abs(leptonPdg)==13', btagVar = btagVarString) #THIS ONE GOT CHANGED FROM 2-3 TO 2-4!
   #rCS_cr_Name_0b, rCS_cr_Cut_0b = nameAndCut(stb, htb, (2,3), btb=(0,0), presel=presel, btagVar = btagVarString)
   #rCS_crNJet_1b = getRCS(cBkg, rCS_cr_Cut_1b,  dPhiCut) 
   rCS_crNJet_1b = getRCS(cData, rCS_cr_Cut_1b,  dPhiCut) 
@@ -72,7 +76,7 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, btagVa
   rd['rCS_crNJet_0b_onlyTT'] = rCS_crNJet_0b_onlyTT
 
   #low njet CR: crNJet, 0-btags, low DPhi
-  crName, crCut = nameAndCut(stb, htb, (2,3),btb=(0,0), presel=presel, btagVar=btagVarString) 
+  crName, crCut = nameAndCut(stb, htb, nJetCR,btb=(0,0), presel=presel, btagVar=btagVarString) 
 
   yTT_crNJet_0b_lowDPhi         = fit_crNJet_lowDPhi['TT_AllPdg']['yield']*fit_crNJet_lowDPhi['TT_AllPdg']['template'].GetBinContent(1)
   yTT_Var_crNJet_0b_lowDPhi     = fit_crNJet_lowDPhi['TT_AllPdg']['yieldVar']*fit_crNJet_lowDPhi['TT_AllPdg']['template'].GetBinContent(1)**2
@@ -94,43 +98,43 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, btagVa
 #  print "Subtract denominator", yTT_crNJet_0b_lowDPhi,'true', yTT_crNJet_0b_lowDPhi_truth
   
   #calculate corrected rCS for W
-  y_crNJet_0b_highDPhi     = getYieldFromChain(cBkg, crCut+"&&abs(leptonPdg)==13&&"+dPhiStr+">"+str(dPhiCut), weight = weight_str)
-  y_Var_crNJet_0b_highDPhi = getYieldFromChain(cBkg, crCut+"&&abs(leptonPdg)==13&&"+dPhiStr+">"+str(dPhiCut), weight = weight_err_str)
-  y_crNJet_0b_lowDPhi      = getYieldFromChain(cBkg, crCut+"&&abs(leptonPdg)==13&&"+dPhiStr+"<"+str(dPhiCut), weight = weight_str)
-  y_Var_crNJet_0b_lowDPhi  = getYieldFromChain(cBkg, crCut+"&&abs(leptonPdg)==13&&"+dPhiStr+"<"+str(dPhiCut), weight = weight_err_str)
+  y_crNJet_0b_highDPhi     = getYieldFromChain(cData, crCut+"&&abs(leptonPdg)==13&&"+dPhiStr+">"+str(dPhiCut), weight = weight_str)
+  y_Var_crNJet_0b_highDPhi = getYieldFromChain(cData, crCut+"&&abs(leptonPdg)==13&&"+dPhiStr+">"+str(dPhiCut), weight = weight_err_str)
+  y_crNJet_0b_lowDPhi      = getYieldFromChain(cData, crCut+"&&abs(leptonPdg)==13&&"+dPhiStr+"<"+str(dPhiCut), weight = weight_str)
+  y_Var_crNJet_0b_lowDPhi  = getYieldFromChain(cData, crCut+"&&abs(leptonPdg)==13&&"+dPhiStr+"<"+str(dPhiCut), weight = weight_err_str)
   rCS_W_crNJet_0b_corr     = (y_crNJet_0b_highDPhi - yTT_crNJet_0b_highDPhi)/(y_crNJet_0b_lowDPhi - yTT_crNJet_0b_lowDPhi)
   rCS_Var_W_crNJet_0b_corr = rCS_W_crNJet_0b_corr**2*(\
       (y_Var_crNJet_0b_highDPhi + yTT_Var_crNJet_0b_highDPhi)/(y_crNJet_0b_highDPhi - yTT_crNJet_0b_highDPhi)**2 
      +(y_Var_crNJet_0b_lowDPhi + yTT_Var_crNJet_0b_lowDPhi)/(y_crNJet_0b_lowDPhi - yTT_crNJet_0b_lowDPhi)**2
       )
   rCS_W_crNJet_0b_notcorr     = (y_crNJet_0b_highDPhi )/(y_crNJet_0b_lowDPhi )
-  rCS_Var_W_crNJet_0b_notcorr = rCS_W_crNJet_0b_notcorr**2*( (y_Var_crNJet_0b_highDPhi )/(y_crNJet_0b_highDPhi)**2 + (y_Var_crNJet_0b_lowDPhi)/(y_crNJet_0b_lowDPhi)**2 )
+  rCS_Var_W_crNJet_0b_notcorr = rCS_W_crNJet_0b_notcorr**2*( UncertaintyDivision(y_Var_crNJet_0b_highDPhi,y_crNJet_0b_highDPhi**2) + (y_Var_crNJet_0b_lowDPhi)/(y_crNJet_0b_lowDPhi)**2 )
 
   #calculate corrected rCS(+-) for W(+-) [because of yTT is symmetric in charge one have to subtract 0.5*yTT]
   #PosPdg
-  y_crNJet_0b_highDPhi_PosPdg     = getYieldFromChain(cBkg, 'leptonPdg>0&&abs(leptonPdg)==13&&'+crCut+"&&"+dPhiStr+">"+str(dPhiCut), weight = weight_str)
-  y_Var_crNJet_0b_highDPhi_PosPdg = getYieldFromChain(cBkg, 'leptonPdg>0&&abs(leptonPdg)==13&&'+crCut+"&&"+dPhiStr+">"+str(dPhiCut), weight = weight_err_str)
-  y_crNJet_0b_lowDPhi_PosPdg      = getYieldFromChain(cBkg, 'leptonPdg>0&&abs(leptonPdg)==13&&'+crCut+"&&"+dPhiStr+"<"+str(dPhiCut), weight = weight_str)
-  y_Var_crNJet_0b_lowDPhi_PosPdg  = getYieldFromChain(cBkg, 'leptonPdg>0&&abs(leptonPdg)==13&&'+crCut+"&&"+dPhiStr+"<"+str(dPhiCut), weight = weight_err_str)
+  y_crNJet_0b_highDPhi_PosPdg     = getYieldFromChain(cData, 'leptonPdg>0&&abs(leptonPdg)==13&&'+crCut+"&&"+dPhiStr+">"+str(dPhiCut), weight = weight_str)
+  y_Var_crNJet_0b_highDPhi_PosPdg = getYieldFromChain(cData, 'leptonPdg>0&&abs(leptonPdg)==13&&'+crCut+"&&"+dPhiStr+">"+str(dPhiCut), weight = weight_err_str)
+  y_crNJet_0b_lowDPhi_PosPdg      = getYieldFromChain(cData, 'leptonPdg>0&&abs(leptonPdg)==13&&'+crCut+"&&"+dPhiStr+"<"+str(dPhiCut), weight = weight_str)
+  y_Var_crNJet_0b_lowDPhi_PosPdg  = getYieldFromChain(cData, 'leptonPdg>0&&abs(leptonPdg)==13&&'+crCut+"&&"+dPhiStr+"<"+str(dPhiCut), weight = weight_err_str)
   rCS_W_PosPdg_crNJet_0b_corr     = (y_crNJet_0b_highDPhi_PosPdg - (0.5*yTT_crNJet_0b_highDPhi))/(y_crNJet_0b_lowDPhi_PosPdg - (0.5*yTT_crNJet_0b_lowDPhi))
   rCS_Var_W_PosPdg_crNJet_0b_corr = rCS_W_PosPdg_crNJet_0b_corr**2*(\
       (y_Var_crNJet_0b_highDPhi_PosPdg + (0.5*yTT_Var_crNJet_0b_highDPhi))/(y_crNJet_0b_highDPhi_PosPdg - (0.5*yTT_crNJet_0b_highDPhi))**2 
      +(y_Var_crNJet_0b_lowDPhi_PosPdg + (0.5*yTT_Var_crNJet_0b_lowDPhi))/(y_crNJet_0b_lowDPhi_PosPdg - (0.5*yTT_crNJet_0b_lowDPhi))**2
       )
   rCS_W_PosPdg_crNJet_0b_notcorr     = (y_crNJet_0b_highDPhi_PosPdg )/(y_crNJet_0b_lowDPhi_PosPdg )
-  rCS_Var_W_PosPdg_crNJet_0b_notcorr = rCS_W_PosPdg_crNJet_0b_notcorr**2*( (y_Var_crNJet_0b_highDPhi_PosPdg )/(y_crNJet_0b_highDPhi_PosPdg)**2 + (y_Var_crNJet_0b_lowDPhi_PosPdg)/(y_crNJet_0b_lowDPhi_PosPdg)**2 )
+  rCS_Var_W_PosPdg_crNJet_0b_notcorr = rCS_W_PosPdg_crNJet_0b_notcorr**2*( UncertaintyDivision(y_Var_crNJet_0b_highDPhi_PosPdg,y_crNJet_0b_highDPhi_PosPdg**2) + (y_Var_crNJet_0b_lowDPhi_PosPdg)/(y_crNJet_0b_lowDPhi_PosPdg)**2 )
   #NegPdg
-  y_crNJet_0b_highDPhi_NegPdg     = getYieldFromChain(cBkg, 'leptonPdg<0&&abs(leptonPdg)==13&&'+crCut+"&&"+dPhiStr+">"+str(dPhiCut), weight = weight_str)
-  y_Var_crNJet_0b_highDPhi_NegPdg = getYieldFromChain(cBkg, 'leptonPdg<0&&abs(leptonPdg)==13&&'+crCut+"&&"+dPhiStr+">"+str(dPhiCut), weight = weight_err_str)
-  y_crNJet_0b_lowDPhi_NegPdg      = getYieldFromChain(cBkg, 'leptonPdg<0&&abs(leptonPdg)==13&&'+crCut+"&&"+dPhiStr+"<"+str(dPhiCut), weight = weight_str)
-  y_Var_crNJet_0b_lowDPhi_NegPdg  = getYieldFromChain(cBkg, 'leptonPdg<0&&abs(leptonPdg)==13&&'+crCut+"&&"+dPhiStr+"<"+str(dPhiCut), weight = weight_err_str)
+  y_crNJet_0b_highDPhi_NegPdg     = getYieldFromChain(cData, 'leptonPdg<0&&abs(leptonPdg)==13&&'+crCut+"&&"+dPhiStr+">"+str(dPhiCut), weight = weight_str)
+  y_Var_crNJet_0b_highDPhi_NegPdg = getYieldFromChain(cData, 'leptonPdg<0&&abs(leptonPdg)==13&&'+crCut+"&&"+dPhiStr+">"+str(dPhiCut), weight = weight_err_str)
+  y_crNJet_0b_lowDPhi_NegPdg      = getYieldFromChain(cData, 'leptonPdg<0&&abs(leptonPdg)==13&&'+crCut+"&&"+dPhiStr+"<"+str(dPhiCut), weight = weight_str)
+  y_Var_crNJet_0b_lowDPhi_NegPdg  = getYieldFromChain(cData, 'leptonPdg<0&&abs(leptonPdg)==13&&'+crCut+"&&"+dPhiStr+"<"+str(dPhiCut), weight = weight_err_str)
   rCS_W_NegPdg_crNJet_0b_corr     = (y_crNJet_0b_highDPhi_NegPdg - (0.5*yTT_crNJet_0b_highDPhi))/(y_crNJet_0b_lowDPhi_NegPdg - (0.5*yTT_crNJet_0b_lowDPhi))
   rCS_Var_W_NegPdg_crNJet_0b_corr = rCS_W_NegPdg_crNJet_0b_corr**2*(\
       (y_Var_crNJet_0b_highDPhi_NegPdg + (0.5*yTT_Var_crNJet_0b_highDPhi))/(y_crNJet_0b_highDPhi_NegPdg - (0.5*yTT_crNJet_0b_highDPhi))**2
      +(y_Var_crNJet_0b_lowDPhi_NegPdg + (0.5*yTT_Var_crNJet_0b_lowDPhi))/(y_crNJet_0b_lowDPhi_NegPdg - (0.5*yTT_crNJet_0b_lowDPhi))**2
       )
   rCS_W_NegPdg_crNJet_0b_notcorr     = (y_crNJet_0b_highDPhi_NegPdg )/(y_crNJet_0b_lowDPhi_NegPdg )
-  rCS_Var_W_NegPdg_crNJet_0b_notcorr = rCS_W_NegPdg_crNJet_0b_notcorr**2*( (y_Var_crNJet_0b_highDPhi_NegPdg )/(y_crNJet_0b_highDPhi_NegPdg)**2 + (y_Var_crNJet_0b_lowDPhi_NegPdg)/(y_crNJet_0b_lowDPhi_NegPdg)**2 )
+  rCS_Var_W_NegPdg_crNJet_0b_notcorr = rCS_W_NegPdg_crNJet_0b_notcorr**2*( UncertaintyDivision(y_Var_crNJet_0b_highDPhi_NegPdg,y_crNJet_0b_highDPhi_NegPdg**2) + (y_Var_crNJet_0b_lowDPhi_NegPdg)/(y_crNJet_0b_lowDPhi_NegPdg)**2 )
 
   rd['y_crNJet_0b_highDPhi']       = y_crNJet_0b_highDPhi
   rd['y_Var_crNJet_0b_highDPhi']   = y_Var_crNJet_0b_highDPhi

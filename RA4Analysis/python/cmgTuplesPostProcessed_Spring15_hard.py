@@ -42,11 +42,34 @@ singleTop=makeSample({\
 "bins" : ["ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1", "ST_t-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1", "ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1", "ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1"],
 'dir' : "/data/easilar/cmgTuples/postProcessed_Spring15_AllFlags/",
 })
+#DY=makeSample({\
+#"name" : "DY",
+#"bins" : ["DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8"],
+#'dir' : "/data/easilar/cmgTuples/postProcessed_Spring15_AllFlags/",
+#})
 DY=makeSample({\
 "name" : "DY",
 "bins" : ["DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8"],
+'dir' : "/data/dspitzbart/cmgTuples/postProcessed_Spring15_AllFlags2/",
+})
+
+
+QCD=makeSample({\
+"name" : "QCD",
+"bins" : \
+["QCD_Pt_10to15_TuneCUETP8M1_13TeV_pythia8","QCD_Pt_15to30_TuneCUETP8M1_13TeV_pythia8",\
+"QCD_Pt_30to50_TuneCUETP8M1_13TeV_pythia8","QCD_Pt_50to80_TuneCUETP8M1_13TeV_pythia8",\
+"QCD_Pt_80to120_TuneCUETP8M1_13TeV_pythia8","QCD_Pt_120to170_TuneCUETP8M1_13TeV_pythia8",\
+"QCD_Pt_170to300_TuneCUETP8M1_13TeV_pythia8","QCD_Pt_300to470_TuneCUETP8M1_13TeV_pythia8",\
+"QCD_Pt_470to600_TuneCUETP8M1_13TeV_pythia8","QCD_Pt_600to800_TuneCUETP8M1_13TeV_pythia8",\
+"QCD_Pt_800to1000_TuneCUETP8M1_13TeV_pythia8","QCD_Pt_1000to1400_TuneCUETP8M1_13TeV_pythia8",\
+"QCD_Pt_1400to1800_TuneCUETP8M1_13TeV_pythia8","QCD_Pt_1800to2400_TuneCUETP8M1_13TeV_pythia8",\
+"QCD_Pt_2400to3200_TuneCUETP8M1_13TeV_pythia8","QCD_Pt_3200toInf_TuneCUETP8M1_13TeV_pythia8"],
 'dir' : "/data/easilar/cmgTuples/postProcessed_Spring15_AllFlags/",
 })
+
+
+
 #QCD=makeSample({\
 #"name" : "QCD",
 #"bins" : ["QCD_HT_100To250","QCD_HT_250To500", "QCD_HT_500To1000", "QCD_HT_1000ToInf"],
@@ -71,6 +94,8 @@ DY=makeSample({\
 #"bins": ["T5Full_1500_800_100"],
 #'dir' : "/data/easilar/cmgTuples/postProcessed_v0/singleLepton/",
 #}
+
+
 
 
 #allSignalStrings=[\

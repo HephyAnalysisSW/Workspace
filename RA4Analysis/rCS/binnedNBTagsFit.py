@@ -8,7 +8,7 @@ from Workspace.HEPHYPythonTools.user import username
 from math import pi, sqrt
 from rCShelpers import *# weight_str , weight_err_str , lumi
 
-def binnedNBTagsFit(cut, samples, nBTagVar = 'nBJetMediumCSV30', lumi=4.0, prefix="", printDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/PHYS14v3/signal_contamination_tests/templateFit_'+str(lumi)+'_data/'):
+def binnedNBTagsFit(cut, samples, nBTagVar = 'nBJetMediumCSV30', lumi=4.0, prefix="", printDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/nBtagFits_W3-4/templateFit/'):
   print "LUMI:" , lumi
   if not os.path.exists(printDir):
      os.makedirs(printDir) 

@@ -6,14 +6,32 @@
 #python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=WJetsToLNu_HT600toInf &
 #
 #python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=DYJetsToLL_M_50  &
-python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=TToLeptons_sch  &
-python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=TToLeptons_tch  &
-python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=TBar_tWch  &
-python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=T_tWch  &
+#python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=TToLeptons_sch  &
+#python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=TToLeptons_tch  &
+#python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=TBar_tWch  &
+#python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=T_tWch  &
 
 #python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=data_mu  &
 #python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=data_ele  &
 
+#python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=QCD_Pt10to15_50ns    
+#python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=QCD_Pt15to30_50ns
+#python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=QCD_Pt30to50_50ns
+#python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=QCD_Pt50to80_50ns      &
+#python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=QCD_Pt80to120_50ns     &
+#python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=QCD_Pt120to170_50ns    &
+#python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=QCD_Pt170to300_50ns    &
+#python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=QCD_Pt300to470_50ns    &
+#python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=QCD_Pt470to600_50ns    &
+#python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=QCD_Pt600to800_50ns    &
+#python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=QCD_Pt800to1000_50ns   &
+#python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=QCD_Pt1000to1400_50ns  &
+#python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=QCD_Pt1400to1800_50ns  &
+#python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=QCD_Pt1800to2400_50ns  &
+#python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=QCD_Pt2400to3200_50ns  &
+#python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=QCD_Pt3200toInf_25ns   &
+
+python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=DYJetsToLL_M_50_25ns   &
 
 
 #########Phys14###############
