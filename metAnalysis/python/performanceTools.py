@@ -34,7 +34,7 @@ def makeMETPerformanceHistos(setup):
         hname = name+'_'.join([str(x) for x in b])
         v['uperp'][mname][b] = ROOT.TH1D(hname+'_'+mname+'_uperp', hname+'_'+mname+'_uperp', 400,-200,200) 
         v['upara'][mname][b] = ROOT.TH1D(hname+'_'+mname+'_upara', hname+'_'+mname+'_upara', 500,-400,100) 
-        v['qt'][mname][b] = ROOT.TH1D(hname+'_'+mname+'_qt', hname+'_'+mname+'_qt', 500,-400,100) 
+        v['qt'][mname][b] = ROOT.TH1D(hname+'_'+mname+'_qt', hname+'_'+mname+'_qt', 500,0,500) 
 
   for s in setup["samples"]:
     for b in s['bins']:
@@ -49,7 +49,7 @@ def makeMETPerformanceHistos(setup):
         l0, l1 = muons
         if not setup['massWindow'](l0,l1):continue
         qx = l0['pt']*cos(l0['phi']) + l1['pt']*cos(l1['phi'])  
-        qy = l0['pt']*sin(l0['phi']) + l1['pt']*cos(l1['phi']) 
+        qy = l0['pt']*sin(l0['phi']) + l1['pt']*sin(l1['phi']) 
   #      qphi = atan2(qy, qx)
         qt = sqrt(qx**2+qy**2)
   #      print l0, l1
