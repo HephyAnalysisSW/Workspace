@@ -10,13 +10,14 @@ from Workspace.metAnalysis.performanceTools import makeMETPerformanceHistos
 from Workspace.RA4Analysis.simplePlotHelpers import plot, stack, drawNMStacks
 
 lumi=100.
-small = False
+small = True 
 
 samples=[ 
-  {"name":"DY", "bins":[DYJetsToLL_M50_25ns], "legendText":"Drell-Yan"}
+#  {"name":"DY", "bins":[DYJetsToLL_M50_25ns], "legendText":"Drell-Yan"}
+  {"name":"DY", "bins":[DYJetsToLL_M50_25ns_CERNRerun], "legendText":"Drell-Yan"}
 ]
 
-maxN = 10 if small else -1
+maxN = 100 if small else -1
 for s in samples:
   totalYield=0
   for b in s["bins"]:
@@ -39,7 +40,10 @@ variables = {
 }
 metVariables = {
   'type1':{'ptFunc':lambda c:getVarValue(c,"met_pt"), 'phiFunc':lambda c:getVarValue(c,"met_phi")},
-  'noHF': {'ptFunc':lambda c:getVarValue(c,"metNoHF_pt"), 'phiFunc':lambda c:getVarValue(c,"metNoHF_phi")}
+  'noHF': {'ptFunc':lambda c:getVarValue(c,"metNoHF_pt"), 'phiFunc':lambda c:getVarValue(c,"metNoHF_phi")},
+#  'perfect': {'ptFunc':lambda c:0., 'phiFunc':lambda c:0.}
+  'type1raw': {'ptFunc':lambda c:getVarValue(c,"met_rawPt"), 'phiFunc':lambda c:getVarValue(c,"met_rawPhi")},
+  'noHFraw':  {'ptFunc':lambda c:getVarValue(c,"metNoHF_rawPt"), 'phiFunc':lambda c:getVarValue(c,"metNoHF_rawPhi")},
 }
 
 presel = "1"
@@ -75,7 +79,7 @@ setup = {
     'preselection':cut,
     'leptons':getMuons,
     'massWindow':massWindow,
-    'small':small
+    'maxEvents':100000
     }
 
 setup = makeMETPerformanceHistos(setup) 
@@ -95,7 +99,10 @@ for name, v in setup["variables"].iteritems():
 
   p_type1 = plot.fromHisto( v['upara']['type1']['scale'], style={'legendText':'DY+Jets, 25ns, type-1',  'style':"l", 'lineThickNess':2, 'errorBars':True, 'color':ROOT.kBlack, 'markerStyle':None, 'markerSize':None})
   p_noHF_type1 = plot.fromHisto( v['upara']['noHF']['scale'], style={'legendText':'DY+Jets, 25ns, noHF, type-1',  'style':"l", 'lineThickNess':2, 'errorBars':True, 'color':ROOT.kRed, 'markerStyle':None, 'markerSize':None})
-  plotLists = [[p_type1], [p_noHF_type1]]
+#  p_perfect = plot.fromHisto( v['upara']['perfect']['scale'], style={'legendText':'DY+Jets, 25ns, noHF, perfect',  'style':"l", 'lineThickNess':2, 'errorBars':True, 'color':ROOT.kGreen, 'markerStyle':None, 'markerSize':None})
+  p_type1raw = plot.fromHisto( v['upara']['type1raw']['scale'], style={'legendText':'DY+Jets, 25ns, raw',  'style':"l", 'lineThickNess':2, 'errorBars':True, 'color':ROOT.kGreen, 'markerStyle':None, 'markerSize':None})
+  p_noHFraw = plot.fromHisto( v['upara']['noHFraw']['scale'], style={'legendText':'DY+Jets, 25ns, noHF, raw',  'style':"l", 'lineThickNess':2, 'errorBars':True, 'color':ROOT.kBlue, 'markerStyle':None, 'markerSize':None})
+  plotLists = [[p_type1], [p_noHF_type1], [p_type1raw], [p_noHFraw]]
   labels={'x':v['legendText'],'y':'\langle u_{\parallel}\\rangle/\langle q_T \\rangle'}
   opt = {'labels':labels, 'logX':False, 'logY':False, 'yRange':[0,1.5], 'ratio':None}
   opt['texLines'] = [{'pos':(0.16, 0.96),'text':'CMS Simulation, 13 TeV',        'options':{'size':0.035}}]
@@ -105,7 +112,10 @@ for name, v in setup["variables"].iteritems():
 
   p_type1 = plot.fromHisto( v['upara']['type1']['RMS'], style={'legendText':'DY+Jets, 25ns, type-1',  'style':"l", 'lineThickNess':2, 'errorBars':True, 'color':ROOT.kBlack, 'markerStyle':None, 'markerSize':None})
   p_noHF_type1 = plot.fromHisto( v['upara']['noHF']['RMS'], style={'legendText':'DY+Jets, 25ns, noHF, type-1',  'style':"l", 'lineThickNess':2, 'errorBars':True, 'color':ROOT.kRed, 'markerStyle':None, 'markerSize':None})
-  plotLists = [[p_type1], [p_noHF_type1]]
+#  p_perfect = plot.fromHisto( v['upara']['perfect']['RMS'], style={'legendText':'DY+Jets, 25ns, noHF, perfect',  'style':"l", 'lineThickNess':2, 'errorBars':True, 'color':ROOT.kGreen, 'markerStyle':None, 'markerSize':None})
+  p_type1raw = plot.fromHisto( v['upara']['type1raw']['RMS'], style={'legendText':'DY+Jets, 25ns, raw',  'style':"l", 'lineThickNess':2, 'errorBars':True, 'color':ROOT.kGreen, 'markerStyle':None, 'markerSize':None})
+  p_noHFraw = plot.fromHisto( v['upara']['noHFraw']['RMS'], style={'legendText':'DY+Jets, 25ns, noHF, raw',  'style':"l", 'lineThickNess':2, 'errorBars':True, 'color':ROOT.kBlue, 'markerStyle':None, 'markerSize':None})
+  plotLists = [[p_type1], [p_noHF_type1], [p_type1raw], [p_noHFraw]]
   labels={'x':v['legendText'],'y':'\sigma(u_{\parallel}+q_{T})'}
   opt = {'labels':labels, 'logX':False, 'logY':False, 'yRange':[0,50], 'ratio':None}
   opt['texLines'] = [{'pos':(0.16, 0.96),'text':'CMS Simulation, 13 TeV',        'options':{'size':0.035}}]
@@ -115,7 +125,9 @@ for name, v in setup["variables"].iteritems():
 
   p_type1 = plot.fromHisto( v['upara']['type1']['RMScorr'], style={'legendText':'DY+Jets, 25ns, type-1',  'style':"l", 'lineThickNess':2, 'errorBars':True, 'color':ROOT.kBlack, 'markerStyle':None, 'markerSize':None})
   p_noHF_type1 = plot.fromHisto( v['upara']['noHF']['RMScorr'], style={'legendText':'DY+Jets, 25ns, noHF, type-1',  'style':"l", 'lineThickNess':2, 'errorBars':True, 'color':ROOT.kRed, 'markerStyle':None, 'markerSize':None})
-  plotLists = [[p_type1], [p_noHF_type1]]
+  p_type1raw = plot.fromHisto( v['upara']['type1raw']['RMScorr'], style={'legendText':'DY+Jets, 25ns, raw',  'style':"l", 'lineThickNess':2, 'errorBars':True, 'color':ROOT.kGreen, 'markerStyle':None, 'markerSize':None})
+  p_noHFraw = plot.fromHisto( v['upara']['noHFraw']['RMScorr'], style={'legendText':'DY+Jets, 25ns, noHF, raw',  'style':"l", 'lineThickNess':2, 'errorBars':True, 'color':ROOT.kBlue, 'markerStyle':None, 'markerSize':None})
+  plotLists = [[p_type1], [p_noHF_type1], [p_type1raw], [p_noHFraw]]
   labels={'x':v['legendText'],'y':'\sigma (u_{\parallel}+q_{T}) / (\langle u_{\parallel}\\rangle/\langle q_T \\rangle)'}
   opt = {'labels':labels, 'logX':False, 'logY':False, 'yRange':[0,50], 'ratio':None}
   opt['texLines'] = [{'pos':(0.16, 0.96),'text':'CMS Simulation, 13 TeV',        'options':{'size':0.035}}]
@@ -125,7 +137,9 @@ for name, v in setup["variables"].iteritems():
 
   p_type1 = plot.fromHisto( v['uperp']['type1']['RMS'], style={'legendText':'DY+Jets, 25ns, type-1',  'style':"l", 'lineThickNess':2, 'errorBars':True, 'color':ROOT.kBlack, 'markerStyle':None, 'markerSize':None})
   p_noHF_type1 = plot.fromHisto( v['uperp']['noHF']['RMS'], style={'legendText':'DY+Jets, 25ns, noHF, type-1',  'style':"l", 'lineThickNess':2, 'errorBars':True, 'color':ROOT.kRed, 'markerStyle':None, 'markerSize':None})
-  plotLists = [[p_type1], [p_noHF_type1]]
+  p_type1raw = plot.fromHisto( v['uperp']['type1raw']['RMS'], style={'legendText':'DY+Jets, 25ns, raw',  'style':"l", 'lineThickNess':2, 'errorBars':True, 'color':ROOT.kGreen, 'markerStyle':None, 'markerSize':None})
+  p_noHFraw = plot.fromHisto( v['uperp']['noHFraw']['RMS'], style={'legendText':'DY+Jets, 25ns, noHF, raw',  'style':"l", 'lineThickNess':2, 'errorBars':True, 'color':ROOT.kBlue, 'markerStyle':None, 'markerSize':None})
+  plotLists = [[p_type1], [p_noHF_type1], [p_type1raw], [p_noHFraw]]
   labels={'x':v['legendText'],'y':'\sigma(u_{\perp})'}
   opt = {'labels':labels, 'logX':False, 'logY':False, 'yRange':[0,50], 'ratio':None}
   opt['texLines'] = [{'pos':(0.16, 0.96),'text':'CMS Simulation, 13 TeV',        'options':{'size':0.035}}]
@@ -135,7 +149,9 @@ for name, v in setup["variables"].iteritems():
 
   p_type1 = plot.fromHisto( v['uperp']['type1']['RMScorr'], style={'legendText':'DY+Jets, 25ns, type-1',  'style':"l", 'lineThickNess':2, 'errorBars':True, 'color':ROOT.kBlack, 'markerStyle':None, 'markerSize':None})
   p_noHF_type1 = plot.fromHisto( v['uperp']['noHF']['RMScorr'], style={'legendText':'DY+Jets, 25ns, noHF, type-1',  'style':"l", 'lineThickNess':2, 'errorBars':True, 'color':ROOT.kRed, 'markerStyle':None, 'markerSize':None})
-  plotLists = [[p_type1], [p_noHF_type1]]
+  p_type1raw = plot.fromHisto( v['uperp']['type1raw']['RMScorr'], style={'legendText':'DY+Jets, 25ns, raw',  'style':"l", 'lineThickNess':2, 'errorBars':True, 'color':ROOT.kGreen, 'markerStyle':None, 'markerSize':None})
+  p_noHFraw = plot.fromHisto( v['uperp']['noHFraw']['RMScorr'], style={'legendText':'DY+Jets, 25ns, noHF, raw',  'style':"l", 'lineThickNess':2, 'errorBars':True, 'color':ROOT.kBlue, 'markerStyle':None, 'markerSize':None})
+  plotLists = [[p_type1], [p_noHF_type1], [p_type1raw], [p_noHFraw]]
   labels={'x':v['legendText'],'y':'\sigma(u_{\perp}) / (\langle u_{\parallel}\\rangle/\langle q_T \\rangle)'}
   opt = {'labels':labels, 'logX':False, 'logY':False, 'yRange':[0,50], 'ratio':None}
   opt['texLines'] = [{'pos':(0.16, 0.96),'text':'CMS Simulation, 13 TeV',        'options':{'size':0.035}}]
@@ -143,14 +159,16 @@ for name, v in setup["variables"].iteritems():
   stk = stack(plotLists, options = opt)
   stuff.append(drawNMStacks(1,1,[stk],         'pngMet/'+prefix+'uperp_RMScorr_vs_'+name+'.png'))
 
-  for bin in v['bins']:
-    p_type1 = plot.fromHisto( v['qt']['type1'][bin].Rebin(5), style={'legendText':'DY+Jets, 25ns, type-1',  'style':"l", 'lineThickNess':2, 'errorBars':True, 'color':ROOT.kBlack, 'markerStyle':None, 'markerSize':None})
-    p_noHF_type1 = plot.fromHisto( v['qt']['type1'][bin].Rebin(5), style={'legendText':'DY+Jets, 25ns, noHF, type-1',  'style':"l", 'lineThickNess':2, 'errorBars':True, 'color':ROOT.kRed, 'markerStyle':None, 'markerSize':None})
-    plotLists = [[p_type1], [p_noHF_type1]]
-    labels={'x':'p_{T,Z} (GeV)','y':'Number of events'}
-    opt = {'labels':labels, 'logX':False, 'logY':True, 'yRange':None, 'ratio':None}
-    opt['texLines'] = [{'pos':(0.16, 0.96),'text':'CMS Simulation, 13 TeV',  'options':{'size':0.035}}, 
-                       {'pos':(0.4,0.7),'text':str(bin[0])+' < '+v['legendText']+' < '+str(bin[1])}]
-    opt['legend'] = {'coordinates':[0.41,0.78,0.97,0.95],'boxed':True}
-    stk = stack(plotLists, options = opt)
-    stuff.append(drawNMStacks(1,1,[stk],         'pngMet/qt/'+prefix+'qt_'+name+'_'+str(bin[0])+'_'+str(bin[1])+'.png'))
+#  for bin in v['bins']:
+#    p_type1 = plot.fromHisto( v['qt']['type1'][bin], style={'legendText':'DY+Jets, 25ns, type-1',  'style':"l", 'lineThickNess':2, 'errorBars':True, 'color':ROOT.kBlack, 'markerStyle':None, 'markerSize':None})
+#    p_noHF_type1 = plot.fromHisto( v['qt']['type1'][bin], style={'legendText':'DY+Jets, 25ns, noHF, type-1',  'style':"l", 'lineThickNess':2, 'errorBars':True, 'color':ROOT.kRed, 'markerStyle':None, 'markerSize':None})
+##    p_perfect = plot.fromHisto( v['qt']['perfect'][bin], style={'legendText':'DY+Jets, 25ns, noHF, perfect',  'style':"l", 'lineThickNess':2, 'errorBars':True, 'color':ROOT.kGreen, 'markerStyle':None, 'markerSize':None})
+##    plotLists = [[p_type1], [p_noHF_type1], [p_perfect]]
+#    plotLists = [[p_type1], [p_noHF_type1]]
+#    labels={'x':'p_{T,Z} (GeV)','y':'Number of events'}
+#    opt = {'labels':labels, 'logX':False, 'logY':True, 'yRange':None, 'ratio':None}
+#    opt['texLines'] = [{'pos':(0.16, 0.96),'text':'CMS Simulation, 13 TeV',  'options':{'size':0.035}}, 
+#                       {'pos':(0.4,0.7),'text':str(bin[0])+' < '+v['legendText']+' < '+str(bin[1])}]
+#    opt['legend'] = {'coordinates':[0.41,0.78,0.97,0.95],'boxed':True}
+#    stk = stack(plotLists, options = opt)
+#    stuff.append(drawNMStacks(1,1,[stk],         'pngMet/qt/'+prefix+'qt_'+name+'_'+str(bin[0])+'_'+str(bin[1])+'.png'))

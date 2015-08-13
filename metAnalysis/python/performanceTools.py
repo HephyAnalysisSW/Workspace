@@ -11,17 +11,18 @@ def findBin(v, varValue):
       return bin
 
 def makeMETPerformanceHistos(setup):
-  small = True if setup.has_key('small') and setup['small'] else False
   for name, v in setup["variables"].iteritems():
     v['bins']=[(v["binning"][i],v["binning"][i+1]) for i in range(len(v["binning"])-1)]
     v['uperp']={}
     v['upara']={}
+    v['uparaPlusQt']={}
     v['qt']={}
     v['histo']={}
     for mname, mv in setup["metVariables"].iteritems():
       hname = '_'.join([name,mname])
       v['histo'][mname]=ROOT.TH1D('histo_'+hname, 'histo_'+hname, len(v['binning'])-1, array('d',v['binning']))
       v['upara'][mname]={}
+      v['uparaPlusQt'][mname]={}
       v['uperp'][mname]={}
       v['qt'][mname]={}
       v['upara'][mname]["scale"] = ROOT.TH1D(hname+'_upara_scale', hname+'_upara_scale',len(v['binning'])-1, array('d',v['binning']))
@@ -32,15 +33,16 @@ def makeMETPerformanceHistos(setup):
       v['uperp'][mname]["RMScorr"] = ROOT.TH1D(hname+'_uperp_RMScorr', hname+'_uperp_RMScorr',len(v['binning'])-1, array('d',v['binning']))
       for b in v['bins']:
         hname = name+'_'.join([str(x) for x in b])
-        v['uperp'][mname][b] = ROOT.TH1D(hname+'_'+mname+'_uperp', hname+'_'+mname+'_uperp', 400,-200,200) 
-        v['upara'][mname][b] = ROOT.TH1D(hname+'_'+mname+'_upara', hname+'_'+mname+'_upara', 500,-400,100) 
+        v['uperp'][mname][b] = ROOT.TH1D(hname+'_'+mname+'_uperp', hname+'_'+mname+'_uperp', 800,-400,400) 
+        v['upara'][mname][b] = ROOT.TH1D(hname+'_'+mname+'_upara', hname+'_'+mname+'_upara', 800,-600,200) 
+        v['uparaPlusQt'][mname][b] = ROOT.TH1D(hname+'_'+mname+'_uparaPlusQt', hname+'_'+mname+'_uparaPlusQt', 800,-400,400) 
         v['qt'][mname][b] = ROOT.TH1D(hname+'_'+mname+'_qt', hname+'_'+mname+'_qt', 500,0,500) 
 
   for s in setup["samples"]:
     for b in s['bins']:
       b['chain'].Draw('>>eList', setup['preselection'])
       eList = ROOT.gDirectory.Get('eList')
-      nEvents = eList.GetN() if not small else 10000
+      nEvents = eList.GetN() if not setup.has_key('maxEvents') else setup['maxEvents']
       for nev in range(nEvents):
         if nev%1000==0:print "At %i / %i"%(nev, nEvents)
         b['chain'].GetEntry(eList.GetEntry(nev))
@@ -71,6 +73,7 @@ def makeMETPerformanceHistos(setup):
             if varBin: 
               v['uperp'][mname][varBin].Fill(uperp, weight) 
               v['upara'][mname][varBin].Fill(upara, weight) 
+              v['uparaPlusQt'][mname][varBin].Fill(upara+qt, weight) 
               v['qt'][mname][varBin].Fill(qt, weight) 
     del eList
 
@@ -81,19 +84,19 @@ def makeMETPerformanceHistos(setup):
         upara_mean_err  = v['upara'][mname][bin].GetMeanError()
         uperp_mean      = v['uperp'][mname][bin].GetMean()
         uperp_mean_err  = v['uperp'][mname][bin].GetMeanError()
-        upara_RMS      = v['upara'][mname][bin].GetRMS()
-        upara_RMS_err  = v['upara'][mname][bin].GetRMSError()
+        upara_RMS      = v['uparaPlusQt'][mname][bin].GetRMS()
+        upara_RMS_err  = v['uparaPlusQt'][mname][bin].GetRMSError()
         uperp_RMS      = v['uperp'][mname][bin].GetRMS()
         uperp_RMS_err  = v['uperp'][mname][bin].GetRMSError()
         qt_mean       = v['qt'][mname][bin].GetMean()
         qt_mean_err   = v['qt'][mname][bin].GetMeanError()
-        if (not qt_mean>0) or (not upara_RMS>0) or (not uperp_RMS>0):continue
+        if (not qt_mean>0):continue
         scale         =  - upara_mean / qt_mean 
         scale_err     =  upara_mean / qt_mean * sqrt(upara_mean_err**2/upara_mean**2 + qt_mean_err**2/qt_mean**2)
-        upara_RMS_scaleCorr       =  upara_RMS/scale
-        upara_RMS_scaleCorr_err   =  upara_RMS/scale*sqrt(upara_RMS_err**2/upara_RMS**2 + scale_err**2/scale**2)
-        uperp_RMS_scaleCorr       =  uperp_RMS/scale
-        uperp_RMS_scaleCorr_err   =  uperp_RMS/scale*sqrt(uperp_RMS_err**2/uperp_RMS**2 + scale_err**2/scale**2)
+        upara_RMS_scaleCorr       =  upara_RMS/scale if scale>0 else float('nan')
+        upara_RMS_scaleCorr_err   =  upara_RMS/scale*sqrt(upara_RMS_err**2/upara_RMS**2 + scale_err**2/scale**2) if upara_RMS>0 and scale>0 else float('nan') 
+        uperp_RMS_scaleCorr       =  uperp_RMS/scale if scale>0 else float('nan')
+        uperp_RMS_scaleCorr_err   =  uperp_RMS/scale*sqrt(uperp_RMS_err**2/uperp_RMS**2 + scale_err**2/scale**2) if uperp_RMS>0 and scale>0 else float('nan')
         val = 0.5*(bin[0]+bin[1])
         nbin = v['upara'][mname]["scale"].FindBin(val)
         v['upara'][mname]["scale"].SetBinContent(nbin, scale)
