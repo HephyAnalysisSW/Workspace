@@ -31,6 +31,12 @@ WJetsHTToLNu=makeSample({\
 'dir' : "/data/easilar/cmgTuples/postProcessed_Spring15_AllFlags/",
 })
 
+#WJetsHTToLNu=makeSample({\
+#"name" : "WJetsHTToLNu",
+#"bins" : ["WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8", "WJetsToLNu_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8", "WJetsToLNu_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8", "WJetsToLNu_HT-600To800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8", "WJetsToLNu_HT-800To1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8","WJetsToLNu_HT-1200To2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8","WJetsToLNu_HT-2500ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"],
+#'dir' : "/data/easilar/cmgTuples/postProcessed_Spring15_AllFlags/",
+#})
+
 #TTVH=makeSample({\
 #"name" : "TTVH",
 #"bins" : ["TTH", "TTWJets", "TTZJets"],

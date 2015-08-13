@@ -13,7 +13,7 @@ useTTcorrection = False
 signal = False
 
 prefix = 'singleLeptonic_Spring15_'
-path = '/data/'+username+'/Spring15/firstPredictionNoDY_W3-4/rCS_0b_3.0/' 
+path = '/data/'+username+'/Spring15/PredictionWithCorrectionNoDY/rCS_0b_3.0/' 
 
 res = pickle.load(file(path+prefix+'_estimationResults_pkl'))
 
@@ -122,8 +122,8 @@ print '\\hline\end{tabular}}\end{center}\caption{Closure table for the backgroun
 #      #      res[srNJet][stb][htb]['rCS_srNJet_0b_onlyTT']['rCSE_sim']/res[srNJet][stb][htb]['rCS_srNJet_0b_onlyTT']['rCS']]
 #      #rCS_srPredErrorTT = max(rCS_srPredErrorCandidatesTT)
 #      
-#      ttPredictionVar = kcs['tt'][stb][htb]['FitRatio']**2*res[srNJet][stb][htb]['TT_pred_err']**2 + kcs['tt'][stb][htb]['FitRatioError']**2*res[srNJet][stb][htb]['TT_pred']**2
-#      ttPredictionPosPdgVar = kcs['tt'][stb][htb]['FitRatio']**2*(0.5*res[srNJet][stb][htb]['TT_pred_err'])**2 + kcs['tt'][stb][htb]['FitRatioError']**2*(0.5*res[srNJet][stb][htb]['TT_pred'])**2
+#      ttPredictionVar = kcs['tt'][srNJet][stb][htb]['FitRatio']**2*res[srNJet][stb][htb]['TT_pred_err']**2 + kcs['tt'][srNJet][stb][htb]['FitRatioError']**2*res[srNJet][stb][htb]['TT_pred']**2
+#      ttPredictionPosPdgVar = kcs['tt'][srNJet][stb][htb]['FitRatio']**2*(0.5*res[srNJet][stb][htb]['TT_pred_err'])**2 + kcs['tt'][srNJet][stb][htb]['FitRatioError']**2*(0.5*res[srNJet][stb][htb]['TT_pred'])**2
 #      ttPredictionNegPdgVar = ttPredictionPosPdgVar
 #      
 #      # calculate disagreement between mu/ele+mu rcs values
@@ -164,7 +164,7 @@ print '\\hline\end{tabular}}\end{center}\caption{Closure table for the backgroun
 #      W_pred_statVar = res[srNJet][stb][htb]['yW_Var_srNJet_0b_lowDPhi'] * W_pred_rcs**2 + W_pred_rcs_Var * res[srNJet][stb][htb]['yW_srNJet_0b_lowDPhi']**2
 #      W_Var = W_pred_statVar + (WratioErr*W_pred)**2 + W_slope_Var
 #      
-#      TT_pred = res[srNJet][stb][htb]['TT_pred']*kcs['tt'][stb][htb]['FitRatio']
+#      TT_pred = res[srNJet][stb][htb]['TT_pred']*kcs['tt'][srNJet][stb][htb]['FitRatio']
 #            
 #      totalPrediction = TT_pred + W_pred + res[srNJet][stb][htb]['Rest_truth']
 #      totalPredictionPosPdg = 0.5*TT_pred + W_PosPdg_pred + res[srNJet][stb][htb]['Rest_PosPdg_truth']

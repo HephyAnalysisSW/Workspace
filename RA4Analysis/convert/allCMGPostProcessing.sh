@@ -31,7 +31,18 @@
 #python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=QCD_Pt2400to3200_50ns  &
 #python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=QCD_Pt3200toInf_25ns   &
 
-python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=DYJetsToLL_M_50_25ns   &
+#python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=DYJetsToLL_M_50_25ns   &
+
+python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=WJetsToLNu_HT100to200   &
+python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=WJetsToLNu_HT200to400   &
+python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=WJetsToLNu_HT400to600   &
+python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=WJetsToLNu_HT600toInf   &
+
+
+#python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=WJetsToLNu_HT600to800   &
+#python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=WJetsToLNu_HT800to1200   &
+#python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=WJetsToLNu_HT1200to2500   &
+#python cmgPostProcessing.py --leptonSelection=hard --inputTreeName="" --samples=WJetsToLNu_HT2500toInf   &
 
 
 #########Phys14###############
