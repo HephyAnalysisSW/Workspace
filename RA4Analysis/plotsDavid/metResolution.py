@@ -27,7 +27,7 @@ ROOT.gStyle.SetPalette(1)
 ROOT.gStyle.SetOptStat(2211)
 
 getW = 'abs(genPartAll_pdgId)==24&&abs(genPartAll_motherId)<10'
-para = ['pt','phi','pdgId','motherId']
+para = ['pt','phi','pdgId','motherId','grandmotherId']
 
 def getMetXY(c):
   metPt = c.GetLeaf('met_pt').GetValue() 
@@ -54,6 +54,42 @@ def getW(c):
 #    print len(WfromQ)
 #    print 'W pt and phi taken as 0!'
     return float('nan'), float('nan')
+
+def getGenW(c):
+  genPartAll = [getObjDict(c, 'genPartAll_', para, j) for j in range(int(c.GetLeaf('ngenPartAll').GetValue()))]
+  lepFromW = filter(lambda lep:abs(lep['pdgId'])<=14 and abs(lep['pdgId'])>=13,genPartAll)
+#  print lepFromW
+  WfromQ = filter(lambda w:abs(w['motherId'])==24, lepFromW)
+#  WfromQ = filter(lambda w:abs(w['grandmotherId'])<10, W)
+  if len(WfromQ)>0:
+    if len(WfromQ)>2: print 'this should not have happened'
+#    print len(WfromQ)
+    for lep in WfromQ:
+      if abs(lep['pdgId'])==14: 
+        nuPt = lep['pt']
+        nuPhi = lep['phi']
+      elif abs(lep['pdgId'])==13:
+        lepPt = lep['pt']
+        lepPhi = lep['phi']
+      else:
+        print 'this should not have happened 2'
+        continue
+    Wx = lepPt*cos(lepPhi)+nuPt*cos(nuPhi)
+    Wy = lepPt*sin(lepPhi)+nuPt*sin(nuPhi)
+    WPhi = atan(Wy/Wx)
+    if Wx<0:
+      if Wy>0:
+        WPhi = pi + WPhi
+      if Wy<0:
+        WPhi = WPhi - pi
+    WPt = sqrt(Wx**2+Wy**2)
+#    WPt = WfromQ[0]['pt']
+#    WPhi = WfromQ[0]['phi']
+    return WPt, WPhi, nuPt, nuPhi, lepPt, lepPhi
+  else:
+#    print len(WfromQ)
+#    print 'W pt and phi taken as 0!'
+    return float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan')
   
 def getRecoW(c):
   metPhi = c.GetLeaf('met_phi').GetValue()
@@ -110,7 +146,7 @@ def getU2(c, WPt, WPhi):
   Upara = x*cos(WPhi)+y*sin(WPhi)
   Uperp = x*sin(WPhi)-y*cos(WPhi)
   fakeMet = sqrt(x*x + y*y)
-  return Upara, Uperp, fakeMet
+  return Upara, Uperp, fakeMet, metPt, metPhi
 
 
 def getU(c, WPt, WPhi):
@@ -170,7 +206,7 @@ def getWeight(sample,nEvents,target_lumi):
 varstring="deltaPhi_Wl"
 plotDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/pngCMG2/hard/Phys14V3/WjetKinFakeMetOnW/'
 #pickleDir='/data/dhandl/results2015/metStudy/'
-prefix = 'recoW_'
+prefix = 'genW_'
 
 if not os.path.exists(plotDir):
   os.makedirs(plotDir)
@@ -317,6 +353,8 @@ for st in stReg:
       fakeMetHist = ROOT.TH1F('fakeMetHist','fakeMetHist',50,0,500)
       genMetHist = ROOT.TH1F('genMetHist','genMetHist',50,0,500)
       recoMetHist = ROOT.TH1F('recoMetHist','recoMetHist',50,0,500)
+      lepPtHist = ROOT.TH1F('lepPtHist','lepPtHist',50,0,500)
+      nuPtHist = ROOT.TH1F('nuPtHist','nuPtHist',50,0,500)
       RecoGenFracHist = ROOT.TH1F('RecoGenFracHist','RecogenFracHist',60,0,3)
       UperpVSUpara = ROOT.TH2F('UperpVSUpara','UperpVSUpara',100,-500,500,100,-500,500)
       genMetVSfakeMet = ROOT.TH2F('genMetVSfakeMet','genMetVSfakeMet',50,0,500,50,0,500)
@@ -325,8 +363,8 @@ for st in stReg:
       LtHist = ROOT.TH1F('LtHist','LtHist',50,0,500)
       genLtHist = ROOT.TH1F('genLtHist','genLtHist',50,0,500)
       print 'Processing njet',jet
-      cutname, cut = nameAndCut(st, ht, jet, btb=btb, presel=presel, btagVar = 'nBJetMediumCSV30')
-#      cutname = nameAndCut(None, ht, jet, btb=btb, presel=presel, btagVar = 'nBJetMediumCSV30')[0]
+      cutname = nameAndCut(st, ht, jet, btb=btb, presel=presel, btagVar = 'nBJetMediumCSV30')[0]
+      cut = nameAndCut(None, ht, jet, btb=btb, presel=presel, btagVar = 'nBJetMediumCSV30')[1]
 #      cut = presel+'&&'+htCut(ht, minPt=30, maxEta=2.4, njCorr=0.)+'&&'+nBTagCut(btb, minPt=30, maxEta=2.4, minCSVTag=0.814)+'&&'+nJetCut(jet, minPt=30, maxEta=2.4)#+'&&'+nJetCut(2, minPt=80, maxEta=2.4)
 #      for sample in Bkg:
       WJETS.Draw('>>eList',cut)
@@ -340,29 +378,33 @@ for st in stReg:
 #        sample['chain'].GetEntry(elist.GetEntry(i))
         weight=getVarValue(WJETS,"weight")
 #        weight=sample['weight']
-        WPt, WPhi, recoMetPt, recoMetPhi, lepPt, lepPhi = getRecoW(WJETS)
+        WPt, WPhi, nuPt, nuPhi, lepPt, lepPhi = getGenW(WJETS)
 #        WPt, WPhi, recoMetPt, recoMetPhi, lepPt, lepPhi = getRecoWunskimmed(sample['chain'])
         if WPt>0:
+          Upara, Uperp, fakeMet, recoMetPt, recoMetPhi = getU2(WJETS, WPt, WPhi)
+#          Upara, Uperp, fakeMet = getU2(sample['chain'], WPt, WPhi)
+          Lt = recoMetPt + lepPt
+          genLt = nuPt + lepPt
+          if genLt<st[0] or genLt>=st[1]: continue
           WPtHist.Fill(WPt,weight)
           WPhiHist.Fill(WPhi,weight)
-          Upara, Uperp, fakeMet = getU2(WJETS, WPt, WPhi)
-#          Upara, Uperp, fakeMet = getU2(sample['chain'], WPt, WPhi)
           UparaHist.Fill(Upara,weight)
           UperpHist.Fill(Uperp,weight)
           fakeMetHist.Fill(fakeMet,weight)
           UperpVSUpara.Fill(Upara,Uperp,weight)
           genMet = WJETS.GetLeaf('met_genPt').GetValue()
 #          genMet = sample['chain'].GetLeaf('met_genPt').GetValue()
-          RecoGenFrac = recoMetPt/genMet
-          RecoGenFracHist.Fill(RecoGenFrac,weight)
+#          RecoGenFrac = recoMetPt/genMet
+#          RecoGenFracHist.Fill(RecoGenFrac,weight)
           genMetVSfakeMet.Fill(fakeMet,genMet,weight)
           genMetHist.Fill(genMet,weight)
           recoMetHist.Fill(recoMetPt,weight)
-          Lt = recoMetPt + lepPt
-          genLt = genMet + lepPt
+          lepPtHist.Fill(lepPt,weight)
+          nuPtHist.Fill(nuPt,weight)
           LtHist.Fill(Lt,weight)
           genLtHist.Fill(genLt,weight)
-          dPhi = acos((lepPt+recoMetPt*cos(lepPhi-recoMetPhi))/sqrt(lepPt**2+recoMetPt**2+2*recoMetPt*lepPt*cos(lepPhi-recoMetPhi)))
+#          dPhi = acos((lepPt+recoMetPt*cos(lepPhi-recoMetPhi))/sqrt(lepPt**2+recoMetPt**2+2*recoMetPt*lepPt*cos(lepPhi-recoMetPhi)))
+          dPhi = acos((lepPt+nuPt*cos(lepPhi-nuPhi))/sqrt(lepPt**2+nuPt**2+2*nuPt*lepPt*cos(lepPhi-nuPhi)))
           dPhiHist.Fill(dPhi,weight)
           dPhiDummy.Fill(dPhi,weight)
 
@@ -401,9 +443,15 @@ for st in stReg:
       recoMetHist.Draw('hist')
       can1.Print(plotDir+prefix+'recoMet_'+cutname+'.png')
       can1.Print(plotDir+prefix+'recoMet_'+cutname+'.root')
-      RecoGenFracHist.Draw('hist')
-      can1.Print(plotDir+prefix+'RecoGenFrac_'+cutname+'.png')
-      can1.Print(plotDir+prefix+'RecoGenFrac_'+cutname+'.root')
+      lepPtHist.Draw('hist')
+      can1.Print(plotDir+prefix+'lepPt_'+cutname+'.png')
+      can1.Print(plotDir+prefix+'lepPt_'+cutname+'.root')
+      nuPtHist.Draw('hist')
+      can1.Print(plotDir+prefix+'nuPt_'+cutname+'.png')
+      can1.Print(plotDir+prefix+'nuPt_'+cutname+'.root')
+#      RecoGenFracHist.Draw('hist')
+#      can1.Print(plotDir+prefix+'RecoGenFrac_'+cutname+'.png')
+#      can1.Print(plotDir+prefix+'RecoGenFrac_'+cutname+'.root')
       dPhiHist.Draw('hist')
       can1.Print(plotDir+prefix+'dPhi_'+cutname+'.png')
       can1.Print(plotDir+prefix+'dPhi_'+cutname+'.root')

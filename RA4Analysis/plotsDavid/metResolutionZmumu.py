@@ -20,9 +20,9 @@ from draw_helpers import *
 from localInfo import username
 
 #presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80"
-diMuonic = "(Sum$(abs(genLep_pdgId)==13&&abs(genLep_motherId)==23)==2)"
 #muVeto = looseLeptonVeto('muon', minPt=10)
-presel = diMuonic
+#presel = '(Sum$(abs(genLep_pdgId)==13&&genLep_pt>25&&abs(genLep_eta)<2.4&&abs(genLep_motherId)==23)==2)'
+presel = "(Sum$(abs(genLep_pdgId)==13&&abs(genLep_motherId)==23)==2)"
 
 ROOT.TH1F().SetDefaultSumw2()
 ROOT.gStyle.SetPalette(1)
@@ -74,7 +74,7 @@ def getGenZ(c):
       ZPhi = pi + ZPhi
     if y<0:
       ZPhi = ZPhi - pi
-  return ZPt, ZPhi, invMass, x, y, leadLepPt, leadLepPhi, subLepPt, subLepPhi  
+  return ZPt, ZPhi, invMass, x, y, leadLepPt, leadLepPhi, leadLepEta, subLepPt, subLepPhi, subLepEta  
 
 def getRecoW(c):
   metPhi = c.GetLeaf('met_phi').GetValue()
@@ -173,8 +173,8 @@ def getWeight(sample,nEvents,target_lumi):
   return weight
 
 varstring="deltaPhi_Wl"
-#plotDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/pngCMG2/hard/Phys14V3/MetPerformanceZmumu_mimicMuToNu/withLtCut/'
-plotDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/pngCMG2/hard/Phys14V3/MetPerformanceZmumu_mimicMuToNu/'
+plotDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/pngCMG2/hard/Phys14V3/MetPerformanceZmumu_mimicMuToNu/withGenLtCut_v2/'
+#plotDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/pngCMG2/hard/Phys14V3/MetPerformanceZmumu_mimicMuToNu/'
 #pickleDir='/data/dhandl/results2015/metStudyZmumu/'
 prefix = ''
 
@@ -187,9 +187,9 @@ if not os.path.exists(plotDir):
 lepSel='hard'
 #WJETS = getChain(WJetsHTToLNu[lepSel],histname='')
 #cDY = getChain(DY[lepSel],histname='')
-Bkg = [{'name':'DYJetsToLL_M50_HT100to200_PU20bx25', 'sample':DYJetsToLL_M50_HT100to200_PU20bx25, 'legendName':'DY HT100-200'},
-       {'name':'DYJetsToLL_M50_HT200to400_PU20bx25', 'sample':DYJetsToLL_M50_HT200to400_PU20bx25, 'legendName':'DY HT200-400'},
-       {'name':'DYJetsToLL_M50_HT400to600_PU20bx25', 'sample':DYJetsToLL_M50_HT400to600_PU20bx25, 'legendName':'DY HT400-600'},
+Bkg = [#{'name':'DYJetsToLL_M50_HT100to200_PU20bx25', 'sample':DYJetsToLL_M50_HT100to200_PU20bx25, 'legendName':'DY HT100-200'},
+       #{'name':'DYJetsToLL_M50_HT200to400_PU20bx25', 'sample':DYJetsToLL_M50_HT200to400_PU20bx25, 'legendName':'DY HT200-400'},
+       #{'name':'DYJetsToLL_M50_HT400to600_PU20bx25', 'sample':DYJetsToLL_M50_HT400to600_PU20bx25, 'legendName':'DY HT400-600'},
        {'name':'DYJetsToLL_M50_HT600toInf_PU20bx25', 'sample':DYJetsToLL_M50_HT600toInf_PU20bx25, 'legendName':'DY HT600-Inf'}]
 
 small = False
@@ -519,9 +519,10 @@ for st in stReg:
       ZPtHist = ROOT.TH1F('ZPtHist','ZPtHist',50,0,500)
       WPhiHist = ROOT.TH1F('WPhiHist','WPhiHist',32,-3.2,3.2)
       WPtHist = ROOT.TH1F('WPtHist','WPtHist',50,0,500)
-      genMetHist = ROOT.TH1F('genMetHist','genMetHist',150,0,1500)
-      recoMetHist = ROOT.TH1F('recoMetHist','recoMetHist',150,0,1500)
-      fakeMetHist = ROOT.TH1F('fakeMetHist','fakeMetHist',150,0,1500)
+      genMetHist = ROOT.TH1F('genMetHist','genMetHist',50,0,500)
+      recoMetHist = ROOT.TH1F('recoMetHist','recoMetHist',50,0,500)
+      fakeMetHist = ROOT.TH1F('fakeMetHist','fakeMetHist',50,0,500)
+      lepPtHist = ROOT.TH1F('lepPtHist','lepPtHist',50,0,500)
       RecoGenFracHist = ROOT.TH1F('RecoGenFracHist','RecogenFracHist',60,0,3)
       dPhiHist = ROOT.TH1F('dPhiHist','dPhiHist',30,0,pi)
       dPhiDummy = ROOT.TH1F('dPhiDummy','dPhiDummy',2, array('d', [0,1.0,pi]))
@@ -531,8 +532,10 @@ for st in stReg:
       genMetVSfakeMet = ROOT.TH2F('genMetVSfakeMet','genMetVSfakeMet',50,0,500,50,0,500)
       print 'Processing njet',jet
       cutname = nameAndCut(st, ht, jet, btb=btb, presel=presel, btagVar = 'nBJetMediumCSV30')[0]
-      cut = presel+'&&'+htCut(ht, minPt=30, maxEta=2.4, njCorr=0.)+'&&'+ nBTagCut((0,0), minPt=30, maxEta=2.4, minCSVTag=0.814)+'&&'+nJetCut(jet, minPt=30, maxEta=2.4)
-  
+      cut = presel+'&&'+htCut(ht, minPt=30, maxEta=2.4, njCorr=0.)+'&&'+ nBTagCut((0,0), minPt=30, maxEta=2.4, minCSVTag=0.814)+'&&'+nJetCut(jet, minPt=30, maxEta=2.4)+'&&'+nJetCut(2, minPt=80, maxEta=2.4)
+
+      f=open('genLtSortOut.txt','w')
+      g=open('fakeMetTail.txt','w')
       for DY in Bkg:
         DY['chain'].Draw('>>eList',cut)
         elist = ROOT.gDirectory.Get("eList")
@@ -542,13 +545,22 @@ for st in stReg:
             print "At %i of %i in Drell-Yan events "%(i,number_events)
           DY['chain'].GetEntry(elist.GetEntry(i))
   
-          ZPt, ZPhi, invMass, qtx, qty, leadLepPt, leadLepPhi, subLepPt, subLepPhi = getGenZ(DY['chain'])
-  
-#          if invMass>120 or invMass<60: continue
-  
+          ZPt, ZPhi, invMass, qtx, qty, leadLepPt, leadLepPhi, leadLepEta, subLepPt, subLepPhi, subLepEta = getGenZ(DY['chain'])
+
           metPhi = DY['chain'].GetLeaf('met_phi').GetValue()
           metPt = DY['chain'].GetLeaf('met_pt').GetValue()
-  
+          if metPt>125:
+            jets = [getObjDict(DY['chain'], 'Jet_', ['pt','phi','eta'], j) for j in range(int(DY['chain'].GetLeaf('nJet').GetValue()))]
+            events = {'fakeMetPt':metPt, 'fakeMetPhi':metPhi, 'lep1Pt':leadLepPt, 'lep1Phi':leadLepPhi, 'lep1Eta':leadLepEta,'lep2Pt':subLepPt, 'lep2Phi':subLepPhi, 'lep2Eta':subLepEta, 'jets':jets}
+            g.write(events)
+
+          #if invMass>120 or invMass<60: continue
+          if (leadLepPt+subLepPt)<st[0] or (leadLepPt+subLepPt)>=st[1]: 
+            jets = [getObjDict(DY['chain'], 'Jet_', ['pt','phi','eta'], j) for j in range(int(DY['chain'].GetLeaf('nJet').GetValue()))]
+            events = {'fakeMetPt':metPt, 'fakeMetPhi':metPhi, 'lep1Pt':leadLepPt, 'lep1Phi':leadLepPhi, 'lep1Eta':leadLepEta,'lep2Pt':subLepPt, 'lep2Phi':subLepPhi, 'lep2Eta':subLepEta, 'jets':jets}
+            f.write(events)
+            continue
+ 
           #pick one of the two muons and mimic it as neutrino, and treat the event as  Wmunu 
           a = randint(0,1)
           if a:
@@ -557,6 +569,7 @@ for st in stReg:
             genMetPhi = leadLepPhi
             lepPt = subLepPt
             lepPhi = subLepPhi
+            if lepPt<25 and abs(subLepEta)>2.4:continue
             metX = metPt*cos(metPhi) + genMetPt*cos(genMetPhi)
             metY = metPt*sin(metPhi) + genMetPt*sin(genMetPhi)
             qtWx_corr =metX + lepPt*cos(lepPhi)
@@ -566,6 +579,7 @@ for st in stReg:
             genMetPhi = subLepPhi
             lepPt = leadLepPt
             lepPhi = leadLepPhi
+            if lepPt<25 and abs(leadLepEta)>2.4:continue
             metX = metPt*cos(metPhi) + genMetPt*cos(genMetPhi)
             metY = metPt*sin(metPhi) + genMetPt*sin(genMetPhi)
             qtWx_corr =metX + lepPt*cos(lepPhi)
@@ -581,7 +595,7 @@ for st in stReg:
               recoMetPhi = pi + recoMetPhi
             if metY<0:
               recoMetPhi = recoMetPhi - pi
-  
+ 
           #calculate the pt and phi of mimic boson 
           WPt = sqrt(qtWx_corr**2 + qtWy_corr**2)
           WPhi = atan(qtWy_corr/qtWx_corr)
@@ -606,8 +620,8 @@ for st in stReg:
           RecoGenFrac = recoMetPt/genMetPt
           Lt = recoMetPt + lepPt
           genLt = genMetPt + lepPt
-          dPhi = acos((lepPt+recoMetPt*cos(lepPhi-recoMetPhi))/sqrt(lepPt**2+recoMetPt**2+2*recoMetPt*lepPt*cos(lepPhi-recoMetPhi)))
-#          if Lt<st[0] or Lt>=st[1]: continue
+#          dPhi = acos((lepPt+recoMetPt*cos(lepPhi-recoMetPhi))/sqrt(lepPt**2+recoMetPt**2+2*recoMetPt*lepPt*cos(lepPhi-recoMetPhi)))
+          dPhi = acos((lepPt+genMetPt*cos(lepPhi-genMetPhi))/sqrt(lepPt**2+genMetPt**2+2*genMetPt*lepPt*cos(lepPhi-genMetPhi)))
           dPhiHist.Fill(dPhi,DY['weight'])
           dPhiDummy.Fill(dPhi,DY['weight'])
           ZPtHist.Fill(ZPt,DY['weight'])
@@ -617,6 +631,7 @@ for st in stReg:
           fakeMetHist.Fill(fakeMetPt,DY['weight'])
           recoMetHist.Fill(recoMetPt,DY['weight'])
           genMetHist.Fill(genMetPt,DY['weight'])
+          lepPtHist.Fill(lepPt,DY['weight'])
           UparaHist.Fill(Upara,DY['weight'])
           UperpHist.Fill(Uperp,DY['weight'])
           RecoGenFracHist.Fill(RecoGenFrac,DY['weight'])
@@ -625,6 +640,9 @@ for st in stReg:
           genMetVSfakeMet.Fill(fakeMetPt,genMetPt,DY['weight'])
           UperpVSUpara.Fill(Upara,Uperp,DY['weight'])
       
+      f.close()
+      g.close()
+
       UparaHist.Draw('e hist')
       UparaHist.Fit('gaus','','same')
       FitFunc = UparaHist.GetFunction('gaus')
@@ -667,6 +685,9 @@ for st in stReg:
       RecoGenFracHist.Draw('hist')
       can1.Print(plotDir+prefix+'RecoGenFrac_'+cutname+'.png')
       can1.Print(plotDir+prefix+'RecoGenFrac_'+cutname+'.root')
+      lepPtHist.Draw('hist')
+      can1.Print(plotDir+prefix+'lepPt_'+cutname+'.png')
+      can1.Print(plotDir+prefix+'lepPt_'+cutname+'.root')
       dPhiHist.Draw('hist')
       can1.Print(plotDir+prefix+'dPhi_'+cutname+'.png')
       can1.Print(plotDir+prefix+'dPhi_'+cutname+'.root')
