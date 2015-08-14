@@ -94,18 +94,14 @@ class cutClass():
     self.inclDict     = self._makeDict(self.inclList)
     self.inclFlow     = self._makeFlow(self.inclList)
     self.inclCombined = self._combine(self.inclList) 
+    self.inclCombinedList  = (self.name ,self._combine(self.inclList) )
     self.baseCut      = baseCut
 
     self.list         = [ [name,baseCut+"&&"+cut] for name,cut in self.inclList ]
     self.dict         = self._makeDict(self.list)
     self.flow         = self._makeFlow(self.list)
     self.combined     = self._combine(self.inclList,baseCut)
-    
-
-
-
-
-
+    self.combinedList = (self.name, self.combined)
    # if baseCut and baseCut != "(1)":
    #   self.baseCut = baseCut
    #   self.list = [ [name,baseCut+"&&"+cut] for name,cut in cutList ] 
@@ -117,7 +113,6 @@ class cutClass():
    # self.keys = [x[0] for x in self.list]
    # self.dict= self._makeDict(self.InclusiveCutList)
    # self._combine(cutList)
-
   def _makeDict(self,cutList):
     Dict={}
     for cutName, cutString in cutList:
