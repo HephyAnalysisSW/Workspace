@@ -91,70 +91,6 @@ parser = OptionParser()
 (options, args) = parser.parse_args()
 
 
-def getCMGHashedDirs(sourceDir):
-  dirDict={}
-  dirs=[]
-  proc = subprocess.Popen(["dpns-ls", sourceDir],stdout=subprocess.PIPE)
-  stdout = proc.stdout.readlines()
-  if proc.stderr:
-    print "############# STDERR ################"
-    for line in proc.stderr:
-        print line
-  else:
-    nLines = len(stdout)
-    #print "Number of Directories:", nLines
-    if nLines > 50:
-       print "#####################################################"
-       print "Too many directories here! this could take some time!" 
-       print "#####################################################"
-    if nLines == 0:
-       print "Directory not valid: ", sourceDir
-       assert False 
-    if nLines == 1:
-      cmgHash=str([l.rsplit()[0] for l in stdout ][0])
-      if cmgHash.replace("_","").isalnum():
-        cmgHashedDir = sourceDir+"/"+cmgHash+"/"
-        proc2 = subprocess.Popen(["dpns-ls", cmgHashedDir],stdout=subprocess.PIPE)
-        cmg000s=[]
-        ## checking the 0000 or 0001, etc, directories in the Hashed Dir
-        for l in proc2.stdout.readlines():
-          cmg000= l.rsplit()[0]
-          if cmg000.isalnum() and len(cmg000)==4:
-            #print cmg000
-            if verbose: print "DPM Sample: ", sourceDir
-            dirs.append(cmgHashedDir+cmg000+"/")
-          else:
-             
-            print "#####################################################"
-            print cmgHash, "is not a cmgHash (0000 dir) or directory is not a CMG Hashed Dir:", cmgHashedDir
-            print "#####################################################"
-        #cmgHashedDir = sourceDir+"/"+cmgHash+"/0000/"
-        #print "cmgHash:", cmgHash
-        #print "cmgHashedDir:", cmgHashedDir 
-
-        #dirs.append(cmgHashedDir)
-        #return cmgHashedDir
-        return dirs
-      else:
-        #print cmgHash.replace("_","")
-        #print cmgHash.replace("_","").isalnum()
-        #print str(cmgHash.replace("_","")).isalnum()
-        #print type(cmgHash)
-        #print cmgHash, "is not a cmgHash or directory is not a CMG output dir:", sourceDir
-        #del cmgHash
-        line = stdout[0].rsplit()[0]
-        if verbose:
-          print "Descending into directories:"
-          print "        ", line
-        dirs.append(getCMGHashedDirs(sourceDir+"/"+line)[0])
-    else:
-      print "Descending into directories:" 
-      for line in stdout:
-        print "        ", line
-        #dirDict['l1'].append(line.rstrip())
-        #dirDict['l1'].append()
-        dirs.append(getCMGHashedDirs(sourceDir+"/"+line.rsplit()[0])[0]  )
-  return dirs
 
 
 
@@ -175,11 +111,6 @@ except NameError:
       indxHash = -2
       sampleName= "_".join(dirSplit[indxUsr+1:indxHash-1])
       #print sampleName
-
-
-
-
-      
       allOptDicts.append(  {
                             "dpmDir":dir,
                             "sourceDirDPM":dir.replace(dpmDir,"").replace(userNameDPM,""),

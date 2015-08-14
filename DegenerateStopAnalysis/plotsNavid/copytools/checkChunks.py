@@ -1,10 +1,9 @@
-#!/bin/sh
+
 import subprocess
 import os
 from os.path import basename, splitext
-from optparse import OptionParser
-
 import glob
+from copytools import *
 
 
 dirToCheck="/data/nrad/cmgTuples/RunII/Spring15_v1"
@@ -15,80 +14,6 @@ dirToCheck="/data/nrad/cmgTuples/RunII/Spring15_v1"
 #mainDirProc = subprocess.Popen(["ls", dirToCheck],stdout=subprocess.PIPE)
 #filesMainDir = [l.rsplit()[0] for l in mainDirProc.stdout.readlines()]
 
-def checkWildCard(dir):
-  if "*" in dir:
-    return dir
-  else:
-    return dir+"/*"
-
-def removeBasename(dir):
-  return dir.replace("/"+basename(dir),"")
-
-def checkForStrandedRootFiles(dir,filename="*",warn=False):
-  strandedRootFiles=glob.glob(dir+"/%s.root"%filename)
-  if warn and strandedRootFiles:
-    print "There these stranded Rootfiles:", strandedRootFiles
-  return strandedRootFiles
-
-def getDirs(dir):
-  dir = checkWildCard(dir)
-  files = glob.glob(dir)
-  dirs = [f for f in files if os.path.isdir(f)]
-  return dirs
-
-def getChunkNum(chunk):
-  chunkString="Chunk"
-  try:
-    chunk = [x for x in chunk.rsplit("/") if "Chunk" in x][0]
-    chunkNum= chunk[ chunk.index("Chunk")+5: ]
-    if chunkNum.isalnum():
-      return chunkNum
-    else:
-      print "##########################################"
-      print "%s chunkNum is not Number"%chunkNum
-      print chunk
-      print "##########################################"
-      return False
-  except ValueError:
-    return ""
-
-def getTreeNum(chunk):
-  string="tree"
-  try:
-    chunk = [x for x in chunk.rsplit("/") if string in x][0]
-    chunk = splitext(chunk)[0]
-    chunkNum= chunk[ chunk.index(string)+len(string)+1: ]
-    if chunkNum.isalnum():
-      return chunkNum
-    else:
-      print "##########################################"
-      print "chunkNum is not Number"
-      return False
-  except ValueError:
-    return ""
-
-def getChunk(dir,chunkNum="*"):
-  chunks = glob.glob(dir+"/"+basename(dir)+"_Chunk%s"%chunkNum)
-  return chunks
-
-def isGoodChunk(dir,chuckNum):
-  chunk = getChunk(dir,chuckNum)
-  return len(glob.glob(chunk+"/tree.root"))==1  
-
-def isBadCMGDir(dir,warn=False):
-  chunks = getChunk(dir)
-  chunksWithRootFiles = [removeBasename(d) for d in glob.glob(dir+"/*/tree.root")]
-
-  nChunks             = len( chunks)
-  nChunksWithRootFile = len( chunksWithRootFiles )
-
-  if nChunks == nChunksWithRootFile:
-    return False
-  else:
-    if warn: print nChunks-nChunksWithRootFile , "Chunks are without rootfiles in Dir:", dir
-    chunksWithoutRootFiles = [x for x in chunks if x not in chunksWithRootFiles]
-    badChunkList = [getChunkNum(x) for x in chunksWithoutRootFiles] 
-    return (chunksWithoutRootFiles,badChunkList)
 
 subDirs= getDirs(dirToCheck)
 strandedRootFilesDict={}
@@ -167,7 +92,6 @@ userNameDPM                 ='schoef'
 #sourceBaseDirDPM            =["DYJetsToLL_M-50_HT-200to400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"]
 targetBaseDirNFS            ="/cmgTuples/RunII/Spring15_v1/"
 userNameNFS                 ='nrad'
-verbose=False
 
 
 try: 
@@ -186,7 +110,7 @@ except NameError:
       indxHash = -2
       sampleName= "_".join(dirSplit[indxUsr+1:indxHash-1])
       #print sampleName
-      allOptDicts.append(  {
+      allOptDicts.append({
                             "dpmDir":dir,
                             "sourceDirDPM":dir.replace(dpmDir,"").replace(userNameDPM,""),
                             "targetDirNFS":targetBaseDirNFS+"/"+sampleName,
@@ -195,11 +119,6 @@ except NameError:
                             "userNameDPM":userNameDPM,
                            })
 
-
-
-
-
-
 for dir in badCMGDirs:
   sampleName = dir['sampleName']
   #print len(filter( lambda x: x['sampleName']==sampleName,allOptDicts ))
@@ -207,11 +126,7 @@ for dir in badCMGDirs:
   dir['dpmDir']= filter( lambda x: x['sampleName']==sampleName,allOptDicts )[0]['dpmDir']
 
 
-
-
-
 def fixBadCMGChunk(badCMGDirDict,attempt=0):
-
   if not isBadCMGDir(badCMGDirDict['targetDir']):
     print badCMGDirDict['sampleName'] ,"has no bad chunks"
   else:
@@ -273,10 +188,8 @@ def fixStrandedRootFiles(badCMGDirDict,attempt=0,defaultOutput="output.log_"):
       tarFileName = defaultOutput+treeNum+".tgz"
       sourceTarFile = dpmDir+tarFileName
       targetTarFile = badCMGDirDict['targetDir']+"/"+tarFileName
-
       #print sourceTarFile, chunkName, cmgChunk
       print treeNum ," :   " 
-
       missingTarfileLs =subprocess.Popen(["dpns-ls" , sourceTarFile ],stdout=subprocess.PIPE, stderr=subprocess.PIPE)
       stdout      = [l for l in missingTarfileLs.stderr.readlines()]
       if stdout:
@@ -297,7 +210,6 @@ def fixStrandedRootFiles(badCMGDirDict,attempt=0,defaultOutput="output.log_"):
         print "                 ", command
         os.system(command)
       #return commands,objs
-
       #os.system("mkdir %s"%chunk)
       #os.system("tar -xf %s --directory=%s --strip-components=1"%(directory+"/"+filename,cmgChunks))
       #os.system( "mv %s %s"%(directory + '/' + rootFileName,cmgChunks+'/'+treeProducerName+'/'+finalTreeName))

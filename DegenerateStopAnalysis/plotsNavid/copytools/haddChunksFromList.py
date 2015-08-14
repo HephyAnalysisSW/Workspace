@@ -2,6 +2,8 @@
 import os
 import glob
 
+## you can get the samples with glob.glob( "/mother_dir/*Spring15*" )
+
 
 samples=['/data/nrad/cmgTuples/RunII/Spring15_v1/QCD_Pt-80to120_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1_test',
  '/data/nrad/cmgTuples/RunII/Spring15_v1/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1_MC25ns',
@@ -83,5 +85,6 @@ def doHadd():
   for sample in samples:
     #os.system("cd %s"%sample)
     os.chdir(sample)
-    os.system("haddChunks.py -c %s"%sample)
+    #os.system("haddChunks.py -c %s"%sample)
+    os.system("heppy_hadd.py -c .")
   
