@@ -4,22 +4,22 @@ from Workspace.HEPHYPythonTools.helpers import getChunks
 sampleDir="/afs/hephy.at/work/n/nrad/cmgTuples/withTracks/"
 
 
-WJetsToLNu_50ns={\
-"name" : "WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8",
-"chunkString" :"WJetsToLNu_50ns", 
-'dir': "/afs/hephy.at/work/n/nrad/cmgTuples/withTracks/_WJetsToLNu_50ns/Chunks/",
-'dbsName':'WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8',
-"treeName":"treeProducerSusySingleLepton",
-"rootFileLocation":"treeProducerSusySingleLepton/tree.root",
-"skimAnalyzerDir":"skimAnalyzerCount",
-'isData':False
-}
+#WJetsToLNu_50ns={\
+#"name" : "WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8",
+#"chunkString" :"WJetsToLNu_50ns", 
+#'dir': "/afs/hephy.at/work/n/nrad/cmgTuples/withTracks/_WJetsToLNu_50ns/Chunks/",
+#'dbsName':'WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8',
+#"treeName":"treeProducerSusySingleLepton",
+#"rootFileLocation":"treeProducerSusySingleLepton/tree.root",
+#"skimAnalyzerDir":"skimAnalyzerCount",
+#'isData':False
+#}
 
 
 WJetsToLNu={\
 "name" : "WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8",
 "chunkString" :"WJetsToLNu", 
-'dir': "/afs/hephy.at/work/n/nrad/cmgTuples/withTracks/WithTracks_batch/",
+'dir': "/afs/hephy.at/work/n/nrad/cmgTuples/withTracks/WJetsToLNu/",
 'dbsName':'WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8',
 "treeName":"treeProducerSusySingleLepton",
 "rootFileLocation":"treeProducerSusySingleLepton/tree.root",
