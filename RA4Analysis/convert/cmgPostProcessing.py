@@ -8,7 +8,7 @@ from Workspace.HEPHYPythonTools.helpers import getObjFromFile, getObjDict, getFi
 from Workspace.HEPHYPythonTools.convertHelpers import compileClass, readVar, printHeader, typeStr, createClassString
 
 
-subDir = "postProcessed_Spring15_v2"
+subDir = "postProcessed_Spring15_AllFlags2"
 #from Workspace.RA4Analysis.cmgTuples_v3 import *
 from Workspace.HEPHYPythonTools.helpers import getChunksFromNFS, getChunks
 #from Workspace.RA4Analysis.cmgTuples_PHYS14V3 import *
