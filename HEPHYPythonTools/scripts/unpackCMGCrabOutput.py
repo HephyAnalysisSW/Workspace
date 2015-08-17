@@ -17,7 +17,6 @@ parser.add_option("--untar", dest="untar", default=".tgz", type="string", action
 parser.add_option("--hadd", dest="hadd",default=False,action="store_true",help="adds chunks together.")
 parser.add_option("--clean", dest="clean",default=False,action="store_true",help="move chunks to Chunks/ after processing. relevant only with --hadd")
 
-
 #parser.add_option("--sampleName", dest="sampleName", default="TTJets", type="string", action="store", help="Name of sample name which will be used with chunks")
 (options, args) = parser.parse_args()
 
@@ -49,7 +48,7 @@ treeProducerName=""
 #  os.system("mkdir -p "+oDir)
 
 #lsNFS = os.listdir(oDir)
-debug =0 
+debug =1
 p = subprocess.Popen(["ls -l "+ directory], shell = True , stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
 
