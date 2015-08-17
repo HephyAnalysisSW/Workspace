@@ -110,7 +110,7 @@ def getChain(sL, minAgeDPM=0, histname='histo', xrootPrefix='root://hephyse.oeaw
           for f in getFileList(dir+'/'+b, minAgeDPM, histname, xrootPrefix, maxN):
             i+=1
             c.Add(f)
-  print "Added ",i #,'files from sample',s['name']
+  print "Added ",i,'files from sample',s['name']
   return c
 
 def getChunks(sample, maxN=-1):
@@ -130,10 +130,9 @@ def getChunks(sample, maxN=-1):
 def getChunksFromNFS(sample,  maxN=-1):
 #  print "sample" , sample , maxN
   import os, subprocess, datetime
-  #sample['dir']=sample['dir']+'/'+sample['name']
-  print "sample dir:" , sample['dir']
+  #print "sample dir:" , sample['dir']
   chunks = [{'name':x} for x in os.listdir(sample['dir']) if x.startswith(sample['chunkString']+'_Chunk') or x==sample['name']]
-  print chunks
+  #print chunks
   chunks=chunks[:maxN] if maxN>0 else chunks
   sumWeights=0
   allFiles=[]
@@ -163,7 +162,6 @@ def getChunksFromNFS(sample,  maxN=-1):
 #    except: print "Chunk",s,"could not be added"
   print "Found",len(chunks),"chunks for sample",sample["name"],'with a normalization constant of',sumWeights,
   if len(chunks) > 0: print ". Failed for:",",".join([c['name'] for c in failedChunks]),"(",round(100*len(failedChunks)/float(len(chunks)),1),")%"
-  del sample
   return chunks, sumWeights
 
 #def getChunksFromDPM(sample, fromDPM=False, maxN=-1):
