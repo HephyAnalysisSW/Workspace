@@ -38,6 +38,27 @@ def getWMass(c):
     WMass = float('nan')
   return WMass
 
+def getNeutrino(c):
+  para = ['pt','phi','eta','pdgId','motherId']
+  genPartAll = [getObjDict(c, 'genPartAll_', para, j) for j in range(int(c.GetLeaf('ngenPartAll').GetValue()))]
+  #Neutrino = [i for i in genPartAll if (abs(i['pdgId'])==14 or abs(i['pdgId'])==12)]
+  Neutrinos = []
+  NeutrinosFromW = []
+  for Neutrino in filterParticles(genPartAll, [12,14], 'pdgId'):
+    Neutrinos.append(Neutrino)
+  for NeutrinoFromW in filterParticles(Neutrinos, [24], 'motherId'):
+    NeutrinosFromW.append(NeutrinoFromW)
+  #Neutrino = filter(lambda w:(abs(w['pdgId'])==14 or abs(w['pdgId'])==12), genPartAll)
+  #NeutrinoFromW = filter(lambda w:abs(w['motherId'])==24, Neutrino)
+  metGenPhi = c.GetLeaf('met_genPhi').GetValue()
+  metGenPt = c.GetLeaf('met_genPt').GetValue()
+  if len(NeutrinosFromW)>0:
+    if len(NeutrinosFromW)>1: print 'this should not have happened'
+    NeutrinoPt = NeutrinosFromW[0]['pt']
+    NeutrinoPhi = NeutrinosFromW[0]['phi']
+    return NeutrinoPt, NeutrinoPhi, metGenPt
+  else: return 0., 0.
+
 lepSel = 'hard'
 
 WJETS  = getChain(WJetsHTToLNu[lepSel],histname='')

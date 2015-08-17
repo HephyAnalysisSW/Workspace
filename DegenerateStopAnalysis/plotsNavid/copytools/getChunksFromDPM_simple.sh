@@ -1,8 +1,8 @@
 #!/bin/sh
 eval `scramv1 runtime -sh`
 
-export userNameDPM='easilar'
-export userNameNFS='easilar'
+export userNameDPM='schoef'
+export userNameNFS='nrad'
 
 
 ##### MAKE SURE SAMPLE NAME IN SOURCE AND TARGET MATCH!!!! ####
@@ -13,12 +13,13 @@ export userNameNFS='easilar'
 #export SOURCE="TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1_fixgentaus/150720_180859/0000/"
 #export SOURCE="WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1_fixgentaus/150720_181150/0000/"
 
-export SOURCE="ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1_fixgentaus/150720_181025/0000/"
-export TARGET="cmgTuples/crab_Spring15/ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1/"
+export SOURCE="DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v3_MC25ns/150808_200524/0000/"
+#export TARGET="cmgTuples/Spring15_v0/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v3_MC25ns/"
+export TARGET="cmgTuples/Spring15_v0/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/test1/"
 
 
 getCMGCrabOutput.py     --userNameDPM=$userNameDPM --userNameNFS=$userNameNFS --source=$SOURCE --target=$TARGET --fileName='' --suffix=".root .tgz" 
-unpackCMGCrabOutput.py  --userNameNFS=$userNameNFS  --dir=$TARGET --suffix=".tgz"
+#unpackCMGCrabOutput.py  --userNameNFS=$userNameNFS  --dir=$TARGET --suffix=".tgz"
 
 
 

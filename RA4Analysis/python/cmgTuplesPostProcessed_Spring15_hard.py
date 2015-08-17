@@ -27,9 +27,15 @@ ttJets=makeSample({\
 
 WJetsHTToLNu=makeSample({\
 "name" : "WJetsHTToLNu",
-"bins" : ["WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8", "WJetsToLNu_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8", "WJetsToLNu_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8", "WJetsToLNu_HT-600ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"],
-'dir' : "/data/easilar/cmgTuples/postProcessed_Spring15_AllFlags/",
+"bins" : ["WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1_MC25ns", "WJetsToLNu_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1_MC25ns", "WJetsToLNu_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v3_MC25ns", "WJetsToLNu_HT-600ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1_MC25ns"],
+'dir' : "/data/dspitzbart/cmgTuples/postProcessed_Spring15_AllFlags2/",
 })
+
+#WJetsHTToLNu=makeSample({\
+#"name" : "WJetsHTToLNu",
+#"bins" : ["WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8", "WJetsToLNu_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8", "WJetsToLNu_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8", "WJetsToLNu_HT-600To800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8", "WJetsToLNu_HT-800To1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8","WJetsToLNu_HT-1200To2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8","WJetsToLNu_HT-2500ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"],
+#'dir' : "/data/easilar/cmgTuples/postProcessed_Spring15_AllFlags/",
+#})
 
 #TTVH=makeSample({\
 #"name" : "TTVH",
@@ -42,11 +48,17 @@ singleTop=makeSample({\
 "bins" : ["ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1", "ST_t-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1", "ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1", "ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1"],
 'dir' : "/data/easilar/cmgTuples/postProcessed_Spring15_AllFlags/",
 })
+#DY=makeSample({\
+#"name" : "DY",
+#"bins" : ["DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8"],
+#'dir' : "/data/easilar/cmgTuples/postProcessed_Spring15_AllFlags/",
+#})
 DY=makeSample({\
 "name" : "DY",
 "bins" : ["DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8"],
-'dir' : "/data/easilar/cmgTuples/postProcessed_Spring15_AllFlags/",
+'dir' : "/data/dspitzbart/cmgTuples/postProcessed_Spring15_AllFlags2/",
 })
+
 
 QCD=makeSample({\
 "name" : "QCD",

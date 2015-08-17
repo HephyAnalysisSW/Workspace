@@ -27,7 +27,7 @@ directory= "/data/"+options.userNameNFS+'/'+options.dir
 
 suf = options.suffix
 
-print options.dir.split("/")
+#print options.dir.split("/")
 
 if not options.dir.endswith("/"):
   sampleName = options.dir.split("/")[-1]
@@ -39,9 +39,11 @@ else:
 
 
 
-treeName="susySingleLepton"
+#treeName="susySingleLepton"
+#treeProducerName="treeProducerSusySingleLepton"
+treeName="tree"
 finalTreeName="tree.root"
-treeProducerName="treeProducerSusySingleLepton"
+treeProducerName=""
 #if not os.path.isdir(oDir):
 #  print "Creating ",oDir
 #  os.system("mkdir -p "+oDir)
@@ -64,7 +66,7 @@ for line in p.stdout.readlines():
   linePart=line[:-1].split()
   #print "#### ", linePart
   if linePart[0]=='total':
-    print line
+    #print line
     continue
   else: 
     if linePart[-1].endswith(suf):
