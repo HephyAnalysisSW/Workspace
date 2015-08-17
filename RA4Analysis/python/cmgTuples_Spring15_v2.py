@@ -1,52 +1,7 @@
 import copy, os, sys
 
-
-#artur_path = "/afs/cern.ch/work/e/easilar/Aug06_GoldenJSON/"
-artur_path = "/afs/cern.ch/work/e/easilar/data/data_from_Artur_newMET_13Aug/Aug12_GoldenJson_METnoHF/"
-
 navid_path = "/data/nrad/cmgTuples/RunII/Spring15_v1/"
 
-data_ele={\
-"name" : "SingleElectron_Run2015B",
-"chunkString" : "SingleElectron_Run2015B",
-"rootFileLocation":"/treeProducerSusySingleLepton/tree.root",
-"skimAnalyzerDir":"skimAnalyzerCount",
-"treeName":"tree",
-'isData':True,
-'dir' : artur_path+"/"
-}
-
-data_mu={\
-"name" : "SingleMuon_Run2015B",
-"chunkString" : "SingleMuon_Run2015B",
-"rootFileLocation":"/treeProducerSusySingleLepton/tree.root",
-"skimAnalyzerDir":"skimAnalyzerCount",
-"treeName":"tree",
-'isData':True,
-'dir' : artur_path+"/"
-}
-
-
-data_ele_17July={\
-"name" : "SingleElectron_Run2015B_17Jul",
-"chunkString" : "SingleElectron_Run2015B_17Jul",
-"rootFileLocation":"/treeProducerSusySingleLepton/tree.root",
-"skimAnalyzerDir":"skimAnalyzerCount",
-"treeName":"tree",
-'isData':True,
-'dir' : artur_path+"/"
-}
-
-data_mu_17July={\
-"name" : "SingleMuon_Run2015B_17Jul",
-"chunkString" : "SingleMuon_Run2015B_17Jul",
-"rootFileLocation":"/treeProducerSusySingleLepton/tree.root",
-"skimAnalyzerDir":"skimAnalyzerCount",
-"treeName":"tree",
-'isData':True,
-'dir' : artur_path+"/"
-}
-################
 
 TTJets={\
 "chunkString" : "TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1_test",
@@ -57,16 +12,6 @@ TTJets={\
 'isData':False
 }
 
-#DY={\
-##"name" : "DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8",
-#"chunkString" : "RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v2_plzworkheplx",
-#"name" : "RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v2_plzworkheplx",
-##'dir' : "/tmp/easilar/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v2_plzworkheplx/", 
-#'dir' : "/afs/hephy.at/work/e/easilar/MC_Spring15_Samples/hadded_samples/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8//", 
-#"rootFileLocation":"tree.root",
-#"treeName":"tree",
-#'isData':False
-#}
 
 DY_HT200to400={\
 "chunkString" : "DYJetsToLL_M-50_HT-200to400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1_test",
