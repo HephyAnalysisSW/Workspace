@@ -42,7 +42,7 @@ def makeMETPerformanceHistos(setup):
     for b in s['bins']:
       b['chain'].Draw('>>eList', setup['preselection'])
       eList = ROOT.gDirectory.Get('eList')
-      nEvents = eList.GetN() if not setup.has_key('maxEvents') else setup['maxEvents']
+      nEvents = eList.GetN() if not setup.has_key('maxEvents') or setup['maxEvents']<0 else setup['maxEvents']
       for nev in range(nEvents):
         if nev%1000==0:print "At %i / %i"%(nev, nEvents)
         b['chain'].GetEntry(eList.GetEntry(nev))

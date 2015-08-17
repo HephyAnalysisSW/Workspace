@@ -10,7 +10,7 @@ from Workspace.metAnalysis.performanceTools import makeMETPerformanceHistos
 from Workspace.RA4Analysis.simplePlotHelpers import plot, stack, drawNMStacks
 
 lumi=100.
-small = True 
+small = False
 
 samples=[ 
 #  {"name":"DY", "bins":[DYJetsToLL_M50_25ns], "legendText":"Drell-Yan"}
@@ -36,7 +36,7 @@ variables = {
   'nVert':{"func":lambda c:getVarValue(c,"nVert"), "legendText":"vertex multiplicity", "binning":nvtxBinning},
   'qt':{"func":"qt", "legendText":"p_{T,Z} (GeV)", "binning":qtBinning},
   'sumEt':{"func":lambda c:getVarValue(c,"met_sumEt"), "legendText":"\Sigma E_{T} (GeV)", "binning":sumETBinning},
-  'jet0Eta':{"func":lambda c:getVarValue(c,"Jet_eta",0), "legendText":"\eta(j_0)", "binning":range(-5,5,1)},
+  'jet0Eta':{"func":lambda c:getVarValue(c,"Jet_eta",0), "legendText":"\eta(j_0)", "binning":range(-5,6,1)},
 }
 metVariables = {
   'type1':{'ptFunc':lambda c:getVarValue(c,"met_pt"), 'phiFunc':lambda c:getVarValue(c,"met_phi")},
@@ -79,10 +79,15 @@ setup = {
     'preselection':cut,
     'leptons':getMuons,
     'massWindow':massWindow,
-    'maxEvents':100000
-    }
+#    'maxEvents':10000
+    'maxEvents':-1
+ }
 
 setup = makeMETPerformanceHistos(setup) 
+
+topleft = [0.16,0.78,0.7,0.95]
+bottomleft = [0.16,0.16,0.7,0.33]
+bottomright = [0.40,0.13,0.98,0.3]
 
 prefix = 'small_' if small else ''
 stuff=[]
@@ -106,7 +111,7 @@ for name, v in setup["variables"].iteritems():
   labels={'x':v['legendText'],'y':'\langle u_{\parallel}\\rangle/\langle q_T \\rangle'}
   opt = {'labels':labels, 'logX':False, 'logY':False, 'yRange':[0,1.5], 'ratio':None}
   opt['texLines'] = [{'pos':(0.16, 0.96),'text':'CMS Simulation, 13 TeV',        'options':{'size':0.035}}]
-  opt['legend'] = {'coordinates':[0.16,0.78,0.7,0.95],'boxed':True}
+  opt['legend'] = {'coordinates':bottomright,'boxed':True}
   stk = stack(plotLists, options = opt)
   stuff.append(drawNMStacks(1,1,[stk],         'pngMet/'+prefix+'scale_vs_'+name+'.png'))
 
@@ -119,7 +124,7 @@ for name, v in setup["variables"].iteritems():
   labels={'x':v['legendText'],'y':'\sigma(u_{\parallel}+q_{T})'}
   opt = {'labels':labels, 'logX':False, 'logY':False, 'yRange':[0,50], 'ratio':None}
   opt['texLines'] = [{'pos':(0.16, 0.96),'text':'CMS Simulation, 13 TeV',        'options':{'size':0.035}}]
-  opt['legend'] = {'coordinates':[0.16,0.78,0.7,0.95],'boxed':True}
+  opt['legend'] = {'coordinates':bottomright,'boxed':True}
   stk = stack(plotLists, options = opt)
   stuff.append(drawNMStacks(1,1,[stk],         'pngMet/'+prefix+'upara_RMS_vs_'+name+'.png'))
 
@@ -131,7 +136,7 @@ for name, v in setup["variables"].iteritems():
   labels={'x':v['legendText'],'y':'\sigma (u_{\parallel}+q_{T}) / (\langle u_{\parallel}\\rangle/\langle q_T \\rangle)'}
   opt = {'labels':labels, 'logX':False, 'logY':False, 'yRange':[0,50], 'ratio':None}
   opt['texLines'] = [{'pos':(0.16, 0.96),'text':'CMS Simulation, 13 TeV',        'options':{'size':0.035}}]
-  opt['legend'] = {'coordinates':[0.16,0.78,0.7,0.95],'boxed':True}
+  opt['legend'] = {'coordinates':bottomright,'boxed':True}
   stk = stack(plotLists, options = opt)
   stuff.append(drawNMStacks(1,1,[stk],         'pngMet/'+prefix+'upara_RMScorr_vs_'+name+'.png'))
 
@@ -143,7 +148,7 @@ for name, v in setup["variables"].iteritems():
   labels={'x':v['legendText'],'y':'\sigma(u_{\perp})'}
   opt = {'labels':labels, 'logX':False, 'logY':False, 'yRange':[0,50], 'ratio':None}
   opt['texLines'] = [{'pos':(0.16, 0.96),'text':'CMS Simulation, 13 TeV',        'options':{'size':0.035}}]
-  opt['legend'] = {'coordinates':[0.16,0.78,0.7,0.95],'boxed':True}
+  opt['legend'] = {'coordinates':bottomright,'boxed':True}
   stk = stack(plotLists, options = opt)
   stuff.append(drawNMStacks(1,1,[stk],         'pngMet/'+prefix+'uperp_RMS_vs_'+name+'.png'))
 
@@ -155,7 +160,7 @@ for name, v in setup["variables"].iteritems():
   labels={'x':v['legendText'],'y':'\sigma(u_{\perp}) / (\langle u_{\parallel}\\rangle/\langle q_T \\rangle)'}
   opt = {'labels':labels, 'logX':False, 'logY':False, 'yRange':[0,50], 'ratio':None}
   opt['texLines'] = [{'pos':(0.16, 0.96),'text':'CMS Simulation, 13 TeV',        'options':{'size':0.035}}]
-  opt['legend'] = {'coordinates':[0.16,0.78,0.7,0.95],'boxed':True}
+  opt['legend'] = {'coordinates':bottomright,'boxed':True}
   stk = stack(plotLists, options = opt)
   stuff.append(drawNMStacks(1,1,[stk],         'pngMet/'+prefix+'uperp_RMScorr_vs_'+name+'.png'))
 
