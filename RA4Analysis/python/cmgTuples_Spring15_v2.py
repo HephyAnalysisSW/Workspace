@@ -1,7 +1,7 @@
 import copy, os, sys
 
 navid_path = "/data/nrad/cmgTuples/RunII/Spring15_v1/"
-
+ece_path = "/data/easilar/cmgTuples/crab_Spring15/Summer15_25nsV2_MC/"
 
 TTJets={\
 "chunkString" : "TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1_test",
@@ -83,12 +83,12 @@ WJets={\
 #"treeName":"tree",
 #'isData':False
 #}
-'''
+
 QCD_HT200to300={\
 #"name" : "QCD_HT200to300_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/",
 "chunkString" : "RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2_plzworkheplx",
 "name" : "RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2_plzworkheplx",
-'dir' : "/afs/hephy.at/work/e/easilar/MC_Spring15_Samples/hadded_samples/QCD_HT200to300_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/",
+'dir' : ece_path+"/QCD_HT200to300_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/",
 "rootFileLocation":"tree.root",
 "treeName":"tree",
 'isData':False
@@ -98,7 +98,7 @@ QCD_HT300to500={\
 #"name" : "QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/",
 "chunkString" : "RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2_plzworkheplx",
 "name" : "RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2_plzworkheplx",
-'dir' : "/afs/hephy.at/work/e/easilar/MC_Spring15_Samples/hadded_samples/QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/",
+'dir' : ece_path+"/QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/",
 "rootFileLocation":"tree.root",
 "treeName":"tree",
 'isData':False
@@ -108,7 +108,7 @@ QCD_HT500to700={\
 #"name" : "/QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/",
 "chunkString" : "RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1_plzworkheplx",
 "name" : "RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1_plzworkheplx",
-'dir' : "/afs/hephy.at/work/e/easilar/MC_Spring15_Samples/hadded_samples/QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/",
+'dir' : ece_path+"/QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/",
 "rootFileLocation":"tree.root",
 "treeName":"tree",
 'isData':False
@@ -118,7 +118,7 @@ QCD_HT700to1000={\
 #"name" : "/QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/",
 "chunkString" : "RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1_plzworkheplx",
 "name" : "RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1_plzworkheplx",
-'dir' : "/afs/hephy.at/work/e/easilar/MC_Spring15_Samples/hadded_samples/QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/",
+'dir' : ece_path+"/QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/",
 "rootFileLocation":"tree.root",
 "treeName":"tree",
 'isData':False
@@ -128,7 +128,7 @@ QCD_HT1000to1500={\
 #"name" : "/QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/",
 "chunkString" : "RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2_plzworkheplx",
 "name" : "RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2_plzworkheplx",
-'dir' : "/afs/hephy.at/work/e/easilar/MC_Spring15_Samples/hadded_samples/QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/",
+'dir' : ece_path+"/QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/",
 "rootFileLocation":"tree.root",
 "treeName":"tree",
 'isData':False
@@ -138,7 +138,7 @@ QCD_HT1500to2000={\
 #"name" : "/QCD_HT1000to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/",
 "chunkString" : "RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1_plzworkheplx",
 "name" : "RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1_plzworkheplx",
-'dir' : "/afs/hephy.at/work/e/easilar/MC_Spring15_Samples/hadded_samples/QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/",
+'dir' : ece_path+"/QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/",
 "rootFileLocation":"tree.root",
 "treeName":"tree",
 'isData':False
@@ -148,12 +148,10 @@ QCD_HT2000toInf={\
 #"name" : "/QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/",
 "chunkString" : "RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1_plzworkheplx",
 "name" : "RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1_plzworkheplx",
-'dir' : "/afs/hephy.at/work/e/easilar/MC_Spring15_Samples/hadded_samples/QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/",
+'dir' : ece_path+"/QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/",
 "rootFileLocation":"tree.root",
 "treeName":"tree",
 'isData':False
 }
 
-#print QCD_HT500to700
-'''
 
