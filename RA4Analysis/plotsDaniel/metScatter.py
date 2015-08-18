@@ -16,7 +16,7 @@ from Workspace.RA4Analysis.helpers import *
 from Workspace.RA4Analysis.eventShape import *
 
 #presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&deltaPhi_Wl>1."
-presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&Flag_EcalDeadCellTriggerPrimitiveFilter"#&&Jet_pt[0]<800"
+presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80"#&&Flag_EcalDeadCellTriggerPrimitiveFilter"#&&Jet_pt[0]<800"
 #presel = "singleMuonic|singleElectronic&&njets>=2"
 
 ROOT.TH1F().SetDefaultSumw2()
@@ -90,7 +90,7 @@ def getZ(c):
 
 
 varstring="deltaPhi_Wl"
-plotDir='/afs/hephy.at/user/d/dspitzbart/www/Spring15/WjetScatterDPhiJetMetCut/'
+plotDir='/afs/hephy.at/user/d/dspitzbart/www/Spring15/WjetScatterEnhancedStatAFMCut/'
 
 if not os.path.exists(plotDir):
   os.makedirs(plotDir)
@@ -107,7 +107,7 @@ c = getChain(WJetsHTToLNu[lepSel],histname='')
 
 stReg=[(250,350)]#,(350,450),(450,-1)]#,(350,450),(450,-1)]
 htReg=[(1000,-1)]#,(750,1000),(1000,-1)]#,(1250,-1)]#,(1250,-1)]
-jetReg = [(2,3),(4,4),(5,5),(6,7),(8,-1)]#,(8,-1)]#,(6,-1)]#,(8,-1)]#,(6,-1),(8,-1)]
+jetReg = [(2,2),(3,3),(4,4),(5,5),(6,7),(8,-1)]#,(8,-1)]#,(6,-1)]#,(8,-1)]#,(6,-1),(8,-1)]
 btb = (0,0)
 
 colors = [ROOT.kBlue+2, ROOT.kBlue-4, ROOT.kBlue-7, ROOT.kBlue-9, ROOT.kCyan-9, ROOT.kCyan-6, ROOT.kCyan-2,ROOT.kGreen+3,ROOT.kGreen-2,ROOT.kGreen-6,ROOT.kGreen-7, ROOT.kOrange-4, ROOT.kOrange+1, ROOT.kOrange+8, ROOT.kRed, ROOT.kRed+1]
@@ -178,13 +178,14 @@ for st in stReg:
               #if dPhiJetMet<0.9:
               print int(run), int(lumi), int(evt), fakeMet, met, metGenPhi, metPt, metPhi, leptonPt, leptonPhi, leptonEta, stValue, dPhi
             points[-1].SetPoint(0,fakeMet,met)
-            points[-1].SetMarkerStyle(8)
-            #pointSize = 0.2+weight*15
+            points[-1].SetMarkerStyle(20)
+            #pointSize = 0.6+abs(weight)*7
             pointSize=0.5
             points[-1].SetMarkerSize(pointSize)
             for a in range(0,16):
               if dPhi*5<a:
-                points[-1].SetMarkerColor(colors[a])
+                if weight<0.: points[-1].SetMarkerColor(ROOT.kMagenta)
+                else: points[-1].SetMarkerColor(colors[a])
                 break
             points[-1].Draw('p same')
       #UparaHist.Draw('e hist')
