@@ -90,7 +90,7 @@ def getZ(c):
 
 
 varstring="deltaPhi_Wl"
-plotDir='/afs/hephy.at/user/d/dspitzbart/www/Spring15/WjetScatterEnhancedStatAFMCut/'
+plotDir='/afs/hephy.at/user/d/dspitzbart/www/Spring15/WjetScatterEnhancedStatAFMCutTotal/'
 
 if not os.path.exists(plotDir):
   os.makedirs(plotDir)
@@ -98,6 +98,7 @@ if not os.path.exists(plotDir):
 
 lepSel='hard'
 #c = getChain(DY[lepSel],histname='')
+#c = getChain(WJetsHTToLNuLow[lepSel],histname='')
 c = getChain(WJetsHTToLNu[lepSel],histname='')
 
 ## for old samples
@@ -151,7 +152,7 @@ for st in stReg:
       points[0].GetYaxis().SetTitle('#slash{E}_{T}^{gen}')
       points[0].SetMarkerSize(0)
       points[0].Draw('ap')
-      print 'run, lumi, evt, fakeMet, genMet, genMetPhi, recoMet, recoMetPhi, leptonPt, leptonPhi, leptonEta, st, deltaPhi'
+      #print 'run, lumi, evt, fakeMet, genMet, genMetPhi, recoMet, recoMetPhi, leptonPt, leptonPhi, leptonEta, st, deltaPhi'
       for i in range(number_events):
         c.GetEntry(elist.GetEntry(i))
         weight=getVarValue(c,"weight")
@@ -171,16 +172,16 @@ for st in stReg:
         #print dPhi
         if met > 0.:
           points.append(ROOT.TGraph())
-          if dPhi>1. and dPhiJetMet>0.45:# and dPhiJetMet<0.9:
+          if dPhi>0. and dPhiJetMet>0.45:# and metPt>100.:# and dPhiJetMet<0.9:
             totWeight += weight
             if fakeMet/met>1.:# and fakeMet<50.:
               low+=weight
               #if dPhiJetMet<0.9:
-              print int(run), int(lumi), int(evt), fakeMet, met, metGenPhi, metPt, metPhi, leptonPt, leptonPhi, leptonEta, stValue, dPhi
+              #print int(run), int(lumi), int(evt), fakeMet, met, metGenPhi, metPt, metPhi, leptonPt, leptonPhi, leptonEta, stValue, dPhi
             points[-1].SetPoint(0,fakeMet,met)
             points[-1].SetMarkerStyle(20)
             #pointSize = 0.6+abs(weight)*7
-            pointSize=0.5
+            pointSize=.8
             points[-1].SetMarkerSize(pointSize)
             for a in range(0,16):
               if dPhi*5<a:

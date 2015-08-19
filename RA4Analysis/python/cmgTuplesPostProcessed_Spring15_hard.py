@@ -31,6 +31,12 @@ WJetsHTToLNu=makeSample({\
 'dir' : "/data/dspitzbart/cmgTuples/postProcessed_Spring15_AllFlags2/",
 })
 
+WJetsHTToLNuLow=makeSample({\
+"name" : "WJetsHTToLNu",
+"bins" : ["WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8", "WJetsToLNu_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8", "WJetsToLNu_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8", "WJetsToLNu_HT-600ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"],
+'dir' : "/data/dspitzbart/cmgTuples/postProcessed_Spring15_AllFlags2/",
+})
+
 #TTVH=makeSample({\
 #"name" : "TTVH",
 #"bins" : ["TTH", "TTWJets", "TTZJets"],

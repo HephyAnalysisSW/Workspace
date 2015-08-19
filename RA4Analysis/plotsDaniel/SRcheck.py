@@ -8,6 +8,7 @@ from array import array
 
 from Workspace.HEPHYPythonTools.helpers import getVarValue, getChain, deltaPhi
 from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
+
 from Workspace.RA4Analysis.helpers import *
 from rCShelpers import *
 
@@ -18,7 +19,7 @@ prepresel = 'singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseS
 
 bVar = 'nBJetMediumCSV30'
 
-deltaPhiCut=1.
+deltaPhiCut=0.5
 varstring='deltaPhi_Wl'
 vartex = '#Delta#Phi(W,l)'
 twoBin=[0,deltaPhiCut,3.2]
@@ -27,9 +28,9 @@ lepSel = 'hard'
 nBtagReg=[(0,0),(1,1)]#,(2,-1)]
 nJetReg=[(5,5),(6,7),(8,-1)]
 stReg=[(250,350),(350,450),(450,-1)]
-htReg=[(500,750),(750,1000),(1000,1250),(1250,-1)]
+htReg=[(500,750),(750,1000),(1000,-1)]
 
-targetLumi = 3. #fb^-1
+targetLumi = 0.042 #fb^-1
 sampleLumi = 4. #fb^-1
 threshold = 1.
 
@@ -62,10 +63,11 @@ for njb in nJetReg:
       signal2.Draw(varstring+'>>sig2H','('+cut+')*weight')
       signal3.Draw(varstring+'>>sig3H','('+cut+')*weight')
       yBkg = bkgH.GetBinContent(2)
+      yBkgCR = bkgH.GetBinContent(1)
       yS1 = sig1H.GetBinContent(2)
       yS2 = sig2H.GetBinContent(2)
       yS3 = sig3H.GetBinContent(2)
-      rd = {'Jets':njb, 'HT':htb, 'ST':stb, 'Bkg':yBkg, 'Model1':yS1, 'Model2':yS2, 'Model3':yS3}
+      rd = {'Jets':njb, 'HT':htb, 'ST':stb, 'Bkg':yBkg, 'BkgCR':yBkgCR, 'Model1':yS1, 'Model2':yS2, 'Model3':yS3}
       yields[njb][htb][stb] = rd
       bins.append(rd)
       print rd
@@ -80,6 +82,7 @@ for njb in reversed(nJetReg):
   yS2 = 0.
   yS3 = 0.
   yBkg = 0.
+  yBkgCR = 0.
   #bin = [njb]
   for htb in reversed(htReg):
     regions[njb][htb] = {}
@@ -89,6 +92,7 @@ for njb in reversed(nJetReg):
     yS2 = 0.
     yS3 = 0.
     yBkg = 0.
+    yBkgCR = 0.
     bin = []
     for stb in reversed(stReg):
       flag = False
@@ -96,6 +100,7 @@ for njb in reversed(nJetReg):
       yS2 += yields[njb][htb][stb]['Model2']*scaleFactor
       yS3 += yields[njb][htb][stb]['Model3']*scaleFactor
       yBkg += yields[njb][htb][stb]['Bkg']*scaleFactor
+      yBkgCR += yields[njb][htb][stb]['BkgCR']*scaleFactor
       bin.append(stb)
       if yS1>threshold or yS2>threshold or yS3>threshold:
         flag = True
@@ -106,12 +111,13 @@ for njb in reversed(nJetReg):
           if sts[1] > upperBound and upperBound > 0.: upperBound = sts[1]
         newStBin = (lowerBound, upperBound)
         regions[njb][htb][newStBin] = {'Jets':njb, 'HT':htb, 'ST':newStBin, 'Bkg':yBkg, 'Model1':yS1, 'Model2':yS2, 'Model3':yS3}
-        yieldPklST.append({'nJet':njb, 'HT':htb, 'ST':newStBin, 'B':yBkg, 'S1000':yS1, 'S1200':yS2, 'S1500':yS3})
+        yieldPklST.append({'nJet':njb, 'HT':htb, 'ST':newStBin, 'B':yBkg, 'S1000':yS1, 'S1200':yS2, 'S1500':yS3, 'BCR':yBkgCR})
         bin = []
         yS1 = 0.
         yS2 = 0.
         yS3 = 0.
         yBkg = 0.
+        yBkgCR = 0.
       #else:
       #  flag = False
     if not flag:
@@ -122,7 +128,7 @@ for njb in reversed(nJetReg):
         if sts[1] > upperBound and upperBound > 0.: upperBound = sts[1]
       newStBin = (lowerBound, upperBound)
       regions[njb][htb][newStBin] = {'Jets':njb, 'HT':htb, 'ST':newStBin, 'Bkg':yBkg, 'Model1':yS1, 'Model2':yS2, 'Model3':yS3}
-      yieldPklST.append({'nJet':njb, 'HT':htb, 'ST':newStBin, 'B':yBkg, 'S1000':yS1, 'S1200':yS2, 'S1500':yS3})
+      yieldPklST.append({'nJet':njb, 'HT':htb, 'ST':newStBin, 'B':yBkg, 'S1000':yS1, 'S1200':yS2, 'S1500':yS3, 'BCR':yBkgCR})
 
 
 #Reduce HT Bins
@@ -137,6 +143,7 @@ for njb in reversed(nJetReg):
   yS2 = 0.
   yS3 = 0.
   yBkg = 0.
+  yBkgCR = 0.
   #bin = [njb]
   for stb in reversed(stReg):
     regionsHTcomb[njb][stb] = {}
@@ -147,6 +154,7 @@ for njb in reversed(nJetReg):
     yS2 = 0.
     yS3 = 0.
     yBkg = 0.
+    yBkgCR = 0.
     bin = []
     for htb in reversed(htReg):
       flag = False
@@ -154,6 +162,7 @@ for njb in reversed(nJetReg):
       yS2 += yields[njb][htb][stb]['Model2']*scaleFactor
       yS3 += yields[njb][htb][stb]['Model3']*scaleFactor
       yBkg += yields[njb][htb][stb]['Bkg']*scaleFactor
+      yBkgCR += yields[njb][htb][stb]['BkgCR']*scaleFactor
       bin.append(htb)
       if yS1>threshold or yS2>threshold or yS3>threshold:
         flag = True
@@ -165,12 +174,13 @@ for njb in reversed(nJetReg):
         newHtBin = (lowerBound, upperBound)
         regionsHTcomb[njb][stb][newHtBin] = {'Jets':njb, 'ST':stb, 'HT':newHtBin, 'Bkg':yBkg, 'Model1':yS1, 'Model2':yS2, 'Model3':yS3}
         signalRegions[njb][stb][newHtBin] = {'deltaPhi': 1.0}
-        yieldPklHT.append({'nJet':njb, 'HT':newHtBin, 'ST':stb, 'B':yBkg, 'S1000':yS1, 'S1200':yS2, 'S1500':yS3})
+        yieldPklHT.append({'nJet':njb, 'HT':newHtBin, 'ST':stb, 'B':yBkg, 'S1000':yS1, 'S1200':yS2, 'S1500':yS3, 'BCR':yBkgCR})
         bin = []
         yS1 = 0.
         yS2 = 0.
         yS3 = 0.
         yBkg = 0.
+        yBkgCR = 0.
       #else:
       #  flag = False
     if not flag:
@@ -182,6 +192,6 @@ for njb in reversed(nJetReg):
       newHtBin = (lowerBound, upperBound)
       regionsHTcomb[njb][stb][newHtBin] = {'Jets':njb, 'ST':stb, 'HT':newHtBin, 'Bkg':yBkg, 'Model1':yS1, 'Model2':yS2, 'Model3':yS3}
       signalRegions[njb][stb][newHtBin] = {'deltaPhi': 1.0}
-      yieldPklHT.append({'nJet':njb, 'HT':newHtBin, 'ST':stb, 'B':yBkg, 'S1000':yS1, 'S1200':yS2, 'S1500':yS3})
+      yieldPklHT.append({'nJet':njb, 'HT':newHtBin, 'ST':stb, 'B':yBkg, 'S1000':yS1, 'S1200':yS2, 'S1500':yS3, 'BCR':yBkgCR})
 
 
