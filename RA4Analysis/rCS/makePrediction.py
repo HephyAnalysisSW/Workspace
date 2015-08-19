@@ -16,24 +16,24 @@ from math import pi, sqrt
 from Workspace.RA4Analysis.signalRegions import *
 
 lepSel = 'hard'
- 
+
 cWJets  = getChain(WJetsHTToLNu[lepSel],histname='')
 cTTJets = getChain(ttJets[lepSel],histname='')
-cDY = getChain(DY[lepSel],histname='')
-cDY.GetEntries()
-cRest = getChain([singleTop[lepSel]],histname='')#no QCD no TTVH no DY (too low statistics!)
+cRest = getChain([singleTop[lepSel], DY[lepSel]],histname='')#no QCD no TTVH no DY (too low statistics!)
+cBkg = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], singleTop[lepSel], DY[lepSel]],histname='')#no QCD, no TTVH, no DY
+cData = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], singleTop[lepSel], DY[lepSel]] , histname='')
+
 #cBkg = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]],histname='')#no QCD
 #cData = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]] , histname='')
-cBkg = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], singleTop[lepSel]],histname='')#no QCD, no TTVH, no DY
-cData = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], singleTop[lepSel]] , histname='')
-
-
 #cData = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]],  ttJets[lepSel] , histname='')#no QCD , ##to calculate signal contamination
 #cData = cBkg
 
-signalRegions = signalRegion3fb     ##because 10 one is full
-#signalRegions = {(5, 5): {(250, 350): {(500, -1):   {'deltaPhi': 1.0}}}} 
-lumi = 3.
+signalRegions = signalRegion40pb
+
+#DEFINE LUMI AND PLOTDIR
+lumi = .042
+printDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/40pbMC/templateFit/'
+
 
 weight_str, weight_err_str = makeWeight(lumi, sampleLumi=3.)
 
@@ -53,8 +53,7 @@ if signal:
 ROOT.TH1F().SetDefaultSumw2()
 
 prefix = 'singleLeptonic_Spring15_'
-presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&Flag_EcalDeadCellTriggerPrimitiveFilter&&acos(cos(Jet_phi[0]-met_phi))>0.45&&acos(cos(Jet_phi[1]-met_phi))>0.45"
-
+presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80"#&&Flag_EcalDeadCellTriggerPrimitiveFilter&&acos(cos(Jet_phi[0]-met_phi))>0.45&&acos(cos(Jet_phi[1]-met_phi))>0.45"
 btagString = 'nBJetMediumCSV30'
 
 
@@ -86,10 +85,10 @@ for srNJet in signalRegions:
       #deltaPhiCut = dynDeltaPhi(defDeltaPhiCut, stb)
       rd={}
       #join TT estimation results to dict
-      makeTTPrediction(rd, samples, htb, stb, srNJet, presel, dPhiCut=deltaPhiCut, btagVarString = btagString, lumi=lumi)
+      makeTTPrediction(rd, samples, htb, stb, srNJet, presel, dPhiCut=deltaPhiCut, btagVarString = btagString, lumi=lumi, printDir=printDir)
 
       #join W estimation results to dict
-      makeWPrediction(rd, samples, htb, stb, srNJet, presel, dPhiCut=deltaPhiCut, btagVarString = btagString, lumi=lumi)
+      makeWPrediction(rd, samples, htb, stb, srNJet, presel, dPhiCut=deltaPhiCut, btagVarString = btagString, lumi=lumi, printDir=printDir)
 
       ##If you want to make prediction of one of the bkgs, comment out all the estimation of total Bkgs
       #estimate total background
@@ -145,7 +144,7 @@ for srNJet in signalRegions:
 
       #bins[htb][stb][srNJet]=rd
       bins[srNJet][stb][htb] = rd
-path = '/data/'+username+'/Spring15/PredictionWithCorrectionNoDY/rCS_0b_'+str(lumi)+'/'
+path = '/data/'+username+'/Spring15/Prediction40pbMC/rCS_0b_'+str(lumi)+'/'
 if not os.path.exists(path):
   os.makedirs(path)
 pickle.dump(bins, file(path+prefix+'_estimationResults_pkl','w'))

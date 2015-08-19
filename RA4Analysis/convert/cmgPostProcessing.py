@@ -13,7 +13,7 @@ subDir = "postProcessed_Spring15_AllFlags2"
 from Workspace.HEPHYPythonTools.helpers import getChunksFromNFS, getChunks
 #from Workspace.RA4Analysis.cmgTuples_PHYS14V3 import *
 #from Workspace.RA4Analysis.cmgTuples_v1_PHYS14V3 import *
-from Workspace.RA4Analysis.cmgTuples_Spring15 import *
+from Workspace.RA4Analysis.cmgTuples_Spring15_25ns import *
 
 target_lumi = 3000 #pb-1
 

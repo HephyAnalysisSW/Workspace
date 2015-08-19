@@ -46,7 +46,7 @@ ROOT.TH1F().SetDefaultSumw2()
 #    res[htb][stb] = {}
 #    for srNJet in njreg:
       
-def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, btagVarString = 'nBJetMediumCSV30', lumi=4.0):
+def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, btagVarString = 'nBJetMediumCSV30', lumi=4.0, printDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/defaultDir/templateFit/'):
   print "in W predition lumi is :"  , lumi
   weight_str, weight_err_str = makeWeight(lumi)
   cWJets = samples['W']
@@ -60,7 +60,7 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, btagVa
   
   #TT Jets yield in crNJet, no b-tag cut, low DPhi
   fit_crName, fit_crCut = nameAndCut(stb, htb, nJetCR, btb=None, presel=presel+'&&abs(leptonPdg)==13', btagVar = btagVarString) 
-  fit_crNJet_lowDPhi = binnedNBTagsFit(fit_crCut+"&&"+dPhiStr+"<"+str(dPhiCut), samples=samples, nBTagVar = btagVarString , lumi=lumi, prefix=fit_crName)
+  fit_crNJet_lowDPhi = binnedNBTagsFit(fit_crCut+"&&"+dPhiStr+"<"+str(dPhiCut), samples=samples, nBTagVar = btagVarString , lumi=lumi, prefix=fit_crName, printDir=printDir)
 #  fit_crNJet_lowDPhi = binnedNBTagsFit(fit_crCut+"&&"+dPhiStr+"<"+str(dPhiCut), samples = {'W':cWJets, 'TT':cTTJets}, nBTagVar = 'nBJetMedium25', prefix=fit_crName)
   rd['fit_crNJet_lowDPhi'] = fit_crNJet_lowDPhi
   
@@ -167,7 +167,7 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, btagVa
   rd['rCS_W_NegPdg_crNJet_0b_truth']  = getRCS(cWJets, 'leptonPdg<0&&'+crCut, dPhiCut)
 
   fit_srName, fit_srCut = nameAndCut(stb, htb, srNJet, btb=None, presel=presel,btagVar = btagVarString) 
-  fit_srNJet_lowDPhi = binnedNBTagsFit(fit_srCut+"&&"+dPhiStr+"<"+str(dPhiCut), samples = samples, nBTagVar = btagVarString, lumi=lumi, prefix=fit_srName)
+  fit_srNJet_lowDPhi = binnedNBTagsFit(fit_srCut+"&&"+dPhiStr+"<"+str(dPhiCut), samples = samples, nBTagVar = btagVarString, lumi=lumi, prefix=fit_srName, printDir=printDir)
 #  fit_srNJet_lowDPhi = binnedNBTagsFit(fit_srCut+"&&"+dPhiStr+"<"+str(dPhiCut), samples = {'W':cWJets, 'TT':cTTJets}, nBTagVar = 'nBJetMedium25', prefix=fit_srName)
 
   rd['fit_srNJet_lowDPhi'] = fit_srNJet_lowDPhi
