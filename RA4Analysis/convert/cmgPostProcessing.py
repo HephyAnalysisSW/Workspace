@@ -1,24 +1,10 @@
 import ROOT
 import sys, os, copy, random, subprocess, datetime
 from array import array
-from Workspace.RA4Analysis.cmgObjectSelection import cmgLooseLepIndices,ele_ID_eta, splitIndList, get_cmg_jets_fromStruct, splitListOfObjects
+from Workspace.RA4Analysis.cmgObjectSelection import cmgLooseLepIndices, splitIndList, get_cmg_jets_fromStruct, splitListOfObjects, cmgTightMuID, cmgTightEleID
 from Workspace.HEPHYPythonTools.xsec import xsec
 from Workspace.HEPHYPythonTools.helpers import getObjFromFile, getObjDict, getFileList
-#from Workspace.RA4Analysis.convertHelpers import compileClass, readVar, printHeader, typeStr, createClassString
 from Workspace.HEPHYPythonTools.convertHelpers import compileClass, readVar, printHeader, typeStr, createClassString
-
-
-subDir = "postProcessed_Spring15_AllFlags2"
-#from Workspace.RA4Analysis.cmgTuples_v3 import *
-from Workspace.HEPHYPythonTools.helpers import getChunksFromNFS, getChunks
-#from Workspace.RA4Analysis.cmgTuples_PHYS14V3 import *
-#from Workspace.RA4Analysis.cmgTuples_v1_PHYS14V3 import *
-from Workspace.RA4Analysis.cmgTuples_Spring15_25ns import *
-from Workspace.RA4Analysis.cmgTuples_Spring15_50ns import data_mu as data_mu_50ns
-
-target_lumi = 3000 #pb-1
-
-#from  Workspace.RA4Analysis import mt2w
 
 from math import *
 from Workspace.HEPHYPythonTools.user import username
@@ -26,11 +12,37 @@ from Workspace.HEPHYPythonTools.user import username
 ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 
-#defSampleStr = "WJetsToLNu_HT100to200"
-defSampleStr = "data_mu_50ns"
-#defSampleStr = "data_doubleMu"
+from Workspace.HEPHYPythonTools.helpers import getChunksFromNFS, getChunks
+from Workspace.RA4Analysis.cmgTuples_Spring15_25ns import *
 
-#"nGenP6StatusThree", "GenP6StatusThree_*", "nGenTop", "GenTop_*"
+target_lumi = 3000 #pb-1
+smallDef = True
+defSampleStr = "TTJets_25ns"
+subDir = "postProcessed_Spring15_AllFlags"
+
+#branches to be kept for data and MC
+branchKeepStrings_DATAMC = ["run", "lumi", "evt", "puWeight", "isData", "rho", "nVert", 
+                     "nJet25", "nBJetLoose25", "nBJetMedium25", "nBJetTight25", "nJet40", "nJet40a", "nBJetLoose40", "nBJetMedium40", "nBJetTight40", 
+                     "nLepGood20", "nLepGood15", "nLepGood10", "htJet25", "mhtJet25", "htJet40j", "htJet40", "mhtJet40", "nSoftBJetLoose25", "nSoftBJetMedium25", "nSoftBJetTight25", 
+                     "met*","Flag_*","HLT_*"
+#                     "nFatJet","FatJet_*", 
+                     "nJet", "Jet_*", 
+                     "nLepGood", "LepGood_*", 
+                     "nLepOther", "LepOther_*", 
+                     "nTauGood", "TauGood_*",
+                     ] 
+
+#branches to be kept for MC samples only
+branchKeepStrings_MC = [ "nTrueInt", "genWeight", "xsec", 
+                     "GenSusyMScan1", "GenSusyMScan2", "GenSusyMScan3", "GenSusyMScan4", "GenSusyMGluino", "GenSusyMGravitino", "GenSusyMStop", "GenSusyMSbottom", "GenSusyMStop2", "GenSusyMSbottom2", "GenSusyMSquark", "GenSusyMNeutralino", "GenSusyMNeutralino2", "GenSusyMNeutralino3", "GenSusyMNeutralino4", "GenSusyMChargino", "GenSusyMChargino2", 
+                     "ngenLep", "genLep_*", 
+                     "nGenPart", "GenPart_*",
+                     "ngenPartAll","genPartAll_*" ,
+                     "ngenTau", "genTau_*", 
+                     "ngenLepFromTau", "genLepFromTau_*"]
+
+#branches to be kept for data only
+branchKeepStrings_DATA = []
 
 from optparse import OptionParser
 parser = OptionParser()
@@ -40,7 +52,7 @@ parser.add_option("--targetDir", dest="targetDir", default="/data/"+username+"/c
 parser.add_option("--skim", dest="skim", default="", type="string", action="store", help="any skim condition?")
 parser.add_option("--leptonSelection", dest="leptonSelection", default="hard", type="string", action="store", help="which lepton selection? 'soft', 'hard', 'none', 'dilep'?")
 
-parser.add_option("--small", dest="small", default = False, action="store_true", help="Just do a small subset.")
+parser.add_option("--small", dest="small", default = smallDef, action="store_true", help="Just do a small subset.")
 #parser.add_option("--overwrite", dest="overwrite", action="store_true", help="Overwrite?", default=True)
 (options, args) = parser.parse_args()
 assert options.leptonSelection in ['soft', 'hard', 'none', 'dilep'], "Unknown leptonSelection: %s"%options.leptonSelection
@@ -95,7 +107,7 @@ for isample, sample in enumerate(allSamples):
   #chunks, sumWeight = getChunks(sample, options.inputTreeName)
   chunks, sumWeight = getChunks(sample)
   #chunks, nTotEvents = getChunksFromDPM(sample, options.inputTreeName)
-  print "Chunks:" , chunks 
+#  print "Chunks:" , chunks 
   outDir = options.targetDir+'/'+"/".join([options.skim, options.leptonSelection, sample['name']])
   tmpDir = outDir+'/tmp/'
   os.system('mkdir -p ' + outDir) 
@@ -103,27 +115,14 @@ for isample, sample in enumerate(allSamples):
   os.system('rm -rf '+tmpDir+'/*')
   
   if sample['isData']: 
-    prelumiWeight=1
-    branchKeepStrings = ["run", "lumi", "evt", "isData", "rho", "nVert", "nJet25", "nBJetLoose25", "nBJetMedium25", "nBJetTight25", "nJet40", "nJet40a", "nBJetLoose40", "nBJetMedium40", "nBJetTight40",
-                     "nLepGood20", "nLepGood15", "nLepGood10",  
-                     "htJet25", "mhtJet25", "htJet40j", "htJet40", "mhtJet40", "nSoftBJetLoose25", "nSoftBJetMedium25", "nSoftBJetTight25",
-                     "met_*","Flag_*",
-                     "nFatJet","FatJet_*", 
-                     "nLepOther", "LepOther_*", "nLepGood", "LepGood_*", "nTauGood", "TauGood_*",
-                     "nJet", "Jet_*"] 
+    lumiScaleFactor=1
+    branchKeepStrings = branchKeepStrings_DATAMC + branchKeepStrings_DATA 
   else:
-    prelumiWeight = xsec[sample['dbsName']]*target_lumi/float(sumWeight)
-    branchKeepStrings = ["run", "lumi", "evt", "isData", "xsec", "puWeight", "nTrueInt", "genWeight", "rho", "nVert", "nJet25", "nBJetLoose25", "nBJetMedium25", "nBJetTight25", "nJet40", "nJet40a", "nBJetLoose40", "nBJetMedium40", "nBJetTight40",  
-                     "nLepGood20", "nLepGood15", "nLepGood10",  
-                     "GenSusyMScan1", "GenSusyMScan2", "GenSusyMScan3", "GenSusyMScan4", "GenSusyMGluino", "GenSusyMGravitino", "GenSusyMStop", "GenSusyMSbottom", "GenSusyMStop2", "GenSusyMSbottom2", "GenSusyMSquark", "GenSusyMNeutralino", "GenSusyMNeutralino2", "GenSusyMNeutralino3", "GenSusyMNeutralino4", "GenSusyMChargino", "GenSusyMChargino2",
-                     "htJet25", "mhtJet25", "htJet40j", "htJet40", "mhtJet40", "nSoftBJetLoose25", "nSoftBJetMedium25", "nSoftBJetTight25",
-                     "met_*","Flag_*",
-                     "nFatJet","FatJet_*", 
-                     "nLepOther", "LepOther_*", "nLepGood", "LepGood_*", "ngenLep", "genLep_*", "nTauGood", "TauGood_*",
-                     "nGenPart", "GenPart_*","ngenPartAll","genPartAll_*" ,"ngenTau", "genTau_*", "nJet", "Jet_*", "ngenLepFromTau", "genLepFromTau_*"] 
-  #print "sample['dbsName']:" , sample['dbsName']
+    lumiScaleFactor = xsec[sample['dbsName']]*target_lumi/float(sumWeight)
+    branchKeepStrings = branchKeepStrings_DATAMC + branchKeepStrings_MC
+
   readVariables = ['met_pt/F', 'met_phi/F']
-  newVariables = []
+  newVariables = ['weight']
   aliases = [ "met:met_pt", "metPhi:met_phi"]
 
   readVectors = [\
@@ -131,11 +130,11 @@ for isample, sample in enumerate(allSamples):
     {'prefix':'Jet',  'nMax':100, 'vars':['pt/F', 'eta/F', 'phi/F', 'id/I','btagCSV/F', 'btagCMVA/F']},
   ]
   if not sample['isData']: 
-    newVariables = ['weight/F','weight_XSecTTBar1p1/F','weight_XSecTTBar0p9/F']
+    newVariables = ['weight_XSecTTBar1p1/F','weight_XSecTTBar0p9/F']
     aliases.extend(['genMet:met_genPt', 'genMetPhi:met_genPhi'])
     #readVectors[1]['vars'].extend('partonId/I')
   if options.leptonSelection.lower() in ['soft', 'hard']:
-    newVariables.extend( ['nLooseSoftLeptons/I', 'nLooseSoftPt10Leptons/I', 'nLooseHardLeptons/I', 'nTightSoftLeptons/I', 'nTightHardLeptons/I'] )
+    newVariables.extend( ['nLooseSoftLeptons/I', 'nLooseHardLeptons/I', 'nTightSoftLeptons/I', 'nTightHardLeptons/I'] )
     newVariables.extend( ['deltaPhi_Wl/F','nBJetMediumCSV30/I','nJet30/I','htJet30j/F','st/F', 'leptonPt/F','leptonMiniRelIso/F','leptonRelIso03/F' ,'leptonEta/F', 'leptonPhi/F', 'leptonPdg/I/0', 'leptonInd/I/-1', 'leptonMass/F', 'singleMuonic/I', 'singleElectronic/I', 'singleLeptonic/I' ]) #, 'mt2w/F'] )
   newVars = [readVar(v, allowRenaming=False, isWritten = True, isRead=False) for v in newVariables]
 
@@ -182,7 +181,7 @@ for isample, sample in enumerate(allSamples):
           t.SetBranchAddress(var['stage1Name'], ROOT.AddressOf(r, var['stage1Name']))
       for a in aliases:
         t.SetAlias(*(a.split(":")))
-      print "File",chunk['file'],'chunk',chunk['name'],"found", nEvents, '(skim:',options.skim,') condition:', skimCond,' with weight',prelumiWeight, 'in Chain -> post processing...'
+      print "File: %s Chunk: %s nEvents: %i (skim: %s) condition: %s lumiScaleFactor: %f"%(chunk['file'],chunk['name'], nEvents, options.skim, skimCond, lumiScaleFactor)
       
       for i in range(nEvents):
         if (i%10000 == 0) and i>0 :
@@ -190,11 +189,11 @@ for isample, sample in enumerate(allSamples):
         s.init()
         r.init()
         t.GetEntry(i)
-        if not sample['isData']:
-          genWeight = t.GetLeaf('genWeight').GetValue()
-          s.weight = prelumiWeight*genWeight
+        genWeight = 1 if sample['isData'] else t.GetLeaf('genWeight').GetValue()
+        s.weight = lumiScaleFactor*genWeight
           #print "reweighted:" , s.weight
-          if "TTJets_" in sample['dbsName']:
+        if not sample['isData']:
+          if "TTJets" in sample['dbsName']:
             s.weight_XSecTTBar1p1 = s.weight*1.1 
             s.weight_XSecTTBar0p9 = s.weight*0.9
           else :
@@ -203,23 +202,20 @@ for isample, sample in enumerate(allSamples):
         
         if options.leptonSelection.lower() in ['soft','hard']:
           #get all >=loose lepton indices
-          looseLepInd = cmgLooseLepIndices(r, ptCuts=(10,10), absEtaCuts=(2.5,2.4), ele_MVAID_cuts={'eta08':0.35 , 'eta104':0.20,'eta204': -0.52} )    ##Tight ele_MVAID_cuts={'eta08':0.73 , 'eta104':0.57,'eta204':  0.05}
+          looseLepInd = cmgLooseLepIndices(r) 
           #split into soft and hard leptons
           looseSoftLepInd, looseHardLepInd = splitIndList(r.LepGood_pt, looseLepInd, 25.)
-          #select soft leptons above 10 GeV (for vetoing in the hard lepton selection)
-          looseSoftPt10LepInd = filter(lambda i:r.LepGood_pt[i]>10, looseSoftLepInd) 
           #select tight soft leptons (no special tight ID for now)
-          tightSoftLepInd = looseSoftLepInd #No tight loose selection as of yet 
+          tightSoftLepInd = looseSoftLepInd #No tight soft selection as of yet 
           #select tight hard leptons (use POG ID)
           ###tightHardLepInd = filter(lambda i:(abs(r.LepGood_pdgId[i])==11 and r.LepGood_relIso03[i]<0.14 and r.LepGood_tightId[i]>=3) \
           ###                               or (abs(r.LepGood_pdgId[i])==13 and r.LepGood_relIso03[i]<0.12 and r.LepGood_tightId[i]), looseHardLepInd)
-          tightHardLepInd = filter(lambda i:(abs(r.LepGood_pdgId[i])==11 and r.LepGood_miniRelIso[i]<0.1 and ele_ID_eta(r,nLep=i,ele_MVAID_cuts={'eta08':0.73 , 'eta104':0.57,'eta204':  0.05}) and r.LepGood_tightId[i]>=3) \
-                                         or (abs(r.LepGood_pdgId[i])==13 and r.LepGood_miniRelIso[i]<0.2  and r.LepGood_tightId[i]), looseHardLepInd)  
+          tightHardLepInd = filter(lambda i:(abs(r.LepGood_pdgId[i])==11 and cmgTightEleID(r,i)) \
+                                         or (abs(r.LepGood_pdgId[i])==13 and cmgTightMuID(r,i)), looseHardLepInd)  
 
 
           #print "s lepgood pt: " ,s.LepGood_pt[0]
           s.nLooseSoftLeptons = len(looseSoftLepInd)
-          s.nLooseSoftPt10Leptons = len(looseSoftPt10LepInd)
           s.nLooseHardLeptons = len(looseHardLepInd)
           s.nTightSoftLeptons = len(tightSoftLepInd)
           s.nTightHardLeptons = len(tightHardLepInd)
@@ -228,7 +224,6 @@ for isample, sample in enumerate(allSamples):
           allLeptons = [getObjDict(t, 'LepGood_', vars, i) for i in looseLepInd]
           looseSoftLep = [getObjDict(t, 'LepGood_', vars, i) for i in looseSoftLepInd] 
           looseHardLep = [getObjDict(t, 'LepGood_', vars, i) for i in looseHardLepInd]
-          looseSoftPt10Lep = [getObjDict(t, 'LepGood_', vars, i) for i in looseSoftPt10LepInd]
           tightSoftLep = [getObjDict(t, 'LepGood_', vars, i) for i in tightSoftLepInd]
           tightHardLep =  [getObjDict(t, 'LepGood_', vars, i) for i in tightHardLepInd]
           #print "tightHardLep" , tightHardLep 
@@ -282,7 +277,6 @@ for isample, sample in enumerate(allSamples):
           #print "jets:" , jets
 #          lightJets_, bJetsCMVA = splitListOfObjects('btagCMVA', 0.732, jets) 
           lightJets,  bJetsCSV = splitListOfObjects('btagCSV', 0.890, jets)
-          #lightJets,  bJetsCSV = filter(lambda j:j['btagCSV']<0.814 and -1<j['btagCSV'] , jetscopy)
           #print "bjetsCMVA:" , bJetsCMVA , "bjetsCSV:" ,  bJetsCSV
           s.htJet30j = sum([x['pt'] for x in jets])
           s.nJet30 = len(jets)
@@ -293,7 +287,6 @@ for isample, sample in enumerate(allSamples):
           s.deltaPhi_Wl = acos((s.leptonPt+r.met_pt*cos(s.leptonPhi-r.met_phi))/sqrt(s.leptonPt**2+r.met_pt**2+2*r.met_pt*s.leptonPt*cos(s.leptonPhi-r.met_phi))) 
           #print "deltaPhi:" , s.deltaPhi_Wl
   #          print "Warning -> Why can't I compute mt2w?", s.mt2w, len(jets), len(bJets), len(allTightLeptons),lightJets,bJets, {'pt':s.type1phiMet, 'phi':s.type1phiMetphi}, {'pt':s.leptonPt, 'phi':s.leptonPhi, 'eta':s.leptonEta}
-          
         for v in newVars:
           v['branch'].Fill()
       newFileName = sample['name']+'_'+chunk['name']+'_'+str(iSplit)+'.root'
