@@ -3,7 +3,7 @@ import copy, os, sys
 data_path = "/data/easilar/cmgTuples/crab_Spring15/Summer15_50nsV4_Data/"
 print data_path
 
-data_mu={\
+data_mu_50ns={\
 "name" : "cmgTuples_SingleMuon_Run2015B-PromptReco-v1_Summer15_50nsV4_lumi",
 "chunkString" : "cmgTuples_SingleMuon_Run2015B-PromptReco-v1_Summer15_50nsV4_lumi",
 "rootFileLocation":"tree.root",
@@ -12,7 +12,7 @@ data_mu={\
 'isData':True,
 'dir' : data_path+"/SingleMuon_Run2015B-PromptReco-v1/"
 }
-data_ele={\
+data_ele_50ns={\
 "name" : "cmgTuples_SingleElectron_Run2015B-PromptReco-v1_Summer15_50nsV4_lumi",
 "chunkString" : "cmgTuples_SingleElectron_Run2015B-PromptReco-v1_Summer15_50nsV4_lumi",
 "rootFileLocation":"tree.root",
@@ -22,7 +22,7 @@ data_ele={\
 'dir' : data_path+"/SingleElectron_Run2015B-PromptReco-v1/"
 }
 
-data_mu_17July={\
+data_mu_17July_50ns={\
 "name" : "cmgTuples_SingleMuon_Run2015B-17Jul2015-v1_Summer15_50nsV4_lumi2",
 "chunkString" : "cmgTuples_SingleMuon_Run2015B-17Jul2015-v1_Summer15_50nsV4_lumi2",
 "rootFileLocation":"tree.root",
@@ -32,7 +32,7 @@ data_mu_17July={\
 'dir' : data_path+"/SingleMuon_Run2015B-17Jul2015-v1"
 }
 
-data_ele_17July={\
+data_ele_17July_50ns={\
 "name" : "cmgTuples_SingleElectron_Run2015B-17Jul2015-v1_Summer15_50nsV4_lumi2",
 "chunkString" : "cmgTuples_SingleElectron_Run2015B-17Jul2015-v1_Summer15_50nsV4_lumi2",
 "rootFileLocation":"tree.root",
@@ -42,8 +42,7 @@ data_ele_17July={\
 'dir' : data_path+"/SingleElectron_Run2015B-17Jul2015-v1/"
 }
 
-
-TTJets={\
+TTJets_50ns{\
 "name" : "TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1_test",
 "chunkString":"TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1_test",
 "dir" : "/data/nrad/cmgTuples/RunII/Spring15_v1/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1_test/Chunks/",
@@ -53,7 +52,7 @@ TTJets={\
 'isData':False
 }
 
-DYJetsToLL_M_10to50={\
+DYJetsToLL_M_10to50_50ns{\
 'name' : "DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1_test",
 'chunkString' : "DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1_test",
 'dir':"/data/nrad/cmgTuples/RunII/Spring15_v1/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1_test/",
@@ -63,7 +62,7 @@ DYJetsToLL_M_10to50={\
 'isData':False
 }
 
-DYJetsToLL_M_50_HT100to200={\
+DYJetsToLL_M_50_HT100to200_50ns{\
 "name" : "DYJetsToLL_M-50_HT-100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1",
 "chunkString" : "DYJetsToLL_M-50_HT-100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1",
 'dir':"/data/nrad/cmgTuples/RunII/Spring15_v1/",
@@ -73,7 +72,7 @@ DYJetsToLL_M_50_HT100to200={\
 'isData':False
 }
 
-DYJetsToLL_M_50_HT200to400={\
+DYJetsToLL_M_50_HT200to400_50ns{\
 "name" : "DYJetsToLL_M-50_HT-200to400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1_test",
 "chunkString" : "DYJetsToLL_M-50_HT-200to400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1_test",
 'dir':"/data/nrad/cmgTuples/RunII/Spring15_v1/DYJetsToLL_M-50_HT-200to400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1_test/",
@@ -83,7 +82,7 @@ DYJetsToLL_M_50_HT200to400={\
 'isData':False
 }
 
-DYJetsToLL_M_50_HT400to600={\
+DYJetsToLL_M_50_HT400to600_50ns{\
 "name" : "DYJetsToLL_M-50_HT-400to600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1_test",
 "chunkString" : "DYJetsToLL_M-50_HT-400to600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1_test",
 'dir':"/data/nrad/cmgTuples/RunII/Spring15_v1/DYJetsToLL_M-50_HT-400to600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1_test/",
@@ -93,7 +92,7 @@ DYJetsToLL_M_50_HT400to600={\
 'isData':False
 }
 
-DYJetsToLL_M_50_HT600toInf={\
+DYJetsToLL_M_50_HT600toInf_50ns{\
 "name" : "DYJetsToLL_M-50_HT-600toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1_test",
 "chunkString" : "DYJetsToLL_M-50_HT-600toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1_test",
 'dir':"/data/nrad/cmgTuples/RunII/Spring15_v1/DYJetsToLL_M-50_HT-600toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1_test/",
@@ -103,7 +102,7 @@ DYJetsToLL_M_50_HT600toInf={\
 'isData':False
 }
 
-WJetsToLNu={\
+WJetsToLNu_50ns{\
 "name" : "WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1_test",
 "chunkString" :"WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1_test",
 'dir':'/data/nrad/cmgTuples/RunII/Spring15_v1/WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1_test/',
@@ -113,7 +112,7 @@ WJetsToLNu={\
 'isData':False
 }
 
-TToLeptons_tch={\
+TToLeptons_tch_50ns{\
 "name" : "ST_t-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1_test",
 "chunkString":"ST_t-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1_test",
 "dir" : "/data/nrad/cmgTuples/RunII/Spring15_v1/ST_t-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1_test/",
@@ -123,7 +122,7 @@ TToLeptons_tch={\
 'isData':False
 }
 
-TBar_tWch={\
+TBar_tWch_50ns{\
 "name" : "ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v2_test",
 "chunkString":"ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v2_test",
 "dir" : "/data/nrad/cmgTuples/RunII/Spring15_v1/ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v2_test/",
@@ -133,7 +132,7 @@ TBar_tWch={\
 'isData':False
 }
 
-T_tWch={\
+T_tWch_50ns{\
 "name" : "ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1_test",
 "chunkString":"ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1_test",
 "dir" : "/data/nrad/cmgTuples/RunII/Spring15_v1/ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1_test/",
@@ -143,7 +142,7 @@ T_tWch={\
 'isData':False
 }
 
-QCD_MuEnriched_Pt15to20={\
+QCD_MuEnriched_Pt15to20_50ns{\
 "name" : "QCD_Pt-15to20_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v3_test",
 "chunkString":"QCD_Pt-15to20_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v3_test",
 "dir" : "/data/nrad/cmgTuples/RunII/Spring15_v1/QCD_Pt-15to20_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v3_test/",
@@ -153,7 +152,7 @@ QCD_MuEnriched_Pt15to20={\
 'isData':False
 }
 
-QCD_MuEnriched_Pt20to30={\
+QCD_MuEnriched_Pt20to30_50ns{\
 "name" : "QCD_Pt-20to30_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v2_test",
 "chunkString":"QCD_Pt-20to30_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v2_test",
 "dir" : "/data/nrad/cmgTuples/RunII/Spring15_v1/QCD_Pt-20to30_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v2_test/",
@@ -163,7 +162,7 @@ QCD_MuEnriched_Pt20to30={\
 'isData':False
 }
 
-QCD_MuEnriched_Pt30to50={\
+QCD_MuEnriched_Pt30to50_50ns{\
 "name" : "QCD_Pt-30to50_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1_test",
 "chunkString":"QCD_Pt-30to50_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1_test",
 "dir" : "/data/nrad/cmgTuples/RunII/Spring15_v1/QCD_Pt-30to50_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1_test/",
@@ -173,7 +172,7 @@ QCD_MuEnriched_Pt30to50={\
 'isData':False
 }
 
-QCD_MuEnriched_Pt50to80={\
+QCD_MuEnriched_Pt50to80_50ns{\
 "name" : "QCD_Pt-50to80_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1_test",
 "chunkString":"QCD_Pt-50to80_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1_test",
 "dir" : "/data/nrad/cmgTuples/RunII/Spring15_v1/QCD_Pt-50to80_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1_test/",
@@ -183,7 +182,7 @@ QCD_MuEnriched_Pt50to80={\
 'isData':False
 }
 
-QCD_MuEnriched_Pt80to120={\
+QCD_MuEnriched_Pt80to120_50ns{\
 "name" : "QCD_Pt-80to120_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1_test",
 "chunkString":"QCD_Pt-80to120_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1_test",
 "dir" : "/data/nrad/cmgTuples/RunII/Spring15_v1/QCD_Pt-80to120_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1_test/",
@@ -193,7 +192,7 @@ QCD_MuEnriched_Pt80to120={\
 'isData':False
 }
 
-QCD_MuEnriched_Pt120to170={\
+QCD_MuEnriched_Pt120to170_50ns{\
 "name" : "QCD_Pt-120to170_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1_test",
 "chunkString":"QCD_Pt-120to170_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1_test",
 "dir" : "/data/nrad/cmgTuples/RunII/Spring15_v1/QCD_Pt-120to170_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1_test/",
@@ -203,7 +202,7 @@ QCD_MuEnriched_Pt120to170={\
 'isData':False
 }
 
-QCD_MuEnriched_Pt170to300={\
+QCD_MuEnriched_Pt170to300_50ns{\
 "name" : "QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v2_test",
 "chunkString":"QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v2_test",
 "dir" : "/data/nrad/cmgTuples/RunII/Spring15_v1/QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v2_test/",
@@ -213,7 +212,7 @@ QCD_MuEnriched_Pt170to300={\
 'isData':False
 }
 
-QCD_MuEnriched_Pt300to470={\
+QCD_MuEnriched_Pt300to470_50ns{\
 "name" : "QCD_Pt-300to470_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v3_test",
 "chunkString":"QCD_Pt-300to470_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v3_test",
 "dir" : "/data/nrad/cmgTuples/RunII/Spring15_v1/QCD_Pt-300to470_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v3_test/",
@@ -223,7 +222,7 @@ QCD_MuEnriched_Pt300to470={\
 'isData':False
 }
 
-QCD_MuEnriched_Pt470to600={\
+QCD_MuEnriched_Pt470to600_50ns{\
 "name" : "QCD_Pt-470to600_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v3_test",
 "chunkString":"QCD_Pt-470to600_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v3_test",
 "dir" : "/data/nrad/cmgTuples/RunII/Spring15_v1/QCD_Pt-470to600_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v3_test/",
@@ -233,7 +232,7 @@ QCD_MuEnriched_Pt470to600={\
 'isData':False
 }
 
-QCD_MuEnriched_Pt600to800={\
+QCD_MuEnriched_Pt600to800_50ns{\
 "name" : "QCD_Pt-600to800_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v2_test",
 "chunkString":"QCD_Pt-600to800_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v2_test",
 "dir" : "/data/nrad/cmgTuples/RunII/Spring15_v1/QCD_Pt-600to800_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v2_test/",
@@ -243,7 +242,7 @@ QCD_MuEnriched_Pt600to800={\
 'isData':False
 }
 
-QCD_MuEnriched_Pt800to1000={\
+QCD_MuEnriched_Pt800to1000_50ns{\
 "name" : "QCD_Pt-800to1000_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v2_test",
 "chunkString":"QCD_Pt-800to1000_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v2_test",
 "dir" : "/data/nrad/cmgTuples/RunII/Spring15_v1/QCD_Pt-800to1000_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v2_test/",
@@ -253,7 +252,7 @@ QCD_MuEnriched_Pt800to1000={\
 'isData':False
 }
 
-QCD_MuEnriched_Pt1000toInf={\
+QCD_MuEnriched_Pt1000toInf_50ns{\
 "name" : "QCD_Pt-1000toInf_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v2_test",
 "chunkString":"QCD_Pt-1000toInf_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v2_test",
 "dir" : "/data/nrad/cmgTuples/RunII/Spring15_v1/QCD_Pt-1000toInf_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v2_test/",
@@ -263,7 +262,7 @@ QCD_MuEnriched_Pt1000toInf={\
 'isData':False
 }
 
-WZ={\
+WZ_50ns{\
 "name" : "WZ_TuneCUETP8M1_13TeV-pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v2_test",
 "chunkString":"WZ_TuneCUETP8M1_13TeV-pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v2_test",
 "dir" : "/data/nrad/cmgTuples/RunII/Spring15_v1/WZ_TuneCUETP8M1_13TeV-pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v2_test/",
@@ -273,7 +272,7 @@ WZ={\
 'isData':False
 }
 
-WWTo2L2Nu={\
+WWTo2L2Nu_50ns{\
 "name" : "WWTo2L2Nu_13TeV-powheg_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v2_test",
 "chunkString":"WWTo2L2Nu_13TeV-powheg_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v2_test",
 "dir" : "/data/nrad/cmgTuples/RunII/Spring15_v1/WWTo2L2Nu_13TeV-powheg_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v2_test/",
@@ -283,7 +282,7 @@ WWTo2L2Nu={\
 'isData':False
 }
 
-ZZ={\
+ZZ_50ns{\
 "name" : "ZZ_TuneCUETP8M1_13TeV-pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v2_test",
 "chunkString":"ZZ_TuneCUETP8M1_13TeV-pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v2_test",
 "dir" : "/data/nrad/cmgTuples/RunII/Spring15_v1/ZZ_TuneCUETP8M1_13TeV-pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v2_test/",
