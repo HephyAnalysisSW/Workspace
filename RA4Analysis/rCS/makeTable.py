@@ -13,7 +13,7 @@ useTTcorrection = False
 signal = False
 
 prefix = 'singleLeptonic_Spring15_'
-path = '/data/'+username+'/Spring15/PredictionWithCorrectionNoDY/rCS_0b_3.0/' 
+path = '/data/'+username+'/Spring15/Prediction40pbMC/rCS_0b_0.042/' 
 
 res = pickle.load(file(path+prefix+'_estimationResults_pkl'))
 
@@ -41,7 +41,7 @@ if signal:
     s['chain'] = getChain(s['sample'],histname='')
 
 
-signalRegions = signalRegion3fb
+signalRegions = signalRegion40pb
 #signalRegions = {(5, 5): {(250, 350): {(500, -1):   {'deltaPhi': 1.0}}}}
 
 #streg = [[(250, 350), 1.], [(350, 450), 1.], [(450,-1), 1.]]
