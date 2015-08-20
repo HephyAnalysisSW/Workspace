@@ -6,46 +6,11 @@ from binnedNBTagsFit import binnedNBTagsFit
 from rCShelpers import * 
 from math import pi, sqrt
 from rCShelpers import *
-#from pred_helper import weight_str , weight_err_str
-#lepSel = 'hard'
  
-#nBTagCMVA = 'Sum$(Jet_pt>30&&abs(Jet_eta)<2.4&&Jet_id&&Jet_btagCMVA>0.732)' 
-
-#cWJets  = getChain(WJetsHTToLNu[lepSel],histname='')
-#cTTJets = getChain(ttJets[lepSel],histname='')
-#cBkg = getChain([DY[lepSel], singleTop[lepSel], TTVH[lepSel]],histname='')#no QCD 
-#cData = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]],histname='')#no QCD
-#for c in [cWJets, cTTJets, cRest, cBkg]:
-#  c.SetAlias('nBTagCMVA', nBTagCMVA)
-
-#ROOT_colors = [ROOT.kBlack, ROOT.kRed-7, ROOT.kBlue-2, ROOT.kGreen+3, ROOT.kOrange+1,ROOT.kRed-3, ROOT.kAzure+6, ROOT.kCyan+3, ROOT.kOrange , ROOT.kRed-10]
-#dPhiStr = "acos((leptonPt+met*cos(leptonPhi-metPhi))/sqrt(leptonPt**2+met**2+2*met*leptonPt*cos(leptonPhi-metPhi)))"
-
 dPhiStr = 'deltaPhi_Wl'
 
 ROOT.TH1F().SetDefaultSumw2()
 
-#prefix = 'singleLeptonic_20150220'
-#presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0"
-
-#streg = [[(250, 350), 1.], [(350, -1), 1.]] 
-#htreg = [(500,750),(750,-1)]
-#njreg = [(5,5),(6,-1)]
-
-#small = True
-#if small:
-#  streg = [(250,350),1.]
-#  htreg = (500,750)
-#  njreg = (6,-1)
-
-#crNJet = (2,3)
-#res = {}
-#for i_htb, htb in enumerate(htreg):
-#  res[htb] = {}
-#  for stb, dPhiCut in streg:
-#    res[htb][stb] = {}
-#    for srNJet in njreg:
-      
 def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, btagVarString = 'nBJetMediumCSV30', lumi=4.0, printDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/defaultDir/templateFit/'):
   print "in W predition lumi is :"  , lumi
   weight_str, weight_err_str = makeWeight(lumi)
