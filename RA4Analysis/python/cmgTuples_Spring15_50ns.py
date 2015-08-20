@@ -1,31 +1,47 @@
 import copy, os, sys
 
-data_ele={\
-"name" : "SingleElectron_Run2015B",
-"chunkString" : "SingleElectron_Run2015B",
-'dir'  :"/data/easilar/cmgTuples/crab_Spring15/",
-"rootFileLocation":"tree.root",
-"treeName":"tree",
-'isData':True
-}
+data_path = "/data/easilar/cmgTuples/crab_Spring15/Summer15_50nsV4_Data/"
+print data_path
 
 data_mu={\
-"name" : "SingleMuon_Run2015B",
-"chunkString" : "SingleMuon_Run2015B",
-'dir'  :"/data/easilar/cmgTuples/crab_Spring15/",
+"name" : "cmgTuples_SingleMuon_Run2015B-PromptReco-v1_Summer15_50nsV4_lumi",
+"chunkString" : "cmgTuples_SingleMuon_Run2015B-PromptReco-v1_Summer15_50nsV4_lumi",
 "rootFileLocation":"tree.root",
+"skimAnalyzerDir":"",
 "treeName":"tree",
-'isData':True
+'isData':True,
+'dir' : data_path+"/SingleMuon_Run2015B-PromptReco-v1/"
+}
+data_ele={\
+"name" : "cmgTuples_SingleElectron_Run2015B-PromptReco-v1_Summer15_50nsV4_lumi",
+"chunkString" : "cmgTuples_SingleElectron_Run2015B-PromptReco-v1_Summer15_50nsV4_lumi",
+"rootFileLocation":"tree.root",
+"skimAnalyzerDir":"",
+"treeName":"tree",
+'isData':True,
+'dir' : data_path+"/SingleElectron_Run2015B-PromptReco-v1/"
 }
 
-data_doubleMu={\
-"name" : "DoubleMuon_Run2015B",
-"chunkString" : "DoubleMuon_Run2015B",
-'dir'  :"/data/easilar/cmgTuples/crab_Spring15/",
+data_mu_17July={\
+"name" : "cmgTuples_SingleMuon_Run2015B-17Jul2015-v1_Summer15_50nsV4_lumi2",
+"chunkString" : "cmgTuples_SingleMuon_Run2015B-17Jul2015-v1_Summer15_50nsV4_lumi2",
 "rootFileLocation":"tree.root",
+"skimAnalyzerDir":"",
 "treeName":"tree",
-'isData':True
+'isData':True,
+'dir' : data_path+"/SingleMuon_Run2015B-17Jul2015-v1"
 }
+
+data_ele_17July={\
+"name" : "cmgTuples_SingleElectron_Run2015B-17Jul2015-v1_Summer15_50nsV4_lumi2",
+"chunkString" : "cmgTuples_SingleElectron_Run2015B-17Jul2015-v1_Summer15_50nsV4_lumi2",
+"rootFileLocation":"tree.root",
+"skimAnalyzerDir":"",
+"treeName":"tree",
+'isData':True,
+'dir' : data_path+"/SingleElectron_Run2015B-17Jul2015-v1/"
+}
+
 
 TTJets={\
 "name" : "TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1_test",
