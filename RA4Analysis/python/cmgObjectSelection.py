@@ -10,7 +10,7 @@ def cmgMVAEleID(r,nLep,mva_cuts):
     if aeta>=abs_e[0] and aeta<abs_e[1] and r.LepGood_mvaIdPhys14[nLep]>mva: return True
   return False
   
-#ele_MVAID_cuts_loose = {(0,0.8):0.35 , (0.8, 1.479):0.20, (1.479, 999): -0.52}
+#ele_MVAID_cuts_loose = {(0,0.8):0.35 , (0.8, 1.44):0.20, (1.57, 999): -0.52}
 ele_MVAID_cuts_vloose = {(0,0.8):-0.11 , (0.8, 1.44):-0.35, (1.57, 999): -0.55}
 ele_MVAID_cuts_tight = {(0,0.8):0.73 , (0.8, 1.44):0.57, (1.57, 999):  0.05}
 

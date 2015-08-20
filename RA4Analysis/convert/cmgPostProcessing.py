@@ -14,17 +14,19 @@ ROOT.AutoLibraryLoader.enable()
 
 from Workspace.HEPHYPythonTools.helpers import getChunksFromNFS, getChunks
 from Workspace.RA4Analysis.cmgTuples_Spring15_25ns import *
-
 target_lumi = 3000 #pb-1
-smallDef = True
-defSampleStr = "TTJets_25ns"
-subDir = "postProcessed_Spring15_AllFlags"
+
+#defSampleStr = "TTJets_25ns"
+#defSampleStr = "TTJets_25ns,DYJetsToLL_M_10to50_25ns,DYJetsToLL_M_50_HT100to200_25ns,DYJetsToLL_M_50_HT200to400_25ns,DYJetsToLL_M_50_HT400to600_25ns,DYJetsToLL_M_50_HT600toInf_25ns,WJetsToLNu_HT100to200_25ns,WJetsToLNu_HT200to400_25ns,WJetsToLNu_HT400to600_25ns,WJetsToLNu_HT600toInf_25ns,WJetsToLNu_HT600to800_25ns,WJetsToLNu_HT800to1200_25ns,WJetsToLNu_HT1200to2500_25ns,WJetsToLNu_HT2500toInf_25ns,TToLeptons_sch_25ns,TToLeptons_tch_25ns,TBar_tWch_25ns,T_tWch_25ns,QCD_MuEnriched_Pt15to20_25ns,QCD_MuEnriched_Pt20to30_25ns,QCD_MuEnriched_Pt30to50_25ns,QCD_MuEnriched_Pt50to80_25ns,QCD_MuEnriched_Pt80to120_25ns,QCD_MuEnriched_Pt120to170_25ns,QCD_MuEnriched_Pt170to300_25ns,QCD_MuEnriched_Pt300to470_25ns,QCD_MuEnriched_Pt470to600_25ns,QCD_MuEnriched_Pt600to800_25ns,QCD_MuEnriched_Pt800to1000_25ns,QCD_MuEnriched_Pt1000toInf_25ns,QCD_EMEnriched_Pt15to20_25ns,QCD_EMEnriched_Pt20to30_25ns,QCD_EMEnriched_Pt30to50_25ns,QCD_EMEnriched_Pt50to80_25ns,QCD_EMEnriched_Pt80to120_25ns,QCD_EMEnriched_Pt120to170_25ns,QCD_EMEnriched_Pt170to300_25ns,QCD_EMEnriched_Pt300toInf_25ns,QCD_bcToE_Pt15to20_25ns,QCD_bcToE_Pt20to30_25ns,QCD_bcToE_Pt30to80_25ns,QCD_bcToE_Pt80to170_25ns,QCD_bcToE_Pt170to250_25ns,QCD_bcToE_Pt250toInf_25ns,WZ_25ns,WWTo2L2Nu_25ns,ZZ_25ns,ZJetsToNuNu_HT200to400_25ns,ZJetsToNuNu_HT400to600_25ns,ZJetsToNuNu_HT600toInf_25ns"
+defSampleStr = "DYJetsToLL_M_50_HT200to400_25ns,DYJetsToLL_M_50_HT400to600_25ns,DYJetsToLL_M_50_HT600toInf_25ns,WJetsToLNu_HT100to200_25ns,WJetsToLNu_HT200to400_25ns,WJetsToLNu_HT400to600_25ns,WJetsToLNu_HT600toInf_25ns,WJetsToLNu_HT600to800_25ns,WJetsToLNu_HT800to1200_25ns,WJetsToLNu_HT1200to2500_25ns,WJetsToLNu_HT2500toInf_25ns,TToLeptons_sch_25ns,TToLeptons_tch_25ns,TBar_tWch_25ns,T_tWch_25ns,QCD_MuEnriched_Pt15to20_25ns,QCD_MuEnriched_Pt20to30_25ns,QCD_MuEnriched_Pt30to50_25ns,QCD_MuEnriched_Pt50to80_25ns,QCD_MuEnriched_Pt80to120_25ns,QCD_MuEnriched_Pt120to170_25ns,QCD_MuEnriched_Pt170to300_25ns,QCD_MuEnriched_Pt300to470_25ns,QCD_MuEnriched_Pt470to600_25ns,QCD_MuEnriched_Pt600to800_25ns,QCD_MuEnriched_Pt800to1000_25ns,QCD_MuEnriched_Pt1000toInf_25ns,QCD_EMEnriched_Pt15to20_25ns,QCD_EMEnriched_Pt20to30_25ns,QCD_EMEnriched_Pt30to50_25ns,QCD_EMEnriched_Pt50to80_25ns,QCD_EMEnriched_Pt80to120_25ns,QCD_EMEnriched_Pt120to170_25ns,QCD_EMEnriched_Pt170to300_25ns,QCD_EMEnriched_Pt300toInf_25ns,QCD_bcToE_Pt15to20_25ns,QCD_bcToE_Pt20to30_25ns,QCD_bcToE_Pt30to80_25ns,QCD_bcToE_Pt80to170_25ns,QCD_bcToE_Pt170to250_25ns,QCD_bcToE_Pt250toInf_25ns,WZ_25ns,WWTo2L2Nu_25ns,ZZ_25ns,ZJetsToNuNu_HT200to400_25ns,ZJetsToNuNu_HT400to600_25ns,ZJetsToNuNu_HT600toInf_25ns"
+
+subDir = "postProcessed_Spring15_test_50ns"
 
 #branches to be kept for data and MC
 branchKeepStrings_DATAMC = ["run", "lumi", "evt", "puWeight", "isData", "rho", "nVert", 
                      "nJet25", "nBJetLoose25", "nBJetMedium25", "nBJetTight25", "nJet40", "nJet40a", "nBJetLoose40", "nBJetMedium40", "nBJetTight40", 
                      "nLepGood20", "nLepGood15", "nLepGood10", "htJet25", "mhtJet25", "htJet40j", "htJet40", "mhtJet40", "nSoftBJetLoose25", "nSoftBJetMedium25", "nSoftBJetTight25", 
-                     "met*","Flag_*","HLT_*"
+                     "met*","Flag_*","HLT_*",
 #                     "nFatJet","FatJet_*", 
                      "nJet", "Jet_*", 
                      "nLepGood", "LepGood_*", 
@@ -52,7 +54,7 @@ parser.add_option("--targetDir", dest="targetDir", default="/data/"+username+"/c
 parser.add_option("--skim", dest="skim", default="", type="string", action="store", help="any skim condition?")
 parser.add_option("--leptonSelection", dest="leptonSelection", default="hard", type="string", action="store", help="which lepton selection? 'soft', 'hard', 'none', 'dilep'?")
 
-parser.add_option("--small", dest="small", default = smallDef, action="store_true", help="Just do a small subset.")
+parser.add_option("--small", dest="small", default = False, action="store_true", help="Just do a small subset.")
 #parser.add_option("--overwrite", dest="overwrite", action="store_true", help="Overwrite?", default=True)
 (options, args) = parser.parse_args()
 assert options.leptonSelection in ['soft', 'hard', 'none', 'dilep'], "Unknown leptonSelection: %s"%options.leptonSelection
@@ -103,7 +105,6 @@ def getTreeFromChunk(c, skimCond, iSplit, nSplit):
    
 exec('allSamples=['+options.allsamples+']')
 for isample, sample in enumerate(allSamples):
-  print sample 
   #chunks, sumWeight = getChunks(sample, options.inputTreeName)
   chunks, sumWeight = getChunks(sample)
   #chunks, nTotEvents = getChunksFromDPM(sample, options.inputTreeName)
@@ -157,7 +158,7 @@ for isample, sample in enumerate(allSamples):
   r = compileClass(className=readClassName, classString=readClassString, tmpDir='/data/'+username+'/tmp/')
 
   filesForHadd=[]
-  if options.small: chunks=chunks[:1]
+  if True or options.small: chunks=chunks[:1]
   #print "CHUNKS:" , chunks
   for chunk in chunks:
     sourceFileSize = os.path.getsize(chunk['file'])
