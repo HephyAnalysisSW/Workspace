@@ -14,6 +14,7 @@ from Workspace.HEPHYPythonTools.helpers import getChunksFromNFS, getChunks
 #from Workspace.RA4Analysis.cmgTuples_PHYS14V3 import *
 #from Workspace.RA4Analysis.cmgTuples_v1_PHYS14V3 import *
 from Workspace.RA4Analysis.cmgTuples_Spring15_25ns import *
+from Workspace.RA4Analysis.cmgTuples_Spring15_50ns import data_mu as data_mu_50ns
 
 target_lumi = 3000 #pb-1
 
@@ -26,17 +27,9 @@ ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 
 #defSampleStr = "WJetsToLNu_HT100to200"
-defSampleStr = "data_mu"
+defSampleStr = "data_mu_50ns"
 #defSampleStr = "data_doubleMu"
 
-branchKeepStrings = ["run", "lumi", "evt", "isData", "xsec", "puWeight", "nTrueInt", "genWeight", "rho", "nVert", "nJet25", "nBJetLoose25", "nBJetMedium25", "nBJetTight25", "nJet40", "nJet40a", "nBJetLoose40", "nBJetMedium40", "nBJetTight40", 
-                     "nLepGood20", "nLepGood15", "nLepGood10",  
-                     "GenSusyMScan1", "GenSusyMScan2", "GenSusyMScan3", "GenSusyMScan4", "GenSusyMGluino", "GenSusyMGravitino", "GenSusyMStop", "GenSusyMSbottom", "GenSusyMStop2", "GenSusyMSbottom2", "GenSusyMSquark", "GenSusyMNeutralino", "GenSusyMNeutralino2", "GenSusyMNeutralino3", "GenSusyMNeutralino4", "GenSusyMChargino", "GenSusyMChargino2", 
-                     "htJet25", "mhtJet25", "htJet40j", "htJet40", "mhtJet40", "nSoftBJetLoose25", "nSoftBJetMedium25", "nSoftBJetTight25", 
-                     "met_*","Flag_*",
-                     "nFatJet","FatJet_*", 
-                     "nLepOther", "LepOther_*", "nLepGood", "LepGood_*", "ngenLep", "genLep_*", "nTauGood", "TauGood_*", 
-                     "nGenPart", "GenPart_*","ngenPartAll","genPartAll_*" ,"ngenTau", "genTau_*", "nJet", "Jet_*", "ngenLepFromTau", "genLepFromTau_*"]
 #"nGenP6StatusThree", "GenP6StatusThree_*", "nGenTop", "GenTop_*"
 
 from optparse import OptionParser
@@ -210,7 +203,7 @@ for isample, sample in enumerate(allSamples):
         
         if options.leptonSelection.lower() in ['soft','hard']:
           #get all >=loose lepton indices
-          looseLepInd = cmgLooseLepIndices(r, ptCuts=(7,5), absEtaCuts=(2.5,2.4), ele_MVAID_cuts={'eta08':0.35 , 'eta104':0.20,'eta204': -0.52} )    ##Tight ele_MVAID_cuts={'eta08':0.73 , 'eta104':0.57,'eta204':  0.05}
+          looseLepInd = cmgLooseLepIndices(r, ptCuts=(10,10), absEtaCuts=(2.5,2.4), ele_MVAID_cuts={'eta08':0.35 , 'eta104':0.20,'eta204': -0.52} )    ##Tight ele_MVAID_cuts={'eta08':0.73 , 'eta104':0.57,'eta204':  0.05}
           #split into soft and hard leptons
           looseSoftLepInd, looseHardLepInd = splitIndList(r.LepGood_pt, looseLepInd, 25.)
           #select soft leptons above 10 GeV (for vetoing in the hard lepton selection)
@@ -288,7 +281,7 @@ for isample, sample in enumerate(allSamples):
           jets = filter(lambda j:j['pt']>30 and abs(j['eta'])<2.4 and j['id'], get_cmg_jets_fromStruct(r,j_list))
           #print "jets:" , jets
 #          lightJets_, bJetsCMVA = splitListOfObjects('btagCMVA', 0.732, jets) 
-          lightJets,  bJetsCSV = splitListOfObjects('btagCSV', 0.814, jets)
+          lightJets,  bJetsCSV = splitListOfObjects('btagCSV', 0.890, jets)
           #lightJets,  bJetsCSV = filter(lambda j:j['btagCSV']<0.814 and -1<j['btagCSV'] , jetscopy)
           #print "bjetsCMVA:" , bJetsCMVA , "bjetsCSV:" ,  bJetsCSV
           s.htJet30j = sum([x['pt'] for x in jets])
