@@ -34,7 +34,6 @@ def cmgTightEleID(r, nLep):
 
 #and r.LepGood_lostHits[nLep]<=0 and r.LepGood_convVeto[nLep] 
 
- 
 #def cmgLooseLepID(r, nLep, ptCuts, absEtaCuts, hybridIso03):
 #  if abs(r.LepGood_pdgId[nLep])==11: return cmgLooseEleID(r, nLep=nLep, ptCut=ptCuts[0], absEtaCut=absEtaCuts[0],hybridIso03=hybridIso03)
 #  elif abs(r.LepGood_pdgId[nLep])==13: return cmgLooseMuID(r, nLep=nLep, ptCut=ptCuts[1], absEtaCut=absEtaCuts[1],hybridIso03=hybridIso03)
@@ -47,7 +46,6 @@ def cmgLooseLepID(r, nLep):
 #  return [i for i in range(min(nMax, r.nLepGood)) if cmgLooseLepID(r, nLep=i, ptCuts=ptCuts, absEtaCuts=absEtaCuts, hybridIso03=hybridIso03) ]
 def cmgLooseLepIndices(r, nMax=8):
   return [i for i in range(min(nMax, r.nLepGood)) if cmgLooseLepID(r, nLep=i) ]
-
 
 def splitIndList(var, l, val):
   resLow = []
