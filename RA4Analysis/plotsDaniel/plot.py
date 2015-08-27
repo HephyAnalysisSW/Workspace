@@ -18,26 +18,47 @@ DY = {}
 QCD = {}
 samples = [WJETS, TTJETS]#, DY, QCD]
 
+
+dPhiJet1Met = {'name':'acos(cos(Jet_phi[0]-met_phi))', 'binning':[32,0,3.2], 'titleX':'#Delta#Phi(j_{1},#slash{E}_{T})', 'titleY':'Events'}
+dPhiJet2Met = {'name':'acos(cos(Jet_phi[1]-met_phi))', 'binning':[32,0,3.2], 'titleX':'#Delta#Phi(j_{1},#slash{E}_{T})', 'titleY':'Events'}
+dPhiJet3Met = {'name':'acos(cos(Jet_phi[2]-met_phi))', 'binning':[32,0,3.2], 'titleX':'#Delta#Phi(j_{1},#slash{E}_{T})', 'titleY':'Events'}
 st = {'name':'st', 'binning':[30,0,1500], 'titleX':'L_{T}', 'titleY':'Events'}
 variables = [st]
 
-presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80"
-name, cut = nameAndCut((250,-1),(500,-1),(3,-1),btb=(0,0),presel=presel)
-cuts = [cut]
+presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&st>250&&nJet30>2&&htJet30j>500"
 
-def plot(samples, variable, cuts, data=False, maximum=False, minimum=0., stacking=False, filling=True, setLogY=False, setLogX=False, titleText='CMS', lumi='?', legend=True):
+name, cut = nameAndCut((250,350),(1000,-1),(5,5),btb=(0,0),presel=presel)
+cut1 = {'name':name,'string':cut,'niceName':'L_{T} [250,350), H_{T} [1000,-1)'}
+name, cut = nameAndCut((350,450),(750,1000),(5,5),btb=(0,0),presel=presel)
+cut2 = {'name':name,'string':cut,'niceName':'L_{T} [350,450), H_{T} [750,1000)'}
+name, cut = nameAndCut((450,-1),(750,1000),(5,5),btb=(0,0),presel=presel)
+cut3 = {'name':name,'string':cut,'niceName':'L_{T} [450,-1), H_{T} [750,1000)'}
+name, cut = nameAndCut((450,-1),(1000,-1),(5,5),btb=(0,0),presel=presel)
+cut4 = {'name':name,'string':cut,'niceName':'L_{T} [450,-1), H_{T} [1000,-1)'}
+name, cut = nameAndCut((450,-1),(500,750),(5,5),btb=(0,0),presel=presel)
+cut5 = {'name':name,'string':cut,'niceName':'L_{T} [450,-1), H_{T} [500,750)'}
+
+cuts = [cut1, cut2, cut3, cut4, cut5]
+
+randomCut = 'weight*(singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&st>250&&st<350&&nJet30>=3&&htJet30j>500&&htJet30j<750&&nBJetMediumCSV30==0)'
+
+
+
+def plot(samples, variable, cuts, data=False, maximum=False, minimum=0., stacking=False, filling=True, setLogY=False, setLogX=False, titleText='CMS simulation', lumi='3', legend=True):
   can = ROOT.TCanvas('c','c',700,600)
-  colorList = [ROOT.kBlue+2, ROOT.kCyan-9, ROOT.kGreen+3, ROOT.kOrange-4, ROOT.kRed+1]
+  colorList = [ROOT.kBlue+1, ROOT.kCyan-9, ROOT.kOrange-4, ROOT.kGreen+1, ROOT.kRed+1]
   h = []
   nsamples = len(samples)
   ncuts = len(cuts)
   for isample, sample in enumerate(samples):
     for icut, cut in enumerate(cuts):
       i = isample*ncuts+icut
-      h.append({'hist':ROOT.TH1F('h'+str(isample)+'_'+str(icut),sample['niceName'],*variable['binning']),'yield':0.})
+      if nsamples>1: legendName = sample['niceName']
+      else: legendName = cut['niceName']
+      h.append({'hist':ROOT.TH1F('h'+str(isample)+'_'+str(icut), legendName, *variable['binning']),'yield':0., 'legendName':legendName})
       if sample['weight']=='weight':weight='weight'
       else: weight=str(sample['weight'])
-      sample['chain'].Draw(variable['name']+'>>h'+str(isample)+'_'+str(icut),weight+'*('+cut+')','goff')
+      sample['chain'].Draw(variable['name']+'>>h'+str(isample)+'_'+str(icut),weight+'*('+cut['string']+')','goff')
       h[i]['yield'] = h[i]['hist'].GetSumOfWeights()
       if minimum: h[i]['hist'].SetMinimum(minimum)
       if maximum: h[i]['hist'].SetMaximum(maximum)
@@ -54,9 +75,11 @@ def plot(samples, variable, cuts, data=False, maximum=False, minimum=0., stackin
       h[i]['hist'].GetYaxis().SetTitle(variable['titleY'])
       #h[i]['hist'].GetYaxis().SetTitleSize(0.04)
   h.sort(key=operator.itemgetter('yield'))
+  legendNameLengths = [len(x['legendName']) for x in h]
+  legendWidth = 0.012*max(legendNameLengths)+0.15
   if legend:
-    height = 0.07*len(h)
-    leg = ROOT.TLegend(0.7,0.95-height,0.98,0.95)
+    height = 0.06*len(h)
+    leg = ROOT.TLegend(0.98-legendWidth,0.95-height,0.98,0.95)
     leg.SetFillColor(ROOT.kWhite)
     leg.SetShadowColor(ROOT.kWhite)
     leg.SetBorderSize(1)
@@ -84,7 +107,7 @@ def plot(samples, variable, cuts, data=False, maximum=False, minimum=0., stackin
         item['hist'].Draw('hist same')
   if data:
     dataHist = ROOT.TH1F('data','Data',*variable['binning'])
-    data.Draw(variable['name']+'>>data',cut)
+    data.Draw(variable['name']+'>>data',cut['sting'])
     data.Draw('e1p same')
     h['data'] = dataHist
     leg.AddEntry(dataHist)

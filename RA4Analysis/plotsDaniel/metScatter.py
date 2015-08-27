@@ -41,7 +41,7 @@ def getMetPtOS(c):
   metGenPhi = getVarValue(c, 'genmetphi')
   metGenPt = getVarValue(c, 'genmet')
   lepPhi = getVarValue(c, 'leptonPhi')
-  lepPt = getVarValue(c, 'leptonPhi')
+  lepPt = getVarValue(c, 'leptonPt')
   dPhi = acos((lepPt+metPt*cos(lepPhi-metPhi))/sqrt(lepPt**2+metPt**2+2*metPt*lepPt*cos(lepPhi-metPhi)))
   x = -metGenPt*cos(metGenPhi)+metPt*cos(metPhi)
   y = -metGenPt*sin(metGenPhi)+metPt*sin(metPhi)
@@ -90,7 +90,7 @@ def getZ(c):
 
 
 varstring="deltaPhi_Wl"
-plotDir='/afs/hephy.at/user/d/dspitzbart/www/Spring15/WjetScatterEnhancedStatAFMCutTotal/'
+plotDir='/afs/hephy.at/user/d/dspitzbart/www/Spring15/WjetScatterEnhancedStatHighDPhi/'
 
 if not os.path.exists(plotDir):
   os.makedirs(plotDir)
@@ -106,14 +106,14 @@ c = getChain(WJetsHTToLNu[lepSel],histname='')
 #c.Add('/data/rschoefbeck/data/rschoefbeck/pat_240614/*.root')
 
 
-stReg=[(250,350)]#,(350,450),(450,-1)]#,(350,450),(450,-1)]
-htReg=[(1000,-1)]#,(750,1000),(1000,-1)]#,(1250,-1)]#,(1250,-1)]
+stReg=[(350,450)]#,(350,450),(450,-1)]#,(350,450),(450,-1)]
+htReg=[(750,1000)]#,(1000,-1)]#,(1250,-1)]#,(1250,-1)]
 jetReg = [(2,2),(3,3),(4,4),(5,5),(6,7),(8,-1)]#,(8,-1)]#,(6,-1)]#,(8,-1)]#,(6,-1),(8,-1)]
 btb = (0,0)
 
 colors = [ROOT.kBlue+2, ROOT.kBlue-4, ROOT.kBlue-7, ROOT.kBlue-9, ROOT.kCyan-9, ROOT.kCyan-6, ROOT.kCyan-2,ROOT.kGreen+3,ROOT.kGreen-2,ROOT.kGreen-6,ROOT.kGreen-7, ROOT.kOrange-4, ROOT.kOrange+1, ROOT.kOrange+8, ROOT.kRed, ROOT.kRed+1]
 
-can1 = ROOT.TCanvas('c1','c1',800,600)
+can1 = ROOT.TCanvas('c1','c1',800,700)
 count = {}
 
 for st in stReg:
@@ -140,10 +140,11 @@ for st in stReg:
       number_events = elist.GetN()
       totWeight = 0.
       low = 0.
+      reg1 = reg2 = reg3 = reg4 = 0
       points = []
       points.append(ROOT.TGraph())
       if st[0]>300:
-        points[0].SetPoint(1,750.,750.)
+        points[0].SetPoint(1,600.,600.)
       elif st[0]>400:
         points[ 0].SetPoint(1,1000.,1000.)
       else:
@@ -168,11 +169,12 @@ for st in stReg:
         #dPhi = getVarValue(c,"deltaPhi_Wl")
         #totWeight += weight
         met, fakeMet, dPhi, metPt, metPhi, metGenPhi = getMetPt(c)
+        genLT = met + leptonPt
         #points.append(ROOT.TGraph())
         #print dPhi
         if met > 0.:
           points.append(ROOT.TGraph())
-          if dPhi>0. and dPhiJetMet>0.45:# and metPt>100.:# and dPhiJetMet<0.9:
+          if dPhi>1.:# and dPhiJetMet>0.45:# and metPt>100.:# and dPhiJetMet<0.9:
             totWeight += weight
             if fakeMet/met>1.:# and fakeMet<50.:
               low+=weight
@@ -181,8 +183,20 @@ for st in stReg:
             points[-1].SetPoint(0,fakeMet,met)
             points[-1].SetMarkerStyle(20)
             #pointSize = 0.6+abs(weight)*7
-            pointSize=.8
+            pointSize=.6
             points[-1].SetMarkerSize(pointSize)
+            #if genLT<250:
+            #  points[-1].SetMarkerColor(colors[1])
+            #  reg1+=weight
+            #elif genLT>250 and genLT<350:
+            #  points[-1].SetMarkerColor(colors[8])
+            #  reg2+=weight
+            #elif genLT>350 and genLT<450:
+            #  points[-1].SetMarkerColor(colors[13])
+            #  reg3+=weight
+            #else:
+            #  points[-1].SetMarkerColor(colors[5])
+            #  reg4+=weight
             for a in range(0,16):
               if dPhi*5<a:
                 if weight<0.: points[-1].SetMarkerColor(ROOT.kMagenta)
@@ -195,6 +209,7 @@ for st in stReg:
       #FitFunc.Draw('same')
       can1.Print(plotDir+'scatter_'+cutname+'.png')
       can1.Print(plotDir+'scatter_'+cutname+'.root')
+      can1.Print(plotDir+'scatter_'+cutname+'.pdf')
       #can1.Print(plotDir+'scatterDeltaPhiG1_'+cutname+'.png')
       #can1.Print(plotDir+'scatterDeltaPhiG1_'+cutname+'.root')
       if totWeight>0:
@@ -203,6 +218,7 @@ for st in stReg:
         frac = 1.
       count[st][ht][jet] = {'rightLow':low,'total':totWeight, 'fraction':frac}
       print 'right low', low, 'total', totWeight, 'fraction', frac
+      print 'Yield blue',reg1,'green',reg2,'orange',reg3,'cyan',reg4
 
 leg = []
 leg.append(ROOT.TGraph())
