@@ -20,12 +20,18 @@ samples = [WJETS, TTJETS]#, DY, QCD]
 
 
 dPhiJet1Met = {'name':'acos(cos(Jet_phi[0]-met_phi))', 'binning':[32,0,3.2], 'titleX':'#Delta#Phi(j_{1},#slash{E}_{T})', 'titleY':'Events'}
-dPhiJet2Met = {'name':'acos(cos(Jet_phi[1]-met_phi))', 'binning':[32,0,3.2], 'titleX':'#Delta#Phi(j_{1},#slash{E}_{T})', 'titleY':'Events'}
-dPhiJet3Met = {'name':'acos(cos(Jet_phi[2]-met_phi))', 'binning':[32,0,3.2], 'titleX':'#Delta#Phi(j_{1},#slash{E}_{T})', 'titleY':'Events'}
+dPhiJet2Met = {'name':'acos(cos(Jet_phi[1]-met_phi))', 'binning':[32,0,3.2], 'titleX':'#Delta#Phi(j_{2},#slash{E}_{T})', 'titleY':'Events'}
+dPhiJet3Met = {'name':'acos(cos(Jet_phi[2]-met_phi))', 'binning':[32,0,3.2], 'titleX':'#Delta#Phi(j_{3},#slash{E}_{T})', 'titleY':'Events'}
+dPhiJet4Met = {'name':'acos(cos(Jet_phi[3]-met_phi))', 'binning':[32,0,3.2], 'titleX':'#Delta#Phi(j_{4},#slash{E}_{T})', 'titleY':'Events'}
+
 st = {'name':'st', 'binning':[30,0,1500], 'titleX':'L_{T}', 'titleY':'Events'}
 variables = [st]
 
 presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&st>250&&nJet30>2&&htJet30j>500"
+fakeMet = "sqrt((met_pt*cos(met_phi)-met_genPt*cos(met_genPhi))**2+(met_pt*sin(met_phi)-met_genPt*sin(met_genPhi))**2)"
+fakeMetSelection = '('+fakeMet+'>50||'+fakeMet+'>met_genPt)'
+antiFakeMetSelection = '('+fakeMet+'<50&&'+fakeMet+'<met_genPt)'
+
 
 name, cut = nameAndCut((250,350),(1000,-1),(5,5),btb=(0,0),presel=presel)
 cut1 = {'name':name,'string':cut,'niceName':'L_{T} [250,350), H_{T} [1000,-1)'}
@@ -42,6 +48,9 @@ cuts = [cut1, cut2, cut3, cut4, cut5]
 
 randomCut = 'weight*(singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&st>250&&st<350&&nJet30>=3&&htJet30j>500&&htJet30j<750&&nBJetMediumCSV30==0)'
 
+name, cut = nameAndCut((250,350),(1000,-1),(5,5),btb=(0,0),presel=presel)
+highFakeMetCut = {'name':name,'string':cut+'&&'+fakeMetSelection,'niceName':'E_{T}^{miss,fake} > 50 GeV || > E_{T}^{miss,gen}'}
+lowFakeMetCut = {'name':name,'string':cut+'&&'+antiFakeMetSelection,'niceName':'E_{T}^{miss,fake} < 50 GeV && < E_{T}^{miss,gen}'}
 
 
 def plot(samples, variable, cuts, data=False, maximum=False, minimum=0., stacking=False, filling=True, setLogY=False, setLogX=False, titleText='CMS simulation', lumi='3', legend=True):
@@ -111,18 +120,13 @@ def plot(samples, variable, cuts, data=False, maximum=False, minimum=0., stackin
     data.Draw('e1p same')
     h['data'] = dataHist
     leg.AddEntry(dataHist)
-  if titleText:
+  if titleText or lumi:
     latex1 = ROOT.TLatex()
     latex1.SetNDC()
     latex1.SetTextSize(0.04)
     latex1.SetTextAlign(11) # align right
-    latex1.DrawLatex(0.17,0.96,titleText)
-  if lumi:
-    latex2 = ROOT.TLatex()
-    latex2.SetNDC()
-    latex2.SetTextSize(0.04)
-    latex2.SetTextAlign(11)
-    latex2.DrawLatex(0.75,0.96,"L="+str(lumi)+"fb^{-1} (13TeV)")
+  if titleText: latex1.DrawLatex(0.17,0.96,titleText)
+  if lumi: latex1.DrawLatex(0.75,0.96,"L="+str(lumi)+"fb^{-1} (13TeV)")
   if legend: leg.Draw()
   can.Update()
   return [h, can, leg]
