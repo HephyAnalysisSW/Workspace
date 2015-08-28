@@ -12,8 +12,9 @@ from Workspace.HEPHYPythonTools.user import username
 from binnedNBTagsFit import binnedNBTagsFit
 from rCShelpers import * 
 from math import pi, sqrt
-#from pred_helper import lumi,weight_str , weight_err_str
 from Workspace.RA4Analysis.signalRegions import *
+
+ROOT.TH1F().SetDefaultSumw2()
 
 lepSel = 'hard'
 
@@ -30,15 +31,22 @@ cData = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], singleTop[lepSel], DY[le
 
 signalRegions = signalRegion40pb
 
+small = False
+if small: signalRegions = smallRegion
+
 #DEFINE LUMI AND PLOTDIR
 lumi = .042
 printDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/40pbMC/templateFit/'
+pickleDir = '/data/'+username+'/Spring15/Prediction40pbMC/rCS_0b_'+str(lumi)+'/'
 
+if not os.path.exists(pickleDir):
+  os.makedirs(pickleDir)
+if not os.path.exists(printDir):
+  os.makedirs(printDir)
 
 weight_str, weight_err_str = makeWeight(lumi, sampleLumi=3.)
 
 samples={'W':cWJets, 'TT':cTTJets, 'Rest':cRest, 'Bkg':cBkg, 'Data': cData}
-
 signal = False
 if signal:
   allSignals=[
@@ -50,24 +58,11 @@ if signal:
   for s in allSignals:
     s['chain'] = getChain(s['sample'],histname='')
 
-ROOT.TH1F().SetDefaultSumw2()
-
 prefix = 'singleLeptonic_Spring15_'
 presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80"#&&Flag_EcalDeadCellTriggerPrimitiveFilter&&acos(cos(Jet_phi[0]-met_phi))>0.45&&acos(cos(Jet_phi[1]-met_phi))>0.45"
 btagString = 'nBJetMediumCSV30'
 
-
-defDeltaPhiCut = 1.0
-#streg = [[(250, 350), deltaPhiCut], [(350, 450), deltaPhiCut], [(450, -1), deltaPhiCut]] 
 bjreg = (0,0)
-
-
-small = False 
-#small = 0
-if small:
-  streg = [(250,350)]
-  htreg = [(500,750)]
-  njreg = [(5,5),(6,-1)]
 
 bins = {}
 
@@ -76,13 +71,7 @@ for srNJet in signalRegions:
   for stb in signalRegions[srNJet]:
     bins[srNJet][stb] ={}
     for htb in signalRegions[srNJet][stb]:
-#for i_htb, htb in enumerate(htreg):
-#  bins[htb] = {}
-#  for stb in streg:
-#    bins[htb][stb] = {}
-#    for srNJet in njreg:
       deltaPhiCut = signalRegions[srNJet][stb][htb]['deltaPhi']
-      #deltaPhiCut = dynDeltaPhi(defDeltaPhiCut, stb)
       rd={}
       #join TT estimation results to dict
       makeTTPrediction(rd, samples, htb, stb, srNJet, presel, dPhiCut=deltaPhiCut, btagVarString = btagString, lumi=lumi, printDir=printDir)
@@ -142,10 +131,7 @@ for srNJet in signalRegions:
                       s['name']+'_FOM':s['FOM'],\
                     })
 
-      #bins[htb][stb][srNJet]=rd
       bins[srNJet][stb][htb] = rd
-path = '/data/'+username+'/Spring15/Prediction40pbMC/rCS_0b_'+str(lumi)+'/'
-if not os.path.exists(path):
-  os.makedirs(path)
-pickle.dump(bins, file(path+prefix+'_estimationResults_pkl','w'))
-print "written:" , path+prefix+'_estimationResults_pkl'
+
+pickle.dump(bins, file(pickleDir+prefix+'_estimationResults_pkl','w'))
+print "written:" , pickleDir+prefix+'_estimationResults_pkl'

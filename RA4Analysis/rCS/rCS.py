@@ -25,7 +25,7 @@ cWJets  = getChain(WJetsHTToLNu[lepSel],histname='',maxN=maxN)
 
 from Workspace.HEPHYPythonTools.user import username
 uDir = username[0]+'/'+username
-subDir = 'Spring15/rCS/enhancedStatWithWeightAFMCutMet100'
+subDir = 'Spring15/rCS/enhancedStatGenMetGenLTbinned'
 #subDir = 'pngCMG2/rCS/PHYS14V3/useRecoMet'
 
 path = '/afs/hephy.at/user/'+uDir+'/www/'+subDir+'/'
@@ -50,14 +50,14 @@ if channel == 'ele':
 elif channel =='mu':
   pdgId = 13
 
-streg = [[(250,350),1.],[(350,450),1.],[(450,-1),1.]]#,[(350,450), 1.],[(450,-1),1.]]#, [(350, 450), 1.],  [(450, -1), 1.] ]
+streg = [[(250,350),1.]]#,[(350,450),1.],[(450,-1),1.]]#,[(350,450), 1.],[(450,-1),1.]]#, [(350, 450), 1.],  [(450, -1), 1.] ]
 htreg = [(500,750),(750,1000),(1000,-1)]#,(1000,1250),(1250,-1)]#,(1250,-1)]
 btreg = (0,0)
 njreg = [(3,3),(4,4),(5,5),(6,7),(8,-1)]#,(7,7),(8,8),(9,9)]
 nbjreg = [(0,0),(1,1),(2,2)]
 
 #Usage of GenMet for deltaPhi / rCS
-GenMetSwitch = False
+GenMetSwitch = True
 useOnlyGenMetPt = False
 useOnlyGenMetPhi = False
 
@@ -71,8 +71,8 @@ l_H     = ngNuEFromW+"+"+ngNuMuFromW+"==1&&"+ngNuTauFromW+"==0"
 #presel='singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&'+l_H
 #presel='singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&Max$(abs(Jet_pt-Jet_mcPt))<50'
 #presel='singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&(sqrt((-met_genPt*cos(met_genPhi)+met_pt*cos(met_phi))**2+(-met_genPt*sin(met_genPhi)+met_pt*sin(met_phi))**2)/met_genPt)<1'
-presel='singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&acos(cos(Jet_phi[0]-met_phi))>0.45&&acos(cos(Jet_phi[1]-met_phi))>0.45&&met_pt>100'
-#presel='singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80'
+#presel='singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&acos(cos(Jet_phi[0]-met_phi))>0.45&&acos(cos(Jet_phi[1]-met_phi))>0.45&&met_pt>100'
+presel='singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80'
 #presel='singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&Flag_EcalDeadCellTriggerPrimitiveFilter&&acos(cos(Jet_phi[0]-met_phi))>0.45&&acos(cos(Jet_phi[1]-met_phi))>0.45'
 prefix = presel.split('&&')[0]+'_'
 
@@ -184,7 +184,7 @@ for lep, pdgId in channels:
           h_nj_pos[lep][name][stb][htb].SetMinimum(0.)
           h_nj_neg[lep][name][stb][htb].SetMinimum(0.)
         for i_njb, njb in enumerate(njreg):
-          cname, cut = nameAndCut(stb,htb,njb, btb=btreg ,presel=presel)#, stVar='(leptonPt+met_genPt)')
+          cname, cut = nameAndCut(stb,htb,njb, btb=btreg ,presel=presel, stVar='(leptonPt+met_genPt)')
           if lep in ['ele','mu']:
             cut = cut+'&&abs(leptonPdg)=='+str(pdgId)
           poscut = 'leptonPdg>0&&'+cut
@@ -294,7 +294,7 @@ for lep, pdgId in channels:
         text.SetTextSize(0.04)
         text.SetTextAlign(11)
         text.DrawLatex(0.6,0.85,name+'+jets')
-        text.DrawLatex(0.6,0.8,varBinName(stb, 'S_{T}'))
+        text.DrawLatex(0.6,0.8,varBinName(stb, 'L_{T}'))
         if first:
           first = False
           h_nj[lep][name][stb][htb].Draw()
@@ -341,7 +341,7 @@ for lep, pdgId in channels:
   #      h_nj[name][stb][htb].GetYaxis().SetRangeUser(0, 0.1)
         h_nj[lep][name][stb][htb].SetLineColor(ROOT_colors[istb])
         h_nj[lep][name][stb][htb].SetLineWidth(2)
-        l.AddEntry(h_nj[lep][name][stb][htb], varBinName(stb, 'S_{T}'))
+        l.AddEntry(h_nj[lep][name][stb][htb], varBinName(stb, 'L_{T}'))
         text=ROOT.TLatex()
         text.SetNDC()
         text.SetTextSize(0.04)
@@ -399,7 +399,7 @@ for lep, pdgId in channels:
 #          h_nj_pos[lep][name][stb][htb].SetMaximum(0.08)
 #        h_nj_pos[lep][name][stb][htb].SetLineColor(ROOT_colors[istb])
 #        h_nj_pos[lep][name][stb][htb].SetLineWidth(2)
-#        l.AddEntry(h_nj_pos[lep][name][stb][htb], varBinName(stb, 'S_{T}'))
+#        l.AddEntry(h_nj_pos[lep][name][stb][htb], varBinName(stb, 'L_{T}'))
 #        text=ROOT.TLatex()
 #        text.SetNDC()
 #        text.SetTextSize(0.04)
@@ -458,7 +458,7 @@ for lep, pdgId in channels:
 #        FitFunc.Draw('same')
 #        h_nj_neg[lep][name][stb][htb].SetLineColor(ROOT_colors[istb])
 #        h_nj_neg[lep][name][stb][htb].SetLineWidth(2)
-#        l.AddEntry(h_nj_neg[lep][name][stb][htb], varBinName(stb, 'S_{T}'))
+#        l.AddEntry(h_nj_neg[lep][name][stb][htb], varBinName(stb, 'L_{T}'))
 #        text=ROOT.TLatex()
 #        text.SetNDC()
 #        text.SetTextSize(0.04)
@@ -513,7 +513,7 @@ for lep, pdgId in channels:
 ##      h_ht[name][stb][njb].GetYaxis().SetRangeUser(0, 0.1)
 #      h_ht[name][stb][njb].SetLineColor(ROOT_colors[istb])
 #      h_nj[name][stb][htb].SetLineWidth(2)
-#      l.AddEntry(h_ht[name][stb][njb], varBinName(stb, 'S_{T}'))
+#      l.AddEntry(h_ht[name][stb][njb], varBinName(stb, 'L_{T}'))
 #      if first:
 #        first = False
 #        h_ht[name][stb][njb].Draw()
@@ -556,7 +556,7 @@ for lep, pdgId in channels:
 #        text.SetTextAlign(11)
 #        text.DrawLatex(0.3,0.85,name+'+jets')
 #        text.DrawLatex(0.6,0.85,varBinName(htb, 'H_{T}'))
-#        text.DrawLatex(0.6,0.8,varBinName(stb, 'S_{T}'))
+#        text.DrawLatex(0.6,0.8,varBinName(stb, 'L_{T}'))
 #        h_nbj[name][stb][htb][nbb].Fit('pol0','','same',2,6)
 #        FitFunc     = h_nbj[name][stb][htb][nbb].GetFunction('pol0')
 #        FitPar      = FitFunc.GetParameter(0)
@@ -643,7 +643,7 @@ for lep, pdgId in channels:
 #        text.SetTextSize(0.04)
 #        text.SetTextAlign(11)
 #        text.DrawLatex(0.2,0.85,name+'+jets')
-#        text.DrawLatex(0.2,0.8,varBinName(stb, 'S_{T}'))
+#        text.DrawLatex(0.2,0.8,varBinName(stb, 'L_{T}'))
 #        text.DrawLatex(0.2,0.75,varBinName(htb, 'H_{T}'))
 #        if first:
 #          first = False
