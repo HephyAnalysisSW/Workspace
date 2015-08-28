@@ -12,8 +12,9 @@ from Workspace.HEPHYPythonTools.user import username
 ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 
-from Workspace.HEPHYPythonTools.helpers import getChunksFromNFS, getChunks
+from Workspace.HEPHYPythonTools.helpers import getChunks
 from Workspace.RA4Analysis.cmgTuples_Spring15_25ns import *
+from Workspace.RA4Analysis.cmgTuples_Spring15_50ns import *
 target_lumi = 3000 #pb-1
 
 defSampleStr = "TTJets_25ns"
@@ -121,7 +122,7 @@ for isample, sample in enumerate(allSamples):
     branchKeepStrings = branchKeepStrings_DATAMC + branchKeepStrings_MC
 
   readVariables = ['met_pt/F', 'met_phi/F']
-  newVariables = ['weight']
+  newVariables = ['weight/F']
   aliases = [ "met:met_pt", "metPhi:met_phi"]
 
   readVectors = [\
@@ -129,7 +130,7 @@ for isample, sample in enumerate(allSamples):
     {'prefix':'Jet',  'nMax':100, 'vars':['pt/F', 'eta/F', 'phi/F', 'id/I','btagCSV/F', 'btagCMVA/F']},
   ]
   if not sample['isData']: 
-    newVariables = ['weight_XSecTTBar1p1/F','weight_XSecTTBar0p9/F']
+    newVariables.extend(['weight_XSecTTBar1p1/F','weight_XSecTTBar0p9/F'])
     aliases.extend(['genMet:met_genPt', 'genMetPhi:met_genPhi'])
     #readVectors[1]['vars'].extend('partonId/I')
   if options.leptonSelection.lower() in ['soft', 'hard']:
@@ -190,7 +191,7 @@ for isample, sample in enumerate(allSamples):
         t.GetEntry(i)
         genWeight = 1 if sample['isData'] else t.GetLeaf('genWeight').GetValue()
         s.weight = lumiScaleFactor*genWeight
-          #print "reweighted:" , s.weight
+
         if not sample['isData']:
           if "TTJets" in sample['dbsName']:
             s.weight_XSecTTBar1p1 = s.weight*1.1 
@@ -315,7 +316,7 @@ for isample, sample in enumerate(allSamples):
     for f in filesForHadd:
       size+=os.path.getsize(tmpDir+'/'+f)
       files.append(f)
-      if size>(0.5*(10**9)) or f==filesForHadd[-1]:
+      if size>(0.5*(10**9)) or f==filesForHadd[-1] or len(files)>200:
         ofile = outDir+'/'+sample['name']+'_'+str(counter)+'.root'
         print "Running hadd on", tmpDir, files
         os.system('cd '+tmpDir+';hadd -f '+ofile+' '+' '.join(files))

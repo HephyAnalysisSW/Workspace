@@ -24,15 +24,16 @@ xsec=xsec_()
 xsec['/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/Spring14miniaod-PU20bx25_POSTLS170_V5-v1/MINIAODSIM'] = 689.1 
 xsec['/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/Spring14miniaod-PU20bx25_POSTLS170_V5-v2/MINIAODSIM'] = 689.1 
 xsec['/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/Spring14miniaod-PU_S14_POSTLS170_V6-v1/MINIAODSIM'] = 689.1
-###We need to put crossection of WJets
+
 xsec['/WJetsToLNu_13TeV-madgraph-pythia8-tauola/Spring14miniaod-PU20bx25_POSTLS170_V5-v1/MINIAODSIM'] = 20508.9
+xsec['/WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1/MINIAODSIM'] = 20508.9 
 ##Obtained from HT fit
 xsec['/WJetsToLNu_HT-100to200_Tune4C_13TeV-madgraph-tauola/Spring14dr-PU_S14_POSTLS170_V6-v1/AODSIM'] = 20508.9*0.0746149974976  
 xsec['/WJetsToLNu_HT-200to400_Tune4C_13TeV-madgraph-tauola/Spring14dr-PU_S14_POSTLS170_V6-v1/AODSIM'] = 20508.9*0.00867842338647 
 xsec['/WJetsToLNu_HT-400to600_Tune4C_13TeV-madgraph-tauola/Spring14dr-PU_S14_POSTLS170_V6-v1/AODSIM'] = 20508.9*0.00151784517782 
 xsec['/WJetsToLNu_HT-600toInf_Tune4C_13TeV-madgraph-tauola/Spring14dr-PU_S14_POSTLS170_V6-v1/AODSIM'] = 20508.9*0.000327181070988
 
-from xsecSMS import gluino13TeV_NLONLL
+from StopsDilepton.samples.xsecSMS import gluino13TeV_NLONLL
 
 xsec['T1qqqq_1400_325_300'] = gluino13TeV_NLONLL[1400]
 xsec["SMS_T1qqqq_2J_mGl1000_mLSP800_PU_S14_POSTLS170"] =  gluino13TeV_NLONLL[1000]
@@ -135,6 +136,7 @@ xsec["/WJetsToLNu_HT-600toInf_Tune4C_13TeV-madgraph-tauola/Phys14DR-PU20bx25_PHY
 xsec["/DYJetsToLL_M-50_13TeV-madgraph-pythia8/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM"] = 2008.*3
 xsec["/DYJetsToLL_M-50_13TeV-madgraph-pythia8/Phys14DR-PU20bx25_PHYS14_25_V1-v1/AODSIM"] = 2008.*3
 
+
 xsec["/DYJetsToLL_M-50_HT-100to200_Tune4C_13TeV-madgraph-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM"] = 139.4*1.27
 xsec["/DYJetsToLL_M-50_HT-200to400_Tune4C_13TeV-madgraph-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM"] = 42.75*1.27
 xsec["/DYJetsToLL_M-50_HT-400to600_Tune4C_13TeV-madgraph-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM"] = 5.497*1.27
@@ -143,6 +145,10 @@ xsec["/DYJetsToLL_M-50_HT-100to200_Tune4C_13TeV-madgraph-tauola/Phys14DR-PU20bx2
 xsec["/DYJetsToLL_M-50_HT-200to400_Tune4C_13TeV-madgraph-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/AODSIM"] = 42.75*1.27
 xsec["/DYJetsToLL_M-50_HT-400to600_Tune4C_13TeV-madgraph-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/AODSIM"] = 5.497*1.27
 xsec["/DYJetsToLL_M-50_HT-600toInf_Tune4C_13TeV-madgraph-tauola/Phys14DR-PU20bx25_PHYS14_25_V1-v1/AODSIM"] = 2.21*1.27 
+xsec['/DYJetsToLL_M-50_HT-100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1/MINIAODSIM'] = 139.4*1.27 
+xsec['/DYJetsToLL_M-50_HT-200to400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1/MINIAODSIM'] = 42.75*1.27
+xsec['/DYJetsToLL_M-50_HT-400to600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1/MINIAODSIM'] = 5.497*1.27
+xsec['/DYJetsToLL_M-50_HT-600toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1/MINIAODSIM'] = 2.21*1.27 
 
 xsec['/QCD_HT_100To250_13TeV-madgraph/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'] =  28730000.  
 xsec['/QCD_HT_250To500_13TeV-madgraph/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'] =  670500.  
@@ -164,6 +170,7 @@ xsec['WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISpring15DR74-Asymp
 xsec['/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISpring15DR74-AsymptFlat10to50bx25Raw_MCRUN2_74_V9-v1/MINIAODSIM'] = 3.*2008.
 xsec['/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v3/MINIAODSIM'] = 2008.*3.
 xsec["/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM"] = 18610
+xsec['/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1/MINIAODSIM'] = 18610 
 
 xsec["/DYJetsToLL_M-50_HT-100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/MINIAODSIM"] =  139.4*1.27 
 xsec["/DYJetsToLL_M-50_HT-200to400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/MINIAODSIM"] =  42.75*1.27 
@@ -180,10 +187,17 @@ xsec['/WJetsToLNu_HT-1200To2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpri
 xsec['/WJetsToLNu_HT-2500ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/MINIAODSIM'] = 0.03089*1.23
 
 xsec['/ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM'] = (7.20+4.16)*0.108*3
-xsec['/ST_t-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM'] = (136.05+80.97)*0.108*3
-xsec['/ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM'] = 35.6
-xsec['/ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM'] = 35.6
+xsec['/ST_t-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM'] =     (136.05+80.97)*0.108*3
+xsec['/ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM'] =   35.6
+xsec['/ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM'] =       35.6
+
+xsec["/ST_t-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1/MINIAODSIM"] =      (136.05+80.97)*0.108*3 
+xsec["/ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v2/MINIAODSIM"] =    35.6
+xsec["/ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1/MINIAODSIM"] =        35.6
+
+
 xsec['/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM']=831.76
+xsec["/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1/MINIAODSIM"]=831.76 
 
 xsec["/QCD_Pt_10to15_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1/MINIAODSIM"]=5887580000
 xsec["/QCD_Pt_15to30_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1/MINIAODSIM"]=1837410000
@@ -202,6 +216,27 @@ xsec["/QCD_Pt_1800to2400_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt50ns
 xsec["/QCD_Pt_2400to3200_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1/MINIAODSIM"]=0.00682981
 xsec["/QCD_Pt_3200toInf_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1/MINIAODSIM"]=0.000165445
 
+xsec["/QCD_Pt_80to120_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM"] = 2762530.0
+xsec["/QCD_Pt_120to170_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM"]=  471100
+xsec["/QCD_Pt_170to300_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/MINIAODSIM"]=  117276
+xsec["/QCD_Pt_300to470_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM"]=  7823
+xsec["/QCD_Pt_470to600_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/MINIAODSIM"]=  648.2
+xsec["/QCD_Pt_600to800_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v3/MINIAODSIM"]=  186.9
+xsec["/QCD_Pt_800to1000_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/MINIAODSIM"] =  32.293
+xsec["/QCD_Pt_1000to1400_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM"]  = 9.4183
+xsec["/QCD_Pt_1400to1800_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM"]  = 0.84265
+xsec["/QCD_Pt_1800to2400_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM"]  = 0.114943
+xsec["/QCD_Pt_2400to3200_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM"]  = 0.00682981
+xsec["/QCD_Pt_3200toInf_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM"]   = 0.000165445
+
+xsec["/QCD_HT200to300_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/MINIAODSIM"] = 1735000
+xsec["/QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/MINIAODSIM"] = 367000
+xsec["/QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM"] = 29400
+xsec["/QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM"] = 6524
+xsec["/QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/MINIAODSIM"] = 1064
+xsec["/QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM"] = 121.5
+xsec["/QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM"] = 25.42
+
 xsec["/QCD_Pt-15to20_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM"] =     1273190000*0.003  
 xsec["/QCD_Pt-20to30_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/MINIAODSIM"] =     558528000*0.0053
 xsec["/QCD_Pt-30to50_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM"] =     139803000*0.01182
@@ -214,6 +249,20 @@ xsec["/QCD_Pt-470to600_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR7
 xsec["/QCD_Pt-600to800_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/MINIAODSIM"] =   187.109*0.13412
 xsec["/QCD_Pt-800to1000_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/MINIAODSIM"] =  32.3486*0.14552
 xsec["/QCD_Pt-1000toInf_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/MINIAODSIM"] =  10.4305*0.15544
+
+xsec["/QCD_Pt-15to20_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v3/MINIAODSIM"] =     1273190000*0.003   
+xsec["/QCD_Pt-20to30_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v2/MINIAODSIM"] =     558528000*0.0053
+xsec["/QCD_Pt-30to50_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1/MINIAODSIM"] =     139803000*0.01182
+xsec["/QCD_Pt-50to80_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1/MINIAODSIM"] =     19222500*0.02276
+xsec["/QCD_Pt-80to120_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1/MINIAODSIM"] =    2758420*0.03844
+xsec["/QCD_Pt-120to170_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1/MINIAODSIM"] =   469797*0.05362
+xsec["/QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v2/MINIAODSIM"] =   117989*0.07335
+xsec["/QCD_Pt-300to470_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v3/MINIAODSIM"] =   7820.25*0.10196
+xsec["/QCD_Pt-470to600_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v3/MINIAODSIM"] =   645.528*0.12242
+xsec["/QCD_Pt-600to800_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v2/MINIAODSIM"] =   187.109*0.13412
+xsec["/QCD_Pt-800to1000_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v2/MINIAODSIM"] =  32.3486*0.14552
+xsec["/QCD_Pt-1000toInf_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v2/MINIAODSIM"] =  10.4305*0.15544
+
 
 xsec["/QCD_Pt-15to20_EMEnriched_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM"] =    1273000000*0.0002 
 xsec["/QCD_Pt-20to30_EMEnriched_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM"] =    557600000*0.0096
@@ -233,8 +282,11 @@ xsec["/QCD_Pt_250toInf_bcToE_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt
 
 
 xsec["/WZ_TuneCUETP8M1_13TeV-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM"] = (40.2+25.9)
+xsec["/WZ_TuneCUETP8M1_13TeV-pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v2/MINIAODSIM"] = (40.2+25.9) 
 xsec["/WWTo2L2Nu_13TeV-powheg/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM"] =  118.7*((3*0.108)**2)
+xsec["/WWTo2L2Nu_13TeV-powheg/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v2/MINIAODSIM"] = 118.7*((3*0.108)**2) 
 xsec["/ZZ_TuneCUETP8M1_13TeV-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v3/MINIAODSIM"] = 31.8
+xsec["/ZZ_TuneCUETP8M1_13TeV-pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v2/MINIAODSIM"] =31.8 
 xsec["/ZJetsToNuNu_HT-200To400_13TeV-madgraph/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM"] = 78.36*1.27 
 xsec["/ZJetsToNuNu_HT-400To600_13TeV-madgraph/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM"] = 10.94*1.27
 xsec["/ZJetsToNuNu_HT-600ToInf_13TeV-madgraph/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM"] = 4.203*1.27
@@ -246,160 +298,3 @@ xsec['/T2DegStop2j_300_270_GENSIM/nrad-T2DegStop2j_300_270_MINIAOD-a279b5108ada7
 xsec['T2DegStop_300_270'] = 8.51615
 #xsec['T2DegStop_test'] = 8.51615
 
-##------------------------------------------------------------
-##SUMMER 12
-##https://twiki.cern.ch/twiki/bin/viewauth/CMS/StandardModelCrossSectionsat8TeV
-#xsec["8TeV-DYJetsToLL-M50"]                     =       3503.71
-#xsec["8TeV-DYJetsToLL-M10to50"]                 =       877.
-#xsec["8TeV-DYToEE-M20"]                         =       1915.08333
-#xsec["8TeV-DYToMuMu-M20"]                       =       1915.08333
-#xsec["8TeV-DYToTauTau-M20"]                     =       1915.08333
-#
-#xsec["8TeV-T-s"]                                =       3.79
-#xsec["8TeV-T-t"]                                =       56.4
-#xsec["8TeV-T-tW"]                               =       11.1
-#
-#xsec["8TeV-Tbar-s"]                             =       1.76
-#xsec["8TeV-Tbar-t"]                             =       30.7
-#xsec["8TeV-Tbar-tW"]                            =       11.1
-#
-#xsec["8TeV-TTJets"]                             =       225.197
-#xsec["8TeV-TTWJets"]                            =       0.232 
-#xsec["8TeV-TTZJets"]                            =       0.2057 
-#
-#xsec["8TeV-WJetsToLNu"]                         =       36257.2
-#
-##https://twiki.cern.ch/twiki/bin/view/CMS/TTbarHiggs
-#xsec["8TeV-W1JetsToLNu"] =  6440.4  
-#xsec["8TeV-W2JetsToLNu"] =  2087.2  
-#xsec["8TeV-W3JetsToLNu"] =  619.0 
-#xsec["8TeV-W4JetsToLNu"] =  255.2 
-#
-###http://cms.cern.ch/iCMS/prep/requestmanagement?campid=Summer12_DR52X
-##xsec["8TeV-WJets-HT400"]                   =       25.22 #* 27965.3/18656.04 #including match to NLO WJetstoLNu (corr-factor obtained from normalizing MET-shape HT>450)
-##xsec["8TeV-WJets-HT250to300"]              =       48.01 #* 27965.3/18656.04 #including match to NLO WJetstoLNu (corr-factor obtained from normalizing MET-shape HT>450)
-##xsec["8TeV-WJets-HT300to400"]              =       38.3  #* 27965.3/18656.04 #including match to NLO WJetstoLNu (corr-factor obtained from normalizing MET-shape HT>450)
-#xsec["8TeV-WbbJetsToLNu"]                  =       3*0.108*377.4 #https://twiki.cern.ch/twiki/bin/view/CMS/StandardModelCrossSectionsat8TeV times lep. BR from PDG
-#
-##http://cms.cern.ch/iCMS/jsp/mcprod/admin/requestmanagement.jsp?campid=Summer12_DR53X
-#xsec["8TeV-WJetsToLNu_HT-150To200"] = 235.6  #/WJetsToLNu_HT-150To200_8TeV-madgraph/Summer12_DR53X-PU_S10_START53_V7C-v1/AODSIM
-#xsec["8TeV-WJetsToLNu_HT-200To250"] =  90.27#/WJetsToLNu_HT-200To250_8TeV-madgraph/Summer12_DR53X-PU_S10_START53_V7C-v1/AODSIM
-#xsec["8TeV-WJetsToLNu_HT-250To300"] =  48.01#/WJetsToLNu_HT-250To300_8TeV-madgraph_v2/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM
-#xsec["8TeV-WJetsToLNu_HT-300To400"] =  38.3#/WJetsToLNu_HT-300To400_8TeV-madgraph_v2/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM
-#xsec["8TeV-WJetsToLNu_HT-400ToInf"] =  25.22 #/WJetsToLNu_HT-400ToInf_8TeV-madgraph_v2/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM
-#
-##http://cms.cern.ch/iCMS/jsp/mcprod/admin/requestmanagement.jsp?campid=Summer12_DR53X
-##xsec["8TeV-WJetsToLNu_PtW-100_8TeV-herwigpp"] =  #/WJetsToLNu_PtW-100_8TeV-herwigpp/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM #https://twiki.cern.ch/twiki/bin/viewauth/CMS/HiggsMCProductionSummer12
-#xsec["8TeV-WJetsToLNu_PtW-100_TuneZ2star_8TeV_ext-madgraph-tarball"] = 221.3  #/WJetsToLNu_PtW-100_TuneZ2star_8TeV_ext-madgraph-tarball/Summer12_DR53X-PU_S10_START53_V7C-v1/AODSIM
-#xsec["8TeV-WJetsToLNu_PtW-180_TuneZ2star_8TeV-madgraph-tarball"] = 23.5 #/WJetsToLNu_PtW-180_TuneZ2star_8TeV-madgraph-tarball/Summer12_DR53X-PU_S10_START53_V7C-v1/AODSIM
-#
-#xsec["8TeV-WJetsToLNu_PtW-50To70_TuneZ2star_8TeV-madgraph"] = 811.2 #/WJetsToLNu_PtW-50To70_TuneZ2star_8TeV-madgraph/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM
-#xsec["8TeV-WJetsToLNu_PtW-70To100_TuneZ2star_8TeV-madgraph"] =  428.9 #/WJetsToLNu_PtW-70To100_TuneZ2star_8TeV-madgraph/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM
-#xsec["8TeV-WJetsToLNu_PtW-100_TuneZ2star_8TeV-madgraph"] = 228.9  #/WJetsToLNu_PtW-100_TuneZ2star_8TeV-madgraph/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM
-#
-#xsec["8TeV-WminusToENu"] = 4697.0  #/WminusToENu_CT10_TuneZ2star_8TeV-powheg-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM
-#xsec["8TeV-WminusToMuNu"] =4697.0  #/WminusToMuNu_CT10_TuneZ2star_8TeV-powheg-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM
-#xsec["8TeV-WminusToTauNu"] =4697.0  #/WminusToTauNu_CT10_TuneZ2star_8TeV-powheg-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM
-#xsec["8TeV-WminusToTauNu-tauola"] =4697.0  #/WminusToTauNu_CT10_TuneZ2star_8TeV-powheg-tauola-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM
-#xsec["8TeV-WplusToENu"] = 6702.0 #/WplusToENu_CT10_TuneZ2star_8TeV-powheg-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM
-#xsec["8TeV-WplusToMuNu"] = 6702.0 #/WplusToMuNu_CT10_TuneZ2star_8TeV-powheg-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM
-#xsec["8TeV-WplusToTauNu"] = 6702.0 #/WplusToTauNu_CT10_TuneZ2star_8TeV-powheg-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM
-#xsec["8TeV-WplusToTauNu-tauola"] = 6702.0 #/WplusToTauNu_CT10_TuneZ2star_8TeV-powheg-tauola-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM
-#
-##http://cms.cern.ch/iCMS/jsp/mcprod/admin/requestmanagement.jsp?campid=Summer12_DR53X
-##xsec["8TeV-DYJetsToLL_M10-50_PtZ-100_TuneZ2star_8TeV-madgraph"] =  #/DYJetsToLL_M10-50_PtZ-100_TuneZ2star_8TeV-madgraph/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
-##xsec["8TeV-DYJetsToLL_M10-50_PtZ70-100_TuneZ2star_8TeV-madgraph"] =  #/DYJetsToLL_M10-50_PtZ70-100_TuneZ2star_8TeV-madgraph/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
-#xsec["8TeV-DYJetsToLL_PtZ-180_TuneZ2star_8TeV-madgraph-tarball"] = 4.56 #/DYJetsToLL_PtZ-180_TuneZ2star_8TeV-madgraph-tarball/Summer12_DR53X-PU_S10_START53_V7C-v1/AODSIM
-#
-#xsec["8TeV-DYJetsToLL_PtZ-50To70_TuneZ2star_8TeV-madgraph-tarball"] = 93.8 #/DYJetsToLL_PtZ-50To70_TuneZ2star_8TeV-madgraph-tarball/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM
-#xsec["8TeV-DYJetsToLL_PtZ-70To100_TuneZ2star_8TeV-madgraph-tarball"] = 52.31 #/DYJetsToLL_PtZ-70To100_TuneZ2star_8TeV-madgraph-tarball/Summer12_DR53X-PU_S10_START53_V7A-v2/AODSIM
-#xsec["8TeV-DYJetsToLL_PtZ-100_TuneZ2star_8TeV-madgraph"] = 34.1 #/DYJetsToLL_PtZ-100_TuneZ2star_8TeV-madgraph/Summer12_DR53X-PU_S10_START53_V7A-v2/AODSIM
-#
-#xsec["8TeV-DYJetsToLL_PtZ-50To70_TuneZ2star_8TeV_ext-madgraph-tarball"] = 89.0 #/DYJetsToLL_PtZ-50To70_TuneZ2star_8TeV_ext-madgraph-tarball/Summer12_DR53X-PU_S10_START53_V7C-v1/AODSIM
-#xsec["8TeV-DYJetsToLL_PtZ-70To100_TuneZ2star_8TeV_ext-madgraph-tarball"] = 53.0 #/DYJetsToLL_PtZ-70To100_TuneZ2star_8TeV_ext-madgraph-tarball/Summer12_DR53X-PU_S10_START53_V7C-v1/AODSIM
-#xsec["8TeV-DYJetsToLL_PtZ-100_TuneZ2star_8TeV_ext-madgraph-tarball"] = 32.9 #/DYJetsToLL_PtZ-100_TuneZ2star_8TeV_ext-madgraph-tarball/Summer12_DR53X-PU_S10_START53_V7C-v1/AODSIM
-#
-#
-#xsec["8TeV-ZJetsToNuNu_50_HT_100_TuneZ2Star_8TeV_madgraph"] = 381.2  #/ZJetsToNuNu_50_HT_100_TuneZ2Star_8TeV_madgraph/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM
-#xsec["8TeV-ZJetsToNuNu_50_HT_100_TuneZ2Star_8TeV_madgraph_ext"] = 381.2 #/ZJetsToNuNu_50_HT_100_TuneZ2Star_8TeV_madgraph_ext/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM
-#xsec["8TeV-ZJetsToNuNu_100_HT_200_TuneZ2Star_8TeV_madgraph"] = 160.3 #/ZJetsToNuNu_100_HT_200_TuneZ2Star_8TeV_madgraph/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM
-#xsec["8TeV-ZJetsToNuNu_100_HT_200_TuneZ2Star_8TeV_madgraph_ext"] = 160.3 #/ZJetsToNuNu_100_HT_200_TuneZ2Star_8TeV_madgraph_ext/Summer12_DR53X-PU_S10_START53_V7C-v1/AODSIM
-#xsec["8TeV-ZJetsToNuNu_200_HT_400_TuneZ2Star_8TeV_madgraph"] = 41.49 #/ZJetsToNuNu_200_HT_400_TuneZ2Star_8TeV_madgraph/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM
-#xsec["8TeV-ZJetsToNuNu_200_HT_400_TuneZ2Star_8TeV_madgraph_ext"] = 41.49  #/ZJetsToNuNu_200_HT_400_TuneZ2Star_8TeV_madgraph_ext/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM
-#xsec["8TeV-ZJetsToNuNu_400_HT_inf_TuneZ2Star_8TeV_madgraph"] = 5.274  #/ZJetsToNuNu_400_HT_inf_TuneZ2Star_8TeV_madgraph/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM
-#xsec["8TeV-ZJetsToNuNu_400_HT_inf_TuneZ2Star_8TeV_madgraph_ext"] = 5.274  #/ZJetsToNuNu_400_HT_inf_TuneZ2Star_8TeV_madgraph_ext/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM
-#
-##xsec["8TeV-ZJetsToLL_Pt-100_8TeV-herwigpp"] =  #/ZJetsToLL_Pt-100_8TeV-herwigpp/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM
-##xsec["8TeV-ZJetsToNuNu_Pt-100_8TeV-herwigpp"] =  #/ZJetsToNuNu_Pt-100_8TeV-herwigpp/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM
-#xsec["8TeV-ZJetsToNuNu_PtZ-70To100_8TeV"] = 32.9  #/ZJetsToNuNu_PtZ-70To100_8TeV/Summer12_DR53X-PU_S10_START53_V7C-v1/AODSIM
-#xsec["8TeV-ZJetsToNuNu_PtZ-100_8TeV-madgraph"] = 21.44 #/ZJetsToNuNu_PtZ-100_8TeV-madgraph/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM
-#
-##http://cms.cern.ch/iCMS/prep/requestmanagement?campid=Summer12_DR52X
-#xsec["8TeV-LM6"]                                =       0.5047
-#xsec["8TeV-LM9"]                                =       9.287
-#xsec["8TeV-QCD-Pt1000-MuEnrichedPt5"]           =       0.774*0.1097
-#xsec["8TeV-QCD-Pt120to170-MuEnrichedPt5"]       =       157800.0*0.0473
-#xsec["8TeV-QCD-Pt170to300-MuEnrichedPt5"]       =       34020.0*0.0676
-#xsec["8TeV-QCD-Pt20to30-MuEnrichedPt5"]         =       2.87*(10**8)*0.0065
-#xsec["8TeV-QCD-Pt300to470-MuEnrichedPt5"]       =       1757.0*0.0864
-#xsec["8TeV-QCD-Pt30to50-MuEnrichedPt5"]         =       6.609*(10**7)*0.0122
-#xsec["8TeV-QCD-Pt50to80-MuEnrichedPt5"]         =       8.082*(10**6)*0.0218
-#xsec["8TeV-QCD-Pt470to600-MuEnrichedPt5"]       =       115.2*0.1024
-#xsec["8TeV-QCD-Pt600to800-MuEnrichedPt5"]       =       27.01*0.0996
-#xsec["8TeV-QCD-Pt800to1000-MuEnrichedPt5"]      =       3.57*0.1033
-#xsec["8TeV-QCD-Pt80to120-MuEnrichedPt5"]        =       1024000.0*0.0395
-#xsec["8TeV-ZJetsToNuNu-HT50to100"] =  452.75 #NNLO https://twiki.cern.ch/twiki/bin/viewauth/CMS/SUSYJetsMETTausAnalysis2012 
-#xsec["8TeV-ZJetsToNuNu-HT100to200"] = 190.39
-#xsec["8TeV-ZJetsToNuNu-HT200to400"] = 49.28
-#xsec["8TeV-ZJetsToNuNu-HT200-400"] = 49.28
-#xsec["8TeV-ZJetsToNuNu-HT400"] = 6.26
-#
-#xsec["8TeV-QCD_Pt-5to15"]                       =       4.2639499*(10**10)
-##fehlt
-#xsec["8TeV-QCD_Pt-30to50"]                      =       6.6285328*(10**7)
-#xsec["8TeV-QCD_Pt-50to80"]                      =       8148778.0
-#xsec["8TeV-QCD_Pt-80to120"]                     =       1033680.0
-#xsec["8TeV-QCD_Pt-120to170"]                    =       156293.3
-#xsec["8TeV-QCD_Pt-170to300"]                    =       34138.15
-#xsec["8TeV-QCD_Pt-300to470"]                    =       1759.549
-#xsec["8TeV-QCD_Pt-470to600"]                    =       113.8791
-#xsec["8TeV-QCD_Pt-600to800"]                    =       26.9921
-#xsec["8TeV-QCD_Pt-800to1000"]                   =       3.550036
-#xsec["8TeV-QCD_Pt-1000to1400"]                  =       0.737844
-#xsec["8TeV-QCD_Pt-1400to1800"]                  =       0.03352235
-#xsec["8TeV-QCD_Pt-1800"]                        =       0.001829005
-#
-#xsec["8TeV-QCD_EMEnriched_Pt_20_30"]           =        2.886*(10**8)*0.0101 	
-#xsec["8TeV-QCD_EMEnriched_Pt_30_80"]           =        7.433*(10**7)*0.0621 	
-#xsec["8TeV-QCD_EMEnriched_Pt_80_170"]          = 	    1191000.0*0.1539
-#xsec["8TeV-QCD_EMEnriched_Pt_170_250"]         =        30990.0*0.148
-#xsec["8TeV-QCD_EMEnriched_Pt_250_350"]         =        4250.0*0.131
-#xsec["8TeV-QCD_EMEnriched_Pt_350"]             = 	    810.0*0.11
-#xsec["8TeV-QCD_BCtoE_Pt_20_30"]                =        2.886*(10**8)*5.8*(10**(-4))
-#xsec["8TeV-QCD_BCtoE_Pt_30_80"]                =        7.424*(10**7)*0.00225
-#xsec["8TeV-QCD_BCtoE_Pt_80_170"]               =        1191000.0*0.0109
-#xsec["8TeV-QCD_BCtoE_Pt_170_250"]              =        30980.0*0.0204
-#xsec["8TeV-QCD_BCtoE_Pt_250_350"]              =        4250.0*0.0243
-#xsec["8TeV-QCD_BCtoE_Pt_350"]                  =        811.0*0.0295
-#
-##xsec["8TeV-ZJetsToNuNu-HT50to100"] = 381.2
-##xsec["8TeV-ZJetsToNuNu-HT100to200"] = 160.3
-##xsec["8TeV-ZJetsToNuNu-HT200to400"] = 41.49
-##xsec["8TeV-ZJetsToNuNu-HT200-400"] = 41.49
-##xsec["8TeV-ZJetsToNuNu-HT400"] = 5.274
-#xsec["8TeV-WW"] = 54.838
-#xsec["8TeV-WZ"] = 32.3 
-#xsec["8TeV-ZZ"] = 7.7 
-#
-##MonoJet Signals
-##https://twiki.cern.ch/twiki/bin/view/LHCPhysics/SUSYCrossSections8TeVstopsbottom
-#xsec["8TeV-stop300-LSP270"] = 1.99608
-#xsec["8TeV-stop300-LSP270-FullSim"] = 1.99608
-#xsec["8TeV-stop200lsp170g100"] = 18.5245  
-#xsec["8TeV-stop300lsp240g150"] = 1.99608
-#xsec["8TeV-stop300lsp270g175"] = 1.99608
-#xsec["8TeV-stop300lsp270"] = 1.99608
-#xsec["8TeV-stop300lsp270g200"] = 1.99608
-#
-#xsec["T5Full_1100_200_100-4"] = 0.0101744
-#xsec["T5Full_1100_800_600-4"] = 0.0101744
