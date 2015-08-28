@@ -1,16 +1,25 @@
 import copy, os, sys
 #from StopsDilepton.tools.localInfo import dataDir
-dir = '/data/rschoefbeck/cmgTuples/postProcessed_Spring15_25ns/HT400ST200/hard/' 
+dir = '/data/rschoefbeck/cmgTuples/postProcessed_Spring15_25ns/HT400ST200/' 
 #"ZJetsToNuNu_HT-200To400_13TeV-madgraph_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1",
 #"ZJetsToNuNu_HT-400To600_13TeV-madgraph_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1",
 #"ZJetsToNuNu_HT-600ToInf_13TeV-madgraph_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1",
 
-TTJets_25ns={\
+def makeSample(sample):
+  h = copy.deepcopy(sample)
+  h['dir']=h['dir']+'/hard/'
+  s = copy.deepcopy(sample)
+  s['dir']=s['dir']+'/soft/'
+  return {'hard':h, 'soft':s}
+
+
+TTJets_25ns=makeSample({\
 "name" : "tt+Jets",
 "bins" : ["TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1"],
 'dir' : dir,
-}
-WJetsHTToLNu_25ns={\
+})
+
+WJetsHTToLNu_25ns=makeSample({\
 "name" : "W+Jets",
 "bins" : [
 "WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1",
@@ -22,9 +31,9 @@ WJetsHTToLNu_25ns={\
 "WJetsToLNu_HT-2500ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2",
 ],
 'dir' : dir,
-}
+})
 
-diBosons_25ns={\
+diBosons_25ns=makeSample({\
 "name" : "WW/WZ/ZZ",
 "bins" : [
 "WWTo2L2Nu_13TeV-powheg_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1",
@@ -32,8 +41,9 @@ diBosons_25ns={\
 "ZZ_TuneCUETP8M1_13TeV-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v3",
 ],
 'dir' : dir,
-}
-singleTop_25ns={\
+})
+
+singleTop_25ns=makeSample({\
 "name" : "single top",
 "bins" : [
 "ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1",
@@ -42,8 +52,9 @@ singleTop_25ns={\
 "ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1",
 ],
 'dir' : dir,
-}
-DY_25ns={\
+})
+
+DY_25ns=makeSample({\
 "name" : "DY",
 "bins" : [
 "DYJetsToLL_M-50_HT-100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2",
@@ -52,15 +63,17 @@ DY_25ns={\
 "DYJetsToLL_M-50_HT-600toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2",
 ],
 'dir' : dir,
-}
-DYM10to50_25ns={\
+})
+
+DYM10to50_25ns=makeSample({\
 "name" : "DY M10-50",
 "bins" : [
 "DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1",
 ],
 'dir' : dir,
-}
-QCDMu_25ns={\
+})
+
+QCDMu_25ns=makeSample({\
 "name" : "QCD (MuPt5 enriched)",
 "bins" : [
 "QCD_Pt-15to20_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1",
@@ -77,10 +90,10 @@ QCDMu_25ns={\
 "QCD_Pt-1000toInf_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2"
 ],
 'dir' : dir,
-}
+})
 
 
-QCDEle_25ns={\
+QCDEle_25ns=makeSample({\
 "name" : "QCD (Ele)",
 "bins" : [
 "QCD_Pt_15to20_bcToE_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1",
@@ -99,7 +112,7 @@ QCDEle_25ns={\
 "QCD_Pt-300toInf_EMEnriched_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2",
 ],
 'dir' : dir,
-}
+})
 
 allSignalStrings=[\
 "SMS_T2tt_2J_mStop425_mLSP325",
