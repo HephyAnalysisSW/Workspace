@@ -8,15 +8,35 @@ from math import *
 from array import array
 from Workspace.HEPHYPythonTools.helpers import *
 from Workspace.RA4Analysis.helpers import *
-from Workspace.RA4Analysis.cmgTuplesPostProcessed_Spring15_hard import *
+#from Workspace.RA4Analysis.cmgTuplesPostProcessed_Spring15_hard import *
+#from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_postProcessed import *
+from Workspace.RA4Analysis.cmgTuples_Spring15_50ns_postProcessed import *
+
+
 
 lepSel = 'hard'
+#50ns samples
+WJETS = {'name':'WJets', 'chain':getChain(WJetsToLNu_50ns[lepSel],histname=''), 'color':color('WJets'),'weight':'weight', 'niceName':'W Jets'}
+TTJETS = {'name':'TTJets', 'chain':getChain(TTJets_50ns[lepSel],histname=''), 'color':color('TTJets'),'weight':'weight', 'niceName':'t#bar{t} Jets'}
+DY = {'name':'DY', 'chain':getChain(DY_50ns[lepSel],histname=''), 'color':color('DY'),'weight':'weight', 'niceName':'Drell Yan'}
+singleTop = {'name':'singleTop', 'chain':getChain(singleTop_50ns[lepSel],histname=''), 'color':color('singleTop'),'weight':'weight', 'niceName':'single Top'}
+#QCD = {'name':'QCD', 'chain':getChain(QCDEle_50ns[lepSel],histname=''), 'color':color('QCD'),'weight':'weight', 'niceName':'QCD'}
+samples = [WJETS, TTJETS, DY, singleTop]#, QCD]
 
-WJETS = {'name':'WJets', 'chain':getChain(WJetsHTToLNu[lepSel],histname=''), 'color':color('WJets'),'weight':'weight', 'niceName':'W Jets'}
-TTJETS = {'name':'TTJets', 'chain':getChain(ttJets[lepSel],histname=''), 'color':color('TTJets'),'weight':'weight', 'niceName':'t#bar{t} Jets'}
-DY = {}
-QCD = {}
-samples = [WJETS, TTJETS]#, DY, QCD]
+##25ns samples
+#WJETS = {'name':'WJets', 'chain':getChain(WJetsHTToLNu_25ns[lepSel],histname=''), 'color':color('WJets'),'weight':'weight', 'niceName':'W Jets'}
+#TTJETS = {'name':'TTJets', 'chain':getChain(TTJets_25ns[lepSel],histname=''), 'color':color('TTJets'),'weight':'weight', 'niceName':'t#bar{t} Jets'}
+#DY = {'name':'DY', 'chain':getChain(DY_25ns[lepSel],histname=''), 'color':color('DY'),'weight':'weight', 'niceName':'Drell Yan'}
+#singleTop = {'name':'singleTop', 'chain':getChain(singleTop_25ns[lepSel],histname=''), 'color':color('singleTop'),'weight':'weight', 'niceName':'single Top'}
+#QCD = {'name':'QCD', 'chain':getChain(QCDMu_25ns[lepSel],histname=''), 'color':color('QCD'),'weight':'weight', 'niceName':'QCD'}
+#samples = [WJETS, TTJETS, singleTop, DY, QCD]
+
+# older samples
+#WJETS = {'name':'WJets', 'chain':getChain(WJetsHTToLNu[lepSel],histname=''), 'color':color('WJets'),'weight':'weight', 'niceName':'W Jets'}
+#TTJETS = {'name':'TTJets', 'chain':getChain(ttJets[lepSel],histname=''), 'color':color('TTJets'),'weight':'weight', 'niceName':'t#bar{t} Jets'}
+#DY = {}
+#QCD = {}
+#samples = [WJETS, TTJETS]#, DY, QCD]
 
 
 dPhiJet1Met = {'name':'acos(cos(Jet_phi[0]-met_phi))', 'binning':[32,0,3.2], 'titleX':'#Delta#Phi(j_{1},#slash{E}_{T})', 'titleY':'Events'}
@@ -29,11 +49,20 @@ dPhiJet2GenMet = {'name':'acos(cos(Jet_phi[1]-met_genPhi))', 'binning':[32,0,3.2
 dPhiJet3GenMet = {'name':'acos(cos(Jet_phi[2]-met_genPhi))', 'binning':[32,0,3.2], 'titleX':'#Delta#Phi(j_{3},#slash{E}_{T}^{gen})', 'titleY':'Events'}
 
 
-st = {'name':'st', 'binning':[30,0,1500], 'titleX':'L_{T}', 'titleY':'Events'}
+st = {'name':'st', 'binning':[30,0,1500], 'titleX':'L_{T} [GeV]', 'titleY':'Events'}
+ht = {'name':'htJet30j', 'binning':[40,500,2500], 'titleX':'H_{T} [GeV]', 'titleY':'Events'}
+njet = {'name':'nJet30', 'binning':[15,0,15], 'titleX':'n_{jets}', 'titleY':'Events'}
+deltaPhi = {'name':'deltaPhi_Wl', 'binning':[32,0,3.2], 'titleX':'#Delta#Phi(W,l)', 'titleY':'Events'}
+leptonPt = {'name':'leptonPt', 'binning':[40,0,1000], 'titleX':'p_{T} [GeV]', 'titleY':'Events'}
+leadingJetPt = {'name':'Jet_pt[0]', 'binning':[40,0,2000], 'titleX':'p_{T} (leading jet) [GeV]', 'titleY':'Events'}
+
+
 variables = [st]
 
 presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&st>250&&nJet30>2&&htJet30j>500"
 newpresel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&Jet_pt[1]>80&&st>250&&nJet30>2&&htJet30j>500"
+
+newPreselCut = {'name':'presel','string':newpresel,'niceName':'Preselection'}
 
 fakeMet = "sqrt((met_pt*cos(met_phi)-met_genPt*cos(met_genPhi))**2+(met_pt*sin(met_phi)-met_genPt*sin(met_genPhi))**2)"
 fakeMetSelection = '('+fakeMet+'>50||'+fakeMet+'>met_genPt)'
@@ -137,7 +166,8 @@ def plot(samples, variable, cuts, data=False, maximum=False, minimum=0., stackin
   if lumi: latex1.DrawLatex(0.75,0.96,"L="+str(lumi)+"fb^{-1} (13TeV)")
   if legend: leg.Draw()
   can.Update()
-  return [h, can, leg]
+  if stacking: return {'hist':h, 'canvas':can, 'legend':leg, 'stack':h_Stack}
+  else: return {'hist':h, 'canvas':can, 'legend':leg}
 
 #plot(samples,st,cuts)
 

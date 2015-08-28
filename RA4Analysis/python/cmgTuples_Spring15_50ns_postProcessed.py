@@ -1,5 +1,4 @@
 import copy, os, sys
-from StopsDilepton.tools.localInfo import dataDir
 dir = '/data/rschoefbeck/cmgTuples/postProcessed_Spring15/HT400ST200/hard/' 
 
 TTJets_50ns={\
@@ -7,6 +6,7 @@ TTJets_50ns={\
 "bins" : ["TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1"],
 'dir' : dir,
 }
+
 WJetsToLNu_50ns={\
 "name" : "W+Jets",
 "bins" : [
@@ -24,15 +24,17 @@ diBosons_50ns={\
 ],
 'dir' : dir,
 }
+
 singleTop_50ns={\
 "name" : "single top",
 "bins" : [
-"ST_t-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1",
+#"ST_t-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1",
 "ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v2",
 "ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1",
 ],
 'dir' : dir,
 }
+
 DY_50ns={\
 "name" : "DY",
 "bins" : [
@@ -48,7 +50,7 @@ DYM10to50_50ns={\
 "bins" : [
 "DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1",
 ],
-'dir' : dataDir,
+'dir' : dir,
 }
 QCDMu_50ns={\
 "name" : "QCDMu",
