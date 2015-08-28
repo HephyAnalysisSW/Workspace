@@ -8,14 +8,23 @@ from math import *
 from array import array
 from Workspace.HEPHYPythonTools.helpers import *
 from Workspace.RA4Analysis.helpers import *
-from Workspace.RA4Analysis.cmgTuplesPostProcessed_Spring15_hard import *
+#from Workspace.RA4Analysis.cmgTuplesPostProcessed_Spring15_hard import *
+from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_postProcessed.py import *
+#from Workspace.RA4Analysis.cmgTuples_Spring15_50ns_postProcessed.py import *
+
+
 
 lepSel = 'hard'
 
-WJETS = {'name':'WJets', 'chain':getChain(WJetsHTToLNu[lepSel],histname=''), 'color':color('WJets'),'weight':'weight', 'niceName':'W Jets'}
-TTJETS = {'name':'TTJets', 'chain':getChain(ttJets[lepSel],histname=''), 'color':color('TTJets'),'weight':'weight', 'niceName':'t#bar{t} Jets'}
-DY = {}
-QCD = {}
+WJETS = {'name':'WJets', 'chain':getChain(WJetsHTToLNu_25ns[lepSel],histname=''), 'color':color('WJets'),'weight':'weight', 'niceName':'W Jets'}
+TTJETS = {'name':'TTJets', 'chain':getChain(TTJets_25ns[lepSel],histname=''), 'color':color('TTJets'),'weight':'weight', 'niceName':'t#bar{t} Jets'}
+DY_25ns
+singleTop_25ns
+
+#WJETS = {'name':'WJets', 'chain':getChain(WJetsHTToLNu[lepSel],histname=''), 'color':color('WJets'),'weight':'weight', 'niceName':'W Jets'}
+#TTJETS = {'name':'TTJets', 'chain':getChain(ttJets[lepSel],histname=''), 'color':color('TTJets'),'weight':'weight', 'niceName':'t#bar{t} Jets'}
+#DY = {}
+#QCD = {}
 samples = [WJETS, TTJETS]#, DY, QCD]
 
 
