@@ -1,6 +1,6 @@
 import copy, os, sys
 from StopsDilepton.tools.localInfo import dataDir
-dir = '/data/rschoefbeck/cmgTuples/postProcessed_Spring15_25ns/HT400ST200/hard/' 
+dir = '/data/rschoefbeck/cmgTuples/postProcessed_Spring15/HT400ST200/hard/' 
 
 TTJets_50ns={\
 "name" : "tt+Jets",
