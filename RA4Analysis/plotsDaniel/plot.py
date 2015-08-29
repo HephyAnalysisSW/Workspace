@@ -9,27 +9,27 @@ from array import array
 from Workspace.HEPHYPythonTools.helpers import *
 from Workspace.RA4Analysis.helpers import *
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_Spring15_hard import *
-from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_postProcessed import *
-#from Workspace.RA4Analysis.cmgTuples_Spring15_50ns_postProcessed import *
+#from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_postProcessed import *
+from Workspace.RA4Analysis.cmgTuples_Spring15_50ns_postProcessed import *
 
 
 
 lepSel = 'hard'
-##50ns samples
-#WJETS = {'name':'WJets', 'chain':getChain(WJetsToLNu_50ns[lepSel],histname=''), 'color':color('WJets'),'weight':'weight', 'niceName':'W Jets'}
-#TTJETS = {'name':'TTJets', 'chain':getChain(TTJets_50ns[lepSel],histname=''), 'color':color('TTJets'),'weight':'weight', 'niceName':'t#bar{t} Jets'}
-#DY = {'name':'DY', 'chain':getChain(DY_50ns[lepSel],histname=''), 'color':color('DY'),'weight':'weight', 'niceName':'Drell Yan'}
-#singleTop = {'name':'singleTop', 'chain':getChain(singleTop_50ns[lepSel],histname=''), 'color':color('singleTop'),'weight':'weight', 'niceName':'single Top'}
-##QCD = {'name':'QCD', 'chain':getChain(QCDEle_50ns[lepSel],histname=''), 'color':color('QCD'),'weight':'weight', 'niceName':'QCD'}
-#samples = [WJETS, TTJETS, DY, singleTop]#, QCD]
+#50ns samples
+WJETS = {'name':'WJets', 'chain':getChain(WJetsToLNu_50ns,histname=''), 'color':color('WJets'),'weight':'weight', 'niceName':'W Jets'}
+TTJETS = {'name':'TTJets', 'chain':getChain(TTJets_50ns,histname=''), 'color':color('TTJets'),'weight':'weight', 'niceName':'t#bar{t} Jets'}
+DY = {'name':'DY', 'chain':getChain(DY_50ns,histname=''), 'color':color('DY'),'weight':'weight', 'niceName':'Drell Yan'}
+singleTop = {'name':'singleTop', 'chain':getChain(singleTop_50ns,histname=''), 'color':color('singleTop'),'weight':'weight', 'niceName':'single Top'}
+QCD = {'name':'QCD', 'chain':getChain(QCDMu_50ns,histname=''), 'color':color('QCD'),'weight':'weight', 'niceName':'QCD'}
+samples = [WJETS, TTJETS, DY, singleTop, QCD]
 
-#25ns samples
-WJETS = {'name':'WJets', 'chain':getChain(WJetsHTToLNu_25ns[lepSel],histname=''), 'color':color('WJets'),'weight':'weight', 'niceName':'W Jets'}
-TTJETS = {'name':'TTJets', 'chain':getChain(TTJets_25ns[lepSel],histname=''), 'color':color('TTJets'),'weight':'weight', 'niceName':'t#bar{t} Jets'}
-DY = {'name':'DY', 'chain':getChain(DY_25ns[lepSel],histname=''), 'color':color('DY'),'weight':'weight', 'niceName':'Drell Yan'}
-singleTop = {'name':'singleTop', 'chain':getChain(singleTop_25ns[lepSel],histname=''), 'color':color('singleTop'),'weight':'weight', 'niceName':'single Top'}
-QCD = {'name':'QCD', 'chain':getChain(QCDMu_25ns[lepSel],histname=''), 'color':color('QCD'),'weight':'weight', 'niceName':'QCD'}
-samples = [WJETS, TTJETS, singleTop, DY, QCD]
+##25ns samples
+#WJETS = {'name':'WJets', 'chain':getChain(WJetsHTToLNu_25ns,histname=''), 'color':color('WJets'),'weight':'weight', 'niceName':'W Jets'}
+#TTJETS = {'name':'TTJets', 'chain':getChain(TTJets_25ns,histname=''), 'color':color('TTJets'),'weight':'weight', 'niceName':'t#bar{t} Jets'}
+#DY = {'name':'DY', 'chain':getChain(DY_25ns,histname=''), 'color':color('DY'),'weight':'weight', 'niceName':'Drell Yan'}
+#singleTop = {'name':'singleTop', 'chain':getChain(singleTop_25ns,histname=''), 'color':color('singleTop'),'weight':'weight', 'niceName':'single Top'}
+#QCD = {'name':'QCD', 'chain':getChain(QCDMu_25ns,histname=''), 'color':color('QCD'),'weight':'weight', 'niceName':'QCD'}
+#samples = [WJETS, TTJETS, singleTop, DY, QCD]
 
 # older samples
 #WJETS = {'name':'WJets', 'chain':getChain(WJetsHTToLNu[lepSel],histname=''), 'color':color('WJets'),'weight':'weight', 'niceName':'W Jets'}
