@@ -9,27 +9,27 @@ from array import array
 from Workspace.HEPHYPythonTools.helpers import *
 from Workspace.RA4Analysis.helpers import *
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_Spring15_hard import *
-#from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_postProcessed import *
-from Workspace.RA4Analysis.cmgTuples_Spring15_50ns_postProcessed import *
+from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_postProcessed import *
+#from Workspace.RA4Analysis.cmgTuples_Spring15_50ns_postProcessed import *
 
 
 
 lepSel = 'hard'
-#50ns samples
-WJETS = {'name':'WJets', 'chain':getChain(WJetsToLNu_50ns[lepSel],histname=''), 'color':color('WJets'),'weight':'weight', 'niceName':'W Jets'}
-TTJETS = {'name':'TTJets', 'chain':getChain(TTJets_50ns[lepSel],histname=''), 'color':color('TTJets'),'weight':'weight', 'niceName':'t#bar{t} Jets'}
-DY = {'name':'DY', 'chain':getChain(DY_50ns[lepSel],histname=''), 'color':color('DY'),'weight':'weight', 'niceName':'Drell Yan'}
-singleTop = {'name':'singleTop', 'chain':getChain(singleTop_50ns[lepSel],histname=''), 'color':color('singleTop'),'weight':'weight', 'niceName':'single Top'}
-#QCD = {'name':'QCD', 'chain':getChain(QCDEle_50ns[lepSel],histname=''), 'color':color('QCD'),'weight':'weight', 'niceName':'QCD'}
-samples = [WJETS, TTJETS, DY, singleTop]#, QCD]
+##50ns samples
+#WJETS = {'name':'WJets', 'chain':getChain(WJetsToLNu_50ns[lepSel],histname=''), 'color':color('WJets'),'weight':'weight', 'niceName':'W Jets'}
+#TTJETS = {'name':'TTJets', 'chain':getChain(TTJets_50ns[lepSel],histname=''), 'color':color('TTJets'),'weight':'weight', 'niceName':'t#bar{t} Jets'}
+#DY = {'name':'DY', 'chain':getChain(DY_50ns[lepSel],histname=''), 'color':color('DY'),'weight':'weight', 'niceName':'Drell Yan'}
+#singleTop = {'name':'singleTop', 'chain':getChain(singleTop_50ns[lepSel],histname=''), 'color':color('singleTop'),'weight':'weight', 'niceName':'single Top'}
+##QCD = {'name':'QCD', 'chain':getChain(QCDEle_50ns[lepSel],histname=''), 'color':color('QCD'),'weight':'weight', 'niceName':'QCD'}
+#samples = [WJETS, TTJETS, DY, singleTop]#, QCD]
 
-##25ns samples
-#WJETS = {'name':'WJets', 'chain':getChain(WJetsHTToLNu_25ns[lepSel],histname=''), 'color':color('WJets'),'weight':'weight', 'niceName':'W Jets'}
-#TTJETS = {'name':'TTJets', 'chain':getChain(TTJets_25ns[lepSel],histname=''), 'color':color('TTJets'),'weight':'weight', 'niceName':'t#bar{t} Jets'}
-#DY = {'name':'DY', 'chain':getChain(DY_25ns[lepSel],histname=''), 'color':color('DY'),'weight':'weight', 'niceName':'Drell Yan'}
-#singleTop = {'name':'singleTop', 'chain':getChain(singleTop_25ns[lepSel],histname=''), 'color':color('singleTop'),'weight':'weight', 'niceName':'single Top'}
-#QCD = {'name':'QCD', 'chain':getChain(QCDMu_25ns[lepSel],histname=''), 'color':color('QCD'),'weight':'weight', 'niceName':'QCD'}
-#samples = [WJETS, TTJETS, singleTop, DY, QCD]
+#25ns samples
+WJETS = {'name':'WJets', 'chain':getChain(WJetsHTToLNu_25ns[lepSel],histname=''), 'color':color('WJets'),'weight':'weight', 'niceName':'W Jets'}
+TTJETS = {'name':'TTJets', 'chain':getChain(TTJets_25ns[lepSel],histname=''), 'color':color('TTJets'),'weight':'weight', 'niceName':'t#bar{t} Jets'}
+DY = {'name':'DY', 'chain':getChain(DY_25ns[lepSel],histname=''), 'color':color('DY'),'weight':'weight', 'niceName':'Drell Yan'}
+singleTop = {'name':'singleTop', 'chain':getChain(singleTop_25ns[lepSel],histname=''), 'color':color('singleTop'),'weight':'weight', 'niceName':'single Top'}
+QCD = {'name':'QCD', 'chain':getChain(QCDMu_25ns[lepSel],histname=''), 'color':color('QCD'),'weight':'weight', 'niceName':'QCD'}
+samples = [WJETS, TTJETS, singleTop, DY, QCD]
 
 # older samples
 #WJETS = {'name':'WJets', 'chain':getChain(WJetsHTToLNu[lepSel],histname=''), 'color':color('WJets'),'weight':'weight', 'niceName':'W Jets'}
@@ -91,7 +91,7 @@ lowFakeMetCut = {'name':name,'string':cut+'&&'+antiFakeMetSelection,'niceName':'
 
 
 def plot(samples, variable, cuts, data=False, maximum=False, minimum=0., stacking=False, filling=True, setLogY=False, setLogX=False, titleText='CMS simulation', lumi='3', legend=True):
-  can = ROOT.TCanvas('c','c',700,600)
+  can = ROOT.TCanvas('c','c',700,700)
   colorList = [ROOT.kBlue+1, ROOT.kCyan-9, ROOT.kOrange-4, ROOT.kGreen+1, ROOT.kRed+1]
   h = []
   nsamples = len(samples)
@@ -117,6 +117,7 @@ def plot(samples, variable, cuts, data=False, maximum=False, minimum=0., stackin
         else: h[i]['hist'].SetLineColor(colorList[icut])
       h[i]['hist'].SetLineWidth(2)
       h[i]['hist'].GetXaxis().SetTitle(variable['titleX'])
+      h[i]['hist'].GetXaxis().SetNdivisions(508)
       #h[i]['hist'].GetXaxis().SetTitleSize(0.04)
       h[i]['hist'].GetYaxis().SetTitle(variable['titleY'])
       #h[i]['hist'].GetYaxis().SetTitleSize(0.04)
@@ -142,6 +143,7 @@ def plot(samples, variable, cuts, data=False, maximum=False, minimum=0., stackin
     if maximum: h_Stack.SetMaximum(maximum)
     h_Stack.Draw('hist')
     h_Stack.GetXaxis().SetTitle(variable['titleX'])
+    h_Stack.GetXaxis().SetNdivisions(508)
     h_Stack.GetYaxis().SetTitle(variable['titleY'])
   else:
     first = True
