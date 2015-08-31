@@ -1,4 +1,5 @@
-mport subprocess
+#!/usr/bin/env python
+import subprocess
 import os, re
 import shutil
 
