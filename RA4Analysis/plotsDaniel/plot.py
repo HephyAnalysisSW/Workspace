@@ -43,6 +43,9 @@ samples = [WJETS, TTJETS, singleTop, DY, QCD]
 T5qqqqWW_mGo1000_mCh800_mChi700 = {'name':'T5qqqqWW_mGo1000_mCh800_mChi700', 'chain':getChain(T5qqqqWW_mGo1000_mCh800_mChi700[lepSel],histname=''), 'color':ROOT.kOrange+1,'weight':'weight', 'niceName':'T5q^{4} 1.0/0.8/0.7'}
 T5qqqqWW_mGo1200_mCh1000_mChi800 = {'name':'T5qqqqWW_mGo1200_mCh1000_mChi800', 'chain':getChain(T5qqqqWW_mGo1200_mCh1000_mChi800[lepSel],histname=''), 'color':ROOT.kRed+1,'weight':'weight', 'niceName':'T5q^{4} 1.2/1.0/0.8'}
 T5qqqqWW_mGo1500_mCh800_mChi100 = {'name':'T5qqqqWW_mGo1500_mCh800_mChi100', 'chain':getChain(T5qqqqWW_mGo1500_mCh800_mChi100[lepSel],histname=''), 'color':ROOT.kYellow+1,'weight':'weight', 'niceName':'T5q^{4} 1.5/0.8/0.1'}
+WJETSPhys14 = {'name':'WJetsPhys14', 'chain':getChain(WJetsHTToLNu[lepSel],histname=''), 'color':ROOT.kOrange+1,'weight':'weight', 'niceName':'W Jets Phys14'}
+TTJETSPhys14 = {'name':'ttJetsPhys14', 'chain':getChain(ttJets[lepSel],histname=''), 'color':ROOT.kOrange+1,'weight':'weight', 'niceName':'t#bar{t} Jets Phys14'}
+
 
 signals = [T5qqqqWW_mGo1000_mCh800_mChi700,T5qqqqWW_mGo1200_mCh1000_mChi800,T5qqqqWW_mGo1500_mCh800_mChi100]
 
@@ -55,6 +58,11 @@ dPhiJet1GenMet = {'name':'acos(cos(Jet_phi[0]-met_genPhi))', 'binning':[32,0,3.2
 dPhiJet2GenMet = {'name':'acos(cos(Jet_phi[1]-met_genPhi))', 'binning':[32,0,3.2], 'titleX':'#Delta#Phi(j_{2},#slash{E}_{T}^{gen})', 'titleY':'Events'}
 dPhiJet3GenMet = {'name':'acos(cos(Jet_phi[2]-met_genPhi))', 'binning':[32,0,3.2], 'titleX':'#Delta#Phi(j_{3},#slash{E}_{T}^{gen})', 'titleY':'Events'}
 
+singleLeptonic = {'name':'singleLeptonic', 'binning':[2,0,2], 'titleX':'single leptonic', 'titleY':'Events'}
+nLooseHardLeptons = {'name':'nLooseHardLeptons', 'binning':[4,0,4], 'titleX':'nLooseHardLeptons', 'titleY':'Events'}
+nTightHardLeptons = {'name':'nTightHardLeptons', 'binning':[4,0,4], 'titleX':'nTightHardLeptons', 'titleY':'Events'}
+nLooseSoftLeptons = {'name':'nLooseSoftLeptons', 'binning':[4,0,4], 'titleX':'nLooseSoftLeptons', 'titleY':'Events'}
+nBJetMediumCSV30 = {'name':'nBJetMediumCSV30', 'binning':[5,0,5], 'titleX':'nBJetMediumCSV30', 'titleY':'Events'}
 
 st = {'name':'st', 'binning':[37,250,2100], 'titleX':'L_{T} [GeV]', 'titleY':'Events'}
 ht = {'name':'htJet30j', 'binning':[52,500,3100], 'titleX':'H_{T} [GeV]', 'titleY':'Events'}
@@ -63,12 +71,24 @@ deltaPhi = {'name':'deltaPhi_Wl', 'binning':[32,0,3.2], 'titleX':'#Delta#Phi(W,l
 leptonPt = {'name':'leptonPt', 'binning':[40,0,1000], 'titleX':'p_{T} [GeV]', 'titleY':'Events'}
 leadingJetPt = {'name':'Jet_pt[0]', 'binning':[40,0,2000], 'titleX':'p_{T} (leading jet) [GeV]', 'titleY':'Events'}
 
-
-variables = [st]
+met = {'name':'met_pt', 'binning':[40,0,2000], 'titleX':'E_{T}^{miss} [GeV]', 'titleY':'Events'}
 
 presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&st>250&&nJet30>2&&htJet30j>500&&nBJetMediumCSV30==0"
+preselNoLtHt = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&Jet_pt[1]>80&&nBJetMediumCSV30==0"
 newpresel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&Jet_pt[1]>80&&st>250&&nJet30>2&&htJet30j>500&&nBJetMediumCSV30==0"
 
+
+noCut = {'name':'empty', 'string':'(1)', 'niceName':'no cut'}
+
+name, cut = nameAndCut((350,450),(750,1000),(5,5),btb=(0,0),presel=newpresel)
+bin1 = {'name':name,'string':cut,'niceName':'L_{T} [350,450), H_{T} [750,1000)'}
+posWeightBin = {'name':'posWeight', 'string':cut+'&&weight>0', 'niceName':'pos. weight'}
+negWeightBin = {'name':'negWeight', 'string':cut+'&&weight<0', 'niceName':'neg. weight'}
+
+posWeight = {'name':'posWeight', 'string':newpresel+'&&weight>0', 'niceName':'pos. weight'}
+negWeight = {'name':'negWeight', 'string':newpresel+'&&weight<0', 'niceName':'neg. weight'}
+
+newPreselNoLtHt = {'name':'presel','string':preselNoLtHt,'niceName':'Preselection'}
 newPreselCut = {'name':'presel','string':newpresel,'niceName':'Preselection'}
 newPreselCutSingleMuAN = {'name':'presel','string':newpresel+'&&singleMuonic&&nJet30>3','niceName':'Preselection'}
 newPreselCutSingleEleAN = {'name':'presel','string':newpresel+'&&singleElectronic&&nJet30>3','niceName':'Preselection'}
@@ -90,7 +110,7 @@ antiFakeMetSelection = '('+fakeMet+'<50&&'+fakeMet+'<met_genPt)'
 AFMCut = {'name':'AFMCut','string':newpresel+"&&acos(cos(Jet_phi[0]-met_phi))>0.45&&acos(cos(Jet_phi[1]-met_phi))>0.45", 'niceName':'E_{T}^{miss} veto'}
 
 
-name, cut = nameAndCut((250,350),(1000,-1),(5,5),btb=(0,0),presel=presel)
+name, cut = nameAndCut((250,350),(1000,-1),(5,5),btb=(0,0),presel=newpresel)
 cut1 = {'name':name,'string':cut,'niceName':'L_{T} [250,350), H_{T} [1000,-1)'}
 name, cut = nameAndCut((350,450),(750,1000),(5,5),btb=(0,0),presel=presel)
 cut2 = {'name':name,'string':cut,'niceName':'L_{T} [350,450), H_{T} [750,1000)'}
