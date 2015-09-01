@@ -33,7 +33,8 @@ xsec['/WJetsToLNu_HT-200to400_Tune4C_13TeV-madgraph-tauola/Spring14dr-PU_S14_POS
 xsec['/WJetsToLNu_HT-400to600_Tune4C_13TeV-madgraph-tauola/Spring14dr-PU_S14_POSTLS170_V6-v1/AODSIM'] = 20508.9*0.00151784517782 
 xsec['/WJetsToLNu_HT-600toInf_Tune4C_13TeV-madgraph-tauola/Spring14dr-PU_S14_POSTLS170_V6-v1/AODSIM'] = 20508.9*0.000327181070988
 
-from StopsDilepton.samples.xsecSMS import gluino13TeV_NLONLL
+#from StopsDilepton.samples.xsecSMS import gluino13TeV_NLONLL
+from xsecSMS import gluino13TeV_NLONLL
 
 xsec['T1qqqq_1400_325_300'] = gluino13TeV_NLONLL[1400]
 xsec["SMS_T1qqqq_2J_mGl1000_mLSP800_PU_S14_POSTLS170"] =  gluino13TeV_NLONLL[1000]
