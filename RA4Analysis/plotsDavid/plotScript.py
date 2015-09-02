@@ -4,41 +4,52 @@ ROOT.setTDRStyle()
 from math import *
 import os, copy, sys
 from array import array
-from Workspace.HEPHYPythonTools.helpers import getVarValue, getChain, deltaPhi, getYieldFromChain
-from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
-from Workspace.RA4Analysis.helpers import *
-from Workspace.RA4Analysis.eventShape import * 
-from getJetHem import *
+from random import randint
 
-lepSel = 'hard'
+from Workspace.HEPHYPythonTools.helpers import *
+from Workspace.HEPHYPythonTools.xsec import *
+from Workspace.HEPHYPythonTools.user import *
+from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_postProcessed import *
+from Workspace.RA4Analysis.helpers import *
+from draw_helpers import *
+from eleID_helper import *
+
 dPhiStr = "acos((leptonPt+met*cos(leptonPhi-metPhi))/sqrt(leptonPt**2+met**2+2*met*leptonPt*cos(leptonPhi-metPhi)))"
 
 #Bkg chains 
 allBkg=[
-        {'name':'QCD',       'sample':QCD[lepSel],           'weight':'weight'   },
-        {'name':'DY',        'sample':DY[lepSel],            'weight':'weight'   },
-        {'name':'TTV',       'sample':TTVH[lepSel],          'weight':'weight'   },
-        {'name':'singleTop', 'sample':singleTop[lepSel],     'weight':'weight'   },
-        {'name':'WJets',     'sample':WJetsHTToLNu[lepSel],  'weight':'weight'   },
-        {'name':'TTJets',    'sample':ttJets[lepSel],        'weight':'weight'   },
+        {'name':'QCD',       'sample':      },
+        {'name':'DY',        'sample':DY_25ns           },
+        {'name':'TTV',       'sample':     },
+        {'name':'single top', 'sample':singleTop_25ns   },
+        {'name':'W+Jets',     'sample':WJetsHTToLNu_25ns},
+        {'name':'tt+Jets',   'sample':TTJets_25ns       },
       ]
 
 for bkg in allBkg:
-  bkg['chain'] = getChain(bkg['sample'],histname='')
+  bkg['chain'] = getChain(bkg['sample'],histname='',treeName='tree')
   bkg['color'] = color(bkg['name'])
-  bkg['chain'].SetAlias('dPhi',dPhiStr)
+#  bkg['chain'].SetAlias('dPhi',dPhiStr)
+
+#Data
+#data=[
+#     {'name':'DoubleMuon_Run2015B_17Jul2015', 'sample':DoubleMuon_Run2015B_17Jul2015, 'legendName':'Data', 'merge':'Data'},
+#     {'name':'DoubleMuon_Run2015B_PromptReco', 'sample':DoubleMuon_Run2015B_PromptReco, 'legendName':'Data', 'merge':'Data'},
+#     {'name':'DoubleEG_Run2015B_17Jul2015', 'sample':DoubleEG_Run2015B_17Jul2015, 'legendName':'Data', 'merge':'Data'},
+#     {'name':'DoubleEG_Run2015B_PromptReco', 'sample':DoubleEG_Run2015B_PromptReco, 'legendName':'Data', 'merge':'Data'},
+#]
 
 #Signal chains
-allSignals=[
+#allSignals=[
             #"SMS_T1tttt_2J_mGl1200_mLSP800",
             #"SMS_T1tttt_2J_mGl1500_mLSP100",
             #"SMS_T2tt_2J_mStop425_mLSP325",
             #"SMS_T2tt_2J_mStop500_mLSP325",
             #"SMS_T2tt_2J_mStop650_mLSP325",
             #"SMS_T2tt_2J_mStop850_mLSP100",
-            {'name':'T5q^{4} 1.2/1.0/0.8', 'sample':T5qqqqWW_mGo1200_mCh1000_mChi800[lepSel], 'weight':'weight', 'color':ROOT.kBlack},
-            {'name':'T5q^{4} 1.5/0.8/0.1',  'sample':T5qqqqWW_mGo1500_mCh800_mChi100[lepSel],  'weight':'weight', 'color':ROOT.kMagenta},
-            {'name':'T5q^{4} 1.0/0.8/0.7', 'sample':T5qqqqWW_mGo1000_mCh800_mChi700[lepSel], 'weight':'weight', 'color':ROOT.kBlue},
+            #{'name':'T5q^{4} 1.2/1.0/0.8', 'sample':T5qqqqWW_mGo1200_mCh1000_mChi800[lepSel], 'weight':'weight', 'color':ROOT.kBlack},
+            #{'name':'T5q^{4} 1.5/0.8/0.1',  'sample':T5qqqqWW_mGo1500_mCh800_mChi100[lepSel],  'weight':'weight', 'color':ROOT.kMagenta},
+            #{'name':'T5q^{4} 1.0/0.8/0.7', 'sample':T5qqqqWW_mGo1000_mCh800_mChi700[lepSel], 'weight':'weight', 'color':ROOT.kBlue},
             #"T1ttbbWW_mGo1000_mCh725_mChi715",
             #"T1ttbbWW_mGo1000_mCh725_mChi720",
             #"T1ttbbWW_mGo1300_mCh300_mChi290",
@@ -47,7 +58,7 @@ allSignals=[
             #"T5ttttDeg_mGo1000_mStop300_mChi280",
             #"T5ttttDeg_mGo1300_mStop300_mCh285_mChi280",
             #"T5ttttDeg_mGo1300_mStop300_mChi280",
-]
+#]
 
 for s in allSignals:
   s['chain'] = getChain(s['sample'],histname='')

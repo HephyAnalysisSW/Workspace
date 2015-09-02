@@ -30,11 +30,12 @@ def getWeight(sample,nEvents,target_lumi):
 
 #Bkg chains 
 allBkg=[
-       {'name':'DYJetsToLL_M_50_HT100to200_50ns', 'sample':DYJetsToLL_M_50_HT100to200_50ns, 'legendName':'DY HT100-200', 'color':ROOT.kRed-6, 'merge':'DY'},
-       {'name':'DYJetsToLL_M_50_HT200to400_50ns', 'sample':DYJetsToLL_M_50_HT200to400_50ns, 'legendName':'DY HT200-400', 'color':ROOT.kRed-6, 'merge':'DY'},
-       {'name':'DYJetsToLL_M_50_HT400to600_50ns', 'sample':DYJetsToLL_M_50_HT400to600_50ns, 'legendName':'DY HT400-600', 'color':ROOT.kRed-6, 'merge':'DY'},
-       {'name':'DYJetsToLL_M_50_HT600toInf_50ns', 'sample':DYJetsToLL_M_50_HT600toInf_50ns, 'legendName':'DY HT600-Inf', 'color':ROOT.kRed-6, 'merge':'DY'},
-       {'name':'TTJets_50ns', 'sample':TTJets_50ns, 'legendName':'t#bar{t}+Jets', 'color':ROOT.kBlue-2, 'merge':'ttbar'},
+        {'name':'TTJets_50ns', 'sample':TTJets_50ns, 'legendName':'t#bar{t}+Jets', 'color':ROOT.kBlue-2, 'merge':'ttbar'},
+        {'name':'DYJetsToLL_M_50_50ns', 'sample':DYJetsToLL_M_50_50ns, 'legendName':'DY' , 'color':ROOT.kRed-6, 'merge':'DY_inclusive'},
+#       {'name':'DYJetsToLL_M_50_HT100to200_50ns', 'sample':DYJetsToLL_M_50_HT100to200_50ns, 'legendName':'DY HT100-200', 'color':ROOT.kRed-6, 'merge':'DY'},
+#       {'name':'DYJetsToLL_M_50_HT200to400_50ns', 'sample':DYJetsToLL_M_50_HT200to400_50ns, 'legendName':'DY HT200-400', 'color':ROOT.kRed-6, 'merge':'DY'},
+#       {'name':'DYJetsToLL_M_50_HT400to600_50ns', 'sample':DYJetsToLL_M_50_HT400to600_50ns, 'legendName':'DY HT400-600', 'color':ROOT.kRed-6, 'merge':'DY'},
+#       {'name':'DYJetsToLL_M_50_HT600toInf_50ns', 'sample':DYJetsToLL_M_50_HT600toInf_50ns, 'legendName':'DY HT600-Inf', 'color':ROOT.kRed-6, 'merge':'DY'},
 ]
 
 #Data

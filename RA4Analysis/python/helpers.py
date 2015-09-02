@@ -19,9 +19,9 @@ def color(S):
     return ROOT.kCyan-6 
   if "singletop" in s:
     return ROOT.kViolet+5
-  if ("ttjets" in s) or ("ttbar" in s):
+  if ("ttjets" in s) or ("ttbar" in s) or ("tt+jets" in s):
     return ROOT.kBlue-2
-  if ("wjets" in s):
+  if ("wjets" in s) or ("w+jets" in s):
     return ROOT.kGreen-2
   if "ttv" in s or "ttz" in s or "ttw" in s or "tth" in s:
     return ROOT.kOrange-3
