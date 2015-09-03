@@ -147,7 +147,7 @@ def getChunks(sample,  maxN=-1):
         failedChunks.append(chunks[i])
 #    except: print "Chunk",s,"could not be added"
   eff = round(100*len(failedChunks)/float(len(chunks)),3)
-  print "Chunks: %i total, %i good (normalization constant %f), %i bad. Efficiency: %f"%(len(chunks),len(goodChunks),sumWeights,len(failedChunks), eff)
+  print "Chunks: %i total, %i good (normalization constant %f), %i bad. Inefficiency: %f"%(len(chunks),len(goodChunks),sumWeights,len(failedChunks), eff)
   for s in failedChunks: 
     print "Failed:",s
   return goodChunks, sumWeights

@@ -1,5 +1,5 @@
 import copy, os, sys
-dir = '/data/rschoefbeck/cmgTuples/postProcessed_Spring15/hard/' 
+dir = '/data/rschoefbeck/cmgTuples/postProcessed_Spring15/HT400ST200/hard/' 
 
 TTJets_50ns={\
 "name" : "tt+Jets",

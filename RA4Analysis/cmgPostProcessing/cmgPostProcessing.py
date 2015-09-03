@@ -15,14 +15,15 @@ ROOT.AutoLibraryLoader.enable()
 from Workspace.HEPHYPythonTools.helpers import getChunks
 from Workspace.RA4Analysis.cmgTuples_Spring15_25ns import *
 from Workspace.RA4Analysis.cmgTuples_Spring15_50ns import *
+from Workspace.RA4Analysis.cmgTuples_Data50ns_1l import *
 target_lumi = 3000 #pb-1
 
 defSampleStr = "TTJets_25ns"
 
-subDir = "postProcessed_Spring15_25ns"
+subDir = "postProcessed_Spring15"
 
 #branches to be kept for data and MC
-branchKeepStrings_DATAMC = ["run", "lumi", "evt", "puWeight", "isData", "rho", "nVert", 
+branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert", 
                      "nJet25", "nBJetLoose25", "nBJetMedium25", "nBJetTight25", "nJet40", "nJet40a", "nBJetLoose40", "nBJetMedium40", "nBJetTight40", 
                      "nLepGood20", "nLepGood15", "nLepGood10", "htJet25", "mhtJet25", "htJet40j", "htJet40", "mhtJet40", "nSoftBJetLoose25", "nSoftBJetMedium25", "nSoftBJetTight25", 
                      "met*","Flag_*","HLT_*",
@@ -34,7 +35,7 @@ branchKeepStrings_DATAMC = ["run", "lumi", "evt", "puWeight", "isData", "rho", "
                      ] 
 
 #branches to be kept for MC samples only
-branchKeepStrings_MC = [ "nTrueInt", "genWeight", "xsec", 
+branchKeepStrings_MC = [ "nTrueInt", "genWeight", "xsec", "puWeight", 
                      "GenSusyMScan1", "GenSusyMScan2", "GenSusyMScan3", "GenSusyMScan4", "GenSusyMGluino", "GenSusyMGravitino", "GenSusyMStop", "GenSusyMSbottom", "GenSusyMStop2", "GenSusyMSbottom2", "GenSusyMSquark", "GenSusyMNeutralino", "GenSusyMNeutralino2", "GenSusyMNeutralino3", "GenSusyMNeutralino4", "GenSusyMChargino", "GenSusyMChargino2", 
                      "ngenLep", "genLep_*", 
                      "nGenPart", "GenPart_*",
