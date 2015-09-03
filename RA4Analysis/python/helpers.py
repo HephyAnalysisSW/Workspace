@@ -19,9 +19,9 @@ def color(S):
     return ROOT.kCyan-6 
   if "singletop" in s:
     return ROOT.kViolet+5
-  if ("ttjets" in s) or ("ttbar" in s):
+  if ("ttjets" in s) or ("ttbar" in s) or ("tt+jets" in s):
     return ROOT.kBlue-2
-  if ("wjets" in s):
+  if ("wjets" in s) or ("w+jets" in s):
     return ROOT.kGreen-2
   if "ttv" in s or "ttz" in s or "ttw" in s or "tth" in s:
     return ROOT.kOrange-3
@@ -69,12 +69,14 @@ def cmgST(c):
   return  met+leptonPt 
 
 def cmgGetJets(c, ptMin=30., etaMax=999.):
-  addJetVars =  ['phi', 'mcFlavour', 'mcMatchId', 'mcMatchFlav', 'btagCSV', 'btagCMVA']
+  #addJetVars =  ['phi', 'mcFlavour', 'mcMatchId', 'mcMatchFlav', 'btagCSV', 'btagCMVA']
+  addJetVars =  ['phi', 'btagCSV', 'btagCMVA']
   if c=="branches":return ['nJet','Jet_pt','Jet_eta'] + ['Jet_'+x for x in addJetVars]
   nJet = int(getVarValue(c, 'nJet'))
   jets=[]
   for i in range(nJet):
-    jet = getObjDict(c, 'Jet_', ['pt','eta', 'id','mcPt'], i)
+    #jet = getObjDict(c, 'Jet_', ['pt','eta', 'id','mcPt'], i)
+    jet = getObjDict(c, 'Jet_', ['pt','eta', 'id'], i)
     if jet['pt']>ptMin and abs(jet['eta'])<etaMax and jet['id']:
       jet.update(getObjDict(c, 'Jet_', addJetVars, i))
       jets.append(jet)

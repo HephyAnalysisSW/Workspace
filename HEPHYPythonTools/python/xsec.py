@@ -33,7 +33,8 @@ xsec['/WJetsToLNu_HT-200to400_Tune4C_13TeV-madgraph-tauola/Spring14dr-PU_S14_POS
 xsec['/WJetsToLNu_HT-400to600_Tune4C_13TeV-madgraph-tauola/Spring14dr-PU_S14_POSTLS170_V6-v1/AODSIM'] = 20508.9*0.00151784517782 
 xsec['/WJetsToLNu_HT-600toInf_Tune4C_13TeV-madgraph-tauola/Spring14dr-PU_S14_POSTLS170_V6-v1/AODSIM'] = 20508.9*0.000327181070988
 
-from StopsDilepton.samples.xsecSMS import gluino13TeV_NLONLL
+#from StopsDilepton.samples.xsecSMS import gluino13TeV_NLONLL
+from xsecSMS import gluino13TeV_NLONLL
 
 xsec['T1qqqq_1400_325_300'] = gluino13TeV_NLONLL[1400]
 xsec["SMS_T1qqqq_2J_mGl1000_mLSP800_PU_S14_POSTLS170"] =  gluino13TeV_NLONLL[1000]
@@ -246,6 +247,8 @@ xsec["/ZJetsToNuNu_HT-600ToInf_13TeV-madgraph/RunIISpring15DR74-Asympt25ns_MCRUN
 #CMGTools/samples Spring15 50ns
 xsec['WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1/MINIAODSIM'] = 20508.9*3
 
+xsec['/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1/MINIAODSIM'] = 18610
+xsec['/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v2/MINIAODSIM'] = 2008.*3
 xsec['/DYJetsToLL_M-50_HT-100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1/MINIAODSIM'] = 139.4*1.27 
 xsec['/DYJetsToLL_M-50_HT-200to400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1/MINIAODSIM'] = 42.75*1.27
 xsec['/DYJetsToLL_M-50_HT-400to600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1/MINIAODSIM'] = 5.497*1.27
