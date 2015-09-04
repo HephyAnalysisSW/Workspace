@@ -1,7 +1,7 @@
 import ROOT
 from getSamples import *
 from cutLists import *
-from Workspace.DegenerateStopAnalysis.navidPlotTools import getPlots, getYieldTable, drawPlots,cutClass, makeTableFromYieldDict, getYieldTable2
+from Workspace.DegenerateStopAnalysis.navidPlotTools import getPlots, getYieldTable, drawPlots,cutClass, makeTableFromYieldDict, getYieldTable2, getYieldTable3
 
 saveDir = "/afs/hephy.at/user/n/nrad/www/T2Deg13TeV/analysis/RunII/"
 tableDir=saveDir+"/table"
@@ -34,7 +34,7 @@ for sample in sampleDict:
 #sampleDict['T4Deg300_270_RunII']['tree'].Draw("nJet:abs(Jet_phi[0]-Jet_phi[1])>>(8,0,2*pi,5,0,5)","nJet==1 || (nJet==2)","COLZ") 
 def getSyncTable(cutList = sr1sync,output= "sr1sync" ):
   #NEW ONE:
-  syncYields=getYieldTable2(sampleDict,  cutList, classList="inclList", treeList="", orderedKeys=[],bkgs=["TTJets", "WJets"],sigs=["T2Deg300_270"] ,saveDir=tableDir)
+  syncYields=getYieldTable3(sampleDict,  cutList, classList="inclList", treeList="", orderedKeys=[],bkgs=["TTJets", "WJets"],sigs=["T2Deg300_270"] ,saveDir=tableDir)
   #syncYields=getYieldTable(sampleDict,  cutList.list , treeList="", orderedKeys=["TTJets", "WJets", "bkg", "T2Deg300_270", "fom_T2Deg300_270"  ], output=output ,saveDir=tableDir)
   #getYieldTable(sampleDict,  sr1sync.list , treeList="", bkgs=["TTJets", "WJets"],sigs=["T2Deg350_330","T2Deg300_270", "T2Deg300_270_RunII"], output= "sync_antiQCDfix" ,saveDir=tableDir) 
   return syncYields

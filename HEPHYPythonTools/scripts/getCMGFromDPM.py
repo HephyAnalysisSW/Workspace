@@ -166,4 +166,3 @@ else:
     os.remove(tlf) #remove target log file
     print "... done."
   print "Done with copying %i files"%len(pairs)
-

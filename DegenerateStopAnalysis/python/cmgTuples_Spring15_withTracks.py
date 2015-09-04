@@ -1,7 +1,9 @@
 import copy, os, sys
 from Workspace.HEPHYPythonTools.helpers import getChunks
 
+#sampleDir="/afs/hephy.at/work/n/nrad/cmgTuples/withTracks/"
 sampleDir="/afs/hephy.at/work/n/nrad/cmgTuples/withTracks/"
+
 
 
 #WJetsToLNu_50ns={\
@@ -19,7 +21,7 @@ sampleDir="/afs/hephy.at/work/n/nrad/cmgTuples/withTracks/"
 WJetsToLNu={\
 "name" : "WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8",
 "chunkString" :"WJetsToLNu", 
-'dir': "/afs/hephy.at/work/n/nrad/cmgTuples/withTracks/WJetsToLNu/",
+'dir': sampleDir+"WJetsToLNu",
 'dbsName':'WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8',
 "treeName":"treeProducerSusySingleLepton",
 "rootFileLocation":"treeProducerSusySingleLepton/tree.root",

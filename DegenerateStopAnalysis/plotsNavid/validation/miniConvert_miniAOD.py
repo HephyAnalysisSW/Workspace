@@ -204,10 +204,12 @@ def innerTrack_dxy_BS(tree, fwlEvt, iEvt):
 
 stepDict=[
         #{'name':'test',               'filelist': rootFilesIn("/data/nrad/T2DegStop13TeV/GEN/t2degen1step/")  },
+        #{'name':'W',               'filelist': ["root://xrootd.unl.edu//store/mc/RunIISpring15DR74/WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/Asympt25ns_MCRUN2_74_V9-v1/00000/048FB1EE-33FD-E411-A2BA-0025905A6094.root"] },
+        {'name':'W',               'filelist': ["/afs/hephy.at/user/n/nrad/CMSSW/CMSSW_7_4_7/src/Workspace/DegenerateStopAnalysis/plotsNavid/validation/Wjets.root"] }, 
         #{'name':'stop',               'filelist': ['root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/nrad/T2DegStop2j_300_270_GENSIM/T2DegStop2j_300_270_MINIAOD/a279b5108ada7c3c0926210c2a95f22e/T2DegStop2j_300_270_miniAOD_2_1_yQN.root'] },
         #{'name':'WJets',              'filelist': ['root://xrootd.unl.edu//store/mc/Phys14DR/WJetsToLNu_13TeV-madgraph-pythia8-tauola/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/02215B44-2D70-E411-90A3-0025905A60B8.root']},
         #{'name':'stop',               'filelist': ['/data/nrad/T2DegStop13TeV/T2DegStop2j_sample_miniAOD.root']},
-        {'name':'stop',               'filelist': [' /afs/hephy.at/user/n/nrad/public/T2DegStop2j_300_270_miniAOD_withGenParticles.root '] }
+        #{'name':'stop',               'filelist': [' /afs/hephy.at/user/n/nrad/public/T2DegStop2j_300_270_miniAOD_withGenParticles.root '] }
         #{'name':'stop',               'filelist': ['root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms//store/user/nrad/T2DegStop2j_300_270_GENSIM/T2DegStop2j_300_270_MINIAOD/a279b5108ada7c3c0926210c2a95f22e/T2DegStop2j_300_270_miniAOD_1_1_RGu.root']},
         #{'name':'stop',               'filelist': ['/data/nrad/T2DegStop13TeV/RunII/step3_PAT.root']},
         #{'name':'WJets',              'filelist': ['../WJetsToLNu_13TeV_Phys14_miniAOD.root']},
