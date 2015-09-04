@@ -35,7 +35,7 @@ singleTop_50ns={\
 'dir' : dir,
 }
 
-DY_50ns={\
+DYHT_50ns={\
 "name" : "DY",
 "bins" : [
 "DYJetsToLL_M-50_HT-100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1",

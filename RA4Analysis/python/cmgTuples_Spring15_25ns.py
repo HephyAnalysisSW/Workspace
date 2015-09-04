@@ -10,6 +10,15 @@ TTJets_25ns={\
 'isData':False
 }
 
+DYJetsToLL_M_50_25ns={\
+'name' : "DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v3",
+'chunkString' : "DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v3",
+"dir": data_path,
+'dbsName':'/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v3/MINIAODSIM',
+"rootFileLocation":"tree.root",
+"treeName":"tree",
+'isData':False
+}
 
 DYJetsToLL_M_10to50_25ns={\
 'name' : "DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1",
