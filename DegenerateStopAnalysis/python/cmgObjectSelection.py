@@ -1,41 +1,81 @@
 from Workspace.HEPHYPythonTools.helpers import findClosestObject, deltaR, deltaR2,getVarValue, getObjFromFile,getObjDict
 from math import *
-def hybridIso03ID(r, nLep, hybridIso03):
-  return (r.LepGood_pt[nLep]>=hybridIso03['ptSwitch'] and r.LepGood_relIso03[nLep]<hybridIso03['relIso']) or (r.LepGood_pt[nLep]<hybridIso03['ptSwitch'] and r.LepGood_relIso03[nLep]*r.LepGood_pt[nLep]<hybridIso03['absIso'])
 
+
+
+def isGoodLepton(lep, ptCut=5, etaCut = 2.5, hybridIso04={"ptSwitch":25,"relIso":0.2,'absIso':5} , dzCut=0.2 , dxyCut=0.05 ,sip3dCut=4.0 ):
+  if abs(lep['pdgId'])==13:
+    if lep['mediumMuonId']==1 and lep['dz']<dzCut and lep['dxy'] < dxyCut and lep['sip3d'] < sip3dCut and lep['pt'] > ptCut and abs(lep['eta']) < etaCut and hybridIso04ID(lep):
+      return True
+    else: return False
+  elif abs(lep['pdgId'])==11:
+    return False
+
+def hybridIso04ID(lep,hybridIso04={"ptSwitch":25,"relIso":0.2,'absIso':5}):
+  return (lep["pt"]>=hybridIso04['ptSwitch'] and lep["relIso04"]<hybridIso04['relIso']) or (lep["pt"]<hybridIso04['ptSwitch'] and lep["relIso04"]*lep["pt"]<hybridIso04['absIso'])
+
+
+
+
+
+
+
+#def hybridIso03ID(r, nLep, hybridIso03):
+#  return (r.LepGood_pt[nLep]>=hybridIso03['ptSwitch'] and r.LepGood_relIso03[nLep]<hybridIso03['relIso']) or (r.LepGood_pt[nLep]<hybridIso03['ptSwitch'] and r.LepGood_relIso03[nLep]*r.LepGood_pt[nLep]<hybridIso03['absIso'])
+#  
    
+#def hybridIso04ID(r, nLep, hybridIso04={"ptSwitch":25,"relIso":0.2,'absIso':5}):
+#  if lepton=="LepGood":
+#    return (r.LepGood_pt[nLep]>=hybridIso04['ptSwitch'] and r.LepGood_relIso04[nLep]<hybridIso04['relIso']) or (r.LepGood_pt[nLep]<hybridIso04['ptSwitch'] and r.LepGood_relIso04[nLep]*r.LepGood_pt[nLep]<hybridIso04['absIso'])
+#  if lepton=="LepOther":
+#    return (r.LepOther_pt[nLep]>=hybridIso04['ptSwitch'] and r.LepOther_relIso04[nLep]<hybridIso04['relIso']) or (r.LepOther_pt[nLep]<hybridIso04['ptSwitch'] and r.LepOther_relIso04[nLep]*r.LepOther_pt[nLep]<hybridIso04['absIso'])
+
 def ele_ID_eta(r,nLep,ele_MVAID_cuts):
   if abs(r.LepGood_eta[nLep]) < 0.8 and r.LepGood_mvaIdPhys14[nLep] > ele_MVAID_cuts['eta08'] : return True
   elif abs(r.LepGood_eta[nLep]) > 0.8 and abs(r.LepGood_eta[nLep]) < 1.44 and r.LepGood_mvaIdPhys14[nLep] > ele_MVAID_cuts['eta104'] : return True
   elif abs(r.LepGood_eta[nLep]) > 1.57 and r.LepGood_mvaIdPhys14[nLep] > ele_MVAID_cuts['eta204'] : return True
   return False
-  
+
+
+
+ 
 #def cmgLooseMuID(r, nLep, ptCut, absEtaCut, hybridIso03):
 #  return r.LepGood_pt[nLep]>=ptCut and abs(r.LepGood_eta[nLep])<absEtaCut and hybridIso03ID(r,nLep,hybridIso03)
 
-def cmgLooseMuID(r, nLep, ptCut, absEtaCut):
+def cmgLooseMuID(r, nLep, ptCut, absEtaCut,lepton="LepGood"):
   return r.LepGood_mediumMuonId[nLep]==1 and r.LepGood_miniRelIso[nLep]<0.4 and r.LepGood_sip3d[nLep]<4.0 and r.LepGood_pt[nLep]>=ptCut and abs(r.LepGood_eta[nLep])<absEtaCut
 
 #def cmgLooseEleID(r, nLep, ptCut, absEtaCut):
 #  return r.LepGood_pt[nLep]>=ptCut and abs(r.LepGood_eta[nLep])<absEtaCut and hybridIso03ID(r,nLep,hybridIso03)
 
-def cmgLooseEleID(r, nLep, ptCut , absEtaCut, ele_MVAID_cuts):
-  return r.LepGood_pt[nLep]>=ptCut and (abs(r.LepGood_eta[nLep])<1.44 or abs(r.LepGood_eta[nLep])>1.57) and abs(r.LepGood_eta[nLep])<absEtaCut and r.LepGood_miniRelIso[nLep]<0.4 and ele_ID_eta(r,nLep,ele_MVAID_cuts) and r.LepGood_lostHits[nLep]<=1 and r.LepGood_convVeto[nLep] and r.LepGood_sip3d[nLep] < 4.0 
+def cmgLooseEleID(r, nLep, ptCut , absEtaCut, ele_MVAID_cuts,lepton="LepGood"):
+  if lepton=="LepGood":
+    return r.LepGood_pt[nLep]>=ptCut and (abs(r.LepGood_eta[nLep])   <1.44 or abs(r.LepGood_eta[nLep])>1.57) and abs(r.LepGood_eta[nLep])<absEtaCut and r.LepGood_miniRelIso[nLep]<0.4 and ele_ID_eta(r,nLep,ele_MVAID_cuts) and r.LepGood_lostHits[nLep]<=1 and r.LepGood_convVeto[nLep] and r.LepGood_sip3d[nLep] < 4.0 
+  if lepton=="LepOther":
+    return r.LepOther_pt[nLep]>=ptCut and (abs(r.LepOther_eta[nLep]) <1.44 or abs(r.LepOther_eta[nLep])>1.57) and abs(r.LepOther_eta[nLep])<absEtaCut and r.LepOther_miniRelIso[nLep]<0.4 and ele_ID_eta(r,nLep,ele_MVAID_cuts) and r.LepOther_lostHits[nLep]<=1 and r.LepOther_convVeto[nLep] and r.LepOther_sip3d[nLep] < 4.0 
 
 #def cmgLooseLepID(r, nLep, ptCuts, absEtaCuts, hybridIso03):
 #  if abs(r.LepGood_pdgId[nLep])==11: return cmgLooseEleID(r, nLep=nLep, ptCut=ptCuts[0], absEtaCut=absEtaCuts[0],hybridIso03=hybridIso03)
 #  elif abs(r.LepGood_pdgId[nLep])==13: return cmgLooseMuID(r, nLep=nLep, ptCut=ptCuts[1], absEtaCut=absEtaCuts[1],hybridIso03=hybridIso03)
 
-def cmgLooseLepID(r, nLep, ptCuts, absEtaCuts, ele_MVAID_cuts):
-  if abs(r.LepGood_pdgId[nLep])==11: return cmgLooseEleID(r, nLep=nLep, ptCut=ptCuts[0], absEtaCut=absEtaCuts[0], ele_MVAID_cuts=ele_MVAID_cuts)
-  elif abs(r.LepGood_pdgId[nLep])==13: return cmgLooseMuID(r, nLep=nLep, ptCut=ptCuts[1], absEtaCut=absEtaCuts[1])
+def cmgLooseLepID(r, nLep, ptCuts, absEtaCuts, ele_MVAID_cuts,lepton="LepGood"):
+  if lepton=="LepGood":
+    if abs(r.LepGood_pdgId[nLep])==11: return cmgLooseEleID(r, nLep=nLep, ptCut=ptCuts[0], absEtaCut=absEtaCuts[0], ele_MVAID_cuts=ele_MVAID_cuts,lepton=lepton)
+    elif abs(r.LepGood_pdgId[nLep])==13: return cmgLooseMuID(r, nLep=nLep, ptCut=ptCuts[1], absEtaCut=absEtaCuts[1],lepton=lepton)
+  elif lepton=="LepOther":
+    if abs(r.LepOther_pdgId[nLep])==11: return cmgLooseEleID(r, nLep=nLep, ptCut=ptCuts[0], absEtaCut=absEtaCuts[0], ele_MVAID_cuts=ele_MVAID_cuts,lepton=lepton)
+    elif abs(r.LepOther_pdgId[nLep])==13: return cmgLooseMuID(r, nLep=nLep, ptCut=ptCuts[1], absEtaCut=absEtaCuts[1],lepton=lepton)
 
 #def cmgLooseLepIndices(r, ptCuts=(7.,5.), absEtaCuts=(2.4,2.1), hybridIso03={'ptSwitch':25, 'absIso':7.5, 'relIso':0.3}, nMax=8):
 #  return [i for i in range(min(nMax, r.nLepGood)) if cmgLooseLepID(r, nLep=i, ptCuts=ptCuts, absEtaCuts=absEtaCuts, hybridIso03=hybridIso03) ]
 
-def cmgLooseLepIndices(r, ptCuts=(7.,5.), absEtaCuts=(2.5,2.4),ele_MVAID_cuts = {'eta08':0.35 , 'eta104':0.20,'eta204': -0.52} , nMax=8):
-  return [i for i in range(min(nMax, r.nLepGood)) if cmgLooseLepID(r, nLep=i, ptCuts=ptCuts, absEtaCuts=absEtaCuts,ele_MVAID_cuts=ele_MVAID_cuts) ]
-
+def cmgLooseLepIndices(r, ptCuts=(7.,5.), absEtaCuts=(2.5,2.4),ele_MVAID_cuts = {'eta08':0.35 , 'eta104':0.20,'eta204': -0.52} , nMax=8,lepton="LepGood"):
+  if lepton=="LepGood":
+    return [i for i in range(min(nMax, r.nLepGood)) if cmgLooseLepID(r, nLep=i, ptCuts=ptCuts, absEtaCuts=absEtaCuts,ele_MVAID_cuts=ele_MVAID_cuts,lepton=lepton) ]
+  elif lepton=="LepOther":
+    return [i for i in range(min(nMax, r.nLepOther)) if cmgLooseLepID(r, nLep=i, ptCuts=ptCuts, absEtaCuts=absEtaCuts,ele_MVAID_cuts=ele_MVAID_cuts,lepton=lepton) ]
+    
+    
 def splitIndList(var, l, val):
   resLow = []
   resHigh = []

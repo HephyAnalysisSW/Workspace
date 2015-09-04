@@ -451,6 +451,36 @@ def makeTableFromYieldDict(yieldDict,cutList,orderedKeys=[],sigs=[],bkgs=[], out
 
 
 
+def getYieldTable3(sampleDict,cutclass,classList="inclList",treeList='',orderedKeys=[],sigs=["T2Deg300_270"],bkgs=["TTJets","WJets"],returnError=True,saveDir="./",pickleDir="./pkl"):
+  cutList = getattr(cutclass,classList)
+  baseCut =  getattr(cutclass,"baseCut")
+  output    = getattr(cutclass,"name")
+
+  if baseCut:
+    for t in treeList:
+      sampleDict[t]['tree'].Draw(">>eList",baseCut)
+      print t, "Setting event list with cut:",
+      print baseCut,
+      print "reducing events by a factor of: ", 1.*ROOT.eList.GetN()/sampleDict[t]['tree'].GetEntries()
+      sampleDict[t]['tree'].SetEventList(ROOT.eList)
+      print "##### eList set", t, ROOT.eList.GetN() , sampleDict[t]['tree'].GetEventList().GetN()
+      del ROOT.eList
+      print "##### eList deleted", t, sampleDict[t]['tree'].GetEventList()
+
+  pickleOut = output + ".pkl"
+  yieldDict=getYieldsFromCutList(sampleDict,cutList,baseCut=baseCut,treeList=treeList, returnError=returnError,pickleOut=pickleDir+"/"+pickleOut)
+  makeTableFromYieldDict(yieldDict,cutList,orderedKeys=orderedKeys,sigs=sigs,bkgs=bkgs,output=output,saveDir=saveDir)
+
+  
+  if baseCut:
+    for t in treeList:
+      print "##### eList set", t,  sampleDict[t]['tree'].GetEventList().GetN()
+      sampleDict[t]['tree'].SetEventList(0)
+      print "##### eList deleted", t, sampleDict[t]['tree'].GetEventList()
+
+  return yieldDict
+
+
 def getYieldTable2(sampleDict,cutclass,classList="inclList",treeList='',orderedKeys=[],sigs=["T2Deg300_270"],bkgs=["TTJets","WJets"],returnError=True,saveDir="./",pickleDir="./pkl"):
   cutList = getattr(cutclass,classList)
   baseCut =  getattr(cutclass,"baseCut")

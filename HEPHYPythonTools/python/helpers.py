@@ -374,7 +374,15 @@ def deltaR(l1, l2):
 #Get an object with name-prefix (e.g. LepGood) as a dictionary by specifying index i and variables ['pt','eta',...]
 def getObjDict(c, prefix, variables, i):
  return {var: c.GetLeaf(prefix+var).GetValue(i) for var in variables}
-
+def getVectorObjDict(c, prefix, variables,iter=True):
+ nVarString = "n"+prefix.replace("_","")
+ nVar = int(c.GetLeaf(nVarString).GetValue(0))
+ #return {var: [c.GetLeaf(prefix+var).GetValue(i) for i in xrange(nVar) ]for var in variables }
+ if iter:
+   return ({var: c.GetLeaf(prefix+var).GetValue(i) for var in variables}  for i in xrange(nVar)  )
+ else:
+   return [{var: c.GetLeaf(prefix+var).GetValue(i) for var in variables}  for i in xrange(nVar)  ]
+  
 #FIXME: Move this selection specific stuff to the analysis directory (Deg stop)
 #def getJets(c):
 #  njets = int(c.GetLeaf('njetCount').GetValue())
