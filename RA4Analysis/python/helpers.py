@@ -27,6 +27,8 @@ def color(S):
     return ROOT.kOrange-3
   if 'dy' in s:
     return ROOT.kRed-6
+  if 'data' in s or 'Run2015' in s:
+    return ROOT.kBlack
 
 def stage2MT(c):
   if c=="branches":return ['met_pt','leptonPt','met_phi','leptonPhi']

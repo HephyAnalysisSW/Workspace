@@ -123,13 +123,15 @@ def loopAndFill(stacks):
   for s in allSamples:
     cutStringForSample=[]
     plotsPerCutForSample={}
+#    print s['name'], s.has_key('isData'), s.has_key('isData') and s['isData'], s.has_key('isData') and s['isData'] and s.has_key('dataCut')
     for p in allPlots:
       if p.sample==s:
-        if not p.cut['string'] in cutStringForSample:
-          cutStringForSample.append(p.cut['string'])
-          plotsPerCutForSample[p.cut['string']]=[]
-        if not p in plotsPerCutForSample[p.cut['string']]:
-          plotsPerCutForSample[p.cut['string']].append(p)
+        cut = p.cut['string'] if not (s.has_key('isData') and s['isData'] and p.cut.has_key('dataCut')) else "("+p.cut['string']+")&&("+p.cut['dataCut']+")"
+        if not cut in cutStringForSample:
+          cutStringForSample.append(cut)
+          plotsPerCutForSample[cut]=[]
+        if not p in plotsPerCutForSample[cut]:
+          plotsPerCutForSample[cut].append(p)
     s['plotsPerCutForSample'] = plotsPerCutForSample
   for s in allSamples:
     sampleScaleFac = 1 if not s.has_key('scale') else s['scale']
@@ -184,7 +186,6 @@ def loopAndFill(stacks):
                 val = p.func(c)
               p.histo.Fill(val, weight*sampleScaleFac)
 #              print p.histo.GetName(), b, val, weight*sampleScaleFac
-        print "Deleting"
       del c
   for s in stacks:
     sumStackHistos(s)   
@@ -218,7 +219,7 @@ def sumStackHistos(stack):
 
 def drawStack(stk, maskedArea=None):
   stuff=[]
-  if stk.options.has_key('legend'):
+  if stk.options.has_key('legend') and  stk.options['legend']:
     l = ROOT.TLegend(*(stk.options['legend']['coordinates']))
     l.SetFillColor(0)
     l.SetShadowColor(ROOT.kWhite)
@@ -330,7 +331,7 @@ def drawStack(stk, maskedArea=None):
         if p.style['style'] == "f" or p.style['style'] == "l" or p.style['style'] == "d":
           hcopy.Draw("eh1same")
 #      if p.style.has_key('legendText') and stk.options.has_key('legend') and stk.options['legend']:
-      if stk.options.has_key('legend'):
+      if stk.options.has_key('legend') and  stk.options['legend']:
         l.AddEntry(hcopy, p.style['legendText'])
   ROOT.gPad.RedrawAxis()
 #  if  stk.options.has_key('legend') and stk.options['legend']:

@@ -28,15 +28,31 @@ diBosons_50ns={\
 singleTop_50ns={\
 "name" : "single top",
 "bins" : [
-#"ST_t-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1",
+"ST_t-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1",
 "ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v2",
 "ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1",
 ],
 'dir' : dir,
 }
 
+DYM10to50_50ns={\
+"name" : "DY-M10-50",
+"bins" : [
+"DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1",
+],
+'dir' : dir,
+}
+
+DY_50ns={\
+"name" : "DY-M50",
+"bins" : [
+"DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v3",
+],
+'dir' : dir,
+}
+
 DYHT_50ns={\
-"name" : "DY",
+"name" : "DY-M50-HT",
 "bins" : [
 "DYJetsToLL_M-50_HT-100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1",
 "DYJetsToLL_M-50_HT-200to400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1",
@@ -45,13 +61,7 @@ DYHT_50ns={\
 ],
 'dir' : dir,
 }
-DYM10to50_50ns={\
-"name" : "DY M10-50",
-"bins" : [
-"DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1",
-],
-'dir' : dir,
-}
+
 QCDMu_50ns={\
 "name" : "QCDMu",
 "bins" : [
