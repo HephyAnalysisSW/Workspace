@@ -30,6 +30,7 @@ TTJETS = {'name':'TTJets', 'chain':getChain(TTJets_25ns,histname=''), 'color':co
 DY = {'name':'DY', 'chain':getChain(DY_25ns,histname=''), 'color':color('DY'),'weight':'weight', 'niceName':'Drell Yan'}
 singleTop = {'name':'singleTop', 'chain':getChain(singleTop_25ns,histname=''), 'color':color('singleTop'),'weight':'weight', 'niceName':'single Top'}
 QCD = {'name':'QCD', 'chain':getChain(QCDMu_25ns,histname=''), 'color':color('QCD'),'weight':'weight', 'niceName':'QCD'}
+diBoson = {'name':'diBoson', 'chain':getChain(diBosons_25ns,histname=''), 'color':ROOT.kMagenta,'weight':'weight', 'niceName':'diboson'}
 samples = [WJETS, TTJETS, singleTop, DY, QCD]
 
 # older samples
@@ -136,6 +137,7 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
   if signals:
     if not type(signals)==type([]): signals = [signals]
   can = ROOT.TCanvas('c','c',700,700)
+  bottomMargin = 0.13
   if data:
     marginForPad2 = 0.3
     bottomMargin = 0.
@@ -216,11 +218,11 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
         first = False
       else:
         item['hist'].Draw('hist same')
+  s = []
   if signals:
-    s = []
     for isignal,signal in enumerate(signals):
       s.append({'hist':ROOT.TH1F('s'+str(isignal), signal['niceName'], *variable['binning']),'yield':0., 'legendName':signal['niceName']})
-      if signal['weight']=='weight':weight='weight'
+      if signal['weight']=='weight':weight='weight*(3./4.)'
       else: weight=str(signal['weight'])
       signal['chain'].Draw(variable['name']+'>>s'+str(isignal),weight+'*('+cut['string']+')','goff')
       s[isignal]['hist'].SetLineColor(signal['color'])
@@ -270,8 +272,14 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
   if lumi: latex1.DrawLatex(0.73,0.96,"L="+str(lumi)+"fb^{-1} (13TeV)")
   if legend: leg.Draw()
   can.Update()
-  if stacking: return {'hist':h, 'canvas':can, 'legend':leg, 'stack':h_Stack}
-  else: return {'hist':h, 'canvas':can, 'legend':leg}
+  if stacking: return {'hist':h, 'canvas':can, 'legend':leg, 'stack':h_Stack, 'signals':s}
+  else: return {'hist':h, 'canvas':can, 'legend':leg, 'signals':s}
 
 #plot(samples,st,cuts)
 
+vars = [st,ht,njet,deltaPhi,leptonPt,leadingJetPt]
+
+for v in vars:
+  t = plot(samples,v,newPreselCut, signals=signals,filling=True,stacking=True,minimum=0.008, maximum=5000, setLogY=True)
+  t['canvas'].Print('/afs/hephy.at/user/d/dspitzbart/www/Spring15/25ns/'+v['name']+'.png')
+  t['canvas'].Print('/afs/hephy.at/user/d/dspitzbart/www/Spring15/25ns/'+v['name']+'.root')
