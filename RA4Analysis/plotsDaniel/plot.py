@@ -40,15 +40,15 @@ samples = [WJETS, TTJETS, singleTop, DY, QCD]
 #QCD = {}
 #samples = [WJETS, TTJETS]#, DY, QCD]
 
-#PHYS14 signals:
-T5qqqqWW_mGo1000_mCh800_mChi700 = {'name':'T5qqqqWW_mGo1000_mCh800_mChi700', 'chain':getChain(T5qqqqWW_mGo1000_mCh800_mChi700[lepSel],histname=''), 'color':ROOT.kOrange+1,'weight':'weight', 'niceName':'T5q^{4} 1.0/0.8/0.7'}
-T5qqqqWW_mGo1200_mCh1000_mChi800 = {'name':'T5qqqqWW_mGo1200_mCh1000_mChi800', 'chain':getChain(T5qqqqWW_mGo1200_mCh1000_mChi800[lepSel],histname=''), 'color':ROOT.kRed+1,'weight':'weight', 'niceName':'T5q^{4} 1.2/1.0/0.8'}
-T5qqqqWW_mGo1500_mCh800_mChi100 = {'name':'T5qqqqWW_mGo1500_mCh800_mChi100', 'chain':getChain(T5qqqqWW_mGo1500_mCh800_mChi100[lepSel],histname=''), 'color':ROOT.kYellow+1,'weight':'weight', 'niceName':'T5q^{4} 1.5/0.8/0.1'}
-WJETSPhys14 = {'name':'WJetsPhys14', 'chain':getChain(WJetsHTToLNu[lepSel],histname=''), 'color':ROOT.kOrange+1,'weight':'weight', 'niceName':'W Jets Phys14'}
-TTJETSPhys14 = {'name':'ttJetsPhys14', 'chain':getChain(ttJets[lepSel],histname=''), 'color':ROOT.kOrange+1,'weight':'weight', 'niceName':'t#bar{t} Jets Phys14'}
+##PHYS14 signals:
+#T5qqqqWW_mGo1000_mCh800_mChi700 = {'name':'T5qqqqWW_mGo1000_mCh800_mChi700', 'chain':getChain(T5qqqqWW_mGo1000_mCh800_mChi700[lepSel],histname=''), 'color':ROOT.kOrange+1,'weight':'weight', 'niceName':'T5q^{4} 1.0/0.8/0.7'}
+#T5qqqqWW_mGo1200_mCh1000_mChi800 = {'name':'T5qqqqWW_mGo1200_mCh1000_mChi800', 'chain':getChain(T5qqqqWW_mGo1200_mCh1000_mChi800[lepSel],histname=''), 'color':ROOT.kRed+1,'weight':'weight', 'niceName':'T5q^{4} 1.2/1.0/0.8'}
+#T5qqqqWW_mGo1500_mCh800_mChi100 = {'name':'T5qqqqWW_mGo1500_mCh800_mChi100', 'chain':getChain(T5qqqqWW_mGo1500_mCh800_mChi100[lepSel],histname=''), 'color':ROOT.kYellow+1,'weight':'weight', 'niceName':'T5q^{4} 1.5/0.8/0.1'}
+#WJETSPhys14 = {'name':'WJetsPhys14', 'chain':getChain(WJetsHTToLNu[lepSel],histname=''), 'color':ROOT.kOrange+1,'weight':'weight', 'niceName':'W Jets Phys14'}
+#TTJETSPhys14 = {'name':'ttJetsPhys14', 'chain':getChain(ttJets[lepSel],histname=''), 'color':ROOT.kOrange+1,'weight':'weight', 'niceName':'t#bar{t} Jets Phys14'}
 
 
-signals = [T5qqqqWW_mGo1000_mCh800_mChi700,T5qqqqWW_mGo1200_mCh1000_mChi800,T5qqqqWW_mGo1500_mCh800_mChi100]
+#signals = [T5qqqqWW_mGo1000_mCh800_mChi700,T5qqqqWW_mGo1200_mCh1000_mChi800,T5qqqqWW_mGo1500_mCh800_mChi100]
 
 dPhiJet1Met = {'name':'acos(cos(Jet_phi[0]-met_phi))', 'binning':[32,0,3.2], 'titleX':'#Delta#Phi(j_{1},#slash{E}_{T})', 'titleY':'Events'}
 dPhiJet2Met = {'name':'acos(cos(Jet_phi[1]-met_phi))', 'binning':[32,0,3.2], 'titleX':'#Delta#Phi(j_{2},#slash{E}_{T})', 'titleY':'Events'}
@@ -131,7 +131,10 @@ highFakeMetCut = {'name':name,'string':cut+'&&'+fakeMetSelection,'niceName':'E_{
 lowFakeMetCut = {'name':name,'string':cut+'&&'+antiFakeMetSelection,'niceName':'E_{T}^{miss,fake} < 50 GeV && < E_{T}^{miss,gen}'}
 
 
-def plot(samples, variable, cuts, signals=False, data=False, maximum=False, minimum=0., stacking=False, filling=True, setLogY=False, setLogX=False, titleText='CMS simulation', lumi='3', legend=True):
+def plot(samples, variable, cuts, signals=False, data=False, maximum=False, minimum=0., stacking=False, filling=True, setLogY=False, setLogX=False, titleText='CMS simulation', lumi='3', legend=True, MClumiScale=1.):
+  totalChain = ROOT.TChain('tree')
+  for s in samples:
+    totalChain.Add(s['chain'])
   if not type(samples)==type([]): samples = [samples]
   if not type(cuts)==type([]): cuts = [cuts]
   if signals:
@@ -154,6 +157,15 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
   totalH = ROOT.TH1F('totalH', 'totalH', *variable['binning'])
   nsamples = len(samples)
   ncuts = len(cuts)
+  MCscale=1.
+  if ncuts == 1 and data:
+    if data['cut']: dataCutString = data['cut']
+    else: dataCutString = cuts[0]['string']
+    dataYield = getYieldFromChain(data['chain'],cutString=dataCutString,weight='(1)')
+    MCYield = getYieldFromChain(totalChain,cutString=cuts[0]['string'],weight=str(MClumiScale)+'*''weight')
+    MCscale = dataYield/MCYield
+    print MCscale
+  else: MCscale=1.
   for isample, sample in enumerate(samples):
     for icut, cut in enumerate(cuts):
       i = isample*ncuts+icut
@@ -162,7 +174,7 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
       h.append({'hist':ROOT.TH1F('h'+str(isample)+'_'+str(icut), legendName, *variable['binning']),'yield':0., 'legendName':legendName})
       if sample['weight']=='weight':weight='weight'
       else: weight=str(sample['weight'])
-      sample['chain'].Draw(variable['name']+'>>h'+str(isample)+'_'+str(icut),weight+'*('+cut['string']+')','goff')
+      sample['chain'].Draw(variable['name']+'>>h'+str(isample)+'_'+str(icut),str(MCscale*MClumiScale)+'*'+weight+'*('+cut['string']+')','goff')
       totalH.Add(h[i]['hist'])
       h[i]['yield'] = h[i]['hist'].GetSumOfWeights()
       if minimum: h[i]['hist'].SetMinimum(minimum)
@@ -189,6 +201,7 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
   legendWidth = 0.013*max(legendNameLengths)+0.15
   if legend:
     height = 0.04*len(h)
+    if data: height+=0.04
     if signals: height += 0.04*len(signals)
     if data: height += 0.04
     leg = ROOT.TLegend(0.98-legendWidth,0.95-height,0.98,0.95)
@@ -232,7 +245,9 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
       s[isignal]['hist'].Draw('same hist')
   if data:
     h.append({'hist':ROOT.TH1F('data','Data',*variable['binning']),'yield':0., 'legendName':'data'})
-    data['chain'].Draw(variable['name']+'>>data',weight+'*('+cut['string']+')','goff')
+    if data['cut']: cutstring = data['cut']
+    else: cutstring = cut['string']
+    data['chain'].Draw(variable['name']+'>>data',cutstring,'goff')
     #h_Stack.Draw('hist')
     h[-1]['hist'].Draw('same e1p')
     if legend: leg.AddEntry(h[-1]['hist'])
@@ -277,9 +292,9 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
 
 #plot(samples,st,cuts)
 
-vars = [st,ht,njet,deltaPhi,leptonPt,leadingJetPt]
-
-for v in vars:
-  t = plot(samples,v,newPreselCut, signals=signals,filling=True,stacking=True,minimum=0.008, maximum=5000, setLogY=True)
-  t['canvas'].Print('/afs/hephy.at/user/d/dspitzbart/www/Spring15/25ns/'+v['name']+'.png')
-  t['canvas'].Print('/afs/hephy.at/user/d/dspitzbart/www/Spring15/25ns/'+v['name']+'.root')
+#vars = [st,ht,njet,deltaPhi,leptonPt,leadingJetPt]
+#
+#for v in vars:
+#  t = plot(samples,v,newPreselCut, signals=signals,filling=True,stacking=True,minimum=0.008, maximum=5000, setLogY=True)
+#  t['canvas'].Print('/afs/hephy.at/user/d/dspitzbart/www/Spring15/25ns/'+v['name']+'.png')
+#  t['canvas'].Print('/afs/hephy.at/user/d/dspitzbart/www/Spring15/25ns/'+v['name']+'.root')
