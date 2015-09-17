@@ -62,15 +62,16 @@ ele_MVAID_cutstr_tight= "((abs(LepGood_eta)<0.8&&LepGood_mvaIdPhys14>"+ str(ele_
                        +"||((abs(LepGood_eta)>=1.57)&&LepGood_mvaIdPhys14>"+str(ele_MVAID_cuts_tight['eta204'])+"))"
 
 singleMuonic = '(Sum$(abs(LepGood_pdgId)==13&&LepGood_pt>=25&&abs(LepGood_eta)<2.4&&LepGood_miniRelIso<0.2&&LepGood_mediumMuonId==1&&LepGood_sip3d<4.0)==1)'
-#singleMuonic = '(Sum$(abs(genLep_pdgId)==13&&abs(genLep_motherId)==24&&genLep_pt>=25&&abs(genLep_eta)<2.4)==1)'
+#singleMuonic = '(Sum$(abs(LepGood_pdgId)==13&&LepGood_pt>=25&&abs(LepGood_eta)<2.4)==1)'
 singleElectronic = "(Sum$(abs(LepGood_pdgId)==11&&LepGood_pt>=25&&abs(LepGood_eta)<2.4&&LepGood_miniRelIso<0.1&&"+ele_MVAID_cutstr_tight+"&&LepGood_lostHits==0&&LepGood_convVeto&&LepGood_sip3d<4.0)==1)"
-#singleElectronic = "(Sum$(abs(genLep_pdgId)==11&&abs(genLep_motherId)==24&&genLep_pt>=25&&abs(genLep_eta)<2.4)==1)"
+#singleElectronic = "(Sum$(abs(LepGood_pdgId)==11&&LepGood_pt>=25&&abs(LepGood_eta)<2.4)==1)"
 htStr = 'Sum$(Jet_pt*(Jet_pt>30&&abs(Jet_eta)<2.4&&Jet_id))'
-stStr = 'Sum$(LepGood_pt+met_pt)'
+electronId = "(abs(LepGood_pdgId)==11&&LepGood_pt>=25&&abs(LepGood_eta)<2.4&&LepGood_miniRelIso<0.1&&"+ele_MVAID_cutstr_tight+"&&LepGood_lostHits==0&&LepGood_convVeto&&LepGood_sip3d<4.0)"
+stStr = 'Sum$((LepGood_pt+metNoHF_pt)*'+electronId+')'
 
 
-presel = '('+singleMuonic+'||'+singleElectronic+')&&nJet30>1&&nBJetMedium30>=0&&'+htStr+'>500&&'+stStr+'>250'
-#presel = singleElectronic+'&&nJet30>1&&nBJetMedium30==0&&'+htStr+'>500&&'+stStr+'>250'
+presel = singleElectronic+'&&nJet30>1&&nBJetMedium30>=0&&'+htStr+'>500&&'+stStr+'>250'
+#presel = singleElectronic+'&&nJet30>1&&nBJetMedium30>=0&&'+htStr+'>500&&'+stStr+'>250'
 #presel = singleMuonic+'&&nJet30>1&&nBJetMedium30==0&&'+htStr+'>500&&'+stStr+'>250'
 
 
@@ -95,7 +96,7 @@ def getdPhiMetJet(c):
   return dPhi
 
 varstring="deltaPhi_Wl"
-plotDir='/afs/hephy.at/user/d/dspitzbart/www/data/25ns/deltaRvsdeltaPhi/'
+plotDir='/afs/hephy.at/user/d/dspitzbart/www/data/25ns/METvsLep/'
 
 if not os.path.exists(plotDir):
   os.makedirs(plotDir)
@@ -144,8 +145,8 @@ for st in stReg:
       helper.SetMarkerStyle(1)
       helper.SetPoint(1,maxX,maxY)
       helper.Draw('ap')
-      helper.GetXaxis().SetTitle('min #DeltaR(j,l)')
-      helper.GetYaxis().SetTitle('#Delta#Phi (W,l)')
+      helper.GetXaxis().SetTitle('E_{T}^{miss}')
+      helper.GetYaxis().SetTitle('p_{T} lep.')
       #helper.GetXaxis().SetRangeUser(0.,4.)
       #helper.GetYaxis().SetRangeUser(0.,4.)
       
@@ -161,15 +162,20 @@ for st in stReg:
         run=getVarValue(c,"run")
         lumi=getVarValue(c,"lumi")
         evt=getVarValue(c,"evt")
+        metPt = getVarValue(c,"metNoHF_pt")
+        #leptonPt = getVarValue(c,"LepGood_pt")
         #leptonPt = getVarValue(c,"leptonPt")
         #leptonPhi = getVarValue(c,"leptonPhi")
         #leptonEta = getVarValue(c,"leptonEta")
         jets = cmgGetJets(c, ptMin=30., etaMax=2.4)
         lep = getObjDict(c, 'LepGood_', ['pt','phi','eta'], 0)
+        leptonPt = lep['pt']
         deltaR = findClosestObject(jets, lep, sortFunc=lambda o1, o2: deltaR2(o1,o2))
         deltaPhi = getDeltaPhi(c)
         #stValue = getVarValue(c,"st")
         points.SetPoint(i,sqrt(deltaR['distance']),deltaPhi)
+        #points.SetPoint(i,metPt,leptonPt)
+        #print leptonPt+metPt
       #points.Draw('ap')
       #points.GetXaxis().SetTitle('min #DeltaR(j,l)')
       #points.GetYaxis().SetTitle('#Delta#Phi (W,l)')
@@ -179,9 +185,9 @@ for st in stReg:
       #points.GetYaxis().SetRangeUser(0.,4.)
       points.Draw('p same')
       #can1.Update()
-      can1.Print(plotDir+'scatter_'+cutname+'.png')
-      can1.Print(plotDir+'scatter_'+cutname+'.root')
-      can1.Print(plotDir+'scatter_'+cutname+'.pdf')
+      can1.Print(plotDir+'scatter_tighterSel_'+cutname+'.png')
+      can1.Print(plotDir+'scatter_tighterSel_'+cutname+'.root')
+      can1.Print(plotDir+'scatter_tighterSel_'+cutname+'.pdf')
 
 #leg = []
 #leg.append(ROOT.TGraph())
