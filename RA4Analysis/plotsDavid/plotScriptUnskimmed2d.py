@@ -30,8 +30,8 @@ def getWeight(sample,nEvents,target_lumi):
 
 #Bkg chains 
 allBkg=[
-        {'name':'TTJets_50ns', 'sample':TTJets_50ns, 'legendName':'t#bar{t}+Jets', 'color':ROOT.kBlue-2, 'merge':'ttbar'},
-        {'name':'DYJetsToLL_M_50_50ns', 'sample':DYJetsToLL_M_50_50ns, 'legendName':'DY' , 'color':ROOT.kRed-6, 'merge':'DY_inclusive'},
+#        {'name':'TTJets_50ns', 'sample':TTJets_50ns, 'legendName':'t#bar{t}+Jets', 'color':ROOT.kBlue-2, 'merge':'ttbar'},
+        {'name':'DYJetsToLL_M_50_50ns', 'sample':DYJetsToLL_M_50_50ns, 'legendName':'DY bkg' , 'color':ROOT.kRed-6, 'merge':'DY_inclusive'},
 #       {'name':'DYJetsToLL_M_50_HT100to200_50ns', 'sample':DYJetsToLL_M_50_HT100to200_50ns, 'legendName':'DY HT100-200', 'color':ROOT.kRed-6, 'merge':'DY'},
 #       {'name':'DYJetsToLL_M_50_HT200to400_50ns', 'sample':DYJetsToLL_M_50_HT200to400_50ns, 'legendName':'DY HT200-400', 'color':ROOT.kRed-6, 'merge':'DY'},
 #       {'name':'DYJetsToLL_M_50_HT400to600_50ns', 'sample':DYJetsToLL_M_50_HT400to600_50ns, 'legendName':'DY HT400-600', 'color':ROOT.kRed-6, 'merge':'DY'},
@@ -256,7 +256,7 @@ for i_htb, htb in enumerate(htreg):
         namestr = nameAndCut(None, None, srNJet, btb=None, presel=presel, btagVar = 'nBJetMediumCMVA30')[0]
         cut = presel+'&&'+nJetCut(srNJet, minPt=30, maxEta=2.4)#+'&&'+htCut(htb, minPt=30, maxEta=2.4, njCorr=0.)#+'&&'+nJetCut(2, minPt=30, maxEta=2.4)#+'&&'+nBTagCut(b, minPt=30, maxEta=2.4, minCSVTag=0.814)
         #print cut
-        for sample in data:
+        for sample in allBkg:
           #histos[sample['name']] = {}
           
           sample["chain"].Draw(">>eList",cut) #Get the event list 'eList' which has all the events satisfying the cut
@@ -309,7 +309,7 @@ for i_htb, htb in enumerate(htreg):
             #pad1.SetLogz()
             #pad1.Draw()
             #pad1.cd()
-            #l = ROOT.TLegend(0.65,0.75,0.95,0.95)
+            #l = ROOT.TLegend(0.65,0.85,0.85,0.95)
             #l.SetFillColor(0)
             #l.SetBorderSize(1)
             #l.SetShadowColor(ROOT.kWhite)
@@ -333,8 +333,8 @@ for i_htb, htb in enumerate(htreg):
             pal.SetY1NDC(0.13)
             pal.SetY2NDC(0.95)
             #stack.Add(histos[sample['name']][var['name']])
-            #l.AddEntry(histos[sample['name']][var['name']], sample['name'],'f')
-         
+            for sample in allBkg:
+              text.DrawLatex(0.67,0.89,"#bf{"+sample['legendName']+"}") 
             #stack.Draw()
             #stack.GetXaxis().SetTitle(var['legendName'])
             #stack.GetYaxis().SetTitle(var['Ytitle'])# / '+ str( (var['binning'][2] - var['binning'][1])/var['binning'][0])+'GeV')

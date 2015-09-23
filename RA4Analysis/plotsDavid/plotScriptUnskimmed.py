@@ -40,7 +40,7 @@ allBkg=[
 #Data
 data=[
      #{'name':'DoubleMuon_Run2015B_17Jul2015', 'sample':DoubleMuon_Run2015B_17Jul2015, 'legendName':'Data', 'merge':'Data'},
-     {'name':'DoubleMuon_Run2015B_PromptReco', 'sample':DoubleMuon_Run2015B_PromptReco, 'legendName':'Data', 'merge':'Data'},
+     #{'name':'DoubleMuon_Run2015B_PromptReco', 'sample':DoubleMuon_Run2015B_PromptReco, 'legendName':'Data', 'merge':'Data'},
      #{'name':'DoubleEG_Run2015B_17Jul2015', 'sample':DoubleEG_Run2015B_17Jul2015, 'legendName':'Data', 'merge':'Data'},
      {'name':'DoubleEG_Run2015B_PromptReco', 'sample':DoubleEG_Run2015B_PromptReco, 'legendName':'Data', 'merge':'Data'},
 ]
@@ -88,9 +88,9 @@ njreg = [(2,-1)]
 btb = [(0,0)]
 diMuonic = '(Sum$(abs(LepGood_pdgId)==13&&LepGood_pt[0]>=25&&LepGood_pt[1]>=20&&abs(LepGood_eta)<2.4&&LepGood_miniRelIso<0.2&&LepGood_tightId==1&&LepGood_sip3d<4.0&&((LepGood_charge[0]+LepGood_charge[1])==0))==2)'
 diElectronic = "(Sum$(abs(LepGood_pdgId)==11&&LepGood_pt[0]>=25&&LepGood_pt[1]>=20&&LepGood_miniRelIso<0.1&&"+ele_MVAID_cutstr_tight+"&&LepGood_lostHits<=1&&LepGood_convVeto&&LepGood_sip3d<4.0&&LepGood_tightId>=3&&((LepGood_charge[0]+LepGood_charge[1])==0))==2)"
-presel = '('+diMuonic+'||'+diElectronic+')'
-#presel = diMuonic
-preprefix = 'diLeptonic_nj2'
+#presel = '('+diMuonic+'||'+diElectronic+')'
+presel = diElectronic
+preprefix = 'diElectronic_nj2'
 wwwDir = saveDir+'RunII/Spring15_50ns/'+preprefix+'/'
 
 if not os.path.exists(wwwDir):
@@ -128,7 +128,7 @@ def getZPhi(c):
   subLepPhi = c.GetLeaf('LepGood_phi').GetValue(1)
   x = leadLepPt*cos(leadLepPhi)+subLepPt*cos(subLepPhi)
   y = leadLepPt*sin(leadLepPhi)+subLepPt*sin(subLepPhi)
-  Zphi = atan2(y/x)
+  Zphi = atan2(y,x)
   return Zphi
 
 def getLt(c):
@@ -200,6 +200,7 @@ nJets = {'name':'mynJets', 'varFunc':getNJets, 'legendName':'Jets', 'Ytitle':'# 
 dPhi = {'name':'mydeltaPhi', 'varFunc':getdPhi, 'legendName':'#Delta#Phi(W,l)','binning':[30,0,pi], 'Ytitle':'# of Events'}#, 'binningIsExplicit':True}
 lMomentum = {'name':'myleptonPt', 'varFunc':getLeadLep, 'legendName':'p_{T}(lead. l)', 'Ytitle':'# of Events / 25GeV', 'binning':[40,0,1000]}
 Zmomentum = {'name':'myZPt', 'varFunc':getZPt, 'legendName':'p_{T}(Z)', 'Ytitle':'# of Events / 25GeV', 'binning':[40,0,1000]}
+Zphi = {'name':'myZPhi', 'varFunc':getZPhi, 'legendName':'#phi(Z)', 'Ytitle':'# of Events', 'binning':[40,-pi,pi]}
 invMassVar = {'name':'myInvMass', 'varFunc':getInvMass, 'legendName':'m_{ll}', 'Ytitle':'# of Events / 1GeV', 'binning':[30,76,106]}
 #htratio = {'name':'myhtratio', 'varFunc':gethtRatio, 'legendName':'#frac{H_{T,j>2}}{j_{1}+j_{2}}', 'Ytitle':'# of Events', 'binning':[25,0,2.5]}
 #htratio3 = {'name':'myhtratio3', 'varFunc':gethtRatio3, 'legendName':'#frac{H_{T,j>3}}{j_{1}+j_{2}+j_{3}}', 'Ytitle':'# of Events', 'binning':[25,0,2.5]}
@@ -228,6 +229,7 @@ allVariables.append(nJets)
 allVariables.append(dPhi)
 allVariables.append(lMomentum)
 allVariables.append(Zmomentum)
+allVariables.append(Zphi)
 allVariables.append(invMassVar)
 allVariables.append(leadingJet)
 allVariables.append(secondJet)
