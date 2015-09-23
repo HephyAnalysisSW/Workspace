@@ -2,7 +2,7 @@ import ROOT, copy, numbers
 from math import log
 import types
 from array import array
-ROOT.gROOT.LoadMacro("../../HEPHYPythonTools/scripts/root/tdrstyle.C")
+ROOT.gROOT.LoadMacro("$CMSSW_BASE/src/Workspace/HEPHYPythonTools/scripts/root/tdrstyle.C")
 #ROOT.gROOT.LoadMacro("../../HEPHYPythonTools/scripts/root/CMS_lumi.C")
 ROOT.setTDRStyle()
 ROOT.TH1D.SetDefaultSumw2()

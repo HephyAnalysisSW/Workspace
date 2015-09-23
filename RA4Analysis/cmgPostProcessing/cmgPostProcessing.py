@@ -165,7 +165,8 @@ for isample, sample in enumerate(allSamples):
     nSplit = 1+int(sourceFileSize/(200*10**6)) #split into 200MB
     if nSplit>1: print "Chunk too large, will split into",nSplit,"of appox 200MB"
     for iSplit in range(nSplit):
-      t = getTreeFromChunk(chunk, skimCond, iSplit, nSplit)
+      cut = "("+skimCond+")&&("+sample['postProcessingCut']+")" if sample.has_key('postProcessingCut') else skimCond
+      t = getTreeFromChunk(chunk, cut, iSplit, nSplit)
       if not t: 
         print "Tree object not found:", t
         continue

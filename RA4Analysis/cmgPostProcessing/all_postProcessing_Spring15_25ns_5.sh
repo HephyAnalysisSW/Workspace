@@ -8,7 +8,7 @@
 #python cmgPostProcessing.py --leptonSelection=hard --skim=""  --samples=QCD_MuEnriched_Pt80to120_25ns
 #python cmgPostProcessing.py --leptonSelection=hard --skim=""  --samples=QCD_MuEnriched_Pt120to170_25ns
 #python cmgPostProcessing.py --leptonSelection=hard --skim=""  --samples=QCD_MuEnriched_Pt170to300_25ns
-#python cmgPostProcessing.py --leptonSelection=hard --skim=""  --samples=QCD_MuEnriched_Pt300to470_25ns
+python cmgPostProcessing.py --leptonSelection=hard --skim=""  --samples=QCD_MuEnriched_Pt300to470_25ns
 #python cmgPostProcessing.py --leptonSelection=hard --skim=""  --samples=QCD_MuEnriched_Pt470to600_25ns
 #python cmgPostProcessing.py --leptonSelection=hard --skim=""  --samples=QCD_MuEnriched_Pt600to800_25ns
 #python cmgPostProcessing.py --leptonSelection=hard --skim=""  --samples=QCD_MuEnriched_Pt800to1000_25ns
@@ -36,7 +36,7 @@
 #python cmgPostProcessing.py --leptonSelection=hard --skim=""  --samples=QCD_HT1000to1500_25ns
 #python cmgPostProcessing.py --leptonSelection=hard --skim=""  --samples=QCD_HT1500to2000_25ns
 #python cmgPostProcessing.py --leptonSelection=hard --skim=""  --samples=QCD_HT2000toInf_25ns
-python cmgPostProcessing.py --leptonSelection=hard --skim=""  --samples=QCD_Pt_80to120_25ns
+#python cmgPostProcessing.py --leptonSelection=hard --skim=""  --samples=QCD_Pt_80to120_25ns
 #python cmgPostProcessing.py --leptonSelection=hard --skim=""  --samples=QCD_Pt_120to170_25ns
 #python cmgPostProcessing.py --leptonSelection=hard --skim=""  --samples=QCD_Pt_170to300_25ns
 #python cmgPostProcessing.py --leptonSelection=hard --skim=""  --samples=QCD_Pt_300to470_25ns
