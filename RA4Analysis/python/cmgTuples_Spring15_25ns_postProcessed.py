@@ -103,7 +103,7 @@ QCDHT_25ns = {
 "QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1",
 "QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1",
 ],
-'dir' : dir,
+'dir' : '/data/easilar/cmgTuples/postProcessed_Spring15/hard/',
 }
 
 
