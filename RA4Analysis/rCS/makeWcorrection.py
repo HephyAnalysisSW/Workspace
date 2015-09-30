@@ -3,7 +3,9 @@ import os,sys
 from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain
 
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
-from Workspace.RA4Analysis.cmgTuplesPostProcessed_Spring15_hard import *
+#from Workspace.RA4Analysis.cmgTuplesPostProcessed_Spring15_hard import *
+from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_postProcessed import *
+
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName, nBTagBinName, varBinName, varBin
 from rCShelpers import *
 import math
@@ -15,11 +17,11 @@ maxN = -1 if not small else 1
 
 lepSel = 'hard'
 
-cWJets  = getChain(WJetsHTToLNu[lepSel],histname='',maxN=maxN)
+cWJets  = getChain(WJetsHTToLNu_25ns,histname='',maxN=maxN)
 
 from Workspace.HEPHYPythonTools.user import username
 uDir = username[0]+'/'+username
-subDir = 'Spring15/rCS/rCS_WjetfitNoCorr/'
+subDir = 'Spring15/rCS/25ns/rCS_WjetfitNoCorr/'
 
 ### DEFINE SR
 signalRegions = signalRegion3fb
@@ -28,7 +30,7 @@ path = '/afs/hephy.at/user/'+uDir+'/www/'+subDir+'/'
 if not os.path.exists(path):
   os.makedirs(path)
 
-picklePath = '/data/'+username+'/firstPredictionNoDY_W3-4/'
+picklePath = '/data/'+username+'/Spring15/25ns/rCS_0b_3.0/'
 if not os.path.exists(picklePath):
   os.makedirs(picklePath)
 
@@ -44,60 +46,60 @@ btreg = (0,0)
 njreg = [(3,4),(5,5),(6,7),(8,-1)]
 
 #presel='singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&Flag_EcalDeadCellTriggerPrimitiveFilter&&acos(cos(Jet_phi[0]-met_phi))>0.45&&acos(cos(Jet_phi[1]-met_phi))>0.45'
-presel='singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80'
+presel='singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&Jet_pt[1]>80'
 prefix = presel.split('&&')[0]+'_'
 
-#h_nj = {}
-#h_nj_pos = {}
-#h_nj_neg = {}
-#
-#rcsDict = {}
-#rcsDict_pos = {}
-#rcsDict_neg = {}
-#
-#for srNJet in sorted(signalRegions):
-#  h_nj[srNJet] = {}
-#  h_nj_pos[srNJet] = {}
-#  h_nj_neg[srNJet] = {}
-#  rcsDict[srNJet] = {}
-#  rcsDict_pos[srNJet] = {}
-#  rcsDict_neg[srNJet] = {}
-#  for stb in sorted(signalRegions[srNJet]):
-#    h_nj[srNJet][stb] = {}
-#    h_nj_pos[srNJet][stb] = {}
-#    h_nj_neg[srNJet][stb] = {}
-#    rcsDict[srNJet][stb] = {}
-#    rcsDict_pos[srNJet][stb] = {}
-#    rcsDict_neg[srNJet][stb] = {}
-#    for htb in sorted(signalRegions[srNJet][stb]):
-#      h_nj[srNJet][stb][htb] = ROOT.TH1F("rcs_nj","",len(njreg),0,len(njreg))
-#      h_nj_pos[srNJet][stb][htb] = ROOT.TH1F("rcs_nj_pos","",len(njreg),0,len(njreg))
-#      h_nj_neg[srNJet][stb][htb] = ROOT.TH1F("rcs_nj_neg","",len(njreg),0,len(njreg))
-#      dPhiCut = signalRegions[srNJet][stb][htb]['deltaPhi']
-#      rcsDict[srNJet][stb][htb] = {'deltaPhi':dPhiCut}
-#      rcsDict_pos[srNJet][stb][htb] = {'deltaPhi':dPhiCut}
-#      rcsDict_neg[srNJet][stb][htb] = {'deltaPhi':dPhiCut}
-#      for i_njb, njb in enumerate(njreg):
-#        cname, cut = nameAndCut(stb,htb,njb, btb=btreg ,presel=presel)
-#        rcs = getRCS(cWJets, cut, dPhiCut)
-#        rcs_pos = getRCS(cWJets, cut+'&&leptonPdg>0', dPhiCut)
-#        rcs_neg = getRCS(cWJets, cut+'&&leptonPdg<0', dPhiCut)
-#        print rcs, dPhiCut
-#        rcsDict[srNJet][stb][htb][njb] = rcs
-#        rcsDict_pos[srNJet][stb][htb][njb] = rcs_pos
-#        rcsDict_neg[srNJet][stb][htb][njb] = rcs_neg
-#        if not math.isnan(rcs['rCS']):
-#          if rcs['rCS']>0.:
-#            h_nj[srNJet][stb][htb].SetBinContent(i_njb+1,rcs['rCS'])
-#            h_nj[srNJet][stb][htb].SetBinError(i_njb+1,rcs['rCSE_sim'])
-#        if not math.isnan(rcs_pos['rCS']):
-#          if rcs_pos['rCS']>0.:
-#            h_nj_pos[srNJet][stb][htb].SetBinContent(i_njb+1,rcs_pos['rCS'])
-#            h_nj_pos[srNJet][stb][htb].SetBinError(i_njb+1,rcs_pos['rCSE_sim'])
-#        if not math.isnan(rcs_neg['rCS']):
-#          if rcs_neg['rCS']>0.:
-#            h_nj_neg[srNJet][stb][htb].SetBinContent(i_njb+1,rcs_neg['rCS'])
-#            h_nj_neg[srNJet][stb][htb].SetBinError(i_njb+1,rcs_neg['rCSE_sim'])
+h_nj = {}
+h_nj_pos = {}
+h_nj_neg = {}
+
+rcsDict = {}
+rcsDict_pos = {}
+rcsDict_neg = {}
+
+for srNJet in sorted(signalRegions):
+  h_nj[srNJet] = {}
+  h_nj_pos[srNJet] = {}
+  h_nj_neg[srNJet] = {}
+  rcsDict[srNJet] = {}
+  rcsDict_pos[srNJet] = {}
+  rcsDict_neg[srNJet] = {}
+  for stb in sorted(signalRegions[srNJet]):
+    h_nj[srNJet][stb] = {}
+    h_nj_pos[srNJet][stb] = {}
+    h_nj_neg[srNJet][stb] = {}
+    rcsDict[srNJet][stb] = {}
+    rcsDict_pos[srNJet][stb] = {}
+    rcsDict_neg[srNJet][stb] = {}
+    for htb in sorted(signalRegions[srNJet][stb]):
+      h_nj[srNJet][stb][htb] = ROOT.TH1F("rcs_nj","",len(njreg),0,len(njreg))
+      h_nj_pos[srNJet][stb][htb] = ROOT.TH1F("rcs_nj_pos","",len(njreg),0,len(njreg))
+      h_nj_neg[srNJet][stb][htb] = ROOT.TH1F("rcs_nj_neg","",len(njreg),0,len(njreg))
+      dPhiCut = signalRegions[srNJet][stb][htb]['deltaPhi']
+      rcsDict[srNJet][stb][htb] = {'deltaPhi':dPhiCut}
+      rcsDict_pos[srNJet][stb][htb] = {'deltaPhi':dPhiCut}
+      rcsDict_neg[srNJet][stb][htb] = {'deltaPhi':dPhiCut}
+      for i_njb, njb in enumerate(njreg):
+        cname, cut = nameAndCut(stb,htb,njb, btb=btreg ,presel=presel)
+        rcs = getRCS(cWJets, cut, dPhiCut)
+        rcs_pos = getRCS(cWJets, cut+'&&leptonPdg>0', dPhiCut)
+        rcs_neg = getRCS(cWJets, cut+'&&leptonPdg<0', dPhiCut)
+        print rcs, dPhiCut
+        rcsDict[srNJet][stb][htb][njb] = rcs
+        rcsDict_pos[srNJet][stb][htb][njb] = rcs_pos
+        rcsDict_neg[srNJet][stb][htb][njb] = rcs_neg
+        if not math.isnan(rcs['rCS']):
+          if rcs['rCS']>0.:
+            h_nj[srNJet][stb][htb].SetBinContent(i_njb+1,rcs['rCS'])
+            h_nj[srNJet][stb][htb].SetBinError(i_njb+1,rcs['rCSE_sim'])
+        if not math.isnan(rcs_pos['rCS']):
+          if rcs_pos['rCS']>0.:
+            h_nj_pos[srNJet][stb][htb].SetBinContent(i_njb+1,rcs_pos['rCS'])
+            h_nj_pos[srNJet][stb][htb].SetBinError(i_njb+1,rcs_pos['rCSE_sim'])
+        if not math.isnan(rcs_neg['rCS']):
+          if rcs_neg['rCS']>0.:
+            h_nj_neg[srNJet][stb][htb].SetBinContent(i_njb+1,rcs_neg['rCS'])
+            h_nj_neg[srNJet][stb][htb].SetBinError(i_njb+1,rcs_neg['rCSE_sim'])
         
 for srNJet in sorted(signalRegions):
   for stb in sorted(signalRegions[srNJet]):

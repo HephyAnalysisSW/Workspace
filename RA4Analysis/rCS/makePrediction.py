@@ -5,7 +5,8 @@ from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYi
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,varBinName
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v9_Phys14V3_HT400ST200_ForTTJetsUnc import *
-from Workspace.RA4Analysis.cmgTuplesPostProcessed_Spring15_hard import *
+#from Workspace.RA4Analysis.cmgTuplesPostProcessed_Spring15_hard import *
+from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_postProcessed import *
 from makeTTPrediction import makeTTPrediction
 from makeWPrediction import makeWPrediction
 from Workspace.HEPHYPythonTools.user import username
@@ -18,26 +19,26 @@ ROOT.TH1F().SetDefaultSumw2()
 
 lepSel = 'hard'
 
-cWJets  = getChain(WJetsHTToLNu[lepSel],histname='')
-cTTJets = getChain(ttJets[lepSel],histname='')
-cRest = getChain([singleTop[lepSel], DY[lepSel]],histname='')#no QCD no TTVH no DY (too low statistics!)
-cBkg = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], singleTop[lepSel], DY[lepSel]],histname='')#no QCD, no TTVH, no DY
-cData = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], singleTop[lepSel], DY[lepSel]] , histname='')
+cWJets  = getChain(WJetsHTToLNu_25ns,histname='')
+cTTJets = getChain(TTJets_LO_25ns,histname='')
+cRest = getChain([singleTop_25ns, DY_25ns, diBosons_25ns],histname='')#no QCD no TTVH no DY (too low statistics!)
+cBkg = getChain([WJetsHTToLNu_25ns,TTJets_LO_25ns,singleTop_25ns, DY_25ns, diBosons_25ns],histname='')#no QCD, no TTVH, no DY
+cData = getChain([WJetsHTToLNu_25ns,TTJets_LO_25ns,singleTop_25ns, DY_25ns, diBosons_25ns] , histname='')
 
 #cBkg = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]],histname='')#no QCD
 #cData = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]] , histname='')
 #cData = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]],  ttJets[lepSel] , histname='')#no QCD , ##to calculate signal contamination
 #cData = cBkg
 
-signalRegions = signalRegion40pb
+signalRegions = signalRegion3fb
 
 small = False
 if small: signalRegions = smallRegion
 
 #DEFINE LUMI AND PLOTDIR
-lumi = .042
-printDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/40pbMC/templateFit/'
-pickleDir = '/data/'+username+'/Spring15/Prediction40pbMC/rCS_0b_'+str(lumi)+'/'
+lumi = 3.
+printDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/25ns/templateFit/'
+pickleDir = '/data/'+username+'/Spring15/25ns/rCS_0b_'+str(lumi)+'/'
 
 if not os.path.exists(pickleDir):
   os.makedirs(pickleDir)
@@ -59,7 +60,9 @@ if signal:
     s['chain'] = getChain(s['sample'],histname='')
 
 prefix = 'singleLeptonic_Spring15_'
-presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80"#&&Flag_EcalDeadCellTriggerPrimitiveFilter&&acos(cos(Jet_phi[0]-met_phi))>0.45&&acos(cos(Jet_phi[1]-met_phi))>0.45"
+#presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80"#&&Flag_EcalDeadCellTriggerPrimitiveFilter&&acos(cos(Jet_phi[0]-met_phi))>0.45&&acos(cos(Jet_phi[1]-met_phi))>0.45"
+#presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&Jet_pt[1]>80"
+presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&Jet_pt[1]>80"
 btagString = 'nBJetMediumCSV30'
 
 bjreg = (0,0)
