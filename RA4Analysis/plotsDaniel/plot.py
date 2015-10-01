@@ -10,9 +10,12 @@ from Workspace.HEPHYPythonTools.helpers import *
 from Workspace.RA4Analysis.helpers import *
 from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_Spring15_hard import *
-from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_postProcessed import *
+#from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_postProcessed import *
+from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT400ST200_postProcessed import *
+from Workspace.RA4Analysis.cmgTuples_Data25ns_0l import *
 #from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT400ST200_postProcessed import *
 #from Workspace.RA4Analysis.cmgTuples_Spring15_50ns_postProcessed import *
+from Workspace.HEPHYPythonTools.user import username
 
 
 
@@ -35,7 +38,7 @@ singleTop = {'name':'singleTop', 'chain':getChain(singleTop_25ns,histname=''), '
 QCD = {'name':'QCD', 'chain':getChain(QCDHT_25ns,histname=''), 'color':color('QCD'),'weight':'weight', 'niceName':'QCD'}
 #QCD = {'name':'QCD', 'chain':getChain(QCDEle_25ns,histname=''), 'color':color('QCD'),'weight':'weight', 'niceName':'QCD'}
 diBoson = {'name':'diBoson', 'chain':getChain(diBosons_25ns,histname=''), 'color':ROOT.kMagenta,'weight':'weight', 'niceName':'diboson'}
-samples = [WJETS, TTJetsLO, singleTop, DY, QCD, diBoson]
+samples = [WJETS, TTJetsLO, singleTop, DY, QCD]#, diBoson]
 
 # older samples
 #WJETS = {'name':'WJets', 'chain':getChain(WJetsHTToLNu[lepSel],histname=''), 'color':color('WJets'),'weight':'weight', 'niceName':'W Jets'}
@@ -78,6 +81,8 @@ leptonPt = {'name':'leptonPt', 'binning':[40,0,1000], 'titleX':'p_{T} [GeV]', 't
 leadingJetPt = {'name':'Jet_pt[0]', 'binning':[40,0,2000], 'titleX':'p_{T} (leading jet) [GeV]', 'titleY':'Events'}
 
 met = {'name':'met_pt', 'binning':[44,0,220], 'titleX':'E_{T}^{miss} [GeV]', 'titleY':'Events'}
+metPhi = {'name':'met_phi', 'binning':[16,-3.2,3.2], 'titleX':'#Phi(E_{T}^{miss})', 'titleY':'Events'}
+metRawPhi = {'name':'met_rawPhi', 'binning':[16,-3.2,3.2], 'titleX':'#Phi(E_{T}^{miss}) raw', 'titleY':'Events'}
 metNoHF = {'binning': [20, 0, 1000], 'name': 'metNoHF_pt', 'titleX': 'E_{T}^{miss} NoHF [GeV]', 'titleY': 'Events'}
 metNoHFPhi = {'binning': [16, -3.2, 3.2], 'name': 'metNoHF_phi', 'titleX': '#Phi(E_{T}^{miss}) NoHF', 'titleY': 'Events'}
 #deltaPhiCMG = {'binning': [16, 0, 3.2], 'name': 'Sum$((acos((LepGood_pt+metNoHF_pt*cos(LepGood_phi-metNoHF_phi))/sqrt(LepGood_pt**2+metNoHF_pt**2+2*metNoHF_pt*LepGood_pt*cos(LepGood_phi-metNoHF_phi))))*'+electronId+')', 'titleX': '#Delta#Phi(W,l) NoHF', 'titleY': 'Events'}
@@ -138,10 +143,15 @@ name, cut = nameAndCut((250,350),(1000,-1),(5,5),btb=(0,0),presel=presel)
 highFakeMetCut = {'name':name,'string':cut+'&&'+fakeMetSelection,'niceName':'E_{T}^{miss,fake} > 50 GeV || > E_{T}^{miss,gen}'}
 lowFakeMetCut = {'name':name,'string':cut+'&&'+antiFakeMetSelection,'niceName':'E_{T}^{miss,fake} < 50 GeV && < E_{T}^{miss,gen}'}
 
-path25ns = '/data/easilar/cmgTuples/crab/Summer15_25nsV2MC_Data/'
-SingleElectron_Run2015C = {'name':'SingleElectron_Run2015C-PromptReco-v1', 'dir':path25ns+'SingleElectron_Run2015C/'}
-SingleMuon_Run2015C = {'name':'SingleMuon_Run2015C-PromptReco-v1', 'dir':path25ns+'SingleMuon_Run2015C/'}
-samples25ns = [SingleElectron_Run2015C,SingleMuon_Run2015C]
+#path25ns = '/data/easilar/cmgTuples/crab/Summer15_25nsV2MC_Data/'
+#SingleElectron_Run2015C = {'name':'SingleElectron_Run2015C-PromptReco-v1', 'dir':path25ns+'SingleElectron_Run2015C/'}
+#SingleMuon_Run2015C = {'name':'SingleMuon_Run2015C-PromptReco-v1', 'dir':path25ns+'SingleMuon_Run2015C/'}
+SingleMuonData = SingleMuon_Run2015D_PromptReco
+SingleElectronData = SingleElectron_Run2015D_PromptReco
+
+#samples25ns = [SingleElectronData,SingleMuonData,MuonEG_Run2015D_PromptReco,DoubleEG_Run2015D_PromptReco,DoubleMuon_Run2015D_PromptReco,JetHT_Run2015D_PromptReco,MET_Run2015D_PromptReco]
+
+samples25ns = [SingleElectronData,SingleMuonData]
 
 dataSamples = samples25ns
 for s in dataSamples:
@@ -190,15 +200,18 @@ LeptonReq = singleLeptonic
 #LeptonId = muonId
 #LeptonReq = singleMuonic
 
-stStr = 'Sum$((LepGood_pt+met_pt)*'+LeptonId+')'
+leptonVeto = '((abs(LepGood_pdgId)==11&&((Sum$(abs(LepGood_pdgId)==13&&LepGood_pt>=10&&abs(LepGood_eta)<2.4))==0&&(Sum$(abs(LepGood_pdgId)==11&&LepGood_pt>=10&&abs(LepGood_eta)<2.5))==1))\
+             ||(abs(LepGood_pdgId)==13&&((Sum$(abs(LepGood_pdgId)==13&&LepGood_pt>=10&&abs(LepGood_eta)<2.4))==1&&(Sum$(abs(LepGood_pdgId)==11&&LepGood_pt>=10&&abs(LepGood_eta)<2.5))==0)))'
+
+stStr = 'Sum$((LepGood_pt+metNoHF_pt)*'+LeptonId+')'
 htStr = 'Sum$(Jet_pt*(Jet_pt>30&&abs(Jet_eta)<2.4&&Jet_id))'
 
 #datapresel = '('+singleMuonic+'||'+singleElectronic+')&&nJet30>2&&nBJetMedium30>=0&&'+htStr+'>500&&'+stStr+'>200'
-datapresel = LeptonReq+'&&nJet30>=2&&nBJetMedium30>=0&&'+htStr+'>500&&'+stStr+'>250&&Flag_CSCTightHaloFilter'
+datapresel = LeptonReq+'&&'+leptonVeto+'&&nJet30>=2&&nBJetMedium30>=0&&'+htStr+'>500&&'+stStr+'>250&&Flag_CSCTightHaloFilter'
 
 dataDict = {'chain':data, 'cut':datapresel,'name':'data'}
 
-deltaPhiCMG = {'binning': [16, 0, 3.2], 'name': 'Sum$((acos((LepGood_pt+metNoHF_pt*cos(LepGood_phi-metNoHF_phi))/sqrt(LepGood_pt**2+metNoHF_pt**2+2*metNoHF_pt*LepGood_pt*cos(LepGood_phi-metNoHF_phi))))*'+LeptonId+')', 'titleX': '#Delta#Phi(W,l) NoHF', 'titleY': 'Events'}
+deltaPhiCMG = {'binning': [30, 0, 3.2], 'name': 'Sum$((acos((LepGood_pt+metNoHF_pt*cos(LepGood_phi-metNoHF_phi))/sqrt(LepGood_pt**2+metNoHF_pt**2+2*metNoHF_pt*LepGood_pt*cos(LepGood_phi-metNoHF_phi))))*'+LeptonId+')', 'titleX': '#Delta#Phi(W,l) NoHF', 'titleY': 'Events'}
 
 def plot(samples, variable, cuts, signals=False, data=False, maximum=False, minimum=0., stacking=False, filling=True, setLogY=False, setLogX=False, titleText='CMS simulation', lumi='3', legend=True, MClumiScale=1., drawError=False):
   totalChain = ROOT.TChain('tree')
@@ -280,7 +293,7 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
     leg.SetBorderSize(1)
     leg.SetTextSize(0.035)
     for item in reversed(h):
-      leg.AddEntry(item['hist'])
+      leg.AddEntry(item['hist'],'','f')
   if setLogY: pad1.SetLogy()
   if setLogX: pad1.SetLogx()
   if stacking:
@@ -367,6 +380,11 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
   can.Update()
   if stacking: return {'hist':h, 'canvas':can, 'legend':leg, 'stack':h_Stack, 'signals':s}
   else: return {'hist':h, 'canvas':can, 'legend':leg, 'signals':s}
+
+def savePlot(plotDict, path, fileType=['pdf','root','png']):
+  wwwDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/'
+  for t in fileType:
+    plotDict['canvas'].Print(wwwDir+path+'.'+t)
 
 #plot(samples,st,cuts)
 

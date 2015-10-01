@@ -10,6 +10,7 @@ from array import array
 
 def makeWeight(lumi=4., sampleLumi=3.,debug=False):
   if debug:
+    print 'No lumi-reweighting done!!'
     return 'weight', 'weight*weight'
   else:
     weight_str = '(((weight)/'+str(sampleLumi)+')*'+str(lumi)+')'

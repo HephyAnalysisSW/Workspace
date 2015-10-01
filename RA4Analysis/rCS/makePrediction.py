@@ -18,7 +18,7 @@ from Workspace.RA4Analysis.signalRegions import *
 ROOT.TH1F().SetDefaultSumw2()
 
 lepSel = 'hard'
-debugReweighting = True
+debugReweighting = False
 
 cWJets  = getChain(WJetsHTToLNu_25ns,histname='')
 cTTJets = getChain(TTJets_LO_25ns,histname='')

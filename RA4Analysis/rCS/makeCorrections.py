@@ -36,7 +36,7 @@ if small: signalRegions = smallRegion
 #DEFINE LUMI AND PLOTDIR
 lumi = 3.
 printDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/25ns/templateFit/'
-pickleDir = '/data/'+username+'/Spring15/25ns/rCS_0b_'+str(lumi)+'/'
+pickleDir = '/data/'+username+'/Spring15/25ns/NORMALIZATIONTEST_rCS_0b_'+str(lumi)+'/'
 
 if not os.path.exists(pickleDir):
   os.makedirs(pickleDir)
@@ -76,13 +76,16 @@ for i_njb, njb in enumerate(signalRegions):
     bins[njb][stb] ={}
     for htb in signalRegions[njb][stb]:
       print
+      print '#############################################'
       print 'bin: \t njet \t\t LT \t\t HT'
       if len(str(njb))<7:
         print '\t',njb,'\t\t',stb,'\t',htb
       else:
         print '\t',njb,'\t',stb,'\t',htb
+      print '#############################################'
+      print
       dPhiCut = signalRegions[njb][stb][htb]['deltaPhi']
-      wJetRcsFitH = ROOT.TH1F("wJetRcsFitH","",len(wJetBins),0,len(wJetBins))
+      #wJetRcsFitH = ROOT.TH1F("wJetRcsFitH","",len(wJetBins),0,len(wJetBins))
       ttJetRcsFitH = ROOT.TH1F("ttJetRcsFitH","",len(ttJetBins),0,len(ttJetBins))
       ttJetRcsFitH1b = ROOT.TH1F("ttJetRcsFitH1b","",len(ttJetBins),0,len(ttJetBins))
       
@@ -109,7 +112,7 @@ for i_njb, njb in enumerate(signalRegions):
         if not math.isnan(rcsD1b['rCS']):
           ttJetRcsFitH1b.SetBinContent(i_njbTT+1, rcsD1b['rCS'])
           ttJetRcsFitH1b.SetBinError(i_njbTT+1, rcsD1b['rCSE_sim'])
-
+      print
       print 'Linear Fit for tt Jets Rcs values in 0b MC'
       #linear fit in 0b
       ttJetRcsFitH.Fit('pol1','','same',0,3)
@@ -120,36 +123,53 @@ for i_njb, njb in enumerate(signalRegions):
       ttKE = FitFunc.GetParError(1)
       #print ttD, ttK
       
-      #konstant fit in 0b and 1b 
+      #konstant fit in 0b and 1b
+      print
       print 'Konstant Fit for tt Jets Rcs values in 0b MC'
       ttJetRcsFitH.Fit('pol0','','same',0,3)
       FitFunc     = ttJetRcsFitH.GetFunction('pol0')
       ttConst0  = FitFunc.GetParameter(0)
       ttConst0E = FitFunc.GetParError(0)
+      print
       print 'Konstant Fit for tt Jets Rcs values in 1b MC'
       ttJetRcsFitH1b.Fit('pol0','','same',0,3)
       FitFunc     = ttJetRcsFitH1b.GetFunction('pol0')
       ttConst1  = FitFunc.GetParameter(0)
       ttConst1E = FitFunc.GetParError(0)
       kappaTTfit = ttConst0/ttConst1
+      kappaTTfitErr = kappaTTfit*sqrt(ttConst1E**2/ttConst1**2+ttConst0E**2/ttConst0**2)
 
-      rcsTTdiff = abs(res[njb][stb][htb]['rCS_crLowNJet_1b']['rCS'] - (ttD+ttK*i_njb))
-      rcsTTdiffKappaCorr = abs(kappaTT['kappa']*res[njb][stb][htb]['rCS_crLowNJet_1b']['rCS'] - (ttD+ttK*i_njb))
-      TTdiff = rcsTTdiff*res[njb][stb][htb]['yTT_srNJet_0b_lowDPhi']
-      TTdiffKappaCorr = rcsTTdiffKappaCorr*res[njb][stb][htb]['yTT_srNJet_0b_lowDPhi']
-      TTexpandedErr = res[njb][stb][htb]['TT_pred_err']+abs(1-kappaTT['kappa'])*res[njb][stb][htb]['TT_pred']+TTdiff
+      TT_rcs_diff = abs(rcs0bCRtt['rCS'] - (ttD+ttK*i_njb))
+      TT_rcs_diffKappaCorr = abs(kappaTT['kappa']*rcs0bCRtt['rCS'] - (ttD+ttK*i_njb))
+      TT_y_diff = TT_rcs_diff*res[njb][stb][htb]['yTT_srNJet_0b_lowDPhi']
+      TT_y_diffKappaCorr = TT_rcs_diffKappaCorr*res[njb][stb][htb]['yTT_srNJet_0b_lowDPhi']
       
-      ttCorrected = res[njb][stb][htb]['TT_pred']*kappaTT['kappa']
-      ttCorrectedErr = sqrt(res[njb][stb][htb]['TT_pred']**2*kappaTT['kappaE_sim']**2+res[njb][stb][htb]['TT_pred_err']**2*kappaTT['kappa']**2) + TTdiffKappaCorr
+      #TTexpandedErr = res[njb][stb][htb]['TT_pred_err']+abs(1-kappaTT['kappa'])*res[njb][stb][htb]['TT_pred']+TTdiff
       
+      TT_pred_corr = res[njb][stb][htb]['TT_pred']*kappaTT['kappa']
+      #ttCorrectedErr = sqrt(res[njb][stb][htb]['TT_pred']**2*kappaTT['kappaE_sim']**2+res[njb][stb][htb]['TT_pred_err']**2*kappaTT['kappa']**2) + TTdiffKappaCorr
       
+      TT_stat_err = sqrt(res[njb][stb][htb]['TT_pred']**2*kappaTT['kappaE_sim']**2+res[njb][stb][htb]['TT_pred_err']**2*kappaTT['kappa']**2)
+      TT_syst_err = TT_y_diff
+      TT_pred_err = sqrt(TT_stat_err**2 + TT_syst_err**2)
+      
+      TT_corrections = {'k_0b/1b':kappaTT['kappa'], 'k_0b/1b_err':kappaTT['kappaE_sim'], 'k_0b/1b_fit':kappaTTfit, 'k_0b/1b_fit_err':kappaTTfitErr, '0b_fit_const':ttD,'0b_fit_const_err':ttDE, '0b_fit_grad':ttK, '0b_fit_grad_err':ttKE}
+      res[njb][stb][htb].update({'TT_rCS_fits_MC':TT_corrections})
+      
+      #print
+      #print 'ttJets\tK\tKerr\tKfit\tRcsPred\tRcsFit\tRcsTrue\tRcs+K\tRcsDiff\t+K\tYDiff\t+K\tYpred\tYEpred\tYtrue\tYEtrue\tpropE'
+      #print '\t',round(kappaTT['kappa'],2), '\t',round(kappaTT['kappaE_sim'],2), '\t',round(kappaTTfit,2), '\t', round(res[njb][stb][htb]['rCS_crLowNJet_1b']['rCS'],3),'\t', round(ttD+ttK*i_njb,3),'\t',\
+      #           round(res[njb][stb][htb]['rCS_srNJet_0b_onlyTT']['rCS'],3),'\t',round(kappaTT['kappa']*res[njb][stb][htb]['rCS_crLowNJet_1b']['rCS'],3),'\t',\
+      #           round(TT_rcs_diff,3), '\t', round(TT_rcs_diffKappaCorr,3), '\t', round(TT_y_diff,3), '\t', round(TT_y_diffKappaCorr,3), '\t', round(res[njb][stb][htb]['TT_pred'],3), '\t',\
+      #           round(res[njb][stb][htb]['TT_pred_err'],3), '\t', round(res[njb][stb][htb]['TT_truth'],3), '\t', round(res[njb][stb][htb]['TT_truth_err'],3), '\t',\
+      #           round(TTexpandedErr,3)
+
       print
-      print 'ttJets\tK\tKerr\tKfit\tRcsPred\tRcsFit\tRcsTrue\tRcs+K\tRcsDiff\t+K\tYDiff\t+K\tYpred\tYEpred\tYtrue\tYEtrue\tpropE'
-      print '\t',round(kappaTT['kappa'],2), '\t',round(kappaTT['kappaE_sim'],2), '\t',round(kappaTTfit,2), '\t', round(res[njb][stb][htb]['rCS_crLowNJet_1b']['rCS'],3),'\t', round(ttD+ttK*i_njb,3),'\t',\
-                 round(res[njb][stb][htb]['rCS_srNJet_0b_onlyTT']['rCS'],3),'\t',round(kappaTT['kappa']*res[njb][stb][htb]['rCS_crLowNJet_1b']['rCS'],3),'\t',\
-                 round(rcsTTdiff,3), '\t', round(rcsTTdiffKappaCorr,3), '\t', round(TTdiff,3), '\t', round(TTdiffKappaCorr,3), '\t', round(res[njb][stb][htb]['TT_pred'],3), '\t',\
-                 round(res[njb][stb][htb]['TT_pred_err'],3), '\t', round(res[njb][stb][htb]['TT_truth'],3), '\t', round(res[njb][stb][htb]['TT_truth_err'],3), '\t',\
-                 round(TTexpandedErr,3)
+      print 'ttJets\tK\tK_err\tRcs:\tTruth\tPred\tFit\tMC0bSB\tYield:\tTruth\tPred\tCorr\tstat\tsyst\ttot_err'
+      print '\t',round(kappaTT['kappa'],2), '\t',round(kappaTT['kappaE_sim'],2), '\t\t', round(res[njb][stb][htb]['rCS_srNJet_0b_onlyTT']['rCS'],3),'\t',\
+                 round(res[njb][stb][htb]['rCS_crLowNJet_1b']['rCS'],3), '\t', round(ttD+ttK*i_njb,3),'\t', round(rcs0bCRtt['rCS'],3),'\t\t', \
+                 round(res[njb][stb][htb]['TT_truth'],3), '\t',round(res[njb][stb][htb]['TT_pred'],3), '\t',round(TT_pred_corr,3),'\t',\
+                 round(TT_stat_err,3), '\t',round(TT_syst_err,3), '\t',round(TT_pred_err,3)
       #total+=1
       #if (res[njb][stb][htb]['TT_pred']-TTexpandedErr)<=res[njb][stb][htb]['TT_truth']<=(res[njb][stb][htb]['TT_pred']+TTexpandedErr):
       #  print 'Truth value inside expanded error band!'
@@ -157,45 +177,96 @@ for i_njb, njb in enumerate(signalRegions):
       #  if (res[njb][stb][htb]['TT_pred']-res[njb][stb][htb]['TT_pred_err'])<=res[njb][stb][htb]['TT_truth']<=(res[njb][stb][htb]['TT_pred']+res[njb][stb][htb]['TT_pred_err']):
       #    print 'Also already inside statistical error band!'
       #    scoreStat+=1
-      res[njb][stb][htb]['TT_pred'] = ttCorrected
-      res[njb][stb][htb]['TT_pred_err'] = ttCorrectedErr
+      res[njb][stb][htb]['TT_pred'] = TT_pred_corr
+      res[njb][stb][htb]['TT_pred_err'] = TT_pred_err
 
       #Wjets corrections
-      for i_njbW, njbW in enumerate(wJetBins):
-        cname, cut = nameAndCut(stb,htb,njbW, btb=(0,0) ,presel=presel)
-        rcsD = getRCS(cWJets, cut, dPhiCut)
-        rcs = rcsD['rCS']
-        rcsErrPred = rcsD['rCSE_pred']
-        rcsErr = rcsD['rCSE_sim']
-        if not math.isnan(rcs):
-          wJetRcsFitH.SetBinContent(i_njbW+1, rcs)
-          wJetRcsFitH.SetBinError(i_njbW+1, rcsErr)
-      print 'Linear Fit for WJets Rcs values in 0b MC'
-      wJetRcsFitH.Fit('pol1','','same',0,3)
-      FitFunc     = wJetRcsFitH.GetFunction('pol1')
-      wD  = FitFunc.GetParameter(0)
-      wDE = FitFunc.GetParError(0)
-      wK  = FitFunc.GetParameter(1)
-      wKE = FitFunc.GetParError(1)
-      rcsWdiff = abs(res[njb][stb][htb]['rCS_W_crNJet_0b_corr'] - (wD+wK*i_njb))
-      Wdiff = rcsWdiff*res[njb][stb][htb]['yW_srNJet_0b_lowDPhi']
-      
-      WexpandedErr = res[njb][stb][htb]['W_pred_err']+Wdiff
-      
+      Wcharges = [{'name':'PosPdg','cut':'leptonPdg>0', 'string':'_PosPdg'},{'name':'NegPdg','cut':'leptonPdg<0', 'string':'_NegPdg'},{'name':'all', 'cut':'(1)', 'string':''}]
+      for Wc in Wcharges:
+        wJetRcsFitH = ROOT.TH1F("wJetRcsFitH","",len(wJetBins),0,len(wJetBins))
+        
+        #fill histograms for linear fit to account for possible non-flat rcs values
+        for i_njbW, njbW in enumerate(wJetBins):
+          cname, cut = nameAndCut(stb,htb,njbW, btb=(0,0) ,presel=presel)
+          rcsD = getRCS(cWJets, cut+'&&'+Wc['cut'], dPhiCut)
+          #rcs = rcsD['rCS']
+          #rcsErrPred = rcsD['rCSE_pred']
+          #rcsErr = rcsD['rCSE_sim']
+          if not math.isnan(rcs):
+            wJetRcsFitH.SetBinContent(i_njbW+1, rcsD['rCS'])
+            wJetRcsFitH.SetBinError(i_njbW+1, rcsD['rCSE_sim'])
+
+        print 'Linear Fit for WJets Rcs values in 0b MC', Wc['name'], 'charges'
+        wJetRcsFitH.Fit('pol1','','same',0,3)
+        FitFunc     = wJetRcsFitH.GetFunction('pol1')
+        wD  = FitFunc.GetParameter(0)
+        wDE = FitFunc.GetParError(0)
+        wK  = FitFunc.GetParameter(1)
+        wKE = FitFunc.GetParError(1)
+        
+        #difference of measured rcs and fit in 0b MC rcs
+
+        cnameCRW, cutCRW = nameAndCut(stb,htb,(3,4), btb=(0,0) ,presel=presel)
+        rcsCRW = getRCS(cWJets, cutCRW, dPhiCut)
+        #RcsKey = 'rCS_W'+Wc['string']+'_crNJet_0b_corr'
+        #rcsWdiff = abs(res[njb][stb][htb][RcsKey] - (wD+wK*i_njb)) #difference of rcs
+        rcsWdiff = abs(rcsCRW['rCS'] - (wD+wK*i_njb)) #difference of rcs
+        YieldLowDPhiKey = 'yW'+Wc['string']+'_srNJet_0b_lowDPhi'
+        Wdiff = rcsWdiff*res[njb][stb][htb][YieldLowDPhiKey] #difference of yield
+        
+        #systematics of rcs measured in mu only compared to ele+mu
+        # calculate disagreement between mu/ele+mu rcs values
+        keyMu = 'rCS_crLowNJet_0b_onlyW_mu'+Wc['string']
+        keyBoth = 'rCS_crLowNJet_0b_onlyW'+Wc['string']
+        ratio = res[njb][stb][htb][keyMu]['rCS']/res[njb][stb][htb][keyBoth]['rCS']
+        if math.isnan(ratio): ratio = 0.
+  
+        # take max of disagreement and stat. limit of ele+mu
+        #print 'Error mu/e+mu: ratio, stat', abs(1-ratio), res[njb][stb][htb][keyBoth]['rCSE_sim']/res[njb][stb][htb][keyBoth]['rCS']
+        WratioErr = max([abs(1-ratio),res[njb][stb][htb][keyBoth]['rCSE_sim']/res[njb][stb][htb][keyBoth]['rCS']])*res[njb][stb][htb][RcsKey]*res[njb][stb][htb][YieldLowDPhiKey]
+        #WratioErr *= res[njb][stb][htb][YieldLowDPhiKey]
+        #total error W
+        PredErrKey = 'W'+Wc['string']+'_pred_err' #stat error
+        W_stat_err = res[njb][stb][htb][PredErrKey]
+        W_syst_err = sqrt(WratioErr**2+Wdiff**2)
+        WexpandedErr = sqrt(W_stat_err**2 + W_syst_err**2)
+        
+        #save fit results in dict for pickle file
+        WFitPar = {'const':wD,'const_err':wDE, 'grad':wK, 'grad_err':wKE}
+        WFitKey = 'W_rCS_linearFit_MC_0b'+Wc['string']
+        res[njb][stb][htb].update({WFitKey:WFitPar})
+        W_errs = {'stat':W_stat_err, 'syst':W_syst_err, 'tot':WexpandedErr}
+        W_errs_key = 'W_pred_errs'+Wc['string']
+        res[njb][stb][htb].update({W_errs_key:W_errs})
+        
+        W_err_key = 'W_pred_err'+Wc['string']
+        res[njb][stb][htb][W_err_key] = WexpandedErr
+        del wJetRcsFitH
+
+#      print
+#      print 'WJets\tRcsPred\tRcsFit\tRcsTrue\tRcsDiff\tYDiff\tYpred\tYEpred\tYtrue\tYEtrue\tpropE'
+#      print '\t',round(res[njb][stb][htb]['rCS_W_crNJet_0b_corr'],3),'\t', round(wD+wK*i_njb,3),'\t',\
+#                 round(res[njb][stb][htb]['rCS_srNJet_0b_onlyW']['rCS'],3),'\t',\
+#                 round(rcsWdiff,3), '\t', round(Wdiff,3), '\t', round(res[njb][stb][htb]['W_pred'],3), '\t',\
+#                 round(res[njb][stb][htb]['W_pred_err'],3), '\t', round(res[njb][stb][htb]['W_truth'],3), '\t', round(res[njb][stb][htb]['W_truth_err'],3), '\t',\
+#                 round(WexpandedErr,3)
+
       print
-      print 'WJets\tRcsPred\tRcsFit\tRcsTrue\tRcsDiff\tYDiff\tYpred\tYEpred\tYtrue\tYEtrue\tpropE'
-      print '\t',round(res[njb][stb][htb]['rCS_W_crNJet_0b_corr'],3),'\t', round(wD+wK*i_njb,3),'\t',\
-                 round(res[njb][stb][htb]['rCS_srNJet_0b_onlyW']['rCS'],3),'\t',\
-                 round(rcsWdiff,3), '\t', round(Wdiff,3), '\t', round(res[njb][stb][htb]['W_pred'],3), '\t',\
-                 round(res[njb][stb][htb]['W_pred_err'],3), '\t', round(res[njb][stb][htb]['W_truth'],3), '\t', round(res[njb][stb][htb]['W_truth_err'],3), '\t',\
-                 round(WexpandedErr,3)
-      res[njb][stb][htb]['W_pred_err'] = WexpandedErr
+      print 'WJets\tRcs:\tTruth\tPred\tFit\tMC0bSB\tYield:\tTruth\tPred\tstat\tsyst\ttot_err'
+      print '\t\t',round(res[njb][stb][htb]['rCS_srNJet_0b_onlyW']['rCS'],3), '\t',round(res[njb][stb][htb]['rCS_W_crNJet_0b_corr'],3), '\t', round(wD+wK*i_njb,3),'\t',\
+                   round(rcsCRW['rCS'],3),'\t\t',\
+                   round(res[njb][stb][htb]['W_truth'],3), '\t', round(res[njb][stb][htb]['W_pred'],3),'\t', \
+                   round(W_stat_err,3), '\t',round(W_syst_err,3), '\t',round(WexpandedErr,3)
+
+
+
+      #res[njb][stb][htb]['W_pred_err'] = WexpandedErr
       
       #res[njb][stb][htb]['tot_pred_err'] = sqrt(TTexpandedErr**2 + WexpandedErr**2 + res[njb][stb][htb]['Rest_truth_err']**2)
-      res[njb][stb][htb]['tot_pred_err'] = sqrt(ttCorrectedErr**2 + WexpandedErr**2 + res[njb][stb][htb]['Rest_truth_err']**2)
-      res[njb][stb][htb]['tot_pred'] = ttCorrected + res[njb][stb][htb]['W_pred'] + res[njb][stb][htb]['Rest_truth']
+      res[njb][stb][htb]['tot_pred_err'] = sqrt(TT_pred_err**2 + WexpandedErr**2 + res[njb][stb][htb]['Rest_truth_err']**2)
+      res[njb][stb][htb]['tot_pred'] = TT_pred_corr + res[njb][stb][htb]['W_pred'] + res[njb][stb][htb]['Rest_truth']
       #update res dict with new error
-      del wJetRcsFitH, ttJetRcsFitH, ttJetRcsFitH1b
+      del ttJetRcsFitH, ttJetRcsFitH1b
       
 
 #print 'Events inside expanded error band:',scoreExp/total
