@@ -1,6 +1,6 @@
 import copy, os, sys
 
-data_path = "/data/rschoefbeck/cmgTuples/Run2015D/"
+data_path = "/data/rschoefbeck/cmgTuples/Run2015D/hadd/"
 
 SingleMuon_Run2015D_PromptReco = { "name" : "SingleMuon_Run2015D-PromptReco-v3",}
 MuonEG_Run2015D_PromptReco = { "name" : "MuonEG_Run2015D-PromptReco-v3",}

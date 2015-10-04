@@ -117,6 +117,7 @@ def loopAndFill(stacks):
         else:
           usedBranches = list(set(usedBranches+p.usedBranches))
         if not p.sample in allSamples:
+          assert p.sample.has_key('dir') or p.sample.has_key('dirname'), "Missing key dir or dirname in sample %s"%repr(p.sample)
           allSamples.append(p.sample)
   
   print "Found",len(allSamples),'different samples:',", ".join(s['name'] for s in allSamples)

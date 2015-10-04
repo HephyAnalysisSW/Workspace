@@ -16,7 +16,7 @@ from Workspace.HEPHYPythonTools.helpers import getChunks
 from Workspace.RA4Analysis.cmgTuples_Spring15_25ns import *
 from Workspace.RA4Analysis.cmgTuples_Spring15_50ns import *
 from Workspace.RA4Analysis.cmgTuples_Data50ns_1l import *
-from Workspace.RA4Analysis.cmgTuples_Data25ns_0l import *
+from Workspace.RA4Analysis.cmgTuples_Data25ns import *
 target_lumi = 3000 #pb-1
 
 defSampleStr = "TTJets_25ns"
