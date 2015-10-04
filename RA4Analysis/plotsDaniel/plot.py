@@ -203,7 +203,11 @@ LeptonReq = singleLeptonic
 leptonVeto = '((abs(LepGood_pdgId)==11&&((Sum$(abs(LepGood_pdgId)==13&&LepGood_pt>=10&&abs(LepGood_eta)<2.4))==0&&(Sum$(abs(LepGood_pdgId)==11&&LepGood_pt>=10&&abs(LepGood_eta)<2.5))==1))\
              ||(abs(LepGood_pdgId)==13&&((Sum$(abs(LepGood_pdgId)==13&&LepGood_pt>=10&&abs(LepGood_eta)<2.4))==1&&(Sum$(abs(LepGood_pdgId)==11&&LepGood_pt>=10&&abs(LepGood_eta)<2.5))==0)))'
 
+leptonVetoNoEta = '((abs(LepGood_pdgId)==11&&((Sum$(abs(LepGood_pdgId)==13&&LepGood_pt>=10))==0&&(Sum$(abs(LepGood_pdgId)==11&&LepGood_pt>=10))==1))\
+             ||(abs(LepGood_pdgId)==13&&((Sum$(abs(LepGood_pdgId)==13&&LepGood_pt>=10))==1&&(Sum$(abs(LepGood_pdgId)==11&&LepGood_pt>=10))==0)))'
+
 stStr = 'Sum$((LepGood_pt+metNoHF_pt)*'+LeptonId+')'
+stStrSimple = 'Sum$(LepGood_pt[0]+metNoHF_pt)'
 htStr = 'Sum$(Jet_pt*(Jet_pt>30&&abs(Jet_eta)<2.4&&Jet_id))'
 
 #datapresel = '('+singleMuonic+'||'+singleElectronic+')&&nJet30>2&&nBJetMedium30>=0&&'+htStr+'>500&&'+stStr+'>200'
@@ -240,14 +244,19 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
   nsamples = len(samples)
   ncuts = len(cuts)
   MCscale=1.
-  if ncuts == 1 and data:
+  if data:
     if data['cut']: dataCutString = data['cut']
     else: dataCutString = cuts[0]['string']
     dataYield = getYieldFromChain(data['chain'],cutString=dataCutString,weight='(1)')
+  if ncuts == 1 and data and MCscale:
+    #if data['cut']: dataCutString = data['cut']
+    #else: dataCutString = cuts[0]['string']
+    #dataYield = getYieldFromChain(data['chain'],cutString=dataCutString,weight='(1)')
     MCYield = getYieldFromChain(totalChain,cutString=cuts[0]['string'],weight=str(MClumiScale)+'*''weight')
-    print dataYield, MCYield
+    print 'Yield Data:\t', dataYield
+    print 'Yield MC:\t', MCYield
     MCscale = dataYield/MCYield
-    print MCscale, 1./MCscale
+    print 'Area normalization factor:',MCscale
   else: MCscale=1.
   for isample, sample in enumerate(samples):
     for icut, cut in enumerate(cuts):
@@ -334,7 +343,7 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
       if drawError: s[isignal]['hist'].Draw('e same hist')
       else: s[isignal]['hist'].Draw('same hist')
   if data:
-    h.append({'hist':ROOT.TH1F('data','Data',*variable['binning']),'yield':0., 'legendName':'data'})
+    h.append({'hist':ROOT.TH1F('data','Data',*variable['binning']),'yield':dataYield, 'legendName':'data'})
     if data['cut']: cutstring = data['cut']
     else: cutstring = cut['string']
     #if data['var']: variable = data['var']
