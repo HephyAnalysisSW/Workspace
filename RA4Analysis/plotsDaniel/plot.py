@@ -78,9 +78,10 @@ ht = {'name':'htJet30j', 'binning':[52,500,3100], 'titleX':'H_{T} [GeV]', 'title
 njet = {'name':'nJet30', 'binning':[15,0,15], 'titleX':'n_{jets}', 'titleY':'Events'}
 deltaPhi = {'name':'deltaPhi_Wl', 'binning':[32,0,3.2], 'titleX':'#Delta#Phi(W,l)', 'titleY':'Events'}
 leptonPt = {'name':'leptonPt', 'binning':[40,0,1000], 'titleX':'p_{T} [GeV]', 'titleY':'Events'}
+lepGoodPt = {'name':'LepGood_pt[0]', 'binning':[22,0,1100], 'titleX':'p_{T} [GeV] (lepton)', 'titleY':'Events'}
 leadingJetPt = {'name':'Jet_pt[0]', 'binning':[40,0,2000], 'titleX':'p_{T} (leading jet) [GeV]', 'titleY':'Events'}
 
-met = {'name':'met_pt', 'binning':[44,0,220], 'titleX':'E_{T}^{miss} [GeV]', 'titleY':'Events'}
+met = {'name':'met_pt', 'binning':[22,0,1100], 'titleX':'E_{T}^{miss} [GeV]', 'titleY':'Events'}
 metPhi = {'name':'met_phi', 'binning':[16,-3.2,3.2], 'titleX':'#Phi(E_{T}^{miss})', 'titleY':'Events'}
 metRawPhi = {'name':'met_rawPhi', 'binning':[16,-3.2,3.2], 'titleX':'#Phi(E_{T}^{miss}) raw', 'titleY':'Events'}
 metNoHF = {'binning': [20, 0, 1000], 'name': 'metNoHF_pt', 'titleX': 'E_{T}^{miss} NoHF [GeV]', 'titleY': 'Events'}
@@ -206,16 +207,31 @@ leptonVeto = '((abs(LepGood_pdgId)==11&&((Sum$(abs(LepGood_pdgId)==13&&LepGood_p
 leptonVetoNoEta = '((abs(LepGood_pdgId)==11&&((Sum$(abs(LepGood_pdgId)==13&&LepGood_pt>=10))==0&&(Sum$(abs(LepGood_pdgId)==11&&LepGood_pt>=10))==1))\
              ||(abs(LepGood_pdgId)==13&&((Sum$(abs(LepGood_pdgId)==13&&LepGood_pt>=10))==1&&(Sum$(abs(LepGood_pdgId)==11&&LepGood_pt>=10))==0)))'
 
-stStr = 'Sum$((LepGood_pt+metNoHF_pt)*'+LeptonId+')'
+stStrMetNoHF = 'Sum$((LepGood_pt+metNoHF_pt)*'+LeptonId+')'
+stStr = 'Sum$(LepGood_pt[0]+met_pt)'
 stStrSimple = 'Sum$(LepGood_pt[0]+metNoHF_pt)'
 htStr = 'Sum$(Jet_pt*(Jet_pt>30&&abs(Jet_eta)<2.4&&Jet_id))'
 
+htComp = {'name':htStr, 'binning':[52,500,3100], 'titleX':'H_{T} [GeV]', 'titleY':'Events'}
+stComp = {'name':stStr, 'binning':[37,250,2100], 'titleX':'L_{T} [GeV]', 'titleY':'Events'}
+
+
 #datapresel = '('+singleMuonic+'||'+singleElectronic+')&&nJet30>2&&nBJetMedium30>=0&&'+htStr+'>500&&'+stStr+'>200'
-datapresel = LeptonReq+'&&'+leptonVeto+'&&nJet30>=2&&nBJetMedium30>=0&&'+htStr+'>500&&'+stStr+'>250&&Flag_CSCTightHaloFilter'
+trigger = "&&((HLT_ElNoIso||HLT_EleHT350)||(HLT_MuHT350||HLT_Mu50NoIso))"
+filters = "&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFilterMinZeroPatched&&Flag_goodVertices&&Flag_eeBadScFilter"
+
+datapresel = LeptonReq+'&&'+leptonVeto+'&&nJet30>=2&&nBJetMedium30>=0&&'+htStr+'>500&&'+stStr+'>250'+trigger+filters
 
 dataDict = {'chain':data, 'cut':datapresel,'name':'data'}
 
-deltaPhiCMG = {'binning': [30, 0, 3.2], 'name': 'Sum$((acos((LepGood_pt+metNoHF_pt*cos(LepGood_phi-metNoHF_phi))/sqrt(LepGood_pt**2+metNoHF_pt**2+2*metNoHF_pt*LepGood_pt*cos(LepGood_phi-metNoHF_phi))))*'+LeptonId+')', 'titleX': '#Delta#Phi(W,l) NoHF', 'titleY': 'Events'}
+deltaPhiCMG_NoHF = {'binning': [30, 0, 3.2], 'name': 'Sum$((acos((LepGood_pt+metNoHF_pt*cos(LepGood_phi-metNoHF_phi))/sqrt(LepGood_pt**2+metNoHF_pt**2+2*metNoHF_pt*LepGood_pt*cos(LepGood_phi-metNoHF_phi))))*'+LeptonId+')', 'titleX': '#Delta#Phi(W,l) NoHF', 'titleY': 'Events'}
+deltaPhiCMG = {'binning': [32, 0, 3.2], 'name': 'Sum$((acos((LepGood_pt+met_pt*cos(LepGood_phi-met_phi))/sqrt(LepGood_pt**2+met_pt**2+2*met_pt*LepGood_pt*cos(LepGood_phi-met_phi))))*'+LeptonId+')', 'titleX': '#Delta#Phi(W,l) NoHF', 'titleY': 'Events'}
+
+dataPlotList = [stComp, htComp, deltaPhiCMG, met, njet, leadingJetPt]
+
+#for d in dataPlotList:
+#  t = plot(samples,leadingJetPt,newPreselCut, data=dataDict,filling=True,stacking=True,minimum=0.08, maximum=2000, MClumiScale=205./3000., setLogY=True, lumi=0.205, titleText='CMS preliminary')
+#  savePlot(t, d['titleX'])
 
 def plot(samples, variable, cuts, signals=False, data=False, maximum=False, minimum=0., stacking=False, filling=True, setLogY=False, setLogX=False, titleText='CMS simulation', lumi='3', legend=True, MClumiScale=1., drawError=False):
   totalChain = ROOT.TChain('tree')
