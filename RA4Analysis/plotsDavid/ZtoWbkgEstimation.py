@@ -1,6 +1,8 @@
 import ROOT
+import pickle
 ROOT.gROOT.LoadMacro("../../HEPHYPythonTools/scripts/root/tdrstyle.C")
 ROOT.setTDRStyle()
+ROOT.TH1F().SetDefaultSumw2()
 from math import *
 import os, copy, sys
 from array import array
@@ -14,15 +16,12 @@ from Workspace.RA4Analysis.helpers import *
 from draw_helpers import *
 from eleID_helper import *
 
-#lepSel = 'hard'
-#dPhiStr = "acos((leptonPt+met*cos(leptonPhi-metPhi))/sqrt(leptonPt**2+met**2+2*met*leptonPt*cos(leptonPhi-metPhi)))"
 #small = True
 small = False
 bunchCrossing = '50ns'
 #bunchCrossing = '25ns'
 
-#def getMatch(genLep,recoLep):
-#  return ( (genLep['charge']==recoLep['charge']) and deltaR(genLep,recoLep)<0.1 and (abs(genLep['pt']-recoLep['pt'])/genLep['pt'])<0.5)
+#LpInformation = pickle.load(file('/data/'+username+'/results2015/convertHistToPickle/njet2_nbtagEq0_Z-Wratio_Lp_pkl'))
 
 def getWeight(sample,nEvents,target_lumi):
   weight = xsec[sample['dbsName']] * target_lumi/nEvents
@@ -35,8 +34,8 @@ if bunchCrossing == '50ns':
   sampleLumi = 3000 #pb-1
   #Bkg chains 
   diLepBkg=[
-            {'name':'TTJets_50ns', 'sample':TTJets_50ns, 'legendName':'t#bar{t}+jets', 'selection':'diLep', 'weight':'weight', 'color':ROOT.kBlue-2, 'merge':'ttbar'},
-            {'name':'DY_50ns', 'sample':DY_50ns, 'legendName':'DY' , 'selection':'diLep', 'weight':'weight', 'color':ROOT.kRed-6, 'merge':'DY_inclusive'},
+  #          {'name':'TTJets_50ns', 'sample':TTJets_50ns, 'legendName':'t#bar{t}+jets', 'selection':'diLep', 'weight':'weight', 'color':ROOT.kBlue-2, 'merge':'ttbar'},
+            {'name':'DY_50ns', 'sample':DY_50ns, 'legendName':'DY' , 'selection':'diLep', 'weight':'weight', 'color':ROOT.kRed-6, 'merge':'DY_inclusive', 'treeName':'Events'},
   #       {'name':'DYJetsToLL_M_50_HT100to200_50ns', 'sample':DYJetsToLL_M_50_HT100to200_50ns, 'legendName':'DY', 'color':ROOT.kRed-6, 'merge':'DY_HTbinned'},
   #       {'name':'DYJetsToLL_M_50_HT200to400_50ns', 'sample':DYJetsToLL_M_50_HT200to400_50ns, 'legendName':'DY', 'color':ROOT.kRed-6, 'merge':'DY_HTbinned'},
   #       {'name':'DYJetsToLL_M_50_HT400to600_50ns', 'sample':DYJetsToLL_M_50_HT400to600_50ns, 'legendName':'DY', 'color':ROOT.kRed-6, 'merge':'DY_HTbinned'},
@@ -44,26 +43,26 @@ if bunchCrossing == '50ns':
   ]
   
   singleLepBkg=[
-                {'name':'WJetsToLNu_50ns', 'sample':WJetsToLNu_50ns, 'legendName':'W+jets', 'selection':'singleLep', 'weight':'weight', 'color':ROOT.kGreen-2, 'merge':'Wjets'},
+                {'name':'WJetsToLNu_50ns', 'sample':WJetsToLNu_50ns, 'legendName':'W+jets', 'selection':'singleLep', 'weight':'weight', 'color':ROOT.kGreen-2, 'merge':'Wjets', 'treeName':'Events'},
   ]
   #Data
   diLepData=[
        #{'name':'DoubleMuon_Run2015B_17Jul2015', 'sample':DoubleMuon_Run2015B_17Jul2015, 'legendName':'Data', 'merge':'Data'},
-       {'name':'DoubleMuon_Run2015B_PromptReco', 'sample':DoubleMuon_Run2015B_PromptReco, 'legendName':'Data', 'selection':'diLep'},
+       {'name':'DoubleMuon_Run2015B_PromptReco', 'sample':DoubleMuon_Run2015B_PromptReco, 'legendName':'Data', 'selection':'diLep', 'treeName':'tree'},
        #{'name':'DoubleEG_Run2015B_17Jul2015', 'sample':DoubleEG_Run2015B_17Jul2015, 'legendName':'Data', 'merge':'Data'},
-       {'name':'DoubleEG_Run2015B_PromptReco', 'sample':DoubleEG_Run2015B_PromptReco, 'legendName':'Data', 'selection':'diLep'},
+       {'name':'DoubleEG_Run2015B_PromptReco', 'sample':DoubleEG_Run2015B_PromptReco, 'legendName':'Data', 'selection':'diLep', 'treeName':'tree'},
   ]
   singleLepData=[
        #{'name':'SingleMuon_Run2015B_17Jul2015', 'sample':SingleMuon_Run2015B_17Jul2015, 'legendName':'Data', 'merge':'singleLepData'},
-       {'name':'SingleMuon_Run2015B_PromptReco', 'sample':SingleMuon_Run2015B_PromptReco, 'legendName':'Data', 'selection':'singleLep'},
+       {'name':'SingleMuon_Run2015B_PromptReco', 'sample':SingleMuon_Run2015B_PromptReco, 'legendName':'Data', 'selection':'singleLep', 'treeName':'tree'},
        #{'name':'SingleElectron_Run2015B_17Jul2015', 'sample':SingleElectron_Run2015B_17Jul2015, 'legendName':'Data', 'merge':'singleLepData'},
-       {'name':'SingleElectron_Run2015B_PromptReco', 'sample':SingleElectron_Run2015B_PromptReco, 'legendName':'Data', 'selection':'singleLep'},
+       {'name':'SingleElectron_Run2015B_PromptReco', 'sample':SingleElectron_Run2015B_PromptReco, 'legendName':'Data', 'selection':'singleLep', 'treeName':'tree'},
   ]
 
   maxN=1 if small else -1
   
   for sample in diLepBkg+singleLepBkg+diLepData+singleLepData:
-    sample['chain'] = getChain(sample['sample'],histname='',treeName='Events')
+    sample['chain'] = getChain(sample['sample'],histname='',treeName=sample['treeName'])
   
 #  for sample in diLepBkg+singleLepBkg:
 #    sample['weight'] = getWeight(sample['sample'], sample['nEvents'], targetLumi)
@@ -73,12 +72,12 @@ if bunchCrossing == '25ns':
   targetLumi = 3000 #pb-1
   #Bkg chains 
   diLepBkg=[
-            {'name':'TTJets_25ns', 'sample':TTJets_25ns, 'legendName':'t#bar{t}+jets', 'selection':'diLep', 'color':ROOT.kBlue-2, 'weight':'weight'},
-            {'name':'DY_25ns', 'sample':DY_25ns, 'legendName':'DY' , 'selection':'diLep', 'color':ROOT.kRed-6, 'weight':'weight'},
+  #          {'name':'TTJets_25ns', 'sample':TTJets_25ns, 'legendName':'t#bar{t}+jets', 'selection':'diLep', 'color':ROOT.kBlue-2, 'weight':'weight'},
+            {'name':'DY_25ns', 'sample':DY_25ns, 'legendName':'DY' , 'selection':'diLep', 'color':ROOT.kRed-6, 'weight':'weight', 'treeName':'Events'},
   ]
 
   singleLepBkg=[
-                {'name':'WJetsHTToLNu_25ns', 'sample':WJetsHTToLNu_25ns, 'legendName':'W+jets', 'selection':'singleLep', 'color':ROOT.kGreen-2, 'weight':'weight'},
+                {'name':'WJetsHTToLNu_25ns', 'sample':WJetsHTToLNu_25ns, 'legendName':'W+jets', 'selection':'singleLep', 'color':ROOT.kGreen-2, 'weight':'weight', 'treeName':'Events'},
   ]
 #  #Data
 #  diLepData=[
@@ -95,7 +94,7 @@ if bunchCrossing == '25ns':
 #  ]
 
   for sample in diLepBkg+singleLepBkg:#+diLepData+singleLepData:
-    sample['chain'] = getChain(sample['sample'],histname='') 
+    sample['chain'] = getChain(sample['sample'],histname='',treeName=sample['treeName']) 
 
 #Signal chains
 #allSignals=[
@@ -128,13 +127,15 @@ htreg = [(200,-1)]#,(750,1000),(1000,1250),(1250,-1)]
 njreg = [(2,-1)]
 btb = [(0,0)]
 #diMuonic = '(Sum$(abs(LepGood_pdgId)==13&&LepGood_pt[0]>=25&&LepGood_pt[1]>=20&&abs(LepGood_eta)<2.4&&LepGood_miniRelIso<0.2&&LepGood_mediumMuonId==1&&LepGood_sip3d<4.0&&((LepGood_charge[0]+LepGood_charge[1])==0))==2)'
-diMuonic = '(Sum$(abs(genLep_pdgId)==13&&genLep_pt[0]>=25&&genLep_pt[1]>=20&&abs(genLep_eta)<2.4&&abs(genLep_motherId)==23&&((genLep_charge[0]+genLep_charge[1])==0))==2)'
+diMuonic = '((Sum$(abs(genLep_pdgId)==13&&abs(genLep_motherId)==23)==2)&&ngenLep==2)'
 #diElectronic = "(Sum$(abs(LepGood_pdgId)==11&&LepGood_pt[0]>=25&&LepGood_pt[1]>=20&&abs(LepGood_eta)<2.4&&LepGood_miniRelIso<0.1&&"+ele_MVAID_cutstr_tight+"&&LepGood_lostHits==0&&LepGood_convVeto&&LepGood_sip3d<4.0&&((LepGood_charge[0]+LepGood_charge[1])==0))==2)"
-diElectronic = "(Sum$(abs(genLep_pdgId)==11&&genLep_pt[0]>=25&&genLep_pt[1]>=20&&abs(genLep_eta)<2.4&&abs(genLep_motherId)==23&&((genLep_charge[0]+genLep_charge[1])==0))==2)"
+diElectronic = "((Sum$(abs(genLep_pdgId)==11&&abs(genLep_motherId)==23)==2)&&ngenLep==2)"
 #singleMuonic = '(Sum$(abs(LepGood_pdgId)==13&&LepGood_pt>=25&&abs(LepGood_eta)<2.4&&LepGood_miniRelIso<0.2&&LepGood_mediumMuonId==1&&LepGood_sip3d<4.0)==1)'
-singleMuonic = '(Sum$(abs(genLep_pdgId)==13&&abs(genLep_motherId)==24&&genLep_pt>=25&&abs(genLep_eta)<2.4)==1)'
+singleMuonic = '(Sum$(abs(genLep_pdgId)==13&&abs(genLep_motherId)==24)==1)'
+#singleMuonic = '(Sum$(genLep_pdgId==13&&genLep_motherId==(-24)&&genLep_pt>=25&&abs(genLep_eta)<2.4)==1)'
 #singleElectronic = "(Sum$(abs(LepGood_pdgId)==11&&LepGood_pt>=25&&abs(LepGood_eta)<2.4&&LepGood_miniRelIso<0.1&&"+ele_MVAID_cutstr_tight+"&&LepGood_lostHits==0&&LepGood_convVeto&&LepGood_sip3d<4.0)==1)"
-singleElectronic = "(Sum$(abs(genLep_pdgId)==11&&abs(genLep_motherId)==24&&genLep_pt>=25&&abs(genLep_eta)<2.4)==1)"
+singleElectronic = "(Sum$(abs(genLep_pdgId)==11&&abs(genLep_motherId)==24)==1)"
+#singleElectronic = "(Sum$(genLep_pdgId==11&&genLep_motherId==(-24)&&genLep_pt>=25&&abs(genLep_eta)<2.4)==1)"
 diLepPresel = '('+diMuonic+'||'+diElectronic+')'
 singleLepPresel = '('+singleMuonic+'||'+singleElectronic+')'
 preprefix = 'ZtoWclosure_MCstudy'
@@ -216,29 +217,103 @@ def getZdPhi(c):
   dPhi = acos((lepPt+nuPt*cos(lepPhi-nuPhi))/sqrt(lepPt**2+nuPt**2+2*lepPt*nuPt*cos(lepPhi-nuPhi)))
   return dPhi
 
+def getZLp(c):
+  lepPt = c.GetLeaf('LepGood_pt').GetValue(1)
+  lepPhi = c.GetLeaf('LepGood_phi').GetValue(1)
+  nuPt = c.GetLeaf('LepGood_pt').GetValue(0)
+  nuPhi = c.GetLeaf('LepGood_phi').GetValue(0)
+  Lp = (lepPt/sqrt(lepPt**2+nuPt**2+2*lepPt*nuPt*cos(lepPhi-nuPhi)))*((lepPt+nuPt*cos(lepPhi-nuPhi))/sqrt(lepPt**2+nuPt**2+2*lepPt*nuPt*cos(lepPhi-nuPhi)))
+  return Lp
+
 def getGenZdPhi(c):
-#  a=randint(0,1)
-  #if a:
-    #subleading lepton becomes neutrino
-    #lepPt = c.GetLeaf('genLep_pt').GetValue(0)
-    #lepPhi = c.GetLeaf('genLep_phi').GetValue(0)
-    #nuPt = c.GetLeaf('genLep_pt').GetValue(1)
-    #nuPhi = c.GetLeaf('genLep_phi').GetValue(1)
-  #else:
+  lepton1 = getObjDict(sample['chain'], 'genLep_', ['pt','eta','phi','mass','pdgId','motherId'], 0)
+  lepton2 = getObjDict(sample['chain'], 'genLep_', ['pt','eta','phi','mass','pdgId','motherId'], 1)
+  if lepton1['pt'] > lepton2['pt']:
+    leadLep = lepton1
+    subLep = lepton2
+  else:
+    leadLep = lepton2
+    subLep = lepton1
   #leading lepton becomes neutrino
+  nuPt = leadLep['pt']
+  nuPhi = leadLep['phi']
+  lepPt = subLep['pt']
+  lepPhi = subLep['phi']  
+  dPhi = acos((lepPt+nuPt*cos(lepPhi-nuPhi))/sqrt(lepPt**2+nuPt**2+2*lepPt*nuPt*cos(lepPhi-nuPhi)))
+  return dPhi
+
+def getGenZPt(c):
+  leadLepPt = c.GetLeaf('genLep_pt').GetValue(0)
+  leadLepPhi = c.GetLeaf('genLep_phi').GetValue(0)
+  subLepPt = c.GetLeaf('genLep_pt').GetValue(1)
+  subLepPhi = c.GetLeaf('genLep_phi').GetValue(1)
+  Zpt = sqrt(leadLepPt**2+subLepPt**2+2*leadLepPt*subLepPt*cos(leadLepPhi-subLepPhi))
+  return Zpt
+
+def getGenZLp(c):
+  lepton1 = getObjDict(sample['chain'], 'genLep_', ['pt','eta','phi','mass','pdgId','motherId'], 0)
+  lepton2 = getObjDict(sample['chain'], 'genLep_', ['pt','eta','phi','mass','pdgId','motherId'], 1)
+  if lepton1['pt'] > lepton2['pt']:
+    leadLep = lepton1
+    subLep = lepton2
+  else:
+    leadLep = lepton2
+    subLep = lepton1
+  #leading lepton becomes neutrino
+  nuPt = leadLep['pt']
+  nuPhi = leadLep['phi']
+  lepPt = subLep['pt']
+  lepPhi = subLep['phi']
+  Lp = (lepPt/sqrt(lepPt**2+nuPt**2+2*lepPt*nuPt*cos(lepPhi-nuPhi)))*((lepPt+nuPt*cos(lepPhi-nuPhi))/sqrt(lepPt**2+nuPt**2+2*lepPt*nuPt*cos(lepPhi-nuPhi)))
+  return Lp
+
+def getGenZEta(c):
+  leadLep = ROOT.TLorentzVector()
+  subLep = ROOT.TLorentzVector()
+  Z = ROOT.TLorentzVector()
+  leadLepPt = c.GetLeaf('genLep_pt').GetValue(0)
+  leadLepEta = c.GetLeaf('genLep_eta').GetValue(0)
+  leadLepPhi = c.GetLeaf('genLep_phi').GetValue(0)
+  leadLepMass = c.GetLeaf('genLep_mass').GetValue(0)
+  subLepPt = c.GetLeaf('genLep_pt').GetValue(1)
+  subLepEta = c.GetLeaf('genLep_eta').GetValue(1)
+  subLepPhi = c.GetLeaf('genLep_phi').GetValue(1)
+  subLepMass = c.GetLeaf('genLep_mass').GetValue(1)
+  leadLep.SetPtEtaPhiM(leadLepPt,leadLepEta,leadLepPhi,leadLepMass)
+  subLep.SetPtEtaPhiM(subLepPt,subLepEta,subLepPhi,subLepMass)
+  Z = leadLep + subLep
+  return Z.Eta()
+
+def getGenZ(c):
+  leadLep = ROOT.TLorentzVector()
+  subLep = ROOT.TLorentzVector()
+  Z = ROOT.TLorentzVector()
+  leadLepPt = c.GetLeaf('genLep_pt').GetValue(0)
+  leadLepEta = c.GetLeaf('genLep_eta').GetValue(0)
+  leadLepPhi = c.GetLeaf('genLep_phi').GetValue(0)
+  leadLepMass = c.GetLeaf('genLep_mass').GetValue(0)
+  subLepPt = c.GetLeaf('genLep_pt').GetValue(1)
+  subLepEta = c.GetLeaf('genLep_eta').GetValue(1)
+  subLepPhi = c.GetLeaf('genLep_phi').GetValue(1)
+  subLepMass = c.GetLeaf('genLep_mass').GetValue(1)
+#  leadX = leadLepPt * cos(leadLepPhi)
+#  leadY = leadLepPt * sin(leadLepPhi)
+#  leadZ = leadLepPt * sinh(leadLepEta)
+#  subX = subLepPt * cos(subLepPhi)
+#  subY = subLepPt * sin(subLepPhi)
+#  subZ = subLepPt * sinh(subLepEta)
+#  cosdPhi = (leadX*subX + leadY*subY + leadZ*subZ)/(sqrt(leadX**2 + leadY**2 + leadZ**2) * sqrt(subX**2 + subY**2 + subZ**2))
+  leadLep.SetPtEtaPhiM(leadLepPt,leadLepEta,leadLepPhi,leadLepMass)
+  subLep.SetPtEtaPhiM(subLepPt,subLepEta,subLepPhi,subLepMass)
+  Z = leadLep + subLep
+  return leadLepPt 
+
+def getGenZptRatio(c):
   lepPt = c.GetLeaf('genLep_pt').GetValue(1)
   lepPhi = c.GetLeaf('genLep_phi').GetValue(1)
   nuPt = c.GetLeaf('genLep_pt').GetValue(0)
   nuPhi = c.GetLeaf('genLep_phi').GetValue(0)
-  #metPt = c.GetLeaf('met_genPt').GetValue()
-  #metPhi = c.GetLeaf('met_genPhi').GetValue()
-  #metCorrX = metPt*cos(metPhi) + nuPt*cos(nuPhi)
-  #metCorrY = metPt*sin(metPhi) + nuPt*sin(nuPhi)
-  #metCorrPt = sqrt(metCorrX**2 + metCorrY**2)
-  #metCorrPhi = atan2(metCorrY,metCorrX)
-  #dPhi = acos((lepPt+metCorrPt*cos(lepPhi-metCorrPhi))/sqrt(lepPt**2+metCorrPt**2+2*lepPt*metCorrPt*cos(lepPhi-metCorrPhi)))
-  dPhi = acos((lepPt+nuPt*cos(lepPhi-nuPhi))/sqrt(lepPt**2+nuPt**2+2*lepPt*nuPt*cos(lepPhi-nuPhi)))
-  return dPhi
+  return (lepPt/sqrt(lepPt**2+nuPt**2+2*lepPt*nuPt*cos(lepPhi-nuPhi)))
 
 def getWdPhi(c):
   lepPt = c.GetLeaf('LepGood_pt').GetValue(0)
@@ -248,6 +323,14 @@ def getWdPhi(c):
   dPhi = acos((lepPt+metPt*cos(lepPhi-metPhi))/sqrt(lepPt**2+metPt**2+2*lepPt*metPt*cos(lepPhi-metPhi)))
   return dPhi
 
+def getWLp(c):
+  lepPt = c.GetLeaf('LepGood_pt').GetValue(0)
+  lepPhi = c.GetLeaf('LepGood_phi').GetValue(0)
+  metPt = c.GetLeaf('met_pt').GetValue()
+  metPhi = c.GetLeaf('met_phi').GetValue()
+  Lp = (lepPt/sqrt(lepPt**2+metPt**2+2*lepPt*metPt*cos(lepPhi-metPhi)))*((lepPt+metPt*cos(lepPhi-metPhi))/sqrt(lepPt**2+metPt**2+2*lepPt*metPt*cos(lepPhi-metPhi)))
+  return Lp
+
 def getGenWdPhi(c):
   lepPt = c.GetLeaf('genLep_pt').GetValue(0)
   lepPhi = c.GetLeaf('genLep_phi').GetValue(0)
@@ -255,6 +338,81 @@ def getGenWdPhi(c):
   metPhi = c.GetLeaf('met_genPhi').GetValue()
   dPhi = acos((lepPt+metPt*cos(lepPhi-metPhi))/sqrt(lepPt**2+metPt**2+2*lepPt*metPt*cos(lepPhi-metPhi)))
   return dPhi
+
+def getGenWPt(c):
+  lepPt = c.GetLeaf('genLep_pt').GetValue(0)
+  lepPhi = c.GetLeaf('genLep_phi').GetValue(0)
+  metPt = c.GetLeaf('met_genPt').GetValue()
+  metPhi = c.GetLeaf('met_genPhi').GetValue()
+  Wpt = sqrt(lepPt**2+metPt**2+2*lepPt*metPt*cos(lepPhi-metPhi))
+  return Wpt
+
+def getGenWLp(c):
+  lepPt = c.GetLeaf('genLep_pt').GetValue(0)
+  lepPhi = c.GetLeaf('genLep_phi').GetValue(0)
+  metPt = c.GetLeaf('met_genPt').GetValue()
+  metPhi = c.GetLeaf('met_genPhi').GetValue()
+  Lp = (lepPt/sqrt(lepPt**2+metPt**2+2*lepPt*metPt*cos(lepPhi-metPhi)))*((lepPt+metPt*cos(lepPhi-metPhi))/sqrt(lepPt**2+metPt**2+2*lepPt*metPt*cos(lepPhi-metPhi)))
+  return Lp
+ 
+def getGenWEta(c):
+  genPartAll = [getObjDict(c, 'genPartAll_', ['pt','eta','phi','mass','pdgId','motherId'], j) for j in range(int(c.GetLeaf('ngenPartAll').GetValue()))]
+  neutrino = filter(lambda n:abs(n['pdgId']) in [12,14], genPartAll)
+  nuFromW = filter(lambda w:abs(w['motherId'])==24, neutrino)
+  if len(nuFromW)>0:
+    if len(nuFromW)>1: print 'this should not have happened'
+    if abs(nuFromW[0]['pdgId'])-abs(c.GetLeaf('genLep_pdgId').GetValue(0))>1.: print 'this should not have happened'
+    leadLep = ROOT.TLorentzVector()
+    nu = ROOT.TLorentzVector()
+    W = ROOT.TLorentzVector()
+    leadLepPt = c.GetLeaf('genLep_pt').GetValue(0)
+    leadLepEta = c.GetLeaf('genLep_eta').GetValue(0)
+    leadLepPhi = c.GetLeaf('genLep_phi').GetValue(0)
+    leadLepMass = c.GetLeaf('genLep_mass').GetValue(0)
+    nuPt = nuFromW[0]['pt']
+    nuEta = nuFromW[0]['eta']
+    nuPhi = nuFromW[0]['phi']
+    nuMass = nuFromW[0]['mass']
+    #print nuPt, c.GetLeaf('met_genPt').GetValue()
+    leadLep.SetPtEtaPhiM(leadLepPt,leadLepEta,leadLepPhi,leadLepMass)
+    nu.SetPtEtaPhiM(nuPt,nuEta,nuPhi,nuMass)
+    W = leadLep + nu
+    return W.Eta()
+
+def getGenWptRatio(c):
+  lepPt = c.GetLeaf('genLep_pt').GetValue(0)
+  lepPhi = c.GetLeaf('genLep_phi').GetValue(0)
+  metPt = c.GetLeaf('met_genPt').GetValue()
+  metPhi = c.GetLeaf('met_genPhi').GetValue()
+  return (lepPt/sqrt(lepPt**2+metPt**2+2*lepPt*metPt*cos(lepPhi-metPhi)))
+
+def getGenW(c):
+  genPartAll = [getObjDict(c, 'genPartAll_', ['pt','eta','phi','mass','pdgId','motherId'], j) for j in range(int(c.GetLeaf('ngenPartAll').GetValue()))]
+  neutrino = filter(lambda n:abs(n['pdgId']) in [12,14], genPartAll)
+  nuFromW = filter(lambda w:abs(w['motherId'])==24, neutrino)
+  if len(nuFromW)>0:
+    if len(nuFromW)>1: print 'this should not have happened'
+    if abs(nuFromW[0]['pdgId'])-abs(c.GetLeaf('genLep_pdgId').GetValue(0))>1.: print 'this should not have happened'
+    leadLep = ROOT.TLorentzVector()
+    nu = ROOT.TLorentzVector()
+    W = ROOT.TLorentzVector()
+    lepPt = c.GetLeaf('genLep_pt').GetValue(0)
+    lepEta = c.GetLeaf('genLep_eta').GetValue(0)
+    lepPhi = c.GetLeaf('genLep_phi').GetValue(0)
+    lepMass = c.GetLeaf('genLep_mass').GetValue(0)
+    nuPt = nuFromW[0]['pt']
+    nuEta = nuFromW[0]['eta']
+    nuPhi = nuFromW[0]['phi']
+    nuMass = nuFromW[0]['mass']
+#    leadLep.SetPtEtaPhiM(lepPt,lepEta,lepPhi,lepMass)
+#    nu.SetPtEtaPhiM(nuPt,nuEta,nuPhi,nuMass)
+#    W = leadLep + nu
+#  if lepPt < nuPt:
+#    return Pt
+#  else:
+#    return nuPt
+    dPhi = acos((lepPt+nuPt*cos(lepPhi-nuPhi))/sqrt(lepPt**2+nuPt**2+2*lepPt*nuPt*cos(lepPhi-nuPhi)))
+    return dPhi
 
 def getleadingJet(c):
   jets = cmgGetJets(c,ptMin=30,etaMax=2.4)
@@ -266,15 +424,6 @@ def getsecondJet(c):
   Jet1 = jets[1]['pt']
   return Jet1
 
-def getdPhiMetJet(c):
-  jets = cmgGetJets(c,ptMin=30,etaMax=2.4)
-  met = c.GetLeaf('met_pt').GetValue()
-  metPhi = c.GetLeaf('met_phi').GetValue()
-  JetPt = jets[0]['pt']
-  JetPhi = jets[0]['phi']
-#  dPhi = acos((met*JetPt*cos(metPhi-JetPhi))/(met*JetPt))
-  dPhi = deltaPhi(metPhi,JetPhi)
-  return dPhi
 
 diLepVariables = []
 
@@ -282,7 +431,8 @@ diLepmet = {'name':'mymet', 'varString':"met_pt", 'legendName':'#slash{E}_{T}', 
 diLepht = {'name':'myht', 'varFunc':getHt, 'legendName':'H_{T}', 'Ytitle':'# of Events / 25GeV', 'binning':[64,0,1600]}
 diLepLt = {'name':'mylt', 'varFunc':getLt, 'legendName':'L_{T}', 'Ytitle':'# of Events / 25GeV', 'binning':[64,0,1600]}
 diLepnJets = {'name':'mynJets', 'varFunc':getNJets, 'legendName':'Jets', 'Ytitle':'# of Events', 'binning':[17,-0.5,16.5]}
-diLepdPhi = {'name':'mydeltaPhi', 'varFunc':getGenZdPhi, 'legendName':'#Delta#Phi(W,l)','binning':[30,0,pi], 'Ytitle':'# of Events'}#, 'binningIsExplicit':True}
+diLepdPhi = {'name':'mydeltaPhi', 'varFunc':getGenZdPhi, 'legendName':'#Delta#Phi(Boson,l)','binning':[30,0,pi], 'Ytitle':'# of Events'}#, 'binningIsExplicit':True}
+diLepLp = {'name':'myLp', 'varFunc':getGenZLp, 'legendName':'L_{P}', 'Ytitle':'# of Events', 'binning':[60,-2.5,3.5]}
 diLeplMomentum = {'name':'myleptonPt', 'varFunc':getLeadLep, 'legendName':'p_{T}(lead. l)', 'Ytitle':'# of Events / 25GeV', 'binning':[40,0,1000]}
 diLepZmomentum = {'name':'myZPt', 'varFunc':getZPt, 'legendName':'p_{T}(Z)', 'Ytitle':'# of Events / 25GeV', 'binning':[40,0,1000]}
 diLepZphi = {'name':'myZPhi', 'varFunc':getZPhi, 'legendName':'#phi(Z)', 'Ytitle':'# of Events', 'binning':[40,-pi,pi]}
@@ -290,12 +440,13 @@ diLepinvMassVar = {'name':'myInvMass', 'varFunc':getInvMass, 'legendName':'m_{ll
 diLepleadingJet = {'name':'myleadingJet', 'varFunc':getleadingJet, 'legendName':'p_{T}(leading Jet)', 'Ytitle':'# of Events / 50GeV', 'binning':[32,0,1600]}
 diLepsecondJet = {'name':'mysecondJet', 'varFunc':getsecondJet, 'legendName':'p_{T}(J_{2})', 'Ytitle':'# of Events / 50GeV', 'binning':[32,0,1600]}
 #diLepBJets = {'name':'mynBJets', 'varString':'nBJetMediumCMVA30', 'legendName':'B Jets', 'Ytitle':'# of Events', 'binning':[17,-0.5,16.5]}
+diVar = {'name':'myVar', 'varFunc':getGenZdPhi, 'legendName':'L_{P}', 'Ytitle':'# of Events', 'binning':[30,0,pi]}
 
 #diLepVariables.append(met)
 #diLepVariables.append(ht)
 #diLepVariables.append(Lt)
 #diLepVariables.append(nJets)
-diLepVariables.append(diLepdPhi)
+diLepVariables.append(diVar)
 #diLepVariables.append(lMomentum)
 #diLepVariables.append(Zmomentum)
 #diLepVariables.append(Zphi)
@@ -318,12 +469,13 @@ singleLepinvMassVar = {'name':'myInvMass', 'varFunc':getInvMass, 'legendName':'m
 singleLepleadingJet = {'name':'myleadingJet', 'varFunc':getleadingJet, 'legendName':'p_{T}(leading Jet)', 'Ytitle':'# of Events / 50GeV', 'binning':[32,0,1600]}
 singleLepsecondJet = {'name':'mysecondJet', 'varFunc':getsecondJet, 'legendName':'p_{T}(J_{2})', 'Ytitle':'# of Events / 50GeV', 'binning':[32,0,1600]}
 #singleLepnBJets = {'name':'mynBJets', 'varString':'nBJetMediumCMVA30', 'legendName':'B Jets', 'Ytitle':'# of Events', 'binning':[17,-0.5,16.5]}
+singleVar = {'name':'myVar', 'varFunc':getGenW, 'legendName':'L_{P}', 'Ytitle':'# of Events', 'binning':[30,0,pi]}
 
 #singleLepVariables.append(met)
 #singleLepVariables.append(ht)
 #singleLepVariables.append(Lt)
 #singleLepVariables.append(nJets)
-singleLepVariables.append(singleLepdPhi)
+singleLepVariables.append(singleVar)
 #singleLepVariables.append(lMomentum)
 #singleLepVariables.append(Zmomentum)
 #singleLepVariables.append(Zphi)
@@ -368,8 +520,8 @@ for i_htb, htb in enumerate(htreg):
               histos['diLep'][sample['name']][var['name']] = ROOT.TH1F(sample['name']+'_'+var['name']+'_diLep', sample['name']+'_'+var['name']+'_diLep', *var['binning'])
             histos['diLep'][sample['name']][var['name']].Reset()
             
-          diLepNamestr = nameAndCut(None, None, srNJet, btb=None, presel=diLepPresel, btagVar = 'nBJetMediumCMVA30')[0]
-          diLepCut = diLepPresel+'&&'+nJetCut(srNJet, minPt=30, maxEta=2.4)+'&&'+nBTagCut(b, minPt=30, maxEta=2.4, minCSVTag=0.890)#+'&&'+htCut(htb, minPt=30, maxEta=2.4, njCorr=0.)#+'&&'+nJetCut(2, minPt=30, maxEta=2.4)
+          diLepNamestr, diLepCut = nameAndCut(None, None, None, btb=None, presel=diLepPresel)
+          #diLepCut = diLepPresel#+'&&'+nJetCut(srNJet, minPt=30, maxEta=2.4)+'&&'+nBTagCut(b, minPt=30, maxEta=2.4, minCSVTag=0.890)#+'&&'+htCut(htb, minPt=30, maxEta=2.4, njCorr=0.)#+'&&'+nJetCut(2, minPt=30, maxEta=2.4)
 
           sample["chain"].Draw(">>eList",diLepCut) #Get the event list 'eList' which has all the events satisfying the cut
           elist = ROOT.gDirectory.Get("eList")
@@ -387,23 +539,29 @@ for i_htb, htb in enumerate(htreg):
             #Lt = getLt(sample['chain'])
             #if Lt<stb[0]: continue
             #if stb[1]>0 and Lt>stb[1]: continue
-            weight = 1           
+
+#            Lp = getGenZLp(sample['chain'])
+#            reweight = LpInformation[0]['BinContent']
+#            for bin in LpInformation:
+#              if Lp > bin['BinLowEdge']: 
+#                reweight = bin['BinContent']
+            weight = 1
             if sample.has_key('weight'):
               if type(sample['weight'])==type(''):
                 sampleWeight = getVarValue(sample['chain'], sample['weight'])
-                weight = (sampleWeight/sampleLumi)*targetLumi
+                weight = (sampleWeight/sampleLumi)*targetLumi# * (1./reweight)
               else:
                 genWeight = sample['chain'].GetLeaf('genWeight').GetValue()
                 weight = sample['weight'] * genWeight
 #            if sample.has_key('merge'):
 #              if sample['merge']=='Data':
-            dPhi = getGenZdPhi(sample['chain'])
-            if dPhi<1.0:
-              deltaPhi['diLep']['lowDP'] += weight
-              deltaPhi['diLep']['lowDPvar'] += weight*weight
-            else:
-              deltaPhi['diLep']['highDP'] += weight
-              deltaPhi['diLep']['highDPvar'] += weight*weight
+#            dPhi = getGenZdPhi(sample['chain'])
+#            if dPhi<1.0:
+#              deltaPhi['diLep']['lowDP'] += weight
+#              deltaPhi['diLep']['lowDPvar'] += weight*weight
+#            else:
+#              deltaPhi['diLep']['highDP'] += weight
+#              deltaPhi['diLep']['highDPvar'] += weight*weight
             for var in diLepVariables:
               assert (var.has_key('varString') or var.has_key('varFunc')), "Error: Did not specify 'varString' or 'varFunc' for var %s" % repr(var)
               assert not (var.has_key('varString') and var.has_key('varFunc')), "Error: Specified both 'varString' and 'varFunc' for var %s" % repr(var)
@@ -421,8 +579,8 @@ for i_htb, htb in enumerate(htreg):
               histos['singleLep'][sample['name']][var['name']] = ROOT.TH1F(sample['name']+'_'+var['name']+'_singleLep', sample['name']+'_'+var['name']+'_singleLep', *var['binning'])
             histos['singleLep'][sample['name']][var['name']].Reset()
             
-          singleLepNamestr = nameAndCut(None, None, srNJet, btb=None, presel=singleLepPresel, btagVar = 'nBJetMediumCMVA30')[0]
-          singleLepCut = singleLepPresel+'&&'+nJetCut(srNJet, minPt=30, maxEta=2.4)+'&&'+nBTagCut(b, minPt=30, maxEta=2.4, minCSVTag=0.890)#+'&&'+htCut(htb, minPt=30, maxEta=2.4, njCorr=0.)#+'&&'+nJetCut(2, minPt=30, maxEta=2.4)
+          singleLepNamestr,singleLepCut = nameAndCut(None, None, None, btb=None, presel=singleLepPresel)
+          #singleLepCut = singleLepPresel#+'&&'+nJetCut(srNJet, minPt=30, maxEta=2.4)+'&&'+nBTagCut(b, minPt=30, maxEta=2.4, minCSVTag=0.890)#+'&&'+htCut(htb, minPt=30, maxEta=2.4, njCorr=0.)#+'&&'+nJetCut(2, minPt=30, maxEta=2.4)
 
           sample["chain"].Draw(">>eList",singleLepCut) #Get the event list 'eList' which has all the events satisfying the cut
           elist = ROOT.gDirectory.Get("eList")
@@ -448,13 +606,13 @@ for i_htb, htb in enumerate(htreg):
               else:
                 genWeight = sample['chain'].GetLeaf('genWeight').GetValue()
                 weight = sample['weight'] * genWeight
-            dPhi = getGenWdPhi(sample['chain'])
-            if dPhi<1.0:
-              deltaPhi['singleLep']['lowDP'] += weight
-              deltaPhi['singleLep']['lowDPvar'] += weight*weight
-            else:
-              deltaPhi['singleLep']['highDP'] += weight
-              deltaPhi['singleLep']['highDPvar'] += weight*weight
+#            dPhi = getGenWdPhi(sample['chain'])
+#            if dPhi<1.0:
+#              deltaPhi['singleLep']['lowDP'] += weight
+#              deltaPhi['singleLep']['lowDPvar'] += weight*weight
+#            else:
+#              deltaPhi['singleLep']['highDP'] += weight
+#              deltaPhi['singleLep']['highDPvar'] += weight*weight
             for var in singleLepVariables:
               assert (var.has_key('varString') or var.has_key('varFunc')), "Error: Did not specify 'varString' or 'varFunc' for var %s" % repr(var)
               assert not (var.has_key('varString') and var.has_key('varFunc')), "Error: Specified both 'varString' and 'varFunc' for var %s" % repr(var)
@@ -468,13 +626,13 @@ for i_htb, htb in enumerate(htreg):
           #      histos[sample['name']][var['name']].Scale(histos['TTJets'][var['name']].Integral()/histos[sample['name']][var['name']].Integral())
 
         #plotting
-        canvas = ROOT.TCanvas('deltaPhi_closure','deltaPhi_closure')
-        pad1 = ROOT.TPad('deltaPhi_Pad','deltaPhi_Pad',0.,0.3,1.,1.)
+        canvas = ROOT.TCanvas('closure','closure')
+        pad1 = ROOT.TPad('Pad','Pad',0.,0.3,1.,1.)
         pad1.SetBottomMargin(0.01)
         pad1.SetLogy()
         pad1.Draw()
         pad1.cd()
-        l = ROOT.TLegend(0.65,0.85,0.98,0.95)
+        l = ROOT.TLegend(0.8,0.85,0.98,0.95)
         l.SetFillColor(0)
         l.SetBorderSize(1)
         l.SetShadowColor(ROOT.kWhite)
@@ -485,71 +643,71 @@ for i_htb, htb in enumerate(htreg):
         text.SetTextAlign(11) 
 
         if bunchCrossing=='50ns':
-          histo_diLep = histos['diLep']['DY_50ns']['mydeltaPhi'].Clone()
-          histo_diLep.Add(histos['diLep']['TTJets_50ns']['mydeltaPhi'])
+          histo_diLep = histos['diLep']['DY_50ns']['myVar'].Clone()
+          #histo_diLep.Add(histos['diLep']['TTJets_50ns']['myVar'])
           wjetsStr = 'WJetsToLNu_50ns'
         elif bunchCrossing=='25ns':
-          histo_diLep = histos['diLep']['DY_25ns']['mydeltaPhi'].Clone()
-          histo_diLep.Add(histos['diLep']['TTJets_25ns']['mydeltaPhi'])
+          histo_diLep = histos['diLep']['DY_25ns']['myVar'].Clone()
+          #histo_diLep.Add(histos['diLep']['TTJets_25ns']['myVar'])
           wjetsStr = 'WJetsHTToLNu_25ns'
         histo_diLep.SetLineColor(ROOT.kBlue)
         histo_diLep.SetLineStyle(7)
         histo_diLep.SetLineWidth(2)
         histo_diLep.SetMarkerStyle(0)
-        histo_diLep.GetXaxis().SetTitle('#Delta#Phi(W,l)')
+        histo_diLep.GetXaxis().SetTitle('#Delta#Phi')
         histo_diLep.GetYaxis().SetTitle('# of Events')# / '+ str( (var['binning'][2] - var['binning'][1])/var['binning'][0])+'GeV')
         histo_diLep.GetXaxis().SetLabelSize(0.04)
         histo_diLep.GetYaxis().SetLabelSize(0.04)
-        l.AddEntry(histo_diLep,'(Z+t#bar{t})#rightarrow W')
+        l.AddEntry(histo_diLep,'Z #rightarrow W')
         histo_diLep.Draw('hist e')
-        histo_diLep.SetMinimum(10**(-1))
+        histo_diLep.SetMinimum(0.08)
         histo_diLep.SetMaximum(100*histo_diLep.GetMaximum())
 
-        histos['singleLep'][wjetsStr]['mydeltaPhi'].SetLineColor(ROOT.kRed)
-        histos['singleLep'][wjetsStr]['mydeltaPhi'].SetLineWidth(2)
-        histos['singleLep'][wjetsStr]['mydeltaPhi'].SetMarkerStyle(0)
-        histos['singleLep'][wjetsStr]['mydeltaPhi'].GetXaxis().SetTitle('#Delta#Phi(W,l)')
-        histos['singleLep'][wjetsStr]['mydeltaPhi'].GetYaxis().SetTitle('# of Events')# / '+ str( (var['binning'][2] - var['binning'][1])/var['binning'][0])+'GeV')
-        histos['singleLep'][wjetsStr]['mydeltaPhi'].GetXaxis().SetLabelSize(0.04)
-        histos['singleLep'][wjetsStr]['mydeltaPhi'].GetYaxis().SetLabelSize(0.04)
-        l.AddEntry(histos['singleLep'][wjetsStr]['mydeltaPhi'],'W+jets')
-        histos['singleLep'][wjetsStr]['mydeltaPhi'].Draw('hist same e')
-        histos['singleLep'][wjetsStr]['mydeltaPhi'].SetMinimum(10**(-1))
-        histos['singleLep'][wjetsStr]['mydeltaPhi'].SetMaximum(100*histos['singleLep'][wjetsStr]['mydeltaPhi'].GetMaximum())
+        histos['singleLep'][wjetsStr]['myVar'].SetLineColor(ROOT.kRed)
+        histos['singleLep'][wjetsStr]['myVar'].SetLineWidth(2)
+        histos['singleLep'][wjetsStr]['myVar'].SetMarkerStyle(0)
+        histos['singleLep'][wjetsStr]['myVar'].GetXaxis().SetTitle('#Delta#Phi')
+        histos['singleLep'][wjetsStr]['myVar'].GetYaxis().SetTitle('# of Events')# / '+ str( (var['binning'][2] - var['binning'][1])/var['binning'][0])+'GeV')
+        histos['singleLep'][wjetsStr]['myVar'].GetXaxis().SetLabelSize(0.04)
+        histos['singleLep'][wjetsStr]['myVar'].GetYaxis().SetLabelSize(0.04)
+        l.AddEntry(histos['singleLep'][wjetsStr]['myVar'],'W+jets')
+        histos['singleLep'][wjetsStr]['myVar'].Draw('hist same e')
+        histos['singleLep'][wjetsStr]['myVar'].SetMinimum(0.08)
+        histos['singleLep'][wjetsStr]['myVar'].SetMaximum(100*histos['singleLep'][wjetsStr]['myVar'].GetMaximum())
         l.Draw()
         
-        if deltaPhi['diLep']['lowDP']>0:
-          rcsDiLep = float(deltaPhi['diLep']['highDP'])/float(deltaPhi['diLep']['lowDP'])
-          if deltaPhi['diLep']['highDP']>0:
-            rcsE_sim_DiLep = rcsDiLep*sqrt(float(deltaPhi['diLep']['lowDPvar'])/float(deltaPhi['diLep']['lowDP'])**2+float(deltaPhi['diLep']['highDPvar'])/float(deltaPhi['diLep']['highDP'])**2)
-            rcsE_pred_DiLep = rcsDiLep*sqrt(1./deltaPhi['diLep']['lowDP']+1./deltaPhi['diLep']['highDP'])
-          else:
-            rcsDiLep=float('nan')
-            rcsE_pred_DiLep=float('nan')
-            rcsE_sim_DiLep=float('nan')
-        else:
-          rcsDiLep=float('nan')
-          rcsE_pred_DiLep=float('nan')
-          rcsE_sim_DiLep=float('nan')
-        if deltaPhi['singleLep']['lowDP']>0:
-          rcsSingleLep = float(deltaPhi['singleLep']['highDP'])/float(deltaPhi['singleLep']['lowDP'])
-          if deltaPhi['singleLep']['highDP']>0:
-            rcsE_sim_SingleLep = rcsSingleLep*sqrt(float(deltaPhi['singleLep']['lowDPvar'])/float(deltaPhi['singleLep']['lowDP'])**2+float(deltaPhi['singleLep']['highDPvar'])/float(deltaPhi['singleLep']['highDP'])**2)
-            rcsE_pred_SingleLep = rcsSingleLep*sqrt(1./deltaPhi['singleLep']['lowDP']+1./deltaPhi['singleLep']['highDP'])
-          else:
-            rcsSingleLep=float('nan')
-            rcsE_pred_SingleLep=float('nan')
-            rcsE_sim_SingleLep=float('nan')
-        else:
-          rcsSingleLep=float('nan')
-          rcsE_pred_SingleLep=float('nan')
-          rcsE_sim_SingleLep=float('nan')
-        rCStext = ROOT.TLatex()
-        rCStext.SetNDC()
-        rCStext.SetTextSize(0.035)
-        rCStext.SetTextAlign(11)
-        rCStext.DrawLatex(0.20,0.88,'#bf{R^{Z#rightarrow W}_{CS} = '+str(round(rcsDiLep,4))+'#pm'+str(round(rcsE_sim_DiLep,4))+'}')
-        rCStext.DrawLatex(0.20,0.82,'#bf{R^{W}_{CS} = '+str(round(rcsSingleLep,4))+'#pm'+str(round(rcsE_sim_SingleLep,4))+'}')
+#        if deltaPhi['diLep']['lowDP']>0:
+#          rcsDiLep = float(deltaPhi['diLep']['highDP'])/float(deltaPhi['diLep']['lowDP'])
+#          if deltaPhi['diLep']['highDP']>0:
+#            rcsE_sim_DiLep = rcsDiLep*sqrt(float(deltaPhi['diLep']['lowDPvar'])/float(deltaPhi['diLep']['lowDP'])**2+float(deltaPhi['diLep']['highDPvar'])/float(deltaPhi['diLep']['highDP'])**2)
+#            rcsE_pred_DiLep = rcsDiLep*sqrt(1./deltaPhi['diLep']['lowDP']+1./deltaPhi['diLep']['highDP'])
+#          else:
+#            rcsDiLep=float('nan')
+#            rcsE_pred_DiLep=float('nan')
+#            rcsE_sim_DiLep=float('nan')
+#        else:
+#          rcsDiLep=float('nan')
+#          rcsE_pred_DiLep=float('nan')
+#          rcsE_sim_DiLep=float('nan')
+#        if deltaPhi['singleLep']['lowDP']>0:
+#          rcsSingleLep = float(deltaPhi['singleLep']['highDP'])/float(deltaPhi['singleLep']['lowDP'])
+#          if deltaPhi['singleLep']['highDP']>0:
+#            rcsE_sim_SingleLep = rcsSingleLep*sqrt(float(deltaPhi['singleLep']['lowDPvar'])/float(deltaPhi['singleLep']['lowDP'])**2+float(deltaPhi['singleLep']['highDPvar'])/float(deltaPhi['singleLep']['highDP'])**2)
+#            rcsE_pred_SingleLep = rcsSingleLep*sqrt(1./deltaPhi['singleLep']['lowDP']+1./deltaPhi['singleLep']['highDP'])
+#          else:
+#            rcsSingleLep=float('nan')
+#            rcsE_pred_SingleLep=float('nan')
+#            rcsE_sim_SingleLep=float('nan')
+#        else:
+#          rcsSingleLep=float('nan')
+#          rcsE_pred_SingleLep=float('nan')
+#          rcsE_sim_SingleLep=float('nan')
+#        rCStext = ROOT.TLatex()
+#        rCStext.SetNDC()
+#        rCStext.SetTextSize(0.035)
+#        rCStext.SetTextAlign(11)
+#        rCStext.DrawLatex(0.20,0.88,'#bf{R^{Z#rightarrow W}_{CS} = '+str(round(rcsDiLep,4))+'#pm'+str(round(rcsE_sim_DiLep,4))+'}')
+#        rCStext.DrawLatex(0.20,0.82,'#bf{R^{W}_{CS} = '+str(round(rcsSingleLep,4))+'#pm'+str(round(rcsE_sim_SingleLep,4))+'}')
   
         text.DrawLatex(0.15,.96,"CMS #bf{#it{Preliminary}}")
         text.DrawLatex(0.67,0.96,"#bf{L="+str(targetLumi)+" pb^{-1} (13 TeV)}")
@@ -571,7 +729,7 @@ for i_htb, htb in enumerate(htreg):
         #histo_diLepDummy = histo_diLep.Clone()
         #histo_diLepDummy.Scale(1./histo_diLep.Integral())
         #h_ratio['deltaPhi'].Add(histo_diLepDummy,-1.)
-        histo_dummy = histos['singleLep'][wjetsStr]['mydeltaPhi'].Clone()
+        histo_dummy = histos['singleLep'][wjetsStr]['myVar'].Clone()
         histo_dummy.Scale(1./histo_dummy.Integral())
         h_ratio['deltaPhi'].Divide(histo_dummy)
         h_ratio['deltaPhi'].SetMarkerStyle(20)
@@ -579,7 +737,7 @@ for i_htb, htb in enumerate(htreg):
         h_ratio['deltaPhi'].SetLineStyle(1)
         h_ratio['deltaPhi'].SetLineWidth(1)
         h_ratio['deltaPhi'].Draw("ep")
-        h_ratio['deltaPhi'].GetXaxis().SetTitle('#Delta#Phi(W,l)')
+        h_ratio['deltaPhi'].GetXaxis().SetTitle('#Delta#Phi')
         h_ratio['deltaPhi'].GetYaxis().SetTitle("Z/W")
         h_ratio['deltaPhi'].GetYaxis().SetNdivisions(505)
         h_ratio['deltaPhi'].GetYaxis().SetTitleSize(23)
@@ -596,180 +754,35 @@ for i_htb, htb in enumerate(htreg):
         h_ratio['deltaPhi'].GetXaxis().SetLabelSize(20)
         h_ratio['deltaPhi'].GetXaxis().SetLabelOffset(0.04)
           
-#        canvas.cd()
-#        canvas.Print(wwwDir+namestr+'_'+var['name']+'.png')
-#        canvas.Print(wwwDir+namestr+'_'+var['name']+'.root')
-#        canvas.Print(wwwDir+namestr+'_'+var['name']+'.pdf')
-#        canvas.Clear()
+        canvas.cd()
+        canvas.Print(wwwDir+'genLevel_1stLepNu_Z-Wclosure_dPhi.png')
+        canvas.Print(wwwDir+'genLevel_1stLepNu_Z-Wclosure_dPhi.root')
+        canvas.Print(wwwDir+'genLevel_1stLepNu_Z-Wclosure_dPhi.pdf')
+        canvas.Clear()
 
-        canvas2 = ROOT.TCanvas('deltaPhi_normalization','deltaPhi_normalization')
-        p1 = ROOT.TPad('deltaPhiNorm_Pad','deltaPhiNorm_Pad',0.,0.,1.,1.)
+        canvas2 = ROOT.TCanvas('normalization','normalization')
+        canvas2.SetLogy()
+        p1 = ROOT.TPad('norm_Pad','norm_Pad',0.,0.,1.,1.)
         p1.Draw()
         p1.cd()
 
-        h_ratio['deltaPhiNormDiLep'] = histo_diLep.Clone()
-        h_ratio['deltaPhiNormDiLep'].Sumw2()
-        h_ratio['deltaPhiNormDiLep'].SetMinimum(0)
-        h_ratio['deltaPhiNormDiLep'].SetMaximum(0.3)
-        h_ratio['deltaPhiNormDiLep'].Scale(1./h_ratio['deltaPhiNormDiLep'].Integral())
+        h_ratio['normDiLep'] = histo_diLep.Clone()
+        h_ratio['normDiLep'].Sumw2()
+        h_ratio['normDiLep'].SetMinimum(0.0008)
+        h_ratio['normDiLep'].SetMaximum(0.3)
+        h_ratio['normDiLep'].Scale(1./h_ratio['normDiLep'].Integral())
         
-        h_ratio['deltaPhiNormDiLep'].Draw('hist e')
+        h_ratio['normDiLep'].Draw('hist e')
         histo_dummy.Draw('hist e same')
-        h_ratio['deltaPhiNormDiLep'].GetXaxis().SetTitle('#Delta#Phi(W,l)')
-        h_ratio['deltaPhiNormDiLep'].GetYaxis().SetTitle('a.u.')
+        h_ratio['normDiLep'].GetXaxis().SetTitle('#Delta#Phi')
+        h_ratio['normDiLep'].GetYaxis().SetTitle('a.u.')
         l.Draw()
         text.DrawLatex(0.15,.96,"CMS #bf{#it{Preliminary}}")
         text.DrawLatex(0.67,0.96,"#bf{L="+str(targetLumi)+" pb^{-1} (13 TeV)}")
 
-#        canvas2.cd()
-#        canvas2.Print(wwwDir+namestr+'deltaPhi_NormPlot.root')
-#        canvas2.Print(wwwDir+namestr+'deltaPhi_NormPlot.pdf')
-#        canvas2.Print(wwwDir+namestr+'deltaPhi_NormPlot.png')
-#        canvas2.Clear()
+        canvas2.cd()
+        canvas2.Print(wwwDir+'genLevel_1stLepNu_Z-Wclosure_normalized_dPhi.root')
+        canvas2.Print(wwwDir+'genLevel_1stLepNu_Z-Wclosure_normalized_dPhi.pdf')
+        canvas2.Print(wwwDir+'genLevel_1stLepNu_Z-Wclosure_normalized_dPhi.png')
+        canvas2.Clear()
 
-#          #Define and stack the histograms...
-#        for var in diLepVariables+singleLepVariables:
-#          canvas = ROOT.TCanvas(var['name']+'_Window',var['name']+'_Window')
-#          pad1 = ROOT.TPad(var['name']+'_Pad',var['name']+'_Pad',0.,0.3,1.,1.)
-#          pad1.SetBottomMargin(0.01)
-#          pad1.SetLogy()
-#          pad1.Draw()
-#          pad1.cd()
-#          l = ROOT.TLegend(0.65,0.8,0.98,0.95)
-#          l.SetFillColor(0)
-#          l.SetBorderSize(1)
-#          l.SetShadowColor(ROOT.kWhite)
-#          stack = ROOT.THStack('stack','Stacked Histograms')
-# 
-#          text = ROOT.TLatex()
-#          text.SetNDC()
-#          text.SetTextSize(0.045)
-#          text.SetTextAlign(11) 
-#
-#          if var.has_key('binningIsExplicit') and var['binningIsExplicit']:
-#            histos['mergeDY'][var['name']] = ROOT.TH1F('merge_'+var['name'],'merge_'+var['name'], len(var['binning'])-1, array('d', var['binning']))
-#          else:
-#            histos['mergeDY'][var['name']] = ROOT.TH1F('merge_'+var['name'],'merge_'+var['name'], *var['binning'])
-#          histos['mergeDY'][var['name']].Reset()
-# 
-#          for sample in allBkg:
-#            histos[sample['name']][var['name']].SetLineColor(ROOT.kBlack)
-#            histos[sample['name']][var['name']].SetFillColor(sample['color'])
-#            histos[sample['name']][var['name']].SetMarkerStyle(0)
-#            histos[sample['name']][var['name']].GetXaxis().SetTitle(var['legendName'])
-#            histos[sample['name']][var['name']].GetYaxis().SetTitle(var['Ytitle'])# / '+ str( (var['binning'][2] - var['binning'][1])/var['binning'][0])+'GeV')
-#            histos[sample['name']][var['name']].GetXaxis().SetLabelSize(0.04)
-#            histos[sample['name']][var['name']].GetYaxis().SetLabelSize(0.04)
-#            if sample.has_key('merge'):
-#              if sample['merge']=='DY_HTbinned':
-#                histos['mergeDY'][var['name']].Add(histos[sample['name']][var['name']])
-#                stack.Add(histos['mergeDY'][var['name']])
-#                l.AddEntry(histos['mergeDY'][var['name']].sample['legendName'],'f')
-#              else:
-#                stack.Add(histos[sample['name']][var['name']])
-#                l.AddEntry(histos[sample['name']][var['name']], sample['legendName'],'f')
-#         
-#          stack.Draw('hist')
-#          stack.GetXaxis().SetTitle(var['legendName'])
-#          stack.GetYaxis().SetTitle(var['Ytitle'])# / '+ str( (var['binning'][2] - var['binning'][1])/var['binning'][0])+'GeV')
-#          stack.SetMinimum(10**(-2))
-#          stack.SetMaximum(100*stack.GetMaximum())
-#
-#          if var.has_key('binningIsExplicit') and var['binningIsExplicit']:
-#            histos['data'][var['name']] = ROOT.TH1F('data_'+var['name'],'data_'+var['name'], len(var['binning'])-1, array('d', var['binning']))   
-#          else:
-#            histos['data'][var['name']] = ROOT.TH1F('data_'+var['name'],'data_'+var['name'], *var['binning'])   
-#          histos['data'][var['name']].Reset()
-#          for extra in data:
-#            histos['data'][var['name']].Add(histos[extra['name']][var['name']])
-#          histos['data'][var['name']].SetMarkerStyle(20)
-#          histos['data'][var['name']].Draw('same E')
-#          l.AddEntry(histos['data'][var['name']],extra['legendName'])
-#         
-#  #        for sig in allSignals:
-#  #          histos[sig['name']][var['name']].SetLineColor(sig['color'])
-#  #          histos[sig['name']][var['name']].SetLineWidth(2)
-#  #          histos[sig['name']][var['name']].SetFillColor(0)
-#  #          histos[sig['name']][var['name']].SetMarkerStyle(0)
-#  #          histos[sig['name']][var['name']].Draw('same')
-#  #          l.AddEntry(histos[sig['name']][var['name']], sig['name'])
-#         
-#          l.Draw()
-#          if var.has_key('name'):
-#            if var['name'] == 'mydeltaPhi':
-#              if lowDP>0:
-#                rcs = float(highDP)/float(lowDP)
-#                if highDP>0:
-#                  rcsE_sim = rcs*sqrt(float(lowDPvar)/float(lowDP)**2+float(highDPvar)/float(highDP)**2)
-#                  rcsE_pred = rcs*sqrt(1./lowDP+1./highDP)
-#                else:
-#                  rcs=float('nan')
-#                  rcsE_pred=float('nan')
-#                  rcsE_sim=float('nan')
-#              else:
-#                rcs=float('nan')
-#                rcsE_pred=float('nan')
-#                rcsE_sim=float('nan')
-#              rCStext = ROOT.TLatex()
-#              rCStext.SetNDC()
-#              rCStext.SetTextSize(0.035)
-#              rCStext.SetTextAlign(11)
-#              rCStext.DrawLatex(0.20,0.88,'#bf{R_{CS} = '+str(round(rcs,4))+'#pm'+str(round(rcsE_sim,4))+'}')
-#  
-#          text.DrawLatex(0.15,.96,"CMS #bf{#it{Preliminary}}")
-#          text.DrawLatex(0.67,0.96,"#bf{L="+str(targetLumi)+" pb^{-1} (13 TeV)}")
-#          
-#          canvas.cd()
-#          pad2 = ROOT.TPad(var['name']+" Ratio",var['name']+" Ratio",0.,0.,1.,0.3)
-#          pad2.SetTopMargin(0.01)
-#          pad2.SetBottomMargin(0.3)
-#          pad2.SetGrid()
-#          pad2.Draw()
-#          pad2.cd()
-#          
-#          if var.has_key('binningIsExplicit') and var['binningIsExplicit']:
-#            histo_merge = ROOT.TH1F(var['name']+"_Ratio",var['name']+"_Ratio", len(var['binning'])-1, array('d', var['binning']))
-#          else:
-#            histo_merge = ROOT.TH1F(var['name']+"_Ratio",var['name']+"_Ratio", *var['binning'])
-#          histo_merge.Merge(stack.GetHists())
-#           
-##          first = True
-##          for sample in data:
-##            if first:
-#          h_ratio[var['name']] = histos['data'][var['name']].Clone()
-##            else:
-##              h_ratio[var['name']].Add(histos[sample['name']][var['name']])
-##            first = False
-##            h_ratio[var['name']].SetLineColor(sig['color'])
-##            h_ratio[var['name']].SetLineWidth(2)
-#          h_ratio[var['name']].SetMinimum(-1)
-#          h_ratio[var['name']].SetMaximum(3.4)
-#          h_ratio[var['name']].Sumw2()
-#          h_ratio[var['name']].SetStats(0)
-#          h_ratio[var['name']].Divide(histo_merge)
-#          h_ratio[var['name']].SetMarkerStyle(20)
-#          h_ratio[var['name']].Draw("ep")
-#          h_ratio[var['name']].GetXaxis().SetTitle(var['legendName'])
-#          h_ratio[var['name']].GetYaxis().SetTitle("Data/MC")
-#          h_ratio[var['name']].GetYaxis().SetNdivisions(505)
-#          h_ratio[var['name']].GetYaxis().SetTitleSize(23)
-#          h_ratio[var['name']].GetYaxis().SetTitleFont(43)
-#          h_ratio[var['name']].GetYaxis().SetTitleOffset(1.8)
-#          h_ratio[var['name']].GetYaxis().SetLabelFont(43)
-#          h_ratio[var['name']].GetYaxis().SetLabelSize(20)
-#          h_ratio[var['name']].GetYaxis().SetLabelOffset(0.015)
-#          h_ratio[var['name']].GetXaxis().SetNdivisions(510)
-#          h_ratio[var['name']].GetXaxis().SetTitleSize(23)
-#          h_ratio[var['name']].GetXaxis().SetTitleFont(43)
-#          h_ratio[var['name']].GetXaxis().SetTitleOffset(3.4)
-#          h_ratio[var['name']].GetXaxis().SetLabelFont(43)
-#          h_ratio[var['name']].GetXaxis().SetLabelSize(20)
-#          h_ratio[var['name']].GetXaxis().SetLabelOffset(0.04)
-#            
-#          canvas.cd()
-#          canvas.Print(wwwDir+namestr+'_'+var['name']+'.png')
-#          canvas.Print(wwwDir+namestr+'_'+var['name']+'.root')
-#          canvas.Print(wwwDir+namestr+'_'+var['name']+'.pdf')
-#          canvas.Clear()
-##          for sample in allBkg:
-##            del histos[sample['name']][var['name']]
