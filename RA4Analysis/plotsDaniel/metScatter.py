@@ -10,7 +10,8 @@ from array import array
 from Workspace.HEPHYPythonTools.helpers import *
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2_HT400ST150_withDF import *
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
-from Workspace.RA4Analysis.cmgTuplesPostProcessed_Spring15_hard import *
+#from Workspace.RA4Analysis.cmgTuplesPostProcessed_Spring15_hard import *
+from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_postProcessed import *
 
 from Workspace.RA4Analysis.helpers import *
 from Workspace.RA4Analysis.eventShape import *
@@ -90,7 +91,7 @@ def getZ(c):
 
 
 varstring="deltaPhi_Wl"
-plotDir='/afs/hephy.at/user/d/dspitzbart/www/Spring15/WjetScatterEnhancedStatHighDPhi/'
+plotDir='/afs/hephy.at/user/d/dspitzbart/www/Spring15/25ns/WjetScatter/'
 
 if not os.path.exists(plotDir):
   os.makedirs(plotDir)
@@ -106,8 +107,8 @@ c = getChain(WJetsHTToLNu[lepSel],histname='')
 #c.Add('/data/rschoefbeck/data/rschoefbeck/pat_240614/*.root')
 
 
-stReg=[(350,450)]#,(350,450),(450,-1)]#,(350,450),(450,-1)]
-htReg=[(750,1000)]#,(1000,-1)]#,(1250,-1)]#,(1250,-1)]
+stReg=[(250,350),(350,450),(450,-1)]#,(350,450),(450,-1)]
+htReg=[(500,750),(750,1000),(1000,-1)]#,(1250,-1)]#,(1250,-1)]
 jetReg = [(2,2),(3,3),(4,4),(5,5),(6,7),(8,-1)]#,(8,-1)]#,(6,-1)]#,(8,-1)]#,(6,-1),(8,-1)]
 btb = (0,0)
 
@@ -174,7 +175,7 @@ for st in stReg:
         #print dPhi
         if met > 0.:
           points.append(ROOT.TGraph())
-          if dPhi>1.:# and dPhiJetMet>0.45:# and metPt>100.:# and dPhiJetMet<0.9:
+          if dPhi>0.:# and dPhiJetMet>0.45:# and metPt>100.:# and dPhiJetMet<0.9:
             totWeight += weight
             if fakeMet/met>1.:# and fakeMet<50.:
               low+=weight

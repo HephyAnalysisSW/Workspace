@@ -6,6 +6,7 @@ from Workspace.RA4Analysis.helpers import *# nameAndCut, nJetBinName, nBTagBinNa
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2_HT400_withDF import *
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v6_Phys14V2_HT400ST150_withDF import *
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
+#from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_postProcessed import *
 from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_postProcessed import *
 from rCShelpers import *
 import math
@@ -20,13 +21,13 @@ maxN = -1 if not small else 1
 lepSel = 'hard'
 
 cWJets  = getChain(WJetsHTToLNu_25ns,histname='',maxN=maxN)
-cTTJets = getChain(TTJets_25ns,histname='',maxN=maxN)
+cTTJets = getChain(TTJets_LO_25ns,histname='',maxN=maxN)
 #cTTJets = getChain(ttJets[lepSel],histname='',maxN=maxN)
 #cBkg    = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], QCD[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]],histname='')
 
 from Workspace.HEPHYPythonTools.user import username
 uDir = username[0]+'/'+username
-subDir = 'Spring15/rCSforAN/preselectionWithFiltersAFMCut'
+subDir = 'Spring15/25ns/rCS/presel/'
 #subDir = 'pngCMG2/rCS/PHYS14V3/useRecoMet'
 
 path = '/afs/hephy.at/user/'+uDir+'/www/'+subDir+'/'
@@ -77,8 +78,8 @@ l_H     = ngNuEFromW+"+"+ngNuMuFromW+"==1&&"+ngNuTauFromW+"==0"
 #presel='singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&Flag_EcalDeadCellTriggerPrimitiveFilter&&acos(cos(Jet_phi[0]-met_phi))>0.45&&acos(cos(Jet_phi[1]-met_phi))>0.45'
 
 presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&Jet_pt[1]>80&&st>250&&nJet30>2&&htJet30j>500&&nBJetMediumCSV30==0"
-presel = presel + '&&Flag_EcalDeadCellTriggerPrimitiveFilter&&Flag_eeBadScFilter&&Flag_goodVertices&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFilter'
-presel = presel + '&acos(cos(Jet_phi[0]-met_phi))>0.45&&acos(cos(Jet_phi[1]-met_phi))>0.45'
+#presel = presel + '&&Flag_EcalDeadCellTriggerPrimitiveFilter&&Flag_eeBadScFilter&&Flag_goodVertices&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFilter'
+#presel = presel + '&acos(cos(Jet_phi[0]-met_phi))>0.45&&acos(cos(Jet_phi[1]-met_phi))>0.45'
 
 prefix = presel.split('&&')[0]+'_'
 
@@ -136,6 +137,10 @@ prefix = presel.split('&&')[0]+'_'
 
 #1D and 2D plots of RCS
 
+print
+print 'Computing Rcs values now ...'
+print
+
 h_nj_pos = {}
 h_nj_neg = {}
 h_nj = {}
@@ -153,6 +158,8 @@ for lep, pdgId in channels:
   h_2d[lep] = {}
   rcsDict[lep] = {}
   for name, c in [["W",cWJets],["tt", cTTJets] ]:# [["tt", cTTJets] , ["W",cWJets] ]:
+    print 'Using sample', name
+    print
     h_nj_pos[lep][name] = {}
     h_nj_neg[lep][name] = {}
     h_nj[lep][name] = {}
@@ -195,7 +202,7 @@ for lep, pdgId in channels:
             cut = cut+'&&abs(leptonPdg)=='+str(pdgId)
           poscut = 'leptonPdg>0&&'+cut
           negcut = 'leptonPdg<0&&'+cut
-          dPhiCut = dynDeltaPhi(1.0,stb, htb, njb)
+          dPhiCut = dynDeltaPhi(1.0,stb, htb, njb) #prints selection
           #if njb[1]<5 and njb[1]>0:
           #  dPhiJetMetCut = 0.6
           #else:
@@ -207,7 +214,7 @@ for lep, pdgId in channels:
           rcs = getRCS(c, cut, dPhiCut, useGenMet=GenMetSwitch, useOnlyGenMetPt=useOnlyGenMetPt, useOnlyGenMetPhi=useOnlyGenMetPhi, useWeight=True)
           rcsPos = getRCS(c, poscut, dPhiCut, useGenMet=GenMetSwitch, useOnlyGenMetPt=useOnlyGenMetPt, useOnlyGenMetPhi=useOnlyGenMetPhi, useWeight=True)
           rcsNeg = getRCS(c, negcut, dPhiCut, useGenMet=GenMetSwitch, useOnlyGenMetPt=useOnlyGenMetPt, useOnlyGenMetPhi=useOnlyGenMetPhi, useWeight=True)
-          print rcs, dPhiCut
+          print 'Results: Rcs:', round(rcs['rCS'],3), 'sim. Error:',round(rcs['rCSE_sim'],3)
           res = rcs['rCS']
           resErr = rcs['rCSE_sim']
           rcsDict[lep][name][stb][htb][njb] = {'PosPdg':rcsPos['rCS'], 'PosPdgE':rcsPos['rCSE_sim'], 'NegPdg':rcsNeg['rCS'], 'NegPdgE':rcsNeg['rCSE_sim'], 'AllPdg':res, 'AllPdgE':resErr}

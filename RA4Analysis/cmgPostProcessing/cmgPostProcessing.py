@@ -16,6 +16,7 @@ from Workspace.HEPHYPythonTools.helpers import getChunks
 from Workspace.RA4Analysis.cmgTuples_Spring15_25ns import *
 from Workspace.RA4Analysis.cmgTuples_Spring15_50ns import *
 from Workspace.RA4Analysis.cmgTuples_Data50ns_1l import *
+from Workspace.RA4Analysis.cmgTuples_Data25ns_0l import *
 target_lumi = 3000 #pb-1
 
 defSampleStr = "TTJets_25ns"
@@ -53,9 +54,9 @@ parser.add_option("--inputTreeName", dest="inputTreeName", default="treeProducer
 parser.add_option("--targetDir", dest="targetDir", default="/data/"+username+"/cmgTuples/"+subDir+'/', type="string", action="store", help="target directory.")
 parser.add_option("--skim", dest="skim", default="", type="string", action="store", help="any skim condition?")
 parser.add_option("--leptonSelection", dest="leptonSelection", default="hard", type="string", action="store", help="which lepton selection? 'soft', 'hard', 'none', 'dilep'?")
-
 parser.add_option("--small", dest="small", default = False, action="store_true", help="Just do a small subset.")
-#parser.add_option("--overwrite", dest="overwrite", action="store_true", help="Overwrite?", default=True)
+parser.add_option("--overwrite", dest="overwrite", default = False, action="store_true", help="Overwrite?")
+
 (options, args) = parser.parse_args()
 assert options.leptonSelection in ['soft', 'hard', 'none', 'dilep'], "Unknown leptonSelection: %s"%options.leptonSelection
 skimCond = "(1)"
@@ -110,6 +111,10 @@ for isample, sample in enumerate(allSamples):
   #chunks, nTotEvents = getChunksFromDPM(sample, options.inputTreeName)
 #  print "Chunks:" , chunks 
   outDir = options.targetDir+'/'+"/".join([options.skim, options.leptonSelection, sample['name']])
+  if os.path.exists(outDir) and os.listdir(outDir) != [] and not options.overwrite:
+    print "Found non-empty directory: %s -> skipping!"%outDir
+    continue
+
   tmpDir = outDir+'/tmp/'
   os.system('mkdir -p ' + outDir) 
   os.system('mkdir -p '+tmpDir)

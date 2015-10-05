@@ -433,16 +433,21 @@ def findClosestObject(jets, obj, sortFunc=lambda o1, o2: deltaR2(o1,o2)):
 #  return findClosestObject(c, getSoftIsolatedMu(c))['deltaR']
 
 def invMass(p1 , p2):
+  with_mass = False
+  if p1.has_key('mass') and p2.has_key('mass'):
+    with_mass = True
   pxp1 = p1['pt']*cos(p1['phi']) 
   pyp1 = p1['pt']*sin(p1['phi']) 
   pzp1 = p1['pt']*sinh(p1['eta'])
-  Ep1 = sqrt(pxp1**2 + pyp1**2 + pzp1**2)
-
   pxp2 = p2['pt']*cos(p2['phi'])
   pyp2 = p2['pt']*sin(p2['phi'])
   pzp2 = p2['pt']*sinh(p2['eta'])
-  Ep2 = sqrt(pxp2**2 + pyp2**2 + pzp2**2)
-
+  if with_mass:
+    Ep1 = sqrt(pxp1**2 + pyp1**2 + pzp1**2 + p1['mass']**2)
+    Ep2 = sqrt(pxp2**2 + pyp2**2 + pzp2**2 + p2['mass']**2)
+  else:
+    Ep1 = sqrt(pxp1**2 + pyp1**2 + pzp1**2)
+    Ep2 = sqrt(pxp2**2 + pyp2**2 + pzp2**2)
   return sqrt( (Ep1 + Ep2)**2 - (pxp1 + pxp2)**2 - (pyp1 + pyp2)**2 - (pzp1 + pzp2)**2)
 
 def KolmogorovDistance(s0, s1): #Kolmogorov distance from two list of values (unbinned, discrete)

@@ -2,7 +2,9 @@ import ROOT
 import os,sys
 from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain
 
-from Workspace.RA4Analysis.cmgTuplesPostProcessed_Spring15_hard import *
+#from Workspace.RA4Analysis.cmgTuplesPostProcessed_Spring15_hard import *
+from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_postProcessed import *
+
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName, nBTagBinName, varBinName, varBin
 from rCShelpers import *
 import math
@@ -14,13 +16,17 @@ maxN = -1 if not small else 1
 
 lepSel = 'hard'
 
-cWJets  = getChain(WJetsHTToLNu[lepSel],histname='',maxN=maxN)
-cTTJets = getChain(ttJets[lepSel],histname='',maxN=maxN)
-cEWK = getChain([WJetsHTToLNu[lepSel],ttJets[lepSel],singleTop[lepSel]],histname='')
+#cWJets  = getChain(WJetsHTToLNu[lepSel],histname='',maxN=maxN)
+#cTTJets = getChain(ttJets[lepSel],histname='',maxN=maxN)
+#cEWK = getChain([WJetsHTToLNu[lepSel],ttJets[lepSel],singleTop[lepSel]],histname='')
+
+cWJets  = getChain(WJetsHTToLNu_25ns,histname='',maxN=maxN)
+cTTJets = getChain(TTJets_LO_25ns,histname='',maxN=maxN)
+cEWK = getChain([WJetsHTToLNu_25ns,TTJets_LO_25ns,DY_25ns,singleTop_25ns],histname='')
 
 from Workspace.HEPHYPythonTools.user import username
 uDir = username[0]+'/'+username
-subDir = 'Spring15/rCS/firstPredictionNoDY_W3-4/'
+subDir = 'Spring15/rCS/25ns/rCS/btagFitMoreBins/'
 
 ### DEFINE SR
 signalRegions = signalRegion3fb
@@ -29,7 +35,7 @@ path = '/afs/hephy.at/user/'+uDir+'/www/'+subDir+'/'
 if not os.path.exists(path):
   os.makedirs(path)
 
-picklePath = '/data/'+username+'/Spring15/PredictionDPhiJetMetNoDY_W3-4/rCS_0b_3.0/'
+picklePath = '/data/'+username+'/Spring15/25ns/rCS_0b_3.0/'
 if not os.path.exists(picklePath):
   os.makedirs(picklePath)
 
@@ -41,17 +47,18 @@ ROOT.gStyle.SetOptStat(0)
 ROOT.TH1F().SetDefaultSumw2()
 
 btreg = (0,0)
-njreg = [(3,3),(4,4),(5,5),(6,7),(8,-1)]#,(7,7),(8,8),(9,9)]
+njreg = [(3,3),(4,4),(5,5),(6,6),(7,7),(8,8),(9,-1)]#,(7,7),(8,8),(9,9)]
 nbjreg = [(0,0),(1,1)]#,(2,2)]
 
 
-presel='singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&Flag_EcalDeadCellTriggerPrimitiveFilter&&acos(cos(Jet_phi[0]-met_phi))>0.45&&acos(cos(Jet_phi[1]-met_phi))>0.45'
+#presel='singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&Flag_EcalDeadCellTriggerPrimitiveFilter&&acos(cos(Jet_phi[0]-met_phi))>0.45&&acos(cos(Jet_phi[1]-met_phi))>0.45'
+presel='singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&Jet_pt[1]>80'
 
 #presel='singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80'
 prefix = presel.split('&&')[0]+'_'
 
-samples = [["tt", cTTJets] , ["W",cWJets]]
-#samples = [["W",cWJets]]
+#samples = [["tt", cTTJets] , ["W",cWJets]]
+samples = [["tt",cTTJets]]
 
 h_nbj = {}
 for name, c in samples:
@@ -123,16 +130,16 @@ for name, c in samples:
           text.SetTextAlign(11)
           text.DrawLatex(0.3,0.85,name+'+jets')
           text.DrawLatex(0.6,0.85,varBinName(htb, 'H_{T}'))
-          text.DrawLatex(0.6,0.8,varBinName(stb, 'S_{T}'))
+          text.DrawLatex(0.6,0.8,varBinName(stb, 'L_{T}'))
           h_nbj[name][srNJet][stb][htb][nbb].SetMinimum(0.)
           if name == 'tt':
             h_nbj[name][srNJet][stb][htb][nbb].SetMaximum(0.25)
             lowerFitBound = 1
-            upperFitBound = 5
+            upperFitBound = 7
           elif name == 'W':
             h_nbj[name][srNJet][stb][htb][nbb].SetMaximum(0.15)
             lowerFitBound = 0
-            upperFitBound = 5
+            upperFitBound = 7
           for a in range(lowerFitBound+1,upperFitBound+1):
             if h_nbj[name][srNJet][stb][htb][nbb].GetBinContent(a)<=0.:
               upperFitBound = a-1
