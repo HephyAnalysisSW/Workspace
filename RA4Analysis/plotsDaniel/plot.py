@@ -39,6 +39,7 @@ QCD = {'name':'QCD', 'chain':getChain(QCDHT_25ns,histname=''), 'color':color('QC
 #QCD = {'name':'QCD', 'chain':getChain(QCDEle_25ns,histname=''), 'color':color('QCD'),'weight':'weight', 'niceName':'QCD'}
 diBoson = {'name':'diBoson', 'chain':getChain(diBosons_25ns,histname=''), 'color':ROOT.kMagenta,'weight':'weight', 'niceName':'diboson'}
 samples = [WJETS, TTJetsLO, singleTop, DY, QCD]#, diBoson]
+samplesComp = [WJETS, TTJETS, singleTop, DY, QCD]
 
 # older samples
 #WJETS = {'name':'WJets', 'chain':getChain(WJetsHTToLNu[lepSel],histname=''), 'color':color('WJets'),'weight':'weight', 'niceName':'W Jets'}
@@ -211,18 +212,21 @@ stStrMetNoHF = 'Sum$((LepGood_pt+metNoHF_pt)*'+LeptonId+')'
 stStr = 'Sum$(LepGood_pt[0]+met_pt)'
 stStrSimple = 'Sum$(LepGood_pt[0]+metNoHF_pt)'
 htStr = 'Sum$(Jet_pt*(Jet_pt>30&&abs(Jet_eta)<2.4&&Jet_id))'
+btagStr = 'Sum$(Jet_pt>30&&abs(Jet_eta)<2.4&&Jet_id&&Jet_btagCSV>0.890)'
 
 htComp = {'name':htStr, 'binning':[52,500,3100], 'titleX':'H_{T} [GeV]', 'titleY':'Events'}
 stComp = {'name':stStr, 'binning':[37,250,2100], 'titleX':'L_{T} [GeV]', 'titleY':'Events'}
-
+nbjetComp = {'name':btagStr, 'binning':[6,0,6], 'titleX':'n_{b-jets}', 'titleY':'Events'}
 
 #datapresel = '('+singleMuonic+'||'+singleElectronic+')&&nJet30>2&&nBJetMedium30>=0&&'+htStr+'>500&&'+stStr+'>200'
-trigger = "&&((HLT_ElNoIso||HLT_EleHT350)||(HLT_MuHT350||HLT_Mu50NoIso))"
-filters = "&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFilterMinZeroPatched&&Flag_goodVertices&&Flag_eeBadScFilter"
+#trigger = "&&((HLT_ElNoIso||HLT_EleHT350)||(HLT_MuHT350||HLT_Mu50NoIso))"
+trigger = "&&((HLT_ElNoIso||HLT_EleHT350MET70)||(HLT_MuHT350MET70||HLT_Mu50NoIso))"
+filters = "&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFilterMinZeroPatched&&Flag_goodVertices&&Flag_eeBadScFilter"#&&Flag_EcalDeadCellTriggerPrimitiveFilter"
 
-datapresel = LeptonReq+'&&'+leptonVeto+'&&nJet30>=2&&nBJetMedium30>=0&&'+htStr+'>500&&'+stStr+'>250'+trigger+filters
-
-dataDict = {'chain':data, 'cut':datapresel,'name':'data'}
+#datapresel = LeptonReq+'&&'+leptonVeto+'&&nJet30>=2&&nBJetMedium30>=0&&'+htStr+'>500&&'+stStr+'>250'
+datapresel = LeptonReq+'&&'+leptonVeto+'&&nJet30>=2&&'+htStr+'>500&&'+stStr+'>250'
+datacut = datapresel+trigger+filters
+dataDict = {'chain':data, 'cut':datacut,'name':'data'}
 
 deltaPhiCMG_NoHF = {'binning': [30, 0, 3.2], 'name': 'Sum$((acos((LepGood_pt+metNoHF_pt*cos(LepGood_phi-metNoHF_phi))/sqrt(LepGood_pt**2+metNoHF_pt**2+2*metNoHF_pt*LepGood_pt*cos(LepGood_phi-metNoHF_phi))))*'+LeptonId+')', 'titleX': '#Delta#Phi(W,l) NoHF', 'titleY': 'Events'}
 deltaPhiCMG = {'binning': [32, 0, 3.2], 'name': 'Sum$((acos((LepGood_pt+met_pt*cos(LepGood_phi-met_phi))/sqrt(LepGood_pt**2+met_pt**2+2*met_pt*LepGood_pt*cos(LepGood_phi-met_phi))))*'+LeptonId+')', 'titleX': '#Delta#Phi(W,l) NoHF', 'titleY': 'Events'}
@@ -233,7 +237,7 @@ dataPlotList = [stComp, htComp, deltaPhiCMG, met, njet, leadingJetPt]
 #  t = plot(samples,leadingJetPt,newPreselCut, data=dataDict,filling=True,stacking=True,minimum=0.08, maximum=2000, MClumiScale=205./3000., setLogY=True, lumi=0.205, titleText='CMS preliminary')
 #  savePlot(t, d['titleX'])
 
-def plot(samples, variable, cuts, signals=False, data=False, maximum=False, minimum=0., stacking=False, filling=True, setLogY=False, setLogX=False, titleText='CMS simulation', lumi='3', legend=True, MClumiScale=1., drawError=False):
+def plot(samples, variable, cuts, signals=False, data=False, maximum=False, minimum=0., stacking=False, filling=True, setLogY=False, setLogX=False, titleText='simulation', lumi='3', legend=True, MClumiScale=1., drawError=False, MCscale=True):
   totalChain = ROOT.TChain('tree')
   for s in samples:
     totalChain.Add(s['chain'])
@@ -259,20 +263,20 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
   totalH = ROOT.TH1F('totalH', 'totalH', *variable['binning'])
   nsamples = len(samples)
   ncuts = len(cuts)
-  MCscale=1.
   if data:
     if data['cut']: dataCutString = data['cut']
     else: dataCutString = cuts[0]['string']
-    dataYield = getYieldFromChain(data['chain'],cutString=dataCutString,weight='(1)')
+    dataYield, dataYieldError = getYieldFromChain(data['chain'],cutString=dataCutString,weight='(1)', returnError=True)
   if ncuts == 1 and data and MCscale:
     #if data['cut']: dataCutString = data['cut']
     #else: dataCutString = cuts[0]['string']
     #dataYield = getYieldFromChain(data['chain'],cutString=dataCutString,weight='(1)')
-    MCYield = getYieldFromChain(totalChain,cutString=cuts[0]['string'],weight=str(MClumiScale)+'*''weight')
+    MCYield, MCYieldError = getYieldFromChain(totalChain,cutString=cuts[0]['string'],weight=str(MClumiScale)+'*''weight', returnError=True)
     print 'Yield Data:\t', dataYield
     print 'Yield MC:\t', MCYield
     MCscale = dataYield/MCYield
-    print 'Area normalization factor:',MCscale
+    MCscaleError = dataYield/MCYield*sqrt(MCYieldError**2/dataYield**2+dataYieldError**2/MCYield**2)
+    print 'Area normalization factor:',round(MCscale,3),'+/-',round(MCscaleError,3)
   else: MCscale=1.
   for isample, sample in enumerate(samples):
     for icut, cut in enumerate(cuts):
@@ -399,17 +403,20 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
     latex1.SetNDC()
     latex1.SetTextSize(0.04)
     latex1.SetTextAlign(11) # align right
-  if titleText: latex1.DrawLatex(0.15,0.96,titleText)
+  if titleText: latex1.DrawLatex(0.15,0.96,'CMS '+titleText)
+  if MCscale: latex1.DrawLatex(0.98-legendWidth,0.95-height-0.04,'MC~ scale:'+str(round(MCscale,3))+'\pm'+str(round(MCscaleError,3)))
   if lumi: latex1.DrawLatex(0.73,0.96,"L="+str(lumi)+"fb^{-1} (13TeV)")
   if legend: leg.Draw()
   can.Update()
   if stacking: return {'hist':h, 'canvas':can, 'legend':leg, 'stack':h_Stack, 'signals':s}
   else: return {'hist':h, 'canvas':can, 'legend':leg, 'signals':s}
 
-def savePlot(plotDict, path, fileType=['pdf','root','png']):
+def savePlot(plotDict, path, filename, fileType=['pdf','root','png']):
   wwwDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/'
+  if not os.path.exists(wwwDir+path):
+    os.makedirs(wwwDir+path)
   for t in fileType:
-    plotDict['canvas'].Print(wwwDir+path+'.'+t)
+    plotDict['canvas'].Print(wwwDir+path+filename+'.'+t)
 
 #plot(samples,st,cuts)
 

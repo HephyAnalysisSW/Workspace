@@ -128,3 +128,11 @@ def getNumString(n,ne, acc=2):    ##For printing table
   #if type(n) is str and type(ne) is str: 
   else:
     return n +'&$\pm$&'+ ne
+
+def getNumStringWithSyst(n,eSys, eStat, acc=2):    ##For printing table 
+  if type(n) is float and type(eSys) is float and type(eStat) is float:
+    return str(round(n,acc))+'&$\pm$&'+str(round(eSys,acc)) +'&$\pm$&'+str(round(eStat,acc))
+  #if type(n) is str and type(ne) is str: 
+  else:
+    return n +'&$\pm$&'+ eSys +'&$\pm$&'+ eStat
+

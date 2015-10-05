@@ -123,6 +123,37 @@ for srNJet in sorted(signalRegions):
       if htb[1] == -1 : print '\\cline{2-21}'
 print '\\hline\end{tabular}}\end{center}\caption{EFGH}\label{tab:0b_rcscorr_Wbkg}\end{table}'
 
+# W closure table with systematics
+#res = pickle.load(file(path+prefix+'_estimationResults_pkl_updated'))
+#multiplier = {(5,5):2, (6,7):3, (8,-1):4}
+print
+print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrrrr|rrr|rrrrr|rrr|rrrrr|rrr|}\\hline'
+print ' \\njet & \ST & \HT &\multicolumn{8}{c|}{$W+$ Jets}&\multicolumn{8}{c|}{$W-$ Jets}&\multicolumn{8}{c|}{$W$ Jets}\\\%\hline'
+print ' & $[$GeV$]$ &$[$GeV$]$&\multicolumn{5}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{5}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{5}{c}{prediction}&\multicolumn{3}{c|}{simulation} \\\\\hline'
+secondLine = False
+for srNJet in sorted(signalRegions):
+  print '\\hline'
+  if secondLine: print '\\hline'
+  secondLine = True
+  print '\multirow{'+str(rowsNJet[srNJet]['n'])+'}{*}{\\begin{sideways}$'+varBin(srNJet)+'$\end{sideways}}'
+  for stb in sorted(signalRegions[srNJet]):
+    print '&\multirow{'+str(rowsSt[srNJet][stb]['n'])+'}{*}{$'+varBin(stb)+'$}'
+    first = True
+    for htb in sorted(signalRegions[srNJet][stb]):
+      if not first: print '&'
+      first = False
+
+      print '&$'+varBin(htb)+'$'
+      print ' & '+getNumStringWithSyst(res[srNJet][stb][htb]['W_NegPdg_pred'], res[srNJet][stb][htb]['W_pred_errs_NegPdg']['syst'],res[srNJet][stb][htb]['W_pred_errs_NegPdg']['stat'])\
+           +' & '+getNumString(res[srNJet][stb][htb]['W_NegPdg_truth'], res[srNJet][stb][htb]['W_NegPdg_truth_err'])\
+           +' & '+getNumStringWithSyst(res[srNJet][stb][htb]['W_PosPdg_pred'], res[srNJet][stb][htb]['W_pred_errs_PosPdg']['syst'], res[srNJet][stb][htb]['W_pred_errs_PosPdg']['stat'])\
+           +' & '+getNumString(res[srNJet][stb][htb]['W_PosPdg_truth'], res[srNJet][stb][htb]['W_PosPdg_truth_err'])\
+           +' & '+getNumStringWithSyst(res[srNJet][stb][htb]['W_pred'], res[srNJet][stb][htb]['W_pred_errs']['syst'], res[srNJet][stb][htb]['W_pred_errs']['stat'])\
+           +' & '+getNumString(res[srNJet][stb][htb]['W_truth'],        res[srNJet][stb][htb]['W_truth_err']) +'\\\\'
+      if htb[1] == -1 : print '\\cline{2-27}'
+print '\\hline\end{tabular}}\end{center}\caption{EFGH}\label{tab:0b_rcscorr_Wbkg}\end{table}'
+
+
 
 print "Results"
 print

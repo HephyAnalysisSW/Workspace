@@ -15,6 +15,8 @@ small = False
 maxN = -1 if not small else 1
 
 lepSel = 'hard'
+useFits = False
+
 
 #cWJets  = getChain(WJetsHTToLNu[lepSel],histname='',maxN=maxN)
 #cTTJets = getChain(ttJets[lepSel],histname='',maxN=maxN)
@@ -26,7 +28,7 @@ cEWK = getChain([WJetsHTToLNu_25ns,TTJets_LO_25ns,DY_25ns,singleTop_25ns],histna
 
 from Workspace.HEPHYPythonTools.user import username
 uDir = username[0]+'/'+username
-subDir = 'Spring15/rCS/25ns/rCS/btagFitMoreBins/'
+subDir = 'Spring15/25ns/AN/btagMultiplicityTT_AltBinning'
 
 ### DEFINE SR
 signalRegions = signalRegion3fb
@@ -47,7 +49,7 @@ ROOT.gStyle.SetOptStat(0)
 ROOT.TH1F().SetDefaultSumw2()
 
 btreg = (0,0)
-njreg = [(3,3),(4,4),(5,5),(6,6),(7,7),(8,8),(9,-1)]#,(7,7),(8,8),(9,9)]
+njreg = [(4,5),(5,5),(6,7),(8,-1)]#,(7,7),(8,8),(9,9)]
 nbjreg = [(0,0),(1,1)]#,(2,2)]
 
 
@@ -140,34 +142,37 @@ for name, c in samples:
             h_nbj[name][srNJet][stb][htb][nbb].SetMaximum(0.15)
             lowerFitBound = 0
             upperFitBound = 7
-          for a in range(lowerFitBound+1,upperFitBound+1):
-            if h_nbj[name][srNJet][stb][htb][nbb].GetBinContent(a)<=0.:
-              upperFitBound = a-1
-              break
-          h_nbj[name][srNJet][stb][htb][nbb].Fit('pol0','','same',lowerFitBound,upperFitBound)
-          FitFunc     = h_nbj[name][srNJet][stb][htb][nbb].GetFunction('pol0')
-          FitPar      = FitFunc.GetParameter(0)
-          FitParError = FitFunc.GetParError(0)
-          FitFunc.SetLineColor(ROOT_colors[inbb])
-          FitFunc.SetLineStyle(2)
-          FitFunc.SetLineWidth(2)
-          FitParList.update({nbb:FitPar})
-          FitParErrorList.update({nbb:FitParError})
+          if useFits:
+            for a in range(lowerFitBound+1,upperFitBound+1):
+              if h_nbj[name][srNJet][stb][htb][nbb].GetBinContent(a)<=0.:
+                upperFitBound = a-1
+                break
+            h_nbj[name][srNJet][stb][htb][nbb].Fit('pol0','','same',lowerFitBound,upperFitBound)
+            FitFunc     = h_nbj[name][srNJet][stb][htb][nbb].GetFunction('pol0')
+            FitPar      = FitFunc.GetParameter(0)
+            FitParError = FitFunc.GetParError(0)
+            FitFunc.SetLineColor(ROOT_colors[inbb])
+            FitFunc.SetLineStyle(2)
+            FitFunc.SetLineWidth(2)
+            FitParList.update({nbb:FitPar})
+            FitParErrorList.update({nbb:FitParError})
           if first:
             first = False
             h_nbj[name][srNJet][stb][htb][nbb].Draw()
           else:
             h_nbj[name][srNJet][stb][htb][nbb].Draw('same')
-          correctionFactors[name][srNJet][stb][htb][nbb] = {'FitPar':FitPar, 'FitParError':FitParError}
-          FitFunc.Draw("same")
-        FitRatio = FitParList[(0,0)]/FitParList[(1,1)]
-        FitRatioError = FitRatio*sqrt((FitParErrorList[(0,0)]/FitParList[(0,0)])**2+(FitParErrorList[(1,1)]/FitParList[(1,1)])**2)
-        correctionFactors[name][srNJet][stb][htb].update({'FitRatio':FitRatio, 'FitRatioError':FitRatioError})
-        Etext=ROOT.TLatex()
-        Etext.SetNDC()
-        Etext.SetTextSize(0.04)
-        Etext.SetTextAlign(11)
-        Etext.DrawLatex(0.18,0.75,'Fit(0b/1b)='+str(round(FitRatio,3))+'#pm'+str(round(FitRatioError,4)))
+          if useFits:
+            correctionFactors[name][srNJet][stb][htb][nbb] = {'FitPar':FitPar, 'FitParError':FitParError}
+            FitFunc.Draw("same")
+        if useFits:
+          FitRatio = FitParList[(0,0)]/FitParList[(1,1)]
+          FitRatioError = FitRatio*sqrt((FitParErrorList[(0,0)]/FitParList[(0,0)])**2+(FitParErrorList[(1,1)]/FitParList[(1,1)])**2)
+          correctionFactors[name][srNJet][stb][htb].update({'FitRatio':FitRatio, 'FitRatioError':FitRatioError})
+          Etext=ROOT.TLatex()
+          Etext.SetNDC()
+          Etext.SetTextSize(0.04)
+          Etext.SetTextAlign(11)
+          Etext.DrawLatex(0.18,0.75,'Fit(0b/1b)='+str(round(FitRatio,3))+'#pm'+str(round(FitRatioError,4)))
         l.Draw()
         c1.Print(path+prefix+'_rCS_nbjet_'+name+'_'+nameAndCut(stb,htb=htb,njetb=srNJet, btb=btreg, presel=presel)[0]+".pdf")
         c1.Print(path+prefix+'_rCS_nbjet_'+name+'_'+nameAndCut(stb,htb=htb,njetb=srNJet, btb=btreg, presel=presel)[0]+".png")
@@ -208,5 +213,5 @@ for srNJet in sorted(signalRegions):
 print '\\hline\end{tabular}\end{center}\caption{Correction factors for \\ttJets background, 3$fb^{-1}$}\label{tab:0b_rcscorr_Wbkg}\end{table}'
 print
 
-pickle.dump(correctionFactors, file(picklePath+'correction_pkl','w'))
-print "correction pkl written here :" , picklePath+'correction_pkl'
+#pickle.dump(correctionFactors, file(picklePath+'correction_pkl','w'))
+#print "correction pkl written here :" , picklePath+'correction_pkl'
