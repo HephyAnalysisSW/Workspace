@@ -2,6 +2,7 @@ import ROOT
 import pickle 
 import copy, os, sys
 ROOT.gROOT.LoadMacro("../../HEPHYPythonTools/scripts/root/tdrstyle.C")
+ROOT.TH1F().SetDefaultSumw2()
 ROOT.setTDRStyle()
 ROOT.gStyle.SetPalette(1)
 ROOT.gStyle.SetOptStat(0)
@@ -9,7 +10,9 @@ ROOT.gStyle.SetOptStat(0)
 from Workspace.HEPHYPythonTools.helpers import *
 from Workspace.HEPHYPythonTools.xsec import *
 from Workspace.RA4Analysis.helpers import *
-from Workspace.RA4Analysis.cmgTuples_v1_PHYS14V3 import *
+from Workspace.RA4Analysis.cmgTuples_Spring15_25ns import *
+from Workspace.RA4Analysis.cmgTuples_Data25ns_0l import *
+#from Workspace.RA4Analysis.cmgTuples_v1_PHYS14V3 import *
 from Workspace.RA4Analysis.signalRegions import *
 from draw_helpers import *
 from math import *
@@ -17,7 +20,7 @@ from Workspace.HEPHYPythonTools.user import username
 from LpTemplateFit import LpTemplateFit
 
 preprefix = 'QCDestimation/ratioPlots'
-wwwDir = '/afs/hephy.at/user/d/dhandl/www/pngCMG2/hard/Phys14V3/'+preprefix+'/'
+wwwDir = '/afs/hephy.at/user/d/dhandl/www/RunII/Spring15_25ns/'+preprefix+'/'
 presel = 'QCDratio_singleElectronic_'
 
 if not os.path.exists(wwwDir):
@@ -45,36 +48,10 @@ eleFromW = ['pt', 'eta', 'phi', 'pdgId', 'motherId', 'grandmotherId', 'charge', 
 def getMatch(genLep,recoLep):
   return ( (genLep['charge']==recoLep['charge']) and deltaR(genLep,recoLep)<0.1 and (abs(genLep['pt']-recoLep['pt'])/genLep['pt'])<0.5)
 
-target_lumi = 3000 #pb-1
-def getWeight(sample,nEvents,target_lumi):
-  weight = xsec[sample['dbsName']] * target_lumi/nEvents
+targetLumi = 204.2 #pb-1
+def getWeight(sample,nEvents,targetLumi):
+  weight = xsec[sample['dbsName']] * targetLumi/nEvents
   return weight
-
-QCD_HT_100To250_PU20bx25={\
-"name" : "QCD_HT_100To250",
-"chunkString": "QCD_HT_100To250",
-'dir' : "/data/easilar/Phys14_V3/",
-'dbsName':'/QCD_HT_100To250_13TeV-madgraph/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'
-}
-
-QCD_HT_250To500_PU20bx25={\
-"name" : "QCD_HT_250To500",
-"chunkString": "QCD_HT_250To500",
-'dir' : "/data/easilar/Phys14_V3/",
-'dbsName':'/QCD_HT_250To500_13TeV-madgraph/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'
-}
-QCD_HT_500To1000_PU20bx25={\
-"name" : "QCD_HT_500To1000",
-"chunkString": "QCD_HT_500To1000",
-'dir' : "/data/easilar/Phys14_V3/",
-'dbsName':'/QCD_HT_500To1000_13TeV-madgraph/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'
-}
-QCD_HT_1000ToInf_PU20bx25={\
-"name" : "QCD_HT_1000ToInf",
-"chunkString": "QCD_HT_1000ToInf",
-'dir' : "/data/easilar/Phys14_V3/",
-'dbsName':'/QCD_HT_1000ToInf_13TeV-madgraph/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM'
-}
 
 singleElectronVeto = '((Sum$(abs(LepGood_pdgId)==13&&LepGood_pt>=5))==0&&'\
                      +'(Sum$(abs(LepGood_pdgId)==11&&LepGood_pt>=10&&LepGood_miniRelIso<0.4&&((abs(LepGood_eta)<0.8&&LepGood_mvaIdPhys14>0.35)'\
@@ -91,8 +68,8 @@ antiSelStr = '((abs(LepGood_pdgId)==11&&LepGood_pt>=25&&abs(LepGood_eta)<0.8&&Le
              +'(abs(LepGood_pdgId)==11&&LepGood_pt>=25&&abs(LepGood_eta)>=1.479&&abs(LepGood_eta)<2.4&&LepGood_mvaIdPhys14>=(-0.52)&&LepGood_mvaIdPhys14<0.05))'
 
 SelStr = '((abs(LepGood_pdgId)==11&&LepGood_pt>=25&&LepGood_miniRelIso<0.1&&LepGood_convVeto&&LepGood_sip3d<4.0&&LepGood_lostHits==0&&abs(LepGood_eta)<0.8&&LepGood_mvaIdPhys14>=0.73)||'\
-           +'(abs(LepGood_pdgId)==11&&LepGood_pt>=25&&LepGood_miniRelIso<0.1&&LepGood_convVeto&&LepGood_sip3d<4.0&&LepGood_lostHits==0&&abs(LepGood_eta)>=0.8&&abs(LepGood_eta)<1.479&&LepGood_mvaIdPhys14>=0.57)||'\
-           +'(abs(LepGood_pdgId)==11&&LepGood_pt>=25&&LepGood_miniRelIso<0.1&&LepGood_convVeto&&LepGood_sip3d<4.0&&LepGood_lostHits==0&&abs(LepGood_eta)>=1.479&&abs(LepGood_eta)<2.4&&LepGood_mvaIdPhys14>=0.05))'
+         +'(abs(LepGood_pdgId)==11&&LepGood_pt>=25&&LepGood_miniRelIso<0.1&&LepGood_convVeto&&LepGood_sip3d<4.0&&LepGood_lostHits==0&&abs(LepGood_eta)>=0.8&&abs(LepGood_eta)<1.479&&LepGood_mvaIdPhys14>=0.57)||'\
+         +'(abs(LepGood_pdgId)==11&&LepGood_pt>=25&&LepGood_miniRelIso<0.1&&LepGood_convVeto&&LepGood_sip3d<4.0&&LepGood_lostHits==0&&abs(LepGood_eta)>=1.479&&abs(LepGood_eta)<2.4&&LepGood_mvaIdPhys14>=0.05))'
 
 singleHardElectron = '(Sum$('+antiSelStr+'||'+SelStr+')==1)'
 
@@ -110,47 +87,67 @@ def getLp(met,metPhi,e):
 #  met = c.GetLeaf('met_pt').GetValue()
 #  metPhi = c.GetLeaf('met_phi').GetValue()
   
-  Lp = e['pt']/sqrt( (e['pt']*cos(e['phi']) + met*cos(metPhi))**2 + (e['pt']*sin(e['phi']) + met*sin(metPhi))**2 )\
-       * (e['pt']+met*cos(e['phi']-metPhi))/sqrt(e['pt']**2+met**2+2*met*e['pt']*cos(e['phi']-metPhi))
+Lp = ((e['pt']/sqrt(e['pt']**2+met**2+2*met*e['pt']*cos(e['phi']-metPhi)))\
+       * ((e['pt']+met*cos(e['phi']-metPhi))/sqrt(e['pt']**2+met**2+2*met*e['pt']*cos(e['phi']-metPhi))))
   return Lp
 
 #attention only use this string after singleElectronic (sel/antiSel) preselection
-LpStr = '(LepGood_pt/sqrt((LepGood_pt*cos(LepGood_phi)+met_pt*cos(met_phi))**2+(LepGood_pt*sin(LepGood_phi)+met_pt*sin(met_phi))**2))'\
-      +'*(LepGood_pt+met_pt*cos(LepGood_phi-met_phi))/sqrt(LepGood_pt**2+met_pt**2+2*met_pt*LepGood_pt*cos(LepGood_phi-met_phi))'
+LpStr = '((LepGood_pt/sqrt(LepGood_pt**2+met_pt**2+2*met_pt*LepGood_pt*cos(LepGood_phi-met_phi)))'\
+      +'*((LepGood_pt+met_pt*cos(LepGood_phi-met_phi))/sqrt(LepGood_pt**2+met_pt**2+2*met_pt*LepGood_pt*cos(LepGood_phi-met_phi))))'
 
-Bkg = [{'name':'QCD_HT_100To250_PU20bx25', 'sample':QCD_HT_100To250_PU20bx25, 'legendName':'QCD HT100-250', 'color':ROOT.kCyan+3, 'merge':'QCD'},
-       {'name':'QCD_HT_250To500_PU20bx25', 'sample':QCD_HT_250To500_PU20bx25, 'legendName':'QCD HT250-500', 'color':ROOT.kCyan, 'merge':'QCD'},
-       {'name':'QCD_HT_500To1000_PU20bx25', 'sample':QCD_HT_500To1000_PU20bx25, 'legendName':'QCD HT500-1000', 'color':ROOT.kCyan-3, 'merge':'QCD'},
-       {'name':'QCD_HT_1000ToInf_PU20bx25', 'sample':QCD_HT_1000ToInf_PU20bx25, 'legendName':'QCD HT1000-Inf', 'color':ROOT.kCyan-7, 'merge':'QCD'},
-       {'name':'TBarToLeptons_sChannel_PU20bx25', 'sample':TBarToLeptons_sChannel_PU20bx25, 'legendName':'TBarToLep sCh', 'color':ROOT.kViolet, 'merge':'EWK'},
-       {'name':'TBarToLeptons_tChannel_PU20bx25', 'sample':TBarToLeptons_tChannel_PU20bx25, 'legendName':'TBarToLep tCh', 'color':ROOT.kViolet-3, 'merge':'EWK'},
-       {'name':'TToLeptons_sChannel_PU20bx25', 'sample':TToLeptons_sChannel_PU20bx25, 'legendName':'TToLep sCh', 'color':ROOT.kViolet-5, 'merge':'EWK'},
-       {'name':'TToLeptons_tChannel_PU20bx25', 'sample':TToLeptons_tChannel_PU20bx25, 'legendName':'TToLep tCh', 'color':ROOT.kViolet-7, 'merge':'EWK'},
-       {'name':'T_tWChannel_PU20bx25', 'sample':T_tWChannel_PU20bx25, 'legendName':'TtW', 'color':ROOT.kViolet+1, 'merge':'EWK'},
-       {'name':'TBar_tWChannel_PU20bx25', 'sample':TBar_tWChannel_PU20bx25, 'legendName':'TBartW', 'color':ROOT.kViolet+6, 'merge':'EWK'},
-       {'name':'ttWJets_PU20bx25', 'sample':ttWJets_PU20bx25, 'legendName':'tt+W', 'color':ROOT.kOrange, 'merge':'EWK'},
-       {'name':'ttZJets_PU20bx25', 'sample':ttZJets_PU20bx25, 'legendName':'tt+Z', 'color':ROOT.kOrange+7, 'merge':'EWK'},
-       {'name':'ttH_PU20bx25', 'sample':ttH_PU20bx25, 'legendName':'tt+H', 'color':ROOT.kOrange+4, 'merge':'EWK'},
-       {'name':'DYJetsToLL_M50_HT100to200_PU20bx25', 'sample':DYJetsToLL_M50_HT100to200_PU20bx25, 'legendName':'DY HT100-200', 'color':ROOT.kRed, 'merge':'EWK'},
-       {'name':'DYJetsToLL_M50_HT200to400_PU20bx25', 'sample':DYJetsToLL_M50_HT200to400_PU20bx25, 'legendName':'DY HT200-400', 'color':ROOT.kRed+2, 'merge':'EWK'},
-       {'name':'DYJetsToLL_M50_HT400to600_PU20bx25', 'sample':DYJetsToLL_M50_HT400to600_PU20bx25, 'legendName':'DY HT400-600', 'color':ROOT.kRed-7, 'merge':'EWK'},
-       {'name':'DYJetsToLL_M50_HT600toInf_PU20bx25', 'sample':DYJetsToLL_M50_HT600toInf_PU20bx25, 'legendName':'DY HT600-Inf', 'color':ROOT.kRed-8, 'merge':'EWK'},
-       {'name':'WJetsToLNu_HT100to200_PU20bx25', 'sample':WJetsToLNu_HT100to200_PU20bx25, 'legendName':'W HT100-200', 'color':ROOT.kGreen+3, 'merge':'EWK'},
-       {'name':'WJetsToLNu_HT200to400_PU20bx25', 'sample':WJetsToLNu_HT200to400_PU20bx25, 'legendName':'W HT200-400', 'color':ROOT.kGreen, 'merge':'EWK'},
-       {'name':'WJetsToLNu_HT400to600_PU20bx25', 'sample':WJetsToLNu_HT400to600_PU20bx25, 'legendName':'W HT400-600', 'color':ROOT.kGreen-3, 'merge':'EWK'},
-       {'name':'WJetsToLNu_HT600toInf_PU20bx25', 'sample':WJetsToLNu_HT600toInf_PU20bx25, 'legendName':'W HT600-Inf', 'color':ROOT.kGreen-7, 'merge':'EWK'},
-       {'name':'ttJets_PU20bx25', 'sample':ttJets_PU20bx25, 'legendName':'ttJets', 'color':ROOT.kRed, 'merge':'EWK'},# 'prompt':False},
+Bkg = [{'name':'QCD_HT200to300_25ns', 'sample':QCD_HT200to300_25ns, 'legendName':'QCD HT200-300', 'color':ROOT.kCyan+3, 'merge':'QCD'},
+       {'name':'QCD_HT300to500_25ns', 'sample':QCD_HT300to500_25ns, 'legendName':'QCD HT300-500', 'color':ROOT.kCyan, 'merge':'QCD'},
+       {'name':'QCD_HT500to700_25ns', 'sample':QCD_HT500to700_25ns, 'legendName':'QCD HT500-700', 'color':ROOT.kCyan-3, 'merge':'QCD'},
+       {'name':'QCD_HT700to1000_25ns', 'sample':QCD_HT700to1000_25ns, 'legendName':'QCD HT700-1000', 'color':ROOT.kCyan-3, 'merge':'QCD'},
+       {'name':'QCD_HT1000to1500_25ns', 'sample':QCD_HT1000to1500_25ns, 'legendName':'QCD HT1000-1500', 'color':ROOT.kCyan-3, 'merge':'QCD'},
+       {'name':'QCD_HT1500to2000_25ns', 'sample':QCD_HT1500to2000_25ns, 'legendName':'QCD HT1500-2000', 'color':ROOT.kCyan-3, 'merge':'QCD'},
+       {'name':'QCD_HT2000toInf_25ns', 'sample':QCD_HT2000toInf_25ns, 'legendName':'QCD HT2000-Inf', 'color':ROOT.kCyan-7, 'merge':'QCD'},
+       #{'name':'TBarToLeptons_sChannel_PU20bx25', 'sample':TBarToLeptons_sChannel_PU20bx25, 'legendName':'TBarToLep sCh', 'color':ROOT.kViolet, 'merge':'EWK'},
+       #{'name':'TBarToLeptons_tChannel_PU20bx25', 'sample':TBarToLeptons_tChannel_PU20bx25, 'legendName':'TBarToLep tCh', 'color':ROOT.kViolet-3, 'merge':'EWK'},
+       {'name':'TToLeptons_sch_25ns', 'sample':TToLeptons_sch_25ns, 'legendName':'TToLep sCh', 'color':ROOT.kViolet-5, 'merge':'EWK'},
+       {'name':'TToLeptons_tch_25ns', 'sample':TToLeptons_tch_25ns, 'legendName':'TToLep tCh', 'color':ROOT.kViolet-7, 'merge':'EWK'},
+       {'name':'T_tWch_25ns', 'sample':T_tWch_25ns, 'legendName':'TtW', 'color':ROOT.kViolet+1, 'merge':'EWK'},
+       {'name':'TBar_tWch_25ns', 'sample':TBar_tWch_25ns, 'legendName':'TBartW', 'color':ROOT.kViolet+6, 'merge':'EWK'},
+       #{'name':'ttWJets_PU20bx25', 'sample':ttWJets_PU20bx25, 'legendName':'tt+W', 'color':ROOT.kOrange, 'merge':'EWK'},
+       #{'name':'ttZJets_PU20bx25', 'sample':ttZJets_PU20bx25, 'legendName':'tt+Z', 'color':ROOT.kOrange+7, 'merge':'EWK'},
+       #{'name':'ttH_PU20bx25', 'sample':ttH_PU20bx25, 'legendName':'tt+H', 'color':ROOT.kOrange+4, 'merge':'EWK'},
+       {'name':'WZ_25ns', 'sample':WZ_25ns, 'legendName':'WZ', 'color':ROOT.kOrange, 'merge':'EWK'},
+       {'name':'WWTo2L2Nu_25ns', 'sample':WWTo2L2Nu_25ns, 'legendName':'WW', 'color':ROOT.kOrange+7, 'merge':'EWK'},
+       {'name':'ZZ_25ns', 'sample':ZZ_25ns, 'legendName':'ZZ', 'color':ROOT.kOrange+4, 'merge':'EWK'},
+       {'name':'DYJetsToLL_M_50_25ns', 'sample':DYJetsToLL_M_50_25ns, 'legendName':'DY', 'color':ROOT.kRed, 'merge':'EWK'},
+       #{'name':'DYJetsToLL_M50_HT100to200_PU20bx25', 'sample':DYJetsToLL_M50_HT100to200_PU20bx25, 'legendName':'DY HT100-200', 'color':ROOT.kRed, 'merge':'EWK'},
+       #{'name':'DYJetsToLL_M50_HT200to400_PU20bx25', 'sample':DYJetsToLL_M50_HT200to400_PU20bx25, 'legendName':'DY HT200-400', 'color':ROOT.kRed+2, 'merge':'EWK'},
+       #{'name':'DYJetsToLL_M50_HT400to600_PU20bx25', 'sample':DYJetsToLL_M50_HT400to600_PU20bx25, 'legendName':'DY HT400-600', 'color':ROOT.kRed-7, 'merge':'EWK'},
+       #{'name':'DYJetsToLL_M50_HT600toInf_PU20bx25', 'sample':DYJetsToLL_M50_HT600toInf_PU20bx25, 'legendName':'DY HT600-Inf', 'color':ROOT.kRed-8, 'merge':'EWK'},
+       {'name':'WJetsToLNu_HT100to200_25ns', 'sample':WJetsToLNu_HT100to200_25ns, 'legendName':'W HT100-200', 'color':ROOT.kGreen+3, 'merge':'EWK'},
+       {'name':'WJetsToLNu_HT200to400_25ns', 'sample':WJetsToLNu_HT200to400_25ns, 'legendName':'W HT200-400', 'color':ROOT.kGreen, 'merge':'EWK'},
+       {'name':'WJetsToLNu_HT400to600_25ns', 'sample':WJetsToLNu_HT400to600_25ns, 'legendName':'W HT400-600', 'color':ROOT.kGreen-3, 'merge':'EWK'},
+       {'name':'WJetsToLNu_HT600to800_25ns', 'sample':WJetsToLNu_HT600to800_25ns, 'legendName':'W HT600-800', 'color':ROOT.kGreen-7, 'merge':'EWK'},
+       {'name':'WJetsToLNu_HT800to1200_25ns', 'sample':WJetsToLNu_HT800to1200_25ns, 'legendName':'W HT800-1200', 'color':ROOT.kGreen-7, 'merge':'EWK'},
+       {'name':'WJetsToLNu_HT1200to2500_25ns', 'sample':WJetsToLNu_HT1200to2500_25ns, 'legendName':'W HT1200-2500', 'color':ROOT.kGreen-7, 'merge':'EWK'},
+       {'name':'WJetsToLNu_HT2500toInf_25ns', 'sample':WJetsToLNu_HT2500toInf_25ns, 'legendName':'W HT2500-Inf', 'color':ROOT.kGreen-7, 'merge':'EWK'},
+       {'name':'TTJets_25ns', 'sample':TTJets_25ns, 'legendName':'t #bar{t}+Jets', 'color':ROOT.kRed, 'merge':'EWK'}# 'prompt':False},
+]
+
+Data = [{'name':'SingleElectron_Run2015D_PromptReco', 'sample':SingleElectron_Run2015D_PromptReco, 'LegendName':'Data', 'merge':'Data'},
+        {'name':'SingleMuon_Run2015D_PromptReco', 'sample':SingleMuon_Run2015D_PromptReco, 'LegendName':'Data', 'merge':'Data'},
 ]
 
 maxN=1 if small else -1
 
 for sample in Bkg:
-  sample['chunks'], sample['nEvents'] = getChunks(sample['sample'],treeName='treeProducerSusySingleLepton', maxN=maxN)
+  sample['chunks'], sample['norm'] = getChunks(sample['sample'], maxN=maxN)
   sample['chain'] = ROOT.TChain('tree')
   for chunk in sample['chunks']:
     sample['chain'].Add(chunk['file'])
 
-  sample['weight'] = getWeight(sample['sample'], sample['nEvents'], target_lumi)
+  sample['weight'] = getWeight(sample['sample'], sample['norm'], targetLumi)
+
+dataChain = ROOT.TChain('tree')
+for sample in Data:
+  sample['chunks'], sample['norm'] = getChunks(sample['sample'], maxN=maxN)
+  for chunk in sample['chunks']:
+    dataChain.Add(chunk['file'])
 
 histos = {}
 bins = {}
@@ -169,10 +166,10 @@ for srNJet in njreg:
 #        cut = '(Sum$(abs(LepGood_pdgId)==11&&abs(LepGood_dxy)<=0.05&&abs(LepGood_dz)<=0.1)+Sum$(abs(LepOther_pdgId)==11&&abs(LepOther_dxy)<=0.05&&abs(LepOther_dz)<=0.1)>=1)&&'+htCut(htb, minPt=30, maxEta=2.4, njCorr=0.)+'&&'+ nBTagCut(btb, minPt=30, maxEta=2.4, minCSVTag=0.814)+'&&'+nJetCut(srNJet, minPt=30, maxEta=2.4)+'&&'+nJetCut(2, minPt=80, maxEta=2.4)
 #        cut = '(Sum$(abs(LepGood_pdgId)==11&&LepGood_pt>10)>=1)&&'+htCut(htb, minPt=30, maxEta=2.4, njCorr=0.)+'&&'+ nBTagCut(btb, minPt=30, maxEta=2.4, minCSVTag=0.814)+'&&'+nJetCut(srNJet, minPt=30, maxEta=2.4)+'&&'+nJetCut(2, minPt=80, maxEta=2.4)
 
-        SelCut = singleElectronVeto+'&&'+singleHardElectron+'&&(Sum$('+SelStr+')==1)&&'+stCutQCD(stb)+'&&'+htCut(htb, minPt=30, maxEta=2.4, njCorr=0.)+'&&'+ nBTagCut(btb, minPt=30, maxEta=2.4, minCSVTag=0.814)\
-                 +'&&'+nJetCut(srNJet, minPt=30, maxEta=2.4)+'&&'+nJetCut(2, minPt=80, maxEta=2.4)
-        antiSelCut = singleElectronVetoAnti+'&&'+singleHardElectron+'&&(Sum$('+antiSelStr+')==1)&&'+stCutQCD(stb)+'&&'+htCut(htb, minPt=30, maxEta=2.4, njCorr=0.)+'&&'+ nBTagCut(btb, minPt=30, maxEta=2.4, minCSVTag=0.814)\
-                     +'&&'+nJetCut(srNJet, minPt=30, maxEta=2.4)+'&&'+nJetCut(2, minPt=80, maxEta=2.4)
+        SelCut = '('+singleElectronVeto+'&&'+singleHardElectron+'&&(Sum$('+SelStr+')==1)&&'+stCutQCD(stb)+'&&'+htCut(htb, minPt=30, maxEta=2.4, njCorr=0.)+'&&'+ nBTagCut(btb, minPt=30, maxEta=2.4, minCSVTag=0.890)\
+                 +'&&'+nJetCut(srNJet, minPt=30, maxEta=2.4)+'&&'+nJetCut(2, minPt=80, maxEta=2.4)+')'
+        antiSelCut = '('+singleElectronVetoAnti+'&&'+singleHardElectron+'&&(Sum$('+antiSelStr+')==1)&&'+stCutQCD(stb)+'&&'+htCut(htb, minPt=30, maxEta=2.4, njCorr=0.)+'&&'+ nBTagCut(btb, minPt=30, maxEta=2.4, minCSVTag=0.890)\
+                     +'&&'+nJetCut(srNJet, minPt=30, maxEta=2.4)+'&&'+nJetCut(2, minPt=80, maxEta=2.4)+')'
 
 #        histos['merged_EWK']={}
 #        histos['merged_QCD']['antiSelection']=ROOT.TH1F('merged_QCD_antiSelection','merged_QCD_antiSelection',12,-0.7,1.7)
@@ -371,7 +368,7 @@ text.SetTextAlign(11)
 #      l.Draw()
 #      t.DrawLatex(0.175,0.85,varBinName(stb,'S_{T}'))
 #      text.DrawLatex(0.15,.96,"CMS Simulation")
-#      text.DrawLatex(0.65,0.96,"L="+str(target_lumi/1000)+" fb^{-1} (13 TeV)")
+#      text.DrawLatex(0.65,0.96,"L="+str(targetLumi/1000)+" fb^{-1} (13 TeV)")
 #      canv.Print(wwwDir+presel+'Fsa_ht_'+nameAndCut(stb, None, None, btb=btb, presel="(1)", charge="", btagVar = 'nBJetMediumCSV30')[0]+'.png')
 #      canv.Print(wwwDir+presel+'Fsa_ht_'+nameAndCut(stb, None, None, btb=btb, presel="(1)", charge="", btagVar = 'nBJetMediumCSV30')[0]+'.pdf')
 #      canv.Print(wwwDir+presel+'Fsa_ht_'+nameAndCut(stb, None, None, btb=btb, presel="(1)", charge="", btagVar = 'nBJetMediumCSV30')[0]+'.root')
@@ -426,7 +423,7 @@ text.SetTextAlign(11)
 #      l2.Draw()
 #      t.DrawLatex(0.175,0.85,varBinName(htb,'H_{T}'))
 #      text.DrawLatex(0.15,.96,"CMS Simulation")
-#      text.DrawLatex(0.65,0.96,"L="+str(target_lumi/1000)+" fb^{-1} (13 TeV)")
+#      text.DrawLatex(0.65,0.96,"L="+str(targetLumi/1000)+" fb^{-1} (13 TeV)")
 #      canv2.Print(wwwDir+presel+'Fsa_st_'+nameAndCut(None, htb, njetb=None, btb=btb, presel="(1)", charge="", btagVar = 'nBJetMediumCSV30')[0]+'.png')
 #      canv2.Print(wwwDir+presel+'Fsa_st_'+nameAndCut(None, htb, njetb=None, btb=btb, presel="(1)", charge="", btagVar = 'nBJetMediumCSV30')[0]+'.pdf')
 #      canv2.Print(wwwDir+presel+'Fsa_st_'+nameAndCut(None, htb, njetb=None, btb=btb, presel="(1)", charge="", btagVar = 'nBJetMediumCSV30')[0]+'.root')
@@ -473,7 +470,7 @@ text.SetTextAlign(11)
 #        ratio_2d[njb][btb].Draw('COLZ TEXTE')
 #      t.DrawLatex(0.175,0.85,nJetBinName(njb))
 #      text.DrawLatex(0.15,.96,"CMS Simulation")
-#      text.DrawLatex(0.65,0.96,"L="+str(target_lumi/1000)+" fb^{-1} (13 TeV)") 
+#      text.DrawLatex(0.65,0.96,"L="+str(targetLumi/1000)+" fb^{-1} (13 TeV)") 
 #      canv3.Print(wwwDir+presel+'st_vs_ht_'+nameAndCut(None, None, njetb=njb, btb=btb, presel="(1)", charge="", btagVar = 'nBJetMediumCSV30')[0]+'.png')
 #      canv3.Print(wwwDir+presel+'st_vs_ht_'+nameAndCut(None, None, njetb=njb, btb=btb, presel="(1)", charge="", btagVar = 'nBJetMediumCSV30')[0]+'.pdf')
 #      canv3.Print(wwwDir+presel+'st_vs_ht_'+nameAndCut(None, None, njetb=njb, btb=btb, presel="(1)", charge="", btagVar = 'nBJetMediumCSV30')[0]+'.root')
@@ -530,7 +527,7 @@ for htb in htreg:
       l3.Draw()
       t3.DrawLatex(0.2,0.85,varBinName(htb,'H_{T}'))
       text.DrawLatex(0.15,.96,"CMS Simulation")
-      text.DrawLatex(0.65,0.96,"L="+str(target_lumi/1000)+" fb^{-1} (13 TeV)")
+      text.DrawLatex(0.65,0.96,"L="+str(targetLumi/1000)+" fb^{-1} (13 TeV)")
       canv4.Print(wwwDir+presel+'Fsa_nj_'+nameAndCut(None, htb, None, btb=btb, presel="(1)", charge="", btagVar = 'nBJetMediumCSV30')[0]+'.png')
       canv4.Print(wwwDir+presel+'Fsa_nj_'+nameAndCut(None, htb, None, btb=btb, presel="(1)", charge="", btagVar = 'nBJetMediumCSV30')[0]+'.pdf')
       canv4.Print(wwwDir+presel+'Fsa_nj_'+nameAndCut(None, htb, None, btb=btb, presel="(1)", charge="", btagVar = 'nBJetMediumCSV30')[0]+'.root')
