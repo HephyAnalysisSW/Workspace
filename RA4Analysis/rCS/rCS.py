@@ -30,7 +30,7 @@ cTTJets = getChain(TTJets_LO_25ns,histname='',maxN=maxN)
 
 from Workspace.HEPHYPythonTools.user import username
 uDir = username[0]+'/'+username
-subDir = 'Spring15/25ns/rCS/ANnoFitWithFilters/'
+subDir = 'Spring15/25ns/rCS/ANnoFitWithFiltersAltBin/'
 #subDir = 'pngCMG2/rCS/PHYS14V3/useRecoMet'
 
 path = '/afs/hephy.at/user/'+uDir+'/www/'+subDir+'/'
@@ -56,7 +56,7 @@ elif channel =='mu':
   pdgId = 13
 
 streg = [[(250,350),1.],[(350,450),1.],[(450,-1),1.]]#,[(350,450), 1.],[(450,-1),1.]]#, [(350, 450), 1.],  [(450, -1), 1.] ]
-htreg = [(500,-1),(750,-1),(1000,-1)]#,(500,1000)]#,(1000,1250),(1250,-1)]#,(1250,-1)]
+htreg = [(500,750),(750,1000),(1000,-1)]#,(500,1000)]#,(1000,1250),(1250,-1)]#,(1250,-1)]
 btreg = (0,0)
 njreg = [(3,3),(4,4),(5,5),(6,7),(8,-1)]#,(7,7),(8,8),(9,9)]
 nbjreg = [(0,0),(1,1),(2,2)]
@@ -83,7 +83,7 @@ l_H     = ngNuEFromW+"+"+ngNuMuFromW+"==1&&"+ngNuTauFromW+"==0"
 presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&Jet_pt[1]>80&&st>250&&nJet30>2&&htJet30j>500"#&&nBJetMediumCSV30==0"
 #presel = presel + '&&Flag_EcalDeadCellTriggerPrimitiveFilter&&Flag_eeBadScFilter&&Flag_goodVertices&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFilter'
 #presel = presel + '&acos(cos(Jet_phi[0]-met_phi))>0.45&&acos(cos(Jet_phi[1]-met_phi))>0.45'
-filters = "&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFilterMinZeroPatched&&Flag_goodVertices&&Flag_eeBadScFilter"
+filters = "&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFilterMinZeroPatched&&Flag_goodVertices&&Flag_eeBadScFilter&&Flag_EcalDeadCellTriggerPrimitiveFilter"
 presel += filters
 
 prefix = presel.split('&&')[0]+'_'
@@ -479,7 +479,7 @@ for lep, pdgId in channels:
           FitFunc.SetLineColor(ROOT_colors[istb])
           FitFunc.SetLineStyle(2)
           FitFunc.SetLineWidth(2)
-        rcsDict[lep][name][stb][htb].update({'D':FitParD, 'DErr':FitParDError, 'K':FitParK, 'Kerr':FitParKError})
+          rcsDict[lep][name][stb][htb].update({'D':FitParD, 'DErr':FitParDError, 'K':FitParK, 'Kerr':FitParKError})
         if name == 'tt':
           h_nj_neg[lep][name][stb][htb].SetMaximum(0.25)
         else:
