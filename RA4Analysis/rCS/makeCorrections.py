@@ -192,7 +192,7 @@ for i_njb, njb in enumerate(signalRegions):
           #rcs = rcsD['rCS']
           #rcsErrPred = rcsD['rCSE_pred']
           #rcsErr = rcsD['rCSE_sim']
-          if not math.isnan(rcs):
+          if not math.isnan(rcsD['rCS']):
             wJetRcsFitH.SetBinContent(i_njbW+1, rcsD['rCS'])
             wJetRcsFitH.SetBinError(i_njbW+1, rcsD['rCSE_sim'])
 
@@ -208,7 +208,7 @@ for i_njb, njb in enumerate(signalRegions):
 
         cnameCRW, cutCRW = nameAndCut(stb,htb,(3,4), btb=(0,0) ,presel=presel)
         rcsCRW = getRCS(cWJets, cutCRW, dPhiCut)
-        #RcsKey = 'rCS_W'+Wc['string']+'_crNJet_0b_corr'
+        RcsKey = 'rCS_W'+Wc['string']+'_crNJet_0b_corr'
         #rcsWdiff = abs(res[njb][stb][htb][RcsKey] - (wD+wK*i_njb)) #difference of rcs
         rcsWdiff = abs(rcsCRW['rCS'] - (wD+wK*i_njb)) #difference of rcs
         YieldLowDPhiKey = 'yW'+Wc['string']+'_srNJet_0b_lowDPhi'
@@ -239,8 +239,25 @@ for i_njb, njb in enumerate(signalRegions):
         W_errs_key = 'W_pred_errs'+Wc['string']
         res[njb][stb][htb].update({W_errs_key:W_errs})
         
-        W_err_key = 'W_pred_err'+Wc['string']
+        W_key = 'W'+Wc['string']+'_pred'
+        W_err_key = 'W'+Wc['string']+'_pred_err'
         res[njb][stb][htb][W_err_key] = WexpandedErr
+        
+        tot_key = 'tot'+Wc['string']+'_pred'
+        tot_err_key = 'tot'+Wc['string']+'_pred_err'
+        rest_key = 'Rest'+Wc['string']+'_truth'
+        rest_err_key = 'Rest'+Wc['string']+'_truth_err'
+
+        if not Wc['name']=='all':
+          TT_pred_forTotal = 0.5*TT_pred_corr
+          TT_pred_err_forTotal = 0.5*TT_pred_err
+        else:
+          TT_pred_forTotal = TT_pred_corr
+          TT_pred_err_forTotal = TT_pred_err
+
+        res[njb][stb][htb][tot_err_key] = sqrt(TT_pred_err_forTotal**2 + WexpandedErr**2 + res[njb][stb][htb][rest_err_key]**2)
+        res[njb][stb][htb][tot_key] = TT_pred_forTotal + res[njb][stb][htb][W_key] + res[njb][stb][htb][rest_key]
+        
         del wJetRcsFitH
 
 #      print
@@ -262,10 +279,11 @@ for i_njb, njb in enumerate(signalRegions):
 
       #res[njb][stb][htb]['W_pred_err'] = WexpandedErr
       
+      # totals corrected
       #res[njb][stb][htb]['tot_pred_err'] = sqrt(TTexpandedErr**2 + WexpandedErr**2 + res[njb][stb][htb]['Rest_truth_err']**2)
-      res[njb][stb][htb]['tot_pred_err'] = sqrt(TT_pred_err**2 + WexpandedErr**2 + res[njb][stb][htb]['Rest_truth_err']**2)
-      res[njb][stb][htb]['tot_pred'] = TT_pred_corr + res[njb][stb][htb]['W_pred'] + res[njb][stb][htb]['Rest_truth']
-      #update res dict with new error
+      #res[njb][stb][htb]['tot_pred_err'] = sqrt(TT_pred_err**2 + WexpandedErr**2 + res[njb][stb][htb]['Rest_truth_err']**2)
+      #res[njb][stb][htb]['tot_pred'] = TT_pred_corr + res[njb][stb][htb]['W_pred'] + res[njb][stb][htb]['Rest_truth']
+      
       del ttJetRcsFitH, ttJetRcsFitH1b
       
 
