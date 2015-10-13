@@ -11,19 +11,20 @@ from Workspace.HEPHYPythonTools.helpers import  getChunks, deltaR, deltaR2, invM
 from math import *
 from Workspace.HEPHYPythonTools.user import username
 
-from Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_25ns import *
-#from Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_withTracks import *
+#from Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_25ns import *
+from Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_packedGenPart_tracks import *
 #from Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_50ns import *
 #from Workspace.DegenerateStopAnalysis.cmgTuples_Data50ns_1l import *
 #from Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_v1 import *
 
 target_lumi = 10000 #pb-1
 lepton_soft_hard_cut  = 30
-tracks = False
+tracks = True
+pkdGenParts = True
 verbose = False
 break_for_debug =False
 defSampleStr = "WJetsToLNu_HT100to200"
-subDir = "postProcessed_Spring15_vasile_v1"
+subDir = "postProcessed_Spring15_nTracks"
 
 
 ROOT.gSystem.Load("libFWCoreFWLite.so")
@@ -57,7 +58,7 @@ branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert",
                      ] 
 if tracks:
   branchKeepStrings_DATAMC.extend(["track_*","isoTrack_*"])
-
+  trackMinPtList= [1,1.5,2]
 
 #branches to be kept for MC samples only
 branchKeepStrings_MC = [ "nTrueInt", "genWeight", "xsec", "puWeight", 
@@ -66,7 +67,13 @@ branchKeepStrings_MC = [ "nTrueInt", "genWeight", "xsec", "puWeight",
                      "nGenPart", "GenPart_*",
                      "ngenPartAll","genPartAll_*" ,
                      "ngenTau", "genTau_*", 
-                     "ngenLepFromTau", "genLepFromTau_*"]
+                     "ngenLepFromTau", "genLepFromTau_*", 
+                     "GenJet_*",
+                      ]
+
+if pkdGenParts:
+  branchKeepStrings_MC.extend(["genPartPkd_*"])
+  genPartMinPtList= [1,1.5,2]
 
 #branches to be kept for data only
 branchKeepStrings_DATA = []
@@ -81,7 +88,7 @@ parser.add_option("--inputTreeName", dest="inputTreeName", default="treeProducer
 parser.add_option("--targetDir", dest="targetDir", default="/data/"+username+"/cmgTuples/"+subDir+'/', type="string", action="store", help="target directory.")
 parser.add_option("--skim", dest="skim", default="", type="string", action="store", help="any skim condition?")
 parser.add_option("--leptonSelection", dest="leptonSelection", default="hard", type="string", action="store", help="which lepton selection? 'soft', 'hard', 'inc', 'dilep'?")
-
+parser.add_option("--preselect", dest="preselect", action="store_true", help="Apply preselection for the postprocessing")
 parser.add_option("--small", dest="small", default = False, action="store_true", help="Just do a small subset.")
 #parser.add_option("--overwrite", dest="overwrite", action="store_true", help="Overwrite?", default=True)
 (options, args) = parser.parse_args()
@@ -108,9 +115,13 @@ if options.leptonSelection.lower()=='inc':
   #skimCond += "&&Sum$(LepGood_pt>25&&LepGood_relIso03<0.4&&abs(LepGood_eta)<2.4)>=1"
   #skimCond += "&&Sum$(abs(LepGood_eta)< 2.5)>=1"
   skimCond += ""
-
 if options.skim=='inc':
   skimCond = "(1)"
+if options.preselect:
+  #preselection = "(met_pt > 200 && Jet_pt[0]> 100 && Sum$(Jet_pt)>200 )"
+  preselection = "(met_pt > 150 && Jet_pt[0]> 80 && Sum$(Jet_pt)>200 )"
+  print "Applying Preselection", preselection
+  skimCond += "&&%s"%preselection
 
 if sys.argv[0].count('ipython'):
   options.small=True
@@ -187,11 +198,23 @@ for isample, sample in enumerate(allSamples):
     readVectors.append(
             {'prefix':'track'  , 'nMax':1000, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I' , 'dxy/F', 'dz/F', 'fromPV/I'] },
                       )
+  if pkdGenParts: 
+    readVectors.extend([
+            {'prefix':'genPartPkd'  , 'nMax':1000, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I' ] },
+            {'prefix':'GenJet'  , 'nMax':100, 'vars':['pt/F', 'eta/F', 'phi/F', 'mass/F' ] },
+
+                      ])
   if not sample['isData']: 
     #newVariables = ['weight/F','weight_XSecTTBar1p1/F','weight_XSecTTBar0p9/F']
     newVariables = ['weight/F']
     aliases.extend(['genMet:met_genPt', 'genMetPhi:met_genPhi'])
     #readVectors[1]['vars'].extend('partonId/I')
+    if pkdGenParts:
+      newVariables.extend([
+                           'genPartPkd_ISRdPhi/F' , 'genPartPkd_CosISRdPhi/F' ,"ngenPartPkd_1p5/I/0","ngenPartPkd_1/I/0","ngenPartPkd_2/I/0",
+                           'ngenPartPkdOppISR_1/F','ngenPartPkdOppISR_1p5/F', 'ngenPartPkdOppISR_2/F','ngenPartPkdO90isr_1/F', 'ngenPartPkdO90isr_1p5/F', 'ngenPartPkdO90isr_2/F', 
+
+                          ] )
   if options.leptonSelection.lower() in ['soft', 'hard','inc']:
     newVariables.extend( ['nLooseSoftLeptons/I', 'nLooseSoftPt10Leptons/I', 'nLooseHardLeptons/I', 'nTightSoftLeptons/I', 'nTightHardLeptons/I'] )
     newVariables.extend( ['deltaPhi_Wl/F','nBJetMediumCSV30/I', "nSoftBJetsCSV/F", "nHardBJetsCSV/F",  'nJet30/I','htJet30j/F',"nJet60/I","nJet110/I","nJet325/I" ,'st/F', 'singleMuonic/I', 'singleElectronic/I', 'singleLeptonic/I', 
@@ -207,8 +230,13 @@ for isample, sample in enumerate(allSamples):
 
     if tracks:
       newVariables.extend( [
-                           'track_ISRdPhi/F' , 'track_CosISRdPhi/F' ,"ntracks_0/F","ntracks_0p5/I/-1","ntracks_1/I/0","ntracks_2/I/0","ntracks_3/I/0","ntracks_5/I/0","ntracks_10/I/0"
+                           'track_ISRdPhi/F' , 'track_CosISRdPhi/F' ,"ntrack_1p5/I/0","ntrack_1/I/0","ntrack_2/I/0",
+                           'ntrackOppISR_1/F','ntrackOppISR_1p5/F', 'ntrackOppISR_2/F','ntrackO90isr_1/F', 'ntrackO90isr_1p5/F', 'ntrackO90isr_2/F', 
                            ]) 
+
+
+
+
     
   newVars = [readVar(v, allowRenaming=False, isWritten = True, isRead=False) for v in newVariables]
 
@@ -280,30 +308,6 @@ for isample, sample in enumerate(allSamples):
           #  s.weight_XSecTTBar1p1 = s.weight
           #  s.weight_XSecTTBar0p9 = s.weight
 
-
-        ###############################       track variables
-        if tracks:
-          vars = ['pt', 'eta', 'phi', "dxy", "dz", 'pdgId' ]
-          tracks =   (getObjDict(t, 'track_',vars, i ) for i in range(r.ntrack))
-          trackMinPtList= [0,0.5,1,2,3,5,10]
-          ntracks={ minPt : 0 for minPt in trackMinPtList}
-          for track in tracks:
-            #print track
-            if not (abs(track['eta']) < 2.5 and abs(track['dxy']) < 0.02 and abs( track['dz'] ) < 0.5 ) :
-              continue
-            for trackMinPt in trackMinPtList:
-              if track['pt'] > trackMinPt:
-                ntracks[trackMinPt]+=1
-                #print "added one track to", trackMinPt, ntracks[trackMinPt]
-          
-          s.ntrack_0    = ntracks[0]
-          s.ntrack_0p5  = ntracks[0.5]    
-          s.ntrack_1    = ntracks[1]    
-          s.ntrack_2    = ntracks[2]    
-          s.ntrack_3    = ntracks[3]    
-          s.ntrack_5    = ntracks[5]    
-          s.ntrack_10   = ntracks[10]    
-          
 
 
         
@@ -502,9 +506,6 @@ for isample, sample in enumerate(allSamples):
               s.dRJet1Jet2  = deltaR(jets[0],jets[1])
               s.J2Mass      = invMass(jets[0],jets[1])
 
-                
-                
-                
               if s.nJet30 > 2:              
                 j1 =ROOT.TLorentzVector() 
                 j1.SetPtEtaPhiM(jets[0]['pt'],jets[0]['eta'],jets[0]['phi'],jets[0]['mass'] )
@@ -525,6 +526,89 @@ for isample, sample in enumerate(allSamples):
             #s.dRJetHBLep =
             #s.jetHBpt
 
+        ###############################       track variables
+        if tracks:
+          vars = ['pt', 'eta', 'phi', "dxy", "dz", 'pdgId' ]
+          tracks =   (getObjDict(t, 'track_',vars, i ) for i in range(r.ntrack))
+          ntracks={ minPt : 0 for minPt in trackMinPtList}
+          ntracksOppISR={ minPt : 0 for minPt in trackMinPtList}
+          ntracksOpp90ISR={ minPt : 0 for minPt in trackMinPtList}
+          ntracksOppISR2={ minPt : 0 for minPt in trackMinPtList}
+          ntracksOpp90ISR2={ minPt : 0 for minPt in trackMinPtList}
+          for track in tracks:
+            if not (abs(track['eta']) < 2.5 and abs(track['dxy']) < 0.02 and abs( track['dz'] ) < 0.5 and track['pt']>=1.0) :
+              continue
+            #print track
+
+            if cos(track['phi']-s.jet1Phi) < 0:
+              for trackMinPt in trackMinPtList:
+                if track['pt'] > trackMinPt:
+                  ntracksOppISR[trackMinPt]+=1
+              if cos(track['phi']-s.jet1Phi) <  -sqrt(2)/2:
+                for trackMinPt in trackMinPtList:
+                  if track['pt'] > trackMinPt:
+                    ntracksOpp90ISR[trackMinPt]+=1
+
+            for trackMinPt in trackMinPtList:
+              if track['pt'] > trackMinPt:
+                ntracks[trackMinPt]+=1
+                #print "added one track to", trackMinPt, ntracks[trackMinPt]
+          
+          s.ntrack_1    = ntracks[1]    
+          s.ntrack_1p5    = ntracks[1.5]    
+          s.ntrack_2    = ntracks[2]    
+          
+ 
+          s.ntrackOppISR_1 = ntracksOppISR[1]  
+          s.ntrackOppISR_1p5 = ntracksOppISR[1.5]  
+          s.ntrackOppISR_2 = ntracksOppISR[2]  
+
+          s.ntrackO90isr_1 = ntracksOpp90ISR[1]  
+          s.ntrackO90isr_1p5 = ntracksOpp90ISR[1.5]  
+          s.ntrackO90isr_2 = ntracksOpp90ISR[2]  
+
+
+        if pkdGenParts:
+          vars = ['pt', 'eta', 'phi', 'pdgId' ]
+          genPartPkds =   (getObjDict(t, 'genPartPkd_',vars, i ) for i in range(r.ngenPartPkd))
+          ngenPartPkds={ minPt : 0 for minPt in genPartMinPtList}
+          ngenPartPkdsOppISR={ minPt : 0 for minPt in genPartMinPtList}
+          ngenPartPkdsOpp90ISR={ minPt : 0 for minPt in genPartMinPtList}
+          ngenPartPkdsOppISR2={ minPt : 0 for minPt in genPartMinPtList}
+          ngenPartPkdsOpp90ISR2={ minPt : 0 for minPt in genPartMinPtList}
+          for genPartPkd in genPartPkds:
+            if not (abs(genPartPkd['eta']) < 2.5 and genPartPkd['pt']>=1.0) :
+              continue
+            #print genPartPkd
+
+            if cos(genPartPkd['phi']-s.jet1Phi) < 0:
+              for genPartPkdMinPt in genPartMinPtList:
+                if genPartPkd['pt'] > genPartPkdMinPt:
+                  ngenPartPkdsOppISR[genPartPkdMinPt]+=1
+              if cos(genPartPkd['phi']-s.jet1Phi) <  -sqrt(2)/2:
+                for genPartPkdMinPt in genPartMinPtList:
+                  if genPartPkd['pt'] > genPartPkdMinPt:
+                    ngenPartPkdsOpp90ISR[genPartPkdMinPt]+=1
+
+            for genPartPkdMinPt in genPartMinPtList:
+              if genPartPkd['pt'] > genPartPkdMinPt:
+                ngenPartPkds[genPartPkdMinPt]+=1
+                #print "added one genPartPkd to", genPartPkdMinPt, ngenPartPkds[genPartPkdMinPt]
+          
+          s.ngenPartPkd_1    = ngenPartPkds[1]    
+          s.ngenPartPkd_1p5    = ngenPartPkds[1.5]    
+          s.ngenPartPkd_2    = ngenPartPkds[2]    
+          
+ 
+          s.ngenPartPkdOppISR_1 = ngenPartPkdsOppISR[1]  
+          s.ngenPartPkdOppISR_1p5 = ngenPartPkdsOppISR[1.5]  
+          s.ngenPartPkdOppISR_2 = ngenPartPkdsOppISR[2]  
+
+          s.ngenPartPkdO90isr_1 = ngenPartPkdsOpp90ISR[1]  
+          s.ngenPartPkdO90isr_1p5 = ngenPartPkdsOpp90ISR[1.5]  
+          s.ngenPartPkdO90isr_2 = ngenPartPkdsOpp90ISR[2]  
+
+########################################################
 
 #         s.nBJetMediumCMVA30 = len(bJetsCMVA)
           s.nBJetMediumCSV30 = len(bJetsCSV)

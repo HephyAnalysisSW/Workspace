@@ -45,7 +45,7 @@ sr1   = cutClass ("sr1",    [
                               ["MuEta1.5","abs(lepEta)<1.5"],
                               ["BVeto_Medium25","nBJetMedium25==0"],
                               ["MuPt30","lepPt<30"],
-                           ]  
+                           ] , 
                   baseCut = presel.combined
                   )
 
