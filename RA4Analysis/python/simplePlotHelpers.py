@@ -1,5 +1,5 @@
 import ROOT, copy, numbers
-from math import log
+from math import log, sqrt
 import types
 from array import array
 ROOT.gROOT.LoadMacro("$CMSSW_BASE/src/Workspace/HEPHYPythonTools/scripts/root/tdrstyle.C")
@@ -22,7 +22,7 @@ from Workspace.HEPHYPythonTools.helpers import getFileList, getVarValue
 #middlerightlines=[[0.62,0.6,"#font[22]{CMS preliminary 2012}"],[0.62,0.55,"#sqrt{s} = 8TeV"]]
 
 class plot:
-  def __init__(self, var, binning, cut, sample, style, weight = {'string':'weight'}, options=None):
+  def __init__(self, var, binning, cut, sample, style, weightString = None, weightFunc=None, options=None):
     if var:
       self.leaf = var['leaf'] if var.has_key('leaf') else None
       self.func = var['func'] if var.has_key('func') else None
@@ -51,7 +51,8 @@ class plot:
     self.cut = cut
     self.style=style
     self.sample=sample
-    self.weight=weight
+    self.weightString=weightString
+    self.weightFunc=weightFunc
     if hasattr(self, 'histo'):
       if type(self.histo)==type(ROOT.TH1D()):
         self.Reset()
@@ -66,7 +67,7 @@ class plot:
 
   @staticmethod
   def fromHisto(histo,style,options=None):
-    p = plot(var=None,binning=None,cut='',sample=None,style=style,weight=None,options=options)
+    p = plot(var=None,binning=None,cut='',sample=None,style=style,options=options)
     p.histo = histo
     return p
 
@@ -112,8 +113,8 @@ def loopAndFill(stacks):
         if p.leaf:
           if not p.leaf in usedBranches:
             usedBranches.append(p.leaf)
-          if p.weight  and p.weight.has_key('string') and p.weight['string'] and not p.weight['string'] in usedBranches:
-            usedBranches.append(p.weight['string'])
+          if p.weightString  and not p.weightString in usedBranches:
+            usedBranches.append(p.weightString)
         else:
           usedBranches = list(set(usedBranches+p.usedBranches))
         if not p.sample in allSamples:
@@ -176,7 +177,8 @@ def loopAndFill(stacks):
           for p in plotsToFill:
 #            print p.cut['func'],  p.cut['func'](c)
             if (not p.cut['func']) or p.cut['func'](c):
-              weight = c.GetLeaf(p.weight['string']).GetValue() if (hasattr(p,"weight") and p.weight) else 1.
+              weight = c.GetLeaf(p.weightString).GetValue() if p.weightString else 1.
+              reWeight = p.weightFunc(c) if p.weightFunc else 1.
               if p.leaf:
                 val =  getVarValue(c, p.leaf, p.ind)
 #                print "Fill leaf",p.leaf, p.ind, val, weight,sampleScaleFac
@@ -185,9 +187,19 @@ def loopAndFill(stacks):
                 val = p.ttreeFormula.EvalInstance()
               if p.func:
                 val = p.func(c)
-              p.histo.Fill(val, weight*sampleScaleFac)
-#              print p.histo.GetName(), b, val, weight*sampleScaleFac
+              p.histo.Fill(val, reWeight*weight*sampleScaleFac)
+#              print p.histo.GetName(), b, val, weight*sampleScaleFac, reWeight*weight*sampleScaleFac
+      c.Reset()
       del c
+#do over-flow bins
+  for p in allPlots:
+    if p.overFlow and p.overFlow in [ "upper", "both"]:
+      nbins = p.histo.GetNbinsX()
+      p.histo.SetBinContent(nbins , p.histo.GetBinContent(nbins) + p.histo.GetBinContent(nbins + 1))
+      p.histo.SetBinError(nbins , sqrt(p.histo.GetBinError(nbins)**2 + p.histo.GetBinError(nbins + 1)**2))
+    if p.overFlow and p.overFlow in [ "lower", "both"]:
+      p.histo.SetBinContent(1 , p.histo.GetBinContent(0) + p.histo.GetBinContent(1))
+      p.histo.SetBinError(1 , sqrt(p.histo.GetBinError(0)**2 + p.histo.GetBinError(1)**2))
   for s in stacks:
     sumStackHistos(s)   
 #                reweightFac = 1.
@@ -255,11 +267,13 @@ def drawStack(stk, maskedArea=None):
   if logYMaxGlobal: logYMaxGlobal = None if logYMaxGlobal == log(ymin,10) else logYMaxGlobal
   for s in stk.stackLists:
     for p in s:
-      hcopy = p.histo.Clone()
+      hcopy = p.histo.Clone(p.histo.GetName()+'_Clone')
 #      print p.histo,p.histo.Integral()
-      if p.style.has_key('errorBars') and not p.style['errorBars']:
-        for nbin in range(0, hcopy.GetNbinsX()+1):
-          hcopy.SetBinError(nbin, 0.)
+
+#      if p.style.has_key('errorBars') and not p.style['errorBars']:
+#        for nbin in range(0, hcopy.GetNbinsX()+1):
+#          hcopy.SetBinError(nbin, 0.)
+
 #      if stk.options.has_key('labels'):
       try:
         hcopy.GetXaxis().SetTitle(stk.options['labels']['x'])
@@ -453,11 +467,11 @@ def drawNMStacks(intn, intm, stacks, filename, path = defaultPlotPath):
       maskedArea = calcTLegendMaskedArea(stk.options['legend']['coordinates'], margins={'top':topMargin, 'bottom':0.13,'right':0.02,'left':0.15}) if stk.options.has_key('legend') else None
       stuff += drawStack(stk, maskedArea=maskedArea)
   if filename[-4:] not in [".png", ".pdf", "root"]:
-    c1.Print(path+filename+".png")
-    c1.Print(path+filename+".root")
-    c1.Print(path+filename+".pdf")
+    c1.Print(path+'/'+filename+".png")
+    c1.Print(path+'/'+filename+".root")
+    c1.Print(path+'/'+filename+".pdf")
   else:
-    c1.Print(path+filename)
+    c1.Print(path+'/'+filename)
   del c1
   return stuff
 #class plot2D:
