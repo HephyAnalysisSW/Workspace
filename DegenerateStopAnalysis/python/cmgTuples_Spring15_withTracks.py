@@ -22,7 +22,7 @@ WJetsToLNu={\
 "name" : "WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8",
 "chunkString" :"WJetsToLNu", 
 'dir': sampleDir+"WJetsToLNu",
-'dbsName':'WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8',
+'dbsName':'/WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1/MINIAODSIM',
 "treeName":"treeProducerSusySingleLepton",
 "rootFileLocation":"treeProducerSusySingleLepton/tree.root",
 "skimAnalyzerDir":"skimAnalyzerCount",

@@ -119,8 +119,9 @@ class cutClass():
       Dict[cutName]=cutString
     return Dict
   def _makeFlow(self,cutList):
-    self.flow=makeCutFlowList(cutList)
-    self.flowDict= self._makeDict(self.flow)
+    flow=makeCutFlowList(cutList)
+    flowDict= self._makeDict(flow)
+    return flow
   def _combine(self,cutList,baseCut="") :
     if not baseCut or baseCut == "(1)":
       return combineCutList(cutList)
@@ -339,9 +340,6 @@ def getYieldsFromCutClass(sampleDict,cutClass,treeList='',returnError=True,pickl
     
 
 
-
-
-
 def getYieldsFromCutList(sampleDict,cutList,baseCut='',treeList='',returnError=True,pickleOut=""):
   treeList  = matchListToDictKeys(treeList,sampleDict)
   print treeList
@@ -365,6 +363,73 @@ def getYieldsFromCutList(sampleDict,cutList,baseCut='',treeList='',returnError=T
     #  if cutList.baseCut:
     #    baseCut = cutList.baseCut
     #    sampleDict[t]['tree'].SetEventList(baseCut)
+    if baseCut:
+      sampleDict[t]['tree'].Draw(">>eList",baseCut)
+      print t, "Setting event list with cut:", 
+      print baseCut, 
+      print "reducing events by a factor of: ", 1.*ROOT.eList.GetN()/sampleDict[t]['tree'].GetEntries() 
+      sampleDict[t]['tree'].SetEventList(ROOT.eList)
+
+
+    for cutName,cutString in cutList:
+      #cutName=cut[0]
+      #cutString=cut[1]
+      #cutString=cut[cutName]
+      #cutString = "(%s) && (%s)"%(plotDict[p]['presel'],plotDict[p]['cut'])
+      if returnError:
+        yieldDict[t][cutName] , yieldDict[t][cutName +"_Err"]= getYieldFromChain(sampleDict[t]['tree'],cutString,weight=weight,returnError=True)
+        print cutName , "     " , yieldDict[t][cutName] , " +- ", yieldDict[t][cutName +"_Err"]
+      else:
+        yieldDict[t][cutName] = getYieldFromChain(sampleDict[t]['tree'],cutString,weight=weight,returnError=False)
+        print cutName , "     " , yieldDict[t][cutName]
+    
+    if baseCut:
+      sampleDict[t]['tree'].SetEventList(0)
+      print t, "  Setting EventList to default"
+      del ROOT.eList
+  #########################################################
+  ##   Getting Total Background and FOM for each Signal  ##
+  #########################################################
+  bkgList = [s for s in treeList if not sampleDict[s]['isSignal']]
+  sigList = [s for s in treeList if sampleDict[s]['isSignal']]
+  if len(bkgList) > 0:
+    yieldDict['bkg']={}
+    iBkg=0
+    for cutName, cutString in cutList:
+      yieldDict['bkg'][cutName] = sum([ yieldDict[bkg][cutName] for bkg in bkgList])
+      yieldDict['bkg'][cutName+"_Err"] = addSquareSum([ yieldDict[bkg][cutName+"_Err"] for bkg in bkgList])
+    iSig=0
+    for sig in sigList:
+      fomSig='fom_%s'%sig
+      yieldDict[fomSig]={}
+      for cut in cutList:
+        cutName=cut[0]
+        cutString=cut[1]
+        if yieldDict['bkg'][cutName] != 0:
+          yieldDict[fomSig][cutName] = yieldDict[sig][cutName]/ math.sqrt(yieldDict['bkg'][cutName])
+        else: yieldDict[fomSig][cutName] = 0 
+        yieldDict[fomSig][cutName+"_Err"] = 0.0
+    #print "added", iBkg+1 , "to bkg"
+  if pickleOut:
+    pickle.dump(yieldDict,open(pickleOut,"wb"))
+  return yieldDict     
+
+
+
+def getYieldsFromCutList2(sampleDict,cutList,baseCut='',treeList='',returnError=True,pickleOut="",verbose=True):
+  treeList  = matchListToDictKeys(treeList,sampleDict)
+  if verbose: print treeList
+  if not treeList:
+    treeList=sampleDict.keys()
+  yieldDict={}
+  for t in treeList:
+    if verbose: print "      Sample: %s"%t
+    if sampleDict[t].has_key("weight"):
+      print 'using weight value in sampleDict for:  ', t ,  sampleDict[t]['weight']
+      weight = str(sampleDict[t]['weight'])
+    else: weight= "weight"
+    if verbose: print weight
+    yieldDict[t]={}
     if baseCut:
       sampleDict[t]['tree'].Draw(">>eList",baseCut)
       print t, "Setting event list with cut:", 
@@ -501,5 +566,43 @@ def getYieldTable(sampleDict,cutList,treeList='',orderedKeys=[],sigs=[],bkgs=[],
   makeTableFromYieldDict(yieldDict,cutList,orderedKeys=orderedKeys,sigs=sigs,bkgs=bkgs,output=output,saveDir=saveDir)
   return yieldDict
 
+
+def setEventListToChain(chain,cut,eListName="",verbose=True):
+  if not eListName:
+    print "WARNING: Using Default eList Name, this could be dangerous!"
+    eListName="eList"
+  if verbose: print "Setting EventList to Chain: ", chain, "Reducing the raw nEvents from ", chain.GetEntries(), " to ",
+  chain.SetEventList(0)
+  chain.Draw(">>%s"%eListName,cut)
+  eList = getattr(ROOT,eListName)
+  chain.SetEventList(eList )
+  if verbose: print eList.GetN()
+  assert eList.GetN() == chain.GetEventList().GetN()
+  del eList
+
+def setEventListToChains(sampleDict,chains,(cutName,cut),verbose=True):
+  for chain in chains:
+    eListName="eList_%s_%s"%(chain,cutName)
+    setEventListToChain(sampleDict[chain]['tree'],cut,eListName=eListName,verbose=verbose)
+
+
+
+def decorHist(title='',x='',y="",color='',width='',fillColor=''):
+  def decorateFunc(h):
+    if color: h.SetLineColor(color)
+    if width: h.SetLineWidth(width)
+    if title: h.SetTitle(title)
+    if fillColor: h.SetFillColor(fillColor)
+    if x : h.GetXaxis().SetTitle(x)
+    if y : h.GetYaxis().SetTitle(y)
+  return decorateFunc
+
+
+def decorCanv(xlog=0,ylog=0,zlog=0):
+  def decorateFunc(canv):
+    if xlog: canv.SetLogx(xlog)
+    if ylog: canv.SetLogy(zlog)
+    if zlog: canv.SetLogz(ylog)
+  return decorateFunc
 
  

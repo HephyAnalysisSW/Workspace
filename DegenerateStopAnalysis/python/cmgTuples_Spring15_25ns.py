@@ -684,5 +684,45 @@ ZJetsToNuNu_HT600toInf_25ns={\
 "treeName":"tree",
 'isData':False
 }
+#allSamples_Spring15_25ns = [TTJets_25ns, DYJetsToLL_M_10to50_25ns, DYJetsToLL_M_50_HT100to200_25ns, DYJetsToLL_M_50_HT200to400_25ns, DYJetsToLL_M_50_HT400to600_25ns, DYJetsToLL_M_50_HT600toInf_25ns, WJetsToLNu_HT100to200_25ns, WJetsToLNu_HT200to400_25ns, WJetsToLNu_HT400to600_25ns, WJetsToLNu_HT600toInf_25ns, WJetsToLNu_HT600to800_25ns, WJetsToLNu_HT800to1200_25ns, WJetsToLNu_HT1200to2500_25ns, WJetsToLNu_HT2500toInf_25ns, TToLeptons_sch_25ns, TToLeptons_tch_25ns, TBar_tWch_25ns, T_tWch_25ns, QCD_MuEnriched_Pt15to20_25ns, QCD_MuEnriched_Pt20to30_25ns, QCD_MuEnriched_Pt30to50_25ns, QCD_MuEnriched_Pt50to80_25ns, QCD_MuEnriched_Pt80to120_25ns, QCD_MuEnriched_Pt120to170_25ns, QCD_MuEnriched_Pt170to300_25ns, QCD_MuEnriched_Pt300to470_25ns, QCD_MuEnriched_Pt470to600_25ns, QCD_MuEnriched_Pt600to800_25ns, QCD_MuEnriched_Pt800to1000_25ns, QCD_MuEnriched_Pt1000toInf_25ns, QCD_EMEnriched_Pt15to20_25ns, QCD_EMEnriched_Pt20to30_25ns, QCD_EMEnriched_Pt30to50_25ns, QCD_EMEnriched_Pt50to80_25ns, QCD_EMEnriched_Pt80to120_25ns, QCD_EMEnriched_Pt120to170_25ns, QCD_EMEnriched_Pt170to300_25ns, QCD_EMEnriched_Pt300toInf_25ns, QCD_bcToE_Pt15to20_25ns, QCD_bcToE_Pt20to30_25ns, QCD_bcToE_Pt30to80_25ns, QCD_bcToE_Pt80to170_25ns, QCD_bcToE_Pt170to250_25ns, QCD_bcToE_Pt250toInf_25ns, WZ_25ns, WWTo2L2Nu_25ns, ZZ_25ns, ZJetsToNuNu_HT200to400_25ns, ZJetsToNuNu_HT400to600_25ns, ZJetsToNuNu_HT600toInf_25ns, ]
 
-allSamples_Spring15_25ns = [TTJets_25ns, DYJetsToLL_M_10to50_25ns, DYJetsToLL_M_50_HT100to200_25ns, DYJetsToLL_M_50_HT200to400_25ns, DYJetsToLL_M_50_HT400to600_25ns, DYJetsToLL_M_50_HT600toInf_25ns, WJetsToLNu_HT100to200_25ns, WJetsToLNu_HT200to400_25ns, WJetsToLNu_HT400to600_25ns, WJetsToLNu_HT600toInf_25ns, WJetsToLNu_HT600to800_25ns, WJetsToLNu_HT800to1200_25ns, WJetsToLNu_HT1200to2500_25ns, WJetsToLNu_HT2500toInf_25ns, TToLeptons_sch_25ns, TToLeptons_tch_25ns, TBar_tWch_25ns, T_tWch_25ns, QCD_MuEnriched_Pt15to20_25ns, QCD_MuEnriched_Pt20to30_25ns, QCD_MuEnriched_Pt30to50_25ns, QCD_MuEnriched_Pt50to80_25ns, QCD_MuEnriched_Pt80to120_25ns, QCD_MuEnriched_Pt120to170_25ns, QCD_MuEnriched_Pt170to300_25ns, QCD_MuEnriched_Pt300to470_25ns, QCD_MuEnriched_Pt470to600_25ns, QCD_MuEnriched_Pt600to800_25ns, QCD_MuEnriched_Pt800to1000_25ns, QCD_MuEnriched_Pt1000toInf_25ns, QCD_EMEnriched_Pt15to20_25ns, QCD_EMEnriched_Pt20to30_25ns, QCD_EMEnriched_Pt30to50_25ns, QCD_EMEnriched_Pt50to80_25ns, QCD_EMEnriched_Pt80to120_25ns, QCD_EMEnriched_Pt120to170_25ns, QCD_EMEnriched_Pt170to300_25ns, QCD_EMEnriched_Pt300toInf_25ns, QCD_bcToE_Pt15to20_25ns, QCD_bcToE_Pt20to30_25ns, QCD_bcToE_Pt30to80_25ns, QCD_bcToE_Pt80to170_25ns, QCD_bcToE_Pt170to250_25ns, QCD_bcToE_Pt250toInf_25ns, WZ_25ns, WWTo2L2Nu_25ns, ZZ_25ns, ZJetsToNuNu_HT200to400_25ns, ZJetsToNuNu_HT400to600_25ns, ZJetsToNuNu_HT600toInf_25ns, ]
+allSamples_Spring15_25ns = [TTJets_25ns, 
+                            DYJetsToLL_M_10to50_25ns, 
+                            WJetsToLNu_HT100to200_25ns, WJetsToLNu_HT200to400_25ns, WJetsToLNu_HT400to600_25ns, #WJetsToLNu_HT600toInf_25ns, 
+                            WJetsToLNu_HT600to800_25ns, WJetsToLNu_HT800to1200_25ns, WJetsToLNu_HT1200to2500_25ns, WJetsToLNu_HT2500toInf_25ns, 
+                            ZJetsToNuNu_HT200to400_25ns, ZJetsToNuNu_HT400to600_25ns, ZJetsToNuNu_HT600toInf_25ns, ]
+
+
+
+
+allSignalData=[\
+#["/data/nrad/cmgTuples/dxy0fix/T2DegStop_300_270_miniIso/T2DegStop_300_270", "T2DegStop_300_270"],
+#["/afs/hephy.at/work/n/nrad/cmgTuples/RunII/","T2DegStop_300_270"]
+["/data/nrad/cmgTuples/RunII/T2DegStop_300_270/","T2DegStop_300_270"]
+]
+
+
+allSignalStrings = [s[1] for s in allSignalData]
+def getSignalSample(dir, signal):
+  if signal in allSignalStrings:
+    return {\
+      "name" : signal,
+      "chunkString": signal,
+      'dir' : dir,
+      'dbsName':signal,
+      'isData':False,
+      "rootFileLocation":"treeProducerSusySingleLepton/tree.root",
+      "treeName":"tree",
+      "skimAnalyzerDir":"skimAnalyzerCount",
+      }
+  else:
+    print "Signal",signal,"unknown. Available: ",", ".join(allSignalStrings)
+
+allSignals=[]
+for d,s in allSignalData:
+  exec(s+"=getSignalSample('"+d+"','"+s+"')")
+  exec("allSignals.append("+s+")")
+
+
+
+

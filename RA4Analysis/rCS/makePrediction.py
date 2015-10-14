@@ -18,6 +18,7 @@ from Workspace.RA4Analysis.signalRegions import *
 ROOT.TH1F().SetDefaultSumw2()
 
 lepSel = 'hard'
+debugReweighting = False
 
 cWJets  = getChain(WJetsHTToLNu_25ns,histname='')
 cTTJets = getChain(TTJets_LO_25ns,histname='')
@@ -38,14 +39,14 @@ if small: signalRegions = smallRegion
 #DEFINE LUMI AND PLOTDIR
 lumi = 3.
 printDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/25ns/templateFit/'
-pickleDir = '/data/'+username+'/Spring15/25ns/rCS_0b_'+str(lumi)+'/'
+pickleDir = '/data/'+username+'/Spring15/25ns/NORMALIZATIONTEST_rCS_0b_'+str(lumi)+'/'
 
 if not os.path.exists(pickleDir):
   os.makedirs(pickleDir)
 if not os.path.exists(printDir):
   os.makedirs(printDir)
 
-weight_str, weight_err_str = makeWeight(lumi, sampleLumi=3.)
+weight_str, weight_err_str = makeWeight(lumi, sampleLumi=3., debug=debugReweighting)
 
 samples={'W':cWJets, 'TT':cTTJets, 'Rest':cRest, 'Bkg':cBkg, 'Data': cData}
 signal = False

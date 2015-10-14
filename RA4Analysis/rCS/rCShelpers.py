@@ -5,10 +5,17 @@ from Workspace.RA4Analysis.helpers import *#nameAndCut, nJetBinName, nBTagBinNam
 from math import sqrt, pi, cosh
 from array import array
 
-def makeWeight(lumi=4., sampleLumi=3.):
-  weight_str = '(((weight)/'+str(sampleLumi)+')*'+str(lumi)+')'
-  weight_err_str = '('+weight_str+'*'+weight_str+')'
-  return weight_str, weight_err_str
+#def makeWeight(lumi=4., sampleLumi=3.):
+#  return 'weight', 'weight*weight'
+
+def makeWeight(lumi=4., sampleLumi=3.,debug=False):
+  if debug:
+    print 'No lumi-reweighting done!!'
+    return 'weight', 'weight*weight'
+  else:
+    weight_str = '(((weight)/'+str(sampleLumi)+')*'+str(lumi)+')'
+    weight_err_str = '('+weight_str+'*'+weight_str+')'
+    return weight_str, weight_err_str
 
 
 #ROOT.TH1F().SetDefaultSumw2()
@@ -121,3 +128,11 @@ def getNumString(n,ne, acc=2):    ##For printing table
   #if type(n) is str and type(ne) is str: 
   else:
     return n +'&$\pm$&'+ ne
+
+def getNumStringWithSyst(n,eSys, eStat, acc=2):    ##For printing table 
+  if type(n) is float and type(eSys) is float and type(eStat) is float:
+    return str(round(n,acc))+'&$\pm$&'+str(round(eSys,acc)) +'&$\pm$&'+str(round(eStat,acc))
+  #if type(n) is str and type(ne) is str: 
+  else:
+    return n +'&$\pm$&'+ eSys +'&$\pm$&'+ eStat
+

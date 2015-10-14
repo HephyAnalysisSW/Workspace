@@ -10,9 +10,12 @@ from Workspace.HEPHYPythonTools.helpers import *
 from Workspace.RA4Analysis.helpers import *
 from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_Spring15_hard import *
-from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_postProcessed import *
+#from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_postProcessed import *
+from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT400ST200_postProcessed import *
+from Workspace.RA4Analysis.cmgTuples_Data25ns_0l import *
 #from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT400ST200_postProcessed import *
 #from Workspace.RA4Analysis.cmgTuples_Spring15_50ns_postProcessed import *
+from Workspace.HEPHYPythonTools.user import username
 
 
 
@@ -35,7 +38,8 @@ singleTop = {'name':'singleTop', 'chain':getChain(singleTop_25ns,histname=''), '
 QCD = {'name':'QCD', 'chain':getChain(QCDHT_25ns,histname=''), 'color':color('QCD'),'weight':'weight', 'niceName':'QCD'}
 #QCD = {'name':'QCD', 'chain':getChain(QCDEle_25ns,histname=''), 'color':color('QCD'),'weight':'weight', 'niceName':'QCD'}
 diBoson = {'name':'diBoson', 'chain':getChain(diBosons_25ns,histname=''), 'color':ROOT.kMagenta,'weight':'weight', 'niceName':'diboson'}
-samples = [WJETS, TTJetsLO, singleTop, DY, QCD, diBoson]
+samples = [WJETS, TTJetsLO, singleTop, DY, QCD]#, diBoson]
+samplesComp = [WJETS, TTJETS, singleTop, DY, QCD]
 
 # older samples
 #WJETS = {'name':'WJets', 'chain':getChain(WJetsHTToLNu[lepSel],histname=''), 'color':color('WJets'),'weight':'weight', 'niceName':'W Jets'}
@@ -72,12 +76,19 @@ nBJetMedium30 = {'name':'nBJetMedium30', 'binning':[5,0,5], 'titleX':'nBJetMediu
 
 st = {'name':'st', 'binning':[37,250,2100], 'titleX':'L_{T} [GeV]', 'titleY':'Events'}
 ht = {'name':'htJet30j', 'binning':[52,500,3100], 'titleX':'H_{T} [GeV]', 'titleY':'Events'}
-njet = {'name':'nJet30', 'binning':[15,0,15], 'titleX':'n_{jets}', 'titleY':'Events'}
+njet = {'name':'nJet30', 'binning':[15,0,15], 'titleX':'n_{jets}', 'titleY':'Events', 'filename':'nJet30'}
 deltaPhi = {'name':'deltaPhi_Wl', 'binning':[32,0,3.2], 'titleX':'#Delta#Phi(W,l)', 'titleY':'Events'}
 leptonPt = {'name':'leptonPt', 'binning':[40,0,1000], 'titleX':'p_{T} [GeV]', 'titleY':'Events'}
-leadingJetPt = {'name':'Jet_pt[0]', 'binning':[40,0,2000], 'titleX':'p_{T} (leading jet) [GeV]', 'titleY':'Events'}
+lepGoodPt = {'name':'LepGood_pt[0]', 'binning':[22,0,1100], 'titleX':'p_{T} [GeV] (lepton)', 'titleY':'Events', 'filename':'LepGood_pt[0]'}
+lepGoodEta = {'name':'LepGood_eta[0]', 'binning':[30,-3.,3.], 'titleX':'#eta (lepton)', 'titleY':'Events', 'filename':'LepGood_eta[0]'}
+leadingJetPt = {'name':'Jet_pt[0]', 'binning':[40,0,2000], 'titleX':'p_{T} (leading jet) [GeV]', 'titleY':'Events', 'filename':'Jet_pt[0]'}
+leadingJetPhi = {'name':'Jet_phi[0]', 'binning':[32,-3.2,3.2], 'titleX':'#Phi (leading jet)', 'titleY':'Events', 'filename':'Jet_phi[0]'}
+invMass = {'name':'sqrt(2*LepGood_pt[0]*LepGood_pt[1]*(cosh(LepGood_eta[0]-LepGood_eta[1])-cos(LepGood_phi[0]-LepGood_phi[1])))','binning':[40,0,1000], 'titleX':'M [GeV]', 'titleY':'Events', 'filename':'invMass'}
 
-met = {'name':'met_pt', 'binning':[44,0,220], 'titleX':'E_{T}^{miss} [GeV]', 'titleY':'Events'}
+
+met = {'name':'met_pt', 'binning':[22,0,1100], 'titleX':'E_{T}^{miss} [GeV]', 'titleY':'Events', 'filename':'MET_pt'}
+metPhi = {'name':'met_phi', 'binning':[16,-3.2,3.2], 'titleX':'#Phi(E_{T}^{miss})', 'titleY':'Events', 'filename':'MET_phi'}
+metRawPhi = {'name':'met_rawPhi', 'binning':[16,-3.2,3.2], 'titleX':'#Phi(E_{T}^{miss}) raw', 'titleY':'Events'}
 metNoHF = {'binning': [20, 0, 1000], 'name': 'metNoHF_pt', 'titleX': 'E_{T}^{miss} NoHF [GeV]', 'titleY': 'Events'}
 metNoHFPhi = {'binning': [16, -3.2, 3.2], 'name': 'metNoHF_phi', 'titleX': '#Phi(E_{T}^{miss}) NoHF', 'titleY': 'Events'}
 #deltaPhiCMG = {'binning': [16, 0, 3.2], 'name': 'Sum$((acos((LepGood_pt+metNoHF_pt*cos(LepGood_phi-metNoHF_phi))/sqrt(LepGood_pt**2+metNoHF_pt**2+2*metNoHF_pt*LepGood_pt*cos(LepGood_phi-metNoHF_phi))))*'+electronId+')', 'titleX': '#Delta#Phi(W,l) NoHF', 'titleY': 'Events'}
@@ -99,8 +110,8 @@ negWeight = {'name':'negWeight', 'string':newpresel+'&&weight<0', 'niceName':'ne
 
 newPreselNoLtHt = {'name':'presel','string':preselNoLtHt,'niceName':'Preselection'}
 newPreselCut = {'name':'presel','string':newpresel,'niceName':'Preselection'}
-newPreselCutSingleMuAN = {'name':'presel','string':newpresel+'&&singleMuonic&&nJet30>2','niceName':'Preselection'}
-newPreselCutSingleEleAN = {'name':'presel','string':newpresel+'&&singleElectronic&&nJet30>2','niceName':'Preselection'}
+newPreselCutSingleMuAN = {'name':'presel','string':newpresel+'&&singleMuonic','niceName':'Preselection'}
+newPreselCutSingleEleAN = {'name':'presel','string':newpresel+'&&singleElectronic','niceName':'Preselection'}
 
 Flag_EcalDeadCellTriggerPrimitiveFilter = {'name':'ecalFilterCut','string':newpresel+'&&Flag_EcalDeadCellTriggerPrimitiveFilter','niceName':'EcalDeadCellFilter'}
 Flag_HBHENoiseFilter  = {'name':'ecalFilterCut','string':newpresel+'&&Flag_HBHENoiseFilter','niceName':'HBHENoiseFilter'}
@@ -138,10 +149,15 @@ name, cut = nameAndCut((250,350),(1000,-1),(5,5),btb=(0,0),presel=presel)
 highFakeMetCut = {'name':name,'string':cut+'&&'+fakeMetSelection,'niceName':'E_{T}^{miss,fake} > 50 GeV || > E_{T}^{miss,gen}'}
 lowFakeMetCut = {'name':name,'string':cut+'&&'+antiFakeMetSelection,'niceName':'E_{T}^{miss,fake} < 50 GeV && < E_{T}^{miss,gen}'}
 
-path25ns = '/data/easilar/cmgTuples/crab/Summer15_25nsV2MC_Data/'
-SingleElectron_Run2015C = {'name':'SingleElectron_Run2015C-PromptReco-v1', 'dir':path25ns+'SingleElectron_Run2015C/'}
-SingleMuon_Run2015C = {'name':'SingleMuon_Run2015C-PromptReco-v1', 'dir':path25ns+'SingleMuon_Run2015C/'}
-samples25ns = [SingleElectron_Run2015C,SingleMuon_Run2015C]
+#path25ns = '/data/easilar/cmgTuples/crab/Summer15_25nsV2MC_Data/'
+#SingleElectron_Run2015C = {'name':'SingleElectron_Run2015C-PromptReco-v1', 'dir':path25ns+'SingleElectron_Run2015C/'}
+#SingleMuon_Run2015C = {'name':'SingleMuon_Run2015C-PromptReco-v1', 'dir':path25ns+'SingleMuon_Run2015C/'}
+SingleMuonData = SingleMuon_Run2015D_PromptReco
+SingleElectronData = SingleElectron_Run2015D_PromptReco
+
+#samples25ns = [SingleElectronData,SingleMuonData,MuonEG_Run2015D_PromptReco,DoubleEG_Run2015D_PromptReco,DoubleMuon_Run2015D_PromptReco,JetHT_Run2015D_PromptReco,MET_Run2015D_PromptReco]
+
+samples25ns = [SingleElectronData,SingleMuonData]
 
 dataSamples = samples25ns
 for s in dataSamples:
@@ -174,6 +190,7 @@ ele_MVAID_cutstr_vloose= "((abs(LepGood_eta)<0.8&&LepGood_mvaIdPhys14>"+ str(ele
                        +"||((abs(LepGood_eta)>=1.57)&&LepGood_mvaIdPhys14>"+str(ele_MVAID_cuts_vloose['eta204'])+"))"
 
 singleMuonic = '(Sum$(abs(LepGood_pdgId)==13&&LepGood_pt>=25&&abs(LepGood_eta)<2.4&&LepGood_miniRelIso<0.2&&LepGood_mediumMuonId==1&&LepGood_sip3d<4.0)==1)'
+diMuonic = '(Sum$(abs(LepGood_pdgId)==13&&LepGood_pt>=25&&abs(LepGood_eta)<2.4&&LepGood_miniRelIso<0.2&&LepGood_mediumMuonId==1&&LepGood_sip3d<4.0)==2)'
 #singleMuonic = '(Sum$(abs(LepGood_pdgId)==13&&LepGood_pt>=25&&abs(LepGood_eta)<2.4)==1)'
 singleElectronic = "(Sum$(abs(LepGood_pdgId)==11&&LepGood_pt>=25&&abs(LepGood_eta)<2.5&&LepGood_miniRelIso<0.1&&"+ele_MVAID_cutstr_tight+"&&LepGood_lostHits==0&&LepGood_convVeto&&LepGood_sip3d<4.0)==1)"
 #singleElectronic = "(Sum$(abs(LepGood_pdgId)==11&&LepGood_pt>=25&&abs(LepGood_eta)<2.4)==1)"
@@ -190,17 +207,47 @@ LeptonReq = singleLeptonic
 #LeptonId = muonId
 #LeptonReq = singleMuonic
 
-stStr = 'Sum$((LepGood_pt+met_pt)*'+LeptonId+')'
+leptonVeto = '((abs(LepGood_pdgId)==11&&((Sum$(abs(LepGood_pdgId)==13&&LepGood_pt>=10&&abs(LepGood_eta)<2.4))==0&&(Sum$(abs(LepGood_pdgId)==11&&LepGood_pt>=10&&abs(LepGood_eta)<2.5))==1))\
+             ||(abs(LepGood_pdgId)==13&&((Sum$(abs(LepGood_pdgId)==13&&LepGood_pt>=10&&abs(LepGood_eta)<2.4))==1&&(Sum$(abs(LepGood_pdgId)==11&&LepGood_pt>=10&&abs(LepGood_eta)<2.5))==0)))'
+
+leptonVetoNoEta = '((abs(LepGood_pdgId)==11&&((Sum$(abs(LepGood_pdgId)==13&&LepGood_pt>=10))==0&&(Sum$(abs(LepGood_pdgId)==11&&LepGood_pt>=10))==1))\
+             ||(abs(LepGood_pdgId)==13&&((Sum$(abs(LepGood_pdgId)==13&&LepGood_pt>=10))==1&&(Sum$(abs(LepGood_pdgId)==11&&LepGood_pt>=10))==0)))'
+
+stStrMetNoHF = 'Sum$((LepGood_pt+metNoHF_pt)*'+LeptonId+')'
+stStr = 'Sum$(LepGood_pt[0]+met_pt)'
+stStrSimple = 'Sum$(LepGood_pt[0]+metNoHF_pt)'
 htStr = 'Sum$(Jet_pt*(Jet_pt>30&&abs(Jet_eta)<2.4&&Jet_id))'
+btagStr = 'Sum$(Jet_pt>30&&abs(Jet_eta)<2.4&&Jet_id&&Jet_btagCSV>0.890)'
+
+htComp = {'name':htStr, 'binning':[52,500,3100], 'titleX':'H_{T} [GeV]', 'titleY':'Events', 'filename':'HT'}
+stComp = {'name':stStr, 'binning':[37,250,2100], 'titleX':'L_{T} [GeV]', 'titleY':'Events', 'filename':'LT'}
+nbjetComp = {'name':btagStr, 'binning':[6,0,6], 'titleX':'n_{b-jets}', 'titleY':'Events', 'filename':'nBJetMedium'}
 
 #datapresel = '('+singleMuonic+'||'+singleElectronic+')&&nJet30>2&&nBJetMedium30>=0&&'+htStr+'>500&&'+stStr+'>200'
-datapresel = LeptonReq+'&&nJet30>=2&&nBJetMedium30>=0&&'+htStr+'>500&&'+stStr+'>250&&Flag_CSCTightHaloFilter'
+#trigger = "&&((HLT_ElNoIso||HLT_EleHT350)||(HLT_MuHT350||HLT_Mu50NoIso))"
+#trigger = "&&((HLT_ElNoIso||HLT_EleHT350MET70)||(HLT_MuHT350MET70||HLT_Mu50NoIso))"
+trigger = "&&(HLT_EleHT350||HLT_MuHT350)"
+filters = "&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFilterMinZeroPatched&&Flag_goodVertices&&Flag_eeBadScFilter"
+#filters = "&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFilterMinZeroPatched&&Flag_goodVertices&&Flag_eeBadScFilter"#&&Flag_EcalDeadCellTriggerPrimitiveFilter"
 
-dataDict = {'chain':data, 'cut':datapresel,'name':'data'}
+#datapresel = LeptonReq+'&&'+leptonVeto+'&&nJet30>=2&&nBJetMedium30>=0&&'+htStr+'>500&&'+stStr+'>250'
+datapresel = LeptonReq+'&&'+leptonVeto+'&&nJet30>=2&&'+htStr+'>500&&'+stStr+'>250'
+datacut = datapresel+trigger+filters
+dataDict = {'chain':data, 'cut':datacut,'name':'data'}
 
-deltaPhiCMG = {'binning': [16, 0, 3.2], 'name': 'Sum$((acos((LepGood_pt+metNoHF_pt*cos(LepGood_phi-metNoHF_phi))/sqrt(LepGood_pt**2+metNoHF_pt**2+2*metNoHF_pt*LepGood_pt*cos(LepGood_phi-metNoHF_phi))))*'+LeptonId+')', 'titleX': '#Delta#Phi(W,l) NoHF', 'titleY': 'Events'}
+deltaPhiCMG_NoHF = {'binning': [30, 0, 3.2], 'name': 'Sum$((acos((LepGood_pt+metNoHF_pt*cos(LepGood_phi-metNoHF_phi))/sqrt(LepGood_pt**2+metNoHF_pt**2+2*metNoHF_pt*LepGood_pt*cos(LepGood_phi-metNoHF_phi))))*'+LeptonId+')', 'titleX': '#Delta#Phi(W,l) NoHF', 'titleY': 'Events'}
+#deltaPhiCMG = {'binning': [32, 0, 3.2], 'name': 'Sum$((acos((LepGood_pt+met_pt*cos(LepGood_phi-met_phi))/sqrt(LepGood_pt**2+met_pt**2+2*met_pt*LepGood_pt*cos(LepGood_phi-met_phi))))*'+LeptonId+')', 'titleX': '#Delta#Phi(W,l) NoHF', 'titleY': 'Events', 'filename':'deltaPhi_Wl', 'binningIsExplicit':True}
+deltaPhiCMG = {'binning': [0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.1,1.3,1.5,1.8,2.2,2.6,3.2], 'name': 'Sum$((acos((LepGood_pt+met_pt*cos(LepGood_phi-met_phi))/sqrt(LepGood_pt**2+met_pt**2+2*met_pt*LepGood_pt*cos(LepGood_phi-met_phi))))*'+LeptonId+')', 'titleX': '#Delta#Phi(W,l) NoHF', 'titleY': 'Events', 'filename':'deltaPhi_Wl', 'binningIsExplicit':True}
 
-def plot(samples, variable, cuts, signals=False, data=False, maximum=False, minimum=0., stacking=False, filling=True, setLogY=False, setLogX=False, titleText='CMS simulation', lumi='3', legend=True, MClumiScale=1., drawError=False):
+dataPlotList = [stComp, htComp, deltaPhiCMG, met, njet, leadingJetPt, lepGoodPt, lepGoodEta, nbjetComp]
+
+#for d in dataPlotList:
+#  t = plot(samples,leadingJetPt,newPreselCut, data=dataDict,filling=True,stacking=True,minimum=0.08, maximum=2000, MClumiScale=205./3000., setLogY=True, lumi=0.205, titleText='CMS preliminary')
+#  savePlot(t, d['titleX'])
+
+def plot(samples, variable, cuts, signals=False, data=False, maximum=False, minimum=0., stacking=False, filling=True, setLogY=False, setLogX=False, titleText='simulation', lumi='3', legend=True, MClumiScale=1., drawError=False, MCscale=True):
+  if 'binningIsExplicit' in variable: binningIsExplicit = variable['binningIsExplicit']
+  else: binningIsExplicit = False
   totalChain = ROOT.TChain('tree')
   for s in samples:
     totalChain.Add(s['chain'])
@@ -223,25 +270,32 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
   pad1.cd()
   colorList = [ROOT.kBlue+1, ROOT.kCyan-9, ROOT.kOrange-4, ROOT.kGreen+1, ROOT.kRed+1]
   h = []
-  totalH = ROOT.TH1F('totalH', 'totalH', *variable['binning'])
+  if binningIsExplicit: totalH = ROOT.TH1F('totalH', 'totalH', len(variable['binning'])-1, array('d', variable['binning']))
+  else: totalH = ROOT.TH1F('totalH', 'totalH', *variable['binning'])
   nsamples = len(samples)
   ncuts = len(cuts)
-  MCscale=1.
-  if ncuts == 1 and data:
+  if data:
     if data['cut']: dataCutString = data['cut']
     else: dataCutString = cuts[0]['string']
-    dataYield = getYieldFromChain(data['chain'],cutString=dataCutString,weight='(1)')
-    MCYield = getYieldFromChain(totalChain,cutString=cuts[0]['string'],weight=str(MClumiScale)+'*''weight')
-    print dataYield, MCYield
+    dataYield, dataYieldError = getYieldFromChain(data['chain'],cutString=dataCutString,weight='(1)', returnError=True)
+  if ncuts == 1 and data and MCscale:
+    #if data['cut']: dataCutString = data['cut']
+    #else: dataCutString = cuts[0]['string']
+    #dataYield = getYieldFromChain(data['chain'],cutString=dataCutString,weight='(1)')
+    MCYield, MCYieldError = getYieldFromChain(totalChain,cutString=cuts[0]['string'],weight=str(MClumiScale)+'*''weight', returnError=True)
+    print 'Yield Data:\t', dataYield
+    print 'Yield MC:\t', MCYield
     MCscale = dataYield/MCYield
-    print MCscale, 1./MCscale
+    MCscaleError = dataYield/MCYield*sqrt(MCYieldError**2/dataYield**2+dataYieldError**2/MCYield**2)
+    print 'Area normalization factor:',round(MCscale,3),'+/-',round(MCscaleError,3)
   else: MCscale=1.
   for isample, sample in enumerate(samples):
     for icut, cut in enumerate(cuts):
       i = isample*ncuts+icut
       if nsamples>1: legendName = sample['niceName']
       else: legendName = cut['niceName']
-      h.append({'hist':ROOT.TH1F('h'+str(isample)+'_'+str(icut), legendName, *variable['binning']),'yield':0., 'legendName':legendName})
+      if binningIsExplicit: h.append({'hist':ROOT.TH1F('h'+str(isample)+'_'+str(icut), legendName, len(variable['binning'])-1, array('d', variable['binning'])),'yield':0., 'legendName':legendName})
+      else: h.append({'hist':ROOT.TH1F('h'+str(isample)+'_'+str(icut), legendName, *variable['binning']),'yield':0., 'legendName':legendName})
       if sample['weight']=='weight':weight='weight'
       else: weight=str(sample['weight'])
       sample['chain'].Draw(variable['name']+'>>h'+str(isample)+'_'+str(icut),str(MCscale*MClumiScale)+'*'+weight+'*('+cut['string']+')','goff')
@@ -280,7 +334,7 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
     leg.SetBorderSize(1)
     leg.SetTextSize(0.035)
     for item in reversed(h):
-      leg.AddEntry(item['hist'])
+      leg.AddEntry(item['hist'],'','f')
   if setLogY: pad1.SetLogy()
   if setLogX: pad1.SetLogx()
   if stacking:
@@ -310,7 +364,8 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
   s = []
   if signals:
     for isignal,signal in enumerate(signals):
-      s.append({'hist':ROOT.TH1F('s'+str(isignal), signal['niceName'], *variable['binning']),'yield':0., 'legendName':signal['niceName']})
+      if binningIsExplicit: s.append({'hist':ROOT.TH1F('s'+str(isignal), signal['niceName'], len(variable['binning'])-1, array('d', variable['binning'])),'yield':0., 'legendName':signal['niceName']})
+      else: s.append({'hist':ROOT.TH1F('s'+str(isignal), signal['niceName'], *variable['binning']),'yield':0., 'legendName':signal['niceName']})
       #if signal['weight']=='weight':weight='weight*(3./4.)'
       #else: weight=str(signal['weight'])
       signal['chain'].Draw(variable['name']+'>>s'+str(isignal),weight+'*('+cut['string']+')','goff')
@@ -321,7 +376,8 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
       if drawError: s[isignal]['hist'].Draw('e same hist')
       else: s[isignal]['hist'].Draw('same hist')
   if data:
-    h.append({'hist':ROOT.TH1F('data','Data',*variable['binning']),'yield':0., 'legendName':'data'})
+    if binningIsExplicit: h.append({'hist':ROOT.TH1F('data','Data',len(variable['binning'])-1, array('d', variable['binning'])),'yield':dataYield, 'legendName':'data'})
+    else: h.append({'hist':ROOT.TH1F('data','Data',*variable['binning']),'yield':dataYield, 'legendName':'data'})
     if data['cut']: cutstring = data['cut']
     else: cutstring = cut['string']
     #if data['var']: variable = data['var']
@@ -329,7 +385,8 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
     #h_Stack.Draw('hist')
     h[-1]['hist'].Draw('same e1p')
     if legend: leg.AddEntry(h[-1]['hist'])
-    dataMCH = ROOT.TH1F('dataMC','DataMC',*variable['binning'])
+    if binningIsExplicit: dataMCH = ROOT.TH1F('dataMC','DataMC',len(variable['binning'])-1, array('d', variable['binning']))
+    else: dataMCH = ROOT.TH1F('dataMC','DataMC',*variable['binning'])
     dataMCH.Sumw2()
     dataMCH = h[-1]['hist'].Clone()
     dataMCH.Divide(totalH)
@@ -361,13 +418,25 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
     latex1.SetNDC()
     latex1.SetTextSize(0.04)
     latex1.SetTextAlign(11) # align right
-  if titleText: latex1.DrawLatex(0.15,0.96,titleText)
+  if titleText: latex1.DrawLatex(0.15,0.96,'CMS '+titleText)
+  if MCscale: latex1.DrawLatex(0.98-legendWidth,0.95-height-0.04,'MC~ scale:'+str(round(MCscale,3))+'\pm'+str(round(MCscaleError,3)))
   if lumi: latex1.DrawLatex(0.73,0.96,"L="+str(lumi)+"fb^{-1} (13TeV)")
   if legend: leg.Draw()
   can.Update()
   if stacking: return {'hist':h, 'canvas':can, 'legend':leg, 'stack':h_Stack, 'signals':s}
   else: return {'hist':h, 'canvas':can, 'legend':leg, 'signals':s}
 
+def savePlot(plotDict, path, filename, fileType=['pdf','root','png']):
+  wwwDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/'
+  if not os.path.exists(wwwDir+path):
+    os.makedirs(wwwDir+path)
+  for t in fileType:
+    plotDict['canvas'].Print(wwwDir+path+filename+'.'+t)
+
+def createDefaultDataPlots(dataList):
+  for a in dataList:
+    t = plot(samples,a,newPreselCut, data=dataDict,filling=True,stacking=True,minimum=0.08, maximum=2000, MClumiScale=204./3000., setLogY=True, lumi=0.204, titleText='preliminary')
+    savePlot(t, 'data/25ns/204pbV3/',a['filename'])
 #plot(samples,st,cuts)
 
 #vars = [st,ht,njet,deltaPhi,leptonPt,leadingJetPt]

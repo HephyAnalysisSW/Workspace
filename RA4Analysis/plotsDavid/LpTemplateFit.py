@@ -7,7 +7,8 @@ from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,v
 from Workspace.HEPHYPythonTools.user import username
 from math import pi, sqrt
 
-def LpTemplateFit(LpTemplates, prefix="", printDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/pngCMG2/templateFit_Phys14V3/QCDestimation'):
+#def LpTemplateFit(LpTemplates, prefix="", printDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/pngCMG2/templateFit_Phys14V3/QCDestimation'):
+def LpTemplateFit(LpTemplates, prefix="", printDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/RunII/Spring15_25ns/QCDestimation/templateFit'):
   if not os.path.exists(printDir):
      os.makedirs(printDir) 
 #  cWJets = samples['W']
@@ -17,6 +18,8 @@ def LpTemplateFit(LpTemplates, prefix="", printDir='/afs/hephy.at/user/'+usernam
   histoEWKsel = LpTemplates['EWKsel']
   histoQCDantiSel = LpTemplates['QCDantiSel']
   histoQCDsel = LpTemplates['QCDsel']
+  histoDATAantiSel = LpTemplates['DATAantiSel']
+  histoDATAsel = LpTemplates['DATAsel']
 
 #Clone histograms from LpTemplates: EWK selected and QCD anti-selected
   template_EWK   = histoEWKsel.Clone()
@@ -43,8 +46,7 @@ def LpTemplateFit(LpTemplates, prefix="", printDir='/afs/hephy.at/user/'+usernam
 #  hData_NegPdg.Scale(0.5)
 #  hData_NegPdg.Add(template_WJets_NegPdg)
 #  hData_NegPdg.Add(template_Rest_NegPdg)
-  hData = histoEWKsel.Clone()
-  hData.Add(histoQCDsel)
+  hData = histoDATAsel.Clone()
 
   if template_EWK.Integral()>0:
     template_EWK.Scale(1./template_EWK.Integral())
@@ -71,8 +73,8 @@ def LpTemplateFit(LpTemplates, prefix="", printDir='/afs/hephy.at/user/'+usernam
 #  dh_Rest_PosPdg=ROOT.RooDataHist("mcRest","mcRest",ROOT.RooArgList(x),template_Rest_PosPdg)
 #  dh_Rest_NegPdg=ROOT.RooDataHist("mcRest","mcRest",ROOT.RooArgList(x),template_Rest_NegPdg)
 
-  yield_EWK=ROOT.RooRealVar("EWK_yield","yieldEWK",0.1,0,10**7)
-  yield_QCD=ROOT.RooRealVar("QCD_yield","yieldQCD",0.1,0,10**7)
+  yield_EWK=ROOT.RooRealVar("EWK_yield","yieldEWK",0.1,0,10**9)
+  yield_QCD=ROOT.RooRealVar("QCD_yield","yieldQCD",0.1,0,10**9)
 #  yield_WJets_PosPdg = ROOT.RooRealVar("yield_WJets_PosPdg","yield_WJets_PosPdg",0.1,0,10**5)
 #  yield_WJets_NegPdg = ROOT.RooRealVar("yield_WJets_NegPdg","yield_WJets_NegPdg",0.1,0,10**5)
 #  yield_Rest_PosPdg = ROOT.RooRealVar("yield_Rest_PosPdg","yield_Rest_PosPdg",0.1,0,10**5)
@@ -155,9 +157,8 @@ def LpTemplateFit(LpTemplates, prefix="", printDir='/afs/hephy.at/user/'+usernam
   ROOT.RooMinuit(sumNLL).hesse()
   ROOT.RooMinuit(sumNLL).minos()#optional
 
-  #myPdf->paramOn(frame,Layout(xmin,ymin,ymax))
-  fitFrame=x.frame(rf.Bins(50),rf.Title("FitModel"))
-  model.paramOn(fitFrame,rf.Layout(0.55,0.95,0.95))
+  fitFrame=x.frame(rf.Bins(50),rf.Title("Fit Model"))
+  model.paramOn(fitFrame,rf.Layout(0.68,0.98,0.95))
   data.plotOn(fitFrame,rf.LineColor(ROOT.kBlack))
   model.plotOn(fitFrame,rf.LineColor(ROOT.kRed))
   model.plotOn(fitFrame,rf.Components("model_QCD"),rf.LineColor(ROOT.kGreen),rf.LineStyle(ROOT.kDashed))
@@ -207,7 +208,7 @@ def LpTemplateFit(LpTemplates, prefix="", printDir='/afs/hephy.at/user/'+usernam
 #                     'yieldVar':(0.5*(yield_Rest_NegPdg.getErrorHi()-yield_Rest_NegPdg.getErrorLo()))**2},
 #        }
 #  del model_NegPdg, model_PosPdg, data_PosPdg, sumNLL
-  res = {'TT':{'template':template_EWK, 'yield':yield_EWK.getVal(), 'yield_high':yield_EWK.getVal()+yield_EWK.getErrorHi(), 'yield_low':yield_EWK.getVal()+yield_EWK.getErrorLo(), 
+  res = {'EWK':{'template':template_EWK, 'yield':yield_EWK.getVal(), 'yield_high':yield_EWK.getVal()+yield_EWK.getErrorHi(), 'yield_low':yield_EWK.getVal()+yield_EWK.getErrorLo(), 
                       'yieldVar':(yield_EWK.getErrorHi()-yield_EWK.getErrorLo())**2},
          'QCD':{'template':template_QCD,'yield':yield_QCD.getVal(), 'yield_high':yield_QCD.getVal()+yield_QCD.getErrorHi(), 'yield_low':yield_QCD.getVal()+yield_QCD.getErrorLo(),
                      'yieldVar':(yield_QCD.getErrorHi()-yield_QCD.getErrorLo())**2},
