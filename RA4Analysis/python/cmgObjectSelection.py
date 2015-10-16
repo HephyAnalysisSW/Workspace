@@ -7,12 +7,16 @@ def hybridIso03ID(r, nLep, hybridIso03):
 def cmgMVAEleID(r,nLep,mva_cuts):
   aeta = abs(r.LepGood_eta[nLep])
   for abs_e, mva in mva_cuts.iteritems():
-    if aeta>=abs_e[0] and aeta<abs_e[1] and r.LepGood_mvaIdPhys14[nLep]>mva: return True
+    if aeta>=abs_e[0] and aeta<abs_e[1] and r.LepGood_mvaIdSpring15[nLep]>mva: return True
   return False
-  
+###Phys14 MVAID####
 #ele_MVAID_cuts_loose = {(0,0.8):0.35 , (0.8, 1.44):0.20, (1.57, 999): -0.52}
-ele_MVAID_cuts_vloose = {(0,0.8):-0.11 , (0.8, 1.44):-0.35, (1.57, 999): -0.55}
-ele_MVAID_cuts_tight = {(0,0.8):0.73 , (0.8, 1.44):0.57, (1.57, 999):  0.05}
+#ele_MVAID_cuts_vloose = {(0,0.8):-0.11 , (0.8, 1.44):-0.35, (1.57, 999): -0.55}
+#ele_MVAID_cuts_tight = {(0,0.8):0.73 , (0.8, 1.44):0.57, (1.57, 999):  0.05}
+
+###Spring15 MVAID#### https://twiki.cern.ch/twiki/bin/viewauth/CMS/SUSLeptonSF
+ele_MVAID_cuts_vloose = {(0,0.8): -0.16 , (0.8,  1.479):-0.65, (1.479, 999):-0.74}
+ele_MVAID_cuts_tight = {(0,0.8): 0.87   , (0.8,  1.479): 0.60, (1.479, 999): 0.17}
 
 def cmgLooseMuID(r, nLep):
   return r.LepGood_miniRelIso[nLep]<0.4 and r.LepGood_pt[nLep]>=10 and abs(r.LepGood_eta[nLep])<2.4
