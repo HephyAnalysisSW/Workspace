@@ -12,7 +12,10 @@ from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import 
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_Spring15_hard import *
 #from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_postProcessed import *
 from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT400ST200_postProcessed import *
-from Workspace.RA4Analysis.cmgTuples_Data25ns_0l import *
+#from Workspace.RA4Analysis.cmgTuples_Data25ns_0l import *
+from Workspace.RA4Analysis.cmgTuples_Data25ns_Artur import *
+from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_postProcessed_fromArtur import *
+
 #from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT400ST200_postProcessed import *
 #from Workspace.RA4Analysis.cmgTuples_Spring15_50ns_postProcessed import *
 from Workspace.HEPHYPythonTools.user import username
@@ -32,6 +35,7 @@ lepSel = 'hard'
 WJETS = {'name':'WJets', 'chain':getChain(WJetsHTToLNu_25ns,histname=''), 'color':color('WJets'),'weight':'weight', 'niceName':'W Jets'}
 TTJETS = {'name':'TTJets', 'chain':getChain(TTJets_25ns,histname=''), 'color':color('TTJets'),'weight':'weight', 'niceName':'t#bar{t} Jets NLO'}
 TTJetsLO = {'name':'TTJets', 'chain':getChain(TTJets_LO_25ns,histname=''), 'color':color('TTJets')-2,'weight':'weight', 'niceName':'t#bar{t} Jets LO'}
+TTJetsNew = {'name':'TTJets', 'chain':getChain(TTJets_HTLO_25ns,histname=''), 'color':color('TTJets')-5,'weight':'weight', 'niceName':'t#bar{t} Jets LO'}
 DY = {'name':'DY', 'chain':getChain(DY_25ns,histname=''), 'color':color('DY'),'weight':'weight', 'niceName':'Drell Yan'}
 singleTop = {'name':'singleTop', 'chain':getChain(singleTop_25ns,histname=''), 'color':color('singleTop'),'weight':'weight', 'niceName':'single Top'}
 #QCD = {'name':'QCD', 'chain':getChain(QCDMu_25ns,histname=''), 'color':color('QCD'),'weight':'weight', 'niceName':'QCD'}
@@ -95,7 +99,7 @@ metNoHFPhi = {'binning': [16, -3.2, 3.2], 'name': 'metNoHF_phi', 'titleX': '#Phi
 
 presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&st>250&&nJet30>2&&htJet30j>500&&nBJetMediumCSV30==0"
 preselNoLtHt = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&Jet_pt[1]>80&&nBJetMediumCSV30==0"
-newpresel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&st>250&&nJet30>=2&&htJet30j>500&&nBJetMediumCSV30>=0" ####changed here!!
+newpresel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&st>250&&nJet30>=2&&htJet30j>500&&Jet_pt[1]>80" ####changed here!!
 
 
 noCut = {'name':'empty', 'string':'(1)', 'niceName':'no cut'}
@@ -152,26 +156,28 @@ lowFakeMetCut = {'name':name,'string':cut+'&&'+antiFakeMetSelection,'niceName':'
 #path25ns = '/data/easilar/cmgTuples/crab/Summer15_25nsV2MC_Data/'
 #SingleElectron_Run2015C = {'name':'SingleElectron_Run2015C-PromptReco-v1', 'dir':path25ns+'SingleElectron_Run2015C/'}
 #SingleMuon_Run2015C = {'name':'SingleMuon_Run2015C-PromptReco-v1', 'dir':path25ns+'SingleMuon_Run2015C/'}
-SingleMuonData = SingleMuon_Run2015D_PromptReco
-SingleElectronData = SingleElectron_Run2015D_PromptReco
+#SingleMuonData = SingleMuon_Run2015D_PromptReco
+SingleMuonData = SingleMuon_Run2015D
+#SingleElectronData = SingleElectron_Run2015D_PromptReco
 
 #samples25ns = [SingleElectronData,SingleMuonData,MuonEG_Run2015D_PromptReco,DoubleEG_Run2015D_PromptReco,DoubleMuon_Run2015D_PromptReco,JetHT_Run2015D_PromptReco,MET_Run2015D_PromptReco]
 
-samples25ns = [SingleElectronData,SingleMuonData]
+samples25ns = [SingleMuonData]
 
-dataSamples = samples25ns
-for s in dataSamples:
-  s['chunkString'] = s['name']
-  s.update({
-    "rootFileLocation":"tree.root",
-    "skimAnalyzerDir":"",
-    "treeName":"tree",
-    'isData':True,
-    #'dir' : data_path
-  })
+#dataSamples = samples25ns
+#for s in dataSamples:
+#  s['chunkString'] = s['name']
+#  s.update({
+#    "rootFileLocation":"tree.root",
+#    "skimAnalyzerDir":"",
+#    "treeName":"tree",
+#    'isData':True,
+#    #'dir' : data_path
+#  })
 
 dSamples = []
-for sample in dataSamples:
+#for sample in dataSamples:
+for sample in samples25ns:
   dSamples.append({'name':sample['name'],'sample':sample})
 data = ROOT.TChain('tree')
 for sample in dSamples:
@@ -188,6 +194,16 @@ ele_MVAID_cutstr_tight= "((abs(LepGood_eta)<0.8&&LepGood_mvaIdPhys14>"+ str(ele_
 ele_MVAID_cutstr_vloose= "((abs(LepGood_eta)<0.8&&LepGood_mvaIdPhys14>"+ str(ele_MVAID_cuts_vloose['eta08'])+")"\
                        +"||((abs(LepGood_eta)>=0.8&&abs(LepGood_eta)<1.44)&&LepGood_mvaIdPhys14>"+ str(ele_MVAID_cuts_vloose['eta104'])+")"\
                        +"||((abs(LepGood_eta)>=1.57)&&LepGood_mvaIdPhys14>"+str(ele_MVAID_cuts_vloose['eta204'])+"))"
+
+ele_MVAID_Spring15_cuts_tight={'eta08':0.87 , 'eta104':0.60,'eta204': 0.17}
+ele_MVAID_Spring15_cuts_vloose = {'eta08':-0.16 , 'eta104':-0.65, 'eta204': -0.74}
+
+ele_MVAID_Spring15_cutstr_tight= "((abs(LepGood_eta)<0.8&&LepGood__Spring15mvaIdSpring15>"+ str(ele_MVAID_Spring15_cuts_tight['eta08'])+")"\
+                       +"||((abs(LepGood_eta)>=0.8&&abs(LepGood_eta)<1.479)&&LepGood_mvaIdSpring15>"+ str(ele_MVAID_Spring15_cuts_tight['eta104'])+")"\
+                       +"||((abs(LepGood_eta)>=1.479&&abs(LepGood_eta)<2.5)&&LepGood_mvaIdSpring15>"+str(ele_MVAID_Spring15_cuts_tight['eta204'])+"))"
+ele_MVAID_Spring15_cutstr_vloose= "((abs(LepGood_eta)<0.8&&LepGood_mvaIdSpring15>"+ str(ele_MVAID_Spring15_cuts_vloose['eta08'])+")"\
+                       +"||((abs(LepGood_eta)>=0.8&&abs(LepGood_eta)<1.479)&&LepGood_mvaIdSpring15>"+ str(ele_MVAID_Spring15_cuts_vloose['eta104'])+")"\
+                       +"||((abs(LepGood_eta)>=1.479&&abs(LepGood_eta)<2.5)&&LepGood_mvaIdSpring15>"+str(ele_MVAID_Spring15_cuts_vloose['eta204'])+"))"
 
 singleMuonic = '(Sum$(abs(LepGood_pdgId)==13&&LepGood_pt>=25&&abs(LepGood_eta)<2.4&&LepGood_miniRelIso<0.2&&LepGood_mediumMuonId==1&&LepGood_sip3d<4.0)==1)'
 diMuonic = '(Sum$(abs(LepGood_pdgId)==13&&LepGood_pt>=25&&abs(LepGood_eta)<2.4&&LepGood_miniRelIso<0.2&&LepGood_mediumMuonId==1&&LepGood_sip3d<4.0)==2)'
@@ -419,7 +435,7 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
     latex1.SetTextSize(0.04)
     latex1.SetTextAlign(11) # align right
   if titleText: latex1.DrawLatex(0.15,0.96,'CMS '+titleText)
-  if MCscale: latex1.DrawLatex(0.98-legendWidth,0.95-height-0.04,'MC~ scale:'+str(round(MCscale,3))+'\pm'+str(round(MCscaleError,3)))
+  if MCscale and (MCscale>1.001 or MCscale<0.99) : latex1.DrawLatex(0.98-legendWidth,0.95-height-0.04,'MC~ scale:'+str(round(MCscale,3))+'\pm'+str(round(MCscaleError,3)))
   if lumi: latex1.DrawLatex(0.73,0.96,"L="+str(lumi)+"fb^{-1} (13TeV)")
   if legend: leg.Draw()
   can.Update()

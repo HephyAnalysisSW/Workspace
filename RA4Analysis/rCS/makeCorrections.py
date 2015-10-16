@@ -36,7 +36,7 @@ if small: signalRegions = smallRegion
 #DEFINE LUMI AND PLOTDIR
 lumi = 3.
 printDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/25ns/templateFit/'
-pickleDir = '/data/'+username+'/Spring15/25ns/NORMALIZATIONTEST_rCS_0b_'+str(lumi)+'/'
+pickleDir = '/data/'+username+'/Spring15/25ns/PredictionAN_'+str(lumi)+'/'
 
 if not os.path.exists(pickleDir):
   os.makedirs(pickleDir)
