@@ -13,8 +13,8 @@ from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import 
 #from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_postProcessed import *
 from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT400ST200_postProcessed import *
 #from Workspace.RA4Analysis.cmgTuples_Data25ns_0l import *
-from Workspace.RA4Analysis.cmgTuples_Data25ns_Artur import *
-from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_postProcessed_fromArtur import *
+#from Workspace.RA4Analysis.cmgTuples_Data25ns_Artur import *
+#from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_postProcessed_fromArtur import *
 
 #from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT400ST200_postProcessed import *
 #from Workspace.RA4Analysis.cmgTuples_Spring15_50ns_postProcessed import *
@@ -35,7 +35,7 @@ lepSel = 'hard'
 WJETS = {'name':'WJets', 'chain':getChain(WJetsHTToLNu_25ns,histname=''), 'color':color('WJets'),'weight':'weight', 'niceName':'W Jets'}
 TTJETS = {'name':'TTJets', 'chain':getChain(TTJets_25ns,histname=''), 'color':color('TTJets'),'weight':'weight', 'niceName':'t#bar{t} Jets NLO'}
 TTJetsLO = {'name':'TTJets', 'chain':getChain(TTJets_LO_25ns,histname=''), 'color':color('TTJets')-2,'weight':'weight', 'niceName':'t#bar{t} Jets LO'}
-TTJetsNew = {'name':'TTJets', 'chain':getChain(TTJets_HTLO_25ns,histname=''), 'color':color('TTJets')-5,'weight':'weight', 'niceName':'t#bar{t} Jets LO'}
+#TTJetsNew = {'name':'TTJets', 'chain':getChain(TTJets_HTLO_25ns,histname=''), 'color':color('TTJets')-5,'weight':'weight', 'niceName':'t#bar{t} Jets LO'}
 DY = {'name':'DY', 'chain':getChain(DY_25ns,histname=''), 'color':color('DY'),'weight':'weight', 'niceName':'Drell Yan'}
 singleTop = {'name':'singleTop', 'chain':getChain(singleTop_25ns,histname=''), 'color':color('singleTop'),'weight':'weight', 'niceName':'single Top'}
 #QCD = {'name':'QCD', 'chain':getChain(QCDMu_25ns,histname=''), 'color':color('QCD'),'weight':'weight', 'niceName':'QCD'}
