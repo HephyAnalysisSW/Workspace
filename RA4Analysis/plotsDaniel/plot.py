@@ -35,7 +35,7 @@ lepSel = 'hard'
 WJETS = {'name':'WJets', 'chain':getChain(WJetsHTToLNu_25ns,histname=''), 'color':color('WJets'),'weight':'weight', 'niceName':'W Jets'}
 TTJETS = {'name':'TTJets', 'chain':getChain(TTJets_25ns,histname=''), 'color':color('TTJets'),'weight':'weight', 'niceName':'t#bar{t} Jets NLO'}
 TTJetsLO = {'name':'TTJets', 'chain':getChain(TTJets_LO_25ns,histname=''), 'color':color('TTJets')-2,'weight':'weight', 'niceName':'t#bar{t} Jets LO'}
-#TTJetsNew = {'name':'TTJets', 'chain':getChain(TTJets_HTLO_25ns,histname=''), 'color':color('TTJets')-5,'weight':'weight', 'niceName':'t#bar{t} Jets LO'}
+TTJetsNew = {'name':'TTJets', 'chain':getChain(TTJets_LO_25ns_bweight,histname=''), 'color':color('TTJets')-5,'weight':'weight', 'niceName':'t#bar{t} Jets LO'}
 DY = {'name':'DY', 'chain':getChain(DY_25ns,histname=''), 'color':color('DY'),'weight':'weight', 'niceName':'Drell Yan'}
 singleTop = {'name':'singleTop', 'chain':getChain(singleTop_25ns,histname=''), 'color':color('singleTop'),'weight':'weight', 'niceName':'single Top'}
 #QCD = {'name':'QCD', 'chain':getChain(QCDMu_25ns,histname=''), 'color':color('QCD'),'weight':'weight', 'niceName':'QCD'}
@@ -153,37 +153,37 @@ name, cut = nameAndCut((250,350),(1000,-1),(5,5),btb=(0,0),presel=presel)
 highFakeMetCut = {'name':name,'string':cut+'&&'+fakeMetSelection,'niceName':'E_{T}^{miss,fake} > 50 GeV || > E_{T}^{miss,gen}'}
 lowFakeMetCut = {'name':name,'string':cut+'&&'+antiFakeMetSelection,'niceName':'E_{T}^{miss,fake} < 50 GeV && < E_{T}^{miss,gen}'}
 
-#path25ns = '/data/easilar/cmgTuples/crab/Summer15_25nsV2MC_Data/'
-#SingleElectron_Run2015C = {'name':'SingleElectron_Run2015C-PromptReco-v1', 'dir':path25ns+'SingleElectron_Run2015C/'}
-#SingleMuon_Run2015C = {'name':'SingleMuon_Run2015C-PromptReco-v1', 'dir':path25ns+'SingleMuon_Run2015C/'}
-#SingleMuonData = SingleMuon_Run2015D_PromptReco
-SingleMuonData = SingleMuon_Run2015D
-#SingleElectronData = SingleElectron_Run2015D_PromptReco
-
-#samples25ns = [SingleElectronData,SingleMuonData,MuonEG_Run2015D_PromptReco,DoubleEG_Run2015D_PromptReco,DoubleMuon_Run2015D_PromptReco,JetHT_Run2015D_PromptReco,MET_Run2015D_PromptReco]
-
-samples25ns = [SingleMuonData]
-
-#dataSamples = samples25ns
-#for s in dataSamples:
-#  s['chunkString'] = s['name']
-#  s.update({
-#    "rootFileLocation":"tree.root",
-#    "skimAnalyzerDir":"",
-#    "treeName":"tree",
-#    'isData':True,
-#    #'dir' : data_path
-#  })
-
-dSamples = []
-#for sample in dataSamples:
-for sample in samples25ns:
-  dSamples.append({'name':sample['name'],'sample':sample})
-data = ROOT.TChain('tree')
-for sample in dSamples:
-  sample['chunks'], sample['nEvents'] = getChunks(sample['sample'])
-  for chunk in sample['chunks']:
-    data.Add(chunk['file'])
+##path25ns = '/data/easilar/cmgTuples/crab/Summer15_25nsV2MC_Data/'
+##SingleElectron_Run2015C = {'name':'SingleElectron_Run2015C-PromptReco-v1', 'dir':path25ns+'SingleElectron_Run2015C/'}
+##SingleMuon_Run2015C = {'name':'SingleMuon_Run2015C-PromptReco-v1', 'dir':path25ns+'SingleMuon_Run2015C/'}
+##SingleMuonData = SingleMuon_Run2015D_PromptReco
+#SingleMuonData = SingleMuon_Run2015D
+##SingleElectronData = SingleElectron_Run2015D_PromptReco
+#
+##samples25ns = [SingleElectronData,SingleMuonData,MuonEG_Run2015D_PromptReco,DoubleEG_Run2015D_PromptReco,DoubleMuon_Run2015D_PromptReco,JetHT_Run2015D_PromptReco,MET_Run2015D_PromptReco]
+#
+#samples25ns = [SingleMuonData]
+#
+##dataSamples = samples25ns
+##for s in dataSamples:
+##  s['chunkString'] = s['name']
+##  s.update({
+##    "rootFileLocation":"tree.root",
+##    "skimAnalyzerDir":"",
+##    "treeName":"tree",
+##    'isData':True,
+##    #'dir' : data_path
+##  })
+#
+#dSamples = []
+##for sample in dataSamples:
+#for sample in samples25ns:
+#  dSamples.append({'name':sample['name'],'sample':sample})
+#data = ROOT.TChain('tree')
+#for sample in dSamples:
+#  sample['chunks'], sample['nEvents'] = getChunks(sample['sample'])
+#  for chunk in sample['chunks']:
+#    data.Add(chunk['file'])
 
 ele_MVAID_cuts_tight={'eta08':0.73 , 'eta104':0.57,'eta204': 0.05}
 ele_MVAID_cuts_vloose = {'eta08':-0.11 , 'eta104':-0.35, 'eta204': -0.55}
@@ -246,10 +246,10 @@ trigger = "&&(HLT_EleHT350||HLT_MuHT350)"
 filters = "&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFilterMinZeroPatched&&Flag_goodVertices&&Flag_eeBadScFilter"
 #filters = "&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFilterMinZeroPatched&&Flag_goodVertices&&Flag_eeBadScFilter"#&&Flag_EcalDeadCellTriggerPrimitiveFilter"
 
-#datapresel = LeptonReq+'&&'+leptonVeto+'&&nJet30>=2&&nBJetMedium30>=0&&'+htStr+'>500&&'+stStr+'>250'
-datapresel = LeptonReq+'&&'+leptonVeto+'&&nJet30>=2&&'+htStr+'>500&&'+stStr+'>250'
-datacut = datapresel+trigger+filters
-dataDict = {'chain':data, 'cut':datacut,'name':'data'}
+##datapresel = LeptonReq+'&&'+leptonVeto+'&&nJet30>=2&&nBJetMedium30>=0&&'+htStr+'>500&&'+stStr+'>250'
+#datapresel = LeptonReq+'&&'+leptonVeto+'&&nJet30>=2&&'+htStr+'>500&&'+stStr+'>250'
+#datacut = datapresel+trigger+filters
+#dataDict = {'chain':data, 'cut':datacut,'name':'data'}
 
 deltaPhiCMG_NoHF = {'binning': [30, 0, 3.2], 'name': 'Sum$((acos((LepGood_pt+metNoHF_pt*cos(LepGood_phi-metNoHF_phi))/sqrt(LepGood_pt**2+metNoHF_pt**2+2*metNoHF_pt*LepGood_pt*cos(LepGood_phi-metNoHF_phi))))*'+LeptonId+')', 'titleX': '#Delta#Phi(W,l) NoHF', 'titleY': 'Events'}
 #deltaPhiCMG = {'binning': [32, 0, 3.2], 'name': 'Sum$((acos((LepGood_pt+met_pt*cos(LepGood_phi-met_phi))/sqrt(LepGood_pt**2+met_pt**2+2*met_pt*LepGood_pt*cos(LepGood_phi-met_phi))))*'+LeptonId+')', 'titleX': '#Delta#Phi(W,l) NoHF', 'titleY': 'Events', 'filename':'deltaPhi_Wl', 'binningIsExplicit':True}

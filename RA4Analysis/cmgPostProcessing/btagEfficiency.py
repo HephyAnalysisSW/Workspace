@@ -116,8 +116,9 @@ def getMCEff(parton, pt, eta, year = 2012):
 # get MC efficiencies and scale factors for all jets of one event c, uses getMCEff
 def getMCEfficiencyForBTagSF(c, onlyLightJetSystem = False, sms=""):
   nsoftjets = int(getVarValue(c, "nJet30"))
+  njets = int(getVarValue(c, "nJet"))
   jets = []
-  for i in range(nsoftjets):
+  for i in range(njets):
     jPt     = getVarValue(c, "Jet_pt", i)
     jEta    = getVarValue(c, "Jet_eta", i)
     jParton = getVarValue(c, "Jet_mcFlavour", i)
@@ -138,6 +139,7 @@ def getMCEfficiencyForBTagSF(c, onlyLightJetSystem = False, sms=""):
     r = getMCEff(parton=jParton, pt=jPt, eta=jEta, year=2012)#getEfficiencyAndMistagRate(jPt, jEta, jParton )
     jet.append(r)
 #    print [j[0] for j in jets]
+  if len(jets) != nsoftjets: print '!!!!! Different number of jets in collection than there should be !!!!!'
   mceffs = tuple()
   mceffs_SF = tuple()
   mceffs_SF_b_Up = tuple()
@@ -189,3 +191,77 @@ def getTagWeightDict(effs, maxConsideredBTagWeight):
     if not tagWeight.has_key(i):
       tagWeight[i] = 0.
   return tagWeight
+
+# Function for different method, described in https://twiki.cern.ch/twiki/bin/view/CMS/BTagSFMethods#1a_Event_reweighting_using_scale
+# FastSim corrections not implemented yet
+
+def getBTagWeight(c, sms=""):
+  nsoftjets = int(getVarValue(c, "nJet30"))
+  njets = int(getVarValue(c, "nJet"))
+  jets = []
+  for i in range(njets):
+    isBtagged = False
+    jPt     = getVarValue(c, "Jet_pt", i)
+    jEta    = getVarValue(c, "Jet_eta", i)
+    jParton = getVarValue(c, "Jet_mcFlavour", i)
+    jBTagCSV = getVarValue(c, "Jet_btagCSV", i)
+    if jBTagCSV > 0.890: isBtagged = True
+    if jPt<=30. or abs(jEta)>=2.4 or (not getVarValue(c, "Jet_id", i)):
+      continue
+    jets.append([jParton, jPt, jEta, isBtagged])
+  if len(jets) != nsoftjets: print 'Different number of jets in collection than there should be!!'
+  mceffs = tuple()
+  mceffs_SF = tuple()
+  mceffs_SF_b_Up = tuple()
+  mceffs_SF_b_Down = tuple()
+  mceffs_SF_light_Up = tuple()
+  mceffs_SF_light_Down = tuple()
+  PMC = 1.
+  PData = 1.
+  PData_b_up = 1.
+  PData_b_down = 1.
+  PData_l_up = 1.
+  PData_l_down = 1.
+  for jParton, jPt, jEta, isBtagged in jets:
+    r = getMCEff(parton=jParton, pt=jPt, eta=jEta, year=2012)#getEfficiencyAndMistagRate(jPt, jEta, jParton )
+    if sms!="":
+      fsim_SF = ROOT.getFastSimCorr(partonName(abs(jParton)),jPt,"mean",jEta)
+      fsim_SF_up = ROOT.getFastSimCorr(partonName(abs(jParton)),jPt,"up",jEta)
+      fsim_SF_down = ROOT.getFastSimCorr(partonName(abs(jParton)),jPt,"down",jEta)
+    else:
+      fsim_SF = 1.
+      fsim_SF_up = 1.
+      fsim_SF_down = 1.
+    if isBtagged:
+      PMC *= r['mcEff']
+      PData *= r['mcEff']*r['SF']
+      if abs(jParton)==5 or abs(jParton)==4:
+        PData_b_up *= r['mcEff']*r['SF_up']
+        PData_b_down *= r['mcEff']*r['SF_down']
+        PData_l_up *= r['mcEff']*r['SF']
+        PData_l_down *= r['mcEff']*r['SF']
+      else:
+        PData_b_up *= r['mcEff']*r['SF']
+        PData_b_down *= r['mcEff']*r['SF']
+        PData_l_up *= r['mcEff']*r['SF_up']
+        PData_l_down *= r['mcEff']*r['SF_down']
+    else:
+      PMC *= (1. - r['mcEff'])
+      PData *= (1. - r['mcEff']*r['SF'])
+      if abs(jParton)==5 or abs(jParton)==4:
+        PData_b_up *=   (1 - r['mcEff']*r['SF_up'])
+        PData_b_down *= (1 - r['mcEff']*r['SF_down'])
+        PData_l_up *=   (1 - r['mcEff']*r['SF'])
+        PData_l_down *= (1 - r['mcEff']*r['SF'])
+      else:
+        PData_b_up *=   (1 - r['mcEff']*r['SF'])
+        PData_b_down *= (1 - r['mcEff']*r['SF'])
+        PData_l_up *=   (1 - r['mcEff']*r['SF_up'])
+        PData_l_down *= (1 - r['mcEff']*r['SF_down'])
+      #PData_up *= (1 - r['mcEff']*r['SF_up'])
+      #PData_down *= (1 - r['mcEff']*r['SF_down'])
+    res = {'w':PData/PMC, 'w_b_up':PData_b_up/PMC, 'w_b_down':PData_b_down/PMC, 'w_l_up':PData_l_up/PMC, 'w_l_down':PData_l_down/PMC}
+    return res
+
+
+

@@ -21,13 +21,13 @@ from btagEfficiency import *
 
 target_lumi = 3000 #pb-1
 
-maxConsideredBTagWeight = 2
-calcSystematics = True
+#maxConsideredBTagWeight = 2
+#calcSystematics = True
 separateBTagWeights = True
 
 defSampleStr = "TTJets_25ns"
 
-subDir = "postProcessed_Spring15"
+subDir = "postProcessed_Spring15_jetCollBugFix"
 
 #branches to be kept for data and MC
 branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert", 
@@ -62,6 +62,8 @@ parser.add_option("--skim", dest="skim", default="", type="string", action="stor
 parser.add_option("--leptonSelection", dest="leptonSelection", default="hard", type="string", action="store", help="which lepton selection? 'soft', 'hard', 'none', 'dilep'?")
 parser.add_option("--small", dest="small", default = False, action="store_true", help="Just do a small subset.")
 parser.add_option("--overwrite", dest="overwrite", default = False, action="store_true", help="Overwrite?")
+parser.add_option("--systematics", dest="systematics", default = False, action="store_true", help="Calculate systematics?")
+parser.add_option("--btagWeight", dest="btagWeight", default = 2, action="store", help="Max nBJet to calculate the weight for")
 
 (options, args) = parser.parse_args()
 assert options.leptonSelection in ['soft', 'hard', 'none', 'dilep'], "Unknown leptonSelection: %s"%options.leptonSelection
@@ -89,6 +91,9 @@ if options.skim=='inc':
 
 if sys.argv[0].count('ipython'):
   options.small=True
+
+maxConsideredBTagWeight = options.btagWeight
+calcSystematics = options.systematics
 
 def getTreeFromChunk(c, skimCond, iSplit, nSplit):
   if not c.has_key('file'):return
@@ -210,7 +215,7 @@ for isample, sample in enumerate(allSamples):
         t.GetEntry(i)
         genWeight = 1 if sample['isData'] else t.GetLeaf('genWeight').GetValue()
         s.weight = lumiScaleFactor*genWeight
-
+        #calculatedWeight = True
         if not sample['isData']:
           if "TTJets" in sample['dbsName']:
             s.weight_XSecTTBar1p1 = s.weight*1.1 
@@ -344,7 +349,7 @@ for isample, sample in enumerate(allSamples):
               exec("s.weightBTag"+str(j)+"p_SF_b_Down     -="+str(mceffW_SF_b_Down[i])+'*'+lweight)
               exec("s.weightBTag"+str(j)+"p_SF_light_Up   -="+str(mceffW_SF_light_Up[i])+'*'+lweight)
               exec("s.weightBTag"+str(j)+"p_SF_light_Down -="+str(mceffW_SF_light_Down[i])+'*'+lweight)
-          for i in range (int(s.nJet30)+1, maxConsideredBTagWeight+1):
+          for i in range (int(r.nJet)+1, maxConsideredBTagWeight+1):
             exec("s.weightBTag"+str(i)+"= 0.")
             exec("s.weightBTag"+str(i)+"_SF= 0.")
             exec("s.weightBTag"+str(i)+"_SF_b_Up= 0.")
