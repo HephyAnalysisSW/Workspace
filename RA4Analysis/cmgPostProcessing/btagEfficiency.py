@@ -10,7 +10,7 @@ import PhysicsTools.Heppy.physicsutils.BTagSF
 #TTJetsLO = {'name':'TTJets', 'chain':getChain(TTJets_LO_25ns,histname=''), 'color':color('TTJets')-2,'weight':'weight', 'niceName':'t#bar{t} Jets LO'}
 #newpresel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&st>250&&nJet30>=2&&htJet30j>500"
 
-bTagEffFile = '/data/dspitzbart/Results2015/MCEffTTJets_hadronId_heppy_pkl'
+bTagEffFile = '/data/dspitzbart/Results2015/MCEffWJets_hadronId_heppy_pkl'
 
 ptBorders = [30, 40, 50, 60, 70, 80, 100, 120, 160, 210, 260, 320, 400, 500, 670]
 ptBins = []
@@ -50,7 +50,7 @@ def partonName (parton):
 
 
 # get MC truth efficiencies for a specific sample
-def getBTagMCTruthEfficiencies(c, cut="(1)"):
+def getBTagMCTruthEfficiencies(c, cut="(1)", overwrite=True):
   print c, cut
   mceff = {}
   commoncf=cut+"&&"
@@ -74,7 +74,7 @@ def getBTagMCTruthEfficiencies(c, cut="(1)"):
       mceff[tuple(ptBin)][tuple(etaBin)]["other"] = hOther.GetMean()
       print "Eta",etaBin,etaCut,"Pt",ptBin,ptCut,"Found b/c/other", mceff[tuple(ptBin)][tuple(etaBin)]["b"], mceff[tuple(ptBin)][tuple(etaBin)]["c"], mceff[tuple(ptBin)][tuple(etaBin)]["other"]
       del hbQuark, hcQuark, hOther
-  pickle.dump(mceff, file(bTagEffFile, 'w'))
+  if overwrite: pickle.dump(mceff, file(bTagEffFile, 'w'))
   return mceff
 
 
@@ -99,7 +99,11 @@ def getSF(parton, pt, eta, year = 2012):
 
 
 # get MC efficiencies and scale factors for a specific jet (with parton flavor, pt and eta)
-mcEff = pickle.load(file(bTagEffFile))
+try:
+  mcEff = pickle.load(file(bTagEffFile))
+except IOError:
+  print 'Unable to load MC efficiency file!'
+  mcEff = False
 def getMCEff(parton, pt, eta, year = 2012):
   for ptBin in ptBins:
     if pt>=ptBin[0] and (pt<ptBin[1] or ptBin[1]<0):

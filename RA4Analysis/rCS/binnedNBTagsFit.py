@@ -2,16 +2,18 @@ import ROOT
 import os, sys
 from ROOT import RooFit as rf
 
-from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain
+from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYieldFromChain
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,varBinName
 from Workspace.HEPHYPythonTools.user import username
 from math import pi, sqrt
 from rCShelpers import *# weight_str , weight_err_str , lumi
 
-def binnedNBTagsFit(cut, samples, nBTagVar = 'nBJetMediumCSV30', lumi=4.0, prefix="", printDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/nBtagFits_W3-4/templateFit/'):
+def binnedNBTagsFit(cut, cutname, samples, nBTagVar = 'nBJetMediumCSV30', lumi=4.0, prefix="", printDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/nBtagFits/templateFit/', templateDir = '/data/'+username+'/Results2015/btagTemplates/',useBTagWeights=False):
   print "LUMI:" , lumi
   if not os.path.exists(printDir):
      os.makedirs(printDir) 
+  if not os.path.exists(templateDir):
+     os.makedirs(templateDir)
   weight_str, weight_err_str = makeWeight(lumi)
   cWJets = samples['W']
   cTTJets = samples['TT']
@@ -19,17 +21,77 @@ def binnedNBTagsFit(cut, samples, nBTagVar = 'nBJetMediumCSV30', lumi=4.0, prefi
   cData = samples['Data']
 
   #Get histograms binned in b-tag multiplicity
-  template_WJets_PosPdg=getPlotFromChain(cWJets, nBTagVar, [0,1,2,3], 'leptonPdg>0&&'+cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
-  template_WJets_NegPdg=getPlotFromChain(cWJets, nBTagVar, [0,1,2,3], 'leptonPdg<0&&'+cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
-  template_TTJets=      getPlotFromChain(cTTJets,nBTagVar, [0,1,2,3], cut,                 weight_str, binningIsExplicit=True,addOverFlowBin='upper')
-  template_Rest_PosPdg= getPlotFromChain(cRest,  nBTagVar, [0,1,2,3], 'leptonPdg>0&&'+cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
-  template_Rest_NegPdg= getPlotFromChain(cRest,  nBTagVar, [0,1,2,3], 'leptonPdg<0&&'+cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
+  template_WJets_PosPdg_Dict = getTemplate(cutname, templateDir, 'WJets_PosPdg') #these templates will always be MC, so a reweighting (e.g. b-tagging) should not be used
+  if template_WJets_PosPdg_Dict['loadTemp']: template_WJets_PosPdg = template_WJets_PosPdg_Dict['hist']
+  else:
+    template_WJets_PosPdg = getPlotFromChain(cWJets, nBTagVar, [0,1,2,3], 'leptonPdg>0&&'+cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
+    tempFile = ROOT.TFile(templateDir+cutname+'_WJets_PosPdg.root','new')
+    template_WJets_PosPdg.Write()
+    tempFile.Close()
+
+  template_WJets_NegPdg_Dict = getTemplate(cutname, templateDir, 'WJets_NegPdg') #these templates will always be MC, so a reweighting (e.g. b-tagging) should not be used
+  if template_WJets_NegPdg_Dict['loadTemp']: template_WJets_NegPdg = template_WJets_NegPdg_Dict['hist']
+  else: 
+    template_WJets_NegPdg = getPlotFromChain(cWJets, nBTagVar, [0,1,2,3], 'leptonPdg<0&&'+cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
+    tempFile = ROOT.TFile(templateDir+cutname+'_WJets_NegPdg.root','new')
+    template_WJets_NegPdg.Write()
+    tempFile.Close()
+
+  template_TTJets_Dict = getTemplate(cutname, templateDir, 'TTJets') #these templates will always be MC, so a reweighting (e.g. b-tagging) should not be used
+  if template_TTJets_Dict['loadTemp']: template_TTJets = template_TTJets_Dict['hist']
+  else: 
+    template_TTJets = getPlotFromChain(cTTJets, nBTagVar, [0,1,2,3], cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
+    tempFile = ROOT.TFile(templateDir+cutname+'_TTJets.root','new')
+    template_TTJets.Write()
+    tempFile.Close()
+
+  template_Rest_PosPdg_Dict = getTemplate(cutname, templateDir, 'Rest_PosPdg') #these templates will always be MC, so a reweighting (e.g. b-tagging) should not be used
+  if template_Rest_PosPdg_Dict['loadTemp']: template_Rest_PosPdg = template_Rest_PosPdg_Dict['hist']
+  else: 
+    template_Rest_PosPdg = getPlotFromChain(cRest, nBTagVar, [0,1,2,3], 'leptonPdg>0&&'+cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
+    tempFile = ROOT.TFile(templateDir+cutname+'_Rest_PosPdg.root','new')
+    template_Rest_PosPdg.Write()
+    tempFile.Close()
+
+  template_Rest_NegPdg_Dict = getTemplate(cutname, templateDir, 'Rest_NegPdg') #these templates will always be MC, so a reweighting (e.g. b-tagging) should not be used
+  if template_Rest_NegPdg_Dict['loadTemp']: template_Rest_NegPdg = template_Rest_NegPdg_Dict['hist']
+  else: 
+    template_Rest_NegPdg = getPlotFromChain(cRest, nBTagVar, [0,1,2,3], 'leptonPdg<0&&'+cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
+    tempFile = ROOT.TFile(templateDir+cutname+'_Rest_NegPdg.root','new')
+    template_Rest_NegPdg.Write()
+    tempFile.Close()
+
+  #template_WJets_PosPdg=getPlotFromChain(cWJets, nBTagVar, [0,1,2,3], 'leptonPdg>0&&'+cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
+  #template_WJets_NegPdg=getPlotFromChain(cWJets, nBTagVar, [0,1,2,3], 'leptonPdg<0&&'+cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
+  #template_TTJets=      getPlotFromChain(cTTJets,nBTagVar, [0,1,2,3], cut,                 weight_str, binningIsExplicit=True,addOverFlowBin='upper')
+  #template_Rest_PosPdg= getPlotFromChain(cRest,  nBTagVar, [0,1,2,3], 'leptonPdg>0&&'+cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
+  #template_Rest_NegPdg= getPlotFromChain(cRest,  nBTagVar, [0,1,2,3], 'leptonPdg<0&&'+cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
 
   print "Nominal yields TT:",template_TTJets.Integral(),'WJets_PosPdg',template_WJets_PosPdg.Integral(),'WJets_NegPdg',template_WJets_NegPdg.Integral()
   print "Nominal yields:",'Rest_PosPdg',template_Rest_PosPdg.Integral(),'Rest_NegPdg',template_Rest_NegPdg.Integral()
   
-  hData_PosPdg = getPlotFromChain(cData, nBTagVar, [0,1,2,3], 'leptonPdg>0&&'+cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
-  hData_NegPdg = getPlotFromChain(cData, nBTagVar, [0,1,2,3], 'leptonPdg<0&&'+cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
+  # use this for fake data
+  if useBTagWeight:
+    hData_PosPdg = getPlotFromChain(cRest, nBTagVar, [0,1,2,3], 'leptonPdg>0&&'+cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
+    hData_PosPdg.Fill(0,getYieldFromChain(cWJets, cutString =   'leptonPdg>0&&'+cut, weight = weight_str+'*weightBTag0'))
+    hData_PosPdg.Fill(1,getYieldFromChain(cWJets, cutString =   'leptonPdg>0&&'+cut, weight = weight_str+'*weightBTag1'))
+    hData_PosPdg.Fill(2,getYieldFromChain(cWJets, cutString =   'leptonPdg>0&&'+cut, weight = weight_str+'*weightBTag2'))
+    hData_PosPdg.Fill(0,getYieldFromChain(cTTJets, cutString =  'leptonPdg>0&&'+cut, weight = weight_str+'*weightBTag0'))
+    hData_PosPdg.Fill(1,getYieldFromChain(cTTJets, cutString =  'leptonPdg>0&&'+cut, weight = weight_str+'*weightBTag1'))
+    hData_PosPdg.Fill(2,getYieldFromChain(cTTJets, cutString =  'leptonPdg>0&&'+cut, weight = weight_str+'*weightBTag2'))
+    
+    hData_NegPdg = getPlotFromChain(cRest, nBTagVar, [0,1,2,3], 'leptonPdg<0&&'+cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
+    hData_NegPdg.Fill(0,getYieldFromChain(cWJets, cutString =   'leptonPdg<0&&'+cut, weight = weight_str+'*weightBTag0'))
+    hData_NegPdg.Fill(1,getYieldFromChain(cWJets, cutString =   'leptonPdg<0&&'+cut, weight = weight_str+'*weightBTag1'))
+    hData_NegPdg.Fill(2,getYieldFromChain(cWJets, cutString =   'leptonPdg<0&&'+cut, weight = weight_str+'*weightBTag2'))
+    hData_NegPdg.Fill(0,getYieldFromChain(cTTJets, cutString =  'leptonPdg<0&&'+cut, weight = weight_str+'*weightBTag0'))
+    hData_NegPdg.Fill(1,getYieldFromChain(cTTJets, cutString =  'leptonPdg<0&&'+cut, weight = weight_str+'*weightBTag1'))
+    hData_NegPdg.Fill(2,getYieldFromChain(cTTJets, cutString =  'leptonPdg<0&&'+cut, weight = weight_str+'*weightBTag2'))
+
+  ##### use this for DATA
+  else:
+    hData_PosPdg = getPlotFromChain(cData, nBTagVar, [0,1,2,3], 'leptonPdg>0&&'+cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
+    hData_NegPdg = getPlotFromChain(cData, nBTagVar, [0,1,2,3], 'leptonPdg<0&&'+cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
 
   print "Nominal yields data Pos:", hData_PosPdg.Integral()
   print "Nominal yields data Neg:", hData_NegPdg.Integral()

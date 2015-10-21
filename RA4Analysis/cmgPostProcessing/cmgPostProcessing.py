@@ -13,10 +13,11 @@ ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 
 from Workspace.HEPHYPythonTools.helpers import getChunks
-from Workspace.RA4Analysis.cmgTuples_Spring15_25ns import *
-from Workspace.RA4Analysis.cmgTuples_Spring15_50ns import *
+#from Workspace.RA4Analysis.cmgTuples_Spring15_25ns import *
+#from Workspace.RA4Analysis.cmgTuples_Spring15_50ns import *
 #from Workspace.RA4Analysis.cmgTuples_Data50ns_1l import *
 #from Workspace.RA4Analysis.cmgTuples_Data25ns import *
+from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_fromArthur import *
 from btagEfficiency import *
 
 target_lumi = 3000 #pb-1
