@@ -1,4 +1,5 @@
-#Configuration file fragment used for GenHTFilter module initalisation (GeneratorInterface/GenFilters/GenHTFilter/plugins/GenHTFilter.cc)
+#Configuration file fragment used for GenHTFilter module (GeneratorInterface/GenFilters/src/GenHTFilter.cc) initalisation
+#genHTFilter_cfi GeneratorInterface/GenFilters/python/genHTFilter_cfi.py
 
 import FWCore.ParameterSet.Config as cms
 

@@ -2,7 +2,7 @@
 Package:    GeneralInterface/GenFilters/GenHTFilter
 Class:      GenHTFilter
 
-class GenHTFilter GenHTFilter.cc GeneratorInterface/GenFilters/GenHTFilter/plugins/GenHTFilter.cc
+class GenHTFilter GenHTFilter.cc GeneratorInterface/GenFilters/src/GenHTFilter.cc
 
 Description: EDFilter which firstly calculates the generated HT (genHT) from GenJets (given a HT definition) and then filters the events on the generator level (given a certain genHT cut).  
 
@@ -45,13 +45,13 @@ class GenHTFilter : public edm::EDFilter
       virtual bool filter(edm::Event&, const edm::EventSetup&) override;
       
       //Member data 
-      edm::InputTag inTag;
+      edm::EDGetTokenT<reco::GenJetCollection> token;
       double jetPtCut, jetEtaCut, genHTcut;
 };
 
 //Constructor
 GenHTFilter::GenHTFilter(const edm::ParameterSet& params):
-   inTag(params.getParameter<edm::InputTag>("src")),
+   token(consumes<reco::GenJetCollection>(params.getParameter<edm::InputTag>("src"))),
    jetPtCut(params.getParameter<double>("jetPtCut")),
    jetEtaCut(params.getParameter<double>("jetEtaCut")),
    genHTcut(params.getParameter<double>("genHTcut")){}
@@ -66,8 +66,8 @@ bool GenHTFilter::filter(edm::Event& evt, const edm::EventSetup& params)
    using namespace reco;
    
    //Read GenJets Collection from Event
-   edm::Handle<GenJetCollection> generatedJets;
-   evt.getByLabel(inTag, generatedJets);
+   edm::Handle<reco::GenJetCollection> generatedJets;
+   evt.getByToken(token, generatedJets);
    
    //Loop over all jets in Event and calculate genHT
    double genHT = 0.0;
