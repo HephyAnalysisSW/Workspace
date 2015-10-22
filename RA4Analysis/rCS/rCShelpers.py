@@ -8,18 +8,18 @@ from array import array
 #def makeWeight(lumi=4., sampleLumi=3.):
 #  return 'weight', 'weight*weight'
 
-def makeWeight(lumi=4., sampleLumi=3.,debug=False, reWeight = False):
+def makeWeight(lumi=4., sampleLumi=3.,debug=False):
   if debug:
     print 'No lumi-reweighting done!!'
     return 'weight', 'weight*weight'
   else:
     weight_str = '(((weight)/'+str(sampleLumi)+')*'+str(lumi)+')'
     weight_err_str = '('+weight_str+'*'+weight_str+')'
-  if reWeight: ## to be fixed!!!
-    weights = {'weight':weight_str, 'weight_err':weight_err_str, 'data_weight':dataWeight = weight_str+'*'+reWeight, 'data_weight_err':weight_err_str+'('+reWeight+'*'+reWeight+')'}
-    return weights
-  else:
-    return weight_str, weight_err_str
+  #if reWeight: ## to be fixed!!!
+  #  weights = {'weight':weight_str, 'weight_err':weight_err_str, 'data_weight':dataWeight = weight_str+'*'+reWeight, 'data_weight_err':weight_err_str+'('+reWeight+'*'+reWeight+')'}
+  #  return weights
+  #else:
+  return weight_str, weight_err_str
 
 def getTemplate(cutName, path, sampleName):
   temp = ROOT.TH1F()

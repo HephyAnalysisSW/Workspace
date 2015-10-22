@@ -10,7 +10,7 @@ import PhysicsTools.Heppy.physicsutils.BTagSF
 #TTJetsLO = {'name':'TTJets', 'chain':getChain(TTJets_LO_25ns,histname=''), 'color':color('TTJets')-2,'weight':'weight', 'niceName':'t#bar{t} Jets LO'}
 #newpresel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&st>250&&nJet30>=2&&htJet30j>500"
 
-bTagEffFile = '/data/dspitzbart/Results2015/MCEffWJets_hadronId_heppy_pkl'
+bTagEffFile = '/data/dspitzbart/Results2015/MCEffTTJets_hadronId_heppy_pkl'
 
 ptBorders = [30, 40, 50, 60, 70, 80, 100, 120, 160, 210, 260, 320, 400, 500, 670]
 ptBins = []
@@ -77,6 +77,16 @@ def getBTagMCTruthEfficiencies(c, cut="(1)", overwrite=True):
   if overwrite: pickle.dump(mceff, file(bTagEffFile, 'w'))
   return mceff
 
+
+def getHistMCTruthEfficiencies(MCEff, histname, etaBin = (0,0.8), hadron='b'):
+  nBins = len(MCEff)
+  hist = ROOT.TH1F(histname,'MC truth b-tag efficiency',nBins,0,nBins)
+  effs = []
+  for a in sorted(MCEff):
+    effs.append(MCEff[a][etaBin][hadron])
+  for b in range(1,nBins+1):
+    hist.SetBinContent(b,effs[b-1])
+  return hist
 
 # get SF
 def getSF(parton, pt, eta, year = 2012):

@@ -8,7 +8,7 @@ from Workspace.HEPHYPythonTools.user import username
 from math import pi, sqrt
 from rCShelpers import *# weight_str , weight_err_str , lumi
 
-def binnedNBTagsFit(cut, cutname, samples, nBTagVar = 'nBJetMediumCSV30', lumi=4.0, prefix="", printDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/nBtagFits/templateFit/', templateDir = '/data/'+username+'/Results2015/btagTemplates/',useBTagWeights=False):
+def binnedNBTagsFit(cut, cutname, samples, nBTagVar = 'nBJetMediumCSV30', lumi=4.0, prefix="", printDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/nBtagFits/templateFit/', templateDir = '/data/'+username+'/Results2015/btagTemplates/',useBTagWeights=False, btagWeightSuffix=''):
   print "LUMI:" , lumi
   if not os.path.exists(printDir):
      os.makedirs(printDir) 
@@ -22,44 +22,54 @@ def binnedNBTagsFit(cut, cutname, samples, nBTagVar = 'nBJetMediumCSV30', lumi=4
 
   #Get histograms binned in b-tag multiplicity
   template_WJets_PosPdg_Dict = getTemplate(cutname, templateDir, 'WJets_PosPdg') #these templates will always be MC, so a reweighting (e.g. b-tagging) should not be used
-  if template_WJets_PosPdg_Dict['loadTemp']: template_WJets_PosPdg = template_WJets_PosPdg_Dict['hist']
+  if template_WJets_PosPdg_Dict['loadTemp']:
+    template_WJets_PosPdg = template_WJets_PosPdg_Dict['hist']
+    tempFile_WJets_PosPdg = template_WJets_PosPdg_Dict['file']
   else:
     template_WJets_PosPdg = getPlotFromChain(cWJets, nBTagVar, [0,1,2,3], 'leptonPdg>0&&'+cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
-    tempFile = ROOT.TFile(templateDir+cutname+'_WJets_PosPdg.root','new')
+    tempFile_WJets_PosPdg = ROOT.TFile(templateDir+cutname+'_WJets_PosPdg.root','new')
     template_WJets_PosPdg.Write()
-    tempFile.Close()
+    #tempFile.Close()
 
   template_WJets_NegPdg_Dict = getTemplate(cutname, templateDir, 'WJets_NegPdg') #these templates will always be MC, so a reweighting (e.g. b-tagging) should not be used
-  if template_WJets_NegPdg_Dict['loadTemp']: template_WJets_NegPdg = template_WJets_NegPdg_Dict['hist']
+  if template_WJets_NegPdg_Dict['loadTemp']:
+    template_WJets_NegPdg = template_WJets_NegPdg_Dict['hist']
+    tempFile_WJets_NegPdg = template_WJets_NegPdg_Dict['file']
   else: 
     template_WJets_NegPdg = getPlotFromChain(cWJets, nBTagVar, [0,1,2,3], 'leptonPdg<0&&'+cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
-    tempFile = ROOT.TFile(templateDir+cutname+'_WJets_NegPdg.root','new')
+    tempFile_WJets_NegPdg = ROOT.TFile(templateDir+cutname+'_WJets_NegPdg.root','new')
     template_WJets_NegPdg.Write()
-    tempFile.Close()
+    #tempFile.Close()
 
   template_TTJets_Dict = getTemplate(cutname, templateDir, 'TTJets') #these templates will always be MC, so a reweighting (e.g. b-tagging) should not be used
-  if template_TTJets_Dict['loadTemp']: template_TTJets = template_TTJets_Dict['hist']
+  if template_TTJets_Dict['loadTemp']:
+    template_TTJets = template_TTJets_Dict['hist']
+    tempFile_TTJets = template_TTJets_Dict['file']
   else: 
     template_TTJets = getPlotFromChain(cTTJets, nBTagVar, [0,1,2,3], cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
-    tempFile = ROOT.TFile(templateDir+cutname+'_TTJets.root','new')
+    tempFile_TTJets = ROOT.TFile(templateDir+cutname+'_TTJets.root','new')
     template_TTJets.Write()
-    tempFile.Close()
+    #tempFile.Close()
 
   template_Rest_PosPdg_Dict = getTemplate(cutname, templateDir, 'Rest_PosPdg') #these templates will always be MC, so a reweighting (e.g. b-tagging) should not be used
-  if template_Rest_PosPdg_Dict['loadTemp']: template_Rest_PosPdg = template_Rest_PosPdg_Dict['hist']
+  if template_Rest_PosPdg_Dict['loadTemp']:
+    template_Rest_PosPdg = template_Rest_PosPdg_Dict['hist']
+    tempFile_Rest_PosPdg = template_Rest_PosPdg_Dict['file']
   else: 
     template_Rest_PosPdg = getPlotFromChain(cRest, nBTagVar, [0,1,2,3], 'leptonPdg>0&&'+cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
-    tempFile = ROOT.TFile(templateDir+cutname+'_Rest_PosPdg.root','new')
+    tempFile_Rest_PosPdg = ROOT.TFile(templateDir+cutname+'_Rest_PosPdg.root','new')
     template_Rest_PosPdg.Write()
-    tempFile.Close()
+    #tempFile.Close()
 
   template_Rest_NegPdg_Dict = getTemplate(cutname, templateDir, 'Rest_NegPdg') #these templates will always be MC, so a reweighting (e.g. b-tagging) should not be used
-  if template_Rest_NegPdg_Dict['loadTemp']: template_Rest_NegPdg = template_Rest_NegPdg_Dict['hist']
+  if template_Rest_NegPdg_Dict['loadTemp']:
+    template_Rest_NegPdg = template_Rest_NegPdg_Dict['hist']
+    tempFile_Rest_NegPdg = template_Rest_NegPdg_Dict['file']
   else: 
     template_Rest_NegPdg = getPlotFromChain(cRest, nBTagVar, [0,1,2,3], 'leptonPdg<0&&'+cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
-    tempFile = ROOT.TFile(templateDir+cutname+'_Rest_NegPdg.root','new')
+    tempFile_Rest_NegPdg = ROOT.TFile(templateDir+cutname+'_Rest_NegPdg.root','new')
     template_Rest_NegPdg.Write()
-    tempFile.Close()
+    #tempFile.Close()
 
   #template_WJets_PosPdg=getPlotFromChain(cWJets, nBTagVar, [0,1,2,3], 'leptonPdg>0&&'+cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
   #template_WJets_NegPdg=getPlotFromChain(cWJets, nBTagVar, [0,1,2,3], 'leptonPdg<0&&'+cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
@@ -71,22 +81,22 @@ def binnedNBTagsFit(cut, cutname, samples, nBTagVar = 'nBJetMediumCSV30', lumi=4
   print "Nominal yields:",'Rest_PosPdg',template_Rest_PosPdg.Integral(),'Rest_NegPdg',template_Rest_NegPdg.Integral()
   
   # use this for fake data
-  if useBTagWeight:
+  if useBTagWeights:
     hData_PosPdg = getPlotFromChain(cRest, nBTagVar, [0,1,2,3], 'leptonPdg>0&&'+cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
-    hData_PosPdg.Fill(0,getYieldFromChain(cWJets, cutString =   'leptonPdg>0&&'+cut, weight = weight_str+'*weightBTag0'))
-    hData_PosPdg.Fill(1,getYieldFromChain(cWJets, cutString =   'leptonPdg>0&&'+cut, weight = weight_str+'*weightBTag1'))
-    hData_PosPdg.Fill(2,getYieldFromChain(cWJets, cutString =   'leptonPdg>0&&'+cut, weight = weight_str+'*weightBTag2'))
-    hData_PosPdg.Fill(0,getYieldFromChain(cTTJets, cutString =  'leptonPdg>0&&'+cut, weight = weight_str+'*weightBTag0'))
-    hData_PosPdg.Fill(1,getYieldFromChain(cTTJets, cutString =  'leptonPdg>0&&'+cut, weight = weight_str+'*weightBTag1'))
-    hData_PosPdg.Fill(2,getYieldFromChain(cTTJets, cutString =  'leptonPdg>0&&'+cut, weight = weight_str+'*weightBTag2'))
+    hData_PosPdg.Fill(0,getYieldFromChain(cWJets, cutString =   'leptonPdg>0&&'+cut, weight = weight_str+'*weightBTag0'+btagWeightSuffix))
+    hData_PosPdg.Fill(1,getYieldFromChain(cWJets, cutString =   'leptonPdg>0&&'+cut, weight = weight_str+'*weightBTag1'+btagWeightSuffix))
+    hData_PosPdg.Fill(2,getYieldFromChain(cWJets, cutString =   'leptonPdg>0&&'+cut, weight = weight_str+'*weightBTag2'+btagWeightSuffix))
+    hData_PosPdg.Fill(0,getYieldFromChain(cTTJets, cutString =  'leptonPdg>0&&'+cut, weight = weight_str+'*weightBTag0'+btagWeightSuffix))
+    hData_PosPdg.Fill(1,getYieldFromChain(cTTJets, cutString =  'leptonPdg>0&&'+cut, weight = weight_str+'*weightBTag1'+btagWeightSuffix))
+    hData_PosPdg.Fill(2,getYieldFromChain(cTTJets, cutString =  'leptonPdg>0&&'+cut, weight = weight_str+'*weightBTag2'+btagWeightSuffix))
     
     hData_NegPdg = getPlotFromChain(cRest, nBTagVar, [0,1,2,3], 'leptonPdg<0&&'+cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
-    hData_NegPdg.Fill(0,getYieldFromChain(cWJets, cutString =   'leptonPdg<0&&'+cut, weight = weight_str+'*weightBTag0'))
-    hData_NegPdg.Fill(1,getYieldFromChain(cWJets, cutString =   'leptonPdg<0&&'+cut, weight = weight_str+'*weightBTag1'))
-    hData_NegPdg.Fill(2,getYieldFromChain(cWJets, cutString =   'leptonPdg<0&&'+cut, weight = weight_str+'*weightBTag2'))
-    hData_NegPdg.Fill(0,getYieldFromChain(cTTJets, cutString =  'leptonPdg<0&&'+cut, weight = weight_str+'*weightBTag0'))
-    hData_NegPdg.Fill(1,getYieldFromChain(cTTJets, cutString =  'leptonPdg<0&&'+cut, weight = weight_str+'*weightBTag1'))
-    hData_NegPdg.Fill(2,getYieldFromChain(cTTJets, cutString =  'leptonPdg<0&&'+cut, weight = weight_str+'*weightBTag2'))
+    hData_NegPdg.Fill(0,getYieldFromChain(cWJets, cutString =   'leptonPdg<0&&'+cut, weight = weight_str+'*weightBTag0'+btagWeightSuffix))
+    hData_NegPdg.Fill(1,getYieldFromChain(cWJets, cutString =   'leptonPdg<0&&'+cut, weight = weight_str+'*weightBTag1'+btagWeightSuffix))
+    hData_NegPdg.Fill(2,getYieldFromChain(cWJets, cutString =   'leptonPdg<0&&'+cut, weight = weight_str+'*weightBTag2'+btagWeightSuffix))
+    hData_NegPdg.Fill(0,getYieldFromChain(cTTJets, cutString =  'leptonPdg<0&&'+cut, weight = weight_str+'*weightBTag0'+btagWeightSuffix))
+    hData_NegPdg.Fill(1,getYieldFromChain(cTTJets, cutString =  'leptonPdg<0&&'+cut, weight = weight_str+'*weightBTag1'+btagWeightSuffix))
+    hData_NegPdg.Fill(2,getYieldFromChain(cTTJets, cutString =  'leptonPdg<0&&'+cut, weight = weight_str+'*weightBTag2'+btagWeightSuffix))
 
   ##### use this for DATA
   else:
@@ -296,15 +306,15 @@ def binnedNBTagsFit(cut, cutname, samples, nBTagVar = 'nBJetMediumCSV30', lumi=4
   del nllComponents
 
   res = {'TT_AllPdg':{'template':template_TTJets, 'yield':2*yield_TTJets.getVal(), 'yield_high':2*(yield_TTJets.getVal()+yield_TTJets.getErrorHi()), 'yield_low':2*(yield_TTJets.getVal()+yield_TTJets.getErrorLo()), 
-                      'yieldVar':(yield_TTJets.getErrorHi()-yield_TTJets.getErrorLo())**2},
+                      'yieldVar':(yield_TTJets.getErrorHi()-yield_TTJets.getErrorLo())**2, 'file':tempFile_TTJets},
          'W_PosPdg':{'template':template_WJets_PosPdg,'yield':yield_WJets_PosPdg.getVal(), 'yield_high':yield_WJets_PosPdg.getVal()+yield_WJets_PosPdg.getErrorHi(), 'yield_low':yield_WJets_PosPdg.getVal()+yield_WJets_PosPdg.getErrorLo(),
-                     'yieldVar':(0.5*(yield_WJets_PosPdg.getErrorHi()-yield_WJets_PosPdg.getErrorLo()))**2},
+                     'yieldVar':(0.5*(yield_WJets_PosPdg.getErrorHi()-yield_WJets_PosPdg.getErrorLo()))**2, 'file':tempFile_WJets_PosPdg},
          'W_NegPdg':{'template':template_WJets_NegPdg,'yield':yield_WJets_NegPdg.getVal(), 'yield_high':yield_WJets_NegPdg.getVal()+yield_WJets_NegPdg.getErrorHi(), 'yield_low':yield_WJets_NegPdg.getVal()+yield_WJets_NegPdg.getErrorLo(),
-                     'yieldVar':(0.5*(yield_WJets_NegPdg.getErrorHi()-yield_WJets_NegPdg.getErrorLo()))**2},
+                     'yieldVar':(0.5*(yield_WJets_NegPdg.getErrorHi()-yield_WJets_NegPdg.getErrorLo()))**2, 'file':tempFile_WJets_NegPdg},
          'Rest_PosPdg':{'template':template_Rest_PosPdg, 'yield':yield_Rest_PosPdg.getVal(), 'yield_high':yield_Rest_PosPdg.getVal()+yield_Rest_PosPdg.getErrorHi(), 'yield_low':yield_Rest_PosPdg.getVal()+yield_Rest_PosPdg.getErrorLo(),
-                     'yieldVar':(0.5*(yield_Rest_PosPdg.getErrorHi()-yield_Rest_PosPdg.getErrorLo()))**2},
+                     'yieldVar':(0.5*(yield_Rest_PosPdg.getErrorHi()-yield_Rest_PosPdg.getErrorLo()))**2, 'file':tempFile_Rest_PosPdg},
          'Rest_NegPdg':{'template':template_Rest_NegPdg, 'yield':yield_Rest_NegPdg.getVal(), 'yield_high':yield_Rest_NegPdg.getVal()+yield_Rest_NegPdg.getErrorHi(), 'yield_low':yield_Rest_NegPdg.getVal()+yield_Rest_NegPdg.getErrorLo(),
-                     'yieldVar':(0.5*(yield_Rest_NegPdg.getErrorHi()-yield_Rest_NegPdg.getErrorLo()))**2},
+                     'yieldVar':(0.5*(yield_Rest_NegPdg.getErrorHi()-yield_Rest_NegPdg.getErrorLo()))**2, 'file':tempFile_Rest_NegPdg},
         }
   del model_NegPdg, model_PosPdg, data_PosPdg,  data_NegPdg,sumNLL
   return res

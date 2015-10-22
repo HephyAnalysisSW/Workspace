@@ -3,15 +3,16 @@ from math import *
 def hybridIso03ID(r, nLep, hybridIso03):
   return (r.LepGood_pt[nLep]>=hybridIso03['ptSwitch'] and r.LepGood_relIso03[nLep]<hybridIso03['relIso']) or (r.LepGood_pt[nLep]<hybridIso03['ptSwitch'] and r.LepGood_relIso03[nLep]*r.LepGood_pt[nLep]<hybridIso03['absIso'])
 
-   
 def cmgMVAEleID(r,nLep,mva_cuts):
   aeta = abs(r.LepGood_eta[nLep])
   for abs_e, mva in mva_cuts.iteritems():
-    if aeta>=abs_e[0] and aeta<abs_e[1] and r.LepGood_mvaIdPhys14[nLep]>mva: return True
+    if aeta>=abs_e[0] and aeta<abs_e[1] and r.LepGood_mvaIdSpring15[nLep]>mva: return True
   return False
   
 #ele_MVAID_cuts_loose = {(0,0.8):0.35 , (0.8, 1.44):0.20, (1.57, 999): -0.52}
-ele_MVAID_cuts_vloose = {(0,0.8):-0.11 , (0.8, 1.44):-0.35, (1.57, 999): -0.55}
+#ele_MVAID_cuts_vloose = {(0,0.8):-0.11 , (0.8, 1.44):-0.35, (1.57, 999): -0.55}
+#ele_MVAID_cuts_tight = {(0,0.8):0.73 , (0.8, 1.44):0.57, (1.57, 999):  0.05}
+ele_MVAID_cuts_vloose = {(0,0.8):-0.11 , (0.8, 1.44):-0.55, (1.57, 999): -0.74}   ###from desy people !!!!
 ele_MVAID_cuts_tight = {(0,0.8):0.73 , (0.8, 1.44):0.57, (1.57, 999):  0.05}
 
 def cmgLooseMuID(r, nLep):
@@ -29,8 +30,13 @@ def cmgLooseEleID(r, nLep):
 def cmgTightEleID(r, nLep):
   return r.LepGood_pt[nLep]>=25 and abs(r.LepGood_eta[nLep])<2.5\
     and  r.LepGood_miniRelIso[nLep]<0.1  \
-    and cmgMVAEleID(r,nLep,ele_MVAID_cuts_tight) \
-    and r.LepGood_lostHits[nLep]<=0 and r.LepGood_convVeto[nLep] and abs(r.LepGood_sip3d[nLep])<4
+    and  r.LepGood_SPRING15_25ns_v1==4
+
+#def cmgTightEleID(r, nLep):
+#  return r.LepGood_pt[nLep]>=25 and abs(r.LepGood_eta[nLep])<2.5\
+#    and  r.LepGood_miniRelIso[nLep]<0.1  \
+#    and cmgMVAEleID(r,nLep,ele_MVAID_cuts_tight) \
+#    and r.LepGood_lostHits[nLep]<=0 and r.LepGood_convVeto[nLep] and abs(r.LepGood_sip3d[nLep])<4
 
 #and r.LepGood_lostHits[nLep]<=0 and r.LepGood_convVeto[nLep] 
 
