@@ -36,7 +36,7 @@ cData = getChain([WJetsHT_25ns, TTJets_HTLO_25ns, singleTop_25ns, DY_25ns, TTV_2
 
 signalRegions = signalRegion3fb
 
-small = False
+small = True
 if small: signalRegions = smallRegion
 
 #DEFINE LUMI AND PLOTDIR
@@ -44,8 +44,8 @@ lumi = 3.
 sampleLumi = 3.
 debugReweighting = False
 
-printDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/25ns/templateFit/'
-pickleDir = '/data/'+username+'/Results2015/PredictionBTagWeight_SmallSRSet_'+str(lumi)+'/'
+printDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/25ns/templateFit_SFTemplate_b_Up/'
+pickleDir = '/data/'+username+'/Results2015/PredictionSFTemplate_b_Up_SmallSRSet_'+str(lumi)+'/'
 QCDpickle = '/data/bla/QCD_pkl'
 
 if not os.path.exists(pickleDir):
@@ -80,9 +80,9 @@ presel += filters
 
 btagString = 'nBJetMediumCSV30'
 useBTagWeights=True
-btagWeightSuffix = ''
-
-useBTagWeightForTemplate = False
+btagWeightSuffix = '_SF_b_Up'
+templateWeights = True
+templateWeightSuffix = '_SF'
 
 bjreg = (0,0)
 
@@ -102,10 +102,10 @@ for srNJet in signalRegions:
       print '## Using a dPhi cut value of',str(deltaPhiCut)
       print '#################################################'
       print
-      makeTTPrediction(rd, samples, htb, stb, srNJet, presel, dPhiCut=deltaPhiCut, btagVarString = btagString, lumi=lumi, printDir=printDir, useBTagWeights=useBTagWeights, btagWeightSuffix=btagWeightSuffix)
+      makeTTPrediction(rd, samples, htb, stb, srNJet, presel, dPhiCut=deltaPhiCut, btagVarString = btagString, lumi=lumi, printDir=printDir, useBTagWeights=useBTagWeights, btagWeightSuffix=btagWeightSuffix, templateWeights=templateWeights, templateWeightSuffix=templateWeightSuffix)
 
       #join W estimation results to dict
-      makeWPrediction(rd, samples, htb, stb, srNJet, presel, dPhiCut=deltaPhiCut, btagVarString = btagString, lumi=lumi, printDir=printDir, useBTagWeights=useBTagWeights, btagWeightSuffix=btagWeightSuffix)
+      makeWPrediction(rd, samples, htb, stb, srNJet, presel, dPhiCut=deltaPhiCut, btagVarString = btagString, lumi=lumi, printDir=printDir, useBTagWeights=useBTagWeights, btagWeightSuffix=btagWeightSuffix, templateWeights=templateWeights, templateWeightSuffix=templateWeightSuffix)
 
       ##If you want to make prediction of one of the bkgs, comment out all the estimation of total Bkgs
       #estimate total background

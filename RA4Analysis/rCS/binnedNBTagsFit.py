@@ -8,7 +8,7 @@ from Workspace.HEPHYPythonTools.user import username
 from math import pi, sqrt
 from rCShelpers import *# weight_str , weight_err_str , lumi
 
-def binnedNBTagsFit(cut, cutname, samples, nBTagVar = 'nBJetMediumCSV30', lumi=4.0, prefix="", printDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/nBtagFits/templateFit/', templateDir = '/data/'+username+'/Results2015/btagTemplates/',useBTagWeights=False, btagWeightSuffix=''):
+def binnedNBTagsFit(cut, cutname, samples, nBTagVar = 'nBJetMediumCSV30', lumi=4.0, prefix="", printDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/nBtagFits/templateFit/', templateDir = '/data/'+username+'/Results2015/btagSFTemplates/',useBTagWeights=False, btagWeightSuffix='', templateWeights=False, templateWeightSuffix=''):
   print "LUMI:" , lumi
   if not os.path.exists(printDir):
      os.makedirs(printDir) 
@@ -27,6 +27,13 @@ def binnedNBTagsFit(cut, cutname, samples, nBTagVar = 'nBJetMediumCSV30', lumi=4
     tempFile_WJets_PosPdg = template_WJets_PosPdg_Dict['file']
   else:
     template_WJets_PosPdg = getPlotFromChain(cWJets, nBTagVar, [0,1,2,3], 'leptonPdg>0&&'+cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
+    if templateWeights:
+      template_WJets_PosPdg.SetBinContent(1,getYieldFromChain(cWJets, cutString = 'leptonPdg>0&&'+cut, weight = weight_str+'*weightBTag0'+templateWeightSuffix))
+      template_WJets_PosPdg.SetBinError(1,  sqrt(getYieldFromChain(cWJets, cutString = 'leptonPdg>0&&'+cut, weight = weight_err_str+'*weightBTag0'+templateWeightSuffix+'**2')))
+      template_WJets_PosPdg.SetBinContent(2,getYieldFromChain(cWJets, cutString = 'leptonPdg>0&&'+cut, weight = weight_str+'*weightBTag1'+templateWeightSuffix))
+      template_WJets_PosPdg.SetBinError(2,  sqrt(getYieldFromChain(cWJets, cutString = 'leptonPdg>0&&'+cut, weight = weight_err_str+'*weightBTag1'+templateWeightSuffix+'**2')))
+      template_WJets_PosPdg.SetBinContent(3,getYieldFromChain(cWJets, cutString = 'leptonPdg>0&&'+cut, weight = weight_str+'*weightBTag2'+templateWeightSuffix))
+      template_WJets_PosPdg.SetBinError(3,  sqrt(getYieldFromChain(cWJets, cutString = 'leptonPdg>0&&'+cut, weight = weight_err_str+'*weightBTag2'+templateWeightSuffix+'**2')))
     tempFile_WJets_PosPdg = ROOT.TFile(templateDir+cutname+'_WJets_PosPdg.root','new')
     template_WJets_PosPdg.Write()
     #tempFile.Close()
@@ -37,6 +44,13 @@ def binnedNBTagsFit(cut, cutname, samples, nBTagVar = 'nBJetMediumCSV30', lumi=4
     tempFile_WJets_NegPdg = template_WJets_NegPdg_Dict['file']
   else: 
     template_WJets_NegPdg = getPlotFromChain(cWJets, nBTagVar, [0,1,2,3], 'leptonPdg<0&&'+cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
+    if templateWeights:
+      template_WJets_NegPdg.SetBinContent(1,getYieldFromChain(cWJets, cutString = 'leptonPdg<0&&'+cut, weight = weight_str+'*weightBTag0'+templateWeightSuffix))
+      template_WJets_NegPdg.SetBinError(1,  sqrt(getYieldFromChain(cWJets, cutString = 'leptonPdg<0&&'+cut, weight = weight_err_str+'*weightBTag0'+templateWeightSuffix+'**2')))
+      template_WJets_NegPdg.SetBinContent(2,getYieldFromChain(cWJets, cutString = 'leptonPdg<0&&'+cut, weight = weight_str+'*weightBTag1'+templateWeightSuffix))
+      template_WJets_NegPdg.SetBinError(2,  sqrt(getYieldFromChain(cWJets, cutString = 'leptonPdg<0&&'+cut, weight = weight_err_str+'*weightBTag1'+templateWeightSuffix+'**2')))
+      template_WJets_NegPdg.SetBinContent(3,getYieldFromChain(cWJets, cutString = 'leptonPdg<0&&'+cut, weight = weight_str+'*weightBTag2'+templateWeightSuffix))
+      template_WJets_NegPdg.SetBinError(3,  sqrt(getYieldFromChain(cWJets, cutString = 'leptonPdg<0&&'+cut, weight = weight_err_str+'*weightBTag2'+templateWeightSuffix+'**2')))
     tempFile_WJets_NegPdg = ROOT.TFile(templateDir+cutname+'_WJets_NegPdg.root','new')
     template_WJets_NegPdg.Write()
     #tempFile.Close()
@@ -47,6 +61,13 @@ def binnedNBTagsFit(cut, cutname, samples, nBTagVar = 'nBJetMediumCSV30', lumi=4
     tempFile_TTJets = template_TTJets_Dict['file']
   else: 
     template_TTJets = getPlotFromChain(cTTJets, nBTagVar, [0,1,2,3], cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
+    if templateWeights:
+      template_TTJets.SetBinContent(1,getYieldFromChain(cTTJets, cutString = cut, weight = weight_str+'*weightBTag0'+templateWeightSuffix))
+      template_TTJets.SetBinError(1,  sqrt(getYieldFromChain(cTTJets, cutString = cut, weight = weight_err_str+'*weightBTag0'+templateWeightSuffix+'**2')))
+      template_TTJets.SetBinContent(2,getYieldFromChain(cTTJets, cutString = cut, weight = weight_str+'*weightBTag1'+templateWeightSuffix))
+      template_TTJets.SetBinError(2,  sqrt(getYieldFromChain(cTTJets, cutString = cut, weight = weight_err_str+'*weightBTag1'+templateWeightSuffix+'**2')))
+      template_TTJets.SetBinContent(3,getYieldFromChain(cTTJets, cutString = cut, weight = weight_str+'*weightBTag2'+templateWeightSuffix))
+      template_TTJets.SetBinError(3,  sqrt(getYieldFromChain(cTTJets, cutString = cut, weight = weight_err_str+'*weightBTag2'+templateWeightSuffix+'**2')))
     tempFile_TTJets = ROOT.TFile(templateDir+cutname+'_TTJets.root','new')
     template_TTJets.Write()
     #tempFile.Close()
@@ -83,20 +104,74 @@ def binnedNBTagsFit(cut, cutname, samples, nBTagVar = 'nBJetMediumCSV30', lumi=4
   # use this for fake data
   if useBTagWeights:
     hData_PosPdg = getPlotFromChain(cRest, nBTagVar, [0,1,2,3], 'leptonPdg>0&&'+cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
-    hData_PosPdg.Fill(0,getYieldFromChain(cWJets, cutString =   'leptonPdg>0&&'+cut, weight = weight_str+'*weightBTag0'+btagWeightSuffix))
-    hData_PosPdg.Fill(1,getYieldFromChain(cWJets, cutString =   'leptonPdg>0&&'+cut, weight = weight_str+'*weightBTag1'+btagWeightSuffix))
-    hData_PosPdg.Fill(2,getYieldFromChain(cWJets, cutString =   'leptonPdg>0&&'+cut, weight = weight_str+'*weightBTag2'+btagWeightSuffix))
-    hData_PosPdg.Fill(0,getYieldFromChain(cTTJets, cutString =  'leptonPdg>0&&'+cut, weight = weight_str+'*weightBTag0'+btagWeightSuffix))
-    hData_PosPdg.Fill(1,getYieldFromChain(cTTJets, cutString =  'leptonPdg>0&&'+cut, weight = weight_str+'*weightBTag1'+btagWeightSuffix))
-    hData_PosPdg.Fill(2,getYieldFromChain(cTTJets, cutString =  'leptonPdg>0&&'+cut, weight = weight_str+'*weightBTag2'+btagWeightSuffix))
+    #hData_PosPdg.Sumw2()
+    bin1 = hData_PosPdg.GetBinContent(1)
+    bin1Var = (hData_PosPdg.GetBinError(1))**2
+    bin1    += getYieldFromChain(cWJets, cutString =   'leptonPdg>0&&'+cut, weight = weight_str+'*weightBTag0'+btagWeightSuffix)
+    bin1Var += getYieldFromChain(cWJets, cutString =   'leptonPdg>0&&'+cut, weight = weight_err_str+'*weightBTag0'+btagWeightSuffix+'**2')
+    bin1    += getYieldFromChain(cTTJets, cutString =  'leptonPdg>0&&'+cut, weight = weight_str+'*weightBTag0'+btagWeightSuffix)
+    bin1Var += getYieldFromChain(cTTJets, cutString =   'leptonPdg>0&&'+cut, weight = weight_err_str+'*weightBTag0'+btagWeightSuffix+'**2')
+    hData_PosPdg.SetBinContent(1,bin1)
+    hData_PosPdg.SetBinError(1,sqrt(bin1Var))
+    
+    bin2 = hData_PosPdg.GetBinContent(2)
+    bin2Var = (hData_PosPdg.GetBinError(2))**2
+    bin2    += getYieldFromChain(cWJets, cutString =   'leptonPdg>0&&'+cut, weight = weight_str+'*weightBTag1'+btagWeightSuffix)
+    bin2Var += getYieldFromChain(cWJets, cutString =   'leptonPdg>0&&'+cut, weight = weight_err_str+'*weightBTag1'+btagWeightSuffix+'**2')
+    bin2    += getYieldFromChain(cTTJets, cutString =  'leptonPdg>0&&'+cut, weight = weight_str+'*weightBTag1'+btagWeightSuffix)
+    bin2Var += getYieldFromChain(cTTJets, cutString =   'leptonPdg>0&&'+cut, weight = weight_err_str+'*weightBTag1'+btagWeightSuffix+'**2')
+    hData_PosPdg.SetBinContent(2,bin2)
+    hData_PosPdg.SetBinError(2,sqrt(bin2Var))
+    
+    bin3 = hData_PosPdg.GetBinContent(3)
+    bin3Var = (hData_PosPdg.GetBinError(3))**2
+    bin3    += getYieldFromChain(cWJets, cutString =   'leptonPdg>0&&'+cut, weight = weight_str+'*weightBTag2'+btagWeightSuffix)
+    bin3Var += getYieldFromChain(cWJets, cutString =   'leptonPdg>0&&'+cut, weight = weight_err_str+'*weightBTag2'+btagWeightSuffix+'**2')
+    bin3    += getYieldFromChain(cTTJets, cutString =  'leptonPdg>0&&'+cut, weight = weight_str+'*weightBTag2'+btagWeightSuffix)
+    bin3Var += getYieldFromChain(cTTJets, cutString =   'leptonPdg>0&&'+cut, weight = weight_err_str+'*weightBTag2'+btagWeightSuffix+'**2')
+    hData_PosPdg.SetBinContent(3,bin3)
+    hData_PosPdg.SetBinError(3,sqrt(bin3Var))
+    #hData_PosPdg.Fill(0,getYieldFromChain(cWJets, cutString =   'leptonPdg>0&&'+cut, weight = weight_str+'*weightBTag0'+btagWeightSuffix))
+    #hData_PosPdg.Fill(1,getYieldFromChain(cWJets, cutString =   'leptonPdg>0&&'+cut, weight = weight_str+'*weightBTag1'+btagWeightSuffix))
+    #hData_PosPdg.Fill(2,getYieldFromChain(cWJets, cutString =   'leptonPdg>0&&'+cut, weight = weight_str+'*weightBTag2'+btagWeightSuffix))
+    #hData_PosPdg.Fill(0,getYieldFromChain(cTTJets, cutString =  'leptonPdg>0&&'+cut, weight = weight_str+'*weightBTag0'+btagWeightSuffix))
+    #hData_PosPdg.Fill(1,getYieldFromChain(cTTJets, cutString =  'leptonPdg>0&&'+cut, weight = weight_str+'*weightBTag1'+btagWeightSuffix))
+    #hData_PosPdg.Fill(2,getYieldFromChain(cTTJets, cutString =  'leptonPdg>0&&'+cut, weight = weight_str+'*weightBTag2'+btagWeightSuffix))
     
     hData_NegPdg = getPlotFromChain(cRest, nBTagVar, [0,1,2,3], 'leptonPdg<0&&'+cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
-    hData_NegPdg.Fill(0,getYieldFromChain(cWJets, cutString =   'leptonPdg<0&&'+cut, weight = weight_str+'*weightBTag0'+btagWeightSuffix))
-    hData_NegPdg.Fill(1,getYieldFromChain(cWJets, cutString =   'leptonPdg<0&&'+cut, weight = weight_str+'*weightBTag1'+btagWeightSuffix))
-    hData_NegPdg.Fill(2,getYieldFromChain(cWJets, cutString =   'leptonPdg<0&&'+cut, weight = weight_str+'*weightBTag2'+btagWeightSuffix))
-    hData_NegPdg.Fill(0,getYieldFromChain(cTTJets, cutString =  'leptonPdg<0&&'+cut, weight = weight_str+'*weightBTag0'+btagWeightSuffix))
-    hData_NegPdg.Fill(1,getYieldFromChain(cTTJets, cutString =  'leptonPdg<0&&'+cut, weight = weight_str+'*weightBTag1'+btagWeightSuffix))
-    hData_NegPdg.Fill(2,getYieldFromChain(cTTJets, cutString =  'leptonPdg<0&&'+cut, weight = weight_str+'*weightBTag2'+btagWeightSuffix))
+    #hData_NegPdg.Sumw2()
+    bin1 = hData_NegPdg.GetBinContent(1)
+    bin1Var = (hData_NegPdg.GetBinError(1))**2
+    bin1    += getYieldFromChain(cWJets, cutString =   'leptonPdg<0&&'+cut, weight = weight_str+'*weightBTag0'+btagWeightSuffix)
+    bin1Var += getYieldFromChain(cWJets, cutString =   'leptonPdg<0&&'+cut, weight = weight_err_str+'*weightBTag0'+btagWeightSuffix+'**2')
+    bin1    += getYieldFromChain(cTTJets, cutString =  'leptonPdg<0&&'+cut, weight = weight_str+'*weightBTag0'+btagWeightSuffix)
+    bin1Var += getYieldFromChain(cTTJets, cutString =  'leptonPdg<0&&'+cut, weight = weight_err_str+'*weightBTag0'+btagWeightSuffix+'**2')
+    hData_NegPdg.SetBinContent(1,bin1)
+    hData_NegPdg.SetBinError(1,sqrt(bin1Var))
+
+    bin2 = hData_NegPdg.GetBinContent(2)
+    bin2Var = (hData_NegPdg.GetBinError(2))**2
+    bin2    += getYieldFromChain(cWJets, cutString =   'leptonPdg<0&&'+cut, weight = weight_str+'*weightBTag1'+btagWeightSuffix)
+    bin2Var += getYieldFromChain(cWJets, cutString =   'leptonPdg<0&&'+cut, weight = weight_err_str+'*weightBTag1'+btagWeightSuffix+'**2')
+    bin2    += getYieldFromChain(cTTJets, cutString =  'leptonPdg<0&&'+cut, weight = weight_str+'*weightBTag1'+btagWeightSuffix)
+    bin2Var += getYieldFromChain(cTTJets, cutString =  'leptonPdg<0&&'+cut, weight = weight_err_str+'*weightBTag1'+btagWeightSuffix+'**2')
+    hData_NegPdg.SetBinContent(2,bin2)
+    hData_NegPdg.SetBinError(2,sqrt(bin2Var))
+
+    bin3 = hData_NegPdg.GetBinContent(3)
+    bin3Var = (hData_NegPdg.GetBinError(3))**2
+    bin3    += getYieldFromChain(cWJets, cutString =   'leptonPdg<0&&'+cut, weight = weight_str+'*weightBTag2'+btagWeightSuffix)
+    bin3Var += getYieldFromChain(cWJets, cutString =   'leptonPdg<0&&'+cut, weight = weight_err_str+'*weightBTag2'+btagWeightSuffix+'**2')
+    bin3    += getYieldFromChain(cTTJets, cutString =  'leptonPdg<0&&'+cut, weight = weight_str+'*weightBTag2'+btagWeightSuffix)
+    bin3Var += getYieldFromChain(cTTJets, cutString =  'leptonPdg<0&&'+cut, weight = weight_err_str+'*weightBTag2'+btagWeightSuffix+'**2')
+    hData_NegPdg.SetBinContent(3,bin3)
+    hData_NegPdg.SetBinError(3,sqrt(bin3Var))
+    #hData_NegPdg.Fill(0,getYieldFromChain(cWJets, cutString =   'leptonPdg<0&&'+cut, weight = weight_str+'*weightBTag0'+btagWeightSuffix))
+    #hData_NegPdg.Fill(1,getYieldFromChain(cWJets, cutString =   'leptonPdg<0&&'+cut, weight = weight_str+'*weightBTag1'+btagWeightSuffix))
+    #hData_NegPdg.Fill(2,getYieldFromChain(cWJets, cutString =   'leptonPdg<0&&'+cut, weight = weight_str+'*weightBTag2'+btagWeightSuffix))
+    #hData_NegPdg.Fill(0,getYieldFromChain(cTTJets, cutString =  'leptonPdg<0&&'+cut, weight = weight_str+'*weightBTag0'+btagWeightSuffix))
+    #hData_NegPdg.Fill(1,getYieldFromChain(cTTJets, cutString =  'leptonPdg<0&&'+cut, weight = weight_str+'*weightBTag1'+btagWeightSuffix))
+    #hData_NegPdg.Fill(2,getYieldFromChain(cTTJets, cutString =  'leptonPdg<0&&'+cut, weight = weight_str+'*weightBTag2'+btagWeightSuffix))
 
   ##### use this for DATA
   else:

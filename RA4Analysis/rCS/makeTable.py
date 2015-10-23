@@ -13,7 +13,7 @@ useTTcorrection = False
 signal = False
 
 prefix = 'singleLeptonic_Spring15_'
-path = '/data/'+username+'/Results2015/PredictionNoBTagWeight_FullSRSet_3.0/' 
+path = '/data/'+username+'/Results2015/PredictionNoBTagWeight_SmallSRSet_3.0/' 
 
 res = pickle.load(file(path+prefix+'_estimationResults_pkl'))
 
@@ -44,7 +44,7 @@ if signal:
 
 
 signalRegions = signalRegion3fb
-signalRegions = smallRegion
+#signalRegions = smallRegion
 #signalRegions = {(5, 5): {(250, 350): {(500, -1):   {'deltaPhi': 1.0}}}}
 
 #streg = [[(250, 350), 1.], [(350, 450), 1.], [(450,-1), 1.]]
