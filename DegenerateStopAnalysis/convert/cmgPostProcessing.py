@@ -12,7 +12,8 @@ from math import *
 from Workspace.HEPHYPythonTools.user import username
 
 #from Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_25ns import *
-from Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_packedGenPart_tracks import *
+#from Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_packedGenPart_tracks import *
+from Workspace.DegenerateStopAnalysis.cmgTuples_Data25ns import *
 #from Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_50ns import *
 #from Workspace.DegenerateStopAnalysis.cmgTuples_Data50ns_1l import *
 #from Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_v1 import *
@@ -24,7 +25,7 @@ pkdGenParts = True
 verbose = False
 break_for_debug =False
 defSampleStr = "WJetsToLNu_HT100to200"
-subDir = "postProcessed_Spring15_nTracks"
+subDir = "postProcessed_Data25ns"
 
 
 ROOT.gSystem.Load("libFWCoreFWLite.so")
