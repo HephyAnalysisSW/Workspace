@@ -13,7 +13,8 @@ from Workspace.HEPHYPythonTools.user import username
 
 #from Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_25ns import *
 #from Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_packedGenPart_tracks import *
-from Workspace.DegenerateStopAnalysis.cmgTuples_Data25ns import *
+#from Workspace.DegenerateStopAnalysis.cmgTuples_Data25ns import *
+from Workspace.DegenerateStopAnalysis.cmgTuples_Data25ns_fromArtur import *
 #from Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_50ns import *
 #from Workspace.DegenerateStopAnalysis.cmgTuples_Data50ns_1l import *
 #from Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_v1 import *
