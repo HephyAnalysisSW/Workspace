@@ -1,11 +1,5 @@
-#import ROOT
-#from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYieldFromChain, getChunks
-#from Workspace.DegenerateStopAnalysis.navidPlotTools import joinCutStrings, makeCutFlowList, cutClass
-from Workspace.DegenerateStopAnalysis.navidPlotTools import joinCutStrings, cutClass 
-
-
-
-
+import math
+from Workspace.DegenerateStopAnalysis.navidTools.CutTools import *
 
 
 ## --------------------------------------------------------------
@@ -24,7 +18,7 @@ minAngle = lambda phi1, phi2 : "TMath::Min( (2*pi) - abs({phi1}-{phi2}) , abs({p
 
 
 
-presel = cutClass ("presel", [
+presel = CutClass ("presel", [
                               ["MET200","met>200"],
                               ["ISR110","nJet110>=1" ],
                               ["HT300","htJet30j>300"],
@@ -40,7 +34,7 @@ preselection = presel.combined
 
 
 
-sr1   = cutClass ("sr1",    [
+sr1   = CutClass ("sr1",    [
                               ["negMuon","lepPdg==13"],
                               ["MuEta1.5","abs(lepEta)<1.5"],
                               ["BVeto_Medium25","nBJetMedium25==0"],
@@ -50,9 +44,13 @@ sr1   = cutClass ("sr1",    [
                   )
 
 
-      
+
+
+
 
   
+
+
 
 
 

@@ -119,7 +119,7 @@ if options.skim=='inc':
   skimCond = "(1)"
 if options.preselect:
   #preselection = "(met_pt > 200 && Jet_pt[0]> 100 && Sum$(Jet_pt)>200 )"
-  preselection = "(met_pt > 150 && Jet_pt[0]> 80 && Sum$(Jet_pt)>200 )"
+  preselection = "(met_pt > 100 && Jet_pt[0]> 80 && Sum$(Jet_pt)>100 )"
   print "Applying Preselection", preselection
   skimCond += "&&%s"%preselection
 
