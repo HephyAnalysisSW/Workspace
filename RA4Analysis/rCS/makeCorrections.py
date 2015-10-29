@@ -6,7 +6,12 @@ from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,v
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v9_Phys14V3_HT400ST200_ForTTJetsUnc import *
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_Spring15_hard import *
-from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_postProcessed import *
+#from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_postProcessed import *
+#from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT400ST200_postProcessed_fromArthur import *
+
+from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT400ST200_postProcessed_btagWeight import *
+from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT500ST250_postProcessed_fromArthur import *
+
 #from makeTTPrediction import makeTTPrediction
 #from makeWPrediction import makeWPrediction
 from Workspace.HEPHYPythonTools.user import username
@@ -19,9 +24,15 @@ ROOT.TH1F().SetDefaultSumw2()
 
 lepSel = 'hard'
 
-cWJets  = getChain(WJetsHTToLNu_25ns,histname='')
-cTTJets = getChain(TTJets_LO_25ns,histname='')
-cEWK = getChain([WJetsHTToLNu_25ns,TTJets_LO_25ns,DY_25ns,singleTop_25ns],histname='')
+#cWJets  = getChain(WJetsHTToLNu_25ns,histname='')
+#cTTJets = getChain(TTJets_LO_25ns,histname='')
+#cEWK = getChain([WJetsHTToLNu_25ns,TTJets_LO_25ns,DY_25ns,singleTop_25ns],histname='')
+
+cWJets  = getChain(WJetsHT_25ns_btagweight,histname='')
+cTTJets = getChain(TTJets_LO_25ns_btagweight,histname='')
+#cRest = getChain([singleTop_25ns, DY_25ns, TTV_25ns],histname='')#no QCD
+cEWK =  getChain([WJetsHT_25ns_btagweight, TTJets_LO_25ns_btagweight, singleTop_25ns, DY_25ns, TTV_25ns], histname='')#no QCD
+#cData = getChain([WJetsHT_25ns, TTJets_HTLO_25ns, singleTop_25ns, DY_25ns, TTV_25ns], histname='')
 
 #cBkg = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]],histname='')#no QCD
 #cData = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]] , histname='')
@@ -29,25 +40,35 @@ cEWK = getChain([WJetsHTToLNu_25ns,TTJets_LO_25ns,DY_25ns,singleTop_25ns],histna
 #cData = cBkg
 
 signalRegions = signalRegion3fb
+signalRegions = signalRegionCRonly
 
 small = False
 if small: signalRegions = smallRegion
 
 #DEFINE LUMI AND PLOTDIR
-lumi = 3.
-printDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/25ns/templateFit/'
-pickleDir = '/data/'+username+'/Spring15/25ns/PredictionAN_'+str(lumi)+'/'
+lumi = 1.26
+
+pickleDir = '/data/'+username+'/Results2015/Prediction_bweightTemplate_data_reducedSR_lep_'+str(lumi)+'/'
+
+fitDir = '/data/'+username+'/Results2015/correctionFitForData_Lep_reducedSR/'
+
+createFits = False
+if not createFits: loadedFit = pickle.load(file(fitDir+prefix+'_fit_pkl'))
 
 if not os.path.exists(pickleDir):
   os.makedirs(pickleDir)
-if not os.path.exists(printDir):
-  os.makedirs(printDir)
+if not os.path.exists(fitDir):
+  os.makedirs(fitDir)
 
 weight_str, weight_err_str = makeWeight(lumi, sampleLumi=3.)
 
 
 prefix = 'singleLeptonic_Spring15_'
-presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&Jet_pt[1]>80"
+presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&Jet_pt[1]>80&&st>250&&nJet30>2&&htJet30j>500"#&&nBJetMediumCSV30==0"
+filters = "&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFilter&&Flag_goodVertices&&Flag_eeBadScFilter"#&&Flag_EcalDeadCellTriggerPrimitiveFilter" #strange filter settings!!
+#presel += '&&singleMuonic'
+presel += filters
+#presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&Jet_pt[1]>80"
 btagString = 'nBJetMediumCSV30'
 
 wJetBins = [(3,4),(5,5),(6,7),(8,-1)]
@@ -69,11 +90,14 @@ res = pickle.load(file(pickleDir+prefix+'_estimationResults_pkl'))
 scoreExp=0.
 scoreStat=0.
 total=0.
+fitResults = {}
 
 for i_njb, njb in enumerate(signalRegions):
   bins[njb] = {}
+  fitResults[njb] = {}
   for stb in signalRegions[njb]:
     bins[njb][stb] ={}
+    fitResults[njb][stb] ={}
     for htb in signalRegions[njb][stb]:
       print
       print '#############################################'
@@ -85,57 +109,76 @@ for i_njb, njb in enumerate(signalRegions):
       print '#############################################'
       print
       dPhiCut = signalRegions[njb][stb][htb]['deltaPhi']
-      #wJetRcsFitH = ROOT.TH1F("wJetRcsFitH","",len(wJetBins),0,len(wJetBins))
-      ttJetRcsFitH = ROOT.TH1F("ttJetRcsFitH","",len(ttJetBins),0,len(ttJetBins))
-      ttJetRcsFitH1b = ROOT.TH1F("ttJetRcsFitH1b","",len(ttJetBins),0,len(ttJetBins))
-      
-      #ttJets corrections
-      cname1bCRtt, cut1bCRtt = nameAndCut(stb,htb,(4,5), btb=(1,1) ,presel=presel)
-      cname0bCRtt, cut0bCRtt = nameAndCut(stb,htb,(4,5), btb=(0,0) ,presel=presel)
-      rcs1bCRtt = getRCS(cEWK, cut1bCRtt, dPhiCut)
-      rcs0bCRtt = getRCS(cTTJets, cut0bCRtt, dPhiCut)
-      #Kappa now calculated only in the SB bin (4,5) jets 1b allEWK MC vs 0b tt MC - no fit applied for the moment!
-      kappaTT = divideRCSdict(rcs0bCRtt,rcs1bCRtt)
-      
-      #fill histograms
-      for i_njbTT, njbTT in enumerate(ttJetBins):
-        cname, cut = nameAndCut(stb,htb,njbTT, btb=(0,0) ,presel=presel)
-        cname1b, cut1b = nameAndCut(stb,htb,njbTT, btb=(1,1) ,presel=presel)
-        rcsD = getRCS(cTTJets, cut, dPhiCut)
-        rcsD1b = getRCS(cTTJets, cut1b, dPhiCut)
-        #rcs = rcsD['rCS']
-        #rcsErrPred = rcsD['rCSE_pred']
-        #rcsErr = rcsD['rCSE_sim']
-        if not math.isnan(rcsD['rCS']):
-          ttJetRcsFitH.SetBinContent(i_njbTT+1, rcsD['rCS'])
-          ttJetRcsFitH.SetBinError(i_njbTT+1, rcsD['rCSE_sim'])
-        if not math.isnan(rcsD1b['rCS']):
-          ttJetRcsFitH1b.SetBinContent(i_njbTT+1, rcsD1b['rCS'])
-          ttJetRcsFitH1b.SetBinError(i_njbTT+1, rcsD1b['rCSE_sim'])
-      print
-      print 'Linear Fit for tt Jets Rcs values in 0b MC'
-      #linear fit in 0b
-      ttJetRcsFitH.Fit('pol1','','same',0,3)
-      FitFunc     = ttJetRcsFitH.GetFunction('pol1')
-      ttD  = FitFunc.GetParameter(0)
-      ttDE = FitFunc.GetParError(0)
-      ttK  = FitFunc.GetParameter(1)
-      ttKE = FitFunc.GetParError(1)
-      #print ttD, ttK
-      
-      #konstant fit in 0b and 1b
-      print
-      print 'Konstant Fit for tt Jets Rcs values in 0b MC'
-      ttJetRcsFitH.Fit('pol0','','same',0,3)
-      FitFunc     = ttJetRcsFitH.GetFunction('pol0')
-      ttConst0  = FitFunc.GetParameter(0)
-      ttConst0E = FitFunc.GetParError(0)
-      print
-      print 'Konstant Fit for tt Jets Rcs values in 1b MC'
-      ttJetRcsFitH1b.Fit('pol0','','same',0,3)
-      FitFunc     = ttJetRcsFitH1b.GetFunction('pol0')
-      ttConst1  = FitFunc.GetParameter(0)
-      ttConst1E = FitFunc.GetParError(0)
+      if createFits:
+        #ttJets corrections
+        ttJetRcsFitH = ROOT.TH1F("ttJetRcsFitH","",len(ttJetBins),0,len(ttJetBins))
+        ttJetRcsFitH1b = ROOT.TH1F("ttJetRcsFitH1b","",len(ttJetBins),0,len(ttJetBins))
+        cname1bCRtt, cut1bCRtt = nameAndCut(stb,htb,(4,5), btb=(1,1) ,presel=presel)
+        cname0bCRtt, cut0bCRtt = nameAndCut(stb,htb,(4,5), btb=(0,0) ,presel=presel)
+        rcs1bCRtt = getRCS(cEWK, cut1bCRtt, dPhiCut)
+        rcs0bCRtt = getRCS(cTTJets, cut0bCRtt, dPhiCut)
+        #Kappa now calculated only in the SB bin (4,5) jets 1b allEWK MC vs 0b tt MC - no fit applied for the moment!
+        kappaTT = divideRCSdict(rcs0bCRtt,rcs1bCRtt)
+        fitResults[njb][stb][htb] = {'kappaTT':kappaTT, 'rcs1bCRtt':rcs1bCRtt, 'rcs0bCRtt':rcs0bCRtt}
+        #fill histograms
+        for i_njbTT, njbTT in enumerate(ttJetBins):
+          cname, cut = nameAndCut(stb,htb,njbTT, btb=(0,0) ,presel=presel)
+          cname1b, cut1b = nameAndCut(stb,htb,njbTT, btb=(1,1) ,presel=presel)
+          rcsD = getRCS(cTTJets, cut, dPhiCut)
+          rcsD1b = getRCS(cTTJets, cut1b, dPhiCut)
+          #rcs = rcsD['rCS']
+          #rcsErrPred = rcsD['rCSE_pred']
+          #rcsErr = rcsD['rCSE_sim']
+          if not math.isnan(rcsD['rCS']):
+            ttJetRcsFitH.SetBinContent(i_njbTT+1, rcsD['rCS'])
+            ttJetRcsFitH.SetBinError(i_njbTT+1, rcsD['rCSE_sim'])
+          if not math.isnan(rcsD1b['rCS']):
+            ttJetRcsFitH1b.SetBinContent(i_njbTT+1, rcsD1b['rCS'])
+            ttJetRcsFitH1b.SetBinError(i_njbTT+1, rcsD1b['rCSE_sim'])
+        print
+        print 'Linear Fit for tt Jets Rcs values in 0b MC'
+        #linear fit in 0b
+        ttJetRcsFitH.Fit('pol1','','same',0,3)
+        FitFunc     = ttJetRcsFitH.GetFunction('pol1')
+        ttD  = FitFunc.GetParameter(0)
+        ttDE = FitFunc.GetParError(0)
+        ttK  = FitFunc.GetParameter(1)
+        ttKE = FitFunc.GetParError(1)
+        ttLinear = {'ttD':ttD, 'ttDE':ttDE, 'ttK':ttK, 'ttKE':ttKE}
+        fitResults[njb][stb][htb].update({'ttLinear':ttLinear})
+        #print ttD, ttK
+        #constant fit in 0b and 1b
+        print
+        print 'Konstant Fit for tt Jets Rcs values in 0b MC'
+        ttJetRcsFitH.Fit('pol0','','same',0,3)
+        FitFunc     = ttJetRcsFitH.GetFunction('pol0')
+        ttConst0  = FitFunc.GetParameter(0)
+        ttConst0E = FitFunc.GetParError(0)
+        ttC0 = {'ttConst0':ttConst0, 'ttConst0E':ttConst0E}
+        
+        print
+        print 'Konstant Fit for tt Jets Rcs values in 1b MC'
+        ttJetRcsFitH1b.Fit('pol0','','same',0,3)
+        FitFunc     = ttJetRcsFitH1b.GetFunction('pol0')
+        ttConst1  = FitFunc.GetParameter(0)
+        ttConst1E = FitFunc.GetParError(0)
+        ttC1 = {'ttConst1':ttConst1, 'ttConst1E':ttConst1E}
+        fitResults[njb][stb][htb].update({'ttC0':ttC0, 'ttC1':ttC1})
+      else:
+        
+        rcs1bCRtt = loadedFit[njb][stb][htb]['rcs1bCRtt']
+        rcs0bCRtt = loadedFit[njb][stb][htb]['rcs0bCRtt']
+        kappaTT =   loadedFit[njb][stb][htb]['kappaTT']
+        ttD =       loadedFit[njb][stb][htb]['ttLinear']['ttD']
+        ttDE =      loadedFit[njb][stb][htb]['ttLinear']['ttDE']
+        ttK =       loadedFit[njb][stb][htb]['ttLinear']['ttK']
+        ttKE =      loadedFit[njb][stb][htb]['ttLinear']['ttKE']
+        ttConst0 =  loadedFit[njb][stb][htb]['ttC0']['ttConst0']
+        ttConst0E = loadedFit[njb][stb][htb]['ttC0']['ttConst0E']
+        ttConst1 =  loadedFit[njb][stb][htb]['ttC1']['ttConst1']
+        ttConst1E = loadedFit[njb][stb][htb]['ttC1']['ttConst1E']
+
+
       kappaTTfit = ttConst0/ttConst1
       kappaTTfitErr = kappaTTfit*sqrt(ttConst1E**2/ttConst1**2+ttConst0E**2/ttConst0**2)
 
@@ -183,27 +226,33 @@ for i_njb, njb in enumerate(signalRegions):
       #Wjets corrections
       Wcharges = [{'name':'PosPdg','cut':'leptonPdg>0', 'string':'_PosPdg'},{'name':'NegPdg','cut':'leptonPdg<0', 'string':'_NegPdg'},{'name':'all', 'cut':'(1)', 'string':''}]
       for Wc in Wcharges:
-        wJetRcsFitH = ROOT.TH1F("wJetRcsFitH","",len(wJetBins),0,len(wJetBins))
-        
-        #fill histograms for linear fit to account for possible non-flat rcs values
-        for i_njbW, njbW in enumerate(wJetBins):
-          cname, cut = nameAndCut(stb,htb,njbW, btb=(0,0) ,presel=presel)
-          rcsD = getRCS(cWJets, cut+'&&'+Wc['cut'], dPhiCut)
-          #rcs = rcsD['rCS']
-          #rcsErrPred = rcsD['rCSE_pred']
-          #rcsErr = rcsD['rCSE_sim']
-          if not math.isnan(rcsD['rCS']):
-            wJetRcsFitH.SetBinContent(i_njbW+1, rcsD['rCS'])
-            wJetRcsFitH.SetBinError(i_njbW+1, rcsD['rCSE_sim'])
+        if createFits:
+          wJetRcsFitH = ROOT.TH1F("wJetRcsFitH","",len(wJetBins),0,len(wJetBins))
+          
+          #fill histograms for linear fit to account for possible non-flat rcs values
+          for i_njbW, njbW in enumerate(wJetBins):
+            cname, cut = nameAndCut(stb,htb,njbW, btb=(0,0) ,presel=presel)
+            rcsD = getRCS(cWJets, cut+'&&'+Wc['cut'], dPhiCut)
+            #rcs = rcsD['rCS']
+            #rcsErrPred = rcsD['rCSE_pred']
+            #rcsErr = rcsD['rCSE_sim']
+            if not math.isnan(rcsD['rCS']):
+              wJetRcsFitH.SetBinContent(i_njbW+1, rcsD['rCS'])
+              wJetRcsFitH.SetBinError(i_njbW+1, rcsD['rCSE_sim'])
 
-        print 'Linear Fit for WJets Rcs values in 0b MC', Wc['name'], 'charges'
-        wJetRcsFitH.Fit('pol1','','same',0,3)
-        FitFunc     = wJetRcsFitH.GetFunction('pol1')
-        wD  = FitFunc.GetParameter(0)
-        wDE = FitFunc.GetParError(0)
-        wK  = FitFunc.GetParameter(1)
-        wKE = FitFunc.GetParError(1)
-        
+          print 'Linear Fit for WJets Rcs values in 0b MC', Wc['name'], 'charges'
+          wJetRcsFitH.Fit('pol1','','same',0,3)
+          FitFunc     = wJetRcsFitH.GetFunction('pol1')
+          wD  = FitFunc.GetParameter(0)
+          wDE = FitFunc.GetParError(0)
+          wK  = FitFunc.GetParameter(1)
+          wKE = FitFunc.GetParError(1)
+          fitResults[njb][stb][htb][Wc['name']] = {'wD':wD, 'wDE':wDE, 'wK':wK, 'wKE':wKE}
+        else:
+          wD  = loadedFit[njb][stb][htb][Wc['name']]['wD']
+          wDE = loadedFit[njb][stb][htb][Wc['name']]['wDE']
+          wK  = loadedFit[njb][stb][htb][Wc['name']]['wK']
+          wKE = loadedFit[njb][stb][htb][Wc['name']]['wKE']
         #difference of measured rcs and fit in 0b MC rcs
 
         cnameCRW, cutCRW = nameAndCut(stb,htb,(3,4), btb=(0,0) ,presel=presel)
@@ -258,7 +307,8 @@ for i_njb, njb in enumerate(signalRegions):
         res[njb][stb][htb][tot_err_key] = sqrt(TT_pred_err_forTotal**2 + WexpandedErr**2 + res[njb][stb][htb][rest_err_key]**2)
         res[njb][stb][htb][tot_key] = TT_pred_forTotal + res[njb][stb][htb][W_key] + res[njb][stb][htb][rest_key]
         
-        del wJetRcsFitH
+        if createFits:
+          del wJetRcsFitH
 
 #      print
 #      print 'WJets\tRcsPred\tRcsFit\tRcsTrue\tRcsDiff\tYDiff\tYpred\tYEpred\tYtrue\tYEtrue\tpropE'
@@ -283,12 +333,13 @@ for i_njb, njb in enumerate(signalRegions):
       #res[njb][stb][htb]['tot_pred_err'] = sqrt(TTexpandedErr**2 + WexpandedErr**2 + res[njb][stb][htb]['Rest_truth_err']**2)
       #res[njb][stb][htb]['tot_pred_err'] = sqrt(TT_pred_err**2 + WexpandedErr**2 + res[njb][stb][htb]['Rest_truth_err']**2)
       #res[njb][stb][htb]['tot_pred'] = TT_pred_corr + res[njb][stb][htb]['W_pred'] + res[njb][stb][htb]['Rest_truth']
-      
-      del ttJetRcsFitH, ttJetRcsFitH1b
+      if createFits:
+        del ttJetRcsFitH, ttJetRcsFitH1b
       
 
 #print 'Events inside expanded error band:',scoreExp/total
 #print 'Events inside stat error band:',scoreStat/total
 
+if createFits: pickle.dump(fitResults ,file(fitDir+prefix+'_fit_pkl','w'))
 pickle.dump(res,file(pickleDir+prefix+'_estimationResults_pkl_kappa_corrected','w'))
 

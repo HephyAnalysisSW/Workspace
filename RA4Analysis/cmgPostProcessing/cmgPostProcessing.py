@@ -28,7 +28,7 @@ separateBTagWeights = True
 
 defSampleStr = "TTJets_25ns"
 
-subDir = "postProcessed_Spring15_CB"
+subDir = "postProcessed_Spring15_CB_btagweight"
 
 #branches to be kept for data and MC
 branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert", 
@@ -75,6 +75,8 @@ if options.skim=='HT400':
   skimCond = "Sum$(Jet_pt)>400"
 if options.skim=='HT400ST200':   ##tuples have already ST200 skim
   skimCond = "Sum$(Jet_pt)>400&&(LepGood_pt[0]+met_pt)>200"
+if options.skim=='LHEHT600':
+  skimCond = "lheHTIncoming<600"
 
 ##In case a lepton selection is required, loop only over events where there is one 
 if options.leptonSelection.lower()=='soft':
@@ -82,7 +84,7 @@ if options.leptonSelection.lower()=='soft':
   skimCond += "&&Sum$(LepGood_pt>5&&LepGood_pt<25&&abs(LepGood_eta)<2.4)>=1"
 if options.leptonSelection.lower()=='hard':
   #skimCond += "&&Sum$(LepGood_pt>25&&LepGood_relIso03<0.4&&abs(LepGood_eta)<2.4)>=1"
-  skimCond += "&&Sum$(LepGood_pt>25&&abs(LepGood_eta)<2.4)>=1"
+  skimCond += "&&Sum$(LepGood_pt>25&&abs(LepGood_eta)<2.5)>=0"
 if options.leptonSelection.lower()=='dilep':
   #skimCond += "&&Sum$(LepGood_pt>25&&LepGood_relIso03<0.4&&abs(LepGood_eta)<2.4)>=1"
   skimCond += "&&Sum$(LepGood_pt>15&&abs(LepGood_eta)<2.4)>1"
@@ -144,7 +146,7 @@ for isample, sample in enumerate(allSamples):
   aliases = [ "met:met_pt", "metPhi:met_phi"]
 
   readVectors = [\
- {'prefix':'LepGood', 'nMax':8, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I', 'relIso03/F','SPRING15_25ns_v1/F' ,'tightId/I', 'miniRelIso/F','mass/F','sip3d/F','mediumMuonId/I', 'mvaIdPhys14/F','mvaIdSpring15/F','lostHits/I', 'convVeto/I']},
+ {'prefix':'LepGood', 'nMax':8, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I', 'relIso03/F','SPRING15_25ns_v1/I' ,'tightId/I', 'miniRelIso/F','mass/F','sip3d/F','mediumMuonId/I', 'mvaIdPhys14/F','mvaIdSpring15/F','lostHits/I', 'convVeto/I']},
     {'prefix':'Jet',  'nMax':100, 'vars':['pt/F', 'eta/F', 'phi/F', 'id/I','btagCSV/F', 'btagCMVA/F']},
   ]
   if not sample['isData']: 
@@ -153,7 +155,7 @@ for isample, sample in enumerate(allSamples):
     #readVectors[1]['vars'].extend('partonId/I')
   if options.leptonSelection.lower() in ['soft', 'hard']:
     newVariables.extend( ['nLooseSoftLeptons/I', 'nLooseHardLeptons/I', 'nTightSoftLeptons/I', 'nTightHardLeptons/I'] )
-    newVariables.extend( ['deltaPhi_Wl/F','nBJetMediumCSV30/I','nJet30/I','htJet30j/F','st/F', 'leptonPt/F','leptonMiniRelIso/F','leptonRelIso03/F' ,'leptonEta/F', 'leptonPhi/F', 'leptonPdg/I/0', 'leptonInd/I/-1', 'leptonMass/F', 'singleMuonic/I', 'singleElectronic/I', 'singleLeptonic/I' ]) #, 'mt2w/F'] )
+    newVariables.extend( ['deltaPhi_Wl/F','nBJetMediumCSV30/I','nJet30/I','htJet30j/F','st/F', 'leptonPt/F','leptonMiniRelIso/F','leptonRelIso03/F' ,'leptonEta/F', 'leptonPhi/F','leptonSPRING15_25ns_v1/I/-2','leptonPdg/I/0', 'leptonInd/I/-1', 'leptonMass/F', 'singleMuonic/I', 'singleElectronic/I', 'singleLeptonic/I' ]) #, 'mt2w/F'] )
     if calcSystematics:
       #newVariables.extend( ["weightBTag/F", "weightBTag_SF/F", "weightBTag_SF_b_Up/F", "weightBTag_SF_b_Down/F", "weightBTag_SF_light_Up/F", "weightBTag_SF_light_Down/F"])
       for i in range(maxConsideredBTagWeight+1):
@@ -245,7 +247,7 @@ for isample, sample in enumerate(allSamples):
           s.nTightSoftLeptons = len(tightSoftLepInd)
           s.nTightHardLeptons = len(tightHardLepInd)
           #print "tightHardLepInd:" , tightHardLepInd
-          vars = ['pt', 'eta', 'phi', 'miniRelIso','relIso03', 'pdgId']
+          vars = ['pt', 'eta', 'phi', 'miniRelIso','relIso03', 'pdgId', 'SPRING15_25ns_v1']
           allLeptons = [getObjDict(t, 'LepGood_', vars, i) for i in looseLepInd]
           looseSoftLep = [getObjDict(t, 'LepGood_', vars, i) for i in looseSoftLepInd] 
           looseHardLep = [getObjDict(t, 'LepGood_', vars, i) for i in looseHardLepInd]

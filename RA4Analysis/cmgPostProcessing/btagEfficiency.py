@@ -10,34 +10,35 @@ import PhysicsTools.Heppy.physicsutils.BTagSF
 #TTJetsLO = {'name':'TTJets', 'chain':getChain(TTJets_LO_25ns,histname=''), 'color':color('TTJets')-2,'weight':'weight', 'niceName':'t#bar{t} Jets LO'}
 #newpresel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&st>250&&nJet30>=2&&htJet30j>500"
 
-bTagEffFile = '/data/dspitzbart/Results2015/MCEffTTJets_hadronId_heppy_pkl'
+
+bTagEffFile = '/data/dspitzbart/Results2015/MCEffWJets_hadronId_heppy_pkl'
 
 ptBorders = [30, 40, 50, 60, 70, 80, 100, 120, 160, 210, 260, 320, 400, 500, 670]
 ptBins = []
 etaBins = [[0,0.8], [0.8,1.6], [ 1.6, 2.4]]
 
 
-SFb_errors = [\
- 0.0209663,
- 0.0207019,
- 0.0230073,
- 0.0208719,
- 0.0200453,
- 0.0264232,
- 0.0240102,
- 0.0229375,
- 0.0184615,
- 0.0216242,
- 0.0248119,
- 0.0465748,
- 0.0474666,
- 0.0718173
-]
+#SFb_errors = [\
+# 0.0209663,
+# 0.0207019,
+# 0.0230073,
+# 0.0208719,
+# 0.0200453,
+# 0.0264232,
+# 0.0240102,
+# 0.0229375,
+# 0.0184615,
+# 0.0216242,
+# 0.0248119,
+# 0.0465748,
+# 0.0474666,
+# 0.0718173
+#]
 
-SFb_err={}
+#SFb_err={}
 for i in range(len(ptBorders)-1):
   ptBins.append([ptBorders[i], ptBorders[i+1]])
-  SFb_err[tuple(ptBins[i])] = SFb_errors[i]
+#  SFb_err[tuple(ptBins[i])] = SFb_errors[i]
   if i == len(ptBorders)-2:
     ptBins.append([ptBorders[i+1], -1])
 

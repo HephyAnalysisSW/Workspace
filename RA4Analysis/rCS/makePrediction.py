@@ -8,7 +8,9 @@ from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,v
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_Spring15_hard import *
 #from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_postProcessed import *
 #from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_postProcessed_fromArtur import *
-from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT400ST200_postProcessed_fromArthur import *
+
+from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT400ST200_postProcessed_btagWeight import *
+from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT500ST250_postProcessed_fromArthur import *
 
 
 from makeTTPrediction import makeTTPrediction
@@ -23,11 +25,12 @@ ROOT.TH1F().SetDefaultSumw2()
 
 lepSel = 'hard'
 
-cWJets  = getChain(WJetsHT_25ns,histname='')
-cTTJets = getChain(TTJets_HTLO_25ns,histname='')
+cWJets  = getChain(WJetsHT_25ns_btagweight,histname='')
+cTTJets = getChain(TTJets_LO_25ns_btagweight,histname='')
 cRest = getChain([singleTop_25ns, DY_25ns, TTV_25ns],histname='')#no QCD
-cBkg =  getChain([WJetsHT_25ns, TTJets_HTLO_25ns, singleTop_25ns, DY_25ns, TTV_25ns], histname='')#no QCD
-cData = getChain([WJetsHT_25ns, TTJets_HTLO_25ns, singleTop_25ns, DY_25ns, TTV_25ns], histname='')
+cBkg =  getChain([WJetsHT_25ns_btagweight, TTJets_LO_25ns_btagweight, singleTop_25ns, DY_25ns, TTV_25ns], histname='')#no QCD
+#cData = getChain([WJetsHT_25ns_btagweight, TTJets_LO_25ns_btagweight, singleTop_25ns, DY_25ns, TTV_25ns], histname='')
+cData = getChain([SingleMuon_Run2015D, SingleElectron_Run2015D], histname='')
 
 #cBkg = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]],histname='')#no QCD
 #cData = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]] , histname='')
@@ -35,18 +38,24 @@ cData = getChain([WJetsHT_25ns, TTJets_HTLO_25ns, singleTop_25ns, DY_25ns, TTV_2
 #cData = cBkg
 
 signalRegions = signalRegion3fb
+signalRegions = signalRegionCRonly
 
-small = True
+
+small = False
 if small: signalRegions = smallRegion
 
 #DEFINE LUMI AND PLOTDIR
-lumi = 3.
+lumi = 1.26
 sampleLumi = 3.
 debugReweighting = False
 
-printDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/25ns/templateFit_SFTemplate_b_Up/'
-pickleDir = '/data/'+username+'/Results2015/PredictionSFTemplate_b_Up_SmallSRSet_'+str(lumi)+'/'
-QCDpickle = '/data/bla/QCD_pkl'
+printDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/25ns/templateFit_bweightTemplate_data_reducedSR_lep/'
+pickleDir = '/data/'+username+'/Results2015/Prediction_bweightTemplate_data_reducedSR_lep_'+str(lumi)+'/'
+
+isData = True
+QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151027_QCDestimation_firstTry_pkl'
+QCDestimate = pickle.load(file(QCDpickle))
+#QCDestimate=False
 
 if not os.path.exists(pickleDir):
   os.makedirs(pickleDir)
@@ -74,15 +83,19 @@ prefix = 'singleLeptonic_Spring15_'
 #presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&Jet_pt[1]>80&&st>250&&nJet30>2&&htJet30j>500"#&&nBJetMediumCSV30==0"
 #filters = "&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFilter&&Flag_goodVertices&&Flag_eeBadScFilter&&Flag_EcalDeadCellTriggerPrimitiveFilter"
 presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&Jet_pt[1]>80&&st>250&&nJet30>2&&htJet30j>500"#&&nBJetMediumCSV30==0"
-filters = "&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFilter_fix&&Flag_HBHENoiseFilter&&Flag_goodVertices&&Flag_eeBadScFilter&&Flag_EcalDeadCellTriggerPrimitiveFilter" #strange filter settings!!
+filters = "&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFilter&&Flag_goodVertices&&Flag_eeBadScFilter"#&&Flag_EcalDeadCellTriggerPrimitiveFilter" #strange filter settings!!
+#presel += '&&singleMuonic'
 presel += filters
+
+#triggers = "&&(HLT_EleHT350||HLT_MuHT350)"
+#presel += triggers
 
 
 btagString = 'nBJetMediumCSV30'
-useBTagWeights=True
-btagWeightSuffix = '_SF_b_Up'
+useBTagWeights=False #True for weighted fake data, false for data
+btagWeightSuffix = ''
 templateWeights = True
-templateWeightSuffix = '_SF'
+templateWeightSuffix = ''
 
 bjreg = (0,0)
 
@@ -102,10 +115,10 @@ for srNJet in signalRegions:
       print '## Using a dPhi cut value of',str(deltaPhiCut)
       print '#################################################'
       print
-      makeTTPrediction(rd, samples, htb, stb, srNJet, presel, dPhiCut=deltaPhiCut, btagVarString = btagString, lumi=lumi, printDir=printDir, useBTagWeights=useBTagWeights, btagWeightSuffix=btagWeightSuffix, templateWeights=templateWeights, templateWeightSuffix=templateWeightSuffix)
+      makeTTPrediction(rd, samples, htb, stb, srNJet, presel, dPhiCut=deltaPhiCut, btagVarString = btagString, lumi=lumi, printDir=printDir, useBTagWeights=useBTagWeights, btagWeightSuffix=btagWeightSuffix, templateWeights=templateWeights, templateWeightSuffix=templateWeightSuffix, QCD=QCDestimate, isData=isData)
 
       #join W estimation results to dict
-      makeWPrediction(rd, samples, htb, stb, srNJet, presel, dPhiCut=deltaPhiCut, btagVarString = btagString, lumi=lumi, printDir=printDir, useBTagWeights=useBTagWeights, btagWeightSuffix=btagWeightSuffix, templateWeights=templateWeights, templateWeightSuffix=templateWeightSuffix)
+      makeWPrediction(rd, samples, htb, stb, srNJet, presel, dPhiCut=deltaPhiCut, btagVarString = btagString, lumi=lumi, printDir=printDir, useBTagWeights=useBTagWeights, btagWeightSuffix=btagWeightSuffix, templateWeights=templateWeights, templateWeightSuffix=templateWeightSuffix, QCD=QCDestimate, isData=isData)
 
       ##If you want to make prediction of one of the bkgs, comment out all the estimation of total Bkgs
       #estimate total background

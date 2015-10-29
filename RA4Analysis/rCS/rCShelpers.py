@@ -37,7 +37,7 @@ def getTemplate(cutName, path, sampleName):
 
 #ROOT.TH1F().SetDefaultSumw2()
 
-def getRCS(c, cut, dPhiCut, useGenMet=False, useAllGen=False, useOnlyGenMetPt=False, useOnlyGenMetPhi=False, useWeight = True, weight='weight'):   
+def getRCS(c, cut, dPhiCut, useGenMet=False, useAllGen=False, useOnlyGenMetPt=False, useOnlyGenMetPhi=False, useWeight = True, weight='weight', QCD_lowDPhi={'y':0.,'e':0.}, QCD_highDPhi={'y':0.,'e':0.}):   
   if useGenMet: dPhiStr = "acos((leptonPt+met_genPt*cos(leptonPhi-met_genPhi))/sqrt(leptonPt**2+met_genPt**2+2*met_genPt*leptonPt*cos(leptonPhi-met_genPhi)))"
   elif useAllGen: dPhiStr = "acos((genLep_pt+met_genPt*cos(genLep_phi-met_genPhi))/sqrt(genLep_pt**2+met_genPt**2+2*met_genPt*genLep_pt*cos(genLep_phi-met_genPhi)))"
   elif useOnlyGenMetPt: dPhiStr = "acos((leptonPt+met_genPt*cos(leptonPhi-met_phi))/sqrt(leptonPt**2+met_genPt**2+2*met_genPt*leptonPt*cos(leptonPhi-met_phi)))"
@@ -49,10 +49,13 @@ def getRCS(c, cut, dPhiCut, useGenMet=False, useAllGen=False, useOnlyGenMetPt=Fa
     h = getPlotFromChain(c, dPhiStr, [0,dPhiCut,pi], cutString=cut, binningIsExplicit=True, weight='1')
   h.Sumw2()
   if h.GetBinContent(1)>0:
-    rcs = h.GetBinContent(2)/h.GetBinContent(1)
+    rcs = (h.GetBinContent(2) - QCD_highDPhi['y']) / (h.GetBinContent(1) - QCD_lowDPhi['y'])
     if h.GetBinContent(2)>0:
-      rCSE_sim = rcs*sqrt(h.GetBinError(2)**2/h.GetBinContent(2)**2 + h.GetBinError(1)**2/h.GetBinContent(1)**2)
-      rCSE_pred = rcs*sqrt(1./h.GetBinContent(2) + 1./h.GetBinContent(1))
+      rCSE_sim = rcs*sqrt((h.GetBinError(2)**2 + QCD_highDPhi['e']**2)/(h.GetBinContent(2) - QCD_highDPhi['y'])**2 + (h.GetBinError(1)**2 + QCD_lowDPhi['e']**2)/(h.GetBinContent(1) -QCD_lowDPhi['y'] )**2)
+      rCSE_pred = rcs*sqrt((h.GetBinContent(2) + QCD_highDPhi['y'])/(h.GetBinContent(2) - QCD_highDPhi['y'])**2 + (h.GetBinContent(1) + QCD_lowDPhi['y'])/(h.GetBinContent(1) -QCD_lowDPhi['y'] )**2)
+      
+      #rCSE_sim = rcs*sqrt(h.GetBinError(2)**2/h.GetBinContent(2)**2 + h.GetBinError(1)**2/h.GetBinContent(1)**2) #errors without QCD consideration
+      #rCSE_pred = rcs*sqrt(1./h.GetBinContent(2) + 1./h.GetBinContent(1)) #errors without QCD consideration
       del h
       return {'rCS':rcs, 'rCSE_pred':rCSE_pred, 'rCSE_sim':rCSE_sim}
     else:

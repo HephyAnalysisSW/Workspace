@@ -1,9 +1,13 @@
 # loop looks like this: for njb in signalRegion2fb: for stb in signalRegion2fb[njb]: for htb in signalRegion2fb[njb][stb]: print signalRegion2fb[njb][stb][htb]['deltaPhi']
 
-signalRegion40pb = {(5,5): {(250, 350): {(500, -1): {'deltaPhi': .8}},
-                            (350, -1):  {(500, -1): {'deltaPhi': .8}}},
-                    (6,-1):{(250, 350): {(500, -1): {'deltaPhi': .8}},
-                            (350, -1):  {(500, -1): {'deltaPhi': .8}}}
+signalRegion40pb = {(5,5): {(250, 350): {(500, -1): {'deltaPhi': .5}},
+                            (350, -1):  {(500, -1): {'deltaPhi': .5}}},
+                    (6,-1):{(250, 350): {(500, -1): {'deltaPhi': .5}},
+                            (350, -1):  {(500, -1): {'deltaPhi': .5}}}
+                   }
+
+signalRegionCRonly = {(5,5): {(250, -1): {(500, -1): {'deltaPhi': .5}}},
+                    (6,-1):{(250, -1): {(500, -1): {'deltaPhi': .5}}}
                    }
 
 smallRegion = {(5,5): {(250, 350): {(500, 750): {'deltaPhi': 1.}}},

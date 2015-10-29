@@ -8,13 +8,17 @@ from math import *
 from array import array
 from Workspace.HEPHYPythonTools.helpers import *
 from Workspace.RA4Analysis.helpers import *
-from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
+#from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_Spring15_hard import *
 #from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_postProcessed import *
 from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT400ST200_postProcessed import *
 #from Workspace.RA4Analysis.cmgTuples_Data25ns_0l import *
 #from Workspace.RA4Analysis.cmgTuples_Data25ns_Artur import *
-from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT400ST200_postProcessed_fromArthur import *
+
+#from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT400ST200_postProcessed_fromArthur import *
+from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT400ST200_postProcessed_btagWeight import *
+from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT500ST250_postProcessed_fromArthur import *
+
 #from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT400ST200_postProcessed import *
 #from Workspace.RA4Analysis.cmgTuples_Spring15_50ns_postProcessed import *
 from Workspace.HEPHYPythonTools.user import username
@@ -31,19 +35,24 @@ lepSel = 'hard'
 #samples = [WJETS, TTJETS, DY, singleTop, QCD]
 
 #25ns samples
-WJETS = {'name':'WJets', 'chain':getChain(WJetsHTToLNu_25ns,histname=''), 'color':ROOT.kMagenta,'weight':'weight', 'niceName':'W Jets, MVA ID'}
-WJETSNew = {'name':'WJets', 'chain':getChain(WJetsHT_25ns,histname=''), 'color':color('WJets'),'weight':'weight', 'niceName':'W Jets, CB ID'}
+#WJETS = {'name':'WJets', 'chain':getChain(WJetsHTToLNu_25ns,histname=''), 'color':ROOT.kMagenta,'weight':'weight', 'niceName':'W Jets, MVA ID'}
+WJETSbtagweight = {'name':'WJets', 'chain':getChain(WJetsHT_25ns_btagweight,histname=''), 'color':ROOT.kMagenta,'weight':'weight', 'niceName':'W Jets btag'}
+WJETS = {'name':'WJets', 'chain':getChain(WJetsHT_25ns,histname=''), 'color':color('WJets'),'weight':'weight', 'niceName':'W Jets CB ID'}
 #TTJETS = {'name':'TTJets', 'chain':getChain(TTJets_25ns,histname=''), 'color':color('TTJets'),'weight':'weight', 'niceName':'t#bar{t} Jets NLO'}
-TTJetsLO = {'name':'TTJets', 'chain':getChain(TTJets_LO_25ns,histname=''), 'color':color('singleTop'),'weight':'weight', 'niceName':'t#bar{t} Jets MVA ID'}
-TTJetsNew = {'name':'TTJets', 'chain':getChain(TTJets_HTLO_25ns,histname=''), 'color':color('TTJets')-2,'weight':'weight', 'niceName':'t#bar{t} Jets CB ID'}
+#TTJetsLO = {'name':'TTJets', 'chain':getChain(TTJets_LO_25ns,histname=''), 'color':color('singleTop'),'weight':'weight', 'niceName':'t#bar{t} Jets MVA ID'}
+TTJetsbtagweight = {'name':'TTJets', 'chain':getChain(TTJets_LO_25ns_btagweight,histname=''), 'color':color('singleTop'),'weight':'weight', 'niceName':'t#bar{t} Jets btag'}
+TTJets = {'name':'TTJets', 'chain':getChain(TTJets_HTLO_25ns,histname=''), 'color':color('TTJets')-2,'weight':'weight', 'niceName':'t#bar{t} Jets CB ID'}
 DY = {'name':'DY', 'chain':getChain(DY_25ns,histname=''), 'color':color('DY'),'weight':'weight', 'niceName':'Drell Yan'}
 singleTop = {'name':'singleTop', 'chain':getChain(singleTop_25ns,histname=''), 'color':color('singleTop'),'weight':'weight', 'niceName':'single Top'}
 #QCD = {'name':'QCD', 'chain':getChain(QCDMu_25ns,histname=''), 'color':color('QCD'),'weight':'weight', 'niceName':'QCD'}
 QCD = {'name':'QCD', 'chain':getChain(QCDHT_25ns,histname=''), 'color':color('QCD'),'weight':'weight', 'niceName':'QCD'}
 #QCD = {'name':'QCD', 'chain':getChain(QCDEle_25ns,histname=''), 'color':color('QCD'),'weight':'weight', 'niceName':'QCD'}
 diBoson = {'name':'diBoson', 'chain':getChain(diBosons_25ns,histname=''), 'color':ROOT.kMagenta,'weight':'weight', 'niceName':'diboson'}
-samples = [WJETS, TTJetsLO, singleTop, DY, QCD]#, diBoson]
+samples = [WJETS, TTJets, singleTop, DY, QCD]#, diBoson]
 #samplesComp = [WJETS, TTJETS, singleTop, DY, QCD]
+
+#data = {'name':'data', 'chain':getChain([SingleElectron_Run2015D,SingleMuon_Run2015D],histname=''), 'color':ROOT.kBlack,'weight':'weight', 'niceName':'data', 'cut':False}
+
 
 # older samples
 #WJETS = {'name':'WJets', 'chain':getChain(WJetsHTToLNu[lepSel],histname=''), 'color':color('WJets'),'weight':'weight', 'niceName':'W Jets'}
@@ -99,8 +108,11 @@ metNoHFPhi = {'binning': [16, -3.2, 3.2], 'name': 'metNoHF_phi', 'titleX': '#Phi
 
 presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&st>250&&nJet30>2&&htJet30j>500&&nBJetMediumCSV30==0"
 preselNoLtHt = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&Jet_pt[1]>80&&nBJetMediumCSV30==0"
-newpresel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&st>250&&nJet30>=2&&htJet30j>500&&Jet_pt[1]>80" ####changed here!!
 
+newpresel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&st>250&&nJet30>=2&&htJet30j>500&&Jet_pt[1]>80" ####changed here!!
+newpresel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&st>250&&nJet30>=2&&htJet30j>500&&Jet_pt[1]>80&&deltaPhi_Wl<0.5"
+filters = "&&Flag_goodVertices&&Flag_HBHENoiseFilter&&Flag_eeBadScFilter&&Flag_CSCTightHaloFilter"
+newpresel += filters
 
 noCut = {'name':'empty', 'string':'(1)', 'niceName':'no cut'}
 
@@ -252,6 +264,8 @@ filters = "&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFilterMinZeroPatched&&Flag_g
 #datapresel = LeptonReq+'&&'+leptonVeto+'&&nJet30>=2&&'+htStr+'>500&&'+stStr+'>250'
 #datacut = datapresel+trigger+filters
 #dataDict = {'chain':data, 'cut':datacut,'name':'data'}
+
+data = {'name':'data', 'chain':getChain([SingleElectron_Run2015D,SingleMuon_Run2015D],histname=''), 'cut':newpresel+'&&SingleElectronic'+trigger}
 
 deltaPhiCMG_NoHF = {'binning': [30, 0, 3.2], 'name': 'Sum$((acos((LepGood_pt+metNoHF_pt*cos(LepGood_phi-metNoHF_phi))/sqrt(LepGood_pt**2+metNoHF_pt**2+2*metNoHF_pt*LepGood_pt*cos(LepGood_phi-metNoHF_phi))))*'+LeptonId+')', 'titleX': '#Delta#Phi(W,l) NoHF', 'titleY': 'Events'}
 #deltaPhiCMG = {'binning': [32, 0, 3.2], 'name': 'Sum$((acos((LepGood_pt+met_pt*cos(LepGood_phi-met_phi))/sqrt(LepGood_pt**2+met_pt**2+2*met_pt*LepGood_pt*cos(LepGood_phi-met_phi))))*'+LeptonId+')', 'titleX': '#Delta#Phi(W,l) NoHF', 'titleY': 'Events', 'filename':'deltaPhi_Wl', 'binningIsExplicit':True}

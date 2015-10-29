@@ -8,7 +8,7 @@ from Workspace.HEPHYPythonTools.user import username
 from math import pi, sqrt
 from rCShelpers import *# weight_str , weight_err_str , lumi
 
-def binnedNBTagsFit(cut, cutname, samples, nBTagVar = 'nBJetMediumCSV30', lumi=4.0, prefix="", printDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/nBtagFits/templateFit/', templateDir = '/data/'+username+'/Results2015/btagSFTemplates/',useBTagWeights=False, btagWeightSuffix='', templateWeights=False, templateWeightSuffix=''):
+def binnedNBTagsFit(cut, cutname, samples, nBTagVar = 'nBJetMediumCSV30', lumi=4.0, prefix="", printDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/nBtagFits/templateFit/', templateDir = '/data/'+username+'/Results2015/btagTemplatesBTagWeightedLep/',useBTagWeights=False, btagWeightSuffix='', templateWeights=False, templateWeightSuffix='', QCD_dict={0:{'y':0.,'e':0.}, 1:{'y':0.,'e':0.},2:{'y':0.,'e':0.}}, isData=False):
   print "LUMI:" , lumi
   if not os.path.exists(printDir):
      os.makedirs(printDir) 
@@ -19,7 +19,15 @@ def binnedNBTagsFit(cut, cutname, samples, nBTagVar = 'nBJetMediumCSV30', lumi=4
   cTTJets = samples['TT']
   cRest = samples['Rest']
   cData = samples['Data']
-
+  
+  if isData: w = weight_str
+  else: w = 'weight'
+  
+  hQCD = ROOT.TH1F('hQCD','hQCD',len([0,1,2,3])-1, array('d',[0,1,2,3]))
+  for n in range(3):
+    hQCD.SetBinContent(n+1,QCD_dict[n]['y']/2) #divide by 2 to split in +/- charge
+    hQCD.SetBinError(n+1,QCD_dict[n]['e']/2)
+  
   #Get histograms binned in b-tag multiplicity
   template_WJets_PosPdg_Dict = getTemplate(cutname, templateDir, 'WJets_PosPdg') #these templates will always be MC, so a reweighting (e.g. b-tagging) should not be used
   if template_WJets_PosPdg_Dict['loadTemp']:
@@ -175,9 +183,11 @@ def binnedNBTagsFit(cut, cutname, samples, nBTagVar = 'nBJetMediumCSV30', lumi=4
 
   ##### use this for DATA
   else:
-    hData_PosPdg = getPlotFromChain(cData, nBTagVar, [0,1,2,3], 'leptonPdg>0&&'+cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
-    hData_NegPdg = getPlotFromChain(cData, nBTagVar, [0,1,2,3], 'leptonPdg<0&&'+cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
-
+    hData_PosPdg = getPlotFromChain(cData, nBTagVar, [0,1,2,3], 'leptonPdg>0&&'+cut, w, binningIsExplicit=True,addOverFlowBin='upper')
+    hData_NegPdg = getPlotFromChain(cData, nBTagVar, [0,1,2,3], 'leptonPdg<0&&'+cut, w, binningIsExplicit=True,addOverFlowBin='upper')
+    hData_PosPdg.Add(hQCD,-1)
+    hData_NegPdg.Add(hQCD,-1)
+    
   print "Nominal yields data Pos:", hData_PosPdg.Integral()
   print "Nominal yields data Neg:", hData_NegPdg.Integral()
 

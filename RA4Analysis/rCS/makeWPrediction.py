@@ -11,7 +11,7 @@ dPhiStr = 'deltaPhi_Wl'
 
 ROOT.TH1F().SetDefaultSumw2()
 
-def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, btagVarString = 'nBJetMediumCSV30', lumi=4.0, printDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/defaultDir/templateFit/', useBTagWeights=False, btagWeightSuffix='', templateWeights=False, templateWeightSuffix=''):
+def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, btagVarString = 'nBJetMediumCSV30', lumi=4.0, printDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/defaultDir/templateFit/', useBTagWeights=False, btagWeightSuffix='', templateWeights=False, templateWeightSuffix='', QCD=False, isData=False):
   print "in W predition lumi is :"  , lumi
   if useBTagWeights: 'Will use b-tag weights for W-jets prediction!'
   weight_str, weight_err_str = makeWeight(lumi)
@@ -24,21 +24,29 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, btagVa
   
   nJetCR = (3,4)
   
+  if isData:
+    w = 'weight'
+    w_err = 'weight**2'
+  else:
+    w = weight_str
+    w_err = weight_err_str
+  
   #TT Jets yield in crNJet, no b-tag cut, low DPhi
   fit_crName, fit_crCut = nameAndCut(stb, htb, nJetCR, btb=None, presel=presel+'&&abs(leptonPdg)==13', btagVar = btagVarString) 
-  fit_crNJet_lowDPhi = binnedNBTagsFit(fit_crCut+"&&"+dPhiStr+"<"+str(dPhiCut), fit_crName+'_dPhi'+str(dPhiCut), samples=samples, nBTagVar = btagVarString , lumi=lumi, prefix=fit_crName, printDir=printDir, useBTagWeights=useBTagWeights, btagWeightSuffix=btagWeightSuffix, templateWeights=templateWeights, templateWeightSuffix=templateWeightSuffix)
+  fit_crNJet_lowDPhi = binnedNBTagsFit(fit_crCut+"&&"+dPhiStr+"<"+str(dPhiCut), fit_crName+'_dPhi'+str(dPhiCut)+'_muonChannel', samples=samples, nBTagVar = btagVarString , lumi=lumi, prefix=fit_crName, printDir=printDir, useBTagWeights=useBTagWeights, btagWeightSuffix=btagWeightSuffix, templateWeights=templateWeights, templateWeightSuffix=templateWeightSuffix) #no QCD subtraction - there should only be a very small QCD contamination in muon channel
 #  fit_crNJet_lowDPhi = binnedNBTagsFit(fit_crCut+"&&"+dPhiStr+"<"+str(dPhiCut), samples = {'W':cWJets, 'TT':cTTJets}, nBTagVar = 'nBJetMedium25', prefix=fit_crName)
   rd['fit_crNJet_lowDPhi'] = fit_crNJet_lowDPhi
   
-  rCS_cr_Name_1b, rCS_cr_Cut_1b = nameAndCut(stb, htb, nJetCR, btb=(1,1), presel=presel, btagVar = btagVarString) 
+  #rCS_cr_Name_1b, rCS_cr_Cut_1b = nameAndCut(stb, htb, nJetCR, btb=(1,1), presel=presel, btagVar = btagVarString) 
   rCS_cr_Name_0b, rCS_cr_Cut_0b = nameAndCut(stb, htb, nJetCR, btb=(0,0), presel=presel+'&&abs(leptonPdg)==13', btagVar = btagVarString) #THIS ONE GOT CHANGED FROM 2-3 TO 2-4!
   #rCS_cr_Name_0b, rCS_cr_Cut_0b = nameAndCut(stb, htb, (2,3), btb=(0,0), presel=presel, btagVar = btagVarString)
   #rCS_crNJet_1b = getRCS(cBkg, rCS_cr_Cut_1b,  dPhiCut) 
-  rCS_crNJet_1b = getRCS(cData, rCS_cr_Cut_1b,  dPhiCut) 
-  rCS_crNJet_1b_onlyTT = getRCS(cTTJets, rCS_cr_Cut_1b,  dPhiCut) 
-  rCS_crNJet_0b_onlyTT = getRCS(cTTJets, rCS_cr_Cut_0b,  dPhiCut) 
-  rd['rCS_crNJet_1b'] = rCS_crNJet_1b
-  rd['rCS_crNJet_1b_onlyTT'] = rCS_crNJet_1b_onlyTT
+  #rCS_crNJet_1b = getRCS(cData, rCS_cr_Cut_1b,  dPhiCut) 
+  #rCS_crNJet_1b_onlyTT = getRCS(cTTJets, rCS_cr_Cut_1b,  dPhiCut) 
+  #rd['rCS_crNJet_1b'] = rCS_crNJet_1b
+  #rd['rCS_crNJet_1b_onlyTT'] = rCS_crNJet_1b_onlyTT
+  
+  rCS_crNJet_0b_onlyTT = getRCS(cTTJets, rCS_cr_Cut_0b,  dPhiCut)
   rd['rCS_crNJet_0b_onlyTT'] = rCS_crNJet_0b_onlyTT #no reweighting here, still from MC!
 
   #low njet CR: crNJet, 0-btags, low DPhi
@@ -85,10 +93,10 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, btagVa
     y_Var_crNJet_0b_lowDPhi += getYieldFromChain(cTTJets, crCut+muonCut+dPhiStr+"<"+str(dPhiCut), weight = weight_err_str+'*weightBTag0'+btagWeightSuffix+'**2')
     y_Var_crNJet_0b_lowDPhi += getYieldFromChain(cWJets, crCut+muonCut+dPhiStr+"<"+str(dPhiCut), weight = weight_err_str+'*weightBTag0'+btagWeightSuffix+'**2')
   else:
-    y_crNJet_0b_highDPhi     = getYieldFromChain(cData, crCutTruth+muonCut+dPhiStr+">"+str(dPhiCut), weight = weight_str)
-    y_Var_crNJet_0b_highDPhi = getYieldFromChain(cData, crCutTruth+muonCut+dPhiStr+">"+str(dPhiCut), weight = weight_err_str)
-    y_crNJet_0b_lowDPhi      = getYieldFromChain(cData, crCutTruth+muonCut+dPhiStr+"<"+str(dPhiCut), weight = weight_str)
-    y_Var_crNJet_0b_lowDPhi  = getYieldFromChain(cData, crCutTruth+muonCut+dPhiStr+"<"+str(dPhiCut), weight = weight_err_str)
+    y_crNJet_0b_highDPhi     = getYieldFromChain(cData, crCutTruth+muonCut+dPhiStr+">"+str(dPhiCut), weight = w)
+    y_Var_crNJet_0b_highDPhi = getYieldFromChain(cData, crCutTruth+muonCut+dPhiStr+">"+str(dPhiCut), weight = w_err)
+    y_crNJet_0b_lowDPhi      = getYieldFromChain(cData, crCutTruth+muonCut+dPhiStr+"<"+str(dPhiCut), weight = w)
+    y_Var_crNJet_0b_lowDPhi  = getYieldFromChain(cData, crCutTruth+muonCut+dPhiStr+"<"+str(dPhiCut), weight = w_err)
 
   rCS_W_crNJet_0b_corr     = (y_crNJet_0b_highDPhi - yTT_crNJet_0b_highDPhi)/(y_crNJet_0b_lowDPhi - yTT_crNJet_0b_lowDPhi)
   rCS_Var_W_crNJet_0b_corr = rCS_W_crNJet_0b_corr**2*(\
@@ -126,10 +134,10 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, btagVa
     y_Var_crNJet_0b_lowDPhi_PosPdg += getYieldFromChain(cTTJets, crCut+muonCut+dPhiStr+"<"+str(dPhiCut), weight = weight_err_str+'*weightBTag0'+btagWeightSuffix+'**2')
     y_Var_crNJet_0b_lowDPhi_PosPdg += getYieldFromChain(cWJets, crCut+muonCut+dPhiStr+"<"+str(dPhiCut), weight = weight_err_str+'*weightBTag0'+btagWeightSuffix+'**2')
   else:
-    y_crNJet_0b_highDPhi_PosPdg     = getYieldFromChain(cData, crCut+muonCut+dPhiStr+">"+str(dPhiCut), weight = weight_str)
-    y_Var_crNJet_0b_highDPhi_PosPdg = getYieldFromChain(cData, crCut+muonCut+dPhiStr+">"+str(dPhiCut), weight = weight_err_str)
-    y_crNJet_0b_lowDPhi_PosPdg      = getYieldFromChain(cData, crCut+muonCut+dPhiStr+"<"+str(dPhiCut), weight = weight_str)
-    y_Var_crNJet_0b_lowDPhi_PosPdg  = getYieldFromChain(cData, crCut+muonCut+dPhiStr+"<"+str(dPhiCut), weight = weight_err_str)
+    y_crNJet_0b_highDPhi_PosPdg     = getYieldFromChain(cData, crCut+muonCut+dPhiStr+">"+str(dPhiCut), weight = w)
+    y_Var_crNJet_0b_highDPhi_PosPdg = getYieldFromChain(cData, crCut+muonCut+dPhiStr+">"+str(dPhiCut), weight = w_err)
+    y_crNJet_0b_lowDPhi_PosPdg      = getYieldFromChain(cData, crCut+muonCut+dPhiStr+"<"+str(dPhiCut), weight = w)
+    y_Var_crNJet_0b_lowDPhi_PosPdg  = getYieldFromChain(cData, crCut+muonCut+dPhiStr+"<"+str(dPhiCut), weight = w_err)
 
   rCS_W_PosPdg_crNJet_0b_corr     = (y_crNJet_0b_highDPhi_PosPdg - (0.5*yTT_crNJet_0b_highDPhi))/(y_crNJet_0b_lowDPhi_PosPdg - (0.5*yTT_crNJet_0b_lowDPhi))
   rCS_Var_W_PosPdg_crNJet_0b_corr = rCS_W_PosPdg_crNJet_0b_corr**2*(\
@@ -165,10 +173,10 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, btagVa
     y_Var_crNJet_0b_lowDPhi_NegPdg += getYieldFromChain(cTTJets, crCut+muonCut+dPhiStr+"<"+str(dPhiCut), weight = weight_err_str+'*weightBTag0'+btagWeightSuffix+'**2')
     y_Var_crNJet_0b_lowDPhi_NegPdg += getYieldFromChain(cWJets, crCut+muonCut+dPhiStr+"<"+str(dPhiCut), weight = weight_err_str+'*weightBTag0'+btagWeightSuffix+'**2')
   else:
-    y_crNJet_0b_highDPhi_NegPdg     = getYieldFromChain(cData, crCut+muonCut+dPhiStr+">"+str(dPhiCut), weight = weight_str)
-    y_Var_crNJet_0b_highDPhi_NegPdg = getYieldFromChain(cData, crCut+muonCut+dPhiStr+">"+str(dPhiCut), weight = weight_err_str)
-    y_crNJet_0b_lowDPhi_NegPdg      = getYieldFromChain(cData, crCut+muonCut+dPhiStr+"<"+str(dPhiCut), weight = weight_str)
-    y_Var_crNJet_0b_lowDPhi_NegPdg  = getYieldFromChain(cData, crCut+muonCut+dPhiStr+"<"+str(dPhiCut), weight = weight_err_str)
+    y_crNJet_0b_highDPhi_NegPdg     = getYieldFromChain(cData, crCut+muonCut+dPhiStr+">"+str(dPhiCut), weight = w)
+    y_Var_crNJet_0b_highDPhi_NegPdg = getYieldFromChain(cData, crCut+muonCut+dPhiStr+">"+str(dPhiCut), weight = w_err)
+    y_crNJet_0b_lowDPhi_NegPdg      = getYieldFromChain(cData, crCut+muonCut+dPhiStr+"<"+str(dPhiCut), weight = w)
+    y_Var_crNJet_0b_lowDPhi_NegPdg  = getYieldFromChain(cData, crCut+muonCut+dPhiStr+"<"+str(dPhiCut), weight = w_err)
 
   rCS_W_NegPdg_crNJet_0b_corr     = (y_crNJet_0b_highDPhi_NegPdg - (0.5*yTT_crNJet_0b_highDPhi))/(y_crNJet_0b_lowDPhi_NegPdg - (0.5*yTT_crNJet_0b_lowDPhi))
   rCS_Var_W_NegPdg_crNJet_0b_corr = rCS_W_NegPdg_crNJet_0b_corr**2*(\
@@ -211,9 +219,16 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, btagVa
   rd['rCS_W_NegPdg_crNJet_0b_notcorr']       = rCS_W_NegPdg_crNJet_0b_notcorr
   rd['rCS_Var_W_NegPdg_crNJet_0b_notcorr']   = rCS_Var_W_NegPdg_crNJet_0b_notcorr
   rd['rCS_W_NegPdg_crNJet_0b_truth']  = getRCS(cWJets, 'leptonPdg<0&&'+crCutTruth, dPhiCut)
-
-  fit_srName, fit_srCut = nameAndCut(stb, htb, srNJet, btb=None, presel=presel,btagVar = btagVarString) 
-  fit_srNJet_lowDPhi = binnedNBTagsFit(fit_srCut+"&&"+dPhiStr+"<"+str(dPhiCut), fit_srName+'_dPhi'+str(dPhiCut), samples = samples, nBTagVar = btagVarString, lumi=lumi, prefix=fit_srName, printDir=printDir, useBTagWeights=useBTagWeights, btagWeightSuffix=btagWeightSuffix, templateWeights=templateWeights, templateWeightSuffix=templateWeightSuffix)
+  
+  fit_srName, fit_srCut = nameAndCut(stb, htb, srNJet, btb=None, presel=presel,btagVar = btagVarString)
+  #QCD yields for b-tag fit
+  if QCD:
+    QCD_dict={0:{'y':QCD[srNJet][stb][htb][(0,0)]['NQCDpred_lowdPhi'], 'e':QCD[srNJet][stb][htb][(0,0)]['NQCDpred_lowdPhi_err']},\
+              1:{'y':QCD[srNJet][stb][htb][(1,1)]['NQCDpred_lowdPhi'], 'e':QCD[srNJet][stb][htb][(1,1)]['NQCDpred_lowdPhi_err']},\
+              2:{'y':QCD[srNJet][stb][htb][(2,2)]['NQCDpred_lowdPhi'], 'e':QCD[srNJet][stb][htb][(2,2)]['NQCDpred_lowdPhi_err']}}
+    fit_srNJet_lowDPhi = binnedNBTagsFit(fit_srCut+"&&"+dPhiStr+"<"+str(dPhiCut), fit_srName+'_dPhi'+str(dPhiCut), samples = samples, nBTagVar = btagVarString, lumi=lumi, prefix=fit_srName, printDir=printDir, useBTagWeights=useBTagWeights, btagWeightSuffix=btagWeightSuffix, templateWeights=templateWeights, templateWeightSuffix=templateWeightSuffix, QCD_dict=QCD_dict)
+  else:
+    fit_srNJet_lowDPhi = binnedNBTagsFit(fit_srCut+"&&"+dPhiStr+"<"+str(dPhiCut), fit_srName+'_dPhi'+str(dPhiCut), samples = samples, nBTagVar = btagVarString, lumi=lumi, prefix=fit_srName, printDir=printDir, useBTagWeights=useBTagWeights, btagWeightSuffix=btagWeightSuffix, templateWeights=templateWeights, templateWeightSuffix=templateWeightSuffix)
 #  fit_srNJet_lowDPhi = binnedNBTagsFit(fit_srCut+"&&"+dPhiStr+"<"+str(dPhiCut), samples = {'W':cWJets, 'TT':cTTJets}, nBTagVar = 'nBJetMedium25', prefix=fit_srName)
 
   rd['fit_srNJet_lowDPhi'] = fit_srNJet_lowDPhi
@@ -319,7 +334,7 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, btagVa
   print "W(-) pred:",pred_W_PosPdg,'+/-',sqrt(pred_Var_W_PosPdg),'W truth:',truth_W_PosPdg,'+/-',sqrt(truth_W_var_PosPdg)
   print "W(+) pred:",pred_W_NegPdg,'+/-',sqrt(pred_Var_W_NegPdg),'W truth:',truth_W_NegPdg,'+/-',sqrt(truth_W_var_NegPdg)
 
-  rd.update( {"W_pred":pred_W,"W_pred_err":sqrt(pred_Var_W_MC), "W_pred_err":sqrt(pred_Var_W_MC),\
+  rd.update( {"W_pred":pred_W,"W_pred_err":sqrt(pred_Var_W), "W_pred_err_MC":sqrt(pred_Var_W_MC),\
               "W_truth":truth_W,"W_truth_err":sqrt(truth_W_var),\
               "W_PosPdg_pred":pred_W_PosPdg,"W_PosPdg_pred_err":sqrt(pred_Var_W_PosPdg),"W_PosPdg_pred_err_MC":sqrt(pred_Var_W_PosPdg_MC),\
               "W_PosPdg_truth":truth_W_PosPdg,"W_PosPdg_truth_err":sqrt(truth_W_var_PosPdg),\
