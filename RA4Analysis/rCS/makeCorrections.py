@@ -40,17 +40,19 @@ cEWK =  getChain([WJetsHT_25ns_btagweight, TTJets_LO_25ns_btagweight, singleTop_
 #cData = cBkg
 
 signalRegions = signalRegion3fb
-signalRegions = signalRegionCRonly
+#signalRegions = signalRegionCRonly
 
 small = False
 if small: signalRegions = smallRegion
 
 #DEFINE LUMI AND PLOTDIR
-lumi = 1.26
+lumi = 3.
 
-pickleDir = '/data/'+username+'/Results2015/Prediction_bweightTemplate_data_reducedSR_lep_'+str(lumi)+'/'
+pickleDir = '/data/'+username+'/Results2015/Prediction_SFTemplate_MC_fullSR_lep_'+str(lumi)+'_light_Down/'
 
-fitDir = '/data/'+username+'/Results2015/correctionFitForData_Lep_reducedSR/'
+fitDir = '/data/'+username+'/Results2015/correctionFitForData_SFtemplate_Lep_fullSR/'
+
+prefix = 'singleLeptonic_Spring15_'
 
 createFits = False
 if not createFits: loadedFit = pickle.load(file(fitDir+prefix+'_fit_pkl'))
@@ -63,7 +65,6 @@ if not os.path.exists(fitDir):
 weight_str, weight_err_str = makeWeight(lumi, sampleLumi=3.)
 
 
-prefix = 'singleLeptonic_Spring15_'
 presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&Jet_pt[1]>80&&st>250&&nJet30>2&&htJet30j>500"#&&nBJetMediumCSV30==0"
 filters = "&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFilter&&Flag_goodVertices&&Flag_eeBadScFilter"#&&Flag_EcalDeadCellTriggerPrimitiveFilter" #strange filter settings!!
 #presel += '&&singleMuonic'
