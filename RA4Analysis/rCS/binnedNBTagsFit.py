@@ -20,6 +20,11 @@ def binnedNBTagsFit(cut, cutname, samples, nBTagVar = 'nBJetMediumCSV30', lumi=4
   cRest = samples['Rest']
   cData = samples['Data']
   
+  templateLumi = 1.26
+  errorScale = 1
+  if errorScale != 1:
+    print '############################## DANGER! ERROR IN TEMPLATE DOWNSCALED! DANGER! ##################################################################################'
+  
   if isData: w = weight_str
   else: w = 'weight'
   
@@ -37,11 +42,11 @@ def binnedNBTagsFit(cut, cutname, samples, nBTagVar = 'nBJetMediumCSV30', lumi=4
     template_WJets_PosPdg = getPlotFromChain(cWJets, nBTagVar, [0,1,2,3], 'leptonPdg>0&&'+cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
     if templateWeights:
       template_WJets_PosPdg.SetBinContent(1,getYieldFromChain(cWJets, cutString = 'leptonPdg>0&&'+cut, weight = weight_str+'*weightBTag0'+templateWeightSuffix))
-      template_WJets_PosPdg.SetBinError(1,  sqrt(getYieldFromChain(cWJets, cutString = 'leptonPdg>0&&'+cut, weight = weight_err_str+'*weightBTag0'+templateWeightSuffix+'**2')))
+      template_WJets_PosPdg.SetBinError(1,  errorScale*sqrt(getYieldFromChain(cWJets, cutString = 'leptonPdg>0&&'+cut, weight = weight_err_str+'*weightBTag0'+templateWeightSuffix+'**2')))
       template_WJets_PosPdg.SetBinContent(2,getYieldFromChain(cWJets, cutString = 'leptonPdg>0&&'+cut, weight = weight_str+'*weightBTag1'+templateWeightSuffix))
-      template_WJets_PosPdg.SetBinError(2,  sqrt(getYieldFromChain(cWJets, cutString = 'leptonPdg>0&&'+cut, weight = weight_err_str+'*weightBTag1'+templateWeightSuffix+'**2')))
+      template_WJets_PosPdg.SetBinError(2,  errorScale*sqrt(getYieldFromChain(cWJets, cutString = 'leptonPdg>0&&'+cut, weight = weight_err_str+'*weightBTag1'+templateWeightSuffix+'**2')))
       template_WJets_PosPdg.SetBinContent(3,getYieldFromChain(cWJets, cutString = 'leptonPdg>0&&'+cut, weight = weight_str+'*weightBTag2'+templateWeightSuffix))
-      template_WJets_PosPdg.SetBinError(3,  sqrt(getYieldFromChain(cWJets, cutString = 'leptonPdg>0&&'+cut, weight = weight_err_str+'*weightBTag2'+templateWeightSuffix+'**2')))
+      template_WJets_PosPdg.SetBinError(3,  errorScale*sqrt(getYieldFromChain(cWJets, cutString = 'leptonPdg>0&&'+cut, weight = weight_err_str+'*weightBTag2'+templateWeightSuffix+'**2')))
     tempFile_WJets_PosPdg = ROOT.TFile(templateDir+cutname+'_WJets_PosPdg.root','new')
     template_WJets_PosPdg.Write()
     #tempFile.Close()
@@ -54,11 +59,11 @@ def binnedNBTagsFit(cut, cutname, samples, nBTagVar = 'nBJetMediumCSV30', lumi=4
     template_WJets_NegPdg = getPlotFromChain(cWJets, nBTagVar, [0,1,2,3], 'leptonPdg<0&&'+cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
     if templateWeights:
       template_WJets_NegPdg.SetBinContent(1,getYieldFromChain(cWJets, cutString = 'leptonPdg<0&&'+cut, weight = weight_str+'*weightBTag0'+templateWeightSuffix))
-      template_WJets_NegPdg.SetBinError(1,  sqrt(getYieldFromChain(cWJets, cutString = 'leptonPdg<0&&'+cut, weight = weight_err_str+'*weightBTag0'+templateWeightSuffix+'**2')))
+      template_WJets_NegPdg.SetBinError(1,  errorScale*sqrt(getYieldFromChain(cWJets, cutString = 'leptonPdg<0&&'+cut, weight = weight_err_str+'*weightBTag0'+templateWeightSuffix+'**2')))
       template_WJets_NegPdg.SetBinContent(2,getYieldFromChain(cWJets, cutString = 'leptonPdg<0&&'+cut, weight = weight_str+'*weightBTag1'+templateWeightSuffix))
-      template_WJets_NegPdg.SetBinError(2,  sqrt(getYieldFromChain(cWJets, cutString = 'leptonPdg<0&&'+cut, weight = weight_err_str+'*weightBTag1'+templateWeightSuffix+'**2')))
+      template_WJets_NegPdg.SetBinError(2,  errorScale*sqrt(getYieldFromChain(cWJets, cutString = 'leptonPdg<0&&'+cut, weight = weight_err_str+'*weightBTag1'+templateWeightSuffix+'**2')))
       template_WJets_NegPdg.SetBinContent(3,getYieldFromChain(cWJets, cutString = 'leptonPdg<0&&'+cut, weight = weight_str+'*weightBTag2'+templateWeightSuffix))
-      template_WJets_NegPdg.SetBinError(3,  sqrt(getYieldFromChain(cWJets, cutString = 'leptonPdg<0&&'+cut, weight = weight_err_str+'*weightBTag2'+templateWeightSuffix+'**2')))
+      template_WJets_NegPdg.SetBinError(3,  errorScale*sqrt(getYieldFromChain(cWJets, cutString = 'leptonPdg<0&&'+cut, weight = weight_err_str+'*weightBTag2'+templateWeightSuffix+'**2')))
     tempFile_WJets_NegPdg = ROOT.TFile(templateDir+cutname+'_WJets_NegPdg.root','new')
     template_WJets_NegPdg.Write()
     #tempFile.Close()
@@ -71,11 +76,11 @@ def binnedNBTagsFit(cut, cutname, samples, nBTagVar = 'nBJetMediumCSV30', lumi=4
     template_TTJets = getPlotFromChain(cTTJets, nBTagVar, [0,1,2,3], cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
     if templateWeights:
       template_TTJets.SetBinContent(1,getYieldFromChain(cTTJets, cutString = cut, weight = weight_str+'*weightBTag0'+templateWeightSuffix))
-      template_TTJets.SetBinError(1,  sqrt(getYieldFromChain(cTTJets, cutString = cut, weight = weight_err_str+'*weightBTag0'+templateWeightSuffix+'**2')))
+      template_TTJets.SetBinError(1,  errorScale*sqrt(getYieldFromChain(cTTJets, cutString = cut, weight = weight_err_str+'*weightBTag0'+templateWeightSuffix+'**2')))
       template_TTJets.SetBinContent(2,getYieldFromChain(cTTJets, cutString = cut, weight = weight_str+'*weightBTag1'+templateWeightSuffix))
-      template_TTJets.SetBinError(2,  sqrt(getYieldFromChain(cTTJets, cutString = cut, weight = weight_err_str+'*weightBTag1'+templateWeightSuffix+'**2')))
+      template_TTJets.SetBinError(2,  errorScale*sqrt(getYieldFromChain(cTTJets, cutString = cut, weight = weight_err_str+'*weightBTag1'+templateWeightSuffix+'**2')))
       template_TTJets.SetBinContent(3,getYieldFromChain(cTTJets, cutString = cut, weight = weight_str+'*weightBTag2'+templateWeightSuffix))
-      template_TTJets.SetBinError(3,  sqrt(getYieldFromChain(cTTJets, cutString = cut, weight = weight_err_str+'*weightBTag2'+templateWeightSuffix+'**2')))
+      template_TTJets.SetBinError(3,  errorScale*sqrt(getYieldFromChain(cTTJets, cutString = cut, weight = weight_err_str+'*weightBTag2'+templateWeightSuffix+'**2')))
     tempFile_TTJets = ROOT.TFile(templateDir+cutname+'_TTJets.root','new')
     template_TTJets.Write()
     #tempFile.Close()
@@ -187,10 +192,24 @@ def binnedNBTagsFit(cut, cutname, samples, nBTagVar = 'nBJetMediumCSV30', lumi=4
     hData_NegPdg = getPlotFromChain(cData, nBTagVar, [0,1,2,3], 'leptonPdg<0&&'+cut, w, binningIsExplicit=True,addOverFlowBin='upper')
     hData_PosPdg.Add(hQCD,-1)
     hData_NegPdg.Add(hQCD,-1)
+  hData_PosPdg_File = ROOT.TFile(templateDir+cutname+'_PosPdg_DataHist.root','new')
+  hData_PosPdg.Write()
+  hData_NegPdg_File = ROOT.TFile(templateDir+cutname+'_NegPdg_DataHist.root','new')
+  hData_NegPdg.Write()
     
   print "Nominal yields data Pos:", hData_PosPdg.Integral()
   print "Nominal yields data Neg:", hData_NegPdg.Integral()
 
+  #print 'Error in the 0b bin of the data hist, neg PDG:',hData_NegPdg.GetBinError(1)
+  #print 'Error in the 0b bin of the data hist, pos PDG:',hData_PosPdg.GetBinError(1)
+
+  #print 'Resetting the errors!'
+  #for i in range(1,4):
+  #  print 'Yield and error before scaling',hData_NegPdg.GetBinContent(i), hData_NegPdg.GetBinError(i)
+  #  hData_NegPdg.SetBinError(i, 10*hData_NegPdg.GetBinError(i))
+  #  print 'Yield and error after scaling',hData_NegPdg.GetBinContent(i), hData_NegPdg.GetBinError(i)
+  #  hData_PosPdg.SetBinError(i, 10*hData_PosPdg.GetBinError(i))
+  
 
   ##hData_PosPdg=getPlotFromChain(cData,nBTagVar,[0,1,2,3],mTCut+'&&'+nameAndCut(metb,htb,njetb,'pos',btagRequirement='None')[1],weight_str,binningIsExplicit=True,addOverFlowBin='upper')
   ##hData_NegPdg=getPlotFromChain(cData,nBTagVar,[0,1,2,3],mTCut+'&&'+nameAndCut(metb,htb,njetb,'neg',btagRequirement='None')[1],weight_str,binningIsExplicit=True,addOverFlowBin='upper')
@@ -214,8 +233,8 @@ def binnedNBTagsFit(cut, cutname, samples, nBTagVar = 'nBJetMediumCSV30', lumi=4
   template_TTJets.Scale(1./template_TTJets.Integral())
   template_WJets_PosPdg.Scale(1./template_WJets_PosPdg.Integral())
   template_WJets_NegPdg.Scale(1./template_WJets_NegPdg.Integral())
-  y_Rest_PosPdg = template_Rest_PosPdg.Integral()
-  y_Rest_NegPdg = template_Rest_NegPdg.Integral()
+  y_Rest_PosPdg = template_Rest_PosPdg.Integral()*lumi/templateLumi
+  y_Rest_NegPdg = template_Rest_NegPdg.Integral()*lumi/templateLumi
   template_Rest_PosPdg.Scale(1./template_Rest_PosPdg.Integral())
   template_Rest_NegPdg.Scale(1./template_Rest_NegPdg.Integral())
   #hData_PosPdg.Scale(1./hData_PosPdg.Integral())

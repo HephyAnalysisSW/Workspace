@@ -1,4 +1,5 @@
 import ROOT
+import pickle
 import sys, os, copy, random, subprocess, datetime
 from array import array
 from Workspace.RA4Analysis.cmgObjectSelection import cmgLooseLepIndices, splitIndList, get_cmg_jets_fromStruct, splitListOfObjects, cmgTightMuID, cmgTightEleID
@@ -20,6 +21,13 @@ from Workspace.HEPHYPythonTools.helpers import getChunks
 from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_fromArthur import *
 from btagEfficiency import *
 
+bTagEffFile = '/data/dspitzbart/Results2015/MCEff_pkl'
+try:
+  mcEffDict = pickle.load(file(bTagEffFile))
+except IOError:
+  print 'Unable to load MC efficiency file!'
+  mcEffDict = False
+
 target_lumi = 3000 #pb-1
 
 #maxConsideredBTagWeight = 2
@@ -28,7 +36,7 @@ separateBTagWeights = True
 
 defSampleStr = "TTJets_25ns"
 
-subDir = "postProcessed_Spring15_CB"
+subDir = "postProcessed_Spring15_test"
 
 #branches to be kept for data and MC
 branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert", 
@@ -140,7 +148,12 @@ for isample, sample in enumerate(allSamples):
   else:
     lumiScaleFactor = xsec[sample['dbsName']]*target_lumi/float(sumWeight)
     branchKeepStrings = branchKeepStrings_DATAMC + branchKeepStrings_MC
-
+  
+  sampleKey = ''
+  if 'TTJets' in sample['dbsName']: sampleKey = 'TTJets'
+  elif 'WJets' in sample['dbsName']: sampleKey = 'WJets'
+  else: sampleKey = 'none'
+  
   readVariables = ['met_pt/F', 'met_phi/F']
   newVariables = ['weight/F']
   aliases = [ "met:met_pt", "metPhi:met_phi"]
@@ -161,7 +174,7 @@ for isample, sample in enumerate(allSamples):
       for i in range(maxConsideredBTagWeight+1):
         newVariables.extend( ["weightBTag"+str(i)+"/F", "weightBTag"+str(i)+"_SF/F", "weightBTag"+str(i)+"_SF_b_Up/F", "weightBTag"+str(i)+"_SF_b_Down/F", "weightBTag"+str(i)+"_SF_light_Up/F", "weightBTag"+str(i)+"_SF_light_Down/F"])
         #if i>0:
-        newVariables.extend( ["weightBTag"+str(i)+"p/F", "weightBTag"+str(i)+"p_SF/F", "weightBTag"+str(i)+"p_SF_b_Up/F", "weightBTag"+str(i)+"p_SF_b_Down/F", "weightBTag"+str(i)+"p_SF_light_Up/F", "weightBTag"+str(i)+"p_SF_light_Down/F"])
+        newVariables.extend( ["weightBTag"+str(i+1)+"p/F", "weightBTag"+str(i+1)+"p_SF/F", "weightBTag"+str(i+1)+"p_SF_b_Up/F", "weightBTag"+str(i+1)+"p_SF_b_Down/F", "weightBTag"+str(i+1)+"p_SF_light_Up/F", "weightBTag"+str(i+1)+"p_SF_light_Down/F"])
   newVars = [readVar(v, allowRenaming=False, isWritten = True, isRead=False) for v in newVariables]
 
   
@@ -319,7 +332,7 @@ for isample, sample in enumerate(allSamples):
         if calcSystematics:
 #          separateBTagWeights = False
           zeroTagWeight = 1.
-          mceff = getMCEfficiencyForBTagSF(t, sms="")
+          mceff = getMCEfficiencyForBTagSF(t, mcEffDict[sampleKey], sms='')
           #print
           #print mceff["mceffs"]
           mceffW                = getTagWeightDict(mceff["mceffs"], maxConsideredBTagWeight)
@@ -332,7 +345,7 @@ for isample, sample in enumerate(allSamples):
             lweight = str(s.weight)
           else: lweight = "(1.)"
           #if not separateBTagWeights:
-          for i in range(0, maxConsideredBTagWeight+1):
+          for i in range(1, maxConsideredBTagWeight+2):
             exec("s.weightBTag"+str(i)+"p="+lweight)
             exec("s.weightBTag"+str(i)+"p_SF="+lweight)
             exec("s.weightBTag"+str(i)+"p_SF_b_Up="+lweight)
@@ -340,13 +353,13 @@ for isample, sample in enumerate(allSamples):
             exec("s.weightBTag"+str(i)+"p_SF_light_Up="+lweight)
             exec("s.weightBTag"+str(i)+"p_SF_light_Down="+lweight)
           for i in range(maxConsideredBTagWeight+1):
-            exec("s.weightBTag"+str(i)+"="+str(mceffW[i])+'*'+lweight)
-            exec("s.weightBTag"+str(i)+"_SF="+str(mceffW_SF[i])+'*'+lweight)
-            exec("s.weightBTag"+str(i)+"_SF_b_Up="+str(mceffW_SF_b_Up[i])+'*'+lweight)
-            exec("s.weightBTag"+str(i)+"_SF_b_Down="+str(mceffW_SF_b_Down[i])+'*'+lweight)
-            exec("s.weightBTag"+str(i)+"_SF_light_Up="+str(mceffW_SF_light_Up[i])+'*'+lweight)
+            exec("s.weightBTag"+str(i)+"="              +str(mceffW[i])+'*'+lweight)
+            exec("s.weightBTag"+str(i)+"_SF="           +str(mceffW_SF[i])+'*'+lweight)
+            exec("s.weightBTag"+str(i)+"_SF_b_Up="      +str(mceffW_SF_b_Up[i])+'*'+lweight)
+            exec("s.weightBTag"+str(i)+"_SF_b_Down="    +str(mceffW_SF_b_Down[i])+'*'+lweight)
+            exec("s.weightBTag"+str(i)+"_SF_light_Up="  +str(mceffW_SF_light_Up[i])+'*'+lweight)
             exec("s.weightBTag"+str(i)+"_SF_light_Down="+str(mceffW_SF_light_Down[i])+'*'+lweight)
-            for j in range(i, maxConsideredBTagWeight+1):
+            for j in range(i+1, maxConsideredBTagWeight+2):
               exec("s.weightBTag"+str(j)+"p               -="+str(mceffW[i])+'*'+lweight)
               exec("s.weightBTag"+str(j)+"p_SF            -="+str(mceffW_SF[i])+'*'+lweight)
               exec("s.weightBTag"+str(j)+"p_SF_b_Up       -="+str(mceffW_SF_b_Up[i])+'*'+lweight)
@@ -354,12 +367,12 @@ for isample, sample in enumerate(allSamples):
               exec("s.weightBTag"+str(j)+"p_SF_light_Up   -="+str(mceffW_SF_light_Up[i])+'*'+lweight)
               exec("s.weightBTag"+str(j)+"p_SF_light_Down -="+str(mceffW_SF_light_Down[i])+'*'+lweight)
           for i in range (int(r.nJet)+1, maxConsideredBTagWeight+1):
-            exec("s.weightBTag"+str(i)+"= 0.")
-            exec("s.weightBTag"+str(i)+"_SF= 0.")
-            exec("s.weightBTag"+str(i)+"_SF_b_Up= 0.")
-            exec("s.weightBTag"+str(i)+"_SF_b_Down= 0.")
-            exec("s.weightBTag"+str(i)+"_SF_light_Up= 0.")
-            exec("s.weightBTag"+str(i)+"_SF_light_Down= 0.")
+            exec("s.weightBTag"+str(i)+"               = 0.")
+            exec("s.weightBTag"+str(i)+"_SF            = 0.")
+            exec("s.weightBTag"+str(i)+"_SF_b_Up       = 0.")
+            exec("s.weightBTag"+str(i)+"_SF_b_Down     = 0.")
+            exec("s.weightBTag"+str(i)+"_SF_light_Up   = 0.")
+            exec("s.weightBTag"+str(i)+"_SF_light_Down = 0.")
             exec("s.weightBTag"+str(i)+"p              = 0.")
             exec("s.weightBTag"+str(i)+"p_SF           = 0.")
             exec("s.weightBTag"+str(i)+"p_SF_b_Up      = 0.")

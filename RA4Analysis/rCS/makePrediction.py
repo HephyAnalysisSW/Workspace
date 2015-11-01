@@ -29,8 +29,8 @@ cWJets  = getChain(WJetsHT_25ns_btagweight,histname='')
 cTTJets = getChain(TTJets_LO_25ns_btagweight,histname='')
 cRest = getChain([singleTop_25ns, DY_25ns, TTV_25ns],histname='')#no QCD
 cBkg =  getChain([WJetsHT_25ns_btagweight, TTJets_LO_25ns_btagweight, singleTop_25ns, DY_25ns, TTV_25ns], histname='')#no QCD
-#cData = getChain([WJetsHT_25ns_btagweight, TTJets_LO_25ns_btagweight, singleTop_25ns, DY_25ns, TTV_25ns], histname='')
-cData = getChain([SingleMuon_Run2015D, SingleElectron_Run2015D], histname='')
+cData = getChain([WJetsHT_25ns_btagweight, TTJets_LO_25ns_btagweight, singleTop_25ns, DY_25ns, TTV_25ns], histname='')
+#cData = getChain([SingleMuon_Run2015D, SingleElectron_Run2015D], histname='')
 
 #cBkg = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]],histname='')#no QCD
 #cData = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]] , histname='')
@@ -45,17 +45,17 @@ small = False
 if small: signalRegions = smallRegion
 
 #DEFINE LUMI AND PLOTDIR
-lumi = 1.26
+lumi = 3.
 sampleLumi = 3.
 debugReweighting = False
 
-printDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/25ns/templateFit_bweightTemplate_data_reducedSR_lep/'
-pickleDir = '/data/'+username+'/Results2015/Prediction_bweightTemplate_data_reducedSR_lep_'+str(lumi)+'/'
+printDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/25ns/templateFit_bweightTemplate_MC_reducedSR_lep_higherLumi/'
+pickleDir = '/data/'+username+'/Results2015/Prediction_bweightTemplate_MC_reducedSR_lep_'+str(lumi)+'/'
 
-isData = True
+isData = False
 QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151027_QCDestimation_firstTry_pkl'
-QCDestimate = pickle.load(file(QCDpickle))
-#QCDestimate=False
+#QCDestimate = pickle.load(file(QCDpickle))
+QCDestimate=False
 
 if not os.path.exists(pickleDir):
   os.makedirs(pickleDir)
@@ -92,7 +92,7 @@ presel += filters
 
 
 btagString = 'nBJetMediumCSV30'
-useBTagWeights=False #True for weighted fake data, false for data
+useBTagWeights=True #True for weighted fake data, false for data
 btagWeightSuffix = ''
 templateWeights = True
 templateWeightSuffix = ''

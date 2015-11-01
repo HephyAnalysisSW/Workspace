@@ -11,7 +11,7 @@ import PhysicsTools.Heppy.physicsutils.BTagSF
 #newpresel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&st>250&&nJet30>=2&&htJet30j>500"
 
 
-bTagEffFile = '/data/dspitzbart/Results2015/MCEffWJets_hadronId_heppy_pkl'
+#bTagEffFile = '/data/dspitzbart/Results2015/MCEffWJets_hadronId_heppy_pkl'
 
 ptBorders = [30, 40, 50, 60, 70, 80, 100, 120, 160, 210, 260, 320, 400, 500, 670]
 ptBins = []
@@ -51,7 +51,7 @@ def partonName (parton):
 
 
 # get MC truth efficiencies for a specific sample
-def getBTagMCTruthEfficiencies(c, cut="(1)", overwrite=True):
+def getBTagMCTruthEfficiencies(c, cut="(1)", overwrite=False):
   print c, cut
   mceff = {}
   commoncf=cut+"&&"
@@ -78,6 +78,16 @@ def getBTagMCTruthEfficiencies(c, cut="(1)", overwrite=True):
   if overwrite: pickle.dump(mceff, file(bTagEffFile, 'w'))
   return mceff
 
+def getDummyEfficiencies():
+  mceff={}
+  for ptBin in ptBins:
+    mceff[tuple(ptBin)] = {}
+    for etaBin in etaBins:
+      mceff[tuple(ptBin)][tuple(etaBin)] = {}
+      mceff[tuple(ptBin)][tuple(etaBin)]["b"]     = 0.5
+      mceff[tuple(ptBin)][tuple(etaBin)]["c"]     = 0.5
+      mceff[tuple(ptBin)][tuple(etaBin)]["other"] = 0.5
+  return mceff
 
 def getHistMCTruthEfficiencies(MCEff, histname, etaBin = (0,0.8), hadron='b'):
   nBins = len(MCEff)
@@ -110,12 +120,12 @@ def getSF(parton, pt, eta, year = 2012):
 
 
 # get MC efficiencies and scale factors for a specific jet (with parton flavor, pt and eta)
-try:
-  mcEff = pickle.load(file(bTagEffFile))
-except IOError:
-  print 'Unable to load MC efficiency file!'
-  mcEff = False
-def getMCEff(parton, pt, eta, year = 2012):
+#try:
+#  mcEff = pickle.load(file(bTagEffFile))
+#except IOError:
+#  print 'Unable to load MC efficiency file!'
+#  mcEff = False
+def getMCEff(parton, pt, eta, mcEff, year = 2012):
   for ptBin in ptBins:
     if pt>=ptBin[0] and (pt<ptBin[1] or ptBin[1]<0):
       for etaBin in etaBins:
@@ -129,7 +139,7 @@ def getMCEff(parton, pt, eta, year = 2012):
 
 
 # get MC efficiencies and scale factors for all jets of one event c, uses getMCEff
-def getMCEfficiencyForBTagSF(c, onlyLightJetSystem = False, sms=""):
+def getMCEfficiencyForBTagSF(c, mcEff, onlyLightJetSystem = False, sms=""):
   nsoftjets = int(getVarValue(c, "nJet30"))
   njets = int(getVarValue(c, "nJet"))
   jets = []
@@ -151,7 +161,7 @@ def getMCEfficiencyForBTagSF(c, onlyLightJetSystem = False, sms=""):
     jets[nc][0] = 4
   for jet in jets:
     jParton, jPt, jEta = jet
-    r = getMCEff(parton=jParton, pt=jPt, eta=jEta, year=2012)#getEfficiencyAndMistagRate(jPt, jEta, jParton )
+    r = getMCEff(parton=jParton, pt=jPt, eta=jEta, mcEff=mcEff, year=2012)#getEfficiencyAndMistagRate(jPt, jEta, jParton )
     jet.append(r)
 #    print [j[0] for j in jets]
   if len(jets) != nsoftjets: print '!!!!! Different number of jets in collection than there should be !!!!!'
