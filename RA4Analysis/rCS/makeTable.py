@@ -88,20 +88,20 @@ scaleFactor = 0.8
 #      if not first: print '&'
 #      first = False
 #      #data
-#      ttPred = res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['TT_AllPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['TT_AllPdg']['yield']
-#      WPredPosPdg = res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_PosPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_PosPdg']['yield']
-#      WPredNegPdg = res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_NegPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_NegPdg']['yield']
-#      RestPredPosPdg = res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_PosPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_PosPdg']['yield']
-#      RestPredNegPdg = res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_NegPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_NegPdg']['yield']
+#      ttPred = res[srNJet][stb][htb][fitkey]['TT_AllPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb][fitkey]['TT_AllPdg']['yield']
+#      WPredPosPdg = res[srNJet][stb][htb][fitkey]['W_PosPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb][fitkey]['W_PosPdg']['yield']
+#      WPredNegPdg = res[srNJet][stb][htb][fitkey]['W_NegPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb][fitkey]['W_NegPdg']['yield']
+#      RestPredPosPdg = res[srNJet][stb][htb][fitkey]['Rest_PosPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb][fitkey]['Rest_PosPdg']['yield']
+#      RestPredNegPdg = res[srNJet][stb][htb][fitkey]['Rest_NegPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb][fitkey]['Rest_NegPdg']['yield']
 #      totalPredPosPdg = ttPred/2 + WPredPosPdg + RestPredPosPdg
 #      totalPredNegPdg = ttPred/2 + WPredNegPdg + RestPredNegPdg 
 #      
 #      #MC
-#      ttPredMC = res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['TT_AllPdg']['template'].GetBinContent(1)*res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['TT_AllPdg']['yield']
-#      WPredPosPdgMC = res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_PosPdg']['template'].GetBinContent(1)*res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_PosPdg']['yield']
-#      WPredNegPdgMC = res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_NegPdg']['template'].GetBinContent(1)*res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_NegPdg']['yield']
-#      RestPredPosPdgMC = res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_PosPdg']['template'].GetBinContent(1)*res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_PosPdg']['yield']
-#      RestPredNegPdgMC = res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_NegPdg']['template'].GetBinContent(1)*res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_NegPdg']['yield']
+#      ttPredMC = res2[srNJet][stb][htb][fitkey]['TT_AllPdg']['template'].GetBinContent(1)*res2[srNJet][stb][htb][fitkey]['TT_AllPdg']['yield']
+#      WPredPosPdgMC = res2[srNJet][stb][htb][fitkey]['W_PosPdg']['template'].GetBinContent(1)*res2[srNJet][stb][htb][fitkey]['W_PosPdg']['yield']
+#      WPredNegPdgMC = res2[srNJet][stb][htb][fitkey]['W_NegPdg']['template'].GetBinContent(1)*res2[srNJet][stb][htb][fitkey]['W_NegPdg']['yield']
+#      RestPredPosPdgMC = res2[srNJet][stb][htb][fitkey]['Rest_PosPdg']['template'].GetBinContent(1)*res2[srNJet][stb][htb][fitkey]['Rest_PosPdg']['yield']
+#      RestPredNegPdgMC = res2[srNJet][stb][htb][fitkey]['Rest_NegPdg']['template'].GetBinContent(1)*res2[srNJet][stb][htb][fitkey]['Rest_NegPdg']['yield']
 #      totalPredPosPdgMC = ttPredMC/2 + WPredPosPdgMC + RestPredPosPdgMC
 #      totalPredNegPdgMC = ttPredMC/2 + WPredNegPdgMC + RestPredNegPdgMC
 #      print '&$'+varBin(htb)+'$'
@@ -120,6 +120,9 @@ scaleFactor = 0.8
 #      if htb[1] == -1 : print '\\cline{2-15}'
 #print '\\hline\end{tabular}}\end{center}\caption{Closure table for the background in the 0-tag regions, 3$fb^{-1}$}\label{tab:0b_totalClosure}\end{table}'
 
+#fitkey = 'fit_crNJet_lowDPhi'
+fitkey = 'fit_srNJet_lowDPhi'
+
 print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrrrrr|rrrrrr|}\\hline'
 print ' \\njet     & \ST & \HT     &\multicolumn{6}{c|}{$tt+$Jets neg. PDG}&\multicolumn{6}{c|}{$tt+$Jets pos. PDG}\\\%\hline'
 print ' & $[$GeV$]$ &$[$GeV$]$ & \multicolumn{3}{c}{data} & \multicolumn{3}{c|}{MC} & \multicolumn{3}{c}{data} & \multicolumn{3}{c|}{MC} \\\\\hline'
@@ -137,21 +140,21 @@ for srNJet in sorted(signalRegions):
       if not first: print '&'
       first = False
       #data yields and errors
-      ttPred = res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['TT_AllPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['TT_AllPdg']['yield']
-      ttPredVar = res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['TT_AllPdg']['template'].GetBinError(1)**2*res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['TT_AllPdg']['yield']**2 + \
-                  res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['TT_AllPdg']['template'].GetBinContent(1)**2*res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['TT_AllPdg']['yieldVar']
-      WPredPosPdg = res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_PosPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_PosPdg']['yield']
-      WPredPosPdgVar = res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_PosPdg']['template'].GetBinError(1)**2*res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_PosPdg']['yield']**2 + \
-                       res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_PosPdg']['template'].GetBinContent(1)**2*res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_PosPdg']['yieldVar']
-      WPredNegPdg = res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_NegPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_NegPdg']['yield']
-      WPredNegPdgVar = res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_NegPdg']['template'].GetBinError(1)**2*res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_NegPdg']['yield']**2 + \
-                       res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_NegPdg']['template'].GetBinContent(1)**2*res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_NegPdg']['yieldVar']
-      RestPredPosPdg = res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_PosPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_PosPdg']['yield']
-      RestPredPosPdgVar = res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_PosPdg']['template'].GetBinError(1)**2*res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_PosPdg']['yield']**2 + \
-                          res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_PosPdg']['template'].GetBinContent(1)**2*res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_PosPdg']['yieldVar']
-      RestPredNegPdg = res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_NegPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_NegPdg']['yield']
-      RestPredNegPdgVar = res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_NegPdg']['template'].GetBinError(1)**2*res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_NegPdg']['yield']**2 + \
-                          res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_NegPdg']['template'].GetBinContent(1)**2*res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_NegPdg']['yieldVar']
+      ttPred = res[srNJet][stb][htb][fitkey]['TT_AllPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb][fitkey]['TT_AllPdg']['yield']
+      ttPredVar = res[srNJet][stb][htb][fitkey]['TT_AllPdg']['template'].GetBinError(1)**2*res[srNJet][stb][htb][fitkey]['TT_AllPdg']['yield']**2 + \
+                  res[srNJet][stb][htb][fitkey]['TT_AllPdg']['template'].GetBinContent(1)**2*res[srNJet][stb][htb][fitkey]['TT_AllPdg']['yieldVar']
+      WPredPosPdg = res[srNJet][stb][htb][fitkey]['W_PosPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb][fitkey]['W_PosPdg']['yield']
+      WPredPosPdgVar = res[srNJet][stb][htb][fitkey]['W_PosPdg']['template'].GetBinError(1)**2*res[srNJet][stb][htb][fitkey]['W_PosPdg']['yield']**2 + \
+                       res[srNJet][stb][htb][fitkey]['W_PosPdg']['template'].GetBinContent(1)**2*res[srNJet][stb][htb][fitkey]['W_PosPdg']['yieldVar']
+      WPredNegPdg = res[srNJet][stb][htb][fitkey]['W_NegPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb][fitkey]['W_NegPdg']['yield']
+      WPredNegPdgVar = res[srNJet][stb][htb][fitkey]['W_NegPdg']['template'].GetBinError(1)**2*res[srNJet][stb][htb][fitkey]['W_NegPdg']['yield']**2 + \
+                       res[srNJet][stb][htb][fitkey]['W_NegPdg']['template'].GetBinContent(1)**2*res[srNJet][stb][htb][fitkey]['W_NegPdg']['yieldVar']
+      RestPredPosPdg = res[srNJet][stb][htb][fitkey]['Rest_PosPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb][fitkey]['Rest_PosPdg']['yield']
+      RestPredPosPdgVar = res[srNJet][stb][htb][fitkey]['Rest_PosPdg']['template'].GetBinError(1)**2*res[srNJet][stb][htb][fitkey]['Rest_PosPdg']['yield']**2 + \
+                          res[srNJet][stb][htb][fitkey]['Rest_PosPdg']['template'].GetBinContent(1)**2*res[srNJet][stb][htb][fitkey]['Rest_PosPdg']['yieldVar']
+      RestPredNegPdg = res[srNJet][stb][htb][fitkey]['Rest_NegPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb][fitkey]['Rest_NegPdg']['yield']
+      RestPredNegPdgVar = res[srNJet][stb][htb][fitkey]['Rest_NegPdg']['template'].GetBinError(1)**2*res[srNJet][stb][htb][fitkey]['Rest_NegPdg']['yield']**2 + \
+                          res[srNJet][stb][htb][fitkey]['Rest_NegPdg']['template'].GetBinContent(1)**2*res[srNJet][stb][htb][fitkey]['Rest_NegPdg']['yieldVar']
 
       totalPredPosPdg = ttPred/2 + WPredPosPdg + RestPredPosPdg
       totalPredPosPdgVar = ttPredVar/4 + WPredPosPdgVar + RestPredPosPdgVar
@@ -179,21 +182,21 @@ for srNJet in sorted(signalRegions):
       RestPredNegFracVar = RestPredNegPdgVar/totalPredNegPdg**2 + totalPredNegPdgVar*RestPredNegPdg**2/totalPredNegPdg**4
       
       #MC yields and errors
-      ttPredMC =            res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['TT_AllPdg']['template'].GetBinContent(1)*       res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['TT_AllPdg']['yield']
-      ttPredMCVar =         res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['TT_AllPdg']['template'].GetBinError(1)**2*      res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['TT_AllPdg']['yield']**2 + \
-                            res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['TT_AllPdg']['template'].GetBinContent(1)**2*    res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['TT_AllPdg']['yieldVar']
-      WPredPosPdgMC =       res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_PosPdg']['template'].GetBinContent(1)*        res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_PosPdg']['yield']
-      WPredPosPdgMCVar =    res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_PosPdg']['template'].GetBinError(1)**2*       res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_PosPdg']['yield']**2 + \
-                            res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_PosPdg']['template'].GetBinContent(1)**2*     res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_PosPdg']['yieldVar']
-      WPredNegPdgMC =       res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_NegPdg']['template'].GetBinContent(1)*        res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_NegPdg']['yield']
-      WPredNegPdgMCVar =    res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_NegPdg']['template'].GetBinError(1)**2*       res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_NegPdg']['yield']**2 + \
-                            res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_NegPdg']['template'].GetBinContent(1)**2*     res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_NegPdg']['yieldVar']
-      RestPredPosPdgMC =    res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_PosPdg']['template'].GetBinContent(1)*     res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_PosPdg']['yield']
-      RestPredPosPdgMCVar = res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_PosPdg']['template'].GetBinError(1)**2*    res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_PosPdg']['yield']**2 + \
-                            res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_PosPdg']['template'].GetBinContent(1)**2*  res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_PosPdg']['yieldVar']
-      RestPredNegPdgMC =    res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_NegPdg']['template'].GetBinContent(1)*     res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_NegPdg']['yield']
-      RestPredNegPdgMCVar = res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_NegPdg']['template'].GetBinError(1)**2*    res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_NegPdg']['yield']**2 + \
-                            res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_NegPdg']['template'].GetBinContent(1)**2*  res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_NegPdg']['yieldVar']
+      ttPredMC =            res2[srNJet][stb][htb][fitkey]['TT_AllPdg']['template'].GetBinContent(1)*       res2[srNJet][stb][htb][fitkey]['TT_AllPdg']['yield']
+      ttPredMCVar =         res2[srNJet][stb][htb][fitkey]['TT_AllPdg']['template'].GetBinError(1)**2*      res2[srNJet][stb][htb][fitkey]['TT_AllPdg']['yield']**2 + \
+                            res2[srNJet][stb][htb][fitkey]['TT_AllPdg']['template'].GetBinContent(1)**2*    res2[srNJet][stb][htb][fitkey]['TT_AllPdg']['yieldVar']
+      WPredPosPdgMC =       res2[srNJet][stb][htb][fitkey]['W_PosPdg']['template'].GetBinContent(1)*        res2[srNJet][stb][htb][fitkey]['W_PosPdg']['yield']
+      WPredPosPdgMCVar =    res2[srNJet][stb][htb][fitkey]['W_PosPdg']['template'].GetBinError(1)**2*       res2[srNJet][stb][htb][fitkey]['W_PosPdg']['yield']**2 + \
+                            res2[srNJet][stb][htb][fitkey]['W_PosPdg']['template'].GetBinContent(1)**2*     res2[srNJet][stb][htb][fitkey]['W_PosPdg']['yieldVar']
+      WPredNegPdgMC =       res2[srNJet][stb][htb][fitkey]['W_NegPdg']['template'].GetBinContent(1)*        res2[srNJet][stb][htb][fitkey]['W_NegPdg']['yield']
+      WPredNegPdgMCVar =    res2[srNJet][stb][htb][fitkey]['W_NegPdg']['template'].GetBinError(1)**2*       res2[srNJet][stb][htb][fitkey]['W_NegPdg']['yield']**2 + \
+                            res2[srNJet][stb][htb][fitkey]['W_NegPdg']['template'].GetBinContent(1)**2*     res2[srNJet][stb][htb][fitkey]['W_NegPdg']['yieldVar']
+      RestPredPosPdgMC =    res2[srNJet][stb][htb][fitkey]['Rest_PosPdg']['template'].GetBinContent(1)*     res2[srNJet][stb][htb][fitkey]['Rest_PosPdg']['yield']
+      RestPredPosPdgMCVar = res2[srNJet][stb][htb][fitkey]['Rest_PosPdg']['template'].GetBinError(1)**2*    res2[srNJet][stb][htb][fitkey]['Rest_PosPdg']['yield']**2 + \
+                            res2[srNJet][stb][htb][fitkey]['Rest_PosPdg']['template'].GetBinContent(1)**2*  res2[srNJet][stb][htb][fitkey]['Rest_PosPdg']['yieldVar']
+      RestPredNegPdgMC =    res2[srNJet][stb][htb][fitkey]['Rest_NegPdg']['template'].GetBinContent(1)*     res2[srNJet][stb][htb][fitkey]['Rest_NegPdg']['yield']
+      RestPredNegPdgMCVar = res2[srNJet][stb][htb][fitkey]['Rest_NegPdg']['template'].GetBinError(1)**2*    res2[srNJet][stb][htb][fitkey]['Rest_NegPdg']['yield']**2 + \
+                            res2[srNJet][stb][htb][fitkey]['Rest_NegPdg']['template'].GetBinContent(1)**2*  res2[srNJet][stb][htb][fitkey]['Rest_NegPdg']['yieldVar']
 
       totalPredPosPdgMC = ttPredMC/2 + WPredPosPdgMC + RestPredPosPdgMC
       totalPredPosPdgMCVar = ttPredMCVar/4 + WPredPosPdgMCVar + RestPredPosPdgMCVar
@@ -247,21 +250,21 @@ for srNJet in sorted(signalRegions):
       if not first: print '&'
       first = False
       #data yields and errors
-      ttPred = res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['TT_AllPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['TT_AllPdg']['yield']
-      ttPredVar = res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['TT_AllPdg']['template'].GetBinError(1)**2*res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['TT_AllPdg']['yield']**2 + \
-                  res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['TT_AllPdg']['template'].GetBinContent(1)**2*res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['TT_AllPdg']['yieldVar']
-      WPredPosPdg = res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_PosPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_PosPdg']['yield']
-      WPredPosPdgVar = res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_PosPdg']['template'].GetBinError(1)**2*res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_PosPdg']['yield']**2 + \
-                       res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_PosPdg']['template'].GetBinContent(1)**2*res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_PosPdg']['yieldVar']
-      WPredNegPdg = res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_NegPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_NegPdg']['yield']
-      WPredNegPdgVar = res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_NegPdg']['template'].GetBinError(1)**2*res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_NegPdg']['yield']**2 + \
-                       res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_NegPdg']['template'].GetBinContent(1)**2*res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_NegPdg']['yieldVar']
-      RestPredPosPdg = res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_PosPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_PosPdg']['yield']
-      RestPredPosPdgVar = res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_PosPdg']['template'].GetBinError(1)**2*res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_PosPdg']['yield']**2 + \
-                          res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_PosPdg']['template'].GetBinContent(1)**2*res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_PosPdg']['yieldVar']
-      RestPredNegPdg = res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_NegPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_NegPdg']['yield']
-      RestPredNegPdgVar = res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_NegPdg']['template'].GetBinError(1)**2*res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_NegPdg']['yield']**2 + \
-                          res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_NegPdg']['template'].GetBinContent(1)**2*res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_NegPdg']['yieldVar']
+      ttPred = res[srNJet][stb][htb][fitkey]['TT_AllPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb][fitkey]['TT_AllPdg']['yield']
+      ttPredVar = res[srNJet][stb][htb][fitkey]['TT_AllPdg']['template'].GetBinError(1)**2*res[srNJet][stb][htb][fitkey]['TT_AllPdg']['yield']**2 + \
+                  res[srNJet][stb][htb][fitkey]['TT_AllPdg']['template'].GetBinContent(1)**2*res[srNJet][stb][htb][fitkey]['TT_AllPdg']['yieldVar']
+      WPredPosPdg = res[srNJet][stb][htb][fitkey]['W_PosPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb][fitkey]['W_PosPdg']['yield']
+      WPredPosPdgVar = res[srNJet][stb][htb][fitkey]['W_PosPdg']['template'].GetBinError(1)**2*res[srNJet][stb][htb][fitkey]['W_PosPdg']['yield']**2 + \
+                       res[srNJet][stb][htb][fitkey]['W_PosPdg']['template'].GetBinContent(1)**2*res[srNJet][stb][htb][fitkey]['W_PosPdg']['yieldVar']
+      WPredNegPdg = res[srNJet][stb][htb][fitkey]['W_NegPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb][fitkey]['W_NegPdg']['yield']
+      WPredNegPdgVar = res[srNJet][stb][htb][fitkey]['W_NegPdg']['template'].GetBinError(1)**2*res[srNJet][stb][htb][fitkey]['W_NegPdg']['yield']**2 + \
+                       res[srNJet][stb][htb][fitkey]['W_NegPdg']['template'].GetBinContent(1)**2*res[srNJet][stb][htb][fitkey]['W_NegPdg']['yieldVar']
+      RestPredPosPdg = res[srNJet][stb][htb][fitkey]['Rest_PosPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb][fitkey]['Rest_PosPdg']['yield']
+      RestPredPosPdgVar = res[srNJet][stb][htb][fitkey]['Rest_PosPdg']['template'].GetBinError(1)**2*res[srNJet][stb][htb][fitkey]['Rest_PosPdg']['yield']**2 + \
+                          res[srNJet][stb][htb][fitkey]['Rest_PosPdg']['template'].GetBinContent(1)**2*res[srNJet][stb][htb][fitkey]['Rest_PosPdg']['yieldVar']
+      RestPredNegPdg = res[srNJet][stb][htb][fitkey]['Rest_NegPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb][fitkey]['Rest_NegPdg']['yield']
+      RestPredNegPdgVar = res[srNJet][stb][htb][fitkey]['Rest_NegPdg']['template'].GetBinError(1)**2*res[srNJet][stb][htb][fitkey]['Rest_NegPdg']['yield']**2 + \
+                          res[srNJet][stb][htb][fitkey]['Rest_NegPdg']['template'].GetBinContent(1)**2*res[srNJet][stb][htb][fitkey]['Rest_NegPdg']['yieldVar']
 
       totalPredPosPdg = ttPred/2 + WPredPosPdg + RestPredPosPdg
       totalPredPosPdgVar = ttPredVar/4 + WPredPosPdgVar + RestPredPosPdgVar
@@ -289,21 +292,21 @@ for srNJet in sorted(signalRegions):
       RestPredNegFracVar = RestPredNegPdgVar/totalPredNegPdg**2 + totalPredNegPdgVar*RestPredNegPdg**2/totalPredNegPdg**4
       
       #MC yields and errors
-      ttPredMC = res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['TT_AllPdg']['template'].GetBinContent(1)*res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['TT_AllPdg']['yield']
-      ttPredMCVar = res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['TT_AllPdg']['template'].GetBinError(1)**2*res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['TT_AllPdg']['yield']**2 + \
-                    res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['TT_AllPdg']['template'].GetBinContent(1)**2*res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['TT_AllPdg']['yieldVar']
-      WPredPosPdgMC = res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_PosPdg']['template'].GetBinContent(1)*res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_PosPdg']['yield']
-      WPredPosPdgMCVar = res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_PosPdg']['template'].GetBinError(1)**2*res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_PosPdg']['yield']**2 + \
-                         res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_PosPdg']['template'].GetBinContent(1)**2*res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_PosPdg']['yieldVar']
-      WPredNegPdgMC = res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_NegPdg']['template'].GetBinContent(1)*res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_NegPdg']['yield']
-      WPredNegPdgMCVar = res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_NegPdg']['template'].GetBinError(1)**2*res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_NegPdg']['yield']**2 + \
-                         res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_NegPdg']['template'].GetBinContent(1)**2*res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_NegPdg']['yieldVar']
-      RestPredPosPdgMC = res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_PosPdg']['template'].GetBinContent(1)*res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_PosPdg']['yield']
-      RestPredPosPdgMCVar = res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_PosPdg']['template'].GetBinError(1)**2*res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_PosPdg']['yield']**2 + \
-                            res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_PosPdg']['template'].GetBinContent(1)**2*res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_PosPdg']['yieldVar']
-      RestPredNegPdgMC = res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_NegPdg']['template'].GetBinContent(1)*res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_NegPdg']['yield']
-      RestPredNegPdgMCVar = res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_NegPdg']['template'].GetBinError(1)**2*res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_NegPdg']['yield']**2 + \
-                            res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_NegPdg']['template'].GetBinContent(1)**2*res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_NegPdg']['yieldVar']
+      ttPredMC = res2[srNJet][stb][htb][fitkey]['TT_AllPdg']['template'].GetBinContent(1)*res2[srNJet][stb][htb][fitkey]['TT_AllPdg']['yield']
+      ttPredMCVar = res2[srNJet][stb][htb][fitkey]['TT_AllPdg']['template'].GetBinError(1)**2*res2[srNJet][stb][htb][fitkey]['TT_AllPdg']['yield']**2 + \
+                    res2[srNJet][stb][htb][fitkey]['TT_AllPdg']['template'].GetBinContent(1)**2*res2[srNJet][stb][htb][fitkey]['TT_AllPdg']['yieldVar']
+      WPredPosPdgMC = res2[srNJet][stb][htb][fitkey]['W_PosPdg']['template'].GetBinContent(1)*res2[srNJet][stb][htb][fitkey]['W_PosPdg']['yield']
+      WPredPosPdgMCVar = res2[srNJet][stb][htb][fitkey]['W_PosPdg']['template'].GetBinError(1)**2*res2[srNJet][stb][htb][fitkey]['W_PosPdg']['yield']**2 + \
+                         res2[srNJet][stb][htb][fitkey]['W_PosPdg']['template'].GetBinContent(1)**2*res2[srNJet][stb][htb][fitkey]['W_PosPdg']['yieldVar']
+      WPredNegPdgMC = res2[srNJet][stb][htb][fitkey]['W_NegPdg']['template'].GetBinContent(1)*res2[srNJet][stb][htb][fitkey]['W_NegPdg']['yield']
+      WPredNegPdgMCVar = res2[srNJet][stb][htb][fitkey]['W_NegPdg']['template'].GetBinError(1)**2*res2[srNJet][stb][htb][fitkey]['W_NegPdg']['yield']**2 + \
+                         res2[srNJet][stb][htb][fitkey]['W_NegPdg']['template'].GetBinContent(1)**2*res2[srNJet][stb][htb][fitkey]['W_NegPdg']['yieldVar']
+      RestPredPosPdgMC = res2[srNJet][stb][htb][fitkey]['Rest_PosPdg']['template'].GetBinContent(1)*res2[srNJet][stb][htb][fitkey]['Rest_PosPdg']['yield']
+      RestPredPosPdgMCVar = res2[srNJet][stb][htb][fitkey]['Rest_PosPdg']['template'].GetBinError(1)**2*res2[srNJet][stb][htb][fitkey]['Rest_PosPdg']['yield']**2 + \
+                            res2[srNJet][stb][htb][fitkey]['Rest_PosPdg']['template'].GetBinContent(1)**2*res2[srNJet][stb][htb][fitkey]['Rest_PosPdg']['yieldVar']
+      RestPredNegPdgMC = res2[srNJet][stb][htb][fitkey]['Rest_NegPdg']['template'].GetBinContent(1)*res2[srNJet][stb][htb][fitkey]['Rest_NegPdg']['yield']
+      RestPredNegPdgMCVar = res2[srNJet][stb][htb][fitkey]['Rest_NegPdg']['template'].GetBinError(1)**2*res2[srNJet][stb][htb][fitkey]['Rest_NegPdg']['yield']**2 + \
+                            res2[srNJet][stb][htb][fitkey]['Rest_NegPdg']['template'].GetBinContent(1)**2*res2[srNJet][stb][htb][fitkey]['Rest_NegPdg']['yieldVar']
 
       totalPredPosPdgMC = ttPredMC/2 + WPredPosPdgMC + RestPredPosPdgMC
       totalPredPosPdgMCVar = ttPredMCVar/4 + WPredPosPdgMCVar + RestPredPosPdgMCVar
@@ -357,21 +360,21 @@ for srNJet in sorted(signalRegions):
       if not first: print '&'
       first = False
       #data yields and errors
-      ttPred = res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['TT_AllPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['TT_AllPdg']['yield']
-      ttPredVar = res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['TT_AllPdg']['template'].GetBinError(1)**2*res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['TT_AllPdg']['yield']**2 + \
-                  res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['TT_AllPdg']['template'].GetBinContent(1)**2*res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['TT_AllPdg']['yieldVar']
-      WPredPosPdg = res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_PosPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_PosPdg']['yield']
-      WPredPosPdgVar = res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_PosPdg']['template'].GetBinError(1)**2*res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_PosPdg']['yield']**2 + \
-                       res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_PosPdg']['template'].GetBinContent(1)**2*res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_PosPdg']['yieldVar']
-      WPredNegPdg = res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_NegPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_NegPdg']['yield']
-      WPredNegPdgVar = res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_NegPdg']['template'].GetBinError(1)**2*res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_NegPdg']['yield']**2 + \
-                       res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_NegPdg']['template'].GetBinContent(1)**2*res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_NegPdg']['yieldVar']
-      RestPredPosPdg = res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_PosPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_PosPdg']['yield']
-      RestPredPosPdgVar = res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_PosPdg']['template'].GetBinError(1)**2*res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_PosPdg']['yield']**2 + \
-                          res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_PosPdg']['template'].GetBinContent(1)**2*res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_PosPdg']['yieldVar']
-      RestPredNegPdg = res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_NegPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_NegPdg']['yield']
-      RestPredNegPdgVar = res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_NegPdg']['template'].GetBinError(1)**2*res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_NegPdg']['yield']**2 + \
-                          res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_NegPdg']['template'].GetBinContent(1)**2*res[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_NegPdg']['yieldVar']
+      ttPred = res[srNJet][stb][htb][fitkey]['TT_AllPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb][fitkey]['TT_AllPdg']['yield']
+      ttPredVar = res[srNJet][stb][htb][fitkey]['TT_AllPdg']['template'].GetBinError(1)**2*res[srNJet][stb][htb][fitkey]['TT_AllPdg']['yield']**2 + \
+                  res[srNJet][stb][htb][fitkey]['TT_AllPdg']['template'].GetBinContent(1)**2*res[srNJet][stb][htb][fitkey]['TT_AllPdg']['yieldVar']
+      WPredPosPdg = res[srNJet][stb][htb][fitkey]['W_PosPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb][fitkey]['W_PosPdg']['yield']
+      WPredPosPdgVar = res[srNJet][stb][htb][fitkey]['W_PosPdg']['template'].GetBinError(1)**2*res[srNJet][stb][htb][fitkey]['W_PosPdg']['yield']**2 + \
+                       res[srNJet][stb][htb][fitkey]['W_PosPdg']['template'].GetBinContent(1)**2*res[srNJet][stb][htb][fitkey]['W_PosPdg']['yieldVar']
+      WPredNegPdg = res[srNJet][stb][htb][fitkey]['W_NegPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb][fitkey]['W_NegPdg']['yield']
+      WPredNegPdgVar = res[srNJet][stb][htb][fitkey]['W_NegPdg']['template'].GetBinError(1)**2*res[srNJet][stb][htb][fitkey]['W_NegPdg']['yield']**2 + \
+                       res[srNJet][stb][htb][fitkey]['W_NegPdg']['template'].GetBinContent(1)**2*res[srNJet][stb][htb][fitkey]['W_NegPdg']['yieldVar']
+      RestPredPosPdg = res[srNJet][stb][htb][fitkey]['Rest_PosPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb][fitkey]['Rest_PosPdg']['yield']
+      RestPredPosPdgVar = res[srNJet][stb][htb][fitkey]['Rest_PosPdg']['template'].GetBinError(1)**2*res[srNJet][stb][htb][fitkey]['Rest_PosPdg']['yield']**2 + \
+                          res[srNJet][stb][htb][fitkey]['Rest_PosPdg']['template'].GetBinContent(1)**2*res[srNJet][stb][htb][fitkey]['Rest_PosPdg']['yieldVar']
+      RestPredNegPdg = res[srNJet][stb][htb][fitkey]['Rest_NegPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb][fitkey]['Rest_NegPdg']['yield']
+      RestPredNegPdgVar = res[srNJet][stb][htb][fitkey]['Rest_NegPdg']['template'].GetBinError(1)**2*res[srNJet][stb][htb][fitkey]['Rest_NegPdg']['yield']**2 + \
+                          res[srNJet][stb][htb][fitkey]['Rest_NegPdg']['template'].GetBinContent(1)**2*res[srNJet][stb][htb][fitkey]['Rest_NegPdg']['yieldVar']
 
       totalPredPosPdg = ttPred/2 + WPredPosPdg + RestPredPosPdg
       totalPredPosPdgVar = ttPredVar/4 + WPredPosPdgVar + RestPredPosPdgVar
@@ -399,21 +402,21 @@ for srNJet in sorted(signalRegions):
       RestPredNegFracVar = RestPredNegPdgVar/totalPredNegPdg**2 + totalPredNegPdgVar*RestPredNegPdg**2/totalPredNegPdg**4
       
       #MC yields and errors
-      ttPredMC = res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['TT_AllPdg']['template'].GetBinContent(1)*res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['TT_AllPdg']['yield']
-      ttPredMCVar = res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['TT_AllPdg']['template'].GetBinError(1)**2*res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['TT_AllPdg']['yield']**2 + \
-                    res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['TT_AllPdg']['template'].GetBinContent(1)**2*res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['TT_AllPdg']['yieldVar']
-      WPredPosPdgMC = res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_PosPdg']['template'].GetBinContent(1)*res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_PosPdg']['yield']
-      WPredPosPdgMCVar = res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_PosPdg']['template'].GetBinError(1)**2*res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_PosPdg']['yield']**2 + \
-                         res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_PosPdg']['template'].GetBinContent(1)**2*res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_PosPdg']['yieldVar']
-      WPredNegPdgMC = res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_NegPdg']['template'].GetBinContent(1)*res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_NegPdg']['yield']
-      WPredNegPdgMCVar = res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_NegPdg']['template'].GetBinError(1)**2*res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_NegPdg']['yield']**2 + \
-                         res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_NegPdg']['template'].GetBinContent(1)**2*res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['W_NegPdg']['yieldVar']
-      RestPredPosPdgMC = res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_PosPdg']['template'].GetBinContent(1)*res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_PosPdg']['yield']
-      RestPredPosPdgMCVar = res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_PosPdg']['template'].GetBinError(1)**2*res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_PosPdg']['yield']**2 + \
-                            res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_PosPdg']['template'].GetBinContent(1)**2*res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_PosPdg']['yieldVar']
-      RestPredNegPdgMC = res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_NegPdg']['template'].GetBinContent(1)*res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_NegPdg']['yield']
-      RestPredNegPdgMCVar = res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_NegPdg']['template'].GetBinError(1)**2*res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_NegPdg']['yield']**2 + \
-                            res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_NegPdg']['template'].GetBinContent(1)**2*res2[srNJet][stb][htb]['fit_srNJet_lowDPhi']['Rest_NegPdg']['yieldVar']
+      ttPredMC = res2[srNJet][stb][htb][fitkey]['TT_AllPdg']['template'].GetBinContent(1)*res2[srNJet][stb][htb][fitkey]['TT_AllPdg']['yield']
+      ttPredMCVar = res2[srNJet][stb][htb][fitkey]['TT_AllPdg']['template'].GetBinError(1)**2*res2[srNJet][stb][htb][fitkey]['TT_AllPdg']['yield']**2 + \
+                    res2[srNJet][stb][htb][fitkey]['TT_AllPdg']['template'].GetBinContent(1)**2*res2[srNJet][stb][htb][fitkey]['TT_AllPdg']['yieldVar']
+      WPredPosPdgMC = res2[srNJet][stb][htb][fitkey]['W_PosPdg']['template'].GetBinContent(1)*res2[srNJet][stb][htb][fitkey]['W_PosPdg']['yield']
+      WPredPosPdgMCVar = res2[srNJet][stb][htb][fitkey]['W_PosPdg']['template'].GetBinError(1)**2*res2[srNJet][stb][htb][fitkey]['W_PosPdg']['yield']**2 + \
+                         res2[srNJet][stb][htb][fitkey]['W_PosPdg']['template'].GetBinContent(1)**2*res2[srNJet][stb][htb][fitkey]['W_PosPdg']['yieldVar']
+      WPredNegPdgMC = res2[srNJet][stb][htb][fitkey]['W_NegPdg']['template'].GetBinContent(1)*res2[srNJet][stb][htb][fitkey]['W_NegPdg']['yield']
+      WPredNegPdgMCVar = res2[srNJet][stb][htb][fitkey]['W_NegPdg']['template'].GetBinError(1)**2*res2[srNJet][stb][htb][fitkey]['W_NegPdg']['yield']**2 + \
+                         res2[srNJet][stb][htb][fitkey]['W_NegPdg']['template'].GetBinContent(1)**2*res2[srNJet][stb][htb][fitkey]['W_NegPdg']['yieldVar']
+      RestPredPosPdgMC = res2[srNJet][stb][htb][fitkey]['Rest_PosPdg']['template'].GetBinContent(1)*res2[srNJet][stb][htb][fitkey]['Rest_PosPdg']['yield']
+      RestPredPosPdgMCVar = res2[srNJet][stb][htb][fitkey]['Rest_PosPdg']['template'].GetBinError(1)**2*res2[srNJet][stb][htb][fitkey]['Rest_PosPdg']['yield']**2 + \
+                            res2[srNJet][stb][htb][fitkey]['Rest_PosPdg']['template'].GetBinContent(1)**2*res2[srNJet][stb][htb][fitkey]['Rest_PosPdg']['yieldVar']
+      RestPredNegPdgMC = res2[srNJet][stb][htb][fitkey]['Rest_NegPdg']['template'].GetBinContent(1)*res2[srNJet][stb][htb][fitkey]['Rest_NegPdg']['yield']
+      RestPredNegPdgMCVar = res2[srNJet][stb][htb][fitkey]['Rest_NegPdg']['template'].GetBinError(1)**2*res2[srNJet][stb][htb][fitkey]['Rest_NegPdg']['yield']**2 + \
+                            res2[srNJet][stb][htb][fitkey]['Rest_NegPdg']['template'].GetBinContent(1)**2*res2[srNJet][stb][htb][fitkey]['Rest_NegPdg']['yieldVar']
 
       totalPredPosPdgMC = ttPredMC/2 + WPredPosPdgMC + RestPredPosPdgMC
       totalPredPosPdgMCVar = ttPredMCVar/4 + WPredPosPdgMCVar + RestPredPosPdgMCVar
