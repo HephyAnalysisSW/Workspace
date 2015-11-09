@@ -6,7 +6,8 @@ from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,v
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v9_Phys14V3_HT400ST200_ForTTJetsUnc import *
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_Spring15_hard import *
-from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_postProcessed import *
+#from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_postProcessed import *
+from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_postProcessed_WPolarization import *
 #from makeTTPrediction import makeTTPrediction
 #from makeWPrediction import makeWPrediction
 from Workspace.HEPHYPythonTools.user import username
@@ -20,8 +21,8 @@ ROOT.TH1F().SetDefaultSumw2()
 lepSel = 'hard'
 
 cWJets  = getChain(WJetsHTToLNu_25ns,histname='')
-cTTJets = getChain(TTJets_LO_25ns,histname='')
-cEWK = getChain([WJetsHTToLNu_25ns,TTJets_LO_25ns,DY_25ns,singleTop_25ns],histname='')
+cTTJets = getChain(TTJets_HTLO_25ns,histname='')
+cEWK = getChain([WJetsHTToLNu_25ns,TTJets_HTLO_25ns,DY_25ns,singleTop_25ns, TTV_25ns],histname='')
 
 #cBkg = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]],histname='')#no QCD
 #cData = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]] , histname='')
@@ -46,7 +47,7 @@ if not os.path.exists(printDir):
 weight_str, weight_err_str = makeWeight(lumi, sampleLumi=3.)
 
 
-prefix = 'singleLeptonic_Spring15_'
+prefix = 'singleLeptonic_Spring15'
 presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&Jet_pt[1]>80"
 btagString = 'nBJetMediumCSV30'
 

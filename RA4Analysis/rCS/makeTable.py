@@ -6,13 +6,13 @@ from rCShelpers import *
 import math
 from Workspace.HEPHYPythonTools.user import username
 from Workspace.RA4Analysis.signalRegions import *
-from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
+#from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
 
 useWcorrection = False
 useTTcorrection = False
 signal = False
 
-prefix = 'singleLeptonic_Spring15_'
+prefix = 'singleLeptonic_Spring15'
 path = '/data/'+username+'/Spring15/25ns/PredictionAN_3.0/' 
 
 res = pickle.load(file(path+prefix+'_estimationResults_pkl_kappa_corrected'))

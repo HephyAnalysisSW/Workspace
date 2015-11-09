@@ -20,11 +20,11 @@ from math import *
 from Workspace.HEPHYPythonTools.user import username
 from LpTemplateFit import LpTemplateFit
 
-preprefix = 'QCDestimation/TupelsFromArtur'
+preprefix = 'QCDestimation/TupelsFromArtur/CB_ID'
 wwwDir = '/afs/hephy.at/user/d/dhandl/www/RunII/Spring15_25ns/'+preprefix+'/'
 picklePath = '/data/'+username+'/results2015/QCDEstimation/'
 presel = 'Lp_singleElectronic_'
-picklePresel = '20151027_QCDestimationLowSR_mvaID_pkl'
+picklePresel = '20151102_QCDestimation_reducedSR_pkl'
 
 if not os.path.exists(wwwDir):
   os.makedirs(wwwDir)
@@ -66,11 +66,11 @@ signalRegion = {(3, 4): {(250, 350): {(500, -1):   {'deltaPhi': 1.0}, #3-4jets Q
                           (450, -1): {(500, -1):   {'deltaPhi': 0.75}}}
 }
 
-signalRegion = {(3, 4): {(250, -1): {(500, -1):   {'deltaPhi': 1.0}}}}
-#                (5, 5): {(250, -1): {(500, -1):   {'deltaPhi': 1.0}}},  #signal regions
-#                (6, 7): {(250, -1): {(500, -1):   {'deltaPhi': 1.0}}}}  #signal regions
-
-btreg = [(0,0)]#, (1,1), (2,2)] #1b and 2b estimates are needed for the btag fit
+#signalRegion = {(3, 4): {(250, -1): {(500, -1):   {'deltaPhi': 0.5}}}, #QCD CR
+#                (4, 5): {(250, -1): {(500, -1):   {'deltaPhi': 0.5}}}, #TTbar CR 1b 
+#                (5, 5): {(250, -1): {(500, -1):   {'deltaPhi': 0.5}}}, #SR 
+#                (6,-1): {(250, -1): {(500, -1):   {'deltaPhi': 0.5}}}} #SR 
+btreg = [(0,0), (1,1), (2,2)] #1b and 2b estimates are needed for the btag fit
 
 #small = True
 small = False
@@ -126,25 +126,47 @@ def getPseudoRCS(small,smallE,large,largeE):
 trigger = "&&(HLT_EleHT350||HLT_MuHT350)"
 filters = "&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFilter_fix&&Flag_HBHENoiseIsoFilter&&Flag_goodVertices&&Flag_eeBadScFilter"
 
-singleElectronVeto = '((Sum$(abs(LepGood_pdgId)==13&&LepGood_pt>=5)==0)&&'\
-                     +'(Sum$(abs(LepGood_pdgId)==11&&LepGood_pt>=10&&LepGood_miniRelIso<0.4&&((abs(LepGood_eta)<0.8&&LepGood_mvaIdPhys14>(-0.16))'\
-                     +'||((abs(LepGood_eta)>0.8&&abs(LepGood_eta)<1.479)&&LepGood_mvaIdPhys14>(-0.65))'\
-                     +'||((abs(LepGood_eta)>1.479&&abs(LepGood_eta)<2.5)&&LepGood_mvaIdPhys14>(-0.74)))&&LepGood_lostHits<=1&&LepGood_convVeto&&LepGood_sip3d<4.0)==1))'
+#e_tight       = "(abs(LepGood_pdgId)==11&&LepGood_pt>=10&&abs(LepGood_eta)<=2.5&&LepGood_miniRelIso<0.1&&LepGood_SPRING15_25ns_v1==4)" 
+#n_tight_e =  "(Sum$("+e_tight+"))"
+#e_veto = "(abs(LepGood_pdgId)==11&&LepGood_pt>=10&&abs(LepGood_eta)<=2.5&&!("+e_tight+"))"
+#n_veto_e ="(Sum$("+e_veto+"))"
 
-singleElectronVetoAnti = '((Sum$(abs(LepGood_pdgId)==13&&LepGood_pt>=5)==0)&&'\
-                         +'(Sum$(abs(LepGood_pdgId)==11&&LepGood_pt>=10&&LepGood_miniRelIso<0.4&&((abs(LepGood_eta)<0.8&&LepGood_mvaIdPhys14>(-0.16))'\
-                         +'||((abs(LepGood_eta)>0.8&&abs(LepGood_eta)<1.479)&&LepGood_mvaIdPhys14>(-0.65))'\
-                         +'||((abs(LepGood_eta)>1.479&&abs(LepGood_eta)<2.5)&&LepGood_mvaIdPhys14>(-0.74))))==1))'
+###OneLep = "("+mu_tight+"+"+e_tight+"==1"+")"
+#OneLep = "("+n_tight_mu+"+"+n_tight_e+"==1)" 
+#OneMu = "("+n_tight_mu+"==1"+")"
+#OneMu_lepveto = "("+n_veto_mu+"==0&&"+n_veto_e+"==0&&"+n_tight_e+"==0"+")"
+#OneE = "("+n_tight_e+"==1"+")"
+#OneE_lepveto = "("+n_veto_e+"==0&&"+n_veto_mu+"==0&&"+n_tight_mu+"==0"+")"
+#lep_hard  = "LepGood_pt[0]>25"
+#OneLep_lepveto = "("+e_veto+"==0&&"+mu_veto+"==0)"
 
-antiSelStr = '((abs(LepGood_pdgId)==11&&LepGood_pt>=25&&abs(LepGood_eta)<0.8&&LepGood_mvaIdPhys14>=(-0.16)&&LepGood_mvaIdPhys14<0.87)||'\
-             +'(abs(LepGood_pdgId)==11&&LepGood_pt>=25&&abs(LepGood_eta)>=0.8&&abs(LepGood_eta)<1.479&&LepGood_mvaIdPhys14>=(-0.65)&&LepGood_mvaIdPhys14<0.60)||'\
-             +'(abs(LepGood_pdgId)==11&&LepGood_pt>=25&&abs(LepGood_eta)>=1.479&&abs(LepGood_eta)<2.5&&LepGood_mvaIdPhys14>=(-0.74)&&LepGood_mvaIdPhys14<0.17))'
+#singleElectronVeto = '((Sum$(abs(LepGood_pdgId)==13&&LepGood_pt>=5)==0)&&'\
+#                     +'(Sum$(abs(LepGood_pdgId)==11&&LepGood_pt>=10&&LepGood_miniRelIso<0.4&&((abs(LepGood_eta)<0.8&&LepGood_mvaIdPhys14>(-0.16))'\
+#                     +'||((abs(LepGood_eta)>0.8&&abs(LepGood_eta)<1.479)&&LepGood_mvaIdPhys14>(-0.65))'\
+#                     +'||((abs(LepGood_eta)>1.479&&abs(LepGood_eta)<2.5)&&LepGood_mvaIdPhys14>(-0.74)))&&LepGood_lostHits<=1&&LepGood_convVeto&&LepGood_sip3d<4.0)==1))'
+#
+#singleElectronVetoAnti = '((Sum$(abs(LepGood_pdgId)==13&&LepGood_pt>=5)==0)&&'\
+#                         +'(Sum$(abs(LepGood_pdgId)==11&&LepGood_pt>=10&&LepGood_miniRelIso<0.4&&((abs(LepGood_eta)<0.8&&LepGood_mvaIdPhys14>(-0.16))'\
+#                         +'||((abs(LepGood_eta)>0.8&&abs(LepGood_eta)<1.479)&&LepGood_mvaIdPhys14>(-0.65))'\
+#                         +'||((abs(LepGood_eta)>1.479&&abs(LepGood_eta)<2.5)&&LepGood_mvaIdPhys14>(-0.74))))==1))'
+#
+#antiSelStr = '((abs(LepGood_pdgId)==11&&LepGood_pt>=25&&abs(LepGood_eta)<0.8&&LepGood_mvaIdPhys14>=(-0.16)&&LepGood_mvaIdPhys14<0.87)||'\
+#             +'(abs(LepGood_pdgId)==11&&LepGood_pt>=25&&abs(LepGood_eta)>=0.8&&abs(LepGood_eta)<1.479&&LepGood_mvaIdPhys14>=(-0.65)&&LepGood_mvaIdPhys14<0.60)||'\
+#             +'(abs(LepGood_pdgId)==11&&LepGood_pt>=25&&abs(LepGood_eta)>=1.479&&abs(LepGood_eta)<2.5&&LepGood_mvaIdPhys14>=(-0.74)&&LepGood_mvaIdPhys14<0.17))'
+#
+#SelStr = '((abs(LepGood_pdgId)==11&&LepGood_pt>=25&&LepGood_miniRelIso<0.1&&LepGood_convVeto&&LepGood_sip3d<4.0&&LepGood_lostHits<=0&&abs(LepGood_eta)<0.8&&LepGood_mvaIdPhys14>=0.87)||'\
+#         +'(abs(LepGood_pdgId)==11&&LepGood_pt>=25&&LepGood_miniRelIso<0.1&&LepGood_convVeto&&LepGood_sip3d<4.0&&LepGood_lostHits<=0&&abs(LepGood_eta)>=0.8&&abs(LepGood_eta)<1.479&&LepGood_mvaIdPhys14>=0.60)||'\
+#         +'(abs(LepGood_pdgId)==11&&LepGood_pt>=25&&LepGood_miniRelIso<0.1&&LepGood_convVeto&&LepGood_sip3d<4.0&&LepGood_lostHits<=0&&abs(LepGood_eta)>=1.479&&abs(LepGood_eta)<2.5&&LepGood_mvaIdPhys14>=0.17))'
 
-SelStr = '((abs(LepGood_pdgId)==11&&LepGood_pt>=25&&LepGood_miniRelIso<0.1&&LepGood_convVeto&&LepGood_sip3d<4.0&&LepGood_lostHits<=0&&abs(LepGood_eta)<0.8&&LepGood_mvaIdPhys14>=0.87)||'\
-         +'(abs(LepGood_pdgId)==11&&LepGood_pt>=25&&LepGood_miniRelIso<0.1&&LepGood_convVeto&&LepGood_sip3d<4.0&&LepGood_lostHits<=0&&abs(LepGood_eta)>=0.8&&abs(LepGood_eta)<1.479&&LepGood_mvaIdPhys14>=0.60)||'\
-         +'(abs(LepGood_pdgId)==11&&LepGood_pt>=25&&LepGood_miniRelIso<0.1&&LepGood_convVeto&&LepGood_sip3d<4.0&&LepGood_lostHits<=0&&abs(LepGood_eta)>=1.479&&abs(LepGood_eta)<2.5&&LepGood_mvaIdPhys14>=0.17))'
+antiSelStr = '(abs(LepGood_pdgId)==11&&LepGood_pt>=10&&abs(LepGood_eta)<=2.5&&LepGood_SPRING15_25ns_v1>=1&&LepGood_SPRING15_25ns_v1<3)'
 
-singleHardElectron = '(Sum$('+antiSelStr+'||'+SelStr+')==1)'
+SelStr = '(abs(LepGood_pdgId)==11&&LepGood_pt>=10&&LepGood_miniRelIso<0.1&&abs(LepGood_eta)<=2.5&&LepGood_SPRING15_25ns_v1>=4)'
+
+singleElectronVeto = '((Sum$(abs(LepGood_pdgId)==13&&LepGood_pt>=10)==0)&&(Sum$(abs(LepGood_pdgId)==11&&LepGood_pt>=10&&abs(LepGood_eta)<=2.5&&!('+SelStr+'))==0))'
+
+singleElectronVetoAnti = '((Sum$(abs(LepGood_pdgId)==13&&LepGood_pt>=10)==0)&&(Sum$(abs(LepGood_pdgId)==11&&LepGood_pt>=10&&abs(LepGood_eta)<=2.5&&!('+antiSelStr+'))==0))'
+
+singleHardElectron = '((Sum$('+antiSelStr+'||'+SelStr+')==1)&&LepGood_pt[0]>=25)'
 
 def stCutQCD(stb):
   if type(stb)==type([]) or type(stb)==type(()):
@@ -165,10 +187,10 @@ def getLp(met,metPhi,e):
   return Lp
 
 #attention only use this string after singleElectronic (sel/antiSel) preselection
-LpStr = '((LepGood_pt/sqrt(LepGood_pt**2+met_pt**2+2*met_pt*LepGood_pt*cos(LepGood_phi-met_phi)))'\
-      +'*((LepGood_pt+met_pt*cos(LepGood_phi-met_phi))/sqrt(LepGood_pt**2+met_pt**2+2*met_pt*LepGood_pt*cos(LepGood_phi-met_phi))))'
+LpStr = '((LepGood_pt[0]/sqrt(LepGood_pt[0]**2+met_pt**2+2*met_pt*LepGood_pt[0]*cos(LepGood_phi[0]-met_phi)))'\
+      +'*((LepGood_pt[0]+met_pt*cos(LepGood_phi[0]-met_phi))/sqrt(LepGood_pt[0]**2+met_pt**2+2*met_pt*LepGood_pt[0]*cos(LepGood_phi[0]-met_phi))))'
 
-dPhiStr = 'acos((LepGood_pt+met_pt*cos(LepGood_phi-met_phi))/sqrt(LepGood_pt**2+met_pt**2+2*met_pt*LepGood_pt*cos(LepGood_phi-met_phi)))'
+dPhiStr = 'acos((LepGood_pt[0]+met_pt*cos(LepGood_phi[0]-met_phi))/sqrt(LepGood_pt[0]**2+met_pt**2+2*met_pt*LepGood_pt[0]*cos(LepGood_phi[0]-met_phi)))'
 
 Bkg = [
        #{'name':'QCD_HT100to200_25ns', 'sample':QCD_HT100to200_25ns, 'legendName':'QCD HT100-200', 'color':ROOT.kCyan+3, 'merge':'QCD'},
@@ -252,6 +274,7 @@ for srNJet in signalRegion:
         antiSelCut = '('+singleElectronVetoAnti+'&&'+singleHardElectron+'&&(Sum$('+antiSelStr+')==1)&&'+stCutQCD(stb)+'&&'+htCut(htb, minPt=30, maxEta=2.4, njCorr=0.)+'&&'+ nBTagCut(btb, minPt=30, maxEta=2.4, minCSVTag=0.890)\
                      +'&&'+nJetCut(srNJet, minPt=30, maxEta=2.4)+'&&'+nJetCut(2, minPt=80, maxEta=2.4)+')'
 
+
         histos['merged_QCD']={}
         histos['merged_EWK']={}
         histos['merged_DATA']={}
@@ -286,6 +309,12 @@ for srNJet in signalRegion:
 #          if sample.has_key('addCut'):
 #            SelCut = '('+SelCut+sample['addCut']+')'
 #            antiSelCut = '('+antiSelCut+sample['addCut']+')'
+#          if sample['chain'].GetLeaf('nLepGood').GetValue()>1: 
+#            print 'ATTENTION: this should not have happened!'
+#            run = sample['chain'].GetLeaf('run').GetValue()
+#            evt = sample['chain'].GetLeaf('evt').GetValue()
+#            lumi = sample['chain'].GetLeaf('lumi').GetValue()
+#            print sample['name'], run, lumi, evt
 
           sample['chain'].Draw(LpStr+'>>'+sample['name']+'_antiSelection','('+str(sample['weight'])+')*xsec*(genWeight)*('+antiSelCut+')')
           sample['chain'].Draw(LpStr+'>>'+sample['name']+'_Selection','('+str(sample['weight'])+')*xsec*(genWeight)*('+SelCut+')')
@@ -466,6 +495,29 @@ for srNJet in signalRegion:
         ROOT.setTDRStyle()
         if not os.path.exists(picklePath):
           os.makedirs(picklePath)
+        pickle.dump(bins, file(picklePath+picklePresel,'w'))
+
+#derive N_QCD(dPhi<x) and N_QCD(dPhi>x)
+for srNJet in signalRegion:
+  for stb in signalRegion[srNJet]:
+    for htb in signalRegion[srNJet][stb]:
+      for btb in btreg:
+        deltaPhiCut = signalRegion[srNJet][stb][htb]['deltaPhi']
+        Fsta = bins[(3,4)][stb][htb][(0,0)]['F_seltoantisel']
+        Fsta_err = bins[(3,4)][stb][htb][(0,0)]['F_seltoantisel_err']
+        Nanti = bins[srNJet][stb][htb][btb]['NDATAAntiSel']
+        Nanti_err = bins[srNJet][stb][htb][btb]['NDATAAntiSel_err']
+        RcsAnti = bins[srNJet][stb][htb][btb]['rCSantiSelectedDATA']['rCS']
+        RcsAnti_err = bins[srNJet][stb][htb][btb]['rCSantiSelectedDATA']['rCSE_pred']
+        NQCD = Fsta * Nanti
+        NQCD_err = sqrt(Fsta_err**2*Nanti**2+Nanti_err**2*Fsta**2)
+        try: NQCD_lowDPhi = NQCD/(RcsAnti+1)
+        except ZeroDivisionError: NQCD_lowDPhi = float('nan') 
+        try: NQCD_lowDPhi_err = NQCD_lowDPhi*sqrt((NQCD_err/NQCD)**2 + (RcsAnti_err/(RcsAnti+1))**2)
+        except ZeroDivisionError: NQCD_lowDPhi_err = float('nan')
+        NQCD_highDPhi = NQCD - NQCD_lowDPhi
+        NQCD_highDPhi_err = sqrt(RcsAnti_err**2*NQCD_lowDPhi**2 + RcsAnti**2*NQCD_lowDPhi_err**2)
+        bins[srNJet][stb][htb][btb].update({'NQCDpred':NQCD, 'NQCDpred_err':NQCD_err, 'NQCDpred_lowdPhi':NQCD_lowDPhi, 'NQCDpred_lowdPhi_err':NQCD_lowDPhi_err, 'NQCDpred_highdPhi':NQCD_highDPhi, 'NQCDpred_highdPhi_err':NQCD_highDPhi_err})
         pickle.dump(bins, file(picklePath+picklePresel,'w'))
 
 #          #Get the event list 'eList' which has all the events satisfying the cut

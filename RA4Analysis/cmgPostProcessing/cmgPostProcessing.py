@@ -9,19 +9,24 @@ from Workspace.HEPHYPythonTools.convertHelpers import compileClass, readVar, pri
 from math import *
 from Workspace.HEPHYPythonTools.user import username
 
+ROOT.gROOT.ProcessLine(".L ../../HEPHYPythonTools/scripts/root/WPolarizationVariation.C+")
+ROOT.gROOT.ProcessLine(".L ../../HEPHYPythonTools/scripts/root/TTbarPolarization.C+")
 ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 
 from Workspace.HEPHYPythonTools.helpers import getChunks
-from Workspace.RA4Analysis.cmgTuples_Spring15_25ns import *
-from Workspace.RA4Analysis.cmgTuples_Spring15_50ns import *
-from Workspace.RA4Analysis.cmgTuples_Data50ns_1l import *
-from Workspace.RA4Analysis.cmgTuples_Data25ns import *
+#from Workspace.RA4Analysis.cmgTuples_Spring15_25ns import *
+#from Workspace.RA4Analysis.cmgTuples_Spring15_50ns import *
+#from Workspace.RA4Analysis.cmgTuples_Data50ns_1l import *
+#from Workspace.RA4Analysis.cmgTuples_Data25ns import *
+from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_fromArtur import *
+from Workspace.RA4Analysis.cmgTuples_data_25ns_fromArtur import *
+
 target_lumi = 3000 #pb-1
 
-defSampleStr = "TTJets_25ns"
+defSampleStr = "TTJets_LO_HT600to800_25ns"
 
-subDir = "postProcessed_Spring15"
+subDir = "postProcessed_Spring15_Polarization_v1"
 
 #branches to be kept for data and MC
 branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert", 
@@ -66,6 +71,8 @@ if options.skim=='HT400':
   skimCond = "Sum$(Jet_pt)>400"
 if options.skim=='HT400ST200':   ##tuples have already ST200 skim
   skimCond = "Sum$(Jet_pt)>400&&(LepGood_pt[0]+met_pt)>200"
+if options.skim=="LHEHT600":
+  skimCond = "lheHTIncoming<600"
 
 ##In case a lepton selection is required, loop only over events where there is one 
 if options.leptonSelection.lower()=='soft':
@@ -73,7 +80,7 @@ if options.leptonSelection.lower()=='soft':
   skimCond += "&&Sum$(LepGood_pt>5&&LepGood_pt<25&&abs(LepGood_eta)<2.4)>=1"
 if options.leptonSelection.lower()=='hard':
   #skimCond += "&&Sum$(LepGood_pt>25&&LepGood_relIso03<0.4&&abs(LepGood_eta)<2.4)>=1"
-  skimCond += "&&Sum$(LepGood_pt>25&&abs(LepGood_eta)<2.4)>=1"
+  skimCond += "&&Sum$(LepGood_pt>25&&abs(LepGood_eta)<2.5)>=1"
 if options.leptonSelection.lower()=='dilep':
   #skimCond += "&&Sum$(LepGood_pt>25&&LepGood_relIso03<0.4&&abs(LepGood_eta)<2.4)>=1"
   skimCond += "&&Sum$(LepGood_pt>15&&abs(LepGood_eta)<2.4)>1"
@@ -104,6 +111,107 @@ def getTreeFromChunk(c, skimCond, iSplit, nSplit):
   del rf
   return t
    
+def getGenWandLepton(c):
+  genPartAll = [getObjDict(c, 'GenPart_', ['pt','eta','phi','mass','pdgId','motherId','motherIndex'], j) for j in range(int(c.GetLeaf('nGenPart').GetValue()))]
+  lepton = filter(lambda l:abs(l['pdgId']) in [11,13,15], genPartAll)
+  if len(lepton)==0:
+    print "no generated lepton found!"
+    p4w=False
+    p4lepton=False
+    return p4w, p4lepton
+  lFromW = filter(lambda w:abs(w['motherId'])==24, lepton)
+  if len(lFromW)==0:
+    print 'no generated W found!'
+    print lepton
+    p4w=False
+    p4lepton=False
+    return p4w, p4lepton
+  elif len(lFromW)>0:
+    if len(lFromW)>1: print 'this should not have happened'
+    if abs(lFromW[0]['motherId'])!=24: print 'this should not have happened'
+    genW = getObjDict(c, 'GenPart_', ['pt','eta','phi','mass','pdgId','motherId','motherIndex'], int(lFromW[0]['motherIndex']))
+    lep = ROOT.TLorentzVector()
+    lep.SetPtEtaPhiM(lFromW[0]['pt'],lFromW[0]['eta'],lFromW[0]['phi'],lFromW[0]['mass'])
+  if abs(genW['pdgId'])!=24: 'this should not have happened'
+  W = ROOT.TLorentzVector()
+  W.SetPtEtaPhiM(genW['pt'],genW['eta'],genW['phi'],genW['mass'])
+  p4lepton = ROOT.LorentzVector(lep.Px(),lep.Py(),lep.Pz(),lep.E())
+  p4w = ROOT.LorentzVector(W.Px(),W.Py(),W.Pz(),W.E())
+  return p4w, p4lepton
+
+def getGenTopWLepton(c):
+  genPartAll = [getObjDict(c, 'GenPart_', ['pt','eta','phi','mass','pdgId','charge','motherId','motherIndex'], j) for j in range(int(c.GetLeaf('nGenPart').GetValue()))]
+  lepton = filter(lambda l:abs(l['pdgId']) in [11,13,15], genPartAll)
+  if len(lepton)==0:
+    p4t=False
+    p4w=False
+    p4lepton=False
+    return p4t, p4w, p4lepton
+  lFromW = filter(lambda w:abs(w['motherId'])==24, lepton)
+  if len(lFromW)>0:
+    if len(lFromW)==1:
+      if abs(lFromW[0]['motherId'])!=24: print '1)this should not have happened'
+      genW = getObjDict(c, 'GenPart_', ['pt','eta','phi','mass','pdgId','charge','motherId','motherIndex'], int(lFromW[0]['motherIndex']))
+      if abs(genW['pdgId'])!=24: '2)this should not have happened'
+      genTop = getObjDict(c, 'GenPart_', ['pt','eta','phi','mass','pdgId','charge','motherId','motherIndex'], int(genW['motherIndex']))
+      lep = ROOT.TLorentzVector()
+      lep.SetPtEtaPhiM(lFromW[0]['pt'],lFromW[0]['eta'],lFromW[0]['phi'],lFromW[0]['mass'])
+    elif len(lFromW)==2:
+      match = False
+      leadLep = getObjDict(c, 'LepGood_', ['pt','eta','phi','mass','pdgId','charge'], 0)
+      for l in lFromW:
+        if leadLep['charge'] == l['charge']:
+          match = True
+          genW = getObjDict(c, 'GenPart_', ['pt','eta','phi','mass','pdgId','charge','motherId','motherIndex'], int(l['motherIndex']))
+          genTop = getObjDict(c, 'GenPart_', ['pt','eta','phi','mass','pdgId','charge','motherId','motherIndex'], int(genW['motherIndex']))
+          lep = ROOT.TLorentzVector()
+          lep.SetPtEtaPhiM(l['pt'],l['eta'],l['phi'],l['mass'])
+      if not match:
+        print 'No match at all!'
+        p4t=False
+        p4w=False
+        p4lepton=False
+        return p4t, p4w, p4lepton
+  elif len(lFromW)>2 or len(lFromW)==0:
+    print "8) this should not have happened"
+    p4t=False
+    p4w=False
+    p4lepton=False
+    return p4t, p4w, p4lepton
+  t = ROOT.TLorentzVector()
+  W = ROOT.TLorentzVector()
+  W.SetPtEtaPhiM(genW['pt'],genW['eta'],genW['phi'],genW['mass'])
+  t.SetPtEtaPhiM(genTop['pt'],genTop['eta'],genTop['phi'],genTop['mass'])
+  p4lepton = ROOT.LorentzVector(lep.Px(),lep.Py(),lep.Pz(),lep.E())
+  p4w = ROOT.LorentzVector(W.Px(),W.Py(),W.Pz(),W.E())
+  p4t = ROOT.LorentzVector(t.Px(),t.Py(),t.Pz(),t.E())
+  return p4t, p4w, p4lepton
+
+def cleanJetsAndLeptons(jets,leptons,deltaR,arbitration):
+    dr2 = deltaR**2
+    goodjet = [ True for j in jets ]
+    goodlep = [ True for l in leptons ]
+    for il, l in enumerate(leptons):
+        ibest, d2m = -1, dr2
+        for i,j in enumerate(jets):
+            d2i = deltaR2(l.eta(),l.phi(), j.eta(),j.phi())
+            if d2i < dr2:
+                choice = arbitration(j,l)
+                if choice == j:
+                   # if the two match, and we prefer the jet, then drop the lepton and be done
+                   goodlep[il] = False
+                   break
+                elif choice == (j,l) or choice == (l,j):
+                   # asked to keep both, so we don't consider this match
+                   continue
+            if d2i < d2m:
+                ibest, d2m = i, d2i
+        # this lepton has been killed by a jet, then we clean the jet that best matches it
+        if not goodlep[il]: continue
+        if ibest != -1: goodjet[ibest] = False
+    return ( [ j for (i ,j) in enumerate(jets)    if goodjet[i ] == True ],
+             [ l for (il,l) in enumerate(leptons) if goodlep[il] == True ] )
+
 exec('allSamples=['+options.allsamples+']')
 for isample, sample in enumerate(allSamples):
   #chunks, sumWeight = getChunks(sample, options.inputTreeName)
@@ -124,7 +232,9 @@ for isample, sample in enumerate(allSamples):
     lumiScaleFactor=1
     branchKeepStrings = branchKeepStrings_DATAMC + branchKeepStrings_DATA 
   else:
-    lumiScaleFactor = xsec[sample['dbsName']]*target_lumi/float(sumWeight)
+    if "TTJets" in sample['dbsName']: lumiScaleFactor = xsec[sample['dbsName']]*target_lumi/float(sumWeight)
+    else: lumiScaleFactor = target_lumi/float(sumWeight)
+    #lumiScaleFactor = target_lumi/float(sumWeight)
     branchKeepStrings = branchKeepStrings_DATAMC + branchKeepStrings_MC
 
   readVariables = ['met_pt/F', 'met_phi/F']
@@ -132,16 +242,17 @@ for isample, sample in enumerate(allSamples):
   aliases = [ "met:met_pt", "metPhi:met_phi"]
 
   readVectors = [\
-    {'prefix':'LepGood',  'nMax':8, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I', 'relIso03/F', 'tightId/I', 'miniRelIso/F','mass/F','sip3d/F','mediumMuonId/I', 'mvaIdPhys14/F','lostHits/I', 'convVeto/I']},
+    {'prefix':'LepGood', 'nMax':8, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I', 'relIso03/F','SPRING15_25ns_v1/I' ,'tightId/I', 'miniRelIso/F','mass/F','sip3d/F','mediumMuonId/I', 'mvaIdPhys14/F','mvaIdSpring15/F','lostHits/I', 'convVeto/I', 'charge/I']},
+    #{'prefix':'LepGood',  'nMax':8, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I', 'relIso03/F', 'tightId/I', 'miniRelIso/F','mass/F','sip3d/F','mediumMuonId/I', 'mvaIdPhys14/F','lostHits/I', 'convVeto/I']},
     {'prefix':'Jet',  'nMax':100, 'vars':['pt/F', 'eta/F', 'phi/F', 'id/I','btagCSV/F', 'btagCMVA/F']},
   ]
   if not sample['isData']: 
-    newVariables.extend(['weight_XSecTTBar1p1/F','weight_XSecTTBar0p9/F'])
+    newVariables.extend(['weight_XSecTTBar1p1/F','weight_XSecTTBar0p9/F','weight_WPolPlus10/F', 'weight_WPolMinus10/F', 'weight_TTPolPlus5/F', 'weight_TTPolMinus5/F'])
     aliases.extend(['genMet:met_genPt', 'genMetPhi:met_genPhi'])
     #readVectors[1]['vars'].extend('partonId/I')
   if options.leptonSelection.lower() in ['soft', 'hard']:
     newVariables.extend( ['nLooseSoftLeptons/I', 'nLooseHardLeptons/I', 'nTightSoftLeptons/I', 'nTightHardLeptons/I'] )
-    newVariables.extend( ['deltaPhi_Wl/F','nBJetMediumCSV30/I','nJet30/I','htJet30j/F','st/F', 'leptonPt/F','leptonMiniRelIso/F','leptonRelIso03/F' ,'leptonEta/F', 'leptonPhi/F', 'leptonPdg/I/0', 'leptonInd/I/-1', 'leptonMass/F', 'singleMuonic/I', 'singleElectronic/I', 'singleLeptonic/I' ]) #, 'mt2w/F'] )
+    newVariables.extend( ['deltaPhi_Wl/F','nBJetMediumCSV30/I','nJet30/I','htJet30j/F','st/F', 'leptonPt/F','leptonMiniRelIso/F','leptonRelIso03/F' ,'leptonEta/F', 'leptonPhi/F', 'leptonSPRING15_25ns_v1/I/-2', 'leptonPdg/I/0', 'leptonInd/I/-1', 'leptonMass/F', 'singleMuonic/I', 'singleElectronic/I', 'singleLeptonic/I' ]) #, 'mt2w/F'] )
   newVars = [readVar(v, allowRenaming=False, isWritten = True, isRead=False) for v in newVariables]
 
   
@@ -197,7 +308,11 @@ for isample, sample in enumerate(allSamples):
         r.init()
         t.GetEntry(i)
         genWeight = 1 if sample['isData'] else t.GetLeaf('genWeight').GetValue()
-        s.weight = lumiScaleFactor*genWeight
+        xsectemp = 1 if sample['isData'] else t.GetLeaf('xsec').GetValue()
+        if "TTJets" in sample["name"] : 
+          s.weight = lumiScaleFactor*genWeight
+        else:
+          s.weight = lumiScaleFactor*genWeight*xsectemp
 
         if not sample['isData']:
           if "TTJets" in sample['dbsName']:
@@ -227,7 +342,7 @@ for isample, sample in enumerate(allSamples):
           s.nTightSoftLeptons = len(tightSoftLepInd)
           s.nTightHardLeptons = len(tightHardLepInd)
           #print "tightHardLepInd:" , tightHardLepInd
-          vars = ['pt', 'eta', 'phi', 'miniRelIso','relIso03', 'pdgId']
+          vars = ['pt', 'eta', 'phi', 'miniRelIso','relIso03', 'pdgId', 'SPRING15_25ns_v1']
           allLeptons = [getObjDict(t, 'LepGood_', vars, i) for i in looseLepInd]
           looseSoftLep = [getObjDict(t, 'LepGood_', vars, i) for i in looseSoftLepInd] 
           looseHardLep = [getObjDict(t, 'LepGood_', vars, i) for i in looseHardLepInd]
@@ -248,12 +363,55 @@ for isample, sample in enumerate(allSamples):
             s.leptonPhi = r.LepGood_phi[leadingLepInd]
             s.leptonPdg = r.LepGood_pdgId[leadingLepInd]
             s.leptonMass= r.LepGood_mass[leadingLepInd]
+            s.leptonSPRING15_25ns_v1= r.LepGood_SPRING15_25ns_v1[leadingLepInd]
             s.st = r.met_pt + s.leptonPt
           s.singleLeptonic = s.nTightHardLeptons==1
           if s.singleLeptonic:
             s.singleMuonic      =  abs(s.leptonPdg)==13
             s.singleElectronic  =  abs(s.leptonPdg)==11
+            if "TTJets" in sample["name"]: #W polarization in TTbar
+              p4t, p4w, p4lepton = getGenTopWLepton(t)
+              if not p4t and not p4w and not p4lepton:
+                s.weight = s.weight
+                s.weight_WPolPlus10 = s.weight
+                s.weight_WPolMinus10 = s.weight
+                s.weight_TTPolPlus5 = s.weight
+                s.weight_TTPolMinus5 = s.weight
+              else:
+                cosTheta = ROOT.ttbarPolarizationAngle(p4t, p4w, p4lepton)
+                s.weight = s.weight
+                s.weight_WPolPlus10 = s.weight
+                s.weight_WPolMinus10 = s.weight
+                s.weight_TTPolPlus5 = s.weight * (1. + 0.05*(1.-cosTheta)**2) * 1./(1.+0.05*2./3.) * (1./1.0323239521945559)
+                s.weight_TTPolMinus5 = s.weight * (1. - 0.05*(1.-cosTheta)**2) * 1./(1.-0.05*2./3.) * (1.034553190276963956)
+            elif "WJets" in sample["name"] and not "TTW" in sample["name"]: #W polarization in W+jets
+              p4w, p4lepton = getGenWandLepton(t)
+              if not p4w and not p4lepton: 
+                s.weight = s.weight
+                s.weight_WPolPlus10 = s.weight
+                s.weight_WPolMinus10 = s.weight
+                s.weight_TTPolPlus5 = s.weight
+                s.weight_TTPolMinus5 = s.weight
+              else:
+                cosTheta = ROOT.WjetPolarizationAngle(p4w, p4lepton)
+                s.weight = s.weight
+                s.weight_WPolPlus10 = s.weight * (1. + 0.1*(1.-cosTheta)**2) * 1./(1.+0.1*2./3.) * (1./1.04923678332724659) 
+                s.weight_WPolMinus10 = s.weight * (1. - 0.1*(1.-cosTheta)**2) * 1./(1.-0.1*2./3.) * (1.05627060952003952)
+                s.weight_TTPolPlus5 = s.weight
+                s.weight_TTPolMinus5 = s.weight 
+            else:
+              s.weight = s.weight
+              s.weight_WPolPlus10 = s.weight
+              s.weight_WPolMinus10 = s.weight
+              s.weight_TTPolPlus5 = s.weight
+              s.weight_TTPolMinus5 = s.weight
           else:
+            s.weight = s.weight
+            s.weight_WPolPlus10 = s.weight
+            s.weight_WPolMinus10 = s.weight
+            s.weight_TTPolPlus5 = s.weight
+            s.weight_TTPolMinus5 = s.weight
+
             s.singleMuonic      = False 
             s.singleElectronic  = False 
 
