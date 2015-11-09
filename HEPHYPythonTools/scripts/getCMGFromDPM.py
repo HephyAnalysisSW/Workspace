@@ -8,10 +8,11 @@ from optparse import OptionParser
 parser = OptionParser()
 parser.add_option("--source", dest="source", default="", type="string", action="store", help="source directory in users dpm folder")
 parser.add_option("--usernameDPM", dest="usernameDPM", default="schoef", type="string", action="store", help="username on DPM")
-parser.add_option("--usernameNFS", dest="usernameNFS", default="rschoefbeck", type="string", action="store", help="username on NFS")
+#parser.add_option("--usernameNFS", dest="usernameNFS", default="rschoefbeck", type="string", action="store", help="username on NFS")
 parser.add_option("--treeFilename", dest="treeFilename", default="tree_", type="string", action="store", help="tree filename")
 parser.add_option("--logFilename", dest="logFilename", default="output.log_", type="string", action="store", help="log file name")
-parser.add_option("--targetDir", dest="targetDir", default=".", type="string", action="store", help="target directory in users NFS folder")
+parser.add_option("--targetSubDir", dest="targetSubDir", default=".", type="string", action="store", help="target directory in users NFS folder")
+parser.add_option("--targetBaseDir", dest="targetBaseDir", default="/data", type="string", action="store", help="base directory")
 parser.add_option("--dpmDir", dest="dpmDir", default="/dpm/oeaw.ac.at/home/cms/store/user/", type="string", action="store", help="default dpm string /dpm/oeaw.ac.at/home/cms/store/user/")
 parser.add_option("--overwrite", dest="overwrite", action="store_true", default=False, help="Overwrite chunks?") 
 parser.add_option("--verbose", dest="verbose", action="store_true", default=False, help="verbose") 
@@ -49,7 +50,8 @@ def isLogFilename(fname):
 def getAbsDPMPath(relpath):
   return '/'.join([options.dpmDir,options.usernameDPM,relpath])
 def getAbsNFSPath(relpath):
-  return '/'.join(['/data',options.usernameNFS,relpath])
+#  return '/'.join([options.targetBaseDir,options.usernameNFS,relpath])
+  return '/'.join([options.targetBaseDir.rstrip('/'),relpath])
 
 def ls(relpath):
   abspath = getAbsDPMPath(relpath) 
@@ -91,7 +93,7 @@ def walkPath(relpath):
   res=ls(relpath)
   if isCMGOutputDirectory(res):
     if options.verbose:print "Found CMG dir: %s"%relpath
-    print ' '.join(['getCMGFromDPM.py', '--usernameDPM='+options.usernameDPM, '--target='+suggestTargetDir(relpath), '--usernameNFS='+options.usernameNFS, '--source='+relpath ])
+    print ' '.join(['getCMGFromDPM.py', '--usernameDPM='+options.usernameDPM, '--targetBaseDir'+options.targetBaseDir, '--targetSubDir='+suggestTargetDir(relpath), '--source='+relpath ])
   else:
     dirs = getDirs(res)
     if len(dirs)>0:
@@ -128,8 +130,8 @@ else:
   print "Now working through %i pairs of log- and tree files."%len(pairs)
 
   for n, [logFile, treeFile] in pairs.iteritems():
-    sdir=options.targetDir.rstrip('/').split('/')[-1]
-    chunkDir = getAbsNFSPath(options.targetDir).rstrip('/')+'/'+sdir+'_Chunk_'+str(n)
+    sdir=options.targetSubDir.rstrip('/').split('/')[-1]
+    chunkDir = getAbsNFSPath(options.targetSubDir).rstrip('/')+'/'+sdir+'_Chunk_'+str(n)
     if os.path.exists(chunkDir):
       if options.overwrite:
         shutil.rmtree(chunkDir)
