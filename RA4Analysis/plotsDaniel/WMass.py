@@ -1,13 +1,19 @@
 import ROOT
 import pickle
 from Workspace.HEPHYPythonTools.helpers import *# getChain, getPlotFromChain, getYieldFromChain
-from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName, nBTagBinName, varBinName
+from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName, nBTagBinName, varBinName, varBin, UncertaintyDivision
+
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
 from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT500ST250_postProcessed_fromArthur import *
+from rCShelpers import *
 
+from Workspace.RA4Analysis.signalRegions import *
 
 from math import sqrt, pi, cosh
 from array import array
+
+ROOT.gROOT.LoadMacro('../../HEPHYPythonTools/scripts/root/tdrstyle.C')
+ROOT.setTDRStyle()
 
 def filterParticles(l, values, attribute):
   for a in l:
@@ -108,56 +114,147 @@ Whists = {}
 
 newpresel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&st>250&&nJet30>=2&&htJet30j>500&&Jet_pt[1]>80"
 
-stb = (250,-1)
-htb = (500,-1)
-njb = (3,-1)
-btreg = (0,0)
+path = '/afs/hephy.at/user/d/dspitzbart/www/Spring15/deltaPhi_vs_Wmass/'
 
-cname, cut = nameAndCut(stb,htb,njb, btb=btreg ,presel=newpresel)
-dPhiStr = 'deltaPhi_Wl'
-WJETS.Draw('>>eList',cut)
-elist = ROOT.gDirectory.Get("eList")
-number_events = elist.GetN()
-
-print 'Will loop over',number_events, 'events, patience please'
-
-WmassHist = ROOT.TH1F('Whist_lowMass','low W mass',100,0,1000)
-Whist_lowMass = ROOT.TH1F('Whist_lowMass','low W mass',16,0,3.2)
-Whist_highMass = ROOT.TH1F('Whist_lowMass','low W mass',16,0,3.2)
-Whist_lowMass.SetLineColor(ROOT.kBlue)
-Whist_highMass.SetLineColor(ROOT.kRed)
-
-for stb, dPhiCut in streg:
-  Whists[stb] = {}
-  for i_htb, htb in enumerate(htreg):
-    Whists[stb][htb] = {}
-    totalL = ROOT.TLegend(0.6,0.6,0.95,0.93)
-    totalL.SetFillColor(ROOT.kWhite)
-    totalL.SetShadowColor(ROOT.kWhite)
-    totalL.SetBorderSize(1)
-    for i_njb, njb in enumerate(njreg):
-      print 'Processing njet',njb
-      cname, cut = nameAndCut(stb,htb,njb, btb=btreg ,presel=presel)
+if not os.path.exists(path):
+  os.makedirs(path)
 
 
-for i in range(number_events):
-  if i>0 and (i%10000)==0: print "Filled ",i
-  WJETS.GetEntry(elist.GetEntry(i))
-  weight = getVarValue(WJETS,"weight")
-  deltaPhi = WJETS.GetLeaf(dPhiStr).GetValue()
-  WMass = getWMass(WJETS)
-  #print WMass
-  WmassHist.Fill(WMass,weight)
-  if WMass>100.:
-    Whist_highMass.Fill(deltaPhi,weight)
-  else:
-    Whist_lowMass.Fill(deltaPhi,weight)
 
-highMassYield = Whist_highMass.Integral()
-lowMassYield  = Whist_lowMass.Integral()
+#
+#stb = (250,-1)
+#htb = (500,-1)
+#njb = (3,-1)
+#btreg = (0,0)
+#
+#cname, cut = nameAndCut(stb,htb,njb, btb=btreg ,presel=newpresel)
+#dPhiStr = 'deltaPhi_Wl'
+#WJETS.Draw('>>eList',cut)
+#elist = ROOT.gDirectory.Get("eList")
+#number_events = elist.GetN()
+#
+#print 'Will loop over',number_events, 'events, patience please'
+#
+#WmassHist = ROOT.TH1F('Whist_lowMass','low W mass',100,0,1000)
+#Whist_lowMass = ROOT.TH1F('Whist_lowMass','low W mass',16,0,3.2)
+#Whist_highMass = ROOT.TH1F('Whist_lowMass','low W mass',16,0,3.2)
+#Whist_lowMass.SetLineColor(ROOT.kBlue)
+#Whist_highMass.SetLineColor(ROOT.kRed)
 
-Whist_lowMass.Scale(1/Whist_lowMass.Integral())
-Whist_highMass.Scale(1/Whist_highMass.Integral())
+W_lowMass = {}
+W_highMass ={}
+signalRegions = signalRegion3fb
+
+for srNJet in sorted(signalRegions):
+  W_lowMass[srNJet] = {}
+  W_highMass[srNJet] ={}
+  for stb in sorted(signalRegions[srNJet]):
+    W_lowMass[srNJet][stb] = {}
+    W_highMass[srNJet][stb] ={}
+    for htb in sorted(signalRegions[srNJet][stb]):
+      print
+      print '#############################################'
+      print 'bin: \t njet \t\t LT \t\t HT'
+      if len(str(srNJet))<7:
+        print '\t',srNJet,'\t\t',stb,'\t',htb
+      else:
+        print '\t',srNJet,'\t',stb,'\t',htb
+      print '#############################################'
+      print
+      cname, cut = nameAndCut(stb,htb,srNJet, btb=(0,0) ,presel=newpresel)
+      W_lowMass[srNJet][stb][htb] = {}
+      W_highMass[srNJet][stb][htb] = {}
+      #W_lowMass[srNJet][stb][htb] = {'hist': ROOT.TH1F('Whist_lowMass'+cname,'low W mass',16,0,3.2)}
+      #W_highMass[srNJet][stb][htb] = {'hist':ROOT.TH1F('Whist_highMass'+cname,'high W mass',16,0,3.2)}
+      #W_lowMass[srNJet][stb][htb]['hist'].SetLineColor(ROOT.kBlue)
+      #W_highMass[srNJet][stb][htb]['hist'].SetLineColor(ROOT.kRed)
+      #W_lowMass[srNJet][stb][htb]['hist'].SetMarkerStyle(0)
+      #W_highMass[srNJet][stb][htb]['hist'].SetMarkerStyle(0)
+      #W_lowMass[srNJet][stb][htb]['hist'].Sumw2()
+      #W_highMass[srNJet][stb][htb]['hist'].Sumw2()
+      #
+      #WJETS.Draw('deltaPhi_Wl>>Whist_lowMass'+cname,'weight*('+cut+'&&genPartAll_mass<100&&abs(genPartAll_pdgId)==24&&abs(genPartAll_motherId)!=24)')
+      #WJETS.Draw('deltaPhi_Wl>>Whist_highMass'+cname,'weight*('+cut+'&&genPartAll_mass>=100&&abs(genPartAll_pdgId)==24&&abs(genPartAll_motherId)!=24)')
+      #
+      #highMassHighDPhiYield = 0.
+      #lowMassHighDPhiYield = 0.
+      #for i in range(6,17):
+      #  highMassHighDPhiYield += W_highMass[srNJet][stb][htb]['hist'].GetBinContent(i)
+      #  lowMassHighDPhiYield += W_lowMass[srNJet][stb][htb]['hist'].GetBinContent(i)
+      #
+      #W_lowMass[srNJet][stb][htb]['yield'] = W_lowMass[srNJet][stb][htb]['hist'].Integral()
+      #W_highMass[srNJet][stb][htb]['yield'] = W_highMass[srNJet][stb][htb]['hist'].Integral()
+
+      #W_lowMass[srNJet][stb][htb]['hist'].Scale(1/W_lowMass[srNJet][stb][htb]['hist'].Integral())
+      #W_highMass[srNJet][stb][htb]['hist'].Scale(1/W_highMass[srNJet][stb][htb]['hist'].Integral())
+      #
+      #can = ROOT.TCanvas('c','c',700,700)
+      #can.SetLogy()
+      #
+      #totalL = ROOT.TLegend(0.65,0.82,0.98,0.95)
+      #totalL.SetFillColor(ROOT.kWhite)
+      #totalL.SetShadowColor(ROOT.kWhite)
+      #totalL.SetBorderSize(1)
+      #totalL.AddEntry(W_lowMass[srNJet][stb][htb]['hist'])
+      #totalL.AddEntry(W_highMass[srNJet][stb][htb]['hist'])
+      #
+      #W_lowMass[srNJet][stb][htb]['hist'].GetXaxis().SetTitle('#Delta#Phi (W,l)')
+      #W_lowMass[srNJet][stb][htb]['hist'].GetYaxis().SetTitle('fraction')
+      #
+      #latex1 = ROOT.TLatex()
+      #latex1.SetNDC()
+      #latex1.SetTextSize(0.04)
+      #latex1.SetTextAlign(11)
+      #
+      #W_lowMass[srNJet][stb][htb]['hist'].Draw('e hist')
+      #W_highMass[srNJet][stb][htb]['hist'].Draw('e hist same')
+      #totalL.Draw()
+      #latex1.DrawLatex(0.35,0.92,'h/l:'+str(round(W_highMass[srNJet][stb][htb]['yield']/W_lowMass[srNJet][stb][htb]['yield'],2)))
+      #latex1.DrawLatex(0.35,0.87,'h+#Delta#Phi>1 y:'+str(round(highMassHighDPhiYield,2)))
+      #latex1.DrawLatex(0.35,0.82,'l+#Delta#Phi>1 y:'+str(round(lowMassHighDPhiYield,2)))
+      #can.Print(path+cname+'WmassSplit100.png')
+      #can.Print(path+cname+'WmassSplit100.root')
+      deltaPhi=signalRegions[srNJet][stb][htb]['deltaPhi']
+      W_lowMass[srNJet][stb][htb]['rcs_total'] = getRCS(WJETS, cut, deltaPhi)
+      W_lowMass[srNJet][stb][htb]['yield_totalHighDPhi'] = getYieldFromChain(WJETS, cutString=cut+'&&deltaPhi_Wl>='+str(deltaPhi))
+      W_lowMass[srNJet][stb][htb]['mass_ratio'] = getRCS(WJETS, cut+'&&abs(genPartAll_pdgId)==24&&abs(genPartAll_motherId)!=24', 100, cutVar='genPartAll_mass', varMax=1000000)
+      W_lowMass[srNJet][stb][htb]['rcs'] = getRCS(WJETS, cut+'&&genPartAll_mass<100&&abs(genPartAll_pdgId)==24&&abs(genPartAll_motherId)!=24',deltaPhi)
+      W_lowMass[srNJet][stb][htb]['yield_highDPhi'] = getYieldFromChain(WJETS, cutString=cut+'&&genPartAll_mass<100&&abs(genPartAll_pdgId)==24&&abs(genPartAll_motherId)!=24&&deltaPhi_Wl>='+str(deltaPhi))
+      W_lowMass[srNJet][stb][htb]['yield_highDPhi_Var'] = getYieldFromChain(WJETS, cutString=cut+'&&genPartAll_mass<100&&abs(genPartAll_pdgId)==24&&abs(genPartAll_motherId)!=24&&deltaPhi_Wl>='+str(deltaPhi), weight = 'weight**2')
+
+      W_highMass[srNJet][stb][htb]['rcs'] = getRCS(WJETS, cut+'&&genPartAll_mass>=100&&abs(genPartAll_pdgId)==24&&abs(genPartAll_motherId)!=24',deltaPhi)
+      W_highMass[srNJet][stb][htb]['yield_highDPhi'] = getYieldFromChain(WJETS, cutString=cut+'&&genPartAll_mass>=100&&abs(genPartAll_pdgId)==24&&abs(genPartAll_motherId)!=24&&deltaPhi_Wl>='+str(deltaPhi))
+      W_highMass[srNJet][stb][htb]['yield_highDPhi_Var'] = getYieldFromChain(WJETS, cutString=cut+'&&genPartAll_mass>=100&&abs(genPartAll_pdgId)==24&&abs(genPartAll_motherId)!=24&&deltaPhi_Wl>='+str(deltaPhi), weight = 'weight**2')
+      
+      print 'Yield highDPhi total', round(W_lowMass[srNJet][stb][htb]['yield_totalHighDPhi'],2), round(W_lowMass[srNJet][stb][htb]['yield_highDPhi']+W_highMass[srNJet][stb][htb]['yield_highDPhi'],2)
+      
+
+print "Results"
+print
+print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrr|rrr|rrr|rrr|rrr|}\\hline'
+print ' \\njet & \ST & \HT     &\multicolumn{9}{c|}{$R_{CS}$} &\multicolumn{6}{c|}{yield $\Delta\Phi\geq x$} &\multicolumn{3}{c|}{ratio}\\\%\hline'
+print ' & $[$GeV$]$ &$[$GeV$]$ & \multicolumn{3}{c}{$m_{W}<100$} & \multicolumn{3}{c}{$m_{W}\geq100$} & \multicolumn{3|}{c}{total} & \multicolumn{3}{c}{$m_{W}<100$} & \multicolumn{3}{c|}{$m_{W}\geq100$} & \multicolumn{3}{c|}{$m_{W}\geq100 / m_{W}<100$}\\\ '
+secondLine = False
+for srNJet in sorted(signalRegions):
+  print '\\hline'
+  if secondLine: print '\\hline'
+  secondLine = True
+  print '\multirow{'+str(rowsNJet[srNJet]['n'])+'}{*}{\\begin{sideways}$'+varBin(srNJet)+'$\end{sideways}}'
+  for stb in sorted(signalRegions[srNJet]):
+    print '&\multirow{'+str(rowsSt[srNJet][stb]['n'])+'}{*}{$'+varBin(stb)+'$}'
+    first = True
+    for htb in sorted(signalRegions[srNJet][stb]):
+      if not first: print '&'
+      first = False
+      print '&$'+varBin(htb)+'$'
+      print ' & '+getNumString(W_lowMass[srNJet][stb][htb]['rcs']['rCS'], W_lowMass[srNJet][stb][htb]['rcs']['rCSE_sim'],3)\
+          + ' & '+getNumString(W_highMass[srNJet][stb][htb]['rcs']['rCS'], W_highMass[srNJet][stb][htb]['rcs']['rCSE_sim'],3)\
+          + ' & '+getNumString(W_lowMass[srNJet][stb][htb]['rcs_total']['rCS'], W_lowMass[srNJet][stb][htb]['rcs_total']['rCSE_sim'],3)\
+          + ' & '+getNumString(W_lowMass[srNJet][stb][htb]['yield_highDPhi'], sqrt(W_lowMass[srNJet][stb][htb]['yield_highDPhi_Var']))\
+          + ' & '+getNumString(W_highMass[srNJet][stb][htb]['yield_highDPhi'], sqrt(W_highMass[srNJet][stb][htb]['yield_highDPhi_Var']))\
+          + ' & '+getNumString(W_lowMass[srNJet][stb][htb]['massRatio']['rCS'], sqrt(W_lowMass[srNJet][stb][htb]['massRatio']['rCSE_sim']))+'\\\\ '
+    if htb[1] == -1 : print '\\cline{2-21}'
+print '\\hline\end{tabular}}\end{center}\caption{\Rcs values of different masses of W bosons, W+Jets background, 3$fb^{-1}$}\label{tab:0b_Wmass}\end{table}'
 
 
 #for stb, dPhiCut in streg:

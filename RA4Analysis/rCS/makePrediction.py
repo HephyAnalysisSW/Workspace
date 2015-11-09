@@ -9,7 +9,7 @@ from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,v
 #from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_postProcessed import *
 #from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_postProcessed_fromArtur import *
 
-from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT400ST200_postProcessed_btagWeight import *
+from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT500ST250_postProcessed_btagWeight import *
 from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT500ST250_postProcessed_fromArthur import *
 
 
@@ -29,33 +29,34 @@ cWJets  = getChain(WJetsHT_25ns_btagweight,histname='')
 cTTJets = getChain(TTJets_LO_25ns_btagweight,histname='')
 cRest = getChain([singleTop_25ns, DY_25ns, TTV_25ns],histname='')#no QCD
 cBkg =  getChain([WJetsHT_25ns_btagweight, TTJets_LO_25ns_btagweight, singleTop_25ns, DY_25ns, TTV_25ns], histname='')#no QCD
-cData = getChain([WJetsHT_25ns_btagweight, TTJets_LO_25ns_btagweight, singleTop_25ns, DY_25ns, TTV_25ns], histname='')
-#cData = getChain([SingleMuon_Run2015D, SingleElectron_Run2015D], histname='')
+#cData = getChain([WJetsHT_25ns_btagweight, TTJets_LO_25ns_btagweight, singleTop_25ns, DY_25ns, TTV_25ns], histname='')
+cData = getChain([SingleMuon_Run2015D, SingleElectron_Run2015D], histname='')
 
 #cBkg = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]],histname='')#no QCD
 #cData = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]] , histname='')
 #cData = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]],  ttJets[lepSel] , histname='')#no QCD , ##to calculate signal contamination
 #cData = cBkg
 
-#signalRegions = signalRegion3fb
-signalRegions = signalRegionCRonly
+signalRegions = signalRegion3fb
+#signalRegions = signalRegionCRonly
 
 
 small = False
 if small: signalRegions = smallRegion
 
 #DEFINE LUMI AND PLOTDIR
-lumi = 3.
+lumi = 1.26
 sampleLumi = 3.
 debugReweighting = False
 
-printDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/25ns/templateFit_bweightTemplate_MC_reducedSR_lep_higherLumi/'
-pickleDir = '/data/'+username+'/Results2015/Prediction_bweightTemplate_MC_reducedSR_lep_'+str(lumi)+'/'
+printDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/25ns/templateFit_bweightSFTemplate_Data_fullSR_lep_'+str(lumi)+'/'
+pickleDir = '/data/'+username+'/Results2015/Prediction_bweightSFTemplate_Data_fullSR_lep_'+str(lumi)+'/'
 
-isData = False
-QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151027_QCDestimation_firstTry_pkl'
-#QCDestimate = pickle.load(file(QCDpickle))
-QCDestimate=False
+isData = True
+#QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151027_QCDestimation_firstTry_pkl'
+QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151106_QCDestimation_pkl'
+QCDestimate = pickle.load(file(QCDpickle))
+#QCDestimate=False
 
 if not os.path.exists(pickleDir):
   os.makedirs(pickleDir)
@@ -82,20 +83,20 @@ prefix = 'singleLeptonic_Spring15_'
 #presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&Jet_pt[1]>80"
 #presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&Jet_pt[1]>80&&st>250&&nJet30>2&&htJet30j>500"#&&nBJetMediumCSV30==0"
 #filters = "&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFilter&&Flag_goodVertices&&Flag_eeBadScFilter&&Flag_EcalDeadCellTriggerPrimitiveFilter"
-presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&Jet_pt[1]>80&&st>250&&nJet30>2&&htJet30j>500"#&&nBJetMediumCSV30==0"
-filters = "&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFilter&&Flag_goodVertices&&Flag_eeBadScFilter"#&&Flag_EcalDeadCellTriggerPrimitiveFilter" #strange filter settings!!
-#presel += '&&singleMuonic'
-presel += filters
+#presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&Jet_pt[1]>80&&st>250&&nJet30>2&&htJet30j>500"#&&nBJetMediumCSV30==0"
+#filters = "&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFilter&&Flag_goodVertices&&Flag_eeBadScFilter"#&&Flag_EcalDeadCellTriggerPrimitiveFilter" #strange filter settings!!
 
-#triggers = "&&(HLT_EleHT350||HLT_MuHT350)"
-#presel += triggers
+triggers = "(HLT_EleHT350||HLT_MuHT350)"
+filters = "Flag_goodVertices && Flag_HBHENoiseFilter_fix && Flag_CSCTightHaloFilter && Flag_eeBadScFilter && Flag_HBHENoiseIsoFilter"
+presel = "((!isData&&singleLeptonic)||(isData&&"+triggers+"&&((muonDataSet&&singleMuonic)||(eleDataSet&&singleElectronic))&&"+filters+"))"
+presel += "&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&Jet_pt[1]>80&&st>250&&nJet30>2&&htJet30j>500"
 
 
 btagString = 'nBJetMediumCSV30'
-useBTagWeights=True #True for weighted fake data, false for data
+useBTagWeights=False #True for weighted fake data, false for data
 btagWeightSuffix = ''
 templateWeights = True
-templateWeightSuffix = ''
+templateWeightSuffix = '_SF'
 
 bjreg = (0,0)
 

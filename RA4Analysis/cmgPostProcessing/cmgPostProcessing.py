@@ -36,10 +36,11 @@ separateBTagWeights = True
 
 defSampleStr = "TTJets_25ns"
 
-subDir = "postProcessed_Spring15_test"
+#subDir = "postProcessed_Spring15_test"
+subDir = "postProcessed_PUreweight"
 
 #branches to be kept for data and MC
-branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert", 
+branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert",
                      "nJet25", "nBJetLoose25", "nBJetMedium25", "nBJetTight25", "nJet40", "nJet40a", "nBJetLoose40", "nBJetMedium40", "nBJetTight40", 
                      "nLepGood20", "nLepGood15", "nLepGood10", "htJet25", "mhtJet25", "htJet40j", "htJet40", "mhtJet40", "nSoftBJetLoose25", "nSoftBJetMedium25", "nSoftBJetTight25", 
                      "met*","Flag_*","HLT_*",
@@ -83,6 +84,8 @@ if options.skim=='HT400':
   skimCond = "Sum$(Jet_pt)>400"
 if options.skim=='HT400ST200':   ##tuples have already ST200 skim
   skimCond = "Sum$(Jet_pt)>400&&(LepGood_pt[0]+met_pt)>200"
+if options.skim=='HT500ST250':  
+  skimCond = "Sum$(Jet_pt)>500&&(LepGood_pt[0]+met_pt)>250"
 if options.skim=='LHEHT600':
   skimCond = "lheHTIncoming<600"
 
@@ -102,6 +105,11 @@ if options.skim=='inc':
 
 if sys.argv[0].count('ipython'):
   options.small=True
+
+###For PU reweight###
+PU_File = ROOT.TFile("/data/easilar/tuples_from_Artur/METfromMINIAOD_eleID-Spring15MVAL_1260pb/PUhistos/ratio_PU.root")
+PU_histo = PU_File.Get("h_ratio")
+#####################
 
 maxConsideredBTagWeight = options.btagWeight
 calcSystematics = options.systematics
@@ -155,7 +163,7 @@ for isample, sample in enumerate(allSamples):
   else: sampleKey = 'none'
   
   readVariables = ['met_pt/F', 'met_phi/F']
-  newVariables = ['weight/F']
+  newVariables = ['weight/F','muonDataSet/I','eleDataSet/I']
   aliases = [ "met:met_pt", "metPhi:met_phi"]
 
   readVectors = [\
@@ -168,7 +176,7 @@ for isample, sample in enumerate(allSamples):
     #readVectors[1]['vars'].extend('partonId/I')
   if options.leptonSelection.lower() in ['soft', 'hard']:
     newVariables.extend( ['nLooseSoftLeptons/I', 'nLooseHardLeptons/I', 'nTightSoftLeptons/I', 'nTightHardLeptons/I'] )
-    newVariables.extend( ['deltaPhi_Wl/F','nBJetMediumCSV30/I','nJet30/I','htJet30j/F','st/F', 'leptonPt/F','leptonMiniRelIso/F','leptonRelIso03/F' ,'leptonEta/F', 'leptonPhi/F','leptonSPRING15_25ns_v1/I/-2','leptonPdg/I/0', 'leptonInd/I/-1', 'leptonMass/F', 'singleMuonic/I', 'singleElectronic/I', 'singleLeptonic/I' ]) #, 'mt2w/F'] )
+    newVariables.extend( ['puReweight_true/F','deltaPhi_Wl/F','nBJetMediumCSV30/I','nJet30/I','htJet30j/F','st/F', 'leptonPt/F','leptonMiniRelIso/F','leptonRelIso03/F' ,'leptonEta/F', 'leptonPhi/F','leptonSPRING15_25ns_v1/I/-2','leptonPdg/I/0', 'leptonInd/I/-1', 'leptonMass/F', 'singleMuonic/I', 'singleElectronic/I', 'singleLeptonic/I' ]) #, 'mt2w/F'] )
     if calcSystematics:
       #newVariables.extend( ["weightBTag/F", "weightBTag_SF/F", "weightBTag_SF_b_Up/F", "weightBTag_SF_b_Down/F", "weightBTag_SF_light_Up/F", "weightBTag_SF_light_Down/F"])
       for i in range(maxConsideredBTagWeight+1):
@@ -231,8 +239,13 @@ for isample, sample in enumerate(allSamples):
         t.GetEntry(i)
         genWeight = 1 if sample['isData'] else t.GetLeaf('genWeight').GetValue()
         s.weight = lumiScaleFactor*genWeight
+
+        nVert = t.GetLeaf('nVert').GetValue()
+        s.puReweight_true = 1 if sample['isData'] else PU_histo.GetBinContent(PU_histo.FindBin(nVert))
         #calculatedWeight = True
         if not sample['isData']:
+          s.muonDataSet = False
+          s.eleDataSet = False
           if "TTJets" in sample['dbsName']:
             s.weight_XSecTTBar1p1 = s.weight*1.1 
             s.weight_XSecTTBar0p9 = s.weight*0.9

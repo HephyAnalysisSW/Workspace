@@ -21,14 +21,21 @@ def makeTTPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, btagV
   cData = samples['Data']
   rd = {}
   
+  if isData:
+    w = 'weight'
+    w_err = 'weight**2'
+  else:
+    w = weight_str
+    w_err = weight_err_str
+  
   #TT Jets yield in srNJet, no b-tag cut, low DPhi
   fit_srName, fit_srCut = nameAndCut(stb, htb, srNJet, btb=None, presel=presel, btagVar = btagVarString)
 
   if QCD:
     #Get QCD yields in low dPhi for b-tag fit
-    QCD_dict={0:{'y':QCD[srNJet][stb][htb][(0,0)]['NQCDpred_lowdPhi'], 'e':QCD[srNJet][stb][htb][(0,0)]['NQCDpred_lowdPhi_err']},\
-              1:{'y':QCD[srNJet][stb][htb][(1,1)]['NQCDpred_lowdPhi'], 'e':QCD[srNJet][stb][htb][(1,1)]['NQCDpred_lowdPhi_err']},\
-              2:{'y':QCD[srNJet][stb][htb][(2,2)]['NQCDpred_lowdPhi'], 'e':QCD[srNJet][stb][htb][(2,2)]['NQCDpred_lowdPhi_err']}}
+    QCD_dict={0:{'y':QCD[srNJet][stb][htb][(0,0)]['NQCDpred_lowdPhi'], 'e':QCD[srNJet][stb][htb][(0,0)]['NQCDpred_lowdPhi_err'], 'totalY':QCD[srNJet][stb][htb][(0,0)]['NQCDpred']},\
+              1:{'y':QCD[srNJet][stb][htb][(1,1)]['NQCDpred_lowdPhi'], 'e':QCD[srNJet][stb][htb][(1,1)]['NQCDpred_lowdPhi_err'], 'totalY':QCD[srNJet][stb][htb][(1,1)]['NQCDpred']},\
+              2:{'y':QCD[srNJet][stb][htb][(2,2)]['NQCDpred_lowdPhi'], 'e':QCD[srNJet][stb][htb][(2,2)]['NQCDpred_lowdPhi_err'], 'totalY':QCD[srNJet][stb][htb][(2,2)]['NQCDpred']}}
     fit_srNJet_lowDPhi = binnedNBTagsFit(fit_srCut+"&&"+dPhiStr+"<"+str(dPhiCut), fit_srName+'_dPhi'+str(dPhiCut), samples = samples, nBTagVar = btagVarString, lumi=lumi, prefix=fit_srName, printDir=printDir,useBTagWeights=useBTagWeights, btagWeightSuffix=btagWeightSuffix, templateWeights=templateWeights, templateWeightSuffix=templateWeightSuffix, QCD_dict=QCD_dict)
   else:
     fit_srNJet_lowDPhi = binnedNBTagsFit(fit_srCut+"&&"+dPhiStr+"<"+str(dPhiCut), fit_srName+'_dPhi'+str(dPhiCut), samples = samples, nBTagVar = btagVarString, lumi=lumi, prefix=fit_srName, printDir=printDir,useBTagWeights=useBTagWeights, btagWeightSuffix=btagWeightSuffix, templateWeights=templateWeights, templateWeightSuffix=templateWeightSuffix)
@@ -70,7 +77,7 @@ def makeTTPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, btagV
     if QCD:
       QCD_lowDPhi={'y':QCD[(4,5)][stb][htb][(1,1)]['NQCDpred_lowdPhi'],'e':QCD[(4,5)][stb][htb][(1,1)]['NQCDpred_lowdPhi_err']}
       QCD_highDPhi={'y':QCD[(4,5)][stb][htb][(1,1)]['NQCDpred_highdPhi'],'e':QCD[(4,5)][stb][htb][(1,1)]['NQCDpred_highdPhi_err']}
-      rCS_crLowNJet_1b = getRCS(cData, rCS_crLowNJet_Cut_1b,  dPhiCut, weight = weight_str, QCD_lowDPhi=QCD_lowDPhi, QCD_highDPhi=QCD_highDPhi) #Low njet tt-jets CR to be orthoganl to DPhi 
+      rCS_crLowNJet_1b = getRCS(cData, rCS_crLowNJet_Cut_1b,  dPhiCut, weight = w, QCD_lowDPhi=QCD_lowDPhi, QCD_highDPhi=QCD_highDPhi) #Low njet tt-jets CR to be orthoganl to DPhi 
     else:
       rCS_crLowNJet_1b = getRCS(cData, rCS_crLowNJet_Cut_1b,  dPhiCut, weight = weight_str)
     rCS_crLowNJet_1b_onlyTT = getRCS(cTTJets, rCS_crLowNJet_Cut_1b,  dPhiCut, weight = weight_str)

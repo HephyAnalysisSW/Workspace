@@ -5,10 +5,10 @@ from ROOT import RooFit as rf
 from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYieldFromChain
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,varBinName
 from Workspace.HEPHYPythonTools.user import username
-from math import pi, sqrt
+from math import pi, sqrt, isnan
 from rCShelpers import *# weight_str , weight_err_str , lumi
 
-def binnedNBTagsFit(cut, cutname, samples, nBTagVar = 'nBJetMediumCSV30', lumi=4.0, prefix="", printDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/nBtagFits/templateFit/', templateDir = '/data/'+username+'/Results2015/btagTemplatesBTagWeightedLep/',useBTagWeights=False, btagWeightSuffix='', templateWeights=False, templateWeightSuffix='', QCD_dict={0:{'y':0.,'e':0.}, 1:{'y':0.,'e':0.},2:{'y':0.,'e':0.}}, isData=False):
+def binnedNBTagsFit(cut, cutname, samples, nBTagVar = 'nBJetMediumCSV30', lumi=4.0, prefix="", printDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/nBtagFits/templateFit/', templateDir = '/data/'+username+'/Results2015/btagTemplatesBTagWeightedSF_forData_FullSR_Lep/',useBTagWeights=False, btagWeightSuffix='', templateWeights=False, templateWeightSuffix='', QCD_dict={0:{'y':0.,'e':0.,'totalY':0.}, 1:{'y':0.,'e':0.,'totalY':0.},2:{'y':0.,'e':0.,'totalY':0.}}, isData=False):
   print "LUMI:" , lumi
   if not os.path.exists(printDir):
      os.makedirs(printDir) 
@@ -30,8 +30,11 @@ def binnedNBTagsFit(cut, cutname, samples, nBTagVar = 'nBJetMediumCSV30', lumi=4
   
   hQCD = ROOT.TH1F('hQCD','hQCD',len([0,1,2,3])-1, array('d',[0,1,2,3]))
   for n in range(3):
+    if isnan(QCD_dict[n]['y']): QCD_dict[n]['y'] = QCD_dict[n]['totalY']
     hQCD.SetBinContent(n+1,QCD_dict[n]['y']/2) #divide by 2 to split in +/- charge
-    hQCD.SetBinError(n+1,QCD_dict[n]['e']/2)
+    if isnan(QCD_dict[n]['e']): qcdErr = QCD_dict[n]['y']
+    else: qcdErr = QCD_dict[n]['e']
+    hQCD.SetBinError(n+1,qcdErr/2)
   
   #Get histograms binned in b-tag multiplicity
   template_WJets_PosPdg_Dict = getTemplate(cutname, templateDir, 'WJets_PosPdg') #these templates will always be MC, so a reweighting (e.g. b-tagging) should not be used

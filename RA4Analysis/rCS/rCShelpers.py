@@ -5,9 +5,6 @@ from Workspace.RA4Analysis.helpers import *#nameAndCut, nJetBinName, nBTagBinNam
 from math import sqrt, pi, cosh
 from array import array
 
-#def makeWeight(lumi=4., sampleLumi=3.):
-#  return 'weight', 'weight*weight'
-
 def makeWeight(lumi=4., sampleLumi=3.,debug=False):
   if debug:
     print 'No lumi-reweighting done!!'
@@ -15,10 +12,6 @@ def makeWeight(lumi=4., sampleLumi=3.,debug=False):
   else:
     weight_str = '(((weight)/'+str(sampleLumi)+')*'+str(lumi)+')'
     weight_err_str = '('+weight_str+'*'+weight_str+')'
-  #if reWeight: ## to be fixed!!!
-  #  weights = {'weight':weight_str, 'weight_err':weight_err_str, 'data_weight':dataWeight = weight_str+'*'+reWeight, 'data_weight_err':weight_err_str+'('+reWeight+'*'+reWeight+')'}
-  #  return weights
-  #else:
   return weight_str, weight_err_str
 
 def getTemplate(cutName, path, sampleName):
@@ -28,25 +21,42 @@ def getTemplate(cutName, path, sampleName):
     print 'Found existing template at:',path,'and will use this one'
     temp = tempFile.Get('h_tmp')
     print temp
-    #tempFile.Close()
     return {'hist':temp, 'loadTemp':True, 'file':tempFile}
   else:
     print 'Could NOT find template at:',path,', creating new template now!'
     return {'hist':temp, 'loadTemp':False}
   
+#combine different Rcs values, where samples should look sth like this: [{'chain':c, 'cut':c, 'weight':w},...]
+def combineRCS(samples, dPhiCut):
+  totalCRYield = 0.
+  totalCRYieldVar = 0.
+  for s in samples:
+    s['rcs'] = getRCS(s['chain'],s['cut'],dPhiCut, weight=s['weight'])
+    s['CRyield'] = getYieldFromChain(s['chain'], cutString=s['cut']+'&&deltaPhi_Wl<'+str(dPhiCut),weight=s['weight'])
+    #print s['rcs']['rCS'],s['rcs']['rCSE_sim'], s['CRyield']
+    s['CRyieldVar'] = getYieldFromChain(s['chain'], cutString=s['cut']+'&&deltaPhi_Wl<'+str(dPhiCut),weight='('+s['weight']+')**2')
+    totalCRYield += s['CRyield']
+    totalCRYieldVar += s['CRyieldVar']
+  totalRcs = 0.
+  totalRcsVar = 0.
+  for s in samples:
+    if s['rcs']['rCS']>0:
+      totalRcs += s['rcs']['rCS']*(s['CRyield']/totalCRYield)
+      totalRcsVar += (s['rcs']['rCS']*(s['CRyield']/totalCRYield))**2*(s['rcs']['rCSE_sim']**2/s['rcs']['rCS']**2 + s['CRyieldVar']/s['CRyield']**2 + totalCRYieldVar/totalCRYield**2)
+  return {'rCS':totalRcs, 'rCSE_sim':sqrt(totalRcsVar), 'rCSE_pred':1.}
 
 #ROOT.TH1F().SetDefaultSumw2()
 
-def getRCS(c, cut, dPhiCut, useGenMet=False, useAllGen=False, useOnlyGenMetPt=False, useOnlyGenMetPhi=False, useWeight = True, weight='weight', QCD_lowDPhi={'y':0.,'e':0.}, QCD_highDPhi={'y':0.,'e':0.}):   
+def getRCS(c, cut, dPhiCut, useGenMet=False, useAllGen=False, useOnlyGenMetPt=False, useOnlyGenMetPhi=False, useWeight = True, weight='weight', QCD_lowDPhi={'y':0.,'e':0.}, QCD_highDPhi={'y':0.,'e':0.}, cutVar='deltaPhi_Wl', varMax=pi):   
   if useGenMet: dPhiStr = "acos((leptonPt+met_genPt*cos(leptonPhi-met_genPhi))/sqrt(leptonPt**2+met_genPt**2+2*met_genPt*leptonPt*cos(leptonPhi-met_genPhi)))"
   elif useAllGen: dPhiStr = "acos((genLep_pt+met_genPt*cos(genLep_phi-met_genPhi))/sqrt(genLep_pt**2+met_genPt**2+2*met_genPt*genLep_pt*cos(genLep_phi-met_genPhi)))"
   elif useOnlyGenMetPt: dPhiStr = "acos((leptonPt+met_genPt*cos(leptonPhi-met_phi))/sqrt(leptonPt**2+met_genPt**2+2*met_genPt*leptonPt*cos(leptonPhi-met_phi)))"
   elif useOnlyGenMetPhi: dPhiStr = "acos((leptonPt+met_pt*cos(leptonPhi-met_genPhi))/sqrt(leptonPt**2+met_pt**2+2*met_pt*leptonPt*cos(leptonPhi-met_genPhi)))"
-  else: dPhiStr = 'deltaPhi_Wl'
+  else: dPhiStr = cutVar
   if useWeight:
-    h = getPlotFromChain(c, dPhiStr, [0,dPhiCut,pi], cutString=cut, binningIsExplicit=True, weight=weight)
+    h = getPlotFromChain(c, dPhiStr, [0,dPhiCut,varMax], cutString=cut, binningIsExplicit=True, weight=weight)
   else:
-    h = getPlotFromChain(c, dPhiStr, [0,dPhiCut,pi], cutString=cut, binningIsExplicit=True, weight='1')
+    h = getPlotFromChain(c, dPhiStr, [0,dPhiCut,varMax], cutString=cut, binningIsExplicit=True, weight='1')
   h.Sumw2()
   if h.GetBinContent(1)>0:
     rcs = (h.GetBinContent(2) - QCD_highDPhi['y']) / (h.GetBinContent(1) - QCD_lowDPhi['y'])

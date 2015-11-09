@@ -223,9 +223,9 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, btagVa
   fit_srName, fit_srCut = nameAndCut(stb, htb, srNJet, btb=None, presel=presel,btagVar = btagVarString)
   #QCD yields for b-tag fit
   if QCD:
-    QCD_dict={0:{'y':QCD[srNJet][stb][htb][(0,0)]['NQCDpred_lowdPhi'], 'e':QCD[srNJet][stb][htb][(0,0)]['NQCDpred_lowdPhi_err']},\
-              1:{'y':QCD[srNJet][stb][htb][(1,1)]['NQCDpred_lowdPhi'], 'e':QCD[srNJet][stb][htb][(1,1)]['NQCDpred_lowdPhi_err']},\
-              2:{'y':QCD[srNJet][stb][htb][(2,2)]['NQCDpred_lowdPhi'], 'e':QCD[srNJet][stb][htb][(2,2)]['NQCDpred_lowdPhi_err']}}
+    QCD_dict={0:{'y':QCD[srNJet][stb][htb][(0,0)]['NQCDpred_lowdPhi'], 'e':QCD[srNJet][stb][htb][(0,0)]['NQCDpred_lowdPhi_err'], 'totalY':QCD[srNJet][stb][htb][(0,0)]['NQCDpred']},\
+              1:{'y':QCD[srNJet][stb][htb][(1,1)]['NQCDpred_lowdPhi'], 'e':QCD[srNJet][stb][htb][(1,1)]['NQCDpred_lowdPhi_err'], 'totalY':QCD[srNJet][stb][htb][(1,1)]['NQCDpred']},\
+              2:{'y':QCD[srNJet][stb][htb][(2,2)]['NQCDpred_lowdPhi'], 'e':QCD[srNJet][stb][htb][(2,2)]['NQCDpred_lowdPhi_err'], 'totalY':QCD[srNJet][stb][htb][(2,2)]['NQCDpred']}}
     fit_srNJet_lowDPhi = binnedNBTagsFit(fit_srCut+"&&"+dPhiStr+"<"+str(dPhiCut), fit_srName+'_dPhi'+str(dPhiCut), samples = samples, nBTagVar = btagVarString, lumi=lumi, prefix=fit_srName, printDir=printDir, useBTagWeights=useBTagWeights, btagWeightSuffix=btagWeightSuffix, templateWeights=templateWeights, templateWeightSuffix=templateWeightSuffix, QCD_dict=QCD_dict)
   else:
     fit_srNJet_lowDPhi = binnedNBTagsFit(fit_srCut+"&&"+dPhiStr+"<"+str(dPhiCut), fit_srName+'_dPhi'+str(dPhiCut), samples = samples, nBTagVar = btagVarString, lumi=lumi, prefix=fit_srName, printDir=printDir, useBTagWeights=useBTagWeights, btagWeightSuffix=btagWeightSuffix, templateWeights=templateWeights, templateWeightSuffix=templateWeightSuffix)

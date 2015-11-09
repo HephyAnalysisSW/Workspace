@@ -8,11 +8,15 @@ from Workspace.RA4Analysis.helpers import *# nameAndCut, nJetBinName, nBTagBinNa
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
 #from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_postProcessed import *
 #from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_postProcessed import *
-from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_postProcessed_fromArtur import *
+from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT400ST200_postProcessed_btagWeight import *
+from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT500ST250_postProcessed_fromArthur import *
+#from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_postProcessed_fromArtur import *
 
 from rCShelpers import *
 import math
 from Workspace.RA4Analysis.signalRegions import *
+from Workspace.HEPHYPythonTools.user import username
+
 
 #ROOT.gROOT.LoadMacro('../../HEPHYPythonTools/scripts/root/tdrstyle.C')
 #ROOT.setTDRStyle()
@@ -25,14 +29,15 @@ useFits = False
 drawOption = 'hist ][ e1'
 drawOptionSame = drawOption + 'same'
 
-cWJets  = getChain(WJetsHTToLNu_25ns,histname='',maxN=maxN)
-#cTTJets = getChain(TTJets_LO_25ns,histname='',maxN=maxN)
+cWJets  = getChain(WJetsHT_25ns,histname='',maxN=maxN)
+cTTJets = getChain(TTJets_HTLO_25ns,histname='',maxN=maxN)
 #cTTJets = getChain(ttJets[lepSel],histname='',maxN=maxN)
 #cBkg    = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], QCD[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]],histname='')
+cWJetsbtag  = getChain(WJetsHT_25ns_btagweight,histname='',maxN=maxN)
+cTTJetsbtag = getChain(TTJets_LO_25ns_btagweight,histname='',maxN=maxN)
 
-from Workspace.HEPHYPythonTools.user import username
 uDir = username[0]+'/'+username
-subDir = 'Spring15/25ns/rCS/ANnoFitWithFiltersMVAEleID15_softVeto/'
+subDir = 'Spring15/25ns/rCS/AN_CB_btag/'
 #subDir = 'pngCMG2/rCS/PHYS14V3/useRecoMet'
 
 path = '/afs/hephy.at/user/'+uDir+'/www/'+subDir+'/'
@@ -146,8 +151,8 @@ prefix = presel.split('&&')[0]+'_'
 
 #1D and 2D plots of RCS
 
-sampleList = [["W",cWJets]]
-#sampleList = [["W",cWJets],["tt", cTTJets]]
+#sampleList = [["tt",cTTJets]]
+sampleList = [["W",cWJetsbtag],["tt", cTTJetsbtag]]
 
 print
 print 'Computing Rcs values now ...'
@@ -223,9 +228,13 @@ for lep, pdgId in channels:
           #rcs = getRCSel(c, cut, dPhiCut, dPhiMetJet=dPhiJetMetCut)
           #rcsPos = getRCSel(c, poscut, dPhiCut, dPhiMetJet=dPhiJetMetCut)
           #rcsNeg = getRCSel(c, negcut, dPhiCut, dPhiMetJet=dPhiJetMetCut)
-          rcs = getRCS(c, cut, dPhiCut, useGenMet=GenMetSwitch, useOnlyGenMetPt=useOnlyGenMetPt, useOnlyGenMetPhi=useOnlyGenMetPhi, useWeight=True)
-          rcsPos = getRCS(c, poscut, dPhiCut, useGenMet=GenMetSwitch, useOnlyGenMetPt=useOnlyGenMetPt, useOnlyGenMetPhi=useOnlyGenMetPhi, useWeight=True)
-          rcsNeg = getRCS(c, negcut, dPhiCut, useGenMet=GenMetSwitch, useOnlyGenMetPt=useOnlyGenMetPt, useOnlyGenMetPhi=useOnlyGenMetPhi, useWeight=True)
+          if c.GetBranchStatus('weightBTag0'):
+            weight = 'weight*weightBTag0'
+            print 'Using b-tag weights!'
+          else: weight = 'weight'
+          rcs = getRCS(c, cut, dPhiCut, useGenMet=GenMetSwitch, useOnlyGenMetPt=useOnlyGenMetPt, useOnlyGenMetPhi=useOnlyGenMetPhi, useWeight=True, weight=weight)
+          rcsPos = getRCS(c, poscut, dPhiCut, useGenMet=GenMetSwitch, useOnlyGenMetPt=useOnlyGenMetPt, useOnlyGenMetPhi=useOnlyGenMetPhi, useWeight=True, weight=weight)
+          rcsNeg = getRCS(c, negcut, dPhiCut, useGenMet=GenMetSwitch, useOnlyGenMetPt=useOnlyGenMetPt, useOnlyGenMetPhi=useOnlyGenMetPhi, useWeight=True, weight=weight)
           print 'Results: Rcs:', round(rcs['rCS'],3), 'sim. Error:',round(rcs['rCSE_sim'],3)
           res = rcs['rCS']
           resErr = rcs['rCSE_sim']

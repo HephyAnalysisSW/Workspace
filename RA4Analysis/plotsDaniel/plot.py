@@ -16,7 +16,8 @@ from Workspace.RA4Analysis.helpers import *
 #from Workspace.RA4Analysis.cmgTuples_Data25ns_Artur import *
 
 #from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT400ST200_postProcessed_fromArthur import *
-from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT400ST200_postProcessed_btagWeight import *
+#from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT400ST200_postProcessed_btagWeight import *
+from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT500ST250_postProcessed_btagWeight import *
 from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT500ST250_postProcessed_fromArthur import *
 
 #from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT400ST200_postProcessed import *
@@ -46,10 +47,13 @@ DY = {'name':'DY', 'chain':getChain(DY_25ns,histname=''), 'color':color('DY'),'w
 singleTop = {'name':'singleTop', 'chain':getChain(singleTop_25ns,histname=''), 'color':color('singleTop'),'weight':'weight', 'niceName':'single Top'}
 #QCD = {'name':'QCD', 'chain':getChain(QCDMu_25ns,histname=''), 'color':color('QCD'),'weight':'weight', 'niceName':'QCD'}
 QCD = {'name':'QCD', 'chain':getChain(QCDHT_25ns,histname=''), 'color':color('QCD'),'weight':'weight', 'niceName':'QCD'}
+TTVH = {'name':'TTVH', 'chain':getChain(TTV_25ns,histname=''), 'color':color('TTV'),'weight':'weight', 'niceName':'TTVH'}
 #QCD = {'name':'QCD', 'chain':getChain(QCDEle_25ns,histname=''), 'color':color('QCD'),'weight':'weight', 'niceName':'QCD'}
 #diBoson = {'name':'diBoson', 'chain':getChain(diBosons_25ns,histname=''), 'color':ROOT.kMagenta,'weight':'weight', 'niceName':'diboson'}
 samples = [WJETS, TTJets, singleTop, DY, QCD]#, diBoson]
 #samplesComp = [WJETS, TTJETS, singleTop, DY, QCD]
+
+EWK = {'name':'EWK', 'chain':getChain([WJetsHT_25ns,TTJets_HTLO_25ns,singleTop_25ns,DY_25ns,TTV_25ns],histname=''), 'color':color('DY'),'weight':'weight', 'niceName':'EWK'}
 
 #data = {'name':'data', 'chain':getChain([SingleElectron_Run2015D,SingleMuon_Run2015D],histname=''), 'color':ROOT.kBlack,'weight':'weight', 'niceName':'data', 'cut':False}
 

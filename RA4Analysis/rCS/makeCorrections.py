@@ -30,6 +30,9 @@ lepSel = 'hard'
 
 cWJets  = getChain(WJetsHT_25ns_btagweight,histname='')
 cTTJets = getChain(TTJets_LO_25ns_btagweight,histname='')
+DY = getChain(DY_25ns,histname='')
+singleTop = getChain(singleTop_25ns,histname='')
+TTV = getChain(TTV_25ns,histname='')
 #cRest = getChain([singleTop_25ns, DY_25ns, TTV_25ns],histname='')#no QCD
 cEWK =  getChain([WJetsHT_25ns_btagweight, TTJets_LO_25ns_btagweight, singleTop_25ns, DY_25ns, TTV_25ns], histname='')#no QCD
 #cData = getChain([WJetsHT_25ns, TTJets_HTLO_25ns, singleTop_25ns, DY_25ns, TTV_25ns], histname='')
@@ -48,13 +51,13 @@ if small: signalRegions = smallRegion
 #DEFINE LUMI AND PLOTDIR
 lumi = 3.
 
-pickleDir = '/data/'+username+'/Results2015/Prediction_SFTemplate_MC_fullSR_lep_'+str(lumi)+'_light_Down/'
+pickleDir = '/data/'+username+'/Results2015/Prediction_SFTemplate_MC_fullSR_lep_'+str(lumi)+'/'
 
-fitDir = '/data/'+username+'/Results2015/correctionFitForData_SFtemplate_Lep_fullSR/'
+fitDir = '/data/'+username+'/Results2015/correctionFit_btagKappa_MC_fullSR/'
 
 prefix = 'singleLeptonic_Spring15_'
 
-createFits = False
+createFits = True
 if not createFits: loadedFit = pickle.load(file(fitDir+prefix+'_fit_pkl'))
 
 if not os.path.exists(pickleDir):
@@ -66,9 +69,10 @@ weight_str, weight_err_str = makeWeight(lumi, sampleLumi=3.)
 
 
 presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&Jet_pt[1]>80&&st>250&&nJet30>2&&htJet30j>500"#&&nBJetMediumCSV30==0"
-filters = "&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFilter&&Flag_goodVertices&&Flag_eeBadScFilter"#&&Flag_EcalDeadCellTriggerPrimitiveFilter" #strange filter settings!!
+#filters = "&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFilter&&Flag_goodVertices&&Flag_eeBadScFilter&&Flag_EcalDeadCellTriggerPrimitiveFilter" #strange filter settings!!
+filters = "&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFilter_fix&&Flag_HBHENoiseFilter&&Flag_goodVertices&&Flag_eeBadScFilter&&Flag_EcalDeadCellTriggerPrimitiveFilter"
 #presel += '&&singleMuonic'
-presel += filters
+#presel += filters
 #presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&Jet_pt[1]>80"
 btagString = 'nBJetMediumCSV30'
 
@@ -116,11 +120,16 @@ for i_njb, njb in enumerate(signalRegions):
         ttJetRcsFitH1b = ROOT.TH1F("ttJetRcsFitH1b","",len(ttJetBins),0,len(ttJetBins))
         cname1bCRtt, cut1bCRtt = nameAndCut(stb,htb,(4,5), btb=(1,1) ,presel=presel)
         cname0bCRtt, cut0bCRtt = nameAndCut(stb,htb,(4,5), btb=(0,0) ,presel=presel)
+        cnameCRtt, cutCRtt = nameAndCut(stb,htb,(4,5), btb=(0,-1) ,presel=presel)
         rcs1bCRtt = getRCS(cEWK, cut1bCRtt, dPhiCut)
         rcs0bCRtt = getRCS(cTTJets, cut0bCRtt, dPhiCut)
+        samples = [{'chain':cWJets, 'cut':cutCRtt, 'weight':'weight*weightBTag1'}, {'chain':cTTJets, 'cut':cutCRtt, 'weight':'weight*weightBTag1'},{'chain':DY, 'cut':cut1bCRtt, 'weight':'weight'},{'chain':TTV, 'cut':cut1bCRtt, 'weight':'weight'},{'chain':singleTop, 'cut':cut1bCRtt, 'weight':'weight'}]
+        rcs1bCRtt_btag = combineRCS(samples, dPhiCut)
+        rcs0bCRtt_btag = getRCS(cTTJets, cutCRtt, dPhiCut, weight = 'weight*weightBTag0')
         #Kappa now calculated only in the SB bin (4,5) jets 1b allEWK MC vs 0b tt MC - no fit applied for the moment!
         kappaTT = divideRCSdict(rcs0bCRtt,rcs1bCRtt)
-        fitResults[njb][stb][htb] = {'kappaTT':kappaTT, 'rcs1bCRtt':rcs1bCRtt, 'rcs0bCRtt':rcs0bCRtt}
+        kappaTT_btag = divideRCSdict(rcs0bCRtt_btag,rcs1bCRtt_btag)
+        fitResults[njb][stb][htb] = {'kappaTT':kappaTT, 'rcs1bCRtt':rcs1bCRtt, 'rcs0bCRtt':rcs0bCRtt, 'kappaTT_btag':kappaTT_btag}
         #fill histograms
         for i_njbTT, njbTT in enumerate(ttJetBins):
           cname, cut = nameAndCut(stb,htb,njbTT, btb=(0,0) ,presel=presel)
@@ -183,8 +192,8 @@ for i_njb, njb in enumerate(signalRegions):
       kappaTTfit = ttConst0/ttConst1
       kappaTTfitErr = kappaTTfit*sqrt(ttConst1E**2/ttConst1**2+ttConst0E**2/ttConst0**2)
 
-      TT_rcs_diff = abs(rcs0bCRtt['rCS'] - (ttD+ttK*i_njb))
-      TT_rcs_diffKappaCorr = abs(kappaTT['kappa']*rcs0bCRtt['rCS'] - (ttD+ttK*i_njb))
+      TT_rcs_diff = abs(rcs1bCRtt['rCS'] - (ttD+ttK*i_njb))
+      TT_rcs_diffKappaCorr = abs(kappaTT['kappa']*rcs1bCRtt['rCS'] - (ttD+ttK*i_njb))
       TT_y_diff = TT_rcs_diff*res[njb][stb][htb]['yTT_srNJet_0b_lowDPhi']
       TT_y_diffKappaCorr = TT_rcs_diffKappaCorr*res[njb][stb][htb]['yTT_srNJet_0b_lowDPhi']
       
@@ -197,7 +206,7 @@ for i_njb, njb in enumerate(signalRegions):
       TT_syst_err = TT_y_diff
       TT_pred_err = sqrt(TT_stat_err**2 + TT_syst_err**2)
       
-      TT_corrections = {'k_0b/1b':kappaTT['kappa'], 'k_0b/1b_err':kappaTT['kappaE_sim'], 'k_0b/1b_fit':kappaTTfit, 'k_0b/1b_fit_err':kappaTTfitErr, '0b_fit_const':ttD,'0b_fit_const_err':ttDE, '0b_fit_grad':ttK, '0b_fit_grad_err':ttKE}
+      TT_corrections = {'k_0b/1b':kappaTT['kappa'], 'k_0b/1b_err':kappaTT['kappaE_sim'], 'k_0b/1b_btag':kappaTT_btag['kappa'], 'k_0b/1b_btag_err':kappaTT_btag['kappaE_sim'], 'k_0b/1b_fit':kappaTTfit, 'k_0b/1b_fit_err':kappaTTfitErr, '0b_fit_const':ttD,'0b_fit_const_err':ttDE, '0b_fit_grad':ttK, '0b_fit_grad_err':ttKE}
       res[njb][stb][htb].update({'TT_rCS_fits_MC':TT_corrections})
       
       #print
@@ -342,5 +351,5 @@ for i_njb, njb in enumerate(signalRegions):
 #print 'Events inside stat error band:',scoreStat/total
 
 if createFits: pickle.dump(fitResults ,file(fitDir+prefix+'_fit_pkl','w'))
-pickle.dump(res,file(pickleDir+prefix+'_estimationResults_pkl_kappa_corrected','w'))
+pickle.dump(res,file(pickleDir+prefix+'_estimationResults_pkl_kappa_btag_corrected','w'))
 

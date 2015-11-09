@@ -13,11 +13,12 @@ useTTcorrection = False
 signal = False
 
 prefix = 'singleLeptonic_Spring15_'
-path = '/data/'+username+'/Results2015/Prediction_bweightTemplate_data_reducedSR_lep_1.26/' 
-path2 = '/data/'+username+'/Results2015/Prediction_bweightTemplate_MC_reducedSR_lep_3.0/'
+path = '/data/'+username+'/Results2015/Prediction_bweightSFTemplate_Data_fullSR_lep_1.26/'
+#path = '/data/'+username+'/Results2015/Prediction_SFTemplate_MC_fullSR_lep_3.0/' 
+#path2 = '/data/'+username+'/Results2015/Prediction_bweightTemplate_MC_reducedSR_lep_3.0/'
 
-res = pickle.load(file(path+prefix+'_estimationResults_pkl_kappa_corrected'))
-res2 = pickle.load(file(path2+prefix+'_estimationResults_pkl'))
+res = pickle.load(file(path+prefix+'_estimationResults_pkl'))
+#res2 = pickle.load(file(path2+prefix+'_estimationResults_pkl'))
 
 if useTTcorrection: kcs = pickle.load(file('/data/dspitzbart/Spring15/25ns/rCS_0b_3.0/correction_pkl'))
 if useWcorrection:
@@ -45,8 +46,8 @@ if signal:
     s['chain'] = getChain(s['sample'],histname='')
 
 
-#signalRegions = signalRegion3fb
-signalRegions = signalRegionCRonly
+signalRegions = signalRegion3fb
+#signalRegions = signalRegionCRonly
 
 #signalRegions = smallRegion
 #signalRegions = {(5, 5): {(250, 350): {(500, -1):   {'deltaPhi': 1.0}}}}
@@ -71,171 +72,13 @@ for srNJet in sorted(signalRegions):
 scaleFactor = 0.8
 #scaleFactor = 1
 
-#print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rr|rr|rr|rr|rr|rr|}\\hline'
-#print ' \\njet     & \ST & \HT     &\multicolumn{2}{c|}{$tt+$Jets Neg.Pdg}&\multicolumn{2}{c|}{$tt+$Jets Pos.Pdg}&\multicolumn{2}{c|}{$W+$ Jets Neg.Pdg}&\multicolumn{2}{c|}{$W+$ Jets Pos.Pdg}&\multicolumn{2}{c|}{Rest bkg. Neg.Pdg}&\multicolumn{2}{c|}{Rest bkg. Pos.Pdg}\\\%\hline'
-#print ' & $[$GeV$]$ &$[$GeV$]$ & data & MC & data & MC & data & MC & data & MC & data & MC & data & MC \\\\\hline'
-#
-#secondLine = False
-#for srNJet in sorted(signalRegions):
-#  print '\\hline'
-#  if secondLine: print '\\hline'
-#  secondLine = True
-#  print '\multirow{'+str(rowsNJet[srNJet]['n'])+'}{*}{\\begin{sideways}$'+varBin(srNJet)+'$\end{sideways}}'
-#  for stb in sorted(signalRegions[srNJet]):
-#    print '&\multirow{'+str(rowsSt[srNJet][stb]['n'])+'}{*}{$'+varBin(stb)+'$}'
-#    first = True
-#    for htb in sorted(signalRegions[srNJet][stb]):
-#      if not first: print '&'
-#      first = False
-#      #data
-#      ttPred = res[srNJet][stb][htb][fitkey]['TT_AllPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb][fitkey]['TT_AllPdg']['yield']
-#      WPredPosPdg = res[srNJet][stb][htb][fitkey]['W_PosPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb][fitkey]['W_PosPdg']['yield']
-#      WPredNegPdg = res[srNJet][stb][htb][fitkey]['W_NegPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb][fitkey]['W_NegPdg']['yield']
-#      RestPredPosPdg = res[srNJet][stb][htb][fitkey]['Rest_PosPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb][fitkey]['Rest_PosPdg']['yield']
-#      RestPredNegPdg = res[srNJet][stb][htb][fitkey]['Rest_NegPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb][fitkey]['Rest_NegPdg']['yield']
-#      totalPredPosPdg = ttPred/2 + WPredPosPdg + RestPredPosPdg
-#      totalPredNegPdg = ttPred/2 + WPredNegPdg + RestPredNegPdg 
-#      
-#      #MC
-#      ttPredMC = res2[srNJet][stb][htb][fitkey]['TT_AllPdg']['template'].GetBinContent(1)*res2[srNJet][stb][htb][fitkey]['TT_AllPdg']['yield']
-#      WPredPosPdgMC = res2[srNJet][stb][htb][fitkey]['W_PosPdg']['template'].GetBinContent(1)*res2[srNJet][stb][htb][fitkey]['W_PosPdg']['yield']
-#      WPredNegPdgMC = res2[srNJet][stb][htb][fitkey]['W_NegPdg']['template'].GetBinContent(1)*res2[srNJet][stb][htb][fitkey]['W_NegPdg']['yield']
-#      RestPredPosPdgMC = res2[srNJet][stb][htb][fitkey]['Rest_PosPdg']['template'].GetBinContent(1)*res2[srNJet][stb][htb][fitkey]['Rest_PosPdg']['yield']
-#      RestPredNegPdgMC = res2[srNJet][stb][htb][fitkey]['Rest_NegPdg']['template'].GetBinContent(1)*res2[srNJet][stb][htb][fitkey]['Rest_NegPdg']['yield']
-#      totalPredPosPdgMC = ttPredMC/2 + WPredPosPdgMC + RestPredPosPdgMC
-#      totalPredNegPdgMC = ttPredMC/2 + WPredNegPdgMC + RestPredNegPdgMC
-#      print '&$'+varBin(htb)+'$'
-#      print ' & ' + str(round(ttPred/(2*totalPredNegPdg),3)) \
-#          + ' & ' + str(round(ttPredMC/(2*totalPredNegPdgMC),3))\
-#          + ' & ' + str(round(ttPred/(2*totalPredPosPdg),3))\
-#          + ' & ' + str(round(ttPredMC/(2*totalPredPosPdgMC),3))\
-#          + ' & ' + str(round(WPredNegPdg/totalPredNegPdg,3))\
-#          + ' & ' + str(round(WPredNegPdgMC/totalPredNegPdgMC,3))\
-#          + ' & ' + str(round(WPredPosPdg/totalPredPosPdg,3))\
-#          + ' & ' + str(round(WPredPosPdgMC/totalPredPosPdgMC,3))\
-#          + ' & ' + str(round(RestPredNegPdg/totalPredNegPdg,3))\
-#          + ' & ' + str(round(RestPredNegPdgMC/totalPredNegPdgMC,3))\
-#          + ' & ' + str(round(RestPredPosPdg/totalPredPosPdg,3))\
-#          + ' & ' + str(round(RestPredPosPdgMC/totalPredPosPdgMC,3)) +'\\\\'
-#      if htb[1] == -1 : print '\\cline{2-15}'
-#print '\\hline\end{tabular}}\end{center}\caption{Closure table for the background in the 0-tag regions, 3$fb^{-1}$}\label{tab:0b_totalClosure}\end{table}'
 
-#fitkey = 'fit_crNJet_lowDPhi'
-fitkey = 'fit_srNJet_lowDPhi'
-
-print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrrrrr|rrrrrr|}\\hline'
-print ' \\njet     & \ST & \HT     &\multicolumn{6}{c|}{$tt+$Jets neg. PDG}&\multicolumn{6}{c|}{$tt+$Jets pos. PDG}\\\%\hline'
-print ' & $[$GeV$]$ &$[$GeV$]$ & \multicolumn{3}{c}{data} & \multicolumn{3}{c|}{MC} & \multicolumn{3}{c}{data} & \multicolumn{3}{c|}{MC} \\\\\hline'
-
-secondLine = False
-for srNJet in sorted(signalRegions):
-  print '\\hline'
-  if secondLine: print '\\hline'
-  secondLine = True
-  print '\multirow{'+str(rowsNJet[srNJet]['n'])+'}{*}{\\begin{sideways}$'+varBin(srNJet)+'$\end{sideways}}'
-  for stb in sorted(signalRegions[srNJet]):
-    print '&\multirow{'+str(rowsSt[srNJet][stb]['n'])+'}{*}{$'+varBin(stb)+'$}'
-    first = True
-    for htb in sorted(signalRegions[srNJet][stb]):
-      if not first: print '&'
-      first = False
-      #data yields and errors
-      ttPred = res[srNJet][stb][htb][fitkey]['TT_AllPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb][fitkey]['TT_AllPdg']['yield']
-      ttPredVar = res[srNJet][stb][htb][fitkey]['TT_AllPdg']['template'].GetBinError(1)**2*res[srNJet][stb][htb][fitkey]['TT_AllPdg']['yield']**2 + \
-                  res[srNJet][stb][htb][fitkey]['TT_AllPdg']['template'].GetBinContent(1)**2*res[srNJet][stb][htb][fitkey]['TT_AllPdg']['yieldVar']
-      WPredPosPdg = res[srNJet][stb][htb][fitkey]['W_PosPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb][fitkey]['W_PosPdg']['yield']
-      WPredPosPdgVar = res[srNJet][stb][htb][fitkey]['W_PosPdg']['template'].GetBinError(1)**2*res[srNJet][stb][htb][fitkey]['W_PosPdg']['yield']**2 + \
-                       res[srNJet][stb][htb][fitkey]['W_PosPdg']['template'].GetBinContent(1)**2*res[srNJet][stb][htb][fitkey]['W_PosPdg']['yieldVar']
-      WPredNegPdg = res[srNJet][stb][htb][fitkey]['W_NegPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb][fitkey]['W_NegPdg']['yield']
-      WPredNegPdgVar = res[srNJet][stb][htb][fitkey]['W_NegPdg']['template'].GetBinError(1)**2*res[srNJet][stb][htb][fitkey]['W_NegPdg']['yield']**2 + \
-                       res[srNJet][stb][htb][fitkey]['W_NegPdg']['template'].GetBinContent(1)**2*res[srNJet][stb][htb][fitkey]['W_NegPdg']['yieldVar']
-      RestPredPosPdg = res[srNJet][stb][htb][fitkey]['Rest_PosPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb][fitkey]['Rest_PosPdg']['yield']
-      RestPredPosPdgVar = res[srNJet][stb][htb][fitkey]['Rest_PosPdg']['template'].GetBinError(1)**2*res[srNJet][stb][htb][fitkey]['Rest_PosPdg']['yield']**2 + \
-                          res[srNJet][stb][htb][fitkey]['Rest_PosPdg']['template'].GetBinContent(1)**2*res[srNJet][stb][htb][fitkey]['Rest_PosPdg']['yieldVar']
-      RestPredNegPdg = res[srNJet][stb][htb][fitkey]['Rest_NegPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb][fitkey]['Rest_NegPdg']['yield']
-      RestPredNegPdgVar = res[srNJet][stb][htb][fitkey]['Rest_NegPdg']['template'].GetBinError(1)**2*res[srNJet][stb][htb][fitkey]['Rest_NegPdg']['yield']**2 + \
-                          res[srNJet][stb][htb][fitkey]['Rest_NegPdg']['template'].GetBinContent(1)**2*res[srNJet][stb][htb][fitkey]['Rest_NegPdg']['yieldVar']
-
-      totalPredPosPdg = ttPred/2 + WPredPosPdg + RestPredPosPdg
-      totalPredPosPdgVar = ttPredVar/4 + WPredPosPdgVar + RestPredPosPdgVar
-
-      totalPredNegPdg = ttPred/2 + WPredNegPdg + RestPredNegPdg
-      totalPredNegPdgVar = ttPredVar/4 + WPredNegPdgVar + RestPredNegPdgVar
-
-      #fractions and errors
-      ttPredPosFrac = ttPred/(2*totalPredPosPdg)
-      ttPredPosFracVar = (ttPredVar/4)/totalPredPosPdg**2 + totalPredPosPdgVar*(ttPred/2)**2/totalPredPosPdg**4
-      
-      ttPredNegFrac = ttPred/(2*totalPredNegPdg)
-      ttPredNegFracVar = (ttPredVar/4)/totalPredNegPdg**2 + totalPredNegPdgVar*(ttPred/2)**2/totalPredNegPdg**4
-      
-      WPredPosFrac = WPredPosPdg/totalPredPosPdg
-      WPredPosFracVar = WPredPosPdgVar/totalPredPosPdg**2 + totalPredPosPdgVar*WPredPosPdg**2/totalPredPosPdg**4
-      
-      WPredNegFrac = WPredNegPdg/totalPredNegPdg
-      WPredNegFracVar = WPredNegPdgVar/totalPredNegPdg**2 + totalPredNegPdgVar*WPredNegPdg**2/totalPredNegPdg**4
-      
-      RestPredPosFrac = RestPredPosPdg/totalPredPosPdg
-      RestPredPosFracVar = RestPredPosPdgVar/totalPredPosPdg**2 + totalPredPosPdgVar*RestPredPosPdg**2/totalPredPosPdg**4
-
-      RestPredNegFrac = RestPredNegPdg/totalPredNegPdg
-      RestPredNegFracVar = RestPredNegPdgVar/totalPredNegPdg**2 + totalPredNegPdgVar*RestPredNegPdg**2/totalPredNegPdg**4
-      
-      #MC yields and errors
-      ttPredMC =            res2[srNJet][stb][htb][fitkey]['TT_AllPdg']['template'].GetBinContent(1)*       res2[srNJet][stb][htb][fitkey]['TT_AllPdg']['yield']
-      ttPredMCVar =         res2[srNJet][stb][htb][fitkey]['TT_AllPdg']['template'].GetBinError(1)**2*      res2[srNJet][stb][htb][fitkey]['TT_AllPdg']['yield']**2 + \
-                            res2[srNJet][stb][htb][fitkey]['TT_AllPdg']['template'].GetBinContent(1)**2*    res2[srNJet][stb][htb][fitkey]['TT_AllPdg']['yieldVar']
-      WPredPosPdgMC =       res2[srNJet][stb][htb][fitkey]['W_PosPdg']['template'].GetBinContent(1)*        res2[srNJet][stb][htb][fitkey]['W_PosPdg']['yield']
-      WPredPosPdgMCVar =    res2[srNJet][stb][htb][fitkey]['W_PosPdg']['template'].GetBinError(1)**2*       res2[srNJet][stb][htb][fitkey]['W_PosPdg']['yield']**2 + \
-                            res2[srNJet][stb][htb][fitkey]['W_PosPdg']['template'].GetBinContent(1)**2*     res2[srNJet][stb][htb][fitkey]['W_PosPdg']['yieldVar']
-      WPredNegPdgMC =       res2[srNJet][stb][htb][fitkey]['W_NegPdg']['template'].GetBinContent(1)*        res2[srNJet][stb][htb][fitkey]['W_NegPdg']['yield']
-      WPredNegPdgMCVar =    res2[srNJet][stb][htb][fitkey]['W_NegPdg']['template'].GetBinError(1)**2*       res2[srNJet][stb][htb][fitkey]['W_NegPdg']['yield']**2 + \
-                            res2[srNJet][stb][htb][fitkey]['W_NegPdg']['template'].GetBinContent(1)**2*     res2[srNJet][stb][htb][fitkey]['W_NegPdg']['yieldVar']
-      RestPredPosPdgMC =    res2[srNJet][stb][htb][fitkey]['Rest_PosPdg']['template'].GetBinContent(1)*     res2[srNJet][stb][htb][fitkey]['Rest_PosPdg']['yield']
-      RestPredPosPdgMCVar = res2[srNJet][stb][htb][fitkey]['Rest_PosPdg']['template'].GetBinError(1)**2*    res2[srNJet][stb][htb][fitkey]['Rest_PosPdg']['yield']**2 + \
-                            res2[srNJet][stb][htb][fitkey]['Rest_PosPdg']['template'].GetBinContent(1)**2*  res2[srNJet][stb][htb][fitkey]['Rest_PosPdg']['yieldVar']
-      RestPredNegPdgMC =    res2[srNJet][stb][htb][fitkey]['Rest_NegPdg']['template'].GetBinContent(1)*     res2[srNJet][stb][htb][fitkey]['Rest_NegPdg']['yield']
-      RestPredNegPdgMCVar = res2[srNJet][stb][htb][fitkey]['Rest_NegPdg']['template'].GetBinError(1)**2*    res2[srNJet][stb][htb][fitkey]['Rest_NegPdg']['yield']**2 + \
-                            res2[srNJet][stb][htb][fitkey]['Rest_NegPdg']['template'].GetBinContent(1)**2*  res2[srNJet][stb][htb][fitkey]['Rest_NegPdg']['yieldVar']
-
-      totalPredPosPdgMC = ttPredMC/2 + WPredPosPdgMC + RestPredPosPdgMC
-      totalPredPosPdgMCVar = ttPredMCVar/4 + WPredPosPdgMCVar + RestPredPosPdgMCVar
-
-      totalPredNegPdgMC = ttPredMC/2 + WPredNegPdgMC + RestPredNegPdgMC
-      totalPredNegPdgMCVar = ttPredMCVar/4 + WPredNegPdgMCVar + RestPredNegPdgMCVar
-
-      #fractions and errors      
-      ttPredPosFracMC = ttPredMC/(2*totalPredPosPdgMC)
-      ttPredPosFracMCVar = (ttPredMCVar/4)/totalPredPosPdgMC**2 + totalPredPosPdgMCVar*(ttPredMC/2)**2/totalPredPosPdgMC**4
-      
-      ttPredNegFracMC = ttPredMC/(2*totalPredNegPdgMC)
-      ttPredNegFracMCVar = (ttPredMCVar/4)/totalPredNegPdgMC**2 + totalPredNegPdgMCVar*(ttPredMC/2)**2/totalPredNegPdgMC**4
-
-      WPredPosFracMC = WPredPosPdgMC/totalPredPosPdgMC
-      WPredPosFracMCVar = WPredPosPdgMCVar/totalPredPosPdgMC**2 + totalPredPosPdgMCVar*WPredPosPdgMC**2/totalPredPosPdgMC**4
-
-      WPredNegFracMC = WPredNegPdgMC/totalPredNegPdgMC
-      WPredNegFracMCVar = WPredNegPdgMCVar/totalPredNegPdgMC**2 + totalPredNegPdgMCVar*WPredNegPdgMC**2/totalPredNegPdgMC**4
-      
-      RestPredPosFracMC = RestPredPosPdgMC/totalPredPosPdgMC
-      RestPredPosFracMCVar = RestPredPosPdgMCVar/totalPredPosPdgMC**2 + totalPredPosPdgMCVar*RestPredPosPdgMC**2/totalPredPosPdgMC**4
-
-      RestPredNegFracMC = RestPredNegPdgMC/totalPredNegPdgMC
-      RestPredNegFracMCVar = RestPredNegPdgMCVar/totalPredNegPdgMC**2 + totalPredNegPdgMCVar*RestPredNegPdgMC**2/totalPredNegPdgMC**4
-
-      print '&$'+varBin(htb)+'$'
-      print ' & ' + getNumString(ttPredNegFrac,   sqrt(ttPredNegFracVar)) \
-          + ' & ' + getNumString(ttPredNegFracMC, sqrt(ttPredNegFracMCVar)) \
-          + ' & ' + getNumString(ttPredPosFrac,   sqrt(ttPredPosFracVar)) \
-          + ' & ' + getNumString(ttPredPosFracMC, sqrt(ttPredPosFracMCVar)) +'\\\\'
-
-      if htb[1] == -1 : print '\\cline{2-15}'
-print '\\hline\end{tabular}}\end{center}\caption{Fractions of t$\\bar{t}$+Jets background obtained from a b-tag multiplicity fit for data and MC in the CRs}\label{tab:fitFractionsTT}\end{table}'
-
+#closure table
+print "Closure table"
 print
-print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrrrrr|rrrrrr|}\\hline'
-print ' \\njet     & \ST & \HT     &\multicolumn{6}{c|}{$W+$Jets neg. PDG}&\multicolumn{6}{c|}{$W+$Jets pos. PDG}\\\%\hline'
-print ' & $[$GeV$]$ &$[$GeV$]$ & \multicolumn{3}{c}{data} & \multicolumn{3}{c|}{MC} & \multicolumn{3}{c}{data} & \multicolumn{3}{c|}{MC} \\\\\hline'
+print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrr|rrr|rrr|rrr|rrr|rrr|}\\hline'
+print ' \\njet     & \ST & \HT     &\multicolumn{6}{c|}{$tt+$Jets}&\multicolumn{6}{c|}{$W+$ Jets}&\multicolumn{3}{c|}{Other EW bkg.}&\multicolumn{6}{c|}{total bkg.}\\\%\hline'
+print ' & $[$GeV$]$ &$[$GeV$]$&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation} \\\\\hline'
 
 secondLine = False
 for srNJet in sorted(signalRegions):
@@ -249,103 +92,22 @@ for srNJet in sorted(signalRegions):
     for htb in sorted(signalRegions[srNJet][stb]):
       if not first: print '&'
       first = False
-      #data yields and errors
-      ttPred = res[srNJet][stb][htb][fitkey]['TT_AllPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb][fitkey]['TT_AllPdg']['yield']
-      ttPredVar = res[srNJet][stb][htb][fitkey]['TT_AllPdg']['template'].GetBinError(1)**2*res[srNJet][stb][htb][fitkey]['TT_AllPdg']['yield']**2 + \
-                  res[srNJet][stb][htb][fitkey]['TT_AllPdg']['template'].GetBinContent(1)**2*res[srNJet][stb][htb][fitkey]['TT_AllPdg']['yieldVar']
-      WPredPosPdg = res[srNJet][stb][htb][fitkey]['W_PosPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb][fitkey]['W_PosPdg']['yield']
-      WPredPosPdgVar = res[srNJet][stb][htb][fitkey]['W_PosPdg']['template'].GetBinError(1)**2*res[srNJet][stb][htb][fitkey]['W_PosPdg']['yield']**2 + \
-                       res[srNJet][stb][htb][fitkey]['W_PosPdg']['template'].GetBinContent(1)**2*res[srNJet][stb][htb][fitkey]['W_PosPdg']['yieldVar']
-      WPredNegPdg = res[srNJet][stb][htb][fitkey]['W_NegPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb][fitkey]['W_NegPdg']['yield']
-      WPredNegPdgVar = res[srNJet][stb][htb][fitkey]['W_NegPdg']['template'].GetBinError(1)**2*res[srNJet][stb][htb][fitkey]['W_NegPdg']['yield']**2 + \
-                       res[srNJet][stb][htb][fitkey]['W_NegPdg']['template'].GetBinContent(1)**2*res[srNJet][stb][htb][fitkey]['W_NegPdg']['yieldVar']
-      RestPredPosPdg = res[srNJet][stb][htb][fitkey]['Rest_PosPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb][fitkey]['Rest_PosPdg']['yield']
-      RestPredPosPdgVar = res[srNJet][stb][htb][fitkey]['Rest_PosPdg']['template'].GetBinError(1)**2*res[srNJet][stb][htb][fitkey]['Rest_PosPdg']['yield']**2 + \
-                          res[srNJet][stb][htb][fitkey]['Rest_PosPdg']['template'].GetBinContent(1)**2*res[srNJet][stb][htb][fitkey]['Rest_PosPdg']['yieldVar']
-      RestPredNegPdg = res[srNJet][stb][htb][fitkey]['Rest_NegPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb][fitkey]['Rest_NegPdg']['yield']
-      RestPredNegPdgVar = res[srNJet][stb][htb][fitkey]['Rest_NegPdg']['template'].GetBinError(1)**2*res[srNJet][stb][htb][fitkey]['Rest_NegPdg']['yield']**2 + \
-                          res[srNJet][stb][htb][fitkey]['Rest_NegPdg']['template'].GetBinContent(1)**2*res[srNJet][stb][htb][fitkey]['Rest_NegPdg']['yieldVar']
+      print '&$'+varBin(htb)+'$' 
+      print ' & '+getNumString(res[srNJet][stb][htb]['TT_pred'],  res[srNJet][stb][htb]['TT_pred_err'])\
+           +' & '+getNumString(res[srNJet][stb][htb]['TT_truth']*scaleFactor, res[srNJet][stb][htb]['TT_truth_err'])\
+           +' & '+getNumString(res[srNJet][stb][htb]['W_pred'],   res[srNJet][stb][htb]['W_pred_err'])\
+           +' & '+getNumString(res[srNJet][stb][htb]['W_truth']*scaleFactor,  res[srNJet][stb][htb]['W_truth_err'])\
+           +' & '+getNumString(res[srNJet][stb][htb]['Rest_truth'], res[srNJet][stb][htb]['Rest_truth_err'])\
+           +' & '+getNumString(res[srNJet][stb][htb]['tot_pred'], res[srNJet][stb][htb]['tot_pred_err'])\
+           +' & '+getNumString(res[srNJet][stb][htb]['tot_truth']*scaleFactor,res[srNJet][stb][htb]['tot_truth_err']) +'\\\\'
+      if htb[1] == -1 : print '\\cline{2-24}'
+print '\\hline\end{tabular}}\end{center}\caption{Closure table for the background in the 0-tag regions, 3$fb^{-1}$}\label{tab:0b_totalClosure}\end{table}'
 
-      totalPredPosPdg = ttPred/2 + WPredPosPdg + RestPredPosPdg
-      totalPredPosPdgVar = ttPredVar/4 + WPredPosPdgVar + RestPredPosPdgVar
-
-      totalPredNegPdg = ttPred/2 + WPredNegPdg + RestPredNegPdg
-      totalPredNegPdgVar = ttPredVar/4 + WPredNegPdgVar + RestPredNegPdgVar
-
-      #fractions and errors
-      ttPredPosFrac = ttPred/(2*totalPredPosPdg)
-      ttPredPosFracVar = (ttPredVar/4)/totalPredPosPdg**2 + totalPredPosPdgVar*(ttPred/2)**2/totalPredPosPdg**4
-      
-      ttPredNegFrac = ttPred/(2*totalPredNegPdg)
-      ttPredNegFracVar = (ttPredVar/4)/totalPredNegPdg**2 + totalPredNegPdgVar*(ttPred/2)**2/totalPredNegPdg**4
-      
-      WPredPosFrac = WPredPosPdg/totalPredPosPdg
-      WPredPosFracVar = WPredPosPdgVar/totalPredPosPdg**2 + totalPredPosPdgVar*WPredPosPdg**2/totalPredPosPdg**4
-      
-      WPredNegFrac = WPredNegPdg/totalPredNegPdg
-      WPredNegFracVar = WPredNegPdgVar/totalPredNegPdg**2 + totalPredNegPdgVar*WPredNegPdg**2/totalPredNegPdg**4
-      
-      RestPredPosFrac = RestPredPosPdg/totalPredPosPdg
-      RestPredPosFracVar = RestPredPosPdgVar/totalPredPosPdg**2 + totalPredPosPdgVar*RestPredPosPdg**2/totalPredPosPdg**4
-
-      RestPredNegFrac = RestPredNegPdg/totalPredNegPdg
-      RestPredNegFracVar = RestPredNegPdgVar/totalPredNegPdg**2 + totalPredNegPdgVar*RestPredNegPdg**2/totalPredNegPdg**4
-      
-      #MC yields and errors
-      ttPredMC = res2[srNJet][stb][htb][fitkey]['TT_AllPdg']['template'].GetBinContent(1)*res2[srNJet][stb][htb][fitkey]['TT_AllPdg']['yield']
-      ttPredMCVar = res2[srNJet][stb][htb][fitkey]['TT_AllPdg']['template'].GetBinError(1)**2*res2[srNJet][stb][htb][fitkey]['TT_AllPdg']['yield']**2 + \
-                    res2[srNJet][stb][htb][fitkey]['TT_AllPdg']['template'].GetBinContent(1)**2*res2[srNJet][stb][htb][fitkey]['TT_AllPdg']['yieldVar']
-      WPredPosPdgMC = res2[srNJet][stb][htb][fitkey]['W_PosPdg']['template'].GetBinContent(1)*res2[srNJet][stb][htb][fitkey]['W_PosPdg']['yield']
-      WPredPosPdgMCVar = res2[srNJet][stb][htb][fitkey]['W_PosPdg']['template'].GetBinError(1)**2*res2[srNJet][stb][htb][fitkey]['W_PosPdg']['yield']**2 + \
-                         res2[srNJet][stb][htb][fitkey]['W_PosPdg']['template'].GetBinContent(1)**2*res2[srNJet][stb][htb][fitkey]['W_PosPdg']['yieldVar']
-      WPredNegPdgMC = res2[srNJet][stb][htb][fitkey]['W_NegPdg']['template'].GetBinContent(1)*res2[srNJet][stb][htb][fitkey]['W_NegPdg']['yield']
-      WPredNegPdgMCVar = res2[srNJet][stb][htb][fitkey]['W_NegPdg']['template'].GetBinError(1)**2*res2[srNJet][stb][htb][fitkey]['W_NegPdg']['yield']**2 + \
-                         res2[srNJet][stb][htb][fitkey]['W_NegPdg']['template'].GetBinContent(1)**2*res2[srNJet][stb][htb][fitkey]['W_NegPdg']['yieldVar']
-      RestPredPosPdgMC = res2[srNJet][stb][htb][fitkey]['Rest_PosPdg']['template'].GetBinContent(1)*res2[srNJet][stb][htb][fitkey]['Rest_PosPdg']['yield']
-      RestPredPosPdgMCVar = res2[srNJet][stb][htb][fitkey]['Rest_PosPdg']['template'].GetBinError(1)**2*res2[srNJet][stb][htb][fitkey]['Rest_PosPdg']['yield']**2 + \
-                            res2[srNJet][stb][htb][fitkey]['Rest_PosPdg']['template'].GetBinContent(1)**2*res2[srNJet][stb][htb][fitkey]['Rest_PosPdg']['yieldVar']
-      RestPredNegPdgMC = res2[srNJet][stb][htb][fitkey]['Rest_NegPdg']['template'].GetBinContent(1)*res2[srNJet][stb][htb][fitkey]['Rest_NegPdg']['yield']
-      RestPredNegPdgMCVar = res2[srNJet][stb][htb][fitkey]['Rest_NegPdg']['template'].GetBinError(1)**2*res2[srNJet][stb][htb][fitkey]['Rest_NegPdg']['yield']**2 + \
-                            res2[srNJet][stb][htb][fitkey]['Rest_NegPdg']['template'].GetBinContent(1)**2*res2[srNJet][stb][htb][fitkey]['Rest_NegPdg']['yieldVar']
-
-      totalPredPosPdgMC = ttPredMC/2 + WPredPosPdgMC + RestPredPosPdgMC
-      totalPredPosPdgMCVar = ttPredMCVar/4 + WPredPosPdgMCVar + RestPredPosPdgMCVar
-
-      totalPredNegPdgMC = ttPredMC/2 + WPredNegPdgMC + RestPredNegPdgMC
-      totalPredNegPdgMCVar = ttPredMCVar/4 + WPredNegPdgMCVar + RestPredNegPdgMCVar
-
-      #fractions and errors      
-      ttPredPosFracMC = ttPredMC/(2*totalPredPosPdgMC)
-      ttPredPosFracMCVar = (ttPredMCVar/4)/totalPredPosPdgMC**2 + totalPredPosPdgMCVar*(ttPredMC/2)**2/totalPredPosPdgMC**4
-      
-      ttPredNegFracMC = ttPredMC/(2*totalPredNegPdgMC)
-      ttPredNegFracMCVar = (ttPredMCVar/4)/totalPredNegPdgMC**2 + totalPredNegPdgMCVar*(ttPredMC/2)**2/totalPredNegPdgMC**4
-
-      WPredPosFracMC = WPredPosPdgMC/totalPredPosPdgMC
-      WPredPosFracMCVar = WPredPosPdgMCVar/totalPredPosPdgMC**2 + totalPredPosPdgMCVar*WPredPosPdgMC**2/totalPredPosPdgMC**4
-
-      WPredNegFracMC = WPredNegPdgMC/totalPredNegPdgMC
-      WPredNegFracMCVar = WPredNegPdgMCVar/totalPredNegPdgMC**2 + totalPredNegPdgMCVar*WPredNegPdgMC**2/totalPredNegPdgMC**4
-      
-      RestPredPosFracMC = RestPredPosPdgMC/totalPredPosPdgMC
-      RestPredPosFracMCVar = RestPredPosPdgMCVar/totalPredPosPdgMC**2 + totalPredPosPdgMCVar*RestPredPosPdgMC**2/totalPredPosPdgMC**4
-
-      RestPredNegFracMC = RestPredNegPdgMC/totalPredNegPdgMC
-      RestPredNegFracMCVar = RestPredNegPdgMCVar/totalPredNegPdgMC**2 + totalPredNegPdgMCVar*RestPredNegPdgMC**2/totalPredNegPdgMC**4
-
-      print '&$'+varBin(htb)+'$'
-      print ' & ' + getNumString(WPredNegFrac,   sqrt(WPredNegFracVar)) \
-          + ' & ' + getNumString(WPredNegFracMC, sqrt(WPredNegFracMCVar)) \
-          + ' & ' + getNumString(WPredPosFrac,   sqrt(WPredPosFracVar)) \
-          + ' & ' + getNumString(WPredPosFracMC, sqrt(WPredPosFracMCVar)) +'\\\\'
-
-      if htb[1] == -1 : print '\\cline{2-15}'
-print '\\hline\end{tabular}}\end{center}\caption{Fractions of W+jets background obtained from a b-tag multiplicity fit for data and MC in the CRs}\label{tab:fitFractionsW}\end{table}'
-
+print "Rcs table"
 print
-print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrrrrr|rrrrrr|}\\hline'
-print ' \\njet     & \ST & \HT     &\multicolumn{6}{c|}{Rare EWK neg. PDG}&\multicolumn{6}{c|}{Rare EWK pos. PDG}\\\%\hline'
-print ' & $[$GeV$]$ &$[$GeV$]$ & \multicolumn{3}{c}{data} & \multicolumn{3}{c|}{MC} & \multicolumn{3}{c}{data} & \multicolumn{3}{c|}{MC} \\\\\hline'
+print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrr|rrr|rrr|}\\hline'
+print ' \\njet     & \ST & \HT     &\multicolumn{6}{c|}{$tt+$Jets}&\multicolumn{6}{c|}{$W+$ Jets}\\\%\hline'
+print ' & $[$GeV$]$ &$[$GeV$]$&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation} \\\\\hline'
 
 secondLine = False
 for srNJet in sorted(signalRegions):
@@ -359,129 +121,15 @@ for srNJet in sorted(signalRegions):
     for htb in sorted(signalRegions[srNJet][stb]):
       if not first: print '&'
       first = False
-      #data yields and errors
-      ttPred = res[srNJet][stb][htb][fitkey]['TT_AllPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb][fitkey]['TT_AllPdg']['yield']
-      ttPredVar = res[srNJet][stb][htb][fitkey]['TT_AllPdg']['template'].GetBinError(1)**2*res[srNJet][stb][htb][fitkey]['TT_AllPdg']['yield']**2 + \
-                  res[srNJet][stb][htb][fitkey]['TT_AllPdg']['template'].GetBinContent(1)**2*res[srNJet][stb][htb][fitkey]['TT_AllPdg']['yieldVar']
-      WPredPosPdg = res[srNJet][stb][htb][fitkey]['W_PosPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb][fitkey]['W_PosPdg']['yield']
-      WPredPosPdgVar = res[srNJet][stb][htb][fitkey]['W_PosPdg']['template'].GetBinError(1)**2*res[srNJet][stb][htb][fitkey]['W_PosPdg']['yield']**2 + \
-                       res[srNJet][stb][htb][fitkey]['W_PosPdg']['template'].GetBinContent(1)**2*res[srNJet][stb][htb][fitkey]['W_PosPdg']['yieldVar']
-      WPredNegPdg = res[srNJet][stb][htb][fitkey]['W_NegPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb][fitkey]['W_NegPdg']['yield']
-      WPredNegPdgVar = res[srNJet][stb][htb][fitkey]['W_NegPdg']['template'].GetBinError(1)**2*res[srNJet][stb][htb][fitkey]['W_NegPdg']['yield']**2 + \
-                       res[srNJet][stb][htb][fitkey]['W_NegPdg']['template'].GetBinContent(1)**2*res[srNJet][stb][htb][fitkey]['W_NegPdg']['yieldVar']
-      RestPredPosPdg = res[srNJet][stb][htb][fitkey]['Rest_PosPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb][fitkey]['Rest_PosPdg']['yield']
-      RestPredPosPdgVar = res[srNJet][stb][htb][fitkey]['Rest_PosPdg']['template'].GetBinError(1)**2*res[srNJet][stb][htb][fitkey]['Rest_PosPdg']['yield']**2 + \
-                          res[srNJet][stb][htb][fitkey]['Rest_PosPdg']['template'].GetBinContent(1)**2*res[srNJet][stb][htb][fitkey]['Rest_PosPdg']['yieldVar']
-      RestPredNegPdg = res[srNJet][stb][htb][fitkey]['Rest_NegPdg']['template'].GetBinContent(1)*res[srNJet][stb][htb][fitkey]['Rest_NegPdg']['yield']
-      RestPredNegPdgVar = res[srNJet][stb][htb][fitkey]['Rest_NegPdg']['template'].GetBinError(1)**2*res[srNJet][stb][htb][fitkey]['Rest_NegPdg']['yield']**2 + \
-                          res[srNJet][stb][htb][fitkey]['Rest_NegPdg']['template'].GetBinContent(1)**2*res[srNJet][stb][htb][fitkey]['Rest_NegPdg']['yieldVar']
-
-      totalPredPosPdg = ttPred/2 + WPredPosPdg + RestPredPosPdg
-      totalPredPosPdgVar = ttPredVar/4 + WPredPosPdgVar + RestPredPosPdgVar
-
-      totalPredNegPdg = ttPred/2 + WPredNegPdg + RestPredNegPdg
-      totalPredNegPdgVar = ttPredVar/4 + WPredNegPdgVar + RestPredNegPdgVar
-
-      #fractions and errors
-      ttPredPosFrac = ttPred/(2*totalPredPosPdg)
-      ttPredPosFracVar = (ttPredVar/4)/totalPredPosPdg**2 + totalPredPosPdgVar*(ttPred/2)**2/totalPredPosPdg**4
-      
-      ttPredNegFrac = ttPred/(2*totalPredNegPdg)
-      ttPredNegFracVar = (ttPredVar/4)/totalPredNegPdg**2 + totalPredNegPdgVar*(ttPred/2)**2/totalPredNegPdg**4
-      
-      WPredPosFrac = WPredPosPdg/totalPredPosPdg
-      WPredPosFracVar = WPredPosPdgVar/totalPredPosPdg**2 + totalPredPosPdgVar*WPredPosPdg**2/totalPredPosPdg**4
-      
-      WPredNegFrac = WPredNegPdg/totalPredNegPdg
-      WPredNegFracVar = WPredNegPdgVar/totalPredNegPdg**2 + totalPredNegPdgVar*WPredNegPdg**2/totalPredNegPdg**4
-      
-      RestPredPosFrac = RestPredPosPdg/totalPredPosPdg
-      RestPredPosFracVar = RestPredPosPdgVar/totalPredPosPdg**2 + totalPredPosPdgVar*RestPredPosPdg**2/totalPredPosPdg**4
-
-      RestPredNegFrac = RestPredNegPdg/totalPredNegPdg
-      RestPredNegFracVar = RestPredNegPdgVar/totalPredNegPdg**2 + totalPredNegPdgVar*RestPredNegPdg**2/totalPredNegPdg**4
-      
-      #MC yields and errors
-      ttPredMC = res2[srNJet][stb][htb][fitkey]['TT_AllPdg']['template'].GetBinContent(1)*res2[srNJet][stb][htb][fitkey]['TT_AllPdg']['yield']
-      ttPredMCVar = res2[srNJet][stb][htb][fitkey]['TT_AllPdg']['template'].GetBinError(1)**2*res2[srNJet][stb][htb][fitkey]['TT_AllPdg']['yield']**2 + \
-                    res2[srNJet][stb][htb][fitkey]['TT_AllPdg']['template'].GetBinContent(1)**2*res2[srNJet][stb][htb][fitkey]['TT_AllPdg']['yieldVar']
-      WPredPosPdgMC = res2[srNJet][stb][htb][fitkey]['W_PosPdg']['template'].GetBinContent(1)*res2[srNJet][stb][htb][fitkey]['W_PosPdg']['yield']
-      WPredPosPdgMCVar = res2[srNJet][stb][htb][fitkey]['W_PosPdg']['template'].GetBinError(1)**2*res2[srNJet][stb][htb][fitkey]['W_PosPdg']['yield']**2 + \
-                         res2[srNJet][stb][htb][fitkey]['W_PosPdg']['template'].GetBinContent(1)**2*res2[srNJet][stb][htb][fitkey]['W_PosPdg']['yieldVar']
-      WPredNegPdgMC = res2[srNJet][stb][htb][fitkey]['W_NegPdg']['template'].GetBinContent(1)*res2[srNJet][stb][htb][fitkey]['W_NegPdg']['yield']
-      WPredNegPdgMCVar = res2[srNJet][stb][htb][fitkey]['W_NegPdg']['template'].GetBinError(1)**2*res2[srNJet][stb][htb][fitkey]['W_NegPdg']['yield']**2 + \
-                         res2[srNJet][stb][htb][fitkey]['W_NegPdg']['template'].GetBinContent(1)**2*res2[srNJet][stb][htb][fitkey]['W_NegPdg']['yieldVar']
-      RestPredPosPdgMC = res2[srNJet][stb][htb][fitkey]['Rest_PosPdg']['template'].GetBinContent(1)*res2[srNJet][stb][htb][fitkey]['Rest_PosPdg']['yield']
-      RestPredPosPdgMCVar = res2[srNJet][stb][htb][fitkey]['Rest_PosPdg']['template'].GetBinError(1)**2*res2[srNJet][stb][htb][fitkey]['Rest_PosPdg']['yield']**2 + \
-                            res2[srNJet][stb][htb][fitkey]['Rest_PosPdg']['template'].GetBinContent(1)**2*res2[srNJet][stb][htb][fitkey]['Rest_PosPdg']['yieldVar']
-      RestPredNegPdgMC = res2[srNJet][stb][htb][fitkey]['Rest_NegPdg']['template'].GetBinContent(1)*res2[srNJet][stb][htb][fitkey]['Rest_NegPdg']['yield']
-      RestPredNegPdgMCVar = res2[srNJet][stb][htb][fitkey]['Rest_NegPdg']['template'].GetBinError(1)**2*res2[srNJet][stb][htb][fitkey]['Rest_NegPdg']['yield']**2 + \
-                            res2[srNJet][stb][htb][fitkey]['Rest_NegPdg']['template'].GetBinContent(1)**2*res2[srNJet][stb][htb][fitkey]['Rest_NegPdg']['yieldVar']
-
-      totalPredPosPdgMC = ttPredMC/2 + WPredPosPdgMC + RestPredPosPdgMC
-      totalPredPosPdgMCVar = ttPredMCVar/4 + WPredPosPdgMCVar + RestPredPosPdgMCVar
-
-      totalPredNegPdgMC = ttPredMC/2 + WPredNegPdgMC + RestPredNegPdgMC
-      totalPredNegPdgMCVar = ttPredMCVar/4 + WPredNegPdgMCVar + RestPredNegPdgMCVar
-
-      #fractions and errors      
-      ttPredPosFracMC = ttPredMC/(2*totalPredPosPdgMC)
-      ttPredPosFracMCVar = (ttPredMCVar/4)/totalPredPosPdgMC**2 + totalPredPosPdgMCVar*(ttPredMC/2)**2/totalPredPosPdgMC**4
-      
-      ttPredNegFracMC = ttPredMC/(2*totalPredNegPdgMC)
-      ttPredNegFracMCVar = (ttPredMCVar/4)/totalPredNegPdgMC**2 + totalPredNegPdgMCVar*(ttPredMC/2)**2/totalPredNegPdgMC**4
-
-      WPredPosFracMC = WPredPosPdgMC/totalPredPosPdgMC
-      WPredPosFracMCVar = WPredPosPdgMCVar/totalPredPosPdgMC**2 + totalPredPosPdgMCVar*WPredPosPdgMC**2/totalPredPosPdgMC**4
-
-      WPredNegFracMC = WPredNegPdgMC/totalPredNegPdgMC
-      WPredNegFracMCVar = WPredNegPdgMCVar/totalPredNegPdgMC**2 + totalPredNegPdgMCVar*WPredNegPdgMC**2/totalPredNegPdgMC**4
-      
-      RestPredPosFracMC = RestPredPosPdgMC/totalPredPosPdgMC
-      RestPredPosFracMCVar = RestPredPosPdgMCVar/totalPredPosPdgMC**2 + totalPredPosPdgMCVar*RestPredPosPdgMC**2/totalPredPosPdgMC**4
-
-      RestPredNegFracMC = RestPredNegPdgMC/totalPredNegPdgMC
-      RestPredNegFracMCVar = RestPredNegPdgMCVar/totalPredNegPdgMC**2 + totalPredNegPdgMCVar*RestPredNegPdgMC**2/totalPredNegPdgMC**4
-
       print '&$'+varBin(htb)+'$'
-      print ' & ' + getNumString(RestPredNegFrac,   sqrt(RestPredNegFracVar)) \
-          + ' & ' + getNumString(RestPredNegFracMC, sqrt(RestPredNegFracMCVar)) \
-          + ' & ' + getNumString(RestPredPosFrac,   sqrt(RestPredPosFracVar)) \
-          + ' & ' + getNumString(RestPredPosFracMC, sqrt(RestPredPosFracMCVar)) +'\\\\'
-
+      print ' & '+getNumString(res[srNJet][stb][htb]['rCS_crLowNJet_1b']['rCS'],  res[srNJet][stb][htb]['rCS_crLowNJet_1b']['rCSE_pred'],3)\
+           +' & '+getNumString(res[srNJet][stb][htb]['rCS_srNJet_0b_onlyTT']['rCS'], res[srNJet][stb][htb]['rCS_srNJet_0b_onlyTT']['rCSE_sim'],3)\
+           +' & '+getNumString(res[srNJet][stb][htb]['rCS_W_crNJet_0b_corr'],   sqrt(res[srNJet][stb][htb]['rCS_Var_W_crNJet_0b_corr']),3)\
+           +' & '+getNumString(res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW']['rCS'],  res[srNJet][stb][htb]['rCS_srNJet_0b_onlyW']['rCSE_sim'],3) + '\\\\'
       if htb[1] == -1 : print '\\cline{2-15}'
-print '\\hline\end{tabular}}\end{center}\caption{Fractions of rare EWK backgrounds obtained from a b-tag multiplicity fit for data and MC in the CRs}\label{tab:fitFractionsRest}\end{table}'
+print '\\hline\end{tabular}}\end{center}\caption{Rcs table for the two main backgrounds, 3$fb^{-1}$}\label{tab:0b_rcs}\end{table}'
 
-##closure table
-#print "Closure table"
-#print
-#print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrr|rrr|rrr|rrr|rrr|rrr|}\\hline'
-#print ' \\njet     & \ST & \HT     &\multicolumn{6}{c|}{$tt+$Jets}&\multicolumn{6}{c|}{$W+$ Jets}&\multicolumn{3}{c|}{Other EW bkg.}&\multicolumn{6}{c|}{total bkg.}\\\%\hline'
-#print ' & $[$GeV$]$ &$[$GeV$]$&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation} \\\\\hline'
-#
-#secondLine = False
-#for srNJet in sorted(signalRegions):
-#  print '\\hline'
-#  if secondLine: print '\\hline'
-#  secondLine = True
-#  print '\multirow{'+str(rowsNJet[srNJet]['n'])+'}{*}{\\begin{sideways}$'+varBin(srNJet)+'$\end{sideways}}'
-#  for stb in sorted(signalRegions[srNJet]):
-#    print '&\multirow{'+str(rowsSt[srNJet][stb]['n'])+'}{*}{$'+varBin(stb)+'$}'
-#    first = True
-#    for htb in sorted(signalRegions[srNJet][stb]):
-#      if not first: print '&'
-#      first = False
-#      print '&$'+varBin(htb)+'$' 
-#      print ' & '+getNumString(res[srNJet][stb][htb]['TT_pred'],  res[srNJet][stb][htb]['TT_pred_err'])\
-#           +' & '+getNumString(res[srNJet][stb][htb]['TT_truth']*scaleFactor, res[srNJet][stb][htb]['TT_truth_err'])\
-#           +' & '+getNumString(res[srNJet][stb][htb]['W_pred'],   res[srNJet][stb][htb]['W_pred_err'])\
-#           +' & '+getNumString(res[srNJet][stb][htb]['W_truth']*scaleFactor,  res[srNJet][stb][htb]['W_truth_err'])\
-#           +' & '+getNumString(res[srNJet][stb][htb]['Rest_truth'], res[srNJet][stb][htb]['Rest_truth_err'])\
-#           +' & '+getNumString(res[srNJet][stb][htb]['tot_pred'], res[srNJet][stb][htb]['tot_pred_err'])\
-#           +' & '+getNumString(res[srNJet][stb][htb]['tot_truth']*scaleFactor,res[srNJet][stb][htb]['tot_truth_err']) +'\\\\'
-#      if htb[1] == -1 : print '\\cline{2-24}'
-#print '\\hline\end{tabular}}\end{center}\caption{Closure table for the background in the 0-tag regions, 3$fb^{-1}$}\label{tab:0b_totalClosure}\end{table}'
-#
+
 ##closure table
 #print
 #print "Rcs table"
@@ -511,37 +159,37 @@ print '\\hline\end{tabular}}\end{center}\caption{Fractions of rare EWK backgroun
 #print '\\hline\end{tabular}}\end{center}\caption{Rcs table for the two main backgrounds, 3$fb^{-1}$}\label{tab:0b_rcs}\end{table}'
 #
 #
-## W closure table
-##res = pickle.load(file(path+prefix+'_estimationResults_pkl_updated'))
-##multiplier = {(5,5):2, (6,7):3, (8,-1):4}
-#print
-#print 'W closure table'
-#print
-#print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrr|rrr|rrr|rrr|rrr|}\\hline'
-#print ' \\njet & \ST & \HT &\multicolumn{6}{c|}{$W+$ Jets}&\multicolumn{6}{c|}{$W-$ Jets}&\multicolumn{6}{c|}{$W$ Jets}\\\%\hline'
-#print ' & $[$GeV$]$ &$[$GeV$]$&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation} \\\\\hline'
-#secondLine = False
-#for srNJet in sorted(signalRegions):
-#  print '\\hline'
-#  if secondLine: print '\\hline'
-#  secondLine = True
-#  print '\multirow{'+str(rowsNJet[srNJet]['n'])+'}{*}{\\begin{sideways}$'+varBin(srNJet)+'$\end{sideways}}'
-#  for stb in sorted(signalRegions[srNJet]):
-#    print '&\multirow{'+str(rowsSt[srNJet][stb]['n'])+'}{*}{$'+varBin(stb)+'$}'
-#    first = True
-#    for htb in sorted(signalRegions[srNJet][stb]):
-#      if not first: print '&'
-#      first = False
-#
-#      print '&$'+varBin(htb)+'$'
-#      print ' & '+getNumString(res[srNJet][stb][htb]['W_NegPdg_pred'], res[srNJet][stb][htb]['W_NegPdg_pred_err'])\
-#           +' & '+getNumString(res[srNJet][stb][htb]['W_NegPdg_truth']*scaleFactor, res[srNJet][stb][htb]['W_NegPdg_truth_err'])\
-#           +' & '+getNumString(res[srNJet][stb][htb]['W_PosPdg_pred'], res[srNJet][stb][htb]['W_PosPdg_pred_err'])\
-#           +' & '+getNumString(res[srNJet][stb][htb]['W_PosPdg_truth']*scaleFactor, res[srNJet][stb][htb]['W_PosPdg_truth_err'])\
-#           +' & '+getNumString(res[srNJet][stb][htb]['W_pred'],        res[srNJet][stb][htb]['W_pred_err'])\
-#           +' & '+getNumString(res[srNJet][stb][htb]['W_truth']*scaleFactor,        res[srNJet][stb][htb]['W_truth_err']) +'\\\\'
-#      if htb[1] == -1 : print '\\cline{2-21}'
-#print '\\hline\end{tabular}}\end{center}\caption{EFGH}\label{tab:0b_rcscorr_Wbkg}\end{table}'
+# W closure table
+#res = pickle.load(file(path+prefix+'_estimationResults_pkl_updated'))
+#multiplier = {(5,5):2, (6,7):3, (8,-1):4}
+print
+print 'W closure table'
+print
+print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrr|rrr|rrr|rrr|rrr|}\\hline'
+print ' \\njet & \ST & \HT &\multicolumn{6}{c|}{$W+$ Jets}&\multicolumn{6}{c|}{$W-$ Jets}&\multicolumn{6}{c|}{$W$ Jets}\\\%\hline'
+print ' & $[$GeV$]$ &$[$GeV$]$&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation} \\\\\hline'
+secondLine = False
+for srNJet in sorted(signalRegions):
+  print '\\hline'
+  if secondLine: print '\\hline'
+  secondLine = True
+  print '\multirow{'+str(rowsNJet[srNJet]['n'])+'}{*}{\\begin{sideways}$'+varBin(srNJet)+'$\end{sideways}}'
+  for stb in sorted(signalRegions[srNJet]):
+    print '&\multirow{'+str(rowsSt[srNJet][stb]['n'])+'}{*}{$'+varBin(stb)+'$}'
+    first = True
+    for htb in sorted(signalRegions[srNJet][stb]):
+      if not first: print '&'
+      first = False
+
+      print '&$'+varBin(htb)+'$'
+      print ' & '+getNumString(res[srNJet][stb][htb]['W_NegPdg_pred'], res[srNJet][stb][htb]['W_NegPdg_pred_err'])\
+           +' & '+getNumString(res[srNJet][stb][htb]['W_NegPdg_truth']*scaleFactor, res[srNJet][stb][htb]['W_NegPdg_truth_err'])\
+           +' & '+getNumString(res[srNJet][stb][htb]['W_PosPdg_pred'], res[srNJet][stb][htb]['W_PosPdg_pred_err'])\
+           +' & '+getNumString(res[srNJet][stb][htb]['W_PosPdg_truth']*scaleFactor, res[srNJet][stb][htb]['W_PosPdg_truth_err'])\
+           +' & '+getNumString(res[srNJet][stb][htb]['W_pred'],        res[srNJet][stb][htb]['W_pred_err'])\
+           +' & '+getNumString(res[srNJet][stb][htb]['W_truth']*scaleFactor,        res[srNJet][stb][htb]['W_truth_err']) +'\\\\'
+      if htb[1] == -1 : print '\\cline{2-21}'
+print '\\hline\end{tabular}}\end{center}\caption{EFGH}\label{tab:0b_rcscorr_Wbkg}\end{table}'
 
 ## W closure table with systematics
 ##res = pickle.load(file(path+prefix+'_estimationResults_pkl_updated'))
@@ -577,9 +225,9 @@ print '\\hline\end{tabular}}\end{center}\caption{Fractions of rare EWK backgroun
 
 #print "Results"
 #print
-#print '\\begin{table}[ht]\\begin{center}\\begin{tabular}{|c|c|c|rrr|}\\hline'
-#print ' \\njet & \ST & \HT     &\multicolumn{3}{c|}{$\kappa_{CS}$}\\\%\hline'
-#print ' & $[$GeV$]$ &$[$GeV$]$&\multicolumn{3}{c|}{0b/1b}\\\ '
+#print '\\begin{table}[ht]\\begin{center}\\begin{tabular}{|c|c|c|rrr|rrr|}\\hline'
+#print ' \\njet & \ST & \HT     &\multicolumn{3}{c|}{$\kappa_{CS}$} &\multicolumn{3}{c|}{$\kappa_{CS}$ b-tag}\\\%\hline'
+#print ' & $[$GeV$]$ &$[$GeV$]$&\multicolumn{3}{c|}{0b/1b}&\multicolumn{3}{c|}{0b/1b}\\\ '
 #secondLine = False
 #for srNJet in sorted(signalRegions):
 #  print '\\hline'
@@ -593,7 +241,9 @@ print '\\hline\end{tabular}}\end{center}\caption{Fractions of rare EWK backgroun
 #      if not first: print '&'
 #      first = False
 #      print '&$'+varBin(htb)+'$'
-#      print ' & '+getNumString(res[srNJet][stb][htb]['TT_rCS_fits_MC']['k_0b/1b'], res[srNJet][stb][htb]['TT_rCS_fits_MC']['k_0b/1b_err'])+'\\\\ '
+#      print ' & '+getNumString(res[srNJet][stb][htb]['TT_rCS_fits_MC']['k_0b/1b'], res[srNJet][stb][htb]['TT_rCS_fits_MC']['k_0b/1b_err'])\
+#          + ' & '+getNumString(res[srNJet][stb][htb]['TT_rCS_fits_MC']['k_0b/1b_btag'], res[srNJet][stb][htb]['TT_rCS_fits_MC']['k_0b/1b_btag_err'])+'\\\\ '
+#    if htb[1] == -1 : print '\\cline{2-9}'
 #print '\\hline\end{tabular}\end{center}\caption{Correction factors for \\ttJets background, 3$fb^{-1}$}\label{tab:0b_rcscorr_Wbkg}\end{table}'
 
 
