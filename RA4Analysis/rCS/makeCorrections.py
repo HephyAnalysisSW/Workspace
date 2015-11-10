@@ -33,9 +33,7 @@ cTTJets = getChain(TTJets_LO_25ns_btagweight,histname='')
 DY = getChain(DY_25ns,histname='')
 singleTop = getChain(singleTop_25ns,histname='')
 TTV = getChain(TTV_25ns,histname='')
-#cRest = getChain([singleTop_25ns, DY_25ns, TTV_25ns],histname='')#no QCD
 cEWK =  getChain([WJetsHT_25ns_btagweight, TTJets_LO_25ns_btagweight, singleTop_25ns, DY_25ns, TTV_25ns], histname='')#no QCD
-#cData = getChain([WJetsHT_25ns, TTJets_HTLO_25ns, singleTop_25ns, DY_25ns, TTV_25ns], histname='')
 
 #cBkg = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]],histname='')#no QCD
 #cData = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]] , histname='')
@@ -49,11 +47,11 @@ small = False
 if small: signalRegions = smallRegion
 
 #DEFINE LUMI AND PLOTDIR
-lumi = 3.
+lumi = 1.26
 
-pickleDir = '/data/'+username+'/Results2015/Prediction_SFTemplate_MC_fullSR_lep_'+str(lumi)+'/'
+pickleDir = '/data/'+username+'/Results2015/Prediction_bweightSFTemplate_Data_fullSR_lep_'+str(lumi)+'/'
 
-fitDir = '/data/'+username+'/Results2015/correctionFit_btagKappa_MC_fullSR/'
+fitDir = '/data/'+username+'/Results2015/correctionFit_btagKappa_data_fullSR/'
 
 prefix = 'singleLeptonic_Spring15_'
 
@@ -68,12 +66,14 @@ if not os.path.exists(fitDir):
 weight_str, weight_err_str = makeWeight(lumi, sampleLumi=3.)
 
 
-presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&Jet_pt[1]>80&&st>250&&nJet30>2&&htJet30j>500"#&&nBJetMediumCSV30==0"
+triggers = "(HLT_EleHT350||HLT_MuHT350)"
+filters = "Flag_goodVertices && Flag_HBHENoiseFilter_fix && Flag_CSCTightHaloFilter && Flag_eeBadScFilter && Flag_HBHENoiseIsoFilter"
+presel = "((!isData&&singleLeptonic)||(isData&&"+triggers+"&&((muonDataSet&&singleMuonic)||(eleDataSet&&singleElectronic))&&"+filters+"))"
+presel += "&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&Jet_pt[1]>80&&st>250&&nJet30>2&&htJet30j>500"
+
+#presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&Jet_pt[1]>80&&st>250&&nJet30>2&&htJet30j>500"#&&nBJetMediumCSV30==0"
 #filters = "&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFilter&&Flag_goodVertices&&Flag_eeBadScFilter&&Flag_EcalDeadCellTriggerPrimitiveFilter" #strange filter settings!!
-filters = "&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFilter_fix&&Flag_HBHENoiseFilter&&Flag_goodVertices&&Flag_eeBadScFilter&&Flag_EcalDeadCellTriggerPrimitiveFilter"
-#presel += '&&singleMuonic'
-#presel += filters
-#presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&Jet_pt[1]>80"
+#filters = "&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFilter_fix&&Flag_HBHENoiseFilter&&Flag_goodVertices&&Flag_eeBadScFilter&&Flag_EcalDeadCellTriggerPrimitiveFilter"
 btagString = 'nBJetMediumCSV30'
 
 wJetBins = [(3,4),(5,5),(6,7),(8,-1)]
@@ -209,14 +209,6 @@ for i_njb, njb in enumerate(signalRegions):
       TT_corrections = {'k_0b/1b':kappaTT['kappa'], 'k_0b/1b_err':kappaTT['kappaE_sim'], 'k_0b/1b_btag':kappaTT_btag['kappa'], 'k_0b/1b_btag_err':kappaTT_btag['kappaE_sim'], 'k_0b/1b_fit':kappaTTfit, 'k_0b/1b_fit_err':kappaTTfitErr, '0b_fit_const':ttD,'0b_fit_const_err':ttDE, '0b_fit_grad':ttK, '0b_fit_grad_err':ttKE}
       res[njb][stb][htb].update({'TT_rCS_fits_MC':TT_corrections})
       
-      #print
-      #print 'ttJets\tK\tKerr\tKfit\tRcsPred\tRcsFit\tRcsTrue\tRcs+K\tRcsDiff\t+K\tYDiff\t+K\tYpred\tYEpred\tYtrue\tYEtrue\tpropE'
-      #print '\t',round(kappaTT['kappa'],2), '\t',round(kappaTT['kappaE_sim'],2), '\t',round(kappaTTfit,2), '\t', round(res[njb][stb][htb]['rCS_crLowNJet_1b']['rCS'],3),'\t', round(ttD+ttK*i_njb,3),'\t',\
-      #           round(res[njb][stb][htb]['rCS_srNJet_0b_onlyTT']['rCS'],3),'\t',round(kappaTT['kappa']*res[njb][stb][htb]['rCS_crLowNJet_1b']['rCS'],3),'\t',\
-      #           round(TT_rcs_diff,3), '\t', round(TT_rcs_diffKappaCorr,3), '\t', round(TT_y_diff,3), '\t', round(TT_y_diffKappaCorr,3), '\t', round(res[njb][stb][htb]['TT_pred'],3), '\t',\
-      #           round(res[njb][stb][htb]['TT_pred_err'],3), '\t', round(res[njb][stb][htb]['TT_truth'],3), '\t', round(res[njb][stb][htb]['TT_truth_err'],3), '\t',\
-      #           round(TTexpandedErr,3)
-
       print
       print 'ttJets\tK\tK_err\tRcs:\tTruth\tPred\tFit\tMC0bSB\tYield:\tTruth\tPred\tCorr\tstat\tsyst\ttot_err'
       print '\t',round(kappaTT['kappa'],2), '\t',round(kappaTT['kappaE_sim'],2), '\t\t', round(res[njb][stb][htb]['rCS_srNJet_0b_onlyTT']['rCS'],3),'\t',\
@@ -320,14 +312,6 @@ for i_njb, njb in enumerate(signalRegions):
         if createFits:
           del wJetRcsFitH
 
-#      print
-#      print 'WJets\tRcsPred\tRcsFit\tRcsTrue\tRcsDiff\tYDiff\tYpred\tYEpred\tYtrue\tYEtrue\tpropE'
-#      print '\t',round(res[njb][stb][htb]['rCS_W_crNJet_0b_corr'],3),'\t', round(wD+wK*i_njb,3),'\t',\
-#                 round(res[njb][stb][htb]['rCS_srNJet_0b_onlyW']['rCS'],3),'\t',\
-#                 round(rcsWdiff,3), '\t', round(Wdiff,3), '\t', round(res[njb][stb][htb]['W_pred'],3), '\t',\
-#                 round(res[njb][stb][htb]['W_pred_err'],3), '\t', round(res[njb][stb][htb]['W_truth'],3), '\t', round(res[njb][stb][htb]['W_truth_err'],3), '\t',\
-#                 round(WexpandedErr,3)
-
       print
       print 'WJets\tRcs:\tTruth\tPred\tFit\tMC0bSB\tYield:\tTruth\tPred\tstat\tsyst\ttot_err'
       print '\t\t',round(res[njb][stb][htb]['rCS_srNJet_0b_onlyW']['rCS'],3), '\t',round(res[njb][stb][htb]['rCS_W_crNJet_0b_corr'],3), '\t', round(wD+wK*i_njb,3),'\t',\
@@ -336,13 +320,6 @@ for i_njb, njb in enumerate(signalRegions):
                    round(W_stat_err,3), '\t',round(W_syst_err,3), '\t',round(WexpandedErr,3)
 
 
-
-      #res[njb][stb][htb]['W_pred_err'] = WexpandedErr
-      
-      # totals corrected
-      #res[njb][stb][htb]['tot_pred_err'] = sqrt(TTexpandedErr**2 + WexpandedErr**2 + res[njb][stb][htb]['Rest_truth_err']**2)
-      #res[njb][stb][htb]['tot_pred_err'] = sqrt(TT_pred_err**2 + WexpandedErr**2 + res[njb][stb][htb]['Rest_truth_err']**2)
-      #res[njb][stb][htb]['tot_pred'] = TT_pred_corr + res[njb][stb][htb]['W_pred'] + res[njb][stb][htb]['Rest_truth']
       if createFits:
         del ttJetRcsFitH, ttJetRcsFitH1b
       

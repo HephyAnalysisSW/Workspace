@@ -162,6 +162,9 @@ for srNJet in sorted(signalRegions):
 
 #res = pickle.load(file('/data/dspitzbart/Spring15/Stat_SBandCR_pkl'))
 #
+
+res = stats
+
 rowsNJet = {}
 rowsSt = {}
 for srNJet in sorted(signalRegions):
