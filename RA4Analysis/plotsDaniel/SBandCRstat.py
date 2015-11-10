@@ -48,7 +48,7 @@ btagString = 'nBJetMediumCSV30'
 charges = [['posPDG','leptonPdg>0'],['negPDG','leptonPdg<0']]
 
 stats ={}
-signalRegions = signalRegion3fb
+signalRegions = signalRegion3fbReduced
 
 lumi = 1.26
 

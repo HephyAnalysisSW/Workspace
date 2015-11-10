@@ -110,25 +110,34 @@ metNoHF = {'binning': [20, 0, 1000], 'name': 'metNoHF_pt', 'titleX': 'E_{T}^{mis
 metNoHFPhi = {'binning': [16, -3.2, 3.2], 'name': 'metNoHF_phi', 'titleX': '#Phi(E_{T}^{miss}) NoHF', 'titleY': 'Events'}
 #deltaPhiCMG = {'binning': [16, 0, 3.2], 'name': 'Sum$((acos((LepGood_pt+metNoHF_pt*cos(LepGood_phi-metNoHF_phi))/sqrt(LepGood_pt**2+metNoHF_pt**2+2*metNoHF_pt*LepGood_pt*cos(LepGood_phi-metNoHF_phi))))*'+electronId+')', 'titleX': '#Delta#Phi(W,l) NoHF', 'titleY': 'Events'}
 
-presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&st>250&&nJet30>2&&htJet30j>500&&nBJetMediumCSV30==0"
-preselNoLtHt = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&Jet_pt[1]>80&&nBJetMediumCSV30==0"
+#presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&st>250&&nJet30>2&&htJet30j>500&&nBJetMediumCSV30==0"
+#preselNoLtHt = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&Jet_pt[1]>80&&nBJetMediumCSV30==0"
+#
+#newpresel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&st>250&&nJet30>=2&&htJet30j>500&&Jet_pt[1]>80" ####changed here!!
+#newpresel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&st>250&&nJet30>=2&&htJet30j>500&&Jet_pt[1]>80&&deltaPhi_Wl<0.5"
+#filters = "&&Flag_goodVertices&&Flag_HBHENoiseFilter&&Flag_eeBadScFilter&&Flag_CSCTightHaloFilter"
+#newpresel += filters
 
-newpresel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&st>250&&nJet30>=2&&htJet30j>500&&Jet_pt[1]>80" ####changed here!!
-newpresel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&st>250&&nJet30>=2&&htJet30j>500&&Jet_pt[1]>80&&deltaPhi_Wl<0.5"
-filters = "&&Flag_goodVertices&&Flag_HBHENoiseFilter&&Flag_eeBadScFilter&&Flag_CSCTightHaloFilter"
-newpresel += filters
+triggers = "(HLT_EleHT350||HLT_MuHT350)"
+filters = "Flag_goodVertices && Flag_HBHENoiseFilter_fix && Flag_CSCTightHaloFilter && Flag_eeBadScFilter && Flag_HBHENoiseIsoFilter"
+presel = "((!isData&&singleLeptonic)||(isData&&"+triggers+"&&((muonDataSet&&singleMuonic)||(eleDataSet&&singleElectronic))&&"+filters+"))"
+presel += "&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&Jet_pt[1]>80&&st>250&&nJet30>2&&htJet30j>500"
+newpresel = presel
 
 noCut = {'name':'empty', 'string':'(1)', 'niceName':'no cut'}
 
 name, cut = nameAndCut((250,350),(500,-1),(5,5),btb=(0,0),presel=newpresel)
+name, cut = nameAndCut((450,-1),(500,-1),(5,5),btb=(0,0),presel=newpresel)
+
 bin1 = {'name':name,'string':cut+'&&deltaPhi_Wl>1.','niceName':'Lowest SR'}
+bin3 = {'name':name,'string':cut,'niceName':'Lowest SR'}
 posWeightBin = {'name':'posWeight', 'string':cut+'&&weight>0', 'niceName':'pos. weight'}
 negWeightBin = {'name':'negWeight', 'string':cut+'&&weight<0', 'niceName':'neg. weight'}
 
 posWeight = {'name':'posWeight', 'string':newpresel+'&&weight>0', 'niceName':'pos. weight'}
 negWeight = {'name':'negWeight', 'string':newpresel+'&&weight<0', 'niceName':'neg. weight'}
 
-newPreselNoLtHt = {'name':'presel','string':preselNoLtHt,'niceName':'Preselection'}
+#newPreselNoLtHt = {'name':'presel','string':preselNoLtHt,'niceName':'Preselection'}
 newPreselCut = {'name':'presel','string':newpresel,'niceName':'Preselection'}
 newPreselCutSingleMuAN = {'name':'presel','string':newpresel+'&&singleMuonic','niceName':'Preselection'}
 newPreselCutSingleEleAN = {'name':'presel','string':newpresel+'&&singleElectronic','niceName':'Preselection'}

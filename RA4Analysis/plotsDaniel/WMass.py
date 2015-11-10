@@ -112,7 +112,11 @@ can = ROOT.TCanvas('c1','c1',800,600)
 can.SetLogy()
 Whists = {}
 
-newpresel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&st>250&&nJet30>=2&&htJet30j>500&&Jet_pt[1]>80"
+triggers = "(HLT_EleHT350||HLT_MuHT350)"
+filters = "Flag_goodVertices && Flag_HBHENoiseFilter_fix && Flag_CSCTightHaloFilter && Flag_eeBadScFilter && Flag_HBHENoiseIsoFilter"
+presel = "((!isData&&singleLeptonic)||(isData&&"+triggers+"&&((muonDataSet&&singleMuonic)||(eleDataSet&&singleElectronic))&&"+filters+"))"
+presel += "&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&Jet_pt[1]>80&&st>250&&nJet30>2&&htJet30j>500"
+newpresel = presel
 
 path = '/afs/hephy.at/user/d/dspitzbart/www/Spring15/deltaPhi_vs_Wmass/'
 
@@ -229,11 +233,22 @@ for srNJet in sorted(signalRegions):
       print 'Yield highDPhi total', round(W_lowMass[srNJet][stb][htb]['yield_totalHighDPhi'],2), round(W_lowMass[srNJet][stb][htb]['yield_highDPhi']+W_highMass[srNJet][stb][htb]['yield_highDPhi'],2)
       
 
+rowsNJet = {}
+rowsSt = {}
+for srNJet in sorted(signalRegions):
+  rowsNJet[srNJet] = {}
+  rowsSt[srNJet] = {}
+  rows = 0
+  for stb in sorted(signalRegions[srNJet]):
+    rows += len(signalRegions[srNJet][stb])
+    rowsSt[srNJet][stb] = {'n':len(signalRegions[srNJet][stb])}
+  rowsNJet[srNJet] = {'nST':len(signalRegions[srNJet]), 'n':rows}
+
 print "Results"
 print
 print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrr|rrr|rrr|rrr|rrr|}\\hline'
 print ' \\njet & \ST & \HT     &\multicolumn{9}{c|}{$R_{CS}$} &\multicolumn{6}{c|}{yield $\Delta\Phi\geq x$} &\multicolumn{3}{c|}{ratio}\\\%\hline'
-print ' & $[$GeV$]$ &$[$GeV$]$ & \multicolumn{3}{c}{$m_{W}<100$} & \multicolumn{3}{c}{$m_{W}\geq100$} & \multicolumn{3|}{c}{total} & \multicolumn{3}{c}{$m_{W}<100$} & \multicolumn{3}{c|}{$m_{W}\geq100$} & \multicolumn{3}{c|}{$m_{W}\geq100 / m_{W}<100$}\\\ '
+print ' & $[$GeV$]$ &$[$GeV$]$ & \multicolumn{3}{c}{$m_{W}<100$} & \multicolumn{3}{c}{$m_{W}\geq100$} & \multicolumn{3}{c|}{total} & \multicolumn{3}{c}{$m_{W}<100$} & \multicolumn{3}{c|}{$m_{W}\geq100$} & \multicolumn{3}{c|}{$\\frac{m_{W}\geq100}{m_{W}<100}$}\\\ '
 secondLine = False
 for srNJet in sorted(signalRegions):
   print '\\hline'
@@ -252,7 +267,7 @@ for srNJet in sorted(signalRegions):
           + ' & '+getNumString(W_lowMass[srNJet][stb][htb]['rcs_total']['rCS'], W_lowMass[srNJet][stb][htb]['rcs_total']['rCSE_sim'],3)\
           + ' & '+getNumString(W_lowMass[srNJet][stb][htb]['yield_highDPhi'], sqrt(W_lowMass[srNJet][stb][htb]['yield_highDPhi_Var']))\
           + ' & '+getNumString(W_highMass[srNJet][stb][htb]['yield_highDPhi'], sqrt(W_highMass[srNJet][stb][htb]['yield_highDPhi_Var']))\
-          + ' & '+getNumString(W_lowMass[srNJet][stb][htb]['massRatio']['rCS'], sqrt(W_lowMass[srNJet][stb][htb]['massRatio']['rCSE_sim']))+'\\\\ '
+          + ' & '+getNumString(W_lowMass[srNJet][stb][htb]['mass_ratio']['rCS'], W_lowMass[srNJet][stb][htb]['mass_ratio']['rCSE_sim'])+'\\\\ '
     if htb[1] == -1 : print '\\cline{2-21}'
 print '\\hline\end{tabular}}\end{center}\caption{\Rcs values of different masses of W bosons, W+Jets background, 3$fb^{-1}$}\label{tab:0b_Wmass}\end{table}'
 
