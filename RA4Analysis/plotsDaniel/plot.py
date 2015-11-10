@@ -8,13 +8,17 @@ from math import *
 from array import array
 from Workspace.HEPHYPythonTools.helpers import *
 from Workspace.RA4Analysis.helpers import *
-from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
+#from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_Spring15_hard import *
 #from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_postProcessed import *
-from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT400ST200_postProcessed import *
+#from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT400ST200_postProcessed import *
 #from Workspace.RA4Analysis.cmgTuples_Data25ns_0l import *
-from Workspace.RA4Analysis.cmgTuples_Data25ns_Artur import *
-from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_postProcessed_fromArtur import *
+#from Workspace.RA4Analysis.cmgTuples_Data25ns_Artur import *
+
+#from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT400ST200_postProcessed_fromArthur import *
+#from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT400ST200_postProcessed_btagWeight import *
+from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT500ST250_postProcessed_btagWeight import *
+from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT500ST250_postProcessed_fromArthur import *
 
 #from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT400ST200_postProcessed import *
 #from Workspace.RA4Analysis.cmgTuples_Spring15_50ns_postProcessed import *
@@ -32,18 +36,27 @@ lepSel = 'hard'
 #samples = [WJETS, TTJETS, DY, singleTop, QCD]
 
 #25ns samples
-WJETS = {'name':'WJets', 'chain':getChain(WJetsHTToLNu_25ns,histname=''), 'color':color('WJets'),'weight':'weight', 'niceName':'W Jets'}
-TTJETS = {'name':'TTJets', 'chain':getChain(TTJets_25ns,histname=''), 'color':color('TTJets'),'weight':'weight', 'niceName':'t#bar{t} Jets NLO'}
-TTJetsLO = {'name':'TTJets', 'chain':getChain(TTJets_LO_25ns,histname=''), 'color':color('TTJets')-2,'weight':'weight', 'niceName':'t#bar{t} Jets LO'}
-TTJetsNew = {'name':'TTJets', 'chain':getChain(TTJets_HTLO_25ns,histname=''), 'color':color('TTJets')-5,'weight':'weight', 'niceName':'t#bar{t} Jets LO'}
+#WJETS = {'name':'WJets', 'chain':getChain(WJetsHTToLNu_25ns,histname=''), 'color':ROOT.kMagenta,'weight':'weight', 'niceName':'W Jets, MVA ID'}
+WJETSbtagweight = {'name':'WJets', 'chain':getChain(WJetsHT_25ns_btagweight,histname=''), 'color':ROOT.kMagenta,'weight':'weight', 'niceName':'W Jets btag'}
+WJETS = {'name':'WJets', 'chain':getChain(WJetsHT_25ns,histname=''), 'color':color('WJets'),'weight':'weight', 'niceName':'W Jets CB ID'}
+#TTJETS = {'name':'TTJets', 'chain':getChain(TTJets_25ns,histname=''), 'color':color('TTJets'),'weight':'weight', 'niceName':'t#bar{t} Jets NLO'}
+#TTJetsLO = {'name':'TTJets', 'chain':getChain(TTJets_LO_25ns,histname=''), 'color':color('singleTop'),'weight':'weight', 'niceName':'t#bar{t} Jets MVA ID'}
+TTJetsbtagweight = {'name':'TTJets', 'chain':getChain(TTJets_LO_25ns_btagweight,histname=''), 'color':color('singleTop'),'weight':'weight', 'niceName':'t#bar{t} Jets btag'}
+TTJets = {'name':'TTJets', 'chain':getChain(TTJets_HTLO_25ns,histname=''), 'color':color('TTJets')-2,'weight':'weight', 'niceName':'t#bar{t} Jets CB ID'}
 DY = {'name':'DY', 'chain':getChain(DY_25ns,histname=''), 'color':color('DY'),'weight':'weight', 'niceName':'Drell Yan'}
 singleTop = {'name':'singleTop', 'chain':getChain(singleTop_25ns,histname=''), 'color':color('singleTop'),'weight':'weight', 'niceName':'single Top'}
 #QCD = {'name':'QCD', 'chain':getChain(QCDMu_25ns,histname=''), 'color':color('QCD'),'weight':'weight', 'niceName':'QCD'}
 QCD = {'name':'QCD', 'chain':getChain(QCDHT_25ns,histname=''), 'color':color('QCD'),'weight':'weight', 'niceName':'QCD'}
+TTVH = {'name':'TTVH', 'chain':getChain(TTV_25ns,histname=''), 'color':color('TTV'),'weight':'weight', 'niceName':'TTVH'}
 #QCD = {'name':'QCD', 'chain':getChain(QCDEle_25ns,histname=''), 'color':color('QCD'),'weight':'weight', 'niceName':'QCD'}
-diBoson = {'name':'diBoson', 'chain':getChain(diBosons_25ns,histname=''), 'color':ROOT.kMagenta,'weight':'weight', 'niceName':'diboson'}
-samples = [WJETS, TTJetsLO, singleTop, DY, QCD]#, diBoson]
-samplesComp = [WJETS, TTJETS, singleTop, DY, QCD]
+#diBoson = {'name':'diBoson', 'chain':getChain(diBosons_25ns,histname=''), 'color':ROOT.kMagenta,'weight':'weight', 'niceName':'diboson'}
+samples = [WJETS, TTJets, singleTop, DY, QCD]#, diBoson]
+#samplesComp = [WJETS, TTJETS, singleTop, DY, QCD]
+
+EWK = {'name':'EWK', 'chain':getChain([WJetsHT_25ns,TTJets_HTLO_25ns,singleTop_25ns,DY_25ns,TTV_25ns],histname=''), 'color':color('DY'),'weight':'weight', 'niceName':'EWK'}
+
+#data = {'name':'data', 'chain':getChain([SingleElectron_Run2015D,SingleMuon_Run2015D],histname=''), 'color':ROOT.kBlack,'weight':'weight', 'niceName':'data', 'cut':False}
+
 
 # older samples
 #WJETS = {'name':'WJets', 'chain':getChain(WJetsHTToLNu[lepSel],histname=''), 'color':color('WJets'),'weight':'weight', 'niceName':'W Jets'}
@@ -97,22 +110,34 @@ metNoHF = {'binning': [20, 0, 1000], 'name': 'metNoHF_pt', 'titleX': 'E_{T}^{mis
 metNoHFPhi = {'binning': [16, -3.2, 3.2], 'name': 'metNoHF_phi', 'titleX': '#Phi(E_{T}^{miss}) NoHF', 'titleY': 'Events'}
 #deltaPhiCMG = {'binning': [16, 0, 3.2], 'name': 'Sum$((acos((LepGood_pt+metNoHF_pt*cos(LepGood_phi-metNoHF_phi))/sqrt(LepGood_pt**2+metNoHF_pt**2+2*metNoHF_pt*LepGood_pt*cos(LepGood_phi-metNoHF_phi))))*'+electronId+')', 'titleX': '#Delta#Phi(W,l) NoHF', 'titleY': 'Events'}
 
-presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&st>250&&nJet30>2&&htJet30j>500&&nBJetMediumCSV30==0"
-preselNoLtHt = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&Jet_pt[1]>80&&nBJetMediumCSV30==0"
-newpresel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&st>250&&nJet30>=2&&htJet30j>500&&Jet_pt[1]>80" ####changed here!!
+#presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&st>250&&nJet30>2&&htJet30j>500&&nBJetMediumCSV30==0"
+#preselNoLtHt = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&Jet_pt[1]>80&&nBJetMediumCSV30==0"
+#
+#newpresel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&st>250&&nJet30>=2&&htJet30j>500&&Jet_pt[1]>80" ####changed here!!
+#newpresel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&st>250&&nJet30>=2&&htJet30j>500&&Jet_pt[1]>80&&deltaPhi_Wl<0.5"
+#filters = "&&Flag_goodVertices&&Flag_HBHENoiseFilter&&Flag_eeBadScFilter&&Flag_CSCTightHaloFilter"
+#newpresel += filters
 
+triggers = "(HLT_EleHT350||HLT_MuHT350)"
+filters = "Flag_goodVertices && Flag_HBHENoiseFilter_fix && Flag_CSCTightHaloFilter && Flag_eeBadScFilter && Flag_HBHENoiseIsoFilter"
+presel = "((!isData&&singleLeptonic)||(isData&&"+triggers+"&&((muonDataSet&&singleMuonic)||(eleDataSet&&singleElectronic))&&"+filters+"))"
+presel += "&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&Jet_pt[1]>80&&st>250&&nJet30>2&&htJet30j>500"
+newpresel = presel
 
 noCut = {'name':'empty', 'string':'(1)', 'niceName':'no cut'}
 
-name, cut = nameAndCut((350,450),(750,1000),(5,5),btb=(0,0),presel=newpresel)
-bin1 = {'name':name,'string':cut,'niceName':'L_{T} [350,450), H_{T} [750,1000)'}
+name, cut = nameAndCut((250,350),(500,-1),(5,5),btb=(0,0),presel=newpresel)
+name, cut = nameAndCut((450,-1),(500,-1),(5,5),btb=(0,0),presel=newpresel)
+
+bin1 = {'name':name,'string':cut+'&&deltaPhi_Wl>1.','niceName':'Lowest SR'}
+bin3 = {'name':name,'string':cut,'niceName':'Lowest SR'}
 posWeightBin = {'name':'posWeight', 'string':cut+'&&weight>0', 'niceName':'pos. weight'}
 negWeightBin = {'name':'negWeight', 'string':cut+'&&weight<0', 'niceName':'neg. weight'}
 
 posWeight = {'name':'posWeight', 'string':newpresel+'&&weight>0', 'niceName':'pos. weight'}
 negWeight = {'name':'negWeight', 'string':newpresel+'&&weight<0', 'niceName':'neg. weight'}
 
-newPreselNoLtHt = {'name':'presel','string':preselNoLtHt,'niceName':'Preselection'}
+#newPreselNoLtHt = {'name':'presel','string':preselNoLtHt,'niceName':'Preselection'}
 newPreselCut = {'name':'presel','string':newpresel,'niceName':'Preselection'}
 newPreselCutSingleMuAN = {'name':'presel','string':newpresel+'&&singleMuonic','niceName':'Preselection'}
 newPreselCutSingleEleAN = {'name':'presel','string':newpresel+'&&singleElectronic','niceName':'Preselection'}
@@ -126,6 +151,8 @@ allFiltersNoEcal = {'name':'ecalFilterCut','string':newpresel+'&&Flag_eeBadScFil
 allFilters = {'name':'ecalFilterCut','string':newpresel+'&&Flag_EcalDeadCellTriggerPrimitiveFilter&&Flag_eeBadScFilter&&Flag_goodVertices&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFilter','niceName':'All filters'}
 
 filterCutList = [Flag_EcalDeadCellTriggerPrimitiveFilter,Flag_HBHENoiseFilter,Flag_CSCTightHaloFilter,Flag_goodVertices,Flag_eeBadScFilter,allFiltersNoEcal,allFilters]
+
+filters = "&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFilter_fix&&Flag_HBHENoiseFilter&&Flag_goodVertices&&Flag_eeBadScFilter&&Flag_EcalDeadCellTriggerPrimitiveFilter" #strange filter settings!!
 
 fakeMet = "sqrt((met_pt*cos(met_phi)-met_genPt*cos(met_genPhi))**2+(met_pt*sin(met_phi)-met_genPt*sin(met_genPhi))**2)"
 fakeMetSelection = '('+fakeMet+'>50||'+fakeMet+'>met_genPt)'
@@ -153,37 +180,37 @@ name, cut = nameAndCut((250,350),(1000,-1),(5,5),btb=(0,0),presel=presel)
 highFakeMetCut = {'name':name,'string':cut+'&&'+fakeMetSelection,'niceName':'E_{T}^{miss,fake} > 50 GeV || > E_{T}^{miss,gen}'}
 lowFakeMetCut = {'name':name,'string':cut+'&&'+antiFakeMetSelection,'niceName':'E_{T}^{miss,fake} < 50 GeV && < E_{T}^{miss,gen}'}
 
-#path25ns = '/data/easilar/cmgTuples/crab/Summer15_25nsV2MC_Data/'
-#SingleElectron_Run2015C = {'name':'SingleElectron_Run2015C-PromptReco-v1', 'dir':path25ns+'SingleElectron_Run2015C/'}
-#SingleMuon_Run2015C = {'name':'SingleMuon_Run2015C-PromptReco-v1', 'dir':path25ns+'SingleMuon_Run2015C/'}
-#SingleMuonData = SingleMuon_Run2015D_PromptReco
-SingleMuonData = SingleMuon_Run2015D
-#SingleElectronData = SingleElectron_Run2015D_PromptReco
-
-#samples25ns = [SingleElectronData,SingleMuonData,MuonEG_Run2015D_PromptReco,DoubleEG_Run2015D_PromptReco,DoubleMuon_Run2015D_PromptReco,JetHT_Run2015D_PromptReco,MET_Run2015D_PromptReco]
-
-samples25ns = [SingleMuonData]
-
-#dataSamples = samples25ns
-#for s in dataSamples:
-#  s['chunkString'] = s['name']
-#  s.update({
-#    "rootFileLocation":"tree.root",
-#    "skimAnalyzerDir":"",
-#    "treeName":"tree",
-#    'isData':True,
-#    #'dir' : data_path
-#  })
-
-dSamples = []
-#for sample in dataSamples:
-for sample in samples25ns:
-  dSamples.append({'name':sample['name'],'sample':sample})
-data = ROOT.TChain('tree')
-for sample in dSamples:
-  sample['chunks'], sample['nEvents'] = getChunks(sample['sample'])
-  for chunk in sample['chunks']:
-    data.Add(chunk['file'])
+##path25ns = '/data/easilar/cmgTuples/crab/Summer15_25nsV2MC_Data/'
+##SingleElectron_Run2015C = {'name':'SingleElectron_Run2015C-PromptReco-v1', 'dir':path25ns+'SingleElectron_Run2015C/'}
+##SingleMuon_Run2015C = {'name':'SingleMuon_Run2015C-PromptReco-v1', 'dir':path25ns+'SingleMuon_Run2015C/'}
+##SingleMuonData = SingleMuon_Run2015D_PromptReco
+#SingleMuonData = SingleMuon_Run2015D
+##SingleElectronData = SingleElectron_Run2015D_PromptReco
+#
+##samples25ns = [SingleElectronData,SingleMuonData,MuonEG_Run2015D_PromptReco,DoubleEG_Run2015D_PromptReco,DoubleMuon_Run2015D_PromptReco,JetHT_Run2015D_PromptReco,MET_Run2015D_PromptReco]
+#
+#samples25ns = [SingleMuonData]
+#
+##dataSamples = samples25ns
+##for s in dataSamples:
+##  s['chunkString'] = s['name']
+##  s.update({
+##    "rootFileLocation":"tree.root",
+##    "skimAnalyzerDir":"",
+##    "treeName":"tree",
+##    'isData':True,
+##    #'dir' : data_path
+##  })
+#
+#dSamples = []
+##for sample in dataSamples:
+#for sample in samples25ns:
+#  dSamples.append({'name':sample['name'],'sample':sample})
+#data = ROOT.TChain('tree')
+#for sample in dSamples:
+#  sample['chunks'], sample['nEvents'] = getChunks(sample['sample'])
+#  for chunk in sample['chunks']:
+#    data.Add(chunk['file'])
 
 ele_MVAID_cuts_tight={'eta08':0.73 , 'eta104':0.57,'eta204': 0.05}
 ele_MVAID_cuts_vloose = {'eta08':-0.11 , 'eta104':-0.35, 'eta204': -0.55}
@@ -246,10 +273,12 @@ trigger = "&&(HLT_EleHT350||HLT_MuHT350)"
 filters = "&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFilterMinZeroPatched&&Flag_goodVertices&&Flag_eeBadScFilter"
 #filters = "&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFilterMinZeroPatched&&Flag_goodVertices&&Flag_eeBadScFilter"#&&Flag_EcalDeadCellTriggerPrimitiveFilter"
 
-#datapresel = LeptonReq+'&&'+leptonVeto+'&&nJet30>=2&&nBJetMedium30>=0&&'+htStr+'>500&&'+stStr+'>250'
-datapresel = LeptonReq+'&&'+leptonVeto+'&&nJet30>=2&&'+htStr+'>500&&'+stStr+'>250'
-datacut = datapresel+trigger+filters
-dataDict = {'chain':data, 'cut':datacut,'name':'data'}
+##datapresel = LeptonReq+'&&'+leptonVeto+'&&nJet30>=2&&nBJetMedium30>=0&&'+htStr+'>500&&'+stStr+'>250'
+#datapresel = LeptonReq+'&&'+leptonVeto+'&&nJet30>=2&&'+htStr+'>500&&'+stStr+'>250'
+#datacut = datapresel+trigger+filters
+#dataDict = {'chain':data, 'cut':datacut,'name':'data'}
+
+data = {'name':'data', 'chain':getChain([SingleElectron_Run2015D,SingleMuon_Run2015D],histname=''), 'cut':newpresel+'&&SingleElectronic'+trigger}
 
 deltaPhiCMG_NoHF = {'binning': [30, 0, 3.2], 'name': 'Sum$((acos((LepGood_pt+metNoHF_pt*cos(LepGood_phi-metNoHF_phi))/sqrt(LepGood_pt**2+metNoHF_pt**2+2*metNoHF_pt*LepGood_pt*cos(LepGood_phi-metNoHF_phi))))*'+LeptonId+')', 'titleX': '#Delta#Phi(W,l) NoHF', 'titleY': 'Events'}
 #deltaPhiCMG = {'binning': [32, 0, 3.2], 'name': 'Sum$((acos((LepGood_pt+met_pt*cos(LepGood_phi-met_phi))/sqrt(LepGood_pt**2+met_pt**2+2*met_pt*LepGood_pt*cos(LepGood_phi-met_phi))))*'+LeptonId+')', 'titleX': '#Delta#Phi(W,l) NoHF', 'titleY': 'Events', 'filename':'deltaPhi_Wl', 'binningIsExplicit':True}
