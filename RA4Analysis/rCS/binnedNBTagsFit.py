@@ -8,19 +8,21 @@ from Workspace.HEPHYPythonTools.user import username
 from math import pi, sqrt, isnan
 from rCShelpers import *# weight_str , weight_err_str , lumi
 
-def binnedNBTagsFit(cut, cutname, samples, nBTagVar = 'nBJetMediumCSV30', lumi=4.0, prefix="", printDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/nBtagFits/templateFit/', templateDir = '/data/'+username+'/Results2015/btagTemplatesBTagWeightedSF_forData_FullSR_Lep/',useBTagWeights=False, btagWeightSuffix='', templateWeights=False, templateWeightSuffix='', QCD_dict={0:{'y':0.,'e':0.,'totalY':0.}, 1:{'y':0.,'e':0.,'totalY':0.},2:{'y':0.,'e':0.,'totalY':0.}}, isData=False):
-  print "LUMI:" , lumi
-  if not os.path.exists(printDir):
-     os.makedirs(printDir) 
-  if not os.path.exists(templateDir):
-     os.makedirs(templateDir)
-  weight_str, weight_err_str = makeWeight(lumi)
+from predictionConfig import *
+
+def binnedNBTagsFit(cut, cutname, samples, prefix = "", QCD_dict={0:{'y':0.,'e':0.,'totalY':0.}, 1:{'y':0.,'e':0.,'totalY':0.},2:{'y':0.,'e':0.,'totalY':0.}}):
+  #print "LUMI:" , lumi
+  #if not os.path.exists(printDir):
+  #   os.makedirs(printDir) 
+  #if not os.path.exists(templateDir):
+  #   os.makedirs(templateDir)
+  weight_str, weight_err_str = makeWeight(lumi, sampleLumi)
   cWJets = samples['W']
   cTTJets = samples['TT']
   cRest = samples['Rest']
   cData = samples['Data']
   
-  templateLumi = 1.26
+  #templateLumi = 1.26
   errorScale = 1
   if errorScale != 1:
     print '############################## DANGER! ERROR IN TEMPLATE DOWNSCALED! DANGER! ##################################################################################'
