@@ -15,6 +15,9 @@ def hybridIso04ID(lep,hybridIso04={"ptSwitch":25,"relIso":0.2,'absIso':5}):
   return (lep["pt"]>=hybridIso04['ptSwitch'] and lep["relIso04"]<hybridIso04['relIso']) or (lep["pt"]<hybridIso04['ptSwitch'] and lep["relIso04"]*lep["pt"]<hybridIso04['absIso'])
 
 
+#use indicies, probably faster!
+#def cmgTrackIndices(r, ptCuts=1, absEtaCuts=(2.5,2.4), , nMax=300 ):
+#  return [i for i in range(min(nMax,r.ntrack) ) if cmgTrackID(r,nTrk=i) ]
 
 
 
@@ -74,6 +77,8 @@ def cmgLooseLepIndices(r, ptCuts=(7.,5.), absEtaCuts=(2.5,2.4),ele_MVAID_cuts = 
     return [i for i in range(min(nMax, r.nLepGood)) if cmgLooseLepID(r, nLep=i, ptCuts=ptCuts, absEtaCuts=absEtaCuts,ele_MVAID_cuts=ele_MVAID_cuts,lepton=lepton) ]
   elif lepton=="LepOther":
     return [i for i in range(min(nMax, r.nLepOther)) if cmgLooseLepID(r, nLep=i, ptCuts=ptCuts, absEtaCuts=absEtaCuts,ele_MVAID_cuts=ele_MVAID_cuts,lepton=lepton) ]
+
+
     
     
 def splitIndList(var, l, val):
