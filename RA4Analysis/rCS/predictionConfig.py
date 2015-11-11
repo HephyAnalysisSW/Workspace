@@ -11,7 +11,7 @@ from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT500ST250_postProcessed_from
 from Workspace.HEPHYPythonTools.user import username
 from Workspace.RA4Analysis.signalRegions import *
 
-testRun = True
+testRun = False
 
 ## b-tagging and other variables
 dPhiStr = 'deltaPhi_Wl'
@@ -24,7 +24,7 @@ templateWeightSuffix = '_SF'
 
 
 ## samples
-isData = False
+isData = True
 
 cWJets      = getChain(WJetsHT_25ns_btagweight,histname='')
 cTTJets     = getChain(TTJets_HTLO_25ns_btagweight,histname='')
@@ -41,7 +41,7 @@ else:
 
 
 ## signal region definition
-signalRegions = signalRegion3fb
+signalRegions = signalRegion3fbReduced
 
 
 ## weight calculations
@@ -51,9 +51,9 @@ sampleLumi = 3.
 debugReweighting = False
 
 ## QCD estimation
-QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151106_QCDestimation_pkl'
+QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151111_QCDestimation_pkl'
 QCDestimate = pickle.load(file(QCDpickle))
-QCDestimate=False
+#QCDestimate=False
 
 
 ## Directories for plots, results and templates
@@ -71,6 +71,8 @@ filters = "Flag_goodVertices && Flag_HBHENoiseFilter_fix && Flag_CSCTightHaloFil
 presel = "((!isData&&singleLeptonic)||(isData&&"+triggers+"&&((muonDataSet&&singleMuonic)||(eleDataSet&&singleElectronic))&&"+filters+"))"
 presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSoftLeptons==0 && Jet_pt[1]>80 && st>250 && nJet30>2 && htJet30j>500"
 
+singleMu_presel = "((!isData&&singleMuonic)||(isData&&"+triggers+"&&(muonDataSet&&singleMuonic)&&"+filters+"))"
+singleMu_presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSoftLeptons==0 && Jet_pt[1]>80 && st>250 && nJet30>2 && htJet30j>500"
 
 ## corrections
 createFits = True
