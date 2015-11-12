@@ -4,7 +4,7 @@ from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,v
 from Workspace.HEPHYPythonTools.user import username
 from binnedNBTagsFit import binnedNBTagsFit
 from rCShelpers import * 
-from math import pi, sqrt
+from math import pi, sqrt, isnan
 from rCShelpers import *
 
 from predictionConfig import *
@@ -32,10 +32,10 @@ def makeTTPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, QCD=F
   fit_srName, fit_srCut = nameAndCut(stb, htb, srNJet, btb=None, presel=presel, btagVar = nBTagVar)
 
   if QCD:
-    #Get QCD yields in low dPhi for b-tag fit
-    QCD_dict={0:{'y':QCD[srNJet][stb][htb][(0,0)]['NQCDpred_lowdPhi'], 'e':QCD[srNJet][stb][htb][(0,0)]['NQCDpred_lowdPhi_err'], 'totalY':QCD[srNJet][stb][htb][(0,0)]['NQCDpred']},\
-              1:{'y':QCD[srNJet][stb][htb][(1,1)]['NQCDpred_lowdPhi'], 'e':QCD[srNJet][stb][htb][(1,1)]['NQCDpred_lowdPhi_err'], 'totalY':QCD[srNJet][stb][htb][(1,1)]['NQCDpred']},\
-              2:{'y':QCD[srNJet][stb][htb][(2,2)]['NQCDpred_lowdPhi'], 'e':QCD[srNJet][stb][htb][(2,2)]['NQCDpred_lowdPhi_err'], 'totalY':QCD[srNJet][stb][htb][(2,2)]['NQCDpred']}}
+    #Get QCD yields in CR for b-tag fit
+    QCD_dict={0:{'y':QCD[srNJet][stb][htb][(0,0)][dPhiCut]['NQCDpred_lowdPhi'], 'e':QCD[srNJet][stb][htb][(0,0)][dPhiCut]['NQCDpred_lowdPhi_err'], 'totalY':QCD[srNJet][stb][htb][(0,0)][dPhiCut]['NQCDpred']},\
+              1:{'y':QCD[srNJet][stb][htb][(1,1)][dPhiCut]['NQCDpred_lowdPhi'], 'e':QCD[srNJet][stb][htb][(1,1)][dPhiCut]['NQCDpred_lowdPhi_err'], 'totalY':QCD[srNJet][stb][htb][(1,1)][dPhiCut]['NQCDpred']},\
+              2:{'y':QCD[srNJet][stb][htb][(2,2)][dPhiCut]['NQCDpred_lowdPhi'], 'e':QCD[srNJet][stb][htb][(2,2)][dPhiCut]['NQCDpred_lowdPhi_err'], 'totalY':QCD[srNJet][stb][htb][(2,2)][dPhiCut]['NQCDpred']}}
     fit_srNJet_lowDPhi = binnedNBTagsFit(fit_srCut+"&&"+dPhiStr+"<"+str(dPhiCut), fit_srName+'_dPhi'+str(dPhiCut), samples = samples, prefix=fit_srName, QCD_dict=QCD_dict)
   else:
     fit_srNJet_lowDPhi = binnedNBTagsFit(fit_srCut+"&&"+dPhiStr+"<"+str(dPhiCut), fit_srName+'_dPhi'+str(dPhiCut), samples = samples, prefix=fit_srName)
@@ -74,9 +74,15 @@ def makeTTPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, QCD=F
     rCS_crLowNJet_1b_onlyTT = getRCS(cTTJets, rCS_crLowNJet_Cut,  dPhiCut, weight = weight_str+'*weightBTag1'+btagWeightSuffix) 
   else:
     rCS_crLowNJet_Name_1b, rCS_crLowNJet_Cut_1b = nameAndCut(stb, htb, (4,5), btb=(1,1), presel=presel, btagVar = nBTagVar)
-    if QCD:
-      QCD_lowDPhi={'y':QCD[(4,5)][stb][htb][(1,1)]['NQCDpred_lowdPhi'],'e':QCD[(4,5)][stb][htb][(1,1)]['NQCDpred_lowdPhi_err']}
-      QCD_highDPhi={'y':QCD[(4,5)][stb][htb][(1,1)]['NQCDpred_highdPhi'],'e':QCD[(4,5)][stb][htb][(1,1)]['NQCDpred_highdPhi_err']}
+    if QCD: #get estimated QCD yields for Rcs calculation in 1b (high and low deltaPhi)
+      QCD_lowDPhi  = {'y':QCD[(4,5)][stb][htb][(1,1)][dPhiCut]['NQCDpred_lowdPhi'], 'e':QCD[(4,5)][stb][htb][(1,1)][dPhiCut]['NQCDpred_lowdPhi_err']}
+      QCD_highDPhi = {'y':QCD[(4,5)][stb][htb][(1,1)][dPhiCut]['NQCDpred_highdPhi'],'e':QCD[(4,5)][stb][htb][(1,1)][dPhiCut]['NQCDpred_highdPhi_err']}
+      QCDlist = [QCD_lowDPhi, QCD_highDPhi]
+      for q in QCDlist:
+        for e in q:
+          if isnan(q[e]): 
+            print 'found nan value error value in QCD estimation, setting error to 100% instead'
+            q['e'] = q['y']
       rCS_crLowNJet_1b = getRCS(cData, rCS_crLowNJet_Cut_1b,  dPhiCut, weight = w, QCD_lowDPhi=QCD_lowDPhi, QCD_highDPhi=QCD_highDPhi) #Low njet tt-jets CR to be orthoganl to DPhi 
     else:
       rCS_crLowNJet_1b = getRCS(cData, rCS_crLowNJet_Cut_1b,  dPhiCut, weight = weight_str)

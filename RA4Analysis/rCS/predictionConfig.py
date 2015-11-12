@@ -51,7 +51,7 @@ sampleLumi = 3.
 debugReweighting = False
 
 ## QCD estimation
-QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151111_QCDestimation_pkl'
+QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151111_QCDestimation_fix_pkl'
 QCDestimate = pickle.load(file(QCDpickle))
 #QCDestimate=False
 
