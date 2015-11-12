@@ -250,7 +250,7 @@ QCD_HT700to1000_25ns={
 QCD_HT1000to1500_25ns={
 "name" : "QCD_HT1000to1500",
 "chunkString":"QCD_HT1000to1500",
-"bsName":"/QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/MINIAODSIM",
+"dbsName":"/QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/MINIAODSIM",
 "skimAnalyzerDir":"skimAnalyzerCount",
 "rootFileLocation":"/treeProducerSusySingleLepton/tree.root",
 "dir": path,
@@ -294,7 +294,7 @@ TTWJetsToQQ_25ns={\
 "name" : "TTWToQQ",
 "chunkString":"TTWToQQ",
 "dir":  path,
-"bsName" : "",
+"dbsName" : "",
 "skimAnalyzerDir":"skimAnalyzerCount",
 "rootFileLocation":"/treeProducerSusySingleLepton/tree.root",
 "treeName":"tree",
@@ -367,6 +367,7 @@ TToLeptons_tch ={\
 "treeName":"tree",
 'isData':False
 }
+
 TToLeptons_tch_amcatnlo ={\
 "name" : "TToLeptons_tch_amcatnlo",
 "chunkString":"TToLeptons_tch_amcatnlo",
