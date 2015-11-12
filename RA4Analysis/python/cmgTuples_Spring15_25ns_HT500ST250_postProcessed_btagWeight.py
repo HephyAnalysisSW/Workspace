@@ -2,7 +2,7 @@ import copy, os, sys
 dirDaniel = '/data/dspitzbart/cmgTuples/postProcessed_Spring15_CB/HT400ST200/hard/'
 dirNew = '/data/dspitzbart/cmgTuples/postProcessed_PUreweight/HT500ST250/hard/'
 
-TTJets_LO_25ns_btagweight={\
+TTJets_HTLO_25ns_btagweight={\
 "name" : "tt+Jets_LO",
 "bins" : [
 "TTJets_LO_25ns",

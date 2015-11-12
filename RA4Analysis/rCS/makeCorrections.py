@@ -3,78 +3,19 @@ import pickle
 import os,sys,math
 from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYieldFromChain
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,varBinName
-#from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
-#from Workspace.RA4Analysis.cmgTuplesPostProcessed_v9_Phys14V3_HT400ST200_ForTTJetsUnc import *
-#from Workspace.RA4Analysis.cmgTuplesPostProcessed_Spring15_hard import *
-#from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_postProcessed import *
-#from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT400ST200_postProcessed_fromArthur import *
 
-from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT500ST250_postProcessed_btagWeight import *
-from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT500ST250_postProcessed_fromArthur import *
-
-#from makeTTPrediction import makeTTPrediction
-#from makeWPrediction import makeWPrediction
 from Workspace.HEPHYPythonTools.user import username
-from binnedNBTagsFit import binnedNBTagsFit
 from rCShelpers import *
 from math import pi, sqrt
 from Workspace.RA4Analysis.signalRegions import *
 
+from predictionConfig import *
+
 ROOT.TH1F().SetDefaultSumw2()
 
-lepSel = 'hard'
-
-#cWJets  = getChain(WJetsHTToLNu_25ns,histname='')
-#cTTJets = getChain(TTJets_LO_25ns,histname='')
-#cEWK = getChain([WJetsHTToLNu_25ns,TTJets_LO_25ns,DY_25ns,singleTop_25ns],histname='')
-
-cWJets  = getChain(WJetsHT_25ns_btagweight,histname='')
-cTTJets = getChain(TTJets_LO_25ns_btagweight,histname='')
-DY = getChain(DY_25ns,histname='')
-singleTop = getChain(singleTop_25ns,histname='')
-TTV = getChain(TTV_25ns,histname='')
-cEWK =  getChain([WJetsHT_25ns_btagweight, TTJets_LO_25ns_btagweight, singleTop_25ns, DY_25ns, TTV_25ns], histname='')#no QCD
-
-#cBkg = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]],histname='')#no QCD
-#cData = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]] , histname='')
-#cData = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]],  ttJets[lepSel] , histname='')#no QCD , ##to calculate signal contamination
-#cData = cBkg
-
-signalRegions = signalRegion3fb
-#signalRegions = signalRegionCRonly
-
-small = False
-if small: signalRegions = smallRegion
-
-#DEFINE LUMI AND PLOTDIR
-lumi = 1.26
-
-pickleDir = '/data/'+username+'/Results2015/Prediction_bweightSFTemplate_Data_fullSR_lep_'+str(lumi)+'/'
-
-fitDir = '/data/'+username+'/Results2015/correctionFit_btagKappa_data_fullSR/'
-
-prefix = 'singleLeptonic_Spring15_'
-
-createFits = True
 if not createFits: loadedFit = pickle.load(file(fitDir+prefix+'_fit_pkl'))
 
-if not os.path.exists(pickleDir):
-  os.makedirs(pickleDir)
-if not os.path.exists(fitDir):
-  os.makedirs(fitDir)
-
-weight_str, weight_err_str = makeWeight(lumi, sampleLumi=3.)
-
-
-triggers = "(HLT_EleHT350||HLT_MuHT350)"
-filters = "Flag_goodVertices && Flag_HBHENoiseFilter_fix && Flag_CSCTightHaloFilter && Flag_eeBadScFilter && Flag_HBHENoiseIsoFilter"
-presel = "((!isData&&singleLeptonic)||(isData&&"+triggers+"&&((muonDataSet&&singleMuonic)||(eleDataSet&&singleElectronic))&&"+filters+"))"
-presel += "&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&Jet_pt[1]>80&&st>250&&nJet30>2&&htJet30j>500"
-
-#presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&Jet_pt[1]>80&&st>250&&nJet30>2&&htJet30j>500"#&&nBJetMediumCSV30==0"
-#filters = "&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFilter&&Flag_goodVertices&&Flag_eeBadScFilter&&Flag_EcalDeadCellTriggerPrimitiveFilter" #strange filter settings!!
-#filters = "&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFilter_fix&&Flag_HBHENoiseFilter&&Flag_goodVertices&&Flag_eeBadScFilter&&Flag_EcalDeadCellTriggerPrimitiveFilter"
-btagString = 'nBJetMediumCSV30'
+weight_str, weight_err_str = makeWeight(lumi, sampleLumi=sampleLumi)
 
 wJetBins = [(3,4),(5,5),(6,7),(8,-1)]
 ttJetBins = [(4,4),(5,5),(6,7),(8,-1)]
@@ -123,7 +64,7 @@ for i_njb, njb in enumerate(signalRegions):
         cnameCRtt, cutCRtt = nameAndCut(stb,htb,(4,5), btb=(0,-1) ,presel=presel)
         rcs1bCRtt = getRCS(cEWK, cut1bCRtt, dPhiCut)
         rcs0bCRtt = getRCS(cTTJets, cut0bCRtt, dPhiCut)
-        samples = [{'chain':cWJets, 'cut':cutCRtt, 'weight':'weight*weightBTag1'}, {'chain':cTTJets, 'cut':cutCRtt, 'weight':'weight*weightBTag1'},{'chain':DY, 'cut':cut1bCRtt, 'weight':'weight'},{'chain':TTV, 'cut':cut1bCRtt, 'weight':'weight'},{'chain':singleTop, 'cut':cut1bCRtt, 'weight':'weight'}]
+        samples = [{'chain':cWJets, 'cut':cutCRtt, 'weight':'weight*weightBTag1'}, {'chain':cTTJets, 'cut':cutCRtt, 'weight':'weight*weightBTag1'},{'chain':cDY, 'cut':cut1bCRtt, 'weight':'weight'},{'chain':cTTV, 'cut':cut1bCRtt, 'weight':'weight'},{'chain':csingleTop, 'cut':cut1bCRtt, 'weight':'weight'}]
         rcs1bCRtt_btag = combineRCS(samples, dPhiCut)
         rcs0bCRtt_btag = getRCS(cTTJets, cutCRtt, dPhiCut, weight = 'weight*weightBTag0')
         #Kappa now calculated only in the SB bin (4,5) jets 1b allEWK MC vs 0b tt MC - no fit applied for the moment!

@@ -246,9 +246,9 @@ for srNJet in sorted(signalRegions):
 
 print "Results"
 print
-print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrr|rrr|rrr|rrr|rrr|}\\hline'
-print ' \\njet & \ST & \HT     &\multicolumn{9}{c|}{$R_{CS}$} &\multicolumn{6}{c|}{yield $\Delta\Phi\geq x$} &\multicolumn{3}{c|}{ratio}\\\%\hline'
-print ' & $[$GeV$]$ &$[$GeV$]$ & \multicolumn{3}{c}{$m_{W}<100$} & \multicolumn{3}{c}{$m_{W}\geq100$} & \multicolumn{3}{c|}{total} & \multicolumn{3}{c}{$m_{W}<100$} & \multicolumn{3}{c|}{$m_{W}\geq100$} & \multicolumn{3}{c|}{$\\frac{m_{W}\geq100}{m_{W}<100}$}\\\ '
+print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrr|rrr|rrr|rrr|rrr|rrr|rrr|}\\hline'
+print ' \\njet & \ST & \HT     &\multicolumn{9}{c|}{$R_{CS}$} & \multicolumn{6}{c|}{yield $\Delta\Phi< x$} & \multicolumn{6}{c|}{yield $\Delta\Phi\geq x$} & \multicolumn{3}{c|}{ratio}\\\%\hline'
+print ' & $[$GeV$]$ &$[$GeV$]$ & \multicolumn{3}{c}{$m_{W}<100$} & \multicolumn{3}{c}{$m_{W}\geq100$} & \multicolumn{3}{c}{$m_{W}<100$} & \multicolumn{3}{c}{$m_{W}\geq100$} & \multicolumn{3}{c|}{total} & \multicolumn{3}{c}{$m_{W}<100$} & \multicolumn{3}{c|}{$m_{W}\geq100$} & \multicolumn{3}{c|}{$\\frac{m_{W}\geq100}{m_{W}<100}$}\\\ '
 secondLine = False
 for srNJet in sorted(signalRegions):
   print '\\hline'
@@ -261,14 +261,21 @@ for srNJet in sorted(signalRegions):
     for htb in sorted(signalRegions[srNJet][stb]):
       if not first: print '&'
       first = False
+      W_lowMass_lowDPhi = W_lowMass[srNJet][stb][htb]['yield_highDPhi']/W_lowMass[srNJet][stb][htb]['rcs']['rCS']
+      W_lowMass_lowDPhi_err = W_lowMass_lowDPhi*sqrt(W_lowMass[srNJet][stb][htb]['yield_highDPhi_Var']/W_lowMass[srNJet][stb][htb]['yield_highDPhi']**2 + W_lowMass[srNJet][stb][htb]['rcs']['rCSE_sim']**2/W_lowMass[srNJet][stb][htb]['rcs']['rCS']**2)
+      W_highMass_lowDPhi = W_highMass[srNJet][stb][htb]['yield_highDPhi']/W_highMass[srNJet][stb][htb]['rcs']['rCS']
+      W_highMass_lowDPhi_err = W_highMass_lowDPhi*sqrt(W_highMass[srNJet][stb][htb]['yield_highDPhi_Var']/W_highMass[srNJet][stb][htb]['yield_highDPhi']**2 + W_highMass[srNJet][stb][htb]['rcs']['rCSE_sim']**2/W_highMass[srNJet][stb][htb]['rcs']['rCS']**2)
+      
       print '&$'+varBin(htb)+'$'
       print ' & '+getNumString(W_lowMass[srNJet][stb][htb]['rcs']['rCS'], W_lowMass[srNJet][stb][htb]['rcs']['rCSE_sim'],3)\
           + ' & '+getNumString(W_highMass[srNJet][stb][htb]['rcs']['rCS'], W_highMass[srNJet][stb][htb]['rcs']['rCSE_sim'],3)\
           + ' & '+getNumString(W_lowMass[srNJet][stb][htb]['rcs_total']['rCS'], W_lowMass[srNJet][stb][htb]['rcs_total']['rCSE_sim'],3)\
+          + ' & '+getNumString(W_lowMass_lowDPhi,W_lowMass_lowDPhi_err)\
+          + ' & '+getNumString(W_highMass_lowDPhi,W_highMass_lowDPhi_err)\
           + ' & '+getNumString(W_lowMass[srNJet][stb][htb]['yield_highDPhi'], sqrt(W_lowMass[srNJet][stb][htb]['yield_highDPhi_Var']))\
           + ' & '+getNumString(W_highMass[srNJet][stb][htb]['yield_highDPhi'], sqrt(W_highMass[srNJet][stb][htb]['yield_highDPhi_Var']))\
           + ' & '+getNumString(W_lowMass[srNJet][stb][htb]['mass_ratio']['rCS'], W_lowMass[srNJet][stb][htb]['mass_ratio']['rCSE_sim'])+'\\\\ '
-    if htb[1] == -1 : print '\\cline{2-21}'
+    if htb[1] == -1 : print '\\cline{2-27}'
 print '\\hline\end{tabular}}\end{center}\caption{\Rcs values of different masses of W bosons, W+Jets background, 3$fb^{-1}$}\label{tab:0b_Wmass}\end{table}'
 
 
