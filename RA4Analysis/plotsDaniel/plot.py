@@ -41,7 +41,7 @@ WJETSbtagweight = {'name':'WJets', 'chain':getChain(WJetsHT_25ns_btagweight,hist
 WJETS = {'name':'WJets', 'chain':getChain(WJetsHT_25ns,histname=''), 'color':color('WJets'),'weight':'weight', 'niceName':'W Jets CB ID'}
 #TTJETS = {'name':'TTJets', 'chain':getChain(TTJets_25ns,histname=''), 'color':color('TTJets'),'weight':'weight', 'niceName':'t#bar{t} Jets NLO'}
 #TTJetsLO = {'name':'TTJets', 'chain':getChain(TTJets_LO_25ns,histname=''), 'color':color('singleTop'),'weight':'weight', 'niceName':'t#bar{t} Jets MVA ID'}
-TTJetsbtagweight = {'name':'TTJets', 'chain':getChain(TTJets_LO_25ns_btagweight,histname=''), 'color':color('singleTop'),'weight':'weight', 'niceName':'t#bar{t} Jets btag'}
+TTJetsbtagweight = {'name':'TTJets', 'chain':getChain(TTJets_HTLO_25ns_btagweight,histname=''), 'color':color('singleTop'),'weight':'weight', 'niceName':'t#bar{t} Jets btag'}
 TTJets = {'name':'TTJets', 'chain':getChain(TTJets_HTLO_25ns,histname=''), 'color':color('TTJets')-2,'weight':'weight', 'niceName':'t#bar{t} Jets CB ID'}
 DY = {'name':'DY', 'chain':getChain(DY_25ns,histname=''), 'color':color('DY'),'weight':'weight', 'niceName':'Drell Yan'}
 singleTop = {'name':'singleTop', 'chain':getChain(singleTop_25ns,histname=''), 'color':color('singleTop'),'weight':'weight', 'niceName':'single Top'}
