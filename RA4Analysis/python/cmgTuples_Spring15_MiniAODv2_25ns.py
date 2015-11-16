@@ -53,8 +53,8 @@ TTJets_LO = {\
 }
 
 TTJets_LO_HT600to800_25ns={\
-"name" : "TTJets_HT600to800",
-"chunkString":"TTJets_HT600to800",
+"name" : "TTJets_LO_HT600to800",
+"chunkString":"TTJets_LO_HT600to800",
 "dir": path,
 "dbsName" : "/TTJets_HT-600to800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM",
 "skimAnalyzerDir":"skimAnalyzerCount",
@@ -64,8 +64,8 @@ TTJets_LO_HT600to800_25ns={\
 }
 
 TTJets_LO_HT800to1200_25ns={\
-"name" : "TTJets_HT800to1200",
-"chunkString":"TTJets_HT800to1200",
+"name" : "TTJets_LO_HT800to1200",
+"chunkString":"TTJets_LO_HT800to1200",
 "dir": path,
 "dbsName" : "/TTJets_HT-800to1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM",
 "skimAnalyzerDir":"skimAnalyzerCount",
@@ -73,9 +73,10 @@ TTJets_LO_HT800to1200_25ns={\
 "treeName":"tree",
 'isData':False,
 }
+
 TTJets_LO_HT1200to2500_25ns={\
-"name" : "TTJets_HT1200to2500",
-"chunkString":"TTJets_HT1200to2500",
+"name" : "TTJets_LO_HT1200to2500",
+"chunkString":"TTJets_LO_HT1200to2500",
 "dir": path,
 "dbsName" : "/TTJets_HT-1200to2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM",
 "skimAnalyzerDir":"skimAnalyzerCount",
@@ -83,9 +84,10 @@ TTJets_LO_HT1200to2500_25ns={\
 "treeName":"tree",
 'isData':False,
 }
+
 TTJets_LO_HT2500toInf_25ns={\
-"name" : "TTJets_HT2500toInf",
-"chunkString":"TTJets_HT2500toInf",
+"name" : "TTJets_LO_HT2500toInf",
+"chunkString":"TTJets_LO_HT2500toInf",
 "dir": path,
 "dbsName" : "/TTJets_HT-2500toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM",
 "skimAnalyzerDir":"skimAnalyzerCount",
@@ -367,7 +369,6 @@ TToLeptons_tch ={\
 "treeName":"tree",
 'isData':False
 }
-
 TToLeptons_tch_amcatnlo ={\
 "name" : "TToLeptons_tch_amcatnlo",
 "chunkString":"TToLeptons_tch_amcatnlo",
