@@ -9,12 +9,14 @@ from Workspace.DegenerateStopAnalysis.cmgObjectSelection import cmgLooseLepIndic
 from Workspace.HEPHYPythonTools.convertHelpers import compileClass, readVar, printHeader, typeStr, createClassString
 from Workspace.HEPHYPythonTools.helpers import  getChunks, deltaR, deltaR2, invMass
 from math import *
-from Workspace.HEPHYPythonTools.user import username
+from Workspace.HEPHYPythonTools.user import username,afsDataName
 
 #from Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_25ns import *
 #from Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_packedGenPart_tracks import *
 #from Workspace.DegenerateStopAnalysis.cmgTuples_Data25ns import *
-from Workspace.DegenerateStopAnalysis.cmgTuples_Data25ns_fromArtur import *
+#from Workspace.DegenerateStopAnalysis.cmgTuples_Data25ns_fromArtur import *
+from Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_7412pass2 import *
+import time
 #from Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_50ns import *
 #from Workspace.DegenerateStopAnalysis.cmgTuples_Data50ns_1l import *
 #from Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_v1 import *
@@ -22,11 +24,11 @@ from Workspace.DegenerateStopAnalysis.cmgTuples_Data25ns_fromArtur import *
 target_lumi = 10000 #pb-1
 lepton_soft_hard_cut  = 30
 tracks = True
-pkdGenParts = True
+pkdGenParts = False
 verbose = False
-break_for_debug =False
-defSampleStr = "WJetsToLNu_HT100to200"
-subDir = "postProcessed_Data25ns"
+break_for_debug = False
+defSampleStr = "T2DegStop_300_270"
+subDir = "postProcessed_7412pass2_test"
 
 
 ROOT.gSystem.Load("libFWCoreFWLite.so")
@@ -34,14 +36,16 @@ ROOT.AutoLibraryLoader.enable()
 
 
 
-branchKeepStrings = ["run", "lumi", "evt", "isData", "xsec", "puWeight", "nTrueInt", "genWeight", "rho", "nVert", "nJet25", "nBJetLoose25", "nBJetMedium25", "nBJetTight25", "nJet40", "nJet40a", "nBJetLoose40", "nBJetMedium40", "nBJetTight40", 
-                     "nLepGood20", "nLepGood15", "nLepGood10",  
-                     "GenSusyMScan1", "GenSusyMScan2", "GenSusyMScan3", "GenSusyMScan4", "GenSusyMGluino", "GenSusyMGravitino", "GenSusyMStop", "GenSusyMSbottom", "GenSusyMStop2", "GenSusyMSbottom2", "GenSusyMSquark", "GenSusyMNeutralino", "GenSusyMNeutralino2", "GenSusyMNeutralino3", "GenSusyMNeutralino4", "GenSusyMChargino", "GenSusyMChargino2", 
-                     "htJet25", "mhtJet25", "htJet40j", "htJet40", "mhtJet40", "nSoftBJetLoose25", "nSoftBJetMedium25", "nSoftBJetTight25", 
-                     "met_*","Flag_*",
-                     "nFatJet","FatJet_*", 
-                     "nLepOther", "LepOther_*", "nLepGood", "LepGood_*", "ngenLep", "genLep_*", "nTauGood", "TauGood_*", 
-                     "nGenPart", "GenPart_*","ngenPartAll","genPartAll_*" ,"ngenTau", "genTau_*", "nJet", "Jet_*", "ngenLepFromTau", "genLepFromTau_*"]
+#branchKeepStrings = ["run", "lumi", "evt", "isData", "xsec", "puWeight", "nTrueInt", "genWeight", "rho", "nVert", "nJet25", "nBJetLoose25", "nBJetMedium25", "nBJetTight25", "nJet40", "nJet40a", "nBJetLoose40", "nBJetMedium40", "nBJetTight40", 
+#                     "nLepGood20", "nLepGood15", "nLepGood10",  
+#                     "GenSusyMScan1", "GenSusyMScan2", "GenSusyMScan3", "GenSusyMScan4", "GenSusyMGluino", "GenSusyMGravitino", "GenSusyMStop", "GenSusyMSbottom", "GenSusyMStop2", "GenSusyMSbottom2", "GenSusyMSquark", "GenSusyMNeutralino", "GenSusyMNeutralino2", "GenSusyMNeutralino3", "GenSusyMNeutralino4", "GenSusyMChargino", "GenSusyMChargino2", 
+#                     "htJet25", "mhtJet25", "htJet40j", "htJet40", "mhtJet40", "nSoftBJetLoose25", "nSoftBJetMedium25", "nSoftBJetTight25", 
+#                     "met_*","Flag_*",
+#                     "nFatJet","FatJet_*", 
+#                     "nLepOther", "LepOther_*", "nLepGood", "LepGood_*", "ngenLep", "genLep_*", "nTauGood", "TauGood_*", 
+#                     "nGenPart", "GenPart_*","ngenPartAll","genPartAll_*" ,"ngenTau", "genTau_*", "nJet", "Jet_*", "ngenLepFromTau", "genLepFromTau_*",
+#                      ]
+                      
 #"nGenP6StatusThree", "GenP6StatusThree_*", "nGenTop", "GenTop_*"
 
 
@@ -51,16 +55,17 @@ branchKeepStrings = ["run", "lumi", "evt", "isData", "xsec", "puWeight", "nTrueI
 branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert", 
                      "nJet25", "nBJetLoose25", "nBJetMedium25", "nBJetTight25", "nJet40", "nJet40a", "nBJetLoose40", "nBJetMedium40", "nBJetTight40", 
                      "nLepGood20", "nLepGood15", "nLepGood10", "htJet25", "mhtJet25", "htJet40j", "htJet40", "mhtJet40", "nSoftBJetLoose25", "nSoftBJetMedium25", "nSoftBJetTight25", 
-                     "met*","Flag_*","HLT_*",
+                     "met*","puppi*","Flag_*","HLT_*",
 #                     "nFatJet","FatJet_*", 
                      "nJet", "Jet_*", 
                      "nLepGood", "LepGood_*", 
                      "nLepOther", "LepOther_*", 
                      "nTauGood", "TauGood_*",
+                     "track_*", "isoTrack_*",
                      ] 
 if tracks:
-  branchKeepStrings_DATAMC.extend(["track_*","isoTrack_*"])
-  trackMinPtList= [1,1.5,2]
+  #branchKeepStrings_DATAMC.extend(["track_*","isoTrack_*"])
+  trackMinPtList= [1,1.5,2,2.5,3]
 
 #branches to be kept for MC samples only
 branchKeepStrings_MC = [ "nTrueInt", "genWeight", "xsec", "puWeight", 
@@ -87,9 +92,10 @@ from optparse import OptionParser
 parser = OptionParser()
 parser.add_option("--samples", dest="allsamples", default=defSampleStr, type="string", action="store", help="samples:Which samples.")
 parser.add_option("--inputTreeName", dest="inputTreeName", default="treeProducerSusySingleLepton", type="string", action="store", help="samples:Which samples.")
-parser.add_option("--targetDir", dest="targetDir", default="/data/"+username+"/cmgTuples/"+subDir+'/', type="string", action="store", help="target directory.")
+#parser.add_option("--targetDir", dest="targetDir", default="/data/"+username+"/cmgTuples/"+subDir+'/', type="string", action="store", help="target directory.")
+parser.add_option("--targetDir", dest="targetDir", default="/afs/hephy.at/data/%s"%afsDataName+"/cmgTuples/"+subDir+'/', type="string", action="store", help="target directory.")
 parser.add_option("--skim", dest="skim", default="", type="string", action="store", help="any skim condition?")
-parser.add_option("--leptonSelection", dest="leptonSelection", default="hard", type="string", action="store", help="which lepton selection? 'soft', 'hard', 'inc', 'dilep'?")
+parser.add_option("--leptonSelection", dest="leptonSelection", default="inc", type="string", action="store", help="which lepton selection? 'soft', 'hard', 'inc', 'dilep'?")
 parser.add_option("--preselect", dest="preselect", action="store_true", help="Apply preselection for the postprocessing")
 parser.add_option("--small", dest="small", default = False, action="store_true", help="Just do a small subset.")
 #parser.add_option("--overwrite", dest="overwrite", action="store_true", help="Overwrite?", default=True)
@@ -104,18 +110,19 @@ if options.skim=='HT400ST200':   ##tuples have already ST200 skim
   skimCond = "Sum$(Jet_pt)>400&&(LepGood_pt[0]+met_pt)>200"
 
 ##In case a lepton selection is required, loop only over events where there is one 
-if options.leptonSelection.lower()=='soft':
-  #skimCond += "&&Sum$(LepGood_pt>5&&LepGood_pt<25&&LepGood_relIso03<0.4&&abs(LepGood_eta)<2.4)>=1"
-  skimCond += "&&(Sum$(LepGood_pt>5&&LepGood_pt<{ptCut} &&abs(LepGood_eta)<2.4)>=1 ||  Sum$(LepOther_pt>5&&LepOther_pt<{ptCut} && abs(LepOther_eta)<2.4)>=1 )".format(ptCut=lepton_soft_hard_cut)
-if options.leptonSelection.lower()=='hard':
-  #skimCond += "&&Sum$(LepGood_pt>25&&LepGood_relIso03<0.4&&abs(LepGood_eta)<2.4)>=1"
-  skimCond += "&&Sum$(LepGood_pt>%s&&abs(LepGood_eta)<2.4)>=1"%lepton_soft_hard_cut
-if options.leptonSelection.lower()=='dilep':
-  #skimCond += "&&Sum$(LepGood_pt>25&&LepGood_relIso03<0.4&&abs(LepGood_eta)<2.4)>=1"
-  skimCond += "&&Sum$(LepGood_pt>15&&abs(LepGood_eta)<2.4)>1"
+#if options.leptonSelection.lower()=='soft':
+#  #skimCond += "&&Sum$(LepGood_pt>5&&LepGood_pt<25&&LepGood_relIso03<0.4&&abs(LepGood_eta)<2.4)>=1"
+#  print "----------------------------- THIS IS UNKNOWN TERRITORY DONT TRUST THE REUSLT! --------------------------------------"
+#  skimCond += "&&(Sum$(LepGood_pt>5&&LepGood_pt<{ptCut} &&abs(LepGood_eta)<2.4)>=1 ||  Sum$(LepOther_pt>5&&LepOther_pt<{ptCut} && abs(LepOther_eta)<2.4)>=1 )".format(ptCut=lepton_soft_hard_cut)
+#if options.leptonSelection.lower()=='hard':
+#  #skimCond += "&&Sum$(LepGood_pt>25&&LepGood_relIso03<0.4&&abs(LepGood_eta)<2.4)>=1"
+#  print "----------------------------- THIS IS UNKNOWN TERRITORY DONT TRUST THE REUSLT! --------------------------------------"
+#  skimCond += "&&Sum$(LepGood_pt>%s&&abs(LepGood_eta)<2.4)>=1"%lepton_soft_hard_cut
+#if options.leptonSelection.lower()=='dilep':
+#  print "----------------------------- THIS IS UNKNOWN TERRITORY DONT TRUST THE REUSLT! --------------------------------------"
+#  #skimCond += "&&Sum$(LepGood_pt>25&&LepGood_relIso03<0.4&&abs(LepGood_eta)<2.4)>=1"
+#  skimCond += "&&Sum$(LepGood_pt>15&&abs(LepGood_eta)<2.4)>1"
 if options.leptonSelection.lower()=='inc':
-  #skimCond += "&&Sum$(LepGood_pt>25&&LepGood_relIso03<0.4&&abs(LepGood_eta)<2.4)>=1"
-  #skimCond += "&&Sum$(abs(LepGood_eta)< 2.5)>=1"
   skimCond += ""
 if options.skim=='inc':
   skimCond = "(1)"
@@ -124,6 +131,19 @@ if options.preselect:
   preselection = "(met_pt > 100 && Jet_pt[0]> 80 && Sum$(Jet_pt)>100 )"
   print "Applying Preselection", preselection
   skimCond += "&&%s"%preselection
+
+if options.skim.lower()=='lhehthi':  
+  print "Applying lheHTIncoming >=600     ---- you better know why!"
+  skimCond += "lheHTIncoming>=600"
+if options.skim.lower()=='lhehtlow':
+  print "Applying lheHTIncoming < 600     ---- you better know why!"
+  skimCond += "lheHTIncoming<600"
+
+
+print "SkimCondition:"
+print skimCond
+
+
 
 if sys.argv[0].count('ipython'):
   options.small=True
@@ -154,7 +174,9 @@ for isample, sample in enumerate(allSamples):
   #chunks, sumWeight = getChunks(sample, options.inputTreeName)
   chunks, sumWeight = getChunks(sample)
   #chunks, nTotEvents = getChunksFromDPM(sample, options.inputTreeName)
-  print "Chunks:" , chunks 
+  #print "Chunks:" , chunks 
+  print "Here is what the first chunk looks like: (out of %s):"%len(chunks)
+  print chunks[0]
   outDir = options.targetDir+'/'+"/".join([options.skim, options.leptonSelection, sample['name']])
   tmpDir = outDir+'/tmp/'
   os.system('mkdir -p ' + outDir) 
@@ -172,9 +194,11 @@ for isample, sample in enumerate(allSamples):
     #                 "nLepOther", "LepOther_*", "nLepGood", "LepGood_*", "nTauGood", "TauGood_*",
     #                 "nJet", "Jet_*"] 
   else:
-    print chunks,
-    print sumWeight 
-    prelumiWeight = xsec[sample['dbsName']]*target_lumi/float(sumWeight)
+    print "sumWeight", sumWeight
+    sampleXsec = sample['xsec'] if sample.has_key('xsec') else xsec[sample['dbsName']]
+    
+    #prelumiWeight = xsec[sample['dbsName']]*target_lumi/float(sumWeight)
+    prelumiWeight = sampleXsec*target_lumi/float(sumWeight)
     branchKeepStrings = branchKeepStrings_DATAMC + branchKeepStrings_MC
 
     #branchKeepStrings = ["run", "lumi", "evt", "isData", "xsec", "puWeight", "nTrueInt", "genWeight", "rho", "nVert", "nJet25", "nBJetLoose25", "nBJetMedium25", "nBJetTight25", "nJet40", "nJet40a", "nBJetLoose40", "nBJetMedium40", "nBJetTight40",  
@@ -214,7 +238,7 @@ for isample, sample in enumerate(allSamples):
     if pkdGenParts:
       newVariables.extend([
                            'genPartPkd_ISRdPhi/F' , 'genPartPkd_CosISRdPhi/F' ,"ngenPartPkd_1p5/I/0","ngenPartPkd_1/I/0","ngenPartPkd_2/I/0",
-                           'ngenPartPkdOppISR_1/F','ngenPartPkdOppISR_1p5/F', 'ngenPartPkdOppISR_2/F','ngenPartPkdO90isr_1/F', 'ngenPartPkdO90isr_1p5/F', 'ngenPartPkdO90isr_2/F', 
+                           'ngenPartPkdOppJet1_1/F','ngenPartPkdOppJet1_1p5/F', 'ngenPartPkdOppJet1_2/F','ngenPartPkdO90isr_1/F', 'ngenPartPkdO90isr_1p5/F', 'ngenPartPkdO90isr_2/F', 
 
                           ] )
   if options.leptonSelection.lower() in ['soft', 'hard','inc']:
@@ -231,10 +255,17 @@ for isample, sample in enumerate(allSamples):
                           ]) #, 'mt2w/F'] )
 
     if tracks:
-      newVariables.extend( [
-                           'track_ISRdPhi/F' , 'track_CosISRdPhi/F' ,"ntrack_1p5/I/0","ntrack_1/I/0","ntrack_2/I/0",
-                           'ntrackOppISR_1/F','ntrackOppISR_1p5/F', 'ntrackOppISR_2/F','ntrackO90isr_1/F', 'ntrackO90isr_1p5/F', 'ntrackO90isr_2/F', 
-                           ]) 
+      newTrackVars = []
+      for minTrkPt in trackMinPtList:
+        ptString = str(minTrkPt).replace(".","p")
+        newTrackVars.extend( [ x%ptString for x in  [ "ntracks_%s/I" ,"ntrackOppJet1_%s/I" ,"ntrackOppJet12_%s/I" , "ntrackOppJetAll_%s/I" ] ] )
+      newVariables.extend(newTrackVars)
+      #newVariables.extend( [
+      #                     'track_ISRdPhi/F' , 'track_CosISRdPhi/F' ,"ntrack_1p5/I/0","ntrack_1/I/0","ntrack_2/I/0",
+      #                     'ntrackOppJet1_1/F','ntrackOppJet1_1p5/F', 'ntrackOppJet1_2/F','ntrackO90isr_1/F', 'ntrackO90isr_1p5/F', 'ntrackO90isr_2/F', 
+      #                     ["ntrackOppJetAll_%s"%minTrkPt.replace(".","p") ]
+
+      #                     ]) 
 
 
 
@@ -289,16 +320,19 @@ for isample, sample in enumerate(allSamples):
       for a in aliases:
         t.SetAlias(*(a.split(":")))
       print "File",chunk['file'],'chunk',chunk['name'],"found", nEvents, '(skim:',options.skim,') condition:', skimCond,' with weight',prelumiWeight, 'in Chain -> post processing...'
-      
-      for i in range(nEvents):
+
+      t1 = time.time()      
+      for ievt in range(nEvents):
         if break_for_debug: 
           print "!!!!!!!!!!!!!!!!!!! BREAKING FOR INTERACTIVE DEBUG !!!!!!!!!!!!!!!!!!!!!!!!!!!!"
           break
-        if (i%10000 == 0) and i>0 :
-          print i,"/",nEvents  , "name:" , chunk['name']
+        if (ievt%10000 == 0) and ievt>0 :
+          checkmark = time.time()
+          print ievt,"/",nEvents, "(%s s)"%(checkmark-t1)  , "name:" , chunk['name']
+          t1 = checkmark
         s.init()
         r.init()
-        t.GetEntry(i)
+        t.GetEntry(ievt)
         if not sample['isData']:
           genWeight = t.GetLeaf('genWeight').GetValue()
           s.weight = prelumiWeight*genWeight
@@ -310,8 +344,6 @@ for isample, sample in enumerate(allSamples):
           #  s.weight_XSecTTBar1p1 = s.weight
           #  s.weight_XSecTTBar0p9 = s.weight
 
-
-
         
         if options.leptonSelection.lower() in ['soft','hard','inc']:
           looseLepInd = cmgLooseLepIndices(r, ptCuts=(7,5), absEtaCuts=(2.5,2.4), ele_MVAID_cuts={'eta08':0.35 , 'eta104':0.20,'eta204': -0.52} )    ##Tight ele_MVAID_cuts={'eta08':0.73 , '
@@ -319,10 +351,6 @@ for isample, sample in enumerate(allSamples):
           tightHardLepInd = filter(lambda i:(abs(r.LepGood_pdgId[i])==11 and r.LepGood_miniRelIso[i]<0.1 and ele_ID_eta(r,nLep=i,ele_MVAID_cuts={'eta08':0.73 , 'eta104':0.57,'eta204':  0.05}) and r.LepGood_tightId[i]>=3) \
                                          or (abs(r.LepGood_pdgId[i])==13 and r.LepGood_miniRelIso[i]<0.2  and r.LepGood_tightId[i]), looseHardLepInd)  
           s.nTightHardLeptons = len(tightHardLepInd)
-
-
-
-
           #looseLepInd = cmgLooseLepIndices(r, ptCuts=(7,5), absEtaCuts=(2.5,2.4), ele_MVAID_cuts={'eta08':0.35 , 'eta104':0.20,'eta204': -0.52} )    ##Tight ele_MVAID_cuts={'eta08':0.73 , 'eta104':0.57,'eta204':  0.05}
           vars = ['pt', 'eta', 'phi', 'miniRelIso','relIso03',"relIso04", "dxy", "dz", 'pdgId', "sip3d","mediumMuonId"]
 
@@ -330,19 +358,11 @@ for isample, sample in enumerate(allSamples):
           lepOthers =  [getObjDict(t, 'LepOther_',vars, i ) for i in range(r.nLepOther)]
           allLeptons = lepGoods + lepOthers
 
-          #if r.nLepOther != len(lepOthers) or  r.nLepGood != len(lepGoods):
-          #  print "#####################################################"
-          #  print "#####################################################"
-          #  print r.nLepOther, len(lepOthers), r.nLepGood, len(lepGoods)
-          #  print "#####################################################"
-          #  print "#####################################################"
+          #selectedLepOthers = filter( isGoodLepton , lepOthers )
+          #selectedLepOthers = sorted( selectedLepOthers ,key= lambda lep: lep['pt'], reverse=True)
 
-
-          selectedLepOthers = filter( isGoodLepton , lepOthers )
-          selectedLepOthers = sorted( selectedLepOthers ,key= lambda lep: lep['pt'], reverse=True)
-
-          selectedLepGoods = filter( isGoodLepton , lepGoods )
-          selectedLepGoods = sorted( selectedLepGoods ,key= lambda lep: lep['pt'], reverse=True)
+          #selectedLepGoods = filter( isGoodLepton , lepGoods )
+          #selectedLepGoods = sorted( selectedLepGoods ,key= lambda lep: lep['pt'], reverse=True)
 
           selectedLeptons = filter( isGoodLepton , allLeptons )
           selectedLeptons = sorted( selectedLeptons ,key= lambda lep: lep['pt'], reverse=True)
@@ -361,93 +381,86 @@ for isample, sample in enumerate(allSamples):
           #print "tightHardLep" , tightHardLep 
           leadingLepInd = None
 
-          #for lep in selectedLeptons:
-          if selectedLepGoods:
-            lep= selectedLepGoods[0]
-            s.lepGoodPt     = lep['pt']
-            s.lepGoodEta    = lep['eta'] 
-            s.lepGoodPhi    = lep['phi'] 
-            s.lepGoodAbsIso = lep['relIso04']*lep['pt'] 
-            s.lepGoodDxy    = lep['dxy'] 
-            s.lepGoodDz     = lep['dz']  
-            s.lepGoodPdgId  = lep['pdgId']
-            s.lepGoodEta    = lep['eta'] 
-            s.lepGoodMedMuId= lep['mediumMuonId']
-            s.lepGoodSip3d  = lep['sip3d']
-            s.lepGoodRelIso04=  lep['relIso04']
-            s.lepGoodRelIso03=  lep['relIso03']
-            s.lepGoodMiniRelIso =  lep['miniRelIso']
-          if selectedLepOthers:
-            lep= selectedLepOthers[0]
-            s.lepOtherPt     = lep['pt']
-            s.lepOtherEta    = lep['eta'] 
-            s.lepOtherPhi    = lep['phi'] 
-            s.lepOtherAbsIso = lep['relIso04']*lep['pt'] 
-            s.lepOtherDxy    = lep['dxy'] 
-            s.lepOtherDz     = lep['dz']  
-            s.lepOtherPdgId  = lep['pdgId']
-            s.lepOtherEta    = lep['eta'] 
-            s.lepOtherMedMuId= lep['mediumMuonId']
-            s.lepOtherSip3d  = lep['sip3d']
-            s.lepOtherRelIso04=  lep['relIso04']
-            s.lepOtherRelIso03=  lep['relIso03']
-            s.lepOtherMiniRelIso =  lep['miniRelIso']
+          varsToKeep = vars +[]
           if selectedLeptons:
             lep= selectedLeptons[0]
-            s.lepPt     = lep['pt']
-            s.lepEta    = lep['eta'] 
-            s.lepPhi    = lep['phi'] 
+            lepName = "lep"
+            for var in varsToKeep:
+              varName = lepName + var.title()
+              setattr(s,varName,lep[var])
             s.lepAbsIso = lep['relIso04']*lep['pt'] 
-            s.lepDxy    = lep['dxy'] 
-            s.lepDz     = lep['dz']  
-            s.lepPdgId  = lep['pdgId']
-            s.lepEta    = lep['eta'] 
-            s.lepMedMuId= lep['mediumMuonId']
-            s.lepSip3d  = lep['sip3d']
-            s.lepRelIso04=  lep['relIso04']
-            s.lepRelIso03=  lep['relIso03']
-            s.lepMiniRelIso =  lep['miniRelIso']
-            s.nlep  = len(selectedLeptons)
-            s.singleMuonic = s.nlep==1
 
-        if options.leptonSelection=='hard':
-          if s.nTightHardLeptons>=1:
-            leadingLepInd = tightHardLepInd[0]
-            #print "highest pt: " , r.LepGood_pt[0]
-            s.leptonPt  = r.LepGood_pt[leadingLepInd]
-            s.leptonMiniRelIso = r.LepGood_miniRelIso[leadingLepInd]
-            s.leptonRelIso03 = r.LepGood_relIso03[leadingLepInd]
-            #print s.leptonMiniRelIso ,s.leptonPt, 'met:', r.met_pt, r.nLepGood, r.LepGood_pt[leadingLepInd],r.LepGood_eta[leadingLepInd], r.LepGood_phi[leadingLepInd] , r.LepGood_pdgId[leadingLepInd], r.LepGood_relIso03[leadingLepInd], r.LepGood_tightId[leadingLepInd], r.LepGood_mass[leadingLepInd]
-            s.leptonInd = leadingLepInd 
-            s.leptonEta = r.LepGood_eta[leadingLepInd]
-            s.leptonPhi = r.LepGood_phi[leadingLepInd]
-            s.leptonPdg = r.LepGood_pdgId[leadingLepInd]
-            s.leptonMass= r.LepGood_mass[leadingLepInd]
-            s.leptonDz = r.LepGood_Dz[leadingLepInd]
-            s.leptonDxy= r.LepGood_Dxy[leadingLepInd]
-            s.st = r.met_pt + s.leptonPt
-          s.singleLeptonic = s.nTightHardLeptons==1
-          if s.singleLeptonic:
-            s.singleMuonic      =  abs(s.leptonPdg)==13
-            s.singleElectronic  =  abs(s.leptonPdg)==11
-          else:
-            s.singleMuonic      = False 
-            s.singleElectronic  = False 
+          #for lep in selectedLeptons:
+          #if selectedLepGoods:
+          #  lep= selectedLepGoods[0]
+          #  lepName = "lepGood"
+  
+          #  for var in varsToKeep:
+          #    varName = lepName + var.title()
+          #    setattr(s,varName,lep[var])
+          #  s.lepGoodAbsIso = lep['relIso04']*lep['pt'] 
 
-        if options.leptonSelection in ['soft', 'inc']:
-          #Select hardest tight lepton among soft leptons
-          if s.nTightSoftLeptons>=1:
-            leadingLepInd = tightSoftLepInd[0]
-  #          print s.leptonPt, r.LepGood_pt[leadingLepInd],r.LepGood_eta[leadingLepInd], leadingLepInd
-            s.leptonPt  = r.LepGood_pt[leadingLepInd]
-            s.leptonInd = leadingLepInd 
-            s.leptonEta = r.LepGood_eta[leadingLepInd]
-            s.leptonPhi = r.LepGood_phi[leadingLepInd]
-            s.leptonPdg = r.LepGood_pdgId[leadingLepInd]
-            s.leptonMass= r.LepGood_mass[leadingLepInd]
-            s.leptonDz = r.LepGood_Dz[leadingLepInd]
-            s.leptonDxy= r.LepGood_Dxy[leadingLepInd]
-            s.st = r.met_pt + s.leptonPt
+          #if selectedLepOthers:
+          #  lep= selectedLepOthers[0]
+          #  lepName = "lepOther"
+  
+          #  for var in varsToKeep:
+          #    varName = lepName + var.title()
+          #    setattr(s,varName,lep[var])
+          #  s.lepOtherAbsIso = lep['relIso04']*lep['pt'] 
+            #s.lepPt     = lep['pt']
+            #s.lepEta    = lep['eta'] 
+            #s.lepPhi    = lep['phi'] 
+            #s.lepDxy    = lep['dxy'] 
+            #s.lepDz     = lep['dz']  
+            #s.lepPdgId  = lep['pdgId']
+            #s.lepEta    = lep['eta'] 
+            #s.lepMedMuId= lep['mediumMuonId']
+            #s.lepSip3d  = lep['sip3d']
+            #s.lepRelIso04=  lep['relIso04']
+            #s.lepRelIso03=  lep['relIso03']
+            #s.lepMiniRelIso =  lep['miniRelIso']
+            #s.nlep  = len(selectedLeptons)
+            #s.singleMuonic = s.nlep==1
+
+        #if options.leptonSelection=='hard':
+        #  if s.nTightHardLeptons>=1:
+        #    leadingLepInd = tightHardLepInd[0]
+        #    #print "highest pt: " , r.LepGood_pt[0]
+        #    s.leptonPt  = r.LepGood_pt[leadingLepInd]
+        #    s.leptonMiniRelIso = r.LepGood_miniRelIso[leadingLepInd]
+        #    s.leptonRelIso03 = r.LepGood_relIso03[leadingLepInd]
+        #    #print s.leptonMiniRelIso ,s.leptonPt, 'met:', r.met_pt, r.nLepGood, r.LepGood_pt[leadingLepInd],r.LepGood_eta[leadingLepInd], r.LepGood_phi[leadingLepInd] , r.LepGood_pdgId[leadingLepInd], r.LepGood_relIso03[leadingLepInd], r.LepGood_tightId[leadingLepInd], r.LepGood_mass[leadingLepInd]
+        #    s.leptonInd = leadingLepInd 
+        #    s.leptonEta = r.LepGood_eta[leadingLepInd]
+        #    s.leptonPhi = r.LepGood_phi[leadingLepInd]
+        #    s.leptonPdg = r.LepGood_pdgId[leadingLepInd]
+        #    s.leptonMass= r.LepGood_mass[leadingLepInd]
+        #    s.leptonDz = r.LepGood_Dz[leadingLepInd]
+        #    s.leptonDxy= r.LepGood_Dxy[leadingLepInd]
+        #    s.st = r.met_pt + s.leptonPt
+        #  s.singleLeptonic = s.nTightHardLeptons==1
+        #  if s.singleLeptonic:
+        #    s.singleMuonic      =  abs(s.leptonPdg)==13
+        #    s.singleElectronic  =  abs(s.leptonPdg)==11
+        #  else:
+        #    s.singleMuonic      = False 
+        #    s.singleElectronic  = False 
+
+        #if options.leptonSelection in ['soft', 'inc']:
+        #  #Select hardest tight lepton among soft leptons
+        #  if s.nTightSoftLeptons>=1:
+        #    leadingLepInd = tightSoftLepInd[0]
+  #     #     print s.leptonPt, r.LepGood_pt[leadingLepInd],r.LepGood_eta[leadingLepInd], leadingLepInd
+        #    s.leptonPt  = r.LepGood_pt[leadingLepInd]
+        #    s.leptonInd = leadingLepInd 
+        #    s.leptonEta = r.LepGood_eta[leadingLepInd]
+        #    s.leptonPhi = r.LepGood_phi[leadingLepInd]
+        #    s.leptonPdg = r.LepGood_pdgId[leadingLepInd]
+        #    s.leptonMass= r.LepGood_mass[leadingLepInd]
+        #    s.leptonDz = r.LepGood_Dz[leadingLepInd]
+        #    s.leptonDxy= r.LepGood_Dxy[leadingLepInd]
+        #    s.st = r.met_pt + s.leptonPt
           #s.singleLeptonic = s.nTightSoftLeptons==1
           #if s.singleLeptonic:
           #  s.singleMuonic      =  abs(s.leptonPdg)==13
@@ -461,8 +474,6 @@ for isample, sample in enumerate(allSamples):
           #if not sample['isData']: j_list.extend('partonId')
           jets = filter(lambda j:j['pt']>30 and abs(j['eta'])<2.4 and j['id'], get_cmg_jets_fromStruct(r,j_list))
           
-          #print "jets:" , jets
-#          lightJets_, bJetsCMVA = splitListOfObjects('btagCMVA', 0.732, jets) 
           lightJets,  bJetsCSV = splitListOfObjects('btagCSV', 0.890, jets)
           #lightJets,  bJetsCSV = filter(lambda j:j['btagCSV']<0.814 and -1<j['btagCSV'] , jetscopy)
           #print "bjetsCMVA:" , bJetsCMVA , "bjetsCSV:" ,  bJetsCSV
@@ -472,16 +483,7 @@ for isample, sample in enumerate(allSamples):
           jets60   = filter(lambda j:j['pt']>60 and abs(j['eta'])<2.4 and j['id'], get_cmg_jets_fromStruct(r,j_list))  ## maybe use jets instead
 
           bJets = filter( lambda j: j["btagCSV"] > 0.890 , jets )
-          bJets1 = filter( lambda j: j["btagCSV"] > 0.890 and j['pt']>30 and abs(j['eta'])<2.4 and j['id'], get_cmg_jets_fromStruct(r,j_list))
           softBJetsCSV,  hardBJetsCSV = splitListOfObjects('pt', 60, bJets)
-          if bJets != bJets1:
-            print get_cmg_jets_fromStruct(r,j_list) 
-            print bJets
-            print bJets1
-            print "##################################################################"
-            print "################################## BJets ARE NOT CONSISTANT!!!!!!!!!!!! ###########################################"
-            print "##################################################################"
-
 
           s.nSoftBJetsCSV = len(softBJetsCSV)
           s.nHardBJetsCSV = len(hardBJetsCSV)
@@ -530,53 +532,73 @@ for isample, sample in enumerate(allSamples):
 
         ###############################       track variables
         if tracks:
-          vars = ['pt', 'eta', 'phi', "dxy", "dz", 'pdgId' ]
+          vars = ['pt', 'eta', 'phi', "dxy", "dz", 'pdgId' , "matchedJetIndex", "matchedJetDr", "CosPhiJet1", "CosPhiJet12", "CosPhiJetAll"]
           tracks =   (getObjDict(t, 'track_',vars, i ) for i in range(r.ntrack))
-          ntracks={ minPt : 0 for minPt in trackMinPtList}
-          ntracksOppISR={ minPt : 0 for minPt in trackMinPtList}
-          ntracksOpp90ISR={ minPt : 0 for minPt in trackMinPtList}
-          ntracksOppISR2={ minPt : 0 for minPt in trackMinPtList}
-          ntracksOpp90ISR2={ minPt : 0 for minPt in trackMinPtList}
+
+          ntrack={ minPt : 0 for minPt in trackMinPtList}
+          ntrackOppJet1={ minPt : 0 for minPt in trackMinPtList}
+          ntrackOppJet12={ minPt : 0 for minPt in trackMinPtList}
+          ntrackOppJetAll={ minPt : 0 for minPt in trackMinPtList}
+          ntrackOpp90Jet1={ minPt : 0 for minPt in trackMinPtList}
+          ntrackOpp90Jet12={ minPt : 0 for minPt in trackMinPtList}
+          ntrackOpp90JetAll={ minPt : 0 for minPt in trackMinPtList}
+
+          #goodTracks = filter( )
           for track in tracks:
             if not (abs(track['eta']) < 2.5 and abs(track['dxy']) < 0.02 and abs( track['dz'] ) < 0.5 and track['pt']>=1.0) :
               continue
+            if not ( track["matchedJetIndex"]==-1  and track['matchedJetDr']>0.4  ):## also check jet pt  ## vetoing tracks that are matched to a jet 
+              continue
+            for minTrkPt in trackMinPtList:
+              if track['pt'] > minTrkPt:
+                ntrack[minTrkPt]+=1
+                if track['CosPhiJet1'] < 0:
+                  ntrackOppJet1[minTrkPt]+=1
+                if track['CosPhiJet12'] < 0:
+                  ntrackOppJet12[minTrkPt]+=1
+                if track['CosPhiJetAll'] < 0:
+                  ntrackOppJetAll[minTrkPt]+=1
+          #break_for_debug = True        
+
+              
+
+
+
             #print track
 
-            if cos(track['phi']-s.jet1Phi) < 0:
-              for trackMinPt in trackMinPtList:
-                if track['pt'] > trackMinPt:
-                  ntracksOppISR[trackMinPt]+=1
-              if cos(track['phi']-s.jet1Phi) <  -sqrt(2)/2:
-                for trackMinPt in trackMinPtList:
-                  if track['pt'] > trackMinPt:
-                    ntracksOpp90ISR[trackMinPt]+=1
+            #if cos(track['phi']-s.jet1Phi) < 0:
+            #  for trackMinPt in trackMinPtList:
+            #    if track['pt'] > trackMinPt:
+            #      ntracksOppJet1[trackMinPt]+=1
+            #  if cos(track['phi']-s.jet1Phi) <  -sqrt(2)/2:
+            #    for trackMinPt in trackMinPtList:
+            #      if track['pt'] > trackMinPt:
+            #        ntracksOpp90ISR[trackMinPt]+=1
 
-            for trackMinPt in trackMinPtList:
-              if track['pt'] > trackMinPt:
-                ntracks[trackMinPt]+=1
-                #print "added one track to", trackMinPt, ntracks[trackMinPt]
+            #for trackMinPt in trackMinPtList:
+            #  if track['pt'] > trackMinPt:
+            #    ntracks[trackMinPt]+=1
+            #    #print "added one track to", trackMinPt, ntracks[trackMinPt]
           
-          s.ntrack_1    = ntracks[1]    
-          s.ntrack_1p5    = ntracks[1.5]    
-          s.ntrack_2    = ntracks[2]    
+          
+          for minTrkPt in trackMinPtList:
+            trkPtString = str(minTrkPt).replace(".","p")
+            setattr(s,"ntracks_%s"         %trkPtString         ,  ntrack[minTrkPt]   )
+            setattr(s,"ntrackOppJet1_%s"  %trkPtString  ,  ntrackOppJet1[minTrkPt]   )
+            setattr(s,"ntrackOppJet12_%s" %trkPtString ,  ntrackOppJet12[minTrkPt]   )  
+            setattr(s,"ntrackOppJetAll_%s"%trkPtString,  ntrackOppJetAll[minTrkPt]   )
+
           
  
-          s.ntrackOppISR_1 = ntracksOppISR[1]  
-          s.ntrackOppISR_1p5 = ntracksOppISR[1.5]  
-          s.ntrackOppISR_2 = ntracksOppISR[2]  
-
-          s.ntrackO90isr_1 = ntracksOpp90ISR[1]  
-          s.ntrackO90isr_1p5 = ntracksOpp90ISR[1.5]  
-          s.ntrackO90isr_2 = ntracksOpp90ISR[2]  
 
 
         if pkdGenParts:
           vars = ['pt', 'eta', 'phi', 'pdgId' ]
           genPartPkds =   (getObjDict(t, 'genPartPkd_',vars, i ) for i in range(r.ngenPartPkd))
           ngenPartPkds={ minPt : 0 for minPt in genPartMinPtList}
-          ngenPartPkdsOppISR={ minPt : 0 for minPt in genPartMinPtList}
+          ngenPartPkdsOppJet1={ minPt : 0 for minPt in genPartMinPtList}
           ngenPartPkdsOpp90ISR={ minPt : 0 for minPt in genPartMinPtList}
-          ngenPartPkdsOppISR2={ minPt : 0 for minPt in genPartMinPtList}
+          ngenPartPkdsOppJet12={ minPt : 0 for minPt in genPartMinPtList}
           ngenPartPkdsOpp90ISR2={ minPt : 0 for minPt in genPartMinPtList}
           for genPartPkd in genPartPkds:
             if not (abs(genPartPkd['eta']) < 2.5 and genPartPkd['pt']>=1.0) :
@@ -586,7 +608,7 @@ for isample, sample in enumerate(allSamples):
             if cos(genPartPkd['phi']-s.jet1Phi) < 0:
               for genPartPkdMinPt in genPartMinPtList:
                 if genPartPkd['pt'] > genPartPkdMinPt:
-                  ngenPartPkdsOppISR[genPartPkdMinPt]+=1
+                  ngenPartPkdsOppJet1[genPartPkdMinPt]+=1
               if cos(genPartPkd['phi']-s.jet1Phi) <  -sqrt(2)/2:
                 for genPartPkdMinPt in genPartMinPtList:
                   if genPartPkd['pt'] > genPartPkdMinPt:
@@ -602,9 +624,9 @@ for isample, sample in enumerate(allSamples):
           s.ngenPartPkd_2    = ngenPartPkds[2]    
           
  
-          s.ngenPartPkdOppISR_1 = ngenPartPkdsOppISR[1]  
-          s.ngenPartPkdOppISR_1p5 = ngenPartPkdsOppISR[1.5]  
-          s.ngenPartPkdOppISR_2 = ngenPartPkdsOppISR[2]  
+          s.ngenPartPkdOppJet1_1 = ngenPartPkdsOppJet1[1]  
+          s.ngenPartPkdOppJet1_1p5 = ngenPartPkdsOppJet1[1.5]  
+          s.ngenPartPkdOppJet1_2 = ngenPartPkdsOppJet1[2]  
 
           s.ngenPartPkdO90isr_1 = ngenPartPkdsOpp90ISR[1]  
           s.ngenPartPkdO90isr_1p5 = ngenPartPkdsOpp90ISR[1.5]  

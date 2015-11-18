@@ -118,6 +118,7 @@ def getChunks(sample,  maxN=-1):
   import os, subprocess, datetime
   #print "sample dir:" , sample['dir']
   chunks = [{'name':x} for x in os.listdir(sample['dir']) if x.startswith(sample['chunkString']+'_Chunk') or x==sample['name']]
+  ## there in the line above. if x==sample['name'], the chunk directories are ignored! 
   #print chunks
   chunks=chunks[:maxN] if maxN>0 else chunks
   sumWeights=0

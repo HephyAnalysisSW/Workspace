@@ -1,2 +1,0 @@
-username="schoef"
-afsuser = "schoefbeck"
