@@ -2,7 +2,7 @@
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: Configuration/GenProduction/python/SUS-RunIISpring15FSPremix-00002-fragment.py --filein root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/nrad/lhe/merged/T2DegStop2j_300_270_merged.lhe --pileup_input dbs:/Neutrino_E-10_gun/RunIISpring15PrePremix-MCRUN2_74_V9-v1/GEN-SIM-DIGI-RAW --mc --eventcontent AODSIM --fast --customise SLHCUpgradeSimulations/Configuration/postLS1CustomsPreMixing.customisePostLS1 --datatier AODSIM --conditions MCRUN2_74_V9 --beamspot NominalCollision2015 --step GEN,SIM,RECOBEFMIX,DIGIPREMIX_S2:pdigi_valid,DATAMIX,L1,L1Reco,RECO,HLT:@frozen25ns --magField 38T_PostLS1 --datamix PreMix --no_exec --python_filename fastSim_cfg.py
+# with command line options: Configuration/GenProduction/python/SUS-RunIISpring15FSPremix-00002-fragment.py --filein root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/nrad/lhe/merged/T2DegStop2j_300_270_merged.lhe --pileup_input dbs:/Neutrino_E-10_gun/RunIISpring15PrePremix-MCRUN2_74_V9-v1/GEN-SIM-DIGI-RAW --mc --eventcontent AODSIM --fast --customise SLHCUpgradeSimulations/Configuration/postLS1CustomsPreMixing.customisePostLS1 --datatier AODSIM --conditions MCRUN2_74_V9 --beamspot NominalCollision2015 --step GEN,SIM,RECOBEFMIX,DIGIPREMIX_S2:pdigi_valid,DATAMIX,L1,L1Reco,RECO,HLT:@frozen25ns --magField 38T_PostLS1 --datamix PreMix --no_exec --python_filename fastSim_cfg.py -n 1500000 --fileout T2DegStop_300_270_FastSim_full.root
 import FWCore.ParameterSet.Config as cms
 
 process = cms.Process('HLT')
@@ -37,7 +37,6 @@ process.maxEvents = cms.untracked.PSet(
 # Input source
 process.source = cms.Source("LHESource",
     fileNames = cms.untracked.vstring('root://hephyse.oeaw.ac.at//dpm/oeaw.ac.at/home/cms/store/user/nrad/lhe/merged/T2DegStop2j_300_270_merged.lhe')
-    #fileNames = cms.untracked.vstring('file:/data/nrad/T2DegStop13TeV/t2degen2step2_300.0_0_decayed_1000022_270.lhe')
 )
 
 process.options = cms.untracked.PSet(
@@ -46,7 +45,7 @@ process.options = cms.untracked.PSet(
 
 # Production Info
 process.configurationMetadata = cms.untracked.PSet(
-    annotation = cms.untracked.string('Configuration/GenProduction/python/SUS-RunIISpring15FSPremix-00002-fragment.py nevts:1'),
+    annotation = cms.untracked.string('Configuration/GenProduction/python/SUS-RunIISpring15FSPremix-00002-fragment.py nevts:1500000'),
     name = cms.untracked.string('Applications'),
     version = cms.untracked.string('$Revision: 1.19 $')
 )
@@ -64,9 +63,7 @@ process.AODSIMoutput = cms.OutputModule("PoolOutputModule",
         filterName = cms.untracked.string('')
     ),
     eventAutoFlushCompressedSize = cms.untracked.int32(15728640),
-    #fileName = cms.untracked.string('SUS-RunIISpring15FSPremix-00002-fragment_py_GEN_SIM_RECOBEFMIX_DIGIPREMIX_S2_DATAMIX_L1_L1Reco_RECO_HLT.root'),
-    #fileName = cms.untracked.string('file:/afs/hephy.at/work/n/nrad/T2DegStop300_270-RunIISpring15FSPremix_GEN_SIM_RECOBEFMIX_DIGIPREMIX_S2_DATAMIX_L1_L1Reco_RECO_HLT.root'),
-    fileName = cms.untracked.string('file:/data/nrad/T2DegStop300_270-RunIISpring15FSPremix_GEN_SIM_RECOBEFMIX_DIGIPREMIX_S2_DATAMIX_L1_L1Reco_RECO_HLT.root'),
+    fileName = cms.untracked.string('T2DegStop_300_270_FastSim.root'),
     outputCommands = process.AODSIMEventContent.outputCommands
 )
 
@@ -88,7 +85,7 @@ process.generator = cms.EDFilter("Pythia8HadronizerFilter",
             'JetMatching:etaJetMax = 5.', 
             'JetMatching:coneRadius = 1.', 
             'JetMatching:slowJetPower = 1', 
-            'JetMatching:qCut = 50.', 
+            'JetMatching:qCut = 50.', #was 116 
             'JetMatching:nQmatch = 5', 
             'JetMatching:nJetMax = 2', 
             'JetMatching:doShowerKt = off'),
