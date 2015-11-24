@@ -30,7 +30,20 @@ TTJets_SemiLep = {\
 'dir' : dir,
 }
 
-
+TTJets_combined = {\
+"name" : "TTJets_combined",
+"bins" : [
+"TTJets_LO_HT1200to2500_Had_LHE",
+"TTJets_LO_HT2500toInf_Had_LHE",
+"TTJets_LO_HT600to800_Had_LHE",
+"TTJets_LO_HT800to1200_Had_LHE",
+"TTJets_LO_Had_LHE",
+"TTJets_DiLepton_full",
+"TTJets_SingleLeptonFromT_full",
+"TTJets_SingleLeptonFromTbar_full",
+],
+'dir' : dir,
+}
 WJetsHTToLNu_25ns={\
 "name" : "W+Jets",
 "bins" : [
