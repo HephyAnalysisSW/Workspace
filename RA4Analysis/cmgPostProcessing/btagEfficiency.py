@@ -17,6 +17,7 @@ ptBorders = [30, 40, 50, 60, 70, 80, 100, 120, 160, 210, 260, 320, 400, 500, 670
 ptBins = []
 etaBins = [[0,0.8], [0.8,1.6], [ 1.6, 2.4]]
 
+calib = ROOT.BTagCalibration("csvv2", "btagEff/CSVv2.csv")
 
 #SFb_errors = [\
 # 0.0209663,
@@ -118,6 +119,28 @@ def getSF(parton, pt, eta, year = 2012):
     sf_u = btag.getSFl(pt,eta,2,y)
   return {"SF":sf, "SF_down":sf_d,"SF_up":sf_u}
 
+# get SF
+def getSF2015(parton, pt, eta):
+  calib = ROOT.BTagCalibration("csvv2", "btagEff/CSVv2.csv")
+  readerCombUp      = ROOT.BTagCalibrationReader(calib, 1, "comb", "up")
+  readerCombCentral = ROOT.BTagCalibrationReader(calib, 1, "comb", "central")
+  readerCombDown    = ROOT.BTagCalibrationReader(calib, 1, "comb", "down")
+  readerMuUp        = ROOT.BTagCalibrationReader(calib, 1, "mujets", "up")
+  readerMuCentral   = ROOT.BTagCalibrationReader(calib, 1, "mujets", "central")
+  readerMuDown      = ROOT.BTagCalibrationReader(calib, 1, "mujets", "down")
+  if abs(parton)==5: #SF for b
+    sf   = readerMuCentral.eval(0, eta, pt)
+    sf_d = readerMuDown.eval(0, eta, pt)
+    sf_u = readerMuUp.eval(0, eta, pt)
+  elif abs(parton)==4: #SF for c
+    sf   = readerMuCentral.eval(1, eta, pt)
+    sf_d = readerMuDown.eval(1, eta, pt)
+    sf_u = readerMuUp.eval(1, eta, pt)
+  else: #SF for light flavours
+    sf   = readerCombCentral.eval(2, eta, pt)
+    sf_d = readerCombDown.eval(2, eta, pt)
+    sf_u = readerCombUp.eval(2, eta, pt)
+  return {"SF":sf, "SF_down":sf_d,"SF_up":sf_u}
 
 # get MC efficiencies and scale factors for a specific jet (with parton flavor, pt and eta)
 #try:
@@ -125,12 +148,13 @@ def getSF(parton, pt, eta, year = 2012):
 #except IOError:
 #  print 'Unable to load MC efficiency file!'
 #  mcEff = False
-def getMCEff(parton, pt, eta, mcEff, year = 2012):
+def getMCEff(parton, pt, eta, mcEff, year = 2015):
   for ptBin in ptBins:
     if pt>=ptBin[0] and (pt<ptBin[1] or ptBin[1]<0):
       for etaBin in etaBins:
         if abs(eta)>=etaBin[0] and abs(eta)<etaBin[1]:
-          res=getSF(parton, pt, eta, year)
+          if year == 2015: res=getSF2015(parton, pt, eta)
+          else: res=getSF(parton, pt, eta, year)
 #          print ptBin, etaBin      , mcEff[tuple(ptBin)][tuple(etaBin)]
           if abs(parton)==5:                  res["mcEff"] = mcEff[tuple(ptBin)][tuple(etaBin)]["b"]
           if abs(parton)==4:                  res["mcEff"] = mcEff[tuple(ptBin)][tuple(etaBin)]["c"]
@@ -161,7 +185,7 @@ def getMCEfficiencyForBTagSF(c, mcEff, onlyLightJetSystem = False, sms=""):
     jets[nc][0] = 4
   for jet in jets:
     jParton, jPt, jEta = jet
-    r = getMCEff(parton=jParton, pt=jPt, eta=jEta, mcEff=mcEff, year=2012)#getEfficiencyAndMistagRate(jPt, jEta, jParton )
+    r = getMCEff(parton=jParton, pt=jPt, eta=jEta, mcEff=mcEff, year=2015)#getEfficiencyAndMistagRate(jPt, jEta, jParton )
     jet.append(r)
 #    print [j[0] for j in jets]
   if len(jets) != nsoftjets: print '!!!!! Different number of jets in collection than there should be !!!!!'
@@ -248,7 +272,7 @@ def getBTagWeight(c, sms=""):
   PData_l_up = 1.
   PData_l_down = 1.
   for jParton, jPt, jEta, isBtagged in jets:
-    r = getMCEff(parton=jParton, pt=jPt, eta=jEta, year=2012)#getEfficiencyAndMistagRate(jPt, jEta, jParton )
+    r = getMCEff(parton=jParton, pt=jPt, eta=jEta, year=2015)#getEfficiencyAndMistagRate(jPt, jEta, jParton )
     if sms!="":
       fsim_SF = ROOT.getFastSimCorr(partonName(abs(jParton)),jPt,"mean",jEta)
       fsim_SF_up = ROOT.getFastSimCorr(partonName(abs(jParton)),jPt,"up",jEta)

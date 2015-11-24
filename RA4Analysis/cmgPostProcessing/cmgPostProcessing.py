@@ -18,7 +18,8 @@ from Workspace.HEPHYPythonTools.helpers import getChunks
 #from Workspace.RA4Analysis.cmgTuples_Spring15_50ns import *
 #from Workspace.RA4Analysis.cmgTuples_Data50ns_1l import *
 #from Workspace.RA4Analysis.cmgTuples_Data25ns import *
-from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_fromArthur import *
+#from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_fromArthur import *
+from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns import *
 from btagEfficiency import *
 
 bTagEffFile = '/data/dspitzbart/Results2015/MCEff_pkl'
@@ -37,7 +38,7 @@ separateBTagWeights = True
 defSampleStr = "TTJets_25ns"
 
 #subDir = "postProcessed_Spring15_test"
-subDir = "postProcessed_PUreweight"
+subDir = "postProcessed_2015SF"
 
 #branches to be kept for data and MC
 branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert",
@@ -74,6 +75,8 @@ parser.add_option("--small", dest="small", default = False, action="store_true",
 parser.add_option("--overwrite", dest="overwrite", default = False, action="store_true", help="Overwrite?")
 parser.add_option("--calcbtagweights", dest="systematics", default = False, action="store_true", help="Calculate b-tag weights for systematics?")
 parser.add_option("--btagWeight", dest="btagWeight", default = 2, action="store", help="Max nBJet to calculate the b-tag weight for")
+parser.add_option("--hadronicLeg", dest="hadronicLeg", default = False, action="store_true", help="Use only the hadronic leg of the sample?")
+parser.add_option("--manScaleFactor", dest="manScaleFactor", default = 1, action="store", help="define a scale factor for the whole sample")
 
 (options, args) = parser.parse_args()
 assert options.leptonSelection in ['soft', 'hard', 'none', 'dilep'], "Unknown leptonSelection: %s"%options.leptonSelection
@@ -99,6 +102,12 @@ if options.leptonSelection.lower()=='hard':
 if options.leptonSelection.lower()=='dilep':
   #skimCond += "&&Sum$(LepGood_pt>25&&LepGood_relIso03<0.4&&abs(LepGood_eta)<2.4)>=1"
   skimCond += "&&Sum$(LepGood_pt>15&&abs(LepGood_eta)<2.4)>1"
+
+if options.hadronicLeg:
+  skimCond += "&&(nGenLep+nGenTau)==0"
+
+if options.manScaleFactor!=1:
+  targetlumi = targetlumi*options.manScaleFactor
 
 if options.skim=='inc':
   skimCond = "(1)"
