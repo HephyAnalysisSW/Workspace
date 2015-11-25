@@ -23,8 +23,8 @@ def LpTemplateFit(LpTemplates, prefix="", printDir='/afs/hephy.at/user/'+usernam
 
 #Clone histograms from LpTemplates: EWK selected and QCD anti-selected
   template_EWK   = histoEWKsel.Clone()
-  template_QCD   = histoQCDantiSel.Clone()
-  template_QCD.Add(histoEWKantiSel)
+  template_QCD   = histoDATAantiSel.Clone()
+#  template_QCD.Add(histoEWKantiSel)
 
 #  template_WJets_PosPdg=getPlotFromChain(cWJets, nBTagVar, [0,1,2,3], 'leptonPdg>0&&'+cut, 'weight', binningIsExplicit=True,addOverFlowBin='upper')
 #  template_WJets_NegPdg=getPlotFromChain(cWJets, nBTagVar, [0,1,2,3], 'leptonPdg<0&&'+cut, 'weight', binningIsExplicit=True,addOverFlowBin='upper')
@@ -147,6 +147,7 @@ def LpTemplateFit(LpTemplates, prefix="", printDir='/afs/hephy.at/user/'+usernam
   nllComponents = ROOT.RooArgList("nllComponents")
   nll=model.createNLL(data,rf.NumCPU(1))
 #  nll_NegPdg=model_NegPdg.createNLL(data_NegPdg,rf.NumCPU(1))
+#  print yield_EWK.getVal(), yield_EWK.getErrorHi(), yield_EWK.getErrorLo(), yield_QCD.getVal(),yield_QCD.getErrorHi(), yield_QCD.getErrorLo()
   nllComponents.add(nll)
 #  nllComponents.add(nll_NegPdg)
 
