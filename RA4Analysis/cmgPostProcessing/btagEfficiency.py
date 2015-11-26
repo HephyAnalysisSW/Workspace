@@ -120,14 +120,15 @@ def getSF(parton, pt, eta, year = 2012):
   return {"SF":sf, "SF_down":sf_d,"SF_up":sf_u}
 
 # get SF
+calib = ROOT.BTagCalibration("csvv2", "btagEff/CSVv2.csv")
+readerCombUp      = ROOT.BTagCalibrationReader(calib, 1, "comb", "up")
+readerCombCentral = ROOT.BTagCalibrationReader(calib, 1, "comb", "central")
+readerCombDown    = ROOT.BTagCalibrationReader(calib, 1, "comb", "down")
+readerMuUp        = ROOT.BTagCalibrationReader(calib, 1, "mujets", "up")
+readerMuCentral   = ROOT.BTagCalibrationReader(calib, 1, "mujets", "central")
+readerMuDown      = ROOT.BTagCalibrationReader(calib, 1, "mujets", "down")
+
 def getSF2015(parton, pt, eta):
-  calib = ROOT.BTagCalibration("csvv2", "btagEff/CSVv2.csv")
-  readerCombUp      = ROOT.BTagCalibrationReader(calib, 1, "comb", "up")
-  readerCombCentral = ROOT.BTagCalibrationReader(calib, 1, "comb", "central")
-  readerCombDown    = ROOT.BTagCalibrationReader(calib, 1, "comb", "down")
-  readerMuUp        = ROOT.BTagCalibrationReader(calib, 1, "mujets", "up")
-  readerMuCentral   = ROOT.BTagCalibrationReader(calib, 1, "mujets", "central")
-  readerMuDown      = ROOT.BTagCalibrationReader(calib, 1, "mujets", "down")
   if abs(parton)==5: #SF for b
     sf   = readerMuCentral.eval(0, eta, pt)
     sf_d = readerMuDown.eval(0, eta, pt)

@@ -13,7 +13,7 @@ useTTcorrection = False
 signal = False
 
 prefix = 'singleLeptonic_Spring15_'
-path = '/data/'+username+'/Results2015/Prediction_data_newSR_lep_SFtemplates_1.26/'
+path = '/data/'+username+'/Results2015/Prediction_data_newSR_lep_SFtemplates_1.55/'
 #path = '/data/'+username+'/Results2015/Prediction_SFTemplate_MC_fullSR_lep_3.0/' 
 #path2 = '/data/'+username+'/Results2015/Prediction_bweightTemplate_MC_reducedSR_lep_3.0/'
 

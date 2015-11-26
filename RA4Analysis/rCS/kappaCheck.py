@@ -18,6 +18,12 @@ colorList = [ROOT.kBlue+1, ROOT.kCyan-9, ROOT.kOrange-4, ROOT.kGreen+1, ROOT.kRe
 
 ROOT.TH1F().SetDefaultSumw2()
 
+lumi = 1.26
+predictionName = 'data_newSR_lep_SFtemplates'
+pickleDir   = '/data/'+username+'/Results2015/Prediction_'+predictionName+'_'+str(lumi)+'/'
+
+res = pickle.load(file(pickleDir+'singleLeptonic_Spring15__estimationResults_pkl'))
+
 def divideRCSdict(a,b):
   if b['rCS']>0:
     kappa = a['rCS']/b['rCS']
@@ -127,7 +133,7 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
       print
       dPhiCut = signalRegions[njb][stb][htb]['deltaPhi']
       #ttJets corrections
-      cname2bCRtt, cut2bCRtt = nameAndCut(stb,htb,(4,5), btb=(2,2) ,presel=presel)
+      cname2bCRtt, cut2bCRtt = nameAndCut(stb,htb,(4,5), btb=(2,-1) ,presel=presel)
       cname1bCRtt, cut1bCRtt = nameAndCut(stb,htb,(4,5), btb=(1,1) ,presel=presel)
       cname0bCRtt, cut0bCRtt = nameAndCut(stb,htb,(4,5), btb=(0,0) ,presel=presel)
       cnameCRtt, cutCRtt = nameAndCut(stb,htb,(4,5), btb=(0,-1) ,presel=presel)
@@ -135,7 +141,7 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
       #rcs0bCRtt = getRCS(cTTJets, cut0bCRtt, dPhiCut)
       samples0b = [{'chain':cWJets, 'cut':cutCRtt, 'weight':'weight*weightBTag0'}, {'chain':cTTJets, 'cut':cutCRtt, 'weight':'weight*weightBTag0'},{'chain':cDY, 'cut':cut0bCRtt, 'weight':'weight'},{'chain':cTTV, 'cut':cut0bCRtt, 'weight':'weight'},{'chain':csingleTop, 'cut':cut0bCRtt, 'weight':'weight'}]
       samples1b = [{'chain':cWJets, 'cut':cutCRtt, 'weight':'weight*weightBTag1_SF'}, {'chain':cTTJets, 'cut':cutCRtt, 'weight':'weight*weightBTag1_SF'},{'chain':cDY, 'cut':cut1bCRtt, 'weight':'weight'},{'chain':cTTV, 'cut':cut1bCRtt, 'weight':'weight'},{'chain':csingleTop, 'cut':cut1bCRtt, 'weight':'weight'}]
-      samples2b = [{'chain':cWJets, 'cut':cutCRtt, 'weight':'weight*weightBTag2_SF'}, {'chain':cTTJets, 'cut':cutCRtt, 'weight':'weight*weightBTag2_SF'},{'chain':cDY, 'cut':cut2bCRtt, 'weight':'weight'},{'chain':cTTV, 'cut':cut2bCRtt, 'weight':'weight'},{'chain':csingleTop, 'cut':cut2bCRtt, 'weight':'weight'}]
+      samples2b = [{'chain':cWJets, 'cut':cutCRtt, 'weight':'weight*weightBTag2p_SF'}, {'chain':cTTJets, 'cut':cutCRtt, 'weight':'weight*weightBTag2p_SF'},{'chain':cDY, 'cut':cut2bCRtt, 'weight':'weight'},{'chain':cTTV, 'cut':cut2bCRtt, 'weight':'weight'},{'chain':csingleTop, 'cut':cut2bCRtt, 'weight':'weight'}]
       #rcs0bCRtt_btag_EWK = combineRCS(samples0b, dPhiCut)
       rcs1bCRtt_btag_EWK = combineRCS(samples1b, dPhiCut)
       rcs2bCRtt_btag_EWK = combineRCS(samples2b, dPhiCut)
@@ -143,8 +149,8 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
       QCD1b_lowDPhi  = {'y':QCDestimate[(4,5)][stb][htb][(1,1)][dPhiCut]['NQCDpred_lowdPhi'],  'e':QCDestimate[(4,5)][stb][htb][(1,1)][dPhiCut]['NQCDpred_lowdPhi_err']}
       QCD1b_highDPhi = {'y':QCDestimate[(4,5)][stb][htb][(1,1)][dPhiCut]['NQCDpred_highdPhi'], 'e':QCDestimate[(4,5)][stb][htb][(1,1)][dPhiCut]['NQCDpred_highdPhi_err']}
 
-      QCD2b_lowDPhi  = {'y':QCDestimate[(4,5)][stb][htb][(2,2)][dPhiCut]['NQCDpred_lowdPhi'],  'e':QCDestimate[(4,5)][stb][htb][(2,2)][dPhiCut]['NQCDpred_lowdPhi_err']}
-      QCD2b_highDPhi = {'y':QCDestimate[(4,5)][stb][htb][(2,2)][dPhiCut]['NQCDpred_highdPhi'], 'e':QCDestimate[(4,5)][stb][htb][(2,2)][dPhiCut]['NQCDpred_highdPhi_err']}
+      QCD2b_lowDPhi  = {'y':QCDestimate[(4,5)][stb][htb][(2,-1)][dPhiCut]['NQCDpred_lowdPhi'],  'e':QCDestimate[(4,5)][stb][htb][(2,-1)][dPhiCut]['NQCDpred_lowdPhi_err']}
+      QCD2b_highDPhi = {'y':QCDestimate[(4,5)][stb][htb][(2,-1)][dPhiCut]['NQCDpred_highdPhi'], 'e':QCDestimate[(4,5)][stb][htb][(2,-1)][dPhiCut]['NQCDpred_highdPhi_err']}
       
       QCD = [QCD1b_lowDPhi,QCD1b_highDPhi,QCD2b_lowDPhi,QCD2b_highDPhi]
       
