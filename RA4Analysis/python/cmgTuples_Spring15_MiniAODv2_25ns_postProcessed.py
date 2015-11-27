@@ -1,6 +1,8 @@
 import copy, os, sys
-dir  = '/data/easilar/cmgTuples/postProcessed_miniAODv2_fix/HT500LT250/hard/'
+#dir  = '/data/easilar/cmgTuples/postProcessed_miniAODv2_fix/HT500LT250/hard/'
+dir = '/data/easilar/cmgTuples/postProcessed_miniAODv2_combine2/HT500LT250/hard/'
 
+####usual HT combination####
 TTJets_HTLO_25ns={\
 "name" : "tt+Jets_LO",
 "bins" : [
@@ -10,40 +12,40 @@ TTJets_HTLO_25ns={\
 "TTJets_LO_HT1200to2500",
 "TTJets_LO_HT2500toInf",
 ],
-'dir' : dir,
+'dir' : '/data/easilar/cmgTuples/postProcessed_miniAODv2_fix/HT500LT250/hard/',
 }
-
-TTJets_diLep = {\
-"name" : "TTJets_diLep",
-"bins" : [
-"TTJets_DiLepton_full",
-],
-'dir' : dir,
-}
-
-TTJets_SemiLep = {\
-"name" : "TTJets_SemiLep",
-"bins" : [
-"TTJets_SingleLeptonFromT_full",
-"TTJets_SingleLeptonFromTbar_full",
-],
-'dir' : dir,
-}
-
+#####diLep+SemiLep+HT binned samples####
 TTJets_combined = {\
 "name" : "TTJets_combined",
 "bins" : [
-"TTJets_LO_HT1200to2500_Had_LHE",
-"TTJets_LO_HT2500toInf_Had_LHE",
-"TTJets_LO_HT600to800_Had_LHE",
-"TTJets_LO_HT800to1200_Had_LHE",
-"TTJets_LO_Had_LHE",
 "TTJets_DiLepton_full",
+"TTJets_LO",
+"TTJets_LO_HT1200to2500",
+"TTJets_LO_HT2500toInf",
+"TTJets_LO_HT600to800",
+"TTJets_LO_HT800to1200",
 "TTJets_SingleLeptonFromT_full",
 "TTJets_SingleLeptonFromTbar_full",
 ],
 'dir' : dir,
 }
+#####(diLep+SemiLep+HT binned samples) for LHE_HT<=1000 & (HT binned samples) for LHE_HT>1000 
+TTJets_combined_2 = {\
+"name" : "TTJets_combined",
+"bins" : [
+"TTJets_DiLepton_full",
+"TTJets_LO",
+"TTJets_LO_HT1200to2500",
+"TTJets_LO_HT2500toInf",
+"TTJets_LO_HT600to800",
+"TTJets_LO_HT800to1200",
+"TTJets_SingleLeptonFromT_full",
+"TTJets_SingleLeptonFromTbar_full",
+],
+'dir' : '/data/easilar/cmgTuples/postProcessed_miniAODv2_combine3//HT500LT250/hard/',
+}
+
+
 WJetsHTToLNu_25ns={\
 "name" : "W+Jets",
 "bins" : [

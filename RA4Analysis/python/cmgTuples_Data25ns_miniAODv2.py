@@ -1,7 +1,7 @@
 import copy, os, sys
 
-data_path = "/data/easilar/tuples_from_Artur/JECv6recalibrateMET_eleCBID_1550pb"
-
+#data_path = "/data/easilar/tuples_from_Artur/JECv6recalibrateMET_eleCBID_1550pb"
+data_path = "/data/easilar/tuples_from_Artur/JECv6recalibrateMET_2100pb/trig_skim/"
 
 SingleMuon_Run2015D_v4 = {"name":"SingleMuon_Run2015D_v4",}
 SingleMuon_Run2015D_05Oct= {"name":"SingleMuon_Run2015D_05Oct",}
