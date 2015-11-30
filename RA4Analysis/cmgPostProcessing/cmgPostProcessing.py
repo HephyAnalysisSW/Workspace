@@ -116,7 +116,7 @@ if sys.argv[0].count('ipython'):
   options.small=True
 
 ###For PU reweight###
-PU_File = ROOT.TFile("/data/easilar/tuples_from_Artur/METfromMINIAOD_eleID-Spring15MVAL_1260pb/PUhistos/ratio_PU.root")
+PU_File = ROOT.TFile("/data/easilar/tuples_from_Artur/JECv6recalibrateMET_2100pb/trig_skim/PUhistos/ratio_PU.root")
 PU_histo = PU_File.Get("h_ratio")
 #####################
 
@@ -250,7 +250,7 @@ for isample, sample in enumerate(allSamples):
         s.weight = lumiScaleFactor*genWeight
 
         nVert = t.GetLeaf('nVert').GetValue()
-        s.puReweight_true = 1 if sample['isData'] else PU_histo.GetBinContent(PU_histo.FindBin(nVert))
+        s.puReweight_true = 1 if sample['isData'] else PU_histo.GetBinContent(PU_histo.FindBin(nTrueInt))
         #calculatedWeight = True
         if not sample['isData']:
           s.muonDataSet = False
