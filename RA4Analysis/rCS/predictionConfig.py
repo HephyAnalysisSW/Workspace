@@ -20,14 +20,14 @@ testRun = False
 dPhiStr = 'deltaPhi_Wl'
 bjreg = (0,0)
 nBTagVar = 'nBJetMediumCSV30'
-useBTagWeights = False #True for weighted fake data, false for data
-btagWeightSuffix = ''
+useBTagWeights = True #True for weighted fake data, false for data
+btagWeightSuffix = '_SF'
 templateWeights = True
 templateWeightSuffix = '_SF'
 
 
 ## samples
-isData = True
+isData = False
 
 cWJets      = getChain(WJetsHTToLNu_25ns_btag,histname='')
 cTTJets     = getChain(TTJets_combined_btag,histname='')
@@ -55,13 +55,17 @@ debugReweighting = False
 
 ## QCD estimation
 QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151120_QCDestimation_pkl'
-QCDestimate = pickle.load(file(QCDpickle))
-#QCDestimate=False
+if isData: QCDestimate = pickle.load(file(QCDpickle))
+else: QCDestimate=False
 
 
 ## Directories for plots, results and templates
-predictionName = 'data_newSR_lep_SFtemplates'
-templateName   = 'SFtemplates_for_data_newSR_lep'
+if isData:
+  predictionName = 'newSR_lep_SFtemplates_data'
+  templateName   = 'SFtemplates_newSR_lep_data'
+else:
+  predictionName = 'newSR_lep_SFtemplates_MC'+btagWeightSuffix
+  templateName   = 'SFtemplates_newSR_lep_MC'
 printDir    = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/25ns/templateFit_'+predictionName+'_'+str(lumi)+'/'
 pickleDir   = '/data/'+username+'/Results2015/Prediction_'+predictionName+'_'+str(lumi)+'/'
 templateDir = '/data/'+username+'/Results2015/btagTemplates_'+templateName+'_'+str(templateLumi)+'/'
@@ -79,7 +83,7 @@ singleMu_presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSof
 
 ## corrections
 createFits = True
-fitDir = '/data/'+username+'/Results2015/correctionFit_btagKappa_data_fullSR/'
+fitDir = '/data/'+username+'/Results2015/correctionFit_btagKappa_MC_newSR/'
 
 
 ## do stuff for test runs

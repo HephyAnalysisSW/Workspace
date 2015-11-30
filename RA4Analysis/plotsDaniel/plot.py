@@ -44,17 +44,18 @@ WJETSbtagweight = {'name':'WJets', 'chain':getChain(WJetsHTToLNu_25ns_btag,histn
 WJETS = {'name':'WJets', 'chain':getChain(WJetsHTToLNu_25ns,histname=''), 'color':color('WJets'),'weight':'weight', 'niceName':'W Jets CB ID'}
 #TTJETS = {'name':'TTJets', 'chain':getChain(TTJets_25ns,histname=''), 'color':color('TTJets'),'weight':'weight', 'niceName':'t#bar{t} Jets NLO'}
 #TTJetsLO = {'name':'TTJets', 'chain':getChain(TTJets_LO_25ns,histname=''), 'color':color('singleTop'),'weight':'weight', 'niceName':'t#bar{t} Jets MVA ID'}
-TTJetsbtagweight = {'name':'TTJets', 'chain':getChain(TTJets_combined_btag,histname=''), 'color':color('QCD'),'weight':'weight', 'niceName':'t#bar{t} Jets btag'}
+TTJetsbtagweight = {'name':'TTJets', 'chain':getChain(TTJets_combined_btag,histname=''), 'color':color('TTJets')-2,'weight':'weight', 'niceName':'t#bar{t} Jets btag'}
 TTJets = {'name':'TTJets', 'chain':getChain(TTJets_HTLO_25ns,histname=''), 'color':ROOT.kOrange,'weight':'weight', 'niceName':'t#bar{t} Jets HT bin'}
-TTJets_combined = {'name':'TTJets', 'chain':getChain(TTJets_combined,histname=''), 'color':color('TTJets')-4,'weight':'weight', 'niceName':'t#bar{t} Jets comb'}
+TTJets_combined = {'name':'TTJets', 'chain':getChain(TTJets_combined,histname=''), 'color':color('TTJets')-2,'weight':'weight', 'niceName':'t#bar{t} Jets comb'}
 DY = {'name':'DY', 'chain':getChain(DY_25ns,histname=''), 'color':color('DY'),'weight':'weight', 'niceName':'Drell Yan'}
 singleTop = {'name':'singleTop', 'chain':getChain(singleTop_25ns,histname=''), 'color':color('singleTop'),'weight':'weight', 'niceName':'single Top'}
 #QCD = {'name':'QCD', 'chain':getChain(QCDMu_25ns,histname=''), 'color':color('QCD'),'weight':'weight', 'niceName':'QCD'}
 QCD = {'name':'QCD', 'chain':getChain(QCDHT_25ns,histname=''), 'color':color('QCD'),'weight':'weight', 'niceName':'QCD'}
 TTVH = {'name':'TTVH', 'chain':getChain(TTV_25ns,histname=''), 'color':color('TTV'),'weight':'weight', 'niceName':'TTVH'}
+Rest = {'name':'TTVH', 'chain':getChain([TTV_25ns,singleTop_25ns,DY_25ns],histname=''), 'color':color('TTV'),'weight':'weight', 'niceName':'Rest EWK'}
 #QCD = {'name':'QCD', 'chain':getChain(QCDEle_25ns,histname=''), 'color':color('QCD'),'weight':'weight', 'niceName':'QCD'}
 #diBoson = {'name':'diBoson', 'chain':getChain(diBosons_25ns,histname=''), 'color':ROOT.kMagenta,'weight':'weight', 'niceName':'diboson'}
-samples = [WJETS, TTJets, singleTop, DY, QCD, TTVH]#, diBoson]
+samples = [WJETS, TTJets_combined, Rest, QCD]#, diBoson]
 #samplesComp = [WJETS, TTJETS, singleTop, DY, QCD]
 
 #EWK = {'name':'EWK', 'chain':getChain([WJetsHT_25ns,TTJets_HTLO_25ns,singleTop_25ns,DY_25ns,TTV_25ns],histname=''), 'color':color('DY'),'weight':'weight', 'niceName':'EWK'}
@@ -152,6 +153,12 @@ newPreselCutDiLep = {'name':'presel','string':newpresel+'&&(ngenLep+ngenTau)==2'
 newPreselCutSingleMuAN = {'name':'presel','string':newpresel+'&&singleMuonic','niceName':'Preselection'}
 newPreselCutSingleEleAN = {'name':'presel','string':newpresel+'&&singleElectronic','niceName':'Preselection'}
 
+name, cut = nameAndCut((250,350),(500,-1),(4,5),btb=(1,1),presel=newpresel)
+cut1 = {'name':name,'string':cut,'niceName':'L_{T} [250,350), H_{T} [500,-1)'}
+
+name, cut = nameAndCut((250,350),(500,-1),(3,4),btb=(0,0),presel=newpresel)
+cut2 = {'name':name,'string':cut,'niceName':'L_{T} [250,350), H_{T} [500,-1)'}
+
 Flag_EcalDeadCellTriggerPrimitiveFilter = {'name':'ecalFilterCut','string':newpresel+'&&Flag_EcalDeadCellTriggerPrimitiveFilter','niceName':'EcalDeadCellFilter'}
 Flag_HBHENoiseFilter  = {'name':'ecalFilterCut','string':newpresel+'&&Flag_HBHENoiseFilter','niceName':'HBHENoiseFilter'}
 Flag_CSCTightHaloFilter = {'name':'ecalFilterCut','string':newpresel+'&&Flag_CSCTightHaloFilter','niceName':'CSCTightHaloFilter'}
@@ -171,18 +178,18 @@ antiFakeMetSelection = '('+fakeMet+'<50&&'+fakeMet+'<met_genPt)'
 AFMCut = {'name':'AFMCut','string':newpresel+"&&acos(cos(Jet_phi[0]-met_phi))>0.45&&acos(cos(Jet_phi[1]-met_phi))>0.45", 'niceName':'E_{T}^{miss} veto'}
 
 
-name, cut = nameAndCut((250,350),(1000,-1),(5,5),btb=(0,0),presel=newpresel)
-cut1 = {'name':name,'string':cut,'niceName':'L_{T} [250,350), H_{T} [1000,-1)'}
-name, cut = nameAndCut((350,450),(750,1000),(5,5),btb=(0,0),presel=presel)
-cut2 = {'name':name,'string':cut,'niceName':'L_{T} [350,450), H_{T} [750,1000)'}
-name, cut = nameAndCut((450,-1),(750,1000),(5,5),btb=(0,0),presel=presel)
-cut3 = {'name':name,'string':cut,'niceName':'L_{T} [450,-1), H_{T} [750,1000)'}
-name, cut = nameAndCut((450,-1),(1000,-1),(5,5),btb=(0,0),presel=presel)
-cut4 = {'name':name,'string':cut,'niceName':'L_{T} [450,-1), H_{T} [1000,-1)'}
-name, cut = nameAndCut((450,-1),(500,750),(5,5),btb=(0,0),presel=presel)
-cut5 = {'name':name,'string':cut,'niceName':'L_{T} [450,-1), H_{T} [500,750)'}
-
-cuts = [cut1, cut2, cut3, cut4, cut5]
+#name, cut = nameAndCut((250,350),(1000,-1),(5,5),btb=(0,0),presel=newpresel)
+#cut1 = {'name':name,'string':cut,'niceName':'L_{T} [250,350), H_{T} [1000,-1)'}
+#name, cut = nameAndCut((350,450),(750,1000),(5,5),btb=(0,0),presel=presel)
+#cut2 = {'name':name,'string':cut,'niceName':'L_{T} [350,450), H_{T} [750,1000)'}
+#name, cut = nameAndCut((450,-1),(750,1000),(5,5),btb=(0,0),presel=presel)
+#cut3 = {'name':name,'string':cut,'niceName':'L_{T} [450,-1), H_{T} [750,1000)'}
+#name, cut = nameAndCut((450,-1),(1000,-1),(5,5),btb=(0,0),presel=presel)
+#cut4 = {'name':name,'string':cut,'niceName':'L_{T} [450,-1), H_{T} [1000,-1)'}
+#name, cut = nameAndCut((450,-1),(500,750),(5,5),btb=(0,0),presel=presel)
+#cut5 = {'name':name,'string':cut,'niceName':'L_{T} [450,-1), H_{T} [500,750)'}
+#
+#cuts = [cut1, cut2, cut3, cut4, cut5]
 
 randomCut = 'weight*(singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&st>250&&st<350&&nJet30>=3&&htJet30j>500&&htJet30j<750&&nBJetMediumCSV30==0)'
 

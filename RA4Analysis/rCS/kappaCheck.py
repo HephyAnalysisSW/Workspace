@@ -4,26 +4,31 @@ import os,sys,math
 from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYieldFromChain
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,varBinName
 
-ROOT.gROOT.LoadMacro('../../HEPHYPythonTools/scripts/root/tdrstyle.C')
-ROOT.setTDRStyle()
-
 from Workspace.HEPHYPythonTools.user import username
 from rCShelpers import *
 from math import pi, sqrt, isnan
 from Workspace.RA4Analysis.signalRegions import *
 
+from binnedNBTagsFit import *
+
 from predictionConfig import *
+
+ROOT.gROOT.LoadMacro('../../HEPHYPythonTools/scripts/root/tdrstyle.C')
+ROOT.setTDRStyle()
+
 
 colorList = [ROOT.kBlue+1, ROOT.kCyan-9, ROOT.kOrange-4, ROOT.kGreen+1, ROOT.kRed+1]
 
 ROOT.TH1F().SetDefaultSumw2()
 
-lumi = 1.26
+lumi = 1.55
 predictionName = 'data_newSR_lep_SFtemplates'
+predictionName2 = 'MCwSF_newSR_lep_SFtemplates'
 pickleDir   = '/data/'+username+'/Results2015/Prediction_'+predictionName+'_'+str(lumi)+'/'
+pickleDir2   = '/data/'+username+'/Results2015/Prediction_'+predictionName2+'_'+str(lumi)+'/'
 
 res = pickle.load(file(pickleDir+'singleLeptonic_Spring15__estimationResults_pkl'))
-
+resMC = pickle.load(file(pickleDir2+'singleLeptonic_Spring15__estimationResults_pkl'))
 def divideRCSdict(a,b):
   if b['rCS']>0:
     kappa = a['rCS']/b['rCS']
@@ -39,6 +44,9 @@ def divideRCSdict(a,b):
     kappaErrorSim  = float('nan')
   return {'kappa':kappa, 'kappaE_pred':kappaErrorPred, 'kappaE_sim':kappaErrorSim}
 
+def getValErrString(val,err, precision=3):
+  return str(round(val,precision))+' +/- '+str(round(err,precision))
+
 rowsNJet = {}
 rowsSt = {}
 bins = 0
@@ -53,21 +61,39 @@ for srNJet in sorted(signalRegions):
   bins += rows
 
 rcs1bMC   = ROOT.TH1F('rcs1bMC','Rcs 1b MC',bins,0,bins)
+rcs1bMCrescale   = ROOT.TH1F('rcs1bMCrescale','Rcs 1b MC',bins,0,bins)
+rcs1bMCrescaleD   = ROOT.TH1F('rcs1bMCrescaleD','Rcs 1b MC',bins,0,bins)
+
+
 rcs1bdata = ROOT.TH1F('rcs1bdata','Rcs 1b data',bins,0,bins)
 rcs2bMC   = ROOT.TH1F('rcs2bMC','Rcs 2b MC',bins,0,bins)
 rcs2bdata = ROOT.TH1F('rcs2bdata','Rcs 2b data',bins,0,bins)
 
+
+fit1bMC   = ROOT.TH1F('fit1bMC',  'Fit 1b MC',bins,0,bins)
+fit1bdata = ROOT.TH1F('fit1bdata','Fit 1b data',bins,0,bins)
+fit2bMC   = ROOT.TH1F('fit2bMC',  'Fit 2b MC',bins,0,bins)
+fit2bdata = ROOT.TH1F('fit2bdata','Fit 2b data',bins,0,bins)
+
+
 rcs1bMC.SetLineColor(colorList[0])
+rcs1bMCrescale.SetLineColor(colorList[4])
+rcs1bMCrescaleD.SetLineColor(colorList[2])
+
 rcs1bdata.SetLineColor(colorList[1])
 rcs2bMC.SetLineColor(colorList[2])
 rcs2bdata.SetLineColor(colorList[3])
 
 rcs1bMC.SetMarkerStyle(0)
+rcs1bMCrescale.SetMarkerStyle(0)
+rcs1bMCrescaleD.SetMarkerStyle(0)
 rcs1bdata.SetMarkerStyle(0)
 rcs2bMC.SetMarkerStyle(0)
 rcs2bdata.SetMarkerStyle(0)
 
 rcs1bMC.SetLineWidth(2)
+rcs1bMCrescale.SetLineWidth(2)
+rcs1bMCrescaleD.SetLineWidth(2)
 rcs1bdata.SetLineWidth(2)
 rcs2bMC.SetLineWidth(2)
 rcs2bdata.SetLineWidth(2)
@@ -111,7 +137,7 @@ kappa12data.SetLineWidth(2)
 i = 1
 can = ROOT.TCanvas('c','c',700,700)
 
-leg = ROOT.TLegend(0.6,0.7,0.98,0.95)
+leg = ROOT.TLegend(0.65,0.75,0.98,0.95)
 leg.SetFillColor(ROOT.kWhite)
 leg.SetShadowColor(ROOT.kWhite)
 leg.SetBorderSize(1)
@@ -119,9 +145,14 @@ leg.SetTextSize(0.035)
 
 #presel = singleMu_presel
 
+frac = {}
+
 for i_njb, njb in enumerate(sorted(signalRegions)):
+  frac[njb] = {}
   for stb in sorted(signalRegions[njb]):
+    frac[njb][stb] = {}
     for htb in sorted(signalRegions[njb][stb]):
+      frac[njb][stb][htb] = {}
       print
       print '#############################################'
       print 'bin: \t njet \t\t LT \t\t HT'
@@ -146,6 +177,8 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
       rcs1bCRtt_btag_EWK = combineRCS(samples1b, dPhiCut)
       rcs2bCRtt_btag_EWK = combineRCS(samples2b, dPhiCut)
       
+      QCD0b_lowDPhi  = {'y':QCDestimate[(4,5)][stb][htb][(0,0)][dPhiCut]['NQCDpred_lowdPhi'],  'e':QCDestimate[(4,5)][stb][htb][(0,0)][dPhiCut]['NQCDpred_lowdPhi_err']}
+      
       QCD1b_lowDPhi  = {'y':QCDestimate[(4,5)][stb][htb][(1,1)][dPhiCut]['NQCDpred_lowdPhi'],  'e':QCDestimate[(4,5)][stb][htb][(1,1)][dPhiCut]['NQCDpred_lowdPhi_err']}
       QCD1b_highDPhi = {'y':QCDestimate[(4,5)][stb][htb][(1,1)][dPhiCut]['NQCDpred_highdPhi'], 'e':QCDestimate[(4,5)][stb][htb][(1,1)][dPhiCut]['NQCDpred_highdPhi_err']}
 
@@ -165,14 +198,108 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
       print rcs2bCR_data
 
       #rcs0bCRtt_btag = getRCS(cTTJets, cutCRtt, dPhiCut, weight = 'weight*weightBTag0')
-      #rcs1bCRtt_btag = getRCS(cTTJets, cutCRtt, dPhiCut, weight = 'weight*weightBTag1')
-      #rcs2bCRtt_btag = getRCS(cTTJets, cutCRtt, dPhiCut, weight = 'weight*weightBTag2')
+      rcs1bCRtt_btag = getRCS(cTTJets, cutCRtt, dPhiCut, weight = 'weight*weightBTag1')
+      rcs1bCRtt_btag_dilep = getRCS(cTTJets, cutCRtt+'&&(ngenLep+ngenTau)==2', dPhiCut, weight = 'weight*weightBTag1')
+      rcs1bCRtt_btag_semilep = getRCS(cTTJets, cutCRtt+'&&(ngenLep+ngenTau)==1', dPhiCut, weight = 'weight*weightBTag1')
+      rcs1bCRtt_btag_had = getRCS(cTTJets, cutCRtt+'&&(ngenLep+ngenTau)==0', dPhiCut, weight = 'weight*weightBTag1')
+
+      
+      rcs1bCRtt_btag_Pos = rcs1bCRtt_btag_Neg = rcs1bCRtt_btag
+      rcs1bCRW_btag = getRCS(cWJets, cutCRtt, dPhiCut, weight = 'weight*weightBTag1')
+      rcs1bCRW_btag_Pos = getRCS(cWJets, cutCRtt+'&&leptonPdg>0', dPhiCut, weight = 'weight*weightBTag1')
+      rcs1bCRW_btag_Neg = getRCS(cWJets, cutCRtt+'&&leptonPdg<0', dPhiCut, weight = 'weight*weightBTag1')
+      rcs1bCRRest = getRCS(cRest, cut1bCRtt, dPhiCut)
+      rcs1bCRRest_Pos = getRCS(cRest, cut1bCRtt+'&&leptonPdg>0', dPhiCut)
+      rcs1bCRRest_Neg = getRCS(cRest, cut1bCRtt+'&&leptonPdg<0', dPhiCut)
+      
+      yield_1b_Pos = getYieldFromChain(cBkg, cut1bCRtt+'&&leptonPdg>0&&deltaPhi_Wl<'+str(dPhiCut))
+      yield_1b_Neg = getYieldFromChain(cBkg, cut1bCRtt+'&&leptonPdg<0&&deltaPhi_Wl<'+str(dPhiCut))
+      
+      print 'Fraction pos pdg 1b MC truth:',yield_1b_Pos/(yield_1b_Pos+yield_1b_Neg)
+      
+      rcs2bCRtt_btag = getRCS(cTTJets, cutCRtt, dPhiCut, weight = 'weight*weightBTag2')
       ##Kappa now calculated only in the SB bin (4,5) jets 1b allEWK MC vs 0b tt MC - no fit applied for the moment!
       #kappaTT01 = divideRCSdict(rcs0bCRtt_btag,rcs1bCRtt_btag)
-      #kappaTT12 = divideRCSdict(rcs1bCRtt_btag,rcs2bCRtt_btag)
+      kappaTT12 = divideRCSdict(rcs1bCRtt_btag,rcs2bCRtt_btag)
+      
+      #create a b-tag fit in the ttbar SB (4-5jets) - not done in prediction
+      fit = binnedNBTagsFit(cutCRtt+"&&"+dPhiStr+"<"+str(dPhiCut), cnameCRtt+'_dPhi'+str(dPhiCut), samples={'W':cWJets, 'TT':cTTJets, 'Rest':cRest, 'Bkg':cBkg, 'Data': cData}, prefix = cnameCRtt, QCD_dict={0:QCD0b_lowDPhi, 1:QCD1b_lowDPhi,2:QCD2b_lowDPhi})
+      
+      #get true yields in 1b from data
+      y1b_data = getYieldFromChain(cData,cut1bCRtt+'&&deltaPhi_Wl<'+str(dPhiCut),weight='(1)')
+      y1b_data_Pos = getYieldFromChain(cData,cut1bCRtt+'&&deltaPhi_Wl<'+str(dPhiCut)+'&&leptonPdg>0',weight='(1)')
+      y1b_data_Neg = getYieldFromChain(cData,cut1bCRtt+'&&deltaPhi_Wl<'+str(dPhiCut)+'&&leptonPdg<0',weight='(1)')
+      
+      #get yields in 1b from fit in low dphi (otherwise looking into 0b search bin), QCD is already taken care of in fit
+      y1b_Pos =fit['TT_AllPdg']['template'].GetBinContent(2)*fit['TT_AllPdg']['yield']*0.5+fit['W_PosPdg']['template'].GetBinContent(2)*fit['W_PosPdg']['yield']+fit['Rest_PosPdg']['template'].GetBinContent(2)*fit['Rest_PosPdg']['yield']
+      y1b_Neg =fit['TT_AllPdg']['template'].GetBinContent(2)*fit['TT_AllPdg']['yield']*0.5+fit['W_NegPdg']['template'].GetBinContent(2)*fit['W_NegPdg']['yield']+fit['Rest_NegPdg']['template'].GetBinContent(2)*fit['Rest_NegPdg']['yield']
+      y1b = y1b_Neg+y1b_Pos
+      
+      #obtain the fit fractions in data
+      fitFracTT1b = getPropagatedError([fit['TT_AllPdg']['template'].GetBinContent(2),fit['TT_AllPdg']['yield']], [fit['TT_AllPdg']['template'].GetBinError(2),sqrt(fit['TT_AllPdg']['yieldVar'])],y1b, sqrt(y1b), returnCalcResult=True)
+      fitFracTT1b_Pos = getPropagatedError([fit['TT_AllPdg']['template'].GetBinContent(2),fit['TT_AllPdg']['yield']*0.5], [fit['TT_AllPdg']['template'].GetBinError(2),sqrt(fit['TT_AllPdg']['yieldVar'])],y1b_Pos, sqrt(y1b_Pos), returnCalcResult=True)
+      fitFracTT1b_Neg = getPropagatedError([fit['TT_AllPdg']['template'].GetBinContent(2),fit['TT_AllPdg']['yield']*0.5], [fit['TT_AllPdg']['template'].GetBinError(2),sqrt(fit['TT_AllPdg']['yieldVar'])],y1b_Neg, sqrt(y1b_Neg), returnCalcResult=True)
+      fitFracW1b_Pos = getPropagatedError([fit['W_PosPdg']['template'].GetBinContent(2),fit['W_PosPdg']['yield']], [fit['W_PosPdg']['template'].GetBinError(2),sqrt(fit['W_PosPdg']['yieldVar'])],y1b_Pos, sqrt(y1b_Pos), returnCalcResult=True)
+      fitFracW1b_Neg = getPropagatedError([fit['W_NegPdg']['template'].GetBinContent(2),fit['W_NegPdg']['yield']], [fit['W_NegPdg']['template'].GetBinError(2),sqrt(fit['W_NegPdg']['yieldVar'])],y1b_Neg, sqrt(y1b_Neg), returnCalcResult=True)
+      fitFracRest1b_Pos = getPropagatedError([fit['Rest_PosPdg']['template'].GetBinContent(2),fit['Rest_PosPdg']['yield']], [fit['Rest_PosPdg']['template'].GetBinError(2),sqrt(fit['Rest_PosPdg']['yieldVar'])],y1b_Pos, sqrt(y1b_Pos), returnCalcResult=True)
+      fitFracRest1b_Neg = getPropagatedError([fit['Rest_NegPdg']['template'].GetBinContent(2),fit['Rest_NegPdg']['yield']], [fit['Rest_NegPdg']['template'].GetBinError(2),sqrt(fit['Rest_NegPdg']['yieldVar'])],y1b_Neg, sqrt(y1b_Neg), returnCalcResult=True)
+      print 'Pos fractions tt, W, Rest, QCD',fitFracTT1b_Pos,fitFracW1b_Pos,fitFracRest1b_Pos, QCD1b_lowDPhi['y']*0.5/y1b_Pos
 
-      #kappaTT01 = divideRCSdict(rcs0bCRtt_btag,rcs1bCRtt_btag)
-      #kappaTT12 = divideRCSdict(rcs1bCRtt_btag,rcs2bCRtt_btag)
+      ##rescaling redundant now
+      #fitFracTT1b_Pos_rescale = fitFracTT1b_Pos[0]/(fitFracTT1b_Pos[0]+fitFracW1b_Pos[0]+fitFracRest1b_Pos[0])
+      #fitFracW1b_Pos_rescale = fitFracW1b_Pos[0]/(fitFracTT1b_Pos[0]+fitFracW1b_Pos[0]+fitFracRest1b_Pos[0])
+      #fitFracRest1b_Pos_rescale = fitFracRest1b_Pos[0]/(fitFracTT1b_Pos[0]+fitFracW1b_Pos[0]+fitFracRest1b_Pos[0])
+      #fitFracTT1b_Neg_rescale = fitFracTT1b_Neg[0]/(fitFracTT1b_Neg[0]+fitFracW1b_Neg[0]+fitFracRest1b_Neg[0])
+      #fitFracW1b_Neg_rescale = fitFracW1b_Neg[0]/(fitFracTT1b_Neg[0]+fitFracW1b_Neg[0]+fitFracRest1b_Neg[0])
+      #fitFracRest1b_Neg_rescale = fitFracRest1b_Neg[0]/(fitFracTT1b_Neg[0]+fitFracW1b_Neg[0]+fitFracRest1b_Neg[0])
+
+      print 'Neg fractions tt, W, Rest, QCD',fitFracTT1b_Neg,fitFracW1b_Neg,fitFracRest1b_Neg, QCD1b_lowDPhi['y']*0.5/y1b_Neg
+      print 'Frac pos, neg', y1b_Pos/y1b,y1b_Neg/y1b
+      y2b_Pos =fit['TT_AllPdg']['template'].GetBinContent(3)*fit['TT_AllPdg']['yield']*0.5+fit['W_PosPdg']['template'].GetBinContent(3)*fit['W_PosPdg']['yield']+fit['Rest_PosPdg']['template'].GetBinContent(3)*fit['Rest_PosPdg']['yield']
+      y2b_Neg =fit['TT_AllPdg']['template'].GetBinContent(3)*fit['TT_AllPdg']['yield']*0.5+fit['W_NegPdg']['template'].GetBinContent(3)*fit['W_NegPdg']['yield']+fit['Rest_NegPdg']['template'].GetBinContent(3)*fit['Rest_NegPdg']['yield']
+      y2b = y1b_Neg+y1b_Pos
+      fitFracTT2b = getPropagatedError([fit['TT_AllPdg']['template'].GetBinContent(3),fit['TT_AllPdg']['yield']], [fit['TT_AllPdg']['template'].GetBinError(3),sqrt(fit['TT_AllPdg']['yieldVar'])],y2b, sqrt(y2b), returnCalcResult=True)
+      
+      #get MC truth fractions
+      TT1bMC = getYieldFromChain(cTTJets,cut1bCRtt+'&&deltaPhi_Wl<'+str(dPhiCut),returnError=True)
+      TT1bMC_dilep = getYieldFromChain(cTTJets,cut1bCRtt+'&&deltaPhi_Wl<'+str(dPhiCut)+'&&(ngenLep+ngenTau)==2',returnError=True)
+      TT1bMC_semilep = getYieldFromChain(cTTJets,cut1bCRtt+'&&deltaPhi_Wl<'+str(dPhiCut)+'&&(ngenLep+ngenTau)==1',returnError=True)
+      TT1bMC_had = getYieldFromChain(cTTJets,cut1bCRtt+'&&deltaPhi_Wl<'+str(dPhiCut)+'&&(ngenLep+ngenTau)==0',returnError=True)
+
+      W1bMC = getYieldFromChain(cWJets,cut1bCRtt+'&&deltaPhi_Wl<'+str(dPhiCut),returnError=True)
+      Rest1bMC = getYieldFromChain(cRest,cut1bCRtt+'&&deltaPhi_Wl<'+str(dPhiCut),returnError=True)
+
+
+      Total1bMC = getYieldFromChain(cBkg,cut1bCRtt+'&&deltaPhi_Wl<'+str(dPhiCut),returnError=True)
+      TT2bMC = getYieldFromChain(cTTJets,cut2bCRtt+'&&deltaPhi_Wl<'+str(dPhiCut),returnError=True)
+      Total2bMC = getYieldFromChain(cBkg,cut2bCRtt+'&&deltaPhi_Wl<'+str(dPhiCut),returnError=True)
+      truthFracTT1bMC =  getPropagatedError(TT1bMC[0],TT1bMC[1],Total1bMC[0],Total1bMC[1],returnCalcResult=True)
+      truthFracTT2bMC =  getPropagatedError(TT2bMC[0],TT2bMC[1],Total2bMC[0],Total2bMC[1],returnCalcResult=True)
+      print
+      print '***********************************************************'
+      print 'ttbar fractions in data and MC'
+      print 'ttbar fractions 1b/2b:', getValErrString(fitFracTT1b[0],fitFracTT1b[1]), ',', getValErrString(fitFracTT2b[0],fitFracTT2b[1])
+      #print 'fit MC fractions 1b/2b:', fitFracTT1bMC,fitFracTT2bMC
+      print 'truth MC fractions 1b/2b:', getValErrString(truthFracTT1bMC[0], truthFracTT1bMC[1]),',',getValErrString(truthFracTT2bMC[0],truthFracTT2bMC[1])
+      print '***********************************************************'
+      print
+      frac[njb][stb][htb]['data'] = fitFracTT1b, fitFracTT2b
+      frac[njb][stb][htb]['MCtruth'] = truthFracTT1bMC,truthFracTT2bMC 
+
+      rcs1bCR_MC_rescale = (y1b_Pos/y1b)*(fitFracTT1b_Pos[0]*rcs1bCRtt_btag_Pos['rCS']+fitFracW1b_Pos[0]*rcs1bCRW_btag_Pos['rCS']+fitFracRest1b_Pos[0]*rcs1bCRRest_Pos['rCS']) + (y1b_Neg/y1b)*(fitFracTT1b_Neg[0]*rcs1bCRtt_btag_Neg['rCS']+fitFracW1b_Neg[0]*rcs1bCRW_btag_Neg['rCS']+fitFracRest1b_Neg[0]*rcs1bCRRest_Neg['rCS'])
+      
+      dilep_downscale = 0.25
+      
+      rcs1bCR_MC_dilepRescale_tt = (rcs1bCRtt_btag_dilep['rCS']*TT1bMC_dilep[0]*(1-dilep_downscale)+rcs1bCRtt_btag_semilep['rCS']*(TT1bMC_semilep[0]+TT1bMC_dilep[0]*dilep_downscale)+rcs1bCRtt_btag_had['rCS']*TT1bMC_had[0])/TT1bMC[0]
+      rcs1bCR_MC_dilepRescale = (rcs1bCR_MC_dilepRescale_tt*TT1bMC[0]+rcs1bCRW_btag['rCS']*W1bMC[0]+rcs1bCRRest['rCS']*Rest1bMC[0])/Total1bMC[0]
+
+      print 'Rcs MC 1b before/after rescaling',round(rcs1bCRtt_btag_EWK['rCS'],3),',',round(rcs1bCR_MC_rescale ,3),',',round(rcs1bCR_MC_dilepRescale ,3)
+      print
+      frac[njb][stb][htb]['rcs1bEWK_MC'] = rcs1bCRtt_btag_EWK['rCS']
+      frac[njb][stb][htb]['rcs1bEWK_MC_rescale'] = rcs1bCR_MC_rescale
+      #rcs1bCRtt_btag['rCS']=rcs1bCRtt_btag['rCS']*fitFracTT1b
+      #rcs2bCRtt_btag['rCS']=rcs2bCRtt_btag['rCS']*fitFracTT2b
+      #kappaTT12_data = divideRCSdict(rcs1bCRtt_btag,rcs2bCRtt_btag)
 
       #kappaEWK01 = divideRCSdict(rcs0bCRtt_btag_EWK,rcs1bCRtt_btag_EWK)
       #kappaEWK12 = divideRCSdict(rcs1bCRtt_btag_EWK,rcs2bCRtt_btag_EWK)
@@ -185,7 +312,7 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
 
       #kappa01TT.SetBinContent(i,kappaTT01['kappa'])
       #kappa01TT.SetBinError(i,kappaTT01['kappaE_sim'])
-      #kappa12TT.SetBinContent(i,kappaTT12['kappa'])
+      kappa12TT.SetBinContent(i,kappaTT12['kappa'])
       #kappa12TT.SetBinError(i,kappaTT12['kappaE_sim'])
 
       #kappa0tt1EWK.SetBinContent(i,kappa0tt1ewk['kappa'])
@@ -196,14 +323,29 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
       #kappa12EWK.SetBinContent(i,kappaEWK12['kappa'])
       #kappa12EWK.SetBinError(i,kappaEWK12['kappaE_sim'])
 
+      fit1bMC.SetBinContent  (i,truthFracTT1bMC[0])
+      fit1bMC.SetBinError    (i,truthFracTT1bMC[1])
+      fit1bdata.SetBinContent(i,fitFracTT1b[0])
+      fit1bdata.SetBinError  (i,fitFracTT1b[1])
+      fit2bMC.SetBinContent  (i,truthFracTT2bMC[0])
+      fit2bMC.SetBinError    (i,truthFracTT2bMC[1])
+      fit2bdata.SetBinContent(i,fitFracTT2b[0])
+      fit2bdata.SetBinError  (i,fitFracTT2b[1])
+
       rcs1bMC.SetBinContent(i,rcs1bCRtt_btag_EWK['rCS'])
       rcs1bMC.SetBinError(i,rcs1bCRtt_btag_EWK['rCSE_sim'])
+      rcs1bMCrescale.SetBinContent(i,rcs1bCR_MC_rescale)
+      rcs1bMCrescale.SetBinError(i,rcs1bCRtt_btag_EWK['rCSE_sim'])
+      rcs1bMCrescaleD.SetBinContent(i,rcs1bCR_MC_dilepRescale)
+      rcs1bMCrescaleD.SetBinError(i,rcs1bCRtt_btag_EWK['rCSE_sim'])
+
       rcs1bdata.SetBinContent(i,rcs1bCR_data['rCS'])
       rcs1bdata.SetBinError(i,rcs1bCR_data['rCSE_pred'])
       rcs2bMC.SetBinContent(i,rcs2bCRtt_btag_EWK['rCS'])
       rcs2bMC.SetBinError(i,rcs2bCRtt_btag_EWK['rCSE_sim'])
       rcs2bdata.SetBinContent(i,rcs2bCR_data['rCS'])
       rcs2bdata.SetBinError(i,rcs2bCR_data['rCSE_pred'])
+      
       #print 'Total Electroweak'
       #print '0b/1b:', round(kappaEWK01['kappa'],2),'+/-',round(kappaEWK01['kappaE_sim'],2)
       #print '1b/2b:', round(kappaEWK12['kappa'],2),'+/-',round(kappaEWK12['kappaE_sim'],2)
@@ -214,9 +356,11 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
       i += 1
 
 rcs1bMC.Draw('hist e1')
+rcs1bMCrescale.Draw('hist e1 same')
+rcs1bMCrescaleD.Draw('hist e1 same')
 rcs1bdata.Draw('hist e1 same')
-rcs2bMC.Draw('hist e1 same')
-rcs2bdata.Draw('hist e1 same')
+#rcs2bMC.Draw('hist e1 same')
+#rcs2bdata.Draw('hist e1 same')
 
 
 #kappa01TT.Draw('hist e1')
@@ -232,10 +376,12 @@ rcs2bdata.Draw('hist e1 same')
 #leg.AddEntry(kappa12EWK)
 ##leg.AddEntry(kappa01EWK)
 #leg.AddEntry(kappa12data)
-leg.AddEntry(rcs1bMC)
-leg.AddEntry(rcs1bdata)
-leg.AddEntry(rcs2bMC)
-leg.AddEntry(rcs2bdata)
+leg.AddEntry(rcs1bMC, 'MC truth 1b')
+leg.AddEntry(rcs1bMCrescale, 'MC 1b rescaled')
+leg.AddEntry(rcs1bMCrescaleD, 'MC 1b dilep resc.')
+leg.AddEntry(rcs1bdata, 'data 1b')
+#leg.AddEntry(rcs2bMC, 'MC truth 2b')
+#leg.AddEntry(rcs2bdata, 'data 2b')
 
 
 leg.Draw()

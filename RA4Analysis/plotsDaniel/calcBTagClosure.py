@@ -11,12 +11,12 @@ ROOT.gROOT.LoadMacro('../../HEPHYPythonTools/scripts/root/tdrstyle.C')
 ROOT.setTDRStyle()
 
 prefix = 'singleLeptonic_Spring15_'
-signalRegions = signalRegion3fb
+signalRegions = signalRegion3fbReduced
 
 ROOT.gStyle.SetOptTitle(0);
 ROOT.gStyle.SetOptStat('')
 
-lumi = 3.
+lumi = 1.55
 small = False
 if small: signalRegions = smallRegion
 
@@ -34,18 +34,18 @@ for srNJet in sorted(signalRegions):
   bins += rows
 
 baseDir = '/data/'+username+'/Results2015/'
-b_upDir =   'Prediction_SFTemplate_MC_fullSR_lep_'+str(lumi)+'_b_Up/'
-b_downDir = 'Prediction_SFTemplate_MC_fullSR_lep_'+str(lumi)+'_b_Down/'
-light_upDir =   'Prediction_SFTemplate_MC_fullSR_lep_'+str(lumi)+'_light_Up/'
-light_downDir = 'Prediction_SFTemplate_MC_fullSR_lep_'+str(lumi)+'_light_Down/'
+b_upDir =   'Prediction_newSR_lep_SFtemplates_MC_SF_b_Up_'+str(lumi)+'/'
+b_downDir = 'Prediction_newSR_lep_SFtemplates_MC_SF_b_Down_'+str(lumi)+'/'
+light_upDir =   'Prediction_newSR_lep_SFtemplates_MC_SF_light_Up_'+str(lumi)+'/'
+light_downDir = 'Prediction_newSR_lep_SFtemplates_MC_SF_light_Down_'+str(lumi)+'/'
 
-nominalDir = 'Prediction_SFTemplate_MC_fullSR_lep_'+str(lumi)+'/'
+nominalDir = 'Prediction_newSR_lep_SFtemplates_MC_SF_'+str(lumi)+'/'
  
-light_up = pickle.load(file(baseDir+light_upDir+prefix+'_estimationResults_pkl_kappa_corrected'))
-light_down = pickle.load(file(baseDir+light_downDir+prefix+'_estimationResults_pkl_kappa_corrected'))
-b_up = pickle.load(file(baseDir+b_upDir+prefix+'_estimationResults_pkl_kappa_corrected'))
-b_down = pickle.load(file(baseDir+b_downDir+prefix+'_estimationResults_pkl_kappa_corrected'))
-nominal = pickle.load(file(baseDir+nominalDir+prefix+'_estimationResults_pkl_kappa_corrected'))
+light_up = pickle.load(file(baseDir+light_upDir+prefix+'_estimationResults_pkl'))
+light_down = pickle.load(file(baseDir+light_downDir+prefix+'_estimationResults_pkl'))
+b_up = pickle.load(file(baseDir+b_upDir+prefix+'_estimationResults_pkl'))
+b_down = pickle.load(file(baseDir+b_downDir+prefix+'_estimationResults_pkl'))
+nominal = pickle.load(file(baseDir+nominalDir+prefix+'_estimationResults_pkl'))
 
 varUp = []
 varDown = []
@@ -169,4 +169,12 @@ leg.AddEntry(b_Up_H,'b/c var')
 leg.AddEntry(light_Up_H,'light var')
 
 leg.Draw()
+
+latex1 = ROOT.TLatex()
+latex1.SetNDC()
+latex1.SetTextSize(0.035)
+latex1.SetTextAlign(11)
+
+latex1.DrawLatex(0.18,0.96,'CMS Simulation')
+latex1.DrawLatex(0.68,0.96,"L=1.55fb^{-1} (13TeV)")
 
