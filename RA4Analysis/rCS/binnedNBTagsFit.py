@@ -10,7 +10,7 @@ from rCShelpers import *# weight_str , weight_err_str , lumi
 
 from predictionConfig import *
 
-def binnedNBTagsFit(cut, cutname, samples, prefix = "", QCD_dict={0:{'y':0.,'e':0.,'totalY':0.}, 1:{'y':0.,'e':0.,'totalY':0.},2:{'y':0.,'e':0.,'totalY':0.}}):
+def binnedNBTagsFit(cut, cutname, samples, prefix = "", QCD_dict={0:{'y':0.,'e':0.,'totalY':0.}, 1:{'y':0.,'e':0.,'totalY':0.},2:{'y':0.,'e':0.,'totalY':0.}}, bootstrap=False):
   #print "LUMI:" , lumi
   #if not os.path.exists(printDir):
   #   os.makedirs(printDir) 
@@ -236,6 +236,12 @@ def binnedNBTagsFit(cut, cutname, samples, prefix = "", QCD_dict={0:{'y':0.,'e':
   print "QCD yield", hQCD.Integral()
 
   #Normalize histograms
+  if bootstrap:
+    template_TTJets = getRandomHistOfTemplate(template_TTJets)
+    template_WJets_PosPdg = getRandomHistOfTemplate(template_WJets_PosPdg)
+    template_WJets_NegPdg = getRandomHistOfTemplate(template_WJets_NegPdg)
+    template_Rest_PosPdg = getRandomHistOfTemplate(template_Rest_PosPdg)
+    template_Rest_NegPdg = getRandomHistOfTemplate(template_Rest_NegPdg)
   template_TTJets.Scale(1./template_TTJets.Integral())
   template_WJets_PosPdg.Scale(1./template_WJets_PosPdg.Integral())
   template_WJets_NegPdg.Scale(1./template_WJets_NegPdg.Integral())
