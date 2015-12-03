@@ -411,12 +411,16 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
   legendNameLengthsSignal = []
   if signals: legendNameLengthsSignal = [len(x['niceName']) for x in signals]
   legendNameLengths = legendNameLengthsSamples + legendNameLengthsSignal
-  legendWidth = 0.08*max(legendNameLengths)+0.1
+  legendWidth = 0.015*max(legendNameLengths)+0.03
+  print legendWidth
+  print max(legendNameLengths)
+  print legendNameLengths
   if legend:
     height = 0.04*len(h)
     if data: height+=0.04
     if signals: height += 0.04*len(signals)
     if data: height += 0.04
+    print legendWidth
     leg = ROOT.TLegend(0.98-legendWidth,0.95-height,0.98,0.95)
     leg.SetFillColor(ROOT.kWhite)
     leg.SetShadowColor(ROOT.kWhite)
