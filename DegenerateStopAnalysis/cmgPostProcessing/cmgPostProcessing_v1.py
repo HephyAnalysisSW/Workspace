@@ -14,9 +14,6 @@ import math
 import time
 import io
 
-from collections import namedtuple
-from contextlib import contextmanager
-
 # imports user modules or functions
 
 import ROOT
@@ -790,7 +787,12 @@ def processJets(leptonSelection, readTree, splitTree, saveTree):
         saveTree.nJet60 = len(jets60)
         saveTree.nJet110 = len(jets110)
         saveTree.nJet325 = len(filter(lambda j: j["pt"] > 325 , jets110))
-       
+        
+        logger.debug(
+            "\n Number of jets: \n  pt > 30 GeV: %i \n  pt > 60 GeV: %i \n  pt > 110 GeV: %i \n  pt > 325 GeV: %i \n", 
+            saveTree.nJet30, saveTree.nJet60,  saveTree.nJet110, saveTree.nJet325
+            )
+               
         # separation of jets and bJets according to discriminant (CMVA;  CSV - default)
         
         discCMVA = 0.732
@@ -811,19 +813,33 @@ def processJets(leptonSelection, readTree, splitTree, saveTree):
         saveTree.nHardBJetsCSV = len(hardBJetsCSV)
         saveTree.nBJetMediumCSV30 = len(bJetsCSV)
         
-        logger.debug("\n Number of soft and hard b jets (CSV): \n  soft: %i \n  hard: %i \n  total: %i \n", 
-                     saveTree.nSoftBJetsCSV  ,saveTree.nHardBJetsCSV,  saveTree.nBJetMediumCSV30)
+        logger.debug(
+            "\n Number of soft and hard b jets (CSV): \n  soft: %i \n  hard: %i \n  total: %i \n", 
+            saveTree.nSoftBJetsCSV, saveTree.nHardBJetsCSV, saveTree.nBJetMediumCSV30
+            )
 
         # HT as sum of jets pT > 30 GeV
         
         saveTree.htJet30j = sum([x['pt'] for x in jets])
 
-        # save some additional jet quantities
+        # save some additional jet quantities, after initialization
+
+        saveTree.jet1Pt = 0.
+        saveTree.jet1Eta = 0.
+        saveTree.jet1Phi = 0.
+        
+        saveTree.jet2Pt = 0.
+        saveTree.jet2Eta = 0.
+        saveTree.jet2Phi = 0.
+        
+        saveTree.dRJet1Jet2 = 0.
+        saveTree.deltaPhi_j12 = 0.
 
         if saveTree.nJet30 > 0:    
             saveTree.jet1Pt = jets[0]['pt']
             saveTree.jet1Eta = jets[0]['eta']
             saveTree.jet1Phi = jets[0]['phi']
+            saveTree.dRJet1Jet2 = 0.
 
         if saveTree.nJet30 > 1:
             saveTree.jet2Pt = jets[1]['pt']
@@ -833,7 +849,7 @@ def processJets(leptonSelection, readTree, splitTree, saveTree):
             saveTree.dRJet1Jet2 = hephyHelpers.deltaR(jets[0], jets[1])
             
         if saveTree.nJet60 == 0:
-            saveTree.deltaPhi_j12 = 999
+            saveTree.deltaPhi_j12 = 999.
         elif saveTree.nJet60 == 1:
             saveTree.deltaPhi_j12 = 0.
         else:
@@ -842,7 +858,10 @@ def processJets(leptonSelection, readTree, splitTree, saveTree):
                 abs(jets60[1]['phi'] - jets60[0]['phi'])
                 )
  
-        
+        logger.debug(
+            "\n Jet separation: \n  dRJet1Jet2: %f \n  deltaPhi_j12: %f \n", 
+            saveTree.dRJet1Jet2, saveTree.deltaPhi_j12
+            )
     
     #
     return saveTree, jets
@@ -907,7 +926,7 @@ def processLeptonJets(leptonSelection, readTree, splitTree, saveTree, lep, jets)
     return saveTree
 
 
-def processTracksFunction(readTree, splitTree, saveTree, trackMinPtList, disableTracksDebugLogging):
+def processTracksFunction(readTree, splitTree, saveTree, trackMinPtList):
     '''Process tracks. 
     
     TODO describe here the processing.
@@ -915,9 +934,6 @@ def processTracksFunction(readTree, splitTree, saveTree, trackMinPtList, disable
     
     logger = logging.getLogger('cmgPostProcessing.processTracksFunction')
     
-    if disableTracksLogging:
-        logger.propagate = False
-
     varList = [
         'pt', 'eta', 'phi', "dxy", "dz", 'pdgId' ,
         "matchedJetIndex", "matchedJetDr",
@@ -1110,6 +1126,60 @@ def computeWeight(target_lumi, sample, sumWeight, splitTree, saveTree):
         
     #
     return saveTree
+
+
+def haddFiles(sample, filesForHadd, temporaryDir, outputWriteDirectory):
+    ''' Add the histograms using ROOT hadd script
+        
+        If
+            input files to be hadd-ed sum to more than maxFileSize MB or
+            the number of files to be added is greater than  maxNumberFiles
+        then split the hadd
+    '''
+
+    logger = logging.getLogger('cmgPostProcessing.haddFiles')
+        
+    maxFileSize = 500 # split into maxFileSize MB
+    maxNumberFiles = 200
+    logger.debug(
+        "\n " + \
+        "\n Sum up the split files in files smaller as %f MB \n",
+         maxFileSize
+         )
+
+    size = 0
+    counter = 0
+    files = []
+    for f in filesForHadd:
+        size += os.path.getsize(temporaryDir + '/' + f)
+        files.append(f)
+        if size > (maxFileSize * (10 ** 6)) or f == filesForHadd[-1] or len(files) > maxNumberFiles:
+            ofile = outputWriteDirectory + '/' + sample['name'] + '_' + str(counter) + '.root'
+            logger.debug(
+                "\n Running hadd on directory \n %s \n files: \n %s \n", 
+                temporaryDir, pprint.pformat(files)
+                )
+            os.system('cd ' + temporaryDir + ';hadd -f -v 0 ' + ofile + ' ' + ' '.join(files))
+            logger.debug("\n Written output file \n %s \n", ofile)
+            size = 0
+            counter += 1
+            files = []
+    
+    # remove the temporary directory  
+    os.system('cd ' + outputWriteDirectory)
+    ROOT.gDirectory.cd("..")
+    shutil.rmtree(temporaryDir, onerror=retryRemove)
+    if not os.path.exists(temporaryDir): 
+        logger.debug("\n Temporary directory \n    %s \n deleted. \n", temporaryDir)
+    else:
+        logger.info(
+            "\n Temporary directory \n    %s \n not deleted. \n" + \
+            "\n Delete it by hand.", 
+            temporaryDir
+            )
+        
+    return
+
 
 def cmgPostProcessing(argv=None):
     
@@ -1378,53 +1448,10 @@ def cmgPostProcessing(argv=None):
             sampleName
             )
         
-        # add the histograms using ROOT hadd script
-        # if
-        #     input files to be hadd-ed sum to more than maxFileSize MB or
-        #     the number of files to be added is greater than  maxNumberFiles
-        # then split the hadd
-         
+        # add the histograms using ROOT hadd script         
         if not testMethods: 
+            haddFiles(sample, filesForHadd, temporaryDir, outputWriteDirectory)
             
-            maxFileSize = 500 # split into maxFileSize MB
-            maxNumberFiles = 200
-            logger.debug(
-                "\n " + \
-                "\n Sum up the split files in files smaller as %f MB \n",
-                 maxFileSize
-                 )
-
-            size = 0
-            counter = 0
-            files = []
-            for f in filesForHadd:
-                size += os.path.getsize(temporaryDir + '/' + f)
-                files.append(f)
-                if size > (maxFileSize * (10 ** 6)) or f == filesForHadd[-1] or len(files) > maxNumberFiles:
-                    ofile = outputWriteDirectory + '/' + sample['name'] + '_' + str(counter) + '.root'
-                    logger.debug(
-                        "\n Running hadd on directory \n %s \n files: \n %s \n", 
-                        temporaryDir, pprint.pformat(files)
-                        )
-                    os.system('cd ' + temporaryDir + ';hadd -f -v 0 ' + ofile + ' ' + ' '.join(files))
-                    logger.debug("\n Written output file \n %s \n", ofile)
-                    size = 0
-                    counter += 1
-                    files = []
-            
-            # remove the temporary directory  
-            os.system('cd ' + outputWriteDirectory)
-            ROOT.gDirectory.cd("..")
-            shutil.rmtree(temporaryDir, onerror=retryRemove)
-            if not os.path.exists(temporaryDir): 
-                logger.debug("\n Temporary directory \n    %s \n deleted. \n", temporaryDir)
-            else:
-                logger.info(
-                    "\n Temporary directory \n    %s \n not deleted. \n" + \
-                    "\n Delete it by hand.", 
-                    temporaryDir
-                    )
-                    
     logger.info(
         "\n " + \
         "\n End of post-processing sample %s " + \
