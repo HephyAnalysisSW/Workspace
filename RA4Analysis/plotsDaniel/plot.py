@@ -40,22 +40,23 @@ lepSel = 'hard'
 
 #25ns samples
 #WJETS = {'name':'WJets', 'chain':getChain(WJetsHTToLNu_25ns,histname=''), 'color':ROOT.kMagenta,'weight':'weight', 'niceName':'W Jets, MVA ID'}
-WJETSbtagweight = {'name':'WJets', 'chain':getChain(WJetsHTToLNu_25ns_btag,histname=''), 'color':ROOT.kMagenta,'weight':'weight', 'niceName':'W Jets btag'}
-WJETS = {'name':'WJets', 'chain':getChain(WJetsHTToLNu_25ns,histname=''), 'color':color('WJets'),'weight':'weight', 'niceName':'W Jets CB ID'}
+WJETSbtagweight = {'name':'WJets', 'chain':getChain(WJetsHTToLNu_25ns_btag,histname=''), 'color':color('WJets'),'weight':'weight', 'niceName':'W+Jets', 'cut':''}
+WJETS = {'name':'WJets', 'chain':getChain(WJetsHTToLNu_25ns,histname=''), 'color':color('WJets'),'weight':'weight', 'niceName':'W+Jets', 'cut':''}
 #TTJETS = {'name':'TTJets', 'chain':getChain(TTJets_25ns,histname=''), 'color':color('TTJets'),'weight':'weight', 'niceName':'t#bar{t} Jets NLO'}
 #TTJetsLO = {'name':'TTJets', 'chain':getChain(TTJets_LO_25ns,histname=''), 'color':color('singleTop'),'weight':'weight', 'niceName':'t#bar{t} Jets MVA ID'}
-TTJetsbtagweight = {'name':'TTJets', 'chain':getChain(TTJets_combined_btag,histname=''), 'color':color('TTJets')-2,'weight':'weight', 'niceName':'t#bar{t} Jets btag'}
-TTJets = {'name':'TTJets', 'chain':getChain(TTJets_HTLO_25ns,histname=''), 'color':ROOT.kOrange,'weight':'weight', 'niceName':'t#bar{t} Jets HT bin'}
-TTJets_combined = {'name':'TTJets', 'chain':getChain(TTJets_combined,histname=''), 'color':color('TTJets')-2,'weight':'weight', 'niceName':'t#bar{t} Jets comb'}
-DY = {'name':'DY', 'chain':getChain(DY_25ns,histname=''), 'color':color('DY'),'weight':'weight', 'niceName':'Drell Yan'}
-singleTop = {'name':'singleTop', 'chain':getChain(singleTop_25ns,histname=''), 'color':color('singleTop'),'weight':'weight', 'niceName':'single Top'}
+TTJetsbtagweight = {'name':'TTJets', 'chain':getChain(TTJets_combined_btag,histname=''), 'color':color('TTJets')-2,'weight':'weight', 'niceName':'t#bar{t}+Jets', 'cut':''}
+TTJets = {'name':'TTJets', 'chain':getChain(TTJets_HTLO_25ns,histname=''), 'color':ROOT.kOrange,'weight':'weight', 'niceName':'t#bar{t}+Jets', 'cut':''}
+TTJets_combined = {'name':'TTJets', 'chain':getChain(TTJets_combined_2,histname=''), 'color':color('TTJets')-2,'weight':'weight', 'niceName':'t#bar{t}+Jets', 'cut':''}
+DY = {'name':'DY', 'chain':getChain(DY_25ns,histname=''), 'color':color('DY'),'weight':'weight', 'niceName':'Drell Yan', 'cut':''}
+singleTop = {'name':'singleTop', 'chain':getChain(singleTop_25ns,histname=''), 'color':color('singleTop'),'weight':'weight', 'niceName':'single Top', 'cut':''}
 #QCD = {'name':'QCD', 'chain':getChain(QCDMu_25ns,histname=''), 'color':color('QCD'),'weight':'weight', 'niceName':'QCD'}
-QCD = {'name':'QCD', 'chain':getChain(QCDHT_25ns,histname=''), 'color':color('QCD'),'weight':'weight', 'niceName':'QCD'}
-TTVH = {'name':'TTVH', 'chain':getChain(TTV_25ns,histname=''), 'color':color('TTV'),'weight':'weight', 'niceName':'TTVH'}
-Rest = {'name':'TTVH', 'chain':getChain([TTV_25ns,singleTop_25ns,DY_25ns],histname=''), 'color':color('TTV'),'weight':'weight', 'niceName':'Rest EWK'}
+QCD = {'name':'QCD', 'chain':getChain(QCDHT_25ns,histname=''), 'color':color('QCD'),'weight':'weight', 'niceName':'QCD', 'cut':''}
+TTVH = {'name':'TTVH', 'chain':getChain(TTV_25ns,histname=''), 'color':color('TTV'),'weight':'weight', 'niceName':'TTVH', 'cut':''}
+Rest = {'name':'TTVH', 'chain':getChain([TTV_25ns,singleTop_25ns,DY_25ns],histname=''), 'color':color('TTV'),'weight':'weight', 'niceName':'Rest EWK', 'cut':''}
 #QCD = {'name':'QCD', 'chain':getChain(QCDEle_25ns,histname=''), 'color':color('QCD'),'weight':'weight', 'niceName':'QCD'}
 #diBoson = {'name':'diBoson', 'chain':getChain(diBosons_25ns,histname=''), 'color':ROOT.kMagenta,'weight':'weight', 'niceName':'diboson'}
 samples = [WJETS, TTJets_combined, Rest, QCD]#, diBoson]
+samplesBtag = [WJETSbtagweight, TTJetsbtagweight, Rest, QCD]
 #samplesComp = [WJETS, TTJETS, singleTop, DY, QCD]
 
 #EWK = {'name':'EWK', 'chain':getChain([WJetsHT_25ns,TTJets_HTLO_25ns,singleTop_25ns,DY_25ns,TTV_25ns],histname=''), 'color':color('DY'),'weight':'weight', 'niceName':'EWK'}
@@ -81,10 +82,13 @@ data = {'name':'data', 'chain':getChain([single_mu_Run2015D, single_ele_Run2015D
 #signals = [T5qqqqWW_mGo1000_mCh800_mChi700,T5qqqqWW_mGo1200_mCh1000_mChi800,T5qqqqWW_mGo1500_mCh800_mChi100]
 
 dPhiJet1Met = {'name':'acos(cos(Jet_phi[0]-met_phi))', 'binning':[32,0,3.2], 'titleX':'#Delta#Phi(j_{1},#slash{E}_{T})', 'titleY':'Events'}
-mindPhiJetMet = {'name':'min(acos(cos(Jet_phi[0]-met_phi)),acos(cos(Jet_phi[1]-met_phi)),acos(cos(Jet_phi[2]-met_phi)))', 'binning':[16,0,pi], 'titleX':'min(#Delta#Phi(j_{1,2,3},#slash{E}_{T}))', 'titleY':'Events'}
 dPhiJet2Met = {'name':'acos(cos(Jet_phi[1]-met_phi))', 'binning':[32,0,3.2], 'titleX':'#Delta#Phi(j_{2},#slash{E}_{T})', 'titleY':'Events'}
 dPhiJet3Met = {'name':'acos(cos(Jet_phi[2]-met_phi))', 'binning':[32,0,3.2], 'titleX':'#Delta#Phi(j_{3},#slash{E}_{T})', 'titleY':'Events'}
 dPhiJet4Met = {'name':'acos(cos(Jet_phi[3]-met_phi))', 'binning':[32,0,3.2], 'titleX':'#Delta#Phi(j_{4},#slash{E}_{T})', 'titleY':'Events'}
+
+mindPhiJetMet2 = {'name':'min(acos(cos(Jet_phi[0]-met_phi)),acos(cos(Jet_phi[1]-met_phi)))', 'binning':[16,0,pi], 'titleX':'min(#Delta#Phi(j_{1,2},#slash{E}_{T}))', 'titleY':'Events', 'fileName':'mindPhiJet12Met'}
+mindPhiJetMet3 = {'name':'min(min(acos(cos(Jet_phi[0]-met_phi)),acos(cos(Jet_phi[1]-met_phi))),acos(cos(Jet_phi[2]-met_phi)))', 'binning':[16,0,pi], 'titleX':'min(#Delta#Phi(j_{1,2,3},#slash{E}_{T}))', 'titleY':'Events', 'fileName':'mindPhiJet123Met'}
+mindPhiJetMet4 = {'name':'min(min(acos(cos(Jet_phi[0]-met_phi)),acos(cos(Jet_phi[1]-met_phi))),min(acos(cos(Jet_phi[2]-met_phi)),acos(cos(Jet_phi[3]-met_phi))))', 'binning':[16,0,pi], 'titleX':'min(#Delta#Phi(j_{1,2,3,4},#slash{E}_{T}))', 'titleY':'Events', 'fileName':'mindPhiJet1234Met'}
 
 dPhiJet1GenMet = {'name':'acos(cos(Jet_phi[0]-met_genPhi))', 'binning':[32,0,3.2], 'titleX':'#Delta#Phi(j_{1},#slash{E}_{T}^{gen})', 'titleY':'Events'}
 dPhiJet2GenMet = {'name':'acos(cos(Jet_phi[1]-met_genPhi))', 'binning':[32,0,3.2], 'titleX':'#Delta#Phi(j_{2},#slash{E}_{T}^{gen})', 'titleY':'Events'}
@@ -145,7 +149,7 @@ negWeight = {'name':'negWeight', 'string':newpresel+'&&weight<0', 'niceName':'ne
 
 #newPreselNoLtHt = {'name':'presel','string':preselNoLtHt,'niceName':'Preselection'}
 newPreselCut = {'name':'presel','string':newpresel,'niceName':'Preselection'}
-newPreselCutBlinded = {'name':'presel','string':newpresel+'&&deltaPhi_Wl<0.75','niceName':'Preselection'}
+newPreselCutBlinded = {'name':'presel','string':newpresel+'&&deltaPhi_Wl<0.5','niceName':'Preselection'}
 newPreselCutHad = {'name':'presel','string':newpresel+'&&(ngenLep+ngenTau)==0','niceName':'Preselection'}
 newPreselCutSemiLep = {'name':'presel','string':newpresel+'&&(ngenLep+ngenTau)==1','niceName':'Preselection'}
 newPreselCutDiLep = {'name':'presel','string':newpresel+'&&(ngenLep+ngenTau)==2','niceName':'Preselection'}
@@ -153,6 +157,16 @@ newPreselCutDiLep = {'name':'presel','string':newpresel+'&&(ngenLep+ngenTau)==2'
 
 newPreselCutSingleMuAN = {'name':'presel','string':newpresel+'&&singleMuonic','niceName':'Preselection'}
 newPreselCutSingleEleAN = {'name':'presel','string':newpresel+'&&singleElectronic','niceName':'Preselection'}
+
+name_ttSB, cut_ttSB = nameAndCut((250,-1),(500,-1),(4,5),btb=(1,1),presel=newpresel)
+name_ttSBnoB, cut_ttSBnoB = nameAndCut((250,-1),(500,-1),(4,5),btb=None,presel=newpresel)
+ttSB = {'name':'tt SB', 'string':cut_ttSB, 'niceName':'t#bar{t} SB'}
+ttSBnoB = {'name':'tt SB', 'string':cut_ttSBnoB, 'niceName':'t#bar{t} SB'}
+
+name_WSB, cut_WSB = nameAndCut((250,-1),(500,-1),(3,4),btb=(0,0),presel=newpresel)
+name_WSBnoB, cut_WSBnoB = nameAndCut((250,-1),(500,-1),(3,4),btb=None,presel=newpresel)
+WSB = {'name':'W SB', 'string':cut_WSB, 'niceName':'W SB'}
+WSBnoB = {'name':'W SB', 'string':cut_WSBnoB, 'niceName':'W SB'}
 
 name, cut = nameAndCut((250,350),(500,-1),(4,5),btb=(1,1),presel=newpresel)
 cut1 = {'name':name,'string':cut,'niceName':'L_{T} [250,350), H_{T} [500,-1)'}
@@ -169,8 +183,6 @@ allFiltersNoEcal = {'name':'ecalFilterCut','string':newpresel+'&&Flag_eeBadScFil
 allFilters = {'name':'ecalFilterCut','string':newpresel+'&&Flag_EcalDeadCellTriggerPrimitiveFilter&&Flag_eeBadScFilter&&Flag_goodVertices&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFilter','niceName':'All filters'}
 
 filterCutList = [Flag_EcalDeadCellTriggerPrimitiveFilter,Flag_HBHENoiseFilter,Flag_CSCTightHaloFilter,Flag_goodVertices,Flag_eeBadScFilter,allFiltersNoEcal,allFilters]
-
-filters = "&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFilter_fix&&Flag_HBHENoiseFilter&&Flag_goodVertices&&Flag_eeBadScFilter&&Flag_EcalDeadCellTriggerPrimitiveFilter" #strange filter settings!!
 
 fakeMet = "sqrt((met_pt*cos(met_phi)-met_genPt*cos(met_genPhi))**2+(met_pt*sin(met_phi)-met_genPt*sin(met_genPhi))**2)"
 fakeMetSelection = '('+fakeMet+'>50||'+fakeMet+'>met_genPt)'
@@ -287,8 +299,8 @@ nbjetComp = {'name':btagStr, 'binning':[6,0,6], 'titleX':'n_{b-jets}', 'titleY':
 #datapresel = '('+singleMuonic+'||'+singleElectronic+')&&nJet30>2&&nBJetMedium30>=0&&'+htStr+'>500&&'+stStr+'>200'
 #trigger = "&&((HLT_ElNoIso||HLT_EleHT350)||(HLT_MuHT350||HLT_Mu50NoIso))"
 #trigger = "&&((HLT_ElNoIso||HLT_EleHT350MET70)||(HLT_MuHT350MET70||HLT_Mu50NoIso))"
-trigger = "&&(HLT_EleHT350||HLT_MuHT350)"
-filters = "&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFilterMinZeroPatched&&Flag_goodVertices&&Flag_eeBadScFilter"
+#trigger = "&&(HLT_EleHT350||HLT_MuHT350)"
+#filters = "&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFilterMinZeroPatched&&Flag_goodVertices&&Flag_eeBadScFilter"
 #filters = "&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFilterMinZeroPatched&&Flag_goodVertices&&Flag_eeBadScFilter"#&&Flag_EcalDeadCellTriggerPrimitiveFilter"
 
 ##datapresel = LeptonReq+'&&'+leptonVeto+'&&nJet30>=2&&nBJetMedium30>=0&&'+htStr+'>500&&'+stStr+'>250'
@@ -327,7 +339,7 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
     marginForPad2 = 0.
     bottomMargin = 0.13
   pad1=ROOT.TPad("pad1","MyTitle",0.,marginForPad2,1.,1.)
-  pad1.SetLeftMargin(0.15)
+  pad1.SetLeftMargin(0.11)
   pad1.SetBottomMargin(bottomMargin)
   pad1.Draw()
   pad1.cd()
@@ -347,21 +359,35 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
     #dataYield = getYieldFromChain(data['chain'],cutString=dataCutString,weight='(1)')
     MCYield, MCYieldError = getYieldFromChain(totalChain,cutString=cuts[0]['string'],weight=str(MClumiScale)+'*''weight', returnError=True)
     print 'Yield Data:\t', dataYield
-    print 'Yield MC:\t', MCYield
+    print 'Yield MC:\t', round(MCYield,1)
     MCscale = dataYield/MCYield
     MCscaleError = dataYield/MCYield*sqrt(MCYieldError**2/dataYield**2+dataYieldError**2/MCYield**2)
-    print 'Area normalization factor:',round(MCscale,3),'+/-',round(MCscaleError,3)
+    print 'Area norm. factor:',round(MCscale,3),'+/-',round(MCscaleError,3)
   else: MCscale=1.
   for isample, sample in enumerate(samples):
     for icut, cut in enumerate(cuts):
+      print
       i = isample*ncuts+icut
       if nsamples>1: legendName = sample['niceName']
       else: legendName = cut['niceName']
       if binningIsExplicit: h.append({'hist':ROOT.TH1F('h'+str(isample)+'_'+str(icut), legendName, len(variable['binning'])-1, array('d', variable['binning'])),'yield':0., 'legendName':legendName})
       else: h.append({'hist':ROOT.TH1F('h'+str(isample)+'_'+str(icut), legendName, *variable['binning']),'yield':0., 'legendName':legendName})
-      if sample['weight']=='weight':weight='weight'
-      else: weight=str(sample['weight'])
-      sample['chain'].Draw(variable['name']+'>>h'+str(isample)+'_'+str(icut),str(MCscale*MClumiScale)+'*'+weight+'*('+cut['string']+')','goff')
+      print 'Will apply the following cuts and weight for sample',sample['name']
+      print 'Weight:'
+      if sample['weight']=='weight':
+        weight='weight'
+        print ' - chained weight'
+      else:
+        weight=str(sample['weight'])
+        print ' - weight:', weight
+      print 'Cut'
+      if sample['cut']:
+        useCut = sample['cut']
+        print ' - cut:', sample['name']
+      else:
+        useCut = cut['string']
+        print ' - global cut'
+      sample['chain'].Draw(variable['name']+'>>h'+str(isample)+'_'+str(icut),str(MCscale*MClumiScale)+'*'+weight+'*('+useCut+')','goff')
       totalH.Add(h[i]['hist'])
       h[i]['yield'] = h[i]['hist'].GetSumOfWeights()
       if minimum: h[i]['hist'].SetMinimum(minimum)
@@ -385,7 +411,7 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
   legendNameLengthsSignal = []
   if signals: legendNameLengthsSignal = [len(x['niceName']) for x in signals]
   legendNameLengths = legendNameLengthsSamples + legendNameLengthsSignal
-  legendWidth = 0.013*max(legendNameLengths)+0.15
+  legendWidth = 0.08*max(legendNameLengths)+0.1
   if legend:
     height = 0.04*len(h)
     if data: height+=0.04
@@ -410,6 +436,7 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
     h_Stack.GetXaxis().SetTitle(variable['titleX'])
     h_Stack.GetXaxis().SetNdivisions(508)
     h_Stack.GetYaxis().SetTitle(variable['titleY'])
+    h_Stack.GetYaxis().SetTitleOffset(0.9)
   else:
     first = True
     for item in reversed(h):
@@ -455,7 +482,7 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
     dataMCH.Divide(totalH)
     can.cd()
     pad2=ROOT.TPad("pad2","datavsMC",0.,0.,1.,.3)
-    pad2.SetLeftMargin(0.15)
+    pad2.SetLeftMargin(0.11)
     pad2.SetBottomMargin(0.3)
     pad2.SetTopMargin(0.)
     pad2.SetGrid()
@@ -468,9 +495,9 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
     dataMCH.GetYaxis().SetTitle('data/MC')
     dataMCH.GetYaxis().SetTitleSize(0.13)
     dataMCH.GetYaxis().SetLabelSize(0.13)
-    dataMCH.GetYaxis().SetTitleOffset(0.6)
+    dataMCH.GetYaxis().SetTitleOffset(0.4)
     dataMCH.GetYaxis().SetNdivisions(508)
-    dataMCH.SetMinimum(0.)
+    dataMCH.SetMinimum(0.1)
     dataMCH.SetMaximum(2.2)
     h.append({'hist':dataMCH, 'yield':0., 'legendName':'notInLegend'})
     dataMCH.Draw('same e1p')
@@ -481,9 +508,9 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
     latex1.SetNDC()
     latex1.SetTextSize(0.04)
     latex1.SetTextAlign(11) # align right
-  if titleText: latex1.DrawLatex(0.15,0.96,'CMS '+titleText)
-  if MCscale and (MCscale>1.001 or MCscale<0.99) : latex1.DrawLatex(0.98-legendWidth,0.95-height-0.04,'MC~ scale:'+str(round(MCscale,3))+'\pm'+str(round(MCscaleError,3)))
-  if lumi: latex1.DrawLatex(0.73,0.96,"L="+str(lumi)+"fb^{-1} (13TeV)")
+  if titleText: latex1.DrawLatex(0.11,0.96,'CMS #bf{#it{'+titleText+'}}')
+  if MCscale and (MCscale>1.001 or MCscale<0.99) : latex1.DrawLatex(0.6,0.95-height-0.04,'MC~scale:'+str(round(MCscale,3))+'\pm'+str(round(MCscaleError,3)))
+  if lumi: latex1.DrawLatex(0.77,0.96,"L="+str(lumi)+"fb^{-1} (13TeV)")
   if legend: leg.Draw()
   can.Update()
   if stacking: return {'hist':h, 'canvas':can, 'legend':leg, 'stack':h_Stack, 'signals':s}
