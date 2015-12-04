@@ -29,13 +29,13 @@
 #python cmgPostProcessing.py --leptonSelection=hard --skim=""  --samples=QCD_bcToE_Pt170to250_25ns
 #python cmgPostProcessing.py --leptonSelection=hard --skim=""  --samples=QCD_bcToE_Pt250toInf_25ns
 #
-python cmgPostProcessing.py --leptonSelection=hard --skim="HT400ST200"  --samples=QCD_HT200to300_25ns
-python cmgPostProcessing.py --leptonSelection=hard --skim="HT400ST200"  --samples=QCD_HT300to500_25ns
-python cmgPostProcessing.py --leptonSelection=hard --skim="HT400ST200"  --samples=QCD_HT500to700_25ns
-python cmgPostProcessing.py --leptonSelection=hard --skim="HT400ST200"  --samples=QCD_HT700to1000_25ns
-python cmgPostProcessing.py --leptonSelection=hard --skim="HT400ST200"  --samples=QCD_HT1000to1500_25ns
-python cmgPostProcessing.py --leptonSelection=hard --skim="HT400ST200"  --samples=QCD_HT1500to2000_25ns
-python cmgPostProcessing.py --leptonSelection=hard --skim="HT400ST200"  --samples=QCD_HT2000toInf_25ns
+#python cmgPostProcessingAntiSelectionV2.py --overwrite --leptonSelection=none --skim="HT500"  --samples=QCD_HT200to300_25ns
+python cmgPostProcessingAntiSelectionV2.py --overwrite --leptonSelection=none --skim="HT500"  --samples=QCD_HT300to500_25ns
+python cmgPostProcessingAntiSelectionV2.py --overwrite --leptonSelection=none --skim="HT500"  --samples=QCD_HT500to700_25ns
+python cmgPostProcessingAntiSelectionV2.py --overwrite --leptonSelection=none --skim="HT500"  --samples=QCD_HT700to1000_25ns
+python cmgPostProcessingAntiSelectionV2.py --overwrite --leptonSelection=none --skim="HT500"  --samples=QCD_HT1000to1500_25ns
+python cmgPostProcessingAntiSelectionV2.py --overwrite --leptonSelection=none --skim="HT500"  --samples=QCD_HT1500to2000_25ns
+python cmgPostProcessingAntiSelectionV2.py --overwrite --leptonSelection=none --skim="HT500"  --samples=QCD_HT2000toInf_25ns
 #python cmgPostProcessing.py --leptonSelection=hard --skim=""  --samples=QCD_Pt_80to120_25ns
 #python cmgPostProcessing.py --leptonSelection=hard --skim=""  --samples=QCD_Pt_120to170_25ns
 #python cmgPostProcessing.py --leptonSelection=hard --skim=""  --samples=QCD_Pt_170to300_25ns

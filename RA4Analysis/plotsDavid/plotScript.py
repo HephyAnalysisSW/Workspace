@@ -1,6 +1,7 @@
 import ROOT
 ROOT.gROOT.LoadMacro("../../HEPHYPythonTools/scripts/root/tdrstyle.C")
 ROOT.setTDRStyle()
+ROOT.TH1F().SetDefaultSumw2()
 from math import *
 import os, copy, sys
 from array import array
@@ -15,7 +16,7 @@ from eleID_helper import *
 
 preprefix = 'plots/1p55fb'
 wwwDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/RunII/Spring15_25ns/'+preprefix+'/'
-prefix = 'singleElectronic_'
+prefix = 'singleLeptonic_'
 
 if not os.path.exists(wwwDir):
   os.makedirs(wwwDir)
@@ -35,12 +36,12 @@ weight_str, weight_err_str = makeWeight(lumi, sampleLumi=sampleLumi, debug=debug
 
 #Bkg chains 
 allBkg=[
-        {'name':'DY',         'sample':DY_25ns,           'legendName':'DY+jets',          'weight':weight_str},
-        {'name':'single top', 'sample':singleTop_25ns     'legendName':'single top',       'weight':weight_str},
-        {'name':'QCD',        'sample':QCDHT_25ns,        'legendName':'QCD',              'weight':weight_str},
-        {'name':'TTV',        'sample':TTV_25ns,          'legendName':'t#bar{t}V(W/Z/H)', 'weight':weight_str},
-        {'name':'W+Jets',     'sample':WJetsHTToLNu_25ns, 'legendName':'W+jets',           'weight':weight_str},
-        {'name':'tt+Jets',    'sample':TTJets_HTLO_25ns,  'legendName':'t#bar{t}+jets',    'weight':weight_str}
+        {'name':'DY',         'sample':DY_25ns,           'legendName':'DY+jets',          'weight':weight_str, 'isData':False},
+        {'name':'singletop',  'sample':singleTop_25ns,    'legendName':'single top',       'weight':weight_str, 'isData':False},
+        {'name':'QCD',        'sample':QCDHT_25ns,        'legendName':'QCD',              'weight':weight_str, 'isData':False},
+        {'name':'TTV',        'sample':TTV_25ns,          'legendName':'t#bar{t}V(W/Z/H)', 'weight':weight_str, 'isData':False},
+        {'name':'W+Jets',     'sample':WJetsHTToLNu_25ns, 'legendName':'W+jets',           'weight':weight_str, 'isData':False},
+        {'name':'tt+Jets',    'sample':TTJets_HTLO_25ns,  'legendName':'t#bar{t}+jets',    'weight':weight_str, 'isData':False}
       ]
 
 for bkg in allBkg:
@@ -50,8 +51,8 @@ for bkg in allBkg:
 
 #Data
 data=[
-     {'name':'date_ele_25ns', 'sample':data_ele_25ns, 'legendName':'Data'},
-     {'name':'data_mu_25ns',  'sample':data_mu_25ns,  'legendName':'Data'}
+     {'name':'date_ele_25ns', 'sample':data_ele_25ns, 'legendName':'Data', 'chain':getChain(data_ele_25ns,histname=''), 'isData':True},
+     {'name':'data_mu_25ns',  'sample':data_mu_25ns,  'legendName':'Data', 'chain':getChain(data_mu_25ns, histname=''), 'isData':True}
 ]
 
 #Signal chains
@@ -87,9 +88,9 @@ btb = (0,0)
 
 #trigger and filters for real Data
 trigger = "&&(HLT_EleHT350||HLT_MuHT350)"
-filters = "&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFilter_fix&&Flag_HBHENoiseFilter&&Flag_goodVertices&&Flag_eeBadScFilter&&Flag_EcalDeadCellTriggerPrimitiveFilter"
+filters = "&&Flag_goodVertices&&Flag_HBHENoiseFilter_fix&&Flag_CSCTightHaloFilter&&Flag_eeBadScFilter&&Flag_HBHENoiseIsoFilter"
 
-presel = 'nLep==1&&nVeto==0&&nEl==1&&leptonPt>25&&Jet2_pt>80'
+presel = 'nLep==1&&nVeto==0&&nTightLep==1&&leptonPt>25&&Jet2_pt>80'
 antiSelStr = presel+filters+'&&Selected==-1&&leptonHoverE>0.01'
 SelStr = presel+filters+'&&Selected==1'
 
@@ -129,9 +130,7 @@ for i_htb, htb in enumerate(htreg):
   for stb in streg:
     for srNJet in njreg:
       print 'Var region => ht: ',htb,'st: ',stb, 'NJet: ',srNJet
-      #for sig in allSignals:            
-      #  h_ratio[sig['name']] = {}     
-      for sample in allBkg:# + allSignals: #Loop over samples
+      for sample in allBkg + data: #Loop over samples
         histos[sample['name']] = {}
 
         for var in allVariables:
@@ -142,9 +141,15 @@ for i_htb, htb in enumerate(htreg):
           histos[sample['name']][var['name']].Reset()
           #sample['chain'].Draw("Sum$(isoTrack_pt<15&&abs(isoTrack_pdgId)==211&&abs(isoTrack_dz)<0.05)"+">>"+sample["name"]+"_"+var["name"])
           #sample['chain'].Draw(var['varString']+">>"+sample['name']+'_'+var['name'], sample["weight"]+"*("+cut+")")
-          
-        namestr = nameAndCut(None, None, srNJet, btb=btb, presel=presel, btagVar = 'nBJetMediumCMVA30')[0]
-        cut = presel+'&&'+nJetCut(srNJet, minPt=30, maxEta=2.4)+'&&'+nBTagCut(btb, minPt=30, maxEta=2.4, minCSVTag=0.890)#+'&&'+htCut(htb, minPt=30, maxEta=2.4, njCorr=0.)#+'&&'+nJetCut(2, minPt=30, maxEta=2.4)
+        
+        if sample['isData']:
+          if 'mu' in sample['name']:  
+            namestr,cut = nameAndCut(stb, htb, srNJet, btb=(0,0), presel=SelStr+'&&nTightMu==1'+trigger, btagVar = 'nBJetMediumCSV30')
+          elif 'ele' in sample['name']:
+            namestr,cut = nameAndCut(stb, htb, srNJet, btb=(0,0), presel=SelStr+'&&nTightEl==1'+trigger, btagVar = 'nBJetMediumCSV30')
+        else:
+          namestr,cut = nameAndCut(stb, htb, srNJet, btb=(0,0), presel=SelStr, btagVar = 'nBJetMediumCSV30')
+        #cut = presel+'&&'+nJetCut(srNJet, minPt=30, maxEta=2.4)+'&&'+nBTagCut(btb, minPt=30, maxEta=2.4, minCSVTag=0.890)#+'&&'+htCut(htb, minPt=30, maxEta=2.4, njCorr=0.)#+'&&'+nJetCut(2, minPt=30, maxEta=2.4)
         
         sample["chain"].Draw(">>eList",cut) #Get the event list 'eList' which has all the events satisfying the cut
         elist = ROOT.gDirectory.Get("eList")
@@ -157,11 +162,10 @@ for i_htb, htb in enumerate(htreg):
             print "At %i of %i for sample %s"%(i,number_events,sample['name'])
 
           sample["chain"].GetEntry(elist.GetEntry(i))  #Set the chain to the current event (it's the i-th event of the eList). This is the central line in this file!
-          weight = 1
+          weight = 1.
           if sample.has_key('weight'):
             if type(sample['weight'])==type(''):
-              sampleWeight = getVarValue(sample['chain'], sample['weight'])
-              weight = (sampleWeight/sampleLumi)*lumi
+              weight = getVarValue(sample['chain'],sample['weight'])
             else:
               weight = sample['weight']
 
@@ -179,20 +183,18 @@ for i_htb, htb in enumerate(htreg):
         
         #Define and stack the histograms...
       for var in allVariables:
-        canvas = ROOT.TCanvas(var['name']+' Window',var['name']+' Window')
-        pad1 = ROOT.TPad(var['name']+' Pad',var['name']+' Pad',0.,0.,1.,1.)
-        #pad1.SetBottomMargin(0)
+        canvas = ROOT.TCanvas(var['name']+'_Window',var['name']+'_Window')
+        pad1 = ROOT.TPad(var['name']+'_Pad',var['name']+'_Pad',0.,0.3,1.,1.)
+        pad1.SetBottomMargin(0.01)
         pad1.SetLogy()
         pad1.Draw()
         pad1.cd()
-        l = ROOT.TLegend(0.65,0.85,0.98,0.95)
+        l = ROOT.TLegend(0.65,0.75,0.98,0.95)
         l.SetFillColor(0)
         l.SetBorderSize(1)
         l.SetShadowColor(ROOT.kWhite)
         stack = ROOT.THStack('stack','Stacked Histograms')
        
-#        lines = [{'pos':(0.15, 0.95),'text':'CMS Simulation',        'options':{'size':0.045}},\
-#                 {'pos':(0.7, 0.95), 'text':'L=4fb{}^{-1} (13 TeV)', 'options':{'size':0.045}}]
         text = ROOT.TLatex()
         text.SetNDC()
         text.SetTextSize(0.045)
@@ -207,7 +209,7 @@ for i_htb, htb in enumerate(htreg):
           histos[sample['name']][var['name']].GetXaxis().SetLabelSize(0.04)
           histos[sample['name']][var['name']].GetYaxis().SetLabelSize(0.04)
           stack.Add(histos[sample['name']][var['name']])
-          l.AddEntry(histos[sample['name']][var['name']], sample['name'],'f')
+          l.AddEntry(histos[sample['name']][var['name']], sample['legendName'],'f')
        
         stack.Draw('hist')
         stack.GetXaxis().SetTitle(var['legendName'])
@@ -215,10 +217,16 @@ for i_htb, htb in enumerate(htreg):
         stack.SetMinimum(10**(-1))
         stack.SetMaximum(100*stack.GetMaximum())
  
-        #for extra in extraSamples:
-        #  histos[extra['name']][var['name']].SetMarkerStyle(21)
-        #  histos[extra['name']][var['name']].Draw('same E')
-        #  l.AddEntry(histos[extra['name']][var['name']],extra['name'])
+        first = True
+        for extra in data:
+          histos[extra['name']][var['name']].SetMarkerStyle(20)
+          if first:
+            histData = histos[extra['name']][var['name']].Clone()
+            l.AddEntry(histos[extra['name']][var['name']],extra['legendName'])
+            first = False
+          else:
+            histData.Add(histos[extra['name']][var['name']])
+        histData.Draw('same ep')
        
         #for sig in allSignals:
         #  histos[sig['name']][var['name']].SetLineColor(sig['color'])
@@ -230,49 +238,49 @@ for i_htb, htb in enumerate(htreg):
        
         l.Draw()
 
-        text.DrawLatex(0.15,.96,"CMS #bf{#it{Preliminary}}")
-        text.DrawLatex(0.6,0.96,"#bf{L="+str(lumi)+" pb^{-1} (13 TeV)}")
+        text.DrawLatex(0.16,.96,"CMS #bf{#it{Preliminary}}")
+        text.DrawLatex(0.67,0.96,"#bf{L="+str(lumi)+" fb^{-1} (13 TeV)}")
         
-#        canvas.cd()
-#        pad2 = ROOT.TPad(var['name']+" Ratio",var['name']+" Ratio",0.,0.,1.,0.3)
-#        pad2.SetTopMargin(0)
-#        pad2.SetBottomMargin(0.3)
-#        pad2.Draw()
-#        pad2.cd()
-#        
-#        if var.has_key('binningIsExplicit') and var['binningIsExplicit']:
-#          histo_merge = ROOT.TH1F(var['name']+" Ratio",var['name']+" Ratio", len(var['binning'])-1, array('d', var['binning']))
-#        else:
-#          histo_merge = ROOT.TH1F(var['name']+" Ratio",var['name']+" Ratio", *var['binning'])
-#        histo_merge.Merge(stack.GetHists())
-#
-#        for sig in allSignals:
-#          h_ratio[sig['name']][var['name']] = histos[sig['name']][var['name']].Clone()
-#          h_ratio[sig['name']][var['name']].SetLineColor(sig['color'])
-#          h_ratio[sig['name']][var['name']].SetLineWidth(2)
-#        # h_ratio[sig['name']][var['name']].SetMinimum(0.0)
-#       #  h_ratio[sig['name']][var['name']].SetMaximum(0.02)
-#          h_ratio[sig['name']][var['name']].Sumw2()
-#          h_ratio[sig['name']][var['name']].SetStats(0)
-#          h_ratio[sig['name']][var['name']].Divide(histo_merge)
-#          h_ratio[sig['name']][var['name']].SetMarkerStyle(21)
-#          h_ratio[sig['name']][var['name']].Draw("ep")
-#          h_ratio[sig['name']][var['name']].GetXaxis().SetTitle(var['legendName'])
-#          h_ratio[sig['name']][var['name']].GetYaxis().SetTitle("Signal/Bkg")
-#          h_ratio[sig['name']][var['name']].GetYaxis().SetNdivisions(505)
-#          h_ratio[sig['name']][var['name']].GetYaxis().SetTitleSize(23)
-#          h_ratio[sig['name']][var['name']].GetYaxis().SetTitleFont(43)
-#          h_ratio[sig['name']][var['name']].GetYaxis().SetTitleOffset(1.8)
-#          h_ratio[sig['name']][var['name']].GetYaxis().SetLabelFont(43)
-#          h_ratio[sig['name']][var['name']].GetYaxis().SetLabelSize(20)
-#          h_ratio[sig['name']][var['name']].GetYaxis().SetLabelOffset(0.015)
-#        #  h_ratio[sig['name']][var['name']].GetXaxis().SetNdivisions(510)
-#          h_ratio[sig['name']][var['name']].GetXaxis().SetTitleSize(23)
-#          h_ratio[sig['name']][var['name']].GetXaxis().SetTitleFont(43)
-#          h_ratio[sig['name']][var['name']].GetXaxis().SetTitleOffset(3.4)
-#          h_ratio[sig['name']][var['name']].GetXaxis().SetLabelFont(43)
-#          h_ratio[sig['name']][var['name']].GetXaxis().SetLabelSize(20)
-#          h_ratio[sig['name']][var['name']].GetXaxis().SetLabelOffset(0.04)
+        canvas.cd()
+        pad2 = ROOT.TPad(var['name']+"_Ratio",var['name']+"_Ratio",0.,0.,1.,0.3)
+        pad2.SetTopMargin(0.01)
+        pad2.SetBottomMargin(0.3)
+        pad2.SetGrid()
+        pad2.Draw()
+        pad2.cd()
+        
+        if var.has_key('binningIsExplicit') and var['binningIsExplicit']:
+          histo_merge = ROOT.TH1F(var['name']+"_Ratio",var['name']+"_Ratio", len(var['binning'])-1, array('d', var['binning']))
+        else:
+          histo_merge = ROOT.TH1F(var['name']+"_Ratio",var['name']+"_Ratio", *var['binning'])
+        histo_merge.Merge(stack.GetHists())
+
+        h_ratio = histData.Clone()
+        h_ratio.SetMinimum(-0.4)
+        h_ratio.SetMaximum(2.4)
+        h_ratio.Sumw2()
+        h_ratio.SetStats(0)
+        h_ratio.Divide(histo_merge)
+        h_ratio.SetMarkerStyle(20)
+        h_ratio.SetLineStyle(1)
+        h_ratio.SetLineWidth(1)
+        h_ratio.Draw("ep")
+        h_ratio.GetXaxis().SetTitle(var['legendName'])
+        h_ratio.GetYaxis().SetTitle("Data/MC")
+        h_ratio.GetYaxis().SetNdivisions(505)
+        h_ratio.GetYaxis().SetTitleSize(23)
+        h_ratio.GetYaxis().SetTitleFont(43)
+        h_ratio.GetYaxis().SetTitleOffset(1.8)
+        h_ratio.GetYaxis().SetLabelFont(43)
+        h_ratio.GetYaxis().SetLabelSize(20)
+        h_ratio.GetYaxis().SetLabelOffset(0.015)
+        h_ratio.GetXaxis().SetNdivisions(510)
+        h_ratio.GetXaxis().SetTitleSize(23)
+        h_ratio.GetXaxis().SetTitleFont(43)
+        h_ratio.GetXaxis().SetTitleOffset(3.4)
+        h_ratio.GetXaxis().SetLabelFont(43)
+        h_ratio.GetXaxis().SetLabelSize(20)
+        h_ratio.GetXaxis().SetLabelOffset(0.04)
           
           #h_ratio2 = histos['T5Full_1500_800_100'][var['name']].Clone('h_ratio2')
           #h_ratio2.SetLineColor(signal1500['color'])
@@ -285,8 +293,8 @@ for i_htb, htb in enumerate(htreg):
           #h_ratio2.Draw("same")
          
         canvas.cd()
-        canvas.Print(wwwDir+namestr+'_'+var['name']+'.png')
-        canvas.Print(wwwDir+namestr+'_'+var['name']+'.root')
-        canvas.Print(wwwDir+namestr+'_'+var['name']+'.pdf')
+        canvas.Print(wwwDir+prefix+namestr+'_'+var['name']+'.png')
+        canvas.Print(wwwDir+prefix+namestr+'_'+var['name']+'.root')
+        canvas.Print(wwwDir+prefix+namestr+'_'+var['name']+'.pdf')
         canvas.Clear()
 
