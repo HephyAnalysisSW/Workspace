@@ -26,10 +26,11 @@ signal = False
 #path = '/data/'+username+'/Results2015/Prediction_SFTemplate_MC_fullSR_lep_3.0/'
 
 #res = pickle.load(file(path+prefix+'_estimationResults_pkl_kappa_corrected'))
-res = pickle.load(file(pickleDir+prefix+'_estimationResults_pkl_kappa_btag_corrected'))
-res = pickle.load(file(pickleDir+prefix+'_estimationResults_pkl'))
+#res = pickle.load(file(pickleDir+prefix+'_estimationResults_pkl_kappa_btag_corrected'))
+#res = pickle.load(file(pickleDir+prefix+'_estimationResults_pkl'))
+res = pickle.load(file('/data/dspitzbart/Results2015/Prediction_SFTemplate_MC_fullSR_lep_3.0/singleLeptonic_Spring15__estimationResults_pkl'))
 
-signalRegions = signalRegion3fbReduced
+signalRegions = signalRegion3fb
 #signalRegions = signalRegionCRonly
 
 
@@ -119,7 +120,7 @@ for srNJet in sorted(signalRegions):
       truth_H.SetBinContent(i,res[srNJet][stb][htb]['tot_truth'])
       truth_H.SetBinError(i,  res[srNJet][stb][htb]['tot_truth_err'])
       truth_H.GetXaxis().SetBinLabel(i, str(i))
-      pred_H.GetXaxis().SetBinLabel(i, str(i))
+      pred_H.GetXaxis().SetBinLabel(i,'#splitline{'+signalRegions[srNJet][stb][htb]['njet']+'}{#splitline{'+signalRegions[srNJet][stb][htb]['LT']+'}{'+signalRegions[srNJet][stb][htb]['HT']+'}}')
       i+=1
 
 ax = array('d',predX)
@@ -184,8 +185,8 @@ latex1.SetNDC()
 latex1.SetTextSize(0.04)
 latex1.SetTextAlign(11)
 
-latex1.DrawLatex(0.15,0.96,'CMS Simulation')
-latex1.DrawLatex(0.73,0.96,"L=1.55fb^{-1} (13TeV)")
+latex1.DrawLatex(0.15,0.96,'CMS #bf{#it{preliminary}}')
+latex1.DrawLatex(0.78,0.96,"L=2.1fb^{-1} (13TeV)")
 
 pad1.SetLogy()
 
@@ -205,9 +206,9 @@ pad2.Draw()
 pad2.cd()
 ratio.SetLineColor(ROOT.kBlack)
 ratio.SetMarkerStyle(8)
-ratio.GetXaxis().SetTitle('Signal Region #')
+#ratio.GetXaxis().SetTitle('Signal Region #')
 ratio.GetXaxis().SetTitleSize(0.13)
-ratio.GetXaxis().SetLabelSize(0.21)
+ratio.GetXaxis().SetLabelSize(0.11)
 ratio.GetXaxis().SetNdivisions(508)
 ratio.GetYaxis().SetTitle('pred./truth')
 ratio.GetYaxis().SetTitleSize(0.13)

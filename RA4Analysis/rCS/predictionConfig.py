@@ -44,17 +44,17 @@ else:
 
 
 ## signal region definition
-signalRegions = signalRegion3fbReduced
+signalRegions = signalRegion3fb
 
 
 ## weight calculations
-lumi = 1.55
-templateLumi = 1.55 # lumi that was used when template was created - if defined wrong, fixed rest backgrounds will be wrong
+lumi = 2.1
+templateLumi = 2.1 # lumi that was used when template was created - if defined wrong, fixed rest backgrounds will be wrong
 sampleLumi = 3.
 debugReweighting = False
 
 ## QCD estimation
-QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151120_QCDestimation_pkl'
+QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151120_QCDestimation_2p1fb_pkl'
 if isData: QCDestimate = pickle.load(file(QCDpickle))
 else: QCDestimate=False
 
