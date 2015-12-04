@@ -24,14 +24,7 @@ from Workspace.HEPHYPythonTools.helpers import getChunks
 from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns import *
 from btagEfficiency import *
 
-target_lumi = 3000 #pb-1
-
-defSampleStr = "TTJets_LO_HT600to800_25ns"
-
-subDir = "postProcessed_Spring15_Polarization_v1"
-
-
-bTagEffFile = '/data/dspitzbart/Results2015/MCEff_pkl'
+bTagEffFile = '/data/dspitzbart/Results2015/MCEff_skim_pkl'
 try:
   mcEffDict = pickle.load(file(bTagEffFile))
 except IOError:
@@ -45,7 +38,7 @@ separateBTagWeights = True
 defSampleStr = "TTJets_25ns"
 
 #subDir = "postProcessed_Spring15_test"
-subDir = "postProcessed_Spring15_Nov15_incl"
+subDir = "postProcessed_Spring15_btagEff_SF15"
 
 #branches to be kept for data and MC
 branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert",
@@ -111,10 +104,13 @@ if options.leptonSelection.lower()=='dilep':
   skimCond += "&&Sum$(LepGood_pt>15&&abs(LepGood_eta)<2.4)>1"
 
 if options.hadronicLeg:
-  skimCond += "&&(nGenLep+nGenTau)==0"
+  skimCond += "&&(ngenLep+ngenTau)==0"
 
 if options.manScaleFactor!=1:
-  targetlumi = targetlumi*options.manScaleFactor
+  target_lumi = target_lumi*float(options.manScaleFactor)
+  print
+  print "target lumi scaled!"
+  print "New lumi:", target_lumi
 
 if options.skim=='inc':
   skimCond = "(1)"
@@ -364,7 +360,7 @@ for isample, sample in enumerate(allSamples):
         else:
           s.weight = lumiScaleFactor*genWeight*xsectemp
 
-        nVert = t.GetLeaf('nVert').GetValue()
+        nTrueInt = t.GetLeaf('nTrueInt').GetValue()
         s.puReweight_true = 1 if sample['isData'] else PU_histo.GetBinContent(PU_histo.FindBin(nTrueInt))
         #calculatedWeight = True
         if not sample['isData']:

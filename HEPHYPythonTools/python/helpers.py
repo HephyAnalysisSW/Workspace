@@ -505,3 +505,24 @@ def calcMT(lepton, met):
     return sqrt(2.*met['pt']*lepton['pt']*(1-cos(lepton['phi'] - met['phi'])))
   else:
     return float('nan')
+
+def getPropagatedError(nums,numErrors,denums,denumErrors, returnCalcResult=False):
+  if not type(nums)==type([]): nums=[nums]
+  if not type(numErrors)==type([]): numErrors=[numErrors]
+  if not type(denums)==type([]): denums=[denums]
+  if not type(denumErrors)==type([]): denumErrors=[denumErrors]
+  numP = 1
+  denumP = 1
+  a = 0
+  for i,n in enumerate(nums):
+    numP *= n
+    a += (numErrors[i]/n)**2
+  for i,d in enumerate(denums):
+    denumP *= d
+    a += (denumErrors[i]/d)**2
+  f = numP/denumP
+  if returnCalcResult: return f, f*sqrt(a)
+  else: return f*sqrt(a)
+  
+  
+

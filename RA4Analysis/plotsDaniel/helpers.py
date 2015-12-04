@@ -17,3 +17,6 @@ def addKey(d, newDict='deltaPhiCut'):
       d[k] = addKey(v, newDict)
   return d
 
+def getValErrString(val,err, precision=3):
+  return str(round(val,precision))+' +/- '+str(round(err,precision))
+

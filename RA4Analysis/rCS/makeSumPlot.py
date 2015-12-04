@@ -13,6 +13,8 @@ from Workspace.RA4Analysis.signalRegions import *
 from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
 from array import array
 
+from predictionConfig import *
+
 ROOT.gStyle.SetOptTitle(0);
 ROOT.gStyle.SetOptStat('')
 
@@ -20,12 +22,14 @@ useWcorrection = False
 useTTcorrection = False
 signal = False
 
-prefix = 'singleLeptonic_Spring15_'
-path = '/data/'+username+'/Results2015/Prediction_SFTemplate_MC_fullSR_lep_3.0/'
+#prefix = 'singleLeptonic_Spring15_'
+#path = '/data/'+username+'/Results2015/Prediction_SFTemplate_MC_fullSR_lep_3.0/'
 
-res = pickle.load(file(path+prefix+'_estimationResults_pkl_kappa_corrected'))
+#res = pickle.load(file(path+prefix+'_estimationResults_pkl_kappa_corrected'))
+res = pickle.load(file(pickleDir+prefix+'_estimationResults_pkl_kappa_btag_corrected'))
+res = pickle.load(file(pickleDir+prefix+'_estimationResults_pkl'))
 
-signalRegions = signalRegion3fb
+signalRegions = signalRegion3fbReduced
 #signalRegions = signalRegionCRonly
 
 
@@ -63,6 +67,7 @@ w_truth_H.SetLineWidth(2)
 rest_H = ROOT.TH1F('rest_H','EWK rest', bins,0,bins)
 rest_H.SetLineColor(color('TTVH')+1)
 rest_H.SetFillColor(color('TTVH'))
+rest_H.SetLineWidth(2)
 w_truth_H.SetLineColor(color('DY'))
 
 pred_H  = ROOT.TH1F('pred_H','total pred.', bins,0,bins)
@@ -128,17 +133,18 @@ can = ROOT.TCanvas('can','can',700,700)
 
 pad1=ROOT.TPad("pad1","MyTitle",0.,0.3,1.,1.)
 pad1.SetLeftMargin(0.15)
-pad1.SetBottomMargin(0.)
+pad1.SetBottomMargin(0.02)
 pad1.Draw()
 pad1.cd()
 
 h_Stack = ROOT.THStack('h_Stack','Stack')
-h_Stack.Add(tt_pred_H)
-h_Stack.Add(w_pred_H)
 h_Stack.Add(rest_H)
+h_Stack.Add(w_pred_H)
+h_Stack.Add(tt_pred_H)
 h_Stack.SetMaximum(30)
-#h_Stack.GetYaxis().SetTitle('Signal Region #')
+h_Stack.SetMinimum(0.080)
 
+#h_Stack.GetYaxis().SetTitle('Signal Region #')
 
 truth_H.SetMaximum(20)
 truth_H.GetYaxis().SetTitle('Events')
@@ -158,6 +164,8 @@ leg.AddEntry(rest_H,'','f')
 
 h_Stack.Draw('hist')
 h_Stack.GetYaxis().SetTitle('Events')
+h_Stack.GetXaxis().SetBinLabel(1,'')
+
 h_Stack.GetYaxis().SetTitleOffset(0.8)
 h_Stack.GetYaxis().SetNdivisions(508)
 #predError = ROOT.TGraphError(pred_H)
@@ -171,6 +179,16 @@ truth_H.Draw('e1p same')
 
 leg.Draw()
 
+latex1 = ROOT.TLatex()
+latex1.SetNDC()
+latex1.SetTextSize(0.04)
+latex1.SetTextAlign(11)
+
+latex1.DrawLatex(0.15,0.96,'CMS Simulation')
+latex1.DrawLatex(0.73,0.96,"L=1.55fb^{-1} (13TeV)")
+
+pad1.SetLogy()
+
 can.cd()
 
 ratio = ROOT.TH1F('ratio','ratio',bins,0,bins)
@@ -181,7 +199,7 @@ ratio.Divide(truth_H)
 pad2=ROOT.TPad("pad2","datavsMC",0.,0.,1.,.3)
 pad2.SetLeftMargin(0.15)
 pad2.SetBottomMargin(0.3)
-pad2.SetTopMargin(0.)
+pad2.SetTopMargin(0.02)
 pad2.SetGrid()
 pad2.Draw()
 pad2.cd()
@@ -201,5 +219,4 @@ ratio.SetMaximum(2.2)
 ratio.Draw('e1p')
 
 can.cd()
-
 

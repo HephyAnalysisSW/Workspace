@@ -1,31 +1,10 @@
 from CMGTools.RootTools.samples.samples_13TeV_RunIISpring15MiniAODv2 import *
 
+# temporary solution for CMG components and cross-section of signal or samples not in the CMG sample file
+import PhysicsTools.HeppyCore.framework.config as cfg
+from Workspace.HEPHYPythonTools.xsec import xsec
+
 data_path = "/data/nrad/cmgTuples/RunII/7412pass2/RunIISpring15MiniAODv2"
-
-
-
-
-def makeSample (cmgMCcomponent,skimAnalyzerDir="skimAnalyzerCount", rootFileLocation="tree.root", treeName="tree"):
-  sample = cmgMCcomponent
-  d = {
-        "cmgMCcomp":sample,
-        "name" : sample.name,
-        "chunkString":sample.name,
-        "dir": data_path,
-        "dbsName" : sample.dataset,
-        "skimAnalyzerDir":skimAnalyzerDir,
-        "rootFileLocation":rootFileLocation,
-        "treeName":treeName,
-        'isData':sample.isData,
-        }
-  return d
-
-
-
-#for sample in samples:
-# exec(sample.name + "=makeSample(sample)")
-
-
 
 
 TTJets_LO = {\
@@ -184,11 +163,11 @@ WJetsToLNu_HT2500toInf ={\
 }
 
 
+TTJets = [TTJets_LO, TTJets_LO_HT600to800, TTJets_LO_HT800to1200, TTJets_LO_HT1200to2500, TTJets_LO_HT2500toInf]
+WJetsInc = [WJetsToLNu]
+WJetsHT  = [WJetsToLNu_HT100to200, WJetsToLNu_HT200to400, WJetsToLNu_HT400to600, WJetsToLNu_HT600toInf, WJetsToLNu_HT600to800, WJetsToLNu_HT800to1200, WJetsToLNu_HT1200to2500 , WJetsToLNu_HT2500toInf]
 
-
-samples = [TTJets_LO, TTJets_LO_HT600to800, TTJets_LO_HT800to1200, TTJets_LO_HT1200to2500, TTJets_LO_HT2500toInf] + [WJetsToLNu, WJetsToLNu_HT100to200, WJetsToLNu_HT200to400, WJetsToLNu_HT400to600, WJetsToLNu_HT600toInf, WJetsToLNu_HT600to800, WJetsToLNu_HT800to1200, WJetsToLNu_HT1200to2500] #+ [ ZJetsToNuNu_HT100to200, ZJetsToNuNu_HT200to400, ZJetsToNuNu_HT400to600, ZJetsToNuNu_HT600toInf]
-#samples = [TTJets_LO, TTJets_LO_HT600to800, TTJets_LO_HT800to1200, TTJets_LO_HT1200to2500, TTJets_LO_HT2500toInf] 
-
+samples = TTJets + WJetsInc + WJetsHT
 
 for sample in samples:
 #  print sample
@@ -196,31 +175,30 @@ for sample in samples:
   sample['dir'] = sample['dir']+"/"+sample['name']
 
 
+# signal samples
 
-
-
-
-
-
-
-
-
-
-
-
-#allSamples_Spring15 = [TTJets, DYJetsToLL_M_10to50, DYJetsToLL_M_50_HT100to200, DYJetsToLL_M_50_HT200to400, DYJetsToLL_M_50_HT400to600, DYJetsToLL_M_50_HT600toInf, WJetsToLNu_HT100to200, WJetsToLNu_HT200to400, WJetsToLNu_HT400to600, WJetsToLNu_HT600toInf, WJetsToLNu_HT600to800, WJetsToLNu_HT800to1200, WJetsToLNu_HT1200to2500, WJetsToLNu_HT2500toInf, TToLeptons_sch, TToLeptons_tch, TBar_tWch, T_tWch, QCD_MuEnriched_Pt15to20, QCD_MuEnriched_Pt20to30, QCD_MuEnriched_Pt30to50, QCD_MuEnriched_Pt50to80, QCD_MuEnriched_Pt80to120, QCD_MuEnriched_Pt120to170, QCD_MuEnriched_Pt170to300, QCD_MuEnriched_Pt300to470, QCD_MuEnriched_Pt470to600, QCD_MuEnriched_Pt600to800, QCD_MuEnriched_Pt800to1000, QCD_MuEnriched_Pt1000toInf, QCD_EMEnriched_Pt15to20, QCD_EMEnriched_Pt20to30, QCD_EMEnriched_Pt30to50, QCD_EMEnriched_Pt50to80, QCD_EMEnriched_Pt80to120, QCD_EMEnriched_Pt120to170, QCD_EMEnriched_Pt170to300, QCD_EMEnriched_Pt300toInf, QCD_bcToE_Pt15to20, QCD_bcToE_Pt20to30, QCD_bcToE_Pt30to80, QCD_bcToE_Pt80to170, QCD_bcToE_Pt170to250, QCD_bcToE_Pt250toInf, WZ, WWTo2L2Nu, ZZ, ZJetsToNuNu_HT200to400, ZJetsToNuNu_HT400to600, ZJetsToNuNu_HT600toInf, ]
-
-allSignalData=[\
-#["/data/nrad/cmgTuples/dxy0fix/T2DegStop_300_270_miniIso/T2DegStop_300_270", "T2DegStop_300_270"],
-#["/afs/hephy.at/work/n/nrad/cmgTuples/RunII/","T2DegStop_300_270"]
-[data_path+"/T2DegStop_300_270","T2DegStop_300_270"]
-]
+allSignalData=[
+    [data_path+"/T2DegStop_300_270","T2DegStop_300_270"]
+    ]
 
 
 allSignalStrings = [s[1] for s in allSignalData]
 def getSignalSample(dir, signal):
   if signal in allSignalStrings:
+     
+    # dirty way of creating a CMG component        
+    component = cfg.MCComponent(
+        dataset=signal,
+        name = signal,
+        files = [],
+        xSection = 0.0,
+        nGenEvents = 1,
+        triggers = [],
+        effCorrFactor = 1,
+        )
+      
     return {\
+      'cmgComp': component,
       "name" : signal,
       "chunkString": signal,
       'dir' : dir,
@@ -237,5 +215,9 @@ allSignals=[]
 for d,s in allSignalData:
   exec(s+"=getSignalSample('"+d+"','"+s+"')")
   exec("allSignals.append("+s+")")
+  
+for sample in allSignals:
+    sample['xsec'] = xsec[sample['dbsName']]
+    sample['cmgComp'].xSection = xsec[sample['dbsName']]
 
 

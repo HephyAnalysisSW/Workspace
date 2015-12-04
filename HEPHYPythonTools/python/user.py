@@ -26,3 +26,8 @@ if os.environ['USER'] in ['dhandl']:
   saveDir         = defaultPlotPath
   username = "dhandl"
 
+if os.environ['USER'] in ['vghete']:
+  defaultPlotPath = "/afs/hephy.at/user/v/vghete/www/"
+  saveDir         = defaultPlotPath 
+  afsDataName  = 'vghete01'
+  username = 'vghete'

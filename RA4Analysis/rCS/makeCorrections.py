@@ -61,7 +61,7 @@ for i_njb, njb in enumerate(signalRegions):
         cname1bCRtt, cut1bCRtt = nameAndCut(stb,htb,(4,5), btb=(1,1) ,presel=presel)
         cname0bCRtt, cut0bCRtt = nameAndCut(stb,htb,(4,5), btb=(0,0) ,presel=presel)
         cnameCRtt, cutCRtt = nameAndCut(stb,htb,(4,5), btb=(0,-1) ,presel=presel)
-        rcs1bCRtt = getRCS(cEWK, cut1bCRtt, dPhiCut)
+        rcs1bCRtt = getRCS(cBkg, cut1bCRtt, dPhiCut)
         rcs0bCRtt = getRCS(cTTJets, cut0bCRtt, dPhiCut)
         samples = [{'chain':cWJets, 'cut':cutCRtt, 'weight':'weight*weightBTag1'}, {'chain':cTTJets, 'cut':cutCRtt, 'weight':'weight*weightBTag1'},{'chain':cDY, 'cut':cut1bCRtt, 'weight':'weight'},{'chain':cTTV, 'cut':cut1bCRtt, 'weight':'weight'},{'chain':csingleTop, 'cut':cut1bCRtt, 'weight':'weight'}]
         rcs1bCRtt_btag = combineRCS(samples, dPhiCut)

@@ -25,7 +25,19 @@ def getTemplate(cutName, path, sampleName):
   else:
     print 'Could NOT find template at:',path,', creating new template now!'
     return {'hist':temp, 'loadTemp':False}
-  
+ 
+def getRandomHistOfTemplate(hist, color=ROOT.kOrange):
+  h = ROOT.TH1F()
+  hist.Copy(h)
+  h.Reset()
+  h.Sumw2()
+  h.SetLineColor(color)
+  h.FillRandom(hist, int(hist.GetEntries()))
+  h.Scale(1./h.Integral()*hist.Integral())
+  res = h.Clone()
+  del h
+  return res
+ 
 #combine different Rcs values, where samples should look sth like this: [{'chain':c, 'cut':c, 'weight':w},...]
 def combineRCS(samples, dPhiCut):
   totalCRYield = 0.
