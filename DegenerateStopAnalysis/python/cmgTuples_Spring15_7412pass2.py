@@ -165,7 +165,16 @@ WJetsToLNu_HT2500toInf ={\
 
 TTJets = [TTJets_LO, TTJets_LO_HT600to800, TTJets_LO_HT800to1200, TTJets_LO_HT1200to2500, TTJets_LO_HT2500toInf]
 WJetsInc = [WJetsToLNu]
-WJetsHT  = [WJetsToLNu_HT100to200, WJetsToLNu_HT200to400, WJetsToLNu_HT400to600, WJetsToLNu_HT600toInf, WJetsToLNu_HT600to800, WJetsToLNu_HT800to1200, WJetsToLNu_HT1200to2500 , WJetsToLNu_HT2500toInf]
+WJetsHT  = [
+    WJetsToLNu_HT100to200, 
+    WJetsToLNu_HT200to400, 
+    WJetsToLNu_HT400to600, 
+    WJetsToLNu_HT600toInf, 
+    WJetsToLNu_HT600to800, 
+    WJetsToLNu_HT800to1200, 
+    WJetsToLNu_HT1200to2500 , 
+    WJetsToLNu_HT2500toInf,
+    ]
 
 samples = TTJets + WJetsInc + WJetsHT
 
