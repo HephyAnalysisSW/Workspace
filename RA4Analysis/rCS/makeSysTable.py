@@ -20,22 +20,28 @@ signal = False
 prefix = 'singleLeptonic_Spring15_'
 #path1 = '/data/'+username+'/Results2015/Prediction_bweightTemplate_data_reducedSR_lep_1.26/'
 #path2 = '/data/'+username+'/Results2015/Prediction_bweightTemplate_MC_reducedSR_lep_3.0/'
-path1 = '/data/'+username+'/Results2015/Prediction_SFTemplate_MC_fullSR_lep_3.0/'
-path2 = '/data/'+username+'/Results2015/Prediction_SFTemplate_MC_fullSR_lep_3.0_b_Up/'
-path3 = '/data/'+username+'/Results2015/Prediction_SFTemplate_MC_fullSR_lep_3.0_b_Down/'
-path4 = '/data/'+username+'/Results2015/Prediction_SFTemplate_MC_fullSR_lep_3.0_light_Up/'
-path5 = '/data/'+username+'/Results2015/Prediction_SFTemplate_MC_fullSR_lep_3.0_light_Down/'
 
+pdata1 = '/data/'+username+'/Results2015/Prediction_data_newSR_lep_SFtemplates_1.55/'
+pmc1 = '/data/'+username+'/Results2015/Prediction_MCwSF_newSR_lep_SFtemplates_1.55/'
+pdata2 = '/data/'+username+'/Results2015/Prediction_data_newSR_lep_SFtemplates_1.26/'
+#path1 = '/data/'+username+'/Results2015/Prediction_SFTemplate_MC_fullSR_lep_3.0/'
+#path2 = '/data/'+username+'/Results2015/Prediction_SFTemplate_MC_fullSR_lep_3.0_b_Up/'
+#path3 = '/data/'+username+'/Results2015/Prediction_SFTemplate_MC_fullSR_lep_3.0_b_Down/'
+#path4 = '/data/'+username+'/Results2015/Prediction_SFTemplate_MC_fullSR_lep_3.0_light_Up/'
+#path5 = '/data/'+username+'/Results2015/Prediction_SFTemplate_MC_fullSR_lep_3.0_light_Down/'
 
-nominal = pickle.load(file(path1+prefix+'_estimationResults_pkl_kappa_corrected'))
-b_up = pickle.load(file(path2+prefix+'_estimationResults_pkl_kappa_corrected'))
-b_down = pickle.load(file(path3+prefix+'_estimationResults_pkl_kappa_corrected'))
-light_up = pickle.load(file(path4+prefix+'_estimationResults_pkl_kappa_corrected'))
-light_down = pickle.load(file(path5+prefix+'_estimationResults_pkl_kappa_corrected'))
+data1 = pickle.load(file(pdata1+prefix+'_estimationResults_pkl'))
+data2 = pickle.load(file(pdata2+prefix+'_estimationResults_pkl'))
+mc1 = pickle.load(file(pmc1+prefix+'_estimationResults_pkl'))
+#nominal = pickle.load(file(path1+prefix+'_estimationResults_pkl_kappa_corrected'))
+#b_up = pickle.load(file(path2+prefix+'_estimationResults_pkl_kappa_corrected'))
+#b_down = pickle.load(file(path3+prefix+'_estimationResults_pkl_kappa_corrected'))
+#light_up = pickle.load(file(path4+prefix+'_estimationResults_pkl_kappa_corrected'))
+#light_down = pickle.load(file(path5+prefix+'_estimationResults_pkl_kappa_corrected'))
 
-
+pkls = [data1,data2,mc1]
 #pkls = [res1,res2,res3,res4,res5]
-pkls = [nominal, b_up, b_down, light_up, light_down]
+#pkls = [nominal, b_up, b_down, light_up, light_down]
 
 if useTTcorrection: kcs = pickle.load(file('/data/dspitzbart/Spring15/25ns/rCS_0b_3.0/correction_pkl'))
 if useWcorrection:
@@ -63,7 +69,7 @@ if signal:
     s['chain'] = getChain(s['sample'],histname='')
 
 
-signalRegions = signalRegion3fb
+signalRegions = signalRegion3fbReduced
 #signalRegions = signalRegionCRonly
 
 rowsNJet = {}
@@ -144,162 +150,193 @@ bkgs = ['W','tt','Rest']
 keys = [['CR','bTagFit_fractions_CR'],['SR','bTagFit_fractions_SR']]
 
 
-varUp = []
-varDown = []
-signDown = 1
-signUp = 1
+#varUp = []
+#varDown = []
+#signDown = 1
+#signUp = 1
+#
+#Up_H  = ROOT.TH1F('Up_H','total Up',bins,0,bins)
+#Down_H  = ROOT.TH1F('Down_H','total Down',bins,0,bins)
+#b_Up_H  = ROOT.TH1F('b_Up_H','b Up',bins,0,bins)
+#b_Down_H  = ROOT.TH1F('b_Down_H','b Down',bins,0,bins)
+#light_Up_H  = ROOT.TH1F('light_Up_H','light Up',bins,0,bins)
+#light_Down_H  = ROOT.TH1F('light_Down_H','light Down',bins,0,bins)
+#
+#max_H = ROOT.TH1F('max_H','total max',bins,0,bins)
+#min_H = ROOT.TH1F('min_H','total min',bins,0,bins)
+#zero_H = ROOT.TH1F('zero_H','zero',bins,0,bins)
+#
+#for keyName, fitkey in keys:
+#  for charge in charges:
+#    for bkg in bkgs:
+#      i=1
+#      b_varUp = []
+#      b_varDown = []
+#      b_signDown = 1
+#      b_signUp = 1
+#      light_varUp = []
+#      light_varDown = []
+#      light_signDown = 1
+#      light_signUp = 1
+#      varUp = []
+#      varDown = []
+#      signDown = 1
+#      signUp = 1
+#      for i_njb, srNJet in enumerate(sorted(signalRegions)):
+#        for stb in sorted(signalRegions[srNJet]):
+#          for htb in sorted(signalRegions[srNJet][stb]):
+#            print
+#            print '#############################################'
+#            print 'bin: \t njet \t\t LT \t\t HT'
+#            if len(str(srNJet))<7:
+#              print '\t',srNJet,'\t\t',stb,'\t',htb
+#            else:
+#              print '\t',srNJet,'\t',stb,'\t',htb
+#            print
+#            light_upDiff   = (light_up[srNJet][stb][htb][fitkey][charge][bkg]-nominal[srNJet][stb][htb][fitkey][charge][bkg])/nominal[srNJet][stb][htb][fitkey][charge][bkg]
+#            light_downDiff = (light_down[srNJet][stb][htb][fitkey][charge][bkg]-nominal[srNJet][stb][htb][fitkey][charge][bkg])/nominal[srNJet][stb][htb][fitkey][charge][bkg]
+#            print 'light up, down:', light_upDiff, light_downDiff
+#            b_upDiff   = (b_up[srNJet][stb][htb][fitkey][charge][bkg]-nominal[srNJet][stb][htb][fitkey][charge][bkg])/nominal[srNJet][stb][htb][fitkey][charge][bkg]
+#            b_downDiff = (b_down[srNJet][stb][htb][fitkey][charge][bkg]-nominal[srNJet][stb][htb][fitkey][charge][bkg])/nominal[srNJet][stb][htb][fitkey][charge][bkg]
+#            print 'b up, down:', b_upDiff, b_downDiff
+#            if sign(b_upDiff) != sign(light_upDiff): print '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11'
+#            upDiff = sqrt(light_upDiff**2 + b_upDiff**2)
+#            downDiff = sqrt(light_downDiff**2 + b_downDiff**2)
+#            print 'total up, down:', upDiff, downDiff
+#            Up_H.SetBinContent(i,sign(b_upDiff)*upDiff)
+#            Up_H.GetXaxis().SetBinLabel(i,str(i))
+#            Down_H.SetBinContent(i,sign(b_downDiff)*downDiff)
+#            
+#            b_Up_H.SetBinContent(i,b_upDiff)
+#            b_Down_H.SetBinContent(i,b_downDiff)
+#            light_Up_H.SetBinContent(i,light_upDiff)
+#            light_Down_H.SetBinContent(i,light_downDiff)
+#            
+#            b_varUp.append(b_upDiff)
+#            b_varDown.append(b_downDiff)
+#            light_varUp.append(light_upDiff)
+#            light_varDown.append(light_downDiff)
+#            varUp.append(upDiff)
+#            varDown.append(downDiff)
+#            i += 1
+#      can = ROOT.TCanvas('can','can',700,700)
+#      
+#      b_maxDown = max(map(abs,b_varDown))
+#      if b_varDown[0]<0: b_signDown = -1
+#      b_maxUp = max(map(abs,b_varUp))
+#      if b_varUp[0]<0: b_signUp = -1
+#      
+#      light_maxDown = max(map(abs,light_varDown))
+#      if light_varDown[0]<0: light_signDown = -1
+#      light_maxUp = max(map(abs,light_varUp))
+#      if light_varUp[0]<0: light_signUp = -1
+#      
+#      maxDown = max(map(abs,varDown))
+#      maxUp = max(map(abs,varUp))
+#      totalMax = max(map(abs,[maxDown,maxUp]))
+#      print
+#      print 'Max. change to nominal for b variation up:',b_maxUp*b_signUp
+#      print 'Max. change to nominal for b variation down:',b_maxDown*b_signDown
+#      print 'Max. change to nominal for light variation up:',light_maxUp*light_signUp
+#      print 'Max. change to nominal for light variation down:',light_maxDown*light_signDown
+#      print 'Max. change to nominal for total variation up:',maxUp*b_signUp
+#      print 'Max. change to nominal for total variation down:',maxDown*b_signDown
+#      
+#      Up_H.GetXaxis().SetTitle('Signal Region #')
+#      Up_H.GetXaxis().SetTitleSize(0.05)
+#      Up_H.GetXaxis().SetTitleOffset(1.0)
+#      Up_H.GetXaxis().SetLabelSize(0.08)
+#      
+#      Up_H.GetYaxis().SetTitle('#delta_{k}')
+#      
+#      Up_H.SetMinimum(-(2*totalMax))
+#      Up_H.SetMaximum((2*totalMax))
+#      Up_H.SetFillColor(ROOT.kGray)
+#      Up_H.SetMarkerStyle(0)
+#      Down_H.SetFillColor(ROOT.kGray)
+#      Up_H.SetLineColor(ROOT.kBlack)
+#      Up_H.SetLineWidth(2)
+#      Down_H.SetLineColor(ROOT.kBlack)
+#      Down_H.SetLineWidth(2)
+#      b_Up_H.SetLineColor(ROOT.kOrange+8)
+#      b_Up_H.SetMarkerStyle(0)
+#      b_Up_H.SetLineWidth(2)
+#      b_Down_H.SetLineColor(ROOT.kOrange+8)
+#      b_Down_H.SetLineWidth(2)
+#      light_Up_H.SetLineColor(ROOT.kBlue)
+#      light_Up_H.SetMarkerStyle(0)
+#      light_Up_H.SetLineWidth(2)
+#      light_Down_H.SetLineColor(ROOT.kBlue)
+#      light_Down_H.SetLineWidth(2)
+#      
+#      for i in range(1,bins+1):
+#        max_H.SetBinContent(i,maxUp*b_signUp)
+#        min_H.SetBinContent(i,maxDown*b_signDown)
+#        zero_H.SetBinContent(i,0)
+#      max_H.SetLineStyle(3)
+#      min_H.SetLineStyle(3)
+#      
+#      Up_H.Draw()
+#      Down_H.Draw('same')
+#      b_Up_H.Draw('same')
+#      b_Down_H.Draw('same')
+#      light_Up_H.Draw('same')
+#      light_Down_H.Draw('same')
+#      max_H.Draw('same')
+#      min_H.Draw('same')
+#      zero_H.Draw('same')
+#      can.RedrawAxis()
+#      
+#      leg = ROOT.TLegend(0.65,0.78,0.98,0.95)
+#      leg.SetFillColor(ROOT.kWhite)
+#      leg.SetShadowColor(ROOT.kWhite)
+#      leg.SetBorderSize(1)
+#      leg.SetTextSize(0.045)
+#      leg.AddEntry(Up_H,'total')
+#      leg.AddEntry(b_Up_H,'b/c var')
+#      leg.AddEntry(light_Up_H,'light var')
+#      leg.Draw()
+#      can.Print(path+keyName+'_'+charge+'_'+bkg+'.png')
+#      can.Print(path+keyName+'_'+charge+'_'+bkg+'.root')
 
-Up_H  = ROOT.TH1F('Up_H','total Up',bins,0,bins)
-Down_H  = ROOT.TH1F('Down_H','total Down',bins,0,bins)
-b_Up_H  = ROOT.TH1F('b_Up_H','b Up',bins,0,bins)
-b_Down_H  = ROOT.TH1F('b_Down_H','b Down',bins,0,bins)
-light_Up_H  = ROOT.TH1F('light_Up_H','light Up',bins,0,bins)
-light_Down_H  = ROOT.TH1F('light_Down_H','light Down',bins,0,bins)
 
-max_H = ROOT.TH1F('max_H','total max',bins,0,bins)
-min_H = ROOT.TH1F('min_H','total min',bins,0,bins)
-zero_H = ROOT.TH1F('zero_H','zero',bins,0,bins)
+
+
+#fitkey = 'fit_crNJet_lowDPhi'
+#fitkey = 'fit_srNJet_lowDPhi'
+
 
 for keyName, fitkey in keys:
   for charge in charges:
     for bkg in bkgs:
-      i=1
-      b_varUp = []
-      b_varDown = []
-      b_signDown = 1
-      b_signUp = 1
-      light_varUp = []
-      light_varDown = []
-      light_signDown = 1
-      light_signUp = 1
-      varUp = []
-      varDown = []
-      signDown = 1
-      signUp = 1
-      for i_njb, srNJet in enumerate(sorted(signalRegions)):
-        for stb in sorted(signalRegions[srNJet]):
-          for htb in sorted(signalRegions[srNJet][stb]):
-            print
-            print '#############################################'
-            print 'bin: \t njet \t\t LT \t\t HT'
-            if len(str(srNJet))<7:
-              print '\t',srNJet,'\t\t',stb,'\t',htb
-            else:
-              print '\t',srNJet,'\t',stb,'\t',htb
-            print
-            light_upDiff   = (light_up[srNJet][stb][htb][fitkey][charge][bkg]-nominal[srNJet][stb][htb][fitkey][charge][bkg])/nominal[srNJet][stb][htb][fitkey][charge][bkg]
-            light_downDiff = (light_down[srNJet][stb][htb][fitkey][charge][bkg]-nominal[srNJet][stb][htb][fitkey][charge][bkg])/nominal[srNJet][stb][htb][fitkey][charge][bkg]
-            print 'light up, down:', light_upDiff, light_downDiff
-            b_upDiff   = (b_up[srNJet][stb][htb][fitkey][charge][bkg]-nominal[srNJet][stb][htb][fitkey][charge][bkg])/nominal[srNJet][stb][htb][fitkey][charge][bkg]
-            b_downDiff = (b_down[srNJet][stb][htb][fitkey][charge][bkg]-nominal[srNJet][stb][htb][fitkey][charge][bkg])/nominal[srNJet][stb][htb][fitkey][charge][bkg]
-            print 'b up, down:', b_upDiff, b_downDiff
-            if sign(b_upDiff) != sign(light_upDiff): print '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11'
-            upDiff = sqrt(light_upDiff**2 + b_upDiff**2)
-            downDiff = sqrt(light_downDiff**2 + b_downDiff**2)
-            print 'total up, down:', upDiff, downDiff
-            Up_H.SetBinContent(i,sign(b_upDiff)*upDiff)
-            Up_H.GetXaxis().SetBinLabel(i,str(i))
-            Down_H.SetBinContent(i,sign(b_downDiff)*downDiff)
-            
-            b_Up_H.SetBinContent(i,b_upDiff)
-            b_Down_H.SetBinContent(i,b_downDiff)
-            light_Up_H.SetBinContent(i,light_upDiff)
-            light_Down_H.SetBinContent(i,light_downDiff)
-            
-            b_varUp.append(b_upDiff)
-            b_varDown.append(b_downDiff)
-            light_varUp.append(light_upDiff)
-            light_varDown.append(light_downDiff)
-            varUp.append(upDiff)
-            varDown.append(downDiff)
-            i += 1
-      can = ROOT.TCanvas('can','can',700,700)
-      
-      b_maxDown = max(map(abs,b_varDown))
-      if b_varDown[0]<0: b_signDown = -1
-      b_maxUp = max(map(abs,b_varUp))
-      if b_varUp[0]<0: b_signUp = -1
-      
-      light_maxDown = max(map(abs,light_varDown))
-      if light_varDown[0]<0: light_signDown = -1
-      light_maxUp = max(map(abs,light_varUp))
-      if light_varUp[0]<0: light_signUp = -1
-      
-      maxDown = max(map(abs,varDown))
-      maxUp = max(map(abs,varUp))
-      totalMax = max(map(abs,[maxDown,maxUp]))
       print
-      print 'Max. change to nominal for b variation up:',b_maxUp*b_signUp
-      print 'Max. change to nominal for b variation down:',b_maxDown*b_signDown
-      print 'Max. change to nominal for light variation up:',light_maxUp*light_signUp
-      print 'Max. change to nominal for light variation down:',light_maxDown*light_signDown
-      print 'Max. change to nominal for total variation up:',maxUp*b_signUp
-      print 'Max. change to nominal for total variation down:',maxDown*b_signDown
-      
-      Up_H.GetXaxis().SetTitle('Signal Region #')
-      Up_H.GetXaxis().SetTitleSize(0.05)
-      Up_H.GetXaxis().SetTitleOffset(1.0)
-      Up_H.GetXaxis().SetLabelSize(0.08)
-      
-      Up_H.GetYaxis().SetTitle('#delta_{k}')
-      
-      Up_H.SetMinimum(-(2*totalMax))
-      Up_H.SetMaximum((2*totalMax))
-      Up_H.SetFillColor(ROOT.kGray)
-      Up_H.SetMarkerStyle(0)
-      Down_H.SetFillColor(ROOT.kGray)
-      Up_H.SetLineColor(ROOT.kBlack)
-      Up_H.SetLineWidth(2)
-      Down_H.SetLineColor(ROOT.kBlack)
-      Down_H.SetLineWidth(2)
-      b_Up_H.SetLineColor(ROOT.kOrange+8)
-      b_Up_H.SetMarkerStyle(0)
-      b_Up_H.SetLineWidth(2)
-      b_Down_H.SetLineColor(ROOT.kOrange+8)
-      b_Down_H.SetLineWidth(2)
-      light_Up_H.SetLineColor(ROOT.kBlue)
-      light_Up_H.SetMarkerStyle(0)
-      light_Up_H.SetLineWidth(2)
-      light_Down_H.SetLineColor(ROOT.kBlue)
-      light_Down_H.SetLineWidth(2)
-      
-      for i in range(1,bins+1):
-        max_H.SetBinContent(i,maxUp*b_signUp)
-        min_H.SetBinContent(i,maxDown*b_signDown)
-        zero_H.SetBinContent(i,0)
-      max_H.SetLineStyle(3)
-      min_H.SetLineStyle(3)
-      
-      Up_H.Draw()
-      Down_H.Draw('same')
-      b_Up_H.Draw('same')
-      b_Down_H.Draw('same')
-      light_Up_H.Draw('same')
-      light_Down_H.Draw('same')
-      max_H.Draw('same')
-      min_H.Draw('same')
-      zero_H.Draw('same')
-      can.RedrawAxis()
-      
-      leg = ROOT.TLegend(0.65,0.78,0.98,0.95)
-      leg.SetFillColor(ROOT.kWhite)
-      leg.SetShadowColor(ROOT.kWhite)
-      leg.SetBorderSize(1)
-      leg.SetTextSize(0.045)
-      leg.AddEntry(Up_H,'total')
-      leg.AddEntry(b_Up_H,'b/c var')
-      leg.AddEntry(light_Up_H,'light var')
-      leg.Draw()
-      can.Print(path+keyName+'_'+charge+'_'+bkg+'.png')
-      can.Print(path+keyName+'_'+charge+'_'+bkg+'.root')
+      #print keyName, charge, bkg
+      #print
+      print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrr|rrr|}\\hline'
+      print ' \\njet     & \ST & \HT     &\multicolumn{9}{c|}{'+bkg+' '+charge+' PDG}\\\%\hline'
+      print ' & $[$GeV$]$ &$[$GeV$]$ & \multicolumn{3}{c}{data, 2015SF} & \multicolumn{3}{c}{data, 2012SF} & \multicolumn{3}{c|}{MC}  \\\\\hline'
+      secondLine = False
+      for srNJet in sorted(signalRegions):
+        print '\\hline'
+        if secondLine: print '\\hline'
+        secondLine = True
+        print '\multirow{'+str(rowsNJet[srNJet]['n'])+'}{*}{\\begin{sideways}$'+varBin(srNJet)+'$\end{sideways}}'
+        for stb in sorted(signalRegions[srNJet]):
+          print '&\multirow{'+str(rowsSt[srNJet][stb]['n'])+'}{*}{$'+varBin(stb)+'$}'
+          first = True
+          for htb in sorted(signalRegions[srNJet][stb]):
+            if not first: print '&'
+            first = False
+            print '&$'+varBin(htb)+'$'
+            print ' & ' + getNumString(data1[srNJet][stb][htb][fitkey][charge][bkg], sqrt(data1[srNJet][stb][htb][fitkey][charge][bkg+'_var'])) \
+                + ' & ' + getNumString(data2[srNJet][stb][htb][fitkey][charge][bkg],   sqrt(data2[srNJet][stb][htb][fitkey][charge][bkg+'_var'])) \
+                + ' & ' + getNumString(mc1[srNJet][stb][htb][fitkey][charge][bkg], sqrt(mc1[srNJet][stb][htb][fitkey][charge][bkg+'_var'])) +'\\\\'
+
+            if htb[1] == -1 : print '\\cline{2-12}'
+      if keyName == 'CR': print '\\hline\end{tabular}}\end{center}\caption{Fractions of background obtained from a b-tag multiplicity fit for calculating W Rcs (3-4 jets) using MC (templates using b-tag weights) with varied SFs}\label{tab:fitFractions'+bkg+charge+keyName+'}\end{table}'
+      if keyName == 'SR': print '\\hline\end{tabular}}\end{center}\caption{Fractions of background obtained from a b-tag multiplicity fit for obtaining the final background prediction using MC (templates using b-tag weights) with varied SFs}\label{tab:fitFractions'+bkg+charge+keyName+'}\end{table}'
 
 
-
-
-##fitkey = 'fit_crNJet_lowDPhi'
-#fitkey = 'fit_srNJet_lowDPhi'
-#
-#
 #for keyName, fitkey in keys:
 #  for charge in charges:
 #    for bkg in bkgs:

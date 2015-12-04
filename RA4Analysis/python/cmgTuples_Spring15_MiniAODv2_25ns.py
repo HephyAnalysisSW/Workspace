@@ -15,7 +15,7 @@ TTJets_SingleLeptonFromT_full = {\
 "name" : "TTJets_SingleLeptonFromT_full",
 "chunkString":"TTJets_SingleLeptonFromT_full",
 "dir": path,
-"dbsName" : "",
+"dbsName" : "/TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM",
 "skimAnalyzerDir":"skimAnalyzerCount",
 "rootFileLocation":"/treeProducerSusySingleLepton/tree.root",
 "treeName":"tree",
@@ -25,7 +25,7 @@ TTJets_SingleLeptonFromTbar_full = {\
 "name" : "TTJets_SingleLeptonFromTbar_full",
 "chunkString":"TTJets_SingleLeptonFromTbar_full",
 "dir": path,
-"dbsName" : "",
+"dbsName" : "/TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/MINIAODSIM",
 "skimAnalyzerDir":"skimAnalyzerCount",
 "rootFileLocation":"/treeProducerSusySingleLepton/tree.root",
 "treeName":"tree",
@@ -35,7 +35,7 @@ TTJets_DiLepton_full = {\
 "name" : "TTJets_DiLepton_full",
 "chunkString":"TTJets_DiLepton_full",
 "dir": path,
-"dbsName" : "",
+"dbsName" : "/TTJets_DiLept_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/MINIAODSIM",
 "skimAnalyzerDir":"skimAnalyzerCount",
 "rootFileLocation":"/treeProducerSusySingleLepton/tree.root",
 "treeName":"tree",
@@ -50,6 +50,7 @@ TTJets_LO = {\
 "rootFileLocation":"/treeProducerSusySingleLepton/tree.root",
 "treeName":"tree",
 'isData':False,
+'postProcessingCut':"lheHTIncoming<600",
 }
 
 TTJets_LO_HT600to800_25ns={\
