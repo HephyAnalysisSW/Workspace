@@ -22,13 +22,13 @@ useWcorrection = False
 useTTcorrection = False
 signal = False
 
-#prefix = 'singleLeptonic_Spring15_'
+prefix = 'singleLeptonic_Spring15_'
 #path = '/data/'+username+'/Results2015/Prediction_SFTemplate_MC_fullSR_lep_3.0/'
 
 #res = pickle.load(file(path+prefix+'_estimationResults_pkl_kappa_corrected'))
-#res = pickle.load(file(pickleDir+prefix+'_estimationResults_pkl_kappa_btag_corrected'))
+res = pickle.load(file(pickleDir+prefix+'_estimationResults_pkl_kappa_btag_corrected'))
 #res = pickle.load(file(pickleDir+prefix+'_estimationResults_pkl'))
-res = pickle.load(file('/data/dspitzbart/Results2015/Prediction_SFTemplate_MC_fullSR_lep_3.0/singleLeptonic_Spring15__estimationResults_pkl'))
+#res = pickle.load(file('/data/dspitzbart/Results2015/Prediction_SFTemplate_MC_fullSR_lep_3.0/singleLeptonic_Spring15__estimationResults_pkl'))
 
 signalRegions = signalRegion3fb
 #signalRegions = signalRegionCRonly
