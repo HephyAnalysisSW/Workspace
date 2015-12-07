@@ -252,7 +252,7 @@ for isample, sample in enumerate(allSamples):
         genWeight = 1 if sample['isData'] else t.GetLeaf('genWeight').GetValue()
         s.weight = lumiScaleFactor*genWeight
 
-        nVert = t.GetLeaf('nVert').GetValue()
+        nTrueInt = t.GetLeaf('nTrueInt').GetValue()
         s.puReweight_true = 1 if sample['isData'] else PU_histo.GetBinContent(PU_histo.FindBin(nTrueInt))
         #calculatedWeight = True
         if not sample['isData']:
