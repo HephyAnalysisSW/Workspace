@@ -1,6 +1,7 @@
 import copy, os, sys
 #dir  = '/data/easilar/cmgTuples/postProcessed_miniAODv2_fix//HT500LT250/hard/'
-dir = '/data/easilar/cmgTuples/postProcessed_miniAODv2_2100pb/HT500LT250/hard/'
+#dir = '/data/easilar/cmgTuples/postProcessed_miniAODv2_2100pb/HT500LT250/hard/'
+dir = '/data/easilar/cmgTuples/postProcessed_data_miniAODv2_2100pb_vetoEventsFix/'
 
 single_mu_Run2015D = {\
 "name" : "single_mu_Run215D",
