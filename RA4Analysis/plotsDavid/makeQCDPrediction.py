@@ -23,8 +23,8 @@ preprefix = 'QCDestimation/final2p1fb/MC'
 wwwDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/RunII/Spring15_25ns/'+preprefix+'/'
 picklePath = '/data/'+username+'/results2015/QCDEstimation/'
 prefix = 'Lp_singleElectronic_'
-picklePresel = '20151201_QCDestimation_MC2p1fb_pkl'
-pickleFit    = '20151201_fitResult_MC2p1fb_pkl'
+picklePresel = '20151208_QCDestimation_MC2p1fb_pkl'
+pickleFit    = '20151208_fitResult_MC2p1fb_pkl'
 
 if not os.path.exists(wwwDir):
   os.makedirs(wwwDir)
@@ -97,7 +97,7 @@ def makeWeight(lumi=3., sampleLumi=3.,debug=False):
     weight_err_str = '('+weight_str+'*'+weight_str+')'
     return weight_str, weight_err_str
 lumi = 2.11
-sampleLumi = 1.55
+sampleLumi = 2.11
 debugReweighting = True
 weight_str, weight_err_str = makeWeight(lumi, sampleLumi=sampleLumi, debug=debugReweighting)
 
@@ -141,15 +141,9 @@ filters = "&&Flag_goodVertices && Flag_HBHENoiseFilter_fix && Flag_CSCTightHaloF
 #filters = "&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFilter_fix&&Flag_HBHENoiseFilter&&Flag_goodVertices&&Flag_eeBadScFilter&&Flag_EcalDeadCellTriggerPrimitiveFilter"
 #filters = "&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFilter_fix&&Flag_HBHENoiseIsoFilter&&Flag_goodVertices&&Flag_eeBadScFilter"
 
-#antiSelStr = '(abs(LepGood_pdgId)==11&&LepGood_pt>=10&&abs(LepGood_eta)<=2.5&&LepGood_SPRING15_25ns_v1>=1&&LepGood_SPRING15_25ns_v1<3)'
-#SelStr = '(abs(LepGood_pdgId)==11&&LepGood_pt>=10&&LepGood_miniRelIso<0.1&&abs(LepGood_eta)<=2.5&&LepGood_SPRING15_25ns_v1>=4)'
-#singleElectronVeto = '((Sum$(abs(LepGood_pdgId)==13&&LepGood_pt>=10)==0)&&(Sum$(abs(LepGood_pdgId)==11&&LepGood_pt>=10&&abs(LepGood_eta)<=2.5&&!('+SelStr+'))==0))'
-#singleElectronVetoAnti = '((Sum$(abs(LepGood_pdgId)==13&&LepGood_pt>=10)==0)&&(Sum$(abs(LepGood_pdgId)==11&&LepGood_pt>=10&&abs(LepGood_eta)<=2.5&&!('+antiSelStr+'))==0))'
-#singleHardElectron = '((Sum$('+antiSelStr+'||'+SelStr+')==1)&&LepGood_pt[0]>=25)'
-
 presel = 'nLep==1&&nVeto==0&&nEl==1&&leptonPt>25&&Jet2_pt>80'
-antiSelStr = presel+filters+'&&Selected==-1'
-SelStr = presel+filters+'&&Selected==1'
+antiSelStr = presel+'&&Selected==(-1)'
+SelStr = presel+'&&Selected==1'
 
 cQCD  = getChain(QCDHT_25ns,histname='')
 cEWK  = getChain([WJetsHTToLNu_25ns, TTJets_combined_2, singleTop_25ns, DY_25ns, TTV_25ns],histname='')
@@ -159,7 +153,7 @@ cData = getChain([QCDHT_25ns, WJetsHTToLNu_25ns, TTJets_combined_2, singleTop_25
 #get template for fit method
 template_QCD = ROOT.TH1F('template_QCD','template_QCD',30,-0.5,2.5)
 templateName, templateCut = nameAndCut((250,-1), (500,-1), (3,4), (0,0), presel=antiSelStr, charge="", btagVar = 'nBJetMediumCSV30')
-#cData.Draw('Lp>>template_QCD','('+templateCut+trigger+')','goff')
+#cData.Draw('Lp>>template_QCD','('+templateCut+trigger+filters+')','goff')
 cData.Draw('Lp>>template_QCD','('+weight_str+')*('+templateCut+')','goff')
 
 histos = {}
@@ -200,13 +194,13 @@ for crNJet in sorted(fitCR):
       cQCD.Draw('Lp>>QCD_Selection','('+weight_str+')*('+SelCut+')')
       cEWK.Draw('Lp>>EWK_antiSelection','('+weight_str+')*('+antiSelCut+')')
       cEWK.Draw('Lp>>EWK_Selection','('+weight_str+')*('+SelCut+')')
-#      cData.Draw('Lp>>DATA_antiSelection','('+antiSelCut+trigger+')')
+#      cData.Draw('Lp>>DATA_antiSelection','('+antiSelCut+trigger+filters+')')
       cData.Draw('Lp>>DATA_antiSelection','('+weight_str+')*('+antiSelCut+')')
-#      cData.Draw('Lp>>DATA_Selection','('+SelCut+trigger+')')
+#      cData.Draw('Lp>>DATA_Selection','('+SelCut+trigger+filters+')')
       cData.Draw('Lp>>DATA_Selection','('+weight_str+')*('+SelCut+')')
 
-#      rCSanti = getRCS(cData, antiSelCut, deltaPhiCut, useWeight = False, weight = weight_str)
-#      rCSsel = getRCS(cData, SelCut, deltaPhiCut, useWeight = False, weight = weight_str)
+#      rCSanti = getRCS(cData, antiSelCut+trigger+filters, deltaPhiCut, useWeight = False, weight = weight_str)
+#      rCSsel = getRCS(cData, SelCut+trigger+filters, deltaPhiCut, useWeight = False, weight = weight_str)
       rCSanti = getRCS(cData, antiSelCut, deltaPhiCut, useWeight = True, weight = weight_str)
       rCSsel = getRCS(cData, SelCut, deltaPhiCut, useWeight = True, weight = weight_str)
 
@@ -281,7 +275,8 @@ for crNJet in sorted(fitCR):
       histos['DATA']['Selection'].SetMaximum(1.5*histos['DATA']['Selection'].GetMaximum())
 
       leg.Draw()
-      text.DrawLatex(0.16,.96,"CMS #bf{#it{Preliminary}}")
+#      text.DrawLatex(0.16,.96,"CMS #bf{#it{Preliminary}}")
+      text.DrawLatex(0.16,.96,"CMS #bf{#it{Simulation}}")
       text.DrawLatex(0.62,0.96,"#bf{L="+str(lumi)+" fb^{-1} (13 TeV)}")
 
       Canv.cd()
@@ -346,13 +341,13 @@ for srNJet in sorted(signalRegion):
           cQCD.Draw('Lp>>QCD_Selection','('+weight_str+')*('+SelCut+')')
           cEWK.Draw('Lp>>EWK_antiSelection','('+weight_str+')*('+antiSelCut+')')
           cEWK.Draw('Lp>>EWK_Selection','('+weight_str+')*('+SelCut+')')
-#          cData.Draw('Lp>>DATA_antiSelection','('+antiSelCut+trigger+')')
+#          cData.Draw('Lp>>DATA_antiSelection','('+antiSelCut+trigger+filters+')')
           cData.Draw('Lp>>DATA_antiSelection','('+weight_str+')*('+antiSelCut+')')
-#          cData.Draw('Lp>>DATA_Selection','('+SelCut+trigger+')')
+#          cData.Draw('Lp>>DATA_Selection','('+SelCut+trigger+filters+')')
           cData.Draw('Lp>>DATA_Selection','('+weight_str+')*('+SelCut+')')
 
-#          rCSanti = getRCS(cData, antiSelCut, deltaPhiCut, useWeight = False, weight = weight_str)
-#          rCSsel = getRCS(cData, SelCut, deltaPhiCut, useWeight = False, weight = weight_str)
+#          rCSanti = getRCS(cData, antiSelCut+trigger+filters, deltaPhiCut, useWeight = False, weight = weight_str)
+#          rCSsel = getRCS(cData, SelCut+trigger+filters, deltaPhiCut, useWeight = False, weight = weight_str)
           rCSanti = getRCS(cData, antiSelCut, deltaPhiCut, useWeight = True, weight = weight_str)
           rCSsel = getRCS(cData, SelCut, deltaPhiCut, useWeight = True, weight = weight_str)
 
@@ -427,7 +422,8 @@ for srNJet in sorted(signalRegion):
           histos['DATA']['Selection'].SetMaximum(1.5*histos['DATA']['Selection'].GetMaximum())
             
           leg.Draw()
-          text.DrawLatex(0.16,.96,"CMS #bf{#it{Preliminary}}")
+#          text.DrawLatex(0.16,.96,"CMS #bf{#it{Preliminary}}")
+          text.DrawLatex(0.16,.96,"CMS #bf{#it{Simulation}}")
           text.DrawLatex(0.62,0.96,"#bf{L="+str(lumi)+" fb^{-1} (13 TeV)}")
   
           Canv.cd()

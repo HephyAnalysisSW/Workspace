@@ -1,7 +1,7 @@
 import copy, os, sys
 #dir  = '/data/easilar/cmgTuples/postProcessed_miniAODv2_fix/HT500LT250/hard/'
-dir = '/data/easilar/cmgTuples/postProcessed_miniAODv2_combine2/HT500LT250/hard/'
-
+#dir = '/data/easilar/cmgTuples/postProcessed_miniAODv2_combine2/HT500LT250/hard/'
+dir = '/data/easilar/cmgTuples/postProcessed_Spring15_btagEff_SF15/HT500ST250/hard/'
 ####usual HT combination####
 TTJets_HTLO_25ns={\
 "name" : "tt+Jets_LO",
@@ -14,7 +14,7 @@ TTJets_HTLO_25ns={\
 ],
 'dir' : '/data/easilar/cmgTuples/postProcessed_miniAODv2_fix/HT500LT250/hard/',
 }
-#####diLep+SemiLep+HT binned samples####
+#####(diLep+SemiLep+HT binned samples) for LHE_HT<=1000 & (HT binned samples) for LHE_HT>1000
 TTJets_combined = {\
 "name" : "TTJets_combined",
 "bins" : [
@@ -27,22 +27,7 @@ TTJets_combined = {\
 "TTJets_SingleLeptonFromT_full",
 "TTJets_SingleLeptonFromTbar_full",
 ],
-'dir' : dir,
-}
-#####(diLep+SemiLep+HT binned samples) for LHE_HT<=1000 & (HT binned samples) for LHE_HT>1000 
-TTJets_combined_2 = {\
-"name" : "TTJets_combined",
-"bins" : [
-"TTJets_DiLepton_full",
-"TTJets_LO",
-"TTJets_LO_HT1200to2500",
-"TTJets_LO_HT2500toInf",
-"TTJets_LO_HT600to800",
-"TTJets_LO_HT800to1200",
-"TTJets_SingleLeptonFromT_full",
-"TTJets_SingleLeptonFromTbar_full",
-],
-'dir' : '/data/easilar/cmgTuples/postProcessed_miniAODv2_combine3//HT500LT250/hard/',
+'dir' : '/data/easilar/cmgTuples/postProcessed_Spring15_ttJets_btagWeights//HT500LT250/hard/',
 }
 
 

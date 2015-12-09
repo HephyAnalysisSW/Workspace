@@ -412,15 +412,11 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
   if signals: legendNameLengthsSignal = [len(x['niceName']) for x in signals]
   legendNameLengths = legendNameLengthsSamples + legendNameLengthsSignal
   legendWidth = 0.015*max(legendNameLengths)+0.03
-  print legendWidth
-  print max(legendNameLengths)
-  print legendNameLengths
   if legend:
     height = 0.04*len(h)
     if data: height+=0.04
     if signals: height += 0.04*len(signals)
     if data: height += 0.04
-    print legendWidth
     leg = ROOT.TLegend(0.98-legendWidth,0.95-height,0.98,0.95)
     leg.SetFillColor(ROOT.kWhite)
     leg.SetShadowColor(ROOT.kWhite)
@@ -513,7 +509,9 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
     latex1.SetTextSize(0.04)
     latex1.SetTextAlign(11) # align right
   if titleText: latex1.DrawLatex(0.11,0.96,'CMS #bf{#it{'+titleText+'}}')
-  if MCscale and (MCscale>1.001 or MCscale<0.99) : latex1.DrawLatex(0.6,0.95-height-0.04,'MC~scale:'+str(round(MCscale,3))+'\pm'+str(round(MCscaleError,3)))
+  if MCscale and (MCscale>1.001 or MCscale<0.99) :
+    latex1.DrawLatex(0.82, 0.95-height-0.04,'#bf{MC scale:}')
+    latex1.DrawLatex(0.82, 0.95-height-0.04*2, str(round(MCscale,2))+'\pm'+str(round(MCscaleError,2)))
   if lumi: latex1.DrawLatex(0.77,0.96,"L="+str(lumi)+"fb^{-1} (13TeV)")
   if legend: leg.Draw()
   can.Update()

@@ -1,9 +1,12 @@
 import ROOT
 import pickle
 import os,sys,math
+
+ROOT.gROOT.LoadMacro('../../HEPHYPythonTools/scripts/root/tdrstyle.C')
+ROOT.setTDRStyle()
+
 from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYieldFromChain
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,varBinName
-
 from Workspace.HEPHYPythonTools.user import username
 from rCShelpers import *
 from math import pi, sqrt, isnan
@@ -13,22 +16,19 @@ from binnedNBTagsFit import *
 
 from predictionConfig import *
 
-ROOT.gROOT.LoadMacro('../../HEPHYPythonTools/scripts/root/tdrstyle.C')
-ROOT.setTDRStyle()
-
 
 colorList = [ROOT.kBlue+1, ROOT.kCyan-9, ROOT.kOrange-4, ROOT.kGreen+1, ROOT.kRed+1]
 
 ROOT.TH1F().SetDefaultSumw2()
 
-lumi = 1.55
+lumi = 2.1
 predictionName = 'data_newSR_lep_SFtemplates'
 predictionName2 = 'MCwSF_newSR_lep_SFtemplates'
 pickleDir   = '/data/'+username+'/Results2015/Prediction_'+predictionName+'_'+str(lumi)+'/'
 pickleDir2   = '/data/'+username+'/Results2015/Prediction_'+predictionName2+'_'+str(lumi)+'/'
 
-res = pickle.load(file(pickleDir+'singleLeptonic_Spring15__estimationResults_pkl'))
-resMC = pickle.load(file(pickleDir2+'singleLeptonic_Spring15__estimationResults_pkl'))
+#res = pickle.load(file(pickleDir+'singleLeptonic_Spring15__estimationResults_pkl'))
+#resMC = pickle.load(file(pickleDir2+'singleLeptonic_Spring15__estimationResults_pkl'))
 def divideRCSdict(a,b):
   if b['rCS']>0:
     kappa = a['rCS']/b['rCS']
@@ -46,6 +46,15 @@ def divideRCSdict(a,b):
 
 def getValErrString(val,err, precision=3):
   return str(round(val,precision))+' +/- '+str(round(err,precision))
+
+def setNiceBinLabel(hist):
+  i = 1
+  for njb in sorted(signalRegions):
+    for stb in sorted(signalRegions[njb]):
+      for htb in sorted(signalRegions[njb][stb]):
+        hist.GetXaxis().SetBinLabel(i,'#splitline{'+signalRegions[njb][stb][htb]['njet']+'}{#splitline{'+signalRegions[njb][stb][htb]['LT']+'}{'+signalRegions[njb][stb][htb]['HT']+'}}')
+        i += 1
+
 
 rowsNJet = {}
 rowsSt = {}
@@ -75,14 +84,36 @@ fit1bdata = ROOT.TH1F('fit1bdata','Fit 1b data',bins,0,bins)
 fit2bMC   = ROOT.TH1F('fit2bMC',  'Fit 2b MC',bins,0,bins)
 fit2bdata = ROOT.TH1F('fit2bdata','Fit 2b data',bins,0,bins)
 
+fit1bMC.SetLineColor(colorList[0])
+fit1bMC.SetMarkerStyle(0)
+fit1bMC.SetLineWidth(2)
+fit1bMC.SetMaximum(1.2)
+fit1bMC.SetMinimum(0)
+fit1bMC.GetXaxis().SetLabelSize(0.04)
+fit1bMC.GetYaxis().SetLabelSize(0.04)
+fit1bMC.GetYaxis().SetTitle('t#bar{t} fraction')
+
+
+fit1bdata.SetLineColor(colorList[3])
+fit1bdata.SetMarkerStyle(0)
+fit1bdata.SetLineWidth(2)
+
+fit2bMC.SetLineColor(colorList[2])
+fit2bMC.SetMarkerStyle(0)
+fit2bMC.SetLineWidth(2)
+
+fit2bdata.SetLineColor(colorList[4])
+fit2bdata.SetMarkerStyle(0)
+fit2bdata.SetLineWidth(2)
+
 
 rcs1bMC.SetLineColor(colorList[0])
 rcs1bMCrescale.SetLineColor(colorList[4])
 rcs1bMCrescaleD.SetLineColor(colorList[2])
 
-rcs1bdata.SetLineColor(colorList[1])
+rcs1bdata.SetLineColor(colorList[3])
 rcs2bMC.SetLineColor(colorList[2])
-rcs2bdata.SetLineColor(colorList[3])
+rcs2bdata.SetLineColor(colorList[4])
 
 rcs1bMC.SetMarkerStyle(0)
 rcs1bMCrescale.SetMarkerStyle(0)
@@ -100,6 +131,10 @@ rcs2bdata.SetLineWidth(2)
 
 rcs1bMC.SetMinimum(0.)
 rcs1bMC.SetMaximum(0.25)
+rcs1bMC.GetYaxis().SetTitle('R_{CS}')
+rcs1bMC.GetYaxis().SetLabelSize(0.04)
+rcs1bMC.GetXaxis().SetLabelSize(0.04)
+
 
 
 kappa01TT  = ROOT.TH1F('kappa01','tt(0b)/tt(1b)',bins,0,bins)
@@ -117,8 +152,8 @@ kappa01TT.SetMaximum(2.)
 kappa12TT.SetLineColor(colorList[1])
 kappa0tt1EWK.SetLineColor(colorList[2])
 kappa01EWK.SetLineColor(colorList[3])
-kappa12EWK.SetLineColor(colorList[4])
-kappa12data.SetLineColor(ROOT.kBlack)
+kappa12EWK.SetLineColor(colorList[0])
+kappa12data.SetLineColor(colorList[3])
 
 kappa01TT.SetMarkerStyle(0)
 kappa12TT.SetMarkerStyle(0)
@@ -131,7 +166,16 @@ kappa01TT.SetLineWidth(2)
 kappa12TT.SetLineWidth(2)
 kappa0tt1EWK.SetLineWidth(2)
 kappa01EWK.SetLineWidth(2)
+
+kappa01EWK.SetMaximum(1.5)
+kappa01EWK.SetMinimum(0)
+
 kappa12EWK.SetLineWidth(2)
+kappa12EWK.GetYaxis().SetLabelSize(0.04)
+kappa12EWK.GetXaxis().SetLabelSize(0.04)
+kappa12EWK.GetYaxis().SetTitle('#kappa_{b}')
+setNiceBinLabel(kappa12EWK)
+
 kappa12data.SetLineWidth(2)
 
 i = 1
@@ -142,6 +186,18 @@ leg.SetFillColor(ROOT.kWhite)
 leg.SetShadowColor(ROOT.kWhite)
 leg.SetBorderSize(1)
 leg.SetTextSize(0.035)
+
+leg2 = ROOT.TLegend(0.65,0.75,0.98,0.95)
+leg2.SetFillColor(ROOT.kWhite)
+leg2.SetShadowColor(ROOT.kWhite)
+leg2.SetBorderSize(1)
+leg2.SetTextSize(0.035)
+
+leg3 = ROOT.TLegend(0.65,0.82,0.98,0.95)
+leg3.SetFillColor(ROOT.kWhite)
+leg3.SetShadowColor(ROOT.kWhite)
+leg3.SetBorderSize(1)
+leg3.SetTextSize(0.035)
 
 #presel = singleMu_presel
 
@@ -257,7 +313,7 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
       print 'Frac pos, neg', y1b_Pos/y1b,y1b_Neg/y1b
       y2b_Pos =fit['TT_AllPdg']['template'].GetBinContent(3)*fit['TT_AllPdg']['yield']*0.5+fit['W_PosPdg']['template'].GetBinContent(3)*fit['W_PosPdg']['yield']+fit['Rest_PosPdg']['template'].GetBinContent(3)*fit['Rest_PosPdg']['yield']
       y2b_Neg =fit['TT_AllPdg']['template'].GetBinContent(3)*fit['TT_AllPdg']['yield']*0.5+fit['W_NegPdg']['template'].GetBinContent(3)*fit['W_NegPdg']['yield']+fit['Rest_NegPdg']['template'].GetBinContent(3)*fit['Rest_NegPdg']['yield']
-      y2b = y1b_Neg+y1b_Pos
+      y2b = y2b_Neg+y2b_Pos
       fitFracTT2b = getPropagatedError([fit['TT_AllPdg']['template'].GetBinContent(3),fit['TT_AllPdg']['yield']], [fit['TT_AllPdg']['template'].GetBinError(3),sqrt(fit['TT_AllPdg']['yieldVar'])],y2b, sqrt(y2b), returnCalcResult=True)
       
       #get MC truth fractions
@@ -302,18 +358,22 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
       #kappaTT12_data = divideRCSdict(rcs1bCRtt_btag,rcs2bCRtt_btag)
 
       #kappaEWK01 = divideRCSdict(rcs0bCRtt_btag_EWK,rcs1bCRtt_btag_EWK)
-      #kappaEWK12 = divideRCSdict(rcs1bCRtt_btag_EWK,rcs2bCRtt_btag_EWK)
-
+      kappaEWK12 = divideRCSdict(rcs1bCRtt_btag_EWK,rcs2bCRtt_btag_EWK)
+      
+      #kappa01EWK.SetBinContent(i,kappaEWK01['kappa'])
+      #kappa01EWK.SetBinError(i,kappaEWK01['kappaE_sim'])
+      kappa12EWK.SetBinContent(i,kappaEWK12['kappa'])
+      kappa12EWK.SetBinError(i,kappaEWK12['kappaE_sim'])
       #kappa0tt1ewk = divideRCSdict(rcs0bCRtt_btag,rcs1bCRtt_btag_EWK)
 
-      #kappa_data = divideRCSdict(rcs1bCR_data,rcs2bCR_data)
-      #kappa12data.SetBinContent(i,kappa_data['kappa'])
-      #kappa12data.SetBinError(i,kappa_data['kappaE_pred'])
+      kappa_data = divideRCSdict(rcs1bCR_data,rcs2bCR_data)
+      kappa12data.SetBinContent(i,kappa_data['kappa'])
+      kappa12data.SetBinError(i,kappa_data['kappaE_pred'])
 
       #kappa01TT.SetBinContent(i,kappaTT01['kappa'])
       #kappa01TT.SetBinError(i,kappaTT01['kappaE_sim'])
       kappa12TT.SetBinContent(i,kappaTT12['kappa'])
-      #kappa12TT.SetBinError(i,kappaTT12['kappaE_sim'])
+      kappa12TT.SetBinError(i,kappaTT12['kappaE_sim'])
 
       #kappa0tt1EWK.SetBinContent(i,kappa0tt1ewk['kappa'])
       #kappa0tt1EWK.SetBinError(i,kappa0tt1ewk['kappaE_sim'])
@@ -325,6 +385,7 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
 
       fit1bMC.SetBinContent  (i,truthFracTT1bMC[0])
       fit1bMC.SetBinError    (i,truthFracTT1bMC[1])
+      
       fit1bdata.SetBinContent(i,fitFracTT1b[0])
       fit1bdata.SetBinError  (i,fitFracTT1b[1])
       fit2bMC.SetBinContent  (i,truthFracTT2bMC[0])
@@ -334,6 +395,7 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
 
       rcs1bMC.SetBinContent(i,rcs1bCRtt_btag_EWK['rCS'])
       rcs1bMC.SetBinError(i,rcs1bCRtt_btag_EWK['rCSE_sim'])
+      
       rcs1bMCrescale.SetBinContent(i,rcs1bCR_MC_rescale)
       rcs1bMCrescale.SetBinError(i,rcs1bCRtt_btag_EWK['rCSE_sim'])
       rcs1bMCrescaleD.SetBinContent(i,rcs1bCR_MC_dilepRescale)
@@ -355,34 +417,63 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
       #print '0b/1b:', round(kappa0tt1ewk['kappa'],2),'+/-',round(kappa0tt1ewk['kappaE_sim'],2)
       i += 1
 
+
+#plot Rcs
+setNiceBinLabel(rcs1bMC)
 rcs1bMC.Draw('hist e1')
-rcs1bMCrescale.Draw('hist e1 same')
-rcs1bMCrescaleD.Draw('hist e1 same')
+#rcs1bMCrescale.Draw('hist e1 same')
+#rcs1bMCrescaleD.Draw('hist e1 same')
 rcs1bdata.Draw('hist e1 same')
-#rcs2bMC.Draw('hist e1 same')
-#rcs2bdata.Draw('hist e1 same')
+rcs2bMC.Draw('hist e1 same')
+rcs2bdata.Draw('hist e1 same')
 
 
-#kappa01TT.Draw('hist e1')
-#kappa12TT.Draw('hist e1 same')
-#kappa0tt1EWK.Draw('hist e1 same')
-##kappa01EWK.Draw('hist e1 same')
-#kappa12EWK.Draw('hist e1 same')
-#kappa12data.Draw('hist e1 same')
-#
-#leg.AddEntry(kappa01TT)
-#leg.AddEntry(kappa12TT)
-#leg.AddEntry(kappa0tt1EWK)
-#leg.AddEntry(kappa12EWK)
-##leg.AddEntry(kappa01EWK)
-#leg.AddEntry(kappa12data)
-leg.AddEntry(rcs1bMC, 'MC truth 1b')
-leg.AddEntry(rcs1bMCrescale, 'MC 1b rescaled')
-leg.AddEntry(rcs1bMCrescaleD, 'MC 1b dilep resc.')
-leg.AddEntry(rcs1bdata, 'data 1b')
-#leg.AddEntry(rcs2bMC, 'MC truth 2b')
-#leg.AddEntry(rcs2bdata, 'data 2b')
+leg.AddEntry(rcs1bMC, '1b MC')
+leg.AddEntry(rcs1bdata, '1b data')
+leg.AddEntry(rcs2bMC, '2b MC')
+leg.AddEntry(rcs2bdata, '2b data')
 
 
 leg.Draw()
 
+latex1 = ROOT.TLatex()
+latex1.SetNDC()
+latex1.SetTextSize(0.04)
+latex1.SetTextAlign(11)
+
+latex1.DrawLatex(0.16,0.96,'CMS #bf{#it{preliminary}}')
+latex1.DrawLatex(0.7,0.96,"L=2.1fb^{-1} (13TeV)")
+
+ROOT.gROOT.LoadMacro('../../HEPHYPythonTools/scripts/root/tdrstyle.C')
+ROOT.setTDRStyle()
+
+
+#plot fractions
+can_frac = ROOT.TCanvas('can_frac','can_frac',700,700)
+setNiceBinLabel(fit1bMC)
+fit1bMC.Draw('hist e1')
+fit1bdata.Draw('hist e1 same')
+fit2bMC.Draw('hist e1 same')
+fit2bdata.Draw('hist e1 same')
+
+
+leg2.AddEntry(fit1bMC, '1b MC')
+leg2.AddEntry(fit1bdata, '1b data')
+leg2.AddEntry(fit2bMC, '2b MC')
+leg2.AddEntry(fit2bdata, '2b data')
+leg2.Draw()
+
+latex1.DrawLatex(0.16,0.96,'CMS #bf{#it{preliminary}}')
+latex1.DrawLatex(0.7,0.96,"L=2.1fb^{-1} (13TeV)")
+
+#plot kappas
+can_kap = ROOT.TCanvas('can_kap','can_kap',700,700)
+kappa12EWK.Draw('hist e1')
+kappa12data.Draw('hist e1 same')
+
+leg3.AddEntry(kappa12EWK, '#kappa (1b/2b) MC')
+leg3.AddEntry(kappa12data, '#kappa (1b/2b) data')
+leg3.Draw()
+
+latex1.DrawLatex(0.16,0.96,'CMS #bf{#it{preliminary}}')
+latex1.DrawLatex(0.7,0.96,"L=2.1fb^{-1} (13TeV)")

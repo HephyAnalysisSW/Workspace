@@ -13,6 +13,7 @@ import pprint
 import math
 import time
 import io
+import importlib
 
 # imports user modules or functions
 
@@ -50,8 +51,7 @@ def get_parser():
         action='store',
         nargs='?',
         type=str,
-        choices=['Data_25ns', 'Data_50ns', 'Spring15_25ns', 'Spring15_50ns', 'Spring15_25ns_packedGenPart_tracks'],
-        default='Spring15_25ns',
+        default='RunIISpring15DR74_25ns',
         help="CMG ntuples to be post-processed"
         )
        
@@ -63,14 +63,6 @@ def get_parser():
         help="List of samples to be post-processed, given as CMG component name"
         )
     
-    argParser.add_argument('--inputTreeName',
-        action='store',
-        nargs='?',
-        type=str,
-        default='treeProducerSusySingleLepton',
-        help="Name of the input tree"
-        )
-    
     argParser.add_argument('--targetDir',
         action='store',
         nargs='?',
@@ -79,6 +71,22 @@ def get_parser():
         help="Name of the directory the post-processed files will be saved"
         )
     
+    argParser.add_argument('--processingEra',
+        action='store',
+        nargs='?',
+        type=str,
+        default='postProcessed_mAODv2',
+        help="Name of the processing era"
+        )
+
+    argParser.add_argument('--processingTag',
+        action='store',
+        nargs='?',
+        type=str,
+        default='v0',
+        help="Name of the processing tag, preferably a tag for Workspace"
+        )
+
     argParser.add_argument('--skim',
         action='store',
         nargs='?',
@@ -203,7 +211,7 @@ def retryRemove(function, path, excinfo):
             )
         
 
-def getSamples(cmgTuples, processSamples, targetDir):
+def getSamples(args):
     '''Return a list of components to be post-processed.
     
     No logger here, as the log file is determined with variables computed here.
@@ -212,33 +220,46 @@ def getSamples(cmgTuples, processSamples, targetDir):
     
     The sample processed will be written eventually in the logger,
     after a call to this function.
+    
+    Create also the output main directory, if it does not exist.
     '''
 
-    subDir = ''
+    cmgTuples = args.cmgTuples
+    processSamples = args.processSamples
     
+    targetDir = args.targetDir
+    processingEra = args.processingEra
+    processingTag = args.processingTag
+
     if cmgTuples == "Data_25ns":
         # from Workspace.DegenerateStopAnalysis.cmgTuples_Data25ns import *
         import Workspace.DegenerateStopAnalysis.cmgTuples_Data25ns_fromArtur as cmgSamples
-        subDir = "postProcessed_Data_25ns"
     elif cmgTuples == "Data_50ns":
         import Workspace.DegenerateStopAnalysis.cmgTuples_Data50ns_1l as cmgSamples
-        subDir = "postProcessed_Data_50ns"
-    elif cmgTuples == "Spring15_25ns":
+    elif cmgTuples == "RunIISpring15DR74_25ns":
         import Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_7412pass2 as cmgSamples
-        subDir = "postProcessed_Spring15_25ns_7412pass2"
-    elif cmgTuples == "Spring15_50ns":
+    elif cmgTuples == "RunIISpring15DR74_25ns":
         import Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_50ns as cmgSamples
-        subDir = "postProcessed_Spring15_50ns"
-    elif cmgTuples == "Spring15_25ns_packedGenPart_tracks":
-        import Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_packedGenPart_tracks as cmgSamples
-        subDir = "postProcessed_Spring15_25ns_packedGenPart_tracks"
     else:
-        print "\n The required set of CMG tuples \n cmgTuples: {0} does not exist.".format(cmgTuples), \
-            "\n Correct the name and re-run the script. \n Exiting."
-        sys.exit()
+        # use the cmgTuples values to find the cmgSamples definition file
+        moduleName = 'cmgTuples_'  + cmgTuples
+        moduleFullName = 'Workspace.DegenerateStopAnalysis.' + moduleName
+        
+        cmssw_base = os.environ['CMSSW_BASE']
+        sampleFile = os.path.join(cmssw_base, 'src/Workspace/DegenerateStopAnalysis/python') + \
+            '/' + moduleName + '.py'
+
+        try:
+            cmgSamples = importlib.import_module(moduleFullName)
+        except ImportError, err:      
+            print 'ImportError:', err
+            print "\n The required set of CMG tuples \n cmgTuples: {0} \n ".format(cmgTuples) + \
+                "with expected sample definition file \n {0} \n does not exist.".format(sampleFile), \
+                "\n Correct the name and re-run the script. \n Exiting."
+            sys.exit()
     
-    outDir = targetDir + '/' + subDir
-    
+    outDir = os.path.join(targetDir, processingEra, processingTag, cmgTuples)
+
     # samples
     
     allComponentsList = [] 
@@ -311,7 +332,11 @@ def getSamples(cmgTuples, processSamples, targetDir):
                 "\n Exiting."
             sys.exit() 
     
-    #
+    # create the target output directory, if it does not exist, if sample definition is OK
+    if not os.path.exists(outDir):
+        os.makedirs(outDir)
+
+    #    
     return allComponentsList, outDir
     
      
@@ -1216,14 +1241,8 @@ def cmgPostProcessing(argv=None):
     # choose the sample(s) to process (allSamples), with results saved in outputDirectory
     
     cmgTuples = args.cmgTuples
-    processSamples = args.processSamples
-    
-    allSamples, outputDirectory = getSamples(cmgTuples, processSamples, args.targetDir)
+    allSamples, outputDirectory = getSamples(args)
      
-    # create the target output directory, if it does not exist
-    if not os.path.exists(outputDirectory):
-        os.makedirs(outputDirectory)
-
     # logging configuration
 
     logLevel = args.logLevel
@@ -1238,8 +1257,11 @@ def cmgPostProcessing(argv=None):
     #
     logger.info(
         "\n Running on CMG ntuples %s " + \
-        "\n Samples to be processed: %i \n %s \n",  
-        cmgTuples, len(allSamples), pprint.pformat([sample['cmgComp'].name for sample in allSamples])
+        "\n Samples to be processed: %i \n %s \n" + \
+        "\n Results will be written to directory \n %s \n",
+        cmgTuples, len(allSamples), 
+        pprint.pformat([sample['cmgComp'].name for sample in allSamples]),
+        outputDirectory
         )
     logger.debug("\n Samples to be processed: %i \n %s \n",  
         len(allSamples), pprint.pformat(allSamples))

@@ -1,5 +1,5 @@
 import copy, os, sys
-dir = '/data/dhandl/cmgTuples/postProcessed_Spring15_antiSelection_final2p1fb/HT500/none/'
+dir = '/data/dhandl/cmgTuples/postProcessed_Spring15_antiSelection_final2p1fb_V2/HT500/none/'
 
 single_mu_Run2015D = {\
 "name" : "single_mu_Run215D",
@@ -24,13 +24,13 @@ single_ele_Run2015D = {\
 TTJets_HTLO_25ns={\
 "name" : "tt+Jets_LO",
 "bins" : [
-"TTJets_LO",
-"TTJets_LO_HT600to800",
-"TTJets_LO_HT800to1200",
-"TTJets_LO_HT1200to2500",
-"TTJets_LO_HT2500toInf",
+"HT500LHE_FullHadronic_inc/none/TTJets_LO",
+"HT500LHE_FullHadronic/none/TTJets_LO_HT600to800",
+"HT500LHE_FullHadronic/none/TTJets_LO_HT800to1200",
+"HT500LHE_FullHadronic/none/TTJets_LO_HT1200to2500",
+"HT500LHE_FullHadronic/none/TTJets_LO_HT2500toInf",
 ],
-'dir' : dir,
+'dir' : '/data/dhandl/cmgTuples/postProcessed_Spring15_antiSelection_final2p1fb/',
 }
 #####diLep+SemiLep+HT binned samples####
 TTJets_combined = {\
@@ -60,7 +60,7 @@ TTJets_combined_2 = {\
 "HT500semiLep/none/TTJets_SingleLeptonFromT_full",
 "HT500semiLep/none/TTJets_SingleLeptonFromTbar_full",
 ],
-'dir' : '/data/dhandl/cmgTuples/postProcessed_Spring15_antiSelection_final2p1fb/',
+'dir' : '/data/dhandl/cmgTuples/postProcessed_Spring15_antiSelection_final2p1fb_V2/',
 }
 
 
