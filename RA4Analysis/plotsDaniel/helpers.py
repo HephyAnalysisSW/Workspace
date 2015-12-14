@@ -1,3 +1,5 @@
+from Workspace.RA4Analysis.signalRegions import *
+
 def filterParticles(l, values, attribute):
   for a in l:
     for v in values:
@@ -19,4 +21,16 @@ def addKey(d, newDict='deltaPhiCut'):
 
 def getValErrString(val,err, precision=3):
   return str(round(val,precision))+' +/- '+str(round(err,precision))
+
+def sign(a):
+  return (a > 0) - (a < 0)
+
+def setNiceBinLabel(hist, signalRegions=signalRegion3fb):
+  i = 1
+  for njb in sorted(signalRegions):
+    for stb in sorted(signalRegions[njb]):
+      for htb in sorted(signalRegions[njb][stb]):
+        hist.GetXaxis().SetBinLabel(i,'#splitline{'+signalRegions[njb][stb][htb]['njet']+'}{#splitline{'+signalRegions[njb][stb][htb]['LT']+'}{'+signalRegions[njb][stb][htb]['HT']+'}}')
+        i += 1
+
 

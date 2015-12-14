@@ -9,7 +9,7 @@ from Workspace.HEPHYPythonTools.helpers import getChain
 #from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT500ST250_postProcessed_fromArthur import *
 from Workspace.RA4Analysis.cmgTuples_Data25ns_miniAODv2_postprocessed import *
 from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed import *
-from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed_btag import *
+#from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed_btag import *
 
 from Workspace.HEPHYPythonTools.user import username
 from Workspace.RA4Analysis.signalRegions import *
@@ -20,27 +20,27 @@ testRun = False
 dPhiStr = 'deltaPhi_Wl'
 bjreg = (0,0)
 nBTagVar = 'nBJetMediumCSV30'
-useBTagWeights = True #True for weighted fake data, false for data
+useBTagWeights = False #True for weighted fake data, false for data
 btagWeightSuffix = '_SF'
 templateWeights = True
 templateWeightSuffix = '_SF'
 
 
 ## samples
-isData = False
+isData = True
 
-cWJets      = getChain(WJetsHTToLNu_25ns_btag,histname='')
-cTTJets     = getChain(TTJets_combined_btag,histname='')
+cWJets      = getChain(WJetsHTToLNu_25ns,histname='')
+cTTJets     = getChain(TTJets_combined,histname='')
 cDY         = getChain(DY_25ns,histname='')
 csingleTop  = getChain(singleTop_25ns,histname='')
 cTTV        = getChain(TTV_25ns,histname='')
 cRest       = getChain([singleTop_25ns, DY_25ns, TTV_25ns],histname='')#no QCD
-cBkg        = getChain([WJetsHTToLNu_25ns_btag, TTJets_combined_btag, singleTop_25ns, DY_25ns, TTV_25ns], histname='')#no QCD
+cBkg        = getChain([WJetsHTToLNu_25ns, TTJets_combined, singleTop_25ns, DY_25ns, TTV_25ns], histname='')#no QCD
 
 if isData:
   cData = getChain([single_mu_Run2015D, single_ele_Run2015D], histname='')
 else:
-  cData = getChain([WJetsHTToLNu_25ns_btag, TTJets_combined_btag, singleTop_25ns, DY_25ns, TTV_25ns], histname='')
+  cData = getChain([WJetsHTToLNu_25ns, TTJets_combined, singleTop_25ns, DY_25ns, TTV_25ns], histname='')
 
 
 ## signal region definition

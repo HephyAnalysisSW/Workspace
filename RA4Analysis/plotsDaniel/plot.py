@@ -8,6 +8,7 @@ from math import *
 from array import array
 from Workspace.HEPHYPythonTools.helpers import *
 from Workspace.RA4Analysis.helpers import *
+from Workspace.RA4Analysis.signalRegions import *
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_Spring15_hard import *
 #from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_postProcessed import *
@@ -21,12 +22,19 @@ from Workspace.RA4Analysis.helpers import *
 #from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT500ST250_postProcessed_fromArthur import *
 from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed import *
 from Workspace.RA4Analysis.cmgTuples_Data25ns_miniAODv2_postprocessed import *
-from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed_btag import *
+#from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed_btag import *
 
 #from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT400ST200_postProcessed import *
 #from Workspace.RA4Analysis.cmgTuples_Spring15_50ns_postProcessed import *
 from Workspace.HEPHYPythonTools.user import username
 
+from helpers import *
+
+def getBTagCutAndWeight(chain, btagcut, btagweight, cut, weight):
+  if chain.GetBranchStatus(btagweight):
+    return cut, weight+'*'+btagweight
+  else:
+    return cut+'&&'+btagcut, weight
 
 
 lepSel = 'hard'
@@ -38,30 +46,31 @@ lepSel = 'hard'
 #QCD = {'name':'QCD', 'chain':getChain(QCDMu_50ns,histname=''), 'color':color('QCD'),'weight':'weight', 'niceName':'QCD'}
 #samples = [WJETS, TTJETS, DY, singleTop, QCD]
 
+
+totalWeight = 'weight*puReweight_true*lepton_muSF_mediumID*lepton_muSF_miniIso02*lepton_muSF_sip3d*lepton_eleSF_cutbasedID*lepton_eleSF_miniIso01'
 #25ns samples
-#WJETS = {'name':'WJets', 'chain':getChain(WJetsHTToLNu_25ns,histname=''), 'color':ROOT.kMagenta,'weight':'weight', 'niceName':'W Jets, MVA ID'}
-WJETSbtagweight = {'name':'WJets', 'chain':getChain(WJetsHTToLNu_25ns_btag,histname=''), 'color':color('WJets'),'weight':'weight', 'niceName':'W+Jets', 'cut':''}
-WJETS = {'name':'WJets', 'chain':getChain(WJetsHTToLNu_25ns,histname=''), 'color':color('WJets'),'weight':'weight', 'niceName':'W+Jets', 'cut':''}
-#TTJETS = {'name':'TTJets', 'chain':getChain(TTJets_25ns,histname=''), 'color':color('TTJets'),'weight':'weight', 'niceName':'t#bar{t} Jets NLO'}
-#TTJetsLO = {'name':'TTJets', 'chain':getChain(TTJets_LO_25ns,histname=''), 'color':color('singleTop'),'weight':'weight', 'niceName':'t#bar{t} Jets MVA ID'}
-TTJetsbtagweight = {'name':'TTJets', 'chain':getChain(TTJets_combined_btag,histname=''), 'color':color('TTJets')-2,'weight':'weight', 'niceName':'t#bar{t}+Jets', 'cut':''}
+WJETS = {'name':'WJets', 'chain':getChain(WJetsHTToLNu_25ns,histname=''), 'color':color('WJets'),'weight':totalWeight, 'niceName':'W+Jets', 'cut':''}
 TTJets = {'name':'TTJets', 'chain':getChain(TTJets_HTLO_25ns,histname=''), 'color':ROOT.kOrange,'weight':'weight', 'niceName':'t#bar{t}+Jets', 'cut':''}
-TTJets_combined = {'name':'TTJets', 'chain':getChain(TTJets_combined_2,histname=''), 'color':color('TTJets')-2,'weight':'weight', 'niceName':'t#bar{t}+Jets', 'cut':''}
-DY = {'name':'DY', 'chain':getChain(DY_25ns,histname=''), 'color':color('DY'),'weight':'weight', 'niceName':'Drell Yan', 'cut':''}
-singleTop = {'name':'singleTop', 'chain':getChain(singleTop_25ns,histname=''), 'color':color('singleTop'),'weight':'weight', 'niceName':'single Top', 'cut':''}
-#QCD = {'name':'QCD', 'chain':getChain(QCDMu_25ns,histname=''), 'color':color('QCD'),'weight':'weight', 'niceName':'QCD'}
-QCD = {'name':'QCD', 'chain':getChain(QCDHT_25ns,histname=''), 'color':color('QCD'),'weight':'weight', 'niceName':'QCD', 'cut':''}
-TTVH = {'name':'TTVH', 'chain':getChain(TTV_25ns,histname=''), 'color':color('TTV'),'weight':'weight', 'niceName':'TTVH', 'cut':''}
-Rest = {'name':'TTVH', 'chain':getChain([TTV_25ns,singleTop_25ns,DY_25ns],histname=''), 'color':color('TTV'),'weight':'weight', 'niceName':'Rest EWK', 'cut':''}
-#QCD = {'name':'QCD', 'chain':getChain(QCDEle_25ns,histname=''), 'color':color('QCD'),'weight':'weight', 'niceName':'QCD'}
+TTJets_combined = {'name':'TTJets', 'chain':getChain(TTJets_combined,histname=''), 'color':color('TTJets')-2,'weight':totalWeight, 'niceName':'t#bar{t}+Jets', 'cut':''}
+TTJets_combined_singleLep = {'name':'TTJets', 'chain':getChain(TTJets_combined,histname=''), 'color':color('TTJets')-2,'weight':totalWeight, 'niceName':'t#bar{t}+Jets', 'cut':'(ngenLep+ngenTau)==1'}
+TTJets_combined_diLep = {'name':'TTJets', 'chain':getChain(TTJets_combined,histname=''), 'color':color('TTJets'),'weight':totalWeight, 'niceName':'t#bar{t}+Jets', 'cut':'(ngenLep+ngenTau)==2'}
+TTJets_combined_had = {'name':'TTJets', 'chain':getChain(TTJets_combined,histname=''), 'color':color('TTJets')+2,'weight':totalWeight, 'niceName':'t#bar{t}+Jets', 'cut':'(ngenLep+ngenTau)==0'}
+
+
+DY = {'name':'DY', 'chain':getChain(DY_25ns,histname=''), 'color':color('DY'),'weight':totalWeight, 'niceName':'Drell Yan', 'cut':''}
+singleTop = {'name':'singleTop', 'chain':getChain(singleTop_25ns,histname=''), 'color':color('singleTop'),'weight':totalWeight, 'niceName':'single Top', 'cut':''}
+QCD = {'name':'QCD', 'chain':getChain(QCDHT_25ns,histname=''), 'color':color('QCD'),'weight':totalWeight, 'niceName':'QCD', 'cut':''}
+TTVH = {'name':'TTVH', 'chain':getChain(TTV_25ns,histname=''), 'color':color('TTV'),'weight':totalWeight, 'niceName':'TTVH', 'cut':''}
+Rest = {'name':'TTVH', 'chain':getChain([TTV_25ns,singleTop_25ns,DY_25ns],histname=''), 'color':color('TTV'),'weight':totalWeight, 'niceName':'Rest EWK', 'cut':''}
 #diBoson = {'name':'diBoson', 'chain':getChain(diBosons_25ns,histname=''), 'color':ROOT.kMagenta,'weight':'weight', 'niceName':'diboson'}
 samples = [WJETS, TTJets_combined, Rest, QCD]#, diBoson]
-samplesBtag = [WJETSbtagweight, TTJetsbtagweight, Rest, QCD]
+samplesTTcheck = [WJETS, TTJets_combined_singleLep, TTJets_combined_diLep, TTJets_combined_had, Rest, QCD]#, diBoson]
+
 #samplesComp = [WJETS, TTJETS, singleTop, DY, QCD]
 
 #EWK = {'name':'EWK', 'chain':getChain([WJetsHT_25ns,TTJets_HTLO_25ns,singleTop_25ns,DY_25ns,TTV_25ns],histname=''), 'color':color('DY'),'weight':'weight', 'niceName':'EWK'}
 
-data = {'name':'data', 'chain':getChain([single_mu_Run2015D, single_ele_Run2015D],histname=''), 'color':ROOT.kBlack,'weight':'weight', 'niceName':'data', 'cut':False}
+data = {'name':'data', 'chain':getChain([single_mu_Run2015D, single_ele_Run2015D],histname=''), 'color':ROOT.kBlack,'weight':'weight', 'niceName':'data', 'cut':''}
 
 
 # older samples
@@ -110,7 +119,7 @@ lepGoodPt = {'name':'LepGood_pt[0]', 'binning':[22,0,1100], 'titleX':'p_{T} [GeV
 lepGoodEta = {'name':'LepGood_eta[0]', 'binning':[30,-3.,3.], 'titleX':'#eta (lepton)', 'titleY':'Events', 'filename':'LepGood_eta[0]'}
 leadingJetPt = {'name':'Jet_pt[0]', 'binning':[40,0,2000], 'titleX':'p_{T} (leading jet) [GeV]', 'titleY':'Events', 'filename':'Jet_pt[0]'}
 leadingJetPhi = {'name':'Jet_phi[0]', 'binning':[32,-3.2,3.2], 'titleX':'#Phi (leading jet)', 'titleY':'Events', 'filename':'Jet_phi[0]'}
-invMass = {'name':'sqrt(2*LepGood_pt[0]*LepGood_pt[1]*(cosh(LepGood_eta[0]-LepGood_eta[1])-cos(LepGood_phi[0]-LepGood_phi[1])))','binning':[40,0,1000], 'titleX':'M [GeV]', 'titleY':'Events', 'filename':'invMass'}
+invMass = {'name':'sqrt(2*LepGood_pt[0]*LepGood_pt[1]*(cosh(LepGood_eta[0]-LepGood_eta[1])-cos(LepGood_phi[0]-LepGood_phi[1])))','binning':[50,0,500], 'titleX':'M [GeV]', 'titleY':'Events', 'filename':'invMass'}
 
 
 met = {'name':'met_pt', 'binning':[22,0,1100], 'titleX':'E_{T}^{miss} [GeV]', 'titleY':'Events', 'filename':'MET_pt'}
@@ -134,9 +143,42 @@ presel = "((!isData&&singleLeptonic)||(isData&&"+triggers+"&&((muonDataSet&&sing
 presel += "&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&Jet_pt[1]>80&&st>250&&nJet30>2&&htJet30j>500"
 newpresel = presel
 
+singleMuonic = '(Sum$(abs(LepGood_pdgId)==13&&LepGood_pt>=25&&abs(LepGood_eta)<2.4&&LepGood_miniRelIso<0.2&&LepGood_mediumMuonId==1&&LepGood_sip3d<4.0)==1)'
+singleElectronic = '(Sum$(abs(LepGood_pdgId)==11&&LepGood_pt>=25&&abs(LepGood_eta)<2.5&&LepGood_miniRelIso<0.2&&LepGood_SPRING15_25ns_v1==4)==1)'
+
+multiMuonic = '(Sum$(abs(LepGood_pdgId)==13&&LepGood_pt>=25&&abs(LepGood_eta)<2.4&&LepGood_miniRelIso<0.2&&LepGood_mediumMuonId==1&&LepGood_sip3d<4.0)>=1)'
+multiElectronic = '(Sum$(abs(LepGood_pdgId)==11&&LepGood_pt>=25&&abs(LepGood_eta)<2.5&&LepGood_miniRelIso<0.2&&LepGood_SPRING15_25ns_v1==4)>=1)'
+
+multiLeptonic = '('+multiMuonic+'||'+multiElectronic+')'
+
+diMuonic = '(Sum$(abs(LepGood_pdgId)==13&&LepGood_pt>=25&&abs(LepGood_eta)<2.4&&LepGood_miniRelIso<0.2&&LepGood_mediumMuonId==1&&LepGood_sip3d<4.0)==2)'
+diElectronic = '(Sum$(abs(LepGood_pdgId)==11&&LepGood_pt>=25&&abs(LepGood_eta)<2.5&&LepGood_miniRelIso<0.2&&LepGood_SPRING15_25ns_v1==4)==2)'
+ZcutOut = '(sqrt(2*LepGood_pt[0]*LepGood_pt[1]*(cosh(LepGood_eta[0]-LepGood_eta[1])-cos(LepGood_phi[0]-LepGood_phi[1])))>110||sqrt(2*LepGood_pt[0]*LepGood_pt[1]*(cosh(LepGood_eta[0]-LepGood_eta[1])-cos(LepGood_phi[0]-LepGood_phi[1])))<70)'
+
+diOF = '('+singleMuonic+'&&'+singleElectronic+')'
+diSF = '('+diMuonic+'||'+diElectronic+')'
+diLep = '('+diOF+'||'+diMuonic+'||'+diElectronic+')'
+diLepNoZ = '('+diOF+'||('+diMuonic+'&&'+ZcutOut+')||('+diElectronic+'&&'+ZcutOut+'))'
+diLepOS = '('+diOF+'||('+diMuonic+'&&'+ZcutOut+')||('+diElectronic+'&&'+ZcutOut+'))&&(LepGood_pdgId[0]!=LepGood_pdgId[1])'
+
+preselDiLep = '((isData&&'+triggers+'&&'+filters+')||(!isData))&&('+diLep + '&&Jet_pt[1]>80&&(LepGood_pt[0]+met_pt)>250&&nJet30>2&&htJet30j>500)'
+preselDiLepNoZ = '((isData&&'+triggers+'&&'+filters+')||(!isData))&&('+diLepNoZ + '&&Jet_pt[1]>80&&(LepGood_pt[0]+met_pt)>250&&nJet30>2&&htJet30j>500)' 
+preselDiLepOS = '((isData&&'+triggers+'&&'+filters+')||(!isData))&&('+diLepOS + '&&Jet_pt[1]>80&&(LepGood_pt[0]+met_pt)>250&&nJet30>2&&htJet30j>500)'
+preselDiLepOF = '((isData&&'+triggers+'&&'+filters+')||(!isData))&&('+diOF + '&&Jet_pt[1]>80&&(LepGood_pt[0]+met_pt)>250&&nJet30>2&&htJet30j>500)'
+preselDiLepSF = '((isData&&'+triggers+'&&'+filters+')||(!isData))&&('+diSF + '&&Jet_pt[1]>80&&(LepGood_pt[0]+met_pt)>250&&nJet30>2&&htJet30j>500)'
+preselDiMu = '((isData&&'+triggers+'&&'+filters+')||(!isData))&&('+diMuonic + '&&Jet_pt[1]>80&&(LepGood_pt[0]+met_pt)>250&&nJet30>2&&htJet30j>500)'
+preselDiEle = '((isData&&'+triggers+'&&'+filters+')||(!isData))&&('+diElectronic + '&&Jet_pt[1]>80&&(LepGood_pt[0]+met_pt)>250&&nJet30>2&&htJet30j>500)'
+
+preselMultiLep = '((isData&&'+triggers+'&&'+filters+')||(!isData))&&('+ multiLeptonic + '&&Jet_pt[1]>80&&(LepGood_pt[0]+met_pt)>250&&nJet30>2&&htJet30j>500)'
+
 noCut = {'name':'empty', 'string':'(1)', 'niceName':'no cut'}
 
-name, cut = nameAndCut((250,350),(500,-1),(5,5),btb=(0,0),presel=newpresel)
+name, cut = nameAndCut((250,350),(500,750),(4,5),btb=(0,-1),presel=newpresel)
+ttSBbin1 = {'name':name,'string':cut,'niceName':'Lowest SR'}
+
+name, cut = nameAndCut((250,350),(500,750),(4,5),btb=(0,-1),presel=preselDiLepNoZ)
+ttSBbin1diLep = {'name':name,'string':cut,'niceName':'Lowest SR'}
+
 name, cut = nameAndCut((450,-1),(500,-1),(5,5),btb=(0,0),presel=newpresel)
 
 bin1 = {'name':name,'string':cut+'&&deltaPhi_Wl>1.','niceName':'Lowest SR'}
@@ -150,10 +192,21 @@ negWeight = {'name':'negWeight', 'string':newpresel+'&&weight<0', 'niceName':'ne
 #newPreselNoLtHt = {'name':'presel','string':preselNoLtHt,'niceName':'Preselection'}
 newPreselCut = {'name':'presel','string':newpresel,'niceName':'Preselection'}
 newPreselCutBlinded = {'name':'presel','string':newpresel+'&&deltaPhi_Wl<0.5','niceName':'Preselection'}
-newPreselCutHad = {'name':'presel','string':newpresel+'&&(ngenLep+ngenTau)==0','niceName':'Preselection'}
-newPreselCutSemiLep = {'name':'presel','string':newpresel+'&&(ngenLep+ngenTau)==1','niceName':'Preselection'}
-newPreselCutDiLep = {'name':'presel','string':newpresel+'&&(ngenLep+ngenTau)==2','niceName':'Preselection'}
+newPreselCutHadTT = {'name':'presel','string':newpresel+'&&(ngenLep+ngenTau)==0','niceName':'Preselection'}
+newPreselCutSemiLepTT = {'name':'presel','string':newpresel+'&&(ngenLep+ngenTau)==1','niceName':'Preselection'}
+newPreselCutDiLepTT = {'name':'presel','string':newpresel+'&&(ngenLep+ngenTau)==2','niceName':'Preselection'}
 
+newPreselCutDiLep = {'name':'presel','string':preselDiLep,'niceName':'Preselection 2l'}
+newPreselCutDiLepNoZ = {'name':'presel','string':preselDiLepNoZ,'niceName':'Preselection 2l'}
+
+newPreselCutDiLepOS = {'name':'presel','string':preselDiLepOS,'niceName':'2l OS'}
+newPreselCutDiLepOF = {'name':'presel','string':preselDiLepOF,'niceName':'2l OF'}
+newPreselCutDiLepSF = {'name':'presel','string':preselDiLepSF,'niceName':'Preselection 2l'}
+newPreselCutDiMu = {'name':'presel','string':preselDiMu,'niceName':'Preselection 2mu'}
+newPreselCutDiEle = {'name':'presel','string':preselDiEle,'niceName':'Preselection 2e'}
+
+
+newPreselCutMultiLep = {'name':'presel','string':preselMultiLep, 'niceName':'#geq 1 lepton'}
 
 newPreselCutSingleMuAN = {'name':'presel','string':newpresel+'&&singleMuonic','niceName':'Preselection'}
 newPreselCutSingleEleAN = {'name':'presel','string':newpresel+'&&singleElectronic','niceName':'Preselection'}
@@ -320,7 +373,7 @@ dataPlotList = [stComp, htComp, deltaPhiCMG, met, njet, leadingJetPt, lepGoodPt,
 #  t = plot(samples,leadingJetPt,newPreselCut, data=dataDict,filling=True,stacking=True,minimum=0.08, maximum=2000, MClumiScale=205./3000., setLogY=True, lumi=0.205, titleText='CMS preliminary')
 #  savePlot(t, d['titleX'])
 
-def plot(samples, variable, cuts, signals=False, data=False, maximum=False, minimum=0., stacking=False, filling=True, setLogY=False, setLogX=False, titleText='simulation', lumi='3', legend=True, MClumiScale=1., drawError=False, MCscale=True):
+def plot(samples, variable, cuts, signals=False, data=False, maximum=False, minimum=0., stacking=False, filling=True, setLogY=False, setLogX=False, titleText='simulation', lumi='3', legend=True, MClumiScale=1., drawError=False, MCscale=True, btagcut='nBJetMediumCSV30==0', btagweight='weightBTag0_SF'):
   if 'binningIsExplicit' in variable: binningIsExplicit = variable['binningIsExplicit']
   else: binningIsExplicit = False
   totalChain = ROOT.TChain('tree')
@@ -350,14 +403,32 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
   nsamples = len(samples)
   ncuts = len(cuts)
   if data:
-    if data['cut']: dataCutString = data['cut']
-    else: dataCutString = cuts[0]['string']
+    #dataCutString = preselMultiLep
+    #if data['cut']:
+    #  dataCutString = cuts[0]['string'] +'&&'+ data['cut']
+    #  print dataCutString
+    #else: dataCutString = cuts[0]['string']
+    dataCutString, dataweight = getBTagCutAndWeight(data['chain'], btagcut, btagweight, cuts[0]['string'], '(1)')
     dataYield, dataYieldError = getYieldFromChain(data['chain'],cutString=dataCutString,weight='(1)', returnError=True)
   if ncuts == 1 and data and MCscale:
     #if data['cut']: dataCutString = data['cut']
     #else: dataCutString = cuts[0]['string']
     #dataYield = getYieldFromChain(data['chain'],cutString=dataCutString,weight='(1)')
-    MCYield, MCYieldError = getYieldFromChain(totalChain,cutString=cuts[0]['string'],weight=str(MClumiScale)+'*''weight', returnError=True)
+    #MCYield, MCYieldError = getYieldFromChain(totalChain,cutString=cuts[0]['string'],weight=str(MClumiScale)+'*''weight', returnError=True)
+    MCYield = 0
+    MCYieldError = 0
+    for s in samples:
+      normCut, normWeight = getBTagCutAndWeight(s['chain'], btagcut, btagweight, cuts[0]['string'], s['weight']+'*'+str(MClumiScale))
+      if s['cut']:
+        normCut = normCut + '&&' + s['cut']
+        #print ' - cut:', sample['name']
+      #print normCut, normWeight
+      a, b = getYieldFromChain(s['chain'],cutString=normCut,weight=normWeight, returnError=True)
+      #print a, b
+      MCYield += a
+      MCYieldError += b**2
+    MCYieldError = sqrt(MCYieldError)
+    #MCYield, MCYieldError = getYieldFromChain(totalChain,cutString=preselMultiLep,weight=str(MClumiScale)+'*weight', returnError=True)
     print 'Yield Data:\t', dataYield
     print 'Yield MC:\t', round(MCYield,1)
     MCscale = dataYield/MCYield
@@ -372,22 +443,23 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
       else: legendName = cut['niceName']
       if binningIsExplicit: h.append({'hist':ROOT.TH1F('h'+str(isample)+'_'+str(icut), legendName, len(variable['binning'])-1, array('d', variable['binning'])),'yield':0., 'legendName':legendName})
       else: h.append({'hist':ROOT.TH1F('h'+str(isample)+'_'+str(icut), legendName, *variable['binning']),'yield':0., 'legendName':legendName})
-      print 'Will apply the following cuts and weight for sample',sample['name']
-      print 'Weight:'
-      if sample['weight']=='weight':
-        weight='weight'
-        print ' - chained weight'
-      else:
-        weight=str(sample['weight'])
-        print ' - weight:', weight
-      print 'Cut'
+      normCut, normWeight = getBTagCutAndWeight(s['chain'], btagcut, btagweight, cut['string'], s['weight'])
+      #print 'Will apply the following cuts and weight for sample',sample['name']
+      #print 'Weight:'
+      #if sample['weight']=='weight':
+      #  weight='weight'
+      #  print ' - chained weight'
+      #else:
+      #  weight=str(sample['weight'])
+      #  print ' - weight:', weight
+      #print 'Cut'
       if sample['cut']:
-        useCut = sample['cut']
+        normCut = normCut + '&&' + sample['cut']
         print ' - cut:', sample['name']
-      else:
-        useCut = cut['string']
-        print ' - global cut'
-      sample['chain'].Draw(variable['name']+'>>h'+str(isample)+'_'+str(icut),str(MCscale*MClumiScale)+'*'+weight+'*('+useCut+')','goff')
+      #else:
+      #  useCut = cut['string']
+      #  print ' - global cut'
+      sample['chain'].Draw(variable['name']+'>>h'+str(isample)+'_'+str(icut),str(MCscale*MClumiScale)+'*'+normWeight+'*('+normCut+')','goff')
       totalH.Add(h[i]['hist'])
       h[i]['yield'] = h[i]['hist'].GetSumOfWeights()
       if minimum: h[i]['hist'].SetMinimum(minimum)
@@ -468,10 +540,11 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
   if data:
     if binningIsExplicit: h.append({'hist':ROOT.TH1F('data','Data',len(variable['binning'])-1, array('d', variable['binning'])),'yield':dataYield, 'legendName':'data'})
     else: h.append({'hist':ROOT.TH1F('data','Data',*variable['binning']),'yield':dataYield, 'legendName':'data'})
-    if data['cut']: cutstring = data['cut']
-    else: cutstring = cut['string']
+    #if data['cut']: cutstring = data['cut']
+    #else: cutstring = cut['string']
     #if data['var']: variable = data['var']
-    data['chain'].Draw(variable['name']+'>>data',cutstring,'goff')
+    normCut, normWeight = getBTagCutAndWeight(data['chain'], btagcut, btagweight, cut['string'], (1))
+    data['chain'].Draw(variable['name']+'>>data',normCut,'goff')
     #h_Stack.Draw('hist')
     h[-1]['hist'].Draw('same e1p')
     if legend: leg.AddEntry(h[-1]['hist'])
@@ -501,6 +574,7 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
     dataMCH.SetMaximum(2.2)
     h.append({'hist':dataMCH, 'yield':0., 'legendName':'notInLegend'})
     dataMCH.Draw('same e1p')
+    pad2.RedrawAxis()
     can.cd()
     pad1.cd()
   if titleText or lumi:
@@ -517,6 +591,201 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
   can.Update()
   if stacking: return {'hist':h, 'canvas':can, 'legend':leg, 'stack':h_Stack, 'signals':s}
   else: return {'hist':h, 'canvas':can, 'legend':leg, 'signals':s}
+
+def plotInSignalRegions(samples, presel, data=False, fixedNJet=None, btb=None, signalRegions=signalRegion3fb, legend=True, stacking=True, fractions=True, minimum=0, maximum=0, MClumiScale=2.2/3., MCscale=1, titleText='preliminary', lumi=2.2, btagcut='nBJetMediumCSV30==0', btagweight='weightBTag0_SF'):
+  can = ROOT.TCanvas('c','c',700,700)
+  totalChain = ROOT.TChain('tree')
+  for s in samples:
+    totalChain.Add(s['chain'])
+  bottomMargin = 0.13
+  if data:
+    marginForPad2 = 0.3
+    bottomMargin = 0.
+  else:
+    marginForPad2 = 0.
+    bottomMargin = 0.13
+  pad1=ROOT.TPad("pad1","MyTitle",0.,marginForPad2,1.,1.)
+  pad1.SetLeftMargin(0.11)
+  pad1.SetBottomMargin(bottomMargin)
+  pad1.Draw()
+  pad1.cd()
+  pad1.SetLogy()
+  if data:
+    dataYield, dataYieldError = getYieldFromChain(data['chain'],cutString=preselMultiLep,weight='(1)', returnError=True)
+  if data and MCscale==1:
+    MCYield, MCYieldError = getYieldFromChain(totalChain,cutString=preselMultiLep,weight=str(MClumiScale)+'*'+totalWeight, returnError=True)
+    print 'Yield Data:\t', dataYield
+    print 'Yield MC:\t', round(MCYield,1)
+    MCscale = dataYield/MCYield
+    MCscaleError = dataYield/MCYield*sqrt(MCYieldError**2/dataYield**2+dataYieldError**2/MCYield**2)
+  else:
+    MCscale = MCscale
+    MCscaleError = 0
+  print 'Will scale MC with factor:',getValErrString(MCscale,MCscaleError)
+  h = []
+  bins = 0
+  for srNJet in sorted(signalRegions):
+    rows = 0
+    for stb in sorted(signalRegions[srNJet]):
+      rows += len(signalRegions[srNJet][stb])
+    bins += rows
+  #print bins
+
+  for isample, sample in enumerate(samples):
+    legendName = sample['niceName']
+    h.append({'hist':ROOT.TH1F('h'+str(isample), legendName, bins, 0, bins),'yield':0., 'legendName':legendName})
+    h[-1]['hist'].SetFillColor(sample['color'])
+  if data:
+    dataD ={'hist':ROOT.TH1F('data','Data',bins, 0, bins),'yield':dataYield, 'legendName':'data'}
+  totalH = ROOT.TH1F('totalH', 'totalH', bins, 0, bins)
+  dataMCH = ROOT.TH1F('dataMC','DataMC', bins, 0, bins)
+  i = 1
+  for i_njb, njb in enumerate(sorted(signalRegions)):
+    for stb in sorted(signalRegions[njb]):
+      for htb in sorted(signalRegions[njb][stb]):
+        if fixedNJet is not None: njets=fixedNJet
+        else: njets=njb
+        #print njets
+        name, cut = nameAndCut(stb,htb,njets,btb=btb,presel=presel['string'])
+        print 'Processing cut:', name
+        totalY = [0,0]
+        for isample, sample in enumerate(samples):
+          print 'Sample', sample['name']
+          normCut, normWeight = getBTagCutAndWeight(sample['chain'], btagcut, btagweight, cut, sample['weight']+'*'+str(MClumiScale*MCscale))
+          #weight = sample['weight']+'*'+str(MCscale*MClumiScale)
+          ##print weight
+          ##print weight
+          #if sample['cut']:
+          #  totalCut = cut + '&&' + sample['cut']
+          #  #print sample['cut']
+          #else: totalCut = cut
+          ##print totalCut
+          y = getYieldFromChain(sample['chain'], normCut, normWeight, returnError=True)
+          ySemi = getYieldFromChain(sample['chain'], normCut+'&&(ngenLep+ngenTau)==1', normWeight, returnError=True)
+          yDi = getYieldFromChain(sample['chain'], normCut+'&&(ngenLep+ngenTau)==2', normWeight, returnError=True)
+          if ySemi[0]>0:
+            fracSemi = getPropagatedError(ySemi[0],ySemi[1],y[0],y[1], returnCalcResult=True)
+          else: fracSemi = (0,0)
+          print 'Fraction Semileptonic', fracSemi
+          if yDi[0]>0:
+            fracDi = getPropagatedError(yDi[0],yDi[1],y[0],y[1], returnCalcResult=True)
+          else: fracDi = (0,0)
+          print 'Fraction Dileptonic', fracDi
+          h[isample]['hist'].SetBinContent(i, y[0])
+          h[isample]['hist'].SetBinError(i, y[1])
+          h[isample]['yield'] += y[0]
+          #print y[0]
+          totalY[0] += y[0]
+          totalY[1] += y[1]
+        totalH.SetBinContent(i,totalY[0])
+        totalH.SetBinError(i,totalY[1])
+        if data:
+          #if data['cut']:
+          #  totalCut = cut + '&&' + data['cut']
+          #  #print data['cut']
+          #else: totalCut = cut
+          normCut, normWeight = getBTagCutAndWeight(data['chain'], btagcut, btagweight, cut, '(1)')
+          y = getYieldFromChain(data['chain'], normCut, weight='(1)', returnError=True)
+          print 'Data yield:', y
+          if y[0]>0:
+            ratio = getPropagatedError(y[0],y[1],totalH.GetBinContent(i),totalH.GetBinError(i), returnCalcResult=True)
+          else:
+            ratio = (0,totalH.GetBinError(i)/totalH.GetBinContent(i))
+          print 'Data/MC:', getValErrString(ratio[0],ratio[1])
+          dataD['hist'].SetBinContent(i, y[0]) 
+          dataD['hist'].SetBinError(i, y[1]) 
+          dataD['yield'] += y[0]
+          dataMCH.SetBinContent(i, ratio[0])
+          dataMCH.SetBinError(i, ratio[1])
+        i+=1
+  
+  legendNameLengthsSamples = [len(x['legendName']) for x in h]
+  legendNameLengths = legendNameLengthsSamples
+  legendWidth = 0.015*max(legendNameLengths)+0.03
+  if legend:
+    height = 0.04*len(h)
+    if data: height+=0.08
+    leg = ROOT.TLegend(0.98-legendWidth,0.95-height,0.98,0.95)
+    leg.SetFillColor(ROOT.kWhite)
+    leg.SetShadowColor(ROOT.kWhite)
+    leg.SetBorderSize(1)
+    leg.SetTextSize(0.035)
+    for item in reversed(h):
+      leg.AddEntry(item['hist'],'','f')
+  
+  h.sort(key=operator.itemgetter('yield'))
+  frac = []
+  if stacking:
+    h_Stack = ROOT.THStack('h_Stack','Stack')
+    for item in h:
+      h_Stack.Add(item['hist'])
+      frac.append(item['hist'].Clone())
+      frac[-1].Divide(totalH)
+    if minimum: h_Stack.SetMinimum(minimum)
+    if maximum: h_Stack.SetMaximum(maximum)
+    h_Stack.Draw('hist')
+    h_Stack.GetYaxis().SetTitle('Events')
+    h_Stack.GetYaxis().SetTitleOffset(0.9)
+  
+  if fractions and data:
+    h_Stack_frac = ROOT.THStack('h_Stack_frac','Stack')
+    for f in reversed(frac):
+      f.SetFillStyle(3001)
+      h_Stack_frac.Add(f)
+      #f.Draw('hist same')
+
+  if data:
+    dataD['hist'].Draw('same e1p')
+    if legend: leg.AddEntry(dataD['hist'], '', 'e1p')
+    can.cd()
+    pad2=ROOT.TPad("pad2","datavsMC",0.,0.,1.,.3)
+    pad2.SetLeftMargin(0.11)
+    pad2.SetBottomMargin(0.3)
+    pad2.SetTopMargin(0.)
+    pad2.SetGrid()
+    pad2.Draw()
+    pad2.cd()
+    setNiceBinLabel(dataMCH)
+    dataMCH.GetXaxis().SetTitleSize(0.13)
+    dataMCH.GetXaxis().SetLabelSize(0.13)
+    dataMCH.GetXaxis().SetNdivisions(508)
+    dataMCH.GetYaxis().SetTitle('data/MC')
+    dataMCH.GetYaxis().SetTitleSize(0.13)
+    dataMCH.GetYaxis().SetLabelSize(0.13)
+    dataMCH.GetYaxis().SetTitleOffset(0.4)
+    dataMCH.GetYaxis().SetNdivisions(508)
+    dataMCH.SetMinimum(0.01)
+    dataMCH.SetMaximum(2.2)
+    #h_Stack_frac.Draw('hist same')
+    h.append({'hist':dataMCH, 'yield':0., 'legendName':'notInLegend'})
+    h.append(dataD)
+    dataMCH.Draw('same e1p')
+    h_Stack_frac.Draw('hist same')
+    dataMCH.Draw('same e1p')
+    pad2.RedrawAxis()
+    pad2.SetGrid()
+    can.cd()
+    pad1.cd()
+  
+  leg.Draw()
+
+  if titleText or lumi:
+    latex1 = ROOT.TLatex()
+    latex1.SetNDC()
+    latex1.SetTextSize(0.04)
+    latex1.SetTextAlign(11) # align right
+  if titleText: latex1.DrawLatex(0.11,0.96,'CMS #bf{#it{'+titleText+'}}')
+  if MCscale and (MCscale>1.001 or MCscale<0.99) :
+    latex1.DrawLatex(0.82, 0.95-height-0.04,'#bf{MC scale:}')
+    latex1.DrawLatex(0.82, 0.95-height-0.04*2, str(round(MCscale,2))+'\pm'+str(round(MCscaleError,2)))
+  if lumi: latex1.DrawLatex(0.77,0.96,"L="+str(lumi)+"fb^{-1} (13TeV)")
+
+  #if data:
+  #  h.append(dataD)
+  #  h.append(dataMCH)
+  can.Update()
+  if stacking: return {'hist':h, 'canvas':can, 'legend':leg, 'stack':h_Stack, 'total':totalH, 'frac_stack':h_Stack_frac, 'fracs':frac}
+  else: return {'hist':h, 'canvas':can, 'legend':leg}
 
 def savePlot(plotDict, path, filename, fileType=['pdf','root','png']):
   wwwDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/'
