@@ -9,8 +9,12 @@ from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,v
 #from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_postProcessed import *
 #from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT400ST200_postProcessed_fromArthur import *
 
-from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT500ST250_postProcessed_btagWeight import *
-from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT500ST250_postProcessed_fromArthur import *
+#from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT500ST250_postProcessed_btagWeight import *
+#from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT500ST250_postProcessed_fromArthur import *
+
+from Workspace.RA4Analysis.cmgTuples_Data25ns_miniAODv2_postprocessed import *
+from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed import *
+
 
 #from makeTTPrediction import makeTTPrediction
 #from makeWPrediction import makeWPrediction
@@ -24,19 +28,25 @@ ROOT.TH1F().SetDefaultSumw2()
 
 lepSel = 'hard'
 
-#cWJets  = getChain(WJetsHTToLNu_25ns,histname='')
-#cTTJets = getChain(TTJets_LO_25ns,histname='')
-#cEWK = getChain([WJetsHTToLNu_25ns,TTJets_LO_25ns,DY_25ns,singleTop_25ns],histname='')
+cWJets      = getChain(WJetsHTToLNu_25ns,histname='')
+cTTJets     = getChain(TTJets_combined,histname='')
+cDY         = getChain(DY_25ns,histname='')
+csingleTop  = getChain(singleTop_25ns,histname='')
+cTTV        = getChain(TTV_25ns,histname='')
+cRest       = getChain([singleTop_25ns, DY_25ns, TTV_25ns],histname='')#no QCD
+cBkg        = getChain([WJetsHTToLNu_25ns, TTJets_combined, singleTop_25ns, DY_25ns, TTV_25ns], histname='')
 
-cWJets  = getChain(WJetsHT_25ns,histname='')
-cTTJets = getChain(TTJets_HTLO_25ns,histname='')
-#DY = getChain(DY_25ns,histname='')
-#singleTop = getChain(singleTop_25ns,histname='')
-#TTV = getChain(TTV_25ns,histname='')
-#cRest = getChain([singleTop_25ns, DY_25ns, TTV_25ns],histname='')#no QCD
-cRest = getChain([singleTop_25ns, DY_25ns, TTV_25ns], histname='')
-#cEWK =  getChain([WJetsHT_25ns, TTJets_HTLO_25ns, singleTop_25ns, DY_25ns, TTV_25ns], histname='')#no QCD
-cData = getChain([SingleMuon_Run2015D, SingleElectron_Run2015D], histname='')
+cData = getChain([single_mu_Run2015D, single_ele_Run2015D], histname='')
+
+#cWJets  = getChain(WJetsHT_25ns,histname='')
+#cTTJets = getChain(TTJets_HTLO_25ns,histname='')
+##DY = getChain(DY_25ns,histname='')
+##singleTop = getChain(singleTop_25ns,histname='')
+##TTV = getChain(TTV_25ns,histname='')
+##cRest = getChain([singleTop_25ns, DY_25ns, TTV_25ns],histname='')#no QCD
+#cRest = getChain([singleTop_25ns, DY_25ns, TTV_25ns], histname='')
+##cEWK =  getChain([WJetsHT_25ns, TTJets_HTLO_25ns, singleTop_25ns, DY_25ns, TTV_25ns], histname='')#no QCD
+#cData = getChain([SingleMuon_Run2015D, SingleElectron_Run2015D], histname='')
 
 triggers = "(HLT_EleHT350||HLT_MuHT350)"
 filters = "Flag_goodVertices && Flag_HBHENoiseFilter_fix && Flag_CSCTightHaloFilter && Flag_eeBadScFilter && Flag_HBHENoiseIsoFilter"
@@ -48,9 +58,9 @@ btagString = 'nBJetMediumCSV30'
 charges = [['posPDG','leptonPdg>0'],['negPDG','leptonPdg<0']]
 
 stats ={}
-signalRegions = signalRegion3fbReduced
+signalRegions = signalRegion3fb
 
-lumi = 1.26
+lumi = 2.1
 
 def makeWeight(lumi=4., sampleLumi=3.,debug=False):
   if debug:

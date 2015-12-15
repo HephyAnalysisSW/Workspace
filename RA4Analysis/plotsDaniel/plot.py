@@ -52,16 +52,19 @@ totalWeight = 'weight*puReweight_true*lepton_muSF_mediumID*lepton_muSF_miniIso02
 WJETS = {'name':'WJets', 'chain':getChain(WJetsHTToLNu_25ns,histname=''), 'color':color('WJets'),'weight':totalWeight, 'niceName':'W+Jets', 'cut':''}
 TTJets = {'name':'TTJets', 'chain':getChain(TTJets_HTLO_25ns,histname=''), 'color':ROOT.kOrange,'weight':'weight', 'niceName':'t#bar{t}+Jets', 'cut':''}
 TTJets_combined = {'name':'TTJets', 'chain':getChain(TTJets_combined,histname=''), 'color':color('TTJets')-2,'weight':totalWeight, 'niceName':'t#bar{t}+Jets', 'cut':''}
-TTJets_combined_singleLep = {'name':'TTJets', 'chain':getChain(TTJets_combined,histname=''), 'color':color('TTJets')-2,'weight':totalWeight, 'niceName':'t#bar{t}+Jets', 'cut':'(ngenLep+ngenTau)==1'}
-TTJets_combined_diLep = {'name':'TTJets', 'chain':getChain(TTJets_combined,histname=''), 'color':color('TTJets'),'weight':totalWeight, 'niceName':'t#bar{t}+Jets', 'cut':'(ngenLep+ngenTau)==2'}
-TTJets_combined_had = {'name':'TTJets', 'chain':getChain(TTJets_combined,histname=''), 'color':color('TTJets')+2,'weight':totalWeight, 'niceName':'t#bar{t}+Jets', 'cut':'(ngenLep+ngenTau)==0'}
+
+TTJets_combined_singleLep = {'name':'TTJets', 'chain':TTJets_combined['chain'], 'color':color('TTJets')-2,'weight':totalWeight, 'niceName':'t#bar{t}+Jets 1l', 'cut':'(ngenLep+ngenTau)==1'}
+TTJets_combined_diLep =     {'name':'TTJets', 'chain':TTJets_combined['chain'], 'color':color('TTJets'),'weight':totalWeight, 'niceName':'t#bar{t}+Jets 2l', 'cut':'(ngenLep+ngenTau)==2'}
+TTJets_combined_had =       {'name':'TTJets', 'chain':TTJets_combined['chain'], 'color':color('TTJets')+2,'weight':totalWeight, 'niceName':'t#bar{t}+Jets 0l', 'cut':'(ngenLep+ngenTau)==0'}
 
 
 DY = {'name':'DY', 'chain':getChain(DY_25ns,histname=''), 'color':color('DY'),'weight':totalWeight, 'niceName':'Drell Yan', 'cut':''}
 singleTop = {'name':'singleTop', 'chain':getChain(singleTop_25ns,histname=''), 'color':color('singleTop'),'weight':totalWeight, 'niceName':'single Top', 'cut':''}
 QCD = {'name':'QCD', 'chain':getChain(QCDHT_25ns,histname=''), 'color':color('QCD'),'weight':totalWeight, 'niceName':'QCD', 'cut':''}
 TTVH = {'name':'TTVH', 'chain':getChain(TTV_25ns,histname=''), 'color':color('TTV'),'weight':totalWeight, 'niceName':'TTVH', 'cut':''}
-Rest = {'name':'TTVH', 'chain':getChain([TTV_25ns,singleTop_25ns,DY_25ns],histname=''), 'color':color('TTV'),'weight':totalWeight, 'niceName':'Rest EWK', 'cut':''}
+Rest = {'name':'Rest', 'chain':getChain([TTV_25ns,singleTop_25ns,DY_25ns],histname=''), 'color':color('TTV'),'weight':totalWeight, 'niceName':'Rest EWK', 'cut':''}
+Bkg = {'name':'Bkg', 'chain':getChain([TTJets_HTLO_25ns,WJetsHTToLNu_25ns,QCDHT_25ns,TTV_25ns,singleTop_25ns,DY_25ns],histname=''), 'color':color('TTV'),'weight':totalWeight, 'niceName':'total Bkg', 'cut':''}
+EWK = {'name':'Bkg', 'chain':getChain([TTJets_HTLO_25ns,WJetsHTToLNu_25ns,TTV_25ns,singleTop_25ns,DY_25ns],histname=''), 'color':color('TTV'),'weight':totalWeight, 'niceName':'total Bkg', 'cut':''}
 #diBoson = {'name':'diBoson', 'chain':getChain(diBosons_25ns,histname=''), 'color':ROOT.kMagenta,'weight':'weight', 'niceName':'diboson'}
 samples = [WJETS, TTJets_combined, Rest, QCD]#, diBoson]
 samplesTTcheck = [WJETS, TTJets_combined_singleLep, TTJets_combined_diLep, TTJets_combined_had, Rest, QCD]#, diBoson]
@@ -114,6 +117,8 @@ st = {'name':'st', 'binning':[37,250,2100], 'titleX':'L_{T} [GeV]', 'titleY':'Ev
 ht = {'name':'htJet30j', 'binning':[52,500,3100], 'titleX':'H_{T} [GeV]', 'titleY':'Events'}
 njet = {'name':'nJet30', 'binning':[15,0,15], 'titleX':'n_{jets}', 'titleY':'Events', 'filename':'nJet30'}
 deltaPhi = {'name':'deltaPhi_Wl', 'binning':[32,0,3.2], 'titleX':'#Delta#Phi(W,l)', 'titleY':'Events'}
+deltaPhiRB = {'name':'deltaPhi_Wl', 'binning':[16,0,3.2], 'titleX':'#Delta#Phi(W,l)', 'titleY':'Events'}
+
 leptonPt = {'name':'leptonPt', 'binning':[40,0,1000], 'titleX':'p_{T} [GeV]', 'titleY':'Events'}
 lepGoodPt = {'name':'LepGood_pt[0]', 'binning':[22,0,1100], 'titleX':'p_{T} [GeV] (lepton)', 'titleY':'Events', 'filename':'LepGood_pt[0]'}
 lepGoodEta = {'name':'LepGood_eta[0]', 'binning':[30,-3.,3.], 'titleX':'#eta (lepton)', 'titleY':'Events', 'filename':'LepGood_eta[0]'}
@@ -175,9 +180,19 @@ noCut = {'name':'empty', 'string':'(1)', 'niceName':'no cut'}
 
 name, cut = nameAndCut((250,350),(500,750),(4,5),btb=(0,-1),presel=newpresel)
 ttSBbin1 = {'name':name,'string':cut,'niceName':'Lowest SR'}
+ttSBbin1mu = {'name':name,'string':cut+'&&abs(leptonPdg)==13','niceName':'Lowest SR'}
+ttSBbin1ele = {'name':name,'string':cut+'&&abs(leptonPdg)==11','niceName':'Lowest SR'}
+
+name, cut = nameAndCut((250,-1),(500,-1),(3,3),btb=(0,-1),presel=newpresel)
+ttSBincl = {'name':name,'string':cut,'niceName':'Lowest SR'}
+ttSBinclmu = {'name':name,'string':cut+'&&abs(leptonPdg)==13','niceName':'Lowest SR'}
+ttSBinclele = {'name':name,'string':cut+'&&abs(leptonPdg)==11','niceName':'Lowest SR'}
 
 name, cut = nameAndCut((250,350),(500,750),(4,5),btb=(0,-1),presel=preselDiLepNoZ)
 ttSBbin1diLep = {'name':name,'string':cut,'niceName':'Lowest SR'}
+
+name, cut = nameAndCut((250,-1),(500,-1),(4,5),btb=(0,-1),presel=preselDiLepNoZ)
+ttSBincldiLep = {'name':name,'string':cut,'niceName':'Lowest SR'}
 
 name, cut = nameAndCut((450,-1),(500,-1),(5,5),btb=(0,0),presel=newpresel)
 
@@ -443,7 +458,7 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
       else: legendName = cut['niceName']
       if binningIsExplicit: h.append({'hist':ROOT.TH1F('h'+str(isample)+'_'+str(icut), legendName, len(variable['binning'])-1, array('d', variable['binning'])),'yield':0., 'legendName':legendName})
       else: h.append({'hist':ROOT.TH1F('h'+str(isample)+'_'+str(icut), legendName, *variable['binning']),'yield':0., 'legendName':legendName})
-      normCut, normWeight = getBTagCutAndWeight(s['chain'], btagcut, btagweight, cut['string'], s['weight'])
+      normCut, normWeight = getBTagCutAndWeight(sample['chain'], btagcut, btagweight, cut['string'], sample['weight'])
       #print 'Will apply the following cuts and weight for sample',sample['name']
       #print 'Weight:'
       #if sample['weight']=='weight':
@@ -452,7 +467,7 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
       #else:
       #  weight=str(sample['weight'])
       #  print ' - weight:', weight
-      #print 'Cut'
+      print normWeight
       if sample['cut']:
         normCut = normCut + '&&' + sample['cut']
         print ' - cut:', sample['name']

@@ -28,6 +28,8 @@ templateWeightSuffix = '_SF'
 
 ## samples
 isData = True
+unblinded = False
+validation = True
 
 cWJets      = getChain(WJetsHTToLNu_25ns,histname='')
 cTTJets     = getChain(TTJets_combined,histname='')
@@ -44,7 +46,8 @@ else:
 
 
 ## signal region definition
-signalRegions = signalRegion3fb
+signalRegions = validationRegion
+#signalRegions = signalRegion3fb
 
 
 ## weight calculations
@@ -54,15 +57,16 @@ sampleLumi = 3.
 debugReweighting = False
 
 ## QCD estimation
+useQCDestimation = False
 QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151120_QCDestimation_2p1fb_pkl'
-if isData: QCDestimate = pickle.load(file(QCDpickle))
+if isData and useQCDestimation: QCDestimate = pickle.load(file(QCDpickle))
 else: QCDestimate=False
 
 
 ## Directories for plots, results and templates
 if isData:
-  predictionName = 'newSR_lep_SFtemplates_data'
-  templateName   = 'SFtemplates_newSR_lep_data'
+  predictionName = 'validation_mu_SFtemplates_data'
+  templateName   = 'SFtemplates_validation_mu_data'
 else:
   predictionName = 'newSR_lep_SFtemplates_MC'+btagWeightSuffix
   templateName   = 'SFtemplates_newSR_lep_MC'
@@ -80,6 +84,8 @@ presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSoftLeptons=
 
 singleMu_presel = "((!isData&&singleMuonic)||(isData&&"+triggers+"&&(muonDataSet&&singleMuonic)&&"+filters+"))"
 singleMu_presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSoftLeptons==0 && Jet_pt[1]>80 && st>250 && nJet30>2 && htJet30j>500"
+
+presel = singleMu_presel
 
 ## corrections
 createFits = True

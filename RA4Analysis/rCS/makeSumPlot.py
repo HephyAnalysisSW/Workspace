@@ -30,7 +30,7 @@ res = pickle.load(file(pickleDir+prefix+'_estimationResults_pkl_kappa_btag_corre
 #res = pickle.load(file(pickleDir+prefix+'_estimationResults_pkl'))
 #res = pickle.load(file('/data/dspitzbart/Results2015/Prediction_SFTemplate_MC_fullSR_lep_3.0/singleLeptonic_Spring15__estimationResults_pkl'))
 
-signalRegions = signalRegion3fb
+signalRegions = validationRegion
 #signalRegions = signalRegionCRonly
 
 
@@ -47,6 +47,12 @@ for srNJet in sorted(signalRegions):
   rowsNJet[srNJet] = {'nST':len(signalRegions[srNJet]), 'n':rows}
   bins += rows
 
+data_truth_H = ROOT.TH1F('data_truth_H','data',bins,0,bins)
+data_truth_H.SetLineColor(ROOT.kRed+2)
+data_truth_H.SetLineWidth(2)
+data_truth_H.SetMarkerStyle(29)
+data_truth_H.SetMarkerColor(ROOT.kRed+2)
+data_truth_H.SetMarkerSize(2)
 
 
 tt_pred_H  = ROOT.TH1F('tt_pred_H','t#bar{t}+Jets pred.',bins,0,bins)
@@ -97,6 +103,12 @@ i=1
 for srNJet in sorted(signalRegions):
   for stb in sorted(signalRegions[srNJet]):
     for htb in sorted(signalRegions[srNJet][stb]):
+      if unblinded or validation:
+        dcn, dc = nameAndCut(stb, htb, srNJet, (0,0), presel+'&&deltaPhi_Wl>'+str(signalRegions[srNJet][stb][htb]['deltaPhi']))
+        data_yield = getYieldFromChain(cData, dc)
+        print data_yield
+        data_truth_H.SetBinContent(i,data_yield)
+        data_truth_H.SetBinError(i, sqrt(data_yield))
       #print 1
       tt_pred_H.SetBinContent(i, res[srNJet][stb][htb]['TT_pred'])
       tt_pred_H.SetBinError(i,   res[srNJet][stb][htb]['TT_pred_err'])
@@ -162,6 +174,8 @@ leg.AddEntry(truth_H)
 leg.AddEntry(tt_pred_H,'','f')
 leg.AddEntry(w_pred_H,'','f')
 leg.AddEntry(rest_H,'','f')
+if unblinded or validation:
+  leg.AddEntry(data_truth_H, 'data')
 
 h_Stack.Draw('hist')
 h_Stack.GetYaxis().SetTitle('Events')
@@ -176,7 +190,8 @@ pred_err.SetFillColor(ROOT.kGray+1)
 pred_err.SetFillStyle(3244)
 pred_err.Draw('2 same')
 truth_H.Draw('e1p same')
-
+if unblinded or validation:
+  data_truth_H.Draw('e1p same')
 
 leg.Draw()
 

@@ -22,7 +22,7 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, QCD=Fa
   cData = samples['Data']
   rd={}
   
-  nJetCR = (3,4)
+  nJetCR = (3,3)
   
   if isData:
     w = 'weight'

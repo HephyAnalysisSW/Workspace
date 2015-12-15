@@ -6,11 +6,12 @@ from math import sqrt, pi, cosh
 from array import array
 
 def makeWeight(lumi=4., sampleLumi=3.,debug=False):
+  reWeight = 'lepton_muSF_mediumID*lepton_muSF_miniIso02*lepton_muSF_sip3d*lepton_eleSF_cutbasedID*lepton_eleSF_miniIso01'
   if debug:
     print 'No lumi-reweighting done!!'
     return 'weight', 'weight*weight'
   else:
-    weight_str = '(((weight)/'+str(sampleLumi)+')*'+str(lumi)+')'
+    weight_str = '((weight/'+str(sampleLumi)+')*'+str(lumi)+'*'+reWeight+')'
     weight_err_str = '('+weight_str+'*'+weight_str+')'
   return weight_str, weight_err_str
 

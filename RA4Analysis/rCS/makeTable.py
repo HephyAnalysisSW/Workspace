@@ -13,11 +13,11 @@ useTTcorrection = False
 signal = False
 
 prefix = 'singleLeptonic_Spring15_'
-path = '/data/'+username+'/Results2015/Prediction_data_newSR_lep_SFtemplates_1.55/'
+path = '/data/'+username+'/Results2015/Prediction_validation_mu_SFtemplates_data_2.1/'
 #path = '/data/'+username+'/Results2015/Prediction_SFTemplate_MC_fullSR_lep_3.0/' 
 #path2 = '/data/'+username+'/Results2015/Prediction_bweightTemplate_MC_reducedSR_lep_3.0/'
 
-res = pickle.load(file(path+prefix+'_estimationResults_pkl'))
+res = pickle.load(file(path+prefix+'_estimationResults_pkl_kappa_btag_corrected'))
 #res2 = pickle.load(file(path2+prefix+'_estimationResults_pkl'))
 
 if useTTcorrection: kcs = pickle.load(file('/data/dspitzbart/Spring15/25ns/rCS_0b_3.0/correction_pkl'))
@@ -46,7 +46,7 @@ if signal:
     s['chain'] = getChain(s['sample'],histname='')
 
 
-signalRegions = signalRegion3fbReduced
+signalRegions = validationRegion
 #signalRegions = signalRegionCRonly
 
 #signalRegions = smallRegion

@@ -209,6 +209,8 @@ leg3.SetTextSize(0.035)
 
 #presel = singleMu_presel
 
+#presel += '&&abs(leptonPdg)==13'
+
 frac = {}
 b = 1
 
@@ -231,17 +233,21 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
       print
       dPhiCut = signalRegions[njb][stb][htb]['deltaPhi']
       #ttJets corrections
-      cname2bCRtt, cut2bCRtt = nameAndCut(stb,htb,(4,5), btb=(2,-1) ,presel=presel)
-      cname1bCRtt, cut1bCRtt = nameAndCut(stb,htb,(4,5), btb=(1,1) ,presel=presel)
-      cname0bCRtt, cut0bCRtt = nameAndCut(stb,htb,(4,5), btb=(0,0) ,presel=presel)
-      cnameCRtt, cutCRtt = nameAndCut(stb,htb,(4,5), btb=(0,-1) ,presel=presel)
+      srNJet = (3,5)
+      cname2bCRtt, cut2bCRtt =    nameAndCut(stb,htb,srNJet, btb=(2,-1) ,presel=presel)
+      cname1bCRtt, cut1bCRtt =    nameAndCut(stb,htb,srNJet, btb=(1,1) ,presel=presel)
+      cname1pbCRtt, cut1pbCRtt =  nameAndCut(stb,htb,srNJet, btb=(1,-1) ,presel=presel)
+      cname0bCRtt, cut0bCRtt =    nameAndCut(stb,htb,srNJet, btb=(0,0) ,presel=presel)
+      cnameCRtt, cutCRtt =        nameAndCut(stb,htb,srNJet, btb=(0,-1) ,presel=presel)
       #rcs1bCRtt = getRCS(cEWK, cut1bCRtt, dPhiCut)
       #rcs0bCRtt = getRCS(cTTJets, cut0bCRtt, dPhiCut)
       samples0b = [{'chain':cWJets, 'cut':cutCRtt, 'weight':'weight*weightBTag0'}, {'chain':cTTJets, 'cut':cutCRtt, 'weight':'weight*weightBTag0'},{'chain':cDY, 'cut':cut0bCRtt, 'weight':'weight'},{'chain':cTTV, 'cut':cut0bCRtt, 'weight':'weight'},{'chain':csingleTop, 'cut':cut0bCRtt, 'weight':'weight'}]
       samples1b = [{'chain':cWJets, 'cut':cutCRtt, 'weight':'weight*weightBTag1_SF'}, {'chain':cTTJets, 'cut':cutCRtt, 'weight':'weight*weightBTag1_SF'},{'chain':cDY, 'cut':cut1bCRtt, 'weight':'weight'},{'chain':cTTV, 'cut':cut1bCRtt, 'weight':'weight'},{'chain':csingleTop, 'cut':cut1bCRtt, 'weight':'weight'}]
+      samples1pb = [{'chain':cWJets, 'cut':cutCRtt, 'weight':'weight*weightBTag1p_SF'}, {'chain':cTTJets, 'cut':cutCRtt, 'weight':'weight*weightBTag1p_SF'},{'chain':cDY, 'cut':cut1pbCRtt, 'weight':'weight'},{'chain':cTTV, 'cut':cut1pbCRtt, 'weight':'weight'},{'chain':csingleTop, 'cut':cut1pbCRtt, 'weight':'weight'}]
       samples2b = [{'chain':cWJets, 'cut':cutCRtt, 'weight':'weight*weightBTag2p_SF'}, {'chain':cTTJets, 'cut':cutCRtt, 'weight':'weight*weightBTag2p_SF'},{'chain':cDY, 'cut':cut2bCRtt, 'weight':'weight'},{'chain':cTTV, 'cut':cut2bCRtt, 'weight':'weight'},{'chain':csingleTop, 'cut':cut2bCRtt, 'weight':'weight'}]
       #rcs0bCRtt_btag_EWK = combineRCS(samples0b, dPhiCut)
       rcs1bCRtt_btag_EWK = combineRCS(samples1b, dPhiCut)
+      #rcs1bCRtt_btag_EWK = combineRCS(samples1pb, dPhiCut)
       rcs2bCRtt_btag_EWK = combineRCS(samples2b, dPhiCut)
       
       QCD0b_lowDPhi  = {'y':QCDestimate[(4,5)][stb][htb][(0,0)][dPhiCut]['NQCDpred_lowdPhi'],  'e':QCDestimate[(4,5)][stb][htb][(0,0)][dPhiCut]['NQCDpred_lowdPhi_err']}
@@ -252,15 +258,19 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
       QCD2b_lowDPhi  = {'y':QCDestimate[(4,5)][stb][htb][(2,-1)][dPhiCut]['NQCDpred_lowdPhi'],  'e':QCDestimate[(4,5)][stb][htb][(2,-1)][dPhiCut]['NQCDpred_lowdPhi_err']}
       QCD2b_highDPhi = {'y':QCDestimate[(4,5)][stb][htb][(2,-1)][dPhiCut]['NQCDpred_highdPhi'], 'e':QCDestimate[(4,5)][stb][htb][(2,-1)][dPhiCut]['NQCDpred_highdPhi_err']}
       
-      QCD = [QCD1b_lowDPhi,QCD1b_highDPhi,QCD2b_lowDPhi,QCD2b_highDPhi]
+      QCD1pb_lowDPhi = {'y':QCD1b_lowDPhi['y']+QCD2b_lowDPhi['y'], 'e':sqrt(QCD1b_lowDPhi['e']**2+QCD2b_lowDPhi['e']**2)}
+      QCD1pb_highDPhi = {'y':QCD1b_highDPhi['y']+QCD2b_highDPhi['y'], 'e':sqrt(QCD1b_highDPhi['e']**2+QCD2b_highDPhi['e']**2)}
+      
+      QCD = [QCD1b_lowDPhi,QCD1b_highDPhi,QCD2b_lowDPhi,QCD2b_highDPhi, QCD1pb_lowDPhi, QCD1pb_highDPhi]
       
       for q in QCD:
         if isnan(q['e']):
           print 'found nan error value', q['e'], 'going to set error to 100%'
           q['e'] = q['y']
       
-      QCD1b_highDPhi = {'y':0.,'e':0.} #test of high deltaPhi QCD estimation
+      #QCD1b_highDPhi = {'y':0.,'e':0.} #test of high deltaPhi QCD estimation
       rcs1bCR_data = getRCS(cData, cut1bCRtt, dPhiCut, QCD_lowDPhi=QCD1b_lowDPhi, QCD_highDPhi=QCD1b_highDPhi)
+      #rcs1bCR_data = getRCS(cData, cut1pbCRtt, dPhiCut, QCD_lowDPhi=QCD1pb_lowDPhi, QCD_highDPhi=QCD1pb_highDPhi)
       rcs1bCR_data_noQCDcorr = getRCS(cData, cut1bCRtt, dPhiCut)
       rcs2bCR_data = getRCS(cData, cut2bCRtt, dPhiCut, QCD_lowDPhi=QCD2b_lowDPhi, QCD_highDPhi=QCD2b_highDPhi)
       rcs2bCR_data_noQCDcorr = getRCS(cData, cut2bCRtt, dPhiCut)
@@ -448,6 +458,17 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
       #print '0b/1b:', round(kappa0tt1ewk['kappa'],2),'+/-',round(kappa0tt1ewk['kappaE_sim'],2)
       i += 1
 
+rcs1bdata_noQCDcorr.SetLineWidth(2)
+rcs2bdata_noQCDcorr.SetLineWidth(2)
+rcs1bdata_noQCDcorr.SetLineColor(ROOT.kGreen+2)
+rcs2bdata_noQCDcorr.SetLineColor(ROOT.kRed+2)
+rcs1bdata_noQCDcorr.SetMarkerColor(ROOT.kGreen+2)
+rcs2bdata_noQCDcorr.SetMarkerColor(ROOT.kRed+2)
+rcs1bdata_noQCDcorr.SetMarkerStyle(rcs1bdata.GetMarkerStyle())
+rcs2bdata_noQCDcorr.SetMarkerStyle(rcs2bdata.GetMarkerStyle())
+
+
+
 
 #plot Rcs
 setNiceBinLabel(rcs1bMC)
@@ -455,8 +476,8 @@ rcs1bMC.Draw('hist e1')
 #rcs1bMCrescale.Draw('hist e1 same')
 #rcs1bMCrescaleD.Draw('hist e1 same')
 rcs1bdata.Draw('hist e1 same')
-rcs1bdata_noQCDcorr.Draw('hist e1 same')
-rcs2bdata_noQCDcorr.Draw('hist e1 same')
+#rcs1bdata_noQCDcorr.Draw('hist e1 same')
+#rcs2bdata_noQCDcorr.Draw('hist e1 same')
 
 
 rcs2bMC.Draw('hist e1 same')
@@ -469,8 +490,8 @@ leg.AddEntry(rcs1bdata, '1b data')
 #leg.AddEntry(rcs1bMCrescaleD, '1b MC dilep sc.')
 leg.AddEntry(rcs2bMC, '2b MC')
 leg.AddEntry(rcs2bdata, '2b data')
-leg.AddEntry(rcs1bdata_noQCDcorr, '1b data w/QCD')
-leg.AddEntry(rcs2bdata_noQCDcorr, '2b data w/QCD')
+#leg.AddEntry(rcs1bdata_noQCDcorr, '1b data w/QCD')
+#leg.AddEntry(rcs2bdata_noQCDcorr, '2b data w/QCD')
 
 leg.Draw()
 
