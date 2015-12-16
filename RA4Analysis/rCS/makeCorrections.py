@@ -71,18 +71,25 @@ for i_njb, njb in enumerate(signalRegions):
         #ttJets corrections
         ttJetRcsFitH = ROOT.TH1F("ttJetRcsFitH","",len(ttJetBins),0,len(ttJetBins))
         ttJetRcsFitH1b = ROOT.TH1F("ttJetRcsFitH1b","",len(ttJetBins),0,len(ttJetBins))
+
         cname1bCRtt, cut1bCRtt = nameAndCut(stb,htb,(4,5), btb=(1,1) ,presel=presel)
         cname0bCRtt, cut0bCRtt = nameAndCut(stb,htb,(4,5), btb=(0,0) ,presel=presel)
         cnameCRtt, cutCRtt = nameAndCut(stb,htb,(4,5), btb=(0,-1) ,presel=presel)
+
         rcs1bCRtt = getRCS(cBkg, cut1bCRtt, dPhiCut, weight = weight_str)
         rcs0bCRtt = getRCS(cTTJets, cut0bCRtt, dPhiCut, weight = weight_str)
-        samples = [{'chain':cWJets, 'cut':cutCRtt, 'weight':weight_str+'*weightBTag1'}, {'chain':cTTJets, 'cut':cutCRtt, 'weight':weight_str+'*weightBTag1'},{'chain':cDY, 'cut':cut1bCRtt, 'weight':weight_str},{'chain':cTTV, 'cut':cut1bCRtt, 'weight':weight_str},{'chain':csingleTop, 'cut':cut1bCRtt, 'weight':weight_str}]
+
+        samples = [{'chain':cWJets, 'cut':cutCRtt, 'weight':weight_str+'*weightBTag1'+btagWeightSuffix}, {'chain':cTTJets, 'cut':cutCRtt, 'weight':weight_str+'*weightBTag1'+btagWeightSuffix},{'chain':cDY, 'cut':cut1bCRtt, 'weight':weight_str},{'chain':cTTV, 'cut':cut1bCRtt, 'weight':weight_str},{'chain':csingleTop, 'cut':cut1bCRtt, 'weight':weight_str}]
+
         rcs1bCRtt_btag = combineRCS(samples, dPhiCut)
-        rcs0bCRtt_btag = getRCS(cTTJets, cutCRtt, dPhiCut, weight = weight_str+'*weightBTag0')
+        rcs0bCRtt_btag = getRCS(cTTJets, cutCRtt, dPhiCut, weight = weight_str+'*weightBTag0'+btagWeightSuffix)
+
         #Kappa now calculated only in the SB bin (4,5) jets 1b allEWK MC vs 0b tt MC - no fit applied for the moment!
         kappaTT = divideRCSdict(rcs0bCRtt,rcs1bCRtt)
         kappaTT_btag = divideRCSdict(rcs0bCRtt_btag,rcs1bCRtt_btag)
+
         fitResults[njb][stb][htb] = {'kappaTT':kappaTT, 'rcs1bCRtt':rcs1bCRtt, 'rcs0bCRtt':rcs0bCRtt, 'kappaTT_btag':kappaTT_btag}
+
         #fill histograms
         for i_njbTT, njbTT in enumerate(ttJetBins):
           cname, cut = nameAndCut(stb,htb,njbTT, btb=(0,0) ,presel=presel)
@@ -109,6 +116,7 @@ for i_njb, njb in enumerate(signalRegions):
         print stars
         print
         print 'Linear Fit for tt Jets Rcs values in 0b MC'
+
         #linear fit in 0b
         ttJetRcsFitH.Fit('pol1','','same',0,3)
         FitFunc     = ttJetRcsFitH.GetFunction('pol1')
@@ -119,6 +127,7 @@ for i_njb, njb in enumerate(signalRegions):
         ttLinear = {'ttD':ttD, 'ttDE':ttDE, 'ttK':ttK, 'ttKE':ttKE}
         fitResults[njb][stb][htb].update({'ttLinear':ttLinear})
         #print ttD, ttK
+
         #constant fit in 0b and 1b
         print
         print 'Konstant Fit for tt Jets Rcs values in 0b MC'
@@ -136,8 +145,9 @@ for i_njb, njb in enumerate(signalRegions):
         ttConst1E = FitFunc.GetParError(0)
         ttC1 = {'ttConst1':ttConst1, 'ttConst1E':ttConst1E}
         fitResults[njb][stb][htb].update({'ttC0':ttC0, 'ttC1':ttC1})
+
       else:
-        
+        #Load fit results if fitting isn't done        
         rcs1bCRtt = loadedFit[njb][stb][htb]['rcs1bCRtt']
         rcs0bCRtt = loadedFit[njb][stb][htb]['rcs0bCRtt']
         kappaTT =   loadedFit[njb][stb][htb]['kappaTT']
@@ -156,22 +166,22 @@ for i_njb, njb in enumerate(signalRegions):
 
       TT_rcs_diff = abs(rcs1bCRtt['rCS'] - (ttD+ttK*i_njb))
       TT_rcs_diffKappaCorr = abs(kappaTT['kappa']*rcs1bCRtt['rCS'] - (ttD+ttK*i_njb))
+
       TT_y_diff = TT_rcs_diff*res[njb][stb][htb]['yTT_srNJet_0b_lowDPhi']
       TT_y_diffKappaCorr = TT_rcs_diffKappaCorr*res[njb][stb][htb]['yTT_srNJet_0b_lowDPhi']
       
       #TTexpandedErr = res[njb][stb][htb]['TT_pred_err']+abs(1-kappaTT['kappa'])*res[njb][stb][htb]['TT_pred']+TTdiff
       
-      TT_pred_corr = res[njb][stb][htb]['TT_pred']*kappaTT['kappa']
-      #ttCorrectedErr = sqrt(res[njb][stb][htb]['TT_pred']**2*kappaTT['kappaE_sim']**2+res[njb][stb][htb]['TT_pred_err']**2*kappaTT['kappa']**2) + TTdiffKappaCorr
+      TT_pred_corr = res[njb][stb][htb]['TT_pred']*kappaTT_btag['kappa']
       
-      TT_stat_err = sqrt(res[njb][stb][htb]['TT_pred']**2*kappaTT['kappaE_sim']**2+res[njb][stb][htb]['TT_pred_err']**2*kappaTT['kappa']**2)
+      TT_stat_err = sqrt(res[njb][stb][htb]['TT_pred']**2*kappaTT_btag['kappaE_sim']**2+res[njb][stb][htb]['TT_pred_err']**2*kappaTT_btag['kappa']**2)
       TT_syst_err = TT_y_diff
       TT_pred_err = sqrt(TT_stat_err**2 + TT_syst_err**2)
       print
       print '## ** tt+jets prediction stat+syst/total **'
       print '##',getValErrStringSyst(res[njb][stb][htb]['TT_pred'],TT_stat_err,TT_syst_err)
       print '##',getValErrString(TT_pred_corr,TT_pred_err)
-      print '## Kappa_b:',getValErrString(kappaTT['kappa'],kappaTT['kappaE_sim'])
+      print '## Kappa_b:',getValErrString(kappaTT_btag['kappa'],kappaTT_btag['kappaE_sim'])
       print '## **  **'
       
       TT_corrections = {'k_0b/1b':kappaTT['kappa'], 'k_0b/1b_err':kappaTT['kappaE_sim'], 'k_0b/1b_btag':kappaTT_btag['kappa'], 'k_0b/1b_btag_err':kappaTT_btag['kappaE_sim'], 'k_0b/1b_fit':kappaTTfit, 'k_0b/1b_fit_err':kappaTTfitErr, '0b_fit_const':ttD,'0b_fit_const_err':ttDE, '0b_fit_grad':ttK, '0b_fit_grad_err':ttKE}
