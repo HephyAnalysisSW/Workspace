@@ -100,6 +100,8 @@ truth_H.SetMarkerStyle(29)
 truth_H.SetMarkerColor(ROOT.kRed+2)
 truth_H.SetMarkerSize(2)
 
+kappa = ROOT.TH1F('kappa','kappa_b', bins,0,bins)
+kappa.SetLineWidth(2)
 
 
 drawOption = 'hist ][ e1'
@@ -132,7 +134,10 @@ for srNJet in sorted(signalRegions):
       
       rest_H.SetBinContent(i,res[srNJet][stb][htb]['Rest_truth'])
       rest_H.SetBinError(i,  res[srNJet][stb][htb]['Rest_truth_err'])
-
+      
+      kappa.SetBinContent(i,res[srNJet][stb][htb]['TT_rCS_fits_MC']['k_0b/1b_btag'])
+      kappa.SetBinError(i,res[srNJet][stb][htb]['TT_rCS_fits_MC']['k_0b/1b_btag_err'])
+      
       pred_H.SetBinContent(i, res[srNJet][stb][htb]['tot_pred'])
       pred_H.SetBinError(i,   res[srNJet][stb][htb]['tot_pred_err'])
       predYErr.append(res[srNJet][stb][htb]['tot_pred_err'])
@@ -140,7 +145,7 @@ for srNJet in sorted(signalRegions):
       predY.append(res[srNJet][stb][htb]['tot_pred'])
       predX.append(i-0.5)
       print 'Predicted:', getValErrString(res[srNJet][stb][htb]['tot_pred'], res[srNJet][stb][htb]['tot_pred_err'])
-      print 'Measured: ', getValErrString(data_yield, sqrt(data_yield))
+      if unblinded or validation: print 'Measured: ', getValErrString(data_yield, sqrt(data_yield))
       truth_H.SetBinContent(i,res[srNJet][stb][htb]['tot_truth'])
       truth_H.SetBinError(i,  res[srNJet][stb][htb]['tot_truth_err'])
       truth_H.GetXaxis().SetBinLabel(i, str(i))
@@ -221,17 +226,24 @@ can.cd()
 
 ratio = ROOT.TH1F('ratio_mc','ratio pred/mc truth',bins,0,bins)
 ratio.Sumw2()
-ratio = pred_H.Clone()
-ratio.Divide(truth_H)
+#ratio = pred_H.Clone()
+ratio = truth_H.Clone()
+#ratio.Divide(truth_H)
+ratio.Divide(pred_H)
 ratio.SetMarkerStyle(29)
 ratio.SetMarkerColor(ROOT.kRed+2)
 ratio.SetMarkerSize(2)
 ratio.SetLineColor(ROOT.kRed+2)
+ratio.GetXaxis().SetTitle('')
+
+setNiceBinLabel(ratio, validationRegionAll)
 
 ratio2 = ROOT.TH1F('ratio_d','ratio pred/data',bins,0,bins)
 ratio2.Sumw2()
-ratio2 = pred_H.Clone()
-ratio2.Divide(data_truth_H)
+#ratio2 = pred_H.Clone()
+ratio2 = data_truth_H.Clone()
+#ratio2.Divide(data_truth_H)
+ratio2.Divide(pred_H)
 ratio2.SetLineColor(ROOT.kBlack)
 ratio2.SetMarkerStyle(8)
 ratio2.SetMarkerSize(1.3)
@@ -247,7 +259,7 @@ pad2.cd()
 ratio.GetXaxis().SetTitleSize(0.13)
 ratio.GetXaxis().SetLabelSize(0.11)
 ratio.GetXaxis().SetNdivisions(508)
-ratio.GetYaxis().SetTitle('pred./truth')
+ratio.GetYaxis().SetTitle('data/pred.')
 ratio.GetYaxis().SetTitleSize(0.13)
 ratio.GetYaxis().SetLabelSize(0.13)
 ratio.GetYaxis().SetTitleOffset(0.4)
@@ -263,4 +275,6 @@ can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2015/Predi
 can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2015/Prediction_'+predictionName+'_'+str(lumi)+'.root')
 can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2015/Prediction_'+predictionName+'_'+str(lumi)+'.pdf')
 
+can2 = ROOT.TCanvas('can2','can2',700,700)
 
+kappa.Draw('e1 hist')

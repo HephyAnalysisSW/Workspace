@@ -52,13 +52,13 @@ print weight_str
 print
 
 
-for i_njb, njb in enumerate(signalRegions):
+for i_njb, njb in enumerate(sorted(signalRegions)):
   bins[njb] = {}
   fitResults[njb] = {}
-  for stb in signalRegions[njb]:
+  for stb in sorted(signalRegions[njb]):
     bins[njb][stb] ={}
     fitResults[njb][stb] ={}
-    for htb in signalRegions[njb][stb]:
+    for htb in sorted(signalRegions[njb][stb]):
       print
       print '#############################################'
       print '## * njet:',njb
@@ -118,7 +118,12 @@ for i_njb, njb in enumerate(signalRegions):
         print 'Linear Fit for tt Jets Rcs values in 0b MC'
 
         #linear fit in 0b
-        ttJetRcsFitH.Fit('pol1','','same',0,3)
+        filledBin = 0
+        for b in range(len(ttJetBins)):
+          if ttJetRcsFitH.GetBinContent(b+1)>0:
+            filledBin += 1
+          else: break
+        ttJetRcsFitH.Fit('pol1','','same',0,filledBin)
         FitFunc     = ttJetRcsFitH.GetFunction('pol1')
         ttD  = FitFunc.GetParameter(0)
         ttDE = FitFunc.GetParError(0)
@@ -131,7 +136,7 @@ for i_njb, njb in enumerate(signalRegions):
         #constant fit in 0b and 1b
         print
         print 'Konstant Fit for tt Jets Rcs values in 0b MC'
-        ttJetRcsFitH.Fit('pol0','','same',0,3)
+        ttJetRcsFitH.Fit('pol0','','same',0,filledBin)
         FitFunc     = ttJetRcsFitH.GetFunction('pol0')
         ttConst0  = FitFunc.GetParameter(0)
         ttConst0E = FitFunc.GetParError(0)
@@ -139,7 +144,7 @@ for i_njb, njb in enumerate(signalRegions):
         
         print
         print 'Konstant Fit for tt Jets Rcs values in 1b MC'
-        ttJetRcsFitH1b.Fit('pol0','','same',0,3)
+        ttJetRcsFitH1b.Fit('pol0','','same',0,filledBin)
         FitFunc     = ttJetRcsFitH1b.GetFunction('pol0')
         ttConst1  = FitFunc.GetParameter(0)
         ttConst1E = FitFunc.GetParError(0)
@@ -229,7 +234,12 @@ for i_njb, njb in enumerate(signalRegions):
           print message
           print stars
           print
-          wJetRcsFitH.Fit('pol1','','same',0,3)
+          filledBin = 0
+          for b in range(len(wJetBins)):
+            if wJetRcsFitH.GetBinContent(b+1)>0:
+              filledBin += 1
+            else: break
+          wJetRcsFitH.Fit('pol1','','same',0,filledBin)
           FitFunc     = wJetRcsFitH.GetFunction('pol1')
           wD  = FitFunc.GetParameter(0)
           wDE = FitFunc.GetParError(0)
@@ -276,6 +286,7 @@ for i_njb, njb in enumerate(signalRegions):
         W_errs_key = 'W_pred_errs'+Wc['string'] #Key for new dict with all errors
         W_key = 'W'+Wc['string']+'_pred' #Key for W prediction
         W_err_key = 'W'+Wc['string']+'_pred_err' #Key for W prediction error
+        #print filledBin, wJetRcsFitH.GetBinContent(filledBin)
         print
         print '## ** W+jets prediction stat+syst/total **'
         print '##',getValErrStringSyst(res[njb][stb][htb][W_key],W_stat_err,W_syst_err)

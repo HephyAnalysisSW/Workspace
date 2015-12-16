@@ -19,19 +19,19 @@ testRun = False
 ## b-tagging and other variables
 dPhiStr = 'deltaPhi_Wl'
 bjreg = (0,0)
-wjetsSB = (3,4)
+wjetsSB = (3,3)
 
 nBTagVar = 'nBJetMediumCSV30'
-useBTagWeights = True #True for weighted fake data, false for data
+useBTagWeights = False #True for weighted fake data, false for data
 btagWeightSuffix = '_SF'
 templateWeights = True
 templateWeightSuffix = '_SF'
 
 
 ## samples
-isData = False
+isData = True
 unblinded = False
-validation = False
+validation = True
 
 cWJets      = getChain(WJetsHTToLNu_25ns,histname='')
 cTTJets     = getChain(TTJets_combined,histname='')
@@ -48,8 +48,8 @@ else:
 
 
 ## signal region definition
-#signalRegions = validationRegion2
-signalRegions = signalRegion3fb
+signalRegions = validationRegionAll
+#signalRegions = signalRegion3fb
 
 
 ## weight calculations
@@ -59,8 +59,8 @@ sampleLumi = 3.
 debugReweighting = False
 
 ## QCD estimation
-useQCDestimation = False
-QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151120_QCDestimation_2p1fb_pkl'
+useQCDestimation = True
+QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_extendedClosureTest3to4j_2p1fb_pkl'
 #QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_closureTest4to5j_2p1fb_pkl'
 if isData and useQCDestimation: QCDestimate = pickle.load(file(QCDpickle))
 else: QCDestimate=False
@@ -68,7 +68,7 @@ else: QCDestimate=False
 
 ## Directories for plots, results and templates
 if isData:
-  templateName   = 'SFtemplates_validation2_lep_data'
+  templateName   = 'SFtemplates_validationAll_lep_data'
   predictionName = templateName
 else:
   templateName   = 'SFtemplates_fullSR_lep_MC'
@@ -92,7 +92,7 @@ singleMu_presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSof
 
 ## corrections
 createFits = True
-fitDir = '/data/'+username+'/Results2015/correctionFit_btagKappa_MC_fullSR/'
+fitDir = '/data/'+username+'/Results2015/correctionFit_btagKappa_data_validationAll/'
 
 
 ## do stuff for test runs
