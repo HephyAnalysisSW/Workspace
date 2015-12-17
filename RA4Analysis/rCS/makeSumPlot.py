@@ -271,9 +271,9 @@ ratio2.Draw('e1p same')
 
 can.cd()
 
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2015/Prediction_'+predictionName+'_'+str(lumi)+'.png')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2015/Prediction_'+predictionName+'_'+str(lumi)+'.root')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2015/Prediction_'+predictionName+'_'+str(lumi)+'.pdf')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2015/Prediction_'+predictionName+'_'+str(lumi)+'_bugFix_2.png')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2015/Prediction_'+predictionName+'_'+str(lumi)+'_bugFix_2.root')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2015/Prediction_'+predictionName+'_'+str(lumi)+'_bugFix_2.pdf')
 
 can2 = ROOT.TCanvas('can2','can2',700,700)
 

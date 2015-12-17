@@ -129,17 +129,38 @@ readerMuDown      = ROOT.BTagCalibrationReader(calib, 1, "mujets", "down")
 
 def getSF2015(parton, pt, eta):
   if abs(parton)==5: #SF for b
-    sf   = readerMuCentral.eval(0, eta, pt)
-    sf_d = readerMuDown.eval(0, eta, pt)
-    sf_u = readerMuUp.eval(0, eta, pt)
+    if pt>669.9:
+      sf   = readerMuCentral.eval(0, eta, 669.9)
+      sf_d = readerMuDown.eval(0, eta, 669.9)
+      sf_u = readerMuUp.eval(0, eta, 669.9)
+      sf_d = 2*sf_d - sf
+      sf_u = 2*sf_u - sf
+    else:
+      sf   = readerMuCentral.eval(0, eta, pt)
+      sf_d = readerMuDown.eval(0, eta, pt)
+      sf_u = readerMuUp.eval(0, eta, pt)
   elif abs(parton)==4: #SF for c
-    sf   = readerMuCentral.eval(1, eta, pt)
-    sf_d = readerMuDown.eval(1, eta, pt)
-    sf_u = readerMuUp.eval(1, eta, pt)
+    if pt>669.9:
+      sf   = readerMuCentral.eval(1, eta, 669.9)
+      sf_d = readerMuDown.eval(1, eta, 669.9)
+      sf_u = readerMuUp.eval(1, eta, 669.9)
+      sf_d = 2*sf_d - sf
+      sf_u = 2*sf_u - sf
+    else:
+      sf   = readerMuCentral.eval(1, eta, pt)
+      sf_d = readerMuDown.eval(1, eta, pt)
+      sf_u = readerMuUp.eval(1, eta, pt)
   else: #SF for light flavours
-    sf   = readerCombCentral.eval(2, eta, pt)
-    sf_d = readerCombDown.eval(2, eta, pt)
-    sf_u = readerCombUp.eval(2, eta, pt)
+    if pt>999:
+      sf   = readerCombCentral.eval(2, eta, 999)
+      sf_d = readerCombDown.eval(2, eta, 999)
+      sf_u = readerCombUp.eval(2, eta, 999)
+      sf_d = 2*sf_d - sf
+      sf_u = 2*sf_u - sf
+    else:
+      sf   = readerCombCentral.eval(2, eta, pt)
+      sf_d = readerCombDown.eval(2, eta, pt)
+      sf_u = readerCombUp.eval(2, eta, pt)
   return {"SF":sf, "SF_down":sf_d,"SF_up":sf_u}
 
 # get MC efficiencies and scale factors for a specific jet (with parton flavor, pt and eta)
