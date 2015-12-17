@@ -36,7 +36,7 @@ bins = {}
 
 if isData: dataSetString = 'data'
 else: dataSetString = 'MC'
-if isData and useQCDestimation: qcdstring = QCDpickle
+if QCDestimate: qcdstring = QCDpickle
 else: qcdstring = 'not used'
 if useBTagWeights: btagweightstring = 'b-tag weights used with suffix:'+btagWeightSuffix
 else: btagweightstring = 'b-tag weights not used'

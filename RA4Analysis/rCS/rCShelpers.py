@@ -46,6 +46,10 @@ def combineRCS(samples, dPhiCut):
   for s in samples:
     s['rcs'] = getRCS(s['chain'],s['cut'],dPhiCut, weight=s['weight'])
     s['CRyield'] = getYieldFromChain(s['chain'], cutString=s['cut']+'&&deltaPhi_Wl<'+str(dPhiCut),weight=s['weight'])
+    if 'fracScale' in s.keys():
+      print s['CRyield']
+      s['CRyield'] = s['CRyield']*s['fracScale']
+      print s['CRyield']
     #print s['rcs']['rCS'],s['rcs']['rCSE_sim'], s['CRyield']
     s['CRyieldVar'] = getYieldFromChain(s['chain'], cutString=s['cut']+'&&deltaPhi_Wl<'+str(dPhiCut),weight='('+s['weight']+')**2')
     totalCRYield += s['CRyield']
@@ -54,6 +58,8 @@ def combineRCS(samples, dPhiCut):
   totalRcsVar = 0.
   for s in samples:
     if s['rcs']['rCS']>0:
+      print 'Rcs of background', s['name'],s['rcs']['rCS']
+      print 'Fraction',s['CRyield']/totalCRYield
       totalRcs += s['rcs']['rCS']*(s['CRyield']/totalCRYield)
       totalRcsVar += (s['rcs']['rCS']*(s['CRyield']/totalCRYield))**2*(s['rcs']['rCSE_sim']**2/s['rcs']['rCS']**2 + s['CRyieldVar']/s['CRyield']**2 + totalCRYieldVar/totalCRYield**2)
   return {'rCS':totalRcs, 'rCSE_sim':sqrt(totalRcsVar), 'rCSE_pred':1.}
@@ -179,3 +185,10 @@ def getNumStringWithSyst(n,eSys, eStat, acc=2):    ##For printing table
   else:
     return n +'&$\pm$&'+ eSys +'&$\pm$&'+ eStat
 
+def setNiceBinLabel(hist, signalRegions):
+  i = 1
+  for njb in sorted(signalRegions):
+    for stb in sorted(signalRegions[njb]):
+      for htb in sorted(signalRegions[njb][stb]):
+        hist.GetXaxis().SetBinLabel(i,'#splitline{'+signalRegions[njb][stb][htb]['njet']+'}{#splitline{'+signalRegions[njb][stb][htb]['LT']+'}{'+signalRegions[njb][stb][htb]['HT']+'}}')
+        i += 1

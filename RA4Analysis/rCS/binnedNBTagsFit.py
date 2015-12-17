@@ -32,10 +32,15 @@ def binnedNBTagsFit(cut, cutname, samples, prefix = "", QCD_dict={0:{'y':0.,'e':
   hQCD = ROOT.TH1F('hQCD','hQCD',len([0,1,2,3])-1, array('d',[0,1,2,3]))
   for n in range(3):
     if isnan(QCD_dict[n]['y']): QCD_dict[n]['y'] = QCD_dict[n]['totalY'] #if lowDPhi QCD pred is nan, use total QCD pred (which should be 0 then)
-    hQCD.SetBinContent(n+1,QCD_dict[n]['y'])
+    #hQCD.SetBinContent(n+1,QCD_dict[n]['y'])
     if isnan(QCD_dict[n]['e']): qcdErr = QCD_dict[n]['y'] #if QCD pred error is nan set the error to 100%
     else: qcdErr = QCD_dict[n]['e']
-    hQCD.SetBinError(n+1,qcdErr)
+    if QCDup: hQCD.SetBinContent(n+1, QCD_dict[n]['y'] + QCD_dict[n]['e'])
+    elif QCDdown:
+      if (QCD_dict[n]['y']-QCD_dict[n]['e'])>0: hQCD.SetBinContent(n+1, QCD_dict[n]['y'] - QCD_dict[n]['e'])
+      else: hQCD.SetBinContent(n+1, 0.)
+    else: hQCD.SetBinContent(n+1, QCD_dict[n]['y'])
+    hQCD.SetBinError(n+1, qcdErr)
   hQCD.Scale(0.5) #split in +/- charge
   
   #Get histograms binned in b-tag multiplicity
