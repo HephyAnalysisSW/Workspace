@@ -87,6 +87,24 @@ signalRegion3fbReduced = {(5, 5):  {(250, 350): {(500, -1):  {'deltaPhi': 1.0, '
                                                  (750, -1):  {'deltaPhi': 1.0, 'name':'#geq8j, L_{Tl}, H_{Tmh}'}},
                                     (350, -1):  {(500, -1):  {'deltaPhi': 0.75, 'name':'#geq8j, L_{Tmh}, H_{Ti}'}}}}
 
+validationRegion = {(4, 4):  {(250, 350): {(500, -1):   {'deltaPhi': 1.0, 'njet':'4j','LT':'L_{T}1','HT': 'H_{T}i'}},
+                             (350, 450): {(500, -1):   {'deltaPhi': 1.0, 'njet':'4j','LT':'L_{T}2','HT': 'H_{T}i'}},
+                             (450, -1):  {(500, -1):   {'deltaPhi': 1.0, 'njet':'4j','LT':'L_{T}3','HT': 'H_{T}i'}}}}
+
+validationRegion2 = {(4, 4):  {(250, -1): {(500, 750):   {'deltaPhi': 1.0, 'njet':'4j','LT':'L_{T}i','HT': 'H_{T}1'},
+                                           (750, 1000):  {'deltaPhi': 1.0, 'njet':'4j','LT':'L_{T}i','HT': 'H_{T}2'},
+                                           (1000, -1):   {'deltaPhi': 1.0, 'njet':'4j','LT':'L_{T}i','HT': 'H_{T}3'}}}}
+
+validationRegionAll = {(4, 4):  {(250, 350): {(500, -1):   {'deltaPhi': 1.0, 'njet':'5j','LT':'L_{T}1','HT': 'H_{T}i'}
+                                              (500, 750):  {'deltaPhi': 1.0, 'njet':'6-7j','LT':'L_{T}1','HT': 'H_{T}1'},
+                                              (750, -1):   {'deltaPhi': 1.0, 'njet':'6-7j','LT':'L_{T}1','HT': 'H_{T}23'}},
+                                 (350, 450): {(500, -1):   {'deltaPhi': 1.0, 'njet':'5j','LT':'L_{T}2','HT': 'H_{T}i'}
+                                              (500, 750):  {'deltaPhi': 1.0, 'njet':'6-7j','LT':'L_{T}2','HT': 'H_{T}1'},
+                                              (750, -1):   {'deltaPhi': 1.0, 'njet':'6-7j','LT':'L_{T}2','HT': 'H_{T}23'}},
+                                 (450, -1):  {(500, -1):   {'deltaPhi': 1.0, 'njet':'5j','LT':'L_{T}3','HT': 'H_{T}i'},
+                                              (500, 1000): {'deltaPhi': 0.75, 'njet':'6-7j','LT':'L_{T}3','HT': 'H_{T}12'},
+                                              (1000, -1):  {'deltaPhi': 0.75, 'njet':'6-7j','LT':'L_{T}3','HT': 'H_{T}3'}}}}
+
 newBins3fb = {(5, 5):  {(450, -1): {(500, -1):    {'deltaPhi': 0.75}}},
               (6, 7):  {(450, -1): {(500, 750):   {'deltaPhi': 0.75},
                                     (750, -1):    {'deltaPhi': 0.75}}},

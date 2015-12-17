@@ -9,7 +9,7 @@ from Workspace.HEPHYPythonTools.helpers import getChain
 #from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT500ST250_postProcessed_fromArthur import *
 from Workspace.RA4Analysis.cmgTuples_Data25ns_miniAODv2_postprocessed import *
 from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed import *
-from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed_btag import *
+#from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed_btag import *
 
 from Workspace.HEPHYPythonTools.user import username
 from Workspace.RA4Analysis.signalRegions import *
@@ -19,6 +19,8 @@ testRun = False
 ## b-tagging and other variables
 dPhiStr = 'deltaPhi_Wl'
 bjreg = (0,0)
+wjetsSB = (3,4)
+
 nBTagVar = 'nBJetMediumCSV30'
 useBTagWeights = True #True for weighted fake data, false for data
 btagWeightSuffix = '_SF'
@@ -28,22 +30,25 @@ templateWeightSuffix = '_SF'
 
 ## samples
 isData = False
+unblinded = False
+validation = False
 
-cWJets      = getChain(WJetsHTToLNu_25ns_btag,histname='')
-cTTJets     = getChain(TTJets_combined_btag,histname='')
+cWJets      = getChain(WJetsHTToLNu_25ns,histname='')
+cTTJets     = getChain(TTJets_combined,histname='')
 cDY         = getChain(DY_25ns,histname='')
 csingleTop  = getChain(singleTop_25ns,histname='')
 cTTV        = getChain(TTV_25ns,histname='')
 cRest       = getChain([singleTop_25ns, DY_25ns, TTV_25ns],histname='')#no QCD
-cBkg        = getChain([WJetsHTToLNu_25ns_btag, TTJets_combined_btag, singleTop_25ns, DY_25ns, TTV_25ns], histname='')#no QCD
+cBkg        = getChain([WJetsHTToLNu_25ns, TTJets_combined, singleTop_25ns, DY_25ns, TTV_25ns], histname='')#no QCD
 
 if isData:
   cData = getChain([single_mu_Run2015D, single_ele_Run2015D], histname='')
 else:
-  cData = getChain([WJetsHTToLNu_25ns_btag, TTJets_combined_btag, singleTop_25ns, DY_25ns, TTV_25ns], histname='')
+  cData = getChain([WJetsHTToLNu_25ns, TTJets_combined, singleTop_25ns, DY_25ns, TTV_25ns], histname='')
 
 
 ## signal region definition
+#signalRegions = validationRegion2
 signalRegions = signalRegion3fb
 
 
@@ -54,18 +59,20 @@ sampleLumi = 3.
 debugReweighting = False
 
 ## QCD estimation
+useQCDestimation = False
 QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151120_QCDestimation_2p1fb_pkl'
-if isData: QCDestimate = pickle.load(file(QCDpickle))
+#QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_closureTest4to5j_2p1fb_pkl'
+if isData and useQCDestimation: QCDestimate = pickle.load(file(QCDpickle))
 else: QCDestimate=False
 
 
 ## Directories for plots, results and templates
 if isData:
-  predictionName = 'newSR_lep_SFtemplates_data'
-  templateName   = 'SFtemplates_newSR_lep_data'
+  templateName   = 'SFtemplates_validation2_lep_data'
+  predictionName = templateName
 else:
-  predictionName = 'newSR_lep_SFtemplates_MC'+btagWeightSuffix
-  templateName   = 'SFtemplates_newSR_lep_MC'
+  templateName   = 'SFtemplates_fullSR_lep_MC'
+  predictionName = templateName+btagWeightSuffix
 printDir    = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/25ns/templateFit_'+predictionName+'_'+str(lumi)+'/'
 pickleDir   = '/data/'+username+'/Results2015/Prediction_'+predictionName+'_'+str(lumi)+'/'
 templateDir = '/data/'+username+'/Results2015/btagTemplates_'+templateName+'_'+str(templateLumi)+'/'
@@ -81,9 +88,11 @@ presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSoftLeptons=
 singleMu_presel = "((!isData&&singleMuonic)||(isData&&"+triggers+"&&(muonDataSet&&singleMuonic)&&"+filters+"))"
 singleMu_presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSoftLeptons==0 && Jet_pt[1]>80 && st>250 && nJet30>2 && htJet30j>500"
 
+#presel = singleMu_presel
+
 ## corrections
 createFits = True
-fitDir = '/data/'+username+'/Results2015/correctionFit_btagKappa_MC_newSR/'
+fitDir = '/data/'+username+'/Results2015/correctionFit_btagKappa_MC_fullSR/'
 
 
 ## do stuff for test runs

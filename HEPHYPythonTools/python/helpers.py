@@ -516,11 +516,16 @@ def getPropagatedError(nums,numErrors,denums,denumErrors, returnCalcResult=False
   a = 0
   for i,n in enumerate(nums):
     numP *= n
-    a += (numErrors[i]/n)**2
+    if n>0:
+      a += (numErrors[i]/n)**2
   for i,d in enumerate(denums):
     denumP *= d
-    a += (denumErrors[i]/d)**2
-  f = numP/denumP
+    if d>0:
+      a += (denumErrors[i]/d)**2
+  if denumP>0:
+    f = numP/denumP
+  else:
+    f = float('nan')
   if returnCalcResult: return f, f*sqrt(a)
   else: return f*sqrt(a)
   

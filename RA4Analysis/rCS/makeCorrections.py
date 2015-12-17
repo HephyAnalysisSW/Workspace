@@ -14,7 +14,7 @@ ROOT.TH1F().SetDefaultSumw2()
 
 if not createFits: loadedFit = pickle.load(file(fitDir+prefix+'_fit_pkl'))
 
-weight_str, weight_err_str = makeWeight(lumi, sampleLumi=sampleLumi)
+weight_str, weight_err_str = makeWeight(3, sampleLumi=sampleLumi)
 
 wJetBins = [(3,4),(5,5),(6,7),(8,-1)]
 ttJetBins = [(4,4),(5,5),(6,7),(8,-1)]
@@ -30,12 +30,26 @@ def divideRCSdict(a,b):
 def printFloatInTableCell(a, cellWidth=20):
   print '>>%-'+str(cellWidth)+'s<<' %(str(a))
 
+def getValErrString(val,err, precision=3):
+  return str(round(val,precision))+' +/- '+str(round(err,precision))
+
+def getValErrStringSyst(val,err,syst, precision=3):
+  return str(round(val,precision))+' +/- '+str(round(err,precision)) +' +/- '+str(round(syst,precision))
+
 res = pickle.load(file(pickleDir+prefix+'_estimationResults_pkl'))
 
 scoreExp=0.
 scoreStat=0.
 total=0.
 fitResults = {}
+
+#correction is purly MC based, so cData should not enter anywhere here!
+
+print
+print 'Starting with fits for corrections and systematic errors, will use the following weight for all MC:'
+print weight_str
+print
+
 
 for i_njb, njb in enumerate(signalRegions):
   bins[njb] = {}
@@ -46,11 +60,9 @@ for i_njb, njb in enumerate(signalRegions):
     for htb in signalRegions[njb][stb]:
       print
       print '#############################################'
-      print 'bin: \t njet \t\t LT \t\t HT'
-      if len(str(njb))<7:
-        print '\t',njb,'\t\t',stb,'\t',htb
-      else:
-        print '\t',njb,'\t',stb,'\t',htb
+      print '## * njet:',njb
+      print '## * LT:  ',stb
+      print '## * HT:  ',htb
       print '#############################################'
       print
       dPhiCut = signalRegions[njb][stb][htb]['deltaPhi']
@@ -58,24 +70,31 @@ for i_njb, njb in enumerate(signalRegions):
         #ttJets corrections
         ttJetRcsFitH = ROOT.TH1F("ttJetRcsFitH","",len(ttJetBins),0,len(ttJetBins))
         ttJetRcsFitH1b = ROOT.TH1F("ttJetRcsFitH1b","",len(ttJetBins),0,len(ttJetBins))
+
         cname1bCRtt, cut1bCRtt = nameAndCut(stb,htb,(4,5), btb=(1,1) ,presel=presel)
         cname0bCRtt, cut0bCRtt = nameAndCut(stb,htb,(4,5), btb=(0,0) ,presel=presel)
         cnameCRtt, cutCRtt = nameAndCut(stb,htb,(4,5), btb=(0,-1) ,presel=presel)
-        rcs1bCRtt = getRCS(cBkg, cut1bCRtt, dPhiCut)
-        rcs0bCRtt = getRCS(cTTJets, cut0bCRtt, dPhiCut)
-        samples = [{'chain':cWJets, 'cut':cutCRtt, 'weight':'weight*weightBTag1'}, {'chain':cTTJets, 'cut':cutCRtt, 'weight':'weight*weightBTag1'},{'chain':cDY, 'cut':cut1bCRtt, 'weight':'weight'},{'chain':cTTV, 'cut':cut1bCRtt, 'weight':'weight'},{'chain':csingleTop, 'cut':cut1bCRtt, 'weight':'weight'}]
+
+        rcs1bCRtt = getRCS(cBkg, cut1bCRtt, dPhiCut, weight = weight_str)
+        rcs0bCRtt = getRCS(cTTJets, cut0bCRtt, dPhiCut, weight = weight_str)
+
+        samples = [{'chain':cWJets, 'cut':cutCRtt, 'weight':weight_str+'*weightBTag1'+btagWeightSuffix}, {'chain':cTTJets, 'cut':cutCRtt, 'weight':weight_str+'*weightBTag1'+btagWeightSuffix},{'chain':cDY, 'cut':cut1bCRtt, 'weight':weight_str},{'chain':cTTV, 'cut':cut1bCRtt, 'weight':weight_str},{'chain':csingleTop, 'cut':cut1bCRtt, 'weight':weight_str}]
+
         rcs1bCRtt_btag = combineRCS(samples, dPhiCut)
-        rcs0bCRtt_btag = getRCS(cTTJets, cutCRtt, dPhiCut, weight = 'weight*weightBTag0')
+        rcs0bCRtt_btag = getRCS(cTTJets, cutCRtt, dPhiCut, weight = weight_str+'*weightBTag0'+btagWeightSuffix)
+
         #Kappa now calculated only in the SB bin (4,5) jets 1b allEWK MC vs 0b tt MC - no fit applied for the moment!
         kappaTT = divideRCSdict(rcs0bCRtt,rcs1bCRtt)
         kappaTT_btag = divideRCSdict(rcs0bCRtt_btag,rcs1bCRtt_btag)
+
         fitResults[njb][stb][htb] = {'kappaTT':kappaTT, 'rcs1bCRtt':rcs1bCRtt, 'rcs0bCRtt':rcs0bCRtt, 'kappaTT_btag':kappaTT_btag}
+
         #fill histograms
         for i_njbTT, njbTT in enumerate(ttJetBins):
           cname, cut = nameAndCut(stb,htb,njbTT, btb=(0,0) ,presel=presel)
           cname1b, cut1b = nameAndCut(stb,htb,njbTT, btb=(1,1) ,presel=presel)
-          rcsD = getRCS(cTTJets, cut, dPhiCut)
-          rcsD1b = getRCS(cTTJets, cut1b, dPhiCut)
+          rcsD = getRCS(cTTJets, cut, dPhiCut, weight = weight_str)
+          rcsD1b = getRCS(cTTJets, cut1b, dPhiCut, weight = weight_str)
           #rcs = rcsD['rCS']
           #rcsErrPred = rcsD['rCSE_pred']
           #rcsErr = rcsD['rCSE_sim']
@@ -85,8 +104,18 @@ for i_njb, njb in enumerate(signalRegions):
           if not math.isnan(rcsD1b['rCS']):
             ttJetRcsFitH1b.SetBinContent(i_njbTT+1, rcsD1b['rCS'])
             ttJetRcsFitH1b.SetBinError(i_njbTT+1, rcsD1b['rCSE_sim'])
+
+        message = '** Fits for tt+Jets Rcs values in 0b MC all charges **'
+        stars = ''
+        for star in range(len(message)):
+          stars += '*'
+        print
+        print stars
+        print message
+        print stars
         print
         print 'Linear Fit for tt Jets Rcs values in 0b MC'
+
         #linear fit in 0b
         ttJetRcsFitH.Fit('pol1','','same',0,3)
         FitFunc     = ttJetRcsFitH.GetFunction('pol1')
@@ -97,6 +126,7 @@ for i_njb, njb in enumerate(signalRegions):
         ttLinear = {'ttD':ttD, 'ttDE':ttDE, 'ttK':ttK, 'ttKE':ttKE}
         fitResults[njb][stb][htb].update({'ttLinear':ttLinear})
         #print ttD, ttK
+
         #constant fit in 0b and 1b
         print
         print 'Konstant Fit for tt Jets Rcs values in 0b MC'
@@ -114,8 +144,9 @@ for i_njb, njb in enumerate(signalRegions):
         ttConst1E = FitFunc.GetParError(0)
         ttC1 = {'ttConst1':ttConst1, 'ttConst1E':ttConst1E}
         fitResults[njb][stb][htb].update({'ttC0':ttC0, 'ttC1':ttC1})
+
       else:
-        
+        #Load fit results if fitting isn't done        
         rcs1bCRtt = loadedFit[njb][stb][htb]['rcs1bCRtt']
         rcs0bCRtt = loadedFit[njb][stb][htb]['rcs0bCRtt']
         kappaTT =   loadedFit[njb][stb][htb]['kappaTT']
@@ -134,27 +165,34 @@ for i_njb, njb in enumerate(signalRegions):
 
       TT_rcs_diff = abs(rcs1bCRtt['rCS'] - (ttD+ttK*i_njb))
       TT_rcs_diffKappaCorr = abs(kappaTT['kappa']*rcs1bCRtt['rCS'] - (ttD+ttK*i_njb))
+
       TT_y_diff = TT_rcs_diff*res[njb][stb][htb]['yTT_srNJet_0b_lowDPhi']
       TT_y_diffKappaCorr = TT_rcs_diffKappaCorr*res[njb][stb][htb]['yTT_srNJet_0b_lowDPhi']
       
       #TTexpandedErr = res[njb][stb][htb]['TT_pred_err']+abs(1-kappaTT['kappa'])*res[njb][stb][htb]['TT_pred']+TTdiff
       
-      TT_pred_corr = res[njb][stb][htb]['TT_pred']*kappaTT['kappa']
-      #ttCorrectedErr = sqrt(res[njb][stb][htb]['TT_pred']**2*kappaTT['kappaE_sim']**2+res[njb][stb][htb]['TT_pred_err']**2*kappaTT['kappa']**2) + TTdiffKappaCorr
+      TT_pred_corr = res[njb][stb][htb]['TT_pred']*kappaTT_btag['kappa']
       
-      TT_stat_err = sqrt(res[njb][stb][htb]['TT_pred']**2*kappaTT['kappaE_sim']**2+res[njb][stb][htb]['TT_pred_err']**2*kappaTT['kappa']**2)
+      TT_stat_err = sqrt(res[njb][stb][htb]['TT_pred']**2*kappaTT_btag['kappaE_sim']**2+res[njb][stb][htb]['TT_pred_err']**2*kappaTT_btag['kappa']**2)
       TT_syst_err = TT_y_diff
       TT_pred_err = sqrt(TT_stat_err**2 + TT_syst_err**2)
+      print
+      print '## ** tt+jets prediction stat+syst/total **'
+      print '##',getValErrStringSyst(res[njb][stb][htb]['TT_pred'],TT_stat_err,TT_syst_err)
+      print '##',getValErrString(TT_pred_corr,TT_pred_err)
+      print '## Kappa_b:',getValErrString(kappaTT_btag['kappa'],kappaTT_btag['kappaE_sim'])
+      print '## **  **'
       
       TT_corrections = {'k_0b/1b':kappaTT['kappa'], 'k_0b/1b_err':kappaTT['kappaE_sim'], 'k_0b/1b_btag':kappaTT_btag['kappa'], 'k_0b/1b_btag_err':kappaTT_btag['kappaE_sim'], 'k_0b/1b_fit':kappaTTfit, 'k_0b/1b_fit_err':kappaTTfitErr, '0b_fit_const':ttD,'0b_fit_const_err':ttDE, '0b_fit_grad':ttK, '0b_fit_grad_err':ttKE}
       res[njb][stb][htb].update({'TT_rCS_fits_MC':TT_corrections})
       
       print
-      print 'ttJets\tK\tK_err\tRcs:\tTruth\tPred\tFit\tMC0bSB\tYield:\tTruth\tPred\tCorr\tstat\tsyst\ttot_err'
-      print '\t',round(kappaTT['kappa'],2), '\t',round(kappaTT['kappaE_sim'],2), '\t\t', round(res[njb][stb][htb]['rCS_srNJet_0b_onlyTT']['rCS'],3),'\t',\
-                 round(res[njb][stb][htb]['rCS_crLowNJet_1b']['rCS'],3), '\t', round(ttD+ttK*i_njb,3),'\t', round(rcs0bCRtt['rCS'],3),'\t\t', \
-                 round(res[njb][stb][htb]['TT_truth'],3), '\t',round(res[njb][stb][htb]['TT_pred'],3), '\t',round(TT_pred_corr,3),'\t',\
-                 round(TT_stat_err,3), '\t',round(TT_syst_err,3), '\t',round(TT_pred_err,3)
+      #print 'ttJets\tK\tK_err\tRcs:\tTruth\tPred\tFit\tMC0bSB\tYield:\tTruth\tPred\tCorr\tstat\tsyst\ttot_err'
+      #print '\t',round(kappaTT['kappa'],2), '\t',round(kappaTT['kappaE_sim'],2), '\t\t', round(res[njb][stb][htb]['rCS_srNJet_0b_onlyTT']['rCS'],3),'\t',\
+      #           round(res[njb][stb][htb]['rCS_crLowNJet_1b']['rCS'],3), '\t', round(ttD+ttK*i_njb,3),'\t', round(rcs0bCRtt['rCS'],3),'\t\t', \
+      #           round(res[njb][stb][htb]['TT_truth'],3), '\t',round(res[njb][stb][htb]['TT_pred'],3), '\t',round(TT_pred_corr,3),'\t',\
+      #           round(TT_stat_err,3), '\t',round(TT_syst_err,3), '\t',round(TT_pred_err,3)
+
       #total+=1
       #if (res[njb][stb][htb]['TT_pred']-TTexpandedErr)<=res[njb][stb][htb]['TT_truth']<=(res[njb][stb][htb]['TT_pred']+TTexpandedErr):
       #  print 'Truth value inside expanded error band!'
@@ -174,15 +212,22 @@ for i_njb, njb in enumerate(signalRegions):
           #fill histograms for linear fit to account for possible non-flat rcs values
           for i_njbW, njbW in enumerate(wJetBins):
             cname, cut = nameAndCut(stb,htb,njbW, btb=(0,0) ,presel=presel)
-            rcsD = getRCS(cWJets, cut+'&&'+Wc['cut'], dPhiCut)
+            rcsD = getRCS(cWJets, cut+'&&'+Wc['cut'], dPhiCut, weight = weight_str)
             #rcs = rcsD['rCS']
             #rcsErrPred = rcsD['rCSE_pred']
             #rcsErr = rcsD['rCSE_sim']
             if not math.isnan(rcsD['rCS']):
               wJetRcsFitH.SetBinContent(i_njbW+1, rcsD['rCS'])
               wJetRcsFitH.SetBinError(i_njbW+1, rcsD['rCSE_sim'])
-
-          print 'Linear Fit for WJets Rcs values in 0b MC', Wc['name'], 'charges'
+          message = '** Linear Fit for WJets Rcs values in 0b MC '+Wc['name']+' charges **'
+          stars = ''
+          for star in range(len(message)):
+            stars += '*'
+          print
+          print stars
+          print message
+          print stars
+          print
           wJetRcsFitH.Fit('pol1','','same',0,3)
           FitFunc     = wJetRcsFitH.GetFunction('pol1')
           wD  = FitFunc.GetParameter(0)
@@ -198,7 +243,7 @@ for i_njb, njb in enumerate(signalRegions):
         #difference of measured rcs and fit in 0b MC rcs
 
         cnameCRW, cutCRW = nameAndCut(stb,htb,(3,4), btb=(0,0) ,presel=presel)
-        rcsCRW = getRCS(cWJets, cutCRW, dPhiCut)
+        rcsCRW = getRCS(cWJets, cutCRW, dPhiCut, weight = weight_str)
         RcsKey = 'rCS_W'+Wc['string']+'_crNJet_0b_corr'
         #rcsWdiff = abs(res[njb][stb][htb][RcsKey] - (wD+wK*i_njb)) #difference of rcs
         rcsWdiff = abs(rcsCRW['rCS'] - (wD+wK*i_njb)) #difference of rcs
@@ -227,11 +272,16 @@ for i_njb, njb in enumerate(signalRegions):
         WFitKey = 'W_rCS_linearFit_MC_0b'+Wc['string']
         res[njb][stb][htb].update({WFitKey:WFitPar})
         W_errs = {'stat':W_stat_err, 'syst':W_syst_err, 'tot':WexpandedErr}
-        W_errs_key = 'W_pred_errs'+Wc['string']
+        W_errs_key = 'W_pred_errs'+Wc['string'] #Key for new dict with all errors
+        W_key = 'W'+Wc['string']+'_pred' #Key for W prediction
+        W_err_key = 'W'+Wc['string']+'_pred_err' #Key for W prediction error
+        print
+        print '## ** W+jets prediction stat+syst/total **'
+        print '##',getValErrStringSyst(res[njb][stb][htb][W_key],W_stat_err,W_syst_err)
+        print '##',getValErrString(res[njb][stb][htb][W_key],WexpandedErr)
+        print '## **  **'
         res[njb][stb][htb].update({W_errs_key:W_errs})
         
-        W_key = 'W'+Wc['string']+'_pred'
-        W_err_key = 'W'+Wc['string']+'_pred_err'
         res[njb][stb][htb][W_err_key] = WexpandedErr
         
         tot_key = 'tot'+Wc['string']+'_pred'
@@ -245,24 +295,27 @@ for i_njb, njb in enumerate(signalRegions):
         else:
           TT_pred_forTotal = TT_pred_corr
           TT_pred_err_forTotal = TT_pred_err
-
+        print
+        print '## ** Total prediction origin/updated for',Wc['name'],'charges **'
+        print '##',getValErrString(res[njb][stb][htb][tot_key],res[njb][stb][htb][tot_err_key])
         res[njb][stb][htb][tot_err_key] = sqrt(TT_pred_err_forTotal**2 + WexpandedErr**2 + res[njb][stb][htb][rest_err_key]**2)
         res[njb][stb][htb][tot_key] = TT_pred_forTotal + res[njb][stb][htb][W_key] + res[njb][stb][htb][rest_key]
-        
+        print '##',getValErrString(res[njb][stb][htb][tot_key],res[njb][stb][htb][tot_err_key])
+        print '## **  **'
         if createFits:
           del wJetRcsFitH
 
       print
-      print 'WJets\tRcs:\tTruth\tPred\tFit\tMC0bSB\tYield:\tTruth\tPred\tstat\tsyst\ttot_err'
-      print '\t\t',round(res[njb][stb][htb]['rCS_srNJet_0b_onlyW']['rCS'],3), '\t',round(res[njb][stb][htb]['rCS_W_crNJet_0b_corr'],3), '\t', round(wD+wK*i_njb,3),'\t',\
-                   round(rcsCRW['rCS'],3),'\t\t',\
-                   round(res[njb][stb][htb]['W_truth'],3), '\t', round(res[njb][stb][htb]['W_pred'],3),'\t', \
-                   round(W_stat_err,3), '\t',round(W_syst_err,3), '\t',round(WexpandedErr,3)
+      #print 'WJets\tRcs:\tTruth\tPred\tFit\tMC0bSB\tYield:\tTruth\tPred\tstat\tsyst\ttot_err'
+      #print '\t\t',round(res[njb][stb][htb]['rCS_srNJet_0b_onlyW']['rCS'],3), '\t',round(res[njb][stb][htb]['rCS_W_crNJet_0b_corr'],3), '\t', round(wD+wK*i_njb,3),'\t',\
+      #             round(rcsCRW['rCS'],3),'\t\t',\
+      #             round(res[njb][stb][htb]['W_truth'],3), '\t', round(res[njb][stb][htb]['W_pred'],3),'\t', \
+      #             round(W_stat_err,3), '\t',round(W_syst_err,3), '\t',round(WexpandedErr,3)
 
 
       if createFits:
         del ttJetRcsFitH, ttJetRcsFitH1b
-      
+    #res[njb][stb][htb][]
 
 #print 'Events inside expanded error band:',scoreExp/total
 #print 'Events inside stat error band:',scoreStat/total

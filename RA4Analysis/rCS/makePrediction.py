@@ -34,6 +34,37 @@ if signal:
 
 bins = {}
 
+if isData: dataSetString = 'data'
+else: dataSetString = 'MC'
+if isData and useQCDestimation: qcdstring = QCDpickle
+else: qcdstring = 'not used'
+if useBTagWeights: btagweightstring = 'b-tag weights used with suffix:'+btagWeightSuffix
+else: btagweightstring = 'b-tag weights not used'
+if unblinded: blindingstring = 'Results will be shown UNBLINDED'
+elif validation: blindingstring = 'Results will be shown for validation, please check that SR are chosen accordingly'
+else: blindingstring = 'We are still blinded, data yields in SR will not be shown!'
+
+print 
+print 'Starting prediction with', dataSetString
+print blindingstring
+print
+print 'Signal regions:', signalRegions
+print
+print 'Datalumi, templatelumi, samplelumi:',lumi,templateLumi,sampleLumi
+print 'W sideband:',wjetsSB
+print 'b-tag multiplicity:',bjreg
+print 'QCD estimation:', qcdstring
+print btagweightstring
+print 'Result will be saved in:', pickleDir
+print 'Plots will be saved in:', printDir
+print 'Templates will be saved in:', templateDir
+print 'Preselection to be used:'
+print presel
+print
+print 'That is all for now, see you in a few hours!'
+print
+
+
 for srNJet in signalRegions:
   bins[srNJet] = {}
   for stb in signalRegions[srNJet]:
