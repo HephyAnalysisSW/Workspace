@@ -8,7 +8,7 @@ from Workspace.HEPHYPythonTools.user import username
 from math import pi, sqrt
 
 #def LpTemplateFit(LpTemplates, prefix="", printDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/pngCMG2/templateFit_Phys14V3/QCDestimation'):
-def LpTemplateFit(LpTemplates, prefix="", printDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/RunII/Spring15_25ns/QCDestimation/templateFit'):
+def LpTemplateFit(LpTemplates, prefix="", printDir='/afs/hephy.at/user/'+username[0]+'/'+username+'/www/RunII/Spring15_25ns/QCDestimation/templateFit', storePlot = True):
   if not os.path.exists(printDir):
      os.makedirs(printDir) 
 #  cWJets = samples['W']
@@ -23,8 +23,8 @@ def LpTemplateFit(LpTemplates, prefix="", printDir='/afs/hephy.at/user/'+usernam
 
 #Clone histograms from LpTemplates: EWK selected and QCD anti-selected
   template_EWK   = histoEWKsel.Clone()
-  template_QCD   = histoQCDantiSel.Clone()
-  template_QCD.Add(histoEWKantiSel)
+  template_QCD   = histoDATAantiSel.Clone()
+#  template_QCD.Add(histoEWKantiSel)
 
 #  template_WJets_PosPdg=getPlotFromChain(cWJets, nBTagVar, [0,1,2,3], 'leptonPdg>0&&'+cut, 'weight', binningIsExplicit=True,addOverFlowBin='upper')
 #  template_WJets_NegPdg=getPlotFromChain(cWJets, nBTagVar, [0,1,2,3], 'leptonPdg<0&&'+cut, 'weight', binningIsExplicit=True,addOverFlowBin='upper')
@@ -147,6 +147,7 @@ def LpTemplateFit(LpTemplates, prefix="", printDir='/afs/hephy.at/user/'+usernam
   nllComponents = ROOT.RooArgList("nllComponents")
   nll=model.createNLL(data,rf.NumCPU(1))
 #  nll_NegPdg=model_NegPdg.createNLL(data_NegPdg,rf.NumCPU(1))
+#  print yield_EWK.getVal(), yield_EWK.getErrorHi(), yield_EWK.getErrorLo(), yield_QCD.getVal(),yield_QCD.getErrorHi(), yield_QCD.getErrorLo()
   nllComponents.add(nll)
 #  nllComponents.add(nll_NegPdg)
 
@@ -172,28 +173,28 @@ def LpTemplateFit(LpTemplates, prefix="", printDir='/afs/hephy.at/user/'+usernam
 #  model_NegPdg.plotOn(fitFrame_NegPdg,rf.Components("model_TTJets"),rf.LineColor(ROOT.kBlue))
 #  model_NegPdg.plotOn(fitFrame_NegPdg,rf.Components("model_Rest_NegPdg"),rf.LineColor(ROOT.kOrange+7))
  
- 
-  c1=ROOT.TCanvas("c1","FitModel",600,600)
-  ROOT.gROOT.SetStyle("Plain")
-#  c1.Divide(1,2)
-#  c1.cd(1)
-  ROOT.gROOT.SetStyle("Plain")#Removesgraybackgroundfromplots
-  ROOT.gPad.SetLeftMargin(0.15)
-  fitFrame.GetYaxis().SetTitleOffset(1.4)
-  fitFrame.GetXaxis().SetTitle('L_{P}')
-  fitFrame.Draw()
-
-#  c1.cd(2)
-#  ROOT.gROOT.SetStyle("Plain")#Removesgraybackgroundfromplots
-#  ROOT.gPad.SetLeftMargin(0.15)
-#  fitFrame_NegPdg.GetYaxis().SetTitleOffset(1.4)
-#  fitFrame_NegPdg.GetXaxis().SetTitle('nBJetCMVA')
-#  fitFrame_NegPdg.Draw()
-
-  c1.Print(printDir+'/'+prefix+'_TemplateFit.png')
-  c1.Print(printDir+'/'+prefix+'_TemplateFit.pdf')
-  c1.Print(printDir+'/'+prefix+'_TemplateFit.root')
-  del c1
+  if storePlot: 
+    c1=ROOT.TCanvas("c1","FitModel",600,600)
+    ROOT.gROOT.SetStyle("Plain")
+  #  c1.Divide(1,2)
+  #  c1.cd(1)
+    ROOT.gROOT.SetStyle("Plain")#Removesgraybackgroundfromplots
+    ROOT.gPad.SetLeftMargin(0.15)
+    fitFrame.GetYaxis().SetTitleOffset(1.4)
+    fitFrame.GetXaxis().SetTitle('L_{P}')
+    fitFrame.Draw()
+  
+  #  c1.cd(2)
+  #  ROOT.gROOT.SetStyle("Plain")#Removesgraybackgroundfromplots
+  #  ROOT.gPad.SetLeftMargin(0.15)
+  #  fitFrame_NegPdg.GetYaxis().SetTitleOffset(1.4)
+  #  fitFrame_NegPdg.GetXaxis().SetTitle('nBJetCMVA')
+  #  fitFrame_NegPdg.Draw()
+  
+    c1.Print(printDir+'/'+prefix+'_TemplateFit.png')
+    c1.Print(printDir+'/'+prefix+'_TemplateFit.pdf')
+    c1.Print(printDir+'/'+prefix+'_TemplateFit.root')
+    del c1
   del nllComponents
 
 #  res = {'TT_AllPdg':{'template':template_TTJets, 'yield':2*yield_TTJets.getVal(), 'yield_high':2*(yield_TTJets.getVal()+yield_TTJets.getErrorHi()), 'yield_low':2*(yield_TTJets.getVal()+yield_TTJets.getErrorLo()), 

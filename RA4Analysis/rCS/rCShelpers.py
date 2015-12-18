@@ -66,7 +66,7 @@ def combineRCS(samples, dPhiCut):
 
 #ROOT.TH1F().SetDefaultSumw2()
 
-def getRCS(c, cut, dPhiCut, useGenMet=False, useAllGen=False, useOnlyGenMetPt=False, useOnlyGenMetPhi=False, useWeight = True, weight='weight', QCD_lowDPhi={'y':0.,'e':0.}, QCD_highDPhi={'y':0.,'e':0.}, cutVar='deltaPhi_Wl', varMax=pi):   
+def getRCS(c, cut, dPhiCut, useGenMet=False, useAllGen=False, useOnlyGenMetPt=False, useOnlyGenMetPhi=False, useWeight = True, weight='weight', QCD_lowDPhi={'y':0.,'e':0.}, QCD_highDPhi={'y':0.,'e':0.}, cutVar='deltaPhi_Wl', varMax=pi): 
   if useGenMet: dPhiStr = "acos((leptonPt+met_genPt*cos(leptonPhi-met_genPhi))/sqrt(leptonPt**2+met_genPt**2+2*met_genPt*leptonPt*cos(leptonPhi-met_genPhi)))"
   elif useAllGen: dPhiStr = "acos((genLep_pt+met_genPt*cos(genLep_phi-met_genPhi))/sqrt(genLep_pt**2+met_genPt**2+2*met_genPt*genLep_pt*cos(genLep_phi-met_genPhi)))"
   elif useOnlyGenMetPt: dPhiStr = "acos((leptonPt+met_genPt*cos(leptonPhi-met_phi))/sqrt(leptonPt**2+met_genPt**2+2*met_genPt*leptonPt*cos(leptonPhi-met_phi)))"

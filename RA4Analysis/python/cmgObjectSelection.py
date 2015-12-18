@@ -32,12 +32,6 @@ def cmgTightEleID(r, nLep):
     and  r.LepGood_miniRelIso[nLep]<0.1  \
     and  r.LepGood_SPRING15_25ns_v1[nLep]==4
 
-#def cmgTightEleID(r, nLep):
-#  return r.LepGood_pt[nLep]>=25 and abs(r.LepGood_eta[nLep])<2.5\
-#    and  r.LepGood_miniRelIso[nLep]<0.1  \
-#    and cmgMVAEleID(r,nLep,ele_MVAID_cuts_tight) \
-#    and r.LepGood_lostHits[nLep]<=0 and r.LepGood_convVeto[nLep] and abs(r.LepGood_sip3d[nLep])<4
-
 #and r.LepGood_lostHits[nLep]<=0 and r.LepGood_convVeto[nLep] 
 
 #def cmgLooseLepID(r, nLep, ptCuts, absEtaCuts, hybridIso03):

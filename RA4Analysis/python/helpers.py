@@ -192,7 +192,7 @@ def varBin(vb):
 def getBinBorders(l, max=10**4):
   return [x[0] for x in l ] + [max]
 
-def nameAndCut(stb, htb, njetb, btb=None, presel="(1)", charge="", btagVar = 'nBJetMediumCSV30', stVar = 'st', htVar = 'htJet30j', njetVar='nJet30'):
+def nameAndCut(stb, htb, njetb, btb=None, presel="(1)", charge="", btagVar = 'nBJetMediumCSV30', stVar = 'Lt', htVar = 'htJet30clean', njetVar='nJet30clean'):
   cut=presel
   name=""
   if stb:

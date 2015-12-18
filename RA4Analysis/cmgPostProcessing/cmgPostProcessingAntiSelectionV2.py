@@ -4,7 +4,7 @@ import sys, os, copy, random, subprocess, datetime
 from array import array
 from Workspace.RA4Analysis.cmgObjectSelection import cmgLooseLepIndices, splitIndList, get_cmg_jets_fromStruct, splitListOfObjects, cmgTightMuID, cmgTightEleID
 from Workspace.HEPHYPythonTools.xsec import xsec
-from Workspace.HEPHYPythonTools.helpers import getObjFromFile, getObjDict, getFileList
+from Workspace.HEPHYPythonTools.helpers import getObjFromFile, getObjDict, getFileList, deltaR, deltaPhi, deltaR2
 from Workspace.HEPHYPythonTools.convertHelpers import compileClass, readVar, printHeader, typeStr, createClassString
 
 from math import *
@@ -16,13 +16,12 @@ ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 
 from Workspace.HEPHYPythonTools.helpers import getChunks
-#from Workspace.RA4Analysis.cmgTuples_Spring15_25ns import *
-#from Workspace.RA4Analysis.cmgTuples_Spring15_50ns import *
-#from Workspace.RA4Analysis.cmgTuples_Data50ns_1l import *
-#from Workspace.RA4Analysis.cmgTuples_Data25ns import *
-#from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_fromArthur import *
+#from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_fromArturV2 import *
+#from Workspace.RA4Analysis.cmgTuples_data_25ns_fromArtur import *
 from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns import *
+from Workspace.RA4Analysis.cmgTuples_Data25ns_miniAODv2 import *
 from btagEfficiency import *
+from readVetoEventList import *
 
 bTagEffFile = '/data/dspitzbart/Results2015/MCEff_skim_pkl'
 try:
@@ -31,14 +30,13 @@ except IOError:
   print 'Unable to load MC efficiency file!'
   mcEffDict = False
 
-#maxConsideredBTagWeight = 2
-#calcSystematics = True
+target_lumi = 2110 #pb-1
+
 separateBTagWeights = True
 
-defSampleStr = "TTJets_25ns"
+defSampleStr = "TTJets_LO_HT600to800_25ns"
 
-#subDir = "postProcessed_Spring15_test"
-subDir = "postProcessed_Spring15_btagEff_SF15"
+subDir = "postProcessed_Spring15_antiSelection_final2p1fb_V6"
 
 #branches to be kept for data and MC
 branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert",
@@ -81,18 +79,39 @@ parser.add_option("--manScaleFactor", dest="manScaleFactor", default = 1, action
 (options, args) = parser.parse_args()
 assert options.leptonSelection in ['soft', 'hard', 'none', 'dilep'], "Unknown leptonSelection: %s"%options.leptonSelection
 skimCond = "(1)"
+ht500 = "Sum$(Jet_pt)>500"
 if options.skim.startswith('met'):
   skimCond = "met_pt>"+str(float(options.skim[3:]))
 if options.skim=='HT400':
   skimCond = "Sum$(Jet_pt)>400"
 if options.skim=='HT400ST200':   ##tuples have already ST200 skim
   skimCond = "Sum$(Jet_pt)>400&&(LepGood_pt[0]+met_pt)>200"
-if options.skim=='HT500ST250':  
-  skimCond = "Sum$(Jet_pt)>500&&(LepGood_pt[0]+met_pt)>250"
+if options.skim=='HT500':  
+  skimCond = ht500
 if options.skim=='LHEHT600':
-  skimCond = "lheHTIncoming<600"
+  skimCond = "lheHTIncoming>600"
+
+####dilep skim##
+if options.skim=='diLep':
+  skimCond = "((ngenLep+ngenTau)==2)&&lheHTIncoming<=1000"#+ht500
+###semilep skim###
+if options.skim=='semiLep':
+  skimCond = "((ngenLep+ngenTau)==1)&&lheHTIncoming<=1000"#+ht500
+###Full hadronic###
+if options.skim=='LHE_FullHadronic_inc':
+  skimCond = "((ngenLep+ngenTau)==0)&&lheHTIncoming<=600"#+ht500
+###Full hadronic for the ht binned###
+if options.skim=='LHE_FullHadronic': 
+  skimCond = "lheHTIncoming>600&&lheHTIncoming<=1000&&((ngenLep+ngenTau)==0)"#+ht500
+###Full inclusive for high HT
+if options.skim=='LHEHT1000':
+  skimCond = "lheHTIncoming>1000"#+ht500
 
 ##In case a lepton selection is required, loop only over events where there is one 
+if options.leptonSelection.lower()=='none':
+  #skimCond += "&&Sum$(LepGood_pt>10&&abs(LepGood_eta)<2.5)>=1"
+  #skimCond += "&&(nLepGood+nLepOther)>=1"
+  skimCond += "&&(1)"
 if options.leptonSelection.lower()=='soft':
   #skimCond += "&&Sum$(LepGood_pt>5&&LepGood_pt<25&&LepGood_relIso03<0.4&&abs(LepGood_eta)<2.4)>=1"
   skimCond += "&&Sum$(LepGood_pt>5&&LepGood_pt<25&&abs(LepGood_eta)<2.4)>=1"
@@ -104,13 +123,10 @@ if options.leptonSelection.lower()=='dilep':
   skimCond += "&&Sum$(LepGood_pt>15&&abs(LepGood_eta)<2.4)>1"
 
 if options.hadronicLeg:
-  skimCond += "&&(ngenLep+ngenTau)==0"
+  skimCond += "&&(nGenLep+nGenTau)==0"
 
 if options.manScaleFactor!=1:
-  target_lumi = target_lumi*float(options.manScaleFactor)
-  print
-  print "target lumi scaled!"
-  print "New lumi:", target_lumi
+  targetlumi = targetlumi*options.manScaleFactor
 
 if options.skim=='inc':
   skimCond = "(1)"
@@ -118,9 +134,27 @@ if options.skim=='inc':
 if sys.argv[0].count('ipython'):
   options.small=True
 
+###get evt Veto List  for filters####
+evt_veto_list = evt_veto_list()
 ###For PU reweight###
 PU_File = ROOT.TFile("/data/easilar/tuples_from_Artur/JECv6recalibrateMET_2100pb/trig_skim/PUhistos/ratio_PU.root")
 PU_histo = PU_File.Get("h_ratio")
+#####################
+
+#####################
+###For Lepton SF#####
+mu_mediumID_File = ROOT.TFile("/data/easilar/SF2015/TnP_MuonID_NUM_MediumID_DENOM_generalTracks_VAR_map_pt_eta.root")
+mu_looseID_File = ROOT.TFile("/data/easilar/SF2015/TnP_MuonID_NUM_LooseID_DENOM_generalTracks_VAR_map_pt_eta-2.root")
+mu_miniIso02_File = ROOT.TFile("/data/easilar/SF2015/TnP_MuonID_NUM_MiniIsoTight_DENOM_LooseID_VAR_map_pt_eta.root")
+mu_sip3d_File = ROOT.TFile("/data/easilar/SF2015/TnP_MuonID_NUM_TightIP3D_DENOM_LooseID_VAR_map_pt_eta.root")
+ele_kin_File = ROOT.TFile("/data/easilar/SF2015/kinematicBinSFele.root")
+#
+mu_mediumID_histo = mu_mediumID_File.Get("pt_abseta_PLOT_pair_probeMultiplicity_bin0_&_tag_combRelIsoPF04dBeta_bin0_&_tag_pt_bin0_&_tag_IsoMu20_pass")
+mu_looseID_histo = mu_looseID_File.Get("pt_abseta_PLOT_pair_probeMultiplicity_bin0_&_tag_combRelIsoPF04dBeta_bin0_&_tag_pt_bin0_&_tag_IsoMu20_pass")
+mu_miniIso02_histo = mu_miniIso02_File.Get("pt_abseta_PLOT_pair_probeMultiplicity_bin0_&_tag_combRelIsoPF04dBeta_bin0_&_tag_pt_bin0_&_PF_pass_&_tag_IsoMu20_pass")
+mu_sip3d_histo = mu_sip3d_File.Get("pt_abseta_PLOT_pair_probeMultiplicity_bin0_&_tag_combRelIsoPF04dBeta_bin0_&_tag_pt_bin0_&_PF_pass_&_tag_IsoMu20_pass")
+ele_cutbased_histo = ele_kin_File.Get("CutBasedTight")
+ele_miniIso01_histo = ele_kin_File.Get("MiniIso0p1_vs_AbsEta")
 #####################
 
 maxConsideredBTagWeight = options.btagWeight
@@ -146,107 +180,6 @@ def getTreeFromChunk(c, skimCond, iSplit, nSplit):
   del rf
   return t
    
-def getGenWandLepton(c):
-  genPartAll = [getObjDict(c, 'GenPart_', ['pt','eta','phi','mass','pdgId','motherId','motherIndex'], j) for j in range(int(c.GetLeaf('nGenPart').GetValue()))]
-  lepton = filter(lambda l:abs(l['pdgId']) in [11,13,15], genPartAll)
-  if len(lepton)==0:
-    print "no generated lepton found!"
-    p4w=False
-    p4lepton=False
-    return p4w, p4lepton
-  lFromW = filter(lambda w:abs(w['motherId'])==24, lepton)
-  if len(lFromW)==0:
-    print 'no generated W found!'
-    print lepton
-    p4w=False
-    p4lepton=False
-    return p4w, p4lepton
-  elif len(lFromW)>0:
-    if len(lFromW)>1: print 'this should not have happened'
-    if abs(lFromW[0]['motherId'])!=24: print 'this should not have happened'
-    genW = getObjDict(c, 'GenPart_', ['pt','eta','phi','mass','pdgId','motherId','motherIndex'], int(lFromW[0]['motherIndex']))
-    lep = ROOT.TLorentzVector()
-    lep.SetPtEtaPhiM(lFromW[0]['pt'],lFromW[0]['eta'],lFromW[0]['phi'],lFromW[0]['mass'])
-  if abs(genW['pdgId'])!=24: 'this should not have happened'
-  W = ROOT.TLorentzVector()
-  W.SetPtEtaPhiM(genW['pt'],genW['eta'],genW['phi'],genW['mass'])
-  p4lepton = ROOT.LorentzVector(lep.Px(),lep.Py(),lep.Pz(),lep.E())
-  p4w = ROOT.LorentzVector(W.Px(),W.Py(),W.Pz(),W.E())
-  return p4w, p4lepton
-
-def getGenTopWLepton(c):
-  genPartAll = [getObjDict(c, 'GenPart_', ['pt','eta','phi','mass','pdgId','charge','motherId','motherIndex'], j) for j in range(int(c.GetLeaf('nGenPart').GetValue()))]
-  lepton = filter(lambda l:abs(l['pdgId']) in [11,13,15], genPartAll)
-  if len(lepton)==0:
-    p4t=False
-    p4w=False
-    p4lepton=False
-    return p4t, p4w, p4lepton
-  lFromW = filter(lambda w:abs(w['motherId'])==24, lepton)
-  if len(lFromW)>0:
-    if len(lFromW)==1:
-      if abs(lFromW[0]['motherId'])!=24: print '1)this should not have happened'
-      genW = getObjDict(c, 'GenPart_', ['pt','eta','phi','mass','pdgId','charge','motherId','motherIndex'], int(lFromW[0]['motherIndex']))
-      if abs(genW['pdgId'])!=24: '2)this should not have happened'
-      genTop = getObjDict(c, 'GenPart_', ['pt','eta','phi','mass','pdgId','charge','motherId','motherIndex'], int(genW['motherIndex']))
-      lep = ROOT.TLorentzVector()
-      lep.SetPtEtaPhiM(lFromW[0]['pt'],lFromW[0]['eta'],lFromW[0]['phi'],lFromW[0]['mass'])
-    elif len(lFromW)==2:
-      match = False
-      leadLep = getObjDict(c, 'LepGood_', ['pt','eta','phi','mass','pdgId','charge'], 0)
-      for l in lFromW:
-        if leadLep['charge'] == l['charge']:
-          match = True
-          genW = getObjDict(c, 'GenPart_', ['pt','eta','phi','mass','pdgId','charge','motherId','motherIndex'], int(l['motherIndex']))
-          genTop = getObjDict(c, 'GenPart_', ['pt','eta','phi','mass','pdgId','charge','motherId','motherIndex'], int(genW['motherIndex']))
-          lep = ROOT.TLorentzVector()
-          lep.SetPtEtaPhiM(l['pt'],l['eta'],l['phi'],l['mass'])
-      if not match:
-        print 'No match at all!'
-        p4t=False
-        p4w=False
-        p4lepton=False
-        return p4t, p4w, p4lepton
-  elif len(lFromW)>2 or len(lFromW)==0:
-    print "8) this should not have happened"
-    p4t=False
-    p4w=False
-    p4lepton=False
-    return p4t, p4w, p4lepton
-  t = ROOT.TLorentzVector()
-  W = ROOT.TLorentzVector()
-  W.SetPtEtaPhiM(genW['pt'],genW['eta'],genW['phi'],genW['mass'])
-  t.SetPtEtaPhiM(genTop['pt'],genTop['eta'],genTop['phi'],genTop['mass'])
-  p4lepton = ROOT.LorentzVector(lep.Px(),lep.Py(),lep.Pz(),lep.E())
-  p4w = ROOT.LorentzVector(W.Px(),W.Py(),W.Pz(),W.E())
-  p4t = ROOT.LorentzVector(t.Px(),t.Py(),t.Pz(),t.E())
-  return p4t, p4w, p4lepton
-
-def cleanJetsAndLeptons(jets,leptons,deltaR,arbitration):
-    dr2 = deltaR**2
-    goodjet = [ True for j in jets ]
-    goodlep = [ True for l in leptons ]
-    for il, l in enumerate(leptons):
-        ibest, d2m = -1, dr2
-        for i,j in enumerate(jets):
-            d2i = deltaR2(l.eta(),l.phi(), j.eta(),j.phi())
-            if d2i < dr2:
-                choice = arbitration(j,l)
-                if choice == j:
-                   # if the two match, and we prefer the jet, then drop the lepton and be done
-                   goodlep[il] = False
-                   break
-                elif choice == (j,l) or choice == (l,j):
-                   # asked to keep both, so we don't consider this match
-                   continue
-            if d2i < d2m:
-                ibest, d2m = i, d2i
-        # this lepton has been killed by a jet, then we clean the jet that best matches it
-        if not goodlep[il]: continue
-        if ibest != -1: goodjet[ibest] = False
-    return ( [ j for (i ,j) in enumerate(jets)    if goodjet[i ] == True ],
-             [ l for (il,l) in enumerate(leptons) if goodlep[il] == True ] )
-
 exec('allSamples=['+options.allsamples+']')
 for isample, sample in enumerate(allSamples):
   #chunks, sumWeight = getChunks(sample, options.inputTreeName)
@@ -269,38 +202,38 @@ for isample, sample in enumerate(allSamples):
   else:
     if "TTJets" in sample['dbsName']: lumiScaleFactor = xsec[sample['dbsName']]*target_lumi/float(sumWeight)
     else: lumiScaleFactor = target_lumi/float(sumWeight)
-    #lumiScaleFactor = target_lumi/float(sumWeight)
     branchKeepStrings = branchKeepStrings_DATAMC + branchKeepStrings_MC
   
-  sampleKey = ''
-  if 'TTJets' in sample['dbsName']: sampleKey = 'TTJets'
-  elif 'WJets' in sample['dbsName']: sampleKey = 'WJets'
-  else: sampleKey = 'none'
-  
   readVariables = ['met_pt/F', 'met_phi/F']
-  newVariables = ['weight/F','muonDataSet/I','eleDataSet/I']
+  newVariables = ['weight/F', 'muonDataSet/I', 'eleDataSet/I']
   aliases = [ "met:met_pt", "metPhi:met_phi"]
 
   readVectors = [\
-    {'prefix':'LepGood', 'nMax':8, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I', 'relIso03/F','SPRING15_25ns_v1/I' ,'tightId/I', 'miniRelIso/F','mass/F','sip3d/F','mediumMuonId/I', 'mvaIdPhys14/F','mvaIdSpring15/F','lostHits/I', 'convVeto/I', 'charge/I']},
-    #{'prefix':'LepGood',  'nMax':8, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I', 'relIso03/F', 'tightId/I', 'miniRelIso/F','mass/F','sip3d/F','mediumMuonId/I', 'mvaIdPhys14/F','lostHits/I', 'convVeto/I']},
+    {'prefix':'LepGood', 'nMax':8, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I', 'relIso03/F','SPRING15_25ns_v1/I','eleCBID_SPRING15_25ns/I', 'eleCBID_SPRING15_25ns_ConvVetoDxyDz/I', 'tightId/I', 'miniRelIso/F','mass/F','sip3d/F','mediumMuonId/I', 'mvaIdPhys14/F','mvaIdSpring15/F','lostHits/I', 'convVeto/I', 'charge/I', 'hOverE/F']},
+    {'prefix':'LepOther', 'nMax':8, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I', 'relIso03/F','eleCBID_SPRING15_25ns/I', 'eleCBID_SPRING15_25ns_ConvVetoDxyDz/I' ,'tightId/I', 'miniRelIso/F','mass/F','sip3d/F','mediumMuonId/I', 'lostHits/I', 'convVeto/I', 'charge/I', 'hOverE/F']},
     {'prefix':'Jet',  'nMax':100, 'vars':['pt/F', 'eta/F', 'phi/F', 'id/I','btagCSV/F', 'btagCMVA/F']},
   ]
   if not sample['isData']: 
-    newVariables.extend(['weight_XSecTTBar1p1/F','weight_XSecTTBar0p9/F','weight_WPolPlus10/F', 'weight_WPolMinus10/F', 'weight_TTPolPlus5/F', 'weight_TTPolMinus5/F'])
+    newVariables.extend(['puReweight_true/F', 'weight_XSecTTBar1p1/F','weight_XSecTTBar0p9/F','weight_WPolPlus10/F', 'weight_WPolMinus10/F', 'weight_TTPolPlus5/F', 'weight_TTPolMinus5/F'])
     aliases.extend(['genMet:met_genPt', 'genMetPhi:met_genPhi'])
     #readVectors[1]['vars'].extend('partonId/I')
   if options.leptonSelection.lower() in ['soft', 'hard']:
-    newVariables.extend( ['nLooseSoftLeptons/I', 'nLooseHardLeptons/I', 'nTightSoftLeptons/I', 'nTightHardLeptons/I'] )
-    newVariables.extend( ['puReweight_true/F','deltaPhi_Wl/F','nBJetMediumCSV30/I','nJet30/I','htJet30j/F','st/F', 'leptonPt/F','leptonMiniRelIso/F','leptonRelIso03/F' ,'leptonEta/F', 'leptonPhi/F','leptonSPRING15_25ns_v1/I/-2','leptonPdg/I/0', 'leptonInd/I/-1', 'leptonMass/F', 'singleMuonic/I', 'singleElectronic/I', 'singleLeptonic/I' ]) #, 'mt2w/F'] )
+    newVariables.extend( ['nLooseSoftLeptons/I', 'nLooseHardLeptons/I', 'nTightSoftLeptons/I', 'nTightHardLeptons/I' ])
+    newVariables.extend( ['deltaPhi_Wl/F', 'Lp/F', 'Lt/F', 'nBJetMediumCSV30/I','nJet30/I','htJet30j/F', 'st/F', 'leptonPt/F','leptonMiniRelIso/F','leptonRelIso03/F' ,'leptonEta/F', 'leptonPhi/F', 'leptonSPRING15_25ns_v1/I/-2', 'leptonPdg/I/0', 'leptonInd/I/-1', 'leptonMass/F', 'singleMuonic/I', 'singleElectronic/I', 'singleLeptonic/I', 'lslJet80/I' ]) #, 'mt2w/F'] )
+  if options.leptonSelection.lower() == 'none':
+    newVariables.extend( ['nLep/I', 'nVeto/I', 'nTightLep/I', 'nTightEl/I', 'nTightMu/I', 'nEl/I', 'nMu/I', 'Selected/I'] )
+    newVariables.extend( ['deltaPhi_Wl/F', 'Lp/F', 'Lt/F', 'nBJetMediumCSV30/I','nJet30clean/I','htJet30clean/F', 'st/F', 'leptonPt/F','leptonMiniRelIso/F','leptonRelIso03/F' ,'leptonEta/F', 'leptonPhi/F', 'leptonPdg/I', 'leptonInd/I', 'leptonMass/F','leptonHoverE/F', 'leptonEt/F', 'lslJet80/I', 'Jet1_pt/F', 'Jet2_pt/F', 'nJet30nonClean/I', 'htJet30nonClean/F', 'singleMuonic/I', 'singleElectronic/I', 'singleLeptonic/I' ]) #, 'mt2w/F'] )
+    newVariables.extend( ['lepton_muSF_looseID/D/1.','lepton_muSF_mediumID/D/1.','lepton_muSF_miniIso02/D/1.','lepton_muSF_sip3d/D/1.','lepton_eleSF_cutbasedID/D/1.','lepton_eleSF_miniIso01/D/1.'])
+    newVariables.extend( ['lepton_muSF_looseID_err/D/0.','lepton_muSF_mediumID_err/D/0.','lepton_muSF_miniIso02_err/D/0.','lepton_muSF_sip3d_err/D/0.','lepton_eleSF_cutbasedID_err/D/0.','lepton_eleSF_miniIso01_err/D/0.'])
+
     if calcSystematics:
       #newVariables.extend( ["weightBTag/F", "weightBTag_SF/F", "weightBTag_SF_b_Up/F", "weightBTag_SF_b_Down/F", "weightBTag_SF_light_Up/F", "weightBTag_SF_light_Down/F"])
       for i in range(maxConsideredBTagWeight+1):
-        newVariables.extend( ["weightBTag"+str(i)+"/F", "weightBTag"+str(i)+"_SF/F", "weightBTag"+str(i)+"_SF_b_Up/F", "weightBTag"+str(i)+"_SF_b_Down/F", "weightBTag"+str(i)+"_SF_light_Up/F", "weightBTag"+str(i)+"_SF_light_Down/F"])
+        newVariables.extend( ["weightBTag"+str(i)+"/F/1", "weightBTag"+str(i)+"_SF/F/1", "weightBTag"+str(i)+"_SF_b_Up/F/1", "weightBTag"+str(i)+"_SF_b_Down/F/1", "weightBTag"+str(i)+"_SF_light_Up/F/1", "weightBTag"+str(i)+"_SF_light_Down/F/1"])
         #if i>0:
-        newVariables.extend( ["weightBTag"+str(i+1)+"p/F", "weightBTag"+str(i+1)+"p_SF/F", "weightBTag"+str(i+1)+"p_SF_b_Up/F", "weightBTag"+str(i+1)+"p_SF_b_Down/F", "weightBTag"+str(i+1)+"p_SF_light_Up/F", "weightBTag"+str(i+1)+"p_SF_light_Down/F"])
-  newVars = [readVar(v, allowRenaming=False, isWritten = True, isRead=False) for v in newVariables]
+        newVariables.extend( ["weightBTag"+str(i+1)+"p/F/1", "weightBTag"+str(i+1)+"p_SF/F/1", "weightBTag"+str(i+1)+"p_SF_b_Up/F/1", "weightBTag"+str(i+1)+"p_SF_b_Down/F/1", "weightBTag"+str(i+1)+"p_SF_light_Up/F/1", "weightBTag"+str(i+1)+"p_SF_light_Down/F/1"])
 
+  newVars = [readVar(v, allowRenaming=False, isWritten = True, isRead=False) for v in newVariables]
   
   readVars = [readVar(v, allowRenaming=False, isWritten=False, isRead=True) for v in readVariables]
   for v in readVectors:
@@ -353,19 +286,34 @@ for isample, sample in enumerate(allSamples):
         s.init()
         r.init()
         t.GetEntry(i)
+
+        if sample['isData']:
+          vetoEvt = str(t.GetLeaf('run').GetValue())+":"+str(t.GetLeaf('lumi').GetValue())+":"+str(t.GetLeaf('evt').GetValue())+"\n"
+          if vetoEvt in evt_veto_list : continue
+
         genWeight = 1 if sample['isData'] else t.GetLeaf('genWeight').GetValue()
         xsectemp = 1 if sample['isData'] else t.GetLeaf('xsec').GetValue()
-        if "TTJets" in sample["name"] : 
-          s.weight = lumiScaleFactor*genWeight
-        else:
-          s.weight = lumiScaleFactor*genWeight*xsectemp
 
-        nTrueInt = t.GetLeaf('nTrueInt').GetValue()
-        s.puReweight_true = 1 if sample['isData'] else PU_histo.GetBinContent(PU_histo.FindBin(nTrueInt))
+        if sample['isData']:
+          if "Muon" in sample['name']:
+            s.muonDataSet = True
+            s.eleDataSet = False
+          if "Electron" in sample['name']:
+            s.muonDataSet = False
+            s.eleDataSet = True
+            
         #calculatedWeight = True
         if not sample['isData']:
           s.muonDataSet = False
           s.eleDataSet = False
+          nTrueInt = t.GetLeaf('nTrueInt').GetValue()
+          s.puReweight_true = PU_histo.GetBinContent(PU_histo.FindBin(nTrueInt))
+
+          if "TTJets" in sample["name"] :
+            s.weight = lumiScaleFactor*genWeight
+          else:
+             s.weight = lumiScaleFactor*genWeight*xsectemp
+
           if "TTJets" in sample['dbsName']:
             s.weight_XSecTTBar1p1 = s.weight*1.1 
             s.weight_XSecTTBar0p9 = s.weight*0.9
@@ -386,14 +334,13 @@ for isample, sample in enumerate(allSamples):
           tightHardLepInd = filter(lambda i:(abs(r.LepGood_pdgId[i])==11 and cmgTightEleID(r,i)) \
                                          or (abs(r.LepGood_pdgId[i])==13 and cmgTightMuID(r,i)), looseHardLepInd)  
 
-
           #print "s lepgood pt: " ,s.LepGood_pt[0]
           s.nLooseSoftLeptons = len(looseSoftLepInd)
           s.nLooseHardLeptons = len(looseHardLepInd)
           s.nTightSoftLeptons = len(tightSoftLepInd)
           s.nTightHardLeptons = len(tightHardLepInd)
           #print "tightHardLepInd:" , tightHardLepInd
-          vars = ['pt', 'eta', 'phi', 'miniRelIso','relIso03', 'pdgId', 'SPRING15_25ns_v1']
+          vars = ['pt', 'eta', 'phi', 'miniRelIso','relIso03', 'pdgId', 'SPRING15_25ns_v1', 'mass']
           allLeptons = [getObjDict(t, 'LepGood_', vars, i) for i in looseLepInd]
           looseSoftLep = [getObjDict(t, 'LepGood_', vars, i) for i in looseSoftLepInd] 
           looseHardLep = [getObjDict(t, 'LepGood_', vars, i) for i in looseHardLepInd]
@@ -504,6 +451,336 @@ for isample, sample in enumerate(allSamples):
           #print "deltaPhi:" , s.deltaPhi_Wl
   #          print "Warning -> Why can't I compute mt2w?", s.mt2w, len(jets), len(bJets), len(allTightLeptons),lightJets,bJets, {'pt':s.type1phiMet, 'phi':s.type1phiMetphi}, {'pt':s.leptonPt, 'phi':s.leptonPhi, 'eta':s.leptonEta}
 
+        if options.leptonSelection == 'none':
+
+          ### LEPTONS
+          vars = ['pt', 'eta', 'phi', 'mass', 'miniRelIso','relIso03', 'pdgId', 'eleCBID_SPRING15_25ns', 'eleCBID_SPRING15_25ns_ConvVetoDxyDz','mediumMuonId', 'sip3d', 'hOverE']
+          leptonIndices = [i for i in range(r.nLepGood)]
+          leptons = [getObjDict(t, 'LepGood_', vars, i) for i in leptonIndices]
+          nlep = len(leptonIndices)
+          ## Isolation
+          eleMiniIsoCut = 0.1
+          muMiniIsoCut = 0.2
+          looseMiniIsoCut = 0.4
+          triggerMiniIsoCut = 0.8
+
+          goodEl_lostHits = 0
+          goodEl_sip3d = 4
+          goodMu_sip3d = 4
+
+          Selected = False
+          #selected good leptons
+          selTightLeptons = []
+          selTightLepIndices = []
+          selVetoLeptons = [] 
+
+          #anti-selected leptons
+          antiTightLeptons = []
+          antiTightLepIndices = []
+          antiVetoLeptons = []      
+
+          #loop over all leptons and sort them to sel, anti-sel, selVeto and antiVeto
+          for idx,lep in enumerate(leptons):
+
+            # min Pt and abs eta for all Leptons
+            if (abs(lep['eta'])>2.4): continue
+            if lep['pt'] < 10: continue
+            if lep['miniRelIso'] > triggerMiniIsoCut: continue
+
+            ### MUONS
+            if(abs(lep['pdgId']) == 13):
+
+              if (abs(lep['eta'])>2.4): continue
+
+              #ID, IP and Iso check:
+              passID = True if lep['mediumMuonId'] == 1 else False
+              passIso = True if lep['miniRelIso'] < muMiniIsoCut else False
+              passIP = True if lep['sip3d'] < goodMu_sip3d else False
+
+              #selected muons
+              if passIso and passID and passIP:
+                selTightLeptons.append(lep)
+                selTightLepIndices.append(idx)
+                antiVetoLeptons.append(lep)
+              else:
+                selVetoLeptons.append(lep)
+
+              #anti-selected muons
+              if not passIso:
+                antiTightLeptons.append(lep)
+                antiTightLepIndices.append(idx)
+              else:
+                antiVetoLeptons.append(lep)
+            
+            ### ELECTRONS
+            if(abs(lep['pdgId']) == 11):
+
+              if abs(lep['eta'])>2.4: continue
+                
+              #pass variables
+              passIso = False
+              passConv = False
+
+              #electron CutBased ID, ConvVeto, dxy,dz already included
+              passTightID = True if (lep['eleCBID_SPRING15_25ns_ConvVetoDxyDz'] == 4) else False
+              passMediumID = True if (lep['eleCBID_SPRING15_25ns_ConvVetoDxyDz'] >= 3) else False
+              passVetoID = True if (lep['eleCBID_SPRING15_25ns_ConvVetoDxyDz'] >= 1) else False
+
+              #selected electrons
+              if passTightID:
+                #all selected leptons are veto for anti
+                antiVetoLeptons.append(lep)
+
+                #Iso check:
+                if lep['miniRelIso'] < eleMiniIsoCut: passIso = True
+                passConv = True #already included in CBID_SPRING15_25ns_ConvVetoDxyDz
+
+                #fill
+                if passIso and passConv:
+                  selTightLeptons.append(lep)
+                  selTightLepIndices.append(idx)
+                else:
+                  selVetoLeptons.append(lep)
+
+              # anti-selected electrons
+              elif not passMediumID:
+                #all anti leptons are veto for selected
+                selVetoLeptons.append(lep)
+
+                passIso = True if lep['miniRelIso'] < looseMiniIsoCut else False #should be always true
+
+                passOther = True if lep['hOverE'] > 0.01 else False
+
+                #fill
+                if passIso and passOther:
+                  antiTightLeptons.append(lep)
+                  antiTightLepIndices.append(idx)
+                else:
+                  antiVetoLeptons.append(lep)
+              #Veto leptons
+              elif passVetoID:
+                #the rest is veto for selected and anti
+                selVetoLeptons.append(lep)
+                antiVetoLeptons.append(lep)
+
+          #loop over lepOther Collection for anti-selected leptons
+          otherIndices = [i for i in range(r.nLepOther)]
+          other = [getObjDict(t, 'LepOther_', vars, i) for i in otherIndices]
+
+          for idx,lep in enumerate(other):
+
+            #again min Pt and max eta are the same
+            if (abs(lep['eta']) > 2.4): continue
+            if lep['pt'] < 10: continue
+            if lep['miniRelIso'] > triggerMiniIsoCut: continue
+
+            ### MUONS
+            if (abs(lep['pdgId']) == 13):
+              passIso = True if lep['miniRelIso'] > muMiniIsoCut else False
+
+              if passIso:
+                antiTightLeptons.append(lep)
+                antiTightLepIndices.append(idx)
+              else:
+                antiVetoLeptons.append(lep)
+
+            ### ELECTRONS
+            if (abs(lep['pdgId']) == 11):
+
+              if (abs(lep['eta']) > 2.4): continue
+              #electron should have MiniIso < 0.4
+              if lep['miniRelIso'] > 0.4: continue
+
+              #use the eleCBID_SPRING15_25ns, ConvVeto, dxy, dz an not included
+              passMediumIDother = True if (lep['eleCBID_SPRING15_25ns'] >= 3) else False
+              passVetoIDother = True if (lep['eleCBID_SPRING15_25ns'] >= 1) else False
+
+              #Anti-selected electrons with CBID <3
+              if not passMediumIDother:
+                passOther = True if lep['hOverE'] > 0.01 else False
+                
+                if passOther: 
+                  antiTightLeptons.append(lep)
+                  antiTightLepIndices.append(idx)
+                else:
+                  antiVetoLeptons.append(lep)
+
+              elif passVetoIDother:
+                antiVetoLeptons.append(lep)
+
+          #define common tight lep collection for selected leptons
+          if len(selTightLeptons) > 0: #if there's at least one tight selected lepton Selected = 1 for this event
+            tightLeptons = selTightLeptons
+            tightLepIndices = selTightLepIndices
+            vetoLeptons = selVetoLeptons
+
+            #write the numbers to branches
+            s.nTightLep = len(tightLeptons)
+            s.nTightMu = sum([ abs(lep['pdgId']) == 13 for lep in tightLeptons])
+            s.nTightEl = sum([ abs(lep['pdgId']) == 11 for lep in tightLeptons])
+
+            #set selected to 1 for tight leptons 
+            s.Selected = 1
+
+          elif len(antiTightLeptons) > 0: #otherwise number of tight leptons is 0, but anti-selected leptons in the event,selected = -1
+              tightLeptons = antiTightLeptons
+              tightLepIndices = antiTightLepIndices
+              vetoLeptons = antiVetoLeptons
+
+              #write the numbers to branches
+              s.nTightLep = 0
+              s.nTightMu = 0
+              s.nTightEl = 0
+
+              s.Selected = -1
+
+          else: # no tight sel and anti-sel leptons at all, selected = 0
+              tightLeptons = []
+              tightLepIndices = []
+              vetoLeptons = []
+
+              nTightLeptons = 0
+              nTightMu = 0
+              nTightEl = 0
+
+              Selected = 0 
+
+          #store Tight and Veto lepton numbers
+          s.nLep = len(tightLeptons)
+          s.nVeto = len(vetoLeptons)
+
+          #get number of tight el and mu
+          tightEl = [lep for lep in tightLeptons if abs(lep['pdgId']) == 11]
+          tightMu = [lep for lep in tightLeptons if abs(lep['pdgId']) == 13]  
+          s.nEl = len(tightEl)
+          s.nMu = len(tightMu)
+
+          # save leading lepton vars
+          if len(tightLeptons) > 0:
+            s.leptonInd         = tightLepIndices[0]
+            s.leptonPt          = tightLeptons[0]['pt']
+            s.leptonEta         = tightLeptons[0]['eta']
+            s.leptonPhi         = tightLeptons[0]['phi']
+            s.leptonPdg         = tightLeptons[0]['pdgId']
+            s.leptonMass        = tightLeptons[0]['mass']
+            s.leptonRelIso03    = tightLeptons[0]['relIso03']
+            s.leptonMiniRelIso  = tightLeptons[0]['miniRelIso']
+            s.leptonHoverE      = tightLeptons[0]['hOverE']
+            lepVec = ROOT.TLorentzVector()
+            lepVec.SetPtEtaPhiM(s.leptonPt,s.leptonEta,s.leptonPhi,s.leptonMass)
+            s.leptonEt          = lepVec.Et()
+
+          elif len(leptons) > 0: # if no tight but at least some leptons fill it
+            s.leptonInd         = 0
+            s.leptonPt          = leptons[0]['pt']
+            s.leptonEta         = leptons[0]['eta']
+            s.leptonPhi         = leptons[0]['phi']
+            s.leptonPdg         = leptons[0]['pdgId']
+            s.leptonMass        = leptons[0]['mass']
+            s.leptonRelIso03    = leptons[0]['relIso03']
+            s.leptonMiniRelIso  = leptons[0]['miniRelIso']
+            s.leptonHoverE      = leptons[0]['hOverE']
+            lepVec = ROOT.TLorentzVector()
+            lepVec.SetPtEtaPhiM(s.leptonPt,s.leptonEta,s.leptonPhi,s.leptonMass)
+            s.leptonEt          = lepVec.Et()
+
+          s.singleLeptonic = True if (s.nTightLep==1) else False
+          if s.singleLeptonic:
+            s.singleMuonic     = True if (abs(s.leptonPdg)==13) else False
+            s.singleElectronic = True if (abs(s.leptonPdg)==11) else False
+          else:
+            s.singleMuonic     = False
+            s.singleElectronic = False
+
+          if s.singleMuonic and s.leptonPt<120:
+            s.lepton_muSF_mediumID = mu_mediumID_histo.GetBinContent(mu_mediumID_histo.FindBin(s.leptonPt,abs(s.leptonEta))) 
+            s.lepton_muSF_looseID =  mu_looseID_histo.GetBinContent(mu_looseID_histo.FindBin(s.leptonPt,abs(s.leptonEta))) 
+            s.lepton_muSF_miniIso02 =  mu_miniIso02_histo.GetBinContent(mu_miniIso02_histo.FindBin(s.leptonPt,abs(s.leptonEta))) 
+            s.lepton_muSF_sip3d =  mu_sip3d_histo.GetBinContent(mu_sip3d_histo.FindBin(s.leptonPt,abs(s.leptonEta))) 
+            s.lepton_muSF_mediumID_err =  mu_mediumID_histo.GetBinError(mu_mediumID_histo.FindBin(s.leptonPt,abs(s.leptonEta))) 
+            s.lepton_muSF_looseID_err =  mu_looseID_histo.GetBinError(mu_looseID_histo.FindBin(s.leptonPt,abs(s.leptonEta))) 
+            s.lepton_muSF_miniIso02_err =  mu_miniIso02_histo.GetBinError(mu_miniIso02_histo.FindBin(s.leptonPt,abs(s.leptonEta))) 
+            s.lepton_muSF_sip3d_err =  mu_sip3d_histo.GetBinError(mu_sip3d_histo.FindBin(s.leptonPt,abs(s.leptonEta))) 
+          if s.singleElectronic:
+            s.lepton_eleSF_cutbasedID = ele_cutbased_histo.GetBinContent(ele_cutbased_histo.FindBin(s.leptonEt,abs(s.leptonEta)))
+            s.lepton_eleSF_miniIso01 = ele_miniIso01_histo.GetBinContent(ele_miniIso01_histo.FindBin(s.leptonEt,abs(s.leptonEta)))
+            s.lepton_eleSF_cutbasedID_err = ele_cutbased_histo.GetBinError(ele_cutbased_histo.FindBin(s.leptonEt,abs(s.leptonEta)))
+            s.lepton_eleSF_miniIso01_err = ele_miniIso01_histo.GetBinError(ele_miniIso01_histo.FindBin(s.leptonEt,abs(s.leptonEta)))
+
+          ### JETS
+          j_list=['eta','pt','phi','btagCMVA', 'btagCSV','id']
+#          jetsIndices = [i for i in range(r.nJet)]
+#          jets = [getObjDict(t, 'Jet_', j_list, i) for i in jetsIndices]
+
+          jet30 = filter(lambda j:j['pt']>30 and abs(j['eta'])<2.4 and j['id'], get_cmg_jets_fromStruct(r,j_list)) 
+#          jet30 = []
+#          jet30Indices =[]
+#          for i,j in enumerate(jets):
+#            if j['pt']>30 and abs(j['eta'])<2.4:
+#              jet30.append(j)
+#              jet30Indices.append(i)
+
+          s.nJet30nonClean = len(jet30)
+          s.htJet30nonClean = sum([j['pt'] for j in jet30]) 
+
+          jet30Clean = filter(lambda j:j['pt']>30 and abs(j['eta'])<2.4 and j['id'], get_cmg_jets_fromStruct(r,j_list))
+          dRminCut = 0.4
+
+#          jet30Clean = jet30          
+          if len(tightLeptons)>=1:
+            # clean jets from tight leptons
+            for lep in tightLeptons:
+#              print 'Jet cleaning!'
+              if lep not in other: 
+#                print 'lep not in other' 
+                continue
+              jNear, dRmin = None, 99
+              for jet in jet30Clean:
+                dR = deltaR(jet,lep)
+#                print 'Lep candidate: ',lep,'Jet candidate: ',jet
+#                print 'dR: ',dR
+                if dR < dRmin:
+                  jNear, dRmin = jet, dR
+              if dRmin < dRminCut:
+#                print 'remove jet!'
+#                print jNear
+                jet30Clean.remove(jNear)
+#                print len(jet30Clean)
+
+#          if s.nJet30nonClean !=  len(jet30Clean) and False:
+#            print "Non-clean jets: ", len(jet30), "\tclean jets:", len(jet30Clean)
+#            print jet
+#            print leptons
+#            print other
+
+          if len(jet30Clean) > 0:
+            s.Jet1_pt = jet30Clean[0]['pt']
+          if len(jet30Clean) > 1:
+            s.Jet2_pt = jet30Clean[1]['pt']
+
+          #use Jet2_pt > 80 instead
+          s.lslJet80 = 1 if sum([j['pt']>80 for j in jet30Clean])>=2 else 0
+
+          s.nJet30clean = len(jet30Clean)
+          s.htJet30clean = sum([j['pt'] for j in jet30Clean])
+#          lightJets,  bJetsCSV = splitListOfObjects('btagCSV', 0.890, jet30Clean)
+
+#          print s.nJet30nonClean, s.nJet30clean
+#          print s.htJet30nonClean, s.htJet30clean
+
+          bJetsCSV = []
+          for i, j in enumerate(jet30Clean):
+            if j['btagCSV'] > 0.890:
+              bJetsCSV.append(j)
+
+          s.nBJetMediumCSV30 = len(bJetsCSV)
+
+          if len(tightLeptons)>=1:
+            s.deltaPhi_Wl = acos((s.leptonPt+r.met_pt*cos(s.leptonPhi-r.met_phi))/sqrt(s.leptonPt**2+r.met_pt**2+2*r.met_pt*s.leptonPt*cos(s.leptonPhi-r.met_phi))) 
+            s.Lt = s.leptonPt + r.met_pt
+            s.st = s.leptonPt + r.met_pt
+            s.Lp = ((s.leptonPt/sqrt(s.leptonPt**2+r.met_pt**2+2*r.met_pt*s.leptonPt*cos(s.leptonPhi-r.met_phi)))*((s.leptonPt+r.met_pt*cos(s.leptonPhi-r.met_phi))/sqrt(s.leptonPt**2+r.met_pt**2+2*r.met_pt*s.leptonPt*cos(s.leptonPhi-r.met_phi)))) 
+
         if calcSystematics:
 #          separateBTagWeights = False
           zeroTagWeight = 1.
@@ -554,7 +831,7 @@ for isample, sample in enumerate(allSamples):
             exec("s.weightBTag"+str(i)+"p_SF_b_Down    = 0.")
             exec("s.weightBTag"+str(i)+"p_SF_light_Up  = 0.")
             exec("s.weightBTag"+str(i)+"p_SF_light_Down= 0.")
-
+            
         for v in newVars:
           v['branch'].Fill()
       newFileName = sample['name']+'_'+chunk['name']+'_'+str(iSplit)+'.root'
