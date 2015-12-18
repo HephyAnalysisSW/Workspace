@@ -241,12 +241,16 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
       cnameCRtt, cutCRtt =        nameAndCut(stb,htb,srNJet, btb=(0,-1) ,presel=presel)
       #rcs1bCRtt = getRCS(cEWK, cut1bCRtt, dPhiCut)
       #rcs0bCRtt = getRCS(cTTJets, cut0bCRtt, dPhiCut)
-      samples0b = [{'chain':cWJets, 'cut':cutCRtt, 'weight':'weight*weightBTag0'}, {'chain':cTTJets, 'cut':cutCRtt, 'weight':'weight*weightBTag0'},{'chain':cDY, 'cut':cut0bCRtt, 'weight':'weight'},{'chain':cTTV, 'cut':cut0bCRtt, 'weight':'weight'},{'chain':csingleTop, 'cut':cut0bCRtt, 'weight':'weight'}]
-      samples1b = [{'chain':cWJets, 'cut':cutCRtt, 'weight':'weight*weightBTag1_SF'}, {'chain':cTTJets, 'cut':cutCRtt, 'weight':'weight*weightBTag1_SF'},{'chain':cDY, 'cut':cut1bCRtt, 'weight':'weight'},{'chain':cTTV, 'cut':cut1bCRtt, 'weight':'weight'},{'chain':csingleTop, 'cut':cut1bCRtt, 'weight':'weight'}]
-      samples1pb = [{'chain':cWJets, 'cut':cutCRtt, 'weight':'weight*weightBTag1p_SF'}, {'chain':cTTJets, 'cut':cutCRtt, 'weight':'weight*weightBTag1p_SF'},{'chain':cDY, 'cut':cut1pbCRtt, 'weight':'weight'},{'chain':cTTV, 'cut':cut1pbCRtt, 'weight':'weight'},{'chain':csingleTop, 'cut':cut1pbCRtt, 'weight':'weight'}]
-      samples2b = [{'chain':cWJets, 'cut':cutCRtt, 'weight':'weight*weightBTag2p_SF'}, {'chain':cTTJets, 'cut':cutCRtt, 'weight':'weight*weightBTag2p_SF'},{'chain':cDY, 'cut':cut2bCRtt, 'weight':'weight'},{'chain':cTTV, 'cut':cut2bCRtt, 'weight':'weight'},{'chain':csingleTop, 'cut':cut2bCRtt, 'weight':'weight'}]
+      samples0b = [{'chain':cWJets, 'cut':cutCRtt, 'weight':'weight*weightBTag0_SF', 'name':'WJets'}, {'chain':cTTJets, 'cut':cutCRtt, 'weight':'weight*weightBTag0_SF', 'name':'ttJets'},{'chain':cDY, 'cut':cut0bCRtt, 'weight':'weight', 'name':'DY'},{'chain':cTTV, 'cut':cut0bCRtt, 'weight':'weight', 'name':'TTV'},{'chain':csingleTop, 'cut':cut0bCRtt, 'weight':'weight', 'name':'singleTop'}]
+      samples1b = [{'chain':cWJets, 'cut':cutCRtt, 'weight':'weight*weightBTag1_SF', 'name':'WJets'}, {'chain':cTTJets, 'cut':cutCRtt, 'weight':'weight*weightBTag1_SF', 'fracScale':0.43, 'name':'ttJets'},{'chain':cDY, 'cut':cut1bCRtt, 'weight':'weight', 'name':'DY'},{'chain':cTTV, 'cut':cut1bCRtt, 'weight':'weight', 'name':'TTV'},{'chain':csingleTop, 'cut':cut1bCRtt, 'weight':'weight', 'name':'singleTop'}]
+      samples1ba = [{'chain':cWJets, 'cut':cutCRtt, 'weight':'weight*weightBTag1_SF', 'name':'WJets'}, {'chain':cTTJets, 'cut':cutCRtt, 'weight':'weight*weightBTag1_SF', 'name':'ttJets'},{'chain':cDY, 'cut':cut1bCRtt, 'weight':'weight', 'name':'DY'},{'chain':cTTV, 'cut':cut1bCRtt, 'weight':'weight', 'name':'TTV'},{'chain':csingleTop, 'cut':cut1bCRtt, 'weight':'weight', 'name':'singleTop'}]
+      samples1pb = [{'chain':cWJets, 'cut':cutCRtt, 'weight':'weight*weightBTag1p_SF', 'name':'WJets'}, {'chain':cTTJets, 'cut':cutCRtt, 'weight':'weight*weightBTag1p_SF', 'name':'ttJets'},{'chain':cDY, 'cut':cut1pbCRtt, 'weight':'weight', 'name':'DY'},{'chain':cTTV, 'cut':cut1pbCRtt, 'weight':'weight', 'name':'TTV'},{'chain':csingleTop, 'cut':cut1pbCRtt, 'weight':'weight', 'name':'singleTop'}]
+      samples2b = [{'chain':cWJets, 'cut':cutCRtt, 'weight':'weight*weightBTag2p_SF', 'name':'WJets'}, {'chain':cTTJets, 'cut':cutCRtt, 'weight':'weight*weightBTag2p_SF', 'name':'ttJets'},{'chain':cDY, 'cut':cut2bCRtt, 'weight':'weight', 'name':'DY'},{'chain':cTTV, 'cut':cut2bCRtt, 'weight':'weight', 'name':'TTV'},{'chain':csingleTop, 'cut':cut2bCRtt, 'weight':'weight', 'name':'singleTop'}]
       #rcs0bCRtt_btag_EWK = combineRCS(samples0b, dPhiCut)
       rcs1bCRtt_btag_EWK = combineRCS(samples1b, dPhiCut)
+      print rcs1bCRtt_btag_EWK
+      rcs1bCRtt_btag_EWKa = combineRCS(samples1ba, dPhiCut)
+      print rcs1bCRtt_btag_EWKa
       #rcs1bCRtt_btag_EWK = combineRCS(samples1pb, dPhiCut)
       rcs2bCRtt_btag_EWK = combineRCS(samples2b, dPhiCut)
       

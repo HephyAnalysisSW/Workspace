@@ -51,13 +51,13 @@ print weight_str
 print
 
 
-for i_njb, njb in enumerate(signalRegions):
+for i_njb, njb in enumerate(sorted(signalRegions)):
   bins[njb] = {}
   fitResults[njb] = {}
-  for stb in signalRegions[njb]:
+  for stb in sorted(signalRegions[njb]):
     bins[njb][stb] ={}
     fitResults[njb][stb] ={}
-    for htb in signalRegions[njb][stb]:
+    for htb in sorted(signalRegions[njb][stb]):
       print
       print '#############################################'
       print '## * njet:',njb
@@ -71,13 +71,14 @@ for i_njb, njb in enumerate(signalRegions):
         ttJetRcsFitH = ROOT.TH1F("ttJetRcsFitH","",len(ttJetBins),0,len(ttJetBins))
         ttJetRcsFitH1b = ROOT.TH1F("ttJetRcsFitH1b","",len(ttJetBins),0,len(ttJetBins))
 
+        #Rcs values w/o b-tag weights
         cname1bCRtt, cut1bCRtt = nameAndCut(stb,htb,(4,5), btb=(1,1) ,presel=presel)
         cname0bCRtt, cut0bCRtt = nameAndCut(stb,htb,(4,5), btb=(0,0) ,presel=presel)
-        cnameCRtt, cutCRtt = nameAndCut(stb,htb,(4,5), btb=(0,-1) ,presel=presel)
-
         rcs1bCRtt = getRCS(cBkg, cut1bCRtt, dPhiCut, weight = weight_str)
         rcs0bCRtt = getRCS(cTTJets, cut0bCRtt, dPhiCut, weight = weight_str)
-
+        
+        #Rcs values w/ b-tag weights
+        cnameCRtt, cutCRtt = nameAndCut(stb,htb,(4,5), btb=(0,-1) ,presel=presel)
         samples = [{'chain':cWJets, 'cut':cutCRtt, 'weight':weight_str+'*weightBTag1'+btagWeightSuffix}, {'chain':cTTJets, 'cut':cutCRtt, 'weight':weight_str+'*weightBTag1'+btagWeightSuffix},{'chain':cDY, 'cut':cut1bCRtt, 'weight':weight_str},{'chain':cTTV, 'cut':cut1bCRtt, 'weight':weight_str},{'chain':csingleTop, 'cut':cut1bCRtt, 'weight':weight_str}]
 
         rcs1bCRtt_btag = combineRCS(samples, dPhiCut)
@@ -87,17 +88,15 @@ for i_njb, njb in enumerate(signalRegions):
         kappaTT = divideRCSdict(rcs0bCRtt,rcs1bCRtt)
         kappaTT_btag = divideRCSdict(rcs0bCRtt_btag,rcs1bCRtt_btag)
 
-        fitResults[njb][stb][htb] = {'kappaTT':kappaTT, 'rcs1bCRtt':rcs1bCRtt, 'rcs0bCRtt':rcs0bCRtt, 'kappaTT_btag':kappaTT_btag}
+        fitResults[njb][stb][htb] = {'kappaTT':kappaTT, 'rcs1bCRtt':rcs1bCRtt_btag, 'rcs0bCRtt':rcs0bCRtt_btag, 'kappaTT_btag':kappaTT_btag}
 
         #fill histograms
         for i_njbTT, njbTT in enumerate(ttJetBins):
-          cname, cut = nameAndCut(stb,htb,njbTT, btb=(0,0) ,presel=presel)
-          cname1b, cut1b = nameAndCut(stb,htb,njbTT, btb=(1,1) ,presel=presel)
-          rcsD = getRCS(cTTJets, cut, dPhiCut, weight = weight_str)
-          rcsD1b = getRCS(cTTJets, cut1b, dPhiCut, weight = weight_str)
-          #rcs = rcsD['rCS']
-          #rcsErrPred = rcsD['rCSE_pred']
-          #rcsErr = rcsD['rCSE_sim']
+          # get the Rcs plots, use b-tag weights and scale factors
+          cname, cut     = nameAndCut(stb,htb,njbTT, btb=(0,-1) ,presel=presel)
+          cname1b, cut1b = nameAndCut(stb,htb,njbTT, btb=(0,-1) ,presel=presel)
+          rcsD = getRCS(cTTJets, cut, dPhiCut, weight = weight_str+'*weightBTag0'+btagWeightSuffix)
+          rcsD1b = getRCS(cTTJets, cut1b, dPhiCut, weight = weight_str+'*weightBTag1'+btagWeightSuffix)
           if not math.isnan(rcsD['rCS']):
             ttJetRcsFitH.SetBinContent(i_njbTT+1, rcsD['rCS'])
             ttJetRcsFitH.SetBinError(i_njbTT+1, rcsD['rCSE_sim'])
@@ -117,7 +116,12 @@ for i_njb, njb in enumerate(signalRegions):
         print 'Linear Fit for tt Jets Rcs values in 0b MC'
 
         #linear fit in 0b
-        ttJetRcsFitH.Fit('pol1','','same',0,3)
+        filledBin = 0
+        for b in range(len(ttJetBins)):
+          if ttJetRcsFitH.GetBinContent(b+1)>0:
+            filledBin += 1
+          else: break
+        ttJetRcsFitH.Fit('pol1','','same',0,filledBin)
         FitFunc     = ttJetRcsFitH.GetFunction('pol1')
         ttD  = FitFunc.GetParameter(0)
         ttDE = FitFunc.GetParError(0)
@@ -130,7 +134,7 @@ for i_njb, njb in enumerate(signalRegions):
         #constant fit in 0b and 1b
         print
         print 'Konstant Fit for tt Jets Rcs values in 0b MC'
-        ttJetRcsFitH.Fit('pol0','','same',0,3)
+        ttJetRcsFitH.Fit('pol0','','same',0,filledBin)
         FitFunc     = ttJetRcsFitH.GetFunction('pol0')
         ttConst0  = FitFunc.GetParameter(0)
         ttConst0E = FitFunc.GetParError(0)
@@ -138,7 +142,7 @@ for i_njb, njb in enumerate(signalRegions):
         
         print
         print 'Konstant Fit for tt Jets Rcs values in 1b MC'
-        ttJetRcsFitH1b.Fit('pol0','','same',0,3)
+        ttJetRcsFitH1b.Fit('pol0','','same',0,filledBin)
         FitFunc     = ttJetRcsFitH1b.GetFunction('pol0')
         ttConst1  = FitFunc.GetParameter(0)
         ttConst1E = FitFunc.GetParError(0)
@@ -162,10 +166,18 @@ for i_njb, njb in enumerate(signalRegions):
 
       kappaTTfit = ttConst0/ttConst1
       kappaTTfitErr = kappaTTfit*sqrt(ttConst1E**2/ttConst1**2+ttConst0E**2/ttConst0**2)
-
-      TT_rcs_diff = abs(rcs1bCRtt['rCS'] - (ttD+ttK*i_njb))
-      TT_rcs_diffKappaCorr = abs(kappaTT['kappa']*rcs1bCRtt['rCS'] - (ttD+ttK*i_njb))
-
+      
+      # calculate the difference between the assumption that Rcs is flat over njet and the linear fit
+      TT_rcs_diff = abs(rcs1bCRtt_btag['rCS'] - (ttD+ttK*(i_njb+1.5))) # kappa not used for the correction
+      TT_rcs_diffKappaCorr = abs(kappaTT_btag['kappa']*rcs1bCRtt_btag['rCS'] - (ttD+ttK*(i_njb+1.5))) #optional, one could also take the difference to the kappa corrected Rcs
+      
+      print 'parameters for correction'
+      print i_njb
+      print ttD+ttK*(i_njb+1.5)
+      print rcs1bCRtt_btag['rCS']
+      print rcs1bCRtt_btag['rCS'] - (ttD+ttK*(i_njb+1.5)) # +1.5 needed to get to the correct bin - if sth is changed in SR this needs to get adapted
+      print kappaTT_btag['kappa']*rcs1bCRtt_btag['rCS'] - (ttD+ttK*(i_njb+1.5))
+      
       TT_y_diff = TT_rcs_diff*res[njb][stb][htb]['yTT_srNJet_0b_lowDPhi']
       TT_y_diffKappaCorr = TT_rcs_diffKappaCorr*res[njb][stb][htb]['yTT_srNJet_0b_lowDPhi']
       
@@ -211,14 +223,12 @@ for i_njb, njb in enumerate(signalRegions):
           
           #fill histograms for linear fit to account for possible non-flat rcs values
           for i_njbW, njbW in enumerate(wJetBins):
-            cname, cut = nameAndCut(stb,htb,njbW, btb=(0,0) ,presel=presel)
-            rcsD = getRCS(cWJets, cut+'&&'+Wc['cut'], dPhiCut, weight = weight_str)
-            #rcs = rcsD['rCS']
-            #rcsErrPred = rcsD['rCSE_pred']
-            #rcsErr = rcsD['rCSE_sim']
+            cname, cut = nameAndCut(stb,htb,njbW, btb=(0,-1) ,presel=presel)
+            rcsD = getRCS(cWJets, cut+'&&'+Wc['cut'], dPhiCut, weight = weight_str+'*weightBTag0'+btagWeightSuffix)
             if not math.isnan(rcsD['rCS']):
               wJetRcsFitH.SetBinContent(i_njbW+1, rcsD['rCS'])
               wJetRcsFitH.SetBinError(i_njbW+1, rcsD['rCSE_sim'])
+
           message = '** Linear Fit for WJets Rcs values in 0b MC '+Wc['name']+' charges **'
           stars = ''
           for star in range(len(message)):
@@ -228,7 +238,12 @@ for i_njb, njb in enumerate(signalRegions):
           print message
           print stars
           print
-          wJetRcsFitH.Fit('pol1','','same',0,3)
+          filledBin = 0
+          for b in range(len(wJetBins)):
+            if wJetRcsFitH.GetBinContent(b+1)>0:
+              filledBin += 1
+            else: break
+          wJetRcsFitH.Fit('pol1','','same',0,filledBin)
           FitFunc     = wJetRcsFitH.GetFunction('pol1')
           wD  = FitFunc.GetParameter(0)
           wDE = FitFunc.GetParError(0)
@@ -242,11 +257,16 @@ for i_njb, njb in enumerate(signalRegions):
           wKE = loadedFit[njb][stb][htb][Wc['name']]['wKE']
         #difference of measured rcs and fit in 0b MC rcs
 
-        cnameCRW, cutCRW = nameAndCut(stb,htb,(3,4), btb=(0,0) ,presel=presel)
-        rcsCRW = getRCS(cWJets, cutCRW, dPhiCut, weight = weight_str)
+        cnameCRW, cutCRW = nameAndCut(stb,htb,(3,4), btb=(0,-1) ,presel=presel)
+        rcsCRW = getRCS(cWJets, cutCRW, dPhiCut, weight = weight_str+'*weightBTag0'+btagWeightSuffix)
         RcsKey = 'rCS_W'+Wc['string']+'_crNJet_0b_corr'
         #rcsWdiff = abs(res[njb][stb][htb][RcsKey] - (wD+wK*i_njb)) #difference of rcs
-        rcsWdiff = abs(rcsCRW['rCS'] - (wD+wK*i_njb)) #difference of rcs
+        print 'parameters for correction'
+        print i_njb
+        print wD+wK*i_njb
+        print rcsCRW['rCS']
+        print rcsCRW['rCS'] - (wD+wK*(i_njb+1.5)) # +1.5 needed to get to the correct bin - if sth is changed in SR this needs to get adapted
+        rcsWdiff = abs(rcsCRW['rCS'] - (wD+wK*(i_njb+1.5))) #difference of rcs
         YieldLowDPhiKey = 'yW'+Wc['string']+'_srNJet_0b_lowDPhi'
         Wdiff = rcsWdiff*res[njb][stb][htb][YieldLowDPhiKey] #difference of yield
         
@@ -275,6 +295,7 @@ for i_njb, njb in enumerate(signalRegions):
         W_errs_key = 'W_pred_errs'+Wc['string'] #Key for new dict with all errors
         W_key = 'W'+Wc['string']+'_pred' #Key for W prediction
         W_err_key = 'W'+Wc['string']+'_pred_err' #Key for W prediction error
+        #print filledBin, wJetRcsFitH.GetBinContent(filledBin)
         print
         print '## ** W+jets prediction stat+syst/total **'
         print '##',getValErrStringSyst(res[njb][stb][htb][W_key],W_stat_err,W_syst_err)

@@ -13,7 +13,7 @@ useTTcorrection = False
 signal = False
 
 prefix = 'singleLeptonic_Spring15_'
-path = '/data/'+username+'/Results2015/Prediction_validation_mu_SFtemplates_data_2.1/'
+path = '/data/'+username+'/Results2015/Prediction_SFtemplates_fullSR_lep_MC_SF_2.1/'
 #path = '/data/'+username+'/Results2015/Prediction_SFTemplate_MC_fullSR_lep_3.0/' 
 #path2 = '/data/'+username+'/Results2015/Prediction_bweightTemplate_MC_reducedSR_lep_3.0/'
 
@@ -46,8 +46,8 @@ if signal:
     s['chain'] = getChain(s['sample'],histname='')
 
 
-signalRegions = validationRegion
-#signalRegions = signalRegionCRonly
+#signalRegions = validationRegion
+signalRegions = signalRegion3fb
 
 #signalRegions = smallRegion
 #signalRegions = {(5, 5): {(250, 350): {(500, -1):   {'deltaPhi': 1.0}}}}
@@ -223,28 +223,28 @@ print '\\hline\end{tabular}}\end{center}\caption{EFGH}\label{tab:0b_rcscorr_Wbkg
 
 
 
-#print "Results"
-#print
-#print '\\begin{table}[ht]\\begin{center}\\begin{tabular}{|c|c|c|rrr|rrr|}\\hline'
-#print ' \\njet & \ST & \HT     &\multicolumn{3}{c|}{$\kappa_{CS}$} &\multicolumn{3}{c|}{$\kappa_{CS}$ b-tag}\\\%\hline'
-#print ' & $[$GeV$]$ &$[$GeV$]$&\multicolumn{3}{c|}{0b/1b}&\multicolumn{3}{c|}{0b/1b}\\\ '
-#secondLine = False
-#for srNJet in sorted(signalRegions):
-#  print '\\hline'
-#  if secondLine: print '\\hline'
-#  secondLine = True
-#  print '\multirow{'+str(rowsNJet[srNJet]['n'])+'}{*}{\\begin{sideways}$'+varBin(srNJet)+'$\end{sideways}}'
-#  for stb in sorted(signalRegions[srNJet]):
-#    print '&\multirow{'+str(rowsSt[srNJet][stb]['n'])+'}{*}{$'+varBin(stb)+'$}'
-#    first = True
-#    for htb in sorted(signalRegions[srNJet][stb]):
-#      if not first: print '&'
-#      first = False
-#      print '&$'+varBin(htb)+'$'
-#      print ' & '+getNumString(res[srNJet][stb][htb]['TT_rCS_fits_MC']['k_0b/1b'], res[srNJet][stb][htb]['TT_rCS_fits_MC']['k_0b/1b_err'])\
-#          + ' & '+getNumString(res[srNJet][stb][htb]['TT_rCS_fits_MC']['k_0b/1b_btag'], res[srNJet][stb][htb]['TT_rCS_fits_MC']['k_0b/1b_btag_err'])+'\\\\ '
-#    if htb[1] == -1 : print '\\cline{2-9}'
-#print '\\hline\end{tabular}\end{center}\caption{Correction factors for \\ttJets background, 3$fb^{-1}$}\label{tab:0b_rcscorr_Wbkg}\end{table}'
+print "Results"
+print
+print '\\begin{table}[ht]\\begin{center}\\begin{tabular}{|c|c|c|rrr|rrr|}\\hline'
+print ' \\njet & \ST & \HT     &\multicolumn{3}{c|}{$\kappa_{CS}$} &\multicolumn{3}{c|}{$\kappa_{CS}$ b-tag}\\\%\hline'
+print ' & $[$GeV$]$ &$[$GeV$]$&\multicolumn{3}{c|}{0b/1b}&\multicolumn{3}{c|}{0b/1b}\\\ '
+secondLine = False
+for srNJet in sorted(signalRegions):
+  print '\\hline'
+  if secondLine: print '\\hline'
+  secondLine = True
+  print '\multirow{'+str(rowsNJet[srNJet]['n'])+'}{*}{\\begin{sideways}$'+varBin(srNJet)+'$\end{sideways}}'
+  for stb in sorted(signalRegions[srNJet]):
+    print '&\multirow{'+str(rowsSt[srNJet][stb]['n'])+'}{*}{$'+varBin(stb)+'$}'
+    first = True
+    for htb in sorted(signalRegions[srNJet][stb]):
+      if not first: print '&'
+      first = False
+      print '&$'+varBin(htb)+'$'
+      print ' & '+getNumString(res[srNJet][stb][htb]['TT_rCS_fits_MC']['k_0b/1b'], res[srNJet][stb][htb]['TT_rCS_fits_MC']['k_0b/1b_err'])\
+          + ' & '+getNumString(res[srNJet][stb][htb]['TT_rCS_fits_MC']['k_0b/1b_btag'], res[srNJet][stb][htb]['TT_rCS_fits_MC']['k_0b/1b_btag_err'])+'\\\\ '
+    if htb[1] == -1 : print '\\cline{2-9}'
+print '\\hline\end{tabular}\end{center}\caption{Correction factors for \\ttJets background, 3$fb^{-1}$}\label{tab:0b_rcscorr_Wbkg}\end{table}'
 
 
 ##closure table, calculate old corrections and errors (phys14)
