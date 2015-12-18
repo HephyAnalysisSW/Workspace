@@ -1,5 +1,5 @@
 import copy, os, sys
-dir = '/data/dhandl/cmgTuples/postProcessed_Spring15_antiSelection_final2p1fb_V2/HT500/none/'
+dir = '/data/dhandl/cmgTuples/postProcessed_Spring15_antiSelection_final2p1fb_V6/none/'
 
 single_mu_Run2015D = {\
 "name" : "single_mu_Run215D",
@@ -24,13 +24,13 @@ single_ele_Run2015D = {\
 TTJets_HTLO_25ns={\
 "name" : "tt+Jets_LO",
 "bins" : [
-"HT500LHE_FullHadronic_inc/none/TTJets_LO",
-"HT500LHE_FullHadronic/none/TTJets_LO_HT600to800",
-"HT500LHE_FullHadronic/none/TTJets_LO_HT800to1200",
-"HT500LHE_FullHadronic/none/TTJets_LO_HT1200to2500",
-"HT500LHE_FullHadronic/none/TTJets_LO_HT2500toInf",
+"LHE_FullHadronic_inc/none/TTJets_LO",
+"LHE_FullHadronic/none/TTJets_LO_HT600to800",
+"LHE_FullHadronic/none/TTJets_LO_HT800to1200",
+"LHE_FullHadronic/none/TTJets_LO_HT1200to2500",
+"LHE_FullHadronic/none/TTJets_LO_HT2500toInf",
 ],
-'dir' : '/data/dhandl/cmgTuples/postProcessed_Spring15_antiSelection_final2p1fb/',
+'dir' : dir,
 }
 #####diLep+SemiLep+HT binned samples####
 TTJets_combined = {\
@@ -51,16 +51,16 @@ TTJets_combined = {\
 TTJets_combined_2 = {\
 "name" : "TTJets_combined",
 "bins" : [
-"HT500diLep/none/TTJets_DiLepton_full",
-"HT500LHE_FullHadronic_inc/none/TTJets_LO",
-"HT500LHE_FullHadronic/none/TTJets_LO_HT1200to2500",
-"HT500LHE_FullHadronic/none/TTJets_LO_HT2500toInf",
-"HT500LHE_FullHadronic/none/TTJets_LO_HT600to800",
-"HT500LHE_FullHadronic/none/TTJets_LO_HT800to1200",
-"HT500semiLep/none/TTJets_SingleLeptonFromT_full",
-"HT500semiLep/none/TTJets_SingleLeptonFromTbar_full",
+"diLep/none/TTJets_DiLepton_full",
+"LHE_FullHadronic_inc/none/TTJets_LO",
+"LHE_FullHadronic/none/TTJets_LO_HT1200to2500",
+"LHE_FullHadronic/none/TTJets_LO_HT2500toInf",
+"LHE_FullHadronic/none/TTJets_LO_HT600to800",
+"LHE_FullHadronic/none/TTJets_LO_HT800to1200",
+"semiLep/none/TTJets_SingleLeptonFromT_full",
+"semiLep/none/TTJets_SingleLeptonFromTbar_full",
 ],
-'dir' : '/data/dhandl/cmgTuples/postProcessed_Spring15_antiSelection_final2p1fb_V2/',
+'dir' : '/data/dhandl/cmgTuples/postProcessed_Spring15_antiSelection_final2p1fb_V6/',
 }
 
 

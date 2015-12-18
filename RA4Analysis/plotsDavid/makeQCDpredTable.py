@@ -4,7 +4,7 @@ import copy, os, sys
 
 from Workspace.HEPHYPythonTools.helpers import *
 from Workspace.RA4Analysis.helpers import *
-from Workspace.RA4Analysis.signalRegions import *
+#from Workspace.RA4Analysis.signalRegions import *
 from Workspace.HEPHYPythonTools.user import username
 from math import *
 
@@ -69,8 +69,8 @@ btreg = [(0,0), (1,1), (2,-1)] #1b and 2b estimates are needed for the btag fit
 
 #add the path where the pickle files are located
 path = '/data/'+username+'/results2015/QCDEstimation/'
-pickleFile = '20151201_QCDestimation_MC2p1fb_pkl'
-pickleFit  = '20151201_fitResult_MC2p1fb_pkl'
+pickleFile = '20151216_QCDestimation_2p1fb_pkl'
+pickleFit  = '20151216_fitResult_2p1fb_pkl'
 bins = pickle.load(file(path+pickleFile))
 fitRes = pickle.load(file(path+pickleFit))
 
@@ -146,7 +146,7 @@ for njb in sorted(ratio):
       print ' & '+getNumString(ratio[njb][stb][htb]['NQCDFit'],ratio[njb][stb][htb]['NQCDFit_err'])\
            +' & '+getNumString(ratio[njb][stb][htb]['NQCDSelMC'],ratio[njb][stb][htb]['NQCDSelMC_err'])\
            +' & '+getNumString(ratio[njb][stb][htb]['F_seltoantisel'],ratio[njb][stb][htb]['F_seltoantisel_err'])+'\\\\'
-print '\\hline\end{tabular}}\end{center}\caption{Closure and Ratio for QCD background in the CR, 0-tag regions, 3$fb^{-1}$}\label{tab:0b_QCDpredCR}\end{table}'
+print '\\hline\end{tabular}}\end{center}\caption{Closure and Ratio for QCD background in the CR, 0-tag regions, $2.1 fb^{-1}$}\label{tab:0b_QCDpredCR}\end{table}'
 
 print 'Results QCD in 4-5j, 1b CR'
 print
@@ -172,7 +172,7 @@ for stb in sorted(signalRegion[(4,5)]):
              +' & '+getNumString(bins[(4,5)][stb][htb][(1,1)][dP]['NQCDSelMC'], bins[(4,5)][stb][htb][(1,1)][dP]['NQCDSelMC_err'])\
              +' & '+str(round(res,2))+'\\\\'
 
-print '\\hline\end{tabular}}\end{center}\caption{Closure table for QCD background , 0-tag regions, 3$fb^{-1}$}\label{tab:0b_QCDpred}\end{table}'
+print '\\hline\end{tabular}}\end{center}\caption{Closure table for QCD background , 0-tag regions, $2.1 fb^{-1}$}\label{tab:0b_QCDpred}\end{table}'
 
 #print RCS factors in the CR 4-5j, 1b
 #print 'RCS in CR 4-5j,1b'
@@ -269,7 +269,7 @@ for srNJet in sorted(signalRegion):
              +' & '+str(round(res,2))+'\\\\'
 #      if htb[1] == -1 : print '\\cline{2-9}'
 
-print '\\hline\end{tabular}}\end{center}\caption{Closure table for QCD background , 0-tag regions, 3$fb^{-1}$}\label{tab:0b_QCDpred}\end{table}'
+print '\\hline\end{tabular}}\end{center}\caption{Closure table for QCD background , 0-tag regions, $2.1 fb^{-1}$}\label{tab:0b_QCDpred}\end{table}'
 
 #print "Results $R^{QCD}_{CS} $"
 #print
