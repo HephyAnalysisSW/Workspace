@@ -1,0 +1,236 @@
+import ROOT
+import pickle
+
+ROOT.gROOT.LoadMacro('../../HEPHYPythonTools/scripts/root/tdrstyle.C')
+ROOT.setTDRStyle()
+
+from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYieldFromChain
+from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName, nBTagBinName, varBinName, varBin, UncertaintyDivision
+from rCShelpers import *
+import math
+from Workspace.HEPHYPythonTools.user import username
+from Workspace.RA4Analysis.signalRegions import *
+from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
+from array import array
+
+
+ROOT.gStyle.SetOptTitle(0);
+ROOT.gStyle.SetOptStat('')
+
+signalRegions = signalRegion3fb
+
+def getValErrString(val,err, precision=3):
+  return str(round(val,precision))+' +/- '+str(round(err,precision))
+
+rowsNJet = {}
+rowsSt = {}
+bins = 0
+for srNJet in sorted(signalRegions):
+  rowsNJet[srNJet] = {}
+  rowsSt[srNJet] = {}
+  rows = 0
+  for stb in sorted(signalRegions[srNJet]):
+    rows += len(signalRegions[srNJet][stb])
+    rowsSt[srNJet][stb] = {'n':len(signalRegions[srNJet][stb])}
+  rowsNJet[srNJet] = {'nST':len(signalRegions[srNJet]), 'n':rows}
+  bins += rows
+
+wfile = ROOT.TFile('/data/easilar/uncRoot/WJets_xsec_Unc.root')
+a = wfile.Get('cb')
+w_h1b = a.GetPrimitive('h1b')
+w_h2b = a.GetPrimitive('h2b')
+
+ttfile = ROOT.TFile('/data/easilar/uncRoot/ttJets_xsec_Unc.root')
+b = ttfile.Get('cb')
+tt_h1b = a.GetPrimitive('h1b')
+tt_h2b = a.GetPrimitive('h2b')
+
+#ttdifile = ROOT.TFile('/data/easilar/uncRoot/ttJets_diLep_Unc.root')
+#c = ttdifile.Get('cb')
+#ttdi_h1b = a.GetPrimitive('h1b')
+#ttdi_h2b = a.GetPrimitive('h2b')
+
+wpol = pickle.load(file('/data/dhandl/results2015/WPolarizationEstimation/20151218_wjetsPolSys_pkl'))
+b_err = pickle.load(file('/data/dspitzbart/Results2015/btagErr_pkl'))
+l_err = pickle.load(file('/data/dspitzbart/Results2015/mistagErr_pkl'))
+rcs = pickle.load(file('/data/dspitzbart/Results2015/Prediction_SFtemplates_fullSR_lep_data_2.1/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'))
+dataResult = rcs
+#dataResult = pickle.load(file('/data/dspitzbart/Results2015/Prediction_SFtemplates_fullSR_lep_data_2.1/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'))
+
+colors = [ROOT.kBlue+2, ROOT.kBlue-4, ROOT.kBlue-7, ROOT.kBlue-9, ROOT.kCyan-9, ROOT.kCyan-6, ROOT.kCyan-2,ROOT.kGreen+3,ROOT.kGreen-2,ROOT.kGreen-6,ROOT.kGreen-7, ROOT.kOrange-4, ROOT.kOrange+1, ROOT.kOrange+8, ROOT.kRed, ROOT.kRed+1]
+colors = [ROOT.kBlue, ROOT.kCyan-9, ROOT.kCyan-2, ROOT.kGreen-6, ROOT.kOrange+6, ROOT.kRed+1]
+
+bErrH = ROOT.TH1F('bErrH','b-jet SFs',bins,0,bins)
+wXErrH = ROOT.TH1F('WXErrH','W+jets x-sec',bins,0,bins)
+ttXErrH = ROOT.TH1F('ttXErrH','t#bar{t}+jets x-sec',bins,0,bins)
+wPErrH = ROOT.TH1F('wPErrH','W polarization',bins,0,bins)
+rcsErrH = ROOT.TH1F('rcsErrH','R_{CS} systematics',bins,0,bins)
+
+ratio = ROOT.TH1F('ratio','ratio',bins,0,bins)
+
+hists = [rcsErrH,bErrH,wXErrH,ttXErrH,wPErrH,]
+for i_h,h in enumerate(hists):
+  h.SetFillColor(colors[i_h])
+  h.SetLineWidth(1)
+  
+
+totalH = ROOT.TH1F('totalH','total',bins,0,bins)
+totalH.SetLineColor(ROOT.kRed+1)
+totalH.SetLineWidth(2)
+totalH.SetMarkerSize(0)
+
+totalXErr = []
+totalYErr = []
+totalX = []
+totalY = []
+
+i=1
+for injb,srNJet in enumerate(sorted(signalRegions)):
+  for stb in sorted(signalRegions[srNJet]):
+    for htb in sorted(signalRegions[srNJet][stb]):
+      print
+      print '#############################################'
+      print '## * njet:',srNJet
+      print '## * LT:  ',stb
+      print '## * HT:  ',htb
+      print '#############################################'
+      print
+
+      bErr = sqrt(b_err[srNJet][stb][htb]**2 + l_err[srNJet][stb][htb]**2) # sum of squares of b/c and mistag
+      bErrH.SetBinContent(i, bErr)\
+
+      wXErr = (abs(w_h1b.GetBinContent(i))+abs(w_h2b.GetBinContent(i)))/2 # w x-sec
+      wXErrH.SetBinContent(i, wXErr)
+
+      ttXErr = (abs(tt_h1b.GetBinContent(i))+abs(tt_h2b.GetBinContent(i)))/2 # ttbar x-sec
+      ttXErrH.SetBinContent(i, ttXErr)
+      
+      wPErr = sqrt(((abs(wpol[srNJet][stb][htb]['uWPolMinus10'])+abs(wpol[srNJet][stb][htb]['uWPolPlus10']))/2)**2 + ((abs(wpol[srNJet][stb][htb]['uTTPolMinus5'])+abs(wpol[srNJet][stb][htb]['uTTPolPlus5']))/2)**2) # w pol for w and ttbar
+      wPErrH.SetBinContent(i, wPErr)
+      
+      rcsErr = sqrt(rcs[srNJet][stb][htb]['W_pred_errs']['syst']**2+rcs[srNJet][stb][htb]['TT_rCS_fits_MC']['syst']**2)/rcs[srNJet][stb][htb]['tot_pred']
+      rcsErrH.SetBinContent(i,rcsErr)
+      
+      totalSyst = bErr**2 + wXErr**2 + ttXErr**2 + wPErr**2 + rcsErr**2
+      totalSyst = sqrt(totalSyst)
+      
+      dataStat = dataResult[srNJet][stb][htb]['tot_pred_err']/dataResult[srNJet][stb][htb]['tot_pred']
+      total = sqrt(totalSyst**2+dataStat**2)
+      totalH.SetBinContent(i, totalSyst)
+      
+      systematics = {'btagSF':bErr, 'Wxsec':wXErr, 'TTxsec':ttXErr, 'Wpol':wPErr, 'rcs':rcsErr, 'total':totalSyst}
+      
+      print 'Stat. unc.:',dataStat
+      print 'Syst. unc.:',totalSyst
+      print 'Total unc.:',total
+
+      ratio.SetBinContent(i,1)
+      totalYErr.append(total)
+      totalXErr.append(0.5)
+      totalY.append(1)
+      totalX.append(i-0.5)
+      i+=1
+
+
+ax =   array('d',totalX)
+ay =   array('d',totalY)
+aexh = array('d',totalXErr)
+aexl = array('d',totalXErr)
+aeyh = array('d',totalYErr)
+aeyl = array('d',totalYErr)
+
+can = ROOT.TCanvas('can','can',700,700)
+
+pad1=ROOT.TPad("pad1","MyTitle",0.,0.3,1.,1.)
+pad1.SetLeftMargin(0.15)
+pad1.SetBottomMargin(0.02)
+pad1.Draw()
+pad1.cd()
+
+h_Stack = ROOT.THStack('h_Stack','Stack')
+
+h_Stack.Add(rcsErrH)
+h_Stack.Add(bErrH)
+h_Stack.Add(wXErrH)
+h_Stack.Add(ttXErrH)
+h_Stack.Add(wPErrH)
+
+
+h_Stack.SetMaximum(0.6)
+h_Stack.SetMinimum(0)
+
+leg = ROOT.TLegend(0.68,0.75,0.98,0.95)
+leg.SetFillColor(ROOT.kWhite)
+leg.SetShadowColor(ROOT.kWhite)
+leg.SetBorderSize(1)
+leg.SetTextSize(0.04)
+leg.AddEntry(rcsErrH,'','f')
+leg.AddEntry(bErrH,'','f')
+leg.AddEntry(wXErrH,'','f')
+
+
+leg2 = ROOT.TLegend(0.38,0.75,0.68,0.95)
+leg2.SetFillColor(ROOT.kWhite)
+leg2.SetShadowColor(ROOT.kWhite)
+leg2.SetBorderSize(1)
+leg2.SetTextSize(0.04)
+leg2.AddEntry(ttXErrH,'','f')
+leg2.AddEntry(wPErrH,'','f')
+leg2.AddEntry(totalH)
+
+h_Stack.Draw('hist')
+totalH.Draw('hist same')
+h_Stack.GetXaxis().SetLabelSize(0.)
+h_Stack.GetXaxis().SetLabelOffset(10)
+h_Stack.GetYaxis().SetTitle('syst. unc.')
+h_Stack.GetYaxis().SetTitleOffset(0.8)
+h_Stack.GetYaxis().SetNdivisions(508)
+
+leg.Draw()
+leg2.Draw()
+
+latex1 = ROOT.TLatex()
+latex1.SetNDC()
+latex1.SetTextSize(0.04)
+latex1.SetTextAlign(11)
+
+latex1.DrawLatex(0.15,0.96,'CMS #bf{#it{simulation}}')
+#latex1.DrawLatex(0.78,0.96,"L=2.1fb^{-1} (13TeV)")
+
+h_Stack.GetXaxis().SetLabelSize(0.04)
+h_Stack.GetYaxis().SetLabelSize(0.055)
+h_Stack.GetYaxis().SetTitleSize(0.055)
+h_Stack.GetYaxis().SetTitleOffset(1.0)
+
+can.cd()
+
+pad2=ROOT.TPad("pad2","datavsMC",0.,0.,1.,.3)
+pad2.SetLeftMargin(0.15)
+pad2.SetBottomMargin(0.3)
+pad2.SetTopMargin(0.02)
+pad2.Draw()
+pad2.cd()
+
+setNiceBinLabel(ratio, signalRegion3fb)
+ratio.GetXaxis().SetTitleSize(0.13)
+ratio.GetXaxis().SetLabelSize(0.11)
+ratio.GetXaxis().SetNdivisions(508)
+ratio.GetYaxis().SetTitle('total unc.')
+ratio.GetYaxis().SetTitleSize(0.13)
+ratio.GetYaxis().SetLabelSize(0.13)
+ratio.GetYaxis().SetTitleOffset(0.4)
+ratio.GetYaxis().SetNdivisions(508)
+ratio.SetMinimum(0.1)
+ratio.SetMaximum(2.2)
+ratio.Draw('hist')
+total_err = ROOT.TGraphAsymmErrors(bins, ax, ay, aexl, aexh, aeyl, aeyh)
+total_err.SetFillColor(ROOT.kGray+1)
+total_err.SetFillStyle(3244)
+total_err.Draw('2 same')
+
+can.cd()
+
+can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2015/syst_errors_3.png')
+can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2015/syst_errors_3.root')
+can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2015/syst_errors_3.pdf')
+
