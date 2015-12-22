@@ -74,7 +74,7 @@ else: QCDestimate=False
 
 ## Directories for plots, results and templates
 if isData:
-  templateName   = 'SFtemplates_validationAll_lep_data'
+  templateName   = 'SFtemplates_fullSR_lep_data'
   predictionName = templateName
 else:
   templateName   = 'SFtemplates_fullSR_lep_MC' + nameSuffix

@@ -14,6 +14,7 @@ signal = False
 
 prefix = 'singleLeptonic_Spring15_'
 path = '/data/'+username+'/Results2015/Prediction_SFtemplates_fullSR_lep_MC_SF_2.1/'
+path = '/data/'+username+'/Results2015/Prediction_SFtemplates_fullSR_lep_data_2.1/'
 #path = '/data/'+username+'/Results2015/Prediction_SFTemplate_MC_fullSR_lep_3.0/' 
 #path2 = '/data/'+username+'/Results2015/Prediction_bweightTemplate_MC_reducedSR_lep_3.0/'
 
@@ -225,9 +226,9 @@ print '\\hline\end{tabular}}\end{center}\caption{EFGH}\label{tab:0b_rcscorr_Wbkg
 
 print "Results"
 print
-print '\\begin{table}[ht]\\begin{center}\\begin{tabular}{|c|c|c|rrr|rrr|}\\hline'
-print ' \\njet & \ST & \HT     &\multicolumn{3}{c|}{$\kappa_{CS}$} &\multicolumn{3}{c|}{$\kappa_{CS}$ b-tag}\\\%\hline'
-print ' & $[$GeV$]$ &$[$GeV$]$&\multicolumn{3}{c|}{0b/1b}&\multicolumn{3}{c|}{0b/1b}\\\ '
+print '\\begin{table}[ht]\\begin{center}\\begin{tabular}{|c|c|c|rrr|}\\hline'
+print ' \\njet & \ST & \HT     &\multicolumn{3}{c|}{$\kappa_{b}$}\\\%\hline'# &\multicolumn{3}{c|}{$\kappa_{CS}$ b-tag}\\\%\hline'
+print ' & $[$GeV$]$ &$[$GeV$]$&\multicolumn{3}{c|}{0b/1b}\\\ '
 secondLine = False
 for srNJet in sorted(signalRegions):
   print '\\hline'
@@ -241,10 +242,9 @@ for srNJet in sorted(signalRegions):
       if not first: print '&'
       first = False
       print '&$'+varBin(htb)+'$'
-      print ' & '+getNumString(res[srNJet][stb][htb]['TT_rCS_fits_MC']['k_0b/1b'], res[srNJet][stb][htb]['TT_rCS_fits_MC']['k_0b/1b_err'])\
-          + ' & '+getNumString(res[srNJet][stb][htb]['TT_rCS_fits_MC']['k_0b/1b_btag'], res[srNJet][stb][htb]['TT_rCS_fits_MC']['k_0b/1b_btag_err'])+'\\\\ '
-    if htb[1] == -1 : print '\\cline{2-9}'
-print '\\hline\end{tabular}\end{center}\caption{Correction factors for \\ttJets background, 3$fb^{-1}$}\label{tab:0b_rcscorr_Wbkg}\end{table}'
+      print ' & '+getNumString(res[srNJet][stb][htb]['TT_rCS_fits_MC']['k_0b/1b'], res[srNJet][stb][htb]['TT_rCS_fits_MC']['k_0b/1b_err'])+'\\\\ '
+    if htb[1] == -1 : print '\\cline{2-6}'
+print '\\hline\end{tabular}\end{center}\caption{Correction factors for \\ttJets background}\label{tab:0b_rcscorr_Wbkg}\end{table}'
 
 
 ##closure table, calculate old corrections and errors (phys14)

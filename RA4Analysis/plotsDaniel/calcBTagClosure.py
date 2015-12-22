@@ -67,8 +67,16 @@ min_H = ROOT.TH1F('min_H','total min',bins,0,bins)
 zero_H = ROOT.TH1F('zero_H','zero',bins,0,bins)
 
 i = 1
+
+b_err = {}
+l_err = {}
+
 for i_njb, srNJet in sorted(enumerate(signalRegions)): #just changed this Nov 4th, not sorted before!
+  b_err[srNJet] = {}
+  l_err[srNJet] = {}
   for stb in sorted(signalRegions[srNJet]):
+    b_err[srNJet][stb] = {}
+    l_err[srNJet][stb] = {}
     for htb in sorted(signalRegions[srNJet][stb]):
       print
       print '#############################################'
@@ -94,6 +102,8 @@ for i_njb, srNJet in sorted(enumerate(signalRegions)): #just changed this Nov 4t
       light_Down_H.SetBinContent(i,light_downDiff)
       varUp.append(upDiff)
       varDown.append(downDiff)
+      b_err[srNJet][stb][htb] = (abs(b_upDiff)+abs(b_downDiff))/2
+      l_err[srNJet][stb][htb] = (abs(light_upDiff)+abs(light_downDiff))/2
       i += 1
 
 can = ROOT.TCanvas('can','can',700,700)
