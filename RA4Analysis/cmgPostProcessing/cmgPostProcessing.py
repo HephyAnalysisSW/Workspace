@@ -16,6 +16,7 @@ ROOT.AutoLibraryLoader.enable()
 from Workspace.HEPHYPythonTools.helpers import getChunks
 from Workspace.RA4Analysis.cmgTuples_Data25ns_miniAODv2 import *
 from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns import *
+from systematics_helper import calc_btag_systematics
 from btagEfficiency import *
 
 bTagEffFile = '/data/dspitzbart/Results2015/MCEff_skim_pkl'
@@ -34,7 +35,7 @@ separateBTagWeights = True
 
 defSampleStr = "TTJets_25ns"
 
-subDir = "postProcessed_Spring15_btagEff_SF15"
+subDir = "postProcessing_Tets"
 
 #branches to be kept for data and MC
 branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert",
@@ -154,7 +155,7 @@ def getTreeFromChunk(c, skimCond, iSplit, nSplit):
 exec('allSamples=['+options.allsamples+']')
 for isample, sample in enumerate(allSamples):
   chunks, sumWeight = getChunks(sample)
-  outDir = options.targetDir+'/'+"/".join([options.skim, sample['name']])
+  outDir = options.targetDir+"/".join([options.skim, sample['name']])
   if os.path.exists(outDir) and os.listdir(outDir) != [] and not options.overwrite:
     print "Found non-empty directory: %s -> skipping!"%outDir
     continue
@@ -188,7 +189,6 @@ for isample, sample in enumerate(allSamples):
   if not sample['isData']: 
     newVariables.extend(['weight_diLepTTBar0p5/F','weight_diLepTTBar2p0/F','weight_XSecTTBar1p1/F','weight_XSecTTBar0p9/F','weight_XSecWJets1p1/F','weight_XSecWJets0p9/F'])
     aliases.extend(['genMet:met_genPt', 'genMetPhi:met_genPhi'])
-    #readVectors[1]['vars'].extend('partonId/I')
   newVariables.extend( ['nLooseSoftLeptons/I', 'nLooseHardLeptons/I', 'nTightSoftLeptons/I', 'nTightHardLeptons/I'] )
   newVariables.extend( ['puReweight_true/F','deltaPhi_Wl/F','nBJetMediumCSV30/I','nJet30/I','htJet30j/F','st/F', 'leptonPt/F','leptonMiniRelIso/F','leptonRelIso03/F' ,'leptonEta/F', 'leptonPhi/F','leptonSPRING15_25ns_v1/I/-2','leptonPdg/I/0', 'leptonInd/I/-1', 'leptonMass/F', 'singleMuonic/I', 'singleElectronic/I', 'singleLeptonic/I' ]) #, 'mt2w/F'] )
   if calcSystematics:
@@ -260,7 +260,6 @@ for isample, sample in enumerate(allSamples):
 
         nTrueInt = t.GetLeaf('nTrueInt').GetValue()
         s.puReweight_true = 1 if sample['isData'] else PU_histo.GetBinContent(PU_histo.FindBin(nTrueInt))
-        #calculatedWeight = True
         
         if not sample['isData']:
           s.muonDataSet = False
@@ -344,7 +343,7 @@ for isample, sample in enumerate(allSamples):
         s.deltaPhi_Wl = acos((s.leptonPt+r.met_pt*cos(s.leptonPhi-r.met_phi))/sqrt(s.leptonPt**2+r.met_pt**2+2*r.met_pt*s.leptonPt*cos(s.leptonPhi-r.met_phi))) 
 
         if calcSystematics: 
-          calc_btag_systematics(t,s,mcEffDict,sampleKey)
+          calc_btag_systematics(t,s,r,mcEffDict,sampleKey,maxConsideredBTagWeight,separateBTagWeights)
 
 
         for v in newVars:

@@ -1,6 +1,6 @@
 from btagEfficiency import *
 
-def calc_btag_systematics(t,s,mcEffDict,sampleKey):
+def calc_btag_systematics(t,s,r,mcEffDict,sampleKey,maxConsideredBTagWeight,separateBTagWeights):
   #separateBTagWeights = False
   zeroTagWeight = 1.
   mceff = getMCEfficiencyForBTagSF(t, mcEffDict[sampleKey], sms='')
