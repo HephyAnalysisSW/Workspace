@@ -14,15 +14,11 @@ ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 
 from Workspace.HEPHYPythonTools.helpers import getChunks
-#from Workspace.RA4Analysis.cmgTuples_Spring15_25ns import *
-#from Workspace.RA4Analysis.cmgTuples_Spring15_50ns import *
-#from Workspace.RA4Analysis.cmgTuples_Data50ns_1l import *
-#from Workspace.RA4Analysis.cmgTuples_Data25ns import *
-#from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_fromArthur import *
 from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns import *
 from btagEfficiency import *
 
 bTagEffFile = '/data/dspitzbart/Results2015/MCEff_skim_pkl'
+
 try:
   mcEffDict = pickle.load(file(bTagEffFile))
 except IOError:
@@ -37,7 +33,6 @@ separateBTagWeights = True
 
 defSampleStr = "TTJets_25ns"
 
-#subDir = "postProcessed_Spring15_test"
 subDir = "postProcessed_Spring15_btagEff_SF15"
 
 #branches to be kept for data and MC
@@ -148,10 +143,7 @@ def getTreeFromChunk(c, skimCond, iSplit, nSplit):
    
 exec('allSamples=['+options.allsamples+']')
 for isample, sample in enumerate(allSamples):
-  #chunks, sumWeight = getChunks(sample, options.inputTreeName)
   chunks, sumWeight = getChunks(sample)
-  #chunks, nTotEvents = getChunksFromDPM(sample, options.inputTreeName)
-#  print "Chunks:" , chunks 
   outDir = options.targetDir+'/'+"/".join([options.skim, options.leptonSelection, sample['name']])
   if os.path.exists(outDir) and os.listdir(outDir) != [] and not options.overwrite:
     print "Found non-empty directory: %s -> skipping!"%outDir
@@ -206,18 +198,15 @@ for isample, sample in enumerate(allSamples):
   printHeader("Compiling class to write")
   writeClassName = "ClassToWrite_"+str(isample)
   writeClassString = createClassString(className=writeClassName, vars= newVars, vectors=[], nameKey = 'stage2Name', typeKey = 'stage2Type')
-#  print writeClassString
   s = compileClass(className=writeClassName, classString=writeClassString, tmpDir='/data/'+username+'/tmp/')
 
   readClassName = "ClassToRead_"+str(isample)
   readClassString = createClassString(className=readClassName, vars=readVars, vectors=readVectors, nameKey = 'stage1Name', typeKey = 'stage1Type', stdVectors=False)
   printHeader("Class to Read")
-#  print readClassString
   r = compileClass(className=readClassName, classString=readClassString, tmpDir='/data/'+username+'/tmp/')
 
   filesForHadd=[]
   if options.small: chunks=chunks[:1]
-  #print "CHUNKS:" , chunks
   for chunk in chunks:
     sourceFileSize = os.path.getsize(chunk['file'])
     nSplit = 1+int(sourceFileSize/(400*10**6)) #split into 400MB
@@ -231,10 +220,8 @@ for isample, sample in enumerate(allSamples):
       t.SetName("Events")
       nEvents = t.GetEntries()
       for v in newVars:
-#        print "new VAR:" , v
         v['branch'] = t.Branch(v['stage2Name'], ROOT.AddressOf(s,v['stage2Name']), v['stage2Name']+'/'+v['stage2Type'])
       for v in readVars:
-#        print "read VAR:" , v
         t.SetBranchAddress(v['stage1Name'], ROOT.AddressOf(r, v['stage1Name']))
       for v in readVectors:
         for var in v['vars']:
@@ -273,34 +260,27 @@ for isample, sample in enumerate(allSamples):
           #select tight soft leptons (no special tight ID for now)
           tightSoftLepInd = looseSoftLepInd #No tight soft selection as of yet 
           #select tight hard leptons (use POG ID)
-          ###tightHardLepInd = filter(lambda i:(abs(r.LepGood_pdgId[i])==11 and r.LepGood_relIso03[i]<0.14 and r.LepGood_tightId[i]>=3) \
-          ###                               or (abs(r.LepGood_pdgId[i])==13 and r.LepGood_relIso03[i]<0.12 and r.LepGood_tightId[i]), looseHardLepInd)
           tightHardLepInd = filter(lambda i:(abs(r.LepGood_pdgId[i])==11 and cmgTightEleID(r,i)) \
                                          or (abs(r.LepGood_pdgId[i])==13 and cmgTightMuID(r,i)), looseHardLepInd)  
 
 
-          #print "s lepgood pt: " ,s.LepGood_pt[0]
           s.nLooseSoftLeptons = len(looseSoftLepInd)
           s.nLooseHardLeptons = len(looseHardLepInd)
           s.nTightSoftLeptons = len(tightSoftLepInd)
           s.nTightHardLeptons = len(tightHardLepInd)
-          #print "tightHardLepInd:" , tightHardLepInd
           vars = ['pt', 'eta', 'phi', 'miniRelIso','relIso03', 'pdgId', 'SPRING15_25ns_v1']
           allLeptons = [getObjDict(t, 'LepGood_', vars, i) for i in looseLepInd]
           looseSoftLep = [getObjDict(t, 'LepGood_', vars, i) for i in looseSoftLepInd] 
           looseHardLep = [getObjDict(t, 'LepGood_', vars, i) for i in looseHardLepInd]
           tightSoftLep = [getObjDict(t, 'LepGood_', vars, i) for i in tightSoftLepInd]
           tightHardLep =  [getObjDict(t, 'LepGood_', vars, i) for i in tightHardLepInd]
-          #print "tightHardLep" , tightHardLep 
           leadingLepInd = None
         if options.leptonSelection=='hard':
           if s.nTightHardLeptons>=1:
             leadingLepInd = tightHardLepInd[0]
-            #print "highest pt: " , r.LepGood_pt[0]
             s.leptonPt  = r.LepGood_pt[leadingLepInd]
             s.leptonMiniRelIso = r.LepGood_miniRelIso[leadingLepInd]
             s.leptonRelIso03 = r.LepGood_relIso03[leadingLepInd]
-            #print s.leptonMiniRelIso ,s.leptonPt, 'met:', r.met_pt, r.nLepGood, r.LepGood_pt[leadingLepInd],r.LepGood_eta[leadingLepInd], r.LepGood_phi[leadingLepInd] , r.LepGood_pdgId[leadingLepInd], r.LepGood_relIso03[leadingLepInd], r.LepGood_tightId[leadingLepInd], r.LepGood_mass[leadingLepInd]
             s.leptonInd = leadingLepInd 
             s.leptonEta = r.LepGood_eta[leadingLepInd]
             s.leptonPhi = r.LepGood_phi[leadingLepInd]
@@ -320,7 +300,6 @@ for isample, sample in enumerate(allSamples):
           #Select hardest tight lepton among soft leptons
           if s.nTightSoftLeptons>=1:
             leadingLepInd = tightSoftLepInd[0]
-  #          print s.leptonPt, r.LepGood_pt[leadingLepInd],r.LepGood_eta[leadingLepInd], leadingLepInd
             s.leptonPt  = r.LepGood_pt[leadingLepInd]
             s.leptonInd = leadingLepInd 
             s.leptonEta = r.LepGood_eta[leadingLepInd]
@@ -335,24 +314,15 @@ for isample, sample in enumerate(allSamples):
           else:
             s.singleMuonic      = False 
             s.singleElectronic  = False 
-  #      print "Selected",s.leptonPt
         if options.leptonSelection in ['soft','hard']:
           j_list=['eta','pt','phi','btagCMVA', 'btagCSV', 'id']
-          #if not sample['isData']: j_list.extend('partonId')
           jets = filter(lambda j:j['pt']>30 and abs(j['eta'])<2.4 and j['id'], get_cmg_jets_fromStruct(r,j_list))
-          #print "jets:" , jets
-#          lightJets_, bJetsCMVA = splitListOfObjects('btagCMVA', 0.732, jets) 
           lightJets,  bJetsCSV = splitListOfObjects('btagCSV', 0.890, jets)
-          #print "bjetsCMVA:" , bJetsCMVA , "bjetsCSV:" ,  bJetsCSV
           s.htJet30j = sum([x['pt'] for x in jets])
           s.nJet30 = len(jets)
-#          s.nBJetMediumCMVA30 = len(bJetsCMVA)
           s.nBJetMediumCSV30 = len(bJetsCSV)
-          #print "nbjetsCMVA:" , s.nBJetMediumCMVA30  ,"nbjetsCSV:" ,  s.nBJetMediumCSV30
           #s.mt2w = mt2w.mt2w(met = {'pt':r.met_pt, 'phi':r.met_phi}, l={'pt':s.leptonPt, 'phi':s.leptonPhi, 'eta':s.leptonEta}, ljets=lightJets, bjets=bJetsCSV)
           s.deltaPhi_Wl = acos((s.leptonPt+r.met_pt*cos(s.leptonPhi-r.met_phi))/sqrt(s.leptonPt**2+r.met_pt**2+2*r.met_pt*s.leptonPt*cos(s.leptonPhi-r.met_phi))) 
-          #print "deltaPhi:" , s.deltaPhi_Wl
-  #          print "Warning -> Why can't I compute mt2w?", s.mt2w, len(jets), len(bJets), len(allTightLeptons),lightJets,bJets, {'pt':s.type1phiMet, 'phi':s.type1phiMetphi}, {'pt':s.leptonPt, 'phi':s.leptonPhi, 'eta':s.leptonEta}
 
         if calcSystematics:
 #          separateBTagWeights = False
