@@ -265,13 +265,13 @@ for isample, sample in enumerate(allSamples):
         if not sample['isData']:
           s.muonDataSet = False
           s.eleDataSet = False
+          s.weight =xsec_branch*lumiScaleFactor*genWeight
           nTrueInt = t.GetLeaf('nTrueInt').GetValue()
           s.puReweight_true = PU_histo.GetBinContent(PU_histo.FindBin(nTrueInt))
-          if ("TTJets" in sample['dbsName']) : s.weight = lumiScaleFactor*genWeight
-          else : s.weight = xsectemp*lumiScaleFactor*genWeight
           ngenLep = t.GetLeaf('ngenLep').GetValue()
           ngenTau = t.GetLeaf('ngenTau').GetValue()
           if ("TTJets" in sample['dbsName']):
+            s.weight = lumiScaleFactor*genWeight
             s.weight_XSecTTBar1p1 = s.weight*1.1
             s.weight_XSecTTBar0p9 = s.weight*0.9
             if ngenLep+ngenTau == 2:
@@ -343,56 +343,9 @@ for isample, sample in enumerate(allSamples):
         #s.mt2w = mt2w.mt2w(met = {'pt':r.met_pt, 'phi':r.met_phi}, l={'pt':s.leptonPt, 'phi':s.leptonPhi, 'eta':s.leptonEta}, ljets=lightJets, bjets=bJetsCSV)
         s.deltaPhi_Wl = acos((s.leptonPt+r.met_pt*cos(s.leptonPhi-r.met_phi))/sqrt(s.leptonPt**2+r.met_pt**2+2*r.met_pt*s.leptonPt*cos(s.leptonPhi-r.met_phi))) 
 
-        if calcSystematics:
-#          separateBTagWeights = False
-          zeroTagWeight = 1.
-          mceff = getMCEfficiencyForBTagSF(t, mcEffDict[sampleKey], sms='')
-          #print
-          #print mceff["mceffs"]
-          mceffW                = getTagWeightDict(mceff["mceffs"], maxConsideredBTagWeight)
-          mceffW_SF             = getTagWeightDict(mceff["mceffs_SF"], maxConsideredBTagWeight)
-          mceffW_SF_b_Up        = getTagWeightDict(mceff["mceffs_SF_b_Up"], maxConsideredBTagWeight)
-          mceffW_SF_b_Down      = getTagWeightDict(mceff["mceffs_SF_b_Down"], maxConsideredBTagWeight)
-          mceffW_SF_light_Up    = getTagWeightDict(mceff["mceffs_SF_light_Up"], maxConsideredBTagWeight)
-          mceffW_SF_light_Down  = getTagWeightDict(mceff["mceffs_SF_light_Down"], maxConsideredBTagWeight)
-          if not separateBTagWeights:
-            lweight = str(s.weight)
-          else: lweight = "(1.)"
-          #if not separateBTagWeights:
-          for i in range(1, maxConsideredBTagWeight+2):
-            exec("s.weightBTag"+str(i)+"p="+lweight)
-            exec("s.weightBTag"+str(i)+"p_SF="+lweight)
-            exec("s.weightBTag"+str(i)+"p_SF_b_Up="+lweight)
-            exec("s.weightBTag"+str(i)+"p_SF_b_Down="+lweight)
-            exec("s.weightBTag"+str(i)+"p_SF_light_Up="+lweight)
-            exec("s.weightBTag"+str(i)+"p_SF_light_Down="+lweight)
-          for i in range(maxConsideredBTagWeight+1):
-            exec("s.weightBTag"+str(i)+"="              +str(mceffW[i])+'*'+lweight)
-            exec("s.weightBTag"+str(i)+"_SF="           +str(mceffW_SF[i])+'*'+lweight)
-            exec("s.weightBTag"+str(i)+"_SF_b_Up="      +str(mceffW_SF_b_Up[i])+'*'+lweight)
-            exec("s.weightBTag"+str(i)+"_SF_b_Down="    +str(mceffW_SF_b_Down[i])+'*'+lweight)
-            exec("s.weightBTag"+str(i)+"_SF_light_Up="  +str(mceffW_SF_light_Up[i])+'*'+lweight)
-            exec("s.weightBTag"+str(i)+"_SF_light_Down="+str(mceffW_SF_light_Down[i])+'*'+lweight)
-            for j in range(i+1, maxConsideredBTagWeight+2):
-              exec("s.weightBTag"+str(j)+"p               -="+str(mceffW[i])+'*'+lweight) #prob. for >=j b-tagged jets
-              exec("s.weightBTag"+str(j)+"p_SF            -="+str(mceffW_SF[i])+'*'+lweight)
-              exec("s.weightBTag"+str(j)+"p_SF_b_Up       -="+str(mceffW_SF_b_Up[i])+'*'+lweight)
-              exec("s.weightBTag"+str(j)+"p_SF_b_Down     -="+str(mceffW_SF_b_Down[i])+'*'+lweight)
-              exec("s.weightBTag"+str(j)+"p_SF_light_Up   -="+str(mceffW_SF_light_Up[i])+'*'+lweight)
-              exec("s.weightBTag"+str(j)+"p_SF_light_Down -="+str(mceffW_SF_light_Down[i])+'*'+lweight)
-          for i in range (int(r.nJet)+1, maxConsideredBTagWeight+1):
-            exec("s.weightBTag"+str(i)+"               = 0.")
-            exec("s.weightBTag"+str(i)+"_SF            = 0.")
-            exec("s.weightBTag"+str(i)+"_SF_b_Up       = 0.")
-            exec("s.weightBTag"+str(i)+"_SF_b_Down     = 0.")
-            exec("s.weightBTag"+str(i)+"_SF_light_Up   = 0.")
-            exec("s.weightBTag"+str(i)+"_SF_light_Down = 0.")
-            exec("s.weightBTag"+str(i)+"p              = 0.")
-            exec("s.weightBTag"+str(i)+"p_SF           = 0.")
-            exec("s.weightBTag"+str(i)+"p_SF_b_Up      = 0.")
-            exec("s.weightBTag"+str(i)+"p_SF_b_Down    = 0.")
-            exec("s.weightBTag"+str(i)+"p_SF_light_Up  = 0.")
-            exec("s.weightBTag"+str(i)+"p_SF_light_Down= 0.")
+        if calcSystematics: 
+          calc_btag_systematics(t,s,mcEffDict,sampleKey)
+
 
         for v in newVars:
           v['branch'].Fill()
