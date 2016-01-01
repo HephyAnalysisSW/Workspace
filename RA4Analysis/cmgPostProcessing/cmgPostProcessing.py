@@ -14,6 +14,7 @@ ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 
 from Workspace.HEPHYPythonTools.helpers import getChunks
+from Workspace.RA4Analysis.cmgTuples_Data25ns_miniAODv2 import *
 from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns import *
 from btagEfficiency import *
 
@@ -74,6 +75,7 @@ parser.add_option("--manScaleFactor", dest="manScaleFactor", default = 1, action
 
 (options, args) = parser.parse_args()
 skimCond = "(1)"
+ht500lt250 = "Sum$(Jet_pt)>500&&(LepGood_pt[0]+met_pt)>250"
 if options.skim.startswith('met'):
   skimCond = "met_pt>"+str(float(options.skim[3:]))
 if options.skim=='HT400':
@@ -81,11 +83,31 @@ if options.skim=='HT400':
 if options.skim=='HT400ST200':   ##tuples have already ST200 skim
   skimCond = "Sum$(Jet_pt)>400&&(LepGood_pt[0]+met_pt)>200"
 if options.skim=='HT500ST250':  
-  skimCond = "Sum$(Jet_pt)>500&&(LepGood_pt[0]+met_pt)>250"
+  skimCond = ht500lt250
 if options.skim=='LHEHT600':
   skimCond = "lheHTIncoming<600"
 
 skimCond += "&&Sum$(LepGood_pt>25&&abs(LepGood_eta)<2.5)>=0"
+
+##skim conditions for fancy ttJets combination##
+
+####dilep skim##
+if options.skim=='HT500ST250diLep':
+  skimCond = "((ngenLep+ngenTau)==2)&&lheHTIncoming<=1000&&"+ht500lt250
+###semilep skim###
+if options.skim=='HT500ST250semiLep':
+  skimCond = "((ngenLep+ngenTau)==1)&&lheHTIncoming<=1000&&"+ht500lt250
+###Full hadronic###
+if options.skim=='HT500ST250LHE_FullHadronic_inc':
+  skimCond = "((ngenLep+ngenTau)==0)&&lheHTIncoming<=600&&"+ht500lt250
+###Full hadronic for the ht binned###
+if options.skim=='HT500ST250LHE_FullHadronic':
+  skimCond = "lheHTIncoming>600&&lheHTIncoming<=1000&&((ngenLep+ngenTau)==0)&&"+ht500lt250
+###Full inclusive for high HT
+if options.skim=='LHEHT1000':
+  skimCond = "lheHTIncoming>1000&&"+ht500lt250
+
+
 
 if options.hadronicLeg:
   skimCond += "&&(ngenLep+ngenTau)==0"
@@ -147,7 +169,8 @@ for isample, sample in enumerate(allSamples):
     lumiScaleFactor=1
     branchKeepStrings = branchKeepStrings_DATAMC + branchKeepStrings_DATA 
   else:
-    lumiScaleFactor = xsec[sample['dbsName']]*target_lumi/float(sumWeight)
+    if ("TTJets" in sample['dbsName']): lumiScaleFactor = xsec[sample['dbsName']]*target_lumi/float(sumWeight)
+    else: lumiScaleFactor = target_lumi/float(sumWeight)
     branchKeepStrings = branchKeepStrings_DATAMC + branchKeepStrings_MC
   
   sampleKey = ''
