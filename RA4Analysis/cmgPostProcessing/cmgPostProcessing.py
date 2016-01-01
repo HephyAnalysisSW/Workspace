@@ -220,8 +220,8 @@ for isample, sample in enumerate(allSamples):
   #print "CHUNKS:" , chunks
   for chunk in chunks:
     sourceFileSize = os.path.getsize(chunk['file'])
-    nSplit = 1+int(sourceFileSize/(200*10**6)) #split into 200MB
-    if nSplit>1: print "Chunk too large, will split into",nSplit,"of appox 200MB"
+    nSplit = 1+int(sourceFileSize/(400*10**6)) #split into 400MB
+    if nSplit>1: print "Chunk too large, will split into",nSplit,"of appox 400MB"
     for iSplit in range(nSplit):
       cut = "("+skimCond+")&&("+sample['postProcessingCut']+")" if sample.has_key('postProcessingCut') else skimCond
       t = getTreeFromChunk(chunk, cut, iSplit, nSplit)
