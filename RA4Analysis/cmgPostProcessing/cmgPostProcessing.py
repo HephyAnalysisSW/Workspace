@@ -108,7 +108,6 @@ if options.skim=='LHEHT1000':
   skimCond = "lheHTIncoming>1000&&"+ht500lt250
 
 
-
 if options.hadronicLeg:
   skimCond += "&&(ngenLep+ngenTau)==0"
 
@@ -187,7 +186,7 @@ for isample, sample in enumerate(allSamples):
     {'prefix':'Jet',  'nMax':100, 'vars':['pt/F', 'eta/F', 'phi/F', 'id/I','btagCSV/F', 'btagCMVA/F']},
   ]
   if not sample['isData']: 
-    newVariables.extend(['weight_XSecTTBar1p1/F','weight_XSecTTBar0p9/F'])
+    newVariables.extend(['weight_diLepTTBar0p5/F','weight_diLepTTBar2p0/F','weight_XSecTTBar1p1/F','weight_XSecTTBar0p9/F','weight_XSecWJets1p1/F','weight_XSecWJets0p9/F'])
     aliases.extend(['genMet:met_genPt', 'genMetPhi:met_genPhi'])
     #readVectors[1]['vars'].extend('partonId/I')
   newVariables.extend( ['nLooseSoftLeptons/I', 'nLooseHardLeptons/I', 'nTightSoftLeptons/I', 'nTightHardLeptons/I'] )
@@ -248,21 +247,51 @@ for isample, sample in enumerate(allSamples):
         r.init()
         t.GetEntry(i)
         genWeight = 1 if sample['isData'] else t.GetLeaf('genWeight').GetValue()
+        xsec_branch = 1 if sample['isData'] else t.GetLeaf('xsec').GetValue()
         s.weight = lumiScaleFactor*genWeight
+        if sample['isData']:
+          s.puReweight_true = 1
+          if "Muon" in sample['name']:
+            s.muonDataSet = True
+            s.eleDataSet = False
+          if "Electron" in sample['name']:
+            s.muonDataSet = False
+            s.eleDataSet = True
 
         nTrueInt = t.GetLeaf('nTrueInt').GetValue()
         s.puReweight_true = 1 if sample['isData'] else PU_histo.GetBinContent(PU_histo.FindBin(nTrueInt))
         #calculatedWeight = True
+        
         if not sample['isData']:
           s.muonDataSet = False
           s.eleDataSet = False
-          if "TTJets" in sample['dbsName']:
-            s.weight_XSecTTBar1p1 = s.weight*1.1 
+          nTrueInt = t.GetLeaf('nTrueInt').GetValue()
+          s.puReweight_true = PU_histo.GetBinContent(PU_histo.FindBin(nTrueInt))
+          if ("TTJets" in sample['dbsName']) : s.weight = lumiScaleFactor*genWeight
+          else : s.weight = xsectemp*lumiScaleFactor*genWeight
+          ngenLep = t.GetLeaf('ngenLep').GetValue()
+          ngenTau = t.GetLeaf('ngenTau').GetValue()
+          if ("TTJets" in sample['dbsName']):
+            s.weight_XSecTTBar1p1 = s.weight*1.1
             s.weight_XSecTTBar0p9 = s.weight*0.9
+            if ngenLep+ngenTau == 2:
+              s.weight_diLepTTBar2p0 = s.weight*2.0
+              s.weight_diLepTTBar0p5 = s.weight*0.5
+            else :
+              s.weight_diLepTTBar2p0 = s.weight
+              s.weight_diLepTTBar0p5 = s.weight
           else :
             s.weight_XSecTTBar1p1 = s.weight
             s.weight_XSecTTBar0p9 = s.weight
-        
+            s.weight_diLepTTBar2p0 = s.weight
+            s.weight_diLepTTBar0p5 = s.weight
+          if "WJets" in sample['dbsName']:
+            s.weight_XSecWJets1p1 = s.weight*1.1
+            s.weight_XSecWJets0p9 = s.weight*0.9
+          else :
+            s.weight_XSecWJets1p1 = s.weight
+            s.weight_XSecWJets0p9 = s.weight       
+ 
         #get all >=loose lepton indices
         looseLepInd = cmgLooseLepIndices(r) 
         #split into soft and hard leptons
