@@ -65,7 +65,6 @@ parser.add_option("--samples", dest="allsamples", default=defSampleStr, type="st
 parser.add_option("--inputTreeName", dest="inputTreeName", default="treeProducerSusySingleLepton", type="string", action="store", help="samples:Which samples.")
 parser.add_option("--targetDir", dest="targetDir", default="/data/"+username+"/cmgTuples/"+subDir+'/', type="string", action="store", help="target directory.")
 parser.add_option("--skim", dest="skim", default="", type="string", action="store", help="any skim condition?")
-parser.add_option("--leptonSelection", dest="leptonSelection", default="hard", type="string", action="store", help="which lepton selection? 'soft', 'hard', 'none', 'dilep'?")
 parser.add_option("--small", dest="small", default = False, action="store_true", help="Just do a small subset.")
 parser.add_option("--overwrite", dest="overwrite", default = False, action="store_true", help="Overwrite?")
 parser.add_option("--calcbtagweights", dest="systematics", default = False, action="store_true", help="Calculate b-tag weights for systematics?")
@@ -74,7 +73,6 @@ parser.add_option("--hadronicLeg", dest="hadronicLeg", default = False, action="
 parser.add_option("--manScaleFactor", dest="manScaleFactor", default = 1, action="store", help="define a scale factor for the whole sample")
 
 (options, args) = parser.parse_args()
-assert options.leptonSelection in ['soft', 'hard', 'none', 'dilep'], "Unknown leptonSelection: %s"%options.leptonSelection
 skimCond = "(1)"
 if options.skim.startswith('met'):
   skimCond = "met_pt>"+str(float(options.skim[3:]))
@@ -87,16 +85,7 @@ if options.skim=='HT500ST250':
 if options.skim=='LHEHT600':
   skimCond = "lheHTIncoming<600"
 
-##In case a lepton selection is required, loop only over events where there is one 
-if options.leptonSelection.lower()=='soft':
-  #skimCond += "&&Sum$(LepGood_pt>5&&LepGood_pt<25&&LepGood_relIso03<0.4&&abs(LepGood_eta)<2.4)>=1"
-  skimCond += "&&Sum$(LepGood_pt>5&&LepGood_pt<25&&abs(LepGood_eta)<2.4)>=1"
-if options.leptonSelection.lower()=='hard':
-  #skimCond += "&&Sum$(LepGood_pt>25&&LepGood_relIso03<0.4&&abs(LepGood_eta)<2.4)>=1"
-  skimCond += "&&Sum$(LepGood_pt>25&&abs(LepGood_eta)<2.5)>=0"
-if options.leptonSelection.lower()=='dilep':
-  #skimCond += "&&Sum$(LepGood_pt>25&&LepGood_relIso03<0.4&&abs(LepGood_eta)<2.4)>=1"
-  skimCond += "&&Sum$(LepGood_pt>15&&abs(LepGood_eta)<2.4)>1"
+skimCond += "&&Sum$(LepGood_pt>25&&abs(LepGood_eta)<2.5)>=0"
 
 if options.hadronicLeg:
   skimCond += "&&(ngenLep+ngenTau)==0"
@@ -171,7 +160,7 @@ for isample, sample in enumerate(allSamples):
   aliases = [ "met:met_pt", "metPhi:met_phi"]
 
   readVectors = [\
- {'prefix':'LepGood', 'nMax':8, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I', 'relIso03/F','SPRING15_25ns_v1/I' ,'tightId/I', 'miniRelIso/F','mass/F','sip3d/F','mediumMuonId/I', 'mvaIdPhys14/F','mvaIdSpring15/F','lostHits/I', 'convVeto/I']},
+    {'prefix':'LepGood', 'nMax':8, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I', 'relIso03/F','SPRING15_25ns_v1/I' ,'tightId/I', 'miniRelIso/F','mass/F','sip3d/F','mediumMuonId/I', 'mvaIdPhys14/F','mvaIdSpring15/F','lostHits/I', 'convVeto/I']},
     {'prefix':'Jet',  'nMax':100, 'vars':['pt/F', 'eta/F', 'phi/F', 'id/I','btagCSV/F', 'btagCMVA/F']},
   ]
   if not sample['isData']: 
@@ -252,77 +241,56 @@ for isample, sample in enumerate(allSamples):
             s.weight_XSecTTBar1p1 = s.weight
             s.weight_XSecTTBar0p9 = s.weight
         
-        if options.leptonSelection.lower() in ['soft','hard']:
-          #get all >=loose lepton indices
-          looseLepInd = cmgLooseLepIndices(r) 
-          #split into soft and hard leptons
-          looseSoftLepInd, looseHardLepInd = splitIndList(r.LepGood_pt, looseLepInd, 25.)
-          #select tight soft leptons (no special tight ID for now)
-          tightSoftLepInd = looseSoftLepInd #No tight soft selection as of yet 
-          #select tight hard leptons (use POG ID)
-          tightHardLepInd = filter(lambda i:(abs(r.LepGood_pdgId[i])==11 and cmgTightEleID(r,i)) \
-                                         or (abs(r.LepGood_pdgId[i])==13 and cmgTightMuID(r,i)), looseHardLepInd)  
+        #get all >=loose lepton indices
+        looseLepInd = cmgLooseLepIndices(r) 
+        #split into soft and hard leptons
+        looseSoftLepInd, looseHardLepInd = splitIndList(r.LepGood_pt, looseLepInd, 25.)
+        #select tight soft leptons (no special tight ID for now)
+        tightSoftLepInd = looseSoftLepInd #No tight soft selection as of yet 
+        #select tight hard leptons (use POG ID)
+        tightHardLepInd = filter(lambda i:(abs(r.LepGood_pdgId[i])==11 and cmgTightEleID(r,i)) \
+                                       or (abs(r.LepGood_pdgId[i])==13 and cmgTightMuID(r,i)), looseHardLepInd)  
 
 
-          s.nLooseSoftLeptons = len(looseSoftLepInd)
-          s.nLooseHardLeptons = len(looseHardLepInd)
-          s.nTightSoftLeptons = len(tightSoftLepInd)
-          s.nTightHardLeptons = len(tightHardLepInd)
-          vars = ['pt', 'eta', 'phi', 'miniRelIso','relIso03', 'pdgId', 'SPRING15_25ns_v1']
-          allLeptons = [getObjDict(t, 'LepGood_', vars, i) for i in looseLepInd]
-          looseSoftLep = [getObjDict(t, 'LepGood_', vars, i) for i in looseSoftLepInd] 
-          looseHardLep = [getObjDict(t, 'LepGood_', vars, i) for i in looseHardLepInd]
-          tightSoftLep = [getObjDict(t, 'LepGood_', vars, i) for i in tightSoftLepInd]
-          tightHardLep =  [getObjDict(t, 'LepGood_', vars, i) for i in tightHardLepInd]
-          leadingLepInd = None
-        if options.leptonSelection=='hard':
-          if s.nTightHardLeptons>=1:
-            leadingLepInd = tightHardLepInd[0]
-            s.leptonPt  = r.LepGood_pt[leadingLepInd]
-            s.leptonMiniRelIso = r.LepGood_miniRelIso[leadingLepInd]
-            s.leptonRelIso03 = r.LepGood_relIso03[leadingLepInd]
-            s.leptonInd = leadingLepInd 
-            s.leptonEta = r.LepGood_eta[leadingLepInd]
-            s.leptonPhi = r.LepGood_phi[leadingLepInd]
-            s.leptonPdg = r.LepGood_pdgId[leadingLepInd]
-            s.leptonMass= r.LepGood_mass[leadingLepInd]
-            s.leptonSPRING15_25ns_v1= r.LepGood_SPRING15_25ns_v1[leadingLepInd]
-            s.st = r.met_pt + s.leptonPt
-          s.singleLeptonic = s.nTightHardLeptons==1
-          if s.singleLeptonic:
-            s.singleMuonic      =  abs(s.leptonPdg)==13
-            s.singleElectronic  =  abs(s.leptonPdg)==11
-          else:
-            s.singleMuonic      = False 
-            s.singleElectronic  = False 
+        s.nLooseSoftLeptons = len(looseSoftLepInd)
+        s.nLooseHardLeptons = len(looseHardLepInd)
+        s.nTightSoftLeptons = len(tightSoftLepInd)
+        s.nTightHardLeptons = len(tightHardLepInd)
+        vars = ['pt', 'eta', 'phi', 'miniRelIso','relIso03', 'pdgId', 'SPRING15_25ns_v1']
+        allLeptons = [getObjDict(t, 'LepGood_', vars, i) for i in looseLepInd]
+        looseSoftLep = [getObjDict(t, 'LepGood_', vars, i) for i in looseSoftLepInd] 
+        looseHardLep = [getObjDict(t, 'LepGood_', vars, i) for i in looseHardLepInd]
+        tightSoftLep = [getObjDict(t, 'LepGood_', vars, i) for i in tightSoftLepInd]
+        tightHardLep =  [getObjDict(t, 'LepGood_', vars, i) for i in tightHardLepInd]
+        leadingLepInd = None
+        if s.nTightHardLeptons>=1:
+          leadingLepInd = tightHardLepInd[0]
+          s.leptonPt  = r.LepGood_pt[leadingLepInd]
+          s.leptonMiniRelIso = r.LepGood_miniRelIso[leadingLepInd]
+          s.leptonRelIso03 = r.LepGood_relIso03[leadingLepInd]
+          s.leptonInd = leadingLepInd 
+          s.leptonEta = r.LepGood_eta[leadingLepInd]
+          s.leptonPhi = r.LepGood_phi[leadingLepInd]
+          s.leptonPdg = r.LepGood_pdgId[leadingLepInd]
+          s.leptonMass= r.LepGood_mass[leadingLepInd]
+          s.leptonSPRING15_25ns_v1= r.LepGood_SPRING15_25ns_v1[leadingLepInd]
+          s.st = r.met_pt + s.leptonPt
+        s.singleLeptonic = s.nTightHardLeptons==1
+        if s.singleLeptonic:
+          s.singleMuonic      =  abs(s.leptonPdg)==13
+          s.singleElectronic  =  abs(s.leptonPdg)==11
+        else:
+          s.singleMuonic      = False 
+          s.singleElectronic  = False 
 
-        if options.leptonSelection=='soft':
-          #Select hardest tight lepton among soft leptons
-          if s.nTightSoftLeptons>=1:
-            leadingLepInd = tightSoftLepInd[0]
-            s.leptonPt  = r.LepGood_pt[leadingLepInd]
-            s.leptonInd = leadingLepInd 
-            s.leptonEta = r.LepGood_eta[leadingLepInd]
-            s.leptonPhi = r.LepGood_phi[leadingLepInd]
-            s.leptonPdg = r.LepGood_pdgId[leadingLepInd]
-            s.leptonMass= r.LepGood_mass[leadingLepInd]
-            s.st = r.met_pt + s.leptonPt
-          s.singleLeptonic = s.nTightSoftLeptons==1
-          if s.singleLeptonic:
-            s.singleMuonic      =  abs(s.leptonPdg)==13
-            s.singleElectronic  =  abs(s.leptonPdg)==11
-          else:
-            s.singleMuonic      = False 
-            s.singleElectronic  = False 
-        if options.leptonSelection in ['soft','hard']:
-          j_list=['eta','pt','phi','btagCMVA', 'btagCSV', 'id']
-          jets = filter(lambda j:j['pt']>30 and abs(j['eta'])<2.4 and j['id'], get_cmg_jets_fromStruct(r,j_list))
-          lightJets,  bJetsCSV = splitListOfObjects('btagCSV', 0.890, jets)
-          s.htJet30j = sum([x['pt'] for x in jets])
-          s.nJet30 = len(jets)
-          s.nBJetMediumCSV30 = len(bJetsCSV)
-          #s.mt2w = mt2w.mt2w(met = {'pt':r.met_pt, 'phi':r.met_phi}, l={'pt':s.leptonPt, 'phi':s.leptonPhi, 'eta':s.leptonEta}, ljets=lightJets, bjets=bJetsCSV)
-          s.deltaPhi_Wl = acos((s.leptonPt+r.met_pt*cos(s.leptonPhi-r.met_phi))/sqrt(s.leptonPt**2+r.met_pt**2+2*r.met_pt*s.leptonPt*cos(s.leptonPhi-r.met_phi))) 
+        j_list=['eta','pt','phi','btagCMVA', 'btagCSV', 'id']
+        jets = filter(lambda j:j['pt']>30 and abs(j['eta'])<2.4 and j['id'], get_cmg_jets_fromStruct(r,j_list))
+        lightJets,  bJetsCSV = splitListOfObjects('btagCSV', 0.890, jets)
+        s.htJet30j = sum([x['pt'] for x in jets])
+        s.nJet30 = len(jets)
+        s.nBJetMediumCSV30 = len(bJetsCSV)
+        #s.mt2w = mt2w.mt2w(met = {'pt':r.met_pt, 'phi':r.met_phi}, l={'pt':s.leptonPt, 'phi':s.leptonPhi, 'eta':s.leptonEta}, ljets=lightJets, bjets=bJetsCSV)
+        s.deltaPhi_Wl = acos((s.leptonPt+r.met_pt*cos(s.leptonPhi-r.met_phi))/sqrt(s.leptonPt**2+r.met_pt**2+2*r.met_pt*s.leptonPt*cos(s.leptonPhi-r.met_phi))) 
 
         if calcSystematics:
 #          separateBTagWeights = False
