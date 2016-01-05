@@ -77,6 +77,7 @@ parser.add_option("--manScaleFactor", dest="manScaleFactor", default = 1, action
 (options, args) = parser.parse_args()
 skimCond = "(1)"
 ht500lt250 = "Sum$(Jet_pt)>500&&(LepGood_pt[0]+met_pt)>250"
+common_skim = "HT500LT250"
 if options.skim.startswith('met'):
   skimCond = "met_pt>"+str(float(options.skim[3:]))
 if options.skim=='HT400':
@@ -171,7 +172,7 @@ def getTreeFromChunk(c, skimCond, iSplit, nSplit):
 exec('allSamples=['+options.allsamples+']')
 for isample, sample in enumerate(allSamples):
   chunks, sumWeight = getChunks(sample)
-  outDir = options.targetDir+"/".join(["HT500LT250", sample['name']])
+  outDir = options.targetDir+"/".join([common_skim, sample['name']])
   if os.path.exists(outDir) and os.listdir(outDir) != [] and not options.overwrite:
     print "Found non-empty directory: %s -> skipping!"%outDir
     continue
