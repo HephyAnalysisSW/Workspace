@@ -16,7 +16,7 @@ ROOT.AutoLibraryLoader.enable()
 from Workspace.HEPHYPythonTools.helpers import getChunks
 from Workspace.RA4Analysis.cmgTuples_Data25ns_miniAODv2 import *
 from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns import *
-from systematics_helper import calc_btag_systematics
+from systematics_helper import calc_btag_systematics, calc_LeptonScale_factors_and_systematics
 from btagEfficiency import *
 
 bTagEffFile = '/data/dspitzbart/Results2015/MCEff_skim_pkl'
@@ -128,6 +128,22 @@ if sys.argv[0].count('ipython'):
 PU_File = ROOT.TFile("/data/easilar/tuples_from_Artur/JECv6recalibrateMET_2100pb/trig_skim/PUhistos/ratio_PU.root")
 PU_histo = PU_File.Get("h_ratio")
 #####################
+###For Lepton SF#####
+mu_mediumID_File = ROOT.TFile("/data/easilar/SF2015/TnP_MuonID_NUM_MediumID_DENOM_generalTracks_VAR_map_pt_eta.root")
+mu_looseID_File = ROOT.TFile("/data/easilar/SF2015/TnP_MuonID_NUM_LooseID_DENOM_generalTracks_VAR_map_pt_eta-2.root")
+mu_miniIso02_File = ROOT.TFile("/data/easilar/SF2015/TnP_MuonID_NUM_MiniIsoTight_DENOM_LooseID_VAR_map_pt_eta.root")
+mu_sip3d_File = ROOT.TFile("/data/easilar/SF2015/TnP_MuonID_NUM_TightIP3D_DENOM_LooseID_VAR_map_pt_eta.root")
+ele_kin_File = ROOT.TFile("/data/easilar/SF2015/kinematicBinSFele.root")
+#
+histos_LS = {
+'mu_mediumID_histo':  mu_mediumID_File.Get("pt_abseta_PLOT_pair_probeMultiplicity_bin0_&_tag_combRelIsoPF04dBeta_bin0_&_tag_pt_bin0_&_tag_IsoMu20_pass"),\
+'mu_looseID_histo':   mu_looseID_File.Get("pt_abseta_PLOT_pair_probeMultiplicity_bin0_&_tag_combRelIsoPF04dBeta_bin0_&_tag_pt_bin0_&_tag_IsoMu20_pass"),\
+'mu_miniIso02_histo': mu_miniIso02_File.Get("pt_abseta_PLOT_pair_probeMultiplicity_bin0_&_tag_combRelIsoPF04dBeta_bin0_&_tag_pt_bin0_&_PF_pass_&_tag_IsoMu20_pass"),\
+'mu_sip3d_histo':     mu_sip3d_File.Get("pt_abseta_PLOT_pair_probeMultiplicity_bin0_&_tag_combRelIsoPF04dBeta_bin0_&_tag_pt_bin0_&_PF_pass_&_tag_IsoMu20_pass"),\
+'ele_cutbased_histo': ele_kin_File.Get("CutBasedTight"),\
+'ele_miniIso01_histo':ele_kin_File.Get("MiniIso0p1_vs_AbsEta"),\
+}
+#####################
 
 maxConsideredBTagWeight = options.btagWeight
 calcSystematics = options.systematics
@@ -155,7 +171,7 @@ def getTreeFromChunk(c, skimCond, iSplit, nSplit):
 exec('allSamples=['+options.allsamples+']')
 for isample, sample in enumerate(allSamples):
   chunks, sumWeight = getChunks(sample)
-  outDir = options.targetDir+"/".join([options.skim, sample['name']])
+  outDir = options.targetDir+"/".join(["HT500LT250", sample['name']])
   if os.path.exists(outDir) and os.listdir(outDir) != [] and not options.overwrite:
     print "Found non-empty directory: %s -> skipping!"%outDir
     continue
@@ -187,10 +203,12 @@ for isample, sample in enumerate(allSamples):
     {'prefix':'Jet',  'nMax':100, 'vars':['pt/F', 'eta/F', 'phi/F', 'id/I','btagCSV/F', 'btagCMVA/F']},
   ]
   if not sample['isData']: 
-    newVariables.extend(['weight_diLepTTBar0p5/F','weight_diLepTTBar2p0/F','weight_XSecTTBar1p1/F','weight_XSecTTBar0p9/F','weight_XSecWJets1p1/F','weight_XSecWJets0p9/F'])
+    newVariables.extend(['puReweight_true/F','puReweight_true_Down/F','puReweight_true_Up/F','weight_diLepTTBar0p5/F','weight_diLepTTBar2p0/F','weight_XSecTTBar1p1/F','weight_XSecTTBar0p9/F','weight_XSecWJets1p1/F','weight_XSecWJets0p9/F'])
+    newVariables.extend(['lepton_muSF_looseID/D/1.','lepton_muSF_mediumID/D/1.','lepton_muSF_miniIso02/D/1.','lepton_muSF_sip3d/D/1.','lepton_eleSF_cutbasedID/D/1.','lepton_eleSF_miniIso01/D/1.'])
+    newVariables.extend(['lepton_muSF_looseID_err/D/0.','lepton_muSF_mediumID_err/D/0.','lepton_muSF_miniIso02_err/D/0.','lepton_muSF_sip3d_err/D/0.','lepton_eleSF_cutbasedID_err/D/0.','lepton_eleSF_miniIso01_err/D/0.'])
     aliases.extend(['genMet:met_genPt', 'genMetPhi:met_genPhi'])
   newVariables.extend( ['nLooseSoftLeptons/I', 'nLooseHardLeptons/I', 'nTightSoftLeptons/I', 'nTightHardLeptons/I'] )
-  newVariables.extend( ['puReweight_true/F','deltaPhi_Wl/F','nBJetMediumCSV30/I','nJet30/I','htJet30j/F','st/F', 'leptonPt/F','leptonMiniRelIso/F','leptonRelIso03/F' ,'leptonEta/F', 'leptonPhi/F','leptonSPRING15_25ns_v1/I/-2','leptonPdg/I/0', 'leptonInd/I/-1', 'leptonMass/F', 'singleMuonic/I', 'singleElectronic/I', 'singleLeptonic/I' ]) #, 'mt2w/F'] )
+  newVariables.extend( ['deltaPhi_Wl/F','nBJetMediumCSV30/I','nJet30/I','htJet30j/F','st/F', 'leptonPt/F','leptonEt/F','leptonMiniRelIso/F','leptonRelIso03/F' ,'leptonEta/F', 'leptonPhi/F','leptonSPRING15_25ns_v1/I/-2','leptonPdg/I/0', 'leptonInd/I/-1', 'leptonMass/F', 'singleMuonic/I', 'singleElectronic/I', 'singleLeptonic/I' ]) #, 'mt2w/F'] )
   if calcSystematics:
     #newVariables.extend( ["weightBTag/F", "weightBTag_SF/F", "weightBTag_SF_b_Up/F", "weightBTag_SF_b_Down/F", "weightBTag_SF_light_Up/F", "weightBTag_SF_light_Down/F"])
     for i in range(maxConsideredBTagWeight+1):
@@ -250,7 +268,6 @@ for isample, sample in enumerate(allSamples):
         xsec_branch = 1 if sample['isData'] else t.GetLeaf('xsec').GetValue()
         s.weight = lumiScaleFactor*genWeight
         if sample['isData']:
-          s.puReweight_true = 1
           if "Muon" in sample['name']:
             s.muonDataSet = True
             s.eleDataSet = False
@@ -259,7 +276,6 @@ for isample, sample in enumerate(allSamples):
             s.eleDataSet = True
 
         nTrueInt = t.GetLeaf('nTrueInt').GetValue()
-        s.puReweight_true = 1 if sample['isData'] else PU_histo.GetBinContent(PU_histo.FindBin(nTrueInt))
         
         if not sample['isData']:
           s.muonDataSet = False
@@ -267,6 +283,8 @@ for isample, sample in enumerate(allSamples):
           s.weight =xsec_branch*lumiScaleFactor*genWeight
           nTrueInt = t.GetLeaf('nTrueInt').GetValue()
           s.puReweight_true = PU_histo.GetBinContent(PU_histo.FindBin(nTrueInt))
+          s.puReweight_true_Down = s.puReweight_true*0.95
+          s.puReweight_true_Up = s.puReweight_true*1.05
           ngenLep = t.GetLeaf('ngenLep').GetValue()
           ngenTau = t.GetLeaf('ngenTau').GetValue()
           if ("TTJets" in sample['dbsName']):
@@ -327,6 +345,9 @@ for isample, sample in enumerate(allSamples):
           s.st = r.met_pt + s.leptonPt
         s.singleLeptonic = s.nTightHardLeptons==1
         if s.singleLeptonic:
+          lep_vec = ROOT.TLorentzVector()
+          lep_vec.SetPtEtaPhiM(s.leptonPt,s.leptonEta,s.leptonPhi,s.leptonMass)
+          s.leptonEt = lep_vec.Et()
           s.singleMuonic      =  abs(s.leptonPdg)==13
           s.singleElectronic  =  abs(s.leptonPdg)==11
         else:
@@ -342,9 +363,10 @@ for isample, sample in enumerate(allSamples):
         #s.mt2w = mt2w.mt2w(met = {'pt':r.met_pt, 'phi':r.met_phi}, l={'pt':s.leptonPt, 'phi':s.leptonPhi, 'eta':s.leptonEta}, ljets=lightJets, bjets=bJetsCSV)
         s.deltaPhi_Wl = acos((s.leptonPt+r.met_pt*cos(s.leptonPhi-r.met_phi))/sqrt(s.leptonPt**2+r.met_pt**2+2*r.met_pt*s.leptonPt*cos(s.leptonPhi-r.met_phi))) 
 
-        if calcSystematics: 
-          calc_btag_systematics(t,s,r,mcEffDict,sampleKey,maxConsideredBTagWeight,separateBTagWeights)
 
+        if calcSystematics: 
+          calc_LeptonScale_factors_and_systematics(s,histos_LS)
+          calc_btag_systematics(t,s,r,mcEffDict,sampleKey,maxConsideredBTagWeight,separateBTagWeights)
 
         for v in newVars:
           v['branch'].Fill()
@@ -376,7 +398,7 @@ for isample, sample in enumerate(allSamples):
       size+=os.path.getsize(tmpDir+'/'+f)
       files.append(f)
       if size>(0.5*(10**9)) or f==filesForHadd[-1] or len(files)>200:
-        ofile = outDir+'/'+sample['name']+'_'+str(counter)+'.root'
+        ofile = outDir+'/'+sample['name']+'_'+options.skim+'_'+str(counter)+'.root'
         print "Running hadd on", tmpDir, files
         os.system('cd '+tmpDir+';hadd -f '+ofile+' '+' '.join(files))
         print "Written", ofile
