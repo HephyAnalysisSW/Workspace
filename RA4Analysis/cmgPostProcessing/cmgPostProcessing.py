@@ -35,7 +35,7 @@ separateBTagWeights = True
 
 defSampleStr = "TTJets_25ns"
 
-subDir = "postProcessing_Tets"
+subDir = "postProcessing_Syst"
 
 #branches to be kept for data and MC
 branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert",
@@ -368,8 +368,8 @@ for isample, sample in enumerate(allSamples):
         s.deltaPhi_Wl = acos((s.leptonPt+r.met_pt*cos(s.leptonPhi-r.met_phi))/sqrt(s.leptonPt**2+r.met_pt**2+2*r.met_pt*s.leptonPt*cos(s.leptonPhi-r.met_phi))) 
 
 
+        calc_LeptonScale_factors_and_systematics(s,histos_LS)
         if calcSystematics: 
-          calc_LeptonScale_factors_and_systematics(s,histos_LS)
           calc_btag_systematics(t,s,r,mcEffDict,sampleKey,maxConsideredBTagWeight,separateBTagWeights)
 
         for v in newVars:
