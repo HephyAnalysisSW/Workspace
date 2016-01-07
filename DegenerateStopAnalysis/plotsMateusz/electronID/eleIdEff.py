@@ -9,8 +9,8 @@ from array import array
 from math import pi, sqrt #cos, sin, sinh, log
 
 #Input options
-inputSample = "WJets" # "Signal" "TTJets" "WJets"
-zoom = 1
+inputSample = "Signal" # "Signal" "TTJets" "WJets"
+zoom = 0
 save = 1
 presel = 1
 nEles = "01" # 01,01tau,1,2
