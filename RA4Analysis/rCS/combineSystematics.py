@@ -53,12 +53,13 @@ tt_h2b = a.GetPrimitive('h2b')
 wpol = pickle.load(file('/data/dhandl/results2015/WPolarizationEstimation/20151218_wjetsPolSys_pkl'))
 b_err = pickle.load(file('/data/dspitzbart/Results2015/btagErr_pkl'))
 l_err = pickle.load(file('/data/dspitzbart/Results2015/mistagErr_pkl'))
-rcs = pickle.load(file('/data/dspitzbart/Results2015/Prediction_SFtemplates_fullSR_lep_data_2.1/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'))
+#rcs = pickle.load(file('/data/dspitzbart/Results2015/Prediction_SFtemplates_fullSR_lep_data_2.1/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'))
+rcs = pickle.load(file('/data/dspitzbart/Results2015/Prediction_SFtemplates_fullSR_lep_MC_SF_2.1/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'))
 dataResult = rcs
 #dataResult = pickle.load(file('/data/dspitzbart/Results2015/Prediction_SFtemplates_fullSR_lep_data_2.1/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'))
 
 colors = [ROOT.kBlue+2, ROOT.kBlue-4, ROOT.kBlue-7, ROOT.kBlue-9, ROOT.kCyan-9, ROOT.kCyan-6, ROOT.kCyan-2,ROOT.kGreen+3,ROOT.kGreen-2,ROOT.kGreen-6,ROOT.kGreen-7, ROOT.kOrange-4, ROOT.kOrange+1, ROOT.kOrange+8, ROOT.kRed, ROOT.kRed+1]
-colors = [ROOT.kBlue, ROOT.kCyan-9, ROOT.kCyan-2, ROOT.kGreen-6, ROOT.kOrange+6, ROOT.kRed+1]
+colors = [ROOT.kBlue-7, ROOT.kCyan-9, ROOT.kCyan-2, ROOT.kGreen-6, ROOT.kOrange+6, ROOT.kRed+1]
 
 bErrH = ROOT.TH1F('bErrH','b-jet SFs',bins,0,bins)
 wXErrH = ROOT.TH1F('WXErrH','W+jets x-sec',bins,0,bins)
@@ -120,9 +121,9 @@ for injb,srNJet in enumerate(sorted(signalRegions)):
       
       systematics = {'btagSF':bErr, 'Wxsec':wXErr, 'TTxsec':ttXErr, 'Wpol':wPErr, 'rcs':rcsErr, 'total':totalSyst}
       
-      print 'Stat. unc.:',dataStat
-      print 'Syst. unc.:',totalSyst
-      print 'Total unc.:',total
+      print 'Stat. unc.:',round(dataStat,3)
+      print 'Syst. unc.:',round(totalSyst,3)
+      print 'Total unc.:',round(total,3)
 
       ratio.SetBinContent(i,1)
       totalYErr.append(total)
@@ -230,7 +231,7 @@ total_err.Draw('2 same')
 
 can.cd()
 
-can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2015/syst_errors_3.png')
-can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2015/syst_errors_3.root')
-can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2015/syst_errors_3.pdf')
+can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2015/syst_errors_MC.png')
+can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2015/syst_errors_MC.root')
+can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2015/syst_errors_MC.pdf')
 
