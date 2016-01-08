@@ -52,12 +52,12 @@ lepSel = 'hard'
 totalWeight = 'weight'#*puReweight_true*lepton_muSF_mediumID*lepton_muSF_miniIso02*lepton_muSF_sip3d*lepton_eleSF_cutbasedID*lepton_eleSF_miniIso01'
 #25ns samples
 WJETS = {'name':'WJets', 'chain':getChain(WJetsHTToLNu_25ns,histname=''), 'color':color('WJets'),'weight':totalWeight, 'niceName':'W+Jets', 'cut':''}
-WJETS_2 = {'name':'WJets', 'chain':getChain(WJetsHTToLNu_25ns_2,histname=''), 'color':ROOT.kOrange,'weight':totalWeight, 'niceName':'W+Jets old', 'cut':''}
+WJETS_2 = {'name':'WJets', 'chain':getChain(WJetsHTToLNu_25ns_2,histname=''), 'color':ROOT.kOrange,'weight':totalWeight, 'niceName':'W+Jets fix', 'cut':''}
 
 
 TTJets = {'name':'TTJets', 'chain':getChain(TTJets_HTLO_25ns,histname=''), 'color':ROOT.kOrange,'weight':'weight', 'niceName':'t#bar{t}+Jets', 'cut':''}
 TTJets_combined = {'name':'TTJets', 'chain':getChain(TTJets_combined,histname=''), 'color':color('TTJets')-2,'weight':totalWeight, 'niceName':'t#bar{t}+Jets', 'cut':''}
-TTJets_combined_2 = {'name':'TTJets', 'chain':getChain(TTJets_combined_2,histname=''), 'color':ROOT.kMagenta,'weight':totalWeight, 'niceName':'t#bar{t}+Jets old', 'cut':''}
+TTJets_combined_2 = {'name':'TTJets', 'chain':getChain(TTJets_combined_2,histname=''), 'color':ROOT.kMagenta,'weight':totalWeight, 'niceName':'t#bar{t}+Jets fix', 'cut':''}
 
 
 TTJets_combined_singleLep = {'name':'TTJets', 'chain':TTJets_combined['chain'], 'color':color('TTJets')-2,'weight':totalWeight, 'niceName':'t#bar{t}+Jets 1l', 'cut':'(ngenLep+ngenTau)==1'}

@@ -53,8 +53,8 @@ tt_h2b = a.GetPrimitive('h2b')
 wpol = pickle.load(file('/data/dhandl/results2015/WPolarizationEstimation/20151218_wjetsPolSys_pkl'))
 b_err = pickle.load(file('/data/dspitzbart/Results2015/btagErr_pkl'))
 l_err = pickle.load(file('/data/dspitzbart/Results2015/mistagErr_pkl'))
-#rcs = pickle.load(file('/data/dspitzbart/Results2015/Prediction_SFtemplates_fullSR_lep_data_2.1/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'))
-rcs = pickle.load(file('/data/dspitzbart/Results2015/Prediction_SFtemplates_fullSR_lep_MC_SF_2.1/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'))
+rcs = pickle.load(file('/data/dspitzbart/Results2015/Prediction_SFtemplates_fullSR_lep_data_2.1/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'))
+#rcs = pickle.load(file('/data/dspitzbart/Results2015/Prediction_SFtemplates_fullSR_lep_MC_SF_2.1/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'))
 dataResult = rcs
 #dataResult = pickle.load(file('/data/dspitzbart/Results2015/Prediction_SFtemplates_fullSR_lep_data_2.1/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'))
 
@@ -110,6 +110,7 @@ for injb,srNJet in enumerate(sorted(signalRegions)):
       wPErrH.SetBinContent(i, wPErr)
       
       rcsErr = sqrt(rcs[srNJet][stb][htb]['W_pred_errs']['syst']**2+rcs[srNJet][stb][htb]['TT_rCS_fits_MC']['syst']**2)/rcs[srNJet][stb][htb]['tot_pred']
+      print rcs[srNJet][stb][htb]['W_pred_errs']['syst'], rcs[srNJet][stb][htb]['TT_rCS_fits_MC']['syst'], rcs[srNJet][stb][htb]['tot_pred']
       rcsErrH.SetBinContent(i,rcsErr)
       
       totalSyst = bErr**2 + wXErr**2 + ttXErr**2 + wPErr**2 + rcsErr**2
@@ -231,7 +232,7 @@ total_err.Draw('2 same')
 
 can.cd()
 
-can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2015/syst_errors_MC.png')
-can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2015/syst_errors_MC.root')
-can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2015/syst_errors_MC.pdf')
+can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2015/syst_errors_4.png')
+can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2015/syst_errors_4.root')
+can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2015/syst_errors_4.pdf')
 

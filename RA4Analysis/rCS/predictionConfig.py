@@ -64,11 +64,11 @@ sampleLumi = 3.
 debugReweighting = False
 
 ## QCD estimation
-useQCDestimation = True
+useQCDestimation = False
 #QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_extendedClosureTest3to4j_2p1fb_pkl'
 #QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_closureTest4to5j_2p1fb_pkl'
 QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_MC2p1fb_pkl'
-if isData or useQCDestimation: QCDestimate = pickle.load(file(QCDpickle))
+if isData and useQCDestimation: QCDestimate = pickle.load(file(QCDpickle))
 else: QCDestimate=False
 
 

@@ -77,6 +77,10 @@ rest_neg_err = ROOT.TH1F('rest_neg_err','rest neg',bins,0,bins)
 
 b = 1
 
+signalRegions = signalRegion3fb
+n_bootstrap = 100
+
+
 for i_njb, njb in enumerate(sorted(signalRegions)):
   for stb in sorted(signalRegions[njb]):
     for htb in sorted(signalRegions[njb][stb]):
@@ -114,7 +118,7 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
       rest_neg = ROOT.TH1F('rest_neg','rest_neg',100,rest_neg_min,rest_neg_max)
 
 
-      for i in range(100):
+      for i in range(n_bootstrap):
         'Bootstrapping now...', i
         fit = binnedNBTagsFit(cut+"&&"+dPhiStr+"<"+str(dPhiCut), name+'_dPhi'+str(dPhiCut), samples = samples, prefix=name, bootstrap=True)
         w_pos.Fill(fit['W_PosPdg']['template'].GetBinContent(1)*fit['W_PosPdg']['yield'])
@@ -129,4 +133,24 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
       if rest_pos.GetMean()>0:rest_pos_err.SetBinContent(b, rest_pos.GetRMS()/rest_pos.GetMean())
       if rest_neg.GetMean()>0:rest_neg_err.SetBinContent(b, rest_neg.GetRMS()/rest_neg.GetMean())
       
-      b += 1 
+      b += 1
+
+tmpFile_TTJets =       ROOT.TFile('/data/dspitzbart/bootstrap/TTJets.root','new')
+tt_err.Write()
+tmpFile_TTJets.Close()
+
+tmpFile_WJets_PosPdg = ROOT.TFile('/data/dspitzbart/bootstrap/WJets_PosPdg.root','new')
+w_pos_err.Write()
+tmpFile_WJets_PosPdg.Close()
+
+tmpFile_WJets_NegPdg = ROOT.TFile('/data/dspitzbart/bootstrap/WJets_NegPdg.root','new')
+w_neg_err.Write()
+tmpFile_WJets_NegPdg.Close()
+
+tmpFile_Rest_PosPdg =  ROOT.TFile('/data/dspitzbart/bootstrap/Rest_PosPdg.root','new')
+rest_pos_err.Write()
+tmpFile_Rest_PosPdg.Close()
+
+tmpFile_Rest_NegPdg =  ROOT.TFile('/data/dspitzbart/bootstrap/Rest_NegPdg.root','new')
+rest_neg_err.Write()
+tmpFile_Rest_NegPdg.Close()
