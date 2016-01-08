@@ -2,6 +2,7 @@ import copy, os, sys
 #dir  = '/data/easilar/cmgTuples/postProcessed_miniAODv2_fix/HT500LT250/hard/'
 #dir = '/data/easilar/cmgTuples/postProcessed_miniAODv2_combine2/HT500LT250/hard/'
 dir = '/data/easilar/cmgTuples/postProcessed_Spring15_btagEff_SF15/HT500ST250/hard/'
+#dir = '/data/easilar/cmgTuples/postProcessed_miniAODv2_btagweight_fix4/HT500LT250/hard/'
 ####usual HT combination####
 TTJets_HTLO_25ns={\
 "name" : "tt+Jets_LO",
@@ -12,6 +13,7 @@ TTJets_HTLO_25ns={\
 "TTJets_LO_HT1200to2500",
 "TTJets_LO_HT2500toInf",
 ],
+#'dir' : dir,
 'dir' : '/data/easilar/cmgTuples/postProcessed_miniAODv2_fix/HT500LT250/hard/',
 }
 #####(diLep+SemiLep+HT binned samples) for LHE_HT<=1000 & (HT binned samples) for LHE_HT>1000
@@ -27,6 +29,7 @@ TTJets_combined = {\
 "TTJets_SingleLeptonFromT_full",
 "TTJets_SingleLeptonFromTbar_full",
 ],
+#'dir' : dir,
 'dir' : '/data/easilar/cmgTuples/postProcessed_Spring15_ttJets_btagWeights//HT500LT250/hard/',
 }
 

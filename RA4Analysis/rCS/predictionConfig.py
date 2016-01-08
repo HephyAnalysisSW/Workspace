@@ -19,7 +19,7 @@ testRun = False
 ## b-tagging and other variables
 dPhiStr = 'deltaPhi_Wl'
 bjreg = (0,0)
-wjetsSB = (3,3)
+wjetsSB = (3,4)
 
 nBTagVar = 'nBJetMediumCSV30'
 useBTagWeights = False #True for weighted fake data, false for data
@@ -27,11 +27,16 @@ btagWeightSuffix = '_SF'
 templateWeights = True
 templateWeightSuffix = '_SF'
 
+QCDup = False
+QCDdown = False
+nameSuffix = ''
+if QCDup: nameSuffix += '_QCDup'
+if QCDdown: nameSuffix += '_QCDdown'
 
 ## samples
 isData = True
 unblinded = False
-validation = True
+validation = False
 
 cWJets      = getChain(WJetsHTToLNu_25ns,histname='')
 cTTJets     = getChain(TTJets_combined,histname='')
@@ -48,8 +53,8 @@ else:
 
 
 ## signal region definition
-signalRegions = validationRegionAll
-#signalRegions = signalRegion3fb
+#signalRegions = validationRegionAll
+signalRegions = signalRegion3fb
 
 
 ## weight calculations
@@ -59,20 +64,21 @@ sampleLumi = 3.
 debugReweighting = False
 
 ## QCD estimation
-useQCDestimation = True
-QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_extendedClosureTest3to4j_2p1fb_pkl'
+useQCDestimation = False
+#QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_extendedClosureTest3to4j_2p1fb_pkl'
 #QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_closureTest4to5j_2p1fb_pkl'
+QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_MC2p1fb_pkl'
 if isData and useQCDestimation: QCDestimate = pickle.load(file(QCDpickle))
 else: QCDestimate=False
 
 
 ## Directories for plots, results and templates
 if isData:
-  templateName   = 'SFtemplates_validationAll_lep_data'
+  templateName   = 'SFtemplates_fullSR_lep_data'
   predictionName = templateName
 else:
-  templateName   = 'SFtemplates_fullSR_lep_MC'
-  predictionName = templateName+btagWeightSuffix
+  templateName   = 'SFtemplates_fullSR_lep_MC' + nameSuffix
+  predictionName = templateName+btagWeightSuffix + nameSuffix
 printDir    = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/25ns/templateFit_'+predictionName+'_'+str(lumi)+'/'
 pickleDir   = '/data/'+username+'/Results2015/Prediction_'+predictionName+'_'+str(lumi)+'/'
 templateDir = '/data/'+username+'/Results2015/btagTemplates_'+templateName+'_'+str(templateLumi)+'/'
@@ -92,7 +98,7 @@ singleMu_presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSof
 
 ## corrections
 createFits = True
-fitDir = '/data/'+username+'/Results2015/correctionFit_btagKappa_data_validationAll/'
+fitDir = '/data/'+username+'/Results2015/correctionFit_validationAll_data/'
 
 
 ## do stuff for test runs
