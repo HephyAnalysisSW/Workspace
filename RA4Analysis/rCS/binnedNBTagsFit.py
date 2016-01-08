@@ -24,7 +24,7 @@ def binnedNBTagsFit(cut, cutname, samples, prefix = "", QCD_dict={0:{'y':0.,'e':
   
   errorScale = 1
   if errorScale != 1:
-    print '############################## DANGER! ERROR IN TEMPLATE DOWNSCALED! DANGER! ##################################################################################'
+    print 'ERROR IN TEMPLATE DOWNSCALED! This should only be done for testing.'
   
   if isData: w = 'weight'
   else: w = weight_str

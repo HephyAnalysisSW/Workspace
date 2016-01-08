@@ -43,6 +43,8 @@ else: btagweightstring = 'b-tag weights not used'
 if unblinded: blindingstring = 'Results will be shown UNBLINDED'
 elif validation: blindingstring = 'Results will be shown for validation, please check that SR are chosen accordingly'
 else: blindingstring = 'We are still blinded, data yields in SR will not be shown!'
+if templateBootstrap: bootstrapMessage='Using template-uncertainties obtained from bootstrapping'
+else: bootstrapMessage='Not using additional template uncertainties'
 
 print 
 print 'Starting prediction with', dataSetString
@@ -58,6 +60,7 @@ print btagweightstring
 print 'Result will be saved in:', pickleDir
 print 'Plots will be saved in:', printDir
 print 'Templates will be saved in:', templateDir
+print bootstrapMessage
 print 'Preselection to be used:'
 print presel
 print

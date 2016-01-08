@@ -22,7 +22,7 @@ bjreg = (0,0)
 wjetsSB = (3,4)
 
 nBTagVar = 'nBJetMediumCSV30'
-useBTagWeights = False #True for weighted fake data, false for data
+useBTagWeights = True #True for weighted fake data, false for data
 btagWeightSuffix = '_SF'
 templateWeights = True
 templateWeightSuffix = '_SF'
@@ -34,7 +34,7 @@ if QCDup: nameSuffix += '_QCDup'
 if QCDdown: nameSuffix += '_QCDdown'
 
 ## samples
-isData = True
+isData = False
 unblinded = False
 validation = False
 
@@ -45,9 +45,25 @@ csingleTop  = getChain(singleTop_25ns,histname='')
 cTTV        = getChain(TTV_25ns,histname='')
 cRest       = getChain([singleTop_25ns, DY_25ns, TTV_25ns],histname='')#no QCD
 cBkg        = getChain([WJetsHTToLNu_25ns, TTJets_combined, singleTop_25ns, DY_25ns, TTV_25ns], histname='')#no QCD
+cQCD        = getChain(QCDHT_25ns,histname='')
+
+
+## QCD estimation
+useQCDestimation = False
+if not isData and useQCDestimation: QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_MC2p1fb_pkl'
+if isData:
+  QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151120_QCDestimation_2p1fb_pkl'
+  #QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_extendedClosureTest3to4j_2p1fb_pkl'
+  #QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_closureTest4to5j_2p1fb_pkl'
+
+if isData or useQCDestimation: QCDestimate = pickle.load(file(QCDpickle))
+else: QCDestimate=False
+
 
 if isData:
   cData = getChain([single_mu_Run2015D, single_ele_Run2015D], histname='')
+elif not isData and useQCDestimation:
+  cData = getChain([WJetsHTToLNu_25ns, TTJets_combined, singleTop_25ns, DY_25ns, TTV_25ns, QCDHT_25ns], histname='')
 else:
   cData = getChain([WJetsHTToLNu_25ns, TTJets_combined, singleTop_25ns, DY_25ns, TTV_25ns], histname='')
 
@@ -63,14 +79,11 @@ templateLumi = 2.1 # lumi that was used when template was created - if defined w
 sampleLumi = 3.
 debugReweighting = False
 
-## QCD estimation
-useQCDestimation = False
-#QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_extendedClosureTest3to4j_2p1fb_pkl'
-#QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_closureTest4to5j_2p1fb_pkl'
-QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_MC2p1fb_pkl'
-if isData and useQCDestimation: QCDestimate = pickle.load(file(QCDpickle))
-else: QCDestimate=False
 
+## Template Bootstrap error dictionary
+templateBootstrap = True
+templateBootstrapDir = '/data/dspitzbart/bootstrap/combined_errs_pkl'
+if templateBootstrap: templateBootstrap = pickle.load(file(templateBootstrapDir))
 
 ## Directories for plots, results and templates
 if isData:
@@ -98,7 +111,7 @@ singleMu_presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSof
 
 ## corrections
 createFits = True
-fitDir = '/data/'+username+'/Results2015/correctionFit_validationAll_data/'
+fitDir = '/data/'+username+'/Results2015/correctionFit_fullSR_MC_2016/'
 
 
 ## do stuff for test runs
