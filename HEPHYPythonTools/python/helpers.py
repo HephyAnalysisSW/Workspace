@@ -85,7 +85,6 @@ def getFileList(dir, minAgeDPM=0, histname='histo', xrootPrefix='root://hephyse.
   return filelist
 
 def getChain(sL, minAgeDPM=0, histname='histo', xrootPrefix='root://hephyse.oeaw.ac.at/', maxN=-1, treeName="Events"):
-  print "verdigim sample" , sL
   if not type(sL)==type([]):
     sList = [sL]
   else:
@@ -93,7 +92,6 @@ def getChain(sL, minAgeDPM=0, histname='histo', xrootPrefix='root://hephyse.oeaw
   c = ROOT.TChain(treeName)
   i=0
   for s in sList:
-    print "for loopun ici" , s
     if type(s)==type(""):
       for f in getFileList(s, minAgeDPM, histname, xrootPrefix, maxN):
         i+=1
