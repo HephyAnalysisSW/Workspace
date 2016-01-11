@@ -417,6 +417,26 @@ T_tWch_DS ={\
 
 ####Signal Samples###
 
+T5qqqqVV_mGluino_600To675_mLSP_1to550 ={\
+"name" : "T5qqqqVV_mGluino_600To675_mLSP_1to550",
+"chunkString":"T5qqqqVV_mGluino_600To675_mLSP_1to550",
+"dir": "/data/easilar/SignalScans2016/Chunks_T5qqqqVV_mGluino_600To675_mLSP_1to550/",
+"dbsName" : "",
+"skimAnalyzerDir":"skimAnalyzerCount",
+"rootFileLocation":"/treeProducerSusySingleLepton/tree.root",
+"treeName":"tree",
+'isData':False
+}
+T5qqqqVV_mGluino_700To775_mLSP_1To650 ={\
+"name" : "T5qqqqVV_mGluino_700To775_mLSP_1To650",
+"chunkString":"T5qqqqVV_mGluino_700To775_mLSP_1To650",
+"dir": "/data/easilar/SignalScans2016/Chunks_T5qqqqVV_mGluino_700To775_mLSP_1To650/",
+"dbsName" : "",
+"skimAnalyzerDir":"skimAnalyzerCount",
+"rootFileLocation":"/treeProducerSusySingleLepton/tree.root",
+"treeName":"tree",
+'isData':False
+}
 T5qqqqVV_mGluino_800To975_mLSP_1To850 ={\
 "name" : "T5qqqqVV_mGluino_800To975_mLSP_1To850",
 "chunkString":"T5qqqqVV_mGluino_800To975_mLSP_1To850",
