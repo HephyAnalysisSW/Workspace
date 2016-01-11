@@ -57,7 +57,7 @@ def get_parser():
        
     argParser.add_argument('--processSamples',
         action='store',
-        nargs='?',
+        nargs='*',
         type=str,
         default='TTJets_LO',
         help="List of samples to be post-processed, given as CMG component name"
@@ -264,11 +264,12 @@ def getSamples(args):
     
     allComponentsList = [] 
     
-    processSamples = processSamples.replace(' ', '')
-    processSamplesList = []
-    if len(processSamples):
-        processSamplesList = processSamples.split(',')
+    #processSamples = processSamples.replace(' ', '')
+    #if len(processSamples):
+    #    processSamplesList = processSamples.split(',')
         
+    processSamplesList = processSamples
+    print processSamplesList
     for sampleName in processSamplesList:
         foundSample = False
         
@@ -561,10 +562,6 @@ def rwTreeClasses(sample, isample, args, temporaryDir, params={} ):
                 'vars':[
                           'pt/F', 'eta/F', 'phi/F', "dxy/F", "dz/F", 'pdgId/I' , 'fromPV/I' , 
                           "matchedJetIndex/I", "matchedJetDr/F", "CosPhiJet1/F", "CosPhiJet12/F", "CosPhiJetAll/F",
-                       ]   })
-        readVectors_MC.append(
-            {'prefix':'Tracks'  , 'nMax':300, 
-                'vars':[
                           "mcMatchId/I", "mcMatchIndex/I", "mcMatchPtRatio/F", "mcMatchDr/F"
                        ]   })
                       
@@ -1441,7 +1438,7 @@ def cmgPostProcessing(argv=None):
                     chunk['name'], iSplit, nSplit, nEvents
                     )
                 
-                print "{:-^80}".format(" Processing %s Events "%nEvents )
+                print "{:-^80}".format(" Processing Chunk with %s  Events "%(nEvents) )
                 start_time = int(time.time())
                 last_time = start_time
                 nVerboseEvents = 10000
