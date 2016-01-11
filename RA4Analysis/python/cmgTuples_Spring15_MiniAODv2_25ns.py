@@ -415,4 +415,75 @@ T_tWch_DS ={\
 'isData':False
 }
 
+####Signal Samples###
 
+T5qqqqVV_mGluino_800To975_mLSP_1To850 ={\
+"name" : "T5qqqqVV_mGluino_800To975_mLSP_1To850",
+"chunkString":"T5qqqqVV_mGluino_800To975_mLSP_1To850",
+"dir": "/data/easilar/SignalScans2016/Chunks_T5qqqqVV_mGluino_800To975_mLSP_1To850/",
+"dbsName" : "",
+"skimAnalyzerDir":"skimAnalyzerCount",
+"rootFileLocation":"/treeProducerSusySingleLepton/tree.root",
+"treeName":"tree",
+'isData':False
+}
+T5qqqqVV_mGluino_1000To1075_mLSP_1To950 ={\
+"name" : "T5qqqqVV_mGluino_1000To1075_mLSP_1To950",
+"chunkString":"T5qqqqVV_mGluino_1000To1075_mLSP_1To950",
+"dir": "/data/easilar/SignalScans2016/Chunks_T5qqqqVV_mGluino_1000To1075_mLSP_1To950" ,
+"dbsName" : "",
+"skimAnalyzerDir":"skimAnalyzerCount",
+"rootFileLocation":"/treeProducerSusySingleLepton/tree.root",
+"treeName":"tree",
+'isData':False
+}
+T5qqqqVV_mGluino_1100To1175_mLSP_1to1050 ={\
+"name" : "T5qqqqVV_mGluino_1100To1175_mLSP_1to1050",
+"chunkString":"T5qqqqVV_mGluino_1100To1175_mLSP_1to1050",
+"dir": "/data/easilar/SignalScans2016/Chunks_T5qqqqVV_mGluino_1100To1175_mLSP_1to1050/",
+"dbsName" : "",
+"skimAnalyzerDir":"skimAnalyzerCount",
+"rootFileLocation":"/treeProducerSusySingleLepton/tree.root",
+"treeName":"tree",
+'isData':False
+}
+T5qqqqVV_mGluino_1200To1275_mLSP_1to1150 ={\
+"name" : "T5qqqqVV_mGluino_1200To1275_mLSP_1to1150",
+"chunkString":"T5qqqqVV_mGluino_1200To1275_mLSP_1to1150",
+"dir": "/data/easilar/SignalScans2016/Chunks_T5qqqqVV_mGluino_1200To1275_mLSP_1to1150/",
+"dbsName" : "",
+"skimAnalyzerDir":"skimAnalyzerCount",
+"rootFileLocation":"/treeProducerSusySingleLepton/tree.root",
+"treeName":"tree",
+'isData':False
+}
+T5qqqqVV_mGluino_1300To1375_mLSP_1to1250 ={\
+"name" : "T5qqqqVV_mGluino_1300To1375_mLSP_1to1250",
+"chunkString":"T5qqqqVV_mGluino_1300To1375_mLSP_1to1250",
+"dir": "/data/easilar/SignalScans2016/Chunks_T5qqqqVV_mGluino_1300To1375_mLSP_1to1250/",
+"dbsName" : "",
+"skimAnalyzerDir":"skimAnalyzerCount",
+"rootFileLocation":"/treeProducerSusySingleLepton/tree.root",
+"treeName":"tree",
+'isData':False
+}
+T5qqqqVV_mGluino_1400To1550_mLSP_1To1275 ={\
+"name" : "T5qqqqVV_mGluino_1400To1550_mLSP_1To1275",
+"chunkString":"T5qqqqVV_mGluino_1400To1550_mLSP_1To1275",
+"dir": "/data/easilar/SignalScans2016/Chunks_T5qqqqVV_mGluino_1400To1550_mLSP_1To1275/",
+"dbsName" : "",
+"skimAnalyzerDir":"skimAnalyzerCount",
+"rootFileLocation":"/treeProducerSusySingleLepton/tree.root",
+"treeName":"tree",
+'isData':False
+}
+T5qqqqVV_mGluino_1600To1750_mLSP_1To950 ={\
+"name" : "T5qqqqVV_mGluino_1600To1750_mLSP_1To950",
+"chunkString":"T5qqqqVV_mGluino_1600To1750_mLSP_1To950",
+"dir": "/data/easilar/SignalScans2016/Chunks_T5qqqqVV_mGluino_1600To1750_mLSP_1To950/",
+"dbsName" : "",
+"skimAnalyzerDir":"skimAnalyzerCount",
+"rootFileLocation":"/treeProducerSusySingleLepton/tree.root",
+"treeName":"tree",
+'isData':False
+}
