@@ -10,7 +10,6 @@ from rCShelpers import *
 import math
 from Workspace.HEPHYPythonTools.user import username
 from Workspace.RA4Analysis.signalRegions import *
-from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
 from array import array
 
 from predictionConfig import *
@@ -27,7 +26,7 @@ prefix = 'singleLeptonic_Spring15_'
 
 #res = pickle.load(file(path+prefix+'_estimationResults_pkl_kappa_corrected'))
 #pickleDir = '/data/dspitzbart/Results2015/Prediction_SFtemplates_validation_lep_data_2.1/'
-res = pickle.load(file(pickleDir+prefix+'_estimationResults_pkl'))
+res = pickle.load(file(pickleDir+prefix+'_estimationResults_pkl_kappa_corrected'))
 #res = pickle.load(file(pickleDir+prefix+'_estimationResults_pkl'))
 #res = pickle.load(file('/data/dspitzbart/Results2015/Prediction_SFTemplate_MC_fullSR_lep_3.0/singleLeptonic_Spring15__estimationResults_pkl'))
 
@@ -277,9 +276,9 @@ ratio2.Draw('e1p')
 
 can.cd()
 
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2015/Prediction_'+predictionName+'_'+str(lumi)+'.png')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2015/Prediction_'+predictionName+'_'+str(lumi)+'.root')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2015/Prediction_'+predictionName+'_'+str(lumi)+'.pdf')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2015/SumPlot/Prediction_'+predictionName+'_'+str(lumi)+'_corrected.png')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2015/SumPlot/Prediction_'+predictionName+'_'+str(lumi)+'_corrected.root')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2015/SumPlot/Prediction_'+predictionName+'_'+str(lumi)+'_corrected.pdf')
 
 can2 = ROOT.TCanvas('can2','can2',700,700)
 

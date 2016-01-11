@@ -36,23 +36,28 @@ for srNJet in sorted(signalRegions):
   bins += rows
 
 baseDir = '/data/'+username+'/Results2015/'
-#QCD_upDir =   'Prediction_SFtemplates_fullSR_lep_MC_QCDup_SF_QCDup_2.1/'
-#QCD_downDir = 'Prediction_SFtemplates_fullSR_lep_MC_QCDdown_SF_QCDdown_2.1/'
+QCD_upDir =   'Prediction_SFtemplates_fullSR_lep_MC_QCDup_SF_QCDup_2.1/'
+QCD_downDir = 'Prediction_SFtemplates_fullSR_lep_MC_QCDdown_SF_QCDdown_2.1/'
+QCD_nominalDir = 'Prediction_SFtemplates_fullSR_lep_MC_QCDzentral_SF_QCDzentral_2.1/'
+
 b_upDir =   'Prediction_SFtemplates_fullSR_lep_MC_SF_b_Up_2.1/'
 b_downDir = 'Prediction_SFtemplates_fullSR_lep_MC_SF_b_Down_2.1/'
 light_upDir =   'Prediction_SFtemplates_fullSR_lep_MC_SF_light_Up_2.1/'
 light_downDir = 'Prediction_SFtemplates_fullSR_lep_MC_SF_light_Down_2.1/'
-
 nominalDir = 'Prediction_SFtemplates_fullSR_lep_MC_SF_2.1/'
- 
-light_up =    pickle.load(file(baseDir+light_upDir+prefix+'_estimationResults_pkl_kappa_btag_corrected'))
-light_down =  pickle.load(file(baseDir+light_downDir+prefix+'_estimationResults_pkl_kappa_btag_corrected'))
-b_up =        pickle.load(file(baseDir+b_upDir+prefix+'_estimationResults_pkl_kappa_btag_corrected'))
-b_down =      pickle.load(file(baseDir+b_downDir+prefix+'_estimationResults_pkl_kappa_btag_corrected'))
-#qcd_up =      pickle.load(file(baseDir+QCD_upDir+prefix+'_estimationResults_pkl_kappa_btag_corrected'))
-#qcd_down =    pickle.load(file(baseDir+QCD_downDir+prefix+'_estimationResults_pkl'))
 
-nominal =     pickle.load(file(baseDir+nominalDir+prefix+'_estimationResults_pkl_kappa_btag_corrected'))
+postfix = '_kappa_corrected'
+#postfix = ''
+
+light_up =    pickle.load(file(baseDir+light_upDir+prefix+'_estimationResults_pkl'+postfix))
+light_down =  pickle.load(file(baseDir+light_downDir+prefix+'_estimationResults_pkl'+postfix))
+b_up =        pickle.load(file(baseDir+b_upDir+prefix+'_estimationResults_pkl'+postfix))
+b_down =      pickle.load(file(baseDir+b_downDir+prefix+'_estimationResults_pkl'+postfix))
+nominal =     pickle.load(file(baseDir+nominalDir+prefix+'_estimationResults_pkl'+postfix))
+
+qcd_up =      pickle.load(file(baseDir+QCD_upDir+prefix+'_estimationResults_pkl'+postfix))
+qcd_down =    pickle.load(file(baseDir+QCD_downDir+prefix+'_estimationResults_pkl'+postfix))
+qcd_nominal = pickle.load(file(baseDir+QCD_nominalDir+prefix+'_estimationResults_pkl'+postfix))
 
 varUp = []
 varDown = []
@@ -67,8 +72,8 @@ b_Down_H  = ROOT.TH1F('b_Down_H','b Down',bins,0,bins)
 light_Up_H  = ROOT.TH1F('light_Up_H','light Up',bins,0,bins)
 light_Down_H  = ROOT.TH1F('light_Down_H','light Down',bins,0,bins)
 
-#qcd_Up_H  = ROOT.TH1F('qcd_Up_H','b Up',bins,0,bins)
-#qcd_Down_H  = ROOT.TH1F('qcd_Down_H','b Down',bins,0,bins)
+qcd_Up_H  = ROOT.TH1F('qcd_Up_H','b Up',bins,0,bins)
+qcd_Down_H  = ROOT.TH1F('qcd_Down_H','b Down',bins,0,bins)
 
 max_H = ROOT.TH1F('max_H','total max',bins,0,bins)
 min_H = ROOT.TH1F('min_H','total min',bins,0,bins)
@@ -79,7 +84,7 @@ i = 1
 b_err = {}
 l_err = {}
 
-key = 'W_pred'
+key = 'tot_pred'
 
 for i_njb, srNJet in enumerate(sorted(signalRegions)): #just changed this Nov 4th, not sorted before!
   b_err[srNJet] = {}
@@ -102,23 +107,22 @@ for i_njb, srNJet in enumerate(sorted(signalRegions)): #just changed this Nov 4t
       b_upDiff   = (b_up[srNJet][stb][htb][key]-nominal[srNJet][stb][htb][key])/nominal[srNJet][stb][htb][key]
       b_downDiff = (b_down[srNJet][stb][htb][key]-nominal[srNJet][stb][htb][key])/nominal[srNJet][stb][htb][key]
       print 'b/c up, down:', b_upDiff, b_downDiff
-      #qcd_upDiff = (qcd_up[srNJet][stb][htb][key]-nominal[srNJet][stb][htb][key])/nominal[srNJet][stb][htb][key]
-      #qcd_downDiff = (qcd_down[srNJet][stb][htb][key]-nominal[srNJet][stb][htb][key])/nominal[srNJet][stb][htb][key]
+      qcd_upDiff = (qcd_up[srNJet][stb][htb][key]-qcd_nominal[srNJet][stb][htb][key])/qcd_nominal[srNJet][stb][htb][key]
+      qcd_downDiff = (qcd_down[srNJet][stb][htb][key]-qcd_nominal[srNJet][stb][htb][key])/qcd_nominal[srNJet][stb][htb][key]
+      print 'qcd up, down:', qcd_upDiff, qcd_downDiff
 
       upDiff = sqrt(light_upDiff**2 + b_upDiff**2)
-      print 'b/c up, down:', b_upDiff, b_downDiff
       downDiff = sqrt(light_downDiff**2 + b_downDiff**2)
       Up_H.SetBinContent(i,-upDiff)
       Up_H.GetXaxis().SetBinLabel(i,str(i))
       Down_H.SetBinContent(i,downDiff)
     
       b_Up_H.SetBinContent(i,b_upDiff)
-      print 'b/c up, down:', b_upDiff, b_downDiff
       b_Down_H.SetBinContent(i,b_downDiff)
       light_Up_H.SetBinContent(i,light_upDiff)
       light_Down_H.SetBinContent(i,light_downDiff)
-      #qcd_Up_H.SetBinContent(i,qcd_upDiff)
-      #qcd_Down_H.SetBinContent(i,qcd_downDiff)
+      qcd_Up_H.SetBinContent(i,qcd_upDiff)
+      qcd_Down_H.SetBinContent(i,qcd_downDiff)
 
       varUp.append(upDiff)
       varDown.append(downDiff)
@@ -150,8 +154,8 @@ Up_H.GetXaxis().SetLabelSize(0.08)
 
 Up_H.GetYaxis().SetTitle('#delta_{k}')
 
-Up_H.SetMinimum(-0.73)
-Up_H.SetMaximum(0.73)
+Up_H.SetMinimum(-0.13)
+Up_H.SetMaximum(0.13)
 Up_H.SetFillColor(ROOT.kGray)
 Up_H.SetMarkerStyle(0)
 Down_H.SetFillColor(ROOT.kGray)
@@ -173,13 +177,13 @@ light_Up_H.SetLineWidth(2)
 light_Down_H.SetLineColor(ROOT.kBlue)
 light_Down_H.SetLineWidth(2)
 
-#qcd_Up_H.SetLineColor(426)
-#qcd_Up_H.SetMarkerStyle(0)
-#qcd_Up_H.SetLineWidth(2)
+qcd_Up_H.SetLineColor(426)
+qcd_Up_H.SetMarkerStyle(0)
+qcd_Up_H.SetLineWidth(2)
 
-#qcd_Down_H.SetLineColor(426+4)
-#qcd_Down_H.SetMarkerStyle(0)
-#qcd_Down_H.SetLineWidth(2)
+qcd_Down_H.SetLineColor(426+4)
+qcd_Down_H.SetMarkerStyle(0)
+qcd_Down_H.SetLineWidth(2)
 
 
 for i in range(1,bins+1):
@@ -229,3 +233,40 @@ latex1.DrawLatex(0.68,0.96,"L=2.1fb^{-1} (13TeV)")
 setNiceBinLabel(Up_H, signalRegion3fb)
 Up_H.GetXaxis().SetLabelSize(0.04)
 Up_H.GetXaxis().SetTitle('')
+
+
+can2 = ROOT.TCanvas('can2','can2',700,700)
+
+qcd_Up_H.SetMinimum(-0.13)
+qcd_Up_H.SetMaximum(0.13)
+
+
+qcd_Up_H.Draw()
+qcd_Down_H.Draw('same')
+#max_H.Draw('same')
+#min_H.Draw('same')
+zero_H.Draw('same')
+
+can2.RedrawAxis()
+
+leg2 = ROOT.TLegend(0.65,0.85,0.98,0.95)
+leg2.SetFillColor(ROOT.kWhite)
+leg2.SetShadowColor(ROOT.kWhite)
+leg2.SetBorderSize(1)
+leg2.SetTextSize(0.04)
+leg2.AddEntry(qcd_Up_H,'QCD up')
+leg2.AddEntry(qcd_Down_H,'QCD down')
+
+leg2.Draw()
+
+latex1.DrawLatex(0.15,0.96,'CMS #bf{#it{simulation}}')
+latex1.DrawLatex(0.68,0.96,"L=2.1fb^{-1} (13TeV)")
+
+setNiceBinLabel(qcd_Up_H, signalRegion3fb)
+
+qcd_Up_H.GetYaxis().SetTitle('#delta_{k}')
+qcd_Up_H.GetXaxis().SetLabelSize(0.04)
+qcd_Up_H.GetXaxis().SetTitle('')
+
+
+
