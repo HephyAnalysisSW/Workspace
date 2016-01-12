@@ -44,8 +44,14 @@ def makeTTPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, QCD=F
   rd['fit_srNJet_lowDPhi'] = fit_srNJet_lowDPhi
 
   yTT_srNJet_0b_lowDPhi =  fit_srNJet_lowDPhi['TT_AllPdg']['yield']*fit_srNJet_lowDPhi['TT_AllPdg']['template'].GetBinContent(1)
+  if templateBootstrap:
+    print
+    print 'Using bootstrap template error'
   yTT_Var_srNJet_0b_lowDPhi =  fit_srNJet_lowDPhi['TT_AllPdg']['yieldVar']*fit_srNJet_lowDPhi['TT_AllPdg']['template'].GetBinContent(1)**2
-
+  print yTT_Var_srNJet_0b_lowDPhi
+  if templateBootstrap: yTT_Var_srNJet_0b_lowDPhi += fit_srNJet_lowDPhi['TT_AllPdg']['yield']**2*templateBootstrap['TTJets'][srNJet][stb][htb]**2
+  print yTT_Var_srNJet_0b_lowDPhi
+  print
   #rCS_crLowNJet_Name_1b, rCS_crLowNJet_Cut_1b = nameAndCut(stb, htb, (4,5), presel=presel, btagVar = nBTagVar) 
   rCS_sr_Name_0b, rCS_sr_Cut_0b = nameAndCut(stb, htb, srNJet, btb=(0,0), presel=presel, btagVar = nBTagVar)#for Check 
   #rCS_crLowNJet_1b = getRCS(cBkg, rCS_crLowNJet_Cut_1b,  dPhiCut) #Low njet tt-jets CR to be orthoganl to DPhi 

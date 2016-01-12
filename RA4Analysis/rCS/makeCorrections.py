@@ -89,7 +89,7 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
         kappaTT = divideRCSdict(rcs0bCRtt,rcs1bCRtt)
         kappaTT_btag = divideRCSdict(rcs0bCRtt_btag,rcs1bCRtt_btag)
 
-        fitResults[njb][stb][htb] = {'kappaTT':kappaTT, 'rcs1bCRtt':rcs1bCRtt_btag, 'rcs0bCRtt':rcs0bCRtt_btag, 'kappaTT_btag':kappaTT_btag}
+        fitResults[njb][stb][htb] = {'kappaTT':kappaTT, 'rcs1bCRtt_btag':rcs1bCRtt_btag, 'rcs1bCRtt':rcs1bCRtt, 'rcs0bCRtt':rcs0bCRtt, 'rcs0bCRtt_btag':rcs0bCRtt_btag, 'kappaTT_btag':kappaTT_btag}
 
         #fill histograms
         for i_njbTT, njbTT in enumerate(ttJetBins):
@@ -154,7 +154,10 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
         #Load fit results if fitting isn't done        
         rcs1bCRtt = loadedFit[njb][stb][htb]['rcs1bCRtt']
         rcs0bCRtt = loadedFit[njb][stb][htb]['rcs0bCRtt']
+        rcs1bCRtt_btag = loadedFit[njb][stb][htb]['rcs1bCRtt_btag']
+        rcs0bCRtt_btag = loadedFit[njb][stb][htb]['rcs0bCRtt_btag']
         kappaTT =   loadedFit[njb][stb][htb]['kappaTT']
+        kappaTT_btag =   loadedFit[njb][stb][htb]['kappaTT_btag']
         ttD =       loadedFit[njb][stb][htb]['ttLinear']['ttD']
         ttDE =      loadedFit[njb][stb][htb]['ttLinear']['ttDE']
         ttK =       loadedFit[njb][stb][htb]['ttLinear']['ttK']
