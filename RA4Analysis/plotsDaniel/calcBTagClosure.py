@@ -46,6 +46,8 @@ light_upDir =   'Prediction_SFtemplates_fullSR_lep_MC_SF_light_Up_2.1/'
 light_downDir = 'Prediction_SFtemplates_fullSR_lep_MC_SF_light_Down_2.1/'
 nominalDir = 'Prediction_SFtemplates_fullSR_lep_MC_SF_2.1/'
 
+savePkl = True
+
 postfix = '_kappa_corrected'
 #postfix = ''
 
@@ -83,15 +85,18 @@ i = 1
 
 b_err = {}
 l_err = {}
+qcd_err = {}
 
 key = 'tot_pred'
 
 for i_njb, srNJet in enumerate(sorted(signalRegions)): #just changed this Nov 4th, not sorted before!
   b_err[srNJet] = {}
   l_err[srNJet] = {}
+  qcd_err[srNJet] = {}
   for stb in sorted(signalRegions[srNJet]):
     b_err[srNJet][stb] = {}
     l_err[srNJet][stb] = {}
+    qcd_err[srNJet][stb] = {}
     for htb in sorted(signalRegions[srNJet][stb]):
       print
       print '#############################################'
@@ -128,6 +133,7 @@ for i_njb, srNJet in enumerate(sorted(signalRegions)): #just changed this Nov 4t
       varDown.append(downDiff)
       b_err[srNJet][stb][htb] = (abs(b_upDiff)+abs(b_downDiff))/2
       l_err[srNJet][stb][htb] = (abs(light_upDiff)+abs(light_downDiff))/2
+      qcd_err[srNJet][stb][htb] = (abs(qcd_upDiff)+abs(qcd_downDiff))/2
       i += 1
 
 can = ROOT.TCanvas('can','can',700,700)
@@ -268,5 +274,9 @@ qcd_Up_H.GetYaxis().SetTitle('#delta_{k}')
 qcd_Up_H.GetXaxis().SetLabelSize(0.04)
 qcd_Up_H.GetXaxis().SetTitle('')
 
+if savePkl:
+  pickle.dump(b_err, file(baseDir+'btagErr_pkl','w'))
+  pickle.dump(l_err, file(baseDir+'mistagErr_pkl','w'))
+  pickle.dump(qcd_err, file(baseDir+'qcdErr_pkl','w'))
 
 

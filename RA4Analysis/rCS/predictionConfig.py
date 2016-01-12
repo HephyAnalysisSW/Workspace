@@ -22,7 +22,7 @@ bjreg = (0,0)
 wjetsSB = (3,4)
 
 nBTagVar = 'nBJetMediumCSV30'
-useBTagWeights = True #True for weighted fake data, false for data
+useBTagWeights = False #True for weighted fake data, false for data
 btagWeightSuffix = '_SF'
 templateWeights = True
 templateWeightSuffix = '_SF'
@@ -34,7 +34,7 @@ if QCDup: nameSuffix += '_QCDup'
 if QCDdown: nameSuffix += '_QCDdown'
 
 ## samples
-isData = False
+isData = True
 unblinded = False
 validation = False
 
@@ -49,10 +49,10 @@ cQCD        = getChain(QCDHT_25ns,histname='')
 
 
 ## QCD estimation
-useQCDestimation = False
+useQCDestimation = True
 if not isData and useQCDestimation: QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_MC2p1fb_pkl'
 if isData:
-  QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151120_QCDestimation_2p1fb_pkl'
+  QCDpickle  = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_2p1fb_pkl'
   #QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_extendedClosureTest3to4j_2p1fb_pkl'
   #QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_closureTest4to5j_2p1fb_pkl'
 

@@ -20,6 +20,7 @@ ROOT.gStyle.SetOptStat('')
 useWcorrection = False
 useTTcorrection = False
 signal = False
+withSystematics = True
 
 prefix = 'singleLeptonic_Spring15_'
 #path = '/data/'+username+'/Results2015/Prediction_SFTemplate_MC_fullSR_lep_3.0/'
@@ -27,6 +28,8 @@ prefix = 'singleLeptonic_Spring15_'
 #res = pickle.load(file(path+prefix+'_estimationResults_pkl_kappa_corrected'))
 #pickleDir = '/data/dspitzbart/Results2015/Prediction_SFtemplates_validation_lep_data_2.1/'
 res = pickle.load(file(pickleDir+prefix+'_estimationResults_pkl_kappa_corrected'))
+if withSystematics:
+  res = pickle.load(file(pickleDir+'resultsFinal_withSystematics_pkl'))
 #res = pickle.load(file(pickleDir+prefix+'_estimationResults_pkl'))
 #res = pickle.load(file('/data/dspitzbart/Results2015/Prediction_SFTemplate_MC_fullSR_lep_3.0/singleLeptonic_Spring15__estimationResults_pkl'))
 
@@ -142,11 +145,17 @@ for srNJet in sorted(signalRegions):
       
       pred_H.SetBinContent(i, res[srNJet][stb][htb]['tot_pred'])
       pred_H.SetBinError(i,   res[srNJet][stb][htb]['tot_pred_err'])
-      predYErr.append(res[srNJet][stb][htb]['tot_pred_err'])
+      if withSystematics:
+        predYErr.append(sqrt(res[srNJet][stb][htb]['tot_pred_err']**2 + res[srNJet][stb][htb]['systematics']['total']**2))
+      else:
+        predYErr.append(res[srNJet][stb][htb]['tot_pred_err'])
       predXErr.append(0.5)
       predY.append(res[srNJet][stb][htb]['tot_pred'])
       predX.append(i-0.5)
-      print 'Predicted:', getValErrString(res[srNJet][stb][htb]['tot_pred'], res[srNJet][stb][htb]['tot_pred_err'])
+      if withSystematics:
+        print 'SR'+str(i)+':', getValErrString(res[srNJet][stb][htb]['tot_pred'], sqrt(res[srNJet][stb][htb]['tot_pred_err']**2 + res[srNJet][stb][htb]['systematics']['total']**2))
+      else:
+        print 'SR'+str(i)+':', getValErrString(res[srNJet][stb][htb]['tot_pred'], res[srNJet][stb][htb]['tot_pred_err'])
       if unblinded or validation: print 'Measured: ', getValErrString(data_yield, sqrt(data_yield))
       truth_H.SetBinContent(i,res[srNJet][stb][htb]['tot_truth'])
       truth_H.SetBinError(i,  res[srNJet][stb][htb]['tot_truth_err'])
