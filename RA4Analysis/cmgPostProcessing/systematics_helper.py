@@ -1,4 +1,5 @@
 from btagEfficiency import *
+from math import *
 
 def calc_btag_systematics(t,s,r,mcEffDict,sampleKey,maxConsideredBTagWeight,separateBTagWeights):
   #separateBTagWeights = False
@@ -83,4 +84,40 @@ def calc_LeptonScale_factors_and_systematics(s,histos_LS):
     s.lepton_eleSF_miniIso01 = ele_miniIso01_histo.GetBinContent(ele_miniIso01_histo.FindBin(s.leptonEt,abs(s.leptonEta)))
     s.lepton_eleSF_cutbasedID_err = ele_cutbased_histo.GetBinError(ele_cutbased_histo.FindBin(s.leptonEt,abs(s.leptonEta)))
     s.lepton_eleSF_miniIso01_err = ele_miniIso01_histo.GetBinError(ele_miniIso01_histo.FindBin(s.leptonEt,abs(s.leptonEta)))
+  return
+
+
+def calc_TopPt_Weights(s,genParts):
+  genTops = filter(lambda g:abs(g['pdgId'])==6, genParts)
+  s.nGenTops = len(genTops)
+  GenAntiTopIdx = -999
+  GenTopIdx = -999
+  for i_part, genPart in enumerate(genParts):
+    if genPart['pdgId'] ==  6:
+          s.GenTopPt = genPart['pt']
+          GenTopIdx = i_part
+    if genPart['pdgId'] == -6:
+          s.GenAntiTopPt = genPart['pt']
+          GenAntiTopIdx = i_part
+
+  if s.GenTopPt!=-999 and s.GenAntiTopPt!=-999 and s.nGenTops==2:
+    #print "genTop" , s.GenTopPt
+    SFTop     = exp(0.156    -0.00137*s.GenTopPt    )
+    SFAntiTop = exp(0.156    -0.00137*s.GenAntiTopPt)
+    #print "SFTOP" , SFTop
+    s.TopPtWeight = sqrt(SFTop*SFAntiTop)
+    if s.TopPtWeight<0.5: s.TopPtWeight=0.5
+
+    if GenAntiTopIdx!=-999 and GenTopIdx!=-999:
+      genTop_vec = ROOT.TLorentzVector()
+      genTop_vec.SetPtEtaPhiM(genParts[GenTopIdx]['pt'],genParts[GenTopIdx]['eta'],genParts[GenTopIdx]['phi'],genParts[GenTopIdx]['mass'])
+      genAntiTop_vec = ROOT.TLorentzVector()
+      genAntiTop_vec.SetPtEtaPhiM(genParts[GenAntiTopIdx]['pt'],genParts[GenAntiTopIdx]['eta'],genParts[GenAntiTopIdx]['phi'],genParts[GenAntiTopIdx]['mass'])
+      GenTTBarp4 = genTop_vec + genAntiTop_vec
+      s.GenTTBarPt = GenTTBarp4.Pt()
+      if s.GenTTBarPt>120: s.GenTTBarWeight= 0.95
+      if s.GenTTBarPt>150: s.GenTTBarWeight= 0.90
+      if s.GenTTBarPt>250: s.GenTTBarWeight= 0.80
+      if s.GenTTBarPt>400: s.GenTTBarWeight= 0.70 
+      #print s.GenTTBarPt , s.GenTTBarWeight
   return
