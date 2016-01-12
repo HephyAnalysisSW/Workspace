@@ -269,7 +269,6 @@ def getSamples(args):
     #    processSamplesList = processSamples.split(',')
         
     processSamplesList = processSamples
-    print processSamplesList
     for sampleName in processSamplesList:
         foundSample = False
         
@@ -290,14 +289,15 @@ def getSamples(args):
                         foundSample = True
                 continue 
             else:
-                print "\n Not possible to build list of components for .".format(sampleName), \
+                print "\n Not possible to build list of components for {0} .".format(sampleName), \
                 "\n Exiting."
+                print "Requested Sample:", sampleRequested
                 sys.exit()
                 
                     
         except AttributeError:
             sampleRequested = cmgSamples.samples + cmgSamples.allSignals
-        
+
             if isinstance(sampleRequested, dict):
                 # single component
                 if (sampleName == sampleRequested['cmgComp'].name):
@@ -313,12 +313,11 @@ def getSamples(args):
                         foundSample = True
                         break 
             else:
-                print "\n Not possible to build list of components for .".format(sampleName), \
+                print "\n Not possible to build list of components for {0}".format(sampleName), \
                 "\n Exiting."
                 sys.exit()
                 
                 
-        print "\n List of samples requested to be processed: \n {0} \n".format(pprint.pformat(processSamplesList))
         
         if not foundSample:
             print "\n List of available samples in cmgTuples set {0}: \n {1} \n".format(
@@ -395,10 +394,15 @@ def eventsSkimPreselect(skimName, leptonSelection, preselectFlag):
     logger.info("\n Jobs running with skim = '%s' \n Skimming condition: \n  %s \n ", skimName, skimCond)
     
     if preselectFlag:
-        # preselectionCuts = "(met_pt > 200 && Jet_pt[0]> 100 && Sum$(Jet_pt)>200 )"
-        preselectionCuts = "(met_pt > 100 && Jet_pt[0]> 80 && Sum$(Jet_pt)>100 )"
+        metCut = "(met_pt>200)"
+        leadingJet100 = "((Max$(Jet_pt*(abs(Jet_eta)<2.4 && Jet_id) ) > 100 ) >=1)"
+        HTCut    = "(Sum$(Jet_pt*(Jet_pt>30 && abs(Jet_eta)<2.4 && (Jet_id)) ) >200)"
+
+        preselectionCuts = "(%s)"%'&&'.join([metCut,leadingJet100,HTCut])
+        skimCond += "&&%s"%preselectionCuts
+
+
         logger.info("\n Applying preselection cuts: %s ", preselectionCuts)
-        skimCond += "&&%s" % preselectionCuts
         logger.info("\n Skimming condition with preselection: \n  %s \n", skimCond)
     else:
         logger.info("\n No preselection cuts are applied for skim %s \n Skimming condition unchanged \n", skimName)
@@ -496,7 +500,7 @@ def rwTreeClasses(sample, isample, args, temporaryDir, params={} ):
         
         newVariables_DATAMC.extend([
             'nBJetMediumCSV30/I', 'nSoftBJetsCSV/F', 'nHardBJetsCSV/F',  
-            'nJet30/I','htJet30j/F','nJet60/I','nJet110/I','nJet325/I' ,
+            'nJet30/I','htJet30j/F','nJet60/I','nJet100/I', 'nJet110/I','nJet325/I' ,
             ])
         
         newVariables_DATAMC.extend([
@@ -826,17 +830,22 @@ def processJets(leptonSelection, readTree, splitTree, saveTree):
         ptCut = 60 
         jets60 = selectionJets(readTree, ptCut)
 
+        ptCut = 100
+        jets100 = selectionJets(readTree, ptCut)
+
         ptCut = 110
         jets110 = selectionJets(readTree, ptCut)
+
 
         saveTree.nJet30 = len(jets)
         saveTree.nJet60 = len(jets60)
         saveTree.nJet110 = len(jets110)
+        saveTree.nJet100 = len(jets100)
         saveTree.nJet325 = len(filter(lambda j: j["pt"] > 325 , jets110))
         
         logger.debug(
-            "\n Number of jets: \n  pt > 30 GeV: %i \n  pt > 60 GeV: %i \n  pt > 110 GeV: %i \n  pt > 325 GeV: %i \n", 
-            saveTree.nJet30, saveTree.nJet60,  saveTree.nJet110, saveTree.nJet325
+            "\n Number of jets: \n  pt > 30 GeV: %i \n  pt > 60 GeV: %i \n  pt > 100 GeV: %i \n  pt > 110 GeV: %i \n  pt > 325 GeV: %i \n", 
+            saveTree.nJet30, saveTree.nJet60,  saveTree.nJet100, saveTree.nJet110, saveTree.nJet325
             )
                
         # separation of jets and bJets according to discriminant (CMVA;  CSV - default)
@@ -1355,7 +1364,11 @@ def cmgPostProcessing(argv=None):
         # that will be deleted automatically at the end of the job. If the directory exists,
         # it will be deleted and re-created.
         
-        outputWriteDirectory = os.path.join(outputDirectory, skim, leptonSelection, sample['name'])
+        if preselect:
+            outputWriteDirectory = os.path.join(outputDirectory, skim, 'preselection', leptonSelection, sample['name'])
+        else:
+            outputWriteDirectory = os.path.join(outputDirectory, skim, leptonSelection, sample['name'])
+
         if not os.path.exists(outputWriteDirectory):
             os.makedirs(outputWriteDirectory)
             logger.debug(
