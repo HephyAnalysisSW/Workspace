@@ -77,11 +77,12 @@ opts = {
     "small": False          ,
     "log": 'INFO'           ,
     "processTracks": False  ,
+    "preselect": True       , 
     }
 
 
 
-def makePostProcCommand(sample, cmgTuple, tag, overwrite="False", lepSel='inc', small='False', log='INFO',processTracks='False'): 
+def makePostProcCommand(sample, cmgTuple, tag, overwrite="False", lepSel='inc', small='False', log='INFO',processTracks='False', preselect="False"): 
     opts=[]
     opts.append("--processSamples=%s"%sample)
     if overwrite: opts.append("--overwriteOutputFiles")
