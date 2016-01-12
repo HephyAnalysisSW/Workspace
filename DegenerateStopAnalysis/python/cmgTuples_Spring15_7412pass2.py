@@ -340,35 +340,36 @@ for sample in samples:
 
 # signal samples
 
+from CMGTools.RootTools.samples.samples_13TeV_74X_susyT2DegStopPriv import *
 allSignalData=[
-    [data_path+"/T2DegStop_300_270","T2DegStop_300_270"],
-    [data_path+"/T2DegStop_300_290FS","T2DegStop_300_290FS"],
-    [data_path+"/T2DegStop_300_260FS","T2DegStop_300_240FS"],
-    [data_path+"/T2DegStop_300_270FS","T2DegStop_300_270FS"],
+    [data_path+"/T2DegStop_300_270","T2DegStop_300_270", T2DegStop_300_270],
+    [data_path+"/T2DegStop_300_240_FastSim","T2DegStop_300_240_FastSim", T2DegStop_300_240_FastSim  ],
+    [data_path+"/T2DegStop_300_270_FastSim","T2DegStop_300_270_FastSim", T2DegStop_300_270_FastSim ],
+    [data_path+"/T2DegStop_300_290_FastSim","T2DegStop_300_290_FastSim", T2DegStop_300_290_FastSim],
     ]
 
 
 allSignalStrings = [s[1] for s in allSignalData]
-def getSignalSample(dir, signal):
+def getSignalSample(dir, signal,component):
   if signal in allSignalStrings:
      
     # dirty way of creating a CMG component        
-    component = cfg.MCComponent(
-        dataset=signal,
-        name = signal,
-        files = [],
-        xSection = 0.0,
-        nGenEvents = 1,
-        triggers = [],
-        effCorrFactor = 1,
-        )
+    #component = cfg.MCComponent(
+    #    dataset=signal,
+    #    name = signal,
+    #    files = [],
+    #    xSection = 0.0,
+    #    nGenEvents = 1,
+    #    triggers = [],
+    #    effCorrFactor = 1,
+    #    )
       
     return {\
       'cmgComp': component,
       "name" : signal,
       "chunkString": signal,
       'dir' : dir,
-      'dbsName':signal,
+      'dbsName':component.dataset,
       'isData':False,
       #"rootFileLocation":"treeProducerSusySingleLepton/tree.root",
       "rootFileLocation":"tree.root",
@@ -379,9 +380,11 @@ def getSignalSample(dir, signal):
     print "Signal",signal,"unknown. Available: ",", ".join(allSignalStrings)
 
 allSignals=[]
-for d,s in allSignalData:
-  exec(s+"=getSignalSample('"+d+"','"+s+"')")
-  exec("allSignals.append("+s+")")
+for sig in allSignalData:
+  #exec(s+"=getSignalSample('"+d+"','"+s+"')")
+  signal = getSignalSample(*sig)
+  exec("{s}=signal".format(s=sig[1]))
+  exec("allSignals.append({s})".format(s=sig[1]))
   
 for sample in allSignals:
     sample['xsec'] = sample['cmgComp'].xSection
