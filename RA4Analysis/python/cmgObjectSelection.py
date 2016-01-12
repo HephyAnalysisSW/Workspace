@@ -89,11 +89,15 @@ def get_cmg_index_and_DR(objs,objPhi,objEta):
     dr=float('nan')
   return index , dr
 
+
 def get_cmg_genLeps(c):
   return [getObjDict(c, 'genLep_', ['eta','pt','phi','charge', 'pdgId', 'sourceId'], i) for i in range(int(getVarValue(c, 'ngenLep')))]
 
 def get_cmg_genParts(c):
   return [getObjDict(c, 'GenPart_', ['eta','pt','phi','charge', 'pdgId', 'motherId', 'grandmotherId'], i) for i in range(int(getVarValue(c, 'nGenPart')))]
+
+def get_cmg_genParts_fromStruct(r,g_list):
+  return [{p:getattr(r, 'GenPart'+'_'+p)[i] for p in g_list} for i in range(r.nGenPart)]
 
 def get_cmg_genPartsAll(c):
   return [getObjDict(c, 'genPartAll_', ['eta','pt','phi','charge', 'pdgId', 'motherId', 'grandmotherId'], i) for i in range(int(getVarValue(c, 'ngenPartAll')))]
