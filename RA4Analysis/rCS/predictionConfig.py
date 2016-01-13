@@ -93,8 +93,8 @@ else:
   templateName   = 'SFtemplates_fullSR_lep_MC' + nameSuffix
   predictionName = templateName+btagWeightSuffix + nameSuffix
 printDir    = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/25ns/templateFit_'+predictionName+'_'+str(lumi)+'/'
-pickleDir   = '/data/'+username+'/Results2015/Prediction_'+predictionName+'_'+str(lumi)+'/'
-templateDir = '/data/'+username+'/Results2015/btagTemplates_'+templateName+'_'+str(templateLumi)+'/'
+pickleDir   = '/data/'+username+'/Results2016/Prediction_'+predictionName+'_'+str(lumi)+'/'
+templateDir = '/data/'+username+'/Results2016/btagTemplates_'+templateName+'_'+str(templateLumi)+'/'
 prefix = 'singleLeptonic_Spring15_'
 
 
@@ -111,7 +111,7 @@ singleMu_presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSof
 
 ## corrections
 createFits = True
-fitDir = '/data/'+username+'/Results2015/correctionFit_fullSR_MC_2016/'
+fitDir = '/data/'+username+'/Results2016/correctionFit_fullSR_MC_2016/'
 
 
 ## do stuff for test runs
@@ -119,8 +119,9 @@ if testRun:
   signalRegions = smallRegion
   predictionName = 'testRun'
   printDir    = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/25ns/templateFit_'+predictionName+'_'+str(lumi)+'/'
-  pickleDir   = '/data/'+username+'/Results2015/Prediction_'+predictionName+'_'+str(lumi)+'/'
-  templateDir = '/data/'+username+'/Results2015/btagTemplates_'+predictionName+'_'+str(templateLumi)+'/'
+  pickleDir   = '/data/'+username+'/Results2016/Prediction_'+predictionName+'_'+str(lumi)+'/'
+  templateDir = '/data/'+username+'/Results2016/btagTemplates_'+predictionName+'_'+str(templateLumi)+'/'
+
 
 
 ## create directories that are defined but do not yet exist

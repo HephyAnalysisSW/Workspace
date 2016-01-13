@@ -196,10 +196,14 @@ for isample, sample in enumerate(allSamples):
     lumiScaleFactor = target_lumi/float(sumWeight)
     branchKeepStrings = branchKeepStrings_DATAMC + branchKeepStrings_MC
   
-    sampleKey = ''
-    if 'TTJets' in sample['dbsName']: sampleKey = 'TTJets'
-    elif 'WJets' in sample['dbsName']: sampleKey = 'WJets'
-    else: sampleKey = 'none'
+  sampleKey = ''
+  topology1 = ['ttjets', 'ttw', 'ttz', 'tbar_tw','tto', 't_tw']
+  topology2 = ['wjets', 'dyjets']
+  for top in topology1:
+    if top in sample['name'].lower(): sampleKey = 'TTJets'
+  for top in topology2:
+    if top in sample['name'].lower(): sampleKey = 'WJets'
+  if not sampleKey: sampleKey = 'none'
   
   readVariables = ['met_pt/F', 'met_phi/F','met_eta/F','met_mass/F']
   newVariables = ['weight/F','muonDataSet/I','eleDataSet/I']
