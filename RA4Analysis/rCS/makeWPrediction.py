@@ -62,14 +62,45 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, QCD=Fa
   yTT_Var_crNJet_0b_highDPhi    = rCS_crNJet_0b_onlyTT['rCSE_pred']**2*yTT_crNJet_0b_lowDPhi**2 + rCS_crNJet_0b_onlyTT['rCS']**2*yTT_Var_crNJet_0b_lowDPhi
   yTT_Var_crNJet_0b_highDPhi_MC = rCS_crNJet_0b_onlyTT['rCSE_sim']**2*yTT_crNJet_0b_lowDPhi**2 + rCS_crNJet_0b_onlyTT['rCS']**2*yTT_Var_crNJet_0b_lowDPhi
   #yTT_Var_crNJet_0b_highDPhi    = rCS_crNJet_1b['rCSE_pred']**2*yTT_crNJet_0b_lowDPhi**2 + rCS_crNJet_1b['rCS']**2*yTT_Var_crNJet_0b_lowDPhi
-  yTT_crNJet_0b_lowDPhi_truth   = getYieldFromChain(cTTJets, crCutTruth+"&&"+dPhiStr+"<"+str(dPhiCut), weight = weight_str)
-  yTT_crNJet_0b_highDPhi_truth  = getYieldFromChain(cTTJets, crCutTruth+"&&"+dPhiStr+">"+str(dPhiCut), weight = weight_str)
+
+  muonCut = "&&abs(leptonPdg)==13&&"
+  yTT_crNJet_0b_lowDPhi_truth   = getYieldFromChain(cTTJets, crCutTruth+muonCut+dPhiStr+"<"+str(dPhiCut), weight = weight_str+'*weightBTag0'+btagWeightSuffix, returnError = True)
+  yTT_crNJet_0b_highDPhi_truth  = getYieldFromChain(cTTJets, crCutTruth+muonCut+dPhiStr+">"+str(dPhiCut), weight = weight_str+'*weightBTag0'+btagWeightSuffix, returnError = True)
+  
+  yW_crNJet_0b_lowDPhi_truth   = getYieldFromChain(cWJets, crCutTruth+muonCut+dPhiStr+"<"+str(dPhiCut), weight = weight_str+'*weightBTag0'+btagWeightSuffix, returnError = True)
+  yW_crNJet_0b_highDPhi_truth  = getYieldFromChain(cWJets, crCutTruth+muonCut+dPhiStr+">"+str(dPhiCut), weight = weight_str+'*weightBTag0'+btagWeightSuffix, returnError = True)
+
+  muonCut = '&&leptonPdg>0&&abs(leptonPdg)==13&&'
+  yW_crNJet_0b_lowDPhi_truth_PosPdg   = getYieldFromChain(cWJets, crCutTruth+muonCut+dPhiStr+"<"+str(dPhiCut), weight = weight_str+'*weightBTag0'+btagWeightSuffix, returnError = True)
+  yW_crNJet_0b_highDPhi_truth_PosPdg  = getYieldFromChain(cWJets, crCutTruth+muonCut+dPhiStr+">"+str(dPhiCut), weight = weight_str+'*weightBTag0'+btagWeightSuffix, returnError = True)
+
+  muonCut = '&&leptonPdg<0&&abs(leptonPdg)==13&&'
+  yW_crNJet_0b_lowDPhi_truth_NegPdg   = getYieldFromChain(cWJets, crCutTruth+muonCut+dPhiStr+"<"+str(dPhiCut), weight = weight_str+'*weightBTag0'+btagWeightSuffix, returnError = True)
+  yW_crNJet_0b_highDPhi_truth_NegPdg  = getYieldFromChain(cWJets, crCutTruth+muonCut+dPhiStr+">"+str(dPhiCut), weight = weight_str+'*weightBTag0'+btagWeightSuffix, returnError = True)
+  
   rd['yTT_crNJet_0b_lowDPhi']          =  yTT_crNJet_0b_lowDPhi         
   rd['yTT_Var_crNJet_0b_lowDPhi']      =  yTT_Var_crNJet_0b_lowDPhi     
   rd['yTT_crNJet_0b_highDPhi']         =  yTT_crNJet_0b_highDPhi        
   rd['yTT_Var_crNJet_0b_highDPhi']     =  yTT_Var_crNJet_0b_highDPhi    
-  rd['yTT_crNJet_0b_lowDPhi_truth']    =  yTT_crNJet_0b_lowDPhi_truth   
-  rd['yTT_crNJet_0b_highDPhi_truth']   =  yTT_crNJet_0b_highDPhi_truth  
+  rd['yTT_crNJet_0b_lowDPhi_truth']       =  yTT_crNJet_0b_lowDPhi_truth[0]
+  rd['yTT_Var_crNJet_0b_lowDPhi_truth']   =  yTT_crNJet_0b_lowDPhi_truth[1]
+  rd['yTT_crNJet_0b_highDPhi_truth']      =  yTT_crNJet_0b_highDPhi_truth[0]
+  rd['yTT_Var_crNJet_0b_highDPhi_truth']  =  yTT_crNJet_0b_highDPhi_truth[1]
+
+  rd['yW_crNJet_0b_lowDPhi_truth']       =  yW_crNJet_0b_lowDPhi_truth[0]
+  rd['yW_Var_crNJet_0b_lowDPhi_truth']   =  yW_crNJet_0b_lowDPhi_truth[1]
+  rd['yW_crNJet_0b_highDPhi_truth']      =  yW_crNJet_0b_highDPhi_truth[0]
+  rd['yW_Var_crNJet_0b_highDPhi_truth']  =  yW_crNJet_0b_highDPhi_truth[1]
+
+  rd['yW_crNJet_0b_lowDPhi_truth_PosPdg']       =  yW_crNJet_0b_lowDPhi_truth_PosPdg[0]
+  rd['yW_Var_crNJet_0b_lowDPhi_truth_PosPdg']   =  yW_crNJet_0b_lowDPhi_truth_PosPdg[1]
+  rd['yW_crNJet_0b_highDPhi_truth_PosPdg']      =  yW_crNJet_0b_highDPhi_truth_PosPdg[0]
+  rd['yW_Var_crNJet_0b_highDPhi_truth_PosPdg']  =  yW_crNJet_0b_highDPhi_truth_PosPdg[1]
+
+  rd['yW_crNJet_0b_lowDPhi_truth_NegPdg']       =  yW_crNJet_0b_lowDPhi_truth_NegPdg[0]
+  rd['yW_Var_crNJet_0b_lowDPhi_truth_NegPdg']   =  yW_crNJet_0b_lowDPhi_truth_NegPdg[1]
+  rd['yW_crNJet_0b_highDPhi_truth_NegPdg']      =  yW_crNJet_0b_highDPhi_truth_NegPdg[0]
+  rd['yW_Var_crNJet_0b_highDPhi_truth_NegPdg']  =  yW_crNJet_0b_highDPhi_truth_NegPdg[1]
 
 #  print "Check: Impact of TT on RCS(W)"
 #  print "Subtract numerator  ", yTT_crNJet_0b_highDPhi,'(rcs=',rCS_crNJet_1b['rCS'],'yield_0b',yTT_crNJet_0b_lowDPhi,') true',yTT_crNJet_0b_highDPhi_truth
@@ -104,10 +135,12 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, QCD=Fa
       (y_Var_crNJet_0b_highDPhi + yTT_Var_crNJet_0b_highDPhi)/(y_crNJet_0b_highDPhi - yTT_crNJet_0b_highDPhi)**2 
      +(y_Var_crNJet_0b_lowDPhi + yTT_Var_crNJet_0b_lowDPhi)/(y_crNJet_0b_lowDPhi - yTT_crNJet_0b_lowDPhi)**2
       )
+
   rCS_Var_W_crNJet_0b_corr_MC = rCS_W_crNJet_0b_corr**2*(\
       (y_Var_crNJet_0b_highDPhi + yTT_Var_crNJet_0b_highDPhi_MC)/(y_crNJet_0b_highDPhi - yTT_crNJet_0b_highDPhi)**2
      +(y_Var_crNJet_0b_lowDPhi + yTT_Var_crNJet_0b_lowDPhi)/(y_crNJet_0b_lowDPhi - yTT_crNJet_0b_lowDPhi)**2
       )
+
   rCS_W_crNJet_0b_notcorr     = (y_crNJet_0b_highDPhi )/(y_crNJet_0b_lowDPhi )
   rCS_Var_W_crNJet_0b_notcorr = rCS_W_crNJet_0b_notcorr**2*( UncertaintyDivision(y_Var_crNJet_0b_highDPhi,y_crNJet_0b_highDPhi**2) + (y_Var_crNJet_0b_lowDPhi)/(y_crNJet_0b_lowDPhi)**2 )
 
@@ -145,6 +178,7 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, QCD=Fa
       (y_Var_crNJet_0b_highDPhi_PosPdg + (0.5*yTT_Var_crNJet_0b_highDPhi))/(y_crNJet_0b_highDPhi_PosPdg - (0.5*yTT_crNJet_0b_highDPhi))**2 
      +(y_Var_crNJet_0b_lowDPhi_PosPdg + (0.5*yTT_Var_crNJet_0b_lowDPhi))/(y_crNJet_0b_lowDPhi_PosPdg - (0.5*yTT_crNJet_0b_lowDPhi))**2
       )
+
   rCS_Var_W_PosPdg_crNJet_0b_corr_MC = rCS_W_PosPdg_crNJet_0b_corr**2*(\
       (y_Var_crNJet_0b_highDPhi_PosPdg + (0.5*yTT_Var_crNJet_0b_highDPhi_MC))/(y_crNJet_0b_highDPhi_PosPdg - (0.5*yTT_crNJet_0b_highDPhi))**2
      +(y_Var_crNJet_0b_lowDPhi_PosPdg + (0.5*yTT_Var_crNJet_0b_lowDPhi))/(y_crNJet_0b_lowDPhi_PosPdg - (0.5*yTT_crNJet_0b_lowDPhi))**2
