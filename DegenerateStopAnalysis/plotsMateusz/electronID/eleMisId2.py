@@ -2,14 +2,14 @@
 import ROOT
 import os, sys
 from Workspace.HEPHYPythonTools.helpers import getChunks, getChain#, getPlotFromChain, getYieldFromChain
-from Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_7412pass2 import *
+from Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_7412pass2_v4 import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from array import array
 from math import pi, sqrt #cos, sin, sinh, log
 
 #Input options
-inputSample = "WJets" # "Signal" "TTJets" "WJets"
-zoom = 1
+inputSample = "Signal" # "Signal" "TTJets" "WJets"
+zoom = 0
 save = 1
 presel = 1
 
@@ -145,8 +145,6 @@ for i in range(1,5): #hists 1-4
    hists_passed[i-1].SetLineWidth(3)
    hists_passed[i-1].Draw("histsame")
 
-
-
 hists_passed[0].SetName("electrons_veto")
 hists_passed[0].SetLineColor(ROOT.kGreen+3)
 
@@ -252,9 +250,8 @@ effs[3].SetMarkerColor(ROOT.kRed+1)
 effs[3].SetLineColor(ROOT.kRed+1)
 effs[3].Draw("sameP")
 
-
 #Efficiency WP80
-effs[4].SetName("eff6")
+effs[4].SetName("eff5")
 effs[4].SetMarkerColor(ROOT.kAzure+5)
 effs[4].SetMarkerStyle(22)
 effs[4].SetMarkerSize(1)
@@ -262,7 +259,7 @@ effs[4].Draw("sameP")
 effs[4].SetLineColor(ROOT.kAzure+5)
 
 #Efficiency WP90
-effs[5].SetName("eff5")
+effs[5].SetName("eff6")
 effs[5].SetMarkerColor(ROOT.kMagenta+2)
 effs[5].SetMarkerStyle(22)
 effs[5].SetMarkerSize(1)

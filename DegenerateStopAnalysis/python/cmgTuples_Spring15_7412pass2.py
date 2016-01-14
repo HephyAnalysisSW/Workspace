@@ -371,7 +371,6 @@ def getSignalSample(dir, signal,component):
       'dir' : dir,
       'dbsName':component.dataset,
       'isData':False,
-      #"rootFileLocation":"treeProducerSusySingleLepton/tree.root",
       "rootFileLocation":"tree.root",
       "treeName":"tree",
       #"skimAnalyzerDir":"skimAnalyzerCount",

@@ -2,7 +2,7 @@
 import ROOT
 import os, sys
 from Workspace.HEPHYPythonTools.helpers import getChunks, getChain, getObjDict, deltaPhi#, getPlotFromChain, getYieldFromChain
-from Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_7412pass2 import *
+from Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_7412pass2_v4 import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from array import array
 from math import pi, sqrt #cos, sin, sinh, log
@@ -11,7 +11,7 @@ def deltaR(l1, l2):
   return sqrt(deltaPhi(l1['phi'], l2['phi'])**2 + (l1['eta'] - l2['eta'])**2)
 
 #Input options
-inputSample = "WJets" # "Signal" "TTJets" "WJets"
+inputSample = "Signal" # "Signal" "TTJets" "WJets"
 zoom = 1
 save = 1
 presel = 1
