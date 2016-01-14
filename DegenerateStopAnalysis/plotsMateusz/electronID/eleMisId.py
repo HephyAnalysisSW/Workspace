@@ -2,13 +2,13 @@
 import ROOT
 import os, sys
 from Workspace.HEPHYPythonTools.helpers import getChunks, getChain#, getPlotFromChain, getYieldFromChain
-from Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_7412pass2 import *
+from Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_7412pass2_v4 import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from array import array
 from math import pi, sqrt #cos, sin, sinh, log
 
 #Input options
-inputSample = "WJets" # "Signal" "TTJets" "WJets"
+inputSample = "Signal" # "Signal" "TTJets" "WJets"
 zoom = 1
 save = 1
 presel = 1
@@ -128,7 +128,7 @@ for i in range(0,4): #hists 1-4
    hists_total.append(makeHistVarBins(Events, "LepGood_pt", normFactor + "*" + weight + "*(" + preSel + "&&" + recoSel + "&& (" + cutSel + str(i+1) + "))", bins)) 
    hists_passed.append(makeHistVarBins(Events, "LepGood_pt", normFactor + "*" + weight + "*(" + preSel + "&&" + recoSel + "&&" + misMatchSel + "&& (" + cutSel + str(i+1) + "))", bins)) 
 
-   if i == 1: hists_total[0].Draw("hist")   
+   if i == 0: hists_total[0].Draw("hist")   
    hists_passed[i].SetFillColor(0)
    hists_passed[i].SetLineWidth(3)
    hists_passed[i].Draw("histsame")
@@ -258,7 +258,7 @@ effs[3].Draw("sameP")
 
 
 #Efficiency WP80
-effs[4].SetName("eff6")
+effs[4].SetName("eff5")
 effs[4].SetMarkerColor(ROOT.kAzure+5)
 effs[4].SetMarkerStyle(22)
 effs[4].SetMarkerSize(1)
@@ -266,7 +266,7 @@ effs[4].Draw("sameP")
 effs[4].SetLineColor(ROOT.kAzure+5)
 
 #Efficiency WP90
-effs[5].SetName("eff5")
+effs[5].SetName("eff6")
 effs[5].SetMarkerColor(ROOT.kMagenta+2)
 effs[5].SetMarkerStyle(22)
 effs[5].SetMarkerSize(1)

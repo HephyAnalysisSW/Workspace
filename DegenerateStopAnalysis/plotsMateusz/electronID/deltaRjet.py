@@ -2,13 +2,13 @@
 import ROOT
 import os, sys
 from Workspace.HEPHYPythonTools.helpers import getChunks, getChain#, getPlotFromChain, getYieldFromChain
-from Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_7412pass2 import *
+from Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_7412pass2_v4 import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from array import array
 from math import pi, sqrt #cos, sin, sinh, log
 
 #Input options
-inputSample = "WJets" # "Signal" "TTJets" "WJets"
+inputSample = "Signal" # "Signal" "TTJets" "WJets"
 save = 1
 presel = 1
 nEles = "01" # 01,01tau,1,2
@@ -92,7 +92,7 @@ preSel2 = "(Sum$(Jet_pt*(Jet_pt > 30 && abs(Jet_eta) < 4.5 && Jet_id)) > 200)" #
 preSel3 = "(Max$(Jet_pt*(abs(Jet_eta) < " + str(etaAcc) + ") > 100))" #ISR
 #preSel4 = "(abs(genLep_pdgId) == 11 && abs(genLep_eta) < " + str(etaAcc) + " && genLep_pt < 30)" #Soft electron spectrum
 
-if presel == 1: preSel = preSel1 + "&&" + preSel2 + "&&" + preSel3 + "&&" + preSel4
+if presel == 1: preSel = preSel1 + "&&" + preSel2 + "&&" + preSel3# + "&&" + preSel4
 elif presel == 0: preSel = "1"
 
 deltaRcut = 0.3

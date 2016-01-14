@@ -213,9 +213,9 @@ def getSignalSample(dir, signal):
       'dir' : dir,
       'dbsName':signal,
       'isData':False,
-      "rootFileLocation":"treeProducerSusySingleLepton/tree.root",
+      #"rootFileLocation":"tree.root",
       "treeName":"tree",
-      "skimAnalyzerDir":"skimAnalyzerCount",
+      #"skimAnalyzerDir":"skimAnalyzerCount",
       }
   else:
     print "Signal",signal,"unknown. Available: ",", ".join(allSignalStrings)
