@@ -35,7 +35,7 @@ separateBTagWeights = True
 
 defSampleStr = "TTJets_LO"
 
-subDir = "postProcessing_Syst_topPt_diLep"
+subDir = "postProcessing_data_2p2fb"
 #subDir = "postProcessing_Tests"
 
 #branches to be kept for data and MC
@@ -196,10 +196,10 @@ for isample, sample in enumerate(allSamples):
     lumiScaleFactor = target_lumi/float(sumWeight)
     branchKeepStrings = branchKeepStrings_DATAMC + branchKeepStrings_MC
   
-  sampleKey = ''
-  if 'TTJets' in sample['dbsName']: sampleKey = 'TTJets'
-  elif 'WJets' in sample['dbsName']: sampleKey = 'WJets'
-  else: sampleKey = 'none'
+    sampleKey = ''
+    if 'TTJets' in sample['dbsName']: sampleKey = 'TTJets'
+    elif 'WJets' in sample['dbsName']: sampleKey = 'WJets'
+    else: sampleKey = 'none'
   
   readVariables = ['met_pt/F', 'met_phi/F','met_eta/F','met_mass/F']
   newVariables = ['weight/F','muonDataSet/I','eleDataSet/I']
@@ -208,9 +208,9 @@ for isample, sample in enumerate(allSamples):
   readVectors = [\
     {'prefix':'LepGood', 'nMax':8, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I','charge/F' ,'relIso03/F','SPRING15_25ns_v1/I' ,'tightId/I', 'miniRelIso/F','mass/F','sip3d/F','mediumMuonId/I', 'mvaIdPhys14/F','mvaIdSpring15/F','lostHits/I', 'convVeto/I']},
     {'prefix':'Jet',  'nMax':100, 'vars':['pt/F', 'eta/F', 'phi/F', 'id/I','btagCSV/F', 'btagCMVA/F']},
-    {'prefix':'GenPart',  'nMax':100, 'vars':['eta/F','pt/F','phi/F','mass/F','charge/F', 'pdgId/I', 'motherId/F', 'grandmotherId/F']},
   ]
   if not sample['isData']: 
+    readVectors.append({'prefix':'GenPart',  'nMax':100, 'vars':['eta/F','pt/F','phi/F','mass/F','charge/F', 'pdgId/I', 'motherId/F', 'grandmotherId/F']})
     newVariables.extend(['puReweight_true/F','puReweight_true_max4/F','puReweight_true_Down/F','puReweight_true_Up/F','weight_diLepTTBar0p5/F','weight_diLepTTBar2p0/F','weight_XSecTTBar1p1/F','weight_XSecTTBar0p9/F','weight_XSecWJets1p1/F','weight_XSecWJets0p9/F'])
     newVariables.extend(['GenTopPt/F/-999.','GenAntiTopPt/F/-999.','TopPtWeight/F/1.','GenTTBarPt/F/-999.','GenTTBarWeight/F/1.','nGenTops/I/0.'])
     newVariables.extend(['lepton_muSF_looseID/D/1.','lepton_muSF_mediumID/D/1.','lepton_muSF_miniIso02/D/1.','lepton_muSF_sip3d/D/1.','lepton_eleSF_cutbasedID/D/1.','lepton_eleSF_miniIso01/D/1.'])
@@ -295,8 +295,6 @@ for isample, sample in enumerate(allSamples):
             s.muonDataSet = False
             s.eleDataSet = True
 
-        nTrueInt = t.GetLeaf('nTrueInt').GetValue()
-        
         if not sample['isData']:
           s.muonDataSet = False
           s.eleDataSet = False
@@ -382,16 +380,16 @@ for isample, sample in enumerate(allSamples):
         #s.mt2w = mt2w.mt2w(met = {'pt':r.met_pt, 'phi':r.met_phi}, l={'pt':s.leptonPt, 'phi':s.leptonPhi, 'eta':s.leptonEta}, ljets=lightJets, bjets=bJetsCSV)
         s.deltaPhi_Wl = acos((s.leptonPt+r.met_pt*cos(s.leptonPhi-r.met_phi))/sqrt(s.leptonPt**2+r.met_pt**2+2*r.met_pt*s.leptonPt*cos(s.leptonPhi-r.met_phi))) 
 
-        g_list=['eta','pt','phi','mass','charge', 'pdgId', 'motherId', 'grandmotherId']
-        genParts = get_cmg_genParts_fromStruct(r,g_list)
-
         #For systematics 
-        rand_input = evt_branch*lumi_branch
-        calc_diLep_contributions(s,r,tightHardLep,rand_input)
-        calc_TopPt_Weights(s,genParts)
-        calc_LeptonScale_factors_and_systematics(s,histos_LS)
-        if calcSystematics: 
-          calc_btag_systematics(t,s,r,mcEffDict,sampleKey,maxConsideredBTagWeight,separateBTagWeights)
+        if not sample['isData']:
+          g_list=['eta','pt','phi','mass','charge', 'pdgId', 'motherId', 'grandmotherId']
+          genParts = get_cmg_genParts_fromStruct(r,g_list)
+          rand_input = evt_branch*lumi_branch
+          calc_diLep_contributions(s,r,tightHardLep,rand_input)
+          calc_TopPt_Weights(s,genParts)
+          calc_LeptonScale_factors_and_systematics(s,histos_LS)
+          if calcSystematics: 
+            calc_btag_systematics(t,s,r,mcEffDict,sampleKey,maxConsideredBTagWeight,separateBTagWeights)
 
         for v in newVars:
           v['branch'].Fill()
