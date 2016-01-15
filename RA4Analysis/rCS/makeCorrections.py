@@ -1,7 +1,7 @@
 import ROOT
 import pickle
 import os,sys,math
-from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYieldFromChain
+from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYieldFromChain, getPropagatedError
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,varBinName
 
 from Workspace.HEPHYPythonTools.user import username
@@ -162,9 +162,9 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
         latex2.DrawLatex(0.17,0.96,'CMS #bf{#it{simulation}}')
         latex2.DrawLatex(0.7,0.96,"L=2.1fb^{-1} (13TeV)")
 
-        ttcan.Print(fitPrintDir+cname+'_ttjets_'+Wc['name']+'_fit.png')
-        ttcan.Print(fitPrintDir+cname+'_ttjets_'+Wc['name']+'_fit.pdf')
-        ttcan.Print(fitPrintDir+cname+'_ttjets_'+Wc['name']+'_fit.root')
+        ttcan.Print(fitPrintDir+cname+'_ttjets_all_fit.png')
+        ttcan.Print(fitPrintDir+cname+'_ttjets_all_fit.pdf')
+        ttcan.Print(fitPrintDir+cname+'_ttjets_all_fit.root')
         
         #print ttD, ttK
 
@@ -375,7 +375,7 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
         else:
           TT_pred_forTotal = TT_pred_corr
           TT_pred_err_forTotal = TT_stat_err
-
+        
         print
         print '## ** Total prediction origin/updated for',Wc['name'],'charges **'
         print '##',getValErrString(res[njb][stb][htb][tot_key],res[njb][stb][htb][tot_err_key])
@@ -387,6 +387,16 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
           del wJetRcsFitH
 
       print
+      print 'Calculating kappa values'
+      if not isData:
+        TT_kappa, TT_kappa_err = getPropagatedError(res[njb][stb][htb]['TT_truth'], res[njb][stb][htb]['TT_truth_err'], TT_pred_forTotal, TT_pred_err_forTotal, returnCalcResult=True)
+        W_kappa, W_kappa_err = getPropagatedError(res[njb][stb][htb]['W_truth'], res[njb][stb][htb]['W_truth_err'], res[njb][stb][htb]['W_pred'], res[njb][stb][htb]['W_pred_err'], returnCalcResult=True)
+        res[njb][stb][htb]['TT_kappa'] = TT_kappa
+        res[njb][stb][htb]['TT_kappa_err'] = TT_kappa_err
+        res[njb][stb][htb]['W_kappa'] = W_kappa
+        res[njb][stb][htb]['W_kappa_err'] = W_kappa_err
+      print 'kappa(TT):', getValErrString(TT_kappa,TT_kappa_err)
+      print 'kappa(W):', getValErrString(W_kappa,W_kappa_err)
 
       if createFits:
         del ttJetRcsFitH, ttJetRcsFitH1b

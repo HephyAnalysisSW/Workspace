@@ -14,7 +14,7 @@ from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed impor
 from Workspace.HEPHYPythonTools.user import username
 from Workspace.RA4Analysis.signalRegions import *
 
-testRun = True
+testRun = False
 
 ## b-tagging and other variables
 dPhiStr = 'deltaPhi_Wl'
@@ -124,7 +124,7 @@ fitPrintDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results'+year
 
 ## do stuff for test runs
 if testRun:
-  signalRegions = smallRegion
+  signalRegions = oneRegion
   predictionName = 'testRun'
   printDir    = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results'+year+'/25ns/templateFit_'+predictionName+'_'+lumistr+'/'
   pickleDir   = '/data/'+username+'/Results'+year+'/Prediction_'+predictionName+'_'+lumistr+'/'

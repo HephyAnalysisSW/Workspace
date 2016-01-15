@@ -5,6 +5,7 @@ import copy, os, sys
 #dir = '/data/easilar/cmgTuples/postProcessed_Spring15_btagEff_SF15/HT500ST250/hard/'
 #dir = '/data/easilar/cmgTuples/postProcessing_Syst/HT500LT250/'
 dir = '/data/easilar/cmgTuples/postProcessing_Syst_topPt_diLep/HT500LT250/'
+
 ####usual HT combination####
 TTJets_HTLO_25ns={\
 "name" : "tt+Jets_LO",
