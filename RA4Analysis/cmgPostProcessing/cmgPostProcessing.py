@@ -16,7 +16,7 @@ ROOT.AutoLibraryLoader.enable()
 from Workspace.HEPHYPythonTools.helpers import getChunks
 from Workspace.RA4Analysis.cmgTuples_Data25ns_miniAODv2 import *
 from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns import *
-from systematics_helper import calc_btag_systematics, calc_LeptonScale_factors_and_systematics, calc_TopPt_Weights
+from systematics_helper import calc_btag_systematics, calc_LeptonScale_factors_and_systematics, calc_TopPt_Weights , calcDLDictionary, calc_diLep_contributions
 from btagEfficiency import *
 
 bTagEffFile = '/data/dspitzbart/Results2015/MCEff_skim_pkl'
@@ -35,8 +35,8 @@ separateBTagWeights = True
 
 defSampleStr = "TTJets_LO"
 
-#subDir = "postProcessing_Syst"
-subDir = "postProcessing_Tests"
+subDir = "postProcessing_Syst_topPt_diLep"
+#subDir = "postProcessing_Tests"
 
 #branches to be kept for data and MC
 branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert",
@@ -127,9 +127,15 @@ if sys.argv[0].count('ipython'):
   options.small=True
 
 ###For PU reweight###
-PU_File = ROOT.TFile("/data/easilar/tuples_from_Artur/JECv6recalibrateMET_2100pb/trig_skim/PUhistos/ratio_PU.root")
-PU_histo = PU_File.Get("h_ratio")
+PU_dir = "/data/easilar/tuples_from_Artur/JECv6recalibrateMET_2p2fb/PUhistos/"
+PU_File_66mb = ROOT.TFile(PU_dir+"/pileUp_66mb_map.root")
+PU_File_70mb = ROOT.TFile(PU_dir+"/pileUp_70mb_map.root")
+PU_File_74mb = ROOT.TFile(PU_dir+"/pileUp_74mb_map.root")
+PU_histo_66 = PU_File_66mb.Get("h_ratio_66")
+PU_histo_70 = PU_File_70mb.Get("h_ratio_70")
+PU_histo_74 = PU_File_74mb.Get("h_ratio_74")
 #####################
+
 ###For Lepton SF#####
 mu_mediumID_File = ROOT.TFile("/data/easilar/SF2015/TnP_MuonID_NUM_MediumID_DENOM_generalTracks_VAR_map_pt_eta.root")
 mu_looseID_File = ROOT.TFile("/data/easilar/SF2015/TnP_MuonID_NUM_LooseID_DENOM_generalTracks_VAR_map_pt_eta-2.root")
@@ -187,8 +193,7 @@ for isample, sample in enumerate(allSamples):
     lumiScaleFactor=1
     branchKeepStrings = branchKeepStrings_DATAMC + branchKeepStrings_DATA 
   else:
-    if ("TTJets" in sample['dbsName']): lumiScaleFactor = xsec[sample['dbsName']]*target_lumi/float(sumWeight)
-    else: lumiScaleFactor = target_lumi/float(sumWeight)
+    lumiScaleFactor = target_lumi/float(sumWeight)
     branchKeepStrings = branchKeepStrings_DATAMC + branchKeepStrings_MC
   
   sampleKey = ''
@@ -196,20 +201,26 @@ for isample, sample in enumerate(allSamples):
   elif 'WJets' in sample['dbsName']: sampleKey = 'WJets'
   else: sampleKey = 'none'
   
-  readVariables = ['met_pt/F', 'met_phi/F']
+  readVariables = ['met_pt/F', 'met_phi/F','met_eta/F','met_mass/F']
   newVariables = ['weight/F','muonDataSet/I','eleDataSet/I']
   aliases = [ "met:met_pt", "metPhi:met_phi"]
 
   readVectors = [\
-    {'prefix':'LepGood', 'nMax':8, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I', 'relIso03/F','SPRING15_25ns_v1/I' ,'tightId/I', 'miniRelIso/F','mass/F','sip3d/F','mediumMuonId/I', 'mvaIdPhys14/F','mvaIdSpring15/F','lostHits/I', 'convVeto/I']},
+    {'prefix':'LepGood', 'nMax':8, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I','charge/F' ,'relIso03/F','SPRING15_25ns_v1/I' ,'tightId/I', 'miniRelIso/F','mass/F','sip3d/F','mediumMuonId/I', 'mvaIdPhys14/F','mvaIdSpring15/F','lostHits/I', 'convVeto/I']},
     {'prefix':'Jet',  'nMax':100, 'vars':['pt/F', 'eta/F', 'phi/F', 'id/I','btagCSV/F', 'btagCMVA/F']},
     {'prefix':'GenPart',  'nMax':100, 'vars':['eta/F','pt/F','phi/F','mass/F','charge/F', 'pdgId/I', 'motherId/F', 'grandmotherId/F']},
   ]
   if not sample['isData']: 
-    newVariables.extend(['puReweight_true/F','puReweight_true_Down/F','puReweight_true_Up/F','weight_diLepTTBar0p5/F','weight_diLepTTBar2p0/F','weight_XSecTTBar1p1/F','weight_XSecTTBar0p9/F','weight_XSecWJets1p1/F','weight_XSecWJets0p9/F'])
-    newVariables.extend(['GenTopPt/F/-999','GenAntiTopPt/F/-999','TopPtWeight/F/1','GenTTBarPt/F/-999','GenTTBarWeight/F/1','nGenTops/I/0'])
+    newVariables.extend(['puReweight_true/F','puReweight_true_max4/F','puReweight_true_Down/F','puReweight_true_Up/F','weight_diLepTTBar0p5/F','weight_diLepTTBar2p0/F','weight_XSecTTBar1p1/F','weight_XSecTTBar0p9/F','weight_XSecWJets1p1/F','weight_XSecWJets0p9/F'])
+    newVariables.extend(['GenTopPt/F/-999.','GenAntiTopPt/F/-999.','TopPtWeight/F/1.','GenTTBarPt/F/-999.','GenTTBarWeight/F/1.','nGenTops/I/0.'])
     newVariables.extend(['lepton_muSF_looseID/D/1.','lepton_muSF_mediumID/D/1.','lepton_muSF_miniIso02/D/1.','lepton_muSF_sip3d/D/1.','lepton_eleSF_cutbasedID/D/1.','lepton_eleSF_miniIso01/D/1.'])
     newVariables.extend(['lepton_muSF_looseID_err/D/0.','lepton_muSF_mediumID_err/D/0.','lepton_muSF_miniIso02_err/D/0.','lepton_muSF_sip3d_err/D/0.','lepton_eleSF_cutbasedID_err/D/0.','lepton_eleSF_miniIso01_err/D/0.'])
+    newVariables.extend(['LepToKeep_pdgId/I','l1l2ovMET_lepToKeep/F','Vecl1l2ovMET_lepToKeep/F','DPhil1l2_lepToKeep/F'])
+    newVariables.extend(['l1l2ovMET_lepToDiscard/F','Vecl1l2ovMET_lepToDiscard/F','DPhil1l2_lepToDiscard/F'])
+    for action in ["notAddLepMet" , "AddLepMet" , "AddLep1ov3Met"]:
+      for var_DL in ["ST","HT","dPhiLepW","nJet"] :
+         for lep_DL in ["lepToDiscard" , "lepToKeep"]:
+           newVariables.extend(["DL_"+var_DL+"_"+lep_DL+"_"+action+"/F/-999."])
     aliases.extend(['genMet:met_genPt', 'genMetPhi:met_genPhi'])
   newVariables.extend( ['nLooseSoftLeptons/I', 'nLooseHardLeptons/I', 'nTightSoftLeptons/I', 'nTightHardLeptons/I'] )
   newVariables.extend( ['deltaPhi_Wl/F','nBJetMediumCSV30/I','nJet30/I','htJet30j/F','st/F'])
@@ -273,6 +284,8 @@ for isample, sample in enumerate(allSamples):
         t.GetEntry(i)
         genWeight = 1 if sample['isData'] else t.GetLeaf('genWeight').GetValue()
         xsec_branch = 1 if sample['isData'] else t.GetLeaf('xsec').GetValue()
+        lumi_branch = t.GetLeaf('lumi').GetValue()
+        evt_branch = t.GetLeaf('evt').GetValue()
         s.weight = lumiScaleFactor*genWeight
         if sample['isData']:
           if "Muon" in sample['name']:
@@ -289,13 +302,13 @@ for isample, sample in enumerate(allSamples):
           s.eleDataSet = False
           s.weight =xsec_branch*lumiScaleFactor*genWeight
           nTrueInt = t.GetLeaf('nTrueInt').GetValue()
-          s.puReweight_true = PU_histo.GetBinContent(PU_histo.FindBin(nTrueInt))
-          s.puReweight_true_Down = s.puReweight_true*0.95
-          s.puReweight_true_Up = s.puReweight_true*1.05
+          s.puReweight_true = PU_histo_70.GetBinContent(PU_histo_70.FindBin(nTrueInt))
+          s.puReweight_true_max4 = min(4,s.puReweight_true)
+          s.puReweight_true_Down = PU_histo_66.GetBinContent(PU_histo_66.FindBin(nTrueInt))
+          s.puReweight_true_Up = PU_histo_74.GetBinContent(PU_histo_74.FindBin(nTrueInt))
           ngenLep = t.GetLeaf('ngenLep').GetValue()
           ngenTau = t.GetLeaf('ngenTau').GetValue()
           if ("TTJets" in sample['dbsName']):
-            s.weight = lumiScaleFactor*genWeight
             s.weight_XSecTTBar1p1 = s.weight*1.1
             s.weight_XSecTTBar0p9 = s.weight*0.9
             if ngenLep+ngenTau == 2:
@@ -331,7 +344,7 @@ for isample, sample in enumerate(allSamples):
         s.nLooseHardLeptons = len(looseHardLepInd)
         s.nTightSoftLeptons = len(tightSoftLepInd)
         s.nTightHardLeptons = len(tightHardLepInd)
-        vars = ['pt', 'eta', 'phi', 'miniRelIso','relIso03', 'pdgId', 'SPRING15_25ns_v1']
+        vars = ['pt', 'eta', 'phi','mass' ,'charge' ,'miniRelIso','relIso03', 'pdgId', 'SPRING15_25ns_v1']
         allLeptons = [getObjDict(t, 'LepGood_', vars, i) for i in looseLepInd]
         looseSoftLep = [getObjDict(t, 'LepGood_', vars, i) for i in looseSoftLepInd] 
         looseHardLep = [getObjDict(t, 'LepGood_', vars, i) for i in looseHardLepInd]
@@ -373,6 +386,8 @@ for isample, sample in enumerate(allSamples):
         genParts = get_cmg_genParts_fromStruct(r,g_list)
 
         #For systematics 
+        rand_input = evt_branch*lumi_branch
+        calc_diLep_contributions(s,r,tightHardLep,rand_input)
         calc_TopPt_Weights(s,genParts)
         calc_LeptonScale_factors_and_systematics(s,histos_LS)
         if calcSystematics: 
@@ -404,9 +419,12 @@ for isample, sample in enumerate(allSamples):
     size=0
     counter=0
     files=[]
+    print "files to HADD" , filesForHadd
     for f in filesForHadd:
       size+=os.path.getsize(tmpDir+'/'+f)
       files.append(f)
+      print "f: " , f
+      print "size :" , size
       if size>(0.5*(10**9)) or f==filesForHadd[-1] or len(files)>200:
         ofile = outDir+'/'+sample['name']+'_'+options.skim+'_'+str(counter)+'.root'
         print "Running hadd on", tmpDir, files
