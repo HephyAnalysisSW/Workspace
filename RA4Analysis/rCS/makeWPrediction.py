@@ -67,7 +67,7 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, QCD=Fa
   yTT_Var_crNJet_0b_highDPhi_MC = rCS_crNJet_0b_onlyTT['rCSE_sim']**2*yTT_crNJet_0b_lowDPhi**2 + rCS_crNJet_0b_onlyTT['rCS']**2*yTT_Var_crNJet_0b_lowDPhi
   #yTT_Var_crNJet_0b_highDPhi    = rCS_crNJet_1b['rCSE_pred']**2*yTT_crNJet_0b_lowDPhi**2 + rCS_crNJet_1b['rCS']**2*yTT_Var_crNJet_0b_lowDPhi
 
-  # Get all the MC truth yields !
+  # Get all the MC truth yields and save them in the pickle file, use all available SFs.
 
   chargeList = [{'charge':'', 'muonCut':"&&abs(leptonPdg)==13&&"},{'charge':'_PosPdg', 'muonCut':'&&leptonPdg>0&&abs(leptonPdg)==13&&'}, {'charge':'_NegPdg', 'muonCut':'&&leptonPdg<0&&abs(leptonPdg)==13&&'}]
   MCsamples = [{'name':'TT', 'chain':cTTJets}, {'name':'W', 'chain':cWJets}, {'name':'Rest','chain':cRest}]
@@ -272,10 +272,18 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, QCD=Fa
   #predicted yields with RCS method
   pred_W                = yW_srNJet_0b_lowDPhi*rCS_W_crNJet_0b_corr['rCS']
   pred_Var_W            = yW_Var_srNJet_0b_lowDPhi*rCS_W_crNJet_0b_corr['rCS']**2 + yW_srNJet_0b_lowDPhi**2*rCS_W_crNJet_0b_corr['rCSE_sim']**2
-  pred_W_PosPdg         = yW_PosPdg_srNJet_0b_lowDPhi*rCS_W_PosPdg_crNJet_0b_corr['rCS']
-  pred_Var_W_PosPdg     = yW_PosPdg_Var_srNJet_0b_lowDPhi*rCS_W_PosPdg_crNJet_0b_corr['rCS']**2 + yW_PosPdg_srNJet_0b_lowDPhi**2*rCS_W_PosPdg_crNJet_0b_corr['rCSE_sim']**2
-  pred_W_NegPdg         = yW_NegPdg_srNJet_0b_lowDPhi*rCS_W_NegPdg_crNJet_0b_corr['rCS']
-  pred_Var_W_NegPdg     = yW_NegPdg_Var_srNJet_0b_lowDPhi*rCS_W_NegPdg_crNJet_0b_corr['rCS']**2 + yW_NegPdg_srNJet_0b_lowDPhi**2*rCS_W_NegPdg_crNJet_0b_corr['rCSE_sim']**2
+  pred_corrRest_W       = yW_srNJet_0b_lowDPhi*rCS_W_crNJet_0b_corr_rest['rCS']
+  pred_Var_corrRest_W   = yW_Var_srNJet_0b_lowDPhi*rCS_W_crNJet_0b_corr_rest['rCS']**2 + yW_srNJet_0b_lowDPhi**2*rCS_W_crNJet_0b_corr_rest['rCSE_sim']**2
+
+  pred_W_PosPdg               = yW_PosPdg_srNJet_0b_lowDPhi*rCS_W_PosPdg_crNJet_0b_corr['rCS']
+  pred_Var_W_PosPdg           = yW_PosPdg_Var_srNJet_0b_lowDPhi*rCS_W_PosPdg_crNJet_0b_corr['rCS']**2 + yW_PosPdg_srNJet_0b_lowDPhi**2*rCS_W_PosPdg_crNJet_0b_corr['rCSE_sim']**2
+  pred_corrRest_W_PosPdg      = yW_PosPdg_srNJet_0b_lowDPhi*rCS_W_PosPdg_crNJet_0b_corr_rest['rCS']
+  pred_Var_corrRest_W_PosPdg  = yW_PosPdg_Var_srNJet_0b_lowDPhi*rCS_W_PosPdg_crNJet_0b_corr_rest['rCS']**2 + yW_PosPdg_srNJet_0b_lowDPhi**2*rCS_W_PosPdg_crNJet_0b_corr_rest['rCSE_sim']**2
+
+  pred_W_NegPdg               = yW_NegPdg_srNJet_0b_lowDPhi*rCS_W_NegPdg_crNJet_0b_corr['rCS']
+  pred_Var_W_NegPdg           = yW_NegPdg_Var_srNJet_0b_lowDPhi*rCS_W_NegPdg_crNJet_0b_corr['rCS']**2 + yW_NegPdg_srNJet_0b_lowDPhi**2*rCS_W_NegPdg_crNJet_0b_corr['rCSE_sim']**2
+  pred_corrRest_W_NegPdg      = yW_NegPdg_srNJet_0b_lowDPhi*rCS_W_NegPdg_crNJet_0b_corr_rest['rCS']
+  pred_Var_corrRest_W_NegPdg  = yW_NegPdg_Var_srNJet_0b_lowDPhi*rCS_W_NegPdg_crNJet_0b_corr_rest['rCS']**2 + yW_NegPdg_srNJet_0b_lowDPhi**2*rCS_W_NegPdg_crNJet_0b_corr_rest['rCSE_sim']**2
 
 
   print "W pred:",pred_W,'+/-',sqrt(pred_Var_W),'W truth:',truth_W,'+/-',sqrt(truth_W_var)
@@ -284,10 +292,13 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, QCD=Fa
 
 
   rd.update( {"W_pred":pred_W,"W_pred_err":sqrt(pred_Var_W),\
+              "W_pred_corrRest":pred_corrRest_W,"W_pred_corrRest_err":sqrt(pred_Var_corrRest_W),\
               "W_truth":truth_W,"W_truth_err":sqrt(truth_W_var),\
               "W_PosPdg_pred":pred_W_PosPdg,"W_PosPdg_pred_err":sqrt(pred_Var_W_PosPdg),\
+              "W_PosPdg_pred_corrRest":pred_corrRest_W_PosPdg,"W_PosPdg_pred_corrRest_err":sqrt(pred_Var_corrRest_W_PosPdg),\
               "W_PosPdg_truth":truth_W_PosPdg,"W_PosPdg_truth_err":sqrt(truth_W_var_PosPdg),\
               "W_NegPdg_pred":pred_W_NegPdg,"W_NegPdg_pred_err":sqrt(pred_Var_W_NegPdg),\
+              "W_NegPdg_pred_corrRest":pred_corrRest_W_NegPdg,"W_NegPdg_pred_corrRest_err":sqrt(pred_Var_corrRest_W_NegPdg),\
               "W_NegPdg_truth":truth_W_NegPdg,"W_NegPdg_truth_err":sqrt(truth_W_var_NegPdg),\
               'Rest_truth':truth_Rest,'Rest_truth_err':sqrt(truth_Rest_var),\
               'Rest_PosPdg_truth':truth_Rest_PosPdg,'Rest_PosPdg_truth_err':sqrt(truth_Rest_var_PosPdg),\
