@@ -1,6 +1,7 @@
 import copy, os, sys
 #dir  = '/data/easilar/cmgTuples/postProcessed_miniAODv2_fix/HT500LT250/hard/'
 #dir = '/data/easilar/cmgTuples/postProcessed_miniAODv2_combine2/HT500LT250/hard/'
+#dir = '/data/easilar/cmgTuples/postProcessed_miniAODv2_btagweight_fix4/HT500LT250/hard/'
 #dir = '/data/easilar/cmgTuples/postProcessed_Spring15_btagEff_SF15/HT500ST250/hard/'
 #dir = '/data/easilar/cmgTuples/postProcessing_Syst/HT500LT250/'
 dir = '/data/easilar/cmgTuples/postProcessing_Syst_topPt_diLep/HT500LT250/'
@@ -16,6 +17,7 @@ TTJets_HTLO_25ns={\
 ],
 'dir' : '/data/easilar/cmgTuples/postProcessed_miniAODv2_fix/HT500LT250/hard/',
 }
+
 #####(diLep+SemiLep+HT binned samples) for LHE_HT<=1000 & (HT binned samples) for LHE_HT>1000
 TTJets_combined = {\
 "name" : "TTJets_combined",

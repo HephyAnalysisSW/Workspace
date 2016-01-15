@@ -10,7 +10,6 @@ from rCShelpers import *
 import math
 from Workspace.HEPHYPythonTools.user import username
 from Workspace.RA4Analysis.signalRegions import *
-from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
 from array import array
 
 from predictionConfig import *
@@ -21,13 +20,16 @@ ROOT.gStyle.SetOptStat('')
 useWcorrection = False
 useTTcorrection = False
 signal = False
+withSystematics = True
 
 prefix = 'singleLeptonic_Spring15_'
 #path = '/data/'+username+'/Results2015/Prediction_SFTemplate_MC_fullSR_lep_3.0/'
 
 #res = pickle.load(file(path+prefix+'_estimationResults_pkl_kappa_corrected'))
 #pickleDir = '/data/dspitzbart/Results2015/Prediction_SFtemplates_validation_lep_data_2.1/'
-res = pickle.load(file(pickleDir+prefix+'_estimationResults_pkl_kappa_btag_corrected'))
+res = pickle.load(file(pickleDir+prefix+'_estimationResults_pkl_kappa_corrected'))
+if withSystematics:
+  res = pickle.load(file(pickleDir+'resultsFinal_withSystematics_pkl'))
 #res = pickle.load(file(pickleDir+prefix+'_estimationResults_pkl'))
 #res = pickle.load(file('/data/dspitzbart/Results2015/Prediction_SFTemplate_MC_fullSR_lep_3.0/singleLeptonic_Spring15__estimationResults_pkl'))
 
@@ -94,11 +96,14 @@ pred_H.SetLineColor(ROOT.kGray+1)
 pred_H.SetMarkerStyle(1)
 pred_H.SetLineWidth(2)
 
-truth_H.SetLineColor(ROOT.kRed+2)
+#truth_H.SetLineColor(ROOT.kRed+2)
+truth_H.SetLineColor(ROOT.kBlack)
 truth_H.SetLineWidth(2)
-truth_H.SetMarkerStyle(29)
-truth_H.SetMarkerColor(ROOT.kRed+2)
-truth_H.SetMarkerSize(2)
+#truth_H.SetMarkerStyle(29)
+truth_H.SetMarkerStyle(8)
+truth_H.SetMarkerColor(ROOT.kBlack)
+#truth_H.SetMarkerColor(ROOT.kRed+2)
+truth_H.SetMarkerSize(1)
 
 kappa = ROOT.TH1F('kappa','kappa_b', bins,0,bins)
 kappa.SetLineWidth(2)
@@ -135,16 +140,22 @@ for srNJet in sorted(signalRegions):
       rest_H.SetBinContent(i,res[srNJet][stb][htb]['Rest_truth'])
       rest_H.SetBinError(i,  res[srNJet][stb][htb]['Rest_truth_err'])
       
-      kappa.SetBinContent(i,res[srNJet][stb][htb]['TT_rCS_fits_MC']['k_0b/1b_btag'])
-      kappa.SetBinError(i,res[srNJet][stb][htb]['TT_rCS_fits_MC']['k_0b/1b_btag_err'])
+      #kappa.SetBinContent(i,res[srNJet][stb][htb]['TT_rCS_fits_MC']['k_0b/1b_btag'])
+      #kappa.SetBinError(i,res[srNJet][stb][htb]['TT_rCS_fits_MC']['k_0b/1b_btag_err'])
       
       pred_H.SetBinContent(i, res[srNJet][stb][htb]['tot_pred'])
       pred_H.SetBinError(i,   res[srNJet][stb][htb]['tot_pred_err'])
-      predYErr.append(res[srNJet][stb][htb]['tot_pred_err'])
+      if withSystematics:
+        predYErr.append(sqrt(res[srNJet][stb][htb]['tot_pred_err']**2 + res[srNJet][stb][htb]['systematics']['total']**2))
+      else:
+        predYErr.append(res[srNJet][stb][htb]['tot_pred_err'])
       predXErr.append(0.5)
       predY.append(res[srNJet][stb][htb]['tot_pred'])
       predX.append(i-0.5)
-      print 'Predicted:', getValErrString(res[srNJet][stb][htb]['tot_pred'], res[srNJet][stb][htb]['tot_pred_err'])
+      if withSystematics:
+        print 'SR'+str(i)+':', getValErrString(res[srNJet][stb][htb]['tot_pred'], sqrt(res[srNJet][stb][htb]['tot_pred_err']**2 + res[srNJet][stb][htb]['systematics']['total']**2))
+      else:
+        print 'SR'+str(i)+':', getValErrString(res[srNJet][stb][htb]['tot_pred'], res[srNJet][stb][htb]['tot_pred_err'])
       if unblinded or validation: print 'Measured: ', getValErrString(data_yield, sqrt(data_yield))
       truth_H.SetBinContent(i,res[srNJet][stb][htb]['tot_truth'])
       truth_H.SetBinError(i,  res[srNJet][stb][htb]['tot_truth_err'])
@@ -241,12 +252,15 @@ setNiceBinLabel(ratio, validationRegionAll)
 ratio2 = ROOT.TH1F('ratio_d','ratio pred/data',bins,0,bins)
 ratio2.Sumw2()
 #ratio2 = pred_H.Clone()
-ratio2 = data_truth_H.Clone()
+ratio2 = truth_H.Clone()
 #ratio2.Divide(data_truth_H)
 ratio2.Divide(pred_H)
 ratio2.SetLineColor(ROOT.kBlack)
 ratio2.SetMarkerStyle(8)
 ratio2.SetMarkerSize(1.3)
+ratio2.GetXaxis().SetTitle('')
+
+setNiceBinLabel(ratio2, signalRegion3fb)
 
 pad2=ROOT.TPad("pad2","datavsMC",0.,0.,1.,.3)
 pad2.SetLeftMargin(0.15)
@@ -256,24 +270,24 @@ pad2.SetGrid()
 pad2.Draw()
 pad2.cd()
 #ratio.GetXaxis().SetTitle('Signal Region #')
-ratio.GetXaxis().SetTitleSize(0.13)
-ratio.GetXaxis().SetLabelSize(0.11)
-ratio.GetXaxis().SetNdivisions(508)
-ratio.GetYaxis().SetTitle('data/pred.')
-ratio.GetYaxis().SetTitleSize(0.13)
-ratio.GetYaxis().SetLabelSize(0.13)
-ratio.GetYaxis().SetTitleOffset(0.4)
-ratio.GetYaxis().SetNdivisions(508)
-ratio.SetMinimum(0.)
-ratio.SetMaximum(2.2)
-ratio.Draw('e1p')
-ratio2.Draw('e1p same')
+ratio2.GetXaxis().SetTitleSize(0.13)
+ratio2.GetXaxis().SetLabelSize(0.11)
+ratio2.GetXaxis().SetNdivisions(508)
+ratio2.GetYaxis().SetTitle('data/pred.')
+ratio2.GetYaxis().SetTitleSize(0.13)
+ratio2.GetYaxis().SetLabelSize(0.13)
+ratio2.GetYaxis().SetTitleOffset(0.4)
+ratio2.GetYaxis().SetNdivisions(508)
+ratio2.SetMinimum(0.)
+ratio2.SetMaximum(2.2)
+ratio2.Draw('e1p')
+#ratio2.Draw('e1p same')
 
 can.cd()
 
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2015/Prediction_'+predictionName+'_'+str(lumi)+'_bugFix_2.png')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2015/Prediction_'+predictionName+'_'+str(lumi)+'_bugFix_2.root')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2015/Prediction_'+predictionName+'_'+str(lumi)+'_bugFix_2.pdf')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2015/SumPlot/Prediction_'+predictionName+'_'+str(lumi)+'_corrected.png')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2015/SumPlot/Prediction_'+predictionName+'_'+str(lumi)+'_corrected.root')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2015/SumPlot/Prediction_'+predictionName+'_'+str(lumi)+'_corrected.pdf')
 
 can2 = ROOT.TCanvas('can2','can2',700,700)
 

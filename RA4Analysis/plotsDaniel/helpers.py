@@ -33,4 +33,16 @@ def setNiceBinLabel(hist, signalRegions=signalRegion3fb):
         hist.GetXaxis().SetBinLabel(i,'#splitline{'+signalRegions[njb][stb][htb]['njet']+'}{#splitline{'+signalRegions[njb][stb][htb]['LT']+'}{'+signalRegions[njb][stb][htb]['HT']+'}}')
         i += 1
 
+def createDictFromHist(hist, signalRegions):
+  i = 1
+  d = {}
+  for njb in sorted(signalRegions):
+    d[njb] = {}
+    for stb in sorted(signalRegions[njb]):
+      d[njb][stb] = {}
+      for htb in sorted(signalRegions[njb][stb]):
+        d[njb][stb][htb] = hist.GetBinContent(i)
+        i += 1
+  
+  return d
 

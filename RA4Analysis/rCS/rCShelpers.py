@@ -58,8 +58,8 @@ def combineRCS(samples, dPhiCut):
   totalRcsVar = 0.
   for s in samples:
     if s['rcs']['rCS']>0:
-      print 'Rcs of background', s['name'],s['rcs']['rCS']
-      print 'Fraction',s['CRyield']/totalCRYield
+      #print 'Rcs of background', s['name'],s['rcs']['rCS']
+      #print 'Fraction',s['CRyield']/totalCRYield
       totalRcs += s['rcs']['rCS']*(s['CRyield']/totalCRYield)
       totalRcsVar += (s['rcs']['rCS']*(s['CRyield']/totalCRYield))**2*(s['rcs']['rCSE_sim']**2/s['rcs']['rCS']**2 + s['CRyieldVar']/s['CRyield']**2 + totalCRYieldVar/totalCRYield**2)
   return {'rCS':totalRcs, 'rCSE_sim':sqrt(totalRcsVar), 'rCSE_pred':1.}
