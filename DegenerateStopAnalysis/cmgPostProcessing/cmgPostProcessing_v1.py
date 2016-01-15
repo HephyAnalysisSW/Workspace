@@ -231,6 +231,8 @@ def getSamples(args):
     processingEra = args.processingEra
     processingTag = args.processingTag
 
+
+
     if cmgTuples == "Data_25ns":
         # from Workspace.DegenerateStopAnalysis.cmgTuples_Data25ns import *
         import Workspace.DegenerateStopAnalysis.cmgTuples_Data25ns as cmgSamples
@@ -257,8 +259,13 @@ def getSamples(args):
                 "with expected sample definition file \n {0} \n does not exist.".format(sampleFile), \
                 "\n Correct the name and re-run the script. \n Exiting."
             sys.exit()
+   
+
+    if args.preselect:
+        outDir = os.path.join(targetDir, processingEra, processingTag, cmgTuples, args.skim, 'preselection',  args.leptonSelection )
+    else:
+        outDir = os.path.join(targetDir, processingEra, processingTag, cmgTuples, args.skim, args.leptonSelection )
     
-    outDir = os.path.join(targetDir, processingEra, processingTag, cmgTuples)
 
     # samples
     
@@ -281,7 +288,9 @@ def getSamples(args):
                 if (sampleName == sampleRequested['cmgComp'].name):
                     allComponentsList.append(sampleRequested)
                     foundSample = True
-                    continue            
+                    continue      
+                else:
+                    print "WARNING:  Sample name is not consistant with the cmgComp name"
             elif isinstance(sampleRequested, list):
                 # list of components - add all components
                 for comp in sampleRequested:
@@ -436,6 +445,7 @@ def rwTreeClasses(sample, isample, args, temporaryDir, params={} ):
         'ngenTau', 'genTau_*', 
         'ngenLepFromTau', 'genLepFromTau_*', 
         'GenJet_*',
+        'GenTracks_*',
                           ]
     
     readVariables_MC = []
@@ -583,7 +593,7 @@ def rwTreeClasses(sample, isample, args, temporaryDir, params={} ):
             newGenTrackVars.extend( [ x+"_pt%s"%ptString+"/I" for x in  genTrkCountVars  ] )
         newVariables_DATAMC.extend(newGenTrackVars)        
         readVectors_MC.append(
-            {'prefix':genTrkVar  , 'nMax':1000, 
+            {'prefix':genTrkVar  , 'nMax':300, 
                 'vars':[
                           'pt/F', 'eta/F', 'phi/F', "dxy/F", "dz/F", 'pdgId/I' , 'fromPV/I' , 
                           "matchedJetIndex/I", "matchedJetDr/F", "CosPhiJet1/F", "CosPhiJet12/F", "CosPhiJetAll/F",
@@ -1364,10 +1374,7 @@ def cmgPostProcessing(argv=None):
         # that will be deleted automatically at the end of the job. If the directory exists,
         # it will be deleted and re-created.
         
-        if preselect:
-            outputWriteDirectory = os.path.join(outputDirectory, skim, 'preselection', leptonSelection, sample['name'])
-        else:
-            outputWriteDirectory = os.path.join(outputDirectory, skim, leptonSelection, sample['name'])
+        outputWriteDirectory = os.path.join(outputDirectory, sample['name'])
 
         if not os.path.exists(outputWriteDirectory):
             os.makedirs(outputWriteDirectory)

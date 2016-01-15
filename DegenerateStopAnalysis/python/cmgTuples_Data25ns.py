@@ -10,7 +10,7 @@ data_path = "/data/nrad/cmgTuples/RunII/7412pass2_v4/Data25ns_Run2015D_Nov13Json
 
 SingleMuon_Run2015D_v4 ={\
 "cmgComp":SingleMuon_Run2015D_Promptv4,
-"chunkString":"SingleMuon_Run2015D-05Oct2015-v1",
+"chunkString":"SingleMuon_Run2015D-PromptReco-v4",
 "name" : "SingleMuon_Run2015D-PromptReco-v4",
 "dir": data_path,
 "rootFileLocation":"/tree.root",
