@@ -14,7 +14,7 @@ from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed impor
 from Workspace.HEPHYPythonTools.user import username
 from Workspace.RA4Analysis.signalRegions import *
 
-testRun = False
+testRun = True
 
 ## b-tagging and other variables
 dPhiStr = 'deltaPhi_Wl'
@@ -22,7 +22,7 @@ bjreg = (0,0)
 wjetsSB = (3,4)
 
 nBTagVar = 'nBJetMediumCSV30'
-useBTagWeights = False #True for weighted fake data, false for data
+useBTagWeights = True #True for weighted fake data, false for data
 btagWeightSuffix = '_SF'
 templateWeights = True
 templateWeightSuffix = '_SF'
@@ -34,7 +34,7 @@ if QCDup: nameSuffix += '_QCDup'
 if QCDdown: nameSuffix += '_QCDdown'
 
 ## samples
-isData = True
+isData = False
 unblinded = False
 validation = False
 
