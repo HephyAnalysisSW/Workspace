@@ -85,16 +85,14 @@ def getRCS(c, cut, dPhiCut, useGenMet=False, useAllGen=False, useOnlyGenMetPt=Fa
       
       #rCSE_sim = rcs*sqrt(h.GetBinError(2)**2/h.GetBinContent(2)**2 + h.GetBinError(1)**2/h.GetBinContent(1)**2) #errors without QCD consideration
       #rCSE_pred = rcs*sqrt(1./h.GetBinContent(2) + 1./h.GetBinContent(1)) #errors without QCD consideration
-      del h
       r = {'rCS':rcs, 'rCSE_pred':rCSE_pred, 'rCSE_sim':rCSE_sim}
     else:
-      del h
       r = {'rCS':rcs, 'rCSE_pred':float('nan'), 'rCSE_sim':float('nan')}
   else:
-    del h
     r = {'rCS':float('nan'), 'rCSE_pred':float('nan'), 'rCSE_sim':float('nan')}
   if returnValues:
     r.update({'num':h.GetBinContent(2), 'numE':h.GetBinError(2), 'denom':h.GetBinContent(1), 'denomE':h.GetBinError(1)})
+  del h
   return r
 
 #get Rcs value with event loop

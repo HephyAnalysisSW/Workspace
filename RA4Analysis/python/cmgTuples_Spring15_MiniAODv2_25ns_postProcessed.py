@@ -59,7 +59,7 @@ singleTop_25ns={\
 "TToLeptons_tch_amcatnlo_full",
 "T_tWch",
 ],
-'dir' : dir,
+'dir' : '/data/dspitzbart/cmgTuples/postProcessing_Syst/HT500LT250/',
 }
 
 DY_25ns={\
@@ -70,7 +70,7 @@ DY_25ns={\
 "DYJetsToLL_M50_HT400to600",
 "DYJetsToLL_M50_HT600toInf",
 ],
-'dir' : dir,
+'dir' : '/data/dspitzbart/cmgTuples/postProcessing_Syst/HT500LT250/',
 }
 
 
@@ -96,7 +96,7 @@ TTV_25ns = {
 "TTZToLLNuNu",
 "TTZToQQ",
 ],
-'dir' : dir,
+'dir' : '/data/dspitzbart/cmgTuples/postProcessing_Syst/HT500LT250/',
 }
 
 

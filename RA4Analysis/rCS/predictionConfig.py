@@ -14,7 +14,7 @@ from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed impor
 from Workspace.HEPHYPythonTools.user import username
 from Workspace.RA4Analysis.signalRegions import *
 
-testRun = False
+testRun = True
 
 ## b-tagging and other variables
 dPhiStr = 'deltaPhi_Wl'
@@ -22,7 +22,7 @@ bjreg = (0,0)
 wjetsSB = (3,4)
 
 nBTagVar = 'nBJetMediumCSV30'
-useBTagWeights = False #True for weighted fake data, false for data
+useBTagWeights = True
 btagWeightSuffix = '_SF'
 templateWeights = True
 templateWeightSuffix = '_SF'
@@ -34,7 +34,7 @@ if QCDup: nameSuffix += '_QCDup'
 if QCDdown: nameSuffix += '_QCDdown'
 
 ## samples
-isData = True
+isData = False
 unblinded = False
 validation = False
 
@@ -49,7 +49,7 @@ cQCD        = getChain(QCDHT_25ns,histname='')
 
 
 ## QCD estimation
-useQCDestimation = True
+useQCDestimation = False
 if not isData and useQCDestimation: QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_MC2p1fb_pkl'
 if isData:
   QCDpickle  = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_2p1fb_pkl'
@@ -79,6 +79,14 @@ templateLumi = 2.1 # lumi that was used when template was created - if defined w
 sampleLumi = 3.
 debugReweighting = False
 
+year = '2016'
+
+if year=='2016':
+  lumistr = str(lumi).replace('.','p')
+  templateLumistr = str(templateLumi).replace('.','p')
+else:
+  lumistr = str(lumi)#.replace('.','p')
+  templateLumistr = str(templateLumi)#.replace('.','p')
 
 ## Template Bootstrap error dictionary
 templateBootstrap = True
@@ -92,9 +100,9 @@ if isData:
 else:
   templateName   = 'SFtemplates_fullSR_lep_MC' + nameSuffix
   predictionName = templateName+btagWeightSuffix + nameSuffix
-printDir    = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/25ns/templateFit_'+predictionName+'_'+str(lumi)+'/'
-pickleDir   = '/data/'+username+'/Results2016/Prediction_'+predictionName+'_'+str(lumi)+'/'
-templateDir = '/data/'+username+'/Results2016/btagTemplates_'+templateName+'_'+str(templateLumi)+'/'
+printDir    = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/25ns/templateFit_'+predictionName+'_'+lumistr+'/'
+pickleDir   = '/data/'+username+'/Results'+year+'/Prediction_'+predictionName+'_'+lumistr+'/'
+templateDir = '/data/'+username+'/Results'+year+'/btagTemplates_'+templateName+'_'+templateLumistr+'/'
 prefix = 'singleLeptonic_Spring15_'
 
 
@@ -111,16 +119,16 @@ singleMu_presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSof
 
 ## corrections
 createFits = True
-fitDir = '/data/'+username+'/Results2016/correctionFit_fullSR_MC_2016/'
-
+fitDir = '/data/'+username+'/Results'+year+'/correctionFit_fullSR_MC'+nameSuffix+'/'
+fitPrintDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results'+year+'/25ns/RcsFit_'+predictionName+'_'+lumistr+'/'
 
 ## do stuff for test runs
 if testRun:
   signalRegions = smallRegion
   predictionName = 'testRun'
-  printDir    = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/25ns/templateFit_'+predictionName+'_'+str(lumi)+'/'
-  pickleDir   = '/data/'+username+'/Results2016/Prediction_'+predictionName+'_'+str(lumi)+'/'
-  templateDir = '/data/'+username+'/Results2016/btagTemplates_'+predictionName+'_'+str(templateLumi)+'/'
+  printDir    = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results'+year+'/25ns/templateFit_'+predictionName+'_'+lumistr+'/'
+  pickleDir   = '/data/'+username+'/Results'+year+'/Prediction_'+predictionName+'_'+lumistr+'/'
+  templateDir = '/data/'+username+'/Results'+year+'/btagTemplates_'+predictionName+'_'+templateLumistr+'/'
 
 
 
@@ -133,3 +141,5 @@ if not os.path.exists(printDir):
   os.makedirs(printDir)
 if not os.path.exists(templateDir):
   os.makedirs(templateDir)
+if not os.path.exists(fitPrintDir):
+  os.makedirs(fitPrintDir)
