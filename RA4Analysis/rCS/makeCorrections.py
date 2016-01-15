@@ -11,6 +11,9 @@ from Workspace.RA4Analysis.signalRegions import *
 
 from predictionConfig import *
 
+ROOT.gROOT.LoadMacro('../../HEPHYPythonTools/scripts/root/tdrstyle.C')
+ROOT.setTDRStyle()
+
 ROOT.TH1F().SetDefaultSumw2()
 
 if not createFits: loadedFit = pickle.load(file(fitDir+prefix+'_fit_pkl'))
@@ -50,6 +53,9 @@ print
 print 'Starting with fits for corrections and systematic errors, will use the following weight for all MC:'
 print weight_str
 print
+
+ttcan = ROOT.TCanvas('ttcan','ttcan',700,700)
+wcan = ROOT.TCanvas('wcan','wcan',700,700)
 
 
 for i_njb, njb in enumerate(sorted(signalRegions)):
@@ -130,6 +136,36 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
         ttKE = FitFunc.GetParError(1)
         ttLinear = {'ttD':ttD, 'ttDE':ttDE, 'ttK':ttK, 'ttKE':ttKE}
         fitResults[njb][stb][htb].update({'ttLinear':ttLinear})
+
+        ttcan.cd()
+        ttJetRcsFitH.SetMarkerColor(ROOT.kBlue)
+        ttJetRcsFitH.SetLineColor(ROOT.kBlue)
+        ttJetRcsFitH.SetBarWidth(1)
+        ttJetRcsFitH.SetBarOffset(0)
+        ttJetRcsFitH.SetStats(0)
+        ttJetRcsFitH.SetMinimum(0)
+        ttJetRcsFitH.SetMaximum(0.2)
+        ttJetRcsFitH.Draw('EH1')
+        
+        latex1 = ROOT.TLatex()
+        latex1.SetNDC()
+        latex1.SetTextSize(0.03)
+        latex1.SetTextAlign(11)
+        latex1.DrawLatex(0.6,0.86,'linear fit k x + d')
+        latex1.DrawLatex(0.6,0.83,'k = '+str(round(ttK*1000,2))+' #pm '+str(round(ttKE*1000,2))+' #times 10^{-3}')
+        latex1.DrawLatex(0.6,0.8,'d = '+str(round(ttD*1000,2))+' #pm '+str(round(ttDE*1000,2))+' #times 10^{-3}')
+
+        latex2 = ROOT.TLatex()
+        latex2.SetNDC()
+        latex2.SetTextSize(0.04)
+        latex2.SetTextAlign(11)
+        latex2.DrawLatex(0.17,0.96,'CMS #bf{#it{simulation}}')
+        latex2.DrawLatex(0.7,0.96,"L=2.1fb^{-1} (13TeV)")
+
+        ttcan.Print(fitPrintDir+cname+'_ttjets_'+Wc['name']+'_fit.png')
+        ttcan.Print(fitPrintDir+cname+'_ttjets_'+Wc['name']+'_fit.pdf')
+        ttcan.Print(fitPrintDir+cname+'_ttjets_'+Wc['name']+'_fit.root')
+        
         #print ttD, ttK
 
         #constant fit in 0b and 1b
@@ -220,6 +256,7 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
             if not math.isnan(rcsD['rCS']):
               wJetRcsFitH.SetBinContent(i_njbW+1, rcsD['rCS'])
               wJetRcsFitH.SetBinError(i_njbW+1, rcsD['rCSE_sim'])
+              wJetRcsFitH.GetXaxis().SetBinLabel(i_njbW+1,nJetBinName(njbW))
 
           message = '** Linear Fit for WJets Rcs values in 0b MC '+Wc['name']+' charges **'
           stars = ''
@@ -242,6 +279,37 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
           wK  = FitFunc.GetParameter(1)
           wKE = FitFunc.GetParError(1)
           fitResults[njb][stb][htb][Wc['name']] = {'wD':wD, 'wDE':wDE, 'wK':wK, 'wKE':wKE}
+          
+          wcan.cd()
+          wJetRcsFitH.SetMarkerColor(color('wjets'))
+          wJetRcsFitH.SetLineColor(color('wjets'))
+          wJetRcsFitH.SetBarWidth(1)
+          wJetRcsFitH.SetBarOffset(0)
+          wJetRcsFitH.SetStats(0)
+          wJetRcsFitH.SetMinimum(0) 
+          wJetRcsFitH.SetMaximum(0.2)
+          wJetRcsFitH.GetYaxis().SetTitle('R_{CS}')
+          wJetRcsFitH.Draw('EH1')
+          
+          latex1 = ROOT.TLatex()
+          latex1.SetNDC()
+          latex1.SetTextSize(0.03)
+          latex1.SetTextAlign(11)
+          latex1.DrawLatex(0.6,0.86,'linear fit k x + d')
+          latex1.DrawLatex(0.6,0.83,'k = '+str(round(wK*1000,2))+' #pm '+str(round(wKE*1000,2))+' #times 10^{-3}')
+          latex1.DrawLatex(0.6,0.80,'d = '+str(round(wD*1000,2))+' #pm '+str(round(wDE*1000,2))+' #times 10^{-3}')
+          
+          latex2 = ROOT.TLatex()
+          latex2.SetNDC()
+          latex2.SetTextSize(0.04)
+          latex2.SetTextAlign(11)
+          latex2.DrawLatex(0.17,0.96,'CMS #bf{#it{simulation}}')
+          latex2.DrawLatex(0.7,0.96,"L=2.1fb^{-1} (13TeV)")
+          
+          wcan.Print(fitPrintDir+cname+'_Wjets_'+Wc['name']+'_fit.png')
+          wcan.Print(fitPrintDir+cname+'_Wjets_'+Wc['name']+'_fit.pdf')
+          wcan.Print(fitPrintDir+cname+'_Wjets_'+Wc['name']+'_fit.root')
+          
         else:
           wD  = loadedFit[njb][stb][htb][Wc['name']]['wD']
           wDE = loadedFit[njb][stb][htb][Wc['name']]['wDE']
@@ -324,5 +392,5 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
         del ttJetRcsFitH, ttJetRcsFitH1b
 
 if createFits: pickle.dump(fitResults ,file(fitDir+prefix+'_fit_pkl','w'))
-pickle.dump(res,file(pickleDir+prefix+'_estimationResults_pkl_kappa_corrected','w'))
+pickle.dump(res,file(pickleDir+prefix+'_estimationResults_pkl_kappa_corrected_test','w'))
 

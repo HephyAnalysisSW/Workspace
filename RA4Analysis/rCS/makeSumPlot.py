@@ -146,14 +146,16 @@ for srNJet in sorted(signalRegions):
       pred_H.SetBinContent(i, res[srNJet][stb][htb]['tot_pred'])
       pred_H.SetBinError(i,   res[srNJet][stb][htb]['tot_pred_err'])
       if withSystematics:
-        predYErr.append(sqrt(res[srNJet][stb][htb]['tot_pred_err']**2 + res[srNJet][stb][htb]['systematics']['total']**2))
+        predYErr.append(sqrt(res[srNJet][stb][htb]['tot_pred_err']**2 + (res[srNJet][stb][htb]['tot_pred']*res[srNJet][stb][htb]['systematics']['total'])**2))
       else:
         predYErr.append(res[srNJet][stb][htb]['tot_pred_err'])
       predXErr.append(0.5)
       predY.append(res[srNJet][stb][htb]['tot_pred'])
       predX.append(i-0.5)
       if withSystematics:
-        print 'SR'+str(i)+':', getValErrString(res[srNJet][stb][htb]['tot_pred'], sqrt(res[srNJet][stb][htb]['tot_pred_err']**2 + res[srNJet][stb][htb]['systematics']['total']**2))
+        print 'SR'+str(i)+':', getValErrString(res[srNJet][stb][htb]['tot_pred'], sqrt(res[srNJet][stb][htb]['tot_pred_err']**2 + (res[srNJet][stb][htb]['tot_pred']*res[srNJet][stb][htb]['systematics']['total'])**2))
+        print 'SR'+str(i)+':', getValErrString(res[srNJet][stb][htb]['tot_pred'], sqrt(res[srNJet][stb][htb]['tot_pred_err']**2 + (res[srNJet][stb][htb]['systematics']['total'])**2))
+        print res[srNJet][stb][htb]['systematics']['total']
       else:
         print 'SR'+str(i)+':', getValErrString(res[srNJet][stb][htb]['tot_pred'], res[srNJet][stb][htb]['tot_pred_err'])
       if unblinded or validation: print 'Measured: ', getValErrString(data_yield, sqrt(data_yield))
