@@ -13,12 +13,12 @@ useTTcorrection = False
 signal = False
 
 prefix = 'singleLeptonic_Spring15_'
-path = '/data/'+username+'/Results2015/Prediction_SFtemplates_fullSR_lep_MC_SF_2.1/'
-path = '/data/'+username+'/Results2015/Prediction_SFtemplates_fullSR_lep_data_2.1/'
+path = '/data/'+username+'/Results2016/Prediction_SFtemplates_fullSR_lep_MC_SF_2p1/'
+#path = '/data/'+username+'/Results2016/Prediction_SFtemplates_fullSR_lep_data_2p1/'
 #path = '/data/'+username+'/Results2015/Prediction_SFTemplate_MC_fullSR_lep_3.0/' 
 #path2 = '/data/'+username+'/Results2015/Prediction_bweightTemplate_MC_reducedSR_lep_3.0/'
 
-res = pickle.load(file(path+prefix+'_estimationResults_pkl_kappa_btag_corrected'))
+res = pickle.load(file(path+prefix+'_estimationResults_pkl'))
 #res2 = pickle.load(file(path2+prefix+'_estimationResults_pkl'))
 
 if useTTcorrection: kcs = pickle.load(file('/data/dspitzbart/Spring15/25ns/rCS_0b_3.0/correction_pkl'))
@@ -70,8 +70,8 @@ for srNJet in sorted(signalRegions):
     rowsSt[srNJet][stb] = {'n':len(signalRegions[srNJet][stb])}
   rowsNJet[srNJet] = {'nST':len(signalRegions[srNJet]), 'n':rows}
 
-scaleFactor = 0.8
-#scaleFactor = 1
+#scaleFactor = 0.8
+scaleFactor = 1
 
 
 #closure table

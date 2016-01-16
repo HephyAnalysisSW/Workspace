@@ -254,13 +254,33 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, QCD=Fa
   rd['rCS_srNJet_0b_onlyW_ele_NegPdg']  = rCS_srNJet_0b_onlyW_ele_NegPdg #Rcs in SR for ele, neg PDG
 
   #true yields measured from MC samples, residual background is also calculated here and added to the dict
-  truth_W, truth_W_var       = getYieldFromChain(cWJets,  rCS_sr_Cut+"&&"+dPhiStr+">"+str(dPhiCut), weight = weight_str_0bMC, returnVar=True)
-  truth_Rest, truth_Rest_var = getYieldFromChain(cRest,   rCS_sr_Cut+"&&"+dPhiStr+">"+str(dPhiCut), weight = weight_str_0bMC, returnVar=True)
+  truth_W, truth_W_var              = getYieldFromChain(cWJets,  rCS_sr_Cut+"&&"+dPhiStr+">"+str(dPhiCut), weight = weight_str_0bMC, returnVar=True)
+  truth_W_CR, truth_W_CR_var        = getYieldFromChain(cWJets,  rCS_sr_Cut+"&&"+dPhiStr+"<"+str(dPhiCut), weight = weight_str_0bMC, returnVar=True)
+  truth_Rest, truth_Rest_var        = getYieldFromChain(cRest,   rCS_sr_Cut+"&&"+dPhiStr+">"+str(dPhiCut), weight = weight_str_0bMC, returnVar=True)
+  truth_Rest_CR, truth_Rest_CR_var  = getYieldFromChain(cRest,   rCS_sr_Cut+"&&"+dPhiStr+"<"+str(dPhiCut), weight = weight_str_0bMC, returnVar=True)
 
-  truth_W_PosPdg, truth_W_var_PosPdg       = getYieldFromChain(cWJets, 'leptonPdg>0&&'+rCS_sr_Cut+"&&"+dPhiStr+">"+str(dPhiCut), weight = weight_str_0bMC, returnVar=True)
-  truth_W_NegPdg, truth_W_var_NegPdg       = getYieldFromChain(cWJets, 'leptonPdg<0&&'+rCS_sr_Cut+"&&"+dPhiStr+">"+str(dPhiCut), weight = weight_str_0bMC, returnVar=True)
-  truth_Rest_PosPdg, truth_Rest_var_PosPdg = getYieldFromChain(cRest,  'leptonPdg>0&&'+rCS_sr_Cut+"&&"+dPhiStr+">"+str(dPhiCut), weight = weight_str_0bMC, returnVar=True)
-  truth_Rest_NegPdg, truth_Rest_var_NegPdg = getYieldFromChain(cRest,  'leptonPdg<0&&'+rCS_sr_Cut+"&&"+dPhiStr+">"+str(dPhiCut), weight = weight_str_0bMC, returnVar=True)
+  truth_W_PosPdg, truth_W_PosPdg_var              = getYieldFromChain(cWJets, 'leptonPdg>0&&'+rCS_sr_Cut+"&&"+dPhiStr+">"+str(dPhiCut), weight = weight_str_0bMC, returnVar=True)
+  truth_W_PosPdg_CR, truth_W_PosPdg_CR_var        = getYieldFromChain(cWJets, 'leptonPdg>0&&'+rCS_sr_Cut+"&&"+dPhiStr+"<"+str(dPhiCut), weight = weight_str_0bMC, returnVar=True)
+  truth_W_NegPdg, truth_W_NegPdg_var              = getYieldFromChain(cWJets, 'leptonPdg<0&&'+rCS_sr_Cut+"&&"+dPhiStr+">"+str(dPhiCut), weight = weight_str_0bMC, returnVar=True)
+  truth_W_NegPdg_CR, truth_W_NegPdg_CR_var        = getYieldFromChain(cWJets, 'leptonPdg<0&&'+rCS_sr_Cut+"&&"+dPhiStr+"<"+str(dPhiCut), weight = weight_str_0bMC, returnVar=True)
+  truth_Rest_PosPdg, truth_Rest_PosPdg_var        = getYieldFromChain(cRest,  'leptonPdg>0&&'+rCS_sr_Cut+"&&"+dPhiStr+">"+str(dPhiCut), weight = weight_str_0bMC, returnVar=True)
+  truth_Rest_PosPdg_CR, truth_Rest_PosPdg_CR_var  = getYieldFromChain(cRest,  'leptonPdg>0&&'+rCS_sr_Cut+"&&"+dPhiStr+"<"+str(dPhiCut), weight = weight_str_0bMC, returnVar=True)
+  truth_Rest_NegPdg, truth_Rest_NegPdg_var        = getYieldFromChain(cRest,  'leptonPdg<0&&'+rCS_sr_Cut+"&&"+dPhiStr+">"+str(dPhiCut), weight = weight_str_0bMC, returnVar=True)
+  truth_Rest_NegPdg_CR, truth_Rest_NegPdg_CR_var  = getYieldFromChain(cRest,  'leptonPdg<0&&'+rCS_sr_Cut+"&&"+dPhiStr+"<"+str(dPhiCut), weight = weight_str_0bMC, returnVar=True)
+
+  rd['yW_srNJet_0b_lowDPhi_truth']            = truth_W_CR
+  rd['yW_Var_srNJet_0b_lowDPhi_truth']        = truth_W_CR_var
+  rd['yW_PosPdg_srNJet_0b_lowDPhi_truth']     = truth_W_PosPdg_CR
+  rd['yW_Var_PosPdg_srNJet_0b_lowDPhi_truth'] = truth_W_PosPdg_CR_var
+  rd['yW_NegPdg_srNJet_0b_lowDPhi_truth']     = truth_W_NegPdg_CR
+  rd['yW_Var_NegPdg_srNJet_0b_lowDPhi_truth'] = truth_W_NegPdg_CR_var
+
+  rd['yRest_srNJet_0b_lowDPhi_truth']             = truth_Rest_CR
+  rd['yRest_Var_srNJet_0b_lowDPhi_truth']         = truth_Rest_CR_var
+  rd['yRest_PosPdg_srNJet_0b_lowDPhi_truth']      = truth_Rest_PosPdg_CR
+  rd['yRest_Var_PosPdg_srNJet_0b_lowDPhi_truth']  = truth_Rest_PosPdg_CR_var
+  rd['yRest_NegPdg_srNJet_0b_lowDPhi_truth']      = truth_Rest_NegPdg_CR
+  rd['yRest_Var_NegPdg_srNJet_0b_lowDPhi_truth']  = truth_Rest_NegPdg_CR_var
 
   #predicted yields with RCS method
   pred_W                = yW_srNJet_0b_lowDPhi*rCS_W_crNJet_0b_corr['rCS']
@@ -280,8 +300,8 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, QCD=Fa
 
 
   print "W pred:",pred_W,'+/-',sqrt(pred_Var_W),'W truth:',truth_W,'+/-',sqrt(truth_W_var)
-  print "W(-) pred:",pred_W_PosPdg,'+/-',sqrt(pred_Var_W_PosPdg),'W truth:',truth_W_PosPdg,'+/-',sqrt(truth_W_var_PosPdg)
-  print "W(+) pred:",pred_W_NegPdg,'+/-',sqrt(pred_Var_W_NegPdg),'W truth:',truth_W_NegPdg,'+/-',sqrt(truth_W_var_NegPdg)
+  print "W(-) pred:",pred_W_PosPdg,'+/-',sqrt(pred_Var_W_PosPdg),'W truth:',truth_W_PosPdg,'+/-',sqrt(truth_W_PosPdg_var)
+  print "W(+) pred:",pred_W_NegPdg,'+/-',sqrt(pred_Var_W_NegPdg),'W truth:',truth_W_NegPdg,'+/-',sqrt(truth_W_NegPdg_var)
 
 
   rd.update( {"W_pred":pred_W,"W_pred_err":sqrt(pred_Var_W),\
@@ -289,13 +309,13 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, QCD=Fa
               "W_truth":truth_W,"W_truth_err":sqrt(truth_W_var),\
               "W_PosPdg_pred":pred_W_PosPdg,"W_PosPdg_pred_err":sqrt(pred_Var_W_PosPdg),\
               "W_PosPdg_pred_corrRest":pred_corrRest_W_PosPdg,"W_PosPdg_pred_corrRest_err":sqrt(pred_Var_corrRest_W_PosPdg),\
-              "W_PosPdg_truth":truth_W_PosPdg,"W_PosPdg_truth_err":sqrt(truth_W_var_PosPdg),\
+              "W_PosPdg_truth":truth_W_PosPdg,"W_PosPdg_truth_err":sqrt(truth_W_PosPdg_var),\
               "W_NegPdg_pred":pred_W_NegPdg,"W_NegPdg_pred_err":sqrt(pred_Var_W_NegPdg),\
               "W_NegPdg_pred_corrRest":pred_corrRest_W_NegPdg,"W_NegPdg_pred_corrRest_err":sqrt(pred_Var_corrRest_W_NegPdg),\
-              "W_NegPdg_truth":truth_W_NegPdg,"W_NegPdg_truth_err":sqrt(truth_W_var_NegPdg),\
+              "W_NegPdg_truth":truth_W_NegPdg,"W_NegPdg_truth_err":sqrt(truth_W_NegPdg_var),\
               'Rest_truth':truth_Rest,'Rest_truth_err':sqrt(truth_Rest_var),\
-              'Rest_PosPdg_truth':truth_Rest_PosPdg,'Rest_PosPdg_truth_err':sqrt(truth_Rest_var_PosPdg),\
-              'Rest_NegPdg_truth':truth_Rest_NegPdg,'Rest_NegPdg_truth_err':sqrt(truth_Rest_var_NegPdg),\
+              'Rest_PosPdg_truth':truth_Rest_PosPdg,'Rest_PosPdg_truth_err':sqrt(truth_Rest_PosPdg_var),\
+              'Rest_NegPdg_truth':truth_Rest_NegPdg,'Rest_NegPdg_truth_err':sqrt(truth_Rest_NegPdg_var),\
               })
   bins.update(rd)
   del rd

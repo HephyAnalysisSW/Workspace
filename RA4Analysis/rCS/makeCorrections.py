@@ -388,19 +388,48 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
 
       print
       print 'Calculating kappa values'
-      if not isData:
+      if isCentralPrediction:
         TT_kappa, TT_kappa_err = getPropagatedError(res[njb][stb][htb]['TT_truth'], res[njb][stb][htb]['TT_truth_err'], TT_pred_forTotal, TT_pred_err_forTotal, returnCalcResult=True)
         W_kappa, W_kappa_err = getPropagatedError(res[njb][stb][htb]['W_truth'], res[njb][stb][htb]['W_truth_err'], res[njb][stb][htb]['W_pred'], res[njb][stb][htb]['W_pred_err'], returnCalcResult=True)
+        W_corrRest_kappa, W_corrRest_kappa_err = getPropagatedError(res[njb][stb][htb]['W_truth'], res[njb][stb][htb]['W_truth_err'], res[njb][stb][htb]['W_pred_corrRest'], res[njb][stb][htb]['W_pred_corrRest_err'], returnCalcResult=True)
         res[njb][stb][htb]['TT_kappa'] = TT_kappa
         res[njb][stb][htb]['TT_kappa_err'] = TT_kappa_err
         res[njb][stb][htb]['W_kappa'] = W_kappa
         res[njb][stb][htb]['W_kappa_err'] = W_kappa_err
-      print 'kappa(TT):', getValErrString(TT_kappa,TT_kappa_err)
-      print 'kappa(W):', getValErrString(W_kappa,W_kappa_err)
+        res[njb][stb][htb]['W_corrRest_kappa'] = W_corrRest_kappa
+        res[njb][stb][htb]['W_corrRest_kappa_err'] = W_corrRest_kappa_err
+        print 'kappa(TT):', getValErrString(TT_kappa,TT_kappa_err)
+        print 'kappa(W):', getValErrString(W_kappa,W_kappa_err)
+        print 'kappa(W_corrRest):', getValErrString(W_kappa,W_kappa_err)
+      else:
+        kappa_dict = pickle.load(file(kappa_dict_dir))
+        TT_kappa              = kappa_dict[njb][stb][htb]['TT_kappa']
+        TT_kappa_err          = kappa_dict[njb][stb][htb]['TT_kappa_err']
+        W_kappa               = kappa_dict[njb][stb][htb]['W_kappa']
+        W_kappa_err           = kappa_dict[njb][stb][htb]['W_kappa_err']
+        W_corrRest_kappa      = kappa_dict[njb][stb][htb]['W_corrRest_kappa']
+        W_corrRest_kappa_err  = kappa_dict[njb][stb][htb]['W_corrRest_kappa_err']
+        TT_pred_kappa, TT_pred_kappa_err = getPropagatedError([TT_pred_corr, TT_kappa], [TT_stat_err, TT_kappa_err], 1, 0, returnCalcResult=True)
+        W_pred_kappa, W_pred_kappa_err = getPropagatedError([res[njb][stb][htb]['W_pred'], W_kappa], [res[njb][stb][htb]['W_pred_err'], W_kappa_err], 1, 0, returnCalcResult=True)
+        #W_pred_corrRest_kappa, W_pred_corrRest_kappa_err = getPropagatedError([res[njb][stb][htb]['W_pred_corrRest'], W_corrRest_kappa], [res[njb][stb][htb]['W_pred_corrRest_err'], W_corrRest_kappa_err], 1, 0, returnCalcResult=True)
+        
+        res[njb][stb][htb]['TT_kappa'] = TT_kappa
+        res[njb][stb][htb]['TT_kappa_err'] = TT_kappa_err
+        res[njb][stb][htb]['W_kappa'] = W_kappa
+        res[njb][stb][htb]['W_kappa_err'] = W_kappa_err
+        res[njb][stb][htb]['W_corrRest_kappa'] = W_corrRest_kappa
+        res[njb][stb][htb]['W_corrRest_kappa_err'] = W_corrRest_kappa_err
+        
+        res[njb][stb][htb]['W_pred_final']      = W_pred_kappa
+        res[njb][stb][htb]['W_pred_final_err']  = W_pred_kappa_err
+        res[njb][stb][htb]['TT_pred_final']     = TT_pred_kappa
+        res[njb][stb][htb]['TT_pred_final_err'] = TT_pred_kappa_err
+        res[njb][stb][htb]['tot_final']         = TT_pred_kappa + W_pred_kappa + res[njb][stb][htb]['Rest_truth']
+        res[njb][stb][htb]['tot_final_err']     = sqrt(TT_pred_kappa_err**2 + W_pred_kappa_err**2 + res[njb][stb][htb]['Rest_truth_err']**2)
 
       if createFits:
         del ttJetRcsFitH, ttJetRcsFitH1b
 
 if createFits: pickle.dump(fitResults ,file(fitDir+prefix+'_fit_pkl','w'))
-pickle.dump(res,file(pickleDir+prefix+'_estimationResults_pkl_kappa_corrected_test','w'))
+pickle.dump(res,file(pickleDir+prefix+'_estimationResults_pkl_kappa_corrected','w'))
 

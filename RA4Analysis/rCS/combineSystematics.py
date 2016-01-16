@@ -148,17 +148,23 @@ for injb,srNJet in enumerate(sorted(signalRegions)):
       qcdErrH.SetBinContent(i, qcdErr)
       
       rcsErr = sqrt(rcs[srNJet][stb][htb]['W_pred_errs']['syst']**2+rcs[srNJet][stb][htb]['TT_rCS_fits_MC']['syst']**2)/rcs[srNJet][stb][htb]['tot_pred']
+      rcsErr_tt = rcs[srNJet][stb][htb]['TT_rCS_fits_MC']['syst']/rcs[srNJet][stb][htb]['TT_pred']
+      rcsErr_W = rcs[srNJet][stb][htb]['W_pred_errs']['syst']/rcs[srNJet][stb][htb]['W_pred']
+      print 'Rcs unc tt, W',rcsErr_tt, rcsErr_W
       print rcs[srNJet][stb][htb]['W_pred_errs']['syst'], rcs[srNJet][stb][htb]['TT_rCS_fits_MC']['syst'], rcs[srNJet][stb][htb]['tot_pred']
       rcsErrH.SetBinContent(i,rcsErr)
       
       totalSyst = bErr**2 + wXErr**2 + ttXErr**2 + wPErr**2 + rcsErr**2 + qcdErr**2
       totalSyst = sqrt(totalSyst)
+
+      ttSyst  = sqrt(bErr**2 + wXErr**2 + ttXErr**2 + wPErr**2 + rcsErr_tt**2 + qcdErr**2)
+      WSyst   = sqrt(bErr**2 + wXErr**2 + ttXErr**2 + wPErr**2 + rcsErr_W**2 + qcdErr**2)
       
       dataStat = dataResult[srNJet][stb][htb]['tot_pred_err']/dataResult[srNJet][stb][htb]['tot_pred']
       total = sqrt(totalSyst**2+dataStat**2)
       totalH.SetBinContent(i, totalSyst)
       
-      systematics = {'btagSF':bErr, 'Wxsec':wXErr, 'TTxsec':ttXErr, 'Wpol':wPErr, 'rcs':rcsErr, 'QCD':qcdErr, 'total':totalSyst}
+      systematics = {'btagSF':bErr, 'Wxsec':wXErr, 'TTxsec':ttXErr, 'Wpol':wPErr, 'rcs':rcsErr, 'QCD':qcdErr, 'total':totalSyst, 'rcs_tt':rcsErr_tt, 'rcs_W':rcsErr_W, 'ttJets':ttSyst, 'WJets':WSyst}
       
       rcs[srNJet][stb][htb]['systematics'] = systematics
             
@@ -290,9 +296,9 @@ total_err.Draw('2 same')
 
 can.cd()
 
-can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2015/syst_errors_6.png')
-can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2015/syst_errors_6.root')
-can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2015/syst_errors_6.pdf')
+can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2015/syst_errors_forKappa.png')
+can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2015/syst_errors_forKappa.root')
+can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2015/syst_errors_forKappa.pdf')
 
 pickle.dump(rcs, file(pickleDir+'resultsFinal_withSystematics_pkl','w'))
 
