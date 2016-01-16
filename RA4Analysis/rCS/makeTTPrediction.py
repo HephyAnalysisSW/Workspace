@@ -166,7 +166,19 @@ def makeTTPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, QCD=F
 
   #true yields measured from MC samples
   truth_TT, truth_TT_var = getYieldFromChain(cTTJets, rCS_sr_Cut+"&&"+dPhiStr+">"+str(dPhiCut), weight = weight_str_0bMC, returnVar=True)
+  truth_TT_CR, truth_TT_CR_var = getYieldFromChain(cTTJets, rCS_sr_Cut+"&&"+dPhiStr+"<"+str(dPhiCut), weight = weight_str_0bMC, returnVar=True)
+  rd['yTT_srNJet_0b_lowDPhi_truth'] = truth_TT_CR
+  rd['yTT_Var_srNJet_0b_lowDPhi_truth'] = truth_TT_CR_var
 #  truth_TT_var    = getYieldFromChain(cTTJets, rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = weight_err_str)
+
+  truth_QCD, truth_QCD_var = getYieldFromChain(cQCD, rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = weight_str, returnVar=True)
+  truth_QCD_CR, truth_QCD_CR_var = getYieldFromChain(cQCD, rCS_sr_Cut_0b+"&&"+dPhiStr+"<"+str(dPhiCut), weight = weight_str, returnVar=True)
+  rd['yQCD_srNJet_0b_lowDPhi_truth']      = truth_QCD_CR
+  rd['yQCD_Var_srNJet_0b_lowDPhi_truth']  = truth_QCD_CR_var
+
+  rd['QCD_truth']     = truth_QCD
+  rd['QCD_truth_err'] = sqrt(truth_QCD_var)
+
 
   #predicted yields with RCS method
   ttJetsCRForRCS = rCS_crLowNJet_1b #New version, orthogonal to DPhi (lower njet region in 1b-tag bin)

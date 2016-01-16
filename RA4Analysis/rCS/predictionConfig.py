@@ -21,22 +21,23 @@ dPhiStr = 'deltaPhi_Wl'
 bjreg = (0,0)
 wjetsSB = (3,4)
 
-nBTagVar = 'nBJetMediumCSV30'
-useBTagWeights = True
-btagWeightSuffix = '_SF'
-templateWeights = True
-templateWeightSuffix = '_SF'
+nBTagVar              = 'nBJetMediumCSV30'
+useBTagWeights        = True
+btagWeightSuffix      = '_SF'
+templateWeights       = True
+templateWeightSuffix  = '_SF'
 
-QCDup = False
-QCDdown = False
-nameSuffix = ''
+QCDup       = False
+QCDdown     = False
+nameSuffix  = ''
 if QCDup: nameSuffix += '_QCDup'
 if QCDdown: nameSuffix += '_QCDdown'
 
 ## samples
-isData = False
-unblinded = False
-validation = False
+isData              = True
+unblinded           = False
+validation          = False
+isCentralPrediction = False
 
 cWJets      = getChain(WJetsHTToLNu_25ns,histname='')
 cTTJets     = getChain(TTJets_combined,histname='')
@@ -98,13 +99,14 @@ if isData:
   templateName   = 'SFtemplates_fullSR_lep_data'
   predictionName = templateName
 else:
-  templateName   = 'SFtemplates_fullSR_lep_MC' + nameSuffix
+  templateName   = 'SFtemplates_fullSR_lep_MC'
   predictionName = templateName+btagWeightSuffix + nameSuffix
 printDir    = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/25ns/templateFit_'+predictionName+'_'+lumistr+'/'
 pickleDir   = '/data/'+username+'/Results'+year+'/Prediction_'+predictionName+'_'+lumistr+'/'
 templateDir = '/data/'+username+'/Results'+year+'/btagTemplates_'+templateName+'_'+templateLumistr+'/'
 prefix = 'singleLeptonic_Spring15_'
 
+kappa_dict_dir = '/data/'+username+'/Results'+year+'/Prediction_SFtemplates_fullSR_lep_MC_SF_2p1/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'
 
 ## Preselection cut
 triggers = "(HLT_EleHT350||HLT_MuHT350)"
