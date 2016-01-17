@@ -79,7 +79,7 @@ b = 1
 
 signalRegions = signalRegion3fb
 n_bootstrap = 100
-
+WSB = False
 
 for i_njb, njb in enumerate(sorted(signalRegions)):
   for stb in sorted(signalRegions[njb]):
@@ -92,8 +92,12 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
       print '#############################################'
       print
       dPhiCut = signalRegions[njb][stb][htb]['deltaPhi']
-
-      name, cut = nameAndCut(stb, htb, njb, btb=None, presel=presel, btagVar = nBTagVar)
+      srNJet = njb
+      if WSB:
+        srNJet = (3,4)
+        presel += '&&abs(leptonPdg)==13'
+      
+      name, cut = nameAndCut(stb, htb, srNJet, btb=None, presel=presel, btagVar = nBTagVar)
 
       fit = binnedNBTagsFit(cut+"&&"+dPhiStr+"<"+str(dPhiCut), name+'_dPhi'+str(dPhiCut), samples = samples, prefix=name)
       

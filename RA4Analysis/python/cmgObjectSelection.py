@@ -16,19 +16,19 @@ ele_MVAID_cuts_vloose = {(0,0.8):-0.11 , (0.8, 1.44):-0.55, (1.57, 999): -0.74} 
 ele_MVAID_cuts_tight = {(0,0.8):0.73 , (0.8, 1.44):0.57, (1.57, 999):  0.05}
 
 def cmgLooseMuID(r, nLep):
-  return r.LepGood_miniRelIso[nLep]<0.4 and r.LepGood_pt[nLep]>=10 and abs(r.LepGood_eta[nLep])<2.4
+  return r.LepGood_miniRelIso[nLep]<0.4 and r.LepGood_pt[nLep]>=10 and abs(r.LepGood_eta[nLep])<=2.4
 
 def cmgTightMuID(r, nLep):
-  return r.LepGood_pt[nLep]>=25 and abs(r.LepGood_eta[nLep])<2.4\
+  return r.LepGood_pt[nLep]>=25 and abs(r.LepGood_eta[nLep])<=2.4\
      and r.LepGood_miniRelIso[nLep]<0.2\
      and r.LepGood_mediumMuonId[nLep]\
      and abs(r.LepGood_sip3d[nLep])<4
 
 def cmgLooseEleID(r, nLep):
-  return r.LepGood_pt[nLep]>=10 and abs(r.LepGood_eta[nLep])<2.5 #and r.LepGood_miniRelIso[nLep]<0.4 and cmgMVAEleID(r,nLep,ele_MVAID_cuts_vloose) 
+  return r.LepGood_pt[nLep]>=10 and abs(r.LepGood_eta[nLep])<=2.4 #and r.LepGood_miniRelIso[nLep]<0.4 and cmgMVAEleID(r,nLep,ele_MVAID_cuts_vloose) 
 
 def cmgTightEleID(r, nLep):
-  return r.LepGood_pt[nLep]>=10 and abs(r.LepGood_eta[nLep])<2.5\
+  return r.LepGood_pt[nLep]>=10 and abs(r.LepGood_eta[nLep])<=2.4\
     and  r.LepGood_miniRelIso[nLep]<0.1  \
     and  r.LepGood_SPRING15_25ns_v1[nLep]==4
 
@@ -89,11 +89,15 @@ def get_cmg_index_and_DR(objs,objPhi,objEta):
     dr=float('nan')
   return index , dr
 
+
 def get_cmg_genLeps(c):
   return [getObjDict(c, 'genLep_', ['eta','pt','phi','charge', 'pdgId', 'sourceId'], i) for i in range(int(getVarValue(c, 'ngenLep')))]
 
 def get_cmg_genParts(c):
   return [getObjDict(c, 'GenPart_', ['eta','pt','phi','charge', 'pdgId', 'motherId', 'grandmotherId'], i) for i in range(int(getVarValue(c, 'nGenPart')))]
+
+def get_cmg_genParts_fromStruct(r,g_list):
+  return [{p:getattr(r, 'GenPart'+'_'+p)[i] for p in g_list} for i in range(r.nGenPart)]
 
 def get_cmg_genPartsAll(c):
   return [getObjDict(c, 'genPartAll_', ['eta','pt','phi','charge', 'pdgId', 'motherId', 'grandmotherId'], i) for i in range(int(getVarValue(c, 'ngenPartAll')))]

@@ -21,22 +21,23 @@ dPhiStr = 'deltaPhi_Wl'
 bjreg = (0,0)
 wjetsSB = (3,4)
 
-nBTagVar = 'nBJetMediumCSV30'
-useBTagWeights = True #True for weighted fake data, false for data
-btagWeightSuffix = '_SF'
-templateWeights = True
-templateWeightSuffix = '_SF'
+nBTagVar              = 'nBJetMediumCSV30'
+useBTagWeights        = True
+btagWeightSuffix      = '_SF'
+templateWeights       = True
+templateWeightSuffix  = '_SF'
 
-QCDup = False
-QCDdown = False
-nameSuffix = ''
+QCDup       = False
+QCDdown     = False
+nameSuffix  = ''
 if QCDup: nameSuffix += '_QCDup'
 if QCDdown: nameSuffix += '_QCDdown'
 
 ## samples
-isData = False
-unblinded = False
-validation = False
+isData              = True
+unblinded           = False
+validation          = False
+isCentralPrediction = False
 
 cWJets      = getChain(WJetsHTToLNu_25ns,histname='')
 cTTJets     = getChain(TTJets_combined,histname='')
@@ -45,9 +46,25 @@ csingleTop  = getChain(singleTop_25ns,histname='')
 cTTV        = getChain(TTV_25ns,histname='')
 cRest       = getChain([singleTop_25ns, DY_25ns, TTV_25ns],histname='')#no QCD
 cBkg        = getChain([WJetsHTToLNu_25ns, TTJets_combined, singleTop_25ns, DY_25ns, TTV_25ns], histname='')#no QCD
+cQCD        = getChain(QCDHT_25ns,histname='')
+
+
+## QCD estimation
+useQCDestimation = False
+if not isData and useQCDestimation: QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_MC2p1fb_pkl'
+if isData:
+  QCDpickle  = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_2p1fb_pkl'
+  #QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_extendedClosureTest3to4j_2p1fb_pkl'
+  #QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_closureTest4to5j_2p1fb_pkl'
+
+if isData or useQCDestimation: QCDestimate = pickle.load(file(QCDpickle))
+else: QCDestimate=False
+
 
 if isData:
   cData = getChain([single_mu_Run2015D, single_ele_Run2015D], histname='')
+elif not isData and useQCDestimation:
+  cData = getChain([WJetsHTToLNu_25ns, TTJets_combined, singleTop_25ns, DY_25ns, TTV_25ns, QCDHT_25ns], histname='')
 else:
   cData = getChain([WJetsHTToLNu_25ns, TTJets_combined, singleTop_25ns, DY_25ns, TTV_25ns], histname='')
 
@@ -63,27 +80,33 @@ templateLumi = 2.1 # lumi that was used when template was created - if defined w
 sampleLumi = 3.
 debugReweighting = False
 
-## QCD estimation
-useQCDestimation = False
-#QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_extendedClosureTest3to4j_2p1fb_pkl'
-#QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_closureTest4to5j_2p1fb_pkl'
-QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_MC2p1fb_pkl'
-if isData and useQCDestimation: QCDestimate = pickle.load(file(QCDpickle))
-else: QCDestimate=False
+year = '2016'
 
+if year=='2016':
+  lumistr = str(lumi).replace('.','p')
+  templateLumistr = str(templateLumi).replace('.','p')
+else:
+  lumistr = str(lumi)#.replace('.','p')
+  templateLumistr = str(templateLumi)#.replace('.','p')
+
+## Template Bootstrap error dictionary
+templateBootstrap = True
+templateBootstrapDir = '/data/dspitzbart/bootstrap/combined_errs_pkl'
+if templateBootstrap: templateBootstrap = pickle.load(file(templateBootstrapDir))
 
 ## Directories for plots, results and templates
 if isData:
   templateName   = 'SFtemplates_fullSR_lep_data'
   predictionName = templateName
 else:
-  templateName   = 'SFtemplates_fullSR_lep_MC' + nameSuffix
+  templateName   = 'SFtemplates_fullSR_lep_MC'
   predictionName = templateName+btagWeightSuffix + nameSuffix
-printDir    = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/25ns/templateFit_'+predictionName+'_'+str(lumi)+'/'
-pickleDir   = '/data/'+username+'/Results2015/Prediction_'+predictionName+'_'+str(lumi)+'/'
-templateDir = '/data/'+username+'/Results2015/btagTemplates_'+templateName+'_'+str(templateLumi)+'/'
+printDir    = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/25ns/templateFit_'+predictionName+'_'+lumistr+'/'
+pickleDir   = '/data/'+username+'/Results'+year+'/Prediction_'+predictionName+'_'+lumistr+'/'
+templateDir = '/data/'+username+'/Results'+year+'/btagTemplates_'+templateName+'_'+templateLumistr+'/'
 prefix = 'singleLeptonic_Spring15_'
 
+kappa_dict_dir = '/data/'+username+'/Results'+year+'/Prediction_SFtemplates_fullSR_lep_MC_SF_2p1/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'
 
 ## Preselection cut
 triggers = "(HLT_EleHT350||HLT_MuHT350)"
@@ -98,16 +121,17 @@ singleMu_presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSof
 
 ## corrections
 createFits = True
-fitDir = '/data/'+username+'/Results2015/correctionFit_validationAll_data/'
-
+fitDir = '/data/'+username+'/Results'+year+'/correctionFit_fullSR_MC'+nameSuffix+'/'
+fitPrintDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results'+year+'/25ns/RcsFit_'+predictionName+'_'+lumistr+'/'
 
 ## do stuff for test runs
 if testRun:
-  signalRegions = smallRegion
+  signalRegions = oneRegion
   predictionName = 'testRun'
-  printDir    = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/25ns/templateFit_'+predictionName+'_'+str(lumi)+'/'
-  pickleDir   = '/data/'+username+'/Results2015/Prediction_'+predictionName+'_'+str(lumi)+'/'
-  templateDir = '/data/'+username+'/Results2015/btagTemplates_'+predictionName+'_'+str(templateLumi)+'/'
+  printDir    = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results'+year+'/25ns/templateFit_'+predictionName+'_'+lumistr+'/'
+  pickleDir   = '/data/'+username+'/Results'+year+'/Prediction_'+predictionName+'_'+lumistr+'/'
+  templateDir = '/data/'+username+'/Results'+year+'/btagTemplates_'+predictionName+'_'+templateLumistr+'/'
+
 
 
 ## create directories that are defined but do not yet exist
@@ -119,3 +143,5 @@ if not os.path.exists(printDir):
   os.makedirs(printDir)
 if not os.path.exists(templateDir):
   os.makedirs(templateDir)
+if not os.path.exists(fitPrintDir):
+  os.makedirs(fitPrintDir)

@@ -1,7 +1,7 @@
 import ROOT
 import pickle
 import os,sys,math
-from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYieldFromChain
+from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYieldFromChain, getPropagatedError
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,varBinName
 
 from Workspace.HEPHYPythonTools.user import username
@@ -10,6 +10,9 @@ from math import pi, sqrt
 from Workspace.RA4Analysis.signalRegions import *
 
 from predictionConfig import *
+
+ROOT.gROOT.LoadMacro('../../HEPHYPythonTools/scripts/root/tdrstyle.C')
+ROOT.setTDRStyle()
 
 ROOT.TH1F().SetDefaultSumw2()
 
@@ -51,6 +54,9 @@ print 'Starting with fits for corrections and systematic errors, will use the fo
 print weight_str
 print
 
+ttcan = ROOT.TCanvas('ttcan','ttcan',700,700)
+wcan = ROOT.TCanvas('wcan','wcan',700,700)
+
 
 for i_njb, njb in enumerate(sorted(signalRegions)):
   bins[njb] = {}
@@ -89,7 +95,7 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
         kappaTT = divideRCSdict(rcs0bCRtt,rcs1bCRtt)
         kappaTT_btag = divideRCSdict(rcs0bCRtt_btag,rcs1bCRtt_btag)
 
-        fitResults[njb][stb][htb] = {'kappaTT':kappaTT, 'rcs1bCRtt':rcs1bCRtt_btag, 'rcs0bCRtt':rcs0bCRtt_btag, 'kappaTT_btag':kappaTT_btag}
+        fitResults[njb][stb][htb] = {'kappaTT':kappaTT, 'rcs1bCRtt_btag':rcs1bCRtt_btag, 'rcs1bCRtt':rcs1bCRtt, 'rcs0bCRtt':rcs0bCRtt, 'rcs0bCRtt_btag':rcs0bCRtt_btag, 'kappaTT_btag':kappaTT_btag}
 
         #fill histograms
         for i_njbTT, njbTT in enumerate(ttJetBins):
@@ -130,6 +136,36 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
         ttKE = FitFunc.GetParError(1)
         ttLinear = {'ttD':ttD, 'ttDE':ttDE, 'ttK':ttK, 'ttKE':ttKE}
         fitResults[njb][stb][htb].update({'ttLinear':ttLinear})
+
+        ttcan.cd()
+        ttJetRcsFitH.SetMarkerColor(ROOT.kBlue)
+        ttJetRcsFitH.SetLineColor(ROOT.kBlue)
+        ttJetRcsFitH.SetBarWidth(1)
+        ttJetRcsFitH.SetBarOffset(0)
+        ttJetRcsFitH.SetStats(0)
+        ttJetRcsFitH.SetMinimum(0)
+        ttJetRcsFitH.SetMaximum(0.2)
+        ttJetRcsFitH.Draw('EH1')
+        
+        latex1 = ROOT.TLatex()
+        latex1.SetNDC()
+        latex1.SetTextSize(0.03)
+        latex1.SetTextAlign(11)
+        latex1.DrawLatex(0.6,0.86,'linear fit k x + d')
+        latex1.DrawLatex(0.6,0.83,'k = '+str(round(ttK*1000,2))+' #pm '+str(round(ttKE*1000,2))+' #times 10^{-3}')
+        latex1.DrawLatex(0.6,0.8,'d = '+str(round(ttD*1000,2))+' #pm '+str(round(ttDE*1000,2))+' #times 10^{-3}')
+
+        latex2 = ROOT.TLatex()
+        latex2.SetNDC()
+        latex2.SetTextSize(0.04)
+        latex2.SetTextAlign(11)
+        latex2.DrawLatex(0.17,0.96,'CMS #bf{#it{simulation}}')
+        latex2.DrawLatex(0.7,0.96,"L=2.1fb^{-1} (13TeV)")
+
+        ttcan.Print(fitPrintDir+cname+'_ttjets_all_fit.png')
+        ttcan.Print(fitPrintDir+cname+'_ttjets_all_fit.pdf')
+        ttcan.Print(fitPrintDir+cname+'_ttjets_all_fit.root')
+        
         #print ttD, ttK
 
         #constant fit in 0b and 1b
@@ -154,7 +190,10 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
         #Load fit results if fitting isn't done        
         rcs1bCRtt = loadedFit[njb][stb][htb]['rcs1bCRtt']
         rcs0bCRtt = loadedFit[njb][stb][htb]['rcs0bCRtt']
+        rcs1bCRtt_btag = loadedFit[njb][stb][htb]['rcs1bCRtt_btag']
+        rcs0bCRtt_btag = loadedFit[njb][stb][htb]['rcs0bCRtt_btag']
         kappaTT =   loadedFit[njb][stb][htb]['kappaTT']
+        kappaTT_btag =   loadedFit[njb][stb][htb]['kappaTT_btag']
         ttD =       loadedFit[njb][stb][htb]['ttLinear']['ttD']
         ttDE =      loadedFit[njb][stb][htb]['ttLinear']['ttDE']
         ttK =       loadedFit[njb][stb][htb]['ttLinear']['ttK']
@@ -217,6 +256,7 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
             if not math.isnan(rcsD['rCS']):
               wJetRcsFitH.SetBinContent(i_njbW+1, rcsD['rCS'])
               wJetRcsFitH.SetBinError(i_njbW+1, rcsD['rCSE_sim'])
+              wJetRcsFitH.GetXaxis().SetBinLabel(i_njbW+1,nJetBinName(njbW))
 
           message = '** Linear Fit for WJets Rcs values in 0b MC '+Wc['name']+' charges **'
           stars = ''
@@ -239,6 +279,37 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
           wK  = FitFunc.GetParameter(1)
           wKE = FitFunc.GetParError(1)
           fitResults[njb][stb][htb][Wc['name']] = {'wD':wD, 'wDE':wDE, 'wK':wK, 'wKE':wKE}
+          
+          wcan.cd()
+          wJetRcsFitH.SetMarkerColor(color('wjets'))
+          wJetRcsFitH.SetLineColor(color('wjets'))
+          wJetRcsFitH.SetBarWidth(1)
+          wJetRcsFitH.SetBarOffset(0)
+          wJetRcsFitH.SetStats(0)
+          wJetRcsFitH.SetMinimum(0) 
+          wJetRcsFitH.SetMaximum(0.2)
+          wJetRcsFitH.GetYaxis().SetTitle('R_{CS}')
+          wJetRcsFitH.Draw('EH1')
+          
+          latex1 = ROOT.TLatex()
+          latex1.SetNDC()
+          latex1.SetTextSize(0.03)
+          latex1.SetTextAlign(11)
+          latex1.DrawLatex(0.6,0.86,'linear fit k x + d')
+          latex1.DrawLatex(0.6,0.83,'k = '+str(round(wK*1000,2))+' #pm '+str(round(wKE*1000,2))+' #times 10^{-3}')
+          latex1.DrawLatex(0.6,0.80,'d = '+str(round(wD*1000,2))+' #pm '+str(round(wDE*1000,2))+' #times 10^{-3}')
+          
+          latex2 = ROOT.TLatex()
+          latex2.SetNDC()
+          latex2.SetTextSize(0.04)
+          latex2.SetTextAlign(11)
+          latex2.DrawLatex(0.17,0.96,'CMS #bf{#it{simulation}}')
+          latex2.DrawLatex(0.7,0.96,"L=2.1fb^{-1} (13TeV)")
+          
+          wcan.Print(fitPrintDir+cname+'_Wjets_'+Wc['name']+'_fit.png')
+          wcan.Print(fitPrintDir+cname+'_Wjets_'+Wc['name']+'_fit.pdf')
+          wcan.Print(fitPrintDir+cname+'_Wjets_'+Wc['name']+'_fit.root')
+          
         else:
           wD  = loadedFit[njb][stb][htb][Wc['name']]['wD']
           wDE = loadedFit[njb][stb][htb][Wc['name']]['wDE']
@@ -304,7 +375,7 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
         else:
           TT_pred_forTotal = TT_pred_corr
           TT_pred_err_forTotal = TT_stat_err
-
+        
         print
         print '## ** Total prediction origin/updated for',Wc['name'],'charges **'
         print '##',getValErrString(res[njb][stb][htb][tot_key],res[njb][stb][htb][tot_err_key])
@@ -316,6 +387,45 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
           del wJetRcsFitH
 
       print
+      print 'Calculating kappa values'
+      if isCentralPrediction:
+        TT_kappa, TT_kappa_err = getPropagatedError(res[njb][stb][htb]['TT_truth'], res[njb][stb][htb]['TT_truth_err'], TT_pred_forTotal, TT_pred_err_forTotal, returnCalcResult=True)
+        W_kappa, W_kappa_err = getPropagatedError(res[njb][stb][htb]['W_truth'], res[njb][stb][htb]['W_truth_err'], res[njb][stb][htb]['W_pred'], res[njb][stb][htb]['W_pred_err'], returnCalcResult=True)
+        W_corrRest_kappa, W_corrRest_kappa_err = getPropagatedError(res[njb][stb][htb]['W_truth'], res[njb][stb][htb]['W_truth_err'], res[njb][stb][htb]['W_pred_corrRest'], res[njb][stb][htb]['W_pred_corrRest_err'], returnCalcResult=True)
+        res[njb][stb][htb]['TT_kappa'] = TT_kappa
+        res[njb][stb][htb]['TT_kappa_err'] = TT_kappa_err
+        res[njb][stb][htb]['W_kappa'] = W_kappa
+        res[njb][stb][htb]['W_kappa_err'] = W_kappa_err
+        res[njb][stb][htb]['W_corrRest_kappa'] = W_corrRest_kappa
+        res[njb][stb][htb]['W_corrRest_kappa_err'] = W_corrRest_kappa_err
+        print 'kappa(TT):', getValErrString(TT_kappa,TT_kappa_err)
+        print 'kappa(W):', getValErrString(W_kappa,W_kappa_err)
+        print 'kappa(W_corrRest):', getValErrString(W_kappa,W_kappa_err)
+      else:
+        kappa_dict = pickle.load(file(kappa_dict_dir))
+        TT_kappa              = kappa_dict[njb][stb][htb]['TT_kappa']
+        TT_kappa_err          = kappa_dict[njb][stb][htb]['TT_kappa_err']
+        W_kappa               = kappa_dict[njb][stb][htb]['W_kappa']
+        W_kappa_err           = kappa_dict[njb][stb][htb]['W_kappa_err']
+        W_corrRest_kappa      = kappa_dict[njb][stb][htb]['W_corrRest_kappa']
+        W_corrRest_kappa_err  = kappa_dict[njb][stb][htb]['W_corrRest_kappa_err']
+        TT_pred_kappa, TT_pred_kappa_err = getPropagatedError([TT_pred_corr, TT_kappa], [TT_stat_err, TT_kappa_err], 1, 0, returnCalcResult=True)
+        W_pred_kappa, W_pred_kappa_err = getPropagatedError([res[njb][stb][htb]['W_pred'], W_kappa], [res[njb][stb][htb]['W_pred_err'], W_kappa_err], 1, 0, returnCalcResult=True)
+        #W_pred_corrRest_kappa, W_pred_corrRest_kappa_err = getPropagatedError([res[njb][stb][htb]['W_pred_corrRest'], W_corrRest_kappa], [res[njb][stb][htb]['W_pred_corrRest_err'], W_corrRest_kappa_err], 1, 0, returnCalcResult=True)
+        
+        res[njb][stb][htb]['TT_kappa'] = TT_kappa
+        res[njb][stb][htb]['TT_kappa_err'] = TT_kappa_err
+        res[njb][stb][htb]['W_kappa'] = W_kappa
+        res[njb][stb][htb]['W_kappa_err'] = W_kappa_err
+        res[njb][stb][htb]['W_corrRest_kappa'] = W_corrRest_kappa
+        res[njb][stb][htb]['W_corrRest_kappa_err'] = W_corrRest_kappa_err
+        
+        res[njb][stb][htb]['W_pred_final']      = W_pred_kappa
+        res[njb][stb][htb]['W_pred_final_err']  = W_pred_kappa_err
+        res[njb][stb][htb]['TT_pred_final']     = TT_pred_kappa
+        res[njb][stb][htb]['TT_pred_final_err'] = TT_pred_kappa_err
+        res[njb][stb][htb]['tot_final']         = TT_pred_kappa + W_pred_kappa + res[njb][stb][htb]['Rest_truth']
+        res[njb][stb][htb]['tot_final_err']     = sqrt(TT_pred_kappa_err**2 + W_pred_kappa_err**2 + res[njb][stb][htb]['Rest_truth_err']**2)
 
       if createFits:
         del ttJetRcsFitH, ttJetRcsFitH1b
