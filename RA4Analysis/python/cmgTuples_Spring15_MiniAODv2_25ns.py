@@ -1,19 +1,20 @@
-path = "/data/easilar/tuples_from_Artur/MiniAODv2/" 
+#path = "/data/easilar/tuples_from_Artur/MiniAODv2/" 
+path = "/data/easilar/tuples_from_Artur/HT350_1nLep_LT200_hadrFlav/" 
 
-TTJets_LO_pow = {\
-"name" : "TTJets_LO_pow",
-"chunkString":"TTJets_LO_pow",
-"dir": path,
-"dbsName" : "",
-"skimAnalyzerDir":"skimAnalyzerCount",
-"rootFileLocation":"/treeProducerSusySingleLepton/tree.root",
-"treeName":"tree",
-'isData':False,
-}
+#TTJets_LO_pow = {\
+#"name" : "TTJets_LO_pow",
+#"chunkString":"TTJets_LO_pow",
+#"dir": path,
+#"dbsName" : "",
+#"skimAnalyzerDir":"skimAnalyzerCount",
+#"rootFileLocation":"/treeProducerSusySingleLepton/tree.root",
+#"treeName":"tree",
+#'isData':False,
+#}
 
 TTJets_SingleLeptonFromT_full = {\
-"name" : "TTJets_SingleLeptonFromT_full",
-"chunkString":"TTJets_SingleLeptonFromT_full",
+"name" : "TTJets_SingleLepton",
+"chunkString":"TTJets_SingleLepton",
 "dir": path,
 "dbsName" : "/TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM",
 "skimAnalyzerDir":"skimAnalyzerCount",
@@ -21,19 +22,19 @@ TTJets_SingleLeptonFromT_full = {\
 "treeName":"tree",
 'isData':False,
 }
-TTJets_SingleLeptonFromTbar_full = {\
-"name" : "TTJets_SingleLeptonFromTbar_full",
-"chunkString":"TTJets_SingleLeptonFromTbar_full",
-"dir": path,
-"dbsName" : "/TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/MINIAODSIM",
-"skimAnalyzerDir":"skimAnalyzerCount",
-"rootFileLocation":"/treeProducerSusySingleLepton/tree.root",
-"treeName":"tree",
-'isData':False,
-}
+#TTJets_SingleLeptonFromTbar_full = {\
+#"name" : "TTJets_SingleLeptonFromTbar_full",
+#"chunkString":"TTJets_SingleLeptonFromTbar_full",
+#"dir": path,
+#"dbsName" : "/TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/MINIAODSIM",
+#"skimAnalyzerDir":"skimAnalyzerCount",
+#"rootFileLocation":"/treeProducerSusySingleLepton/tree.root",
+#"treeName":"tree",
+#'isData':False,
+#}
 TTJets_DiLepton_full = {\
-"name" : "TTJets_DiLepton_full",
-"chunkString":"TTJets_DiLepton_full",
+"name" : "TTJets_DiLepton",
+"chunkString":"TTJets_DiLepton",
 "dir": path,
 "dbsName" : "/TTJets_DiLept_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/MINIAODSIM",
 "skimAnalyzerDir":"skimAnalyzerCount",
@@ -337,16 +338,16 @@ TBar_tWch ={\
 'isData':False
 }
 
-TBar_tWch_DS ={\
-"name" : "TBar_tWch_DS",
-"chunkString":"TBar_tWch_DS",
-"dir":  path ,
-"dbsName" : "",
-"skimAnalyzerDir":"skimAnalyzerCount",
-"rootFileLocation":"/treeProducerSusySingleLepton/tree.root",
-"treeName":"tree",
-'isData':False
-}
+#TBar_tWch_DS ={\
+#"name" : "TBar_tWch_DS",
+#"chunkString":"TBar_tWch_DS",
+#"dir":  path ,
+#"dbsName" : "",
+#"skimAnalyzerDir":"skimAnalyzerCount",
+#"rootFileLocation":"/treeProducerSusySingleLepton/tree.root",
+#"treeName":"tree",
+#'isData':False
+#}
 
 
 TToLeptons_sch ={\
@@ -360,17 +361,17 @@ TToLeptons_sch ={\
 'isData':False
 }
 
+#TToLeptons_tch ={\
+#"name" : "TToLeptons_tch_amcatnlo_full",
+#"chunkString":"TToLeptons_tch_amcatnlo_full",
+#"dir":  path ,
+#"dbsName" : "",
+#"skimAnalyzerDir":"skimAnalyzerCount",
+#"rootFileLocation":"/treeProducerSusySingleLepton/tree.root",
+#"treeName":"tree",
+#'isData':False
+#}
 TToLeptons_tch ={\
-"name" : "TToLeptons_tch_amcatnlo_full",
-"chunkString":"TToLeptons_tch_amcatnlo_full",
-"dir":  path ,
-"dbsName" : "",
-"skimAnalyzerDir":"skimAnalyzerCount",
-"rootFileLocation":"/treeProducerSusySingleLepton/tree.root",
-"treeName":"tree",
-'isData':False
-}
-TToLeptons_tch_amcatnlo ={\
 "name" : "TToLeptons_tch_amcatnlo",
 "chunkString":"TToLeptons_tch_amcatnlo",
 "dir":  path ,
@@ -381,16 +382,16 @@ TToLeptons_tch_amcatnlo ={\
 'isData':False
 }
 
-TToLeptons_tch_amcatnlo_ext = {\
-"name" : "TToLeptons_tch_amcatnlo_ext",
-"chunkString":"TToLeptons_tch_amcatnlo_ext",
-"dir":  path ,
-"dbsName" : "",
-"skimAnalyzerDir":"skimAnalyzerCount",
-"rootFileLocation":"/treeProducerSusySingleLepton/tree.root",
-"treeName":"tree",
-'isData':False
-}
+#TToLeptons_tch_amcatnlo_ext = {\
+#"name" : "TToLeptons_tch_amcatnlo_ext",
+#"chunkString":"TToLeptons_tch_amcatnlo_ext",
+#"dir":  path ,
+#"dbsName" : "",
+#"skimAnalyzerDir":"skimAnalyzerCount",
+#"rootFileLocation":"/treeProducerSusySingleLepton/tree.root",
+#"treeName":"tree",
+#'isData':False
+#}
 
 
 T_tWch ={\
@@ -404,16 +405,16 @@ T_tWch ={\
 'isData':False
 }
 
-T_tWch_DS ={\
-"name" : "T_tWch_DS",
-"chunkString":"T_tWch_DS",
-"dir":  path ,
-"dbsName" : "",
-"skimAnalyzerDir":"skimAnalyzerCount",
-"rootFileLocation":"/treeProducerSusySingleLepton/tree.root",
-"treeName":"tree",
-'isData':False
-}
+#T_tWch_DS ={\
+#"name" : "T_tWch_DS",
+#"chunkString":"T_tWch_DS",
+#"dir":  path ,
+#"dbsName" : "",
+#"skimAnalyzerDir":"skimAnalyzerCount",
+#"rootFileLocation":"/treeProducerSusySingleLepton/tree.root",
+#"treeName":"tree",
+#'isData':False
+#}
 
 ####Signal Samples###
 
