@@ -65,9 +65,9 @@ def getBTagMCTruthEfficiencies(c, cut="(1)", overwrite=False):
       ptCut = "abs(Jet_pt)>"+str(ptBin[0])
       if ptBin[1]>0:
         ptCut += "&&abs(Jet_pt)<"+str(ptBin[1])
-      c.Draw(commoncf+"(Jet_btagCSV>0.890)>>hbQuark(100,-1,2)",commoncf+"abs(Jet_mcFlavour)==5&&                     "+etaCut+"&&"+ptCut)
-      c.Draw(commoncf+"(Jet_btagCSV>0.890)>>hcQuark(100,-1,2)",commoncf+"abs(Jet_mcFlavour)==4&&                     "+etaCut+"&&"+ptCut)
-      c.Draw(commoncf+"(Jet_btagCSV>0.890)>>hOther(100,-1,2)" ,commoncf+"(abs(Jet_mcFlavour) < 4  || abs(Jet_mcFlavour) > 5)&&  "+etaCut+"&&"+ptCut)
+      c.Draw(commoncf+"(Jet_btagCSV>0.890)>>hbQuark(100,-1,2)",commoncf+"abs(Jet_hadronFlavour)==5&&                     "+etaCut+"&&"+ptCut)
+      c.Draw(commoncf+"(Jet_btagCSV>0.890)>>hcQuark(100,-1,2)",commoncf+"abs(Jet_hadronFlavour)==4&&                     "+etaCut+"&&"+ptCut)
+      c.Draw(commoncf+"(Jet_btagCSV>0.890)>>hOther(100,-1,2)" ,commoncf+"(abs(Jet_hadronFlavour) < 4  || abs(Jet_hadronFlavour) > 5)&&  "+etaCut+"&&"+ptCut)
       hbQuark = ROOT.gDirectory.Get("hbQuark")
       hcQuark = ROOT.gDirectory.Get("hcQuark")
       hOther = ROOT.gDirectory.Get("hOther")
@@ -191,7 +191,7 @@ def getMCEfficiencyForBTagSF(c, mcEff, onlyLightJetSystem = False, sms=""):
   for i in range(njets):
     jPt     = getVarValue(c, "Jet_pt", i)
     jEta    = getVarValue(c, "Jet_eta", i)
-    jParton = getVarValue(c, "Jet_mcFlavour", i)
+    jParton = getVarValue(c, "Jet_hadronFlavour", i)
 #                eff = 0.9-min(5,i)*0.1#getEfficiencyAndMistagRate(jPt, jEta, jParton )
     #if jPt<=40. or abs(jEta)>=2.4 or (not getVarValue(c, "jetsEleCleaned", i)) or (not getVarValue(c, "jetsMuCleaned", i)) or (not getVarValue(c, "jetsID", i)):
     if jPt<=30. or abs(jEta)>=2.4 or (not getVarValue(c, "Jet_id", i)):
@@ -273,7 +273,7 @@ def getBTagWeight(c, sms=""):
     isBtagged = False
     jPt     = getVarValue(c, "Jet_pt", i)
     jEta    = getVarValue(c, "Jet_eta", i)
-    jParton = getVarValue(c, "Jet_mcFlavour", i)
+    jParton = getVarValue(c, "Jet_hadronFlavour", i)
     jBTagCSV = getVarValue(c, "Jet_btagCSV", i)
     if jBTagCSV > 0.890: isBtagged = True
     if jPt<=30. or abs(jEta)>=2.4 or (not getVarValue(c, "Jet_id", i)):
