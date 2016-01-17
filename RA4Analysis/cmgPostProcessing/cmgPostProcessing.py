@@ -76,7 +76,7 @@ parser.add_option("--hadronicLeg", dest="hadronicLeg", default = False, action="
 parser.add_option("--manScaleFactor", dest="manScaleFactor", default = 1, action="store", help="define a scale factor for the whole sample")
 
 (options, args) = parser.parse_args()
-skimCond = "(Sum$(Jet_pt)>500)"
+skimCond = "(1)"
 ht500lt250 = "Sum$(Jet_pt)>500&&(LepGood_pt[0]+met_pt)>250"
 common_skim = "HT500LT250"
 if options.skim.startswith('met'):
@@ -392,8 +392,8 @@ for isample, sample in enumerate(allSamples):
           genParts = get_cmg_genParts_fromStruct(r,g_list)
           calc_TopPt_Weights(s,genParts)
           calc_LeptonScale_factors_and_systematics(s,histos_LS)
-          #if calcSystematics: 
-          #  calc_btag_systematics(t,s,r,mcEffDict,sampleKey,maxConsideredBTagWeight,separateBTagWeights)
+          if calcSystematics: 
+            calc_btag_systematics(t,s,r,mcEffDict,sampleKey,maxConsideredBTagWeight,separateBTagWeights)
 
         for v in newVars:
           v['branch'].Fill()
