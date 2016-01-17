@@ -14,7 +14,7 @@ from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed impor
 from Workspace.HEPHYPythonTools.user import username
 from Workspace.RA4Analysis.signalRegions import *
 
-testRun = False
+testRun = True
 
 ## b-tagging and other variables
 dPhiStr = 'deltaPhi_Wl'
