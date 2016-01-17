@@ -4,7 +4,8 @@ import copy, os, sys
 #dir = '/data/easilar/cmgTuples/postProcessed_miniAODv2_btagweight_fix4/HT500LT250/hard/'
 #dir = '/data/easilar/cmgTuples/postProcessed_Spring15_btagEff_SF15/HT500ST250/hard/'
 #dir = '/data/easilar/cmgTuples/postProcessing_Syst/HT500LT250/'
-dir = '/data/easilar/cmgTuples/postProcessing_Syst_topPt_diLep/HT500LT250/'
+#dir = '/data/easilar/cmgTuples/postProcessing_Syst_topPt_diLep/HT500LT250/'
+dir = '/data/easilar/cmgTuples/postProcessing_MC_hadrFlav/HT500LT250/'
 ####usual HT combination####
 TTJets_HTLO_25ns={\
 "name" : "tt+Jets_LO",
@@ -22,14 +23,15 @@ TTJets_HTLO_25ns={\
 TTJets_combined = {\
 "name" : "TTJets_combined",
 "bins" : [
-"TTJets_DiLepton_full",
+"TTJets_DiLepton",
 "TTJets_LO",
 "TTJets_LO_HT1200to2500",
 "TTJets_LO_HT2500toInf",
 "TTJets_LO_HT600to800",
 "TTJets_LO_HT800to1200",
-"TTJets_SingleLeptonFromT_full",
-"TTJets_SingleLeptonFromTbar_full",
+#"TTJets_SingleLeptonFromT_full",
+#"TTJets_SingleLeptonFromTbar_full",
+'TTJets_SingleLepton'
 ],
 'dir' : dir,
 }
@@ -56,10 +58,10 @@ singleTop_25ns={\
 "bins" : [
 "TBar_tWch",
 "TToLeptons_sch",
-"TToLeptons_tch_amcatnlo_full",
+"TToLeptons_tch_amcatnlo",
 "T_tWch",
 ],
-'dir' : '/data/dspitzbart/cmgTuples/postProcessing_Syst/HT500LT250/',
+'dir' : dir,
 }
 
 DY_25ns={\
@@ -70,7 +72,7 @@ DY_25ns={\
 "DYJetsToLL_M50_HT400to600",
 "DYJetsToLL_M50_HT600toInf",
 ],
-'dir' : '/data/dspitzbart/cmgTuples/postProcessing_Syst/HT500LT250/',
+'dir' : dir,
 }
 
 
@@ -96,7 +98,7 @@ TTV_25ns = {
 "TTZToLLNuNu",
 "TTZToQQ",
 ],
-'dir' : '/data/dspitzbart/cmgTuples/postProcessing_Syst/HT500LT250/',
+'dir' : dir,
 }
 
 allSignalStrings=[\
