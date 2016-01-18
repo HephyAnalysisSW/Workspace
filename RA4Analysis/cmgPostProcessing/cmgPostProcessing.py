@@ -19,7 +19,7 @@ from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns import *
 from systematics_helper import calc_btag_systematics, calc_LeptonScale_factors_and_systematics, calc_TopPt_Weights , calcDLDictionary, calc_diLep_contributions
 from btagEfficiency import *
 
-bTagEffFile = '/data/dspitzbart/Results2015/MCEff_skim_pkl'
+bTagEffFile = '/data/dspitzbart/Results2016/MCEff_skim_hadron_pkl'
 
 try:
   mcEffDict = pickle.load(file(bTagEffFile))
@@ -35,13 +35,13 @@ separateBTagWeights = True
 
 defSampleStr = "TTJets_LO"
 
-subDir = "postProcessing_MC_hadrFlav"
+subDir = "postProcessing_MC_hadrFlav_btag_Eff"
 #subDir = "postProcessing_Tests"
 
 #branches to be kept for data and MC
 branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert",
                      "nJet25", "nBJetLoose25", "nBJetMedium25", "nBJetTight25", "nJet40", "nJet40a", "nBJetLoose40", "nBJetMedium40", "nBJetTight40", 
-                     "nLepGood20", "nLepGood15", "nLepGood10", "htJet25", "mhtJet25", "htJet40j", "htJet40", "mhtJet40", "nSoftBJetLoose25", "nSoftBJetMedium25", "nSoftBJetTight25", 
+                     "nLepGood20", "nLepGood15", "nLepGood10", "htJet25", "mhtJet25", "htJet40j", "htJet40", "mhtJet40",
                      "met*","Flag_*","HLT_*",
 #                     "nFatJet","FatJet_*", 
                      "nJet", "Jet_*", 
@@ -55,7 +55,6 @@ branchKeepStrings_MC = [ "nTrueInt","lheHTIncoming","genWeight", "xsec", "puWeig
                      "GenSusyMScan1", "GenSusyMScan2", "GenSusyMScan3", "GenSusyMScan4", "GenSusyMGluino", "GenSusyMGravitino", "GenSusyMStop", "GenSusyMSbottom", "GenSusyMStop2", "GenSusyMSbottom2", "GenSusyMSquark", "GenSusyMNeutralino", "GenSusyMNeutralino2", "GenSusyMNeutralino3", "GenSusyMNeutralino4", "GenSusyMChargino", "GenSusyMChargino2", 
                      "ngenLep", "genLep_*", 
                      "nGenPart", "GenPart_*",
-                     "ngenPartAll","genPartAll_*" ,
                      "ngenTau", "genTau_*", 
                      "ngenLepFromTau", "genLepFromTau_*"]
 
