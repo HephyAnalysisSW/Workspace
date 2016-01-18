@@ -158,20 +158,20 @@ for srNJet in sorted(signalRegions):
       rest_H.SetBinError(i,  res[srNJet][stb][htb]['Rest_truth_err'])
 
       kappa_tt.SetBinContent(i,res[srNJet][stb][htb]['TT_kappa'])
-      kappa_tt_err = sqrt(res[srNJet][stb][htb]['TT_kappa_err']**2 + (res[srNJet][stb][htb]['TT_kappa']*sys[srNJet][stb][htb]['systematics']['ttJets'])**2)
+      kappa_tt_err = sqrt(res[srNJet][stb][htb]['TT_kappa_err']**2 + (res[srNJet][stb][htb]['TT_kappa']*sys[srNJet][stb][htb]['systematics']['total_tt'])**2)
       kappa_tt.SetBinError(i, kappa_tt_err)
       tt, tt_err = getPropagatedError([res[srNJet][stb][htb]['TT_pred'],res[srNJet][stb][htb]['TT_kappa']],[res[srNJet][stb][htb]['TT_pred_err'], kappa_tt_err], 1, 0, returnCalcResult=True)
       print
       print 'tt',getValErrString(tt, tt_err)
 
       kappa_W.SetBinContent(i,res[srNJet][stb][htb]['W_kappa'])
-      kappa_W_err = sqrt(res[srNJet][stb][htb]['W_kappa_err']**2 + (res[srNJet][stb][htb]['W_kappa']*sys[srNJet][stb][htb]['systematics']['WJets'])**2)
+      kappa_W_err = sqrt(res[srNJet][stb][htb]['W_kappa_err']**2 + (res[srNJet][stb][htb]['W_kappa']*sys[srNJet][stb][htb]['systematics']['total_W'])**2)
       kappa_W.SetBinError(i, kappa_W_err)
       w, w_err = getPropagatedError([res[srNJet][stb][htb]['W_pred'],res[srNJet][stb][htb]['W_kappa']],[res[srNJet][stb][htb]['W_pred_err'], kappa_W_err], 1, 0, returnCalcResult=True)
       print 'W',getValErrString(w, w_err)
 
       rest = res[srNJet][stb][htb]['Rest_truth']
-      rest_err = sqrt(res[srNJet][stb][htb]['Rest_truth_err']**2 + (res[srNJet][stb][htb]['Rest_truth']*0.5)**2)
+      rest_err = sqrt(res[srNJet][stb][htb]['Rest_truth_err']**2 + (res[srNJet][stb][htb]['Rest_truth']*sys[srNJet][stb][htb]['systematics']['total_W'])**2)
       print 'rest', getValErrString(rest, rest_err)
 
       total = tt + w + rest

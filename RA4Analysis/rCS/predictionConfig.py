@@ -14,7 +14,7 @@ from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed impor
 from Workspace.HEPHYPythonTools.user import username
 from Workspace.RA4Analysis.signalRegions import *
 
-testRun = True
+testRun = False
 
 ## b-tagging and other variables
 dPhiStr = 'deltaPhi_Wl'
@@ -34,7 +34,7 @@ if QCDup: nameSuffix += '_QCDup'
 if QCDdown: nameSuffix += '_QCDdown'
 
 ## samples
-isData              = True
+isData              = False
 unblinded           = False
 validation          = False
 isCentralPrediction = False
@@ -75,8 +75,8 @@ signalRegions = signalRegion3fb
 
 
 ## weight calculations
-lumi = 2.1
-templateLumi = 2.1 # lumi that was used when template was created - if defined wrong, fixed rest backgrounds will be wrong
+lumi = 2.3
+templateLumi = 2.3 # lumi that was used when template was created - if defined wrong, fixed rest backgrounds will be wrong
 sampleLumi = 3.
 debugReweighting = False
 
@@ -96,10 +96,10 @@ if templateBootstrap: templateBootstrap = pickle.load(file(templateBootstrapDir)
 
 ## Directories for plots, results and templates
 if isData:
-  templateName   = 'SFtemplates_fullSR_lep_data'
+  templateName   = 'SFtemplates_validation_lep_data'
   predictionName = templateName
 else:
-  templateName   = 'SFtemplates_fullSR_lep_MC'
+  templateName   = 'SFtemplates_validation_lep_MC'
   predictionName = templateName+btagWeightSuffix + nameSuffix
 printDir    = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/25ns/templateFit_'+predictionName+'_'+lumistr+'/'
 pickleDir   = '/data/'+username+'/Results'+year+'/Prediction_'+predictionName+'_'+lumistr+'/'

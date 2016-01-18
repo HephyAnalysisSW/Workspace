@@ -164,7 +164,11 @@ for injb,srNJet in enumerate(sorted(signalRegions)):
       total = sqrt(totalSyst**2+dataStat**2)
       totalH.SetBinContent(i, totalSyst)
       
-      systematics = {'btagSF':bErr, 'Wxsec':wXErr, 'TTxsec':ttXErr, 'Wpol':wPErr, 'rcs':rcsErr, 'QCD':qcdErr, 'total':totalSyst, 'rcs_tt':rcsErr_tt, 'rcs_W':rcsErr_W, 'ttJets':ttSyst, 'WJets':WSyst}
+      systematics = {'btagSF':bErr, 'Wxsec':wXErr, 'TTxsec':ttXErr, 'Wpol':wPErr, 'rcs':rcsErr, 'QCD':qcdErr, 'total':totalSyst, 'rcs_tt':rcsErr_tt, 'rcs_W':rcsErr_W, 'total_tt':ttSyst, 'total_W':WSyst, 'total_Rest':0.5}
+      rcs[srNJet][stb][htb]['TT_kappa_err_syst'] = rcs[srNJet][stb][htb]['W_kappa']*ttSyst
+      rcs[srNJet][stb][htb]['W_kappa_err_syst'] = rcs[srNJet][stb][htb]['W_kappa']*WSyst
+      rcs[srNJet][stb][htb]['TT_kappa_err_total'] = sqrt(rcs[srNJet][stb][htb]['W_kappa_err']**2 + (rcs[srNJet][stb][htb]['W_kappa']*ttSyst)**2)
+      rcs[srNJet][stb][htb]['W_kappa_err_total'] = sqrt(rcs[srNJet][stb][htb]['W_kappa_err']**2 + (rcs[srNJet][stb][htb]['W_kappa']*WSyst)**2)
       
       rcs[srNJet][stb][htb]['systematics'] = systematics
             
