@@ -14,6 +14,9 @@ import tempfile
 
 import ROOT
 
+# logger
+logger = logging.getLogger(__name__)   
+
 # functions
 
 def getEntryList(chain, cut, newname='entryListTMP'):
@@ -115,7 +118,7 @@ def prettyPrintCuts(cutName, cutExpression, printUnformated=False):
     nClosePar = cutExpression.count(')')
     nLogicalOp = cutExpression.count('&&') + cutExpression.count('||')
     
-    if (nOpenPar != nClosePar) or (2*nLogicalOp < nOpenPar):
+    if (nOpenPar != nClosePar):
         return '\nCut expression not well formated. \n' + prettyCutExpression + cutExpression 
 
     # cut expression well formated, return pretty format with two levels (zero and one)
@@ -242,6 +245,8 @@ def variablesStruct(variableList, structName='Variables'):
     The input is a dictionary, key: [rootDataType, rootMiDataType], with name as key and 
     [ROOT data type, ROOT machine-independent data type] as value.
     """
+
+    logger = logging.getLogger(__name__ + '.variablesStruct')   
     
     varList = []
     structString = " struct " + structName + " {"
@@ -260,7 +265,7 @@ def variablesStruct(variableList, structName='Variables'):
     structString += ''.join(varList) 
     structString += "};"
     
-    logging.info("\n Structure for variables: \n  %s ", str(structString) + '\n')
+    logger.info("\n Structure for variables: \n  %s ", str(structString) + '\n')
     # 
     return structString
 
