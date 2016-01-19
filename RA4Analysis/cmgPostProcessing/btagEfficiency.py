@@ -18,7 +18,8 @@ ptBorders = [30, 40, 50, 60, 70, 80, 100, 120, 160, 210, 260, 320, 400, 500, 670
 ptBins = []
 etaBins = [[0,0.8], [0.8,1.6], [ 1.6, 2.4]]
 
-calib = ROOT.BTagCalibration("csvv2", "CSVv2.csv")
+calib = ROOT.BTagCalibration("csvv2", "data/CSVv2.csv")
+calibFS = ROOT.BTagCalibration("csv", "data/CSV_13TEV_Combined_20_11_2015.csv")
 
 #SFb_errors = [\
 # 0.0209663,
@@ -128,6 +129,11 @@ readerMuUp        = ROOT.BTagCalibrationReader(calib, 1, "mujets", "up")
 readerMuCentral   = ROOT.BTagCalibrationReader(calib, 1, "mujets", "central")
 readerMuDown      = ROOT.BTagCalibrationReader(calib, 1, "mujets", "down")
 
+readerFSUp        = ROOT.BTagCalibrationReader(calibFS, 1, "fastsim", "up")
+readerFSCentral   = ROOT.BTagCalibrationReader(calibFS, 1, "fastsim", "central")
+readerFSDown      = ROOT.BTagCalibrationReader(calibFS, 1, "fastsim", "down")
+
+
 def getSF2015(parton, pt, eta):
   if abs(parton)==5: #SF for b
     if pt>669.9:
@@ -219,9 +225,22 @@ def getMCEfficiencyForBTagSF(c, mcEff, onlyLightJetSystem = False, sms=""):
   mceffs_SF_light_Down = tuple()
   for jParton, jPt, jEta, r in jets:
     if sms!="":
-      fsim_SF = ROOT.getFastSimCorr(partonName(abs(jParton)),jPt,"mean",jEta)
-      fsim_SF_up = ROOT.getFastSimCorr(partonName(abs(jParton)),jPt,"up",jEta)
-      fsim_SF_down = ROOT.getFastSimCorr(partonName(abs(jParton)),jPt,"down",jEta)
+      if abs(parton)==5: #SF for b
+        hadId = 0
+      elif abs(parton)==4: #SF for c
+        hadId = 1
+      else: #SF for light flavours
+        hadId = 2
+      if pt < 799.9:
+        fsim_SF       = readerFSCentral.eval(hadId, eta, pt)
+        fsim_SF_down  = readerFSDown.eval(hadId, eta, pt)
+        fsim_SF_up    = readerFSUp.eval(hadId, eta, pt)
+      else:
+        fsim_SF       = readerFSCentral.eval(hadId, eta, 799.9)
+        fsim_SF_down  = readerFSDown.eval(hadId, eta, 799.9)
+        fsim_SF_up    = readerFSUp.eval(hadId, eta, 799.9)
+        fsim_SF_down  = 2*fsim_SF_down - fsim_SF
+        fsim_SF_up    = 2*fsim_SF_up - fsim_SF
     else:
       fsim_SF = 1.
       fsim_SF_up = 1.

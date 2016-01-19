@@ -37,7 +37,9 @@ if QCDdown: nameSuffix += '_QCDdown'
 isData              = False
 unblinded           = False
 validation          = False
-isCentralPrediction = False
+isCentralPrediction = True
+if isData:
+  isCentralPrediction = False
 
 cWJets      = getChain(WJetsHTToLNu_25ns,histname='')
 cTTJets     = getChain(TTJets_combined,histname='')
@@ -60,7 +62,6 @@ if isData:
 if isData or useQCDestimation: QCDestimate = pickle.load(file(QCDpickle))
 else: QCDestimate=False
 
-
 if isData:
   cData = getChain([single_mu_Run2015D, single_ele_Run2015D], histname='')
 elif not isData and useQCDestimation:
@@ -72,7 +73,7 @@ else:
 ## signal region definition
 #signalRegions = validationRegionAll
 signalRegions = signalRegion3fb
-
+#signalRegions = signalRegion3fbMerge
 
 ## weight calculations
 lumi = 2.3
@@ -106,7 +107,7 @@ pickleDir   = '/data/'+username+'/Results'+year+'/Prediction_'+predictionName+'_
 templateDir = '/data/'+username+'/Results'+year+'/btagTemplates_'+templateName+'_'+templateLumistr+'/'
 prefix = 'singleLeptonic_Spring15_'
 
-kappa_dict_dir = '/data/'+username+'/Results'+year+'/Prediction_SFtemplates_fullSR_lep_MC_SF_2p1/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'
+kappa_dict_dir = '/data/'+username+'/Results'+year+'/Prediction_SFtemplates_validation_lep_MC_SF_2p3/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'
 
 ## Preselection cut
 triggers = "(HLT_EleHT350||HLT_MuHT350)"
@@ -120,7 +121,7 @@ singleMu_presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSof
 #presel = singleMu_presel
 
 ## corrections
-createFits = True
+createFits = False
 fitDir = '/data/'+username+'/Results'+year+'/correctionFit_fullSR_MC'+nameSuffix+'/'
 fitPrintDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results'+year+'/25ns/RcsFit_'+predictionName+'_'+lumistr+'/'
 

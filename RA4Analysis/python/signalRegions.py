@@ -75,6 +75,11 @@ signalRegion3fb = {(5, 5):  {(250, 350): {(500, -1):   {'deltaPhi': 1.0, 'njet':
                              (350, 450): {(500, -1):   {'deltaPhi': 0.75, 'njet':'#geq8j','LT':'L_{T}2','HT': 'H_{T}i'}},
                              (450, -1):  {(500, -1):   {'deltaPhi': 0.75, 'njet':'#geq8j','LT':'L_{T}3','HT': 'H_{T}i'}}}}
 
+signalRegion3fbMerge = {(5, 5):  {(450, -1):  {(500, -1):   {'deltaPhi': 0.75, 'njet':'5j','LT':'L_{T}3','HT': 'H_{T}i'}}},
+                        (6, 7):  {(450, -1):  {(500, 750):  {'deltaPhi': 0.75, 'njet':'6-7j','LT':'L_{T}3','HT': 'H_{T}12'},
+                                               (750, -1):   {'deltaPhi': 0.75, 'njet':'6-7j','LT':'L_{T}3','HT': 'H_{T}3'}}},
+                        (8, -1): {(350, 450): {(500, -1):   {'deltaPhi': 1.0,  'njet':'#geq8j','LT':'L_{T}2','HT': 'H_{T}i'}}}}
+
 signalRegion3fbReduced = {(5, 5):  {(250, 350): {(500, -1):  {'deltaPhi': 1.0, 'name':'5j, L_{Tl}, H_{Ti}'}},
                                     (350, 450): {(500, -1):  {'deltaPhi': 1.0, 'name':'5j, L_{Tm}, H_{Ti}'}},
                                     (450, -1):  {(500, -1):  {'deltaPhi': 0.75, 'name':'5j, L_{Th}, H_{Ti}'}}},

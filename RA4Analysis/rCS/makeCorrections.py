@@ -223,7 +223,10 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
       
       TT_y_diff = TT_rcs_diff*res[njb][stb][htb]['yTT_srNJet_0b_lowDPhi']
       
+      TT_pred_rcs_corr, TT_pred_rcs_corr_err = getPropagatedError([res[njb][stb][htb]['rCS_crLowNJet_1b']['rCS'], kappaTT_btag['kappa']],[res[njb][stb][htb]['rCS_crLowNJet_1b']['rCSE_sim'], kappaTT_btag['kappaE_sim']],1,0, returnCalcResult=True)
+
       TT_pred_corr = res[njb][stb][htb]['TT_pred']*kappaTT_btag['kappa']
+      res[njb][stb][htb]['rCS_crLowNJet_1b_kappa'] = {'rCS':TT_pred_rcs_corr, 'rCSE_sim':TT_pred_rcs_corr_err, 'rCSE_pred':TT_pred_rcs_corr_err}
       
       TT_stat_err = sqrt(res[njb][stb][htb]['TT_pred']**2*kappaTT_btag['kappaE_sim']**2+res[njb][stb][htb]['TT_pred_err']**2*kappaTT_btag['kappa']**2)
       TT_syst_err = TT_y_diff
@@ -351,7 +354,7 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
         WFitKey = 'W_rCS_linearFit_MC_0b'+Wc['string']
         res[njb][stb][htb].update({WFitKey:WFitPar})
 
-        W_errs = {'stat':W_stat_err, 'syst':W_syst_err, 'tot':WexpandedErr}
+        W_errs = {'stat':W_stat_err, 'syst':W_syst_err, 'tot':WexpandedErr, 'ratio_mu_elemu':WratioErr, 'const_vs_slope':Wdiff}
         W_errs_key = 'W_pred_errs'+Wc['string'] #Key for new dict with all errors
         W_key = 'W'+Wc['string']+'_pred' #Key for W prediction
         W_err_key = 'W'+Wc['string']+'_pred_err' #Key for W prediction error
@@ -389,9 +392,15 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
       print
       print 'Calculating kappa values'
       if isCentralPrediction:
-        TT_kappa, TT_kappa_err = getPropagatedError(res[njb][stb][htb]['TT_truth'], res[njb][stb][htb]['TT_truth_err'], TT_pred_forTotal, TT_pred_err_forTotal, returnCalcResult=True)
-        W_kappa, W_kappa_err = getPropagatedError(res[njb][stb][htb]['W_truth'], res[njb][stb][htb]['W_truth_err'], res[njb][stb][htb]['W_pred'], res[njb][stb][htb]['W_pred_err'], returnCalcResult=True)
-        W_corrRest_kappa, W_corrRest_kappa_err = getPropagatedError(res[njb][stb][htb]['W_truth'], res[njb][stb][htb]['W_truth_err'], res[njb][stb][htb]['W_pred_corrRest'], res[njb][stb][htb]['W_pred_corrRest_err'], returnCalcResult=True)
+        #kappa similar to multi-b analysis, does not invoke b-tag fit results (ratio of Rcs values)
+        TT_kappa, TT_kappa_err = getPropagatedError(res[njb][stb][htb]['rCS_srNJet_0b_onlyTT']['rCS'], res[njb][stb][htb]['rCS_srNJet_0b_onlyTT']['rCSE_sim'], TT_pred_rcs_corr, TT_pred_rcs_corr_err, returnCalcResult=True)
+        W_kappa, W_kappa_err = getPropagatedError(res[njb][stb][htb]['rCS_srNJet_0b_onlyW']['rCS'], res[njb][stb][htb]['rCS_srNJet_0b_onlyW']['rCSE_sim'], res[njb][stb][htb]['rCS_W_crNJet_0b_corr'], sqrt(res[njb][stb][htb]['rCS_Var_W_crNJet_0b_corr']), returnCalcResult=True)
+        W_corrRest_kappa, W_corrRest_kappa_err = getPropagatedError(res[njb][stb][htb]['rCS_srNJet_0b_onlyW']['rCS'], res[njb][stb][htb]['rCS_srNJet_0b_onlyW']['rCSE_sim'], res[njb][stb][htb]['rCS_W_crNJet_0b_corr_rest'], sqrt(res[njb][stb][htb]['rCS_Var_W_crNJet_0b_corr_rest']), returnCalcResult=True)
+
+        #different kappa to get closure in MC
+        TT_kappa_yield, TT_kappa_yield_err = getPropagatedError(res[njb][stb][htb]['TT_truth'], res[njb][stb][htb]['TT_truth_err'], TT_pred_forTotal, TT_pred_err_forTotal, returnCalcResult=True)
+        W_yield_kappa, W_kappa_yield_err = getPropagatedError(res[njb][stb][htb]['W_truth'], res[njb][stb][htb]['W_truth_err'], res[njb][stb][htb]['W_pred'], res[njb][stb][htb]['W_pred_err'], returnCalcResult=True)
+        W_yield_corrRest_kappa, W_yield_corrRest_kappa_err = getPropagatedError(res[njb][stb][htb]['W_truth'], res[njb][stb][htb]['W_truth_err'], res[njb][stb][htb]['W_pred_corrRest'], res[njb][stb][htb]['W_pred_corrRest_err'], returnCalcResult=True)
         res[njb][stb][htb]['TT_kappa'] = TT_kappa
         res[njb][stb][htb]['TT_kappa_err'] = TT_kappa_err
         res[njb][stb][htb]['W_kappa'] = W_kappa
@@ -409,9 +418,6 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
         W_kappa_err           = kappa_dict[njb][stb][htb]['W_kappa_err']
         W_corrRest_kappa      = kappa_dict[njb][stb][htb]['W_corrRest_kappa']
         W_corrRest_kappa_err  = kappa_dict[njb][stb][htb]['W_corrRest_kappa_err']
-        TT_pred_kappa, TT_pred_kappa_err = getPropagatedError([TT_pred_corr, TT_kappa], [TT_stat_err, TT_kappa_err], 1, 0, returnCalcResult=True)
-        W_pred_kappa, W_pred_kappa_err = getPropagatedError([res[njb][stb][htb]['W_pred'], W_kappa], [res[njb][stb][htb]['W_pred_err'], W_kappa_err], 1, 0, returnCalcResult=True)
-        #W_pred_corrRest_kappa, W_pred_corrRest_kappa_err = getPropagatedError([res[njb][stb][htb]['W_pred_corrRest'], W_corrRest_kappa], [res[njb][stb][htb]['W_pred_corrRest_err'], W_corrRest_kappa_err], 1, 0, returnCalcResult=True)
         
         res[njb][stb][htb]['TT_kappa'] = TT_kappa
         res[njb][stb][htb]['TT_kappa_err'] = TT_kappa_err
@@ -420,12 +426,26 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
         res[njb][stb][htb]['W_corrRest_kappa'] = W_corrRest_kappa
         res[njb][stb][htb]['W_corrRest_kappa_err'] = W_corrRest_kappa_err
         
-        res[njb][stb][htb]['W_pred_final']      = W_pred_kappa
-        res[njb][stb][htb]['W_pred_final_err']  = W_pred_kappa_err
-        res[njb][stb][htb]['TT_pred_final']     = TT_pred_kappa
-        res[njb][stb][htb]['TT_pred_final_err'] = TT_pred_kappa_err
-        res[njb][stb][htb]['tot_final']         = TT_pred_kappa + W_pred_kappa + res[njb][stb][htb]['Rest_truth']
-        res[njb][stb][htb]['tot_final_err']     = sqrt(TT_pred_kappa_err**2 + W_pred_kappa_err**2 + res[njb][stb][htb]['Rest_truth_err']**2)
+      TT_pred_kappa, TT_pred_kappa_err = getPropagatedError([TT_pred_corr, TT_kappa], [TT_stat_err, TT_kappa_err], 1, 0, returnCalcResult=True)
+      W_pred_kappa, W_pred_kappa_err = getPropagatedError([res[njb][stb][htb]['W_pred'], W_kappa], [res[njb][stb][htb]['W_pred_err'], W_kappa_err], 1, 0, returnCalcResult=True)
+      #W_pred_corrRest_kappa, W_pred_corrRest_kappa_err = getPropagatedError([res[njb][stb][htb]['W_pred_corrRest'], W_corrRest_kappa], [res[njb][stb][htb]['W_pred_corrRest_err'], W_corrRest_kappa_err], 1, 0, returnCalcResult=True)
+        
+      res[njb][stb][htb]['W_pred_final']      = W_pred_kappa
+      res[njb][stb][htb]['W_pred_final_err']  = W_pred_kappa_err
+      res[njb][stb][htb]['TT_pred_final']     = TT_pred_kappa
+      res[njb][stb][htb]['TT_pred_final_err'] = TT_pred_kappa_err
+      res[njb][stb][htb]['tot_pred_final']         = TT_pred_kappa + W_pred_kappa + res[njb][stb][htb]['Rest_truth']
+      res[njb][stb][htb]['tot_pred_final_err']     = sqrt(TT_pred_kappa_err**2 + W_pred_kappa_err**2 + res[njb][stb][htb]['Rest_truth_err']**2)
+      
+      if not 'yQCD_crNJet_1b_lowDPhi' in res[njb][stb][htb].keys():
+        res[njb][stb][htb]['yQCD_crNJet_1b_lowDPhi'] = 0.
+        res[njb][stb][htb]['yQCD_Var_crNJet_1b_lowDPhi'] = 0.
+      if not 'yQCD_crNJet_1b_highDPhi' in res[njb][stb][htb].keys():
+        res[njb][stb][htb]['yQCD_crNJet_1b_highDPhi'] = 0.
+        res[njb][stb][htb]['yQCD_Var_crNJet_1b_highDPhi'] = 0.
+      if not 'yQCD_srNJet_0b_lowDPhi' in res[njb][stb][htb].keys():
+        res[njb][stb][htb]['yQCD_srNJet_0b_lowDPhi'] = 0.
+        res[njb][stb][htb]['yQCD_Var_srNJet_0b_lowDPhi'] = 0.
 
       if createFits:
         del ttJetRcsFitH, ttJetRcsFitH1b

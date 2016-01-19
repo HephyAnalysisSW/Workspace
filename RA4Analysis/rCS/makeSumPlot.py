@@ -20,7 +20,7 @@ ROOT.gStyle.SetOptStat('')
 useWcorrection = False
 useTTcorrection = False
 signal = False
-withSystematics = True
+withSystematics = False
 
 prefix = 'singleLeptonic_Spring15_'
 #path = '/data/'+username+'/Results2015/Prediction_SFTemplate_MC_fullSR_lep_3.0/'
@@ -158,20 +158,29 @@ for srNJet in sorted(signalRegions):
       rest_H.SetBinError(i,  res[srNJet][stb][htb]['Rest_truth_err'])
 
       kappa_tt.SetBinContent(i,res[srNJet][stb][htb]['TT_kappa'])
-      kappa_tt_err = sqrt(res[srNJet][stb][htb]['TT_kappa_err']**2 + (res[srNJet][stb][htb]['TT_kappa']*sys[srNJet][stb][htb]['systematics']['total_tt'])**2)
+      if withSystematics:
+        kappa_tt_err = sqrt(res[srNJet][stb][htb]['TT_kappa_err']**2 + (res[srNJet][stb][htb]['TT_kappa']*sys[srNJet][stb][htb]['systematics']['total_tt'])**2)
+      else:
+        kappa_tt_err = res[srNJet][stb][htb]['TT_kappa_err']
       kappa_tt.SetBinError(i, kappa_tt_err)
       tt, tt_err = getPropagatedError([res[srNJet][stb][htb]['TT_pred'],res[srNJet][stb][htb]['TT_kappa']],[res[srNJet][stb][htb]['TT_pred_err'], kappa_tt_err], 1, 0, returnCalcResult=True)
       print
       print 'tt',getValErrString(tt, tt_err)
 
       kappa_W.SetBinContent(i,res[srNJet][stb][htb]['W_kappa'])
-      kappa_W_err = sqrt(res[srNJet][stb][htb]['W_kappa_err']**2 + (res[srNJet][stb][htb]['W_kappa']*sys[srNJet][stb][htb]['systematics']['total_W'])**2)
+      if withSystematics:
+        kappa_W_err = sqrt(res[srNJet][stb][htb]['W_kappa_err']**2 + (res[srNJet][stb][htb]['W_kappa']*sys[srNJet][stb][htb]['systematics']['total_W'])**2)
+      else:
+        kappa_W_err = res[srNJet][stb][htb]['W_kappa_err']
       kappa_W.SetBinError(i, kappa_W_err)
       w, w_err = getPropagatedError([res[srNJet][stb][htb]['W_pred'],res[srNJet][stb][htb]['W_kappa']],[res[srNJet][stb][htb]['W_pred_err'], kappa_W_err], 1, 0, returnCalcResult=True)
       print 'W',getValErrString(w, w_err)
 
       rest = res[srNJet][stb][htb]['Rest_truth']
-      rest_err = sqrt(res[srNJet][stb][htb]['Rest_truth_err']**2 + (res[srNJet][stb][htb]['Rest_truth']*sys[srNJet][stb][htb]['systematics']['total_W'])**2)
+      if withSystematics:
+        rest_err = sqrt(res[srNJet][stb][htb]['Rest_truth_err']**2 + (res[srNJet][stb][htb]['Rest_truth']*sys[srNJet][stb][htb]['systematics']['total_W'])**2)
+      else:
+        rest_err = res[srNJet][stb][htb]['Rest_truth_err']
       print 'rest', getValErrString(rest, rest_err)
 
       total = tt + w + rest
@@ -209,8 +218,9 @@ for srNJet in sorted(signalRegions):
         rest_H.SetBinContent(i, rest)
         rest_H.SetBinError(i,   rest_err)
       one.SetBinContent(i,1)
-      pred_H.SetBinContent(i, res[srNJet][stb][htb]['tot_pred'])
-      pred_H.SetBinError(i,   res[srNJet][stb][htb]['tot_pred_err'])
+      pred_H.SetBinContent(i, res[srNJet][stb][htb]['tot_pred_final'])
+      #need to use systematics here as well!!!
+      pred_H.SetBinError(i,   res[srNJet][stb][htb]['tot_pred_final_err'])
       if withSystematics:
         #predYErr.append(sqrt(res[srNJet][stb][htb]['tot_pred_err']**2 + (res[srNJet][stb][htb]['tot_pred']*sys[srNJet][stb][htb]['systematics']['total'])**2))
         predYErr.append(total_err)
@@ -300,7 +310,7 @@ latex1.SetTextSize(0.04)
 latex1.SetTextAlign(11)
 
 latex1.DrawLatex(0.15,0.96,'CMS #bf{#it{preliminary}}')
-latex1.DrawLatex(0.78,0.96,"L=2.1fb^{-1} (13TeV)")
+latex1.DrawLatex(0.78,0.96,"L=2.3fb^{-1} (13TeV)")
 
 pad1.SetLogy()
 
@@ -356,9 +366,9 @@ ratio2.Draw('e1p')
 
 can.cd()
 
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Prediction_'+predictionName+'_'+str(lumi)+'_data.png')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Prediction_'+predictionName+'_'+str(lumi)+'_data.root')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Prediction_'+predictionName+'_'+str(lumi)+'_data.pdf')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Prediction_'+predictionName+'_'+lumistr+'_fix_data_noSys.png')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Prediction_'+predictionName+'_'+lumistr+'_fix_data_noSys.root')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Prediction_'+predictionName+'_'+lumistr+'_fix_data_noSys.pdf')
 
 can2 = ROOT.TCanvas('can2','can2',700,700)
 
@@ -389,7 +399,7 @@ kappa_W.Draw('e1p same')
 leg2.Draw()
 
 latex2.DrawLatex(0.17,0.96,'CMS #bf{#it{simulation}}')
-latex2.DrawLatex(0.7,0.96,"L=2.1fb^{-1} (13TeV)")
+latex2.DrawLatex(0.7,0.96,"L=2.3fb^{-1} (13TeV)")
 
 can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Kappa.png')
 can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Kappa.root')
