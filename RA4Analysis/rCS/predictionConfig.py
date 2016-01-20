@@ -27,17 +27,17 @@ btagWeightSuffix      = '_SF'
 templateWeights       = True
 templateWeightSuffix  = '_SF'
 
-QCDup       = True
+QCDup       = False
 QCDdown     = False
 nameSuffix  = ''
 if QCDup: nameSuffix += '_QCDup'
 if QCDdown: nameSuffix += '_QCDdown'
 
 ## samples
-isData              = False
+isData              = True
 unblinded           = False
-validation          = False
-isCentralPrediction = True
+validation          = True
+isCentralPrediction = False
 
 cWJets      = getChain(WJetsHTToLNu_25ns,histname='')
 cTTJets     = getChain(TTJets_combined,histname='')
@@ -69,8 +69,8 @@ else:
 
 
 ## signal region definition
-#signalRegions = validationRegionAll
-signalRegions = signalRegion3fb
+signalRegions = validationRegionAll
+#signalRegions = signalRegion3fb
 #signalRegions = signalRegion3fbMerge
 
 ## weight calculations
@@ -95,10 +95,10 @@ if templateBootstrap: templateBootstrap = pickle.load(file(templateBootstrapDir)
 
 ## Directories for plots, results and templates
 if isData:
-  templateName   = 'SFtemplates_validation_lep_data'
+  templateName   = 'SFtemplates_validation_5j_lep_data'
   predictionName = templateName
 else:
-  templateName   = 'SFtemplates_validation_lep_MC'
+  templateName   = 'SFtemplates_validation_5j_lep_MC'
   predictionName = templateName+btagWeightSuffix + nameSuffix
 printDir    = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/25ns/templateFit_'+predictionName+'_'+lumistr+'/'
 pickleDir   = '/data/'+username+'/Results'+year+'/Prediction_'+predictionName+'_'+lumistr+'/'

@@ -67,10 +67,12 @@ b_err   = pickle.load(file('/data/dspitzbart/Results2016/btagErr_pkl'))
 l_err   = pickle.load(file('/data/dspitzbart/Results2016/mistagErr_pkl'))
 qcd_err = pickle.load(file('/data/dspitzbart/Results2015/qcdErr_pkl'))
 rcs     = pickle.load(file(pickleDir+'singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'))
-if validation:
-  dilep   = pickle.load(file('/data/easilar/Spring15/25ns/unc_with_validationRegionAll'))
-else:
-  dilep   = pickle.load(file('/data/easilar/Spring15/25ns/extended_with_truth_counts_tot_kappa_pkl'))
+dilep   = pickle.load(file('/data/dspitzbart/Results2016/dilep_val_pkl'))
+
+#if validation:
+#  dilep   = pickle.load(file('/data/easilar/Spring15/25ns/unc_with_validationRegionAll'))
+#else:
+#  dilep   = pickle.load(file('/data/easilar/Spring15/25ns/extended_with_truth_counts_tot_kappa_pkl'))
 
 topPt_Err = pickle.load(file("/data/easilar/Spring15/25ns/extended_with_truth_counts_topPt_pkl"))
 pu_Unc    = pickle.load(file("/data/easilar/Spring15/25ns/extended_with_truth_counts_PU_pkl"))
@@ -88,11 +90,13 @@ bErrH     = ROOT.TH1F('bErrH','b-jet SFs',bins,0,bins)
 wXErrH    = ROOT.TH1F('WXErrH','W+jets x-sec',bins,0,bins)
 ttXErrH   = ROOT.TH1F('ttXErrH','t#bar{t}+jets x-sec',bins,0,bins)
 wPErrH    = ROOT.TH1F('wPErrH','W polarization',bins,0,bins)
-rcsErrH   = ROOT.TH1F('rcsErrH','R_{CS} systematics',bins,0,bins)
+rcsErrH   = ROOT.TH1F('rcsErrH','R_{CS} n_{jet} depend.',bins,0,bins)
 qcdErrH   = ROOT.TH1F('qcdErrH','QCD fit',bins,0,bins)
 puErrH    = ROOT.TH1F('puErrH','pile-up',bins,0,bins)
 lepSFErrH = ROOT.TH1F('lepSFErrH','lepton SFs',bins,0,bins)
 topErrH   = ROOT.TH1F('topErrH','top p_{T}',bins,0,bins)
+dilepErrH = ROOT.TH1F('dilepErrH','dilep. events',bins,0,bins)
+
 
 dilepC   = ROOT.TH1F('dilepC','2l constant',bins,0,bins)
 dilepS   = ROOT.TH1F('dilepS','2l slope',bins,0,bins)
@@ -103,8 +107,8 @@ dummy.SetFillColor(ROOT.kWhite)
 
 ratio = ROOT.TH1F('ratio','ratio',bins,0,bins)
 
-hists = [dilepC,dilepS,bErrH,wXErrH,ttXErrH,wPErrH,qcdErrH, puErrH, lepSFErrH, topErrH]
-#hists = [rcsErrH,bErrH,wXErrH,ttXErrH,wPErrH,qcdErrH, puErrH, lepSFErrH, topErrH]
+#hists = [dilepC,dilepS,bErrH,wXErrH,ttXErrH,wPErrH,qcdErrH, puErrH, lepSFErrH, topErrH]
+hists = [rcsErrH,dilepErrH,bErrH,wXErrH,ttXErrH,wPErrH,qcdErrH, puErrH, lepSFErrH, topErrH]
 for i_h,h in enumerate(hists):
   h.SetFillColor(colors[i_h])
   h.SetLineColor(colors[i_h]+1)
@@ -204,26 +208,29 @@ for injb,srNJet in enumerate(sorted(signalRegions)):
       qcdErrH.SetBinContent(i, qcdErr)
       
       #2l
-      dilepConstant = max(map(abs,[dilep[srNJet][stb][htb]['delta_constant_Down'], dilep[srNJet][stb][htb]['delta_constant_Up']]))
-      dilepSlope    = max(map(abs,[dilep[srNJet][stb][htb]['delta_slope_Down'], dilep[srNJet][stb][htb]['delta_slope_Up']]))
-      dilepC.SetBinContent(i, dilepConstant)
-      dilepS.SetBinContent(i, dilepSlope)
+      dilepErr = dilep[srNJet][stb][htb]
+      dilepErrH.SetBinContent(i, dilepErr)
+      #dilepConstant = max(map(abs,[dilep[srNJet][stb][htb]['delta_constant_Down'], dilep[srNJet][stb][htb]['delta_constant_Up']]))
+      #dilepSlope    = max(map(abs,[dilep[srNJet][stb][htb]['delta_slope_Down'], dilep[srNJet][stb][htb]['delta_slope_Up']]))
+      #dilepC.SetBinContent(i, dilepConstant)
+      #dilepS.SetBinContent(i, dilepSlope)
       
       rcsErr = sqrt(rcs[srNJet][stb][htb]['W_pred_errs']['syst']**2+rcs[srNJet][stb][htb]['TT_rCS_fits_MC']['syst']**2)/rcs[srNJet][stb][htb]['tot_pred']
       rcsErr_tt = rcs[srNJet][stb][htb]['TT_rCS_fits_MC']['syst']/rcs[srNJet][stb][htb]['TT_pred']
       rcsErr_W = rcs[srNJet][stb][htb]['W_pred_errs']['syst']/rcs[srNJet][stb][htb]['W_pred']
       W_muToLep = rcs[srNJet][stb][htb]['W_pred_errs']['ratio_mu_elemu']/(rcs[srNJet][stb][htb]['rCS_W_crNJet_0b_corr']*rcs[srNJet][stb][htb]['yW_srNJet_0b_lowDPhi'])
+      print rcs[srNJet][stb][htb]['W_pred'], (rcs[srNJet][stb][htb]['rCS_W_crNJet_0b_corr']*rcs[srNJet][stb][htb]['yW_srNJet_0b_lowDPhi'])
       
       #print 'Rcs unc tt, W',rcsErr_tt, rcsErr_W
       #print rcs[srNJet][stb][htb]['W_pred_errs']['syst'], rcs[srNJet][stb][htb]['TT_rCS_fits_MC']['syst'], rcs[srNJet][stb][htb]['tot_pred']
       rcsErrH.SetBinContent(i,rcsErr)
       
-      totalSyst = bErr**2 + wXErr**2 + ttXErr**2 + wPErr**2 + qcdErr**2 + dilepSlope**2 + dilepConstant**2 + topErr**2 + puErr**2 + lepSFErr**2
-      #totalSyst = bErr**2 + wXErr**2 + ttXErr**2 + wPErr**2 + qcdErr**2 + rcsErr**2 + topErr**2 + puErr**2 + lepSFErr**2
+      #totalSyst = bErr**2 + wXErr**2 + ttXErr**2 + wPErr**2 + qcdErr**2 + dilepSlope**2 + dilepConstant**2 + topErr**2 + puErr**2 + lepSFErr**2
+      totalSyst = bErr**2 + wXErr**2 + ttXErr**2 + wPErr**2 + qcdErr**2 + rcsErr**2 + topErr**2 + puErr**2 + lepSFErr**2 + dilepErr**2
       totalSyst = sqrt(totalSyst)
 
-      ttSyst  = sqrt(bErr_tt**2 + wXErr**2 + ttXErr**2 + wPErr**2 + dilepSlope**2 + dilepConstant**2 + qcdErr**2 + topErr**2 + puErr**2 + lepSFErr**2)
-      WSyst   = sqrt(bErr_W**2  + wXErr**2 + ttXErr**2 + wPErr**2 + dilepSlope**2 + dilepConstant**2 + qcdErr**2 + topErr**2 + puErr**2 + lepSFErr**2 + W_muToLep**2)
+      ttSyst  = sqrt(bErr_tt**2 + wXErr**2 + ttXErr**2 + wPErr**2 + dilepErr**2 + qcdErr**2 + topErr**2 + puErr**2 + lepSFErr**2 + rcsErr_tt**2)
+      WSyst   = sqrt(bErr_W**2  + wXErr**2 + ttXErr**2 + wPErr**2 + dilepErr**2 + qcdErr**2 + topErr**2 + puErr**2 + lepSFErr**2 + rcsErr_W**2)
       
       dataStat = dataResult[srNJet][stb][htb]['tot_pred_err']/dataResult[srNJet][stb][htb]['tot_pred']
       total = sqrt(totalSyst**2+dataStat**2)
@@ -378,9 +385,9 @@ total_err.Draw('2 same')
 
 can.cd()
 
-can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2016/syst_errors.png')
-can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2016/syst_errors.root')
-can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2016/syst_errors.pdf')
+can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2016/syst_errors_validation.png')
+can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2016/syst_errors_validation.root')
+can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2016/syst_errors_validation.pdf')
 
-#pickle.dump(rcs, file(pickleDir+'resultsFinal_withSystematics_pkl','w'))
+pickle.dump(rcs, file(pickleDir+'resultsFinal_withSystematics_pkl','w'))
 

@@ -23,6 +23,7 @@ signal          = False
 withSystematics = False
 applyKappa      = False
 
+showMCtruth     = True
 
 weight_str, weight_err_str = makeWeight(lumi, sampleLumi)
 
@@ -290,7 +291,8 @@ leg.SetTextSize(0.045)
 if unblinded or validation:
   leg.AddEntry(truth_H, 'data')
 else:
-  leg.AddEntry(truth_H)
+  if showMCtruth:
+    leg.AddEntry(truth_H)
 leg.AddEntry(tt_pred_H,'','f')
 leg.AddEntry(w_pred_H,'','f')
 leg.AddEntry(rest_H,'','f')
@@ -307,7 +309,8 @@ pred_err = ROOT.TGraphAsymmErrors(bins, ax, ay, aexl, aexh, aeyl, aeyh)
 pred_err.SetFillColor(ROOT.kGray+1)
 pred_err.SetFillStyle(3244)
 pred_err.Draw('2 same')
-truth_H.Draw('e1p same')
+if showMCtruth:
+  truth_H.Draw('e1p same')
 #if unblinded or validation:
 #  data_truth_H.Draw('e1p same')
 
@@ -375,9 +378,9 @@ ratio2.Draw('e1p')
 
 can.cd()
 
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Prediction_'+predictionName+'_'+lumistr+'_noSys.png')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Prediction_'+predictionName+'_'+lumistr+'_noSys.root')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Prediction_'+predictionName+'_'+lumistr+'_noSys.pdf')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Prediction_'+predictionName+'_'+lumistr+'.png')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Prediction_'+predictionName+'_'+lumistr+'.root')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Prediction_'+predictionName+'_'+lumistr+'.pdf')
 
 can2 = ROOT.TCanvas('can2','can2',700,700)
 
@@ -410,7 +413,7 @@ leg2.Draw()
 latex2.DrawLatex(0.17,0.96,'CMS #bf{#it{simulation}}')
 latex2.DrawLatex(0.7,0.96,"L=2.3fb^{-1} (13TeV)")
 
-can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Kappa_QCD.png')
-can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Kappa_QCD.root')
-can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Kappa_QCD.pdf')
+can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Kappa.png')
+can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Kappa.root')
+can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Kappa.pdf')
 
