@@ -1,4 +1,4 @@
-#eleIdEff_iso.py
+#eleIdEff_noIso.py
 import ROOT
 import os, sys
 from Workspace.HEPHYPythonTools.helpers import getChunks, getChain#, getPlotFromChain, getYieldFromChain
@@ -8,13 +8,13 @@ from array import array
 from math import pi, sqrt #cos, sin, sinh, log
 
 #Input options
-inputSample = "WJets" # "Signal" "TTJets" "WJets"
-zoom = 0
+inputSample = "Signal" # "Signal" "TTJets" "WJets"
+zoom = 1
 save = 1
 presel = 1
 mvaWPs = 0
 nEles = "01" # 01,01tau,1,2
-isolation = "relIso03" #miniRelIso, relIso03, relIso04, relIsoAn04
+#isolation =  "relIso03" #relIso04, relIsoAn04, miniRelIso
 
 #ROOT Options
 ROOT.gROOT.Reset() #re-initialises ROOT
@@ -197,12 +197,12 @@ for WP in cuts.keys():
    cutSel = "(\
    (abs(LepGood_eta) <=" + str(ebeeSplit) + "&& LepGood_sigmaIEtaIEta <" + str(cuts[WP]['sigmaEtaEta']['Barrel']) + "&& abs(LepGood_dEtaScTrkIn) <" + str(cuts[WP]['dEta']['Barrel']) + \
    "&& abs(LepGood_dPhiScTrkIn) <" + str(cuts[WP]['dPhi']['Barrel']) + "&& LepGood_hadronicOverEm <" + str(cuts[WP]['hOverE']['Barrel']) + "&& abs(LepGood_eInvMinusPInv) <" + str(cuts[WP]['ooEmooP']['Barrel']) + \
-   "&& abs(LepGood_dxy) <" + str(cuts[WP]['d0']['Barrel']) + "&& abs(LepGood_dz) <" + str(cuts[WP]['dz']['Barrel']) + "&& LepGood_lostHits <=" + str(cuts[WP]['MissingHits']['Barrel']) + \
-   "&& LepGood_" + isolation + "<" + str(cuts[WP]['relIso']['Barrel']) + ") ||" + \
+   "&& abs(LepGood_dxy) <" + str(cuts[WP]['d0']['Barrel']) + "&& abs(LepGood_dz) <" + str(cuts[WP]['dz']['Barrel']) + "&& LepGood_lostHits <=" + str(cuts[WP]['MissingHits']['Barrel']) + ") ||" + \
    "(abs(LepGood_eta) >" + str(ebeeSplit) + "&& abs(LepGood_eta) <" + str(etaAcc) + "&& LepGood_sigmaIEtaIEta <" + str(cuts[WP]['sigmaEtaEta']['Endcap']) + "&& abs(LepGood_dEtaScTrkIn) <" + str(cuts[WP]['dEta']['Endcap']) + \
    "&& abs(LepGood_dPhiScTrkIn) <" + str(cuts[WP]['dPhi']['Endcap']) + "&& LepGood_hadronicOverEm <" + str(cuts[WP]['hOverE']['Endcap']) + "&& abs(LepGood_eInvMinusPInv) <" + str(cuts[WP]['ooEmooP']['Endcap']) + \
    "&& abs(LepGood_dxy) <" + str(cuts[WP]['d0']['Endcap']) + "&& abs(LepGood_dz) <" + str(cuts[WP]['dz']['Endcap']) + "&& LepGood_lostHits <=" + str(cuts[WP]['MissingHits']['Endcap']) + \
-   "&& LepGood_" + isolation + "<" + str(cuts[WP]['relIso']['Endcap']) + "))"
+   "))" #"&& LepGood_" + isolation + "<" + str(cuts['Endcap']['Veto']['relIso']) + "))"
+   #"&& LepGood_" + isolation + "<" + str(cuts['Barrel']['Veto']['relIso']) + ") ||" + \
    
    hists_passed[WP] = makeHistVarBins(Events, var, normFactor + "*" + weight + "*(" + preSel + "&&" + genSel + "&&" + matchSel + "&& " + cutSel + ")", bins)
    hists_passed[WP].SetName("eleID_" + WP)
@@ -226,8 +226,8 @@ l1.AddEntry("eleID_Loose", "Loose ID", "F")
 l1.AddEntry("eleID_Medium", "Medium ID", "F")
 l1.AddEntry("eleID_Tight", "Tight ID", "F")
 
-if mvaWPs == 1:
 #Electron MVA IDs
+if mvaWPs == 1:
    WPs = {'WP90':\
             {'EB1_lowPt':-0.083313, 'EB2_lowPt':-0.235222, 'EE_lowPt':-0.67099, 'EB1':0.913286, 'EB2':0.805013, 'EE':0.358969},\
           'WP80':\
@@ -261,11 +261,6 @@ if mvaWPs == 1:
 l1.Draw()
 
 ################################################################################################################################################################################
-#Efficiency curves
-c1.cd(2)
-
-effs = {}
-
 #Efficiency curves
 c1.cd(2)
 
@@ -323,7 +318,7 @@ if mvaWPs == 1:
 
    ROOT.gPad.Modified()
    ROOT.gPad.Update()
-
+   
    l2.AddEntry("eff_WP90", "MVA ID (WP90)", "P")
    l2.AddEntry("eff_WP80", "MVA ID (WP80)", "P")
 
@@ -336,8 +331,9 @@ c1.Update()
 
 #Write to file
 if save == 1:
-   if mvaWPs == 0: savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/electronReconstruction/electronID/iso/" + isolation + "/efficiency" #web address: http://www.hephy.at/user/mzarucki/plots/electronReconstruction/electronIdEfficiency
-   elif mvaWPs == 1: savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/electronReconstruction/electronID/iso/" + isolation + "/efficiency/withMva"  
+   if mvaWPs == 0: savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/electronReconstruction/electronID/noIso/efficiency" #web address: http://www.hephy.at/user/mzarucki/plots/electronReconstruction/electronIdEfficiency
+   elif mvaWPs == 1: savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/electronReconstruction/electronID/noIso/efficiency/withMva"
+   
    if not os.path.exists(savedir):
       os.makedirs(savedir)
    if not os.path.exists(savedir + "/root"):
@@ -346,6 +342,6 @@ if save == 1:
       os.makedirs(savedir + "/pdf")
    
    #Save to Web
-   c1.SaveAs(savedir + "/eleIDeff_iso_" + inputSample + z + ".png")
-   c1.SaveAs(savedir + "/root/eleIDeff_iso_" + inputSample + z + ".root")
-   c1.SaveAs(savedir + "/pdf/eleIDeff_iso_" + inputSample + z + ".pdf")
+   c1.SaveAs(savedir + "/eleIDeff_noIso_" + inputSample + z + ".png")
+   c1.SaveAs(savedir + "/root/eleIDeff_noIso_" + inputSample + z + ".root")
+   c1.SaveAs(savedir + "/pdf/eleIDeff_noIso_" + inputSample + z + ".pdf")

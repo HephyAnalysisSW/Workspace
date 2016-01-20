@@ -2,7 +2,7 @@
 import ROOT
 import os, sys
 from Workspace.HEPHYPythonTools.helpers import getChunks, getChain, getObjDict, deltaPhi#, getPlotFromChain, getYieldFromChain
-from Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_7412pass2_v4 import *
+from Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_7412pass2_v4 import * #data_path = "/data/nrad/cmgTuples/RunII/7412pass2_v4/RunIISpring15xminiAODv2"
 from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from array import array
 from math import pi, sqrt #cos, sin, sinh, log
@@ -11,7 +11,7 @@ def deltaR(l1, l2):
   return sqrt(deltaPhi(l1['phi'], l2['phi'])**2 + (l1['eta'] - l2['eta'])**2)
 
 #Input options
-inputSample = "Signal" # "Signal" "TTJets" "WJets"
+inputSample = "WJets" # "Signal" "TTJets" "WJets"
 zoom = 1
 save = 1
 presel = 1
@@ -29,17 +29,14 @@ ROOT.gStyle.SetOptFit(1111) #1111 prints fits results on plot
 #ROOT.gStyle.SetLineWidth(2)
 
 ROOT.gStyle.SetPaintTextFormat("4.2f")
-#ROOT.gStyle->SetTitleX(0.1)
-#ROOT.gStyle->SetTitleW(0.8)
+#ROOT.gStyle.SetTitleX(0.5) 
+#ROOT.gStyle.SetTitleAlign(23)
+#ROOT.gStyle.SetTitleW(0.8)
 
 ROOT.gStyle.SetStatX(0.75)
 ROOT.gStyle.SetStatY(0.65)
 ROOT.gStyle.SetStatW(0.1)
 ROOT.gStyle.SetStatH(0.15)
-
-#CMG Tuples
-#data_path = "/data/nrad/cmgTuples/RunII/7412pass2/RunIISpring15xminiAODv2"
-#data_path = "/afs/hephy.at/data/mzarucki01/cmgTuples"
 
 print makeLine()
 print "Signal Samples:"
@@ -49,18 +46,12 @@ print makeLine()
 print "Background Samples:"
 newLine()
 for s in samples: print s['name']
-#print makeLine()
 
 print makeLine()
 print "Using", inputSample, "samples."
 print makeLine()
 
 Events = ROOT.TChain("tree")
-
-#for s in allSamples_Spring15_25ns:
-#   if sample in s['name']:
-#      print s['name']
-#      for f in getChunks(s)[0]: Events.Add(f['file'])
 
 #Bin size 
 #nbins = 100
@@ -103,22 +94,25 @@ deltaRcut = 0.3
 
 #IDs: 0 - none, 1 - veto (~95% eff), 2 - loose (~90% eff), 3 - medium (~80% eff), 4 - tight (~70% eff)
 cutSel = "LepGood_SPRING15_25ns_v1 >="
-
+WPs_cut = ['Veto', 'Loose', 'Medium', 'Tight']
 #MVA IDs
-WPs = {'WP90':\
+WPs_mva = {'WP90':\
          {'EB1_lowPt':-0.083313, 'EB2_lowPt':-0.235222, 'EE_lowPt':-0.67099, 'EB1':0.913286, 'EB2':0.805013, 'EE':0.358969},\
        'WP80':\
          {'EB1_lowPt':0.287435, 'EB2_lowPt':0.221846, 'EE_lowPt':-0.303263, 'EB1':0.967083, 'EB2':0.929117, 'EE':0.726311},\
 }
 
+WPs = WPs_cut + WPs_mva.keys()
+
 ptSplit = 10 #we have above and below 10 GeV categories
 
 #Generated electrons
-hist_total = emptyHistVarBins("genEle", bins)
-hists_passed = []
+hist_total = emptyHistVarBins("eleID", bins)
+hists_passed = {}
 
-for i in range(1,7):
-   hists_passed.append(emptyHistVarBins("eleID" + str(i), bins))
+for i,WP in enumerate(WPs):
+   hists_passed[WP] = emptyHistVarBins("eleID_" + WP, bins)
+   hists_passed[WP].SetName("eleID_" + WP)
 
 #Selection criteria
 intLum = 10.0 #fb-1
@@ -184,49 +178,49 @@ for i in range(nEvents):
          #Determination of MVA ID cut value (dependent on electron pt and detector region)
          if recoEle['pt'] <= ptSplit:
             if abs(recoEle['eta']) < ebSplit:
-               MVA_min1 = WPs['WP80']['EB1_lowPt']
-               MVA_min2 = WPs['WP90']['EB1_lowPt']
+               MVA_min1 = WPs_mva['WP90']['EB1_lowPt']
+               MVA_min2 = WPs_mva['WP80']['EB1_lowPt']
             elif abs(recoEle['eta']) >= ebSplit and abs(recoEle['eta']) < ebeeSplit:
-               MVA_min1 = WPs['WP80']['EB2_lowPt']
-               MVA_min2 = WPs['WP90']['EB2_lowPt']
+               MVA_min1 = WPs_mva['WP90']['EB2_lowPt']
+               MVA_min2 = WPs_mva['WP80']['EB2_lowPt']
             elif abs(recoEle['eta']) >= ebeeSplit:
-               MVA_min1 = WPs['WP80']['EE_lowPt']
-               MVA_min2 = WPs['WP90']['EE_lowPt']
+               MVA_min1 = WPs_mva['WP90']['EE_lowPt']
+               MVA_min2 = WPs_mva['WP80']['EE_lowPt']
          elif recoEle['pt'] > ptSplit:
             if abs(recoEle['eta']) < ebSplit:
-               MVA_min1 = WPs['WP80']['EB1']
-               MVA_min2 = WPs['WP90']['EB1']
+               MVA_min1 = WPs_mva['WP90']['EB1']
+               MVA_min2 = WPs_mva['WP80']['EB1']
             elif abs(recoEle['eta']) >= ebSplit and abs(recoEle['eta']) < ebeeSplit:
-               MVA_min1 = WPs['WP80']['EB2']
-               MVA_min2 = WPs['WP90']['EB2']
+               MVA_min1 = WPs_mva['WP90']['EB2']
+               MVA_min2 = WPs_mva['WP80']['EB2']
             elif abs(recoEle['eta']) >= ebeeSplit:
-               MVA_min1 = WPs['WP80']['EE']
-               MVA_min2 = WPs['WP90']['EE']
+               MVA_min1 = WPs_mva['WP90']['EE']
+               MVA_min2 = WPs_mva['WP80']['EE']
    
          #Cut ID Fill
-         for i in range(1,5):
-            if recoEle['SPRING15_25ns_v1'] >= i: 
+         for i,WP in enumerate(WPs_cut):
+            if recoEle['SPRING15_25ns_v1'] >= i+1: 
                if zoom == 0: 
-                  if genEles[recoEle['matchIndex']]['pt'] >= xmin and genEles[recoEle['matchIndex']]['pt'] < 50: hists_passed[i-1].Fill(genEles[recoEle['matchIndex']]['pt'], weight/2)
-                  if genEles[recoEle['matchIndex']]['pt'] >= 50 and genEles[recoEle['matchIndex']]['pt'] < 100: hists_passed[i-1].Fill(genEles[recoEle['matchIndex']]['pt'], weight/5)
-                  if genEles[recoEle['matchIndex']]['pt'] >= 100 and genEles[recoEle['matchIndex']]['pt'] < xmax + 10: hists_passed[i-1].Fill(genEles[recoEle['matchIndex']]['pt'], weight/10)
-               elif zoom == 1: hists_passed[i-1].Fill(genEles[recoEle['matchIndex']]['pt'], weight/2) 
+                  if genEles[recoEle['matchIndex']]['pt'] >= xmin and genEles[recoEle['matchIndex']]['pt'] < 50: hists_passed[WP].Fill(genEles[recoEle['matchIndex']]['pt'], weight/2)
+                  if genEles[recoEle['matchIndex']]['pt'] >= 50 and genEles[recoEle['matchIndex']]['pt'] < 100: hists_passed[WP].Fill(genEles[recoEle['matchIndex']]['pt'], weight/5)
+                  if genEles[recoEle['matchIndex']]['pt'] >= 100 and genEles[recoEle['matchIndex']]['pt'] < xmax + 10: hists_passed[WP].Fill(genEles[recoEle['matchIndex']]['pt'], weight/10)
+               elif zoom == 1: hists_passed[WP].Fill(genEles[recoEle['matchIndex']]['pt'], weight/2) 
          
          #MVA ID Fill
-         if recoEle['mvaIdSpring15'] >= MVA_min1: 
+         if recoEle['mvaIdSpring15'] >= MVA_min1:
             if zoom == 0:
-               if genEles[recoEle['matchIndex']]['pt'] >= xmin and genEles[recoEle['matchIndex']]['pt'] < 50: hists_passed[4].Fill(genEles[recoEle['matchIndex']]['pt'], weight/2)
-               if genEles[recoEle['matchIndex']]['pt'] >= 50 and genEles[recoEle['matchIndex']]['pt'] < 100: hists_passed[4].Fill(genEles[recoEle['matchIndex']]['pt'], weight/5)
-               if genEles[recoEle['matchIndex']]['pt'] >= 100 and genEles[recoEle['matchIndex']]['pt'] < xmax + 10: hists_passed[4].Fill(genEles[recoEle['matchIndex']]['pt'], weight/10)
-            elif zoom == 1: hists_passed[4].Fill(genEles[recoEle['matchIndex']]['pt'], weight/2) 
-         
-         if recoEle['mvaIdSpring15'] >= MVA_min2:
-            if zoom == 0:
-               if genEles[recoEle['matchIndex']]['pt'] >= xmin and genEles[recoEle['matchIndex']]['pt'] < 50: hists_passed[5].Fill(genEles[recoEle['matchIndex']]['pt'], weight/2)
-               if genEles[recoEle['matchIndex']]['pt'] >= 50 and genEles[recoEle['matchIndex']]['pt'] < 100: hists_passed[5].Fill(genEles[recoEle['matchIndex']]['pt'], weight/5)
-               if genEles[recoEle['matchIndex']]['pt'] >= 100 and genEles[recoEle['matchIndex']]['pt'] < xmax + 10: hists_passed[5].Fill(genEles[recoEle['matchIndex']]['pt'], weight/10)
-            elif zoom == 1: hists_passed[5].Fill(genEles[recoEle['matchIndex']]['pt'], weight/2) 
+               if genEles[recoEle['matchIndex']]['pt'] >= xmin and genEles[recoEle['matchIndex']]['pt'] < 50: hists_passed['WP90'].Fill(genEles[recoEle['matchIndex']]['pt'], weight/2)
+               if genEles[recoEle['matchIndex']]['pt'] >= 50 and genEles[recoEle['matchIndex']]['pt'] < 100: hists_passed['WP90'].Fill(genEles[recoEle['matchIndex']]['pt'], weight/5)
+               if genEles[recoEle['matchIndex']]['pt'] >= 100 and genEles[recoEle['matchIndex']]['pt'] < xmax + 10: hists_passed['WP90'].Fill(genEles[recoEle['matchIndex']]['pt'], weight/10)
+            elif zoom == 1: hists_passed['WP90'].Fill(genEles[recoEle['matchIndex']]['pt'], weight/2) 
    
+         if recoEle['mvaIdSpring15'] >= MVA_min2: 
+            if zoom == 0:
+               if genEles[recoEle['matchIndex']]['pt'] >= xmin and genEles[recoEle['matchIndex']]['pt'] < 50: hists_passed['WP80'].Fill(genEles[recoEle['matchIndex']]['pt'], weight/2)
+               if genEles[recoEle['matchIndex']]['pt'] >= 50 and genEles[recoEle['matchIndex']]['pt'] < 100: hists_passed['WP80'].Fill(genEles[recoEle['matchIndex']]['pt'], weight/5)
+               if genEles[recoEle['matchIndex']]['pt'] >= 100 and genEles[recoEle['matchIndex']]['pt'] < xmax + 10: hists_passed['WP80'].Fill(genEles[recoEle['matchIndex']]['pt'], weight/10)
+            elif zoom == 1: hists_passed['WP80'].Fill(genEles[recoEle['matchIndex']]['pt'], weight/2) 
+         
    #Generated electron pt fill (denominator) 
    for genEle in genEles:
    #if ngenLep == 1 and ngenLepFromTau == 0:
@@ -243,137 +237,115 @@ c1.Divide(1,2)
 
 c1.cd(1)
 
-hist_total.SetName("genEle")
+hist_total.SetName("eleID")
 hist_total.SetTitle("Electron p_{T} Distributions for Various IDs (" + inputSample + " Sample)")
 hist_total.GetXaxis().SetTitle("Generated Electron p_{T} / GeV")
 hist_total.GetYaxis().SetTitle("Counts / GeV")
+hist_total.GetXaxis().SetTitleOffset(1.2)
+hist_total.GetYaxis().SetTitleOffset(1.2)
 hist_total.SetFillColor(ROOT.kBlue-9)
 hist_total.SetLineColor(ROOT.kBlack)
 hist_total.SetLineWidth(3)
 hist_total.Draw("hist")
+
 ROOT.gPad.SetLogy()
+ROOT.gPad.Modified()
 ROOT.gPad.Update()
-hist_total.GetXaxis().SetTitleOffset(1.2)
-hist_total.GetYaxis().SetTitleOffset(1.2)
+
 alignStats(hist_total)
 
-#Veto ID
-hists_passed[0].SetName("electrons_veto")
-hists_passed[0].SetLineColor(ROOT.kGreen+3)
+#Colours
+hists_passed['Veto'].SetLineColor(ROOT.kGreen+3)
+hists_passed['Loose'].SetLineColor(ROOT.kBlue+1)
+hists_passed['Medium'].SetLineColor(ROOT.kOrange-2)
+hists_passed['Tight'].SetLineColor(ROOT.kRed+1)
+hists_passed['WP90'].SetLineColor(ROOT.kMagenta+2)
+hists_passed['WP80'].SetLineColor(ROOT.kAzure+5)
 
-#Loose ID
-hists_passed[1].SetName("electrons_loose")
-hists_passed[1].SetLineColor(ROOT.kBlue+1)
+for WP in WPs: 
+   hists_passed[WP].SetFillColor(0)
+   hists_passed[WP].SetLineWidth(3)
+   hists_passed[WP].Draw("histsame")
 
-#Medium ID
-hists_passed[2].SetName("electrons_medium")
-hists_passed[2].SetLineColor(ROOT.kOrange-2)
-
-#Tight ID
-hists_passed[3].SetName("electrons_tight")
-hists_passed[3].SetLineColor(ROOT.kRed+1)
-
-hists_passed[4].SetName("electrons_mva_WP80")
-hists_passed[4].SetLineColor(ROOT.kAzure+5)
-
-hists_passed[5].SetName("electrons_mva_WP90")
-hists_passed[5].SetLineColor(ROOT.kMagenta+2)
-
-for i in range(0,6): #hists 1-6
-   hists_passed[i].SetFillColor(0)
-   hists_passed[i].SetLineWidth(3)
-   hists_passed[i].Draw("histsame")
+ROOT.gPad.Modified()
+ROOT.gPad.Update()
 
 l1 = makeLegend()
-l1.AddEntry("genEle", "Generated Electron p_{T}", "F")
-l1.AddEntry("electrons_veto", "Veto ID", "F")
-l1.AddEntry("electrons_loose", "Loose ID", "F")
-l1.AddEntry("electrons_medium", "Medium ID", "F")
-l1.AddEntry("electrons_tight", "Tight ID", "F")
-l1.AddEntry("electrons_mva_WP80", "MVA ID (WP80)", "F")
-l1.AddEntry("electrons_mva_WP90", "MVA ID (WP90)", "F")
+l1.AddEntry("eleID", "Generated Electron p_{T}", "F")
+l1.AddEntry("eleID_Veto", "Veto ID", "F")
+l1.AddEntry("eleID_Loose", "Loose ID", "F")
+l1.AddEntry("eleID_Medium", "Medium ID", "F")
+l1.AddEntry("eleID_Tight", "Tight ID", "F")
+l1.AddEntry("eleID_WP80", "MVA ID (WP80)", "F")
+l1.AddEntry("eleID_WP90", "MVA ID (WP90)", "F")
 l1.Draw()
 
 ################################################################################################################################################################################
 #Efficiency curves
 c1.cd(2)
-l2 = makeLegend()
 
-effs = []
+effs = {}
 
-#Efficiency Veto
-for i in range (0, 6):
-   effs.append(ROOT.TEfficiency(hists_passed[i], hist_total)) #(passed, total)
-   effs[i].SetMarkerStyle(33)
-   effs[i].SetMarkerSize(1.5)
-   effs[i].SetLineWidth(2)
+for WP in sorted(hists_passed.keys()):
+   print WP
+   effs[WP] = ROOT.TEfficiency(hists_passed[WP], hist_total) #(passed, total)
+   effs[WP].SetName("eff_" + WP)
+   effs[WP].SetMarkerStyle(33)
+   effs[WP].SetMarkerSize(1.5)
+   effs[WP].SetLineWidth(2)
+   if WP == 'Loose': effs['Loose'].Draw("AP")
+   elif WP != 'Loose': effs[WP].Draw("sameP")
 
-effs[0].SetTitle("Electron ID Efficiencies (" + inputSample + " Sample) ; Generated Electron p_{T} / GeV ; Efficiency")
-effs[0].SetName("eff1")
-effs[0].SetMarkerColor(ROOT.kGreen+3)
-effs[0].SetLineColor(ROOT.kGreen+3)
+effs['Loose'].SetTitle("Electron ID Efficiencies (" + inputSample + " Sample) ; Generated Electron p_{T} / GeV ; Efficiency")
+effs['Loose'].SetMarkerColor(ROOT.kBlue+1)
+effs['Loose'].SetLineColor(ROOT.kBlue+1)
 ROOT.gPad.SetGridx()
 ROOT.gPad.SetGridy()
-effs[0].Draw("AP") 
+ROOT.gPad.Modified()
 ROOT.gPad.Update()
-effs[0].GetPaintedGraph().GetXaxis().SetLimits(xmin,xmax)
-effs[0].GetPaintedGraph().SetMinimum(0)
-effs[0].GetPaintedGraph().SetMaximum(1)
-#effs[0].GetPaintedGraph().GetXaxis().SetNdivisions(510, 1)
-effs[0].GetPaintedGraph().GetXaxis().CenterTitle()
-effs[0].GetPaintedGraph().GetYaxis().CenterTitle()
+effs['Loose'].GetPaintedGraph().GetXaxis().SetLimits(xmin,xmax)
+effs['Loose'].GetPaintedGraph().SetMinimum(0)
+effs['Loose'].GetPaintedGraph().SetMaximum(1)
+effs['Loose'].GetPaintedGraph().GetXaxis().CenterTitle()
+effs['Loose'].GetPaintedGraph().GetYaxis().CenterTitle()
 
-#Efficiency Loose
-effs[1].SetName("eff2")
-effs[1].SetMarkerColor(ROOT.kBlue+1)
-effs[1].SetLineColor(ROOT.kBlue+1)
-effs[1].Draw("sameP") 
+#Colours
+effs['Veto'].SetMarkerColor(ROOT.kGreen+3)
+effs['Veto'].SetLineColor(ROOT.kGreen+3)
+effs['Medium'].SetMarkerColor(ROOT.kOrange-2)
+effs['Medium'].SetLineColor(ROOT.kOrange-2)
+effs['Tight'].SetMarkerColor(ROOT.kRed+1)
+effs['Tight'].SetLineColor(ROOT.kRed+1)
+effs['WP90'].SetMarkerColor(ROOT.kMagenta+2)
+effs['WP90'].SetLineColor(ROOT.kMagenta+2)
+effs['WP90'].SetMarkerStyle(22)
+effs['WP90'].SetMarkerSize(1)
+effs['WP80'].SetMarkerColor(ROOT.kAzure+5)
+effs['WP80'].SetLineColor(ROOT.kAzure+5)
+effs['WP80'].SetMarkerStyle(22)
+effs['WP80'].SetMarkerSize(1)
 
-#Efficiency Medium
-effs[2].SetName("eff3")
-effs[2].SetMarkerColor(ROOT.kOrange-2)
-effs[2].SetLineColor(ROOT.kOrange-2)
-effs[2].Draw("sameP") 
-
-#Efficiency Tight
-effs[3].SetName("eff4")
-effs[3].SetMarkerColor(ROOT.kRed+1)
-effs[3].SetLineColor(ROOT.kRed+1)
-effs[3].Draw("sameP") 
-
-#Efficiency WP80
-effs[4].SetName("eff5")
-effs[4].SetMarkerColor(ROOT.kAzure+5)
-effs[4].SetMarkerStyle(22)
-effs[4].SetMarkerSize(1)
-effs[4].Draw("sameP")
-effs[4].SetLineColor(ROOT.kAzure+5)
-
-#Efficiency WP90
-effs[5].SetName("eff6")
-effs[5].SetMarkerColor(ROOT.kMagenta+2)
-effs[5].SetMarkerStyle(22)
-effs[5].SetMarkerSize(1)
-effs[5].Draw("sameP")
-effs[5].SetLineColor(ROOT.kMagenta+2)
-
+ROOT.gPad.Modified()
 ROOT.gPad.Update()
 
-l2.AddEntry("eff1", "Veto ID", "P")
-l2.AddEntry("eff2", "Loose ID", "P")
-l2.AddEntry("eff3", "Medium ID", "P")
-l2.AddEntry("eff4", "Tight ID", "P")
-l2.AddEntry("eff5", "MVA ID (WP80)", "P")
-l2.AddEntry("eff6", "MVA ID (WP90)", "P")
+l2 = makeLegend()
+l2.AddEntry("eff_Veto", "Veto ID", "P")
+l2.AddEntry("eff_Loose", "Loose ID", "P")
+l2.AddEntry("eff_Medium", "Medium ID", "P")
+l2.AddEntry("eff_Tight", "Tight ID", "P")
+l2.AddEntry("eff_WP90", "MVA ID (WP90)", "P")
+l2.AddEntry("eff_WP80", "MVA ID (WP80)", "P")
+
 l2.Draw()
 
+ROOT.gPad.Modified()
 ROOT.gPad.Update()
 c1.Modified()
 c1.Update()
 
 if save == 1:
    #Write to file
-   savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/electronReconstruction/electronID/efficiency/loop" #web address: http://www.hephy.at/user/mzarucki/plots/electronReconstruction/electronIdEfficiency
+   savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/electronReconstruction/electronID/standard/efficiency/loop" #web address: http://www.hephy.at/user/mzarucki/plots/electronReconstruction/electronIdEfficiency
    
    if not os.path.exists(savedir):
       os.makedirs(savedir)

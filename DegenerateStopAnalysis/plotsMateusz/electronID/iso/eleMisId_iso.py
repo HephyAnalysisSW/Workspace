@@ -2,7 +2,7 @@
 import ROOT
 import os, sys
 from Workspace.HEPHYPythonTools.helpers import getChunks, getChain#, getPlotFromChain, getYieldFromChain
-from Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_7412pass2_v4 import *
+from Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_7412pass2_v4 import * #data_path = "/data/nrad/cmgTuples/RunII/7412pass2_v4/RunIISpring15xminiAODv2"
 from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from array import array
 from math import pi, sqrt #cos, sin, sinh, log
@@ -12,6 +12,8 @@ inputSample = "Signal" # "Signal" "TTJets" "WJets"
 zoom = 1
 save = 1
 presel = 1
+mvaWPs = 0
+isolation = "relIso04" #miniRelIso, relIso03, relIso04, relIsoAn04
 
 #ROOT Options
 ROOT.gROOT.Reset() #re-initialises ROOT
@@ -25,17 +27,14 @@ ROOT.gStyle.SetOptFit(1111) #1111 prints fits results on plot
 #ROOT.gStyle.SetLineWidth(2)
 
 ROOT.gStyle.SetPaintTextFormat("4.2f")
-#ROOT.gStyle->SetTitleX(0.1)
-#ROOT.gStyle->SetTitleW(0.8)
+#ROOT.gStyle.SetTitleX(0.5)
+#ROOT.gStyle.SetTitleAlign(23)
+#ROOT.gStyle.SetTitleW(0.8)
 
 ROOT.gStyle.SetStatX(0.75)
 ROOT.gStyle.SetStatY(0.65)
 ROOT.gStyle.SetStatW(0.1)
 ROOT.gStyle.SetStatH(0.15)
- 
-#CMG Tuples
-#data_path = "/data/nrad/cmgTuples/RunII/RunIISpring15MiniAODv2/"
-#data_path = "/afs/hephy.at/data/mzarucki01/cmgTuples"
 
 print makeLine()
 print "Signal Samples:"
@@ -45,18 +44,12 @@ print makeLine()
 print "Background Samples:"
 newLine()
 for s in samples: print s['name']
-#print makeLine()
 
 print makeLine()
 print "Using", inputSample, "samples."
 print makeLine()
 
 Events = ROOT.TChain("tree")
-
-#for s in allSamples_Spring15_25ns:
-#   if sample in s['name']:
-#      print s['name']
-#      for f in getChunks(s)[0]: Events.Add(f['file'])
 
 #Bin size 
 #nbins = 100
@@ -134,10 +127,8 @@ hists_total = {}
 hists_passed = {}
 
 #Electron Cut IDs
-
-isolation = "relIso04" #miniRelIso, relIso03, relIso04, relIsoAn04
-
-for WP in cuts:
+for WP in sorted(cuts.keys()):
+   print WP
    cutSel = "(\
    (abs(LepGood_eta) <=" + str(ebeeSplit) + "&& LepGood_sigmaIEtaIEta <" + str(cuts[WP]['sigmaEtaEta']['Barrel']) + "&& abs(LepGood_dEtaScTrkIn) <" + str(cuts[WP]['dEta']['Barrel']) + \
    "&& abs(LepGood_dPhiScTrkIn) <" + str(cuts[WP]['dPhi']['Barrel']) + "&& LepGood_hadronicOverEm <" + str(cuts[WP]['hOverE']['Barrel']) + "&& abs(LepGood_eInvMinusPInv) <" + str(cuts[WP]['ooEmooP']['Barrel']) + \
@@ -149,26 +140,28 @@ for WP in cuts:
    "&& LepGood_" + isolation + "<" + str(cuts[WP]['relIso']['Endcap']) + "))"
  
    hists_total[WP] = makeHistVarBins(Events, "LepGood_pt", normFactor + "*" + weight + "*(" + preSel + "&&" + recoSel + "&& " + cutSel + ")", bins)
-   if WP == 'Veto': hists_total[WP].Draw("hist")
+   if WP == 'Loose': hists_total['Loose'].Draw("hist")
    hists_passed[WP] = makeHistVarBins(Events, "LepGood_pt", normFactor + "*" + weight + "*(" + preSel + "&&" + recoSel + "&&" + misMatchSel + "&& " + cutSel + ")", bins) 
    hists_passed[WP].SetName("misID_" + WP)
    hists_passed[WP].SetFillColor(0)
    hists_passed[WP].SetLineWidth(3)
    hists_passed[WP].Draw("histsame")
 
-hists_total['Veto'].SetName("misID")
-hists_total['Veto'].SetTitle("Fake (Non-Prompt) Electron p_{T} Distributions for Various IDs (" + inputSample + " Sample)")
-hists_total['Veto'].GetXaxis().SetTitle("Reconstructed Electron p_{T} / GeV")
-hists_total['Veto'].GetXaxis().SetTitleOffset(1.2)
-hists_total['Veto'].GetYaxis().SetTitleOffset(1.2)
-hists_total['Veto'].SetFillColor(ROOT.kBlue-9)
-hists_total['Veto'].SetLineColor(ROOT.kBlack)
-hists_total['Veto'].SetLineWidth(3)
+hists_total['Loose'].SetName("MisID")
+hists_total['Loose'].SetTitle("Fake (Non-Prompt) Electron p_{T} Distributions for Various IDs (" + inputSample + " Sample)")
+hists_total['Loose'].GetXaxis().SetTitle("Reconstructed Electron p_{T} / GeV")
+hists_total['Loose'].GetYaxis().SetTitle("Counts / GeV")
+hists_total['Loose'].GetXaxis().SetTitleOffset(1.2)
+hists_total['Loose'].GetYaxis().SetTitleOffset(1.2)
+hists_total['Loose'].SetFillColor(ROOT.kBlue-9)
+hists_total['Loose'].SetLineColor(ROOT.kBlack)
+hists_total['Loose'].SetLineWidth(3)
 
 ROOT.gPad.SetLogy()
+ROOT.gPad.Modified()
 ROOT.gPad.Update()
 
-alignStats(hists_total['Veto'])
+alignStats(hists_total['Loose'])
 
 #Colours
 hists_passed['Veto'].SetLineColor(ROOT.kGreen+3)
@@ -176,128 +169,126 @@ hists_passed['Loose'].SetLineColor(ROOT.kBlue+1)
 hists_passed['Medium'].SetLineColor(ROOT.kOrange-2)
 hists_passed['Tight'].SetLineColor(ROOT.kRed+1)
 
-##Electron MVA IDs
-#WPs = {'WP90':\
-#         {'EB1_lowPt':-0.083313, 'EB2_lowPt':-0.235222, 'EE_lowPt':-0.67099, 'EB1':0.913286, 'EB2':0.805013, 'EE':0.358969},\
-#       'WP80':\
-#         {'EB1_lowPt':0.287435, 'EB2_lowPt':0.221846, 'EE_lowPt':-0.303263, 'EB1':0.967083, 'EB2':0.929117, 'EE':0.726311},\
-#}
-#
-#ptSplit = 10 #we have above and below 10 GeV categories
-#
-#for WP in WPs:
-#   mvaSel = "(\
-#   (LepGood_pt <=" + str(ptSplit) + "&& abs(LepGood_eta) < " + str(ebSplit) + "&& LepGood_mvaIdSpring15 >=" + str(WPs[WP]['EB1_lowPt']) + ") || \
-#   (LepGood_pt <=" + str(ptSplit) + "&& abs(LepGood_eta) >=" + str(ebSplit) + "&& abs(LepGood_eta) <" + str(ebeeSplit) + "&& LepGood_mvaIdSpring15 >=" + str(WPs[WP]['EB2_lowPt']) + ") || \
-#   (LepGood_pt <=" + str(ptSplit) + "&& abs(LepGood_eta) >=" + str(ebeeSplit) + "&& abs(LepGood_eta) <" + str(etaAcc) + "&& LepGood_mvaIdSpring15 >=" + str(WPs[WP]['EE_lowPt']) + ") || \
-#   (LepGood_pt >" + str(ptSplit) + "&& abs(LepGood_eta) <" + str(ebSplit) + "&& LepGood_mvaIdSpring15 >=" + str(WPs[WP]['EB1']) + ") || \
-#   (LepGood_pt >" + str(ptSplit) + "&& abs(LepGood_eta) >=" + str(ebSplit) + "&& abs(LepGood_eta) <" + str(ebeeSplit) + "&& LepGood_mvaIdSpring15 >=" + str(WPs[WP]['EB2']) + ") || \
-#   (LepGood_pt >" + str(ptSplit) + "&& abs(LepGood_eta) >=" + str(ebeeSplit) + "&& abs(LepGood_eta) <" + str(etaAcc) + "&& LepGood_mvaIdSpring15 >=" + str(WPs[WP]['EE']) + "))"
-#   
-#   hists_total[WP] = makeHistVarBins(Events, "LepGood_pt", normFactor + "*" + weight + "*(" + preSel + "&&" + recoSel + "&&" + mvaSel + ")", bins)
-#   hists_passed[WP] = makeHistVarBins(Events, "LepGood_pt", normFactor + "*" + weight + "*(" + preSel + "&&" + recoSel + "&&" + misMatchSel + "&&" + mvaSel + ")", bins)
-#   hists_passed[WP].SetFillColor(0)
-#   hists_passed[WP].SetLineWidth(3)
-#   hists_passed[WP].SetName("misID_" + WP)
-#   hists_passed[WP].Draw("histsame")
-#
-##Colours
-#hists_passed['WP80'].SetLineColor(ROOT.kAzure+5)
-#hists_passed['WP90'].SetLineColor(ROOT.kMagenta+2)
-
+ROOT.gPad.Modified()
 ROOT.gPad.Update()
 
 l1 = makeLegend()
-l1.AddEntry("misID", "Reconstructed Electron p_{T}", "F")
+l1.AddEntry("MisID", "Reconstructed Electron p_{T}", "F")
 l1.AddEntry("misID_Veto", "Veto ID", "F")
 l1.AddEntry("misID_Loose", "Loose ID", "F")
 l1.AddEntry("misID_Medium", "Medium ID", "F")
 l1.AddEntry("misID_Tight", "Tight ID", "F")
-#l1.AddEntry("misID_WP80", "MVA ID (WP80)", "F")
-#l1.AddEntry("misID_WP90", "MVA ID (WP90)", "F")
+
+#Electron MVA IDs
+if mvaWPs == 1:
+   WPs = {'WP90':\
+            {'EB1_lowPt':-0.083313, 'EB2_lowPt':-0.235222, 'EE_lowPt':-0.67099, 'EB1':0.913286, 'EB2':0.805013, 'EE':0.358969},\
+          'WP80':\
+            {'EB1_lowPt':0.287435, 'EB2_lowPt':0.221846, 'EE_lowPt':-0.303263, 'EB1':0.967083, 'EB2':0.929117, 'EE':0.726311},\
+   }
+   
+   ptSplit = 10 #we have above and below 10 GeV categories
+   
+   for WP in WPs.keys():
+      mvaSel = "(\
+      (LepGood_pt <=" + str(ptSplit) + "&& abs(LepGood_eta) < " + str(ebSplit) + "&& LepGood_mvaIdSpring15 >=" + str(WPs[WP]['EB1_lowPt']) + ") || \
+      (LepGood_pt <=" + str(ptSplit) + "&& abs(LepGood_eta) >=" + str(ebSplit) + "&& abs(LepGood_eta) <" + str(ebeeSplit) + "&& LepGood_mvaIdSpring15 >=" + str(WPs[WP]['EB2_lowPt']) + ") || \
+      (LepGood_pt <=" + str(ptSplit) + "&& abs(LepGood_eta) >=" + str(ebeeSplit) + "&& abs(LepGood_eta) <" + str(etaAcc) + "&& LepGood_mvaIdSpring15 >=" + str(WPs[WP]['EE_lowPt']) + ") || \
+      (LepGood_pt >" + str(ptSplit) + "&& abs(LepGood_eta) <" + str(ebSplit) + "&& LepGood_mvaIdSpring15 >=" + str(WPs[WP]['EB1']) + ") || \
+      (LepGood_pt >" + str(ptSplit) + "&& abs(LepGood_eta) >=" + str(ebSplit) + "&& abs(LepGood_eta) <" + str(ebeeSplit) + "&& LepGood_mvaIdSpring15 >=" + str(WPs[WP]['EB2']) + ") || \
+      (LepGood_pt >" + str(ptSplit) + "&& abs(LepGood_eta) >=" + str(ebeeSplit) + "&& abs(LepGood_eta) <" + str(etaAcc) + "&& LepGood_mvaIdSpring15 >=" + str(WPs[WP]['EE']) + "))"
+      
+      hists_total[WP] = makeHistVarBins(Events, "LepGood_pt", normFactor + "*" + weight + "*(" + preSel + "&&" + recoSel + "&&" + mvaSel + ")", bins)
+      hists_passed[WP] = makeHistVarBins(Events, "LepGood_pt", normFactor + "*" + weight + "*(" + preSel + "&&" + recoSel + "&&" + misMatchSel + "&&" + mvaSel + ")", bins)
+      hists_passed[WP].SetFillColor(0)
+      hists_passed[WP].SetLineWidth(3)
+      hists_passed[WP].SetName("misID_" + WP)
+      hists_passed[WP].Draw("histsame")
+   
+   hists_passed['WP90'].SetLineColor(ROOT.kMagenta+2)
+   hists_passed['WP80'].SetLineColor(ROOT.kAzure+5)
+
+   ROOT.gPad.Modified()
+   ROOT.gPad.Update()
+   
+   l1.AddEntry("misID_WP90", "MVA ID (WP90)", "F")
+   l1.AddEntry("misID_WP80", "MVA ID (WP80)", "F")
+
 l1.Draw()
 
 #######################################################################################################################################################
 #Efficiency curves
 c1.cd(2)
-l2 = makeLegend()
 
 effs = {}
 
 #Efficiency Veto
-for WP in hists_passed:
+for WP in sorted(hists_passed.keys()):
    effs[WP] = ROOT.TEfficiency(hists_passed[WP], hists_total[WP]) #(passed, total)
+   effs[WP].SetName("eff_" + WP)
    effs[WP].SetMarkerStyle(33)
    effs[WP].SetMarkerSize(1.5)
    effs[WP].SetLineWidth(2)
+   if WP == 'Loose': effs['Loose'].Draw("AP")
+   elif WP != 'Loose': effs[WP].Draw("sameP")
 
-effs['Veto'].SetTitle("Electron Mismatch Efficiencies for Various IDs (" + inputSample + " Sample) ; Reconstructed Electron p_{T} / GeV ; Efficiency")
-effs['Veto'].SetName("eff_Veto")
-effs['Veto'].SetMarkerColor(ROOT.kGreen+3)
-effs['Veto'].SetLineColor(ROOT.kGreen+3)
-ROOT.gPad.SetGridx()
-ROOT.gPad.SetGridy()
-effs['Veto'].Draw("AP") 
-ROOT.gPad.Update()
-effs['Veto'].GetPaintedGraph().GetXaxis().SetLimits(xmin,xmax)
-effs['Veto'].GetPaintedGraph().SetMinimum(0)
-effs['Veto'].GetPaintedGraph().SetMaximum(1)
-#effs['Veto'].GetPaintedGraph().GetXaxis().SetNdivisions(510, 1)
-effs['Veto'].GetPaintedGraph().GetXaxis().CenterTitle()
-effs['Veto'].GetPaintedGraph().GetYaxis().CenterTitle()
-
-#Efficiency Loose
-effs['Loose'].SetName("eff_Loose")
+effs['Loose'].SetTitle("Electron Mismatch Efficiencies for Various IDs (" + inputSample + " Sample) ; Reconstructed Electron p_{T} / GeV ; Efficiency")
 effs['Loose'].SetMarkerColor(ROOT.kBlue+1)
 effs['Loose'].SetLineColor(ROOT.kBlue+1)
-effs['Loose'].Draw("sameP") 
+ROOT.gPad.SetGridx()
+ROOT.gPad.SetGridy()
+ROOT.gPad.Modified()
+ROOT.gPad.Update()
+effs['Loose'].GetPaintedGraph().GetXaxis().SetLimits(xmin,xmax)
+effs['Loose'].GetPaintedGraph().SetMinimum(0)
+effs['Loose'].GetPaintedGraph().SetMaximum(1)
+effs['Loose'].GetPaintedGraph().GetXaxis().CenterTitle()
+effs['Loose'].GetPaintedGraph().GetYaxis().CenterTitle()
 
-#Efficiency Medium
-effs['Medium'].SetName("eff_Medium")
+#Colours
+effs['Veto'].SetMarkerColor(ROOT.kGreen+3)
+effs['Veto'].SetLineColor(ROOT.kGreen+3)
 effs['Medium'].SetMarkerColor(ROOT.kOrange-2)
 effs['Medium'].SetLineColor(ROOT.kOrange-2)
-effs['Medium'].Draw("sameP")
-
-#Efficiency Tight
-effs['Tight'].SetName("eff_Tight")
 effs['Tight'].SetMarkerColor(ROOT.kRed+1)
 effs['Tight'].SetLineColor(ROOT.kRed+1)
-effs['Tight'].Draw("sameP")
 
-
-##Efficiency WP80
-#effs['WP80'].SetName("eff_WP80")
-#effs['WP80'].SetMarkerColor(ROOT.kAzure+5)
-#effs['WP80'].SetMarkerStyle(22)
-#effs['WP80'].SetMarkerSize(1)
-#effs['WP80'].Draw("sameP")
-#effs['WP80'].SetLineColor(ROOT.kAzure+5)
-#
-##Efficiency WP90
-#effs["WP90"].SetName("eff_WP90")
-#effs["WP90"].SetMarkerColor(ROOT.kMagenta+2)
-#effs["WP90"].SetMarkerStyle(22)
-#effs["WP90"].SetMarkerSize(1)
-#effs["WP90"].Draw("sameP")
-#effs["WP90"].SetLineColor(ROOT.kMagenta+2)
-
+ROOT.gPad.Modified()
 ROOT.gPad.Update()
 
+l2 = makeLegend()
 l2.AddEntry("eff_Veto", "Veto ID", "P")
 l2.AddEntry("eff_Loose", "Loose ID", "P")
 l2.AddEntry("eff_Medium", "Medium ID", "P")
 l2.AddEntry("eff_Tight", "Tight ID", "P")
-#l2.AddEntry("eff_WP80", "MVA ID (WP80)", "P")
-#l2.AddEntry("eff_WP90", "MVA ID (WP90)", "P")
+
+if mvaWPs == 1:
+   effs["WP90"].SetMarkerColor(ROOT.kMagenta+2)
+   effs["WP90"].SetLineColor(ROOT.kMagenta+2)
+   effs["WP90"].SetMarkerStyle(22)
+   effs["WP90"].SetMarkerSize(1)
+   effs['WP80'].SetMarkerColor(ROOT.kAzure+5)
+   effs['WP80'].SetLineColor(ROOT.kAzure+5)
+   effs['WP80'].SetMarkerStyle(22)
+   effs['WP80'].SetMarkerSize(1)
+
+   ROOT.gPad.Modified()
+   ROOT.gPad.Update()
+
+   l2.AddEntry("eff_WP90", "MVA ID (WP90)", "P")
+   l2.AddEntry("eff_WP80", "MVA ID (WP80)", "P")
+
 l2.Draw()
 
+ROOT.gPad.Modified()
 ROOT.gPad.Update()
 c1.Modified()
 c1.Update()
 
 #Write to file
 if save == 1:
-   savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/electronReconstruction/electronID/iso/" + isolation + "/misID" #web address: http://www.hephy.at/user/mzarucki/plots/electronReconstruction/electronIdEfficiency
+   if mvaWPs == 0: savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/electronReconstruction/electronID/iso/" + isolation + "/misID" #web address: http://www.hephy.at/user/mzarucki/plots/electronReconstruction/electronIdEfficiency
+   elif mvaWPs == 1: savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/electronReconstruction/electronID/iso/" + isolation + "/misID/withMva"
    
    if not os.path.exists(savedir):
       os.makedirs(savedir)

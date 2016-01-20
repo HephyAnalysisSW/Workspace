@@ -1,4 +1,4 @@
-#eleMisId2.py
+#eleMisId2_noIso.py
 import ROOT
 import os, sys
 from Workspace.HEPHYPythonTools.helpers import getChunks, getChain#, getPlotFromChain, getYieldFromChain
@@ -8,11 +8,12 @@ from array import array
 from math import pi, sqrt #cos, sin, sinh, log
 
 #Input options
-inputSample = "WJets" # "Signal" "TTJets" "WJets"
+inputSample = "TTJets" # "Signal" "TTJets" "WJets"
 zoom = 1
 save = 1
 presel = 1
-mvaWPs = 1
+mvaWPs = 0
+#isolation = "miniRelIso" #relIso03, relIso04, relIsoAn04
 
 #ROOT Options
 ROOT.gROOT.Reset() #re-initialises ROOT
@@ -87,7 +88,7 @@ weight = "(xsec*" + str(intLum) + "*(10^3)/" + str(getChunks(sampleName)[1]) + "
 if zoom == 1: normFactor = "(0.5)"
 elif zoom == 0: normFactor = "((LepGood_pt < 50)*0.5 + (LepGood_pt >= 50 && LepGood_pt < 100)*0.2 + (LepGood_pt >= 100)*0.1)"
 
-#Geometric divisons
+#Geometric divisions
 ebSplit = 0.8 #barrel is split into two regions
 ebeeSplit = 1.479 #division between barrel and endcap
 etaAcc = 2.5 #eta acceptance
@@ -101,10 +102,19 @@ if presel == 1: preSel = preSel1 + "&&" + preSel2 + "&&" + preSel3
 elif presel == 0: preSel = "1"
 
 #IDs: 0 - none, 1 - veto (~95% eff), 2 - loose (~90% eff), 3 - medium (~80% eff), 4 - tight (~70% eff)
-WPs = ['Veto', 'Loose', 'Medium', 'Tight']
 recoSel = "(abs(LepGood_pdgId) == 11)"
 misMatchSel = "(LepGood_mcMatchId == 0)"
-cutSel = "LepGood_SPRING15_25ns_v1 >="
+#cutSel = "LepGood_SPRING15_25ns_v1 >="
+
+cuts = {\
+'Veto':{'sigmaEtaEta':{'Barrel':0.0114, 'Endcap':0.0352}, 'dEta':{'Barrel':0.0152, 'Endcap':0.0113}, 'dPhi':{'Barrel':0.216, 'Endcap':0.237}, 'hOverE':{'Barrel':0.181, 'Endcap':0.116}, 'ooEmooP':{'Barrel':0.207, 'Endcap':0.174},\
+'d0':{'Barrel':0.0564, 'Endcap':0.222}, 'dz':{'Barrel':0.472, 'Endcap':0.921}, 'MissingHits':{'Barrel':2, 'Endcap':3}, 'convVeto':{'Barrel':1, 'Endcap':1}, 'relIso' : {'Barrel':0.126, 'Endcap':0.144}},
+'Loose':{'sigmaEtaEta':{'Barrel':0.0103, 'Endcap':0.0301}, 'dEta':{'Barrel':0.0105, 'Endcap':0.00814}, 'dPhi':{'Barrel':0.115, 'Endcap':0.182}, 'hOverE':{'Barrel':0.104, 'Endcap':0.0897}, 'ooEmooP':{'Barrel':0.102, 'Endcap':0.126},\
+'d0':{'Barrel':0.0261, 'Endcap':0.118}, 'dz':{'Barrel':0.41, 'Endcap':0.822}, 'MissingHits':{'Barrel':2, 'Endcap':1}, 'convVeto':{'Barrel':1, 'Endcap':1}, 'relIso' : {'Barrel':0.0893, 'Endcap':0.121}},
+'Medium':{'sigmaEtaEta':{'Barrel':0.0101, 'Endcap':0.0283}, 'dEta':{'Barrel':0.0103, 'Endcap':0.00733}, 'dPhi':{'Barrel':0.0336, 'Endcap':0.114}, 'hOverE':{'Barrel':0.0876, 'Endcap':0.0678}, 'ooEmooP':{'Barrel':0.0174, 'Endcap':0.0898},\
+'d0':{'Barrel':0.0118, 'Endcap':0.0739}, 'dz':{'Barrel':0.373, 'Endcap':0.602}, 'MissingHits':{'Barrel':2, 'Endcap':1}, 'convVeto':{'Barrel':1, 'Endcap':1}, 'relIso' : {'Barrel':0.0766, 'Endcap':0.0678}},
+'Tight':{'sigmaEtaEta':{'Barrel':0.0101, 'Endcap':0.0279}, 'dEta':{'Barrel':0.00926, 'Endcap':0.00724}, 'dPhi':{'Barrel':0.0336, 'Endcap':0.0918}, 'hOverE':{'Barrel':0.0597, 'Endcap':0.0615}, 'ooEmooP':{'Barrel':0.012, 'Endcap':0.00999},
+'d0':{'Barrel':0.0111, 'Endcap':0.0351}, 'dz':{'Barrel':0.0466, 'Endcap':0.417}, 'MissingHits':{'Barrel':2, 'Endcap':1}, 'convVeto':{'Barrel':1, 'Endcap':1}, 'relIso' : {'Barrel':0.0354, 'Endcap':0.0646}}}
 
 ##################################################################################Canvas 1#############################################################################################
 c1 = ROOT.TCanvas("c1", "Canvas 1", 1800, 1500)
@@ -112,8 +122,9 @@ c1.Divide(1,2)
 
 c1.cd(1)
 
+#Electron Cut IDs
 #Reconstructed selection
-hist_total = makeHistVarBins(Events, "LepGood_pt", normFactor + "*" + weight + "*(" + preSel + "&&" + recoSel + "&&" + misMatchSel + ")", bins) 
+hist_total = makeHistVarBins(Events, "LepGood_pt", normFactor + "*" + weight + "*(" + preSel + "&&" + recoSel + "&&" + misMatchSel + ")", bins)
 hist_total.SetName("MisID2")
 hist_total.SetTitle("Fake (Non-Prompt) Electron p_{T} Distributions for Various IDs (" + inputSample + " Sample)")
 hist_total.GetXaxis().SetTitle("Reconstructed Electron p_{T} / GeV")
@@ -134,8 +145,18 @@ alignStats(hist_total)
 hists_passed = {}
 
 #Electron Cut IDs
-for i,WP in enumerate(WPs):
-   hists_passed[WP] = makeHistVarBins(Events, "LepGood_pt", normFactor + "*" + weight + "*(" + preSel + "&&" + recoSel + "&&" + misMatchSel + "&& (" + cutSel + str(i+1) + "))", bins) 
+for WP in cuts.keys():
+   cutSel = "(\
+   (abs(LepGood_eta) <=" + str(ebeeSplit) + "&& LepGood_sigmaIEtaIEta <" + str(cuts[WP]['sigmaEtaEta']['Barrel']) + "&& abs(LepGood_dEtaScTrkIn) <" + str(cuts[WP]['dEta']['Barrel']) + \
+   "&& abs(LepGood_dPhiScTrkIn) <" + str(cuts[WP]['dPhi']['Barrel']) + "&& LepGood_hadronicOverEm <" + str(cuts[WP]['hOverE']['Barrel']) + "&& abs(LepGood_eInvMinusPInv) <" + str(cuts[WP]['ooEmooP']['Barrel']) + \
+   "&& abs(LepGood_dxy) <" + str(cuts[WP]['d0']['Barrel']) + "&& abs(LepGood_dz) <" + str(cuts[WP]['dz']['Barrel']) + "&& LepGood_lostHits <=" + str(cuts[WP]['MissingHits']['Barrel']) + ") ||" + \
+   "(abs(LepGood_eta) >" + str(ebeeSplit) + "&& abs(LepGood_eta) <" + str(etaAcc) + "&& LepGood_sigmaIEtaIEta <" + str(cuts[WP]['sigmaEtaEta']['Endcap']) + "&& abs(LepGood_dEtaScTrkIn) <" + str(cuts[WP]['dEta']['Endcap']) + \
+   "&& abs(LepGood_dPhiScTrkIn) <" + str(cuts[WP]['dPhi']['Endcap']) + "&& LepGood_hadronicOverEm <" + str(cuts[WP]['hOverE']['Endcap']) + "&& abs(LepGood_eInvMinusPInv) <" + str(cuts[WP]['ooEmooP']['Endcap']) + \
+   "&& abs(LepGood_dxy) <" + str(cuts[WP]['d0']['Endcap']) + "&& abs(LepGood_dz) <" + str(cuts[WP]['dz']['Endcap']) + "&& LepGood_lostHits <=" + str(cuts[WP]['MissingHits']['Endcap']) + \
+   "))" #"&& LepGood_" + isolation + "<" + str(cuts['Endcap']['Veto']['relIso']) + "))"
+   #"&& LepGood_" + isolation + "<" + str(cuts['Barrel']['Veto']['relIso']) + ") ||" + \
+ 
+   hists_passed[WP] = makeHistVarBins(Events, "LepGood_pt", normFactor + "*" + weight + "*(" + preSel + "&&" + recoSel + "&&" + misMatchSel + "&& " + cutSel + ")", bins) 
    hists_passed[WP].SetName("misID2_" + WP)
    hists_passed[WP].SetFillColor(0)
    hists_passed[WP].SetLineWidth(3)
@@ -167,28 +188,30 @@ if mvaWPs == 1:
    
    ptSplit = 10 #we have above and below 10 GeV categories
    
-   for WP in WPs.keys():
+   for WP in WPs:
       mvaSel = "(\
       (LepGood_pt <=" + str(ptSplit) + "&& abs(LepGood_eta) < " + str(ebSplit) + "&& LepGood_mvaIdSpring15 >=" + str(WPs[WP]['EB1_lowPt']) + ") || \
       (LepGood_pt <=" + str(ptSplit) + "&& abs(LepGood_eta) >=" + str(ebSplit) + "&& abs(LepGood_eta) <" + str(ebeeSplit) + "&& LepGood_mvaIdSpring15 >=" + str(WPs[WP]['EB2_lowPt']) + ") || \
-      (LepGood_pt <=" + str(ptSplit) + "&& abs(LepGood_eta) >=" + str(ebeeSplit) + "&& abs(LepGood_eta) < " + str(etaAcc) + " && LepGood_mvaIdSpring15 >=" + str(WPs[WP]['EE_lowPt']) + ") || \
+      (LepGood_pt <=" + str(ptSplit) + "&& abs(LepGood_eta) >=" + str(ebeeSplit) + "&& abs(LepGood_eta) <" + str(etaAcc) + "&& LepGood_mvaIdSpring15 >=" + str(WPs[WP]['EE_lowPt']) + ") || \
       (LepGood_pt >" + str(ptSplit) + "&& abs(LepGood_eta) <" + str(ebSplit) + "&& LepGood_mvaIdSpring15 >=" + str(WPs[WP]['EB1']) + ") || \
       (LepGood_pt >" + str(ptSplit) + "&& abs(LepGood_eta) >=" + str(ebSplit) + "&& abs(LepGood_eta) <" + str(ebeeSplit) + "&& LepGood_mvaIdSpring15 >=" + str(WPs[WP]['EB2']) + ") || \
-      (LepGood_pt >" + str(ptSplit) + "&& abs(LepGood_eta) >=" + str(ebeeSplit) + "&& abs(LepGood_eta) < " + str(etaAcc) + " && LepGood_mvaIdSpring15 >=" + str(WPs[WP]['EE']) + "))"
+      (LepGood_pt >" + str(ptSplit) + "&& abs(LepGood_eta) >=" + str(ebeeSplit) + "&& abs(LepGood_eta) <" + str(etaAcc) + "&& LepGood_mvaIdSpring15 >=" + str(WPs[WP]['EE']) + "))"
+      
+      hists_total[WP] = makeHistVarBins(Events, "LepGood_pt", normFactor + "*" + weight + "*(" + preSel + "&&" + recoSel + "&&" + mvaSel + ")", bins)
       hists_passed[WP] = makeHistVarBins(Events, "LepGood_pt", normFactor + "*" + weight + "*(" + preSel + "&&" + recoSel + "&&" + misMatchSel + "&&" + mvaSel + ")", bins)
-      hists_passed[WP].SetName("misID2_" + WP)
       hists_passed[WP].SetFillColor(0)
       hists_passed[WP].SetLineWidth(3)
+      hists_passed[WP].SetName("misID_" + WP)
       hists_passed[WP].Draw("histsame")
-
+   
    hists_passed['WP90'].SetLineColor(ROOT.kMagenta+2)
    hists_passed['WP80'].SetLineColor(ROOT.kAzure+5)
 
    ROOT.gPad.Modified()
    ROOT.gPad.Update()
 
-   l1.AddEntry("misID2_WP90", "MVA ID (WP90)", "F")
-   l1.AddEntry("misID2_WP80", "MVA ID (WP80)", "F")
+   l1.AddEntry("misID_WP90", "MVA ID (WP90)", "F")
+   l1.AddEntry("misID_WP80", "MVA ID (WP80)", "F")
 
 l1.Draw()
 
@@ -198,7 +221,7 @@ c1.cd(2)
 
 effs = {}
 
-#Efficiency
+#Efficiency Veto
 for WP in sorted(hists_passed.keys()):
    effs[WP] = ROOT.TEfficiency(hists_passed[WP], hist_total) #(passed, total)
    effs[WP].SetName("eff_" + WP)
@@ -239,10 +262,10 @@ l2.AddEntry("eff_Medium", "Medium ID", "P")
 l2.AddEntry("eff_Tight", "Tight ID", "P")
 
 if mvaWPs == 1:
-   effs['WP90'].SetMarkerColor(ROOT.kMagenta+2)
-   effs['WP90'].SetLineColor(ROOT.kMagenta+2)
-   effs['WP90'].SetMarkerStyle(22)
-   effs['WP90'].SetMarkerSize(1)
+   effs["WP90"].SetMarkerColor(ROOT.kMagenta+2)
+   effs["WP90"].SetLineColor(ROOT.kMagenta+2)
+   effs["WP90"].SetMarkerStyle(22)
+   effs["WP90"].SetMarkerSize(1)
    effs['WP80'].SetMarkerColor(ROOT.kAzure+5)
    effs['WP80'].SetLineColor(ROOT.kAzure+5)
    effs['WP80'].SetMarkerStyle(22)
@@ -263,8 +286,8 @@ c1.Update()
 
 #Write to file
 if save == 1:
-   if mvaWPs == 1: savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/electronReconstruction/electronID/standard/misID2" #web address: http://www.hephy.at/user/mzarucki/plots/electronReconstruction/electronIdEfficiency
-   elif mvaWPs == 0: savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/electronReconstruction/electronID/standard/misID2/noMva"
+   if mvaWPs == 0: savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/electronReconstruction/electronID/noIso/misID2" #web address: http://www.hephy.at/user/mzarucki/plots/electronReconstruction/electronIdEfficiency
+   elif mvaWPs == 1: savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/electronReconstruction/electronID/noIso/misID2/withMva"
    
    if not os.path.exists(savedir):
       os.makedirs(savedir)
@@ -274,6 +297,6 @@ if save == 1:
       os.makedirs(savedir + "/pdf")
    
    #Save to Web
-   c1.SaveAs(savedir + "/eleMisID2_" + inputSample + z + ".png")
-   c1.SaveAs(savedir + "/root/eleMisID2_" + inputSample + z + ".root")
-   c1.SaveAs(savedir + "/pdf/eleMisID2_" + inputSample + z + ".pdf")
+   c1.SaveAs(savedir + "/eleMisID2_noIso_" + inputSample + z + ".png")
+   c1.SaveAs(savedir + "/root/eleMisID2_noIso_" + inputSample + z + ".root")
+   c1.SaveAs(savedir + "/pdf/eleMisID2_noIso_" + inputSample + z + ".pdf")
