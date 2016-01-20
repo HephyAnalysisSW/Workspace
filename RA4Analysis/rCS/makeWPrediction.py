@@ -87,10 +87,10 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, QCD=Fa
 #  print "Subtract denominator", yTT_crNJet_0b_lowDPhi,'true', yTT_crNJet_0b_lowDPhi_truth
 
   muonCut = "&&abs(leptonPdg)==13"
-  correction_lowDPhi        = {'y':yTT_crNJet_0b_lowDPhi,'e':yTT_Var_crNJet_0b_lowDPhi}
-  correction_highDPhi       = {'y':yTT_crNJet_0b_highDPhi,'e':yTT_Var_crNJet_0b_highDPhi}
-  correction_lowDPhi_rest   = {'y':yTT_crNJet_0b_lowDPhi+rd['yRest_crNJet_0b_lowDPhi_truth'],'e':yTT_Var_crNJet_0b_lowDPhi+sqrt(rd['yRest_Var_crNJet_0b_lowDPhi_truth'])}
-  correction_highDPhi_rest  = {'y':yTT_crNJet_0b_highDPhi+rd['yRest_crNJet_0b_highDPhi_truth'],'e':yTT_Var_crNJet_0b_highDPhi+sqrt(rd['yRest_Var_crNJet_0b_highDPhi_truth'])}
+  correction_lowDPhi        = {'y':yTT_crNJet_0b_lowDPhi,'e':sqrt(yTT_Var_crNJet_0b_lowDPhi)}
+  correction_highDPhi       = {'y':yTT_crNJet_0b_highDPhi,'e':sqrt(yTT_Var_crNJet_0b_highDPhi)}
+  correction_lowDPhi_rest   = {'y':yTT_crNJet_0b_lowDPhi+rd['yRest_crNJet_0b_lowDPhi_truth'],'e':sqrt(yTT_Var_crNJet_0b_lowDPhi + rd['yRest_Var_crNJet_0b_lowDPhi_truth'])}
+  correction_highDPhi_rest  = {'y':yTT_crNJet_0b_highDPhi+rd['yRest_crNJet_0b_highDPhi_truth'],'e':sqrt(yTT_Var_crNJet_0b_highDPhi + rd['yRest_Var_crNJet_0b_highDPhi_truth'])}
 
   if isData:
     #treat contamination like QCD
@@ -107,10 +107,10 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, QCD=Fa
   #calculate corrected rCS(+-) for W(+-) [because of yTT is symmetric in charge one have to subtract 0.5*yTT]
   #PosPdg
   muonCut = '&&leptonPdg>0&&abs(leptonPdg)==13'
-  correction_lowDPhi        = {'y':0.5*yTT_crNJet_0b_lowDPhi,'e':0.5*yTT_Var_crNJet_0b_lowDPhi}
-  correction_highDPhi       = {'y':0.5*yTT_crNJet_0b_highDPhi,'e':0.5*yTT_Var_crNJet_0b_highDPhi}
-  correction_lowDPhi_rest   = {'y':yTT_crNJet_0b_lowDPhi+rd['yRest_crNJet_0b_lowDPhi_truth_PosPdg'],'e':yTT_Var_crNJet_0b_lowDPhi+sqrt(rd['yRest_Var_crNJet_0b_lowDPhi_truth_PosPdg'])}
-  correction_highDPhi_rest  = {'y':yTT_crNJet_0b_highDPhi+rd['yRest_crNJet_0b_highDPhi_truth_PosPdg'],'e':yTT_Var_crNJet_0b_highDPhi+sqrt(rd['yRest_Var_crNJet_0b_highDPhi_truth_PosPdg'])}
+  correction_lowDPhi        = {'y':0.5*yTT_crNJet_0b_lowDPhi,'e':0.5*sqrt(yTT_Var_crNJet_0b_lowDPhi)}
+  correction_highDPhi       = {'y':0.5*yTT_crNJet_0b_highDPhi,'e':0.5*sqrt(yTT_Var_crNJet_0b_highDPhi)}
+  correction_lowDPhi_rest   = {'y':yTT_crNJet_0b_lowDPhi+rd['yRest_crNJet_0b_lowDPhi_truth_PosPdg'],'e':sqrt(yTT_Var_crNJet_0b_lowDPhi + rd['yRest_Var_crNJet_0b_lowDPhi_truth_PosPdg'])}
+  correction_highDPhi_rest  = {'y':yTT_crNJet_0b_highDPhi+rd['yRest_crNJet_0b_highDPhi_truth_PosPdg'],'e':sqrt(yTT_Var_crNJet_0b_highDPhi + rd['yRest_Var_crNJet_0b_highDPhi_truth_PosPdg'])}
   
   if isData:
     #treat contamination like QCD
@@ -125,8 +125,8 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, QCD=Fa
 
   #NegPdg
   muonCut = '&&leptonPdg<0&&abs(leptonPdg)==13'
-  correction_lowDPhi_rest   = {'y':yTT_crNJet_0b_lowDPhi+rd['yRest_crNJet_0b_lowDPhi_truth_NegPdg'],'e':yTT_Var_crNJet_0b_lowDPhi+sqrt(rd['yRest_Var_crNJet_0b_lowDPhi_truth_NegPdg'])}
-  correction_highDPhi_rest  = {'y':yTT_crNJet_0b_highDPhi+rd['yRest_crNJet_0b_highDPhi_truth_NegPdg'],'e':yTT_Var_crNJet_0b_highDPhi+sqrt(rd['yRest_Var_crNJet_0b_highDPhi_truth_NegPdg'])}
+  correction_lowDPhi_rest   = {'y':yTT_crNJet_0b_lowDPhi+rd['yRest_crNJet_0b_lowDPhi_truth_NegPdg'],'e':sqrt(yTT_Var_crNJet_0b_lowDPhi + rd['yRest_Var_crNJet_0b_lowDPhi_truth_NegPdg'])}
+  correction_highDPhi_rest  = {'y':yTT_crNJet_0b_highDPhi+rd['yRest_crNJet_0b_highDPhi_truth_NegPdg'],'e':sqrt(yTT_Var_crNJet_0b_highDPhi + rd['yRest_Var_crNJet_0b_highDPhi_truth_NegPdg'])}
 
   if isData:
     #treat contamination like QCD

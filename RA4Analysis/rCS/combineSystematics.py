@@ -60,6 +60,8 @@ lepSF_h2b = d.GetPrimitive('h2b')
 #ttdi_h1b = a.GetPrimitive('h1b')
 #ttdi_h2b = a.GetPrimitive('h2b')
 
+#pickleDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_validation_lep_data_2p3/'
+
 wpol    = pickle.load(file('/data/dhandl/results2015/WPolarizationEstimation/20151218_wjetsPolSys_pkl'))
 b_err   = pickle.load(file('/data/dspitzbart/Results2016/btagErr_pkl'))
 l_err   = pickle.load(file('/data/dspitzbart/Results2016/mistagErr_pkl'))
@@ -102,6 +104,7 @@ dummy.SetFillColor(ROOT.kWhite)
 ratio = ROOT.TH1F('ratio','ratio',bins,0,bins)
 
 hists = [dilepC,dilepS,bErrH,wXErrH,ttXErrH,wPErrH,qcdErrH, puErrH, lepSFErrH, topErrH]
+#hists = [rcsErrH,bErrH,wXErrH,ttXErrH,wPErrH,qcdErrH, puErrH, lepSFErrH, topErrH]
 for i_h,h in enumerate(hists):
   h.SetFillColor(colors[i_h])
   h.SetLineColor(colors[i_h]+1)
@@ -210,11 +213,13 @@ for injb,srNJet in enumerate(sorted(signalRegions)):
       rcsErr_tt = rcs[srNJet][stb][htb]['TT_rCS_fits_MC']['syst']/rcs[srNJet][stb][htb]['TT_pred']
       rcsErr_W = rcs[srNJet][stb][htb]['W_pred_errs']['syst']/rcs[srNJet][stb][htb]['W_pred']
       W_muToLep = rcs[srNJet][stb][htb]['W_pred_errs']['ratio_mu_elemu']/(rcs[srNJet][stb][htb]['rCS_W_crNJet_0b_corr']*rcs[srNJet][stb][htb]['yW_srNJet_0b_lowDPhi'])
+      
       #print 'Rcs unc tt, W',rcsErr_tt, rcsErr_W
       #print rcs[srNJet][stb][htb]['W_pred_errs']['syst'], rcs[srNJet][stb][htb]['TT_rCS_fits_MC']['syst'], rcs[srNJet][stb][htb]['tot_pred']
       rcsErrH.SetBinContent(i,rcsErr)
       
       totalSyst = bErr**2 + wXErr**2 + ttXErr**2 + wPErr**2 + qcdErr**2 + dilepSlope**2 + dilepConstant**2 + topErr**2 + puErr**2 + lepSFErr**2
+      #totalSyst = bErr**2 + wXErr**2 + ttXErr**2 + wPErr**2 + qcdErr**2 + rcsErr**2 + topErr**2 + puErr**2 + lepSFErr**2
       totalSyst = sqrt(totalSyst)
 
       ttSyst  = sqrt(bErr_tt**2 + wXErr**2 + ttXErr**2 + wPErr**2 + dilepSlope**2 + dilepConstant**2 + qcdErr**2 + topErr**2 + puErr**2 + lepSFErr**2)
@@ -373,9 +378,9 @@ total_err.Draw('2 same')
 
 can.cd()
 
-can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2015/syst_errors_forKappa_val.png')
-can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2015/syst_errors_forKappa_val.root')
-can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2015/syst_errors_forKappa_val.pdf')
+can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2016/syst_errors.png')
+can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2016/syst_errors.root')
+can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2016/syst_errors.pdf')
 
-pickle.dump(rcs, file(pickleDir+'resultsFinal_withSystematics_pkl','w'))
+#pickle.dump(rcs, file(pickleDir+'resultsFinal_withSystematics_pkl','w'))
 

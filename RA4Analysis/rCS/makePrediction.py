@@ -75,6 +75,7 @@ for srNJet in signalRegions:
     for htb in signalRegions[srNJet][stb]:
       deltaPhiCut = signalRegions[srNJet][stb][htb]['deltaPhi']
       rd={}
+      rd['deltaPhiCut'] = deltaPhiCut
       #join TT estimation results to dict
       print
       print '#################################################'
