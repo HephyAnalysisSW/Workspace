@@ -11,8 +11,9 @@ ROOT.gROOT.LoadMacro("../../HEPHYPythonTools/scripts/root/tdrstyle.C")
 ROOT.setTDRStyle()
 maxN = -1
 ROOT.gStyle.SetOptStat(0)
-lumi = 2250##pb
+lumi = 2300##pb
 path = "/afs/hephy.at/user/e/easilar/www/data/Run2015D/2p3fb/diLep_syst_study_results/"
+data_mean = pickle.load(file('/data/easilar/Spring15/25ns/data_mean_pkl'))
 SR = signalRegion3fb
 
 btagVarString = 'nBJetMediumCSV30'
@@ -46,7 +47,8 @@ for srNJet in sorted(SR):
       h_double_ratio.GetYaxis().SetTitleSize(0.05)
       h_double_ratio.Sumw2()
       h_double_ratio.Draw()
-      func = ROOT.TF1("my","[0] + [1] * (x-"+str(format(h_double_ratio.GetMean(),'.3f'))+")",4,9)
+      bin[srNJet][stb][htb]["nJetMean"] = data_mean[srNJet][stb][htb]["data_mean"]
+      func = ROOT.TF1("my","[0] + [1] * (x-"+str(format(bin[srNJet][stb][htb]["nJetMean"],'.3f'))+")",4,9)
       h_double_ratio.Fit(func)
       FitFunc     = h_double_ratio.GetFunction('my')
       latex.DrawLatex(0.6,0.85,"Fit:")
@@ -56,13 +58,12 @@ for srNJet in sorted(SR):
       latex.DrawLatex(0.2,0.85,"(nJet+add lost)/(nJet)")
       bin[srNJet][stb][htb]["constant"] = sqrt(abs(1-FitFunc.GetParameter(0))**2+abs(FitFunc.GetParError(0))**2)
       bin[srNJet][stb][htb]["slope"] = sqrt(abs(0-abs(FitFunc.GetParameter(1)))**2+abs(FitFunc.GetParError(1))**2)
-      bin[srNJet][stb][htb]["nJetMean"] = h_double_ratio.GetMean()
       print "mean:" , bin[srNJet][stb][htb]["nJetMean"]
       print "constant",abs(1-FitFunc.GetParameter(0)) ,"error", abs(FitFunc.GetParError(0)),"quad sum of constant:" , bin[srNJet][stb][htb]["constant"]
       print "slope",abs(0-abs(FitFunc.GetParameter(1))) ,"error", abs(FitFunc.GetParError(1)),"quad sum of constant:" , bin[srNJet][stb][htb]["slope"]
-      cb.SaveAs(path+Name+'_'+p['varname']+'_allWeights_double_Ratio.root')
-      cb.SaveAs(path+Name+'_'+p['varname']+'_allWeights_double_Ratio.png')
-      cb.SaveAs(path+Name+'_'+p['varname']+'_allWeights_double_Ratio.pdf')
+      #cb.SaveAs(path+Name+'_'+p['varname']+'_allWeights_double_Ratio.root')
+      #cb.SaveAs(path+Name+'_'+p['varname']+'_allWeights_double_Ratio.png')
+      #cb.SaveAs(path+Name+'_'+p['varname']+'_allWeights_double_Ratio.pdf')
       #for f_ratio in [{'name':'diLep' , 'file':fratio_diLep} , {'name':'oneLep' , 'file':fratio_oneLep}]:
       #  cb = ROOT.TCanvas("cb","cb",800,800)
       #  cb.cd()

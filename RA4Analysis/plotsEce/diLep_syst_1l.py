@@ -1,4 +1,5 @@
 import ROOT
+import pickle
 from Workspace.HEPHYPythonTools.helpers import getObjFromFile, getChain, getChunks, getYieldFromChain,getPlotFromChain
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName, nBTagBinName, varBinName, varBin, UncertaintyDivision
 from Workspace.RA4Analysis.cmgTuples_Data25ns_miniAODv2_postprocessed import *
@@ -159,6 +160,7 @@ for p in plots:
         h_data.GetYaxis().SetLabelSize(0.05)
         h_data.Draw("E1P")
         print "data mean :" , h_data.GetMean()
+        bin[srNJet][stb][htb]['data_mean'] = h_data.GetMean() 
         h_data.SetMaximum(2500)
         h_data.SetMinimum(0.11)
         h_Stack.Draw("HistoSame")
@@ -223,5 +225,5 @@ for p in plots:
         cb.Clear()
         del h_Stack
             
-
+pickle.dump(bin,file('/data/easilar/Spring15/25ns/data_mean_pkl','w'))
 

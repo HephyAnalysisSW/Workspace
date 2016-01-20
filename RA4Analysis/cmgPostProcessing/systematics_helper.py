@@ -139,7 +139,12 @@ def calcDLDictionary(s,r,keepIdx , discardIdx ,tightHardLep):
 
    Met2D_AddFull = met_2vec + lepToDiscard2D #adding lost lepton pt to met
    Met2D_AddThird = met_2vec + (1/3.*lepToDiscard2D)
-   LepToKeep_pt = lepToKeep2D.Mod()
+   out_dict["LepToKeep_pt"] = lepToKeep2D.Mod()
+   out_dict["LepToKeep_eta"] = lepToKeep4D.Eta()
+   out_dict["LepToKeep_Et"] = lepToKeep4D.Et()
+   out_dict["lepToDiscard_pt"] = lepToDiscard2D.Mod()
+   out_dict["lepToDiscard_eta"] = lepToDiscard4D.Eta()
+   out_dict["lepToDiscard_Et"] = lepToDiscard4D.Et()
 
    DL_dPhiLepW = {}
    DL_ST = {}
@@ -178,14 +183,13 @@ def calcDLDictionary(s,r,keepIdx , discardIdx ,tightHardLep):
    out_dict["DL_HT"] = DL_HT
    out_dict["DL_nJet"] = DL_nJet
 
-   out_dict["LepToKeep_pt"] = LepToKeep_pt
 
    #print out_dict
 
    return out_dict
 
 
-def calc_diLep_contributions(s,r,tightHardLep,rand_input):
+def calc_diLep_contributions(s,r,tightHardLep,rand_input,histos_LS):
   if s.nTightHardLeptons==2:
     #print "n lepton :" , s.nTightHardLeptons
     passSel = False
@@ -205,6 +209,7 @@ def calc_diLep_contributions(s,r,tightHardLep,rand_input):
       #print "leptokeep: " , lepToKeep
       s.LepToKeep_pdgId = tightHardLep[lepToKeep]["pdgId"]
       lepToDiscard = int(not lepToKeep)
+      s.lepToDiscard_pdgId = tightHardLep[lepToDiscard]["pdgId"]
       aktions = ["notAddLepMet" , "AddLepMet" , "AddLep1ov3Met"]
       var_DLs = ["ST","HT","dPhiLepW","nJet"]
       keepIdx=lepToDiscard
@@ -233,5 +238,22 @@ def calc_diLep_contributions(s,r,tightHardLep,rand_input):
       s.DPhil1l2_lepToKeep    = outdict["DPhil1l2"]
 
       s.LepToKeep_pt = outdict["LepToKeep_pt"]
+      ####calculate the lepton scale eff for each lepton####
+      mu_mediumID_histo   =histos_LS['mu_mediumID_histo']
+      mu_miniIso02_histo  =histos_LS['mu_miniIso02_histo']
+      mu_sip3d_histo      =histos_LS['mu_sip3d_histo']
+      ele_cutbased_histo  =histos_LS['ele_cutbased_histo']
+      ele_miniIso01_histo =histos_LS['ele_miniIso01_histo']
+
+      if abs(s.LepToKeep_pdgId)==11 : s.LepToKeep_eleSF = ele_cutbased_histo.GetBinContent(ele_cutbased_histo.FindBin(outdict["LepToKeep_Et"],abs(outdict["LepToKeep_eta"])))*(ele_miniIso01_histo.GetBinContent(ele_miniIso01_histo.FindBin(outdict["LepToKeep_Et"],abs(outdict["LepToKeep_eta"])))) 
+
+      if abs(s.LepToKeep_pdgId)==13 and outdict["LepToKeep_pt"]>=120: s.LepToKeep_muSF =mu_mediumID_histo.GetBinContent(mu_mediumID_histo.FindBin(119,abs(outdict["LepToKeep_eta"])))*(mu_miniIso02_histo.GetBinContent(mu_miniIso02_histo.FindBin(119,abs(outdict["LepToKeep_eta"]))))*(mu_sip3d_histo.GetBinContent(mu_sip3d_histo.FindBin(119,abs(outdict["LepToKeep_eta"]))))
+      if abs(s.LepToKeep_pdgId)==13 and outdict["LepToKeep_pt"]<120: s.LepToKeep_muSF =mu_mediumID_histo.GetBinContent(mu_mediumID_histo.FindBin(outdict["LepToKeep_pt"],abs(outdict["LepToKeep_eta"])))*(mu_miniIso02_histo.GetBinContent(mu_miniIso02_histo.FindBin(outdict["LepToKeep_pt"],abs(outdict["LepToKeep_eta"]))))*(mu_sip3d_histo.GetBinContent(mu_sip3d_histo.FindBin(outdict["LepToKeep_pt"],abs(outdict["LepToKeep_eta"]))))
+
+      if abs(s.lepToDiscard_pdgId)==11 : s.lepToDiscard_eleSF = ele_cutbased_histo.GetBinContent(ele_cutbased_histo.FindBin(outdict["lepToDiscard_Et"],abs(outdict["lepToDiscard_eta"])))*(ele_miniIso01_histo.GetBinContent(ele_miniIso01_histo.FindBin(outdict["lepToDiscard_Et"],abs(outdict["lepToDiscard_eta"]))))
+
+      if abs(s.lepToDiscard_pdgId)==13 and outdict["lepToDiscard_pt"]>=120 : s.lepToDiscard_muSF =mu_mediumID_histo.GetBinContent(mu_mediumID_histo.FindBin(119,abs(outdict["lepToDiscard_eta"])))*(mu_miniIso02_histo.GetBinContent(mu_miniIso02_histo.FindBin(119,abs(outdict["lepToDiscard_eta"]))))*(mu_sip3d_histo.GetBinContent(mu_sip3d_histo.FindBin(119,abs(outdict["lepToDiscard_eta"]))))
+      if abs(s.lepToDiscard_pdgId)==13 and outdict["lepToDiscard_pt"]<120 : s.lepToDiscard_muSF = mu_mediumID_histo.GetBinContent(mu_mediumID_histo.FindBin(outdict["lepToDiscard_pt"],abs(outdict["lepToDiscard_eta"])))*(mu_miniIso02_histo.GetBinContent(mu_miniIso02_histo.FindBin(outdict["lepToDiscard_pt"],abs(outdict["lepToDiscard_eta"]))))*(mu_sip3d_histo.GetBinContent(mu_sip3d_histo.FindBin(outdict["lepToDiscard_pt"],abs(outdict["lepToDiscard_eta"]))))
+
 
   return

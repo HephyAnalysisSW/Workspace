@@ -65,9 +65,9 @@ def getBTagMCTruthEfficiencies(c, cut="(1)", overwrite=False):
       ptCut = "abs(Jet_pt)>"+str(ptBin[0])
       if ptBin[1]>0:
         ptCut += "&&abs(Jet_pt)<"+str(ptBin[1])
-      c.Draw(commoncf+"(Jet_btagCSV>0.890)>>hbQuark(100,-1,2)",commoncf+"abs(Jet_hadronFlavour)==5&&                     "+etaCut+"&&"+ptCut)
-      c.Draw(commoncf+"(Jet_btagCSV>0.890)>>hcQuark(100,-1,2)",commoncf+"abs(Jet_hadronFlavour)==4&&                     "+etaCut+"&&"+ptCut)
-      c.Draw(commoncf+"(Jet_btagCSV>0.890)>>hOther(100,-1,2)" ,commoncf+"(abs(Jet_hadronFlavour) < 4  || abs(Jet_hadronFlavour) > 5)&&  "+etaCut+"&&"+ptCut)
+      c.Draw(commoncf+"(Jet_btagCSV>0.890)>>hbQuark(100,-1,2)",commoncf+"abs(Jet_mcFlavour)==5&&                     "+etaCut+"&&"+ptCut)
+      c.Draw(commoncf+"(Jet_btagCSV>0.890)>>hcQuark(100,-1,2)",commoncf+"abs(Jet_mcFlavour)==4&&                     "+etaCut+"&&"+ptCut)
+      c.Draw(commoncf+"(Jet_btagCSV>0.890)>>hOther(100,-1,2)" ,commoncf+"(abs(Jet_mcFlavour) < 4  || abs(Jet_mcFlavour) > 5)&&  "+etaCut+"&&"+ptCut)
       hbQuark = ROOT.gDirectory.Get("hbQuark")
       hcQuark = ROOT.gDirectory.Get("hcQuark")
       hOther = ROOT.gDirectory.Get("hOther")
@@ -171,12 +171,13 @@ def getSF2015(parton, pt, eta):
 #  mcEff = False
 def getMCEff(parton, pt, eta, mcEff, year = 2015):
   for ptBin in ptBins:
+    #print ptBin
     if pt>=ptBin[0] and (pt<ptBin[1] or ptBin[1]<0):
       for etaBin in etaBins:
         if abs(eta)>=etaBin[0] and abs(eta)<etaBin[1]:
           if year == 2015: res=getSF2015(parton, pt, eta)
           else: res=getSF(parton, pt, eta, year)
-#          print ptBin, etaBin      , mcEff[tuple(ptBin)][tuple(etaBin)]
+          #print ptBin, etaBin      , mcEff[tuple(ptBin)][tuple(etaBin)]
           if abs(parton)==5:                  res["mcEff"] = mcEff[tuple(ptBin)][tuple(etaBin)]["b"]
           if abs(parton)==4:                  res["mcEff"] = mcEff[tuple(ptBin)][tuple(etaBin)]["c"]
           if abs(parton)>5 or abs(parton)<4:  res["mcEff"] = mcEff[tuple(ptBin)][tuple(etaBin)]["other"]
@@ -191,7 +192,7 @@ def getMCEfficiencyForBTagSF(c, mcEff, onlyLightJetSystem = False, sms=""):
   for i in range(njets):
     jPt     = getVarValue(c, "Jet_pt", i)
     jEta    = getVarValue(c, "Jet_eta", i)
-    jParton = getVarValue(c, "Jet_hadronFlavour", i)
+    jParton = getVarValue(c, "Jet_mcFlavour", i)
 #                eff = 0.9-min(5,i)*0.1#getEfficiencyAndMistagRate(jPt, jEta, jParton )
     #if jPt<=40. or abs(jEta)>=2.4 or (not getVarValue(c, "jetsEleCleaned", i)) or (not getVarValue(c, "jetsMuCleaned", i)) or (not getVarValue(c, "jetsID", i)):
     if jPt<=30. or abs(jEta)>=2.4 or (not getVarValue(c, "Jet_id", i)):
@@ -207,8 +208,9 @@ def getMCEfficiencyForBTagSF(c, mcEff, onlyLightJetSystem = False, sms=""):
   for jet in jets:
     jParton, jPt, jEta = jet
     r = getMCEff(parton=jParton, pt=jPt, eta=jEta, mcEff=mcEff, year=2015)#getEfficiencyAndMistagRate(jPt, jEta, jParton )
+    #print "R: " , r
     jet.append(r)
-#    print [j[0] for j in jets]
+  #print [j[0] for j in jets]
   if len(jets) != nsoftjets: print '!!!!! Different number of jets in collection than there should be !!!!!'
   mceffs = tuple()
   mceffs_SF = tuple()
@@ -273,7 +275,7 @@ def getBTagWeight(c, sms=""):
     isBtagged = False
     jPt     = getVarValue(c, "Jet_pt", i)
     jEta    = getVarValue(c, "Jet_eta", i)
-    jParton = getVarValue(c, "Jet_hadronFlavour", i)
+    jParton = getVarValue(c, "Jet_mcFlavour", i)
     jBTagCSV = getVarValue(c, "Jet_btagCSV", i)
     if jBTagCSV > 0.890: isBtagged = True
     if jPt<=30. or abs(jEta)>=2.4 or (not getVarValue(c, "Jet_id", i)):

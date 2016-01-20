@@ -1,5 +1,5 @@
-#path = "/data/easilar/tuples_from_Artur/MiniAODv2/" 
-path = "/data/easilar/tuples_from_Artur/HT350_1nLep_LT200_hadrFlav/" 
+path = "/data/easilar/tuples_from_Artur/MiniAODv2/" 
+#path = "/data/easilar/tuples_from_Artur/HT350_1nLep_LT200_hadrFlav/" 
 
 #TTJets_LO_pow = {\
 #"name" : "TTJets_LO_pow",
@@ -13,8 +13,8 @@ path = "/data/easilar/tuples_from_Artur/HT350_1nLep_LT200_hadrFlav/"
 #}
 
 TTJets_SingleLeptonFromT_full = {\
-"name" : "TTJets_SingleLepton",
-"chunkString":"TTJets_SingleLepton",
+"name" : "TTJets_SingleLeptonFromT_full",
+"chunkString":"TTJets_SingleLeptonFromT_full",
 "dir": path,
 "dbsName" : "/TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM",
 "skimAnalyzerDir":"skimAnalyzerCount",
@@ -22,19 +22,19 @@ TTJets_SingleLeptonFromT_full = {\
 "treeName":"tree",
 'isData':False,
 }
-#TTJets_SingleLeptonFromTbar_full = {\
-#"name" : "TTJets_SingleLeptonFromTbar_full",
-#"chunkString":"TTJets_SingleLeptonFromTbar_full",
-#"dir": path,
-#"dbsName" : "/TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/MINIAODSIM",
-#"skimAnalyzerDir":"skimAnalyzerCount",
-#"rootFileLocation":"/treeProducerSusySingleLepton/tree.root",
-#"treeName":"tree",
-#'isData':False,
-#}
+TTJets_SingleLeptonFromTbar_full = {\
+"name" : "TTJets_SingleLeptonFromTbar_full",
+"chunkString":"TTJets_SingleLeptonFromTbar_full",
+"dir": path,
+"dbsName" : "/TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/MINIAODSIM",
+"skimAnalyzerDir":"skimAnalyzerCount",
+"rootFileLocation":"/treeProducerSusySingleLepton/tree.root",
+"treeName":"tree",
+'isData':False,
+}
 TTJets_DiLepton_full = {\
-"name" : "TTJets_DiLepton",
-"chunkString":"TTJets_DiLepton",
+"name" : "TTJets_DiLepton_full",
+"chunkString":"TTJets_DiLepton_full",
 "dir": path,
 "dbsName" : "/TTJets_DiLept_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/MINIAODSIM",
 "skimAnalyzerDir":"skimAnalyzerCount",
@@ -361,19 +361,9 @@ TToLeptons_sch ={\
 'isData':False
 }
 
-#TToLeptons_tch ={\
-#"name" : "TToLeptons_tch_amcatnlo_full",
-#"chunkString":"TToLeptons_tch_amcatnlo_full",
-#"dir":  path ,
-#"dbsName" : "",
-#"skimAnalyzerDir":"skimAnalyzerCount",
-#"rootFileLocation":"/treeProducerSusySingleLepton/tree.root",
-#"treeName":"tree",
-#'isData':False
-#}
 TToLeptons_tch ={\
-"name" : "TToLeptons_tch_amcatnlo",
-"chunkString":"TToLeptons_tch_amcatnlo",
+"name" : "TToLeptons_tch_amcatnlo_full",
+"chunkString":"TToLeptons_tch_amcatnlo_full",
 "dir":  path ,
 "dbsName" : "",
 "skimAnalyzerDir":"skimAnalyzerCount",
@@ -381,6 +371,16 @@ TToLeptons_tch ={\
 "treeName":"tree",
 'isData':False
 }
+#TToLeptons_tch ={\
+#"name" : "TToLeptons_tch_amcatnlo",
+#"chunkString":"TToLeptons_tch_amcatnlo",
+#"dir":  path ,
+#"dbsName" : "",
+#"skimAnalyzerDir":"skimAnalyzerCount",
+#"rootFileLocation":"/treeProducerSusySingleLepton/tree.root",
+#"treeName":"tree",
+#'isData':False
+#}
 
 #TToLeptons_tch_amcatnlo_ext = {\
 #"name" : "TToLeptons_tch_amcatnlo_ext",

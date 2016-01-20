@@ -60,28 +60,42 @@ lepSF_h2b = d.GetPrimitive('h2b')
 #c = ttdifile.Get('cb')
 #ttdi_h1b = a.GetPrimitive('h1b')
 #ttdi_h2b = a.GetPrimitive('h2b')
-
+pickleDir = '/data/easilar/Spring15/25ns/'
 wpol = pickle.load(file('/data/dhandl/results2015/WPolarizationEstimation/20151218_wjetsPolSys_pkl'))
 b_err = pickle.load(file('/data/dspitzbart/Results2015/btagErr_pkl'))
 l_err = pickle.load(file('/data/dspitzbart/Results2015/mistagErr_pkl'))
 qcd_err = pickle.load(file('/data/dspitzbart/Results2015/qcdErr_pkl'))
-rcs = pickle.load(file(pickleDir+'singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'))
+#rcs = pickle.load(file(pickleDir+'singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'))
+rcs = pickle.load(file('/data/dspitzbart/Results2016/Prediction_SFtemplates_validation_lep_data_2p3/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'))
+#diLep_dict = pickle.load(file('/data/easilar/Spring15/25ns/extended_with_truth_counts_tt_pkl'))
+###diLep_dict = pickle.load(file('/data/easilar/Spring15/25ns/extended_with_truth_counts_tot_kappa_pkl'))
+diLep_dict = pickle.load(file('/data/easilar/Spring15/25ns/extended_with_truth_counts_Wkappa_pkl'))
+#diLep_w_dict = pickle.load(file('/data/easilar/Spring15/25ns/extended_with_truth_counts_Wkappa_pkl'))
+lep_Eff =  pickle.load(file("/data/easilar/Spring15/25ns/extended_with_truth_counts_LS_pkl"))
+pu_Unc =  pickle.load(file("/data/easilar/Spring15/25ns/extended_with_truth_counts_PU_pkl"))
+topPt_Err =  pickle.load(file("/data/easilar/Spring15/25ns/extended_with_truth_counts_topPt_pkl"))
 
 #rcs = pickle.load(file('/data/dspitzbart/Results2015/Prediction_SFtemplates_fullSR_lep_MC_SF_2.1/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'))
 dataResult = rcs
 #dataResult = pickle.load(file('/data/dspitzbart/Results2015/Prediction_SFtemplates_fullSR_lep_data_2.1/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'))
 
-colors = [ROOT.kBlue+2, ROOT.kBlue-4, ROOT.kBlue-7, ROOT.kBlue-9, ROOT.kCyan-9, ROOT.kCyan-6, ROOT.kCyan-2,ROOT.kGreen+3,ROOT.kGreen-2,ROOT.kGreen-6,ROOT.kGreen-7, ROOT.kOrange-4, ROOT.kOrange+1, ROOT.kOrange+8, ROOT.kRed, ROOT.kRed+1]
-colors = [ROOT.kBlue-7, ROOT.kCyan-9, ROOT.kCyan-2, ROOT.kGreen-6, ROOT.kOrange+6, ROOT.kRed+1, ROOT.kRed-6, ROOT.kYellow+2]
+#colors = [ROOT.kBlue+2, ROOT.kBlue-4, ROOT.kBlue-7, ROOT.kBlue-9, ROOT.kCyan-9, ROOT.kCyan-6, ROOT.kCyan-2,ROOT.kGreen+3,ROOT.kGreen-2,ROOT.kRed-6,ROOT.kRed-7, ROOT.kOrange-4, ROOT.kOrange+1, ROOT.kOrange+8, ROOT.kRed, ROOT.kRed+1]
+colors = [ROOT.kRed-6,ROOT.kRed-7,ROOT.kOrange-4, ROOT.kOrange+1, ROOT.kOrange+8 ,ROOT.kBlue+2, ROOT.kBlue-4, ROOT.kBlue-7, ROOT.kBlue-9, ROOT.kCyan-9, ROOT.kCyan-6, ROOT.kCyan-2,ROOT.kGreen+3,ROOT.kGreen-2,ROOT.kRed-6,ROOT.kRed-7, ROOT.kOrange-4, ROOT.kOrange+1, ROOT.kOrange+8, ROOT.kRed, ROOT.kRed+1]
+#colors = [ROOT.kBlue-7, ROOT.kCyan-9, ROOT.kCyan-2, ROOT.kGreen-6, ROOT.kOrange+6, ROOT.kRed+1, ROOT.kRed-6, ROOT.kYellow+2, ROOT.kBlue-4 , ROOT.kBlue+4]
 
 bErrH = ROOT.TH1F('bErrH','b-jet SFs',bins,0,bins)
 wXErrH = ROOT.TH1F('WXErrH','W+jets x-sec',bins,0,bins)
 ttXErrH = ROOT.TH1F('ttXErrH','t#bar{t}+jets x-sec',bins,0,bins)
 wPErrH = ROOT.TH1F('wPErrH','W polarization',bins,0,bins)
-rcsErrH = ROOT.TH1F('rcsErrH','R_{CS} systematics',bins,0,bins)
+#rcsErrH = ROOT.TH1F('rcsErrH','R_{CS} systematics',bins,0,bins)
 qcdErrH = ROOT.TH1F('qcdErrH','QCD fit',bins,0,bins)
 puErrH = ROOT.TH1F('puErrH','pile-up',bins,0,bins)
+topPtErrH = ROOT.TH1F('topPtErrH','top pT ',bins,0,bins)
 lepSFErrH = ROOT.TH1F('lepSFErrH','lepton SFs',bins,0,bins)
+diLep_constant_H = ROOT.TH1F('diLep_constant_H','diLep tt constant',bins,0,bins)
+diLep_slope_H = ROOT.TH1F('diLep_slope_H','diLep tt slope',bins,0,bins)
+diLep_w_constant_H = ROOT.TH1F('diLep_w_constant_H','diLep w constant',bins,0,bins)
+diLep_w_slope_H = ROOT.TH1F('diLep_w_slope_H','diLep w slope',bins,0,bins)
 
 dummy = ROOT.TH1F('dummy','',bins,0,bins)
 dummy.SetLineColor(ROOT.kWhite)
@@ -89,7 +103,9 @@ dummy.SetFillColor(ROOT.kWhite)
 
 ratio = ROOT.TH1F('ratio','ratio',bins,0,bins)
 
-hists = [rcsErrH,bErrH,wXErrH,ttXErrH,wPErrH,qcdErrH, puErrH, lepSFErrH]
+#hists = [rcsErrH,bErrH,wXErrH,ttXErrH,wPErrH,qcdErrH, puErrH, lepSFErrH,diLep_constant_H,diLep_slope_H]
+#hists = [bErrH,wXErrH,ttXErrH,wPErrH,qcdErrH, puErrH,lepSFErrH,topPtErrH ,diLep_constant_H,diLep_slope_H , diLep_w_constant_H , diLep_w_slope_H ]
+hists = [bErrH,wXErrH,ttXErrH,wPErrH,qcdErrH, puErrH,lepSFErrH,topPtErrH ,diLep_constant_H,diLep_slope_H]
 for i_h,h in enumerate(hists):
   h.SetFillColor(colors[i_h])
   h.SetLineColor(colors[i_h]+1)
@@ -132,11 +148,17 @@ for injb,srNJet in enumerate(sorted(signalRegions)):
       ttXErrH.SetBinContent(i, ttXErr)
       
       #pile-up
-      puErr = (abs(pu_h1b.GetBinContent(i))+abs(pu_h2b.GetBinContent(i)))/2 # w x-sec
+      #puErr = (abs(pu_h1b.GetBinContent(i))+abs(pu_h2b.GetBinContent(i)))/2 # w x-sec
+      puErr = (abs(pu_Unc[srNJet][stb][htb]['delta_Up'])) # w x-sec
       puErrH.SetBinContent(i, puErr)
-      
+
+      #top pt re weight
+      topPtErr = (abs(topPt_Err[srNJet][stb][htb]['delta_Up'])) # w x-sec
+      topPtErrH.SetBinContent(i, topPtErr) 
+
       #lepton SF
-      lepSFErr = (abs(lepSF_h1b.GetBinContent(i))+abs(lepSF_h2b.GetBinContent(i)))/2 # w x-sec
+      #lepSFErr = (abs(lepSF_h1b.GetBinContent(i))+abs(lepSF_h2b.GetBinContent(i)))/2 # w x-sec
+      lepSFErr = abs(lep_Eff[srNJet][stb][htb]['delta_Up'])# w x-sec
       lepSFErrH.SetBinContent(i, lepSFErr)
 
       #W polarization      
@@ -152,19 +174,39 @@ for injb,srNJet in enumerate(sorted(signalRegions)):
       rcsErr_W = rcs[srNJet][stb][htb]['W_pred_errs']['syst']/rcs[srNJet][stb][htb]['W_pred']
       print 'Rcs unc tt, W',rcsErr_tt, rcsErr_W
       print rcs[srNJet][stb][htb]['W_pred_errs']['syst'], rcs[srNJet][stb][htb]['TT_rCS_fits_MC']['syst'], rcs[srNJet][stb][htb]['tot_pred']
-      rcsErrH.SetBinContent(i,rcsErr)
-      
-      totalSyst = bErr**2 + wXErr**2 + ttXErr**2 + wPErr**2 + rcsErr**2 + qcdErr**2
+      #rcsErrH.SetBinContent(i,rcsErr)
+      #diLep constant and slope
+      diLep_constant_Err = max(abs(diLep_dict[srNJet][stb][htb]['delta_constant_Down']),abs(diLep_dict[srNJet][stb][htb]['delta_constant_Up']))
+      print "constant",diLep_constant_Err
+      diLep_constant_H.SetBinContent(i,diLep_constant_Err)
+      diLep_slope_Err = max(abs(diLep_dict[srNJet][stb][htb]['delta_slope_Down']),abs(diLep_dict[srNJet][stb][htb]['delta_slope_Down']))
+      print "slope" , diLep_slope_Err 
+      diLep_slope_H.SetBinContent(i,diLep_slope_Err)
+     
+
+      #diLep_constant_w_Err = max(abs(diLep_w_dict[srNJet][stb][htb]['delta_constant_Down']),abs(diLep_w_dict[srNJet][stb][htb]['delta_constant_Up']))
+      #print "W constant",diLep_constant_w_Err
+      #print diLep_constant_w_Err
+      #diLep_w_constant_H.SetBinContent(i,diLep_constant_w_Err)
+      #diLep_slope_w_Err = max(abs(diLep_w_dict[srNJet][stb][htb]['delta_slope_Down']),abs(diLep_w_dict[srNJet][stb][htb]['delta_slope_Down']))
+      #print "slope" , diLep_slope_w_Err 
+      #diLep_w_slope_H.SetBinContent(i,diLep_slope_w_Err)
+
+ 
+      #totalSyst = bErr**2 + wXErr**2 + ttXErr**2 + wPErr**2 + rcsErr**2 + qcdErr**2 + diLep_constant_Err**2 + diLep_slope_Err**2
+      totalSyst = bErr**2 + wXErr**2 + ttXErr**2 + wPErr**2 + qcdErr**2 + diLep_constant_Err**2 + diLep_slope_Err**2 + puErr**2 + lepSFErr**2 + topPtErr**2 
       totalSyst = sqrt(totalSyst)
 
-      ttSyst  = sqrt(bErr**2 + wXErr**2 + ttXErr**2 + wPErr**2 + rcsErr_tt**2 + qcdErr**2)
-      WSyst   = sqrt(bErr**2 + wXErr**2 + ttXErr**2 + wPErr**2 + rcsErr_W**2 + qcdErr**2)
+      ttSyst  = sqrt(bErr**2 + wXErr**2 + ttXErr**2 + wPErr**2 +  diLep_constant_Err**2 + diLep_slope_Err**2 + qcdErr**2)
+      #WSyst   = sqrt(bErr**2 + wXErr**2 + ttXErr**2 + wPErr**2 +diLep_constant_w_Err**2 + diLep_slope_w_Err**2 +qcdErr**2)
+      WSyst   = sqrt(bErr**2 + wXErr**2 + ttXErr**2 + wPErr**2 +qcdErr**2)
       
       dataStat = dataResult[srNJet][stb][htb]['tot_pred_err']/dataResult[srNJet][stb][htb]['tot_pred']
       total = sqrt(totalSyst**2+dataStat**2)
       totalH.SetBinContent(i, totalSyst)
       
-      systematics = {'btagSF':bErr, 'Wxsec':wXErr, 'TTxsec':ttXErr, 'Wpol':wPErr, 'rcs':rcsErr, 'QCD':qcdErr, 'total':totalSyst, 'rcs_tt':rcsErr_tt, 'rcs_W':rcsErr_W, 'ttJets':ttSyst, 'WJets':WSyst}
+      systematics = {'btagSF':bErr, 'Wxsec':wXErr, 'TTxsec':ttXErr, 'Wpol':wPErr, 'rcs':rcsErr, 'QCD':qcdErr, 'total':totalSyst,'diLep_tt_constant':diLep_constant_Err,\
+                     'diLep_tt_slope':diLep_slope_Err ,'rcs_tt':rcsErr_tt, 'rcs_W':rcsErr_W, 'ttJets':ttSyst, 'WJets':WSyst}
       
       rcs[srNJet][stb][htb]['systematics'] = systematics
             
@@ -197,16 +239,21 @@ pad1.cd()
 
 h_Stack = ROOT.THStack('h_Stack','Stack')
 
-h_Stack.Add(rcsErrH)
-h_Stack.Add(bErrH)
-h_Stack.Add(qcdErrH)
-h_Stack.Add(wXErrH)
-h_Stack.Add(ttXErrH)
-h_Stack.Add(wPErrH)
-h_Stack.Add(puErrH)
-h_Stack.Add(lepSFErrH)
+#h_Stack.Add(rcsErrH)
+#h_Stack.Add(bErrH)
+#h_Stack.Add(qcdErrH)
+#h_Stack.Add(wXErrH)
+#h_Stack.Add(ttXErrH)
+#h_Stack.Add(wPErrH)
+#h_Stack.Add(puErrH)
+#h_Stack.Add(topPtErrH)
+#h_Stack.Add(lepSFErrH)
+h_Stack.Add(diLep_slope_H)
+h_Stack.Add(diLep_constant_H)
+#h_Stack.Add(diLep_w_slope_H)
+#h_Stack.Add(diLep_w_constant_H)
 
-h_Stack.SetMaximum(0.6)
+h_Stack.SetMaximum(1.2)
 h_Stack.SetMinimum(0)
 
 leg = ROOT.TLegend(0.7,0.75,0.98,0.95)
@@ -215,9 +262,10 @@ leg.SetShadowColor(ROOT.kWhite)
 leg.SetBorderSize(1)
 leg.SetTextSize(0.04)
 leg.AddEntry(totalH)
-leg.AddEntry(rcsErrH,'','f')
+#leg.AddEntry(rcsErrH,'','f')
 leg.AddEntry(bErrH,'','f')
 leg.AddEntry(wXErrH,'','f')
+leg.AddEntry(lepSFErrH,'','f')
 
 leg2 = ROOT.TLegend(0.43,0.75,0.7,0.95)
 leg2.SetFillColor(ROOT.kWhite)
@@ -228,16 +276,17 @@ leg2.AddEntry(qcdErrH,'','f')
 leg2.AddEntry(ttXErrH,'','f')
 leg2.AddEntry(wPErrH,'','f')
 leg2.AddEntry(puErrH,'','f')
+leg2.AddEntry(topPtErrH,'','f')
 
 leg3 = ROOT.TLegend(0.15,0.75,0.43,0.95)
 leg3.SetFillColor(ROOT.kWhite)
 leg3.SetShadowColor(ROOT.kWhite)
 leg3.SetBorderSize(1)
 leg3.SetTextSize(0.04)
-leg3.AddEntry(lepSFErrH,'','f')
-leg3.AddEntry(dummy,'','f')
-leg3.AddEntry(dummy,'','f')
-leg3.AddEntry(dummy,'','f')
+leg3.AddEntry(diLep_slope_H,'','f')
+leg3.AddEntry(diLep_constant_H,'','f')
+#leg3.AddEntry(diLep_w_slope_H,'','f')
+#leg3.AddEntry(diLep_w_constant_H,'','f')
 
 
 
@@ -296,9 +345,9 @@ total_err.Draw('2 same')
 
 can.cd()
 
-can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2015/syst_errors_forKappa.png')
-can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2015/syst_errors_forKappa.root')
-can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2015/syst_errors_forKappa.pdf')
+can.Print('/afs/hephy.at/user/e/easilar/www/syst_errors_WOnly.png')
+can.Print('/afs/hephy.at/user/e/easilar/www/syst_errors_WOnly.root')
+can.Print('/afs/hephy.at/user/e/easilar/www/syst_errors_WOnly.pdf')
 
 pickle.dump(rcs, file(pickleDir+'resultsFinal_withSystematics_pkl','w'))
 

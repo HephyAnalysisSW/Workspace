@@ -19,7 +19,7 @@ from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns import *
 from systematics_helper import calc_btag_systematics, calc_LeptonScale_factors_and_systematics, calc_TopPt_Weights , calcDLDictionary, calc_diLep_contributions
 from btagEfficiency import *
 
-bTagEffFile = '/data/dspitzbart/Results2016/MCEff_skim_hadron_pkl'
+bTagEffFile = '/data/dspitzbart/Results2015/MCEff_skim_pkl'
 
 try:
   mcEffDict = pickle.load(file(bTagEffFile))
@@ -35,7 +35,7 @@ separateBTagWeights = True
 
 defSampleStr = "TTJets_LO"
 
-subDir = "postProcessing_MC_hadrFlav_btag_Eff"
+subDir = "postProcessing_MC_old_noLT"
 #subDir = "postProcessing_Tests"
 
 #branches to be kept for data and MC
@@ -76,7 +76,8 @@ parser.add_option("--manScaleFactor", dest="manScaleFactor", default = 1, action
 
 (options, args) = parser.parse_args()
 skimCond = "(1)"
-ht500lt250 = "Sum$(Jet_pt)>500&&(LepGood_pt[0]+met_pt)>250"
+#ht500lt250 = "Sum$(Jet_pt)>500&&(LepGood_pt[0]+met_pt)>250"
+ht500lt250 = "Sum$(Jet_pt)>500"
 common_skim = "HT500LT250"
 if options.skim.startswith('met'):
   skimCond = "met_pt>"+str(float(options.skim[3:]))
@@ -203,7 +204,7 @@ for isample, sample in enumerate(allSamples):
   for top in topology2:
     if top in sample['name'].lower(): sampleKey = 'WJets'
   if not sampleKey: sampleKey = 'none'
-  
+  print "sample Key : " , sampleKey 
   readVariables = ['met_pt/F', 'met_phi/F','met_eta/F','met_mass/F']
   newVariables = ['weight/F','muonDataSet/I','eleDataSet/I']
   aliases = [ "met:met_pt", "metPhi:met_phi"]
@@ -212,8 +213,8 @@ for isample, sample in enumerate(allSamples):
     {'prefix':'LepGood', 'nMax':8, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I','charge/F' ,'relIso03/F','SPRING15_25ns_v1/I' ,'tightId/I', 'miniRelIso/F','mass/F','sip3d/F','mediumMuonId/I', 'mvaIdPhys14/F','mvaIdSpring15/F','lostHits/I', 'convVeto/I']},
     {'prefix':'Jet',  'nMax':100, 'vars':['pt/F', 'eta/F', 'phi/F', 'id/I','btagCSV/F', 'btagCMVA/F']},
   ]
-  newVariables.extend(['LepToKeep_pdgId/I','l1l2ovMET_lepToKeep/F','Vecl1l2ovMET_lepToKeep/F','DPhil1l2_lepToKeep/F'])
-  newVariables.extend(['l1l2ovMET_lepToDiscard/F','Vecl1l2ovMET_lepToDiscard/F','DPhil1l2_lepToDiscard/F'])
+  newVariables.extend(['LepToKeep_eleSF/F/1.','LepToKeep_muSF/F/1.','LepToKeep_pdgId/I','l1l2ovMET_lepToKeep/F','Vecl1l2ovMET_lepToKeep/F','DPhil1l2_lepToKeep/F'])
+  newVariables.extend(['lepToDiscard_eleSF/F/1.','lepToDiscard_muSF/F/1.','lepToDiscard_pdgId/I','l1l2ovMET_lepToDiscard/F','Vecl1l2ovMET_lepToDiscard/F','DPhil1l2_lepToDiscard/F'])
   for action in ["notAddLepMet" , "AddLepMet" , "AddLep1ov3Met"]:
     for var_DL in ["ST","HT","dPhiLepW","nJet"] :
        for lep_DL in ["lepToDiscard" , "lepToKeep"]:
@@ -384,7 +385,7 @@ for isample, sample in enumerate(allSamples):
         s.deltaPhi_Wl = acos((s.leptonPt+r.met_pt*cos(s.leptonPhi-r.met_phi))/sqrt(s.leptonPt**2+r.met_pt**2+2*r.met_pt*s.leptonPt*cos(s.leptonPhi-r.met_phi))) 
 
         rand_input = evt_branch*lumi_branch
-        calc_diLep_contributions(s,r,tightHardLep,rand_input)
+        calc_diLep_contributions(s,r,tightHardLep,rand_input,histos_LS)
         #For systematics 
         if not sample['isData']:
           g_list=['eta','pt','phi','mass','charge', 'pdgId', 'motherId', 'grandmotherId']
