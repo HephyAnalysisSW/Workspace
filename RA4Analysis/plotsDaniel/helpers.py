@@ -53,4 +53,5 @@ def addDPhiCutDict(res, signalRegions):
         res[njb][stb][htb]['deltaPhiCut'] = signalRegions[njb][stb][htb]['deltaPhi']
   return res
 
-
+def sign(a):
+  return (a > 0) - (a < 0)

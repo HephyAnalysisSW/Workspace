@@ -27,7 +27,7 @@ btagWeightSuffix      = '_SF'
 templateWeights       = True
 templateWeightSuffix  = '_SF'
 
-QCDup       = False
+QCDup       = True
 QCDdown     = False
 nameSuffix  = ''
 if QCDup: nameSuffix += '_QCDup'
@@ -38,8 +38,6 @@ isData              = False
 unblinded           = False
 validation          = False
 isCentralPrediction = True
-if isData:
-  isCentralPrediction = False
 
 cWJets      = getChain(WJetsHTToLNu_25ns,histname='')
 cTTJets     = getChain(TTJets_combined,histname='')
@@ -52,7 +50,7 @@ cQCD        = getChain(QCDHT_25ns,histname='')
 
 
 ## QCD estimation
-useQCDestimation = False
+useQCDestimation = True
 if not isData and useQCDestimation: QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_MC2p1fb_pkl'
 if isData:
   QCDpickle  = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_2p1fb_pkl'
@@ -107,7 +105,7 @@ pickleDir   = '/data/'+username+'/Results'+year+'/Prediction_'+predictionName+'_
 templateDir = '/data/'+username+'/Results'+year+'/btagTemplates_'+templateName+'_'+templateLumistr+'/'
 prefix = 'singleLeptonic_Spring15_'
 
-kappa_dict_dir = '/data/'+username+'/Results'+year+'/Prediction_SFtemplates_validation_lep_MC_SF_2p3/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'
+kappa_dict_dir = '/data/'+username+'/Results'+year+'/Prediction_SFtemplates_fullSR_lep_MC_SF_2p1/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'
 
 ## Preselection cut
 triggers = "(HLT_EleHT350||HLT_MuHT350)"

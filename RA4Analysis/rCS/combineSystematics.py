@@ -18,7 +18,6 @@ from predictionConfig import *
 ROOT.gStyle.SetOptTitle(0);
 ROOT.gStyle.SetOptStat('')
 
-signalRegions = signalRegion3fb
 
 def getValErrString(val,err, precision=3):
   return str(round(val,precision))+' +/- '+str(round(err,precision))
@@ -61,27 +60,40 @@ lepSF_h2b = d.GetPrimitive('h2b')
 #ttdi_h1b = a.GetPrimitive('h1b')
 #ttdi_h2b = a.GetPrimitive('h2b')
 
-wpol = pickle.load(file('/data/dhandl/results2015/WPolarizationEstimation/20151218_wjetsPolSys_pkl'))
-b_err = pickle.load(file('/data/dspitzbart/Results2015/btagErr_pkl'))
-l_err = pickle.load(file('/data/dspitzbart/Results2015/mistagErr_pkl'))
+wpol    = pickle.load(file('/data/dhandl/results2015/WPolarizationEstimation/20151218_wjetsPolSys_pkl'))
+b_err   = pickle.load(file('/data/dspitzbart/Results2016/btagErr_pkl'))
+l_err   = pickle.load(file('/data/dspitzbart/Results2016/mistagErr_pkl'))
 qcd_err = pickle.load(file('/data/dspitzbart/Results2015/qcdErr_pkl'))
-rcs = pickle.load(file(pickleDir+'singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'))
+rcs     = pickle.load(file(pickleDir+'singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'))
+if validation:
+  dilep   = pickle.load(file('/data/easilar/Spring15/25ns/unc_with_validationRegionAll'))
+else:
+  dilep   = pickle.load(file('/data/easilar/Spring15/25ns/extended_with_truth_counts_tot_kappa_pkl'))
+
+topPt_Err = pickle.load(file("/data/easilar/Spring15/25ns/extended_with_truth_counts_topPt_pkl"))
+pu_Unc    = pickle.load(file("/data/easilar/Spring15/25ns/extended_with_truth_counts_PU_pkl"))
+lep_Eff   = pickle.load(file("/data/easilar/Spring15/25ns/extended_with_truth_counts_LS_pkl"))
+#dilep   = pickle.load(file('/data/easilar/Spring15/25ns/unc_with_validationRegionAll'))
 
 #rcs = pickle.load(file('/data/dspitzbart/Results2015/Prediction_SFtemplates_fullSR_lep_MC_SF_2.1/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'))
 dataResult = rcs
 #dataResult = pickle.load(file('/data/dspitzbart/Results2015/Prediction_SFtemplates_fullSR_lep_data_2.1/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'))
 
 colors = [ROOT.kBlue+2, ROOT.kBlue-4, ROOT.kBlue-7, ROOT.kBlue-9, ROOT.kCyan-9, ROOT.kCyan-6, ROOT.kCyan-2,ROOT.kGreen+3,ROOT.kGreen-2,ROOT.kGreen-6,ROOT.kGreen-7, ROOT.kOrange-4, ROOT.kOrange+1, ROOT.kOrange+8, ROOT.kRed, ROOT.kRed+1]
-colors = [ROOT.kBlue-7, ROOT.kCyan-9, ROOT.kCyan-2, ROOT.kGreen-6, ROOT.kOrange+6, ROOT.kRed+1, ROOT.kRed-6, ROOT.kYellow+2]
+colors = [ROOT.kBlue-7, ROOT.kCyan-9, ROOT.kCyan-2, ROOT.kGreen-6, ROOT.kOrange+6, ROOT.kRed+1, ROOT.kRed-6, ROOT.kYellow+2, ROOT.kGreen, ROOT.kGreen+3]
 
-bErrH = ROOT.TH1F('bErrH','b-jet SFs',bins,0,bins)
-wXErrH = ROOT.TH1F('WXErrH','W+jets x-sec',bins,0,bins)
-ttXErrH = ROOT.TH1F('ttXErrH','t#bar{t}+jets x-sec',bins,0,bins)
-wPErrH = ROOT.TH1F('wPErrH','W polarization',bins,0,bins)
-rcsErrH = ROOT.TH1F('rcsErrH','R_{CS} systematics',bins,0,bins)
-qcdErrH = ROOT.TH1F('qcdErrH','QCD fit',bins,0,bins)
-puErrH = ROOT.TH1F('puErrH','pile-up',bins,0,bins)
+bErrH     = ROOT.TH1F('bErrH','b-jet SFs',bins,0,bins)
+wXErrH    = ROOT.TH1F('WXErrH','W+jets x-sec',bins,0,bins)
+ttXErrH   = ROOT.TH1F('ttXErrH','t#bar{t}+jets x-sec',bins,0,bins)
+wPErrH    = ROOT.TH1F('wPErrH','W polarization',bins,0,bins)
+rcsErrH   = ROOT.TH1F('rcsErrH','R_{CS} systematics',bins,0,bins)
+qcdErrH   = ROOT.TH1F('qcdErrH','QCD fit',bins,0,bins)
+puErrH    = ROOT.TH1F('puErrH','pile-up',bins,0,bins)
 lepSFErrH = ROOT.TH1F('lepSFErrH','lepton SFs',bins,0,bins)
+topErrH   = ROOT.TH1F('topErrH','top p_{T}',bins,0,bins)
+
+dilepC   = ROOT.TH1F('dilepC','2l constant',bins,0,bins)
+dilepS   = ROOT.TH1F('dilepS','2l slope',bins,0,bins)
 
 dummy = ROOT.TH1F('dummy','',bins,0,bins)
 dummy.SetLineColor(ROOT.kWhite)
@@ -89,7 +101,7 @@ dummy.SetFillColor(ROOT.kWhite)
 
 ratio = ROOT.TH1F('ratio','ratio',bins,0,bins)
 
-hists = [rcsErrH,bErrH,wXErrH,ttXErrH,wPErrH,qcdErrH, puErrH, lepSFErrH]
+hists = [dilepC,dilepS,bErrH,wXErrH,ttXErrH,wPErrH,qcdErrH, puErrH, lepSFErrH, topErrH]
 for i_h,h in enumerate(hists):
   h.SetFillColor(colors[i_h])
   h.SetLineColor(colors[i_h]+1)
@@ -120,51 +132,99 @@ for injb,srNJet in enumerate(sorted(signalRegions)):
       print
 
       #b-tag SF
-      bErr = sqrt(b_err[srNJet][stb][htb]**2 + l_err[srNJet][stb][htb]**2) # sum of squares of b/c and mistag
-      bErrH.SetBinContent(i, bErr)\
-
+      #total
+      if validation:
+        bErr=0.05
+      else:
+        bErr = sqrt(b_err['tot_pred'][srNJet][stb][htb]**2 + l_err['tot_pred'][srNJet][stb][htb]**2) # sum of squares of b/c and mistag
+      bErrH.SetBinContent(i, bErr)
+      
+      #tt
+      if validation:
+        bErr_tt = 0.03
+      else:
+        bErr_tt = sqrt(b_err['TT_kappa'][srNJet][stb][htb]**2 + l_err['TT_kappa'][srNJet][stb][htb]**2) # sum of squares of b/c and mistag
+      
+      #W
+      if validation:
+        bErr_W = 0.12
+      else:
+        bErr_W = sqrt(b_err['W_kappa'][srNJet][stb][htb]**2 + l_err['W_kappa'][srNJet][stb][htb]**2) # sum of squares of b/c and mistag
+      
       #W x-sec
-      wXErr = (abs(w_h1b.GetBinContent(i))+abs(w_h2b.GetBinContent(i)))/2 # w x-sec
+      if validation:
+        wXErr = 0.04
+      else:
+        wXErr = (abs(w_h1b.GetBinContent(i))+abs(w_h2b.GetBinContent(i)))/2 # w x-sec
       wXErrH.SetBinContent(i, wXErr)
 
       #ttbar x-sec
-      ttXErr = (abs(tt_h1b.GetBinContent(i))+abs(tt_h2b.GetBinContent(i)))/2 # ttbar x-sec
+      if validation:
+        ttXErr = 0.04
+      else:
+        ttXErr = (abs(tt_h1b.GetBinContent(i))+abs(tt_h2b.GetBinContent(i)))/2 # ttbar x-sec
       ttXErrH.SetBinContent(i, ttXErr)
       
       #pile-up
-      puErr = (abs(pu_h1b.GetBinContent(i))+abs(pu_h2b.GetBinContent(i)))/2 # w x-sec
+      if validation:
+        puErr = 0.1
+      else:
+        puErr = abs(pu_Unc[srNJet][stb][htb]['delta_Up']) 
       puErrH.SetBinContent(i, puErr)
       
+      #top pt
+      if validation:
+        topErr = 0.15
+      else:
+        topErr = abs(topPt_Err[srNJet][stb][htb]['delta_Up'])  
+      topErrH.SetBinContent(i, topErr)
+      
       #lepton SF
-      lepSFErr = (abs(lepSF_h1b.GetBinContent(i))+abs(lepSF_h2b.GetBinContent(i)))/2 # w x-sec
+      if validation:
+        lepSFErr = 0.03
+      else:
+        lepSFErr = abs(lep_Eff[srNJet][stb][htb]['delta_Up'])
       lepSFErrH.SetBinContent(i, lepSFErr)
 
-      #W polarization      
-      wPErr = sqrt(((abs(wpol[srNJet][stb][htb]['uWPolMinus10'])+abs(wpol[srNJet][stb][htb]['uWPolPlus10']))/2)**2 + ((abs(wpol[srNJet][stb][htb]['uTTPolMinus5'])+abs(wpol[srNJet][stb][htb]['uTTPolPlus5']))/2)**2) # w pol for w and ttbar
+      #W polarization
+      if validation:
+        wPErr = 0.04
+      else:
+        wPErr = sqrt(((abs(wpol[srNJet][stb][htb]['uWPolMinus10'])+abs(wpol[srNJet][stb][htb]['uWPolPlus10']))/2)**2 + ((abs(wpol[srNJet][stb][htb]['uTTPolMinus5'])+abs(wpol[srNJet][stb][htb]['uTTPolPlus5']))/2)**2) # w pol for w and ttbar
       wPErrH.SetBinContent(i, wPErr)
       
       #QCD fit
-      qcdErr = qcd_err[srNJet][stb][htb]
+      if validation:
+        qcdErr = 0.03
+      else:
+        qcdErr = qcd_err[srNJet][stb][htb]
       qcdErrH.SetBinContent(i, qcdErr)
+      
+      #2l
+      dilepConstant = max(map(abs,[dilep[srNJet][stb][htb]['delta_constant_Down'], dilep[srNJet][stb][htb]['delta_constant_Up']]))
+      dilepSlope    = max(map(abs,[dilep[srNJet][stb][htb]['delta_slope_Down'], dilep[srNJet][stb][htb]['delta_slope_Up']]))
+      dilepC.SetBinContent(i, dilepConstant)
+      dilepS.SetBinContent(i, dilepSlope)
       
       rcsErr = sqrt(rcs[srNJet][stb][htb]['W_pred_errs']['syst']**2+rcs[srNJet][stb][htb]['TT_rCS_fits_MC']['syst']**2)/rcs[srNJet][stb][htb]['tot_pred']
       rcsErr_tt = rcs[srNJet][stb][htb]['TT_rCS_fits_MC']['syst']/rcs[srNJet][stb][htb]['TT_pred']
       rcsErr_W = rcs[srNJet][stb][htb]['W_pred_errs']['syst']/rcs[srNJet][stb][htb]['W_pred']
-      print 'Rcs unc tt, W',rcsErr_tt, rcsErr_W
-      print rcs[srNJet][stb][htb]['W_pred_errs']['syst'], rcs[srNJet][stb][htb]['TT_rCS_fits_MC']['syst'], rcs[srNJet][stb][htb]['tot_pred']
+      W_muToLep = rcs[srNJet][stb][htb]['W_pred_errs']['ratio_mu_elemu']/(rcs[srNJet][stb][htb]['rCS_W_crNJet_0b_corr']*rcs[srNJet][stb][htb]['yW_srNJet_0b_lowDPhi'])
+      #print 'Rcs unc tt, W',rcsErr_tt, rcsErr_W
+      #print rcs[srNJet][stb][htb]['W_pred_errs']['syst'], rcs[srNJet][stb][htb]['TT_rCS_fits_MC']['syst'], rcs[srNJet][stb][htb]['tot_pred']
       rcsErrH.SetBinContent(i,rcsErr)
       
-      totalSyst = bErr**2 + wXErr**2 + ttXErr**2 + wPErr**2 + rcsErr**2 + qcdErr**2
+      totalSyst = bErr**2 + wXErr**2 + ttXErr**2 + wPErr**2 + qcdErr**2 + dilepSlope**2 + dilepConstant**2 + topErr**2 + puErr**2 + lepSFErr**2
       totalSyst = sqrt(totalSyst)
 
-      ttSyst  = sqrt(bErr**2 + wXErr**2 + ttXErr**2 + wPErr**2 + rcsErr_tt**2 + qcdErr**2)
-      WSyst   = sqrt(bErr**2 + wXErr**2 + ttXErr**2 + wPErr**2 + rcsErr_W**2 + qcdErr**2)
+      ttSyst  = sqrt(bErr_tt**2 + wXErr**2 + ttXErr**2 + wPErr**2 + dilepSlope**2 + dilepConstant**2 + qcdErr**2 + topErr**2 + puErr**2 + lepSFErr**2)
+      WSyst   = sqrt(bErr_W**2  + wXErr**2 + ttXErr**2 + wPErr**2 + dilepSlope**2 + dilepConstant**2 + qcdErr**2 + topErr**2 + puErr**2 + lepSFErr**2 + W_muToLep**2)
       
       dataStat = dataResult[srNJet][stb][htb]['tot_pred_err']/dataResult[srNJet][stb][htb]['tot_pred']
       total = sqrt(totalSyst**2+dataStat**2)
       totalH.SetBinContent(i, totalSyst)
       
-      systematics = {'btagSF':bErr, 'Wxsec':wXErr, 'TTxsec':ttXErr, 'Wpol':wPErr, 'rcs':rcsErr, 'QCD':qcdErr, 'total':totalSyst, 'rcs_tt':rcsErr_tt, 'rcs_W':rcsErr_W, 'total_tt':ttSyst, 'total_W':WSyst, 'total_Rest':0.5}
+      systematics = {'btagSF':bErr, 'Wxsec':wXErr, 'TTxsec':ttXErr, 'Wpol':wPErr, 'rcs':rcsErr, 'QCD':qcdErr, 'total':totalSyst, 'rcs_tt':rcsErr_tt, 'rcs_W':rcsErr_W, 'total_tt':ttSyst, 'total_W':WSyst, 'total_Rest':0.5, 'ratio_mu_elemu':W_muToLep}
       rcs[srNJet][stb][htb]['TT_kappa_err_syst'] = rcs[srNJet][stb][htb]['W_kappa']*ttSyst
       rcs[srNJet][stb][htb]['W_kappa_err_syst'] = rcs[srNJet][stb][htb]['W_kappa']*WSyst
       rcs[srNJet][stb][htb]['TT_kappa_err_total'] = sqrt(rcs[srNJet][stb][htb]['W_kappa_err']**2 + (rcs[srNJet][stb][htb]['W_kappa']*ttSyst)**2)
@@ -173,6 +233,8 @@ for injb,srNJet in enumerate(sorted(signalRegions)):
       rcs[srNJet][stb][htb]['systematics'] = systematics
             
       print 'Stat. unc.:',round(dataStat,3)
+      print 'Syst. W unc.:',round(WSyst,3)
+      print 'Syst. tt unc.:',round(ttSyst,3)
       print 'Syst. unc.:',round(totalSyst,3)
       print 'Total unc.:',round(total,3)
 
@@ -201,16 +263,20 @@ pad1.cd()
 
 h_Stack = ROOT.THStack('h_Stack','Stack')
 
-h_Stack.Add(rcsErrH)
-h_Stack.Add(bErrH)
-h_Stack.Add(qcdErrH)
-h_Stack.Add(wXErrH)
-h_Stack.Add(ttXErrH)
-h_Stack.Add(wPErrH)
-h_Stack.Add(puErrH)
-h_Stack.Add(lepSFErrH)
+for i_h,h in enumerate(hists):
+  h_Stack.Add(h)
 
-h_Stack.SetMaximum(0.6)
+#h_Stack.Add(dilepS)
+#h_Stack.Add(dilepC)
+#h_Stack.Add(bErrH)
+#h_Stack.Add(qcdErrH)
+#h_Stack.Add(wXErrH)
+#h_Stack.Add(ttXErrH)
+#h_Stack.Add(wPErrH)
+#h_Stack.Add(puErrH)
+#h_Stack.Add(lepSFErrH)
+
+h_Stack.SetMaximum(1.2)
 h_Stack.SetMinimum(0)
 
 leg = ROOT.TLegend(0.7,0.75,0.98,0.95)
@@ -219,30 +285,37 @@ leg.SetShadowColor(ROOT.kWhite)
 leg.SetBorderSize(1)
 leg.SetTextSize(0.04)
 leg.AddEntry(totalH)
-leg.AddEntry(rcsErrH,'','f')
-leg.AddEntry(bErrH,'','f')
-leg.AddEntry(wXErrH,'','f')
+for i in range(3):
+  leg.AddEntry(hists[i], '', 'f')
+#leg.AddEntry(rcsErrH,'','f')
+#leg.AddEntry(bErrH,'','f')
+#leg.AddEntry(wXErrH,'','f')
 
 leg2 = ROOT.TLegend(0.43,0.75,0.7,0.95)
 leg2.SetFillColor(ROOT.kWhite)
 leg2.SetShadowColor(ROOT.kWhite)
 leg2.SetBorderSize(1)
 leg2.SetTextSize(0.04)
-leg2.AddEntry(qcdErrH,'','f')
-leg2.AddEntry(ttXErrH,'','f')
-leg2.AddEntry(wPErrH,'','f')
-leg2.AddEntry(puErrH,'','f')
+for i in range(3,7):
+  leg2.AddEntry(hists[i], '', 'f')
+#leg2.AddEntry(qcdErrH,'','f')
+#leg2.AddEntry(ttXErrH,'','f')
+#leg2.AddEntry(wPErrH,'','f')
+#leg2.AddEntry(puErrH,'','f')
 
 leg3 = ROOT.TLegend(0.15,0.75,0.43,0.95)
 leg3.SetFillColor(ROOT.kWhite)
 leg3.SetShadowColor(ROOT.kWhite)
 leg3.SetBorderSize(1)
 leg3.SetTextSize(0.04)
-leg3.AddEntry(lepSFErrH,'','f')
-leg3.AddEntry(dummy,'','f')
-leg3.AddEntry(dummy,'','f')
-leg3.AddEntry(dummy,'','f')
-
+for i in range(7,len(hists)):
+  leg3.AddEntry(hists[i],'','f')
+#leg3.AddEntry(lepSFErrH,'','f')
+#leg3.AddEntry(dummy,'','f')
+#leg3.AddEntry(dummy,'','f')
+#leg3.AddEntry(dummy,'','f')
+for i in range(len(hists),11):
+  leg3.AddEntry(dummy,'','f')
 
 
 h_Stack.Draw('hist')
@@ -281,7 +354,7 @@ pad2.SetTopMargin(0.02)
 pad2.Draw()
 pad2.cd()
 
-setNiceBinLabel(ratio, signalRegion3fb)
+setNiceBinLabel(ratio, signalRegions)
 ratio.GetXaxis().SetTitleSize(0.13)
 ratio.GetXaxis().SetLabelSize(0.11)
 ratio.GetXaxis().SetNdivisions(508)
@@ -300,9 +373,9 @@ total_err.Draw('2 same')
 
 can.cd()
 
-can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2015/syst_errors_forKappa.png')
-can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2015/syst_errors_forKappa.root')
-can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2015/syst_errors_forKappa.pdf')
+can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2015/syst_errors_forKappa_val.png')
+can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2015/syst_errors_forKappa_val.root')
+can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2015/syst_errors_forKappa_val.pdf')
 
 pickle.dump(rcs, file(pickleDir+'resultsFinal_withSystematics_pkl','w'))
 
