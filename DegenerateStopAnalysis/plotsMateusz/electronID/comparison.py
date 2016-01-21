@@ -2,7 +2,7 @@
 import ROOT
 import os, sys
 from Workspace.HEPHYPythonTools.helpers import getChunks, getChain#, getPlotFromChain, getYieldFromChain
-from Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_7412pass2_v4 import * #data_path = "/data/nrad/cmgTuples/RunII/7412pass2_v4/RunIISpring15xminiAODv2"
+from Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_7412pass2 import * #data_path = "/data/nrad/cmgTuples/RunII/7412pass2_v4/RunIISpring15xminiAODv2"
 from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from array import array
 from math import pi, sqrt #cos, sin, sinh, log
@@ -10,15 +10,15 @@ from math import pi, sqrt #cos, sin, sinh, log
 filedir = "/afs/hephy.at/user/m/mzarucki/www/plots/electronReconstruction/electronID"
 
 #Input options
-inputSample = "WJets" # "Signal" "TTJets" "WJets"
-zoom = 0
+inputSample = "Signal" # "Signal" "TTJets" "WJets"
+zoom = 1
 save = 1
 presel = 1
 nEles = "01" # 01,01tau,1,2
-isolation = "relIso04" #miniRelIso, relIso03, relIso04, relIsoAn04
+isolation = "relIso03" #miniRelIso, relIso03, relIso04, relIsoAn04
 
 num = "iso" # "iso" | "noIso"
-den = "standard" # "noIso" | "standard"
+den = "noIso" # "noIso" | "standard"
 
 #ROOT Options
 ROOT.gROOT.Reset() #re-initialises ROOT
@@ -194,12 +194,12 @@ for i,plot in enumerate(sorted(total.keys())):
   
    if num == "iso":
       if plot == "eleID": effs[plot]['Veto'].SetTitle("Efficiency: Comparison of " + num + " (" + isolation + ") and " + den + " Plots (" + inputSample + " Sample)")
-      elif plot == "misID": effs[plot]['Veto'].SetTitle("MisID Efficiency: Comparison of " + num + " (" + isolation + ") and " + den + " Plots (" + inputSample + " Sample) ; Generated Electron p_{T} / GeV ; Efficiency")
-      elif plot == "misID2": effs[plot]['Veto'].SetTitle("MisID2 Efficiency: Comparison of " + num + " (" + isolation + ") and " + den + " Plots (" + inputSample + " Sample) ; Generated Electron p_{T} / GeV ; Efficiency")
+      elif plot == "misID": effs[plot]['Veto'].SetTitle("MisID Efficiency: Comparison of " + num + " (" + isolation + ") and " + den + " Plots (" + inputSample + " Sample) ; Reconstructed Electron p_{T} / GeV ; Efficiency")
+      elif plot == "misID2": effs[plot]['Veto'].SetTitle("MisID2 Efficiency: Comparison of " + num + " (" + isolation + ") and " + den + " Plots (" + inputSample + " Sample) ; Reconstructed Electron p_{T} / GeV ; Efficiency")
    else: 
       if plot == "eleID": effs[plot]['Veto'].SetTitle("Efficiency: Comparison of " + num + " and " + den + " Plots (" + inputSample + " Sample) ; Generated Electron p_{T} / GeV ; Efficiency")
-      elif plot == "misID": effs[plot]['Veto'].SetTitle("MisID Efficiency: Comparison of " + num + " and " + den + " Plots (" + inputSample + " Sample) ; Generated Electron p_{T} / GeV ; Efficiency")
-      elif plot == "misID2": effs[plot]['Veto'].SetTitle("MisID2 Efficiency: Comparison of " + num + " and " + den + " Plots (" + inputSample + " Sample) ; Generated Electron p_{T} / GeV ; Efficiency")
+      elif plot == "misID": effs[plot]['Veto'].SetTitle("MisID Efficiency: Comparison of " + num + " and " + den + " Plots (" + inputSample + " Sample) ; Reconstructed Electron p_{T} / GeV ; Efficiency")
+      elif plot == "misID2": effs[plot]['Veto'].SetTitle("MisID2 Efficiency: Comparison of " + num + " and " + den + " Plots (" + inputSample + " Sample) ; Reconstructed Electron p_{T} / GeV ; Efficiency")
    
    effs[plot]['Veto'].SetMarkerColor(ROOT.kGreen+3) 
    effs[plot]['Veto'].SetLineColor(ROOT.kGreen+3) 

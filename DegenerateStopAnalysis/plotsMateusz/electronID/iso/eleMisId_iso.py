@@ -2,7 +2,7 @@
 import ROOT
 import os, sys
 from Workspace.HEPHYPythonTools.helpers import getChunks, getChain#, getPlotFromChain, getYieldFromChain
-from Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_7412pass2_v4 import * #data_path = "/data/nrad/cmgTuples/RunII/7412pass2_v4/RunIISpring15xminiAODv2"
+from Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_7412pass2 import * #data_path = "/data/nrad/cmgTuples/RunII/7412pass2_v4/RunIISpring15xminiAODv2"
 from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from array import array
 from math import pi, sqrt #cos, sin, sinh, log
@@ -13,7 +13,7 @@ zoom = 1
 save = 1
 presel = 1
 mvaWPs = 0
-isolation = "relIso04" #miniRelIso, relIso03, relIso04, relIsoAn04
+isolation = "relIso03" #miniRelIso, relIso03, relIso04, relIsoAn04
 
 #ROOT Options
 ROOT.gROOT.Reset() #re-initialises ROOT
