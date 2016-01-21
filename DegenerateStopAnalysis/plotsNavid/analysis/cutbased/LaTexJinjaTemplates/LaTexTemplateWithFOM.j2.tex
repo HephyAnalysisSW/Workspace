@@ -1,0 +1,34 @@
+\documentclass[12pt]{paper}
+\usepackage{a4}
+%\usepackage[usenames,dvipnames]{color}
+\usepackage{amssymb,amsmath}
+\usepackage{amsfonts}
+\usepackage{epsfig,graphics,graphicx,graphpap,color}
+\usepackage{slashed,xspace,setspace}
+\usepackage{caption}
+\usepackage{rotating}
+\usepackage{fullpage}
+\usepackage[top=0.83in]{geometry}
+\usepackage{longtable}
+\usepackage{multirow}
+%<-set colLegend=[] >%
+%<- set nCol=yieldTable[0]|length >%
+%<- set nRow=yieldTable.T[0]|length >%
+%     nCol=<<nCol>>
+%     nRow=<<nRow>>
+%<- set colSetup="|c"*(nCol+1)+"|" >%
+\begin{document}
+\begin{table}[ht]\begin{center}\resizebox{\textwidth}{!}{\begin{tabular}{<<colSetup>>}\hline
+%<- for row in yieldTable >%
+%<- set rowLoop = loop >%
+%<- set yld = yieldTable[rowLoop.index0] | fixForLatex>%
+%<- if rowLoop.first>% 
+&  <<yld|join("  &  ")>>\\
+\hline\multirow{<<nRow>>}{*}{\begin{sideways} << yields.tableName| replace("_","")>>\end{sideways}}
+%<else>%
+&  <<yld|join("  &  ")>>\\
+%<endif>%
+%<- endfor >%
+\hline
+\end{tabular}}\end{center}\caption{<<CAPTION>>}\end{table}
+\end{document}
