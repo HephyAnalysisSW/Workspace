@@ -67,7 +67,10 @@ b_err   = pickle.load(file('/data/dspitzbart/Results2016/btagErr_pkl'))
 l_err   = pickle.load(file('/data/dspitzbart/Results2016/mistagErr_pkl'))
 qcd_err = pickle.load(file('/data/dspitzbart/Results2015/qcdErr_pkl'))
 rcs     = pickle.load(file(pickleDir+'singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'))
-dilep   = pickle.load(file('/data/dspitzbart/Results2016/dilep_val_pkl'))
+if validation:
+  dilep   = pickle.load(file('/data/dspitzbart/Results2016/dilep_val_pkl'))
+else:
+  dilep   = pickle.load(file('/data/dspitzbart/Results2016/dilep_pkl'))
 
 #if validation:
 #  dilep   = pickle.load(file('/data/easilar/Spring15/25ns/unc_with_validationRegionAll'))
@@ -142,8 +145,12 @@ for injb,srNJet in enumerate(sorted(signalRegions)):
       #total
       if validation:
         bErr=0.05
+        mistag_SF = 0.05/sqrt(2)
+        b_c_SF = 0.05/sqrt(2)
       else:
         bErr = sqrt(b_err['tot_pred'][srNJet][stb][htb]**2 + l_err['tot_pred'][srNJet][stb][htb]**2) # sum of squares of b/c and mistag
+        mistag_SF = l_err['tot_pred'][srNJet][stb][htb]
+        b_c_SF    = b_err['tot_pred'][srNJet][stb][htb]
       bErrH.SetBinContent(i, bErr)
       
       #tt
@@ -215,12 +222,19 @@ for injb,srNJet in enumerate(sorted(signalRegions)):
       #dilepC.SetBinContent(i, dilepConstant)
       #dilepS.SetBinContent(i, dilepSlope)
       
-      rcsErr = sqrt(rcs[srNJet][stb][htb]['W_pred_errs']['syst']**2+rcs[srNJet][stb][htb]['TT_rCS_fits_MC']['syst']**2)/rcs[srNJet][stb][htb]['tot_pred']
+      rcsErr    = sqrt(rcs[srNJet][stb][htb]['W_pred_errs']['syst']**2+rcs[srNJet][stb][htb]['TT_rCS_fits_MC']['syst']**2)/rcs[srNJet][stb][htb]['tot_pred']
       rcsErr_tt = rcs[srNJet][stb][htb]['TT_rCS_fits_MC']['syst']/rcs[srNJet][stb][htb]['TT_pred']
-      rcsErr_W = rcs[srNJet][stb][htb]['W_pred_errs']['syst']/rcs[srNJet][stb][htb]['W_pred']
-      W_muToLep = rcs[srNJet][stb][htb]['W_pred_errs']['ratio_mu_elemu']/(rcs[srNJet][stb][htb]['rCS_W_crNJet_0b_corr']*rcs[srNJet][stb][htb]['yW_srNJet_0b_lowDPhi'])
-      print rcs[srNJet][stb][htb]['W_pred'], (rcs[srNJet][stb][htb]['rCS_W_crNJet_0b_corr']*rcs[srNJet][stb][htb]['yW_srNJet_0b_lowDPhi'])
+      rcsErr_W  = rcs[srNJet][stb][htb]['W_pred_errs']['const_vs_slope']/rcs[srNJet][stb][htb]['W_pred']
+      W_muToLep = rcs[srNJet][stb][htb]['W_pred_errs']['ratio_mu_elemu']/rcs[srNJet][stb][htb]['W_pred']
       
+      kappa_b_Err   = rcs[srNJet][stb][htb]['TT_rCS_fits_MC']['k_0b/1b_btag_err']/rcs[srNJet][stb][htb]['TT_rCS_fits_MC']['k_0b/1b_btag']
+      kappa_TT_Err  = rcs[srNJet][stb][htb]['TT_kappa_err']/rcs[srNJet][stb][htb]['TT_kappa']
+      kappa_W_Err   = rcs[srNJet][stb][htb]['W_kappa_err']/rcs[srNJet][stb][htb]['W_kappa']
+      
+      print rcs[srNJet][stb][htb]['W_pred'], (rcs[srNJet][stb][htb]['rCS_W_crNJet_0b_corr']*rcs[srNJet][stb][htb]['yW_srNJet_0b_lowDPhi'])
+      print rcsErr_W
+      print W_muToLep
+      print rcsErr_tt
       #print 'Rcs unc tt, W',rcsErr_tt, rcsErr_W
       #print rcs[srNJet][stb][htb]['W_pred_errs']['syst'], rcs[srNJet][stb][htb]['TT_rCS_fits_MC']['syst'], rcs[srNJet][stb][htb]['tot_pred']
       rcsErrH.SetBinContent(i,rcsErr)
@@ -231,16 +245,42 @@ for injb,srNJet in enumerate(sorted(signalRegions)):
 
       ttSyst  = sqrt(bErr_tt**2 + wXErr**2 + ttXErr**2 + wPErr**2 + dilepErr**2 + qcdErr**2 + topErr**2 + puErr**2 + lepSFErr**2 + rcsErr_tt**2)
       WSyst   = sqrt(bErr_W**2  + wXErr**2 + ttXErr**2 + wPErr**2 + dilepErr**2 + qcdErr**2 + topErr**2 + puErr**2 + lepSFErr**2 + rcsErr_W**2)
+      restSyst = 0.5
       
       dataStat = dataResult[srNJet][stb][htb]['tot_pred_err']/dataResult[srNJet][stb][htb]['tot_pred']
-      total = sqrt(totalSyst**2+dataStat**2)
+      totalErr = sqrt(totalSyst**2+dataStat**2)
       totalH.SetBinContent(i, totalSyst)
       
-      systematics = {'btagSF':bErr, 'Wxsec':wXErr, 'TTxsec':ttXErr, 'Wpol':wPErr, 'rcs':rcsErr, 'QCD':qcdErr, 'total':totalSyst, 'rcs_tt':rcsErr_tt, 'rcs_W':rcsErr_W, 'total_tt':ttSyst, 'total_W':WSyst, 'total_Rest':0.5, 'ratio_mu_elemu':W_muToLep}
-      rcs[srNJet][stb][htb]['TT_kappa_err_syst'] = rcs[srNJet][stb][htb]['W_kappa']*ttSyst
-      rcs[srNJet][stb][htb]['W_kappa_err_syst'] = rcs[srNJet][stb][htb]['W_kappa']*WSyst
-      rcs[srNJet][stb][htb]['TT_kappa_err_total'] = sqrt(rcs[srNJet][stb][htb]['W_kappa_err']**2 + (rcs[srNJet][stb][htb]['W_kappa']*ttSyst)**2)
-      rcs[srNJet][stb][htb]['W_kappa_err_total'] = sqrt(rcs[srNJet][stb][htb]['W_kappa_err']**2 + (rcs[srNJet][stb][htb]['W_kappa']*WSyst)**2)
+      systematics = {'btagSF':bErr, 'b_c_SF':b_c_SF, 'mistag_SF':mistag_SF, 'Wxsec':wXErr, 'TTxsec':ttXErr, 'Wpol':wPErr}
+      systematics.update({'rcs':rcsErr, 'QCD':qcdErr, 'total':totalSyst, 'rcs_tt':rcsErr_tt, 'rcs_W':rcsErr_W, 'total_tt':ttSyst, 'total_W':WSyst, 'total_Rest':restSyst, 'ratio_mu_elemu':W_muToLep})
+      systematics.update({'topPt':topErr, 'dilep':dilepErr, 'pileup':puErr, 'lepSF':lepSFErr, 'kappa_b':kappa_b_Err, 'kappa_TT':kappa_TT_Err, 'kappa_W':kappa_W_Err})
+
+      #apply systemtatics on Rcs
+      TT_kappa_err_syst  = rcs[srNJet][stb][htb]['TT_kappa']*ttSyst
+      W_kappa_err_syst   = rcs[srNJet][stb][htb]['W_kappa']*WSyst
+      TT_kappa_err_total = sqrt(rcs[srNJet][stb][htb]['TT_kappa_err']**2 + (rcs[srNJet][stb][htb]['TT_kappa']*ttSyst)**2)
+      W_kappa_err_total  = sqrt(rcs[srNJet][stb][htb]['W_kappa_err']**2 + (rcs[srNJet][stb][htb]['W_kappa']*WSyst)**2)
+      rcs[srNJet][stb][htb]['TT_kappa_err_syst']  = TT_kappa_err_syst
+      rcs[srNJet][stb][htb]['W_kappa_err_syst']   = W_kappa_err_syst
+      rcs[srNJet][stb][htb]['TT_kappa_err_total'] = TT_kappa_err_total
+      rcs[srNJet][stb][htb]['W_kappa_err_total']  = W_kappa_err_total
+      
+      #calculate final errors (yields got already corrected in makeCorrections.py)
+      tt, tt_err      = getPropagatedError([rcs[srNJet][stb][htb]['TT_pred'],rcs[srNJet][stb][htb]['TT_kappa']], [rcs[srNJet][stb][htb]['TT_pred_err'], TT_kappa_err_total], 1, 0, returnCalcResult=True)
+      w, w_err        = getPropagatedError([rcs[srNJet][stb][htb]['W_pred'],rcs[srNJet][stb][htb]['W_kappa']], [rcs[srNJet][stb][htb]['W_pred_err'], W_kappa_err_total], 1, 0, returnCalcResult=True)
+      rest, rest_err  = getPropagatedError([rcs[srNJet][stb][htb]['Rest_truth'],1], [rcs[srNJet][stb][htb]['Rest_truth_err'],restSyst], 1, 0, returnCalcResult=True)
+      
+      rcs[srNJet][stb][htb]['TT_pred_final_err']  = tt_err
+      
+      rcs[srNJet][stb][htb]['W_pred_final_err']   = w_err
+      
+      rcs[srNJet][stb][htb]['Rest_truth_final']     = rest
+      rcs[srNJet][stb][htb]['Rest_truth_final_err'] = rest_err
+      
+      total = tt + w + rest
+      total_err = sqrt(tt_err**2 + w_err**2 + rest_err**2)
+      rcs[srNJet][stb][htb]['tot_pred_final']     = total
+      rcs[srNJet][stb][htb]['tot_pred_final_err'] = total_err
       
       rcs[srNJet][stb][htb]['systematics'] = systematics
             
@@ -248,10 +288,10 @@ for injb,srNJet in enumerate(sorted(signalRegions)):
       print 'Syst. W unc.:',round(WSyst,3)
       print 'Syst. tt unc.:',round(ttSyst,3)
       print 'Syst. unc.:',round(totalSyst,3)
-      print 'Total unc.:',round(total,3)
+      print 'Total unc.:',round(totalErr,3)
 
       ratio.SetBinContent(i,1)
-      totalYErr.append(total)
+      totalYErr.append(totalErr)
       totalXErr.append(0.5)
       totalY.append(1)
       totalX.append(i-0.5)
@@ -385,9 +425,9 @@ total_err.Draw('2 same')
 
 can.cd()
 
-can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2016/syst_errors_validation.png')
-can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2016/syst_errors_validation.root')
-can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2016/syst_errors_validation.pdf')
+can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2016/'+predictionName+'_syst_errors.png')
+can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2016/'+predictionName+'_syst_errors.root')
+can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2016/'+predictionName+'_syst_errors.pdf')
 
 pickle.dump(rcs, file(pickleDir+'resultsFinal_withSystematics_pkl','w'))
 

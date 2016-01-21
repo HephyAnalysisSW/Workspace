@@ -20,8 +20,8 @@ ROOT.gStyle.SetOptStat('')
 useWcorrection  = False
 useTTcorrection = False
 signal          = False
-withSystematics = False
-applyKappa      = False
+withSystematics = True
+applyKappa      = True
 
 showMCtruth     = True
 
@@ -32,7 +32,7 @@ prefix = 'singleLeptonic_Spring15_'
 
 #res = pickle.load(file(path+prefix+'_estimationResults_pkl_kappa_corrected'))
 #pickleDir = '/data/dspitzbart/Results2015/Prediction_SFtemplates_validation_lep_data_2.1/'
-res = pickle.load(file(pickleDir+prefix+'_estimationResults_pkl_kappa_corrected'))
+res = pickle.load(file(pickleDir+'resultsFinal_withSystematics_pkl'))
 #sys = pickle.load(file(pickleDir+'resultsFinal_withSystematics_pkl'))
 if withSystematics:
   sys = pickle.load(file(pickleDir+'resultsFinal_withSystematics_pkl'))
@@ -111,7 +111,7 @@ truth_H.SetLineWidth(2)
 truth_H.SetMarkerStyle(8)
 truth_H.SetMarkerColor(ROOT.kBlack)
 #truth_H.SetMarkerColor(ROOT.kRed+2)
-truth_H.SetMarkerSize(1)
+#truth_H.SetMarkerSize(1)
 
 kappa_tt = ROOT.TH1F('kappa_tt','kappa', bins,0,bins)
 kappa_tt.SetLineWidth(1)
@@ -149,41 +149,31 @@ for srNJet in sorted(signalRegions):
       print 'SR'+str(i)
 
       #calculate final tt yields and errors
-      if withSystematics:
-        kappa_tt_err = sqrt(res[srNJet][stb][htb]['TT_kappa_err']**2 + (res[srNJet][stb][htb]['TT_kappa']*sys[srNJet][stb][htb]['systematics']['total_tt'])**2)
-      else:
-        kappa_tt_err = res[srNJet][stb][htb]['TT_kappa_err']
       kappa_tt.SetBinContent(i,res[srNJet][stb][htb]['TT_kappa'])
-      kappa_tt.SetBinError(i, kappa_tt_err)
-      tt, tt_err = getPropagatedError([res[srNJet][stb][htb]['TT_pred'],res[srNJet][stb][htb]['TT_kappa']],[res[srNJet][stb][htb]['TT_pred_err'], kappa_tt_err], 1, 0, returnCalcResult=True)
+      if withSystematics:
+        kappa_tt.SetBinError(i, res[srNJet][stb][htb]['TT_kappa_err_syst'])
+      else:
+        kappa_tt.SetBinError(i, res[srNJet][stb][htb]['TT_kappa_err'])
+
       print fmt.format('tt w/o kappa, syst:', getValErrString(res[srNJet][stb][htb]['TT_pred'], res[srNJet][stb][htb]['TT_pred_err']))
-      print fmt.format('tt with kappa, syst:',getValErrString(tt, tt_err))
+      print fmt.format('tt with kappa, syst:',getValErrString(res[srNJet][stb][htb]['TT_pred_final'], res[srNJet][stb][htb]['TT_pred_final_err']))
 
       #calculate final W yields and errors
-      if withSystematics:
-        kappa_W_err = sqrt(res[srNJet][stb][htb]['W_kappa_err']**2 + (res[srNJet][stb][htb]['W_kappa']*sys[srNJet][stb][htb]['systematics']['total_W'])**2)
-      else:
-        kappa_W_err = res[srNJet][stb][htb]['W_kappa_err']
       kappa_W.SetBinContent(i,res[srNJet][stb][htb]['W_kappa'])
-      kappa_W.SetBinError(i, kappa_W_err)
-      w, w_err = getPropagatedError([res[srNJet][stb][htb]['W_pred'],res[srNJet][stb][htb]['W_kappa']],[res[srNJet][stb][htb]['W_pred_err'], kappa_W_err], 1, 0, returnCalcResult=True)
+      if withSystematics:
+        kappa_W.SetBinError(i, res[srNJet][stb][htb]['W_kappa_err_syst'])
+      else:
+        kappa_W.SetBinError(i, res[srNJet][stb][htb]['W_kappa_err'])
       print fmt.format('W w/o kappa, syst:', getValErrString(res[srNJet][stb][htb]['W_pred'], res[srNJet][stb][htb]['W_pred_err']))
-      print fmt.format('W with kappa, syst:',getValErrString(w, w_err))
+      print fmt.format('W with kappa, syst:',getValErrString(res[srNJet][stb][htb]['W_pred_final'], res[srNJet][stb][htb]['W_pred_final_err']))
       
       #calculate final rest yields and errors
-      rest = res[srNJet][stb][htb]['Rest_truth']
-      if withSystematics:
-        rest_err = sqrt(res[srNJet][stb][htb]['Rest_truth_err']**2 + (res[srNJet][stb][htb]['Rest_truth']*sys[srNJet][stb][htb]['systematics']['total_Rest'])**2)
-      else:
-        rest_err = res[srNJet][stb][htb]['Rest_truth_err']
-      print fmt.format('rest w/o syst:', getValErrString(rest, res[srNJet][stb][htb]['Rest_truth_err']))
-      print fmt.format('rest with syst:', getValErrString(rest, rest_err))
+      print fmt.format('rest w/o syst:', getValErrString(res[srNJet][stb][htb]['Rest_truth'], res[srNJet][stb][htb]['Rest_truth_err']))
+      print fmt.format('rest with syst:', getValErrString(res[srNJet][stb][htb]['Rest_truth_final'], res[srNJet][stb][htb]['Rest_truth_final_err']))
 
-      total = tt + w + rest
-      total_err = sqrt(tt_err**2 + w_err**2 + rest_err**2)
       print fmt.format('total MC', getValErrString(res[srNJet][stb][htb]['tot_truth'],res[srNJet][stb][htb]['tot_truth_err']))
       print fmt.format('- total pred w/o kappa, syst:', getValErrString(res[srNJet][stb][htb]['tot_pred'], res[srNJet][stb][htb]['tot_pred_err']))
-      print fmt.format('- total pred with kappa, syst:', getValErrString(total, total_err))
+      print fmt.format('- total pred with kappa, syst:', getValErrString(res[srNJet][stb][htb]['tot_pred_final'], res[srNJet][stb][htb]['tot_pred_final_err']))
       
       if not applyKappa:
         tt_pred_H.SetBinContent(i, res[srNJet][stb][htb]['TT_pred'])
@@ -193,11 +183,11 @@ for srNJet in sorted(signalRegions):
         w_pred_H.SetBinError(i,   res[srNJet][stb][htb]['W_pred_err'])
       
       else:
-        tt_pred_H.SetBinContent(i, tt)
-        tt_pred_H.SetBinError(i,   tt_err)
+        tt_pred_H.SetBinContent(i, res[srNJet][stb][htb]['TT_pred_final'])
+        tt_pred_H.SetBinError(i,   res[srNJet][stb][htb]['TT_pred_final_err'])
 
-        w_pred_H.SetBinContent(i, w)
-        w_pred_H.SetBinError(i,   w_err)
+        w_pred_H.SetBinContent(i, res[srNJet][stb][htb]['W_pred_final'])
+        w_pred_H.SetBinError(i,   res[srNJet][stb][htb]['W_pred_final_err'])
 
       tt_truth_H.SetBinContent(i,res[srNJet][stb][htb]['TT_truth'])
       tt_truth_H.SetBinError(i,  res[srNJet][stb][htb]['TT_truth_err'])
@@ -206,26 +196,26 @@ for srNJet in sorted(signalRegions):
       w_truth_H.SetBinContent(i,res[srNJet][stb][htb]['W_truth'])
       w_truth_H.SetBinError(i,  res[srNJet][stb][htb]['W_truth_err'])
 
-      rest_H.SetBinContent(i, rest)
-      rest_H.SetBinError(i,   rest_err)
+      rest_H.SetBinContent(i, res[srNJet][stb][htb]['Rest_truth'])
+      rest_H.SetBinError(i,   res[srNJet][stb][htb]['Rest_truth_err'])
 
       one.SetBinContent(i,1)
       if not applyKappa:
         pred_H.SetBinContent(i, res[srNJet][stb][htb]['tot_pred'])
         pred_H.SetBinError(i,   res[srNJet][stb][htb]['tot_pred_err'])
       else:
-        pred_H.SetBinContent(i, total)
-        pred_H.SetBinError(i,   total_err)
+        pred_H.SetBinContent(i, res[srNJet][stb][htb]['tot_pred_final'])
+        pred_H.SetBinError(i,   res[srNJet][stb][htb]['tot_pred_final_err'])
 
       if withSystematics:
-        predYErr.append(total_err)
+        predYErr.append(res[srNJet][stb][htb]['tot_pred_final_err'])
       else:
         predYErr.append(res[srNJet][stb][htb]['tot_pred_err'])
       predXErr.append(0.5)
       if not applyKappa:
         predY.append(res[srNJet][stb][htb]['tot_pred'])
       else:
-        predY.append(total)
+        predY.append(res[srNJet][stb][htb]['tot_pred_final'])
       predX.append(i-0.5)
 
       if unblinded or validation:
@@ -288,7 +278,7 @@ leg.SetFillColor(ROOT.kWhite)
 leg.SetShadowColor(ROOT.kWhite)
 leg.SetBorderSize(1)
 leg.SetTextSize(0.045)
-if unblinded or validation:
+if isData:
   leg.AddEntry(truth_H, 'data')
 else:
   if showMCtruth:
@@ -309,8 +299,12 @@ pred_err = ROOT.TGraphAsymmErrors(bins, ax, ay, aexl, aexh, aeyl, aeyh)
 pred_err.SetFillColor(ROOT.kGray+1)
 pred_err.SetFillStyle(3244)
 pred_err.Draw('2 same')
-if showMCtruth:
+truth_H.SetMarkerStyle(22)
+if isData:
+  truth_H.SetMarkerStyle(20)
   truth_H.Draw('e1p same')
+else:
+  truth_H.Draw('hist e same')
 #if unblinded or validation:
 #  data_truth_H.Draw('e1p same')
 
@@ -366,7 +360,7 @@ pad2.cd()
 ratio2.GetXaxis().SetTitleSize(0.13)
 ratio2.GetXaxis().SetLabelSize(0.11)
 ratio2.GetXaxis().SetNdivisions(508)
-ratio2.GetYaxis().SetTitle('data/pred.')
+ratio2.GetYaxis().SetTitle('MC/pred.')
 ratio2.GetYaxis().SetTitleSize(0.13)
 ratio2.GetYaxis().SetLabelSize(0.13)
 ratio2.GetYaxis().SetTitleOffset(0.4)
@@ -413,7 +407,11 @@ leg2.Draw()
 latex2.DrawLatex(0.17,0.96,'CMS #bf{#it{simulation}}')
 latex2.DrawLatex(0.7,0.96,"L=2.3fb^{-1} (13TeV)")
 
-can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Kappa.png')
-can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Kappa.root')
-can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Kappa.pdf')
+can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/'+predictionName+'_Kappa.png')
+can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/'+predictionName+'_Kappa.root')
+can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/'+predictionName+'_Kappa.pdf')
+
+savePickle = False
+if savePickle:
+  pickle.dump(res, file(pickleDir+'resultsFinal_withSystematics_pkl', 'w'))
 
