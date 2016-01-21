@@ -6,7 +6,6 @@ import numpy as np
 
 
 from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYieldFromChain, getChunks
-from Workspace.DegenerateStopAnalysis.navidTools.CutTools import *
 from Workspace.DegenerateStopAnalysis.navidTools.getRatioPlot import *
 #from Workspace.DegenerateStopAnalysis.navidTools.FOM import *
 execfile('../../../python/navidTools/FOM.py')
