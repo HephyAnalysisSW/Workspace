@@ -235,3 +235,86 @@ def calc_diLep_contributions(s,r,tightHardLep,rand_input):
       s.LepToKeep_pt = outdict["LepToKeep_pt"]
 
   return
+
+def getNew_METandLT_WithJEC(s,r, corrJEC = "central"):
+
+   # jet pT threshold for MET
+   minJpt = 15
+
+   jforMET_list = ['rawPt','pt', 'eta', 'phi', 'mass' ,'id','hadronFlavour','btagCSV', 'btagCMVA','corr_JECUp','corr_JECDown','corr']
+
+   oldjets = get_cmg_JetsforMEt_fromStruct(r,jforMET_list)
+
+   newjets = oldjets
+
+   oldjets = filter(lambda j:j['pt']>minJpt , jets)
+   for jet in oldjets: 
+      jet['4vec'] = ROOT.TLorentzVector()
+      jet['4vec'].SetPtEtaPhiM(jet['pt'],jet['eta'],jet['phi'],jet['mass'])
+
+   # vectorial sum of jets for MET
+   deltaJetP4 = ROOT.TLorentzVector(0,0,0,0)
+   for jet in oldjets: deltaJetP4 += jet['4vec']
+
+   if corrJEC == "central":
+       for jet in newjets: jet['pt'] = jet['rawPt'] * jet['corr']
+   elif corrJEC == "up":
+       for jet in newjets: jet['pt'] = jet['rawPt'] * jet['corr_JECUp']
+   elif corrJEC == "down":
+       for jet in newjets: jet['pt'] = jet['rawPt'] * jet['corr_JECDown']
+
+   # filter jets
+   newjets = filter(lambda j:j['pt']>minJpt , newjets)
+
+   # vectorial sum of jets to substruct
+   for jet in newjets: deltaJetP4 -= jet['4vec']  ###now deltaJetP4 is the difference 
+
+   met_4vec = ROOT.TLorentzVector()
+   met_4vec.SetPtEtaPhiM(r.met_pt,r.met_eta,r.met_phi,r.met_mass)
+
+   newMET = met_4vec - deltaJetP4
+   newLT = s.leptonPt + newMET.Pt()
+   newDeltaPhi_Wl = acos((s.leptonPt+newMET.Pt()*cos(s.leptonPhi-newMET.Phi()))/sqrt(s.leptonPt**2+newMET.Pt()**2+2*newMET.Pt()*s.leptonPt*cos(s.leptonPhi-newMET.Phi())))
+    
+   print "OLD MET:", met_4vec.Pt() ,"MET diff = ", deltaJetP4.Pt() , "NEW MET:" , newMET.Pt() 
+   return {"met": newMET.Pt(), "LT": newLT ,'deltaPhi_Wl': newDeltaPhi_Wl}
+
+def getNew_JetVars_WithJEC(r ,corrJEC = "central"):
+
+   ##jet collection has 20 GeV cut  
+   j_list = ['rawPt','pt', 'eta', 'phi', 'mass' ,'id','hadronFlavour','btagCSV', 'btagCMVA','corr_JECUp','corr_JECDown','corr']
+   jets = get_cmg_jets_fromStruct(r,j_list) 
+   newjets = jets
+   if corrJEC == "central":
+       for jet in newjets: jet['pt'] = jet['rawPt'] * jet['corr']
+   elif corrJEC == "up":
+       for jet in newjets: jet['pt'] = jet['rawPt'] * jet['corr_JECUp']
+   elif corrJEC == "down":
+       for jet in newjets: jet['pt'] = jet['rawPt'] * jet['corr_JECDown'] 
+   
+   ##filter new Jets to calculate new Vars
+   newjets = filter(lambda j:j['pt']>30 and abs(j['eta'])<2.4 and j['id'] , newjets)
+   newHT = sum([x['pt'] for x in jets])
+   newNJet = len(newjets)
+   newlightJets,  newbJetsCSV = splitListOfObjects('btagCSV', 0.890, newjets)
+   newNBtags = len(newbJetsCSV)
+
+   return {"ht": newHT , "nJet": newNJet , "nBJet": newNBtags } 
+
+
+def fill_branch_WithJEC(s,r):
+
+  corr = ["central", "up", "down"]
+  vars_corr = ["ht","nJet","nBJet"]
+  vars_corr_1 = ["LT","met","deltaPhi_Wl"]
+  for corrJEC_str in corr:
+    central_jet_vars_metLT = getNew_METandLT_WithJEC(s,r, corrJEC = corrJEC_str) 
+    central_jet_vars_jetVars = getNew_JetVars_WithJEC(r ,corrJEC = corrJEC_str)
+    for vars_str in vars_corr:
+      exec("s.jec_"+vars_str+"_"+corrJEC_str+"="+str(central_jet_vars_jetVars[vars_str]))
+    for vars_str in vars_corr_1:
+      exec("s.jec_"+vars_str+"_"+corrJEC_str+"="+str(central_jet_vars_metLT[vars_str]))
+
+  return
+
+

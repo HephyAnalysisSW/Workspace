@@ -77,6 +77,8 @@ def get_cmg_jets(c):
   return [getObjDict(c, 'Jet_', ['eta','pt','phi','btagCMVA','btagCSV','mcMatchFlav' ,'partonId', 'id'], i) for i in range(int(getVarValue(c, 'nJet')))]
 def get_cmg_jets_fromStruct(r,j_list):
   return [{p:getattr(r, 'Jet'+'_'+p)[i] for p in j_list} for i in range(r.nJet)]
+def get_cmg_JetsforMEt_fromStruct(r,jforMET_list):
+  return [{p:getattr(r, 'JetForMET'+'_'+p)[i] for p in jforMET_list} for i in range(r.nJetForMET)]
 def get_cmg_fatJets(c):
   return [getObjDict(c, 'FatJet_', ['eta','pt','phi','btagCMVA','btagCSV','mcPt','mcFlavour' ,'prunedMass','tau2', 'tau1'], i) for i in range(int(getVarValue(c, 'nFatJet')))]
 def get_cmg_index_and_DR(objs,objPhi,objEta):
