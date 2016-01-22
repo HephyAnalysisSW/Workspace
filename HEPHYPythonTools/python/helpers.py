@@ -301,7 +301,7 @@ def getYieldFromChain(c, cutString = "(1)", weight = "weight", returnError=False
     return res, resErr
   elif returnVar:
     return res, resErr**2
-  return res 
+  return max(0,res) 
 
 def getPlotFromChain(c, var, binning, cutString = "(1)", weight = "weight", binningIsExplicit=False, addOverFlowBin=''):
   if binningIsExplicit:

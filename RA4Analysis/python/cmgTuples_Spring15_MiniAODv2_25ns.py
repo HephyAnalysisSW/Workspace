@@ -1,5 +1,5 @@
-path = "/data/easilar/tuples_from_Artur/MiniAODv2/" 
-#path = "/data/easilar/tuples_from_Artur/HT350_1nLep_LT200_hadrFlav/" 
+#path = "/data/easilar/tuples_from_Artur/MiniAODv2/" 
+path = "/data/easilar/tuples_from_Artur/HT350_1nLep_LT200_hadrFlav/" 
 
 #TTJets_LO_pow = {\
 #"name" : "TTJets_LO_pow",
