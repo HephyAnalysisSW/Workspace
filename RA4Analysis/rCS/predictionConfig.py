@@ -19,7 +19,7 @@ testRun = False
 ## b-tagging and other variables
 dPhiStr = 'deltaPhi_Wl'
 bjreg = (0,0)
-wjetsSB = (3,3)
+wjetsSB = (3,4)
 
 nBTagVar              = 'nBJetMediumCSV30'
 useBTagWeights        = True
@@ -36,7 +36,7 @@ if QCDdown: nameSuffix += '_QCDdown'
 ## samples
 isData              = False
 unblinded           = False
-validation          = True
+validation          = False
 isCentralPrediction = True
 if isData:
   isCentralPrediction = False
@@ -55,8 +55,8 @@ cQCD        = getChain(QCDHT_25ns,histname='')
 useQCDestimation = False
 if not isData and useQCDestimation: QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_MC2p1fb_pkl'
 if isData:
-  #QCDpickle  = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_2p1fb_pkl'
-  QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_extendedClosureTest3to4j_2p1fb_pkl'
+  QCDpickle  = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_2p1fb_pkl'
+  #QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_extendedClosureTest3to4j_2p1fb_pkl'
   #QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_closureTest4to5j_2p1fb_pkl'
 
 if isData or useQCDestimation: QCDestimate = pickle.load(file(QCDpickle))
@@ -71,8 +71,8 @@ else:
 
 
 ## signal region definition
-signalRegions = validationRegionAll
-#signalRegions = signalRegion3fb
+#signalRegions = validationRegionAll
+signalRegions = signalRegion3fb
 #signalRegions = signalRegion3fbMerge
 
 ## weight calculations
@@ -91,16 +91,16 @@ else:
   templateLumistr = str(templateLumi)#.replace('.','p')
 
 ## Template Bootstrap error dictionary
-templateBootstrap = False
+templateBootstrap = True
 templateBootstrapDir = '/data/dspitzbart/bootstrap/combined_errs_pkl'
 if templateBootstrap: templateBootstrap = pickle.load(file(templateBootstrapDir))
 
 ## Directories for plots, results and templates
 if isData:
-  templateName   = 'SFtemplates_validation_4j_lep_data'
+  templateName   = 'SFtemplates_validation_lep_data'
   predictionName = templateName
 else:
-  templateName   = 'SFtemplates_validation_4j_lep_MC'
+  templateName   = 'SFtemplates_validation_lep_MC'
   predictionName = templateName+btagWeightSuffix + nameSuffix
 printDir    = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/25ns/templateFit_'+predictionName+'_'+lumistr+'/'
 pickleDir   = '/data/'+username+'/Results'+year+'/Prediction_'+predictionName+'_'+lumistr+'/'
@@ -122,7 +122,7 @@ singleMu_presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSof
 
 ## corrections
 createFits = True
-fitDir = '/data/'+username+'/Results'+year+'/correctionFit_validation_4j_MC'+nameSuffix+'/'
+fitDir = '/data/'+username+'/Results'+year+'/correctionFit_fullSR_MC'+nameSuffix+'/'
 fitPrintDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results'+year+'/25ns/RcsFit_'+predictionName+'_'+lumistr+'/'
 
 ## do stuff for test runs
