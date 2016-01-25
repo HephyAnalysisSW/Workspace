@@ -1,0 +1,3 @@
+To Be Used with CMSSW_7_4_4
+
+makeCrabScripts.py can be used to create seperate crabConfig files for each LHE file.
