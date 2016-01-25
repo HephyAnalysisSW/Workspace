@@ -19,7 +19,7 @@ testRun = False
 ## b-tagging and other variables
 dPhiStr = 'deltaPhi_Wl'
 bjreg = (0,0)
-wjetsSB = (3,4)
+wjetsSB = (3,3)
 
 nBTagVar              = 'nBJetMediumCSV30'
 useBTagWeights        = True
@@ -34,10 +34,10 @@ if QCDup: nameSuffix += '_QCDup'
 if QCDdown: nameSuffix += '_QCDdown'
 
 ## samples
-isData              = False
+isData              = True
 unblinded           = False
-validation          = False
-isCentralPrediction = True
+validation          = True
+isCentralPrediction = False
 if isData:
   isCentralPrediction = False
 
@@ -71,8 +71,8 @@ else:
 
 
 ## signal region definition
-#signalRegions = validationRegionAll
-signalRegions = signalRegion3fb
+signalRegions = validationRegionAll
+#signalRegions = signalRegion3fb
 #signalRegions = signalRegion3fbMerge
 
 ## weight calculations
@@ -91,16 +91,16 @@ else:
   templateLumistr = str(templateLumi)#.replace('.','p')
 
 ## Template Bootstrap error dictionary
-templateBootstrap = True
+templateBootstrap = False
 templateBootstrapDir = '/data/dspitzbart/bootstrap/combined_errs_pkl'
 if templateBootstrap: templateBootstrap = pickle.load(file(templateBootstrapDir))
 
 ## Directories for plots, results and templates
 if isData:
-  templateName   = 'SFtemplates_validation_lep_data'
+  templateName   = 'SFtemplates_validation_4j_lep_data'
   predictionName = templateName
 else:
-  templateName   = 'SFtemplates_validation_lep_MC'
+  templateName   = 'SFtemplates_validation_4j_lep_MC'
   predictionName = templateName+btagWeightSuffix + nameSuffix
 printDir    = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/25ns/templateFit_'+predictionName+'_'+lumistr+'/'
 pickleDir   = '/data/'+username+'/Results'+year+'/Prediction_'+predictionName+'_'+lumistr+'/'
@@ -121,7 +121,7 @@ singleMu_presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSof
 #presel = singleMu_presel
 
 ## corrections
-createFits = True
+createFits = False
 fitDir = '/data/'+username+'/Results'+year+'/correctionFit_fullSR_MC'+nameSuffix+'/'
 fitPrintDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results'+year+'/25ns/RcsFit_'+predictionName+'_'+lumistr+'/'
 

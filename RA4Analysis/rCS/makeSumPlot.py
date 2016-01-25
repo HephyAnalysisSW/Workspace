@@ -360,7 +360,10 @@ pad2.cd()
 ratio2.GetXaxis().SetTitleSize(0.13)
 ratio2.GetXaxis().SetLabelSize(0.11)
 ratio2.GetXaxis().SetNdivisions(508)
-ratio2.GetYaxis().SetTitle('MC/pred.')
+if validation or unblinded:
+  ratio2.GetYaxis().SetTitle('data/pred.')
+else:
+  ratio2.GetYaxis().SetTitle('MC/pred.')
 ratio2.GetYaxis().SetTitleSize(0.13)
 ratio2.GetYaxis().SetLabelSize(0.13)
 ratio2.GetYaxis().SetTitleOffset(0.4)

@@ -113,8 +113,8 @@ print '\\hline\end{tabular}}\end{center}\caption{Closure table for the backgroun
 
 print
 print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|c|rrr|rrr|rrr|rrr|}\\hline'
-print ' \\njet     & \ST & \HT & \multirow{2}{*}{bin name} & \multicolumn{3}{c|}{\multirow{2}{*}{$R_{CS}(4-5j, 1b)\cdot\kappa_{b}^{MC}$}} & \multicolumn{3}{c|}{\multirow{2}{*}{$R_{CS}(SR,0b)}$} & \multicolumn{3}{c|}{$\kappa_{t\\bar{t}}$} & \multicolumn{3}{c|}{$\kappa_{b}^{MC}$}\\\%\hline'
-print ' & $[$GeV$]$ & $[$GeV$]$ & & & & & & & & \multicolumn{3}{c|}{} & \multicolumn{3}{c|}{0b/1b} \\\\\hline'
+print ' \\njet     & \ST & \HT & \multirow{2}{*}{bin name} & \multicolumn{3}{c|}{\multirow{2}{*}{$R_{CS}(\\textrm{4-5j, 1b})\cdot\kappa_{b}^{MC}$}} & \multicolumn{3}{c|}{\multirow{2}{*}{$R_{CS}(\\textrm{SR, 0b})$}} & \multicolumn{3}{c|}{$\kappa_{t\\bar{t}}$} & \multicolumn{3}{c|}{$\kappa_{b}^{MC}$}\\\%\hline'
+print ' & $[$GeV$]$ & $[$GeV$]$ & & & & & & & & \multicolumn{3}{c|}{SR/SB} & \multicolumn{3}{c|}{0b/1b} \\\\\hline'
 
 secondLine = False
 for srNJet in sorted(signalRegions):
@@ -134,7 +134,7 @@ for srNJet in sorted(signalRegions):
            +' & '+getNumString(res[srNJet][stb][htb]['rCS_srNJet_0b_onlyTT']['rCS'], res[srNJet][stb][htb]['rCS_srNJet_0b_onlyTT']['rCSE_sim'],4)\
            + '& '+getNumString(res[srNJet][stb][htb]['TT_kappa'], res[srNJet][stb][htb]['TT_kappa_err'])\
            + '& '+getNumString(res[srNJet][stb][htb]['W_kappa'], res[srNJet][stb][htb]['W_kappa_err']) + '\\\\'
-      if htb[1] == -1 : print '\\cline{2-13}'
+      if htb[1] == -1 : print '\\cline{2-16}'
 print '\\hline\end{tabular}}\end{center}\caption{Rcs table for $t\\bar{t}$+jets and the corresponding $\\kappa_{t\\bar{t}}$ value from simulation, 2.3$fb^{-1}$}\label{tab:0b_rcs_tt}\end{table}'
 
 
@@ -142,8 +142,8 @@ print '\\hline\end{tabular}}\end{center}\caption{Rcs table for $t\\bar{t}$+jets 
 
 print
 print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|c|rrr|rrr|rrr|}\\hline'
-print ' \\njet     & \ST & \HT & \multirow{2}{*}{bin name} &\multicolumn{6}{c|}{$R_{CS}$}&\multicolumn{3}{c|}{$\kappa_{W}$}\\\%\hline'
-print ' & $[$GeV$]$ & $[$GeV$]$ & & \multicolumn{3}{c}{3-4 jets, 0b, $\\mu$, corr} & \multicolumn{3}{c|}{SR, 0b} & \multicolumn{3}{c|}{} \\\\\hline'
+print ' \\njet     & \ST & \HT & \multirow{2}{*}{bin name} & \multicolumn{3}{c|}{\multirow{2}{*}{$R_{CS}(\\textrm{3-4j,0b,$\\mu$,corr})$}} & \multicolumn{3}{c|}{\multirow{2}{*}{$R_{CS}(\\textrm{SR,0b})$}}&\multicolumn{3}{c|}{$\kappa_{W}$}\\\%\hline'
+print ' & $[$GeV$]$ & $[$GeV$]$ & & & & & & & & \multicolumn{3}{c|}{SR/SB} \\\\\hline'
 
 secondLine = False
 for srNJet in sorted(signalRegions):
