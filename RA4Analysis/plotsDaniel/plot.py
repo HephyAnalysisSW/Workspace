@@ -58,7 +58,11 @@ WJETS_2 = {'name':'WJets', 'chain':getChain(WJetsHTToLNu_25ns_2,histname=''), 'c
 TTJets = {'name':'TTJets', 'chain':getChain(TTJets_HTLO_25ns,histname=''), 'color':ROOT.kOrange,'weight':'weight', 'niceName':'t#bar{t}+Jets', 'cut':''}
 TTJets_combined = {'name':'TTJets', 'chain':getChain(TTJets_combined,histname=''), 'color':color('TTJets')-2,'weight':totalWeight, 'niceName':'t#bar{t}+Jets', 'cut':''}
 TTJets_combined_2 = {'name':'TTJets', 'chain':getChain(TTJets_combined_2,histname=''), 'color':ROOT.kMagenta,'weight':totalWeight, 'niceName':'t#bar{t}+Jets fix', 'cut':''}
+#TTJets_leptonic = {'name':'TTJets',   'chain':getChain(TTJets_leptonic,histname=''), 'color':color('TTJets')-2,'weight':totalWeight, 'niceName':'t#bar{t}+Jets lep', 'cut':''}
+#TTJets_leptonic_2 = {'name':'TTJets', 'chain':getChain(TTJets_leptonic_2,histname=''), 'color':ROOT.kMagenta,'weight':totalWeight, 'niceName':'t#bar{t}+Jets lep_2', 'cut':''}
 
+#TTJets_ht = {'name':'TTJets',   'chain':getChain(TTJets_ht,histname=''), 'color':color('DY'),'weight':totalWeight, 'niceName':'t#bar{t}+Jets ht', 'cut':''}
+#TTJets_ht_2 = {'name':'TTJets',   'chain':getChain(TTJets_HTLO_25ns_2,histname=''), 'color':color('QCD'),'weight':totalWeight, 'niceName':'t#bar{t}+Jets ht_2', 'cut':''}
 
 TTJets_combined_singleLep = {'name':'TTJets', 'chain':TTJets_combined['chain'], 'color':color('TTJets')-2,'weight':totalWeight, 'niceName':'t#bar{t}+Jets 1l', 'cut':'(ngenLep+ngenTau)==1'}
 TTJets_combined_diLep =     {'name':'TTJets', 'chain':TTJets_combined['chain'], 'color':color('TTJets'),'weight':totalWeight, 'niceName':'t#bar{t}+Jets 2l', 'cut':'(ngenLep+ngenTau)==2'}
@@ -154,6 +158,8 @@ filters = "Flag_goodVertices && Flag_HBHENoiseFilter_fix && Flag_CSCTightHaloFil
 presel = "((!isData&&singleLeptonic)||(isData&&"+triggers+"&&((muonDataSet&&singleMuonic)||(eleDataSet&&singleElectronic))&&"+filters+"))"
 presel += "&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&Jet_pt[1]>80&&st>250&&nJet30>2&&htJet30j>500"
 newpresel = presel
+
+signalpresel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&Jet_pt[1]>80&&st>250&&nJet30>2&&htJet30j>500"
 
 singleMuonic = '(Sum$(abs(LepGood_pdgId)==13&&LepGood_pt>=25&&abs(LepGood_eta)<2.4&&LepGood_miniRelIso<0.2&&LepGood_mediumMuonId==1&&LepGood_sip3d<4.0)==1)'
 singleElectronic = '(Sum$(abs(LepGood_pdgId)==11&&LepGood_pt>=25&&abs(LepGood_eta)<2.5&&LepGood_miniRelIso<0.2&&LepGood_SPRING15_25ns_v1==4)==1)'

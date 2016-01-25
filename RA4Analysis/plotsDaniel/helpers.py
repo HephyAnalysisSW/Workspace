@@ -46,3 +46,12 @@ def createDictFromHist(hist, signalRegions):
   
   return d
 
+def addDPhiCutDict(res, signalRegions):
+  for njb in sorted(signalRegions):
+    for stb in sorted(signalRegions[njb]):
+      for htb in sorted(signalRegions[njb][stb]):
+        res[njb][stb][htb]['deltaPhiCut'] = signalRegions[njb][stb][htb]['deltaPhi']
+  return res
+
+def sign(a):
+  return (a > 0) - (a < 0)

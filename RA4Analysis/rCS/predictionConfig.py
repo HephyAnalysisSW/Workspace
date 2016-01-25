@@ -14,12 +14,12 @@ from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed impor
 from Workspace.HEPHYPythonTools.user import username
 from Workspace.RA4Analysis.signalRegions import *
 
-testRun = True
+testRun = False
 
 ## b-tagging and other variables
 dPhiStr = 'deltaPhi_Wl'
 bjreg = (0,0)
-wjetsSB = (3,4)
+wjetsSB = (3,3)
 
 nBTagVar              = 'nBJetMediumCSV30'
 useBTagWeights        = True
@@ -36,8 +36,10 @@ if QCDdown: nameSuffix += '_QCDdown'
 ## samples
 isData              = True
 unblinded           = False
-validation          = False
+validation          = True
 isCentralPrediction = False
+if isData:
+  isCentralPrediction = False
 
 cWJets      = getChain(WJetsHTToLNu_25ns,histname='')
 cTTJets     = getChain(TTJets_combined,histname='')
@@ -60,7 +62,6 @@ if isData:
 if isData or useQCDestimation: QCDestimate = pickle.load(file(QCDpickle))
 else: QCDestimate=False
 
-
 if isData:
   cData = getChain([single_mu_Run2015D, single_ele_Run2015D], histname='')
 elif not isData and useQCDestimation:
@@ -70,13 +71,13 @@ else:
 
 
 ## signal region definition
-#signalRegions = validationRegionAll
-signalRegions = signalRegion3fb
-
+signalRegions = validationRegionAll
+#signalRegions = signalRegion3fb
+#signalRegions = signalRegion3fbMerge
 
 ## weight calculations
-lumi = 2.1
-templateLumi = 2.1 # lumi that was used when template was created - if defined wrong, fixed rest backgrounds will be wrong
+lumi = 2.3
+templateLumi = 2.3 # lumi that was used when template was created - if defined wrong, fixed rest backgrounds will be wrong
 sampleLumi = 3.
 debugReweighting = False
 
@@ -90,23 +91,23 @@ else:
   templateLumistr = str(templateLumi)#.replace('.','p')
 
 ## Template Bootstrap error dictionary
-templateBootstrap = True
+templateBootstrap = False
 templateBootstrapDir = '/data/dspitzbart/bootstrap/combined_errs_pkl'
 if templateBootstrap: templateBootstrap = pickle.load(file(templateBootstrapDir))
 
 ## Directories for plots, results and templates
 if isData:
-  templateName   = 'SFtemplates_fullSR_lep_data'
+  templateName   = 'SFtemplates_validation_4j_lep_data'
   predictionName = templateName
 else:
-  templateName   = 'SFtemplates_fullSR_lep_MC'
+  templateName   = 'SFtemplates_validation_4j_lep_MC'
   predictionName = templateName+btagWeightSuffix + nameSuffix
 printDir    = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/25ns/templateFit_'+predictionName+'_'+lumistr+'/'
 pickleDir   = '/data/'+username+'/Results'+year+'/Prediction_'+predictionName+'_'+lumistr+'/'
 templateDir = '/data/'+username+'/Results'+year+'/btagTemplates_'+templateName+'_'+templateLumistr+'/'
 prefix = 'singleLeptonic_Spring15_'
 
-kappa_dict_dir = '/data/'+username+'/Results'+year+'/Prediction_SFtemplates_fullSR_lep_MC_SF_2p1/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'
+kappa_dict_dir = '/data/'+username+'/Results'+year+'/Prediction_SFtemplates_validation_lep_MC_SF_2p3/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'
 
 ## Preselection cut
 triggers = "(HLT_EleHT350||HLT_MuHT350)"
@@ -120,7 +121,7 @@ singleMu_presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSof
 #presel = singleMu_presel
 
 ## corrections
-createFits = True
+createFits = False
 fitDir = '/data/'+username+'/Results'+year+'/correctionFit_fullSR_MC'+nameSuffix+'/'
 fitPrintDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results'+year+'/25ns/RcsFit_'+predictionName+'_'+lumistr+'/'
 
