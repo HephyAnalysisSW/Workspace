@@ -15,7 +15,7 @@ signal = False
 withSystematics = True
 
 prefix = 'singleLeptonic_Spring15_'
-path = '/data/'+username+'/Results2016/Prediction_SFtemplates_validation_lep_MC_SF_2p3/'
+path = '/data/'+username+'/Results2016/Prediction_SFtemplates_fullSR_lep_MC_SF_2p25/'
 #path = '/data/'+username+'/Results2016/Prediction_SFtemplates_validation_lep_data_2p3/'
 #path = '/data/'+username+'/Results2016/Prediction_SFtemplates_fullSR_lep_data_2p1/'
 #path = '/data/'+username+'/Results2015/Prediction_SFTemplate_MC_fullSR_lep_3.0/' 

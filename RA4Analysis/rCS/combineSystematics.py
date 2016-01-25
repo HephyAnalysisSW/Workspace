@@ -80,6 +80,7 @@ else:
 topPt_Err = pickle.load(file("/data/easilar/Spring15/25ns/extended_with_truth_counts_topPt_pkl"))
 pu_Unc    = pickle.load(file("/data/easilar/Spring15/25ns/extended_with_truth_counts_PU_pkl"))
 lep_Eff   = pickle.load(file("/data/easilar/Spring15/25ns/extended_with_truth_counts_LS_pkl"))
+jec       = pickle.load(file('/data/easilar/Spring15/25ns/Jec_syst_SRAll_pkl'))
 #dilep   = pickle.load(file('/data/easilar/Spring15/25ns/unc_with_validationRegionAll'))
 
 #rcs = pickle.load(file('/data/dspitzbart/Results2015/Prediction_SFtemplates_fullSR_lep_MC_SF_2.1/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'))
@@ -87,7 +88,7 @@ dataResult = rcs
 #dataResult = pickle.load(file('/data/dspitzbart/Results2015/Prediction_SFtemplates_fullSR_lep_data_2.1/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'))
 
 colors = [ROOT.kBlue+2, ROOT.kBlue-4, ROOT.kBlue-7, ROOT.kBlue-9, ROOT.kCyan-9, ROOT.kCyan-6, ROOT.kCyan-2,ROOT.kGreen+3,ROOT.kGreen-2,ROOT.kGreen-6,ROOT.kGreen-7, ROOT.kOrange-4, ROOT.kOrange+1, ROOT.kOrange+8, ROOT.kRed, ROOT.kRed+1]
-colors = [ROOT.kBlue-7, ROOT.kCyan-9, ROOT.kCyan-2, ROOT.kGreen-6, ROOT.kOrange+6, ROOT.kRed+1, ROOT.kRed-6, ROOT.kYellow+2, ROOT.kGreen, ROOT.kGreen+3]
+colors = [ROOT.kBlue-7, ROOT.kCyan-9, ROOT.kCyan-2, ROOT.kGreen-6, ROOT.kOrange+6, ROOT.kRed+1, ROOT.kRed-6, ROOT.kYellow+2, ROOT.kGreen, ROOT.kGreen+3, ROOT.kBlue-2]
 
 bErrH     = ROOT.TH1F('bErrH','b-jet SFs',bins,0,bins)
 wXErrH    = ROOT.TH1F('WXErrH','W+jets x-sec',bins,0,bins)
@@ -99,7 +100,7 @@ puErrH    = ROOT.TH1F('puErrH','pile-up',bins,0,bins)
 lepSFErrH = ROOT.TH1F('lepSFErrH','lepton SFs',bins,0,bins)
 topErrH   = ROOT.TH1F('topErrH','top p_{T}',bins,0,bins)
 dilepErrH = ROOT.TH1F('dilepErrH','dilep. events',bins,0,bins)
-
+jecErrH   = ROOT.TH1F('jecErrH','JEC',bins,0,bins)
 
 dilepC   = ROOT.TH1F('dilepC','2l constant',bins,0,bins)
 dilepS   = ROOT.TH1F('dilepS','2l slope',bins,0,bins)
@@ -111,7 +112,7 @@ dummy.SetFillColor(ROOT.kWhite)
 ratio = ROOT.TH1F('ratio','ratio',bins,0,bins)
 
 #hists = [dilepC,dilepS,bErrH,wXErrH,ttXErrH,wPErrH,qcdErrH, puErrH, lepSFErrH, topErrH]
-hists = [rcsErrH,dilepErrH,bErrH,wXErrH,ttXErrH,wPErrH,qcdErrH, puErrH, lepSFErrH, topErrH]
+hists = [rcsErrH,dilepErrH,bErrH,wXErrH,ttXErrH,wPErrH,qcdErrH, puErrH, lepSFErrH, topErrH, jecErrH]
 for i_h,h in enumerate(hists):
   h.SetFillColor(colors[i_h])
   h.SetLineColor(colors[i_h]+1)
@@ -206,6 +207,11 @@ for injb,srNJet in enumerate(sorted(signalRegions)):
       else:
         wPErr = sqrt(((abs(wpol[srNJet][stb][htb]['uWPolMinus10'])+abs(wpol[srNJet][stb][htb]['uWPolPlus10']))/2)**2 + ((abs(wpol[srNJet][stb][htb]['uTTPolMinus5'])+abs(wpol[srNJet][stb][htb]['uTTPolPlus5']))/2)**2) # w pol for w and ttbar
       wPErrH.SetBinContent(i, wPErr)
+      
+      #JEC
+      print jec[srNJet][stb][htb]['delta_Up_central'], jec[srNJet][stb][htb]['delta_Down_central'], jec[srNJet][stb][htb]['delta_Up_central']/jec[srNJet][stb][htb]['delta_Down_central']
+      jecErr = max(map(abs,[jec[srNJet][stb][htb]['delta_Up_central'], jec[srNJet][stb][htb]['delta_Down_central']]))
+      jecErrH.SetBinContent(i, jecErr)
       
       #QCD fit
       if validation:
@@ -328,7 +334,7 @@ for i_h,h in enumerate(hists):
 #h_Stack.Add(puErrH)
 #h_Stack.Add(lepSFErrH)
 
-h_Stack.SetMaximum(1.2)
+h_Stack.SetMaximum(1.5)
 h_Stack.SetMinimum(0)
 
 leg = ROOT.TLegend(0.7,0.75,0.98,0.95)

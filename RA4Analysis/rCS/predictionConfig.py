@@ -19,7 +19,7 @@ testRun = False
 ## b-tagging and other variables
 dPhiStr = 'deltaPhi_Wl'
 bjreg = (0,0)
-wjetsSB = (3,3)
+wjetsSB = (3,4)
 
 nBTagVar              = 'nBJetMediumCSV30'
 useBTagWeights        = True
@@ -34,10 +34,10 @@ if QCDup: nameSuffix += '_QCDup'
 if QCDdown: nameSuffix += '_QCDdown'
 
 ## samples
-isData              = True
+isData              = False
 unblinded           = False
-validation          = True
-isCentralPrediction = False
+validation          = False
+isCentralPrediction = True
 if isData:
   isCentralPrediction = False
 
@@ -71,13 +71,17 @@ else:
 
 
 ## signal region definition
-signalRegions = validationRegionAll
-#signalRegions = signalRegion3fb
+if validation:
+  signalRegions = validationRegionAll
+  regStr = 'validation_4j'
+else:
+  signalRegions = signalRegion3fb
+  regStr = 'fullSR'
 #signalRegions = signalRegion3fbMerge
 
 ## weight calculations
-lumi = 2.3
-templateLumi = 2.3 # lumi that was used when template was created - if defined wrong, fixed rest backgrounds will be wrong
+lumi = 2.25
+templateLumi = 2.25 # lumi that was used when template was created - if defined wrong, fixed rest backgrounds will be wrong
 sampleLumi = 3.
 debugReweighting = False
 
@@ -91,16 +95,16 @@ else:
   templateLumistr = str(templateLumi)#.replace('.','p')
 
 ## Template Bootstrap error dictionary
-templateBootstrap = False
+templateBootstrap = True
 templateBootstrapDir = '/data/dspitzbart/bootstrap/combined_errs_pkl'
 if templateBootstrap: templateBootstrap = pickle.load(file(templateBootstrapDir))
 
 ## Directories for plots, results and templates
 if isData:
-  templateName   = 'SFtemplates_validation_4j_lep_data'
+  templateName   = 'SFtemplates_'+regStr+'_lep_data'
   predictionName = templateName
 else:
-  templateName   = 'SFtemplates_validation_4j_lep_MC'
+  templateName   = 'SFtemplates_'+regStr+'_lep_MC'
   predictionName = templateName+btagWeightSuffix + nameSuffix
 printDir    = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/25ns/templateFit_'+predictionName+'_'+lumistr+'/'
 pickleDir   = '/data/'+username+'/Results'+year+'/Prediction_'+predictionName+'_'+lumistr+'/'
@@ -121,8 +125,8 @@ singleMu_presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSof
 #presel = singleMu_presel
 
 ## corrections
-createFits = False
-fitDir = '/data/'+username+'/Results'+year+'/correctionFit_fullSR_MC'+nameSuffix+'/'
+createFits = True
+fitDir = '/data/'+username+'/Results'+year+'/correctionFit_'+regStr+'_MC/'
 fitPrintDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results'+year+'/25ns/RcsFit_'+predictionName+'_'+lumistr+'/'
 
 ## do stuff for test runs

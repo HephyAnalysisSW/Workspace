@@ -316,7 +316,7 @@ latex1.SetTextSize(0.04)
 latex1.SetTextAlign(11)
 
 latex1.DrawLatex(0.15,0.96,'CMS #bf{#it{preliminary}}')
-latex1.DrawLatex(0.78,0.96,"L=2.3fb^{-1} (13TeV)")
+latex1.DrawLatex(0.78,0.96,"L=2.25fb^{-1} (13TeV)")
 
 pad1.SetLogy()
 
@@ -408,7 +408,7 @@ kappa_W.Draw('e1p same')
 leg2.Draw()
 
 latex2.DrawLatex(0.17,0.96,'CMS #bf{#it{simulation}}')
-latex2.DrawLatex(0.7,0.96,"L=2.3fb^{-1} (13TeV)")
+latex2.DrawLatex(0.7,0.96,"L=2.25fb^{-1} (13TeV)")
 
 can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/'+predictionName+'_Kappa.png')
 can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/'+predictionName+'_Kappa.root')

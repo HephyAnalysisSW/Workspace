@@ -103,6 +103,21 @@ for srNJet in signalRegions:
       truth_total_err = sqrt(rd['TT_truth_err']**2 + rd['W_truth_err']**2 + rd['Rest_truth_err']**2)
       truth_total_PosPdg_err = sqrt((0.5*(rd['TT_truth_err']))**2 + rd['W_PosPdg_truth_err']**2 + rd['Rest_PosPdg_truth_err']**2)
       truth_total_NegPdg_err = sqrt((0.5*(rd['TT_truth_err']))**2 + rd['W_NegPdg_truth_err']**2 + rd['Rest_NegPdg_truth_err']**2)
+      
+      #write out data yields in MB, edit for blinding policies
+      if isData:
+        srName, srCut = nameAndCut(stb, htb, srNJet, btb=(0,0), presel=presel, btagVar = nBTagVar)
+        weight_str_sr = weight_str
+      else:
+        srName, srCut = nameAndCut(stb, htb, srNJet, btb=None, presel=presel, btagVar = nBTagVar)
+        weight_str_sr = weight_str+'*weightBTag0_SF'
+
+      y_srNJet_0b_lowDPhi, y_Var_srNJet_0b_lowDPhi = getYieldFromChain(cData, srCut+'&&deltaPhi_Wl<'+str(deltaPhiCut), weight_str_sr, returnVar=True)
+      y_srNJet_0b_highDPhi, y_Var_srNJet_0b_highDPhi = getYieldFromChain(cData, srCut+'&&deltaPhi_Wl>='+str(deltaPhiCut), weight_str_sr, returnVar=True)
+      rd['y_srNJet_0b_lowDPhi'] = y_srNJet_0b_lowDPhi
+      rd['y_Var_srNJet_0b_lowDPhi'] = y_Var_srNJet_0b_lowDPhi
+      rd['y_srNJet_0b_highDPhi'] = y_srNJet_0b_highDPhi
+      rd['y_Var_srNJet_0b_highDPhi'] = y_Var_srNJet_0b_highDPhi
 
       rd.update({\
                 'tot_pred':pred_total,'tot_pred_err':pred_total_err,\
