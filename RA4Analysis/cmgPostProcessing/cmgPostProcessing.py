@@ -2,7 +2,7 @@ import ROOT
 import pickle
 import sys, os, copy, random, subprocess, datetime
 from array import array
-from Workspace.RA4Analysis.cmgObjectSelection import cmgLooseLepIndices, splitIndList, get_cmg_jets_fromStruct, splitListOfObjects, cmgTightMuID, cmgTightEleID , get_cmg_genParts_fromStruct
+from Workspace.RA4Analysis.cmgObjectSelection import cmgLooseLepIndices, splitIndList, get_cmg_jets_fromStruct, splitListOfObjects, cmgTightMuID, cmgTightEleID , get_cmg_genParts_fromStruct , get_cmg_JetsforMEt_fromStruct
 from Workspace.HEPHYPythonTools.xsec import xsec
 from Workspace.HEPHYPythonTools.helpers import getObjFromFile, getObjDict, getFileList
 from Workspace.HEPHYPythonTools.convertHelpers import compileClass, readVar, printHeader, typeStr, createClassString
@@ -35,7 +35,7 @@ separateBTagWeights = True
 
 defSampleStr = "TTJets_LO"
 
-subDir = "postProcessing_MC_JEC"
+subDir = "postProcessing_MC_JEC_v2"
 #subDir = "postProcessing_Tests"
 
 #branches to be kept for data and MC
@@ -211,9 +211,9 @@ for isample, sample in enumerate(allSamples):
   aliases = [ "met:met_pt", "metPhi:met_phi"]
 
   readVectors = [\
-    {'prefix':'LepGood', 'nMax':8, 'vars':['rawPt/F','pt/F', 'eta/F', 'phi/F', 'pdgId/I','charge/F' ,'relIso03/F','SPRING15_25ns_v1/I' ,'tightId/I', 'miniRelIso/F','mass/F','sip3d/F','mediumMuonId/I', 'mvaIdPhys14/F','mvaIdSpring15/F','lostHits/I', 'convVeto/I']},
-    {'prefix':'Jet',  'nMax':100, 'vars':['rawPt/F','pt/F', 'eta/F', 'phi/F', 'mass/F','id/I','btagCSV/F', 'btagCMVA/F','corr_JECUp/F','corr_JECDown/F','corr/F']},
-    {'prefix':'JetForMET',  'nMax':100, 'vars':['pt/F', 'eta/F', 'phi/F','mass/F' ,'id/I','hadronFlavour/F','btagCSV/F', 'btagCMVA/F','corr_JECUp/F','corr_JECDown/F','corr/F']},
+    {'prefix':'LepGood', 'nMax':8, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I','charge/F' ,'relIso03/F','SPRING15_25ns_v1/I' ,'tightId/I', 'miniRelIso/F','mass/F','sip3d/F','mediumMuonId/I', 'mvaIdPhys14/F','mvaIdSpring15/F','lostHits/I', 'convVeto/I']},
+    {'prefix':'Jet',  'nMax':100, 'vars':['hadronFlavour/F','rawPt/F','pt/F', 'eta/F', 'phi/F', 'mass/F','id/I','btagCSV/F', 'btagCMVA/F','corr_JECUp/F','corr_JECDown/F','corr/F']},
+    {'prefix':'JetForMET',  'nMax':100, 'vars':['rawPt/F','pt/F', 'eta/F', 'phi/F','mass/F' ,'id/I','hadronFlavour/F','btagCSV/F', 'btagCMVA/F','corr_JECUp/F','corr_JECDown/F','corr/F']},
   ]
   newVariables.extend(['LepToKeep_pdgId/I','l1l2ovMET_lepToKeep/F','Vecl1l2ovMET_lepToKeep/F','DPhil1l2_lepToKeep/F'])
   newVariables.extend(['l1l2ovMET_lepToDiscard/F','Vecl1l2ovMET_lepToDiscard/F','DPhil1l2_lepToDiscard/F'])
@@ -230,11 +230,12 @@ for isample, sample in enumerate(allSamples):
     newVariables.extend(['lepton_muSF_looseID_err/D/0.','lepton_muSF_mediumID_err/D/0.','lepton_muSF_miniIso02_err/D/0.','lepton_muSF_sip3d_err/D/0.','lepton_eleSF_cutbasedID_err/D/0.','lepton_eleSF_miniIso01_err/D/0.'])
     ### Vars for JEC ###
     corr = ["central", "up", "down"]
-    vars_corr = ["ht","LT","met","deltaPhi_Wl"]
+    vars_corr = ["ht","LT","MeT","deltaPhi_Wl"]
     vars_corr_1 = ["nJet","nBJet"]
     for corrJEC_str in corr:
       for vars_str in vars_corr:
         newVariables.extend(["jec_"+vars_str+"_"+corrJEC_str+"/F/-999."])
+        print "jec_"+vars_str+"_"+corrJEC_str+"/F/-999."
       for vars_str in vars_corr_1:
         newVariables.extend(["jec_"+vars_str+"_"+corrJEC_str+"/I/-999."])
 
@@ -303,6 +304,7 @@ for isample, sample in enumerate(allSamples):
         xsec_branch = 1 if sample['isData'] else t.GetLeaf('xsec').GetValue()
         lumi_branch = t.GetLeaf('lumi').GetValue()
         evt_branch = t.GetLeaf('evt').GetValue()
+        #print evt_branch
         s.weight = lumiScaleFactor*genWeight
         if sample['isData']:
           if "Muon" in sample['name']:
@@ -388,7 +390,7 @@ for isample, sample in enumerate(allSamples):
         else:
           s.singleMuonic      = False 
           s.singleElectronic  = False 
-        j_list=['eta','pt','phi','btagCMVA', 'btagCSV', 'id']
+        j_list=['hadronFlavour','eta','pt','phi','btagCMVA', 'btagCSV', 'id']
         jets = filter(lambda j:j['pt']>30 and abs(j['eta'])<2.4 and j['id'], get_cmg_jets_fromStruct(r,j_list))
         lightJets,  bJetsCSV = splitListOfObjects('btagCSV', 0.890, jets)
         s.htJet30j = sum([x['pt'] for x in jets])
@@ -396,8 +398,7 @@ for isample, sample in enumerate(allSamples):
         s.nBJetMediumCSV30 = len(bJetsCSV)
         #s.mt2w = mt2w.mt2w(met = {'pt':r.met_pt, 'phi':r.met_phi}, l={'pt':s.leptonPt, 'phi':s.leptonPhi, 'eta':s.leptonEta}, ljets=lightJets, bjets=bJetsCSV)
         s.deltaPhi_Wl = acos((s.leptonPt+r.met_pt*cos(s.leptonPhi-r.met_phi))/sqrt(s.leptonPt**2+r.met_pt**2+2*r.met_pt*s.leptonPt*cos(s.leptonPhi-r.met_phi))) 
-
-
+        #print s.nJet30
         #For systematics 
         rand_input = evt_branch*lumi_branch
         calc_diLep_contributions(s,r,tightHardLep,rand_input)

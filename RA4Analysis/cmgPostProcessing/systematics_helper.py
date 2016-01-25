@@ -1,3 +1,4 @@
+from Workspace.RA4Analysis.cmgObjectSelection import cmgLooseLepIndices, splitIndList, get_cmg_jets_fromStruct, splitListOfObjects, cmgTightMuID, cmgTightEleID , get_cmg_genParts_fromStruct , get_cmg_JetsforMEt_fromStruct
 from btagEfficiency import *
 from math import *
 
@@ -247,7 +248,7 @@ def getNew_METandLT_WithJEC(s,r, corrJEC = "central"):
 
    newjets = oldjets
 
-   oldjets = filter(lambda j:j['pt']>minJpt , jets)
+   oldjets = filter(lambda j:j['pt']>minJpt , oldjets)
    for jet in oldjets: 
       jet['4vec'] = ROOT.TLorentzVector()
       jet['4vec'].SetPtEtaPhiM(jet['pt'],jet['eta'],jet['phi'],jet['mass'])
@@ -266,6 +267,10 @@ def getNew_METandLT_WithJEC(s,r, corrJEC = "central"):
    # filter jets
    newjets = filter(lambda j:j['pt']>minJpt , newjets)
 
+   for jet in newjets:
+    jet['4vec'] = ROOT.TLorentzVector()
+    jet['4vec'].SetPtEtaPhiM(jet['pt'],jet['eta'],jet['phi'],jet['mass'])
+   #print "new Jets " , len(newjets)
    # vectorial sum of jets to substruct
    for jet in newjets: deltaJetP4 -= jet['4vec']  ###now deltaJetP4 is the difference 
 
@@ -276,8 +281,8 @@ def getNew_METandLT_WithJEC(s,r, corrJEC = "central"):
    newLT = s.leptonPt + newMET.Pt()
    newDeltaPhi_Wl = acos((s.leptonPt+newMET.Pt()*cos(s.leptonPhi-newMET.Phi()))/sqrt(s.leptonPt**2+newMET.Pt()**2+2*newMET.Pt()*s.leptonPt*cos(s.leptonPhi-newMET.Phi())))
     
-   print "OLD MET:", met_4vec.Pt() ,"MET diff = ", deltaJetP4.Pt() , "NEW MET:" , newMET.Pt() 
-   return {"met": newMET.Pt(), "LT": newLT ,'deltaPhi_Wl': newDeltaPhi_Wl}
+   #print "OLD MET:", met_4vec.Pt() ,"MET diff = ", deltaJetP4.Pt() , "NEW MET:" , newMET.Pt() 
+   return {"MeT": newMET.Pt(), "LT": max(0,newLT) ,'deltaPhi_Wl': max(0,newDeltaPhi_Wl)}
 
 def getNew_JetVars_WithJEC(r ,corrJEC = "central"):
 
@@ -298,7 +303,7 @@ def getNew_JetVars_WithJEC(r ,corrJEC = "central"):
    newNJet = len(newjets)
    newlightJets,  newbJetsCSV = splitListOfObjects('btagCSV', 0.890, newjets)
    newNBtags = len(newbJetsCSV)
-
+   #print {"ht": newHT , "nJet": newNJet , "nBJet": newNBtags }
    return {"ht": newHT , "nJet": newNJet , "nBJet": newNBtags } 
 
 
@@ -306,13 +311,16 @@ def fill_branch_WithJEC(s,r):
 
   corr = ["central", "up", "down"]
   vars_corr = ["ht","nJet","nBJet"]
-  vars_corr_1 = ["LT","met","deltaPhi_Wl"]
+  vars_corr_1 = ["LT","MeT","deltaPhi_Wl"]
   for corrJEC_str in corr:
     central_jet_vars_metLT = getNew_METandLT_WithJEC(s,r, corrJEC = corrJEC_str) 
     central_jet_vars_jetVars = getNew_JetVars_WithJEC(r ,corrJEC = corrJEC_str)
     for vars_str in vars_corr:
       exec("s.jec_"+vars_str+"_"+corrJEC_str+"="+str(central_jet_vars_jetVars[vars_str]))
     for vars_str in vars_corr_1:
+      #print vars_str , corrJEC_str , central_jet_vars_metLT[vars_str]
+      if central_jet_vars_metLT[vars_str] >1000000  : continue
+      #print "s.jec_"+vars_str+"_"+corrJEC_str+"="+str(central_jet_vars_metLT[vars_str])
       exec("s.jec_"+vars_str+"_"+corrJEC_str+"="+str(central_jet_vars_metLT[vars_str]))
 
   return
