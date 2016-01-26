@@ -210,7 +210,8 @@ for injb,srNJet in enumerate(sorted(signalRegions)):
       
       #JEC
       print jec[srNJet][stb][htb]['delta_Up_central'], jec[srNJet][stb][htb]['delta_Down_central'], jec[srNJet][stb][htb]['delta_Up_central']/jec[srNJet][stb][htb]['delta_Down_central']
-      jecErr = max(map(abs,[jec[srNJet][stb][htb]['delta_Up_central'], jec[srNJet][stb][htb]['delta_Down_central']]))
+      #jecErr = max(map(abs,[jec[srNJet][stb][htb]['delta_Up_central'], jec[srNJet][stb][htb]['delta_Down_central']]))
+      jecErr = (abs(jec[srNJet][stb][htb]['delta_Up_central']) + abs(jec[srNJet][stb][htb]['delta_Down_central']))/2
       jecErrH.SetBinContent(i, jecErr)
       
       #QCD fit
@@ -246,11 +247,11 @@ for injb,srNJet in enumerate(sorted(signalRegions)):
       rcsErrH.SetBinContent(i,rcsErr)
       
       #totalSyst = bErr**2 + wXErr**2 + ttXErr**2 + wPErr**2 + qcdErr**2 + dilepSlope**2 + dilepConstant**2 + topErr**2 + puErr**2 + lepSFErr**2
-      totalSyst = bErr**2 + wXErr**2 + ttXErr**2 + wPErr**2 + qcdErr**2 + rcsErr**2 + topErr**2 + puErr**2 + lepSFErr**2 + dilepErr**2
+      totalSyst = bErr**2 + wXErr**2 + ttXErr**2 + wPErr**2 + qcdErr**2 + rcsErr**2 + topErr**2 + puErr**2 + lepSFErr**2 + dilepErr**2 + jecErr**2
       totalSyst = sqrt(totalSyst)
 
-      ttSyst  = sqrt(bErr_tt**2 + wXErr**2 + ttXErr**2 + wPErr**2 + dilepErr**2 + qcdErr**2 + topErr**2 + puErr**2 + lepSFErr**2 + rcsErr_tt**2)
-      WSyst   = sqrt(bErr_W**2  + wXErr**2 + ttXErr**2 + wPErr**2 + dilepErr**2 + qcdErr**2 + topErr**2 + puErr**2 + lepSFErr**2 + rcsErr_W**2)
+      ttSyst  = sqrt(bErr_tt**2 + wXErr**2 + ttXErr**2 + wPErr**2 + dilepErr**2 + qcdErr**2 + topErr**2 + puErr**2 + lepSFErr**2 + jecErr**2 + rcsErr_tt**2)
+      WSyst   = sqrt(bErr_W**2  + wXErr**2 + ttXErr**2 + wPErr**2 + dilepErr**2 + qcdErr**2 + topErr**2 + puErr**2 + lepSFErr**2 + jecErr**2 + rcsErr_W**2)
       restSyst = 0.5
       
       dataStat = dataResult[srNJet][stb][htb]['tot_pred_err']/dataResult[srNJet][stb][htb]['tot_pred']
@@ -259,7 +260,7 @@ for injb,srNJet in enumerate(sorted(signalRegions)):
       
       systematics = {'btagSF':bErr, 'b_c_SF':b_c_SF, 'mistag_SF':mistag_SF, 'Wxsec':wXErr, 'TTxsec':ttXErr, 'Wpol':wPErr}
       systematics.update({'rcs':rcsErr, 'QCD':qcdErr, 'total':totalSyst, 'rcs_tt':rcsErr_tt, 'rcs_W':rcsErr_W, 'total_tt':ttSyst, 'total_W':WSyst, 'total_Rest':restSyst, 'ratio_mu_elemu':W_muToLep})
-      systematics.update({'topPt':topErr, 'dilep':dilepErr, 'pileup':puErr, 'lepSF':lepSFErr, 'kappa_b':kappa_b_Err, 'kappa_TT':kappa_TT_Err, 'kappa_W':kappa_W_Err})
+      systematics.update({'topPt':topErr, 'dilep':dilepErr, 'pileup':puErr, 'lepSF':lepSFErr, 'kappa_b':kappa_b_Err, 'kappa_TT':kappa_TT_Err, 'kappa_W':kappa_W_Err, 'JEC':jecErr})
 
       #apply systemtatics on Rcs
       TT_kappa_err_syst  = rcs[srNJet][stb][htb]['TT_kappa']*ttSyst

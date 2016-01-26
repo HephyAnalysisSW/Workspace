@@ -9,25 +9,10 @@ from array import array
 from Workspace.HEPHYPythonTools.helpers import *
 from Workspace.RA4Analysis.helpers import *
 from Workspace.RA4Analysis.signalRegions import *
-#from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
-#from Workspace.RA4Analysis.cmgTuplesPostProcessed_Spring15_hard import *
-#from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_postProcessed import *
-#from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT400ST200_postProcessed import *
-#from Workspace.RA4Analysis.cmgTuples_Data25ns_0l import *
-#from Workspace.RA4Analysis.cmgTuples_Data25ns_Artur import *
-
-#from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT400ST200_postProcessed_fromArthur import *
-#from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT400ST200_postProcessed_btagWeight import *
-#from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT500ST250_postProcessed_btagWeight import *
-#from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT500ST250_postProcessed_fromArthur import *
 from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed import *
 from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed_2 import *
 
 from Workspace.RA4Analysis.cmgTuples_Data25ns_miniAODv2_postprocessed import *
-#from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed_btag import *
-
-#from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT400ST200_postProcessed import *
-#from Workspace.RA4Analysis.cmgTuples_Spring15_50ns_postProcessed import *
 from Workspace.HEPHYPythonTools.user import username
 
 from helpers import *
@@ -40,16 +25,9 @@ def getBTagCutAndWeight(chain, btagcut, btagweight, cut, weight):
 
 
 lepSel = 'hard'
-##50ns samples
-#WJETS = {'name':'WJets', 'chain':getChain(WJetsToLNu_50ns,histname=''), 'color':color('WJets'),'weight':'weight', 'niceName':'W Jets'}
-#TTJETS = {'name':'TTJets', 'chain':getChain(TTJets_50ns,histname=''), 'color':color('TTJets'),'weight':'weight', 'niceName':'t#bar{t} Jets'}
-#DY = {'name':'DY', 'chain':getChain(DY_50ns,histname=''), 'color':color('DY'),'weight':'weight', 'niceName':'Drell Yan'}
-#singleTop = {'name':'singleTop', 'chain':getChain(singleTop_50ns,histname=''), 'color':color('singleTop'),'weight':'weight', 'niceName':'single Top'}
-#QCD = {'name':'QCD', 'chain':getChain(QCDMu_50ns,histname=''), 'color':color('QCD'),'weight':'weight', 'niceName':'QCD'}
-#samples = [WJETS, TTJETS, DY, singleTop, QCD]
 
 
-totalWeight = 'weight'#*puReweight_true*lepton_muSF_mediumID*lepton_muSF_miniIso02*lepton_muSF_sip3d*lepton_eleSF_cutbasedID*lepton_eleSF_miniIso01'
+totalWeight = 'weight*lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*TopPtWeight*0.94*puReweight_true_max4'
 #25ns samples
 WJETS = {'name':'WJets', 'chain':getChain(WJetsHTToLNu_25ns,histname=''), 'color':color('WJets'),'weight':totalWeight, 'niceName':'W+Jets', 'cut':''}
 WJETS_2 = {'name':'WJets', 'chain':getChain(WJetsHTToLNu_25ns_2,histname=''), 'color':ROOT.kOrange,'weight':totalWeight, 'niceName':'W+Jets fix', 'cut':''}
@@ -84,7 +62,7 @@ samplesTTcheck = [WJETS, TTJets_combined_singleLep, TTJets_combined_diLep, TTJet
 
 #EWK = {'name':'EWK', 'chain':getChain([WJetsHT_25ns,TTJets_HTLO_25ns,singleTop_25ns,DY_25ns,TTV_25ns],histname=''), 'color':color('DY'),'weight':'weight', 'niceName':'EWK'}
 
-data = {'name':'data', 'chain':getChain([single_mu_Run2015D, single_ele_Run2015D],histname=''), 'color':ROOT.kBlack,'weight':'weight', 'niceName':'data', 'cut':''}
+#data = {'name':'data', 'chain':getChain([single_mu_Run2015D, single_ele_Run2015D],histname=''), 'color':ROOT.kBlack,'weight':'weight', 'niceName':'data', 'cut':}
 
 
 # older samples
@@ -125,12 +103,16 @@ nBJetMediumCSV30 = {'name':'nBJetMediumCSV30', 'binning':[5,0,5], 'titleX':'nBJe
 nBJetMedium30 = {'name':'nBJetMedium30', 'binning':[5,0,5], 'titleX':'nBJetMedium30', 'titleY':'Events'}
 
 st = {'name':'st', 'binning':[37,250,2100], 'titleX':'L_{T} [GeV]', 'titleY':'Events'}
-ht = {'name':'htJet30j', 'binning':[52,500,3100], 'titleX':'H_{T} [GeV]', 'titleY':'Events'}
+stRB = {'name':'st', 'binning':[20,250,1250], 'titleX':'L_{T} [GeV]', 'titleY':'Events', 'filename':'lt'}
+
+htRB = {'name':'htJet30j', 'binning':[25,500,2500], 'titleX':'H_{T} [GeV]', 'titleY':'Events', 'filename':'ht'}
 njet = {'name':'nJet30', 'binning':[15,0,15], 'titleX':'n_{jets}', 'titleY':'Events', 'filename':'nJet30'}
 deltaPhi = {'name':'deltaPhi_Wl', 'binning':[32,0,3.2], 'titleX':'#Delta#Phi(W,l)', 'titleY':'Events'}
-deltaPhiRB = {'name':'deltaPhi_Wl', 'binning':[16,0,3.2], 'titleX':'#Delta#Phi(W,l)', 'titleY':'Events'}
+deltaPhiRB = {'name':'deltaPhi_Wl', 'binning':[16,0,3.2], 'titleX':'#Delta#Phi(W,l)', 'titleY':'Events', 'filename':'deltaPhi_Wl'}
 
-leptonPt = {'name':'leptonPt', 'binning':[40,0,1000], 'titleX':'p_{T} [GeV]', 'titleY':'Events'}
+leptonPt = {'name':'leptonPt', 'binning':[40,0,1000], 'titleX':'p_{T} [GeV]', 'titleY':'Events', 'filename':'leptonPt'}
+leptonPhi = {'name':'leptonPt', 'binning':[40,0,1000], 'titleX':'p_{T} [GeV]', 'titleY':'Events', 'filename':'leptonPhi'}
+
 lepGoodPt = {'name':'LepGood_pt[0]', 'binning':[22,0,1100], 'titleX':'p_{T} [GeV] (lepton)', 'titleY':'Events', 'filename':'LepGood_pt[0]'}
 lepGoodEta = {'name':'LepGood_eta[0]', 'binning':[30,-3.,3.], 'titleX':'#eta (lepton)', 'titleY':'Events', 'filename':'LepGood_eta[0]'}
 leadingJetPt = {'name':'Jet_pt[0]', 'binning':[40,0,2000], 'titleX':'p_{T} (leading jet) [GeV]', 'titleY':'Events', 'filename':'Jet_pt[0]'}
@@ -190,6 +172,9 @@ preselDiEle = '((isData&&'+triggers+'&&'+filters+')||(!isData))&&('+diElectronic
 preselMultiLep = '((isData&&'+triggers+'&&'+filters+')||(!isData))&&('+ multiLeptonic + '&&Jet_pt[1]>80&&(LepGood_pt[0]+met_pt)>250&&nJet30>2&&htJet30j>500)'
 
 noCut = {'name':'empty', 'string':'(1)', 'niceName':'no cut'}
+
+name, allSRcut = nameAndCut((250,-1),(500,-1),(5,-1),btb=(0,-1),presel=newpresel)
+allSR = {'name':name,'string':allSRcut,'niceName':'all SR'}
 
 name, cut = nameAndCut((250,350),(500,750),(4,5),btb=(0,-1),presel=newpresel)
 ttSBbin1 = {'name':name,'string':cut,'niceName':'Lowest SR'}
@@ -271,19 +256,6 @@ antiFakeMetSelection = '('+fakeMet+'<50&&'+fakeMet+'<met_genPt)'
 
 AFMCut = {'name':'AFMCut','string':newpresel+"&&acos(cos(Jet_phi[0]-met_phi))>0.45&&acos(cos(Jet_phi[1]-met_phi))>0.45", 'niceName':'E_{T}^{miss} veto'}
 
-
-#name, cut = nameAndCut((250,350),(1000,-1),(5,5),btb=(0,0),presel=newpresel)
-#cut1 = {'name':name,'string':cut,'niceName':'L_{T} [250,350), H_{T} [1000,-1)'}
-#name, cut = nameAndCut((350,450),(750,1000),(5,5),btb=(0,0),presel=presel)
-#cut2 = {'name':name,'string':cut,'niceName':'L_{T} [350,450), H_{T} [750,1000)'}
-#name, cut = nameAndCut((450,-1),(750,1000),(5,5),btb=(0,0),presel=presel)
-#cut3 = {'name':name,'string':cut,'niceName':'L_{T} [450,-1), H_{T} [750,1000)'}
-#name, cut = nameAndCut((450,-1),(1000,-1),(5,5),btb=(0,0),presel=presel)
-#cut4 = {'name':name,'string':cut,'niceName':'L_{T} [450,-1), H_{T} [1000,-1)'}
-#name, cut = nameAndCut((450,-1),(500,750),(5,5),btb=(0,0),presel=presel)
-#cut5 = {'name':name,'string':cut,'niceName':'L_{T} [450,-1), H_{T} [500,750)'}
-#
-#cuts = [cut1, cut2, cut3, cut4, cut5]
 
 randomCut = 'weight*(singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80&&st>250&&st<350&&nJet30>=3&&htJet30j>500&&htJet30j<750&&nBJetMediumCSV30==0)'
 
@@ -389,7 +361,7 @@ nbjetComp = {'name':btagStr, 'binning':[6,0,6], 'titleX':'n_{b-jets}', 'titleY':
 #datacut = datapresel+trigger+filters
 #dataDict = {'chain':data, 'cut':datacut,'name':'data'}
 
-#data = {'name':'data', 'chain':getChain([SingleElectron_Run2015D,SingleMuon_Run2015D],histname=''), 'cut':newpresel+'&&SingleElectronic'+trigger}
+data = {'name':'data', 'chain':getChain([single_mu_Run2015D, single_ele_Run2015D],histname=''), 'cut':newpresel+allSRcut+'&&nBJetMediumCSV30==0'}
 
 deltaPhiCMG_NoHF = {'binning': [30, 0, 3.2], 'name': 'Sum$((acos((LepGood_pt+metNoHF_pt*cos(LepGood_phi-metNoHF_phi))/sqrt(LepGood_pt**2+metNoHF_pt**2+2*metNoHF_pt*LepGood_pt*cos(LepGood_phi-metNoHF_phi))))*'+LeptonId+')', 'titleX': '#Delta#Phi(W,l) NoHF', 'titleY': 'Events'}
 #deltaPhiCMG = {'binning': [32, 0, 3.2], 'name': 'Sum$((acos((LepGood_pt+met_pt*cos(LepGood_phi-met_phi))/sqrt(LepGood_pt**2+met_pt**2+2*met_pt*LepGood_pt*cos(LepGood_phi-met_phi))))*'+LeptonId+')', 'titleX': '#Delta#Phi(W,l) NoHF', 'titleY': 'Events', 'filename':'deltaPhi_Wl', 'binningIsExplicit':True}
@@ -822,10 +794,13 @@ def savePlot(plotDict, path, filename, fileType=['pdf','root','png']):
   for t in fileType:
     plotDict['canvas'].Print(wwwDir+path+filename+'.'+t)
 
+dataList = [stRB, htRB, met, deltaPhiRB, njet, leadingJetPt, metPhi, leptonPt, leptonPt]
+
 def createDefaultDataPlots(dataList):
   for a in dataList:
-    t = plot(samples,a,newPreselCut, data=dataDict,filling=True,stacking=True,minimum=0.08, maximum=2000, MClumiScale=204./3000., setLogY=True, lumi=0.204, titleText='preliminary')
-    savePlot(t, 'data/25ns/204pbV3/',a['filename'])
+    t = plot(samples, a, allSR, data=data, setLogY=True, btagcut='nBJetMediumCSV30==0', btagweight='weightBTag0_SF', stacking=True, filling=True, lumi=2.25, MClumiScale=2.25/3., titleText='preliminary')
+    #t = plot(samples,a,newPreselCut, data=dataDict,filling=True,stacking=True,minimum=0.08, maximum=2000, MClumiScale=204./3000., setLogY=True, lumi=0.204, titleText='preliminary')
+    savePlot(t, 'Results2016/2p25fb/',a['filename'])
 #plot(samples,st,cuts)
 
 #vars = [st,ht,njet,deltaPhi,leptonPt,leadingJetPt]

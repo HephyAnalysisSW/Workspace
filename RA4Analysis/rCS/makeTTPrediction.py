@@ -155,7 +155,7 @@ def makeTTPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, QCD=F
     rd['yQCD_crNJet_1b_lowDPhi']      = QCD_lowDPhi['y']
     rd['yQCD_Var_crNJet_1b_lowDPhi']  = QCD_lowDPhi['e']**2
     rd['yQCD_crNJet_1b_highDPhi']     = QCD_highDPhi['y']
-    rd['yQCD_Var_crNJet_1b_highDPhi'] = QCD_lowDPhi['e']**2
+    rd['yQCD_Var_crNJet_1b_highDPhi'] = QCD_highDPhi['e']**2
     rd['yQCD_srNJet_0b_lowDPhi']      = QCD_dict[0]['y']
     rd['yQCD_Var_srNJet_0b_lowDPhi']  = QCD_dict[0]['e']**2
     rd['yQCD_srNJet_0b']              = QCD_dict[0]['totalY']

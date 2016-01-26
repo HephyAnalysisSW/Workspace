@@ -34,10 +34,10 @@ if QCDup: nameSuffix += '_QCDup'
 if QCDdown: nameSuffix += '_QCDdown'
 
 ## samples
-isData              = False
-unblinded           = False
+isData              = True
+unblinded           = True
 validation          = False
-isCentralPrediction = True
+isCentralPrediction = False
 if isData:
   isCentralPrediction = False
 
@@ -83,6 +83,7 @@ else:
 lumi = 2.25
 templateLumi = 2.25 # lumi that was used when template was created - if defined wrong, fixed rest backgrounds will be wrong
 sampleLumi = 3.
+printlumi = '2.2'
 debugReweighting = False
 
 year = '2016'
@@ -111,7 +112,7 @@ pickleDir   = '/data/'+username+'/Results'+year+'/Prediction_'+predictionName+'_
 templateDir = '/data/'+username+'/Results'+year+'/btagTemplates_'+templateName+'_'+templateLumistr+'/'
 prefix = 'singleLeptonic_Spring15_'
 
-kappa_dict_dir = '/data/'+username+'/Results'+year+'/Prediction_SFtemplates_validation_lep_MC_SF_2p3/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'
+kappa_dict_dir = '/data/'+username+'/Results'+year+'/Prediction_SFtemplates_fullSR_lep_MC_SF_2p25/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'
 
 ## Preselection cut
 triggers = "(HLT_EleHT350||HLT_MuHT350)"
@@ -126,6 +127,8 @@ singleMu_presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSof
 
 ## corrections
 createFits = True
+if not isCentralPrediction:
+  createFits = False
 fitDir = '/data/'+username+'/Results'+year+'/correctionFit_'+regStr+'_MC/'
 fitPrintDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results'+year+'/25ns/RcsFit_'+predictionName+'_'+lumistr+'/'
 

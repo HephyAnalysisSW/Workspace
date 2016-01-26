@@ -107,17 +107,19 @@ for srNJet in signalRegions:
       #write out data yields in MB, edit for blinding policies
       if isData:
         srName, srCut = nameAndCut(stb, htb, srNJet, btb=(0,0), presel=presel, btagVar = nBTagVar)
-        weight_str_sr = weight_str
+        weight_str_sr = '(1)'
       else:
         srName, srCut = nameAndCut(stb, htb, srNJet, btb=None, presel=presel, btagVar = nBTagVar)
         weight_str_sr = weight_str+'*weightBTag0_SF'
+      
+      if unblinded:
+        y_srNJet_0b_highDPhi, y_Var_srNJet_0b_highDPhi = getYieldFromChain(cData, srCut+'&&deltaPhi_Wl>='+str(deltaPhiCut), weight_str_sr, returnVar=True)
+        rd['y_srNJet_0b_highDPhi'] = y_srNJet_0b_highDPhi
+        rd['y_Var_srNJet_0b_highDPhi'] = y_Var_srNJet_0b_highDPhi
 
       y_srNJet_0b_lowDPhi, y_Var_srNJet_0b_lowDPhi = getYieldFromChain(cData, srCut+'&&deltaPhi_Wl<'+str(deltaPhiCut), weight_str_sr, returnVar=True)
-      y_srNJet_0b_highDPhi, y_Var_srNJet_0b_highDPhi = getYieldFromChain(cData, srCut+'&&deltaPhi_Wl>='+str(deltaPhiCut), weight_str_sr, returnVar=True)
       rd['y_srNJet_0b_lowDPhi'] = y_srNJet_0b_lowDPhi
       rd['y_Var_srNJet_0b_lowDPhi'] = y_Var_srNJet_0b_lowDPhi
-      rd['y_srNJet_0b_highDPhi'] = y_srNJet_0b_highDPhi
-      rd['y_Var_srNJet_0b_highDPhi'] = y_Var_srNJet_0b_highDPhi
 
       rd.update({\
                 'tot_pred':pred_total,'tot_pred_err':pred_total_err,\
