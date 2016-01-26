@@ -55,10 +55,6 @@ d = lepSFfile.Get('cb')
 lepSF_h1b = d.GetPrimitive('h1b')
 lepSF_h2b = d.GetPrimitive('h2b')
 
-#ttdifile = ROOT.TFile('/data/easilar/uncRoot/ttJets_diLep_Unc.root')
-#c = ttdifile.Get('cb')
-#ttdi_h1b = a.GetPrimitive('h1b')
-#ttdi_h2b = a.GetPrimitive('h2b')
 
 #pickleDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_validation_lep_data_2p3/'
 
@@ -72,20 +68,12 @@ if validation:
 else:
   dilep   = pickle.load(file('/data/dspitzbart/Results2016/dilep_pkl'))
 
-#if validation:
-#  dilep   = pickle.load(file('/data/easilar/Spring15/25ns/unc_with_validationRegionAll'))
-#else:
-#  dilep   = pickle.load(file('/data/easilar/Spring15/25ns/extended_with_truth_counts_tot_kappa_pkl'))
-
 topPt_Err = pickle.load(file("/data/easilar/Spring15/25ns/extended_with_truth_counts_topPt_pkl"))
 pu_Unc    = pickle.load(file("/data/easilar/Spring15/25ns/extended_with_truth_counts_PU_pkl"))
 lep_Eff   = pickle.load(file("/data/easilar/Spring15/25ns/extended_with_truth_counts_LS_pkl"))
 jec       = pickle.load(file('/data/easilar/Spring15/25ns/Jec_syst_SRAll_pkl'))
-#dilep   = pickle.load(file('/data/easilar/Spring15/25ns/unc_with_validationRegionAll'))
 
-#rcs = pickle.load(file('/data/dspitzbart/Results2015/Prediction_SFtemplates_fullSR_lep_MC_SF_2.1/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'))
 dataResult = rcs
-#dataResult = pickle.load(file('/data/dspitzbart/Results2015/Prediction_SFtemplates_fullSR_lep_data_2.1/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'))
 
 colors = [ROOT.kBlue+2, ROOT.kBlue-4, ROOT.kBlue-7, ROOT.kBlue-9, ROOT.kCyan-9, ROOT.kCyan-6, ROOT.kCyan-2,ROOT.kGreen+3,ROOT.kGreen-2,ROOT.kGreen-6,ROOT.kGreen-7, ROOT.kOrange-4, ROOT.kOrange+1, ROOT.kOrange+8, ROOT.kRed, ROOT.kRed+1]
 colors = [ROOT.kBlue-7, ROOT.kCyan-9, ROOT.kCyan-2, ROOT.kGreen-6, ROOT.kOrange+6, ROOT.kRed+1, ROOT.kRed-6, ROOT.kYellow+2, ROOT.kGreen, ROOT.kGreen+3, ROOT.kBlue-2]

@@ -18,8 +18,10 @@ from Workspace.RA4Analysis.cmgTuples_Data25ns_miniAODv2 import *
 from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns import *
 from systematics_helper import calc_btag_systematics, calc_LeptonScale_factors_and_systematics
 from btagEfficiency import *
+from leptonFastSimSF import leptonFastSimSF as leptonFastSimSF_
 
-bTagEffFile = '/data/dspitzbart/Results2015/MCEff_skim_pkl'
+#bTagEffFile = '/data/dspitzbart/Results2015/MCEff_skim_pkl'
+bTagEffFile = '/data/dspitzbart/Results2016/MCEff_skim_signal_pkl'
 
 try:
   mcEffDict = pickle.load(file(bTagEffFile))
@@ -348,7 +350,8 @@ for isample, sample in enumerate(allSamples):
 
             calc_LeptonScale_factors_and_systematics(s,histos_LS)
             if calcSystematics: 
-              calc_btag_systematics(t,s,r,mcEffDict,sampleKey,maxConsideredBTagWeight,separateBTagWeights)
+              calc_btag_systematics(t,s,r,mcEffDict,sampleKey,maxConsideredBTagWeight,separateBTagWeights, model='T5qqqqWW')
+              calc
 
             for v in newVars:
               v['branch'].Fill()

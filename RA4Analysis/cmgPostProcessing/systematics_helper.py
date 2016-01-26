@@ -2,10 +2,10 @@ from Workspace.RA4Analysis.cmgObjectSelection import cmgLooseLepIndices, splitIn
 from btagEfficiency import *
 from math import *
 
-def calc_btag_systematics(t,s,r,mcEffDict,sampleKey,maxConsideredBTagWeight,separateBTagWeights):
+def calc_btag_systematics(t,s,r,mcEffDict,sampleKey,maxConsideredBTagWeight,separateBTagWeights, model=''):
   #separateBTagWeights = False
   zeroTagWeight = 1.
-  mceff = getMCEfficiencyForBTagSF(t, mcEffDict[sampleKey], sms='')
+  mceff = getMCEfficiencyForBTagSF(t, mcEffDict[sampleKey], sms=model)
   #print
   #print mceff["mceffs"]
   mceffW                = getTagWeightDict(mceff["mceffs"], maxConsideredBTagWeight)
