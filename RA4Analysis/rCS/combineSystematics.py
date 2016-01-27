@@ -10,7 +10,7 @@ from rCShelpers import *
 import math
 from Workspace.HEPHYPythonTools.user import username
 from Workspace.RA4Analysis.signalRegions import *
-from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
+#from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
 from array import array
 
 from predictionConfig import *
@@ -421,9 +421,9 @@ total_err.Draw('2 same')
 
 can.cd()
 
-can.Print('/afs/hephy.at/user/e/easilar/www/Results2016/syst_errors.png')
-can.Print('/afs/hephy.at/user/e/easilar/www/Results2016/syst_errors.root')
-can.Print('/afs/hephy.at/user/e/easilar/www/Results2016/syst_errors.pdf')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/syst_errors.png')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/syst_errors.root')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/syst_errors.pdf')
 
 #pickle.dump(rcs, file(pickleDir+'resultsFinal_withSystematics_pkl','w'))
 
