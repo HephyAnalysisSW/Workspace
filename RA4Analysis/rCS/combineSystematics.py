@@ -56,7 +56,7 @@ lepSF_h1b = d.GetPrimitive('h1b')
 lepSF_h2b = d.GetPrimitive('h2b')
 
 
-#pickleDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_validation_lep_data_2p3/'
+pickleDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_validation_lep_data_2p3/'
 
 wpol    = pickle.load(file('/data/dhandl/results2015/WPolarizationEstimation/20151218_wjetsPolSys_pkl'))
 b_err   = pickle.load(file('/data/dspitzbart/Results2016/btagErr_pkl'))
@@ -322,9 +322,10 @@ for i_h,h in enumerate(hists):
 #h_Stack.Add(wPErrH)
 #h_Stack.Add(puErrH)
 #h_Stack.Add(lepSFErrH)
+#h_Stack.Add(jecErrH)
 
 h_Stack.SetMaximum(1.5)
-h_Stack.SetMinimum(0)
+h_Stack.SetMinimum(0.0)
 
 leg = ROOT.TLegend(0.7,0.75,0.98,0.95)
 leg.SetFillColor(ROOT.kWhite)
@@ -420,9 +421,9 @@ total_err.Draw('2 same')
 
 can.cd()
 
-can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2016/'+predictionName+'_syst_errors.png')
-can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2016/'+predictionName+'_syst_errors.root')
-can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2016/'+predictionName+'_syst_errors.pdf')
+can.Print('/afs/hephy.at/user/e/easilar/www/Results2016/syst_errors.png')
+can.Print('/afs/hephy.at/user/e/easilar/www/Results2016/syst_errors.root')
+can.Print('/afs/hephy.at/user/e/easilar/www/Results2016/syst_errors.pdf')
 
-pickle.dump(rcs, file(pickleDir+'resultsFinal_withSystematics_pkl','w'))
+#pickle.dump(rcs, file(pickleDir+'resultsFinal_withSystematics_pkl','w'))
 
