@@ -18,6 +18,7 @@ from Workspace.RA4Analysis.cmgTuples_Data25ns_miniAODv2 import *
 from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns import *
 from systematics_helper import calc_btag_systematics, calc_LeptonScale_factors_and_systematics, calc_TopPt_Weights , calcDLDictionary, calc_diLep_contributions ,  fill_branch_WithJEC
 from btagEfficiency import *
+from readVetoEventList import *
 
 bTagEffFile = '/data/dspitzbart/Results2016/MCEff_skim_hadron_pkl'
 
@@ -126,6 +127,9 @@ if options.skim=='inc':
 
 if sys.argv[0].count('ipython'):
   options.small=True
+
+###get evt Veto List  for filters####
+evt_veto_list = evt_veto_list()
 
 ###For PU reweight###
 PU_dir = "/data/easilar/tuples_from_Artur/JECv6recalibrateMET_2p2fb/PUhistos/"
@@ -307,6 +311,10 @@ for isample, sample in enumerate(allSamples):
         #print evt_branch
         s.weight = lumiScaleFactor*genWeight
         if sample['isData']:
+
+          vetoEvt = str(t.GetLeaf('run').GetValue())+":"+str(lumi_branch)+":"+str(evt_branch)+"\n"
+          if vetoEvt in evt_veto_list : continue
+
           if "Muon" in sample['name']:
             s.muonDataSet = True
             s.eleDataSet = False
