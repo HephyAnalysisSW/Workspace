@@ -225,20 +225,20 @@ def getMCEfficiencyForBTagSF(c, mcEff, onlyLightJetSystem = False, sms=""):
   mceffs_SF_light_Down = tuple()
   for jParton, jPt, jEta, r in jets:
     if sms!="":
-      if abs(parton)==5: #SF for b
+      if abs(jParton)==5: #SF for b
         hadId = 0
-      elif abs(parton)==4: #SF for c
+      elif abs(jParton)==4: #SF for c
         hadId = 1
       else: #SF for light flavours
         hadId = 2
-      if pt < 799.9:
-        fsim_SF       = readerFSCentral.eval(hadId, eta, pt)
-        fsim_SF_down  = readerFSDown.eval(hadId, eta, pt)
-        fsim_SF_up    = readerFSUp.eval(hadId, eta, pt)
+      if jPt < 799.9:
+        fsim_SF       = readerFSCentral.eval(hadId, jEta, jPt)
+        fsim_SF_down  = readerFSDown.eval(hadId, jEta, jPt)
+        fsim_SF_up    = readerFSUp.eval(hadId, jEta, jPt)
       else:
-        fsim_SF       = readerFSCentral.eval(hadId, eta, 799.9)
-        fsim_SF_down  = readerFSDown.eval(hadId, eta, 799.9)
-        fsim_SF_up    = readerFSUp.eval(hadId, eta, 799.9)
+        fsim_SF       = readerFSCentral.eval(hadId, jEta, 799.9)
+        fsim_SF_down  = readerFSDown.eval(hadId, jEta, 799.9)
+        fsim_SF_up    = readerFSUp.eval(hadId, jEta, 799.9)
         fsim_SF_down  = 2*fsim_SF_down - fsim_SF
         fsim_SF_up    = 2*fsim_SF_up - fsim_SF
     else:
@@ -271,6 +271,10 @@ def getTagWeightDict(effs, maxConsideredBTagWeight):
     twfSum = 0.
     for tagged in itertools.combinations(effs, i):
       twf=1.
+      for x in tagged:
+        if x ==1:
+          print 'Possible problem spotted!'
+          print effs, tagged
       for fac in [x/(1-x) for x in tagged]:
         twf*=fac
       twfSum+=twf

@@ -139,7 +139,8 @@ def getTreeFromChunk(c, skimCond, iSplit, nSplit):
   return t
        
 
-pickleDir = '/data/'+username+'/Spring15/25ns/'
+#pickleDir = '/data/'+username+'/Spring15/25ns/'
+pickleDir = '/data/easilar/Spring15/25ns/'
 
 exec('allSamples=['+options.allsamples+']')
 for isample, sample in enumerate(allSamples):
@@ -170,8 +171,9 @@ for isample, sample in enumerate(allSamples):
       if ("T5qqqqVV" in sample['name']) : lumiScaleFactor = mass_point["xsec"]*target_lumi/mass_point["nEntry"]  
       
       sampleKey = ''
-      if 'TTJets' in sample['dbsName']: sampleKey = 'TTJets'
-      elif 'WJets' in sample['dbsName']: sampleKey = 'WJets'
+      if 'T5qqqqVV_mGluino_1400To1550' in sample['name']: sampleKey = 'T5qqqqWW_1500'
+      elif 'T5qqqqVV_mGluino_1200To1275' in sample['name']: sampleKey = 'T5qqqqWW_1200'
+      elif 'T5qqqqVV_mGluino_1000To1075' in sample['name']: sampleKey = 'T5qqqqWW_1000'
       else: sampleKey = 'none'
       
       readVariables = ['met_pt/F', 'met_phi/F']
@@ -351,7 +353,6 @@ for isample, sample in enumerate(allSamples):
             calc_LeptonScale_factors_and_systematics(s,histos_LS)
             if calcSystematics: 
               calc_btag_systematics(t,s,r,mcEffDict,sampleKey,maxConsideredBTagWeight,separateBTagWeights, model='T5qqqqWW')
-              calc
 
             for v in newVars:
               v['branch'].Fill()
