@@ -52,6 +52,19 @@ def partonName (parton):
   if parton==4:  return 'c'
   return 'other'
 
+def getSignalChain(signal):
+  l = []
+  for x in signal:
+    print
+    print 'mgl', x
+    for y in signal[x]:
+      print 'mX', y
+      l.append(signal[x][y])
+  c = getChain(l, histname='')
+  return c
+
+
+
 
 # get MC truth efficiencies for a specific sample
 def getBTagMCTruthEfficiencies(c, cut="(1)", overwrite=False):
@@ -190,6 +203,8 @@ def getMCEff(parton, pt, eta, mcEff, year = 2015):
           return res
 
 
+SFlist = ["mceffs", "mceffs_SF", "mceffs_SF_b_Up", "mceffs_SF_b_Down", "mceffs_SF_light_Up", "mceffs_SF_light_Down"]
+
 # get MC efficiencies and scale factors for all jets of one event c, uses getMCEff
 def getMCEfficiencyForBTagSF(c, mcEff, onlyLightJetSystem = False, sms=""):
   nsoftjets = int(getVarValue(c, "nJet30"))
@@ -257,6 +272,12 @@ def getMCEfficiencyForBTagSF(c, mcEff, onlyLightJetSystem = False, sms=""):
       mceffs_SF_b_Down += (r["mcEff"]*r["SF"],)
       mceffs_SF_light_Up   += (r["mcEff"]*r["SF_up"]*fsim_SF_up,)
       mceffs_SF_light_Down += (r["mcEff"]*r["SF_down"]*fsim_SF_down,)
+  for ix, x in enumerate([mceffs,mceffs_SF,mceffs_SF_b_Up,mceffs_SF_b_Down,mceffs_SF_light_Up,mceffs_SF_light_Down]):
+    if 1 in x:
+      print '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+      print jets
+      print SFlist[ix]
+      print mcEff
   return {"mceffs":mceffs, "mceffs_SF":mceffs_SF, "mceffs_SF_b_Up":mceffs_SF_b_Up, "mceffs_SF_b_Down":mceffs_SF_b_Down, "mceffs_SF_light_Up":mceffs_SF_light_Up, "mceffs_SF_light_Down":mceffs_SF_light_Down}
 
 
