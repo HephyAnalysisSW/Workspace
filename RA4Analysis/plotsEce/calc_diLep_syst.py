@@ -11,7 +11,7 @@ from cutFlow_helper import *
 
 ROOT.TH1F().SetDefaultSumw2()
 
-weight_str = "((weight*2.2)/3)"
+weight_str = "((weight*2.25)/3)"
 
 def getNumString(n,ne, acc=2, systematic=False):    ##For printing table 
   if type(n) is float and type(ne) is float:
