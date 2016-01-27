@@ -10,16 +10,16 @@ ROOT.gROOT.LoadMacro("../../HEPHYPythonTools/scripts/root/tdrstyle.C")
 ROOT.setTDRStyle()
 maxN = -1
 ROOT.gStyle.SetOptStat(0)
-lumi = 2250##pb
+lumi = 2300##pb
 
-path = "/afs/hephy.at/user/e/easilar/www/data/Run2015D/2p3fb/diLep_syst_study_results/"
+path = "/afs/hephy.at/user/e/easilar/www/data/Run2015D/2p3fb/diLep_syst_study_results_New/"
 if not os.path.exists(path):
   os.makedirs(path)
 
-signalRegion3fbReduced = {(0, -1):  {(0, -1): {(0, -1):  {'deltaPhi': 1.0}}}}
+signalRegion3fbReduced = {(0, -1):  {(250, -1): {(0, -1):  {'deltaPhi': 1.0}}}}
 
-#SR = signalRegion3fbReduced
-SR = signalRegion3fb
+SR = signalRegion3fbReduced
+#SR = signalRegion3fb
 btagVarString = 'nBJetMediumCSV30'
 
 lepSels = [
@@ -52,15 +52,15 @@ plots =[\
 diLep = "(ngenLep+ngenTau)==2"
 not_diLep = "(ngenLep+ngenTau)!=2"
 delta_Phi = "deltaPhi_Wl<0.5"
-diLep_presel = "DL_HT_lepToKeep_AddLep1ov3Met>500&&DL_ST_lepToKeep_AddLep1ov3Met>250&&DL_nJet_lepToKeep_AddLep1ov3Met>=4"
-diLep_presel_1 = "DL_HT_lepToDiscard_AddLep1ov3Met>500&&DL_ST_lepToDiscard_AddLep1ov3Met>250&&DL_nJet_lepToDiscard_AddLep1ov3Met>=4"
+diLep_presel = "DL_HT_lepToKeep_AddLep1ov3Met>500&&DL_ST_lepToKeep_AddLep1ov3Met>250&&DL_nJet_lepToKeep_AddLep1ov3Met>=3"
+diLep_presel_1 = "DL_HT_lepToDiscard_AddLep1ov3Met>500&&DL_ST_lepToDiscard_AddLep1ov3Met>250&&DL_nJet_lepToDiscard_AddLep1ov3Met>=3"
 lepSel = lepSels[0]
 presel = "&&".join([lepSel['cut'],lepSel['veto'],filters,diLep_presel])  
 presel_1 = "&&".join([lepSel['cut'],lepSel['veto'],filters,diLep_presel_1])  
 data_presel = "&&".join([lepSel['cut'],lepSel['veto'],lepSel['trigger'],filters,diLep_presel])
 data_presel_1 = "&&".join([lepSel['cut'],lepSel['veto'],lepSel['trigger'],filters,diLep_presel_1])
 nbTags = (0,0) 
-nJet = (4,-1)
+nJet = (0,-1)
 htbin = (0,-1)
 bin = {}
 for srNJet in sorted(SR):
@@ -75,17 +75,17 @@ for srNJet in sorted(SR):
       bin[srNJet][stb][htb][p['varname']] = {}
       for bkg in bkg_samples:
         bla_Name, Cut = nameAndCut(stb, htbin, nJet, btb=bkg['cut'], presel="(1)", btagVar =  btagVarString, stVar ='DL_ST_lepToKeep_AddLep1ov3Met')
-        weight_str = lepSel['trigWeight']+"*"+bkg['weight']+"*lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*puReweight_true_max4*TopPtWeight*"
-        bin[srNJet][stb][htb][p['varname']][bkg['sample']] = getPlotFromChain(bkg['chain'], p['var'], p['bin'], cutString = "&&".join([presel,Cut]), weight = weight_str+"weight*"+str(lumi)+"/3000", binningIsExplicit=False, addOverFlowBin='both')
+        weight_str = lepSel['trigWeight']+"*"+bkg['weight']+"*puReweight_true_max4*TopPtWeight*"
+        bin[srNJet][stb][htb][p['varname']][bkg['sample']] = getPlotFromChain(bkg['chain'], p['var'], p['bin'], cutString = "&&".join([presel,Cut]), weight = weight_str+"LepToKeep_muSF*LepToKeep_eleSF*weight*"+str(lumi)+"/3000", binningIsExplicit=False, addOverFlowBin='both')
         bla_Name, Cut_1 = nameAndCut(stb, htbin, nJet, btb=bkg['cut'], presel="(1)", btagVar =  btagVarString, stVar ='DL_ST_lepToDiscard_AddLep1ov3Met')
-        bin[srNJet][stb][htb][p['varname']][bkg['sample']+"+1"] = getPlotFromChain(bkg['chain'], plots[1]['var'], p['bin'], cutString = "&&".join([presel_1,Cut_1]), weight = weight_str+"weight*"+str(lumi)+"/3000", binningIsExplicit=False, addOverFlowBin='both')
+        bin[srNJet][stb][htb][p['varname']][bkg['sample']+"+1"] = getPlotFromChain(bkg['chain'], plots[1]['var'], p['bin'], cutString = "&&".join([presel_1,Cut_1]), weight = weight_str+"lepToDiscard_eleSF*lepToDiscard_muSF*weight*"+str(lumi)+"/3000", binningIsExplicit=False, addOverFlowBin='both')
       bla_Name, Cut = nameAndCut(stb, htbin, nJet, btb=c_tt['cut'], presel="(1)", btagVar =  btagVarString,stVar ='DL_ST_lepToKeep_AddLep1ov3Met')
       bla_Name, Cut_1 = nameAndCut(stb, htbin, nJet, btb=c_tt['cut'], presel="(1)", btagVar =  btagVarString,stVar ='DL_ST_lepToDiscard_AddLep1ov3Met')
       weight_str = lepSel['trigWeight']+"*"+bkg['weight']+"*lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*puReweight_true_max4*TopPtWeight*"
-      bin[srNJet][stb][htb][p['varname']][c_tt['sample']] = getPlotFromChain(c_tt['chain'], p['var'], p['bin'], cutString = "&&".join([presel,not_diLep,Cut]), weight = weight_str+"weight*"+str(lumi)+"/3000", binningIsExplicit=False, addOverFlowBin='both')
-      bin[srNJet][stb][htb][p['varname']][c_tt['sample']+"+1"] = getPlotFromChain(c_tt['chain'], plots[1]['var'], p['bin'], cutString = "&&".join([presel_1,not_diLep,Cut_1]), weight = weight_str+"weight*"+str(lumi)+"/3000", binningIsExplicit=False, addOverFlowBin='both')
-      bin[srNJet][stb][htb][p['varname']][c_tt['sample']+'diLep'] = getPlotFromChain(c_tt['chain'], p['var'], p['bin'], cutString = "&&".join([presel,diLep,Cut]), weight = weight_str+"weight*"+str(lumi)+"/3000", binningIsExplicit=False, addOverFlowBin='both')
-      bin[srNJet][stb][htb][p['varname']][c_tt['sample']+'diLep+1'] = getPlotFromChain(c_tt['chain'], plots[1]['var'], p['bin'], cutString = "&&".join([presel_1,diLep,Cut_1]), weight = weight_str+"weight*"+str(lumi)+"/3000", binningIsExplicit=False, addOverFlowBin='both')
+      bin[srNJet][stb][htb][p['varname']][c_tt['sample']] = getPlotFromChain(c_tt['chain'], p['var'], p['bin'], cutString = "&&".join([presel,not_diLep,Cut]), weight = weight_str+"LepToKeep_muSF*LepToKeep_eleSF*weight*"+str(lumi)+"/3000", binningIsExplicit=False, addOverFlowBin='both')
+      bin[srNJet][stb][htb][p['varname']][c_tt['sample']+"+1"] = getPlotFromChain(c_tt['chain'], plots[1]['var'], p['bin'], cutString = "&&".join([presel_1,not_diLep,Cut_1]), weight = weight_str+"lepToDiscard_eleSF*lepToDiscard_muSF*weight*"+str(lumi)+"/3000", binningIsExplicit=False, addOverFlowBin='both')
+      bin[srNJet][stb][htb][p['varname']][c_tt['sample']+'diLep'] = getPlotFromChain(c_tt['chain'], p['var'], p['bin'], cutString = "&&".join([presel,diLep,Cut]), weight = weight_str+"LepToKeep_muSF*LepToKeep_eleSF*weight*"+str(lumi)+"/3000", binningIsExplicit=False, addOverFlowBin='both')
+      bin[srNJet][stb][htb][p['varname']][c_tt['sample']+'diLep+1'] = getPlotFromChain(c_tt['chain'], plots[1]['var'], p['bin'], cutString = "&&".join([presel_1,diLep,Cut_1]), weight = weight_str+"lepToDiscard_eleSF*lepToDiscard_muSF*weight*"+str(lumi)+"/3000", binningIsExplicit=False, addOverFlowBin='both')
       bla_Name, Cut = nameAndCut(stb, htbin, nJet, btb=(0,0), presel="(1)", btagVar =  btagVarString , stVar ='DL_ST_lepToKeep_AddLep1ov3Met')
       bla_Name, Cut_1 = nameAndCut(stb, htbin, nJet, btb=(0,0), presel="(1)", btagVar =  btagVarString , stVar ='DL_ST_lepToDiscard_AddLep1ov3Met')
       print "data Cut:" , "&&".join([data_presel,Cut])
