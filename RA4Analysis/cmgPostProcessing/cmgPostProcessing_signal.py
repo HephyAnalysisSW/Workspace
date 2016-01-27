@@ -92,6 +92,7 @@ parser.add_option("--skim", dest="skim", default="signal", type="string", action
 parser.add_option("--small", dest="small", default = False, action="store_true", help="Just do a small subset.")
 parser.add_option("--overwrite", dest="overwrite", default = True, action="store_true", help="Overwrite?")
 parser.add_option("--calcbtagweights", dest="systematics", default = False, action="store_true", help="Calculate b-tag weights for systematics?")
+parser.add_option("--leptonFastSim", dest="leptonFastSim", default = False, action="store_true", help="Calculate weights for lepton fast sim scale factors?")
 parser.add_option("--btagWeight", dest="btagWeight", default = 2, action="store", help="Max nBJet to calculate the b-tag weight for")
 parser.add_option("--hadronicLeg", dest="hadronicLeg", default = False, action="store_true", help="Use only the hadronic leg of the sample?")
 parser.add_option("--manScaleFactor", dest="manScaleFactor", default = 1, action="store", help="define a scale factor for the whole sample")
@@ -117,6 +118,10 @@ if sys.argv[0].count('ipython'):
 
 maxConsideredBTagWeight = options.btagWeight
 calcSystematics = options.systematics
+leptonFastSim = options.leptonFastSim
+
+if leptonFastSim:
+  leptonFastSimSF = leptonFastSimSF_()
 
 def getTreeFromChunk(c, skimCond, iSplit, nSplit):
   if not c.has_key('file'):return
@@ -146,7 +151,7 @@ exec('allSamples=['+options.allsamples+']')
 for isample, sample in enumerate(allSamples):
   chunks, sumWeight = getChunks(sample)
   mass_dict = pickle.load(file(pickleDir+sample["name"]+'_mass_nEvents_xsec_pkl'))
-  for mglu in mass_dict.keys() :
+  for mglu in mass_dict.keys():
     for mlsp in mass_dict[mglu].keys() :
       skimCond = "Sum$(abs(GenPart_pdgId)==1000022&&abs(GenPart_motherId)==1000024&&abs(GenPart_grandmotherId)==1000021)==2&&(Sum$(abs(GenPart_pdgId)==24)==2)"
       mass_point = mass_dict[mglu][mlsp]
@@ -171,12 +176,15 @@ for isample, sample in enumerate(allSamples):
       if ("T5qqqqVV" in sample['name']) : lumiScaleFactor = mass_point["xsec"]*target_lumi/mass_point["nEntry"]  
       
       sampleKey = ''
-      if 'T5qqqqVV_mGluino_1400To1550' in sample['name']: sampleKey = 'T5qqqqWW_1500'
-      elif 'T5qqqqVV_mGluino_1200To1275' in sample['name']: sampleKey = 'T5qqqqWW_1200'
-      elif 'T5qqqqVV_mGluino_1000To1075' in sample['name']: sampleKey = 'T5qqqqWW_1000'
+      if sample["name"] in mcEffDict.keys():
+        sampleKey = sample["name"]
+        print '##########################################'
+        print '# Found MC truth efficiencies dictionary #'
+        print '##########################################'
+        print sample["name"]
       else: sampleKey = 'none'
       
-      readVariables = ['met_pt/F', 'met_phi/F']
+      readVariables = ['met_pt/F', 'met_phi/F', 'nVert/I']
       newVariables = ['weight/F','muonDataSet/I','eleDataSet/I']
       aliases = [ "met:met_pt", "metPhi:met_phi"]
 
@@ -200,6 +208,8 @@ for isample, sample in enumerate(allSamples):
           newVariables.extend( ["weightBTag"+str(i)+"/F", "weightBTag"+str(i)+"_SF/F", "weightBTag"+str(i)+"_SF_b_Up/F", "weightBTag"+str(i)+"_SF_b_Down/F", "weightBTag"+str(i)+"_SF_light_Up/F", "weightBTag"+str(i)+"_SF_light_Down/F"])
           #if i>0:
           newVariables.extend( ["weightBTag"+str(i+1)+"p/F", "weightBTag"+str(i+1)+"p_SF/F", "weightBTag"+str(i+1)+"p_SF_b_Up/F", "weightBTag"+str(i+1)+"p_SF_b_Down/F", "weightBTag"+str(i+1)+"p_SF_light_Up/F", "weightBTag"+str(i+1)+"p_SF_light_Down/F"])
+      if leptonFastSim:
+        newVariables.extend(['reweightLeptonFastSimSF/F', 'reweightLeptonFastSimSFUp/F', 'reweightLeptonFastSimSFDown/F'])
       newVars = [readVar(v, allowRenaming=False, isWritten = True, isRead=False) for v in newVariables]
 
       
@@ -353,6 +363,17 @@ for isample, sample in enumerate(allSamples):
             calc_LeptonScale_factors_and_systematics(s,histos_LS)
             if calcSystematics: 
               calc_btag_systematics(t,s,r,mcEffDict,sampleKey,maxConsideredBTagWeight,separateBTagWeights, model='T5qqqqWW')
+            
+            if leptonFastSim:
+              if s.nTightHardLeptons>=1:
+                s.reweightLeptonFastSimSF     = leptonFastSimSF.get3DSF(pdgId=s.leptonPdg, pt=s.leptonPt, eta=s.leptonEta, nvtx = r.nVert)
+                s.reweightLeptonFastSimSFUp   = leptonFastSimSF.get3DSF(pdgId=s.leptonPdg, pt=s.leptonPt, eta=s.leptonEta, nvtx = r.nVert, sigma = +1)
+                s.reweightLeptonFastSimSFDown = leptonFastSimSF.get3DSF(pdgId=s.leptonPdg, pt=s.leptonPt, eta=s.leptonEta, nvtx = r.nVert, sigma = -1)
+              else:
+                s.reweightLeptonFastSimSF     = -999 
+                s.reweightLeptonFastSimSFUp   = -999
+                s.reweightLeptonFastSimSFDown = -999
+              
 
             for v in newVars:
               v['branch'].Fill()
