@@ -1,11 +1,6 @@
 import copy, os, sys
-#dir  = '/data/easilar/cmgTuples/postProcessed_miniAODv2_fix/HT500LT250/hard/'
-#dir = '/data/easilar/cmgTuples/postProcessed_miniAODv2_combine2/HT500LT250/hard/'
-#dir = '/data/easilar/cmgTuples/postProcessed_miniAODv2_btagweight_fix4/HT500LT250/hard/'
-#dir = '/data/easilar/cmgTuples/postProcessed_Spring15_btagEff_SF15/HT500ST250/hard/'
-#dir = '/data/easilar/cmgTuples/postProcessing_Syst/HT500LT250/'
-#dir = '/data/easilar/cmgTuples/postProcessing_Syst_topPt_diLep/HT500LT250/'
 dir = '/data/easilar/cmgTuples/postProcessing_MC_hadrFlav_btag_Eff/HT500LT250/'
+
 ####usual HT combination####
 TTJets_HTLO_25ns={\
 "name" : "tt+Jets_LO",
@@ -102,15 +97,15 @@ TTV_25ns = {
 }
 
 allSignalStrings=[\
-#"T5qqqqVV_mGluino_600To675_mLSP_1to550",\
-#"T5qqqqVV_mGluino_700To775_mLSP_1To650",\
-#"T5qqqqVV_mGluino_800To975_mLSP_1To850",\
+"T5qqqqVV_mGluino_600To675_mLSP_1to550",\
+"T5qqqqVV_mGluino_700To775_mLSP_1To650",\
+"T5qqqqVV_mGluino_800To975_mLSP_1To850",\
 "T5qqqqVV_mGluino_1000To1075_mLSP_1To950",\
-#"T5qqqqVV_mGluino_1100To1175_mLSP_1to1050",\
+"T5qqqqVV_mGluino_1100To1175_mLSP_1to1050",\
 "T5qqqqVV_mGluino_1200To1275_mLSP_1to1150",\
-#"T5qqqqVV_mGluino_1300To1375_mLSP_1to1250",\
+"T5qqqqVV_mGluino_1300To1375_mLSP_1to1250",\
 "T5qqqqVV_mGluino_1400To1550_mLSP_1To1275",\
-#"T5qqqqVV_mGluino_1600To1750_mLSP_1To950",\
+"T5qqqqVV_mGluino_1600To1750_mLSP_1To950",\
 ]
 
 from Workspace.HEPHYPythonTools.user import username
