@@ -56,7 +56,7 @@ lepSF_h1b = d.GetPrimitive('h1b')
 lepSF_h2b = d.GetPrimitive('h2b')
 
 
-pickleDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_validation_lep_data_2p3/'
+#pickleDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_validation_lep_data_2p25/'
 
 wpol    = pickle.load(file('/data/dhandl/results2015/WPolarizationEstimation/20151218_wjetsPolSys_pkl'))
 b_err   = pickle.load(file('/data/dspitzbart/Results2016/btagErr_pkl'))
@@ -421,9 +421,9 @@ total_err.Draw('2 same')
 
 can.cd()
 
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/syst_errors.png')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/syst_errors.root')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/syst_errors.pdf')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/syst_errors_update.png')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/syst_errors_update.root')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/syst_errors_update.pdf')
 
-#pickle.dump(rcs, file(pickleDir+'resultsFinal_withSystematics_pkl','w'))
+pickle.dump(rcs, file(pickleDir+'resultsFinal_withSystematics_pkl','w'))
 

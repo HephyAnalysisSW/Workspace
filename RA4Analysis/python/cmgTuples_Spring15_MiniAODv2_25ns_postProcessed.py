@@ -112,7 +112,8 @@ from Workspace.HEPHYPythonTools.user import username
 import pickle
 
 pickleDir = '/data/easilar/Spring15/25ns/'
-signal_dir = '/data/easilar/cmgTuples/postProcessing_Signals/signal/'
+#signal_dir = '/data/easilar/cmgTuples/postProcessing_Signals/signal/'
+signal_dir = '/data/dspitzbart/cmgTuples/postProcessing_Signals/signal/'
 
 def getSignalSample(signal):
   if signal in allSignalStrings:
@@ -131,6 +132,5 @@ def getSignalSample(signal):
 allSignals=[]
 for s in allSignalStrings:
   sm = getSignalSample(s)
-  exec(s+"=sm")
-  exec("allSignals.append(s)")
+  allSignals.append(sm)
 
