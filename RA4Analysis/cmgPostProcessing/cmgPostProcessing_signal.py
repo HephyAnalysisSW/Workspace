@@ -80,6 +80,7 @@ branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert",
 #branches to be kept for MC samples only
 branchKeepStrings_MC = [ "nTrueInt", "genWeight", "xsec", "puWeight", 
                      "GenSusyMScan1", "GenSusyMScan2", "GenSusyMScan3", "GenSusyMScan4", "GenSusyMGluino", "GenSusyMGravitino", "GenSusyMStop", "GenSusyMSbottom", "GenSusyMStop2", "GenSusyMSbottom2", "GenSusyMSquark", "GenSusyMNeutralino", "GenSusyMNeutralino2", "GenSusyMNeutralino3", "GenSusyMNeutralino4", "GenSusyMChargino", "GenSusyMChargino2", 
+                     "nLHEweight","LHEweight_*"
                      "nJetForMET", "JetForMET_*",
                      "ngenLep", "genLep_*", 
                      "nGenPart", "GenPart_*",
