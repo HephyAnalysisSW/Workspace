@@ -2,7 +2,7 @@ import ROOT
 import pickle
 import sys, os, copy, random, subprocess, datetime
 from array import array
-from Workspace.RA4Analysis.cmgObjectSelection import cmgLooseLepIndices, splitIndList, get_cmg_jets_fromStruct, splitListOfObjects, cmgTightMuID, cmgTightEleID
+from Workspace.RA4Analysis.cmgObjectSelection import cmgLooseLepIndices, splitIndList, get_cmg_jets_fromStruct, splitListOfObjects, cmgTightMuID, cmgTightEleID , get_cmg_genParts_fromStruct
 from Workspace.HEPHYPythonTools.xsec import xsec
 from Workspace.HEPHYPythonTools.helpers import getObjFromFile, getObjDict, getFileList
 from Workspace.HEPHYPythonTools.convertHelpers import compileClass, readVar, printHeader, typeStr, createClassString
@@ -16,7 +16,7 @@ ROOT.AutoLibraryLoader.enable()
 from Workspace.HEPHYPythonTools.helpers import getChunks
 from Workspace.RA4Analysis.cmgTuples_Data25ns_miniAODv2 import *
 from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns import *
-from systematics_helper import calc_btag_systematics, calc_LeptonScale_factors_and_systematics
+from systematics_helper import calc_btag_systematics, calc_LeptonScale_factors_and_systematics , getISRWeight , fill_branch_WithJEC
 from btagEfficiency import *
 from leptonFastSimSF import leptonFastSimSF as leptonFastSimSF_
 
@@ -38,8 +38,13 @@ separateBTagWeights = True
 defSampleStr = "T5qqqqVV_mGluino_1000To1075_mLSP_1To950"
 
 ###For PU reweight###
-PU_File = ROOT.TFile("/data/easilar/tuples_from_Artur/JECv6recalibrateMET_2100pb/trig_skim/PUhistos/ratio_PU.root")
-PU_histo = PU_File.Get("h_ratio")
+PU_dir = "/data/easilar/tuples_from_Artur/JECv6recalibrateMET_2p2fb/PUhistos/"
+PU_File_66mb = ROOT.TFile(PU_dir+"/pileUp_66mb_map.root")
+PU_File_70mb = ROOT.TFile(PU_dir+"/pileUp_70mb_map.root")
+PU_File_74mb = ROOT.TFile(PU_dir+"/pileUp_74mb_map.root")
+PU_histo_66 = PU_File_66mb.Get("h_ratio_66")
+PU_histo_70 = PU_File_70mb.Get("h_ratio_70")
+PU_histo_74 = PU_File_74mb.Get("h_ratio_74")
 #####################
 ###For Lepton SF#####
 mu_mediumID_File = ROOT.TFile("/data/easilar/SF2015/TnP_MuonID_NUM_MediumID_DENOM_generalTracks_VAR_map_pt_eta.root")
@@ -58,7 +63,7 @@ histos_LS = {
 }
 #####################
 
-subDir = "postProcessing_Signals"
+subDir = "postProcessing_Signals_v2"
 
 #branches to be kept for data and MC
 branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert",
@@ -75,6 +80,7 @@ branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert",
 #branches to be kept for MC samples only
 branchKeepStrings_MC = [ "nTrueInt", "genWeight", "xsec", "puWeight", 
                      "GenSusyMScan1", "GenSusyMScan2", "GenSusyMScan3", "GenSusyMScan4", "GenSusyMGluino", "GenSusyMGravitino", "GenSusyMStop", "GenSusyMSbottom", "GenSusyMStop2", "GenSusyMSbottom2", "GenSusyMSquark", "GenSusyMNeutralino", "GenSusyMNeutralino2", "GenSusyMNeutralino3", "GenSusyMNeutralino4", "GenSusyMChargino", "GenSusyMChargino2", 
+                     "nJetForMET", "JetForMET_*",
                      "ngenLep", "genLep_*", 
                      "nGenPart", "GenPart_*",
                      "ngenPartAll","genPartAll_*" ,
@@ -184,19 +190,34 @@ for isample, sample in enumerate(allSamples):
         print sample["name"]
       else: sampleKey = 'none'
       
-      readVariables = ['met_pt/F', 'met_phi/F', 'nVert/I']
+      readVariables = ['met_pt/F', 'met_phi/F', 'met_eta/F','met_mass/F' ,'nVert/I']
       newVariables = ['weight/F','muonDataSet/I','eleDataSet/I']
       aliases = [ "met:met_pt", "metPhi:met_phi"]
 
       readVectors = [\
         {'prefix':'LepGood', 'nMax':8, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I', 'relIso03/F','SPRING15_25ns_v1/I' ,'tightId/I', 'miniRelIso/F','mass/F','sip3d/F','mediumMuonId/I', 'mvaIdPhys14/F','mvaIdSpring15/F','lostHits/I', 'convVeto/I']},
-        {'prefix':'Jet',  'nMax':100, 'vars':['pt/F', 'eta/F', 'phi/F', 'id/I','btagCSV/F', 'btagCMVA/F']},
       ]
-      if not sample['isData']: 
-        newVariables.extend(['puReweight_true/F','puReweight_true_Down/F','puReweight_true_Up/F','weight_diLepTTBar0p5/F','weight_diLepTTBar2p0/F','weight_XSecTTBar1p1/F','weight_XSecTTBar0p9/F','weight_XSecWJets1p1/F','weight_XSecWJets0p9/F'])
-        newVariables.extend(['lepton_muSF_looseID/D/1.','lepton_muSF_mediumID/D/1.','lepton_muSF_miniIso02/D/1.','lepton_muSF_sip3d/D/1.','lepton_eleSF_cutbasedID/D/1.','lepton_eleSF_miniIso01/D/1.'])
-        newVariables.extend(['lepton_muSF_looseID_err/D/0.','lepton_muSF_mediumID_err/D/0.','lepton_muSF_miniIso02_err/D/0.','lepton_muSF_sip3d_err/D/0.','lepton_eleSF_cutbasedID_err/D/0.','lepton_eleSF_miniIso01_err/D/0.'])
-        aliases.extend(['genMet:met_genPt', 'genMetPhi:met_genPhi'])
+      newVariables.extend(['puReweight_true/F','puReweight_true_max4/F','puReweight_true_Down/F','puReweight_true_Up/F','weight_diLepTTBar0p5/F','weight_diLepTTBar2p0/F','weight_XSecTTBar1p1/F','weight_XSecTTBar0p9/F','weight_XSecWJets1p1/F','weight_XSecWJets0p9/F'])
+      newVariables.extend(['ngenGluino/I','genGluGlu_pt/F','ISRSigUp/F/1','ISRSigDown/F/1'])
+      newVariables.extend(['lepton_muSF_looseID/D/1.','lepton_muSF_mediumID/D/1.','lepton_muSF_miniIso02/D/1.','lepton_muSF_sip3d/D/1.','lepton_eleSF_cutbasedID/D/1.','lepton_eleSF_miniIso01/D/1.'])
+      newVariables.extend(['lepton_muSF_looseID_err/D/0.','lepton_muSF_mediumID_err/D/0.','lepton_muSF_miniIso02_err/D/0.','lepton_muSF_sip3d_err/D/0.','lepton_eleSF_cutbasedID_err/D/0.','lepton_eleSF_miniIso01_err/D/0.'])
+
+      readVectors.append({'prefix':'GenPart',  'nMax':100, 'vars':['eta/F','pt/F','phi/F','mass/F','charge/F', 'pdgId/I', 'motherId/F', 'grandmotherId/F']})
+      readVectors.append({'prefix':'JetForMET',  'nMax':100, 'vars':['rawPt/F','pt/F', 'eta/F', 'phi/F','mass/F' ,'id/I','hadronFlavour/F','btagCSV/F', 'btagCMVA/F','corr_JECUp/F','corr_JECDown/F','corr/F']})
+      readVectors.append({'prefix':'Jet',  'nMax':100, 'vars':['rawPt/F','pt/F', 'eta/F', 'phi/F','mass/F' ,'id/I','hadronFlavour/F','btagCSV/F', 'btagCMVA/F','corr_JECUp/F','corr_JECDown/F','corr/F']})
+
+      aliases.extend(['genMet:met_genPt', 'genMetPhi:met_genPhi'])
+      ### Vars for JEC ###
+      corr = ["central", "up", "down"]
+      vars_corr = ["ht","LT","MeT","deltaPhi_Wl"]
+      vars_corr_1 = ["nJet","nBJet"]
+      for corrJEC_str in corr:
+        for vars_str in vars_corr:
+          newVariables.extend(["jec_"+vars_str+"_"+corrJEC_str+"/F/-999."])
+          print "jec_"+vars_str+"_"+corrJEC_str+"/F/-999."
+        for vars_str in vars_corr_1:
+          newVariables.extend(["jec_"+vars_str+"_"+corrJEC_str+"/I/-999."])
+
       newVariables.extend( ['nLooseSoftLeptons/I', 'nLooseHardLeptons/I', 'nTightSoftLeptons/I', 'nTightHardLeptons/I'] )
       newVariables.extend( ['deltaPhi_Wl/F','nBJetMediumCSV30/I','nJet30/I','htJet30j/F','st/F'])
       newVariables.extend( ['leptonPt/F','leptonEt/F','leptonMiniRelIso/F','leptonRelIso03/F' ,\
@@ -277,9 +298,10 @@ for isample, sample in enumerate(allSamples):
               s.eleDataSet = False
               s.weight =xsec_branch*lumiScaleFactor*genWeight
               nTrueInt = t.GetLeaf('nTrueInt').GetValue()
-              s.puReweight_true = PU_histo.GetBinContent(PU_histo.FindBin(nTrueInt))
-              s.puReweight_true_Down = s.puReweight_true*0.95
-              s.puReweight_true_Up = s.puReweight_true*1.05
+              s.puReweight_true = PU_histo_70.GetBinContent(PU_histo_70.FindBin(nTrueInt))
+              s.puReweight_true_max4 = min(4,s.puReweight_true)
+              s.puReweight_true_Down = PU_histo_66.GetBinContent(PU_histo_66.FindBin(nTrueInt))
+              s.puReweight_true_Up = PU_histo_74.GetBinContent(PU_histo_74.FindBin(nTrueInt))
               ngenLep = t.GetLeaf('ngenLep').GetValue()
               ngenTau = t.GetLeaf('ngenTau').GetValue()
               if ("TTJets" in sample['dbsName']):
@@ -360,6 +382,10 @@ for isample, sample in enumerate(allSamples):
             s.deltaPhi_Wl = acos((s.leptonPt+r.met_pt*cos(s.leptonPhi-r.met_phi))/sqrt(s.leptonPt**2+r.met_pt**2+2*r.met_pt*s.leptonPt*cos(s.leptonPhi-r.met_phi))) 
 
 
+            g_list=['eta','pt','phi','mass','charge', 'pdgId', 'motherId', 'grandmotherId']
+            genParts = get_cmg_genParts_fromStruct(r,g_list)
+            getISRWeight(s,genParts)
+            fill_branch_WithJEC(s,r)
             calc_LeptonScale_factors_and_systematics(s,histos_LS)
             if calcSystematics: 
               calc_btag_systematics(t,s,r,mcEffDict,sampleKey,maxConsideredBTagWeight,separateBTagWeights, model='T5qqqqWW')

@@ -57,6 +57,7 @@ lepSF_h2b = d.GetPrimitive('h2b')
 
 
 #pickleDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_validation_lep_data_2p25/'
+pickleDir =  '/data/easilar/Results2016/Prediction_SFtemplates_fullSR_lep_data_2p25/'
 
 wpol    = pickle.load(file('/data/dhandl/results2015/WPolarizationEstimation/20151218_wjetsPolSys_pkl'))
 b_err   = pickle.load(file('/data/dspitzbart/Results2016/btagErr_pkl'))
@@ -426,4 +427,4 @@ can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/syst_
 can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/syst_errors_update.pdf')
 
 pickle.dump(rcs, file(pickleDir+'resultsFinal_withSystematics_pkl','w'))
-
+print "pickle Written :" , pickleDir+'resultsFinal_withSystematics_pkl'

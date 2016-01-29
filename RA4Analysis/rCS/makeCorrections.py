@@ -15,7 +15,6 @@ ROOT.gROOT.LoadMacro('../../HEPHYPythonTools/scripts/root/tdrstyle.C')
 ROOT.setTDRStyle()
 
 ROOT.TH1F().SetDefaultSumw2()
-
 if not createFits: loadedFit = pickle.load(file(fitDir+prefix+'_fit_pkl'))
 
 weight_str, weight_err_str = makeWeight(3, sampleLumi=sampleLumi)

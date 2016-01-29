@@ -325,4 +325,18 @@ def fill_branch_WithJEC(s,r):
 
   return
 
+def getISRWeight(s,genParts):
+  genGluino = filter(lambda g:abs(g['pdgId'])==1000021, genParts)
+  s.ngenGluino = len(genGluino)
+  if s.ngenGluino == 2:
+    genGluino1_vec = ROOT.TLorentzVector() 
+    genGluino2_vec = ROOT.TLorentzVector()
+    genGluino1_vec.SetPtEtaPhiM(genGluino[0]['pt'],genGluino[0]['eta'],genGluino[0]['phi'],genGluino[0]['mass'])
+    genGluino2_vec.SetPtEtaPhiM(genGluino[1]['pt'],genGluino[1]['eta'],genGluino[1]['phi'],genGluino[1]['mass'])
+    gluglu_vec = genGluino1_vec+genGluino2_vec
+    s.genGluGlu_pt = gluglu_vec.Pt()
+    if s.genGluGlu_pt <= 400: s.ISRSigUp = 1.0; s.ISRSigDown = 1.0
+    if s.genGluGlu_pt > 400: s.ISRSigUp = 1.15; s.ISRSigDown = 0.85
+    if s.genGluGlu_pt > 600: s.ISRSigUp = 1.30; s.ISRSigDown = 0.70
 
+  return

@@ -94,9 +94,9 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, QCD=Fa
 
   if isData:
     #treat contamination like QCD
-    rCS_W_crNJet_0b_corr      = getRCS(cData, crCutTruth+muonCut,dPhiCut, QCD_lowDPhi=correction_lowDPhi, QCD_highDPhi=correction_highDPhi, returnValues=True)
-    rCS_W_crNJet_0b_corr_rest = getRCS(cData, crCutTruth+muonCut,dPhiCut, QCD_lowDPhi=correction_lowDPhi_rest, QCD_highDPhi=correction_highDPhi_rest, returnValues=True)
-    rCS_W_crNJet_0b_notcorr   = getRCS(cData, crCutTruth+muonCut, dPhiCut, returnValues = True)
+    rCS_W_crNJet_0b_corr      = getRCS(cData, crCutTruth+muonCut+"&& veto_evt_list",dPhiCut, QCD_lowDPhi=correction_lowDPhi, QCD_highDPhi=correction_highDPhi, returnValues=True)
+    rCS_W_crNJet_0b_corr_rest = getRCS(cData, crCutTruth+muonCut+"&& veto_evt_list",dPhiCut, QCD_lowDPhi=correction_lowDPhi_rest, QCD_highDPhi=correction_highDPhi_rest, returnValues=True)
+    rCS_W_crNJet_0b_notcorr   = getRCS(cData, crCutTruth+muonCut+"&& veto_evt_list",dPhiCut, returnValues = True)
     
   else:
     rCS_W_crNJet_0b_corr      = getRCS(cBkg, crCut+muonCut, dPhiCut, weight=weight_str_0b, QCD_lowDPhi=correction_lowDPhi, QCD_highDPhi=correction_highDPhi, returnValues=True)
@@ -114,9 +114,9 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, QCD=Fa
   
   if isData:
     #treat contamination like QCD
-    rCS_W_PosPdg_crNJet_0b_corr       = getRCS(cData, crCutTruth+muonCut,dPhiCut, QCD_lowDPhi=correction_lowDPhi, QCD_highDPhi=correction_highDPhi, returnValues=True)
-    rCS_W_PosPdg_crNJet_0b_corr_rest  = getRCS(cData, crCutTruth+muonCut,dPhiCut, QCD_lowDPhi=correction_lowDPhi_rest, QCD_highDPhi=correction_highDPhi_rest, returnValues=True)
-    rCS_W_PosPdg_crNJet_0b_notcorr    = getRCS(cData, crCutTruth+muonCut, dPhiCut, returnValues = True)
+    rCS_W_PosPdg_crNJet_0b_corr       = getRCS(cData, crCutTruth+muonCut+"&& veto_evt_list",dPhiCut, QCD_lowDPhi=correction_lowDPhi, QCD_highDPhi=correction_highDPhi, returnValues=True)
+    rCS_W_PosPdg_crNJet_0b_corr_rest  = getRCS(cData, crCutTruth+muonCut+"&& veto_evt_list",dPhiCut, QCD_lowDPhi=correction_lowDPhi_rest, QCD_highDPhi=correction_highDPhi_rest, returnValues=True)
+    rCS_W_PosPdg_crNJet_0b_notcorr    = getRCS(cData, crCutTruth+muonCut+"&& veto_evt_list", dPhiCut, returnValues = True)
 
   else:
     rCS_W_PosPdg_crNJet_0b_corr       = getRCS(cBkg, crCut+muonCut,dPhiCut, weight=weight_str_0b, QCD_lowDPhi=correction_lowDPhi, QCD_highDPhi=correction_highDPhi, returnValues=True)
@@ -130,9 +130,9 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, QCD=Fa
 
   if isData:
     #treat contamination like QCD
-    rCS_W_NegPdg_crNJet_0b_corr       = getRCS(cData, crCutTruth+muonCut,dPhiCut, QCD_lowDPhi=correction_lowDPhi, QCD_highDPhi=correction_highDPhi, returnValues=True)
-    rCS_W_NegPdg_crNJet_0b_corr_rest  = getRCS(cData, crCutTruth+muonCut,dPhiCut, QCD_lowDPhi=correction_lowDPhi_rest, QCD_highDPhi=correction_highDPhi_rest, returnValues=True)
-    rCS_W_NegPdg_crNJet_0b_notcorr    = getRCS(cData, crCutTruth+muonCut, dPhiCut, returnValues = True)
+    rCS_W_NegPdg_crNJet_0b_corr       = getRCS(cData, crCutTruth+muonCut+"&& veto_evt_list" ,dPhiCut, QCD_lowDPhi=correction_lowDPhi, QCD_highDPhi=correction_highDPhi, returnValues=True)
+    rCS_W_NegPdg_crNJet_0b_corr_rest  = getRCS(cData, crCutTruth+muonCut+"&& veto_evt_list" ,dPhiCut, QCD_lowDPhi=correction_lowDPhi_rest, QCD_highDPhi=correction_highDPhi_rest, returnValues=True)
+    rCS_W_NegPdg_crNJet_0b_notcorr    = getRCS(cData, crCutTruth+muonCut+"&& veto_evt_list" , dPhiCut, returnValues = True)
 
   else:
     rCS_W_NegPdg_crNJet_0b_corr       = getRCS(cBkg, crCut+muonCut,dPhiCut, weight=weight_str_0b, QCD_lowDPhi=correction_lowDPhi, QCD_highDPhi=correction_highDPhi, returnValues=True)

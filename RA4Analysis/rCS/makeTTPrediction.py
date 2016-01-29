@@ -114,9 +114,9 @@ def makeTTPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, QCD=F
 
   if isData:
     if QCD:
-      rCS_crLowNJet_1b = getRCS(cData, rCS_crLowNJet_Cut_1b,  dPhiCut, weight = w, QCD_lowDPhi=QCD_lowDPhi, QCD_highDPhi=QCD_highDPhi, returnValues=True) #Low njet tt-jets CR to be orthoganl to DPhi 
+      rCS_crLowNJet_1b = getRCS(cData, rCS_crLowNJet_Cut_1b+"&& veto_evt_list",  dPhiCut, weight = w, QCD_lowDPhi=QCD_lowDPhi, QCD_highDPhi=QCD_highDPhi, returnValues=True) #Low njet tt-jets CR to be orthoganl to DPhi 
     else:
-      rCS_crLowNJet_1b = getRCS(cData, rCS_crLowNJet_Cut_1b,  dPhiCut, weight = w, returnValues=True)
+      rCS_crLowNJet_1b = getRCS(cData, rCS_crLowNJet_Cut_1b+"&& veto_evt_list",  dPhiCut, weight = w, returnValues=True)
 
   else:
     if useQCDestimation:
