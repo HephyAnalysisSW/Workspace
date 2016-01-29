@@ -36,7 +36,7 @@ separateBTagWeights = True
 
 defSampleStr = "TTJets_LO"
 
-subDir = "postProcessing_Data_CSC_filter"
+subDir = "postProcessing_Data_with_filters_already_vetoed"
 #subDir = "postProcessing_Tests"
 
 #branches to be kept for data and MC
@@ -78,9 +78,8 @@ parser.add_option("--manScaleFactor", dest="manScaleFactor", default = 1, action
 
 (options, args) = parser.parse_args()
 skimCond = "(1)"
-#htLtSkim = "Sum$(Jet_pt)>500&&(LepGood_pt[0]+met_pt)>250"
-htLtSkim = "Sum$(Jet_pt)>500"
-common_skim = "HT500Skim"
+htLtSkim = "Sum$(Jet_pt)>500&&(LepGood_pt[0]+met_pt)>250"
+common_skim = "HT500LT250Skim"
 if options.skim.startswith('met'):
   skimCond = "met_pt>"+str(float(options.skim[3:]))
 if options.skim=='HT400':
@@ -130,6 +129,8 @@ if sys.argv[0].count('ipython'):
 
 ###get evt Veto List  for filters####
 evt_veto_list = evt_veto_list()
+#print "these events will be vetoed :"
+#print evt_veto_list
 
 ###For PU reweight###
 PU_dir = "/data/easilar/tuples_from_Artur/JECv6recalibrateMET_2p2fb/PUhistos/"
@@ -180,7 +181,7 @@ def getTreeFromChunk(c, skimCond, iSplit, nSplit):
   rf.Close()
   del rf
   return t
-   
+ 
 exec('allSamples=['+options.allsamples+']')
 for isample, sample in enumerate(allSamples):
   chunks, sumWeight = getChunks(sample)
@@ -211,7 +212,7 @@ for isample, sample in enumerate(allSamples):
   if not sampleKey: sampleKey = 'none'
   
   readVariables = ['met_pt/F', 'met_phi/F','met_eta/F','met_mass/F']
-  newVariables = ['weight/F','muonDataSet/I','eleDataSet/I']
+  newVariables = ['weight/F','muonDataSet/I','eleDataSet/I','veto_evt_list/I/1']
   aliases = [ "met:met_pt", "metPhi:met_phi"]
 
   readVectors = [\
@@ -275,6 +276,12 @@ for isample, sample in enumerate(allSamples):
   printHeader("Class to Read")
   r = compileClass(className=readClassName, classString=readClassString, tmpDir='/data/'+username+'/tmp/')
 
+  veto_csc_list = []
+  veto_ecal_list = []
+  veto_muon_list = []
+  veto_badreso_list = []
+
+
   filesForHadd=[]
   if options.small: chunks=chunks[:1]
   for chunk in chunks:
@@ -299,7 +306,6 @@ for isample, sample in enumerate(allSamples):
       for a in aliases:
         t.SetAlias(*(a.split(":")))
       print "File: %s Chunk: %s nEvents: %i (skim: %s) condition: %s lumiScaleFactor: %f"%(chunk['file'],chunk['name'], nEvents, options.skim, skimCond, lumiScaleFactor)
-      
       for i in range(nEvents):
         if (i%10000 == 0) and i>0 :
           print i,"/",nEvents  , "name:" , chunk['name']
@@ -314,9 +320,28 @@ for isample, sample in enumerate(allSamples):
         s.weight = lumiScaleFactor*genWeight
         if sample['isData']:
 
-          vetoEvt = str(t.GetLeaf('run').GetValue())+":"+str(lumi_branch)+":"+str(evt_branch)+"\n"
-          if vetoEvt in evt_veto_list : 
-            print "!!!!this event is skipped !!!" , t.GetLeaf('run').GetValue() , lumi_branch , evt_branch
+          vetoEvt = str(int(t.GetLeaf('run').GetValue()))+":"+str(int(lumi_branch))+":"+str(int(evt_branch))+"\n"
+          #check_fake_evt = str(int(254790))+":"+str(int(111))+":"+str(int(120263348))+"\n"
+          #if check_fake_evt in evt_veto_list: print "YESSS!!!"
+          #print "Event :" , vetoEvt
+          if vetoEvt in evt_veto_list["csc"] : 
+            print "!!!!this event is skipped due to csc!!!" , t.GetLeaf('run').GetValue() , lumi_branch , evt_branch
+            veto_csc_list.append(vetoEvt)
+
+          if vetoEvt in evt_veto_list["ecal"] : 
+            print "!!!!this event is skipped due to ecal!!!" , t.GetLeaf('run').GetValue() , lumi_branch , evt_branch
+            veto_ecal_list.append(vetoEvt)
+          
+          if vetoEvt in evt_veto_list["muon"] : 
+            print "!!!!this event is skipped due to muon!!!" , t.GetLeaf('run').GetValue() , lumi_branch , evt_branch
+            veto_muon_list.append(vetoEvt)
+
+          if vetoEvt in evt_veto_list["badreso"] : 
+            print "!!!!this event is skipped due to badreso!!!" , t.GetLeaf('run').GetValue() , lumi_branch , evt_branch
+            veto_badreso_list.append(vetoEvt)
+
+          if vetoEvt in evt_veto_list["ultimate"] :
+            s.veto_evt_list = False
             continue
 
           if "Muon" in sample['name']:
@@ -447,6 +472,7 @@ for isample, sample in enumerate(allSamples):
         del v['branch']
 
   print "Chunk loop end"
+  print "number of veto " ,   len(veto_csc_list) , len(veto_ecal_list) , len(veto_muon_list) , len(veto_badreso_list)
   if not options.small: 
     size=0
     counter=0
