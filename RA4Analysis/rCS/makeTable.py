@@ -26,7 +26,8 @@ path = '/data/'+username+'/Results2016/Prediction_SFtemplates_fullSR_lep_data_2p
 res = pickle.load(file(path+'resultsFinal_withSystematics_pkl'))
 sys = res
 
-sig = pickle.load(file('/data/easilar/Spring15/25ns/allSignals_2p3_v2_pkl'))
+#sig = pickle.load(file('/data/easilar/Spring15/25ns/allSignals_2p3_v2_pkl'))
+sig = pickle.load(file('/data/dspitzbart/Results2016/signal_unc_pkl'))
 
 #res2 = pickle.load(file(path2+prefix+'_estimationResults_pkl'))
 
@@ -191,9 +192,9 @@ for srNJet in sorted(signalRegions):
       first = False
       print '&$'+varBin(htb)+'$'
       print ' & '+getNumString(res[srNJet][stb][htb]['tot_truth'], res[srNJet][stb][htb]['tot_truth_err'])\
-           +' & '+getNumString(sig[srNJet][stb][htb]['signals'][1000][700]['yield_MB_SR'], sig[srNJet][stb][htb]['signals'][1000][700]['err_MB_SR'])\
-           +' & '+getNumString(sig[srNJet][stb][htb]['signals'][1200][800]['yield_MB_SR'], sig[srNJet][stb][htb]['signals'][1200][800]['err_MB_SR'])\
-           +' & '+getNumString(sig[srNJet][stb][htb]['signals'][1500][100]['yield_MB_SR'], sig[srNJet][stb][htb]['signals'][1500][100]['err_MB_SR'])\
+           +' & '+getNumString(sig[srNJet][stb][htb][1000][700]['yield_MB_SR'], sig[srNJet][stb][htb][1000][700]['err_MB_SR'])\
+           +' & '+getNumString(sig[srNJet][stb][htb][1200][800]['yield_MB_SR'], sig[srNJet][stb][htb][1200][800]['err_MB_SR'])\
+           +' & '+getNumString(sig[srNJet][stb][htb][1500][100]['yield_MB_SR'], sig[srNJet][stb][htb][1500][100]['err_MB_SR'])\
            +' & '+getNumString(res[srNJet][stb][htb]['tot_pred_final'], res[srNJet][stb][htb]['tot_pred_final_err'])
       if unblinded or validation:
         print ' & \multicolumn{3}{c|}{'+str(int(res[srNJet][stb][htb]['y_srNJet_0b_highDPhi']))+'} \\\\'
