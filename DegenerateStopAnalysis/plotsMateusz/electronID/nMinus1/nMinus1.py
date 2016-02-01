@@ -80,9 +80,9 @@ for den in dens:
                print makeLine()
                sys.exit(0)
 
-               #bins = array('d', range(xmin,50,2) + range(50,100,5) + range(100,xmax+10,10)) #Variable bin size
-               #normFactor = "((" + var + " < 50)*0.5 + (" + var + " >= 50 &&" + var + " < 100)*0.2 + (" + var + " >= 100)*0.1)"
-               z = ""
+            #bins = array('d', range(xmin,50,2) + range(50,100,5) + range(100,xmax+10,10)) #Variable bin size
+            #normFactor = "((" + var + " < 50)*0.5 + (" + var + " >= 50 &&" + var + " < 100)*0.2 + (" + var + " >= 100)*0.1)"
+            z = ""
          
          elif zoom == 1:
             #nbins = 10
@@ -174,7 +174,7 @@ for den in dens:
             ROOT.gPad.Modified() 
             ROOT.gPad.Update() 
             
-            if plot == "efficiency" or (sample == "ZJets" or sample == "QCD" and plot == "misID"): 
+            if plot == "efficiency" or ((sample == "ZJets" or sample == "QCD") and plot == "misID"): 
                l1 = makeLegend() 
                l1.AddEntry("eff_efficiency_Veto", "Veto ID", "P") 
                l1.AddEntry("eff_efficiency_Loose", "Loose ID", "P") 

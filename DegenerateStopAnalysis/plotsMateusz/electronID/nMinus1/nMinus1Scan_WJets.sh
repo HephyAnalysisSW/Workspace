@@ -1,7 +1,7 @@
 #nMinus1Scan_WJets.sh
 SAMPLE="WJets"
 
-CUTS1="None
+CUTS="None
 sigmaEtaEta
 dEta
 dPhi
