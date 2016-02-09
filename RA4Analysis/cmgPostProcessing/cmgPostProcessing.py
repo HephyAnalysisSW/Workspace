@@ -36,7 +36,7 @@ separateBTagWeights = True
 
 defSampleStr = "TTJets_LO"
 
-subDir = "postProcessing_Data_with_filters_already_vetoed"
+subDir = "postProcessing_Tests"
 #subDir = "postProcessing_Tests"
 
 #branches to be kept for data and MC
@@ -216,9 +216,10 @@ for isample, sample in enumerate(allSamples):
   aliases = [ "met:met_pt", "metPhi:met_phi"]
 
   readVectors = [\
-    {'prefix':'LepGood', 'nMax':8, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I','charge/F' ,'relIso03/F','SPRING15_25ns_v1/I' ,'tightId/I', 'miniRelIso/F','mass/F','sip3d/F','mediumMuonId/I', 'mvaIdPhys14/F','mvaIdSpring15/F','lostHits/I', 'convVeto/I']},
-    {'prefix':'Jet',  'nMax':100, 'vars':['rawPt/F','pt/F', 'eta/F', 'phi/F', 'mass/F','id/I','btagCSV/F', 'btagCMVA/F']},
+    {'prefix':'LepGood', 'nMax':8, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I','charge/F' ,'relIso03/F','SPRING15_25ns_v1/I' ,'tightId/I', 'miniRelIso/F','mass/F','sip3d/F','mediumMuonId/I', 'mvaIdPhys14/F','mvaIdSpring15/F','lostHits/I', 'convVeto/I']}
   ]
+  if sample['isData']:
+    readVectors.append({'prefix':'Jet',  'nMax':100, 'vars':['rawPt/F','pt/F', 'eta/F', 'phi/F', 'mass/F','id/I','btagCSV/F', 'btagCMVA/F']})
   newVariables.extend(['LepToKeep_pdgId/I','l1l2ovMET_lepToKeep/F','Vecl1l2ovMET_lepToKeep/F','DPhil1l2_lepToKeep/F'])
   newVariables.extend(['l1l2ovMET_lepToDiscard/F','Vecl1l2ovMET_lepToDiscard/F','DPhil1l2_lepToDiscard/F'])
   ### diLepton variables ##
@@ -342,7 +343,7 @@ for isample, sample in enumerate(allSamples):
 
           if vetoEvt in evt_veto_list["ultimate"] :
             s.veto_evt_list = False
-            continue
+            #continue
 
           if "Muon" in sample['name']:
             s.muonDataSet = True

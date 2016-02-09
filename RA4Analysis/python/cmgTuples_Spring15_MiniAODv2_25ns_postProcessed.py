@@ -113,7 +113,7 @@ import pickle
 
 pickleDir = '/data/easilar/Spring15/25ns/'
 #signal_dir = '/data/easilar/cmgTuples/postProcessing_Signals/signal/'
-signal_dir = '/data/dspitzbart/cmgTuples/postProcessing_Signals/signal/'
+signal_dir = '/data/easilar/cmgTuples/postProcessing_Signals_v4/signal/'
 
 def getSignalSample(signal):
   if signal in allSignalStrings:

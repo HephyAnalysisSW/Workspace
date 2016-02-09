@@ -30,8 +30,9 @@ weight_str, weight_err_str = makeWeight(lumi, sampleLumi)
 
 prefix = 'singleLeptonic_Spring15_'
 #path = '/data/'+username+'/Results2015/Prediction_SFTemplate_MC_fullSR_lep_3.0/'
-pickleDir = '/data/easilar/Results2016/Prediction_SFtemplates_fullSR_lep_data_2p25/'
+#pickleDir = '/data/easilar/Results2016/Prediction_SFtemplates_fullSR_lep_data_2p25/'
 #pickleDir = '/data/dspitzbart/Results2015/Prediction_SFtemplates_validation_lep_data_2.1/'
+pickleDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_fullSR_lep_data_2p25_BACKUP_AN_JAN282016/'
 res = pickle.load(file(pickleDir+'resultsFinal_withSystematics_pkl'))
 if withSystematics:
   sys = pickle.load(file(pickleDir+'resultsFinal_withSystematics_pkl'))
@@ -347,9 +348,9 @@ pred_err = ROOT.TGraphAsymmErrors(bins, ax, ay, aexl, aexh, aeyl, aeyh)
 pred_err.SetFillColor(ROOT.kGray+1)
 pred_err.SetFillStyle(3244)
 pred_err.Draw('2 same')
-truth_H.SetMarkerStyle(22)
+truth_H.SetMarkerStyle(8)
 if unblinded or validation:
-  truth_H.SetMarkerStyle(20)
+  truth_H.SetMarkerStyle(8)
   truth_H.Draw('e1p same')
 else:
   truth_H.Draw('hist e same')
@@ -390,7 +391,7 @@ ratio2.GetXaxis().SetTitleSize(0.13)
 ratio2.GetXaxis().SetLabelSize(0.11)
 ratio2.GetXaxis().SetNdivisions(508)
 if validation or unblinded:
-  ratio2.GetYaxis().SetTitle('data/pred.')
+  ratio2.GetYaxis().SetTitle('MC/pred.')
 else:
   ratio2.GetYaxis().SetTitle('MC/pred.')
 ratio2.GetYaxis().SetTitleSize(0.13)

@@ -57,7 +57,10 @@ lepSF_h2b = d.GetPrimitive('h2b')
 
 
 #pickleDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_validation_lep_data_2p25/'
-pickleDir =  '/data/easilar/Results2016/Prediction_SFtemplates_fullSR_lep_data_2p25/'
+#pickleDir =  '/data/easilar/Results2016/Prediction_SFtemplates_fullSR_lep_data_2p25/'
+pickleDir =  '/data/dspitzbart/Results2016/Prediction_SFtemplates_fullSR_lep_data_2p25_BACKUP_AN_JAN282016/'
+saveDir = '/data/easilar/Results2016/Prediction_SFtemplates_fullSR_lep_data_2p25_BACKUP_AN_JAN282016/'
+
 
 wpol    = pickle.load(file('/data/dhandl/results2015/WPolarizationEstimation/20151218_wjetsPolSys_pkl'))
 b_err   = pickle.load(file('/data/dspitzbart/Results2016/btagErr_pkl'))
@@ -79,17 +82,17 @@ dataResult = rcs
 colors = [ROOT.kBlue+2, ROOT.kBlue-4, ROOT.kBlue-7, ROOT.kBlue-9, ROOT.kCyan-9, ROOT.kCyan-6, ROOT.kCyan-2,ROOT.kGreen+3,ROOT.kGreen-2,ROOT.kGreen-6,ROOT.kGreen-7, ROOT.kOrange-4, ROOT.kOrange+1, ROOT.kOrange+8, ROOT.kRed, ROOT.kRed+1]
 colors = [ROOT.kBlue-7, ROOT.kCyan-9, ROOT.kCyan-2, ROOT.kGreen-6, ROOT.kOrange+6, ROOT.kRed+1, ROOT.kRed-6, ROOT.kYellow+2, ROOT.kGreen, ROOT.kGreen+3, ROOT.kBlue-2]
 
+rcsErrH   = ROOT.TH1F('rcsErrH','R_{CS} n_{jet} depend.',bins,0,bins)
+dilepErrH = ROOT.TH1F('dilepErrH','dilep. events',bins,0,bins)
+qcdErrH   = ROOT.TH1F('qcdErrH','QCD fit',bins,0,bins)
 bErrH     = ROOT.TH1F('bErrH','b-jet SFs',bins,0,bins)
+topErrH   = ROOT.TH1F('topErrH','top p_{T}',bins,0,bins)
+jecErrH   = ROOT.TH1F('jecErrH','JEC',bins,0,bins)
 wXErrH    = ROOT.TH1F('WXErrH','W+jets x-sec',bins,0,bins)
 ttXErrH   = ROOT.TH1F('ttXErrH','t#bar{t}+jets x-sec',bins,0,bins)
 wPErrH    = ROOT.TH1F('wPErrH','W polarization',bins,0,bins)
-rcsErrH   = ROOT.TH1F('rcsErrH','R_{CS} n_{jet} depend.',bins,0,bins)
-qcdErrH   = ROOT.TH1F('qcdErrH','QCD fit',bins,0,bins)
 puErrH    = ROOT.TH1F('puErrH','pile-up',bins,0,bins)
 lepSFErrH = ROOT.TH1F('lepSFErrH','lepton SFs',bins,0,bins)
-topErrH   = ROOT.TH1F('topErrH','top p_{T}',bins,0,bins)
-dilepErrH = ROOT.TH1F('dilepErrH','dilep. events',bins,0,bins)
-jecErrH   = ROOT.TH1F('jecErrH','JEC',bins,0,bins)
 
 dilepC   = ROOT.TH1F('dilepC','2l constant',bins,0,bins)
 dilepS   = ROOT.TH1F('dilepS','2l slope',bins,0,bins)
@@ -426,5 +429,5 @@ can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/syst_
 can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/syst_errors_update.root')
 can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/syst_errors_update.pdf')
 
-pickle.dump(rcs, file(pickleDir+'resultsFinal_withSystematics_pkl','w'))
-print "pickle Written :" , pickleDir+'resultsFinal_withSystematics_pkl'
+pickle.dump(rcs, file(saveDir+'resultsFinal_withSystematics_pkl','w'))
+print "pickle Written :" , saveDir+'resultsFinal_withSystematics_pkl'
