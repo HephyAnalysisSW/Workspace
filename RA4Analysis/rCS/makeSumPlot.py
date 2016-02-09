@@ -348,9 +348,9 @@ pred_err = ROOT.TGraphAsymmErrors(bins, ax, ay, aexl, aexh, aeyl, aeyh)
 pred_err.SetFillColor(ROOT.kGray+1)
 pred_err.SetFillStyle(3244)
 pred_err.Draw('2 same')
-truth_H.SetMarkerStyle(8)
+truth_H.SetMarkerStyle(22)
 if unblinded or validation:
-  truth_H.SetMarkerStyle(8)
+  truth_H.SetMarkerStyle(20)
   truth_H.Draw('e1p same')
 else:
   truth_H.Draw('hist e same')
@@ -391,7 +391,7 @@ ratio2.GetXaxis().SetTitleSize(0.13)
 ratio2.GetXaxis().SetLabelSize(0.11)
 ratio2.GetXaxis().SetNdivisions(508)
 if validation or unblinded:
-  ratio2.GetYaxis().SetTitle('MC/pred.')
+  ratio2.GetYaxis().SetTitle('data/pred.')
 else:
   ratio2.GetYaxis().SetTitle('MC/pred.')
 ratio2.GetYaxis().SetTitleSize(0.13)
