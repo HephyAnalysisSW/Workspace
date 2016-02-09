@@ -54,7 +54,7 @@ branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert",
 #branches to be kept for MC samples only
 branchKeepStrings_MC = [ "nTrueInt","lheHTIncoming","genWeight", "xsec", "puWeight", 
                      "GenSusyMScan1", "GenSusyMScan2", "GenSusyMScan3", "GenSusyMScan4", "GenSusyMGluino", "GenSusyMGravitino", "GenSusyMStop", "GenSusyMSbottom", "GenSusyMStop2", "GenSusyMSbottom2", "GenSusyMSquark", "GenSusyMNeutralino", "GenSusyMNeutralino2", "GenSusyMNeutralino3", "GenSusyMNeutralino4", "GenSusyMChargino", "GenSusyMChargino2", 
-                     "nJetForMET", "JetForMET_*", 
+#                     "nJetForMET", "JetForMET_*", 
                      "ngenLep", "genLep_*", 
                      "nGenPart", "GenPart_*",
                      "ngenTau", "genTau_*", 
@@ -75,6 +75,7 @@ parser.add_option("--calcbtagweights", dest="systematics", default = False, acti
 parser.add_option("--btagWeight", dest="btagWeight", default = 2, action="store", help="Max nBJet to calculate the b-tag weight for")
 parser.add_option("--hadronicLeg", dest="hadronicLeg", default = False, action="store_true", help="Use only the hadronic leg of the sample?")
 parser.add_option("--manScaleFactor", dest="manScaleFactor", default = 1, action="store", help="define a scale factor for the whole sample")
+parser.add_option("--useXSecFile", dest="readXsecFromFile", default = False, action="store_true", help="Read x-secs from file instead of using the branch value?")
 
 (options, args) = parser.parse_args()
 skimCond = "(1)"
@@ -211,6 +212,10 @@ for isample, sample in enumerate(allSamples):
     if top in sample['name'].lower(): sampleKey = 'WJets'
   if not sampleKey: sampleKey = 'none'
   
+  readXsecFromFile = options.readXsecFromFile
+  if readXsecFromFile:
+    xsecFromFile = xsec[sample['dbsName']]
+  
   readVariables = ['met_pt/F', 'met_phi/F','met_eta/F','met_mass/F']
   newVariables = ['weight/F','muonDataSet/I','eleDataSet/I','veto_evt_list/I/1']
   aliases = [ "met:met_pt", "metPhi:met_phi"]
@@ -230,7 +235,7 @@ for isample, sample in enumerate(allSamples):
   if not sample['isData']: 
     readVectors.append({'prefix':'GenPart',  'nMax':100, 'vars':['eta/F','pt/F','phi/F','mass/F','charge/F', 'pdgId/I', 'motherId/F', 'grandmotherId/F']})
     readVectors.append({'prefix':'JetForMET',  'nMax':100, 'vars':['rawPt/F','pt/F', 'eta/F', 'phi/F','mass/F' ,'id/I','hadronFlavour/F','btagCSV/F', 'btagCMVA/F','corr_JECUp/F','corr_JECDown/F','corr/F']})
-    readVectors.append({'prefix':'Jet',  'nMax':100, 'vars':['rawPt/F','pt/F', 'eta/F', 'phi/F','mass/F' ,'id/I','hadronFlavour/F','btagCSV/F', 'btagCMVA/F','corr_JECUp/F','corr_JECDown/F','corr/F']})
+    readVectors.append({'prefix':'Jet',  'nMax':100, 'vars':['corr_JECUp/F','corr_JECDown/F','corr/F']})
    
     newVariables.extend(['puReweight_true/F','puReweight_true_max4/F','puReweight_true_Down/F','puReweight_true_Up/F','weight_diLepTTBar0p5/F','weight_diLepTTBar2p0/F','weight_XSecTTBar1p1/F','weight_XSecTTBar0p9/F','weight_XSecWJets1p1/F','weight_XSecWJets0p9/F'])
     newVariables.extend(['GenTopPt/F/-999.','GenAntiTopPt/F/-999.','TopPtWeight/F/1.','GenTTBarPt/F/-999.','GenTTBarWeight/F/1.','nGenTops/I/0.'])
@@ -315,6 +320,7 @@ for isample, sample in enumerate(allSamples):
         t.GetEntry(i)
         genWeight = 1 if sample['isData'] else t.GetLeaf('genWeight').GetValue()
         xsec_branch = 1 if sample['isData'] else t.GetLeaf('xsec').GetValue()
+        if readXsecFromFile: xsec_branch = xsecFromFile
         lumi_branch = t.GetLeaf('lumi').GetValue()
         evt_branch = t.GetLeaf('evt').GetValue()
         #print evt_branch
