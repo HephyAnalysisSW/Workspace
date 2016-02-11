@@ -30,13 +30,13 @@ except IOError:
   print 'Unable to load MC efficiency file!'
   mcEffDict = False
 
-target_lumi = 2110 #pb-1
+target_lumi = 2250 #pb-1
 
 separateBTagWeights = True
 
 defSampleStr = "TTJets_LO_HT600to800_25ns"
 
-subDir = "postProcessed_Spring15_antiSelection_final2p1fb_V6"
+subDir = "postProcessed_Spring15_antiSelection_final2p25fb"
 
 #branches to be kept for data and MC
 branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert",
