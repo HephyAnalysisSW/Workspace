@@ -82,7 +82,7 @@ QCDHT_25ns = {
 "QCD_HT500to700",
 "QCD_HT700to1000",
 ],
-'dir' : dir,
+'dir' : dir,# '/data/dspitzbart/cmgTuples/postProcessing_Data_with_filters_already_vetoed/HT500LT250Skim/',
 }
 
 TTV_25ns = {

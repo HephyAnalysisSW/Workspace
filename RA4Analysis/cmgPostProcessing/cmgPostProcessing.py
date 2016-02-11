@@ -213,8 +213,10 @@ for isample, sample in enumerate(allSamples):
   if not sampleKey: sampleKey = 'none'
   
   readXsecFromFile = options.readXsecFromFile
+  print readXsecFromFile
   if readXsecFromFile:
     xsecFromFile = xsec[sample['dbsName']]
+    print xsecFromFile
   
   readVariables = ['met_pt/F', 'met_phi/F','met_eta/F','met_mass/F']
   newVariables = ['weight/F','muonDataSet/I','eleDataSet/I','veto_evt_list/I/1']
@@ -234,8 +236,8 @@ for isample, sample in enumerate(allSamples):
          newVariables.extend(["DL_"+var_DL+"_"+lep_DL+"_"+action+"/F/-999."])
   if not sample['isData']: 
     readVectors.append({'prefix':'GenPart',  'nMax':100, 'vars':['eta/F','pt/F','phi/F','mass/F','charge/F', 'pdgId/I', 'motherId/F', 'grandmotherId/F']})
-    readVectors.append({'prefix':'JetForMET',  'nMax':100, 'vars':['rawPt/F','pt/F', 'eta/F', 'phi/F','mass/F' ,'id/I','hadronFlavour/F','btagCSV/F', 'btagCMVA/F','corr_JECUp/F','corr_JECDown/F','corr/F']})
-    readVectors.append({'prefix':'Jet',  'nMax':100, 'vars':['corr_JECUp/F','corr_JECDown/F','corr/F']})
+    readVectors.append({'prefix':'JetForMET',  'nMax':100, 'vars':['rawPt/F','pt/F', 'eta/F', 'phi/F', 'mass/F','id/I','hadronFlavour/F','btagCSV/F', 'btagCMVA/F','corr_JECUp/F','corr_JECDown/F','corr/F']})
+    readVectors.append({'prefix':'Jet',  'nMax':100,       'vars':['rawPt/F','pt/F', 'eta/F', 'phi/F', 'mass/F','id/I','hadronFlavour/F','btagCSV/F', 'btagCMVA/F','corr_JECUp/F','corr_JECDown/F','corr/F']})
    
     newVariables.extend(['puReweight_true/F','puReweight_true_max4/F','puReweight_true_Down/F','puReweight_true_Up/F','weight_diLepTTBar0p5/F','weight_diLepTTBar2p0/F','weight_XSecTTBar1p1/F','weight_XSecTTBar0p9/F','weight_XSecWJets1p1/F','weight_XSecWJets0p9/F'])
     newVariables.extend(['GenTopPt/F/-999.','GenAntiTopPt/F/-999.','TopPtWeight/F/1.','GenTTBarPt/F/-999.','GenTTBarWeight/F/1.','nGenTops/I/0.'])
@@ -253,6 +255,10 @@ for isample, sample in enumerate(allSamples):
         newVariables.extend(["jec_"+vars_str+"_"+corrJEC_str+"/I/-999."])
 
     aliases.extend(['genMet:met_genPt', 'genMetPhi:met_genPhi'])
+
+  if sample['isData']:
+    readVectors.append({'prefix':'Jet',  'nMax':100, 'vars':['rawPt/F','pt/F', 'eta/F', 'phi/F', 'mass/F','id/I','btagCSV/F', 'btagCMVA/F']})
+
   newVariables.extend( ['nLooseSoftLeptons/I', 'nLooseHardLeptons/I', 'nTightSoftLeptons/I', 'nTightHardLeptons/I'] )
   newVariables.extend( ['deltaPhi_Wl/F','nBJetMediumCSV30/I','nJet30/I','htJet30j/F','st/F'])
   newVariables.extend( ['leptonPt/F','leptonEt/F','leptonMiniRelIso/F','leptonRelIso03/F' ,\
@@ -266,7 +272,6 @@ for isample, sample in enumerate(allSamples):
       newVariables.extend( ["weightBTag"+str(i+1)+"p/F", "weightBTag"+str(i+1)+"p_SF/F", "weightBTag"+str(i+1)+"p_SF_b_Up/F", "weightBTag"+str(i+1)+"p_SF_b_Down/F", "weightBTag"+str(i+1)+"p_SF_light_Up/F", "weightBTag"+str(i+1)+"p_SF_light_Down/F"])
   newVars = [readVar(v, allowRenaming=False, isWritten = True, isRead=False) for v in newVariables]
 
-  
   readVars = [readVar(v, allowRenaming=False, isWritten=False, isRead=True) for v in readVariables]
   for v in readVectors:
     readVars.append(readVar('n'+v['prefix']+'/I', allowRenaming=False, isWritten=False, isRead=True))
@@ -280,13 +285,13 @@ for isample, sample in enumerate(allSamples):
   readClassName = "ClassToRead_"+str(isample)
   readClassString = createClassString(className=readClassName, vars=readVars, vectors=readVectors, nameKey = 'stage1Name', typeKey = 'stage1Type', stdVectors=False)
   printHeader("Class to Read")
+  
   r = compileClass(className=readClassName, classString=readClassString, tmpDir='/data/'+username+'/tmp/')
 
   veto_csc_list = []
   veto_ecal_list = []
   veto_muon_list = []
   veto_badreso_list = []
-
 
   filesForHadd=[]
   if options.small: chunks=chunks[:1]

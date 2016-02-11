@@ -178,7 +178,7 @@ noCut = {'name':'empty', 'string':'(1)', 'niceName':'no cut'}
 name, allSRcut = nameAndCut((250,-1),(500,-1),(5,-1),btb=(0,-1),presel=newpresel)
 allSR = {'name':name,'string':allSRcut,'niceName':'all SR'}
 allSR_test = {'name':name,'string':allSRcut+'&&weight<1','niceName':'all SR'}
-
+allSR_lowHT = {'name':name,'string':allSRcut+'&&htJet30j<900','niceName':'all SR'}
 
 name, cut = nameAndCut((250,350),(500,750),(4,5),btb=(0,-1),presel=newpresel)
 ttSBbin1 = {'name':name,'string':cut,'niceName':'Lowest SR'}
@@ -386,7 +386,7 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
     for i_eb, eb in enumerate(variable['binning']):
       if not entry:
         scaleYield = eb - variable['binning'][i_eb-1]
-        print scaleYield
+        #print scaleYield
         scaleHist.SetBinContent(i_eb, scaleYield/variable['binNorm'])
         scaleHist.SetBinError(i_eb, 0)
       entry = False
@@ -479,7 +479,8 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
       #else:
       #  weight=str(sample['weight'])
       #  print ' - weight:', weight
-      print normWeight
+      #print normWeight
+      #print normCut
       if sample['cut']:
         normCut = normCut + '&&' + sample['cut']
         print ' - cut:', sample['name']
@@ -633,6 +634,23 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
   can.Update()
   if stacking: return {'hist':h, 'canvas':can, 'legend':leg, 'stack':h_Stack, 'signals':s}
   else: return {'hist':h, 'canvas':can, 'legend':leg, 'signals':s}
+
+def plotInSignalRegions2(samples, presel, data=False, fixedNJet=None, btb=None, signalRegions=signalRegion3fb, legend=True, stacking=True, fractions=True, minimum=0, maximum=0, MClumiScale=2.2/3., MCscale=1, titleText='simulation', lumi=2.2, btagcut='nBJetMediumCSV30==0', btagweight='weightBTag0_SF'):
+  totalQCD = 0
+  for i_njb, njb in enumerate(sorted(signalRegions)):
+    for stb in sorted(signalRegions[njb]):
+      for htb in sorted(signalRegions[njb][stb]):
+        name, cut = nameAndCut(stb,htb,njb,btb=(0,-1),presel=presel)
+        cutD = {'name':name,'string':cut,'niceName':name}
+        qcdEvents = getYieldFromChain(QCD['chain'], cut+'&&deltaPhi_Wl>'+str(signalRegions[njb][stb][htb]['deltaPhi']))
+        print 'weighted QCD events in SR:',qcdEvents
+        qcdEvents = getYieldFromChain(QCD['chain'], cut+'&&deltaPhi_Wl>'+str(signalRegions[njb][stb][htb]['deltaPhi']), weight='(1)')
+        print 'unweighted QCD events in SR:',qcdEvents
+        totalQCD += qcdEvents
+        t = plot(samples, deltaPhiSRB, cutD, stacking = False, filling = False, setLogY=True, lumi=2.2, MClumiScale=2.2/3., drawError=True, titleText='simulation', minimum=0.001)
+        savePlot(t, 'Results2016/plots/mainbands/', 'totalBkg_'+name)
+  print totalQCD
+
 
 def plotInSignalRegions(samples, presel, data=False, fixedNJet=None, btb=None, signalRegions=signalRegion3fb, legend=True, stacking=True, fractions=True, minimum=0, maximum=0, MClumiScale=2.2/3., MCscale=1, titleText='preliminary', lumi=2.2, btagcut='nBJetMediumCSV30==0', btagweight='weightBTag0_SF'):
   can = ROOT.TCanvas('c','c',700,700)
