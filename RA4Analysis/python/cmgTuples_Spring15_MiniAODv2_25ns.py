@@ -11,7 +11,16 @@ path = "/data/easilar/tuples_from_Artur/HT350_1nLep_LT200_hadrFlav/"
 #"treeName":"tree",
 #'isData':False,
 #}
-
+TTJets_fastSim = {\
+"name" : "TTJets_fastSim",
+"chunkString":"TTJets_fastSim",
+"dir": "/afs/cern.ch/work/e/easilar/FastSim_TTJets/",
+"dbsName" : "/TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15MiniAODv2-FastAsympt25ns_74X_mcRun2_asymptotic_v2-v1/MINIAODSIM",
+"skimAnalyzerDir":"skimAnalyzerCount",
+"rootFileLocation":"/treeProducerSusySingleLepton/tree.root",
+"treeName":"tree",
+'isData':False,
+}
 TTJets_SingleLeptonFromT_full = {\
 "name" : "TTJets_SingleLepton",
 "chunkString":"TTJets_SingleLepton",

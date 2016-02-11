@@ -36,7 +36,7 @@ separateBTagWeights = True
 
 defSampleStr = "TTJets_LO"
 
-subDir = "postProcessing_Tests"
+subDir = "postProcessing_MC"
 #subDir = "postProcessing_Tests"
 
 #branches to be kept for data and MC
