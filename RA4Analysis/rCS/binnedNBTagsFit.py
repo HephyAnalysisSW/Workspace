@@ -157,8 +157,8 @@ def binnedNBTagsFit(cut, cutname, samples, prefix = "", QCD_dict={0:{'y':0.,'e':
         hData_NegPdg.SetBinError(i_nbjb+1, err)
   ##### use this for DATA
   else:
-    hData_PosPdg = getPlotFromChain(cData, nBTagVar, [0,1,2,3], 'leptonPdg>0&&'+cut+"&& veto_evt_list", w, binningIsExplicit=True,addOverFlowBin='upper')
-    hData_NegPdg = getPlotFromChain(cData, nBTagVar, [0,1,2,3], 'leptonPdg<0&&'+cut+"&& veto_evt_list", w, binningIsExplicit=True,addOverFlowBin='upper')
+    hData_PosPdg = getPlotFromChain(cData, nBTagVar, [0,1,2,3], 'leptonPdg>0&&'+cut, w, binningIsExplicit=True,addOverFlowBin='upper')
+    hData_NegPdg = getPlotFromChain(cData, nBTagVar, [0,1,2,3], 'leptonPdg<0&&'+cut, w, binningIsExplicit=True,addOverFlowBin='upper')
     #hData_PosPdg.Add(hQCD,-1)
     #hData_NegPdg.Add(hQCD,-1)
   hData_PosPdg_File = ROOT.TFile(templateDir+cutname+'_PosPdg_DataHist.root','new')
