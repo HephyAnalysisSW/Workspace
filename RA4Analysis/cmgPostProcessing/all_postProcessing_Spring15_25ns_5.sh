@@ -30,12 +30,12 @@
 #python cmgPostProcessing.py --leptonSelection=hard --skim=""  --samples=QCD_bcToE_Pt250toInf_25ns
 #
 #python cmgPostProcessing.py --overwrite   --skim="HT500ST250"  --samples=QCD_HT200to300_25ns
-python cmgPostProcessing.py --overwrite --useXSecFile  --skim="HT500ST250"  --samples=QCD_HT300to500_25ns
-python cmgPostProcessing.py --overwrite --useXSecFile  --skim="HT500ST250"  --samples=QCD_HT500to700_25ns
-python cmgPostProcessing.py --overwrite --useXSecFile  --skim="HT500ST250"  --samples=QCD_HT700to1000_25ns
-python cmgPostProcessing.py --overwrite --useXSecFile  --skim="HT500ST250"  --samples=QCD_HT1000to1500_25ns
-python cmgPostProcessing.py --overwrite --useXSecFile  --skim="HT500ST250"  --samples=QCD_HT1500to2000_25ns
-python cmgPostProcessing.py --overwrite --useXSecFile  --skim="HT500ST250"  --samples=QCD_HT2000toInf_25ns
+python cmgPostProcessing.py --overwrite  --skim="HT500ST250"  --samples=QCD_HT300to500_25ns
+python cmgPostProcessing.py --overwrite  --skim="HT500ST250"  --samples=QCD_HT500to700_25ns
+python cmgPostProcessing.py --overwrite  --skim="HT500ST250"  --samples=QCD_HT700to1000_25ns
+python cmgPostProcessing.py --overwrite  --skim="HT500ST250"  --samples=QCD_HT1000to1500_25ns
+python cmgPostProcessing.py --overwrite  --skim="HT500ST250"  --samples=QCD_HT1500to2000_25ns
+python cmgPostProcessing.py --overwrite  --skim="HT500ST250"  --samples=QCD_HT2000toInf_25ns
 #
 #python cmgPostProcessing.py --leptonSelection=hard --skim=""  --samples=QCD_Pt_80to120_25ns
 #python cmgPostProcessing.py --leptonSelection=hard --skim=""  --samples=QCD_Pt_120to170_25ns
