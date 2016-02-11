@@ -287,7 +287,7 @@ def getNew_METandLT_WithJEC(s,r, corrJEC = "central"):
 def getNew_JetVars_WithJEC(r ,corrJEC = "central"):
 
    ##jet collection has 20 GeV cut  
-   j_list = ['rawPt','pt', 'eta', 'phi', 'mass' ,'id','hadronFlavour','btagCSV', 'btagCMVA','corr_JECUp','corr_JECDown','corr']
+   j_list = ['rawPt','pt', 'eta', 'phi', 'mass' ,'id','btagCSV', 'btagCMVA','corr_JECUp','corr_JECDown','corr']
    jets = get_cmg_jets_fromStruct(r,j_list) 
    newjets = jets
    if corrJEC == "central":

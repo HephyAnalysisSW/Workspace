@@ -55,3 +55,29 @@ def addDPhiCutDict(res, signalRegions):
 
 def sign(a):
   return (a > 0) - (a < 0)
+
+def printMatrix(matrix, name='MATRIX', precision=5):
+  a = matrix.GetNrows()
+  b = matrix.GetNcols()
+  fmt = ''
+  for i in range(b+1):
+    fmt += '{'+str(i)+':<12}'
+  #rows = []
+  rows = name + '\n\n'
+  tup = (' ',)
+  for i in range(b):
+    tup += ('p'+str(i),)
+  exec('row=fmt.format'+str(tup))
+  rows += row +'\n'
+  #print row
+  for i in range(a):
+    tup = ()
+    tup += ('p'+str(i),)
+    for j in range(b):
+      tup += ("%0.2e"%matrix(i,j),)
+    exec('row=fmt.format'+str(tup))
+    rows += row + '\n'
+    #print row
+  return rows
+
+
