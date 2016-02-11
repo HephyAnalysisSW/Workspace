@@ -205,7 +205,7 @@ for isample, sample in enumerate(allSamples):
     branchKeepStrings = branchKeepStrings_DATAMC + branchKeepStrings_MC
   
   readVariables = ['met_pt/F', 'met_phi/F']
-  newVariables = ['weight/F', 'muonDataSet/I', 'eleDataSet/I']
+  newVariables = ['weight/F', 'muonDataSet/I', 'eleDataSet/I', 'veto_evt_list/I/1']
   aliases = [ "met:met_pt", "metPhi:met_phi"]
 
   readVectors = [\
@@ -286,10 +286,14 @@ for isample, sample in enumerate(allSamples):
         s.init()
         r.init()
         t.GetEntry(i)
-
+        lumi_branch = t.GetLeaf('lumi').GetValue()
+        evt_branch = t.GetLeaf('evt').GetValue()
+        
         if sample['isData']:
-          vetoEvt = str(t.GetLeaf('run').GetValue())+":"+str(t.GetLeaf('lumi').GetValue())+":"+str(t.GetLeaf('evt').GetValue())+"\n"
-          if vetoEvt in evt_veto_list : continue
+          #vetoEvt = str(t.GetLeaf('run').GetValue())+":"+str(t.GetLeaf('lumi').GetValue())+":"+str(t.GetLeaf('evt').GetValue())+"\n"
+          vetoEvt = str(int(t.GetLeaf('run').GetValue()))+":"+str(int(lumi_branch))+":"+str(int(evt_branch))+"\n"
+          if vetoEvt in evt_veto_list["ultimate"]:
+            s.veto_evt_list = False
 
         genWeight = 1 if sample['isData'] else t.GetLeaf('genWeight').GetValue()
         xsectemp = 1 if sample['isData'] else t.GetLeaf('xsec').GetValue()
