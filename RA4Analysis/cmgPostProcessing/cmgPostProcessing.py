@@ -213,10 +213,8 @@ for isample, sample in enumerate(allSamples):
   if not sampleKey: sampleKey = 'none'
   
   readXsecFromFile = options.readXsecFromFile
-  print readXsecFromFile
   if readXsecFromFile:
     xsecFromFile = xsec[sample['dbsName']]
-    print xsecFromFile
   
   readVariables = ['met_pt/F', 'met_phi/F','met_eta/F','met_mass/F']
   newVariables = ['weight/F','muonDataSet/I','eleDataSet/I','veto_evt_list/I/1']
@@ -253,11 +251,7 @@ for isample, sample in enumerate(allSamples):
         print "jec_"+vars_str+"_"+corrJEC_str+"/F/-999."
       for vars_str in vars_corr_1:
         newVariables.extend(["jec_"+vars_str+"_"+corrJEC_str+"/I/-999."])
-
     aliases.extend(['genMet:met_genPt', 'genMetPhi:met_genPhi'])
-
-  if sample['isData']:
-    readVectors.append({'prefix':'Jet',  'nMax':100, 'vars':['rawPt/F','pt/F', 'eta/F', 'phi/F', 'mass/F','id/I','btagCSV/F', 'btagCMVA/F']})
 
   newVariables.extend( ['nLooseSoftLeptons/I', 'nLooseHardLeptons/I', 'nTightSoftLeptons/I', 'nTightHardLeptons/I'] )
   newVariables.extend( ['deltaPhi_Wl/F','nBJetMediumCSV30/I','nJet30/I','htJet30j/F','st/F'])
