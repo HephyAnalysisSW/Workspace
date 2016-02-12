@@ -377,6 +377,12 @@ for deltaPhi in deltaPhis:
   for htb in [(500,-1),(500,750),(500,1000),(750,1000),(750,-1),(1000,-1)]:
     name, cut = nameAndCut((250,-1), htb, (3,-1), btb=(0,0), presel=presel)
     rcs[deltaPhi][htb] = getRCS(QCD['chain'], cut, deltaPhi)
+    for ltb in [(250,350), (350,450), (450,-1)]:
+      name, cut = nameAndCut(ltb, htb, (3,-1), btb=(0,0), presel=presel)
+      rcs[deltaPhi][htb][ltb] = getRCS(QCD['chain'], cut, deltaPhi)
+  for ltb in [(250,350), (350,450), (450,-1)]:
+    name, cut = nameAndCut(ltb, (500,-1), (3,-1), btb=(0,0), presel=presel)
+    rcs[deltaPhi][ltb] = getRCS(QCD['chain'], cut, deltaPhi)
 
 signalRegions = signalRegion3fb
 
@@ -387,8 +393,15 @@ pred = pickle.load(file(pickleDir+'resultsFinal_withSystematics_pkl'))
 #res = pickle.load(file(pickleDir+'resultsFinal_withSystematics_pkl'))
 QCD_est = pickle.load(file(QCDpickle))
 
+QCD_LT = {}
+QCD_HT = {}
+
 for srNJet in sorted(signalRegions):
+  QCD_LT[srNJet] = {}
+  QCD_HT[srNJet] = {}
   for stb in sorted(signalRegions[srNJet]):
+    QCD_LT[srNJet][stb] = {}
+    QCD_HT[srNJet][stb] = {}
     for htb in sorted(signalRegions[srNJet][stb]):
       deltaPhi = signalRegions[srNJet][stb][htb]['deltaPhi']
       print
@@ -400,12 +413,83 @@ for srNJet in sorted(signalRegions):
       QCD_err = QCD_est[srNJet][stb][htb][(0,0)][deltaPhi]['NQCDpred_err']
       if math.isnan(QCD_err):
         QCD_err = QCD_y
-      QCD_highDPhi_upper = getPropagatedError([rcs[deltaPhi][htb]['rCS'], QCD_y], [rcs[deltaPhi][htb]['rCSE_pred'], QCD_err], (1+rcs[deltaPhi][htb]['rCS']), rcs[deltaPhi][htb]['rCSE_pred'], returnCalcResult=True)
+      QCD_highDPhi_upper_LTbinned = getPropagatedError([rcs[deltaPhi][stb]['rCS'], QCD_y], [rcs[deltaPhi][stb]['rCSE_sim'], QCD_err], (1+rcs[deltaPhi][stb]['rCS']), rcs[deltaPhi][stb]['rCSE_sim'], returnCalcResult=True)
+      QCD_highDPhi_upper_HTbinned = getPropagatedError([rcs[deltaPhi][htb]['rCS'], QCD_y], [rcs[deltaPhi][htb]['rCSE_sim'], QCD_err], (1+rcs[deltaPhi][htb]['rCS']), rcs[deltaPhi][htb]['rCSE_sim'], returnCalcResult=True)
       
-      QCD_frac = getPropagatedError(QCD_highDPhi_upper[0],QCD_highDPhi_upper[1],pred[srNJet][stb][htb]['tot_pred_final'], pred[srNJet][stb][htb]['tot_pred_final_err'], returnCalcResult=True)
+      QCD_frac_LTbinned = getPropagatedError(QCD_highDPhi_upper_LTbinned[0],QCD_highDPhi_upper_LTbinned[1],pred[srNJet][stb][htb]['tot_pred_final'], pred[srNJet][stb][htb]['tot_pred_final_err'], returnCalcResult=True)
+      QCD_frac_HTbinned = getPropagatedError(QCD_highDPhi_upper_HTbinned[0],QCD_highDPhi_upper_HTbinned[1],pred[srNJet][stb][htb]['tot_pred_final'], pred[srNJet][stb][htb]['tot_pred_final_err'], returnCalcResult=True)
       
-      print 'Rcs', getValErrString(rcs[deltaPhi][htb]['rCS'], rcs[deltaPhi][htb]['rCSE_pred'], precision=3)
-      print 'tot QCD', getValErrString(QCD_y, QCD_err, precision=4)
+      QCD_LT[srNJet][stb][htb] = {'y':QCD_highDPhi_upper_LTbinned, 'frac':QCD_frac_LTbinned, 'Rcs':rcs[deltaPhi][stb]}
+      QCD_HT[srNJet][stb][htb] = {'y':QCD_highDPhi_upper_HTbinned, 'frac':QCD_frac_HTbinned, 'Rcs':rcs[deltaPhi][htb]}
+      
+      print 'Rcs', getValErrString(rcs[deltaPhi][stb]['rCS'], rcs[deltaPhi][stb]['rCSE_sim'], precision=4)
+      print 'tot QCD', getValErrString(QCD_y, QCD_err, precision=3)
       print 'QCD pred (antisel Rcs)', getValErrString(QCD_est[srNJet][stb][htb][(0,0)][deltaPhi]['NQCDpred_highdPhi'], QCD_est[srNJet][stb][htb][(0,0)][deltaPhi]['NQCDpred_highdPhi_err'], precision=3)
-      print 'QCD in SR (upper bound)', getValErrString(QCD_highDPhi_upper[0], QCD_highDPhi_upper[1], precision=3)
-      print 'Fraction wrt to total Bkg', getValErrString(QCD_frac[0],QCD_frac[1])
+      print 'QCD in SR (upper bound)', getValErrString(QCD_highDPhi_upper_LTbinned[0], QCD_highDPhi_upper_LTbinned[1], precision=3)
+      print 'Fraction wrt to total Bkg', getValErrString(QCD_frac_LTbinned[0],QCD_frac_LTbinned[1])
+
+
+rowsNJet = {}
+rowsSt = {}
+for srNJet in sorted(signalRegions):
+  rowsNJet[srNJet] = {}
+  rowsSt[srNJet] = {}
+  rows = 0
+  for stb in sorted(signalRegions[srNJet]):
+    rows += len(signalRegions[srNJet][stb])
+    rowsSt[srNJet][stb] = {'n':len(signalRegions[srNJet][stb])}
+  rowsNJet[srNJet] = {'nST':len(signalRegions[srNJet]), 'n':rows}
+
+
+print
+print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrr|rrr|rrr|}\\hline'
+print ' \\njet     & \LT & \HT     & \multicolumn{3}{c|}{EWK} & \multicolumn{9}{c|}{QCD}\\\%\hline'
+print ' & $[$GeV$]$ & $[$GeV$]$ & \multicolumn{3}{c|}{pred} & \multicolumn{3}{c}{yield}&\multicolumn{3}{c}{frac. wrt EWK} & \multicolumn{3}{c|}{$R_{CS}$} \\\\\hline'
+
+secondLine = False
+for srNJet in sorted(signalRegions):
+  print '\\hline'
+  if secondLine: print '\\hline'
+  secondLine = True
+  print '\multirow{'+str(rowsNJet[srNJet]['n'])+'}{*}{\\begin{sideways}$'+varBin(srNJet)+'$\end{sideways}}'
+  for stb in sorted(signalRegions[srNJet]):
+    print '&\multirow{'+str(rowsSt[srNJet][stb]['n'])+'}{*}{$'+varBin(stb)+'$}'
+    first = True
+    for htb in sorted(signalRegions[srNJet][stb]):
+      if not first: print '&'
+      first = False
+      print '&$'+varBin(htb)+'$'
+      print ' & '+getNumString(pred[srNJet][stb][htb]['tot_pred_final'], pred[srNJet][stb][htb]['tot_pred_final_err'])\
+           +' & '+getNumString(QCD_LT[srNJet][stb][htb]['y'][0], QCD_LT[srNJet][stb][htb]['y'][1], 3)\
+           +' & '+getNumString(QCD_LT[srNJet][stb][htb]['frac'][0], QCD_LT[srNJet][stb][htb]['frac'][1])\
+           +' & '+getNumString(QCD_LT[srNJet][stb][htb]['Rcs']['rCS'], QCD_LT[srNJet][stb][htb]['Rcs']['rCSE_sim'],4) +'\\\\'
+      if htb[1] == -1 : print '\\cline{2-15}'
+print '\\hline\end{tabular}}\end{center}\caption{Estimated QCD contamination in the SRs for $R_{CS}$(QCD) measured in $L_T$ bins, 2.25fb$^{-1}$}\label{tab:0b_QCD_SR_upper_LT}\end{table}'
+
+print
+print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrr|rrr|rrr|}\\hline'
+print ' \\njet     & \LT & \HT     & \multicolumn{3}{c|}{EWK} & \multicolumn{9}{c|}{QCD}\\\%\hline'
+print ' & $[$GeV$]$ &$[$GeV$]$&\multicolumn{3}{c|}{pred} & \multicolumn{3}{c}{yield}&\multicolumn{3}{c}{frac. wrt EWK} & \multicolumn{3}{c|}{$R_{CS}$} \\\\\hline'
+
+secondLine = False
+for srNJet in sorted(signalRegions):
+  print '\\hline'
+  if secondLine: print '\\hline'
+  secondLine = True
+  print '\multirow{'+str(rowsNJet[srNJet]['n'])+'}{*}{\\begin{sideways}$'+varBin(srNJet)+'$\end{sideways}}'
+  for stb in sorted(signalRegions[srNJet]):
+    print '&\multirow{'+str(rowsSt[srNJet][stb]['n'])+'}{*}{$'+varBin(stb)+'$}'
+    first = True
+    for htb in sorted(signalRegions[srNJet][stb]):
+      if not first: print '&'
+      first = False
+      print '&$'+varBin(htb)+'$'
+      print ' & '+getNumString(pred[srNJet][stb][htb]['tot_pred_final'], pred[srNJet][stb][htb]['tot_pred_final_err'])\
+           +' & '+getNumString(QCD_HT[srNJet][stb][htb]['y'][0],        QCD_HT[srNJet][stb][htb]['y'][1], 3)\
+           +' & '+getNumString(QCD_HT[srNJet][stb][htb]['frac'][0],     QCD_HT[srNJet][stb][htb]['frac'][1])\
+           +' & '+getNumString(QCD_HT[srNJet][stb][htb]['Rcs']['rCS'],  QCD_HT[srNJet][stb][htb]['Rcs']['rCSE_sim'],4) +'\\\\'
+      if htb[1] == -1 : print '\\cline{2-15}'
+print '\\hline\end{tabular}}\end{center}\caption{Estimated QCD contamination in the SRs for $R_{CS}$(QCD) measured in $H_T$ bins, 2.25fb$^{-1}$}\label{tab:0b_QCD_SR_upper_HT}\end{table}'
+
+
+
