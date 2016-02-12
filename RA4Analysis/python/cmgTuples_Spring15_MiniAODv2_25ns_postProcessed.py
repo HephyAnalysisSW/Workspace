@@ -133,5 +133,6 @@ def getSignalSample(signal):
 allSignals=[]
 for s in allSignalStrings:
   sm = getSignalSample(s)
+  exec(s+"=sm")
   allSignals.append(sm)
 
