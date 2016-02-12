@@ -1,5 +1,7 @@
 import copy, os, sys
-dir = '/data/dhandl/cmgTuples/postProcessed_Spring15_antiSelection_final2p1fb_V6/none/'
+#dir = '/data/dhandl/cmgTuples/postProcessed_Spring15_antiSelection_final2p1fb_V6/none/'
+dir2 = '/data/dspitzbart/cmgTuples/postProcessed_Spring15_antiSelection_final2p25fb/'
+dir = dir2+'none/'
 
 single_mu_Run2015D = {\
 "name" : "single_mu_Run215D",
@@ -60,7 +62,7 @@ TTJets_combined_2 = {\
 "semiLep/none/TTJets_SingleLeptonFromT_full",
 "semiLep/none/TTJets_SingleLeptonFromTbar_full",
 ],
-'dir' : '/data/dhandl/cmgTuples/postProcessed_Spring15_antiSelection_final2p1fb_V6/',
+'dir' : dir2,#'/data/dhandl/cmgTuples/postProcessed_Spring15_antiSelection_final2p1fb_V6/',
 }
 
 

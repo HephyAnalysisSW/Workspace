@@ -14,17 +14,17 @@ from Workspace.RA4Analysis.helpers import *
 from Workspace.RA4Analysis.signalRegions import *
 from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_postProcessed_antiSel import *
 #from Workspace.RA4Analysis.cmgTuples_Data_25ns_postProcessed_antiSel import *
-from draw_helpers import *
+#from draw_helpers import *
 from math import *
 from Workspace.HEPHYPythonTools.user import username
 from LpTemplateFit import LpTemplateFit
 
-preprefix = 'QCDestimation/final2p1fb/MC'
+preprefix = 'QCDestimation/final2p25fb/MC'
 wwwDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/RunII/Spring15_25ns/'+preprefix+'/'
-picklePath = '/data/'+username+'/results2015/QCDEstimation/'
+picklePath = '/data/'+username+'/Results2016/QCDEstimation/'
 prefix = 'Lp_singleElectronic_'
-picklePresel = '20151216_QCDestimation_MC2p1fb_pkl'
-pickleFit    = '20151216_fitResult_MC2p1fb_pkl'
+picklePresel = '20160212_QCDestimation_MC2p1fb_pkl'
+pickleFit    = '20160212_fitResult_MC2p1fb_pkl'
 
 if not os.path.exists(wwwDir):
   os.makedirs(wwwDir)
@@ -124,17 +124,19 @@ signalRegion = {(3, 4): {(250, 350): {(500, -1):   {(1.0):    {'sys':0.025,  'de
 btreg = [(0,0), (1,1), (2,-1)] #1b and 2b estimates are needed for the btag fit
 
 def makeWeight(lumi=3., sampleLumi=3.,debug=False):
+  #reWeight = 'lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*TopPtWeight*0.94*puReweight_true_max4'
+  reWeight = 'lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*0.94'
   if debug:
     print 'No lumi-reweighting done!!'
     return 'weight', 'weight*weight'
   else:
-    weight_str = '(((weight)/'+str(sampleLumi)+')*'+str(lumi)+')'
+    weight_str = '((weight/'+str(sampleLumi)+')*'+str(lumi)+'*'+reWeight+')'
     weight_err_str = '('+weight_str+'*'+weight_str+')'
-    return weight_str, weight_err_str
-lumi = 2.11
-sampleLumi = 2.11
-debugReweighting = True
-weight_str, weight_err_str = makeWeight(lumi, sampleLumi=sampleLumi, debug=debugReweighting)
+  return weight_str, weight_err_str
+
+lumi = 2.25
+sampleLumi = 2.25 #post processed sample already produced with 2.25fb-1
+weight_str, weight_err_str = makeWeight(lumi, sampleLumi)
 
 def getRCS(c, cut, dPhiCut, useWeight = False, weight = 'weight'):
 #  dPhiStr = 'acos((LepGood_pt+met_pt*cos(LepGood_phi-met_phi))/sqrt(LepGood_pt**2+met_pt**2+2*met_pt*LepGood_pt*cos(LepGood_phi-met_phi)))'
@@ -172,7 +174,7 @@ def getPseudoRCS(small,smallE,large,largeE):
 
 #trigger and filters for real Data
 trigger = "&&(HLT_EleHT350||HLT_MuHT350)"
-filters = "&&Flag_goodVertices && Flag_HBHENoiseFilter_fix && Flag_CSCTightHaloFilter && Flag_eeBadScFilter && Flag_HBHENoiseIsoFilter"
+filters = "&&Flag_goodVertices && Flag_HBHENoiseFilter_fix && Flag_eeBadScFilter && Flag_HBHENoiseIsoFilter && veto_evt_list"
 #filters = "&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFilter_fix&&Flag_HBHENoiseFilter&&Flag_goodVertices&&Flag_eeBadScFilter&&Flag_EcalDeadCellTriggerPrimitiveFilter"
 #filters = "&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFilter_fix&&Flag_HBHENoiseIsoFilter&&Flag_goodVertices&&Flag_eeBadScFilter"
 
@@ -195,12 +197,17 @@ histos = {}
 bins = {}
 fitRes = {}
 #perform the fits in QCD CR
+print 'Performing fits in the QCD CRs'
+
 for crNJet in sorted(fitCR):
   fitRes[crNJet] = {}
   for ltb in sorted(fitCR[crNJet]):
     fitRes[crNJet][ltb] = {} 
     for htb in sorted(fitCR[crNJet][ltb]):
       deltaPhiCut = 1.0
+      print '#########################################'
+      print '## CR',str(crNJet),str(ltb),str(htb)
+      print '#########################################'
       antiSelname, antiSelCut = nameAndCut(ltb, htb, crNJet, btb=(0,0), presel=antiSelStr, charge="", btagVar = 'nBJetMediumCSV30')
       Selname, SelCut         = nameAndCut(ltb, htb, crNJet, btb=(0,0), presel=SelStr, charge="", btagVar = 'nBJetMediumCSV30')      
       

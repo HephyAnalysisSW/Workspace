@@ -2,7 +2,7 @@ import ROOT
 import pickle
 import sys, os, copy, random, subprocess, datetime
 from array import array
-from Workspace.RA4Analysis.cmgObjectSelection import cmgLooseLepIndices, splitIndList, get_cmg_jets_fromStruct, splitListOfObjects, cmgTightMuID, cmgTightEleID
+from Workspace.RA4Analysis.cmgObjectSelection import *
 from Workspace.HEPHYPythonTools.xsec import xsec
 from Workspace.HEPHYPythonTools.helpers import getObjFromFile, getObjDict, getFileList, deltaR, deltaPhi, deltaR2
 from Workspace.HEPHYPythonTools.convertHelpers import compileClass, readVar, printHeader, typeStr, createClassString
@@ -22,6 +22,7 @@ from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns import *
 from Workspace.RA4Analysis.cmgTuples_Data25ns_miniAODv2 import *
 from btagEfficiency import *
 from readVetoEventList import *
+from systematics_helper import calc_btag_systematics, calc_LeptonScale_factors_and_systematics, calc_TopPt_Weights , calcDLDictionary, calc_diLep_contributions , fill_branch_WithJEC
 
 bTagEffFile = '/data/dspitzbart/Results2015/MCEff_skim_pkl'
 try:
@@ -41,7 +42,7 @@ subDir = "postProcessed_Spring15_antiSelection_final2p25fb"
 #branches to be kept for data and MC
 branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert",
                      "nJet25", "nBJetLoose25", "nBJetMedium25", "nBJetTight25", "nJet40", "nJet40a", "nBJetLoose40", "nBJetMedium40", "nBJetTight40", 
-                     "nLepGood20", "nLepGood15", "nLepGood10", "htJet25", "mhtJet25", "htJet40j", "htJet40", "mhtJet40", "nSoftBJetLoose25", "nSoftBJetMedium25", "nSoftBJetTight25", 
+                     "nLepGood20", "nLepGood15", "nLepGood10", "htJet25", "mhtJet25", "htJet40j", "htJet40", "mhtJet40", 
                      "met*","Flag_*","HLT_*",
 #                     "nFatJet","FatJet_*", 
                      "nJet", "Jet_*", 
@@ -55,7 +56,6 @@ branchKeepStrings_MC = [ "nTrueInt", "genWeight", "xsec", "puWeight",
                      "GenSusyMScan1", "GenSusyMScan2", "GenSusyMScan3", "GenSusyMScan4", "GenSusyMGluino", "GenSusyMGravitino", "GenSusyMStop", "GenSusyMSbottom", "GenSusyMStop2", "GenSusyMSbottom2", "GenSusyMSquark", "GenSusyMNeutralino", "GenSusyMNeutralino2", "GenSusyMNeutralino3", "GenSusyMNeutralino4", "GenSusyMChargino", "GenSusyMChargino2", 
                      "ngenLep", "genLep_*", 
                      "nGenPart", "GenPart_*",
-                     "ngenPartAll","genPartAll_*" ,
                      "ngenTau", "genTau_*", 
                      "ngenLepFromTau", "genLepFromTau_*"]
 
@@ -137,8 +137,15 @@ if sys.argv[0].count('ipython'):
 ###get evt Veto List  for filters####
 evt_veto_list = evt_veto_list()
 ###For PU reweight###
-PU_File = ROOT.TFile("/data/easilar/tuples_from_Artur/JECv6recalibrateMET_2100pb/trig_skim/PUhistos/ratio_PU.root")
-PU_histo = PU_File.Get("h_ratio")
+#PU_File = ROOT.TFile("/data/easilar/tuples_from_Artur/JECv6recalibrateMET_2100pb/trig_skim/PUhistos/ratio_PU.root")
+#PU_histo = PU_File.Get("h_ratio")
+PU_dir = "/data/easilar/tuples_from_Artur/JECv6recalibrateMET_2p2fb/PUhistos/"
+PU_File_66mb = ROOT.TFile(PU_dir+"/pileUp_66mb_map.root")
+PU_File_70mb = ROOT.TFile(PU_dir+"/pileUp_70mb_map.root")
+PU_File_74mb = ROOT.TFile(PU_dir+"/pileUp_74mb_map.root")
+PU_histo_66 = PU_File_66mb.Get("h_ratio_66")
+PU_histo_70 = PU_File_70mb.Get("h_ratio_70")
+PU_histo_74 = PU_File_74mb.Get("h_ratio_74")
 #####################
 
 #####################
@@ -214,7 +221,9 @@ for isample, sample in enumerate(allSamples):
     {'prefix':'Jet',  'nMax':100, 'vars':['pt/F', 'eta/F', 'phi/F', 'id/I','btagCSV/F', 'btagCMVA/F']},
   ]
   if not sample['isData']: 
-    newVariables.extend(['puReweight_true/F', 'weight_XSecTTBar1p1/F','weight_XSecTTBar0p9/F','weight_WPolPlus10/F', 'weight_WPolMinus10/F', 'weight_TTPolPlus5/F', 'weight_TTPolMinus5/F'])
+    readVectors.append({'prefix':'GenPart', 'nMax':100, 'vars':['eta/F','pt/F','phi/F','mass/F','charge/F', 'pdgId/I', 'motherId/F', 'grandmotherId/F']})
+    newVariables.extend(['puReweight_true/F', 'puReweight_true_max4/F','puReweight_true_Down/F','puReweight_true_Up/F', 'weight_XSecTTBar1p1/F','weight_XSecTTBar0p9/F','weight_WPolPlus10/F', 'weight_WPolMinus10/F', 'weight_TTPolPlus5/F', 'weight_TTPolMinus5/F'])
+    newVariables.extend(['GenTopPt/F/-999.','GenAntiTopPt/F/-999.','TopPtWeight/F/1.','GenTTBarPt/F/-999.','GenTTBarWeight/F/1.','nGenTops/I/0.'])
     aliases.extend(['genMet:met_genPt', 'genMetPhi:met_genPhi'])
     #readVectors[1]['vars'].extend('partonId/I')
   if options.leptonSelection.lower() in ['soft', 'hard']:
@@ -311,7 +320,10 @@ for isample, sample in enumerate(allSamples):
           s.muonDataSet = False
           s.eleDataSet = False
           nTrueInt = t.GetLeaf('nTrueInt').GetValue()
-          s.puReweight_true = PU_histo.GetBinContent(PU_histo.FindBin(nTrueInt))
+          s.puReweight_true = PU_histo_70.GetBinContent(PU_histo_70.FindBin(nTrueInt))
+          s.puReweight_true_max4 = min(4,s.puReweight_true)
+          s.puReweight_true_Down = PU_histo_66.GetBinContent(PU_histo_66.FindBin(nTrueInt))
+          s.puReweight_true_Up = PU_histo_74.GetBinContent(PU_histo_74.FindBin(nTrueInt))
 
           if "TTJets" in sample["name"] :
             s.weight = lumiScaleFactor*genWeight
@@ -784,7 +796,10 @@ for isample, sample in enumerate(allSamples):
             s.Lt = s.leptonPt + r.met_pt
             s.st = s.leptonPt + r.met_pt
             s.Lp = ((s.leptonPt/sqrt(s.leptonPt**2+r.met_pt**2+2*r.met_pt*s.leptonPt*cos(s.leptonPhi-r.met_phi)))*((s.leptonPt+r.met_pt*cos(s.leptonPhi-r.met_phi))/sqrt(s.leptonPt**2+r.met_pt**2+2*r.met_pt*s.leptonPt*cos(s.leptonPhi-r.met_phi)))) 
-
+        if not sample['isData']:
+          g_list=['eta','pt','phi','mass','charge', 'pdgId', 'motherId', 'grandmotherId']
+          genParts = get_cmg_genParts_fromStruct(r,g_list)
+          calc_TopPt_Weights(s,genParts)
         if calcSystematics:
 #          separateBTagWeights = False
           zeroTagWeight = 1.
