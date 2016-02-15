@@ -328,7 +328,7 @@ for isample, sample in enumerate(allSamples):
           if "TTJets" in sample["name"] :
             s.weight = lumiScaleFactor*genWeight
           else:
-             s.weight = lumiScaleFactor*genWeight*xsectemp
+            s.weight = lumiScaleFactor*genWeight*xsectemp
 
           if "TTJets" in sample['dbsName']:
             s.weight_XSecTTBar1p1 = s.weight*1.1 

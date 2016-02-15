@@ -19,12 +19,19 @@ from math import *
 from Workspace.HEPHYPythonTools.user import username
 from LpTemplateFit import LpTemplateFit
 
-preprefix = 'QCDestimation/final2p25fb/MC'
+isData = False
+
+if isData:
+  sampleStr = 'data'
+else:
+  sampleStr = 'MC'
+
+preprefix = 'QCDestimation/final2p25fb_v2/'+sampleStr
 wwwDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/RunII/Spring15_25ns/'+preprefix+'/'
 picklePath = '/data/'+username+'/Results2016/QCDEstimation/'
 prefix = 'Lp_singleElectronic_'
-picklePresel = '20160212_QCDestimation_MC2p1fb_pkl'
-pickleFit    = '20160212_fitResult_MC2p1fb_pkl'
+picklePresel = '20160212_QCDestimation_'+sampleStr+'2p25fb_pkl'
+pickleFit    = '20160212_fitResult_'+sampleStr+'2p25fb_pkl'
 
 if not os.path.exists(wwwDir):
   os.makedirs(wwwDir)
@@ -125,7 +132,7 @@ btreg = [(0,0), (1,1), (2,-1)] #1b and 2b estimates are needed for the btag fit
 
 def makeWeight(lumi=3., sampleLumi=3.,debug=False):
   #reWeight = 'lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*TopPtWeight*0.94*puReweight_true_max4'
-  reWeight = 'lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*0.94'
+  reWeight = 'lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*0.94*TopPtWeight'
   if debug:
     print 'No lumi-reweighting done!!'
     return 'weight', 'weight*weight'
@@ -184,14 +191,19 @@ SelStr = presel+'&&Selected==1'
 
 cQCD  = getChain(QCDHT_25ns,histname='')
 cEWK  = getChain([WJetsHTToLNu_25ns, TTJets_combined_2, singleTop_25ns, DY_25ns, TTV_25ns],histname='')
-#cData = getChain(single_ele_Run2015D, histname='')
-cData = getChain([QCDHT_25ns, WJetsHTToLNu_25ns, TTJets_combined_2, singleTop_25ns, DY_25ns, TTV_25ns] , histname='')
+if isData:
+  cData = getChain(single_ele_Run2015D, histname='')
+else:
+  cData = getChain([QCDHT_25ns, WJetsHTToLNu_25ns, TTJets_combined_2, singleTop_25ns, DY_25ns, TTV_25ns] , histname='')
 
 #get template for fit method
 template_QCD = ROOT.TH1F('template_QCD','template_QCD',30,-0.5,2.5)
 templateName, templateCut = nameAndCut((250,-1), (500,-1), (3,4), (0,0), presel=antiSelStr, charge="", btagVar = 'nBJetMediumCSV30')
-#cData.Draw('Lp>>template_QCD','('+templateCut+trigger+filters+')','goff')
-cData.Draw('Lp>>template_QCD','('+weight_str+')*('+templateCut+')','goff')
+
+if isData:
+  cData.Draw('Lp>>template_QCD','('+templateCut+trigger+filters+')','goff')
+else
+  cData.Draw('Lp>>template_QCD','('+weight_str+')*('+templateCut+')','goff')
 
 histos = {}
 bins = {}
@@ -236,15 +248,27 @@ for crNJet in sorted(fitCR):
       cQCD.Draw('Lp>>QCD_Selection','('+weight_str+')*('+SelCut+')')
       cEWK.Draw('Lp>>EWK_antiSelection','('+weight_str+')*('+antiSelCut+')')
       cEWK.Draw('Lp>>EWK_Selection','('+weight_str+')*('+SelCut+')')
-#      cData.Draw('Lp>>DATA_antiSelection','('+antiSelCut+trigger+filters+')')
-      cData.Draw('Lp>>DATA_antiSelection','('+weight_str+')*('+antiSelCut+')')
-#      cData.Draw('Lp>>DATA_Selection','('+SelCut+trigger+filters+')')
-      cData.Draw('Lp>>DATA_Selection','('+weight_str+')*('+SelCut+')')
+      if isData:
+        cData.Draw('Lp>>DATA_antiSelection','('+antiSelCut+trigger+filters+')')
+        cData.Draw('Lp>>DATA_Selection','('+SelCut+trigger+filters+')')
+      else:
+        cData.Draw('Lp>>DATA_antiSelection','('+weight_str+')*('+antiSelCut+')')
+        cData.Draw('Lp>>DATA_Selection','('+weight_str+')*('+SelCut+')')
+##      cData.Draw('Lp>>DATA_antiSelection','('+antiSelCut+trigger+filters+')')
+#      cData.Draw('Lp>>DATA_antiSelection','('+weight_str+')*('+antiSelCut+')')
+##      cData.Draw('Lp>>DATA_Selection','('+SelCut+trigger+filters+')')
+#      cData.Draw('Lp>>DATA_Selection','('+weight_str+')*('+SelCut+')')
 
-#      rCSanti = getRCS(cData, antiSelCut+trigger+filters, deltaPhiCut, useWeight = False, weight = weight_str)
-#      rCSsel = getRCS(cData, SelCut+trigger+filters, deltaPhiCut, useWeight = False, weight = weight_str)
-      rCSanti = getRCS(cData, antiSelCut, deltaPhiCut, useWeight = True, weight = weight_str)
-      rCSsel = getRCS(cData, SelCut, deltaPhiCut, useWeight = True, weight = weight_str)
+      if isData:
+        rCSanti = getRCS(cData, antiSelCut+trigger+filters, deltaPhiCut, useWeight = False, weight = weight_str)
+        rCSsel = getRCS(cData, SelCut+trigger+filters, deltaPhiCut, useWeight = False, weight = weight_str)
+      else:
+        rCSanti = getRCS(cData, antiSelCut, deltaPhiCut, useWeight = True, weight = weight_str)
+        rCSsel = getRCS(cData, SelCut, deltaPhiCut, useWeight = True, weight = weight_str)
+##      rCSanti = getRCS(cData, antiSelCut+trigger+filters, deltaPhiCut, useWeight = False, weight = weight_str)
+##      rCSsel = getRCS(cData, SelCut+trigger+filters, deltaPhiCut, useWeight = False, weight = weight_str)
+#      rCSanti = getRCS(cData, antiSelCut, deltaPhiCut, useWeight = True, weight = weight_str)
+#      rCSsel = getRCS(cData, SelCut, deltaPhiCut, useWeight = True, weight = weight_str)
 
       for hist in [histos['DATA']['antiSelection'],histos['DATA']['Selection']]:
         hist.SetStats(0)
@@ -317,8 +341,12 @@ for crNJet in sorted(fitCR):
       histos['DATA']['Selection'].SetMaximum(1.5*histos['DATA']['Selection'].GetMaximum())
 
       leg.Draw()
-#      text.DrawLatex(0.16,.96,"CMS #bf{#it{Preliminary}}")
-      text.DrawLatex(0.16,.96,"CMS #bf{#it{Simulation}}")
+      if isData:
+        text.DrawLatex(0.16,.96,"CMS #bf{#it{Preliminary}}")
+      else:
+        text.DrawLatex(0.16,.96,"CMS #bf{#it{Simulation}}")
+##      text.DrawLatex(0.16,.96,"CMS #bf{#it{Preliminary}}")
+#      text.DrawLatex(0.16,.96,"CMS #bf{#it{Simulation}}")
       text.DrawLatex(0.62,0.96,"#bf{L="+str(lumi)+" fb^{-1} (13 TeV)}")
 
       Canv.cd()
@@ -383,15 +411,27 @@ for srNJet in sorted(signalRegion):
           cQCD.Draw('Lp>>QCD_Selection','('+weight_str+')*('+SelCut+')')
           cEWK.Draw('Lp>>EWK_antiSelection','('+weight_str+')*('+antiSelCut+')')
           cEWK.Draw('Lp>>EWK_Selection','('+weight_str+')*('+SelCut+')')
-#          cData.Draw('Lp>>DATA_antiSelection','('+antiSelCut+trigger+filters+')')
-          cData.Draw('Lp>>DATA_antiSelection','('+weight_str+')*('+antiSelCut+')')
-#          cData.Draw('Lp>>DATA_Selection','('+SelCut+trigger+filters+')')
-          cData.Draw('Lp>>DATA_Selection','('+weight_str+')*('+SelCut+')')
+          if isData:
+            cData.Draw('Lp>>DATA_antiSelection','('+antiSelCut+trigger+filters+')')
+            cData.Draw('Lp>>DATA_Selection','('+SelCut+trigger+filters+')')
+          else:
+            cData.Draw('Lp>>DATA_antiSelection','('+weight_str+')*('+antiSelCut+')')
+            cData.Draw('Lp>>DATA_Selection','('+weight_str+')*('+SelCut+')')
+##          cData.Draw('Lp>>DATA_antiSelection','('+antiSelCut+trigger+filters+')')
+#          cData.Draw('Lp>>DATA_antiSelection','('+weight_str+')*('+antiSelCut+')')
+##          cData.Draw('Lp>>DATA_Selection','('+SelCut+trigger+filters+')')
+#          cData.Draw('Lp>>DATA_Selection','('+weight_str+')*('+SelCut+')')
 
-#          rCSanti = getRCS(cData, antiSelCut+trigger+filters, deltaPhiCut, useWeight = False, weight = weight_str)
-#          rCSsel = getRCS(cData, SelCut+trigger+filters, deltaPhiCut, useWeight = False, weight = weight_str)
-          rCSanti = getRCS(cData, antiSelCut, deltaPhiCut, useWeight = True, weight = weight_str)
-          rCSsel = getRCS(cData, SelCut, deltaPhiCut, useWeight = True, weight = weight_str)
+          if isData:
+            rCSanti = getRCS(cData, antiSelCut+trigger+filters, deltaPhiCut, useWeight = False, weight = weight_str)
+            rCSsel = getRCS(cData, SelCut+trigger+filters, deltaPhiCut, useWeight = False, weight = weight_str)
+          else:
+            rCSanti = getRCS(cData, antiSelCut, deltaPhiCut, useWeight = True, weight = weight_str)
+            rCSsel = getRCS(cData, SelCut, deltaPhiCut, useWeight = True, weight = weight_str)
+##          rCSanti = getRCS(cData, antiSelCut+trigger+filters, deltaPhiCut, useWeight = False, weight = weight_str)
+##          rCSsel = getRCS(cData, SelCut+trigger+filters, deltaPhiCut, useWeight = False, weight = weight_str)
+#          rCSanti = getRCS(cData, antiSelCut, deltaPhiCut, useWeight = True, weight = weight_str)
+#          rCSsel = getRCS(cData, SelCut, deltaPhiCut, useWeight = True, weight = weight_str)
 
           for hist in [histos['DATA']['antiSelection'],histos['DATA']['Selection']]:
             hist.SetStats(0)
@@ -464,8 +504,12 @@ for srNJet in sorted(signalRegion):
           histos['DATA']['Selection'].SetMaximum(1.5*histos['DATA']['Selection'].GetMaximum())
             
           leg.Draw()
-#          text.DrawLatex(0.16,.96,"CMS #bf{#it{Preliminary}}")
-          text.DrawLatex(0.16,.96,"CMS #bf{#it{Simulation}}")
+          if isData:
+            text.DrawLatex(0.16,.96,"CMS #bf{#it{Preliminary}}")
+          else:
+            text.DrawLatex(0.16,.96,"CMS #bf{#it{Simulation}}")
+##          text.DrawLatex(0.16,.96,"CMS #bf{#it{Preliminary}}")
+#          text.DrawLatex(0.16,.96,"CMS #bf{#it{Simulation}}")
           text.DrawLatex(0.62,0.96,"#bf{L="+str(lumi)+" fb^{-1} (13 TeV)}")
   
           Canv.cd()

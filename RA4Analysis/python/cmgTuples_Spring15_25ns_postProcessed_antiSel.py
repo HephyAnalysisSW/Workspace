@@ -1,6 +1,6 @@
 import copy, os, sys
 #dir = '/data/dhandl/cmgTuples/postProcessed_Spring15_antiSelection_final2p1fb_V6/none/'
-dir2 = '/data/dspitzbart/cmgTuples/postProcessed_Spring15_antiSelection_final2p25fb/'
+dir2 = '/data/dspitzbart/cmgTuples/postProcessed_Spring15_antiSelection_final2p25fb_v2/'
 dir = dir2+'none/'
 
 single_mu_Run2015D = {\
