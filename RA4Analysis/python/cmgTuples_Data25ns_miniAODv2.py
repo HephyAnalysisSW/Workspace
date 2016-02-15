@@ -3,7 +3,7 @@ import copy, os, sys
 #data_path = "/data/easilar/tuples_from_Artur/JECv6recalibrateMET_eleCBID_1550pb"
 #data_path = "/data/easilar/tuples_from_Artur/JECv6recalibrateMET_2100pb/trig_skim/"
 #data_path = '/data/easilar/tuples_from_Artur/JECv6recalibrateMET_2p2fb/'
-data_path = '/data/easilar/tuples_from_Artur/TrigSkim_noHBHEfix/'
+data_path = '/data/easilar/tuples_from_Artur/JECv7_lumi2p2fb/TrigSkim/'
 
 SingleMuon_Run2015D_v4 = {"name":"SingleMuon_Run2015D_v4",}
 SingleMuon_Run2015D_05Oct= {"name":"SingleMuon_Run2015D_05Oct",}

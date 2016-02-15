@@ -22,6 +22,7 @@ presel = True
 SB_w   = False
 SB_tt  = False
 
+test = False
 
 if all_MB : 
   SR = signalRegion3fb
@@ -52,11 +53,13 @@ lepSels = [
   'label':'_lep_', 'str':'1 $lep$' , 'trigger': trigger}\
 ]
 
+
+
 bkg_samples=[
 {'sample':'TTVH',     "weight":btag_weight ,"cut":(0,-1) , "name":TTV_25ns ,'tex':'t#bar{t}V(W/Z/H)','color':ROOT.kOrange-3},
 {"sample":"singleTop","weight":btag_weight ,"cut":(0,-1) , "name":singleTop_25ns,"tex":"t/#bar{t}",'color': ROOT.kViolet+5},
 {"sample":"DY",       "weight":btag_weight ,"cut":(0,-1) , "name":DY_25ns,"tex":"DY + jets",'color':ROOT.kRed-6},
-{"sample":"QCD",      "weight":"(1)"       ,"cut":(1,1)  , "name":QCDHT_25ns, "tex":"QCD","color":ROOT.kCyan-6},
+{"sample":"QCD",      "weight":"(1)"       ,"cut":nbtag  , "name":QCDHT_25ns, "tex":"QCD","color":ROOT.kCyan-6},
 {"sample":"WJets",    "weight":btag_weight ,"cut":(0,-1) , "name":WJetsHTToLNu_25ns,"tex":"W + jets","color":ROOT.kGreen-2},
 {"sample":"ttJets",   "weight":btag_weight ,"cut":(0,-1) , "name":TTJets_combined, "tex":"t#bar{t} + jets",'color':ROOT.kBlue-4},
 ]
@@ -87,8 +90,12 @@ plots =[\
 {'ndiv':False,'yaxis':'Events','xaxis':'nVert','logy':'True' , 'var':'nVert',       'varname':'nVert',      'binlabel':1,  'bin':(50,0,50)}
   ]
 
+if test :
+  plots = [plots[0]]
+  lepSels = [lepSels[1]]
+
 for lepSel in lepSels:
-  path = "/afs/hephy.at/user/e/easilar/www/data/Run2015D/2p3fb/Tests/"+lepSel['label']
+  path = "/afs/hephy.at/user/e/easilar/www/data/Run2015D/2p25fb/toAN/"+lepSel['label']
   if not os.path.exists(path):
     os.makedirs(path)
   print lepSel['label']

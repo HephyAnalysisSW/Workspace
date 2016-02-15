@@ -9,7 +9,7 @@ btagVarString = 'nBJetMediumCSV30'
 
 ##For Data Only
 
-filters = "(Flag_goodVertices && Flag_HBHENoiseFilter && Flag_eeBadScFilter && Flag_HBHENoiseIsoFilter && veto_evt_list)"
+filters = "(Flag_goodVertices && Flag_HBHENoiseFilter_fix && Flag_eeBadScFilter && Flag_HBHENoiseIsoFilter && veto_evt_list)"
 
 trigger = "((HLT_EleHT350)||(HLT_MuHT350))"
 
@@ -27,5 +27,6 @@ weight_str = '*'.join([trigger_scale,lepton_Scale,topPt,PU,reweight])
 lepton_Scale_signal = 'reweightLeptonFastSimSF'
 weight_str_signal_plot = '*'.join([trigger_scale,lepton_Scale_signal,PU,reweight])
 weight_str_signal_CV = '*'.join([trigger_scale,lepton_Scale_signal,reweight])
+
 
 

@@ -6,12 +6,13 @@ from Workspace.RA4Analysis.cmgTuples_Data25ns_miniAODv2_postprocessed import *
 from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed import *
 from Workspace.RA4Analysis.signalRegions import signalRegion3fb
 from cutFlow_helper import *
+from general_config import *
+
 from math import *
 ROOT.gROOT.LoadMacro("../../HEPHYPythonTools/scripts/root/tdrstyle.C")
 ROOT.setTDRStyle()
 maxN = -1
 ROOT.gStyle.SetOptStat(0)
-lumi = 2300##pb
 
 path = "/afs/hephy.at/user/e/easilar/www/data/Run2015D/2p3fb/diLep_syst_study_results_New/"
 if not os.path.exists(path):
@@ -31,11 +32,11 @@ lepSels = [
 ]
 
 bkg_samples=[
-{'sample':'TTVH',     "weight":"(1)"            ,"cut":(0,0) , "name":TTV_25ns ,'tex':'t#bar{t}+W/Z/H','color':ROOT.kOrange-3},
-{"sample":"singleTop","weight":"(1)"            ,"cut":(0,0) , "name":singleTop_25ns,"tex":"single top",'color': ROOT.kViolet+5},
-{"sample":"DY",       "weight":"(1)"            ,"cut":(0,0) , "name":DY_25ns,"tex":"DY + jets",'color':ROOT.kRed-6},
-{"sample":"QCD",      "weight":"(1)"            ,"cut":(0,0) , "name":QCDHT_25ns, "tex":"QCD","color":ROOT.kCyan-6},
-{"sample":"WJets",    "weight":"weightBTag0_SF" ,"cut":(0,-1) , "name":WJetsHTToLNu_25ns,"tex":"W + jets","color":ROOT.kGreen-2},
+{'sample':'TTVH',     "weight":"weightBTag0_SF"            ,"cut":(0,-1) , "name":TTV_25ns ,'tex':'t#bar{t}+W/Z/H','color':ROOT.kOrange-3},
+{"sample":"singleTop","weight":"weightBTag0_SF"            ,"cut":(0,-1) , "name":singleTop_25ns,"tex":"single top",'color': ROOT.kViolet+5},
+{"sample":"DY",       "weight":"weightBTag0_SF"            ,"cut":(0,-1) , "name":DY_25ns,"tex":"DY + jets",'color':ROOT.kRed-6},
+{"sample":"QCD",      "weight":"(1)"                       ,"cut":(0,0) , "name":QCDHT_25ns, "tex":"QCD","color":ROOT.kCyan-6},
+{"sample":"WJets",    "weight":"weightBTag0_SF"            ,"cut":(0,-1) , "name":WJetsHTToLNu_25ns,"tex":"W + jets","color":ROOT.kGreen-2},
 ]
 
 for bkg in bkg_samples:
