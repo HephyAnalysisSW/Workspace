@@ -13,13 +13,13 @@ from Workspace.HEPHYPythonTools.xsec import *
 from Workspace.RA4Analysis.helpers import *
 from Workspace.RA4Analysis.signalRegions import *
 from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_postProcessed_antiSel import *
-#from Workspace.RA4Analysis.cmgTuples_Data_25ns_postProcessed_antiSel import *
+from Workspace.RA4Analysis.cmgTuples_Data_25ns_postProcessed_antiSel import *
 #from draw_helpers import *
 from math import *
 from Workspace.HEPHYPythonTools.user import username
 from LpTemplateFit import LpTemplateFit
 
-isData = False
+isData = True
 
 if isData:
   sampleStr = 'data'
@@ -202,7 +202,7 @@ templateName, templateCut = nameAndCut((250,-1), (500,-1), (3,4), (0,0), presel=
 
 if isData:
   cData.Draw('Lp>>template_QCD','('+templateCut+trigger+filters+')','goff')
-else
+else:
   cData.Draw('Lp>>template_QCD','('+weight_str+')*('+templateCut+')','goff')
 
 histos = {}

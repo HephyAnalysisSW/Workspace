@@ -60,7 +60,7 @@ TTJets_combined_2 = {\
 "LHE_FullHadronic/none/TTJets_LO_HT600to800",
 "LHE_FullHadronic/none/TTJets_LO_HT800to1200",
 "semiLep/none/TTJets_SingleLeptonFromT_full",
-"semiLep/none/TTJets_SingleLeptonFromTbar_full",
+#"semiLep/none/TTJets_SingleLeptonFromTbar_full",
 ],
 'dir' : dir2,#'/data/dhandl/cmgTuples/postProcessed_Spring15_antiSelection_final2p1fb_V6/',
 }
