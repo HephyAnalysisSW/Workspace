@@ -23,7 +23,7 @@ wjetsSB = (3,4)
 
 nBTagVar              = 'nBJetMediumCSV30'
 useBTagWeights        = True
-btagWeightSuffix      = '_SF_b_Up'
+btagWeightSuffix      = '_SF_light_Down'
 templateWeights       = True
 templateWeightSuffix  = '_SF'
 

@@ -156,20 +156,29 @@ predYErr = []
 predX = []
 predY = []
 
+ratioXErr = []
+ratioYUp = []
+ratioYDown = []
+ratioX = []
+ratioY = []
+
+dataPXErr = []
+dataPX = []
+dataPY = []
+dataPYUp = []
+dataPYDown = []
+
+
 total_meas      = 0
 total_yield     = 0
 total_err       = 0
 total_stat_var  = 0
 
 fmt = '{0:30} {1:>6}'
+fmt2 = '{0:10}{1:>20}'
 
 ratioWithE = []
 
-ratioXErr = []
-ratioYUp = []
-ratioYDown = []
-ratioX = []
-ratioY = []
 
 i=1
 for srNJet in sorted(signalRegions):
@@ -264,19 +273,36 @@ for srNJet in sorted(signalRegions):
         truth_H.SetBinContent(i,data_yield)
         #truth_H.SetBinError(i,  sqrt(data_yield))
 
+        #get asymmetric errors for observation, ratio etc
         truth_H.GetXaxis().SetBinLabel(i, str(i))
         truthLowE = truth_H.GetBinErrorLow(i)
         truthUpE = truth_H.GetBinErrorUp(i)
         ratioUp = getPropagatedError(truth_H.GetBinContent(i), truthUpE, res[srNJet][stb][htb]['tot_pred_final'], res[srNJet][stb][htb]['tot_pred_final_err'], returnCalcResult=True)
         ratioLow = getPropagatedError(truth_H.GetBinContent(i), truthLowE, res[srNJet][stb][htb]['tot_pred_final'], res[srNJet][stb][htb]['tot_pred_final_err'], returnCalcResult=True)
-        ratioWithE.append({'v': ratioUp[0],'up': ratioUp[1], 'down': ratioLow[1]})
-        print {'v': ratioUp[0],'up': ratioUp[1], 'down': ratioLow[1]}
+        if not truth_H.GetBinContent(i)>0:
+          ratioErrUp = truthUpE/res[srNJet][stb][htb]['tot_pred_final']
+          ratioErrLow = 0
+          ratioVal = 0
+        else:
+          ratioErrUp = ratioUp[1]
+          ratioErrLow = ratioLow[1]
+          ratioVal = ratioUp[0]
+        ratioWithE.append({'v': ratioVal,'up': ratioErrUp, 'down': ratioErrLow})
 
+        ratio_str = str(round(ratioVal,3))+' + ' +str(round(ratioErrUp,3)) + ' - ' + str(round(ratioErrLow,3))
+        print fmt2.format('ratio:',ratio_str)
+        
         ratioX.append(i-0.5)
-        ratioY.append(ratioUp[0])
-        ratioXErr.append(0.5)
-        ratioYUp.append(ratioUp[1])
-        ratioYDown.append(ratioLow[1])
+        ratioY.append(ratioVal)
+        ratioXErr.append(0)
+        ratioYUp.append(ratioErrUp)
+        ratioYDown.append(ratioErrLow)
+        
+        dataPX.append(i-0.5)
+        dataPY.append(truth_H.GetBinContent(i))
+        dataPXErr.append(0)
+        dataPYUp.append(truthUpE)
+        dataPYDown.append(truthLowE)
 
 
       else:
@@ -321,8 +347,17 @@ rx    = array('d',ratioX)
 ry    = array('d',ratioY)
 rexh  = array('d',ratioXErr)
 rexl  = array('d',ratioXErr)
-reyh  = array('d',ratioYErr)
-reyl  = array('d',ratioYErr)
+reyh  = array('d',ratioYUp)
+reyl  = array('d',ratioYDown)
+
+#data points
+dx    = array('d',dataPX)
+dy    = array('d',dataPY)
+dexh  = array('d',dataPXErr)
+dexl  = array('d',dataPXErr)
+deyh  = array('d',dataPYUp)
+deyl  = array('d',dataPYDown)
+
 
 can = ROOT.TCanvas('can','can',700,700)
 
@@ -391,9 +426,21 @@ pred_err.SetFillColor(ROOT.kGray+1)
 pred_err.SetFillStyle(3244)
 pred_err.Draw('2 same')
 truth_H.SetMarkerStyle(22)
+
+ratio_err = ROOT.TGraphAsymmErrors(bins, rx, ry, rexl, rexh, reyl, reyh)
+ratio_err.SetMarkerStyle(10)
+ratio_err.SetMarkerSize(1.1)
+ratio_err.SetLineWidth(2)
+
+data_err = ROOT.TGraphAsymmErrors(bins, dx, dy, dexl, dexh, deyl, deyh)
+data_err.SetMarkerStyle(10)
+data_err.SetMarkerSize(1)
+data_err.SetLineWidth(2)
+
 if unblinded or validation:
   truth_H.SetMarkerStyle(20)
-  truth_H.Draw('e0p same')
+  #truth_H.Draw('e0p same')
+  data_err.Draw("P0 same")
 else:
   truth_H.Draw('hist e same')
 
@@ -417,7 +464,9 @@ ratio2 = truth_H.Clone()
 ratio2.Divide(pred_H)
 ratio2.SetLineColor(ROOT.kBlack)
 ratio2.SetMarkerStyle(8)
-ratio2.SetMarkerSize(1.3)
+ratio2.SetMarkerSize(0)
+ratio2.SetLineWidth(0)
+ratio2.SetLineColor(ROOT.kWhite)
 ratio2.GetXaxis().SetTitle('')
 
 setNiceBinLabel(ratio2, signalRegions)
@@ -442,7 +491,9 @@ ratio2.GetYaxis().SetTitleOffset(0.4)
 ratio2.GetYaxis().SetNdivisions(304)
 ratio2.SetMinimum(0.)
 ratio2.SetMaximum(3.2)
-ratio2.Draw('e0p')
+ratio2.Draw('p')
+
+ratio_err.Draw("P0 same")
 
 can.cd()
 
