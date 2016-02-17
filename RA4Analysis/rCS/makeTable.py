@@ -43,7 +43,7 @@ presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoft
 btagString = 'nBJetMediumCSV30'
 
 lumi = 3.
-weight_str, weight_err_str = makeWeight(lumi, sampleLumi=3.)
+weight_str, weight_err_str = makeWeight(lumi, sampleLumi=3., reWeight=MCweight)
 lepSel = 'hard'
 
 if signal:

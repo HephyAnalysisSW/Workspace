@@ -17,7 +17,7 @@ ROOT.setTDRStyle()
 ROOT.TH1F().SetDefaultSumw2()
 if not createFits: loadedFit = pickle.load(file(fitDir+prefix+'_fit_pkl'))
 
-weight_str, weight_err_str = makeWeight(3, sampleLumi=sampleLumi)
+weight_str, weight_err_str = makeWeight(3, sampleLumi=sampleLumi, reWeight = MCweight)
 
 wJetBins = [(3,4),(5,5),(6,7),(8,-1)]
 ttJetBins = [(4,4),(5,5),(6,7),(8,-1)]

@@ -13,7 +13,7 @@ ROOT.TH1F().SetDefaultSumw2()
 
 def makeTTPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, QCD=False):
   #print "in make tt prediction lumi is :" , lumi
-  weight_str, weight_err_str = makeWeight(lumi, sampleLumi)
+  weight_str, weight_err_str = makeWeight(lumi, sampleLumi, reWeight=MCweight)
   cWJets = samples['W']
   cTTJets = samples['TT']
   cRest = samples['Rest']

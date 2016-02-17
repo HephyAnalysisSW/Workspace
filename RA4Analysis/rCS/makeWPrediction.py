@@ -14,7 +14,7 @@ ROOT.TH1F().SetDefaultSumw2()
 def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, QCD=False):
   print "in W predition lumi is :"  , lumi
   if useBTagWeights: 'Will use b-tag weights for W-jets prediction!'
-  weight_str, weight_err_str = makeWeight(lumi)
+  weight_str, weight_err_str = makeWeight(lumi, sampleLumi, reWeight=MCweight)
   cWJets = samples['W']
   cTTJets = samples['TT']
   cRest = samples['Rest']

@@ -16,7 +16,7 @@ def binnedNBTagsFit(cut, cutname, samples, prefix = "", QCD_dict={0:{'y':0.,'e':
   #   os.makedirs(printDir) 
   #if not os.path.exists(templateDir):
   #   os.makedirs(templateDir)
-  weight_str, weight_err_str = makeWeight(lumi, sampleLumi)
+  weight_str, weight_err_str = makeWeight(lumi, sampleLumi, reWeight=MCweight)
   cWJets = samples['W']
   cTTJets = samples['TT']
   cRest = samples['Rest']

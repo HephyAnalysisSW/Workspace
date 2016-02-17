@@ -14,7 +14,7 @@ from predictionConfig import *
 ROOT.gROOT.LoadMacro('../../HEPHYPythonTools/scripts/root/tdrstyle.C')
 ROOT.setTDRStyle()
 
-weight_str, weight_err_str = makeWeight(lumi, sampleLumi)
+weight_str, weight_err_str = makeWeight(lumi, sampleLumi, reWeight=MCweight)
 
 prefix = 'singleLeptonic_Spring15_'
 

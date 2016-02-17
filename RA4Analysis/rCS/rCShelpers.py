@@ -5,8 +5,8 @@ from Workspace.RA4Analysis.helpers import *#nameAndCut, nJetBinName, nBTagBinNam
 from math import sqrt, pi, cosh
 from array import array
 
-def makeWeight(lumi=4., sampleLumi=3.,debug=False):
-  reWeight = 'lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*TopPtWeight*0.94'
+def makeWeight(lumi=4., sampleLumi=3.,debug=False, reWeight='lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*TopPtWeight*0.94'):
+  #reWeight = 'lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*TopPtWeight*0.94'
   #reWeight = 'lepton_muSF_mediumID*lepton_muSF_miniIso02*lepton_muSF_sip3d*lepton_eleSF_cutbasedID*lepton_eleSF_miniIso01'
   if debug:
     print 'No lumi-reweighting done!!'
