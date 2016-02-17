@@ -9,7 +9,7 @@ from Workspace.HEPHYPythonTools.helpers import *
 from Workspace.RA4Analysis.helpers import *
 from Workspace.RA4Analysis.signalRegions import *
 from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed import *
-from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed_2 import *
+#from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed_2 import *
 
 from Workspace.RA4Analysis.cmgTuples_Data25ns_miniAODv2_postprocessed import *
 from Workspace.HEPHYPythonTools.user import username
@@ -386,11 +386,12 @@ for deltaPhi in deltaPhis:
 
 signalRegions = signalRegion3fb
 
-pickleDir = '/data/easilar/Results2016/Prediction_SFtemplates_fullSR_lep_data_2p25/'
+pickleDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_fullSR_lep_data_2p25/'
 
 pred = pickle.load(file(pickleDir+'resultsFinal_withSystematics_pkl'))
 
 #res = pickle.load(file(pickleDir+'resultsFinal_withSystematics_pkl'))
+QCDpickle = '/data/dspitzbart/Results2016/QCDEstimation/20160212_QCDestimation_data2p25fb_pkl'
 QCD_est = pickle.load(file(QCDpickle))
 
 QCD_LT = {}

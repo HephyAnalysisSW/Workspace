@@ -23,7 +23,7 @@ wjetsSB = (3,4)
 
 nBTagVar              = 'nBJetMediumCSV30'
 useBTagWeights        = True
-btagWeightSuffix      = '_SF'
+btagWeightSuffix      = '_SF_b_Up'
 templateWeights       = True
 templateWeightSuffix  = '_SF'
 
@@ -34,10 +34,10 @@ if QCDup: nameSuffix += '_QCDup'
 if QCDdown: nameSuffix += '_QCDdown'
 
 ## samples
-isData              = True
+isData              = False
 unblinded           = True
 validation          = False
-isCentralPrediction = True
+isCentralPrediction = False
 if isData:
   isCentralPrediction = False #should be false for data, otherwise kappa is measured in data!
 

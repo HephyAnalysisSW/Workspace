@@ -14,6 +14,10 @@ from array import array
 
 from predictionConfig import *
 
+cData = getChain([single_mu_Run2015D, single_ele_Run2015D], histname='')
+isData = True
+predictionName = 'SFtemplates_fullSR_lep_data'
+
 ROOT.gStyle.SetOptTitle(0);
 ROOT.gStyle.SetOptStat('')
 
@@ -70,6 +74,8 @@ data_truth_H.SetLineColor(ROOT.kBlack)
 data_truth_H.SetLineWidth(2)
 data_truth_H.SetMarkerColor(ROOT.kBlack)
 data_truth_H.SetMarkerSize(1.3)
+data_truth_H.SetBinErrorOption(ROOT.TH1F.kPoisson)
+
 
 benchmark1_H = ROOT.TH1F('benchmark1_H','T5q^{4}WW 1.0/0.7',bins,0,bins)
 benchmark2_H = ROOT.TH1F('benchmark2_H','T5q^{4}WW 1.2/0.8',bins,0,bins)
@@ -113,6 +119,8 @@ pred_H  = ROOT.TH1F('pred_H','total pred.', bins,0,bins)
 pred_H.SetBarWidth(0.4)
 pred_H.SetBarOffset(0.1)
 truth_H = ROOT.TH1F('truth_H','Total MC truth',bins,0,bins)
+truth_H.SetBinErrorOption(ROOT.TH1F.kPoisson)
+
 
 pred_H.SetLineColor(ROOT.kGray+1)
 pred_H.SetMarkerStyle(1)
@@ -140,7 +148,7 @@ kappa_W.SetLineColor(color('wjets'))
 one = ROOT.TH1F('one','one', bins,0,bins)
 one.SetLineStyle(2)
 
-drawOption = 'hist ][ e1'
+drawOption = 'hist ][ e0'
 drawOptionSame = drawOption + 'same'
 
 predXErr = []
@@ -154,6 +162,14 @@ total_err       = 0
 total_stat_var  = 0
 
 fmt = '{0:30} {1:>6}'
+
+ratioWithE = []
+
+ratioXErr = []
+ratioYUp = []
+ratioYDown = []
+ratioX = []
+ratioY = []
 
 i=1
 for srNJet in sorted(signalRegions):
@@ -241,11 +257,28 @@ for srNJet in sorted(signalRegions):
           dcn, dc = nameAndCut(stb, htb, srNJet, (0,-1), presel+'&&deltaPhi_Wl>'+str(signalRegions[srNJet][stb][htb]['deltaPhi']))
         data_yield = getYieldFromChain(cData, dc,weight)
         data_truth_H.SetBinContent(i,data_yield)
-        data_truth_H.SetBinError(i, sqrt(data_yield))
+        #data_truth_H.SetBinError(i, sqrt(data_yield))
+        data_truth_H.GetBinErrorLow(i)
+        data_truth_H.GetBinErrorUp(i)
         print fmt.format('- Measured: ', getValErrString(data_yield, sqrt(data_yield)))
         truth_H.SetBinContent(i,data_yield)
-        truth_H.SetBinError(i,  sqrt(data_yield))
+        #truth_H.SetBinError(i,  sqrt(data_yield))
+
         truth_H.GetXaxis().SetBinLabel(i, str(i))
+        truthLowE = truth_H.GetBinErrorLow(i)
+        truthUpE = truth_H.GetBinErrorUp(i)
+        ratioUp = getPropagatedError(truth_H.GetBinContent(i), truthUpE, res[srNJet][stb][htb]['tot_pred_final'], res[srNJet][stb][htb]['tot_pred_final_err'], returnCalcResult=True)
+        ratioLow = getPropagatedError(truth_H.GetBinContent(i), truthLowE, res[srNJet][stb][htb]['tot_pred_final'], res[srNJet][stb][htb]['tot_pred_final_err'], returnCalcResult=True)
+        ratioWithE.append({'v': ratioUp[0],'up': ratioUp[1], 'down': ratioLow[1]})
+        print {'v': ratioUp[0],'up': ratioUp[1], 'down': ratioLow[1]}
+
+        ratioX.append(i-0.5)
+        ratioY.append(ratioUp[0])
+        ratioXErr.append(0.5)
+        ratioYUp.append(ratioUp[1])
+        ratioYDown.append(ratioLow[1])
+
+
       else:
         truth_H.SetBinContent(i,res[srNJet][stb][htb]['tot_truth'])
         truth_H.SetBinError(i,  res[srNJet][stb][htb]['tot_truth_err'])
@@ -275,12 +308,21 @@ if unblinded:
 
 print
 print
+#pred error
 ax = array('d',predX)
 ay = array('d',predY)
 aexh = array('d',predXErr)
 aexl = array('d',predXErr)
 aeyh = array('d',predYErr)
 aeyl = array('d',predYErr)
+
+#ratio errors
+rx    = array('d',ratioX)
+ry    = array('d',ratioY)
+rexh  = array('d',ratioXErr)
+rexl  = array('d',ratioXErr)
+reyh  = array('d',ratioYErr)
+reyl  = array('d',ratioYErr)
 
 can = ROOT.TCanvas('can','can',700,700)
 
@@ -351,7 +393,7 @@ pred_err.Draw('2 same')
 truth_H.SetMarkerStyle(22)
 if unblinded or validation:
   truth_H.SetMarkerStyle(20)
-  truth_H.Draw('e1p same')
+  truth_H.Draw('e0p same')
 else:
   truth_H.Draw('hist e same')
 
@@ -370,7 +412,7 @@ pad1.SetLogy()
 can.cd()
 
 ratio2 = ROOT.TH1F('ratio_d','ratio pred/data',bins,0,bins)
-ratio2.Sumw2()
+#ratio2.Sumw2()
 ratio2 = truth_H.Clone()
 ratio2.Divide(pred_H)
 ratio2.SetLineColor(ROOT.kBlack)
@@ -400,7 +442,7 @@ ratio2.GetYaxis().SetTitleOffset(0.4)
 ratio2.GetYaxis().SetNdivisions(304)
 ratio2.SetMinimum(0.)
 ratio2.SetMaximum(3.2)
-ratio2.Draw('e1p')
+ratio2.Draw('e0p')
 
 can.cd()
 
@@ -409,9 +451,9 @@ if not unblinded:
 else:
   suffix = ''
 
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_update.png')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_update.root')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_update.pdf')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_update_p2.png')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_update_p2.root')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_update_p2.pdf')
 
 can2 = ROOT.TCanvas('can2','can2',700,700)
 
