@@ -18,9 +18,9 @@ maxN = -1
 ROOT.gStyle.SetOptStat(0)
 
 all_MB = False
-presel = True
+presel = False
 SB_w   = False
-SB_tt  = False
+SB_tt  = True
 
 test = False
 
