@@ -29,17 +29,17 @@ templateWeightSuffix  = '_SF'
 
 QCDup       = False
 QCDdown     = False
-nameSuffix  = ''
+nameSuffix  = 'noPUreweight'
 if QCDup: nameSuffix += '_QCDup'
 if QCDdown: nameSuffix += '_QCDdown'
 
 ## samples
-isData              = True
+isData              = False
 unblinded           = True
 validation          = False
 isCentralPrediction = True
 if isData:
-  isCentralPrediction = True
+  isCentralPrediction = False #should be false for data, otherwise kappa is measured in data!
 
 cWJets      = getChain(WJetsHTToLNu_25ns,histname='')
 cTTJets     = getChain(TTJets_combined,histname='')
@@ -55,7 +55,8 @@ cQCD        = getChain(QCDHT_25ns,histname='')
 useQCDestimation = False
 if not isData and useQCDestimation: QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_MC2p1fb_pkl'
 if isData:
-  QCDpickle  = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_2p1fb_pkl'
+  QCDpickle  = '/data/dspitzbart/Results2016/QCDEstimation/20160212_QCDestimation_data2p25fb_pkl'
+  #QCDpickle  = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_2p1fb_pkl'
   #QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_extendedClosureTest3to4j_2p1fb_pkl'
   #QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_closureTest4to5j_2p1fb_pkl'
 
