@@ -496,11 +496,11 @@ def rwTreeClasses(sample, isample, args, temporaryDir, params={} ):
     readVectors_DATAMC.extend([
         {'prefix':'LepOther',  'nMax':8, 
             'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I', 'relIso03/F', 'tightId/I', 
-                    'miniRelIso/F','mass/F','sip3d/F','mediumMuonId/I', 
+                    'miniRelIso/F','mass/F','sip3d/F','mediumMuonId/I', 'dxy/F', 'dz/F',  "relIso04/F",
                     'mvaIdPhys14/F','lostHits/I', 'convVeto/I']},
         {'prefix':'LepGood',  'nMax':8, 
             'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I', 'relIso03/F', 'tightId/I', 
-                    'miniRelIso/F','mass/F','sip3d/F','mediumMuonId/I', 
+                    'miniRelIso/F','mass/F','sip3d/F','mediumMuonId/I', 'dxy/F', 'dz/F', "relIso04/F",
                     'mvaIdPhys14/F','lostHits/I', 'convVeto/I']},
         {'prefix':'Jet',  'nMax':100, 
             'vars':['pt/F', 'eta/F', 'phi/F', 'id/I','btagCSV/F', 'btagCMVA/F', 'mass/F']},
@@ -539,6 +539,14 @@ def rwTreeClasses(sample, isample, args, temporaryDir, params={} ):
             'lepAbsIso/F' ,'lepEta/F',  'lepPhi/F', 'lepPdgId/I/0', 'lepInd/I/-1', 
             'lepMass/F', 'lepDz/F', 'lepDxy/F','lepMediumMuonId/I','lepSip3d/F',
             'nlep/I',
+
+
+            'lep30Pt/F','lep30MiniRelIso/F','lep30RelIso03/F' , 'lep30RelIso04/F',
+            'lep30AbsIso/F' ,'lep30Eta/F',  'lep30Phi/F', 'lep30PdgId/I/0', 'lep30Ind/I/-1', 
+            'lep30Mass/F', 'lep30Dz/F', 'lep30Dxy/F','lep30MediumMuonId/I','lep30Sip3d/F',
+            'nlep30/I',
+
+
             ])
             
         newVariables_DATAMC.extend([
@@ -550,9 +558,16 @@ def rwTreeClasses(sample, isample, args, temporaryDir, params={} ):
         newVariables_DATAMC.extend([
             'jet1Pt/F','jet1Eta/F','jet1Phi/F', 
             'jet2Pt/F','jet2Eta/F','jet2Phi/F',
-            'deltaPhi_j12/F', 'dRJet1Jet2/F',
+            'deltaPhi_j12/F', 'dRJet1Jet2/F','deltaPhi30_j12/F' , 'deltaPhi60_j12/F',
             'JetLepMass/F','dRJet1Lep/F',
             'J3Mass/F',
+        
+            "jet1Index/I", "jet2Index/I", "jet3Index/I", 
+            "b0Index/I", "b1Index/I",
+            #"lep1Index/I", "lep2Index/I", 
+            "looseMuonIndex/I", "looseMuonPt30Index/I"
+            #"mu0Index/I", "mu1Index/I",
+            #"el0Index/I", "el1Index/I",
             ])
         
         #newVariables_DATAMC.extend([
@@ -710,6 +725,39 @@ def getTreeFromChunk(c, skimCond, iSplit, nSplit):
 
 
 
+
+
+
+cmgObject = cmgObjectSelection.cmgObject
+
+ptSwitch = 25
+relIso = 0.2
+absIso = 5
+
+muSelector =    lambda readTree,lep,i: \
+                        ( abs(lep.pdgId[i])==13)\
+                        and (lep.pt[i] > 5 )\
+                        and abs(lep.eta[i]) < 2.5\
+                        and abs(lep.dxy[i]) < 0.05\
+                        and abs(lep.dz[i]) < 0.2\
+                        and lep.sip3d[i] < 4\
+                        and lep.mediumMuonId[i] == 1\
+                        and ((lep.pt[i] >= ptSwitch and lep.relIso04[i] < relIso ) or (lep.pt[i] < ptSwitch  and lep.relIso04[i] * lep.pt[i] < absIso ) )
+
+
+muPt30Selector =    lambda readTree,lep,i: \
+                        ( abs(lep.pdgId[i])==13)\
+                        and (lep.pt[i] > 5 )\
+                        and (lep.pt[i] < 30 )\
+                        and abs(lep.eta[i]) < 2.5\
+                        and abs(lep.dxy[i]) < 0.05\
+                        and abs(lep.dz[i]) < 0.2\
+                        and lep.sip3d[i] < 4\
+                        and ((lep.pt[i] >= ptSwitch and lep.relIso04[i] < relIso ) or (lep.pt[i] < ptSwitch  and lep.relIso04[i] * lep.pt[i] < absIso ) )
+                        #and lep.mediumMuonId[i] == 1\
+
+
+
 def processLeptons(leptonSelection, readTree, splitTree, saveTree):
     '''Process leptons. 
     
@@ -725,6 +773,23 @@ def processLeptons(leptonSelection, readTree, splitTree, saveTree):
     if leptonSelection in ['soft','hard','inc']:
 
         # get all >=loose lepton indices
+        lepObj = cmgObject(readTree, "LepGood")
+
+
+        lepList      =  lepObj.getSelectionIndexList(readTree, muSelector )
+        lepPt30List  =  lepObj.getSelectionIndexList(readTree, muPt30Selector, lepList )
+
+        
+        saveTree.nMuons = len(lepList)
+        saveTree.nMuonsPt30 = len(lepPt30List)
+
+
+        saveTree.looseMuonIndex     =  lepList[0] if saveTree.nMuons > 0 else -1
+        saveTree.looseMuonPt30Index =  lepPt30List[0] if saveTree.nMuonsPt30 > 0 else -1
+
+
+
+
         looseLepInd = cmgObjectSelection.cmgLooseLepIndices(
             readTree, ptCuts=(7,5), absEtaCuts=(2.5,2.4), 
             ele_MVAID_cuts={'eta08':0.35 , 'eta104':0.20,'eta204': -0.52} 
@@ -755,10 +820,11 @@ def processLeptons(leptonSelection, readTree, splitTree, saveTree):
         varList = ['pt', 'eta', 'phi', 'miniRelIso','relIso03','relIso04', 'dxy', 'dz', 'pdgId', 'sip3d','mediumMuonId']
 
         lepGoods =   [hephyHelpers.getObjDict(splitTree, 'LepGood_',varList, i ) for i in range(readTree.nLepGood)]
-        lepOthers =  [hephyHelpers.getObjDict(splitTree, 'LepOther_',varList, i ) for i in range(readTree.nLepOther)]
-        allLeptons = lepGoods + lepOthers
+        lepOthers =  [hephyHelpers.getObjDict(splitTree, 'LepOther_',varList, i ) for i in range(readTree.nLepOther)]  # use LepGood for sync 
+        allLeptons = lepGoods #+ lepOthers
         
-        selectedLeptons = filter(cmgObjectSelection.isGoodLepton , allLeptons)
+        #selectedLeptons = filter(cmgObjectSelection.isGoodLepton , allLeptons)
+        selectedLeptons = filter(cmgObjectSelection.isGoodLepton30 , allLeptons)   ## for the sync
         selectedLeptons = sorted(selectedLeptons ,key= lambda lep: lep['pt'], reverse=True)
 
         logger.debug(
@@ -772,6 +838,7 @@ def processLeptons(leptonSelection, readTree, splitTree, saveTree):
             )
                     
         varsToKeep = varList + []
+
         if selectedLeptons:
             lep = selectedLeptons[0]
             lepName = "lep"
@@ -799,6 +866,10 @@ def processLeptons(leptonSelection, readTree, splitTree, saveTree):
             saveTree.singleMuonic      = False 
             saveTree.singleElectronic  = False 
 
+
+
+
+
     #
     return saveTree, lep
 
@@ -816,6 +887,12 @@ def selectionJets(readTree, ptCut,etaCut=2.4):
     return jets
 
 
+jetSelectorFunc = cmgObjectSelection.jetSelectorFunc
+jetSelector = jetSelectorFunc(pt=30, eta=2.4)
+
+
+
+
 def processJets(leptonSelection, readTree, splitTree, saveTree):
     '''Process jets. 
     
@@ -827,6 +904,8 @@ def processJets(leptonSelection, readTree, splitTree, saveTree):
     # initialize returned variables (other than saveTree)
     
     jets = None
+
+    
     
     if leptonSelection in ['soft', 'hard', 'inc']:
         
@@ -847,10 +926,40 @@ def processJets(leptonSelection, readTree, splitTree, saveTree):
         jets110 = selectionJets(readTree, ptCut)
 
 
-        saveTree.nJet30 = len(jets)
-        saveTree.nJet60 = len(jets60)
-        saveTree.nJet110 = len(jets110)
-        saveTree.nJet100 = len(jets100)
+
+       
+
+
+        jetObj      =  cmgObject(readTree,"Jet")
+
+        #jet30List   =  jetObj.
+
+        jet30List   =  jetObj.getSelectionIndexList(readTree, jetSelectorFunc(pt=30, eta=2.4)) 
+        jet60List   =  jetObj.getSelectionIndexList(readTree, jetSelectorFunc(pt=60, eta=2.4), jet30List) 
+        jet100List  =  jetObj.getSelectionIndexList(readTree, jetSelectorFunc(pt=100, eta=2.4), jet60List) 
+        jet110List  =  jetObj.getSelectionIndexList(readTree, jetSelectorFunc(pt=110, eta=2.4), jet100List) 
+        jet325List  =  jetObj.getSelectionIndexList(readTree, jetSelectorFunc(pt=325, eta=2.4), jet110List) 
+
+        assert jet60List   == jetObj.getSelectionIndexList(readTree, jetSelectorFunc(pt=60, eta=2.4) )
+        assert jet100List  == jetObj.getSelectionIndexList(readTree, jetSelectorFunc(pt=100, eta=2.4))
+        assert jet110List  == jetObj.getSelectionIndexList(readTree, jetSelectorFunc(pt=110, eta=2.4)) 
+
+
+        if not len(jets)== len(jet30List):
+            print "-------------------------"
+            print jets
+            print jet30List
+        assert len(jets60)==  len(jet60List)
+        assert len(jets100)== len(jet100List)
+        assert len(jets110)== len(jet110List)
+
+
+
+
+        saveTree.nJet30  = len(jet30List)
+        saveTree.nJet60  = len(jet60List)
+        saveTree.nJet100 = len(jet100List)
+        saveTree.nJet110 = len(jet110List)
         saveTree.nJet325 = len(filter(lambda j: j["pt"] > 325 , jets110))
         
         logger.debug(
@@ -860,14 +969,16 @@ def processJets(leptonSelection, readTree, splitTree, saveTree):
                
         # separation of jets and bJets according to discriminant (CMVA;  CSV - default)
         
-        discCMVA = 0.732
+        # CMVA Obsolete
+        # discCMVA = 0.732                       
+        # lightJetsCMVA, bJetsCMVA = cmgObjectSelection.splitListOfObjects('btagCMVA', discCMVA, jets) 
+
         discCSV = 0.890
         cutSoftHardBJets = 60
         
-        lightJetsCMVA, bJetsCMVA = cmgObjectSelection.splitListOfObjects('btagCMVA', discCMVA, jets) 
         lightJetsCSV, bJetsCSV = cmgObjectSelection.splitListOfObjects('btagCSV', discCSV, jets)
         
-        logger.debug("\n Selected CMVA b jets: %i jets \n %s \n", len(bJetsCMVA), pprint.pformat(bJetsCMVA))
+        #logger.debug("\n Selected CMVA b jets: %i jets \n %s \n", len(bJetsCMVA), pprint.pformat(bJetsCMVA))
         logger.debug("\n Selected CSV b jets: %i jets \n %s \n", len(bJetsCSV), pprint.pformat(bJetsCSV))
 
         bJets = filter(lambda j: j["btagCSV"] > discCSV , jets)
@@ -900,6 +1011,22 @@ def processJets(leptonSelection, readTree, splitTree, saveTree):
         saveTree.dRJet1Jet2 = 0.
         saveTree.deltaPhi_j12 = 0.
 
+
+        ### Get indecies for jet1,2,3
+        saveTree.jet1Index    = jet30List[0] if saveTree.nJet30 >0       else -1
+        saveTree.jet2Index    = jet30List[1] if saveTree.nJet30 >1       else -1
+        saveTree.jet3Index    = jet30List[2] if saveTree.nJet30 >2       else -1
+
+
+        ## USE INDEX FIX
+        #print "-------------------------"
+        #print saveTree.nJet30 , jetObj.nObj
+        #print saveTree.jet1Index, saveTree.jet2Index, saveTree.jet3Index
+
+        saveTree.deltaPhi30_j12 = hephyHelpers.deltaPhi( jetObj.phi[saveTree.jet1Index], jetObj.phi[saveTree.jet2Index]) if saveTree.nJet30 >= 2 else -999
+        saveTree.deltaPhi60_j12 = hephyHelpers.deltaPhi( jetObj.phi[ jet60List[0] ], jetObj.phi[ jet60List[1] ]) if saveTree.nJet60 >= 2 else -999
+
+
         if saveTree.nJet30 > 0:    
             saveTree.jet1Pt = jets[0]['pt']
             saveTree.jet1Eta = jets[0]['eta']
@@ -918,10 +1045,7 @@ def processJets(leptonSelection, readTree, splitTree, saveTree):
         elif saveTree.nJet60 == 1:
             saveTree.deltaPhi_j12 = 0.
         else:
-            saveTree.deltaPhi_j12 = min(
-                2 * math.pi - abs(jets60[1]['phi'] - jets60[0]['phi']),
-                abs(jets60[1]['phi'] - jets60[0]['phi'])
-                )
+            saveTree.deltaPhi_j12 = hephyHelpers.deltaPhi( jets60[0]['phi'], jets60[1]['phi'] ) 
  
         logger.debug(
             "\n Jet separation: \n  dRJet1Jet2: %f \n  deltaPhi_j12: %f \n", 
@@ -944,7 +1068,6 @@ def processLeptonJets(leptonSelection, readTree, splitTree, saveTree, lep, jets)
     '''
     
     logger = logging.getLogger('cmgPostProcessing.processLeptonJets')
-    
 
     if leptonSelection in ['soft', 'hard', 'inc']:
          
@@ -1358,7 +1481,9 @@ def cmgPostProcessing(argv=None):
                 
         logger.info(
             "\n Running on sample %s of type %s" + \
-            "\n Number of chunks: %i \n", sampleName, sampleType, len(chunks)
+            "\n Number of chunks: %i"\
+            "\n SumWeights: %s \n", sampleName, sampleType, len(chunks) , sumWeight
+            
             ) 
         logger.debug("\n Chunks: %s", pprint.pformat(chunks)) 
         
@@ -1387,7 +1512,7 @@ def cmgPostProcessing(argv=None):
             if overwriteOutputFiles:
                 shutil.rmtree(outputWriteDirectory, onerror=retryRemove)
                 os.makedirs(outputWriteDirectory)
-                logger.debug(
+                logger.info(
                     "\n Requested sample directory \n %s \n exists, and overwriteOutputFiles is set to True." + \
                     "\n Cleaned up and recreated the directory done. \n", 
                     outputWriteDirectory

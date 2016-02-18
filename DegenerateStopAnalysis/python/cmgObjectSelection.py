@@ -3,19 +3,185 @@ from math import *
 
 
 
-def isGoodLepton(lep, ptCut=5, etaCut = 2.5, hybridIso04={"ptSwitch":25,"relIso":0.2,'absIso':5} , dzCut=0.2 , dxyCut=0.05 ,sip3dCut=4.0 ):
+
+
+#use indicies, probably faster!
+
+class cmgObject():
+    def __init__(self,readTree, obj ,varList=[]):
+        self.nObj = cmgObjLen(readTree, obj)
+        self.obj = obj
+        self.readTree = readTree  ### Can this create a memory leak?
+        #self.getVars(readTree, varList)
+
+        #def getattr(self, name, tree= readTree):
+        #    return cmgObjVar(readTree, self.obj, name)        
+
+    def __getattr__(self, name ):
+        var = cmgObjVar(self.readTree, self.obj, name)
+        return var
+
+    def __ge__(self, y):
+        raise Exception("cmgObject can't be compared. Item index is probably missing")
+    def __gt__(self, y):
+        raise Exception("cmgObject can't be compared. Item index is probably missing")
+    def __le__(self, y):
+        raise Exception("cmgObject can't be compared. Item index is probably missing")
+    def __lt__(self, y):
+        raise Exception("cmgObject can't be compared. Item index is probably missing")
+    def __eq__(self, y):
+        raise Exception("cmgObject can't be compared. Item index is probably missing")
+
+    def getPassFailList(self, readTree , selectorFunc, objList=None): 
+        """
+        Outputs a list of of True/False depending on whether object pass or fail the SelectorFunc
+        SelectorFunc should take readTree, cmgObject instance and object index
+        Can provide another PassFailList, as the objList, to loop over instead of the entire collection
+        """
+        passFailList = []
+        if not objList:
+            objList = enumerate(range(self.nObj))        # Will Loop over all objs in the collection
+        else:
+            if len(objList)==self.nObj:        # objList should be a passfaillist 
+                objList = enumerate(objList)
+            else:
+                #objList = enumerate()             
+                #print objList
+                objList = enumerate( [i in objList  for i in range(self.nObj) ]  )
+                #assert False               
+        #cutFuncs = self.selFunc(self, readTree, funcList)
+        #print objList
+        #print "----", objList
+        #if True: return objList
+        for iObj , passed in objList:   
+            if passed is False :
+                passFailList.append(False)
+                continue
+            passFailList.append( selectorFunc( readTree, self, iObj )  )    ### func probably won't need readTree, but passing it just in case
+        return passFailList
+
+    def getIndexList(self, passFailList):
+        return getIndexList(passFailList)
+    
+    #def sort(self, readTree, key, objList):
+    #    pass       
+
+    
+
+    def getSelectionIndexList(self, readTree , selectorFunc, objList=None): 
+        """
+        Outputs a list of indices of the objects that have passed the selectorFunc
+        SelectorFunc should take readTree, cmgObject instance and object index
+        Can provide another PassFailList, as the objList, to loop over instead of the entire collection
+        """
+        return getIndexList(self.getPassFailList(readTree, selectorFunc, objList=objList))
+    
+
+    def getVars(self, readTree, varList):
+        for var in varList:
+            setattr(self,var, cmgObjVar(readTree, self.obj, var) )
+
+
+
+def getIndexList(passFailList):
+    indexList=[]
+    for ix, x in enumerate(passFailList):
+        if x:
+            indexList.append(ix)
+    return indexList
+
+def cmgObjVar(readTree, obj, var):                
+    return getattr(readTree, "%s_%s"%(obj,var) )
+
+
+def cmgObjLen(readTree, obj):
+    return getattr(readTree, "n%s"%obj )
+
+
+def cmgLeaf(readTree, obj, var):                
+    leaf = readTree.GetLeaf( "%s_%s"%(obj,var) )
+    return
+
+class Leaf:
+    def __init__(self, readTree, obj, var):
+        self.leaf = readTree.GetLeaf( "%s_%s"%(obj,var) )
+    def __getitem__(self,name):
+        return self.leaf.GetValue(name)
+
+
+
+
+
+ptSwitch = 25
+relIso = 0.2
+absIso = 5
+
+muSelector =    lambda readTree,lep,i: \
+                        ( abs(lep.pdgId[i])==13) \
+                        and (lep.pt[i] > 5 )\
+                        and abs(lep.eta[i]) < 2.5 \
+                        and abs(lep.dxy[i]) < 0.05\
+                        and abs(lep.dz[i]) < 0.2\
+                        and lep.sip3d[i] < 4 \
+                        and lep.mediumMuonId[i] == 1\
+                        and ((lep.pt[i] >= ptSwitch and lep.relIso04[i] < relIso ) or (lep.pt[i] < ptSwitch  and lep.relIso04[i] * lep.pt[i] < absIso ) )
+                
+def jetSelectorFunc(pt, eta):
+    ret = lambda readTree, jet, i:\
+                    jet.pt[i] > pt\
+                    and abs(jet.eta[i]) < eta\
+                    and jet.id[i]
+    return ret
+
+                
+jetSelector = jetSelectorFunc(pt=30, eta=2.4) 
+
+
+
+
+###############################################################################################
+#######################################                    ####################################
+#######################################   OLD FUNCTIONS    ####################################
+#######################################                    ####################################
+###############################################################################################
+
+
+def isGoodLepton(lep, ptCut=5, etaCut = 2.4, hybridIso04={"ptSwitch":25,"relIso":0.2,'absIso':5} , dzCut=0.2 , dxyCut=0.05 ,sip3dCut=4.0 ):
   if abs(lep['pdgId'])==13:
-    if lep['mediumMuonId']==1 and lep['dz']<dzCut and lep['dxy'] < dxyCut and lep['sip3d'] < sip3dCut and lep['pt'] > ptCut and abs(lep['eta']) < etaCut and hybridIso04ID(lep):
+    if lep['mediumMuonId']==1 and abs(lep['dz'])<dzCut and abs(lep['dxy']) < dxyCut and lep['sip3d'] < sip3dCut and lep['pt'] > ptCut and abs(lep['eta']) < etaCut and hybridIso04ID(lep):
       return True
     else: return False
   elif abs(lep['pdgId'])==11:
     return False
 
+def isGoodLepFunc(ptCut=5, ptMax=999999 ,etaCut = 2.4, hybridIso04={"ptSwitch":25,"relIso":0.2,'absIso':5} , dzCut=0.2 , dxyCut=0.05 ,sip3dCut=4.0):
+    def isGoodLepton(lep, ptCut=ptCut, etaCut=etaCut, hybridIso04=hybridIso04, dzCut=dzCut, dxyCut=dxyCut, sip3dCut=sip3dCut ):
+        if abs(lep['pdgId'])==13:
+          if lep['mediumMuonId']==1 and abs(lep['dz'])<dzCut and abs(lep['dxy']) < dxyCut and lep['sip3d'] < sip3dCut and lep['pt'] > ptCut and lep['pt'] < ptMax and abs(lep['eta']) < etaCut and hybridIso04ID(lep):
+            return True
+          else: return False
+        elif abs(lep['pdgId'])==11:
+          return False
+    return isGoodLepton
+
+isGoodLepton30 = isGoodLepFunc(ptMax=30)
+
+
+
 def hybridIso04ID(lep,hybridIso04={"ptSwitch":25,"relIso":0.2,'absIso':5}):
   return (lep["pt"]>=hybridIso04['ptSwitch'] and lep["relIso04"]<hybridIso04['relIso']) or (lep["pt"]<hybridIso04['ptSwitch'] and lep["relIso04"]*lep["pt"]<hybridIso04['absIso'])
 
 
-#use indicies, probably faster!
+
+def cmgLooseLepID(readTree, nLep, ptCuts, absEtaCuts, ele_MVAID_cuts,lepton="LepGood"):
+  if lepton=="LepGood":
+    if abs(readTree.LepGood_pdgId[nLep])==11: return cmgLooseEleID(readTree, nLep=nLep, ptCut=ptCuts[0], absEtaCut=absEtaCuts[0], ele_MVAID_cuts=ele_MVAID_cuts,lepton=lepton)
+    elif abs(readTree.LepGood_pdgId[nLep])==13: return cmgLooseMuID(readTree, nLep=nLep, ptCut=ptCuts[1], absEtaCut=absEtaCuts[1],lepton=lepton)
+  elif lepton=="LepOther":
+    if abs(readTree.LepOther_pdgId[nLep])==11: return cmgLooseEleID(readTree, nLep=nLep, ptCut=ptCuts[0], absEtaCut=absEtaCuts[0], ele_MVAID_cuts=ele_MVAID_cuts,lepton=lepton)
+    elif abs(readTree.LepOther_pdgId[nLep])==13: return cmgLooseMuID(readTree, nLep=nLep, ptCut=ptCuts[1], absEtaCut=absEtaCuts[1],lepton=lepton)
+
+
 #def cmgTrackIndices(r, ptCuts=1, absEtaCuts=(2.5,2.4), , nMax=300 ):
 #  return [i for i in range(min(nMax,r.ntrack) ) if cmgTrackID(r,nTrk=i) ]
 
