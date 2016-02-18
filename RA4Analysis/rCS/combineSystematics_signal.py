@@ -63,7 +63,7 @@ dummy.SetLineColor(ROOT.kWhite)
 dummy.SetFillColor(ROOT.kWhite)
 
 
-hists = [xsecH,PUH,lumiH,triggerH,bErrH , lightErrH , lepSFErrH, Q2ErrH , jecErrH ,isrErrH]
+hists = [PUH,lumiH,triggerH,bErrH , lightErrH , lepSFErrH, Q2ErrH , jecErrH ,isrErrH]
 for i_h,h in enumerate(hists):
   h.SetFillColor(colors[i_h])
   h.SetLineColor(colors[i_h]+1)
@@ -80,9 +80,11 @@ totalXErr = []
 totalYErr = []
 totalX = []
 totalY = []
-for sig in allSignals:
-  for mglu in sig.keys() :
-    for mlsp in sig[mglu].keys() :
+for sig in [allSignals[7]]:
+  #for mglu in sig.keys() :
+  for mglu in [1500] :
+    #for mlsp in sig[mglu].keys() :
+    for mlsp in [100] :
       i=1
       for injb,srNJet in enumerate(sorted(signalRegions)):
         for stb in sorted(signalRegions[srNJet]):
@@ -134,10 +136,10 @@ for sig in allSignals:
             expand_dict[srNJet][stb][htb]["signals"][mglu][mlsp]['syst_lumi'] = lumiErr
             
             xsecErr    = (gluino13TeV_NLONLL_Up[mglu]/gluino13TeV_NLONLL[mglu])-1
-            xsecH.SetBinContent(i, xsecErr )
+            #xsecH.SetBinContent(i, xsecErr )
             expand_dict[srNJet][stb][htb]["signals"][mglu][mlsp]['syst_xsec'] = xsecErr
 
-            totalSyst = isrErr**2 + Q2Err**2 + jecErr**2 +bErr**2 + lightErr**2 + leptonErr**2 + triggerErr**2 + PUErr**2 + lumiErr**2 + xsecErr**2
+            totalSyst = isrErr**2 + Q2Err**2 + jecErr**2 +bErr**2 + lightErr**2 + leptonErr**2 + triggerErr**2 + PUErr**2 + lumiErr**2
             totalSyst = sqrt(totalSyst)
             totalH.SetBinContent(i, totalSyst)
             print mglu , mlsp
@@ -226,4 +228,4 @@ for sig in allSignals:
       can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/signal_syst_approval/syst_errors_signal_'+str(mglu)+'_'+str(mlsp)+'.root')
       can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/signal_syst_approval/syst_errors_signal_'+str(mglu)+'_'+str(mlsp)+'.pdf')
 
-pickle.dump(expand_dict,file('/data/easilar/Spring15/25ns/allSignals_2p25_allSyst_approval_pkl','w'))
+#pickle.dump(expand_dict,file('/data/easilar/Spring15/25ns/allSignals_2p25_allSyst_approval_pkl','w'))
