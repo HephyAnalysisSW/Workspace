@@ -97,7 +97,6 @@ for sig in [allSignals[7]]:
             print '#############################################'
             print
 
-
             isrErr = res[srNJet][stb][htb][mglu][mlsp]['delta_ISR']
             expand_dict[srNJet][stb][htb]["signals"][mglu][mlsp]['syst_ISR'] = isrErr 
             isrErrH.SetBinContent(i, isrErr) 
