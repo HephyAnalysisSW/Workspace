@@ -16,6 +16,10 @@ from Workspace.RA4Analysis.signalRegions import *
 
 testRun = False
 
+####################################################################################################33
+# top pt weight removed in MCweight!!
+
+
 ## b-tagging and other variables
 dPhiStr = 'deltaPhi_Wl'
 bjreg = (0,0)
@@ -23,13 +27,13 @@ wjetsSB = (3,4)
 
 nBTagVar              = 'nBJetMediumCSV30'
 useBTagWeights        = True
-btagWeightSuffix      = '_SF_light_Down'
+btagWeightSuffix      = '_SF'
 templateWeights       = True
 templateWeightSuffix  = '_SF'
 
 QCDup       = False
 QCDdown     = False
-nameSuffix  = 'noPUreweight'
+nameSuffix  = '_noTopPTweights2'
 if QCDup: nameSuffix += '_QCDup'
 if QCDdown: nameSuffix += '_QCDdown'
 
@@ -37,7 +41,7 @@ if QCDdown: nameSuffix += '_QCDdown'
 isData              = False
 unblinded           = True
 validation          = False
-isCentralPrediction = False
+isCentralPrediction = True
 if isData:
   isCentralPrediction = False #should be false for data, otherwise kappa is measured in data!
 
@@ -53,9 +57,10 @@ cQCD        = getChain(QCDHT_25ns,histname='')
 
 ## QCD estimation
 useQCDestimation = False
-if not isData and useQCDestimation: QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_MC2p1fb_pkl'
+if not isData and useQCDestimation: QCDpickle = '/data/dspitzbart/Results2016/QCDEstimation/20160212_QCDestimation_MC2p25fb_pkl'
 if isData:
-  QCDpickle  = '/data/dspitzbart/Results2016/QCDEstimation/20160212_QCDestimation_data2p25fb_pkl'
+  #QCDpickle  = '/data/dspitzbart/Results2016/QCDEstimation/20160212_QCDestimation_data2p25fb_pkl'
+  QCDpickle  = '/data/dspitzbart/Results2016/QCDEstimation/20160218_QCDestimation_validation_data2p25fb_pkl'
   #QCDpickle  = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_2p1fb_pkl'
   #QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_extendedClosureTest3to4j_2p1fb_pkl'
   #QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_closureTest4to5j_2p1fb_pkl'
@@ -98,6 +103,8 @@ else:
 
 ## Template Bootstrap error dictionary
 templateBootstrap = True
+if validation:
+  templateBootstrap = False
 templateBootstrapDir = '/data/dspitzbart/bootstrap/combined_errs_pkl'
 if templateBootstrap: templateBootstrap = pickle.load(file(templateBootstrapDir))
 
@@ -113,7 +120,10 @@ pickleDir   = '/data/'+username+'/Results'+year+'/Prediction_'+predictionName+'_
 templateDir = '/data/'+username+'/Results'+year+'/btagTemplates_'+templateName+'_'+templateLumistr+'/'
 prefix = 'singleLeptonic_Spring15_'
 
-kappa_dict_dir = '/data/dspitzbart/Results'+year+'/Prediction_SFtemplates_fullSR_lep_MC_SFnoPUreweight_2p25/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'
+if validation:
+  kappa_dict_dir = '/data/dspitzbart/Results'+year+'/Prediction_SFtemplates_validation_4j_lep_MC_SFnoPUreweight_2p25/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'
+else:
+  kappa_dict_dir = '/data/dspitzbart/Results'+year+'/Prediction_SFtemplates_fullSR_lep_MC_SFnoPUreweight_2p25/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'
 
 ## Preselection cut
 triggers = "(HLT_EleHT350||HLT_MuHT350)"
@@ -128,10 +138,11 @@ singleMu_presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSof
 #presel = singleMu_presel
 
 ## weights for MC
-MCweight = 'lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*TopPtWeight*0.94'
+MCweight = 'lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*0.94'
+#MCweight = 'lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*TopPtWeight*0.94'
 
 ## corrections
-createFits = True # turn off if you already did one
+createFits = False # turn off if you already did one
 if not isCentralPrediction:
   createFits = False
 fitDir = '/data/'+username+'/Results'+year+'/correctionFit_'+regStr+'_MC/'

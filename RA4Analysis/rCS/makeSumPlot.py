@@ -16,7 +16,7 @@ from predictionConfig import *
 
 cData = getChain([single_mu_Run2015D, single_ele_Run2015D], histname='')
 isData = True
-predictionName = 'SFtemplates_fullSR_lep_data'
+#predictionName = 'SFtemplates_fullSR_lep_data'
 
 ROOT.gStyle.SetOptTitle(0);
 ROOT.gStyle.SetOptStat('')
@@ -37,20 +37,17 @@ prefix = 'singleLeptonic_Spring15_'
 #pickleDir = '/data/easilar/Results2016/Prediction_SFtemplates_fullSR_lep_data_2p25/'
 #pickleDir = '/data/dspitzbart/Results2015/Prediction_SFtemplates_validation_lep_data_2.1/'
 pickleDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_fullSR_lep_data_2p25/'
+#pickleDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_validation_4j_lep_data_2p25/'
+
 res = pickle.load(file(pickleDir+'resultsFinal_withSystematics_pkl'))
 if withSystematics:
   sys = pickle.load(file(pickleDir+'resultsFinal_withSystematics_pkl'))
 
 #sig = pickle.load(file('/data/easilar/Spring15/25ns/allSignals_2p3_v2_pkl'))
-sig = pickle.load(file('/data/dspitzbart/Results2016/signal_unc_pkl'))
+sig = pickle.load(file('/data/easilar/Spring15/25ns/allSignals_2p25_allSyst_approval_pkl'))
 
 #signalRegions = validationRegion
 #signalRegions = signalRegionCRonly
-
-#triggers = "(HLT_EleHT350||HLT_MuHT350)"
-#filters = "Flag_goodVertices && Flag_HBHENoiseFilter_fix && Flag_CSCTightHaloFilter && Flag_eeBadScFilter && Flag_HBHENoiseIsoFilter"
-#presel = "((!isData&&singleLeptonic)||(isData&&"+triggers+"&&((muonDataSet&&singleMuonic)||(eleDataSet&&singleElectronic))&&"+filters+"))"
-#presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSoftLeptons==0 && Jet_pt[1]>80 && st>250 && nJet30>2 && htJet30j>500"
 
 
 def getValErrString(val,err, precision=3):
@@ -156,6 +153,9 @@ predYErr = []
 predX = []
 predY = []
 
+predRelYErr = []
+predRelY = []
+
 ratioXErr = []
 ratioYUp = []
 ratioYDown = []
@@ -248,15 +248,18 @@ for srNJet in sorted(signalRegions):
       
       if withSystematics:
         predYErr.append(res[srNJet][stb][htb]['tot_pred_final_err'])
+        predRelYErr.append(res[srNJet][stb][htb]['tot_pred_final_err']/res[srNJet][stb][htb]['tot_pred_final'])
       else:
         predYErr.append(res[srNJet][stb][htb]['tot_pred_err'])
+        predRelYErr.append(res[srNJet][stb][htb]['tot_pred_err']/res[srNJet][stb][htb]['tot_pred'])
       predXErr.append(0.5)
       if not applyKappa:
         predY.append(res[srNJet][stb][htb]['tot_pred'])
       else:
         predY.append(res[srNJet][stb][htb]['tot_pred_final'])
       predX.append(i-0.5)
-
+      predRelY.append(1)
+      
       if unblinded or validation:
         if isData:
           weight = 'weight'
@@ -277,8 +280,10 @@ for srNJet in sorted(signalRegions):
         truth_H.GetXaxis().SetBinLabel(i, str(i))
         truthLowE = truth_H.GetBinErrorLow(i)
         truthUpE = truth_H.GetBinErrorUp(i)
-        ratioUp = getPropagatedError(truth_H.GetBinContent(i), truthUpE, res[srNJet][stb][htb]['tot_pred_final'], res[srNJet][stb][htb]['tot_pred_final_err'], returnCalcResult=True)
-        ratioLow = getPropagatedError(truth_H.GetBinContent(i), truthLowE, res[srNJet][stb][htb]['tot_pred_final'], res[srNJet][stb][htb]['tot_pred_final_err'], returnCalcResult=True)
+        #ratioUp = getPropagatedError(truth_H.GetBinContent(i), truthUpE, res[srNJet][stb][htb]['tot_pred_final'], res[srNJet][stb][htb]['tot_pred_final_err'], returnCalcResult=True)
+        #ratioLow = getPropagatedError(truth_H.GetBinContent(i), truthLowE, res[srNJet][stb][htb]['tot_pred_final'], res[srNJet][stb][htb]['tot_pred_final_err'], returnCalcResult=True)
+        ratioUp = getPropagatedError(truth_H.GetBinContent(i), truthUpE, res[srNJet][stb][htb]['tot_pred_final'], 0, returnCalcResult=True)
+        ratioLow = getPropagatedError(truth_H.GetBinContent(i), truthLowE, res[srNJet][stb][htb]['tot_pred_final'], 0, returnCalcResult=True)
         if not truth_H.GetBinContent(i)>0:
           ratioErrUp = truthUpE/res[srNJet][stb][htb]['tot_pred_final']
           ratioErrLow = 0
@@ -311,9 +316,9 @@ for srNJet in sorted(signalRegions):
         truth_H.GetXaxis().SetBinLabel(i, str(i))
 
       if signal:
-        benchmark1_H.SetBinContent(i,res[srNJet][stb][htb]['tot_pred_final']+sig[srNJet][stb][htb][1000][700]['yield_MB_SR'])
-        benchmark2_H.SetBinContent(i,res[srNJet][stb][htb]['tot_pred_final']+sig[srNJet][stb][htb][1200][800]['yield_MB_SR'])
-        benchmark3_H.SetBinContent(i,res[srNJet][stb][htb]['tot_pred_final']+sig[srNJet][stb][htb][1500][100]['yield_MB_SR'])
+        benchmark1_H.SetBinContent(i,res[srNJet][stb][htb]['tot_pred_final']+sig[srNJet][stb][htb]['signals'][1000][700]['yield_MB_SR'])
+        benchmark2_H.SetBinContent(i,res[srNJet][stb][htb]['tot_pred_final']+sig[srNJet][stb][htb]['signals'][1200][800]['yield_MB_SR'])
+        benchmark3_H.SetBinContent(i,res[srNJet][stb][htb]['tot_pred_final']+sig[srNJet][stb][htb]['signals'][1500][100]['yield_MB_SR'])
 
       if unblinded:
         total_meas     += data_yield
@@ -341,6 +346,11 @@ aexh = array('d',predXErr)
 aexl = array('d',predXErr)
 aeyh = array('d',predYErr)
 aeyl = array('d',predYErr)
+
+#pred rel error for ratio plot
+a_r_eyh = array('d',predRelYErr)
+a_r_eyl = array('d',predRelYErr)
+a_r_y = array('d',predRelY)
 
 #ratio errors
 rx    = array('d',ratioX)
@@ -427,6 +437,11 @@ pred_err.SetFillStyle(3244)
 pred_err.Draw('2 same')
 truth_H.SetMarkerStyle(22)
 
+pred_rel_err = ROOT.TGraphAsymmErrors(bins, ax, a_r_y, aexl, aexh, a_r_eyl, a_r_eyh)
+pred_rel_err.SetFillColor(ROOT.kGray+1)
+pred_rel_err.SetFillStyle(3244)
+#pred_err.Draw('2 same')
+
 ratio_err = ROOT.TGraphAsymmErrors(bins, rx, ry, rexl, rexh, reyl, reyh)
 ratio_err.SetMarkerStyle(10)
 ratio_err.SetMarkerSize(1.1)
@@ -493,7 +508,9 @@ ratio2.SetMinimum(0.)
 ratio2.SetMaximum(3.2)
 ratio2.Draw('p')
 
+pred_rel_err.Draw('2 same')
 ratio_err.Draw("P0 same")
+
 
 can.cd()
 
@@ -502,9 +519,9 @@ if not unblinded:
 else:
   suffix = ''
 
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_update_p2.png')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_update_p2.root')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_update_p2.pdf')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_update_p3.png')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_update_p3.root')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_update_p3.pdf')
 
 can2 = ROOT.TCanvas('can2','can2',700,700)
 

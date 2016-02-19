@@ -27,106 +27,106 @@ else:
   sampleStr = 'MC'
 
 preprefix = 'QCDestimation/final2p25fb_v2/'+sampleStr
-wwwDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/RunII/Spring15_25ns/'+preprefix+'/'
+wwwDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/RunII/Spring15_25ns/'+preprefix+'_validation/'
 picklePath = '/data/'+username+'/Results2016/QCDEstimation/'
 prefix = 'Lp_singleElectronic_'
-picklePresel = '20160212_QCDestimation_'+sampleStr+'2p25fb_pkl'
-pickleFit    = '20160212_fitResult_'+sampleStr+'2p25fb_pkl'
+picklePresel = '20160218_QCDestimation_validation_'+sampleStr+'2p25fb_pkl'
+pickleFit    = '20160218_fitResult_validation_'+sampleStr+'2p25fb_pkl'
 
 if not os.path.exists(wwwDir):
   os.makedirs(wwwDir)
 
-inclusiveTemplate = {(3, 4): {(250,  -1): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}}}} #use inclusive LT,HT region to get the shape for the fit template
-
-fitCR =  {(3, 4): {(250,  -1): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}},
-                   (250, 350): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}}, #QCD CR exclusive in LT and inclusive in HT, where the fits are performed
-                   (350,  -1): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}}, 
-                   (350, 450): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}},
-                   (450, -1):  {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}}}}
-
-signalRegion = {(3, 4): {(250, 350): {(500, -1):   {(1.0):    {'sys':0.025,  'deltaPhi': 1.0}}, #3-4jets W+jets control region
-                                      (500, 750):  {(1.0):    {'sys':0.025,  'deltaPhi': 1.0}},
-                                      (750, -1):   {(1.0):    {'sys':0.05,   'deltaPhi': 1.0}}},
-                         (350, -1):  {(500, -1):   {(0.75):   {'sys':0.025,  'deltaPhi': 0.75}}},
-                         (350, 450): {(500, -1):   {(1.0):    {'sys':0.025,  'deltaPhi': 1.0},
-                                                    (0.75):   {'sys':0.025,  'deltaPhi': 0.75}},
-                                      (500, 750):  {(1.0):    {'sys':0.025,  'deltaPhi': 1.0}},
-                                      (750, -1):   {(1.0):    {'sys':0.05,   'deltaPhi': 1.0}}},
-                         (450, -1):  {(500, -1):   {(1.0):    {'sys':0.025,  'deltaPhi': 1.0},
-                                                    (0.75):   {'sys':0.025,  'deltaPhi': 0.75}},
-                                      (500, 750):  {(0.75):   {'sys':0.025,  'deltaPhi': 0.75}},
-                                      (750, -1):   {(0.75):   {'sys':0.05,   'deltaPhi': 0.75}},
-                                      (500, 1000): {(0.75):   {'sys':0.025,  'deltaPhi': 0.75}},
-                                      (1000, -1):  {(0.75):   {'sys':0.05,   'deltaPhi': 0.75}}}},
-                (4, 5): {(250, 350): {(500, -1):   {(1.0):    {'sys':0.025,  'deltaPhi': 1.0}}, #4-5jets TTbar control region
-                                      (500, 750):  {(1.0):    {'sys':0.025,  'deltaPhi': 1.0}},
-                                      (750, -1):   {(1.0):    {'sys':0.05,   'deltaPhi': 1.0}}},
-                         (350, -1):  {(500, -1):   {(0.75):   {'sys':0.025,  'deltaPhi': 0.75}}},
-                         (350, 450): {(500, -1):   {(1.0):    {'sys':0.025,  'deltaPhi': 1.0},
-                                                    (0.75):   {'sys':0.025,  'deltaPhi': 0.75}},
-                                      (500, 750):  {(1.0):    {'sys':0.025,  'deltaPhi': 1.0}},
-                                      (750, -1):   {(1.0):    {'sys':0.05,   'deltaPhi': 1.0}}},
-                         (450, -1):  {(500, -1):   {(1.0):    {'sys':0.025,  'deltaPhi': 1.0},
-                                                    (0.75):   {'sys':0.025,  'deltaPhi': 0.75}},
-                                      (500, 750):  {(0.75):   {'sys':0.025,  'deltaPhi': 0.75}},
-                                      (750, -1):   {(0.75):   {'sys':0.05,   'deltaPhi': 0.75}},
-                                      (500, 1000): {(0.75):   {'sys':0.025,  'deltaPhi': 0.75}},
-                                      (1000, -1):  {(0.75):   {'sys':0.05,   'deltaPhi': 0.75}}}},
-                (5, 5): {(250, 350): {(500, -1):   {(1.0):    {'sys':0.025,  'deltaPhi': 1.0}}},  #signal regions
-                         (350, 450): {(500, -1):   {(1.0):    {'sys':0.025,  'deltaPhi': 1.0}}},
-                         (450, -1):  {(500, -1):   {(1.0):    {'sys':0.025,  'deltaPhi': 1.0},
-                                                    (0.75):   {'sys':0.025,  'deltaPhi': 0.75}}}},
-                (6, 7): {(250, 350): {(500, 750):  {(1.0):    {'sys':0.05,   'deltaPhi': 1.0}},
-                                      (750, -1):   {(1.0):    {'sys':0.05,   'deltaPhi': 1.0}}},
-                         (350, 450): {(500, 750):  {(1.0):    {'sys':0.05,   'deltaPhi': 1.0}},
-                                      (750, -1):   {(1.0):    {'sys':0.05,   'deltaPhi': 1.0}}},
-                          (450, -1): {(500, 750):  {(0.75):   {'sys':0.05,   'deltaPhi': 0.75}},
-                                      (750, -1):   {(0.75):   {'sys':0.05,   'deltaPhi': 0.75}},
-                                      (500, 1000): {(0.75):   {'sys':0.05,   'deltaPhi': 0.75}},
-                                      (1000, -1):  {(0.75):   {'sys':0.05,   'deltaPhi': 0.75}}}},
-                (8, -1): {(250, 350):{(500, 750):  {(1.0):    {'sys':0.1,   'deltaPhi': 1.0}},
-                                      (750, -1):   {(1.0):    {'sys':0.1,   'deltaPhi': 1.0}}},
-                          (350, -1): {(500, -1):   {(0.75):   {'sys':0.1,   'deltaPhi': 0.75}}},
-                          (350, 450):{(500, -1):   {(0.75):   {'sys':0.1,   'deltaPhi': 0.75}}},
-                          (450, -1): {(500, -1):   {(0.75):   {'sys':0.1,   'deltaPhi': 0.75}}}}
-}
-
-#inclusiveTemplate = {(3, 3): {(250,  -1): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}}}} #use inclusive LT,HT region to get the shape for the fit template
+#inclusiveTemplate = {(3, 4): {(250,  -1): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}}}} #use inclusive LT,HT region to get the shape for the fit template
 #
-#fitCR =  {(3, 3): {(250,  -1): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}},
+#fitCR =  {(3, 4): {(250,  -1): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}},
 #                   (250, 350): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}}, #QCD CR exclusive in LT and inclusive in HT, where the fits are performed
-#                   #(350,  -1): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}}, 
+#                   (350,  -1): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}}, 
 #                   (350, 450): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}},
 #                   (450, -1):  {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}}}}
 #
-#signalRegion = {(3, 3): {(250, 350): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}, #3-4jets W+jets control region
-#                                      (500, 750):  {(1.0):    {'deltaPhi': 1.0}},
-#                                      (750, -1):   {(1.0):    {'deltaPhi': 1.0}}},
-#                         (350, 450): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}},
-#                                      (500, 750):  {(1.0):    {'deltaPhi': 1.0}},
-#                                      (750, -1):   {(1.0):    {'deltaPhi': 1.0}}},
-#                         (450, -1):  {(500, -1):   {(1.0):    {'deltaPhi': 1.0}},
-#                                      (500, 1000): {(0.75):    {'deltaPhi': 0.75}},
-#                                      (1000, -1):  {(0.75):    {'deltaPhi': 0.75}}}},
-#                (4, 5): {(250, 350): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}, #4-5jets TTbar control region
-#                                      (500, 750):  {(1.0):    {'deltaPhi': 1.0}},
-#                                      (750, -1):   {(1.0):    {'deltaPhi': 1.0}}},
-#                         (350, 450): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}},
-#                                      (500, 750):  {(1.0):    {'deltaPhi': 1.0}},
-#                                      (750, -1):   {(1.0):    {'deltaPhi': 1.0}}},
-#                         (450, -1):  {(500, -1):   {(1.0):    {'deltaPhi': 1.0}},
-#                                      (500, 1000): {(0.75):    {'deltaPhi': 0.75}},
-#                                      (1000, -1):  {(0.75):    {'deltaPhi': 0.75}}}},
-#                (4, 4): {(250, 350): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}},
-#                                      (500, 750):  {(1.0):    {'deltaPhi': 1.0}},
-#                                      (750, -1):   {(1.0):    {'deltaPhi': 1.0}}},
-#                         (350, 450): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}},
-#                                      (500, 750):  {(1.0):    {'deltaPhi': 1.0}},
-#                                      (750, -1):   {(1.0):    {'deltaPhi': 1.0}}},
-#                         (450, -1):  {(500, -1):   {(1.0):    {'deltaPhi': 1.0}},
-#                                      (500, 1000): {(0.75):    {'deltaPhi': 0.75}},
-#                                      (1000, -1):  {(0.75):    {'deltaPhi': 0.75}}}}
+#signalRegion = {(3, 4): {(250, 350): {(500, -1):   {(1.0):    {'sys':0.025,  'deltaPhi': 1.0}}, #3-4jets W+jets control region
+#                                      (500, 750):  {(1.0):    {'sys':0.025,  'deltaPhi': 1.0}},
+#                                      (750, -1):   {(1.0):    {'sys':0.05,   'deltaPhi': 1.0}}},
+#                         (350, -1):  {(500, -1):   {(0.75):   {'sys':0.025,  'deltaPhi': 0.75}}},
+#                         (350, 450): {(500, -1):   {(1.0):    {'sys':0.025,  'deltaPhi': 1.0},
+#                                                    (0.75):   {'sys':0.025,  'deltaPhi': 0.75}},
+#                                      (500, 750):  {(1.0):    {'sys':0.025,  'deltaPhi': 1.0}},
+#                                      (750, -1):   {(1.0):    {'sys':0.05,   'deltaPhi': 1.0}}},
+#                         (450, -1):  {(500, -1):   {(1.0):    {'sys':0.025,  'deltaPhi': 1.0},
+#                                                    (0.75):   {'sys':0.025,  'deltaPhi': 0.75}},
+#                                      (500, 750):  {(0.75):   {'sys':0.025,  'deltaPhi': 0.75}},
+#                                      (750, -1):   {(0.75):   {'sys':0.05,   'deltaPhi': 0.75}},
+#                                      (500, 1000): {(0.75):   {'sys':0.025,  'deltaPhi': 0.75}},
+#                                      (1000, -1):  {(0.75):   {'sys':0.05,   'deltaPhi': 0.75}}}},
+#                (4, 5): {(250, 350): {(500, -1):   {(1.0):    {'sys':0.025,  'deltaPhi': 1.0}}, #4-5jets TTbar control region
+#                                      (500, 750):  {(1.0):    {'sys':0.025,  'deltaPhi': 1.0}},
+#                                      (750, -1):   {(1.0):    {'sys':0.05,   'deltaPhi': 1.0}}},
+#                         (350, -1):  {(500, -1):   {(0.75):   {'sys':0.025,  'deltaPhi': 0.75}}},
+#                         (350, 450): {(500, -1):   {(1.0):    {'sys':0.025,  'deltaPhi': 1.0},
+#                                                    (0.75):   {'sys':0.025,  'deltaPhi': 0.75}},
+#                                      (500, 750):  {(1.0):    {'sys':0.025,  'deltaPhi': 1.0}},
+#                                      (750, -1):   {(1.0):    {'sys':0.05,   'deltaPhi': 1.0}}},
+#                         (450, -1):  {(500, -1):   {(1.0):    {'sys':0.025,  'deltaPhi': 1.0},
+#                                                    (0.75):   {'sys':0.025,  'deltaPhi': 0.75}},
+#                                      (500, 750):  {(0.75):   {'sys':0.025,  'deltaPhi': 0.75}},
+#                                      (750, -1):   {(0.75):   {'sys':0.05,   'deltaPhi': 0.75}},
+#                                      (500, 1000): {(0.75):   {'sys':0.025,  'deltaPhi': 0.75}},
+#                                      (1000, -1):  {(0.75):   {'sys':0.05,   'deltaPhi': 0.75}}}},
+#                (5, 5): {(250, 350): {(500, -1):   {(1.0):    {'sys':0.025,  'deltaPhi': 1.0}}},  #signal regions
+#                         (350, 450): {(500, -1):   {(1.0):    {'sys':0.025,  'deltaPhi': 1.0}}},
+#                         (450, -1):  {(500, -1):   {(1.0):    {'sys':0.025,  'deltaPhi': 1.0},
+#                                                    (0.75):   {'sys':0.025,  'deltaPhi': 0.75}}}},
+#                (6, 7): {(250, 350): {(500, 750):  {(1.0):    {'sys':0.05,   'deltaPhi': 1.0}},
+#                                      (750, -1):   {(1.0):    {'sys':0.05,   'deltaPhi': 1.0}}},
+#                         (350, 450): {(500, 750):  {(1.0):    {'sys':0.05,   'deltaPhi': 1.0}},
+#                                      (750, -1):   {(1.0):    {'sys':0.05,   'deltaPhi': 1.0}}},
+#                          (450, -1): {(500, 750):  {(0.75):   {'sys':0.05,   'deltaPhi': 0.75}},
+#                                      (750, -1):   {(0.75):   {'sys':0.05,   'deltaPhi': 0.75}},
+#                                      (500, 1000): {(0.75):   {'sys':0.05,   'deltaPhi': 0.75}},
+#                                      (1000, -1):  {(0.75):   {'sys':0.05,   'deltaPhi': 0.75}}}},
+#                (8, -1): {(250, 350):{(500, 750):  {(1.0):    {'sys':0.1,   'deltaPhi': 1.0}},
+#                                      (750, -1):   {(1.0):    {'sys':0.1,   'deltaPhi': 1.0}}},
+#                          (350, -1): {(500, -1):   {(0.75):   {'sys':0.1,   'deltaPhi': 0.75}}},
+#                          (350, 450):{(500, -1):   {(0.75):   {'sys':0.1,   'deltaPhi': 0.75}}},
+#                          (450, -1): {(500, -1):   {(0.75):   {'sys':0.1,   'deltaPhi': 0.75}}}}
 #}
+
+inclusiveTemplate = {(3, 3): {(250,  -1): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}}}} #use inclusive LT,HT region to get the shape for the fit template
+
+fitCR =  {(3, 3): {(250,  -1): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}},
+                   (250, 350): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}}, #QCD CR exclusive in LT and inclusive in HT, where the fits are performed
+                   #(350,  -1): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}}, 
+                   (350, 450): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}},
+                   (450, -1):  {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}}}}
+
+signalRegion = {(3, 3): {(250, 350): {(500, -1):   {(1.0):    {'sys':0.025, 'deltaPhi': 1.0}}, #3-4jets W+jets control region
+                                      (500, 750):  {(1.0):    {'sys':0.025, 'deltaPhi': 1.0}},
+                                      (750, -1):   {(1.0):    {'sys':0.05, 'deltaPhi': 1.0}}},
+                         (350, 450): {(500, -1):   {(1.0):    {'sys':0.025, 'deltaPhi': 1.0}},
+                                      (500, 750):  {(1.0):    {'sys':0.025, 'deltaPhi': 1.0}},
+                                      (750, -1):   {(1.0):    {'sys':0.05, 'deltaPhi': 1.0}}},
+                         (450, -1):  {(500, -1):   {(1.0):    {'sys':0.025, 'deltaPhi': 1.0}},
+                                      (500, 1000): {(0.75):   {'sys':0.025, 'deltaPhi': 0.75}},
+                                      (1000, -1):  {(0.75):   {'sys':0.05, 'deltaPhi': 0.75}}}},
+                (4, 5): {(250, 350): {(500, -1):   {(1.0):    {'sys':0.025, 'deltaPhi': 1.0}}, #4-5jets TTbar control region
+                                      (500, 750):  {(1.0):    {'sys':0.025, 'deltaPhi': 1.0}},
+                                      (750, -1):   {(1.0):    {'sys':0.05, 'deltaPhi': 1.0}}},
+                         (350, 450): {(500, -1):   {(1.0):    {'sys':0.025, 'deltaPhi': 1.0}},
+                                      (500, 750):  {(1.0):    {'sys':0.025, 'deltaPhi': 1.0}},
+                                      (750, -1):   {(1.0):    {'sys':0.05, 'deltaPhi': 1.0}}},
+                         (450, -1):  {(500, -1):   {(1.0):    {'sys':0.025, 'deltaPhi': 1.0}},
+                                      (500, 1000): {(0.75):   {'sys':0.025, 'deltaPhi': 0.75}},
+                                      (1000, -1):  {(0.75):   {'sys':0.05, 'deltaPhi': 0.75}}}},
+                (4, 4): {(250, 350): {(500, -1):   {(1.0):    {'sys':0.025, 'deltaPhi': 1.0}},
+                                      (500, 750):  {(1.0):    {'sys':0.025, 'deltaPhi': 1.0}},
+                                      (750, -1):   {(1.0):    {'sys':0.05, 'deltaPhi': 1.0}}},
+                         (350, 450): {(500, -1):   {(1.0):    {'sys':0.025, 'deltaPhi': 1.0}},
+                                      (500, 750):  {(1.0):    {'sys':0.025, 'deltaPhi': 1.0}},
+                                      (750, -1):   {(1.0):    {'sys':0.05, 'deltaPhi': 1.0}}},
+                         (450, -1):  {(500, -1):   {(1.0):    {'sys':0.025, 'deltaPhi': 1.0}},
+                                      (500, 1000): {(0.75):   {'sys':0.025, 'deltaPhi': 0.75}},
+                                      (1000, -1):  {(0.75):   {'sys':0.05, 'deltaPhi': 0.75}}}}
+}
 
 btreg = [(0,0), (1,1), (2,-1)] #1b and 2b estimates are needed for the btag fit
 
@@ -198,7 +198,7 @@ else:
 
 #get template for fit method
 template_QCD = ROOT.TH1F('template_QCD','template_QCD',30,-0.5,2.5)
-templateName, templateCut = nameAndCut((250,-1), (500,-1), (3,4), (0,0), presel=antiSelStr, charge="", btagVar = 'nBJetMediumCSV30')
+templateName, templateCut = nameAndCut((250,-1), (500,-1), (3,4), (0,0), presel=antiSelStr, charge="", btagVar = 'nBJetMediumCSV30', stVar = 'Lt', htVar = 'htJet30clean', njetVar='nJet30clean')
 
 if isData:
   cData.Draw('Lp>>template_QCD','('+templateCut+trigger+filters+')','goff')
@@ -220,8 +220,8 @@ for crNJet in sorted(fitCR):
       print '#########################################'
       print '## CR',str(crNJet),str(ltb),str(htb)
       print '#########################################'
-      antiSelname, antiSelCut = nameAndCut(ltb, htb, crNJet, btb=(0,0), presel=antiSelStr, charge="", btagVar = 'nBJetMediumCSV30')
-      Selname, SelCut         = nameAndCut(ltb, htb, crNJet, btb=(0,0), presel=SelStr, charge="", btagVar = 'nBJetMediumCSV30')      
+      antiSelname, antiSelCut = nameAndCut(ltb, htb, crNJet, btb=(0,0), presel=antiSelStr, charge="", btagVar = 'nBJetMediumCSV30', stVar = 'Lt', htVar = 'htJet30clean', njetVar='nJet30clean')
+      Selname, SelCut         = nameAndCut(ltb, htb, crNJet, btb=(0,0), presel=SelStr, charge="", btagVar = 'nBJetMediumCSV30', stVar = 'Lt', htVar = 'htJet30clean', njetVar='nJet30clean')      
       
       histos['QCD']={}
       histos['EWK']={}
@@ -383,8 +383,8 @@ for srNJet in sorted(signalRegion):
           deltaPhiCut = signalRegion[srNJet][stb][htb][dP]['deltaPhi']
 
           print 'Binning => Ht: ',htb,'Lt: ',stb,'NJet: ',srNJet
-          antiSelname, antiSelCut = nameAndCut(stb, htb, srNJet, btb=btb, presel=antiSelStr, charge="", btagVar = 'nBJetMediumCSV30')
-          Selname, SelCut         = nameAndCut(stb, htb, srNJet, btb=btb, presel=SelStr, charge="", btagVar = 'nBJetMediumCSV30')
+          antiSelname, antiSelCut = nameAndCut(stb, htb, srNJet, btb=btb, presel=antiSelStr, charge="", btagVar = 'nBJetMediumCSV30', stVar = 'Lt', htVar = 'htJet30clean', njetVar='nJet30clean')
+          Selname, SelCut         = nameAndCut(stb, htb, srNJet, btb=btb, presel=SelStr, charge="", btagVar = 'nBJetMediumCSV30', stVar = 'Lt', htVar = 'htJet30clean', njetVar='nJet30clean')
 
           histos['QCD']={}
           histos['EWK']={}
@@ -531,8 +531,8 @@ for srNJet in sorted(signalRegion):
         for dP in sorted(signalRegion[srNJet][stb][htb]):
           deltaPhiCut = signalRegion[srNJet][stb][htb][dP]['deltaPhi']
           sys         = signalRegion[srNJet][stb][htb][dP]['sys']
-          Fsta        = fitRes[(3,4)][stb][(500,-1)]['F_seltoantisel']
-          Fsta_err    = fitRes[(3,4)][stb][(500,-1)]['F_seltoantisel_err']
+          Fsta        = fitRes[inclusiveTemplate.keys()[0]][stb][(500,-1)]['F_seltoantisel']
+          Fsta_err    = fitRes[inclusiveTemplate.keys()[0]][stb][(500,-1)]['F_seltoantisel_err']
           Nanti       = bins[srNJet][stb][htb][btb][dP]['NDATAAntiSel']
           Nanti_err   = bins[srNJet][stb][htb][btb][dP]['NDATAAntiSel_err']
           RcsAnti     = bins[srNJet][stb][htb][btb][dP]['rCSantiSelectedDATA']['rCS']
