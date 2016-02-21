@@ -125,6 +125,78 @@ muSelector =    lambda readTree,lep,i: \
                         and lep.sip3d[i] < 4 \
                         and lep.mediumMuonId[i] == 1\
                         and ((lep.pt[i] >= ptSwitch and lep.relIso04[i] < relIso ) or (lep.pt[i] < ptSwitch  and lep.relIso04[i] * lep.pt[i] < absIso ) )
+
+
+def lepSelectorFunc( lepSel ):
+    muSel = lepSel["mu"] if lepSel.has_key("mu") else None
+    elSel = lepSel["el"] if lepSel.has_key("el") else None
+
+    def lepSelector(readTree, lep, i):
+        if muSel and (abs(lep.pdgId[i])==muSel['pdgId']): 
+            if muSel.has_key('pt') : 
+                if not (lep.pt[i] > muSel['pt'] ):  
+                    #print lep.pt[i]
+                    return False
+            if muSel.has_key('ptMax') : 
+                if not (lep.pt[i] < muSel['ptMax'] ):  
+                    #print lep.pt[i]
+                    return False
+            if muSel.has_key('eta') : 
+                if not abs(lep.eta[i]) < muSel['eta']: 
+                    #print lep.eta[i]
+                    return False
+            if muSel.has_key('dxy') : 
+                if not abs(lep.dxy[i]) < muSel['dxy']: 
+                    #print lep.dxy[i]
+                    return False
+            if muSel.has_key('dz') : 
+                if not abs(lep.dz[i]) < muSel['dz']: 
+                    #print lep.dz[i]
+                    return False
+            if muSel.has_key('sip3d') : 
+                if not lep.sip3d[i] < muSel['sip3d'] : 
+                    #print lep.sip3d[i]
+                    return False
+            if muSel.has_key('mediumMuonId') : 
+                if not lep.mediumMuonId[i] == muSel['mediumMuonId']: 
+                    #print lep.mediumMuonId[i]
+                    return False
+            if muSel.has_key('hybIso') : 
+                if not ( (lep.pt[i] >= muSel['hybIso']['ptSwitch'] and lep.relIso04[i] < muSel['hybIso']['relIso'] ) \
+                or (lep.pt[i] < muSel['hybIso']['ptSwitch']  and lep.relIso04[i] * lep.pt[i] < muSel['hybIso']['absIso'] ) ): 
+                    #print lep.pt, lep.relIso04, 
+                    return False
+            return True
+        elif elSel and (abs(lep.pdgId[i])==elSel['pdgId']): 
+            if elSel.has_key('pt') : 
+                if not (lep.pt[i] > elSel['pt'] ):  
+                    #print lep.pt[i]
+                    return False
+            if elSel.has_key('eta') : 
+                if not abs(lep.eta[i]) < elSel['eta']: 
+                    #print lep.eta[i]
+                    return False
+            if elSel.has_key('dxy') : 
+                if not abs(lep.dxy[i]) < elSel['dxy']: 
+                    #print lep.dxy[i]
+                    return False
+            if elSel.has_key('SPRING15_25ns_v1') : 
+                if not abs(lep.SPRING15_25ns_v1[i]) >= elSel['SPRING15_25ns_v1']: 
+                    #print lep.dxy[i]
+                    return False
+            return True
+        else:
+            #print "Lep Selector Fail", lep.pdgId[i], lep.pt[i]
+            #assert False
+            return False 
+
+    return lepSelector
+
+
+
+
+
+
                 
 def jetSelectorFunc(pt, eta):
     ret = lambda readTree, jet, i:\
