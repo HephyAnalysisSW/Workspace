@@ -47,6 +47,8 @@ expand_dict = pickle.load(file(expand_pickle))
 colors = [ROOT.kBlue+2, ROOT.kBlue-4, ROOT.kBlue-7, ROOT.kBlue-9, ROOT.kCyan-9, ROOT.kCyan-6, ROOT.kCyan-2,ROOT.kGreen+3,ROOT.kGreen-2,ROOT.kGreen-6,ROOT.kGreen-7, ROOT.kOrange-4, ROOT.kOrange+1, ROOT.kOrange+8, ROOT.kRed, ROOT.kRed+1]
 colors = [ROOT.kBlue-7, ROOT.kCyan-9, ROOT.kCyan-2, ROOT.kGreen-6, ROOT.kOrange+6, ROOT.kRed+1, ROOT.kRed-6, ROOT.kYellow+2, ROOT.kGreen, ROOT.kGreen+3, ROOT.kBlue-2]
 
+colors = range(28,100,2)
+
 isrErrH       = ROOT.TH1F('isrErrH','ISR',bins,0,bins)
 Q2ErrH        = ROOT.TH1F('Q2ErrH','Q2',bins,0,bins)
 jecErrH       = ROOT.TH1F('jecErrH','jec',bins,0,bins)
@@ -62,11 +64,13 @@ dummy = ROOT.TH1F('dummy','',bins,0,bins)
 dummy.SetLineColor(ROOT.kWhite)
 dummy.SetFillColor(ROOT.kWhite)
 
+ratio = ROOT.TH1F('ratio','ratio',bins,0,bins)
 
-hists = [PUH,lumiH,triggerH,bErrH , lightErrH , lepSFErrH, Q2ErrH , jecErrH ,isrErrH]
+hists = [lepSFErrH, lumiH, triggerH, Q2ErrH, PUH, lightErrH, bErrH, isrErrH,jecErrH]
 for i_h,h in enumerate(hists):
-  h.SetFillColor(colors[i_h])
-  h.SetLineColor(colors[i_h]+1)
+  h.SetFillColorAlpha(colors[i_h], 0.8)
+  #h.SetFillColor(colors[i_h])
+  h.SetLineColor(colors[i_h])
   h.SetLineWidth(1)
   
 
@@ -75,16 +79,16 @@ totalH.SetLineColor(ROOT.kBlack)
 totalH.SetLineWidth(2)
 totalH.SetMarkerStyle(21)
 totalH.SetMarkerSize(1)
-
+stat_totalYErr = []
 totalXErr = []
 totalYErr = []
 totalX = []
 totalY = []
-for sig in [allSignals[7]]:
+for sig in [allSignals[5]]:
   #for mglu in sig.keys() :
-  for mglu in [1500] :
+  for mglu in [1200] :
     #for mlsp in sig[mglu].keys() :
-    for mlsp in [100] :
+    for mlsp in [800] :
       i=1
       for injb,srNJet in enumerate(sorted(signalRegions)):
         for stb in sorted(signalRegions[srNJet]):
@@ -146,20 +150,40 @@ for sig in [allSignals[7]]:
             print expand_dict[srNJet][stb][htb]["signals"][mglu][mlsp]['stat_err_MB_SR'] , expand_dict[srNJet][stb][htb]["signals"][mglu][mlsp]['yield_MB_SR']
             #totalH.SetBinError(i,0)
             #if not res[srNJet][stb][htb][mglu][mlsp]['yield_MB_SR']==0 : totalH.SetBinError(i, (res[srNJet][stb][htb][mglu][mlsp]['err_MB_SR']/res[srNJet][stb][htb][mglu][mlsp]['yield_MB_SR']))
+            totalErr = totalSyst*expand_dict[srNJet][stb][htb]["signals"][mglu][mlsp]['yield_MB_SR'] + expand_dict[srNJet][stb][htb]["signals"][mglu][mlsp]['stat_err_MB_SR']
+            ratio.SetBinContent(i,expand_dict[srNJet][stb][htb]["signals"][mglu][mlsp]['yield_MB_SR'])
+            totalYErr.append(totalErr)
+            totalXErr.append(0.5)
+            totalY.append(expand_dict[srNJet][stb][htb]["signals"][mglu][mlsp]['yield_MB_SR'])
+            totalX.append(i-0.5)
+
+            stat_totalYErr.append(expand_dict[srNJet][stb][htb]["signals"][mglu][mlsp]['stat_err_MB_SR'])
 
             i+=1
 
+      ax =   array('d',totalX)
+      ay =   array('d',totalY)
+      aexh = array('d',totalXErr)
+      aexl = array('d',totalXErr)
+      aeyh = array('d',totalYErr)
+      aeyl = array('d',totalYErr)
 
+      stat_aeyh = array('d',stat_totalYErr)
 
       can = ROOT.TCanvas('can','can',700,700)
-      can.cd()
+      pad1=ROOT.TPad("pad1","MyTitle",0.,0.3,1.,1.)
+      pad1.SetLeftMargin(0.15)
+      pad1.SetBottomMargin(0.02)
+      pad1.Draw()
+      pad1.cd()
+      #can.cd()
       h_Stack = ROOT.THStack('h_Stack','Stack')
 
       for i_h,h in enumerate(hists):
-        setNiceBinLabel(h, signalRegions)
+        #setNiceBinLabel(h, signalRegions)
         h_Stack.Add(h)
 
-      h_Stack.SetMaximum(1.5)
+      h_Stack.SetMaximum(1.0)
       h_Stack.SetMinimum(0.0)
 
       leg = ROOT.TLegend(0.7,0.75,0.98,0.95)
@@ -187,18 +211,21 @@ for sig in [allSignals[7]]:
       for i in range(6,len(hists)):
         leg3.AddEntry(hists[i], '', 'f')
 
-      setNiceBinLabel(totalH, signalRegions)
-      totalH.GetXaxis().SetTitleSize(0.13)
-      totalH.GetXaxis().SetLabelSize(0.04)
-      totalH.GetXaxis().SetNdivisions(508) 
+      #setNiceBinLabel(totalH, signalRegions)
+      totalH.SetLineWidth(2)
+      totalH.SetMarkerStyle(34)
+      totalH.SetMarkerSize(2)
+      #totalH.GetXaxis().SetTitleSize(0.13)
+      totalH.GetXaxis().SetLabelSize(0.0)
+      #totalH.GetXaxis().SetNdivisions(508) 
       #totalH.GetXAxis().SetLabelOffset(0.05)
       h_Stack.Draw('hist')
-      totalH.Draw('hist same')
+      #totalH.Draw('hist same')
       totalH.Draw('p same')
 
       #h_Stack.GetXaxis().SetLabelSize(0.)
       #h_Stack.GetXaxis().SetLabelOffset(10)
-      h_Stack.GetYaxis().SetTitle('syst. unc.')
+      h_Stack.GetYaxis().SetTitle('Relative Uncertainty')
       h_Stack.GetYaxis().SetTitleOffset(0.8)
       h_Stack.GetYaxis().SetNdivisions(508)
 
@@ -214,15 +241,40 @@ for sig in [allSignals[7]]:
       latex1.DrawLatex(0.15,0.96,'CMS #bf{#it{simulation}}')
       #latex1.DrawLatex(0.78,0.96,"L=2.1fb^{-1} (13TeV)")
 
-      setNiceBinLabel(h_Stack, signalRegions)
-      h_Stack.GetXaxis().SetLabelSize(0.04)
+      h_Stack.GetXaxis().SetLabelSize(0.0)
       h_Stack.GetXaxis().SetTitleSize(0.13)
       h_Stack.GetXaxis().SetNdivisions(508)
       h_Stack.GetYaxis().SetLabelSize(0.055)
       h_Stack.GetYaxis().SetTitleSize(0.055)
       h_Stack.GetYaxis().SetTitleOffset(1.0)
 
+      can.cd()
+      pad2=ROOT.TPad("pad2","datavsMC",0.,0.,1.,.3)
+      pad2.SetLeftMargin(0.15)
+      pad2.SetBottomMargin(0.3)
+      pad2.SetTopMargin(0.02)
+      pad2.Draw()
+      pad2.cd()
 
+      setNiceBinLabel(ratio, signalRegions)
+      ratio.GetXaxis().SetTitleSize(0.13)
+      ratio.GetXaxis().SetLabelSize(0.11)
+      ratio.GetXaxis().SetNdivisions(508)
+      ratio.GetYaxis().SetTitle('Events')
+      ratio.GetYaxis().SetTitleSize(0.13)
+      ratio.GetYaxis().SetLabelSize(0.13)
+      ratio.GetYaxis().SetTitleOffset(0.4)
+      ratio.GetYaxis().SetNdivisions(508)
+      ratio.SetMinimum(0.0)
+      ratio.SetMaximum(2.2)
+      ratio.Draw('p')
+      total_err = ROOT.TGraphAsymmErrors(bins, ax, ay, aexl, aexh, aeyl, aeyh)
+      total_err.SetFillColor(ROOT.kBlue)
+      total_err.SetFillStyle(3244)
+      total_err.Draw('2 same')
+      stat_err = ROOT.TGraphAsymmErrors(bins, ax, ay, aexl, aexh, aeyl, stat_aeyh)
+      stat_err.Draw('p0 same')
+      #ratio.Draw('p0 same')
       can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/signal_syst_approval/syst_errors_signal_'+str(mglu)+'_'+str(mlsp)+'.png')
       can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/signal_syst_approval/syst_errors_signal_'+str(mglu)+'_'+str(mlsp)+'.root')
       can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/signal_syst_approval/syst_errors_signal_'+str(mglu)+'_'+str(mlsp)+'.pdf')

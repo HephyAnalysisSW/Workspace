@@ -78,7 +78,7 @@ else:
   dilep   = pickle.load(file('/data/dspitzbart/Results2016/dilep_pkl'))
 
 #topPt_Err = pickle.load(file("/data/easilar/Spring15/25ns/extended_with_truth_counts_topPt_pkl"))
-topPt_Err = pickle.load(file("/data/dspitzbart/Results2016/topErr_pkl_update"))
+topPt_Err = pickle.load(file("/data/easilar/Spring15/25ns/TTJets_combined_TopPtWeight_syst_SRAll_pkl"))
 pu_Unc    = pickle.load(file("/data/easilar/Spring15/25ns/extended_with_truth_counts_PU_pkl"))
 lep_Eff   = pickle.load(file("/data/easilar/Spring15/25ns/extended_with_truth_counts_LS_pkl"))
 jec       = pickle.load(file('/data/easilar/Spring15/25ns/Jec_syst_SRAll_pkl'))

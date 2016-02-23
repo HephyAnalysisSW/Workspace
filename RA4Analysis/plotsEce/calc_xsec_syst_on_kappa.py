@@ -14,7 +14,6 @@ from general_config import *
 
 ROOT.TH1D().SetDefaultSumw2()
 
-weight_str = weight_str_CV 
 
 btagString = "nBJetMediumCSV30"
 maxN = -1
@@ -26,20 +25,22 @@ lepSels = [
 
 lepSel = lepSels[0]
 signalRegions = signalRegion3fb
-
+lep_weight_Up = "(lepton_eleSF_miniIso01+lepton_eleSF_miniIso01_err)*(lepton_eleSF_cutbasedID+lepton_eleSF_cutbasedID_err)*(lepton_muSF_sip3d+lepton_muSF_sip3d_err)*(lepton_muSF_miniIso02+lepton_muSF_miniIso02_err)*(lepton_muSF_mediumID+lepton_muSF_mediumID_err)"
 #### Here enter which sample do you wanna reweight and the variation
-search_c = WJetsHTToLNu_25ns
-variation = 0.3
-
-presel = presel = "&&".join([lepSel['cut'],lepSel['veto'],filters])
-
 tot_list = [TTJets_combined,DY_25ns,WJetsHTToLNu_25ns,singleTop_25ns,TTV_25ns]
+search_c = tot_list
+#search_c = TTJets_combined
+variation = 0.0
+weight_var = '*'.join([trigger_scale,lep_weight_Up,reweight,topPt,weight_0b])
+
+presel =  "&&".join([lepSel['cut'],lepSel['veto'],filters])
+
 cTot = getChain(tot_list,histname='')
-tot_list.remove(search_c)
+#tot_list.remove(search_c)
 cBkg = getChain(tot_list,histname='')
 search_chain = getChain(search_c , histname='')
-
-weight_str =  "*".join([weight_str , weight_0b])
+#weight_str =  '*'.join([trigger_scale,lepton_Scale,reweight,topPt,weight_0b])
+weight_str = weight_str_CV 
 print "base weight" , weight_str
 
 bin = {}
@@ -69,26 +70,26 @@ for srNJet in sorted(signalRegions):
 
       #calc ttv upi/down kappa
       yield_bkg_SB_SR        = getYieldFromChain(cBkg, SB_cut_SR, weight = weight_str) 
-      yield_ttv_SB_SR_Up     = getYieldFromChain(search_chain, SB_cut_SR, weight = weight_str)*(1+variation) 
-      yield_ttv_SB_SR_Down   = getYieldFromChain(search_chain, SB_cut_SR, weight = weight_str)*(1-variation) 
+      yield_ttv_SB_SR_Up     = getYieldFromChain(search_chain, SB_cut_SR, weight =  "*".join(["(1)" , weight_var]))*(1+variation) 
+      yield_ttv_SB_SR_Down   = getYieldFromChain(search_chain, SB_cut_SR, weight =  "*".join(["(1)" , weight_var]))*(1-variation) 
       yield_tot_SB_SR_Up     = yield_bkg_SB_SR + yield_ttv_SB_SR_Up 
       yield_tot_SB_SR_Down   = yield_bkg_SB_SR + yield_ttv_SB_SR_Down
 
       yield_bkg_SB_CR        = getYieldFromChain(cBkg, SB_cut_CR, weight = weight_str) 
-      yield_ttv_SB_CR_Up     = getYieldFromChain(search_chain, SB_cut_CR, weight = weight_str)*(1+variation) 
-      yield_ttv_SB_CR_Down   = getYieldFromChain(search_chain, SB_cut_CR, weight = weight_str)*(1-variation) 
+      yield_ttv_SB_CR_Up     = getYieldFromChain(search_chain, SB_cut_CR, weight = "*".join(["(1)", weight_var]))*(1+variation) 
+      yield_ttv_SB_CR_Down   = getYieldFromChain(search_chain, SB_cut_CR, weight = "*".join(["(1)", weight_var]))*(1-variation) 
       yield_tot_SB_CR_Up     = yield_bkg_SB_CR + yield_ttv_SB_CR_Up 
       yield_tot_SB_CR_Down   = yield_bkg_SB_CR + yield_ttv_SB_CR_Down 
 
       yield_bkg_MB_SR      = getYieldFromChain(cBkg, MB_cut_SR, weight = weight_str) 
-      yield_ttv_MB_SR_Up   = getYieldFromChain(search_chain, MB_cut_SR, weight = weight_str)*(1+variation) 
-      yield_ttv_MB_SR_Down = getYieldFromChain(search_chain, MB_cut_SR, weight = weight_str)*(1-variation) 
+      yield_ttv_MB_SR_Up   = getYieldFromChain(search_chain, MB_cut_SR, weight =  "*".join(["(1)" , weight_var]))*(1+variation) 
+      yield_ttv_MB_SR_Down = getYieldFromChain(search_chain, MB_cut_SR, weight =  "*".join(["(1)" , weight_var]))*(1-variation) 
       yield_tot_MB_SR_Up   = yield_bkg_MB_SR + yield_ttv_MB_SR_Up 
       yield_tot_MB_SR_Down = yield_bkg_MB_SR + yield_ttv_MB_SR_Down
 
       yield_bkg_MB_CR      =  getYieldFromChain(cBkg, MB_cut_CR, weight = weight_str)    
-      yield_ttv_MB_CR_Up   =  getYieldFromChain(search_chain, MB_cut_CR, weight = weight_str)*(1+variation) 
-      yield_ttv_MB_CR_Down =  getYieldFromChain(search_chain, MB_cut_CR, weight = weight_str)*(1-variation) 
+      yield_ttv_MB_CR_Up   =  getYieldFromChain(search_chain, MB_cut_CR, weight = "*".join(["(1)", weight_var]))*(1+variation) 
+      yield_ttv_MB_CR_Down =  getYieldFromChain(search_chain, MB_cut_CR, weight = "*".join(["(1)", weight_var]))*(1-variation) 
       yield_tot_MB_CR_Up   = yield_bkg_MB_CR + yield_ttv_MB_CR_Up 
       yield_tot_MB_CR_Down = yield_bkg_MB_CR + yield_ttv_MB_CR_Down
 
@@ -116,5 +117,6 @@ for srNJet in sorted(signalRegions):
       bin[srNJet][stb][htb]['delta_avarage'] = (abs(bin[srNJet][stb][htb]['delta_Up'])+abs(bin[srNJet][stb][htb]['delta_Down']))/2 
 
 
-pickle.dump(bin,file('/data/easilar/Spring15/25ns/'+search_c['name']+'xsec_syst_SRAll_pkl','w'))
+#pickle.dump(bin,file('/data/easilar/Spring15/25ns/'+search_c['name']+'_'+weight_var+'_syst_SRAll_pkl','w'))
+pickle.dump(bin,file('/data/easilar/Spring15/25ns/all_lepSF_syst_SRAll_pkl','w'))
 
