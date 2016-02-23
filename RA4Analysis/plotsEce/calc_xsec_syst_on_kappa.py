@@ -25,7 +25,8 @@ lepSels = [
 
 lepSel = lepSels[0]
 signalRegions = signalRegion3fb
-lep_weight_Up = "(lepton_eleSF_miniIso01+lepton_eleSF_miniIso01_err)*(lepton_eleSF_cutbasedID+lepton_eleSF_cutbasedID_err)*(lepton_muSF_sip3d+lepton_muSF_sip3d_err)*(lepton_muSF_miniIso02+lepton_muSF_miniIso02_err)*(lepton_muSF_mediumID+lepton_muSF_mediumID_err)"
+lep_weight_Up_Err = "(lepton_eleSF_miniIso01_err*lepton_eleSF_cutbasedID_err*lepton_muSF_sip3d_err*lepton_muSF_miniIso02_err*lepton_muSF_mediumID_err)"
+lep_weight_Up = lepton_Scale+"+"+lep_weight_Up_Err
 #### Here enter which sample do you wanna reweight and the variation
 tot_list = [TTJets_combined,DY_25ns,WJetsHTToLNu_25ns,singleTop_25ns,TTV_25ns]
 search_c = tot_list

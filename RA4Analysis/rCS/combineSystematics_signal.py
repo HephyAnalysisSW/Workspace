@@ -84,11 +84,11 @@ totalXErr = []
 totalYErr = []
 totalX = []
 totalY = []
-for sig in [allSignals[5]]:
+for sig in [allSignals[7]]:
   #for mglu in sig.keys() :
-  for mglu in [1200] :
+  for mglu in [1500] :
     #for mlsp in sig[mglu].keys() :
-    for mlsp in [800] :
+    for mlsp in [100] :
       i=1
       for injb,srNJet in enumerate(sorted(signalRegions)):
         for stb in sorted(signalRegions[srNJet]):
@@ -121,11 +121,13 @@ for sig in [allSignals[5]]:
             lightErrH.SetBinContent(i, lightErr) 
             expand_dict[srNJet][stb][htb]["signals"][mglu][mlsp]['syst_light'] = lightErr
 
-            leptonErr = res[srNJet][stb][htb][mglu][mlsp]['var_lepton_MB_SR']
+            ##constant systematics##
+
+            #leptonErr = res[srNJet][stb][htb][mglu][mlsp]['var_lepton_MB_SR']
+            leptonErr = 0.05
             lepSFErrH.SetBinContent(i, leptonErr) 
             expand_dict[srNJet][stb][htb]["signals"][mglu][mlsp]['syst_lepton'] = leptonErr
 
-            ##constant systematics##
             triggerErr = 0.01
             triggerH.SetBinContent(i, triggerErr )
             expand_dict[srNJet][stb][htb]["signals"][mglu][mlsp]['syst_trigger'] = triggerErr
