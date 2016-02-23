@@ -397,12 +397,16 @@ QCD_est = pickle.load(file(QCDpickle))
 QCD_LT = {}
 QCD_HT = {}
 
+frac = {}
+
 for srNJet in sorted(signalRegions):
   QCD_LT[srNJet] = {}
   QCD_HT[srNJet] = {}
+  frac[srNJet] = {}
   for stb in sorted(signalRegions[srNJet]):
     QCD_LT[srNJet][stb] = {}
     QCD_HT[srNJet][stb] = {}
+    frac[srNJet][stb] = {}
     for htb in sorted(signalRegions[srNJet][stb]):
       deltaPhi = signalRegions[srNJet][stb][htb]['deltaPhi']
       print
@@ -429,6 +433,39 @@ for srNJet in sorted(signalRegions):
       print 'QCD in SR (upper bound)', getValErrString(QCD_highDPhi_upper_LTbinned[0], QCD_highDPhi_upper_LTbinned[1], precision=3)
       print 'Fraction wrt to total Bkg', getValErrString(QCD_frac_LTbinned[0],QCD_frac_LTbinned[1])
 
+
+      #QCD fractions in sideband and CR
+      QCD_TT_SB_lowDPhi = QCD_est[(4,5)][stb][htb][(1,1)][deltaPhi]['NQCDpred_lowdPhi']
+      QCD_TT_SB_lowDPhi_err = QCD_est[(4,5)][stb][htb][(1,1)][deltaPhi]['NQCDpred_lowdPhi_err']
+      if math.isnan(QCD_TT_SB_lowDPhi_err): QCD_TT_SB_lowDPhi_err = QCD_est[(4,5)][stb][htb][(1,1)][deltaPhi]['NQCDpred_err']
+      if math.isnan(QCD_TT_SB_lowDPhi_err): QCD_TT_SB_lowDPhi_err = QCD_TT_SB_lowDPhi
+
+      QCD_TT_SB_highDPhi = QCD_est[(4,5)][stb][htb][(1,1)][deltaPhi]['NQCDpred_highdPhi']
+      QCD_TT_SB_highDPhi_err = QCD_est[(4,5)][stb][htb][(1,1)][deltaPhi]['NQCDpred_highdPhi_err']
+      if math.isnan(QCD_TT_SB_highDPhi_err): QCD_TT_SB_highDPhi_err = QCD_TT_SB_highDPhi
+
+      QCD_CR = QCD_est[srNJet][stb][htb][(0,0)][deltaPhi]['NQCDpred_lowdPhi']
+      QCD_CR_err = QCD_est[srNJet][stb][htb][(0,0)][deltaPhi]['NQCDpred_lowdPhi_err']
+      if math.isnan(QCD_CR_err): QCD_CR_err = QCD_est[srNJet][stb][htb][(0,0)][deltaPhi]['NQCDpred_err']
+      
+      y_CR = pred[srNJet][stb][htb]['yTT_srNJet_0b_lowDPhi'] + pred[srNJet][stb][htb]['yW_srNJet_0b_lowDPhi'] + pred[srNJet][stb][htb]['yRest_srNJet_0b_lowDPhi_truth'] + QCD_CR
+      y_CR_err = sqrt(pred[srNJet][stb][htb]['yTT_Var_srNJet_0b_lowDPhi'] + pred[srNJet][stb][htb]['yW_Var_srNJet_0b_lowDPhi'] + pred[srNJet][stb][htb]['yRest_Var_srNJet_0b_lowDPhi_truth'] + QCD_CR_err**2)
+
+      y_TT_SB_CR = pred[srNJet][stb][htb]['y_crNJet_1b_lowDPhi']
+      y_TT_SB_CR_err = pred[srNJet][stb][htb]['y_Var_crNJet_1b_lowDPhi']
+      
+      y_TT_SB_SR = pred[srNJet][stb][htb]['y_crNJet_1b_highDPhi']
+      y_TT_SB_SR_err = pred[srNJet][stb][htb]['y_Var_crNJet_1b_highDPhi']
+
+      QCD_frac_CR = getPropagatedError(QCD_CR, QCD_CR_err, y_CR, y_CR_err, returnCalcResult=True)
+      QCD_frac_TT_SB_CR = getPropagatedError(QCD_TT_SB_lowDPhi, QCD_TT_SB_lowDPhi_err, y_TT_SB_CR, y_TT_SB_CR_err, returnCalcResult=True)
+      QCD_frac_TT_SB_SR = getPropagatedError(QCD_TT_SB_highDPhi, QCD_TT_SB_highDPhi_err, y_TT_SB_SR, y_TT_SB_SR_err, returnCalcResult=True)
+
+      print 'fraction of QCD in CR', getValErrString(QCD_frac_CR[0], QCD_frac_CR[1])
+      print 'fraction of QCD in low DPhi of tt SB', getValErrString(QCD_frac_TT_SB_CR[0], QCD_frac_TT_SB_CR[1])
+      print 'fraction of QCD in high DPhi of tt SB', getValErrString(QCD_frac_TT_SB_SR[0], QCD_frac_TT_SB_SR[1])
+      
+      frac[srNJet][stb][htb] = {'CR':QCD_frac_CR[0], 'CR_err':QCD_frac_CR[1], 'TT_SB_CR':QCD_frac_TT_SB_CR[0], 'TT_SB_CR_err':QCD_frac_TT_SB_CR[1], 'TT_SB_SR':QCD_frac_TT_SB_SR[0], 'TT_SB_SR_err':QCD_frac_TT_SB_SR[1]}
 
 rowsNJet = {}
 rowsSt = {}
@@ -492,5 +529,31 @@ for srNJet in sorted(signalRegions):
       if htb[1] == -1 : print '\\cline{2-15}'
 print '\\hline\end{tabular}}\end{center}\caption{Estimated QCD contamination in the SRs for $R_{CS}$(QCD) measured in $H_T$ bins, 2.25fb$^{-1}$}\label{tab:0b_QCD_SR_upper_HT}\end{table}'
 
+
+
+#fraction of QCD in CR and SB
+print
+print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrr|rrr|}\\hline'
+print ' \\njet     & \LT & \HT     & \multicolumn{6}{c|}{4-5jets, 1b} & \multicolumn{3}{c|}{CR 0b}\\\%\hline'
+print ' & $[$GeV$]$ &$[$GeV$]$&\multicolumn{3}{c}{\DF$<$x} & \multicolumn{3}{c|}{\DF$>$x}&\multicolumn{3}{c|}{\DF$<$x} \\\\\hline'
+
+secondLine = False
+for srNJet in sorted(signalRegions):
+  print '\\hline'
+  if secondLine: print '\\hline'
+  secondLine = True
+  print '\multirow{'+str(rowsNJet[srNJet]['n'])+'}{*}{\\begin{sideways}$'+varBin(srNJet)+'$\end{sideways}}'
+  for stb in sorted(signalRegions[srNJet]):
+    print '&\multirow{'+str(rowsSt[srNJet][stb]['n'])+'}{*}{$'+varBin(stb)+'$}'
+    first = True
+    for htb in sorted(signalRegions[srNJet][stb]):
+      if not first: print '&'
+      first = False
+      print '&$'+varBin(htb)+'$'
+      print ' & '+getNumString(frac[srNJet][stb][htb]['TT_SB_CR'], frac[srNJet][stb][htb]['TT_SB_CR_err'])\
+           +' & '+getNumString(frac[srNJet][stb][htb]['TT_SB_SR'], frac[srNJet][stb][htb]['TT_SB_SR_err'])\
+           +' & '+getNumString(frac[srNJet][stb][htb]['CR'], frac[srNJet][stb][htb]['CR_err']) +'\\\\'
+      if htb[1] == -1 : print '\\cline{2-12}'
+print '\\hline\end{tabular}}\end{center}\caption{Estimated QCD contamination in the sideband and control regions, 2.25fb$^{-1}$}\label{tab:0b_QCD_fractions}\end{table}'
 
 

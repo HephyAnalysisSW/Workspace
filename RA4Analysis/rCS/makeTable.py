@@ -17,8 +17,8 @@ signal = False
 withSystematics = True
 
 prefix = 'singleLeptonic_Spring15_'
-#path = '/data/'+username+'/Results2016/Prediction_SFtemplates_fullSR_lep_data_2p25/'
-path = '/data/'+username+'/Results2016/Prediction_SFtemplates_fullSR_lep_MC_SFnoPUreweight_2p25/'
+path = '/data/'+username+'/Results2016/Prediction_SFtemplates_fullSR_lep_data_2p25/'
+#path = '/data/'+username+'/Results2016/Prediction_SFtemplates_fullSR_lep_MC_SFnoPUreweight_2p25/'
 
 #path = '/data/'+username+'/Results2016/Prediction_SFtemplates_validation_lep_data_2p3/'
 #path = '/data/'+username+'/Results2016/Prediction_SFtemplates_fullSR_lep_data_2p1/'
@@ -31,6 +31,8 @@ sys = res
 #sig = pickle.load(file('/data/easilar/Spring15/25ns/allSignals_2p3_v2_pkl'))
 #sig = pickle.load(file('/data/dspitzbart/Results2016/signal_unc_pkl'))
 sig = pickle.load(file('/data/easilar/Spring15/25ns/allSignals_2p25_allSyst_approval_pkl'))
+
+#mc = pickle.load(file(path+'resultsFinal_withSystematics_pkl'))
 
 #res2 = pickle.load(file(path2+prefix+'_estimationResults_pkl'))
 
@@ -142,7 +144,7 @@ for srNJet in sorted(signalRegions):
       print ' & '+getNumString(res[srNJet][stb][htb]['rCS_crLowNJet_1b_kappa']['rCS'],  res[srNJet][stb][htb]['rCS_crLowNJet_1b_kappa']['rCSE_sim'],4)\
            +' & '+getNumString(res[srNJet][stb][htb]['rCS_srNJet_0b_onlyTT']['rCS'], res[srNJet][stb][htb]['rCS_srNJet_0b_onlyTT']['rCSE_sim'],4)\
            + '& '+getNumString(res[srNJet][stb][htb]['TT_kappa'], res[srNJet][stb][htb]['TT_kappa_err'])\
-           + '& '+getNumString(res[srNJet][stb][htb]['W_kappa'], res[srNJet][stb][htb]['W_kappa_err']) + '\\\\'
+           + '& '+getNumString(res[srNJet][stb][htb]['TT_rCS_fits_MC']['k_0b/1b_btag'], res[srNJet][stb][htb]['TT_rCS_fits_MC']['k_0b/1b_btag_err']) + '\\\\'
       if htb[1] == -1 : print '\\cline{2-16}'
 print '\\hline\end{tabular}}\end{center}\caption{Rcs table for $t\\bar{t}$+jets and the corresponding $\\kappa_{t\\bar{t}}$ value from simulation, 2.25fb$^{-1}$}\label{tab:0b_rcs_tt}\end{table}'
 
@@ -173,6 +175,33 @@ for srNJet in sorted(signalRegions):
            + '& '+getNumString(res[srNJet][stb][htb]['W_kappa'], res[srNJet][stb][htb]['W_kappa_err']) + '\\\\'
       if htb[1] == -1 : print '\\cline{2-13}'
 print '\\hline\end{tabular}}\end{center}\caption{Rcs table for W+jets and the corresponding $\\kappa_W$ value from simulation, 2.25fb$^{-1}$}\label{tab:0b_rcs_W}\end{table}'
+
+
+#Rcs table for for sidebands data vs MC
+print
+print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrr|rrr|rrr|}\\hline'
+print ' \\njet     & \LT & \HT & \multicolumn{6}{c|}{3-4j, 0b} & \multicolumn{6}{c|}{4-5j, 1b}\\\%\hline'
+print ' & $[$GeV$]$ & $[$GeV$]$ & \multicolumn{3}{c}{data} & \multicolumn{3}{c|}{simulation} & \multicolumn{3}{c}{data} & \multicolumn{3}{c|}{simulation} \\\\\hline'
+
+secondLine = False
+for srNJet in sorted(signalRegions):
+  print '\\hline'
+  if secondLine: print '\\hline'
+  secondLine = True
+  print '\multirow{'+str(rowsNJet[srNJet]['n'])+'}{*}{\\begin{sideways}$'+varBin(srNJet)+'$\end{sideways}}'
+  for stb in sorted(signalRegions[srNJet]):
+    print '&\multirow{'+str(rowsSt[srNJet][stb]['n'])+'}{*}{$'+varBin(stb)+'$}'
+    first = True
+    for htb in sorted(signalRegions[srNJet][stb]):
+      if not first: print '&'
+      first = False
+      print '&$'+varBin(htb)+'$'
+      print ' & '+getNumString(res[srNJet][stb][htb]['rCS_W_crNJet_0b_corr'],   sqrt(res[srNJet][stb][htb]['rCS_Var_W_crNJet_0b_corr']), 4)\
+           +' & '+getNumString(res[srNJet][stb][htb]['rCS_crLowNJet_0b_onlyW_mu']['rCS'], res[srNJet][stb][htb]['rCS_crLowNJet_0b_onlyW_mu']['rCSE_sim'], 4)\
+           +' & '+getNumString(res[srNJet][stb][htb]['rCS_crLowNJet_1b']['rCS'], res[srNJet][stb][htb]['rCS_crLowNJet_1b']['rCSE_pred'], 4)\
+           + '& '+getNumString(res[srNJet][stb][htb]['rCS_crLowNJet_1b_onlyTT']['rCS'], res[srNJet][stb][htb]['rCS_crLowNJet_1b_onlyTT']['rCSE_sim'], 4) + '\\\\'
+      if htb[1] == -1 : print '\\cline{2-15}'
+print '\\hline\end{tabular}}\end{center}\caption{Rcs table for sidebands, comparing data with simulation, 2.25fb$^{-1}$}\label{tab:0b_rcs_W}\end{table}'
 
 
 #results table

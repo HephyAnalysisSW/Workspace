@@ -25,28 +25,30 @@ from Workspace.RA4Analysis.signalRegions import *
 #from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT500ST250_postProcessed_fromArthur import *
 from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed import *
 from Workspace.RA4Analysis.cmgTuples_Data25ns_miniAODv2_postprocessed import *
-from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed_btag import *
+#from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed_btag import *
 
 #from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT400ST200_postProcessed import *
 #from Workspace.RA4Analysis.cmgTuples_Spring15_50ns_postProcessed import *
 from Workspace.HEPHYPythonTools.user import username
 
-def makeWeight(lumi=4., sampleLumi=3.,debug=False):
+def makeWeight(lumi=4., sampleLumi=3.,debug=False, reWeight='lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*TopPtWeight*0.94'):
+  #reWeight = 'lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*TopPtWeight*0.94'
+  #reWeight = 'lepton_muSF_mediumID*lepton_muSF_miniIso02*lepton_muSF_sip3d*lepton_eleSF_cutbasedID*lepton_eleSF_miniIso01'
   if debug:
     print 'No lumi-reweighting done!!'
     return 'weight', 'weight*weight'
   else:
-    weight_str = '(((weight)/'+str(sampleLumi)+')*'+str(lumi)+')'
+    weight_str = '((weight/'+str(sampleLumi)+')*'+str(lumi)+'*'+reWeight+')'
     weight_err_str = '('+weight_str+'*'+weight_str+')'
   return weight_str, weight_err_str
 
 #25ns samples
 #WJETS = {'name':'WJets', 'chain':getChain(WJetsHTToLNu_25ns,histname=''), 'color':ROOT.kMagenta,'weight':'weight', 'niceName':'W Jets, MVA ID'}
-WJETSbtagweight = {'name':'WJets', 'chain':getChain(WJetsHTToLNu_25ns_btag,histname=''), 'color':ROOT.kMagenta,'weight':'weight', 'niceName':'W Jets btag'}
+#WJETSbtagweight = {'name':'WJets', 'chain':getChain(WJetsHTToLNu_25ns_btag,histname=''), 'color':ROOT.kMagenta,'weight':'weight', 'niceName':'W Jets btag'}
 WJETS = {'name':'WJets', 'chain':getChain(WJetsHTToLNu_25ns,histname=''), 'color':color('WJets'),'weight':'weight', 'niceName':'W Jets CB ID'}
 #TTJETS = {'name':'TTJets', 'chain':getChain(TTJets_25ns,histname=''), 'color':color('TTJets'),'weight':'weight', 'niceName':'t#bar{t} Jets NLO'}
 #TTJetsLO = {'name':'TTJets', 'chain':getChain(TTJets_LO_25ns,histname=''), 'color':color('singleTop'),'weight':'weight', 'niceName':'t#bar{t} Jets MVA ID'}
-TTJetsbtagweight = {'name':'TTJets', 'chain':getChain(TTJets_combined_btag,histname=''), 'color':color('TTJets')-2,'weight':'weight', 'niceName':'t#bar{t} Jets btag'}
+#TTJetsbtagweight = {'name':'TTJets', 'chain':getChain(TTJets_combined_btag,histname=''), 'color':color('TTJets')-2,'weight':'weight', 'niceName':'t#bar{t} Jets btag'}
 TTJets = {'name':'TTJets', 'chain':getChain(TTJets_HTLO_25ns,histname=''), 'color':ROOT.kOrange,'weight':'weight', 'niceName':'t#bar{t} Jets HT bin'}
 TTJets_com = {'name':'TTJets', 'chain':getChain(TTJets_combined,histname=''), 'color':color('TTJets')-2,'weight':'weight', 'niceName':'t#bar{t} Jets comb'}
 DY = {'name':'DY', 'chain':getChain(DY_25ns,histname=''), 'color':color('DY'),'weight':'weight', 'niceName':'Drell Yan'}
@@ -66,9 +68,12 @@ TTandWJets = {'name':'TTJets', 'chain':getChain([TTJets_combined,WJetsHTToLNu_25
 
 Data = {'name':'data', 'chain':getChain([single_mu_Run2015D, single_ele_Run2015D],histname=''), 'color':ROOT.kBlack,'weight':'weight', 'niceName':'data', 'cut':False}
 
-lumi = 2.11
+lumi = 2.25
 sampleLumi = 3.
-weight_str, weight_err_str = makeWeight(lumi, sampleLumi)
+
+MCweight = 'lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*0.94*TopPtWeight'
+
+weight_str, weight_err_str = makeWeight(lumi, sampleLumi, reWeight=MCweight)
 
 dPhiJet1Met = {'name':'acos(cos(Jet_phi[0]-met_phi))', 'binning':[16,0,pi], 'titleX':'#Delta#Phi(j_{1},#slash{E}_{T})', 'titleY':'Events', 'fileName':'dPhiJet1Met'}
 mindPhiJetMet2 = {'name':'min(acos(cos(Jet_phi[0]-met_phi)),acos(cos(Jet_phi[1]-met_phi)))', 'binning':[16,0,pi], 'titleX':'min(#Delta#Phi(j_{1,2},#slash{E}_{T}))', 'titleY':'Events', 'fileName':'mindPhiJet12Met'}
@@ -80,13 +85,11 @@ dPhiJet3Met = {'name':'acos(cos(Jet_phi[2]-met_phi))', 'binning':[16,0,pi], 'tit
 dPhiJet4Met = {'name':'acos(cos(Jet_phi[3]-met_phi))', 'binning':[16,0,pi], 'titleX':'#Delta#Phi(j_{4},#slash{E}_{T})', 'titleY':'Events', 'fileName':'dPhiJet4Met'}
 
 triggers = "(HLT_EleHT350||HLT_MuHT350)"
-filters = "Flag_goodVertices && Flag_HBHENoiseFilter_fix && Flag_CSCTightHaloFilter && Flag_eeBadScFilter && Flag_HBHENoiseIsoFilter"
+#filters = "Flag_goodVertices && Flag_HBHENoiseFilter_fix && Flag_CSCTightHaloFilter && Flag_eeBadScFilter && Flag_HBHENoiseIsoFilter"
+filters = "Flag_goodVertices && Flag_HBHENoiseFilter_fix && Flag_eeBadScFilter && Flag_HBHENoiseIsoFilter && veto_evt_list"
 presel = "((!isData&&singleLeptonic)||(isData&&"+triggers+"&&((muonDataSet&&singleMuonic)||(eleDataSet&&singleElectronic))&&"+filters+"))"
-#presel = "((!isData&&singleElectronic)||(isData&&"+triggers+"&&((muonDataSet&&singleMuonic)||(eleDataSet&&singleElectronic))&&"+filters+"))"
-presel += "&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&Jet_pt[1]>80&&st>250&&nJet30>2&&htJet30j>500"
+presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSoftLeptons==0 && Jet_pt[1]>80 && st>250 && nJet30>2 && htJet30j>500"
 newpresel = presel
-
-
 
 #name, cut = nameAndCut((450,-1),(500,-1),(4,5),btb=(1,1),presel=newpresel)
 #cut = {'name':name,'string':cut+'&&singleElectronic&&abs(leptonEta)<2.4&&'+filters,'niceName':'L_{T} [250,350), H_{T} [500,-1)'}
@@ -110,7 +113,7 @@ varList = [dPhiJet1Met]#, dPhiJet2Met, dPhiJet3Met, mindPhiJetMet2, mindPhiJetMe
 
 specialName = ''
 
-printDir = '/afs/hephy.at/user/d/dspitzbart/www/Spring15/25ns/dPhiJetMetFit_3fbSRs/'
+printDir = '/afs/hephy.at/user/d/dspitzbart/www/Spring15/25ns/dPhiJetMetFit_v2/'
 if not os.path.exists(printDir):
   os.makedirs(printDir)
 
@@ -125,7 +128,7 @@ for srNJet in signalRegions:
     for htb in signalRegions[srNJet][stb]:
       deltaPhiCut = signalRegions[srNJet][stb][htb]['deltaPhi']
       name, cut = nameAndCut(stb,htb,(4,5),btb=(1,1),presel=newpresel)
-      cut = {'name':name,'string':cut+'&&singleElectronic&&abs(leptonEta)<2.4&&'+filters,'niceName':'L_{T} [250,350), H_{T} [500,-1)'}
+      cut = {'name':name,'string':cut+'&&singleElectronic&&abs(leptonEta)<2.4','niceName':'L_{T} [250,350), H_{T} [500,-1)'}
       binCut = cut
       bins[srNJet][stb][htb] = {}
 

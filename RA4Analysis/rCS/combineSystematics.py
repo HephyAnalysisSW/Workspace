@@ -60,6 +60,7 @@ lepSF_h2b = d.GetPrimitive('h2b')
 #pickleDir =  '/data/easilar/Results2016/Prediction_SFtemplates_fullSR_lep_data_2p25/'
 
 pickleDir =  '/data/dspitzbart/Results2016/Prediction_SFtemplates_fullSR_lep_data_2p25/'
+#pickleDir =  '/data/dspitzbart/Results2016/Prediction_SFtemplates_fullSR_lep_data_QCDerrChange_2p25/'
 #pickleDir =  '/data/dspitzbart/Results2016/Prediction_SFtemplates_validation_4j_lep_data_2p25/'
 saveDir = pickleDir
 #saveDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_fullSR_lep_data_2p25/'
@@ -78,7 +79,9 @@ else:
   dilep   = pickle.load(file('/data/dspitzbart/Results2016/dilep_pkl'))
 
 #topPt_Err = pickle.load(file("/data/easilar/Spring15/25ns/extended_with_truth_counts_topPt_pkl"))
+#topPt_Err = pickle.load(file("/data/dspitzbart/Results2016/topErr_pkl_update"))
 topPt_Err = pickle.load(file("/data/easilar/Spring15/25ns/TTJets_combined_TopPtWeight_syst_SRAll_pkl"))
+
 pu_Unc    = pickle.load(file("/data/easilar/Spring15/25ns/extended_with_truth_counts_PU_pkl"))
 lep_Eff   = pickle.load(file("/data/easilar/Spring15/25ns/extended_with_truth_counts_LS_pkl"))
 jec       = pickle.load(file('/data/easilar/Spring15/25ns/Jec_syst_SRAll_pkl'))
@@ -211,7 +214,7 @@ for injb,srNJet in enumerate(sorted(signalRegions)):
       if validation:
         topErr = 0.12
       else:
-        topErr = abs(topPt_Err[srNJet][stb][htb])#['delta_Up'])  
+        topErr = abs(topPt_Err[srNJet][stb][htb]['delta_avarage'])  
       topErrH.SetBinContent(i, topErr)
       
       #lepton SF
@@ -277,7 +280,7 @@ for injb,srNJet in enumerate(sorted(signalRegions)):
       #ttSyst  = sqrt(bErr_tt**2 + wXErr**2 + ttXErr**2 + wPErr**2 + dilepErr**2 + qcdErr**2 + topErr**2 + puErr**2 + lepSFErr**2 + jecErr**2 + rcsErr_tt**2)
       #WSyst   = sqrt(bErr_W**2  + wXErr**2 + ttXErr**2 + wPErr**2 + dilepErr**2 + qcdErr**2 + topErr**2 + puErr**2 + lepSFErr**2 + jecErr**2 + rcsErr_W**2)
       ttSyst  = sqrt(bErr_tt**2 + XsecErr**2 + wPErr**2 + dilepErr**2 + qcdErr**2 + topErr**2 + puErr**2 + lepSFErr**2 + jecErr**2 + rcsErr_tt**2)
-      WSyst   = sqrt(bErr_W**2  + XsecErr**2 + wPErr**2 + dilepErr**2 + qcdErr**2 + topErr**2 + puErr**2 + lepSFErr**2 + jecErr**2 + rcsErr_W**2)
+      WSyst   = sqrt(bErr_W**2  + XsecErr**2 + wPErr**2 + dilepErr**2 + qcdErr**2 + topErr**2 + puErr**2 + lepSFErr**2 + jecErr**2 + rcsErr_W**2 + W_muToLep**2)
       restSyst = 0.5
       
       dataStat = dataResult[srNJet][stb][htb]['tot_pred_err']/dataResult[srNJet][stb][htb]['tot_pred']
@@ -460,9 +463,9 @@ total_err.Draw('2 same')
 
 can.cd()
 
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/syst_errors_update_data_ARC5.png')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/syst_errors_update_data_ARC5.root')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/syst_errors_update_data_ARC5.pdf')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/syst_errors_update_data_ARC6.png')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/syst_errors_update_data_ARC6.root')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/syst_errors_update_data_ARC6.pdf')
 
 pickle.dump(rcs, file(saveDir+'resultsFinal_withSystematics_pkl','w'))
 print "pickle Written :" , saveDir+'resultsFinal_withSystematics_pkl'
