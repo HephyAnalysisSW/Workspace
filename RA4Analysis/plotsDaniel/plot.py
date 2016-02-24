@@ -171,6 +171,9 @@ preselDiLepSF = '((isData&&'+triggers+'&&'+filters+')||(!isData))&&('+diSF + '&&
 preselDiMu = '((isData&&'+triggers+'&&'+filters+')||(!isData))&&('+diMuonic + '&&Jet_pt[1]>80&&(LepGood_pt[0]+met_pt)>250&&nJet30>2&&htJet30j>500)'
 preselDiEle = '((isData&&'+triggers+'&&'+filters+')||(!isData))&&('+diElectronic + '&&Jet_pt[1]>80&&(LepGood_pt[0]+met_pt)>250&&nJet30>2&&htJet30j>500)'
 
+preselSingleMu = "((!isData&&singleMuonic)||(isData&&"+triggers+"&&(muonDataSet&&singleMuonic)&&"+filters+"))"
+preselSingleMu += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSoftLeptons==0 && Jet_pt[1]>80 && st>250 && nJet30>2 && htJet30j>500"
+
 preselMultiLep = '((isData&&'+triggers+'&&'+filters+')||(!isData))&&('+ multiLeptonic + '&&Jet_pt[1]>80&&(LepGood_pt[0]+met_pt)>250&&nJet30>2&&htJet30j>500)'
 
 noCut = {'name':'empty', 'string':'(1)', 'niceName':'no cut'}
@@ -179,6 +182,9 @@ name, allSRcut = nameAndCut((250,-1),(500,-1),(5,-1),btb=(0,-1),presel=newpresel
 allSR = {'name':name,'string':allSRcut,'niceName':'all SR'}
 allSR_test = {'name':name,'string':allSRcut+'&&weight<1','niceName':'all SR'}
 allSR_lowHT = {'name':name,'string':allSRcut+'&&htJet30j<900','niceName':'all SR'}
+
+name, allSRcut = nameAndCut((250,-1),(500,-1),(5,-1),btb=(0,-1),presel=preselSingleMu)
+allSR_singleMu = {'name':name,'string':allSRcut,'niceName':'all SR'}
 
 name, cut = nameAndCut((250,350),(500,750),(4,5),btb=(0,-1),presel=newpresel)
 ttSBbin1 = {'name':name,'string':cut,'niceName':'Lowest SR'}

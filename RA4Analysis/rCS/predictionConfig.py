@@ -16,10 +16,6 @@ from Workspace.RA4Analysis.signalRegions import *
 
 testRun = False
 
-####################################################################################################33
-# top pt weight removed in MCweight!!
-
-
 ## b-tagging and other variables
 dPhiStr = 'deltaPhi_Wl'
 bjreg = (0,0)
@@ -33,12 +29,12 @@ templateWeightSuffix  = '_SF'
 
 QCDup       = False
 QCDdown     = False
-nameSuffix  = '_noTopPTweights2'
+nameSuffix  = ''
 if QCDup: nameSuffix += '_QCDup'
 if QCDdown: nameSuffix += '_QCDdown'
 
 ## samples
-isData              = False
+isData              = True
 unblinded           = True
 validation          = False
 isCentralPrediction = True
@@ -59,8 +55,8 @@ cQCD        = getChain(QCDHT_25ns,histname='')
 useQCDestimation = False
 if not isData and useQCDestimation: QCDpickle = '/data/dspitzbart/Results2016/QCDEstimation/20160212_QCDestimation_MC2p25fb_pkl'
 if isData:
-  #QCDpickle  = '/data/dspitzbart/Results2016/QCDEstimation/20160212_QCDestimation_data2p25fb_pkl'
-  QCDpickle  = '/data/dspitzbart/Results2016/QCDEstimation/20160218_QCDestimation_validation_data2p25fb_pkl'
+  QCDpickle  = '/data/dspitzbart/Results2016/QCDEstimation/20160212_QCDestimation_data2p25fb_pkl'
+  #QCDpickle  = '/data/dspitzbart/Results2016/QCDEstimation/20160218_QCDestimation_validation_data2p25fb_pkl'
   #QCDpickle  = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_2p1fb_pkl'
   #QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_extendedClosureTest3to4j_2p1fb_pkl'
   #QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_closureTest4to5j_2p1fb_pkl'
@@ -111,7 +107,7 @@ if templateBootstrap: templateBootstrap = pickle.load(file(templateBootstrapDir)
 ## Directories for plots, results and templates
 if isData:
   templateName   = 'SFtemplates_'+regStr+'_lep_data'
-  predictionName = templateName
+  predictionName = templateName + nameSuffix
 else:
   templateName   = 'SFtemplates_'+regStr+'_lep_MC'
   predictionName = templateName+btagWeightSuffix + nameSuffix
@@ -138,11 +134,11 @@ singleMu_presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSof
 #presel = singleMu_presel
 
 ## weights for MC
-MCweight = 'lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*0.94'
-#MCweight = 'lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*TopPtWeight*0.94'
+#MCweight = 'lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*0.94'
+MCweight = 'lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*TopPtWeight*0.94'
 
 ## corrections
-createFits = False # turn off if you already did one
+createFits = True # turn off if you already did one
 if not isCentralPrediction:
   createFits = False
 fitDir = '/data/'+username+'/Results'+year+'/correctionFit_'+regStr+'_MC/'
