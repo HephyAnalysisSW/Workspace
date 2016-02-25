@@ -203,6 +203,40 @@ for srNJet in sorted(signalRegions):
       if htb[1] == -1 : print '\\cline{2-15}'
 print '\\hline\end{tabular}}\end{center}\caption{Rcs table for sidebands, comparing data with simulation, 2.25fb$^{-1}$}\label{tab:0b_rcs_W}\end{table}'
 
+#result table for PAS
+print
+print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|c|rrr|rrr|rrr|rrr|rrr|}\\hline'
+
+print ' \multirow{2}{*}{\\njet}     & \LT & \HT     & \multirow{2}{*}{Bin name} & \multicolumn{9}{c|}{expected T5q$^4$WW $m_{gl}$/$m_{\\ninozero}$ $[$TeV$]$} & \multicolumn{3}{c|}{\multirow{2}{*}{predicted}} & \multicolumn{3}{c|}{\multirow{2}{*}{observed}} \\\%\hline'
+print ' & $[$GeV$]$ &$[$GeV$]$ &  & \multicolumn{3}{c}{1.0/0.7} & \multicolumn{3}{c}{1.2/0.8} & \multicolumn{3}{c|}{1.5/0.1} & \multicolumn{3}{c|}{} & \multicolumn{3}{c|}{} \\\\\hline'
+
+
+secondLine = False
+for srNJet in sorted(signalRegions):
+  print '\\hline'
+  if secondLine: print '\\hline'
+  secondLine = True
+  print '\multirow{'+str(rowsNJet[srNJet]['n'])+'}{*}{\\begin{sideways}$'+varBin(srNJet)+'$\end{sideways}}'
+  for stb in sorted(signalRegions[srNJet]):
+    print '&\multirow{'+str(rowsSt[srNJet][stb]['n'])+'}{*}{$'+varBin(stb)+'$}'
+    first = True
+    for htb in sorted(signalRegions[srNJet][stb]):
+      if not first: print '&'
+      first = False
+      print '&$'+varBin(htb)+'$'
+      print ' & $'+signalRegions[srNJet][stb][htb]['tex'] +'$'
+      print ' & '+getNumString(sig[srNJet][stb][htb]['signals'][1000][700]['yield_MB_SR'], sig[srNJet][stb][htb]['signals'][1000][700]['stat_err_MB_SR'])\
+           +' & '+getNumString(sig[srNJet][stb][htb]['signals'][1200][800]['yield_MB_SR'], sig[srNJet][stb][htb]['signals'][1200][800]['stat_err_MB_SR'])\
+           +' & '+getNumString(sig[srNJet][stb][htb]['signals'][1500][100]['yield_MB_SR'], sig[srNJet][stb][htb]['signals'][1500][100]['stat_err_MB_SR'])\
+           +' & '+getNumString(res[srNJet][stb][htb]['tot_pred_final'], res[srNJet][stb][htb]['tot_pred_final_err'])
+      if unblinded or validation:
+        print ' & \multicolumn{3}{c|}{'+str(int(res[srNJet][stb][htb]['y_srNJet_0b_highDPhi']))+'} \\\\'
+      else:
+        print ' & \multicolumn{3}{c|}{blinded} \\\\'
+      if htb[1] == -1 : print '\\cline{2-19}'
+print '\\hline\end{tabular}}\end{center}\caption{Results table of the 0-tag regions, 2.25fb$^{-1}$}\label{tab:0b_results}\end{table}'
+
+
 
 #results table
 print

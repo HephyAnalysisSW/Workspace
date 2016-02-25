@@ -349,6 +349,7 @@ def binnedNBTagsFit(cut, cutname, samples, prefix = "", QCD_dict={0:{'y':0.,'e':
 
   #myPdf->paramOn(frame,Layout(xmin,ymin,ymax))
   fitFrame_PosPdg=x.frame(rf.Bins(50),rf.Title("FitModel"))
+
   model_PosPdg.paramOn(fitFrame_PosPdg,rf.Layout(0.42,0.9,0.9))
   data_PosPdg.plotOn(fitFrame_PosPdg,rf.LineColor(ROOT.kRed))
   model_PosPdg.plotOn(fitFrame_PosPdg,rf.LineStyle(ROOT.kDashed))
@@ -401,7 +402,17 @@ def binnedNBTagsFit(cut, cutname, samples, prefix = "", QCD_dict={0:{'y':0.,'e':
   c1.Print(printDir+'/'+prefix+'_nBTagFitRes.png')
   c1.Print(printDir+'/'+prefix+'_nBTagFitRes.pdf')
   c1.Print(printDir+'/'+prefix+'_nBTagFitRes.root')
+  
+  print yield_TTJets.getVal()
+  
+  fit_res = model_PosPdg.fitTo(data_PosPdg, rf.Save())
+  cov_m = fit_res.covarianceMatrix()
+  cor_m = fit_res.correlationMatrix()
 
+  cov_m.Print()
+  cor_m.Print()
+  
+  print yield_TTJets.getVal()
   
   del c1
   del nllComponents

@@ -31,6 +31,8 @@ from Workspace.RA4Analysis.cmgTuples_Data25ns_miniAODv2_postprocessed import *
 #from Workspace.RA4Analysis.cmgTuples_Spring15_50ns_postProcessed import *
 from Workspace.HEPHYPythonTools.user import username
 
+QCDestimate = pickle.load(file('/data/dspitzbart/Results2016/QCDEstimation/20160212_QCDestimation_MC2p25fb_pkl'))
+
 def makeWeight(lumi=4., sampleLumi=3.,debug=False, reWeight='lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*TopPtWeight*0.94'):
   #reWeight = 'lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*TopPtWeight*0.94'
   #reWeight = 'lepton_muSF_mediumID*lepton_muSF_miniIso02*lepton_muSF_sip3d*lepton_eleSF_cutbasedID*lepton_eleSF_miniIso01'
@@ -119,7 +121,12 @@ if not os.path.exists(printDir):
 
 signalRegions = signalRegion3fb
 
+QCD_LP = ROOT.TH1F('QCD_LP','QCD_LP',13,0,13)
+QCD_DPJM = ROOT.TH1F('QCD_DPJM','QCD_DPJM',13,0,13)
+one = ROOT.TH1F('one','one',13,0,13)
+
 bins = {}
+i = 1
 
 for srNJet in signalRegions:
   bins[srNJet] = {}
@@ -127,7 +134,7 @@ for srNJet in signalRegions:
     bins[srNJet][stb] ={}
     for htb in signalRegions[srNJet][stb]:
       deltaPhiCut = signalRegions[srNJet][stb][htb]['deltaPhi']
-      name, cut = nameAndCut(stb,htb,(4,5),btb=(1,1),presel=newpresel)
+      name, cut = nameAndCut(stb,htb,srNJet,btb=(0,0),presel=newpresel)
       cut = {'name':name,'string':cut+'&&singleElectronic&&abs(leptonEta)<2.4','niceName':'L_{T} [250,350), H_{T} [500,-1)'}
       binCut = cut
       bins[srNJet][stb][htb] = {}
@@ -347,7 +354,13 @@ for srNJet in signalRegions:
         print
         print "yield_TTandWJets:" , yield_TTandWJets.getVal()
         fit_total = yield_WJets.getVal()+yield_TTJets.getVal()+yield_Rest.getVal()+yield_QCD.getVal()
-
+        
+        QCD_LP.SetBinContent(i, QCDestimate[srNJet][stb][htb][(0,0)][deltaPhiCut]['NQCDpred'])
+        QCD_LP.SetBinError(i, QCDestimate[srNJet][stb][htb][(0,0)][deltaPhiCut]['NQCDpred_err'])
+        QCD_DPJM.SetBinContent(i, yield_QCD.getVal())
+        QCD_DPJM.SetBinError(i, yield_QCD.getError())
+        one.SetBinContent(i,1)
+        i = i+1
         fit = {'WJets':yield_WJets.getVal(), 'TTJets':yield_TTJets.getVal(), 'Rest':yield_Rest.getVal(), 'QCD':yield_QCD.getVal(), 'QCDerr':yield_QCD.getError(), 'TTandWJetsComb':yield_TTandWJets.getVal()}
         fit_frac = {}
         for key in fit:
@@ -434,8 +447,24 @@ for srNJet in signalRegions:
         resH.GetYaxis().SetBinLabel(1,'Rest EWK')
         resH.Draw('colz text')
         
+        
         c2.Print(printDir+specialName+name+'_'+var['fileName']+'_fit.png')
         c3.Print(printDir+specialName+name+'_'+var['fileName']+'_templates.png')
         c4.Print(printDir+specialName+name+'_'+var['fileName']+'_correlation.png')
+
+QCD_DPJM.Divide(QCD_LP)
+
+c5=ROOT.TCanvas("c5","ratio",650,500)
+QCD_DPJM.SetMaximum(3.)
+QCD_DPJM.SetMinimum(0.)
+QCD_DPJM.SetLineColor(ROOT.kAzure+9)
+QCD_DPJM.SetMarkerColor(ROOT.kAzure+9)
+
+QCD_DPJM.GetYaxis().SetTitle('f(L_{P})/f(#Delta#Phi(j_{1},#slash{E}_{T}))')
+
+QCD_DPJM.Draw('E1P')
+one.Draw('hist same')
+
+c5.Print(printDir+specialName+name+'_'+var['fileName']+'_ratio.png')
 
 

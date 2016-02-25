@@ -5,7 +5,7 @@ ROOT.gROOT.LoadMacro('../../HEPHYPythonTools/scripts/root/tdrstyle.C')
 ROOT.setTDRStyle()
 
 path = '/afs/hephy.at/user/d/dspitzbart/www/Spring15/25ns/templateFit_SFtemplates_fullSR_lep_data_2p25/'
-name = 'st250-350_ht500-750_njet6-7_nBTagFitRes'
+name = 'st250-350_ht750_njet6-7_nBTagFitRes'
 
 f = ROOT.TFile(path+name+'.root')
 
@@ -38,8 +38,9 @@ can2.cd()
 
 #frame1.Draw()
 h_t = ROOT.TH1F('h_t','h_t',3,0,3)
-h_t.SetMaximum(300)
-h_t.GetXaxis().SetTitle('n_{b-jet}')
+h_t.SetMaximum(150)
+
+h_t.GetXaxis().SetTitle('n_{b-tag}')
 h_t.GetXaxis().SetTitleSize(0.065)
 h_t.GetXaxis().SetBinLabel(1,'0')
 h_t.GetXaxis().SetBinLabel(2,'1')
@@ -49,7 +50,11 @@ h_t.GetXaxis().SetLabelSize(0.08)
 h_t.GetYaxis().SetTitle('Events')
 h_t.GetYaxis().SetNdivisions(508)
 
+h_d.SetLineColor(ROOT.kBlack)
+h_d.SetLineWidth(2)
+
 h_t.Draw()
+
 curve1.Draw('same')
 curve2.Draw('same')
 curve3.Draw('same')
@@ -76,8 +81,9 @@ leg.AddEntry(h_d, 'data', 'lp')
 leg.AddEntry(curve1, 'total', 'l')
 leg.AddEntry(curve2, 'W+jets', 'l')
 leg.AddEntry(curve3, 't#bar{t}+jets', 'l')
-leg.AddEntry(curve4, 'rest EWK', 'l')
 if curve5: leg.AddEntry(curve5, 'QCD', 'l')
+leg.AddEntry(curve4, 'other', 'l')
+#if curve5: leg.AddEntry(curve5, 'QCD', 'l')
 leg.Draw()
 
 
