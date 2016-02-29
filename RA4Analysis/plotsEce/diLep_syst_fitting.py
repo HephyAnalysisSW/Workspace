@@ -11,10 +11,12 @@ ROOT.gROOT.LoadMacro("../../HEPHYPythonTools/scripts/root/tdrstyle.C")
 ROOT.setTDRStyle()
 maxN = -1
 ROOT.gStyle.SetOptStat(0)
-lumi = 2300##pb
-path = "/afs/hephy.at/user/e/easilar/www/data/Run2015D/2p3fb/diLep_syst_study_results/"
-data_mean = pickle.load(file('/data/easilar/Spring15/25ns/data_mean_pkl'))
-SR = signalRegion3fb
+lumi = 2250##pb
+#path = "/afs/hephy.at/user/e/easilar/www/data/Run2015D/2p3fb/diLep_syst_study_results/"
+path = "/afs/hephy.at/user/e/easilar/www/data/Run2015D/2p25fb/diLep_syst_study_results/"
+data_mean = pickle.load(file('/data/easilar/Spring15/25ns/data_mean_25Feb_0p75_pkl'))
+#SR = signalRegion3fb
+SR = {(3,-1):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
 
 btagVarString = 'nBJetMediumCSV30'
 p = {'ndiv':False,'yaxis':'Events','xaxis':'N_{Jets}','logy':False , 'var':'nJet30','varname':'nJet30', 'binlabel':1,  'bin':(6,3,9)}
@@ -36,6 +38,10 @@ for srNJet in sorted(SR):
       latex.SetNDC()
       latex.SetTextSize(0.04)
       latex.SetTextAlign(11) 
+      hint1 = ROOT.TH1F("hint1", "1 sigma", 100, 3, 9)
+      hint2 = ROOT.TH1F("hint2", "2 sigma", 100, 3, 9)
+      hint1.SetMarkerSize(0)
+      hint2.SetMarkerSize(0)
       h_ratio_diLep = fratio_diLep.Get("h_ratio")
       h_ratio_oneLep = fratio_oneLep.Get("h_ratio")
       h_double_ratio = h_ratio_diLep.Clone("h_double_ratio")
@@ -54,16 +60,23 @@ for srNJet in sorted(SR):
       latex.DrawLatex(0.6,0.85,"Fit:")
       latex.DrawLatex(0.6,0.8,"Constant:"+str(format(FitFunc.GetParameter(0),'.3f'))+"+-"+str(format(FitFunc.GetParError(0),'.3f')))
       latex.DrawLatex(0.6,0.75,"Slope:"+str(format(FitFunc.GetParameter(1),'.3f'))+"+-"+str(format(FitFunc.GetParError(1),'.3f')))
-      latex.DrawLatex(0.6,0.7, "mean:"+str(format(h_ratio3.GetMean(),'.3f')))
+      #latex.DrawLatex(0.6,0.7, "mean:"+str(format(h_ratio3.GetMean(),'.3f')))
       latex.DrawLatex(0.2,0.85,"(nJet+add lost)/(nJet)")
       bin[srNJet][stb][htb]["constant"] = sqrt(abs(1-FitFunc.GetParameter(0))**2+abs(FitFunc.GetParError(0))**2)
       bin[srNJet][stb][htb]["slope"] = sqrt(abs(0-abs(FitFunc.GetParameter(1)))**2+abs(FitFunc.GetParError(1))**2)
       print "mean:" , bin[srNJet][stb][htb]["nJetMean"]
       print "constant",abs(1-FitFunc.GetParameter(0)) ,"error", abs(FitFunc.GetParError(0)),"quad sum of constant:" , bin[srNJet][stb][htb]["constant"]
       print "slope",abs(0-abs(FitFunc.GetParameter(1))) ,"error", abs(FitFunc.GetParError(1)),"quad sum of constant:" , bin[srNJet][stb][htb]["slope"]
-      #cb.SaveAs(path+Name+'_'+p['varname']+'_allWeights_double_Ratio.root')
-      #cb.SaveAs(path+Name+'_'+p['varname']+'_allWeights_double_Ratio.png')
-      #cb.SaveAs(path+Name+'_'+p['varname']+'_allWeights_double_Ratio.pdf')
+      ROOT.TVirtualFitter.GetFitter().GetConfidenceIntervals(hint1, 0.68)
+      ROOT.TVirtualFitter.GetFitter().GetConfidenceIntervals(hint2, 0.95)
+      hint1.SetFillColorAlpha(ROOT.kGreen, 0.45)
+      hint2.SetFillColorAlpha(ROOT.kYellow, 0.45)
+      hint2.Draw("e3 same")
+      hint1.Draw("e3 same")
+      h_double_ratio.Draw("same")
+      cb.SaveAs(path+Name+'_'+p['varname']+'_double_Ratio.root')
+      cb.SaveAs(path+Name+'_'+p['varname']+'_double_Ratio.png')
+      cb.SaveAs(path+Name+'_'+p['varname']+'_double_Ratio.pdf')
       #for f_ratio in [{'name':'diLep' , 'file':fratio_diLep} , {'name':'oneLep' , 'file':fratio_oneLep}]:
       #  cb = ROOT.TCanvas("cb","cb",800,800)
       #  cb.cd()

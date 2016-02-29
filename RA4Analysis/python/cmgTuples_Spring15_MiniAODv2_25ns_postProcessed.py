@@ -1,6 +1,7 @@
 import copy, os, sys
 #dir = '/data/easilar/cmgTuples/postProcessing_MC_hadrFlav_btag_Eff/HT500LT250/'
 dir = '/data/easilar/cmgTuples/postProcessing_MC/HT500LT250Skim/'
+#dir = '/data/easilar/cmgTuples/postProcessed_Unblinding/hard/'
 ####usual HT combination####
 
 TTJets_HTLO_25ns={\
