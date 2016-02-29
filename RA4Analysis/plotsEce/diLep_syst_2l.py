@@ -2,25 +2,31 @@ import ROOT
 from Workspace.HEPHYPythonTools.helpers import getObjFromFile, getChain, getChunks, getYieldFromChain,getPlotFromChain
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName, nBTagBinName, varBinName, varBin, UncertaintyDivision
 from Workspace.RA4Analysis.cmgTuples_Data25ns_miniAODv2_postprocessed import *
-from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed import *
+from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed_1 import *
 from Workspace.RA4Analysis.signalRegions import signalRegion3fb
 from cutFlow_helper import *
+from general_config import *
+
 from math import *
 ROOT.gROOT.LoadMacro("../../HEPHYPythonTools/scripts/root/tdrstyle.C")
 ROOT.setTDRStyle()
 maxN = -1
 ROOT.gStyle.SetOptStat(0)
-lumi = 2300##pb
 
-path = "/afs/hephy.at/user/e/easilar/www/data/Run2015D/2p3fb/diLep_syst_study_results_New/"
+path = "/afs/hephy.at/user/e/easilar/www/data/Run2015D/2p25fb/diLep_syst_study_results/"
 if not os.path.exists(path):
   os.makedirs(path)
 
-signalRegion3fbReduced = {(0, -1):  {(250, -1): {(0, -1):  {'deltaPhi': 1.0}}}}
+presel = True
 
-SR = signalRegion3fbReduced
-#SR = signalRegion3fb
-btagVarString = 'nBJetMediumCSV30'
+if presel :
+  SR = {(3,-1):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
+  #btag_weight = "(weightBTag0_SF)"
+  btag_weight = "(weightBTag1p_SF)"
+  btagVarString = 'nBJetMediumCSV30'
+  #nbtag = (0,0)
+  nbtag = (1,-1)
+
 
 lepSels = [
 {'cut':'nTightHardLeptons==2' , 'veto':'nLooseHardLeptons==2&&nLooseSoftLeptons==0',\
@@ -30,38 +36,26 @@ lepSels = [
 ]
 
 bkg_samples=[
-{'sample':'TTVH',     "weight":"(1)"            ,"cut":(0,0) , "name":TTV_25ns ,'tex':'t#bar{t}+W/Z/H','color':ROOT.kOrange-3},
-{"sample":"singleTop","weight":"(1)"            ,"cut":(0,0) , "name":singleTop_25ns,"tex":"single top",'color': ROOT.kViolet+5},
-{"sample":"DY",       "weight":"(1)"            ,"cut":(0,0) , "name":DY_25ns,"tex":"DY + jets",'color':ROOT.kRed-6},
-{"sample":"QCD",      "weight":"(1)"            ,"cut":(0,0) , "name":QCDHT_25ns, "tex":"QCD","color":ROOT.kCyan-6},
-{"sample":"WJets",    "weight":"weightBTag0_SF" ,"cut":(0,-1) , "name":WJetsHTToLNu_25ns,"tex":"W + jets","color":ROOT.kGreen-2},
+{'sample':'TTVH',           "weight":"(1)"       ,"cut":nbtag ,"add_Cut":"(1)","name":TTV_25ns ,'tex':'t#bar{t}V','color':ROOT.kOrange-3},
+{"sample":"DY",             "weight":"(1)"       ,"cut":nbtag ,"add_Cut":"(1)","name":DY_25ns,"tex":"DY + jets",'color':ROOT.kRed-6},
+{"sample":"singleTop",      "weight":"(1)"       ,"cut":nbtag ,"add_Cut":"(1)","name":singleTop_25ns,"tex":"t/#bar{t}",'color': ROOT.kViolet+5},
+{"sample":"QCD",            "weight":"(1)"       ,"cut":nbtag  ,"add_Cut":"(1)","name":QCDHT_25ns, "tex":"QCD","color":ROOT.kCyan-6},
+{"sample":"WJets",          "weight":"(1)"       ,"cut":nbtag ,"add_Cut":"(1)","name":WJetsHTToLNu_25ns,"tex":"W + jets","color":ROOT.kGreen-2},
+{"sample":"ttJets_diLep",   "weight":"(1)"       ,"cut":nbtag ,"add_Cut":"((ngenLep+ngenTau)==2)","name":TTJets_combined, "tex":"t#bar{t} ll + jets",'color':ROOT.kBlue},
+{"sample":"ttJets_semiLep", "weight":"(1)"       ,"cut":nbtag ,"add_Cut":"(!((ngenLep+ngenTau)==2))","name":TTJets_combined, "tex":"t#bar{t} l + jets",'color':ROOT.kBlue-7}
 ]
 
 for bkg in bkg_samples:
     bkg['chain'] = getChain(bkg['name'],maxN=maxN,histname="",treeName="Events")
 
-c_tt = {"sample":"ttJets", "chain":getChain(TTJets_combined, maxN=maxN,histname="",treeName="Events"),  "weight":"weightBTag0_SF" ,"cut":(0,-1) , "name":TTJets_combined, "tex":"ttbar + jets",'color':ROOT.kBlue-4}
-c_tt_diLep = c_tt
-c_tt_diLep["tex"] = "tt diLep"
-c_tt_diLep["color"] = ROOT.kCyan-10
 plots =[\
-{'ndiv':False,'yaxis':'Events','xaxis':'N_{Jets}+lost','logy':False , 'var':'DL_nJet_lepToKeep_AddLep1ov3Met',                      'varname':'nJet30',                   'binlabel':1,  'bin':(6,3,9)},\
-{'ndiv':False,'yaxis':'Events','xaxis':'N_{Jets}+lost','logy':False , 'var':'DL_nJet_lepToDiscard_AddLep1ov3Met',                      'varname':'nJet30',                   'binlabel':1,  'bin':(6,3,9)},\
+{'ndiv':False,'yaxis':'Events','xaxis':'N_{Jets}+lost','logy':False , 'var':'DL_nJet_lepToKeep_AddLep1ov3Met',                      'varname':'nJet30',                   'binlabel':1,  'bin':(7,3,10)},\
+{'ndiv':False,'yaxis':'Events','xaxis':'N_{Jets}+lost','logy':False , 'var':'DL_nJet_lepToDiscard_AddLep1ov3Met',                      'varname':'nJet30',                   'binlabel':1,  'bin':(7,3,10)},\
   ]
 
-diLep = "(ngenLep+ngenTau)==2"
-not_diLep = "(ngenLep+ngenTau)!=2"
-delta_Phi = "deltaPhi_Wl<0.5"
-diLep_presel = "DL_HT_lepToKeep_AddLep1ov3Met>500&&DL_ST_lepToKeep_AddLep1ov3Met>250&&DL_nJet_lepToKeep_AddLep1ov3Met>=3"
-diLep_presel_1 = "DL_HT_lepToDiscard_AddLep1ov3Met>500&&DL_ST_lepToDiscard_AddLep1ov3Met>250&&DL_nJet_lepToDiscard_AddLep1ov3Met>=3"
 lepSel = lepSels[0]
-presel = "&&".join([lepSel['cut'],lepSel['veto'],filters,diLep_presel])  
-presel_1 = "&&".join([lepSel['cut'],lepSel['veto'],filters,diLep_presel_1])  
-data_presel = "&&".join([lepSel['cut'],lepSel['veto'],lepSel['trigger'],filters,diLep_presel])
-data_presel_1 = "&&".join([lepSel['cut'],lepSel['veto'],lepSel['trigger'],filters,diLep_presel_1])
-nbTags = (0,0) 
-nJet = (0,-1)
-htbin = (0,-1)
+presel = "&&".join([lepSel['cut'],lepSel['veto'],"Jet_pt[1]>80&&abs(LepGood_eta[0])<2.4"])
+data_presel = "&&".join([lepSel['cut'],lepSel['veto'],lepSel['trigger'],filters,"Jet_pt[1]>80&&abs(LepGood_eta[0])<2.4"])
 bin = {}
 for srNJet in sorted(SR):
   bin[srNJet]={}
@@ -70,27 +64,24 @@ for srNJet in sorted(SR):
     for htb in sorted(SR[srNJet][stb]):
       bin[srNJet][stb][htb] = {}
       deltaPhiCut = SR[srNJet][stb][htb]['deltaPhi']
-      Name, bla_Cut = nameAndCut(stb, htb, srNJet, btb=(0,0), presel="(1)", btagVar =  btagVarString)
+      Name, bla_Cut = nameAndCut(stb, htb, srNJet, btb=nbtag, presel="(1)", btagVar =  btagVarString)
       p = plots[0]
       bin[srNJet][stb][htb][p['varname']] = {}
       for bkg in bkg_samples:
-        bla_Name, Cut = nameAndCut(stb, htbin, nJet, btb=bkg['cut'], presel="(1)", btagVar =  btagVarString, stVar ='DL_ST_lepToKeep_AddLep1ov3Met')
-        weight_str = lepSel['trigWeight']+"*"+bkg['weight']+"*puReweight_true_max4*TopPtWeight*"
-        bin[srNJet][stb][htb][p['varname']][bkg['sample']] = getPlotFromChain(bkg['chain'], p['var'], p['bin'], cutString = "&&".join([presel,Cut]), weight = weight_str+"LepToKeep_muSF*LepToKeep_eleSF*weight*"+str(lumi)+"/3000", binningIsExplicit=False, addOverFlowBin='both')
-        bla_Name, Cut_1 = nameAndCut(stb, htbin, nJet, btb=bkg['cut'], presel="(1)", btagVar =  btagVarString, stVar ='DL_ST_lepToDiscard_AddLep1ov3Met')
-        bin[srNJet][stb][htb][p['varname']][bkg['sample']+"+1"] = getPlotFromChain(bkg['chain'], plots[1]['var'], p['bin'], cutString = "&&".join([presel_1,Cut_1]), weight = weight_str+"lepToDiscard_eleSF*lepToDiscard_muSF*weight*"+str(lumi)+"/3000", binningIsExplicit=False, addOverFlowBin='both')
-      bla_Name, Cut = nameAndCut(stb, htbin, nJet, btb=c_tt['cut'], presel="(1)", btagVar =  btagVarString,stVar ='DL_ST_lepToKeep_AddLep1ov3Met')
-      bla_Name, Cut_1 = nameAndCut(stb, htbin, nJet, btb=c_tt['cut'], presel="(1)", btagVar =  btagVarString,stVar ='DL_ST_lepToDiscard_AddLep1ov3Met')
-      weight_str = lepSel['trigWeight']+"*"+bkg['weight']+"*lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*puReweight_true_max4*TopPtWeight*"
-      bin[srNJet][stb][htb][p['varname']][c_tt['sample']] = getPlotFromChain(c_tt['chain'], p['var'], p['bin'], cutString = "&&".join([presel,not_diLep,Cut]), weight = weight_str+"LepToKeep_muSF*LepToKeep_eleSF*weight*"+str(lumi)+"/3000", binningIsExplicit=False, addOverFlowBin='both')
-      bin[srNJet][stb][htb][p['varname']][c_tt['sample']+"+1"] = getPlotFromChain(c_tt['chain'], plots[1]['var'], p['bin'], cutString = "&&".join([presel_1,not_diLep,Cut_1]), weight = weight_str+"lepToDiscard_eleSF*lepToDiscard_muSF*weight*"+str(lumi)+"/3000", binningIsExplicit=False, addOverFlowBin='both')
-      bin[srNJet][stb][htb][p['varname']][c_tt['sample']+'diLep'] = getPlotFromChain(c_tt['chain'], p['var'], p['bin'], cutString = "&&".join([presel,diLep,Cut]), weight = weight_str+"LepToKeep_muSF*LepToKeep_eleSF*weight*"+str(lumi)+"/3000", binningIsExplicit=False, addOverFlowBin='both')
-      bin[srNJet][stb][htb][p['varname']][c_tt['sample']+'diLep+1'] = getPlotFromChain(c_tt['chain'], plots[1]['var'], p['bin'], cutString = "&&".join([presel_1,diLep,Cut_1]), weight = weight_str+"lepToDiscard_eleSF*lepToDiscard_muSF*weight*"+str(lumi)+"/3000", binningIsExplicit=False, addOverFlowBin='both')
-      bla_Name, Cut = nameAndCut(stb, htbin, nJet, btb=(0,0), presel="(1)", btagVar =  btagVarString , stVar ='DL_ST_lepToKeep_AddLep1ov3Met')
-      bla_Name, Cut_1 = nameAndCut(stb, htbin, nJet, btb=(0,0), presel="(1)", btagVar =  btagVarString , stVar ='DL_ST_lepToDiscard_AddLep1ov3Met')
+        print bkg['name']
+        bla_Name, Cut = nameAndCut(stb, htb, srNJet, btb=bkg['cut'], presel=presel, btagVar =  btagVarString, stVar ='DL_ST_lepToKeep_AddLep1ov3Met', htVar = 'DL_HT_lepToKeep_AddLep1ov3Met', njetVar= 'DL_nJet_lepToKeep_AddLep1ov3Met')
+        print Cut
+        #weight_str = '*'.join([trigger_scale,reweight])
+        weight_str = weight_str_plot
+        bin[srNJet][stb][htb][p['varname']][bkg['sample']] = getPlotFromChain(bkg['chain'], p['var'], p['bin'], cutString = "&&".join([presel,bkg["add_Cut"],Cut]), weight = "*".join([weight_str,bkg["weight"]]), binningIsExplicit=False, addOverFlowBin='both')
+        bla_Name, Cut_1 = nameAndCut(stb, htb, srNJet, btb=bkg['cut'], presel=presel, btagVar =  btagVarString, stVar ='DL_ST_lepToDiscard_AddLep1ov3Met', htVar = 'DL_HT_lepToDiscard_AddLep1ov3Met' , njetVar = 'DL_nJet_lepToDiscard_AddLep1ov3Met')
+        print Cut_1
+        bin[srNJet][stb][htb][p['varname']][bkg['sample']+"+1"] = getPlotFromChain(bkg['chain'], plots[1]['var'], p['bin'], cutString = "&&".join([bkg["add_Cut"],Cut_1]), weight = "*".join([weight_str,bkg["weight"]]), binningIsExplicit=False, addOverFlowBin='both')
+      bla_Name, Cut = nameAndCut(stb, htb, srNJet, btb=nbtag, presel=data_presel, btagVar =  btagVarString , stVar ='DL_ST_lepToKeep_AddLep1ov3Met' , htVar = 'DL_HT_lepToKeep_AddLep1ov3Met', njetVar= 'DL_nJet_lepToKeep_AddLep1ov3Met')
+      bla_Name, Cut_1 = nameAndCut(stb, htb, srNJet, btb=nbtag, presel=data_presel, btagVar =  btagVarString , stVar ='DL_ST_lepToDiscard_AddLep1ov3Met', htVar = 'DL_HT_lepToDiscard_AddLep1ov3Met' , njetVar = 'DL_nJet_lepToDiscard_AddLep1ov3Met')
       print "data Cut:" , "&&".join([data_presel,Cut])
-      bin[srNJet][stb][htb][p['varname']]['data'] = getPlotFromChain(lepSel['chain'], p['var'], p['bin'], cutString = "&&".join([data_presel,Cut]) , weight = "(1)", binningIsExplicit=False, addOverFlowBin='both')
-      bin[srNJet][stb][htb][p['varname']]['data+1'] = getPlotFromChain(lepSel['chain'], plots[1]['var'], p['bin'], cutString = "&&".join([data_presel_1,Cut_1]) , weight = "(1)", binningIsExplicit=False, addOverFlowBin='both')
+      bin[srNJet][stb][htb][p['varname']]['data'] = getPlotFromChain(lepSel['chain'], p['var'], p['bin'], cutString = Cut , weight = "(1)", binningIsExplicit=False, addOverFlowBin='both')
+      bin[srNJet][stb][htb][p['varname']]['data+1'] = getPlotFromChain(lepSel['chain'], plots[1]['var'], p['bin'], cutString = Cut_1 , weight = "(1)", binningIsExplicit=False, addOverFlowBin='both')
       bin[srNJet][stb][htb]['label'] = Name
       bin[srNJet][stb][htb]['path'] = path+Name
 
@@ -127,12 +118,9 @@ for srNJet in sorted(SR):
       h_Stack = ROOT.THStack('h_Stack','h_Stack')
       for bkg in bkg_samples:
         color = bkg['color']
-        #histo = bin[srNJet][stb][htb][p['varname']][bkg['sample']+"+1"]
-        #histo.SetFillColor(color)
-        #h_Stack.Add(histo)
-        #del histo
         histo = bin[srNJet][stb][htb][p['varname']][bkg['sample']]
         histo.Add(bin[srNJet][stb][htb][p['varname']][bkg['sample']+"+1"])
+        #histo.Scale(2)
         histo.SetFillColor(color)
         histo.SetLineColor(ROOT.kBlack)
         histo.SetLineWidth(2)
@@ -147,38 +135,8 @@ for srNJet in sorted(SR):
         leg.AddEntry(histo, bkg['tex'],"f")
         h_Stack.Add(histo)
         del histo
-      #histo = bin[srNJet][stb][htb][p['varname']][c_tt['sample']+"+1"]
-      #histo.SetFillColor(ROOT.kBlue-4)
-      #h_Stack.Add(histo)
-      #del histo
-      histo = bin[srNJet][stb][htb][p['varname']][c_tt['sample']]
-      histo.Add(bin[srNJet][stb][htb][p['varname']][c_tt['sample']+"+1"])
-      histo.SetFillColor(ROOT.kBlue-4)
-      histo.SetLineColor(ROOT.kBlack)
-      histo.SetLineWidth(2)
-      histo.GetXaxis().SetTitle(p['xaxis'])
-      histo.SetTitle("")
-      histo.GetYaxis().SetTitleSize(2) 
-      h_Stack.Add(histo)
-      leg.AddEntry(histo, 'tt rest',"f")
-      del histo
-      #histo = bin[srNJet][stb][htb][p['varname']][c_tt['sample']+'diLep+1']
-      #histo.SetFillColor(c_tt_diLep['color'])
-      #h_Stack.Add(histo)
-      #del histo
-      histo = bin[srNJet][stb][htb][p['varname']][c_tt['sample']+'diLep']
-      histo.Add(bin[srNJet][stb][htb][p['varname']][c_tt['sample']+'diLep+1'])
-      histo.SetFillColor(c_tt_diLep['color'])
-      histo.SetLineColor(ROOT.kBlack)
-      histo.SetLineWidth(2)
-      histo.GetXaxis().SetTitle(p['xaxis'])
-      histo.SetTitle("")
-      histo.GetYaxis().SetTitleSize(2) 
-      h_Stack.Add(histo)
-      leg.AddEntry(histo, 'tt diLep',"f")
       h_Stack.Draw("Bar")
-      #h_Stack.SetAxisRange(0.11,(h_Stack.GetMaximum())*(5),"Y")
-      maximum = h_Stack.GetMaximum()*5
+      maximum = h_Stack.GetMaximum()*1.2
       h_Stack.SetMaximum(maximum)
       h_Stack.SetMinimum(0.11)
       color = ROOT.kBlack
@@ -186,7 +144,7 @@ for srNJet in sorted(SR):
       h_data = bin[srNJet][stb][htb][p['varname']]['data']
       h_data.Add(h_data_1)
       h_data.SetMarkerStyle(20)
-      h_data.SetMarkerSize(1.8)
+      h_data.SetMarkerSize(1.2)
       h_data.SetLineColor(color)
       h_data.GetXaxis().SetTitle(p['xaxis'])
       h_data.SetTitle("")
@@ -194,7 +152,7 @@ for srNJet in sorted(SR):
       h_data.GetYaxis().SetLabelSize(0.05)
       h_data.Draw("E1P")
       print "data mean:" , h_data.GetMean()
-      h_data.SetAxisRange(0.11,(h_Stack.GetMaximum())*(5),"Y")
+      h_data.SetAxisRange(0.11,(h_Stack.GetMaximum())*(1.2),"Y")
       #h_data.SetMaximum(200)
       #h_data.SetMinimum(0.11)
       h_Stack.Draw("HistoSame")
@@ -212,10 +170,10 @@ for srNJet in sorted(SR):
       leg.SetFillColor(0)
       leg.Draw()
       latex.DrawLatex(0.16,0.958,"#font[22]{CMS}"+" #font[12]{Preliminary}")
-      latex.DrawLatex(0.75,0.958,"#bf{L=2.3 fb^{-1} (13 TeV)}")
+      latex.DrawLatex(0.75,0.958,"#bf{L=2.2 fb^{-1} (13 TeV)}")
       #if nJet[1] == -1: latex.DrawLatex(0.6,0.83,"N_{Jets}#geq"+str(nJet[0]))
       #if nJet[1] != -1: latex.DrawLatex(0.6,0.83,str(nJet[0])+"#leqN_{Jets}#leq"+str(nJet[1]))
-      latex.DrawLatex(0.6,0.88,"#bf{N_{bjets}="+str(nbTags[0])+"}")
+      latex.DrawLatex(0.6,0.88,"#bf{N_{bjets}>=1}")
       Pad1.RedrawAxis()
       cb.cd()
       Pad2 = ROOT.TPad("Pad2", "Pad2",  0, 0.04, 1, 0.35)
@@ -230,7 +188,7 @@ for srNJet in sorted(SR):
       Func.SetLineColor(2)
       h_ratio = h_data.Clone('h_ratio')
       h_ratio.SetMinimum(0.0)
-      h_ratio.SetMaximum(4)
+      h_ratio.SetMaximum(2)
       h_ratio.Sumw2()
       h_ratio.SetStats(0)
       h_ratio.Divide(stack_hist)
@@ -249,12 +207,12 @@ for srNJet in sorted(SR):
       h_ratio.GetYaxis().SetLabelSize(0.1)
       h_ratio.Draw("E1")
       print "mean:" , h_ratio.GetMean()
-      h_ratio.SaveAs(bin[srNJet][stb][htb]['path']+'_'+p['varname']+'_allWeights_diLep_4_Ratio.root')
+      h_ratio.SaveAs(bin[srNJet][stb][htb]['path']+'_'+p['varname']+'_allWeights_diLep_4_Ratio_lg1b.root')
       Func.Draw("same")
       cb.Draw()
-      cb.SaveAs(bin[srNJet][stb][htb]['path']+'_'+p['varname']+'_allWeights_diLep_4_.png')
-      cb.SaveAs(bin[srNJet][stb][htb]['path']+'_'+p['varname']+'_allWeights_diLep_4_.pdf')
-      cb.SaveAs(bin[srNJet][stb][htb]['path']+'_'+p['varname']+'_allWeights_diLep_4_.root')
+      cb.SaveAs(bin[srNJet][stb][htb]['path']+'_'+p['varname']+'_diLep_lg1b_nJet3.png')
+      cb.SaveAs(bin[srNJet][stb][htb]['path']+'_'+p['varname']+'_diLep_lg1b_nJet3.pdf')
+      cb.SaveAs(bin[srNJet][stb][htb]['path']+'_'+p['varname']+'_diLep_lg1b_nJet3.root')
       cb.Clear()
       del h_Stack
             
