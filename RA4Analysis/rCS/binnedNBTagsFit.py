@@ -35,7 +35,7 @@ def binnedNBTagsFit(cut, cutname, samples, prefix = "", QCD_dict={0:{'y':0.,'e':
     #hQCD.SetBinContent(n+1,QCD_dict[n]['y'])
 
     qcdErr = QCD_dict[n]['e']
-    if isnan(qcdErr): qcdErr = QCD_dict[n]['totalY_err']
+    #if isnan(qcdErr): qcdErr = QCD_dict[n]['totalY_err'] #maybe implement later - changes result
     if isnan(qcdErr): qcdErr = QCD_dict[n]['y'] #if QCD pred error is nan set the error to 100%
 
     if QCDup: hQCD.SetBinContent(n+1, QCD_dict[n]['y'] + QCD_dict[n]['e'])
@@ -403,16 +403,17 @@ def binnedNBTagsFit(cut, cutname, samples, prefix = "", QCD_dict={0:{'y':0.,'e':
   c1.Print(printDir+'/'+prefix+'_nBTagFitRes.pdf')
   c1.Print(printDir+'/'+prefix+'_nBTagFitRes.root')
   
-  print yield_TTJets.getVal()
-  
-  fit_res = model_PosPdg.fitTo(data_PosPdg, rf.Save())
-  cov_m = fit_res.covarianceMatrix()
-  cor_m = fit_res.correlationMatrix()
-
-  cov_m.Print()
-  cor_m.Print()
-  
-  print yield_TTJets.getVal()
+  # used to print the matrices
+  #print yield_TTJets.getVal()
+  #
+  #fit_res = model_PosPdg.fitTo(data_PosPdg, rf.Save())
+  #cov_m = fit_res.covarianceMatrix()
+  #cor_m = fit_res.correlationMatrix()
+  #
+  #cov_m.Print()
+  #cor_m.Print()
+  #
+  #print yield_TTJets.getVal()
   
   del c1
   del nllComponents

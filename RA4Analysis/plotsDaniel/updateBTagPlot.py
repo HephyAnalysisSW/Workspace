@@ -1,6 +1,8 @@
 import ROOT
 import pickle, os
 
+from Workspace.RA4Analysis.helpers import *
+
 ROOT.gROOT.LoadMacro('../../HEPHYPythonTools/scripts/root/tdrstyle.C')
 ROOT.setTDRStyle()
 
@@ -13,32 +15,58 @@ c = f.Get('c1')
 
 c.Draw()
 
-can1 = ROOT.TCanvas('can1','can1',650,500)
-can2 = ROOT.TCanvas('can2','can2',650,650)
 
-can1.cd()
-
+can1 = ROOT.TCanvas('mycan1','mycan1',650,500)
 p1 = c.GetPrimitive('c1_2')
-#p2 = c.GetPrimitive('c1_2')
-
 p1.SetPad(0,0,1,1)
-#can1.cd()
+p1.SetName('myp1')
 p1.Draw()
-#p1.cd()
 
-frame1 = p1.GetPrimitive('frame_5a85cd0')
-curve1 = p1.GetPrimitive('model_NegPdg_Norm[nBJetMediumCSV30]')
-curve2 = p1.GetPrimitive('model_NegPdg_Norm[nBJetMediumCSV30]_Comp[model_WJets_NegPdg]')
-curve3 = p1.GetPrimitive('model_NegPdg_Norm[nBJetMediumCSV30]_Comp[model_TTJets]')
-curve4 = p1.GetPrimitive('model_NegPdg_Norm[nBJetMediumCSV30]_Comp[model_Rest_NegPdg]')
-curve5 = p1.GetPrimitive('model_NegPdg_Norm[nBJetMediumCSV30]_Comp[model_QCD]')
-h_d = p1.GetPrimitive('h_data')
+can3 = ROOT.TCanvas('mycan3','mycan3',650,500)
+p2 = c.GetPrimitive('c1_1')
+p2.SetPad(0,0,1,1)
+p2.SetName('myp2')
+p2.Draw()
 
-can2.cd()
+curve1_1 = p1.GetPrimitive('model_NegPdg_Norm[nBJetMediumCSV30]')
+curve2_1 = p1.GetPrimitive('model_NegPdg_Norm[nBJetMediumCSV30]_Comp[model_WJets_NegPdg]')
+curve3_1 = p1.GetPrimitive('model_NegPdg_Norm[nBJetMediumCSV30]_Comp[model_TTJets]')
+curve4_1 = p1.GetPrimitive('model_NegPdg_Norm[nBJetMediumCSV30]_Comp[model_Rest_NegPdg]')
+curve5_1 = p1.GetPrimitive('model_NegPdg_Norm[nBJetMediumCSV30]_Comp[model_QCD]')
+h_d_1 = p1.GetPrimitive('h_data')
 
-#frame1.Draw()
+curve1_2 = p2.GetPrimitive('model_PosPdg_Norm[nBJetMediumCSV30]')
+curve2_2 = p2.GetPrimitive('model_PosPdg_Norm[nBJetMediumCSV30]_Comp[model_WJets_PosPdg]')
+curve3_2 = p2.GetPrimitive('model_PosPdg_Norm[nBJetMediumCSV30]_Comp[model_TTJets]')
+curve4_2 = p2.GetPrimitive('model_PosPdg_Norm[nBJetMediumCSV30]_Comp[model_Rest_PosPdg]')
+curve5_2 = p2.GetPrimitive('model_PosPdg_Norm[nBJetMediumCSV30]_Comp[model_QCD]')
+h_d_2 = p2.GetPrimitive('h_data')
+
+curve1 = ROOT.RooCurve('total','total',curve1_1,curve1_2)
+curve2 = ROOT.RooCurve('wjets','wjets',curve2_1,curve2_2)
+curve3 = ROOT.RooCurve('ttjets','ttjets',curve3_1,curve3_2)
+curve4 = ROOT.RooCurve('rest','rest',curve4_1,curve4_2)
+curve5 = ROOT.RooCurve('qcd','qcd',curve5_1,curve5_2)
+h_d = ROOT.RooHist(h_d_1, h_d_2)
+
+curve1.SetLineStyle(2)
+curve2.SetLineColor(color('wjets'))
+curve3.SetLineColor(color('ttjets')-2)
+curve4.SetLineColor(color('dy'))
+curve5.SetLineColor(color('qcd'))
+
+h_d.SetLineWidth(5)
+h_d.SetMarkerSize(1.3)
+curve1.SetLineWidth(5)
+curve2.SetLineWidth(5)
+curve3.SetLineWidth(5)
+curve4.SetLineWidth(5)
+curve5.SetLineWidth(5)
+
+can2 = ROOT.TCanvas('mycan2','mycan2',650,650)
+
 h_t = ROOT.TH1F('h_t','h_t',3,0,3)
-h_t.SetMaximum(150)
+h_t.SetMaximum(250)
 
 h_t.GetXaxis().SetTitle('n_{b-tag}')
 h_t.GetXaxis().SetTitleSize(0.065)
@@ -70,9 +98,11 @@ latex1.SetTextAlign(11)
 latex1.DrawLatex(0.16,0.96,'CMS #bf{#it{Preliminary}}')
 latex1.DrawLatex(0.75,0.96,"2.2fb^{-1} (13TeV)")
 
-if curve5: lowerBound = 0.70
-else: lowerBound = 0.75
-leg = ROOT.TLegend(0.72,lowerBound,0.98,0.95)
+#if curve5_1:
+#  lowerBound = 0.70
+#else:
+#  lowerBound = 0.75
+leg = ROOT.TLegend(0.72,0.7,0.98,0.95)
 leg.SetFillColor(ROOT.kWhite)
 leg.SetShadowColor(ROOT.kWhite)
 leg.SetBorderSize(1)

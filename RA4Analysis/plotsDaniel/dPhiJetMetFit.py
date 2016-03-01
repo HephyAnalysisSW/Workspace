@@ -31,7 +31,16 @@ from Workspace.RA4Analysis.cmgTuples_Data25ns_miniAODv2_postprocessed import *
 #from Workspace.RA4Analysis.cmgTuples_Spring15_50ns_postProcessed import *
 from Workspace.HEPHYPythonTools.user import username
 
-QCDestimate = pickle.load(file('/data/dspitzbart/Results2016/QCDEstimation/20160212_QCDestimation_MC2p25fb_pkl'))
+#QCDestimate = pickle.load(file('/data/dspitzbart/Results2016/QCDEstimation/20160212_QCDestimation_MC2p25fb_pkl'))
+QCDestimate = pickle.load(file('/data/dspitzbart/Results2016/QCDEstimation/20160212_QCDestimation_data2p25fb_pkl'))
+
+def setNiceBinLabel(hist, signalRegions):
+  i = 1
+  for njb in sorted(signalRegions):
+    for stb in sorted(signalRegions[njb]):
+      for htb in sorted(signalRegions[njb][stb]):
+        hist.GetXaxis().SetBinLabel(i,'#splitline{'+signalRegions[njb][stb][htb]['njet']+'}{#splitline{'+signalRegions[njb][stb][htb]['LT']+'}{'+signalRegions[njb][stb][htb]['HT']+'}}')
+        i += 1
 
 def makeWeight(lumi=4., sampleLumi=3.,debug=False, reWeight='lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*TopPtWeight*0.94'):
   #reWeight = 'lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*TopPtWeight*0.94'
@@ -69,6 +78,8 @@ TTandWJets = {'name':'TTJets', 'chain':getChain([TTJets_combined,WJetsHTToLNu_25
 #EWK = {'name':'EWK', 'chain':getChain([WJetsHT_25ns,TTJets_HTLO_25ns,singleTop_25ns,DY_25ns,TTV_25ns],histname=''), 'color':color('DY'),'weight':'weight', 'niceName':'EWK'}
 
 Data = {'name':'data', 'chain':getChain([single_mu_Run2015D, single_ele_Run2015D],histname=''), 'color':ROOT.kBlack,'weight':'weight', 'niceName':'data', 'cut':False}
+#Data = {'name':'data', 'chain':getChain([TTJets_combined,WJetsHTToLNu_25ns,DY_25ns,singleTop_25ns,QCDHT_25ns,TTV_25ns],histname=''), 'color':ROOT.kBlack,'weight':'weight', 'niceName':'data', 'cut':False}
+
 
 lumi = 2.25
 sampleLumi = 3.
@@ -128,11 +139,17 @@ one = ROOT.TH1F('one','one',13,0,13)
 bins = {}
 i = 1
 
-for srNJet in signalRegions:
+for srNJet in sorted(signalRegions):
   bins[srNJet] = {}
-  for stb in signalRegions[srNJet]:
+  Qname, Qcut = nameAndCut((250,-1),(500,-1),(4,-1),btb=(0,-1),presel=newpresel)
+  QCDcut = {'name':Qname,'string':Qcut+'&&singleElectronic&&abs(leptonEta)<2.4','niceName':'L_{T} [250,350), H_{T} [500,-1)'}
+  varQ = varList[0]
+  template_QCD = getPlotFromChain(QCD['chain'], varQ['name'], varQ['binning'], QCDcut['string'], weight_str)
+  y_QCD = template_QCD.Integral()
+  if template_QCD.Integral()>0: template_QCD.Scale(1./template_QCD.Integral())
+  for stb in sorted(signalRegions[srNJet]):
     bins[srNJet][stb] ={}
-    for htb in signalRegions[srNJet][stb]:
+    for htb in sorted(signalRegions[srNJet][stb]):
       deltaPhiCut = signalRegions[srNJet][stb][htb]['deltaPhi']
       name, cut = nameAndCut(stb,htb,srNJet,btb=(0,0),presel=newpresel)
       cut = {'name':name,'string':cut+'&&singleElectronic&&abs(leptonEta)<2.4','niceName':'L_{T} [250,350), H_{T} [500,-1)'}
@@ -146,7 +163,7 @@ for srNJet in signalRegions:
         #template_WJets_PosPdg = getPlotFromChain(WJETS['chain'], var['name'], var['binning'], binCut['string']+'&&leptonPdg>0', weight_str)
         #template_WJets_NegPdg = getPlotFromChain(WJETS['chain'], var['name'], var['binning'], binCut['string']+'&&leptonPdg<0', weight_str)
         
-        template_QCD = getPlotFromChain(QCD['chain'], var['name'], var['binning'], binCut['string'], weight_str)
+        #template_QCD = getPlotFromChain(QCD['chain'], var['name'], var['binning'], binCut['string'], weight_str)
         #template_QCD_PosPdg = getPlotFromChain(QCD['chain'], var['name'], var['binning'], binCut['string'], weight_str)
         #template_QCD_PosPdg.Scale(0.5)
         #template_QCD_NegPdg = template_QCD_PosPdg
@@ -169,7 +186,7 @@ for srNJet in signalRegions:
         y_TTJets = template_TTJets.Integral()
         y_TTandWJets = template_TTandWJets.Integral()
         y_WJets = template_WJets.Integral()
-        y_QCD = template_QCD.Integral()
+        #y_QCD = template_QCD.Integral()
         y_Rest = template_Rest.Integral()
         #y_Rest_PosPdg = template_Rest_PosPdg.Integral()
         #y_Rest_NegPdg = template_Rest_NegPdg.Integral()
@@ -191,7 +208,7 @@ for srNJet in signalRegions:
         template_Rest.Scale(1./template_Rest.Integral())
         #template_Rest_PosPdg.Scale(1./template_Rest_PosPdg.Integral())
         #template_Rest_NegPdg.Scale(1./template_Rest_NegPdg.Integral())
-        if template_QCD.Integral()>0: template_QCD.Scale(1./template_QCD.Integral())
+        #if template_QCD.Integral()>0: template_QCD.Scale(1./template_QCD.Integral())
         #template_QCD_PosPdg.Scale(1./template_QCD_PosPdg.Integral())
         #template_QCD_NegPdg.Scale(1./template_QCD_NegPdg.Integral())
         
@@ -359,6 +376,7 @@ for srNJet in signalRegions:
         QCD_LP.SetBinError(i, QCDestimate[srNJet][stb][htb][(0,0)][deltaPhiCut]['NQCDpred_err'])
         QCD_DPJM.SetBinContent(i, yield_QCD.getVal())
         QCD_DPJM.SetBinError(i, yield_QCD.getError())
+#        print 'yield QCD pred',QCDestimate[(4,5)][stb][htb][(1,1)][deltaPhiCut]['NQCDpred']
         one.SetBinContent(i,1)
         i = i+1
         fit = {'WJets':yield_WJets.getVal(), 'TTJets':yield_TTJets.getVal(), 'Rest':yield_Rest.getVal(), 'QCD':yield_QCD.getVal(), 'QCDerr':yield_QCD.getError(), 'TTandWJetsComb':yield_TTandWJets.getVal()}
@@ -409,19 +427,48 @@ for srNJet in signalRegions:
         #fitFrame_NegPdg.GetXaxis().SetTitle(var['titleX'])
         #fitFrame_NegPdg.Draw()
         
-        c3=ROOT.TCanvas("c3","templates",650,500)
+        ROOT.setTDRStyle()
+        ROOT.gStyle.SetPalette(1)
+        c3=ROOT.TCanvas("c3","templates",650,650)
+        allTemplates = [template_TTJets, template_WJets, template_QCD, template_Rest]
         template_TTJets.SetLineColor(color('ttjets')-2)
+        template_TTJets.GetXaxis().SetTitle('#Delta#Phi(j_{1},#slash{E}_{T})')
+        template_TTJets.GetYaxis().SetTitle('a.u.')
         template_TTJets.SetMaximum(0.4)
         template_WJets.SetLineColor(color('wjets'))
         template_QCD.SetLineColor(color('qcd'))
-        template_TTandWJets.SetLineColor(ROOT.kMagenta)
-        
+        template_Rest.SetLineColor(color('dy'))
+        #template_TTandWJets.SetLineColor(ROOT.kMagenta)
+        for temp in allTemplates:
+          temp.SetLineWidth(2)
+          temp.SetMarkerSize(0)
         template_TTJets.Draw('hist e1')
         template_WJets.Draw('hist e1 same')
         template_QCD.Draw('hist e1 same')
-        template_TTandWJets.Draw('hist e1 same')
+        template_Rest.Draw('hist e1 same')
         
+        leg = ROOT.TLegend(0.16,0.75,0.4,0.95)
+        leg.SetFillColor(ROOT.kWhite)
+        leg.SetShadowColor(ROOT.kWhite)
+        leg.SetBorderSize(1)
+        leg.SetTextSize(0.04)
+        leg.AddEntry(template_TTJets, 'W+jets', 'l')
+        leg.AddEntry(template_WJets, 't#bar{t}+jets', 'l')
+        leg.AddEntry(template_QCD, 'QCD', 'l')
+        leg.AddEntry(template_Rest, 'other', 'l')
+
+        leg.Draw()
         
+        latex1 = ROOT.TLatex()
+        latex1.SetNDC()
+        latex1.SetTextSize(0.04)
+        latex1.SetTextAlign(11)
+        
+        latex1.DrawLatex(0.16,0.96,'CMS #bf{#it{Simulation}}')
+        latex1.DrawLatex(0.85,0.96,"(13TeV)")
+
+
+
         ROOT.setTDRStyle()
         ROOT.gStyle.SetPalette(1)
         c4=ROOT.TCanvas("c4","correlation",650,500)
@@ -449,22 +496,43 @@ for srNJet in signalRegions:
         
         
         c2.Print(printDir+specialName+name+'_'+var['fileName']+'_fit.png')
+        c2.Print(printDir+specialName+name+'_'+var['fileName']+'_fit.root')
         c3.Print(printDir+specialName+name+'_'+var['fileName']+'_templates.png')
+        c3.Print(printDir+specialName+name+'_'+var['fileName']+'_templates.pdf')
+        c3.Print(printDir+specialName+name+'_'+var['fileName']+'_templates.root')
         c4.Print(printDir+specialName+name+'_'+var['fileName']+'_correlation.png')
 
 QCD_DPJM.Divide(QCD_LP)
 
-c5=ROOT.TCanvas("c5","ratio",650,500)
-QCD_DPJM.SetMaximum(3.)
+c5=ROOT.TCanvas("c5","ratio",650,650)
+QCD_DPJM.SetMaximum(5.)
 QCD_DPJM.SetMinimum(0.)
 QCD_DPJM.SetLineColor(ROOT.kAzure+9)
 QCD_DPJM.SetMarkerColor(ROOT.kAzure+9)
 
-QCD_DPJM.GetYaxis().SetTitle('f(L_{P})/f(#Delta#Phi(j_{1},#slash{E}_{T}))')
+QCD_DPJM.GetYaxis().SetTitle('QCD_{fit}(#Delta#Phi(j_{1},#slash{E}_{T}))/QCD_{fit}(L_{P})')
 
-QCD_DPJM.Draw('E1P')
+QCD_DPJM.GetYaxis().SetTitleSize(0.045)
+QCD_DPJM.GetYaxis().SetTitleOffset(1.7)
+
+QCD_DPJM.GetYaxis().SetLabelSize(0.045)
+QCD_DPJM.GetXaxis().SetLabelSize(0.04)
+
+setNiceBinLabel(QCD_DPJM, signalRegions)
+
+QCD_DPJM.Draw('E0P')
 one.Draw('hist same')
 
-c5.Print(printDir+specialName+name+'_'+var['fileName']+'_ratio.png')
+latex1 = ROOT.TLatex()
+latex1.SetNDC()
+latex1.SetTextSize(0.04)
+latex1.SetTextAlign(11)
+
+latex1.DrawLatex(0.16,0.96,'CMS #bf{#it{Preliminary}}')
+latex1.DrawLatex(0.75,0.96,"2.2fb^{-1}(13TeV)")
+
+c5.Print(printDir+specialName+'MB_data_'+var['fileName']+'_ratio.png')
+c5.Print(printDir+specialName+'MB_data_'+var['fileName']+'_ratio.root')
+c5.Print(printDir+specialName+'MB_data_'+var['fileName']+'_ratio.pdf')
 
 
