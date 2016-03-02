@@ -123,6 +123,38 @@ for srNJet in sorted(signalRegions):
 print '\\hline\end{tabular}}\end{center}\caption{Closure table for the background in the 0-tag regions, 2.3fb$^{-1}$}\label{tab:0b_totalClosure}\end{table}'
 
 
+#closure table
+print "Closure table"
+print
+print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrr|rrr|rrr|rrr|rrr|rrr|}\\hline'
+print ' \\njet     & \LT & \HT     &\multicolumn{6}{c|}{$tt+$Jets}&\multicolumn{6}{c|}{$W+$ Jets}&\multicolumn{3}{c|}{Other EW bkg.}&\multicolumn{6}{c|}{total bkg.}\\\%\hline'
+print ' & $[$GeV$]$ &$[$GeV$]$&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c|}{simulation}&\multicolumn{3}{c}{prediction}&\multicolumn{3}{c|}{simulation} \\\\\hline'
+
+secondLine = False
+for srNJet in sorted(signalRegions):
+  print '\\hline'
+  if secondLine: print '\\hline'
+  secondLine = True
+  print '\multirow{'+str(rowsNJet[srNJet]['n'])+'}{*}{\\begin{sideways}$'+varBin(srNJet)+'$\end{sideways}}'
+  for stb in sorted(signalRegions[srNJet]):
+    print '&\multirow{'+str(rowsSt[srNJet][stb]['n'])+'}{*}{$'+varBin(stb)+'$}'
+    first = True
+    for htb in sorted(signalRegions[srNJet][stb]):
+      if not first: print '&'
+      first = False
+      print '&$'+varBin(htb)+'$'
+      print ' & '+getNumString(res[srNJet][stb][htb]['TT_pred'], res[srNJet][stb][htb]['TT_pred_err'])\
+           +' & '+getNumString(res[srNJet][stb][htb]['TT_truth'], res[srNJet][stb][htb]['TT_truth_err'])\
+           +' & '+getNumString(res[srNJet][stb][htb]['W_pred'], res[srNJet][stb][htb]['W_pred_err'])\
+           +' & '+getNumString(res[srNJet][stb][htb]['W_truth'], res[srNJet][stb][htb]['W_truth_err'])\
+           +' & '+getNumString(res[srNJet][stb][htb]['Rest_truth'], res[srNJet][stb][htb]['Rest_truth_err'])\
+           +' & '+getNumString(res[srNJet][stb][htb]['tot_pred'], res[srNJet][stb][htb]['tot_pred_err'])\
+           +' & '+getNumString(res[srNJet][stb][htb]['tot_truth'], res[srNJet][stb][htb]['tot_truth_err']) +'\\\\'
+      if htb[1] == -1 : print '\\cline{2-24}'
+print '\\hline\end{tabular}}\end{center}\caption{Closure table for the background in the 0-tag regions without using kappa factors, 2.3fb$^{-1}$}\label{tab:0b_totalClosure}\end{table}'
+
+
+
 #QCD closure table
 print "Closure table"
 print
