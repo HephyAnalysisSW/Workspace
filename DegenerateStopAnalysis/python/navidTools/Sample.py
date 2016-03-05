@@ -1,13 +1,32 @@
 
+import ROOT
+import math
+#from Plot import Plot, Plots
+from Workspace.HEPHYPythonTools.helpers import getChain
 
 
 class Sample(dict):
   #def __init__(self, *args, **kwargs):
   #  super(Sample, self).__init__(*args, **kwargs)
-  def __init__(self, name,tree,isSignal=0,isData=0,color=0,lineColor=0,weight="weight", **kwargs):
-    super(Sample, self).__init__(name=name,tree=tree,isSignal=isSignal, isData=isData,color=color ,weight=weight,**kwargs)
+  def __init__(self, name,tree=None,sample=None, isSignal=0,isData=0,color=0,lineColor=0,triggers="",filters="",weight="weight", **kwargs):
+    super(Sample, self).__init__(name=name,tree=tree,sample=sample, isSignal=isSignal, isData=isData,color=color ,triggers=triggers, filters=filters,weight=weight,**kwargs)
     self.__dict__ = self 
+
+    #print self
+    #bool(self.tree) ^ bool(self.sample) , "Provide either a tree, or sampleDic in the form of {'bins'=[], 'dir':/path/to/bins/, 'name':SampleName}"
+   
+    if self.tree:
+        pass
+    if self.sample:
+        if not self.tree:
+            self.tree = getChain(self.sample,histname='')
+        else:
+            print "Will use the provided tree"
+        self.dir  = self.sample['dir']
+
     self.tree.SetLineColor(self.color)
+    #self.plots=Plots()
+    self.plots={}
 
 
 
@@ -29,7 +48,7 @@ class Samples(dict):
         data_name = self[d]['name']
         data_lumi = self[d]['lumi']
         weight_name = data_name +"_weight"
-        print "--------- data_weight will be created for MC samples using the data lumi:  %s fb-1 "%data_lumi
+        print "--------- %s will be created for MC samples using the data lumi:  %s fb-1 "%(weight_name, data_lumi)
         for samp in self:
           if not self[samp].isData:
             self[samp][weight_name] = "({w})*({dlumi})/({mclumi})".format(w=self[samp].weight, dlumi=data_lumi, mclumi=self[samp].lumi)

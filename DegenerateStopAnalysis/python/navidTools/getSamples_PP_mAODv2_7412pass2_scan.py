@@ -2,8 +2,9 @@ import ROOT
 from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYieldFromChain, getChunks
 from Workspace.DegenerateStopAnalysis.navidTools.Sample import Sample, Samples
 from Workspace.DegenerateStopAnalysis.colors import colors
-
 import Workspace.DegenerateStopAnalysis.cmgTuplesPostProcessed_mAODv2_scan as cmgTuplesPostProcessed
+
+import weights
 #-------------------------
 
 
@@ -48,11 +49,11 @@ def getSamples(wtau=False,sampleList=['w','tt','z','sig'], useHT=False, getData=
     htString = "HT" if useHT else "Inc"
     if any( [x in sampleList for x in ["s30", "s30FS","s10FS","s60FS" , "t2tt30FS"]] ):
         sampleDict.update({
-              "s30":            {'sample': cmgPP.T2DegStop_300_270[skim]                ,'name':'S300_270'        ,'color':colors["s30"     ]           , 'isSignal':1 ,'isData':0    ,"lumi":mc_lumi      },# ,'sumWeights':T2Deg[1] ,'xsec':8.51615    },
-              "s60FS":          {'sample': cmgPP.T2DegStop_300_240_FastSim[skim]        ,'name':'S300_240Fast'      ,'color':colors["s60FS"   ]           , 'isSignal':1 ,'isData':0    ,"lumi":mc_lumi   ,"triggers":""   ,"filters":""   ,"weight":"(weight*0.3520 )"   },# ,'sumWeights':T2Deg[1] ,'xsec':8.51615    },
-              "s30FS":          {'sample': cmgPP.T2DegStop_300_270_FastSim[skim]        ,'name':'S300_270Fast'      ,'color':colors["s30FS"   ]           , 'isSignal':1 ,'isData':0    ,"lumi":mc_lumi   ,"triggers":""   ,"filters":""   ,"weight":"(weight*0.2647 )"   },# ,'sumWeights':T2Deg[1] ,'xsec':8.51615    },
-              "s10FS":          {'sample': cmgPP.T2DegStop_300_290_FastSim[skim]        ,'name':'S300_290Fast'      ,'color':colors["s10FS"   ]           , 'isSignal':1 ,'isData':0    ,"lumi":mc_lumi   ,"triggers":""   ,"filters":""   ,"weight":"(weight*0.2546 )"   },# ,'sumWeights':T2Deg[1] ,'xsec':8.51615    },
-              "t2tt30FS":       {'sample': cmgPP.T2tt_300_270_FastSim[skim]             ,'name':'T2tt300_270Fast'   ,'color':colors["t2tt30FS"]           , 'isSignal':1 ,'isData':0    ,"lumi":mc_lumi   ,"triggers":""   ,"filters":""   ,"weight":"(weight*0.2783 )"   },# ,'sumWeights':T2Deg[1] ,'xsec':8.51615    },
+              "s30":            {'sample': cmgPP.T2DegStop_300_270[skim]                ,'name':'S300_270'        ,'color':colors["s30"     ]           , 'isSignal':1 ,'isData':0    ,"lumi":mc_lumi      },# ,'sumWeights':T2Deg[1] ,'xsec':8.51615    },  "weight":weights.isrWeight(9.5e-5)
+              "s60FS":          {'sample': cmgPP.T2DegStop_300_240_FastSim[skim]        ,'name':'S300_240Fast'      ,'color':colors["s60FS"   ]           , 'isSignal':1 ,'isData':0    ,"lumi":mc_lumi   ,"triggers":""   ,"filters":""   ,"weight":"(weight*0.3520*(%s))"%weights.isrWeight(9.5e-5)   },# ,'sumWeights':T2Deg[1] ,'xsec':8.51615    },
+              "s30FS":          {'sample': cmgPP.T2DegStop_300_270_FastSim[skim]        ,'name':'S300_270Fast'      ,'color':colors["s30FS"   ]           , 'isSignal':1 ,'isData':0    ,"lumi":mc_lumi   ,"triggers":""   ,"filters":""   ,"weight":"(weight*0.2647*(%s))"%weights.isrWeight(9.5e-5)   },# ,'sumWeights':T2Deg[1] ,'xsec':8.51615    },
+              "s10FS":          {'sample': cmgPP.T2DegStop_300_290_FastSim[skim]        ,'name':'S300_290Fast'      ,'color':colors["s10FS"   ]           , 'isSignal':1 ,'isData':0    ,"lumi":mc_lumi   ,"triggers":""   ,"filters":""   ,"weight":"(weight*0.2546*(%s))"%weights.isrWeight(9.5e-5)   },# ,'sumWeights':T2Deg[1] ,'xsec':8.51615    },
+              "t2tt30FS":       {'sample': cmgPP.T2tt_300_270_FastSim[skim]             ,'name':'T2tt300_270Fast'   ,'color':colors["t2tt30FS"]           , 'isSignal':1 ,'isData':0    ,"lumi":mc_lumi   ,"triggers":""   ,"filters":""   ,"weight":"(weight*0.2783*(%s))"%weights.isrWeight(9.5e-5)   },# ,'sumWeights':T2Deg[1] ,'xsec':8.51615    },
                           })
     if "w" in sampleList:
         WJetsSample     = cmgPP.WJetsHT[skim] if useHT else cmgPP.WJetsInc[skim]
@@ -120,14 +121,15 @@ def getSamples(wtau=False,sampleList=['w','tt','z','sig'], useHT=False, getData=
 
 
     if scan:
-        icolor = 100
+        icolor = 1
+        #skim = "inc"
         for mstop in mass_dict:
             #if mstop > 300 : continue
             for mlsp in mass_dict[mstop]:
-                        icolor += 1 
+                        #icolor += 1 
                         sampleDict.update({
                             #'s%s_%s'%(mstop,mlsp):      {'sample':eval("SMS_T2_4bd_mStop_%s_mLSP_%s"%(mstop,mlsp))[skim]        ,'name':'T2_4bd%s_%s'%(mstop,mlsp)          ,'color': icolor         , 'isSignal':1 ,'isData':0    ,"lumi":mc_lumi      } ,
-                            's%s_%s'%(mstop,mlsp):      {'sample':getattr(cmgPP,"SMS_T2_4bd_mStop_%s_mLSP_%s"%(mstop,mlsp))[skim]        ,'name':'T2_4bd%s_%s'%(mstop,mlsp)          ,'color': icolor         , 'isSignal':1 ,'isData':0    ,"lumi":mc_lumi      } ,
+                            's%s_%s'%(mstop,mlsp):      {'sample':getattr(cmgPP,"SMS_T2_4bd_mStop_%s_mLSP_%s"%(mstop,mlsp))[skim]        ,'name':'T2_4bd%s_%s'%(mstop,mlsp)         , "weight":weights.isrWeight(9.5e-5) ,'color': icolor         , 'isSignal':1 ,'isData':0    ,"lumi":mc_lumi      } ,
                                             })
 
 
