@@ -398,26 +398,42 @@ fi
 
 
 
-#if true
-#then
-#
-#   python cmgPostProcessing_v1.py $OVERWRITE --leptonSelection=inc  --logLevel=INFO --processingTag=$PROC_TAG --cmgTuples=RunIISpring15DR74_25ns $PRESEL --processSamples=SMS_T2_4bd_mStop_300_mLSP_220to290                             --processSignalScan 300 220  &
-#   python cmgPostProcessing_v1.py $OVERWRITE --leptonSelection=inc  --logLevel=INFO --processingTag=$PROC_TAG --cmgTuples=RunIISpring15DR74_25ns $PRESEL --processSamples=SMS_T2_4bd_mStop_300_mLSP_220to290                             --processSignalScan 300 230  &
-#   python cmgPostProcessing_v1.py $OVERWRITE --leptonSelection=inc  --logLevel=INFO --processingTag=$PROC_TAG --cmgTuples=RunIISpring15DR74_25ns $PRESEL --processSamples=SMS_T2_4bd_mStop_300_mLSP_220to290                             --processSignalScan 300 240  &
-#   python cmgPostProcessing_v1.py $OVERWRITE --leptonSelection=inc  --logLevel=INFO --processingTag=$PROC_TAG --cmgTuples=RunIISpring15DR74_25ns $PRESEL --processSamples=SMS_T2_4bd_mStop_300_mLSP_220to290                             --processSignalScan 300 250  &
-#   python cmgPostProcessing_v1.py $OVERWRITE --leptonSelection=inc  --logLevel=INFO --processingTag=$PROC_TAG --cmgTuples=RunIISpring15DR74_25ns $PRESEL --processSamples=SMS_T2_4bd_mStop_300_mLSP_220to290                             --processSignalScan 300 260  &
-#   python cmgPostProcessing_v1.py $OVERWRITE --leptonSelection=inc  --logLevel=INFO --processingTag=$PROC_TAG --cmgTuples=RunIISpring15DR74_25ns $PRESEL --processSamples=SMS_T2_4bd_mStop_300_mLSP_220to290                             --processSignalScan 300 270  &
-#   python cmgPostProcessing_v1.py $OVERWRITE --leptonSelection=inc  --logLevel=INFO --processingTag=$PROC_TAG --cmgTuples=RunIISpring15DR74_25ns $PRESEL --processSamples=SMS_T2_4bd_mStop_300_mLSP_220to290                             --processSignalScan 300 280  &
-#   python cmgPostProcessing_v1.py $OVERWRITE --leptonSelection=inc  --logLevel=INFO --processingTag=$PROC_TAG --cmgTuples=RunIISpring15DR74_25ns $PRESEL --processSamples=SMS_T2_4bd_mStop_300_mLSP_220to290                             --processSignalScan 300 290  &
-#
-#
-#   python cmgPostProcessing_v1.py $OVERWRITE --leptonSelection=inc $PRESEL --logLevel=INFO --processingTag=$PROC_TAG --cmgTuples=Data_25ns --processSamples=MET_Run2015D_05Oct            &
-#   python cmgPostProcessing_v1.py $OVERWRITE --leptonSelection=inc $PRESEL --logLevel=INFO --processingTag=$PROC_TAG --cmgTuples=Data_25ns --processSamples=MET_Run2015D_v4               &
-#
-#
-#fi
+if true
+then
+
+    #python cmgPostProcessing_v1.py $OVERWRITE --leptonSelection=inc  --logLevel=INFO --processingTag=$PROC_TAG --cmgTuples=RunIISpring15DR74_25ns $PRESEL --processSamples=SMS_T2_4bd_mStop_325_mLSP_245to315   --processSignalScan 325 245  &
+    #python cmgPostProcessing_v1.py $OVERWRITE --leptonSelection=inc  --logLevel=INFO --processingTag=$PROC_TAG --cmgTuples=RunIISpring15DR74_25ns $PRESEL --processSamples=SMS_T2_4bd_mStop_325_mLSP_245to315   --processSignalScan 325 255  &
+    #python cmgPostProcessing_v1.py $OVERWRITE --leptonSelection=inc  --logLevel=INFO --processingTag=$PROC_TAG --cmgTuples=RunIISpring15DR74_25ns $PRESEL --processSamples=SMS_T2_4bd_mStop_325_mLSP_245to315   --processSignalScan 325 265  &
+    #python cmgPostProcessing_v1.py $OVERWRITE --leptonSelection=inc  --logLevel=INFO --processingTag=$PROC_TAG --cmgTuples=RunIISpring15DR74_25ns $PRESEL --processSamples=SMS_T2_4bd_mStop_325_mLSP_245to315   --processSignalScan 325 275  &
+    #python cmgPostProcessing_v1.py $OVERWRITE --leptonSelection=inc  --logLevel=INFO --processingTag=$PROC_TAG --cmgTuples=RunIISpring15DR74_25ns $PRESEL --processSamples=SMS_T2_4bd_mStop_325_mLSP_245to315   --processSignalScan 325 285  &
+    #python cmgPostProcessing_v1.py $OVERWRITE --leptonSelection=inc  --logLevel=INFO --processingTag=$PROC_TAG --cmgTuples=RunIISpring15DR74_25ns $PRESEL --processSamples=SMS_T2_4bd_mStop_325_mLSP_245to315   --processSignalScan 325 295  &
+    #python cmgPostProcessing_v1.py $OVERWRITE --leptonSelection=inc  --logLevel=INFO --processingTag=$PROC_TAG --cmgTuples=RunIISpring15DR74_25ns $PRESEL --processSamples=SMS_T2_4bd_mStop_325_mLSP_245to315   --processSignalScan 325 305  &
+    #python cmgPostProcessing_v1.py $OVERWRITE --leptonSelection=inc  --logLevel=INFO --processingTag=$PROC_TAG --cmgTuples=RunIISpring15DR74_25ns $PRESEL --processSamples=SMS_T2_4bd_mStop_325_mLSP_245to315   --processSignalScan 325 315  &
+    
+
+    #python cmgPostProcessing_v1.py $OVERWRITE --leptonSelection=inc  --logLevel=INFO --processingTag=$PROC_TAG --cmgTuples=RunIISpring15DR74_25ns $PRESEL --processSamples=SMS_T2_4bd_mStop_350_mLSP_270to340   --processSignalScan 350 270  &
+    #python cmgPostProcessing_v1.py $OVERWRITE --leptonSelection=inc  --logLevel=INFO --processingTag=$PROC_TAG --cmgTuples=RunIISpring15DR74_25ns $PRESEL --processSamples=SMS_T2_4bd_mStop_350_mLSP_270to340   --processSignalScan 350 280  &
+    #python cmgPostProcessing_v1.py $OVERWRITE --leptonSelection=inc  --logLevel=INFO --processingTag=$PROC_TAG --cmgTuples=RunIISpring15DR74_25ns $PRESEL --processSamples=SMS_T2_4bd_mStop_350_mLSP_270to340   --processSignalScan 350 290  &
+    #python cmgPostProcessing_v1.py $OVERWRITE --leptonSelection=inc  --logLevel=INFO --processingTag=$PROC_TAG --cmgTuples=RunIISpring15DR74_25ns $PRESEL --processSamples=SMS_T2_4bd_mStop_350_mLSP_270to340   --processSignalScan 350 300  &
+    #python cmgPostProcessing_v1.py $OVERWRITE --leptonSelection=inc  --logLevel=INFO --processingTag=$PROC_TAG --cmgTuples=RunIISpring15DR74_25ns $PRESEL --processSamples=SMS_T2_4bd_mStop_350_mLSP_270to340   --processSignalScan 350 310  &
+    #python cmgPostProcessing_v1.py $OVERWRITE --leptonSelection=inc  --logLevel=INFO --processingTag=$PROC_TAG --cmgTuples=RunIISpring15DR74_25ns $PRESEL --processSamples=SMS_T2_4bd_mStop_350_mLSP_270to340   --processSignalScan 350 320  &
+    #python cmgPostProcessing_v1.py $OVERWRITE --leptonSelection=inc  --logLevel=INFO --processingTag=$PROC_TAG --cmgTuples=RunIISpring15DR74_25ns $PRESEL --processSamples=SMS_T2_4bd_mStop_350_mLSP_270to340   --processSignalScan 350 330  &
+    #python cmgPostProcessing_v1.py $OVERWRITE --leptonSelection=inc  --logLevel=INFO --processingTag=$PROC_TAG --cmgTuples=RunIISpring15DR74_25ns $PRESEL --processSamples=SMS_T2_4bd_mStop_350_mLSP_270to340   --processSignalScan 350 340  &
+    
+  
+    
+    #python cmgPostProcessing_v1.py $OVERWRITE --leptonSelection=inc  --logLevel=INFO --processingTag=$PROC_TAG --cmgTuples=RunIISpring15DR74_25ns $PRESEL --processSamples=SMS_T2_4bd_mStop_375_mLSP_295to365   --processSignalScan 375 295  &
+    #python cmgPostProcessing_v1.py $OVERWRITE --leptonSelection=inc  --logLevel=INFO --processingTag=$PROC_TAG --cmgTuples=RunIISpring15DR74_25ns $PRESEL --processSamples=SMS_T2_4bd_mStop_375_mLSP_295to365   --processSignalScan 375 305  &
+    #python cmgPostProcessing_v1.py $OVERWRITE --leptonSelection=inc  --logLevel=INFO --processingTag=$PROC_TAG --cmgTuples=RunIISpring15DR74_25ns $PRESEL --processSamples=SMS_T2_4bd_mStop_375_mLSP_295to365   --processSignalScan 375 315  &
+    #python cmgPostProcessing_v1.py $OVERWRITE --leptonSelection=inc  --logLevel=INFO --processingTag=$PROC_TAG --cmgTuples=RunIISpring15DR74_25ns $PRESEL --processSamples=SMS_T2_4bd_mStop_375_mLSP_295to365   --processSignalScan 375 325  &
+    #python cmgPostProcessing_v1.py $OVERWRITE --leptonSelection=inc  --logLevel=INFO --processingTag=$PROC_TAG --cmgTuples=RunIISpring15DR74_25ns $PRESEL --processSamples=SMS_T2_4bd_mStop_375_mLSP_295to365   --processSignalScan 375 335  &
+    #python cmgPostProcessing_v1.py $OVERWRITE --leptonSelection=inc  --logLevel=INFO --processingTag=$PROC_TAG --cmgTuples=RunIISpring15DR74_25ns $PRESEL --processSamples=SMS_T2_4bd_mStop_375_mLSP_295to365   --processSignalScan 375 345  &
+    #python cmgPostProcessing_v1.py $OVERWRITE --leptonSelection=inc  --logLevel=INFO --processingTag=$PROC_TAG --cmgTuples=RunIISpring15DR74_25ns $PRESEL --processSamples=SMS_T2_4bd_mStop_375_mLSP_295to365   --processSignalScan 375 355  &
+    #python cmgPostProcessing_v1.py $OVERWRITE --leptonSelection=inc  --logLevel=INFO --processingTag=$PROC_TAG --cmgTuples=RunIISpring15DR74_25ns $PRESEL --processSamples=SMS_T2_4bd_mStop_375_mLSP_295to365   --processSignalScan 375 365  &
 
 
+
+fi
 
 wait
 echo ------------------------------------------ DONE --------------------------------------------------

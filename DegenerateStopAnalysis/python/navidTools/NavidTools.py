@@ -1233,14 +1233,14 @@ class Yields():
 
     def makeLatexTable(self,table=None):
         if not table:
-            table = self.FOMtable
+            table = self.FOMTable
         ret = " \\\\\n".join([" & ".join(map(str,line)) for line in table])
         print ret
         return ret
 
     def pprint(self, table=None, nSpaces=17, align="<"):
         if not table:
-            table = self.FOMtable
+            table = self.FOMTable
         block = "| {:%s%s}"%(align,nSpaces)
         #ret = [( block*len(line) ).format(*map(lambda x: "%s"%x,line)) for line in a.T]
         ret = [( block*len(line) ).format(*line) for line in table]
