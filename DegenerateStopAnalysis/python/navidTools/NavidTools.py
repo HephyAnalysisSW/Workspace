@@ -10,7 +10,7 @@ from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYi
 from Workspace.DegenerateStopAnalysis.navidTools.getRatioPlot import *
 from Workspace.DegenerateStopAnalysis.navidTools.FOM import *
 
-from Workspace.HEPHYPythonTools.RootTools.u_float import u_float
+from Workspace.HEPHYPythonTools.u_float import u_float
 
 #execfile('../../../python/navidTools/FOM.py')
 #execfile('../../../python/navidTools/getRatioPlot.py')
