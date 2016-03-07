@@ -1232,14 +1232,14 @@ class Yields():
             sum(sys.getsizeof(v) for v in self.__dict__.values())
 
     def makeLatexTable(self,table=None):
-        if not table:
+        if table is None:
             table = self.FOMTable
         ret = " \\\\\n".join([" & ".join(map(str,line)) for line in table])
         print ret
         return ret
 
     def pprint(self, table=None, nSpaces=17, align="<"):
-        if not table:
+        if table is None:
             table = self.FOMTable
         block = "| {:%s%s}"%(align,nSpaces)
         #ret = [( block*len(line) ).format(*map(lambda x: "%s"%x,line)) for line in a.T]

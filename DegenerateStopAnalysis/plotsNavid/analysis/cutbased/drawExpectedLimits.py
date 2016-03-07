@@ -5,7 +5,8 @@ import pickle
 import os
 
 
-limit_pickle = "./pkl/RunII_Reload_Scan_Limits_2260.pkl"
+#limit_pickle = "./pkl/RunII_Reload_Scan_Limits_2260.pkl"
+limit_pickle = "./pkl/limits_scan_isr_2200pbm1.pkl"
 
 limits = pickle.load(open(limit_pickle, "r"))
 
@@ -14,7 +15,8 @@ xyz = []
 for point in limits:
     if point in ['s30','s30FS','s10FS','s60FS','t2tt30FS']:
         continue
-    masses = point.replace("Reload_Inc_T2_4bd","").replace("s","")
+    #masses = point.replace("Reload_Inc_T2_4bd","").replace("s","")
+    masses = point.replace("isrrw_Reload_Inc_T2_4bd","").replace("_2200pbm1","")
     mstop, mlsp = masses.rsplit("_")[:2]
     #xyz.append( [ float(mstop),float(mlsp),float( limits[point][1]['0.500'] ) ]  )
     #xyz.append( [ float(mstop),float(mlsp),float( limits[point]['0.500'] ) ]  )
