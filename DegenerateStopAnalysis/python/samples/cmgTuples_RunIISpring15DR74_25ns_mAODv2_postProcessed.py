@@ -29,10 +29,13 @@ dir_cmgPostProcessing_Oct1 = '/data/nrad/cmgTuples/postProcessed_Spring15_vasile
 dir_cmgPostProcessing_v0 = \
     '/afs/hephy.at/user/v/vghete/vghete01/cmgTuples/postProcessed_mAODv2/v0/RunIISpring15DR74_25ns/inc'
 
+dir_cmgPostProcessing_7412pass2_v4_022116_sync_v0 = \
+    '/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/7412pass2_v4_022116_sync_v0/RunIISpring15DR74_25ns/inc'
+
 
 # set the actual ntuple directory 
 #
-ntuple_directory = dir_cmgPostProcessing_v0
+ntuple_directory = dir_cmgPostProcessing_7412pass2_v4_022116_sync_v0
 
 
 # definition of samples
@@ -54,9 +57,9 @@ if ntupleAvailable:
     WJetsToLNu_HT={\
         "name" : "WJetsToLNu_HT",
         "bins" : [
-            "WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2",
-            "WJetsToLNu_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2",
-            "WJetsToLNu_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2",
+            "WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
+            "WJetsToLNu_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",            
+            "WJetsToLNu_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
             "WJetsToLNu_HT-600ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
             ],
         'dir' : ntuple_directory,
