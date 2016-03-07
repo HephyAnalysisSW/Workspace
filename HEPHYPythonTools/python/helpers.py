@@ -147,7 +147,18 @@ def getChunks(sample,  maxN=-1):
         print "log file not found:  ", logfile
         failedChunks.append(chunks[i])
 #    except: print "Chunk",s,"could not be added"
-  eff = round(100*len(failedChunks)/float(len(chunks)),3)
+  try:
+    eff = round(100*len(failedChunks)/float(len(chunks)),3)
+  except ZeroDivisionError:
+    print "NO FILES FOUND"
+    print sample
+    print len(chunks) 
+    print chunks
+    print sample['dir']
+    len(chunks)
+    print "Failed Chunks:", failedChunks
+    assert False
+  
   print "Chunks: %i total, %i good (normalization constant %f), %i bad. Inefficiency: %f"%(len(chunks),len(goodChunks),sumWeights,len(failedChunks), eff)
   for s in failedChunks: 
     print "Failed:",s
