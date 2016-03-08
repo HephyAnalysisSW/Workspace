@@ -16,7 +16,7 @@ from predictionConfig import *
 
 ROOT.TH1F().SetDefaultSumw2()
 
-weight_str, weight_err_str = makeWeight(lumi, sampleLumi=sampleLumi)
+weight_str, weight_err_str = makeWeight(lumi, sampleLumi=sampleLumi, reWeight=MCweight)
 
 samples={'W':cWJets, 'TT':cTTJets, 'Rest':cRest, 'Bkg':cBkg, 'Data': cData}
 
@@ -106,7 +106,7 @@ for srNJet in signalRegions:
       
       #write out data yields in MB, edit for blinding policies
       if isData:
-        srName, srCut = nameAndCut(stb, htb, srNJet, btb=(0,0), presel=presel+"&& veto_evt_list", btagVar = nBTagVar)
+        srName, srCut = nameAndCut(stb, htb, srNJet, btb=(0,0), presel=presel, btagVar = nBTagVar)
         weight_str_sr = '(1)'
       else:
         srName, srCut = nameAndCut(stb, htb, srNJet, btb=None, presel=presel, btagVar = nBTagVar)

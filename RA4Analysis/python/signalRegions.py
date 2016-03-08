@@ -61,19 +61,19 @@ signalRegion3fbStaticDPhi = {(5, 5): {(250, 350): {(500, -1):   {'deltaPhi': 1.0
 #                             (350, 450): {(500, -1):  {'deltaPhi': 0.75}},
 #                             (450, -1): {(500, -1):   {'deltaPhi': 0.75}}}}
 
-signalRegion3fb = {(5, 5):  {(250, 350): {(500, -1):   {'deltaPhi': 1.0, 'njet':'5j','LT':'L_{T}1','HT': 'H_{T}i',      'tex':'\\textrm{5j}, \\textrm{L}_T1, \\textrm{H}_Ti'}},
-                             (350, 450): {(500, -1):   {'deltaPhi': 1.0, 'njet':'5j','LT':'L_{T}2','HT': 'H_{T}i',      'tex':'\\textrm{5j}, \\textrm{L}_T2, \\textrm{H}_Ti'}},
-                             (450, -1):  {(500, -1):   {'deltaPhi': 1.0, 'njet':'5j','LT':'L_{T}3','HT': 'H_{T}i',      'tex':'\\textrm{5j}, \\textrm{L}_T3, \\textrm{H}_Ti'}}},
-                   (6, 7):  {(250, 350): {(500, 750):  {'deltaPhi': 1.0, 'njet':'6-7j','LT':'L_{T}1','HT': 'H_{T}1',    'tex':'\\textrm{6-7j}, \\textrm{L}_T1, \\textrm{H}_T1'},
-                                          (750, -1):   {'deltaPhi': 1.0, 'njet':'6-7j','LT':'L_{T}1','HT': 'H_{T}23',   'tex':'\\textrm{6-7j}, \\textrm{L}_T1, \\textrm{H}_T23'}},
-                             (350, 450): {(500, 750):  {'deltaPhi': 1.0, 'njet':'6-7j','LT':'L_{T}2','HT': 'H_{T}1',    'tex':'\\textrm{6-7j}, \\textrm{L}_T2, \\textrm{H}_T1'},
-                                          (750, -1):   {'deltaPhi': 1.0, 'njet':'6-7j','LT':'L_{T}2','HT': 'H_{T}23',   'tex':'\\textrm{6-7j}, \\textrm{L}_T2, \\textrm{H}_T23'}},
-                             (450, -1):  {(500, 1000): {'deltaPhi': 0.75, 'njet':'6-7j','LT':'L_{T}3','HT': 'H_{T}12',  'tex':'\\textrm{6-7j}, \\textrm{L}_T3, \\textrm{H}_T12'},
-                                          (1000, -1):  {'deltaPhi': 0.75, 'njet':'6-7j','LT':'L_{T}3','HT': 'H_{T}3',   'tex':'\\textrm{6-7j}, \\textrm{L}_T3, \\textrm{H}_T3'}}},
-                   (8, -1): {(250, 350): {(500, 750):  {'deltaPhi': 1.0, 'njet':'#geq8j','LT':'L_{T}1','HT': 'H_{T}1',  'tex':'\geq\\textrm{8j}, \\textrm{L}_T1, \\textrm{H}_T1'},
-                                          (750, -1):   {'deltaPhi': 1.0, 'njet':'#geq8j','LT':'L_{T}1','HT': 'H_{T}23', 'tex':'\geq\\textrm{8j}, \\textrm{L}_T1, \\textrm{H}_T23'}},
-                             (350, 450): {(500, -1):   {'deltaPhi': 0.75, 'njet':'#geq8j','LT':'L_{T}2','HT': 'H_{T}i', 'tex':'\geq\\textrm{8j}, \\textrm{L}_T2, \\textrm{H}_Ti'}},
-                             (450, -1):  {(500, -1):   {'deltaPhi': 0.75, 'njet':'#geq8j','LT':'L_{T}3','HT': 'H_{T}i', 'tex':'\geq\\textrm{8j}, \\textrm{L}_T3, \\textrm{H}_Ti'}}}}
+signalRegion3fb = {(5, 5):  {(250, 350): {(500, -1):   {'deltaPhi': 1.0, 'njet':'5j','LT':'LT1','HT': 'HTi',      'tex':'\\textrm{LT1}, \\textrm{HTi}'}},
+                             (350, 450): {(500, -1):   {'deltaPhi': 1.0, 'njet':'5j','LT':'LT2','HT': 'HTi',      'tex':'\\textrm{LT2}, \\textrm{HTi}'}},
+                             (450, -1):  {(500, -1):   {'deltaPhi': 1.0, 'njet':'5j','LT':'LT3','HT': 'HTi',      'tex':'\\textrm{LT3}, \\textrm{HTi}'}}},
+                   (6, 7):  {(250, 350): {(500, 750):  {'deltaPhi': 1.0, 'njet':'6-7j','LT':'LT1','HT': 'HT1',    'tex':'\\textrm{LT1}, \\textrm{HT1}'},
+                                          (750, -1):   {'deltaPhi': 1.0, 'njet':'6-7j','LT':'LT1','HT': 'HT23',   'tex':'\\textrm{LT1}, \\textrm{HT23}'}},
+                             (350, 450): {(500, 750):  {'deltaPhi': 1.0, 'njet':'6-7j','LT':'LT2','HT': 'HT1',    'tex':'\\textrm{LT2}, \\textrm{HT1}'},
+                                          (750, -1):   {'deltaPhi': 1.0, 'njet':'6-7j','LT':'LT2','HT': 'HT23',   'tex':'\\textrm{LT2}, \\textrm{HT23}'}},
+                             (450, -1):  {(500, 1000): {'deltaPhi': 0.75, 'njet':'6-7j','LT':'LT3','HT': 'HT12',  'tex':'\\textrm{LT3}, \\textrm{HT12}'},
+                                          (1000, -1):  {'deltaPhi': 0.75, 'njet':'6-7j','LT':'LT3','HT': 'HT3',   'tex':'\\textrm{LT3}, \\textrm{HT3}'}}},
+                   (8, -1): {(250, 350): {(500, 750):  {'deltaPhi': 1.0, 'njet':'#geq8j','LT':'LT1','HT': 'HT1',  'tex':'\\textrm{LT1}, \\textrm{HT1}'},
+                                          (750, -1):   {'deltaPhi': 1.0, 'njet':'#geq8j','LT':'LT1','HT': 'HT23', 'tex':'\\textrm{LT1}, \\textrm{HT23}'}},
+                             (350, 450): {(500, -1):   {'deltaPhi': 0.75, 'njet':'#geq8j','LT':'LT2','HT': 'HTi', 'tex':'\\textrm{LT2}, \\textrm{HTi}'}},
+                             (450, -1):  {(500, -1):   {'deltaPhi': 0.75, 'njet':'#geq8j','LT':'LT3','HT': 'HTi', 'tex':'\\textrm{LT3}, \\textrm{HTi}'}}}}
 
 signalRegion3fbMerge = {(5, 5):  {(450, -1):  {(500, -1):   {'deltaPhi': 0.75, 'njet':'5j','LT':'L_{T}3','HT': 'H_{T}i'}}},
                         (6, 7):  {(450, -1):  {(500, 750):  {'deltaPhi': 0.75, 'njet':'6-7j','LT':'L_{T}3','HT': 'H_{T}12'},
@@ -101,15 +101,15 @@ validationRegion2 = {(4, 4):  {(250, -1): {(500, 750):   {'deltaPhi': 1.0, 'njet
                                            (750, 1000):  {'deltaPhi': 1.0, 'njet':'4j','LT':'L_{T}i','HT': 'H_{T}2'},
                                            (1000, -1):   {'deltaPhi': 1.0, 'njet':'4j','LT':'L_{T}i','HT': 'H_{T}3'}}}}
 
-validationRegionAll = {(4, 4):  {(250, 350): {(500, -1):   {'deltaPhi': 1.0, 'njet':'4j','LT':'L_{T}1','HT': 'H_{T}i'},
-                                              (500, 750):  {'deltaPhi': 1.0, 'njet':'4j','LT':'L_{T}1','HT': 'H_{T}1'},
-                                              (750, -1):   {'deltaPhi': 1.0, 'njet':'4j','LT':'L_{T}1','HT': 'H_{T}23'}},
-                                 (350, 450): {(500, -1):   {'deltaPhi': 1.0, 'njet':'4j','LT':'L_{T}2','HT': 'H_{T}i'},
-                                              (500, 750):  {'deltaPhi': 1.0, 'njet':'4j','LT':'L_{T}2','HT': 'H_{T}1'},
-                                              (750, -1):   {'deltaPhi': 1.0, 'njet':'4j','LT':'L_{T}2','HT': 'H_{T}23'}},
-                                 (450, -1):  {(500, -1):   {'deltaPhi': 1.0, 'njet':'4j','LT':'L_{T}3','HT': 'H_{T}i'},
-                                              (500, 1000): {'deltaPhi': 0.75, 'njet':'4j','LT':'L_{T}3','HT': 'H_{T}12'},
-                                              (1000, -1):  {'deltaPhi': 0.75, 'njet':'4j','LT':'L_{T}3','HT': 'H_{T}3'}}}}
+validationRegionAll = {(4, 4):  {(250, 350): {(500, -1):   {'deltaPhi': 1.0, 'njet':'4j','LT':'LT1','HT': 'HTi'},
+                                              (500, 750):  {'deltaPhi': 1.0, 'njet':'4j','LT':'LT1','HT': 'HT1'},
+                                              (750, -1):   {'deltaPhi': 1.0, 'njet':'4j','LT':'LT1','HT': 'HT23'}},
+                                 (350, 450): {(500, -1):   {'deltaPhi': 1.0, 'njet':'4j','LT':'LT2','HT': 'HTi'},
+                                              (500, 750):  {'deltaPhi': 1.0, 'njet':'4j','LT':'LT2','HT': 'HT1'},
+                                              (750, -1):   {'deltaPhi': 1.0, 'njet':'4j','LT':'LT2','HT': 'HT23'}},
+                                 (450, -1):  {(500, -1):   {'deltaPhi': 1.0, 'njet':'4j','LT':'LT3','HT': 'HTi'},
+                                              (500, 1000): {'deltaPhi': 0.75, 'njet':'4j','LT':'LT3','HT': 'HT12'},
+                                              (1000, -1):  {'deltaPhi': 0.75, 'njet':'4j','LT':'LT3','HT': 'HT3'}}}}
 
 newBins3fb = {(5, 5):  {(450, -1): {(500, -1):    {'deltaPhi': 0.75}}},
               (6, 7):  {(450, -1): {(500, 750):   {'deltaPhi': 0.75},

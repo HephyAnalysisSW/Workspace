@@ -13,7 +13,7 @@ ROOT.TH1F().SetDefaultSumw2()
 
 def makeTTPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, QCD=False):
   #print "in make tt prediction lumi is :" , lumi
-  weight_str, weight_err_str = makeWeight(lumi, sampleLumi)
+  weight_str, weight_err_str = makeWeight(lumi, sampleLumi, reWeight=MCweight)
   cWJets = samples['W']
   cTTJets = samples['TT']
   cRest = samples['Rest']
@@ -33,9 +33,9 @@ def makeTTPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, QCD=F
 
   if QCD:
     #Get QCD yields in CR for b-tag fit
-    QCD_dict={0:{'y':QCD[srNJet][stb][htb][(0,0)][dPhiCut]['NQCDpred_lowdPhi'], 'e':QCD[srNJet][stb][htb][(0,0)][dPhiCut]['NQCDpred_lowdPhi_err'], 'totalY':QCD[srNJet][stb][htb][(0,0)][dPhiCut]['NQCDpred']},\
-              1:{'y':QCD[srNJet][stb][htb][(1,1)][dPhiCut]['NQCDpred_lowdPhi'], 'e':QCD[srNJet][stb][htb][(1,1)][dPhiCut]['NQCDpred_lowdPhi_err'], 'totalY':QCD[srNJet][stb][htb][(1,1)][dPhiCut]['NQCDpred']},\
-              2:{'y':QCD[srNJet][stb][htb][(2,-1)][dPhiCut]['NQCDpred_lowdPhi'], 'e':QCD[srNJet][stb][htb][(2,-1)][dPhiCut]['NQCDpred_lowdPhi_err'], 'totalY':QCD[srNJet][stb][htb][(2,-1)][dPhiCut]['NQCDpred']}}
+    QCD_dict={0:{'y':QCD[srNJet][stb][htb][(0,0)][dPhiCut]['NQCDpred_lowdPhi'], 'e':QCD[srNJet][stb][htb][(0,0)][dPhiCut]['NQCDpred_lowdPhi_err'], 'totalY':QCD[srNJet][stb][htb][(0,0)][dPhiCut]['NQCDpred'], 'totalY_err':QCD[srNJet][stb][htb][(0,0)][dPhiCut]['NQCDpred_err']},\
+              1:{'y':QCD[srNJet][stb][htb][(1,1)][dPhiCut]['NQCDpred_lowdPhi'], 'e':QCD[srNJet][stb][htb][(1,1)][dPhiCut]['NQCDpred_lowdPhi_err'], 'totalY':QCD[srNJet][stb][htb][(1,1)][dPhiCut]['NQCDpred'], 'totalY_err':QCD[srNJet][stb][htb][(1,1)][dPhiCut]['NQCDpred_err']},\
+              2:{'y':QCD[srNJet][stb][htb][(2,-1)][dPhiCut]['NQCDpred_lowdPhi'], 'e':QCD[srNJet][stb][htb][(2,-1)][dPhiCut]['NQCDpred_lowdPhi_err'], 'totalY':QCD[srNJet][stb][htb][(2,-1)][dPhiCut]['NQCDpred'], 'totalY_err':QCD[srNJet][stb][htb][(2,-1)][dPhiCut]['NQCDpred_err']}}
     fit_srNJet_lowDPhi = binnedNBTagsFit(fit_srCut+"&&"+dPhiStr+"<"+str(dPhiCut), fit_srName+'_dPhi'+str(dPhiCut), samples = samples, prefix=fit_srName, QCD_dict=QCD_dict)
   else:
     fit_srNJet_lowDPhi = binnedNBTagsFit(fit_srCut+"&&"+dPhiStr+"<"+str(dPhiCut), fit_srName+'_dPhi'+str(dPhiCut), samples = samples, prefix=fit_srName)
@@ -114,9 +114,9 @@ def makeTTPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, QCD=F
 
   if isData:
     if QCD:
-      rCS_crLowNJet_1b = getRCS(cData, rCS_crLowNJet_Cut_1b+"&& veto_evt_list",  dPhiCut, weight = w, QCD_lowDPhi=QCD_lowDPhi, QCD_highDPhi=QCD_highDPhi, returnValues=True) #Low njet tt-jets CR to be orthoganl to DPhi 
+      rCS_crLowNJet_1b = getRCS(cData, rCS_crLowNJet_Cut_1b,  dPhiCut, weight = w, QCD_lowDPhi=QCD_lowDPhi, QCD_highDPhi=QCD_highDPhi, returnValues=True) #Low njet tt-jets CR to be orthoganl to DPhi 
     else:
-      rCS_crLowNJet_1b = getRCS(cData, rCS_crLowNJet_Cut_1b+"&& veto_evt_list",  dPhiCut, weight = w, returnValues=True)
+      rCS_crLowNJet_1b = getRCS(cData, rCS_crLowNJet_Cut_1b,  dPhiCut, weight = w, returnValues=True)
 
   else:
     if useQCDestimation:
@@ -141,7 +141,9 @@ def makeTTPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, QCD=F
       rCS_crLowNJet_1b = getRCS(cBkg, rCS_crLowNJet_Cut, dPhiCut, weight = weight_str_1b, returnValues=True)
 
   rCS_crLowNJet_1b_onlyTT = getRCS(cTTJets, rCS_crLowNJet_Cut,  dPhiCut, weight = weight_str_1bMC)
+  rCS_crLowNJet_0b_onlyTT = getRCS(cTTJets, rCS_crLowNJet_Cut,  dPhiCut, weight = weight_str_0bMC)
   rCS_srNJet_0b_onlyTT    = getRCS(cTTJets, rCS_sr_Cut,  dPhiCut, weight = weight_str_0bMC)
+  rCS_srNJet_1b_onlyTT    = getRCS(cTTJets, rCS_sr_Cut,  dPhiCut, weight = weight_str_1bMC)
 
   rd['yTT_srNJet_0b_lowDPhi']     = yTT_srNJet_0b_lowDPhi
   rd['yTT_Var_srNJet_0b_lowDPhi'] = yTT_Var_srNJet_0b_lowDPhi
@@ -160,9 +162,11 @@ def makeTTPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, QCD=F
     rd['yQCD_Var_srNJet_0b_lowDPhi']  = QCD_dict[0]['e']**2
     rd['yQCD_srNJet_0b']              = QCD_dict[0]['totalY']
   
+  rd['rCS_crLowNJet_0b_onlyTT'] = rCS_crLowNJet_0b_onlyTT
   rd['rCS_crLowNJet_1b']        = rCS_crLowNJet_1b
   rd['rCS_crLowNJet_1b_onlyTT'] = rCS_crLowNJet_1b_onlyTT
   rd['rCS_srNJet_0b_onlyTT']    = rCS_srNJet_0b_onlyTT
+  rd['rCS_srNJet_1b_onlyTT']    = rCS_srNJet_1b_onlyTT
 
   #true yields measured from MC samples
   truth_TT, truth_TT_var = getYieldFromChain(cTTJets, rCS_sr_Cut+"&&"+dPhiStr+">"+str(dPhiCut), weight = weight_str_0bMC, returnVar=True)

@@ -93,7 +93,7 @@ def walkPath(relpath):
   res=ls(relpath)
   if isCMGOutputDirectory(res):
     if options.verbose:print "Found CMG dir: %s"%relpath
-    print ' '.join(['getCMGFromDPM.py', '--usernameDPM='+options.usernameDPM, '--targetBaseDir'+options.targetBaseDir, '--targetSubDir='+suggestTargetDir(relpath), '--source='+relpath ])
+    print ' '.join(['getCMGFromDPM.py', '--usernameDPM='+options.usernameDPM, '--targetBaseDir='+options.targetBaseDir, '--targetSubDir='+suggestTargetDir(relpath), '--source='+relpath ])
   else:
     dirs = getDirs(res)
     if len(dirs)>0:

@@ -9,6 +9,18 @@ from Workspace.RA4Analysis.signalRegions import *
 
 from helpers import *
 
+from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed import *
+
+
+triggers = "(HLT_EleHT350||HLT_MuHT350)"
+#filters = "Flag_goodVertices && Flag_HBHENoiseFilter_fix && Flag_CSCTightHaloFilter && Flag_eeBadScFilter && Flag_HBHENoiseIsoFilter"
+filters = "Flag_goodVertices && Flag_HBHENoiseFilter_fix && Flag_eeBadScFilter && Flag_HBHENoiseIsoFilter && veto_evt_list"
+presel = "((!isData&&singleLeptonic)||(isData&&"+triggers+"&&((muonDataSet&&singleMuonic)||(eleDataSet&&singleElectronic))&&"+filters+"))"
+presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSoftLeptons==0 && Jet_pt[1]>80 && st>250 && nJet30>2 && htJet30j>500"
+
+MCweight = 'lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*0.94'
+
+
 ROOT.gROOT.LoadMacro('../../HEPHYPythonTools/scripts/root/tdrstyle.C')
 ROOT.setTDRStyle()
 
@@ -36,17 +48,25 @@ for srNJet in sorted(signalRegions):
   bins += rows
 
 baseDir = '/data/'+username+'/Results2016/'
-#QCD_upDir      = 'Prediction_SFtemplates_fullSR_lep_MC_QCDup_SF_QCDup_2.1/'
-#QCD_downDir    = 'Prediction_SFtemplates_fullSR_lep_MC_QCDdown_SF_QCDdown_2.1/'
-#QCD_nominalDir = 'Prediction_SFtemplates_fullSR_lep_MC_QCDzentral_SF_QCDzentral_2.1/'
+QCD_upDir      = 'Prediction_SFtemplates_fullSR_lep_MC_SF_QCD_noPU_QCDup_2p25/'
+QCD_downDir    = 'Prediction_SFtemplates_fullSR_lep_MC_SF_QCD_noPU_QCDdown_2p25/'
+QCD_nominalDir = 'Prediction_SFtemplates_fullSR_lep_MC_SF_QCD_noPU_2p25/'
 
-b_upDir       = 'Prediction_SFtemplates_validation_lep_MC_SF_b_Up_2p3/'
-b_downDir     = 'Prediction_SFtemplates_validation_lep_MC_SF_b_Down_2p3/'
-light_upDir   = 'Prediction_SFtemplates_validation_lep_MC_SF_light_Up_2p3/'
-light_downDir = 'Prediction_SFtemplates_validation_lep_MC_SF_light_Down_2p3/'
-nominalDir    = 'Prediction_SFtemplates_validation_lep_MC_SF_2p3/'
+b_upDir       = 'Prediction_SFtemplates_fullSR_lep_MC_SF_b_UpnoPUreweight_2p25/'
+b_downDir     = 'Prediction_SFtemplates_fullSR_lep_MC_SF_b_DownnoPUreweight_2p25/'
+light_upDir   = 'Prediction_SFtemplates_fullSR_lep_MC_SF_light_UpnoPUreweight_2p25/'
+light_downDir = 'Prediction_SFtemplates_fullSR_lep_MC_SF_light_DownnoPUreweight_2p25/'
+nominalDir    = 'Prediction_SFtemplates_fullSR_lep_MC_SFnoPUreweight_2p25/'
 
-savePkl = True
+topDir        = 'Prediction_SFtemplates_fullSR_lep_MC_SF_noTopPTweights2_2p25/'
+
+#b_upDir       = 'Prediction_SFtemplates_validation_lep_MC_SF_b_Up_2p3/'
+#b_downDir     = 'Prediction_SFtemplates_validation_lep_MC_SF_b_Down_2p3/'
+#light_upDir   = 'Prediction_SFtemplates_validation_lep_MC_SF_light_Up_2p3/'
+#light_downDir = 'Prediction_SFtemplates_validation_lep_MC_SF_light_Down_2p3/'
+#nominalDir    = 'Prediction_SFtemplates_validation_lep_MC_SF_2p3/'
+
+savePkl = False
 
 postfix = '_kappa_corrected'
 #postfix = ''
@@ -57,9 +77,11 @@ b_up =        pickle.load(file(baseDir+b_upDir+prefix+'_estimationResults_pkl'+p
 b_down =      pickle.load(file(baseDir+b_downDir+prefix+'_estimationResults_pkl'+postfix))
 nominal =     pickle.load(file(baseDir+nominalDir+prefix+'_estimationResults_pkl'+postfix))
 
-#qcd_up =      pickle.load(file(baseDir+QCD_upDir+prefix+'_estimationResults_pkl'+postfix))
-#qcd_down =    pickle.load(file(baseDir+QCD_downDir+prefix+'_estimationResults_pkl'+postfix))
-#qcd_nominal = pickle.load(file(baseDir+QCD_nominalDir+prefix+'_estimationResults_pkl'+postfix))
+qcd_up =      pickle.load(file(baseDir+QCD_upDir+prefix+'_estimationResults_pkl'+postfix))
+qcd_down =    pickle.load(file(baseDir+QCD_downDir+prefix+'_estimationResults_pkl'+postfix))
+qcd_nominal = pickle.load(file(baseDir+QCD_nominalDir+prefix+'_estimationResults_pkl'+postfix))
+
+top = pickle.load(file(baseDir+topDir+prefix+'_estimationResults_pkl'+postfix))
 
 varUp = []
 varDown = []
@@ -86,9 +108,14 @@ i = 1
 l_dict = {}
 b_dict = {}
 
+cWJets      = getChain(WJetsHTToLNu_25ns,histname='')
+cTTJets     = getChain(TTJets_combined,histname='')
+cBkg        = getChain([WJetsHTToLNu_25ns, TTJets_combined, singleTop_25ns, DY_25ns, TTV_25ns], histname='')#no QCD
+
 
 key = 'W_kappa'
-keys = ['TT_kappa','W_kappa','tot_pred']
+#keys = ['TT_kappa','W_kappa','tot_pred']
+keys = ['tot_pred']
 
 for key in keys:
   varUp = []
@@ -96,15 +123,18 @@ for key in keys:
   b_err = {}
   l_err = {}
   qcd_err = {}
+  top_err = {}
   i = 1
   for i_njb, srNJet in enumerate(sorted(signalRegions)): #just changed this Nov 4th, not sorted before!
     b_err[srNJet] = {}
     l_err[srNJet] = {}
     qcd_err[srNJet] = {}
+    top_err[srNJet] = {}
     for stb in sorted(signalRegions[srNJet]):
       b_err[srNJet][stb] = {}
       l_err[srNJet][stb] = {}
       qcd_err[srNJet][stb] = {}
+      top_err[srNJet][stb] = {}
       for htb in sorted(signalRegions[srNJet][stb]):
         print
         print '#############################################'
@@ -120,9 +150,31 @@ for key in keys:
         b_upDiff   = (b_up[srNJet][stb][htb][key]-nominal[srNJet][stb][htb][key])/nominal[srNJet][stb][htb][key]
         b_downDiff = (b_down[srNJet][stb][htb][key]-nominal[srNJet][stb][htb][key])/nominal[srNJet][stb][htb][key]
         print 'b/c up, down:', b_upDiff, b_downDiff
-        #qcd_upDiff = (qcd_up[srNJet][stb][htb][key]-qcd_nominal[srNJet][stb][htb][key])/qcd_nominal[srNJet][stb][htb][key]
-        #qcd_downDiff = (qcd_down[srNJet][stb][htb][key]-qcd_nominal[srNJet][stb][htb][key])/qcd_nominal[srNJet][stb][htb][key]
-        #print 'qcd up, down:', qcd_upDiff, qcd_downDiff
+        qcd_upDiff = (qcd_up[srNJet][stb][htb][key]-qcd_nominal[srNJet][stb][htb][key])/qcd_nominal[srNJet][stb][htb][key]
+        qcd_downDiff = (qcd_down[srNJet][stb][htb][key]-qcd_nominal[srNJet][stb][htb][key])/qcd_nominal[srNJet][stb][htb][key]
+        print 'qcd up, down:', qcd_upDiff, qcd_downDiff
+        
+        if key == 'tot_pred':
+          n, cut = nameAndCut(stb,htb, srNJet, btb=None, presel=presel)
+          truthPrime = getYieldFromChain(cBkg, cut+'&&deltaPhi_Wl>'+str(signalRegions[srNJet][stb][htb]['deltaPhi']), 'weightBTag0_SF*weight*(2.25/3.)*'+MCweight)
+          truth = getYieldFromChain(cBkg, cut+'&&deltaPhi_Wl>'+str(signalRegions[srNJet][stb][htb]['deltaPhi']), 'weightBTag0_SF*weight*TopPtWeight*(2.25/3.)*'+MCweight)
+          #print truthPrime, truth
+        
+          #w_truthPrime = getYieldFromChain(cWJets, cut+'&&deltaPhi_Wl>'+str(signalRegions[srNJet][stb][htb]['deltaPhi']), 'weightBTag0_SF*weight*(2.25/3.)*'+MCweight)
+          #w_truth = getYieldFromChain(cWJets, cut+'&&deltaPhi_Wl>'+str(signalRegions[srNJet][stb][htb]['deltaPhi']), 'weightBTag0_SF*weight*TopPtWeight*(2.25/3.)*'+MCweight)
+
+          #tt_truthPrime = getYieldFromChain(cTTJets, cut+'&&deltaPhi_Wl>'+str(signalRegions[srNJet][stb][htb]['deltaPhi']), 'weightBTag0_SF*weight*(2.25/3.)*'+MCweight)
+          #tt_truth = getYieldFromChain(cTTJets, cut+'&&deltaPhi_Wl>'+str(signalRegions[srNJet][stb][htb]['deltaPhi']), 'weightBTag0_SF*weight*TopPtWeight*(2.25/3.)*'+MCweight)
+          alt_top_diff = (abs((top[srNJet][stb][htb]['TT_kappa']-nominal[srNJet][stb][htb]['TT_kappa'])/nominal[srNJet][stb][htb]['TT_kappa'])*nominal[srNJet][stb][htb]['TT_pred'] + abs((top[srNJet][stb][htb]['W_kappa']-nominal[srNJet][stb][htb]['W_kappa'])/nominal[srNJet][stb][htb]['W_kappa'])*nominal[srNJet][stb][htb]['W_pred'])/nominal[srNJet][stb][htb]['tot_pred']
+                  
+          top_diff = (top[srNJet][stb][htb][key]/truthPrime)/(nominal[srNJet][stb][htb][key]/truth)-1
+          #w_top_diff = (top[srNJet][stb][htb]['W_pred']/w_truthPrime)/(nominal[srNJet][stb][htb]['W_pred']/w_truth)-1
+          #tt_top_diff = (top[srNJet][stb][htb]['TT_pred']/tt_truthPrime)/(nominal[srNJet][stb][htb]['TT_pred']/tt_truth)-1
+          print 'top delta:', top_diff
+          print 'alt top delta:', alt_top_diff
+          #print 'W', w_top_diff,top[srNJet][stb][htb]['W_pred'], w_truthPrime, nominal[srNJet][stb][htb]['W_pred'], w_truth
+          #print 'tt', tt_top_diff, top[srNJet][stb][htb]['TT_pred'], tt_truthPrime, nominal[srNJet][stb][htb]['TT_pred'], tt_truth
+        
         if sign(light_upDiff) == sign(light_downDiff): print '!!strange!!'
         if sign(light_upDiff)==1:
           light_pos = light_upDiff
@@ -147,14 +199,15 @@ for key in keys:
         b_Down_H.SetBinContent(i,b_neg)
         light_Up_H.SetBinContent(i,light_pos)
         light_Down_H.SetBinContent(i,light_neg)
-        #qcd_Up_H.SetBinContent(i,qcd_upDiff)
-        #qcd_Down_H.SetBinContent(i,qcd_downDiff)
+        qcd_Up_H.SetBinContent(i,qcd_upDiff)
+        qcd_Down_H.SetBinContent(i,qcd_downDiff)
   
         varUp.append(upDiff)
         varDown.append(-downDiff)
         b_err[srNJet][stb][htb] = (abs(b_upDiff)+abs(b_downDiff))/2
         l_err[srNJet][stb][htb] = (abs(light_upDiff)+abs(light_downDiff))/2
-        #qcd_err[srNJet][stb][htb] = (abs(qcd_upDiff)+abs(qcd_downDiff))/2
+        qcd_err[srNJet][stb][htb] = (abs(qcd_upDiff)+abs(qcd_downDiff))/2
+        top_err[srNJet][stb][htb] = top_diff
         i += 1
   
   can = ROOT.TCanvas('can','can',700,700)
@@ -209,13 +262,13 @@ for key in keys:
   light_Down_H.SetLineColor(ROOT.kBlue)
   light_Down_H.SetLineWidth(2)
   
-  #qcd_Up_H.SetLineColor(426)
-  #qcd_Up_H.SetMarkerStyle(0)
-  #qcd_Up_H.SetLineWidth(2)
-  #
-  #qcd_Down_H.SetLineColor(426+4)
-  #qcd_Down_H.SetMarkerStyle(0)
-  #qcd_Down_H.SetLineWidth(2)
+  qcd_Up_H.SetLineColor(426)
+  qcd_Up_H.SetMarkerStyle(0)
+  qcd_Up_H.SetLineWidth(2)
+  
+  qcd_Down_H.SetLineColor(426+4)
+  qcd_Down_H.SetMarkerStyle(0)
+  qcd_Down_H.SetLineWidth(2)
   
   
   for i in range(1,bins+1):
@@ -274,42 +327,43 @@ for key in keys:
   l_dict[key] = l_err
 
 
-#can2 = ROOT.TCanvas('can2','can2',700,700)
-#
-#qcd_Up_H.SetMinimum(-0.13)
-#qcd_Up_H.SetMaximum(0.13)
-#
-#
-#qcd_Up_H.Draw()
-#qcd_Down_H.Draw('same')
-##max_H.Draw('same')
-##min_H.Draw('same')
-#zero_H.Draw('same')
-#
-#can2.RedrawAxis()
-#
-#leg2 = ROOT.TLegend(0.65,0.85,0.98,0.95)
-#leg2.SetFillColor(ROOT.kWhite)
-#leg2.SetShadowColor(ROOT.kWhite)
-#leg2.SetBorderSize(1)
-#leg2.SetTextSize(0.04)
-#leg2.AddEntry(qcd_Up_H,'QCD up')
-#leg2.AddEntry(qcd_Down_H,'QCD down')
-#
-#leg2.Draw()
-#
-#latex1.DrawLatex(0.15,0.96,'CMS #bf{#it{simulation}}')
-#latex1.DrawLatex(0.68,0.96,"L=2.1fb^{-1} (13TeV)")
-#
-#setNiceBinLabel(qcd_Up_H, signalRegion3fb)
-#
-#qcd_Up_H.GetYaxis().SetTitle('#delta_{k}')
-#qcd_Up_H.GetXaxis().SetLabelSize(0.04)
-#qcd_Up_H.GetXaxis().SetTitle('')
+can2 = ROOT.TCanvas('can2','can2',700,700)
+
+qcd_Up_H.SetMinimum(-0.13)
+qcd_Up_H.SetMaximum(0.13)
+
+
+qcd_Up_H.Draw()
+qcd_Down_H.Draw('same')
+#max_H.Draw('same')
+#min_H.Draw('same')
+zero_H.Draw('same')
+
+can2.RedrawAxis()
+
+leg2 = ROOT.TLegend(0.65,0.85,0.98,0.95)
+leg2.SetFillColor(ROOT.kWhite)
+leg2.SetShadowColor(ROOT.kWhite)
+leg2.SetBorderSize(1)
+leg2.SetTextSize(0.04)
+leg2.AddEntry(qcd_Up_H,'QCD up')
+leg2.AddEntry(qcd_Down_H,'QCD down')
+
+leg2.Draw()
+
+latex1.DrawLatex(0.15,0.96,'CMS #bf{#it{simulation}}')
+latex1.DrawLatex(0.68,0.96,"L=2.1fb^{-1} (13TeV)")
+
+setNiceBinLabel(qcd_Up_H, signalRegion3fb)
+
+qcd_Up_H.GetYaxis().SetTitle('#delta_{k}')
+qcd_Up_H.GetXaxis().SetLabelSize(0.04)
+qcd_Up_H.GetXaxis().SetTitle('')
 
 if savePkl:
-  pickle.dump(b_dict, file(baseDir+'btagErr_pkl','w'))
-  pickle.dump(l_dict, file(baseDir+'mistagErr_pkl','w'))
-  #pickle.dump(qcd_err, file(baseDir+'qcdErr_pkl','w'))
+  pickle.dump(b_dict, file(baseDir+'btagErr_pkl_update','w'))
+  pickle.dump(l_dict, file(baseDir+'mistagErr_pkl_update','w'))
+  pickle.dump(qcd_err, file(baseDir+'qcdErr_pkl_update','w'))
+  pickle.dump(top_err, file(baseDir+'topErr_pkl_update','w'))
 
 

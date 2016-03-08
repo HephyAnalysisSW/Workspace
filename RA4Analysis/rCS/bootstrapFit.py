@@ -16,7 +16,7 @@ from predictionConfig import *
 
 ROOT.TH1F().SetDefaultSumw2()
 
-weight_str, weight_err_str = makeWeight(lumi, sampleLumi=sampleLumi)
+weight_str, weight_err_str = makeWeight(lumi, sampleLumi=sampleLumi, reWeight=MCweight)
 
 samples={'W':cWJets, 'TT':cTTJets, 'Rest':cRest, 'Bkg':cBkg, 'Data': cData}
 

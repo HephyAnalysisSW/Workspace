@@ -1,6 +1,10 @@
 import math 
 import ROOT
 
+from Workspace.HEPHYPythonTools.u_float import u_float
+
+
+
 ## --------------------------------------------------------------
 ##                        Figure of Merit Tools
 ## --------------------------------------------------------------
@@ -55,9 +59,23 @@ fomFuncs= {
                 "RATIO"       : RATIO ,  
             }
 
+def get_float(val):
+    try:
+        return float(val) 
+    except AttributeError:     #might be a u_float
+        return float(val.val)     
+    except ValueError:
+        if "+-" in val:
+            split = val.rsplit("+-")
+            return float( split[0] )
+
 def calcFOMs(s,b,sysUnc=0.2,fom=None):
-  s=float(s)
-  b=float(b)
+
+  s=get_float(s)
+  b=get_float(b)
+
+  #s=float(s)
+  #b=float(b)
   if fom: 
     return fomFuncs[fom](float(s),float(b),sysUnc)
   else:
@@ -92,6 +110,9 @@ def getFOMFromTH2F(sHist,bHist,fom="AMSSYS",sysUnc=0.2):
       fomHist.SetBinContent(x,y,fomVal) 
   return fomHist   
 
+
+
+
 def getFOMFromTH1F(sHist,bHist,fom="AMSSYS",sysUnc=0.2,debug=False,norm=False): 
     if debug:
         print sHist,bHist
@@ -104,7 +125,6 @@ def getFOMFromTH1F(sHist,bHist,fom="AMSSYS",sysUnc=0.2,debug=False,norm=False):
         denomHist = bHist.Clone()
         denomHist.Scale(1./denomHist.Integral())
         retHist.Divide(denomHist)
-        
     else:
         assert sHist.GetNbinsX() == bHist.GetNbinsX(), "xBins dont match" 
         retHist=sHist.Clone() 
@@ -140,31 +160,55 @@ def getHistMin(hist,onlyPos=False):
   binContents = [ (x, hist.GetBinContent(x) ) for x in range(1, nBinX+1)]
   if onlyPos:
     binContents=filter( lambda x: x[1]>0, binContents )
-  histMin= min( binContents , key= lambda f: f[1] )
-  return histMin
+  ret = min( binContents , key= lambda f: f[1] ) if binContents else [0,0]
+  return ret
+  #if not binContents: 
+  #  print "?????????????", binContents, hist.GetName(), hist.Print("all")
+  #  return 0 
+  #else:
+  #  histMin= min( binContents , key= lambda f: f[1] )
+  #  return histMin
 
 def getHisMinMax(hist):
     return getHistMin(hist), getHistMax(hist)
 
 
-def getFOMFromTH1FIntegral(sHist,bHist,fom="AMSSYS",sysUnc=0.2, verbose=False):
-  assert sHist.GetNbinsX() == bHist.GetNbinsX(), "xBins dont match"
-  nBinX= sHist.GetNbinsX()
-  fomHist = sHist.Clone()
-  fomHist.Reset()
-  fomHist.GetYaxis().SetTitle(fom)
-  for x in range(1,nBinX+1):
-    s=sHist.Integral(x,nBinX) 
-    b=bHist.Integral(x,nBinX) 
-    fomVal = fomFuncs[fom](s,b,sysUnc) 
-    fomHist.SetBinContent(x,fomVal)
-    if verbose:
-        print "bin:", x
-        print "     Signal: %s, Bkg: %s"%(sHist.GetBinContent(x),bHist.GetBinContent(x)) 
-        print "     INTEGS: %s, %s"%(s,b)
-        print "     FOM:", fomVal
+def getFOMFromTH1FIntegral(sHist,bHist,fom="AMSSYS",sysUnc=0.2, verbose=False, integral =True):
+    if not sHist.GetNbinsX() == bHist.GetNbinsX():
+        print sHist, sHist.GetNbinsX()
+        print bHist, bHist.GetNbinsX()
+        assert False, "xBins dont match"
+    nBinX= sHist.GetNbinsX()
+    fomHist = sHist.Clone()
+    fomHist.Reset()
+    fomHist.GetYaxis().SetTitle("_".join([fom,sHist.GetName(),bHist.GetName()]))
+    fomHist.SetName("_".join([fom,sHist.GetName(),bHist.GetName()]))
+    #nBins  = int( fomHist.GetNbinsX() )
+    #lowBin = int( fomHist.GetBinLowEdge(1)  )
+    #hiBin  = int( fomHist.GetBinLowEdge(fomHist.GetNbinsX()+1)  )
+    #[ (x, sHist.GetBinLowEdge(x),  sHist.Integral( 1  , x   )  )  for x in range(nBins/2, nBins)   ]    
+    #print "-----FOM INTEGRAL", sHist.GetName , nBins, lowBin, hiBin 
 
-  return fomHist
+
+    for x in range(1,nBinX+1):
+        
+        if integral:        
+            s=u_float(sHist.Integral(x,nBinX) )
+            b=u_float(bHist.Integral(x,nBinX) )
+        else:
+            s=u_float( sHist.GetBinContent(x) , sHist.GetBinError(x) )
+            b=u_float( bHist.GetBinContent(x) , bHist.GetBinError(x) )
+
+        fomVal = fomFuncs[fom](s.val,b.val,sysUnc) 
+        fomHist.SetBinContent(x,fomVal)
+        if not integral:
+            if b.sigma: fomHist.SetBinError(x, (s/b).sigma )
+        if verbose:
+            print "bin:", x
+            print "     Signal: %s, Bkg: %s"%(sHist.GetBinContent(x),bHist.GetBinContent(x)) 
+            print "     INTEGS: %s, %s"%(s,b)
+            print "     FOM:", fomVal
+    return fomHist
 
 def getCutEff(hist,rej=False):
   ''' rej=False will return 1-eff ''' 
@@ -262,8 +306,8 @@ def getROC(sHist, bHist, graphName='', fom="AMSSYS", sysUnc=0.2,savePath=''):
   bTot = b['tot']
   roc = ROOT.TGraph()
   for x in range(1,sEffHist.GetNbinsX()+1):
-    sEff = sEffHist.Integral(x)
-    bRej = bRejHist.Integral(x)
+    sEff = sEffHist.GetBinContent(x)
+    bRej = bRejHist.GetBinContent(x)
     roc.SetPoint(x,sEff,bRej)
   return {'roc':roc,'sTot':sTot, 'bTot':bTot}
   #return roc

@@ -16,19 +16,22 @@
 %<- set nRow=yieldTable.T[0]|length >%
 %     nCol=<<nCol>>
 %     nRow=<<nRow>>
-%<- set colSetup="|c"*(nCol+1)+"|" >%
+%   <#- set colSetup="|c"*(nCol+1)+"|" #>%
+%<- set nBkg=yields.bkgList | length >%
+%<- set nSig=yields.sigList | length >%
+%<- set colSetup="|c"*2+ "|c"*nBkg +"||c|" + "|c"*nSig*2 +"|" >%
 \begin{document}
 \begin{table}[ht]\begin{center}\resizebox{\textwidth}{!}{\begin{tabular}{<<colSetup>>}\hline
 %<- for row in yieldTable >%
-%<- set rowLoop = loop >%
-%<- set yld = yieldTable[rowLoop.index0] | fixForLatex>%
-%<- if rowLoop.first>% 
+    %<- set rowLoop = loop >%
+    %<- set yld = yieldTable[rowLoop.index0] | fixForLatex>%
+    %<- if rowLoop.first>% 
 &  <<yld|join("  &  ")>>\\
-\hline\multirow{<<nRow>>}{*}{\begin{sideways} << yields.tableName| replace("_","")>>\end{sideways}}
-%<else>%
+\hline\hline\multirow{<<nRow>>}{*}{\begin{sideways} << yields.tableName| replace("_","")>>\end{sideways}}
+    %<else>%
 &  <<yld|join("  &  ")>>\\
-%<endif>%
-%<- endfor >%
+    %<-endif>%
+    %<- endfor >%
 \hline
 \end{tabular}}\end{center}\caption{<<CAPTION>>}\end{table}
 \end{document}

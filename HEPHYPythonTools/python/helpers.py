@@ -147,7 +147,18 @@ def getChunks(sample,  maxN=-1):
         print "log file not found:  ", logfile
         failedChunks.append(chunks[i])
 #    except: print "Chunk",s,"could not be added"
-  eff = round(100*len(failedChunks)/float(len(chunks)),3)
+  try:
+    eff = round(100*len(failedChunks)/float(len(chunks)),3)
+  except ZeroDivisionError:
+    print "NO FILES FOUND"
+    print sample
+    print len(chunks) 
+    print chunks
+    print sample['dir']
+    len(chunks)
+    print "Failed Chunks:", failedChunks
+    assert False
+  
   print "Chunks: %i total, %i good (normalization constant %f), %i bad. Inefficiency: %f"%(len(chunks),len(goodChunks),sumWeights,len(failedChunks), eff)
   for s in failedChunks: 
     print "Failed:",s
@@ -303,7 +314,7 @@ def getYieldFromChain(c, cutString = "(1)", weight = "weight", returnError=False
     return res, resErr**2
   return res 
 
-def getPlotFromChain(c, var, binning, cutString = "(1)", weight = "weight", binningIsExplicit=False, addOverFlowBin=''):
+def getPlotFromChain(c, var, binning, cutString = "(1)", weight = "weight", binningIsExplicit=False ,addOverFlowBin='',variableBinning=False):
   if binningIsExplicit:
     h = ROOT.TH1D('h_tmp', 'h_tmp', len(binning)-1, array('d', binning))
 #    h.SetBins(len(binning), array('d', binning))
@@ -314,6 +325,11 @@ def getPlotFromChain(c, var, binning, cutString = "(1)", weight = "weight", binn
       h = ROOT.TH1D('h_tmp', 'h_tmp', *binning)
   c.Draw(var+">>h_tmp", weight+"*("+cutString+")", 'goff')
   res = h.Clone()
+  if variableBinning:
+    h = ROOT.TH1D('h_tmp', 'h_tmp', *binning)
+    c.Draw(var+">>h_tmp", weight+"*("+cutString+")", 'goff')
+    h.Scale(0.1,"width")
+    res = h.Clone()
   h.Delete()
   del h
   if addOverFlowBin.lower() == "upper" or addOverFlowBin.lower() == "both":

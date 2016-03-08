@@ -1,7 +1,8 @@
 import copy, os, sys
-dir = '/data/easilar/cmgTuples/postProcessing_MC_hadrFlav_btag_Eff/HT500LT250/'
-
+#dir = '/data/easilar/cmgTuples/postProcessing_MC_hadrFlav_btag_Eff/HT500LT250/'
+dir = '/data/easilar/cmgTuples/postProcessing_MC/HT500LT250Skim/'
 ####usual HT combination####
+
 TTJets_HTLO_25ns={\
 "name" : "tt+Jets_LO",
 "bins" : [
@@ -82,7 +83,7 @@ QCDHT_25ns = {
 "QCD_HT500to700",
 "QCD_HT700to1000",
 ],
-'dir' : dir,
+'dir' : dir,# '/data/dspitzbart/cmgTuples/postProcessing_Data_with_filters_already_vetoed/HT500LT250Skim/',
 }
 
 TTV_25ns = {
@@ -113,7 +114,7 @@ import pickle
 
 pickleDir = '/data/easilar/Spring15/25ns/'
 #signal_dir = '/data/easilar/cmgTuples/postProcessing_Signals/signal/'
-signal_dir = '/data/dspitzbart/cmgTuples/postProcessing_Signals/signal/'
+signal_dir = '/data/easilar/cmgTuples/postProcessing_Signals_v4/signal/'
 
 def getSignalSample(signal):
   if signal in allSignalStrings:
@@ -132,5 +133,6 @@ def getSignalSample(signal):
 allSignals=[]
 for s in allSignalStrings:
   sm = getSignalSample(s)
+  exec(s+"=sm")
   allSignals.append(sm)
 

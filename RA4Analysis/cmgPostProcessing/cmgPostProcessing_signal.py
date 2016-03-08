@@ -63,7 +63,7 @@ histos_LS = {
 }
 #####################
 
-subDir = "postProcessing_Signals_v2"
+subDir = "postProcessing_Signals_v4"
 
 #branches to be kept for data and MC
 branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert",
@@ -80,7 +80,7 @@ branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert",
 #branches to be kept for MC samples only
 branchKeepStrings_MC = [ "nTrueInt", "genWeight", "xsec", "puWeight", 
                      "GenSusyMScan1", "GenSusyMScan2", "GenSusyMScan3", "GenSusyMScan4", "GenSusyMGluino", "GenSusyMGravitino", "GenSusyMStop", "GenSusyMSbottom", "GenSusyMStop2", "GenSusyMSbottom2", "GenSusyMSquark", "GenSusyMNeutralino", "GenSusyMNeutralino2", "GenSusyMNeutralino3", "GenSusyMNeutralino4", "GenSusyMChargino", "GenSusyMChargino2", 
-                     "nLHEweight","LHEweight_*"
+                     "nLHEweight","LHEweight_*",
                      "nJetForMET", "JetForMET_*",
                      "ngenLep", "genLep_*", 
                      "nGenPart", "GenPart_*",
@@ -215,7 +215,7 @@ for isample, sample in enumerate(allSamples):
       for corrJEC_str in corr:
         for vars_str in vars_corr:
           newVariables.extend(["jec_"+vars_str+"_"+corrJEC_str+"/F/-999."])
-          print "jec_"+vars_str+"_"+corrJEC_str+"/F/-999."
+          #print "jec_"+vars_str+"_"+corrJEC_str+"/F/-999."
         for vars_str in vars_corr_1:
           newVariables.extend(["jec_"+vars_str+"_"+corrJEC_str+"/I/-999."])
 

@@ -14,7 +14,7 @@ ROOT.TH1F().SetDefaultSumw2()
 def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, QCD=False):
   print "in W predition lumi is :"  , lumi
   if useBTagWeights: 'Will use b-tag weights for W-jets prediction!'
-  weight_str, weight_err_str = makeWeight(lumi)
+  weight_str, weight_err_str = makeWeight(lumi, sampleLumi, reWeight=MCweight)
   cWJets = samples['W']
   cTTJets = samples['TT']
   cRest = samples['Rest']
@@ -56,7 +56,7 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, QCD=Fa
   yTT_Var_crNJet_0b_lowDPhi     = fit_crNJet_lowDPhi['TT_AllPdg']['yieldVar']*fit_crNJet_lowDPhi['TT_AllPdg']['template'].GetBinContent(1)**2
   if templateBootstrap: yTT_Var_crNJet_0b_lowDPhi += fit_crNJet_lowDPhi['TT_AllPdg']['yield']**2*templateBootstrap['TTJets_mu'][srNJet][stb][htb]**2
   yTT_crNJet_0b_highDPhi        = rCS_crNJet_0b_onlyTT['rCS']*yTT_crNJet_0b_lowDPhi
-  yTT_Var_crNJet_0b_highDPhi    = rCS_crNJet_0b_onlyTT['rCSE_pred']**2*yTT_crNJet_0b_lowDPhi**2 + rCS_crNJet_0b_onlyTT['rCS']**2*yTT_Var_crNJet_0b_lowDPhi
+  yTT_Var_crNJet_0b_highDPhi    = rCS_crNJet_0b_onlyTT['rCSE_pred']**2*yTT_crNJet_0b_lowDPhi**2 + rCS_crNJet_0b_onlyTT['rCS']**2*yTT_Var_crNJet_0b_lowDPhi #should be changed to rCSE_sim after Moriond 2016
   yTT_Var_crNJet_0b_highDPhi_MC = rCS_crNJet_0b_onlyTT['rCSE_sim']**2*yTT_crNJet_0b_lowDPhi**2 + rCS_crNJet_0b_onlyTT['rCS']**2*yTT_Var_crNJet_0b_lowDPhi
   #yTT_Var_crNJet_0b_highDPhi    = rCS_crNJet_1b['rCSE_pred']**2*yTT_crNJet_0b_lowDPhi**2 + rCS_crNJet_1b['rCS']**2*yTT_Var_crNJet_0b_lowDPhi
 
@@ -94,9 +94,9 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, QCD=Fa
 
   if isData:
     #treat contamination like QCD
-    rCS_W_crNJet_0b_corr      = getRCS(cData, crCutTruth+muonCut+"&& veto_evt_list",dPhiCut, QCD_lowDPhi=correction_lowDPhi, QCD_highDPhi=correction_highDPhi, returnValues=True)
-    rCS_W_crNJet_0b_corr_rest = getRCS(cData, crCutTruth+muonCut+"&& veto_evt_list",dPhiCut, QCD_lowDPhi=correction_lowDPhi_rest, QCD_highDPhi=correction_highDPhi_rest, returnValues=True)
-    rCS_W_crNJet_0b_notcorr   = getRCS(cData, crCutTruth+muonCut+"&& veto_evt_list",dPhiCut, returnValues = True)
+    rCS_W_crNJet_0b_corr      = getRCS(cData, crCutTruth+muonCut,dPhiCut, QCD_lowDPhi=correction_lowDPhi, QCD_highDPhi=correction_highDPhi, returnValues=True)
+    rCS_W_crNJet_0b_corr_rest = getRCS(cData, crCutTruth+muonCut,dPhiCut, QCD_lowDPhi=correction_lowDPhi_rest, QCD_highDPhi=correction_highDPhi_rest, returnValues=True)
+    rCS_W_crNJet_0b_notcorr   = getRCS(cData, crCutTruth+muonCut,dPhiCut, returnValues = True)
     
   else:
     rCS_W_crNJet_0b_corr      = getRCS(cBkg, crCut+muonCut, dPhiCut, weight=weight_str_0b, QCD_lowDPhi=correction_lowDPhi, QCD_highDPhi=correction_highDPhi, returnValues=True)
@@ -114,9 +114,9 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, QCD=Fa
   
   if isData:
     #treat contamination like QCD
-    rCS_W_PosPdg_crNJet_0b_corr       = getRCS(cData, crCutTruth+muonCut+"&& veto_evt_list",dPhiCut, QCD_lowDPhi=correction_lowDPhi, QCD_highDPhi=correction_highDPhi, returnValues=True)
-    rCS_W_PosPdg_crNJet_0b_corr_rest  = getRCS(cData, crCutTruth+muonCut+"&& veto_evt_list",dPhiCut, QCD_lowDPhi=correction_lowDPhi_rest, QCD_highDPhi=correction_highDPhi_rest, returnValues=True)
-    rCS_W_PosPdg_crNJet_0b_notcorr    = getRCS(cData, crCutTruth+muonCut+"&& veto_evt_list", dPhiCut, returnValues = True)
+    rCS_W_PosPdg_crNJet_0b_corr       = getRCS(cData, crCutTruth+muonCut,dPhiCut, QCD_lowDPhi=correction_lowDPhi, QCD_highDPhi=correction_highDPhi, returnValues=True)
+    rCS_W_PosPdg_crNJet_0b_corr_rest  = getRCS(cData, crCutTruth+muonCut,dPhiCut, QCD_lowDPhi=correction_lowDPhi_rest, QCD_highDPhi=correction_highDPhi_rest, returnValues=True)
+    rCS_W_PosPdg_crNJet_0b_notcorr    = getRCS(cData, crCutTruth+muonCut, dPhiCut, returnValues = True)
 
   else:
     rCS_W_PosPdg_crNJet_0b_corr       = getRCS(cBkg, crCut+muonCut,dPhiCut, weight=weight_str_0b, QCD_lowDPhi=correction_lowDPhi, QCD_highDPhi=correction_highDPhi, returnValues=True)
@@ -130,9 +130,9 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, QCD=Fa
 
   if isData:
     #treat contamination like QCD
-    rCS_W_NegPdg_crNJet_0b_corr       = getRCS(cData, crCutTruth+muonCut+"&& veto_evt_list" ,dPhiCut, QCD_lowDPhi=correction_lowDPhi, QCD_highDPhi=correction_highDPhi, returnValues=True)
-    rCS_W_NegPdg_crNJet_0b_corr_rest  = getRCS(cData, crCutTruth+muonCut+"&& veto_evt_list" ,dPhiCut, QCD_lowDPhi=correction_lowDPhi_rest, QCD_highDPhi=correction_highDPhi_rest, returnValues=True)
-    rCS_W_NegPdg_crNJet_0b_notcorr    = getRCS(cData, crCutTruth+muonCut+"&& veto_evt_list" , dPhiCut, returnValues = True)
+    rCS_W_NegPdg_crNJet_0b_corr       = getRCS(cData, crCutTruth+muonCut ,dPhiCut, QCD_lowDPhi=correction_lowDPhi, QCD_highDPhi=correction_highDPhi, returnValues=True)
+    rCS_W_NegPdg_crNJet_0b_corr_rest  = getRCS(cData, crCutTruth+muonCut ,dPhiCut, QCD_lowDPhi=correction_lowDPhi_rest, QCD_highDPhi=correction_highDPhi_rest, returnValues=True)
+    rCS_W_NegPdg_crNJet_0b_notcorr    = getRCS(cData, crCutTruth+muonCut , dPhiCut, returnValues = True)
 
   else:
     rCS_W_NegPdg_crNJet_0b_corr       = getRCS(cBkg, crCut+muonCut,dPhiCut, weight=weight_str_0b, QCD_lowDPhi=correction_lowDPhi, QCD_highDPhi=correction_highDPhi, returnValues=True)
@@ -179,9 +179,9 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, QCD=Fa
   fit_srName, fit_srCut = nameAndCut(stb, htb, srNJet, btb=None, presel=presel,btagVar = nBTagVar)
   #QCD yields in CR for b-tag fit
   if QCD:
-    QCD_dict={0:{'y':QCD[srNJet][stb][htb][(0,0)][dPhiCut]['NQCDpred_lowdPhi'], 'e':QCD[srNJet][stb][htb][(0,0)][dPhiCut]['NQCDpred_lowdPhi_err'], 'totalY':QCD[srNJet][stb][htb][(0,0)][dPhiCut]['NQCDpred']},\
-              1:{'y':QCD[srNJet][stb][htb][(1,1)][dPhiCut]['NQCDpred_lowdPhi'], 'e':QCD[srNJet][stb][htb][(1,1)][dPhiCut]['NQCDpred_lowdPhi_err'], 'totalY':QCD[srNJet][stb][htb][(1,1)][dPhiCut]['NQCDpred']},\
-              2:{'y':QCD[srNJet][stb][htb][(2,-1)][dPhiCut]['NQCDpred_lowdPhi'], 'e':QCD[srNJet][stb][htb][(2,-1)][dPhiCut]['NQCDpred_lowdPhi_err'], 'totalY':QCD[srNJet][stb][htb][(2,-1)][dPhiCut]['NQCDpred']}}
+    QCD_dict={0:{'y':QCD[srNJet][stb][htb][(0,0)][dPhiCut]['NQCDpred_lowdPhi'], 'e':QCD[srNJet][stb][htb][(0,0)][dPhiCut]['NQCDpred_lowdPhi_err'], 'totalY':QCD[srNJet][stb][htb][(0,0)][dPhiCut]['NQCDpred'], 'totalY_err':QCD[srNJet][stb][htb][(0,0)][dPhiCut]['NQCDpred_err']},\
+              1:{'y':QCD[srNJet][stb][htb][(1,1)][dPhiCut]['NQCDpred_lowdPhi'], 'e':QCD[srNJet][stb][htb][(1,1)][dPhiCut]['NQCDpred_lowdPhi_err'], 'totalY':QCD[srNJet][stb][htb][(1,1)][dPhiCut]['NQCDpred'], 'totalY_err':QCD[srNJet][stb][htb][(1,1)][dPhiCut]['NQCDpred_err']},\
+              2:{'y':QCD[srNJet][stb][htb][(2,-1)][dPhiCut]['NQCDpred_lowdPhi'], 'e':QCD[srNJet][stb][htb][(2,-1)][dPhiCut]['NQCDpred_lowdPhi_err'], 'totalY':QCD[srNJet][stb][htb][(2,-1)][dPhiCut]['NQCDpred'], 'totalY_err':QCD[srNJet][stb][htb][(2,-1)][dPhiCut]['NQCDpred_err']}}
     fit_srNJet_lowDPhi = binnedNBTagsFit(fit_srCut+"&&"+dPhiStr+"<"+str(dPhiCut), fit_srName+'_dPhi'+str(dPhiCut), samples = samples, prefix=fit_srName, QCD_dict=QCD_dict)
   else:
     fit_srNJet_lowDPhi = binnedNBTagsFit(fit_srCut+"&&"+dPhiStr+"<"+str(dPhiCut), fit_srName+'_dPhi'+str(dPhiCut), samples = samples, prefix=fit_srName)

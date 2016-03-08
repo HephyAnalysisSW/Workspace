@@ -17,7 +17,7 @@ ROOT.setTDRStyle()
 ROOT.TH1F().SetDefaultSumw2()
 if not createFits: loadedFit = pickle.load(file(fitDir+prefix+'_fit_pkl'))
 
-weight_str, weight_err_str = makeWeight(3, sampleLumi=sampleLumi)
+weight_str, weight_err_str = makeWeight(3, sampleLumi=sampleLumi, reWeight = MCweight)
 
 wJetBins = [(3,4),(5,5),(6,7),(8,-1)]
 ttJetBins = [(4,4),(5,5),(6,7),(8,-1)]
@@ -242,8 +242,8 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
       res[njb][stb][htb].update({'TT_rCS_fits_MC':TT_corrections})
       
       # correct prediction, use only stat error -> all systematic errors will be applied in another script
-      res[njb][stb][htb]['TT_pred'] = TT_pred_corr
-      res[njb][stb][htb]['TT_pred_err'] = TT_stat_err
+      #res[njb][stb][htb]['TT_pred'] = TT_pred_corr
+      #res[njb][stb][htb]['TT_pred_err'] = TT_stat_err
 
       # Wjets corrections
       Wcharges = [{'name':'PosPdg','cut':'leptonPdg>0', 'string':'_PosPdg'},{'name':'NegPdg','cut':'leptonPdg<0', 'string':'_NegPdg'},{'name':'all', 'cut':'(1)', 'string':''}]
@@ -392,6 +392,8 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
       print 'Calculating kappa values'
       if isCentralPrediction:
         #kappa similar to multi-b analysis, does not invoke b-tag fit results (ratio of Rcs values)
+        #TT_kappa, TT_kappa_err = getPropagatedError(res[njb][stb][htb]['rCS_srNJet_0b_onlyTT']['rCS'], res[njb][stb][htb]['rCS_srNJet_0b_onlyTT']['rCSE_sim'], res[njb][stb][htb]['rCS_crNJet_0b_onlyTT']['rCS'], res[njb][stb][htb]['rCS_crNJet_0b_onlyTT']['rCSE_sim'], returnCalcResult=True)
+        
         TT_kappa, TT_kappa_err = getPropagatedError(res[njb][stb][htb]['rCS_srNJet_0b_onlyTT']['rCS'], res[njb][stb][htb]['rCS_srNJet_0b_onlyTT']['rCSE_sim'], TT_pred_rcs_corr, TT_pred_rcs_corr_err, returnCalcResult=True)
         W_kappa, W_kappa_err = getPropagatedError(res[njb][stb][htb]['rCS_srNJet_0b_onlyW']['rCS'], res[njb][stb][htb]['rCS_srNJet_0b_onlyW']['rCSE_sim'], res[njb][stb][htb]['rCS_W_crNJet_0b_corr'], sqrt(res[njb][stb][htb]['rCS_Var_W_crNJet_0b_corr']), returnCalcResult=True)
         W_corrRest_kappa, W_corrRest_kappa_err = getPropagatedError(res[njb][stb][htb]['rCS_srNJet_0b_onlyW']['rCS'], res[njb][stb][htb]['rCS_srNJet_0b_onlyW']['rCSE_sim'], res[njb][stb][htb]['rCS_W_crNJet_0b_corr_rest'], sqrt(res[njb][stb][htb]['rCS_Var_W_crNJet_0b_corr_rest']), returnCalcResult=True)
@@ -424,9 +426,10 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
         res[njb][stb][htb]['W_kappa_err'] = W_kappa_err
         res[njb][stb][htb]['W_corrRest_kappa'] = W_corrRest_kappa
         res[njb][stb][htb]['W_corrRest_kappa_err'] = W_corrRest_kappa_err
-        
-      TT_pred_kappa, TT_pred_kappa_err = getPropagatedError([TT_pred_corr, TT_kappa], [TT_stat_err, TT_kappa_err], 1, 0, returnCalcResult=True)
-      W_pred_kappa, W_pred_kappa_err = getPropagatedError([res[njb][stb][htb]['W_pred'], W_kappa], [res[njb][stb][htb]['W_pred_err'], W_kappa_err], 1, 0, returnCalcResult=True)
+      
+      # correct the predictions, but don't apply uncertainties of kappas on them - they are systematic uncertainties
+      TT_pred_kappa, TT_pred_kappa_err = getPropagatedError([res[njb][stb][htb]['TT_pred'], kappaTT_btag['kappa'], TT_kappa], [res[njb][stb][htb]['TT_pred_err'], 0, 0], 1, 0, returnCalcResult=True)
+      W_pred_kappa, W_pred_kappa_err = getPropagatedError([res[njb][stb][htb]['W_pred'], W_kappa], [res[njb][stb][htb]['W_pred_err'], 0], 1, 0, returnCalcResult=True)
       #W_pred_corrRest_kappa, W_pred_corrRest_kappa_err = getPropagatedError([res[njb][stb][htb]['W_pred_corrRest'], W_corrRest_kappa], [res[njb][stb][htb]['W_pred_corrRest_err'], W_corrRest_kappa_err], 1, 0, returnCalcResult=True)
         
       res[njb][stb][htb]['W_pred_final']      = W_pred_kappa

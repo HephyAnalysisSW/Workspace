@@ -113,11 +113,11 @@ for srNJet in sorted(signalRegions):
               #print 'Var '+names[i]+':', unc_highDPhi
               #unc[srNJet][stb][htb][mGl][mLSP][names[i]+'_MB_SR'] = unc_highDPhi
             
-            #unc[srNJet][stb][htb][mGl][mLSP]['var_b_MB_SR']       = (abs(unc_highDPhi['bUp_MB_SR'])       + abs(unc_highDPhi['bDown_MB_SR']))/2 #asymmetric - take max?
-            #unc[srNJet][stb][htb][mGl][mLSP]['var_light_MB_SR']   = (abs(unc_highDPhi['lightUp_MB_SR'])   + abs(unc_highDPhi['lightDown_MB_SR']))/2 #asymmetric - take max?
-            unc[srNJet][stb][htb][mGl][mLSP]['var_b_MB_SR']       = max([abs(unc_highDPhi['bUp_MB_SR']), abs(unc_highDPhi['bDown_MB_SR'])]) #asymmetric - take max?
-            unc[srNJet][stb][htb][mGl][mLSP]['var_light_MB_SR']   = max([abs(unc_highDPhi['lightUp_MB_SR']), abs(unc_highDPhi['lightDown_MB_SR'])]) #asymmetric - take max?
-            unc[srNJet][stb][htb][mGl][mLSP]['var_lepton_MB_SR']  = (abs(unc_highDPhi['leptonUp_MB_SR'])  + abs(unc_highDPhi['leptonDown_MB_SR']))/2 #symmetric, so take average
+            #unc[srNJet][stb][htb][mGl][mLSP]['sys_b_MB_SR']       = (abs(unc_highDPhi['bUp_MB_SR'])       + abs(unc_highDPhi['bDown_MB_SR']))/2 #asymmetric - take max?
+            #unc[srNJet][stb][htb][mGl][mLSP]['sys_light_MB_SR']   = (abs(unc_highDPhi['lightUp_MB_SR'])   + abs(unc_highDPhi['lightDown_MB_SR']))/2 #asymmetric - take max?
+            unc[srNJet][stb][htb][mGl][mLSP]['sys_b_MB_SR']       = max([abs(unc_highDPhi['bUp_MB_SR']), abs(unc_highDPhi['bDown_MB_SR'])]) #asymmetric - take max?
+            unc[srNJet][stb][htb][mGl][mLSP]['sys_light_MB_SR']   = max([abs(unc_highDPhi['lightUp_MB_SR']), abs(unc_highDPhi['lightDown_MB_SR'])]) #asymmetric - take max?
+            unc[srNJet][stb][htb][mGl][mLSP]['sys_lepton_MB_SR']  = (abs(unc_highDPhi['leptonUp_MB_SR'])  + abs(unc_highDPhi['leptonDown_MB_SR']))/2 #symmetric, so take average
             del c
 
 
