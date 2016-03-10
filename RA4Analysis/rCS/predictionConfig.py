@@ -29,17 +29,19 @@ templateWeightSuffix  = '_SF'
 
 QCDup       = False
 QCDdown     = False
-nameSuffix  = ''
+nameSuffix  = '_Moriond'
 if QCDup: nameSuffix += '_QCDup'
 if QCDdown: nameSuffix += '_QCDdown'
 
 ## samples
-isData              = True
+isData              = False
 unblinded           = True
 validation          = False
 isCentralPrediction = True
 if isData:
   isCentralPrediction = False #should be false for data, otherwise kappa is measured in data!
+
+loadTemplate = True
 
 cWJets      = getChain(WJetsHTToLNu_25ns,histname='')
 cTTJets     = getChain(TTJets_combined,histname='')
@@ -140,10 +142,10 @@ singleMu_presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSof
 MCweight = 'lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*TopPtWeight*0.94'
 
 ## corrections
-createFits = False # turn off if you already did one
+createFits = True # turn off if you already did one
 if not isCentralPrediction:
   createFits = False
-fitDir = '/data/'+username+'/Results'+year+'/correctionFit_'+regStr+'_MC/'
+fitDir = '/data/'+username+'/Results'+year+'/correctionFit_'+regStr+'_MC_Moriond/'
 fitPrintDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results'+year+'/25ns/RcsFit_'+predictionName+'_'+lumistr+'/'
 
 ## do stuff for test runs

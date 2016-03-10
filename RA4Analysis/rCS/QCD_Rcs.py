@@ -386,7 +386,7 @@ for deltaPhi in deltaPhis:
 
 signalRegions = signalRegion3fb
 
-pickleDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_fullSR_lep_data_2p25/'
+pickleDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_fullSR_lep_data_2p3/'
 
 pred = pickle.load(file(pickleDir+'resultsFinal_withSystematics_pkl'))
 

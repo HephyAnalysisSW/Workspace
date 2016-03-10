@@ -1,3 +1,5 @@
+# only works with x-forwarding turned off
+
 import ROOT
 import pickle, os
 import UserString
@@ -35,6 +37,11 @@ for rfile in rootfiles:
   name = copy.deepcopy(tmp)
   name = str(name)
   del f
+  
+  kinematics = name.split('_')
+  lt = kinematics[0].split('t')[1].split('-')
+  ht = kinematics[1].split('t')[1].split('-')
+  njet = kinematics[2].split('t')[1].split('-')
   
   if '3-4' in name:
     hasQCD = False
@@ -134,23 +141,40 @@ for rfile in rootfiles:
   latex1.SetTextAlign(11)
   
   latex1.DrawLatex(0.16,0.96,'CMS #bf{#it{Preliminary}}')
-  latex1.DrawLatex(0.75,0.96,"2.2fb^{-1} (13TeV)")
+  latex1.DrawLatex(0.75,0.96,"#bf{2.3fb^{-1} (13TeV)}")
   
-  #if curve5_1:
-  #  lowerBound = 0.70
-  #else:
-  #  lowerBound = 0.75
-  leg = ROOT.TLegend(0.72,0.7,0.98,0.95)
+  latex2 = ROOT.TLatex()
+  latex2.SetNDC()
+  latex2.SetTextSize(0.04)
+  latex2.SetTextAlign(11)
+  
+  if len(lt)>1: lt_str = lt[0]+' #leq L_{T} < '+lt[1] + ' GeV'
+  else: lt_str = 'L_{T} #geq ' + lt[0]+' GeV'
+  if len(ht)>1: ht_str = ht[0]+' #leq H_{T} < '+ht[1] + ' GeV'
+  else: ht_str = 'H_{T} #geq ' + ht[0] + ' GeV'
+  if len(njet)>1: njet_str = njet[0]+' #leq n_{jet} #leq '+njet[1]
+  else:
+    if njet[0] == 'Eq5': njet_str = 'n_{jet} = 5'
+    else: njet_str = 'n_{jet} #geq ' + njet[0]
+
+
+  latex2.DrawLatex(0.20,0.89,lt_str)
+  latex2.DrawLatex(0.20,0.85,ht_str)
+  latex2.DrawLatex(0.20,0.81,njet_str)
+  
+  if hasQCD: lowerBound = 0.71
+  else: lowerBound = 0.75
+  leg = ROOT.TLegend(0.72,lowerBound,0.98,0.95)
   leg.SetFillColor(ROOT.kWhite)
   leg.SetShadowColor(ROOT.kWhite)
   leg.SetBorderSize(1)
   leg.SetTextSize(0.035)
-  leg.AddEntry(h_d, 'data', 'lp')
-  leg.AddEntry(curve1, 'total', 'l')
-  leg.AddEntry(curve2, 'W+jets', 'l')
-  leg.AddEntry(curve3, 't#bar{t}+jets', 'l')
+  leg.AddEntry(h_d, 'Data', 'lp')
+  leg.AddEntry(curve1, 'Total', 'l')
+  leg.AddEntry(curve2, 'W + jets', 'l')
+  leg.AddEntry(curve3, 't#bar{t} + jets', 'l')
   if hasQCD: leg.AddEntry(curve5, 'QCD', 'l')
-  leg.AddEntry(curve4, 'other', 'l')
+  leg.AddEntry(curve4, 'Other', 'l')
   #if curve5: leg.AddEntry(curve5, 'QCD', 'l')
   leg.Draw()
   

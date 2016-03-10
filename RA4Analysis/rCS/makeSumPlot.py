@@ -14,7 +14,7 @@ from array import array
 
 from predictionConfig import *
 
-cData = getChain([single_mu_Run2015D, single_ele_Run2015D], histname='')
+#cData = getChain([single_mu_Run2015D, single_ele_Run2015D], histname='')
 isData = True
 #predictionName = 'SFtemplates_fullSR_lep_data'
 
@@ -91,7 +91,7 @@ benchmark1_H.SetMarkerSize(0)
 benchmark2_H.SetMarkerSize(0)
 benchmark3_H.SetMarkerSize(0)
 
-tt_pred_H  = ROOT.TH1F('tt_pred_H','t#bar{t}+Jets pred.',bins,0,bins)
+tt_pred_H  = ROOT.TH1F('tt_pred_H','t#bar{t} + jets',bins,0,bins)
 tt_truth_H = ROOT.TH1F('tt_truth_H','tt+Jets truth',bins,0,bins)
 tt_pred_H.SetLineColor(color('ttJets')-2)
 tt_pred_H.SetFillColorAlpha(color('ttJets')-2,0.8)
@@ -99,15 +99,15 @@ tt_pred_H.SetLineWidth(2)
 tt_truth_H.SetLineColor(color('ttJets')-1)
 tt_truth_H.SetLineWidth(2)
 
-w_pred_H  = ROOT.TH1F('w_pred_H','W+Jets pred.', bins,0,bins)
-w_truth_H = ROOT.TH1F('w_truth_H','W+Jets truth', bins,0,bins)
+w_pred_H  = ROOT.TH1F('w_pred_H','W + jets', bins,0,bins)
+w_truth_H = ROOT.TH1F('w_truth_H','W + jets truth', bins,0,bins)
 w_pred_H.SetLineColor(color('wJets'))
 w_pred_H.SetFillColorAlpha(color('wJets'),0.8)
 w_pred_H.SetLineWidth(2)
 w_truth_H.SetLineColor(color('wJets')-1)
 w_truth_H.SetLineWidth(2)
 
-rest_H = ROOT.TH1F('rest_H','other', bins,0,bins)
+rest_H = ROOT.TH1F('rest_H','Other', bins,0,bins)
 rest_H.SetLineColor(color('TTVH'))
 rest_H.SetFillColorAlpha(color('TTVH'), 0.8)
 rest_H.SetLineWidth(2)
@@ -246,7 +246,8 @@ for srNJet in sorted(signalRegions):
         else:
           weight =weight_str+'*weightBTag0_SF'
           dcn, dc = nameAndCut(stb, htb, srNJet, (0,-1), presel+'&&deltaPhi_Wl>'+str(signalRegions[srNJet][stb][htb]['deltaPhi']))
-        data_yield = getYieldFromChain(cData, dc,weight)
+        #data_yield = getYieldFromChain(cData, dc,weight)
+        data_yield = res[srNJet][stb][htb]['y_srNJet_0b_highDPhi']
         data_truth_H.SetBinContent(i,data_yield)
         data_truth_H.GetBinErrorLow(i)
         data_truth_H.GetBinErrorUp(i)
@@ -370,14 +371,25 @@ truth_H.GetXaxis().SetTitle('Signal Region #')
 truth_H.GetYaxis().SetTitleSize(0.06)
 truth_H.GetYaxis().SetLabelSize(0.06)
 
-leg = ROOT.TLegend(0.7,0.7,0.98,0.95)
+data_err = ROOT.TGraphAsymmErrors(bins, dx, dy, dexl, dexh, deyl, deyh)
+data_err.SetMarkerStyle(10)
+data_err.SetMarkerSize(1)
+data_err.SetLineWidth(2)
+
+pred_err = ROOT.TGraphAsymmErrors(bins, ax, ay, aexl, aexh, aeyl, aeyh)
+pred_err.SetFillColor(ROOT.kGray+1)
+pred_err.SetFillStyle(3244)
+
+
+leg = ROOT.TLegend(0.65,0.65,0.98,0.95)
 leg.SetFillColor(ROOT.kWhite)
 leg.SetShadowColor(ROOT.kWhite)
 leg.SetBorderSize(1)
 leg.SetTextSize(0.045)
+#leg.AddEntry(None,'bla','')
 if isData:
   if unblinded or validation:
-    leg.AddEntry(truth_H, 'data')
+    leg.AddEntry(data_err, 'Data', 'ep')
   else:
     leg.AddEntry(truth_H, 'MC truth')
 else:
@@ -386,6 +398,7 @@ else:
 leg.AddEntry(tt_pred_H,'','f')
 leg.AddEntry(w_pred_H,'','f')
 leg.AddEntry(rest_H,'','f')
+leg.AddEntry(pred_err,'Pred. Uncertainty','f')
 
 h_Stack.Draw('hist')
 h_Stack.GetYaxis().SetTitle('Events')
@@ -409,9 +422,6 @@ if signal:
 
 h_Stack.GetYaxis().SetTitleOffset(0.8)
 h_Stack.GetYaxis().SetNdivisions(508)
-pred_err = ROOT.TGraphAsymmErrors(bins, ax, ay, aexl, aexh, aeyl, aeyh)
-pred_err.SetFillColor(ROOT.kGray+1)
-pred_err.SetFillStyle(3244)
 pred_err.Draw('2 same')
 truth_H.SetMarkerStyle(22)
 
@@ -425,10 +435,6 @@ ratio_err.SetMarkerStyle(10)
 ratio_err.SetMarkerSize(1.1)
 ratio_err.SetLineWidth(2)
 
-data_err = ROOT.TGraphAsymmErrors(bins, dx, dy, dexl, dexh, deyl, deyh)
-data_err.SetMarkerStyle(10)
-data_err.SetMarkerSize(1)
-data_err.SetLineWidth(2)
 
 if unblinded or validation:
   truth_H.SetMarkerStyle(20)
@@ -445,7 +451,7 @@ latex1.SetTextSize(0.04)
 latex1.SetTextAlign(11)
 
 latex1.DrawLatex(0.15,0.96,'CMS #bf{#it{Preliminary}}')
-latex1.DrawLatex(0.8,0.96,printlumi+"fb^{-1} (13TeV)")
+latex1.DrawLatex(0.8,0.96,'#bf{'+printlumi+"fb^{-1} (13TeV)}")
 
 pad1.SetLogy()
 
@@ -468,14 +474,15 @@ pad2=ROOT.TPad("pad2","datavsMC",0.,0.,1.,.3)
 pad2.SetLeftMargin(0.15)
 pad2.SetBottomMargin(0.3)
 pad2.SetTopMargin(0.02)
-pad2.SetGrid()
+#pad2.SetGrid()
 pad2.Draw()
 pad2.cd()
 ratio2.GetXaxis().SetTitleSize(0.13)
 ratio2.GetXaxis().SetLabelSize(0.11)
 ratio2.GetXaxis().SetNdivisions(508)
 if validation or unblinded:
-  ratio2.GetYaxis().SetTitle('data/pred.')
+  #ratio2.GetYaxis().SetTitle('#frac{Data}{Prediction}')
+  ratio2.GetYaxis().SetTitle('Data/Pred.')
 else:
   ratio2.GetYaxis().SetTitle('MC/pred.')
 ratio2.GetYaxis().SetTitleSize(0.13)
@@ -497,9 +504,9 @@ if not unblinded:
 else:
   suffix = ''
 
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_approval.png')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_approval.root')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_approval.pdf')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_approval_t.png')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_approval_t.root')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_approval_t.pdf')
 
 can2 = ROOT.TCanvas('can2','can2',700,700)
 
@@ -532,7 +539,7 @@ leg2.Draw()
 latex2.DrawLatex(0.17,0.96,'CMS #bf{#it{simulation}}')
 latex2.DrawLatex(0.7,0.96,"L="+printlumi+"fb^{-1} (13TeV)")
 
-can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/'+predictionName+'_Kappa_approval.png')
-can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/'+predictionName+'_Kappa_approval.root')
-can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/'+predictionName+'_Kappa_approval.pdf')
+can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/'+predictionName+'_Kappa_approval_t.png')
+can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/'+predictionName+'_Kappa_approval_t.root')
+can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/'+predictionName+'_Kappa_approval_t.pdf')
 

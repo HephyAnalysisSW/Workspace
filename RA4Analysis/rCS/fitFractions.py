@@ -27,6 +27,8 @@ mc1 = pickle.load(file(pmc1+prefix+'_estimationResults_pkl'))
 CRkey = 'fit_srNJet_lowDPhi'
 SBkey = 'fit_crNJet_lowDPhi'
 keys = [['SB',SBkey],['CR',CRkey]]
+keys = [['SB1bTT',SBkey]]#,['CR',CRkey]]
+
 #keys = [['SB',SBkey]]
 #keys = [['CR',CRkey]]
 bins=39
@@ -34,7 +36,7 @@ binning = [39,0,39]
 
 [['3-4j 0b SB, mu, pos PD', 'fit_crNJet_lowDPhi', '&&leptonPdg>0&&abs(leptonPdg)==13']]
 
-performBTagFits = False
+performBTagFits = True
 if performBTagFits:
   resData = {}
   resMC = {}
@@ -79,6 +81,7 @@ for keyName, fitkey in keys:
           resMC[srNJet][stb] = {}
         for htb in sorted(signalRegions[srNJet][stb]):
           if keyName == 'SB': njb=(3,4)
+          if keyName == 'SB1bTT': njb=(4,5)
           else: njb=srNJet
           name, cut = nameAndCut(stb,htb,njb, (0,0), presel)
           name_ib, cut_ib = nameAndCut(stb,htb,njb, (0,-1), presel)
@@ -101,6 +104,7 @@ for keyName, fitkey in keys:
           if performBTagFits:
             useBTagWeights = True #True for weighted fake data, false for data
             btagWeightSuffix = '_SF'
+            isData = False
             fit_MC = binnedNBTagsFit(cut_ib+"&&"+dPhiStr+"<"+str(dPhiCut), name_ib+'_dPhi'+str(dPhiCut), samples={'W':cWJets, 'TT':cTTJets, 'Rest':cRest, 'Bkg':cBkg, 'Data': cBkg}, prefix = name_ib)
             useBTagWeights = False #True for weighted fake data, false for data
             btagWeightSuffix = '_SF'
@@ -111,6 +115,7 @@ for keyName, fitkey in keys:
 
             QCD2b_lowDPhi  = {'y':QCDestimate[(4,5)][stb][htb][(2,-1)][dPhiCut]['NQCDpred_lowdPhi'],  'e':QCDestimate[(4,5)][stb][htb][(2,-1)][dPhiCut]['NQCDpred_lowdPhi_err']}
             QCD2b_highDPhi = {'y':QCDestimate[(4,5)][stb][htb][(2,-1)][dPhiCut]['NQCDpred_highdPhi'], 'e':QCDestimate[(4,5)][stb][htb][(2,-1)][dPhiCut]['NQCDpred_highdPhi_err']}
+            isData = True
             fit_data = binnedNBTagsFit(cut_ib+"&&"+dPhiStr+"<"+str(dPhiCut), name_ib+'_dPhi'+str(dPhiCut), samples={'W':cWJets, 'TT':cTTJets, 'Rest':cRest, 'Bkg':cBkg, 'Data': cData}, prefix = name_ib, QCD_dict={0:QCD0b_lowDPhi, 1:QCD1b_lowDPhi,2:QCD2b_lowDPhi})
             resData[srNJet][stb][htb][fitkey] = fit_data
             resMC[srNJet][stb][htb][fitkey] = fit_MC
@@ -120,7 +125,7 @@ for keyName, fitkey in keys:
             fit_data = data1[srNJet][stb][htb][fitkey] #change this
           myFits = [fit_data, fit_MC]
           j = 1
-          fitbin = 1 #1 for 0b, 2 for 1b etc
+          fitbin = 2 #1 for 0b, 2 for 1b etc
           for f in myFits:
             fit = f
             ttkey = 'TT_AllPdg'
@@ -172,11 +177,11 @@ for keyName, fitkey in keys:
           Cut = '&&deltaPhi_Wl<'+str(dPhiCut)+'&&'+pdg['cut']
 
           #calc truth and fill an 3rd pos
-          y_TT_Pos = getYieldFromChain(cTTJets, cut_ib+Cut, weight=weight_str+'*weightBTag0_SF',returnError=True)
+          y_TT_Pos = getYieldFromChain(cTTJets, cut_ib+Cut, weight=weight_str+'*weightBTag1_SF',returnError=True)
 
-          y_W_Pos = getYieldFromChain(cWJets, cut_ib+Cut, weight=weight_str+'*weightBTag0_SF',returnError=True)
+          y_W_Pos = getYieldFromChain(cWJets, cut_ib+Cut, weight=weight_str+'*weightBTag1_SF',returnError=True)
 
-          y_Rest_Pos = getYieldFromChain(cRest, cut_ib+Cut, weight=weight_str+'*weightBTag0_SF',returnError=True)
+          y_Rest_Pos = getYieldFromChain(cRest, cut_ib+Cut, weight=weight_str+'*weightBTag1_SF',returnError=True)
 
           y_Pos = (y_TT_Pos[0]+y_W_Pos[0]+y_Rest_Pos[0], sqrt(y_TT_Pos[1]**2+y_W_Pos[1]**2+y_Rest_Pos[1]**2))
           

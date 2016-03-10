@@ -49,7 +49,6 @@ WJetsHTToLNu_25ns={\
 'dir' : dir,
 }
 
-
 singleTop_25ns={\
 "name" : "singleTop",
 "bins" : [

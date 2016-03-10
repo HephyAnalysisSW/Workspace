@@ -48,9 +48,9 @@ TTJets_combined_had =       {'name':'TTJets', 'chain':TTJets_combined['chain'], 
 
 
 DY = {'name':'DY', 'chain':getChain(DY_25ns,histname=''), 'color':color('DY'),'weight':totalWeight, 'niceName':'Drell Yan', 'cut':''}
-singleTop = {'name':'singleTop', 'chain':getChain(singleTop_25ns,histname=''), 'color':color('singleTop'),'weight':totalWeight, 'niceName':'single Top', 'cut':''}
+singleTop = {'name':'singleTop', 'chain':getChain(singleTop_25ns,histname=''), 'color':color('singleTop'),'weight':totalWeight, 'niceName':'t/#bar{t}', 'cut':''}
 QCD = {'name':'QCD', 'chain':getChain(QCDHT_25ns,histname=''), 'color':color('QCD'),'weight':totalWeight, 'niceName':'QCD multijet', 'cut':''}
-TTVH = {'name':'TTVH', 'chain':getChain(TTV_25ns,histname=''), 'color':color('TTV'),'weight':totalWeight, 'niceName':'TTVH', 'cut':''}
+TTVH = {'name':'TTVH', 'chain':getChain(TTV_25ns,histname=''), 'color':color('TTV'),'weight':totalWeight, 'niceName':'t#bar{t}W', 'cut':''}
 Rest = {'name':'Rest', 'chain':getChain([TTV_25ns,singleTop_25ns,DY_25ns],histname=''), 'color':color('TTV'),'weight':totalWeight, 'niceName':'other EWK', 'cut':''}
 Bkg = {'name':'Bkg', 'chain':getChain([TTJets_HTLO_25ns,WJetsHTToLNu_25ns,QCDHT_25ns,TTV_25ns,singleTop_25ns,DY_25ns],histname=''), 'color':color('TTV'),'weight':totalWeight, 'niceName':'total Bkg', 'cut':''}
 EWK = {'name':'Bkg', 'chain':getChain([TTJets_HTLO_25ns,WJetsHTToLNu_25ns,TTV_25ns,singleTop_25ns,DY_25ns],histname=''), 'color':color('TTV'),'weight':totalWeight, 'niceName':'total Bkg', 'cut':''}
@@ -212,7 +212,7 @@ posWeight = {'name':'posWeight', 'string':newpresel+'&&weight>0', 'niceName':'po
 negWeight = {'name':'negWeight', 'string':newpresel+'&&weight<0', 'niceName':'neg. weight'}
 
 #newPreselNoLtHt = {'name':'presel','string':preselNoLtHt,'niceName':'Preselection'}
-newPreselCut = {'name':'presel','string':newpresel,'niceName':'Preselection'}
+newPreselCut = {'name':'presel','string':newpresel, 'signal':signalpresel, 'niceName':'Preselection'}
 newPreselCutNeg = {'name':'presel','string':newpresel+'&&leptonPdg<0','niceName':'Presel NegPdg'}
 newPreselCutPos = {'name':'presel','string':newpresel+'&&leptonPdg>0','niceName':'Presel PosPdg'}
 
@@ -383,7 +383,8 @@ deltaPhiCMG = {'binning': [0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.1,1.3,1.5,1.8
 
 
 #PHYS14 signals:
-signalweight = 'weight*weightBTag0_SF*reweightLeptonFastSimSF*puReweight_true_max4*0.94*2.25/3.'
+signalweight = 'weight*weightBTag0_SF*reweightLeptonFastSimSF*puReweight_true_max4*0.94*2.3/3.'
+
 
 T5qqqqWW_mGo1000_mChi700 = {'name':'T5qqqqWW_mGo1000_mChi700', 'chain':getChain(T5qqqqVV_mGluino_1000To1075_mLSP_1To950[1000][700], histname=''), 'color':ROOT.kAzure+9, 'weight':signalweight, 'niceName':'T5q^{4}WW 1.0/0.7'}
 T5qqqqWW_mGo1200_mChi800 = {'name':'T5qqqqWW_mGo1200_mChi800', 'chain':getChain(T5qqqqVV_mGluino_1200To1275_mLSP_1to1150[1200][800],histname=''), 'color':ROOT.kMagenta+2,    'weight':signalweight, 'niceName':'T5q^{4}WW 1.2/0.8'}
@@ -397,7 +398,7 @@ dataPlotList = [stComp, htComp, deltaPhiCMG, met, njet, leadingJetPt, lepGoodPt,
 #  t = plot(samples,leadingJetPt,newPreselCut, data=dataDict,filling=True,stacking=True,minimum=0.08, maximum=2000, MClumiScale=205./3000., setLogY=True, lumi=0.205, titleText='CMS preliminary')
 #  savePlot(t, d['titleX'])
 
-def plot(samples, variable, cuts, signals=False, data=False, maximum=False, minimum=0., stacking=False, filling=True, setLogY=False, setLogX=False, titleText='simulation', lumi='3', legend=True, MClumiScale=1., drawError=False, MCscale=True, btagcut='nBJetMediumCSV30==0', btagweight='weightBTag0_SF'):
+def plot(samples, variable, cuts, signals=False, data=False, maximum=False, minimum=0., stacking=False, filling=True, setLogY=False, setLogX=False, titleText='simulation', lumi='3', legend=True, MClumiScale=1., drawError=False, MCscale=True, btagcut='nBJetMediumCSV30==0', btagweight='weightBTag0_SF', signalScale=1):
   if 'binningIsExplicit' in variable:
     binningIsExplicit = variable['binningIsExplicit']
     scaleHist = ROOT.TH1F('scaleH', 'scaleH', len(variable['binning'])-1, array('d', variable['binning']))
@@ -533,13 +534,13 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
   h.sort(key=operator.itemgetter('yield'))
   legendNameLengthsSamples = [len(x['legendName']) for x in h]
   legendNameLengthsSignal = []
-  if signals: legendNameLengthsSignal = [len(x['niceName']) for x in signals]
+  #if signals: legendNameLengthsSignal = [len(x['niceName']) for x in signals]
   legendNameLengths = legendNameLengthsSamples + legendNameLengthsSignal
   legendWidth = 0.018*max(legendNameLengths)+0.03
   if legend:
     height = 0.04*len(h)
     if data: height+=0.04
-    if signals: height += 0.04*len(signals)
+    #if signals: height += 0.04*len(signals)
     if data: height += 0.04
     leg = ROOT.TLegend(0.98-legendWidth,0.95-height,0.98,0.95)
     leg.SetFillColor(ROOT.kWhite)
@@ -584,6 +585,12 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
           item['hist'].Draw('hist same')
   s = []
   if signals:
+    #print len(signals)
+    signalLegend = ROOT.TLegend(0.98-legendWidth-0.25,0.92-0.037*len(signals),0.98-legendWidth,0.92)
+    signalLegend.SetFillColor(ROOT.kWhite)
+    signalLegend.SetShadowColor(ROOT.kWhite)
+    signalLegend.SetBorderSize(0)
+    signalLegend.SetTextSize(0.035)
     for isignal,signal in enumerate(signals):
       if binningIsExplicit: s.append({'hist':ROOT.TH1F('s'+str(isignal), signal['niceName'], len(variable['binning'])-1, array('d', variable['binning'])),'yield':0., 'legendName':signal['niceName']})
       else: s.append({'hist':ROOT.TH1F('s'+str(isignal), signal['niceName'], *variable['binning']),'yield':0., 'legendName':signal['niceName']})
@@ -591,12 +598,13 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
       #if signal['weight']=='weight':weight='weight*(3./4.)'
       #else: weight=str(signal['weight'])
       print weight, cut['string']
-      signal['chain'].Draw(variable['name']+'>>s'+str(isignal),weight+'*('+cut['string']+')','goff')
+      signal['chain'].Draw(variable['name']+'>>s'+str(isignal),weight+'*('+cut['signal']+')','goff')
       s[isignal]['hist'].SetLineColor(signal['color'])
       s[isignal]['hist'].SetLineWidth(3)
       s[isignal]['hist'].SetMarkerSize(0)
-      s[isignal]['hist'].Scale(10)
-      if legend: leg.AddEntry(s[isignal]['hist'])
+      s[isignal]['hist'].Scale(signalScale)
+      
+      if legend: signalLegend.AddEntry(s[isignal]['hist'])
       if drawError: s[isignal]['hist'].Draw('e same hist')
       else: s[isignal]['hist'].Draw('same hist')
   if data:
@@ -651,11 +659,15 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
     latex1.DrawLatex(0.82, 0.95-height-0.04,'#bf{MC scale:}')
     latex1.DrawLatex(0.82, 0.95-height-0.04*2, str(round(MCscale,2))+'\pm'+str(round(MCscaleError,2)))
   if lumi:
-    if data: latex1.DrawLatex(0.77,0.96,"L="+str(lumi)+"fb^{-1} (13TeV)")
-    else: latex1.DrawLatex(0.7,0.96,"L="+str(lumi)+"fb^{-1} (13TeV)")
-  if legend: leg.Draw()
+    if data: latex1.DrawLatex(0.8,0.96,str(lumi)+"fb^{-1} (13TeV)")
+    else: latex1.DrawLatex(0.73,0.96,str(lumi)+"fb^{-1} (13TeV)")
+  if legend:
+    leg.Draw()
+    if signals: signalLegend.Draw()
   can.Update()
-  if stacking: return {'hist':h, 'canvas':can, 'legend':leg, 'stack':h_Stack, 'signals':s}
+  if stacking:
+    if signal: return {'hist':h, 'canvas':can, 'legend':leg, 'signalLegend':signalLegend, 'stack':h_Stack, 'signals':s}
+    else: return {'hist':h, 'canvas':can, 'legend':leg, 'stack':h_Stack, 'signals':s}
   else: return {'hist':h, 'canvas':can, 'legend':leg, 'signals':s}
 
 def plotInSignalRegions2(samples, presel, data=False, fixedNJet=None, btb=None, signalRegions=signalRegion3fb, legend=True, stacking=True, fractions=True, minimum=0, maximum=0, MClumiScale=2.2/3., MCscale=1, titleText='simulation', lumi=2.2, btagcut='nBJetMediumCSV30==0', btagweight='weightBTag0_SF'):
