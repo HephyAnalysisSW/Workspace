@@ -97,15 +97,20 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
         fitResults[njb][stb][htb] = {'kappaTT':kappaTT, 'rcs1bCRtt_btag':rcs1bCRtt_btag, 'rcs1bCRtt':rcs1bCRtt, 'rcs0bCRtt':rcs0bCRtt, 'rcs0bCRtt_btag':rcs0bCRtt_btag, 'kappaTT_btag':kappaTT_btag}
 
         #fill histograms
+        # for the time being, bins with 0 entries (= Rcs=0) are not incorporated in the fit (same applies for wjets)
         for i_njbTT, njbTT in enumerate(ttJetBins):
           # get the Rcs plots, use b-tag weights and scale factors
           cname, cut     = nameAndCut(stb,htb,njbTT, btb=(0,-1) ,presel=presel)
           cname1b, cut1b = nameAndCut(stb,htb,njbTT, btb=(0,-1) ,presel=presel)
-          rcsD = getRCS(cTTJets, cut, dPhiCut, weight = weight_str+'*weightBTag0'+btagWeightSuffix)
-          rcsD1b = getRCS(cTTJets, cut1b, dPhiCut, weight = weight_str+'*weightBTag1'+btagWeightSuffix)
+          rcsD = getRCS(cTTJets, cut, dPhiCut, weight = weight_str+'*weightBTag0'+btagWeightSuffix, avoidNan=True)
+          rcsD1b = getRCS(cTTJets, cut1b, dPhiCut, weight = weight_str+'*weightBTag1'+btagWeightSuffix, avoidNan=True)
+          ttJetRcsFitH.GetXaxis().SetBinLabel(i_njbTT+1,nJetBinName(njbTT))
           if not math.isnan(rcsD['rCS']):
             ttJetRcsFitH.SetBinContent(i_njbTT+1, rcsD['rCS'])
             ttJetRcsFitH.SetBinError(i_njbTT+1, rcsD['rCSE_sim'])
+          #if math.isnan(rcsD['rCSE_sim']) or rcsD['rCS']==0:
+          #  if i_njbTT>1: ttJetRcsFitH.SetBinError(i_njbTT+1, 2*ttJetRcsFitH.GetBinError(i_njbTT))
+          #  else: ttJetRcsFitH.SetBinError(i_njbTT+1, 0.2)
           if not math.isnan(rcsD1b['rCS']):
             ttJetRcsFitH1b.SetBinContent(i_njbTT+1, rcsD1b['rCS'])
             ttJetRcsFitH1b.SetBinError(i_njbTT+1, rcsD1b['rCSE_sim'])
@@ -122,45 +127,87 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
         print 'Linear Fit for tt Jets Rcs values in 0b MC'
 
         #linear fit in 0b
-        filledBin = 0
-        for b in range(len(ttJetBins)):
-          if ttJetRcsFitH.GetBinContent(b+1)>0:
-            filledBin += 1
-          else: break
-        ttJetRcsFitH.Fit('pol1','','same',0,filledBin)
-        FitFunc     = ttJetRcsFitH.GetFunction('pol1')
-        ttD  = FitFunc.GetParameter(0)
+        #filledBin = 0
+        #for b in range(len(ttJetBins)):
+        #  if ttJetRcsFitH.GetBinContent(b+1)>0:
+        #    filledBin += 1
+        #  else: break
+        filledBin = len(ttJetBins)
+        
+        # fit pol1 to rcs hist
+        FitFunc = ROOT.TF1("FitFunc", "[0]+[1]*x", 0, filledBin)
+        FitFunc.SetParameters(2,-1)
+        FitFunc.SetLineWidth(2)
+        fitres = ttJetRcsFitH.Fit("FitFunc", "S")
+        fitres.Print("V")
+        ttD   = FitFunc.GetParameter(0)
         ttDE = FitFunc.GetParError(0)
-        ttK  = FitFunc.GetParameter(1)
+        ttK   = FitFunc.GetParameter(1)
         ttKE = FitFunc.GetParError(1)
+
+        covMatrix = fitres.GetCovarianceMatrix()
+        a = covMatrix(0,0)
+        b = c = covMatrix(0,1)
+        d = covMatrix(1,1)
+        f2 = ROOT.TF1("f2", "sqrt([0] + [1]*x + [2]*x**2) + [3] + [4]*x", 0, filledBin)
+        f2.SetParameters(a,b+c,d, ttD, ttK)
+        f2.SetLineColor(ROOT.kAzure)
+        f2.SetLineStyle(2)
+        f2.SetLineWidth(2)
+
+        f3 = ROOT.TF1("f3", "-sqrt([0] + [1]*x + [2]*x**2) + [3] + [4]*x", 0, filledBin)
+        f3.SetParameters(a,b+c,d, ttD, ttK)
+        f3.SetLineColor(ROOT.kAzure)
+        f3.SetLineStyle(2)
+        f3.SetLineWidth(2)
+
         ttLinear = {'ttD':ttD, 'ttDE':ttDE, 'ttK':ttK, 'ttKE':ttKE}
         fitResults[njb][stb][htb].update({'ttLinear':ttLinear})
-
+        f1 = ROOT.TF1("f1", "[0] + [1]*x", 0, filledBin)
+        f1.SetParameters(rcs0bCRtt_btag['rCS'],0)
+        f1.SetLineWidth(2)
+        f1.SetLineColor(ROOT.kRed+1)
+        f1.SetLineStyle(2)
+        FitFunc.SetLineWidth(2)
+        FitFunc.SetLineColor(ROOT.kOrange+1)
         ttcan.cd()
         ttJetRcsFitH.SetMarkerColor(ROOT.kBlue)
         ttJetRcsFitH.SetLineColor(ROOT.kBlue)
+        ttJetRcsFitH.GetYaxis().SetTitle('R_{CS}')
+        ttJetRcsFitH.GetYaxis().SetLabelSize(0.04)
+        ttJetRcsFitH.GetXaxis().SetLabelSize(0.06)
+        ttJetRcsFitH.SetLineWidth(2)
+        ttJetRcsFitH.SetMarkerStyle(21)
         ttJetRcsFitH.SetBarWidth(1)
         ttJetRcsFitH.SetBarOffset(0)
         ttJetRcsFitH.SetStats(0)
         ttJetRcsFitH.SetMinimum(0)
-        ttJetRcsFitH.SetMaximum(0.2)
+        ttJetRcsFitH.SetMaximum(0.19)
         ttJetRcsFitH.Draw('EH1')
         
         latex1 = ROOT.TLatex()
         latex1.SetNDC()
-        latex1.SetTextSize(0.03)
+        latex1.SetTextSize(0.035)
         latex1.SetTextAlign(11)
-        latex1.DrawLatex(0.6,0.86,'linear fit k x + d')
-        latex1.DrawLatex(0.6,0.83,'k = '+str(round(ttK*1000,2))+' #pm '+str(round(ttKE*1000,2))+' #times 10^{-3}')
-        latex1.DrawLatex(0.6,0.8,'d = '+str(round(ttD*1000,2))+' #pm '+str(round(ttDE*1000,2))+' #times 10^{-3}')
-
+        latex1.DrawLatex(0.2,0.9,'linear fit k x + d')
+        latex1.DrawLatex(0.2,0.865,'k = ('+str(round(ttK*1000,2))+' #pm '+str(round(ttKE*1000,2))+') #times 10^{-3}')
+        latex1.DrawLatex(0.2,0.83,'d = ('+str(round(ttD*1000,2))+' #pm '+str(round(ttDE*1000,2))+') #times 10^{-3}')
+        latex1.DrawLatex(0.65,0.9, varBinName(stb, 'L_{T}'))
+        latex1.DrawLatex(0.65,0.865, varBinName(htb, 'H_{T}'))
+       
+        
         latex2 = ROOT.TLatex()
         latex2.SetNDC()
         latex2.SetTextSize(0.04)
         latex2.SetTextAlign(11)
-        latex2.DrawLatex(0.17,0.96,'CMS #bf{#it{simulation}}')
-        latex2.DrawLatex(0.7,0.96,"L=2.1fb^{-1} (13TeV)")
-
+        latex2.DrawLatex(0.16,0.96,'CMS #bf{#it{Simulation}}')
+        latex2.DrawLatex(0.85,0.96,"(13TeV)")
+        
+        f1.Draw('same')
+        #f2.Draw('same')
+        #f3.Draw('same')
+        FitFunc.Draw('same')
+        
         ttcan.Print(fitPrintDir+cname+'_ttjets_all_fit.png')
         ttcan.Print(fitPrintDir+cname+'_ttjets_all_fit.pdf')
         ttcan.Print(fitPrintDir+cname+'_ttjets_all_fit.root')
@@ -170,7 +217,7 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
         #constant fit in 0b and 1b
         print
         print 'Konstant Fit for tt Jets Rcs values in 0b MC'
-        ttJetRcsFitH.Fit('pol0','','same',0,filledBin)
+        ttJetRcsFitH.Fit('pol0','','same',0,4)
         FitFunc     = ttJetRcsFitH.GetFunction('pol0')
         ttConst0  = FitFunc.GetParameter(0)
         ttConst0E = FitFunc.GetParError(0)
@@ -178,7 +225,7 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
         
         print
         print 'Konstant Fit for tt Jets Rcs values in 1b MC'
-        ttJetRcsFitH1b.Fit('pol0','','same',0,filledBin)
+        ttJetRcsFitH1b.Fit('pol0','','same',0,4)
         FitFunc     = ttJetRcsFitH1b.GetFunction('pol0')
         ttConst1  = FitFunc.GetParameter(0)
         ttConst1E = FitFunc.GetParError(0)
@@ -248,18 +295,22 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
       # Wjets corrections
       Wcharges = [{'name':'PosPdg','cut':'leptonPdg>0', 'string':'_PosPdg'},{'name':'NegPdg','cut':'leptonPdg<0', 'string':'_NegPdg'},{'name':'all', 'cut':'(1)', 'string':''}]
       for Wc in Wcharges:
+        cnameCRW, cutCRW = nameAndCut(stb,htb,(3,4), btb=(0,-1) ,presel=presel)
+        rcsCRW = getRCS(cWJets, cutCRW+'&&'+Wc['cut'], dPhiCut, weight = weight_str+'*weightBTag0'+btagWeightSuffix)
         if createFits:
           wJetRcsFitH = ROOT.TH1F("wJetRcsFitH","",len(wJetBins),0,len(wJetBins))
           
           #fill histograms for linear fit to account for possible non-flat rcs values
           for i_njbW, njbW in enumerate(wJetBins):
             cname, cut = nameAndCut(stb,htb,njbW, btb=(0,-1) ,presel=presel)
-            rcsD = getRCS(cWJets, cut+'&&'+Wc['cut'], dPhiCut, weight = weight_str+'*weightBTag0'+btagWeightSuffix)
+            rcsD = getRCS(cWJets, cut+'&&'+Wc['cut'], dPhiCut, weight = weight_str+'*weightBTag0'+btagWeightSuffix, avoidNan=True)
             if not math.isnan(rcsD['rCS']):
               wJetRcsFitH.SetBinContent(i_njbW+1, rcsD['rCS'])
               wJetRcsFitH.SetBinError(i_njbW+1, rcsD['rCSE_sim'])
               wJetRcsFitH.GetXaxis().SetBinLabel(i_njbW+1,nJetBinName(njbW))
-
+            #if math.isnan(rcsD['rCSE_sim']) or rcsD['rCS']==0:
+            #  if i_njbW>1: wJetRcsFitH.SetBinError(i_njbW+1, 2*wJetRcsFitH.GetBinError(i_njbW))
+            #  else: wJetRcsFitH.SetBinError(i_njbW+1, 0.2)
           message = '** Linear Fit for WJets Rcs values in 0b MC '+Wc['name']+' charges **'
           stars = ''
           for star in range(len(message)):
@@ -269,11 +320,13 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
           print message
           print stars
           print
-          filledBin = 0
-          for b in range(len(wJetBins)):
-            if wJetRcsFitH.GetBinContent(b+1)>0:
-              filledBin += 1
-            else: break
+          #filledBin = 0
+          #for b in range(len(wJetBins)):
+          #  if wJetRcsFitH.GetBinContent(b+1)>0:
+          #    filledBin += 1
+          #  else: break
+          filledBin = len(wJetBins)
+
           wJetRcsFitH.Fit('pol1','','same',0,filledBin)
           FitFunc     = wJetRcsFitH.GetFunction('pol1')
           wD  = FitFunc.GetParameter(0)
@@ -281,32 +334,44 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
           wK  = FitFunc.GetParameter(1)
           wKE = FitFunc.GetParError(1)
           fitResults[njb][stb][htb][Wc['name']] = {'wD':wD, 'wDE':wDE, 'wK':wK, 'wKE':wKE}
-          
+          f1 = ROOT.TF1("f1", "[0] + [1]*x", 0, wJetRcsFitH.GetNbinsX())
+          f1.SetParameters(rcsCRW['rCS'],0)
+          f1.SetLineWidth(2)
+          f1.SetLineColor(ROOT.kRed+1)
+          f1.SetLineStyle(2)
+          FitFunc.SetLineWidth(2)
+          FitFunc.SetLineColor(ROOT.kOrange+1)
           wcan.cd()
           wJetRcsFitH.SetMarkerColor(color('wjets'))
+          wJetRcsFitH.SetMarkerStyle(21)
+          wJetRcsFitH.SetLineWidth(2)
           wJetRcsFitH.SetLineColor(color('wjets'))
           wJetRcsFitH.SetBarWidth(1)
           wJetRcsFitH.SetBarOffset(0)
           wJetRcsFitH.SetStats(0)
           wJetRcsFitH.SetMinimum(0) 
-          wJetRcsFitH.SetMaximum(0.2)
+          wJetRcsFitH.SetMaximum(0.11)
           wJetRcsFitH.GetYaxis().SetTitle('R_{CS}')
+          wJetRcsFitH.GetYaxis().SetLabelSize(0.04)
+          wJetRcsFitH.GetXaxis().SetLabelSize(0.06)
           wJetRcsFitH.Draw('EH1')
-          
+          f1.Draw('same')
           latex1 = ROOT.TLatex()
           latex1.SetNDC()
-          latex1.SetTextSize(0.03)
+          latex1.SetTextSize(0.035)
           latex1.SetTextAlign(11)
-          latex1.DrawLatex(0.6,0.86,'linear fit k x + d')
-          latex1.DrawLatex(0.6,0.83,'k = '+str(round(wK*1000,2))+' #pm '+str(round(wKE*1000,2))+' #times 10^{-3}')
-          latex1.DrawLatex(0.6,0.80,'d = '+str(round(wD*1000,2))+' #pm '+str(round(wDE*1000,2))+' #times 10^{-3}')
+          latex1.DrawLatex(0.2,0.9,'linear fit k x + d')
+          latex1.DrawLatex(0.2,0.865,'k = ('+str(round(wK*1000,2))+' #pm '+str(round(wKE*1000,2))+') #times 10^{-3}')
+          latex1.DrawLatex(0.2,0.83,'d = ('+str(round(wD*1000,2))+' #pm '+str(round(wDE*1000,2))+') #times 10^{-3}')
+          latex1.DrawLatex(0.65,0.9, varBinName(stb, 'L_{T}'))
+          latex1.DrawLatex(0.65,0.865, varBinName(htb, 'H_{T}'))
           
           latex2 = ROOT.TLatex()
           latex2.SetNDC()
           latex2.SetTextSize(0.04)
           latex2.SetTextAlign(11)
-          latex2.DrawLatex(0.17,0.96,'CMS #bf{#it{simulation}}')
-          latex2.DrawLatex(0.7,0.96,"L=2.1fb^{-1} (13TeV)")
+          latex2.DrawLatex(0.16,0.96,'CMS #bf{#it{Simulation}}')
+          latex2.DrawLatex(0.85,0.96,"(13TeV)")
           
           wcan.Print(fitPrintDir+cname+'_Wjets_'+Wc['name']+'_fit.png')
           wcan.Print(fitPrintDir+cname+'_Wjets_'+Wc['name']+'_fit.pdf')

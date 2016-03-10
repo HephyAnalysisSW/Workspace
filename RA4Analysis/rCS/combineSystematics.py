@@ -10,7 +10,6 @@ from rCShelpers import *
 import math
 from Workspace.HEPHYPythonTools.user import username
 from Workspace.RA4Analysis.signalRegions import *
-#from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
 from array import array
 
 from predictionConfig import *
@@ -59,9 +58,9 @@ lepSF_h2b = d.GetPrimitive('h2b')
 #pickleDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_validation_lep_data_2p25/'
 #pickleDir =  '/data/easilar/Results2016/Prediction_SFtemplates_fullSR_lep_data_2p25/'
 
-#pickleDir =  '/data/dspitzbart/Results2016/Prediction_SFtemplates_fullSR_lep_data_2p3/'
+pickleDir =  '/data/dspitzbart/Results2016/Prediction_SFtemplates_fullSR_lep_data_2p3/'
 #pickleDir =  '/data/dspitzbart/Results2016/Prediction_SFtemplates_fullSR_lep_data_QCDerrChange_2p25/'
-pickleDir =  '/data/dspitzbart/Results2016/Prediction_SFtemplates_validation_4j_lep_data_2p3/'
+#pickleDir =  '/data/dspitzbart/Results2016/Prediction_SFtemplates_validation_4j_lep_data_2p3/'
 saveDir = pickleDir
 #saveDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_fullSR_lep_data_2p25/'
 
@@ -139,6 +138,10 @@ totalX = []
 totalY = []
 
 kappa_global_list = []
+rcsW_list = []
+rcstt_list = []
+rcsW_diff_list = []
+rcsTot_list = []
 
 i=1
 for injb,srNJet in enumerate(sorted(signalRegions)):
@@ -252,6 +255,12 @@ for injb,srNJet in enumerate(sorted(signalRegions)):
       dilepErr = dilep[srNJet][stb][htb]
       dilepErrH.SetBinContent(i, dilepErr)
       
+      # uncertainties on MC rest
+      trigger_err = 0.01
+      lumi_err = 0.045
+      rest_xsec = 0.55
+      
+      # Rcs uncertainties
       rcsErr    = sqrt(rcs[srNJet][stb][htb]['W_pred_errs']['syst']**2+rcs[srNJet][stb][htb]['TT_rCS_fits_MC']['syst']**2)/rcs[srNJet][stb][htb]['tot_pred']
       rcsErr_tt = rcs[srNJet][stb][htb]['TT_rCS_fits_MC']['syst']/rcs[srNJet][stb][htb]['TT_pred']
       rcsErr_W  = rcs[srNJet][stb][htb]['W_pred_errs']['const_vs_slope']/rcs[srNJet][stb][htb]['W_pred']
@@ -268,13 +277,32 @@ for injb,srNJet in enumerate(sorted(signalRegions)):
       W_kappa_global  = kappa_W_Err*rcs[srNJet][stb][htb]['W_pred']
       kappa_global    = (W_kappa_global + TT_kappa_global)/rcs[srNJet][stb][htb]['tot_pred']
       
+      # get the yields
+      W_pred      = rcs[srNJet][stb][htb]['W_pred_final']
+      TT_pred     = rcs[srNJet][stb][htb]['TT_pred_final']
+      rest_truth  = rcs[srNJet][stb][htb]['Rest_truth']
+      total_pred  = rcs[srNJet][stb][htb]['tot_pred_final']
+      
       # calculate sum squared of systematics (including kappas from MC stats) on total, W and ttbar predictions
-      totalSyst = sqrt(bErr**2 + XsecErr**2    + wPErr**2 + dilepErr**2 + qcdErr**2 + topErr**2 + puErr**2 + lepSFErr**2 + jecErr**2 + rcsErr**2                    + kappa_global**2)
-      ttSyst    = sqrt(bErr**2 + XsecErrWTT**2 + wPErr**2 + dilepErr**2 + qcdErr**2 + topErr**2 + puErr**2 + lepSFErr**2 + jecErr**2 + rcsErr_tt**2                 + kappa_TT_Err**2 + kappa_b_Err**2)
-      WSyst     = sqrt(bErr**2 + XsecErrWTT**2 + wPErr**2 + dilepErr**2 + qcdErr**2 + topErr**2 + puErr**2 + lepSFErr**2 + jecErr**2 + rcsErr_W**2  + W_muToLep**2  + kappa_W_Err**2)
+      
+      # calculate the correlated error
+      totalU  =  (bErr*total_pred)**2 + (wPErr*total_pred)**2 + (dilepErr*total_pred)**2
+      totalU +=  (qcdErr*total_pred)**2 + (topErr*total_pred)**2 + (puErr*total_pred)**2 + (lepSFErr*total_pred)**2
+      totalU +=  (jecErr*total_pred)**2 + (wXErr*total_pred)**2 + (ttXErr*total_pred)**2
+      totalU +=  (rcsErr_W*W_pred)**2  + (W_muToLep*W_pred)**2 + (kappa_W_Err*W_pred)**2
+      totalU +=  (kappa_TT_Err*TT_pred)**2 + (kappa_b_Err*TT_pred)**2 + (rcsErr_tt*TT_pred)**2
+      totalU +=  (rest_xsec*rest_truth)**2 + (lumi_err*rest_truth)**2 + (trigger_err*rest_truth)**2
+      tot_syst_err_Abs = sqrt(totalU) # total abs systematics
+      totalU +=  rcs[srNJet][stb][htb]['W_pred_final_err']**2 + rcs[srNJet][stb][htb]['TT_pred_final_err']**2 + rcs[srNJet][stb][htb]['Rest_truth_err']**2
+      totalU = sqrt(totalU)
+      totalU_rel = totalU/total_pred
+      
+      totalSyst = sqrt(bErr**2 + wXErr**2 + ttXErr**2 + wPErr**2 + dilepErr**2 + qcdErr**2 + topErr**2 + puErr**2 + lepSFErr**2 + jecErr**2 + rcsErr**2                    + kappa_global**2)
+      ttSyst    = sqrt(bErr**2 + wXErr**2 + ttXErr**2 + wPErr**2 + dilepErr**2 + qcdErr**2 + topErr**2 + puErr**2 + lepSFErr**2 + jecErr**2 + rcsErr_tt**2                 + kappa_TT_Err**2 + kappa_b_Err**2)
+      WSyst     = sqrt(bErr**2 + wXErr**2 + ttXErr**2 + wPErr**2 + dilepErr**2 + qcdErr**2 + topErr**2 + puErr**2 + lepSFErr**2 + jecErr**2 + rcsErr_W**2  + W_muToLep**2  + kappa_W_Err**2)
 
-      totalSyst_noKappa = sqrt(bErr**2    + XsecErr**2 + wPErr**2 + dilepErr**2 + qcdErr**2 + topErr**2 + puErr**2 + lepSFErr**2 + jecErr**2 + rcsErr**2) #for visualization purposes only
-      restSyst = sqrt(bErr**2 + XsecErr**2    + wPErr**2 + dilepErr**2 + qcdErr**2 + topErr**2 + puErr**2 + lepSFErr**2 + jecErr**2)
+      totalSyst_noKappa = sqrt(bErr**2 + wXErr**2 + ttXErr**2 + wPErr**2 + dilepErr**2 + qcdErr**2 + topErr**2 + puErr**2 + lepSFErr**2 + jecErr**2 + rcsErr**2) #for visualization purposes only
+      restSyst = sqrt(bErr**2 + wXErr**2 + ttXErr**2 + wPErr**2 + dilepErr**2 + qcdErr**2 + topErr**2 + puErr**2 + lepSFErr**2 + jecErr**2 + rest_xsec**2 + lumi_err**2 + trigger_err**2)
       #restSyst = 0.5
       
       totalH.SetBinContent(i, totalSyst_noKappa)
@@ -285,6 +313,10 @@ for injb,srNJet in enumerate(sorted(signalRegions)):
       systematics.update({'kappa_global':kappa_global})
       
       kappa_global_list.append(kappa_global)
+      rcsW_list.append(rcsErr_W)
+      rcstt_list.append(rcsErr_tt)
+      rcsW_diff_list.append(W_muToLep)
+      rcsTot_list.append(rcsErr)
 
 
       # apply systemtatics on Rcs - not used anymore
@@ -304,8 +336,6 @@ for injb,srNJet in enumerate(sorted(signalRegions)):
       W_syst_err_Abs = getPropagatedError([rcs[srNJet][stb][htb]['W_pred_final'], 1],    [0, WSyst], 1, 0, returnCalcResult=True)
       rest_syst_err_Abs = getPropagatedError([rcs[srNJet][stb][htb]['Rest_truth'], 1],   [0, restSyst], 1, 0, returnCalcResult=True)
       
-      tot_syst_err_Abs = sqrt(tt_syst_err_Abs[1]**2+W_syst_err_Abs[1]**2+rest_syst_err_Abs[1]**2)
-      
       # Combine the stat unc from prediction with systematics
       TT_tot_err_Abs    = getPropagatedError([rcs[srNJet][stb][htb]['TT_pred_final'], 1], [rcs[srNJet][stb][htb]['TT_pred_final_err'],  ttSyst], 1, 0, returnCalcResult=True)
       W_tot_err_Abs     = getPropagatedError([rcs[srNJet][stb][htb]['W_pred_final'],  1], [rcs[srNJet][stb][htb]['W_pred_final_err'],   WSyst], 1, 0, returnCalcResult=True)
@@ -315,9 +345,7 @@ for injb,srNJet in enumerate(sorted(signalRegions)):
       tot_err_Abs = sqrt(TT_tot_err_Abs[1]**2+W_tot_err_Abs[1]**2+Rest_tot_err_Abs[1]**2)
       
       tot_stat_err_Abs = rcs[srNJet][stb][htb]['tot_pred_final_err']
-      total = rcs[srNJet][stb][htb]['tot_pred_final']
-      rcs[srNJet][stb][htb]['tot_pred_final_tot_err'] = tot_err_Abs
-      #rcs[srNJet][stb][htb]['tot_pred_final_stat_err'] = tot_stat_err_Abs
+      rcs[srNJet][stb][htb]['tot_pred_final_tot_err'] = totalU
       rcs[srNJet][stb][htb]['tot_pred_final_syst_err'] = tot_syst_err_Abs
       
       rcs[srNJet][stb][htb]['TT_pred_final_tot_err']    = TT_tot_err_Abs[1]
@@ -330,16 +358,26 @@ for injb,srNJet in enumerate(sorted(signalRegions)):
       print 'Syst. tt unc.:',round(tt_syst_err_Abs[1],3)
       print 'Syst. unc.:',round(tot_syst_err_Abs,3)
       print 'Total unc.:',round(tot_err_Abs,3)
-      print 'Total yield:',round(total,2)
+      print 'Total yield:',round(total_pred,2)
+      print round(totalU,3)
+      print totalU/tot_err_Abs
       
       rcs[srNJet][stb][htb]['systematics'] = systematics
       
       ratio.SetBinContent(i,1)
-      totalYErr.append(tot_err_Abs/total)
+      #totalYErr.append(tot_err_Abs/total)
+      totalYErr.append(totalU_rel)
       totalXErr.append(0.5)
       totalY.append(1)
       totalX.append(i-0.5)
       i+=1
+
+print
+print 'Rcs W systematic range', round(min(rcsW_list),3), round(max(rcsW_list),3)
+print 'Rcs tt systematic range', round(min(rcstt_list),3), round(max(rcstt_list),3)
+print 'Rcs mu/lep systematic range', round(min(rcsW_diff_list),3), round(max(rcsW_diff_list),3)
+print 'Rcs total systematic range', round(min(rcsTot_list),3), round(max(rcsTot_list),3)
+
 
 
 ax =   array('d',totalX)
@@ -361,17 +399,6 @@ h_Stack = ROOT.THStack('h_Stack','Stack')
 
 for i_h,h in enumerate(hists):
   h_Stack.Add(h)
-
-#h_Stack.Add(dilepS)
-#h_Stack.Add(dilepC)
-#h_Stack.Add(bErrH)
-#h_Stack.Add(qcdErrH)
-#h_Stack.Add(wXErrH)
-#h_Stack.Add(ttXErrH)
-#h_Stack.Add(wPErrH)
-#h_Stack.Add(puErrH)
-#h_Stack.Add(lepSFErrH)
-#h_Stack.Add(jecErrH)
 
 h_Stack.SetMaximum(1.5)
 h_Stack.SetMinimum(0.0)
@@ -409,7 +436,7 @@ totalH.Draw('p same')
 
 h_Stack.GetXaxis().SetLabelSize(0.)
 h_Stack.GetXaxis().SetLabelOffset(10)
-h_Stack.GetYaxis().SetTitle('Relative systematic uncertainty')
+h_Stack.GetYaxis().SetTitle('Relative uncertainty')
 h_Stack.GetYaxis().SetTitleOffset(0.8)
 h_Stack.GetYaxis().SetNdivisions(508)
 
@@ -423,7 +450,7 @@ latex1.SetTextSize(0.04)
 latex1.SetTextAlign(11)
 
 latex1.DrawLatex(0.15,0.96,'CMS #bf{#it{Simulation}}')
-latex1.DrawLatex(0.88,0.96,"(13TeV)")
+latex1.DrawLatex(0.88,0.96,"#bf{(13TeV)}")
 
 h_Stack.GetXaxis().SetLabelSize(0.04)
 h_Stack.GetYaxis().SetLabelSize(0.055)
@@ -443,7 +470,7 @@ setNiceBinLabel(ratio, signalRegions)
 ratio.GetXaxis().SetTitleSize(0.13)
 ratio.GetXaxis().SetLabelSize(0.11)
 ratio.GetXaxis().SetNdivisions(508)
-ratio.GetYaxis().SetTitle('total unc.')
+ratio.GetYaxis().SetTitle('Total unc.')
 ratio.GetYaxis().SetTitleSize(0.13)
 ratio.GetYaxis().SetLabelSize(0.13)
 ratio.GetYaxis().SetTitleOffset(0.4)
@@ -458,9 +485,14 @@ total_err.Draw('2 same')
 
 can.cd()
 
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/syst_errors_approval.png')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/syst_errors_approval.root')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/syst_errors_approval.pdf')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/syst_errors_approval_restUp.png')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/syst_errors_approval_restUp.root')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/syst_errors_approval_restUp.pdf')
 
-pickle.dump(rcs, file(saveDir+'resultsFinal_withSystematics_pkl','w'))
-print "pickle Written :" , saveDir+'resultsFinal_withSystematics_pkl'
+
+savePickle = False
+if savePickle:
+  pickle.dump(rcs, file(saveDir+'resultsFinal_withSystematics_pkl','w'))
+  print "pickle Written :" , saveDir+'resultsFinal_withSystematics_pkl'
+else:
+  print "Pickle not saved!"

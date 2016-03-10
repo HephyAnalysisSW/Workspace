@@ -10,6 +10,9 @@ import math
 from Workspace.RA4Analysis.signalRegions import *
 from Workspace.HEPHYPythonTools.user import username
 
+ROOT.gROOT.LoadMacro('../../HEPHYPythonTools/scripts/root/tdrstyle.C')
+ROOT.setTDRStyle()
+
 
 useFits = False
 drawOption = 'hist ][ e1'
@@ -294,7 +297,7 @@ for lep, pdgId in channels:
           f1.SetParameters(2,-1)
           f1.SetLineWidth(2)
           f1.SetLineStyle(2)
-          f1.
+          #f1.
           res = h_nj[lep][name][stb][htb].Fit("f1", "S")
           D   = f1.GetParameter(0)
           D_E = f1.GetParError(0)

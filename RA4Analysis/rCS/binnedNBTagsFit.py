@@ -48,7 +48,7 @@ def binnedNBTagsFit(cut, cutname, samples, prefix = "", QCD_dict={0:{'y':0.,'e':
   
   #Get histograms binned in b-tag multiplicity
   template_WJets_PosPdg_Dict = getTemplate(cutname, templateDir, 'WJets_PosPdg') #these templates will always be MC, so a reweighting (e.g. b-tagging) should not be used
-  if template_WJets_PosPdg_Dict['loadTemp']:
+  if template_WJets_PosPdg_Dict['loadTemp'] and loadTemplate:
     template_WJets_PosPdg = template_WJets_PosPdg_Dict['hist']
     tempFile_WJets_PosPdg = template_WJets_PosPdg_Dict['file']
   else:
@@ -63,7 +63,7 @@ def binnedNBTagsFit(cut, cutname, samples, prefix = "", QCD_dict={0:{'y':0.,'e':
     #tempFile.Close()
 
   template_WJets_NegPdg_Dict = getTemplate(cutname, templateDir, 'WJets_NegPdg') #these templates will always be MC, so a reweighting (e.g. b-tagging) should not be used
-  if template_WJets_NegPdg_Dict['loadTemp']:
+  if template_WJets_NegPdg_Dict['loadTemp'] and loadTemplate:
     template_WJets_NegPdg = template_WJets_NegPdg_Dict['hist']
     tempFile_WJets_NegPdg = template_WJets_NegPdg_Dict['file']
   else: 
@@ -78,7 +78,7 @@ def binnedNBTagsFit(cut, cutname, samples, prefix = "", QCD_dict={0:{'y':0.,'e':
     #tempFile.Close()
 
   template_TTJets_Dict = getTemplate(cutname, templateDir, 'TTJets') #these templates will always be MC, so a reweighting (e.g. b-tagging) should not be used
-  if template_TTJets_Dict['loadTemp']:
+  if template_TTJets_Dict['loadTemp'] and loadTemplate:
     template_TTJets = template_TTJets_Dict['hist']
     tempFile_TTJets = template_TTJets_Dict['file']
   else: 
@@ -93,7 +93,7 @@ def binnedNBTagsFit(cut, cutname, samples, prefix = "", QCD_dict={0:{'y':0.,'e':
     #tempFile.Close()
 
   template_Rest_PosPdg_Dict = getTemplate(cutname, templateDir, 'Rest_PosPdg') #these templates will always be MC, so a reweighting (e.g. b-tagging) should not be used
-  if template_Rest_PosPdg_Dict['loadTemp']:
+  if template_Rest_PosPdg_Dict['loadTemp'] and loadTemplate:
     template_Rest_PosPdg = template_Rest_PosPdg_Dict['hist']
     tempFile_Rest_PosPdg = template_Rest_PosPdg_Dict['file']
   else: 
@@ -108,7 +108,7 @@ def binnedNBTagsFit(cut, cutname, samples, prefix = "", QCD_dict={0:{'y':0.,'e':
     #tempFile.Close()
 
   template_Rest_NegPdg_Dict = getTemplate(cutname, templateDir, 'Rest_NegPdg') #these templates will always be MC, so a reweighting (e.g. b-tagging) should not be used
-  if template_Rest_NegPdg_Dict['loadTemp']:
+  if template_Rest_NegPdg_Dict['loadTemp'] and loadTemplate:
     template_Rest_NegPdg = template_Rest_NegPdg_Dict['hist']
     tempFile_Rest_NegPdg = template_Rest_NegPdg_Dict['file']
   else: 
