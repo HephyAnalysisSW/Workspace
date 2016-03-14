@@ -426,9 +426,9 @@ def eventsSkimPreselect(skimName, leptonSelection, preselectFlag, signalMasses=[
     elif skimName == 'HT400ST200': 
         skimCond = "Sum$(Jet_pt)>400&&(LepGood_pt[0]+met_pt)>200"
     elif skimName == 'lheHThigh': 
-        skimCond += "&&( lheHTIncoming>=600)"
+        skimCond += "&&(lheHTIncoming>=600)"
     elif skimName == 'lheHTlow': 
-        skimCond += "&&( lheHTIncoming<600)"
+        skimCond += "&&(lheHTIncoming<600)"
     else:
         raise Exception("Skim Condition Not recognized: %s"%skimName)
         pass
