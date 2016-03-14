@@ -17,16 +17,12 @@ cmgPP = cmgTuplesPostProcessed(mc_path, signal_path, data_path)
 
 skim='presel'
 
-#lumi_mc   = 10000
-#data_lumi_unblinded = 139.63 #pb-1
-#data_lumi_blinded = 2245.386 #pb-1  (2.2 fb-1)
-
-#
 
 lumis = { 
-            'lumi_mc':10000, 
-            'lumi_data_blind':2245.386, 
-            'lumi_data_unblind':139.63,
+            #'lumi_mc':10000, 
+            'lumi_target':2300., 
+            'lumi_data_blinded':2245.386, 
+            'lumi_data_unblinded':139.63,
         }
 
 
@@ -38,9 +34,12 @@ mass_dict = pickle.load(open(mass_dict_pickle,"r"))
 
 
 
-def getSamples( wtau=False, sampleList=['w','tt','z','sig'], 
-                useHT=False, getData=False, blinded=True, scan=True, skim='presel', cmgPP=cmgPP,  
-                lumi_mc=10000, lumi_data_blind=2245.386, lumi_data_unblind=139.63):
+def getSamples( wtau  = False, sampleList=['w','tt','z','sig'], 
+                useHT = False, getData = False, blinded=True, scan=True, skim='presel', cmgPP=cmgPP,  
+                #lumi_mc=10000, lumi_data_blinded=2245.386, lumi_data_unblinded=139.63):
+                lumi_target=lumis["lumi_target"], lumi_data_blinded=lumis['lumi_data_blinded'], lumi_data_unblinded=lumis['lumi_data_unblinded']):
+
+    lumi_mc = cmgPP.lumi
 
     #data_filters = '((\
     #            Flag_EcalDeadCellTriggerPrimitiveFilter) &&\
@@ -63,11 +62,11 @@ def getSamples( wtau=False, sampleList=['w','tt','z','sig'],
     htString = "HT" if useHT else "Inc"
     if any( [x in sampleList for x in ["s30", "s30FS","s10FS","s60FS" , "t2tt30FS"]] ):
         sampleDict.update({
-              "s30":            {'sample': cmgPP.T2DegStop_300_270[skim]                ,'name':'S300_270'        ,'color':colors["s30"     ]           , 'isSignal':1 ,'isData':0    ,"lumi":lumi_mc      },# ,'sumWeights':T2Deg[1] ,'xsec':8.51615    },  "weight":weights.isrWeight(9.5e-5)
-              "s60FS":          {'sample': cmgPP.T2DegStop_300_240_FastSim[skim]        ,'name':'S300_240Fast'      ,'color':colors["s60FS"   ]           , 'isSignal':1 ,'isData':0    ,"lumi":lumi_mc   ,"triggers":""   ,"filters":""   ,"weight":"(weight*0.3520*(%s))"%weights.isrWeight(9.5e-5)   },# ,'sumWeights':T2Deg[1] ,'xsec':8.51615    },
-              "s30FS":          {'sample': cmgPP.T2DegStop_300_270_FastSim[skim]        ,'name':'S300_270Fast'      ,'color':colors["s30FS"   ]           , 'isSignal':1 ,'isData':0    ,"lumi":lumi_mc   ,"triggers":""   ,"filters":""   ,"weight":"(weight*0.2647*(%s))"%weights.isrWeight(9.5e-5)   },# ,'sumWeights':T2Deg[1] ,'xsec':8.51615    },
-              "s10FS":          {'sample': cmgPP.T2DegStop_300_290_FastSim[skim]        ,'name':'S300_290Fast'      ,'color':colors["s10FS"   ]           , 'isSignal':1 ,'isData':0    ,"lumi":lumi_mc   ,"triggers":""   ,"filters":""   ,"weight":"(weight*0.2546*(%s))"%weights.isrWeight(9.5e-5)   },# ,'sumWeights':T2Deg[1] ,'xsec':8.51615    },
-              "t2tt30FS":       {'sample': cmgPP.T2tt_300_270_FastSim[skim]             ,'name':'T2tt300_270Fast'   ,'color':colors["t2tt30FS"]           , 'isSignal':1 ,'isData':0    ,"lumi":lumi_mc   ,"triggers":""   ,"filters":""   ,"weight":"(weight*0.2783*(%s))"%weights.isrWeight(9.5e-5)   },# ,'sumWeights':T2Deg[1] ,'xsec':8.51615    },
+              "s30":            {'sample': cmgPP.T2DegStop_300_270[skim]                ,'name':'S300_270'        ,'color':colors["s30"     ]             , 'isSignal':2 ,'isData':0    ,"lumi":lumi_mc      },# ,'sumWeights':T2Deg[1] ,'xsec':8.51615    },  "weight":weights.isrWeight(9.5e-5)
+              "s60FS":          {'sample': cmgPP.T2DegStop_300_240_FastSim[skim]        ,'name':'S300_240Fast'      ,'color':colors["s60FS"   ]           , 'isSignal':2 ,'isData':0    ,"lumi":lumi_mc   ,"triggers":""   ,"filters":""   ,"weight":"(weight*0.3520*(%s))"%weights.isrWeight(9.5e-5)   },# ,'sumWeights':T2Deg[1] ,'xsec':8.51615    },
+              "s30FS":          {'sample': cmgPP.T2DegStop_300_270_FastSim[skim]        ,'name':'S300_270Fast'      ,'color':colors["s30FS"   ]           , 'isSignal':2 ,'isData':0    ,"lumi":lumi_mc   ,"triggers":""   ,"filters":""   ,"weight":"(weight*0.2647*(%s))"%weights.isrWeight(9.5e-5)   },# ,'sumWeights':T2Deg[1] ,'xsec':8.51615    },
+              "s10FS":          {'sample': cmgPP.T2DegStop_300_290_FastSim[skim]        ,'name':'S300_290Fast'      ,'color':colors["s10FS"   ]           , 'isSignal':2 ,'isData':0    ,"lumi":lumi_mc   ,"triggers":""   ,"filters":""   ,"weight":"(weight*0.2546*(%s))"%weights.isrWeight(9.5e-5)   },# ,'sumWeights':T2Deg[1] ,'xsec':8.51615    },
+              "t2tt30FS":       {'sample': cmgPP.T2tt_300_270_FastSim[skim]             ,'name':'T2tt300_270Fast'   ,'color':colors["t2tt30FS"]           , 'isSignal':2 ,'isData':0    ,"lumi":lumi_mc   ,"triggers":""   ,"filters":""   ,"weight":"(weight*0.2783*(%s))"%weights.isrWeight(9.5e-5)   },# ,'sumWeights':T2Deg[1] ,'xsec':8.51615    },
                           })
     if "w" in sampleList:
         WJetsSample     = cmgPP.WJetsHT[skim] if useHT else cmgPP.WJetsInc[skim]
@@ -90,8 +89,8 @@ def getSamples( wtau=False, sampleList=['w','tt','z','sig'],
             TTJetsHTLowChain    = getChain( cmgPP.TTJetsHTLow[skim], histname='')
             TTJetsHTHighChain    = getChain( cmgPP.TTJetsHTHigh[skim], histname='')
             TTJetsHTRestChain    = getChain( cmgPP.TTJetsHTRest[skim], histname='')
-            TTJetsHTRestChain.Add(  cmgPP.TTJetsHTLowChain  )
-            TTJetsHTRestChain.Add(  cmgPP.TTJetsHTHighChain )
+            TTJetsHTRestChain.Add(  TTJetsHTLowChain  )
+            TTJetsHTRestChain.Add(  TTJetsHTHighChain )
             
             
             sampleDict.update({
@@ -143,7 +142,8 @@ def getSamples( wtau=False, sampleList=['w','tt','z','sig'],
                         #icolor += 1 
                         sampleDict.update({
                             #'s%s_%s'%(mstop,mlsp):      {'sample':eval("SMS_T2_4bd_mStop_%s_mLSP_%s"%(mstop,mlsp))[skim]        ,'name':'T2_4bd%s_%s'%(mstop,mlsp)          ,'color': icolor         , 'isSignal':1 ,'isData':0    ,"lumi":lumi_mc      } ,
-                            's%s_%s'%(mstop,mlsp):      {'sample':getattr(cmgPP,"SMS_T2_4bd_mStop_%s_mLSP_%s"%(mstop,mlsp))[skim]        ,'name':'T2_4bd%s_%s'%(mstop,mlsp)         , "weight":"(weight*(%s))"%weights.isrWeight(9.5e-5) ,'color': icolor         , 'isSignal':1 ,'isData':0    ,"lumi":lumi_mc      } ,
+                            #'s%s_%s'%(mstop,mlsp):      {'sample':getattr(cmgPP,"SMS_T2_4bd_mStop_%s_mLSP_%s"%(mstop,mlsp))[skim]        ,'name':'T2_4bd_%s_%s'%(mstop,mlsp)         , "weight":"(weight*(%s))"%weights.isrWeight(9.5e-5) ,'color': icolor         , 'isSignal':1 ,'isData':0    ,"lumi":lumi_mc      } ,
+                             's%s_%s'%(mstop,mlsp):      {'sample':getattr(cmgPP,"SMS_T2_4bd_mStop_%s_mLSP_%s"%(mstop,mlsp))[skim]        ,'name':'T2_4bd_%s_%s'%(mstop,mlsp)         , "weight":"weight" ,'color': icolor         , 'isSignal':1 ,'isData':0    ,"lumi":lumi_mc      } ,
                                             })
 
 
@@ -153,6 +153,9 @@ def getSamples( wtau=False, sampleList=['w','tt','z','sig'],
     for samp in sampleDict:
       sampleDict2[samp]=Sample(**sampleDict[samp])
     samples = Samples(**sampleDict2)
+
+    samples.addWeight( lumi_target/lumi_mc , sampleList=[])         ## scale to the target luminosity
+    samples.addWeight( weights.isrWeight(9.5e-5)  , sampleList=samples.massScanList())   ## apply isrWeight to the massScan
 
     return samples
 

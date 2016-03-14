@@ -1,56 +1,63 @@
-
+from Workspace.DegenerateStopAnalysis.navidTools.NavidTools import makeStopLSPPlot, getTH2FbinContent, makeStopLSPRatioPlot 
+from optparse import OptionParser
+parser = OptionParser()
+(options,args) = parser.parse_args()
 
 
 import pickle
 import os
 
 
-#limit_pickle = "./pkl/RunII_Reload_Scan_Limits_2260.pkl"
-limit_pickle = "./pkl/limits_scan_isr_2200pbm1.pkl"
-
-limits = pickle.load(open(limit_pickle, "r"))
-
-xyz = []
-
-for point in limits:
-    if point in ['s30','s30FS','s10FS','s60FS','t2tt30FS']:
-        continue
-    #masses = point.replace("Reload_Inc_T2_4bd","").replace("s","")
-    masses = point.replace("isrrw_Reload_Inc_T2_4bd","").replace("_2200pbm1","")
-    mstop, mlsp = masses.rsplit("_")[:2]
-    #xyz.append( [ float(mstop),float(mlsp),float( limits[point][1]['0.500'] ) ]  )
-    #xyz.append( [ float(mstop),float(mlsp),float( limits[point]['0.500'] ) ]  )
-    if limits[point]:
-        xyz.append( [ int(mstop),int(mlsp),float( limits[point]['50.0'] ) ]  )
-    #else:
-    #    xyz.append( [ int(mstop),int(mlsp),float( -1 ) ]  )
-
+#
+# limit pickle file
+#
 import ROOT
-ROOT.gStyle.SetOptStat(0)
-ROOT.gStyle.SetPaintTextFormat("0.2f")
+import Workspace.DegenerateStopAnalysis.navidTools.limitTools as limitTools
+#limit_pickle = args[0]
 
 
-plot = ROOT.TH2F("explim","expected limit", 24,100,700, 70,0,700 )
+result_dict= {
+                "8tev"      :   {    "pkl":"../../data/limits/8TeV/Full/limits.pkl"                 ,"savedir":"/afs/hephy.at/user/n/nrad/www/T2Deg13TeV/mAODv2_7412pass2/reload/ExpLimit_8TeV.png" },
+                "13tev_isr" :   {    "pkl":"../../data/limits/RunII_IsrWeight/limits.pkl"           ,"savedir":"/afs/hephy.at/user/n/nrad/www/T2Deg13TeV/mAODv2_7412pass2/reload/ExpLimit_13TeV_IsrWeights.png" },
+                "13tev_sys" :   {    "pkl":"../../data/limits/RunII_SysAdjust_IsrWeight/limits.pkl" ,"savedir":"/afs/hephy.at/user/n/nrad/www/T2Deg13TeV/mAODv2_7412pass2/reload/ExpLimit_13TeV_IsrWeights_AdjustedSys.png" },
+             }
+
+
+bins8tev_dir  ="/afs/hephy.at/user/n/nrad/CMSSW/fork/CMSSW_7_4_12_patch4/src/Workspace/DegenerateStopAnalysis/plotsNavid/data/cards/8TeV/Bins" 
+import glob
+
+bins8tev_pkls = glob.glob(bins8tev_dir+"/*.pkl")
+bins8tev_savedir = "/afs/hephy.at/user/n/nrad/www/T2Deg13TeV/mAODv2_7412pass2/reload/expected_limit/8tev/bins/"
+bins8tev = [
+            { "name":limitTools.get_filename(b) , "pkl":b, "savedir":bins8tev_savedir+"/%s.png"%limitTools.get_filename(b) } for b in bins8tev_pkls
+           ]
+
+
+bins13tev_dir  = "/afs/hephy.at/user/n/nrad/CMSSW/fork/CMSSW_7_4_12_patch4/src/Workspace/DegenerateStopAnalysis/plotsNavid/data/cards/13TeV/Reload_IsrWeight/Bins"    
+bins13tev_pkls = glob.glob(bins13tev_dir+"/*.pkl")
+bins13tev_savedir = "/afs/hephy.at/user/n/nrad/www/T2Deg13TeV/mAODv2_7412pass2/reload/expected_limit/13tev/bins/"
+bins13tev = [
+            { "name":limitTools.get_filename(b) , "pkl":b, "savedir":bins13tev_savedir+"/%s.png"%limitTools.get_filename(b) } for b in bins13tev_pkls
+           ]
 
 
 
 
 
-for x,y,z in xyz:
-    plot.Fill(x,y,z)
+#limit_pickle = "./pkl/RunII_Reload_Scan_Limits_2260.pkl"
+#if not limit_pkl:
+#    limit_pickle = "./pkl/limits_scan_isr_2200pbm1.pkl"
 
 
-
-plot.SetContour(2 )
-plot.SetContourLevel(0,0 )
-plot.SetContourLevel(1,1 )
-plot.SetContourLevel(2,10 )
+doStuff = True
 
 
-
-output_name = os.path.splitext(os.path.basename(limit_pickle))[0]+".png"
-
-c1 = ROOT.TCanvas("c1","c1",1920,1080)
-plot.Draw("COL TEXT")
-c1.SaveAs("/afs/hephy.at/user/n/nrad/www/T2Deg13TeV/mAODv2_7412pass2/reload_scan/%s"%output_name)
+if __name__ == "__main__":
+    if doStuff:
+        #for l in result_dict:
+        #    limitTools.drawExpectedLimit(result_dict[l]  )
+        for l in bins8tev:                                                                           
+            limitTools.drawExpectedLimit(l)
+        for l in bins13tev:
+            limitTools.drawExpectedLimit(l)
 

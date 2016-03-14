@@ -1,0 +1,51 @@
+\documentclass[12pt]{paper}
+\usepackage{a4}
+%\usepackage[usenames,dvipnames]{color}
+\usepackage{amssymb,amsmath}
+\usepackage{amsfonts}
+\usepackage{epsfig,graphics,graphicx,graphpap,color}
+\usepackage{slashed,xspace,setspace}
+\usepackage{caption}
+\usepackage{rotating}
+\usepackage{fullpage}
+\usepackage[top=0.83in]{geometry}
+\usepackage{longtable}
+\usepackage{multirow}
+\usepackage{hhline}
+
+\BLOCK{-  set nRows     =   rowList | length  }
+\BLOCK{-  set nCols     =   colList | length  }
+
+\BLOCK{- if transpose }
+\BLOCK{- endif}
+
+\#{ BLOCK{- set colSetup="|c"*2+ "|c"*nBkgs +"||c|" + "|c"*nSigs*2 +"|" }
+\BLOCK{- set colSetup="|c"*(nCols+2) +"|" }
+
+% \VAR{ rowList }
+%     nRow=\VAR{nRows}
+% \VAR{ colList }
+%     nCol=\VAR{nCols}
+% \VAR{ yieldDict }
+%   <#- set colSetup="|c"*(nCol+1)+"|" #}
+\begin{document}
+\begin{table}[ht]\begin{center}\resizebox{\textwidth}{!}
+{\begin{tabular}{\VAR{colSetup}}\hline
+&   \BLOCK{ for col in colList }  &  \VAR{ col }   \BLOCK{endfor } \\ 
+\hline\hline\multirow{\VAR{nRows}}{*}{\begin{sideways} TITLE \end{sideways}}
+
+\BLOCK{- for row in rowList }
+   \BLOCK{- set rowLoop = loop }
+   \BLOCK{- if rowLoop.first} 
+    \BLOCK{- else}
+    \BLOCK{- endif}
+\BLOCK{if "Total" in row} \cline{2-\VAR{nCols+2}}  \BLOCK{endif}
+& \VAR{row}  \BLOCK{ for col in colList }  &  \VAR{ yieldDict[row][col] | replace("+-","$\pm$") }   \BLOCK{endfor } \\ 
+\BLOCK{if "FOM" in row or "Total" in row} \cline{2-\VAR{nCols+2}} \BLOCK{endif}
+\BLOCK{- endfor }
+
+\hline
+\end{tabular}}
+\end{center}\caption{\VAR{CAPTION}}\end{table}
+\end{document}
+
