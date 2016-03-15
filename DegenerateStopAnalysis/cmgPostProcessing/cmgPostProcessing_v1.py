@@ -45,6 +45,11 @@ def get_parser():
         help="Log level for logging"
         )
     
+    argParser.add_argument('--verbose',
+        action='store_true',
+        help="Switch for print statements, for those who can not survive a job without seeing something printed " + 
+            "on the screen. \n bool flag set to True if used")
+
     argParser.add_argument('--overwriteOutputFiles',
         action='store_true',
         help="Overwrite existing output files, bool flag set to True  if used")
@@ -250,9 +255,8 @@ def getSamples(args):
         import Workspace.DegenerateStopAnalysis.cmgTuples_Data25ns_scan as cmgSamples
     elif cmgTuples == "Data_50ns":
         import Workspace.DegenerateStopAnalysis.cmgTuples_Data50ns_1l as cmgSamples
-    #elif cmgTuples == "RunIISpring15DR74_25ns":
-    #    import Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_7412pass2 as cmgSamples
     elif cmgTuples == "RunIISpring15DR74_25ns":
+        #import Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_7412pass2 as cmgSamples
         import Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_7412pass2_mAODv2_v4 as cmgSamples
     elif cmgTuples == "RunIISpring15DR74_50ns":
         import Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_50ns as cmgSamples
@@ -970,7 +974,7 @@ def processLeptons(leptonSelection, readTree, splitTree, saveTree, params):
     
 
         saveTree.looseMuonIndex1     =  lepList[0] if saveTree.nMuons > 0 else -1
-        saveTree.looseMuonPt30Index2 =  lepPt30List[0] if saveTree.nMuonsPt30 > 0 else -1
+        saveTree.looseMuonPt30Index1 =  lepPt30List[0] if saveTree.nMuonsPt30 > 0 else -1
         saveTree.looseMuonIndex2     =  lepList[1] if saveTree.nMuons > 1 else -1
         saveTree.looseMuonPt30Index2 =  lepPt30List[1] if saveTree.nMuonsPt30 > 1 else -1
 
@@ -1480,29 +1484,34 @@ def processMasses(readTree, saveTree):
     #
     return saveTree
 
-def processEventVetoList(readTree,splitTree, saveTree, sample,  veto_event_list):
+def processEventVetoList(readTree, splitTree, saveTree, sample, veto_event_list):
     ''' 
         
     '''
+    
+    logger = logging.getLogger('cmgPostProcessing.processEventVetoList')
+
     if not sample['cmgComp'].isData:
         return
 
-    run  = int(splitTree.GetLeaf('run').GetValue()      )
-    lumi = int(splitTree.GetLeaf('lumi').GetValue()     )
-    evt  = int(splitTree.GetLeaf('evt').GetValue()      )
+    run = int(splitTree.GetLeaf('run').GetValue())
+    lumi = int(splitTree.GetLeaf('lumi').GetValue())
+    evt = int(splitTree.GetLeaf('evt').GetValue())
 
-    run_lumi_evt = "%s:%s:%s\n"%(run,lumi,evt) 
-    #print run_lumi_evt
+    run_lumi_evt = "%s:%s:%s\n" % (run, lumi, evt) 
+    
     if run_lumi_evt in veto_event_list:
         saveTree.Flag_Veto_Event_List = 0
-        #print "=====   evt Failed veto list %s"%run_lumi_evt
-    #else:
-        #print "=   evt  veto list %s"%run_lumi_evt
+        logger.debug(
+            "\n Run:LS:Event %s failed veto list",
+            run_lumi_evt
+            )
+    else:
+        logger.debug(
+            "\n Run:LS:Event %s passed veto list",
+            run_lumi_evt
+            )
         
-
-
-
-
 
 def computeWeight(sample, sumWeight,  splitTree, saveTree, params, xsec=None):
     ''' Compute the weight of each event.
@@ -1642,7 +1651,7 @@ def cmgPostProcessing(argv=None):
     # choose the sample(s) to process (allSamples), with results saved in outputDirectory
     
     cmgTuples = args.cmgTuples
-    allSamples, outputDirectory , mass_dict = getSamples(args)
+    allSamples, outputDirectory, mass_dict = getSamples(args)
      
     # logging configuration
 
@@ -1762,10 +1771,6 @@ def cmgPostProcessing(argv=None):
         sampleType = 'Data' if sample['cmgComp'].isData else 'MC'
                       
         chunks, sumWeight = hephyHelpers.getChunks(sample)
-
-            
-
-            #sumWeight = mass_dict[mstop][mlsp]
                 
         logger.info(
             "\n Running on sample %s of type %s" + \
@@ -1914,6 +1919,7 @@ def cmgPostProcessing(argv=None):
                 nVerboseEvents = 10000
                 
                 for iEv in xrange(nEvents):
+                    
                     nEvents_total +=1
                     if (nEvents_total%nVerboseEvents == 0) and nEvents_total>0:
                         passed_time = int(time.time() ) - last_time
@@ -1938,7 +1944,7 @@ def cmgPostProcessing(argv=None):
                         )
                     
                     # leptons processing
-                    saveTree, lep  = processLeptons(leptonSelection, readTree, splitTree, saveTree, params)
+                    saveTree, lep = processLeptons(leptonSelection, readTree, splitTree, saveTree, params)
                     
                     # jets processing
                     saveTree, jets = processJets(leptonSelection, readTree, splitTree, saveTree)
@@ -1956,9 +1962,9 @@ def cmgPostProcessing(argv=None):
                     saveTree = processMasses(readTree, saveTree)
               
                     # process event veto list flags
-                    processEventVetoList(readTree,splitTree,saveTree, sample, event_veto_list)
+                    processEventVetoList(readTree, splitTree, saveTree, sample, event_veto_list)
 
-                    processGenSusyParticles(readTree,splitTree,saveTree)
+                    processGenSusyParticles(readTree, splitTree, saveTree)
 
 
                     # compute the weight of the event
@@ -1975,7 +1981,7 @@ def cmgPostProcessing(argv=None):
 
                 # 
                 
-                #fileTreeSplit = sample['name'] + '_' + chunk['name'] + '_' + str(iSplit) + '.root' 
+                # fileTreeSplit = sample['name'] + '_' + chunk['name'] + '_' + str(iSplit) + '.root' 
                 fileTreeSplit = sample_name + '_' + chunk['name'] + '_' + str(iSplit) + '.root' 
                 filesForHadd.append(fileTreeSplit)
 
