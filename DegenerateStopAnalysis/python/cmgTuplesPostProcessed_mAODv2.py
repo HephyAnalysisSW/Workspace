@@ -3,9 +3,15 @@ import copy, os, sys
 #spring15_inc_sample_dir = "/data/nrad/cmgTuples/postProcessed_Spring15_vasile_v1/"
 
 
+#from Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_7412pass2_mAODv2_v4 import mass_dict
+## somehow import mass_dict without having to load files in cmgSample file.... (?)
+
+
+
 mc_path     = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/7412pass2_SMSScan_v2/RunIISpring15DR74_25ns" 
 signal_path = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/7412pass2_SMSScan_v2/RunIISpring15DR74_25ns" 
 data_path   = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/7412pass2_SMSScan_v2/Data_25ns" 
+lumi_mc     = 10000. # Lumi that was used in the weight calculation of PostProcessing in pb-1
 
 class cmgTuplesPostProcessed():
 
@@ -32,12 +38,12 @@ class cmgTuplesPostProcessed():
           #'dir' : "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/mAODv2_v4_SMSScan_v1/RunIISpring15DR74_25ns",
           'bins':[signal]}
 
-    def __init__(self, mc_path=mc_path, signal_path=signal_path, data_path=data_path):
+    def __init__(self, mc_path=mc_path, signal_path=signal_path, data_path=data_path, lumi_mc=lumi_mc):
 
         self.mc_path    =   mc_path
         self.signal_path=   signal_path
         self.data_path  =   data_path
-    
+        self.lumi       =   lumi_mc 
 
         print "MC DIR:      ",   mc_path
         print "SIGNAL DIR:  ",   signal_path

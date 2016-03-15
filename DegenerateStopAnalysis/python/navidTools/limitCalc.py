@@ -16,7 +16,7 @@ import ROOT
 #pickleFiles = ["/afs/hephy.at/user/n/nrad/CMSSW/CMSSW_7_4_7/src/Workspace/DegenerateStopAnalysis/plotsNavid/analysis/pkl/SR1_r1_a.pkl"]
 
 
-def getLimit(yld, sig=None , cardBaseName = "", sys_uncorr=1.2, sys_corr = 1.06):
+def getLimit(yld, sig=None , outDir ="./cards/", postfix = "", sys_uncorr=1.2, sys_corr = 1.06):
     c = cardFileWriter()
     c.defWidth=40
     c.maxUncNameWidth=40
@@ -86,13 +86,16 @@ def getLimit(yld, sig=None , cardBaseName = "", sys_uncorr=1.2, sys_corr = 1.06)
         c.bins.remove(bin)
     
     sigName  =  yld.yieldDict[sig][0]
-    filename =  yld.tableName +"_"+ sigName 
-    if cardBaseName:
-        filename = cardBaseName +"_" + filename
+    filename =  sigName + "_" + yld.tableName
+    if postfix:
+        if not postfix.startswith("_"):
+            postfix = "_" + postfix
+        filename += postfix
+
     
     cardName='%s.txt'%filename
-    c.writeToFile('./cards/%s'%cardName)
-    print "Card Written To: %s"%'./cards/%s'%cardName
+    c.writeToFile('%s/%s'%(outDir,cardName))
+    print "Card Written To: %s/%s"%(outDir,cardName)
     #limits=c.calcLimit("./output/%s"%cardName)
     limits=c.calcLimit()
     #print cardName,   "median:  ", limits['0.500']
@@ -216,8 +219,15 @@ def plotLimits(limitDict):
 
 import subprocess
 
-def calcLimitFromCard(card="./cards/T2DegStop_300_270_cards.txt"): 
-    out = subprocess.Popen(['combine', '--saveWorkspace', '-M', 'Asymptotic',card], stdout = subprocess.PIPE)
+#def calcLimitFromCard(card="./cards/T2DegStop_300_270_cards.txt"): 
+def calcLimitFromCard(card="./cards/T2DegStop_300_270_cards.txt", name="", mass=""):
+    command = ['combine', '--saveWorkspace', '-M', 'Asymptotic'] 
+    if name:
+        command.extend(["--name", name])
+    if mass:
+        command.extend(["--mass, mass"])
+    command.append(card)
+    out = subprocess.Popen(command, stdout = subprocess.PIPE)
     start = False
     end   = False
     limit = {}
@@ -230,14 +240,17 @@ def calcLimitFromCard(card="./cards/T2DegStop_300_270_cards.txt"):
             continue
         if line == "\n":
             break
-        print line
-
-        for v in ["%:", "\n", "r <"]:
+        #print line
+        for v in [":","%", "\n", "r <"]:
             line = line.replace(v,"")
-
         ret.append(line)
-        line = line.rsplit()[1:]
-        limit[line[0]]=line[1]
+        limit_sig, limit_val = line.rsplit()[1:]
+        if "limit" in limit_sig.lower(): # this should be the observed limit
+            limit_sig = "-1"
+        else:
+            limit_sig = "%0.3f"%(float ( limit_sig ) / 100.)
+        
+        limit[limit_sig]=limit_val
     return limit
 
 
