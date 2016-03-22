@@ -1,82 +1,77 @@
-#eleIdEffs.py
+# eleIdEffs.py
+# Script to produce electron ID efficiency plots with different ID definitions: standard EG Spring 15 (25ns) ID, manually applied cuts, including isolation and with one cut removed (N-1)
+# Author: Mateusz Zarucki
+
 import ROOT
 import os, sys
-from Workspace.HEPHYPythonTools.helpers import getChunks, getChain#, getPlotFromChain, getYieldFromChain
+import Workspace.DegenerateStopAnalysis.toolsMateusz.ROOToptions
+#from Workspace.HEPHYPythonTools.helpers import getChunks, getChain#, getPlotFromChain, getYieldFromChain
 #from Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_7412pass2 import * #data_path = "/data/nrad/cmgTuples/RunII/7412pass2_v4/RunIISpring15xminiAODv2"
-from Workspace.DegenerateStopAnalysis.toolsMateusz.getSamples_PP_mAODv2_7412pass2 import * #MC_path = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/7412pass2_v4_012016_v2/RunIISpring15DR74_25ns" SIGNAL_path = "/afs/hephy.at/dat
+#from Workspace.DegenerateStopAnalysis.toolsMateusz.getSamples_PP_mAODv2_7412pass2 import * #MC_path = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/7412pass2_v4_012016_v2/RunIISpring15DR74_25ns" SIGNAL_path = "/afs/hephy.at/dat
+from Workspace.DegenerateStopAnalysis.cmgTuplesPostProcessed_mAODv2 import cmgTuplesPostProcessed
+from Workspace.DegenerateStopAnalysis.navidTools.getSamples_PP_mAODv2_7412pass2_scan import getSamples
 from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
+from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
 from array import array
 from math import pi, sqrt #cos, sin, sinh, log
-from optparse import OptionParser
+import argparse
 
-#Input options
-parser = OptionParser()
-parser.add_option("--id", dest="ID",  help="Electron ID type", type="str", default="standard") # "standard" "noIso" "iso"
-parser.add_option("--plot", dest="plot",  help="Plot type", type="str", default="efficiency") # "efficiency" "misID" "misID2"
-parser.add_option("--sample", dest="sample",  help="Sample", type="str", default="S300_270FS") # "S300_240FS" "S300_270FS" "S300_290FS" "S300_270" "T2tt300_270FS" "TTJets" "WJets" "ZJets" 
-parser.add_option("--presel", dest="presel",  help="Add preselection", type="int", default=1) # applies preselection
-parser.add_option("--mvaWPs", dest="mvaWPs",  help="Add MVA WPs", type="int", default=0) # includes MVA WPs
-parser.add_option("--iso", dest="iso",  help="Isolation", type="str", default="relIso03") #"relIso03" "relIso04" "miniRelIso" "relIsoAn04"
-parser.add_option("--zoom", dest="zoom",  help="Toggle zoom", type="int", default=1)
-parser.add_option("--save", dest="save",  help="Toggle save", type="int", default=1)
-#parser.add_option("-b", dest="batch",  help="batch", action="store_true", default=False)
-(options, args) = parser.parse_args()
-if len(args)==0:
-   print "No arguments given. Using default settings."
-   #exit()
-#assert len(args)==1
+mc_path     = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/7412pass2_SMSScan_v3/RunIISpring15DR74_25ns"
+signal_path = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/7412pass2_SMSScan_v3/RunIISpring15DR74_25ns"
+data_path   = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/7412pass2_SMSScan_v3/Data_25ns"
 
-#Arguments 
-ID = options.ID 
-plot = options.plot 
-sample = options.sample 
-presel = options.presel 
-mvaWPs = options.mvaWPs
-zoom = options.zoom
-save = options.save
-if ID == "iso": isolation = options.iso
-#nEles = "01" # 01,01tau,1,2 #Number of electrons in event
-
-#ROOT Options
-ROOT.gROOT.Reset() #re-initialises ROOT
-#ROOT.gROOT.SetStyle("Plain")
-
-ROOT.gStyle.SetOptStat(1111) #0 removes histogram statistics box #Name, Entries, Mean, RMS, Underflow, Overflow, Integral, Skewness, Kurtosis
-ROOT.gStyle.SetOptFit(1111) #1111 prints fits results on plot
-#ROOT.gStyle.SetOptTitle(0) #suppresses title box
-#ROOT.gStyle.SetFuncWidth(1)
-#ROOT.gStyle.SetFuncColor(9)
-#ROOT.gStyle.SetLineWidth(2)
-
-ROOT.gStyle.SetPaintTextFormat("4.2f")
-#ROOT.gStyle.SetTitleX(0.5) 
-#ROOT.gStyle.SetTitleAlign(23)
-#ROOT.gStyle.SetTitleW(0.8)
-
-ROOT.gStyle.SetStatX(0.75)
-ROOT.gStyle.SetStatY(0.65)
-ROOT.gStyle.SetStatW(0.1)
-ROOT.gStyle.SetStatH(0.15)
+cmgPP = cmgTuplesPostProcessed(mc_path, signal_path, data_path)
 
 #Samples
-samples = getSamples()
-signals = ["S300_240FS", "S300_270FS", "S300_290FS", "S300_270", "T2tt300_270FS"]
-backgrounds = ["TTJets", "WJets", "QCD", "ZJets"]
+privateSignals = ["s10FS", "s30", "s30FS", "s60FS", "t2tt30FS"]
+backgrounds=["w","tt","z","qcd"]
+samplesList = privateSignals + backgrounds
+samples = getSamples(sampleList=samplesList, scan=True, useHT=False, cmgPP=cmgPP, getData=False)
+officialSignals = [s for s in samples if samples[s]['isSignal'] and not samples[s]['isData'] and s not in privateSignals and s not in backgrounds] 
+signals = privateSignals + officialSignals
+
+#Input options
+parser = argparse.ArgumentParser(description="Input options")
+parser.add_argument("--plot", dest="plot",  help="Plot type", type=str, default="efficiency") # "efficiency" "misID" "misID2"
+parser.add_argument("--id", dest="ID",  help="Electron ID type", type=str, default="standard") # "standard" "manual" "iso"
+parser.add_argument("--removedCut", dest="removedCut",  help="Variable removed from electron ID", type=str, default="") #"sigmaEtaEta" "dEta" "dPhi" "hOverE" "ooEmooP" "d0" "dz" "MissingHits" "convVeto"
+parser.add_argument("--iso", dest="iso",  help="Isolation", type=str, default="relIso03") #"relIso03" "relIso04" "miniRelIso" "relIsoAn04"
+parser.add_argument("--mvaWPs", dest="mvaWPs",  help="Add MVA WPs", type=int, default=0) # includes MVA WPs
+parser.add_argument("--presel", dest="presel",  help="Add preselection", type=int, default=1) # applies preselection
+parser.add_argument("--lowPt", dest="lowPt",  help="Low electron pt selection", type=int, default=0)
+parser.add_argument("--sample", dest="sample",  help="Sample", type=str, default="s30") # "s10FS", "s30", "s30FS", "s60FS", "t2tt30FS"
+parser.add_argument("--save", dest="save",  help="Toggle save", type=int, default=1)
+parser.add_argument("--zoom", dest="zoom",  help="Toggle zoom", type=int, default=1)
+parser.add_argument("-b", dest="batch",  help="Batch mode", action="store_true", default=False)
+args = parser.parse_args()
+if not len(sys.argv) > 1:
+   print makeLine()
+   print "No arguments given. Using default settings."
+   print makeLine()
+   #exit()
+
+#Arguments
+plot = args.plot 
+ID = args.ID 
+removedCut = args.removedCut 
+mvaWPs = args.mvaWPs
+presel = args.presel
+lowPt = args.lowPt 
+sample = args.sample 
+zoom = args.zoom
+save = args.save
+if ID == "iso": isolation = args.iso
+#nEles = "01" # 01,01tau,1,2 #Number of electrons in event
 
 print makeLine()
 print "Samples:"
 newLine()
-for s in sorted(samples.keys()):
-   print samples[s].name,":",s
-   if samples[s].name not in signals and samples[s].name not in backgrounds:
-      print makeLine()
-      print "!!! Warning: Sample " + samples[s].name + " missing in samples lists. Please update."
-      print makeLine()
-   if sample == samples[s].name:
-      sampleKey = s
-      #break #would not scan all samples 
-newLine()
-print "Using", sample, "samples."
+for s in sorted(samples.keys()): print samples[s].name,":",s
+print makeLine()
+if sample in samples.keys(): print "Using", samples[sample].name, "sample."
+else: 
+   print "!!! Sample " + sample + " unavailable."
+   sys.exit(0)
 print makeLine()
 
 #Geometric divisions
@@ -90,12 +85,26 @@ ptSplit = 10 #we have above and below 10 GeV categories
 #DeltaR cut for matching
 deltaRcut = 0.3
 
+#Selection criteria
+#intLum = 10.0 #fb-1
+#weight = "(xsec*" + str(intLum) + "*(10^3)/" + str(getChunks(sample)[1]) + ")" #xsec in pb
+weight = samples[sample].weight
+
+#Preselection
+preSel1 = "(met_pt > 200)" #MET
+preSel2 = "(Sum$(Jet_pt*(Jet_pt > 30 && abs(Jet_eta) < 4.5 && Jet_id)) > 200)" #HT = Sum of Jets > 30GeV
+preSel3 = "(Max$(Jet_pt*(abs(Jet_eta) < " + str(etaAcc) + ") > 100))" #ISR
+preSelList = [preSel1, preSel2, preSel3]
+
+if presel: preSel = combineSelList(preSelList) 
+else: preSel = "1"
+
 #single-lepton (semileptonic) events
 #if nEles == "01":
 #Generated electron selection
 nSel = "ngenLep == 1" #removes dileptonic events
 genSel1 = "(abs(genLep_pdgId[0]) == 11 && abs(genLep_eta[0]) < " + str(etaAcc) + ")" #electron selection #index [0] ok since (only element)
-genSel = nSel + "&&" + genSel1
+genSel = combineSel(nSel, genSel1)
 
 #Reconstructed electron selection
 deltaR = "sqrt((genLep_eta[0] - LepGood_eta)^2 + (genLep_phi[0] - LepGood_phi)^2)"
@@ -103,8 +112,22 @@ matchSel = "(" + deltaR +"*(abs(LepGood_pdgId) == 11 && abs(LepGood_eta) < " + s
 "&& (" + deltaR +"*(abs(LepGood_pdgId) == 11 && abs(LepGood_eta) < " + str(etaAcc) + " && LepGood_mcMatchId != 0)) != 0)"
 
 #Variable to plot
-if plot == "efficiency": var = "genLep_pt[0]"
-elif plot == "misID" or plot == "misID2": var = "LepGood_pt"
+if plot == "efficiency": variable = "genLep_pt[0]"
+elif plot == "misID" or plot == "misID2": variable = "LepGood_pt"
+
+##single-electron events (semileptonic & dileptonic)
+#elif nEles == "1": #semileptonic
+#   #Generated electron selection
+#   nSel = "ngenLep > 0" #redundant with genSel2 #nLepGood > 0 introduces bias
+#   genSel1 = "(abs(genLep_pdgId) == 11 && abs(genLep_eta) < " + str(etaAcc) + ")" #electron selection (includes dielectron evts) #ngenLep == 1 would remove dileptonic events # index [0] does not include single-electron events with muon 
+#   genSel2 = "(Sum$(abs(genLep_pdgId) == 11 && abs(genLep_eta) < " + str(etaAcc) + ") == 1)" # = number of electrons (includes dileptonic and semileptonic events) 
+#   genSel = nSel + "&&" + genSel1 + "&&" + genSel2
+#
+#elif nEles == "2": #dileptonic
+#   nSel = "ngenLep == 2" #does not include single-lepton events 
+#   genSel1 = "(abs(genLep_pdgId) == 11 && abs(genLep_eta) < " + str(etaAcc) + ")" #electron selection (includes dielectron evts) #ngenLep == 1 would remove dileptonic events
+#   genSel2 = "(Sum$(abs(genLep_pdgId) == 11 && abs(genLep_eta) < " + str(etaAcc) + ") == 2)" # = number of electrons (includes dilepton events only) 
+#   genSel = nSel + "&&" + genSel1 + "&&" + genSel2
 
 #Bin size 
 #nbins = 100
@@ -112,69 +135,123 @@ xmin = 0
 #xmax = 1000
 
 #Zoom
-if zoom == 0:
-   if sample in signals:
-      xmax = 150
-   elif sample in backgrounds:
-      xmax = 500
-   else:
-      print makeLine()
-      print "!!! Sample " + sample + " unavailable."
-      print makeLine()
-      sys.exit(0)
-      
+if not zoom:
+   xmax = 150
+   
    bins = array('d', range(xmin,50,2) + range(50,100,5) + range(100,xmax+10,10)) #Variable bin size
-   normFactor = "((" + var + " < 50)*0.5 + (" + var + " >= 50 &&" + var + " < 100)*0.2 + (" + var + " >= 100)*0.1)"
+   normFactor = "((" + variable + " < 50)*0.5 + (" + variable + " >= 50 &&" + variable + " < 100)*0.2 + (" + variable + " >= 100)*0.1)"
    z = ""
-
-elif zoom == 1:
+else: #zoomed
    #nbins = 10
-   xmax = 50
+   xmax = 20
    bins = array('d',range(xmin,xmax+2,2))
    normFactor = "(0.5)"
-   z = "_lowPt"
+   z = "_zoom"
 
-#Selection criteria
-#intLum = 10.0 #fb-1
-#weight = "(xsec*" + str(intLum) + "*(10^3)/" + str(getChunks(sample)[1]) + ")" #xsec in pb
-weight = samples[sampleKey].weight
+#Save
+if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
+   savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/electronID"
+ 
+   #Save path
+   if not removedCut:
+      savedir += "/efficiencies"
+      if ID == "iso": savedir += "/%s/%s/%s"%(ID, isolation, plot)
+      else: savedir += "/%s/%s"%(ID, plot)
+      
+      if lowPt: savedir += "/lowPt"
+   
+   else: #nMinus1
+      savedir2 = savedir + "/nMinus1/histogramCounts/" + plot
+      if removedCut == "None": savedir += "/nMinus1/variables/None/" + plot  
+      else: savedir += "/nMinus1/variables/%s/no_%s/%s"%(removedCut, removedCut, plot)
+   
+      if lowPt: 
+         savedir += "/lowPt"
+         savedir2 += "/lowPt"
+   
+      if not os.path.exists(savedir2): os.makedirs(savedir2)
+      
+   if not os.path.exists(savedir + "/root/histograms"): os.makedirs(savedir + "/root/histograms")
+   if not os.path.exists(savedir + "/pdf"): os.makedirs(savedir + "/pdf")
+   
+   #Histograms save file 
+   if not removedCut:
+      if ID == "iso": histos = ROOT.TFile(savedir + "/root/histograms/histos_%s_%s_%s%s.root"%(plot, isolation, samples[sample].name, z), "recreate")
+      else: histos = ROOT.TFile(savedir + "/root/histograms/histos_%s_%s_%s%s.root"%(plot, ID, samples[sample].name, z), "recreate")
+   else: histos = ROOT.TFile(savedir + "/root/histograms/histos_%s_no_%s_%s%s.root"%(plot, removedCut, samples[sample].name, z), "recreate")
+   
+###############################################################################################################################################################################
+#Electron ID Definitions
+#IDs: 0 - none, 1 - veto (~95% eff), 2 - loose (~90% eff), 3 - medium (~80% eff), 4 - tight (~70% eff)
+WPs = ['Veto', 'Loose', 'Medium', 'Tight']
+variables = ['sigmaEtaEta', 'dEta',  'dPhi', 'hOverE', 'ooEmooP', 'd0', 'dz', 'MissingHits', 'convVeto']
 
-#Preselection
-preSel1 = "(met_pt > 200)" #MET
-preSel2 = "(Sum$(Jet_pt*(Jet_pt > 30 && abs(Jet_eta) < 4.5 && Jet_id)) > 200)" #HT = Sum of Jets > 30GeV
-preSel3 = "(Max$(Jet_pt*(abs(Jet_eta) < " + str(etaAcc) + ") > 100))" #ISR
+WPcuts = {\
+'Veto':{'sigmaEtaEta':{'EB':0.0114, 'EE':0.0352}, 'dEta':{'EB':0.0152, 'EE':0.0113}, 'dPhi':{'EB':0.216, 'EE':0.237}, 'hOverE':{'EB':0.181, 'EE':0.116}, 'ooEmooP':{'EB':0.207, 'EE':0.174},\
+'d0':{'EB':0.0564, 'EE':0.222}, 'dz':{'EB':0.472, 'EE':0.921}, 'MissingHits':{'EB':2, 'EE':3}, 'convVeto':{'EB':1, 'EE':1}, 'relIso' : {'EB':0.126, 'EE':0.144}},
 
-if presel == 1: preSel = preSel1 + "&&" + preSel2 + "&&" + preSel3
-elif presel == 0: preSel = "1"
+'Loose':{'sigmaEtaEta':{'EB':0.0103, 'EE':0.0301}, 'dEta':{'EB':0.0105, 'EE':0.00814}, 'dPhi':{'EB':0.115, 'EE':0.182}, 'hOverE':{'EB':0.104, 'EE':0.0897}, 'ooEmooP':{'EB':0.102, 'EE':0.126},\
+'d0':{'EB':0.0261, 'EE':0.118}, 'dz':{'EB':0.41, 'EE':0.822}, 'MissingHits':{'EB':2, 'EE':1}, 'convVeto':{'EB':1, 'EE':1}, 'relIso' : {'EB':0.0893, 'EE':0.121}},
 
-#if nEles == "01tau":
-#   #Generated electron selection
-#   nSel = "((ngenLep == 1) != (ngenLepFromTau == 1))" #removes dileptonic events
-#   genSel1 = "((abs(genLep_pdgId[0]) == 11 && abs(genLep_eta[0]) < " + str(etaAcc) + ") || (abs(genLepFromTau_pdgId[0]) == 11 && abs(genLepFromTau_eta[0]) < " + str(etaAcc) + "))" #electron selection #index [0] ok since (only element)
-#   #genSel = nSel# + "&&" + genSel1
-#
-#   #Reconstructed electron selection
-#   deltaR = "sqrt((genLep_eta[0] - LepGood_eta)^2 + (genLep_phi[0] - LepGood_phi)^2)"
-#   deltaRtau = "sqrt((genLepFromTau_eta[0] - LepGood_eta)^2 + (genLepFromTau_phi[0] - LepGood_phi)^2)"
-#   
-#   matchSel = "(" + deltaR +"*(abs(LepGood_pdgId) == 11 && abs(LepGood_eta) < " + str(etaAcc) + " && LepGood_mcMatchId != 0) <" + str(deltaRcut) +\
-#   "&& (" + deltaR +"*(abs(LepGood_pdgId) == 11 && abs(LepGood_eta) < " + str(etaAcc) + " && LepGood_mcMatchId != 0)) != 0)" +\
-#   "||(" + deltaRtau +"*(abs(LepGood_pdgId) == 11 && abs(LepGood_eta) < " + str(etaAcc) + " && LepGood_mcMatchId != 0) <" + str(deltaRcut) +\
-#   "&& (" + deltaRtau +"*(abs(LepGood_pdgId) == 11 && abs(LepGood_eta) < " + str(etaAcc) + " && LepGood_mcMatchId != 0)) != 0)"
+'Medium':{'sigmaEtaEta':{'EB':0.0101, 'EE':0.0283}, 'dEta':{'EB':0.0103, 'EE':0.00733}, 'dPhi':{'EB':0.0336, 'EE':0.114}, 'hOverE':{'EB':0.0876, 'EE':0.0678}, 'ooEmooP':{'EB':0.0174, 'EE':0.0898},\
+'d0':{'EB':0.0118, 'EE':0.0739}, 'dz':{'EB':0.373, 'EE':0.602}, 'MissingHits':{'EB':2, 'EE':1}, 'convVeto':{'EB':1, 'EE':1}, 'relIso' : {'EB':0.0766, 'EE':0.0678}},
 
-##single-electron events (semileptonic & dileptonic)
-#elif nEles == "1":
-#   #Generated electron selection
-#   nSel = "ngenLep > 0" #redundant with genSel2 #nLepGood > 0 introduces bias
-#   genSel1 = "(abs(genLep_pdgId) == 11 && abs(genLep_eta) < " + str(etaAcc) + ")" #electron selection (includes dielectron evts) #ngenLep == 1 would remove dileptonic events # index [0] does not include single-electron events with muon a
-#   genSel2 = "(Sum$(abs(genLep_pdgId) == 11 && abs(genLep_eta) < " + str(etaAcc) + ") == 1)" # = number of electrons (includes dileptonic and semileptonic events) 
-#   genSel = nSel + "&&" + genSel1 + "&&" + genSel2
-#
-#elif nEles == "2":
-#   nSel = "ngenLep == 2" #does not include single-lepton events 
-#   genSel1 = "(abs(genLep_pdgId) == 11 && abs(genLep_eta) < " + str(etaAcc) + ")" #electron selection (includes dielectron evts) #ngenLep == 1 would remove dileptonic events
-#   genSel2 = "(Sum$(abs(genLep_pdgId) == 11 && abs(genLep_eta) < " + str(etaAcc) + ") == 2)" # = number of electrons (includes dilepton events only) 
-#   genSel = nSel + "&&" + genSel1 + "&&" + genSel2
+'Tight':{'sigmaEtaEta':{'EB':0.0101, 'EE':0.0279}, 'dEta':{'EB':0.00926, 'EE':0.00724}, 'dPhi':{'EB':0.0336, 'EE':0.0918}, 'hOverE':{'EB':0.0597, 'EE':0.0615}, 'ooEmooP':{'EB':0.012, 'EE':0.00999},\
+'d0':{'EB':0.0111, 'EE':0.0351}, 'dz':{'EB':0.0466, 'EE':0.417}, 'MissingHits':{'EB':2, 'EE':1}, 'convVeto':{'EB':1, 'EE':1}, 'relIso' : {'EB':0.0354, 'EE':0.0646}}}
+
+#WPcuts['Veto']['sigmaEtaEta']['EB'] = 0.014
+
+cutIDsels = {iWP:{} for iWP in WPs}
+
+for iWP in WPs:
+   for var in variables: cutIDsels[iWP][var] = {}
+   
+for iWP in WPs:
+   for reg in ['EE','EB']:
+      cutIDsels[iWP]['sigmaEtaEta'][reg] = "LepGood_sigmaIEtaIEta < " + str(WPcuts[iWP]['sigmaEtaEta'][reg]) 
+      cutIDsels[iWP]['dEta'][reg] = "abs(LepGood_dEtaScTrkIn) < " + str(WPcuts[iWP]['dEta'][reg])
+      cutIDsels[iWP]['dPhi'][reg] = "abs(LepGood_dPhiScTrkIn) < " + str(WPcuts[iWP]['dPhi'][reg]) 
+      cutIDsels[iWP]['hOverE'][reg] = "LepGood_hadronicOverEm < " + str(WPcuts[iWP]['hOverE'][reg])
+      cutIDsels[iWP]['ooEmooP'][reg] = "abs(LepGood_eInvMinusPInv) < " + str(WPcuts[iWP]['ooEmooP'][reg])
+      cutIDsels[iWP]['d0'][reg] = "abs(LepGood_dxy) < " + str(WPcuts[iWP]['d0'][reg])
+      cutIDsels[iWP]['dz'][reg] = "abs(LepGood_dz) < " + str(WPcuts[iWP]['dz'][reg])
+      cutIDsels[iWP]['MissingHits'][reg] = "LepGood_lostHits <= " + str(WPcuts[iWP]['MissingHits'][reg])
+      cutIDsels[iWP]['convVeto'][reg]= "LepGood_convVeto == " + str(WPcuts[iWP]['convVeto'][reg])
+
+geoSel= {'EB':"(abs(LepGood_eta) <= " + str(ebeeSplit) + ")", 'EE':"(abs(LepGood_eta) > " + str(ebeeSplit) + " && abs(LepGood_eta) < " + str(etaAcc) + ")"}
+lowPtSel = "(genLep_pt > 6 && genLep_pt < 10)" #Pt selection
+recoSel = "(abs(LepGood_pdgId) == 11)"
+misMatchSel = "(LepGood_mcMatchId == 0)"
+cutSel = {}
+
+if not removedCut:
+   if ID == "standard":
+      for i,iWP in enumerate(WPs): cutSel[iWP] = "LepGood_SPRING15_25ns_v1 >= " + str(i+1)
+   
+   elif ID == "manual":
+      EBsel = {iWP: combineSel(geoSel['EB'], combineSelList([cutIDsels[iWP][var]['EB'] for var in variables])) for iWP in WPs} 
+      EEsel = {iWP: combineSel(geoSel['EE'], combineSelList([cutIDsels[iWP][var]['EE'] for var in variables])) for iWP in WPs}
+
+      cutSel = {iWP: "((" + EBsel[iWP] + ") || (" + EEsel[iWP] + "))" for iWP in WPs}
+   
+   elif ID == "iso":
+      EBsel = {iWP: combineSel(geoSel['EB'], combineSelList([cutIDsels[iWP][var]['EB'] for var in variables])) for iWP in WPs}
+      EEsel = {iWP: combineSel(geoSel['EE'], combineSelList([cutIDsels[iWP][var]['EE'] for var in variables])) for iWP in WPs}
+      
+      cutSel = {iWP: "((" + combineSel(EBsel[iWP], "LepGood_" + isolation + " < " + str(WPcuts[iWP]['relIso']['EB'])) + ") || (" + combineSel(EEsel[iWP], "LepGood_" + isolation + " < " + str(WPcuts[iWP]['relIso']['EB'])) + "))" for iWP in WPs}
+
+elif removedCut:
+   if removedCut != "None": variables.remove(removedCut)
+   EBsel = {iWP: combineSel("abs(LepGood_eta) <= " + str(ebeeSplit), combineSelList([cutIDsels[iWP][var]['EB'] for var in variables])) for iWP in WPs}
+   EEsel = {iWP: combineSel("abs(LepGood_eta) > " + str(ebeeSplit) + " && abs(LepGood_eta) < " + str(etaAcc), combineSelList([cutIDsels[iWP][var]['EE'] for var in variables])) for iWP in WPs}
+
+   cutSel = {iWP: "((" + EBsel[iWP] + ") || (" + EEsel[iWP] + "))" for iWP in WPs}
+ 
+else: 
+   print makeLine()
+   print "!!! Wrong variable input."
+   print makeLine()
+   sys.exit(0)
 
 ##################################################################################Canvas 1#############################################################################################
 c1 = ROOT.TCanvas("c1", "Canvas 1", 1800, 1500)
@@ -186,111 +263,83 @@ c1.cd(1)
 hists_total = {}
 hists_passed = {}
 
-#IDs: 0 - none, 1 - veto (~95% eff), 2 - loose (~90% eff), 3 - medium (~80% eff), 4 - tight (~70% eff)
-WPs = ['Veto', 'Loose', 'Medium', 'Tight']
-
-WPcuts = {\
-'Veto':{'sigmaEtaEta':{'Barrel':0.0114, 'Endcap':0.0352}, 'dEta':{'Barrel':0.0152, 'Endcap':0.0113}, 'dPhi':{'Barrel':0.216, 'Endcap':0.237}, 'hOverE':{'Barrel':0.181, 'Endcap':0.116}, 'ooEmooP':{'Barrel':0.207, 'Endcap':0.174},\
-'d0':{'Barrel':0.0564, 'Endcap':0.222}, 'dz':{'Barrel':0.472, 'Endcap':0.921}, 'MissingHits':{'Barrel':2, 'Endcap':3}, 'convVeto':{'Barrel':1, 'Endcap':1}, 'relIso' : {'Barrel':0.126, 'Endcap':0.144}},
-'Loose':{'sigmaEtaEta':{'Barrel':0.0103, 'Endcap':0.0301}, 'dEta':{'Barrel':0.0105, 'Endcap':0.00814}, 'dPhi':{'Barrel':0.115, 'Endcap':0.182}, 'hOverE':{'Barrel':0.104, 'Endcap':0.0897}, 'ooEmooP':{'Barrel':0.102, 'Endcap':0.126},\
-'d0':{'Barrel':0.0261, 'Endcap':0.118}, 'dz':{'Barrel':0.41, 'Endcap':0.822}, 'MissingHits':{'Barrel':2, 'Endcap':1}, 'convVeto':{'Barrel':1, 'Endcap':1}, 'relIso' : {'Barrel':0.0893, 'Endcap':0.121}},
-'Medium':{'sigmaEtaEta':{'Barrel':0.0101, 'Endcap':0.0283}, 'dEta':{'Barrel':0.0103, 'Endcap':0.00733}, 'dPhi':{'Barrel':0.0336, 'Endcap':0.114}, 'hOverE':{'Barrel':0.0876, 'Endcap':0.0678}, 'ooEmooP':{'Barrel':0.0174, 'Endcap':0.0898},\
-'d0':{'Barrel':0.0118, 'Endcap':0.0739}, 'dz':{'Barrel':0.373, 'Endcap':0.602}, 'MissingHits':{'Barrel':2, 'Endcap':1}, 'convVeto':{'Barrel':1, 'Endcap':1}, 'relIso' : {'Barrel':0.0766, 'Endcap':0.0678}},
-'Tight':{'sigmaEtaEta':{'Barrel':0.0101, 'Endcap':0.0279}, 'dEta':{'Barrel':0.00926, 'Endcap':0.00724}, 'dPhi':{'Barrel':0.0336, 'Endcap':0.0918}, 'hOverE':{'Barrel':0.0597, 'Endcap':0.0615}, 'ooEmooP':{'Barrel':0.012, 'Endcap':0.00999},\
-'d0':{'Barrel':0.0111, 'Endcap':0.0351}, 'dz':{'Barrel':0.0466, 'Endcap':0.417}, 'MissingHits':{'Barrel':2, 'Endcap':1}, 'convVeto':{'Barrel':1, 'Endcap':1}, 'relIso' : {'Barrel':0.0354, 'Endcap':0.0646}}}
-
-cutSel = {}
-recoSel = "(abs(LepGood_pdgId) == 11)"
-misMatchSel = "(LepGood_mcMatchId == 0)"
-
-if ID == "standard": 
-   for i,WP in enumerate(WPs):
-      cutSel[WP] = "LepGood_SPRING15_25ns_v1 >= " + str(i+1)
-
-elif ID == "noIso": 
-   for WP in WPcuts.keys():
-      cutSel[WP] = "(\
-      (abs(LepGood_eta) <=" + str(ebeeSplit) + "&& LepGood_sigmaIEtaIEta <" + str(WPcuts[WP]['sigmaEtaEta']['Barrel']) + "&& abs(LepGood_dEtaScTrkIn) <" + str(WPcuts[WP]['dEta']['Barrel']) + \
-      "&& abs(LepGood_dPhiScTrkIn) <" + str(WPcuts[WP]['dPhi']['Barrel']) + "&& LepGood_hadronicOverEm <" + str(WPcuts[WP]['hOverE']['Barrel']) + "&& abs(LepGood_eInvMinusPInv) <" + str(WPcuts[WP]['ooEmooP']['Barrel']) + \
-      "&& abs(LepGood_dxy) <" + str(WPcuts[WP]['d0']['Barrel']) + "&& abs(LepGood_dz) <" + str(WPcuts[WP]['dz']['Barrel']) + "&& LepGood_lostHits <=" + str(WPcuts[WP]['MissingHits']['Barrel']) + \
-      "&& LepGood_convVeto == " + str(WPcuts[WP]['convVeto']['Barrel']) + ") ||" + \
-      "(abs(LepGood_eta) >" + str(ebeeSplit) + "&& abs(LepGood_eta) <" + str(etaAcc) + "&& LepGood_sigmaIEtaIEta <" + str(WPcuts[WP]['sigmaEtaEta']['Endcap']) + "&& abs(LepGood_dEtaScTrkIn) <" + str(WPcuts[WP]['dEta']['Endcap']) + \
-      "&& abs(LepGood_dPhiScTrkIn) <" + str(WPcuts[WP]['dPhi']['Endcap']) + "&& LepGood_hadronicOverEm <" + str(WPcuts[WP]['hOverE']['Endcap']) + "&& abs(LepGood_eInvMinusPInv) <" + str(WPcuts[WP]['ooEmooP']['Endcap']) + \
-      "&& abs(LepGood_dxy) <" + str(WPcuts[WP]['d0']['Endcap']) + "&& abs(LepGood_dz) <" + str(WPcuts[WP]['dz']['Endcap']) + "&& LepGood_lostHits <=" + str(WPcuts[WP]['MissingHits']['Endcap']) + \
-      "&& LepGood_convVeto == " + str(WPcuts[WP]['convVeto']['Barrel']) + "))"
-
-elif ID == "iso": 
-   for WP in WPcuts.keys():
-      cutSel[WP] = "(\
-      (abs(LepGood_eta) <=" + str(ebeeSplit) + "&& LepGood_sigmaIEtaIEta <" + str(WPcuts[WP]['sigmaEtaEta']['Barrel']) + "&& abs(LepGood_dEtaScTrkIn) <" + str(WPcuts[WP]['dEta']['Barrel']) + \
-      "&& abs(LepGood_dPhiScTrkIn) <" + str(WPcuts[WP]['dPhi']['Barrel']) + "&& LepGood_hadronicOverEm <" + str(WPcuts[WP]['hOverE']['Barrel']) + "&& abs(LepGood_eInvMinusPInv) <" + str(WPcuts[WP]['ooEmooP']['Barrel']) + \
-      "&& abs(LepGood_dxy) <" + str(WPcuts[WP]['d0']['Barrel']) + "&& abs(LepGood_dz) <" + str(WPcuts[WP]['dz']['Barrel']) + "&& LepGood_lostHits <=" + str(WPcuts[WP]['MissingHits']['Barrel']) + \
-      "&& LepGood_convVeto == " + str(WPcuts[WP]['convVeto']['Barrel']) + "&& LepGood_" + isolation + "<" + str(WPcuts[WP]['relIso']['Barrel']) + ") ||" + \
-      "(abs(LepGood_eta) >" + str(ebeeSplit) + "&& abs(LepGood_eta) <" + str(etaAcc) + "&& LepGood_sigmaIEtaIEta <" + str(WPcuts[WP]['sigmaEtaEta']['Endcap']) + "&& abs(LepGood_dEtaScTrkIn) <" + str(WPcuts[WP]['dEta']['Endcap']) + \
-      "&& abs(LepGood_dPhiScTrkIn) <" + str(WPcuts[WP]['dPhi']['Endcap']) + "&& LepGood_hadronicOverEm <" + str(WPcuts[WP]['hOverE']['Endcap']) + "&& abs(LepGood_eInvMinusPInv) <" + str(WPcuts[WP]['ooEmooP']['Endcap']) + \
-      "&& abs(LepGood_dxy) <" + str(WPcuts[WP]['d0']['Endcap']) + "&& abs(LepGood_dz) <" + str(WPcuts[WP]['dz']['Endcap']) + "&& LepGood_lostHits <=" + str(WPcuts[WP]['MissingHits']['Endcap']) + \
-      "&& LepGood_convVeto == " + str(WPcuts[WP]['convVeto']['Barrel']) + "&& LepGood_" + isolation + "<" + str(WPcuts[WP]['relIso']['Endcap']) + "))"
-else: 
-   print "!!! Wrong ID input."
-   sys.exit(0)
-
 #Efficiency
 if plot == "efficiency":
-   hists_total['None'] = makeHistVarBins(samples[sampleKey].tree, var, normFactor + "*" + weight + "*(" + preSel + "&&" + genSel + ")", bins)
-   hists_total['None'].SetName("EleID")
-   hists_total['None'].SetTitle("Electron p_{T} Distributions for Various IDs (" + sample + " Sample)")
+   selList = [preSel, genSel] 
+   if lowPt: selList.append(lowPtSel)
+   hists_total['None'] = makeHistVarBins(samples[sample].tree, variable, normFactor + "*" + weight + "*(" + combineSelList(selList) + ")", bins)
+   hists_total['None'].SetName("%s_total_noID"%(plot))
+   
+   if removedCut == "None": hists_total['None'].SetTitle("Electron p_{T} Distributions for Various IDs (%s Sample)"%(samples[sample].name))
+   else: hists_total['None'].SetTitle("Electron p_{T} Distributions for Various IDs without %s Cut (%s Sample)"%(removedCut, samples[sample].name))
+   
    hists_total['None'].GetXaxis().SetTitle("Generated Electron p_{T} / GeV")
    hists_total['None'].GetYaxis().SetTitle("Counts / GeV")
-   hists_total['None'].GetXaxis().SetTitleOffset(1.2)
-   hists_total['None'].GetYaxis().SetTitleOffset(1.2)
-   hists_total['None'].SetFillColor(ROOT.kBlue-9)
-   hists_total['None'].SetLineColor(ROOT.kBlack)
-   hists_total['None'].SetLineWidth(3)
+   hists_total['None'].Write()
    hists_total['None'].Draw("hist")
    
-   for WP in WPs:
-      hists_passed[WP] = makeHistVarBins(samples[sampleKey].tree, var, normFactor + "*" + weight + "*(" + preSel + "&&" + genSel + "&&" + matchSel + "&& " + cutSel[WP] + ")", bins)
-      hists_passed[WP].SetName("eleID_" + WP)
-      hists_passed[WP].SetFillColor(0)
-      hists_passed[WP].SetLineWidth(3)
-      hists_passed[WP].Draw("histsame")
+   for iWP in WPs:
+      del selList[:]
+      selList = [preSel, genSel, matchSel, cutSel[iWP]] 
+      if lowPt: selList.append(lowPtSel)
+      hists_passed[iWP] = makeHistVarBins(samples[sample].tree, variable, normFactor + "*" + weight + "*(" + combineSelList(selList) + ")", bins)
+      hists_passed[iWP].SetName("%s_passed_%s"%(plot,iWP))
+      hists_passed[iWP].SetFillColor(0)
+      hists_passed[iWP].Write()
+      hists_passed[iWP].Draw("histsame")
+
 #MisID
 elif plot == "misID" or plot == "misID2":
-   for i,WP in enumerate(WPs):
-      print WP
-      hists_passed[WP] = makeHistVarBins(samples[sampleKey].tree, var, normFactor + "*" + weight + "*(" + preSel + "&&" + recoSel + "&&" + misMatchSel + "&& (" + cutSel[WP] + "))", bins)
-      if plot == "misID":
-         hists_passed[WP].SetName("misID_" + WP)
-         if i == 0:
-            hists_total['None'] = makeHistVarBins(samples[sampleKey].tree, var, normFactor + "*" + weight + "*(" + preSel + "&&" + recoSel + ")", bins)
-            hists_total['None'].SetName("MisID")
-         hists_total[WP] = makeHistVarBins(samples[sampleKey].tree, var, normFactor + "*" + weight + "*(" + preSel + "&&" + recoSel + "&& (" + cutSel[WP] + "))", bins)
-      if plot == "misID2": 
-         hists_passed[WP].SetName("misID2_" + WP)
-         if i == 0:
-            hists_total['None'] = makeHistVarBins(samples[sampleKey].tree, "LepGood_pt", normFactor + "*" + weight + "*(" + preSel + "&&" + recoSel + "&&" + misMatchSel + ")", bins)
-            hists_total['None'].SetName("MisID2")
-      if i == 0: hists_total['None'].Draw("hist")
-      hists_passed[WP].SetFillColor(0)
-      hists_passed[WP].SetLineWidth(3)
-      hists_passed[WP].Draw("histsame")
+   for i,iWP in enumerate(WPs):
+      print iWP
+      selList = [preSel, recoSel, misMatchSel, cutSel[iWP]]
+      if lowPt: selList.append(lowPtSel)
+      
+      hists_passed[iWP] = makeHistVarBins(samples[sample].tree, variable, normFactor + "*" + weight + "*(" + combineSelList(selList) + ")", bins)
+      hists_passed[iWP].SetName("%s_passed_%s"%(plot,iWP))
 
-   hists_total['None'].SetTitle(hists_total['None'].GetName() +": Fake (Non-Prompt) Electron p_{T} Distributions for Various IDs (" + sample + " Sample)")
+      if plot == "misID":
+         if i == 0:
+            del selList[:] 
+            selList = [preSel, recoSel]
+            if lowPt: selList.append(lowPtSel)
+            hists_total['None'] = makeHistVarBins(samples[sample].tree, variable, normFactor + "*" + weight + "*(" + combineSelList(selList) + ")", bins)
+            hists_total['None'].SetName("%s_total_noID"%(plot))
+        
+         del selList[:] 
+         selList = [preSel, recoSel, cutSel[iWP]]
+         if lowPt: selList.append(lowPtSel)
+         hists_total[iWP] = makeHistVarBins(samples[sample].tree, variable, normFactor + "*" + weight + "*(" + combineSelList(selList) + ")", bins)
+         hists_total[iWP].SetName("%s_total_%s"%(plot,iWP))
+         hists_total[iWP].Write()
+
+      if plot == "misID2": 
+         if i == 0:
+            del selList[:]
+            selList = [preSel, recoSel, misMatchSel]
+            hists_total['None'] = makeHistVarBins(samples[sample].tree, variable, normFactor + "*" + weight + "*(" + combineSelList(selList) + ")", bins)
+            hists_total['None'].SetName("%s_total_noID"%(plot))
+      
+      if i == 0:
+         hists_total['None'].Write()
+         hists_total['None'].Draw("hist")
+      
+      hists_passed[iWP].SetFillColor(0)
+      hists_passed[iWP].Write()
+      hists_passed[iWP].Draw("histsame")
+
+   if not removedCut: hists_total['None'].SetTitle(hists_total['None'].GetName() +": Fake (Non-Prompt) Electron p_{T} Distributions for Various IDs (%s Sample)"%(samples[sample].name))
+   else: hists_total['None'].SetTitle(hists_total['None'].GetName() +": Fake (Non-Prompt) Electron p_{T} Distributions for Various IDs without %s Cut (%s Sample)"%(removedCut, samples[sample].name))
    hists_total['None'].GetXaxis().SetTitle("Reconstructed Electron p_{T} / GeV")
    hists_total['None'].GetYaxis().SetTitle("Counts / GeV")
-   hists_total['None'].GetXaxis().SetTitleOffset(1.2)
-   hists_total['None'].GetYaxis().SetTitleOffset(1.2)
-   hists_total['None'].SetFillColor(ROOT.kBlue-9)
-   hists_total['None'].SetLineColor(ROOT.kBlack)
-   hists_total['None'].SetLineWidth(3)
 
 else:
+   print makeLine()
    print "!!! Wrong plot input."
+   print makeLine()
    sys.exit(0)
 
 ROOT.gPad.SetLogy()
-ROOT.gPad.Modified()
-ROOT.gPad.Update()
 
 alignStats(hists_total['None'])
 
@@ -305,53 +354,54 @@ ROOT.gPad.Update()
 
 l1 = makeLegend()
 if plot == "efficiency":
-   l1.AddEntry("EleID", "Generated Electron p_{T}", "F")
-   l1.AddEntry("eleID_Veto", "Veto ID", "F")
-   l1.AddEntry("eleID_Loose", "Loose ID", "F")
-   l1.AddEntry("eleID_Medium", "Medium ID", "F")
-   l1.AddEntry("eleID_Tight", "Tight ID", "F")
-elif plot == "misID":
-   l1.AddEntry("MisID", "Reconstructed Electron p_{T}", "F")
-   l1.AddEntry("misID_Veto", "Veto ID", "F")
-   l1.AddEntry("misID_Loose", "Loose ID", "F")
-   l1.AddEntry("misID_Medium", "Medium ID", "F")
-   l1.AddEntry("misID_Tight", "Tight ID", "F")
-elif plot == "misID2":
-   l1.AddEntry("MisID2", "Reconstructed Electron p_{T}", "F")
-   l1.AddEntry("misID2_Veto", "Veto ID", "F")
-   l1.AddEntry("misID2_Loose", "Loose ID", "F")
-   l1.AddEntry("misID2_Medium", "Medium ID", "F")
-   l1.AddEntry("misID2_Tight", "Tight ID", "F")
+   l1.AddEntry("%s_total_noID"%(plot), "Generated Electron p_{T}", "F")
+elif plot == "misID" or plot == "misID2":
+   l1.AddEntry("%s_total_noID"%(plot), "Reconstructed Electron p_{T}", "F")
+
+l1.AddEntry("%s_passed_Veto"%(plot), "Veto ID", "F")
+l1.AddEntry("%s_passed_Loose"%(plot), "Loose ID", "F")
+l1.AddEntry("%s_passed_Medium"%(plot), "Medium ID", "F")
+l1.AddEntry("%s_passed_Tight"%(plot), "Tight ID", "F")
+
+ROOT.gPad.Modified()
+ROOT.gPad.Update()
 
 #Electron MVA IDs
-if mvaWPs == 1:
+if mvaWPs:
    mvaCuts = {'WP90':\
              {'EB1_lowPt':-0.083313, 'EB2_lowPt':-0.235222, 'EE_lowPt':-0.67099, 'EB1':0.913286, 'EB2':0.805013, 'EE':0.358969},\
               'WP80':\
              {'EB1_lowPt':0.287435, 'EB2_lowPt':0.221846, 'EE_lowPt':-0.303263, 'EB1':0.967083, 'EB2':0.929117, 'EE':0.726311}}
    
-   for WP in mvaCuts.keys():
+   for iWP in mvaCuts.keys():
       mvaSel = "(\
-      (LepGood_pt <=" + str(ptSplit) + "&& abs(LepGood_eta) < " + str(ebSplit) + "&& LepGood_mvaIdSpring15 >=" + str(mvaCuts[WP]['EB1_lowPt']) + ") || \
-      (LepGood_pt <=" + str(ptSplit) + "&& abs(LepGood_eta) >=" + str(ebSplit) + "&& abs(LepGood_eta) <" + str(ebeeSplit) + "&& LepGood_mvaIdSpring15 >=" + str(mvaCuts[WP]['EB2_lowPt']) + ") || \
-      (LepGood_pt <=" + str(ptSplit) + "&& abs(LepGood_eta) >=" + str(ebeeSplit) + "&& abs(LepGood_eta) <" + str(etaAcc) + "&& LepGood_mvaIdSpring15 >=" + str(mvaCuts[WP]['EE_lowPt']) + ") || \
-      (LepGood_pt >" + str(ptSplit) + "&& abs(LepGood_eta) <" + str(ebSplit) + "&& LepGood_mvaIdSpring15 >=" + str(mvaCuts[WP]['EB1']) + ") || \
-      (LepGood_pt >" + str(ptSplit) + "&& abs(LepGood_eta) >=" + str(ebSplit) + "&& abs(LepGood_eta) <" + str(ebeeSplit) + "&& LepGood_mvaIdSpring15 >=" + str(mvaCuts[WP]['EB2']) + ") || \
-      (LepGood_pt >" + str(ptSplit) + "&& abs(LepGood_eta) >=" + str(ebeeSplit) + "&& abs(LepGood_eta) <" + str(etaAcc) + "&& LepGood_mvaIdSpring15 >=" + str(mvaCuts[WP]['EE']) + "))"
+      (LepGood_pt <= " + str(ptSplit) + " && abs(LepGood_eta) < " + str(ebSplit) + " && LepGood_mvaIdSpring15 >= " + str(mvaCuts[iWP]['EB1_lowPt']) + ") || \
+      (LepGood_pt <= " + str(ptSplit) + " && abs(LepGood_eta) >= " + str(ebSplit) + " && abs(LepGood_eta) < " + str(ebeeSplit) + " && LepGood_mvaIdSpring15 >= " + str(mvaCuts[iWP]['EB2_lowPt']) + ") || \
+      (LepGood_pt <= " + str(ptSplit) + " && abs(LepGood_eta) >= " + str(ebeeSplit) + " && abs(LepGood_eta) < " + str(etaAcc) + " && LepGood_mvaIdSpring15 >= " + str(mvaCuts[iWP]['EE_lowPt']) + ") || \
+      (LepGood_pt > " + str(ptSplit) + " && abs(LepGood_eta) < " + str(ebSplit) + " && LepGood_mvaIdSpring15 >= " + str(mvaCuts[iWP]['EB1']) + ") || \
+      (LepGood_pt > " + str(ptSplit) + " && abs(LepGood_eta) >= " + str(ebSplit) + " && abs(LepGood_eta) < " + str(ebeeSplit) + " && LepGood_mvaIdSpring15 >= " + str(mvaCuts[iWP]['EB2']) + ") || \
+      (LepGood_pt > " + str(ptSplit) + " && abs(LepGood_eta) >= " + str(ebeeSplit) + " && abs(LepGood_eta) < " + str(etaAcc) + " && LepGood_mvaIdSpring15 >= " + str(mvaCuts[iWP]['EE']) + "))"
       if plot == "efficiency": 
-         hists_passed[WP] = makeHistVarBins(samples[sampleKey].tree, var, normFactor + "*" + weight + "*(" + preSel + "&&" + genSel + "&&" + matchSel + "&&" + mvaSel + ")", bins)
-         hists_passed[WP].SetName("eleID_" + WP)
-      if plot == "misID" or plot == "misID2":
-         hists_passed[WP] = makeHistVarBins(samples[sampleKey].tree, "LepGood_pt", normFactor + "*" + weight + "*(" + preSel + "&&" + recoSel + "&&" + misMatchSel + "&& (" + mvaSel + "))", bins)
+         del selList[:]
+         selList = [preSel, genSel, matchSel, mvaSel]
+         if lowPt: selList.append(lowPtSel)
+         hists_passed[iWP] = makeHistVarBins(samples[sample].tree, variable, normFactor + "*" + weight + "*(" + combineSelList(selList) + ")", bins)
+      
+      elif plot == "misID" or plot == "misID2":
+         del selList[:]
+         selList = [preSel, recoSel, misMatchSel, mvaSel]
+         if lowPt: selList.append(lowPtSel)
+         hists_passed[iWP] = makeHistVarBins(samples[sample].tree, variable, normFactor + "*" + weight + "*(" + combineSelList(selList) + ")", bins)
+         
          if plot == "misID":
-            hists_passed[WP].SetName("misID_" + WP)
-            hists_total[WP] = makeHistVarBins(samples[sampleKey].tree, "LepGood_pt", normFactor + "*" + weight + "*(" + preSel + "&&" + recoSel + "&& (" + mvaSel + "))", bins)
-         if plot == "misID2": 
-            hists_passed[WP].SetName("misID2_" + WP)
-       
-      hists_passed[WP].SetFillColor(0)
-      hists_passed[WP].SetLineWidth(3)
-      hists_passed[WP].Draw("histsame")
+            del selList[:]
+            selList = [preSel, recoSel, mvaSel]
+            if lowPt: selList.append(lowPtSel)
+            hists_total[iWP] = makeHistVarBins(samples[sample].tree, variable, normFactor + "*" + weight + "*(" + combineSelList(selList) + ")", bins)
+         
+      hists_passed[iWP].SetName("%s_passed_%s"%(plot,iWP))
+      hists_passed[iWP].SetFillColor(0)
+      hists_passed[iWP].Draw("histsame")
    
    hists_passed['WP90'].SetLineColor(ROOT.kMagenta+2)
    hists_passed['WP80'].SetLineColor(ROOT.kAzure+5)
@@ -359,21 +409,61 @@ if mvaWPs == 1:
    ROOT.gPad.Modified()
    ROOT.gPad.Update()
    
-   if plot == "efficiency":
-      l1.AddEntry("eleID_WP90", "MVA ID (WP90)", "F")
-      l1.AddEntry("eleID_WP80", "MVA ID (WP80)", "F")
-   if plot == "misID":
-      l1.AddEntry("misID_WP90", "MVA ID (WP90)", "F")
-      l1.AddEntry("misID_WP80", "MVA ID (WP80)", "F")
-   if plot == "misID2":
-      l1.AddEntry("misID2_WP90", "MVA ID (WP90)", "F")
-      l1.AddEntry("misID2_WP80", "MVA ID (WP80)", "F")
+   l1.AddEntry("%s_passed_WP90"%(plot), "MVA ID (WP90)", "F")
+   l1.AddEntry("%s_passed_WP80"%(plot), "MVA ID (WP80)", "F")
 
 ROOT.gPad.Modified()
 ROOT.gPad.Update()
 
 l1.Draw()
 
+if removedCut and not zoom:
+   if not lowPt: 
+      if not os.path.isfile(savedir2 + "/histogramCounts_%s_%s.txt"%(plot, samples[sample].name)):
+         outfile = open(savedir2 + "/histogramCounts_%s_%s.txt"%(plot, samples[sample].name), "w")
+         outfile.write(\
+         plot +": N-1 Histogram Counts (%s Sample)\n"%(samples[sample].name))
+         
+         if plot == "efficiency" or plot == "misID2":
+            outfile.write(\
+            "Variable     Total     Veto     Loose     Medium     Tight\n")
+         elif plot == "misID":
+            outfile.write(\
+            "Variable     Total: Veto   Total: Loose   Total: Medium   Total: Tight   Passed: Veto   Passed: Loose   Passed: Medium   Passed: Tight\n")
+            outfile.close()
+      
+      if plot == "efficiency" or plot == "misID2":
+         with open(savedir2 + "/histogramCounts_%s_%s.txt"%(plot, samples[sample].name), "a") as outfile:
+            outfile.write(removedCut + "          " + str(hists_total['None'].GetEntries()) + "          " + \
+            str(hists_passed['Veto'].GetEntries()) + "          " + str(hists_passed['Loose'].GetEntries()) + "          " + str(hists_passed['Medium'].GetEntries()) + "           " + str(hists_passed['Tight'].GetEntries()) + "\n")
+      elif plot == "misID":
+         with open(savedir2 + "/histogramCounts_%s_%s.txt"%(plot, samples[sample].name), "a") as outfile:
+            outfile.write(removedCut + "          " +\
+            str(hists_total['Veto'].GetEntries()) + "          " + str(hists_total['Loose'].GetEntries()) + "          " + str(hists_total['Medium'].GetEntries()) + "          " + str(hists_total['Tight'].GetEntries()) + "          " +\
+            str(hists_passed['Veto'].GetEntries()) + "          " + str(hists_passed['Loose'].GetEntries()) + "          " + str(hists_passed['Medium'].GetEntries()) + "          " + str(hists_passed['Tight'].GetEntries()) + "\n")
+   else:
+      if not os.path.isfile(savedir2 + "/histogramCounts_lowPt_%s_%s.txt"%(plot, samples[sample].name)):
+         outfile = open(savedir2 + "/histogramCounts_lowPt_%s_%s.txt"%(plot, samples[sample].name), "w")
+         outfile.write(plot + ": N-1 Histogram Counts in 6-10 GeV Electron pT Region (%s Sample)\n"%(samples[sample].name))
+         
+         if plot == "efficiency" or plot == "misID2":
+            outfile.write(\
+            "Variable     Total     Veto     Loose     Medium     Tight\n")
+         elif plot == "misID":
+            outfile.write(\
+            "Variable     Total: Veto   Total: Loose   Total: Medium   Total: Tight   Passed: Veto   Passed: Loose   Passed: Medium   Passed: Tight\n")
+            outfile.close()
+      
+      if plot == "efficiency" or plot == "misID2":
+         with open(savedir2 + "/histogramCounts_lowPt_%s_%s.txt"%(plot, samples[sample].name), "a") as outfile:
+            outfile.write(removedCut + "          " + str(hists_total['None'].GetEntries()) + "          " + \
+            str(hists_passed['Veto'].GetEntries()) + "          " + str(hists_passed['Loose'].GetEntries()) + "          " + str(hists_passed['Medium'].GetEntries()) + "           " + str(hists_passed['Tight'].GetEntries()) + "\n")
+      elif plot == "misID":
+         with open(savedir2 + "/histogramCounts_lowPt_%s_%s.txt"%(plot, samples[sample].name), "a") as outfile:
+            outfile.write(removedCut + "          " +\
+            str(hists_total['Veto'].GetEntries()) + "          " + str(hists_total['Loose'].GetEntries()) + "          " + str(hists_total['Medium'].GetEntries()) + "          " + str(hists_total['Tight'].GetEntries()) + "          " +\
+            str(hists_passed['Veto'].GetEntries()) + "          " + str(hists_passed['Loose'].GetEntries()) + "          " + str(hists_passed['Medium'].GetEntries()) + "          " + str(hists_passed['Tight'].GetEntries()) + "\n")
+      
 ################################################################################################################################################################################
 #Efficiency curves
 c1.cd(2)
@@ -381,32 +471,29 @@ c1.cd(2)
 effs = {}
 
 #Efficiency
-for WP in sorted(hists_passed.keys()):
-   if plot == "efficiency" or plot == "misID2": effs[WP] = ROOT.TEfficiency(hists_passed[WP], hists_total['None'])
-   elif plot == "misID": effs[WP] = ROOT.TEfficiency(hists_passed[WP], hists_total[WP])
-   effs[WP].SetName("eff_" + WP)
-   effs[WP].SetMarkerStyle(33)
-   effs[WP].SetMarkerSize(1.5)
-   effs[WP].SetLineWidth(2)
-   if WP == 'Loose': effs['Loose'].Draw("AP")
-   elif WP != 'Loose': effs[WP].Draw("sameP")
+for iWP in sorted(hists_passed.keys()):
+   if plot == "efficiency" or plot == "misID2": effs[iWP] = makeEffPlot(hists_passed[iWP], hists_total['None'])
+   elif plot == "misID": effs[iWP] = makeEffPlot(hists_passed[iWP], hists_total[iWP])
+   
+   effs[iWP].SetName("eff_" + iWP)
+   
+   if iWP == 'Loose': effs['Loose'].Draw("AP")
+   else: effs[iWP].Draw("sameP")
 
-if plot == "efficiency": effs['Loose'].SetTitle("Electron ID Efficiencies (" + sample + " Sample) ; Generated Electron p_{T} / GeV ; Efficiency")
-elif plot == "misID" or plot == "misID2": effs['Loose'].SetTitle("Electron Mismatch Efficiencies for Various IDs (" + sample + " Sample) ; Reconstructed Electron p_{T} / GeV ; Efficiency")
+if plot == "efficiency": 
+   if not removedCut: effs['Loose'].SetTitle("Electron ID Efficiencies (%s Sample) ; Generated Electron p_{T} / GeV ; Efficiency"%(samples[sample].name))
+   else: effs['Loose'].SetTitle("Electron ID Efficiencies without %s Cut (%s Sample) ; Generated Electron p_{T} / GeV ; Efficiency"%(removedCut, samples[sample].name))
+
+elif plot == "misID" or plot == "misID2": 
+   if not removedCut: effs['Loose'].SetTitle("Electron Mismatch Efficiencies for Various IDs (%s Sample) ; Reconstructed Electron p_{T} / GeV ; Efficiency"%(samples[sample].name))
+   else: effs['Loose'].SetTitle("Electron Mismatch Efficiencies for Various IDs without %s Cut (%s Sample) ; Reconstructed Electron p_{T} / GeV ; Efficiency"%(removedCut, samples[sample].name))
+
 effs['Loose'].SetMarkerColor(ROOT.kBlue+1)
 effs['Loose'].SetLineColor(ROOT.kBlue+1)
-ROOT.gPad.SetGridx()
-ROOT.gPad.SetGridy()
-ROOT.gPad.Modified()
-ROOT.gPad.Update()
-effs['Loose'].GetPaintedGraph().GetXaxis().SetLimits(xmin,xmax)
-effs['Loose'].GetPaintedGraph().SetMinimum(0)
-effs['Loose'].GetPaintedGraph().SetMaximum(1)
-effs['Loose'].GetPaintedGraph().GetXaxis().CenterTitle()
-effs['Loose'].GetPaintedGraph().GetYaxis().CenterTitle()
 
-ROOT.gPad.Modified()
-ROOT.gPad.Update()
+setupEffPlot(effs['Loose'])
+
+for iWP in WPs: effs[iWP].GetPaintedGraph().GetXaxis().SetLimits(xmin,xmax)
 
 #Colours
 effs['Veto'].SetMarkerColor(ROOT.kGreen+3)
@@ -425,7 +512,7 @@ l2.AddEntry("eff_Loose", "Loose ID", "P")
 l2.AddEntry("eff_Medium", "Medium ID", "P")
 l2.AddEntry("eff_Tight", "Tight ID", "P")
 
-if mvaWPs == 1:
+if mvaWPs:
    effs['WP90'].SetMarkerColor(ROOT.kMagenta+2)
    effs['WP90'].SetLineColor(ROOT.kMagenta+2)
    effs['WP90'].SetMarkerStyle(22)
@@ -446,33 +533,25 @@ ROOT.gPad.Update()
 
 l2.Draw()
 
-ROOT.gPad.Modified()
-ROOT.gPad.Update()
 c1.Modified()
 c1.Update()
 
-#Write to file
-if save == 1: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
-   if mvaWPs == 0: 
-      if ID == "iso": savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/electronID/" + ID + "/" + isolation + "/" + plot 
-      else: savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/electronID/" + ID + "/" + plot
-   elif mvaWPs == 1: 
-      if ID == "iso": savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/electronID/" + ID + "/" + isolation + "/" + plot + "/withMva"
-      else: savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/electronID/" + ID + "/" + plot + "/withMva"
-   
-   if not os.path.exists(savedir):
-      os.makedirs(savedir)
-   if not os.path.exists(savedir + "/root"):
-      os.makedirs(savedir + "/root")
-   if not os.path.exists(savedir + "/pdf"):
-      os.makedirs(savedir + "/pdf")
-
-   #Save to Web
-   if ID == "iso":
-      c1.SaveAs(savedir + "/" + plot + "_" + isolation + "_" + sample + z + ".png")
-      c1.SaveAs(savedir + "/root/" + plot + "_" + isolation + "_" + sample + z + ".root")
-      c1.SaveAs(savedir + "/pdf/" + plot + "_" + isolation + "_" + sample + z + ".pdf")
+#Save canvas
+if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
+   if not removedCut:
+      if ID == "iso":
+         c1.SaveAs(savedir + "/%s_%s_%s%s.png"%(plot, isolation, samples[sample].name, z))
+         c1.SaveAs(savedir + "/pdf/%s_%s_%s%s.pdf"%(plot, isolation, samples[sample].name, z))
+         c1.SaveAs(savedir + "/root/%s_%s_%s%s.root"%(plot, isolation, samples[sample].name, z))
+      else: 
+         c1.SaveAs(savedir + "/%s_%s_%s%s.png"%(plot, ID, samples[sample].name, z))
+         c1.SaveAs(savedir + "/pdf/%s_%s_%s%s.pdf"%(plot, ID, samples[sample].name, z))
+         c1.SaveAs(savedir + "/root/%s_%s_%s%s.root"%(plot, ID, samples[sample].name, z))
+   elif removedCut == "None":
+      c1.SaveAs(savedir + "/%s_%s%s.png"%(plot, samples[sample].name, z))
+      c1.SaveAs(savedir + "/pdf/%s_%s%s.pdf"%(plot, samples[sample].name, z))
+      c1.SaveAs(savedir + "/root/%s_%s%s.root"%(plot, samples[sample].name, z))
    else:
-      c1.SaveAs(savedir + "/" + plot + "_" + ID + "_" + sample + z + ".png")
-      c1.SaveAs(savedir + "/root/" + plot + "_" + ID + "_" + sample + z + ".root")
-      c1.SaveAs(savedir + "/pdf/" + plot + "_" + ID + "_" + sample + z + ".pdf")
+      c1.SaveAs(savedir + "/%s_no_%s_%s%s.png"%(plot, removedCut, samples[sample].name, z))
+      c1.SaveAs(savedir + "/pdf/%s_no_%s_%s%s.pdf"%(plot, removedCut, samples[sample].name, z))
+      c1.SaveAs(savedir + "/root/%s_no_%s_%s%s.root"%(plot, removedCut, samples[sample].name, z))
