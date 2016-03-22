@@ -38,10 +38,10 @@ for srNJet in sorted(signalRegions):
   bins += rows
 
 
-path = "/data/easilar/Spring15/25ns/allSignals_2p25_all_syst_pkl"
+path = "/data/easilar/Spring15/25ns/allSignals_2p25_allSyst_approval_pkl"
 res = pickle.load(file(path))
 
-expand_pickle = "/data/easilar/Spring15/25ns/allSignals_2p25_Jetpt_cut_pkl"
+expand_pickle = "/data/easilar/Spring15/25ns/allSignals_2p3_pkl"
 expand_dict = pickle.load(file(expand_pickle))
 
 colors = [ROOT.kBlue+2, ROOT.kBlue-4, ROOT.kBlue-7, ROOT.kBlue-9, ROOT.kCyan-9, ROOT.kCyan-6, ROOT.kCyan-2,ROOT.kGreen+3,ROOT.kGreen-2,ROOT.kGreen-6,ROOT.kGreen-7, ROOT.kOrange-4, ROOT.kOrange+1, ROOT.kOrange+8, ROOT.kRed, ROOT.kRed+1]
@@ -74,7 +74,7 @@ for i_h,h in enumerate(hists):
   h.SetLineWidth(1)
   
 
-totalH = ROOT.TH1F('totalH','total',bins,0,bins)
+totalH = ROOT.TH1F('totalH','Total',bins,0,bins)
 totalH.SetLineColor(ROOT.kBlack)
 totalH.SetLineWidth(2)
 totalH.SetMarkerStyle(21)
@@ -84,11 +84,11 @@ totalXErr = []
 totalYErr = []
 totalX = []
 totalY = []
-for sig in [allSignals[7]]:
+for sig in [allSignals[5]]:
   #for mglu in sig.keys() :
-  for mglu in [1500] :
+  for mglu in [1200] :
     #for mlsp in sig[mglu].keys() :
-    for mlsp in [100] :
+    for mlsp in [800] :
       i=1
       for injb,srNJet in enumerate(sorted(signalRegions)):
         for stb in sorted(signalRegions[srNJet]):
@@ -101,26 +101,26 @@ for sig in [allSignals[7]]:
             print '#############################################'
             print
 
-            isrErr = res[srNJet][stb][htb][mglu][mlsp]['delta_ISR']
+            isrErr = res[srNJet][stb][htb]['signals'][mglu][mlsp]['syst_ISR']
             expand_dict[srNJet][stb][htb]["signals"][mglu][mlsp]['syst_ISR'] = isrErr 
             isrErrH.SetBinContent(i, isrErr) 
 
-            Q2Err = res[srNJet][stb][htb][mglu][mlsp]['delta_Q2']
+            Q2Err = res[srNJet][stb][htb]['signals'][mglu][mlsp]['syst_Q2']
             Q2ErrH.SetBinContent(i, Q2Err) 
             expand_dict[srNJet][stb][htb]["signals"][mglu][mlsp]['syst_Q2'] = Q2Err
 
-            jecErr = res[srNJet][stb][htb][mglu][mlsp]['delta_jec']
+            jecErr = res[srNJet][stb][htb]['signals'][mglu][mlsp]['syst_JEC']
             jecErrH.SetBinContent(i, jecErr) 
             expand_dict[srNJet][stb][htb]["signals"][mglu][mlsp]['syst_JEC'] = jecErr
 
-            bErr = res[srNJet][stb][htb][mglu][mlsp]['var_b_MB_SR']
+            bErr = res[srNJet][stb][htb]['signals'][mglu][mlsp]['syst_B']
             bErrH.SetBinContent(i, bErr) 
             expand_dict[srNJet][stb][htb]["signals"][mglu][mlsp]['syst_B'] = bErr
 
-            lightErr = res[srNJet][stb][htb][mglu][mlsp]['var_light_MB_SR']
+            lightErr = res[srNJet][stb][htb]['signals'][mglu][mlsp]['syst_light']
             lightErrH.SetBinContent(i, lightErr) 
             expand_dict[srNJet][stb][htb]["signals"][mglu][mlsp]['syst_light'] = lightErr
-
+            print expand_dict[srNJet][stb][htb]["signals"][mglu][mlsp]['syst_light']
             ##constant systematics##
 
             #leptonErr = res[srNJet][stb][htb][mglu][mlsp]['var_lepton_MB_SR']
@@ -136,7 +136,7 @@ for sig in [allSignals[7]]:
             PUH.SetBinContent(i, PUErr )
             expand_dict[srNJet][stb][htb]["signals"][mglu][mlsp]['syst_PU'] = PUErr
 
-            lumiErr    = 0.045
+            lumiErr    = 0.027
             lumiH.SetBinContent(i, lumiErr )
             expand_dict[srNJet][stb][htb]["signals"][mglu][mlsp]['syst_lumi'] = lumiErr
             
@@ -148,7 +148,7 @@ for sig in [allSignals[7]]:
             totalSyst = sqrt(totalSyst)
             totalH.SetBinContent(i, totalSyst)
             print mglu , mlsp
-            print res[srNJet][stb][htb][mglu][mlsp]['err_MB_SR'] , res[srNJet][stb][htb][mglu][mlsp]['yield_MB_SR']
+            print res[srNJet][stb][htb]['signals'][mglu][mlsp]['stat_err_MB_SR'] , res[srNJet][stb][htb]['signals'][mglu][mlsp]['yield_MB_SR']
             print expand_dict[srNJet][stb][htb]["signals"][mglu][mlsp]['stat_err_MB_SR'] , expand_dict[srNJet][stb][htb]["signals"][mglu][mlsp]['yield_MB_SR']
             #totalH.SetBinError(i,0)
             #if not res[srNJet][stb][htb][mglu][mlsp]['yield_MB_SR']==0 : totalH.SetBinError(i, (res[srNJet][stb][htb][mglu][mlsp]['err_MB_SR']/res[srNJet][stb][htb][mglu][mlsp]['yield_MB_SR']))
@@ -197,7 +197,7 @@ for sig in [allSignals[7]]:
       for i in range(3):
         leg.AddEntry(hists[i], '', 'f')
 
-      leg2 = ROOT.TLegend(0.43,0.75,0.7,0.95)
+      leg2 = ROOT.TLegend(0.42,0.75,0.7,0.95)
       leg2.SetFillColor(ROOT.kWhite)
       leg2.SetShadowColor(ROOT.kWhite)
       leg2.SetBorderSize(1)
@@ -205,7 +205,7 @@ for sig in [allSignals[7]]:
       for i in range(3,6):
         leg2.AddEntry(hists[i], '', 'f')
 
-      leg3 = ROOT.TLegend(0.16,0.75,0.42,0.95)
+      leg3 = ROOT.TLegend(0.15,0.75,0.42,0.95)
       leg3.SetFillColor(ROOT.kWhite)
       leg3.SetShadowColor(ROOT.kWhite)
       leg3.SetBorderSize(1)
@@ -227,7 +227,7 @@ for sig in [allSignals[7]]:
 
       #h_Stack.GetXaxis().SetLabelSize(0.)
       #h_Stack.GetXaxis().SetLabelOffset(10)
-      h_Stack.GetYaxis().SetTitle('Relative Uncertainty')
+      h_Stack.GetYaxis().SetTitle('Relative uncertainty')
       h_Stack.GetYaxis().SetTitleOffset(0.8)
       h_Stack.GetYaxis().SetNdivisions(508)
 
@@ -240,8 +240,9 @@ for sig in [allSignals[7]]:
       latex1.SetTextSize(0.04)
       latex1.SetTextAlign(11)
 
-      latex1.DrawLatex(0.15,0.96,'CMS #bf{#it{simulation}}')
-      #latex1.DrawLatex(0.78,0.96,"L=2.1fb^{-1} (13TeV)")
+      latex1.DrawLatex(0.15,0.96,'CMS #bf{#it{Preliminary}}')
+      latex1.DrawLatex(0.8,0.96,"#bf{2.3 fb^{-1} (13TeV)}")
+      latex1.DrawLatex(0.7,0.7,"T5q^{4}WW 1.2/0.8")
 
       h_Stack.GetXaxis().SetLabelSize(0.0)
       h_Stack.GetXaxis().SetTitleSize(0.13)
@@ -281,4 +282,5 @@ for sig in [allSignals[7]]:
       can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/signal_syst_approval/syst_errors_signal_'+str(mglu)+'_'+str(mlsp)+'.root')
       can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/signal_syst_approval/syst_errors_signal_'+str(mglu)+'_'+str(mlsp)+'.pdf')
 
-#pickle.dump(expand_dict,file('/data/easilar/Spring15/25ns/allSignals_2p25_allSyst_approval_pkl','w'))
+
+#pickle.dump(expand_dict,file('/data/easilar/Spring15/25ns/allSignals_2p3_allSyst_pkl','w'))

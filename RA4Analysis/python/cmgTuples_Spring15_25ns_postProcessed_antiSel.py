@@ -63,6 +63,7 @@ TTJets_combined_2 = {\
 #"semiLep/none/TTJets_SingleLeptonFromTbar_full",
 ],
 'dir' : dir2,#'/data/dhandl/cmgTuples/postProcessed_Spring15_antiSelection_final2p1fb_V6/',
+#'dir' : '/data/dhandl/cmgTuples/postProcessed_Spring15_antiSelection_final2p1fb_V6/',
 }
 
 

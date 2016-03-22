@@ -14,35 +14,40 @@ from Workspace.RA4Analysis.helpers import *
 from math import *
 from Workspace.HEPHYPythonTools.user import username
 from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_postProcessed_antiSel import *
+from Workspace.RA4Analysis.cmgTuples_Data_25ns_postProcessed_antiSel import *
 
-preprefix = 'QCDestimation/final2p1fb/MC'
+preprefix = 'QCDestimation/final2p3fb/MC'
+#wwwDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/RunII/Spring15_25ns/'+preprefix+'/'
 wwwDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/RunII/Spring15_25ns/'+preprefix+'/'
 prefix = ''
-picklePath = '/data/'+username+'/results2015/QCDEstimation/'
+picklePath = '/data/dhandl/results2015/QCDEstimation/'
 picklePresel = '20151216_QCDestimation_2p1fb_pkl'
 picklePreselMC = '20151216_QCDestimation_MC2p1fb_pkl'
 #pickleFit    = '20151201_fitResult_MC2p1fb_pkl'
-resEle = pickle.load(file(picklePath+picklePresel))
-resEleMC = pickle.load(file(picklePath+picklePreselMC))
+#resEle = pickle.load(file(picklePath+picklePresel))
+resEle = pickle.load(file('/data/dspitzbart/Results2016/QCDEstimation/20160212_QCDestimation_data2p25fb_pkl'))
+#resEleMC = pickle.load(file(picklePath+picklePreselMC))
+resEleMC = pickle.load(file('/data/dspitzbart/Results2016/QCDEstimation/20160212_QCDestimation_MC2p25fb_pkl'))
 #fitRes = pickle.load(file(picklePath+pickleFit))
 
 if not os.path.exists(wwwDir):
   os.makedirs(wwwDir)
 
 def makeWeight(lumi=3., sampleLumi=3.,debug=False):
+  reWeight = 'lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*0.94*TopPtWeight'
   if debug:
     print 'No lumi-reweighting done!!'
     return 'weight', 'weight*weight'
   else:
-    weight_str = '(((weight)/'+str(sampleLumi)+')*'+str(lumi)+')'
+    weight_str = '((weight/'+str(sampleLumi)+')*'+str(lumi)+'*'+reWeight+')'
     weight_err_str = '('+weight_str+'*'+weight_str+')'
     return weight_str, weight_err_str
-lumi = 2.11 
-sampleLumi = 2.11
+lumi = 2.3
+sampleLumi = 2.25
 debugReweighting = True
-weight_str, weight_err_str = makeWeight(lumi, sampleLumi=sampleLumi, debug=debugReweighting)
+weight_str, weight_err_str = makeWeight(lumi, sampleLumi=sampleLumi)
 
-def getRCS(c, cut, dPhiCut, useWeight = False, weight = 'weight'):
+def getRCS(c, cut, dPhiCut, useWeight = True, weight = weight_str):
 #  dPhiStr = 'acos((LepGood_pt+met_pt*cos(LepGood_phi-met_phi))/sqrt(LepGood_pt**2+met_pt**2+2*met_pt*LepGood_pt*cos(LepGood_phi-met_phi)))'
   dPhiStr = 'deltaPhi_Wl'
   if useWeight:
@@ -307,17 +312,17 @@ for i_njb, njb in enumerate(sorted(signalRegion)):
         label = signalRegion[njb][ltb][htb][btb]['label']
         deltaPhi = signalRegion[njb][ltb][htb][btb]['deltaPhi']
 #        antiSelnameEle, antiSelCutEle = nameAndCut(ltb, htb, njb, btb, presel=antiSelStrEle, charge="", btagVar = 'nBJetMediumCSV30')
-        SelnameEle, SelCutEle         = nameAndCut(ltb, htb, njb, btb, presel=SelStrEle, charge="", btagVar = 'nBJetMediumCSV30')
+        SelnameEle, SelCutEle         = nameAndCut(ltb, htb, njb, btb, presel=SelStrEle, charge="", btagVar = 'nBJetMediumCSV30' , stVar = 'Lt', htVar = 'htJet30clean', njetVar='nJet30clean')
         nMCEle,nMCEle_err             = getYieldFromChain(cMC, SelCutEle, weight = weight_str, returnError=True)
         nDataEle,nDataEle_err         = getYieldFromChain(cDataEle, SelCutEle+trigger+filters, weight = '(1)', returnError=True)
         nSelEle,nSelEle_err           = getYieldFromChain(cQCD, SelCutEle, weight = weight_str, returnError=True)
         nPredEle, nPredEle_err        = resEle[njb][ltb][htb][btb][deltaPhi]['NQCDpred'], resEle[njb][ltb][htb][btb][deltaPhi]['NQCDpred_err']
 #        nAntiSelEle,nAntiSelEle_err   = getYieldFromChain(cQCD, antiSelCutEle, weight = weight_str, returnError=True)
-        SelnameMuon, SelCutMuon         = nameAndCut(ltb, htb, njb, btb, presel=SelStrMuon, charge="", btagVar = 'nBJetMediumCSV30')
+        SelnameMuon, SelCutMuon         = nameAndCut(ltb, htb, njb, btb, presel=SelStrMuon, charge="", btagVar = 'nBJetMediumCSV30',stVar = 'Lt', htVar = 'htJet30clean', njetVar='nJet30clean')
         nMCMuon,nMCMuon_err             = getYieldFromChain(cMC, SelCutMuon, weight = weight_str, returnError=True)
         nDataMuon,nDataMuon_err         = getYieldFromChain(cDataMuon, SelCutMuon+trigger+filters, weight = '(1)', returnError=True)
         nSelMuon,nSelMuon_err           = getYieldFromChain(cQCD, SelCutMuon, weight = weight_str, returnError=True)
-        antiSelnameMuon, antiSelCutMuon = nameAndCut(ltb, htb, njb, btb, presel=antiSelStrMuon, charge="", btagVar = 'nBJetMediumCSV30')
+        antiSelnameMuon, antiSelCutMuon = nameAndCut(ltb, htb, njb, btb, presel=antiSelStrMuon, charge="", btagVar = 'nBJetMediumCSV30',stVar = 'Lt', htVar = 'htJet30clean', njetVar='nJet30clean')
         nAntiSelMuon,nAntiSelMuon_err   = getYieldFromChain(cDataMuon, antiSelCutMuon+trigger+filters, weight = '(1)', returnError=True)
         totHistEle.SetBinContent(j,nMCEle)
         totHistEle.SetBinError(j,nMCEle_err)

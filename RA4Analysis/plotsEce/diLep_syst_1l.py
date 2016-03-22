@@ -13,6 +13,11 @@ ROOT.gROOT.LoadMacro("../../HEPHYPythonTools/scripts/root/tdrstyle.C")
 ROOT.setTDRStyle()
 maxN = -1
 ROOT.gStyle.SetOptStat(0)
+lumi = 2240##pb
+lumi_label = 2.2
+reweight      = '(weight*'+str(lumi)+')/'+str(sample_lumi)
+weight_str_plot = '*'.join([lepton_Scale,PU,trigger_scale,reweight])
+filters = "(Flag_goodVertices && Flag_HBHENoiseFilter_fix && Flag_eeBadScFilter && Flag_HBHENoiseIsoFilter && Flag_CSCTightHaloFilter)"
 
 path = "/afs/hephy.at/user/e/easilar/www/data/Run2015D/2p25fb/diLep_syst_study_results/"
 if not os.path.exists(path):
@@ -21,7 +26,7 @@ if not os.path.exists(path):
 presel = True
 
 if presel :
-  SR = {(3,-1):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
+  SR = {(4,-1):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
   #btag_weight = "(weightBTag0_SF)"
   btag_weight =  "(weightBTag1p_SF)"
   btagVarString = 'nBJetMediumCSV30'
@@ -37,26 +42,26 @@ lepSels = [
 ]
 
 bkg_samples=[
-{'sample':'TTVH',           "weight":btag_weight ,"cut":(0,-1) ,"add_Cut":"(1)","name":TTV_25ns ,'tex':'t#bar{t}V','color':ROOT.kOrange-3},
-{"sample":"DY",             "weight":btag_weight ,"cut":(0,-1) ,"add_Cut":"(1)","name":DY_25ns,"tex":"DY + jets",'color':ROOT.kRed-6},
-{"sample":"singleTop",      "weight":btag_weight ,"cut":(0,-1) ,"add_Cut":"(1)","name":singleTop_25ns,"tex":"t/#bar{t}",'color': ROOT.kViolet+5},
+{'sample':'TTVH',           "weight":"(1)" ,"cut":nbtag ,"add_Cut":"(1)","name":TTV_25ns ,'tex':'t#bar{t}V','color':ROOT.kOrange-3},
+{"sample":"DY",             "weight":"(1)" ,"cut":nbtag ,"add_Cut":"(1)","name":DY_25ns,"tex":"DY + jets",'color':ROOT.kRed-6},
+{"sample":"singleTop",      "weight":"(1)" ,"cut":nbtag ,"add_Cut":"(1)","name":singleTop_25ns,"tex":"t/#bar{t}",'color': ROOT.kViolet+5},
 {"sample":"QCD",            "weight":"(1)"       ,"cut":nbtag  ,"add_Cut":"(1)","name":QCDHT_25ns, "tex":"QCD","color":ROOT.kCyan-6},
 {"sample":"WJets",          "weight":btag_weight ,"cut":(0,-1) ,"add_Cut":"(1)","name":WJetsHTToLNu_25ns,"tex":"W + jets","color":ROOT.kGreen-2},
-{"sample":"ttJets_diLep",   "weight":btag_weight ,"cut":(0,-1) ,"add_Cut":"((ngenLep+ngenTau)==2)","name":TTJets_combined, "tex":"t#bar{t} ll + jets",'color':ROOT.kBlue},
-{"sample":"ttJets_semiLep", "weight":btag_weight ,"cut":(0,-1) ,"add_Cut":"(!((ngenLep+ngenTau)==2))","name":TTJets_combined, "tex":"t#bar{t} l + jets",'color':ROOT.kBlue-7}
+{"sample":"ttJets_semiLep", "weight":btag_weight ,"cut":(0,-1) ,"add_Cut":"(!((ngenLep+ngenTau)==2))","name":TTJets_combined, "tex":"t#bar{t} l + jets",'color':ROOT.kBlue-7},
+{"sample":"ttJets_diLep",   "weight":btag_weight ,"cut":(0,-1) ,"add_Cut":"((ngenLep+ngenTau)==2)","name":TTJets_combined, "tex":"t#bar{t} ll + jets",'color':ROOT.kBlue}
 ]
 
 for bkg in bkg_samples:
     bkg['chain'] = getChain(bkg['name'],maxN=maxN,histname="",treeName="Events")
 
 plots =[\
-{'ndiv':False,'yaxis':'Events','xaxis':'N_{Jets}','logy':False , 'var':'nJet30',                      'varname':'nJet30',                   'binlabel':1,  'bin':(7,3,10)},\
+{'ndiv':False,'yaxis':'Events','xaxis':'N_{Jets}','logy':False , 'var':'nJet30',                      'varname':'nJet30',                   'binlabel':1,  'bin':(6,4,10)},\
   ]
 
 lepSel = lepSels[0]
-presel = "&&".join([lepSel['cut'],lepSel['veto'],"Jet_pt[1]>80&&abs(LepGood_eta[0])<2.4","deltaPhi_Wl<0.75"])
-data_presel = "&&".join([lepSel['cut'],lepSel['veto'],lepSel['trigger'],filters,"Jet_pt[1]>80&&abs(LepGood_eta[0])<2.4","deltaPhi_Wl<0.75"])
-weight_str = weight_str_CV
+presel = "&&".join([lepSel['cut'],lepSel['veto'],"Jet_pt[1]>80&&abs(LepGood_eta[0])<2.4","deltaPhi_Wl<0.5"])
+data_presel = "&&".join([lepSel['cut'],lepSel['veto'],lepSel['trigger'],filters,"Jet_pt[1]>80&&abs(LepGood_eta[0])<2.4","deltaPhi_Wl<0.5"])
+weight_str = weight_str_plot
 
 bin = {}
 for srNJet in sorted(SR):
@@ -156,11 +161,11 @@ for p in plots:
         leg.SetFillColor(0)
         leg.Draw()
         latex.DrawLatex(0.16,0.958,"#font[22]{CMS}"+" #font[12]{Preliminary}")
-        latex.DrawLatex(0.75,0.958,"#bf{L=2.2 fb^{-1} (13 TeV)}")
+        latex.DrawLatex(0.75,0.958,"#bf{2.2 fb^{-1} (13 TeV)}")
         #if nJet[1] == -1: latex.DrawLatex(0.6,0.83,"N_{Jets}#geq"+str(nJet[0]))
         #if nJet[1] != -1: latex.DrawLatex(0.6,0.83,str(nJet[0])+"#leqN_{Jets}#leq"+str(nJet[1]))
         latex.DrawLatex(0.6,0.80,"#bf{N_{bjets}>="+str(nbtag[0])+"}")
-        latex.DrawLatex(0.6,0.75,"#Delta#Phi<0.75")
+        latex.DrawLatex(0.6,0.75,"#Delta#Phi<0.5")
         Pad1.RedrawAxis()
         cb.cd()
         Pad2 = ROOT.TPad("Pad2", "Pad2",  0, 0.04, 1, 0.35)
@@ -197,9 +202,9 @@ for p in plots:
         h_ratio.SaveAs(bin[srNJet][stb][htb]['path']+'_'+p['varname']+'_allWeights_Ratio_4_lg1b.root')
         Func.Draw("same")
         cb.Draw()
-        cb.SaveAs(bin[srNJet][stb][htb]['path']+'_'+p['varname']+'_lg1b_0p75.png')
-        cb.SaveAs(bin[srNJet][stb][htb]['path']+'_'+p['varname']+'_lg1b_0p75.pdf')
-        cb.SaveAs(bin[srNJet][stb][htb]['path']+'_'+p['varname']+'_lg1b_0p75.root')
+        cb.SaveAs(bin[srNJet][stb][htb]['path']+'_'+p['varname']+'_lg1b_0p5_topPt.png')
+        cb.SaveAs(bin[srNJet][stb][htb]['path']+'_'+p['varname']+'_lg1b_0p5_topPt.pdf')
+        cb.SaveAs(bin[srNJet][stb][htb]['path']+'_'+p['varname']+'_lg1b_0p5_topPt.root')
         cb.Clear()
         del h_Stack
             
