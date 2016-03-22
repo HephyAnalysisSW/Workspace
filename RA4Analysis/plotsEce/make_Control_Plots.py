@@ -81,11 +81,11 @@ maxN = -1
 ROOT.gStyle.SetOptStat(0)
 
 all_MB = False
-presel = True
+presel = False
 SB_w   = False
 SB_tt  = False
 
-test = False
+test = True
 if test :
   presel = True
 
@@ -134,13 +134,13 @@ for bkg in bkg_samples:
     bkg['chain'] = getChain(bkg['name'],maxN=maxN,histname="",treeName="Events")
 
 signals = [\
-{"chain":getChain(T5qqqqVV_mGluino_1000To1075_mLSP_1To950[1000][700],histname='')  ,"name":"s1000","tex":"x10 T5q^{4}WW 1.0/0.7","color":ROOT.kAzure+9},\
-{"chain":getChain(T5qqqqVV_mGluino_1200To1275_mLSP_1to1150[1200][800],histname='') ,"name":"s1200","tex":"x10 T5q^{4}WW 1.2/0.8","color":ROOT.kMagenta+2},\
-{"chain":getChain(T5qqqqVV_mGluino_1400To1550_mLSP_1To1275[1500][100],histname=''),"name":"s1500","tex":"x10 T5q^{4}WW 1.5/0.1","color":ROOT.kRed+1},\
+{"chain":getChain(T5qqqqVV_mGluino_1000To1075_mLSP_1To950[1000][700],histname='')  ,"name":"s1000","tex":"T5q^{4}WW 1.0/0.7 x10","color":ROOT.kAzure+9},\
+{"chain":getChain(T5qqqqVV_mGluino_1200To1275_mLSP_1to1150[1200][800],histname='') ,"name":"s1200","tex":"T5q^{4}WW 1.2/0.8 x10","color":ROOT.kMagenta+2},\
+{"chain":getChain(T5qqqqVV_mGluino_1400To1550_mLSP_1To1275[1500][100],histname=''),"name":"s1500" ,"tex":"T5q^{4}WW 1.5/0.1 x10","color":ROOT.kRed+1},\
 ]
 dPhiBins  = array('d', [float(x)/1000. for x in range(0,500,100)+range(500,700,200)+range(700,1000,300)+range(1000,2000,500)+range(2000,3141,1141)+range(3141,4141,1000)])
 plots =[\
-{'ndiv':False,'yaxis':'Events','xaxis':'#Delta#Phi(W,l)','logy':'True' , 'var':'deltaPhi_Wl',        'bin_set':True,          'varname':'deltaPhi_Wl',       'binlabel':1, 'bin':(len(dPhiBins)-1,dPhiBins)},\
+{'ndiv':False,'yaxis':'< Events >','xaxis':'#Delta#Phi(W,l)','logy':'True' , 'var':'deltaPhi_Wl',        'bin_set':True,          'varname':'deltaPhi_Wl',       'binlabel':1, 'bin':(len(dPhiBins)-1,dPhiBins)},\
 {'ndiv':True,'yaxis':'Events /','xaxis':'L_{T}','logy':'True' , 'var':  'st',                        'bin_set':False,          'varname':'LT',                  'binlabel':25,  'bin':(30,250,1000)},\
 {'ndiv':True,'yaxis':'Events /','xaxis':'H_{T}','logy':'True' , 'var':'htJet30j',                    'bin_set':False,          'varname':'htJet30j',            'binlabel':50,  'bin':(40,500,2500)},\
 {'ndiv':False,'yaxis':'Events','xaxis':'n_{jet}','logy':'True' , 'var':'nJet30',                     'bin_set':False,          'varname':'nJet30',                   'binlabel':1,  'bin':(15,0,15)},\
@@ -227,9 +227,9 @@ for lepSel in lepSels:
           #latex.SetTextSize(0.025)
           #latex.SetTextAlign(11)
           
-          leg = ROOT.TLegend(0.7,0.55,0.93,0.925)
+          leg = ROOT.TLegend(0.65,0.5,0.93,0.925)
           leg.SetBorderSize(1)
-          leg_sig = ROOT.TLegend(0.4,0.75,0.65,0.925)
+          leg_sig = ROOT.TLegend(0.3,0.7,0.6,0.925)
           leg_sig.SetBorderSize(1)
           Pad1 = ROOT.TPad("Pad1", "Pad1", 0,0.31,1,1)
           Pad1.Draw()
@@ -303,7 +303,7 @@ for lepSel in lepSels:
             if presel:
               h_sig.Scale(10)
             h_sig.SetLineColor(sig["color"])
-            h_sig.SetLineWidth(2)
+            h_sig.SetLineWidth(3)
             h_sig.SetTitle("")
             h_sig.Draw("HistoSame")
             leg_sig.AddEntry(h_sig, sig['tex'],"l")
@@ -315,8 +315,7 @@ for lepSel in lepSels:
           if not p['ndiv']:
             h_data.GetYaxis().SetTitle(p['yaxis'])
           print "Integral of BKG:" , stack_hist.Integral()
-          print "Integral of Data:" , h_data.Integral()
-          leg.AddEntry(h_data, "Data","EPL")
+
           leg.SetFillColor(0)
           leg.SetLineColor(0)
           leg.Draw()
@@ -360,8 +359,9 @@ for lepSel in lepSels:
             if h_ratio.GetBinContent(b) == 0: continue
             rmax = max([ rmax, h_ratio.GetBinContent(b) + 2*h_ratio.GetBinError(b) ])
           print rmax
-          h_ratio.SetMinimum(0.0)
-          h_ratio.SetMaximum(min(rmax,4.99))
+          h_ratio.SetMinimum(0.01)
+          #h_ratio.SetMaximum(min(rmax,4.99))
+          h_ratio.SetMaximum(min(rmax,1.9))
           h_ratio.SetMarkerStyle(20)
           h_ratio.SetMarkerSize(1.1)
           h_ratio.SetMarkerColor(ROOT.kBlack)
@@ -379,6 +379,7 @@ for lepSel in lepSels:
           cb.SaveAs(bin[srNJet][stb][htb]['path']+p['varname']+'.root')
           if test:
             cb.SaveAs("/afs/cern.ch/user/e/easilar/public/html/Notes/notes/SUS-15-006/trunk/fig/zerob/LT_zerob.pdf")
+            #cb.SaveAs("/afs/cern.ch/user/e/easilar/public/html/Notes/notes/SUS-15-006/trunk/fig/zerob/"+p['varname']+".pdf")
           cb.Clear()
           del h_Stack
 
