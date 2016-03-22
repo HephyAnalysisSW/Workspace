@@ -14,6 +14,7 @@ ROOT.gStyle.SetOptStat(0)
 lumi = 2250##pb
 #path = "/afs/hephy.at/user/e/easilar/www/data/Run2015D/2p3fb/diLep_syst_study_results/"
 path = "/afs/hephy.at/user/e/easilar/www/data/Run2015D/2p25fb/diLep_syst_study_results/"
+#path = "/afs/hephy.at/user/e/easilar/www/data/Run2015D/2p25fb/diLep_syst_study_results_nJet_Fix/"
 data_mean = pickle.load(file('/data/easilar/Spring15/25ns/data_mean_25Feb_0p75_pkl'))
 #SR = signalRegion3fb
 SR = {(3,-1):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
