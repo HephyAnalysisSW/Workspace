@@ -27,13 +27,13 @@ def exactlyOneTightLepton(lepton="muon"):
 def looseLeptonVeto(lepton, minPt=10):
   if lepton=="muon":
     #return "(Sum$(abs(LepGood_pdgId)==13&&LepGood_pt>"+str(minPt)+")==1&&Sum$(abs(LepGood_pdgId)==11&&LepGood_pt>"+str(minPt)+")==0)"
-    return "nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0"
+    return "nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0"
   if lepton=="electron":
     #return "(Sum$(abs(LepGood_pdgId)==13&&LepGood_pt>"+str(minPt)+")==0&&Sum$(abs(LepGood_pdgId)==11&&LepGood_pt>"+str(minPt)+")==1)"
-    return "nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0"
+    return "nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0"
   if lepton=="both":
     #return "(Sum$(abs(LepGood_pdgId)==13&&LepGood_pt>"+str(minPt)+") + Sum$(abs(LepGood_pdgId)==11&&LepGood_pt>"+str(minPt)+")==1)"
-    return "nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0"
+    return "nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0"
 
 def nBTagStr():
   #return "Sum$(Jet_pt>"+str(minPt)+"&&abs(Jet_eta)<"+str(maxEta)+"&&Jet_id&&Jet_btagCMVA>"+str(minCMVATag)+")"

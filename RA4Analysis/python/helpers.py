@@ -184,6 +184,15 @@ def varBinName(vb, var):
     n+='< '+str(vb[1])
   return n
 
+def varBinNamewithUnit(vb, var, unit="GeV"):
+  if len(vb)>1 and vb[1]<0:
+    n = var+" #geq "+str(list(vb)[0])+" "+unit
+  if len(vb)>1 and vb[1]>0:
+    n = str(list(vb)[0])+" #leq "+var+" < "+str(vb[1])+" "+unit
+  if len(vb)>1 and vb[1]>0 and vb[0]==vb[1]:
+    n= var+" = "+str(vb[0])+" "+unit
+  return n
+
 def varBin(vb):
   if vb[0] < vb[1] : return '[' + str(vb[0]) + ',' +str(vb[1]) + ']' 
   if vb[1]==-1 : return '\geq'+ str(vb[0])
