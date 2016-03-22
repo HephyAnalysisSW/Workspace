@@ -34,7 +34,7 @@ if QCDup: nameSuffix += '_QCDup'
 if QCDdown: nameSuffix += '_QCDdown'
 
 ## samples
-isData              = True
+isData              = False
 unblinded           = True
 validation          = False
 isCentralPrediction = True
@@ -82,10 +82,10 @@ else:
 #signalRegions = signalRegion3fbMerge
 
 ## weight calculations
-lumi = 2.25
-templateLumi = 2.25 # lumi that was used when template was created - if defined wrong, fixed rest backgrounds will be wrong
+lumi = 2.3
+templateLumi = 2.3 # lumi that was used when template was created - if defined wrong, fixed rest backgrounds will be wrong
 sampleLumi = 3.
-printlumi = '2.2'
+printlumi = '2.3'
 debugReweighting = False
 
 year = '2016'
@@ -117,9 +117,10 @@ templateDir = '/data/'+username+'/Results'+year+'/btagTemplates_'+templateName+'
 prefix = 'singleLeptonic_Spring15_'
 
 if validation:
-  kappa_dict_dir = '/data/dspitzbart/Results'+year+'/Prediction_SFtemplates_validation_4j_lep_MC_SFnoPUreweight_2p25/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'
+  kappa_dict_dir = '/data/dspitzbart/Results'+year+'/Prediction_SFtemplates_validation_4j_lep_MC_SFnoPUreweight_2p3/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'
 else:
-  kappa_dict_dir = '/data/dspitzbart/Results'+year+'/Prediction_SFtemplates_fullSR_lep_MC_SFnoPUreweight_2p25/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'
+  #kappa_dict_dir = '/data/dspitzbart/Results'+year+'/Prediction_SFtemplates_fullSR_lep_MC_SFnoPUreweight_2p25/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'
+  kappa_dict_dir = '/data/dspitzbart/Results'+year+'/Prediction_SFtemplates_fullSR_lep_MC_SF_2p3/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'
 
 ## Preselection cut
 triggers = "(HLT_EleHT350||HLT_MuHT350)"
@@ -138,7 +139,7 @@ singleMu_presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSof
 MCweight = 'lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*TopPtWeight*0.94'
 
 ## corrections
-createFits = True # turn off if you already did one
+createFits = False # turn off if you already did one
 if not isCentralPrediction:
   createFits = False
 fitDir = '/data/'+username+'/Results'+year+'/correctionFit_'+regStr+'_MC/'

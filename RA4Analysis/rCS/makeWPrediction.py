@@ -56,7 +56,7 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, QCD=Fa
   yTT_Var_crNJet_0b_lowDPhi     = fit_crNJet_lowDPhi['TT_AllPdg']['yieldVar']*fit_crNJet_lowDPhi['TT_AllPdg']['template'].GetBinContent(1)**2
   if templateBootstrap: yTT_Var_crNJet_0b_lowDPhi += fit_crNJet_lowDPhi['TT_AllPdg']['yield']**2*templateBootstrap['TTJets_mu'][srNJet][stb][htb]**2
   yTT_crNJet_0b_highDPhi        = rCS_crNJet_0b_onlyTT['rCS']*yTT_crNJet_0b_lowDPhi
-  yTT_Var_crNJet_0b_highDPhi    = rCS_crNJet_0b_onlyTT['rCSE_pred']**2*yTT_crNJet_0b_lowDPhi**2 + rCS_crNJet_0b_onlyTT['rCS']**2*yTT_Var_crNJet_0b_lowDPhi
+  yTT_Var_crNJet_0b_highDPhi    = rCS_crNJet_0b_onlyTT['rCSE_pred']**2*yTT_crNJet_0b_lowDPhi**2 + rCS_crNJet_0b_onlyTT['rCS']**2*yTT_Var_crNJet_0b_lowDPhi #should be changed to rCSE_sim after Moriond 2016
   yTT_Var_crNJet_0b_highDPhi_MC = rCS_crNJet_0b_onlyTT['rCSE_sim']**2*yTT_crNJet_0b_lowDPhi**2 + rCS_crNJet_0b_onlyTT['rCS']**2*yTT_Var_crNJet_0b_lowDPhi
   #yTT_Var_crNJet_0b_highDPhi    = rCS_crNJet_1b['rCSE_pred']**2*yTT_crNJet_0b_lowDPhi**2 + rCS_crNJet_1b['rCS']**2*yTT_Var_crNJet_0b_lowDPhi
 

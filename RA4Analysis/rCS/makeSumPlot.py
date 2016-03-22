@@ -36,7 +36,7 @@ prefix = 'singleLeptonic_Spring15_'
 #path = '/data/'+username+'/Results2015/Prediction_SFTemplate_MC_fullSR_lep_3.0/'
 #pickleDir = '/data/easilar/Results2016/Prediction_SFtemplates_fullSR_lep_data_2p25/'
 #pickleDir = '/data/dspitzbart/Results2015/Prediction_SFtemplates_validation_lep_data_2.1/'
-pickleDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_fullSR_lep_data_2p25/'
+pickleDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_fullSR_lep_data_2p3/'
 #pickleDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_validation_4j_lep_data_2p25/'
 
 res = pickle.load(file(pickleDir+'resultsFinal_withSystematics_pkl'))
@@ -44,7 +44,8 @@ if withSystematics:
   sys = pickle.load(file(pickleDir+'resultsFinal_withSystematics_pkl'))
 
 #sig = pickle.load(file('/data/easilar/Spring15/25ns/allSignals_2p3_v2_pkl'))
-sig = pickle.load(file('/data/easilar/Spring15/25ns/allSignals_2p25_allSyst_approval_pkl'))
+#sig = pickle.load(file('/data/easilar/Spring15/25ns/allSignals_2p25_allSyst_approval_pkl'))
+sig = pickle.load(file('/data/easilar/Spring15/25ns/allSignals_2p3_allSyst_pkl'))
 
 #signalRegions = validationRegion
 #signalRegions = signalRegionCRonly
@@ -189,48 +190,34 @@ for srNJet in sorted(signalRegions):
 
       #calculate final tt yields and errors
       kappa_tt.SetBinContent(i,res[srNJet][stb][htb]['TT_kappa'])
-      if withSystematics:
-        kappa_tt.SetBinError(i, res[srNJet][stb][htb]['TT_kappa_err_syst'])
-      else:
-        kappa_tt.SetBinError(i, res[srNJet][stb][htb]['TT_kappa_err'])
+      kappa_tt.SetBinError(i, res[srNJet][stb][htb]['TT_kappa_err'])
 
       print fmt.format('tt w/o kappa, syst:', getValErrString(res[srNJet][stb][htb]['TT_pred'], res[srNJet][stb][htb]['TT_pred_err']))
-      print fmt.format('tt with kappa, syst:',getValErrString(res[srNJet][stb][htb]['TT_pred_final'], res[srNJet][stb][htb]['TT_pred_final_err']))
+      print fmt.format('tt with kappa, syst:',getValErrString(res[srNJet][stb][htb]['TT_pred_final'], res[srNJet][stb][htb]['TT_pred_final_tot_err']))
 
       #calculate final W yields and errors
       kappa_W.SetBinContent(i,res[srNJet][stb][htb]['W_kappa'])
-      if withSystematics:
-        kappa_W.SetBinError(i, res[srNJet][stb][htb]['W_kappa_err_syst'])
-      else:
-        kappa_W.SetBinError(i, res[srNJet][stb][htb]['W_kappa_err'])
+      kappa_W.SetBinError(i, res[srNJet][stb][htb]['W_kappa_err'])
+
       print fmt.format('W w/o kappa, syst:', getValErrString(res[srNJet][stb][htb]['W_pred'], res[srNJet][stb][htb]['W_pred_err']))
-      print fmt.format('W with kappa, syst:',getValErrString(res[srNJet][stb][htb]['W_pred_final'], res[srNJet][stb][htb]['W_pred_final_err']))
+      print fmt.format('W with kappa, syst:',getValErrString(res[srNJet][stb][htb]['W_pred_final'], res[srNJet][stb][htb]['W_pred_final_tot_err']))
       
       #calculate final rest yields and errors
       print fmt.format('rest w/o syst:', getValErrString(res[srNJet][stb][htb]['Rest_truth'], res[srNJet][stb][htb]['Rest_truth_err']))
-      print fmt.format('rest with syst:', getValErrString(res[srNJet][stb][htb]['Rest_truth_final'], res[srNJet][stb][htb]['Rest_truth_final_err']))
+      print fmt.format('rest with syst:', getValErrString(res[srNJet][stb][htb]['Rest_truth'], res[srNJet][stb][htb]['Rest_truth_final_tot_err']))
 
       print fmt.format('total MC', getValErrString(res[srNJet][stb][htb]['tot_truth'],res[srNJet][stb][htb]['tot_truth_err']))
       print fmt.format('- total pred w/o kappa, syst:', getValErrString(res[srNJet][stb][htb]['tot_pred'], res[srNJet][stb][htb]['tot_pred_err']))
-      print fmt.format('- total pred with kappa, syst:', getValErrString(res[srNJet][stb][htb]['tot_pred_final'], res[srNJet][stb][htb]['tot_pred_final_err']))
+      print fmt.format('- total pred with kappa, syst:', getValErrString(res[srNJet][stb][htb]['tot_pred_final'], res[srNJet][stb][htb]['tot_pred_final_tot_err']))
       
-      if not applyKappa:
-        tt_pred_H.SetBinContent(i, res[srNJet][stb][htb]['TT_pred'])
-        tt_pred_H.SetBinError(i,   res[srNJet][stb][htb]['TT_pred_err'])
-        
-        w_pred_H.SetBinContent(i, res[srNJet][stb][htb]['W_pred'])
-        w_pred_H.SetBinError(i,   res[srNJet][stb][htb]['W_pred_err'])
-      
-      else:
-        tt_pred_H.SetBinContent(i, res[srNJet][stb][htb]['TT_pred_final'])
-        tt_pred_H.SetBinError(i,   res[srNJet][stb][htb]['TT_pred_final_err'])
+      tt_pred_H.SetBinContent(i, res[srNJet][stb][htb]['TT_pred_final'])
+      tt_pred_H.SetBinError(i,   res[srNJet][stb][htb]['TT_pred_final_tot_err'])
 
-        w_pred_H.SetBinContent(i, res[srNJet][stb][htb]['W_pred_final'])
-        w_pred_H.SetBinError(i,   res[srNJet][stb][htb]['W_pred_final_err'])
+      w_pred_H.SetBinContent(i, res[srNJet][stb][htb]['W_pred_final'])
+      w_pred_H.SetBinError(i,   res[srNJet][stb][htb]['W_pred_final_tot_err'])
 
       tt_truth_H.SetBinContent(i,res[srNJet][stb][htb]['TT_truth'])
       tt_truth_H.SetBinError(i,  res[srNJet][stb][htb]['TT_truth_err'])
-
 
       w_truth_H.SetBinContent(i,res[srNJet][stb][htb]['W_truth'])
       w_truth_H.SetBinError(i,  res[srNJet][stb][htb]['W_truth_err'])
@@ -239,24 +226,14 @@ for srNJet in sorted(signalRegions):
       rest_H.SetBinError(i,   res[srNJet][stb][htb]['Rest_truth_err'])
 
       one.SetBinContent(i,1)
-      if not applyKappa:
-        pred_H.SetBinContent(i, res[srNJet][stb][htb]['tot_pred'])
-        pred_H.SetBinError(i,   res[srNJet][stb][htb]['tot_pred_err'])
-      else:
-        pred_H.SetBinContent(i, res[srNJet][stb][htb]['tot_pred_final'])
-        pred_H.SetBinError(i,   res[srNJet][stb][htb]['tot_pred_final_err'])
+      pred_H.SetBinContent(i, res[srNJet][stb][htb]['tot_pred_final'])
+      pred_H.SetBinError(i,   res[srNJet][stb][htb]['tot_pred_final_tot_err'])
       
-      if withSystematics:
-        predYErr.append(res[srNJet][stb][htb]['tot_pred_final_err'])
-        predRelYErr.append(res[srNJet][stb][htb]['tot_pred_final_err']/res[srNJet][stb][htb]['tot_pred_final'])
-      else:
-        predYErr.append(res[srNJet][stb][htb]['tot_pred_err'])
-        predRelYErr.append(res[srNJet][stb][htb]['tot_pred_err']/res[srNJet][stb][htb]['tot_pred'])
+      # set values to the uncertainty bands
+      predYErr.append(res[srNJet][stb][htb]['tot_pred_final_tot_err'])
+      predRelYErr.append(res[srNJet][stb][htb]['tot_pred_final_tot_err']/res[srNJet][stb][htb]['tot_pred_final'])
       predXErr.append(0.5)
-      if not applyKappa:
-        predY.append(res[srNJet][stb][htb]['tot_pred'])
-      else:
-        predY.append(res[srNJet][stb][htb]['tot_pred_final'])
+      predY.append(res[srNJet][stb][htb]['tot_pred_final'])
       predX.append(i-0.5)
       predRelY.append(1)
       
@@ -269,12 +246,10 @@ for srNJet in sorted(signalRegions):
           dcn, dc = nameAndCut(stb, htb, srNJet, (0,-1), presel+'&&deltaPhi_Wl>'+str(signalRegions[srNJet][stb][htb]['deltaPhi']))
         data_yield = getYieldFromChain(cData, dc,weight)
         data_truth_H.SetBinContent(i,data_yield)
-        #data_truth_H.SetBinError(i, sqrt(data_yield))
         data_truth_H.GetBinErrorLow(i)
         data_truth_H.GetBinErrorUp(i)
         print fmt.format('- Measured: ', getValErrString(data_yield, sqrt(data_yield)))
         truth_H.SetBinContent(i,data_yield)
-        #truth_H.SetBinError(i,  sqrt(data_yield))
 
         #get asymmetric errors for observation, ratio etc
         truth_H.GetXaxis().SetBinLabel(i, str(i))
@@ -323,7 +298,8 @@ for srNJet in sorted(signalRegions):
       if unblinded:
         total_meas     += data_yield
         total_yield     += res[srNJet][stb][htb]['tot_pred_final']
-        total_err       += res[srNJet][stb][htb]['systematics']['total']*res[srNJet][stb][htb]['tot_pred_final']
+        total_err       += res[srNJet][stb][htb]['tot_pred_final_tot_err']
+        #total_err       += res[srNJet][stb][htb]['systematics']['total']*res[srNJet][stb][htb]['tot_pred_final']
         total_stat_var  += res[srNJet][stb][htb]['tot_pred_final_err']**2
 
       pred_H.GetXaxis().SetBinLabel(i,'#splitline{'+signalRegions[srNJet][stb][htb]['njet']+'}{#splitline{'+signalRegions[srNJet][stb][htb]['LT']+'}{'+signalRegions[srNJet][stb][htb]['HT']+'}}')
@@ -519,9 +495,9 @@ if not unblinded:
 else:
   suffix = ''
 
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_update_p3.png')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_update_p3.root')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_update_p3.pdf')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_approval.png')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_approval.root')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_approval.pdf')
 
 can2 = ROOT.TCanvas('can2','can2',700,700)
 
@@ -554,7 +530,7 @@ leg2.Draw()
 latex2.DrawLatex(0.17,0.96,'CMS #bf{#it{simulation}}')
 latex2.DrawLatex(0.7,0.96,"L="+printlumi+"fb^{-1} (13TeV)")
 
-can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/'+predictionName+'_Kappa_update.png')
-can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/'+predictionName+'_Kappa_update.root')
-can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/'+predictionName+'_Kappa_update.pdf')
+can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/'+predictionName+'_Kappa_approval.png')
+can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/'+predictionName+'_Kappa_approval.root')
+can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/'+predictionName+'_Kappa_approval.pdf')
 

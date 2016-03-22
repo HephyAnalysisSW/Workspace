@@ -5,7 +5,7 @@ from CMGTools.RootTools.samples.samples_13TeV_DATA2015 import *
 import PhysicsTools.HeppyCore.framework.config as cfg
 
 
-data_path = "/data/nrad/cmgTuples/RunII/7412pass2_v4/Data25ns_Run2015D_Nov13Json/"
+data_path = "/data/nrad/cmgTuples/RunII/7412pass2_v4/Data25ns_Run2015D_Json18Dec/"
 
 
 SingleMuon_Run2015D_v4 ={\

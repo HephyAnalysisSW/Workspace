@@ -15,7 +15,7 @@ import time
 import io
 import importlib
 import copy
-
+import pickle
 # imports user modules or functions
 
 import ROOT
@@ -27,6 +27,8 @@ import Workspace.HEPHYPythonTools.helpers as hephyHelpers
 import Workspace.HEPHYPythonTools.convertHelpers as convertHelpers
 
 import Workspace.HEPHYPythonTools.user as user
+
+from  veto_event_list import get_veto_list
 
 def get_parser():
     ''' Argument parser for post-processing module.
@@ -94,6 +96,14 @@ def get_parser():
         type=str,
         default='',
         help="Skim conditions to be applied for post-processing"
+        )
+    
+    argParser.add_argument('--processSignalScan',
+        action='store',
+        nargs='*',
+        type=str,
+        default='',
+        help="Do Processing for a specific Stop and LSP mass"
         )
     
     argParser.add_argument('--leptonSelection',
@@ -236,11 +246,14 @@ def getSamples(args):
 
     if cmgTuples == "Data_25ns":
         # from Workspace.DegenerateStopAnalysis.cmgTuples_Data25ns import *
-        import Workspace.DegenerateStopAnalysis.cmgTuples_Data25ns as cmgSamples
+        #import Workspace.DegenerateStopAnalysis.cmgTuples_Data25ns as cmgSamples
+        import Workspace.DegenerateStopAnalysis.cmgTuples_Data25ns_scan as cmgSamples
     elif cmgTuples == "Data_50ns":
         import Workspace.DegenerateStopAnalysis.cmgTuples_Data50ns_1l as cmgSamples
+    #elif cmgTuples == "RunIISpring15DR74_25ns":
+    #    import Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_7412pass2 as cmgSamples
     elif cmgTuples == "RunIISpring15DR74_25ns":
-        import Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_7412pass2 as cmgSamples
+        import Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_7412pass2_mAODv2_v4 as cmgSamples
     elif cmgTuples == "RunIISpring15DR74_50ns":
         import Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_50ns as cmgSamples
     else:
@@ -346,12 +359,50 @@ def getSamples(args):
     if not os.path.exists(outDir):
         os.makedirs(outDir)
 
-    #    
-    return allComponentsList, outDir
-    
-     
+    if hasattr(cmgSamples,"mass_dict"):
+        mass_dict = cmgSamples.mass_dict
+    else:
+        mass_dict = {}
 
-def eventsSkimPreselect(skimName, leptonSelection, preselectFlag):
+
+    #    
+    return allComponentsList, outDir, mass_dict
+    
+
+ 
+def getSignalScanSamples(args):
+
+
+    #for mstop in mass_dict.keys():
+    #    for mlsp in mass_dict[mstop].keys():
+    #        skimCond = "Sum$(abs(GenPart_pdgId)==1000022&&abs(GenPart_motherId)==1000024&&abs(GenPart_grandmotherId)==1000021)==2&&(Sum$(abs(GenPart_pdgId)==24)==2)"
+    #        skimCond += "(GenSusyMStop==%s) && (GenSusyMNeutralino==%s) "%(mstop,mlsp)
+    #        outDir   = ""     
+
+
+    mstop=args.processSignalScan[0]
+    mlsp =args.processSignalScan[1]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def eventsSkimPreselect(skimName, leptonSelection, preselectFlag, signalMasses=[]):
     '''Define the skim condition, including preselection if required.
     
     The skim condition depends on the skim name, the lepton selection, and on the
@@ -366,17 +417,20 @@ def eventsSkimPreselect(skimName, leptonSelection, preselectFlag):
     
     skimCond = "(1)"
     
-    if skimName.startswith('met'):
+    if not skimName:
+        pass
+    elif skimName.startswith('met'):
         skimCond = "met_pt>" + str(float(skimName[3:]))
     elif skimName == 'HT400':
         skimCond = "Sum$(Jet_pt)>400"
     elif skimName == 'HT400ST200': 
         skimCond = "Sum$(Jet_pt)>400&&(LepGood_pt[0]+met_pt)>200"
     elif skimName == 'lheHThigh': 
-        skimCond += "lheHTIncoming>=600"
+        skimCond += "&&(lheHTIncoming>=600)"
     elif skimName == 'lheHTlow': 
-        skimCond += "lheHTIncoming<600"
+        skimCond += "&&(lheHTIncoming<600)"
     else:
+        raise Exception("Skim Condition Not recognized: %s"%skimName)
         pass
     
     # In case a lepton selection is required, loop only over events where there is one 
@@ -411,13 +465,19 @@ def eventsSkimPreselect(skimName, leptonSelection, preselectFlag):
         preselectionCuts = "(%s)"%'&&'.join([metCut,leadingJet100,HTCut])
         skimCond += "&&%s"%preselectionCuts
 
-
         logger.info("\n Applying preselection cuts: %s ", preselectionCuts)
         logger.info("\n Skimming condition with preselection: \n  %s \n", skimCond)
     else:
         logger.info("\n No preselection cuts are applied for skim %s \n Skimming condition unchanged \n", skimName)
         pass
- 
+
+    if signalMasses:
+        mstop = signalMasses[0]
+        mlsp  = signalMasses[1]
+        skimCond +="&& (GenSusyMStop==%s && GenSusyMNeutralino==%s)"%(mstop,mlsp)
+        logger.info("\n Processing Signal Scan for MStop:%s  MLSP: %s "%(mstop, mlsp ))
+        
+
     #
     return skimCond
 
@@ -474,7 +534,9 @@ def rwTreeClasses(sample, isample, args, temporaryDir, params={} ):
         'nLepGood20', 'nLepGood15', 'nLepGood10', 
         'htJet25', 'mhtJet25', 'htJet40j', 'htJet40', 'mhtJet40', 
         'nSoftBJetLoose25', 'nSoftBJetMedium25', 'nSoftBJetTight25', 
-        'met*','puppi*','Flag_*','HLT_*',
+        'met*','puppi*',
+        'Flag_*','HLT_*',
+        #'MET*','PFMET*','Calo*', 'Mono*', 'Mu*','TkMu*','L1Single*', 'L2Mu*',
         #'nFatJet','FatJet_*', 
         'nJet', 'Jet_*', 
         'nLepGood', 'LepGood_*', 
@@ -505,6 +567,8 @@ def rwTreeClasses(sample, isample, args, temporaryDir, params={} ):
                     'mvaIdPhys14/F','lostHits/I', 'convVeto/I']},
         {'prefix':'Jet',  'nMax':100, 
             'vars':['pt/F', 'eta/F', 'phi/F', 'id/I','btagCSV/F', 'btagCMVA/F', 'mass/F']},
+        {'prefix':'GenPart',  'nMax':30, 
+            'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I', 'mass/F', 'motherId/I' ]},
       ])
      
     if args.leptonSelection in ['soft', 'hard', 'inc']:
@@ -541,6 +605,9 @@ def rwTreeClasses(sample, isample, args, temporaryDir, params={} ):
             'lepMass/F', 'lepDz/F', 'lepDxy/F','lepMediumMuonId/I','lepSip3d/F',
             'nlep/I',
 
+
+            "Flag_Veto_Event_List/I/1",
+
             #Lepton Selection with Pt < 30 , for sync purposes
             #'lep30Pt/F','lep30MiniRelIso/F','lep30RelIso03/F' , 'lep30RelIso04/F',
             #'lep30AbsIso/F' ,'lep30Eta/F',  'lep30Phi/F', 'lep30PdgId/I/0', 'lep30Ind/I/-1', 
@@ -562,10 +629,21 @@ def rwTreeClasses(sample, isample, args, temporaryDir, params={} ):
             'deltaPhi_j12/F', 'dRJet1Jet2/F','deltaPhi30_j12/F' , 'deltaPhi60_j12/F',
             'JetLepMass/F','dRJet1Lep/F',
             'J3Mass/F',
+
+
+            "stopIndex1/I/-1", "stopIndex2/I/-1",
+            "lspIndex1/I/-1", "lspIndex2/I/-1",
+            "gpLepIndex1/I/-1", "gpLepIndex2/I/-1",
+            "gpBIndex1/I/-1", "gpBIndex2/I/-1",
+            "stops_pt/F/-1", "stops_eta/F/-999", "stops_phi/F/-999", 
+            "lsps_pt/F/-1", "lsps_eta/F/-999", "lsps_phi/F/-999", 
+
         
             "jet1Index/I", "jet2Index/I", "jet3Index/I", 
             "b1Index/I", "b2Index/I",
             #"lep1Index/I", "lep2Index/I", 
+            "nMuons/I", "nMuonsPt30/I",
+            #"nElectrons/I", "nElectronsPt30/I"
             "looseMuonIndex1/I", "looseMuonPt30Index1/I",
             "looseMuonIndex2/I", "looseMuonPt30Index2/I",
             "looseElectronIndex1/I", "looseElectronPt30Index1/I",
@@ -731,6 +809,64 @@ def getTreeFromChunk(c, skimCond, iSplit, nSplit):
 
 
 
+def processGenSusyParticles(readTree,splitTree,saveTree):
+
+
+    genPart           =  cmgObject(readTree, "GenPart")
+
+    stopIndices       =  genPart.getSelectionIndexList( readTree,
+                            lambda readTree, gp, igp: abs( gp.pdgId[igp] ) == 1000006
+                            )
+    if len(stopIndices)==0:    # not a susy event... move on
+        return 
+
+
+    isrIndices       =  genPart.getSelectionIndexList( readTree,
+                            lambda readTree, gp, igp: abs( gp.pdgId[igp] ) != 1000006 and gp.motherId==-9999
+                            )
+    lspIndices        =  genPart.getSelectionIndexList( readTree,
+                            lambda readTree, gp, igp: abs( gp.pdgId[igp] ) == 1000022
+                            )
+    bIndices          =  genPart.getSelectionIndexList( readTree,
+                            lambda readTree, gp, igp: abs( gp.pdgId[igp] ) == 5
+                            )
+    lepIndices        =  genPart.getSelectionIndexList( readTree,
+                            lambda readTree, gp, igp: abs( gp.pdgId[igp] ) in [11,13]
+                            )
+
+    saveTree.stopIndex1 = stopIndices[0]
+    saveTree.stopIndex2 = stopIndices[1]
+
+    saveTree.lspIndex1 = lspIndices[0]
+    saveTree.lspIndex2 = lspIndices[1]
+    saveTree.gpBIndex1 = bIndices[0]
+    saveTree.gpBIndex2 = bIndices[1]
+    saveTree.gpLepIndex1 = lepIndices[0] if len(lepIndices) >0 else -1
+    saveTree.gpLepIndex2 = lepIndices[1] if len(lepIndices) >1 else -1 
+
+    stop1_lv = ROOT.TLorentzVector()
+    stop2_lv = ROOT.TLorentzVector()
+
+    stop1_lv.SetPtEtaPhiM( genPart.pt[saveTree.stopIndex1], genPart.eta[saveTree.stopIndex1], genPart.phi[saveTree.stopIndex1], genPart.mass[saveTree.stopIndex1]  )
+    stop2_lv.SetPtEtaPhiM( genPart.pt[saveTree.stopIndex2], genPart.eta[saveTree.stopIndex2], genPart.phi[saveTree.stopIndex2], genPart.mass[saveTree.stopIndex2]  )
+
+    stops = stop1_lv + stop2_lv
+
+    saveTree.stops_pt = stops.Pt()
+    saveTree.stops_eta = stops.Eta()
+    saveTree.stops_phi = stops.Phi()
+
+
+
+    lsp1_lv = ROOT.TLorentzVector()
+    lsp2_lv = ROOT.TLorentzVector()
+    lsp1_lv.SetPtEtaPhiM( genPart.pt[saveTree.lspIndex1], genPart.eta[saveTree.lspIndex1], genPart.phi[saveTree.lspIndex1], genPart.mass[saveTree.lspIndex1]  )
+    lsp2_lv.SetPtEtaPhiM( genPart.pt[saveTree.lspIndex2], genPart.eta[saveTree.lspIndex2], genPart.phi[saveTree.lspIndex2], genPart.mass[saveTree.lspIndex2]  )
+    lsps = lsp1_lv + lsp2_lv
+    saveTree.lsps_pt = lsps.Pt()
+    saveTree.lsps_eta = lsps.Eta()
+    saveTree.lsps_phi = lsps.Phi()
+
 
 
 
@@ -822,11 +958,29 @@ def processLeptons(leptonSelection, readTree, splitTree, saveTree, params):
         saveTree.nMuonsPt30 = len(lepPt30List)
 
 
+
+        #print saveTree.looseMuonIndex1        
+        #if saveTree.nMuons:
+        #    saveTree.looseMuonIndex1 = lepList[0]
+        #    print "yes", lepList[0], saveTree.looseMuonIndex1
+        #else:
+        #    saveTree.looseMuonIndex1 = -1
+        #    print "no", lepList, saveTree.looseMuonIndex1
+
+    
+
         saveTree.looseMuonIndex1     =  lepList[0] if saveTree.nMuons > 0 else -1
         saveTree.looseMuonPt30Index2 =  lepPt30List[0] if saveTree.nMuonsPt30 > 0 else -1
-        saveTree.looseMuonIndex1     =  lepList[1] if saveTree.nMuons > 1 else -1
+        saveTree.looseMuonIndex2     =  lepList[1] if saveTree.nMuons > 1 else -1
         saveTree.looseMuonPt30Index2 =  lepPt30List[1] if saveTree.nMuonsPt30 > 1 else -1
 
+        #if saveTree.nMuons:
+        #    print saveTree.nMuons, lepList, saveTree.looseMuonIndex1, saveTree.looseMuonIndex2
+        #    print lepList[0], saveTree.nMuons 
+        #    print lepList[0] if saveTree.nMuons > 0 else -1 
+        #    print "---------------------"
+
+        #lepPt30List
 
 
 
@@ -863,8 +1017,8 @@ def processLeptons(leptonSelection, readTree, splitTree, saveTree, params):
         lepOthers =  [hephyHelpers.getObjDict(splitTree, 'LepOther_',varList, i ) for i in range(readTree.nLepOther)]  # use LepGood for sync 
         allLeptons = lepGoods #+ lepOthers
         
-        #selectedLeptons = filter(cmgObjectSelection.isGoodLepton , allLeptons)
-        selectedLeptons = filter(cmgObjectSelection.isGoodLepton30 , allLeptons)   ## for the sync
+        selectedLeptons = filter(cmgObjectSelection.isGoodLepton , allLeptons)
+        #selectedLeptons = filter(cmgObjectSelection.isGoodLepton30 , allLeptons)   ## for the sync
         selectedLeptons = sorted(selectedLeptons ,key= lambda lep: lep['pt'], reverse=True)
 
         logger.debug(
@@ -1326,8 +1480,31 @@ def processMasses(readTree, saveTree):
     #
     return saveTree
 
+def processEventVetoList(readTree,splitTree, saveTree, sample,  veto_event_list):
+    ''' 
+        
+    '''
+    if not sample['cmgComp'].isData:
+        return
 
-def computeWeight(sample, sumWeight, splitTree, saveTree, params):
+    run  = int(splitTree.GetLeaf('run').GetValue()      )
+    lumi = int(splitTree.GetLeaf('lumi').GetValue()     )
+    evt  = int(splitTree.GetLeaf('evt').GetValue()      )
+
+    run_lumi_evt = "%s:%s:%s\n"%(run,lumi,evt) 
+    #print run_lumi_evt
+    if run_lumi_evt in veto_event_list:
+        saveTree.Flag_Veto_Event_List = 0
+        #print "=====   evt Failed veto list %s"%run_lumi_evt
+    #else:
+        #print "=   evt  veto list %s"%run_lumi_evt
+        
+
+
+
+
+
+def computeWeight(sample, sumWeight,  splitTree, saveTree, params, xsec=None):
     ''' Compute the weight of each event.
     
     Include all the weights used:
@@ -1345,10 +1522,15 @@ def computeWeight(sample, sumWeight, splitTree, saveTree, params):
     
     genWeight = 1 if isDataSample else splitTree.GetLeaf('genWeight').GetValue()
 
+
     if isDataSample: 
         lumiScaleFactor = 1
     else:
-        lumiScaleFactor = sample['cmgComp'].xSection * target_lumi / float(sumWeight)
+        if not xsec:
+            xSection = sample['cmgComp'].xSection
+        else:
+            xSection = xsec
+        lumiScaleFactor = xSection * target_lumi / float(sumWeight)
         
     saveTree.weight = lumiScaleFactor * genWeight
     
@@ -1370,7 +1552,7 @@ def computeWeight(sample, sumWeight, splitTree, saveTree, params):
     return saveTree
 
 
-def haddFiles(sample, filesForHadd, temporaryDir, outputWriteDirectory):
+def haddFiles(sample_name, filesForHadd, temporaryDir, outputWriteDirectory):
     ''' Add the histograms using ROOT hadd script
         
         If
@@ -1396,7 +1578,8 @@ def haddFiles(sample, filesForHadd, temporaryDir, outputWriteDirectory):
         size += os.path.getsize(temporaryDir + '/' + f)
         files.append(f)
         if size > (maxFileSize * (10 ** 6)) or f == filesForHadd[-1] or len(files) > maxNumberFiles:
-            ofile = outputWriteDirectory + '/' + sample['name'] + '_' + str(counter) + '.root'
+            #ofile = outputWriteDirectory + '/' + sample['name'] + '_' + str(counter) + '.root'
+            ofile = outputWriteDirectory + '/' + sample_name+ '_' + str(counter) + '.root'
             logger.debug(
                 "\n Running hadd on directory \n %s \n files: \n %s \n", 
                 temporaryDir, pprint.pformat(files)
@@ -1404,7 +1587,7 @@ def haddFiles(sample, filesForHadd, temporaryDir, outputWriteDirectory):
             os.system('cd ' + temporaryDir + ';hadd -f -v 0 ' + ofile + ' ' + ' '.join(files))
             logger.debug("\n Written output file \n %s \n", ofile)
             size = 0
-            counter += 1
+            counter += 1 
             files = []
     
     # remove the temporary directory  
@@ -1423,6 +1606,7 @@ def haddFiles(sample, filesForHadd, temporaryDir, outputWriteDirectory):
     return
 
 
+
 def cmgPostProcessing(argv=None):
     
     if argv is None:
@@ -1431,6 +1615,7 @@ def cmgPostProcessing(argv=None):
     # parse command line arguments
     args = get_parser().parse_args()
     
+
     # job control parameters
     
     overwriteOutputFiles = args.overwriteOutputFiles
@@ -1457,7 +1642,7 @@ def cmgPostProcessing(argv=None):
     # choose the sample(s) to process (allSamples), with results saved in outputDirectory
     
     cmgTuples = args.cmgTuples
-    allSamples, outputDirectory = getSamples(args)
+    allSamples, outputDirectory , mass_dict = getSamples(args)
      
     # logging configuration
 
@@ -1519,7 +1704,12 @@ def cmgPostProcessing(argv=None):
 
     params['LepSel'] = LepSel
     params['LepSelPt30'] = LepSelPt30
-    print params 
+
+
+
+    
+    event_veto_list = get_veto_list()['all']
+    
 
     # target luminosity (fixed value, given here)
     params['target_lumi'] = 10000  # pb-1
@@ -1543,8 +1733,25 @@ def cmgPostProcessing(argv=None):
             "nISRsList"      :  [],
                     } )
 
+    #   prepare for signal scan
+    
+    if args.processSignalScan:
+        #mass_dict = pickle.load( open("./mass_dicts/%s_mass_nEvents_xsec.pkl"%sample,"r"))
+        #from mass_dict import mass_dict
+        #mass_dict = pickle.load(open("mass_dict_all.pkl","r"))
+
+        if len(mass_dict) ==0:
+            print "Mass Dict Not Avail. It's needed to split signal scan mass points"
+            assert False, "Mass Dict Not Avail. It's needed to split signal scan mass points"
+
+        mstop = args.processSignalScan[0]
+        mlsp = args.processSignalScan[1]
+        xsec = mass_dict[int(mstop)][int(mlsp)]['xsec']
+        nEntries = mass_dict[int(mstop)][int(mlsp)]['nEntry']
+
     # skim condition 
-    skimCond =  eventsSkimPreselect(skim, leptonSelection, preselect)
+    signalMasses =[mstop, mlsp] if args.processSignalScan else []
+    skimCond =  eventsSkimPreselect(skim, leptonSelection, preselect, signalMasses)
     logger.info("\n Final skimming condition: \n  %s \n", skimCond)
     
     # loop over each sample, process all variables and fill the saved tree
@@ -1555,6 +1762,10 @@ def cmgPostProcessing(argv=None):
         sampleType = 'Data' if sample['cmgComp'].isData else 'MC'
                       
         chunks, sumWeight = hephyHelpers.getChunks(sample)
+
+            
+
+            #sumWeight = mass_dict[mstop][mlsp]
                 
         logger.info(
             "\n Running on sample %s of type %s" + \
@@ -1575,8 +1786,12 @@ def cmgPostProcessing(argv=None):
         # create also a temporary directory (within the output directory)
         # that will be deleted automatically at the end of the job. If the directory exists,
         # it will be deleted and re-created.
-        
-        outputWriteDirectory = os.path.join(outputDirectory, sample['name'])
+
+
+        sample_name = sample['name']
+        if args.processSignalScan:
+            sample_name = "SMS_T2_4bd_mStop_%s_mLSP_%s"%(mstop,mlsp)        
+        outputWriteDirectory = os.path.join(outputDirectory, sample_name)
 
         if not os.path.exists(outputWriteDirectory):
             os.makedirs(outputWriteDirectory)
@@ -1598,7 +1813,7 @@ def cmgPostProcessing(argv=None):
                 logger.error(
                     "\n Requested sample directory \n %s \n exists, and overwriteOutputFiles is set to False." + \
                     "\n Skip post-processing sample %s \n", 
-                    outputWriteDirectory, sample['name']
+                    outputWriteDirectory, sample_name
                     )
                 
                 continue
@@ -1617,10 +1832,20 @@ def cmgPostProcessing(argv=None):
                    
         filesForHadd=[]
 
+        nEvents_total = 0
         for chunk in chunks:
           
             sourceFileSize = os.path.getsize(chunk['file'])
+
+
             maxFileSize = 200 # split into maxFileSize MB
+            
+            #if args.processSignalScan:
+            #    maxFileSize *= 5
+            #    print "---------------------"*10
+            #    print mstop, mlsp
+            #    print "---------------------"*10
+
             nSplit = 1+int(sourceFileSize/(maxFileSize*10**6)) 
             if nSplit>1: 
                 logger.debug("\n Chunk %s too large \n will split it in %i fragments of approx %i MB \n", 
@@ -1636,7 +1861,10 @@ def cmgPostProcessing(argv=None):
                     logger.debug("\n Running on tree object %s \n from split fragment %i \n", splitTree, iSplit)
                     
                 splitTree.SetName("Events")
-                
+                nEvents = splitTree.GetEntries()
+                if not nEvents:
+                    #print "Chunk empty....continuing"
+                    continue
                 # addresses for all variables (read and write) must be done here to take the correct address
                 
                 for v in readVars:
@@ -1653,27 +1881,49 @@ def cmgPostProcessing(argv=None):
     
                 # get entries for tree and loop over events
                 
-                nEvents = splitTree.GetEntries()
+            
                 logger.debug(
                     "\n Number of events after skimming and preselection: \n    chunk: %s \n    " + \
                     "split fragment %i of %i fragments in this chunk: \n    %i events \n", 
                     chunk['name'], iSplit, nSplit, nEvents
                     )
+
+
+                #if args.processSignalScan:
+                #    #mstop = args.processSignalScan[0]
+                #    #mlsp  = args.processSignalScan[1]
+                #    #eListName = "eList_%s_stp%s_lsp%s"%(iSplit, mstop,mlsp)
+                #    #splitTree.Draw(">>%s"%eListName, "(GenSusyMStop==%s) && (GenSusyMNeutralino==%s)"%(mstop,mlsp)  )
+                #    #eList = getattr(ROOT,eListName)
+                #    #splitTree.SetEventList(eList)
+                #    #nEvents_mscan = eList.GetN()
+                #    ##assert nEvents_mscan, "CANNOT PROCESS SIGNAL SAMPL mStop:%s  mLSP:%s "%(mstop, mlsp)
+                #    #print iSplit, mlsp, mstop, nEvents_mscan 
+                #    logger.info(
+                #        "Processing Signal Scan For iSplit:%s mStop:%s  mLSP:%s "%(iSplit, mstop, mlsp)
+                #        )
+
+                #    events = xrange(nEvents_mscan)
+                #else:
+                #    events = xrange(nEvents)
+
                 
-                print "{:-^80}".format(" Processing Chunk with %s  Events "%(nEvents) )
+                #print "{:-^80}".format(" Processing Chunk with %s  Events "%(nEvents) )
                 start_time = int(time.time())
                 last_time = start_time
                 nVerboseEvents = 10000
                 
-                for iEv in range(nEvents):
-                    if (iEv%nVerboseEvents == 0) and iEv>0:
+                for iEv in xrange(nEvents):
+                    nEvents_total +=1
+                    if (nEvents_total%nVerboseEvents == 0) and nEvents_total>0:
                         passed_time = int(time.time() ) - last_time
                         last_time = time.time()
-                        print "Event:{:<8}".format(iEv), "@ {} events/sec".format(round(float(nVerboseEvents)/passed_time ))                      
-                        logger.debug(
-                            "\n Processing event %i from %i events from chunck \n %s \n",
-                            iEv, nEvents, chunk['name']
-                            )
+                        if passed_time:
+                            print "Event:{:<8}".format(nEvents_total), "@ {} events/sec".format(round(float(nVerboseEvents)/passed_time ))                      
+                            logger.debug(
+                                "\n Processing event %i from %i events from chunck \n %s \n",
+                                nEvents_total, iEv, nEvents, chunk['name']
+                                )
             
                     saveTree.init()
                     readTree.init()
@@ -1705,9 +1955,19 @@ def cmgPostProcessing(argv=None):
                     # process various tranverse masses and other variables
                     saveTree = processMasses(readTree, saveTree)
               
+                    # process event veto list flags
+                    processEventVetoList(readTree,splitTree,saveTree, sample, event_veto_list)
+
+                    processGenSusyParticles(readTree,splitTree,saveTree)
+
+
                     # compute the weight of the event
-                    saveTree = computeWeight(sample, sumWeight, splitTree, saveTree, params)
-                    
+                    if not args.processSignalScan:
+                        saveTree = computeWeight(sample, sumWeight, splitTree, saveTree, params)
+                    else:
+                        saveTree = computeWeight(sample, nEntries, splitTree, saveTree, params, xsec=xsec)
+                            
+                
                     # fill all the new variables          
                     for v in newVars:
                         v['branch'].Fill()
@@ -1715,9 +1975,10 @@ def cmgPostProcessing(argv=None):
 
                 # 
                 
-                fileTreeSplit = sample['name'] + '_' + chunk['name'] + '_' + str(iSplit) + '.root' 
+                #fileTreeSplit = sample['name'] + '_' + chunk['name'] + '_' + str(iSplit) + '.root' 
+                fileTreeSplit = sample_name + '_' + chunk['name'] + '_' + str(iSplit) + '.root' 
                 filesForHadd.append(fileTreeSplit)
-                
+
                 if not testMethods:
                     tfileTreeSplit = ROOT.TFile(temporaryDir + '/' + fileTreeSplit, 'recreate')
                     splitTree.SetBranchStatus("*", 0)
@@ -1740,21 +2001,25 @@ def cmgPostProcessing(argv=None):
             "\n " + \
             "\n End of processing events for sample %s . Start summing up the chunks. " + \
             "\n *******************************************************************************\n",
-            sampleName
+            sample_name
+            #sampleName
             )
         
         # add the histograms using ROOT hadd script         
         if not testMethods: 
-            haddFiles(sample, filesForHadd, temporaryDir, outputWriteDirectory)
+            haddFiles(sample_name, filesForHadd, temporaryDir, outputWriteDirectory)
             
     logger.info(
         "\n " + \
         "\n End of post-processing sample %s " + \
         "\n *******************************************************************************\n",
-        sampleName
+        sample_name
+        #sampleName
         )
-   
-    
+    print "Log File Stored in:"
+    print logFile.name
+    print "Output Directory:"
+    print outputWriteDirectory 
  
 if __name__ == "__main__":
     sys.exit(cmgPostProcessing())
