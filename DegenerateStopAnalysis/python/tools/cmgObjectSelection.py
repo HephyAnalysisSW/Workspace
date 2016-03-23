@@ -1,23 +1,39 @@
-from Workspace.HEPHYPythonTools.helpers import findClosestObject, deltaR, deltaR2,getVarValue, getObjFromFile,getObjDict
+''' Module for CMG object selection
+'''
+
+# imports python standard modules or functions
+
+import logging
+import pprint
 from math import *
 
+# imports user modules or functions
 
+from Workspace.HEPHYPythonTools.helpers import findClosestObject, deltaR, deltaR2, getVarValue, getObjFromFile, getObjDict
 
+# logger
+logger = logging.getLogger(__name__)   
 
+# classes and functions
 
-#use indicies, probably faster!
 
 class cmgObject():
-    def __init__(self,readTree, obj ,varList=[]):
+    ''' Class for CMG objects.
+    
+    '''
+    
+    logger = logging.getLogger(__name__ + '.cmgObject')   
+
+    def __init__(self, readTree, splitTree, obj , varList=[]):
         self.nObj = cmgObjLen(readTree, obj)
         self.obj = obj
-        self.readTree = readTree  ### Can this create a memory leak?
-        #self.getVars(readTree, varList)
+        self.readTree = readTree  
+        self.splitTree = splitTree
 
-        #def getattr(self, name, tree= readTree):
+        # def getattr(self, name, tree= readTree):
         #    return cmgObjVar(readTree, self.obj, name)        
 
-    def __getattr__(self, name ):
+    def __getattr__(self, name):
         var = cmgObjVar(self.readTree, self.obj, name)
         return var
 
@@ -32,185 +48,342 @@ class cmgObject():
     def __eq__(self, y):
         raise Exception("cmgObject can't be compared. Item index is probably missing")
 
-    def getPassFailList(self, readTree , selectorFunc, objList=None): 
+    def getPassFailList(self, readTree , selectorFunc, objPassFailList=None): 
+        """Outputs a list of of True/False depending on whether object pass or fail the SelectorFunc.
+        
+        SelectorFunc should take readTree, cmgObject instance and object index.
+        
+        If another PassFailList is given as input,  it will evaluate SelectorFunc only 
+        for the indices which are True in objPassFailList, instead of looping over the entire collection.
         """
-        Outputs a list of of True/False depending on whether object pass or fail the SelectorFunc
-        SelectorFunc should take readTree, cmgObject instance and object index
-        Can provide another PassFailList, as the objList, to loop over instead of the entire collection
-        """
+
+        logger = logging.getLogger(__name__ + '.cmgObject' + '.getPassFailList')   
+
         passFailList = []
-        if not objList:
-            objList = enumerate(range(self.nObj))        # Will Loop over all objs in the collection
+        
+        if not objPassFailList:
+            # loop over all objs in the collection, if no list is given as input
+            objList = enumerate(range(self.nObj))
         else:
-            if len(objList)==self.nObj:        # objList should be a passfaillist 
-                objList = enumerate(objList)
+            if len(objPassFailList) == self.nObj:
+                objList = enumerate(objPassFailList)
             else:
-                #objList = enumerate()             
-                #print objList
-                objList = enumerate( [i in objList  for i in range(self.nObj) ]  )
-                #assert False               
-        #cutFuncs = self.selFunc(self, readTree, funcList)
-        #print objList
-        #print "----", objList
-        #if True: return objList
+                objList = enumerate([i in objPassFailList  for i in range(self.nObj) ])
+
         for iObj , passed in objList:   
             if passed is False :
                 passFailList.append(False)
                 continue
-            passFailList.append( selectorFunc( readTree, self, iObj )  )    ### func probably won't need readTree, but passing it just in case
+            passFailList.append(selectorFunc(readTree, self, iObj))
+            
         return passFailList
 
     def getIndexList(self, passFailList):
         return getIndexList(passFailList)
     
-    #def sort(self, readTree, key, objList):
+    # def sort(self, readTree, key, objList):
     #    pass       
 
     
 
-    def getSelectionIndexList(self, readTree , selectorFunc, objList=None): 
+    def getSelectionIndexList(self, readTree , selectorFunc, objPassFailList=None): 
+        """Outputs a list of indices of the objects that have passed the selectorFunc.
+        
+        SelectorFunc should take readTree, cmgObject instance and object index.
+        
+        If another PassFailList is given as input,  it will evaluate SelectorFunc only 
+        for the indices which are True in objPassFailList, instead of looping over the entire collection.
+        
+        TODO modify the getSelectionIndexList to take as input a list of indices, instead of 
+        a PassFailList.
+
         """
-        Outputs a list of indices of the objects that have passed the selectorFunc
-        SelectorFunc should take readTree, cmgObject instance and object index
-        Can provide another PassFailList, as the objList, to loop over instead of the entire collection
-        """
-        return getIndexList(self.getPassFailList(readTree, selectorFunc, objList=objList))
+        return getIndexList(self.getPassFailList(readTree, selectorFunc, objPassFailList=objPassFailList))
     
 
-    def getVars(self, readTree, varList):
-        for var in varList:
-            setattr(self,var, cmgObjVar(readTree, self.obj, var) )
+    def splitIndexList(self, var, varCutValue, indexList=[]):
+        ''' Split a list of object indices in two lists, for a given variable and the corresponding cut value.  
+        
+        Test the value of the variable for the corresponding index, put the index in the indexListHigh if 
+        the value is higher than the cut value, otherwise put the index in indexListLow.
+        Return the two list of indices.
+        '''
+        
+        indexListLow = []
+        indexListHigh = []
+        
+        for ind in indexList:
+            varValue = cmgObjVar(self.readTree, self.obj, var)[ind]
+            
 
+            if varValue > varCutValue:
+                indexListHigh.append(ind)
+            else:
+                indexListLow.append(ind)
+        
+        return indexListLow, indexListHigh
+    
+
+    def printObjects(self, indexList=[], varList=[]):
+        ''' Print for each object from indexList the values of variables from varList.
+        
+        If the indexList is not given, it will print all objects from the collection.
+        FIXME
+        '''
+
+        logger = logging.getLogger(__name__ + '.cmgObject' + '.printObjects')   
+                    
+        treeBranches = self.splitTree.GetListOfBranches()
+
+        objBranchList = []
+        for i in range(treeBranches.GetEntries()):
+            branchName = treeBranches.At(i).GetName()
+            if branchName.startswith(self.obj):
+                objBranchList.append(branchName)
+            
+        logger.trace(
+            "\n List of all branches for object %s \n %s \n",
+            self.obj, pprint.pformat(objBranchList)
+            )
+
+        varListCurrent = []
+        for var in varList:
+            branchName = self.obj + '_' + var
+            if branchName in objBranchList:
+                varListCurrent.append(var)
+
+        logger.trace(
+            "\n List of variables to print for object %s \n %s \n",
+            self.obj, pprint.pformat(varListCurrent)
+            )
+
+        printStr = ''
+        
+        if indexList == None:
+            printStr += "\n Number of {0} objects: {1} \n".format(self.obj, self.nObj)
+            indexList = list(range(self.nObj))
+        else:
+            printStr += "\n Number of selected {0} objects: {1} \n".format(self.obj, len(indexList))
+
+        for ind in indexList:
+            printStr += "\n + " + self.obj + " object index: " + str(ind) + '\n'
+            for var in varListCurrent:
+                varValue = cmgObjVar(self.readTree, self.obj, var)[ind]
+                varName = self.obj + '_' + var
+                printStr += varName + " = " + str(varValue) + '\n'
+            printStr += '\n'
+
+        #
+        return printStr
+        
 
 
 def getIndexList(passFailList):
-    indexList=[]
+    indexList = []
     for ix, x in enumerate(passFailList):
         if x:
             indexList.append(ix)
     return indexList
 
 def cmgObjVar(readTree, obj, var):                
-    return getattr(readTree, "%s_%s"%(obj,var) )
+    return getattr(readTree, "%s_%s" % (obj, var))
 
 
 def cmgObjLen(readTree, obj):
-    return getattr(readTree, "n%s"%obj )
+    return getattr(readTree, "n%s" % obj)
 
 
 def cmgLeaf(readTree, obj, var):                
-    leaf = readTree.GetLeaf( "%s_%s"%(obj,var) )
+    leaf = readTree.GetLeaf("%s_%s" % (obj, var))
     return
 
 class Leaf:
     def __init__(self, readTree, obj, var):
-        self.leaf = readTree.GetLeaf( "%s_%s"%(obj,var) )
-    def __getitem__(self,name):
+        self.leaf = readTree.GetLeaf("%s_%s" % (obj, var))
+    def __getitem__(self, name):
         return self.leaf.GetValue(name)
 
 
-
-
-
-ptSwitch = 25
-relIso = 0.2
-absIso = 5
-
-muSelector =    lambda readTree,lep,i: \
-                        ( abs(lep.pdgId[i])==13) \
-                        and (lep.pt[i] > 5 )\
-                        and abs(lep.eta[i]) < 2.5 \
-                        and abs(lep.dxy[i]) < 0.05\
-                        and abs(lep.dz[i]) < 0.2\
-                        and lep.sip3d[i] < 4 \
-                        and lep.mediumMuonId[i] == 1\
-                        and ((lep.pt[i] >= ptSwitch and lep.relIso04[i] < relIso ) or (lep.pt[i] < ptSwitch  and lep.relIso04[i] * lep.pt[i] < absIso ) )
-
-
-def lepSelectorFunc( lepSel ):
+def lepSelectorFuncOld(lepSel):
     muSel = lepSel["mu"] if lepSel.has_key("mu") else None
     elSel = lepSel["el"] if lepSel.has_key("el") else None
 
     def lepSelector(readTree, lep, i):
-        if muSel and (abs(lep.pdgId[i])==muSel['pdgId']): 
+        if muSel and (abs(lep.pdgId[i]) == muSel['pdgId']): 
             if muSel.has_key('pt') : 
-                if not (lep.pt[i] > muSel['pt'] ):  
-                    #print lep.pt[i]
+                if not (lep.pt[i] > muSel['pt']):  
+                    # print lep.pt[i]
                     return False
             if muSel.has_key('ptMax') : 
-                if not (lep.pt[i] < muSel['ptMax'] ):  
-                    #print lep.pt[i]
+                if not (lep.pt[i] < muSel['ptMax']):  
+                    # print lep.pt[i]
                     return False
             if muSel.has_key('eta') : 
                 if not abs(lep.eta[i]) < muSel['eta']: 
-                    #print lep.eta[i]
+                    # print lep.eta[i]
                     return False
             if muSel.has_key('dxy') : 
                 if not abs(lep.dxy[i]) < muSel['dxy']: 
-                    #print lep.dxy[i]
+                    # print lep.dxy[i]
                     return False
             if muSel.has_key('dz') : 
                 if not abs(lep.dz[i]) < muSel['dz']: 
-                    #print lep.dz[i]
+                    # print lep.dz[i]
                     return False
             if muSel.has_key('sip3d') : 
                 if not lep.sip3d[i] < muSel['sip3d'] : 
-                    #print lep.sip3d[i]
+                    # print lep.sip3d[i]
                     return False
             if muSel.has_key('mediumMuonId') : 
                 if not lep.mediumMuonId[i] == muSel['mediumMuonId']: 
-                    #print lep.mediumMuonId[i]
+                    # print lep.mediumMuonId[i]
                     return False
             if muSel.has_key('hybIso') : 
-                if not ( (lep.pt[i] >= muSel['hybIso']['ptSwitch'] and lep.relIso04[i] < muSel['hybIso']['relIso'] ) \
-                or (lep.pt[i] < muSel['hybIso']['ptSwitch']  and lep.relIso04[i] * lep.pt[i] < muSel['hybIso']['absIso'] ) ): 
-                    #print lep.pt, lep.relIso04, 
+                if not ((lep.pt[i] >= muSel['hybIso']['ptSwitch'] and lep.relIso04[i] < muSel['hybIso']['relIso']) \
+                or (lep.pt[i] < muSel['hybIso']['ptSwitch']  and lep.relIso04[i] * lep.pt[i] < muSel['hybIso']['absIso'])): 
+                    # print lep.pt, lep.relIso04, 
                     return False
+            #
             return True
-        elif elSel and (abs(lep.pdgId[i])==elSel['pdgId']): 
+        elif elSel and (abs(lep.pdgId[i]) == elSel['pdgId']): 
             if elSel.has_key('pt') : 
-                if not (lep.pt[i] > elSel['pt'] ):  
-                    #print lep.pt[i]
+                if not (lep.pt[i] > elSel['pt']):  
+                    # print lep.pt[i]
+                    return False
+            if elSel.has_key('ptMax') : 
+                if not (lep.pt[i] < elSel['ptMax']):  
+                    # print lep.pt[i]
                     return False
             if elSel.has_key('eta') : 
                 if not abs(lep.eta[i]) < elSel['eta']: 
-                    #print lep.eta[i]
+                    # print lep.eta[i]
                     return False
             if elSel.has_key('dxy') : 
                 if not abs(lep.dxy[i]) < elSel['dxy']: 
-                    #print lep.dxy[i]
+                    # print lep.dxy[i]
+                    return False
+            if elSel.has_key('dz') : 
+                if not abs(lep.dz[i]) < elSel['dz']: 
+                    # print lep.dz[i]
+                    return False
+            if elSel.has_key('sip3d') : 
+                if not lep.sip3d[i] < elSel['sip3d'] : 
+                    # print lep.sip3d[i]
                     return False
             if elSel.has_key('SPRING15_25ns_v1') : 
-                if not abs(lep.SPRING15_25ns_v1[i]) >= elSel['SPRING15_25ns_v1']: 
-                    #print lep.dxy[i]
+                if not abs(lep.SPRING15_25ns_v1[i]) > elSel['SPRING15_25ns_v1']: 
+                    # print lep.SPRING15_25ns_v1[i]
                     return False
+            #
             return True
         else:
-            #print "Lep Selector Fail", lep.pdgId[i], lep.pt[i]
-            #assert False
+            # print "Lep Selector Fail", lep.pdgId[i], lep.pt[i]
+            # assert False
             return False 
 
     return lepSelector
 
 
-
-
-
-
                 
-def jetSelectorFunc(pt, eta):
-    ret = lambda readTree, jet, i:\
-                    jet.pt[i] > pt\
-                    and abs(jet.eta[i]) < eta\
-                    and jet.id[i]
-    return ret
+def jetSelectorFuncOld(jetSel):
+    def jetSelector(readTree, jet, i):
+        if jetSel: 
+            if jetSel.has_key('pt') : 
+                if not (jet.pt[i] > jetSel['pt']):  
+                    # print jet.pt[i]
+                    return False
+            if jetSel.has_key('ptMax') : 
+                if not (jet.pt[i] < jetSel['ptMax']):  
+                    # print jet.pt[i]
+                    return False
+            if jetSel.has_key('eta') : 
+                if not abs(jet.eta[i]) < jetSel['eta']: 
+                    # print jet.eta[i]
+                    return False
+            if jetSel.has_key('id') :  # non-standard operator >=
+                if not abs(jet.id[i]) >= jetSel['id']: 
+                    # print jet.id[i]
+                    return False
+            if jetSel.has_key('btag') : 
+                if jetSel['btag'] == 'btagCSV':
+                    if not jet.btagCSV[i] > jetSel['cutDiscriminator']: 
+                        # print jet.btagCSV[i]
+                        return False
+                else:
+                    raise Exception("\n No comparison operator defined for " + jetSel['btag'])
 
-                
-jetSelector = jetSelectorFunc(pt=30, eta=2.4) 
+            #
+            return True
+
+    return jetSelector
 
 
+def objSelectorFunc(objSel):
+    '''Object selection for cuts given in a dictionary.
+        
+    The format of the dictionary is
+    
+        objSel = {
+        'set_name': {
+            'cut_name': ('variable_name', operator, cut_value),
+            'cut_name1': ('variable_name', operator, cut_value, operator_on_variable),
+            },
+        }
 
+    Multiple cut_name can be given, and multiple set_name can be defined.
+    For operators, use the python standard module "operator" https://docs.python.org/2/library/operator.html
+    
+    For cut_name with complex expression (e.g. hyb_iso) a function must be defined separately, see hyb_iso
+    implementation.
+    '''
+        
+    def hybIso(readTree, obj, i, objSel):
+        ''' Hybrid isolation function for muons
+        
+        '''
+        
+        if not (
+            (obj.pt[i] >= objSel['hybIso']['ptSwitch'] and obj.relIso04[i] < objSel['hybIso']['relIso'])
+            or 
+            (obj.pt[i] < objSel['hybIso']['ptSwitch']  and obj.relIso04[i] * obj.pt[i] < objSel['hybIso']['absIso'])
+            ):
+            
+            return False
+        #
+        return True 
 
+        
+    def objSelector(readTree, obj, i):
+        
+        selector = True
+            
+        for key, keyValue in objSel.iteritems(): 
+            
+            if key == 'hybIso':
+                selector &= hybIso(readTree, obj, i, objSel)
+            else:
+                varValue = getattr(obj, keyValue[0])[i]
+            
+                # operators with two arguments
+                operat = keyValue[1]
+                varCut = keyValue[2]
+            
+                if len(keyValue) > 3:
+                    # apply varOperat operator on variable value
+                    varOperat = keyValue[3]
+                    selector &= operat(varOperat(varValue), varCut)
+                else:
+                    selector &= operat(varValue, varCut)
+                    
+            #
+            if not selector:
+                break
+            
+        return selector
+
+    return objSelector
+    
+    
 ###############################################################################################
 #######################################                    ####################################
 #######################################   OLD FUNCTIONS    ####################################

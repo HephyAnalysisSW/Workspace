@@ -9,6 +9,7 @@ import os
 import logging
 import random
 import tempfile
+import math
 
 # imports user modules or functions
 
@@ -323,6 +324,24 @@ def invMass(objList, massOption=True):
     return invMassValue
 
     
+def dR((eta1, phi1), (eta2, phi2)):
+    ''' Compute dR, with eta and phi values of the two objects as input.
+    
+    '''
+    
+    dPhi = phi2 - phi1
+    
+    if  dPhi > math.pi:
+        dPhi -= 2.0 * math.pi
+    
+    if dPhi <= -math.pi:
+        dPhi += 2.0 * math.pi
+        
+    dEta = eta2 - eta1
+        
+    dRsq = dPhi ** 2 + dEta ** 2   
+
+    return sqrt(dRsq)
     
     
 
