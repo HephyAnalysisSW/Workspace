@@ -462,7 +462,9 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
         TT_kappa, TT_kappa_err = getPropagatedError(res[njb][stb][htb]['rCS_srNJet_0b_onlyTT']['rCS'], res[njb][stb][htb]['rCS_srNJet_0b_onlyTT']['rCSE_sim'], TT_pred_rcs_corr, TT_pred_rcs_corr_err, returnCalcResult=True)
         W_kappa, W_kappa_err = getPropagatedError(res[njb][stb][htb]['rCS_srNJet_0b_onlyW']['rCS'], res[njb][stb][htb]['rCS_srNJet_0b_onlyW']['rCSE_sim'], res[njb][stb][htb]['rCS_W_crNJet_0b_corr'], sqrt(res[njb][stb][htb]['rCS_Var_W_crNJet_0b_corr']), returnCalcResult=True)
         W_corrRest_kappa, W_corrRest_kappa_err = getPropagatedError(res[njb][stb][htb]['rCS_srNJet_0b_onlyW']['rCS'], res[njb][stb][htb]['rCS_srNJet_0b_onlyW']['rCSE_sim'], res[njb][stb][htb]['rCS_W_crNJet_0b_corr_rest'], sqrt(res[njb][stb][htb]['rCS_Var_W_crNJet_0b_corr_rest']), returnCalcResult=True)
-
+        
+        global_kappa, global_kappa_err = getPropagatedError(res[njb][stb][htb]['tot_truth'], res[njb][stb][htb]['tot_truth_err'], res[njb][stb][htb]['tot_pred'], res[njb][stb][htb]['tot_pred_err'], returnCalcResult=True)
+        
         #different kappa to get closure in MC
         TT_kappa_yield, TT_kappa_yield_err = getPropagatedError(res[njb][stb][htb]['TT_truth'], res[njb][stb][htb]['TT_truth_err'], TT_pred_forTotal, TT_pred_err_forTotal, returnCalcResult=True)
         W_yield_kappa, W_kappa_yield_err = getPropagatedError(res[njb][stb][htb]['W_truth'], res[njb][stb][htb]['W_truth_err'], res[njb][stb][htb]['W_pred'], res[njb][stb][htb]['W_pred_err'], returnCalcResult=True)
@@ -473,9 +475,12 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
         res[njb][stb][htb]['W_kappa_err'] = W_kappa_err
         res[njb][stb][htb]['W_corrRest_kappa'] = W_corrRest_kappa
         res[njb][stb][htb]['W_corrRest_kappa_err'] = W_corrRest_kappa_err
+        res[njb][stb][htb]['tot_kappa'] =  global_kappa
+        res[njb][stb][htb]['tot_kappa_err'] = global_kappa_err
         print 'kappa(TT):', getValErrString(TT_kappa,TT_kappa_err)
         print 'kappa(W):', getValErrString(W_kappa,W_kappa_err)
         print 'kappa(W_corrRest):', getValErrString(W_kappa,W_kappa_err)
+        print 'kappa(total):', getValErrString(global_kappa,global_kappa_err)
       else:
         kappa_dict = pickle.load(file(kappa_dict_dir))
         TT_kappa              = kappa_dict[njb][stb][htb]['TT_kappa']
@@ -484,13 +489,17 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
         W_kappa_err           = kappa_dict[njb][stb][htb]['W_kappa_err']
         W_corrRest_kappa      = kappa_dict[njb][stb][htb]['W_corrRest_kappa']
         W_corrRest_kappa_err  = kappa_dict[njb][stb][htb]['W_corrRest_kappa_err']
-        
+        global_kappa          = kappa_dict[njb][stb][htb]['tot_kappa']
+        global_kappa_err      = kappa_dict[njb][stb][htb]['tot_kappa_err']
+
         res[njb][stb][htb]['TT_kappa'] = TT_kappa
         res[njb][stb][htb]['TT_kappa_err'] = TT_kappa_err
         res[njb][stb][htb]['W_kappa'] = W_kappa
         res[njb][stb][htb]['W_kappa_err'] = W_kappa_err
         res[njb][stb][htb]['W_corrRest_kappa'] = W_corrRest_kappa
         res[njb][stb][htb]['W_corrRest_kappa_err'] = W_corrRest_kappa_err
+        res[njb][stb][htb]['tot_kappa'] =  global_kappa
+        res[njb][stb][htb]['tot_kappa_err'] = global_kappa_err
       
       # correct the predictions, but don't apply uncertainties of kappas on them - they are systematic uncertainties
       TT_pred_kappa, TT_pred_kappa_err = getPropagatedError([res[njb][stb][htb]['TT_pred'], kappaTT_btag['kappa'], TT_kappa], [res[njb][stb][htb]['TT_pred_err'], 0, 0], 1, 0, returnCalcResult=True)

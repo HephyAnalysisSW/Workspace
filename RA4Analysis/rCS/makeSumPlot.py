@@ -28,7 +28,9 @@ withSystematics = True
 applyKappa      = True
 
 showMCtruth     = True
-signal = True
+signal = False
+
+latextitle = 'Project Work'
 
 weight_str, weight_err_str = makeWeight(lumi, sampleLumi, reWeight=MCweight)
 
@@ -36,8 +38,8 @@ prefix = 'singleLeptonic_Spring15_'
 #path = '/data/'+username+'/Results2015/Prediction_SFTemplate_MC_fullSR_lep_3.0/'
 #pickleDir = '/data/easilar/Results2016/Prediction_SFtemplates_fullSR_lep_data_2p25/'
 #pickleDir = '/data/dspitzbart/Results2015/Prediction_SFtemplates_validation_lep_data_2.1/'
-pickleDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_fullSR_lep_data_2p3/'
-#pickleDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_validation_4j_lep_data_2p3/'
+#pickleDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_fullSR_lep_data_Moriond_2p3/'
+pickleDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_validation_4j_lep_data_2p3/'
 
 res = pickle.load(file(pickleDir+'resultsFinal_withSystematics_pkl'))
 if withSystematics:
@@ -72,7 +74,8 @@ data_truth_H.SetLineColor(ROOT.kBlack)
 data_truth_H.SetLineWidth(2)
 data_truth_H.SetMarkerColor(ROOT.kBlack)
 data_truth_H.SetMarkerSize(1.3)
-data_truth_H.SetBinErrorOption(ROOT.TH1F.kPoisson)
+if isData:
+  data_truth_H.SetBinErrorOption(ROOT.TH1F.kPoisson)
 
 
 benchmark1_H = ROOT.TH1F('benchmark1_H','T5q^{4}WW 1.0/0.7',bins,0,bins)
@@ -117,7 +120,8 @@ pred_H  = ROOT.TH1F('pred_H','total pred.', bins,0,bins)
 pred_H.SetBarWidth(0.4)
 pred_H.SetBarOffset(0.1)
 truth_H = ROOT.TH1F('truth_H','Total MC truth',bins,0,bins)
-truth_H.SetBinErrorOption(ROOT.TH1F.kPoisson)
+if isData:
+  truth_H.SetBinErrorOption(ROOT.TH1F.kPoisson)
 
 
 pred_H.SetLineColor(ROOT.kGray+1)
@@ -143,8 +147,17 @@ kappa_W.SetMarkerSize(1.5)
 kappa_W.SetMarkerColor(color('wjets'))
 kappa_W.SetLineColor(color('wjets'))
 
+kappa_global = ROOT.TH1F('kappa_global','kappa', bins,0,bins)
+kappa_global.SetLineWidth(2)
+kappa_global.SetMarkerStyle(20)
+kappa_global.SetMarkerSize(0)
+kappa_global.SetMarkerColor(ROOT.kBlack)
+kappa_global.SetLineColor(ROOT.kBlack)
+
+
 one = ROOT.TH1F('one','one', bins,0,bins)
 one.SetLineStyle(2)
+one.SetLineWidth(2)
 
 drawOption = 'hist ][ e0'
 drawOptionSame = drawOption + 'same'
@@ -169,6 +182,10 @@ dataPY = []
 dataPYUp = []
 dataPYDown = []
 
+kappaPYErr = []
+kappaPXErr = []
+kappaPX = []
+kappaPY = []
 
 total_meas      = 0
 total_yield     = 0
@@ -198,6 +215,10 @@ for srNJet in sorted(signalRegions):
       #calculate final W yields and errors
       kappa_W.SetBinContent(i,res[srNJet][stb][htb]['W_kappa'])
       kappa_W.SetBinError(i, res[srNJet][stb][htb]['W_kappa_err'])
+
+      #calculate final W yields and errors
+      kappa_global.SetBinContent(i,res[srNJet][stb][htb]['tot_kappa'])
+      kappa_global.SetBinError(i, res[srNJet][stb][htb]['tot_kappa_err'])
 
       print fmt.format('W w/o kappa, syst:', getValErrString(res[srNJet][stb][htb]['W_pred'], res[srNJet][stb][htb]['W_pred_err']))
       print fmt.format('W with kappa, syst:',getValErrString(res[srNJet][stb][htb]['W_pred_final'], res[srNJet][stb][htb]['W_pred_final_tot_err']))
@@ -287,6 +308,11 @@ for srNJet in sorted(signalRegions):
         dataPYUp.append(truthUpE)
         dataPYDown.append(truthLowE)
 
+        kappaPX.append(i-0.5)
+        kappaPY.append(res[srNJet][stb][htb]['tot_kappa'])
+        kappaPXErr.append(0.5)
+        kappaPYErr.append(res[srNJet][stb][htb]['tot_kappa_err'])
+
 
       else:
         truth_H.SetBinContent(i,res[srNJet][stb][htb]['tot_truth'])
@@ -326,6 +352,12 @@ aexl = array('d',predXErr)
 aeyh = array('d',predYErr)
 aeyl = array('d',predYErr)
 
+#pred error
+kx = array('d',kappaPX)
+ky = array('d',kappaPY)
+kex = array('d',kappaPXErr)
+key = array('d',kappaPYErr)
+
 #pred rel error for ratio plot
 a_r_eyh = array('d',predRelYErr)
 a_r_eyl = array('d',predRelYErr)
@@ -347,7 +379,6 @@ dexl  = array('d',dataPXErr)
 deyh  = array('d',dataPYUp)
 deyl  = array('d',dataPYDown)
 
-
 can = ROOT.TCanvas('can','can',700,700)
 
 pad1=ROOT.TPad("pad1","MyTitle",0.,0.3,1.,1.)
@@ -360,8 +391,12 @@ h_Stack = ROOT.THStack('h_Stack','Stack')
 h_Stack.Add(rest_H)
 h_Stack.Add(w_pred_H)
 h_Stack.Add(tt_pred_H)
-h_Stack.SetMaximum(100)
-h_Stack.SetMinimum(0.080)
+if validation:
+  h_Stack.SetMaximum(300)
+  h_Stack.SetMinimum(0.40)
+else:
+  h_Stack.SetMaximum(100)
+  h_Stack.SetMinimum(0.080)
 
 #h_Stack.GetYaxis().SetTitle('Signal Region #')
 
@@ -380,6 +415,9 @@ pred_err = ROOT.TGraphAsymmErrors(bins, ax, ay, aexl, aexh, aeyl, aeyh)
 pred_err.SetFillColor(ROOT.kGray+1)
 pred_err.SetFillStyle(3244)
 
+kappa_err = ROOT.TGraphAsymmErrors(bins, kx, ky, kex, kex, key, key)
+kappa_err.SetFillColor(ROOT.kGray+1)
+kappa_err.SetFillStyle(3444)
 
 leg = ROOT.TLegend(0.65,0.65,0.98,0.95)
 leg.SetFillColor(ROOT.kWhite)
@@ -394,7 +432,7 @@ if isData:
     leg.AddEntry(truth_H, 'MC truth')
 else:
   if showMCtruth:
-    leg.AddEntry(truth_H)
+    leg.AddEntry(truth_H, 'MC truth')
 leg.AddEntry(tt_pred_H,'','f')
 leg.AddEntry(w_pred_H,'','f')
 leg.AddEntry(rest_H,'','f')
@@ -450,7 +488,7 @@ latex1.SetNDC()
 latex1.SetTextSize(0.04)
 latex1.SetTextAlign(11)
 
-latex1.DrawLatex(0.15,0.96,'CMS #bf{#it{Preliminary}}')
+latex1.DrawLatex(0.15,0.96,'CMS #bf{#it{'+latextitle+'}}')
 latex1.DrawLatex(0.8,0.96,'#bf{'+printlumi+"fb^{-1} (13TeV)}")
 
 pad1.SetLogy()
@@ -474,7 +512,7 @@ pad2=ROOT.TPad("pad2","datavsMC",0.,0.,1.,.3)
 pad2.SetLeftMargin(0.15)
 pad2.SetBottomMargin(0.3)
 pad2.SetTopMargin(0.02)
-#pad2.SetGrid()
+pad2.SetGrid()
 pad2.Draw()
 pad2.cd()
 ratio2.GetXaxis().SetTitleSize(0.13)
@@ -504,42 +542,48 @@ if not unblinded:
 else:
   suffix = ''
 
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_approval_t.png')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_approval_t.root')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_approval_t.pdf')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_approval_Moriond.png')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_approval_Moriond.root')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_approval_Moriond.pdf')
 
 can2 = ROOT.TCanvas('can2','can2',700,700)
 
-one.SetMaximum(3.5)
+one.SetMaximum(3.65)
 one.SetMinimum(0.)
+kappa_global.SetMaximum(3.65)
+kappa_global.SetMinimum(0.)
 
-leg2 = ROOT.TLegend(0.75,0.85,0.98,0.95)
+leg2 = ROOT.TLegend(0.75,0.8,0.98,0.95)
 leg2.SetFillColor(ROOT.kWhite)
 leg2.SetShadowColor(ROOT.kWhite)
 leg2.SetBorderSize(1)
 leg2.SetTextSize(0.04)
 leg2.AddEntry(kappa_tt,'t#bar{t}+jets')
 leg2.AddEntry(kappa_W,'W+jets')
+leg2.AddEntry(kappa_global,'total')
 
-setNiceBinLabel(one, signalRegions)
-one.GetYaxis().SetTitle('#kappa')
-one.GetXaxis().SetLabelSize(0.04)
+setNiceBinLabel(kappa_global, signalRegions)
+kappa_global.GetYaxis().SetTitle('#kappa')
+kappa_global.GetXaxis().SetLabelSize(0.04)
 
 latex2 = ROOT.TLatex()
 latex2.SetNDC()
 latex2.SetTextSize(0.04)
 latex2.SetTextAlign(11)
 
-one.Draw('hist')
+kappa_global.Draw('hist')
+kappa_err.Draw("2 same")
+kappa_global.Draw('hist same')
+one.Draw('hist same')
 kappa_tt.Draw('e1p same')
 kappa_W.Draw('e1p same')
 
 leg2.Draw()
 
-latex2.DrawLatex(0.17,0.96,'CMS #bf{#it{simulation}}')
-latex2.DrawLatex(0.7,0.96,"L="+printlumi+"fb^{-1} (13TeV)")
+latex2.DrawLatex(0.16,0.96,'CMS #bf{#it{'+latextitle+'}}')
+latex2.DrawLatex(0.79,0.96,"#bf{MC (13TeV)}")
 
-can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/'+predictionName+'_Kappa_approval_t.png')
-can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/'+predictionName+'_Kappa_approval_t.root')
-can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/'+predictionName+'_Kappa_approval_t.pdf')
+can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/'+predictionName+'_Kappa_approval_Moriond.png')
+can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/'+predictionName+'_Kappa_approval_Moriond.root')
+can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/'+predictionName+'_Kappa_approval_Moriond.pdf')
 

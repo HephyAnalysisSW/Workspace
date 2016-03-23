@@ -58,9 +58,9 @@ lepSF_h2b = d.GetPrimitive('h2b')
 #pickleDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_validation_lep_data_2p25/'
 #pickleDir =  '/data/easilar/Results2016/Prediction_SFtemplates_fullSR_lep_data_2p25/'
 
-pickleDir =  '/data/dspitzbart/Results2016/Prediction_SFtemplates_fullSR_lep_data_2p3/'
+#pickleDir =  '/data/dspitzbart/Results2016/Prediction_SFtemplates_fullSR_lep_data_Moriond_2p3/'
 #pickleDir =  '/data/dspitzbart/Results2016/Prediction_SFtemplates_fullSR_lep_data_QCDerrChange_2p25/'
-#pickleDir =  '/data/dspitzbart/Results2016/Prediction_SFtemplates_validation_4j_lep_data_2p3/'
+pickleDir =  '/data/dspitzbart/Results2016/Prediction_SFtemplates_validation_4j_lep_data_2p3/'
 saveDir = pickleDir
 #saveDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_fullSR_lep_data_2p25/'
 
@@ -397,6 +397,10 @@ pad1.cd()
 
 h_Stack = ROOT.THStack('h_Stack','Stack')
 
+print 'min and max of the different sources'
+for h in hists:
+  print h.GetName(), round(h.GetMinimum(),2), round(h.GetMaximum(),2)
+
 for i_h,h in enumerate(hists):
   h_Stack.Add(h)
 
@@ -408,7 +412,7 @@ leg.SetFillColor(ROOT.kWhite)
 leg.SetShadowColor(ROOT.kWhite)
 leg.SetBorderSize(1)
 leg.SetTextSize(0.04)
-leg.AddEntry(totalH, 'sum squared', 'p')
+leg.AddEntry(totalH, 'Total', 'p')
 for i in range(3):
   leg.AddEntry(hists[i], '', 'f')
 
@@ -449,8 +453,8 @@ latex1.SetNDC()
 latex1.SetTextSize(0.04)
 latex1.SetTextAlign(11)
 
-latex1.DrawLatex(0.15,0.96,'CMS #bf{#it{Simulation}}')
-latex1.DrawLatex(0.88,0.96,"#bf{(13TeV)}")
+latex1.DrawLatex(0.15,0.96,'CMS #bf{#it{Prelimiary}}')
+latex1.DrawLatex(0.81,0.96,"#bf{2.3fb^{-1} (13TeV)}")
 
 h_Stack.GetXaxis().SetLabelSize(0.04)
 h_Stack.GetYaxis().SetLabelSize(0.055)
@@ -485,12 +489,12 @@ total_err.Draw('2 same')
 
 can.cd()
 
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/syst_errors_approval_restUp.png')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/syst_errors_approval_restUp.root')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/syst_errors_approval_restUp.pdf')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/syst_errors_approval_Moriond.png')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/syst_errors_approval_Moriond.root')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/syst_errors_approval_Moriond.pdf')
 
 
-savePickle = False
+savePickle = True
 if savePickle:
   pickle.dump(rcs, file(saveDir+'resultsFinal_withSystematics_pkl','w'))
   print "pickle Written :" , saveDir+'resultsFinal_withSystematics_pkl'

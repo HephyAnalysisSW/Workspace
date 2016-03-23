@@ -167,8 +167,9 @@ def cmgHTRatio(c):
 def nJetBinName(njb):
   if len(njb)==2 and njb[0]==njb[1]:
     return "n_{jet}="+str(njb[0])
-  n=str(list(njb)[0])+"#leq n_{jet}"
+  n="n_{jet} #geq " + str(list(njb)[0])
   if len(njb)>1 and njb[1]>-1:
+    n=str(list(njb)[0])+"#leq n_{jet}"
     n+='#leq '+str(njb[1])
   return n
 def nBTagBinName(btb):
@@ -178,10 +179,12 @@ def nBTagBinName(btb):
   if len(btb)>1 and btb[1]>-1:
     n+='#leq '+str(btb[1])
   return n
-def varBinName(vb, var):
-  n=str(list(vb)[0])+"#leq "+var
+def varBinName(vb, var, suffix = ''):
+  n=var + ' #geq ' + str(list(vb)[0])
   if len(vb)>1 and vb[1]>0:
-    n+='< '+str(vb[1])
+    n=str(list(vb)[0])+" #leq "+var
+    n+=' < '+str(vb[1])
+  n += suffix
   return n
 
 def varBinNamewithUnit(vb, var, unit="GeV"):

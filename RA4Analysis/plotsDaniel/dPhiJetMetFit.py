@@ -374,6 +374,8 @@ for srNJet in sorted(signalRegions):
         
         QCD_LP.SetBinContent(i, QCDestimate[srNJet][stb][htb][(0,0)][deltaPhiCut]['NQCDpred'])
         QCD_LP.SetBinError(i, QCDestimate[srNJet][stb][htb][(0,0)][deltaPhiCut]['NQCDpred_err'])
+        QCD_truth.SetBinContent(i, QCDestimate[srNJet][stb][htb][(0,0)][deltaPhiCut]['NQCDSelMC'])
+        QCD_truth.SetBinError(i, QCDestimate[srNJet][stb][htb][(0,0)][deltaPhiCut]['NQCDSelMC_err'])
         QCD_DPJM.SetBinContent(i, yield_QCD.getVal())
         QCD_DPJM.SetBinError(i, yield_QCD.getError())
 #        print 'yield QCD pred',QCDestimate[(4,5)][stb][htb][(1,1)][deltaPhiCut]['NQCDpred']
@@ -464,8 +466,8 @@ for srNJet in sorted(signalRegions):
         latex1.SetTextSize(0.04)
         latex1.SetTextAlign(11)
         
-        latex1.DrawLatex(0.16,0.96,'CMS #bf{#it{Simulation}}')
-        latex1.DrawLatex(0.85,0.96,"(13TeV)")
+        latex1.DrawLatex(0.16,0.96,'CMS #bf{#it{Project Work}}')
+        latex1.DrawLatex(0.79,0.96,"MC (13TeV)")
 
 
 
@@ -510,7 +512,7 @@ QCD_DPJM.SetMinimum(0.)
 QCD_DPJM.SetLineColor(ROOT.kAzure+9)
 QCD_DPJM.SetMarkerColor(ROOT.kAzure+9)
 
-QCD_DPJM.GetYaxis().SetTitle('QCD_{fit}(#Delta#Phi(j_{1},#slash{E}_{T}))/QCD_{fit}(L_{P})')
+QCD_DPJM.GetYaxis().SetTitle('N_{fit}(#Delta#Phi(j_{1},#slash{E}_{T})) / N_{fit}(L_{P})')
 
 QCD_DPJM.GetYaxis().SetTitleSize(0.045)
 QCD_DPJM.GetYaxis().SetTitleOffset(1.7)
@@ -528,8 +530,8 @@ latex1.SetNDC()
 latex1.SetTextSize(0.04)
 latex1.SetTextAlign(11)
 
-latex1.DrawLatex(0.16,0.96,'CMS #bf{#it{Preliminary}}')
-latex1.DrawLatex(0.75,0.96,"2.2fb^{-1}(13TeV)")
+latex1.DrawLatex(0.16,0.96,'CMS #bf{#it{Project Work}}')
+latex1.DrawLatex(0.75,0.96,"2.3fb^{-1}(13TeV)")
 
 c5.Print(printDir+specialName+'MB_data_'+var['fileName']+'_ratio.png')
 c5.Print(printDir+specialName+'MB_data_'+var['fileName']+'_ratio.root')
