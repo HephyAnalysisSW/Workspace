@@ -91,6 +91,31 @@ for srNJet in sorted(signalRegions):
 #scaleFactor = 0.8
 scaleFactor = 1
 
+# signal regions table
+
+print "signal regions table"
+print
+print '\\begin{table}[ht]\\begin{center}\\begin{tabular}{|c|c|c|c|}\\hline'
+print ' \\njet     & \LT & \HT     & $\Delta\Phi$ \\\\\hline'
+
+secondLine = False
+for srNJet in sorted(signalRegions):
+  print '\\hline'
+  if secondLine: print '\\hline'
+  secondLine = True
+  print '\multirow{'+str(rowsNJet[srNJet]['n'])+'}{*}{\\begin{sideways}$'+varBin(srNJet)+'$\end{sideways}}'
+  for stb in sorted(signalRegions[srNJet]):
+    print '&\multirow{'+str(rowsSt[srNJet][stb]['n'])+'}{*}{$'+varBin(stb)+'$}'
+    first = True
+    for htb in sorted(signalRegions[srNJet][stb]):
+      if not first: print '&'
+      first = False
+      print '&$'+varBin(htb)+'$'
+      print ' & ' + str(signalRegions[srNJet][stb][htb]['deltaPhi']) +'\\\\'
+      if htb[1] == -1 : print '\\cline{2-4}'
+print '\\hline\end{tabular}\end{center}\caption{Signal regions for the 0b search}\label{tab:0b_signalRegions}\end{table}'
+
+
 
 #closure table
 print "Closure table"
