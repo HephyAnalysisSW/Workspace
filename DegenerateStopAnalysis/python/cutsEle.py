@@ -127,8 +127,8 @@ def cutClasses_eleID(ID = "standard"):
                                  ["MET200","met>200"],\
                                  ["ISR110","nJet110>=1" ],\
                                  ["HT300","htJet30j>300"],\
-                                 ["AntiQCD", " (deltaPhi_j12 < 2.5)" ]], # monojet
-                   baseCut=None)
+                                 ["AntiQCD", " (deltaPhi_j12 < 2.5)"] # monojet
+                                 ], baseCut=None)
    
    #Dictionaries for different WPs 
    preselEle_eleID = {}
@@ -166,127 +166,126 @@ def cutClasses_eleID(ID = "standard"):
    elePt = {}
    eleEta = {} 
    eleMt = {} 
+   eleId = {} 
    
    for iWP in WPs:
       electronSel[iWP] = "(abs(LepGood_pdgId) == 11 && abs(LepGood_eta) < " + str(etaAcc) + " && " + eleIDsel[iWP] + ")"
       elePt[iWP] = "Max$(LepGood_pt*(" + electronSel[iWP] + "))"
       eleEta[iWP] = "Max$(abs(LepGood_eta*(" + electronSel[iWP] + ")))" #absolute value
-      eleMt[iWP] = "(sqrt(2*met*%s*(1 - cos(met_phi - LepGood_phi)))*(LepGood_pt==%s))"%(elePt[iWP], elePt[iWP])#.format(pt=elePt[iWP])
+      eleId[iWP] = "Max$(LepGood_pdgId*(" + electronSel[iWP] + "))"
+      eleMt[iWP] = "(sqrt(2*met*{pt}*(1 - cos(met_phi - LepGood_phi)))*(LepGood_pt=={pt}))".format(pt=elePt[iWP]) #%(elePt[iWP], elePt[iWP])#
  
       ##################Electron Preselection###########
       
       preselEle_eleID[iWP] = CutClass("preselEle_eleID_" + iWP, [\
                               ["nEle>=1", "nLepGood >= 1 && Sum$(" + electronSel[iWP] + ") == 1"], #at least one electron
-                              ["No3rdJet60","nJet60<=2"]],\
-                               baseCut=presel)
+                              ["No3rdJet60","nJet60<=2"]\
+                              ], baseCut=presel)
    
       ##################Signal Regions##################
    
       #SR1
       sr1_eleID[iWP] = CutClass("SR1_eleID_" + iWP, [\
-                      ["negEle","LepGood_pdgId == 11"],\
-                      ["elePt<30", elePt[iWP] + " < 30"],\
-                      ["eleEta1.5", eleEta[iWP] + " < 1.5"],\
-                      ["BVeto","(nSoftBJetsCSV == 0 && nHardBJetsCSV == 0)"],\
-                      ["CT300","min(met, htJet30j - 100) > 300"]],\
-                      baseCut = preselEle_eleID[iWP])
+                              ["negEle", eleId[iWP] + " == 11"],\
+                              ["elePt<30", elePt[iWP] + " < 30"],\
+                              ["eleEta1.5", eleEta[iWP] + " < 1.5"],\
+                              ["BVeto","(nSoftBJetsCSV == 0 && nHardBJetsCSV == 0)"],\
+                              ["CT300","min(met, htJet30j - 100) > 300"]\
+                              ], baseCut = preselEle_eleID[iWP])
    
       sr1Loose_eleID[iWP] = CutClass("sr1Loose_eleID_" + iWP, [\
-                                    ["negEle","LepGood_pdgId == 11"],\
-                                    ["elePt<30", elePt[iWP] + " < 30"],\
-                                    ["eleEta2.4", eleEta[iWP] + " < 2.4"], #looser eta cut than sr1
-                                    ["BVeto","(nSoftBJetsCSV == 0 && nHardBJetsCSV == 0)"],\
-                                    #["met300","met>300"],
-                                    #["HT400","htJet30j>400"],
-                                    ],
-                        baseCut = preselEle_eleID[iWP])
+                              ["negEle","LepGood_pdgId == 11"],\
+                              ["elePt<30", elePt[iWP] + " < 30"],\
+                              ["eleEta2.4", eleEta[iWP] + " < 2.4"], #looser eta cut than sr1
+                              ["BVeto","(nSoftBJetsCSV == 0 && nHardBJetsCSV == 0)"],\
+                              #["met300","met>300"],
+                              #["HT400","htJet30j>400"],
+                              ], baseCut = preselEle_eleID[iWP])
       
       sr1abc_eleID[iWP] = CutClass("sr1abc_eleID_" + iWP,[\
-                                     ["SR1a", eleMt[iWP] + " < 60"],\
-                                     ["SR1b", btw(eleMt[iWP], 60, 88)],\
-                                     ["SR1c", eleMt[iWP] + " > 88"]],\
-                           baseCut = sr1_eleID[iWP])
+                              ["SR1a", eleMt[iWP] + " < 60"],\
+                              ["SR1b", btw(eleMt[iWP], 60, 88)],\
+                              ["SR1c", eleMt[iWP] + " > 88"]\
+                              ], baseCut = sr1_eleID[iWP])
    
       sr1abc_ptbin_eleID[iWP] = CutClass ("SR1abc_PtBinned_eleID_" + iWP, [\
-                                     #["SR1a", eleMt[iWP] + " < 60"],
-                                        ["SRL1a", joinCutStrings([eleMt[iWP] + " < 60", btw(elePt[iWP], 5, 12)])],\
-                                        ["SRH1a", joinCutStrings([eleMt[iWP] + " < 60", btw(elePt[iWP], 12, 20)])],\
-                                        ["SRV1a", joinCutStrings([eleMt[iWP] + " < 60", btw(elePt[iWP], 20, 30)])],\
-                                     #["SR1b",btw(eleMt[iWP], 60, 88)],
-                                        ["SRL1b", joinCutStrings([btw(eleMt[iWP], 60, 88), btw(elePt[iWP], 5, 12)])],\
-                                        ["SRH1b", joinCutStrings([btw(eleMt[iWP], 60, 88), btw(elePt[iWP], 12, 20)])],\
-                                        ["SRV1b", joinCutStrings([btw(eleMt[iWP], 60, 88), btw(elePt[iWP], 20, 30)])],\
-                                     #["SR1c",eleMt[iWP] + " > 88"],
-                                        ["SRL1c", joinCutStrings([eleMt[iWP] + " > 88", btw(elePt[iWP], 5, 12)])],\
-                                        ["SRH1c", joinCutStrings([eleMt[iWP] + " > 88", btw(elePt[iWP], 12, 20)])],\
-                                        ["SRV1c", joinCutStrings([eleMt[iWP] + " > 88", btw(elePt[iWP], 20, 30)])]],\
-                                     baseCut = sr1_eleID[iWP])
+                              #["SR1a", eleMt[iWP] + " < 60"],\
+                              ["SRL1a", joinCutStrings([eleMt[iWP] + " < 60", btw(elePt[iWP], 5, 12)])],\
+                              ["SRH1a", joinCutStrings([eleMt[iWP] + " < 60", btw(elePt[iWP], 12, 20)])],\
+                              ["SRV1a", joinCutStrings([eleMt[iWP] + " < 60", btw(elePt[iWP], 20, 30)])],\
+                              #["SR1b",btw(eleMt[iWP], 60, 88)],\
+                              ["SRL1b", joinCutStrings([btw(eleMt[iWP], 60, 88), btw(elePt[iWP], 5, 12)])],\
+                              ["SRH1b", joinCutStrings([btw(eleMt[iWP], 60, 88), btw(elePt[iWP], 12, 20)])],\
+                              ["SRV1b", joinCutStrings([btw(eleMt[iWP], 60, 88), btw(elePt[iWP], 20, 30)])],\
+                              #["SR1c",eleMt[iWP] + " > 88"],\
+                              ["SRL1c", joinCutStrings([eleMt[iWP] + " > 88", btw(elePt[iWP], 5, 12)])],\
+                              ["SRH1c", joinCutStrings([eleMt[iWP] + " > 88", btw(elePt[iWP], 12, 20)])],\
+                              ["SRV1c", joinCutStrings([eleMt[iWP] + " > 88", btw(elePt[iWP], 20, 30)])]\
+                              ], baseCut = sr1_eleID[iWP])
       
       mtabc_eleID[iWP] = CutClass ("MTabc_eleID_" + iWP, [\
-                      ["MTa", eleMt[iWP] + " < 60"],
-                      ["MTb", btw(eleMt[iWP], 60, 88)],
-                      ["MTc", eleMt[iWP] + " > 88"]],\
-                      baseCut = sr1_eleID[iWP])
+                              ["MTa", eleMt[iWP] + " < 60"],\
+                              ["MTb", btw(eleMt[iWP], 60, 88)],\
+                              ["MTc", eleMt[iWP] + " > 88"]\
+                              ], baseCut = sr1_eleID[iWP])
        
       mtabc_ptbin_eleID[iWP] = splitCutInPt(mtabc_eleID[iWP])
    
       #SR2
       sr2_eleID[iWP] = CutClass ("SR2_eleID_" + iWP, [\
-                             ["ISR325", "nJet325 > 0"],\
-                             ["OneOrMoreSoftB", "nSoftBJetsCSV >= 1"],\
-                             ["noHardB", "nHardBJetsCSV == 0"],\
-                             ["elePt<30", elePt[iWP] + " < 30"]],\
-                             baseCut = preselEle_eleID[iWP])
+                              ["ISR325", "nJet325 > 0"],\
+                              ["OneOrMoreSoftB", "nSoftBJetsCSV >= 1"],\
+                              ["noHardB", "nHardBJetsCSV == 0"],\
+                              ["elePt<30", elePt[iWP] + " < 30"]\
+                              ], baseCut = preselEle_eleID[iWP])
       
       sr2_ptbin_eleID[iWP] = CutClass ("SR2_PtBinned_eleID_" + iWP, [\
-                                        ["SRL2", btw(elePt[iWP], 5, 12)],\
-                                        ["SRH2", btw(elePt[iWP], 12, 20)],\
-                                        ["SRV2", btw(elePt[iWP], 20, 30)]],\
-                           baseCut = sr2_eleID[iWP])
+                              ["SRL2", btw(elePt[iWP], 5, 12)],\
+                              ["SRH2", btw(elePt[iWP], 12, 20)],\
+                              ["SRV2", btw(elePt[iWP], 20, 30)]\
+                              ], baseCut = sr2_eleID[iWP])
    
       ##################Control Regions##################
    
       #CR1
       cr1_eleID[iWP] = CutClass ("CR1_eleID_" + iWP, [\
-                                    ["negEle", "LepGood_pdgId == 11"],\
-                                    ["elePt>30", elePt[iWP] + " > 30"], #greater than
-                                    ["eleEta1.5", eleEta[iWP] + " < 1.5"],\
-                                    ["BVeto","(nSoftBJetsCSV == 0 && nHardBJetsCSV == 0)"],\
-                                    ["CT300","min(met,htJet30j-100) > 300"],\
-                                    #["BVeto_Medium25","nBJetMedium25==0"],
-                                    #["HT400 ","htJet30j>400"],
-                                    #["met300","met>300"],
-                                    ],
-                        baseCut = preselEle_eleID[iWP])
+                              ["negEle", "LepGood_pdgId == 11"],\
+                              ["elePt>30", elePt[iWP] + " > 30"], #greater than
+                              ["eleEta1.5", eleEta[iWP] + " < 1.5"],\
+                              ["BVeto","(nSoftBJetsCSV == 0 && nHardBJetsCSV == 0)"],\
+                              ["CT300","min(met,htJet30j-100) > 300"],\
+                              #["BVeto_Medium25","nBJetMedium25==0"],
+                              #["HT400 ","htJet30j>400"],
+                              #["met300","met>300"],
+                              ], baseCut = preselEle_eleID[iWP])
      
       cr1Loose_eleID[iWP] = CutClass("cr1Loose_eleID_" + iWP, [\
-                                ["negEle", "LepGood_pdgId == 11"],
-                                ["elePt>30", elePt[iWP] + " > 30"], #greater than
-                                ["eleEta1.5", eleEta[iWP] + " < 1.5"],\
-                                ["BVeto","(nSoftBJetsCSV == 0 && nHardBJetsCSV == 0)"]],
-                          baseCut= preselEle_eleID[iWP])
+                              ["negEle", "LepGood_pdgId == 11"],
+                              ["elePt>30", elePt[iWP] + " > 30"], #greater than
+                              ["eleEta1.5", eleEta[iWP] + " < 1.5"],\
+                              ["BVeto","(nSoftBJetsCSV == 0 && nHardBJetsCSV == 0)"]\
+                              ], baseCut= preselEle_eleID[iWP])
       
       cr1abc_eleID[iWP] = CutClass ("CR1abc_eleID_" + iWP, [\
-                                     ["CR1a", eleMt[iWP] + " < 60"],
-                                     ["CR1b", btw(eleMt[iWP], 60, 88)],
-                                     ["CR1c", eleMt[iWP] + " > 88"]],
-                        baseCut = cr1_eleID[iWP])
+                              ["CR1a", eleMt[iWP] + " < 60"],\
+                              ["CR1b", btw(eleMt[iWP], 60, 88)],\
+                              ["CR1c", eleMt[iWP] + " > 88"]\
+                              ], baseCut = cr1_eleID[iWP])
       
       crtt2_eleID[iWP] = CutClass("CRTT2_eleID_" + iWP, [\
-                            ["CRTT2","((nSoftBJetsCSV + nHardBJetsCSV) > 1) && (nHardBJetsCSV > 0)"]],\
-                          baseCut= preselEle_eleID[iWP])
+                              ["CRTT2","((nSoftBJetsCSV + nHardBJetsCSV) > 1) && (nHardBJetsCSV > 0)"]\
+                              ], baseCut= preselEle_eleID[iWP])
       
       #CR2 
       cr2_eleID[iWP] = CutClass ("CR2_eleID_" + iWP, [\
-                              ["Jet325", "nJet325 > 0"],
-                              ["OneOrMoreSoftB","nSoftBJetsCSV >= 1"],
-                              ["noHardB", "nHardBJetsCSV == 0"],
+                              ["Jet325", "nJet325 > 0"],\
+                              ["OneOrMoreSoftB","nSoftBJetsCSV >= 1"],\
+                              ["noHardB", "nHardBJetsCSV == 0"],\
                               ["elePt>30", elePt[iWP] + " > 30"], #greater than
-                              #["met300","met>300"],
-                              ],
-                        baseCut = preselEle_eleID[iWP])
+                              #["met300","met>300"],\
+                              ], baseCut = preselEle_eleID[iWP])
       
-      regions_eleID_sr1[iWP] = {'sr1': sr1_eleID[iWP], 'sr1Loose': sr1Loose_eleID[iWP], 'sr1abc': sr1abc_eleID[iWP], 'sr1abc_ptbin': sr1abc_ptbin_eleID[iWP], 'mtabc': mtabc_eleID[iWP]} #, , 'mtabc_ptbin': mtabc_ptbin_eleID[iWP],
+      regions_eleID_sr1[iWP] = {'sr1': sr1_eleID[iWP], 'sr1Loose': sr1Loose_eleID[iWP], 'sr1abc': sr1abc_eleID[iWP], 'sr1abc_ptbin': sr1abc_ptbin_eleID[iWP], 'mtabc': mtabc_eleID[iWP], 'mtabc_ptbin': mtabc_ptbin_eleID[iWP]}
       regions_eleID_sr2[iWP] = {'sr2': sr2_eleID[iWP], 'sr2_ptbin': sr2_ptbin_eleID[iWP]}
       regions_eleID_cr1[iWP] = {'cr1': cr1_eleID[iWP], 'cr1Loose': cr1Loose_eleID[iWP], 'cr1abc': cr1abc_eleID[iWP], 'crtt2': crtt2_eleID[iWP]}
       regions_eleID_cr2[iWP] = {'cr2': cr2_eleID[iWP]}
