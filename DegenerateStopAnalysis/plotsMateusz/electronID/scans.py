@@ -41,8 +41,8 @@ backgrounds2 = ["z", "qcd"]
 samples = privateSignals + officialSignals + backgrounds1
 #sampleList = privateSignals + backgrounds1
 
-if scan == "standard" or scan == "nMinus1":
-   samples += backgrounds2
+#if scan == "standard" or scan == "nMinus1":
+#   samples += backgrounds2
 #   samplesList += backgrounds2
 
 #cmgPP = cmgTuplesPostProcessed(mc_path, signal_path, data_path)
