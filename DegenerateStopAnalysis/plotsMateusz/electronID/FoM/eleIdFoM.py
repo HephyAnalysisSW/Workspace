@@ -146,15 +146,25 @@ allRegions = cutClasses_eleID(ID) #standard manual nMinus1
 
 sel = allRegions[WP][selection]
 
-plotDict = {"LepPt":{'var':"lepPt", "bins":[100,0,100], "decor":{"title": "Electron ID FoM Plot: %s_%s_%s"%(ID, selection, WP) ,"x":"Electron p_{T} / GeV" , "y":"Events" ,'log':[0,1,0]}}} #"nMinus1":"lepPt" 
+elePt = "Max$(LepGood_pt*(abs(LepGood_pdgId) == 11 && abs(LepGood_eta) < " + str(etaAcc) + " && " + standardIDsel[WP] + "))"
+plotDict = {\
+   "elePt":{'var':elePt, "bins":[100,0,100], "decor":{"title": "Electron ID FoM Plot: %s_%s_%s"%(ID, selection, WP) ,"x":"Electron p_{T} / GeV" , "y":"Events" ,'log':[0,1,0]}},\
+   "MT":{'var':"mt", "bins":[30,0,150], "decor":{"title": "Electron ID FoM Plot: %s_%s_%s"%(ID, selection, WP) ,"x":"M_{T} / GeV" , "y":"Events" ,'log':[0,1,0]}},\
+   "MET":{'var':"met", "bins":[20,150,900], "decor":{"title": "Electron ID FoM Plot: %s_%s_%s"%(ID, selection, WP) ,"x":"Missing E_{T} / GeV" , "y":"Events" ,'log':[0,1,0]}},\
+   #"HT":{'var':"ht", "bins":[100,0,100], "decor":{"title": "Electron ID FoM Plot: %s_%s_%s"%(ID, selection, WP) ,"x":"H_{T} / GeV" , "y":"Events" ,'log':[0,1,0]}}\
+}
+
 plots = Plots(**plotDict)
+plotsList = ["elePt","MT", "MET"]#, "HT"]
 
-getPlots(samples, plots, sel, selectedSamples, ["LepPt"])# addOverFlowBin='both')
-plots['LepPt']['var']="LepGood_pt*(abs(LepGood_pdgId) == 11 && abs(LepGood_eta) < " + str(etaAcc) + ")"
-fomPlots = drawPlots(samples, plots, sel, sampleList=selectedSamples, plotList=["LepPt"], fom="AMSSYS", denoms=["bkg"], noms=["s30FS"], fomLimits=[0,2], save=False)#, plotMin=0.001)
+getPlots(samples, plots, sel, selectedSamples, plotList = plotsList)# addOverFlowBin='both')
+fomPlots = drawPlots(samples, plots, sel, sampleList=selectedSamples, plotList = plotsList, fom="AMSSYS", denoms=["bkg"], noms=["s30FS"], fomLimits=[0,2], save=False)#, plotMin=0.001)
 
-c1 = fomPlots['canvs']['LepPt'][0]
-print "INFO: ", ID, " ", selection, " ", WP
+#c1 = fomPlots['canvs']['elePt'][0]
+#c2 = fomPlots['canvs']['mt'][0]
+#c3 = fomPlots['canvs']['met'][0]
+#c4 = fomPlots['canvs']['ht'][0]
+#print "INFO: ", ID, " ", selection, " ", WP
  
 #fomPlots['stacks']['bkg']['LepPt'].SetTitle("Electron ID FoM Plot:" + selection + " (" + WP + " ID)")
 #fomPlots['stacks']['bkg']['LepPt'].GetHistogram().CenterTitle()
@@ -167,8 +177,8 @@ print "INFO: ", ID, " ", selection, " ", WP
 #hists['None'].Write()
 
 #ROOT.gPad.SetLogy()
-ROOT.gPad.Modified()
-ROOT.gPad.Update()
+#ROOT.gPad.Modified()
+#ROOT.gPad.Update()
 #   if plot == "efficiency":
 #      l1.AddEntry("eleID_WP90", "MVA ID (WP90)", "F")
 #      l1.AddEntry("eleID_WP80", "MVA ID (WP80)", "F")
@@ -196,16 +206,20 @@ ROOT.gPad.Update()
 
 #Save canvas
 if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
-   if removedCut == "None":
-      #if ID == "iso":
-      #   c1.SaveAs(savedir + "/" + plot + "_" + isolation + "_" + samples[sample].name + z + ".png")
-      #   c1.SaveAs(savedir + "/root/" + plot + "_" + isolation + "_" + samples[sample].name + z + ".root")
-      #   c1.SaveAs(savedir + "/pdf/" + plot + "_" + isolation + "_" + samples[sample].name + z + ".pdf")
-      #else: 
-      c1.SaveAs(savedir + "/eleID_FoM_" + sel.name + ".png")
-      c1.SaveAs(savedir + "/root/eleID_FoM_" + sel.name + ".root")
-      c1.SaveAs(savedir + "/pdf/eleID_FoM_" + sel.name + ".pdf")
-   else:
-      c1.SaveAs(savedir + "/eleID_FoM_no_" + removedCut + "_" + sel.name + ".png")
-      c1.SaveAs(savedir + "/root/eleID_FoM_no_" + removedCut + "_" + sel.name + ".root")
-      c1.SaveAs(savedir + "/pdf/eleID_FoM_no_" + removedCut + "_" + sel.name + ".pdf") # _%s_%s_"%(a,b)
+   for canv in fomPlots['canvs']:
+      if not os.path.exists("%s/%s/root"%(savedir, canv)): os.makedirs("%s/%s/root"%(savedir, canv))
+      if not os.path.exists("%s/%s/pdf"%(savedir, canv)): os.makedirs("%s/%s/pdf"%(savedir, canv))
+
+      if removedCut == "None":
+         #if ID == "iso":
+         #   fomPlots['canvs'][canv][0].SaveAs(savedir + "/" + plot + "_" + isolation + "_" + samples[sample].name + z + ".png")
+         #   fomPlots['canvs'][canv][0].SaveAs(savedir + "/root/" + plot + "_" + isolation + "_" + samples[sample].name + z + ".root")
+         #   fomPlots['canvs'][canv][0].SaveAs(savedir + "/pdf/" + plot + "_" + isolation + "_" + samples[sample].name + z + ".pdf")
+         #else: 
+         fomPlots['canvs'][canv][0].SaveAs("%s/%s/eleID_FoM_%s_%s.png"%(savedir, canv, sel.name, canv))
+         fomPlots['canvs'][canv][0].SaveAs("%s/%s/root/eleID_FoM_%s_%s.root"%(savedir, canv, sel.name, canv))
+         fomPlots['canvs'][canv][0].SaveAs("%s/%s/pdf/eleID_FoM_%s_%s.pdf"%(savedir, canv, sel.name, canv))
+      else:
+         fomPlots['canvs'][canv][0].SaveAs("%s/%s/eleID_FoM_no_%s_%s_%s.png"%(savedir, canv, removedCut, sel.name, canv))
+         fomPlots['canvs'][canv][0].SaveAs("%s/%s/root/eleID_FoM_no_%s_%s_%s.root"%(savedir, canv, removedCut, sel.name, canv))
+         fomPlots['canvs'][canv][0].SaveAs("%s/%s/pdf/eleID_FoM_no_%s_%s_%s.pdf"%(savedir, canv, sel.name, canv)) 
