@@ -323,7 +323,33 @@ def invMass(objList, massOption=True):
     #
     return invMassValue
 
+
+def dPhi(obj1Index, obj2Index, obj1Collection, obj2Collection=None):
+    ''' Compute dPhi for two objects.
     
+    dPhi is computed between object index obj1Index from obj1Collection and
+    object index obj2Index from obj2Collection.
+
+    If the second collection is not given, compute dPhi between the two objects from the same collection.    
+    '''
+    
+    if obj2Collection is None:
+        dPhiValue = obj1Collection.phi[obj2Index] - obj1Collection.phi[obj1Index]
+    else:
+        dPhiValue = obj2Collection.phi[obj2Index] - obj1Collection.phi[obj1Index]
+    
+    if  dPhiValue > math.pi:
+        dPhiValue -= 2.0 * math.pi
+    
+    if dPhiValue <= -math.pi:
+        dPhiValue += 2.0 * math.pi
+        
+    dPhiAbsValue = abs(dPhiValue)
+        
+    #
+    return dPhiAbsValue
+
+
 def dR((eta1, phi1), (eta2, phi2)):
     ''' Compute dR, with eta and phi values of the two objects as input.
     
@@ -341,7 +367,28 @@ def dR((eta1, phi1), (eta2, phi2)):
         
     dRsq = dPhi ** 2 + dEta ** 2   
 
-    return sqrt(dRsq)
+    #
+    return math.sqrt(dRsq)
     
     
+def dR(obj1Index, obj2Index, obj1Collection, obj2Collection=None):
+    ''' Compute dR for two objects.
+    
+    dR is computed between object index obj1Index from obj1Collection and
+    object index obj2Index from obj2Collection.
+    
+    If the second collection is not given, compute dR between the two objects from the same collection.        
+    '''
 
+    dPhiValue = dPhi(obj1Index, obj2Index, obj1Collection, obj2Collection)
+
+    if obj2Collection is None:
+        dEtaValue = obj1Collection.eta[obj2Index] - obj1Collection.eta[obj1Index]        
+    else:
+        dEtaValue = obj2Collection.eta[obj2Index] - obj1Collection.eta[obj1Index]
+    
+    dRValue = math.sqrt(dPhiValue ** 2 + dEtaValue ** 2)   
+
+    #
+    return dRValue
+    

@@ -24,14 +24,12 @@ class cmgObject():
     
     logger = logging.getLogger(__name__ + '.cmgObject')   
 
-    def __init__(self, readTree, splitTree, obj , varList=[]):
+    def __init__(self, readTree, splitTree, obj, varList=[]):
         self.nObj = cmgObjLen(readTree, obj)
         self.obj = obj
         self.readTree = readTree  
         self.splitTree = splitTree
 
-        # def getattr(self, name, tree= readTree):
-        #    return cmgObjVar(readTree, self.obj, name)        
 
     def __getattr__(self, name):
         var = cmgObjVar(self.readTree, self.obj, name)
@@ -48,6 +46,7 @@ class cmgObject():
     def __eq__(self, y):
         raise Exception("cmgObject can't be compared. Item index is probably missing")
 
+    
     def getPassFailList(self, readTree , selectorFunc, objPassFailList=None): 
         """Outputs a list of of True/False depending on whether object pass or fail the SelectorFunc.
         
@@ -83,7 +82,6 @@ class cmgObject():
     
     # def sort(self, readTree, key, objList):
     #    pass       
-
     
 
     def getSelectionIndexList(self, readTree , selectorFunc, objPassFailList=None): 
@@ -123,12 +121,25 @@ class cmgObject():
         
         return indexListLow, indexListHigh
     
+    
+    def getObjDictList(self, varList, indexList):
+        ''' Create a list of objects as dictionaries for variables from varList, for objects with indices in indexList.
+        
+        '''
+
+        objDictList = []
+                
+        for ind in indexList:
+            objDict = {var: cmgObjVar(self.readTree, self.obj, var)[ind] for var in varList}
+            objDictList.append(objDict)
+            
+        return objDictList
+    
 
     def printObjects(self, indexList=[], varList=[]):
         ''' Print for each object from indexList the values of variables from varList.
         
         If the indexList is not given, it will print all objects from the collection.
-        FIXME
         '''
 
         logger = logging.getLogger(__name__ + '.cmgObject' + '.printObjects')   
@@ -383,6 +394,51 @@ def objSelectorFunc(objSel):
 
     return objSelector
     
+
+def printObjects(treeName, obj, indexList, varList=[]):
+    ''' Print for each object from indexList the values of variables from varList.
+    
+    '''
+
+    logger = logging.getLogger(__name__ + '.printObjects')   
+                
+    treeBranches = treeName.GetListOfBranches()
+
+    objBranchList = []
+    for i in range(treeBranches.GetEntries()):
+        branchName = treeBranches.At(i).GetName()
+        if branchName.startswith(obj):
+            objBranchList.append(branchName)
+        
+    logger.trace(
+        "\n List of all branches for object %s \n %s \n",
+        obj, pprint.pformat(objBranchList)
+        )
+
+    varListCurrent = []
+    for var in varList:
+        branchName = obj + '_' + var
+        if branchName in objBranchList:
+            varListCurrent.append(var)
+
+    logger.trace(
+        "\n List of variables to print for object %s \n %s \n",
+        obj, pprint.pformat(varListCurrent)
+        )
+
+    printStr = ''
+    printStr += "\n Number of selected {0} objects: {1} \n".format(obj, len(indexList))
+
+    for ind in indexList:
+        printStr += "\n + " + obj + " object index: " + str(ind) + '\n'
+        for var in varListCurrent:
+            varValue = cmgObjVar(treeName, obj, var)[ind]
+            varName = obj + '_' + var
+            printStr += varName + " = " + str(varValue) + '\n'
+        printStr += '\n'
+
+    #
+    return printStr
     
 ###############################################################################################
 #######################################                    ####################################
