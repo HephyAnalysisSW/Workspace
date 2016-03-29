@@ -281,11 +281,21 @@ def getParameterSet(args):
     for var in varListMu+varListEl:
         if var not in varListLep:
             varListLep.append(var)  
+         
+    # variables added for leptons, not available in the readTree, but computed for saveTree            
+    varListLepExt = [
+        'q80','cosLMet',
+        'st', 'dPhi_Wl',
+        'mt',
+        'absIso',
+        ]
+
         
     LepVarList = {
         'mu': varListMu,
         'el': varListEl,
-        'lep': varListLep
+        'lep': varListLep,
+        'ext': varListLepExt,
         }
 
     params['LepVarList'] = LepVarList
@@ -935,14 +945,35 @@ def rwTreeClasses(sample, isample, args, temporaryDir, params={} ):
             v['prefix']+'_'+vvar, allowRenaming=False, isWritten=False, isRead=True) for vvar in v['vars']
             ]
 
+    newVectors = []
+    
+    # extend LepGood with additional quantities
+    newVectors.extend([
+        {'prefix':'LepGood', 'nMax':8, 
+            'vars':[
+                'q80/F','cosLMet/F',
+                'st/F', 'dPhi_Wl/F',
+                'mt/F',
+                'absIso/F',
+                ] 
+         },
+        ])
+
+    for v in newVectors:
+        v['vars'] = [convertHelpers.readVar(
+            v['prefix']+'_'+vvar, allowRenaming=False, isWritten=True, isRead=False
+            ) for vvar in v['vars']
+            ]
+
     logger.debug("\n read variables (readVars) definition: \n %s \n", pprint.pformat(readVars))
     logger.debug("\n aliases definition: \n %s \n", pprint.pformat(aliases))
     logger.debug("\n read vectors (readVectors) definition: \n %s \n", pprint.pformat(readVectors))
     logger.debug("\n new variable (newVars) definition: \n %s \n", pprint.pformat(newVars))
+    logger.debug("\n new vectors (newVectors) definition: \n %s \n", pprint.pformat(newVectors))
 
     convertHelpers.printHeader("Compiling class to write")
     writeClassName = "ClassToWrite_"+str(isample)
-    writeClassString = convertHelpers.createClassString(className=writeClassName, vars= newVars, vectors=[], 
+    writeClassString = convertHelpers.createClassString(className=writeClassName, vars= newVars, vectors=newVectors, 
         nameKey = 'stage2Name', typeKey = 'stage2Type')
     logger.debug("\n writeClassString definition: \n%s \n", writeClassString)
     saveTree = convertHelpers.compileClass(className=writeClassName, classString=writeClassString, tmpDir=temporaryDir)
@@ -955,7 +986,7 @@ def rwTreeClasses(sample, isample, args, temporaryDir, params={} ):
     readTree = convertHelpers.compileClass(className=readClassName, classString=readClassString, tmpDir=temporaryDir)
 
     #
-    return branchKeepStrings, readVars, aliases, readVectors, newVars, readTree, saveTree
+    return branchKeepStrings, readVars, aliases, readVectors, newVars, newVectors, readTree, saveTree
    
    
 def getTreeFromChunk(c, skimCond, iSplit, nSplit):
@@ -1058,7 +1089,7 @@ def processGenSusyParticles(readTree,splitTree,saveTree):
     saveTree.lsps_phi = lsps.Phi()
 
 
-def processLeptons(skimLepton, readTree, splitTree, saveTree, params):
+def processLeptons(readTree, splitTree, saveTree, params):
     '''Process leptons. 
     
     TODO describe here the processing.
@@ -1068,7 +1099,7 @@ def processLeptons(skimLepton, readTree, splitTree, saveTree, params):
     
     # initialize returned variables (other than saveTree)
     
-    lep = None
+    lepObj = None
     
     # lepton selection
     
@@ -1078,10 +1109,52 @@ def processLeptons(skimLepton, readTree, splitTree, saveTree, params):
     LepVarList = params['LepVarList'] 
     LepSel = params['LepSel']
     
+    # compute the additional quantities for leptons
+    
+    for lepIndex in range(lepObj.nObj):
+        
+        lepPt = getattr(lepObj, 'pt')[lepIndex]
+        lepPhi = getattr(lepObj, 'phi')[lepIndex]
+        lepRelIso04 = getattr(lepObj, 'relIso04')[lepIndex]
+
+        q80 = 1 - 80 ** 2 / (2 * lepPt * readTree.met_pt)
+        cosLMet = math.cos(lepPhi - readTree.met_phi)
+    
+        mt = math.sqrt(2 * lepPt * readTree.met_pt * (1 - cosLMet))
+        st = readTree.met_pt + lepPt
+  
+        dPhi_Wl = math.acos(
+            (lepPt + readTree.met_pt * math.cos(lepPhi - readTree.met_phi)) / 
+            (math.sqrt(lepPt ** 2 + readTree.met_pt ** 2 + 
+                      2 * readTree.met_pt * lepPt * math.cos(lepPhi - readTree.met_phi))
+                )
+            ) 
+        
+        absIso = lepRelIso04 * lepPt
+    
+        saveTree.LepGood_q80[lepIndex] = q80
+        saveTree.LepGood_cosLMet[lepIndex] = cosLMet
+        saveTree.LepGood_mt[lepIndex] = mt
+        saveTree.LepGood_st[lepIndex] = st
+        saveTree.LepGood_dPhi_Wl[lepIndex] = dPhi_Wl
+        saveTree.LepGood_absIso[lepIndex] = absIso 
+        
+              
     if logger.isEnabledFor(logging.DEBUG):
         printStr = "\n List of " + objBranches + " leptons before selector: " + \
             lepObj.printObjects(None, LepVarList['lep'])
+
+        for ind in range(lepObj.nObj):
+            printStr += "\n Extended quantities for " + objBranches + " leptons before selector: " + \
+            "\n Lepton index {0}: \n".format(ind)
+            for var in LepVarList['ext']:
+                varName = objBranches + '_' + var
+                varValue = getattr(saveTree, varName)[ind]
+                printStr += varName + " = " + str(varValue) + '\n'
+            printStr += '\n'
+            
         logger.debug(printStr)
+        
 
     muSelector = cmgObjectSelection.objSelectorFunc(LepSel['mu'] )
     elSelector = cmgObjectSelection.objSelectorFunc(LepSel['el'])
@@ -1120,9 +1193,7 @@ def processLeptons(skimLepton, readTree, splitTree, saveTree, params):
             '\n ' + lepObj.printObjects(elList, LepVarList['el'])
         logger.debug(printStr)
 
-        printStr = "\n  " + objBranches + " lepton selector \n " + \
-            pprint.pformat(LepSel) + \
-            '\n ' + lepObj.printObjects(lepList, LepVarList['lep'])
+        printStr = '\n ' + lepObj.printObjects(lepList, LepVarList['lep'])
         logger.debug(printStr)
         
 
@@ -1139,15 +1210,15 @@ def processLeptons(skimLepton, readTree, splitTree, saveTree, params):
             logString = "\n Leading selected muon: "
             for var in LepVarList['mu']:
                 logString += "\n " + lepName + var[0].capitalize() + var[1:] + " = %f"
+            logString = logString % \
+                (tuple((getattr(saveTree, lepName + var[0].capitalize() + var[1:]) for var in LepVarList['mu'])))
+            logString +=  "\n " + "lepAbsIso" + " = %f"
             logString += "\n"
-            logger.debug(
-                logString % 
-                (tuple(getattr(saveTree, lepName + var[0].capitalize() + var[1:]) for var in LepVarList['mu']))
-                )
+            logger.debug(logString, saveTree.lepAbsIso)
     
-
+        
     #
-    return saveTree, lep
+    return saveTree, lepObj, muList
 
 def selectionJets(readTree, ptCut,etaCut=2.4):
     '''Post-processing standard jet selection. 
@@ -1164,13 +1235,16 @@ def selectionJets(readTree, ptCut,etaCut=2.4):
 
 
 
-def processJets(readTree, splitTree, saveTree, params):
+def processJets(args, readTree, splitTree, saveTree, params):
     '''Process jets. 
     
     TODO describe here the processing.
     '''
 
+    #
     logger = logging.getLogger('cmgPostProcessing.processJets')
+    
+    verbose = args.verbose
     
     # initialize returned variables (other than saveTree)
     jets = None
@@ -1292,11 +1366,21 @@ def processJets(readTree, splitTree, saveTree, params):
         saveTree.jet2Pt = jetObj.pt[basJet_2Index]
         saveTree.jet2Eta = jetObj.eta[basJet_2Index]
         saveTree.jet2Phi = jetObj.phi[basJet_2Index]
-         
-        saveTree.dRJet1Jet2 = hephyHelpers.deltaR(jets[0], jets[1])
         
-        saveTree.deltaPhi30_j12 = \
-            hephyHelpers.deltaPhi(jetObj.phi[basJetList[0]], jetObj.phi[basJetList[1]])
+        dR_basJet_j1j2 = helpers.dR(basJetList[0], basJetList[1], jetObj)
+        saveTree.dRJet1Jet2 = dR_basJet_j1j2
+        
+        dRJet1Jet2_jets = hephyHelpers.deltaR(jets[0], jets[1]) 
+        if verbose:
+            print 'dR_basJet_j1j2 = ', dR_basJet_j1j2, ' dRJet1Jet2_jets = ', dRJet1Jet2_jets
+        
+        dPhi_basJet_j1j2 = helpers.dPhi(basJetList[0], basJetList[1], jetObj)
+        saveTree.deltaPhi30_j12 = dPhi_basJet_j1j2
+        
+        deltaPhi30_j12_jets = hephyHelpers.deltaPhi(jetObj.phi[basJetList[0]], jetObj.phi[basJetList[1]])
+        if verbose:
+            print 'dPhi_basJet_j1j2 = ', dPhi_basJet_j1j2, ' deltaPhi30_j12_jets = ', deltaPhi30_j12_jets
+        
     else:
         saveTree.jet2Index = -1
 
@@ -1316,8 +1400,12 @@ def processJets(readTree, splitTree, saveTree, params):
         
 
     if saveTree.nJet60 > 1:
-        saveTree.deltaPhi60_j12 = \
-            hephyHelpers.deltaPhi(jetObj.phi[vetoJetList[0]], jetObj.phi[vetoJetList[1]])
+        dPhi_vetoJet_j1j2 = helpers.dPhi(vetoJetList[0], vetoJetList[1], jetObj)
+        saveTree.deltaPhi60_j12 = dPhi_vetoJet_j1j2
+        
+        deltaPhi60_j12 = hephyHelpers.deltaPhi(jetObj.phi[vetoJetList[0]], jetObj.phi[vetoJetList[1]])
+        if verbose:
+            print 'dPhi_vetoJet_j1j2 = ', dPhi_vetoJet_j1j2, ' deltaPhi60_j12 = ', deltaPhi60_j12
             
         # for backward compatibility
         saveTree.deltaPhi_j12 = saveTree.deltaPhi60_j12 
@@ -1398,13 +1486,16 @@ def processJets(readTree, splitTree, saveTree, params):
 
     # HT as sum of jets pT > 30 GeV
     
-    saveTree.htJet30j = sum([x['pt'] for x in jets])
-
+    ht_basJet = sum (jetObj.pt[ind] for ind in basJetList)
+    saveTree.htJet30j = ht_basJet
     
+    htJet30j = sum([x['pt'] for x in jets])
+    if verbose:
+        print 'ht_basJet = ', ht_basJet, ' htJet30j = ', htJet30j
     
-    return saveTree, jets
+    return saveTree, jetObj, basJetList
 
-def processLeptonJets(skimLepton, readTree, splitTree, saveTree, lep, jets):
+def processLeptonJets(readTree, splitTree, saveTree, lepObj, muList, jetObj, basJetList):
     '''Process correlations between the leading selected lepton and jets. 
     
     Compute:
@@ -1418,46 +1509,58 @@ def processLeptonJets(skimLepton, readTree, splitTree, saveTree, lep, jets):
     
     logger = logging.getLogger('cmgPostProcessing.processLeptonJets')
 
-    if skimLepton in ['soft', 'hard', 'inc']:
          
-        if (lep is not None) and (saveTree.nJet30 > 0):
-            
-            saveTree.dRJet1Lep = hephyHelpers.deltaR(jets[0], lep)
-            
-            # find the dR-closest jet to selected muon
-            closestJetIndex = min(range(len(jets)), key=lambda j:hephyHelpers.deltaR(jets[j], lep))
-            logger.debug("\n Lepton: \n %s, \n \n Closest jet index: %i, \n Jet: \n %s \n dR(lep, jet): %f \n",
-                pprint.pformat(lep), closestJetIndex, pprint.pformat(jets[closestJetIndex]),
-                hephyHelpers.deltaR(jets[closestJetIndex], lep))
-                    
-            # invariant mass of the selected leading lepton and the dR-closest jet            
-            saveTree.JetLepMass = helpers.invMass([jets[closestJetIndex], lep])
-            
-            # invariant mass of 1, 2, 3 jets, other than the closest jet associated to lepton 
+    if (lepObj is not None) and (len(muList) > 0) and (saveTree.nJet30 > 0):
         
-            indexList = [i for i in xrange(len(jets)) if i != closestJetIndex]  
-            logger.debug(
-                "\n Number of jets, excluding the closest jet: %i jets \n List of jet indices: \n %s \n ", 
-                len(indexList), pprint.pformat(indexList)
-                )
-                   
-            if saveTree.nJet30 == 1: 
-                saveTree.J3Mass = 0.
-            elif saveTree.nJet30 == 2:
-                jetList = [jets[indexList[0]]]
-                saveTree.J3Mass = helpers.invMass(jetList)
-            elif saveTree.nJet30 == 3:
-                jetList = [jets[indexList[0]], jets[indexList[1]]]
-                saveTree.J3Mass = helpers.invMass(jetList)
-            else:
-                jetList = [jets[indexList[0]], jets[indexList[1]], jets[indexList[2]]]
-                saveTree.J3Mass = helpers.invMass(jetList)
-       
+        dR_basJet_j1_mu1 = helpers.dR(basJetList[0], muList[0], jetObj, lepObj)
+        saveTree.dRJet1Lep = dR_basJet_j1_mu1
+        
+        # find the dR-closest jet to selected muon
+        # closestJet_basJetListIndex gives the position in basJetList of the jet index closestJetIndex 
+        # giving the minimum dR
+        closestJet_basJetListIndex = min(
+            range(len(basJetList)), key=lambda j:helpers.dR(basJetList[j], muList[0], jetObj, lepObj)
+            )
+        closestJetIndex = basJetList[closestJet_basJetListIndex]
+        logger.debug(
+            "\n Leading lepton index: %i \n Closest basic jet index: %i \n dR(mu1, jet): %f \n",
+            muList[0], closestJetIndex,
+            helpers.dR(closestJetIndex, muList[0], jetObj, lepObj)
+            )
+        
+        # list of variables needed to comput invariant mass        
+        varList = ['pt', 'eta', 'phi', 'mass', ]
+
+        # invariant mass of the selected leading lepton and the dR-closest jet  
+        jlList = jetObj.getObjDictList(varList, [closestJetIndex]) + lepObj.getObjDictList(varList, [muList[0]])
+        mass_basJet_mu1_mindR = helpers.invMass(jlList)
+        saveTree.JetLepMass = mass_basJet_mu1_mindR
+        
+        # invariant mass of 1, 2, 3 jets, other than the closest jet associated to lepton 
     
-            logger.debug(
-                "\n dRJet1Lep: %f \n JetLepMass: %f \n J3Mass: %f \n", 
-                saveTree.dRJet1Lep, saveTree.JetLepMass, saveTree.J3Mass
-                )
+        indexList = [i for i in basJetList if i != closestJetIndex]  
+        logger.debug(
+            "\n Number of jets, excluding the closest jet: %i jets \n List of jet indices: \n %s \n ", 
+            len(indexList), pprint.pformat(indexList)
+            )
+               
+        if saveTree.nJet30 == 1: 
+            saveTree.J3Mass = 0.
+        elif saveTree.nJet30 == 2:
+            jetList = jetObj.getObjDictList(varList, [indexList[0]])
+            saveTree.J3Mass = helpers.invMass(jetList)
+        elif saveTree.nJet30 == 3:
+            jetList = jetObj.getObjDictList(varList, ([indexList[i] for i in range(2)]))
+            saveTree.J3Mass = helpers.invMass(jetList)
+        else:
+            jetList = jetObj.getObjDictList(varList, ([indexList[i] for i in range(3)]))
+            saveTree.J3Mass = helpers.invMass(jetList)
+   
+
+        logger.debug(
+            "\n dRJet1Lep: %f \n JetLepMass: %f \n J3Mass: %f \n", 
+            saveTree.dRJet1Lep, saveTree.JetLepMass, saveTree.J3Mass
+            )
             
     #
     return saveTree
@@ -1921,7 +2024,7 @@ def cmgPostProcessing(argv=None):
         logger.info("\n Output sample directory \n  %s \n", outputWriteDirectory) 
         logger.debug("\n Temporary directory \n  %s \n", temporaryDir) 
         
-        branchKeepStrings, readVars, aliases, readVectors, newVars, readTree, saveTree = \
+        branchKeepStrings, readVars, aliases, readVectors, newVars, newVectors, readTree, saveTree = \
             rwTreeClasses(sample, isample, args, temporaryDir, params)
                    
         #
@@ -1976,7 +2079,9 @@ def cmgPostProcessing(argv=None):
                     if verbose:
                         print "Chunk empty....continuing"
                     continue
-                # addresses for all variables (read and write) must be done here to take the correct address
+                
+                # addresses for all variables (read and write) 
+                # must be done here to take the correct address
                 
                 for v in readVars:
                     splitTree.SetBranchAddress(v['stage1Name'], ROOT.AddressOf(readTree, v['stage1Name']))
@@ -1990,6 +2095,12 @@ def cmgPostProcessing(argv=None):
                     v['branch'] = splitTree.Branch(v['stage2Name'], 
                         ROOT.AddressOf(saveTree,v['stage2Name']), v['stage2Name']+'/'+v['stage2Type'])
     
+                for v in newVectors:
+                    for var in v['vars']:
+                        var['branch'] = splitTree.Branch(var['stage2Name'], 
+                            ROOT.AddressOf(saveTree,var['stage2Name']), var['stage2Name']+'/'+var['stage2Type'])
+                        
+
                 # get entries for tree and loop over events
                 
             
@@ -2052,14 +2163,13 @@ def cmgPostProcessing(argv=None):
                         )
                     
                     # leptons processing
-                    saveTree, lep = processLeptons(skimLepton, readTree, splitTree, saveTree, params)
+                    saveTree, lepObj, muList = processLeptons(readTree, splitTree, saveTree, params)
                     
                     # jets processing
-                    saveTree, jets = processJets(readTree, splitTree, saveTree, params)
+                    saveTree, jetObj, basJetList = processJets(args, readTree, splitTree, saveTree, params)
                     
                     # selected leptons - jets processing
-                    saveTree = processLeptonJets(skimLepton, readTree, splitTree, saveTree, lep, jets)
-
+                    saveTree = processLeptonJets(readTree, splitTree, saveTree, lepObj, muList, jetObj, basJetList)
                     if args.processTracks:
                         saveTree = processTracksFunction(readTree, splitTree, saveTree, lep, jets, params)
 
@@ -2082,10 +2192,14 @@ def cmgPostProcessing(argv=None):
                         saveTree = computeWeight(sample, nEntries, splitTree, saveTree, params, xsec=xsec)
                             
                 
-                    # fill all the new variables          
+                    # fill all the new variables and the new vectors        
                     for v in newVars:
                         v['branch'].Fill()
                         
+                    for v in newVectors:
+                        for var in v['vars']:
+                            var['branch'].Fill()
+                            
 
                 # 
                 
@@ -2095,11 +2209,16 @@ def cmgPostProcessing(argv=None):
 
                 if not testMethods:
                     tfileTreeSplit = ROOT.TFile(temporaryDir + '/' + fileTreeSplit, 'recreate')
+
                     splitTree.SetBranchStatus("*", 0)
                     for b in (branchKeepStrings + 
                               [v['stage2Name'] for v in newVars] + 
                               [v.split(':')[1] for v in aliases]):
                         splitTree.SetBranchStatus(b, 1)
+                    for v in newVectors:
+                        for var in v['vars']:
+                            splitTree.SetBranchStatus(var['stage2Name'], 1)
+                        
                     t2 = splitTree.CloneTree()
                     t2.Write()
                     tfileTreeSplit.Close()
@@ -2108,8 +2227,13 @@ def cmgPostProcessing(argv=None):
                     del t2
                     splitTree.Delete()
                     del splitTree
+                    
                 for v in newVars:
                     del v['branch']
+                    
+                for v in newVectors:
+                    for var in v['vars']:
+                        del var['branch']
     
         logger.debug(
             "\n " + \
