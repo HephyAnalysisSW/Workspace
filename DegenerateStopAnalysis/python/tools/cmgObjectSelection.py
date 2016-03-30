@@ -79,9 +79,41 @@ class cmgObject():
 
     def getIndexList(self, passFailList):
         return getIndexList(passFailList)
+
     
-    # def sort(self, readTree, key, objList):
-    #    pass       
+    def sort(self, key, indexList):
+        ''' Sort a list of objects given as indices in indexList according to key.
+        
+        Return a list of object indices.
+        '''
+        
+        logger = logging.getLogger(__name__ + '.cmgObject' + '.sort')   
+
+        #
+        
+        indexListSort = []
+        
+        if not indexList: 
+            return indexListSort
+        
+        keyIndexList = []
+        for ind in indexList:
+            keyValue = cmgObjVar(self.readTree, self.obj, key)[ind]
+            keyIndexList.append([keyValue, ind])
+            
+        keyIndexListSort = sorted(keyIndexList, key=lambda tup: tup[0], reverse=True)
+        
+        for tup in keyIndexListSort:
+            indexListSort.append(tup[1])
+        
+        logger.debug(
+            "\n List of indices, before sorting: \n" + pprint.pformat(indexList) + \
+            "\n Unsorted list: \n" + pprint.pformat(keyIndexList) + \
+            "\n Sorted list: \n" + pprint.pformat(keyIndexListSort) + \
+            "\n List of indices, after sorting: \n" + pprint.pformat(indexListSort) + "\n"
+            )
+        
+        return indexListSort
     
 
     def getSelectionIndexList(self, readTree , selectorFunc, objPassFailList=None): 
@@ -215,120 +247,6 @@ class Leaf:
         return self.leaf.GetValue(name)
 
 
-def lepSelectorFuncOld(lepSel):
-    muSel = lepSel["mu"] if lepSel.has_key("mu") else None
-    elSel = lepSel["el"] if lepSel.has_key("el") else None
-
-    def lepSelector(readTree, lep, i):
-        if muSel and (abs(lep.pdgId[i]) == muSel['pdgId']): 
-            if muSel.has_key('pt') : 
-                if not (lep.pt[i] > muSel['pt']):  
-                    # print lep.pt[i]
-                    return False
-            if muSel.has_key('ptMax') : 
-                if not (lep.pt[i] < muSel['ptMax']):  
-                    # print lep.pt[i]
-                    return False
-            if muSel.has_key('eta') : 
-                if not abs(lep.eta[i]) < muSel['eta']: 
-                    # print lep.eta[i]
-                    return False
-            if muSel.has_key('dxy') : 
-                if not abs(lep.dxy[i]) < muSel['dxy']: 
-                    # print lep.dxy[i]
-                    return False
-            if muSel.has_key('dz') : 
-                if not abs(lep.dz[i]) < muSel['dz']: 
-                    # print lep.dz[i]
-                    return False
-            if muSel.has_key('sip3d') : 
-                if not lep.sip3d[i] < muSel['sip3d'] : 
-                    # print lep.sip3d[i]
-                    return False
-            if muSel.has_key('mediumMuonId') : 
-                if not lep.mediumMuonId[i] == muSel['mediumMuonId']: 
-                    # print lep.mediumMuonId[i]
-                    return False
-            if muSel.has_key('hybIso') : 
-                if not ((lep.pt[i] >= muSel['hybIso']['ptSwitch'] and lep.relIso04[i] < muSel['hybIso']['relIso']) \
-                or (lep.pt[i] < muSel['hybIso']['ptSwitch']  and lep.relIso04[i] * lep.pt[i] < muSel['hybIso']['absIso'])): 
-                    # print lep.pt, lep.relIso04, 
-                    return False
-            #
-            return True
-        elif elSel and (abs(lep.pdgId[i]) == elSel['pdgId']): 
-            if elSel.has_key('pt') : 
-                if not (lep.pt[i] > elSel['pt']):  
-                    # print lep.pt[i]
-                    return False
-            if elSel.has_key('ptMax') : 
-                if not (lep.pt[i] < elSel['ptMax']):  
-                    # print lep.pt[i]
-                    return False
-            if elSel.has_key('eta') : 
-                if not abs(lep.eta[i]) < elSel['eta']: 
-                    # print lep.eta[i]
-                    return False
-            if elSel.has_key('dxy') : 
-                if not abs(lep.dxy[i]) < elSel['dxy']: 
-                    # print lep.dxy[i]
-                    return False
-            if elSel.has_key('dz') : 
-                if not abs(lep.dz[i]) < elSel['dz']: 
-                    # print lep.dz[i]
-                    return False
-            if elSel.has_key('sip3d') : 
-                if not lep.sip3d[i] < elSel['sip3d'] : 
-                    # print lep.sip3d[i]
-                    return False
-            if elSel.has_key('SPRING15_25ns_v1') : 
-                if not abs(lep.SPRING15_25ns_v1[i]) > elSel['SPRING15_25ns_v1']: 
-                    # print lep.SPRING15_25ns_v1[i]
-                    return False
-            #
-            return True
-        else:
-            # print "Lep Selector Fail", lep.pdgId[i], lep.pt[i]
-            # assert False
-            return False 
-
-    return lepSelector
-
-
-                
-def jetSelectorFuncOld(jetSel):
-    def jetSelector(readTree, jet, i):
-        if jetSel: 
-            if jetSel.has_key('pt') : 
-                if not (jet.pt[i] > jetSel['pt']):  
-                    # print jet.pt[i]
-                    return False
-            if jetSel.has_key('ptMax') : 
-                if not (jet.pt[i] < jetSel['ptMax']):  
-                    # print jet.pt[i]
-                    return False
-            if jetSel.has_key('eta') : 
-                if not abs(jet.eta[i]) < jetSel['eta']: 
-                    # print jet.eta[i]
-                    return False
-            if jetSel.has_key('id') :  # non-standard operator >=
-                if not abs(jet.id[i]) >= jetSel['id']: 
-                    # print jet.id[i]
-                    return False
-            if jetSel.has_key('btag') : 
-                if jetSel['btag'] == 'btagCSV':
-                    if not jet.btagCSV[i] > jetSel['cutDiscriminator']: 
-                        # print jet.btagCSV[i]
-                        return False
-                else:
-                    raise Exception("\n No comparison operator defined for " + jetSel['btag'])
-
-            #
-            return True
-
-    return jetSelector
-
-
 def objSelectorFunc(objSel):
     '''Object selection for cuts given in a dictionary.
         
@@ -363,6 +281,82 @@ def objSelectorFunc(objSel):
         #
         return True 
 
+
+    def elWP(readTree, obj, i, objSel):
+        ''' Supplementary electron selection for a working point.
+        
+        '''
+        
+        # get once the values for the key, to speed up the code
+        elWPSel = objSel['elWP']
+        
+        elWP_eta_EB = elWPSel['eta_EB']
+        elWP_eta_EE = elWPSel['eta_EE']
+        
+        objEta = obj.eta[i]
+        
+        # evaluate each cut, exit if False immediately
+        
+        if not (
+            (obj.hadronicOverEm[i] < elWPSel['hOverE_EB'] and objEta < elWP_eta_EB)
+            or 
+            (obj.hadronicOverEm[i] < elWPSel['hOverE_EE'] and (elWP_eta_EB <= objEta < elWP_eta_EE))
+            ):
+            
+            return False
+        
+        if not (
+            (abs(obj.dEtaScTrkIn[i]) < elWPSel['dEtaScTrkIn_EB'] and objEta < elWP_eta_EB)
+            or 
+            (abs(obj.dEtaScTrkIn[i]) < elWPSel['dEtaScTrkIn_EE'] and (elWP_eta_EB <= objEta < elWP_eta_EE))
+            ):
+            
+            return False
+        
+        
+        if not (
+            (abs(obj.dPhiScTrkIn[i]) < elWPSel['dPhiScTrkIn_EB'] and objEta < elWP_eta_EB)
+            or 
+            (abs(obj.dPhiScTrkIn[i]) < elWPSel['dPhiScTrkIn_EE'] and (elWP_eta_EB <= objEta < elWP_eta_EE))
+            ):
+            
+            return False
+        
+        if not (
+            (abs(obj.eInvMinusPInv[i]) < elWPSel['eInvMinusPInv_EB'] and objEta < elWP_eta_EB)
+            or 
+            (abs(obj.eInvMinusPInv[i]) < elWPSel['eInvMinusPInv_EE'] and (elWP_eta_EB <= objEta < elWP_eta_EE))
+            ):
+            
+            return False
+        
+        if not (
+            (abs(obj.dxy[i]) < elWPSel['dxy_EB'] and objEta < elWP_eta_EB)
+            or 
+            (abs(obj.dxy[i]) < elWPSel['dxy_EE'] and (elWP_eta_EB <= objEta < elWP_eta_EE))
+            ):
+            
+            return False
+        
+        if not (
+            (abs(obj.dz[i]) < elWPSel['dz_EB'] and objEta < elWP_eta_EB)
+            or 
+            (abs(obj.dz[i]) < elWPSel['dz_EE'] and (elWP_eta_EB <= objEta < elWP_eta_EE))
+            ):
+            
+            return False
+        
+        if not (
+            (obj.lostHits[i] < elWPSel['lostHits_EB'] and objEta < elWP_eta_EB)
+            or 
+            (obj.lostHits[i] < elWPSel['lostHits_EE'] and (elWP_eta_EB <= objEta < elWP_eta_EE))
+            ):
+            
+            return False
+
+        #
+        return True
+     
         
     def objSelector(readTree, obj, i):
         
@@ -372,6 +366,8 @@ def objSelectorFunc(objSel):
             
             if key == 'hybIso':
                 selector &= hybIso(readTree, obj, i, objSel)
+            elif key == 'elWP':
+                selector &= elWP(readTree, obj, i, objSel)                
             else:
                 varValue = getattr(obj, keyValue[0])[i]
             
@@ -395,50 +391,6 @@ def objSelectorFunc(objSel):
     return objSelector
     
 
-def printObjects(treeName, obj, indexList, varList=[]):
-    ''' Print for each object from indexList the values of variables from varList.
-    
-    '''
-
-    logger = logging.getLogger(__name__ + '.printObjects')   
-                
-    treeBranches = treeName.GetListOfBranches()
-
-    objBranchList = []
-    for i in range(treeBranches.GetEntries()):
-        branchName = treeBranches.At(i).GetName()
-        if branchName.startswith(obj):
-            objBranchList.append(branchName)
-        
-    logger.trace(
-        "\n List of all branches for object %s \n %s \n",
-        obj, pprint.pformat(objBranchList)
-        )
-
-    varListCurrent = []
-    for var in varList:
-        branchName = obj + '_' + var
-        if branchName in objBranchList:
-            varListCurrent.append(var)
-
-    logger.trace(
-        "\n List of variables to print for object %s \n %s \n",
-        obj, pprint.pformat(varListCurrent)
-        )
-
-    printStr = ''
-    printStr += "\n Number of selected {0} objects: {1} \n".format(obj, len(indexList))
-
-    for ind in indexList:
-        printStr += "\n + " + obj + " object index: " + str(ind) + '\n'
-        for var in varListCurrent:
-            varValue = cmgObjVar(treeName, obj, var)[ind]
-            varName = obj + '_' + var
-            printStr += varName + " = " + str(varValue) + '\n'
-        printStr += '\n'
-
-    #
-    return printStr
     
 ###############################################################################################
 #######################################                    ####################################

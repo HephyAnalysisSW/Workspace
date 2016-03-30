@@ -198,35 +198,6 @@ def getParameterSet(args):
     params['SkimParameters'] = SkimParameters
     
     
-    # lepton selection
-
-#     LepSel = {
-#         'mu': {
-#             'pdgId': 13,
-#             'pt': 5,
-#             'eta': 2.4,
-#             'dxy': 0.05,
-#             'dz': 0.2,
-#             'sip3d': 4,
-#             'mediumMuonId': 1,
-#             'hybIso':{  'ptSwitch': 25, 'relIso': 0.2, 'absIso': 5  }
-#             },
-#         'el': {
-#             'pdgId': 11,
-#             'pt'   : 5,
-#             'eta'  : 2.5,
-#             'dxy'  : 0.05,
-#             'dz'   : 0.2,
-#             'sip3d': 4,
-#             'SPRING15_25ns_v1': 1,
-#             }
-#         }
-# 
-#     LepSelPt30 = copy.deepcopy(LepSel)
-#     LepSelPt30['mu']['ptMax'] = 30 
-#     LepSelPt30['el']['ptMax'] = 30 
-
-
     LepSel = {
         'mu': {
             'pdgId': ('pdgId', operator.eq, 13),
@@ -242,10 +213,19 @@ def getParameterSet(args):
             'pdgId': ('pdgId', operator.eq, 11),
             'pt': ('pt', operator.gt, 5),
             'eta': ('eta', operator.lt, 2.5, operator.abs),
-            'dxy': ('dxy', operator.lt, 0.05),
-            'dz': ('dz', operator.lt, 0.2),
             'sip3d': ('sip3d', operator.lt, 4),
             'mediumMuonId': ('SPRING15_25ns_v1', operator.eq, 1),
+            'convVeto': ('convVeto', operator.eq, 1),
+            'elWP': {
+                'eta_EB': 1.479,'eta_EE': 2.5,
+                'hOverE_EB': 0.181,'hOverE_EE': 0.116,
+                'dEtaScTrkIn_EB': 0.0152,'dEtaScTrkIn_EE': 0.0113,
+                'dPhiScTrkIn_EB': 0.216,'dPhiScTrkIn_EE': 0.237,
+                'eInvMinusPInv_EB': 0.207,'eInvMinusPInv_EE':  0.174,
+                'dxy_EB': 0.0564,'dxy_EE': 0.222,
+                'dz_EB': 0.472,'dz_EE': 0.921,
+                'lostHits_EB': 2,'lostHits_EE': 3,                     
+                }
             }
         }
 
@@ -308,29 +288,6 @@ def getParameterSet(args):
     #    isrH: ISR jet, higher threshold for SR2, selected from basic jets
     #    bjet: b jets, tagged with algorithm btag, separated in soft and hard b jets 
         
-#     JetSel = {
-#         'bas': {
-#             'id': 1,
-#             'pt': 30,
-#             'eta': 2.4,
-#             },
-#         'veto': {
-#             'pt': 60,
-#             },
-#         'isr': {
-#             'pt': 110,
-#             },
-#         'isrH': {
-#             'pt': 325,
-#             },
-#         'bjet': {
-#             'btag': {
-#                 'alg': 'btagCSV',
-#                 'cutDiscriminator': 0.890,
-#                 },
-#             'cutSoftHardBJets': 60
-#             },
-#         }
 
     # list of variables for jets to be used for printing and flat tree
     
@@ -636,6 +593,12 @@ def eventsSkimPreselect(skimName, skimLepton, preselectFlag, params, signalMasse
 
     logger = logging.getLogger('cmgPostProcessing.eventsSkimPreselect')
     
+    #
+    SkimParameters = params['SkimParameters']
+    
+    lheHThighIncoming = SkimParameters['lheHThigh']['lheHTIncoming']
+    lheHTlowIncoming = SkimParameters['lheHTlow']['lheHTIncoming']
+    
     skimCond = "(1)"
     
     if not skimName:
@@ -647,11 +610,11 @@ def eventsSkimPreselect(skimName, skimLepton, preselectFlag, params, signalMasse
     elif skimName == 'HT400ST200': 
         skimCond = "Sum$(Jet_pt)>400&&(LepGood_pt[0]+met_pt)>200"
     elif skimName == 'lheHThigh': 
-        skimCond += "&&(lheHTIncoming>=600)"
+        skimCond += "&&(lheHTIncoming>={0})".format(lheHThighIncoming)
     elif skimName == 'lheHTlow': 
-        skimCond += "&&(lheHTIncoming<600)"
+        skimCond += "&&(lheHTIncoming<{0})".format(lheHTlowIncoming)
     else:
-        raise Exception("Skim Condition Not recognized: %s"%skimName)
+        raise Exception("Skim Condition not recognized: %s"%skimName)
         pass
     
     # lepton skimming, loop only over events fulfilling the lepton skimming condition 
@@ -700,7 +663,188 @@ def rwTreeClasses(sample, isample, args, temporaryDir, params={} ):
     logger = logging.getLogger('cmgPostProcessing.rwTreeClasses')
     
     # define the branches and the variables to be kept and/or read for data and MC
+        
+    # common branches for data and MC samples 
     
+    # common branches already defined in cmgTuples
+    branchKeepStrings_DATAMC = [
+        'run', 'lumi', 'evt', 'isData', 'rho', 'nVert', 
+        'nJet25', 'nBJetLoose25', 'nBJetMedium25', 'nBJetTight25', 
+        'nJet40', 'nJet40a', 'nBJetLoose40', 'nBJetMedium40', 'nBJetTight40', 
+        'nLepGood20', 'nLepGood15', 'nLepGood10', 
+        'htJet25', 'mhtJet25', 'htJet40j', 'htJet40', 'mhtJet40', 
+        'nSoftBJetLoose25', 'nSoftBJetMedium25', 'nSoftBJetTight25', 
+        'met*','puppi*',
+        'Flag_*','HLT_*',
+        #'MET*','PFMET*','Calo*', 'Mono*', 'Mu*','TkMu*','L1Single*', 'L2Mu*',
+        #'nFatJet','FatJet_*', 
+        'nJet', 'Jet_*', 
+        'nLepGood', 'LepGood_*', 
+        'nLepOther', 'LepOther_*', 
+        'nTauGood', 'TauGood_*',
+        'Tracks_*', 'isoTrack_*',
+        ] 
+
+    readVariables_DATAMC = []
+    aliases_DATAMC = []
+    newVariables_DATAMC = []
+    readVectors_DATAMC = []
+    
+    readVariables_DATAMC.extend(['met_pt/F', 'met_phi/F'])
+    aliases_DATAMC.extend([ 'met:met_pt', 'metPhi:met_phi'])
+    newVariables_DATAMC.extend(['weight/F'])
+    
+    readVectors_DATAMC.extend([
+        {'prefix':'LepGood',  'nMax':8, 
+            'vars':[
+                'pdgId/I', 
+                'pt/F', 'eta/F', 'phi/F', 
+                'relIso03/F', 'relIso04/F', 'miniRelIso/F', 'sip3d/F',
+                'dxy/F', 'dz/F',  
+                'mass/F',
+                'tightId/I', 'mediumMuonId/I', 
+                'SPRING15_25ns_v1/I', 'mvaIdPhys14/F', 'mvaIdSpring15/F',
+                'hadronicOverEm/F', 
+                'dEtaScTrkIn/F', 'dPhiScTrkIn/F', 'eInvMinusPInv/F', 'lostHits/I', 
+                'convVeto/I',
+                ]
+            },
+        {'prefix':'LepOther',  'nMax':8, 
+            'vars':[
+                'pdgId/I', 
+                'pt/F', 'eta/F', 'phi/F', 
+                'relIso03/F', 'relIso04/F', 'miniRelIso/F', 'sip3d/F',
+                'dxy/F', 'dz/F',  
+                'mass/F',
+                'tightId/I', 'mediumMuonId/I', 
+                'SPRING15_25ns_v1/I', 'mvaIdPhys14/F', 'mvaIdSpring15/F',
+                'hadronicOverEm/F', 
+                'dEtaScTrkIn/F', 'dPhiScTrkIn/F', 'eInvMinusPInv/F', 'lostHits/I', 
+                'convVeto/I',
+                ]
+            },
+        {'prefix':'Jet',  'nMax':100, 
+            'vars':[
+                'pt/F', 'eta/F', 'phi/F', 'id/I','btagCSV/F', 'btagCMVA/F', 'mass/F'
+                ]
+            },
+        {'prefix':'GenPart',  'nMax':30, 
+            'vars':[
+                'pt/F', 'eta/F', 'phi/F', 'pdgId/I', 'mass/F', 'motherId/I'
+                ]
+            },
+      ])
+     
+
+        
+    newVariables_DATAMC.extend([
+        'nBJetMediumCSV30/I', 'nSoftBJetsCSV/F', 'nHardBJetsCSV/F',  
+        'nJet30/I','htJet30j/F','nJet60/I','nJet100/I', 'nJet110/I','nJet325/I',
+        ])
+    
+    newVariables_DATAMC.extend([
+        'nLooseSoftLeptons/I', 'nLooseSoftPt10Leptons/I', 'nLooseHardLeptons/I', 
+        'nTightSoftLeptons/I', 'nTightHardLeptons/I',
+        ])
+    
+    newVariables_DATAMC.extend([
+        'singleMuonic/I', 'singleElectronic/I', 'singleLeptonic/I', 
+        ])
+    
+    newVariables_DATAMC.extend([
+        'leptonPt/F','leptonMiniRelIso/F','leptonRelIso03/F',
+        'leptonEta/F',  'leptonPhi/F', 'leptonPdg/I/0', 'leptonInd/I/-1', 
+        'leptonMass/F', 'leptonDz/F', 'leptonDxy/F', 
+        
+        'lepGoodPt/F','lepGoodMiniRelIso/F','lepGoodRelIso03/F', 'lepGoodRelIso04/F',
+        'lepGoodAbsIso/F','lepGoodEta/F',  'lepGoodPhi/F', 'lepGoodPdgId/I/0', 'lepGoodInd/I/-1', 
+        'lepGoodMass/F', 'lepGoodDz/F', 'lepGoodDxy/F','lepGoodMediumMuonId/I','lepGoodSip3d/F',
+        
+        'lepOtherPt/F','lepOtherMiniRelIso/F','lepOtherRelIso03/F', 'lepOtherRelIso04/F',
+        'lepOtherAbsIso/F','lepOtherEta/F',  'lepOtherPhi/F', 'lepOtherPdgId/I/0', 'lepOtherInd/I/-1', 
+        'lepOtherMass/F', 'lepOtherDz/F', 'lepOtherDxy/F','lepOtherMediumMuonId/I','lepOtherSip3d/F',
+        
+        'lepPt/F','lepMiniRelIso/F','lepRelIso03/F', 'lepRelIso04/F',
+        'lepAbsIso/F','lepEta/F',  'lepPhi/F', 'lepPdgId/I/0', 'lepInd/I/-1', 
+        'lepMass/F', 'lepDz/F', 'lepDxy/F','lepMediumMuonId/I','lepSip3d/F',
+        'nlep/I',
+
+
+        "Flag_Veto_Event_List/I/1",
+
+        ])
+        
+    newVariables_DATAMC.extend([
+        'Q80/F','CosLMet/F',
+        'st/F', 'deltaPhi_Wl/F',
+        'mt/F',
+        ])
+          
+    newVariables_DATAMC.extend([
+        'jet1Pt/F','jet1Eta/F','jet1Phi/F', 
+        'jet2Pt/F','jet2Eta/F','jet2Phi/F',
+        'deltaPhi_j12/F', 'dRJet1Jet2/F','deltaPhi30_j12/F', 'deltaPhi60_j12/F',
+        'JetLepMass/F','dRJet1Lep/F',
+        'J3Mass/F',
+
+
+        "stopIndex1/I/-1", "stopIndex2/I/-1",
+        "lspIndex1/I/-1", "lspIndex2/I/-1",
+        "gpLepIndex1/I/-1", "gpLepIndex2/I/-1",
+        "gpBIndex1/I/-1", "gpBIndex2/I/-1",
+        "stops_pt/F/-1", "stops_eta/F/-999", "stops_phi/F/-999", 
+        "lsps_pt/F/-1", "lsps_eta/F/-999", "lsps_phi/F/-999", 
+
+    
+        "jet1Index/I", "jet2Index/I", "jet3Index/I", 
+        "b1Index/I", "b2Index/I",
+        "nMuons/I", "nElectrons/I", "nLeptons/I",
+        "looseMuonIndex1/I", "looseMuonIndex2/I",
+        "looseElectronIndex1/I", "looseElectronIndex2/I",             
+        "looseLeptonIndex1/I", "looseLeptonIndex2/I",
+        ])
+    
+    #newVariables_DATAMC.extend([
+    #    'mt2w/F'
+    #    ] )
+
+    newVectors_DATAMC = []
+    
+    # extend LepGood with additional quantities
+    newVectors_DATAMC.extend([
+        {'prefix':'LepGood', 'nMax':8, 
+            'vars':[
+                'q80/F','cosLMet/F',
+                'st/F', 'dPhi_Wl/F',
+                'mt/F',
+                'absIso/F',
+                ] 
+            },
+        ])
+
+    newVectors_DATAMC.extend([
+        {'prefix':'IndexLepton', 'nMax':8, 
+            'vars':[
+                'mu/I/-1',
+                'el/I/-1',
+                'lep/I/-1',
+                ] 
+            },
+        ])
+
+    newVectors_DATAMC.extend([
+        {'prefix':'IndexJet', 'nMax':100, 
+            'vars':[
+                'basJet/I/-1',
+                'vetoJet/I/-1',
+                'isrJet/I/-1',
+                'isrHJet/I/-1',
+                'bJet/I/-1'
+                ] 
+            },
+        ])
+    
+
     # MC samples only
     
     # common branches already defined in cmgTuples
@@ -724,141 +868,31 @@ def rwTreeClasses(sample, isample, args, temporaryDir, params={} ):
     newVariables_MC = []
     
     readVectors_MC = []
+    newVectors_MC = []
     
     aliases_MC.extend(['genMet:met_genPt', 'genMetPhi:met_genPhi'])
     
+ 
     
-    # data and MC samples 
+    # data samples only
     
-    # common branches already defined in cmgTuples
-
+    # branches already defined in cmgTuples
+    branchKeepStrings_DATA = []
+    
+    readVariables_DATA = []
+    aliases_DATA = []
+    newVariables_DATA = []
+    
+    readVectors_DATA = []
+    newVectors_DATA = []
+    
+    
+    # branches for tracks (DATAMC/MC/DATA)
+      
     trackMinPtList = params['trackMinPtList'] 
     hemiSectorList = params['hemiSectorList']
     nISRsList      = params['nISRsList']
-
-
-    branchKeepStrings_DATAMC = [
-        'run', 'lumi', 'evt', 'isData', 'rho', 'nVert', 
-        'nJet25', 'nBJetLoose25', 'nBJetMedium25', 'nBJetTight25', 
-        'nJet40', 'nJet40a', 'nBJetLoose40', 'nBJetMedium40', 'nBJetTight40', 
-        'nLepGood20', 'nLepGood15', 'nLepGood10', 
-        'htJet25', 'mhtJet25', 'htJet40j', 'htJet40', 'mhtJet40', 
-        'nSoftBJetLoose25', 'nSoftBJetMedium25', 'nSoftBJetTight25', 
-        'met*','puppi*',
-        'Flag_*','HLT_*',
-        #'MET*','PFMET*','Calo*', 'Mono*', 'Mu*','TkMu*','L1Single*', 'L2Mu*',
-        #'nFatJet','FatJet_*', 
-        'nJet', 'Jet_*', 
-        'nLepGood', 'LepGood_*', 
-        'nLepOther', 'LepOther_*', 
-        'nTauGood', 'TauGood_*',
-        'Tracks_*', 'isoTrack_*',
-        ] 
-    
-    readVariables_DATAMC = []
-    aliases_DATAMC = []
-    newVariables_DATAMC = []
-    readVectors_DATAMC = []
-    
-
-    
-    readVariables_DATAMC.extend(['met_pt/F', 'met_phi/F'])
-    aliases_DATAMC.extend([ 'met:met_pt', 'metPhi:met_phi'])
-    newVariables_DATAMC.extend(['weight/F'])
-    
-    readVectors_DATAMC.extend([
-        {'prefix':'LepOther',  'nMax':8, 
-            'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I', 'relIso03/F', 'tightId/I', 
-                    'miniRelIso/F', 'mass/F','sip3d/F',
-                    'mediumMuonId/I', 'SPRING15_25ns_v1/I', 
-                    'dxy/F', 'dz/F',  'relIso04/F',
-                    'mvaIdPhys14/F','lostHits/I', 'convVeto/I']},
-        {'prefix':'LepGood',  'nMax':8, 
-            'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I', 'relIso03/F', 'tightId/I', 
-                    'miniRelIso/F', 'mass/F','sip3d/F',
-                    'mediumMuonId/I', 'SPRING15_25ns_v1/I', 
-                    'dxy/F', 'dz/F',  'relIso04/F',
-                    'mvaIdPhys14/F','lostHits/I', 'convVeto/I']},
-        {'prefix':'Jet',  'nMax':100, 
-            'vars':['pt/F', 'eta/F', 'phi/F', 'id/I','btagCSV/F', 'btagCMVA/F', 'mass/F']},
-        {'prefix':'GenPart',  'nMax':30, 
-            'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I', 'mass/F', 'motherId/I' ]},
-      ])
-     
-    if args.skimLepton in ['soft', 'hard', 'inc']:
-        
-        newVariables_DATAMC.extend([
-            'nBJetMediumCSV30/I', 'nSoftBJetsCSV/F', 'nHardBJetsCSV/F',  
-            'nJet30/I','htJet30j/F','nJet60/I','nJet100/I', 'nJet110/I','nJet325/I',
-            ])
-        
-        newVariables_DATAMC.extend([
-            'nLooseSoftLeptons/I', 'nLooseSoftPt10Leptons/I', 'nLooseHardLeptons/I', 
-            'nTightSoftLeptons/I', 'nTightHardLeptons/I',
-            ])
-        
-        newVariables_DATAMC.extend([
-            'singleMuonic/I', 'singleElectronic/I', 'singleLeptonic/I', 
-            ])
-        
-        newVariables_DATAMC.extend([
-            'leptonPt/F','leptonMiniRelIso/F','leptonRelIso03/F',
-            'leptonEta/F',  'leptonPhi/F', 'leptonPdg/I/0', 'leptonInd/I/-1', 
-            'leptonMass/F', 'leptonDz/F', 'leptonDxy/F', 
-            
-            'lepGoodPt/F','lepGoodMiniRelIso/F','lepGoodRelIso03/F', 'lepGoodRelIso04/F',
-            'lepGoodAbsIso/F','lepGoodEta/F',  'lepGoodPhi/F', 'lepGoodPdgId/I/0', 'lepGoodInd/I/-1', 
-            'lepGoodMass/F', 'lepGoodDz/F', 'lepGoodDxy/F','lepGoodMediumMuonId/I','lepGoodSip3d/F',
-            
-            'lepOtherPt/F','lepOtherMiniRelIso/F','lepOtherRelIso03/F', 'lepOtherRelIso04/F',
-            'lepOtherAbsIso/F','lepOtherEta/F',  'lepOtherPhi/F', 'lepOtherPdgId/I/0', 'lepOtherInd/I/-1', 
-            'lepOtherMass/F', 'lepOtherDz/F', 'lepOtherDxy/F','lepOtherMediumMuonId/I','lepOtherSip3d/F',
-            
-            'lepPt/F','lepMiniRelIso/F','lepRelIso03/F', 'lepRelIso04/F',
-            'lepAbsIso/F','lepEta/F',  'lepPhi/F', 'lepPdgId/I/0', 'lepInd/I/-1', 
-            'lepMass/F', 'lepDz/F', 'lepDxy/F','lepMediumMuonId/I','lepSip3d/F',
-            'nlep/I',
-
-
-            "Flag_Veto_Event_List/I/1",
-
-            ])
-            
-        newVariables_DATAMC.extend([
-            'Q80/F','CosLMet/F',
-            'st/F', 'deltaPhi_Wl/F',
-            'mt/F',
-            ])
-              
-        newVariables_DATAMC.extend([
-            'jet1Pt/F','jet1Eta/F','jet1Phi/F', 
-            'jet2Pt/F','jet2Eta/F','jet2Phi/F',
-            'deltaPhi_j12/F', 'dRJet1Jet2/F','deltaPhi30_j12/F', 'deltaPhi60_j12/F',
-            'JetLepMass/F','dRJet1Lep/F',
-            'J3Mass/F',
-
-
-            "stopIndex1/I/-1", "stopIndex2/I/-1",
-            "lspIndex1/I/-1", "lspIndex2/I/-1",
-            "gpLepIndex1/I/-1", "gpLepIndex2/I/-1",
-            "gpBIndex1/I/-1", "gpBIndex2/I/-1",
-            "stops_pt/F/-1", "stops_eta/F/-999", "stops_phi/F/-999", 
-            "lsps_pt/F/-1", "lsps_eta/F/-999", "lsps_phi/F/-999", 
-
-        
-            "jet1Index/I", "jet2Index/I", "jet3Index/I", 
-            "b1Index/I", "b2Index/I",
-            "nMuons/I", "nElectrons/I", "nLeptons/I",
-            "looseMuonIndex1/I", "looseMuonIndex2/I",
-            "looseElectronIndex1/I", "looseElectronIndex2/I",             
-            "looseLeptonIndex1/I", "looseLeptonIndex2/I",
-            ])
-        
-        #newVariables_DATAMC.extend([
-        #    'mt2w/F'
-        #    ] )
-    
-    
+       
     if args.processTracks:
         trkVar="Tracks"
         trkCountVars = [ "n%s"%trkVar ] 
@@ -879,6 +913,8 @@ def rwTreeClasses(sample, isample, args, temporaryDir, params={} ):
                        ]   })
                       
 
+
+    # branches for generated tracks (DATAMC/MC/DATA)
 
     if args.processGenTracks:
         genTrkVar="GenTracks"
@@ -903,22 +939,9 @@ def rwTreeClasses(sample, isample, args, temporaryDir, params={} ):
             ])
    
 
+    
 
- 
-    
-    # data samples only
-    
-    # branches already defined in cmgTuples
-    branchKeepStrings_DATA = []
-    
-    readVariables_DATA = []
-    aliases_DATA = []
-    newVariables_DATA = []
-    
-    readVectors_DATA = []
- 
-
-    # sample dependent part
+    # sum up branches to be defined for each sample, depending on the sample type (data or MC)
     
     if sample['isData']: 
         branchKeepStrings = branchKeepStrings_DATAMC + branchKeepStrings_DATA
@@ -927,6 +950,7 @@ def rwTreeClasses(sample, isample, args, temporaryDir, params={} ):
         aliases = aliases_DATAMC + aliases_DATA
         readVectors = readVectors_DATAMC + readVectors_DATA
         newVariables = newVariables_DATAMC + newVariables_DATA
+        newVectors = newVectors_DATAMC + newVectors_DATA
     else:
         branchKeepStrings = branchKeepStrings_DATAMC + branchKeepStrings_MC
     
@@ -934,6 +958,7 @@ def rwTreeClasses(sample, isample, args, temporaryDir, params={} ):
         aliases = aliases_DATAMC + aliases_MC
         readVectors = readVectors_DATAMC + readVectors_MC
         newVariables = newVariables_DATAMC + newVariables_MC
+        newVectors = newVectors_DATAMC + newVectors_MC
 
 
     readVars = [convertHelpers.readVar(v, allowRenaming=False, isWritten=False, isRead=True) for v in readVariables]
@@ -945,19 +970,6 @@ def rwTreeClasses(sample, isample, args, temporaryDir, params={} ):
             v['prefix']+'_'+vvar, allowRenaming=False, isWritten=False, isRead=True) for vvar in v['vars']
             ]
 
-    newVectors = []
-    
-    # extend LepGood with additional quantities
-    newVectors.extend([
-        {'prefix':'LepGood', 'nMax':8, 
-            'vars':[
-                'q80/F','cosLMet/F',
-                'st/F', 'dPhi_Wl/F',
-                'mt/F',
-                'absIso/F',
-                ] 
-         },
-        ])
 
     for v in newVectors:
         v['vars'] = [convertHelpers.readVar(
@@ -1161,18 +1173,28 @@ def processLeptons(readTree, splitTree, saveTree, params):
 
     muList = lepObj.getSelectionIndexList(readTree, muSelector)
     elList = lepObj.getSelectionIndexList(readTree, elSelector)
-    # TODO how to put electrons and muons together
-    lepList = []
+    # 
+    sumElMuList = muList + elList
+    lepList = lepObj.sort('pt', sumElMuList)
  
     saveTree.nMuons = len(muList)
+    for ind, val in enumerate(muList):
+        saveTree.IndexLepton_mu[ind] = val
+        
     saveTree.looseMuonIndex1 = muList[0] if saveTree.nMuons > 0 else -1
     saveTree.looseMuonIndex2 = muList[1] if saveTree.nMuons > 1 else -1
 
     saveTree.nElectrons = len(elList)
+    for ind, val in enumerate(elList):
+        saveTree.IndexLepton_el[ind] = val
+
     saveTree.looseElectronIndex1 = elList[0] if saveTree.nElectrons > 0 else -1
     saveTree.looseElectronIndex2 = elList[1] if saveTree.nElectrons > 1 else -1
 
     saveTree.nLeptons = len(lepList)
+    for ind, val in enumerate(lepList):
+        saveTree.IndexLepton_lep[ind] = val
+
     saveTree.looseLeptonIndex1 = lepList[0] if saveTree.nLeptons > 0 else -1
     saveTree.looseLeptonIndex2 = lepList[1] if saveTree.nLeptons > 1 else -1
 
@@ -1185,16 +1207,19 @@ def processLeptons(readTree, splitTree, saveTree, params):
 
         printStr = "\n  " + objBranches + " muon selector \n " + \
             pprint.pformat(LepSel['mu']) + \
-            '\n ' + lepObj.printObjects(muList, LepVarList['mu'])
-        logger.debug(printStr)
+            '\n ' + lepObj.printObjects(muList, LepVarList['mu']) + \
+            "\n saveTree.nMuons = %i \n  Index list: " + pprint.pformat(muList) + "\n "
+        logger.debug(printStr, saveTree.nMuons)
 
         printStr = "\n  " + objBranches + " electron selector \n " + \
             pprint.pformat(LepSel['el']) + \
-            '\n ' + lepObj.printObjects(elList, LepVarList['el'])
-        logger.debug(printStr)
+            '\n ' + lepObj.printObjects(elList, LepVarList['el']) + \
+            "\n saveTree.nElectrons = %i \n  Index list: " + pprint.pformat(elList) + "\n "
+        logger.debug(printStr, saveTree.nElectrons)
 
-        printStr = '\n ' + lepObj.printObjects(lepList, LepVarList['lep'])
-        logger.debug(printStr)
+        printStr = '\n ' + lepObj.printObjects(lepList, LepVarList['lep']) + \
+            "\n saveTree.nLeptons = %i \n  Index list:  " + pprint.pformat(lepList) + "\n "        
+        logger.debug(printStr, saveTree.nLeptons)
         
 
     if muList:
