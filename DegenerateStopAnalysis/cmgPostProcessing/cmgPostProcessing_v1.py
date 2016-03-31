@@ -118,7 +118,7 @@ def get_parser():
         help="Do Processing for a specific Stop and LSP mass"
         )
     
-    argParser.add_argument('--preselect',
+    argParser.add_argument('--skimPreselect',
         action='store_true',
         help="Apply preselection for the post processing, bool flag set to True if used"
         )
@@ -200,62 +200,83 @@ def getParameterSet(args):
     
     LepSel = {
         'mu': {
-            'pdgId': ('pdgId', operator.eq, 13),
+            'pdgId': ('pdgId', operator.eq, 13, operator.abs),
             'pt': ('pt', operator.gt, 5),
             'eta': ('eta', operator.lt, 2.4, operator.abs),
             'dxy': ('dxy', operator.lt, 0.05, operator.abs),
             'dz': ('dz', operator.lt, 0.2, operator.abs),
             'sip3d': ('sip3d', operator.lt, 4),
             'mediumMuonId': ('mediumMuonId', operator.eq, 1),
-            'hybIso': { 'ptSwitch': 25, 'relIso': 0.2, 'absIso': 5  },
+            'hybIso': {
+                'ptSwitch': 25, 'relIso': 0.2, 'absIso': 5
+                },
             },
         'el': {
-            'pdgId': ('pdgId', operator.eq, 11),
+            'pdgId': ('pdgId', operator.eq, 11, operator.abs),
             'pt': ('pt', operator.gt, 5),
             'eta': ('eta', operator.lt, 2.5, operator.abs),
             'sip3d': ('sip3d', operator.lt, 4),
-            'mediumMuonId': ('SPRING15_25ns_v1', operator.eq, 1),
             'convVeto': ('convVeto', operator.eq, 1),
             'elWP': {
                 'eta_EB': 1.479,'eta_EE': 2.5,
-                'hOverE_EB': 0.181,'hOverE_EE': 0.116,
-                'dEtaScTrkIn_EB': 0.0152,'dEtaScTrkIn_EE': 0.0113,
-                'dPhiScTrkIn_EB': 0.216,'dPhiScTrkIn_EE': 0.237,
-                'eInvMinusPInv_EB': 0.207,'eInvMinusPInv_EE':  0.174,
-                'dxy_EB': 0.0564,'dxy_EE': 0.222,
-                'dz_EB': 0.472,'dz_EE': 0.921,
-                'lostHits_EB': 2,'lostHits_EE': 3,                     
-                }
-            }
+                'vars': {
+                    'hadronicOverEm': {
+                        'EB': 0.181,'EE': 0.116, 'opCut': operator.lt, 'opVar': None,
+                        },
+                    'dEtaScTrkIn': {
+                        'EB': 0.0152,'EE': 0.0113, 'opCut': operator.lt, 'opVar': operator.abs,
+                        },
+                    'dPhiScTrkIn': {
+                        'EB': 0.216,'EE': 0.237, 'opCut': operator.lt, 'opVar': operator.abs,
+                        },
+                    'eInvMinusPInv': {
+                        'EB': 0.207,'EE':  0.174, 'opCut': operator.lt, 'opVar': operator.abs,
+                        },
+                    'dxy': {
+                        'EB': 0.0564,'EE': 0.222, 'opCut': operator.lt, 'opVar': operator.abs,
+                        },
+                    'dz': {
+                        'EB': 0.472,'EE': 0.921, 'opCut': operator.lt, 'opVar': operator.abs,
+                        },
+                    'lostHits': {
+                        'EB': 2,'EE': 3, 'opCut': operator.lt, 'opVar': None,
+                        },  
+                    },                  
+                },
+            },
         }
 
-    LepSelPt30 = copy.deepcopy(LepSel)
-    LepSelPt30['mu']['ptMax'] = ('pt', operator.lt, 30) 
-    LepSelPt30['el']['ptMax'] = ('pt', operator.lt, 30)
 
 
     if parameterSet == 'analysisHephy':
         params['LepSel'] = LepSel
     elif parameterSet == 'syncLip':
+        LepSelPt30 = copy.deepcopy(LepSel)
+        LepSelPt30['mu']['ptMax'] = ('pt', operator.lt, 30) 
+        LepSelPt30['el']['ptMax'] = ('pt', operator.lt, 30)
+        
         params['LepSel'] = LepSelPt30
      
         
-    # list of variables for muon and electron to be used for printing and flat tree
+    # list of variables for muon and electron to be used for printing
     
     varListMu = [
         'pdgId',
         'pt', 'eta', 'phi', 
         'dxy', 'dz', 'sip3d', 
         'miniRelIso', 'relIso03', 'relIso04', 
-        'mediumMuonId'
+        'mediumMuonId',
         ]
 
     varListEl = [
         'pdgId',
-        'pt', 'eta', 'phi', 
-        'dxy', 'dz', 'sip3d', 
+        'pt', 'eta', 'phi',
+        'dxy', 'dz', 'sip3d',
         'SPRING15_25ns_v1',
-        ]
+        'hadronicOverEm',
+        'dEtaScTrkIn', 'dPhiScTrkIn', 'eInvMinusPInv/F', 'lostHits',
+        'convVeto',
+         ]
         
     varListLep = []
     for var in varListMu+varListEl:
@@ -289,7 +310,7 @@ def getParameterSet(args):
     #    bjet: b jets, tagged with algorithm btag, separated in soft and hard b jets 
         
 
-    # list of variables for jets to be used for printing and flat tree
+    # list of variables for jets to be used for printing
     
     JetVarList = ['pt', 'eta', 'phi', 'btagCSV', 'id', 'mass']
     params['JetVarList'] = JetVarList
@@ -471,10 +492,12 @@ def getSamples(args):
             sys.exit()
    
 
-    if args.preselect:
-        outDir = os.path.join(targetDir, processingEra, processingTag, cmgTuples, args.skim, 'preselection',  args.skimLepton )
+    if args.skimPreselect:
+        outDir = os.path.join(
+            targetDir, processingEra, processingTag, cmgTuples, args.skim, 'skimPreselect', args.skimLepton
+            )
     else:
-        outDir = os.path.join(targetDir, processingEra, processingTag, cmgTuples, args.skim, args.skimLepton )
+        outDir = os.path.join(targetDir, processingEra, processingTag, cmgTuples, args.skim, args.skimLepton)
     
 
     # samples
@@ -1303,11 +1326,6 @@ def processJets(args, readTree, splitTree, saveTree, params):
             '\n ' + jetObj.printObjects(basJetList, JetVarList)
         logger.debug(printStr)
 
-    jets = selectionJets(readTree, basJetSel['pt'][2])
-    logger.debug(
-        "\n Selected jets with pT threshold %i GeV: %i jets \n %s \n", basJetSel['pt'][2], len(jets), pprint.pformat(jets)
-        )
-    
     # veto jets
     
     vetoJetSel = JetSel['veto']
@@ -1320,11 +1338,6 @@ def processJets(args, readTree, splitTree, saveTree, params):
             '\n ' + jetObj.printObjects(vetoJetList, JetVarList)
         logger.debug(printStr)
 
-    jets60 = selectionJets(readTree, vetoJetSel['pt'][2])
-    logger.debug(
-        "\n Selected jets with pT threshold %i GeV: %i jets \n %s \n", 
-        vetoJetSel['pt'][2], len(jets60), pprint.pformat(jets60)
-        )
     
     # ISR jets
 
@@ -1338,11 +1351,6 @@ def processJets(args, readTree, splitTree, saveTree, params):
             '\n ' + jetObj.printObjects(isrJetList, JetVarList)
         logger.debug(printStr)
 
-    jets110 = selectionJets(readTree, isrJetSel['pt'][2])
-    logger.debug(
-        "\n Selected jets with pT threshold %i GeV: %i jets \n %s \n", 
-        isrJetSel['pt'][2], len(jets110), pprint.pformat(jets110)
-        )
 
     # ISR jet, higher threshold for SR2
     
@@ -1357,10 +1365,6 @@ def processJets(args, readTree, splitTree, saveTree, params):
         logger.debug(printStr)
         
     
-    assert len(jets) == len(basJetList)
-    assert len(jets60) == len(vetoJetList)
-    assert len(jets110) == len(isrJetList)
-
     saveTree.nJet30 = len(basJetList)
     saveTree.nJet60 = len(vetoJetList)
     saveTree.nJet100 = -999
@@ -1395,17 +1399,9 @@ def processJets(args, readTree, splitTree, saveTree, params):
         dR_basJet_j1j2 = helpers.dR(basJetList[0], basJetList[1], jetObj)
         saveTree.dRJet1Jet2 = dR_basJet_j1j2
         
-        dRJet1Jet2_jets = hephyHelpers.deltaR(jets[0], jets[1]) 
-        if verbose:
-            print 'dR_basJet_j1j2 = ', dR_basJet_j1j2, ' dRJet1Jet2_jets = ', dRJet1Jet2_jets
-        
         dPhi_basJet_j1j2 = helpers.dPhi(basJetList[0], basJetList[1], jetObj)
         saveTree.deltaPhi30_j12 = dPhi_basJet_j1j2
-        
-        deltaPhi30_j12_jets = hephyHelpers.deltaPhi(jetObj.phi[basJetList[0]], jetObj.phi[basJetList[1]])
-        if verbose:
-            print 'dPhi_basJet_j1j2 = ', dPhi_basJet_j1j2, ' deltaPhi30_j12_jets = ', deltaPhi30_j12_jets
-        
+                
     else:
         saveTree.jet2Index = -1
 
@@ -1427,11 +1423,7 @@ def processJets(args, readTree, splitTree, saveTree, params):
     if saveTree.nJet60 > 1:
         dPhi_vetoJet_j1j2 = helpers.dPhi(vetoJetList[0], vetoJetList[1], jetObj)
         saveTree.deltaPhi60_j12 = dPhi_vetoJet_j1j2
-        
-        deltaPhi60_j12 = hephyHelpers.deltaPhi(jetObj.phi[vetoJetList[0]], jetObj.phi[vetoJetList[1]])
-        if verbose:
-            print 'dPhi_vetoJet_j1j2 = ', dPhi_vetoJet_j1j2, ' deltaPhi60_j12 = ', deltaPhi60_j12
-            
+                    
         # for backward compatibility
         saveTree.deltaPhi_j12 = saveTree.deltaPhi60_j12 
     else:
@@ -1487,37 +1479,12 @@ def processJets(args, readTree, splitTree, saveTree, params):
         "\n Number of b jets, pt separation at %f GeV: \n  soft: %i \n  hard: %i \n  total: %i \n",
         bJetSep[2], saveTree.nSoftBJetsCSV, saveTree.nHardBJetsCSV, saveTree.nBJetMediumCSV30
         )
-    
-
-    ### old-style b-jet selection TODO remove it
-    lightJetsCSV, bJetsCSV = cmgObjectSelection.splitListOfObjects('btagCSV', bJetSel['btag'][2], jets)
-    
-    # logger.debug("\n Selected CMVA b jets: %i jets \n %s \n", len(bJetsCMVA), pprint.pformat(bJetsCMVA))
-    logger.debug("\n Selected CSV b jets: %i jets \n %s \n", len(bJetsCSV), pprint.pformat(bJetsCSV))
-
-    bJets = filter(lambda j: j["btagCSV"] > bJetSel['btag'][2], jets)
-    
-    softBJetsCSV, hardBJetsCSV = cmgObjectSelection.splitListOfObjects('pt', bJetSep[2], bJets)
-    
-    logger.debug(
-        "\n Number of b jets - old style, pt separation at %f GeV: \n  soft: %i \n  hard: %i \n  total: %i \n",
-        bJetSep[2], len(softBJetsCSV), len(hardBJetsCSV), len(bJetsCSV)
-        )
-
-    assert nBJets == len(bJetsCSV)
-    assert nBSoftJets == len(softBJetsCSV)
-    assert nBHardJets == len(hardBJetsCSV)
-    
 
     # HT as sum of jets pT > 30 GeV
     
     ht_basJet = sum (jetObj.pt[ind] for ind in basJetList)
     saveTree.htJet30j = ht_basJet
-    
-    htJet30j = sum([x['pt'] for x in jets])
-    if verbose:
-        print 'ht_basJet = ', ht_basJet, ' htJet30j = ', htJet30j
-    
+        
     return saveTree, jetObj, basJetList
 
 def processLeptonJets(readTree, splitTree, saveTree, lepObj, muList, jetObj, basJetList):
@@ -1529,7 +1496,8 @@ def processLeptonJets(readTree, splitTree, saveTree, lepObj, muList, jetObj, bas
         invariant mass of 1, 2, 3 jets, other than the closest jet associated to lepton 
         
         Jets are considered having mass here, lepton have mass zero.
-
+        
+        TODO: implement correlations for electron and electron plus muon case.
     '''
     
     logger = logging.getLogger('cmgPostProcessing.processLeptonJets')
@@ -1910,7 +1878,7 @@ def cmgPostProcessing(argv=None):
     
     skim = args.skim
     skimLepton = args.skimLepton
-    preselect = args.preselect
+    skimPreselect = args.skimPreselect
     
     runSmallSample = args.runSmallSample
 
@@ -1986,7 +1954,7 @@ def cmgPostProcessing(argv=None):
 
     # skim condition 
     signalMasses = [mstop, mlsp] if args.processSignalScan else []
-    skimCond = eventsSkimPreselect(skim, skimLepton, preselect, params, signalMasses)
+    skimCond = eventsSkimPreselect(skim, skimLepton, skimPreselect, params, signalMasses)
     logger.info("\n Final skimming condition: \n  %s \n", skimCond)
     
     # loop over each sample, process all variables and fill the saved tree

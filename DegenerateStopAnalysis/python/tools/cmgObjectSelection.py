@@ -250,7 +250,7 @@ class Leaf:
 def objSelectorFunc(objSel):
     '''Object selection for cuts given in a dictionary.
         
-    The format of the dictionary is
+    The format of the dictionary for objSelector function is
     
         objSel = {
         'set_name': {
@@ -262,19 +262,23 @@ def objSelectorFunc(objSel):
     Multiple cut_name can be given, and multiple set_name can be defined.
     For operators, use the python standard module "operator" https://docs.python.org/2/library/operator.html
     
-    For cut_name with complex expression (e.g. hyb_iso) a function must be defined separately, see hyb_iso
-    implementation.
+    For cut_name with complex expression (e.g. hyb_iso) a dedicated function must be defined separately, see hyb_iso
+    implementation. The format of the dictionary depends on the deduicated function implementation.
     '''
         
-    def hybIso(readTree, obj, i, objSel):
+    def hybIso(readTree, obj, objIndex, objSel):
         ''' Hybrid isolation function for muons
         
         '''
         
+        objSelHybIso = objSel['hybIso']
+        
         if not (
-            (obj.pt[i] >= objSel['hybIso']['ptSwitch'] and obj.relIso04[i] < objSel['hybIso']['relIso'])
+            ((obj.pt[objIndex] >= objSelHybIso['ptSwitch']) and 
+             (obj.relIso04[objIndex] < objSelHybIso['relIso']))
             or 
-            (obj.pt[i] < objSel['hybIso']['ptSwitch']  and obj.relIso04[i] * obj.pt[i] < objSel['hybIso']['absIso'])
+            ((obj.pt[objIndex] < objSelHybIso['ptSwitch'])  and 
+             (obj.relIso04[objIndex] * obj.pt[objIndex] < objSelHybIso['absIso']))
             ):
             
             return False
@@ -282,105 +286,72 @@ def objSelectorFunc(objSel):
         return True 
 
 
-    def elWP(readTree, obj, i, objSel):
+    def elWP(readTree, obj, objIndex, objSel):
         ''' Supplementary electron selection for a working point.
         
         '''
         
-        # get once the values for the key, to speed up the code
+        # get once the values for the key and eta, to speed up the code
         elWPSel = objSel['elWP']
+        elWPSelVars = elWPSel['vars']
         
         elWP_eta_EB = elWPSel['eta_EB']
         elWP_eta_EE = elWPSel['eta_EE']
         
-        objEta = obj.eta[i]
+        objEta = obj.eta[objIndex]
         
-        # evaluate each cut, exit if False immediately
-        
-        if not (
-            (obj.hadronicOverEm[i] < elWPSel['hOverE_EB'] and objEta < elWP_eta_EB)
-            or 
-            (obj.hadronicOverEm[i] < elWPSel['hOverE_EE'] and (elWP_eta_EB <= objEta < elWP_eta_EE))
-            ):
+        def cut_EB_EE(varName, objIndex, elWPSelVars):
             
-            return False
-        
-        if not (
-            (abs(obj.dEtaScTrkIn[i]) < elWPSel['dEtaScTrkIn_EB'] and objEta < elWP_eta_EB)
-            or 
-            (abs(obj.dEtaScTrkIn[i]) < elWPSel['dEtaScTrkIn_EE'] and (elWP_eta_EB <= objEta < elWP_eta_EE))
-            ):
-            
-            return False
-        
-        
-        if not (
-            (abs(obj.dPhiScTrkIn[i]) < elWPSel['dPhiScTrkIn_EB'] and objEta < elWP_eta_EB)
-            or 
-            (abs(obj.dPhiScTrkIn[i]) < elWPSel['dPhiScTrkIn_EE'] and (elWP_eta_EB <= objEta < elWP_eta_EE))
-            ):
-            
-            return False
-        
-        if not (
-            (abs(obj.eInvMinusPInv[i]) < elWPSel['eInvMinusPInv_EB'] and objEta < elWP_eta_EB)
-            or 
-            (abs(obj.eInvMinusPInv[i]) < elWPSel['eInvMinusPInv_EE'] and (elWP_eta_EB <= objEta < elWP_eta_EE))
-            ):
-            
-            return False
-        
-        if not (
-            (abs(obj.dxy[i]) < elWPSel['dxy_EB'] and objEta < elWP_eta_EB)
-            or 
-            (abs(obj.dxy[i]) < elWPSel['dxy_EE'] and (elWP_eta_EB <= objEta < elWP_eta_EE))
-            ):
-            
-            return False
-        
-        if not (
-            (abs(obj.dz[i]) < elWPSel['dz_EB'] and objEta < elWP_eta_EB)
-            or 
-            (abs(obj.dz[i]) < elWPSel['dz_EE'] and (elWP_eta_EB <= objEta < elWP_eta_EE))
-            ):
-            
-            return False
-        
-        if not (
-            (obj.lostHits[i] < elWPSel['lostHits_EB'] and objEta < elWP_eta_EB)
-            or 
-            (obj.lostHits[i] < elWPSel['lostHits_EE'] and (elWP_eta_EB <= objEta < elWP_eta_EE))
-            ):
-            
-            return False
+            elWPSelVars_var = elWPSelVars[varName]
+            opVar = elWPSelVars_var['opVar']
+            opCut = elWPSelVars_var['opCut']
 
+            varValue = getattr(obj, varName)[objIndex] 
+            if opVar is not None:
+                varValue = opVar(varValue)
+                        
+            if not (
+                ((opCut(varValue, elWPSelVars_var['EB'])) and (objEta < elWP_eta_EB))
+                or 
+                ((opCut(varValue, elWPSelVars_var['EE'])) and (elWP_eta_EB <= objEta < elWP_eta_EE))
+                ):
+                
+                return False
+            
+            # 
+            return True
+               
+        # evaluate each cut, exit if False immediately
+        for var in elWPSelVars:
+            return cut_EB_EE(var, objIndex, elWPSelVars)
+        
         #
         return True
      
         
-    def objSelector(readTree, obj, i):
+    def objSelector(readTree, obj, objIndex):
         
         selector = True
             
         for key, keyValue in objSel.iteritems(): 
             
             if key == 'hybIso':
-                selector &= hybIso(readTree, obj, i, objSel)
+                selector &= hybIso(readTree, obj, objIndex, objSel)
             elif key == 'elWP':
-                selector &= elWP(readTree, obj, i, objSel)                
+                selector &= elWP(readTree, obj, objIndex, objSel)                
             else:
-                varValue = getattr(obj, keyValue[0])[i]
+                varValue = getattr(obj, keyValue[0])[objIndex]
             
                 # operators with two arguments
-                operat = keyValue[1]
+                opCut = keyValue[1]
                 varCut = keyValue[2]
             
                 if len(keyValue) > 3:
-                    # apply varOperat operator on variable value
-                    varOperat = keyValue[3]
-                    selector &= operat(varOperat(varValue), varCut)
+                    # apply opVar operator on variable value
+                    opVar = keyValue[3]
+                    selector &= opCut(opVar(varValue), varCut)
                 else:
-                    selector &= operat(varValue, varCut)
+                    selector &= opCut(varValue, varCut)
                     
             #
             if not selector:

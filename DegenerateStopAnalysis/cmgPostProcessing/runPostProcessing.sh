@@ -1,7 +1,7 @@
 #PROC_TAG=mAODv2_v4_SMSScan_v1
 #PROC_TAG=7412pass2_SMSScan_v3
 PROC_TAG=7412pass2_SMSScan_PUTTHISINV3
-preselect=true
+skimPreselect=true
 overwrite=true
 
 
@@ -111,7 +111,7 @@ done
 echo ------------------------------------------------------------------
 
 echo Processing TAG: $PROC_TAG
-echo Preselect: $preselect
+echo Preselect: $skimPreselect
 echo
 echo
 
@@ -119,9 +119,9 @@ echo
 
 echo ------------------------------------------------------------------
 
-if $preselect
+if $skimPreselect
 then
-    PRESEL="--preselect"
+    PRESEL="--skimPreselect"
 fi
 
 if $overwrite

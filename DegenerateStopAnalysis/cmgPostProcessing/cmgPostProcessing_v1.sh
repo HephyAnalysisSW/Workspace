@@ -21,10 +21,9 @@ fi
 if [[ ${CMSSW_ACTION} == "R" ]]; then
     
     cd ${CMSSW_BASE}/src/Workspace/DegenerateStopAnalysis/cmgPostProcessing
-    
-    python cmgPostProcessing_v1.py --logLevel=INFO --leptonSelection='inc' \
-        --skim='' --processSamples=${CMG_SAMPLE}
-
+            
+    python cmgPostProcessing_v1.py --logLevel=INFO --processSamples=${CMG_SAMPLE} --processingTag='test' \
+        --skim='' --skimLepton='inc' --parameterSet='syncLip'  
 fi
 
 exit 0
