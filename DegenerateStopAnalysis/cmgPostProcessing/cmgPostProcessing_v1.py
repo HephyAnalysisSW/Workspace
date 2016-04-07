@@ -868,13 +868,21 @@ def rwTreeClasses(sample, isample, args, temporaryDir, params={} ):
     
     readVariables_DATAMC.extend(['met_pt/F', 'met_phi/F'])
     aliases_DATAMC.extend([ 'met:met_pt', 'metPhi:met_phi'])
-    newVariables_DATAMC.extend(['weight/F'])
     
     readVectors_DATAMC = appendVectors(params, 'vectors_DATAMC_List', 'read', readVectors_DATAMC)
                         
     newVariables_DATAMC.extend([
-        'nBJetMediumCSV30/I', 'nSoftBJetsCSV/F', 'nHardBJetsCSV/F',  
-        'nJet30/I','htJet30j/F','nJet60/I','nJet100/I', 'nJet110/I','nJet325/I',
+        'Flag_Veto_Event_List/I/1',
+        ])
+        
+    newVariables_DATAMC.extend([
+        'weight/F/-999.',
+        'ht_basJet/F/-999.'
+        ])
+    
+    newVariables_DATAMC.extend([
+        'nBasJet/I/-1', 'nVetoJet/I/-1', 'nIsrJet/I/-1', 'nIsrHJet/I/-1',
+        'nBJets/I/-1', 'nBSoftJets/I/-1', 'nBHardJets/I/-1',
         ])
     
     newVariables_DATAMC.extend([
@@ -883,12 +891,7 @@ def rwTreeClasses(sample, isample, args, temporaryDir, params={} ):
         ])
     
     newVariables_DATAMC.extend([
-        "Flag_Veto_Event_List/I/1",
-
-        ])
-        
-    newVariables_DATAMC.extend([
-        'deltaPhi_j12/F/-999.', 'dRJet1Jet2/F/-999.','deltaPhi30_j12/F/-999.', 'deltaPhi60_j12/F/-999.',
+        'basJet_dR_j1j2/F/-999.', 'basJet_dPhi_j1j2/F/-999.', 'vetoJet_dPhi_j1j2/F/-999.',
         ])
     
     newVariables_DATAMC.extend([
@@ -1356,7 +1359,7 @@ def processJets(args, readTree, splitTree, saveTree, params):
     basJetPassFailList = jetObj.getPassFailList(readTree, basJetSelector)
     basJetList = jetObj.getSelectionIndexList(readTree, basJetSelector, basJetPassFailList)
     
-    saveTree.nJet30 = len(basJetList)
+    saveTree.nBasJet = len(basJetList)
     for ind, val in enumerate(basJetList):
         saveTree.IndexJet_basJet[ind] = val
 
@@ -1366,7 +1369,7 @@ def processJets(args, readTree, splitTree, saveTree, params):
             pprint.pformat(basJetSel) + \
             '\n ' + jetObj.printObjects(basJetList, JetVarList) + \
             "\n saveTree.nBasJet = %i \n  Index list: " + pprint.pformat(basJetList) + "\n "
-        logger.debug(printStr, saveTree.nJet30)
+        logger.debug(printStr, saveTree.nBasJet)
 
     # veto jets
     
@@ -1374,7 +1377,7 @@ def processJets(args, readTree, splitTree, saveTree, params):
     vetoJetSelector = cmgObjectSelection.objSelectorFunc(vetoJetSel)
     vetoJetList = jetObj.getSelectionIndexList(readTree, vetoJetSelector, basJetPassFailList)
 
-    saveTree.nJet60 = len(vetoJetList)
+    saveTree.nVetoJet = len(vetoJetList)
     for ind, val in enumerate(vetoJetList):
         saveTree.IndexJet_vetoJet[ind] = val
 
@@ -1383,7 +1386,7 @@ def processJets(args, readTree, splitTree, saveTree, params):
             pprint.pformat(vetoJetSel) + \
             '\n ' + jetObj.printObjects(vetoJetList, JetVarList) + \
             "\n saveTree.nVetoJet = %i \n  Index list: " + pprint.pformat(vetoJetList) + "\n "
-        logger.debug(printStr, saveTree.nJet60)
+        logger.debug(printStr, saveTree.nVetoJet)
 
     
     # ISR jets
@@ -1392,7 +1395,7 @@ def processJets(args, readTree, splitTree, saveTree, params):
     isrJetSelector = cmgObjectSelection.objSelectorFunc(isrJetSel)
     isrJetList = jetObj.getSelectionIndexList(readTree, isrJetSelector, basJetPassFailList)
 
-    saveTree.nJet110 = len(isrJetList)
+    saveTree.nIsrJet = len(isrJetList)
     for ind, val in enumerate(isrJetList):
         saveTree.IndexJet_isrJet[ind] = val
 
@@ -1401,7 +1404,7 @@ def processJets(args, readTree, splitTree, saveTree, params):
             pprint.pformat(isrJetSel) + \
             '\n ' + jetObj.printObjects(isrJetList, JetVarList) + \
             "\n saveTree.nIsrJet = %i \n  Index list: " + pprint.pformat(isrJetList) + "\n "
-        logger.debug(printStr, saveTree.nJet110)
+        logger.debug(printStr, saveTree.nIsrJet)
 
 
     # ISR jet, higher threshold for SR2
@@ -1410,7 +1413,7 @@ def processJets(args, readTree, splitTree, saveTree, params):
     isrHJetSelector = cmgObjectSelection.objSelectorFunc(isrHJetSel)
     isrHJetList = jetObj.getSelectionIndexList(readTree, isrHJetSelector, basJetPassFailList)
     
-    saveTree.nJet325 = len(isrHJetList)
+    saveTree.nIsrHJet = len(isrHJetList)
     for ind, val in enumerate(isrHJetList):
         saveTree.IndexJet_isrHJet[ind] = val
 
@@ -1419,45 +1422,41 @@ def processJets(args, readTree, splitTree, saveTree, params):
             pprint.pformat(isrHJetSel) + \
             '\n ' + jetObj.printObjects(isrHJetList, JetVarList) + \
             "\n saveTree.nIsrHJet = %i \n  Index list: " + pprint.pformat(isrHJetList) + "\n "
-        logger.debug(printStr, saveTree.nJet325)
+        logger.debug(printStr, saveTree.nIsrHJet)
         
     
-    saveTree.nJet100 = -999
-
     # save some additional jet quantities
     
     if len(basJetList) > 1:
         basJet_dR_j1j2 = helpers.dR(basJetList[0], basJetList[1], jetObj)
-        saveTree.dRJet1Jet2 = basJet_dR_j1j2
+        saveTree.basJet_dR_j1j2 = basJet_dR_j1j2
         
         basJet_dPhi_j1j2 = helpers.dPhi(basJetList[0], basJetList[1], jetObj)
-        saveTree.deltaPhi30_j12 = basJet_dPhi_j1j2
+        saveTree.basJet_dPhi_j1j2 = basJet_dPhi_j1j2
                 
     else:
-        saveTree.dRJet1Jet2 = -999.
-        saveTree.deltaPhi30_j12 = -999.
+        saveTree.basJet_dR_j1j2 = -999.
+        saveTree.basJet_dPhi_j1j2 = -999.
                 
         
     if len(vetoJetList) > 1:
         vetoJet_dPhi_j1j2 = helpers.dPhi(vetoJetList[0], vetoJetList[1], jetObj)
-        saveTree.deltaPhi60_j12 = vetoJet_dPhi_j1j2
+        saveTree.vetoJet_dPhi_j1j2 = vetoJet_dPhi_j1j2
                     
-        # for backward compatibility
-        saveTree.deltaPhi_j12 = saveTree.deltaPhi60_j12 
     else:
-        saveTree.deltaPhi60_j12 = -999.
-        saveTree.deltaPhi_j12 = -999. 
+        saveTree.vetoJet_dPhi_j1j2 = -999.
         
 
     logger.debug(
         "\n Number of jets: \n  basic jets: %i \n  veto jets: %i " + \
         "\n  isr jet: %i \n  isr high Jet: %i \n" +\
         "\n Jet separation: " + \
-        "\n   dRJet1Jet2 = %f \n   deltaPhi_j12 = %f \n" + \
-        "\n   deltaPhi30_j12 = %f \n   deltaPhi60_j12 = %f \n" ,
-        saveTree.nJet30, saveTree.nJet60, saveTree.nJet110, saveTree.nJet325,
-        saveTree.dRJet1Jet2, saveTree.deltaPhi_j12,
-        saveTree.deltaPhi30_j12, saveTree.deltaPhi60_j12
+        "\n   basJet_dR_j1j2 = %f \n   basJet_dPhi_j1j2 = %f \n" + \
+        "\n   vetoJet_dPhi_j1j2 = %f \n" ,
+        saveTree.nBasJet, saveTree.nVetoJet, 
+        saveTree.nIsrJet, saveTree.nIsrHJet,
+        saveTree.basJet_dR_j1j2, saveTree.basJet_dPhi_j1j2,
+        saveTree.vetoJet_dPhi_j1j2
         )
      
     # b jet selection: bJet, bSoftJet and bHardJet are sorted after pt value, like other jets
@@ -1475,7 +1474,7 @@ def processJets(args, readTree, splitTree, saveTree, params):
     bSoftJetList, bHardJetList = jetObj.splitIndexList('pt', bJetSepPtSoftHard, bJetList)
     
     nBJets = len(bJetList)
-    saveTree.nBJetMediumCSV30 = nBJets
+    saveTree.nBJets = nBJets
     for ind, val in enumerate(bJetList):
         saveTree.IndexJet_bJet[ind] = val
 
@@ -1483,12 +1482,12 @@ def processJets(args, readTree, splitTree, saveTree, params):
         saveTree.IndexJet_bJetDiscSort[ind] = val
 
     nBSoftJets = len(bSoftJetList)
-    saveTree.nSoftBJetsCSV = nBSoftJets
+    saveTree.nBSoftJets = nBSoftJets
     for ind, val in enumerate(bSoftJetList):
         saveTree.IndexJet_bSoftJet[ind] = val
 
     nBHardJets = len(bHardJetList)
-    saveTree.nHardBJetsCSV = nBHardJets
+    saveTree.nBHardJets = nBHardJets
     for ind, val in enumerate(bHardJetList):
         saveTree.IndexJet_bHardJet[ind] = val
     
@@ -1497,28 +1496,28 @@ def processJets(args, readTree, splitTree, saveTree, params):
             pprint.pformat(bJetSel) + \
             '\n ' + jetObj.printObjects(bJetList, JetVarList) + \
             "\n saveTree.nBJet = %i \n  Index list: " + pprint.pformat(bJetList) + "\n "
-        logger.debug(printStr, saveTree.nBJetMediumCSV30)
+        logger.debug(printStr, saveTree.nBJets)
         
         printStr = "\n  " + objBranches + " b jet selector (from basic jets), sorted after jet b discriminant \n " + \
             "\n saveTree.nBJet = %i \n  Index list: " + pprint.pformat(bJetDiscSortList) + "\n "
-        logger.debug(printStr, saveTree.nBJetMediumCSV30)
+        logger.debug(printStr, saveTree.nBJets)
 
         printStr = "\n  " + objBranches + " b soft jet selector, sorted after jet pt \n " + \
             '\n pt soft/hard threshold: %f ' + \
             '\n ' + jetObj.printObjects(bSoftJetList, JetVarList) + \
             "\n saveTree.nSoftBJets = %i \n  Index list: " + pprint.pformat(bSoftJetList) + "\n "
-        logger.debug(printStr, bJetSepPtSoftHard, saveTree.nSoftBJetsCSV)
+        logger.debug(printStr, bJetSepPtSoftHard, saveTree.nBSoftJets)
 
         printStr = "\n  " + objBranches + " b hard jet selector, sorted after jet pt \n " + \
             '\n pt soft/hard threshold: %f ' + \
             '\n ' + jetObj.printObjects(bHardJetList, JetVarList) + \
             "\n saveTree.nHardBJets = %i \n  Index list: " + pprint.pformat(bHardJetList) + "\n "
-        logger.debug(printStr, bJetSepPtSoftHard, saveTree.nHardBJetsCSV)
+        logger.debug(printStr, bJetSepPtSoftHard, saveTree.nBHardJets)
 
     # HT as sum of basic jets
     
     ht_basJet = sum (jetObj.pt[ind] for ind in basJetList)
-    saveTree.htJet30j = ht_basJet
+    saveTree.ht_basJet = ht_basJet
     
     logger.debug(
         "\n Missing transverse energy: \n  met_pt =  %f GeV \n  met_phi = %f \n" + \
@@ -1581,12 +1580,12 @@ def processLeptonJets(
          
         basJet_obj_invMass_3j = -999.
               
-        if saveTree.nJet30 == 1: 
+        if saveTree.nBasJet == 1: 
             basJet_obj_invMass_3j = 0.
-        elif saveTree.nJet30 == 2:
+        elif saveTree.nBasJet == 2:
             jetList = jetObj.getObjDictList(varList, [indexList[0]])
             basJet_obj_invMass_3j = helpers.invMass(jetList)
-        elif saveTree.nJet30 == 3:
+        elif saveTree.nBasJet == 3:
             jetList = jetObj.getObjDictList(varList, ([indexList[i] for i in range(2)]))
             basJet_obj_invMass_3j = helpers.invMass(jetList)
         else:
@@ -1602,7 +1601,7 @@ def processLeptonJets(
         return basJet_obj_dR_j1obj1, basJet_obj_invMass_obj1jmindR, basJet_obj_invMass_3j, bJet_obj_dR_jHdobj1
         
     
-    if (lepObj is not None) and (saveTree.nJet30 > 0):
+    if (lepObj is not None) and (saveTree.nBasJet > 0):
         if (len(muList) > 0):
             basJet_mu_dR_j1mu1, basJet_mu_invMass_mu1jmindR, basJet_mu_invMass_3j, bJet_mu_dR_jHdmu1 = \
                 variablesLeptonJets (
