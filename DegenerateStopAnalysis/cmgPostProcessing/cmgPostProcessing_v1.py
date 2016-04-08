@@ -225,7 +225,7 @@ def getParameterSet(args):
                 'tightId/I', 'mediumMuonId/I',
                 ],
             'el': [
-                'SPRING15_25ns_v1/I', 'mvaIdPhys14/F', 'mvaIdSpring15/F',
+                'SPRING15_25ns_v1/I', 'mvaIdSpring15/F',
                 'hadronicOverEm/F',
                 'dEtaScTrkIn/F', 'dPhiScTrkIn/F', 'eInvMinusPInv/F', 'lostHits/I',
                 'convVeto/I',
@@ -242,8 +242,8 @@ def getParameterSet(args):
             'mu': [],
             'el': [],
             'common': [        
-                'q80/F', 'cosLMet/F',
-                'lt/F', 'dPhi_Wl/F',
+                'q80/F', 'cosdPhiLepMet/F',
+                'lt/F', 'dPhiLepW/F',
                 'mt/F',
                 'absIso/F',
                 ],
@@ -882,12 +882,11 @@ def rwTreeClasses(sample, isample, args, temporaryDir, params={} ):
     
     newVariables_DATAMC.extend([
         'nBasJet/I/-1', 'nVetoJet/I/-1', 'nIsrJet/I/-1', 'nIsrHJet/I/-1',
-        'nBJets/I/-1', 'nBSoftJets/I/-1', 'nBHardJets/I/-1',
+        'nBJet/I/-1', 'nBSoftJet/I/-1', 'nBHardJet/I/-1',
         ])
     
     newVariables_DATAMC.extend([
-        "nMuons/I/-1", "nElectrons/I/-1", "nLeptons/I/-1",
-        'singleMuonic/I/-1', 'singleElectronic/I/-1', 'singleLeptonic/I/-1', 
+        "nMuon/I/-1", "nElectron/I/-1", "nLepton/I/-1",
         ])
     
     newVariables_DATAMC.extend([
@@ -1239,12 +1238,12 @@ def processLeptons(readTree, splitTree, saveTree, params):
         lep_relIso04 = getattr(lepObj, 'relIso04')[lepIndex]
 
         q80 = 1 - 80 ** 2 / (2 * lep_pt * readTree.met_pt)
-        cosLMet = math.cos(lep_phi - readTree.met_phi)
+        cosdPhiLepMet = math.cos(lep_phi - readTree.met_phi)
     
-        mt = math.sqrt(2 * lep_pt * readTree.met_pt * (1 - cosLMet))
+        mt = math.sqrt(2 * lep_pt * readTree.met_pt * (1 - cosdPhiLepMet))
         lt = readTree.met_pt + lep_pt
   
-        dPhi_Wl = math.acos(
+        dPhiLepW = math.acos(
             (lep_pt + readTree.met_pt * math.cos(lep_phi - readTree.met_phi)) / 
             (math.sqrt(lep_pt ** 2 + readTree.met_pt ** 2 + 
                       2 * readTree.met_pt * lep_pt * math.cos(lep_phi - readTree.met_phi))
@@ -1254,10 +1253,10 @@ def processLeptons(readTree, splitTree, saveTree, params):
         absIso = lep_relIso04 * lep_pt
     
         saveTree.LepGood_q80[lepIndex] = q80
-        saveTree.LepGood_cosLMet[lepIndex] = cosLMet
+        saveTree.LepGood_cosdPhiLepMet[lepIndex] = cosdPhiLepMet
         saveTree.LepGood_mt[lepIndex] = mt
         saveTree.LepGood_lt[lepIndex] = lt
-        saveTree.LepGood_dPhi_Wl[lepIndex] = dPhi_Wl
+        saveTree.LepGood_dPhiLepW[lepIndex] = dPhiLepW
         saveTree.LepGood_absIso[lepIndex] = absIso 
         
               
@@ -1286,41 +1285,36 @@ def processLeptons(readTree, splitTree, saveTree, params):
     sumElMuList = muList + elList
     lepList = lepObj.sort('pt', sumElMuList)
  
-    saveTree.nMuons = len(muList)
+    saveTree.nMuon = len(muList)
     for ind, val in enumerate(muList):
         saveTree.IndexLepton_mu[ind] = val
         
-    saveTree.nElectrons = len(elList)
+    saveTree.nElectron = len(elList)
     for ind, val in enumerate(elList):
         saveTree.IndexLepton_el[ind] = val
 
-    saveTree.nLeptons = len(lepList)
+    saveTree.nLepton = len(lepList)
     for ind, val in enumerate(lepList):
         saveTree.IndexLepton_lep[ind] = val
 
-    saveTree.singleLeptonic = (saveTree.nLeptons == 1)
-    saveTree.singleMuonic = (saveTree.nLeptons == 1)
-    saveTree.singleElectronic = (saveTree.nLeptons == 1)
-
-    
     if logger.isEnabledFor(logging.DEBUG):
 
         printStr = "\n  " + objBranches + " muon selector \n " + \
             pprint.pformat(LepSel['mu']) + \
             '\n ' + lepObj.printObjects(muList, LepVarList['mu']) + \
-            "\n saveTree.nMuons = %i \n  Index list: " + pprint.pformat(muList) + "\n "
-        logger.debug(printStr, saveTree.nMuons)
+            "\n saveTree.nMuon = %i \n  Index list: " + pprint.pformat(muList) + "\n "
+        logger.debug(printStr, saveTree.nMuon)
 
         printStr = "\n  " + objBranches + " electron selector \n " + \
             pprint.pformat(LepSel['el']) + \
             '\n ' + lepObj.printObjects(elList, LepVarList['el']) + \
-            "\n saveTree.nElectrons = %i \n  Index list: " + pprint.pformat(elList) + "\n "
-        logger.debug(printStr, saveTree.nElectrons)
+            "\n saveTree.nElectron = %i \n  Index list: " + pprint.pformat(elList) + "\n "
+        logger.debug(printStr, saveTree.nElectron)
 
         printStr = "\n  " + objBranches + " lepton (mu + el) selection \n " + \
             '\n ' + lepObj.printObjects(lepList, LepVarList['lep']) + \
-            "\n saveTree.nLeptons = %i \n  Index list:  " + pprint.pformat(lepList) + "\n "        
-        logger.debug(printStr, saveTree.nLeptons)
+            "\n saveTree.nLepton = %i \n  Index list:  " + pprint.pformat(lepList) + "\n "        
+        logger.debug(printStr, saveTree.nLepton)
         
     #
     return saveTree, lepObj, muList, elList, lepList
