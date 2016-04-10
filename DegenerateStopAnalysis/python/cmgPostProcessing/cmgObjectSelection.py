@@ -272,12 +272,20 @@ def objSelectorFunc(objSel):
         
         objSelHybIso = objSel['hybIso']
         
+        objSel_ptSwitch = objSelHybIso['ptSwitch']
+        
+        objSel_relIso_cut = objSelHybIso['relIso']['cut']
+        objSel_relIso_type = objSelHybIso['relIso']['type']
+        
+        objSel_absIso = objSelHybIso['absIso']
+        
+        obj_pt = obj.pt[objIndex]
+        obj_reIso = getattr(obj, objSel_relIso_type)[objIndex]
+        
         if not (
-            ((obj.pt[objIndex] >= objSelHybIso['ptSwitch']) and 
-             (obj.relIso04[objIndex] < objSelHybIso['relIso']))
+            ((obj_pt >= objSel_ptSwitch) and (obj_reIso < objSel_relIso_cut))
             or 
-            ((obj.pt[objIndex] < objSelHybIso['ptSwitch'])  and 
-             (obj.relIso04[objIndex] * obj.pt[objIndex] < objSelHybIso['absIso']))
+            ((obj_pt < objSel_ptSwitch)  and (obj_reIso * obj_pt < objSel_absIso))
             ):
             
             return False

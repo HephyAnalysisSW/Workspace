@@ -29,13 +29,16 @@ dir_cmgPostProcessing_Oct1 = '/data/nrad/cmgTuples/postProcessed_Spring15_vasile
 dir_cmgPostProcessing_v0 = \
     '/afs/hephy.at/user/v/vghete/vghete01/cmgTuples/postProcessed_mAODv2/v0/RunIISpring15DR74_25ns/inc'
 
+dir_cmgPostProcessing_final = \
+    '/afs/hephy.at/user/v/vghete/vghete01/cmgTuples/postProcessed_mAODv2/final/RunIISpring15DR74_25ns/inc'
+    
 dir_cmgPostProcessing_7412pass2_v4_022116_sync_v0 = \
     '/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/7412pass2_v4_022116_sync_v0/RunIISpring15DR74_25ns/inc'
 
 
 # set the actual ntuple directory 
 #
-ntuple_directory = dir_cmgPostProcessing_7412pass2_v4_022116_sync_v0
+ntuple_directory = dir_cmgPostProcessing_final
 
 
 # definition of samples

@@ -239,6 +239,22 @@ def getVariableType(var):
     return ''
 
 
+def getVariableNameList(rootVarList):
+    """ Return a list of variable names for a list of root variables fiven
+        in the format 'name[size]/type/initializer' or 'name/type/initializer'
+        
+    The initializer could be omitted. 
+    """
+    varList = []
+    for var in rootVarList:
+        varName = getVariableName(var)
+        varList.append(varName)
+            
+    # 
+    return varList
+
+  
+
 def variablesStruct(variableList, structName='Variables'): 
     """ Produce a C structure for a variable list, having the correct ROOT type.
     

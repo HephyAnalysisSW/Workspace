@@ -46,7 +46,7 @@ if [[ ${CMSSW_ACTION} == "CB" ]]; then
 
     # add your mirror
     git remote add cmg-hephy https://github.com/HephySusySW/cmg-cmssw.git -f \
-        -t CMGTools-from-CMSSW_7_4_12_LocalDevelopmentsPass2
+        -t CMGTools-from-CMSSW_7_4_12_LocalDevelopmentsPass2_DegStop
     git fetch cmg-hephy
 
     # configure the sparse checkout
@@ -67,8 +67,8 @@ if [[ ${CMSSW_ACTION} == "CB" ]]; then
 
     
     # checkout the CMGTools branch of the release
-    git checkout -b CMGTools-from-CMSSW_7_4_12_LocalDevelopmentsPass2 \
-        cmg-hephy/CMGTools-from-CMSSW_7_4_12_LocalDevelopmentsPass2
+    git checkout -b CMGTools-from-CMSSW_7_4_12_LocalDevelopmentsPass2_DegStop \
+        cmg-hephy/CMGTools-from-CMSSW_7_4_12_LocalDevelopmentsPass2_DegStop
    
     # create also the heppy branch
     git branch heppy_74X cmg-central/heppy_74X
