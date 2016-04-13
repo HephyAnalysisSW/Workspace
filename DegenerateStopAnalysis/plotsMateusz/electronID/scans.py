@@ -5,13 +5,8 @@
 import os, sys
 import argparse
 from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
-
-from Workspace.DegenerateStopAnalysis.cmgTuplesPostProcessed_mAODv2 import cmgTuplesPostProcessed
-from Workspace.DegenerateStopAnalysis.navidTools.getSamples_PP_mAODv2_7412pass2_scan import getSamples
-
-mc_path     = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/7412pass2_SMSScan_v3/RunIISpring15DR74_25ns"
-signal_path = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/7412pass2_SMSScan_v3/RunIISpring15DR74_25ns"
-data_path   = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/7412pass2_SMSScan_v3/Data_25ns"
+from Workspace.DegenerateStopAnalysis.toolsMateusz.cmgTuplesPostProcessed_mAODv2 import cmgTuplesPostProcessed
+from Workspace.DegenerateStopAnalysis.toolsMateusz.getSamples_PP_mAODv2_7412pass2_scan import getSamples
 
 #Input options
 parser = argparse.ArgumentParser(description="Input options")
@@ -38,15 +33,8 @@ officialSignals = ["s300_290", "s300_270", "s300_240"]
 backgrounds1 = ["w", "tt"]
 backgrounds2 = ["z", "qcd"]
 
-samples = privateSignals + officialSignals + backgrounds1
+samples = officialSignals + backgrounds1 #privateSignals
 #sampleList = privateSignals + backgrounds1
-
-#if scan == "standard" or scan == "nMinus1":
-#   samples += backgrounds2
-#   samplesList += backgrounds2
-
-#cmgPP = cmgTuplesPostProcessed(mc_path, signal_path, data_path)
-#allSamples = getSamples(sampleList=samplesList, scan=True, useHT=False, cmgPP=cmgPP, getData=False)
 
 #Electron ID Variables
 variables = ["sigmaEtaEta", "hOverE", "ooEmooP", "d0", "dz", "MissingHits", "convVeto", "dEta", "dPhi"]
