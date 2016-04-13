@@ -5,33 +5,32 @@
 import ROOT
 import os, sys
 import Workspace.DegenerateStopAnalysis.toolsMateusz.ROOToptions
-#from Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_7412pass2 import * #data_path = "/data/nrad/cmgTuples/RunII/7412pass2_v4/RunIISpring15xminiAODv2"
-#from Workspace.DegenerateStopAnalysis.toolsMateusz.getSamples_PP_mAODv2_7412pass2 import * #MC_path = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/7412pass2_v4_012016_v2/RunIISpring15DR74_25ns" SIGNAL_path = "/afs/hephy.at/dat
-from Workspace.DegenerateStopAnalysis.cmgTuplesPostProcessed_mAODv2 import cmgTuplesPostProcessed
-from Workspace.DegenerateStopAnalysis.navidTools.getSamples_PP_mAODv2_7412pass2_scan import getSamples
+from Workspace.DegenerateStopAnalysis.toolsMateusz.cmgTuplesPostProcessed_mAODv2 import cmgTuplesPostProcessed
+from Workspace.DegenerateStopAnalysis.toolsMateusz.getSamples_PP_mAODv2_7412pass2_scan import getSamples
 from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
+from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
 from array import array
 from math import pi, sqrt #cos, sin, sinh, log
-import argparse 
-
-mc_path     = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/7412pass2_SMSScan_v3/RunIISpring15DR74_25ns"
-signal_path = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/7412pass2_SMSScan_v3/RunIISpring15DR74_25ns"
-data_path   = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/7412pass2_SMSScan_v3/Data_25ns"
-
-cmgPP = cmgTuplesPostProcessed(mc_path, signal_path, data_path)
+import argparse
 
 #Samples
 privateSignals = ["s10FS", "s30", "s30FS", "s60FS", "t2tt30FS"]
-backgrounds=["w","tt","z","qcd"]
-samplesList = privateSignals + backgrounds
-samples = getSamples(sampleList=samplesList, scan=True, useHT=False, cmgPP=cmgPP, getData=False)
-officialSignals = [s for s in samples if samples[s]['isSignal'] and not samples[s]['isData'] and s not in privateSignals and s not in backgrounds]
-signals = privateSignals + officialSignals
+backgrounds=["w","tt", "z","qcd"]
+
+samplesList = backgrounds # + privateSignals
+samples = getSamples(sampleList=samplesList, scan=True, useHT=False, getData=False)#, cmgPP=cmgPP) 
+
+officialSignals = ["s300_290", "s300_270", "s300_240"] #FIXME: crosscheck if these are in allOfficialSignals
+
+allOfficialSignals = samples.massScanList()
+#allOfficialSignals = [s for s in samples if samples[s]['isSignal'] and not samples[s]['isData'] and s not in privateSignals and s not in backgrounds] 
+allSignals = privateSignals + allOfficialSignals
+allSamples = allSignals + backgrounds
 
 #Input options
 parser = argparse.ArgumentParser(description="Input options")
 parser.add_argument("--presel", dest="presel",  help="Add Preselection", type=int, default=1) # applies preselection
-parser.add_argument("--sample", dest="sample",  help="Sample", type=str, default="s30FS")
+parser.add_argument("--sample", dest="sample",  help="Sample", type=str, default="s300_270")
 parser.add_argument("--mvaWPs", dest="mvaWPs",  help="Add MVA WPs", type=int, default=1) # includes MVA WPs
 parser.add_argument("--save", dest="save",  help="Toggle Save", type=int, default=1)
 parser.add_argument("-b", dest="batch",  help="Batch Mode", action="store_true", default=False)
