@@ -17,29 +17,30 @@ def tryGluLSP(mass_dict, mglu, mlsp, def_val = 0):
         mass_dict[mglu][mlsp]=def_val
 
 
+VV_label = "WZ"    ###can be WW , WZ , ZZ
+
 samples = [T5qqqqVV_mGluino_600To675_mLSP_1to550, T5qqqqVV_mGluino_700To775_mLSP_1To650, T5qqqqVV_mGluino_800To975_mLSP_1To850, T5qqqqVV_mGluino_1000To1075_mLSP_1To950,\
            T5qqqqVV_mGluino_1100To1175_mLSP_1to1050, T5qqqqVV_mGluino_1200To1275_mLSP_1to1150, T5qqqqVV_mGluino_1300To1375_mLSP_1to1250, T5qqqqVV_mGluino_1400To1550_mLSP_1To1275,\
             T5qqqqVV_mGluino_1600To1750_mLSP_1To950  ]
 #samples = [T5qqqqVV_mGluino_600To675_mLSP_1to550,T5qqqqVV_mGluino_700To775_mLSP_1To650]
 pickleDir = '/data/'+username+'/Spring15/25ns/'
 
-VV_label = "WZ"    ###can be WW , WZ , ZZ
-
-###T5qqqqWW
-if VV_label == "WW" :
-  print "I am at WW"
-  cut_common = "Sum$(abs(GenPart_pdgId)==1000022&&abs(GenPart_motherId)==1000024&&abs(GenPart_grandmotherId)==1000021)==2&&(Sum$(abs(GenPart_pdgId)==24)==2)"
-###T5qqqqWZ
-if VV_label == "WZ" :
-  print "I am at WZ"
-  cut_common = "Sum$(abs(GenPart_pdgId)==1000022&&abs(GenPart_motherId)==1000024&&abs(GenPart_grandmotherId)==1000021)==1&&Sum$(abs(GenPart_pdgId)==1000022&&abs(GenPart_motherId)==1000023&&abs(GenPart_grandmotherId)==1000021)==1&&Sum$(abs(GenPart_pdgId)==23)==1&&Sum$(abs(GenPart_pdgId)==24)==1&&(Sum$(abs(GenPart_pdgId)==23)+Sum$(abs(GenPart_pdgId)==24))==2"
-###T5qqqqZZ
-if VV_label == "ZZ" :
-  print "I am at ZZ"
-  cut_common = "Sum$(abs(GenPart_pdgId)==1000022&&abs(GenPart_motherId)==1000023&&abs(GenPart_grandmotherId)==1000021)==2&&(Sum$(abs(GenPart_pdgId)==23)==2)"
-
 def getGluLSPInfo(sample):
-  cut_common = "Sum$(abs(GenPart_pdgId)==1000022&&abs(GenPart_motherId)==1000024&&abs(GenPart_grandmotherId)==1000021)==1&&Sum$(abs(GenPart_pdgId)==1000022&&abs(GenPart_motherId)==1000023&&abs(GenPart_grandmotherId)==1000021)==1&&Sum$(abs(GenPart_pdgId)==23)==1&&Sum$(abs(GenPart_pdgId)==24)==1&&(Sum$(abs(GenPart_pdgId)==23)+Sum$(abs(GenPart_pdgId)==24))==2"
+  VV_label = "WZ"    ###can be WW , WZ , ZZ
+
+  ###T5qqqqWW
+  if VV_label == "WW" :
+    print "I am at WW"
+    cut_common = "Sum$(abs(GenPart_pdgId)==1000022&&abs(GenPart_motherId)==1000024&&abs(GenPart_grandmotherId)==1000021)==2&&(Sum$(abs(GenPart_pdgId)==24)==2)"
+  ###T5qqqqWZ
+  if VV_label == "WZ" :
+    print "I am at WZ"
+    cut_common = "Sum$(abs(GenPart_pdgId)==1000022&&abs(GenPart_motherId)==1000024&&abs(GenPart_grandmotherId)==1000021)==1&&Sum$(abs(GenPart_pdgId)==1000022&&abs(GenPart_motherId)==1000023&&abs(GenPart_grandmotherId)==1000021)==1&&Sum$(abs(GenPart_pdgId)==23)==1&&Sum$(abs(GenPart_pdgId)==24)==1&&(Sum$(abs(GenPart_pdgId)==23)+Sum$(abs(GenPart_pdgId)==24))==2"
+  ###T5qqqqZZ
+  if VV_label == "ZZ" :
+    print "I am at ZZ"
+    cut_common = "Sum$(abs(GenPart_pdgId)==1000022&&abs(GenPart_motherId)==1000023&&abs(GenPart_grandmotherId)==1000021)==2&&(Sum$(abs(GenPart_pdgId)==23)==2)"
+
   print sample , cut_common
   sample_name = sample["name"]
   print sample["name"]
@@ -74,9 +75,12 @@ if __name__ == "__main__":
   pool = multiprocessing.Pool(10)
   print samples
   results = pool.map(getGluLSPInfo , samples)
-  print results
+  #print results
   pool.close()
   pool.join()
-   
-  pickle.dump(results, file(pickleDir+'T5qqqq'+VV_label+'_mass_nEvents_xsec_pkl','w'))
+
+  final_dict = {}
+  for res in results:
+    final_dict.update(res) 
+  pickle.dump(final_dict, file(pickleDir+'T5qqqq'+VV_label+'_mass_nEvents_xsec_pkl','w'))
   print "written:" , pickleDir+'T5qqqq'+VV_label+'_mass_nEvents_xsec_pkl'
