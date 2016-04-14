@@ -10,8 +10,8 @@ where the campaign is :
         from JSON name file)
     
 The corresponding py sample files are called 
-    cmgTuples_RunIISpring15DR74_25ns_{other identifier}.py
-    cmgTuples_Data_25ns__{other identifier}.py
+    RunIISpring15DR74_25ns_{other identifier}.py
+    Data_25ns__{other identifier}.py
 where other identifier is usually the version of miniAOD.
 """
 

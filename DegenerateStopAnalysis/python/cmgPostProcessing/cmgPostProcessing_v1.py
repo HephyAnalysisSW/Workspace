@@ -30,6 +30,7 @@ import Workspace.HEPHYPythonTools.convertHelpers as convertHelpers
 import Workspace.HEPHYPythonTools.user as user
 
 from  veto_event_list import get_veto_list
+import collections
 
 def get_parser():
     ''' Argument parser for post-processing module.
@@ -51,13 +52,26 @@ def get_parser():
         help="Switch for print statements, for those who can not survive a job without seeing something printed " + 
             "on the screen. \n bool flag set to True if used")
 
+    argParser.add_argument('--targetDir',
+        action='store',
+        nargs='?',
+        type=str,
+        default='/afs/hephy.at/data/' + user.afsDataName + '/cmgTuples',
+        help="Name of the directory the post-processed files will be saved"
+        )
+    
+    argParser.add_argument('--overwriteOutputFiles',
+        action='store_true',
+        help="Overwrite existing output files, bool flag set to True  if used")
+    
+    
     argParser.add_argument('--cmgTuples',
         dest='cmgTuples',
         action='store',
         nargs='?',
         type=str,
-        default='RunIISpring15DR74_25ns',
-        help="CMG ntuples to be post-processed"
+        default='Spring15_7412pass2_mAODv2_v6',
+        help="Sample definition file (w/o .py) for the CMG ntuples to be post-processed"
         )
        
     argParser.add_argument('--processSample',
@@ -68,14 +82,6 @@ def get_parser():
         help="Sample to be post-processed, given as CMG component name"
         )
     
-    argParser.add_argument('--targetDir',
-        action='store',
-        nargs='?',
-        type=str,
-        default='/afs/hephy.at/data/' + user.afsDataName + '/cmgTuples',
-        help="Name of the directory the post-processed files will be saved"
-        )
-    
     argParser.add_argument('--processingEra',
         action='store',
         nargs='?',
@@ -84,12 +90,29 @@ def get_parser():
         help="Name of the processing era"
         )
 
-    argParser.add_argument('--processingTag',
+    argParser.add_argument('--cmgProcessingTag',
         action='store',
         nargs='?',
         type=str,
         default='7412pass2_mAODv2_v6',
-        help="Name of the processing tag, preferably a tag for Workspace"
+        help="Name of the CMG processing tag, preferably a tag for CMGTools"
+        )
+
+    argParser.add_argument('--cmgPostProcessingTag',
+        action='store',
+        nargs='?',
+        type=str,
+        default='cmgPostProc_v0',
+        help="Name of the post-processing tag, preferably a tag for Workspace"
+        )
+
+    argParser.add_argument('--parameterSet',
+        action='store',
+        nargs='?',
+        type=str,
+        choices=['analysisHephy_13TeV_v0', 'analysisHephy_8vs13TeV_v0', 'syncLip_v0', ],
+        default='analysisHephy_13TeV_v0',
+        help="Selection of the parameter set used for post-processing." 
         )
 
     argParser.add_argument('--skim',
@@ -109,17 +132,17 @@ def get_parser():
         help="Lepton skimming to be applied for post-processing"
         )
     
+    argParser.add_argument('--skimPreselect',
+        action='store_true',
+        help="Apply preselection for the post processing, bool flag set to True if used"
+        )
+    
     argParser.add_argument('--processSignalScan',
         action='store',
         nargs='*',
         type=str,
         default='',
         help="Do Processing for a specific Stop and LSP mass"
-        )
-    
-    argParser.add_argument('--skimPreselect',
-        action='store_true',
-        help="Apply preselection for the post processing, bool flag set to True if used"
         )
     
     argParser.add_argument('--processTracks',
@@ -131,21 +154,8 @@ def get_parser():
         action='store_true',
         help="Process packed generated particles for post-processing, bool flag set to True if used"
         )
-     
-    argParser.add_argument('--parameterSet',
-        action='store',
-        nargs='?',
-        type=str,
-        choices=['analysisHephy_13TeV_v0', 'analysisHephy_8vs13TeV_v0', 'syncLip_v0', ],
-        default='analysisHephy_13TeV_v0',
-        help="Selection of the parameter set used for post-processing." + \
-            "\n The choices have to be pre-defined in getParameters function."
-        )
 
-    argParser.add_argument('--overwriteOutputFiles',
-        action='store_true',
-        help="Overwrite existing output files, bool flag set to True  if used")
-    
+     
     argParser.add_argument('--runSmallSample',
         action='store_true',
         help="Run the file on a small sample (for test purpose), bool flag set to True if used"
@@ -354,43 +364,37 @@ def getSamples(args):
     processSample = args.processSample
     
     targetDir = args.targetDir
+    
     processingEra = args.processingEra
-    processingTag = args.processingTag
+    cmgProcessingTag = args.cmgProcessingTag
+    cmgPostProcessingTag = args.cmgPostProcessingTag
     parameterSet = args.parameterSet
 
 
+    # cmg samples definition file
+    cmgTuplesFullName = 'Workspace.DegenerateStopAnalysis.samples.cmgTuples.' + cmgTuples
+    
+    cmssw_base = os.environ['CMSSW_BASE']
+    sampleFile = os.path.join(cmssw_base, 'src/Workspace/DegenerateStopAnalysis/python/samples/cmgTuples') + \
+        '/' + cmgTuples + '.py'
+    
+    try:
+        cmgSamples = importlib.import_module(cmgTuplesFullName)
+    except ImportError, err:      
+        print "\n The required set of CMG tuples \n cmgTuples: {0} \n ".format(cmgTuples) + \
+            "with expected sample definition file \n {0} \n does not exist.".format(sampleFile), \
+            "\n Correct the name and re-run the script. \n Exiting."
+        sys.exit()
 
-    if cmgTuples == "Data_25ns":
-        import Workspace.DegenerateStopAnalysis.cmgTuples_Data25ns_v6 as cmgSamples
-    elif cmgTuples == "RunIISpring15DR74_25ns":
-        import Workspace.DegenerateStopAnalysis.samples.cmgTuples_Spring15_7412pass2_mAODv2_v6 as cmgSamples
-    else:
-        # use the cmgTuples values to find the cmgSamples definition file
-        moduleName = 'cmgTuples_'  + cmgTuples
-        moduleFullName = 'Workspace.DegenerateStopAnalysis.samples.' + moduleName
-        
-        cmssw_base = os.environ['CMSSW_BASE']
-        sampleFile = os.path.join(cmssw_base, 'src/Workspace/DegenerateStopAnalysis/python/samples') + \
-            '/' + moduleName + '.py'
-
-        try:
-            cmgSamples = importlib.import_module(moduleFullName)
-        except ImportError, err:      
-            print 'ImportError:', err
-            print "\n The required set of CMG tuples \n cmgTuples: {0} \n ".format(cmgTuples) + \
-                "with expected sample definition file \n {0} \n does not exist.".format(sampleFile), \
-                "\n Correct the name and re-run the script. \n Exiting."
-            sys.exit()
-   
 
     if args.skimPreselect:
         outDir = os.path.join(
-            targetDir, processingEra, processingTag, parameterSet, 
+            targetDir, processingEra, cmgProcessingTag, cmgPostProcessingTag, parameterSet, 
             cmgTuples, args.skim, 'skimPreselect', args.skimLepton
             )
     else:
         outDir = os.path.join(
-            targetDir, processingEra, processingTag, parameterSet, 
+            targetDir, processingEra, cmgProcessingTag, cmgPostProcessingTag, parameterSet, 
             cmgTuples, args.skim, args.skimLepton
             )
     
@@ -474,27 +478,22 @@ def getSamples(args):
     else:
         mass_dict = {}
 
-
-    #    
-    return allComponentsList, outDir, mass_dict
+    # define the named tuple to return the values
+    rtuple = collections.namedtuple(
+        'getSamples', 
+        [
+            'sampleFile', 
+            'componentList', 
+            'outputDirectory', 
+            'mass_dict'
+            ]
+        )
     
-
- 
-def getSignalScanSamples(args):
-
-
-    #for mstop in mass_dict.keys():
-    #    for mlsp in mass_dict[mstop].keys():
-    #        skimCond = "Sum$(abs(GenPart_pdgId)==1000022&&abs(GenPart_motherId)==1000024&&abs(GenPart_grandmotherId)==1000021)==2&&(Sum$(abs(GenPart_pdgId)==24)==2)"
-    #        skimCond += "(GenSusyMStop==%s) && (GenSusyMNeutralino==%s) "%(mstop,mlsp)
-    #        outDir   = ""     
-
-
-    mstop=args.processSignalScan[0]
-    mlsp =args.processSignalScan[1]
-
-
-
+    getSample_rtuple = rtuple(sampleFile, allComponentsList, outDir, mass_dict) 
+    
+    #    
+    return getSample_rtuple
+    
 
 def eventsSkimPreselect(skimName, skimLepton, preselectFlag, params, signalMasses=[]):
     '''Define the skim condition, including preselection if required.
@@ -629,7 +628,7 @@ def rwTreeClasses(sample, isample, args, temporaryDir, params={} ):
     # common branches for data and MC samples 
     
     # common branches already defined in cmgTuples
-    branchKeepStrings_DATAMC = [
+    keepBranches_DATAMC = [
         'run', 'lumi', 'evt', 'isData', 'rho', 'nVert', 
         'met*','puppi*',
         'Flag_*','HLT_*',
@@ -717,7 +716,7 @@ def rwTreeClasses(sample, isample, args, temporaryDir, params={} ):
     # MC samples only
     
     # common branches already defined in cmgTuples
-    branchKeepStrings_MC = [ 
+    keepBranches_MC = [ 
         'nTrueInt', 'genWeight', 'xsec', 'puWeight', 
         'GenSusyMStop', 
         'GenSusyMNeutralino',        
@@ -761,7 +760,7 @@ def rwTreeClasses(sample, isample, args, temporaryDir, params={} ):
     # data samples only
     
     # branches already defined in cmgTuples
-    branchKeepStrings_DATA = []
+    keepBranches_DATA = []
     
     readVariables_DATA = []
     aliases_DATA = []
@@ -814,7 +813,7 @@ def rwTreeClasses(sample, isample, args, temporaryDir, params={} ):
     # sum up branches to be defined for each sample, depending on the sample type (data or MC)
     
     if sample['isData']: 
-        branchKeepStrings = branchKeepStrings_DATAMC + branchKeepStrings_DATA
+        keepBranches = keepBranches_DATAMC + keepBranches_DATA
     
         readVariables = readVariables_DATAMC + readVariables_DATA
         aliases = aliases_DATAMC + aliases_DATA
@@ -822,7 +821,7 @@ def rwTreeClasses(sample, isample, args, temporaryDir, params={} ):
         newVariables = newVariables_DATAMC + newVariables_DATA
         newVectors = newVectors_DATAMC + newVectors_DATA
     else:
-        branchKeepStrings = branchKeepStrings_DATAMC + branchKeepStrings_MC
+        keepBranches = keepBranches_DATAMC + keepBranches_MC
     
         readVariables = readVariables_DATAMC + readVariables_MC
         aliases = aliases_DATAMC + aliases_MC
@@ -867,8 +866,33 @@ def rwTreeClasses(sample, isample, args, temporaryDir, params={} ):
     logger.debug("\n readClassString definition: \n%s \n", readClassString)
     readTree = convertHelpers.compileClass(className=readClassName, classString=readClassString, tmpDir=temporaryDir)
 
-    #
-    return branchKeepStrings, readVars, aliases, readVectors, newVars, newVectors, readTree, saveTree
+    # define the named tuple to return the values
+    rtuple = collections.namedtuple(
+        'rwTreeClasses', 
+        [
+            'keepBranches', 
+            'readVars', 
+            'aliases', 
+            'readVectors',
+            'newVars',
+            'newVectors',
+            'readTree',
+            'saveTree',
+            ]
+        )
+    
+    rwTreeClasses_rtuple = rtuple(
+        keepBranches, 
+        readVars, 
+        aliases, 
+        readVectors, 
+        newVars, 
+        newVectors, 
+        readTree, 
+        saveTree
+        )
+    #    
+    return rwTreeClasses_rtuple
    
    
 def getTreeFromChunk(c, skimCond, iSplit, nSplit):
@@ -986,6 +1010,8 @@ def processGenSusyParticles(readTree, splitTree, saveTree, params):
     saveTree.Gen_lsp_pt_12 = lsps.Pt()
     saveTree.Gen_lsp_eta_12 = lsps.Eta()
     saveTree.Gen_lsp_phi_12 = lsps.Phi()
+    
+    return saveTree
 
 
 def processLeptons(readTree, splitTree, saveTree, params):
@@ -1095,8 +1121,25 @@ def processLeptons(readTree, splitTree, saveTree, params):
             "\n saveTree.nLepton = %i \n  Index list:  " + pprint.pformat(lepList) + "\n "        
         logger.debug(printStr, saveTree.nLepton)
         
-    #
-    return saveTree, lepObj, muList, elList, lepList
+    # define the named tuple to return the values
+    rtuple = collections.namedtuple(
+        'processLeptons', 
+        [
+            'lepObj',
+            'muList',
+            'elList',
+            'lepList',
+            ]
+        )
+    
+    processLeptons_rtuple = rtuple(
+        lepObj, 
+        muList, 
+        elList, 
+        lepList
+        )
+    #    
+    return saveTree, processLeptons_rtuple
 
 def processJets(args, readTree, splitTree, saveTree, params):
     '''Process jets. 
@@ -1298,13 +1341,29 @@ def processJets(args, readTree, splitTree, saveTree, params):
             readTree.met_pt, readTree.met_phi, ht_basJet
             )
     
-        
-    return saveTree, jetObj, basJetList, bJetDiscSortList
+    # define the named tuple to return the values
+    rtuple = collections.namedtuple(
+        'processJets', 
+        [
+            'jetObj',
+            'basJetList',
+            'bJetDiscSortList',
+            ]
+        )
+    
+    processJets_rtuple = rtuple(
+        jetObj,
+        basJetList,
+        bJetDiscSortList
+        )
+
+    #    
+    return saveTree, processJets_rtuple
+
 
 def processLeptonJets(
         readTree, splitTree, saveTree, 
-        lepObj, muList, elList, lepList, 
-        jetObj, basJetList, bJetDiscSortList
+        processLeptons_rtuple, processJets_rtuple
         ):
     '''Process correlations between the leading selected lepton and jets. 
     
@@ -1318,8 +1377,25 @@ def processLeptonJets(
     '''
     
     logger = logging.getLogger('cmgPostProcessing.processLeptonJets')
+    
+    def variablesLeptonJets (getFieldsOnly, lepObj, jetObj, objList, basJetList, bJetDiscSortList):
+        
+        # define the named tuple to return the values
+        rtuple = collections.namedtuple(
+            'variablesLeptonJets',
+            [
+                'basJet_obj_dR_j1obj1',
+                'basJet_obj_invMass_obj1jmindR',
+                'basJet_obj_invMass_3j',
+                'bJet_obj_dR_jHdobj1',
+                ]
+            )
 
-    def variablesLeptonJets (lepObj, jetObj, objList, basJetList, bJetDiscSortList):
+        if getFieldsOnly:
+            rtuple_fields = rtuple._fields
+            return rtuple_fields
+        
+        #
         
         basJet_obj_dR_j1obj1 = helpers.dR(basJetList[0], objList[0], jetObj, lepObj)
         
@@ -1347,7 +1423,7 @@ def processLeptonJets(
     
         indexList = [i for i in basJetList if i != closestJetIndex]  
         logger.debug(
-            "\n Number of jets, excluding the closest jet: %i jets \n List of jet indices: \n %s \n ", 
+            "\n Number of jets, excluding the closest jet: %i jets \n List of jet indices: \n %s \n ",
             len(indexList), pprint.pformat(indexList)
             )
          
@@ -1371,58 +1447,66 @@ def processLeptonJets(
         else:
             bJet_obj_dR_jHdobj1 = -999.
         #
-        return basJet_obj_dR_j1obj1, basJet_obj_invMass_obj1jmindR, basJet_obj_invMass_3j, bJet_obj_dR_jHdobj1
         
+        # fill the return tuple    
+        variablesLeptonJets_rtuple = rtuple(
+            basJet_obj_dR_j1obj1,
+            basJet_obj_invMass_obj1jmindR,
+            basJet_obj_invMass_3j,
+            bJet_obj_dR_jHdobj1
+            )
     
-    if (lepObj is not None) and (saveTree.nBasJet > 0):
-        if (len(muList) > 0):
-            basJet_mu_dR_j1mu1, basJet_mu_invMass_mu1jmindR, basJet_mu_invMass_3j, bJet_mu_dR_jHdmu1 = \
-                variablesLeptonJets (
-                    lepObj, jetObj, muList, basJetList, bJetDiscSortList
-                    )
+        #    
+        return variablesLeptonJets_rtuple
+    #    
+            
+    #
+    lepObj = processLeptons_rtuple.lepObj
+    jetObj = processJets_rtuple.jetObj
+     
+    basJetList = processJets_rtuple.basJetList
+    bJetDiscSortList = processJets_rtuple.bJetDiscSortList
     
-            saveTree.basJet_mu_dR_j1mu1 = basJet_mu_dR_j1mu1
-            saveTree.basJet_mu_invMass_mu1jmindR = basJet_mu_invMass_mu1jmindR
-            saveTree.basJet_mu_invMass_3j = basJet_mu_invMass_3j
-            saveTree.bJet_mu_dR_jHdmu1 = bJet_mu_dR_jHdmu1
-            
-        if (len(elList) > 0):
-            basJet_el_dR_j1el1, basJet_el_invMass_el1jmindR, basJet_el_invMass_3j, bJet_el_dR_jHdel1 = \
-                variablesLeptonJets (
-                    lepObj, jetObj, elList, basJetList, bJetDiscSortList
-                    )
+    objNameList = ['mu', 'el', 'lep']
     
-            saveTree.basJet_el_dR_j1el1 = basJet_el_dR_j1el1
-            saveTree.basJet_el_invMass_el1jmindR = basJet_el_invMass_el1jmindR
-            saveTree.basJet_el_invMass_3j = basJet_el_invMass_3j
-            saveTree.bJet_el_dR_jHdel1 = bJet_el_dR_jHdel1
-            
-        if (len(lepList) > 0):
-            basJet_lep_dR_j1lep1, basJet_lep_invMass_lep1jmindR, basJet_lep_invMass_3j, bJet_lep_dR_jHdlep1 = \
-                variablesLeptonJets (
-                    lepObj, jetObj, lepList, basJetList, bJetDiscSortList
-                    )
-    
-            saveTree.basJet_lep_dR_j1lep1 = basJet_lep_dR_j1lep1
-            saveTree.basJet_lep_invMass_lep1jmindR = basJet_lep_invMass_lep1jmindR
-            saveTree.basJet_lep_invMass_3j = basJet_lep_invMass_3j
-            saveTree.bJet_lep_dR_jHdlep1 = bJet_lep_dR_jHdlep1
-            
-            
-            
-    logger.debug(
-        "\n basJet_mu_dR_j1mu1 = %f \n basJet_mu_invMass_mu1jmindR = %f \n basJet_mu_invMass_3j = %f \n\n" + \
-        "\n basJet_el_dR_j1el1 = %f \n basJet_el_invMass_el1jmindR = %f \n basJet_el_invMass_3j = %f \n\n" + \
-        "\n basJet_lep_dR_j1lep1 = %f \n basJet_lep_invMass_lep1jmindR = %f \n basJet_lep_invMass_3j = %f \n\n" + \
-        "\n bJet_mu_dR_jHdmu1 = %f \n bJet_el_dR_jHdel1 = %f \n bJet_lep_dR_jHdlep1 = %f \n\n",
-        saveTree.basJet_mu_dR_j1mu1, saveTree.basJet_mu_invMass_mu1jmindR, saveTree.basJet_mu_invMass_3j, 
-        saveTree.basJet_el_dR_j1el1, saveTree.basJet_el_invMass_el1jmindR, saveTree.basJet_el_invMass_3j, 
-        saveTree.basJet_lep_dR_j1lep1, saveTree.basJet_lep_invMass_lep1jmindR, saveTree.basJet_lep_invMass_3j, 
-        saveTree.bJet_mu_dR_jHdmu1, saveTree.bJet_el_dR_jHdel1, saveTree.bJet_lep_dR_jHdlep1 
+    # get here the list of fields only, to be used also for debug when lepjObj is empty
+    getFieldsOnly = True
+    rtuple_fields = variablesLeptonJets(
+        getFieldsOnly, lepObj, jetObj, processLeptons_rtuple.muList, basJetList, bJetDiscSortList
         )
-        
-
+    getFieldsOnly = False
+     
+    # normal usage: fill the variables            
+    if (lepObj is not None) and (saveTree.nBasJet > 0):
+ 
+        for obj in objNameList:
             
+            objList = getattr(processLeptons_rtuple, obj + 'List')
+            if not objList: continue
+            
+            variablesLeptonJets_rtuple = variablesLeptonJets(
+                getFieldsOnly, lepObj, jetObj, objList, basJetList, bJetDiscSortList
+                )
+            
+            for var in rtuple_fields:
+                varName = var.replace('obj', obj)
+                setattr(saveTree, varName, getattr(variablesLeptonJets_rtuple, var))
+                              
+    if logger.isEnabledFor(logging.DEBUG):
+         
+        logString = ''
+        
+        for obj in objNameList:            
+            for var in rtuple_fields:
+                varName = var.replace('obj', obj)
+                varValue = getattr(saveTree, varName)
+                
+                logString += ('\n ' + varName + ' = {}').format(varValue)
+            #
+            logString += '\n\n'     
+        #
+        logger.debug(logString)
+
     #
     return saveTree
 
@@ -1432,7 +1516,10 @@ def hemiSectorCosine(x):
     return round( math.cos(math.pi- 0.5*(x* math.pi/180)),3)
 
 
-def processTracksFunction(readTree, splitTree, saveTree, params, lepObj, muList, elList, lepList, jetObj, basJetList):
+def processTracksFunction(
+    readTree, splitTree, saveTree, params,
+    processLeptons_rtuple, processJets_rtuple
+    ):
     '''Process tracks. 
     
     TODO describe here the processing.
@@ -1466,11 +1553,24 @@ def processTracksFunction(readTree, splitTree, saveTree, params, lepObj, muList,
     ratioPtLepTrackMin = TracksSel['ratioPtLepTrackMin']
     ratioPtLepTrackMax = TracksSel['ratioPtLepTrackMax']
     
+    # selected leptons and jets 
+
+    lepObj = processLeptons_rtuple.lepObj
+    jetObj = processJets_rtuple.jetObj
+    
+    muList = processLeptons_rtuple.muList
+    elList = processLeptons_rtuple.elList
+    lepList = processLeptons_rtuple.lepList
+    
+    basJetList = processJets_rtuple.basJetList
+
     # leading lepton, jet collection as dictionaries
+
     if muList:
         lep = lepObj.getObjDictList(params['LepVarList']['mu'], muList[0])
     else:
         lep = {}
+        
     jets = jetObj.getObjDictList(params['JetVarList'], basJetList)
      
     ### corresponding to 90, 135, 150 degree diff between jet and track
@@ -1535,6 +1635,7 @@ def processTracksFunction(readTree, splitTree, saveTree, params, lepObj, muList,
         for nISRs in nISRsList:
             nTrkVarName = "nTracksOpp%sJet%s"%(hemiSector,nISRs)
             #print nTrkVarName, { trkPt: getattr(saveTree,nTrkVarName+"_pt%s"%str(trkPt).replace(".","p") ) for trkPt in trackMinPtList }
+            
     return saveTree 
  
 
@@ -1609,15 +1710,12 @@ def processGenTracksFunction(readTree, splitTree, saveTree):
     #
     return saveTree
 
-def processEventVetoList(readTree, splitTree, saveTree, sample, veto_event_list):
+def processEventVetoList(readTree, splitTree, saveTree, veto_event_list):
     ''' 
         
     '''
     
     logger = logging.getLogger('cmgPostProcessing.processEventVetoList')
-
-    if not sample['cmgComp'].isData:
-        return
 
     run = int(splitTree.GetLeaf('run').GetValue())
     lumi = int(splitTree.GetLeaf('lumi').GetValue())
@@ -1637,6 +1735,8 @@ def processEventVetoList(readTree, splitTree, saveTree, sample, veto_event_list)
             run_lumi_evt
             )
         
+    #
+    return saveTree    
 
 def computeWeight(sample, sumWeight,  splitTree, saveTree, params, xsec=None):
     ''' Compute the weight of each event.
@@ -1779,7 +1879,11 @@ def cmgPostProcessing(argv=None):
     # choose the sample(s) to process (allSamples), with results saved in outputDirectory
     
     cmgTuples = args.cmgTuples
-    allSamples, outputDirectory, mass_dict = getSamples(args)
+    
+    getSamples_rtuple = getSamples(args)
+    
+    allSamples = getSamples_rtuple.componentList
+    outputDirectory = getSamples_rtuple.outputDirectory
      
     # logging configuration
 
@@ -1797,10 +1901,10 @@ def cmgPostProcessing(argv=None):
 
     #
     logger.info(
-        "\n Running on CMG ntuples %s \n" + \
+        "\n Running on CMG ntuples %s \n defined in the file \n %s" + \
         "\n Samples to be processed: %i \n\n %s \n\n Detailed sample description: \n\n  %s \n" + \
         "\n Results will be written to directory \n %s \n",
-        cmgTuples, len(allSamples), 
+        cmgTuples, getSamples_rtuple.sampleFile, len(allSamples), 
         pprint.pformat([sample['cmgComp'].name for sample in allSamples]),
         pprint.pformat(allSamples),
         outputDirectory
@@ -1828,6 +1932,8 @@ def cmgPostProcessing(argv=None):
         #mass_dict = pickle.load( open("./mass_dicts/%s_mass_nEvents_xsec.pkl"%sample,"r"))
         #from mass_dict import mass_dict
         #mass_dict = pickle.load(open("mass_dict_all.pkl","r"))
+    
+        mass_dict = getSamples_rtuple.mass_dict
 
         if len(mass_dict) ==0:
             print "Mass Dict Not Avail. It's needed to split signal scan mass points"
@@ -1848,7 +1954,9 @@ def cmgPostProcessing(argv=None):
     for isample, sample in enumerate(allSamples):
         
         sampleName = sample['cmgComp'].name
-        sampleType = 'Data' if sample['cmgComp'].isData else 'MC'
+        
+        isDataSample = True if sample['cmgComp'].isData else False
+        sampleType = 'Data' if isDataSample else 'MC'
                               
         logger.info(
             "\n Running on sample %s of type %s \n",
@@ -1903,9 +2011,19 @@ def cmgPostProcessing(argv=None):
         logger.info("\n Output sample directory \n  %s \n", outputWriteDirectory) 
         logger.debug("\n Temporary directory \n  %s \n", temporaryDir) 
         
-        branchKeepStrings, readVars, aliases, readVectors, newVars, newVectors, readTree, saveTree = \
-            rwTreeClasses(sample, isample, args, temporaryDir, params)
-                   
+        rwTreeClasses_rtuple = rwTreeClasses(sample, isample, args, temporaryDir, params) 
+        #
+        keepBranches = rwTreeClasses_rtuple.keepBranches 
+             
+        readVars = rwTreeClasses_rtuple.readVars
+        aliases = rwTreeClasses_rtuple.aliases 
+        readVectors = rwTreeClasses_rtuple.readVectors 
+        
+        newVars = rwTreeClasses_rtuple.newVars 
+        newVectors = rwTreeClasses_rtuple.newVectors 
+        
+        readTree = rwTreeClasses_rtuple.readTree 
+        saveTree = rwTreeClasses_rtuple.saveTree
         #
         
         chunks, sumWeight = hephyHelpers.getChunks(sample)
@@ -1983,27 +2101,6 @@ def cmgPostProcessing(argv=None):
                     chunk['name'], iSplit, nSplit, nEvents
                     )
 
-
-                #if args.processSignalScan:
-                #    #mstop = args.processSignalScan[0]
-                #    #mlsp  = args.processSignalScan[1]
-                #    #eListName = "eList_%s_stp%s_lsp%s"%(iSplit, mstop,mlsp)
-                #    #splitTree.Draw(">>%s"%eListName, "(GenSusyMStop==%s) && (GenSusyMNeutralino==%s)"%(mstop,mlsp)  )
-                #    #eList = getattr(ROOT,eListName)
-                #    #splitTree.SetEventList(eList)
-                #    #nEvents_mscan = eList.GetN()
-                #    ##assert nEvents_mscan, "CANNOT PROCESS SIGNAL SAMPL mStop:%s  mLSP:%s "%(mstop, mlsp)
-                #    #print iSplit, mlsp, mstop, nEvents_mscan 
-                #    logger.info(
-                #        "Processing Signal Scan For iSplit:%s mStop:%s  mLSP:%s "%(iSplit, mstop, mlsp)
-                #        )
-
-                #    events = xrange(nEvents_mscan)
-                #else:
-                #    events = xrange(nEvents)
-
-                
-                #print "{:-^80}".format(" Processing Chunk with %s  Events "%(nEvents) )
                 start_time = int(time.time())
                 last_time = start_time
                 nVerboseEvents = 10000
@@ -2036,38 +2133,39 @@ def cmgPostProcessing(argv=None):
                         )
                     
                     # leptons processing
-                    saveTree, lepObj, muList, elList, lepList = processLeptons(
+                    saveTree, processLeptons_rtuple = processLeptons(
                         readTree, splitTree, saveTree, params
                         )
                     
                     # jets processing
-                    saveTree, jetObj, basJetList, bJetDiscSortList = processJets(
+                    saveTree, processJets_rtuple = processJets(
                         args, readTree, splitTree, saveTree, params
                         )
                     
                     # selected leptons - jets processing
                     saveTree = processLeptonJets(
-                        readTree, splitTree, saveTree, 
-                        lepObj, muList, elList, lepList, 
-                        jetObj, basJetList, bJetDiscSortList
+                        readTree, splitTree, saveTree,
+                        processLeptons_rtuple, processJets_rtuple
                         )
                     
                     # tracks
                     if args.processTracks:
                         saveTree = processTracksFunction(
                             readTree, splitTree, saveTree, params, 
-                            lepObj, muList, elList, lepList, 
-                            jetObj, basJetList
+                            processLeptons_rtuple, processJets_rtuple
                             )
 
-                    if args.processGenTracks:
+                    if (not isDataSample) and args.processGenTracks:
                         saveTree = processGenTracksFunction(readTree, splitTree, saveTree)
                     
                     # process event veto list flags
-                    processEventVetoList(readTree, splitTree, saveTree, sample, event_veto_list)
+                    if isDataSample:
+                        saveTree = processEventVetoList(
+                            readTree, splitTree, saveTree, event_veto_list
+                            )
 
-                    if sampleType == 'MC':
-                        processGenSusyParticles(readTree, splitTree, saveTree, params)
+                    if not isDataSample:
+                        saveTree = processGenSusyParticles(readTree, splitTree, saveTree, params)
 
 
                     # compute the weight of the event
@@ -2096,7 +2194,7 @@ def cmgPostProcessing(argv=None):
                     tfileTreeSplit = ROOT.TFile(temporaryDir + '/' + fileTreeSplit, 'recreate')
 
                     splitTree.SetBranchStatus("*", 0)
-                    for b in (branchKeepStrings + 
+                    for b in (keepBranches + 
                               [v['stage2Name'] for v in newVars] + 
                               [v.split(':')[1] for v in aliases]):
                         splitTree.SetBranchStatus(b, 1)

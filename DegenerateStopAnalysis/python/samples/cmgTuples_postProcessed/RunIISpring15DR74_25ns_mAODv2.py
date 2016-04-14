@@ -19,22 +19,38 @@ The corresponding py sample files are called
 
 # available ntuple directories 
 
+afs_data_vghete = '/afs/hephy.at/data/vghete01/cmgTuples/'
+afs_data_nrad = '/afs/hephy.at/data/nrad01/cmgTuples/'
+
+data_nrad = '/data/nrad/cmgTuples'
+
 # no Workspace tag exists for this set
 dir_cmgPostProcessing_Aug21 = '/afs/hephy.at/work/n/nrad/cmgTuplesPostProcessed/Spring15_v1' 
 
 # Workspace tag: cmgPostProcessing_Oct1
-#dir_cmgPostProcessing_Oct1 = '/data/nrad/cmgTuples/cmgPostProcessing_Oct1/RunIISpring15DR74'
-dir_cmgPostProcessing_Oct1 = '/data/nrad/cmgTuples/postProcessed_Spring15_vasile_v1/inc'
+dir_cmgPostProcessing_Oct1 = \
+    data_nrad + \
+    '/postProcessed_Spring15_vasile_v1/inc'
 
 dir_cmgPostProcessing_v0 = \
-    '/afs/hephy.at/user/v/vghete/vghete01/cmgTuples/postProcessed_mAODv2/v0/RunIISpring15DR74_25ns/inc'
+    afs_data_vghete + \
+    'postProcessed_mAODv2/v0/RunIISpring15DR74_25ns/inc'
 
 dir_cmgPostProcessing_final = \
-    '/afs/hephy.at/user/v/vghete/vghete01/cmgTuples/postProcessed_mAODv2/final/RunIISpring15DR74_25ns/inc'
+    afs_data_vghete + \
+    '/postProcessed_mAODv2/final_v1/RunIISpring15DR74_25ns/inc'
     
-dir_cmgPostProcessing_7412pass2_v4_022116_sync_v0 = \
-    '/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/7412pass2_v4_022116_sync_v0/RunIISpring15DR74_25ns/inc'
+dir_cmgPostProcessing_7412pass2_mAODv2_v6_analysisHephy_8vs13TeV_v0 = \
+    afs_data_vghete + \
+    '/postProcessed_mAODv2/7412pass2_mAODv2_v6/analysisHephy_8vs13TeV_v0/RunIISpring15DR74_25ns/inc'
 
+dir_cmgPostProcessing_7412pass2_v4_022116_sync_v0 = \
+    afs_data_nrad + \
+    '/postProcessed_mAODv2/7412pass2_v4_022116_sync_v0/RunIISpring15DR74_25ns/inc'
+
+dir_cmgPostProcessing_7412pass2_SMSScan_v1 = \
+    afs_data_nrad + \
+    '/postProcessed_mAODv2_v6/7412pass2_SMSScan_v1/RunIISpring15DR74_25ns/inc'
 
 # set the actual ntuple directory 
 #
