@@ -17,10 +17,10 @@ ROOT.gStyle.SetOptStat(0) #1111 #0 removes histogram statistics box #Name, Entri
 
 #Samples
 privateSignals = ["s10FS", "s30", "s30FS", "s60FS", "t2tt30FS"]
-backgrounds=["w","tt", "z","qcd"]
+backgrounds = ["w","tt", "z","qcd"]
 
-samplesList = backgrounds #privateSignals + 
-samples = getSamples(sampleList=samplesList, scan=True, useHT=False, getData=False)#, cmgPP=cmgPP) 
+samplesList = backgrounds # + privateSignals
+samples = getSamples(sampleList = samplesList, scan = True, useHT = True, getData = False)#, cmgPP = cmgPP) 
 
 officialSignals = ["s300_290", "s300_270", "s300_240"] #FIXME: crosscheck if these are in allOfficialSignals
 
@@ -30,15 +30,16 @@ allSignals = privateSignals + allOfficialSignals
 allSamples = allSignals + backgrounds
 
 #Input options
-parser = argparse.ArgumentParser(description="Input options")
-parser.add_argument("--doLimits", dest="doLimits",  help="Draw exclusion limit plot", type=int, default=0)
-parser.add_argument("--doCutFlow", dest="doCutFlow",  help="Draw cut flow table", type=int, default=1)
-parser.add_argument("--ID", dest="ID",  help="Electron ID type", type=str, default="standard") # "standard" "manual" "nMinus1"
-parser.add_argument("--WP", dest="WP",  help="Electron ID Working Point", type=str, default="None")
-parser.add_argument("--removedCut", dest="removedCut",  help="Variable removed from electron ID", type=str, default="None") #"sigmaEtaEta" "dEta" "dPhi" "hOverE" "ooEmooP" "d0" "dz" "MissingHits" "convVeto"
-parser.add_argument("--save", dest="save",  help="Toggle save", type=int, default=1)
-parser.add_argument("--zoom", dest="zoom",  help="Toggle zoom", type=int, default=1)
-parser.add_argument("-b", dest="batch",  help="Batch mode", action="store_true", default=False)
+parser = argparse.ArgumentParser(description = "Input options")
+parser.add_argument("--doLimits", dest = "doLimits",  help = "Draw exclusion limit plot", type = int, default = 0)
+parser.add_argument("--doYields", dest = "doYields",  help = "Make yields table", type = int, default = 1)
+parser.add_argument("--ID", dest = "ID",  help = "Electron ID type", type = str, default = "standard") # "standard" "manual" "nMinus1"
+parser.add_argument("--removedCut", dest = "removedCut",  help = "Variable removed from electron ID", type = str, default = "None") #"sigmaEtaEta" "hOverE" "ooEmooP" "dEta" "dPhi" "d0" "dz" "MissingHits" "convVeto"
+parser.add_argument("--iso", dest = "iso",  help = "Apply isolation", type = int, default = 0)
+parser.add_argument("--WP", dest = "WP",  help = "Electron ID Working Point", type = str, default = "None")
+parser.add_argument("--save", dest = "save",  help = "Toggle save", type = int, default = 1)
+parser.add_argument("--zoom", dest = "zoom",  help = "Toggle zoom", type = int, default = 1)
+parser.add_argument("-b", dest = "batch",  help = "Batch mode", action = "store_true", default = False)
 args = parser.parse_args()
 if not len(sys.argv) > 1:
    print makeLine()
@@ -48,47 +49,64 @@ if not len(sys.argv) > 1:
 
 #Arguments
 doLimits = args.doLimits 
-doCutFlow = args.doCutFlow 
+doYields = args.doYields 
 ID = args.ID 
-WP = args.WP
 removedCut = args.removedCut 
+iso = args.iso
+WP = args.WP
 zoom = args.zoom
 save = args.save
-#if ID == "iso": isolation = args.iso
 
 #Geometric divisions
 ebSplit = 0.8 #barrel is split into two regions
 ebeeSplit = 1.479 #division between barrel and endcap
 etaAcc = 2.5 #eta acceptance
 
-#Pt division for MVA ID
-ptSplit = 10 #we have above and below 10 GeV categories 
-
-#Number of Leptons (hadronic, semileptonic, dileptonic)
-nSel = ["(nLepGood == 0)", "(nLepGood == 1)", "(nLepGood == 2)"]
+##Number of Leptons (hadronic, semileptonic, dileptonic)
+#nSel = ["(nLepGood == 0)", "(nLepGood == 1)", "(nLepGood == 2)"]
 
 #Bin size 
 #nbins = 100
 xmin = 0
 #xmax = 1000
 
+if ID == "nMinus1":
+   string1 = "no_" + removedCut
+   string2 = "_no_" + removedCut
+else: 
+   string1 = ""
+   string2 = ""
+
 #Save
 if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
    savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/electronID/FoM"
-   savedir1 = savedir + "/limits/" + WP
-   savedir2 = savedir + "/yields/" + WP
-   if not os.path.exists(savedir1 + "/cards"): os.makedirs(savedir1 + "/cards")
-   if not os.path.exists(savedir1 + "/tex"): os.makedirs(savedir1 + "/tex")
-   if not os.path.exists(savedir2 + "/tex"): os.makedirs(savedir2 + "/tex")
+   savedir1 = savedir + "/" + ID + "/limits"
+   savedir2 = savedir + "/" + ID + "/yields"
+
+   if iso:
+      savedir1 += "/iso"
+      savedir2 += "/iso"
+      isoString = "_iso"
+   else:
+      isoString = ""
+
+   if not os.path.exists("%s/cards/%s/%s%s"%(savedir1, string1, WP, string2)): os.makedirs("%s/cards/%s/%s%s"%(savedir1, string1, WP, string2))
+   if not os.path.exists("%s/tex/%s/%s%s"%(savedir1, string1, WP, string2)): os.makedirs("%s/tex/%s/%s%s"%(savedir1, string1, WP, string2))
+   if not os.path.exists("%s/tex/%s/%s%s"%(savedir2, string1, WP, string2)): os.makedirs("%s/tex/%s/%s%s"%(savedir2, string1, WP, string2))
    
    #if os.path.isfile(limitPkl):
    #      limits = pickle.load(file(limitPkl))
 
-#Gets all cuts (electron, SR, CR) for given electronID
-allCuts = cutClasses(ID) #standard manual nMinus1
+#Gets all cuts (electron, SR, CR) for given electron ID
+eleIDsel = electronIDs(ID, removedCut, iso)
+allCuts = cutClasses(ID, eleIDsel)
 
 #for s in samples.massScanList(): samples[s].weight = "weight" #removes ISR reweighting from official mass scan signal samples
-for s in samples: samples[s].tree.SetAlias("eleSel", allCuts[WP]['eleSel'])
+#for s in samples: samples[s].tree.SetAlias("eleSel", allCuts[WP]['eleSel'])
+
+print makeLine()
+print "ID type: ", ID, " | Electron ID WP: ", WP, " | Electron ID Cut Removed: ", removedCut, " | Isolation applied: ", iso
+print makeLine()
 
 if doLimits:
    selectedSamples = allOfficialSignals + backgrounds 
@@ -97,8 +115,8 @@ if doLimits:
    
    setEventListToChains(samples, selectedSamples, allCuts['None']['presel'])
 
-   allYields = Yields(samples, selectedSamples, allCuts[WP]['runI'], cutOpt="list2", weight="weight", pklOpt=False, tableName = "RunI", nDigits=2, err=True, verbose=True, nSpaces=10)
-   JinjaTexTable(allYields, pdfDir = savedir1, texDir = savedir1 + "/tex/", caption="Cut Flow Table: RunI Reload Electrons (" + WP + " WP)", transpose=True)
+   allYields = Yields(samples, selectedSamples, allCuts[WP]['runI'], cutOpt = "list2", weight = "weight", pklOpt = False, tableName = "RunI_" + WP + string2 + isoString, nDigits = 2, err = True, verbose = True, nSpaces = 10)
+   JinjaTexTable(allYields, pdfDir = savedir1, texDir = "%s/tex/%s/%s%s%s/"%(savedir1, string1, WP, string2, isoString), caption = "Yields: RunI Reload Electrons (" + WP + string2 + " WP)", transpose = True)
    
    for sig in allOfficialSignals:
       mstop, mlsp = [int(x) for x in sig[1:].rsplit("_")]
@@ -109,14 +127,14 @@ if doLimits:
       try: limits[mstop]
       except KeyError: limits[mstop]={}
       
-      limits[mstop][mlsp] = getLimit(allYields, sig=sig, outDir = savedir1 + "/cards" , postfix= "", calc_limit = True) 
+      limits[mstop][mlsp] = getLimit(allYields, sig = sig, outDir = "%s/cards/%s"%(savedir1, string1), calc_limit = True) #, postfix = WP + string2 + isoString
 
-      #pickle.dump(limits, open(savedir + "/cards/limits.pkl",'w'))
-      exclCanv , exclPlot = drawExpectedLimit(limits, plotDir = savedir1 + "/ExpectedLimit_eleID_%s.png"%(WP), bins=None, key=None)
-      #exclCanv.SetName("ExpectedLimit_eleID_%s.pkl"%(WP))
+   #pickle.dump(limits, open(savedir + "/cards/limits.pkl",'w'))
+   exclCanv, exclPlot = drawExpectedLimit(limits, plotDir = "%s/%s/ExpectedLimit_eleID_%s%s%s.png"%(savedir1, string1, WP, string2, isoString), bins = None, key = None, title = "Expected Limits (%s %s %s) Electron ID)"%(WP, string1, isoString).replace("_", ""))
+   #exclCanv.SetName("ExpectedLimit_eleID_%s.pkl"%(WP))
 
-if doCutFlow:
+if doYields:
    selectedSamples = officialSignals + backgrounds 
    setEventListToChains(samples, selectedSamples, allCuts['None']['presel'])
-   fewSignalYields = Yields(samples, selectedSamples, allCuts[WP]['runI'], cutOpt="list2", weight="weight", pklOpt=False, tableName = "RunI", nDigits=2, err=True, verbose=True, nSpaces=10)
-   JinjaTexTable(fewSignalYields, pdfDir = savedir2, texDir = savedir2 + "/tex/", caption="Cut Flow Table: RunI Reload Electrons (" + WP + " WP)", transpose=False)
+   fewSignalYields = Yields(samples, selectedSamples, allCuts[WP]['runI'], cutOpt = "list2", weight = "weight", pklOpt = False, tableName = "RunI_" + WP + string2 + isoString, nDigits = 2, err = True, verbose = True, nSpaces = 10)
+   JinjaTexTable(fewSignalYields, pdfDir = savedir2, texDir = "%s/%s/tex/%s%s%s/"%(savedir2, string1, WP, string2, isoString), caption = "Cut Flow Table: RunI Reload Electrons (" + WP + string2 + " WP)", transpose = False)

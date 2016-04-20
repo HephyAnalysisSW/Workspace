@@ -1,0 +1,36 @@
+python -b FoMscan1.py --ID standard  --doPlots 1 --doCutFlow 1 --doYields 1 --doLimits 1 --iso 1
+python -b FoMscan1.py --ID standard  --doPlots 1 --doCutFlow 1 --doYields 1 --doLimits 1 --iso 0
+
+python -b FoMscan1.py --ID MVA  --doPlots 1 --doCutFlow 1 --doYields 1 --doLimits 1 --iso 1
+python -b FoMscan1.py --ID MVA  --doPlots 1 --doCutFlow 1 --doYields 1 --doLimits 1 --iso 0
+
+python -b FoMscan1.py --ID manual  --doPlots 1 --doCutFlow 1 --doYields 1 --doLimits 1 --iso 1
+python -b FoMscan1.py --ID manual  --doPlots 1 --doCutFlow 1 --doYields 1 --doLimits 1 --iso 0
+
+python -b FoMscan1.py --ID nMinus1 --removedCut sigmaEtaEta --doPlots 1 --doCutFlow 1 --doYields 1 --doLimits 1 --iso 1
+python -b FoMscan1.py --ID nMinus1 --removedCut sigmaEtaEta --doPlots 1 --doCutFlow 1 --doYields 1 --doLimits 1 --iso 0
+
+python -b FoMscan1.py --ID nMinus1 --removedCut hOverE --doPlots 1 --doCutFlow 1 --doYields 1 --doLimits 1 --iso 1
+python -b FoMscan1.py --ID nMinus1 --removedCut hOverE --doPlots 1 --doCutFlow 1 --doYields 1 --doLimits 1 --iso 0
+
+python -b FoMscan1.py --ID nMinus1 --removedCut ooEmooP --doPlots 1 --doCutFlow 1 --doYields 1 --doLimits 1 --iso 1
+python -b FoMscan1.py --ID nMinus1 --removedCut ooEmooP --doPlots 1 --doCutFlow 1 --doYields 1 --doLimits 1 --iso 0
+
+python -b FoMscan1.py --ID nMinus1 --removedCut dEta --doPlots 1 --doCutFlow 1 --doYields 1 --doLimits 1 --iso 1
+python -b FoMscan1.py --ID nMinus1 --removedCut dEta --doPlots 1 --doCutFlow 1 --doYields 1 --doLimits 1 --iso 0
+
+python -b FoMscan1.py --ID nMinus1 --removedCut dPhi --doPlots 1 --doCutFlow 1 --doYields 1 --doLimits 1 --iso 1
+python -b FoMscan1.py --ID nMinus1 --removedCut dPhi --doPlots 1 --doCutFlow 1 --doYields 1 --doLimits 1 --iso 0
+
+python -b FoMscan1.py --ID nMinus1 --removedCut d0 --doPlots 1 --doCutFlow 1 --doYields 1 --doLimits 1 --iso 1
+python -b FoMscan1.py --ID nMinus1 --removedCut d0 --doPlots 1 --doCutFlow 1 --doYields 1 --doLimits 1 --iso 0
+
+python -b FoMscan1.py --ID nMinus1 --removedCut dz --doPlots 1 --doCutFlow 1 --doYields 1 --doLimits 1 --iso 1
+python -b FoMscan1.py --ID nMinus1 --removedCut dz --doPlots 1 --doCutFlow 1 --doYields 1 --doLimits 1 --iso 0
+
+python -b FoMscan1.py --ID nMinus1 --removedCut MissingHits --doPlots 1 --doCutFlow 1 --doYields 1 --doLimits 1 --iso 1
+python -b FoMscan1.py --ID nMinus1 --removedCut MissingHits --doPlots 1 --doCutFlow 1 --doYields 1 --doLimits 1 --iso 0
+
+python -b FoMscan1.py --ID nMinus1 --removedCut convVeto --doPlots 1 --doCutFlow 1 --doYields 1 --doLimits 1 --iso 1
+python -b FoMscan1.py --ID nMinus1 --removedCut convVeto --doPlots 1 --doCutFlow 1 --doYields 1 --doLimits 1 --iso 0
+

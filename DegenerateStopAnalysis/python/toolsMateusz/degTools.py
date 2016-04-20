@@ -34,6 +34,15 @@ print "CMSSW Release: ", cmsbase
 getAllAlph = lambda str: ''.join(ch for ch in str if ch not in "!>=|<$&@$%[]{}#()/; '\"")
 addSquareSum = lambda x: math.sqrt(sum(( e**2 for e in x   )))
 
+def mkdir_p(path):
+    try:
+        os.makedirs(path)
+    except OSError as exc:  # Python >2.5
+        if exc.errno == errno.EEXIST and os.path.isdir(path):
+            pass
+        else:
+            raise
+
 def makeDir(path):
     if os.path.isdir(path):
         return
@@ -889,7 +898,6 @@ class Yields():
         self.dataList       = [samp for samp in   samples.dataList()  if samp in sampleList]
         self.sampleNames    = { samp:fixForLatex(samples[samp]['name']) for samp in sampleList}
 
-
         self.LatexTitles    = {}
         self.LatexTitles.update({ samp:self.sampleNames[samp] for samp in self.sampleNames})
         self.LatexTitles.update({ fomName:self.fomNames[fomName] for fomName in self.fomNames }) 
@@ -1471,8 +1479,7 @@ def plotLimits(limitDict):
   limitPlot.SetTitle("Median Expected Limits")
   return limitPlot
 
-def drawExpectedLimit( limitDict, plotDir, bins=None, key=None , title=""):
-    saveDir = plotDir
+def drawExpectedLimit(limitDict, plotDir, bins=None, key=None , title=""):
 
     if type(limitDict)==type({}):
         limits = limitDict
@@ -1488,7 +1495,7 @@ def drawExpectedLimit( limitDict, plotDir, bins=None, key=None , title=""):
     if not key:
         key = getValueFromDict
 
-    plot = makeStopLSPPlot("Exclusion", limits, bins=bins, key=key )
+    plot = makeStopLSPPlot("Exclusion", limits, bins = bins, key = key)
 
     ROOT.gStyle.SetOptStat(0)
     ROOT.gStyle.SetPaintTextFormat("0.2f")
@@ -1497,10 +1504,10 @@ def drawExpectedLimit( limitDict, plotDir, bins=None, key=None , title=""):
     #nLevels = len(levels)
     #plot.SetContour(nLevels, levels)
 
-    plot.SetContour(2 )
-    plot.SetContourLevel(0,0 )
-    plot.SetContourLevel(1,1 )
-    plot.SetContourLevel(2,10 )
+    plot.SetContour(2)
+    plot.SetContourLevel(0,0)
+    plot.SetContourLevel(1,1)
+    plot.SetContourLevel(2,10)
 
     #output_name = os.path.splitext(os.path.basename(limit_pickle))[0]+".png"
 
@@ -1516,7 +1523,7 @@ def drawExpectedLimit( limitDict, plotDir, bins=None, key=None , title=""):
         ltitle.DrawLatex(0.2, 0.8, title  )
     c1.Update()
     c1.Modify()
-    #c1.SaveAs("/afs/hephy.at/user/n/nrad/www/T2Deg13TeV/mAODv2_7412pass2/reload_scan_isrweight/%s"%output_name)
+    
     if plotDir:
         c1.SaveAs(plotDir)
         return c1,plot
@@ -1531,4 +1538,3 @@ def getValueFromDict(x, val="0.500", default=999):
     #else:
     #    raise Exception("cannot find value %s in  %s"%(val, x))
     return float(ret)
-
