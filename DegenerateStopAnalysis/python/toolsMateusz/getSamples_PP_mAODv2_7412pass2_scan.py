@@ -7,10 +7,10 @@ from Workspace.DegenerateStopAnalysis.toolsMateusz.cmgTuplesPostProcessed_mAODv2
 import Workspace.DegenerateStopAnalysis.weights as weights
 import pickle
 
+#in cmgTuplesPostProcessed_mAODv2:
 mc_path     = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2_v6/7412pass2_SMSScan_v1/RunIISpring15DR74_25ns"
 signal_path = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2_v6/7412pass2_SMSScan_v1/RunIISpring15DR74_25ns"
 data_path   = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2_v6/7412pass2_SMSScan_v1/Data_25ns"
-#in cmgTuplesPostProcessed_mAODv2
 cmgPP = cmgTuplesPostProcessed(mc_path, signal_path, data_path)
 
 mass_dict_pickle = "/data/nrad/cmgTuples/7412pass2_mAODv2_v6/RunIISpring15MiniAODv2/mass_dict.pkl"
@@ -57,8 +57,8 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'], useHT=False, getData
            TTJetsHTLowChain = getChain(cmgPP.TTJetsHTLow[skim], histname='')
            TTJetsHTHighChain = getChain(cmgPP.TTJetsHTHigh[skim], histname='')
            TTJetsHTRestChain = getChain(cmgPP.TTJetsHTRest[skim], histname='')
-           TTJetsHTRestChain.Add(cmgPP.TTJetsHTLowChain)
-           TTJetsHTRestChain.Add(cmgPP.TTJetsHTHighChain)
+           TTJetsHTRestChain.Add(TTJetsHTLowChain)
+           TTJetsHTRestChain.Add(TTJetsHTHighChain)
            
            sampleDict.update({'tt':{'tree':TTJetsHTRestChain, 'sample':cmgPP.TTJetsHTRest[skim], 'name':'TTJets', 'color':colors['tt'], 'isSignal':0, 'isData':0, "lumi":lumi_mc}})
 

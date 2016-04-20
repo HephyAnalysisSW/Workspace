@@ -1,0 +1,31 @@
+python -b FoMscan2.py --ID standard  --WP None --doPlots 1 --doCutFlow 1 --doYields 1 --doLimits 1 --iso 1
+python -b FoMscan2.py --ID standard  --WP Veto --doPlots 1 --doCutFlow 1 --doYields 1 --doLimits 1 --iso 1
+python -b FoMscan2.py --ID standard  --WP Loose --doPlots 1 --doCutFlow 1 --doYields 1 --doLimits 1 --iso 1
+python -b FoMscan2.py --ID standard  --WP Medium --doPlots 1 --doCutFlow 1 --doYields 1 --doLimits 1 --iso 1
+python -b FoMscan2.py --ID standard  --WP Tight --doPlots 1 --doCutFlow 1 --doYields 1 --doLimits 1 --iso 1
+
+python -b FoMscan2.py --ID standard  --WP None --doPlots 1 --doCutFlow 1 --doYields 1 --doLimits 1 --iso 0
+python -b FoMscan2.py --ID standard  --WP Veto --doPlots 1 --doCutFlow 1 --doYields 1 --doLimits 1 --iso 0
+python -b FoMscan2.py --ID standard  --WP Loose --doPlots 1 --doCutFlow 1 --doYields 1 --doLimits 1 --iso 0
+python -b FoMscan2.py --ID standard  --WP Medium --doPlots 1 --doCutFlow 1 --doYields 1 --doLimits 1 --iso 0
+python -b FoMscan2.py --ID standard  --WP Tight --doPlots 1 --doCutFlow 1 --doYields 1 --doLimits 1 --iso 0
+
+python -b FoMscan2.py --ID MVA --WP None --doPlots 1 --doCutFlow 1 --doYields 1 --doLimits 1 --iso 1
+python -b FoMscan2.py --ID MVA --WP WP80 --doPlots 1 --doCutFlow 1 --doYields 1 --doLimits 1 --iso 1
+python -b FoMscan2.py --ID MVA --WP WP90 --doPlots 1 --doCutFlow 1 --doYields 1 --doLimits 1 --iso 1
+
+python -b FoMscan2.py --ID MVA --WP None --doPlots 1 --doCutFlow 1 --doYields 1 --doLimits 1 --iso 0
+python -b FoMscan2.py --ID MVA --WP WP80 --doPlots 1 --doCutFlow 1 --doYields 1 --doLimits 1 --iso 0
+python -b FoMscan2.py --ID MVA --WP WP90 --doPlots 1 --doCutFlow 1 --doYields 1 --doLimits 1 --iso 0
+
+python -b FoMscan2.py --ID manual --WP None --doPlots 1 --doCutFlow 1 --doYields 1 --doLimits 1 --iso 1
+python -b FoMscan2.py --ID manual --WP Veto --doPlots 1 --doCutFlow 1 --doYields 1 --doLimits 1 --iso 1
+python -b FoMscan2.py --ID manual --WP Loose --doPlots 1 --doCutFlow 1 --doYields 1 --doLimits 1 --iso 1
+python -b FoMscan2.py --ID manual --WP Medium --doPlots 1 --doCutFlow 1 --doYields 1 --doLimits 1 --iso 1
+python -b FoMscan2.py --ID manual --WP Tight --doPlots 1 --doCutFlow 1 --doYields 1 --doLimits 1 --iso 1
+
+python -b FoMscan2.py --ID manual --WP None --doPlots 1 --doCutFlow 1 --doYields 1 --doLimits 1 --iso 0
+python -b FoMscan2.py --ID manual --WP Veto --doPlots 1 --doCutFlow 1 --doYields 1 --doLimits 1 --iso 0
+python -b FoMscan2.py --ID manual --WP Loose --doPlots 1 --doCutFlow 1 --doYields 1 --doLimits 1 --iso 0
+python -b FoMscan2.py --ID manual --WP Medium --doPlots 1 --doCutFlow 1 --doYields 1 --doLimits 1 --iso 0
+python -b FoMscan2.py --ID manual --WP Tight --doPlots 1 --doCutFlow 1 --doYields 1 --doLimits 1 --iso 0

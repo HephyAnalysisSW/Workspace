@@ -6,12 +6,13 @@ import copy, os, sys
 #from Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_7412pass2_mAODv2_v4 import mass_dict
 ## somehow import mass_dict without having to load files in cmgSample file.... (?)
 
-mc_path     = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2_v6/7412pass2_SMSScan_v1/RunIISpring15DR74_25ns" 
-signal_path = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2_v6/7412pass2_SMSScan_v1/RunIISpring15DR74_25ns" 
-data_path   = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2_v6/7412pass2_SMSScan_v1/Data_25ns" 
-lumi_mc     = 10000. # Lumi that was used in the weight calculation of PostProcessing in pb-1
+#mc_path     = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2_v6/7412pass2_SMSScan_v1/RunIISpring15DR74_25ns" 
+#signal_path = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2_v6/7412pass2_SMSScan_v1/RunIISpring15DR74_25ns" 
+#data_path   = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2_v6/7412pass2_SMSScan_v1/Data_25ns" 
 
-class cmgTuplesPostProcessed():
+class cmgTuplesPostProcessed:
+
+    lumi_mc     = 10000. # Lumi that was used in the weight calculation of PostProcessing in pb-1
 
     def makeSample(self, sample):
       i = copy.deepcopy(sample)
@@ -36,7 +37,7 @@ class cmgTuplesPostProcessed():
           #'dir' : "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/mAODv2_v4_SMSScan_v1/RunIISpring15DR74_25ns",
           'bins':[signal]}
 
-    def __init__(self, mc_path=mc_path, signal_path=signal_path, data_path=data_path, lumi_mc=lumi_mc):
+    def __init__(self, mc_path = "", signal_path = "", data_path = "", lumi_mc = lumi_mc):
 
         self.mc_path    =   mc_path
         self.signal_path=   signal_path
