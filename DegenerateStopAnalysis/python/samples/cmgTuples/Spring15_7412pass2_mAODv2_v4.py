@@ -517,7 +517,7 @@ allSignalData=[
     [sample_path+"/","T2DegStop_300_240_FastSim_v3_nrad-T2DegStop_300_240FS-eb69b0448a13fda070ca35fd76ab4e24" ,"T2DegStop_300_240_FastSim", signals_priv.T2DegStop_300_240_FastSim  ],
     [sample_path+"/","T2DegStop_300_270_FastSim_v3_nrad-T2DegStop_300_270FS-eb69b0448a13fda070ca35fd76ab4e24","T2DegStop_300_270_FastSim", signals_priv.T2DegStop_300_270_FastSim ],
     [sample_path+"/","T2DegStop_300_290_FastSim_v3_nrad-T2DegStop_300_290FS-eb69b0448a13fda070ca35fd76ab4e24" ,"T2DegStop_300_290_FastSim", signals_priv.T2DegStop_300_290_FastSim],
-    [sample_path+"/","T2tt_stop300_LSP270_nrad-CMSSW_7_4_4_FastSim_PU25ns_MCRUN2_74_V9_7414_MINIAODv2-eb69b0448a13fda070ca35fd76ab4e24" ,"T2tt_300_270_FastSim", signals_priv.T2tt_300_270_FastSim],
+#     [sample_path+"/","T2tt_stop300_LSP270_nrad-CMSSW_7_4_4_FastSim_PU25ns_MCRUN2_74_V9_7414_MINIAODv2-eb69b0448a13fda070ca35fd76ab4e24" ,"T2tt_300_270_FastSim", signals_priv.T2tt_300_270_FastSim],
     ]
 
 allSignalData.extend(signal_scan)
