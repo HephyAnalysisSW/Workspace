@@ -95,7 +95,6 @@ def getParameterSet(args):
             'eta': ('eta', operator.lt, 2.4, operator.abs),
             'dxy': ('dxy', operator.lt, 0.05, operator.abs),
             'dz': ('dz', operator.lt, 0.2, operator.abs),
-            'sip3d': ('sip3d', operator.lt, 4),
             'mediumMuonId': ('mediumMuonId', operator.eq, 1),
             'hybIso': {
                 'ptSwitch': 25, 
