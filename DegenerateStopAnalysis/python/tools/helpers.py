@@ -10,6 +10,7 @@ import logging
 import random
 import tempfile
 import math
+import collections
 
 # imports user modules or functions
 
@@ -407,4 +408,62 @@ def dR(obj1Index, obj2Index, obj1Collection, obj2Collection=None):
 
     #
     return dRValue
+
+
+def get_logger(logModule, logLevel, logFile):
+    ''' Generic logger.
+    
+    '''
+
+    # add TRACE (numerical level 5, less than DEBUG) to logging (similar to apache) 
+    # see default levels at https://docs.python.org/2/library/logging.html#logging-levels
+    logging.TRACE = 5
+    logging.addLevelName(logging.TRACE, 'TRACE')
+    
+    logging.Logger.trace = lambda inst, msg, *args, **kwargs: inst.log(logging.TRACE, msg, *args, **kwargs)
+    logging.trace = lambda msg, *args, **kwargs: logging.log(logging.TRACE, msg, *args, **kwargs)
+
+    logger = logging.getLogger(logModule)
+
+    numeric_level = getattr(logging, logLevel.upper(), None)
+    if not isinstance(numeric_level, int):
+        raise ValueError("Invalid log level: %s" % logLevel)
+     
+    logger.setLevel(numeric_level)
+     
+    # create the logging file handler
+    fileHandler = logging.FileHandler(logFile, mode='w')
+ 
+    formatter = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
+    fileHandler.setFormatter(formatter)
+ 
+    # add handler to logger object
+    logger.addHandler(fileHandler)
+  
+    # log the exceptions to the logger
+    def excepthook(*args):
+        logger.error("Uncaught exception:", exc_info=args)
+
+    sys.excepthook = excepthook
+    
+        # define the named tuple to return the values
+    rtuple = collections.namedtuple(
+        'get_logger', 
+        [
+            'logger', 
+            'numeric_level', 
+            'fileHandler',
+            ]
+        )
+    
+    get_logger_rtuple = rtuple(
+        logger, 
+        numeric_level, 
+        fileHandler,
+        )
+
+    #    
+    return get_logger_rtuple
+
+
     
