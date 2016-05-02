@@ -448,7 +448,7 @@ def get_logger(logModule, logLevel, logFile):
     
         # define the named tuple to return the values
     rtuple = collections.namedtuple(
-        'get_logger', 
+        'rtuple', 
         [
             'logger', 
             'numeric_level', 

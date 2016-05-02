@@ -461,9 +461,13 @@ def make_command(sampleSet, command_default=[]):
                             break
                         else:
                             optWithArg += ' ' + extraOptions[idxOptNext]
-                                          
+                            logger.trace ('\n option with arguments: %s \n', optWithArg) 
+                                           
                     command[idx] = optWithArg
-                    logger.trace ('\n option with arguments: %s \n', optWithArg) 
+                    
+            if "None" in command[idx]:
+                del command[idx]
+                
                     
         pprint_cust.pprint(" ".join(command))
         
