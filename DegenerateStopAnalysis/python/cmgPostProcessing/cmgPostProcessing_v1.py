@@ -146,40 +146,17 @@ def getParameterSet(args):
 def get_logger(logLevel, logFile):
     ''' Logger for post-processing module.
     
+    Use the basic definition of the logger from helpers.
+    
     '''
 
-    # add TRACE (numerical level 5, less than DEBUG) to logging (similar to apache) 
-    # see default levels at https://docs.python.org/2/library/logging.html#logging-levels
-    logging.TRACE = 5
-    logging.addLevelName(logging.TRACE, 'TRACE')
-    
-    logging.Logger.trace = lambda inst, msg, *args, **kwargs: inst.log(logging.TRACE, msg, *args, **kwargs)
-    logging.trace = lambda msg, *args, **kwargs: logging.log(logging.TRACE, msg, *args, **kwargs)
+    get_logger_rtuple = helpers.get_logger('cmgPostProcessing', logLevel, logFile)
+    logger = get_logger_rtuple.logger
+    numeric_level = get_logger_rtuple.numeric_level
+    fileHandler = get_logger_rtuple.fileHandler
 
-    logger = logging.getLogger('cmgPostProcessing')
-
-    numeric_level = getattr(logging, logLevel.upper(), None)
-    if not isinstance(numeric_level, int):
-        raise ValueError("Invalid log level: %s" % logLevel)
-     
-    logger.setLevel(numeric_level)
     cmgObjectSelection.logger.setLevel(numeric_level)
-     
-    # create the logging file handler
-    fileHandler = logging.FileHandler(logFile, mode='w')
- 
-    formatter = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
-    fileHandler.setFormatter(formatter)
- 
-    # add handler to logger object
-    logger.addHandler(fileHandler)
     cmgObjectSelection.logger.addHandler(fileHandler)
-  
-    # log the exceptions to the logger
-    def excepthook(*args):
-        logger.error("Uncaught exception:", exc_info=args)
-
-    sys.excepthook = excepthook
 
     return logger
 
@@ -357,7 +334,7 @@ def getSamples(args):
 
     # define the named tuple to return the values
     rtuple = collections.namedtuple(
-        'getSamples', 
+        'rtuple', 
         [
             'sampleFile', 
             'componentList', 
@@ -372,7 +349,7 @@ def getSamples(args):
     return getSample_rtuple
     
 
-def eventsSkimPreselect(skimName, skimLepton, preselectFlag, params, signalMasses=[]):
+def eventsSkimPreselect(skimName, skimLepton, skimPreselectFlag, params, skimSignalMasses=[]):
     '''Define the skim condition, including preselection if required.
     
     The skim condition depends on the skim name, the lepton skim selection, and on the
@@ -418,9 +395,9 @@ def eventsSkimPreselect(skimName, skimLepton, preselectFlag, params, signalMasse
     if skimName == 'inc':
         skimCond = "(1)"
       
-    logger.info("\n Jobs running with skim = '%s' \n Skimming condition: \n  %s \n ", skimName, skimCond)
+    logger.info("\n Jobs running with skim = '%s' \n Initial skimming condition: \n  %s \n ", skimName, skimCond)
     
-    if preselectFlag:
+    if skimPreselectFlag:
         metCut = "(met_pt>200)"
         leadingJet100 = "((Max$(Jet_pt*(abs(Jet_eta)<2.4 && Jet_id) ) > 100 ) >=1)"
         HTCut    = "(Sum$(Jet_pt*(Jet_pt>30 && abs(Jet_eta)<2.4 && (Jet_id)) ) >200)"
@@ -434,9 +411,9 @@ def eventsSkimPreselect(skimName, skimLepton, preselectFlag, params, signalMasse
         logger.info("\n No preselection cuts are applied for skim %s \n Skimming condition unchanged \n", skimName)
         pass
 
-    if signalMasses:
-        mstop = signalMasses[0]
-        mlsp  = signalMasses[1]
+    if skimSignalMasses:
+        mstop = skimSignalMasses[0]
+        mlsp  = skimSignalMasses[1]
         skimCond +="&& (GenSusyMStop==%s && GenSusyMNeutralino==%s)"%(mstop,mlsp)
         logger.info("\n Processing Signal Scan for MStop:%s  MLSP: %s "%(mstop, mlsp ))
         
@@ -745,7 +722,7 @@ def rwTreeClasses(sample, isample, args, temporaryDir, params={} ):
 
     # define the named tuple to return the values
     rtuple = collections.namedtuple(
-        'rwTreeClasses', 
+        'rtuple', 
         [
             'keepBranches', 
             'readVars', 
@@ -773,7 +750,7 @@ def rwTreeClasses(sample, isample, args, temporaryDir, params={} ):
    
    
 def getTreeFromChunk(c, skimCond, iSplit, nSplit):
-    '''Get a tree from a chunck.
+    '''Get a tree from a chunk.
     
     '''
      
@@ -1000,7 +977,7 @@ def processLeptons(readTree, splitTree, saveTree, params):
         
     # define the named tuple to return the values
     rtuple = collections.namedtuple(
-        'processLeptons', 
+        'rtuple', 
         [
             'lepObj',
             'muList',
@@ -1220,7 +1197,7 @@ def processJets(args, readTree, splitTree, saveTree, params):
     
     # define the named tuple to return the values
     rtuple = collections.namedtuple(
-        'processJets', 
+        'rtuple', 
         [
             'jetObj',
             'basJetList',
@@ -1259,7 +1236,7 @@ def processLeptonJets(
         
         # define the named tuple to return the values
         rtuple = collections.namedtuple(
-            'variablesLeptonJets',
+            'rtuple',
             [
                 'basJet_obj_dR_j1obj1',
                 'basJet_obj_invMass_obj1jmindR',
@@ -1803,42 +1780,46 @@ def cmgPostProcessing(argv=None):
     # get the event veto list FIXME: are the values updated properly?   
     event_veto_list = get_veto_list()['all']
 
-    #   prepare for signal scan
-    
-    if args.processSignalScan:
-        #mass_dict = pickle.load( open("./mass_dicts/%s_mass_nEvents_xsec.pkl"%sample,"r"))
-        #from mass_dict import mass_dict
-        #mass_dict = pickle.load(open("mass_dict_all.pkl","r"))
-    
-        mass_dict = getSamples_rtuple.mass_dict
-
-        if len(mass_dict) ==0:
-            print "Mass Dict Not Avail. It's needed to split signal scan mass points"
-            assert False, "Mass Dict Not Avail. It's needed to split signal scan mass points"
-
-        mstop = args.processSignalScan[0]
-        mlsp = args.processSignalScan[1]
-        xsec = mass_dict[int(mstop)][int(mlsp)]['xsec']
-        nEntries = mass_dict[int(mstop)][int(mlsp)]['nEntry']
-
-    # skim condition 
-    signalMasses = [mstop, mlsp] if args.processSignalScan else []
-    skimCond = eventsSkimPreselect(skim, skimLepton, skimPreselect, params, signalMasses)
-    logger.info("\n Final skimming condition: \n  %s \n", skimCond)
     
     # loop over each sample, process all variables and fill the saved tree
     
     for isample, sample in enumerate(allSamples):
         
         sampleName = sample['cmgComp'].name
+        sample_name = sample['name']
         
         isDataSample = True if sample['cmgComp'].isData else False
         sampleType = 'Data' if isDataSample else 'MC'
                               
         logger.info(
-            "\n Running on sample %s of type %s \n",
+            "\n Running on CMG sample component %s of type %s \n",
             sampleName, sampleType
             ) 
+
+        #   prepare for signal scan
+        
+        if args.processSignalScan:
+        
+            mass_dict = getSamples_rtuple.mass_dict[sample_name]
+            
+            logger.debug("\n Mass dictionary: \n \n %s \n ", pprint.pformat(mass_dict)) 
+    
+            if len(mass_dict) ==0:
+                print "Mass dictionary, needed to split signal scan mass points, not available. \nExiting job."
+                raise Exception(
+                    "Mass dictionary, needed to split signal scan mass points, not available. \nExiting job."
+                    )
+    
+            mstop = args.processSignalScan[0]
+            mlsp = args.processSignalScan[1]
+            xsec = mass_dict[int(mstop)][int(mlsp)]['xSec']
+            nEntries = mass_dict[int(mstop)][int(mlsp)]['nEvents']
+            
+            
+        # skim condition 
+        skimSignalMasses = [mstop, mlsp] if args.processSignalScan else []
+        skimCond = eventsSkimPreselect(skim, skimLepton, skimPreselect, params, skimSignalMasses)
+        logger.info("\n Final skimming condition: \n  %s \n", skimCond)
 
         # create the output sample directory, if it does not exist. 
         # If it exists and overwriteOutputFiles is set to True, clean up the directory; if overwriteOutputFiles is 
@@ -1849,9 +1830,14 @@ def cmgPostProcessing(argv=None):
         # it will be deleted and re-created.
 
 
-        sample_name = sample['name']
         if args.processSignalScan:
-            sample_name = "SMS_T2_4bd_mStop_%s_mLSP_%s"%(mstop,mlsp)        
+            sample_name = "SMS_T2_4bd_mStop_%s_mLSP_%s"%(mstop,mlsp)
+                
+        logger.info(
+            "\n Sample name (from sample file)  %s of type %s \n",
+            sample_name, sampleType
+            ) 
+
         outputWriteDirectory = os.path.join(outputDirectory, sample_name)
 
         if not os.path.exists(outputWriteDirectory):
@@ -1994,8 +1980,9 @@ def cmgPostProcessing(argv=None):
                                     round(float(nVerboseEvents)/passed_time )
                                     )                      
                             logger.debug(
-                                "\n Processing event %i from %i events from chunck \n %s \n",
-                                nEvents_total, iEv, nEvents, chunk['name']
+                                "\n Processing event %i from %i events from chunk \n %s \n" + \
+                                "\n Total processed events from all chunks: %i \n",
+                                iEv, nEvents, chunk['name'], nEvents_total
                                 )
             
                     saveTree.init()
@@ -2006,7 +1993,7 @@ def cmgPostProcessing(argv=None):
                         "\n " + \
                         "\n ================================================" + \
                         "\n * Processing Run:LS:Event %i:%i:%i \n",
-                        splitTree.run, splitTree.lumi, splitTree.evt 
+                        splitTree.run, splitTree.lumi, int(splitTree.evt) 
                         )
                     
                     # leptons processing
@@ -2063,8 +2050,18 @@ def cmgPostProcessing(argv=None):
 
                 # 
                 
-                # fileTreeSplit = sample['name'] + '_' + chunk['name'] + '_' + str(iSplit) + '.root' 
-                fileTreeSplit = sample_name + '_' + chunk['name'] + '_' + str(iSplit) + '.root' 
+                fileTreeSplit_full = sample_name + '_' + chunk['name'] + '_' + str(iSplit) + '.root' 
+                
+                file_length_limit = 256
+                if len(fileTreeSplit_full)> file_length_limit:
+                    fileTreeSplit = sample_name[:50] + '_' + chunk['name'][:50] + '_' + str(iSplit) + '.root'
+                    logger.debug(
+                        "\n Length of fileTreeSplit name shortened to %d\n New file name: \n %s \n", 
+                        len(fileTreeSplit), fileTreeSplit)
+                else:
+                    fileTreeSplit = fileTreeSplit_full
+                
+                
                 filesForHadd.append(fileTreeSplit)
 
                 if not testMethods:
@@ -2106,12 +2103,12 @@ def cmgPostProcessing(argv=None):
         if not testMethods: 
             haddFiles(sample_name, filesForHadd, temporaryDir, outputWriteDirectory)
                 
-    logger.info(
-        "\n " + \
-        "\n End of post-processing sample %s. \n Total number of event processed for this sample: %i" + \
-        "\n *******************************************************************************\n",
-        sample_name, nEvents_total
-        )
+        logger.info(
+            "\n " + \
+            "\n End of post-processing sample %s. \n Total number of event processed for this sample: %i" + \
+            "\n *******************************************************************************\n",
+            sample_name, nEvents_total
+            )
     
     if verbose:
         print "Log File Stored in:"
