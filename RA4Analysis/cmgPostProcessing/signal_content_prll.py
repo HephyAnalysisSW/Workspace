@@ -40,6 +40,9 @@ def getGluLSPInfo(sample):
   if VV_label == "ZZ" :
     print "I am at ZZ"
     cut_common = "Sum$(abs(GenPart_pdgId)==1000022&&abs(GenPart_motherId)==1000023&&abs(GenPart_grandmotherId)==1000021)==2&&(Sum$(abs(GenPart_pdgId)==23)==2)"
+  if VV_label == "VV" :
+    print "I am at VV"
+    cut_common = "(1)"
 
   print sample , cut_common
   sample_name = sample["name"]

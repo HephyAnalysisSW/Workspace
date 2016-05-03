@@ -113,8 +113,23 @@ from Workspace.HEPHYPythonTools.user import username
 import pickle
 
 pickleDir = '/data/easilar/Spring15/25ns/'
+#pickleDir = '/data/easilar/Spring15/25ns/T5qqqqWZ_mass_nEvents_xsec_pkl'
 #signal_dir = '/data/easilar/cmgTuples/postProcessing_Signals/signal/'
 signal_dir = '/data/easilar/cmgTuples/postProcessing_Signals_v4/signal/'
+#signal_dir = '/data/easilar/cmgTuples/postProcessing_Signals/WZ/'
+
+def getSignalSample_VV(VV_label='WZ'):
+  pickleDir = '/data/easilar/Spring15/25ns/T5qqqq'+VV_label+'_mass_nEvents_xsec_pkl'
+  signal_dir = '/data/easilar/cmgTuples/postProcessing_Signals/'+VV_label+'/'
+  sig = {}
+  mass_dict = pickle.load(file(pickleDir))
+  for mglu in mass_dict.keys() :
+    sig[mglu] = {}
+    for mlsp in mass_dict[mglu].keys() :
+      sig[mglu][mlsp] = mass_dict[mglu][mlsp]
+      sig[mglu][mlsp]['file']="/".join([signal_dir,str(mglu)+"_"+str(mlsp),"*.root"])
+      sig[mglu][mlsp]['name'] ="_".join([str(mglu),str(mlsp)])
+  return sig
 
 def getSignalSample(signal):
   if signal in allSignalStrings:
@@ -129,6 +144,10 @@ def getSignalSample(signal):
     return sig
   else:
     print "Signal",signal,"unknown. Available: ",", ".join(allSignalStrings)
+
+WZ_signals = getSignalSample_VV(VV_label='WZ') 
+ZZ_signals = getSignalSample_VV(VV_label='ZZ') 
+VV_signals = getSignalSample_VV(VV_label='VV') 
 
 allSignals=[]
 for s in allSignalStrings:

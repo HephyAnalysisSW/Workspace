@@ -63,7 +63,7 @@ histos_LS = {
 }
 #####################
 
-subDir = "postProcessing_Signals_v4"
+subDir = "postProcessing_Signals"
 
 #branches to be kept for data and MC
 branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert",
@@ -93,6 +93,7 @@ branchKeepStrings_DATA = []
 from optparse import OptionParser
 parser = OptionParser()
 parser.add_option("--samples", dest="allsamples", default=defSampleStr, type="string", action="store", help="samples:Which samples.")
+parser.add_option("--vv", dest="vv", default="WW", type="string", action="store", help="samples:Which final state WW/WZ/ZZ.")
 parser.add_option("--inputTreeName", dest="inputTreeName", default="treeProducerSusySingleLepton", type="string", action="store", help="samples:Which samples.")
 parser.add_option("--targetDir", dest="targetDir", default="/data/"+username+"/cmgTuples/"+subDir+'/', type="string", action="store", help="target directory.")
 parser.add_option("--skim", dest="skim", default="signal", type="string", action="store", help="any skim condition?")
@@ -108,7 +109,7 @@ parser.add_option("--manScaleFactor", dest="manScaleFactor", default = 1, action
 skimCond = "(1)"
 ht500lt250 = "Sum$(Jet_pt)>500&&(LepGood_pt[0]+met_pt)>250"
 #common_skim = "HT500LT250"
-common_skim = "signal"
+#common_skim = "signal"
 
 if options.manScaleFactor!=1:
   target_lumi = target_lumi*float(options.manScaleFactor)
@@ -150,20 +151,52 @@ def getTreeFromChunk(c, skimCond, iSplit, nSplit):
   del rf
   return t
        
-
+VV_label = options.vv
+###T5qqqqWW
+if VV_label == "WW" :
+  print "I am at WW"
+  cut_common = "Sum$(abs(GenPart_pdgId)==1000022&&abs(GenPart_motherId)==1000024&&abs(GenPart_grandmotherId)==1000021)==2&&(Sum$(abs(GenPart_pdgId)==24)==2)"
+###T5qqqqWZ
+if VV_label == "WZ" :
+  print "I am at WZ"
+  cut_common = "Sum$(abs(GenPart_pdgId)==1000022&&abs(GenPart_motherId)==1000024&&abs(GenPart_grandmotherId)==1000021)==1&&Sum$(abs(GenPart_pdgId)==1000022&&abs(GenPart_motherId)==1000023&&abs(GenPart_grandmotherId)==1000021)==1&&Sum$(abs(GenPart_pdgId)==23)==1&&Sum$(abs(GenPart_pdgId)==24)==1&&(Sum$(abs(GenPart_pdgId)==23)+Sum$(abs(GenPart_pdgId)==24))==2"
+###T5qqqqZZ
+if VV_label == "ZZ" :
+  print "I am at ZZ"
+  cut_common = "Sum$(abs(GenPart_pdgId)==1000022&&abs(GenPart_motherId)==1000023&&abs(GenPart_grandmotherId)==1000021)==2&&(Sum$(abs(GenPart_pdgId)==23)==2)"
+if VV_label == "VV" :
+  print "I am at VV"
+  cut_common = "(1)"
+  
 #pickleDir = '/data/'+username+'/Spring15/25ns/'
 pickleDir = '/data/easilar/Spring15/25ns/'
 
+mass_dict = pickle.load(file(pickleDir+'T5qqqq'+VV_label+'_mass_nEvents_xsec_pkl'))
+
 exec('allSamples=['+options.allsamples+']')
 for isample, sample in enumerate(allSamples):
+  #print sample
   chunks, sumWeight = getChunks(sample)
-  mass_dict = pickle.load(file(pickleDir+sample["name"]+'_mass_nEvents_xsec_pkl'))
   for mglu in mass_dict.keys():
     for mlsp in mass_dict[mglu].keys() :
-      skimCond = "Sum$(abs(GenPart_pdgId)==1000022&&abs(GenPart_motherId)==1000024&&abs(GenPart_grandmotherId)==1000021)==2&&(Sum$(abs(GenPart_pdgId)==24)==2)"
+      #print sample["name"]
+      min_glu , max_glu = sample["name"].split("_")[2].lower().split("to")
+      min_lsp , max_lsp = sample["name"].split("_")[4].lower().split("to")
+      exec('max_mglu='+max_glu)
+      exec('min_mglu='+min_glu)
+      exec('max_mlsp='+max_lsp)
+      exec('min_mlsp='+min_lsp)
+      #print mglu , mlsp
+      #print "min_mglu" , min_mglu , "max_mglu" , max_mglu
+      if not mglu in xrange(min_mglu, max_mglu+1): continue
+      if not mlsp in xrange(min_mlsp, max_mlsp+1): continue
+      #print mglu , mlsp
+      skimCond = cut_common
       mass_point = mass_dict[mglu][mlsp]
+      #print mglu , mlsp , mass_point
       skimCond += "&&GenSusyMGluino=="+str(mglu)+"&&GenSusyMNeutralino=="+str(mlsp)
-      outDir = options.targetDir+"/".join([common_skim, sample['name'],str(mglu)+"_"+str(mlsp)])
+      #outDir = options.targetDir+"/".join([common_skim, sample['name'],str(mglu)+"_"+str(mlsp)])
+      outDir = options.targetDir+"/".join([VV_label,str(mglu)+"_"+str(mlsp)])
       if os.path.exists(outDir) and os.listdir(outDir) != [] and not options.overwrite:
         print "Found non-empty directory: %s -> skipping!"%outDir
         continue
@@ -173,14 +206,8 @@ for isample, sample in enumerate(allSamples):
       os.system('mkdir -p '+tmpDir)
       os.system('rm -rf '+tmpDir+'/*')
 
-      if sample['isData']: 
-        lumiScaleFactor=1
-        branchKeepStrings = branchKeepStrings_DATAMC + branchKeepStrings_DATA 
-      else:
-        if ("TTJets" in sample['dbsName']): lumiScaleFactor = xsec[sample['dbsName']]*target_lumi/float(sumWeight)
-        else: lumiScaleFactor = target_lumi/float(sumWeight)
-        branchKeepStrings = branchKeepStrings_DATAMC + branchKeepStrings_MC
-      if ("T5qqqqVV" in sample['name']) : lumiScaleFactor = mass_point["xsec"]*target_lumi/mass_point["nEntry"]  
+      branchKeepStrings = branchKeepStrings_DATAMC + branchKeepStrings_MC
+      lumiScaleFactor = mass_point["xSec"]*target_lumi/mass_point["nEntry"]  
       
       sampleKey = ''
       if sample["name"] in mcEffDict.keys():

@@ -9,6 +9,7 @@ from Workspace.RA4Analysis.signalRegions import *
 from Workspace.HEPHYPythonTools.user import username
 from math import sqrt, pi
 from general_config import *
+
 ROOT.TH1F().SetDefaultSumw2()
 
 #weight_str = "((weight*2.25)/3)"
@@ -18,7 +19,7 @@ def getFOM(Ysig ,Ysig_Var, Ybkg,  Ybkg_Var):
   if Ybkg>0.0:
     FOM = Ysig/sqrt(Ybkg+(0.2*Ybkg)**2)
     #FOM_Var = Ysig_Var/Ybkg + Ybkg_Var*((Ysig)/(2*Ybkg**(3/2)))**2
-    return FOM#, FOM_Var
+    return FOM #, FOM_Var
   else:
     return 'nan'
 
@@ -77,14 +78,15 @@ for srNJet in sorted(signalRegions):
       dummy, c_SB_tt_SR =  nameAndCut(stb, htb, (4,5),  btb=(0,-1), presel=presel+"&&deltaPhi_Wl>"+str(deltaPhiCut), btagVar = btagString)
       dummy, c_SB_W_SR =  nameAndCut(stb, htb, (3,4),   btb=(0,-1), presel=presel+"&&deltaPhi_Wl>"+str(deltaPhiCut), btagVar = btagString)
       bin[srNJet][stb][htb]["signals"] = {}
-      for signal in allSignals:
-        #print sig
-        #exec("signal="+sig)
-        for mglu in signal.keys() :
-          bin[srNJet][stb][htb]["signals"][mglu] = {}
-          for mlsp in signal[mglu].keys() :
-            s_chain = getChain(signal[mglu][mlsp],histname='')
-            bin[srNJet][stb][htb]["signals"][mglu][mlsp] = {"yield_MB_SR":  getYieldFromChain(s_chain, c_MB_SR,     weight = weight_str+"*weightBTag0_SF")      ,"stat_err_MB_SR":   sqrt(getYieldFromChain(s_chain, c_MB_SR, weight = weight_str+"*"+weight_str+"*weightBTag0_SF*weightBTag0_SF")),\
+      #for signal in WZ_signals:
+      #print sig
+      #exec("signal="+sig)
+      signal = VV_signals
+      for mglu in signal.keys() :
+        bin[srNJet][stb][htb]["signals"][mglu] = {}
+        for mlsp in signal[mglu].keys() :
+          s_chain = getChain(signal[mglu][mlsp],histname='')
+          bin[srNJet][stb][htb]["signals"][mglu][mlsp] = {"yield_MB_SR":  getYieldFromChain(s_chain, c_MB_SR,     weight = weight_str+"*weightBTag0_SF")      ,"stat_err_MB_SR":   sqrt(getYieldFromChain(s_chain, c_MB_SR, weight = weight_str+"*"+weight_str+"*weightBTag0_SF*weightBTag0_SF")),\
                                                           "yield_MB_CR":    getYieldFromChain(s_chain, c_MB_CR,     weight = weight_str+"*weightBTag0_SF")      ,"stat_err_MB_CR":   sqrt(getYieldFromChain(s_chain, c_MB_CR, weight    = weight_str+"*"+weight_str+"*weightBTag0_SF*weightBTag0_SF"))             ,\
                                                           "yield_SB_tt_SR": getYieldFromChain(s_chain, c_SB_tt_SR,  weight = weight_str+"*weightBTag1_SF")      ,"stat_err_SB_tt_SR":sqrt(getYieldFromChain(s_chain, c_SB_tt_SR, weight = weight_str+"*"+weight_str+"*weightBTag1_SF*weightBTag1_SF"))          ,\
                                                           "yield_SB_tt_CR": getYieldFromChain(s_chain, c_SB_tt_CR,  weight = weight_str+"*weightBTag1_SF")      ,"stat_err_SB_tt_CR":sqrt(getYieldFromChain(s_chain, c_SB_tt_CR, weight = weight_str+"*"+weight_str+"*weightBTag1_SF*weightBTag1_SF"))          ,\
@@ -93,7 +95,7 @@ for srNJet in sorted(signalRegions):
                                                           }
       bin[srNJet][stb][htb]['name']=name
 
-pickle.dump(bin,file('/data/easilar/Spring15/25ns/allSignals_2p3_pkl','w'))
+pickle.dump(bin,file('/data/easilar/Spring15/25ns/allSignals_VV_2p3_pkl','w'))
 
 #print bin
 #for srNJet in sorted(signalRegions):
