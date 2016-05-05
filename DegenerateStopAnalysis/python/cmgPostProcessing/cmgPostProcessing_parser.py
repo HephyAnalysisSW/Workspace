@@ -26,6 +26,7 @@ def get_parser():
     argParser.add_argument('--logLevel',
         action='store',
         nargs='?',
+        type=str,
         choices=['CRITICAL', 'ERROR', 'WARNING', 'INFO', 'DEBUG', 'TRACE', 'NOTSET'],
         default='INFO',
         help="Log level for logging"
@@ -99,7 +100,7 @@ def get_parser():
         help="Selection of the parameter set used for post-processing." 
         )
 
-    argParser.add_argument('--skim',
+    argParser.add_argument('--skimGeneral',
         action='store',
         nargs='?',
         type=str,

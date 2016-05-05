@@ -12,6 +12,9 @@ import subprocess
 import pprint
 import copy
 import multiprocessing
+import errno
+import os
+import sys
 
 # imports user modules or functions
 
@@ -53,8 +56,8 @@ sampleSets = {
                 'ttjets':{
                             'samples':[
                                         "TTJets_LO",                                   
-                                        ["TTJets_LO",               "--skim='lheHTlow'"      ],
-                                        ["TTJets_LO_HT600to800",    "--skim='lheHThigh'"     ],
+                                        ["TTJets_LO",               "--skimGeneral='lheHTlow'"      ],
+                                        ["TTJets_LO_HT600to800",    "--skimGeneral='lheHThigh'"     ],
                                         "TTJets_LO_HT800to1200",
                                         "TTJets_LO_HT1200to2500",
                                         "TTJets_LO_HT2500toInf",
@@ -373,22 +376,19 @@ def get_parser():
     return argParser, argsRun
 
 
-def make_default_command(args, argsRun):
-    ''' Create the default command for post-processing script.
+def make_list_options(args, argsRun):
+    ''' Create the list of options for post-processing script.
         
-    The default command is created from the arguments of the cmgPostProcessing_v1.py
-    given on the command line and the default values of the cmgPostProcessing_v1.py arguments (for 
-    arguments not given on the command line). 
+    The list of options is created from the arguments of the cmgPostProcessing_v1.py
+    given on the command line for runPostProcessing and the default values of the cmgPostProcessing_v1.py 
+    arguments (for arguments not given on the command line). 
     
     The arguments specific to runPostProcessing script only, given in argsRun group, are not considered.
     '''
 
-    logger = logging.getLogger('runPostProcessing.make_default_command')
+    logger = logging.getLogger('runPostProcessing.make_list_options')
 
-    command_default = [
-        'python',
-        'cmgPostProcessing_v1.py',
-        ]
+    options_list = []
 
     argsRunList = []
     for a in argsRun._group_actions:
@@ -406,29 +406,29 @@ def make_default_command(args, argsRun):
                 else:
                     continue
             else:
-                argWmStr = argWm + "='{}'".format(argValue)
+                argWmStr = argWm + "={}".format(argValue)
                 
-            command_default.append(argWmStr)
+            options_list.append(argWmStr)
            
-    logger.debug("\n command_default: \n %s \n", pprint_cust.pformat(command_default))
+    logger.debug("\n options_list: \n %s \n", pprint_cust.pformat(options_list))
 
     #
-    return command_default
+    return options_list
 
 
-def make_command(sampleSet, command_default=[]):
+def make_command(sampleSet, options_list=[]):
     ''' Create the final command for post-processing script.
     
-    The command is created from the default command, replacing the "--processSample=..." argument 
+    The command is created using the list of options, replacing the "--processSample=..." argument 
     with the sample specific argument. Optional arguments included in the "samples" definition  
-    replace also the arguments from the default command. 
+    replace also the arguments from the list of options. 
     '''
     logger = logging.getLogger('runPostProcessing.make_command')
     
     commands = []
     for samp in sampleSets[sampleSet]['samples']:
         
-        command = copy.deepcopy(command_default)
+        options_current = []
         extraOptions = []
         if type(samp) == type(""):
             sampName = samp
@@ -439,82 +439,134 @@ def make_command(sampleSet, command_default=[]):
             raise Exception("\n type not recognized for %s" % samp)
         
         logger.debug(
-            "\n Extra options from sample definition for sample %s: \n, %s \n",
+            "\n Extra options from sample definition for sample %s: \n %s \n",
             sampName, pprint_cust.pformat(extraOptions)
             )
         
-        # replace the existing arguments in the command with the arguments from the file
-        for idx, arg in enumerate(command):
+        # add the arguments from options_list to options_current
+        # if necessary, replace the existing arguments from options_list with the arguments from the file
+        for idx, arg in enumerate(options_list):
             logger.trace ('\n argument: %s\n', arg)
             if 'processSample' in arg:
-                command[idx] = "--processSample='{}'".format(sampName)
+                options_current.append("--processSample={}".format(sampName))
                 continue
             
-            optWithArg = ''
-            for idxOpt, opt in enumerate(extraOptions):
+            addOption = True
+            for idxExtra, opt in enumerate(extraOptions):
                 if (opt.split('=')[0]) == (arg.split('=')[0]):
-                    optWithArg = opt
-                
+                    if "'" in opt:
+                        optWithArg = opt.translate(None, "'")
+                    elif '"' in opt:
+                        optWithArg = opt.translate(None, '"')
+                    else:
+                        optWithArg = opt
+                                                            
+                    options_current.append(optWithArg)
+                    logger.trace (
+                        '\n     added option from file: %s \n', optWithArg
+                        ) 
+                    addOption = False
+                    
                     # check if next item is an option or an argument to an option, based on the first character ('-')
-                    for idxOptNext in range(idxOpt + 1, len(extraOptions)):
-                        if extraOptions[idxOptNext].startswith('-'):
+                    for idxExtraNext in range(idxExtra + 1, len(extraOptions)):
+                        if extraOptions[idxExtraNext].startswith('-'):
                             break
                         else:
-                            optWithArg += ' ' + extraOptions[idxOptNext]
-                            logger.trace ('\n option with arguments: %s \n', optWithArg) 
+                            options_current.append(extraOptions[idxExtraNext])
+                            logger.trace (
+                                '\n     option with arguments: %s %s \n', 
+                                optWithArg, 
+                                extraOptions[idxExtraNext]
+                                ) 
                                            
-                    command[idx] = optWithArg
-                    
-            if "None" in command[idx]:
-                del command[idx]
+            
+            if addOption:
+                if not 'None' in arg:        
+                    options_current.append(arg)
+                    logger.trace (
+                        '\n     added option from initial list: %s \n', arg
+                        ) 
                 
                     
-        pprint_cust.pprint(" ".join(command))
+        commandPostProcessing = [
+            'python',
+            'cmgPostProcessing_v1.py',
+            ]
+        
+        commandPostProcessing.extend(options_current)
+
+        pprint_cust.pprint(" ".join(commandPostProcessing))
         
         logger.info(
-            "\n Command to be processed: \n, %s \n",
-            pprint_cust.pformat(" ".join(command))
+            "\n Command to be processed: \n %s \n",
+            pprint_cust.pformat(" ".join(commandPostProcessing))
             )
         
-        commands.append(command)
+
+        commands.append(commandPostProcessing)
     
     #
     return commands
 
-
-def run_commands(commands):
-    for command in commands:
-        subprocess.call(command)
-
-
-
-if __name__ == '__main__':
+def runPostProcessing(argv=None):
+    
+    if argv is None:
+        argv = sys.argv[1:]
 
     # argument parser
     
     parser, argsRun = get_parser() 
     args= parser.parse_args()
     
+    verbose = args.verbose
+    
+    # create the output top directory - here, it is used to write the logging messages
+    # cmgPostProcessing_v1.py creates its own outputDirectory
+    
+    # WARNING: this directory must be in agreement with the directory created by  
+    # cmgPostProcessing_v1.py
+    
+    outputDirectory = os.path.join(
+        args.targetDir, 
+        args.processingEra, args.cmgProcessingTag, args.cmgPostProcessingTag, 
+        args.parameterSet, 
+        args.cmgTuples
+        )
+
+    try:
+        os.makedirs(outputDirectory)
+        msg_logger_debug = \
+            "\n Requested output directory \n {0} \n does not exists.".format(outputDirectory) + \
+            "\n Created new directory. \n"
+    except OSError as exception:
+        if exception.errno != errno.EEXIST:
+            raise
+        else:
+            msg_logger_debug = \
+                "\n Requested output directory \n {0} \n already exists.\n".format(outputDirectory)
+
+    
     # logging
     
     logLevel = args.logLevel
     
     # use a unique name for the log file, write file in the dataset directory
-    prefixLogFile = 'runPostProcessing' + args.sampleSet + \
+    prefixLogFile = 'runPostProcessing_' + args.sampleSet + \
          '_' + logLevel + '_'
-    logFile = tempfile.NamedTemporaryFile(suffix='.log', prefix=prefixLogFile, delete=False) 
+    logFile = tempfile.NamedTemporaryFile(suffix='.log', prefix=prefixLogFile, dir=outputDirectory, delete=False) 
 
     get_logger_rtuple = helpers.get_logger('runPostProcessing', logLevel, logFile.name)
     logger = get_logger_rtuple.logger
 
     #
-    
-    print "{:-^80}".format(" Running Post Processing! ")
-    print '\n Log file: ', logFile.name
-    print "{:-^80}".format(" %s "%args.numberOfProcesses )
-    print "\nSamples:"
-    pprint_cust.pprint(sampleSets[args.sampleSet])
-    print 
+
+    if verbose:    
+        print "{:-^80}".format(" Running Post Processing! ")
+        print '\n Log file: ', logFile.name
+        print "{:-^80}".format(" %s "%args.numberOfProcesses )
+        print "\nSamples:"
+        pprint_cust.pprint(sampleSets[args.sampleSet])
+        print 
     
     logger.info(
         "\n runPostProcessing script arguments" + \
@@ -523,9 +575,16 @@ if __name__ == '__main__':
         )
     logger.info("\n Samples: \n %s \n", pprint_cust.pformat(sampleSets[args.sampleSet]))
 
-    command_default = make_default_command(args, argsRun)
-    commands = make_command(args.sampleSet, command_default)
+    # write the debug message kept in the msg_logger_debug
+    logger.debug(msg_logger_debug)
+
+    options_list = make_list_options(args, argsRun)
+    commands = make_command(args.sampleSet, options_list)
     
+    logger.info(
+        "\n Final commands to be processed: \n %s \n",
+        pprint_cust.pformat(commands)
+        )
 
     if args.run:
         pool = multiprocessing.Pool(processes=args.numberOfProcesses)
@@ -533,6 +592,13 @@ if __name__ == '__main__':
         pool.close()
         pool.join()
 
-        print "{:-^80}".format(" FIN ")
+        if verbose:    
+            print "{:-^80}".format(" FIN ")
     else:
+        # do not put this print unter verbose
         print "\n Run the script adding the option --run to actually run over the chosen sample.\n "
+
+        
+if __name__ == "__main__":
+    sys.exit(runPostProcessing())
+        

@@ -16,6 +16,7 @@ import importlib
 import copy
 import operator
 import collections
+import errno
 
 
 # imports user modules or functions
@@ -211,7 +212,7 @@ def getSamples(args):
     The sample processed will be written eventually in the logger,
     after a call to this function.
     
-    Create also the output main directory, if it does not exist.
+    Return also the output main directory, to be created eventually.
     '''
 
     cmgTuples = args.cmgTuples
@@ -244,12 +245,12 @@ def getSamples(args):
     if args.skimPreselect:
         outDir = os.path.join(
             targetDir, processingEra, cmgProcessingTag, cmgPostProcessingTag, parameterSet, 
-            cmgTuples, args.skim, 'skimPreselect', args.skimLepton
+            cmgTuples, args.skimGeneral, 'skimPreselect', args.skimLepton
             )
     else:
         outDir = os.path.join(
             targetDir, processingEra, cmgProcessingTag, cmgPostProcessingTag, parameterSet, 
-            cmgTuples, args.skim, args.skimLepton
+            cmgTuples, args.skimGeneral, args.skimLepton
             )
     
 
@@ -323,10 +324,6 @@ def getSamples(args):
                 "\n Exiting."
             sys.exit() 
     
-    # create the target output directory, if it does not exist, if sample definition is OK
-    if not os.path.exists(outDir):
-        os.makedirs(outDir)
-
     if hasattr(cmgSamples,"mass_dict"):
         mass_dict = cmgSamples.mass_dict_samples
     else:
@@ -349,10 +346,10 @@ def getSamples(args):
     return getSample_rtuple
     
 
-def eventsSkimPreselect(skimName, skimLepton, skimPreselectFlag, params, skimSignalMasses=[]):
+def eventsSkimPreselect(skimGeneral, skimLepton, skimPreselectFlag, params, skimSignalMasses=[]):
     '''Define the skim condition, including preselection if required.
     
-    The skim condition depends on the skim name, the lepton skim selection, and on the
+    The skim condition depends on the general skim name, the lepton skim selection, and on the
     event preselection. 
     
     FIXME remove hardcoded values, read them from params
@@ -368,20 +365,20 @@ def eventsSkimPreselect(skimName, skimLepton, skimPreselectFlag, params, skimSig
     
     skimCond = "(1)"
     
-    if not skimName:
+    if not skimGeneral:
         pass
-    elif skimName.startswith('met'):
-        skimCond = "met_pt>" + str(float(skimName[3:]))
-    elif skimName == 'HT400':
+    elif skimGeneral.startswith('met'):
+        skimCond = "met_pt>" + str(float(skimGeneral[3:]))
+    elif skimGeneral == 'HT400':
         skimCond = "Sum$(Jet_pt)>400"
-    elif skimName == 'HT400ST200': 
+    elif skimGeneral == 'HT400ST200': 
         skimCond = "Sum$(Jet_pt)>400&&(LepGood_pt[0]+met_pt)>200"
-    elif skimName == 'lheHThigh': 
+    elif skimGeneral == 'lheHThigh': 
         skimCond += "&&(lheHTIncoming>={0})".format(lheHThighIncoming)
-    elif skimName == 'lheHTlow': 
+    elif skimGeneral == 'lheHTlow': 
         skimCond += "&&(lheHTIncoming<{0})".format(lheHTlowIncoming)
     else:
-        raise Exception("Skim Condition not recognized: %s"%skimName)
+        raise Exception("Skim Condition not recognized: %s"%skimGeneral)
         pass
     
     # lepton skimming, loop only over events fulfilling the lepton skimming condition 
@@ -392,10 +389,10 @@ def eventsSkimPreselect(skimName, skimLepton, skimPreselectFlag, params, skimSig
         pass
     
     # for inclusive skim, no skim selection is done, the skim condition is reset 
-    if skimName == 'inc':
+    if skimGeneral == 'inc':
         skimCond = "(1)"
       
-    logger.info("\n Jobs running with skim = '%s' \n Initial skimming condition: \n  %s \n ", skimName, skimCond)
+    logger.info("\n Jobs running with skim = '%s' \n Initial skimming condition: \n  %s \n ", skimGeneral, skimCond)
     
     if skimPreselectFlag:
         metCut = "(met_pt>200)"
@@ -408,7 +405,7 @@ def eventsSkimPreselect(skimName, skimLepton, skimPreselectFlag, params, skimSig
         logger.info("\n Applying preselection cuts: %s ", preselectionCuts)
         logger.info("\n Skimming condition with preselection: \n  %s \n", skimCond)
     else:
-        logger.info("\n No preselection cuts are applied for skim %s \n Skimming condition unchanged \n", skimName)
+        logger.info("\n No preselection cuts are applied for skim %s \n Skimming condition unchanged \n", skimGeneral)
         pass
 
     if skimSignalMasses:
@@ -799,7 +796,7 @@ def processGenSusyParticles(readTree, splitTree, saveTree, params):
                             lambda readTree, gp, igp: abs(gp.pdgId[igp]) == 1000006
                             )
     if len(stopIndices) == 0:  # not a susy event... move on
-        return 
+        return saveTree
 
 
     isrIndices = genPart.getSelectionIndexList(readTree,
@@ -1709,7 +1706,7 @@ def cmgPostProcessing(argv=None):
     verbose = args.verbose
     overwriteOutputFiles = args.overwriteOutputFiles
     
-    skim = args.skim
+    skimGeneral = args.skimGeneral
     skimLepton = args.skimLepton
     skimPreselect = args.skimPreselect
     
@@ -1738,6 +1735,19 @@ def cmgPostProcessing(argv=None):
     
     allSamples = getSamples_rtuple.componentList
     outputDirectory = getSamples_rtuple.outputDirectory
+    
+    try:
+        os.makedirs(outputDirectory)
+        msg_logger_debug = \
+            "\n Requested output directory \n {0} \n does not exists.".format(outputDirectory) + \
+            "\n Created new directory. \n"
+    except OSError as exception:
+        if exception.errno != errno.EEXIST:
+            raise
+        else:
+            msg_logger_debug = \
+                "\n Requested output directory \n {0} \n already exists.\n".format(outputDirectory)
+    
      
     # logging configuration
 
@@ -1763,6 +1773,10 @@ def cmgPostProcessing(argv=None):
         pprint.pformat(allSamples),
         outputDirectory
         )
+    
+    # write the debug message kept in the msg_logger_debug
+    logger.debug(msg_logger_debug)
+
 
     # define job parameters and log the parameters used in this job
     params = getParameterSet(args)
@@ -1818,7 +1832,7 @@ def cmgPostProcessing(argv=None):
             
         # skim condition 
         skimSignalMasses = [mstop, mlsp] if args.processSignalScan else []
-        skimCond = eventsSkimPreselect(skim, skimLepton, skimPreselect, params, skimSignalMasses)
+        skimCond = eventsSkimPreselect(skimGeneral, skimLepton, skimPreselect, params, skimSignalMasses)
         logger.info("\n Final skimming condition: \n  %s \n", skimCond)
 
         # create the output sample directory, if it does not exist. 
@@ -1866,7 +1880,7 @@ def cmgPostProcessing(argv=None):
                 continue
         
         # python 2.7 version - must be removed by hand, preferably in a try: ... finalize:
-        temporaryDir = tempfile.mkdtemp(dir=outputDirectory) 
+        temporaryDir = tempfile.mkdtemp(prefix='tmp_cmgPostProcessing_', dir=outputDirectory) 
         #
         # for 3.X use
         # temporaryDir = tempfile.TemporaryDirectory(suffix=None, prefix=None, dir=None)
