@@ -7,10 +7,20 @@
 #   https://github.com/HephySusySW/cmg-cmssw.git
 #
 # Usage: in sh shell execute
-#   source ./manageRelease.sh
+#   source ./manageRelease.sh WORKSPACE_TAG_BRANCH
+# in the directory where the realease has to be checkout and built
+#
+# if no argument is given, the default branch or tag given below will be used. 
 
 # set parameters
 CMSSW_ACTION="CB"
+
+if [[ $# -ne 1 ]]; then 
+    # default tag or branch
+    WORKSPACE_TAG_BRANCH="74X-master"
+else
+    WORKSPACE_TAG_BRANCH=$1
+fi
 
 # activate debuging
 set -vx
@@ -32,7 +42,7 @@ if [[ ${CMSSW_ACTION} == "CB" ]]; then
     # clone Vienna Workspace repository
     git clone https://github.com/HephySusySW/Workspace 
     cd Workspace
-    git checkout 74X-master
+    git checkout ${WORKSPACE_TAG_BRANCH}
     
     # 
     cd ${CMSSW_BASE}/src
