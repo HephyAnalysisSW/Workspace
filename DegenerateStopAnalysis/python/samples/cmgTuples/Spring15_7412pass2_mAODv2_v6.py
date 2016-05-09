@@ -304,9 +304,296 @@ QCD_HT2000toInf   ={
 'isData':False
 }
 
+#### QCD Pt:
+
+
+QCD_Pt15to30 ={
+"cmgComp":cmgSampleComponents.QCD_Pt15to30,
+"name" : "QCD_Pt_15to30_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
+#"name" : cmgSampleComponents.QCD_Pt15to30.name,
+"chunkString":"QCD_Pt_15to30_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
+"dir": sample_path,
+"dbsName" : cmgSampleComponents.QCD_Pt15to30.dataset,
+"rootFileLocation":"tree.root",
+"treeName":"tree",
+"isData":False
+}
+
+
+QCD_Pt30to50 ={
+"cmgComp":cmgSampleComponents.QCD_Pt30to50,
+"name" : "QCD_Pt_30to50_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
+#"name" : cmgSampleComponents.QCD_Pt30to50.name,
+"chunkString":"QCD_Pt_30to50_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
+"dir": sample_path,
+"dbsName" : cmgSampleComponents.QCD_Pt30to50.dataset,
+"rootFileLocation":"tree.root",
+"treeName":"tree",
+"isData":False
+}
+
+
+QCD_Pt50to80 ={
+"cmgComp":cmgSampleComponents.QCD_Pt50to80,
+"name" : "QCD_Pt_50to80_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
+#"name" : cmgSampleComponents.QCD_Pt50to80.name,
+"chunkString":"QCD_Pt_50to80_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
+"dir": sample_path,
+"dbsName" : cmgSampleComponents.QCD_Pt50to80.dataset,
+"rootFileLocation":"tree.root",
+"treeName":"tree",
+"isData":False
+}
+
+
+QCD_Pt80to120 ={
+"cmgComp":cmgSampleComponents.QCD_Pt80to120,
+"name" : "QCD_Pt_80to120_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
+#"name" : cmgSampleComponents.QCD_Pt80to120.name,
+"chunkString":"QCD_Pt_80to120_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
+"dir": sample_path,
+"dbsName" : cmgSampleComponents.QCD_Pt80to120.dataset,
+"rootFileLocation":"tree.root",
+"treeName":"tree",
+"isData":False
+}
+
+
+QCD_Pt120to170 ={
+"cmgComp":cmgSampleComponents.QCD_Pt120to170,
+"name" : "QCD_Pt_120to170_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
+#"name" : cmgSampleComponents.QCD_Pt120to170.name,
+"chunkString":"QCD_Pt_120to170_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
+"dir": sample_path,
+"dbsName" : cmgSampleComponents.QCD_Pt120to170.dataset,
+"rootFileLocation":"tree.root",
+"treeName":"tree",
+"isData":False
+}
+
+
+QCD_Pt170to300 ={
+"cmgComp":cmgSampleComponents.QCD_Pt170to300,
+"name" : "QCD_Pt_170to300_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
+#"name" : cmgSampleComponents.QCD_Pt170to300.name,
+"chunkString":"QCD_Pt_170to300_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
+"dir": sample_path,
+"dbsName" : cmgSampleComponents.QCD_Pt170to300.dataset,
+"rootFileLocation":"tree.root",
+"treeName":"tree",
+"isData":False
+}
+
+
+QCD_Pt300to470 ={
+"cmgComp":cmgSampleComponents.QCD_Pt300to470,
+"name" : "QCD_Pt_300to470_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
+#"name" : cmgSampleComponents.QCD_Pt300to470.name,
+"chunkString":"QCD_Pt_300to470_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
+"dir": sample_path,
+"dbsName" : cmgSampleComponents.QCD_Pt300to470.dataset,
+"rootFileLocation":"tree.root",
+"treeName":"tree",
+"isData":False
+}
+
+
+QCD_Pt470to600 ={
+"cmgComp":cmgSampleComponents.QCD_Pt470to600,
+"name" : "QCD_Pt_470to600_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
+#"name" : cmgSampleComponents.QCD_Pt470to600.name,
+"chunkString":"QCD_Pt_470to600_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
+"dir": sample_path,
+"dbsName" : cmgSampleComponents.QCD_Pt470to600.dataset,
+"rootFileLocation":"tree.root",
+"treeName":"tree",
+"isData":False
+}
+
+
+QCD_Pt600to800 ={
+"cmgComp":cmgSampleComponents.QCD_Pt600to800,
+"name" : "QCD_Pt_600to800_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
+#"name" : cmgSampleComponents.QCD_Pt600to800.name,
+"chunkString":"QCD_Pt_600to800_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
+"dir": sample_path,
+"dbsName" : cmgSampleComponents.QCD_Pt600to800.dataset,
+"rootFileLocation":"tree.root",
+"treeName":"tree",
+"isData":False
+}
+
+
+QCD_Pt800to1000 ={
+"cmgComp":cmgSampleComponents.QCD_Pt800to1000,
+"name" : "QCD_Pt_800to1000_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
+#"name" : cmgSampleComponents.QCD_Pt800to1000.name,
+"chunkString":"QCD_Pt_800to1000_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
+"dir": sample_path,
+"dbsName" : cmgSampleComponents.QCD_Pt800to1000.dataset,
+"rootFileLocation":"tree.root",
+"treeName":"tree",
+"isData":False
+}
+
+
+QCD_Pt1000to1400 ={
+"cmgComp":cmgSampleComponents.QCD_Pt1000to1400,
+"name" : "QCD_Pt_1000to1400_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
+#"name" : cmgSampleComponents.QCD_Pt1000to1400.name,
+"chunkString":"QCD_Pt_1000to1400_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
+"dir": sample_path,
+"dbsName" : cmgSampleComponents.QCD_Pt1000to1400.dataset,
+"rootFileLocation":"tree.root",
+"treeName":"tree",
+"isData":False
+}
+
+
+QCD_Pt1400to1800 ={
+"cmgComp":cmgSampleComponents.QCD_Pt1400to1800,
+"name" : "QCD_Pt_1400to1800_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
+#"name" : cmgSampleComponents.QCD_Pt1400to1800.name,
+"chunkString":"QCD_Pt_1400to1800_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
+"dir": sample_path,
+"dbsName" : cmgSampleComponents.QCD_Pt1400to1800.dataset,
+"rootFileLocation":"tree.root",
+"treeName":"tree",
+"isData":False
+}
+
+
+QCD_Pt1800to2400 ={
+"cmgComp":cmgSampleComponents.QCD_Pt1800to2400,
+"name" : "QCD_Pt_1800to2400_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
+#"name" : cmgSampleComponents.QCD_Pt1800to2400.name,
+"chunkString":"QCD_Pt_1800to2400_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
+"dir": sample_path,
+"dbsName" : cmgSampleComponents.QCD_Pt1800to2400.dataset,
+"rootFileLocation":"tree.root",
+"treeName":"tree",
+"isData":False
+}
+
+
+QCD_Pt2400to3200 ={
+"cmgComp":cmgSampleComponents.QCD_Pt2400to3200,
+"name" : "QCD_Pt_2400to3200_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
+#"name" : cmgSampleComponents.QCD_Pt2400to3200.name,
+"chunkString":"QCD_Pt_2400to3200_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
+"dir": sample_path,
+"dbsName" : cmgSampleComponents.QCD_Pt2400to3200.dataset,
+"rootFileLocation":"tree.root",
+"treeName":"tree",
+"isData":False
+}
 
 
 
+### QCD PT EM Enriched
+
+QCD_Pt15to20_EMEnriched ={
+"cmgComp":cmgSampleComponents.QCD_Pt15to20_EMEnriched,
+"name" : "QCD_Pt-15to20_EMEnriched_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
+#"name" : cmgSampleComponents.QCD_Pt15to20_EMEnriched.name,
+"chunkString":"QCD_Pt-15to20_EMEnriched_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
+"dir": sample_path,
+"dbsName" : cmgSampleComponents.QCD_Pt15to20_EMEnriched.dataset,
+"rootFileLocation":"tree.root",
+"treeName":"tree",
+"isData":False
+}
+
+
+QCD_Pt20to30_EMEnriched ={
+"cmgComp":cmgSampleComponents.QCD_Pt20to30_EMEnriched,
+"name" : "QCD_Pt-20to30_EMEnriched_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
+#"name" : cmgSampleComponents.QCD_Pt20to30_EMEnriched.name,
+"chunkString":"QCD_Pt-20to30_EMEnriched_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
+"dir": sample_path,
+"dbsName" : cmgSampleComponents.QCD_Pt20to30_EMEnriched.dataset,
+"rootFileLocation":"tree.root",
+"treeName":"tree",
+"isData":False
+}
+
+
+QCD_Pt30to50_EMEnriched ={
+"cmgComp":cmgSampleComponents.QCD_Pt30to50_EMEnriched,
+"name" : "QCD_Pt-30to50_EMEnriched_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
+#"name" : cmgSampleComponents.QCD_Pt30to50_EMEnriched.name,
+"chunkString":"QCD_Pt-30to50_EMEnriched_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
+"dir": sample_path,
+"dbsName" : cmgSampleComponents.QCD_Pt30to50_EMEnriched.dataset,
+"rootFileLocation":"tree.root",
+"treeName":"tree",
+"isData":False
+}
+
+
+QCD_Pt50to80_EMEnriched ={
+"cmgComp":cmgSampleComponents.QCD_Pt50to80_EMEnriched,
+"name" : "QCD_Pt-50to80_EMEnriched_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
+#"name" : cmgSampleComponents.QCD_Pt50to80_EMEnriched.name,
+"chunkString":"QCD_Pt-50to80_EMEnriched_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
+"dir": sample_path,
+"dbsName" : cmgSampleComponents.QCD_Pt50to80_EMEnriched.dataset,
+"rootFileLocation":"tree.root",
+"treeName":"tree",
+"isData":False
+}
+
+
+QCD_Pt80to120_EMEnriched ={
+"cmgComp":cmgSampleComponents.QCD_Pt80to120_EMEnriched,
+"name" : "QCD_Pt-80to120_EMEnriched_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
+#"name" : cmgSampleComponents.QCD_Pt80to120_EMEnriched.name,
+"chunkString":"QCD_Pt-80to120_EMEnriched_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
+"dir": sample_path,
+"dbsName" : cmgSampleComponents.QCD_Pt80to120_EMEnriched.dataset,
+"rootFileLocation":"tree.root",
+"treeName":"tree",
+"isData":False
+}
+
+
+QCD_Pt120to170_EMEnriched ={
+"cmgComp":cmgSampleComponents.QCD_Pt120to170_EMEnriched,
+"name" : "QCD_Pt-120to170_EMEnriched_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
+#"name" : cmgSampleComponents.QCD_Pt120to170_EMEnriched.name,
+"chunkString":"QCD_Pt-120to170_EMEnriched_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
+"dir": sample_path,
+"dbsName" : cmgSampleComponents.QCD_Pt120to170_EMEnriched.dataset,
+"rootFileLocation":"tree.root",
+"treeName":"tree",
+"isData":False
+}
+
+
+QCD_Pt170to300_EMEnriched ={
+"cmgComp":cmgSampleComponents.QCD_Pt170to300_EMEnriched,
+"name" : "QCD_Pt-170to300_EMEnriched_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
+#"name" : cmgSampleComponents.QCD_Pt170to300_EMEnriched.name,
+"chunkString":"QCD_Pt-170to300_EMEnriched_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
+"dir": sample_path,
+"dbsName" : cmgSampleComponents.QCD_Pt170to300_EMEnriched.dataset,
+"rootFileLocation":"tree.root",
+"treeName":"tree",
+"isData":False
+}
+
+
+QCD_Pt300toInf_EMEnriched ={
+"cmgComp":cmgSampleComponents.QCD_Pt300toInf_EMEnriched,
+"name" : "QCD_Pt-300toInf_EMEnriched_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
+#"name" : cmgSampleComponents.QCD_Pt300toInf_EMEnriched.name,
+"chunkString":"QCD_Pt-300toInf_EMEnriched_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
+"dir": sample_path,
+"dbsName" : cmgSampleComponents.QCD_Pt300toInf_EMEnriched.dataset,
+"rootFileLocation":"tree.root",
+"treeName":"tree",
+"isData":False
+}
 
 #sample_path2 = '/data/nrad/cmgTuples/7412pass2_mAODv2_v6/RunIISpring15MiniAODv2'
 
@@ -325,7 +612,6 @@ DYJetsToLL_M5to50_LO ={
 
 
 DYJetsToNuNu_M50 ={
-
 "cmgComp":cmgSampleComponents.DYJetsToNuNu_M50,
 "name" : "DYJetsToNuNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
 "chunkString":"DYJetsToNuNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
@@ -335,13 +621,6 @@ DYJetsToNuNu_M50 ={
 "treeName":"tree",
 "isData":False
 }
-
-
-
-
-
-
-
 
 
 DYJetsToLL_M5to50_HT100to200 ={
@@ -391,8 +670,56 @@ DYJetsToLL_M5to50_HT600toInf ={
 "isData":False
 }
 
+DYJetsToLL_M50_HT100to200 ={
+"cmgComp":cmgSampleComponents.DYJetsToLL_M50_HT100to200,
+"name" : "DYJetsToLL_M-50_HT-100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
+#"name" : cmgSampleComponents.DYJetsToLL_M50_HT100to200.name,
+"chunkString":"DYJetsToLL_M-50_HT-100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
+"dir": sample_path,
+"dbsName" : cmgSampleComponents.DYJetsToLL_M50_HT100to200.dataset,
+"rootFileLocation":"tree.root",
+"treeName":"tree",
+"isData":False
+}
 
 
+DYJetsToLL_M50_HT200to400 ={
+"cmgComp":cmgSampleComponents.DYJetsToLL_M50_HT200to400,
+"name" : "DYJetsToLL_M-50_HT-200to400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
+#"name" : cmgSampleComponents.DYJetsToLL_M50_HT200to400.name,
+"chunkString":"DYJetsToLL_M-50_HT-200to400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
+"dir": sample_path,
+"dbsName" : cmgSampleComponents.DYJetsToLL_M50_HT200to400.dataset,
+"rootFileLocation":"tree.root",
+"treeName":"tree",
+"isData":False
+}
+
+
+DYJetsToLL_M50_HT400to600 ={
+"cmgComp":cmgSampleComponents.DYJetsToLL_M50_HT400to600,
+"name" : "DYJetsToLL_M-50_HT-400to600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v2",
+#"name" : cmgSampleComponents.DYJetsToLL_M50_HT400to600.name,
+"chunkString":"DYJetsToLL_M-50_HT-400to600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v2",
+"dir": sample_path,
+"dbsName" : cmgSampleComponents.DYJetsToLL_M50_HT400to600.dataset,
+"rootFileLocation":"tree.root",
+"treeName":"tree",
+"isData":False
+}
+
+
+DYJetsToLL_M50_HT600toInf ={
+"cmgComp":cmgSampleComponents.DYJetsToLL_M50_HT600toInf,
+"name" : "DYJetsToLL_M-50_HT-600toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
+#"name" : cmgSampleComponents.DYJetsToLL_M50_HT600toInf.name,
+"chunkString":"DYJetsToLL_M-50_HT-600toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
+"dir": sample_path,
+"dbsName" : cmgSampleComponents.DYJetsToLL_M50_HT600toInf.dataset,
+"rootFileLocation":"tree.root",
+"treeName":"tree",
+"isData":False
+}
 
 
 
@@ -418,6 +745,40 @@ ZJetsHT  = [
     ZJetsToNuNu_HT600toInf
     ]
 
+QCDPT = [
+
+    #QCD_Pt5to10,
+    QCD_Pt15to30,
+    QCD_Pt30to50,
+    QCD_Pt50to80,
+    QCD_Pt80to120,
+    QCD_Pt120to170,
+    QCD_Pt170to300,
+    QCD_Pt300to470,
+    QCD_Pt470to600,
+    QCD_Pt600to800,
+    QCD_Pt800to1000,
+    QCD_Pt1000to1400,
+    QCD_Pt1400to1800,
+    QCD_Pt1800to2400,
+    QCD_Pt2400to3200,
+    #QCD_Pt3200toInf,
+
+    ]
+
+QCDPT_EM = [
+
+    QCD_Pt15to20_EMEnriched,
+    QCD_Pt20to30_EMEnriched,
+    QCD_Pt30to50_EMEnriched,
+    QCD_Pt50to80_EMEnriched,
+    QCD_Pt80to120_EMEnriched,
+    QCD_Pt120to170_EMEnriched,
+    QCD_Pt170to300_EMEnriched,
+    QCD_Pt300toInf_EMEnriched,
+
+    ]
+
 QCDHT = [
 
     QCD_HT200to300,
@@ -439,9 +800,14 @@ DY=[
     DYJetsToLL_M5to50_HT400to600,
     DYJetsToLL_M5to50_HT600toInf,
 
+
+    DYJetsToLL_M50_HT100to200,
+    DYJetsToLL_M50_HT200to400,
+    DYJetsToLL_M50_HT400to600,
+    DYJetsToLL_M50_HT600toInf,
     ]
 
-samples = TTJets + WJetsInc + WJetsHT +ZJetsHT + QCDHT + DY
+samples = TTJets + WJetsInc + WJetsHT + ZJetsHT + QCDHT + QCDPT + QCDPT_EM + DY
 
 for sample in samples:
 #  print sample
@@ -454,26 +820,6 @@ for sample in samples:
 import CMGTools.RootTools.samples.samples_13TeV_signals as signals
 
 signal_scan = [
-
-    #[sample_path+"/",     "SMS-T2-4bd_mStop-100_mLSP-20to90_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-FastAsympt25ns_74X_mcRun2_asymptotic_v2-v1"       ,"SMS_T2_4bd_mStop_100_mLSP_20to90",  signals.SMS_T2_4bd_mStop_100_mLSP_20to90            ] , 
-    #[sample_path+"/",     "SMS-T2-4bd_mStop-125_mLSP-45to115_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-FastAsympt25ns_74X_mcRun2_asymptotic_v2-v1"      ,"SMS_T2_4bd_mStop_125_mLSP_45to115", signals.SMS_T2_4bd_mStop_125_mLSP_45to115           ] ,                             
-    #[sample_path+"/",     "SMS-T2-4bd_mStop-200_mLSP-120to190_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-FastAsympt25ns_74X_mcRun2_asymptotic_v2-v1"     ,"SMS_T2_4bd_mStop_200_mLSP_120to190",signals.SMS_T2_4bd_mStop_200_mLSP_120to190          ]     , 
-    #[sample_path+"/",     "SMS-T2-4bd_mStop-225_mLSP-145to225_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-FastAsympt25ns_74X_mcRun2_asymptotic_v2-v1"     ,"SMS_T2_4bd_mStop_225_mLSP_145to225",signals.SMS_T2_4bd_mStop_225_mLSP_145to225          ]  ,
-    #[sample_path+"/",     "SMS-T2-4bd_mStop-275_mLSP-195to265_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-FastAsympt25ns_74X_mcRun2_asymptotic_v2-v1"     ,"SMS_T2_4bd_mStop_275_mLSP_195to265",signals.SMS_T2_4bd_mStop_275_mLSP_195to265          ]  ,
-    #[sample_path+"/",     "SMS-T2-4bd_mStop-300_mLSP-220to290_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-FastAsympt25ns_74X_mcRun2_asymptotic_v2-v1"     ,"SMS_T2_4bd_mStop_300_mLSP_220to290",signals.SMS_T2_4bd_mStop_300_mLSP_220to290          ]  ,
-    #[sample_path+"/",     "SMS-T2-4bd_mStop-325_mLSP-245to315_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-FastAsympt25ns_74X_mcRun2_asymptotic_v2-v1"     ,"SMS_T2_4bd_mStop_325_mLSP_245to315",signals.SMS_T2_4bd_mStop_325_mLSP_245to315          ]   ,   
-    #[sample_path+"/",     "SMS-T2-4bd_mStop-350_mLSP-270to340_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-FastAsympt25ns_74X_mcRun2_asymptotic_v2-v1"     ,"SMS_T2_4bd_mStop_350_mLSP_270to340",signals.SMS_T2_4bd_mStop_350_mLSP_270to340          ]  ,
-    #[sample_path+"/",     "SMS-T2-4bd_mStop-375_mLSP-295to365_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-FastAsympt25ns_74X_mcRun2_asymptotic_v2-v1"     ,"SMS_T2_4bd_mStop_375_mLSP_295to365",signals.SMS_T2_4bd_mStop_375_mLSP_295to365          ]   ,   
-    #[sample_path+"/",     "SMS-T2-4bd_mStop-400_mLSP-320to390_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-FastAsympt25ns_74X_mcRun2_asymptotic_v2-v1"     ,"SMS_T2_4bd_mStop_400_mLSP_320to390",signals.SMS_T2_4bd_mStop_400_mLSP_320to390          ]    ,      
-    #[sample_path+"/",     "SMS-T2-4bd_mStop-550to600_mLSP-470to590_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-FastAsympt25ns_74X_mcRun2_asymptotic_v2-v1","SMS_T2_4bd_mStop_550to600_mLSP_470to590", signals.SMS_T2_4bd_mStop_550to600_mLSP_470to590     ]  ,
-
-
-    #[sample_path+"/",     "SMS-T2mixed_mStop-100_mLSP-20to90_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-FastAsympt25ns_74X_mcRun2_asymptotic_v2-v1"      ,"SMS_T2mixed_mStop_100_mLSP_20to90",signals.SMS_T2mixed_mStop_100_mLSP_20to90           ]      ,
-   ##[sample_path+"/",     ""                                                                                                                                                    ,"#  SMS_                            ",signals.SMS_T2mixed_mStop_125_mLSP_45to115          ]   ,                                       
-    #[sample_path+"/",     "SMS-T2mixed_mStop-175_mLSP-95to165_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-FastAsympt25ns_74X_mcRun2_asymptotic_v2-v1"  ,"SMS_T2mixed_mStop_175_mLSP_95to165",signals.SMS_T2mixed_mStop_175_mLSP_95to165          ]       ,                                       
-    #[sample_path+"/",     "SMS-T2mixed_mStop-275_mLSP-195to265_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-FastAsympt25ns_74X_mcRun2_asymptotic_v2-v1" ,"SMS_T2mixed_mStop_275_mLSP_195to265",signals.SMS_T2mixed_mStop_275_mLSP_195to265         ]       ,               
-
-
 
         [ sample_path +"/",   "SMS-T2-4bd_mStop-100_mLSP-20to90_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-FastAsympt25ns_74X_mcRun2_asymptotic_v2-v1",              "SMS_T2_4bd_mStop_100_mLSP_20to90",              signals.SMS_T2_4bd_mStop_100_mLSP_20to90               ],
         [ sample_path +"/",   "SMS-T2-4bd_mStop-125_mLSP-45to115_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-FastAsympt25ns_74X_mcRun2_asymptotic_v2-v1",             "SMS_T2_4bd_mStop_125_mLSP_45to115",             signals.SMS_T2_4bd_mStop_125_mLSP_45to115              ],
