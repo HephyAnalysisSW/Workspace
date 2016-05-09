@@ -72,6 +72,12 @@ sampleSets = {
                                          "DYJetsToLL_M5to50_HT200to400",
                                          "DYJetsToLL_M5to50_HT400to600",
                                          "DYJetsToLL_M5to50_HT600toInf",
+                                         
+                                         'DYJetsToLL_M50_HT100to200',
+                                         'DYJetsToLL_M50_HT200to400',
+                                         'DYJetsToLL_M50_HT400to600',
+                                         'DYJetsToLL_M50_HT600toInf',
+                                         
                                         ],
                             },
                 'zjets':{
@@ -99,6 +105,42 @@ sampleSets = {
                                         ],
                              
                             },
+              
+                'qcdpt':{
+                            'samples':[
+                                        #"QCD_Pt5to10",
+                                        #"QCD_Pt10to15",
+                                        "QCD_Pt15to30",
+                                        "QCD_Pt30to50",
+                                        "QCD_Pt50to80",
+                                        "QCD_Pt80to120",
+                                        "QCD_Pt120to170",
+                                        "QCD_Pt170to300",
+                                        "QCD_Pt300to470",
+                                        "QCD_Pt470to600",
+                                        "QCD_Pt600to800",
+                                        "QCD_Pt800to1000",
+                                        "QCD_Pt1000to1400",
+                                        "QCD_Pt1400to1800",
+                                        "QCD_Pt1800to2400",
+                                        "QCD_Pt2400to3200",
+                                        #"QCD_Pt3200toInf",
+                                      ],
+                            },
+              
+                'qcdpt_em':{
+                            'samples':[
+                                        'QCD_Pt15to20_EMEnriched',
+                                        'QCD_Pt20to30_EMEnriched',
+                                        'QCD_Pt30to50_EMEnriched',
+                                        'QCD_Pt50to80_EMEnriched',
+                                        'QCD_Pt80to120_EMEnriched',
+                                        'QCD_Pt120to170_EMEnriched',
+                                        'QCD_Pt170to300_EMEnriched',
+                                        'QCD_Pt300toInf_EMEnriched',
+                                      ],
+                            },
+              
                 'data':{
                             'samples':[
 
@@ -597,6 +639,14 @@ def runPostProcessing(argv=None):
     else:
         # do not put this print unter verbose
         print "\n Run the script adding the option --run to actually run over the chosen sample.\n "
+        
+    logger.info(
+        "\n " + \
+        "\n End of runPostProcessing run on sample set %s. \n" + \
+        "\n *******************************************************************************\n",
+        args.sampleSet
+        )
+
 
         
 if __name__ == "__main__":
