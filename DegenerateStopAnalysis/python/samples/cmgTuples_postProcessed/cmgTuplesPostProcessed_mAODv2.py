@@ -18,9 +18,11 @@ class cmgTuplesPostProcessed():
     def makeSample(self, sample):
       i = copy.deepcopy(sample)
       i['dir']=i['dir']+'/inc/'
-      s = copy.deepcopy(sample)
-      s['dir']=s['dir']+'/preselection/inc/'
-      return {'inc':i, 'presel':s}
+      pold = copy.deepcopy(sample)
+      pold['dir']=pold['dir']+'/preselection/inc/'
+      p = copy.deepcopy(sample)
+      p['dir']=p['dir']+'/skimPreselect/inc/'
+      return {'inc':i, 'presel':pold, 'skimPresel':p}
 
     def getDataSample(self, name,sample ):
         s = self.makeSample({ 
