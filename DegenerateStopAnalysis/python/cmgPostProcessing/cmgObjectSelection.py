@@ -282,15 +282,17 @@ def objSelectorFunc(objSel):
         obj_pt = obj.pt[objIndex]
         obj_reIso = getattr(obj, objSel_relIso_type)[objIndex]
         
-        if not (
-            ((obj_pt >= objSel_ptSwitch) and (obj_reIso < objSel_relIso_cut))
-            or 
-            ((obj_pt < objSel_ptSwitch)  and (obj_reIso * obj_pt < objSel_absIso))
-            ):
-            
-            return False
-        #
-        return True 
+        passCut = False
+                       
+        if obj_pt < objSel_ptSwitch:
+            if (obj_reIso * obj_pt < objSel_absIso):
+                passCut = True
+        else:
+            if (obj_reIso < objSel_relIso_cut):
+                passCut = True
+
+        # 
+        return passCut
 
 
     def elWP(readTree, obj, objIndex, objSel):
@@ -307,7 +309,7 @@ def objSelectorFunc(objSel):
         
         objEta = obj.eta[objIndex]
         
-        def cut_EB_EE(varName, objIndex, elWPSelVars):
+        def cut_EB_EE(obj, varName, objIndex, elWPSelVars):
             
             elWPSelVars_var = elWPSelVars[varName]
             opVar = elWPSelVars_var['opVar']
@@ -316,21 +318,27 @@ def objSelectorFunc(objSel):
             varValue = getattr(obj, varName)[objIndex] 
             if opVar is not None:
                 varValue = opVar(varValue)
-                        
-            if not (
-                ((opCut(varValue, elWPSelVars_var['EB'])) and (objEta < elWP_eta_EB))
-                or 
-                ((opCut(varValue, elWPSelVars_var['EE'])) and (elWP_eta_EB <= objEta < elWP_eta_EE))
-                ):
+             
+            passCut = False
+                       
+            if objEta < elWP_eta_EB:
+                if opCut(varValue, elWPSelVars_var['EB']):
+                    passCut = True
+            elif ((elWP_eta_EB <= objEta) and (objEta < elWP_eta_EE)):
+                if opCut(varValue, elWPSelVars_var['EE']):
+                    passCut = True
+            else:
+                # for eta outside ['eta_EB', 'eta_EE'] range, set it to False
+                passCut = False
                 
-                return False
-            
+
             # 
-            return True
+            return passCut
                
         # evaluate each cut, exit if False immediately
         for var in elWPSelVars:
-            return cut_EB_EE(var, objIndex, elWPSelVars)
+            if not cut_EB_EE(obj, var, objIndex, elWPSelVars):
+                return False
         
         #
         return True

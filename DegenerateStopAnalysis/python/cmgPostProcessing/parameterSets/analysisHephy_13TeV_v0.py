@@ -53,7 +53,8 @@ def getParameterSet(args):
     # lepton (electron and muon) selection
     
     LepSel = {
-        # prefix, branches to be read and new branches to be written for leptons
+        # prefix, existing branches to be read (to be used in post-processing and/or printed in debug mode) 
+        # and new branches to be written for leptons (printed also in debug mode)
         # 'common' 'branches' and 'newBranches' are common for electron and muons 
         'branchPrefix': 'LepGood',
         'branches': {
@@ -69,19 +70,16 @@ def getParameterSet(args):
             'common': [
                 'pdgId/I',
                 'pt/F', 'eta/F', 'phi/F',
-                'relIso03/F', 'relIso04/F', 'miniRelIso/F', 'sip3d/F',
+                'relIso03/F', 'relIso04/F', 'miniRelIso/F', 'absIso03/F', 'absIso/F', 'sip3d/F',
                 'dxy/F', 'dz/F',
-                'mass/F',
+                'mass/F', 'Q80/F', 'mt/F', 'cosPhiLepMet/F',
                 ],
             },
         'newBranches': {
             'mu': [],
             'el': [],
             'common': [        
-                'q80/F', 'cosdPhiLepMet/F',
                 'lt/F', 'dPhiLepW/F',
-                'mt/F',
-                'absIso/F',
                 ],
             },
         #
@@ -156,7 +154,7 @@ def getParameterSet(args):
         'branches': [
             'pt/F', 'eta/F', 'phi/F', 'id/I','btagCSV/F', 'mass/F'
             ],
-        'nMax': 100,
+        'nMax': 25,
         'bas': {
             'id': ('id', operator.ge, 1),
             'pt': ('pt', operator.gt, 30),

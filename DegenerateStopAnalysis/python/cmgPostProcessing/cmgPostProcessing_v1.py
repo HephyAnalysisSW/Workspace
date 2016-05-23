@@ -891,12 +891,7 @@ def processLeptons(readTree, splitTree, saveTree, params):
         
         lep_pt = getattr(lepObj, 'pt')[lepIndex]
         lep_phi = getattr(lepObj, 'phi')[lepIndex]
-        lep_relIso04 = getattr(lepObj, 'relIso04')[lepIndex]
 
-        q80 = 1 - 80 ** 2 / (2 * lep_pt * readTree.met_pt)
-        cosdPhiLepMet = math.cos(lep_phi - readTree.met_phi)
-    
-        mt = math.sqrt(2 * lep_pt * readTree.met_pt * (1 - cosdPhiLepMet))
         lt = readTree.met_pt + lep_pt
   
         dPhiLepW = math.acos(
@@ -906,14 +901,8 @@ def processLeptons(readTree, splitTree, saveTree, params):
                 )
             ) 
         
-        absIso = lep_relIso04 * lep_pt
-    
-        saveTree.LepGood_q80[lepIndex] = q80
-        saveTree.LepGood_cosdPhiLepMet[lepIndex] = cosdPhiLepMet
-        saveTree.LepGood_mt[lepIndex] = mt
         saveTree.LepGood_lt[lepIndex] = lt
         saveTree.LepGood_dPhiLepW[lepIndex] = dPhiLepW
-        saveTree.LepGood_absIso[lepIndex] = absIso 
         
               
     if logger.isEnabledFor(logging.DEBUG):
@@ -1140,21 +1129,21 @@ def processJets(args, readTree, splitTree, saveTree, params):
     bJetSepPtSoftHard = JetSel['bjetSep']['ptSoftHard'][2]
     bSoftJetList, bHardJetList = jetObj.splitIndexList('pt', bJetSepPtSoftHard, bJetList)
     
-    nBJets = len(bJetList)
-    saveTree.nBJets = nBJets
+    nBJet = len(bJetList)
+    saveTree.nBJet = nBJet
     for ind, val in enumerate(bJetList):
         saveTree.IndexJet_bJet[ind] = val
 
     for ind, val in enumerate(bJetDiscSortList):
         saveTree.IndexJet_bJetDiscSort[ind] = val
 
-    nBSoftJets = len(bSoftJetList)
-    saveTree.nBSoftJets = nBSoftJets
+    nBSoftJet = len(bSoftJetList)
+    saveTree.nBSoftJet = nBSoftJet
     for ind, val in enumerate(bSoftJetList):
         saveTree.IndexJet_bSoftJet[ind] = val
 
-    nBHardJets = len(bHardJetList)
-    saveTree.nBHardJets = nBHardJets
+    nBHardJet = len(bHardJetList)
+    saveTree.nBHardJet = nBHardJet
     for ind, val in enumerate(bHardJetList):
         saveTree.IndexJet_bHardJet[ind] = val
     
@@ -1163,23 +1152,23 @@ def processJets(args, readTree, splitTree, saveTree, params):
             pprint.pformat(bJetSel) + \
             '\n ' + jetObj.printObjects(bJetList, JetVarList) + \
             "\n saveTree.nBJet = %i \n  Index list: " + pprint.pformat(bJetList) + "\n "
-        logger.debug(printStr, saveTree.nBJets)
+        logger.debug(printStr, saveTree.nBJet)
         
         printStr = "\n  " + objBranches + " b jet selector (from basic jets), sorted after jet b discriminant \n " + \
             "\n saveTree.nBJet = %i \n  Index list: " + pprint.pformat(bJetDiscSortList) + "\n "
-        logger.debug(printStr, saveTree.nBJets)
+        logger.debug(printStr, saveTree.nBJet)
 
         printStr = "\n  " + objBranches + " b soft jet selector, sorted after jet pt \n " + \
             '\n pt soft/hard threshold: %f ' + \
             '\n ' + jetObj.printObjects(bSoftJetList, JetVarList) + \
-            "\n saveTree.nSoftBJets = %i \n  Index list: " + pprint.pformat(bSoftJetList) + "\n "
-        logger.debug(printStr, bJetSepPtSoftHard, saveTree.nBSoftJets)
+            "\n saveTree.nBSoftJet = %i \n  Index list: " + pprint.pformat(bSoftJetList) + "\n "
+        logger.debug(printStr, bJetSepPtSoftHard, saveTree.nBSoftJet)
 
         printStr = "\n  " + objBranches + " b hard jet selector, sorted after jet pt \n " + \
             '\n pt soft/hard threshold: %f ' + \
             '\n ' + jetObj.printObjects(bHardJetList, JetVarList) + \
-            "\n saveTree.nHardBJets = %i \n  Index list: " + pprint.pformat(bHardJetList) + "\n "
-        logger.debug(printStr, bJetSepPtSoftHard, saveTree.nBHardJets)
+            "\n saveTree.nBHardJet = %i \n  Index list: " + pprint.pformat(bHardJetList) + "\n "
+        logger.debug(printStr, bJetSepPtSoftHard, saveTree.nBHardJet)
 
     # HT as sum of basic jets
     
@@ -1760,6 +1749,10 @@ def cmgPostProcessing(argv=None):
 
     logger = get_logger(logLevel, logFile.name)
     
+    if verbose:
+        print "\n Log file stored in: \n", logFile.name
+        print "\n Output directory: \n", outputDirectory 
+
     #
     logger.info("\n Job arguments: \n\n %s \n", pprint.pformat(vars(args)))
 
@@ -1965,8 +1958,11 @@ def cmgPostProcessing(argv=None):
     
                 for v in newVectors:
                     for var in v['vars']:
-                        var['branch'] = splitTree.Branch(var['stage2Name'], 
-                            ROOT.AddressOf(saveTree,var['stage2Name']), var['stage2Name']+'/'+var['stage2Type'])
+                        var['branch'] = splitTree.Branch(
+                            var['stage2Name'], 
+                            ROOT.AddressOf(saveTree,var['stage2Name']), 
+                            var['stage2Name']+'[' + str(v['nMax']) + ']/'+var['stage2Type']
+                            )
                         
 
                 # get entries for tree and loop over events
@@ -2116,19 +2112,22 @@ def cmgPostProcessing(argv=None):
         # add the histograms using ROOT hadd script         
         if not testMethods: 
             haddFiles(sample_name, filesForHadd, temporaryDir, outputWriteDirectory)
-                
-        logger.info(
-            "\n " + \
-            "\n End of post-processing sample %s. \n Total number of event processed for this sample: %i" + \
-            "\n *******************************************************************************\n",
-            sample_name, nEvents_total
-            )
+ 
+        
+        end_message =  "\n " + \
+            "\n ******** End of post-processing sample \n ******** {0}.".format(sample_name) + \
+            "\n Total number of event processed for this sample: {0}".format(nEvents_total) + \
+            '\n'
+            
+              
+        logger.info(end_message)
+        
+        if verbose:
+            print end_message
+
     
     if verbose:
-        print "Log File Stored in:"
-        print logFile.name
-        print "Output Directory:"
-        print outputWriteDirectory 
+        print '\n End of cmgPostProcessing script.\n'
  
 if __name__ == "__main__":
     sys.exit(cmgPostProcessing())
