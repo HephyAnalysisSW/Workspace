@@ -7,6 +7,7 @@ import logging
 import pprint
 
 # imports user modules or functions
+import Workspace.DegenerateStopAnalysis.tools.helpers as helpers
 
 # logger
 logger = logging.getLogger(__name__)   
@@ -22,10 +23,11 @@ class cmgObject():
     logger = logging.getLogger(__name__ + '.cmgObject')   
 
     def __init__(self, readTree, splitTree, obj, varList=[]):
-        self.nObj = cmgObjLen(readTree, obj)
-        self.obj = obj
         self.readTree = readTree  
         self.splitTree = splitTree
+        self.obj = obj
+        if readTree is not None:
+            self.nObj = cmgObjLen(readTree, obj)
 
 
     def __getattr__(self, name):
@@ -165,6 +167,36 @@ class cmgObject():
             
         return objDictList
     
+    def getAllObjBranches(self):
+        ''' Create a list of all branches existing in splitTree.
+        
+        '''
+
+        treeBranches = self.splitTree.GetListOfBranches()
+        typeDict = helpers.rootShortVariableType()
+
+        objBranchList = []
+        objBranchNameType = []
+        
+        for i in range(treeBranches.GetEntries()):
+            branchName = treeBranches.At(i).GetName()
+            
+            branchType = treeBranches.At(i).GetClassName()
+            if not branchType:
+                branchType = treeBranches.At(i).GetListOfLeaves()[0].GetTypeName()
+                
+                
+            branchNameType = branchName + '/' + typeDict[branchType]
+            if branchName.startswith(self.obj):
+                objBranchList.append(branchName)
+                objBranchNameType.append(branchNameType)
+                
+        logger.trace(
+            "\n List of all branches for object %s \n %s \n\n  List of branches and type \n %s",
+            self.obj, pprint.pformat(objBranchList), pprint.pformat(objBranchNameType)
+            )
+
+        return objBranchList, objBranchNameType
 
     def printObjects(self, indexList=[], varList=[]):
         ''' Print for each object from indexList the values of variables from varList.
@@ -174,19 +206,8 @@ class cmgObject():
 
         logger = logging.getLogger(__name__ + '.cmgObject' + '.printObjects')   
                     
-        treeBranches = self.splitTree.GetListOfBranches()
-
-        objBranchList = []
-        for i in range(treeBranches.GetEntries()):
-            branchName = treeBranches.At(i).GetName()
-            if branchName.startswith(self.obj):
-                objBranchList.append(branchName)
-            
-        logger.trace(
-            "\n List of all branches for object %s \n %s \n",
-            self.obj, pprint.pformat(objBranchList)
-            )
-
+        objBranchList, objBranchNameType = self.getAllObjBranches()
+        
         varListCurrent = []
         for var in varList:
             branchName = self.obj + '_' + var

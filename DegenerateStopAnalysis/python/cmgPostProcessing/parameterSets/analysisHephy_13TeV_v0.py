@@ -5,6 +5,7 @@
 # imports python standard modules or functions
 import collections
 import operator
+import copy
 
 
 # imports user modules or functions
@@ -27,6 +28,8 @@ def getParameterSet(args):
     parameterSet = args.parameterSet
     processTracks = args.processTracks
 
+    processLepAll = args.processLepAll
+    
     # parameter set definitions
         
     params = collections.OrderedDict()
@@ -52,7 +55,7 @@ def getParameterSet(args):
     
     # lepton (electron and muon) selection
     
-    LepSel = {
+    LepGoodSel = {
         # prefix, existing branches to be read (to be used in post-processing and/or printed in debug mode) 
         # and new branches to be written for leptons (printed also in debug mode)
         # 'common' 'branches' and 'newBranches' are common for electron and muons 
@@ -79,7 +82,8 @@ def getParameterSet(args):
             'mu': [],
             'el': [],
             'common': [        
-                'lt/F', 'dPhiLepW/F',
+                'lt/F', 'dPhiLepW/F', 
+                'isLepGood/I/0', 'isLepOther/I/0',
                 ],
             },
         #
@@ -139,9 +143,14 @@ def getParameterSet(args):
             },
         }
 
-    params['LepSel'] = LepSel
-     
+    params['LepGoodSel'] = LepGoodSel
+
+    if processLepAll:
+        LepOtherSel = copy.deepcopy(LepGoodSel)
+        LepOtherSel['branchPrefix'] = 'LepOther'
         
+        params['LepOtherSel'] = LepOtherSel
+
     # jet selection
     #    bas: basic jets
     #    veto: jets used for QCD veto, selected from basic jets

@@ -139,7 +139,16 @@ def get_parser():
         help="Process packed generated particles for post-processing, bool flag set to True if used"
         )
 
+    argParser.add_argument('--processLepAll',
+        action='store_true',
+        help="Process leptons from LepGood and LepOther, merging them in LepAll."
+        )
      
+    argParser.add_argument('--storeOnlyLepAll',
+        action='store_true',
+        help="Store only LepAll, do not store LepGood and LepOther. Effective only if processLepAll = True"
+        )
+
     argParser.add_argument('--runSmallSample',
         action='store_true',
         help="Run the file on a small sample (for test purpose), bool flag set to True if used"

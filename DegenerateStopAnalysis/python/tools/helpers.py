@@ -170,9 +170,10 @@ def rootVariableType():
     """
     ROOT machine independent data types currently supported in TTree.
     https://root.cern.ch/root/html/TTree.html
+    enum EDataType
     """    
     rootVariableTypeDict = {
-            'C' :    'Char_t',
+            'C' :    'char*',
             'B' :    'Char_t',
             'b' :    'UChar_t',
             'S' :    'Short_t',
@@ -183,12 +184,35 @@ def rootVariableType():
             'l' : 'ULong64_t',
             'F' :   'Float_t',
             'D' :  'Double_t',
-            'o' :    'Bool_t',
+            'O' :    'Bool_t',
             }
      
      #
     return rootVariableTypeDict
 
+def rootShortVariableType():
+    """
+    ROOT machine independent data types currently supported in TTree.
+    https://root.cern.ch/root/html/TTree.html
+    enum EDataType
+    """    
+    rootShortVariableTypeDict = {
+        'char*':    'C',
+        'Char_t':    'B',
+        'UChar_t':   'b',
+        'Short_t':   'S',
+        'UShort_t':  's',
+        'Int_t':     'I',
+        'UInt_t':    'i',
+        'Long64_t':  'L',
+        'ULong64_t': 'l',
+        'Float_t':   'F',
+        'Double_t':  'D',
+        'Bool_t':    'O',
+        }
+     
+     #
+    return rootShortVariableTypeDict
 
 def getVariableName(var):
     """ Return the variable name for a root variable in the format 'name[size]/type' or 'name/type'
