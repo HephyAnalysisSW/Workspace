@@ -1,21 +1,22 @@
 #!/bin/sh
 
-# shell script to run post-processing via CMSSW cmgPostProcessing_v1.py  
+# shell script to run runPostProcessing_v1.py  
 # Steps:
 #    Prerequisite:
 #      set-up the production release (e.g. via manageRelease.sh from script directory)
 #      in the base repository (where the release was checked out)
-#        ln -s CMSSW_7_4_12_patch4/src/Workspace/DegenerateStopAnalysis/python/cmgPostProcessing/cmgPostProcessing_v1.sh .
+#        ln -s CMSSW_7_4_12_patch4/src/Workspace/DegenerateStopAnalysis/python/cmgPostProcessing/runPostProcessing.sh .
 #    Run steps:   
 #       From the base repository, where the link was done:
-#       krenew -t -K 10 -- bash -c "./cmgPostProcessing_v1.sh $1 [$2 [3]]" &
+#       nohup krenew -t -K 10 -- bash -c "./runPostProcessing.sh $1 [$2 [3]]" &
 # 
 # The parameters to be used are available in 
 #   ${CMSSW_BASE}/src/Workspace/DegenerateStopAnalysis/python/cmgPostProcessing/cmgPostProcessing_parser.py
+#   ${CMSSW_BASE}/src/Workspace/DegenerateStopAnalysis/python/cmgPostProcessing/runPostProcessing.py
 # adapt them here. If not set here, the default parameters will be used
 
 # activate debugging
-set -vx
+#set -vx
 
 # release and architecture, 
 CMSSW_RELEASE="CMSSW_7_4_12_patch4"
@@ -25,7 +26,7 @@ CMSSW_ACTION="R"
 # set parameters 
 
 # cli parameters
-CMG_SAMPLE=$1
+SAMPLE_SET=$1
 
 # semi-hard-coded parameters
 if [[ ${2} == "DATA" ]]; then 
@@ -61,9 +62,9 @@ if [[ ${CMSSW_ACTION} == "R" ]]; then
     
     cd ${CMSSW_BASE}/src/Workspace/DegenerateStopAnalysis/python/cmgPostProcessing
             
-    python cmgPostProcessing_v1.py \
+    python runPostProcessing.py \
         --logLevel=INFO \
-        --processSample=${CMG_SAMPLE} \
+        --sampleSet=${SAMPLE_SET} \
         --cmgTuples=${CMG_TUPLES} \
         --parameterSet=${PARAMETER_SET} \
         --cmgProcessingTag=${CMG_PROCESSING_TAG} \
@@ -72,11 +73,12 @@ if [[ ${CMSSW_ACTION} == "R" ]]; then
         --skimGeneral='' \
         --skimLepton='inc' \
         --skimPreselect \
+        --run \
         ${VERBOSE}
 fi
 
 # deactivate debugging
-set +vx
+#set +vx
 
 exit 0
 
