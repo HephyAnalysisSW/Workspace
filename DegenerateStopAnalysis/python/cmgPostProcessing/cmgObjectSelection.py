@@ -7,6 +7,7 @@ import logging
 import pprint
 
 # imports user modules or functions
+import Workspace.DegenerateStopAnalysis.tools.helpers as helpers
 
 # logger
 logger = logging.getLogger(__name__)   
@@ -22,10 +23,11 @@ class cmgObject():
     logger = logging.getLogger(__name__ + '.cmgObject')   
 
     def __init__(self, readTree, splitTree, obj, varList=[]):
-        self.nObj = cmgObjLen(readTree, obj)
-        self.obj = obj
         self.readTree = readTree  
         self.splitTree = splitTree
+        self.obj = obj
+        if readTree is not None:
+            self.nObj = cmgObjLen(readTree, obj)
 
 
     def __getattr__(self, name):
@@ -165,6 +167,36 @@ class cmgObject():
             
         return objDictList
     
+    def getAllObjBranches(self):
+        ''' Create a list of all branches existing in splitTree.
+        
+        '''
+
+        treeBranches = self.splitTree.GetListOfBranches()
+        typeDict = helpers.rootShortVariableType()
+
+        objBranchList = []
+        objBranchNameType = []
+        
+        for i in range(treeBranches.GetEntries()):
+            branchName = treeBranches.At(i).GetName()
+            
+            branchType = treeBranches.At(i).GetClassName()
+            if not branchType:
+                branchType = treeBranches.At(i).GetListOfLeaves()[0].GetTypeName()
+                
+                
+            branchNameType = branchName + '/' + typeDict[branchType]
+            if branchName.startswith(self.obj):
+                objBranchList.append(branchName)
+                objBranchNameType.append(branchNameType)
+                
+        logger.trace(
+            "\n List of all branches for object %s \n %s \n\n  List of branches and type \n %s",
+            self.obj, pprint.pformat(objBranchList), pprint.pformat(objBranchNameType)
+            )
+
+        return objBranchList, objBranchNameType
 
     def printObjects(self, indexList=[], varList=[]):
         ''' Print for each object from indexList the values of variables from varList.
@@ -174,19 +206,8 @@ class cmgObject():
 
         logger = logging.getLogger(__name__ + '.cmgObject' + '.printObjects')   
                     
-        treeBranches = self.splitTree.GetListOfBranches()
-
-        objBranchList = []
-        for i in range(treeBranches.GetEntries()):
-            branchName = treeBranches.At(i).GetName()
-            if branchName.startswith(self.obj):
-                objBranchList.append(branchName)
-            
-        logger.trace(
-            "\n List of all branches for object %s \n %s \n",
-            self.obj, pprint.pformat(objBranchList)
-            )
-
+        objBranchList, objBranchNameType = self.getAllObjBranches()
+        
         varListCurrent = []
         for var in varList:
             branchName = self.obj + '_' + var
@@ -282,15 +303,17 @@ def objSelectorFunc(objSel):
         obj_pt = obj.pt[objIndex]
         obj_reIso = getattr(obj, objSel_relIso_type)[objIndex]
         
-        if not (
-            ((obj_pt >= objSel_ptSwitch) and (obj_reIso < objSel_relIso_cut))
-            or 
-            ((obj_pt < objSel_ptSwitch)  and (obj_reIso * obj_pt < objSel_absIso))
-            ):
-            
-            return False
-        #
-        return True 
+        passCut = False
+                       
+        if obj_pt < objSel_ptSwitch:
+            if (obj_reIso * obj_pt < objSel_absIso):
+                passCut = True
+        else:
+            if (obj_reIso < objSel_relIso_cut):
+                passCut = True
+
+        # 
+        return passCut
 
 
     def elWP(readTree, obj, objIndex, objSel):
@@ -307,7 +330,7 @@ def objSelectorFunc(objSel):
         
         objEta = obj.eta[objIndex]
         
-        def cut_EB_EE(varName, objIndex, elWPSelVars):
+        def cut_EB_EE(obj, varName, objIndex, elWPSelVars):
             
             elWPSelVars_var = elWPSelVars[varName]
             opVar = elWPSelVars_var['opVar']
@@ -316,21 +339,27 @@ def objSelectorFunc(objSel):
             varValue = getattr(obj, varName)[objIndex] 
             if opVar is not None:
                 varValue = opVar(varValue)
-                        
-            if not (
-                ((opCut(varValue, elWPSelVars_var['EB'])) and (objEta < elWP_eta_EB))
-                or 
-                ((opCut(varValue, elWPSelVars_var['EE'])) and (elWP_eta_EB <= objEta < elWP_eta_EE))
-                ):
+             
+            passCut = False
+                       
+            if objEta < elWP_eta_EB:
+                if opCut(varValue, elWPSelVars_var['EB']):
+                    passCut = True
+            elif ((elWP_eta_EB <= objEta) and (objEta < elWP_eta_EE)):
+                if opCut(varValue, elWPSelVars_var['EE']):
+                    passCut = True
+            else:
+                # for eta outside ['eta_EB', 'eta_EE'] range, set it to False
+                passCut = False
                 
-                return False
-            
+
             # 
-            return True
+            return passCut
                
         # evaluate each cut, exit if False immediately
         for var in elWPSelVars:
-            return cut_EB_EE(var, objIndex, elWPSelVars)
+            if not cut_EB_EE(obj, var, objIndex, elWPSelVars):
+                return False
         
         #
         return True

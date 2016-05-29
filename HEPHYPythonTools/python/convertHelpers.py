@@ -116,8 +116,8 @@ def readVar(v, allowRenaming, isWritten, isRead, makeVecType=False):
 
 def typeStr(t):
   assert type(t)==type("") and t.isalpha(), "Type '%s' not well formatted."%repr(t)
-#  if t=='C':return 'TString' #Need to check this
-#  if t=='B':return 'Char_t'
+  if t=='C':return 'char*'
+  if t=='B':return 'Char_t'
   if t=='b':return 'UChar_t'
   if t=='S':return 'Short_t'
   if t=='s':return 'UShort_t'
@@ -131,8 +131,8 @@ def typeStr(t):
   raise Exception("Unknown type '"+t+"'.")
 
 def typeDefaults(s):
-#  if t=='C':return 'TString' #Need to check this
-#  if t=='B':return '' #Need to check this
+  if s=='C':return '0'
+  if s=='B':return ''
   if s=='b':return '0'
   if s=='S':return '-1'
   if s=='s':return '0'

@@ -62,6 +62,9 @@ def getParameterSet(args):
     parameterSet = args.parameterSet
     processTracks = args.processTracks
 
+    processLepAll = args.processLepAll
+    storeOnlyLepAll = args.storeOnlyLepAll
+
     # parameter sets
     parSetFullName = 'Workspace.DegenerateStopAnalysis.cmgPostProcessing.parameterSets.' + parameterSet
     
@@ -79,21 +82,21 @@ def getParameterSet(args):
     
     # list of variables for muon, electrons, leptons (electrons plus muons)
     
-    LepSel = params['LepSel']
+    LepGoodSel = params['LepGoodSel']
     
     # existing branches
-    varsCommon = helpers.getVariableNameList(LepSel['branches']['common'])
-    varsMu = helpers.getVariableNameList(LepSel['branches']['mu'])
-    varsEl = helpers.getVariableNameList(LepSel['branches']['el'])
+    varsCommon = helpers.getVariableNameList(LepGoodSel['branches']['common'])
+    varsMu = helpers.getVariableNameList(LepGoodSel['branches']['mu'])
+    varsEl = helpers.getVariableNameList(LepGoodSel['branches']['el'])
     
     varListMu = varsCommon + varsMu
     varListEl = varsCommon + varsEl
     varListLep = varsCommon + varsMu + varsEl
     
     # new branches
-    varsCommon = helpers.getVariableNameList(LepSel['newBranches']['common'])
-    varsMu = helpers.getVariableNameList(LepSel['newBranches']['mu'])
-    varsEl = helpers.getVariableNameList(LepSel['newBranches']['el'])
+    varsCommon = helpers.getVariableNameList(LepGoodSel['newBranches']['common'])
+    varsMu = helpers.getVariableNameList(LepGoodSel['newBranches']['mu'])
+    varsEl = helpers.getVariableNameList(LepGoodSel['newBranches']['el'])
     
     varListExtMu = varsCommon + varsMu
     varListExtEl = varsCommon + varsEl
@@ -112,6 +115,10 @@ def getParameterSet(args):
 
     params['LepVarList'] = LepVarList
     
+    if processLepAll:
+        LepOtherSel = params['LepOtherSel']
+
+    
     # list of variables for jets
     JetSel = params['JetSel']
 
@@ -129,7 +136,11 @@ def getParameterSet(args):
 
     # for the object selectors defined here, add the list of branches defined in the selector 
 
-    vectors_DATAMC_List = [LepSel, JetSel]
+    if processLepAll:
+        vectors_DATAMC_List = [LepGoodSel, LepOtherSel, JetSel]
+    else:
+        vectors_DATAMC_List = [LepGoodSel, JetSel]
+        
     if args.processTracks:
         vectors_DATAMC_List.append(TracksSel)
         
@@ -420,7 +431,7 @@ def eventsSkimPreselect(skimGeneral, skimLepton, skimPreselectFlag, params, skim
 
  
  
-def rwTreeClasses(sample, isample, args, temporaryDir, params={} ):
+def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, params={} ):
     '''Define the read / write tree classes for data and MC.
     
     '''
@@ -484,11 +495,19 @@ def rwTreeClasses(sample, isample, args, temporaryDir, params={} ):
         'met*','puppi*',
         'Flag_*','HLT_*',
         'nJet', 'Jet_*', 
-        'nLepGood', 'LepGood_*', 
-        'nLepOther', 'LepOther_*', 
         'nTauGood', 'TauGood_*',
         'Tracks_*', 'isoTrack_*',
         ] 
+
+    if (args.processLepAll and args.storeOnlyLepAll):
+        keepBranches_DATAMC.extend([ 
+            'nLepGood', 'nLepOther',
+            ])
+    else:        
+        keepBranches_DATAMC.extend([ 
+            'nLepGood', 'LepGood_*', 
+            'nLepOther', 'LepOther_*',
+            ])
 
     readVariables_DATAMC = []
     aliases_DATAMC = []
@@ -510,34 +529,87 @@ def rwTreeClasses(sample, isample, args, temporaryDir, params={} ):
         ])
     
     newVariables_DATAMC.extend([
+        "nLepGood_mu/I/-1", "nLepGood_el/I/-1", "nLepGood_lep/I/-1",
+        ])
+    
+    if args.processLepAll:
+        newVariables_DATAMC.extend([
+            "nLepOther_mu/I/-1", "nLepOther_el/I/-1", "nLepOther_lep/I/-1",
+            "nLepAll_mu/I/-1", "nLepAll_el/I/-1", "nLepAll_lep/I/-1",            
+            ])
+
+    newVariables_DATAMC.extend([
         'nBasJet/I/-1', 'nVetoJet/I/-1', 'nIsrJet/I/-1', 'nIsrHJet/I/-1',
         'nBJet/I/-1', 'nBSoftJet/I/-1', 'nBHardJet/I/-1',
         ])
-    
-    newVariables_DATAMC.extend([
-        "nMuon/I/-1", "nElectron/I/-1", "nLepton/I/-1",
-        ])
-    
+        
     newVariables_DATAMC.extend([
         'basJet_dR_j1j2/F/-999.', 'basJet_dPhi_j1j2/F/-999.', 'vetoJet_dPhi_j1j2/F/-999.',
         ])
     
     newVariables_DATAMC.extend([
-        'basJet_mu_invMass_mu1jmindR/F/-999.','basJet_mu_dR_j1mu1/F/-999.', 'basJet_mu_invMass_3j/F/-999.',
-        'basJet_el_invMass_el1jmindR/F/-999.','basJet_el_dR_j1el1/F/-999.', 'basJet_el_invMass_3j/F/-999.',
-        'basJet_lep_invMass_lep1jmindR/F/-999.','basJet_lep_dR_j1lep1/F/-999.', 'basJet_lep_invMass_3j/F/-999.',
-        'bJet_mu_dR_jHdmu1/F/-999.','bJet_el_dR_jHdel1/F/-999.', 'bJet_lep_dR_jHdlep1/F/-999.',
+        'basJet_muGood_invMass_mu1jmindR/F/-999.','basJet_muGood_dR_j1mu1/F/-999.', 'basJet_muGood_invMass_3j/F/-999.',
+        'basJet_elGood_invMass_el1jmindR/F/-999.','basJet_elGood_dR_j1el1/F/-999.', 'basJet_elGood_invMass_3j/F/-999.',
+        'basJet_lepGood_invMass_lep1jmindR/F/-999.','basJet_lepGood_dR_j1lep1/F/-999.', 'basJet_lepGood_invMass_3j/F/-999.',
+        'bJet_muGood_dR_jHdmu1/F/-999.','bJet_elGood_dR_jHdel1/F/-999.', 'bJet_lepGood_dR_jHdlep1/F/-999.',
         ])
+
+    if args.processLepAll:
+        newVariables_DATAMC.extend([
+            'basJet_muAll_invMass_mu1jmindR/F/-999.','basJet_muAll_dR_j1mu1/F/-999.', 'basJet_muAll_invMass_3j/F/-999.',
+            'basJet_elAll_invMass_el1jmindR/F/-999.','basJet_elAll_dR_j1el1/F/-999.', 'basJet_elAll_invMass_3j/F/-999.',
+            'basJet_lepAll_invMass_lep1jmindR/F/-999.','basJet_lepAll_dR_j1lep1/F/-999.', 'basJet_lepAll_invMass_3j/F/-999.',
+            'bJet_muAll_dR_jHdmu1/F/-999.','bJet_elAll_dR_jHdel1/F/-999.', 'bJet_lepAll_dR_jHdlep1/F/-999.',
+            ])
 
     newVectors_DATAMC = []
     
     newVectors_DATAMC = appendVectors(params, 'vectors_DATAMC_List', 'new', newVectors_DATAMC)
-
+    
+    # LepAll collection kludge - needs all Lep*_* branches to clone LepGood and LepOther in LepAll
+    if args.processLepAll:
+        
+        varsNameTypeTreeLepAll = copy.deepcopy(varsNameTypeTreeLep)
+        
+        for vec in readVectors_DATAMC:
+            if vec['prefix'] in ['LepGood', 'LepOther']:
+                vec['vars'] = varsNameTypeTreeLep
+                
+    
+        for vec in newVectors_DATAMC:
+            if vec['prefix'] is 'LepGood':
+                for var in vec['vars']:
+                    varsNameTypeTreeLepAll.append(var)
+        
+        newVariables_DATAMC.extend([
+            "nLepAll/I/-1",
+            ])
+    
+        LepAllVect = [{
+            'prefix':'LepAll',
+            'nMax': params['LepGoodSel']['nMax'] + params['LepOtherSel']['nMax'],
+            'vars': varsNameTypeTreeLepAll,
+            }, ]
+        
+        newVectors_DATAMC.extend(LepAllVect)
+        
+        # add list of variables for leptons in readTree to params
+        vars_LepTree = [helpers.getVariableName(var) for var in varsNameTypeTreeLepAll]
+        params['varsTreeLep'] = vars_LepTree
+        
+        logger.info(
+            "\n Additional entries in the parameter dictionary: variables for LepGood tree \n\n %s \n\n", 
+            pprint.pformat(params['varsTreeLep'])
+            )
+    
+        # end of kludge
+    
+    
     # index sorting
     
     # leptons are sorted after pt
     newVectors_DATAMC.extend([
-        {'prefix':'IndexLepton', 'nMax': params['LepSel']['nMax'], 
+        {'prefix':'IndexLepGood', 'nMax': params['LepGoodSel']['nMax'], 
             'vars':[
                 'mu/I/-1',
                 'el/I/-1',
@@ -545,6 +617,27 @@ def rwTreeClasses(sample, isample, args, temporaryDir, params={} ):
                 ] 
             },
         ])
+
+    if args.processLepAll:
+        newVectors_DATAMC.extend([
+            {'prefix':'IndexLepOther', 'nMax': params['LepOtherSel']['nMax'], 
+                'vars':[
+                    'mu/I/-1',
+                    'el/I/-1',
+                    'lep/I/-1',
+                    ] 
+                },
+            ])
+    
+        newVectors_DATAMC.extend([
+            {'prefix':'IndexLepAll', 'nMax': params['LepGoodSel']['nMax'] + params['LepOtherSel']['nMax'], 
+                'vars':[
+                    'mu/I/-1',
+                    'el/I/-1',
+                    'lep/I/-1',
+                    ] 
+                },
+            ])
 
     # basJet, vetoJet, isrJet, isrHJet are sorted after pt
     # bJet, bSoftJet, bHardJet are sorted also after pt
@@ -697,6 +790,7 @@ def rwTreeClasses(sample, isample, args, temporaryDir, params={} ):
             ) for vvar in v['vars']
             ]
 
+    logger.debug("\n keepBranches definition: \n %s \n", pprint.pformat(keepBranches))
     logger.debug("\n read variables (readVars) definition: \n %s \n", pprint.pformat(readVars))
     logger.debug("\n aliases definition: \n %s \n", pprint.pformat(aliases))
     logger.debug("\n read vectors (readVectors) definition: \n %s \n", pprint.pformat(readVectors))
@@ -864,8 +958,20 @@ def processGenSusyParticles(readTree, splitTree, saveTree, params):
     
     return saveTree
 
+# some auxiliary functions, identical for mu, el, lep 
 
-def processLeptons(readTree, splitTree, saveTree, params):
+def saveTreeLepObject(saveTree, LepColl, objName, objList):
+    ''' Save number of selected lepton objects and their indices.
+
+    '''
+    setattr(saveTree, 'n' + LepColl + '_' + objName, len(objList))
+    for idx, val in enumerate(objList):
+        var = getattr(saveTree, 'Index' + LepColl + '_' + objName)
+        var[idx] = val
+        
+    return saveTree
+
+def processLeptons(readTree, splitTree, saveTree, params, LepSelector):
     '''Process leptons. 
     
     TODO describe here the processing.
@@ -873,6 +979,28 @@ def processLeptons(readTree, splitTree, saveTree, params):
 
     logger = logging.getLogger('cmgPostProcessing.processLeptons')
     
+    # some auxiliary functions, identical for mu, el, lep 
+    
+    def printDebug(saveTree, LepColl, objName, objList):
+        ''' Debug message for each list of indices.
+    
+        '''
+        logger = logging.getLogger('cmgPostProcessing.processLeptons.printDebug')
+
+        selectorName = 'lep (mu + el)' if objName is 'lep' else objName
+        printStr = "\n  {0} {1} selector \n ".format(LepColl, selectorName)
+        
+        if objName in ['mu', 'el']:
+            printStr += '\n  ' + pprint.pformat(LepSel[objName])
+        
+        printStr += '\n ' + lepObj.printObjects(objList, LepVarList[objName])
+
+        printStr += "\n saveTree.n{0}_{1} = %i \n  Index list: ".format(LepColl, objName) + \
+            pprint.pformat(objList) + "\n "
+
+        logger.debug(printStr, getattr(saveTree, 'n' + LepColl + '_' + objName))
+
+
     # initialize returned variables (other than saveTree)
     
     lepObj = None
@@ -880,10 +1008,13 @@ def processLeptons(readTree, splitTree, saveTree, params):
     # lepton selection
     
     LepVarList = params['LepVarList'] 
-    LepSel = params['LepSel']
     
+    LepSel = LepSelector
+    
+    LepColl = LepSel['branchPrefix']
     objBranches = LepSel['branchPrefix']
-    lepObj = cmgObjectSelection.cmgObject(readTree, splitTree, objBranches)
+    
+    lepObj = cmgObjectSelection.cmgObject(readTree, splitTree, LepColl)
     
     # compute the additional quantities for leptons
     
@@ -891,12 +1022,7 @@ def processLeptons(readTree, splitTree, saveTree, params):
         
         lep_pt = getattr(lepObj, 'pt')[lepIndex]
         lep_phi = getattr(lepObj, 'phi')[lepIndex]
-        lep_relIso04 = getattr(lepObj, 'relIso04')[lepIndex]
 
-        q80 = 1 - 80 ** 2 / (2 * lep_pt * readTree.met_pt)
-        cosdPhiLepMet = math.cos(lep_phi - readTree.met_phi)
-    
-        mt = math.sqrt(2 * lep_pt * readTree.met_pt * (1 - cosdPhiLepMet))
         lt = readTree.met_pt + lep_pt
   
         dPhiLepW = math.acos(
@@ -906,14 +1032,17 @@ def processLeptons(readTree, splitTree, saveTree, params):
                 )
             ) 
         
-        absIso = lep_relIso04 * lep_pt
-    
-        saveTree.LepGood_q80[lepIndex] = q80
-        saveTree.LepGood_cosdPhiLepMet[lepIndex] = cosdPhiLepMet
-        saveTree.LepGood_mt[lepIndex] = mt
-        saveTree.LepGood_lt[lepIndex] = lt
-        saveTree.LepGood_dPhiLepW[lepIndex] = dPhiLepW
-        saveTree.LepGood_absIso[lepIndex] = absIso 
+        if LepColl == 'LepGood':
+            saveTree.LepGood_lt[lepIndex] = lt
+            saveTree.LepGood_dPhiLepW[lepIndex] = dPhiLepW
+            saveTree.LepGood_isLepGood[lepIndex] = 1
+            saveTree.LepGood_isLepOther[lepIndex] = 0
+        else:
+            saveTree.LepOther_lt[lepIndex] = lt
+            saveTree.LepOther_dPhiLepW[lepIndex] = dPhiLepW
+            saveTree.LepOther_isLepGood[lepIndex] = 0
+            saveTree.LepOther_isLepOther[lepIndex] = 1
+        
         
               
     if logger.isEnabledFor(logging.DEBUG):
@@ -941,36 +1070,16 @@ def processLeptons(readTree, splitTree, saveTree, params):
     sumElMuList = muList + elList
     lepList = lepObj.sort('pt', sumElMuList)
  
-    saveTree.nMuon = len(muList)
-    for ind, val in enumerate(muList):
-        saveTree.IndexLepton_mu[ind] = val
-        
-    saveTree.nElectron = len(elList)
-    for ind, val in enumerate(elList):
-        saveTree.IndexLepton_el[ind] = val
-
-    saveTree.nLepton = len(lepList)
-    for ind, val in enumerate(lepList):
-        saveTree.IndexLepton_lep[ind] = val
+    # save number of selected objects and their indices
+    
+    saveTree = saveTreeLepObject(saveTree, LepColl, 'mu', muList)
+    saveTree = saveTreeLepObject(saveTree, LepColl, 'el', elList)
+    saveTree = saveTreeLepObject(saveTree, LepColl, 'lep', lepList)
 
     if logger.isEnabledFor(logging.DEBUG):
-
-        printStr = "\n  " + objBranches + " muon selector \n " + \
-            pprint.pformat(LepSel['mu']) + \
-            '\n ' + lepObj.printObjects(muList, LepVarList['mu']) + \
-            "\n saveTree.nMuon = %i \n  Index list: " + pprint.pformat(muList) + "\n "
-        logger.debug(printStr, saveTree.nMuon)
-
-        printStr = "\n  " + objBranches + " electron selector \n " + \
-            pprint.pformat(LepSel['el']) + \
-            '\n ' + lepObj.printObjects(elList, LepVarList['el']) + \
-            "\n saveTree.nElectron = %i \n  Index list: " + pprint.pformat(elList) + "\n "
-        logger.debug(printStr, saveTree.nElectron)
-
-        printStr = "\n  " + objBranches + " lepton (mu + el) selection \n " + \
-            '\n ' + lepObj.printObjects(lepList, LepVarList['lep']) + \
-            "\n saveTree.nLepton = %i \n  Index list:  " + pprint.pformat(lepList) + "\n "        
-        logger.debug(printStr, saveTree.nLepton)
+        printDebug(saveTree, LepColl, 'mu', muList)
+        printDebug(saveTree, LepColl, 'el', elList)
+        printDebug(saveTree, LepColl, 'lep', lepList)
         
     # define the named tuple to return the values
     rtuple = collections.namedtuple(
@@ -991,6 +1100,190 @@ def processLeptons(readTree, splitTree, saveTree, params):
         )
     #    
     return saveTree, processLeptons_rtuple
+
+def processLeptonsAll(
+    readTree, splitTree, saveTree, params,
+    processLepGood_rtuple, processLepOther_rtuple
+    ):
+    '''Process LepAll collection, LepGood + LepOther 
+    
+    '''
+
+    logger = logging.getLogger('cmgPostProcessing.processLeptonsAll')
+    
+    LepVarList = params['LepVarList']
+    
+    # some auxiliary functions, identical for mu, el, lep 
+    
+    def printDebug(saveTree, LepColl, objName, objList, LepVarList):
+        ''' Debug message for each list of indices.
+    
+        '''
+        logger = logging.getLogger('cmgPostProcessing.processLeptonsAll.printDebug')
+
+        selectorName = 'lep (mu + el)' if objName is 'lep' else objName
+        printStr = "\n  {0} {1} selector \n ".format(LepColl, selectorName)
+        
+        printStr += "\n Number of selected {0} objects: {1} \n".format(
+            LepColl, getattr(saveTree, 'n' + LepColl + '_' + objName)
+            )
+        for iLep in range(getattr(saveTree, 'n' + LepColl + '_' + objName)):
+            printStr += "\n + " + LepColl + " object index: " + str(objList[iLep]) + '\n'
+            for var in LepVarList[objName]:
+                printStr += LepColl + '_' + var + ' = ' + \
+                    str(getattr(saveTree, LepColl + '_' + var)[objList[iLep]]) + '\n'
+        printStr += "\n saveTree.n{0}_{1} = %i \n  Index list: ".format(LepColl, objName) + \
+            pprint.pformat(objList) + "\n "
+        logger.debug(printStr, getattr(saveTree, 'n' + LepColl + '_' + objName))
+
+    
+    LepColl = 'LepAll'
+
+    # 
+    lepGoodObj = processLepGood_rtuple.lepObj
+    lepOtherObj = processLepOther_rtuple.lepObj
+    
+    # 
+    varList = ['pt']
+    
+    #
+    lepGoodList = lepGoodObj.getObjDictList(
+        varList,
+        list(range(0, lepGoodObj.nObj))
+        )
+
+    for idx, lep in enumerate(lepGoodList):
+        lep['index'] = idx
+        lep['isLepGood'] = 1
+        
+    logger.debug('\n LepGood list before selector \n %s \n', pprint.pformat(lepGoodList))
+    
+    lepOtherList = lepOtherObj.getObjDictList(
+        varList,
+        list(range(0, lepOtherObj.nObj))
+        )
+
+    for idx, lep in enumerate(lepOtherList):
+        lep['index'] = idx
+        lep['isLepGood'] = 0
+
+    logger.debug('\n LepOther list before selector \n %s \n', pprint.pformat(lepOtherList))
+
+    lepAllList = lepGoodList + lepOtherList
+    lepAllList = sorted(lepAllList , key=lambda lep: lep['pt'], reverse=True)
+
+    logger.debug('\n LepGood + LepOther list before selector, pt sorted \n %s \n', pprint.pformat(lepAllList))
+    
+    logger.debug(
+        '\n Input index lists of selected lep objects: \n' + \
+        'processLepGood_rtuple.lepList \n %s \n' + \
+        'processLepOther_rtuple.lepList \n %s \n',
+        pprint.pformat(processLepGood_rtuple.lepList),
+        pprint.pformat(processLepOther_rtuple.lepList)
+        )
+
+    muList = []
+    elList = []
+    lepList = []        
+    
+    # add LepAll to the saveTree
+    for idx, lep in enumerate(lepAllList):
+        isLepGood = lep['isLepGood']
+        lepIndex = lep['index']
+        
+        # variables for each lepton
+        for var in params['varsTreeLep']:
+            # extended (new) variables are read from saveTree, others from readTree
+            if var in LepVarList['extLep']:
+                if isLepGood:
+                    value = getattr(saveTree, 'LepGood_' + var)[lepIndex]
+                else:
+                    value = getattr(saveTree, 'LepOther_' + var)[lepIndex]
+            else:
+                if isLepGood:
+                    value = getattr(lepGoodObj, var)[lepIndex]
+                else:
+                    value = getattr(lepOtherObj, var)[lepIndex]
+                
+            idxVar = getattr(saveTree, LepColl + '_' + var)
+            idxVar[idx] = value
+            
+        # index lists
+        if isLepGood:
+            if lepIndex in processLepGood_rtuple.muList:
+                muList.append(idx)
+            if lepIndex in processLepGood_rtuple.elList:
+                elList.append(idx)
+            if lepIndex in processLepGood_rtuple.lepList:
+                lepList.append(idx)
+                
+        else:
+            if lepIndex in processLepOther_rtuple.muList:
+                muList.append(idx)
+            if lepIndex in processLepOther_rtuple.elList:
+                elList.append(idx)
+            if lepIndex in processLepOther_rtuple.lepList:
+                lepList.append(idx)
+                            
+    nLepAll = len(lepAllList)
+    saveTree.nLepAll = nLepAll
+
+    if logger.isEnabledFor(logging.DEBUG):
+        printStr = "\n List of LepAll leptons before selector: \n nLepAll = {0}\n".format(nLepAll)
+        
+        for idx in range(nLepAll):
+            printStr += "\n Lepton index {0}: \n".format(idx)
+            for var in params['varsTreeLep']:
+                varName = LepColl + '_' + var
+                varValue = getattr(saveTree, varName)[idx]
+                printStr += varName + " = " + str(varValue) + '\n'
+            printStr += '\n'
+            
+        printStr += '\n'
+        logger.debug(printStr)
+
+    # save number of selected objects and their indices
+    
+    saveTree = saveTreeLepObject(saveTree, LepColl, 'mu', muList)
+    saveTree = saveTreeLepObject(saveTree, LepColl, 'el', elList)
+    saveTree = saveTreeLepObject(saveTree, LepColl, 'lep', lepList)
+
+    if logger.isEnabledFor(logging.DEBUG):
+        printDebug(saveTree, LepColl, 'mu', muList, LepVarList)
+        printDebug(saveTree, LepColl, 'el', elList, LepVarList)
+        printDebug(saveTree, LepColl, 'lep', lepList, LepVarList)
+        
+    # get LepAll as cmgObject, print them in debug mode 
+    lepAllObj = cmgObjectSelection.cmgObject(saveTree, splitTree, LepColl)
+    
+    if logger.isEnabledFor(logging.DEBUG):
+        printStr = "\n List of " + LepColl + " leptons before selector, from LepAll defined as cmgObject: " + \
+            lepAllObj.printObjects(None, LepVarList['lep'])
+
+        logger.debug(printStr)
+    
+
+    # define the named tuple to return the values
+    rtuple = collections.namedtuple(
+        'rtuple',
+        [
+            'lepObj',
+            'muList',
+            'elList',
+            'lepList',
+            ]
+        )
+    
+    lep_rtuple = rtuple(
+        lepAllObj,
+        muList,
+        elList,
+        lepList
+        )
+    #    
+    return saveTree, lep_rtuple
+    
+
 
 def processJets(args, readTree, splitTree, saveTree, params):
     '''Process jets. 
@@ -1140,21 +1433,21 @@ def processJets(args, readTree, splitTree, saveTree, params):
     bJetSepPtSoftHard = JetSel['bjetSep']['ptSoftHard'][2]
     bSoftJetList, bHardJetList = jetObj.splitIndexList('pt', bJetSepPtSoftHard, bJetList)
     
-    nBJets = len(bJetList)
-    saveTree.nBJets = nBJets
+    nBJet = len(bJetList)
+    saveTree.nBJet = nBJet
     for ind, val in enumerate(bJetList):
         saveTree.IndexJet_bJet[ind] = val
 
     for ind, val in enumerate(bJetDiscSortList):
         saveTree.IndexJet_bJetDiscSort[ind] = val
 
-    nBSoftJets = len(bSoftJetList)
-    saveTree.nBSoftJets = nBSoftJets
+    nBSoftJet = len(bSoftJetList)
+    saveTree.nBSoftJet = nBSoftJet
     for ind, val in enumerate(bSoftJetList):
         saveTree.IndexJet_bSoftJet[ind] = val
 
-    nBHardJets = len(bHardJetList)
-    saveTree.nBHardJets = nBHardJets
+    nBHardJet = len(bHardJetList)
+    saveTree.nBHardJet = nBHardJet
     for ind, val in enumerate(bHardJetList):
         saveTree.IndexJet_bHardJet[ind] = val
     
@@ -1163,23 +1456,23 @@ def processJets(args, readTree, splitTree, saveTree, params):
             pprint.pformat(bJetSel) + \
             '\n ' + jetObj.printObjects(bJetList, JetVarList) + \
             "\n saveTree.nBJet = %i \n  Index list: " + pprint.pformat(bJetList) + "\n "
-        logger.debug(printStr, saveTree.nBJets)
+        logger.debug(printStr, saveTree.nBJet)
         
         printStr = "\n  " + objBranches + " b jet selector (from basic jets), sorted after jet b discriminant \n " + \
             "\n saveTree.nBJet = %i \n  Index list: " + pprint.pformat(bJetDiscSortList) + "\n "
-        logger.debug(printStr, saveTree.nBJets)
+        logger.debug(printStr, saveTree.nBJet)
 
         printStr = "\n  " + objBranches + " b soft jet selector, sorted after jet pt \n " + \
             '\n pt soft/hard threshold: %f ' + \
             '\n ' + jetObj.printObjects(bSoftJetList, JetVarList) + \
-            "\n saveTree.nSoftBJets = %i \n  Index list: " + pprint.pformat(bSoftJetList) + "\n "
-        logger.debug(printStr, bJetSepPtSoftHard, saveTree.nBSoftJets)
+            "\n saveTree.nBSoftJet = %i \n  Index list: " + pprint.pformat(bSoftJetList) + "\n "
+        logger.debug(printStr, bJetSepPtSoftHard, saveTree.nBSoftJet)
 
         printStr = "\n  " + objBranches + " b hard jet selector, sorted after jet pt \n " + \
             '\n pt soft/hard threshold: %f ' + \
             '\n ' + jetObj.printObjects(bHardJetList, JetVarList) + \
-            "\n saveTree.nHardBJets = %i \n  Index list: " + pprint.pformat(bHardJetList) + "\n "
-        logger.debug(printStr, bJetSepPtSoftHard, saveTree.nBHardJets)
+            "\n saveTree.nBHardJet = %i \n  Index list: " + pprint.pformat(bHardJetList) + "\n "
+        logger.debug(printStr, bJetSepPtSoftHard, saveTree.nBHardJet)
 
     # HT as sum of basic jets
     
@@ -1321,6 +1614,7 @@ def processLeptonJets(
     objNameList = ['mu', 'el', 'lep']
     
     # get here the list of fields only, to be used also for debug when lepjObj is empty
+    # objects lists used are irrelevant to get the fields, use e.g. muList
     getFieldsOnly = True
     rtuple_fields = variablesLeptonJets(
         getFieldsOnly, lepObj, jetObj, processLeptons_rtuple.muList, basJetList, bJetDiscSortList
@@ -1340,7 +1634,8 @@ def processLeptonJets(
                 )
             
             for var in rtuple_fields:
-                varName = var.replace('obj', obj)
+                varName = var.replace('_obj_', '_' + obj + (lepObj.obj).replace('Lep', '') + '_')
+                varName = varName.replace('obj', obj)
                 setattr(saveTree, varName, getattr(variablesLeptonJets_rtuple, var))
                               
     if logger.isEnabledFor(logging.DEBUG):
@@ -1349,7 +1644,8 @@ def processLeptonJets(
         
         for obj in objNameList:            
             for var in rtuple_fields:
-                varName = var.replace('obj', obj)
+                varName = var.replace('_obj_', '_' + obj + (lepObj.obj).replace('Lep', '') + '_')
+                varName = varName.replace('obj', obj)
                 varValue = getattr(saveTree, varName)
                 
                 logString += ('\n ' + varName + ' = {}').format(varValue)
@@ -1691,6 +1987,39 @@ def haddFiles(sample_name, filesForHadd, temporaryDir, outputWriteDirectory):
     return
 
 
+def varsTreeLep(chunks, skimCond):
+    ''' List of variables corresponding to LepGood branches.
+      
+    Some variables, defined as new in the parameter set, are added in rwTreeClasses.
+    '''
+    
+    logger = logging.getLogger('cmgPostProcessing.varsTreeLep')
+
+    for chunk in chunks:
+        splitTreeKludge = getTreeFromChunk(chunk, skimCond, 0, 1)
+    
+        if not splitTreeKludge: 
+            logger.warning("\n Tree object %s not found\n", splitTreeKludge)
+            continue
+        else:
+            logger.debug("\n varsTreeLep on tree object %s \n from split fragment %i \n", splitTreeKludge, 0)
+    
+        # get the variables from LepGood
+        branchPrefix = 'LepGood'
+        lepGoodObj = cmgObjectSelection.cmgObject(None, splitTreeKludge, branchPrefix)
+        objBranchList, objBranchNameType = lepGoodObj.getAllObjBranches()
+        
+        objVarNameType = [ var.replace(branchPrefix + '_', '')  for var in objBranchNameType]
+
+        logger.debug(
+            "\n List of all variables for object %s \n %s \n",
+            branchPrefix, pprint.pformat(objVarNameType)
+            )
+        
+        break
+    
+    return objVarNameType
+
 
 def cmgPostProcessing(argv=None):
     
@@ -1711,6 +2040,14 @@ def cmgPostProcessing(argv=None):
     skimPreselect = args.skimPreselect
     
     runSmallSample = args.runSmallSample
+    
+    processLepAll = args.processLepAll
+    storeOnlyLepAll = args.storeOnlyLepAll
+    
+    if not processLepAll:
+        if storeOnlyLepAll:
+            raise Exception("\n storeOnlyLepAll option can only be used with processLepAll\n")
+            sys.exit()
 
     # for ipython, run always on small samples   
     if sys.argv[0].count('ipython'):
@@ -1760,6 +2097,10 @@ def cmgPostProcessing(argv=None):
 
     logger = get_logger(logLevel, logFile.name)
     
+    if verbose:
+        print "\n Log file stored in: \n", logFile.name
+        print "\n Output directory: \n", outputDirectory 
+
     #
     logger.info("\n Job arguments: \n\n %s \n", pprint.pformat(vars(args)))
 
@@ -1888,7 +2229,20 @@ def cmgPostProcessing(argv=None):
         logger.info("\n Output sample directory \n  %s \n", outputWriteDirectory) 
         logger.debug("\n Temporary directory \n  %s \n", temporaryDir) 
         
-        rwTreeClasses_rtuple = rwTreeClasses(sample, isample, args, temporaryDir, params) 
+        chunks, sumWeight = hephyHelpers.getChunks(sample)
+        
+        logger.info(
+            "\n Sample %s of type %s has " + \
+            "\n   number of chunks: %i"\
+            "\n   sumWeights: %s \n", sampleName, sampleType, len(chunks), sumWeight
+            ) 
+        logger.debug("\n Chunks: \n \n %s", pprint.pformat(chunks)) 
+        
+        # stupid kludge to get the list of branches for an objects, to be able to add a merged collection to tree
+        varsNameTypeTreeLep = varsTreeLep(chunks, skimCond)
+          
+        # get the tree structure      
+        rwTreeClasses_rtuple = rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, params) 
         #
         keepBranches = rwTreeClasses_rtuple.keepBranches 
              
@@ -1903,14 +2257,6 @@ def cmgPostProcessing(argv=None):
         saveTree = rwTreeClasses_rtuple.saveTree
         #
         
-        chunks, sumWeight = hephyHelpers.getChunks(sample)
-                
-        logger.info(
-            "\n Sample %s of type %s has " + \
-            "\n   number of chunks: %i"\
-            "\n   sumWeights: %s \n", sampleName, sampleType, len(chunks), sumWeight
-            ) 
-        logger.debug("\n Chunks: \n \n %s", pprint.pformat(chunks)) 
         
         if runSmallSample: 
             chunks=chunks[:1]
@@ -1965,8 +2311,11 @@ def cmgPostProcessing(argv=None):
     
                 for v in newVectors:
                     for var in v['vars']:
-                        var['branch'] = splitTree.Branch(var['stage2Name'], 
-                            ROOT.AddressOf(saveTree,var['stage2Name']), var['stage2Name']+'/'+var['stage2Type'])
+                        var['branch'] = splitTree.Branch(
+                            var['stage2Name'], 
+                            ROOT.AddressOf(saveTree,var['stage2Name']), 
+                            var['stage2Name']+'[' + str(v['nMax']) + ']/'+var['stage2Type']
+                            )
                         
 
                 # get entries for tree and loop over events
@@ -1980,7 +2329,7 @@ def cmgPostProcessing(argv=None):
 
                 start_time = int(time.time())
                 last_time = start_time
-                nVerboseEvents = 10000
+                nVerboseEvents = 1000
                 
                 for iEv in xrange(nEvents):
                     
@@ -2011,9 +2360,20 @@ def cmgPostProcessing(argv=None):
                         )
                     
                     # leptons processing
-                    saveTree, processLeptons_rtuple = processLeptons(
-                        readTree, splitTree, saveTree, params
+                    saveTree, processLepGood_rtuple = processLeptons(
+                        readTree, splitTree, saveTree, params, params['LepGoodSel']
                         )
+                                        
+                    if processLepAll:
+                        saveTree, processLepOther_rtuple = processLeptons(
+                            readTree, splitTree, saveTree, params, params['LepOtherSel']
+                            )
+                    
+                        saveTree, processLepAll_rtuple = processLeptonsAll(
+                            readTree, splitTree, saveTree, params,
+                            processLepGood_rtuple, processLepOther_rtuple
+                            )
+                                            
                     
                     # jets processing
                     saveTree, processJets_rtuple = processJets(
@@ -2023,15 +2383,27 @@ def cmgPostProcessing(argv=None):
                     # selected leptons - jets processing
                     saveTree = processLeptonJets(
                         readTree, splitTree, saveTree,
-                        processLeptons_rtuple, processJets_rtuple
+                        processLepGood_rtuple, processJets_rtuple
                         )
+
+                    if processLepAll:
+                        saveTree = processLeptonJets(
+                            readTree, splitTree, saveTree,
+                            processLepAll_rtuple, processJets_rtuple
+                            )
                     
                     # tracks
                     if args.processTracks:
                         saveTree = processTracksFunction(
                             readTree, splitTree, saveTree, params, 
-                            processLeptons_rtuple, processJets_rtuple
+                            processLepGood_rtuple, processJets_rtuple
                             )
+
+                        if processLepAll:
+                            saveTree = processTracksFunction(
+                                readTree, splitTree, saveTree, params, 
+                                processLepAll_rtuple, processJets_rtuple
+                                )
 
                     if (not isDataSample) and args.processGenTracks:
                         saveTree = processGenTracksFunction(readTree, splitTree, saveTree)
@@ -2116,19 +2488,22 @@ def cmgPostProcessing(argv=None):
         # add the histograms using ROOT hadd script         
         if not testMethods: 
             haddFiles(sample_name, filesForHadd, temporaryDir, outputWriteDirectory)
-                
-        logger.info(
-            "\n " + \
-            "\n End of post-processing sample %s. \n Total number of event processed for this sample: %i" + \
-            "\n *******************************************************************************\n",
-            sample_name, nEvents_total
-            )
+ 
+        
+        end_message =  "\n " + \
+            "\n ******** End of post-processing sample \n ******** {0}.".format(sample_name) + \
+            "\n Total number of event processed for this sample: {0}".format(nEvents_total) + \
+            '\n'
+            
+              
+        logger.info(end_message)
+        
+        if verbose:
+            print end_message
+
     
     if verbose:
-        print "Log File Stored in:"
-        print logFile.name
-        print "Output Directory:"
-        print outputWriteDirectory 
+        print '\n End of cmgPostProcessing script.\n'
  
 if __name__ == "__main__":
     sys.exit(cmgPostProcessing())
