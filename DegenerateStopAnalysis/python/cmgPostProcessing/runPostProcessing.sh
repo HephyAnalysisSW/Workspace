@@ -9,11 +9,20 @@
 #    Run steps:   
 #       From the base repository, where the link was done:
 #       nohup krenew -t -K 10 -- bash -c "./runPostProcessing.sh $1 [$2 [3]]" &
+#
+#       $1 compulsory; 
+#          set sample as defined in runPostProcessing.sh
+#       $2 optional for MC samples, must be set to 'DATA' for data
+#          if 'DATA', take cmgTuples="Data25ns_v6", for any other value takes cmgTuples="Spring15_7412pass2_mAODv2_v6"
+#       $3 optional;
+#          if 'TEST', add to "_TEST" to CMG_POST_PROCESSING_TAG, e.g. "74X_postProcessing_v3_TEST"
+#          with 'TEST', it also add '--verbose'
+#
 # 
 # The parameters to be used are available in 
 #   ${CMSSW_BASE}/src/Workspace/DegenerateStopAnalysis/python/cmgPostProcessing/cmgPostProcessing_parser.py
 #   ${CMSSW_BASE}/src/Workspace/DegenerateStopAnalysis/python/cmgPostProcessing/runPostProcessing.py
-# adapt them here. If not set here, the default parameters will be used
+# adapt them below to the desired values. If not set here, the default parameters will be used
 
 # activate debugging
 #set -vx
