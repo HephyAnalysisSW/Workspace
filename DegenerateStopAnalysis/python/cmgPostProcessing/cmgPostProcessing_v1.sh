@@ -21,7 +21,6 @@
 # 
 # The parameters to be used are available in 
 #   ${CMSSW_BASE}/src/Workspace/DegenerateStopAnalysis/python/cmgPostProcessing/cmgPostProcessing_parser.py
-#   ${CMSSW_BASE}/src/Workspace/DegenerateStopAnalysis/python/cmgPostProcessing/runPostProcessing.py
 # adapt them below to the desired values. If not set here, the default parameters will be used
 
 # activate debugging
