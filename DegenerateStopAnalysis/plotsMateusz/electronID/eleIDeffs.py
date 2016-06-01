@@ -13,6 +13,8 @@ from array import array
 from math import pi, sqrt #cos, sin, sinh, log
 import argparse
 
+ROOT.gStyle.SetOptStat(1111) #0 removes histogram statistics box #Name, Entries, Mean, RMS, Underflow, Overflow, Integral, Skewness, Kurtosis
+
 #Samples
 privateSignals = ["s10FS", "s30", "s30FS", "s60FS", "t2tt30FS"]
 backgrounds=["w","tt", "z","qcd"]
@@ -159,7 +161,7 @@ if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
    
    else: #nMinus1
       savedir2 = savedir + "/nMinus1/histogramCounts/" + plot
-      if removedCut == "None": savedir += "/nMinus1/variables/None/" + plot  
+      if not removedCut: savedir += "/nMinus1/variables/None/" + plot  
       else: savedir += "/nMinus1/variables/%s/no_%s/%s"%(removedCut, removedCut, plot)
    
       if lowPt: 
@@ -267,7 +269,7 @@ if plot == "efficiency":
    hists_total['None'] = makeHistVarBins(samples[sample].tree, variable, normFactor + "*" + weight + "*(" + combineSelList(selList) + ")", bins)
    hists_total['None'].SetName("%s_total_noID"%(plot))
    
-   if removedCut == "None": hists_total['None'].SetTitle("Electron p_{T} Distributions for Various IDs (%s Sample)"%(samples[sample].name))
+   if not removedCut: hists_total['None'].SetTitle("Electron p_{T} Distributions for Various IDs (%s Sample)"%(samples[sample].name))
    else: hists_total['None'].SetTitle("Electron p_{T} Distributions for Various IDs without %s Cut (%s Sample)"%(removedCut, samples[sample].name))
    
    hists_total['None'].GetXaxis().SetTitle("Generated Electron p_{T} / GeV")
@@ -482,8 +484,8 @@ if plot == "efficiency":
    else: effs['Loose'].SetTitle("Electron ID Efficiencies without %s Cut (%s Sample) ; Generated Electron p_{T} / GeV ; Efficiency"%(removedCut, samples[sample].name))
 
 elif plot == "misID" or plot == "misID2": 
-   if not removedCut: effs['Loose'].SetTitle("Electron Mismatch Efficiencies for Various IDs (%s Sample) ; Reconstructed Electron p_{T} / GeV ; Efficiency"%(samples[sample].name))
-   else: effs['Loose'].SetTitle("Electron Mismatch Efficiencies for Various IDs without %s Cut (%s Sample) ; Reconstructed Electron p_{T} / GeV ; Efficiency"%(removedCut, samples[sample].name))
+   if not removedCut: effs['Loose'].SetTitle("Electron MisID Efficiencies for Various IDs (%s Sample) ; Reconstructed Electron p_{T} / GeV ; Efficiency"%(samples[sample].name))
+   else: effs['Loose'].SetTitle("Electron MisID Efficiencies for Various IDs without %s Cut (%s Sample) ; Reconstructed Electron p_{T} / GeV ; Efficiency"%(removedCut, samples[sample].name))
 
 effs['Loose'].SetMarkerColor(ROOT.kBlue+1)
 effs['Loose'].SetLineColor(ROOT.kBlue+1)
@@ -513,11 +515,11 @@ if mvaWPs:
    effs['WP90'].SetMarkerColor(ROOT.kMagenta+2)
    effs['WP90'].SetLineColor(ROOT.kMagenta+2)
    effs['WP90'].SetMarkerStyle(22)
-   effs['WP90'].SetMarkerSize(1)
+   effs['WP90'].SetMarkerSize(2)
    effs['WP80'].SetMarkerColor(ROOT.kAzure+5)
    effs['WP80'].SetLineColor(ROOT.kAzure+5)
    effs['WP80'].SetMarkerStyle(22)
-   effs['WP80'].SetMarkerSize(1)
+   effs['WP80'].SetMarkerSize(2)
 
    ROOT.gPad.Modified()
    ROOT.gPad.Update()

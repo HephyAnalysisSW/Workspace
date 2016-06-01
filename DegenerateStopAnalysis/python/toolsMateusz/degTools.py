@@ -16,14 +16,6 @@ from Workspace.DegenerateStopAnalysis.navidTools.getRatioPlot import *
 from Workspace.DegenerateStopAnalysis.navidTools.FOM import *
 
 cmsbase = os.getenv("CMSSW_BASE")
-print "CMSSW Release: ", cmsbase
-#ROOT.gROOT.LoadMacro(cmsbase+"/src/Workspace/HEPHYPythonTools/scripts/root/tdrstyle.C")
-##ROOT.setTDRStyle()
-#ROOT.gStyle.SetErrorX(0.5)
-#maxN = -1
-#ROOT.gStyle.SetOptStat(0)
-#ROOT.gStyle.SetPalette(1)
-##ROOT.gStyle.SetCanvasPreferGL(1)
 
 #############################################################################################################
 ##########################################                    ###############################################
@@ -33,6 +25,7 @@ print "CMSSW Release: ", cmsbase
 
 getAllAlph = lambda str: ''.join(ch for ch in str if ch not in "!>=|<$&@$%[]{}#()/; '\"")
 addSquareSum = lambda x: math.sqrt(sum(( e**2 for e in x   )))
+any_in = lambda a, b: any(i in b for i in a)
 
 def mkdir_p(path):
     try:
@@ -188,7 +181,7 @@ def getPlot(sample,plot,cut,weight="(weight)", nMinus1="",cutStr="",addOverFlowB
         sample.cuts[cut.name]=Dict()
     sample.cuts[cut.name][plot.name]=hist
 
-def getPlots(samples,plots,cut,sampleList=[],plotList=[],weight="(weight)",nMinus1="", addOverFlowBin='',verbose=True):
+def getPlots(samples,plotsDict,cut,sampleList=[],plotList=[],weight="(weight)",nMinus1="", addOverFlowBin='',verbose=True):
     if verbose:print "Getting Plots: "
 
     sigList, bkgList, dataList = getSigBkgDataLists(samples, sampleList=sampleList)
@@ -209,21 +202,25 @@ def getPlots(samples,plots,cut,sampleList=[],plotList=[],weight="(weight)",nMinu
         if verbose: print "  Sample:" , samples[sample].name, 
         weight_str = decide_weight(samples[sample], weight)
         if verbose: print "  Using Weight: %s"%(weight_str)
-        plotList = plotList if plotList else plots.keys()
+        plotList = plotList if plotList else plotsDict.keys()
         for plot in plotList:
-            if plot not in plots.keys():
+            if plot not in plotsDict.keys():
                 print "Ignoring %s .... not in the Plot Dictionary"%plot
                 continue    
             
-            cutStr = plots[plot]['cut']  if plots[plot].has_key("cut") and plots[plot]['cut'] else ''
-            if cutStr: print "        ---applying cutString:", cutStr
+            cutStr = plotsDict[plot]['cut']  if plotsDict[plot].has_key("cut") and plotsDict[plot]['cut'] else ''
+            if cutStr: print "Applying cut:", cutStr
             
             if verbose: print " "*15, plot
             if nMinus1:
                 nMinus1String = nMinus1
-                #nMinus1String = plots[plot]["nMinus1"] if plots[plot].has_key("nMinus1") else nMinus1
+                #nMinus1String = plotsDict[plot]["nMinus1"] if plotsDict[plot].has_key("nMinus1") else nMinus1
             else: nMinus1String=""
-            getPlot(samples[sample],plots[plot],cut,weight=weight_str,nMinus1=nMinus1String,cutStr=cutStr,addOverFlowBin=addOverFlowBin)
+            getPlot(samples[sample],plotsDict[plot],cut,weight=weight_str,nMinus1=nMinus1String,cutStr=cutStr,addOverFlowBin=addOverFlowBin)
+    
+    ret = {'samples':samples, 'plotsDict':plotsDict, 'cut':cut, 'sampleList':sampleList, 'plotList':plotList} 
+
+    return ret
 
 def getStackFromHists(histList,sName=None,scale=None, normalize=False, transparency=False):
   if sName:
@@ -292,42 +289,42 @@ def getSigBkgDataLists ( samples, sampleList):
     dataList = [samp for samp in sampleList if samples[samp]['isData'] ]
     return sigList, bkgList, dataList
 
-def drawPlots(samples,plots,cut,sampleList=['s','w'],plotList=[],plotMin=False, plotLimits=[],logy=0,save=False,
+def drawPlots(plots ,plotMin=False, plotLimits=[], save=False, #logy=0,
                                             fom=True, normalize=False, 
                                             denoms=None,noms=None, ratioNorm=False,  fomLimits=[],
                                             leg=True,unity=True, verbose=False):
+    cut = plots['cut']
+    samples = plots['samples']     
+    plotsDict = plots['plotsDict'] 
+    sampleList = plots['sampleList']
+    plotList = plots['plotList']
+
     if normalize and fom and fom.lower() != "ratio":
-        raise Exception("Using FOM on area  normalized histograms... This can't be right!")
+        raise Exception("Using FOM on area normalized histograms... This can't be right!")
     
     #tfile = ROOT.TFile("test.root","new")
 
     ret = {}
     canvs={}
-    hists   = getSamplePlots(samples,plots,cut,sampleList=sampleList, plotList=plotList)
-    stacks  = getBkgSigStacks(samples,plots,cut, sampleList=sampleList, plotList=plotList, normalize=normalize, transparency=normalize )
+    hists   = getSamplePlots(samples,plotsDict,cut,sampleList=sampleList, plotList=plotList)
+    stacks  = getBkgSigStacks(samples,plotsDict,cut, sampleList=sampleList, plotList=plotList, normalize=normalize, transparency=normalize )
     sigList, bkgList, dataList = getSigBkgDataLists(samples, sampleList=sampleList)
     ret.update({
+                'cut':cut       , 
                 'canvs':canvs       , 
                 'stacks':stacks     ,
                 'hists':hists       ,
                 'fomHists':{}       ,
                 'sigBkgDataList': [sigList,bkgList,dataList],
+                'legs':[],
                 })
     
-    isDataPlot = bool(len(dataList))
-    if isDataPlot:
-        latex = ROOT.TLatex()
-        latex.SetNDC()
-        latex.SetTextSize(0.05)
-        latex.SetTextAlign(11)
-        ret['latex']=latex
-
     if len(dataList) > 1:
         raise Exception("More than one Data Set in the sampleList... This could be dangerous. %"%dataList)       
-    for p in plots.iterkeys():
+    for p in plotsDict.iterkeys():
         if plotList and p not in plotList:
             continue
-        if plots[p]['is2d']:
+        if plotsDict[p]['is2d']:
             print "2D plots not supported:" , p
             continue
         if fom:
@@ -337,13 +334,16 @@ def drawPlots(samples,plots,cut,sampleList=['s','w'],plotList=[],plotMin=False, 
             else:
                 padRatios=[2]+[1]*(len(denoms))
 
-            canvs[p]=makeCanvasMultiPads(c1Name="%s_%s"%(cut.name,p),c1ww=800,c1wh=800, joinPads=True, padRatios=padRatios, pads=[])
-            cSave , cMain=0,1   # index of the main canvas and the canvas to be saved
+            canvs[p] = makeCanvasMultiPads(c1Name="%s_%s"%(cut.name,p),c1ww=800,c1wh=800, joinPads=True, padRatios=padRatios, pads=[])
+            cSave, cMain = 0, 1 # index of the main canvas and the canvas to be saved
         else: 
             canvs[p] = ROOT.TCanvas(p,p,800,800), None, None
-            cSave , cMain=0,0
+            cSave, cMain = 0, 0
+        
         canvs[p][cMain].cd()
+        
         dOpt="hist"
+       
         if normalize: 
             dOpt+="nostack"
         if len(bkgList):
@@ -358,38 +358,60 @@ def drawPlots(samples,plots,cut,sampleList=['s','w'],plotList=[],plotMin=False, 
             dataHist.SetMarkerStyle(20)
             dataHist.SetMarkerSize(1.2)
             dOpt+=""
+        
         stacks['sig'][p].Draw("%s nostack"%dOpt.replace("hist",""))
-        print "!!!!!!!!!!!!!!!!!!!!" , refStack, getattr(refStack,"Get%saxis"%"y".upper() )()
-        if plots[p].has_key("decor"):
-            if plots[p]['decor'].has_key("y") : decorAxis( refStack, 'y', plots[p]['decor']['y'], tOffset=1 )
-            if plots[p]['decor'].has_key("title") :refStack.SetTitle(plots[p]['decor']['title'] ) 
-            if plots[p]['decor'].has_key("log"):
-                logx, logy, logz = plots[p]['decor']['log']
+        #print "!!!!!!!!!!!!!!!!!!!!" , refStack, getattr(refStack,"Get%saxis"%"y".upper() )()
+    
+        if plotsDict[p].has_key("decor"):
+            if plotsDict[p]['decor'].has_key("y") : decorAxis( refStack, 'y', t = plotsDict[p]['decor']['y'], tOffset=1.6, tSize = 0.045) #decorAxis(hist, axis,t="",tSize="",tFont="",tOffset="",lFont="",lSize="",func=""):
+            if plotsDict[p]['decor'].has_key("x") : decorAxis( refStack, 'x', t = plotsDict[p]['decor']['x'], tOffset=1.3, tSize = 0.04) #decorAxis(hist, axis,t="",tSize="",tFont="",tOffset="",lFont="",lSize="",func=""):
+            if plotsDict[p]['decor'].has_key("title") :refStack.SetTitle(plotsDict[p]['decor']['title'] ) 
+            if plotsDict[p]['decor'].has_key("log"):
+                logx, logy, logz = plotsDict[p]['decor']['log']
                 if logx : canvs[p][cMain].SetLogx(1)
                 if logy : canvs[p][cMain].SetLogy(1)
         if plotMin: refStack.SetMinimum( plotMin )
         if plotLimits: 
-            refStack.SetMinimum( plotLimits[0] )
-        refStack.SetMaximum( refStack.GetMaximum() * 10 )
+            refStack.SetMinimum(plotLimits[0])
+            refStack.SetMaximum(plotLimits[1]) #refStack.GetMaximum() * 10 )
 
         if leg:    #MAKE A LEGEND FUNCTION
-            bkgLeg = makeLegend(samples, hists, bkgList, p, loc= [0.7,0.7,0.9,0.9] , name="Legend_bkgs_%s_%s"%(cut.name, p), legOpt="f" )
-            sigLeg = makeLegend(samples, hists, sigList, p, loc= [0.4,0.75,0.7,0.9] , name="Legend_sigs_%s_%s"%(cut.name, p), legOpt="l" )
-
+            #if any_in(sampleList, bkgList):
+            bkgLeg = makeLegend(samples, hists, bkgList, p, loc= [0.7,0.7,0.87,0.87] , name="Legend_bkgs_%s_%s"%(cut.name, p), legOpt="f" )
             bkgLeg.Draw()
-            sigLeg.Draw()
-            ret.update( {'legs':[sigLeg, bkgLeg]})
+            ret['legs'].append(bkgLeg)
+            
+            if any_in(sampleList, sigList): 
+               sigLeg = makeLegend(samples, hists, sigList, p, loc= [0.4,0.75,0.7,0.87] , name="Legend_sigs_%s_%s"%(cut.name, p), legOpt="l" )
+               sigLeg.Draw()
+               ret['legs'].append(sigLeg)
 
         if fom:
             getFOMPlotFromStacks( ret, p, sampleList ,fom=fom, normalize=normalize,
                                               denoms=denoms,noms=noms, ratioNorm=ratioNorm, fomLimits=fomLimits,
                                               leg=leg,unity=unity, verbose=verbose  )
+        canvs[p][cMain].SetRightMargin(10)        
+        #canvs[p][cMain].SetLeftMargin(15) 
         canvs[p][cMain].RedrawAxis()
         canvs[p][cMain].Update()
-        canvs[p][cMain].cd()
+        canvs[p][cMain].cd()        
+    
+        isDataPlot = bool(len(dataList))
+        #if isDataPlot:
+        latex = ROOT.TLatex()
+        latex.SetNDC()
+        latex.SetTextSize(0.03)
+        latex.SetTextAlign(11)
+        ret['latex']=latex
+        
+        
         if isDataPlot:
-            latex.DrawLatex(0.16,0.91,"#font[22]{CMS Preliminary}")
-            latex.DrawLatex(0.7,0.91,"#bf{L=%0.2f fb^{-1} (13 TeV)}"%( round(samples[dataList[0]].lumi/1000.,2)) )
+           latex.DrawLatex(0.20,0.89,"#font[22]{CMS Preliminary}")
+           latex.DrawLatex(0.60,0.89,"#bf{L = %0.2f fb^{-1} (13 TeV)}"%( round(samples[dataList[0]].lumi/1000.,2)) )
+        else:
+           latex.DrawLatex(0.20,0.89,"#font[22]{CMS Simulation}")
+           latex.DrawLatex(0.60,0.89,"#bf{L = 2.3 fb^{-1} (13 TeV)}")
+   
         canvs[p][cSave].Update()
 
         #if save:
@@ -1259,7 +1281,7 @@ class JinjaTexTable():
         #    self.makeTable(self.yields,self.outputName self.info) 
         #    self.makeTable(self.yields,self.outputName self.info) 
 
-    def makeTable(self,yields, outputName, info, removeJunk = True):
+    def makeTable(self,yields, outputName, info, removeJunk = False):
         texTemplate = self.templateEnv.get_template( self.template_file )
         makeDir(self.texDir)  
         self.outputTex = self.texDir + outputName

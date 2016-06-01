@@ -46,7 +46,7 @@ if scan == "standard" or scan == "nMinus1":
    
    if scan == "standard": 
       
-      IDs = ["standard", "manual", "iso"]
+      IDs = ["standard"]#, "manual", "iso"]
       isolations = ["miniRelIso", "relIso03", "relIso04"] #relIsoAn04
    
       for sample in samples:

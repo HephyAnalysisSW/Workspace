@@ -19,22 +19,35 @@ ptSplit = 10 #we have above and below 10 GeV categories
 
 #Electron ID Definitions
 #IDs: 0 - none, 1 - veto (~95% eff), 2 - loose (~90% eff), 3 - medium (~80% eff), 4 - tight (~70% eff)
-WPs = ['None', 'Veto', 'Loose', 'Medium', 'Tight']
 
-def electronIDs(ID = "standard", removedCut = "None", iso = False):
+def electronIDs(ID = "standard", removedCut = "None", iso = "", collection = "LepGood"):
+  
+   WPs = ['None', 'Veto', 'Loose', 'Medium', 'Tight']
 
    if ID not in ["standard", "MVA", "manual", "nMinus1"]:
       print makeLine() 
       print "Wrong ID input. Choose from: standard, MVA, manual, nMinus1."
       print makeLine() 
       exit()
+   else:
+      print makeLine()
+      print "Using " + ID + " electron ID from " + collection + " collection."
+      if ID == "nMinus1": print "with " + removedCut + " cut removed."
+      print makeLine()
    
    if iso:
       print makeLine() 
-      print "Applying hybrid isolation to electrons"
+      print "Applying " + iso + " to electrons"
       print makeLine() 
-      hybIso = "((LepGood_pt >= 25 && LepGood_relIso04 < 0.2) || (LepGood_pt < 25 && LepGood_relIso04 < 5))" #(abs(LepGood_pdgId) == 11) && ((LepGood_pt > 5)) && (abs(LepGood_eta) < " + str(etaAcc) + ") && (abs(LepGood_dz) < 0.2) && (abs(LepGood_dxy) < 0.05) && ((LepGood_sip3d < 4))
-   
+      # absIso, absIso03, relIso03, relIso04, miniRelIso
+      if iso == "hybIso03": hybIso = "(" + collection + "_pt < 25 && " + collection + "_absIso < 5) || ((" + collection + "_pt >= 25 && " + collection + "_relIso04 < 0.2))" 
+      elif iso == "hybIso04": hybIso = "(" + collection + "_pt < 25 && " + collection + "_absIso03 < 5) || ((" + collection + "_pt >= 25 && " + collection + "_relIso03 < 0.2))" 
+      else:
+         print makeLine() 
+         print "Wrong iso input. Choose from: hybIso03, hybIso04. Using no isolation."
+         print makeLine()
+         hybIso == "1"
+
    eleIDsel = {}
 
    #EGamma Standard
@@ -42,7 +55,7 @@ def electronIDs(ID = "standard", removedCut = "None", iso = False):
       
       standardSel = {}
       for i,iWP in enumerate(WPs):
-         standardSel[iWP] = "(LepGood_SPRING15_25ns_v1 >= " + str(i) + ")"
+         standardSel[iWP] = "(" + collection + "_SPRING15_25ns_v1 >= " + str(i) + ")"
          
          if iso: standardSel[iWP] = combineSel(standardSel[iWP], hybIso)
          
@@ -63,12 +76,12 @@ def electronIDs(ID = "standard", removedCut = "None", iso = False):
       
       for iWP in mvaCuts.keys():
          mvaSel[iWP] = "(\
-         (LepGood_pt <= " + str(ptSplit) + " && abs(LepGood_eta) < " + str(ebSplit) + " && LepGood_mvaIdSpring15 >= " + str(mvaCuts[iWP]['EB1_lowPt']) + ") || \
-         (LepGood_pt <= " + str(ptSplit) + " && abs(LepGood_eta) >= " + str(ebSplit) + " && abs(LepGood_eta) < " + str(ebeeSplit) + " && LepGood_mvaIdSpring15 >= " + str(mvaCuts[iWP]['EB2_lowPt']) + ") || \
-         (LepGood_pt <= " + str(ptSplit) + " && abs(LepGood_eta) >= " + str(ebeeSplit) + " && abs(LepGood_eta) < " + str(etaAcc) + " && LepGood_mvaIdSpring15 >= " + str(mvaCuts[iWP]['EE_lowPt']) + ") || \
-         (LepGood_pt > " + str(ptSplit) + " && abs(LepGood_eta) < " + str(ebSplit) + " && LepGood_mvaIdSpring15 >= " + str(mvaCuts[iWP]['EB1']) + ") || \
-         (LepGood_pt > " + str(ptSplit) + " && abs(LepGood_eta) >= " + str(ebSplit) + " && abs(LepGood_eta) < " + str(ebeeSplit) + " && LepGood_mvaIdSpring15 >= " + str(mvaCuts[iWP]['EB2']) + ") || \
-         (LepGood_pt > " + str(ptSplit) + " && abs(LepGood_eta) >= " + str(ebeeSplit) + " && abs(LepGood_eta) < " + str(etaAcc) + " && LepGood_mvaIdSpring15 >= " + str(mvaCuts[iWP]['EE']) + "))"
+         (" + collection + "_pt <= " + str(ptSplit) + " && abs(" + collection + "_eta) < " + str(ebSplit) + " && " + collection + "_mvaIdSpring15 >= " + str(mvaCuts[iWP]['EB1_lowPt']) + ") || \
+         (" + collection + "_pt <= " + str(ptSplit) + " && abs(" + collection + "_eta) >= " + str(ebSplit) + " && abs(" + collection + "_eta) < " + str(ebeeSplit) + " && " + collection + "_mvaIdSpring15 >= " + str(mvaCuts[iWP]['EB2_lowPt']) + ") || \
+         (" + collection + "_pt <= " + str(ptSplit) + " && abs(" + collection + "_eta) >= " + str(ebeeSplit) + " && abs(" + collection + "_eta) < " + str(etaAcc) + " && " + collection + "_mvaIdSpring15 >= " + str(mvaCuts[iWP]['EE_lowPt']) + ") || \
+         (" + collection + "_pt > " + str(ptSplit) + " && abs(" + collection + "_eta) < " + str(ebSplit) + " && " + collection + "_mvaIdSpring15 >= " + str(mvaCuts[iWP]['EB1']) + ") || \
+         (" + collection + "_pt > " + str(ptSplit) + " && abs(" + collection + "_eta) >= " + str(ebSplit) + " && abs(" + collection + "_eta) < " + str(ebeeSplit) + " && " + collection + "_mvaIdSpring15 >= " + str(mvaCuts[iWP]['EB2']) + ") || \
+         (" + collection + "_pt > " + str(ptSplit) + " && abs(" + collection + "_eta) >= " + str(ebeeSplit) + " && abs(" + collection + "_eta) < " + str(etaAcc) + " && " + collection + "_mvaIdSpring15 >= " + str(mvaCuts[iWP]['EE']) + "))"
          
       mvaSel['None'] = "(1)"
          
@@ -80,7 +93,8 @@ def electronIDs(ID = "standard", removedCut = "None", iso = False):
    
    #Manual/nMinus1
    else:
-      WPs.remove('None')
+      WPs = ['Veto', 'Loose', 'Medium', 'Tight']
+ 
       variables = ['sigmaEtaEta', 'dEta',  'dPhi', 'hOverE', 'ooEmooP', 'd0', 'dz', 'MissingHits', 'convVeto']
       
       WPcuts = {\
@@ -107,17 +121,17 @@ def electronIDs(ID = "standard", removedCut = "None", iso = False):
       
       for iWP in WPs:
          for reg in ['EE','EB']:
-            manualSels[iWP]['sigmaEtaEta'][reg] = "LepGood_sigmaIEtaIEta < " + str(WPcuts[iWP]['sigmaEtaEta'][reg])
-            manualSels[iWP]['dEta'][reg] = "abs(LepGood_dEtaScTrkIn) < " + str(WPcuts[iWP]['dEta'][reg])
-            manualSels[iWP]['dPhi'][reg] = "abs(LepGood_dPhiScTrkIn) < " + str(WPcuts[iWP]['dPhi'][reg])
-            manualSels[iWP]['hOverE'][reg] = "LepGood_hadronicOverEm < " + str(WPcuts[iWP]['hOverE'][reg])
-            manualSels[iWP]['ooEmooP'][reg] = "abs(LepGood_eInvMinusPInv) < " + str(WPcuts[iWP]['ooEmooP'][reg])
-            manualSels[iWP]['d0'][reg] = "abs(LepGood_dxy) < " + str(WPcuts[iWP]['d0'][reg])
-            manualSels[iWP]['dz'][reg] = "abs(LepGood_dz) < " + str(WPcuts[iWP]['dz'][reg])
-            manualSels[iWP]['MissingHits'][reg] = "LepGood_lostHits <= " + str(WPcuts[iWP]['MissingHits'][reg])
-            manualSels[iWP]['convVeto'][reg]= "LepGood_convVeto == " + str(WPcuts[iWP]['convVeto'][reg])
+            manualSels[iWP]['sigmaEtaEta'][reg] = "" + collection + "_sigmaIEtaIEta < " + str(WPcuts[iWP]['sigmaEtaEta'][reg])
+            manualSels[iWP]['dEta'][reg] = "abs(" + collection + "_dEtaScTrkIn) < " + str(WPcuts[iWP]['dEta'][reg])
+            manualSels[iWP]['dPhi'][reg] = "abs(" + collection + "_dPhiScTrkIn) < " + str(WPcuts[iWP]['dPhi'][reg])
+            manualSels[iWP]['hOverE'][reg] = "" + collection + "_hadronicOverEm < " + str(WPcuts[iWP]['hOverE'][reg])
+            manualSels[iWP]['ooEmooP'][reg] = "abs(" + collection + "_eInvMinusPInv) < " + str(WPcuts[iWP]['ooEmooP'][reg])
+            manualSels[iWP]['d0'][reg] = "abs(" + collection + "_dxy) < " + str(WPcuts[iWP]['d0'][reg])
+            manualSels[iWP]['dz'][reg] = "abs(" + collection + "_dz) < " + str(WPcuts[iWP]['dz'][reg])
+            manualSels[iWP]['MissingHits'][reg] = "" + collection + "_lostHits <= " + str(WPcuts[iWP]['MissingHits'][reg])
+            manualSels[iWP]['convVeto'][reg]= "" + collection + "_convVeto == " + str(WPcuts[iWP]['convVeto'][reg])
       
-      geoSel= {'EB':"(abs(LepGood_eta) <= " + str(ebeeSplit) + ")", 'EE':"(abs(LepGood_eta) > " + str(ebeeSplit) + " && abs(LepGood_eta) < " + str(etaAcc) + ")"}
+      geoSel= {'EB':"(abs(" + collection + "_eta) <= " + str(ebeeSplit) + ")", 'EE':"(abs(" + collection + "_eta) > " + str(ebeeSplit) + " && abs(" + collection + "_eta) < " + str(etaAcc) + ")"}
       
       EBsel = {iWP: combineSel(geoSel['EB'], combineSelList([manualSels[iWP][var]['EB'] for var in variables])) for iWP in WPs}
       EEsel = {iWP: combineSel(geoSel['EE'], combineSelList([manualSels[iWP][var]['EE'] for var in variables])) for iWP in WPs}
@@ -139,8 +153,8 @@ def electronIDs(ID = "standard", removedCut = "None", iso = False):
 
          #nMinus1 ID selection
          variables.remove(removedCut)
-         EBsel = {iWP: combineSel("abs(LepGood_eta) <= " + str(ebeeSplit), combineSelList([manualSels[iWP][var]['EB'] for var in variables])) for iWP in WPs}
-         EEsel = {iWP: combineSel("abs(LepGood_eta) > " + str(ebeeSplit) + " && abs(LepGood_eta) < " + str(etaAcc), combineSelList([manualSels[iWP][var]['EE'] for var in variables])) for iWP in WPs}
+         EBsel = {iWP: combineSel("abs(" + collection + "_eta) <= " + str(ebeeSplit), combineSelList([manualSels[iWP][var]['EB'] for var in variables])) for iWP in WPs}
+         EEsel = {iWP: combineSel("abs(" + collection + "_eta) > " + str(ebeeSplit) + " && abs(" + collection + "_eta) < " + str(etaAcc), combineSelList([manualSels[iWP][var]['EE'] for var in variables])) for iWP in WPs}
          
          nMinus1Sel = {iWP: "((" + EBsel[iWP] + ") || (" + EEsel[iWP] + "))" for iWP in WPs}
          nMinus1Sel['None'] = "(1)"
@@ -153,21 +167,17 @@ def electronIDs(ID = "standard", removedCut = "None", iso = False):
       
    return eleIDsel
 
-def cutClasses(ID, eleIDsel):
+def cutClasses(eleIDsel, ID = "standard"):
    if not eleIDsel: 
       print makeLine() 
       print "No electron selection. Exiting."
       print makeLine() 
       exit()
-  
+      
    if ID == "MVA": WPs = ['None', 'WP80', 'WP90']
    else: WPs = ['None', 'Veto', 'Loose', 'Medium', 'Tight']
    
    allCuts = {iWP:{} for iWP in WPs}
- 
-   for iWP in WPs:   
-      allCuts[iWP]['eleID_' + iWP] = eleIDsel[iWP]
-      allCuts[iWP]['eleSel'] = "Sum$(abs(LepGood_pdgId) == 11 && abs(LepGood_eta) < " + str(etaAcc) + " && (" + eleIDsel[iWP] + "))"
 
    ###############No selection################
    nosel = CutClass("nosel", [["true", "1"]], baseCut=None)
@@ -184,9 +194,6 @@ def cutClasses(ID, eleIDsel):
                                #["1Mu-2ndMu20Veto", "(nlep==1 || (nlep ==2 && LepGood_pt[looseMuonIndex2] < 20) )"],
                                ["No3rdJet60","nJet60 <= 2"],
                                ], baseCut=None)
-   
-   #Dictionaries for different WPs 
-   preselEle = {}
    
    #SR1
    sr1 = {}
@@ -220,15 +227,17 @@ def cutClasses(ID, eleIDsel):
    allCuts['None']['nosel'] = nosel
    allCuts['None']['presel'] = presel
    
+   #Dictionaries for different WPs 
+   preselEle = {}
    electronSel = {}  
    elePt = {}
-   eleEta = {} 
+   absEleEta = {} 
    eleMt = {} 
    
    for iWP in WPs:
-      electronSel[iWP] = "(abs(LepGood_pdgId) == 11 && abs(LepGood_eta) < " + str(etaAcc) + " && " + eleIDsel[iWP] + ")"
+      electronSel[iWP] = "(abs(LepGood_pdgId) == 11 && abs(LepGood_eta) < " + str(etaAcc) + " && (" + eleIDsel[iWP] + "))"
       elePt[iWP] = "Max$(LepGood_pt*(" + electronSel[iWP] + "))"
-      eleEta[iWP] = "Max$(abs(LepGood_eta*(" + electronSel[iWP] + ")))" #absolute value
+      absEleEta[iWP] = "Max$(abs(LepGood_eta*(" + electronSel[iWP] + ")))" #absolute value
       eleMt[iWP] = "Max$(LepGood_mt*(" + electronSel[iWP] + "))"
       #elePhi[iWP] = "Max$(LepGood_phi*(" + electronSel[iWP] + "))"
       #eleMt[iWP] = "Max$(sqrt(2*met*{pt}*(1 - cos(met_phi - LepGood_phi)))*(LepGood_pt == {pt}))".format(pt=elePt[iWP]) #%(elePt[iWP], elePhi[iWP], elePt[iWP])
@@ -248,26 +257,17 @@ def cutClasses(ID, eleIDsel):
                               ["CT300","min(met, htJet30j - 100) > 300"],
                               ["BVeto","(nSoftBJetsCSV == 0 && nHardBJetsCSV == 0)"],
                               ["negEle", "Sum$(LepGood_pdgId*(" + electronSel[iWP] + ") == 11)"],
-                              ["eleEta1.5", eleEta[iWP] + " < 1.5"],
+                              ["absEleEta1.5", absEleEta[iWP] + " < 1.5"],
                               ["elePt<30", elePt[iWP] + " < 30"],
                               ], baseCut = preselEle[iWP])
                               #["HT400","htJet30j>400"],
                               #["met300","met>300"],
    
-      sr1Loose[iWP] = CutClass("SR1Loose_" + iWP, [
-                              ["BVeto","(nSoftBJetsCSV == 0 && nHardBJetsCSV == 0)"],
-                              ["negEle","LepGood_pdgId == 11"],
-                              ["eleEta2.4", eleEta[iWP] + " < 2.4"], #looser eta cut than sr1
-                              ["elePt<30", elePt[iWP] + " < 30"],
-                              ], baseCut = preselEle[iWP])
-                              #["HT400","htJet30j>400"],
-                              #["met300","met>300"],
-      
-      sr1abc[iWP] = CutClass("SR1abc_" + iWP,[
-                              ["SR1a", eleMt[iWP] + " < 60"],
-                              ["SR1b", btw(eleMt[iWP], 60, 88)],
-                              ["SR1c", eleMt[iWP] + " > 88"]
-                              ], baseCut = sr1[iWP])
+      #sr1abc[iWP] = CutClass("SR1abc_" + iWP,[
+      #                        ["SR1a", eleMt[iWP] + " < 60"],
+      #                        ["SR1b", btw(eleMt[iWP], 60, 88)],
+      #                        ["SR1c", eleMt[iWP] + " > 88"]
+      #                        ], baseCut = sr1[iWP])
    
       sr1abc_ptbin[iWP] = CutClass("SR1abc_ptbin_" + iWP, [
                               #["SR1a", eleMt[iWP] + " < 60"],
@@ -284,17 +284,18 @@ def cutClasses(ID, eleIDsel):
                               ["SRV1c", joinCutStrings([eleMt[iWP] + " > 88", btw(elePt[iWP], 20, 30)])]
                               ], baseCut = sr1[iWP])
       
-      mtabc[iWP] = CutClass ("MTabc_" + iWP, [
-                              ["MTa", eleMt[iWP] + " < 60"],
-                              ["MTb", btw(eleMt[iWP], 60, 88)],
-                              ["MTc", eleMt[iWP] + " > 88"]
-                              ], baseCut = sr1[iWP])
-       
-      mtabc_ptbin[iWP] = splitCutInPt(mtabc[iWP])
+      #mtabc[iWP] = CutClass ("MTabc_" + iWP, [
+      #                        ["MTa", eleMt[iWP] + " < 60"],
+      #                        ["MTb", btw(eleMt[iWP], 60, 88)],
+      #                        ["MTc", eleMt[iWP] + " > 88"]
+      #                        ], baseCut = sr1[iWP])
+      # 
+      #mtabc_ptbin[iWP] = splitCutInPt(mtabc[iWP])
    
       #SR2
       sr2[iWP] = CutClass("SR2_" + iWP, [
-                              ["ISR325+MET300", "nJet325 > 0 && met > 300"],
+                              ["ISR325", "nJet325 > 0"],
+                              ["MET300", "met > 300"],
                               ["SoftBJet", "(nSoftBJetsCSV >= 1) && (nHardBJetsCSV == 0)"],
                               ["elePt<30", elePt[iWP] + " < 30"]
                               ], baseCut = preselEle[iWP])
@@ -312,29 +313,25 @@ def cutClasses(ID, eleIDsel):
                               ["CT300","min(met,htJet30j-100) > 300"],
                               ["BVeto","(nSoftBJetsCSV == 0 && nHardBJetsCSV == 0)"],
                               ["negEle", "LepGood_pdgId == 11"],
-                              ["eleEta1.5", eleEta[iWP] + " < 1.5"],
+                              ["absEleEta1.5", absEleEta[iWP] + " < 1.5"],
                               ["elePt>30", elePt[iWP] + " > 30"], #greater than
                               ], baseCut = preselEle[iWP])
                               #["BVeto_Medium25","nBJetMedium25==0"],
                               #["HT400 ","htJet30j>400"],
                               #["met300","met>300"],
      
-      cr1Loose[iWP] = CutClass("CR1Loose_" + iWP, [ # no CT cut
-                              ["BVeto","(nSoftBJetsCSV == 0 && nHardBJetsCSV == 0)"],
-                              ["negEle", "LepGood_pdgId == 11"],
-                              ["eleEta1.5", eleEta[iWP] + " < 1.5"],
-                              ["elePt>30", elePt[iWP] + " > 30"], #greater than
-                              ], baseCut= preselEle[iWP])
+      #cr1Loose[iWP] = CutClass("CR1Loose_" + iWP, [ # no CT cut
+      #                        ["BVeto","(nSoftBJetsCSV == 0 && nHardBJetsCSV == 0)"],
+      #                        ["negEle", "LepGood_pdgId == 11"],
+      #                        ["absEleEta1.5", absEleEta[iWP] + " < 1.5"],
+      #                        ["elePt>30", elePt[iWP] + " > 30"], #greater than
+      #                        ], baseCut= preselEle[iWP])
       
       cr1abc[iWP] = CutClass("CR1abc_" + iWP, [
                               ["CR1a", eleMt[iWP] + " < 60"],
                               ["CR1b", btw(eleMt[iWP], 60, 88)],
                               ["CR1c", eleMt[iWP] + " > 88"]
                               ], baseCut = cr1[iWP])
-      
-      crtt2[iWP] = CutClass("CRTT2_" + iWP, [
-                              ["CRTT2","((nSoftBJetsCSV + nHardBJetsCSV) > 1) && (nHardBJetsCSV > 0)"]
-                              ], baseCut= preselEle[iWP])
       
       #CR2 
       cr2[iWP] = CutClass("CR2_" + iWP, [
@@ -348,11 +345,17 @@ def cutClasses(ID, eleIDsel):
       cr2_[iWP] = CutClass("CR2_" + iWP, [
                               ["CR2", "(1)"]
                               ], baseCut = cr2[iWP])
+      
+      #CRTT2
+      crtt2[iWP] = CutClass("CRTT2_" + iWP, [
+                              ["CRTT2","((nSoftBJetsCSV + nHardBJetsCSV) > 1) && (nHardBJetsCSV > 0)"]
+                              ], baseCut= preselEle[iWP])
+      
 
-      regions_sr1[iWP] = {'sr1': sr1[iWP], 'sr1Loose': sr1Loose[iWP], 'sr1abc': sr1abc[iWP], 'sr1abc_ptbin': sr1abc_ptbin[iWP], 'mtabc': mtabc[iWP], 'mtabc_ptbin': mtabc_ptbin[iWP]}
+      regions_sr1[iWP] = {'sr1': sr1[iWP], 'sr1abc_ptbin': sr1abc_ptbin[iWP], } #'sr1Loose': sr1Loose[iWP], 'sr1abc': sr1abc[iWP], 'mtabc': mtabc[iWP], 'mtabc_ptbin': mtabc_ptbin[iWP]
       regions_sr2[iWP] = {'sr2': sr2[iWP], 'sr2_ptbin': sr2_ptbin[iWP]}
-      regions_cr1[iWP] = {'cr1': cr1[iWP], 'cr1Loose': cr1Loose[iWP], 'cr1abc': cr1abc[iWP], 'crtt2': crtt2[iWP]}
-      regions_cr2[iWP] = {'cr2': cr2[iWP]}
+      regions_cr1[iWP] = {'cr1': cr1[iWP], 'cr1abc': cr1abc[iWP]} #'cr1Loose': cr1Loose[iWP],
+      regions_cr2[iWP] = {'cr2': cr2[iWP], 'crtt2': crtt2[iWP]}
 
       runI[iWP] = CutClass("RunI_Ele_" + iWP, [] , baseCut = preselEle[iWP])
       runI[iWP].add(sr1abc_ptbin[iWP], baseCutString = sr1[iWP].inclCombined)
@@ -365,10 +368,12 @@ def cutClasses(ID, eleIDsel):
       runIflow[iWP].add(preselEle[iWP], 'flow', baseCutString = None)
       runIflow[iWP].add(sr1[iWP], 'inclFlow', baseCutString = preselEle[iWP].combined)
       runIflow[iWP].add(sr2[iWP], 'inclFlow', baseCutString = preselEle[iWP].combined)
-   
+      
+      allCuts[iWP]['eleID_' + iWP] = eleIDsel[iWP]
+      allCuts[iWP]['eleSel'] = electronSel[iWP] 
       allCuts[iWP]['preselEle'] = preselEle[iWP]  
       allCuts[iWP]['runI'] = runI[iWP]  
-      allCuts[iWP]['runIflow'] = runI[iWP]  
+      allCuts[iWP]['runIflow'] = runIflow[iWP]  
       allCuts[iWP].update(regions_sr1[iWP])
       allCuts[iWP].update(regions_sr2[iWP])
       allCuts[iWP].update(regions_cr1[iWP])
