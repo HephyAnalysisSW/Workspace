@@ -91,7 +91,7 @@ def makeEffPlot(passed,total):
    eff = ROOT.TEfficiency(passed,total)
    eff.SetTitle("Efficiency Plot")
    eff.SetMarkerStyle(33)
-   eff.SetMarkerSize(1.5)
+   eff.SetMarkerSize(2)
    eff.SetLineWidth(2)
    return eff
 
@@ -115,7 +115,7 @@ def makeEffPlot2(passed,total): #When ratio > 1
    eff.Divide(total)
    eff.SetTitle("Efficiency Plot")
    eff.SetMarkerStyle(33)
-   eff.SetMarkerSize(1.5)
+   eff.SetMarkerSize(2)
    eff.SetLineWidth(2)
    return eff
 

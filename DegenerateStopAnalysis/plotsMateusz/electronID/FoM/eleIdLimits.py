@@ -35,10 +35,9 @@ parser.add_argument("--doLimits", dest = "doLimits",  help = "Draw exclusion lim
 parser.add_argument("--doYields", dest = "doYields",  help = "Make yields table", type = int, default = 1)
 parser.add_argument("--ID", dest = "ID",  help = "Electron ID type", type = str, default = "standard") # "standard" "manual" "nMinus1"
 parser.add_argument("--removedCut", dest = "removedCut",  help = "Variable removed from electron ID", type = str, default = "None") #"sigmaEtaEta" "hOverE" "ooEmooP" "dEta" "dPhi" "d0" "dz" "MissingHits" "convVeto"
-parser.add_argument("--iso", dest = "iso",  help = "Apply isolation", type = int, default = 0)
+parser.add_argument("--iso", dest = "iso",  help = "Apply isolation", type = str, default = "")
 parser.add_argument("--WP", dest = "WP",  help = "Electron ID Working Point", type = str, default = "None")
 parser.add_argument("--save", dest = "save",  help = "Toggle save", type = int, default = 1)
-parser.add_argument("--zoom", dest = "zoom",  help = "Toggle zoom", type = int, default = 1)
 parser.add_argument("-b", dest = "batch",  help = "Batch mode", action = "store_true", default = False)
 args = parser.parse_args()
 if not len(sys.argv) > 1:
@@ -54,21 +53,7 @@ ID = args.ID
 removedCut = args.removedCut 
 iso = args.iso
 WP = args.WP
-zoom = args.zoom
 save = args.save
-
-#Geometric divisions
-ebSplit = 0.8 #barrel is split into two regions
-ebeeSplit = 1.479 #division between barrel and endcap
-etaAcc = 2.5 #eta acceptance
-
-##Number of Leptons (hadronic, semileptonic, dileptonic)
-#nSel = ["(nLepGood == 0)", "(nLepGood == 1)", "(nLepGood == 2)"]
-
-#Bin size 
-#nbins = 100
-xmin = 0
-#xmax = 1000
 
 if ID == "nMinus1":
    string1 = "no_" + removedCut
@@ -80,15 +65,18 @@ else:
 #Save
 if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
    savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/electronID/FoM"
-   savedir1 = savedir + "/" + ID + "/limits"
-   savedir2 = savedir + "/" + ID + "/yields"
+   savedir1 = savedir + "/" + ID
+   savedir2 = savedir + "/" + ID
 
    if iso:
-      savedir1 += "/iso"
-      savedir2 += "/iso"
-      isoString = "_iso"
+      savedir1 += "/iso/" + iso
+      savedir2 += "/iso/" + iso
+      isoString = "_" + iso
    else:
       isoString = ""
+   
+   savedir1 += "/limits"
+   savedir2 += "/yields"    
 
    if not os.path.exists("%s/cards/%s/%s%s"%(savedir1, string1, WP, string2)): os.makedirs("%s/cards/%s/%s%s"%(savedir1, string1, WP, string2))
    if not os.path.exists("%s/tex/%s/%s%s"%(savedir1, string1, WP, string2)): os.makedirs("%s/tex/%s/%s%s"%(savedir1, string1, WP, string2))
@@ -99,7 +87,7 @@ if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
 
 #Gets all cuts (electron, SR, CR) for given electron ID
 eleIDsel = electronIDs(ID, removedCut, iso)
-allCuts = cutClasses(ID, eleIDsel)
+allCuts = cutClasses(eleIDsel, ID)
 
 #for s in samples.massScanList(): samples[s].weight = "weight" #removes ISR reweighting from official mass scan signal samples
 #for s in samples: samples[s].tree.SetAlias("eleSel", allCuts[WP]['eleSel'])
@@ -130,7 +118,7 @@ if doLimits:
       limits[mstop][mlsp] = getLimit(allYields, sig = sig, outDir = "%s/cards/%s"%(savedir1, string1), calc_limit = True) #, postfix = WP + string2 + isoString
 
    #pickle.dump(limits, open(savedir + "/cards/limits.pkl",'w'))
-   exclCanv, exclPlot = drawExpectedLimit(limits, plotDir = "%s/%s/ExpectedLimit_eleID_%s%s%s.png"%(savedir1, string1, WP, string2, isoString), bins = None, key = None, title = "Expected Limits (%s %s %s) Electron ID)"%(WP, string1, isoString).replace("_", ""))
+   exclCanv, exclPlot = drawExpectedLimit(limits, plotDir = "%s/%s/ExpectedLimit_eleID_%s%s%s.png"%(savedir1, string1, WP, string2, isoString), bins = None, key = None, title = "Expected Limits (%s %s %s Electron ID)"%(WP, string1, iso))
    #exclCanv.SetName("ExpectedLimit_eleID_%s.pkl"%(WP))
 
 if doYields:

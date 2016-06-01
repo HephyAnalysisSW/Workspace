@@ -35,11 +35,10 @@ parser.add_argument("--doPlots", dest = "doPlots",  help = "Draw plots", type = 
 parser.add_argument("--doCutFlow", dest = "doCutFlow",  help = "Make cut flow table", type = int, default = 1)
 parser.add_argument("--ID", dest = "ID",  help = "Electron ID type", type = str, default = "standard") # standard, MVA, manual, nMinus1
 parser.add_argument("--removedCut", dest = "removedCut",  help = "Variable removed from electron ID", type = str, default = "None") #"sigmaEtaEta" "hOverE" "ooEmooP" "dEta" "dPhi" "d0" "dz" "MissingHits" "convVeto"
-parser.add_argument("--iso", dest = "iso",  help = "Apply isolation", type = int, default = 0)
+parser.add_argument("--iso", dest = "iso",  help = "Apply isolation (hybIso03/04)", type = str, default = "")
 parser.add_argument("--WP", dest = "WP",  help = "Electron ID Working Point", type = str, default = "None")
 parser.add_argument("--selection", dest = "selection",  help = "Region selection", type = str, default = "nosel")
 parser.add_argument("--save", dest = "save",  help = "Toggle save", type = int, default = 1)
-parser.add_argument("--zoom", dest = "zoom",  help = "Toggle zoom", type = int, default = 1)
 parser.add_argument("-b", dest = "batch",  help = "Batch mode", action = "store_true", default = False)
 args = parser.parse_args()
 if not len(sys.argv) > 1:
@@ -56,41 +55,27 @@ removedCut = args.removedCut
 iso = args.iso
 WP = args.WP
 selection = args.selection
-zoom = args.zoom
 save = args.save
-
-#Geometric divisions
-ebSplit = 0.8 #barrel is split into two regions
-ebeeSplit = 1.479 #division between barrel and endcap
-etaAcc = 2.5 #eta acceptance
-
-#Pt division for MVA ID
-ptSplit = 10 #we have above and below 10 GeV categories 
-
-##Number of Leptons (hadronic, semileptonic, dileptonic)
-#nSel = ["(nLepGood == 0)", "(nLepGood == 1)", "(nLepGood == 2)"]
-
-#Bin size 
-#nbins = 100
-xmin = 0
-#xmax = 1000
 
 #Save
 if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
-   savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/electronID/FoM"
-   savedir += "/" + ID + "/plots/" + selection
-
+   #savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/electronID/FoM"
+   savedir += "/" + ID
+   
    if iso: 
-      savedir += "/iso"
-      isoString = "_iso" 
-   else: isoString = ""
+      savedir += "/iso/" + iso
+      isoString = "_" + iso 
+   else: 
+      isoString = ""
+   
+   savedir += "/plots/" + selection
 
    if doCutFlow:
       if not os.path.exists(savedir + "/cutFlow/tex"): os.makedirs(savedir + "/cutFlow/tex")
 
 #Gets all cuts (electron, SR, CR) for given electron ID
 eleIDsel = electronIDs(ID, removedCut, iso)
-allCuts = cutClasses(ID, eleIDsel) 
+allCuts = cutClasses(eleIDsel, ID)
 
 #for s in samples.massScanList(): samples[s].weight = "weight" #removes ISR reweighting from official mass scan signal samples
 for s in samples: samples[s].tree.SetAlias("eleSel", allCuts[WP]['eleSel'])
@@ -118,24 +103,25 @@ if doPlots:
    #eleMt = "Max$(sqrt(2*met*{pt}*(1 - cos(met_phi - LepGood_phi)))*(LepGood_pt == {pt}))".format(pt=elePt)  #%(elePt[iWP], elePhi[iWP], elePt[iWP])#
    
    plotDict = {\
-      "elePt":{'var':elePt, "bins":[100,1,100], "decor":{"title": "Electron ID FoM Plot: %s_%s_%s"%(ID, selection, WP) ,"x":"Electron p_{T} / GeV" , "y":"Events" ,'log':[0,1,0]}},\
-      "MT":{'var':eleMt, "bins":[30,1,150], "decor":{"title": "Electron ID FoM Plot: %s_%s_%s"%(ID, selection, WP) ,"x":"M_{T} / GeV" , "y":"Events" ,'log':[0,1,0]}},\
-      "MET":{'var':"met", "bins":[20,150,900], "decor":{"title": "Electron ID FoM Plot: %s_%s_%s"%(ID, selection, WP) ,"x":"Missing E_{T} / GeV" , "y":"Events" ,'log':[0,1,0]}},\
+      "elePt":{'var':elePt, "bins":[100,1,101], "decor":{"title": "Electron ID FoM Plot: %s_%s_%s"%(ID, selection, WP) ,"x":"Electron p_{T} / GeV" , "y":"Events" ,'log':[0,1,0]}},\
+      "MT":{'var':eleMt, "bins":[30,1,151], "decor":{"title": "Electron ID FoM Plot: %s_%s_%s"%(ID, selection, WP) ,"x":"M_{T} / GeV" , "y":"Events" ,'log':[0,1,0]}},\
+      "MET":{'var':"met", "bins":[60,100,700], "decor":{"title": "Electron ID FoM Plot: %s_%s_%s"%(ID, selection, WP) ,"x":"Missing E_{T} / GeV" , "y":"Events" ,'log':[0,1,0]}},\
       #"HT":{'var':"ht", "bins":[100,0,100], "decor":{"title": "Electron ID FoM Plot: %s_%s_%s"%(ID, selection, WP) ,"x":"H_{T} / GeV" , "y":"Events" ,'log':[0,1,0]}}\
    }
    
-   plots = Plots(**plotDict)
+   plotsDict = Plots(**plotDict)
    plotsList = ["elePt", "MT", "MET"]#, "HT"]
    
-   getPlots(samples, plots, sel, selectedSamples, plotList = plotsList)# addOverFlowBin='both')
-   fomPlots = drawPlots(samples, plots, sel, sampleList = selectedSamples, plotList = plotsList, fom="AMSSYS", denoms=["bkg"], noms=["s300_270"], fomLimits=[0,2], save=False)#, plotMin=0.001)
+   plots = getPlots(samples, plotsDict, sel, selectedSamples, plotList = plotsList)# addOverFlowBin='both')
+   
+   fomPlots = drawPlots(plots, fom="AMSSYS", denoms=["bkg"], noms=["s300_270"], fomLimits=[0,2], save=False)#, plotMin=0.001)
 
 if doCutFlow:
    if sel.baseCut: flow = 'fullFlow'
    else: flow = 'flow'
 
    yields = Yields(samples, selectedSamples, sel, cutOpt = flow, pklOpt = False, verbose = True, nSpaces = 10)
-   if save: JinjaTexTable(yields, outputName = "",  pdfDir = savedir + "/cutFlow", texDir = savedir + "/cutFlow/tex/", caption = "Cut Flow Table (" + yields.cutInst.name.replace("_",", ") + " WP)")
+   if save: JinjaTexTable(yields, outputName = "",  pdfDir = savedir + "/cutFlow", texDir = savedir + "/cutFlow/tex/", caption = "Cut Flow Table (" + yields.cutInst.name.replace("_",", ") + " WP " + iso + ")")
 
 #Save canvas
 if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID

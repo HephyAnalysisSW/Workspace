@@ -7,7 +7,7 @@ from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import makeLine
 parser = argparse.ArgumentParser(description = "Input options")
 parser.add_argument("--ID", dest = "ID",  help = "Electron ID type", type = str, default = "standard") # standard, MVA, manual, nMinus1
 parser.add_argument("--removedCut", dest = "removedCut",  help = "Variable removed from electron ID", type = str, default = "None") #"sigmaEtaEta" "dEta" "dPhi" "hOverE" "ooEmooP" "d0" "dz" "MissingHits" "convVeto"
-parser.add_argument("--iso", dest = "iso",  help = "Apply isolation", type = int, default = 0)
+parser.add_argument("--iso", dest = "iso",  help = "Apply isolation (hybIso03/04)", type = str, default = "") # hybIso03, hybIso04
 parser.add_argument("--WP", dest = "WP",  help = "Electron ID Working Point", type = str, default = "None")
 parser.add_argument("--doPlots", dest = "doPlots",  help = "Draw plots", type = int, default = 0)
 parser.add_argument("--doCutFlow", dest = "doCutFlow",  help = "Make cut flow table", type = int, default = 0)
@@ -36,8 +36,7 @@ doYields = args.doYields
 #else: WPs = ['None', 'Veto', 'Loose', 'Medium', 'Tight']
 
 selections1 = ['nosel', 'presel']
-selections2 = ['preselEle', 'sr1', 'sr1Loose', 'sr2', 'cr1', 'cr1Loose', 'cr2', 'crtt2']
-#selections3 = ['sr1abc', 'sr1abc_ptbin', 'mtabc', 'mtabc_ptbin', 'sr2_ptbin', 'cr1abc']
+selections2 = ['preselEle', 'sr1', 'sr2', 'cr1', 'cr2', 'crtt2'] #'sr1Loose', 'cr1Loose'
 
 #variables = ["sigmaEtaEta", "hOverE", "ooEmooP", "dEta", "dPhi", "d0", "dz", "MissingHits", "convVeto"]
 
@@ -49,10 +48,13 @@ print makeLine()
 
 if doPlots or doCutFlow:
    for sel in selections1:
-         os.system("python -b eleIdFoM.py --ID " + ID + " --removedCut " + removedCut + " --WP None --selection " + sel + " --doPlots " + str(doPlots) + " --doCutFlow " + str(doCutFlow) + " --iso " + str(iso)) 
+         if iso: os.system("python -b eleIdFoM.py --ID " + ID + " --removedCut " + removedCut + " --WP None --selection " + sel + " --doPlots " + str(doPlots) + " --doCutFlow " + str(doCutFlow) + " --iso " + iso) 
+         else: os.system("python -b eleIdFoM.py --ID " + ID + " --removedCut " + removedCut + " --WP None --selection " + sel + " --doPlots " + str(doPlots) + " --doCutFlow " + str(doCutFlow)) 
    
    for sel in selections2:
-      os.system("python -b eleIdFoM.py --ID " + ID + " --removedCut " + removedCut + " --WP " + WP + " --selection " + sel + " --doPlots " + str(doPlots) + " --doCutFlow " + str(doCutFlow) + " --iso " + str(iso)) 
+      if iso: os.system("python -b eleIdFoM.py --ID " + ID + " --removedCut " + removedCut + " --WP " + WP + " --selection " + sel + " --doPlots " + str(doPlots) + " --doCutFlow " + str(doCutFlow) + " --iso " + iso) 
+      else: os.system("python -b eleIdFoM.py --ID " + ID + " --removedCut " + removedCut + " --WP " + WP + " --selection " + sel + " --doPlots " + str(doPlots) + " --doCutFlow " + str(doCutFlow)) 
 
 if doLimits or doYields:
-   os.system("python -b eleIdLimits.py --ID " + ID + " --removedCut " + removedCut + " --WP " + WP + " --doLimits " + str(doLimits) + " --doYields " + str(doYields) + " --iso " + str(iso))
+   if iso: os.system("python -b eleIdLimits.py --ID " + ID + " --removedCut " + removedCut + " --WP " + WP + " --doLimits " + str(doLimits) + " --doYields " + str(doYields) + " --iso " + iso)
+   else: os.system("python -b eleIdLimits.py --ID " + ID + " --removedCut " + removedCut + " --WP " + WP + " --doLimits " + str(doLimits) + " --doYields " + str(doYields))
