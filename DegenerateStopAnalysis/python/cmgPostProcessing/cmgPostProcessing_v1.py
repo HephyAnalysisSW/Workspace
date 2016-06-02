@@ -363,7 +363,6 @@ def eventsSkimPreselect(skimGeneral, skimLepton, skimPreselectFlag, params, skim
     The skim condition depends on the general skim name, the lepton skim selection, and on the
     event preselection. 
     
-    FIXME remove hardcoded values, read them from params
     '''
 
     logger = logging.getLogger('cmgPostProcessing.eventsSkimPreselect')
@@ -380,10 +379,6 @@ def eventsSkimPreselect(skimGeneral, skimLepton, skimPreselectFlag, params, skim
         pass
     elif skimGeneral.startswith('met'):
         skimCond = "met_pt>" + str(float(skimGeneral[3:]))
-    elif skimGeneral == 'HT400':
-        skimCond = "Sum$(Jet_pt)>400"
-    elif skimGeneral == 'HT400ST200': 
-        skimCond = "Sum$(Jet_pt)>400&&(LepGood_pt[0]+met_pt)>200"
     elif skimGeneral == 'lheHThigh': 
         skimCond += "&&(lheHTIncoming>={0})".format(lheHThighIncoming)
     elif skimGeneral == 'lheHTlow': 
@@ -399,21 +394,13 @@ def eventsSkimPreselect(skimGeneral, skimLepton, skimPreselectFlag, params, skim
     else:
         pass
     
-    # for inclusive skim, no skim selection is done, the skim condition is reset 
-    if skimGeneral == 'inc':
-        skimCond = "(1)"
-      
     logger.info("\n Jobs running with skim = '%s' \n Initial skimming condition: \n  %s \n ", skimGeneral, skimCond)
     
     if skimPreselectFlag:
-        metCut = "(met_pt>200)"
-        leadingJet100 = "((Max$(Jet_pt*(abs(Jet_eta)<2.4 && Jet_id) ) > 100 ) >=1)"
-        HTCut    = "(Sum$(Jet_pt*(Jet_pt>30 && abs(Jet_eta)<2.4 && (Jet_id)) ) >200)"
+        skimPreselectionCuts = SkimParameters['skimPreselect']
+        skimCond += "&&%s"%skimPreselectionCuts
 
-        preselectionCuts = "(%s)"%'&&'.join([metCut,leadingJet100,HTCut])
-        skimCond += "&&%s"%preselectionCuts
-
-        logger.info("\n Applying preselection cuts: %s ", preselectionCuts)
+        logger.info("\n Applying preselection cuts for skimming: %s ", skimPreselectionCuts)
         logger.info("\n Skimming condition with preselection: \n  %s \n", skimCond)
     else:
         logger.info("\n No preselection cuts are applied for skim %s \n Skimming condition unchanged \n", skimGeneral)

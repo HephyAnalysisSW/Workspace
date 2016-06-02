@@ -25,9 +25,11 @@ def getParameterSet(args):
 
     #
     # arguments to build the parameter set
-    parameterSet = args.parameterSet
-    processTracks = args.processTracks
+    skimGeneral = args.skimGeneral
+    skimLepton = args.skimLepton
+    skimPreselect = args.skimPreselect
 
+    processTracks = args.processTracks
     processLepAll = args.processLepAll
     
     # parameter set definitions
@@ -41,6 +43,17 @@ def getParameterSet(args):
 
     # skimmimg parameters
     
+    if skimPreselect:
+        # branches for preselection (scalars or vectors) must be included in readVar or readVectors 
+        metCut = "(met_pt>200)"
+        leadingJet100 = "((Max$(Jet_pt*(abs(Jet_eta)<2.4 && Jet_id) ) > 100 ) >=1)"
+        HTCut    = "(Sum$(Jet_pt*(Jet_pt>30 && abs(Jet_eta)<2.4 && (Jet_id)) ) >200)"
+
+        skimPreselectCondition = "(%s)"%'&&'.join([metCut,leadingJet100,HTCut])
+    else:
+        skimPreselectCondition = ''
+        pass
+    
     SkimParameters = {
         'lheHThigh': {
             'lheHTIncoming': 600
@@ -48,7 +61,7 @@ def getParameterSet(args):
         'lheHTlow': {
             'lheHTIncoming': 600
             },
-        
+        'skimPreselect': skimPreselectCondition,
         }
     
     params['SkimParameters'] = SkimParameters
@@ -109,6 +122,7 @@ def getParameterSet(args):
             },
         #
         # electron selection
+        # https://twiki.cern.ch/twiki/bin/view/CMS/CutBasedElectronIdentificationRun2#Spring15_selection_25ns
         'el': {
             'pdgId': ('pdgId', operator.eq, 11, operator.abs),
             'pt': ('pt', operator.gt, 5),

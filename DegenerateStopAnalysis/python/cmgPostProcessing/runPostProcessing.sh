@@ -8,7 +8,7 @@
 #        ln -s CMSSW_7_4_12_patch4/src/Workspace/DegenerateStopAnalysis/python/cmgPostProcessing/runPostProcessing.sh .
 #    Run steps:   
 #       From the base repository, where the link was done:
-#       nohup krenew -t -K 10 -- bash -c "./runPostProcessing.sh $1 [$2 [3]]" &
+#       nohup krenew -t -K 10 -- bash -c "./runPostProcessing.sh $1 [$2 [3]]" & ; disown
 #
 #       $1 compulsory; 
 #          set sample as defined in runPostProcessing.sh
