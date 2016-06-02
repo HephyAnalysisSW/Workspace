@@ -255,12 +255,12 @@ def getSamples(args):
 
     if args.skimPreselect:
         outDir = os.path.join(
-            targetDir, processingEra, cmgProcessingTag, cmgPostProcessingTag, parameterSet, 
+            targetDir, processingEra, cmgProcessingTag, cmgPostProcessingTag, parameterSet, 'step1',
             cmgTuples, args.skimGeneral, 'skimPreselect', args.skimLepton
             )
     else:
         outDir = os.path.join(
-            targetDir, processingEra, cmgProcessingTag, cmgPostProcessingTag, parameterSet, 
+            targetDir, processingEra, cmgProcessingTag, cmgPostProcessingTag, parameterSet, 'step1',
             cmgTuples, args.skimGeneral, args.skimLepton
             )
     
@@ -977,9 +977,6 @@ def processLeptons(readTree, splitTree, saveTree, params, LepSelector):
         selectorName = 'lep (mu + el)' if objName is 'lep' else objName
         printStr = "\n  {0} {1} selector \n ".format(LepColl, selectorName)
         
-        if objName in ['mu', 'el']:
-            printStr += '\n  ' + pprint.pformat(LepSel[objName])
-        
         printStr += '\n ' + lepObj.printObjects(objList, LepVarList[objName])
 
         printStr += "\n saveTree.n{0}_{1} = %i \n  Index list: ".format(LepColl, objName) + \
@@ -1313,7 +1310,6 @@ def processJets(args, readTree, splitTree, saveTree, params):
 
     if logger.isEnabledFor(logging.DEBUG):
         printStr = "\n  " + objBranches + " basic jet selector \n " + \
-            pprint.pformat(basJetSel) + \
             '\n ' + jetObj.printObjects(basJetList, JetVarList) + \
             "\n saveTree.nBasJet = %i \n  Index list: " + pprint.pformat(basJetList) + "\n "
         logger.debug(printStr, saveTree.nBasJet)
@@ -1330,7 +1326,6 @@ def processJets(args, readTree, splitTree, saveTree, params):
 
     if logger.isEnabledFor(logging.DEBUG):
         printStr = "\n  " + objBranches + " veto jet selector (from basic jets) \n " + \
-            pprint.pformat(vetoJetSel) + \
             '\n ' + jetObj.printObjects(vetoJetList, JetVarList) + \
             "\n saveTree.nVetoJet = %i \n  Index list: " + pprint.pformat(vetoJetList) + "\n "
         logger.debug(printStr, saveTree.nVetoJet)
@@ -1348,7 +1343,6 @@ def processJets(args, readTree, splitTree, saveTree, params):
 
     if logger.isEnabledFor(logging.DEBUG):
         printStr = "\n  " + objBranches + " isr jet selector (from basic jets) \n " + \
-            pprint.pformat(isrJetSel) + \
             '\n ' + jetObj.printObjects(isrJetList, JetVarList) + \
             "\n saveTree.nIsrJet = %i \n  Index list: " + pprint.pformat(isrJetList) + "\n "
         logger.debug(printStr, saveTree.nIsrJet)
@@ -1366,7 +1360,6 @@ def processJets(args, readTree, splitTree, saveTree, params):
 
     if logger.isEnabledFor(logging.DEBUG):
         printStr = "\n  " + objBranches + " isr high jet selector (from basic jets) \n " + \
-            pprint.pformat(isrHJetSel) + \
             '\n ' + jetObj.printObjects(isrHJetList, JetVarList) + \
             "\n saveTree.nIsrHJet = %i \n  Index list: " + pprint.pformat(isrHJetList) + "\n "
         logger.debug(printStr, saveTree.nIsrHJet)
@@ -1440,7 +1433,6 @@ def processJets(args, readTree, splitTree, saveTree, params):
     
     if logger.isEnabledFor(logging.DEBUG):
         printStr = "\n  " + objBranches + " b jet selector (from basic jets), sorted after jet pt \n " + \
-            pprint.pformat(bJetSel) + \
             '\n ' + jetObj.printObjects(bJetList, JetVarList) + \
             "\n saveTree.nBJet = %i \n  Index list: " + pprint.pformat(bJetList) + "\n "
         logger.debug(printStr, saveTree.nBJet)
