@@ -31,11 +31,12 @@ TriggerTupelizer::TriggerTupelizer( const edm::ParameterSet & pset):
   params_ ( pset ),
   verbose_ ( pset.getUntrackedParameter< bool >("verbose")),
   triggerCollection_ ( pset.getUntrackedParameter< edm::InputTag >("triggerCollection") ),
-
+  isValidHltConfig_(false),
+  hltPrescale_(pset, consumesCollector(), *this),
+  hltPrescaleSet_(-1),
+  hltConfig_(NULL),
   triggersToMonitor_(pset.getUntrackedParameter<std::vector<std::string> > ("triggersToMonitor") ),
   addL1Prescales_(pset.getUntrackedParameter<bool> ("addL1Prescales") )
-  
-
 {
   for (std::vector<std::string>::iterator s = triggersToMonitor_.begin(); s != triggersToMonitor_.end(); s++) {
     cout<<prefix<<"Monitoring the following trigger:"<<*s<<endl;
@@ -71,15 +72,20 @@ void TriggerTupelizer::endJob()
 void TriggerTupelizer::beginRun ( edm::Run & iRun, edm::EventSetup const & iSetup )
 {
   bool changed(true);
-  if (hltConfig_.init(iRun,iSetup,triggerCollection_.label(),changed)) {
-  } else {
+
+  bool isConfigChanged(false);
+  isValidHltConfig_ =
+    hltPrescale_.init(iRun, iSetup, "HLT", isConfigChanged);
+  // if (hltConfig_.init(iRun,iSetup,triggerCollection_.label(),changed)) {
+  // } else {
+  if ( !isValidHltConfig_ ) {
     edm::LogError(prefix) << " HLT config extraction failure with process name " << triggerCollection_;
   }
 }
 
 int TriggerTupelizer::prescale(edm::Event & ev, const edm::EventSetup & setup, std::string hlt) {
 // return prod(hltConfig_.prescaleValues( ev, setup, hlt.c_str()));
-  return hltConfig_.prescaleValue( ev, setup, hlt.c_str());
+  return hltConfig_->prescaleValue( hltPrescaleSet_, hlt);
 }
 
 
@@ -95,6 +101,10 @@ void TriggerTupelizer::produce( edm::Event & ev, const edm::EventSetup & setup) 
 //              << " not found" << std::endl;
 //    }
 //  cout<<triggerCollection_.label().c_str()<<endl;
+
+  hltPrescaleSet_ = hltPrescale_.prescaleSet(ev,setup);
+  hltConfig_ = &hltPrescale_.hltConfigProvider();
+
   edm::Handle<edm::TriggerResults> HLTR;
 //  edm::InputTag HLTTag = edm::InputTag(triggerLabel_, "", triggerCollection_.label().c_str());
   ev.getByLabel(triggerCollection_, HLTR);

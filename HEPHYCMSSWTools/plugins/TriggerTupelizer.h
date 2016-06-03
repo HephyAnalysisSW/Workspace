@@ -18,6 +18,7 @@
 #include "FWCore/Common/interface/TriggerNames.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
 
+#include "HLTrigger/HLTcore/interface/HLTPrescaleProvider.h"
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
 
 //#include "SimGeneral/HepPDTRecord/interface/ParticleDataTable.h"
@@ -53,7 +54,11 @@ public:
   private:
   bool hlt_initialized_;
   std::vector<std::string> HLT_names_;
-  HLTConfigProvider hltConfig_;
+
+  bool isValidHltConfig_;
+  HLTPrescaleProvider hltPrescale_;
+  int hltPrescaleSet_;
+  const HLTConfigProvider* hltConfig_;
 
   std::vector<std::string> triggersToMonitor_, trigNames_, prescNames_;
   bool addL1Prescales_;
