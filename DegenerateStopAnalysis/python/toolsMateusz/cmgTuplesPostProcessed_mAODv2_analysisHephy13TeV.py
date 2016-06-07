@@ -6,19 +6,22 @@ import copy, os, sys
 #from Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_7412pass2_mAODv2_v4 import mass_dict
 ## somehow import mass_dict without having to load files in cmgSample file.... (?)
 
-#mc_path     = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2_v6/7412pass2_SMSScan_v1/RunIISpring15DR74_25ns" 
-#signal_path = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2_v6/7412pass2_SMSScan_v1/RunIISpring15DR74_25ns" 
-#data_path   = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2_v6/7412pass2_SMSScan_v1/Data_25ns" 
+#mc_path     = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/7412pass2_SMSScan_v2/RunIISpring15DR74_25ns" 
+#signal_path = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/7412pass2_SMSScan_v2/RunIISpring15DR74_25ns" 
+#data_path   = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/7412pass2_SMSScan_v2/Data_25ns" 
+#lumi_mc     = 10000. # Lumi that was used in the weight calculation of PostProcessing in pb-1
+mc_path = "/afs/hephy.at/data/vghete01/cmgTuples/postProcessed_mAODv2/7412pass2_mAODv2_v6/74X_postProcessing_v4/analysisHephy_13TeV_v0/step1/Spring15_7412pass2_mAODv2_v6"
+signal_path = "/afs/hephy.at/data/vghete01/cmgTuples/postProcessed_mAODv2/7412pass2_mAODv2_v6/74X_postProcessing_v4/analysisHephy_13TeV_v0/step1/Spring15_7412pass2_mAODv2_v6"
+data_path = "/afs/hephy.at/data/vghete01/cmgTuples/postProcessed_mAODv2/7412pass2_mAODv2_v6/74X_postProcessing_v4/analysisHephy_13TeV_v0/step1/Data25ns_v6"
+lumi_mc     = 10000. # Lumi that was used in the weight calculation of PostProcessing in pb-1
 
-class cmgTuplesPostProcessed:
-
-    lumi_mc     = 10000. # Lumi that was used in the weight calculation of PostProcessing in pb-1
+class cmgTuplesPostProcessed():
 
     def makeSample(self, sample):
       i = copy.deepcopy(sample)
       i['dir']=i['dir']+'/inc/'
       s = copy.deepcopy(sample)
-      s['dir']=s['dir']+'/skimPreselect/inc/'
+      s['dir']=s['dir']+'/skimPreselect/inc/'#preselection
       return {'inc':i, 'presel':s}
 
     def getDataSample(self, name,sample ):
@@ -37,16 +40,16 @@ class cmgTuplesPostProcessed:
           #'dir' : "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/mAODv2_v4_SMSScan_v1/RunIISpring15DR74_25ns",
           'bins':[signal]}
 
-    def __init__(self, mc_path = "", signal_path = "", data_path = "", lumi_mc = lumi_mc):
+    def __init__(self, mc_path=mc_path, signal_path=signal_path, data_path=data_path, lumi_mc=lumi_mc):
 
         self.mc_path    =   mc_path
         self.signal_path=   signal_path
         self.data_path  =   data_path
         self.lumi       =   lumi_mc 
 
-        print "MC DIR:      ",   mc_path
-        print "SIGNAL DIR:  ",   signal_path
-        print "DATA DIR:    ",   data_path
+        print "MC DIR:      ",   self.mc_path
+        print "SIGNAL DIR:  ",   self.signal_path
+        print "DATA DIR:    ",   self.data_path
         
         self.TTJetsInc=self.makeSample({\
         "name" : "TTJetsInc",
@@ -182,8 +185,52 @@ class cmgTuplesPostProcessed:
         'dir' : self.mc_path 
         })
         
+
+
+        self.QCDPT=self.makeSample({\
+        "name" : "QCDPT",
+        "bins" :  [
+
+                    'QCD_Pt_15to30_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1',
+                    'QCD_Pt_30to50_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1',
+                    'QCD_Pt_50to80_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1',
+                    'QCD_Pt_80to120_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1',
+                    'QCD_Pt_120to170_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1',
+                    'QCD_Pt_170to300_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1',
+                    'QCD_Pt_300to470_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1',
+                    'QCD_Pt_470to600_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1',
+                    'QCD_Pt_600to800_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1',
+                    'QCD_Pt_800to1000_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1',
+                    'QCD_Pt_1000to1400_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1',
+                    'QCD_Pt_1400to1800_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1',
+                    'QCD_Pt_1800to2400_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1',
+                    'QCD_Pt_2400to3200_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1',
+
+
+                  ], 
+        'dir' : self.mc_path 
+        })
         
-        
+       
+
+        self.QCDPT_EM=self.makeSample({\
+        "name" : "QCDPT_EM",
+        "bins" :  [
+
+                    'QCD_Pt-15to20_EMEnriched_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1',
+                    'QCD_Pt-20to30_EMEnriched_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1',
+                    'QCD_Pt-30to50_EMEnriched_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1',
+                    'QCD_Pt-50to80_EMEnriched_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1',
+                    'QCD_Pt-80to120_EMEnriched_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1',
+                    'QCD_Pt-120to170_EMEnriched_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1',
+                    'QCD_Pt-170to300_EMEnriched_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1',
+                    'QCD_Pt-300toInf_EMEnriched_TuneCUETP8M1_13TeV_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1',
+
+                  ], 
+        'dir' : self.mc_path 
+        })
+
+ 
         self.ZJetsHT=self.makeSample({\
         "name" : "ZJetsHT",
         "bins" :  [
@@ -197,7 +244,49 @@ class cmgTuplesPostProcessed:
         
         
         
+        self.DYJetsM5to50HT=self.makeSample({\
+        "name" : "DYJetsM5to50HT",
+        "bins" :  [
+                        "DYJetsToLL_M-5to50_HT-100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1", 
+                        "DYJetsToLL_M-5to50_HT-200to400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1", 
+                        "DYJetsToLL_M-5to50_HT-400to600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1", 
+                        "DYJetsToLL_M-5to50_HT-600toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1", 
+                        #'DYJetsToLL_M-5to50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1',
+                  ] ,
+        'dir' : self.mc_path 
+        })
+
+
+        self.DYJetsM5to50=self.makeSample({\
+        "name" : "DYJetsM5to50",
+        "bins" :  [
+                        'DYJetsToLL_M-5to50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1',
+                  ] ,
+        'dir' : self.mc_path 
+        })
+
         
+        self.DYJetsM50HT=self.makeSample({\
+        "name" : "DYJetsM50HT",
+        "bins" :  [
+                        'DYJetsToLL_M-50_HT-100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1', 
+                        'DYJetsToLL_M-50_HT-200to400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1', 
+                        'DYJetsToLL_M-50_HT-400to600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v2', 
+                        'DYJetsToLL_M-50_HT-600toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1', 
+                  ] ,
+        'dir' : self.mc_path 
+        })
+
+
+        self.DYJetsToNuNu=self.makeSample({\
+        "name" : "DYJetsToNuNu",
+        "bins" :  [
+                        'DYJetsToNuNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1',
+                  ] ,
+        'dir' : self.mc_path 
+        })
+
+
         ######################################################################################################
         #####################################                  ###############################################
         #####################################       DATA       ###############################################
@@ -242,19 +331,24 @@ class cmgTuplesPostProcessed:
         
         
         import pickle
-        mass_dict_pickle = "/data/nrad/cmgTuples/7412pass2_mAODv2_v6/RunIISpring15MiniAODv2/mass_dict.pkl"
+
+
+        #mass_dict_pickle = "/afs/hephy.at/user/n/nrad/CMSSW/fork/CMSSW_7_4_12_patch4/src/Workspace/DegenerateStopAnalysis/cmgPostProcessing/mass_dict_all.pkl"
+        mass_dict_pickle = "/data/nrad/cmgTuples/7412pass2_mAODv2_v6/RunIISpring15MiniAODv2//mass_dict.pkl"
         mass_dict = pickle.load(open(mass_dict_pickle,"r"))
+
+        self.mass_dict = mass_dict
         mass_scan={}
 
         for mstop in mass_dict:
             for mlsp in mass_dict[mstop]:
-                #print "mstop, mlsp: ", mstop, " ", mlsp
                 mass_point = "SMS_T2_4bd_mStop_%s_mLSP_%s"%(mstop,mlsp)
                 mass_scan[mass_point] = {\
                                             "name" : mass_point,
                                             "bins": [mass_point],
                                             'dir' : self.signal_path,
                                         }
+        
         
         for sig in mass_scan:
             sm = self.makeSample(mass_scan[sig])

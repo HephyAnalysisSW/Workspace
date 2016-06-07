@@ -1,0 +1,17 @@
+python -b QCDabcdABCD3.py --HT 300 --MET 300 --METloose 300 --eleWP Veto --removedCut sigmaEtaEta 
+python -b QCDabcdABCD3.py --HT 300 --MET 300 --METloose 250 --eleWP Veto --removedCut sigmaEtaEta 
+
+python -b QCDabcdABCD3.py --HT 200 --MET 200 --METloose 200 --eleWP Veto --removedCut sigmaEtaEta
+python -b QCDabcdABCD3.py --HT 200 --MET 200 --METloose 150 --eleWP Veto --removedCut sigmaEtaEta
+
+python -b QCDabcdABCD3.py --HT 300 --MET 300 --METloose 300 --eleWP Loose 
+python -b QCDabcdABCD3.py --HT 300 --MET 300 --METloose 250 --eleWP Loose 
+
+python -b QCDabcdABCD3.py --HT 200 --MET 200 --METloose 200 --eleWP Loose
+python -b QCDabcdABCD3.py --HT 200 --MET 200 --METloose 150 --eleWP Loose
+
+python -b QCDabcdABCD3.py --HT 300 --MET 300 --METloose 300 --eleWP Loose --removedCut sigmaEtaEta 
+python -b QCDabcdABCD3.py --HT 300 --MET 300 --METloose 250 --eleWP Loose 
+
+python -b QCDabcdABCD3.py --HT 200 --MET 200 --METloose 200 --eleWP Loose --removedCut sigmaEtaEta 
+python -b QCDabcdABCD3.py --HT 200 --MET 200 --METloose 150 --eleWP Loose --removedCut sigmaEtaEta 
