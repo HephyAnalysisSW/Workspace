@@ -8,8 +8,11 @@ from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.degTools import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.cutsEle import *
-from Workspace.DegenerateStopAnalysis.toolsMateusz.cmgTuplesPostProcessed_mAODv2 import cmgTuplesPostProcessed
-from Workspace.DegenerateStopAnalysis.toolsMateusz.getSamples_PP_mAODv2_7412pass2_scan import getSamples
+from Workspace.DegenerateStopAnalysis.toolsMateusz.getSamples_mAODv2_analysisHephy13TeV import getSamples
+from Workspace.DegenerateStopAnalysis.toolsMateusz.cmgTuplesPostProcessed_mAODv2_analysisHephy13TeV import cmgTuplesPostProcessed
+#from Workspace.DegenerateStopAnalysis.toolsMateusz.cmgTuplesPostProcessed_mAODv2 import cmgTuplesPostProcessed
+#from Workspace.DegenerateStopAnalysis.toolsMateusz.getSamples_analysisHephy_13TeV import getSamples
+#from Workspace.DegenerateStopAnalysis.toolsMateusz.getSamples_PP_mAODv2_7412pass2_scan import getSamples
 
 from array import array
 from math import pi, sqrt #cos, sin, sinh, log
@@ -21,8 +24,10 @@ ROOT.gStyle.SetOptStat(0) #1111 #0 removes histogram statistics box #Name, Entri
 privateSignals = ["s10FS", "s30", "s30FS", "s60FS", "t2tt30FS"]
 backgrounds = ["w","tt", "z","qcd"]
 
+cmgPP = cmgTuplesPostProcessed()#mc_path, signal_path, data_path)
+
 samplesList = backgrounds # + privateSignals
-samples = getSamples(sampleList = samplesList, scan = True, useHT = True, getData = False)#, cmgPP = cmgPP) 
+samples = getSamples(cmgPP = cmgPP, skim = 'presel', sampleList = samplesList, scan = False, useHT = True, getData = False)
 
 officialSignals = ["s300_290", "s300_270", "s300_240"] #FIXME: crosscheck if these are in allOfficialSignals
 
@@ -35,6 +40,7 @@ allSamples = allSignals + backgrounds
 parser = argparse.ArgumentParser(description = "Input options")
 #parser.add_argument("--sel", dest = "sel",  help = "Selection", type = str, default = "presel") #presel, SR, QCD_A, QCD_I, QCD_D 
 #parser.add_argument("--isolation", dest = "isolation",  help = "Isolation (hybIso03/hybIso04)", type = str, default = "hybIso03")
+parser.add_argument("--logy", dest = "logy",  help = "Toggle logy", type = int, default = 0)
 parser.add_argument("--save", dest = "save",  help = "Toggle save", type = int, default = 1)
 parser.add_argument("-b", dest = "batch",  help = "Batch mode", action = "store_true", default = False)
 args = parser.parse_args()
@@ -47,6 +53,7 @@ if not len(sys.argv) > 1:
 #Arguments
 #isolation = args.isolation
 #sel = args.sel
+logy = args.logy
 save = args.save
 
 #Save
@@ -81,7 +88,7 @@ for s in selectedSamples:
 #eleMt = "Max$(LepGood_mt*eleSel)"
 #eleMt = "Max$(sqrt(2*met*{pt}*(1 - cos(met_phi - LepGood_phi)))*(LepGood_pt == {pt}))".format(pt=elePt)  #%(elePt[iWP], elePhi[iWP], elePt[iWP])#
 
-def QCDplots(collection = "LepGood", samples = samples, logy = 1, save = save, savedir = savedir):
+def QCDplots(collection = "LepGood", samples = samples, logy = logy, save = save, savedir = savedir):
 
    if collection == "LepGood": otherCollection = "LepOther"
    elif collection == "LepOther": otherCollection = "LepGood"
@@ -113,7 +120,7 @@ def QCDplots(collection = "LepGood", samples = samples, logy = 1, save = save, s
    #Redefining electron pT in terms of selection
    elePt = {}
    elePt['I_D'] = "Max$(" + collection + "_pt*(" + eleSel + "&&" + antiHybIsoCut + "&&" + dxyCut + "))"
-   elePt['I_A'] = "Max$(" + collection + "_pt*(" + eleSel + "&&" + hybIsoCut + "))"
+   elePt['I_A'] = "Max$(" + collection + "_pt*(" + eleSel + "&&" + antiHybIsoCut + "))"
    elePt['A_D'] = "Max$(" + collection + "_pt*(" + eleSel + "&&" + dxyCut + "))"
    elePt['A_I'] = "Max$(" + collection + "_pt*(" + eleSel + "&&" + hybIsoCut + "))"
    elePt['D_I'] = "Max$(" + collection + "_pt*(" + eleSel + "&&" + hybIsoCut + "&&" + antiDxyCut + "))"
@@ -122,7 +129,7 @@ def QCDplots(collection = "LepGood", samples = samples, logy = 1, save = save, s
    #Redefining mT in terms of selection
    eleMt = {}
    eleMt['I_D'] = "Max$(" + collection + "_mt*(" + eleSel + "&&" + antiHybIsoCut + "&&" + dxyCut + "))"
-   eleMt['I_A'] = "Max$(" + collection + "_mt*(" + eleSel + "&&" + hybIsoCut + "))"
+   eleMt['I_A'] = "Max$(" + collection + "_mt*(" + eleSel + "&&" + antiHybIsoCut + "))"
    eleMt['A_D'] = "Max$(" + collection + "_mt*(" + eleSel + "&&" + dxyCut + "))"
    eleMt['A_I'] = "Max$(" + collection + "_mt*(" + eleSel + "&&" + hybIsoCut + "))"
    eleMt['D_I'] = "Max$(" + collection + "_mt*(" + eleSel + "&&" + hybIsoCut + "&&" + antiDxyCut + "))"
@@ -131,7 +138,7 @@ def QCDplots(collection = "LepGood", samples = samples, logy = 1, save = save, s
    #Redefining HI in terms of selection
    absIso = {} 
    absIso['I_D'] = "Max$(" + collection + "_absIso03*(" + eleSel + "&&" + antiHybIsoCut + "&&" + dxyCut + "))"
-   absIso['I_A'] = "Max$(" + collection + "_absIso03*(" + eleSel + "&&" + hybIsoCut + "))"
+   absIso['I_A'] = "Max$(" + collection + "_absIso03*(" + eleSel + "&&" + antiHybIsoCut + "))"
    absIso['A_D'] = "Max$(" + collection + "_absIso03*(" + eleSel + "&&" + dxyCut + "))"
    absIso['A_I'] = "Max$(" + collection + "_absIso03*(" + eleSel + "&&" + hybIsoCut + "))"
    absIso['D_I'] = "Max$(" + collection + "_absIso03*(" + eleSel + "&&" + hybIsoCut + "&&" + antiDxyCut + "))"
@@ -139,7 +146,7 @@ def QCDplots(collection = "LepGood", samples = samples, logy = 1, save = save, s
    
    relIso = {} 
    relIso['I_D'] = "Max$(" + collection + "_relIso03*(" + eleSel + "&&" + antiHybIsoCut + "&&" + dxyCut + "))"
-   relIso['I_A'] = "Max$(" + collection + "_relIso03*(" + eleSel + "&&" + hybIsoCut + "))"
+   relIso['I_A'] = "Max$(" + collection + "_relIso03*(" + eleSel + "&&" + antiHybIsoCut + "))"
    relIso['A_D'] = "Max$(" + collection + "_relIso03*(" + eleSel + "&&" + dxyCut + "))"
    relIso['A_I'] = "Max$(" + collection + "_relIso03*(" + eleSel + "&&" + hybIsoCut + "))"
    relIso['D_I'] = "Max$(" + collection + "_relIso03*(" + eleSel + "&&" + hybIsoCut + "&&" + antiDxyCut + "))"
@@ -147,7 +154,7 @@ def QCDplots(collection = "LepGood", samples = samples, logy = 1, save = save, s
    
    hybIso = {} 
    hybIso['I_D'] = "Max$((" + collection + "_relIso03*min( " + collection + "_pt, 25))*(" + eleSel + "&&" + antiHybIsoCut + "&&" + dxyCut + "))"
-   hybIso['I_A'] = "Max$((" + collection + "_relIso03*min( " + collection + "_pt, 25))*(" + eleSel + "&&" + hybIsoCut + "))"
+   hybIso['I_A'] = "Max$((" + collection + "_relIso03*min( " + collection + "_pt, 25))*(" + eleSel + "&&" + antiHybIsoCut + "))"
    hybIso['A_D'] = "Max$((" + collection + "_relIso03*min( " + collection + "_pt, 25))*(" + eleSel + "&&" + dxyCut + "))"
    hybIso['A_I'] = "Max$((" + collection + "_relIso03*min( " + collection + "_pt, 25))*(" + eleSel + "&&" + hybIsoCut + "))"
    hybIso['D_I'] = "Max$((" + collection + "_relIso03*min( " + collection + "_pt, 25))*(" + eleSel + "&&" + hybIsoCut + "&&" + antiDxyCut + "))"
@@ -156,7 +163,7 @@ def QCDplots(collection = "LepGood", samples = samples, logy = 1, save = save, s
    #Redefining IP in terms of selection
    absDxy = {}
    absDxy['I_D'] = "Max$(abs(" + collection + "_dxy*(" + eleSel + "&&" + antiHybIsoCut + "&&" + dxyCut + ")))"
-   absDxy['I_A'] = "Max$(abs(" + collection + "_dxy*(" + eleSel + "&&" + hybIsoCut + ")))"
+   absDxy['I_A'] = "Max$(abs(" + collection + "_dxy*(" + eleSel + "&&" + antiHybIsoCut + ")))"
    absDxy['A_D'] = "Max$(abs(" + collection + "_dxy*(" + eleSel + "&&" + dxyCut + ")))"
    absDxy['A_I'] = "Max$(abs(" + collection + "_dxy*(" + eleSel + "&&" + hybIsoCut + ")))"
    absDxy['D_I'] = "Max$(abs(" + collection + "_dxy*(" + eleSel + "&&" + hybIsoCut + "&&" + antiDxyCut + ")))"
@@ -165,14 +172,15 @@ def QCDplots(collection = "LepGood", samples = samples, logy = 1, save = save, s
    QCD = {}
    
    presel = CutClass("presel_loose", [
-      ["MET200","met > 200"],
-      ["HT200","htJet30j > 200"],
+      ["MET300","met > 300"],
+      ["HT300","ht_basJet > 300"],
+      ["ISR110", "nIsrJet >= 1"],
+      ["No3rdJet60","nVetoJet <= 2"],
+      ["BVeto","(nBSoftJet == 0 && nBHardJet == 0)"],
       ["eleSel", "Sum$(" + eleSel + ") == 1"],
-      ["No3rdJet60","nJet60 <= 2"],
-      #["BVeto","(nSoftBJetsCSV == 0 && nHardBJetsCSV == 0)"],
       ["otherCollection", "Sum$(" + eleSel_other + ") == 0"],
       #["elePt<30", elePt + " < 30"],
-      #["anti-AntiQCD", "deltaPhi_j12 > 2.5"],
+      #["anti-AntiQCD", "vetoJet_dPhi_j1j2 > 2.5"],
       #["anti-HybIso", "Sum$(" + eleSel + "&&" + antiHybIsoCut + ") == 1"],
       #["anti-dxy", "Max$(abs(" + collection + "_dxy*(" + eleSel + "&&" + antiHybIsoCut + "))) > 0.02"], #TODO:check
       ], baseCut = None) #allCuts['None']['presel'])
@@ -185,25 +193,25 @@ def QCDplots(collection = "LepGood", samples = samples, logy = 1, save = save, s
 
    QCD['I_A'] = CutClass("QCD_I_A", [
       ["elePt<30", elePt['I_A'] + " < 30"],
-      ["A", "deltaPhi_j12 < 2.5"], #applied
+      ["A", "vetoJet_dPhi_j1j2 < 2.5"], #applied
       ["anti-I", "Sum$(" + eleSel + "&&" + antiHybIsoCut + ") == 1"], #inverted
       ], baseCut = presel)
 
    QCD['A_I'] = CutClass("QCD_A_I", [
       ["elePt<30", elePt['A_I'] + " < 30"],
-      ["anti-A", "deltaPhi_j12 > 2.5"], #inverted
+      ["anti-A", "vetoJet_dPhi_j1j2 > 2.5"], #inverted
       ["I", "Sum$(" + eleSel + "&&" + hybIsoCut + ") == 1"], #applied
       ], baseCut = presel)
    
    QCD['A_D'] = CutClass("QCD_A_D", [
       ["elePt<30", elePt['A_D'] + " < 30"],
-      ["anti-A", "deltaPhi_j12 > 2.5"], #inverted
+      ["anti-A", "vetoJet_dPhi_j1j2 > 2.5"], #inverted
       ["D", "Sum$(" + eleSel + "&&" + dxyCut + ") == 1"], #applied
       ], baseCut = presel)
    
    QCD['D_A'] = CutClass("QCD_D_A", [
       ["elePt<30", elePt['D_A'] + " < 30"],
-      ["A", "deltaPhi_j12 < 2.5"], #applied
+      ["A", "vetoJet_dPhi_j1j2 < 2.5"], #applied
       ["anti-D", "Sum$(" + eleSel + "&&" + antiDxyCut + ") == 1"], #inverted
       ], baseCut = presel)
 
@@ -224,14 +232,14 @@ def QCDplots(collection = "LepGood", samples = samples, logy = 1, save = save, s
       plotDict[sel] = {\
          "elePt_" + sel:{'var':elePt[sel], "bins":[10, 0, 50], "decor":{"title": "Electron pT Plot" ,"x":"Electron p_{T} / GeV" , "y":"Events", 'log':[0, logy,0]}}, 
          "absIso_" + sel:{'var':absIso[sel], "bins":[4, 0, 20], "decor":{"title": "Electron absIso Plot" ,"x":"I_{abs} / GeV" , "y":"Events", 'log':[0,logy,0]}}, 
-         "relIso_" + sel:{'var':relIso[sel], "bins":[8, 0, 2], "decor":{"title": "Electron relIso Plot" ,"x":"I_{rel}" , "y":"Events", 'log':[0,logy,0]}}, 
+         "relIso_" + sel:{'var':relIso[sel], "bins":[20, 0, 5], "decor":{"title": "Electron relIso Plot" ,"x":"I_{rel}" , "y":"Events", 'log':[0,logy,0]}}, 
          "hybIso_" + sel:{'var':hybIso[sel], "bins":[10, 0, 25], "decor":{"title": "Electron hybIso Plot" ,"x":"HI = I_{rel}*min(p_{T}, 25 GeV)" , "y":"Events", 'log':[0,logy,0]}},
-         "hybIso2_" + sel:{'var':"(log(1 + " + hybIso[sel] + ")/log(1+5))", "bins":[6, 0, 3], "decor":{"title": "Electron hybIso Plot" ,"x":"log(1+HI)/log(1+5)" , "y":"Events", 'log':[0,logy,0]}},
-         "absDxy_" + sel:{'var':absDxy[sel], "bins":[6, 0, 0.06], "decor":{"title": "Electron |dxy| Plot" ,"x":"|dxy|" , "y":"Events", "log":[0,logy,0]}},
-         "delPhi_" + sel:{'var':"deltaPhi_j12", "bins":[4, 2, 4], "decor":{"title": "deltaPhi(j1,j2) Plot" ,"x":"#Delta#phi(j1,j2)" , "y":"Events", 'log':[0,logy,0]}},
+         "hybIso2_" + sel:{'var':"(log(1 + " + hybIso[sel] + ")/log(1+5))", "bins":[8, 0, 4], "decor":{"title": "Electron hybIso Plot" ,"x":"log(1+HI)/log(1+5)" , "y":"Events", 'log':[0,logy,0]}},
+         "absDxy_" + sel:{'var':absDxy[sel], "bins":[10, 0, 0.1], "decor":{"title": "Electron |dxy| Plot" ,"x":"|dxy|" , "y":"Events", "log":[0,logy,0]}},
+         "delPhi_" + sel:{'var':"vetoJet_dPhi_j1j2", "bins":[8, 0, 3.14], "decor":{"title": "deltaPhi(j1,j2) Plot" ,"x":"#Delta#phi(j1,j2)" , "y":"Events", 'log':[0,logy,0]}},
          "eleMt_" + sel:{'var':eleMt[sel], "bins":[10,0,100], "decor":{"title": "mT Plot" ,"x":"m_{T} / GeV" , "y":"Events", 'log':[0,logy,0]}},
          "MET_" + sel:{'var':"met", "bins":[20,100,500], "decor":{"title": "MET Plot" ,"x":"Missing E_{T} / GeV" , "y":"Events", 'log':[0,logy,0]}},
-         "HT_" + sel:{'var':"htJet30j", "bins":[20,100,500], "decor":{"title": "HT Plot","x":"H_{T} / GeV" , "y":"Events", 'log':[0,logy,0]}}
+         "HT_" + sel:{'var':"ht_basJet", "bins":[20,100,500], "decor":{"title": "HT Plot","x":"H_{T} / GeV" , "y":"Events", 'log':[0,logy,0]}}
       }
   
       plotsList[sel] = ["elePt_" + sel, "absIso_" + sel, "relIso_" + sel,"hybIso_" + sel, "hybIso2_" + sel, "absDxy_" + sel, "delPhi_" + sel, "eleMt_" + sel, "MET_" + sel, "HT_" + sel]
@@ -312,7 +320,7 @@ for sel in selections:
 
       canvs[sel][plot].RedrawAxis()
       canvs[sel][plot].Update()
-      canvs[sel][plot].SetLogy()
+      if logy: canvs[sel][plot].SetLogy()
 
       if sel in canvs.keys():
          canvs[sel][plot].SaveAs("%s/%s/%s.png"%(savedir, sel, plot))
