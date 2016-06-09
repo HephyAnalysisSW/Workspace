@@ -14,8 +14,8 @@ ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 
 from Workspace.HEPHYPythonTools.helpers import getChunks
-from Workspace.RA4Analysis.cmgTuples_Data25ns_miniAODv2 import *
-from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns import *
+#from Workspace.RA4Analysis.cmgTuples_Data25ns_miniAODv2 import *
+from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2 import *
 from systematics_helper import calc_btag_systematics, calc_LeptonScale_factors_and_systematics, calc_TopPt_Weights , calcDLDictionary, calc_diLep_contributions ,  fill_branch_WithJEC
 from btagEfficiency import *
 from readVetoEventList import *
@@ -36,7 +36,7 @@ separateBTagWeights = True
 
 defSampleStr = "TTJets_LO"
 
-subDir = "postProcessing_Data_Jecv7_v2"
+subDir = "postProcessing_Spring16/"
 #subDir = "postProcessing_Tests"
 
 #branches to be kept for data and MC
@@ -128,10 +128,10 @@ if options.skim=='inc':
 if sys.argv[0].count('ipython'):
   options.small=True
 
-###get evt Veto List  for filters####
-evt_veto_list = evt_veto_list()
-#print "these events will be vetoed :"
-#print evt_veto_list
+####get evt Veto List  for filters####
+#evt_veto_list = evt_veto_list()
+##print "these events will be vetoed :"
+##print evt_veto_list
 
 ###For PU reweight###
 PU_dir = "/data/easilar/tuples_from_Artur/JECv6recalibrateMET_2p2fb/PUhistos/"
@@ -217,11 +217,11 @@ for isample, sample in enumerate(allSamples):
     xsecFromFile = xsec[sample['dbsName']]
   
   readVariables = ['met_pt/F', 'met_phi/F','met_eta/F','met_mass/F']
-  newVariables = ['weight/F','muonDataSet/I','eleDataSet/I','veto_evt_list/I/1']
+  newVariables = ['weight/F','muonDataSet/I','eleDataSet/I']#,'veto_evt_list/I/1']
   aliases = [ "met:met_pt", "metPhi:met_phi"]
 
   readVectors = [\
-    {'prefix':'LepGood', 'nMax':8, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I','charge/F' ,'relIso03/F','SPRING15_25ns_v1/I' ,'tightId/I', 'miniRelIso/F','mass/F','sip3d/F','mediumMuonId/I', 'mvaIdPhys14/F','mvaIdSpring15/F','lostHits/I', 'convVeto/I']}
+    {'prefix':'LepGood', 'nMax':8, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I','charge/F' ,'relIso03/F','eleCutIdSpring15_25ns_v1/I' ,'tightId/I', 'miniRelIso/F','mass/F','sip3d/F','mediumMuonId/I', 'mvaIdSpring15/F','lostHits/I', 'convVeto/I']}
   ]
   if sample['isData']:
     readVectors.append({'prefix':'Jet',  'nMax':100, 'vars':['rawPt/F','pt/F', 'eta/F', 'phi/F', 'mass/F','id/I','btagCSV/F', 'btagCMVA/F']})
@@ -326,29 +326,29 @@ for isample, sample in enumerate(allSamples):
         s.weight = lumiScaleFactor*genWeight
         if sample['isData']:
 
-          vetoEvt = str(int(t.GetLeaf('run').GetValue()))+":"+str(int(lumi_branch))+":"+str(int(evt_branch))+"\n"
-          #check_fake_evt = str(int(254790))+":"+str(int(111))+":"+str(int(120263348))+"\n"
-          #if check_fake_evt in evt_veto_list: print "YESSS!!!"
-          #print "Event :" , vetoEvt
-          if vetoEvt in evt_veto_list["csc"] : 
-            print "!!!!this event is skipped due to csc!!!" , t.GetLeaf('run').GetValue() , lumi_branch , evt_branch
-            veto_csc_list.append(vetoEvt)
+          #vetoEvt = str(int(t.GetLeaf('run').GetValue()))+":"+str(int(lumi_branch))+":"+str(int(evt_branch))+"\n"
+          ##check_fake_evt = str(int(254790))+":"+str(int(111))+":"+str(int(120263348))+"\n"
+          ##if check_fake_evt in evt_veto_list: print "YESSS!!!"
+          ##print "Event :" , vetoEvt
+          #if vetoEvt in evt_veto_list["csc"] : 
+          #  print "!!!!this event is skipped due to csc!!!" , t.GetLeaf('run').GetValue() , lumi_branch , evt_branch
+          #  veto_csc_list.append(vetoEvt)
 
-          if vetoEvt in evt_veto_list["ecal"] : 
-            print "!!!!this event is skipped due to ecal!!!" , t.GetLeaf('run').GetValue() , lumi_branch , evt_branch
-            veto_ecal_list.append(vetoEvt)
-          
-          if vetoEvt in evt_veto_list["muon"] : 
-            print "!!!!this event is skipped due to muon!!!" , t.GetLeaf('run').GetValue() , lumi_branch , evt_branch
-            veto_muon_list.append(vetoEvt)
+          #if vetoEvt in evt_veto_list["ecal"] : 
+          #  print "!!!!this event is skipped due to ecal!!!" , t.GetLeaf('run').GetValue() , lumi_branch , evt_branch
+          #  veto_ecal_list.append(vetoEvt)
+          #
+          #if vetoEvt in evt_veto_list["muon"] : 
+          #  print "!!!!this event is skipped due to muon!!!" , t.GetLeaf('run').GetValue() , lumi_branch , evt_branch
+          #  veto_muon_list.append(vetoEvt)
 
-          if vetoEvt in evt_veto_list["badreso"] : 
-            print "!!!!this event is skipped due to badreso!!!" , t.GetLeaf('run').GetValue() , lumi_branch , evt_branch
-            veto_badreso_list.append(vetoEvt)
+          #if vetoEvt in evt_veto_list["badreso"] : 
+          #  print "!!!!this event is skipped due to badreso!!!" , t.GetLeaf('run').GetValue() , lumi_branch , evt_branch
+          #  veto_badreso_list.append(vetoEvt)
 
-          if vetoEvt in evt_veto_list["ultimate"] :
-            s.veto_evt_list = False
-            #continue
+          #if vetoEvt in evt_veto_list["ultimate"] :
+          #  s.veto_evt_list = False
+          #  #continue
 
           if "Muon" in sample['name']:
             s.muonDataSet = True
@@ -404,7 +404,7 @@ for isample, sample in enumerate(allSamples):
         s.nLooseHardLeptons = len(looseHardLepInd)
         s.nTightSoftLeptons = len(tightSoftLepInd)
         s.nTightHardLeptons = len(tightHardLepInd)
-        vars = ['pt', 'eta', 'phi','mass' ,'charge' ,'miniRelIso','relIso03', 'pdgId', 'SPRING15_25ns_v1']
+        vars = ['pt', 'eta', 'phi','mass' ,'charge' ,'miniRelIso','relIso03', 'pdgId', 'eleCutIdSpring15_25ns_v1']
         allLeptons = [getObjDict(t, 'LepGood_', vars, i) for i in looseLepInd]
         looseSoftLep = [getObjDict(t, 'LepGood_', vars, i) for i in looseSoftLepInd] 
         looseHardLep = [getObjDict(t, 'LepGood_', vars, i) for i in looseHardLepInd]
@@ -421,7 +421,7 @@ for isample, sample in enumerate(allSamples):
           s.leptonPhi = r.LepGood_phi[leadingLepInd]
           s.leptonPdg = r.LepGood_pdgId[leadingLepInd]
           s.leptonMass= r.LepGood_mass[leadingLepInd]
-          s.leptonSPRING15_25ns_v1= r.LepGood_SPRING15_25ns_v1[leadingLepInd]
+          s.leptonSPRING15_25ns_v1= r.LepGood_eleCutIdSpring15_25ns_v1[leadingLepInd]
           s.st = r.met_pt + s.leptonPt
         s.singleLeptonic = s.nTightHardLeptons==1
         if s.singleLeptonic:
@@ -478,7 +478,7 @@ for isample, sample in enumerate(allSamples):
         del v['branch']
 
   print "Chunk loop end"
-  print "number of veto " ,   len(veto_csc_list) , len(veto_ecal_list) , len(veto_muon_list) , len(veto_badreso_list)
+  #print "number of veto " ,   len(veto_csc_list) , len(veto_ecal_list) , len(veto_muon_list) , len(veto_badreso_list)
   if not options.small: 
     size=0
     counter=0
