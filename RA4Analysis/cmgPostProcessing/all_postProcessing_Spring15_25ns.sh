@@ -10,8 +10,6 @@
 
 nohup krenew -t -K 10 -- bash -c "./all_postProcessing_Spring15_25ns_data_1.sh >& all_postProcessing_Spring15_25ns_data_1.log" &
 nohup krenew -t -K 10 -- bash -c "./all_postProcessing_Spring15_25ns_data_2.sh >& all_postProcessing_Spring15_25ns_data_2.log" &
-nohup krenew -t -K 10 -- bash -c "./all_postProcessing_Spring15_25ns_data_3.sh >& all_postProcessing_Spring15_25ns_data_3.log" &
-nohup krenew -t -K 10 -- bash -c "./all_postProcessing_Spring15_25ns_data_4.sh >& all_postProcessing_Spring15_25ns_data_4.log" &
 
 
 #nohup krenew -t -K 10 -- bash -c "./all_postProcessing_Spring15_25ns_signals_1.sh >& all_postProcessing_Spring15_25ns_signals_1.log" &

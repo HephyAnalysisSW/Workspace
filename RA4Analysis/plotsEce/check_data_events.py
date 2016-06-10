@@ -9,7 +9,7 @@ def allUnique(x):
   seen = list()
   return not any(i in seen or seen.append(i) for i in x)
 
-chunks = getChunks(SingleMuon_Run2015D_v4)
+chunks = getChunks(SingleElectron_Run2016B_PromptReco_v2)
 
 chain = getChain(chunks[0],treeName='tree')
 
