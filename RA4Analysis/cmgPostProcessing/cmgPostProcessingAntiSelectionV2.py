@@ -134,8 +134,9 @@ if options.skim=='inc':
 if sys.argv[0].count('ipython'):
   options.small=True
 
-###get evt Veto List  for filters####
-evt_veto_list = evt_veto_list()
+####get evt Veto List  for filters####
+#evt_veto_list = evt_veto_list()
+
 ###For PU reweight###
 #PU_File = ROOT.TFile("/data/easilar/tuples_from_Artur/JECv6recalibrateMET_2100pb/trig_skim/PUhistos/ratio_PU.root")
 #PU_histo = PU_File.Get("h_ratio")
@@ -212,11 +213,11 @@ for isample, sample in enumerate(allSamples):
     branchKeepStrings = branchKeepStrings_DATAMC + branchKeepStrings_MC
   
   readVariables = ['met_pt/F', 'met_phi/F']
-  newVariables = ['weight/F', 'muonDataSet/I', 'eleDataSet/I', 'veto_evt_list/I/1']
+  newVariables = ['weight/F', 'muonDataSet/I', 'eleDataSet/I']#, 'veto_evt_list/I/1']
   aliases = [ "met:met_pt", "metPhi:met_phi"]
 
   readVectors = [\
-    {'prefix':'LepGood', 'nMax':8, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I', 'relIso03/F','SPRING15_25ns_v1/I','eleCBID_SPRING15_25ns/I', 'eleCBID_SPRING15_25ns_ConvVetoDxyDz/I', 'tightId/I', 'miniRelIso/F','mass/F','sip3d/F','mediumMuonId/I', 'mvaIdPhys14/F','mvaIdSpring15/F','lostHits/I', 'convVeto/I', 'charge/I', 'hOverE/F']},
+    {'prefix':'LepGood', 'nMax':8, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I', 'relIso03/F','SPRING15_25ns_v1/I','eleCBID_SPRING15_25ns/I', 'eleCBID_SPRING15_25ns_ConvVetoDxyDz/I', 'tightId/I', 'miniRelIso/F','mass/F','sip3d/F','mediumMuonId/I', 'mvaIdSpring15/F','lostHits/I', 'convVeto/I', 'charge/I', 'hOverE/F']},
     {'prefix':'LepOther', 'nMax':8, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I', 'relIso03/F','eleCBID_SPRING15_25ns/I', 'eleCBID_SPRING15_25ns_ConvVetoDxyDz/I' ,'tightId/I', 'miniRelIso/F','mass/F','sip3d/F','mediumMuonId/I', 'lostHits/I', 'convVeto/I', 'charge/I', 'hOverE/F']},
     {'prefix':'Jet',  'nMax':100, 'vars':['pt/F', 'eta/F', 'phi/F', 'id/I','btagCSV/F', 'btagCMVA/F']},
   ]
@@ -301,8 +302,8 @@ for isample, sample in enumerate(allSamples):
         if sample['isData']:
           #vetoEvt = str(t.GetLeaf('run').GetValue())+":"+str(t.GetLeaf('lumi').GetValue())+":"+str(t.GetLeaf('evt').GetValue())+"\n"
           vetoEvt = str(int(t.GetLeaf('run').GetValue()))+":"+str(int(lumi_branch))+":"+str(int(evt_branch))+"\n"
-          if vetoEvt in evt_veto_list["ultimate"]:
-            s.veto_evt_list = False
+          #if vetoEvt in evt_veto_list["ultimate"]:
+          #  s.veto_evt_list = False
 
         genWeight = 1 if sample['isData'] else t.GetLeaf('genWeight').GetValue()
         xsectemp = 1 if sample['isData'] else t.GetLeaf('xsec').GetValue()

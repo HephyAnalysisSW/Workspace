@@ -458,7 +458,8 @@ for isample, sample in enumerate(allSamples):
         for v in newVars:
           v['branch'].Fill()
       print "Event loop end"
-      newFileName = sample['name']+'_'+chunk['name']+'_'+str(iSplit)+'.root'
+      newFileName = sample['name']+'_'+chunk['name'][0:100]+'_'+chunk['name'][-8:-1]+chunk['name'][-1]+'_'+str(iSplit)+'.root'
+      #newFileName = sample['name']+'_'+chunk['name']+'_'+str(iSplit)+'.root'
       filesForHadd.append(newFileName)
       if not options.small:
       #if options.small:

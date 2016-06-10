@@ -10,6 +10,7 @@ from Workspace.HEPHYPythonTools.helpers import *
 from Workspace.RA4Analysis.helpers import *
 from Workspace.RA4Analysis.signalRegions import *
 from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed import *
+from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2_postProcessed import *
 #from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed_2 import *
 
 from Workspace.RA4Analysis.cmgTuples_Data25ns_miniAODv2_postprocessed import *
@@ -28,8 +29,10 @@ lepSel = 'hard'
 
 
 totalWeight = 'weight*lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*TopPtWeight*0.94*puReweight_true_max4'
+totalWeight = 'weight'
 #25ns samples
-WJETS = {'name':'WJets', 'chain':getChain(WJetsHTToLNu_25ns,histname=''), 'color':color('WJets'),'weight':totalWeight, 'niceName':'W+Jets', 'cut':''}
+WJETS_15 = {'name':'WJets', 'chain':getChain(WJetsHTToLNu_25ns,histname=''), 'color':color('WJets')+1,'weight':totalWeight, 'niceName':'W+Jets S15', 'cut':''}
+WJETS_16 = {'name':'WJets', 'chain':getChain(WJetsHTToLNu,histname=''), 'color':color('WJets')-1,'weight':totalWeight, 'niceName':'W+Jets S16', 'cut':''}
 #WJETS_2 = {'name':'WJets', 'chain':getChain(WJetsHTToLNu_25ns_2,histname=''), 'color':ROOT.kOrange,'weight':totalWeight, 'niceName':'W+Jets fix', 'cut':''}
 
 
@@ -47,17 +50,30 @@ TTJets_combined_diLep =     {'name':'TTJets', 'chain':TTJets_combined['chain'], 
 TTJets_combined_had =       {'name':'TTJets', 'chain':TTJets_combined['chain'], 'color':color('TTJets')+2,'weight':totalWeight, 'niceName':'t#bar{t}+Jets 0l', 'cut':'(ngenLep+ngenTau)==0'}
 
 
-DY = {'name':'DY', 'chain':getChain(DY_25ns,histname=''), 'color':color('DY'),'weight':totalWeight, 'niceName':'Drell Yan', 'cut':''}
-singleTop = {'name':'singleTop', 'chain':getChain(singleTop_25ns,histname=''), 'color':color('singleTop'),'weight':totalWeight, 'niceName':'t/#bar{t}', 'cut':''}
-QCD = {'name':'QCD', 'chain':getChain(QCDHT_25ns,histname=''), 'color':color('QCD'),'weight':totalWeight, 'niceName':'QCD multijet', 'cut':''}
-TTVH = {'name':'TTVH', 'chain':getChain(TTV_25ns,histname=''), 'color':color('TTV'),'weight':totalWeight, 'niceName':'t#bar{t}W', 'cut':''}
+DY_15 = {'name':'DY', 'chain':getChain(DY_25ns,histname=''), 'color':color('DY'),'weight':totalWeight, 'niceName':'Drell Yan', 'cut':''}
+DY_16_madgraph = {'name':'DY', 'chain':getChain(DY_madgraph,histname=''), 'color':ROOT.kGreen+1,'weight':totalWeight, 'niceName':'Drell Yan MG', 'cut':''}
+DY_16_amc = {'name':'DY', 'chain':getChain(DY_amc,histname=''), 'color':ROOT.kYellow+1,'weight':totalWeight, 'niceName':'Drell Yan AMC', 'cut':''}
+
+singleTop_15 = {'name':'singleTop', 'chain':getChain(singleTop_25ns,histname=''), 'color':color('singleTop'),'weight':totalWeight, 'niceName':'t/#bar{t}', 'cut':''}
+singleTop_inc_16 = {'name':'singleTop', 'chain':getChain(singleTop_inclusive,histname=''), 'color':ROOT.kGreen+1,'weight':totalWeight, 'niceName':'t/#bar{t} S16 inc', 'cut':''}
+singleTop_lep_16 = {'name':'singleTop', 'chain':getChain(singleTop_lep,histname=''), 'color':ROOT.kOrange+1,'weight':totalWeight, 'niceName':'t/#bar{t} S16 lep', 'cut':''}
+
+QCD_15 = {'name':'QCD', 'chain':getChain(QCDHT_25ns,histname=''), 'color':color('QCD')+1,'weight':totalWeight, 'niceName':'QCD multijet S15', 'cut':''}
+QCD_16 = {'name':'QCD', 'chain':getChain(QCDHT,histname=''), 'color':color('QCD')-1,'weight':totalWeight, 'niceName':'QCD multijet S16', 'cut':''}
+
+diBoson = {'name':'QCD', 'chain':getChain(diBoson,histname=''), 'color':ROOT.kMagenta,'weight':totalWeight, 'niceName':'WW/WZ/ZZ', 'cut':''}
+
+TTV_15 = {'name':'TTVH', 'chain':getChain(TTV_25ns,histname=''), 'color':color('TTV')+2,'weight':totalWeight, 'niceName':'t#bar{t}W/Z S15', 'cut':''}
+TTV_16 = {'name':'TTVH', 'chain':getChain(TTV,histname=''), 'color':ROOT.kOrange,'weight':totalWeight, 'niceName':'t#bar{t}W/Z S16', 'cut':''}
+
 Rest = {'name':'Rest', 'chain':getChain([TTV_25ns,singleTop_25ns,DY_25ns],histname=''), 'color':color('TTV'),'weight':totalWeight, 'niceName':'other EWK', 'cut':''}
 Bkg = {'name':'Bkg', 'chain':getChain([TTJets_HTLO_25ns,WJetsHTToLNu_25ns,QCDHT_25ns,TTV_25ns,singleTop_25ns,DY_25ns],histname=''), 'color':color('TTV'),'weight':totalWeight, 'niceName':'total Bkg', 'cut':''}
 EWK = {'name':'Bkg', 'chain':getChain([TTJets_HTLO_25ns,WJetsHTToLNu_25ns,TTV_25ns,singleTop_25ns,DY_25ns],histname=''), 'color':color('TTV'),'weight':totalWeight, 'niceName':'total Bkg', 'cut':''}
 #diBoson = {'name':'diBoson', 'chain':getChain(diBosons_25ns,histname=''), 'color':ROOT.kMagenta,'weight':'weight', 'niceName':'diboson'}
-samples = [WJETS, TTJets_combined, Rest, QCD]#, diBoson]
-samples2 = [WJETS, TTJets_combined, DY, singleTop, TTVH, QCD]
-samplesTTcheck = [WJETS, TTJets_combined_singleLep, TTJets_combined_diLep, TTJets_combined_had, Rest, QCD]#, diBoson]
+
+samples         = [WJETS_15, TTJets_combined, Rest, QCD_15]#, diBoson]
+samples2        = [WJETS_15, TTJets_combined, DY_15, singleTop_15, TTV_15, QCD_15]
+samplesTTcheck  = [WJETS_15, TTJets_combined_singleLep, TTJets_combined_diLep, TTJets_combined_had, Rest, QCD_15]#, diBoson]
 
 #samplesComp = [WJETS, TTJETS, singleTop, DY, QCD]
 
@@ -180,7 +196,9 @@ name, allSRcut = nameAndCut((250,-1),(500,-1),(5,-1),btb=(0,-1),presel=signalpre
 allSRMC = {'name':name,'string':allSRcut,'niceName':'all SR'}
 allSRMCele = {'name':name,'string':allSRcut+'&&abs(leptonPdg)==11','niceName':'all SR'}
 allSRMCmu  = {'name':name,'string':allSRcut+'&&abs(leptonPdg)==13','niceName':'all SR'}
-
+preselMC = {'name':'preselMC','string':signalpresel,'niceName':'Preselection MC'}
+preselMCele = {'name':'preselMC','string':signalpresel+'&&abs(leptonPdg)==11','niceName':'Preselection MC'}
+preselMCmu = {'name':'preselMC','string':signalpresel+'&&abs(leptonPdg)==13','niceName':'Preselection MC'}
 
 name, allSRcut = nameAndCut((250,-1),(500,-1),(5,-1),btb=(0,-1),presel=preselSingleMu)
 allSR_singleMu = {'name':name,'string':allSRcut,'niceName':'all SR'}
@@ -536,7 +554,9 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
   legendNameLengthsSignal = []
   #if signals: legendNameLengthsSignal = [len(x['niceName']) for x in signals]
   legendNameLengths = legendNameLengthsSamples + legendNameLengthsSignal
-  legendWidth = 0.018*max(legendNameLengths)+0.03
+  #legendWidth = 0.018*max(legendNameLengths)+0.03
+  legendWidth = 0.02*max(legendNameLengths)+0.03
+
   if legend:
     height = 0.04*len(h)
     if data: height+=0.04

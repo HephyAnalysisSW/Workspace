@@ -126,6 +126,9 @@ def getChunks(sample,  maxN=-1):
   goodChunks  =[] 
   const = 'All Events' if sample['isData'] else 'Sum Weights'
   for i, s in enumerate(chunks):
+      #nameLen = len(s['name'])
+      #if nameLen>30: nameLen = 30
+      #s['shortName'] = s['name'][0:nameLen]
       if not sample.has_key("skimAnalyzerDir"):
         logfile = sample['dir']+'/'+s['name']+'/SkimReport.txt'
       else:
