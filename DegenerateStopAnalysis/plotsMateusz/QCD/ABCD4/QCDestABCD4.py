@@ -1,4 +1,4 @@
-#QCDestABCD3.py
+#QCDestABCD4.py
 import ROOT
 import os, sys
 import argparse
@@ -7,8 +7,8 @@ from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.degTools import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.cutsEle import *
-from Workspace.DegenerateStopAnalysis.toolsMateusz.getSamples_mAODv2_analysisHephy13TeV import getSamples
 from Workspace.DegenerateStopAnalysis.toolsMateusz.cmgTuplesPostProcessed_mAODv2_analysisHephy13TeV import cmgTuplesPostProcessed
+from Workspace.DegenerateStopAnalysis.toolsMateusz.getSamples_mAODv2_analysisHephy13TeV import getSamples
 #from Workspace.DegenerateStopAnalysis.toolsMateusz.cmgTuplesPostProcessed_mAODv2 import cmgTuplesPostProcessed
 #from Workspace.DegenerateStopAnalysis.toolsMateusz.getSamples_analysisHephy_13TeV import getSamples
 #from Workspace.DegenerateStopAnalysis.toolsMateusz.getSamples_PP_mAODv2_7412pass2_scan import getSamples
@@ -22,11 +22,11 @@ ROOT.gStyle.SetOptStat(0) #1111 #0 removes histogram statistics box #Name, Entri
 #Input options
 parser = argparse.ArgumentParser(description = "Input options")
 #parser.add_argument("--isolation", dest = "isolation",  help = "Isolation (hybIso03/hybIso04)", type = str, default = "hybIso03")
-parser.add_argument("--MET", dest = "MET",  help = "MET Cut", type = str, default = "200")
-parser.add_argument("--HT", dest = "HT",  help = "HT Cut", type = str, default = "200")
-parser.add_argument("--METloose", dest = "METloose",  help = "Loose MET Cut", type = str, default = "200")
+parser.add_argument("--MET", dest = "MET",  help = "MET Cut", type = str, default = "300")
+parser.add_argument("--HT", dest = "HT",  help = "HT Cut", type = str, default = "300")
+#parser.add_argument("--METloose", dest = "METloose",  help = "Loose MET Cut", type = str, default = "250")
 parser.add_argument("--eleWP", dest = "eleWP",  help = "Electron WP", type = str, default = "Veto")
-parser.add_argument("--removedCut", dest = "removedCut",  help = "Variable removed from electron ID", type = str, default = "None") #"sigmaEtaEta" "hOverE" "ooEmooP" "dEta" "dPhi" "d0" "dz" "MissingHits" "convVeto"
+#parser.add_argument("--removedCut", dest = "removedCut",  help = "Variable removed from electron ID", type = str, default = "None") #"sigmaEtaEta" "hOverE" "ooEmooP" "dEta" "dPhi" "d0" "dz" "MissingHits" "convVeto"
 parser.add_argument("--enriched", dest = "enriched",  help = "EM enriched QCD?", type = bool, default = False)
 parser.add_argument("--save", dest = "save",  help = "Toggle save", type = int, default = 1)
 parser.add_argument("-b", dest = "batch",  help = "Batch mode", action = "store_true", default = False)
@@ -40,18 +40,17 @@ if not len(sys.argv) > 1:
 #Arguments
 #isolation = args.isolation
 METcut = args.MET
-METloose = args.METloose
+#METloose = args.METloose
 HTcut = args.HT
 eleWP = args.eleWP
-removedCut = args.removedCut
+#removedCut = args.removedCut
 enriched = args.enriched
 save = args.save
 
 #Save
 if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
-   savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/QCD/ABCD3/estimation"
-   #if removedCut == "None": savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/QCD/ABCD3/estimation/" + eleWP + "/HT" + HTcut
-   #else: savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/QCD/ABCD3/estimation/" + eleWP + "_no_" + removedCut + "/HT" + HTcut
+   savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/QCD/ABCD4/estimation/"
+   #else: savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/QCD/ABCD4/estimation/" + eleWP + "_no_" + removedCut + "/MET" + METcut + "HT" + HTcut
    if not os.path.exists(savedir): os.makedirs(savedir)
 
 #Samples
@@ -85,12 +84,9 @@ for s in selectedSamples:
       print "!!! Sample " + sample + " unavailable."
       sys.exit(0)
    
-suffix = "_HT" + HTcut + "_MET" + METcut + "_METloose" + METloose
+suffix = "_" + eleWP + "_HT" + HTcut + "_MET" + METcut #+ "_METloose" + METloose
 if enriched == True: suffix += "_EMenriched"
 
-if removedCut == "None": suffix += "_" + eleWP +"_manual"
-else: suffix += "_" + eleWP +"_no_" + removedCut
-   
 QCDcuts = {}
  
 #if collection == "LepGood": otherCollection = "LepOther"
@@ -102,42 +98,58 @@ print "Using LepAll collection."
 print makeLine()
 
 #Gets all cuts (electron, SR, CR) for given electron ID
-if removedCut == "None": eleIDsel = electronIDs(ID = "standard", removedCut = "None", iso = False, collection = "LepAll")
-else: eleIDsel = electronIDs(ID = "nMinus1", removedCut = removedCut, iso = False, collection = "LepAll")
-
-#eleIDsel = electronIDs(ID = "nMinus1", removedCut = "d0", iso = False, collection = "LepAll")
+eleIDsel = electronIDs(ID = "nMinus1", removedCut = "sigmaEtaEta", iso = False, collection = "LepAll")
 
 ##for s in samples.massScanList(): samples[s].weight = "weight" #removes ISR reweighting from official mass scan signal samples
 #for s in samples: samples[s].tree.SetAlias("eleSel", allCuts[WP]['eleSel'])
 
+#Geometrical cuts
 etaAcc = 2.1
-eleSel = "abs(LepAll_pdgId) == 11 && abs(LepAll_eta) < " + str(etaAcc) + " && " + eleIDsel[eleWP]
-#eleSel_other = "abs(" + otherCollection + "_pdgId) == 11 && abs(" + otherCollection + "_eta) < " + str(etaAcc) + " && " + eleIDsel_other['Veto']
+ebSplit = 0.8 #barrel is split into two regions
+ebeeSplit = 1.479 #division between barrel and endcap
 
-#Cuts
-#dxyCut = "abs(LepAll_dxy) < 0.02"
-#looseDxyCut = "abs(LepAll_dxy) < 0.05"
+eleSel = "abs(LepAll_pdgId) == 11 && abs(LepAll_eta) < " + str(etaAcc) + " && " + eleIDsel[eleWP]
+
+geoSel= {\
+   'EB':"(abs(LepAll_eta) <= " + str(ebeeSplit) + ")", 
+   'EE':"(abs(LepAll_eta) > " + str(ebeeSplit) + " && abs(LepAll_eta) < " + str(etaAcc) + ")"}
+
+sigmaEtaEtaCuts = {\
+   'Veto':{'EB':0.0114, 'EE':0.0352},
+   'Loose':{'EB':0.0103, 'EE':0.0301},
+   'Medium':{'EB':0.0101, 'EE':0.0283},
+   'Tight':{'EB':0.0101, 'EE':0.0279}}
+
+sigmaEtaEtaCut = "((" + geoSel['EB'] + " && LepAll_sigmaIEtaIEta <" + str(sigmaEtaEtaCuts[eleWP]['EB']) + ") || (" + geoSel['EE'] + "&& LepAll_sigmaIEtaIEta <" + str(sigmaEtaEtaCuts[eleWP]['EE']) + "))"
+antiSigmaEtaEtaCut = "((" + geoSel['EB'] + " && LepAll_sigmaIEtaIEta >" + str(sigmaEtaEtaCuts[eleWP]['EB']) + ") || (" + geoSel['EE'] + "&& LepAll_sigmaIEtaIEta >" + str(sigmaEtaEtaCuts[eleWP]['EE']) + "))"
 
 hybIsoCut = "(LepAll_relIso03*min(LepAll_pt, 25)) < 5"
 antiHybIsoCut = "(LepAll_relIso03*min(LepAll_pt, 25)) > 5"
 #hybIsoCut = "((LepAll_absIso03 < 5) || LepAll_relIso03 < 0.2))"
 #antiHybIsoCut = "((LepAll_absIso03 > 5) && (LepAll_relIso03 > 0.2))"
-   
-elePt = {}
-elePt['I'] = "Max$(LepAll_pt*(" + eleSel + "&&" + hybIsoCut + "))"
-elePt['anti-I'] = "Max$(LepAll_pt*(" + eleSel + "&&" + antiHybIsoCut + "))"
 
+#Redefining electron pT in terms of selection
+elePt = {}
+elePt['SR'] = "Max$(LepAll_pt*(" + combineCutsList([eleSel, hybIsoCut, sigmaEtaEtaCut]) + "))"
+elePt['IS'] = "Max$(LepAll_pt*(" + combineCutsList([eleSel, antiHybIsoCut, antiSigmaEtaEtaCut]) + "))"
+elePt['I_S'] = "Max$(LepAll_pt*(" + combineCutsList([eleSel, antiHybIsoCut, sigmaEtaEtaCut]) + "))"
+elePt['S_I'] = "Max$(LepAll_pt*(" + combineCutsList([eleSel, hybIsoCut, antiSigmaEtaEtaCut]) + "))"
+
+#Redefining mT in terms of selection
 eleMt = {}
-eleMt['I'] = "Max$(LepAll_mt*(" + eleSel + "&&" + hybIsoCut + "))"
-eleMt['anti-I'] = "Max$(LepAll_mt*(" + eleSel + "&&" + antiHybIsoCut + "))"
+eleMt['SR'] = "Max$(LepAll_mt*(" + combineCutsList([eleSel, hybIsoCut, sigmaEtaEtaCut]) + "))"
+eleMt['IS'] = "Max$(LepAll_mt*(" + combineCutsList([eleSel, antiHybIsoCut, antiSigmaEtaEtaCut]) + "))"
+eleMt['I_S'] = "Max$(LepAll_mt*(" + combineCutsList([eleSel, antiHybIsoCut, sigmaEtaEtaCut]) + "))"
+eleMt['S_I'] = "Max$(LepAll_mt*(" + combineCutsList([eleSel, hybIsoCut, antiSigmaEtaEtaCut]) + "))"
 
 presel = CutClass("presel_SR", [
-   ["METloose","met >" + METloose], #looser MET for B & D regions
+   #["METloose","met >" + METloose], #looser MET for B & D regions
+   ["MET","met >" + METcut],
    ["HT","ht_basJet >" + HTcut],
    ["ISR110", "nIsrJet >= 1"],
    ["No3rdJet60","nVetoJet <= 2"],
    ["BVeto","(nBSoftJet == 0 && nBHardJet == 0)"],
-   ["eleSel", "Sum$(" + eleSel + ") == 1"],
+   #["eleSel", "Sum$(" + eleSel + ") == 1"],
    #["otherCollection", "Sum$(" + eleSel_other + ") == 0"],
    #["elePt<30", elePt + " < 30"],
    #["anti-AntiQCD", "vetoJet_dPhi_j1j2 > 2.5"],
@@ -145,15 +157,18 @@ presel = CutClass("presel_SR", [
    #["anti-dxy", "Max$(abs(" + lep + "_dxy*(" + eleSel + "&&" + antiHybIsoCut + "))) > 0.02"],
    ], baseCut = None) #allCuts['None']['presel'])
 
+
+abcd = {'SR':'SR', 'IS_A':'IS', 'SA_I':'S_I', 'IA_S':'I_S', 'ISA':'IS'}
+
 SRs ={}
 
-for sel in ['I', 'anti-I']:
+for sel in abcd.values(): 
    SRs[sel] = {\
       'SR1':["SR1", elePt[sel] + " < 30"],
       'SR1a':["SR1a", combineCuts(eleMt[sel] + " < 60", elePt[sel] + " < 30")],
       'SR1b':["SR1b", combineCuts(btw(eleMt[sel], 60, 88), elePt[sel] + " < 30")],
       'SR1c':["SR1c", combineCuts(eleMt[sel] + " > 88", elePt[sel] + " < 30")],
-
+      
       'SRL1a':["SRL1a", combineCuts(eleMt[sel] + " < 60", btw(elePt[sel], 5, 12))],
       'SRH1a':["SRH1a", combineCuts(eleMt[sel] + " < 60", btw(elePt[sel], 12, 20))],
       'SRV1a':["SRV1a", combineCuts(eleMt[sel] + " < 60", btw(elePt[sel], 20, 30))],
@@ -174,80 +189,74 @@ regions = ['SR1', 'SR1a', 'SR1b', 'SR1c', 'SRL1a', 'SRH1a', 'SRV1a', 'SRL1b', 'S
 for reg in regions:
    QCD[reg] = {}
  
-   #SR 
    QCD[reg]['SR'] = CutClass("QCD_SR_" + reg, [
-      #["elePt<30", elePt['ID'] + " < 30"],
-      SRs['I'][reg],
-      ["MET", "met >" + METcut], #applied
-      ["I", "Sum$(" + eleSel + "&&" + hybIsoCut + ") == 1"],
+      #["elePt<30", elePt['SR'] + " < 30"],
+      SRs['SR'][reg],
       ["A", "vetoJet_dPhi_j1j2 < 2.5"],
+      ["IS", "Sum$(" + eleSel + "&&" + hybIsoCut + "&&" + sigmaEtaEtaCut + ") == 1"],
       ], baseCut = presel)
-
-   #nA
-   QCD[reg]['IM_A'] = CutClass("QCD_IM_A_" + reg, [
-      #["elePt<30", elePt['ID'] + " < 30"],
-      SRs['anti-I'][reg], 
-      ["anti-I", "Sum$(" + eleSel + "&&" + antiHybIsoCut + ") == 1"], #inverted
+   
+   QCD[reg]['IS_A'] = CutClass("QCD_IS_A_" + reg, [
+      #["elePt<30", elePt['IS'] + " < 30"],
+      SRs['IS'][reg],
       ["A", "vetoJet_dPhi_j1j2 < 2.5"], #applied
+      ["anti-IS", "Sum$(" + eleSel + "&&" + antiHybIsoCut + "&&" + antiSigmaEtaEtaCut + ") == 1"], #inverted, inverted
       ], baseCut = presel)
    
-   #nI
-   QCD[reg]['A_IM'] = CutClass("QCD_A_IM_" + reg, [
-      #["elePt<30", elePt['D_I'] + " < 30"],
-      SRs['I'][reg], 
-      ["MET", "met >" + METcut], #applied
-      ["I", "Sum$(" + eleSel + "&&" + hybIsoCut + ") == 1"], #applied
+   QCD[reg]['SA_I'] = CutClass("QCD_SA_I_" + reg, [
+      #["elePt<30", elePt['S_I'] + " < 30"],
+      SRs['S_I'][reg],
       ["anti-A", "vetoJet_dPhi_j1j2 > 2.5"], #inverted
+      ["I+anti-S", "Sum$(" + eleSel + "&&" + hybIsoCut + "&&" + antiSigmaEtaEtaCut + ") == 1"], #applied, inverted
       ], baseCut = presel)
    
-   #nIDA
-   QCD[reg]['MIA'] = CutClass("QCD_MIA_" + reg, [
-      #["elePt<30", elePt['ID'] + " < 30"],
-      SRs['anti-I'][reg], 
-      ["anti-I", "Sum$(" + eleSel + "&&" + antiHybIsoCut + ") == 1"], #inverted
+   QCD[reg]['IA_S'] = CutClass("QCD_IA_S_" + reg, [
+      #["elePt<30", elePt['I_S'] + " < 30"],
+      SRs['I_S'][reg],
       ["anti-A", "vetoJet_dPhi_j1j2 > 2.5"], #inverted
-      ], baseCut = presel) 
-
-abcd = ['SR', 'IM_A', 'A_IM', 'MIA']
+      ["anti-I+S", "Sum$(" + eleSel + "&&" + antiHybIsoCut + "&&" + sigmaEtaEtaCut + ") == 1"], #inverted, applied
+      ], baseCut = presel)
+   
+   QCD[reg]['ISA'] = CutClass("QCD_ISA_" + reg, [
+      #["elePt<30", elePt['IS'] + " < 30"],
+      SRs['IS'][reg],
+      ["anti-A", "vetoJet_dPhi_j1j2 > 2.5"], #inverted
+      ["anti-IS", "Sum$(" + eleSel + "&&" + antiHybIsoCut + "&&" + antiSigmaEtaEtaCut + ") == 1"], #inverted, inverted
+      ], baseCut = presel)
 
 yields = {}
 QCDexp = {}
    
 if not os.path.isfile(savedir + "/QCDyields" + suffix + ".txt"):
    outfile = open(savedir + "/QCDyields" + suffix + ".txt", "w")
-   outfile.write(eleWP + " Electron ID and (MET,HT) Preselection of (" + HTcut + "," + METcut + ")\nSR           IM_A                        A_IM                     MIA                       QCD                     MC                     Ratio\n")
+   outfile.write(eleWP + " Electron ID and (MET,HT) Preselection of (" + HTcut + "," + METcut + ")\nSR           SA_I                 IA_S                    IS_A                     ISA                       QCD                     MC                     Ratio\n")
 
 for reg in regions:
    yields[reg] = {}
-  
    for sel in abcd:
-      yields[reg][sel] = Yields(samples, [qcd], QCD[reg][sel], cutOpt = "combinedList", weight = "weight", pklOpt = False, tableName = reg + "_" + sel, nDigits = 2, err = True, verbose = True, nSpaces = 10)
-   
-   if yields[reg]['MIA'].yieldDictFull[qcd]['QCD_MIA_' + reg].val: 
-      QCDexp[reg] = (yields[reg]['IM_A'].yieldDictFull[qcd]['QCD_IM_A_' + reg] * yields[reg]['A_IM'].yieldDictFull[qcd]['QCD_A_IM_' + reg]/\
-      yields[reg]['MIA'].yieldDictFull[qcd]['QCD_MIA_' + reg])
-      
-      #QCDerr[reg] = QCDexp * sqrt(\
-      #         (totalErr['nAerr']/totalYlds['nA'])*(totalErr['nAerr']/totalYlds['nA']) +\
-      #         (totalErr['nIerr']/totalYlds['nI'])*(totalErr['nIerr']/totalYlds['nI']) +\
-      #         (totalErr['nDerr']/totalYlds['nD'])*(totalErr['nDerr']/totalYlds['nD']) +\
-      #         2*(totalErr['nIDAerr']/totalYlds['nIDA'])*(totalErr['nIDAerr']/totalYlds['nIDA']))
-  
+      yields[reg][sel] = Yields(samples, ['qcd'], QCD[reg][sel], cutOpt = "combinedList", weight = "weight", pklOpt = False, tableName = reg + "_" + sel, nDigits = 2, err = True, verbose = True, nSpaces = 10)
+
+   if yields[reg]['ISA'].yieldDictFull['qcd']['QCD_ISA_' + reg].val:
+      QCDexp[reg] = (yields[reg]['IS_A'].yieldDictFull['qcd']['QCD_IS_A_' + reg] * yields[reg]['SA_I'].yieldDictFull['qcd']['QCD_SA_I_' + reg] * \
+      yields[reg]['IA_S'].yieldDictFull['qcd']['QCD_IA_S_' + reg])/\
+      (yields[reg]['ISA'].yieldDictFull['qcd']['QCD_ISA_' + reg] * yields[reg]['ISA'].yieldDictFull['qcd']['QCD_ISA_' + reg])
+
       print makeLine()
-      print "nA_IM = ", yields[reg]['A_IM'].yieldDictFull[qcd]['QCD_A_IM_' + reg], " | nIM_A = ", yields[reg]['IM_A'].yieldDictFull[qcd]['QCD_IM_A_' + reg],\
-            " | nMIA = ", yields[reg]['MIA'].yieldDictFull[qcd]['QCD_MIA_' + reg]
+      print "nSA_I = ", yields[reg]['SA_I'].yieldDictFull['qcd']['QCD_SA_I_' + reg], " | nIA_S = ", yields[reg]['IA_S'].yieldDictFull['qcd']['QCD_IA_S_' + reg], " | ",\
+            "nIS_A = ", yields[reg]['IS_A'].yieldDictFull['qcd']['QCD_IS_A_' + reg], " | nISA = ", yields[reg]['ISA'].yieldDictFull['qcd']['QCD_ISA_' + reg]
       print "QCD Estimation in ", reg, ": ", QCDexp[reg]
-      print "QCD MC yield in ", reg, ": ", yields[reg]['SR'].yieldDictFull[qcd]['QCD_SR_' + reg]
+      print "QCD MC yield in ", reg, ": ", yields[reg]['SR'].yieldDictFull['qcd']['QCD_SR_' + reg]
       print makeLine()
-      
+
       with open(savedir + "/QCDyields" + suffix + ".txt", "a") as outfile:
-            outfile.write(reg + "       " +\
-            str(yields[reg]['IM_A'].yieldDictFull[qcd]['QCD_IM_A_' + reg]) + "             " +\
-            str(yields[reg]['A_IM'].yieldDictFull[qcd]['QCD_A_IM_' + reg]) + "             " +\
-            str(yields[reg]['MIA'].yieldDictFull[qcd]['QCD_MIA_' + reg]) + "             " +\
-            str(QCDexp[reg].round(2)) + "             " +\
-            str(yields[reg]['SR'].yieldDictFull[qcd]['QCD_SR_' + reg]) + "             ")
-            if yields[reg]['SR'].yieldDictFull[qcd]['QCD_SR_' + reg].val:
-               outfile.write(str((QCDexp[reg]/yields[reg]['SR'].yieldDictFull[qcd]['QCD_SR_' + reg]).round(2))  + "\n")
-            else:
-               outfile.write("\n")
+         outfile.write(reg + "     " +\
+         str(yields[reg]['SA_I'].yieldDictFull['qcd']['QCD_SA_I_' + reg].round(2)) + "             " +\
+         str(yields[reg]['IA_S'].yieldDictFull['qcd']['QCD_IA_S_' + reg].round(2)) + "             " +\
+         str(yields[reg]['IS_A'].yieldDictFull['qcd']['QCD_IS_A_' + reg].round(2)) + "             " +\
+         str(yields[reg]['ISA'].yieldDictFull['qcd']['QCD_ISA_' + reg].round(2)) + "             " +\
+         str(QCDexp[reg].round(2)) + "             " +\
+         str(yields[reg]['SR'].yieldDictFull['qcd']['QCD_SR_' + reg].round(2)) + "             ")
+         if yields[reg]['SR'].yieldDictFull['qcd']['QCD_SR_' + reg].val:
+            outfile.write(str((QCDexp[reg]/yields[reg]['SR'].yieldDictFull['qcd']['QCD_SR_' + reg]).round(2)) + "\n")
+         else:
+            outfile.write("\n")

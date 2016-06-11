@@ -220,10 +220,22 @@ def getSamples( wtau  = False, sampleList=['w','tt','z','sig'],
         sampleDict2[samp] = Sample(**sampleDict[samp])
     samples = Samples(**sampleDict2)
 
-    print makeLine()
-    print "Reweighting to target luminosity of " + str(lumi_target) + " with factor: " + str(lumi_target/lumi_mc)
-    print makeLine()
-    samples.addWeight(lumi_target/lumi_mc) # scale to the target luminosity
+    if "dblind" in samples: 
+      print makeLine()
+      print "Reweighting MC samples to blinded data luminosity of " + str(lumi_data_blinded) + " with factor: " + str(lumi_data_blinded/lumi_mc)
+      print makeLine()
+      samples.addWeight(lumi_data_blinded/lumi_mc) # scale to the target luminosity
+    elif "d" in samples: 
+      print makeLine()
+      print "Reweighting MC samples to unblinded data luminosity of " + str(lumi_data_unblinded) + " with factor: " + str(lumi_data_unblinded/lumi_mc)
+      print makeLine()
+      samples.addWeight(lumi_data_unblinded/lumi_mc) # scale to the target luminosity
+    else: 
+      print makeLine()
+      print "Reweighting to target luminosity of " + str(lumi_target) + " with factor: " + str(lumi_target/lumi_mc)
+      print makeLine()
+      samples.addWeight(lumi_target/lumi_mc) # scale to the target luminosity
+    
 
     #samples.addLumiWeight( lumi_target = lumi_target, lumi_base = None , sampleList=[])         ## scale to the target luminosity
     #samples.addWeight( weights.isrWeightFunc(9.5e-5)  , sampleList=samples.privSigList() + samples.massScanList() )   ## apply isrWeight to the massScan
