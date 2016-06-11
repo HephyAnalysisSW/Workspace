@@ -165,8 +165,8 @@ def electronIDs(ID = "standard", removedCut = "None", iso = "", collection = "Le
       
       geoSel= {'EB':"(abs(" + collection + "_eta) <= " + str(ebeeSplit) + ")", 'EE':"(abs(" + collection + "_eta) > " + str(ebeeSplit) + " && abs(" + collection + "_eta) < " + str(etaAcc) + ")"}
       
-      EBsel = {iWP: combineSel(geoSel['EB'], combineSelList([manualSels[iWP][var]['EB'] for var in variables])) for iWP in WPs}
-      EEsel = {iWP: combineSel(geoSel['EE'], combineSelList([manualSels[iWP][var]['EE'] for var in variables])) for iWP in WPs}
+      EBsel = {iWP: combineCuts(geoSel['EB'], combineCutsList([manualSels[iWP][var]['EB'] for var in variables])) for iWP in WPs}
+      EEsel = {iWP: combineCuts(geoSel['EE'], combineCutsList([manualSels[iWP][var]['EE'] for var in variables])) for iWP in WPs}
      
       if ID == "manual":
          manualSel = {iWP: "((" + EBsel[iWP] + ") || (" + EEsel[iWP] + "))" for iWP in WPs}
@@ -181,8 +181,8 @@ def electronIDs(ID = "standard", removedCut = "None", iso = "", collection = "Le
 
          #nMinus1 ID selection
          variables.remove(removedCut)
-         EBsel = {iWP: combineSel("abs(" + collection + "_eta) <= " + str(ebeeSplit), combineSelList([manualSels[iWP][var]['EB'] for var in variables])) for iWP in WPs}
-         EEsel = {iWP: combineSel("abs(" + collection + "_eta) > " + str(ebeeSplit) + " && abs(" + collection + "_eta) < " + str(etaAcc), combineSelList([manualSels[iWP][var]['EE'] for var in variables])) for iWP in WPs}
+         EBsel = {iWP: combineCuts("abs(" + collection + "_eta) <= " + str(ebeeSplit), combineCutsList([manualSels[iWP][var]['EB'] for var in variables])) for iWP in WPs}
+         EEsel = {iWP: combineCuts("abs(" + collection + "_eta) > " + str(ebeeSplit) + " && abs(" + collection + "_eta) < " + str(etaAcc), combineCutsList([manualSels[iWP][var]['EE'] for var in variables])) for iWP in WPs}
          
          nMinus1Sel = {iWP: "((" + EBsel[iWP] + ") || (" + EEsel[iWP] + "))" for iWP in WPs}
          nMinus1Sel['None'] = "(1)"
@@ -191,9 +191,9 @@ def electronIDs(ID = "standard", removedCut = "None", iso = "", collection = "Le
   
    #adding pt cut   
    for iWP in eleIDsel:
-      eleIDsel[iWP] = combineSel(eleIDsel[iWP], collection + "_pt > 5")
+      eleIDsel[iWP] = combineCuts(eleIDsel[iWP], collection + "_pt > 5")
          
-      if iso: eleIDsel[iWP] = combineSel(eleIDsel[iWP], hybIso)
+      if iso: eleIDsel[iWP] = combineCuts(eleIDsel[iWP], hybIso)
     
    return eleIDsel
 
@@ -355,8 +355,8 @@ def electronIDsIndex(ID = "standard", removedCut = "None", iso = "", collection 
       
       geoSel= {'EB':"(abs(" + collection + "_eta[" + ind + "]) <= " + str(ebeeSplit) + ")", 'EE':"(abs(" + collection + "_eta[" + ind + "]) > " + str(ebeeSplit) + " && abs(" + collection + "_eta[" + ind + "]) < " + str(etaAcc) + ")"}
       
-      EBsel = {iWP: combineSel(geoSel['EB'], combineSelList([manualSels[iWP][var]['EB'] for var in variables])) for iWP in WPs}
-      EEsel = {iWP: combineSel(geoSel['EE'], combineSelList([manualSels[iWP][var]['EE'] for var in variables])) for iWP in WPs}
+      EBsel = {iWP: combineCuts(geoSel['EB'], combineCutsList([manualSels[iWP][var]['EB'] for var in variables])) for iWP in WPs}
+      EEsel = {iWP: combineCuts(geoSel['EE'], combineCutsList([manualSels[iWP][var]['EE'] for var in variables])) for iWP in WPs}
      
       if ID == "manual":
          manualSel = {iWP: "((" + EBsel[iWP] + ") || (" + EEsel[iWP] + "))" for iWP in WPs}
@@ -371,8 +371,8 @@ def electronIDsIndex(ID = "standard", removedCut = "None", iso = "", collection 
 
          #nMinus1 ID selection
          variables.remove(removedCut)
-         EBsel = {iWP: combineSel("abs(" + collection + "_eta[" + ind + "]) <= " + str(ebeeSplit), combineSelList([manualSels[iWP][var]['EB'] for var in variables])) for iWP in WPs}
-         EEsel = {iWP: combineSel("abs(" + collection + "_eta[" + ind + "]) > " + str(ebeeSplit) + " && abs(" + collection + "_eta[" + ind + "]) < " + str(etaAcc), combineSelList([manualSels[iWP][var]['EE'] for var in variables])) for iWP in WPs}
+         EBsel = {iWP: combineCuts("abs(" + collection + "_eta[" + ind + "]) <= " + str(ebeeSplit), combineCutsList([manualSels[iWP][var]['EB'] for var in variables])) for iWP in WPs}
+         EEsel = {iWP: combineCuts("abs(" + collection + "_eta[" + ind + "]) > " + str(ebeeSplit) + " && abs(" + collection + "_eta[" + ind + "]) < " + str(etaAcc), combineCutsList([manualSels[iWP][var]['EE'] for var in variables])) for iWP in WPs}
          
          nMinus1Sel = {iWP: "((" + EBsel[iWP] + ") || (" + EEsel[iWP] + "))" for iWP in WPs}
          nMinus1Sel['None'] = "(1)"
@@ -381,9 +381,9 @@ def electronIDsIndex(ID = "standard", removedCut = "None", iso = "", collection 
   
    #adding pt cut   
    for iWP in eleIDsel:
-      eleIDsel[iWP] = combineSel(eleIDsel[iWP], collection + "_pt[" + ind + "] > 5")
+      eleIDsel[iWP] = combineCuts(eleIDsel[iWP], collection + "_pt[" + ind + "] > 5")
          
-      if iso: eleIDsel[iWP] = combineSel(eleIDsel[iWP], hybIso)
+      if iso: eleIDsel[iWP] = combineCuts(eleIDsel[iWP], hybIso)
     
    return eleIDsel
 

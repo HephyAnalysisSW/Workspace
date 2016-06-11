@@ -14,6 +14,7 @@ import pprint as pp
 from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYieldFromChain, getChunks
 from Workspace.DegenerateStopAnalysis.navidTools.getRatioPlot import *
 from Workspace.DegenerateStopAnalysis.navidTools.FOM import *
+from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
 
 cmsbase = os.getenv("CMSSW_BASE")
 
@@ -733,26 +734,6 @@ class Plots(dict):
 ##########################################                    ###############################################
 #############################################################################################################
 
-less = lambda var,val: "(%s < %s)"%(var,val)
-more = lambda var,val: "(%s > %s)"%(var,val)
-btw = lambda var,minVal,maxVal: "(%s > %s && %s < %s)"%(var, min(minVal,maxVal), var, max(minVal,maxVal))
-
-deltaPhiStr = lambda x,y : "abs( atan2(sin({x}-{y}), cos({x}-{y}) ) )".format(x=x,y=y)
-
-deltaRStr = lambda eta1,eta2,phi1,phi2: "sqrt( ({eta1}-{eta2})**2 - ({dphi})**2  )".format(eta1=eta1,eta2=eta2, dphi=deltaPhiStr(phi1,phi2) ) 
-
-def btw(var,minVal,maxVal, rangeLimit=[0,0] ):
-    greaterOpp = ">"
-    lessOpp = "<"
-    vals = [minVal, maxVal]
-    minVal = min(vals)
-    maxVal = max(vals)
-    if rangeLimit[0]:
-        greaterOpp += "="
-    if rangeLimit[1]:
-        lessOpp += "="
-    return "(%s)"%" ".join(["%s"%x for x in [var,greaterOpp,minVal, "&&", var, lessOpp, maxVal ]])
-
 def makeCutFlowList(cutList,baseCut=''):
   cutFlowList=[]
   for cutName,cutString in cutList:
@@ -761,12 +742,6 @@ def makeCutFlowList(cutList,baseCut=''):
     cutFlowString = joinCutStrings( cutsToJoin   )
     cutFlowList.append( [cutName, cutFlowString ])
   return cutFlowList
-
-def combineCutList(cutList):
-  return joinCutStrings([x[1] for x in cutList if x[1]!="(1)"])
-
-def joinCutStrings(cutStringList):
-  return "(" + " && ".join([ "("+c +")" for c in cutStringList])    +")"
 
 class CutClass():
     """ CutClass(Name, cutList = [

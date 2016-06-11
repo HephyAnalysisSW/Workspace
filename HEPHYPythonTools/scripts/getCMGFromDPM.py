@@ -87,7 +87,7 @@ def suggestTargetDir(relpath):
   if len(s)>0:
     if '_' in s[-1] and False not in [x.isdigit() for x in s[-1].split('_')]: #last but one path is /data_time/ -> remove it
       s=s[:-1]
-  return '_'.join(s)
+  return '/'.join(s)
 
 def walkPath(relpath):
   res=ls(relpath)

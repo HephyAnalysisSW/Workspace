@@ -129,9 +129,9 @@ def QCDest(collection = "LepGood", samples = samples, save = save, savedir = sav
    eleMt['I_D'] = "Max$(" + collection + "_mt*(" + eleSel + "&&" + antiHybIsoCut + "&&" + dxyCut + "))"
    eleMt['D_I'] = "Max$(" + collection + "_mt*(" + eleSel + "&&" + hybIsoCut + "&&" + antiDxyCut + "))"
    
-   presel = CutClass("presel_loose", [
-      ["MET300","met > 300"],
-      ["HT300","ht_basJet > 300"],
+   presel = CutClass("presel_SR", [
+      ["MET200","met > 200"],
+      ["HT200","ht_basJet > 200"],
       ["ISR110", "nIsrJet >= 1"],
       ["No3rdJet60","nVetoJet <= 2"],
       ["BVeto","(nBSoftJet == 0 && nBHardJet == 0)"],
@@ -145,24 +145,24 @@ def QCDest(collection = "LepGood", samples = samples, save = save, savedir = sav
    
    SRs ={}
    
-   for reg in ['SR', 'ID', 'I_D', 'D_I']:
-      SRs[reg] = {\
-         'SR1':["SR1","1"],
-         'SR1a':["SR1a", eleMt[reg] + " < 60"],
-         'SR1b':["SR1b", btw(eleMt[reg], 60, 88)],
-         'SR1c':["SR1c", eleMt[reg] + " > 88"],
+   for sel in ['SR', 'ID', 'I_D', 'D_I']:
+      SRs[sel] = {\
+         'SR1':["SR1", elePt[sel] + " < 30"],
+         'SR1a':["SR1a", combineCuts(eleMt[sel] + " < 60", elePt[sel] + " < 30")],
+         'SR1b':["SR1b", combineCuts(btw(eleMt[sel], 60, 88), elePt[sel] + " < 30")],
+         'SR1c':["SR1c", combineCuts(eleMt[sel] + " > 88", elePt[sel] + " < 30")],
 
-         'SRL1a':["SRL1a", joinCutStrings([eleMt[reg] + " < 60", btw(elePt[reg], 5, 12)])],
-         'SRH1a':["SRH1a", joinCutStrings([eleMt[reg] + " < 60", btw(elePt[reg], 12, 20)])],
-         'SRV1a':["SRV1a", joinCutStrings([eleMt[reg] + " < 60", btw(elePt[reg], 20, 30)])],
+         'SRL1a':["SRL1a", combineCuts(eleMt[sel] + " < 60", btw(elePt[sel], 5, 12))],
+         'SRH1a':["SRH1a", combineCuts(eleMt[sel] + " < 60", btw(elePt[sel], 12, 20))],
+         'SRV1a':["SRV1a", combineCuts(eleMt[sel] + " < 60", btw(elePt[sel], 20, 30))],
          
-         'SRL1b':["SRL1b", joinCutStrings([btw(eleMt[reg], 60, 88), btw(elePt[reg], 5, 12)])],
-         'SRH1b':["SRH1b", joinCutStrings([btw(eleMt[reg], 60, 88), btw(elePt[reg], 12, 20)])],
-         'SRV1b':["SRV1b", joinCutStrings([btw(eleMt[reg], 60, 88), btw(elePt[reg], 20, 30)])],
+         'SRL1b':["SRL1b", combineCuts(btw(eleMt[sel], 60, 88), btw(elePt[sel], 5, 12))],
+         'SRH1b':["SRH1b", combineCuts(btw(eleMt[sel], 60, 88), btw(elePt[sel], 12, 20))],
+         'SRV1b':["SRV1b", combineCuts(btw(eleMt[sel], 60, 88), btw(elePt[sel], 20, 30))],
          
-         'SRL1c':["SRL1c", joinCutStrings([eleMt[reg] + " > 88", btw(elePt[reg], 5, 12)])],
-         'SRH1c':["SRH1c", joinCutStrings([eleMt[reg] + " > 88", btw(elePt[reg], 12, 20)])],
-         'SRV1c':["SRV1c", joinCutStrings([eleMt[reg] + " > 88", btw(elePt[reg], 20, 30)])]}
+         'SRL1c':["SRL1c", combineCuts(eleMt[sel] + " > 88", btw(elePt[sel], 5, 12))],
+         'SRH1c':["SRH1c", combineCuts(eleMt[sel] + " > 88", btw(elePt[sel], 12, 20))],
+         'SRV1c':["SRV1c", combineCuts(eleMt[sel] + " > 88", btw(elePt[sel], 20, 30))]}
    
    QCD = {}
 
@@ -239,12 +239,6 @@ for reg in regions:
       yields[reg]['IA_D'].yieldDictFull['qcd'][reg + '_IA_D'])/\
       (yields[reg]['IDA'].yieldDictFull['qcd'][reg + '_IDA'] * yields[reg]['IDA'].yieldDictFull['qcd'][reg + '_IDA'])
       
-      #QCDerr[reg] = QCDexp * sqrt(\
-      #         (totalErr['nAerr']/totalYlds['nA'])*(totalErr['nAerr']/totalYlds['nA']) +\
-      #         (totalErr['nIerr']/totalYlds['nI'])*(totalErr['nIerr']/totalYlds['nI']) +\
-      #         (totalErr['nDerr']/totalYlds['nD'])*(totalErr['nDerr']/totalYlds['nD']) +\
-      #         2*(totalErr['nIDAerr']/totalYlds['nIDA'])*(totalErr['nIDAerr']/totalYlds['nIDA']))
-      
       print makeLine()
       print "nI = ", yields[reg]['DA_I'].yieldDictFull['qcd'][reg + '_DA_I'], " | nD = ", yields[reg]['IA_D'].yieldDictFull['qcd'][reg + '_IA_D'], " | ",\
             "nA = ", yields[reg]['ID_A'].yieldDictFull['qcd'][reg + '_ID_A'], " | nIDA = ", yields[reg]['IDA'].yieldDictFull['qcd'][reg + '_IDA']
@@ -254,12 +248,12 @@ for reg in regions:
       
       if not os.path.isfile(savedir + "/QCDyields_combined" + suffix + ".txt"):
          outfile = open(savedir + "/QCDyields_combined" + suffix + ".txt", "w")
-         outfile.write(" SR           DA_I              IA_D               ID_A               IDA               QCD               MC               Ratio\n")
+         outfile.write(" SR           ID_A              DA_I               IA_D               IDA               QCD               MC               Ratio\n")
       with open(savedir + "/QCDyields_combined" + suffix + ".txt", "a") as outfile:
          outfile.write(reg + "     " +\
+         str(yields[reg]['ID_A'].yieldDictFull['qcd'][reg + '_ID_A'].round(2)) + "        " +\
          str(yields[reg]['DA_I'].yieldDictFull['qcd'][reg + '_DA_I'].round(2)) + "        " +\
          str(yields[reg]['IA_D'].yieldDictFull['qcd'][reg + '_IA_D'].round(2)) + "        " +\
-         str(yields[reg]['ID_A'].yieldDictFull['qcd'][reg + '_ID_A'].round(2)) + "        " +\
          str(yields[reg]['IDA'].yieldDictFull['qcd'][reg + '_IDA'].round(2)) + "        " +\
          str(QCDexp[reg].round(2)) + "        " +\
          str(yields[reg]['SR'].yieldDictFull['qcd'][reg + '_SR'].round(2)) + "        ")

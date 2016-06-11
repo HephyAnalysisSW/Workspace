@@ -1,0 +1,5 @@
+python -b QCDestABCD4.py --HT 300 --MET 300 --eleWP Veto  
+python -b QCDestABCD4.py --HT 200 --MET 200 --eleWP Veto
+                                          
+python -b QCDestABCD4.py --HT 300 --MET 300 --eleWP Loose  
+python -b QCDestABCD4.py --HT 200 --MET 200 --eleWP Loose
