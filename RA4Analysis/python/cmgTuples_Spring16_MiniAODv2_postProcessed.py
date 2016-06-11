@@ -16,21 +16,21 @@ dirDaniel = '/data/dspitzbart/cmgTuples/postProcessing_Spring16/HT500LT250Skim/'
 #}
 #
 ######(diLep+SemiLep+HT binned samples) for LHE_HT<=1000 & (HT binned samples) for LHE_HT>1000
-#TTJets_combined = {\
-#"name" : "TTJets_combined",
-#"bins" : [
-#"TTJets_DiLepton",
-#"TTJets_LO",
-#"TTJets_LO_HT1200to2500",
-#"TTJets_LO_HT2500toInf",
-#"TTJets_LO_HT600to800",
-#"TTJets_LO_HT800to1200",
-##"TTJets_SingleLeptonFromT_full",
-##"TTJets_SingleLeptonFromTbar_full",
-#'TTJets_SingleLepton'
-#],
-#'dir' : dir,
-#}
+TTJets_combined = {\
+"name" : "TTJets_combined",
+"bins" : [
+"TTJets_DiLepton",
+"TTJets_LO",
+"TTJets_LO_HT1200to2500",
+"TTJets_LO_HT2500toInf",
+"TTJets_LO_HT600to800",
+"TTJets_LO_HT800to1200",
+#"TTJets_SingleLeptonFromT_full",
+"TTJets_SingleLeptonFromTbar_full",
+'TTJets_SingleLepton'
+],
+'dir' : dirEce,
+}
 
 
 WJetsHTToLNu = {\
