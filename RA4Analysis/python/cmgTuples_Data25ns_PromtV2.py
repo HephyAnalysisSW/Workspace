@@ -6,7 +6,7 @@ import copy, os, sys
 #data_path = '/data/easilar/tuples_from_Artur/JECv7_lumi2p2fb/TrigSkim/'
 #data_path_1 = '/data/easilar/cmgTuples/Run2016B-PromptReco-v2/cmgTuples_SingleElectron_Run2016B-PromptReco-v2_heppy/'
 #data_path_2 = '/data/dspitzbart/cmgTuples/Run2016B-PromptReco-v2/cmgTuples_SingleMuon_Run2016B-PromptReco-v2_heppy/'
-data_path = '/data/easilar/cmgTuples/Run2016B-PromptReco-v2/mkdir_fromHenning_804/'
+data_path = '/data/easilar/cmgTuples/Run2016B-PromptReco-v2/fromHenning_804/'
 
 SingleElectron_Run2016B_PromptReco_v2 ={"name":"SingleElectron_Run2016B_PromptReco_v2",}
 SingleMuon_Run2016B_PromptReco_v2 ={"name":"SingleMuon_Run2016B_PromptReco_v2",}

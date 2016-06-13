@@ -5,8 +5,8 @@ import os,sys
 from Workspace.HEPHYPythonTools.user import username
 from Workspace.HEPHYPythonTools.helpers import getObjFromFile, getChain, getChunks, getYieldFromChain,getPlotFromChain
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName, nBTagBinName, varBinName, varBin, UncertaintyDivision, varBinNamewithUnit
-from Workspace.RA4Analysis.cmgTuples_Data25ns_miniAODv2_postprocessed import *
-from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed import *
+from Workspace.RA4Analysis.cmgTuples_Data25ns_Promtv2_postprocessed import *
+from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2_postProcessed import *
 from Workspace.RA4Analysis.signalRegions import signalRegion3fb 
 from cutFlow_helper import *
 from general_config import *
@@ -18,7 +18,7 @@ def Draw_CMS_header():
    tex.SetTextFont(42)
    tex.SetTextSize(0.05)
    tex.SetLineWidth(2)
-   tex.DrawLatex(0.96,0.96,"2.3 fb^{-1} (13 TeV)")
+   tex.DrawLatex(0.96,0.96,"804 pb^{-1} (13 TeV)")
    tex = ROOT.TLatex()
    tex.SetNDC()
    tex.SetTextFont(61)
@@ -81,31 +81,31 @@ maxN = -1
 ROOT.gStyle.SetOptStat(0)
 
 all_MB = False
-presel = False
+presel = True
 SB_w   = False 
 SB_tt  = False
 
-test = True
+test = False
 
 if all_MB : 
   #SR = signalRegion3fb
   SR = {(5,5):{(250,350):{(500,-1):{"deltaPhi":1.0}}}}
-  btag_weight = "(weightBTag0_SF)"
+  btag_weight = "(1)"#"(weightBTag0_SF)"
   nbtag = (0,0)
   signal_suffix = "x10"
 if presel : 
   SR = {(5,-1):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
-  btag_weight = "(weightBTag0_SF)"
+  btag_weight = "(1)"#"(weightBTag0_SF)"
   nbtag = (0,0)
   signal_suffix = "x10"
 if SB_w : 
   SR = {(3,4):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
-  btag_weight = "(weightBTag0_SF)"
+  btag_weight = "(1)"#"(weightBTag0_SF)"
   nbtag = (0,0)
   signal_suffix = ""
 if SB_tt : 
   SR = {(4,5):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
-  btag_weight = "(weightBTag1_SF)"
+  btag_weight = "(1)" #"(weightBTag1_SF)"
   nbtag = (1,1)
   signal_suffix = ""
 if test :
@@ -116,25 +116,25 @@ if test :
   
 lepSels = [
 {'cut':'(singleMuonic&&(!isData||(isData&&muonDataSet)))' , 'veto':'nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0',\
- 'chain': getChain(single_mu_Run2015D,maxN=maxN,histname="",treeName="Events") ,\
+ 'chain': getChain(single_mu_Run2016B,maxN=maxN,histname="",treeName="Events") ,\
   'label':'_mu_', 'str':'1 $\\mu$' , 'trigger': trigger},\
 {'cut':'singleElectronic&&(!isData||(isData&&eleDataSet))' , 'veto':'nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0',\
- 'chain': getChain(single_ele_Run2015D,maxN=maxN,histname="",treeName="Events") ,\
+ 'chain': getChain(single_ele_Run2016B,maxN=maxN,histname="",treeName="Events") ,\
   'label':'_ele_', 'str':'1 $\\e$' , 'trigger': trigger},\
 {'cut':'((!isData&&singleLeptonic)||(isData&&((eleDataSet&&singleElectronic)||(muonDataSet&&singleMuonic))))' , 'veto':'nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0',\
- 'chain': getChain([single_ele_Run2015D,single_mu_Run2015D],maxN=maxN,histname="",treeName="Events") ,\
+ 'chain': getChain([single_ele_Run2016B,single_mu_Run2016B],maxN=maxN,histname="",treeName="Events") ,\
   'label':'_lep_', 'str':'1 $lep$' , 'trigger': trigger}\
 ]
 
 
 bkg_samples=[
-{'sample':'TTVH',           "weight":btag_weight ,"cut":(0,-1) ,"add_Cut":"(1)","name":TTV_25ns ,'tex':'t#bar{t}V','color':ROOT.kOrange-3},
-{"sample":"DY",             "weight":btag_weight ,"cut":(0,-1) ,"add_Cut":"(1)","name":DY_25ns,"tex":"DY + jets",'color':ROOT.kRed-6},
-{"sample":"singleTop",      "weight":btag_weight ,"cut":(0,-1) ,"add_Cut":"(1)","name":singleTop_25ns,"tex":"t/#bar{t}",'color': ROOT.kViolet+5},
-{"sample":"QCD",            "weight":"(1)"       ,"cut":nbtag  ,"add_Cut":"(1)","name":QCDHT_25ns, "tex":"QCD","color":ROOT.kCyan-6},
-{"sample":"WJets",          "weight":btag_weight ,"cut":(0,-1) ,"add_Cut":"(1)","name":WJetsHTToLNu_25ns,"tex":"W + jets","color":ROOT.kGreen-2},
-{"sample":"ttJets_diLep",   "weight":btag_weight ,"cut":(0,-1) ,"add_Cut":"((ngenLep+ngenTau)==2)","name":TTJets_combined, "tex":"t#bar{t} ll + jets",'color':ROOT.kBlue},
-{"sample":"ttJets_semiLep", "weight":btag_weight ,"cut":(0,-1) ,"add_Cut":"(!((ngenLep+ngenTau)==2))","name":TTJets_combined, "tex":"t#bar{t} l + jets",'color':ROOT.kBlue-7}
+{'sample':'TTVH',           "weight":btag_weight ,"cut":nbtag ,"add_Cut":"(1)","name":TTV ,'tex':'t#bar{t}V','color':ROOT.kOrange-3},
+{"sample":"DY",             "weight":btag_weight ,"cut":nbtag ,"add_Cut":"(1)","name":DY_amc,"tex":"DY + jets",'color':ROOT.kRed-6},
+{"sample":"singleTop",      "weight":btag_weight ,"cut":nbtag ,"add_Cut":"(1)","name":singleTop_lep,"tex":"t/#bar{t}",'color': ROOT.kViolet+5},
+{"sample":"QCD",            "weight":"(1)"       ,"cut":nbtag ,"add_Cut":"(1)","name":QCDHT, "tex":"QCD","color":ROOT.kCyan-6},
+{"sample":"WJets",          "weight":btag_weight ,"cut":nbtag ,"add_Cut":"(1)","name":WJetsHTToLNu,"tex":"W + jets","color":ROOT.kGreen-2},
+{"sample":"ttJets_diLep",   "weight":btag_weight ,"cut":nbtag ,"add_Cut":"((ngenLep+ngenTau)==2)","name":TTJets_combined, "tex":"t#bar{t} ll + jets",'color':ROOT.kBlue},
+{"sample":"ttJets_semiLep", "weight":btag_weight ,"cut":nbtag ,"add_Cut":"(!((ngenLep+ngenTau)==2))","name":TTJets_combined, "tex":"t#bar{t} l + jets",'color':ROOT.kBlue-7}
 ]
 
 for bkg in bkg_samples:
@@ -168,7 +168,7 @@ if test :
   lepSels = [lepSels[2]]
 
 for lepSel in lepSels:
-  path = "/afs/hephy.at/user/e/easilar/www/data/Run2015D/2p25fb/toAN_2p3/"+lepSel['label']
+  path = "/afs/hephy.at/user/e/easilar/www/data/Run2016B/804pb/tests/"+lepSel['label']
   if not os.path.exists(path):
     os.makedirs(path)
   print lepSel['label']
