@@ -7,8 +7,10 @@ from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.degTools import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.cutsEle import *
-from Workspace.DegenerateStopAnalysis.toolsMateusz.cmgTuplesPostProcessed_mAODv2 import cmgTuplesPostProcessed
-from Workspace.DegenerateStopAnalysis.toolsMateusz.getSamples_PP_mAODv2_7412pass2_scan import getSamples
+from Workspace.DegenerateStopAnalysis.toolsMateusz.cmgTuplesPostProcessed_mAODv2_analysisHephy13TeV import cmgTuplesPostProcessed
+from Workspace.DegenerateStopAnalysis.toolsMateusz.getSamples_mAODv2_analysisHephy13TeV import getSamples
+#from Workspace.DegenerateStopAnalysis.toolsMateusz.cmgTuplesPostProcessed_mAODv2 import cmgTuplesPostProcessed
+#from Workspace.DegenerateStopAnalysis.toolsMateusz.getSamples_PP_mAODv2_7412pass2_scan import getSamples
 
 from array import array
 from math import pi, sqrt #cos, sin, sinh, log
@@ -19,8 +21,10 @@ ROOT.gStyle.SetOptStat(0) #1111 #0 removes histogram statistics box #Name, Entri
 privateSignals = ["s10FS", "s30", "s30FS", "s60FS", "t2tt30FS"]
 backgrounds = ["w","tt", "z","qcd"]
 
+cmgPP = cmgTuplesPostProcessed()#mc_path, signal_path, data_path)
+
 samplesList = backgrounds # + privateSignals
-samples = getSamples(sampleList = samplesList, scan = True, useHT = True, getData = False)#, cmgPP = cmgPP) 
+samples = getSamples(cmgPP = cmgPP, sampleList = samplesList, scan = True, useHT = True, getData = False)
 
 officialSignals = ["s300_290", "s300_270", "s300_240"] #FIXME: crosscheck if these are in allOfficialSignals
 
@@ -59,13 +63,14 @@ save = args.save
 
 #Save
 if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
-   #savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/electronID/FoM"
+   savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/electronID/FoM"
    savedir += "/" + ID
    
-   if iso: 
-      savedir += "/iso/" + iso
+   if iso == "hybIso03" or iso == "hybIso04": 
+      savedir += "/" + iso
       isoString = "_" + iso 
-   else: 
+   elif iso == "None": 
+      savedir += "/noIso"
       isoString = ""
    
    savedir += "/plots/" + selection

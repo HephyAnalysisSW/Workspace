@@ -89,9 +89,6 @@ if enriched == True: suffix += "_EMenriched"
 
 QCDcuts = {}
  
-#if collection == "LepGood": otherCollection = "LepOther"
-#elif collection == "LepOther": otherCollection = "LepGood"
-
 print makeLine()
 print "Using LepAll collection."
 #print "Ignoring " + otherCollection + " collection."
@@ -143,18 +140,12 @@ eleMt['I_S'] = "Max$(LepAll_mt*(" + combineCutsList([eleSel, antiHybIsoCut, sigm
 eleMt['S_I'] = "Max$(LepAll_mt*(" + combineCutsList([eleSel, hybIsoCut, antiSigmaEtaEtaCut]) + "))"
 
 presel = CutClass("presel_SR", [
-   #["METloose","met >" + METloose], #looser MET for B & D regions
    ["MET","met >" + METcut],
    ["HT","ht_basJet >" + HTcut],
    ["ISR110", "nIsrJet >= 1"],
    ["No3rdJet60","nVetoJet <= 2"],
    ["BVeto","(nBSoftJet == 0 && nBHardJet == 0)"],
-   #["eleSel", "Sum$(" + eleSel + ") == 1"],
-   #["otherCollection", "Sum$(" + eleSel_other + ") == 0"],
-   #["elePt<30", elePt + " < 30"],
-   #["anti-AntiQCD", "vetoJet_dPhi_j1j2 > 2.5"],
-   #["anti-HybIso", "Sum$(" + eleSel + "&&" + antiHybIsoCut + ") == 1"],
-   #["anti-dxy", "Max$(abs(" + lep + "_dxy*(" + eleSel + "&&" + antiHybIsoCut + "))) > 0.02"],
+   #["METloose","met >" + METloose], #looser MET for B & D regions
    ], baseCut = None) #allCuts['None']['presel'])
 
 

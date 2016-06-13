@@ -258,7 +258,7 @@ for reg in regions:
       QCD[reg]['IXA'] = CutClass("QCD_IXA_" + reg, [
          SRs['IX'][reg],
          ["anti-A", antidPhiCut], #inverted
-         ["anti-IX", sumSel1(combineCuts(eleSel, antiHybIsoCut, invertedCut))], #inverted, inverted
+         ["anti-IX", sumSel1(combineCuts(eleSel, antiHybIsoCut, invertedCut))], #inverted, inverted (loose)
          ], baseCut = presel)
 
       if ABCD == "1" or ABCD == "4":

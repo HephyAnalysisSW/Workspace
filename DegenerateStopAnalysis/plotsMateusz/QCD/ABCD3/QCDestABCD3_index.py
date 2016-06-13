@@ -140,11 +140,6 @@ presel = CutClass("presel_SR", [
    ["eleSel", "nLepAll_el > 0 && " + eleSel],
    ["No3rdJet60","nVetoJet <= 2"],
    ["BVeto","(nBSoftJet == 0 && nBHardJet == 0)"],
-   #["otherCollection", "Sum$(" + eleSel_other + ") == 0"],
-   #["elePt<30", elePt + " < 30"],
-   #["anti-AntiQCD", "vetoJet_dPhi_j1j2 > 2.5"],
-   #["anti-HybIso", "Sum$(" + eleSel + "&&" + antiHybIsoCut + ") == 1"],
-   #["anti-dxy", "Max$(abs(" + lep + "_dxy*(" + eleSel + "&&" + antiHybIsoCut + "))) > 0.02"],
    ], baseCut = None) #allCuts['None']['presel'])
 
 SRs = {\
