@@ -82,6 +82,7 @@ def getParameterSet(args):
                 'hadronicOverEm/F',
                 'dEtaScTrkIn/F', 'dPhiScTrkIn/F', 'eInvMinusPInv/F', 'lostHits/I',
                 'convVeto/I',
+                'etaSc/F',
                 ],
             'common': [
                 'pdgId/I',
