@@ -104,9 +104,6 @@ if enriched == True: suffix += "_EMenriched"
 
 QCDcuts = {}
 
-#if collection == "LepGood": otherCollection = "LepOther"
-#elif collection == "LepOther": otherCollection = "LepGood"
-
 print makeLine()
 print "Using LepAll collection."
 print makeLine()

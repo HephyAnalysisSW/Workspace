@@ -93,35 +93,23 @@ else: suffix += "_" + eleWP +"_no_" + removedCut
    
 QCDcuts = {}
  
-#if collection == "LepGood": otherCollection = "LepOther"
-#elif collection == "LepOther": otherCollection = "LepGood"
-
 print makeLine()
 print "Using LepAll collection."
-#print "Ignoring " + otherCollection + " collection."
 print makeLine()
 
 #Gets all cuts (electron, SR, CR) for given electron ID
 if removedCut == "None": eleIDsel = electronIDs(ID = "standard", removedCut = "None", iso = False, collection = "LepAll")
 else: eleIDsel = electronIDs(ID = "nMinus1", removedCut = removedCut, iso = False, collection = "LepAll")
 
-#eleIDsel = electronIDs(ID = "nMinus1", removedCut = "d0", iso = False, collection = "LepAll")
-
 ##for s in samples.massScanList(): samples[s].weight = "weight" #removes ISR reweighting from official mass scan signal samples
 #for s in samples: samples[s].tree.SetAlias("eleSel", allCuts[WP]['eleSel'])
 
 etaAcc = 2.1
 eleSel = "abs(LepAll_pdgId) == 11 && abs(LepAll_eta) < " + str(etaAcc) + " && " + eleIDsel[eleWP]
-#eleSel_other = "abs(" + otherCollection + "_pdgId) == 11 && abs(" + otherCollection + "_eta) < " + str(etaAcc) + " && " + eleIDsel_other['Veto']
 
 #Cuts
-#dxyCut = "abs(LepAll_dxy) < 0.02"
-#looseDxyCut = "abs(LepAll_dxy) < 0.05"
-
-hybIsoCut = "(LepAll_relIso03*min(LepAll_pt, 25)) < 5"
-antiHybIsoCut = "(LepAll_relIso03*min(LepAll_pt, 25)) > 5"
-#hybIsoCut = "((LepAll_absIso03 < 5) || LepAll_relIso03 < 0.2))"
-#antiHybIsoCut = "((LepAll_absIso03 > 5) && (LepAll_relIso03 > 0.2))"
+hybIsoCut = "(LepAll_relIso03*min(LepAll_pt, 25)) < 5" #hybIsoCut = "((LepAll_absIso03 < 5) || LepAll_relIso03 < 0.2))"
+antiHybIsoCut = "(LepAll_relIso03*min(LepAll_pt, 25)) > 5" #antiHybIsoCut = "((LepAll_absIso03 > 5) && (LepAll_relIso03 > 0.2))"
    
 elePt = {}
 elePt['I'] = "Max$(LepAll_pt*(" + eleSel + "&&" + hybIsoCut + "))"
@@ -137,12 +125,6 @@ presel = CutClass("presel_SR", [
    ["ISR110", "nIsrJet >= 1"],
    ["No3rdJet60","nVetoJet <= 2"],
    ["BVeto","(nBSoftJet == 0 && nBHardJet == 0)"],
-   ["eleSel", "Sum$(" + eleSel + ") == 1"],
-   #["otherCollection", "Sum$(" + eleSel_other + ") == 0"],
-   #["elePt<30", elePt + " < 30"],
-   #["anti-AntiQCD", "vetoJet_dPhi_j1j2 > 2.5"],
-   #["anti-HybIso", "Sum$(" + eleSel + "&&" + antiHybIsoCut + ") == 1"],
-   #["anti-dxy", "Max$(abs(" + lep + "_dxy*(" + eleSel + "&&" + antiHybIsoCut + "))) > 0.02"],
    ], baseCut = None) #allCuts['None']['presel'])
 
 SRs ={}

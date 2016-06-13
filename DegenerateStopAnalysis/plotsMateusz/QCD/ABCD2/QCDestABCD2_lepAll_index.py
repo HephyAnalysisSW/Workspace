@@ -129,8 +129,8 @@ antiHybIsoCut = "(LepAll_relIso03[" + ind + "]*min(LepAll_pt[" + ind + "], 25)) 
 #antiHybIsoCut = "((LepAll_absIso03 > 5) && (LepAll_relIso03 > 0.2))"
    
 presel = CutClass("presel_SR", [
-   ["MET300","met > 300"],
-   ["HT300","ht_basJet > 300"],
+   ["MET300","met > 200"],
+   ["HT300","ht_basJet > 200"],
    ["ISR110", "nIsrJet >= 1"],
    ["No3rdJet60","nVetoJet <= 2"],
    ["BVeto","(nBSoftJet == 0 && nBHardJet == 0)"],

@@ -22,9 +22,8 @@ ROOT.gStyle.SetOptStat(0) #1111 #0 removes histogram statistics box #Name, Entri
 #Input options
 parser = argparse.ArgumentParser(description = "Input options")
 #parser.add_argument("--isolation", dest = "isolation",  help = "Isolation (hybIso03/hybIso04)", type = str, default = "hybIso03")
-#parser.add_argument("--MET", dest = "MET",  help = "MET Cut", type = str, default = "300")
-#parser.add_argument("--HT", dest = "HT",  help = "HT Cut", type = str, default = "300")
-#parser.add_argument("--METloose", dest = "METloose",  help = "Loose MET Cut", type = str, default = "100")
+parser.add_argument("--MET", dest = "MET",  help = "MET Cut", type = str, default = "200")
+parser.add_argument("--HT", dest = "HT",  help = "HT Cut", type = str, default = "200")
 parser.add_argument("--eleWP", dest = "eleWP",  help = "Electron WP", type = str, default = "Veto")
 #parser.add_argument("--enriched", dest = "enriched",  help = "EM enriched QCD?", type = bool, default = False)
 parser.add_argument("--plot", dest = "plot",  help = "Toggle plot", type = int, default = 1)
@@ -39,9 +38,8 @@ if not len(sys.argv) > 1:
 
 #Arguments
 #isolation = args.isolation
-#METcut = args.MET
-#METloose = args.METloose
-#HTcut = args.HT
+METcut = args.MET
+HTcut = args.HT
 #enriched = args.enriched
 eleWP = args.eleWP
 plot = args.plot
@@ -49,7 +47,7 @@ save = args.save
 
 #Save
 if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
-   savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/QCD/ABCD2/estimation/lepAll/looseDxy"
+   savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/QCD/ABCD2/estimation/lepAll"
    if not os.path.exists(savedir): os.makedirs(savedir)
    
 suffix = "_" + eleWP
@@ -109,30 +107,27 @@ eleSel = "abs(LepAll_pdgId) == 11 && abs(LepAll_eta) < " + str(etaAcc) + " && " 
 dxyCut = "abs(LepAll_dxy) < 0.02"
 looseDxyCut = "abs(LepAll_dxy) < 0.05"
 
-hybIsoCut = "(LepAll_relIso03*min(LepAll_pt, 25)) < 5"
-antiHybIsoCut = "(LepAll_relIso03*min(LepAll_pt, 25)) > 5"
-#hybIsoCut = "((LepAll_absIso03 < 5) || LepAll_relIso03 < 0.2))"
-#antiHybIsoCut = "((LepAll_absIso03 > 5) && (LepAll_relIso03 > 0.2))"
+hybIsoCut = "(LepAll_relIso03*min(LepAll_pt, 25)) < 5" #hybIsoCut = "((LepAll_absIso03 < 5) || LepAll_relIso03 < 0.2))"
+antiHybIsoCut = "(LepAll_relIso03*min(LepAll_pt, 25)) > 5" #antiHybIsoCut = "((LepAll_absIso03 > 5) && (LepAll_relIso03 > 0.2))"
    
 elePt = {}
 elePt['SR'] = "Max$(LepAll_pt*(" + eleSel + "&&" + hybIsoCut + "&&" + dxyCut + "))"
 elePt['ID'] = "Max$(LepAll_pt*(" + eleSel + "&&" + antiHybIsoCut + "&&" + looseDxyCut + "))"
-elePt['I_D'] = "Max$(LepAll_pt*(" + eleSel + "&&" + antiHybIsoCut + "&&" + dxyCut + "))"
-elePt['D_I'] = "Max$(LepAll_pt*(" + eleSel + "&&" + hybIsoCut + "&&" + looseDxyCut + "))"
+#elePt['I_D'] = "Max$(LepAll_pt*(" + eleSel + "&&" + antiHybIsoCut + "&&" + dxyCut + "))"
+#elePt['D_I'] = "Max$(LepAll_pt*(" + eleSel + "&&" + hybIsoCut + "&&" + looseDxyCut + "))"
 
 eleMt = {}
 eleMt['SR'] = "Max$(LepAll_mt*(" + eleSel + "&&" + hybIsoCut + "&&" + dxyCut + "))"
 eleMt['ID'] = "Max$(LepAll_mt*(" + eleSel + "&&" + antiHybIsoCut + "&&" + looseDxyCut + "))"
-eleMt['I_D'] = "Max$(LepAll_mt*(" + eleSel + "&&" + antiHybIsoCut + "&&" + dxyCut + "))"
-eleMt['D_I'] = "Max$(LepAll_mt*(" + eleSel + "&&" + hybIsoCut + "&&" + looseDxyCut + "))"
+#eleMt['I_D'] = "Max$(LepAll_mt*(" + eleSel + "&&" + antiHybIsoCut + "&&" + dxyCut + "))"
+#eleMt['D_I'] = "Max$(LepAll_mt*(" + eleSel + "&&" + hybIsoCut + "&&" + looseDxyCut + "))"
 
 presel = CutClass("presel_SR", [
-   ["MET200","met > 200"],
-   ["HT200","ht_basJet > 200"],
+   ["MET","met >" + METcut],
+   ["HT","ht_basJet > " + HTcut],
    ["ISR110", "nIsrJet >= 1"],
    ["No3rdJet60","nVetoJet <= 2"],
    ["BVeto","(nBSoftJet == 0 && nBHardJet == 0)"],
-   ["eleSel", "Sum$(" + eleSel + ") == 1"],
    #["otherCollection", "Sum$(" + eleSel_other + ") == 0"],
    #["elePt<30", elePt + " < 30"],
    #["anti-AntiQCD", "vetoJet_dPhi_j1j2 > 2.5"],
@@ -142,7 +137,7 @@ presel = CutClass("presel_SR", [
 
 SRs ={}
 
-for sel in ['SR', 'ID', 'I_D', 'D_I']:
+for sel in ['SR', 'ID']: #, 'I_D', 'D_I']:
    SRs[sel] = {\
       'SR1':["SR1", elePt[sel] + " < 30"],
       'SR1a':["SR1a", combineCuts(eleMt[sel] + " < 60", elePt[sel] + " < 30")],
@@ -178,17 +173,17 @@ for reg in regions:
    #nA
    QCD[reg]['ID_A'] = CutClass("QCD_ID_A_" + reg, [
       #["elePt<30", elePt['ID'] + " < 30"],
-      SRs['I_D'][reg], 
+      SRs['ID'][reg], 
       ["A", "vetoJet_dPhi_j1j2 < 2.5"], #applied
-      ["anti-I+D", "Sum$(" + eleSel + "&&" + antiHybIsoCut + "&&" + dxyCut + ") == 1"], #inverted, applied
+      ["anti-I+looseD", "Sum$(" + eleSel + "&&" + antiHybIsoCut + "&&" + looseDxyCut + ") == 1"], #inverted
       ], baseCut = presel)
    
    #nI
    QCD[reg]['A_ID'] = CutClass("QCD_A_ID_" + reg, [
       #["elePt<30", elePt['D_I'] + " < 30"],
-      SRs['D_I'][reg], 
+      SRs['SR'][reg], 
       ["anti-A", "vetoJet_dPhi_j1j2 > 2.5"], #inverted
-      ["I+loose-D", "Sum$(" + eleSel + "&&" + hybIsoCut + "&&" + looseDxyCut + ") == 1"], #applied, loose
+      ["I+loose-D", "Sum$(" + eleSel + "&&" + hybIsoCut + "&&" + dxyCut + ") == 1"], #applied, applied 
       ], baseCut = presel)
    
    #nIDA
@@ -203,6 +198,11 @@ abcd = ['SR', 'ID_A', 'A_ID', 'IDA']
 
 yields = {}
 QCDexp = {}
+
+if not os.path.isfile(savedir + "/QCDyields" + suffix + ".txt"):
+   outfile = open(savedir + "/QCDyields" + suffix + ".txt", "w")
+   outfile.write(eleWP + " Electron ID and Preselection of (MET, HT) > (" + METcut + "," + HTcut + ")\n")
+   outfile.write("SR           ID_A                 A_ID                     IDA                       QCD                     MC                     Ratio\n")
 
 for reg in regions:
    yields[reg] = {}
@@ -220,16 +220,13 @@ for reg in regions:
    print "QCD MC yield in ", reg, ": ", yields[reg]['SR'].yieldDictFull['qcd']['QCD_SR_' + reg]
    print makeLine()
    
-   if not os.path.isfile(savedir + "/QCDyields" + suffix + ".txt"):
-      outfile = open(savedir + "/QCDyields" + suffix + ".txt", "w")
-      outfile.write(" SR           ID_A               A_ID               IDA               QCD               MC               Ratio\n")
    with open(savedir + "/QCDyields" + suffix + ".txt", "a") as outfile:
       outfile.write(reg + "     " +\
-      str(yields[reg]['ID_A'].yieldDictFull['qcd']['QCD_ID_A_' + reg]) + "        " +\
-      str(yields[reg]['A_ID'].yieldDictFull['qcd']['QCD_A_ID_' + reg]) + "        " +\
-      str(yields[reg]['IDA'].yieldDictFull['qcd']['QCD_IDA_' + reg]) + "        " +\
-      str(QCDexp[reg].round(2)) + "        " +\
-      str(yields[reg]['SR'].yieldDictFull['qcd']['QCD_SR_' + reg]) + "        ")
+      str(yields[reg]['ID_A'].yieldDictFull['qcd']['QCD_ID_A_' + reg]) + "             " +\
+      str(yields[reg]['A_ID'].yieldDictFull['qcd']['QCD_A_ID_' + reg]) + "             " +\
+      str(yields[reg]['IDA'].yieldDictFull['qcd']['QCD_IDA_' + reg]) + "             " +\
+      str(QCDexp[reg].round(2)) + "             " +\
+      str(yields[reg]['SR'].yieldDictFull['qcd']['QCD_SR_' + reg]) + "             ")
       if yields[reg]['SR'].yieldDictFull['qcd']['QCD_SR_' + reg].val:
          outfile.write(str((QCDexp[reg]/yields[reg]['SR'].yieldDictFull['qcd']['QCD_SR_' + reg]).round(2))  + "\n")
       else:
