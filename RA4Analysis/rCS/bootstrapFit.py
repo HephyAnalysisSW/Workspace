@@ -131,11 +131,11 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
         rest_pos.Fill(fit['Rest_PosPdg']['template'].GetBinContent(1)*fit['Rest_PosPdg']['yield'])
         rest_neg.Fill(fit['Rest_NegPdg']['template'].GetBinContent(1)*fit['Rest_NegPdg']['yield'])
       
-      if tt.GetMean()>0:tt_err.SetBinContent(b, tt.GetRMS()/tt.GetMean())
-      if w_pos.GetMean()>0:w_pos_err.SetBinContent(b, w_pos.GetRMS()/w_pos.GetMean())
-      if w_neg.GetMean()>0:w_neg_err.SetBinContent(b, w_neg.GetRMS()/w_neg.GetMean())
-      if rest_pos.GetMean()>0:rest_pos_err.SetBinContent(b, rest_pos.GetRMS()/rest_pos.GetMean())
-      if rest_neg.GetMean()>0:rest_neg_err.SetBinContent(b, rest_neg.GetRMS()/rest_neg.GetMean())
+      if tt.GetMean()>0:tt_err.SetBinContent(b, tt.GetMeanError()/tt.GetMean())
+      if w_pos.GetMean()>0:w_pos_err.SetBinContent(b, w_pos.GetMeanError()/w_pos.GetMean())
+      if w_neg.GetMean()>0:w_neg_err.SetBinContent(b, w_neg.GetMeanError()/w_neg.GetMean())
+      if rest_pos.GetMean()>0:rest_pos_err.SetBinContent(b, rest_pos.GetMeanError()/rest_pos.GetMean())
+      if rest_neg.GetMean()>0:rest_neg_err.SetBinContent(b, rest_neg.GetMeanError()/rest_neg.GetMean())
       
       b += 1
 

@@ -10,3 +10,4 @@ python cmgPostProcessing.py --overwrite --skim="HT500ST250" --samples=WJetsToLNu
 python cmgPostProcessing.py --overwrite --skim="HT500ST250" --samples=WJetsToLNu_HT1200to2500_25ns
 python cmgPostProcessing.py --overwrite --skim="HT500ST250" --samples=WJetsToLNu_HT2500toInf_25ns
 
+python cmgPostProcessing.py --overwrite --skim="HT500ST250" --samples=WJetsToLNu

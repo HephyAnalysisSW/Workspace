@@ -44,7 +44,7 @@ TTJets_LO = {\
 "rootFileLocation":"tree.root",
 "treeName":"tree",
 'isData':False,
-'postProcessingCut':"lheHTIncoming<600",
+#'postProcessingCut':"lheHTIncoming<600",
 }
 
 TTJets_LO_HT600to800_25ns={\

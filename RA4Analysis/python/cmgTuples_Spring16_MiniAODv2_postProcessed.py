@@ -32,6 +32,13 @@ TTJets_combined = {\
 'dir' : dirEce,
 }
 
+TTJets_incl = {\
+"name" : "TTJets_incl",
+"bins" : [
+"TTJets_LO",
+],
+'dir' : dirDaniel,
+}
 
 WJetsHTToLNu = {\
 "name" : "W+Jets",

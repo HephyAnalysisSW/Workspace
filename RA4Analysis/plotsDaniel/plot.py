@@ -13,7 +13,9 @@ from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed impor
 from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2_postProcessed import *
 #from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed_2 import *
 
-from Workspace.RA4Analysis.cmgTuples_Data25ns_miniAODv2_postprocessed import *
+#from Workspace.RA4Analysis.cmgTuples_Data25ns_miniAODv2_postprocessed import *
+from Workspace.RA4Analysis.cmgTuples_Data25ns_Promtv2_postprocessed import *
+
 from Workspace.HEPHYPythonTools.user import username
 
 from helpers import *
@@ -37,7 +39,12 @@ WJETS_16 = {'name':'WJets', 'chain':getChain(WJetsHTToLNu,histname=''), 'color':
 
 
 TTJets = {'name':'TTJets', 'chain':getChain(TTJets_HTLO_25ns,histname=''), 'color':ROOT.kOrange,'weight':'weight', 'niceName':'t#bar{t}+Jets', 'cut':''}
-TTJets_combined = {'name':'TTJets', 'chain':getChain(TTJets_combined,histname=''), 'color':color('TTJets')-2,'weight':totalWeight, 'niceName':'t#bar{t}+Jets', 'cut':''}
+
+TTJets_incl_16 = {'name':'TTJets', 'chain':getChain(TTJets_incl,histname=''), 'color':color('TTJets')-2,'weight':'weight', 'niceName':'t#bar{t}+Jets incl S16', 'cut':''}
+
+TTJets_combined_15 = {'name':'TTJets', 'chain':getChain(TTJets_combined_25ns,histname=''), 'color':color('TTJets')-2,'weight':totalWeight, 'niceName':'t#bar{t}+Jets S15', 'cut':''}
+TTJets_combined_16 = {'name':'TTJets', 'chain':getChain(TTJets_combined,histname=''), 'color':ROOT.kCyan,'weight':totalWeight, 'niceName':'t#bar{t}+Jets S16', 'cut':''}
+
 #TTJets_combined_2 = {'name':'TTJets', 'chain':getChain(TTJets_combined_2,histname=''), 'color':ROOT.kMagenta,'weight':totalWeight, 'niceName':'t#bar{t}+Jets fix', 'cut':''}
 #TTJets_leptonic = {'name':'TTJets',   'chain':getChain(TTJets_leptonic,histname=''), 'color':color('TTJets')-2,'weight':totalWeight, 'niceName':'t#bar{t}+Jets lep', 'cut':''}
 #TTJets_leptonic_2 = {'name':'TTJets', 'chain':getChain(TTJets_leptonic_2,histname=''), 'color':ROOT.kMagenta,'weight':totalWeight, 'niceName':'t#bar{t}+Jets lep_2', 'cut':''}
@@ -45,18 +52,23 @@ TTJets_combined = {'name':'TTJets', 'chain':getChain(TTJets_combined,histname=''
 #TTJets_ht = {'name':'TTJets',   'chain':getChain(TTJets_ht,histname=''), 'color':color('DY'),'weight':totalWeight, 'niceName':'t#bar{t}+Jets ht', 'cut':''}
 #TTJets_ht_2 = {'name':'TTJets',   'chain':getChain(TTJets_HTLO_25ns_2,histname=''), 'color':color('QCD'),'weight':totalWeight, 'niceName':'t#bar{t}+Jets ht_2', 'cut':''}
 
-TTJets_combined_singleLep = {'name':'TTJets', 'chain':TTJets_combined['chain'], 'color':color('TTJets')-2,'weight':totalWeight, 'niceName':'t#bar{t}+Jets 1l', 'cut':'(ngenLep+ngenTau)==1'}
-TTJets_combined_diLep =     {'name':'TTJets', 'chain':TTJets_combined['chain'], 'color':color('TTJets'),'weight':totalWeight, 'niceName':'t#bar{t}+Jets 2l', 'cut':'(ngenLep+ngenTau)==2'}
-TTJets_combined_had =       {'name':'TTJets', 'chain':TTJets_combined['chain'], 'color':color('TTJets')+2,'weight':totalWeight, 'niceName':'t#bar{t}+Jets 0l', 'cut':'(ngenLep+ngenTau)==0'}
+TTJets_combined_singleLep_15 = {'name':'TTJets', 'chain':TTJets_combined_15['chain'], 'color':color('TTJets')-2,'weight':totalWeight, 'niceName':'t#bar{t}+Jets 1l', 'cut':'(ngenLep+ngenTau)==1'}
+TTJets_combined_singleLep_16 = {'name':'TTJets', 'chain':TTJets_combined_16['chain'], 'color':ROOT.kCyan,'weight':totalWeight, 'niceName':'t#bar{t}+Jets 1l', 'cut':'(ngenLep+ngenTau)==1'}
+
+TTJets_combined_diLep_15 =     {'name':'TTJets', 'chain':TTJets_combined_15['chain'], 'color':color('TTJets'),'weight':totalWeight, 'niceName':'t#bar{t}+Jets 2l', 'cut':'(ngenLep+ngenTau)==2'}
+TTJets_combined_diLep_16 =     {'name':'TTJets', 'chain':TTJets_combined_16['chain'], 'color':ROOT.kCyan,'weight':totalWeight, 'niceName':'t#bar{t}+Jets 2l', 'cut':'(ngenLep+ngenTau)==2'}
+
+TTJets_combined_had_15 =       {'name':'TTJets', 'chain':TTJets_combined_15['chain'], 'color':color('TTJets')+2,'weight':totalWeight, 'niceName':'t#bar{t}+Jets 0l', 'cut':'(ngenLep+ngenTau)==0'}
+TTJets_combined_had_16 =       {'name':'TTJets', 'chain':TTJets_combined_16['chain'], 'color':ROOT.kCyan,'weight':totalWeight, 'niceName':'t#bar{t}+Jets 0l', 'cut':'(ngenLep+ngenTau)==0'}
 
 
 DY_15 = {'name':'DY', 'chain':getChain(DY_25ns,histname=''), 'color':color('DY'),'weight':totalWeight, 'niceName':'Drell Yan', 'cut':''}
-DY_16_madgraph = {'name':'DY', 'chain':getChain(DY_madgraph,histname=''), 'color':ROOT.kGreen+1,'weight':totalWeight, 'niceName':'Drell Yan MG', 'cut':''}
+DY_16_madgraph = {'name':'DY', 'chain':getChain(DY_madgraph,histname=''), 'color':color('DY')-1,'weight':totalWeight, 'niceName':'Drell Yan MG', 'cut':''}
 DY_16_amc = {'name':'DY', 'chain':getChain(DY_amc,histname=''), 'color':ROOT.kYellow+1,'weight':totalWeight, 'niceName':'Drell Yan AMC', 'cut':''}
 
 singleTop_15 = {'name':'singleTop', 'chain':getChain(singleTop_25ns,histname=''), 'color':color('singleTop'),'weight':totalWeight, 'niceName':'t/#bar{t}', 'cut':''}
 singleTop_inc_16 = {'name':'singleTop', 'chain':getChain(singleTop_inclusive,histname=''), 'color':ROOT.kGreen+1,'weight':totalWeight, 'niceName':'t/#bar{t} S16 inc', 'cut':''}
-singleTop_lep_16 = {'name':'singleTop', 'chain':getChain(singleTop_lep,histname=''), 'color':ROOT.kOrange+1,'weight':totalWeight, 'niceName':'t/#bar{t} S16 lep', 'cut':''}
+singleTop_lep_16 = {'name':'singleTop', 'chain':getChain(singleTop_lep,histname=''), 'color':color('singleTop')-2,'weight':totalWeight, 'niceName':'t/#bar{t} S16 lep', 'cut':''}
 
 QCD_15 = {'name':'QCD', 'chain':getChain(QCDHT_25ns,histname=''), 'color':color('QCD')+1,'weight':totalWeight, 'niceName':'QCD multijet S15', 'cut':''}
 QCD_16 = {'name':'QCD', 'chain':getChain(QCDHT,histname=''), 'color':color('QCD')-1,'weight':totalWeight, 'niceName':'QCD multijet S16', 'cut':''}
@@ -64,16 +76,16 @@ QCD_16 = {'name':'QCD', 'chain':getChain(QCDHT,histname=''), 'color':color('QCD'
 diBoson = {'name':'QCD', 'chain':getChain(diBoson,histname=''), 'color':ROOT.kMagenta,'weight':totalWeight, 'niceName':'WW/WZ/ZZ', 'cut':''}
 
 TTV_15 = {'name':'TTVH', 'chain':getChain(TTV_25ns,histname=''), 'color':color('TTV')+2,'weight':totalWeight, 'niceName':'t#bar{t}W/Z S15', 'cut':''}
-TTV_16 = {'name':'TTVH', 'chain':getChain(TTV,histname=''), 'color':ROOT.kOrange,'weight':totalWeight, 'niceName':'t#bar{t}W/Z S16', 'cut':''}
+TTV_16 = {'name':'TTVH', 'chain':getChain(TTV,histname=''), 'color':color('TTV'),'weight':totalWeight, 'niceName':'t#bar{t}W/Z S16', 'cut':''}
 
 Rest = {'name':'Rest', 'chain':getChain([TTV_25ns,singleTop_25ns,DY_25ns],histname=''), 'color':color('TTV'),'weight':totalWeight, 'niceName':'other EWK', 'cut':''}
 Bkg = {'name':'Bkg', 'chain':getChain([TTJets_HTLO_25ns,WJetsHTToLNu_25ns,QCDHT_25ns,TTV_25ns,singleTop_25ns,DY_25ns],histname=''), 'color':color('TTV'),'weight':totalWeight, 'niceName':'total Bkg', 'cut':''}
 EWK = {'name':'Bkg', 'chain':getChain([TTJets_HTLO_25ns,WJetsHTToLNu_25ns,TTV_25ns,singleTop_25ns,DY_25ns],histname=''), 'color':color('TTV'),'weight':totalWeight, 'niceName':'total Bkg', 'cut':''}
 #diBoson = {'name':'diBoson', 'chain':getChain(diBosons_25ns,histname=''), 'color':ROOT.kMagenta,'weight':'weight', 'niceName':'diboson'}
 
-samples         = [WJETS_15, TTJets_combined, Rest, QCD_15]#, diBoson]
-samples2        = [WJETS_15, TTJets_combined, DY_15, singleTop_15, TTV_15, QCD_15]
-samplesTTcheck  = [WJETS_15, TTJets_combined_singleLep, TTJets_combined_diLep, TTJets_combined_had, Rest, QCD_15]#, diBoson]
+samples         = [WJETS_15, TTJets_combined_15, Rest, QCD_15]#, diBoson]
+samples2        = [WJETS_15, TTJets_combined_15, DY_15, singleTop_15, TTV_15, QCD_15]
+samplesTTcheck  = [WJETS_15, TTJets_combined_singleLep_15, TTJets_combined_diLep_15, TTJets_combined_had_15, Rest, QCD_15]#, diBoson]
 
 #samplesComp = [WJETS, TTJETS, singleTop, DY, QCD]
 
@@ -122,10 +134,18 @@ nBJetMedium30 = {'name':'nBJetMedium30', 'binning':[5,0,5], 'titleX':'nBJetMediu
 st = {'name':'st', 'binning':[37,250,2100], 'titleX':'L_{T} [GeV]', 'titleY':'Events'}
 stRB = {'name':'st', 'binning':[20,250,1250], 'titleX':'L_{T} [GeV]', 'titleY':'Events', 'filename':'lt'}
 
-htRB = {'name':'htJet30j', 'binning':[25,500,2500], 'titleX':'H_{T} [GeV]', 'titleY':'Events', 'filename':'ht'}
+htRB = {'name':'htJet30j', 'binning':[22,500,2700], 'titleX':'H_{T} [GeV]', 'titleY':'Events', 'filename':'ht'}
+htSRB = {'name':'htJet30j', 'binning':[12,500,2500], 'titleX':'H_{T} [GeV]', 'titleY':'Events', 'filename':'ht'}
+
+LHEht = {'name':'lheHTIncoming', 'binning':[25,500,2500], 'titleX':'H_{T} [GeV]', 'titleY':'Events', 'filename':'ht'}
+
+
 njet = {'name':'nJet30', 'binning':[15,0,15], 'titleX':'n_{jets}', 'titleY':'Events', 'filename':'nJet30'}
+nbjet = {'name':'nBJetMediumCSV30', 'binning':[5,0,5], 'titleX':'n_{b-jets}', 'titleY':'Events', 'filename':'nBJetMediumCSV30'}
+
 deltaPhi = {'name':'deltaPhi_Wl', 'binning':[32,0,3.2], 'titleX':'#Delta#Phi(W,l)', 'titleY':'Events'}
 deltaPhiRB = {'name':'deltaPhi_Wl', 'binning':[16,0,3.2], 'titleX':'#Delta#Phi(W,l)', 'titleY':'Events', 'filename':'deltaPhi_Wl'}
+deltaPhiVarB = {'name':'deltaPhi_Wl', 'binning':[0,0.2,0.4,0.6,0.8,1.,1.25,1.5,2.,2.5,3.2], 'titleX':'#Delta#Phi(W,l)', 'titleY':'Events', 'filename':'deltaPhi_Wl', 'binningIsExplicit':True, 'binNorm':0.1}
 deltaPhiSRB = {'name':'deltaPhi_Wl', 'binning':[0,0.25,0.5,0.75,1.,1.5,2.,3.2], 'titleX':'#Delta#Phi(W,l)', 'titleY':'Events', 'filename':'deltaPhi_Wl', 'binningIsExplicit':True, 'binNorm':0.1}
 
 
@@ -147,7 +167,8 @@ metNoHFPhi = {'binning': [16, -3.2, 3.2], 'name': 'metNoHF_phi', 'titleX': '#Phi
 #deltaPhiCMG = {'binning': [16, 0, 3.2], 'name': 'Sum$((acos((LepGood_pt+metNoHF_pt*cos(LepGood_phi-metNoHF_phi))/sqrt(LepGood_pt**2+metNoHF_pt**2+2*metNoHF_pt*LepGood_pt*cos(LepGood_phi-metNoHF_phi))))*'+electronId+')', 'titleX': '#Delta#Phi(W,l) NoHF', 'titleY': 'Events'}
 
 triggers = "(HLT_EleHT350||HLT_MuHT350)"
-filters = "Flag_goodVertices && Flag_HBHENoiseFilter_fix && Flag_eeBadScFilter && Flag_HBHENoiseIsoFilter && veto_evt_list"
+#filters = "Flag_goodVertices && Flag_HBHENoiseFilter_fix && Flag_eeBadScFilter && Flag_HBHENoiseIsoFilter && veto_evt_list"
+filters = "Flag_goodVertices && Flag_HBHENoiseFilter_fix && Flag_eeBadScFilter && Flag_HBHENoiseIsoFilter"
 presel = "((!isData&&singleLeptonic)||(isData&&"+triggers+"&&((muonDataSet&&singleMuonic)||(eleDataSet&&singleElectronic))&&"+filters+"))"
 presel += "&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&Jet_pt[1]>80&&st>250&&nJet30>2&&htJet30j>500"
 newpresel = presel
@@ -192,6 +213,7 @@ allSR = {'name':name,'string':allSRcut,'niceName':'all SR'}
 allSR_test = {'name':name,'string':allSRcut+'&&weight<1','niceName':'all SR'}
 allSR_lowHT = {'name':name,'string':allSRcut+'&&htJet30j<900','niceName':'all SR'}
 
+
 name, allSRcut = nameAndCut((250,-1),(500,-1),(5,-1),btb=(0,-1),presel=signalpresel)
 allSRMC = {'name':name,'string':allSRcut,'niceName':'all SR'}
 allSRMCele = {'name':name,'string':allSRcut+'&&abs(leptonPdg)==11','niceName':'all SR'}
@@ -233,6 +255,9 @@ negWeight = {'name':'negWeight', 'string':newpresel+'&&weight<0', 'niceName':'ne
 newPreselCut = {'name':'presel','string':newpresel, 'signal':signalpresel, 'niceName':'Preselection'}
 newPreselCutNeg = {'name':'presel','string':newpresel+'&&leptonPdg<0','niceName':'Presel NegPdg'}
 newPreselCutPos = {'name':'presel','string':newpresel+'&&leptonPdg>0','niceName':'Presel PosPdg'}
+newPreselCutEle = {'name':'presel','string':newpresel+'&&singleElectronic','niceName':'Presel NegPdg'}
+newPreselCutMu  = {'name':'presel','string':newpresel+'&&singleMuonic','niceName':'Presel PosPdg'}
+
 
 CutNeg = {'name':'presel','string':'leptonPdg<0','niceName':'Presel NegPdg'}
 CutPos = {'name':'presel','string':'leptonPdg>0','niceName':'Presel PosPdg'}
@@ -393,7 +418,11 @@ nbjetComp = {'name':btagStr, 'binning':[6,0,6], 'titleX':'n_{b-jets}', 'titleY':
 #datacut = datapresel+trigger+filters
 #dataDict = {'chain':data, 'cut':datacut,'name':'data'}
 
-data = {'name':'data', 'chain':getChain([single_mu_Run2015D, single_ele_Run2015D],histname=''), 'cut':newpresel+allSRcut+'&&nBJetMediumCSV30==0'}
+
+name, allSRcut = nameAndCut((250,-1),(500,-1),(3,-1),btb=(0,-1),presel=newpresel)
+#data = {'name':'data', 'chain':getChain([single_mu_Run2015D, single_ele_Run2015D],histname=''), 'cut':newpresel+allSRcut+'&&nBJetMediumCSV30==0'}
+data = {'name':'data', 'chain':getChain([single_mu_Run2016B, single_ele_Run2016B],histname=''), 'cut':newpresel+allSRcut+'&&nBJetMediumCSV30==0'}
+
 
 deltaPhiCMG_NoHF = {'binning': [30, 0, 3.2], 'name': 'Sum$((acos((LepGood_pt+metNoHF_pt*cos(LepGood_phi-metNoHF_phi))/sqrt(LepGood_pt**2+metNoHF_pt**2+2*metNoHF_pt*LepGood_pt*cos(LepGood_phi-metNoHF_phi))))*'+LeptonId+')', 'titleX': '#Delta#Phi(W,l) NoHF', 'titleY': 'Events'}
 #deltaPhiCMG = {'binning': [32, 0, 3.2], 'name': 'Sum$((acos((LepGood_pt+met_pt*cos(LepGood_phi-met_phi))/sqrt(LepGood_pt**2+met_pt**2+2*met_pt*LepGood_pt*cos(LepGood_phi-met_phi))))*'+LeptonId+')', 'titleX': '#Delta#Phi(W,l) NoHF', 'titleY': 'Events', 'filename':'deltaPhi_Wl', 'binningIsExplicit':True}
@@ -554,8 +583,9 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
   legendNameLengthsSignal = []
   #if signals: legendNameLengthsSignal = [len(x['niceName']) for x in signals]
   legendNameLengths = legendNameLengthsSamples + legendNameLengthsSignal
+  legendWidth = 0.015*max(legendNameLengths)+0.03
   #legendWidth = 0.018*max(legendNameLengths)+0.03
-  legendWidth = 0.02*max(legendNameLengths)+0.03
+  #legendWidth = 0.02*max(legendNameLengths)+0.03
 
   if legend:
     height = 0.04*len(h)

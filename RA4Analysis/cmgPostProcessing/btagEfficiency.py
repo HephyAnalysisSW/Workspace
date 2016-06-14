@@ -79,9 +79,9 @@ def getBTagMCTruthEfficiencies(c, cut="(1)", overwrite=False):
       ptCut = "abs(Jet_pt)>"+str(ptBin[0])
       if ptBin[1]>0:
         ptCut += "&&abs(Jet_pt)<"+str(ptBin[1])
-      c.Draw(commoncf+"(Jet_btagCSV>0.890)>>hbQuark(100,-1,2)",commoncf+"abs(Jet_hadronFlavour)==5&&                     "+etaCut+"&&"+ptCut)
-      c.Draw(commoncf+"(Jet_btagCSV>0.890)>>hcQuark(100,-1,2)",commoncf+"abs(Jet_hadronFlavour)==4&&                     "+etaCut+"&&"+ptCut)
-      c.Draw(commoncf+"(Jet_btagCSV>0.890)>>hOther(100,-1,2)" ,commoncf+"(abs(Jet_hadronFlavour) < 4  || abs(Jet_hadronFlavour) > 5)&&  "+etaCut+"&&"+ptCut)
+      c.Draw(commoncf+"(Jet_btagCSV>0.800)>>hbQuark(100,-1,2)",commoncf+"abs(Jet_hadronFlavour)==5&&                     "+etaCut+"&&"+ptCut)
+      c.Draw(commoncf+"(Jet_btagCSV>0.800)>>hcQuark(100,-1,2)",commoncf+"abs(Jet_hadronFlavour)==4&&                     "+etaCut+"&&"+ptCut)
+      c.Draw(commoncf+"(Jet_btagCSV>0.800)>>hOther(100,-1,2)" ,commoncf+"(abs(Jet_hadronFlavour) < 4  || abs(Jet_hadronFlavour) > 5)&&  "+etaCut+"&&"+ptCut)
       hbQuark = ROOT.gDirectory.Get("hbQuark")
       hcQuark = ROOT.gDirectory.Get("hcQuark")
       hOther = ROOT.gDirectory.Get("hOther")
