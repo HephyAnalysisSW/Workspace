@@ -3,7 +3,7 @@ pathEce     = "/data/easilar/cmgTuples/RunIISpring16MiniAODv2/"
 path = pathEce
 
 TTJets_SingleLeptonFromT_full = {\
-"name" : "TTJets_SingleLepton",
+"name" : "TTJets_SingleLeptonFromT_full",
 "chunkString":"cmgTuples_MC25ns_1l_08062016_TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns",
 "dir": pathEce+"cmgTuples_MC25ns_1l_08062016_TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns/",
 "dbsName" : "/TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM",
