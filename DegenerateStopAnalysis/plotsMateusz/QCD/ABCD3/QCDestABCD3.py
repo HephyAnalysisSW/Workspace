@@ -183,21 +183,21 @@ for reg in regions:
       ], baseCut = presel)
    
    #nIDA
-   QCD[reg]['MIA'] = CutClass("QCD_MIA_" + reg, [
+   QCD[reg]['IMA'] = CutClass("QCD_IMA_" + reg, [
       #["elePt<30", elePt['ID'] + " < 30"],
       SRs['anti-I'][reg], 
       ["anti-I", "Sum$(" + eleSel + "&&" + antiHybIsoCut + ") == 1"], #inverted
       ["anti-A", "vetoJet_dPhi_j1j2 > 2.5"], #inverted
       ], baseCut = presel) 
 
-abcd = ['SR', 'IM_A', 'A_IM', 'MIA']
+abcd = ['SR', 'IM_A', 'A_IM', 'IMA']
 
 yields = {}
 QCDexp = {}
    
 if not os.path.isfile(savedir + "/QCDyields" + suffix + ".txt"):
    outfile = open(savedir + "/QCDyields" + suffix + ".txt", "w")
-   outfile.write(eleWP + " Electron ID and (MET,HT) Preselection of (" + HTcut + "," + METcut + ")\nSR           IM_A                        A_IM                     MIA                       QCD                     MC                     Ratio\n")
+   outfile.write(eleWP + " Electron ID and Preselection of (MET, HT) > (" + METcut + "," + HTcut + ")\nSR           IM_A                 A_IM                     IMA                       QCD                     MC                     Ratio\n")
 
 for reg in regions:
    yields[reg] = {}
@@ -205,28 +205,22 @@ for reg in regions:
    for sel in abcd:
       yields[reg][sel] = Yields(samples, [qcd], QCD[reg][sel], cutOpt = "combinedList", weight = "weight", pklOpt = False, tableName = reg + "_" + sel, nDigits = 2, err = True, verbose = True, nSpaces = 10)
    
-   if yields[reg]['MIA'].yieldDictFull[qcd]['QCD_MIA_' + reg].val: 
+   if yields[reg]['IMA'].yieldDictFull[qcd]['QCD_IMA_' + reg].val: 
       QCDexp[reg] = (yields[reg]['IM_A'].yieldDictFull[qcd]['QCD_IM_A_' + reg] * yields[reg]['A_IM'].yieldDictFull[qcd]['QCD_A_IM_' + reg]/\
-      yields[reg]['MIA'].yieldDictFull[qcd]['QCD_MIA_' + reg])
+      yields[reg]['IMA'].yieldDictFull[qcd]['QCD_IMA_' + reg])
       
-      #QCDerr[reg] = QCDexp * sqrt(\
-      #         (totalErr['nAerr']/totalYlds['nA'])*(totalErr['nAerr']/totalYlds['nA']) +\
-      #         (totalErr['nIerr']/totalYlds['nI'])*(totalErr['nIerr']/totalYlds['nI']) +\
-      #         (totalErr['nDerr']/totalYlds['nD'])*(totalErr['nDerr']/totalYlds['nD']) +\
-      #         2*(totalErr['nIDAerr']/totalYlds['nIDA'])*(totalErr['nIDAerr']/totalYlds['nIDA']))
-  
       print makeLine()
       print "nA_IM = ", yields[reg]['A_IM'].yieldDictFull[qcd]['QCD_A_IM_' + reg], " | nIM_A = ", yields[reg]['IM_A'].yieldDictFull[qcd]['QCD_IM_A_' + reg],\
-            " | nMIA = ", yields[reg]['MIA'].yieldDictFull[qcd]['QCD_MIA_' + reg]
+            " | nIMA = ", yields[reg]['IMA'].yieldDictFull[qcd]['QCD_IMA_' + reg]
       print "QCD Estimation in ", reg, ": ", QCDexp[reg]
       print "QCD MC yield in ", reg, ": ", yields[reg]['SR'].yieldDictFull[qcd]['QCD_SR_' + reg]
       print makeLine()
       
       with open(savedir + "/QCDyields" + suffix + ".txt", "a") as outfile:
-            outfile.write(reg + "       " +\
+            outfile.write(reg + "     " +\
             str(yields[reg]['IM_A'].yieldDictFull[qcd]['QCD_IM_A_' + reg]) + "             " +\
             str(yields[reg]['A_IM'].yieldDictFull[qcd]['QCD_A_IM_' + reg]) + "             " +\
-            str(yields[reg]['MIA'].yieldDictFull[qcd]['QCD_MIA_' + reg]) + "             " +\
+            str(yields[reg]['IMA'].yieldDictFull[qcd]['QCD_IMA_' + reg]) + "             " +\
             str(QCDexp[reg].round(2)) + "             " +\
             str(yields[reg]['SR'].yieldDictFull[qcd]['QCD_SR_' + reg]) + "             ")
             if yields[reg]['SR'].yieldDictFull[qcd]['QCD_SR_' + reg].val:

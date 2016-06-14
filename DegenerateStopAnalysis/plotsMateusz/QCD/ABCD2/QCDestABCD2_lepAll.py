@@ -1,4 +1,4 @@
-#QCDestABCD2_lepAll_looseDxy.py
+#QCDestABCD2_lepAll.py
 import ROOT
 import os, sys
 import argparse
@@ -40,8 +40,8 @@ if not len(sys.argv) > 1:
 #isolation = args.isolation
 METcut = args.MET
 HTcut = args.HT
-#enriched = args.enriched
 eleWP = args.eleWP
+#enriched = args.enriched
 plot = args.plot
 save = args.save
 
@@ -128,7 +128,6 @@ presel = CutClass("presel_SR", [
    ["ISR110", "nIsrJet >= 1"],
    ["No3rdJet60","nVetoJet <= 2"],
    ["BVeto","(nBSoftJet == 0 && nBHardJet == 0)"],
-   #["otherCollection", "Sum$(" + eleSel_other + ") == 0"],
    #["elePt<30", elePt + " < 30"],
    #["anti-AntiQCD", "vetoJet_dPhi_j1j2 > 2.5"],
    #["anti-HybIso", "Sum$(" + eleSel + "&&" + antiHybIsoCut + ") == 1"],
