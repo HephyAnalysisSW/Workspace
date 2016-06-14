@@ -22,8 +22,8 @@ ROOT.gStyle.SetOptStat(0) #1111 #0 removes histogram statistics box #Name, Entri
 #Input options
 parser = argparse.ArgumentParser(description = "Input options")
 #parser.add_argument("--isolation", dest = "isolation",  help = "Isolation (hybIso03/hybIso04)", type = str, default = "hybIso03")
-parser.add_argument("--MET", dest = "MET",  help = "MET Cut", type = str, default = "300")
-parser.add_argument("--HT", dest = "HT",  help = "HT Cut", type = str, default = "300")
+parser.add_argument("--MET", dest = "MET",  help = "MET Cut", type = str, default = "200")
+parser.add_argument("--HT", dest = "HT",  help = "HT Cut", type = str, default = "200")
 #parser.add_argument("--METloose", dest = "METloose",  help = "Loose MET Cut", type = str, default = "250")
 parser.add_argument("--eleWP", dest = "eleWP",  help = "Electron WP", type = str, default = "Veto")
 #parser.add_argument("--removedCut", dest = "removedCut",  help = "Variable removed from electron ID", type = str, default = "None") #"sigmaEtaEta" "hOverE" "ooEmooP" "dEta" "dPhi" "d0" "dz" "MissingHits" "convVeto"
@@ -120,10 +120,8 @@ sigmaEtaEtaCuts = {\
 sigmaEtaEtaCut = "((" + geoSel['EB'] + " && LepAll_sigmaIEtaIEta <" + str(sigmaEtaEtaCuts[eleWP]['EB']) + ") || (" + geoSel['EE'] + "&& LepAll_sigmaIEtaIEta <" + str(sigmaEtaEtaCuts[eleWP]['EE']) + "))"
 antiSigmaEtaEtaCut = "((" + geoSel['EB'] + " && LepAll_sigmaIEtaIEta >" + str(sigmaEtaEtaCuts[eleWP]['EB']) + ") || (" + geoSel['EE'] + "&& LepAll_sigmaIEtaIEta >" + str(sigmaEtaEtaCuts[eleWP]['EE']) + "))"
 
-hybIsoCut = "(LepAll_relIso03*min(LepAll_pt, 25)) < 5"
-antiHybIsoCut = "(LepAll_relIso03*min(LepAll_pt, 25)) > 5"
-#hybIsoCut = "((LepAll_absIso03 < 5) || LepAll_relIso03 < 0.2))"
-#antiHybIsoCut = "((LepAll_absIso03 > 5) && (LepAll_relIso03 > 0.2))"
+hybIsoCut = "(LepAll_relIso03*min(LepAll_pt, 25)) < 5" #hybIsoCut = "((LepAll_absIso03 < 5) || LepAll_relIso03 < 0.2))"
+antiHybIsoCut = "(LepAll_relIso03*min(LepAll_pt, 25)) > 5" #antiHybIsoCut = "((LepAll_absIso03 > 5) && (LepAll_relIso03 > 0.2))"
 
 #Redefining electron pT in terms of selection
 elePt = {}
@@ -220,7 +218,7 @@ QCDexp = {}
    
 if not os.path.isfile(savedir + "/QCDyields" + suffix + ".txt"):
    outfile = open(savedir + "/QCDyields" + suffix + ".txt", "w")
-   outfile.write(eleWP + " Electron ID and (MET,HT) Preselection of (" + HTcut + "," + METcut + ")\nSR           SA_I                 IA_S                    IS_A                     ISA                       QCD                     MC                     Ratio\n")
+   outfile.write(eleWP + " Electron ID and (MET,HT) Preselection of (" + HTcut + "," + METcut + ")\nSR           IS_A                 SA_I                    IA_S                     ISA                       QCD                     MC                     Ratio\n")
 
 for reg in regions:
    yields[reg] = {}
@@ -241,9 +239,9 @@ for reg in regions:
 
       with open(savedir + "/QCDyields" + suffix + ".txt", "a") as outfile:
          outfile.write(reg + "     " +\
+         str(yields[reg]['IS_A'].yieldDictFull['qcd']['QCD_IS_A_' + reg].round(2)) + "             " +\
          str(yields[reg]['SA_I'].yieldDictFull['qcd']['QCD_SA_I_' + reg].round(2)) + "             " +\
          str(yields[reg]['IA_S'].yieldDictFull['qcd']['QCD_IA_S_' + reg].round(2)) + "             " +\
-         str(yields[reg]['IS_A'].yieldDictFull['qcd']['QCD_IS_A_' + reg].round(2)) + "             " +\
          str(yields[reg]['ISA'].yieldDictFull['qcd']['QCD_ISA_' + reg].round(2)) + "             " +\
          str(QCDexp[reg].round(2)) + "             " +\
          str(yields[reg]['SR'].yieldDictFull['qcd']['QCD_SR_' + reg].round(2)) + "             ")

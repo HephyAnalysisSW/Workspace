@@ -22,7 +22,7 @@ ptSplit = 10 #we have above and below 10 GeV categories
 
 def electronIDs(ID = "standard", removedCut = "None", iso = "", collection = "LepGood"):
   
-   WPs = ['None', 'Veto', 'Loose', 'Medium', 'Tig']
+   WPs = ['None', 'Veto', 'Loose', 'Medium', 'Tight']
 
    if ID not in ["standard", "MVA", "manual", "nMinus1"]:
       print makeLine() 
@@ -87,7 +87,7 @@ def electronIDs(ID = "standard", removedCut = "None", iso = "", collection = "Le
    
    #Manual/nMinus1
    else:
-      WPs = ['Veto', 'Loose', 'Medium', 'Tig']
+      WPs = ['Veto', 'Loose', 'Medium', 'Tight']
  
       variables = ['sigmaEtaEta', 'dEta',  'dPhi', 'hOverE', 'ooEmooP', 'd0', 'dz', 'MissingHits', 'convVeto']
       
@@ -128,7 +128,7 @@ def electronIDs(ID = "standard", removedCut = "None", iso = "", collection = "Le
          'convVeto':{   'EB':1, 'EE':1},
          #'relIso' : {   'EB':0.0766, 'EE':0.0678}},
       },
-      'Tig':{
+      'Tight':{
          'sigmaEtaEta':{'EB':0.0101, 'EE':0.0279},
          'dEta':{       'EB':0.00926,'EE':0.00724},
          'dPhi':{       'EB':0.0336, 'EE':0.0918},
@@ -212,7 +212,7 @@ def electronIDsIndex(ID = "standard", removedCut = "None", iso = "", collection 
       print "Applying electron ID to leading lepton."
       print makeLine()
  
-   WPs = ['None', 'Veto', 'Loose', 'Medium', 'Tig']
+   WPs = ['None', 'Veto', 'Loose', 'Medium', 'Tight']
 
    if ID not in ["standard", "MVA", "manual", "nMinus1"]:
       print makeLine() 
@@ -277,7 +277,7 @@ def electronIDsIndex(ID = "standard", removedCut = "None", iso = "", collection 
    
    #Manual/nMinus1
    else:
-      WPs = ['Veto', 'Loose', 'Medium', 'Tig']
+      WPs = ['Veto', 'Loose', 'Medium', 'Tight']
  
       variables = ['sigmaEtaEta', 'dEta',  'dPhi', 'hOverE', 'ooEmooP', 'd0', 'dz', 'MissingHits', 'convVeto']
       
@@ -318,7 +318,7 @@ def electronIDsIndex(ID = "standard", removedCut = "None", iso = "", collection 
          'convVeto':{   'EB':1, 'EE':1},
          #'relIso' : {   'EB':0.0766, 'EE':0.0678}},
       },
-      'Tig':{
+      'Tight':{
          'sigmaEtaEta':{'EB':0.0101, 'EE':0.0279},
          'dEta':{       'EB':0.00926,'EE':0.00724},
          'dPhi':{       'EB':0.0336, 'EE':0.0918},
@@ -395,7 +395,7 @@ def cutClasses(eleIDsel, ID = "standard"):
       exit()
       
    if ID == "MVA": WPs = ['None', 'WP80', 'WP90']
-   else: WPs = ['None', 'Veto', 'Loose', 'Medium', 'Tig']
+   else: WPs = ['None', 'Veto', 'Loose', 'Medium', 'Tight']
    
    allCuts = {iWP:{} for iWP in WPs}
 

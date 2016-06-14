@@ -30,6 +30,7 @@ officialSignals = ["s300_290", "s300_270", "s300_240"] #FIXME: crosscheck if the
 
 allOfficialSignals = samples.massScanList()
 #allOfficialSignals = [s for s in samples if samples[s]['isSignal'] and not samples[s]['isData'] and s not in privateSignals and s not in backgrounds] 
+lessOfficialSignals = [s for s in allOfficialSignals if int(s.split("s")[1].split("_")[0]) < 425]
 allSignals = privateSignals + allOfficialSignals
 allSamples = allSignals + backgrounds
 
@@ -103,7 +104,7 @@ print "ID type: ", ID, " | Electron ID WP: ", WP, " | Electron ID Cut Removed: "
 print makeLine()
 
 if doLimits:
-   selectedSamples = allOfficialSignals + backgrounds 
+   selectedSamples = lessOfficialSignals + backgrounds 
    
    limits={}
    
