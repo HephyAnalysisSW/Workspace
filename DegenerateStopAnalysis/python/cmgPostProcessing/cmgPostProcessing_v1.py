@@ -255,12 +255,12 @@ def getSamples(args):
 
     if args.skimPreselect:
         outDir = os.path.join(
-            targetDir, processingEra, cmgProcessingTag, cmgPostProcessingTag, parameterSet, 
+            targetDir, processingEra, cmgProcessingTag, cmgPostProcessingTag, parameterSet, 'step1',
             cmgTuples, args.skimGeneral, 'skimPreselect', args.skimLepton
             )
     else:
         outDir = os.path.join(
-            targetDir, processingEra, cmgProcessingTag, cmgPostProcessingTag, parameterSet, 
+            targetDir, processingEra, cmgProcessingTag, cmgPostProcessingTag, parameterSet, 'step1',
             cmgTuples, args.skimGeneral, args.skimLepton
             )
     
@@ -363,7 +363,6 @@ def eventsSkimPreselect(skimGeneral, skimLepton, skimPreselectFlag, params, skim
     The skim condition depends on the general skim name, the lepton skim selection, and on the
     event preselection. 
     
-    FIXME remove hardcoded values, read them from params
     '''
 
     logger = logging.getLogger('cmgPostProcessing.eventsSkimPreselect')
@@ -380,10 +379,6 @@ def eventsSkimPreselect(skimGeneral, skimLepton, skimPreselectFlag, params, skim
         pass
     elif skimGeneral.startswith('met'):
         skimCond = "met_pt>" + str(float(skimGeneral[3:]))
-    elif skimGeneral == 'HT400':
-        skimCond = "Sum$(Jet_pt)>400"
-    elif skimGeneral == 'HT400ST200': 
-        skimCond = "Sum$(Jet_pt)>400&&(LepGood_pt[0]+met_pt)>200"
     elif skimGeneral == 'lheHThigh': 
         skimCond += "&&(lheHTIncoming>={0})".format(lheHThighIncoming)
     elif skimGeneral == 'lheHTlow': 
@@ -399,21 +394,13 @@ def eventsSkimPreselect(skimGeneral, skimLepton, skimPreselectFlag, params, skim
     else:
         pass
     
-    # for inclusive skim, no skim selection is done, the skim condition is reset 
-    if skimGeneral == 'inc':
-        skimCond = "(1)"
-      
     logger.info("\n Jobs running with skim = '%s' \n Initial skimming condition: \n  %s \n ", skimGeneral, skimCond)
     
     if skimPreselectFlag:
-        metCut = "(met_pt>200)"
-        leadingJet100 = "((Max$(Jet_pt*(abs(Jet_eta)<2.4 && Jet_id) ) > 100 ) >=1)"
-        HTCut    = "(Sum$(Jet_pt*(Jet_pt>30 && abs(Jet_eta)<2.4 && (Jet_id)) ) >200)"
+        skimPreselectionCuts = SkimParameters['skimPreselect']
+        skimCond += "&&%s"%skimPreselectionCuts
 
-        preselectionCuts = "(%s)"%'&&'.join([metCut,leadingJet100,HTCut])
-        skimCond += "&&%s"%preselectionCuts
-
-        logger.info("\n Applying preselection cuts: %s ", preselectionCuts)
+        logger.info("\n Applying preselection cuts for skimming: %s ", skimPreselectionCuts)
         logger.info("\n Skimming condition with preselection: \n  %s \n", skimCond)
     else:
         logger.info("\n No preselection cuts are applied for skim %s \n Skimming condition unchanged \n", skimGeneral)
@@ -990,9 +977,6 @@ def processLeptons(readTree, splitTree, saveTree, params, LepSelector):
         selectorName = 'lep (mu + el)' if objName is 'lep' else objName
         printStr = "\n  {0} {1} selector \n ".format(LepColl, selectorName)
         
-        if objName in ['mu', 'el']:
-            printStr += '\n  ' + pprint.pformat(LepSel[objName])
-        
         printStr += '\n ' + lepObj.printObjects(objList, LepVarList[objName])
 
         printStr += "\n saveTree.n{0}_{1} = %i \n  Index list: ".format(LepColl, objName) + \
@@ -1326,7 +1310,6 @@ def processJets(args, readTree, splitTree, saveTree, params):
 
     if logger.isEnabledFor(logging.DEBUG):
         printStr = "\n  " + objBranches + " basic jet selector \n " + \
-            pprint.pformat(basJetSel) + \
             '\n ' + jetObj.printObjects(basJetList, JetVarList) + \
             "\n saveTree.nBasJet = %i \n  Index list: " + pprint.pformat(basJetList) + "\n "
         logger.debug(printStr, saveTree.nBasJet)
@@ -1343,7 +1326,6 @@ def processJets(args, readTree, splitTree, saveTree, params):
 
     if logger.isEnabledFor(logging.DEBUG):
         printStr = "\n  " + objBranches + " veto jet selector (from basic jets) \n " + \
-            pprint.pformat(vetoJetSel) + \
             '\n ' + jetObj.printObjects(vetoJetList, JetVarList) + \
             "\n saveTree.nVetoJet = %i \n  Index list: " + pprint.pformat(vetoJetList) + "\n "
         logger.debug(printStr, saveTree.nVetoJet)
@@ -1361,7 +1343,6 @@ def processJets(args, readTree, splitTree, saveTree, params):
 
     if logger.isEnabledFor(logging.DEBUG):
         printStr = "\n  " + objBranches + " isr jet selector (from basic jets) \n " + \
-            pprint.pformat(isrJetSel) + \
             '\n ' + jetObj.printObjects(isrJetList, JetVarList) + \
             "\n saveTree.nIsrJet = %i \n  Index list: " + pprint.pformat(isrJetList) + "\n "
         logger.debug(printStr, saveTree.nIsrJet)
@@ -1379,7 +1360,6 @@ def processJets(args, readTree, splitTree, saveTree, params):
 
     if logger.isEnabledFor(logging.DEBUG):
         printStr = "\n  " + objBranches + " isr high jet selector (from basic jets) \n " + \
-            pprint.pformat(isrHJetSel) + \
             '\n ' + jetObj.printObjects(isrHJetList, JetVarList) + \
             "\n saveTree.nIsrHJet = %i \n  Index list: " + pprint.pformat(isrHJetList) + "\n "
         logger.debug(printStr, saveTree.nIsrHJet)
@@ -1453,7 +1433,6 @@ def processJets(args, readTree, splitTree, saveTree, params):
     
     if logger.isEnabledFor(logging.DEBUG):
         printStr = "\n  " + objBranches + " b jet selector (from basic jets), sorted after jet pt \n " + \
-            pprint.pformat(bJetSel) + \
             '\n ' + jetObj.printObjects(bJetList, JetVarList) + \
             "\n saveTree.nBJet = %i \n  Index list: " + pprint.pformat(bJetList) + "\n "
         logger.debug(printStr, saveTree.nBJet)
