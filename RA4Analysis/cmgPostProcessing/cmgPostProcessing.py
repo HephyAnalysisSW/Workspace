@@ -20,7 +20,7 @@ from systematics_helper import calc_btag_systematics, calc_LeptonScale_factors_a
 from btagEfficiency import *
 from readVetoEventList import *
 
-bTagEffFile = '/data/dspitzbart/Results2016/MCEff_skim_hadron_pkl'
+bTagEffFile = '/data/dspitzbart/Spring16/btagEfficiency/effs_presel_pkl_WPupdate'
 
 try:
   mcEffDict = pickle.load(file(bTagEffFile))

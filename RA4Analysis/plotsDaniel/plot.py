@@ -135,6 +135,8 @@ st = {'name':'st', 'binning':[37,250,2100], 'titleX':'L_{T} [GeV]', 'titleY':'Ev
 stRB = {'name':'st', 'binning':[20,250,1250], 'titleX':'L_{T} [GeV]', 'titleY':'Events', 'filename':'lt'}
 
 htRB = {'name':'htJet30j', 'binning':[22,500,2700], 'titleX':'H_{T} [GeV]', 'titleY':'Events', 'filename':'ht'}
+ht = {'name':'htJet30j', 'binning':[52,500,3100], 'titleX':'H_{T} [GeV]', 'titleY':'Events', 'filename':'ht'}
+
 htSRB = {'name':'htJet30j', 'binning':[12,500,2500], 'titleX':'H_{T} [GeV]', 'titleY':'Events', 'filename':'ht'}
 
 LHEht = {'name':'lheHTIncoming', 'binning':[25,500,2500], 'titleX':'H_{T} [GeV]', 'titleY':'Events', 'filename':'ht'}
@@ -257,6 +259,8 @@ newPreselCutNeg = {'name':'presel','string':newpresel+'&&leptonPdg<0','niceName'
 newPreselCutPos = {'name':'presel','string':newpresel+'&&leptonPdg>0','niceName':'Presel PosPdg'}
 newPreselCutEle = {'name':'presel','string':newpresel+'&&singleElectronic','niceName':'Presel NegPdg'}
 newPreselCutMu  = {'name':'presel','string':newpresel+'&&singleMuonic','niceName':'Presel PosPdg'}
+
+newPreselCutMultiB = {'name':'presel','string':newpresel+'&&nJet30>5', 'signal':signalpresel, 'niceName':'Preselection'}
 
 
 CutNeg = {'name':'presel','string':'leptonPdg<0','niceName':'Presel NegPdg'}

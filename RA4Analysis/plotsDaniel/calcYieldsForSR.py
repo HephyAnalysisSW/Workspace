@@ -7,15 +7,20 @@ from math import *
 from array import array
 
 from Workspace.HEPHYPythonTools.helpers import getVarValue, getChain, deltaPhi
-from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
+#from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
+from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed import *
+
 from Workspace.RA4Analysis.helpers import *
 from rCShelpers import *
 from Workspace.RA4Analysis.signalRegions import *
 from Workspace.HEPHYPythonTools.user import username
 
+
 binning=[30,0,1500]
 
-prepresel = 'singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80'
+#prepresel = 'singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80'
+prepresel = 'singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&Jet_pt[1]>80'
+
 
 bVar = 'nBJetMediumCSV30'
 
@@ -24,15 +29,28 @@ varstring='deltaPhi_Wl'
 lepSel = 'hard'
 
 targetLumi = 10. #fb^-1
-sampleLumi = 4. #fb^-1
-signalRegions = signalRegion10fb
+sampleLumi = 3. #fb^-1
+signalRegions = signalRegions2016
 
 scaleFactor = targetLumi/sampleLumi
 
-cBkg = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]],histname='')
-signal1 = getChain(T5qqqqWW_mGo1000_mCh800_mChi700[lepSel],histname='')
-signal2 = getChain(T5qqqqWW_mGo1200_mCh1000_mChi800[lepSel],histname='')
-signal3 = getChain(T5qqqqWW_mGo1500_mCh800_mChi100[lepSel],histname='')
+#cBkg = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]],histname='')
+#signal1 = getChain(T5qqqqWW_mGo1000_mCh800_mChi700[lepSel],histname='')
+#signal2 = getChain(T5qqqqWW_mGo1200_mCh1000_mChi800[lepSel],histname='')
+#signal3 = getChain(T5qqqqWW_mGo1500_mCh800_mChi100[lepSel],histname='')
+
+cBkg = getChain([TTJets_combined_25ns, WJetsHTToLNu_25ns, singleTop_25ns, DY_25ns, TTV_25ns],histname='')
+
+signal1 = getChain(T5qqqqVV_mGluino_1000To1075_mLSP_1To950[1000][700], histname='')
+signal2 = getChain(T5qqqqVV_mGluino_1200To1275_mLSP_1to1150[1200][800],histname='')
+signal3 = getChain(T5qqqqVV_mGluino_1400To1550_mLSP_1To1275[1500][100],histname='')
+
+signal1 = getChain(T5qqqqVV_mGluino_1200To1275_mLSP_1to1150[1200][900], histname='')
+signal2 = getChain(T5qqqqVV_mGluino_1400To1550_mLSP_1To1275[1400][1000],histname='')
+signal3 = getChain(T5qqqqVV_mGluino_1600To1750_mLSP_1To950[1600][100],histname='')
+
+weight = 'weight*lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*TopPtWeight*0.94'
+signalWeight = 'weight*lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*0.94'
 
 yields = []
 yieldsDict = {}
@@ -54,10 +72,10 @@ for njb in signalRegions:
       
       name, cut = nameAndCut(stb, htb, njb, btb=(0,0), presel=prepresel, btagVar=bVar)
       
-      cBkg.Draw(varstring+'>>bkgH','('+cut+')*weight')
-      signal1.Draw(varstring+'>>sig1H','('+cut+')*weight')
-      signal2.Draw(varstring+'>>sig2H','('+cut+')*weight')
-      signal3.Draw(varstring+'>>sig3H','('+cut+')*weight')
+      cBkg.Draw(varstring+'>>bkgH','('+cut+')*'+weight)
+      signal1.Draw(varstring+'>>sig1H','('+cut+')*'+signalWeight)
+      signal2.Draw(varstring+'>>sig2H','('+cut+')*'+signalWeight)
+      signal3.Draw(varstring+'>>sig3H','('+cut+')*'+signalWeight)
       
       yBkg = bkgH.GetBinContent(2)*scaleFactor
       yBkgE = bkgH.GetBinError(2)*scaleFactor
@@ -96,7 +114,7 @@ res = yieldsDict
 print "Results"
 print
 print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrr|rrr|rrr|c|}\\hline'
-print ' \\njet     & \ST $[$GeV$]$ & \HT $[$GeV$]$ & \multicolumn{3}{c|}{Background} & \multicolumn{3}{c|}{$T5q^4$ 1.0/0.8/0.7} & \multicolumn{3}{c|}{$T5q^4$ 1.2/1.0/0.8} & \multicolumn{3}{c|}{$T5q^4$ 1.5/0.8/0.1} & $\Delta\Phi$ cut\\\ \\hline'
+print ' \\njet     & \LT $[$GeV$]$ & \HT $[$GeV$]$ & \multicolumn{3}{c|}{Background} & \multicolumn{3}{c|}{$T5q^4$ 1.2/0.9} & \multicolumn{3}{c|}{$T5q^4$ 1.4/1.0} & \multicolumn{3}{c|}{$T5q^4$ 1.6/0.1} & $\Delta\Phi$ cut\\\ \\hline'
 
 secondLine = False
 for srNJet in sorted(signalRegions):
