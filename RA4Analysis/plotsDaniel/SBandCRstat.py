@@ -29,14 +29,16 @@ ROOT.TH1F().SetDefaultSumw2()
 lepSel = 'hard'
 
 cWJets      = getChain(WJetsHTToLNu_25ns,histname='')
-cTTJets     = getChain(TTJets_combined,histname='')
+cTTJets     = getChain(TTJets_combined_25ns,histname='')
 cDY         = getChain(DY_25ns,histname='')
 csingleTop  = getChain(singleTop_25ns,histname='')
 cTTV        = getChain(TTV_25ns,histname='')
 cRest       = getChain([singleTop_25ns, DY_25ns, TTV_25ns],histname='')#no QCD
-cBkg        = getChain([WJetsHTToLNu_25ns, TTJets_combined, singleTop_25ns, DY_25ns, TTV_25ns], histname='')
+cBkg        = getChain([WJetsHTToLNu_25ns, TTJets_combined_25ns, singleTop_25ns, DY_25ns, TTV_25ns], histname='')
 
-cData = getChain([single_mu_Run2015D, single_ele_Run2015D], histname='')
+#cData = getChain([single_mu_Run2015D, single_ele_Run2015D], histname='')
+cData = cBkg
+
 
 #cWJets  = getChain(WJetsHT_25ns,histname='')
 #cTTJets = getChain(TTJets_HTLO_25ns,histname='')
@@ -58,18 +60,18 @@ btagString = 'nBJetMediumCSV30'
 charges = [['posPDG','leptonPdg>0'],['negPDG','leptonPdg<0']]
 
 stats ={}
-signalRegions = signalRegion3fb
+signalRegions = signalRegions2016
 
-lumi = 2.1
+lumi = 10.
 
-def makeWeight(lumi=4., sampleLumi=3.,debug=False):
-  if debug:
-    print 'No lumi-reweighting done!!'
-    return 'weight', 'weight*weight'
-  else:
-    weight_str = '(((weight)/'+str(sampleLumi)+')*'+str(lumi)+')'
-    weight_err_str = '('+weight_str+'*'+weight_str+')'
-  return weight_str, weight_err_str
+#def makeWeight(lumi=10., sampleLumi=3.,debug=False):
+#  if debug:
+#    print 'No lumi-reweighting done!!'
+#    return 'weight', 'weight*weight'
+#  else:
+#    weight_str = '(((weight)/'+str(sampleLumi)+')*'+str(lumi)+')'
+#    weight_err_str = '('+weight_str+'*'+weight_str+')'
+#  return weight_str, weight_err_str
 
 weight_str, weight_err_str = makeWeight(lumi=lumi)
 

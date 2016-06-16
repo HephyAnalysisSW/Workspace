@@ -35,8 +35,8 @@ TTJets_DiLepton_full = {\
 'isData':False,
 }
 
-TTJets_LO = {\
-"name" : "TTJets_LO",
+TTJets_NLO = {\
+"name" : "TTJets_NLO",
 "chunkString":"cmgTuples_MC25ns_1l_08062016_TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns",
 "dir": pathEce+"cmgTuples_MC25ns_1l_08062016_TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns/",
 "dbsName" : "/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM",

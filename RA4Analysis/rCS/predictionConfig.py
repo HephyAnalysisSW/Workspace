@@ -14,7 +14,7 @@ from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed impor
 from Workspace.HEPHYPythonTools.user import username
 from Workspace.RA4Analysis.signalRegions import *
 
-testRun = False
+testRun = True
 
 ## b-tagging and other variables
 dPhiStr = 'deltaPhi_Wl'
@@ -22,10 +22,10 @@ bjreg = (0,0)
 wjetsSB = (3,4)
 
 nBTagVar              = 'nBJetMediumCSV30'
-useBTagWeights        = False
-btagWeightSuffix      = ''#'_SF'
-templateWeights       = False
-templateWeightSuffix  = ''#'_SF'
+useBTagWeights        = True
+btagWeightSuffix      = '_SF'
+templateWeights       = True
+templateWeightSuffix  = '_SF'
 
 QCDup       = False
 QCDdown     = False
@@ -53,12 +53,12 @@ loadTemplate = False
 #cQCD        = getChain(QCDHT_25ns,histname='')
 
 cWJets      = getChain(WJetsHTToLNu,histname='')
-cTTJets     = getChain(TTJets_incl,histname='')
+cTTJets     = getChain(TTJets_combined,histname='')
 cDY         = getChain(DY_madgraph,histname='')
 csingleTop  = getChain(singleTop_lep,histname='')
 cTTV        = getChain(TTV,histname='')
 cRest       = getChain([singleTop_lep, DY_madgraph, TTV],histname='')#no QCD
-cBkg        = getChain([WJetsHTToLNu, TTJets_incl, singleTop, DY, TTV], histname='')#no QCD
+cBkg        = getChain([WJetsHTToLNu, TTJets_combined, singleTop, DY, TTV], histname='')#no QCD
 cQCD        = getChain(QCDHT,histname='')
 
 
@@ -89,15 +89,16 @@ if validation:
   signalRegions = validationRegionAll
   regStr = 'validation_4j'
 else:
-  signalRegions = signalRegion3fb
-  regStr = 'fullSR'
+  signalRegions = signalRegions2016R
+  #regStr = 'fullSR'
+  regStr = 'reducedSR'
 #signalRegions = signalRegion3fbMerge
 
 ## weight calculations
-lumi = 3.
-templateLumi = 3. # lumi that was used when template was created - if defined wrong, fixed rest backgrounds will be wrong
+lumi = 0.8
+templateLumi = 0.8 # lumi that was used when template was created - if defined wrong, fixed rest backgrounds will be wrong
 sampleLumi = 3.
-printlumi = '3.'
+printlumi = '0.8'
 debugReweighting = False
 
 year = '2016'
@@ -144,11 +145,12 @@ presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSoftLeptons=
 singleMu_presel = "((!isData&&singleMuonic)||(isData&&"+triggers+"&&(muonDataSet&&singleMuonic)&&"+filters+"))"
 singleMu_presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSoftLeptons==0 && Jet_pt[1]>80 && st>250 && nJet30>2 && htJet30j>500"
 
-#presel = singleMu_presel
+presel = singleMu_presel
 
 ## weights for MC
 #MCweight = 'lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*0.94'
-MCweight = 'lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*TopPtWeight*0.94'
+#MCweight = 'lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*TopPtWeight*0.94'
+MCweight = '(1)'
 
 ## corrections
 createFits = False # turn off if you already did one

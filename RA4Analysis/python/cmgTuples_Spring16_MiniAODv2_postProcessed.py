@@ -25,11 +25,38 @@ TTJets_combined = {\
 "TTJets_LO_HT2500toInf",
 "TTJets_LO_HT600to800",
 "TTJets_LO_HT800to1200",
-#"TTJets_SingleLeptonFromT_full",
+"TTJets_SingleLeptonFromT_full",
 "TTJets_SingleLeptonFromTbar_full",
-'TTJets_SingleLepton'
+#'TTJets_SingleLepton'
 ],
 'dir' : dirEce,
+}
+
+TTJets_singleLep = {\
+"name" : "TTJets_singleLep",
+"bins" : [
+"TTJets_SingleLeptonFromT_full",
+"TTJets_SingleLeptonFromTbar_full",
+],
+'dir' : dirDaniel,
+}
+
+TTJets_diLep = {\
+"name" : "TTJets_singleLep",
+"bins" : [
+"TTJets_DiLepton",
+],
+'dir' : dirDaniel,
+}
+
+TTJets_Lep = {\
+"name" : "TTJets_singleLep",
+"bins" : [
+"TTJets_SingleLeptonFromT_full",
+"TTJets_SingleLeptonFromTbar_full",
+"TTJets_DiLepton",
+],
+'dir' : dirDaniel,
 }
 
 TTJets_incl = {\
