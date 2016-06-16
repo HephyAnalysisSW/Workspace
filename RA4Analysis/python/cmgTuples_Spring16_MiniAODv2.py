@@ -193,6 +193,17 @@ WJetsToLNu_HT2500toInf={\
 'isData':False
 }
 
+WJetsToLNu={\
+"name" : "WJetsToLNu",
+"chunkString":"cmgTuples_MC25ns_1l_08062016_WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns",
+"dir": pathDaniel+"cmgTuples_MC25ns_1l_08062016_WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns/",
+'dbsName':'',
+"skimAnalyzerDir":"",
+"rootFileLocation":"tree.root",
+"treeName":"tree",
+'isData':False
+}
+
 
 QCD_HT300to500_25ns={
 "name" : "QCD_HT300to500",

@@ -20,7 +20,7 @@ from systematics_helper import calc_btag_systematics, calc_LeptonScale_factors_a
 from btagEfficiency import *
 from readVetoEventList import *
 
-bTagEffFile = '/data/dspitzbart/Results2016/MCEff_skim_hadron_pkl'
+bTagEffFile = '/data/dspitzbart/Spring16/btagEfficiency/effs_presel_pkl_WPupdate'
 
 try:
   mcEffDict = pickle.load(file(bTagEffFile))
@@ -435,7 +435,7 @@ for isample, sample in enumerate(allSamples):
           s.singleElectronic  = False 
         j_list=['eta','pt','phi','btagCMVA', 'btagCSV', 'id']
         jets = filter(lambda j:j['pt']>30 and abs(j['eta'])<2.4 and j['id'], get_cmg_jets_fromStruct(r,j_list))
-        lightJets,  bJetsCSV = splitListOfObjects('btagCSV', 0.890, jets)
+        lightJets,  bJetsCSV = splitListOfObjects('btagCSV', 0.800, jets)
         s.htJet30j = sum([x['pt'] for x in jets])
         s.nJet30 = len(jets)
         s.nBJetMediumCSV30 = len(bJetsCSV)

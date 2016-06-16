@@ -22,35 +22,44 @@ bjreg = (0,0)
 wjetsSB = (3,4)
 
 nBTagVar              = 'nBJetMediumCSV30'
-useBTagWeights        = True
-btagWeightSuffix      = '_SF'
-templateWeights       = True
-templateWeightSuffix  = '_SF'
+useBTagWeights        = False
+btagWeightSuffix      = ''#'_SF'
+templateWeights       = False
+templateWeightSuffix  = ''#'_SF'
 
 QCDup       = False
 QCDdown     = False
-nameSuffix  = '_Moriond'
+nameSuffix  = '_FirstCheck'
 if QCDup: nameSuffix += '_QCDup'
 if QCDdown: nameSuffix += '_QCDdown'
 
 ## samples
-isData              = True
+isData              = False
 unblinded           = True
 validation          = False
 isCentralPrediction = True
 if isData:
   isCentralPrediction = False #should be false for data, otherwise kappa is measured in data!
 
-loadTemplate = True
+loadTemplate = False
 
-cWJets      = getChain(WJetsHTToLNu_25ns,histname='')
-cTTJets     = getChain(TTJets_combined,histname='')
-cDY         = getChain(DY_25ns,histname='')
-csingleTop  = getChain(singleTop_25ns,histname='')
-cTTV        = getChain(TTV_25ns,histname='')
-cRest       = getChain([singleTop_25ns, DY_25ns, TTV_25ns],histname='')#no QCD
-cBkg        = getChain([WJetsHTToLNu_25ns, TTJets_combined, singleTop_25ns, DY_25ns, TTV_25ns], histname='')#no QCD
-cQCD        = getChain(QCDHT_25ns,histname='')
+#cWJets      = getChain(WJetsHTToLNu_25ns,histname='')
+#cTTJets     = getChain(TTJets_combined,histname='')
+#cDY         = getChain(DY_25ns,histname='')
+#csingleTop  = getChain(singleTop_25ns,histname='')
+#cTTV        = getChain(TTV_25ns,histname='')
+#cRest       = getChain([singleTop_25ns, DY_25ns, TTV_25ns],histname='')#no QCD
+#cBkg        = getChain([WJetsHTToLNu_25ns, TTJets_combined, singleTop_25ns, DY_25ns, TTV_25ns], histname='')#no QCD
+#cQCD        = getChain(QCDHT_25ns,histname='')
+
+cWJets      = getChain(WJetsHTToLNu,histname='')
+cTTJets     = getChain(TTJets_incl,histname='')
+cDY         = getChain(DY_madgraph,histname='')
+csingleTop  = getChain(singleTop_lep,histname='')
+cTTV        = getChain(TTV,histname='')
+cRest       = getChain([singleTop_lep, DY_madgraph, TTV],histname='')#no QCD
+cBkg        = getChain([WJetsHTToLNu, TTJets_incl, singleTop, DY, TTV], histname='')#no QCD
+cQCD        = getChain(QCDHT,histname='')
 
 
 ## QCD estimation
@@ -85,10 +94,10 @@ else:
 #signalRegions = signalRegion3fbMerge
 
 ## weight calculations
-lumi = 2.3
-templateLumi = 2.3 # lumi that was used when template was created - if defined wrong, fixed rest backgrounds will be wrong
+lumi = 3.
+templateLumi = 3. # lumi that was used when template was created - if defined wrong, fixed rest backgrounds will be wrong
 sampleLumi = 3.
-printlumi = '2.3'
+printlumi = '3.'
 debugReweighting = False
 
 year = '2016'
@@ -101,7 +110,7 @@ else:
   templateLumistr = str(templateLumi)#.replace('.','p')
 
 ## Template Bootstrap error dictionary
-templateBootstrap = True
+templateBootstrap = False
 if validation:
   templateBootstrap = False
 templateBootstrapDir = '/data/dspitzbart/bootstrap/combined_errs_pkl'
@@ -109,10 +118,10 @@ if templateBootstrap: templateBootstrap = pickle.load(file(templateBootstrapDir)
 
 ## Directories for plots, results and templates
 if isData:
-  templateName   = 'SFtemplates_'+regStr+'_lep_data'
+  templateName   = 'Spring16_templates_'+regStr+'_lep_data'
   predictionName = templateName + nameSuffix
 else:
-  templateName   = 'SFtemplates_'+regStr+'_lep_MC'
+  templateName   = 'Spring16_templates_'+regStr+'_lep_MC'
   predictionName = templateName+btagWeightSuffix + nameSuffix
 printDir    = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/25ns/templateFit_'+predictionName+'_'+lumistr+'/'
 pickleDir   = '/data/'+username+'/Results'+year+'/Prediction_'+predictionName+'_'+lumistr+'/'

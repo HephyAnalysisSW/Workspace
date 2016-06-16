@@ -20,19 +20,19 @@ def getHistMCTruthEfficiencies(MCEff, histname, etaBin = (0,0.8), hadron='b'):
 can = ROOT.TCanvas('can','can',600,600)
 can.SetBottomMargin(0.22)
 
-effs = pickle.load(file('/data/dspitzbart/Results2016/MCEff_skim_hadron_pkl'))
+effs = pickle.load(file('/data/dspitzbart/Spring16/btagEfficiency/effs_presel_pkl_WPupdate'))
 
-h_b_1 = getHistMCTruthEfficiencies(effs['TTJets'], 'h_b_1', etaBin = (0,0.8), hadron='b')
-h_b_2 = getHistMCTruthEfficiencies(effs['TTJets'], 'h_b_2', etaBin = (0.8,1.6), hadron='b')
-h_b_3 = getHistMCTruthEfficiencies(effs['TTJets'], 'h_b_3', etaBin = (1.6,2.4), hadron='b')
+h_b_1 = getHistMCTruthEfficiencies(effs['WJets'], 'h_b_1', etaBin = (0,0.8), hadron='b')
+h_b_2 = getHistMCTruthEfficiencies(effs['WJets'], 'h_b_2', etaBin = (0.8,1.6), hadron='b')
+h_b_3 = getHistMCTruthEfficiencies(effs['WJets'], 'h_b_3', etaBin = (1.6,2.4), hadron='b')
 
-h_c_1 = getHistMCTruthEfficiencies(effs['TTJets'], 'h_c_1', etaBin = (0,0.8), hadron='c')
-h_c_2 = getHistMCTruthEfficiencies(effs['TTJets'], 'h_c_2', etaBin = (0.8,1.6), hadron='c')
-h_c_3 = getHistMCTruthEfficiencies(effs['TTJets'], 'h_c_3', etaBin = (1.6,2.4), hadron='c')
+h_c_1 = getHistMCTruthEfficiencies(effs['WJets'], 'h_c_1', etaBin = (0,0.8), hadron='c')
+h_c_2 = getHistMCTruthEfficiencies(effs['WJets'], 'h_c_2', etaBin = (0.8,1.6), hadron='c')
+h_c_3 = getHistMCTruthEfficiencies(effs['WJets'], 'h_c_3', etaBin = (1.6,2.4), hadron='c')
 
-h_l_1 = getHistMCTruthEfficiencies(effs['TTJets'], 'h_l_1', etaBin = (0,0.8), hadron='other')
-h_l_2 = getHistMCTruthEfficiencies(effs['TTJets'], 'h_l_2', etaBin = (0.8,1.6), hadron='other')
-h_l_3 = getHistMCTruthEfficiencies(effs['TTJets'], 'h_l_3', etaBin = (1.6,2.4), hadron='other')
+h_l_1 = getHistMCTruthEfficiencies(effs['WJets'], 'h_l_1', etaBin = (0,0.8), hadron='other')
+h_l_2 = getHistMCTruthEfficiencies(effs['WJets'], 'h_l_2', etaBin = (0.8,1.6), hadron='other')
+h_l_3 = getHistMCTruthEfficiencies(effs['WJets'], 'h_l_3', etaBin = (1.6,2.4), hadron='other')
 
 h_b_1.SetLineColor(ROOT.kAzure+12)
 h_b_2.SetLineColor(ROOT.kAzure+9)
@@ -114,7 +114,7 @@ latex1.SetTextAlign(11)
 latex1.DrawLatex(0.16,0.96,'CMS #bf{#it{Simulation}}')
 latex1.DrawLatex(0.85,0.96,'#bf{(13TeV)}')
 
-can.Print('/afs/hephy.at/user/d/dspitzbart/www/plots4thesis/btagEfficiencies.png')
-can.Print('/afs/hephy.at/user/d/dspitzbart/www/plots4thesis/btagEfficiencies.pdf')
-can.Print('/afs/hephy.at/user/d/dspitzbart/www/plots4thesis/btagEfficiencies.root')
+can.Print('/afs/hephy.at/user/d/dspitzbart/www/Spring16/btagEfficiency/W_jets_Spring16_WPupdate.png')
+can.Print('/afs/hephy.at/user/d/dspitzbart/www/Spring16/btagEfficiency/W_jets_Spring16_WPupdate.pdf')
+can.Print('/afs/hephy.at/user/d/dspitzbart/www/Spring16/btagEfficiency/W_jets_Spring16_WPupdate.root')
 

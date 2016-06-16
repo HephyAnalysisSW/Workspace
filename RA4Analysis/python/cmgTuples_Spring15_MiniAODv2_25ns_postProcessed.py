@@ -17,7 +17,7 @@ TTJets_HTLO_25ns={\
 }
 
 #####(diLep+SemiLep+HT binned samples) for LHE_HT<=1000 & (HT binned samples) for LHE_HT>1000
-TTJets_combined = {\
+TTJets_combined_25ns = {\
 "name" : "TTJets_combined",
 "bins" : [
 "TTJets_DiLepton",
