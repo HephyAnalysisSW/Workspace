@@ -25,9 +25,11 @@ def getParameterSet(args):
 
     #
     # arguments to build the parameter set
-    parameterSet = args.parameterSet
-    processTracks = args.processTracks
+    skimGeneral = args.skimGeneral
+    skimLepton = args.skimLepton
+    skimPreselect = args.skimPreselect
 
+    processTracks = args.processTracks
     processLepAll = args.processLepAll
     
     # parameter set definitions
@@ -36,11 +38,22 @@ def getParameterSet(args):
     
     
     # target luminosity (fixed value, given here)
-    
+
     params['target_lumi'] = 10000  # pb-1
 
     # skimmimg parameters
-    
+
+    if skimPreselect:
+        # branches for preselection (scalars or vectors) must be included in readVar or readVectors
+        metCut = "(met_pt>100)"
+        leadingJet_pt = "((Max$(Jet_pt*(abs(Jet_eta)<2.4 && Jet_id) ) > 90 ) >=1)"
+        HTCut = "(Sum$(Jet_pt*(Jet_pt>30 && abs(Jet_eta)<2.4 && (Jet_id)) ) >200)"
+
+        skimPreselectCondition = "(%s)" % '&&'.join([metCut, leadingJet_pt, HTCut])
+    else:
+        skimPreselectCondition = ''
+        pass
+
     SkimParameters = {
         'lheHThigh': {
             'lheHTIncoming': 600
@@ -48,11 +61,11 @@ def getParameterSet(args):
         'lheHTlow': {
             'lheHTIncoming': 600
             },
-        
+        'skimPreselect': skimPreselectCondition,
         }
-    
+
     params['SkimParameters'] = SkimParameters
-    
+
     # lepton (electron and muon) selection
     
     LepGoodSel = {
@@ -109,6 +122,7 @@ def getParameterSet(args):
             },
         #
         # electron selection
+        # https://twiki.cern.ch/twiki/bin/view/CMS/CutBasedElectronIdentificationRun2#Spring15_selection_25ns
         'el': {
             'pdgId': ('pdgId', operator.eq, 11, operator.abs),
             'pt': ('pt', operator.gt, 5),

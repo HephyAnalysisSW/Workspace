@@ -8,14 +8,14 @@
 #        ln -s CMSSW_7_4_12_patch4/src/Workspace/DegenerateStopAnalysis/python/cmgPostProcessing/runPostProcessing.sh .
 #    Run steps:   
 #       From the base repository, where the link was done:
-#       nohup krenew -t -K 10 -- bash -c "./runPostProcessing.sh $1 [$2 [3]]" &
+#       nohup krenew -t -K 10 -- bash -c "./runPostProcessing.sh $1 [$2 [3]]" & ; disown
 #
 #       $1 compulsory; 
 #          set sample as defined in runPostProcessing.sh
 #       $2 optional for MC samples, must be set to 'DATA' for data
 #          if 'DATA', take cmgTuples="Data25ns_v6", for any other value takes cmgTuples="Spring15_7412pass2_mAODv2_v6"
 #       $3 optional;
-#          if 'TEST', add to "_TEST" to CMG_POST_PROCESSING_TAG, e.g. "74X_postProcessing_v3_TEST"
+#          if 'TEST', add to "_TEST" to CMG_POST_PROCESSING_TAG, e.g. "74X_postProcessing_v4_TEST"
 #          with 'TEST', it also add '--verbose'
 #
 # 
@@ -44,10 +44,10 @@ else
     CMG_TUPLES="Spring15_7412pass2_mAODv2_v6"
 fi
 
-CMG_POST_PROCESSING_TAG="74X_postProcessing_v3"
+CMG_POST_PROCESSING_TAG="74X_postProcessing_v4"
 VERBOSE=""
 if [[ ${3} == "TEST" ]]; then 
-    CMG_POST_PROCESSING_TAG="74X_postProcessing_v3_TEST"
+    CMG_POST_PROCESSING_TAG="74X_postProcessing_v4_TEST"
     VERBOSE="--verbose"
 fi
 
