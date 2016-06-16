@@ -60,7 +60,8 @@ lepSF_h2b = d.GetPrimitive('h2b')
 
 #pickleDir =  '/data/dspitzbart/Results2016/Prediction_SFtemplates_fullSR_lep_data_Moriond_2p3/'
 #pickleDir =  '/data/dspitzbart/Results2016/Prediction_SFtemplates_fullSR_lep_data_QCDerrChange_2p25/'
-pickleDir =  '/data/dspitzbart/Results2016/Prediction_SFtemplates_validation_4j_lep_data_2p3/'
+#pickleDir =  '/data/dspitzbart/Results2016/Prediction_SFtemplates_validation_4j_lep_data_2p3/'
+pickleDir =  '/data/dspitzbart/Results2016/Prediction_testRun_0p8/'
 saveDir = pickleDir
 #saveDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_fullSR_lep_data_2p25/'
 
@@ -76,6 +77,9 @@ if validation:
   dilep   = pickle.load(file('/data/dspitzbart/Results2016/dilep_val_pkl'))
 else:
   dilep   = pickle.load(file('/data/dspitzbart/Results2016/dilep_pkl'))
+
+
+validation = True
 
 #topPt_Err = pickle.load(file("/data/easilar/Spring15/25ns/extended_with_truth_counts_topPt_pkl"))
 #topPt_Err = pickle.load(file("/data/dspitzbart/Results2016/topErr_pkl_update"))
@@ -252,7 +256,10 @@ for injb,srNJet in enumerate(sorted(signalRegions)):
       qcdErrH.SetBinContent(i, qcdErr)
       
       #2l
-      dilepErr = dilep[srNJet][stb][htb]
+      if validation:
+        dilepErr = 0.05
+      else:
+        dilepErr = dilep[srNJet][stb][htb]
       dilepErrH.SetBinContent(i, dilepErr)
       
       # uncertainties on MC rest
@@ -489,9 +496,9 @@ total_err.Draw('2 same')
 
 can.cd()
 
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/syst_errors_approval_Moriond.png')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/syst_errors_approval_Moriond.root')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/syst_errors_approval_Moriond.pdf')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/syst_errors_approval_Moriond_whatever.png')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/syst_errors_approval_Moriond_whatever.root')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/syst_errors_approval_Moriond_whatever.pdf')
 
 
 savePickle = True

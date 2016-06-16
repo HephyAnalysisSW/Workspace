@@ -9,10 +9,10 @@ signalRegion40pb = {(5,5): {(250, 350): {(500, -1): {'deltaPhi': .5}},
 signalRegionCRonly = {(5,5): {(250, -1): {(500, -1): {'deltaPhi': .5}}},
                     (6,-1):{(250, -1): {(500, -1): {'deltaPhi': .5}}}
                    }
-oneRegion = {(5,5): {(250, 350): {(500, -1): {'deltaPhi': 1.}}}}
+oneRegion = {(5,5): {(250, 350): {(500, -1): {'deltaPhi': 1., 'njet':'5j','LT':'LT1','HT': 'HTi',      'tex':'\\textrm{LT1}, \\textrm{HTi}'}}}}
 
-smallRegion = {(5,5): {(250, 350): {(500, -1): {'deltaPhi': 1.}}},
-               (6,7):{(250, 350): {(500, 750): {'deltaPhi': 1.}}}
+smallRegion = {(5,5): {(250, 350): {(500, -1): {'deltaPhi': 1., 'njet':'5j','LT':'LT1','HT': 'HTi',      'tex':'\\textrm{LT1}, \\textrm{HTi}'}}},
+               (6,7):{(250, 350): {(500, 750): {'deltaPhi': 1., 'njet':'6-7j','LT':'LT1','HT': 'HT1',      'tex':'\\textrm{LT1}, \\textrm{HTi}'}}}
               }
 
 signalRegion2fb = {(5, 5): {(250, 350): {(500, -1): {'deltaPhi': 1.0}},
@@ -92,12 +92,12 @@ signalRegions2016 = {(5,5): {(250, 350): {(500, 750):   {'deltaPhi': 1.0},
                                           (750, 1000):  {'deltaPhi': 0.75},
                                           (1000, -1):   {'deltaPhi': 0.75}}}}
 
-signalRegions2016R = {(5,5): {(250, 350): {(500, -1):   {'deltaPhi': 1.0}},
-                             (350, 450): {(500, -1):   {'deltaPhi': 1.0}},
-                             (450, -1):  {(500, -1):   {'deltaPhi': 0.75}}},
-                     (6,-1):{(250, 350): {(500, -1):   {'deltaPhi': 1.0}},
-                             (350, 450): {(500, -1):   {'deltaPhi': 1.0}},
-                             (450, -1):  {(500, -1):   {'deltaPhi': 0.75}}}}
+signalRegions2016R = {(5,5): {(250, 350): {(500, -1):   {'deltaPhi': 1.0, 'njet':'5j','LT':'LT1','HT': 'HTi',      'tex':'\\textrm{LT1}, \\textrm{HTi}'}},
+                             (350, 450): {(500, -1):   {'deltaPhi': 1.0, 'njet':'5j','LT':'LT2','HT': 'HTi',      'tex':'\\textrm{LT2}, \\textrm{HTi}'}},
+                             (450, -1):  {(500, -1):   {'deltaPhi': 0.75, 'njet':'5j','LT':'LT3','HT': 'HTi',      'tex':'\\textrm{LT3}, \\textrm{HTi}'}}},
+                     (6,-1):{(250, 350): {(500, -1):   {'deltaPhi': 1.0, 'njet':'#geq6j','LT':'LT1','HT': 'HTi',      'tex':'\\textrm{LT1}, \\textrm{HTi}'}},
+                             (350, 450): {(500, -1):   {'deltaPhi': 1.0, 'njet':'#geq6j','LT':'LT2','HT': 'HTi',      'tex':'\\textrm{LT2}, \\textrm{HTi}'}},
+                             (450, -1):  {(500, -1):   {'deltaPhi': 0.75, 'njet':'#geq6j','LT':'LT3','HT': 'HTi',      'tex':'\\textrm{LT3}, \\textrm{HTi}'}}}}
 
 
 #signalRegion3fb = {(5, 5): {(250, 350): {(500, -1):   {'deltaPhi': 1.0}},

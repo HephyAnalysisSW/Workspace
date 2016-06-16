@@ -7,14 +7,15 @@ from Workspace.HEPHYPythonTools.helpers import getChain
 
 #from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT500ST250_postProcessed_btagWeight import *
 #from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT500ST250_postProcessed_fromArthur import *
-from Workspace.RA4Analysis.cmgTuples_Data25ns_miniAODv2_postprocessed import *
+#from Workspace.RA4Analysis.cmgTuples_Data25ns_miniAODv2_postprocessed import *
+from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2_postProcessed import *
 from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed import *
-#from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed_btag import *
+from Workspace.RA4Analysis.cmgTuples_Data25ns_Promtv2_postprocessed import *
 
 from Workspace.HEPHYPythonTools.user import username
 from Workspace.RA4Analysis.signalRegions import *
 
-testRun = True
+testRun = False
 
 ## b-tagging and other variables
 dPhiStr = 'deltaPhi_Wl'
@@ -29,12 +30,12 @@ templateWeightSuffix  = '_SF'
 
 QCDup       = False
 QCDdown     = False
-nameSuffix  = '_FirstCheck'
+nameSuffix  = ''
 if QCDup: nameSuffix += '_QCDup'
 if QCDdown: nameSuffix += '_QCDdown'
 
 ## samples
-isData              = False
+isData              = True
 unblinded           = True
 validation          = False
 isCentralPrediction = True
@@ -53,12 +54,12 @@ loadTemplate = False
 #cQCD        = getChain(QCDHT_25ns,histname='')
 
 cWJets      = getChain(WJetsHTToLNu,histname='')
-cTTJets     = getChain(TTJets_combined,histname='')
-cDY         = getChain(DY_madgraph,histname='')
-csingleTop  = getChain(singleTop_lep,histname='')
-cTTV        = getChain(TTV,histname='')
-cRest       = getChain([singleTop_lep, DY_madgraph, TTV],histname='')#no QCD
-cBkg        = getChain([WJetsHTToLNu, TTJets_combined, singleTop, DY, TTV], histname='')#no QCD
+cTTJets     = getChain(TTJets_Lep,histname='')
+cDY         = getChain(DY_25ns,histname='')
+csingleTop  = getChain(singleTop_25ns,histname='')
+cTTV        = getChain(TTV_25ns,histname='')
+cRest       = getChain([singleTop_25ns, DY_25ns, TTV_25ns],histname='')#no QCD
+cBkg        = getChain([WJetsHTToLNu, TTJets_Lep, singleTop_25ns, DY_25ns, TTV_25ns], histname='')#no QCD
 cQCD        = getChain(QCDHT,histname='')
 
 
@@ -77,11 +78,11 @@ if isData or useQCDestimation: QCDestimate = pickle.load(file(QCDpickle))
 else: QCDestimate=False
 
 if isData:
-  cData = getChain([single_mu_Run2015D, single_ele_Run2015D], histname='')
+  cData = getChain([single_mu_Run2016B, single_ele_Run2016B], histname='')
 elif not isData and useQCDestimation:
-  cData = getChain([WJetsHTToLNu_25ns, TTJets_combined, singleTop_25ns, DY_25ns, TTV_25ns, QCDHT_25ns], histname='')
+  cData = getChain([WJetsHTToLNu, TTJets_Lep, singleTop_lep, DY_madgraph, TTV, QCDHT], histname='')
 else:
-  cData = getChain([WJetsHTToLNu_25ns, TTJets_combined, singleTop_25ns, DY_25ns, TTV_25ns], histname='')
+  cData = getChain([WJetsHTToLNu, TTJets_Lep, singleTop_lep, DY_madgraph, TTV], histname='')
 
 
 ## signal region definition
@@ -133,12 +134,14 @@ if validation:
   kappa_dict_dir = '/data/dspitzbart/Results'+year+'/Prediction_SFtemplates_validation_4j_lep_MC_SF_2p3/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'
 else:
   #kappa_dict_dir = '/data/dspitzbart/Results'+year+'/Prediction_SFtemplates_fullSR_lep_MC_SFnoPUreweight_2p25/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'
-  kappa_dict_dir = '/data/dspitzbart/Results'+year+'/Prediction_SFtemplates_fullSR_lep_MC_SF_Moriond_2p3/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'
+  #kappa_dict_dir = '/data/dspitzbart/Results'+year+'/Prediction_SFtemplates_fullSR_lep_MC_SF_Moriond_2p3/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'
+  kappa_dict_dir = '/data/dspitzbart/Results'+year+'/Prediction_testRun_0p8/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'
 
 ## Preselection cut
 triggers = "(HLT_EleHT350||HLT_MuHT350)"
 #filters = "Flag_goodVertices && Flag_HBHENoiseFilter_fix && Flag_CSCTightHaloFilter && Flag_eeBadScFilter && Flag_HBHENoiseIsoFilter"
-filters = "Flag_goodVertices && Flag_HBHENoiseFilter_fix && Flag_eeBadScFilter && Flag_HBHENoiseIsoFilter && veto_evt_list"
+#filters = "Flag_goodVertices && Flag_HBHENoiseFilter_fix && Flag_eeBadScFilter && Flag_HBHENoiseIsoFilter && veto_evt_list"
+filters = "Flag_goodVertices && Flag_HBHENoiseFilter_fix && Flag_eeBadScFilter && Flag_HBHENoiseIsoFilter"
 presel = "((!isData&&singleLeptonic)||(isData&&"+triggers+"&&((muonDataSet&&singleMuonic)||(eleDataSet&&singleElectronic))&&"+filters+"))"
 presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSoftLeptons==0 && Jet_pt[1]>80 && st>250 && nJet30>2 && htJet30j>500"
 
@@ -153,7 +156,7 @@ presel = singleMu_presel
 MCweight = '(1)'
 
 ## corrections
-createFits = False # turn off if you already did one
+createFits = True # turn off if you already did one
 if not isCentralPrediction:
   createFits = False
 fitDir = '/data/'+username+'/Results'+year+'/correctionFit_'+regStr+'_MC'+nameSuffix+'/'

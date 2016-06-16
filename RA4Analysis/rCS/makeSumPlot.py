@@ -39,7 +39,8 @@ prefix = 'singleLeptonic_Spring15_'
 #pickleDir = '/data/easilar/Results2016/Prediction_SFtemplates_fullSR_lep_data_2p25/'
 #pickleDir = '/data/dspitzbart/Results2015/Prediction_SFtemplates_validation_lep_data_2.1/'
 #pickleDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_fullSR_lep_data_Moriond_2p3/'
-pickleDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_validation_4j_lep_data_2p3/'
+#pickleDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_validation_4j_lep_data_2p3/'
+pickleDir = '/data/dspitzbart/Results2016/Prediction_testRun_0p8/'
 
 res = pickle.load(file(pickleDir+'resultsFinal_withSystematics_pkl'))
 if withSystematics:
@@ -542,9 +543,9 @@ if not unblinded:
 else:
   suffix = ''
 
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_approval_Moriond.png')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_approval_Moriond.root')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_approval_Moriond.pdf')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_first_ICHEP.png')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_first_ICHEP.root')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_first_ICHEP.pdf')
 
 can2 = ROOT.TCanvas('can2','can2',700,700)
 
@@ -583,7 +584,7 @@ leg2.Draw()
 latex2.DrawLatex(0.16,0.96,'CMS #bf{#it{'+latextitle+'}}')
 latex2.DrawLatex(0.79,0.96,"#bf{MC (13TeV)}")
 
-can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/'+predictionName+'_Kappa_approval_Moriond.png')
-can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/'+predictionName+'_Kappa_approval_Moriond.root')
-can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/'+predictionName+'_Kappa_approval_Moriond.pdf')
+can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/'+predictionName+'_Kappa_first_ICHEP.png')
+can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/'+predictionName+'_Kappa_first_ICHEP.root')
+can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/'+predictionName+'_Kappa_first_ICHEP.pdf')
 

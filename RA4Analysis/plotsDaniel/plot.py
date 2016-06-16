@@ -42,9 +42,9 @@ TTJets = {'name':'TTJets', 'chain':getChain(TTJets_HTLO_25ns,histname=''), 'colo
 
 TTJets_incl_16 = {'name':'TTJets', 'chain':getChain(TTJets_incl,histname=''), 'color':ROOT.kOrange,'weight':'weight', 'niceName':'t#bar{t}+Jets incl S16', 'cut':''}
 
-TTJets_combined_15 = {'name':'TTJets', 'chain':getChain(TTJets_combined_25ns,histname=''), 'color':color('TTJets')-2,'weight':totalWeight, 'niceName':'t#bar{t}+Jets S15', 'cut':''}
+TTJets_combined_15 = {'name':'TTJets', 'chain':getChain(TTJets_combined_25ns,histname=''), 'color':ROOT.kRed,'weight':totalWeight, 'niceName':'t#bar{t}+Jets S15', 'cut':''}
 TTJets_combined_16 = {'name':'TTJets', 'chain':getChain(TTJets_combined,histname=''), 'color':ROOT.kCyan,'weight':totalWeight, 'niceName':'t#bar{t}+Jets S16', 'cut':''}
-TTJets_singleLep_16 = {'name':'TTJets', 'chain':getChain(TTJets_singleLep,histname=''), 'color':ROOT.kRed,'weight':totalWeight, 'niceName':'t#bar{t}+Jets 1l S16', 'cut':''}
+TTJets_Lep_16 = {'name':'TTJets', 'chain':getChain(TTJets_Lep,histname=''), 'color':color('TTJets')-2,'weight':totalWeight, 'niceName':'t#bar{t}+Jets 1l S16', 'cut':''}
 
 
 #TTJets_combined_2 = {'name':'TTJets', 'chain':getChain(TTJets_combined_2,histname=''), 'color':ROOT.kMagenta,'weight':totalWeight, 'niceName':'t#bar{t}+Jets fix', 'cut':''}
