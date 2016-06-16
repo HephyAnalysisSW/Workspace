@@ -490,4 +490,44 @@ def get_logger(logModule, logLevel, logFile):
     return get_logger_rtuple
 
 
+def retryRemove(function, path, excinfo):
+    ''' Take a nap and try again.
+    
+    Address AFS/NSF problems with left-over lock files which prevents
+    the 'shutil.rmtree' to delete the directory. The idea is to wait at most 20 sec
+    for the fs to automatically remove these lock files and try again.
+    Inspired from some GANGA code.
+    
+    '''   
+    
+    logger = logging.getLogger(__name__ + '.retryRemove')   
+    
+    for delay in 1, 3, 6, 10:
+        
+        if not os.path.exists(path): 
+            break
+        
+        time.sleep(delay) 
+        shutil.rmtree(path, ignore_errors=True)
+        
+    # 
+    if not os.path.exists(path): 
+        logger.debug("\n Path \n    %s \n deleted \n", path)  
+    else:
+        os.system("lsof +D " + path) 
+        
+        # not nice, but try to force - however, even 'rm -rf' can fail for 'Device or resource busy'
+        os.system("rm -rf " + path)
+        logger.debug("\n Try to delete path \n    %s \n by force using 'rm -rf' \n", path)  
+    
+    # last check before giving up  
+    if os.path.exists(path): 
+        exctype, value = excinfo[:2]
+        logger.debug(
+            "\n Unable to remove path \n    %s \n from the system." + \
+            "\n Reason: %s:%s" + \
+            "\n There might be some AFS/NSF lock files left over. \n", 
+            path, exctype, value
+            )
+        
     

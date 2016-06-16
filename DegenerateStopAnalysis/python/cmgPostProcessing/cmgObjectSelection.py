@@ -328,7 +328,7 @@ def objSelectorFunc(objSel):
         elWP_eta_EB = elWPSel['eta_EB']
         elWP_eta_EE = elWPSel['eta_EE']
         
-        objEta = obj.eta[objIndex]
+        objEta = abs(obj.eta[objIndex])
         
         def cut_EB_EE(obj, varName, objIndex, elWPSelVars):
             
@@ -342,10 +342,10 @@ def objSelectorFunc(objSel):
              
             passCut = False
                        
-            if objEta < elWP_eta_EB:
+            if objEta <= elWP_eta_EB:
                 if opCut(varValue, elWPSelVars_var['EB']):
                     passCut = True
-            elif ((elWP_eta_EB <= objEta) and (objEta < elWP_eta_EE)):
+            elif ((elWP_eta_EB < objEta) and (objEta < elWP_eta_EE)):
                 if opCut(varValue, elWPSelVars_var['EE']):
                     passCut = True
             else:

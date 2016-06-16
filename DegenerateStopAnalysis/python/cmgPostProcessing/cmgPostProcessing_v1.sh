@@ -43,10 +43,10 @@ else
     CMG_TUPLES="Spring15_7412pass2_mAODv2_v6"
 fi
 
-CMG_POST_PROCESSING_TAG="74X_postProcessing_v3"
+CMG_POST_PROCESSING_TAG="74X_postProcessing_v4"
 VERBOSE=""
 if [[ ${3} == "TEST" ]]; then 
-    CMG_POST_PROCESSING_TAG="74X_postProcessing_v3_TEST"
+    CMG_POST_PROCESSING_TAG="74X_postProcessing_v4_TEST"
     VERBOSE="--verbose"
 fi
 

@@ -571,7 +571,7 @@ def runPostProcessing(argv=None):
     outputDirectory = os.path.join(
         args.targetDir, 
         args.processingEra, args.cmgProcessingTag, args.cmgPostProcessingTag, 
-        args.parameterSet, 
+        args.parameterSet, 'step1',
         args.cmgTuples
         )
 
