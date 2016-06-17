@@ -2,7 +2,7 @@ import ROOT
 import pickle
 from Workspace.HEPHYPythonTools.user import username
 from Workspace.HEPHYPythonTools.helpers import getObjFromFile, getChain, getChunks, getCutYieldFromChain, getYieldFromChain
-import Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_7412pass2_mAODv2_v6 as cmgTuples
+import Workspace.DegenerateStopAnalysis.samples.cmgTuples.Spring15_7412pass2_mAODv2_v7 as cmgTuples
 from Workspace.HEPHYPythonTools.xsecSMS import *
 
 import pickle
@@ -109,7 +109,3 @@ if __name__ == "__main__":
             chunk = chunks[0]
             chain = getChain(chunk, minAgeDPM=0, histname='histo', xrootPrefix='root://hephyse.oeaw.ac.at/', maxN=-1, treeName='tree')
             chains[sample_name]=chain
-
-
-
-

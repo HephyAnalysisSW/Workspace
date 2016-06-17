@@ -6,7 +6,7 @@ import PhysicsTools.HeppyCore.framework.config as cfg
 
 
 #data_path = "/data/nrad/cmgTuples/RunII/7412pass2_mAODv2_v4/Data25nsRun2015D_Dec18Json/"
-data_path = "/data/nrad/cmgTuples/7412pass2_mAODv2_v6/Data25ns_Run2015D_Dec18_Json/"
+data_path = "/data/mzarucki/cmgTuples/7412pass2_mAODv2_v7/Data25ns_Run2015D_Dec18_Json/"
 
 
 SingleMuon_Run2015D_v4 ={\
