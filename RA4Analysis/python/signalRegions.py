@@ -92,13 +92,10 @@ signalRegions2016 = {(5,5): {(250, 350): {(500, 750):   {'deltaPhi': 1.0},
                                           (750, 1000):  {'deltaPhi': 0.75},
                                           (1000, -1):   {'deltaPhi': 0.75}}}}
 
-signalRegions2016R = {(5,5): {(250, 350): {(500, -1):   {'deltaPhi': 1.0, 'njet':'5j','LT':'LT1','HT': 'HTi',      'tex':'\\textrm{LT1}, \\textrm{HTi}'}},
-                             (350, 450): {(500, -1):   {'deltaPhi': 1.0, 'njet':'5j','LT':'LT2','HT': 'HTi',      'tex':'\\textrm{LT2}, \\textrm{HTi}'}},
-                             (450, -1):  {(500, -1):   {'deltaPhi': 0.75, 'njet':'5j','LT':'LT3','HT': 'HTi',      'tex':'\\textrm{LT3}, \\textrm{HTi}'}}},
-                     (6,-1):{(250, 350): {(500, -1):   {'deltaPhi': 1.0, 'njet':'#geq6j','LT':'LT1','HT': 'HTi',      'tex':'\\textrm{LT1}, \\textrm{HTi}'}},
-                             (350, 450): {(500, -1):   {'deltaPhi': 1.0, 'njet':'#geq6j','LT':'LT2','HT': 'HTi',      'tex':'\\textrm{LT2}, \\textrm{HTi}'}},
-                             (450, -1):  {(500, -1):   {'deltaPhi': 0.75, 'njet':'#geq6j','LT':'LT3','HT': 'HTi',      'tex':'\\textrm{LT3}, \\textrm{HTi}'}}}}
-
+signalRegions2016VR = {(5,5): { (250, 350): {(500, -1):   {'deltaPhi': 0.75, 'njet':'5j','LT':'LT1','HT': 'HTi',      'tex':'\\textrm{LT1}, \\textrm{HTi}'}},
+                                (350, -1):  {(500, -1):   {'deltaPhi': 0.75, 'njet':'5j','LT':'LT2i','HT': 'HTi',     'tex':'\\textrm{LT2i}, \\textrm{HTi}'}}},
+                       (6,-1):{ (250, 350): {(500, -1):   {'deltaPhi': 0.75, 'njet':'#geq6j','LT':'LT1','HT': 'HTi',  'tex':'\\textrm{LT1}, \\textrm{HTi}'}},
+                                (350, -1):  {(500, -1):   {'deltaPhi': 0.75, 'njet':'#geq6j','LT':'LT2i','HT': 'HTi', 'tex':'\\textrm{LT2i}, \\textrm{HTi}'}}}}
 
 #signalRegion3fb = {(5, 5): {(250, 350): {(500, -1):   {'deltaPhi': 1.0}},
 #                            (350, 450): {(500, -1):   {'deltaPhi': 1.0}},

@@ -18,8 +18,13 @@ ROOT.AutoLibraryLoader.enable()
 from Workspace.HEPHYPythonTools.helpers import getChunks
 #from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_fromArturV2 import *
 #from Workspace.RA4Analysis.cmgTuples_data_25ns_fromArtur import *
-from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns import *
-from Workspace.RA4Analysis.cmgTuples_Data25ns_miniAODv2 import *
+#from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns import *
+#from Workspace.RA4Analysis.cmgTuples_Data25ns_miniAODv2 import *
+
+from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2 import *
+from Workspace.RA4Analysis.cmgTuples_Data25ns_PromtV2 import *
+
+
 from btagEfficiency import *
 from readVetoEventList import *
 from systematics_helper import calc_btag_systematics, calc_LeptonScale_factors_and_systematics, calc_TopPt_Weights , calcDLDictionary, calc_diLep_contributions , fill_branch_WithJEC
@@ -31,13 +36,13 @@ except IOError:
   print 'Unable to load MC efficiency file!'
   mcEffDict = False
 
-target_lumi = 2250 #pb-1
+target_lumi = 3000 #pb-1
 
 separateBTagWeights = True
 
 defSampleStr = "TTJets_LO_HT600to800_25ns"
 
-subDir = "postProcessed_Spring15_antiSelection_final2p25fb_v2"
+subDir = "postProcessed_Spring16_antiSelection_3fb"
 
 #branches to be kept for data and MC
 branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert",
@@ -208,8 +213,9 @@ for isample, sample in enumerate(allSamples):
     lumiScaleFactor=1
     branchKeepStrings = branchKeepStrings_DATAMC + branchKeepStrings_DATA 
   else:
-    if "TTJets" in sample['dbsName']: lumiScaleFactor = xsec[sample['dbsName']]*target_lumi/float(sumWeight)
-    else: lumiScaleFactor = target_lumi/float(sumWeight)
+    #if "TTJets" in sample['dbsName']: lumiScaleFactor = xsec[sample['dbsName']]*target_lumi/float(sumWeight)
+    #else:
+    lumiScaleFactor = target_lumi/float(sumWeight)
     branchKeepStrings = branchKeepStrings_DATAMC + branchKeepStrings_MC
   
   readVariables = ['met_pt/F', 'met_phi/F']

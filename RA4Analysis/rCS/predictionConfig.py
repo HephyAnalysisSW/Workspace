@@ -74,7 +74,7 @@ if isData and validation:
 #QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_extendedClosureTest3to4j_2p1fb_pkl'
 #QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_closureTest4to5j_2p1fb_pkl'
 
-if isData or useQCDestimation: QCDestimate = pickle.load(file(QCDpickle))
+if isData and useQCDestimation: QCDestimate = pickle.load(file(QCDpickle))
 else: QCDestimate=False
 
 if isData:
@@ -90,9 +90,9 @@ if validation:
   signalRegions = validationRegionAll
   regStr = 'validation_4j'
 else:
-  signalRegions = signalRegions2016R
+  signalRegions = signalRegions2016VR
   #regStr = 'fullSR'
-  regStr = 'reducedSR'
+  regStr = 'VreducedSR'
 #signalRegions = signalRegion3fbMerge
 
 ## weight calculations
@@ -135,7 +135,7 @@ if validation:
 else:
   #kappa_dict_dir = '/data/dspitzbart/Results'+year+'/Prediction_SFtemplates_fullSR_lep_MC_SFnoPUreweight_2p25/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'
   #kappa_dict_dir = '/data/dspitzbart/Results'+year+'/Prediction_SFtemplates_fullSR_lep_MC_SF_Moriond_2p3/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'
-  kappa_dict_dir = '/data/dspitzbart/Results'+year+'/Prediction_testRun_0p8/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'
+  kappa_dict_dir = '/data/dspitzbart/Results'+year+'/Prediction_Spring16_templates_VreducedSR_lep_MC_SF_0p8/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'
 
 ## Preselection cut
 triggers = "(HLT_EleHT350||HLT_MuHT350)"

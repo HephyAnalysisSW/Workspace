@@ -204,8 +204,8 @@ for isample, sample in enumerate(allSamples):
     branchKeepStrings = branchKeepStrings_DATAMC + branchKeepStrings_MC
   
   sampleKey = ''
-  topology1 = ['ttjets', 'ttw', 'ttz', 'tbar_tw','tto', 't_tw']
-  topology2 = ['wjets', 'dyjets']
+  topology1 = ['ttjets', 'ttw', 'ttz', 'tbar_tw','tto', 't_tw','st_t','st_s']
+  topology2 = ['wjets', 'dyjets','diboson','ww','zz','wz']
   for top in topology1:
     if top in sample['name'].lower(): sampleKey = 'TTJets'
   for top in topology2:
