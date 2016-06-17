@@ -8,8 +8,8 @@ from Workspace.HEPHYPythonTools.xsecSMS import *
 import pickle
 
 dos={
-      "get_sig_info":False,
-      "get_chains":True,
+      "get_sig_info":True,
+      "get_chains":False,
 
 
     }
