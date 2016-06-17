@@ -365,7 +365,7 @@ TTZToLLNuNu = {\
 ST_schannel_4f_leptonDecays = {\
 "name":"ST_schannel_4f_leptonDecays",
 "chunkString":"cmgTuples_MC25ns_1l_13062016_ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns_v2",
-"dir":  pathDaniel+"cmgTuples_MC25ns_1l_13062016_ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns_v2",
+"dir":  pathEce+"cmgTuples_MC25ns_1l_13062016_ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns_v2/",
 "dbsName" : "",
 "skimAnalyzerDir":"",
 "rootFileLocation":"tree.root",
