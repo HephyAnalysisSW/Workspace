@@ -1,6 +1,7 @@
 pathDaniel  = "/data/dspitzbart//cmgTuples/RunIISpring16MiniAODv2/" 
 pathEce     = "/afs/hephy.at/data/easilar01/cmgTuples/RunIISpring16MiniAODv2/"
 pathEce2    = "/data/easilar/cmgTuples/RunIISpring16MiniAODv2/"
+pathEce3    = "/data/easilar/cmgTuples/RunIISpring16MiniAODv2_Copied/"
 path = pathEce
 
 TTJets_SingleLeptonFromT_full = {\
@@ -275,7 +276,7 @@ QCD_HT500to700_25ns={
 QCD_HT700to1000_25ns={
 "name" : "QCD_HT700to1000",
 "chunkString":"cmgTuples_MC25ns_1l_18062016_QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1_MC25ns_v3",
-"dir": pathEce2+"cmgTuples_MC25ns_1l_18062016_QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1_MC25ns_v3/",
+"dir": pathEce3+"cmgTuples_MC25ns_1l_18062016_QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1_MC25ns_v3/",
 "dbsName":"",
 "skimAnalyzerDir":"",
 "rootFileLocation":"tree.root",
@@ -297,7 +298,7 @@ QCD_HT1000to1500_25ns={
 QCD_HT1500to2000_25ns={
 "name" : "QCD_HT1500to2000",
 "chunkString":"cmgTuples_MC25ns_1l_18062016_QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1_MC25ns_v3",
-"dir": pathEce2+"cmgTuples_MC25ns_1l_18062016_QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1_MC25ns_v3/",
+"dir": pathEce3+"cmgTuples_MC25ns_1l_18062016_QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1_MC25ns_v3/",
 "dbsName":"",
 "skimAnalyzerDir":"",
 "rootFileLocation":"tree.root",
