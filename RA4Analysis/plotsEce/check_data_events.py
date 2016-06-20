@@ -16,33 +16,33 @@ for run in runs:
   for lumi in jsn[run]:
      list_run_lumi.append("(run=="+str(run)+"&&"+"lumi>="+str(lumi[0])+"&&"+"lumi<="+str(lumi[1])+")")
 
-#str_run_lumi = "||".join(list_run_lumi)
+str_run_lumi = "||".join(list_run_lumi)
 
-#print str_run_lumi
+print str_run_lumi
 
-chunks = getChunks(SingleElectron_Run2016B_PromptReco_v2)
-
-chain = getChain(chunks[0],treeName='tree')
-#chain = getTreeFromChunk(chunks[0], "nJet>8&&nLepGood==1&&htJet40>1000")
-chain.Draw(">>eList", "nJet>8&&nLepGood==1&&htJet40>1000")
-eList = ROOT.gDirectory.Get("eList")
-number_events = eList.GetN()
-#chain.Scan("run:lumi:evt", "!("+str_run_lumi+")")
-
-
-#nEvents = chain.GetEntries()
-
-ultimate_events = []
-
-for i in range(number_events):
-  chain.GetEntry(eList.GetEntry(i))
-  run_branch = chain.GetLeaf('run').GetValue()
-  lumi_branch = chain.GetLeaf('lumi').GetValue()
-  evt_branch = chain.GetLeaf('evt').GetValue()
-  print run_branch , lumi_branch , evt_branch
-  str_evt = "_".join([str(run_branch),str(lumi_branch),str(evt_branch)]) 
-  #print str_evt
-  ultimate_events.append(list(str_evt)) 
-  
-if not allUnique(ultimate_events):
-  print "HEYY You have double counting in your events!!!!"
+#chunks = getChunks(SingleElectron_Run2016B_PromptReco_v2)
+#
+#chain = getChain(chunks[0],treeName='tree')
+##chain = getTreeFromChunk(chunks[0], "nJet>8&&nLepGood==1&&htJet40>1000")
+#chain.Draw(">>eList", "nJet>8&&nLepGood==1&&htJet40>1000")
+#eList = ROOT.gDirectory.Get("eList")
+#number_events = eList.GetN()
+##chain.Scan("run:lumi:evt", "!("+str_run_lumi+")")
+#
+#
+##nEvents = chain.GetEntries()
+#
+#ultimate_events = []
+#
+#for i in range(number_events):
+#  chain.GetEntry(eList.GetEntry(i))
+#  run_branch = chain.GetLeaf('run').GetValue()
+#  lumi_branch = chain.GetLeaf('lumi').GetValue()
+#  evt_branch = chain.GetLeaf('evt').GetValue()
+#  print run_branch , lumi_branch , evt_branch
+#  str_evt = "_".join([str(run_branch),str(lumi_branch),str(evt_branch)]) 
+#  #print str_evt
+#  ultimate_events.append(list(str_evt)) 
+#  
+#if not allUnique(ultimate_events):
+#  print "HEYY You have double counting in your events!!!!"

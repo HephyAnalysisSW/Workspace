@@ -19,7 +19,7 @@ min_st = 250
 min_ht = 500
 min_DPhi = 1
 nbjet = 0
-btag_var = 0.890
+btag_var = 0.80
 
 
 ######muon  selection####

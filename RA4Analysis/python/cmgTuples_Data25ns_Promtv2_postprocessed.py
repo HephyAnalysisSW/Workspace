@@ -10,7 +10,7 @@ import copy, os, sys
 dir ='/data/easilar/cmgTuples/postProcessing_Spring16/HT500LT250Skim/'
 
 single_mu_Run2016B = {\
-"name" : "SingleMuon_Run2016B_PromptReco_v2",
+"name" : "SingleMuon_Run2016B_PromptReco_v2_HT500ST250",
 "bins" : [
 "SingleMuon_Run2016B_PromptReco_v2",
 ],
@@ -19,7 +19,7 @@ single_mu_Run2016B = {\
 
 
 single_ele_Run2016B = {\
-"name" : "SingleElectron_Run2016B_PromptReco_v2",
+"name" : "SingleElectron_Run2016B_PromptReco_v2_HT500ST250",
 "bins" : [
 "SingleElectron_Run2016B_PromptReco_v2",
 ],

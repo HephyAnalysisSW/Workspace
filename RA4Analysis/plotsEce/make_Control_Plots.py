@@ -81,12 +81,13 @@ maxN = -1
 ROOT.gStyle.SetOptStat(0)
 
 all_MB = False
-presel = True
-SB_w   = False 
+presel = False
+SB_w   = True 
 SB_tt  = False
-
+presel_1b = False
 test = False
 
+draw_signal = False
 if all_MB : 
   #SR = signalRegion3fb
   SR = {(5,5):{(250,350):{(500,-1):{"deltaPhi":1.0}}}}
@@ -96,6 +97,7 @@ if all_MB :
 if presel : 
   SR = {(5,-1):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
   btag_weight = "(1)"#"(weightBTag0_SF)"
+  #btagVarString = "("+nbjets_30+")"
   nbtag = (0,0)
   signal_suffix = "x10"
 if SB_w : 
@@ -113,6 +115,11 @@ if test :
   btag_weight = "(weightBTag0_SF)"
   nbtag = (0,0)
   signal_suffix = "x10"
+if presel_1b : 
+  SR = {(3,-1):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
+  btag_weight = "(1)"#"(weightBTag0_SF)"
+  nbtag = (0,-1)
+  signal_suffix = "x10"
   
 lepSels = [
 {'cut':'(singleMuonic&&(!isData||(isData&&muonDataSet)))' , 'veto':'nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0',\
@@ -129,12 +136,13 @@ lepSels = [
 
 bkg_samples=[
 {'sample':'TTVH',           "weight":btag_weight ,"cut":nbtag ,"add_Cut":"(1)","name":TTV ,'tex':'t#bar{t}V','color':ROOT.kOrange-3},
+{"sample":"DiBosons",       "weight":"(1)"       ,"cut":nbtag ,"add_Cut":"(1)","name":diBoson ,"tex":"WW/WZ/ZZ","color":ROOT.kRed+3},
 {"sample":"DY",             "weight":btag_weight ,"cut":nbtag ,"add_Cut":"(1)","name":DY_amc,"tex":"DY + jets",'color':ROOT.kRed-6},
 {"sample":"singleTop",      "weight":btag_weight ,"cut":nbtag ,"add_Cut":"(1)","name":singleTop_lep,"tex":"t/#bar{t}",'color': ROOT.kViolet+5},
 {"sample":"QCD",            "weight":"(1)"       ,"cut":nbtag ,"add_Cut":"(1)","name":QCDHT, "tex":"QCD","color":ROOT.kCyan-6},
 {"sample":"WJets",          "weight":btag_weight ,"cut":nbtag ,"add_Cut":"(1)","name":WJetsHTToLNu,"tex":"W + jets","color":ROOT.kGreen-2},
-{"sample":"ttJets_diLep",   "weight":btag_weight ,"cut":nbtag ,"add_Cut":"((ngenLep+ngenTau)==2)","name":TTJets_combined, "tex":"t#bar{t} ll + jets",'color':ROOT.kBlue},
-{"sample":"ttJets_semiLep", "weight":btag_weight ,"cut":nbtag ,"add_Cut":"(!((ngenLep+ngenTau)==2))","name":TTJets_combined, "tex":"t#bar{t} l + jets",'color':ROOT.kBlue-7}
+{"sample":"ttJets_diLep",   "weight":btag_weight ,"cut":nbtag ,"add_Cut":"((ngenLep+ngenTau)==2)","name":TTJets_Lep, "tex":"t#bar{t} ll + jets",'color':ROOT.kBlue},
+{"sample":"ttJets_semiLep", "weight":btag_weight ,"cut":nbtag ,"add_Cut":"(!((ngenLep+ngenTau)==2))","name":TTJets_Lep, "tex":"t#bar{t} l + jets",'color':ROOT.kBlue-7}
 ]
 
 for bkg in bkg_samples:
@@ -145,6 +153,7 @@ signals = [\
 {"chain":getChain(T5qqqqVV_mGluino_1200To1275_mLSP_1to1150[1200][800],histname='') ,"name":"s1200","tex":"T5q^{4}WW 1.2/0.8 "+signal_suffix,"color":ROOT.kMagenta+2},\
 {"chain":getChain(T5qqqqVV_mGluino_1400To1550_mLSP_1To1275[1500][100],histname=''),"name":"s1500" ,"tex":"T5q^{4}WW 1.5/0.1 "+signal_suffix,"color":ROOT.kRed+1},\
 ]
+
 dPhiBins  = array('d', [float(x)/1000. for x in range(0,500,100)+range(500,700,200)+range(700,1000,300)+range(1000,2000,500)+range(2000,3141,1141)+range(3141,4141,1000)])
 plots =[\
 {'ndiv':False,'yaxis':'< Events / 0.1>','xaxis':'#Delta#Phi(W,l)','logy':'True' , 'var':'deltaPhi_Wl',        'bin_set':True,          'varname':'deltaPhi_Wl',       'binlabel':1, 'bin':(len(dPhiBins)-1,dPhiBins)},\
@@ -160,15 +169,26 @@ plots =[\
 {'ndiv':False,'yaxis':'Events','xaxis':'#phi(l)','logy':'True' , 'var':'LepGood_phi[0]',             'bin_set':False,          'varname':'leptonPhi',      'binlabel':25,  'bin':(40,-4,4)},\
 {'ndiv':False,'yaxis':'Events','xaxis':'miniIso(l)','logy':'True' , 'var':'LepGood_miniRelIso[0]',   'bin_set':False,          'varname':'leptonminiIso',      'binlabel':30,  'bin':(40,0,0.5)},\
 #{'ndiv':False,'yaxis':'Events','xaxis':'minDeltaR','logy':'True' , 'var':'Min$(sqrt((abs(Jet_phi-LepGood_phi[0]))**2+(abs(Jet_eta-LepGood_eta[0]))**2))',       'varname':'Min_R_Jet_lepton',      'binlabel':1,  'bin':(50,0,10)},\
-{'ndiv':False,'yaxis':'Events','xaxis':'Nvert','logy':'True' , 'var':'nVert',                        'bin_set':False,          'varname':'nVert',      'binlabel':1,  'bin':(50,0,50)}
+{'ndiv':False,'yaxis':'Events','xaxis':'Nvert','logy':'True' , 'var':'nVert',                        'bin_set':False,          'varname':'nVert',      'binlabel':1,  'bin':(50,0,50)},\
+{'ndiv':False,'yaxis':'Events','xaxis':'Jet_btagCSV','logy':'True' , 'var':'Jet_btagCSV',                     'bin_set':False,          'varname':'Jet_btagCSV',      'binlabel':1,  'bin':(50,0,2)},\
+{'ndiv':False,'yaxis':'Events','xaxis':'nbjets_30','logy':'True' , 'var':nbjets_30,                     'bin_set':False,          'varname':'nbjets_30',      'binlabel':1,  'bin':(8,0,8)}
   ]
 
 if test :
   plots = [plots[0]]
   lepSels = [lepSels[2]]
 
+if presel_1b :
+  plots = [plots[0]]
+  lepSels = [lepSels[2]]
+
+if not draw_signal :
+  signals = []
+
+lepSels = [lepSels[2]]
+
 for lepSel in lepSels:
-  path = "/afs/hephy.at/user/e/easilar/www/data/Run2016B/804pb/tests/"+lepSel['label']
+  path = "/afs/hephy.at/user/e/easilar/www/data/Run2016B/804pb/"+lepSel['label']
   if not os.path.exists(path):
     os.makedirs(path)
   print lepSel['label']
@@ -193,12 +213,16 @@ for lepSel in lepSels:
           bin[srNJet][stb][htb][p['varname']] = {}
           for bkg in bkg_samples:
             bla_Name, Cut = nameAndCut(stb, htb, srNJet, btb=bkg['cut'], presel="&&".join([bkg["add_Cut"],presel]), btagVar =  btagVarString)
+            #Cut = "&&".join([Cut,"(1)"])
+            #Cut = "("+Cut+")"
+            print bkg["sample"], Cut
             bin[srNJet][stb][htb][p['varname']][bkg['sample']] = getPlotFromChain(bkg['chain'], p['var'], p['bin'], cutString = Cut, weight = "*".join([weight_str_plot , bkg["weight"]]) , binningIsExplicit=False ,addOverFlowBin='both',variableBinning=p["bin_set"])
           bla_Name, Cut = nameAndCut(stb, htb,srNJet, btb=nbtag, presel=sig_presel, btagVar =  btagVarString)
           bin[srNJet][stb][htb][p['varname']]['signals'] = {}
           for sig in signals:
             bin[srNJet][stb][htb][p['varname']]['signals'][sig["name"]] = getPlotFromChain(sig['chain'], p['var'], p['bin'], cutString = Cut , weight = "*".join([weight_str_signal_plot , btag_weight]), binningIsExplicit=False ,addOverFlowBin='both',variableBinning=p["bin_set"]) 
           bla_Name, Cut = nameAndCut(stb, htb,srNJet, btb=nbtag, presel=data_presel, btagVar =  btagVarString)
+          print "Data" , Cut
           bin[srNJet][stb][htb][p['varname']]['data'] = getPlotFromChain(lepSel['chain'], p['var'], p['bin'], cutString = Cut , weight = "(1)", binningIsExplicit=False,addOverFlowBin='both',variableBinning=p["bin_set"])
           bin[srNJet][stb][htb]['label'] = Name         
           bin[srNJet][stb][htb]['path'] = CR_path        
@@ -322,6 +346,7 @@ for lepSel in lepSels:
           if not p['ndiv']:
             h_data.GetYaxis().SetTitle(p['yaxis'])
           print "Integral of BKG:" , stack_hist.Integral()
+          print "Integral of DATA:" , h_data.Integral()
 
           leg.AddEntry(h_data, "Data","PL")
           for bkg in reversed(bkg_samples):
