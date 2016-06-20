@@ -48,6 +48,7 @@ TTJets_NLO = {\
 #'postProcessingCut':"lheHTIncoming<600",
 }
 TTJets_LO = TTJets_NLO
+TTJets_LO["name"] = "TTJets_LO"
 TTJets_LO["chunkString"] =  "cmgTuples_MC25ns_1l_18062016_TT_TuneCUETP8M1_13TeV-powheg-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext4-v1_MC25ns_v3"
 TTJets_LO["dir"] =  pathEce2+TTJets_LO["chunkString"]
 TTJets_LO["dbsName"] =  "/TT_TuneCUETP8M1_13TeV-powheg-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext4-v1/MINIAODSIM"
