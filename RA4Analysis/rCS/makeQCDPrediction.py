@@ -12,26 +12,29 @@ from Workspace.HEPHYPythonTools.helpers import *
 from Workspace.HEPHYPythonTools.xsec import *
 from Workspace.RA4Analysis.helpers import *
 from Workspace.RA4Analysis.signalRegions import *
-from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_postProcessed_antiSel import *
-from Workspace.RA4Analysis.cmgTuples_Data_25ns_postProcessed_antiSel import *
+#from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_postProcessed_antiSel import *
+#from Workspace.RA4Analysis.cmgTuples_Data_25ns_postProcessed_antiSel import *
+
+from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2_antiSel_postProcessed import *
+
 #from draw_helpers import *
 from math import *
 from Workspace.HEPHYPythonTools.user import username
 from LpTemplateFit import LpTemplateFit
 
-isData = True
+isData = False
 
 if isData:
   sampleStr = 'data'
 else:
   sampleStr = 'MC'
 
-preprefix = 'QCDestimation/final2p25fb_v2/'+sampleStr
-wwwDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/RunII/Spring15_25ns/'+preprefix+'_validation/'
+preprefix = 'QCDestimation/firstMC_2p25fb/'+sampleStr
+wwwDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring16/'+preprefix+'/'
 picklePath = '/data/'+username+'/Results2016/QCDEstimation/'
 prefix = 'Lp_singleElectronic_'
-picklePresel = '20160218_QCDestimation_validation_'+sampleStr+'2p25fb_pkl'
-pickleFit    = '20160218_fitResult_validation_'+sampleStr+'2p25fb_pkl'
+picklePresel = '20160620_QCDestimation_firstMC_'+sampleStr+'2p25fb_pkl'
+pickleFit    = '20160620_fitResult_firstMC_'+sampleStr+'2p25fb_pkl'
 
 if not os.path.exists(wwwDir):
   os.makedirs(wwwDir)
@@ -142,7 +145,7 @@ def makeWeight(lumi=3., sampleLumi=3.,debug=False):
   return weight_str, weight_err_str
 
 lumi = 2.25
-sampleLumi = 2.25 #post processed sample already produced with 2.25fb-1
+sampleLumi = 3.0 #post processed sample already produced with 2.25fb-1
 weight_str, weight_err_str = makeWeight(lumi, sampleLumi)
 
 def getRCS(c, cut, dPhiCut, useWeight = False, weight = 'weight'):
@@ -181,7 +184,7 @@ def getPseudoRCS(small,smallE,large,largeE):
 
 #trigger and filters for real Data
 trigger = "&&(HLT_EleHT350||HLT_MuHT350)"
-filters = "&&Flag_goodVertices && Flag_HBHENoiseFilter_fix && Flag_eeBadScFilter && Flag_HBHENoiseIsoFilter && veto_evt_list"
+filters = "&&Flag_goodVertices && Flag_HBHENoiseFilter_fix && Flag_eeBadScFilter && Flag_HBHENoiseIsoFilter "#&& veto_evt_list"
 #filters = "&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFilter_fix&&Flag_HBHENoiseFilter&&Flag_goodVertices&&Flag_eeBadScFilter&&Flag_EcalDeadCellTriggerPrimitiveFilter"
 #filters = "&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFilter_fix&&Flag_HBHENoiseIsoFilter&&Flag_goodVertices&&Flag_eeBadScFilter"
 
@@ -189,12 +192,16 @@ presel = 'nLep==1&&nVeto==0&&leptonPt>25&&nEl==1&&Jet2_pt>80'
 antiSelStr = presel+'&&Selected==(-1)'
 SelStr = presel+'&&Selected==1'
 
-cQCD  = getChain(QCDHT_25ns,histname='')
-cEWK  = getChain([WJetsHTToLNu_25ns, TTJets_combined_2, singleTop_25ns, DY_25ns, TTV_25ns],histname='')
+#cQCD  = getChain(QCDHT_25ns,histname='')
+#cEWK  = getChain([WJetsHTToLNu_25ns, TTJets_combined_2, singleTop_25ns, DY_25ns, TTV_25ns],histname='')
+
+cQCD  = getChain(QCDHT,histname='')
+cEWK  = getChain([WJetsHTToLNu, TTJets_Lep, singleTop_lep, DY_amc, TTV],histname='')
+
 if isData:
   cData = getChain(single_ele_Run2015D, histname='')
 else:
-  cData = getChain([QCDHT_25ns, WJetsHTToLNu_25ns, TTJets_combined_2, singleTop_25ns, DY_25ns, TTV_25ns] , histname='')
+  cData = getChain([QCDHT, WJetsHTToLNu, TTJets_Lep, singleTop_lep, DY_amc, TTV] , histname='')
 
 #get template for fit method
 template_QCD = ROOT.TH1F('template_QCD','template_QCD',30,-0.5,2.5)

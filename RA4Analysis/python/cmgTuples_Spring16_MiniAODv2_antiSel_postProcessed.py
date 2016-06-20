@@ -37,8 +37,10 @@ singleTop_inclusive = {\
 singleTop_lep = {\
 "name" : "singleTop_lep",
 "bins" : [
-"ST_schannel_4f_leptonDecays",
+#"ST_schannel_4f_leptonDecays",
 "ST_tchannel_antitop_4f_leptonDecays_powheg",
+"ST_tW_antitop_5f_inclusiveDecays_powheg",
+#"ST_tW_antitop_5f_inclusiveDecays_powheg",
 ],
 'dir' : dirDaniel,
 }
