@@ -156,10 +156,10 @@ def getChunks(sample,  maxN=-1):
     print "NO FILES FOUND"
     print sample
     print len(chunks) 
+    print "Failed Chunks:", failedChunks
     print chunks
     print sample['dir']
     len(chunks)
-    print "Failed Chunks:", failedChunks
     assert False
   
   print "Chunks: %i total, %i good (normalization constant %f), %i bad. Inefficiency: %f"%(len(chunks),len(goodChunks),sumWeights,len(failedChunks), eff)

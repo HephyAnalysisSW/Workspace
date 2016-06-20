@@ -36,7 +36,7 @@ separateBTagWeights = True
 
 defSampleStr = "TTJets_LO"
 
-subDir = "postProcessing_Spring16/"
+subDir = "postProcessing_Spring16_JECv3/"
 #subDir = "postProcessing_Tests"
 
 #branches to be kept for data and MC
@@ -98,13 +98,14 @@ if options.skim=='LHEHT600':
 
 ####dilep skim##
 if options.skim=='HT500ST250diLep':
-  skimCond = "((ngenLep+ngenTau)==2)&&lheHTIncoming<=1000&&"+htLtSkim
+  #skimCond = "((ngenLep+ngenTau)==2)&&lheHTIncoming<=1000&&"+htLtSkim
+  skimCond = "((ngenLep+ngenTau)==2)&&"+htLtSkim
 ###semilep skim###
 if options.skim=='HT500ST250semiLep':
-  skimCond = "((ngenLep+ngenTau)==1)&&lheHTIncoming<=1000&&"+htLtSkim
+  skimCond = "((ngenLep+ngenTau)==1)&&"+htLtSkim
 ###Full hadronic###
 if options.skim=='HT500ST250LHE_FullHadronic_inc':
-  skimCond = "((ngenLep+ngenTau)==0)&&lheHTIncoming<=600&&"+htLtSkim
+  skimCond = "((ngenLep+ngenTau)==0)&&"+htLtSkim
 ###Full hadronic for the ht binned###
 if options.skim=='HT500ST250LHE_FullHadronic':
   skimCond = "lheHTIncoming>600&&lheHTIncoming<=1000&&((ngenLep+ngenTau)==0)&&"+htLtSkim
