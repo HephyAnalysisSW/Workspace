@@ -7,7 +7,7 @@ import copy, os, sys
 #dir = '/data/easilar/cmgTuples/postProcessing_Data_Jecv7_forApproval/'
 #dir = '/data/easilar/cmgTuples/postProcessing_data_2p2fb_diLep/HT500LT250/'
 #dir = '/data/easilar/cmgTuples/postProcessing_Data_Jecv7_v2/'
-dir ='/data/easilar/cmgTuples/postProcessing_Spring16/HT500LT250Skim/'
+dir ='/data/easilar/cmgTuples/postProcessing_Spring16_JECv3/HT500LT250Skim/'
 
 single_mu_Run2016B = {\
 "name" : "SingleMuon_Run2016B_PromptReco_v2_HT500ST250",
