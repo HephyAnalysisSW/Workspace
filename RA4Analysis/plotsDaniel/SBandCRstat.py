@@ -13,7 +13,8 @@ from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName,nBTagBinName,v
 #from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT500ST250_postProcessed_fromArthur import *
 
 from Workspace.RA4Analysis.cmgTuples_Data25ns_miniAODv2_postprocessed import *
-from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed import *
+#from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed import *
+from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2_postProcessed import *
 
 
 #from makeTTPrediction import makeTTPrediction
@@ -28,13 +29,13 @@ ROOT.TH1F().SetDefaultSumw2()
 
 lepSel = 'hard'
 
-cWJets      = getChain(WJetsHTToLNu_25ns,histname='')
-cTTJets     = getChain(TTJets_combined_25ns,histname='')
-cDY         = getChain(DY_25ns,histname='')
-csingleTop  = getChain(singleTop_25ns,histname='')
-cTTV        = getChain(TTV_25ns,histname='')
-cRest       = getChain([singleTop_25ns, DY_25ns, TTV_25ns],histname='')#no QCD
-cBkg        = getChain([WJetsHTToLNu_25ns, TTJets_combined_25ns, singleTop_25ns, DY_25ns, TTV_25ns], histname='')
+cWJets      = getChain(WJetsHTToLNu,histname='')
+cTTJets     = getChain(TTJets_Lep,histname='')
+cDY         = getChain(DY_madgraph,histname='')
+csingleTop  = getChain(singleTop_lep,histname='')
+cTTV        = getChain(TTV,histname='')
+cRest       = getChain([singleTop_lep, DY_madgraph, TTV],histname='')#no QCD
+cBkg        = getChain([WJetsHTToLNu, TTJets_Lep, singleTop_lep, DY_madgraph, TTV], histname='')
 
 #cData = getChain([single_mu_Run2015D, single_ele_Run2015D], histname='')
 cData = cBkg
