@@ -7,7 +7,7 @@ path = pathEce
 TTJets_SingleLeptonFromT_full = {\
 "name" : "TTJets_SingleLeptonFromT_full",
 "chunkString":"cmgTuples_MC25ns_1l_18062016_TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns_v3",
-"dir": pathEce2+"cmgTuples_MC25ns_1l_18062016_TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns_v3/",
+"dir": pathEce3+"cmgTuples_MC25ns_1l_18062016_TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns_v3/",
 "dbsName" : "/TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM",
 "skimAnalyzerDir":"",
 "rootFileLocation":"tree.root",
@@ -57,7 +57,7 @@ TTJets_LO["dbsName"] =  "/TT_TuneCUETP8M1_13TeV-powheg-pythia8/RunIISpring16Mini
 TTJets_LO_HT600to800_25ns={\
 "name" : "TTJets_LO_HT600to800",
 "chunkString":"cmgTuples_MC25ns_1l_18062016_TTJets_HT-600to800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1_MC25ns_v3",
-"dir": pathEce2+"cmgTuples_MC25ns_1l_18062016_TTJets_HT-600to800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1_MC25ns_v3/",
+"dir": pathEce3+"cmgTuples_MC25ns_1l_18062016_TTJets_HT-600to800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1_MC25ns_v3/",
 "dbsName" : "/TTJets_HT-600to800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM",
 "skimAnalyzerDir":"",
 "rootFileLocation":"tree.root",
@@ -68,7 +68,7 @@ TTJets_LO_HT600to800_25ns={\
 TTJets_LO_HT800to1200_25ns={\
 "name" : "TTJets_LO_HT800to1200",
 "chunkString":"cmgTuples_MC25ns_1l_18062016_TTJets_HT-800to1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1_MC25ns_v3/",
-"dir": pathEce2+"cmgTuples_MC25ns_1l_18062016_TTJets_HT-800to1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1_MC25ns_v3/",
+"dir": pathEce3+"cmgTuples_MC25ns_1l_18062016_TTJets_HT-800to1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1_MC25ns_v3/",
 "dbsName" : "/TTJets_HT-800to1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM",
 "skimAnalyzerDir":"",
 "rootFileLocation":"tree.root",
@@ -79,7 +79,7 @@ TTJets_LO_HT800to1200_25ns={\
 TTJets_LO_HT1200to2500_25ns={\
 "name" : "TTJets_LO_HT1200to2500",
 "chunkString":"cmgTuples_MC25ns_1l_18062016_TTJets_HT-1200to2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1_MC25ns_v3",
-"dir": pathEce2+"cmgTuples_MC25ns_1l_18062016_TTJets_HT-1200to2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1_MC25ns_v3/",
+"dir": pathEce3+"cmgTuples_MC25ns_1l_18062016_TTJets_HT-1200to2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1_MC25ns_v3/",
 "dbsName" : "/TTJets_HT-1200to2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM",
 "skimAnalyzerDir":"",
 "rootFileLocation":"tree.root",
@@ -90,7 +90,7 @@ TTJets_LO_HT1200to2500_25ns={\
 TTJets_LO_HT2500toInf_25ns={\
 "name" : "TTJets_LO_HT2500toInf",
 "chunkString":"cmgTuples_MC25ns_1l_18062016_TTJets_HT-2500toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns_v3",
-"dir": pathEce2+"cmgTuples_MC25ns_1l_18062016_TTJets_HT-2500toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns_v3/",
+"dir": pathEce3+"cmgTuples_MC25ns_1l_18062016_TTJets_HT-2500toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns_v3/",
 "dbsName" : "/TTJets_HT-2500toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM",
 "skimAnalyzerDir":"",
 "rootFileLocation":"tree.root",
@@ -123,7 +123,7 @@ DYJetsToLL_M_50_madgraphMLM_25ns={\
 DYJetsToLL_M_50_HT_100to200={\
 "name" : "DYJetsToLL_M_50_HT_100to200",
 "chunkString":"cmgTuples_MC25ns_1l_18062016_DYJetsToLL_M-50_HT-100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1_MC25ns_v3",
-"dir": pathEce2+"cmgTuples_MC25ns_1l_18062016_DYJetsToLL_M-50_HT-100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1_MC25ns_v3/",
+"dir": pathEce3+"cmgTuples_MC25ns_1l_18062016_DYJetsToLL_M-50_HT-100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1_MC25ns_v3/",
 'dbsName':'/DYJetsToLL_M-50_HT-100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM',
 "skimAnalyzerDir":"",
 "rootFileLocation":"tree.root",
@@ -133,7 +133,7 @@ DYJetsToLL_M_50_HT_100to200={\
 DYJetsToLL_M_50_HT_200to400={\
 "name" : "DYJetsToLL_M_50_HT_200to400",
 "chunkString":"cmgTuples_MC25ns_1l_18062016_DYJetsToLL_M-50_HT-200to400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1_MC25ns_v3",
-"dir": pathEce2+"cmgTuples_MC25ns_1l_18062016_DYJetsToLL_M-50_HT-200to400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1_MC25ns_v3/",
+"dir": pathEce3+"cmgTuples_MC25ns_1l_18062016_DYJetsToLL_M-50_HT-200to400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1_MC25ns_v3/",
 'dbsName':'/DYJetsToLL_M-50_HT-200to400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM',
 "skimAnalyzerDir":"",
 "rootFileLocation":"tree.root",
@@ -143,7 +143,7 @@ DYJetsToLL_M_50_HT_200to400={\
 DYJetsToLL_M_50_HT_400to600={\
 "name" : "DYJetsToLL_M_50_HT_400to600",
 "chunkString":"cmgTuples_MC25ns_1l_18062016_DYJetsToLL_M-50_HT-400to600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1_MC25ns_v3",
-"dir": pathEce2+"cmgTuples_MC25ns_1l_18062016_DYJetsToLL_M-50_HT-400to600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1_MC25ns_v3/",
+"dir": pathEce3+"cmgTuples_MC25ns_1l_18062016_DYJetsToLL_M-50_HT-400to600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1_MC25ns_v3/",
 'dbsName':'/DYJetsToLL_M-50_HT-400to600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM',
 "skimAnalyzerDir":"",
 "rootFileLocation":"tree.root",
@@ -153,7 +153,7 @@ DYJetsToLL_M_50_HT_400to600={\
 DYJetsToLL_M_50_HT_600toInf={\
 "name" : "DYJetsToLL_M_50_HT_600toInf",
 "chunkString":"cmgTuples_MC25ns_1l_18062016_DYJetsToLL_M-50_HT-600toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1_MC25ns_v3",
-"dir": pathEce2+"cmgTuples_MC25ns_1l_18062016_DYJetsToLL_M-50_HT-600toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1_MC25ns_v3/",
+"dir": pathEce3+"cmgTuples_MC25ns_1l_18062016_DYJetsToLL_M-50_HT-600toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1_MC25ns_v3/",
 'dbsName':'/DYJetsToLL_M-50_HT-600toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM',
 "skimAnalyzerDir":"",
 "rootFileLocation":"tree.root",
@@ -186,7 +186,7 @@ WJetsToLNu_HT200to400={\
 WJetsToLNu_HT400to600={\
 "name" : "WJetsToLNu_HT400to600",
 "chunkString":"cmgTuples_MC25ns_1l_18062016_WJetsToLNu_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns_v3",
-"dir": pathEce2+"cmgTuples_MC25ns_1l_18062016_WJetsToLNu_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns_v3/",
+"dir": pathEce3+"cmgTuples_MC25ns_1l_18062016_WJetsToLNu_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns_v3/",
 'dbsName':'/WJetsToLNu_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM',
 "skimAnalyzerDir":"",
 "rootFileLocation":"tree.root",
@@ -198,7 +198,7 @@ WJetsToLNu_HT400to600={\
 WJetsToLNu_HT600to800={\
 "name" : "WJetsToLNu_HT600to800",
 "chunkString":"cmgTuples_MC25ns_1l_18062016_WJetsToLNu_HT-600To800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns_v3",
-"dir": pathEce2+"cmgTuples_MC25ns_1l_18062016_WJetsToLNu_HT-600To800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns_v3/",
+"dir": pathEce3+"cmgTuples_MC25ns_1l_18062016_WJetsToLNu_HT-600To800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns_v3/",
 'dbsName':'/WJetsToLNu_HT-600To800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM',
 "skimAnalyzerDir":"",
 "rootFileLocation":"tree.root",
@@ -220,7 +220,7 @@ WJetsToLNu_HT800to1200={\
 WJetsToLNu_HT1200to2500={\
 "name" : "WJetsToLNu_HT1200to2500",
 "chunkString":"cmgTuples_MC25ns_1l_18062016_WJetsToLNu_HT-1200To2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns_v3",
-"dir": pathEce2+"cmgTuples_MC25ns_1l_18062016_WJetsToLNu_HT-1200To2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns_v3/",
+"dir": pathEce3+"cmgTuples_MC25ns_1l_18062016_WJetsToLNu_HT-1200To2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns_v3/",
 'dbsName':'/WJetsToLNu_HT-1200To2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM',
 "skimAnalyzerDir":"",
 "rootFileLocation":"tree.root",
@@ -231,7 +231,7 @@ WJetsToLNu_HT1200to2500={\
 WJetsToLNu_HT2500toInf={\
 "name" : "WJetsToLNu_HT2500toInf",
 "chunkString":"cmgTuples_MC25ns_1l_18062016_WJetsToLNu_HT-2500ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns_v3",
-"dir": pathEce2+"cmgTuples_MC25ns_1l_18062016_WJetsToLNu_HT-2500ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns_v3/",
+"dir": pathEce3+"cmgTuples_MC25ns_1l_18062016_WJetsToLNu_HT-2500ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns_v3/",
 'dbsName':'/WJetsToLNu_HT-2500ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM',
 "skimAnalyzerDir":"",
 "rootFileLocation":"tree.root",
@@ -410,7 +410,7 @@ QCD_HT2000toInf_25ns={
 ST_schannel_4f_leptonDecays = {\
 "name":"ST_schannel_4f_leptonDecays",
 "chunkString":"cmgTuples_MC25ns_1l_18062016_ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns_v3",
-"dir":  pathEce2+"cmgTuples_MC25ns_1l_18062016_ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns_v3",
+"dir":  pathEce3+"cmgTuples_MC25ns_1l_18062016_ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns_v3",
 "dbsName" : "",
 "skimAnalyzerDir":"",
 "rootFileLocation":"tree.root",
@@ -421,7 +421,7 @@ ST_schannel_4f_leptonDecays = {\
 ST_tchannel_antitop_4f_leptonDecays ={\
 "name" : "ST_tchannel_antitop_4f_leptonDecays",
 "chunkString":"cmgTuples_MC25ns_1l_18062016_ST_t-channel_antitop_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns_v3",
-"dir":  pathEce2+"cmgTuples_MC25ns_1l_18062016_ST_t-channel_antitop_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns_v3/" ,
+"dir":  pathEce3+"cmgTuples_MC25ns_1l_18062016_ST_t-channel_antitop_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns_v3/" ,
 "dbsName" : "",
 "skimAnalyzerDir":"",
 "rootFileLocation":"tree.root",
@@ -455,7 +455,7 @@ ST_tchannel_antitop_4f_leptonDecays ={\
 ST_tW_antitop_5f_inclusiveDecays ={\
 "name" : "ST_tW_antitop_5f_inclusiveDecays",
 "chunkString":"cmgTuples_MC25ns_1l_18062016_ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns_v3",
-"dir":  pathEce2+"cmgTuples_MC25ns_1l_18062016_ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns_v3/",
+"dir":  pathEce3+"cmgTuples_MC25ns_1l_18062016_ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns_v3/",
 "dbsName" : "",
 "skimAnalyzerDir":"",
 "rootFileLocation":"tree.root",
@@ -466,7 +466,7 @@ ST_tW_antitop_5f_inclusiveDecays ={\
 ST_tW_top_5f_inclusiveDecays ={\
 "name" : "ST_tW_top_5f_inclusiveDecays",
 "chunkString":"cmgTuples_MC25ns_1l_18062016_ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v2_MC25ns_v3",
-"dir":  pathEce2+"cmgTuples_MC25ns_1l_18062016_ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v2_MC25ns_v3/",
+"dir":  pathEce3+"cmgTuples_MC25ns_1l_18062016_ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v2_MC25ns_v3/",
 "dbsName" : "",
 "skimAnalyzerDir":"",
 "rootFileLocation":"tree.root",
