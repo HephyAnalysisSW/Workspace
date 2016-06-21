@@ -23,9 +23,9 @@
 #python cmgPostProcessing.py --overwrite  --calcbtagweights --manScaleFactor=0.93  --skim="LHEHT1000" --samples=TTJets_LO_HT1200to2500_25ns
 #python cmgPostProcessing.py --overwrite  --calcbtagweights --manScaleFactor=0.93  --skim="LHEHT1000" --samples=TTJets_LO_HT2500toInf_25ns
 
-#python cmgPostProcessing.py --overwrite  --calcbtagweights --manScaleFactor=1.0 --skim="HT500ST250diLep" --samples=TTJets_DiLepton_full
-#python cmgPostProcessing.py --overwrite  --calcbtagweights --manScaleFactor=1.0 --skim="HT500ST250semiLep" --samples=TTJets_SingleLeptonFromT_full
-#python cmgPostProcessing.py --overwrite  --calcbtagweights --manScaleFactor=1.0 --skim="HT500ST250semiLep" --samples=TTJets_SingleLeptonFromTbar_full
+python cmgPostProcessing.py --overwrite  --calcbtagweights --manScaleFactor=1.0 --skim="HT500ST250diLep" --samples=TTJets_DiLepton_full
+python cmgPostProcessing.py --overwrite  --calcbtagweights --manScaleFactor=1.0 --skim="HT500ST250semiLep" --samples=TTJets_SingleLeptonFromT_full
+python cmgPostProcessing.py --overwrite  --calcbtagweights --manScaleFactor=1.0 --skim="HT500ST250semiLep" --samples=TTJets_SingleLeptonFromTbar_full
 python cmgPostProcessing.py --overwrite  --calcbtagweights --manScaleFactor=1.0 --skim="HT500ST250LHE_FullHadronic_inc" --samples=TTJets_LO
 
 #python cmgPostProcessing.py --overwrite  --manScaleFactor=1.    --skim="HT500ST250" --samples=TTJets_LO
