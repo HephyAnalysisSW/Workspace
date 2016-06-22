@@ -135,7 +135,7 @@ def setupEffPlot2(eff):
    ROOT.gPad.Update()
 
 #Legend
-def makeLegend(x1=0.775,x2=0.875,y1=0.45,y2= 0.65):
+def makeLegend2(x1=0.775,x2=0.875,y1=0.45,y2= 0.65):
    leg = ROOT.TLegend(x1,y1,x2,y2)
    leg.SetHeader("#bf{Legend}")
    header = leg.GetListOfPrimitives().First()

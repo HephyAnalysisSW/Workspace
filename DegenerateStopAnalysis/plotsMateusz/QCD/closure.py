@@ -31,8 +31,8 @@ ABCDs = ["1", "2", "3", "4"]
 
 for ABCD in ABCDs:
    filedir = "/afs/hephy.at/user/m/mzarucki/www/plots/QCD/ABCD/ABCD" + ABCD + "/estimation/Veto/highWeightVeto"
-   suffix = "_HT300_MET300"
-   if ABCD == "3": suffix += "_METloose250"
+   suffix = "_HT200_MET200"
+   if ABCD == "3": suffix += "_METloose150"
    filename = "QCDyields_Veto" + suffix + ".txt"
    
    yields = {}
@@ -118,7 +118,7 @@ for ABCD in ABCDs:
    ROOT.gPad.Update()
    
    gr1.GetYaxis().SetTitle("Yield")
-   gr1.GetYaxis().SetRangeUser(0,0.3)
+   gr1.GetYaxis().SetRangeUser(0,10)
    gr1.GetXaxis().SetRangeUser(0,15)
    
    gr1.SetMarkerStyle(33)
@@ -148,7 +148,7 @@ for ABCD in ABCDs:
    gr2.SetLineColor(ROOT.kBlue+1)
    gr2.SetLineWidth(2)
    
-   l1 = makeLegend()
+   l1 = makeLegend2()
    l1.AddEntry("QCD", "QCD est.", "P")
    l1.AddEntry("MC", "MC", "P")
    l1.Draw()

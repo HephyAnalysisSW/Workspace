@@ -95,20 +95,20 @@ class Samples(dict):
     #        self.addWeight(lumi_weight, sampleList=[samp])
     #    
 
-    #def addWeight(self, weight, sampleList=[]):
-    #    if not sampleList:
-    #        bkgList = self.bkgList()
-    #        sigList = self.sigList()
-    #        sampleList = bkgList + sigList
+    def addWeight(self, weight, sampleList=[]):
+        if not sampleList:
+            bkgList = self.bkgList()
+            sigList = self.sigList()
+            sampleList = bkgList + sigList
 
-    #    for samp in sampleList:
-    #        if not hasattr(self[samp],"weight"):
-    #            new_weight  = weight
-    #        else:
-    #            new_weight = "(%s *  %s)"%(self[samp]["weight"], weight)
-    #        #print samp, new_weight
-    #        self[samp]["weight"] = new_weight
-    # 
+        for samp in sampleList:
+            if not hasattr(self[samp],"weight"):
+                new_weight  = weight
+            else:
+                new_weight = "(%s *  %s)"%(self[samp]["weight"], weight)
+            #print samp, new_weight
+            self[samp]["weight"] = new_weight
+     
     #    dataList = self.dataList()
     #    if dataList:
     #        self.addWeightFromDataLumi(dataList)    

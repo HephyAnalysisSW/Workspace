@@ -24,7 +24,7 @@ parser = argparse.ArgumentParser(description = "Input options")
 #parser.add_argument("--isolation", dest = "isolation",  help = "Isolation (hybIso03/hybIso04)", type = str, default = "hybIso03")
 parser.add_argument("--MET", dest = "MET",  help = "MET Cut", type = str, default = "200")
 parser.add_argument("--HT", dest = "HT",  help = "HT Cut", type = str, default = "200")
-parser.add_argument("--METloose", dest = "METloose",  help = "Loose MET Cut", type = str, default = "200")
+parser.add_argument("--METloose", dest = "METloose",  help = "Loose MET Cut", type = str, default = "150")
 parser.add_argument("--eleWP", dest = "eleWP",  help = "Electron WP", type = str, default = "Veto")
 parser.add_argument("--removedCut", dest = "removedCut",  help = "Variable removed from electron ID", type = str, default = "None") #"sigmaEtaEta" "hOverE" "ooEmooP" "dEta" "dPhi" "d0" "dz" "MissingHits" "convVeto"
 parser.add_argument("--enriched", dest = "enriched",  help = "EM enriched QCD?", type = bool, default = False)
@@ -49,9 +49,8 @@ save = args.save
 
 #Save
 if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
-   savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/QCD/ABCD3/estimation"
-   #if removedCut == "None": savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/QCD/ABCD3/estimation/" + eleWP + "/HT" + HTcut
-   #else: savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/QCD/ABCD3/estimation/" + eleWP + "_no_" + removedCut + "/HT" + HTcut
+   if removedCut == "None": savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/QCD/ABCD3/estimation/" + eleWP
+   else: savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/QCD/ABCD3/estimation/" + eleWP + "_no_" + removedCut
    if not os.path.exists(savedir): os.makedirs(savedir)
 
 #Samples
@@ -86,11 +85,14 @@ for s in selectedSamples:
       sys.exit(0)
    
 suffix = "_HT" + HTcut + "_MET" + METcut + "_METloose" + METloose
+
+if removedCut == "None": suffix += "_" + eleWP
+else: suffix += "_" + eleWP +"_no_" + removedCut
+
 if enriched == True: suffix += "_EMenriched"
 
-if removedCut == "None": suffix += "_" + eleWP +"_manual"
-else: suffix += "_" + eleWP +"_no_" + removedCut
-   
+suffix += "_LepAll"
+
 QCDcuts = {}
  
 print makeLine()
@@ -160,7 +162,7 @@ for reg in regions:
    QCD[reg]['SR'] = CutClass("QCD_SR_" + reg, [
       #["elePt<30", elePt['ID'] + " < 30"],
       SRs['I'][reg],
-      ["MET", "met >" + METcut], #applied
+      ["tight-MET", "met >" + METcut], #applied
       ["I", "Sum$(" + eleSel + "&&" + hybIsoCut + ") == 1"],
       ["A", "vetoJet_dPhi_j1j2 < 2.5"],
       ], baseCut = presel)
@@ -177,7 +179,7 @@ for reg in regions:
    QCD[reg]['A_IM'] = CutClass("QCD_A_IM_" + reg, [
       #["elePt<30", elePt['D_I'] + " < 30"],
       SRs['I'][reg], 
-      ["MET", "met >" + METcut], #applied
+      ["tight-MET", "met >" + METcut], #applied
       ["I", "Sum$(" + eleSel + "&&" + hybIsoCut + ") == 1"], #applied
       ["anti-A", "vetoJet_dPhi_j1j2 > 2.5"], #inverted
       ], baseCut = presel)
