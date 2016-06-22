@@ -1,6 +1,7 @@
 import copy, os, sys
 dirEce = '/data/easilar/cmgTuples/postProcessing_Spring16/HT500LT250Skim/'
 dirDaniel = '/data/dspitzbart/cmgTuples/postProcessing_Spring16/HT500LT250Skim/'
+dirDaniel2 = '/data/dspitzbart/cmgTuples/postProcessing_Spring16_JECv3/HT500LT250Skim/'
 ####usual HT combination####
 
 #TTJets_HTLO_25ns={\
@@ -151,7 +152,7 @@ TTV = {
 "TTZToLLNuNu",
 #"TTZToQQ",
 ],
-'dir' : dirDaniel,
+'dir' : dirDaniel2,
 }
 
 allSignalStrings=[\

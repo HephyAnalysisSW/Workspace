@@ -35,7 +35,7 @@ if QCDup: nameSuffix += '_QCDup'
 if QCDdown: nameSuffix += '_QCDdown'
 
 ## samples
-isData              = True
+isData              = False
 unblinded           = False
 validation          = True
 isCentralPrediction = True
@@ -64,10 +64,13 @@ cQCD        = getChain(QCDHT,histname='')
 
 
 ## QCD estimation
-useQCDestimation = True
-if not isData and useQCDestimation: QCDpickle = '/data/dspitzbart/Results2016/QCDEstimation/20160212_QCDestimation_MC2p25fb_pkl'
+useQCDestimation = False
+if not isData and useQCDestimation:
+  #QCDpickle = '/data/dspitzbart/Results2016/QCDEstimation/20160212_QCDestimation_MC2p25fb_pkl'
+  QCDpickle = '/data/dspitzbart/Results2016/QCDEstimation/20160621_QCDestimation_2015SR_MC2p57fb_pkl'
 if isData:
-  QCDpickle  = '/data/dspitzbart/Results2016/QCDEstimation/20160212_QCDestimation_data2p25fb_pkl'
+  #QCDpickle  = '/data/dspitzbart/Results2016/QCDEstimation/20160212_QCDestimation_data2p25fb_pkl'
+  QCDpickle  = '/data/dspitzbart/Results2016/QCDEstimation/20160621_QCDestimation_2015SR_data2p57fb_pkl'
 if isData and validation:
   #QCDpickle  = '/data/dspitzbart/Results2016/QCDEstimation/20160218_QCDestimation_validation_data2p25fb_pkl'
   QCDpickle  = '/data/dspitzbart/Results2016/QCDEstimation/20160621_QCDestimation_first_data2p57fb_pkl'
@@ -138,7 +141,7 @@ if validation:
 else:
   #kappa_dict_dir = '/data/dspitzbart/Results'+year+'/Prediction_SFtemplates_fullSR_lep_MC_SFnoPUreweight_2p25/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'
   #kappa_dict_dir = '/data/dspitzbart/Results'+year+'/Prediction_SFtemplates_fullSR_lep_MC_SF_Moriond_2p3/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'
-  kappa_dict_dir = '/data/dspitzbart/Results'+year+'/Prediction_Spring16_templates_2015SR_lep_MC_SF_0p8/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'
+  kappa_dict_dir = '/data/dspitzbart/Results'+year+'/Prediction_Spring16_templates_SR2015_lep_MC_SF_2p57/singleLeptonic_Spring16__estimationResults_pkl_kappa_corrected'
 
 ## Preselection cut
 triggers = "(HLT_EleHT350||HLT_MuHT350)"
