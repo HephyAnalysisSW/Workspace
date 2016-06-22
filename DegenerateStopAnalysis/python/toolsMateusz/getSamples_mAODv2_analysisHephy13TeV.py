@@ -2,11 +2,12 @@ import ROOT
 from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYieldFromChain, getChunks
 from Workspace.DegenerateStopAnalysis.navidTools.Sample import Sample, Samples
 from Workspace.DegenerateStopAnalysis.colors import colors
-#import Workspace.DegenerateStopAnalysis.cmgTuplesPostProcessed_mAODv2_scan as cmgTuplesPostProcessed
 from Workspace.DegenerateStopAnalysis.toolsMateusz.cmgTuplesPostProcessed_mAODv2_analysisHephy13TeV import cmgTuplesPostProcessed
 from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
+from Workspace.DegenerateStopAnalysis.tools.weights import weights , def_weights , Weight
+#from Workspace.DegenerateStopAnalysis.weights import weights , def_weights , Weight
+#import Workspace.DegenerateStopAnalysis.cmgTuplesPostProcessed_mAODv2_scan as cmgTuplesPostProcessed
 #import Workspace.DegenerateStopAnalysis.weights as weights
-from Workspace.DegenerateStopAnalysis.weights import weights , def_weights , Weight
 import os
 import re
 import glob
@@ -45,11 +46,11 @@ def getSamples( wtau  = False, sampleList=['w','tt','z','sig'],
                 #lumi_mc=10000, lumi_data_blinded=2245.386, lumi_data_unblinded=139.63):
                 lumi_target=lumis["lumi_target"], lumi_data_blinded=lumis['lumi_data_blinded'], lumi_data_unblinded=lumis['lumi_data_unblinded']):
 
-    if not cmgPP:
-        mc_path     = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/7412pass2_SMSScan_v3/RunIISpring15DR74_25ns"
-        signal_path = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/7412pass2_SMSScan_v3/RunIISpring15DR74_25ns"
-        data_path   = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/7412pass2_SMSScan_v3/Data_25ns"
-        cmgPP = cmgTuplesPostProcessed(mc_path, signal_path, data_path)
+    #if not cmgPP:
+    #    mc_path     = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/7412pass2_SMSScan_v3/RunIISpring15DR74_25ns"
+    #    signal_path = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/7412pass2_SMSScan_v3/RunIISpring15DR74_25ns"
+    #    data_path   = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/7412pass2_SMSScan_v3/Data_25ns"
+    #    cmgPP = cmgTuplesPostProcessed(mc_path, signal_path, data_path)
 
 
 
@@ -119,22 +120,23 @@ def getSamples( wtau  = False, sampleList=['w','tt','z','sig'],
     if "qcd" in sampleList:
         sampleDict.update({
               'qcd':             {'sample':cmgPP.QCD[skim]            ,'name':'QCD'  ,'color':colors['qcd']            , 'isSignal':0 ,'isData':0    ,"lumi":lumi_mc      },
-              'qcdem':             {'sample':cmgPP.QCDPT_EM[skim]            ,'name':'QCD'  ,'color':colors['qcdem']            , 'isSignal':0 ,'isData':0    ,"lumi":lumi_mc      },
+              #'qcdem':             {'sample':cmgPP.QCDPT_EM[skim]            ,'name':'QCD'  ,'color':colors['qcdem']            , 'isSignal':0 ,'isData':0    ,"lumi":lumi_mc      },
               #'qcd':             {'sample':cmgPP.QCD[skim]            ,'name':'QCD'  ,'color':colors['qcd']            , 'isSignal':0 ,'isData':0    ,"lumi":lumi_mc      },
                         })
 
     if "d" in sampleList or "dblind" in sampleList:
-        if blinded:
-          METDataOct05    = getChain(cmgPP.MET_Oct05[skim],histname='')
-          METDataUnblind  = METDataOct05.CopyTree("run<=257599")
-          METDataBlind    = getChain(cmgPP.MET_v4[skim],histname='')
-          METDataBlind.Add(METDataOct05)
-          sampleDict.update( {
-              "d":              {'tree':METDataUnblind       ,"sample":cmgPP.MET_Oct05[skim]   ,'name':"DataUnblind"      , 'color':ROOT.kBlack             , 'isSignal':0 ,'isData':1    ,"triggers":data_triggers   ,"filters":data_filters    ,'lumi': lumi_data_unblinded  },
-              "dblind":         {'tree':METDataBlind         ,"sample":cmgPP.MET_v4[skim]      ,'name':"DataBlind" , 'color':ROOT.kBlack          , 'isSignal':0 ,'isData':1              ,"triggers":data_triggers   ,"filters":data_filters    ,'lumi': lumi_data_blinded  },
-                })
-        else:
-            assert False
+      skim = 'inc'
+      if blinded:
+        METDataOct05    = getChain(cmgPP.MET_Oct05[skim],histname='')
+        METDataUnblind  = METDataOct05.CopyTree("run<=257599")
+        METDataBlind    = getChain(cmgPP.MET_v4[skim],histname='')
+        METDataBlind.Add(METDataOct05)
+        sampleDict.update( {
+            "d":              {'tree':METDataUnblind       ,"sample":cmgPP.MET_Oct05[skim]   ,'name':"DataUnblind"      , 'color':ROOT.kBlack             , 'isSignal':0 ,'isData':1    ,"triggers":data_triggers   ,"filters":data_filters    ,'lumi': lumi_data_unblinded  },
+            "dblind":         {'tree':METDataBlind         ,"sample":cmgPP.MET_v4[skim]      ,'name':"DataBlind" , 'color':ROOT.kBlack          , 'isSignal':0 ,'isData':1              ,"triggers":data_triggers   ,"filters":data_filters    ,'lumi': lumi_data_blinded  },
+              })
+      else:
+          assert False
 
     if "dy" in sampleList:
         DYJetsSample        = getChain(cmgPP.DYJetsM5to50HT[skim],histname='')
@@ -219,6 +221,7 @@ def getSamples( wtau  = False, sampleList=['w','tt','z','sig'],
 
         sampleDict2[samp] = Sample(**sampleDict[samp])
     samples = Samples(**sampleDict2)
+    samples.set_lumis(lumi_target = lumi_target, lumi_data_blinded = lumi_data_blinded, lumi_data_unblinded = lumi_data_unblinded, lumi_mc = lumi_mc)
 
     if "dblind" in samples: 
       print makeLine()

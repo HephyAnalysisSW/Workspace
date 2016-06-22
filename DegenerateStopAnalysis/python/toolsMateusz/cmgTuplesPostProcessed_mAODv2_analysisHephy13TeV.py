@@ -6,14 +6,20 @@ import copy, os, sys
 #from Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_7412pass2_mAODv2_v4 import mass_dict
 ## somehow import mass_dict without having to load files in cmgSample file.... (?)
 
+mc_path = "/afs/hephy.at/data/mzarucki01/cmgTuples/postProcessed_mAODv2/7412pass2_mAODv2_v7/74X_postProcessing_v5/analysisHephy_13TeV_v0/step1/Spring15_7412pass2_mAODv2_v7"
+signal_path = "/afs/hephy.at/data/mzarucki01/cmgTuples/postProcessed_mAODv2/7412pass2_mAODv2_v7/74X_postProcessing_v5/analysisHephy_13TeV_v0/step1/Spring15_7412pass2_mAODv2_v7"
+data_path = "/afs/hephy.at/data/mzarucki01/cmgTuples/postProcessed_mAODv2/7412pass2_mAODv2_v7/74X_postProcessing_v5/analysisHephy_13TeV_v0/step1/Data25ns_v7"
+lumi_mc     = 10000. # Lumi that was used in the weight calculation of PostProcessing in pb-1
+
+#mc_path = "/afs/hephy.at/data/vghete01/cmgTuples/postProcessed_mAODv2/7412pass2_mAODv2_v6/74X_postProcessing_v4/analysisHephy_13TeV_v0/step1/Spring15_7412pass2_mAODv2_v6"
+#signal_path = "/afs/hephy.at/data/vghete01/cmgTuples/postProcessed_mAODv2/7412pass2_mAODv2_v6/74X_postProcessing_v4/analysisHephy_13TeV_v0/step1/Spring15_7412pass2_mAODv2_v6"
+#data_path = "/afs/hephy.at/data/vghete01/cmgTuples/postProcessed_mAODv2/7412pass2_mAODv2_v6/74X_postProcessing_v4/analysisHephy_13TeV_v0/step1/Data25ns_v6"
+#lumi_mc     = 10000. # Lumi that was used in the weight calculation of PostProcessing in pb-1
+
 #mc_path     = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/7412pass2_SMSScan_v2/RunIISpring15DR74_25ns" 
 #signal_path = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/7412pass2_SMSScan_v2/RunIISpring15DR74_25ns" 
 #data_path   = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/7412pass2_SMSScan_v2/Data_25ns" 
 #lumi_mc     = 10000. # Lumi that was used in the weight calculation of PostProcessing in pb-1
-mc_path = "/afs/hephy.at/data/vghete01/cmgTuples/postProcessed_mAODv2/7412pass2_mAODv2_v6/74X_postProcessing_v4/analysisHephy_13TeV_v0/step1/Spring15_7412pass2_mAODv2_v6"
-signal_path = "/afs/hephy.at/data/vghete01/cmgTuples/postProcessed_mAODv2/7412pass2_mAODv2_v6/74X_postProcessing_v4/analysisHephy_13TeV_v0/step1/Spring15_7412pass2_mAODv2_v6"
-data_path = "/afs/hephy.at/data/vghete01/cmgTuples/postProcessed_mAODv2/7412pass2_mAODv2_v6/74X_postProcessing_v4/analysisHephy_13TeV_v0/step1/Data25ns_v6"
-lumi_mc     = 10000. # Lumi that was used in the weight calculation of PostProcessing in pb-1
 
 class cmgTuplesPostProcessed():
 

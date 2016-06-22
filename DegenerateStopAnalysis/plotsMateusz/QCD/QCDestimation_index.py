@@ -1,4 +1,4 @@
-# QCDestimation.py
+# QCDestimation_index.py
 # Combined script for the QCD estimation using 4 various ABCD methods:
 # ABCD1: 3D ABCD with IDA (inverted dxy)
 # ABCD2: 2D ABCD with loosened D
@@ -15,7 +15,6 @@ from Workspace.DegenerateStopAnalysis.toolsMateusz.degTools import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.cutsEle import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.cmgTuplesPostProcessed_mAODv2_analysisHephy13TeV import cmgTuplesPostProcessed
 from Workspace.DegenerateStopAnalysis.toolsMateusz.getSamples_mAODv2_analysisHephy13TeV import getSamples
-#from Workspace.DegenerateStopAnalysis.navidTools.NavidTools import *
 #from Workspace.DegenerateStopAnalysis.toolsMateusz.cmgTuplesPostProcessed_mAODv2 import cmgTuplesPostProcessed
 #from Workspace.DegenerateStopAnalysis.toolsMateusz.getSamples_analysisHephy_13TeV import getSamples
 #from Workspace.DegenerateStopAnalysis.toolsMateusz.getSamples_PP_mAODv2_7412pass2_scan import getSamples
@@ -39,10 +38,11 @@ parser.add_argument("--removedCut", dest = "removedCut",  help = "Variable remov
 parser.add_argument("--highWeightVeto", dest = "highWeightVeto",  help = "Remove high weighted events", type = bool, default = False)
 parser.add_argument("--enriched", dest = "enriched",  help = "EM enriched QCD?", type = bool, default = False)
 parser.add_argument("--estimation", dest = "estimation",  help = "Toggle estimation", type = int, default = 1)
-parser.add_argument("--plot", dest = "plot",  help = "Toggle plot", type = int, default = 0)
 parser.add_argument("--getData", dest = "getData",  help = "Get data samples", type = int, default = 0)
+parser.add_argument("--plot", dest = "plot",  help = "Toggle plot", type = int, default = 0)
 parser.add_argument("--logy", dest = "logy",  help = "Toggle logy", type = int, default = 0)
 parser.add_argument("--save", dest = "save",  help = "Toggle save", type = int, default = 1)
+parser.add_argument("--new", dest = "new",  help = "New", type = int, default = 0)
 parser.add_argument("-b", dest = "batch",  help = "Batch mode", action = "store_true", default = False)
 args = parser.parse_args()
 if not len(sys.argv) > 1:
@@ -61,17 +61,18 @@ removedCut = args.removedCut
 highWeightVeto = args.highWeightVeto
 enriched = args.enriched
 estimation = args.estimation
-plot = args.plot
 getData = args.getData
+plot = args.plot
 logy = args.logy
 save = args.save
+new = args.new
 
 print makeDoubleLine()
 print "Performing ABCD" + ABCD + " QCD estimation."
 print makeDoubleLine()
 
 #Save
-if save: #web address: http://www.hephy.at/user/mzarucki/plots/
+if save: #web address: http://www.hephy.at/user/mzarucki/plots
    if removedCut == "None": savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/QCD/ABCD/ABCD" + ABCD + "/estimation/" + eleWP 
    else: savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/QCD/ABCD/ABCD" + ABCD + "/estimation/" + eleWP + "_no_" + removedCut
    if highWeightVeto: savedir += "/highWeightVeto" 
@@ -80,6 +81,8 @@ if save: #web address: http://www.hephy.at/user/mzarucki/plots/
 suffix = "_" + eleWP + "_HT" + HTcut + "_MET" + METcut
 if ABCD == "3": suffix += "_METloose" + METloose
 if enriched == True: suffix += "_EMenriched"
+
+suffix += "_index"
 
 #Samples
 if enriched == True: qcd = "qcdem"
@@ -126,31 +129,33 @@ if highWeightVeto:
 else:
    weightCut = "100000"
 
+#Index of leading electron
+ind = "IndexLepAll_el[0]"
+
 #Gets all cuts (electron, SR, CR) for given electron ID
-if ABCD == "1" or ABCD == "2": eleIDsel = electronIDs(ID = "nMinus1", removedCut = "d0", iso = False, collection = collection)
+if ABCD == "1" or ABCD == "2": eleIDsel = electronIDsIndex(ID = "nMinus1", removedCut = "d0", iso = False, collection = collection)
 elif ABCD == "3":              
-   if removedCut == "None":    eleIDsel = electronIDs(ID = "standard", removedCut = "None", iso = False, collection = collection)
-   else:                       eleIDsel = electronIDs(ID = "nMinus1", removedCut = removedCut, iso = False, collection = collection)
-elif ABCD == "4":              eleIDsel = electronIDs(ID = "nMinus1", removedCut = "sigmaEtaEta", iso = False, collection = collection)
-elif ABCD == "5":              eleIDsel = electronIDs(ID = "nMinus1", removedCut = "hOverE", iso = False, collection = collection)
+   if removedCut == "None":    eleIDsel = electronIDsIndex(ID = "standard", removedCut = "None", iso = False, collection = collection)
+   else:                       eleIDsel = electronIDsIndex(ID = "nMinus1", removedCut = removedCut, iso = False, collection = collection)
+elif ABCD == "4":              eleIDsel = electronIDsIndex(ID = "nMinus1", removedCut = "sigmaEtaEta", iso = False, collection = collection)
 
 #Geometric cuts
 etaAcc = 2.1
 ebSplit = 0.8 #barrel is split into two regions
 ebeeSplit = 1.479 #division between barrel and endcap
 
-eleSel = "abs(LepAll_pdgId) == 11 && abs(LepAll_eta) < " + str(etaAcc) + " && " + eleIDsel[eleWP]
+eleSel = "abs(LepAll_pdgId[" + ind + "]) == 11 && abs(LepAll_eta[" + ind + "]) < " + str(etaAcc) + " && " + eleIDsel[eleWP]
 
 #Common QCD cuts
-hybIsoCut = "(LepAll_relIso03*min(LepAll_pt, 25)) < 5" #hybIsoCut = "((LepAll_absIso03 < 5) || LepAll_relIso03 < 0.2))"
-antiHybIsoCut = "(LepAll_relIso03*min(LepAll_pt, 25)) > 5" #antiHybIsoCut = "((LepAll_absIso03 > 5) && (LepAll_relIso03 > 0.2))"
+hybIsoCut = "(LepAll_relIso03[" + ind + "]*min(LepAll_pt[" + ind + "], 25)) < 5" #hybIsoCut = "((LepAll_absIso03 < 5) || LepAll_relIso03 < 0.2))"
+antiHybIsoCut = "(LepAll_relIso03[" + ind + "]*min(LepAll_pt[" + ind + "], 25)) > 5" #antiHybIsoCut = "((LepAll_absIso03 > 5) && (LepAll_relIso03 > 0.2))"
 dPhiCut = "vetoJet_dPhi_j1j2 < 2.5"
 antidPhiCut = "vetoJet_dPhi_j1j2 > 2.5"
 
 #Differing QCD cuts
 geoSel= {\
-      'EB':"(abs(LepAll_eta) <= " + str(ebeeSplit) + ")", 
-      'EE':"(abs(LepAll_eta) > " + str(ebeeSplit) + " && abs(LepAll_eta) < " + str(etaAcc) + ")"}
+      'EB':"(abs(LepAll_eta[" + ind + "]) <= " + str(ebeeSplit) + ")", 
+      'EE':"(abs(LepAll_eta[" + ind + "]) > " + str(ebeeSplit) + " && abs(LepAll_eta[" + ind + "]) < " + str(etaAcc) + ")"}
 
 if ABCD == "1" or ABCD == "2": #dxy oriented
    #dxyCuts = {\
@@ -160,17 +165,17 @@ if ABCD == "1" or ABCD == "2": #dxy oriented
    #      'Tight':{'EB':0.0111, 'EE':0.0351}}
    
    #dxyCut = "(" + combineCuts(geoSel['EB'], "LepAll_dxy <" + str(dxyCuts[eleWP]['EB'])) + ") || (" + combineCuts(geoSel['EE'], "LepAll_dxy <" + str(dxyCuts[eleWP]['EE'])) + ")"
-   dxyCut = "abs(LepAll_dxy) < 0.02"
+   dxyCut = "abs(LepAll_dxy[" + ind + "]) < 0.02"
    appliedCut = dxyCut
 
    if ABCD == "1": #ABCD1
       
       #antiDxyCut = "(" + combineCuts(geoSel['EB'], "LepAll_dxy >" + str(dxyCuts[eleWP]['EB'])) + ") || (" + combineCuts(geoSel['EE'], "LepAll_dxy >" + str(dxyCuts[eleWP]['EE'])) + ")"
-      antiDxyCut = "abs(LepAll_dxy) > 0.02"
+      antiDxyCut = "abs(LepAll_dxy[" + ind + "]) > 0.02"
       invertedCut = antiDxyCut
    
    elif ABCD == "2": #ABCD2
-      looseDxyCut = "abs(LepAll_dxy) < 0.05"
+      looseDxyCut = "abs(LepAll_dxy[" + ind + "]) < 0.05"
       invertedCut = looseDxyCut # NOTE: loosened rather than inverted
 
 elif ABCD == "4": #ABCD4
@@ -181,43 +186,19 @@ elif ABCD == "4": #ABCD4
       'Medium':{'EB':0.0101, 'EE':0.0283},
       'Tight':{'EB':0.0101, 'EE':0.0279}}
    
-   sigmaEtaEtaCut = "(" + combineCuts(geoSel['EB'], "LepAll_sigmaIEtaIEta <" + str(sigmaEtaEtaCuts[eleWP]['EB'])) + ") || (" + combineCuts(geoSel['EE'], "LepAll_sigmaIEtaIEta <" + str(sigmaEtaEtaCuts[eleWP]['EE'])) + ")"
-   antiSigmaEtaEtaCut = "(" + combineCuts(geoSel['EB'], "LepAll_sigmaIEtaIEta >" + str(sigmaEtaEtaCuts[eleWP]['EB'])) + ") || (" + combineCuts(geoSel['EE'], "LepAll_sigmaIEtaIEta >" + str(sigmaEtaEtaCuts[eleWP]['EE'])) + ")"
+   sigmaEtaEtaCut = "(" + combineCuts(geoSel['EB'], "LepAll_sigmaIEtaIEta[" + ind + "] <" + str(sigmaEtaEtaCuts[eleWP]['EB'])) + ") || (" + combineCuts(geoSel['EE'], "LepAll_sigmaIEtaIEta[" + ind + "] <" + str(sigmaEtaEtaCuts[eleWP]['EE'])) + ")"
+   antiSigmaEtaEtaCut = "(" + combineCuts(geoSel['EB'], "LepAll_sigmaIEtaIEta[" + ind + "] >" + str(sigmaEtaEtaCuts[eleWP]['EB'])) + ") || (" + combineCuts(geoSel['EE'], "LepAll_sigmaIEtaIEta[" + ind + "] >" + str(sigmaEtaEtaCuts[eleWP]['EE'])) + ")"
 
    appliedCut = sigmaEtaEtaCut
    invertedCut = antiSigmaEtaEtaCut
 
-elif ABCD == "5": #ABCD5
-   
-   hOverEcuts = {\
-      'Veto':{'EB':0.181, 'EE':0.116},
-      'Loose':{'EB':0.104, 'EE':0.0897},
-      'Medium':{'EB':0.0876, 'EE':0.0678},
-      'Tight':{'EB':0.0597, 'EE':0.0615}}
-   
-   hOverEcut = "(" + combineCuts(geoSel['EB'], "LepAll_hadronicOverEm <" + str(hOverEcuts[eleWP]['EB'])) + ") || (" + combineCuts(geoSel['EE'], "LepAll_hadronicOverEm <" + str(hOverEcuts[eleWP]['EE'])) + ")"
-   antihOverEcut = "(" + combineCuts(geoSel['EB'], "LepAll_hadronicOverEm >" + str(hOverEcuts[eleWP]['EB'])) + ") || (" + combineCuts(geoSel['EE'], "LepAll_hadronicOverEm >" + str(hOverEcuts[eleWP]['EE'])) + ")"
+variables = {'elePt':"LepAll_pt[" + ind + "]", 'eleMt':"LepAll_mt[" + ind + "]"}
 
-   appliedCut = hOverEcut
-   invertedCut = antihOverEcut
-
-variables = {'elePt':["LepAll_pt",{}], 'eleMt':["LepAll_mt",{}]}
-
-if plot: variables.update({"absIso":["LepAll_absIso03",{}], 'relIso':["LepAll_relIso03",{}], "hybIso":["(LepAll_relIso03*min(LepAll_pt, 25))",{}] ,  "absDxy":["LepAll_dxy",{}] , "sigmaEtaEta":["LepAll_sigmaIEtaIEta",{}], "hOverE":["LepAll_hadronicOverEm",{}]})
+if plot: variables.update({"absIso":"LepAll_absIso03[" + ind + "]", 'relIso':"LepAll_relIso03[" + ind + "]", "hybIso":"(LepAll_relIso03[" + ind + "]*min(LepAll_pt[" + ind + "], 25))" ,  "absDxy":"LepAll_dxy[" + ind + "]" , "sigmaEtaEta":"LepAll_sigmaIEtaIEta[" + ind + "]"})
 
 #Redefining variables in terms of electron selection
 # ABCD1: X = D (inverted) | ABCD2: X = D (loose) | ABCD3: X = M (loose) | ABCD4: X = S (inverted)
-Xs = {'1':'D', '2':'D', '3':'M', '4':'S', '5':'H'}
-
-for var in variables:
-   if ABCD == "1" or ABCD == "2" or ABCD == "4" or ABCD == "5":
-      variables[var][1]['SR'] = varSel(variables[var][0], combineCutsList([eleSel, hybIsoCut, appliedCut])) 
-      variables[var][1]['X_I'] = varSel(variables[var][0], combineCutsList([eleSel, hybIsoCut, invertedCut])) 
-      variables[var][1]['I_X'] = varSel(variables[var][0], combineCutsList([eleSel, antiHybIsoCut, appliedCut])) 
-      variables[var][1]['IX'] = varSel(variables[var][0], combineCutsList([eleSel, antiHybIsoCut, invertedCut])) 
-   if ABCD == "3" or plot:
-      variables[var][1]['I'] = varSel(variables[var][0], combineCutsList([eleSel, hybIsoCut])) 
-      variables[var][1]['anti-I'] = varSel(variables[var][0], combineCutsList([eleSel, antiHybIsoCut])) 
+Xs = {'1':'D', '2':'D', '3':'M', '4':'S'}
 
 if ABCD == "3":
    MET = CutClass("MET", [["MET","met >" + METloose]], baseCut = None) #loosened MET cut for ABCD3
@@ -231,12 +212,13 @@ presel = CutClass("presel_SR", [
    ["No3rdJet60","nVetoJet <= 2"],
    ["BVeto","(nBSoftJet == 0 && nBHardJet == 0)"],
    ["HighWeightVeto","weight < " + weightCut],
+   ["eleSel", "nLepAll_el > 0 &&" + eleSel],
    ], baseCut = MET)
 
 # ABCD1: X = D (inverted) | ABCD2: X = D (loose) | ABCD3: X = M (loose) | ABCD4: X = S (inverted)
 abcd = {'SR':'SR', 'IX_A':'IX', 'IXA':'IX'}
 
-if ABCD == "1" or ABCD == "4" or ABCD == "5": # 3D ABCD
+if ABCD == "1" or ABCD == "4": # 3D ABCD
    abcd['IA_X'] = 'I_X' 
    abcd['XA_I'] = 'X_I'
 elif ABCD == "2": # 2D ABCD
@@ -247,102 +229,101 @@ elif ABCD == "3": # 2D ABCD
 
 SRs ={}
 
-for sel in abcd.values(): 
-   SRs[sel] = {\
-      'SR1':["SR1", variables['elePt'][1][sel] + " < 30"],
-      'SR1a':["SR1a", combineCuts(variables['eleMt'][1][sel] + " < 60", variables['elePt'][1][sel] + " < 30")],
-      'SR1b':["SR1b", combineCuts(btw(variables['eleMt'][1][sel], 60, 88), variables['elePt'][1][sel] + " < 30")],
-      'SR1c':["SR1c", combineCuts(variables['eleMt'][1][sel] + " > 88", variables['elePt'][1][sel] + " < 30")],
-      
-      'SRL1a':["SRL1a", combineCuts(variables['eleMt'][1][sel] + " < 60", btw(variables['elePt'][1][sel], 5, 12))],
-      'SRH1a':["SRH1a", combineCuts(variables['eleMt'][1][sel] + " < 60", btw(variables['elePt'][1][sel], 12, 20))],
-      'SRV1a':["SRV1a", combineCuts(variables['eleMt'][1][sel] + " < 60", btw(variables['elePt'][1][sel], 20, 30))],
-      
-      'SRL1b':["SRL1b", combineCuts(btw(variables['eleMt'][1][sel], 60, 88), btw(variables['elePt'][1][sel], 5, 12))],
-      'SRH1b':["SRH1b", combineCuts(btw(variables['eleMt'][1][sel], 60, 88), btw(variables['elePt'][1][sel], 12, 20))],
-      'SRV1b':["SRV1b", combineCuts(btw(variables['eleMt'][1][sel], 60, 88), btw(variables['elePt'][1][sel], 20, 30))],
-      
-      'SRL1c':["SRL1c", combineCuts(variables['eleMt'][1][sel] + " > 88", btw(variables['elePt'][1][sel], 5, 12))],
-      'SRH1c':["SRH1c", combineCuts(variables['eleMt'][1][sel] + " > 88", btw(variables['elePt'][1][sel], 12, 20))],
-      'SRV1c':["SRV1c", combineCuts(variables['eleMt'][1][sel] + " > 88", btw(variables['elePt'][1][sel], 20, 30))]
-   }
+SRs = {\
+   'SR1':["SR1","LepAll_pt[" + ind + "] < 30"],
+   'SR1a':["SR1a", combineCuts("LepAll_mt[" + ind + "] < 60", "LepAll_pt[" + ind + "] < 30")],
+   'SR1b':["SR1b", combineCuts(btw("LepAll_mt[" + ind + "]", 60, 88), "LepAll_pt[" + ind + "] < 30")],
+   'SR1c':["SR1c", combineCuts("LepAll_mt[" + ind + "] > 88", "LepAll_pt[" + ind + "] < 30")],
 
-if plot: 
-  for sel in ['I', 'anti-I']:
-      SRs[sel + '2'] = {'SR1':["SR1", variables['elePt'][1][sel] + " < 30"]}
+   'SRL1a':["SRL1a", combineCuts("LepAll_mt[" + ind + "] < 60", btw("LepAll_pt[" + ind + "]", 5, 12))],
+   'SRH1a':["SRH1a", combineCuts("LepAll_mt[" + ind + "] < 60", btw("LepAll_pt[" + ind + "]", 12, 20))],
+   'SRV1a':["SRV1a", combineCuts("LepAll_mt[" + ind + "] < 60", btw("LepAll_pt[" + ind + "]", 20, 30))],
+
+   'SRL1b':["SRL1b", combineCuts(btw("LepAll_mt[" + ind + "]", 60, 88), btw("LepAll_pt[" + ind + "]", 5, 12))],
+   'SRH1b':["SRH1b", combineCuts(btw("LepAll_mt[" + ind + "]", 60, 88), btw("LepAll_pt[" + ind + "]", 12, 20))],
+   'SRV1b':["SRV1b", combineCuts(btw("LepAll_mt[" + ind + "]", 60, 88), btw("LepAll_pt[" + ind + "]", 20, 30))],
+
+   'SRL1c':["SRL1c", combineCuts("LepAll_mt[" + ind + "] > 88", btw("LepAll_pt[" + ind + "]", 5, 12))],
+   'SRH1c':["SRH1c", combineCuts("LepAll_mt[" + ind + "] > 88", btw("LepAll_pt[" + ind + "]", 12, 20))],
+   'SRV1c':["SRV1c", combineCuts("LepAll_mt[" + ind + "] > 88", btw("LepAll_pt[" + ind + "]", 20, 30))]}
 
 QCD = {}
-
 regions = ['SR1', 'SR1a', 'SR1b', 'SR1c', 'SRL1a', 'SRH1a', 'SRV1a', 'SRL1b', 'SRH1b', 'SRV1b', 'SRL1c', 'SRH1c', 'SRV1c']
 
 for reg in regions:
    QCD[reg] = {}
 
-   if ABCD == "1" or ABCD == "2" or ABCD == "4" or ABCD == "5":
+   if ABCD == "1" or ABCD == "2" or ABCD == "4":
       QCD[reg]['SR'] = CutClass("QCD_SR_" + reg, [
-         SRs['SR'][reg],
+         SRs[reg],
+         ["I", hybIsoCut], #applied
+         ["X", appliedCut], #applied
          ["A", dPhiCut], #applied
-         ["IX", sumSel1(combineCuts(eleSel, hybIsoCut, appliedCut))],
          ], baseCut = presel)
       
       QCD[reg]['IX_A'] = CutClass("QCD_IX_A_" + reg, [
-         SRs['IX'][reg],
+         SRs[reg],
+         ["anti-I", antiHybIsoCut], #inverted,
+         ["anti-X", invertedCut], #inverted (loose)
          ["A", dPhiCut], #applied
-         ["anti-IX", sumSel1(combineCuts(eleSel, antiHybIsoCut, invertedCut))], #inverted, inverted (loose)
          ], baseCut = presel)
       
       QCD[reg]['IXA'] = CutClass("QCD_IXA_" + reg, [
-         SRs['IX'][reg],
+         SRs[reg],
+         ["anti-I", antiHybIsoCut], #inverted, 
+         ["anti-X", invertedCut], #inverted (loose)
          ["anti-A", antidPhiCut], #inverted
-         ["anti-IX", sumSel1(combineCuts(eleSel, antiHybIsoCut, invertedCut))], #inverted, inverted (loose)
          ], baseCut = presel)
 
-      if ABCD == "1" or ABCD == "4" or ABCD == "5":
+      if ABCD == "1" or ABCD == "4":
       
          QCD[reg]['XA_I'] = CutClass("QCD_XA_I_" + reg, [
-            SRs['X_I'][reg],
+            SRs[reg],
+            ["I", hybIsoCut], #applied
+            ["anti-X", invertedCut], #inverted
             ["anti-A", antidPhiCut], #inverted
-            ["I+anti-X", sumSel1(combineCuts(eleSel, hybIsoCut, invertedCut))], #applied, inverted
             ], baseCut = presel)
       
          QCD[reg]['IA_X'] = CutClass("QCD_IA_X_" + reg, [
-            SRs['I_X'][reg],
+            SRs[reg],
+            ["anti-I", antiHybIsoCut], #inverted
+            ["X", appliedCut], #applied
             ["anti-A", antidPhiCut], #inverted
-            ["anti-I+X", sumSel1(combineCuts(eleSel, antiHybIsoCut, appliedCut))], #inverted, applied
             ], baseCut = presel)
 
       elif ABCD == "2": 
          QCD[reg]['A_IX'] = CutClass("QCD_A_IX_" + reg, [
-            SRs['SR'][reg],
+            SRs[reg],
+            ["I", hybIsoCut], #applied
+            ["X", appliedCut], #applied
             ["anti-A", antidPhiCut], #inverted
-            ["IX", sumSel1(combineCuts(eleSel, hybIsoCut, appliedCut))], #applied, applied
             ], baseCut = presel)
     
    elif ABCD == "3": #loosened MET
       QCD[reg]['SR'] = CutClass("QCD_SR_" + reg, [
-         SRs['I'][reg],
+         SRs[reg],
          ["MET", "met >" + METcut], #tight MET
          ["A", dPhiCut], #applied
-         ["I", sumSel1(combineCuts(eleSel, hybIsoCut))],
+         ["I", hybIsoCut],
          ], baseCut = presel)
    
       QCD[reg]['IX_A'] = CutClass("QCD_IX_A_" + reg, [ #loose MET
-         SRs['anti-I'][reg],
+         SRs[reg],
          ["A", dPhiCut], #applied
-         ["anti-I", sumSel1(combineCuts(eleSel, antiHybIsoCut))], #inverted
+         ["anti-I", antiHybIsoCut], #inverted
          ], baseCut = presel)
    
       QCD[reg]['A_IX'] = CutClass("QCD_A_IX_" + reg, [
-         SRs['I'][reg],
+         SRs[reg],
          ["MET", "met >" + METcut], #tight MET
          ["anti-A", antidPhiCut], #inverted
-         ["I", sumSel1(combineCuts(eleSel, hybIsoCut))], #applied, inverted
+         ["I", hybIsoCut], #applied
          ], baseCut = presel)
    
       QCD[reg]['IXA'] = CutClass("QCD_IXA_" + reg, [ #loose MET
-         SRs['anti-I'][reg],
+         SRs[reg],
          ["anti-A", antidPhiCut], #inverted
-         ["anti-I", sumSel1(combineCuts(eleSel, antiHybIsoCut))], #inverted, inverted
+         ["anti-I", antiHybIsoCut], #inverted
          ], baseCut = presel)
 
 if estimation: 
@@ -352,7 +333,7 @@ if estimation:
    if not os.path.isfile(savedir + "/QCDyields" + suffix + ".txt"):
       outfile = open(savedir + "/QCDyields" + suffix + ".txt", "w")
       outfile.write(eleWP + " Electron ID and Preselection of (MET, HT) > (" + METcut + "," + HTcut + ")\n")
-      if ABCD == "1" or ABCD == "4" or ABCD == "5": outfile.write("SR           IX_A                 XA_I                    IA_X                     IXA                       QCD                     MC                     Ratio\n".replace("X", Xs[ABCD]))
+      if ABCD == "1" or ABCD == "4": outfile.write("SR           IX_A                 XA_I                    IA_X                     IXA                       QCD                     MC                     Ratio\n".replace("X", Xs[ABCD]))
       elif ABCD == "2" or ABCD == "3": outfile.write("SR           IX_A                 A_IX                     IXA                       QCD                     MC                     Ratio\n".replace("X", Xs[ABCD]))
    
    for reg in regions:
@@ -362,7 +343,7 @@ if estimation:
    
       if yields[reg]['IXA'].yieldDictFull['qcd']['QCD_IXA_' + reg].val:
          
-         if ABCD == "1" or ABCD == "4" or ABCD == "5": #3D ABCD
+         if ABCD == "1" or ABCD == "4": #3D ABCD
             
             QCDexp[reg] = (yields[reg]['IX_A'].yieldDictFull['qcd']['QCD_IX_A_' + reg] * yields[reg]['XA_I'].yieldDictFull['qcd']['QCD_XA_I_' + reg] * \
             yields[reg]['IA_X'].yieldDictFull['qcd']['QCD_IA_X_' + reg])/\
@@ -427,29 +408,29 @@ if plot:
       if not os.path.exists(plotdir): os.makedirs(plotdir)
 
       QCD['SR1']['I_A'] = CutClass("QCD_I_A_SR1", [
-         SRs['anti-I2']['SR1'],
+         SRs['SR1'],
          ["A", dPhiCut], #applied
-         ["anti-I", sumSel1(combineCuts(eleSel, antiHybIsoCut))], #inverted
+         ["anti-I", antiHybIsoCut], #inverted
          ], baseCut = presel)
       
       QCD['SR1']['IA'] = CutClass("QCD_IA_SR1", [
-         SRs['anti-I2']['SR1'],
+         SRs['SR1'],
          ["anti-A", antidPhiCut], #inverted
-         ["anti-I", sumSel1(combineCuts(eleSel, antiHybIsoCut))], #inverted
+         ["anti-I", antiHybIsoCut], #inverted
          ], baseCut = presel)
 
       if ABCD != "3":
          QCD['SR1']['A_I'] = CutClass("QCD_A_I_SR1", [
-            SRs['I2']['SR1'],
+            SRs['SR1'],
             ["anti-A", antidPhiCut], #inverted
-            ["I", sumSel1(combineCuts(eleSel, hybIsoCut))], #applied
+            ["I", hybIsoCut], #applied
             ], baseCut = presel)
       elif ABCD == "3":
          QCD['SR1']['A_I'] = CutClass("QCD_A_I_SR1", [
-            SRs['I2']['SR1'],
+            SRs['SR1'],
             ["MET", "met >" + METcut], #tight MET
             ["anti-A", antidPhiCut], #inverted
-            ["I", sumSel1(combineCuts(eleSel, hybIsoCut))], #applied
+            ["I", hybIsoCut], #applied
             ], baseCut = presel)
    
    plotsList = {}
@@ -459,7 +440,7 @@ if plot:
    plots2 = {}
    
    plotSamples = [qcd, "z", "tt", "w"]
-   plotRegions = {'I_A':'anti-I'}#, 'IA':'anti-I', 'A_I':'I'}
+   plotRegions = {'I_A':'anti-I', 'IA':'anti-I', 'A_I':'I'}
    plotRegions.update(abcd) 
   
    if getData:
@@ -468,29 +449,28 @@ if plot:
    
    for sel in plotRegions:
       plotDict[sel] = {\
-         "elePt_" + sel:{'var':variables['elePt'][1][plotRegions[sel]], "bins":[10, 0, 50], "decor":{"title": "Electron pT Plot" ,"x":"Electron p_{T} / GeV" , "y":"Events", 'log':[0, logy,0]}},
-         "absIso_" + sel:{'var':variables['absIso'][1][plotRegions[sel]], "bins":[4, 0, 20], "decor":{"title": "Electron absIso Plot" ,"x":"I_{abs} / GeV" , "y":"Events", 'log':[0,logy,0]}},
-         "relIso_" + sel:{'var':variables['relIso'][1][plotRegions[sel]], "bins":[20, 0, 5], "decor":{"title": "Electron relIso Plot" ,"x":"I_{rel}" , "y":"Events", 'log':[0,logy,0]}},
-         "hybIso_" + sel:{'var':variables['hybIso'][1][plotRegions[sel]], "bins":[10, 0, 25], "decor":{"title": "Electron hybIso Plot" ,"x":"HI = I_{rel}*min(p_{T}, 25 GeV)" , "y":"Events", 'log':[0,logy,0]}},
-         "hybIso2_" + sel:{'var':"(log(1 + " + variables['hybIso'][1][plotRegions[sel]] + ")/log(1+5))", "bins":[8, 0, 4], "decor":{"title": "Electron hybIso Plot" ,"x":"log(1+HI)/log(1+5)" , "y":"Events", 'log':[0,logy,0]}},
-         "absDxy_" + sel:{'var':variables['absDxy'][1][plotRegions[sel]], "bins":[4, 0, 0.04], "decor":{"title": "Electron |dxy| Plot" ,"x":"|dxy|" , "y":"Events", "log":[0,logy,0]}},
+         "elePt_" + sel:{'var':variables['elePt'], "bins":[10, 0, 50], "decor":{"title": "Electron pT Plot" ,"x":"Electron p_{T} / GeV" , "y":"Events", 'log':[0, logy,0]}},
+         "absIso_" + sel:{'var':variables['absIso'], "bins":[4, 0, 20], "decor":{"title": "Electron absIso Plot" ,"x":"I_{abs} / GeV" , "y":"Events", 'log':[0,logy,0]}},
+         "relIso_" + sel:{'var':variables['relIso'], "bins":[20, 0, 5], "decor":{"title": "Electron relIso Plot" ,"x":"I_{rel}" , "y":"Events", 'log':[0,logy,0]}},
+         "hybIso_" + sel:{'var':variables['hybIso'], "bins":[10, 0, 25], "decor":{"title": "Electron hybIso Plot" ,"x":"HI = I_{rel}*min(p_{T}, 25 GeV)" , "y":"Events", 'log':[0,logy,0]}},
+         "hybIso2_" + sel:{'var':"(log(1 + " + variables['hybIso'] + ")/log(1+5))", "bins":[8, 0, 4], "decor":{"title": "Electron hybIso Plot" ,"x":"log(1+HI)/log(1+5)" , "y":"Events", 'log':[0,logy,0]}},
+         "absDxy_" + sel:{'var':variables['absDxy'], "bins":[4, 0, 0.04], "decor":{"title": "Electron |dxy| Plot" ,"x":"|dxy|" , "y":"Events", "log":[0,logy,0]}},
          "delPhi_" + sel:{'var':"vetoJet_dPhi_j1j2", "bins":[8, 0, 3.14], "decor":{"title": "deltaPhi(j1,j2) Plot" ,"x":"#Delta#phi(j1,j2)" , "y":"Events", 'log':[0,logy,0]}},
-         "eleMt_" + sel:{'var':variables['eleMt'][1][plotRegions[sel]], "bins":[10,0,100], "decor":{"title": "mT Plot" ,"x":"m_{T} / GeV" , "y":"Events", 'log':[0,logy,0]}},
+         "eleMt_" + sel:{'var':variables['eleMt'], "bins":[10,0,100], "decor":{"title": "mT Plot" ,"x":"m_{T} / GeV" , "y":"Events", 'log':[0,logy,0]}},
          "MET_" + sel:{'var':"met", "bins":[50,0,500], "decor":{"title": "MET Plot" ,"x":"Missing E_{T} / GeV" , "y":"Events", 'log':[0,logy,0]}},
          "HT_" + sel:{'var':"ht_basJet", "bins":[50,0,500], "decor":{"title": "HT Plot","x":"H_{T} / GeV" , "y":"Events", 'log':[0,logy,0]}},
-         "sigmaEtaEta_" + sel:{'var':variables['sigmaEtaEta'][1][plotRegions[sel]], "bins":[5,0,0.05], "decor":{"title": "#sigma#eta#eta Plot","x":"#sigma#eta#eta" , "y":"Events", 'log':[0,logy,0]}},
-         "hOverE_" + sel:{'var':variables['hOverE'][1][plotRegions[sel]], "bins":[10,0,0.2], "decor":{"title": "H/E Plot","x":"H/E" , "y":"Events", 'log':[0,logy,0]}},
+         "sigmaEtaEta_" + sel:{'var':variables['sigmaEtaEta'], "bins":[5,0,0.05], "decor":{"title": "#sigma#eta#eta Plot","x":"#sigma#eta#eta" , "y":"Events", 'log':[0,logy,0]}},
          "weight_" + sel:{'var':"weight", "bins":[20,0,400], "decor":{"title": "Weight Plot","x":"Event Weight" , "y":"Events", 'log':[0,1,0]}}
       }
    
-      plotsList[sel] = ["elePt_" + sel, "absIso_" + sel, "relIso_" + sel,"hybIso_" + sel, "hybIso2_" + sel, "absDxy_" + sel, "delPhi_" + sel, "eleMt_" + sel, "MET_" + sel, "HT_" + sel, "sigmaEtaEta_" + sel, "hOverE_" + sel, "weight_" + sel]
+      plotsList[sel] = ["elePt_" + sel, "absIso_" + sel, "relIso_" + sel,"hybIso_" + sel, "hybIso2_" + sel, "absDxy_" + sel, "delPhi_" + sel, "eleMt_" + sel, "MET_" + sel, "HT_" + sel, "sigmaEtaEta_" + sel, "weight_" + sel]
       #plotsList[sel] = ["hybIso2_" + sel, "absDxy_" + sel, "delPhi_" + sel, "sigmaEtaEta_" + sel, "weight_" + sel]
       #plotsList[sel] = ["hybIso2_" + sel, "absDxy_" + sel, "delPhi_" + sel]
       plotsDict[sel] = Plots(**plotDict[sel])
       plots[sel] = getPlots2(samples, plotsDict[sel], QCD['SR1'][sel], plotSamples, plotList = plotsList[sel], addOverFlowBin='upper')
       if getData: plots2[sel] = drawPlots2(plots[sel], denoms=["bkg"], noms = ["dblind"], fom="RATIO", fomLimits=[0,2.8], plotMin = 0.1, normalize = False, save=False)
       else: plots2[sel] = drawPlots2(plots[sel], fom=False, plotMin = 0.1, normalize = False, save=False)
-   
+ 
       #Save canvas
       if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
          if not os.path.exists("%s/%s/root"%(plotdir, sel)): os.makedirs("%s/%s/root"%(plotdir, sel))
