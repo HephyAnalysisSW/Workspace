@@ -214,8 +214,8 @@ def binnedNBTagsFit(cut, cutname, samples, prefix = "", QCD_dict={0:{'y':0.,'e':
   template_WJets_NegPdg.Scale(1./template_WJets_NegPdg.Integral())
   y_Rest_PosPdg = template_Rest_PosPdg.Integral()*lumi/templateLumi
   y_Rest_NegPdg = template_Rest_NegPdg.Integral()*lumi/templateLumi
-  template_Rest_PosPdg.Scale(1./template_Rest_PosPdg.Integral())
-  template_Rest_NegPdg.Scale(1./template_Rest_NegPdg.Integral())
+  if y_Rest_PosPdg>0: template_Rest_PosPdg.Scale(1./template_Rest_PosPdg.Integral())
+  if y_Rest_NegPdg>0: template_Rest_NegPdg.Scale(1./template_Rest_NegPdg.Integral())
   y_QCD = hQCD.Integral()
   if y_QCD > 0: hQCD.Scale(1./hQCD.Integral()) 
   #hData_PosPdg.Scale(1./hData_PosPdg.Integral())

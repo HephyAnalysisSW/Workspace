@@ -16,6 +16,7 @@ from Workspace.RA4Analysis.signalRegions import *
 #from Workspace.RA4Analysis.cmgTuples_Data_25ns_postProcessed_antiSel import *
 
 from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2_antiSel_postProcessed import *
+from Workspace.RA4Analysis.cmgTuples_Data25ns_Promtv2_antiSel_postprocessed import *
 
 #from draw_helpers import *
 from math import *
@@ -29,12 +30,12 @@ if isData:
 else:
   sampleStr = 'MC'
 
-preprefix = 'QCDestimation/firstMC_2p25fb/'+sampleStr
-wwwDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring16/'+preprefix+'/'
+preprefix = 'QCDestimation/2015SR_2p57fb/'+sampleStr
+wwwDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/'+preprefix+'/'
 picklePath = '/data/'+username+'/Results2016/QCDEstimation/'
 prefix = 'Lp_singleElectronic_'
-picklePresel = '20160620_QCDestimation_firstMC_'+sampleStr+'2p25fb_pkl'
-pickleFit    = '20160620_fitResult_firstMC_'+sampleStr+'2p25fb_pkl'
+picklePresel = '20160621_QCDestimation_2015SR_'+sampleStr+'2p57fb_pkl'
+pickleFit    = '20160621_fitResult_2015SR_'+sampleStr+'2p57fb_pkl'
 
 if not os.path.exists(wwwDir):
   os.makedirs(wwwDir)
@@ -42,7 +43,7 @@ if not os.path.exists(wwwDir):
 ##############################################
 ###   Define sidebands for QCD estimation  ###
 ### (3,4) in std est., (3,3) in validation ###
-QCD_SB = (3,3)
+QCD_SB = (3,4)
 
 inclusiveTemplate = {QCD_SB: {(250,  -1): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}}}} #use inclusive LT,HT region to get the shape for the fit template
 
@@ -52,7 +53,8 @@ fitCR =  {QCD_SB: {(250,  -1): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}},
                    (350, 450): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}},
                    (450, -1):  {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}}}}
 
-SRs = validationRegionAll
+#SRs = validationRegionAll
+SRs = signalRegion3fb
 
 signalRegion = makeQCDsignalRegions(SRs, QCDSB=QCD_SB)
 
@@ -69,7 +71,7 @@ def makeWeight(lumi=3., sampleLumi=3.,debug=False):
     weight_err_str = '('+weight_str+'*'+weight_str+')'
   return weight_str, weight_err_str
 
-lumi = 2.25
+lumi = 2.57
 sampleLumi = 3.0 #post processed sample already produced with 2.25fb-1
 weight_str, weight_err_str = makeWeight(lumi, sampleLumi)
 
@@ -108,7 +110,7 @@ def getPseudoRCS(small,smallE,large,largeE):
     return {'rCS':float('nan'), 'rCSE_pred':float('nan'), 'rCSE_sim':float('nan')}
 
 #trigger and filters for real Data
-trigger = "&&(HLT_EleHT350||HLT_MuHT350)"
+trigger = "&&((HLT_EleHT350||HLT_EleHT400)||(HLT_MuHT350||HLT_MuHT400))"
 filters = "&&Flag_goodVertices && Flag_HBHENoiseFilter_fix && Flag_eeBadScFilter && Flag_HBHENoiseIsoFilter "#&& veto_evt_list"
 #filters = "&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFilter_fix&&Flag_HBHENoiseFilter&&Flag_goodVertices&&Flag_eeBadScFilter&&Flag_EcalDeadCellTriggerPrimitiveFilter"
 #filters = "&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFilter_fix&&Flag_HBHENoiseIsoFilter&&Flag_goodVertices&&Flag_eeBadScFilter"
@@ -124,9 +126,9 @@ cQCD  = getChain(QCDHT,histname='')
 cEWK  = getChain([WJetsHTToLNu, TTJets_Lep, singleTop_lep, DY_amc, TTV],histname='')
 
 if isData:
-  cData = getChain(single_ele_Run2015D, histname='')
+  cData = getChain(single_ele_Run2016B, histname='')
 else:
-  cData = getChain([QCDHT, WJetsHTToLNu, TTJets_Lep, singleTop_lep, DY_amc, TTV] , histname='')
+  cData = getChain([QCDHT, WJetsHTToLNu, TTJets_Lep, singleTop_lep, DY_madgraph, TTV] , histname='')
 
 #get template for fit method
 template_QCD = ROOT.TH1F('template_QCD','template_QCD',30,-0.5,2.5)
