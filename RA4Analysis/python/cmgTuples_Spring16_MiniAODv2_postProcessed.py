@@ -1,5 +1,5 @@
 import copy, os, sys
-dirEce = '/data/easilar/cmgTuples/postProcessing_Spring16/HT500LT250Skim/'
+dirEce = '/data/easilar/cmgTuples/postProcessing_Spring16_JECv3//HT500LT250Skim/'
 dirDaniel = '/data/dspitzbart/cmgTuples/postProcessing_Spring16/HT500LT250Skim/'
 ####usual HT combination####
 
@@ -58,6 +58,18 @@ TTJets_Lep = {\
 ],
 'dir' : dirDaniel,
 }
+
+TTJets_Comp = {\
+"name" : "TTJets_Comp",
+"bins" : [
+"TTJets_SingleLeptonFromT_full",
+"TTJets_SingleLeptonFromTbar_full",
+"TTJets_DiLepton",
+"TTJets_NLO",
+],
+'dir' : dirEce,
+}
+
 
 TTJets_incl = {\
 "name" : "TTJets_incl",

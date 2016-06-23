@@ -2,8 +2,8 @@
 ##General
 
 sample_lumi = 3000##pb
-lumi = 804 #2300##pb
-lumi_label = 804
+lumi = 2571 #2300##pb
+lumi_label = 2.76
 
 btagVarString = 'nBJetMediumCSV30'
 

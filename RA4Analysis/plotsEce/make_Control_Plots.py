@@ -18,7 +18,7 @@ def Draw_CMS_header():
    tex.SetTextFont(42)
    tex.SetTextSize(0.05)
    tex.SetLineWidth(2)
-   tex.DrawLatex(0.96,0.96,"804 pb^{-1} (13 TeV)")
+   tex.DrawLatex(0.96,0.96,"2.57 fb^{-1} (13 TeV)")
    tex = ROOT.TLatex()
    tex.SetNDC()
    tex.SetTextFont(61)
@@ -82,32 +82,37 @@ ROOT.gStyle.SetOptStat(0)
 
 all_MB = False
 presel = False
-SB_w   = True 
+SB_w   = False 
 SB_tt  = False
-presel_1b = False
+presel_1b = True
 test = False
 
 draw_signal = False
+blind = False
+
+add_cut = "(1)"
+
 if all_MB : 
   #SR = signalRegion3fb
   SR = {(5,5):{(250,350):{(500,-1):{"deltaPhi":1.0}}}}
-  btag_weight = "(1)"#"(weightBTag0_SF)"
+  btag_weight = "(weightBTag0_SF)"
   nbtag = (0,0)
   signal_suffix = "x10"
 if presel : 
+  blind = True
   SR = {(5,-1):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
-  btag_weight = "(1)"#"(weightBTag0_SF)"
+  btag_weight = "(weightBTag0_SF)"
   #btagVarString = "("+nbjets_30+")"
   nbtag = (0,0)
   signal_suffix = "x10"
 if SB_w : 
   SR = {(3,4):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
-  btag_weight = "(1)"#"(weightBTag0_SF)"
+  btag_weight = "(weightBTag0_SF)"
   nbtag = (0,0)
   signal_suffix = ""
 if SB_tt : 
   SR = {(4,5):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
-  btag_weight = "(1)" #"(weightBTag1_SF)"
+  btag_weight = "(weightBTag1_SF)"
   nbtag = (1,1)
   signal_suffix = ""
 if test :
@@ -116,10 +121,13 @@ if test :
   nbtag = (0,0)
   signal_suffix = "x10"
 if presel_1b : 
-  SR = {(3,-1):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
+  add_cut = "(deltaPhi_Wl<0.5)"
+  SR = {(5,-1):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
   btag_weight = "(1)"#"(weightBTag0_SF)"
   nbtag = (0,-1)
   signal_suffix = "x10"
+
+if blind: add_cut = "(deltaPhi_Wl<0.7)"
   
 lepSels = [
 {'cut':'(singleMuonic&&(!isData||(isData&&muonDataSet)))' , 'veto':'nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0',\
@@ -135,14 +143,14 @@ lepSels = [
 
 
 bkg_samples=[
-{'sample':'TTVH',           "weight":btag_weight ,"cut":nbtag ,"add_Cut":"(1)","name":TTV ,'tex':'t#bar{t}V','color':ROOT.kOrange-3},
-{"sample":"DiBosons",       "weight":"(1)"       ,"cut":nbtag ,"add_Cut":"(1)","name":diBoson ,"tex":"WW/WZ/ZZ","color":ROOT.kRed+3},
-{"sample":"DY",             "weight":btag_weight ,"cut":nbtag ,"add_Cut":"(1)","name":DY_amc,"tex":"DY + jets",'color':ROOT.kRed-6},
-{"sample":"singleTop",      "weight":btag_weight ,"cut":nbtag ,"add_Cut":"(1)","name":singleTop_lep,"tex":"t/#bar{t}",'color': ROOT.kViolet+5},
-{"sample":"QCD",            "weight":"(1)"       ,"cut":nbtag ,"add_Cut":"(1)","name":QCDHT, "tex":"QCD","color":ROOT.kCyan-6},
-{"sample":"WJets",          "weight":btag_weight ,"cut":nbtag ,"add_Cut":"(1)","name":WJetsHTToLNu,"tex":"W + jets","color":ROOT.kGreen-2},
-{"sample":"ttJets_diLep",   "weight":btag_weight ,"cut":nbtag ,"add_Cut":"((ngenLep+ngenTau)==2)","name":TTJets_Lep, "tex":"t#bar{t} ll + jets",'color':ROOT.kBlue},
-{"sample":"ttJets_semiLep", "weight":btag_weight ,"cut":nbtag ,"add_Cut":"(!((ngenLep+ngenTau)==2))","name":TTJets_Lep, "tex":"t#bar{t} l + jets",'color':ROOT.kBlue-7}
+{'sample':'TTVH',           "weight":"(1)"       ,"cut":nbtag  ,"add_Cut":"(1)","name":TTV ,'tex':'t#bar{t}V','color':ROOT.kOrange-3},
+{"sample":"DiBosons",       "weight":btag_weight ,"cut":(0,-1) ,"add_Cut":"(1)","name":diBoson ,"tex":"WW/WZ/ZZ","color":ROOT.kRed+3},
+{"sample":"DY",             "weight":btag_weight ,"cut":(0,-1) ,"add_Cut":"(1)","name":DY_amc,"tex":"DY + jets",'color':ROOT.kRed-6},
+{"sample":"singleTop",      "weight":btag_weight ,"cut":(0,-1) ,"add_Cut":"(1)","name":singleTop_lep,"tex":"t/#bar{t}",'color': ROOT.kViolet+5},
+{"sample":"QCD",            "weight":"(1)"       ,"cut":nbtag  ,"add_Cut":"(1)","name":QCDHT, "tex":"QCD","color":ROOT.kCyan-6},
+{"sample":"WJets",          "weight":btag_weight ,"cut":(0,-1) ,"add_Cut":"(1)","name":WJetsHTToLNu,"tex":"W + jets","color":ROOT.kGreen-2},
+{"sample":"ttJets_diLep",   "weight":btag_weight ,"cut":(0,-1) ,"add_Cut":"((ngenLep+ngenTau)==2)","name":TTJets_Lep, "tex":"t#bar{t} ll + jets",'color':ROOT.kBlue},
+{"sample":"ttJets_semiLep", "weight":btag_weight ,"cut":(0,-1) ,"add_Cut":"(!((ngenLep+ngenTau)==2))","name":TTJets_Lep, "tex":"t#bar{t} l + jets",'color':ROOT.kBlue-7}
 ]
 
 for bkg in bkg_samples:
@@ -179,23 +187,23 @@ if test :
   lepSels = [lepSels[2]]
 
 if presel_1b :
-  plots = [plots[0]]
+  #plots = [plots[0]]
   lepSels = [lepSels[2]]
 
 if not draw_signal :
   signals = []
 
-lepSels = [lepSels[2]]
+#lepSels = [lepSels[2]]
 
 for lepSel in lepSels:
-  path = "/afs/hephy.at/user/e/easilar/www/data/Run2016B/804pb/"+lepSel['label']
+  path = "/afs/hephy.at/user/e/easilar/www/data/Run2016B/2751pb/"+lepSel['label']
   if not os.path.exists(path):
     os.makedirs(path)
   print lepSel['label']
   print "====== "
-  presel = "&&".join([lepSel['cut'],lepSel['veto'],"Jet_pt[1]>80&&abs(LepGood_eta[0])<2.4"])
+  presel = "&&".join([lepSel['cut'],lepSel['veto'],"Jet_pt[1]>80&&abs(LepGood_eta[0])<2.4",add_cut])
   sig_presel = "&&".join([lepSel['cut'],lepSel['veto'],"Jet_pt[1]>80&&abs(LepGood_eta[0])<2.4"])
-  data_presel = "&&".join([lepSel['cut'],lepSel['veto'],lepSel['trigger'],filters,"Jet_pt[1]>80&&abs(LepGood_eta[0])<2.4"])
+  data_presel = "&&".join([lepSel['cut'],lepSel['veto'],lepSel['trigger'],filters,"Jet_pt[1]>80&&abs(LepGood_eta[0])<2.4",add_cut])
   bin = {}
   for srNJet in sorted(SR):
     bin[srNJet]={}

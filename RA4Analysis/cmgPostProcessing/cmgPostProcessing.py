@@ -36,7 +36,7 @@ separateBTagWeights = True
 
 defSampleStr = "TTJets_LO"
 
-subDir = "postProcessing_Spring16_JECv3/"
+subDir = "postProcessing_Spring16_For_DiLep/"
 #subDir = "postProcessing_Tests"
 
 #branches to be kept for data and MC
@@ -70,6 +70,7 @@ parser.add_option("--inputTreeName", dest="inputTreeName", default="treeProducer
 parser.add_option("--targetDir", dest="targetDir", default="/data/"+username+"/cmgTuples/"+subDir+'/', type="string", action="store", help="target directory.")
 parser.add_option("--skim", dest="skim", default="", type="string", action="store", help="any skim condition?")
 parser.add_option("--small", dest="small", default = False, action="store_true", help="Just do a small subset.")
+parser.add_option("--for_dilep", dest="for_dilep", default = False, action="store_true", help="remove initial skim for diLep.")
 parser.add_option("--overwrite", dest="overwrite", default = False, action="store_true", help="Overwrite?")
 parser.add_option("--calcbtagweights", dest="systematics", default = False, action="store_true", help="Calculate b-tag weights for systematics?")
 parser.add_option("--btagWeight", dest="btagWeight", default = 2, action="store", help="Max nBJet to calculate the b-tag weight for")
@@ -81,6 +82,9 @@ parser.add_option("--useXSecFile", dest="readXsecFromFile", default = False, act
 skimCond = "(1)"
 htLtSkim = "Sum$(Jet_pt)>500&&(LepGood_pt[0]+met_pt)>250"
 common_skim = "HT500LT250Skim"
+if options.for_dilep :
+  htLtSkim = "(1)"
+  common_skim = "skim"
 if options.skim.startswith('met'):
   skimCond = "met_pt>"+str(float(options.skim[3:]))
 if options.skim=='HT400':
