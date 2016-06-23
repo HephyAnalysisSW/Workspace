@@ -46,9 +46,12 @@ for srNJet in sorted(signalRegions):
     rowsSt[srNJet][stb] = {'n':len(signalRegions[srNJet][stb])}
   rowsNJet[srNJet] = {'nST':len(signalRegions[srNJet]), 'n':rows}
 
-constant = abs(DL[(4,-1)][(250,-1)][(500,-1)]["constant"]-1) 
-nJetMean = DL[(4,-1)][(250,-1)][(500,-1)]["nJetMean"] 
-slope    = DL[(4,-1)][(250,-1)][(500,-1)]["slope"] 
+#constant = abs(DL[(4,-1)][(250,-1)][(500,-1)]["constant"]-1) 
+#nJetMean = DL[(4,-1)][(250,-1)][(500,-1)]["nJetMean"] 
+#slope    = DL[(4,-1)][(250,-1)][(500,-1)]["slope"] 
+constant = 0.35
+nJetMean = 5.24
+slope    = 0.04 
 
 constant_weight = "("+str(constant)+")"
 slope_weight = "((nJet30-"+str(nJetMean)+")*"+str(slope)+")"
@@ -59,7 +62,8 @@ calc_errs = [\
 ]
 
 presel = presel = "&&".join([lepSel['cut'],lepSel['veto'],filters])
-c_tt = {"sample":"ttJets", "chain":getChain(TTJets_Comp, maxN=maxN,histname="",treeName="Events"), "weight1b":"weightBTag1_SF" , "weight0b":"weightBTag0_SF" ,"cut":(0,-1) , "name":TTJets_Comp, "tex":"ttbar + jets",'color':ROOT.kBlue-4}
+#c_tt = {"sample":"ttJets", "chain":getChain(TTJets_Lep, maxN=maxN,histname="",treeName="Events"), "weight1b":"weightBTag1_SF" , "weight0b":"weightBTag0_SF" ,"cut":(0,-1) , "name":TTJets_Comp, "tex":"ttbar + jets",'color':ROOT.kBlue-4}
+c_tt = {"sample":"ttJets", "chain":getChain(TTJets_Lep, maxN=maxN,histname="",treeName="Events"), "weight1b":"(1)" , "weight0b":"(1)" ,"cut_1b":(1,1) ,"cut_0b":(0,0) ,"name":TTJets_Lep, "tex":"ttbar + jets",'color':ROOT.kBlue-4}
 c_DY = {"sample":"DY", "chain":getChain(DY_amc, maxN=maxN,histname="",treeName="Events"),  "weight":"(1)" ,"cut":(0,0) , "name":DY_amc, "tex":"DY",'color':ROOT.kRed-6}
 cRest = getChain([TTV,singleTop_lep],histname='') #no QCD
 cW = getChain([WJetsHTToLNu],histname='')
@@ -77,21 +81,21 @@ for srNJet in sorted(signalRegions):
       deltaPhiCut = signalRegions[srNJet][stb][htb]['deltaPhi']
       name,     cut_DY_SR =  nameAndCut(stb, htb, srNJet, btb=c_DY["cut"], presel=presel+"&&deltaPhi_Wl>"+str(deltaPhiCut), btagVar = btagString)
       print name
-      name_bla, tt_SB_cut = nameAndCut(stb, htb, (3,4), btb=c_tt["cut"], presel=presel, btagVar = btagString)
-      name_bla, tt_SB_cut_CR = nameAndCut(stb, htb, (3,4), btb=c_tt["cut"], presel=presel+"&&deltaPhi_Wl<"+str(deltaPhiCut), btagVar = btagString)
-      name_bla, tt_SB_cut_SR = nameAndCut(stb, htb, (3,4), btb=c_tt["cut"], presel=presel+"&&deltaPhi_Wl>"+str(deltaPhiCut), btagVar = btagString)
-      name_bla, tt_MB_cut = nameAndCut(stb, htb, srNJet, btb=c_tt["cut"], presel=presel, btagVar = btagString)
-      name_bla, tt_MB_cut_CR =nameAndCut(stb, htb, srNJet, btb=c_tt["cut"], presel=presel+"&&deltaPhi_Wl<"+str(deltaPhiCut), btagVar = btagString) 
-      name_bla, tt_MB_cut_SR =nameAndCut(stb, htb, srNJet, btb=c_tt["cut"], presel=presel+"&&deltaPhi_Wl>"+str(deltaPhiCut), btagVar = btagString) 
+      name_bla, tt_SB_cut = nameAndCut(stb, htb, (3,4), btb=c_tt["cut_1b"], presel=presel, btagVar = btagString)
+      name_bla, tt_SB_cut_CR = nameAndCut(stb, htb, (3,4), btb=c_tt["cut_1b"], presel=presel+"&&deltaPhi_Wl<"+str(deltaPhiCut), btagVar = btagString)
+      name_bla, tt_SB_cut_SR = nameAndCut(stb, htb, (3,4), btb=c_tt["cut_1b"], presel=presel+"&&deltaPhi_Wl>"+str(deltaPhiCut), btagVar = btagString)
+      name_bla, tt_MB_cut = nameAndCut(stb, htb, srNJet, btb=c_tt["cut_0b"], presel=presel, btagVar = btagString)
+      name_bla, tt_MB_cut_CR =nameAndCut(stb, htb, srNJet, btb=c_tt["cut_0b"], presel=presel+"&&deltaPhi_Wl<"+str(deltaPhiCut), btagVar = btagString) 
+      name_bla, tt_MB_cut_SR =nameAndCut(stb, htb, srNJet, btb=c_tt["cut_0b"], presel=presel+"&&deltaPhi_Wl>"+str(deltaPhiCut), btagVar = btagString) 
 
-      name_bla, W_SB_cut = nameAndCut(stb, htb, (3,4), btb=c_tt["cut"], presel=presel, btagVar = btagString)
-      name_bla, W_SB_cut_CR = nameAndCut(stb, htb, (3,4), btb=c_tt["cut"], presel=presel+"&&deltaPhi_Wl<"+str(deltaPhiCut), btagVar = btagString)
-      name_bla, W_SB_cut_SR = nameAndCut(stb, htb, (3,4), btb=c_tt["cut"], presel=presel+"&&deltaPhi_Wl>"+str(deltaPhiCut), btagVar = btagString)
+      name_bla, W_SB_cut = nameAndCut(stb, htb, (3,4), btb=c_tt["cut_0b"], presel=presel, btagVar = btagString)
+      name_bla, W_SB_cut_CR = nameAndCut(stb, htb, (3,4), btb=c_tt["cut_0b"], presel=presel+"&&deltaPhi_Wl<"+str(deltaPhiCut), btagVar = btagString)
+      name_bla, W_SB_cut_SR = nameAndCut(stb, htb, (3,4), btb=c_tt["cut_0b"], presel=presel+"&&deltaPhi_Wl>"+str(deltaPhiCut), btagVar = btagString)
 
 
-      name_bla, W_MB_cut = nameAndCut(stb, htb, srNJet, btb=c_tt["cut"], presel=presel, btagVar = btagString)
-      name_bla, W_MB_cut_CR = nameAndCut(stb, htb, srNJet, btb=c_tt["cut"], presel=presel+"&&deltaPhi_Wl<"+str(deltaPhiCut), btagVar = btagString)
-      name_bla, W_MB_cut_SR = nameAndCut(stb, htb, srNJet, btb=c_tt["cut"], presel=presel+"&&deltaPhi_Wl>"+str(deltaPhiCut), btagVar = btagString)
+      name_bla, W_MB_cut = nameAndCut(stb, htb, srNJet, btb=c_tt["cut_0b"], presel=presel, btagVar = btagString)
+      name_bla, W_MB_cut_CR = nameAndCut(stb, htb, srNJet, btb=c_tt["cut_0b"], presel=presel+"&&deltaPhi_Wl<"+str(deltaPhiCut), btagVar = btagString)
+      name_bla, W_MB_cut_SR = nameAndCut(stb, htb, srNJet, btb=c_tt["cut_0b"], presel=presel+"&&deltaPhi_Wl>"+str(deltaPhiCut), btagVar = btagString)
 
 
 
@@ -172,18 +176,18 @@ for srNJet in sorted(signalRegions):
           print "yield_diLep_DY_MB_in_CR_constant_Up  " ,yield_diLep_DY_MB_in_CR_constant_Up  
 
 
-          yield_diLep_DY_MB_in_SR                   = max(0,getYieldFromChain(c_DY['chain'], "(ngenLep+ngenTau)==2&&"+DY_MB_cut_SR, weight = common_weight))
-          yield_diLep_DY_MB_in_SR_constant_Up       = max(0,getYieldFromChain(c_DY['chain'], "(ngenLep+ngenTau)==2&&"+DY_MB_cut_SR, weight = common_weight+"*(1"+variation[1]+calc["weight"]+")"))
+          yield_diLep_DY_MB_in_SR                   = max(0.0000001,getYieldFromChain(c_DY['chain'], "(ngenLep+ngenTau)==2&&"+DY_MB_cut_SR, weight = common_weight))
+          yield_diLep_DY_MB_in_SR_constant_Up       = max(0.0000001,getYieldFromChain(c_DY['chain'], "(ngenLep+ngenTau)==2&&"+DY_MB_cut_SR, weight = common_weight+"*(1"+variation[1]+calc["weight"]+")"))
 
-          yield_rest_DY_MB_in_CR                    = max(0,getYieldFromChain(c_DY['chain'], "(ngenLep+ngenTau)!=2&&"+DY_MB_cut_CR, weight = common_weight))
+          yield_rest_DY_MB_in_CR                    = max(0.0000001,getYieldFromChain(c_DY['chain'], "(ngenLep+ngenTau)!=2&&"+DY_MB_cut_CR, weight = common_weight))
 
-          yield_rest_EWK_MB_in_CR                   = max(0,getYieldFromChain(cRest, DY_MB_cut_CR, weight = common_weight))
-          yield_rest_W_MB_in_CR                     = max(0,getYieldFromChain(cW   , W_MB_cut_CR, weight = common_weight+"*"+c_tt["weight0b"]))
+          yield_rest_EWK_MB_in_CR                   = max(0.0000001,getYieldFromChain(cRest, DY_MB_cut_CR, weight = common_weight))
+          yield_rest_W_MB_in_CR                     = max(0.0000001,getYieldFromChain(cW   , W_MB_cut_CR, weight = common_weight+"*"+c_tt["weight0b"]))
 
-          yield_rest_DY_MB_in_SR                    = max(0,getYieldFromChain(c_DY['chain'], "(ngenLep+ngenTau)!=2&&"+DY_MB_cut_SR, weight = common_weight))
+          yield_rest_DY_MB_in_SR                    = max(0.0000001,getYieldFromChain(c_DY['chain'], "(ngenLep+ngenTau)!=2&&"+DY_MB_cut_SR, weight = common_weight))
 
-          yield_rest_EWK_MB_in_SR                   = max(0,getYieldFromChain(cRest, DY_MB_cut_SR, weight = common_weight))
-          yield_rest_W_MB_in_SR                     = max(0,getYieldFromChain(cW   , W_MB_cut_SR, weight = common_weight+"*"+c_tt["weight0b"]))
+          yield_rest_EWK_MB_in_SR                   = max(0.0000001,getYieldFromChain(cRest, DY_MB_cut_SR, weight = common_weight))
+          yield_rest_W_MB_in_SR                     = max(0.0000001,getYieldFromChain(cW   , W_MB_cut_SR, weight = common_weight+"*"+c_tt["weight0b"]))
 
 
 
@@ -376,7 +380,7 @@ for srNJet in sorted(signalRegions):
           res[srNJet][stb][htb]['delta_'+calc['name']+'_'+variation[0]] = ((res[srNJet][stb][htb]['kappa_'+calc['name']+'_'+variation[0]]/res[srNJet][stb][htb]['kappa_original'])-1)
           print calc['name']+'_'+variation[0] , res[srNJet][stb][htb]['delta_'+calc['name']+'_'+variation[0]]
 
-pickle.dump(res,file('/data/easilar/Results2016/ICHEP/DiLep_SYS/V1/unc_with_SRAll','w'))
+pickle.dump(res,file('/data/easilar/Results2016/ICHEP/DiLep_SYS/V1/unc_with_SRAll_pkl','w'))
 
 
 
