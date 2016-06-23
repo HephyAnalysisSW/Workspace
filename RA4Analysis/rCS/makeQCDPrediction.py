@@ -23,7 +23,7 @@ from math import *
 from Workspace.HEPHYPythonTools.user import username
 from LpTemplateFit import LpTemplateFit
 
-isData = False
+isData = True
 
 if isData:
   sampleStr = 'data'
@@ -34,8 +34,8 @@ preprefix = 'QCDestimation/2015SR_2p57fb/'+sampleStr
 wwwDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/'+preprefix+'/'
 picklePath = '/data/'+username+'/Results2016/QCDEstimation/'
 prefix = 'Lp_singleElectronic_'
-picklePresel = '20160621_QCDestimation_2015SR_'+sampleStr+'2p57fb_pkl'
-pickleFit    = '20160621_fitResult_2015SR_'+sampleStr+'2p57fb_pkl'
+picklePresel = '20160623_QCDestimation_2015SR_'+sampleStr+'2p57fb_pkl'
+pickleFit    = '20160623_fitResult_2015SR_'+sampleStr+'2p57fb_pkl'
 
 if not os.path.exists(wwwDir):
   os.makedirs(wwwDir)
@@ -62,7 +62,8 @@ btreg = [(0,0), (1,1), (2,-1)] #1b and 2b estimates are needed for the btag fit
 
 def makeWeight(lumi=3., sampleLumi=3.,debug=False):
   #reWeight = 'lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*TopPtWeight*0.94*puReweight_true_max4'
-  reWeight = 'lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*0.94*TopPtWeight'
+  #reWeight = 'lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*0.94*TopPtWeight'
+  reWeight = '(1)'
   if debug:
     print 'No lumi-reweighting done!!'
     return 'weight', 'weight*weight'

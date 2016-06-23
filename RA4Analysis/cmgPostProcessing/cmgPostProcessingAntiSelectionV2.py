@@ -42,7 +42,8 @@ separateBTagWeights = True
 
 defSampleStr = "TTJets_LO_HT600to800_25ns"
 
-subDir = "postProcessed_2016B_antiSelection_21062016"
+#subDir = "postProcessed_Spring16_antiSelection_3fb_v2"
+subDir = "postProcessed_2016B_antiSelection_23062016"
 
 #branches to be kept for data and MC
 branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert",
@@ -462,7 +463,7 @@ for isample, sample in enumerate(allSamples):
           jets = filter(lambda j:j['pt']>30 and abs(j['eta'])<2.4 and j['id'], get_cmg_jets_fromStruct(r,j_list))
           #print "jets:" , jets
 #          lightJets_, bJetsCMVA = splitListOfObjects('btagCMVA', 0.732, jets) 
-          lightJets,  bJetsCSV = splitListOfObjects('btagCSV', 0.890, jets)
+          lightJets,  bJetsCSV = splitListOfObjects('btagCSV', 0.800, jets)
           #print "bjetsCMVA:" , bJetsCMVA , "bjetsCSV:" ,  bJetsCSV
           s.htJet30j = sum([x['pt'] for x in jets])
           s.nJet30 = len(jets)
@@ -477,7 +478,7 @@ for isample, sample in enumerate(allSamples):
         if options.leptonSelection == 'none':
 
           ### LEPTONS
-          vars = ['pt', 'eta', 'phi', 'mass', 'miniRelIso','relIso03', 'pdgId', 'eleCBID_SPRING15_25ns', 'eleCBID_SPRING15_25ns_ConvVetoDxyDz','mediumMuonId', 'sip3d', 'hOverE']
+          vars = ['pt', 'eta', 'phi', 'mass', 'miniRelIso','relIso03', 'pdgId', 'eleCBID_SPRING15_25ns', 'eleCBID_SPRING15_25ns_ConvVetoDxyDz','mediumMuonId', 'sip3d', 'hOverE', 'eleCutIdSpring15_25ns_v1']
           leptonIndices = [i for i in range(r.nLepGood)]
           leptons = [getObjDict(t, 'LepGood_', vars, i) for i in leptonIndices]
           nlep = len(leptonIndices)
@@ -545,9 +546,9 @@ for isample, sample in enumerate(allSamples):
               passConv = False
 
               #electron CutBased ID, ConvVeto, dxy,dz already included
-              passTightID = True if (lep['eleCBID_SPRING15_25ns_ConvVetoDxyDz'] == 4) else False
-              passMediumID = True if (lep['eleCBID_SPRING15_25ns_ConvVetoDxyDz'] >= 3) else False
-              passVetoID = True if (lep['eleCBID_SPRING15_25ns_ConvVetoDxyDz'] >= 1) else False
+              passTightID = True if (lep['eleCutIdSpring15_25ns_v1'] == 4) else False
+              passMediumID = True if (lep['eleCutIdSpring15_25ns_v1'] >= 3) else False
+              passVetoID = True if (lep['eleCutIdSpring15_25ns_v1'] >= 1) else False
 
               #selected electrons
               if passTightID:
@@ -615,8 +616,8 @@ for isample, sample in enumerate(allSamples):
               if lep['miniRelIso'] > 0.4: continue
 
               #use the eleCBID_SPRING15_25ns, ConvVeto, dxy, dz an not included
-              passMediumIDother = True if (lep['eleCBID_SPRING15_25ns'] >= 3) else False
-              passVetoIDother = True if (lep['eleCBID_SPRING15_25ns'] >= 1) else False
+              passMediumIDother = True if (lep['eleCutIdSpring15_25ns_v1'] >= 3) else False
+              passVetoIDother = True if (lep['eleCutIdSpring15_25ns_v1'] >= 1) else False
 
               #Anti-selected electrons with CBID <3
               if not passMediumIDother:

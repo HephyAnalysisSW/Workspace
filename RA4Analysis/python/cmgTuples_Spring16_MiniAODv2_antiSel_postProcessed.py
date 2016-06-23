@@ -1,5 +1,6 @@
 import copy, os, sys
-dirDaniel = '/data/dspitzbart/cmgTuples/postProcessed_Spring16_antiSelection_3fb/none/'
+#dirDaniel = '/data/dspitzbart/cmgTuples/postProcessed_Spring16_antiSelection_3fb/none/'
+dirDaniel = '/data/dspitzbart/cmgTuples/postProcessed_2016B_antiSelection_23062016/none/'
 
 TTJets_Lep = {\
 "name" : "TTJets_singleLep",
@@ -25,14 +26,14 @@ WJetsHTToLNu = {\
 'dir' : dirDaniel,
 }
 
-singleTop_inclusive = {\
-"name" : "singleTop_inclusive",
-"bins" : [
-"ST_tchannel_antitop_4f_inclusiveDecays_powheg",
-"ST_tW_antitop_5f_inclusiveDecays_powheg",
-],
-'dir' : dirDaniel,
-}
+#singleTop_inclusive = {\
+#"name" : "singleTop_inclusive",
+#"bins" : [
+#"ST_tchannel_antitop_4f_inclusiveDecays_powheg",
+#"ST_tW_antitop_5f_inclusiveDecays_powheg",
+#],
+#'dir' : dirDaniel,
+#}
 
 singleTop_lep = {\
 "name" : "singleTop_lep",
@@ -76,15 +77,15 @@ QCDHT = {\
 'dir' : dirDaniel,
 }
 
-diBoson = {\
-"name":"diBoson",
-"bins":[
-"DiBoson_WW",
-"DiBoson_WZ",
-"DiBoson_ZZ",
-],
-'dir': dirDaniel,
-}
+#diBoson = {\
+#"name":"diBoson",
+#"bins":[
+#"DiBoson_WW",
+#"DiBoson_WZ",
+#"DiBoson_ZZ",
+#],
+#'dir': dirDaniel,
+#}
 
 TTV = {
 "name":"TTV",
