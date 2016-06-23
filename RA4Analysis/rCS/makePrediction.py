@@ -112,7 +112,7 @@ for srNJet in signalRegions:
         srName, srCut = nameAndCut(stb, htb, srNJet, btb=None, presel=presel, btagVar = nBTagVar)
         weight_str_sr = weight_str+'*weightBTag0_SF'
       
-      if unblinded:
+      if unblinded or validation:
         y_srNJet_0b_highDPhi, y_Var_srNJet_0b_highDPhi = getYieldFromChain(cData, srCut+'&&deltaPhi_Wl>='+str(deltaPhiCut), weight_str_sr, returnVar=True)
         rd['y_srNJet_0b_highDPhi'] = y_srNJet_0b_highDPhi
         rd['y_Var_srNJet_0b_highDPhi'] = y_Var_srNJet_0b_highDPhi

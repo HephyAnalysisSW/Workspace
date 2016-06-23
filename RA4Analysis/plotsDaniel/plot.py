@@ -10,11 +10,14 @@ from Workspace.HEPHYPythonTools.helpers import *
 from Workspace.RA4Analysis.helpers import *
 from Workspace.RA4Analysis.signalRegions import *
 from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed import *
-from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2_postProcessed import *
+#from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2_postProcessed import *
 #from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed_2 import *
 
 #from Workspace.RA4Analysis.cmgTuples_Data25ns_miniAODv2_postprocessed import *
-from Workspace.RA4Analysis.cmgTuples_Data25ns_Promtv2_postprocessed import *
+#from Workspace.RA4Analysis.cmgTuples_Data25ns_Promtv2_postprocessed import *
+
+from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2_antiSel_postProcessed import *
+from Workspace.RA4Analysis.cmgTuples_Data25ns_Promtv2_antiSel_postprocessed import *
 
 from Workspace.HEPHYPythonTools.user import username
 
@@ -40,10 +43,10 @@ WJETS_16 = {'name':'WJets', 'chain':getChain(WJetsHTToLNu,histname=''), 'color':
 
 TTJets = {'name':'TTJets', 'chain':getChain(TTJets_HTLO_25ns,histname=''), 'color':ROOT.kOrange,'weight':'weight', 'niceName':'t#bar{t}+Jets', 'cut':''}
 
-TTJets_incl_16 = {'name':'TTJets', 'chain':getChain(TTJets_incl,histname=''), 'color':ROOT.kOrange,'weight':'weight', 'niceName':'t#bar{t}+Jets incl S16', 'cut':''}
+#TTJets_incl_16 = {'name':'TTJets', 'chain':getChain(TTJets_incl,histname=''), 'color':ROOT.kOrange,'weight':'weight', 'niceName':'t#bar{t}+Jets incl S16', 'cut':''}
 
 TTJets_combined_15 = {'name':'TTJets', 'chain':getChain(TTJets_combined_25ns,histname=''), 'color':ROOT.kRed,'weight':totalWeight, 'niceName':'t#bar{t}+Jets S15', 'cut':''}
-TTJets_combined_16 = {'name':'TTJets', 'chain':getChain(TTJets_combined,histname=''), 'color':ROOT.kCyan,'weight':totalWeight, 'niceName':'t#bar{t}+Jets S16', 'cut':''}
+#TTJets_combined_16 = {'name':'TTJets', 'chain':getChain(TTJets_combined,histname=''), 'color':ROOT.kCyan,'weight':totalWeight, 'niceName':'t#bar{t}+Jets S16', 'cut':''}
 TTJets_Lep_16 = {'name':'TTJets', 'chain':getChain(TTJets_Lep,histname=''), 'color':color('TTJets')-2,'weight':totalWeight, 'niceName':'t#bar{t}+Jets 1l S16', 'cut':''}
 
 
@@ -55,13 +58,13 @@ TTJets_Lep_16 = {'name':'TTJets', 'chain':getChain(TTJets_Lep,histname=''), 'col
 #TTJets_ht_2 = {'name':'TTJets',   'chain':getChain(TTJets_HTLO_25ns_2,histname=''), 'color':color('QCD'),'weight':totalWeight, 'niceName':'t#bar{t}+Jets ht_2', 'cut':''}
 
 TTJets_combined_singleLep_15 = {'name':'TTJets', 'chain':TTJets_combined_15['chain'], 'color':color('TTJets')-2,'weight':totalWeight, 'niceName':'t#bar{t}+Jets 1l', 'cut':'(ngenLep+ngenTau)==1'}
-TTJets_combined_singleLep_16 = {'name':'TTJets', 'chain':TTJets_combined_16['chain'], 'color':ROOT.kCyan,'weight':totalWeight, 'niceName':'t#bar{t}+Jets 1l', 'cut':'(ngenLep+ngenTau)==1'}
+#TTJets_combined_singleLep_16 = {'name':'TTJets', 'chain':TTJets_combined_16['chain'], 'color':ROOT.kCyan,'weight':totalWeight, 'niceName':'t#bar{t}+Jets 1l', 'cut':'(ngenLep+ngenTau)==1'}
 
 TTJets_combined_diLep_15 =     {'name':'TTJets', 'chain':TTJets_combined_15['chain'], 'color':color('TTJets'),'weight':totalWeight, 'niceName':'t#bar{t}+Jets 2l', 'cut':'(ngenLep+ngenTau)==2'}
-TTJets_combined_diLep_16 =     {'name':'TTJets', 'chain':TTJets_combined_16['chain'], 'color':ROOT.kCyan,'weight':totalWeight, 'niceName':'t#bar{t}+Jets 2l', 'cut':'(ngenLep+ngenTau)==2'}
+#TTJets_combined_diLep_16 =     {'name':'TTJets', 'chain':TTJets_combined_16['chain'], 'color':ROOT.kCyan,'weight':totalWeight, 'niceName':'t#bar{t}+Jets 2l', 'cut':'(ngenLep+ngenTau)==2'}
 
 TTJets_combined_had_15 =       {'name':'TTJets', 'chain':TTJets_combined_15['chain'], 'color':color('TTJets')+2,'weight':totalWeight, 'niceName':'t#bar{t}+Jets 0l', 'cut':'(ngenLep+ngenTau)==0'}
-TTJets_combined_had_16 =       {'name':'TTJets', 'chain':TTJets_combined_16['chain'], 'color':ROOT.kCyan,'weight':totalWeight, 'niceName':'t#bar{t}+Jets 0l', 'cut':'(ngenLep+ngenTau)==0'}
+#TTJets_combined_had_16 =       {'name':'TTJets', 'chain':TTJets_combined_16['chain'], 'color':ROOT.kCyan,'weight':totalWeight, 'niceName':'t#bar{t}+Jets 0l', 'cut':'(ngenLep+ngenTau)==0'}
 
 
 DY_15 = {'name':'DY', 'chain':getChain(DY_25ns,histname=''), 'color':color('DY'),'weight':totalWeight, 'niceName':'Drell Yan', 'cut':''}
@@ -75,7 +78,7 @@ singleTop_lep_16 = {'name':'singleTop', 'chain':getChain(singleTop_lep,histname=
 QCD_15 = {'name':'QCD', 'chain':getChain(QCDHT_25ns,histname=''), 'color':color('QCD')+1,'weight':totalWeight, 'niceName':'QCD multijet S15', 'cut':''}
 QCD_16 = {'name':'QCD', 'chain':getChain(QCDHT,histname=''), 'color':color('QCD')-1,'weight':totalWeight, 'niceName':'QCD multijet S16', 'cut':''}
 
-diBoson = {'name':'QCD', 'chain':getChain(diBoson,histname=''), 'color':ROOT.kMagenta,'weight':totalWeight, 'niceName':'WW/WZ/ZZ', 'cut':''}
+#diBoson = {'name':'QCD', 'chain':getChain(diBoson,histname=''), 'color':ROOT.kMagenta,'weight':totalWeight, 'niceName':'WW/WZ/ZZ', 'cut':''}
 
 TTV_15 = {'name':'TTVH', 'chain':getChain(TTV_25ns,histname=''), 'color':color('TTV')+2,'weight':totalWeight, 'niceName':'t#bar{t}W/Z S15', 'cut':''}
 TTV_16 = {'name':'TTVH', 'chain':getChain(TTV,histname=''), 'color':color('TTV'),'weight':totalWeight, 'niceName':'t#bar{t}W/Z S16', 'cut':''}
@@ -88,6 +91,7 @@ EWK = {'name':'Bkg', 'chain':getChain([TTJets_HTLO_25ns,WJetsHTToLNu_25ns,TTV_25
 samples         = [WJETS_15, TTJets_combined_15, Rest, QCD_15]#, diBoson]
 samples2        = [WJETS_15, TTJets_combined_15, DY_15, singleTop_15, TTV_15, QCD_15]
 samplesTTcheck  = [WJETS_15, TTJets_combined_singleLep_15, TTJets_combined_diLep_15, TTJets_combined_had_15, Rest, QCD_15]#, diBoson]
+samples16       = [TTJets_Lep_16, DY_16_madgraph, WJETS_16, singleTop_lep_16, QCD_16, TTV_16]
 
 #samplesComp = [WJETS, TTJETS, singleTop, DY, QCD]
 
@@ -138,6 +142,8 @@ stRB = {'name':'st', 'binning':[20,250,1250], 'titleX':'L_{T} [GeV]', 'titleY':'
 
 htRB = {'name':'htJet30j', 'binning':[22,500,2700], 'titleX':'H_{T} [GeV]', 'titleY':'Events', 'filename':'ht'}
 ht = {'name':'htJet30j', 'binning':[52,500,3100], 'titleX':'H_{T} [GeV]', 'titleY':'Events', 'filename':'ht'}
+
+lp = {'name':'Lp', 'binning':[40,-2,2], 'titleX':'L_{P}', 'titleY':'Events', 'filename':'LP'}
 
 htSRB = {'name':'htJet30j', 'binning':[12,500,2500], 'titleX':'H_{T} [GeV]', 'titleY':'Events', 'filename':'ht'}
 

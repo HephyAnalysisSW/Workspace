@@ -61,7 +61,7 @@ lepSF_h2b = d.GetPrimitive('h2b')
 #pickleDir =  '/data/dspitzbart/Results2016/Prediction_SFtemplates_fullSR_lep_data_Moriond_2p3/'
 #pickleDir =  '/data/dspitzbart/Results2016/Prediction_SFtemplates_fullSR_lep_data_QCDerrChange_2p25/'
 #pickleDir =  '/data/dspitzbart/Results2016/Prediction_SFtemplates_validation_4j_lep_data_2p3/'
-pickleDir =  '/data/dspitzbart/Results2016/Prediction_Spring16_templates_VreducedSR_lep_data_0p8/'
+pickleDir =  '/data/dspitzbart/Results2016/Prediction_Spring16_templates_validation_4j_lep_data_2p57/'
 saveDir = pickleDir
 #saveDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_fullSR_lep_data_2p25/'
 
@@ -72,7 +72,8 @@ wpol    = pickle.load(file('/data/dhandl/results2015/WPolarizationEstimation/201
 b_err   = pickle.load(file('/data/dspitzbart/Results2016/btagErr_pkl_update'))
 l_err   = pickle.load(file('/data/dspitzbart/Results2016/mistagErr_pkl_update'))
 qcd_err = pickle.load(file('/data/dspitzbart/Results2016/qcdErr_pkl_update'))
-rcs     = pickle.load(file(pickleDir+'singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'))
+#rcs     = pickle.load(file(pickleDir+'singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'))
+rcs     = pickle.load(file(pickleDir+'singleLeptonic_Spring16__estimationResults_pkl_kappa_corrected'))
 if validation:
   dilep   = pickle.load(file('/data/dspitzbart/Results2016/dilep_val_pkl'))
 else:
@@ -268,12 +269,15 @@ for injb,srNJet in enumerate(sorted(signalRegions)):
       rest_xsec = 0.55
       
       # Rcs uncertainties
-      rcsErr    = sqrt(rcs[srNJet][stb][htb]['W_pred_errs']['syst']**2+rcs[srNJet][stb][htb]['TT_rCS_fits_MC']['syst']**2)/rcs[srNJet][stb][htb]['tot_pred']
-      rcsErr_tt = rcs[srNJet][stb][htb]['TT_rCS_fits_MC']['syst']/rcs[srNJet][stb][htb]['TT_pred']
+      if rcs[srNJet][stb][htb]['tot_pred']>0: rcsErr = sqrt(rcs[srNJet][stb][htb]['W_pred_errs']['syst']**2+rcs[srNJet][stb][htb]['TT_rCS_fits_MC']['syst']**2)/rcs[srNJet][stb][htb]['tot_pred']
+      else: rcsErr = 0.5
+      if rcs[srNJet][stb][htb]['TT_pred']>0: rcsErr_tt = rcs[srNJet][stb][htb]['TT_rCS_fits_MC']['syst']/rcs[srNJet][stb][htb]['TT_pred']
+      else: rcsErr_tt = 0
       rcsErr_W  = rcs[srNJet][stb][htb]['W_pred_errs']['const_vs_slope']/rcs[srNJet][stb][htb]['W_pred']
       W_muToLep = rcs[srNJet][stb][htb]['W_pred_errs']['ratio_mu_elemu']/rcs[srNJet][stb][htb]['W_pred']
       
       rcsErrH.SetBinContent(i,rcsErr)
+      #print rcsErr
       
       kappa_b_Err   = rcs[srNJet][stb][htb]['TT_rCS_fits_MC']['k_0b/1b_btag_err']/rcs[srNJet][stb][htb]['TT_rCS_fits_MC']['k_0b/1b_btag']
       kappa_TT_Err  = rcs[srNJet][stb][htb]['TT_kappa_err']/rcs[srNJet][stb][htb]['TT_kappa']
@@ -300,15 +304,32 @@ for injb,srNJet in enumerate(sorted(signalRegions)):
       totalU +=  (kappa_TT_Err*TT_pred)**2 + (kappa_b_Err*TT_pred)**2 + (rcsErr_tt*TT_pred)**2
       totalU +=  (rest_xsec*rest_truth)**2 + (lumi_err*rest_truth)**2 + (trigger_err*rest_truth)**2
       tot_syst_err_Abs = sqrt(totalU) # total abs systematics
+      tot_syst_err_Rel = tot_syst_err_Abs/total_pred
+      tot_stat_err_Abs = sqrt(rcs[srNJet][stb][htb]['W_pred_final_err']**2 + rcs[srNJet][stb][htb]['TT_pred_final_err']**2 + rcs[srNJet][stb][htb]['Rest_truth_err']**2)
+      print 'Stat tt', rcs[srNJet][stb][htb]['TT_pred_final_err']
+      print 'Stat W', rcs[srNJet][stb][htb]['W_pred_final_err']
+      print 'Stat rest', rcs[srNJet][stb][htb]['Rest_truth_err']
+      tot_stat_err_Rel = tot_stat_err_Abs/total_pred
       totalU +=  rcs[srNJet][stb][htb]['W_pred_final_err']**2 + rcs[srNJet][stb][htb]['TT_pred_final_err']**2 + rcs[srNJet][stb][htb]['Rest_truth_err']**2
       totalU = sqrt(totalU)
-      totalU_rel = totalU/total_pred
+      if total_pred<0:
+        totalU_rel = 1.
+        total_pred = 0.
+      else:
+        totalU_rel = totalU/total_pred
       
       totalSyst = sqrt(bErr**2 + wXErr**2 + ttXErr**2 + wPErr**2 + dilepErr**2 + qcdErr**2 + topErr**2 + puErr**2 + lepSFErr**2 + jecErr**2 + rcsErr**2                    + kappa_global**2)
       ttSyst    = sqrt(bErr**2 + wXErr**2 + ttXErr**2 + wPErr**2 + dilepErr**2 + qcdErr**2 + topErr**2 + puErr**2 + lepSFErr**2 + jecErr**2 + rcsErr_tt**2                 + kappa_TT_Err**2 + kappa_b_Err**2)
       WSyst     = sqrt(bErr**2 + wXErr**2 + ttXErr**2 + wPErr**2 + dilepErr**2 + qcdErr**2 + topErr**2 + puErr**2 + lepSFErr**2 + jecErr**2 + rcsErr_W**2  + W_muToLep**2  + kappa_W_Err**2)
 
-      totalSyst_noKappa = sqrt(bErr**2 + wXErr**2 + ttXErr**2 + wPErr**2 + dilepErr**2 + qcdErr**2 + topErr**2 + puErr**2 + lepSFErr**2 + jecErr**2 + rcsErr**2) #for visualization purposes only
+      errorsForTotal = [bErr, wXErr, ttXErr, wPErr, dilepErr, qcdErr, topErr, puErr, lepSFErr, jecErr, rcsErr]
+      totalSyst_noKappa = 0
+      for err in errorsForTotal: totalSyst_noKappa += err**2
+      totalSyst_noKappa = sqrt(totalSyst_noKappa)
+      errorsForTotalRounded = [ round(elem, 2) for elem in errorsForTotal ]
+      print errorsForTotalRounded
+      #totalSyst_noKappa = sqrt(bErr**2 + wXErr**2 + ttXErr**2 + wPErr**2 + dilepErr**2 + qcdErr**2 + topErr**2 + puErr**2 + lepSFErr**2 + jecErr**2 + rcsErr**2) #for visualization purposes only
+       
       restSyst = sqrt(bErr**2 + wXErr**2 + ttXErr**2 + wPErr**2 + dilepErr**2 + qcdErr**2 + topErr**2 + puErr**2 + lepSFErr**2 + jecErr**2 + rest_xsec**2 + lumi_err**2 + trigger_err**2)
       #restSyst = 0.5
       
@@ -364,6 +385,9 @@ for injb,srNJet in enumerate(sorted(signalRegions)):
       print 'Syst. W unc.:',round(W_syst_err_Abs[1],3)
       print 'Syst. tt unc.:',round(tt_syst_err_Abs[1],3)
       print 'Syst. unc.:',round(tot_syst_err_Abs,3)
+      print 'Rel. syst. unc.:',round(tot_syst_err_Rel,3)
+      print 'Rel. stat. unc.:',round(tot_stat_err_Rel,3)
+      print 'Rel. tot. unc.:',round(totalU_rel,3)
       print 'Total unc.:',round(tot_err_Abs,3)
       print 'Total yield:',round(total_pred,2)
       print round(totalU,3)
@@ -496,9 +520,9 @@ total_err.Draw('2 same')
 
 can.cd()
 
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/syst_errors_approval_Moriond_whatever.png')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/syst_errors_approval_Moriond_whatever.root')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/syst_errors_approval_Moriond_whatever.pdf')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/syst_uncertainties/validation_ICHEP.png')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/syst_uncertainties/validation_ICHEP.root')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/syst_uncertainties/validation_ICHEP.pdf')
 
 
 savePickle = True

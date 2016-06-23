@@ -9,7 +9,7 @@ from Workspace.HEPHYPythonTools.helpers import getChain
 #from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_HT500ST250_postProcessed_fromArthur import *
 #from Workspace.RA4Analysis.cmgTuples_Data25ns_miniAODv2_postprocessed import *
 from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2_postProcessed import *
-from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed import *
+#from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed import *
 from Workspace.RA4Analysis.cmgTuples_Data25ns_Promtv2_postprocessed import *
 
 from Workspace.HEPHYPythonTools.user import username
@@ -35,9 +35,9 @@ if QCDup: nameSuffix += '_QCDup'
 if QCDdown: nameSuffix += '_QCDdown'
 
 ## samples
-isData              = True
-unblinded           = True
-validation          = False
+isData              = False
+unblinded           = False
+validation          = True
 isCentralPrediction = True
 if isData:
   isCentralPrediction = False #should be false for data, otherwise kappa is measured in data!
@@ -55,21 +55,25 @@ loadTemplate = False
 
 cWJets      = getChain(WJetsHTToLNu,histname='')
 cTTJets     = getChain(TTJets_Lep,histname='')
-cDY         = getChain(DY_25ns,histname='')
-csingleTop  = getChain(singleTop_25ns,histname='')
-cTTV        = getChain(TTV_25ns,histname='')
-cRest       = getChain([singleTop_25ns, DY_25ns, TTV_25ns],histname='')#no QCD
-cBkg        = getChain([WJetsHTToLNu, TTJets_Lep, singleTop_25ns, DY_25ns, TTV_25ns], histname='')#no QCD
+cDY         = getChain(DY_madgraph,histname='')
+csingleTop  = getChain(singleTop_lep,histname='')
+cTTV        = getChain(TTV,histname='')
+cRest       = getChain([singleTop_lep, DY_madgraph, TTV],histname='')#no QCD
+cBkg        = getChain([WJetsHTToLNu, TTJets_Lep, singleTop_lep, DY_madgraph, TTV], histname='')#no QCD
 cQCD        = getChain(QCDHT,histname='')
 
 
 ## QCD estimation
 useQCDestimation = False
-if not isData and useQCDestimation: QCDpickle = '/data/dspitzbart/Results2016/QCDEstimation/20160212_QCDestimation_MC2p25fb_pkl'
+if not isData and useQCDestimation:
+  #QCDpickle = '/data/dspitzbart/Results2016/QCDEstimation/20160212_QCDestimation_MC2p25fb_pkl'
+  QCDpickle = '/data/dspitzbart/Results2016/QCDEstimation/20160621_QCDestimation_2015SR_MC2p57fb_pkl'
 if isData:
-  QCDpickle  = '/data/dspitzbart/Results2016/QCDEstimation/20160212_QCDestimation_data2p25fb_pkl'
+  #QCDpickle  = '/data/dspitzbart/Results2016/QCDEstimation/20160212_QCDestimation_data2p25fb_pkl'
+  QCDpickle  = '/data/dspitzbart/Results2016/QCDEstimation/20160621_QCDestimation_2015SR_data2p57fb_pkl'
 if isData and validation:
-  QCDpickle  = '/data/dspitzbart/Results2016/QCDEstimation/20160218_QCDestimation_validation_data2p25fb_pkl'
+  #QCDpickle  = '/data/dspitzbart/Results2016/QCDEstimation/20160218_QCDestimation_validation_data2p25fb_pkl'
+  QCDpickle  = '/data/dspitzbart/Results2016/QCDEstimation/20160621_QCDestimation_first_data2p57fb_pkl'
 #QCDpickle  = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_2p1fb_pkl'
 #QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_extendedClosureTest3to4j_2p1fb_pkl'
 #QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_closureTest4to5j_2p1fb_pkl'
@@ -90,16 +94,17 @@ if validation:
   signalRegions = validationRegionAll
   regStr = 'validation_4j'
 else:
-  signalRegions = signalRegions2016VR
+  #signalRegions = signalRegions2016VR
+  signalRegions = signalRegion3fb
   #regStr = 'fullSR'
-  regStr = 'VreducedSR'
+  regStr = 'SR2015'
 #signalRegions = signalRegion3fbMerge
 
 ## weight calculations
-lumi = 0.8
-templateLumi = 0.8 # lumi that was used when template was created - if defined wrong, fixed rest backgrounds will be wrong
+lumi = 2.57
+templateLumi = 2.57 # lumi that was used when template was created - if defined wrong, fixed rest backgrounds will be wrong
 sampleLumi = 3.
-printlumi = '0.8'
+printlumi = '2.57'
 debugReweighting = False
 
 year = '2016'
@@ -128,14 +133,15 @@ else:
 printDir    = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/25ns/templateFit_'+predictionName+'_'+lumistr+'/'
 pickleDir   = '/data/'+username+'/Results'+year+'/Prediction_'+predictionName+'_'+lumistr+'/'
 templateDir = '/data/'+username+'/Results'+year+'/btagTemplates_'+templateName+'_'+templateLumistr+'/'
-prefix = 'singleLeptonic_Spring15_'
+prefix = 'singleLeptonic_Spring16_'
 
 if validation:
-  kappa_dict_dir = '/data/dspitzbart/Results'+year+'/Prediction_SFtemplates_validation_4j_lep_MC_SF_2p3/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'
+  #kappa_dict_dir = '/data/dspitzbart/Results'+year+'/Prediction_SFtemplates_validation_4j_lep_MC_SF_2p3/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'
+  kappa_dict_dir = '/data/dspitzbart/Results'+year+'/Prediction_Spring16_templates_validation_4j_lep_MC_SF_2p57/singleLeptonic_Spring16__estimationResults_pkl_kappa_corrected'
 else:
   #kappa_dict_dir = '/data/dspitzbart/Results'+year+'/Prediction_SFtemplates_fullSR_lep_MC_SFnoPUreweight_2p25/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'
   #kappa_dict_dir = '/data/dspitzbart/Results'+year+'/Prediction_SFtemplates_fullSR_lep_MC_SF_Moriond_2p3/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'
-  kappa_dict_dir = '/data/dspitzbart/Results'+year+'/Prediction_Spring16_templates_VreducedSR_lep_MC_SF_0p8/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'
+  kappa_dict_dir = '/data/dspitzbart/Results'+year+'/Prediction_Spring16_templates_SR2015_lep_MC_SF_2p57/singleLeptonic_Spring16__estimationResults_pkl_kappa_corrected'
 
 ## Preselection cut
 triggers = "(HLT_EleHT350||HLT_MuHT350)"
@@ -148,7 +154,7 @@ presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSoftLeptons=
 singleMu_presel = "((!isData&&singleMuonic)||(isData&&"+triggers+"&&(muonDataSet&&singleMuonic)&&"+filters+"))"
 singleMu_presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSoftLeptons==0 && Jet_pt[1]>80 && st>250 && nJet30>2 && htJet30j>500"
 
-presel = singleMu_presel
+#presel = singleMu_presel
 
 ## weights for MC
 #MCweight = 'lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*0.94'
