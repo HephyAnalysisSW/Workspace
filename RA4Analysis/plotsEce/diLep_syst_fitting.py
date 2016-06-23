@@ -11,16 +11,18 @@ ROOT.gROOT.LoadMacro("../../HEPHYPythonTools/scripts/root/tdrstyle.C")
 ROOT.setTDRStyle()
 maxN = -1
 ROOT.gStyle.SetOptStat(0)
-lumi = 2250##pb
+#lumi = 2250##pb
 #path = "/afs/hephy.at/user/e/easilar/www/data/Run2015D/2p3fb/diLep_syst_study_results/"
-path = "/afs/hephy.at/user/e/easilar/www/data/Run2015D/2p25fb/diLep_syst_study_results/"
+#path = "/afs/hephy.at/user/e/easilar/www/data/Run2015D/2p25fb/diLep_syst_study_results/"
+path = "/afs/hephy.at/user/e/easilar/www/data/Run2016B/2751pb/diLep_syst_study_results/"
 #path = "/afs/hephy.at/user/e/easilar/www/data/Run2015D/2p25fb/diLep_syst_study_results_nJet_Fix/"
-data_mean = pickle.load(file('/data/easilar/Spring15/25ns/data_mean_25Feb_0p75_pkl'))
+#data_mean = pickle.load(file('/data/easilar/Spring15/25ns/data_mean_25Feb_0p75_pkl'))
+data_mean = pickle.load(file('/data/easilar/Results2016/ICHEP/DiLep_SYS/V1/data_mean_2p75_lg1b_pkl'))
 #SR = signalRegion3fb
-SR = {(3,-1):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
+SR = {(4,-1):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
 
 btagVarString = 'nBJetMediumCSV30'
-p = {'ndiv':False,'yaxis':'Events','xaxis':'N_{Jets}','logy':False , 'var':'nJet30','varname':'nJet30', 'binlabel':1,  'bin':(6,3,9)}
+p = {'ndiv':False,'yaxis':'Events','xaxis':'N_{Jets}','logy':False , 'var':'nJet30','varname':'nJet30', 'binlabel':1,  'bin':(6,4,9)}
 
 bin = {}
 for srNJet in sorted(SR):
@@ -31,16 +33,17 @@ for srNJet in sorted(SR):
       bin[srNJet][stb][htb] = {}
       Name, bla_Cut = nameAndCut(stb, htb, srNJet, btb=(0,0), presel="(1)", btagVar =  btagVarString)
       print Name
-      fratio_diLep = ROOT.TFile(path+Name+'_'+p['varname']+'_allWeights_diLep_4_Ratio.root')
-      fratio_oneLep = ROOT.TFile(path+Name+'_'+p['varname']+'_allWeights_Ratio_4.root')
+      fratio_diLep = ROOT.TFile(path+'st250_ht500_njet4_nbtag1_nJet30_allWeights_diLep_4_Ratio_1b.root')
+      #fratio_diLep = ROOT.TFile(path+'st250_ht500_njet4_nbtagEq0_nJet30_allWeights_diLep_4_Ratio_0b.root')
+      fratio_oneLep = ROOT.TFile(path+'st250_ht500_njet4_nbtag1_nJet30_lg1b_Ratio.root')
       cb = ROOT.TCanvas("cb","cb",800,800)
       cb.cd()
       latex = ROOT.TLatex()
       latex.SetNDC()
       latex.SetTextSize(0.04)
       latex.SetTextAlign(11) 
-      hint1 = ROOT.TH1F("hint1", "1 sigma", 100, 3, 9)
-      hint2 = ROOT.TH1F("hint2", "2 sigma", 100, 3, 9)
+      hint1 = ROOT.TH1F("hint1", "1 sigma", 100, 4, 9)
+      hint2 = ROOT.TH1F("hint2", "2 sigma", 100, 4, 9)
       hint1.SetMarkerSize(0)
       hint2.SetMarkerSize(0)
       h_ratio_diLep = fratio_diLep.Get("h_ratio")
@@ -75,9 +78,9 @@ for srNJet in sorted(SR):
       hint2.Draw("e3 same")
       hint1.Draw("e3 same")
       h_double_ratio.Draw("same")
-      cb.SaveAs(path+Name+'_'+p['varname']+'_double_Ratio.root')
-      cb.SaveAs(path+Name+'_'+p['varname']+'_double_Ratio.png')
-      cb.SaveAs(path+Name+'_'+p['varname']+'_double_Ratio.pdf')
+      cb.SaveAs(path+Name+'_'+p['varname']+'_double_Ratio_1b.root')
+      cb.SaveAs(path+Name+'_'+p['varname']+'_double_Ratio_1b.png')
+      cb.SaveAs(path+Name+'_'+p['varname']+'_double_Ratio_1b.pdf')
       #for f_ratio in [{'name':'diLep' , 'file':fratio_diLep} , {'name':'oneLep' , 'file':fratio_oneLep}]:
       #  cb = ROOT.TCanvas("cb","cb",800,800)
       #  cb.cd()
@@ -108,4 +111,4 @@ for srNJet in sorted(SR):
 
 
 
-pickle.dump(bin,file('/data/easilar/Spring15/25ns/DL_syst_pkl','w'))
+pickle.dump(bin,file('/data/easilar/Results2016/ICHEP/DiLep_SYS/V1/DL_syst_1b_pkl','w'))
