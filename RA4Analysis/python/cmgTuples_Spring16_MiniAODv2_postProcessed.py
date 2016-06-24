@@ -51,7 +51,7 @@ TTJets_diLep = {\
 }
 
 TTJets_Lep = {\
-"name" : "TTJets_singleLep",
+"name" : "TTJets_Lep",
 "bins" : [
 "TTJets_SingleLeptonFromT_full",
 "TTJets_SingleLeptonFromTbar_full",

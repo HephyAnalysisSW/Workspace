@@ -6,24 +6,20 @@ from rCShelpers import *
 import math
 from Workspace.HEPHYPythonTools.user import username
 from Workspace.RA4Analysis.signalRegions import *
-#from Workspace.RA4Analysis.signalRegions import *
-#from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_postProcessed_fromArtur import *
-from Workspace.RA4Analysis.cmgTuples_data_25ns_fromArtur import *
-from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed import *
+from Workspace.RA4Analysis.cmgTuples_Data25ns_Promtv2_postprocessed import *
+from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2_postProcessed import *
+#from cutFlow_helper import *
+from general_config import *
+
 ROOT.gROOT.LoadMacro("../../HEPHYPythonTools/scripts/root/tdrstyle.C")
 ROOT.setTDRStyle()
 ROOT.gStyle.SetOptStat(0)
 
-cWJets  = getChain(WJetsHTToLNu_25ns,histname='')
-#cTTJets = getChain(TTJets_HTLO_25ns,histname='')
-cTTJets = getChain(TTJets_combined,histname='')
-#cBkg = getChain([WJetsHTToLNu_25ns,TTJets_combined,singleTop_25ns,TTV_25ns,DY_25ns,QCDHT_25ns],histname='')#no QCD
-#cBkg = getChain([WJetsHTToLNu_25ns,TTJets_combined,singleTop_25ns,TTV_25ns,DY_25ns],histname='')#no QCD
-cDY = getChain([DY_25ns],histname='')#no QCD
-#cBkg = getChain([WJetsHTToLNu_25ns,TTJets_HTLO_25ns,singleTop_25ns,TTV_25ns,DY_25ns,QCDHT_25ns],histname='')#no QCD
-#cData = getChain([data_mu_25ns , data_ele_25ns] , histname='')
-##cData = getChain([data_mu_25ns] , histname='')
-
+cWJets  = getChain(WJetsHTToLNu,histname='')
+cTTJets = getChain(TTJets_Lep,histname='')
+cDY = getChain([DY_amc],histname='')#no QCD
+maxN = -1
+lumi = 2.6
 def getRCS(c, cut, dPhiCut, weight="weight"):
   #h = getPlotFromChain(c, "deltaPhi_Wl", [0,dPhiCut,pi], cutString=cut, binningIsExplicit=True,weight="weight*weightBTag0_SF")
   h = getPlotFromChain(c, "deltaPhi_Wl", [0,dPhiCut,pi], cutString=cut, binningIsExplicit=True,weight=weight)
@@ -36,19 +32,39 @@ def getRCS(c, cut, dPhiCut, weight="weight"):
   else : return {'rCS':'Nan', 'rCSE_pred':'Nan', 'rCSE_sim':'Nan'}
   del h
 
-lumi = 2.1
+lepSels = [
+{'cut':'((!isData&&singleLeptonic)||(isData&&((eleDataSet&&singleElectronic)||(muonDataSet&&singleMuonic))))' , 'veto':'nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0',\
+ 'chain': getChain([single_ele_Run2016B,single_mu_Run2016B],maxN=maxN,histname="",treeName="Events") ,\
+  'label':'_lep_', 'str':'1 $lep$' , 'trigger': trigger}\
+]
+add_cut = "(1)"
+lepSel = lepSels[0]
+presel = "&&".join([lepSel['cut'],lepSel['veto'],"Jet_pt[1]>80&&abs(LepGood_eta[0])<2.4",add_cut])
+data_presel = "&&".join([lepSel['cut'],lepSel['veto'],lepSel['trigger'],filters,"Jet_pt[1]>80&&abs(LepGood_eta[0])<2.4",add_cut])
+
 weights = [
 {'var':'weight','label':'original'},\
 ]
+
 diLep = "((ngenLep+ngenTau)==2)"
 semiLep = "((ngenLep+ngenTau)==1)"
-prefix = 'singleLeptonic_Spring15_'
-path = '/data/'+username+'/Spring15/25ns/MiniAODv2/rCS_0b_'+str(lumi)+'_CBID/'+weights[0]['label']+'/'
-presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&Jet_pt[1]>80"
-data_presel = "singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&((HLT_EleHT350)||(HLT_MuHT350))&&Jet_pt[1]>80" 
+suffix = ""
+max_plot = 0.1
+plot_dilep = False
+plot_semilep = False
+if plot_dilep:
+  presel = presel+"&&"+diLep
+  suffix = "_diLep"
+  max_plot = 1
+if plot_semilep:
+  presel = presel+"&&"+semiLep
+  suffix = "_semiLep"
+  max_plot = 0.05
+
+prefix = 'singleLeptonic_Spring16_'
+path = '/afs/hephy.at/user/e/easilar/www/data/Run2016B/2571pb/rCS/'
 btagString = 'nBJetMediumCSV30'
 weight_str, weight_err_str = makeWeight(lumi, sampleLumi=3.)
-lepSel = 'hard'
 btagVarString = 'nBJetMediumCSV30'
 
 
@@ -59,34 +75,11 @@ btagVarString = 'nBJetMediumCSV30'
 ##ht = 500
 ###                                         (1000, -1):  {'deltaPhi': 0.75}}}}
 ##
-sideBand3fb = {(5, 5): {(250, 350): {(500, -1):   {'deltaPhi': 1.0}},
-                            (350, 450): {(500, -1):   {'deltaPhi': 1.0}},
-                            (450, -1): {(500, -1):    {'deltaPhi': 1.0}}},
-                   (6, 7): {(250, 350): {(500, 750):  {'deltaPhi': 1.0},
-                                         (750, -1):   {'deltaPhi': 1.0}},
-                            (350, 450): {(500, 750):  {'deltaPhi': 1.0},
-                                         (750, -1):   {'deltaPhi': 1.0}},
-                            (450, -1): {(500, 1000):   {'deltaPhi': 0.75},
-                                        (1000, -1):   {'deltaPhi': 0.75}}},
-                   (8, -1): {(250, 350): {(500, 750): {'deltaPhi': 1.0},
-                                          (750, -1):  {'deltaPhi': 1.0}},
-                             (350, 450): {(500, -1):  {'deltaPhi': 0.75}},
-                             (450, -1): {(500, -1):   {'deltaPhi': 0.75}}}}
 
-signalRegion3fbReduced = {(5, 5):  {(250, 350): {(500, -1):  {'deltaPhi': 1.0}},
-                                    (350, 450): {(500, -1):  {'deltaPhi': 1.0}},
-                                    (450, -1):  {(500, -1):  {'deltaPhi': 0.75}}},
-                          (6, 7):  {(250, 350): {(500, 750): {'deltaPhi': 1.0},
-                                                 (750, -1):  {'deltaPhi': 1.0}},
-                                    (350, 450): {(500, 750): {'deltaPhi': 1.0},
-                                                 (750, -1):  {'deltaPhi': 1.0}},
-                                    (450, -1):  {(500, 750): {'deltaPhi': 0.75},
-                                                 (750, -1):  {'deltaPhi': 0.75}}},
-                          (8, -1): {(250, 350): {(500, 750): {'deltaPhi': 1.0},
-                                                 (750, -1):  {'deltaPhi': 1.0}},
-                                    (350, -1):  {(500, -1):  {'deltaPhi': 0.75}}}}
+SR = {(3,-1):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
 
-sideBand3fb = signalRegion3fbReduced
+#sideBand3fb = signalRegion3fbReduced
+sideBand3fb = SR
 ##bin = {}
 ##for srNJet in sorted(sideBand3fb):
 ##  bin[srNJet]={}
@@ -377,7 +370,7 @@ sideBand3fb = signalRegion3fbReduced
 
 ########TTJets RCS Plots######
 
-signalRegion3fb = {(4, -1): {(250, -1): {(500, -1 ):   {'deltaPhi': 1.0}}}}
+signalRegion3fb = {(4, -1): {(250, 350): {(500, -1 ):   {'deltaPhi': 1.0}}}}
 #                            (350, 450): {(500, -1):   {'deltaPhi': 1.0}}}}
 #signalRegion3fbReduced = {(5, 5):  {(250, 350): {(500, -1):  {'deltaPhi': 1.0}},
 #                                    (350, 450): {(500, -1):  {'deltaPhi': 1.0}},
@@ -444,7 +437,7 @@ for srNJet in signalRegions:
       h1b.SetBarOffset(0)
       h1b.SetStats(0)
       h1b.SetMinimum(0) 
-      h1b.SetMaximum(0.1) 
+      h1b.SetMaximum(max_plot) 
       #h1b.SetMaximum(0.05) 
       for i , crNJet in enumerate(nJetbins):
           h1b.SetBinContent(i+1, njet_dict[crNJet]['1b_value']) 
@@ -461,7 +454,7 @@ for srNJet in signalRegions:
       h0b.SetBarOffset(0)
       h0b.SetStats(0)
       h0b.SetMinimum(0)
-      h0b.SetMaximum(0.1)
+      h0b.SetMaximum(max_plot)
       #h0b.SetMaximum(0.05)
       for i , crNJet in enumerate(nJetbins):
           h0b.SetBinContent(i+1, njet_dict[crNJet]['0b_value'])
@@ -475,17 +468,17 @@ for srNJet in signalRegions:
       leg.SetLineColor(0)
       leg.Draw()
       latex.DrawLatex(0.16,0.958,"#font[22]{CMS}"+" #font[12]{Simulation}")
-      latex.DrawLatex(0.68,0.958,"#bf{L=2.1 fb^{-1} (13 TeV)}")
+      latex.DrawLatex(0.72,0.958,"#bf{(13 TeV)}")
       lt = varBinName(stb,'L_{T}')
       ht = varBinName(htb,'H_{T}')
       latex.DrawLatex(0.6,0.85,ht)
       latex.DrawLatex(0.6,0.8,lt)
       #latex.DrawLatex(0.6,0.8,nJetBinName(srNJet))
       #latex.DrawLatex(0.6,0.75,"#Delta#Phi cut:"+str(njet_dict['deltaPhi']))
-      latex.DrawLatex(0.3,0.85,"ttjets")
+      latex.DrawLatex(0.3,0.85,"ttjets"+suffix)
       #latex.DrawLatex(0.3,0.8,"di-Lepton")
       cb.Draw()
-      cb.SaveAs('~/www/Spring15/25ns/rCS_Plots/TTJets_rCS_LT'+str(stb[0])+str(stb[1])+'_HT'+str(htb[0])+str(htb[1])+'_nJET'+str(srNJet[0])+str(srNJet[1])+'btagW.png')
-      cb.SaveAs('~/www/Spring15/25ns/rCS_Plots/TTJets_rCS_LT'+str(stb[0])+str(stb[1])+'_HT'+str(htb[0])+str(htb[1])+'_nJET'+str(srNJet[0])+str(srNJet[1])+'btagW.pdf')
-      cb.SaveAs('~/www/Spring15/25ns/rCS_Plots/TTJets_rCS_LT'+str(stb[0])+str(stb[1])+'_HT'+str(htb[0])+str(htb[1])+'_nJET'+str(srNJet[0])+str(srNJet[1])+'btagW.root')
+      cb.SaveAs(path+'/TTJets_rCS_LT'+str(stb[0])+str(stb[1])+'_HT'+str(htb[0])+str(htb[1])+'_nJET'+str(srNJet[0])+str(srNJet[1])+'btagW_'+suffix+'.png')
+      cb.SaveAs(path+'/TTJets_rCS_LT'+str(stb[0])+str(stb[1])+'_HT'+str(htb[0])+str(htb[1])+'_nJET'+str(srNJet[0])+str(srNJet[1])+'btagW_'+suffix+'.pdf')
+      cb.SaveAs(path+'/TTJets_rCS_LT'+str(stb[0])+str(stb[1])+'_HT'+str(htb[0])+str(htb[1])+'_nJET'+str(srNJet[0])+str(srNJet[1])+'btagW_'+suffix+'.root')
 

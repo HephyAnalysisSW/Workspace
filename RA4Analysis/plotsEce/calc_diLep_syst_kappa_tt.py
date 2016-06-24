@@ -32,7 +32,7 @@ lepSels = [
 ]
 
 lepSel = lepSels[0]
-signalRegion3fb = {(5, -1):  {(250, -1): {(500, -1):  {'deltaPhi': 1.0}}}}
+#signalRegion3fb = {(5, 5):  {(250, 350): {(500, -1):  {'deltaPhi': 1.0}}}}
 signalRegions = signalRegion3fb
 #signalRegions = validationRegionAll
 rowsNJet = {}
@@ -55,10 +55,9 @@ slope    = 0.04
 
 constant_weight = "("+str(constant)+")"
 slope_weight = "((nJet30-"+str(nJetMean)+")*"+str(slope)+")"
-
 calc_errs = [\
-{"name":"slope","weight":slope_weight},\
-{"name":"constant","weight":constant_weight}
+#{"name":"slope","weight":slope_weight},\
+{"name":"constant","weight":constant_weight , "value":constant}
 ]
 
 presel = presel = "&&".join([lepSel['cut'],lepSel['veto'],filters])
@@ -66,6 +65,7 @@ presel = presel = "&&".join([lepSel['cut'],lepSel['veto'],filters])
 c_tt = {"sample":"ttJets", "chain":getChain(TTJets_Lep, maxN=maxN,histname="",treeName="Events"), "weight1b":"(1)" , "weight0b":"(1)" ,"cut_1b":(1,1) ,"cut_0b":(0,0) ,"name":TTJets_Lep, "tex":"ttbar + jets",'color':ROOT.kBlue-4}
 c_DY = {"sample":"DY", "chain":getChain(DY_madgraph, maxN=maxN,histname="",treeName="Events"),  "weight":"(1)" ,"cut":(0,0) , "name":DY_madgraph, "tex":"DY",'color':ROOT.kRed-6}
 cRest = getChain([TTV,singleTop_lep],histname='') #no QCD
+cEWK = getChain([TTV,singleTop_lep,WJetsHTToLNu,TTJets_Lep,DY_madgraph],histname='') #no QCD
 cW = getChain([WJetsHTToLNu],histname='')
 #common_weight = lepSel['trigWeight']+"*lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*puReweight_true_max4*TopPtWeight*weight*2.3/3"
 common_weight = reweight
@@ -77,7 +77,16 @@ for srNJet in sorted(signalRegions):
     res[srNJet][stb] = {}
     for htb in sorted(signalRegions[srNJet][stb]):
       res[srNJet][stb][htb] = {}
+      
       print srNJet , stb , htb
+
+      constant_weight = "("+str(constant)+")"
+      slope_weight = "((nJet30-"+str(nJetMean)+")*"+str(slope)+")"
+      slope_val = (srNJet[0]-nJetMean)*slope
+      calc_errs = [\
+      {"name":"slope","weight":slope_weight, "value": slope_val },\
+      {"name":"constant","weight":constant_weight , "value":constant}
+      ]
       deltaPhiCut = signalRegions[srNJet][stb][htb]['deltaPhi']
       name,     cut_DY_SR =  nameAndCut(stb, htb, srNJet, btb=c_DY["cut"], presel=presel+"&&deltaPhi_Wl>"+str(deltaPhiCut), btagVar = btagString)
       print name
@@ -110,20 +119,31 @@ for srNJet in sorted(signalRegions):
       ## RCS for SB and MB#
       rCS_tt_SB_diLep = getRCS(c_tt['chain'],"(ngenLep+ngenTau)==2&&"+tt_SB_cut ,  deltaPhiCut,weight = common_weight+"*"+c_tt['weight1b'])
       rCS_tt_SB_rest  = getRCS(c_tt['chain'],"(ngenLep+ngenTau)!=2&&"+tt_SB_cut ,  deltaPhiCut,weight = common_weight+"*"+c_tt['weight1b'])
+      rCS_tt_SB       = getRCS(c_tt['chain'], tt_SB_cut ,  deltaPhiCut,weight = common_weight+"*"+c_tt['weight1b'])
 
       rCS_DY_SB_diLep = getRCS(c_DY['chain'],"(ngenLep+ngenTau)==2&&"+DY_SB_cut ,  deltaPhiCut,weight = common_weight)
       rCS_DY_SB_rest  = getRCS(c_DY['chain'],"(ngenLep+ngenTau)!=2&&"+DY_SB_cut ,  deltaPhiCut,weight = common_weight)
+      rCS_DY_SB       = getRCS(c_DY['chain'],DY_SB_cut ,  deltaPhiCut,weight = common_weight)
       rCS_W_SB        = getRCS(cW,W_SB_cut ,  deltaPhiCut,weight = common_weight+"*"+c_tt["weight0b"])
       rCS_Rest_SB     = getRCS(cRest,DY_SB_cut ,  deltaPhiCut,weight = common_weight)
 
       rCS_DY_MB_diLep = getRCS(c_DY['chain'],"(ngenLep+ngenTau)==2&&"+DY_MB_cut ,  deltaPhiCut,weight = common_weight)
       rCS_DY_MB_rest  = getRCS(c_DY['chain'],"(ngenLep+ngenTau)!=2&&"+DY_MB_cut ,  deltaPhiCut,weight = common_weight)
+      rCS_DY_MB       = getRCS(c_DY['chain'],DY_MB_cut ,  deltaPhiCut,weight = common_weight)
       rCS_W_MB        = getRCS(cW,W_MB_cut ,  deltaPhiCut,weight = common_weight+"*"+c_tt["weight0b"])
       rCS_Rest_MB     = getRCS(cRest,DY_MB_cut ,  deltaPhiCut,weight = common_weight)
 
       rCS_tt_MB_diLep = getRCS(c_tt['chain'],"(ngenLep+ngenTau)==2&&"+tt_MB_cut ,  deltaPhiCut,weight = common_weight+"*"+c_tt['weight0b'])
       rCS_tt_MB_rest  = getRCS(c_tt['chain'],"(ngenLep+ngenTau)!=2&&"+tt_MB_cut ,  deltaPhiCut,weight = common_weight+"*"+c_tt['weight0b'])
+      rCS_tt_MB       = getRCS(c_tt['chain'], tt_MB_cut ,  deltaPhiCut,weight = common_weight+"*"+c_tt['weight0b'])
+      
+      rCS_tot_SB      = getRCS(cEWK,tt_SB_cut ,  deltaPhiCut,weight = common_weight+"*"+c_tt['weight0b'])
+      rCS_tot_SB = rCS_tot_SB['rCS']
 
+
+      kappa_tt = float(rCS_tt_MB['rCS'])/float(rCS_tt_SB['rCS'])
+      print "kappa_tt   " , kappa_tt
+  
       print "rCS_tt_SB_diLep  ",rCS_tt_SB_diLep
       print "rCS_tt_SB_rest"   ,rCS_tt_SB_rest
       print "rCS_DY_SB_diLep  ",rCS_DY_SB_diLep
@@ -153,31 +173,31 @@ for srNJet in sorted(signalRegions):
 
       for calc in calc_errs:
 
-        variations = [("Up","+"),("Down","-")]
+        variations = [("Up",1+calc["value"]),("Down",1-calc["value"])]
         for variation in variations:
 
           ####fractions  MB ######
           yield_diLep_tt_MB_in_CR                   = max(0,getYieldFromChain(c_tt['chain'], "(ngenLep+ngenTau)==2&&"+tt_MB_cut_CR, weight = common_weight+"*"+c_tt['weight0b'])) 
-          yield_diLep_tt_MB_in_CR_constant_Up       = max(0,getYieldFromChain(c_tt['chain'], "(ngenLep+ngenTau)==2&&"+tt_MB_cut_CR, weight = common_weight+"*"+c_tt['weight0b']+"*(1"+variation[1]+calc["weight"]+")")) 
+          yield_diLep_tt_MB_in_CR_constant_Up       = yield_diLep_tt_MB_in_CR*(variation[1]) #max(0,getYieldFromChain(c_tt['chain'], "(ngenLep+ngenTau)==2&&"+tt_MB_cut_CR, weight = common_weight+"*"+c_tt['weight0b']+"*(1"+variation[1]+calc["weight"]+")")) 
           
           print "yield_diLep_tt_MB_in_CR" , yield_diLep_tt_MB_in_CR
           print "yield_diLep_tt_MB_in_CR_"+calc['name']+'_'+variation[0]+"  " , yield_diLep_tt_MB_in_CR_constant_Up   
 
           yield_diLep_tt_MB_in_SR                   = max(0,getYieldFromChain(c_tt['chain'], "(ngenLep+ngenTau)==2&&"+tt_MB_cut_SR, weight = common_weight+"*"+c_tt['weight0b']))
-          yield_diLep_tt_MB_in_SR_constant_Up       = max(0,getYieldFromChain(c_tt['chain'], "(ngenLep+ngenTau)==2&&"+tt_MB_cut_SR, weight = common_weight+"*"+c_tt['weight0b']+"*(1"+variation[1]+calc["weight"]+")"))
+          yield_diLep_tt_MB_in_SR_constant_Up       = yield_diLep_tt_MB_in_SR*(variation[1]) #max(0,getYieldFromChain(c_tt['chain'], "(ngenLep+ngenTau)==2&&"+tt_MB_cut_SR, weight = common_weight+"*"+c_tt['weight0b']+"*(1"+variation[1]+calc["weight"]+")"))
 
           yield_rest_tt_MB_in_CR = max(0,getYieldFromChain(c_tt['chain'], "(ngenLep+ngenTau)!=2&&"+tt_MB_cut_CR, weight = common_weight+"*"+c_tt['weight0b'])) 
           yield_rest_tt_MB_in_SR = max(0,getYieldFromChain(c_tt['chain'], "(ngenLep+ngenTau)!=2&&"+tt_MB_cut_SR, weight = common_weight+"*"+c_tt['weight0b'])) 
 
           yield_diLep_DY_MB_in_CR                   = max(0,getYieldFromChain(c_DY['chain'], "(ngenLep+ngenTau)==2&&"+DY_MB_cut_CR, weight = common_weight))
-          yield_diLep_DY_MB_in_CR_constant_Up       = max(0,getYieldFromChain(c_DY['chain'], "(ngenLep+ngenTau)==2&&"+DY_MB_cut_CR, weight = common_weight+"*(1"+variation[1]+calc["weight"]+")"))
+          yield_diLep_DY_MB_in_CR_constant_Up       = yield_diLep_DY_MB_in_CR*(variation[1]) #max(0,getYieldFromChain(c_DY['chain'], "(ngenLep+ngenTau)==2&&"+DY_MB_cut_CR, weight = common_weight+"*(1"+variation[1]+calc["weight"]+")"))
 
           print "yield_diLep_DY_MB_in_CR              " ,yield_diLep_DY_MB_in_CR              
           print "yield_diLep_DY_MB_in_CR_"+calc['name']+'_'+variation[0]+" " ,yield_diLep_DY_MB_in_CR_constant_Up  
 
 
           yield_diLep_DY_MB_in_SR                   = max(0.0000001,getYieldFromChain(c_DY['chain'], "(ngenLep+ngenTau)==2&&"+DY_MB_cut_SR, weight = common_weight))
-          yield_diLep_DY_MB_in_SR_constant_Up       = max(0.0000001,getYieldFromChain(c_DY['chain'], "(ngenLep+ngenTau)==2&&"+DY_MB_cut_SR, weight = common_weight+"*(1"+variation[1]+calc["weight"]+")"))
+          yield_diLep_DY_MB_in_SR_constant_Up       = yield_diLep_DY_MB_in_SR*(variation[1]) #max(0.0000001,getYieldFromChain(c_DY['chain'], "(ngenLep+ngenTau)==2&&"+DY_MB_cut_SR, weight = common_weight+"*(1"+variation[1]+calc["weight"]+")"))
 
           yield_rest_DY_MB_in_CR                    = max(0.0000001,getYieldFromChain(c_DY['chain'], "(ngenLep+ngenTau)!=2&&"+DY_MB_cut_CR, weight = common_weight))
 
@@ -194,6 +214,22 @@ for srNJet in sorted(signalRegions):
 
           den_tot_MB_in_CR = yield_diLep_tt_MB_in_CR + yield_rest_tt_MB_in_CR + yield_diLep_DY_MB_in_CR + yield_rest_DY_MB_in_CR + yield_rest_EWK_MB_in_CR + yield_rest_W_MB_in_CR 
           den_tot_MB_in_CR_constant_Up   = yield_diLep_tt_MB_in_CR_constant_Up   + yield_rest_tt_MB_in_CR + yield_diLep_DY_MB_in_CR_constant_Up   + yield_rest_DY_MB_in_CR + yield_rest_EWK_MB_in_CR + yield_rest_W_MB_in_CR 
+
+          num_tot_MB_in_SR = yield_diLep_tt_MB_in_SR + yield_rest_tt_MB_in_SR + yield_diLep_DY_MB_in_SR + yield_rest_DY_MB_in_SR + yield_rest_EWK_MB_in_SR + yield_rest_W_MB_in_SR 
+          num_tot_MB_in_SR_constant_Up   = yield_diLep_tt_MB_in_SR_constant_Up   + yield_rest_tt_MB_in_SR + yield_diLep_DY_MB_in_SR_constant_Up   + yield_rest_DY_MB_in_SR + yield_rest_EWK_MB_in_SR + yield_rest_W_MB_in_SR 
+
+          rCS_tot_MB = float(num_tot_MB_in_SR) / float(den_tot_MB_in_CR) 
+          rCS_tot_MB_constant_Up = float(num_tot_MB_in_SR_constant_Up) / float(den_tot_MB_in_CR_constant_Up) 
+
+          den_tt_MB_in_CR = yield_diLep_tt_MB_in_CR + yield_rest_tt_MB_in_CR
+          den_tt_MB_in_CR_constant_Up   = yield_diLep_tt_MB_in_CR_constant_Up   + yield_rest_tt_MB_in_CR
+
+          num_tt_MB_in_SR = yield_diLep_tt_MB_in_SR + yield_rest_tt_MB_in_SR
+          num_tt_MB_in_SR_constant_Up   = yield_diLep_tt_MB_in_SR_constant_Up   + yield_rest_tt_MB_in_SR
+
+          #rCS_tt_MB = float(num_tot_MB_in_SR) / float(den_tot_MB_in_CR) 
+          rCS_tt_MB_constant_Up = float(num_tot_MB_in_SR_constant_Up) / float(den_tot_MB_in_CR_constant_Up) 
+
 
           yield_tt_MB_in_CR = yield_diLep_tt_MB_in_CR + yield_rest_tt_MB_in_CR
           yield_tt_MB_in_CR_constant_Up   = yield_diLep_tt_MB_in_CR_constant_Up   + yield_rest_tt_MB_in_CR
@@ -244,8 +280,6 @@ for srNJet in sorted(signalRegions):
           frac_rest_DY_MB_in_CR_constant_Up   = 1 - frac_diLep_DY_MB_in_CR_constant_Up
           rCS_DY_MB_full = frac_diLep_DY_MB_in_CR*rCS_DY_MB_diLep + frac_rest_DY_MB_in_CR*rCS_DY_MB_rest
           rCS_DY_MB_full_constant_Up   = frac_diLep_DY_MB_in_CR_constant_Up  *rCS_DY_MB_diLep + frac_rest_DY_MB_in_CR_constant_Up  *rCS_DY_MB_rest
-          print "rCS_tt_MB_full    " , rCS_tt_MB_full
-          print "rCS_tt_MB_full_"+calc['name']+'_'+variation[0]+"    " , rCS_tt_MB_full_constant_Up
 
   #####  
 
@@ -271,17 +305,18 @@ for srNJet in sorted(signalRegions):
           ###to calculate SB####
 
           yield_diLep_tt_SB_in_CR                   = max(0,getYieldFromChain(c_tt['chain'], "(ngenLep+ngenTau)==2&&"+tt_SB_cut_CR, weight = common_weight+"*"+c_tt['weight0b'])) 
-          yield_diLep_tt_SB_in_CR_constant_Up       = max(0,getYieldFromChain(c_tt['chain'], "(ngenLep+ngenTau)==2&&"+tt_SB_cut_CR, weight = common_weight+"*"+c_tt['weight0b']+"*(1"+variation[1]+calc["weight"]+")")) 
+          yield_diLep_tt_SB_in_CR_constant_Up       = yield_diLep_tt_SB_in_CR*(variation[1])  #max(0,getYieldFromChain(c_tt['chain'], "(ngenLep+ngenTau)==2&&"+tt_SB_cut_CR, weight = common_weight+"*"+c_tt['weight0b']+"*(1"+variation[1]+calc["weight"]+")")) 
           
           yield_rest_tt_SB_in_CR = max(0,getYieldFromChain(c_tt['chain'], "(ngenLep+ngenTau)!=2&&"+tt_SB_cut_CR, weight = common_weight+"*"+c_tt['weight0b'])) 
 
           yield_diLep_DY_SB_in_CR                   = max(0,getYieldFromChain(c_DY['chain'], "(ngenLep+ngenTau)==2&&"+DY_SB_cut_CR, weight = common_weight))
-          yield_diLep_DY_SB_in_CR_constant_Up       = max(0,getYieldFromChain(c_DY['chain'], "(ngenLep+ngenTau)==2&&"+DY_SB_cut_CR, weight = common_weight+"*(1"+variation[1]+calc["weight"]+")"))
+          yield_diLep_DY_SB_in_CR_constant_Up       = yield_diLep_DY_SB_in_CR*(variation[1]) #max(0,getYieldFromChain(c_DY['chain'], "(ngenLep+ngenTau)==2&&"+DY_SB_cut_CR, weight = common_weight+"*(1"+variation[1]+calc["weight"]+")"))
 
           yield_rest_DY_SB_in_CR                    = max(0,getYieldFromChain(c_DY['chain'], "(ngenLep+ngenTau)!=2&&"+DY_SB_cut_CR, weight = common_weight))
 
           yield_rest_EWK_SB_in_CR                   = max(0,getYieldFromChain(cRest, DY_SB_cut_CR, weight = common_weight))
           yield_rest_W_SB_in_CR                     = max(0,getYieldFromChain(cW   , W_SB_cut_CR, weight = common_weight+"*"+c_tt["weight0b"]))
+
 
           den_tot_SB_in_CR = yield_diLep_tt_SB_in_CR + yield_rest_tt_SB_in_CR + yield_diLep_DY_SB_in_CR + yield_rest_DY_SB_in_CR + yield_rest_EWK_SB_in_CR + yield_rest_W_SB_in_CR 
           den_tot_SB_in_CR_constant_Up   = yield_diLep_tt_SB_in_CR_constant_Up   + yield_rest_tt_SB_in_CR + yield_diLep_DY_SB_in_CR_constant_Up   + yield_rest_DY_SB_in_CR + yield_rest_EWK_SB_in_CR + yield_rest_W_SB_in_CR 
@@ -326,7 +361,7 @@ for srNJet in sorted(signalRegions):
 
 
           yield_diLep_DY_SB_in_SR                   = max(0,getYieldFromChain(c_DY['chain'], "(ngenLep+ngenTau)==2&&"+DY_SB_cut_SR, weight = common_weight))
-          yield_diLep_DY_SB_in_SR_constant_Up       = max(0,getYieldFromChain(c_DY['chain'], "(ngenLep+ngenTau)==2&&"+DY_SB_cut_SR, weight = common_weight+"*(1"+variation[1]+calc["weight"]+")"))
+          yield_diLep_DY_SB_in_SR_constant_Up       = yield_diLep_DY_SB_in_SR*(variation[1]) #max(0,getYieldFromChain(c_DY['chain'], "(ngenLep+ngenTau)==2&&"+DY_SB_cut_SR, weight = common_weight+"*(1"+variation[1]+calc["weight"]+")"))
 
 
 
@@ -342,7 +377,7 @@ for srNJet in sorted(signalRegions):
 
 
           yield_diLep_tt_SB_in_SR                   = max(0,getYieldFromChain(c_tt['chain'], "(ngenLep+ngenTau)==2&&"+tt_SB_cut_SR, weight = common_weight+"*"+c_tt['weight0b']))
-          yield_diLep_tt_SB_in_SR_constant_Up       = max(0,getYieldFromChain(c_tt['chain'], "(ngenLep+ngenTau)==2&&"+tt_SB_cut_SR, weight = common_weight+"*"+c_tt['weight0b']+"*(1"+variation[1]+calc["weight"]+")"))
+          yield_diLep_tt_SB_in_SR_constant_Up       = yield_diLep_tt_SB_in_SR*(variation[1]) #max(0,getYieldFromChain(c_tt['chain'], "(ngenLep+ngenTau)==2&&"+tt_SB_cut_SR, weight = common_weight+"*"+c_tt['weight0b']+"*(1"+variation[1]+calc["weight"]+")"))
 
 
           SB_SR_tot_yield = yield_diLep_DY_SB_in_SR + yield_diLep_tt_SB_in_SR + yield_rest_tt_SB_in_SR + yield_rest_DY_SB_in_SR + yield_rest_W_SB_in_SR + yield_rest_EWK_SB_in_SR 
@@ -375,6 +410,23 @@ for srNJet in sorted(signalRegions):
           print "yield_rest_W_SB_in_CR   " ,yield_rest_W_SB_in_CR   
 
 
+          num_tot_SB_in_SR = yield_diLep_tt_SB_in_SR + yield_rest_tt_SB_in_SR + yield_diLep_DY_SB_in_SR + yield_rest_DY_SB_in_SR + yield_rest_EWK_SB_in_SR + yield_rest_W_SB_in_SR 
+          num_tot_SB_in_SR_constant_Up   = yield_diLep_tt_SB_in_SR_constant_Up   + yield_rest_tt_SB_in_SR + yield_diLep_DY_SB_in_SR_constant_Up   + yield_rest_DY_SB_in_SR + yield_rest_EWK_SB_in_SR + yield_rest_W_SB_in_SR 
+
+          #rCS_tot_SB = float(num_tot_SB_in_SR) / float(den_tot_SB_in_CR)
+          rCS_tot_SB_constant_Up = float(num_tot_SB_in_SR_constant_Up) / float(den_tot_SB_in_CR_constant_Up)
+
+
+          kappa       = float(rCS_tt_MB['rCS']) / float(rCS_tot_SB)
+          kappa_Up    = float(rCS_tt_MB_constant_Up) / float(rCS_tot_SB_constant_Up)
+
+          print "kappas    :" , kappa , kappa_Up
+
+          delta = float(kappa_Up)/float(kappa) 
+          delta = delta-1
+
+          print "systematics   :" , delta
+
           print "rCS_tot_MB_full" , rCS_tot_MB_full , "rCS_tot_SB_full" , rCS_tot_SB_full
           print "rCS_tot_MB_full_"+calc['name']+'_'+variation[0] , rCS_tot_MB_full_constant_Up   , "rCS_tot_SB_full_"+calc['name']+'_'+variation[0] , rCS_tot_SB_full_constant_Up  
 
@@ -383,7 +435,7 @@ for srNJet in sorted(signalRegions):
           print "kappa:" , res[srNJet][stb][htb]['kappa_original'] , res[srNJet][stb][htb]['kappa_'+calc['name']+'_'+variation[0]] 
 
 
-          res[srNJet][stb][htb]['delta_'+calc['name']+'_'+variation[0]] = ((res[srNJet][stb][htb]['kappa_'+calc['name']+'_'+variation[0]]/res[srNJet][stb][htb]['kappa_original'])-1)
+          res[srNJet][stb][htb]['delta_'+calc['name']+'_'+variation[0]] = delta # ((res[srNJet][stb][htb]['kappa_'+calc['name']+'_'+variation[0]]/res[srNJet][stb][htb]['kappa_original'])-1)
           print calc['name']+'_'+variation[0] , res[srNJet][stb][htb]['delta_'+calc['name']+'_'+variation[0]]
 
 pickle.dump(res,file('/data/easilar/Results2016/ICHEP/DiLep_SYS/V1/unc_with_SRAll_pkl','w'))
