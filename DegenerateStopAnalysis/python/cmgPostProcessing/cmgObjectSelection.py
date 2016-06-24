@@ -316,54 +316,54 @@ def objSelectorFunc(objSel):
         return passCut
 
 
-    def elWP(readTree, obj, objIndex, objSel):
-        ''' Supplementary electron selection for a working point.
-        
-        '''
-        
-        # get once the values for the key and eta, to speed up the code
-        elWPSel = objSel['elWP']
-        elWPSelVars = elWPSel['vars']
-        
-        elWP_eta_EB = elWPSel['eta_EB']
-        elWP_eta_EE = elWPSel['eta_EE']
-        
-        #objEta = abs(obj.eta[objIndex])
-        objEtaSc = abs(getattr(obj, 'etaSc')[objIndex])
-          
-        def cut_EB_EE(obj, varName, objIndex, elWPSelVars):
-            
-            elWPSelVars_var = elWPSelVars[varName]
-            opVar = elWPSelVars_var['opVar']
-            opCut = elWPSelVars_var['opCut']
+    #def elWP(readTree, obj, objIndex, objSel):
+    #    ''' Supplementary electron selection for a working point.
+    #    
+    #    '''
+    #    
+    #    # get once the values for the key and eta, to speed up the code
+    #    elWPSel = objSel['elWP']
+    #    elWPSelVars = elWPSel['vars']
+    #    
+    #    elWP_eta_EB = elWPSel['eta_EB']
+    #    elWP_eta_EE = elWPSel['eta_EE']
+    #    
+    #    #objEta = abs(obj.eta[objIndex])
+    #    objEtaSc = abs(getattr(obj, 'etaSc')[objIndex])
+    #      
+    #    def cut_EB_EE(obj, varName, objIndex, elWPSelVars):
+    #        
+    #        elWPSelVars_var = elWPSelVars[varName]
+    #        opVar = elWPSelVars_var['opVar']
+    #        opCut = elWPSelVars_var['opCut']
 
-            varValue = getattr(obj, varName)[objIndex] 
-            if opVar is not None:
-                varValue = opVar(varValue)
-             
-            passCut = False
-                       
-            if objEtaSc <= elWP_eta_EB:
-                if opCut(varValue, elWPSelVars_var['EB']):
-                    passCut = True
-            elif ((elWP_eta_EB < objEtaSc) and (objEtaSc < elWP_eta_EE)):
-                if opCut(varValue, elWPSelVars_var['EE']):
-                    passCut = True
-            else:
-                # for eta outside ['eta_EB', 'eta_EE'] range, set it to False
-                passCut = False
-                
+    #        varValue = getattr(obj, varName)[objIndex] 
+    #        if opVar is not None:
+    #            varValue = opVar(varValue)
+    #         
+    #        passCut = False
+    #                   
+    #        if objEtaSc <= elWP_eta_EB:
+    #            if opCut(varValue, elWPSelVars_var['EB']):
+    #                passCut = True
+    #        elif ((elWP_eta_EB < objEtaSc) and (objEtaSc < elWP_eta_EE)):
+    #            if opCut(varValue, elWPSelVars_var['EE']):
+    #                passCut = True
+    #        else:
+    #            # for eta outside ['eta_EB', 'eta_EE'] range, set it to False
+    #            passCut = False
+    #            
 
-            # 
-            return passCut
-               
-        # evaluate each cut, exit if False immediately
-        for var in elWPSelVars:
-            if not cut_EB_EE(obj, var, objIndex, elWPSelVars):
-                return False
-        
-        #
-        return True
+    #        # 
+    #        return passCut
+    #           
+    #    # evaluate each cut, exit if False immediately
+    #    for var in elWPSelVars:
+    #        if not cut_EB_EE(obj, var, objIndex, elWPSelVars):
+    #            return False
+    #    
+    #    #
+    #    return True
      
         
     def objSelector(readTree, obj, objIndex):
@@ -374,8 +374,8 @@ def objSelectorFunc(objSel):
             
             if key == 'hybIso':
                 selector &= hybIso(readTree, obj, objIndex, objSel)
-            elif key == 'elWP':
-                selector &= elWP(readTree, obj, objIndex, objSel)                
+            #elif key == 'elWP':
+            #    selector &= elWP(readTree, obj, objIndex, objSel)                
             else:
                 varValue = getattr(obj, keyValue[0])[objIndex]
             

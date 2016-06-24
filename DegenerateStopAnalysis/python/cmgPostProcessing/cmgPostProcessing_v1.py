@@ -483,7 +483,7 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
         'Flag_*','HLT_*',
         'nJet', 'Jet_*', 
         'nTauGood', 'TauGood_*',
-        'Tracks_*', 'isoTrack_*',
+        'isoTrack_*', #'Tracks_*',
         ] 
 
     if (args.processLepAll and args.storeOnlyLepAll):
@@ -657,7 +657,7 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
         'ngenTau', 'genTau_*', 
         'ngenLepFromTau', 'genLepFromTau_*', 
         'GenJet_*',
-        'GenTracks_*',
+        #'GenTracks_*',
         ]
     
     readVariables_MC = []

@@ -128,33 +128,34 @@ def getParameterSet(args):
             'pdgId': ('pdgId', operator.eq, 11, operator.abs),
             'pt': ('pt', operator.gt, 5),
             'eta': ('eta', operator.lt, 2.5, operator.abs),
-            'convVeto': ('convVeto', operator.eq, 1),
-            'elWP': {
-                'eta_EB': 1.479, 'eta_EE': 2.5,
-                'vars': {
-                    'hadronicOverEm': {
-                        'EB': 0.181, 'EE': 0.116, 'opCut': operator.lt, 'opVar': None,
-                        },
-                    'dEtaScTrkIn': {
-                        'EB': 0.0152, 'EE': 0.0113, 'opCut': operator.lt, 'opVar': operator.abs,
-                        },
-                    'dPhiScTrkIn': {
-                        'EB': 0.216, 'EE': 0.237, 'opCut': operator.lt, 'opVar': operator.abs,
-                        },
-                    'eInvMinusPInv': {
-                        'EB': 0.207, 'EE':  0.174, 'opCut': operator.lt, 'opVar': operator.abs,
-                        },
-                    'dxy': {
-                        'EB': 0.0564, 'EE': 0.222, 'opCut': operator.lt, 'opVar': operator.abs,
-                        },
-                    'dz': {
-                        'EB': 0.472, 'EE': 0.921, 'opCut': operator.lt, 'opVar': operator.abs,
-                        },
-                    'lostHits': {
-                        'EB': 2, 'EE': 3, 'opCut': operator.le, 'opVar': None,
-                        },
-                    },
-                },
+            'SPRING15_25ns_v1': ('SPRING15_25ns_v1', operator.ge, 1),
+            #'convVeto': ('convVeto', operator.eq, 1),
+            #'elWP': {
+            #    'eta_EB': 1.479, 'eta_EE': 2.5,
+            #    'vars': {
+            #        'hadronicOverEm': {
+            #            'EB': 0.181, 'EE': 0.116, 'opCut': operator.lt, 'opVar': None,
+            #            },
+            #        'dEtaScTrkIn': {
+            #            'EB': 0.0152, 'EE': 0.0113, 'opCut': operator.lt, 'opVar': operator.abs,
+            #            },
+            #        'dPhiScTrkIn': {
+            #            'EB': 0.216, 'EE': 0.237, 'opCut': operator.lt, 'opVar': operator.abs,
+            #            },
+            #        'eInvMinusPInv': {
+            #            'EB': 0.207, 'EE':  0.174, 'opCut': operator.lt, 'opVar': operator.abs,
+            #            },
+            #        'dxy': {
+            #            'EB': 0.0564, 'EE': 0.222, 'opCut': operator.lt, 'opVar': operator.abs,
+            #            },
+            #        'dz': {
+            #            'EB': 0.472, 'EE': 0.921, 'opCut': operator.lt, 'opVar': operator.abs,
+            #            },
+            #        'lostHits': {
+            #            'EB': 2, 'EE': 3, 'opCut': operator.le, 'opVar': None,
+            #            },
+            #        },
+            #    },
             },
         }
 
