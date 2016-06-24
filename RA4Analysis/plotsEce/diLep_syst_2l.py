@@ -53,10 +53,10 @@ for bkg in bkg_samples:
     bkg['chain'] = getChain(bkg['name'],maxN=maxN,histname="",treeName="Events")
 
 plots =[\
-{'ndiv':False,'yaxis':'Events','xaxis':'N_{Jets}+lost','logy':False , 'var':'DL_nJet_lepToKeep_AddLep1ov3Met',     'stVar':'DL_ST_lepToKeep_AddLep1ov3Met',     'htVar':'DL_HT_lepToKeep_AddLep1ov3Met',                   'varname':'nJet30',                   'binlabel':1,  'bin':(6,4,10)},\
+{'ndiv':False,'yaxis':'Events','xaxis':'N_{Jets}+lost','logy':False , 'var':'DL_nJet_lepToKeep_AddLep1ov3Met',     'stVar':'DL_ST_lepToKeep_AddLep1ov3Met',     'htVar':'DL_HT_lepToKeep_AddLep1ov3Met',                   'varname':'nJet30',                   'binlabel':1,  'bin':(7,3,10)},\
 #{'ndiv':False,'yaxis':'Events','xaxis':'N_{Jets}+lost','logy':False , 'var':'DL_nJet_lepToKeep_notAddLepMet',      'stVar':'DL_ST_lepToKeep_notAddLepMet',      'htVar':'DL_HT_lepToKeep_notAddLepMet',                    'varname':'nJet30',                   'binlabel':1,  'bin':(6,4,10)},\
 #{'ndiv':False,'yaxis':'Events','xaxis':'N_{Jets}+lost','logy':False , 'var':'DL_nJet_lepToKeep_AddLepMet',         'stVar':'DL_ST_lepToKeep_AddLepMet',         'htVar':'DL_HT_lepToKeep_AddLepMet',                       'varname':'nJet30',                   'binlabel':1,  'bin':(6,4,10)},\
-{'ndiv':False,'yaxis':'Events','xaxis':'N_{Jets}+lost','logy':False , 'var':'DL_nJet_lepToDiscard_AddLep1ov3Met',  'stVar':'DL_ST_lepToDiscard_AddLep1ov3Met',  'htVar':'DL_HT_lepToDiscard_AddLep1ov3Met',                'varname':'nJet30',                   'binlabel':1,  'bin':(6,4,10)},\
+{'ndiv':False,'yaxis':'Events','xaxis':'N_{Jets}+lost','logy':False , 'var':'DL_nJet_lepToDiscard_AddLep1ov3Met',  'stVar':'DL_ST_lepToDiscard_AddLep1ov3Met',  'htVar':'DL_HT_lepToDiscard_AddLep1ov3Met',                'varname':'nJet30',                   'binlabel':1,  'bin':(7,3,10)},\
 #{'ndiv':False,'yaxis':'Events','xaxis':'N_{Jets}+lost','logy':False , 'var':'DL_nJet_lepToDiscard_notAddLepMet',   'stVar':'DL_ST_lepToDiscard_notAddLepMet',   'htVar':'DL_HT_lepToDiscard_notAddLepMet',                 'varname':'nJet30',                   'binlabel':1,  'bin':(6,4,10)},\
 #{'ndiv':False,'yaxis':'Events','xaxis':'N_{Jets}+lost','logy':False , 'var':'DL_nJet_lepToDiscard_AddLepMet',      'stVar':'DL_ST_lepToDiscard_AddLepMet',      'htVar':'DL_HT_lepToDiscard_AddLepMet',                    'varname':'nJet30',                   'binlabel':1,  'bin':(6,4,10)},\
   ]
@@ -141,7 +141,7 @@ for srNJet in sorted(SR):
         del histo
       h_Stack.Draw("Bar")
       maximum = h_Stack.GetMaximum()*1.2
-      maximum = 300
+      maximum = 200
       h_Stack.SetMaximum(maximum)
       h_Stack.SetMinimum(0.11)
       color = ROOT.kBlack

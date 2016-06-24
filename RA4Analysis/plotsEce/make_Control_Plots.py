@@ -18,7 +18,7 @@ def Draw_CMS_header():
    tex.SetTextFont(42)
    tex.SetTextSize(0.05)
    tex.SetLineWidth(2)
-   tex.DrawLatex(0.96,0.96,"2.57 fb^{-1} (13 TeV)")
+   tex.DrawLatex(0.96,0.96,"2.6 fb^{-1} (13 TeV)")
    tex = ROOT.TLatex()
    tex.SetNDC()
    tex.SetTextFont(61)
@@ -81,10 +81,10 @@ maxN = -1
 ROOT.gStyle.SetOptStat(0)
 
 all_MB = False
-presel = False
+presel = True
 SB_w   = False 
 SB_tt  = False
-presel_1b = True
+presel_1b = False
 test = False
 
 draw_signal = False
@@ -193,10 +193,10 @@ if presel_1b :
 if not draw_signal :
   signals = []
 
-#lepSels = [lepSels[2]]
+lepSels = [lepSels[2]]
 
 for lepSel in lepSels:
-  path = "/afs/hephy.at/user/e/easilar/www/data/Run2016B/2751pb/"+lepSel['label']
+  path = "/afs/hephy.at/user/e/easilar/www/data/Run2016B/2571pb/"+lepSel['label']
   if not os.path.exists(path):
     os.makedirs(path)
   print lepSel['label']

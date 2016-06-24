@@ -19,18 +19,18 @@ lumi_label = 2.571
 reweight      = '(weight*'+str(lumi)+')/'+str(sample_lumi)
 filters = "(Flag_goodVertices && Flag_HBHENoiseFilter_fix && Flag_eeBadScFilter && Flag_HBHENoiseIsoFilter)"
 weight_str = weight_str_plot
-path = "/afs/hephy.at/user/e/easilar/www/data/Run2016B/2751pb/diLep_syst_study_results/"
+path = "/afs/hephy.at/user/e/easilar/www/data/Run2016B/2571pb/diLep_syst_study_results/"
 if not os.path.exists(path):
   os.makedirs(path)
 
 presel = True
 
 if presel :
-  btag_weight =  "(weightBTag1p_SF)"
+  #btag_weight =  "(weightBTag1p_SF)"
   btagVarString = 'nBJetMediumCSV30'
-  SR = {(4,-1):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
+  SR = {(3,-1):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
   #btag_weight = "(weightBTag0_SF)"
-  nbtag = (1,-1)
+  nbtag = (0,0)
 
 lepSels = [
 {'cut':'((!isData&&singleLeptonic)||(isData&&((eleDataSet&&singleElectronic)||(muonDataSet&&singleMuonic))))' , 'veto':'nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0',\
@@ -54,7 +54,7 @@ for bkg in bkg_samples:
 
 plots =[\
 #{'ndiv':False,'yaxis':'Events','xaxis':'N_{Jets}','logy':False , 'var':'nJet30',                      'varname':'nJet30',                   'binlabel':1,  'bin':(6,4,10)},\
-{'ndiv':False,'yaxis':'Events','xaxis':'n_{jet}','logy':'True' , 'var':'nJet30',                     'bin_set':False,          'varname':'nJet30',                   'binlabel':1,  'bin':(6,4,10)}\
+{'ndiv':False,'yaxis':'Events','xaxis':'n_{jet}','logy':'True' , 'var':'nJet30',                     'bin_set':False,          'varname':'nJet30',                   'binlabel':1,  'bin':(7,3,10)}\
   ]
 add_cut = "(deltaPhi_Wl<0.5)"
 lepSel = lepSels[0]
@@ -130,7 +130,7 @@ for p in plots:
           h_Stack.Add(histo)
           del histo
         h_Stack.Draw("Bar")
-        h_Stack.SetMaximum(600)
+        h_Stack.SetMaximum(4000)
         h_Stack.SetMinimum(0.11)
         color = ROOT.kBlack
         h_data = bin[srNJet][stb][htb][p['varname']]['data']
@@ -144,7 +144,7 @@ for p in plots:
         h_data.Draw("E1P")
         print "data mean :" , h_data.GetMean()
         bin[srNJet][stb][htb]['data_mean'] = h_data.GetMean() 
-        h_data.SetMaximum(2000)
+        h_data.SetMaximum(4000)
         h_data.SetMinimum(0.11)
         h_Stack.Draw("HistoSame")
         h_data.Draw("E1PSame")
@@ -164,7 +164,7 @@ for p in plots:
         latex.DrawLatex(0.75,0.958,"#bf{2.6 fb^{-1} (13 TeV)}")
         #if nJet[1] == -1: latex.DrawLatex(0.6,0.83,"N_{Jets}#geq"+str(nJet[0]))
         #if nJet[1] != -1: latex.DrawLatex(0.6,0.83,str(nJet[0])+"#leqN_{Jets}#leq"+str(nJet[1]))
-        latex.DrawLatex(0.6,0.80,"#bf{N_{bjets}>="+str(nbtag[0])+"}")
+        latex.DrawLatex(0.6,0.80,"#bf{N_{bjets}=="+str(nbtag[0])+"}")
         #latex.DrawLatex(0.6,0.75,"#Delta#Phi<0.5")
         Pad1.RedrawAxis()
         cb.cd()
@@ -199,15 +199,15 @@ for p in plots:
         h_ratio.GetYaxis().SetLabelSize(0.1)
         h_ratio.Draw("E1")
         print "mean :" , h_ratio.GetMean()
-        h_ratio.SaveAs(bin[srNJet][stb][htb]['path']+'_'+p['varname']+'_lg1b_Ratio.root')
-        print bin[srNJet][stb][htb]['path']+'_'+p['varname']+'_lg1b_Ratio.root'
+        h_ratio.SaveAs(bin[srNJet][stb][htb]['path']+'_'+p['varname']+'_eq0b_Ratio.root')
+        print bin[srNJet][stb][htb]['path']+'_'+p['varname']+'_eq0b_Ratio.root'
         Func.Draw("same")
         cb.Draw()
-        cb.SaveAs(bin[srNJet][stb][htb]['path']+'_'+p['varname']+'_lg1b.png')
-        cb.SaveAs(bin[srNJet][stb][htb]['path']+'_'+p['varname']+'_lg1b.pdf')
-        cb.SaveAs(bin[srNJet][stb][htb]['path']+'_'+p['varname']+'_lg1b.root')
+        cb.SaveAs(bin[srNJet][stb][htb]['path']+'_'+p['varname']+'_eq0b.png')
+        cb.SaveAs(bin[srNJet][stb][htb]['path']+'_'+p['varname']+'_eq0b.pdf')
+        cb.SaveAs(bin[srNJet][stb][htb]['path']+'_'+p['varname']+'_eq0b.root')
         cb.Clear()
         del h_Stack
             
-pickle.dump(bin,file('/data/easilar/Results2016/ICHEP/DiLep_SYS/V1/data_mean_2p75_lg1b_pkl','w'))
+pickle.dump(bin,file('/data/easilar/Results2016/ICHEP/DiLep_SYS/V1/data_mean_2p6_0b_pkl','w'))
 
