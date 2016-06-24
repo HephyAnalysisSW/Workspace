@@ -333,10 +333,10 @@ for isample, sample in enumerate(allSamples):
           s.puReweight_true_Down = PU_histo_66.GetBinContent(PU_histo_66.FindBin(nTrueInt))
           s.puReweight_true_Up = PU_histo_74.GetBinContent(PU_histo_74.FindBin(nTrueInt))
 
-          if "TTJets" in sample["name"] :
-            s.weight = lumiScaleFactor*genWeight
-          else:
-            s.weight = lumiScaleFactor*genWeight*xsectemp
+          #if "TTJets" in sample["name"] :
+          #  s.weight = lumiScaleFactor*genWeight
+          #else:
+          s.weight = lumiScaleFactor*genWeight*xsectemp
 
           if "TTJets" in sample['dbsName']:
             s.weight_XSecTTBar1p1 = s.weight*1.1 
@@ -787,14 +787,14 @@ for isample, sample in enumerate(allSamples):
 
           s.nJet30clean = len(jet30Clean)
           s.htJet30clean = sum([j['pt'] for j in jet30Clean])
-#          lightJets,  bJetsCSV = splitListOfObjects('btagCSV', 0.890, jet30Clean)
+#          lightJets,  bJetsCSV = splitListOfObjects('btagCSV', 0.800, jet30Clean)
 
 #          print s.nJet30nonClean, s.nJet30clean
 #          print s.htJet30nonClean, s.htJet30clean
 
           bJetsCSV = []
           for i, j in enumerate(jet30Clean):
-            if j['btagCSV'] > 0.890:
+            if j['btagCSV'] > 0.800:
               bJetsCSV.append(j)
 
           s.nBJetMediumCSV30 = len(bJetsCSV)

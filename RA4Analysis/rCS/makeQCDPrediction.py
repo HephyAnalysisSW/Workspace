@@ -30,12 +30,12 @@ if isData:
 else:
   sampleStr = 'MC'
 
-preprefix = 'QCDestimation/2015SR_2p57fb/'+sampleStr
+preprefix = 'QCDestimation/validation_v3_2p57fb/'+sampleStr
 wwwDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/'+preprefix+'/'
 picklePath = '/data/'+username+'/Results2016/QCDEstimation/'
 prefix = 'Lp_singleElectronic_'
-picklePresel = '20160623_QCDestimation_2015SR_'+sampleStr+'2p57fb_pkl'
-pickleFit    = '20160623_fitResult_2015SR_'+sampleStr+'2p57fb_pkl'
+picklePresel = '20160623_v3_QCDestimation_validation_'+sampleStr+'2p57fb_pkl'
+pickleFit    = '20160623_v3_fitResult_validation_'+sampleStr+'2p57fb_pkl'
 
 if not os.path.exists(wwwDir):
   os.makedirs(wwwDir)
@@ -43,7 +43,7 @@ if not os.path.exists(wwwDir):
 ##############################################
 ###   Define sidebands for QCD estimation  ###
 ### (3,4) in std est., (3,3) in validation ###
-QCD_SB = (3,4)
+QCD_SB = (3,3)
 
 inclusiveTemplate = {QCD_SB: {(250,  -1): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}}}} #use inclusive LT,HT region to get the shape for the fit template
 
@@ -53,8 +53,8 @@ fitCR =  {QCD_SB: {(250,  -1): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}},
                    (350, 450): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}},
                    (450, -1):  {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}}}}
 
-#SRs = validationRegionAll
-SRs = signalRegion3fb
+SRs = validationRegionAll
+#SRs = signalRegion3fb
 
 signalRegion = makeQCDsignalRegions(SRs, QCDSB=QCD_SB)
 
