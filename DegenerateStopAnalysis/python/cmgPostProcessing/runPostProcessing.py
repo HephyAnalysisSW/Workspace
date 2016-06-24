@@ -146,10 +146,10 @@ sampleSets = {
 
                                         "MET_Run2015D_05Oct",           
                                         "MET_Run2015D_v4",              
-                                        #"SingleElectron_Run2015D_05Oct",
-                                        #"SingleElectron_Run2015D_v4",   
-                                        #"SingleMuon_Run2015D_05Oct",    
-                                        #"SingleMuon_Run2015D_v4",       
+                                        "SingleElectron_Run2015D_05Oct",
+                                        "SingleElectron_Run2015D_v4",   
+                                        "SingleMuon_Run2015D_05Oct",    
+                                        "SingleMuon_Run2015D_v4",       
                                         ],
                              
                             },
