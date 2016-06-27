@@ -64,7 +64,7 @@ cQCD        = getChain(QCDHT,histname='')
 
 
 ## QCD estimation
-useQCDestimation = False
+useQCDestimation = True
 if not isData and useQCDestimation:
   #QCDpickle = '/data/dspitzbart/Results2016/QCDEstimation/20160212_QCDestimation_MC2p25fb_pkl'
   QCDpickle = '/data/dspitzbart/Results2016/QCDEstimation/20160623_v3_QCDestimation_2015SR_MC2p57fb_pkl'

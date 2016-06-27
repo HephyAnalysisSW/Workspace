@@ -123,13 +123,13 @@ SelStr = presel+'&&Selected==1'
 #cQCD  = getChain(QCDHT_25ns,histname='')
 #cEWK  = getChain([WJetsHTToLNu_25ns, TTJets_combined_2, singleTop_25ns, DY_25ns, TTV_25ns],histname='')
 
-cQCD  = getChain(QCDHT,histname='')
-cEWK  = getChain([WJetsHTToLNu, TTJets_Lep, singleTop_lep, DY_amc, TTV],histname='')
+cQCD  = getChain(QCDHT_antiSel,histname='')
+cEWK  = getChain([WJetsHTToLNu_antiSel, TTJets_Lep_antiSel, singleTop_lep_antiSel, DY_HT_antiSel, TTV_antiSel],histname='')
 
 if isData:
-  cData = getChain(single_ele_Run2016B, histname='')
+  cData = getChain(single_ele_Run2016B_antiSel, histname='')
 else:
-  cData = getChain([QCDHT, WJetsHTToLNu, TTJets_Lep, singleTop_lep, DY_madgraph, TTV] , histname='')
+  cData = getChain([QCDHT_antiSel, WJetsHTToLNu_antiSel, TTJets_Lep_antiSel, singleTop_lep_antiSel, DY_HT_antiSel, TTV_antiSel] , histname='')
 
 #get template for fit method
 template_QCD = ROOT.TH1F('template_QCD','template_QCD',30,-0.5,2.5)

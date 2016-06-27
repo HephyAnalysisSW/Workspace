@@ -179,7 +179,7 @@ for rfile in rootfiles:
   leg.Draw()
   
   
-  printPath = '/afs/hephy.at/user/d/dspitzbart/www/Results2016B/btagFitResults/'
+  printPath = '/afs/hephy.at/user/d/dspitzbart/www/Results2016B/btagFitResults_v2/'
   
   if not os.path.exists(printPath):
     os.makedirs(printPath)
