@@ -388,13 +388,14 @@ def eventsSkimPreselect(skimGeneral, skimLepton, skimPreselectFlag, params, skim
         pass
     
     # lepton skimming, loop only over events fulfilling the lepton skimming condition 
-    if skimLepton == 'inc':
-        # no lepton skim selection is applied for the inclusive skim 
-        skimCond += ""
-    else:
-        pass
+    skimLeptonCondition = SkimParameters['skimLepton']
+    if skimLeptonCondition:
+        skimCond += "&&%s"%skimLeptonCondition
     
-    logger.info("\n Jobs running with skim = '%s' \n Initial skimming condition: \n  %s \n ", skimGeneral, skimCond)
+    logger.info(
+        "\n Jobs running with \n skimGeneral = '%s' \n skimLepton = '%s' \n Skimming condition: \n  %s \n ", 
+        skimGeneral, skimLepton,
+        skimCond)
     
     if skimPreselectFlag:
         skimPreselectionCuts = SkimParameters['skimPreselect']
