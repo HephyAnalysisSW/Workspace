@@ -23,19 +23,19 @@ from math import *
 from Workspace.HEPHYPythonTools.user import username
 from LpTemplateFit import LpTemplateFit
 
-isData = True
+isData = False
 
 if isData:
   sampleStr = 'data'
 else:
   sampleStr = 'MC'
 
-preprefix = 'QCDestimation/validation_v3_2p57fb/'+sampleStr
+preprefix = 'QCDestimation/validation_v5_2p57fb/'+sampleStr
 wwwDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/'+preprefix+'/'
 picklePath = '/data/'+username+'/Results2016/QCDEstimation/'
 prefix = 'Lp_singleElectronic_'
-picklePresel = '20160623_v3_QCDestimation_validation_'+sampleStr+'2p57fb_pkl'
-pickleFit    = '20160623_v3_fitResult_validation_'+sampleStr+'2p57fb_pkl'
+picklePresel = '20160623_v5_QCDestimation_validation_'+sampleStr+'2p57fb_pkl'
+pickleFit    = '20160623_v5_fitResult_validation_'+sampleStr+'2p57fb_pkl'
 
 if not os.path.exists(wwwDir):
   os.makedirs(wwwDir)

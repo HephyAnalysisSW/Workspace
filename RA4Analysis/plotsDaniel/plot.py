@@ -75,8 +75,11 @@ TTJets_combined_had_15 =       {'name':'TTJets', 'chain':TTJets_combined_15['cha
 
 
 DY_15 = {'name':'DY', 'chain':getChain(DY_25ns,histname=''), 'color':color('DY'),'weight':totalWeight, 'niceName':'Drell Yan', 'cut':''}
+#DY_16 = {'name':'DY', 'chain':getChain(DY_HT,histname=''), 'color':color('DY'),'weight':totalWeight, 'niceName':'Drell Yan', 'cut':''}
 DY_16_madgraph = {'name':'DY', 'chain':getChain(DY_madgraph,histname=''), 'color':color('DY')-1,'weight':totalWeight, 'niceName':'Drell Yan MG', 'cut':''}
 DY_16_madgraph_antiSel = {'name':'DY', 'chain':getChain(DY_madgraph_antiSel,histname=''), 'color':color('DY')-1,'weight':totalWeight, 'niceName':'Drell Yan', 'cut':''}
+DY_16_antiSel = {'name':'DY', 'chain':getChain(DY_HT_antiSel,histname=''), 'color':color('DY')-1,'weight':totalWeight, 'niceName':'Drell Yan', 'cut':''}
+
 DY_16_amc = {'name':'DY', 'chain':getChain(DY_amc,histname=''), 'color':ROOT.kYellow+1,'weight':totalWeight, 'niceName':'Drell Yan AMC', 'cut':''}
 
 singleTop_15 = {'name':'singleTop', 'chain':getChain(singleTop_25ns,histname=''), 'color':color('singleTop'),'weight':totalWeight, 'niceName':'t/#bar{t}', 'cut':''}
@@ -86,7 +89,7 @@ singleTop_lep_16_antiSel = {'name':'singleTop', 'chain':getChain(singleTop_lep_a
 
 
 QCD_15 = {'name':'QCD', 'chain':getChain(QCDHT_25ns,histname=''), 'color':color('QCD')+1,'weight':totalWeight, 'niceName':'QCD multijet S15', 'cut':''}
-QCD_15_antiSel = {'name':'QCD', 'chain':getChain(QCDHT_25ns_antiSel,histname=''), 'color':color('QCD')+1,'weight':totalWeight, 'niceName':'QCD multijet S15', 'cut':''}
+QCD_15_antiSel = {'name':'QCD', 'chain':getChain(QCDHT_25ns_antiSel,histname=''), 'color':color('QCD')+1,'weight':totalWeight, 'niceName':'QCD multijet S15     ', 'cut':''}
 
 QCD_16 = {'name':'QCD', 'chain':getChain(QCDHT,histname=''), 'color':color('QCD')-1,'weight':totalWeight, 'niceName':'QCD multijet S16', 'cut':''}
 QCD_16_antiSel = {'name':'QCD', 'chain':getChain(QCDHT_antiSel,histname=''), 'color':color('QCD')-1,'weight':totalWeight, 'niceName':'QCD multijet S16', 'cut':''}
@@ -111,8 +114,11 @@ samples16       = [TTJets_Lep_16, DY_16_madgraph, WJETS_16, singleTop_lep_16, QC
 samples16_antiSel = [TTJets_Lep_16_antiSel, DY_16_madgraph_antiSel, WJETS_16_antiSel, singleTop_lep_16_antiSel, QCD_16_antiSel, TTV_16_antiSel]
 
 test_antiSel = {'name':'w/o DY', 'chain':getChain([TTV_antiSel,singleTop_lep_antiSel,TTJets_Lep_antiSel,WJetsHTToLNu_antiSel],histname=''), 'color':color('TTV'),'weight':totalWeight, 'niceName':'w/o DY', 'cut':''}
-EWK_antiSel = {'name':'w/o DY', 'chain':getChain([DY_madgraph_antiSel,TTV_antiSel,singleTop_lep_antiSel,TTJets_Lep_antiSel,WJetsHTToLNu_antiSel],histname=''), 'color':color('DY'),'weight':totalWeight, 'niceName':'all', 'cut':''}
-EWK_antiSel_15 = {'name':'w/o DY', 'chain':getChain([TTJets_combined_2_antiSel,WJetsHTToLNu_25ns_antiSel,TTV_25ns_antiSel,singleTop_25ns_antiSel,DY_25ns_antiSel],histname=''), 'color':ROOT.kGreen,'weight':totalWeight, 'niceName':'all', 'cut':''}
+EWK_antiSel_mg = {'name':'DY MG', 'chain':getChain([DY_madgraph_antiSel,TTV_antiSel,singleTop_lep_antiSel,TTJets_Lep_antiSel,WJetsHTToLNu_antiSel],histname=''), 'color':color('DY'),'weight':totalWeight, 'niceName':'all DY MG', 'cut':''}
+EWK_antiSel_amc = {'name':'DY AMC', 'chain':getChain([DY_amc_antiSel,TTV_antiSel,singleTop_lep_antiSel,TTJets_Lep_antiSel,WJetsHTToLNu_antiSel],histname=''), 'color':ROOT.kBlue,'weight':totalWeight, 'niceName':'all DY AMC    ', 'cut':''}
+EWK_antiSel = {'name':'DY HT', 'chain':getChain([DY_HT_antiSel,TTV_antiSel,singleTop_lep_antiSel,TTJets_Lep_antiSel,WJetsHTToLNu_antiSel],histname=''), 'color':ROOT.kRed,'weight':totalWeight, 'niceName':'EWK Spring16', 'cut':''}
+EWK_antiSel_15 = {'name':'DY HT15', 'chain':getChain([TTJets_combined_2_antiSel,WJetsHTToLNu_25ns_antiSel,TTV_25ns_antiSel,singleTop_25ns_antiSel,DY_25ns_antiSel],histname=''), 'color':ROOT.kOrange+1,'weight':totalWeight, 'niceName':'EWK Spring15', 'cut':''}
+
 
 
 #samplesComp = [WJETS, TTJETS, singleTop, DY, QCD]
@@ -166,7 +172,7 @@ htRB = {'name':'htJet30j', 'binning':[22,500,2700], 'titleX':'H_{T} [GeV]', 'tit
 ht = {'name':'htJet30j', 'binning':[52,500,3100], 'titleX':'H_{T} [GeV]', 'titleY':'Events', 'filename':'ht'}
 htclean = {'name':'htJet30clean', 'binning':[31,0,3100], 'titleX':'H_{T} [GeV]', 'titleY':'Events', 'filename':'ht'}
 
-lp = {'name':'Lp', 'binning':[40,-1.5,2.5], 'titleX':'L_{P}', 'titleY':'Events', 'filename':'LP'}
+lp = {'name':'Lp', 'binning':[31,-0.5,2.6], 'titleX':'L_{P}', 'titleY':'Events', 'filename':'LP'}
 
 htSRB = {'name':'htJet30j', 'binning':[12,500,2500], 'titleX':'H_{T} [GeV]', 'titleY':'Events', 'filename':'ht'}
 
@@ -310,9 +316,9 @@ newPreselCutMu  = {'name':'presel','string':newpresel+'&&singleMuonic','niceName
 newPreselCutMultiB = {'name':'presel','string':newpresel+'&&nJet30>5', 'signal':signalpresel, 'niceName':'Preselection'}
 
 name, cut = nameAndCut((250,-1),(500,-1),(3,4),btb=(0,0),presel=antiSelStr, charge="", btagVar = 'nBJetMediumCSV30', stVar = 'Lt', htVar = 'htJet30clean', njetVar='nJet30clean')
-QCD_SB_antiSel = {'name':'presel','string':cut, 'signal':'(1)', 'niceName':'Preselection'}
+QCD_SB_antiSel = {'name':'presel','string':cut, 'signal':'(1)', 'niceName':'QCD SB, anti-sel'}
 name, cut = nameAndCut((250,-1),(500,-1),(3,4),btb=(0,0),presel=SelStr, charge="", btagVar = 'nBJetMediumCSV30', stVar = 'Lt', htVar = 'htJet30clean', njetVar='nJet30clean')
-QCD_SB_Sel = {'name':'presel','string':cut, 'signal':'(1)', 'niceName':'Preselection'}
+QCD_SB_Sel = {'name':'presel','string':cut, 'signal':'(1)', 'niceName':'QCD SB, selected       '}
 
 
 CutNeg = {'name':'presel','string':'leptonPdg<0','niceName':'Presel NegPdg'}
@@ -502,7 +508,7 @@ dataPlotList = [stComp, htComp, deltaPhiCMG, met, njet, leadingJetPt, lepGoodPt,
 #  t = plot(samples,leadingJetPt,newPreselCut, data=dataDict,filling=True,stacking=True,minimum=0.08, maximum=2000, MClumiScale=205./3000., setLogY=True, lumi=0.205, titleText='CMS preliminary')
 #  savePlot(t, d['titleX'])
 
-def plot(samples, variable, cuts, signals=False, data=False, maximum=False, minimum=0., stacking=False, filling=True, setLogY=False, setLogX=False, titleText='simulation', lumi='3', legend=True, MClumiScale=1., drawError=False, MCscale=True, btagcut='nBJetMediumCSV30==0', btagweight='weightBTag0_SF', signalScale=1):
+def plot(samples, variable, cuts, signals=False, data=False, maximum=False, minimum=0., stacking=False, filling=True, setLogY=False, setLogX=False, titleText='simulation', lumi='3', legend=True, MClumiScale=1., drawError=False, MCscale=True, btagcut='nBJetMediumCSV30==0', btagweight='weightBTag0_SF', signalScale=1, normalize=False):
   if 'binningIsExplicit' in variable:
     binningIsExplicit = variable['binningIsExplicit']
     scaleHist = ROOT.TH1F('scaleH', 'scaleH', len(variable['binning'])-1, array('d', variable['binning']))
@@ -613,6 +619,7 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
       #  useCut = cut['string']
       #  print ' - global cut'
       sample['chain'].Draw(variable['name']+'>>h'+str(isample)+'_'+str(icut),str(MCscale*MClumiScale)+'*'+normWeight+'*('+normCut+')','goff')
+      if normalize: h[i]['hist'].Scale(1/h[i]['hist'].Integral())
       totalH.Add(h[i]['hist'])
       h[i]['yield'] = h[i]['hist'].GetSumOfWeights()
       if minimum: h[i]['hist'].SetMinimum(minimum)
@@ -631,7 +638,8 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
       h[i]['hist'].GetXaxis().SetTitleSize(yTitleSize)
       h[i]['hist'].GetXaxis().SetLabelSize(yTitleSize)
       h[i]['hist'].GetXaxis().SetTitleOffset(yTitleOffset)
-      h[i]['hist'].GetYaxis().SetTitle(variable['titleY']+YAxisTitleAp)
+      if normalize: h[i]['hist'].GetYaxis().SetTitle('a.u')
+      else: h[i]['hist'].GetYaxis().SetTitle(variable['titleY']+YAxisTitleAp)
       h[i]['hist'].GetYaxis().SetTitleOffset(yTitleOffset)
       h[i]['hist'].GetYaxis().SetTitleSize(yTitleSize)
       h[i]['hist'].GetYaxis().SetLabelSize(yTitleSize)
@@ -923,6 +931,7 @@ def plotInSignalRegions(samples, presel, data=False, fixedNJet=None, btb=None, s
       h_Stack.Add(item['hist'])
       frac.append(item['hist'].Clone())
       frac[-1].Divide(totalH)
+    if normalize: maximum=1.
     if minimum: h_Stack.SetMinimum(minimum)
     if maximum: h_Stack.SetMaximum(maximum)
     h_Stack.Draw('hist')
