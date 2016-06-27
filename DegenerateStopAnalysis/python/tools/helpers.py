@@ -60,12 +60,13 @@ def redirectRootPrint(rootObject):
     return rootObjectPrint
 
 
-def getRandomList(listLength):
+def getRandomList(listLength, seed=None):
     """ Randomize a list of a given length .
     
     listLength is a positive integer. The function shuffle the range [0, listLength].
     """
-    
+    if seed:
+        random.seed(seed)
     listRange = range(listLength)
     random.shuffle(listRange)
     return listRange
@@ -295,10 +296,13 @@ def variablesStruct(variableList, structName='Variables'):
     
     for var in variableList :
         varSize = (variableList[var])[2]
-        if varSize > 1:
-            varSizeString = '[' +  str(varSize) + ']'
-        elif varSize == 1:
+        if varSize == 1:
             varSizeString = ''
+        elif type(varSize)==type(""):
+            print "Variable with a variable size! make sure this works! ", var, varSize
+            varSizeString = '[' +  str(varSize) + ']'
+        elif varSize > 1:
+            varSizeString = '[' +  str(varSize) + ']'
         else:
             raise Exception("\n Incorrect size for variable "+ var, varSize)
         
@@ -326,7 +330,6 @@ def getVariableValue(chain, var, indexObj=0):
             raise Exception("Unsuccessful getVariableValue for leaf %s and index %i"%(leaf, indexObj))
     else:
         leaf = chain.GetLeaf(var)
-    
         if leaf:
             return leaf.GetValue(indexObj)
       

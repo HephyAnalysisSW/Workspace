@@ -4,24 +4,30 @@ import ROOT
 import pickle
 from Workspace.DegenerateStopAnalysis.navidTools.NavidTools import *
 
-def get_basename (f):
-    return os.path.basename(f)
-def get_filename (f):
-    return os.path.splitext(os.path.basename(f))[0]
-def get_ext (f):
-    return os.path.splitext(os.path.basename(f))[1]
-
-def getMasses(string):
-    masses = []    
-    string = get_filename(string)
-    for s in string.rsplit("_"):
-        if s.startswith("s"):
-            s = s[1:]
-        if not s.isdigit(): continue
-        masses.append(s)
-    if len(masses)!=2 or int(masses[0]) < int(masses[1]):
-        raise Exception("Failed to Extract masses from string: %s , only got %s "%(string, masses))        
-    return [int(m) for m in masses]
+#def get_basename (f):
+#    return os.path.basename(f)
+#def get_filename (f):
+#    return os.path.splitext(os.path.basename(f))[0]
+#def get_ext (f):
+#    return os.path.splitext(os.path.basename(f))[1]
+#
+#def getMasses(string):
+#    import re
+#    masses = []    
+#    string = get_filename(string)
+#    splitted = re.split("_|-", string)
+#    #splitted = string.rsplit("_"):
+#    for s in splitted: 
+#        if s.startswith("s8tev"):
+#            s = s[5:]
+#        if s.startswith("s"):
+#            s = s[1:]
+#        if not s.isdigit(): 
+#            continue
+#        masses.append(s)
+#    if len(masses)!=2 or int(masses[0]) < int(masses[1]):
+#        raise Exception("Failed to Extract masses from string: %s , only got %s "%(string, masses))        
+#    return [int(m) for m in masses]
 
 
 
@@ -29,26 +35,36 @@ def getMasses(string):
 
 def getValueFromDict(x, val="0.500", default=999):
     try:
-        ret = float(x['0.500'])
+        ret = x[val]
     except KeyError:
         ret = default
-    return ret
+    #else:
+    #    raise Exception("cannot find value %s in  %s"%(val, x))
+    return float(ret)
 
-def drawExpectedLimit( ldict, save=True ):
-    limit_pickle = ldict["pkl"]
-    savedir = ldict['savedir']
+def drawExpectedLimit( limitDict, plotDir, bins=None, key=None , title="", csize=(1500,1026) ):
+    saveDir = plotDir
+    
+    if type(limitDict)==type({}):
+        limits = limitDict
+    elif type(limitDict)==type("") and limitDict.endswith(".pkl"):
+        limits = pickle.load(open(limitDict, "r"))
+    else:
+        raise Exception("limitDict should either be a dictionary or path to a picke file")
 
-    limits = pickle.load(open(limit_pickle, "r"))
-    bins = [13,87.5,412.5, 75, 17.5, 392.5 ]
-    xyz = []
+    if not bins:
+        bins = [13,87.5,412.5, 75, 17.5, 392.5 ]
+        #bins = [23,87.5,662.5, 127 , 17.5, 642.5]
     
+    if not key:
+        key = getValueFromDict
     
-    plot = makeStopLSPPlot("Exclusion", limits, bins=bins, key= getValueFromDict )
+    plot = makeStopLSPPlot("Exclusion", limits, bins=bins, key=key )
     
     ROOT.gStyle.SetOptStat(0)
     ROOT.gStyle.SetPaintTextFormat("0.2f")
-   
-    #levels = array("d",[0,1,10,1000])
+
+    #levels = array("d",[0,1,10])
     #nLevels = len(levels)
     #plot.SetContour(nLevels, levels)
  
@@ -57,15 +73,26 @@ def drawExpectedLimit( ldict, save=True ):
     plot.SetContourLevel(1,1 )
     plot.SetContourLevel(2,10 )
     
-    output_name = os.path.splitext(os.path.basename(limit_pickle))[0]+".png"
+    #output_name = os.path.splitext(os.path.basename(limit_pickle))[0]+".png"
     
-    c1 = ROOT.TCanvas("c1","c1",1920,1080)
+    #c1 = ROOT.TCanvas("c1","c1",1910,1070)
+    c1 = ROOT.TCanvas("c1","c1",*csize)
     plot.Draw("COL TEXT")
+    if title:
+        ltitle = ROOT.TLatex()
+        ltitle.SetNDC()
+        ltitle.SetTextAlign(12)   
+        #ytop = 1.05- canv.GetTopMargin()
+        #ltitle_info = [0.1, ytop]
+        ltitle.DrawLatex(0.2, 0.8, title  )
+    c1.Update()
+    c1.Modify()
     #c1.SaveAs("/afs/hephy.at/user/n/nrad/www/T2Deg13TeV/mAODv2_7412pass2/reload_scan_isrweight/%s"%output_name)
-    if save:
-        c1.SaveAs(savedir)
-
-    return plot
+    if plotDir:
+        c1.SaveAs(plotDir)
+    #    return c1,plot
+    #else:
+    return c1,plot
 
 
 
@@ -92,7 +119,7 @@ def calcLimit(card, options=""):
     card = os.path.abspath(card)
 
     uniqueDirname="."
-    uniqueDirname = "tmp"+str(uuid.uuid4())
+    uniqueDirname = "tmp_"+str(uuid.uuid4())
     os.system('mkdir '+uniqueDirname)
     os.system("cd "+uniqueDirname+";combine --saveWorkspace -M Asymptotic "+card)
     try:

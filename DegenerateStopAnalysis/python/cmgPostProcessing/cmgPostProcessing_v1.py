@@ -388,13 +388,14 @@ def eventsSkimPreselect(skimGeneral, skimLepton, skimPreselectFlag, params, skim
         pass
     
     # lepton skimming, loop only over events fulfilling the lepton skimming condition 
-    if skimLepton == 'inc':
-        # no lepton skim selection is applied for the inclusive skim 
-        skimCond += ""
-    else:
-        pass
+    skimLeptonCondition = SkimParameters['skimLepton']
+    if skimLeptonCondition:
+        skimCond += "&&%s"%skimLeptonCondition
     
-    logger.info("\n Jobs running with skim = '%s' \n Initial skimming condition: \n  %s \n ", skimGeneral, skimCond)
+    logger.info(
+        "\n Jobs running with \n skimGeneral = '%s' \n skimLepton = '%s' \n Skimming condition: \n  %s \n ", 
+        skimGeneral, skimLepton,
+        skimCond)
     
     if skimPreselectFlag:
         skimPreselectionCuts = SkimParameters['skimPreselect']
@@ -483,7 +484,7 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
         'Flag_*','HLT_*',
         'nJet', 'Jet_*', 
         'nTauGood', 'TauGood_*',
-        'Tracks_*', 'isoTrack_*',
+        'isoTrack_*', #'Tracks_*',
         ] 
 
     if (args.processLepAll and args.storeOnlyLepAll):
@@ -657,7 +658,7 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
         'ngenTau', 'genTau_*', 
         'ngenLepFromTau', 'genLepFromTau_*', 
         'GenJet_*',
-        'GenTracks_*',
+        #'GenTracks_*',
         ]
     
     readVariables_MC = []

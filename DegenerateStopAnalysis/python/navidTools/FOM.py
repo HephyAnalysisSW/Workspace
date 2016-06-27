@@ -59,15 +59,25 @@ fomFuncs= {
                 "RATIO"       : RATIO ,  
             }
 
-def get_float(val):
-    try:
-        return float(val) 
-    except AttributeError:     #might be a u_float
-        return float(val.val)     
-    except ValueError:
-        if "+-" in val:
-            split = val.rsplit("+-")
-            return float( split[0] )
+def get_float(val,sigma=False):
+    if not sigma:
+        try:
+            return float(val) 
+        except AttributeError:     #might be a u_float
+            return float(val.val)     
+        except ValueError:
+            if "+-" in val:
+                split = val.rsplit("+-")
+                return float( split[0] )
+    else:
+        if not hasattr(val,"sigma"):
+            raise Exception("val does not contain sigma information %s"%val)
+        try:
+            return float(val.sigma)     
+        except ValueError:
+            if "+-" in val:
+                split = val.rsplit("+-")
+                return float( split[1] )
 
 def calcFOMs(s,b,sysUnc=0.2,fom=None):
 
@@ -173,7 +183,7 @@ def getHisMinMax(hist):
     return getHistMin(hist), getHistMax(hist)
 
 
-def getFOMFromTH1FIntegral(sHist,bHist,fom="AMSSYS",sysUnc=0.2, verbose=False, integral =True):
+def getFOMFromTH1FIntegral(sHist,bHist,fom="AMSSYS",sysUnc=0.2, verbose=False, integral = False, reverse=True ):
     if not sHist.GetNbinsX() == bHist.GetNbinsX():
         print sHist, sHist.GetNbinsX()
         print bHist, bHist.GetNbinsX()
@@ -182,19 +192,32 @@ def getFOMFromTH1FIntegral(sHist,bHist,fom="AMSSYS",sysUnc=0.2, verbose=False, i
     fomHist = sHist.Clone()
     fomHist.Reset()
     fomHist.GetYaxis().SetTitle("_".join([fom,sHist.GetName(),bHist.GetName()]))
-    fomHist.SetName("_".join([fom,sHist.GetName(),bHist.GetName()]))
+    fomHist.SetName("_".join([fom,sHist.GetName().replace("_",""),bHist.GetName().replace("_","")]))
     #nBins  = int( fomHist.GetNbinsX() )
     #lowBin = int( fomHist.GetBinLowEdge(1)  )
     #hiBin  = int( fomHist.GetBinLowEdge(fomHist.GetNbinsX()+1)  )
     #[ (x, sHist.GetBinLowEdge(x),  sHist.Integral( 1  , x   )  )  for x in range(nBins/2, nBins)   ]    
     #print "-----FOM INTEGRAL", sHist.GetName , nBins, lowBin, hiBin 
 
+    start = 1 if integral else 0
+    rangex = range(start,nBinX+1)
 
-    for x in range(1,nBinX+1):
-        
+
+    if reverse:
+        print "------- Reversing the FOM!"
+        rangex.reverse()
+        points = lambda x: (x,nBinX)
+    else:
+        points = lambda x: (0,x)
+
+    if verbose:
+        print "fom range:", rangex
+        print "integral:", integral, "reverse:", reverse
+    for x in rangex:
+                
         if integral:        
-            s=u_float(sHist.Integral(x,nBinX) )
-            b=u_float(bHist.Integral(x,nBinX) )
+            s=u_float(sHist.Integral(*points(x)) )
+            b=u_float(bHist.Integral(*points(x)) )
         else:
             s=u_float( sHist.GetBinContent(x) , sHist.GetBinError(x) )
             b=u_float( bHist.GetBinContent(x) , bHist.GetBinError(x) )
@@ -208,6 +231,8 @@ def getFOMFromTH1FIntegral(sHist,bHist,fom="AMSSYS",sysUnc=0.2, verbose=False, i
             print "     Signal: %s, Bkg: %s"%(sHist.GetBinContent(x),bHist.GetBinContent(x)) 
             print "     INTEGS: %s, %s"%(s,b)
             print "     FOM:", fomVal
+    if verbose:
+        print [ (i,x) for i,x in enumerate(fomHist)]
     return fomHist
 
 def getCutEff(hist,rej=False):
