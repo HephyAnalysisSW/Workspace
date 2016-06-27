@@ -54,6 +54,18 @@ def getParameterSet(args):
         skimPreselectCondition = ''
         pass
 
+    # lepton skimming
+    #
+    # branches (scalars or vectors) used here must be included in readVar or readVectors via
+    # LepGood 'common' branches
+    if skimLepton == 'incLep':
+        # keep an empty string for inclusive lepton
+        skimLeptonCondition = ''
+    elif skimLepton == 'oneLep':
+        skimLeptonCondition = "nLepGood >=1 || nLepOther >=1"
+    else:
+        pass
+
     SkimParameters = {
         'lheHThigh': {
             'lheHTIncoming': 600
@@ -62,6 +74,7 @@ def getParameterSet(args):
             'lheHTIncoming': 600
             },
         'skimPreselect': skimPreselectCondition,
+        'skimLepton': skimLeptonCondition,
         }
 
     params['SkimParameters'] = SkimParameters
@@ -111,7 +124,6 @@ def getParameterSet(args):
             'eta': ('eta', operator.lt, 2.4, operator.abs),
             'dxy': ('dxy', operator.lt, 0.05, operator.abs),
             'dz': ('dz', operator.lt, 0.2, operator.abs),
-            'mediumMuonId': ('mediumMuonId', operator.eq, 1),
             'hybIso': {
                 'ptSwitch': 25, 
                 'relIso': {

@@ -44,10 +44,10 @@ else
     CMG_TUPLES="Spring15_7412pass2_mAODv2_v7"
 fi
 
-CMG_POST_PROCESSING_TAG="74X_postProcessing_v6"
+CMG_POST_PROCESSING_TAG="74X_postProcessing_v7"
 VERBOSE=""
 if [[ ${3} == "TEST" ]]; then 
-    CMG_POST_PROCESSING_TAG="74X_postProcessing_v6_TEST"
+    CMG_POST_PROCESSING_TAG="74X_postProcessing_v7_TEST"
     VERBOSE="--verbose"
 fi
 
@@ -80,8 +80,7 @@ if [[ ${CMSSW_ACTION} == "R" ]]; then
         --cmgPostProcessingTag=${CMG_POST_PROCESSING_TAG} \
         --processLepAll \
         --skimGeneral='' \
-        --skimLepton='inc' \
-        --skimPreselect \
+        --skimLepton='oneLep' \
         --run \
         ${VERBOSE}
 fi

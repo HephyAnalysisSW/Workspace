@@ -112,8 +112,7 @@ def get_parser():
         action='store',
         nargs='?',
         type=str,
-        choices=['soft', 'hard', 'inc', 'dilep'],
-        default='inc',
+        default='incLep',
         help="Lepton skimming to be applied for post-processing"
         )
     
