@@ -112,7 +112,7 @@ singleTop_lep = {\
 "bins" : [
 "ST_schannel_4f_leptonDecays",
 "ST_tchannel_antitop_4f_leptonDecays_powheg",
-"ST_tchannel_antitop_4f_leptonDecays_powheg",   ##This is not a bug, for the top chanell we introduce a double counting
+"ST_tchannel_top_4f_leptonDecays_powheg",   ##This is a fake sample with inversed leptonPdg, fix asap!!!
 "ST_tW_antitop_5f_inclusiveDecays_powheg",
 "ST_tW_top_5f_inclusiveDecays_powheg",
 ],

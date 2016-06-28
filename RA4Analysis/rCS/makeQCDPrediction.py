@@ -33,23 +33,38 @@ readFit = '/data/dspitzbart/Results2016/QCDEstimation/20160628_fitResult_2015SR_
 readYields = '/data/dspitzbart/Results2016/QCDEstimation/20160628_QCDestimation_2015SR_v9_MC2p57fb_pkl'
 
 
+
 if isData:
   sampleStr = 'data'
 else:
   sampleStr = 'MC'
 
-SRstring = '2015SR_preapp'
+SRstring = '2016SR_preapp'
 if isValidation: SRstring = 'validation'
 
-preprefix = 'QCDestimation/'+SRstring+'_2p57fb/'+sampleStr
+preprefix = 'QCDestimation/'+SRstring+'_10fb/'+sampleStr
 wwwDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/'+preprefix+'/'
 picklePath = '/data/'+username+'/Results2016/QCDEstimation/'
 prefix = 'Lp_singleElectronic_'
-picklePresel = '20160628_QCDestimation_'+SRstring+'_'+sampleStr+'2p57fb_pkl'
-pickleFit    = '20160628_fitResult_'+SRstring+'_'+sampleStr+'2p57fb_pkl'
+picklePresel = '20160628_QCDestimation_'+SRstring+'_'+sampleStr+'10fb_pkl'
+pickleFit    = '20160628_fitResult_'+SRstring+'_'+sampleStr+'10fb_pkl'
 
 if not os.path.exists(wwwDir):
   os.makedirs(wwwDir)
+
+mcFileIsHere = False
+if isData:
+  mcFileIsHere = True
+  try: file(picklePath+'20160628_QCDestimation_'+SRstring+'_MC10fb_pkl')
+  except IOError: mcFileIsHere = False
+  if mcFileIsHere:
+    mc_bins = pickle.load(file(picklePath+'20160628_QCDestimation_'+SRstring+'_MC10fb_pkl'))
+    print 'MC file successfully loaded, can assign correct uncertainties'
+    mcFileIsHere = True
+  else:
+    print
+    print '! Correct Uncertainty can not get assigned at the end, MC file missing !'
+    print
 
 ##############################################
 ###   Define sidebands for QCD estimation  ###
@@ -67,7 +82,9 @@ fitCR =  {QCD_SB: {(250,  -1): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}},
                    (450, -1):  {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}}}}
 
 if isValidation: SRs = validationRegionAll
-else: SRs = signalRegion3fb
+else:
+  #SRs = signalRegion3fb
+  SRs = signalRegions2016
 
 signalRegion = makeQCDsignalRegions(SRs, QCDSB=QCD_SB)
 
@@ -85,7 +102,7 @@ def makeWeight(lumi=3., sampleLumi=3.,debug=False):
     weight_err_str = '('+weight_str+'*'+weight_str+')'
   return weight_str, weight_err_str
 
-lumi = 2.57
+lumi = 3.99
 sampleLumi = 3.0 #post processed sample already produced with 2.25fb-1
 weight_str, weight_err_str = makeWeight(lumi, sampleLumi)
 
@@ -125,7 +142,8 @@ def getPseudoRCS(small,smallE,large,largeE):
 
 #trigger and filters for real Data
 trigger = "&&((HLT_EleHT350||HLT_EleHT400)||(HLT_MuHT350||HLT_MuHT400))"
-filters = "&&Flag_goodVertices && Flag_HBHENoiseFilter_fix && Flag_eeBadScFilter && Flag_HBHENoiseIsoFilter "#&& veto_evt_list"
+#filters = "&&Flag_goodVertices && Flag_HBHENoiseFilter_fix && Flag_eeBadScFilter && Flag_HBHENoiseIsoFilter "#&& veto_evt_list"
+filters = "&& (Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_goodVertices && Flag_eeBadScFilter &&  Flag_globalTightHalo2016Filter && Flag_badChargedHadronFilter && Flag_badMuonFilter)"
 #filters = "&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFilter_fix&&Flag_HBHENoiseFilter&&Flag_goodVertices&&Flag_eeBadScFilter&&Flag_EcalDeadCellTriggerPrimitiveFilter"
 #filters = "&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFilter_fix&&Flag_HBHENoiseIsoFilter&&Flag_goodVertices&&Flag_eeBadScFilter"
 
@@ -496,12 +514,22 @@ for srNJet in sorted(signalRegion):
           RcsAnti_err = bins[srNJet][stb][htb][btb][dP]['rCSantiSelectedDATA']['rCSE_pred']
           NQCD        = Fsta * Nanti
           NQCD_err    = sqrt( (Fsta_err**2*Nanti**2+Nanti_err**2*Fsta**2) + (sys)**2 )
+          NQCD_truth  = bins[srNJet][stb][htb][btb][dP]['NQCDSelMC']
+          if isData and mcFileIsHere: #apply the relative uncertainty determined in MC to data
+            NQCD_err_rel  = mc_bins[srNJet][stb][htb][btb][dP]['NQCDpred_err_rel']
+            NQCD_err      = NQCD_err_rel*NQCD
+          elif isData and not mcFileIsHere:
+            NQCD_err_rel  = 'Uncertainty not correct!!'
+            NQCD_err      = NQCD_err
+          else: #In MC, get the max of the determined error of the method and the non-closure
+            NQCD_err_rel  = max([NQCD_err/NQCD, abs(1-NQCD_truth/NQCD)])
+            NQCD_err      = NQCD_err_rel*NQCD
           try: NQCD_lowDPhi = NQCD/(RcsAnti+1)
           except ZeroDivisionError: NQCD_lowDPhi = float('nan') 
           try: NQCD_lowDPhi_err = NQCD_lowDPhi*sqrt((NQCD_err/NQCD)**2 + (RcsAnti_err/(RcsAnti+1))**2)
           except ZeroDivisionError: NQCD_lowDPhi_err = float('nan')
           NQCD_highDPhi = NQCD - NQCD_lowDPhi
           NQCD_highDPhi_err = sqrt(RcsAnti_err**2*NQCD_lowDPhi**2 + RcsAnti**2*NQCD_lowDPhi_err**2)
-          bins[srNJet][stb][htb][btb][dP].update({'NQCDpred':NQCD, 'NQCDpred_err':NQCD_err, 'NQCDpred_lowdPhi':NQCD_lowDPhi, 'NQCDpred_lowdPhi_err':NQCD_lowDPhi_err, 'NQCDpred_highdPhi':NQCD_highDPhi, 'NQCDpred_highdPhi_err':NQCD_highDPhi_err})
+          bins[srNJet][stb][htb][btb][dP].update({'NQCDpred':NQCD, 'NQCDpred_err':NQCD_err, 'NQCDpred_err_rel':NQCD_err_rel, 'NQCDpred_lowdPhi':NQCD_lowDPhi, 'NQCDpred_lowdPhi_err':NQCD_lowDPhi_err, 'NQCDpred_highdPhi':NQCD_highDPhi, 'NQCDpred_highdPhi_err':NQCD_highDPhi_err})
           pickle.dump(bins, file(picklePath+picklePresel,'w'))
 

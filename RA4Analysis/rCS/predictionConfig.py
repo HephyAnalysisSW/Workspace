@@ -23,10 +23,10 @@ bjreg = (0,0)
 wjetsSB = (3,4)
 
 nBTagVar              = 'nBJetMediumCSV30'
-useBTagWeights        = True
-btagWeightSuffix      = '_SF'
-templateWeights       = True
-templateWeightSuffix  = '_SF'
+useBTagWeights        = False
+btagWeightSuffix      = ''#'_SF'
+templateWeights       = False
+templateWeightSuffix  = ''#'_SF'
 
 QCDup       = False
 QCDdown     = False
@@ -35,7 +35,7 @@ if QCDup: nameSuffix += '_QCDup'
 if QCDdown: nameSuffix += '_QCDdown'
 
 ## samples
-isData              = True
+isData              = False
 unblinded           = False
 validation          = False
 isCentralPrediction = True
@@ -54,12 +54,12 @@ loadTemplate = False
 #cQCD        = getChain(QCDHT_25ns,histname='')
 
 cWJets      = getChain(WJetsHTToLNu,histname='')
-cTTJets     = getChain(TTJets_Lep,histname='')
-cDY         = getChain(DY_madgraph,histname='')
+cTTJets     = getChain(TTJets_Comb,histname='')
+cDY         = getChain(DYHT,histname='')
 csingleTop  = getChain(singleTop_lep,histname='')
 cTTV        = getChain(TTV,histname='')
-cRest       = getChain([singleTop_lep, DY_madgraph, TTV],histname='')#no QCD
-cBkg        = getChain([WJetsHTToLNu, TTJets_Lep, singleTop_lep, DY_madgraph, TTV], histname='')#no QCD
+cRest       = getChain([singleTop_lep, DYHT, TTV],histname='')#no QCD
+cBkg        = getChain([WJetsHTToLNu, TTJets_Comb, singleTop_lep, DYHT, TTV], histname='')#no QCD
 cQCD        = getChain(QCDHT,histname='')
 
 
@@ -84,9 +84,9 @@ else: QCDestimate=False
 if isData:
   cData = getChain([single_mu_Run2016B, single_ele_Run2016B], histname='')
 elif not isData and useQCDestimation:
-  cData = getChain([WJetsHTToLNu, TTJets_Lep, singleTop_lep, DY_madgraph, TTV, QCDHT], histname='')
+  cData = getChain([WJetsHTToLNu, TTJets_Comb, singleTop_lep, DYHT, TTV, QCDHT], histname='')
 else:
-  cData = getChain([WJetsHTToLNu, TTJets_Lep, singleTop_lep, DY_madgraph, TTV], histname='')
+  cData = getChain([WJetsHTToLNu, TTJets_Comb, singleTop_lep, DYHT, TTV], histname='')
 
 
 ## signal region definition
@@ -94,17 +94,17 @@ if validation:
   signalRegions = validationRegionAll
   regStr = 'validation_4j'
 else:
-  #signalRegions = signalRegions2016VR
-  signalRegions = signalRegion3fb
+  signalRegions = signalRegions2016
+  #signalRegions = signalRegion3fb
   #regStr = 'fullSR'
-  regStr = 'SR2015'
+  regStr = 'SR2016_v1'
 #signalRegions = signalRegion3fbMerge
 
 ## weight calculations
-lumi = 2.57
-templateLumi = 2.57 # lumi that was used when template was created - if defined wrong, fixed rest backgrounds will be wrong
+lumi = 3.99
+templateLumi = 3.99 # lumi that was used when template was created - if defined wrong, fixed rest backgrounds will be wrong
 sampleLumi = 3.
-printlumi = '2.57'
+printlumi = '4.0'
 debugReweighting = False
 
 year = '2016'
@@ -144,10 +144,12 @@ else:
   kappa_dict_dir = '/data/dspitzbart/Results'+year+'/Prediction_Spring16_templates_SR2015_lep_MC_SF_2p57/singleLeptonic_Spring16__estimationResults_pkl_kappa_corrected'
 
 ## Preselection cut
-triggers = "(HLT_EleHT350||HLT_MuHT350)"
+#triggers = "(HLT_EleHT350||HLT_MuHT350)"
+triggers = "((HLT_EleHT350||HLT_EleHT400)||(HLT_MuHT350||HLT_MuHT400))"
 #filters = "Flag_goodVertices && Flag_HBHENoiseFilter_fix && Flag_CSCTightHaloFilter && Flag_eeBadScFilter && Flag_HBHENoiseIsoFilter"
 #filters = "Flag_goodVertices && Flag_HBHENoiseFilter_fix && Flag_eeBadScFilter && Flag_HBHENoiseIsoFilter && veto_evt_list"
-filters = "Flag_goodVertices && Flag_HBHENoiseFilter_fix && Flag_eeBadScFilter && Flag_HBHENoiseIsoFilter"
+#filters = "Flag_goodVertices && Flag_HBHENoiseFilter_fix && Flag_eeBadScFilter && Flag_HBHENoiseIsoFilter"
+filters = "(Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_goodVertices && Flag_eeBadScFilter &&  Flag_globalTightHalo2016Filter && Flag_badChargedHadronFilter && Flag_badMuonFilter)"
 presel = "((!isData&&singleLeptonic)||(isData&&"+triggers+"&&((muonDataSet&&singleMuonic)||(eleDataSet&&singleElectronic))&&"+filters+"))"
 presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSoftLeptons==0 && Jet_pt[1]>80 && st>250 && nJet30>2 && htJet30j>500"
 
@@ -162,7 +164,7 @@ singleEle_presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSo
 ## weights for MC
 #MCweight = 'lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*0.94'
 #MCweight = 'lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*TopPtWeight*0.94'
-MCweight = '(1)'
+MCweight = 'TopPtWeight'
 
 ## corrections
 createFits = True # turn off if you already did one
