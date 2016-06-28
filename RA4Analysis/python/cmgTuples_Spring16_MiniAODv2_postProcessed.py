@@ -1,7 +1,7 @@
 import copy, os, sys
 dirEce = '/data/easilar/cmgTuples/postProcessing_Spring16_JECv3//HT500LT250Skim/'
+dirEce2 = '/data/easilar/cmgTuples/postProcessing_Spring16_FIXED_v2/'
 dirDaniel = '/data/dspitzbart/cmgTuples/postProcessing_Spring16/HT500LT250Skim/'
-dirDaniel2 = '/data/dspitzbart/cmgTuples/postProcessing_Spring16_JECv3/HT500LT250Skim/'
 ####usual HT combination####
 
 #TTJets_HTLO_25ns={\
@@ -60,15 +60,18 @@ TTJets_Lep = {\
 'dir' : dirDaniel,
 }
 
-TTJets_Comp = {\
-"name" : "TTJets_Comp",
+TTJets_Comb = {\
+"name" : "TTJets_Comb",
 "bins" : [
 "TTJets_SingleLeptonFromT_full",
 "TTJets_SingleLeptonFromTbar_full",
 "TTJets_DiLepton",
-"TTJets_NLO",
+"TTJets_LO_HT600to800",
+"TTJets_LO_HT800to1200",
+"TTJets_LO_HT1200to2500",
+"TTJets_LO_HT2500toInf",
 ],
-'dir' : dirEce,
+'dir' : dirEce2,
 }
 
 
@@ -109,6 +112,7 @@ singleTop_lep = {\
 "bins" : [
 "ST_schannel_4f_leptonDecays",
 "ST_tchannel_antitop_4f_leptonDecays_powheg",
+"ST_tchannel_antitop_4f_leptonDecays_powheg",   ##This is not a bug, for the top chanell we introduce a double counting
 "ST_tW_antitop_5f_inclusiveDecays_powheg",
 "ST_tW_top_5f_inclusiveDecays_powheg",
 ],
@@ -130,7 +134,16 @@ DY_amc = {\
 ],
 'dir' : dirDaniel,
 }
-
+DYHT = {\
+"name" : "DYHT",
+"bins" : [
+"DYJetsToLL_M_50_HT_100to200",
+"DYJetsToLL_M_50_HT_200to400",
+"DYJetsToLL_M_50_HT_400to600",
+"DYJetsToLL_M_50_HT_600toInf",
+],
+'dir' : dirDaniel,
+}
 
 QCDHT = {\
 "name":"QCD",
