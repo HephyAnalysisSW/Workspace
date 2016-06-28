@@ -3,7 +3,7 @@ import copy, os, sys
 dir2 = '/data/dspitzbart/cmgTuples/postProcessed_Spring15_antiSelection_final2p25fb_v2/'
 dir = dir2+'none/'
 
-single_mu_Run2015D = {\
+single_mu_Run2015D_antiSel = {\
 "name" : "single_mu_Run215D",
 "bins" : [
 "SingleMuon_Run2015D_05Oct",
@@ -13,7 +13,7 @@ single_mu_Run2015D = {\
 }
 
 
-single_ele_Run2015D = {\
+single_ele_Run2015D_antiSel = {\
 "name" : "single_ele_Run215D",
 "bins" : [
 "SingleElectron_Run2015D_05Oct",
@@ -23,7 +23,7 @@ single_ele_Run2015D = {\
 }
 
 ####usual HT combination####
-TTJets_HTLO_25ns={\
+TTJets_HTLO_25ns_antiSel={\
 "name" : "tt+Jets_LO",
 "bins" : [
 "LHE_FullHadronic_inc/none/TTJets_LO",
@@ -35,7 +35,7 @@ TTJets_HTLO_25ns={\
 'dir' : dir,
 }
 #####diLep+SemiLep+HT binned samples####
-TTJets_combined = {\
+TTJets_combined_antiSel = {\
 "name" : "TTJets_combined",
 "bins" : [
 "TTJets_DiLepton_full",
@@ -50,7 +50,7 @@ TTJets_combined = {\
 'dir' : dir,
 }
 #####(diLep+SemiLep+HT binned samples) for LHE_HT<=1000 & (HT binned samples) for LHE_HT>1000 
-TTJets_combined_2 = {\
+TTJets_combined_2_antiSel = {\
 "name" : "TTJets_combined",
 "bins" : [
 "diLep/none/TTJets_DiLepton_full",
@@ -67,7 +67,7 @@ TTJets_combined_2 = {\
 }
 
 
-WJetsHTToLNu_25ns={\
+WJetsHTToLNu_25ns_antiSel={\
 "name" : "W+Jets",
 "bins" : [
 "WJetsToLNu_HT100to200",
@@ -83,7 +83,7 @@ WJetsHTToLNu_25ns={\
 }
 
 
-singleTop_25ns={\
+singleTop_25ns_antiSel={\
 "name" : "singleTop",
 "bins" : [
 "TBar_tWch",
@@ -94,7 +94,7 @@ singleTop_25ns={\
 'dir' : dir,
 }
 
-DY_25ns={\
+DY_25ns_antiSel={\
 "name" : "DY",
 "bins" : [
 "DYJetsToLL_M50_HT100to200",
@@ -106,7 +106,7 @@ DY_25ns={\
 }
 
 
-QCDHT_25ns = {
+QCDHT_25ns_antiSel = {
 "name":"QCD",
 "bins":[
 "QCD_HT1000to1500",
@@ -120,7 +120,7 @@ QCDHT_25ns = {
 'dir' : dir,
 }
 
-TTV_25ns = {
+TTV_25ns_antiSel = {
 "name":"TTVH_HT",
 "bins":[
 "TTWToLNu",

@@ -35,9 +35,9 @@ if QCDup: nameSuffix += '_QCDup'
 if QCDdown: nameSuffix += '_QCDdown'
 
 ## samples
-isData              = False
+isData              = True
 unblinded           = False
-validation          = True
+validation          = False
 isCentralPrediction = True
 if isData:
   isCentralPrediction = False #should be false for data, otherwise kappa is measured in data!
@@ -64,16 +64,16 @@ cQCD        = getChain(QCDHT,histname='')
 
 
 ## QCD estimation
-useQCDestimation = False
+useQCDestimation = True
 if not isData and useQCDestimation:
   #QCDpickle = '/data/dspitzbart/Results2016/QCDEstimation/20160212_QCDestimation_MC2p25fb_pkl'
-  QCDpickle = '/data/dspitzbart/Results2016/QCDEstimation/20160621_QCDestimation_2015SR_MC2p57fb_pkl'
+  QCDpickle = '/data/dspitzbart/Results2016/QCDEstimation/20160623_v3_QCDestimation_2015SR_MC2p57fb_pkl'
 if isData:
   #QCDpickle  = '/data/dspitzbart/Results2016/QCDEstimation/20160212_QCDestimation_data2p25fb_pkl'
-  QCDpickle  = '/data/dspitzbart/Results2016/QCDEstimation/20160621_QCDestimation_2015SR_data2p57fb_pkl'
+  QCDpickle  = '/data/dspitzbart/Results2016/QCDEstimation/20160623_v3_QCDestimation_2015SR_data2p57fb_pkl'
 if isData and validation:
   #QCDpickle  = '/data/dspitzbart/Results2016/QCDEstimation/20160218_QCDestimation_validation_data2p25fb_pkl'
-  QCDpickle  = '/data/dspitzbart/Results2016/QCDEstimation/20160621_QCDestimation_first_data2p57fb_pkl'
+  QCDpickle  = '/data/dspitzbart/Results2016/QCDEstimation/20160623_v3_QCDestimation_validation_data2p57fb_pkl'
 #QCDpickle  = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_2p1fb_pkl'
 #QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_extendedClosureTest3to4j_2p1fb_pkl'
 #QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_closureTest4to5j_2p1fb_pkl'
@@ -153,6 +153,9 @@ presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSoftLeptons=
 
 singleMu_presel = "((!isData&&singleMuonic)||(isData&&"+triggers+"&&(muonDataSet&&singleMuonic)&&"+filters+"))"
 singleMu_presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSoftLeptons==0 && Jet_pt[1]>80 && st>250 && nJet30>2 && htJet30j>500"
+
+singleEle_presel = "((!isData&&singleElectronic)||(isData&&"+triggers+"&&(eleDataSet&&singleElectronic)&&"+filters+"))"
+singleEle_presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSoftLeptons==0 && Jet_pt[1]>80 && st>250 && nJet30>2 && htJet30j>500"
 
 #presel = singleMu_presel
 

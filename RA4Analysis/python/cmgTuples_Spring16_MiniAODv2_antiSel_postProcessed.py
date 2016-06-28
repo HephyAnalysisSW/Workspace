@@ -1,7 +1,8 @@
 import copy, os, sys
-dirDaniel = '/data/dspitzbart/cmgTuples/postProcessed_Spring16_antiSelection_3fb/none/'
+#dirDaniel = '/data/dspitzbart/cmgTuples/postProcessed_Spring16_antiSelection_3fb/none/'
+dirDaniel = '/data/dspitzbart/cmgTuples/postProcessed_2016B_antiSelection_23062016/none/'
 
-TTJets_Lep = {\
+TTJets_Lep_antiSel = {\
 "name" : "TTJets_singleLep",
 "bins" : [
 "TTJets_SingleLeptonFromT_full",
@@ -12,7 +13,7 @@ TTJets_Lep = {\
 }
 
 
-WJetsHTToLNu = {\
+WJetsHTToLNu_antiSel = {\
 "name" : "W+Jets",
 "bins" : [
 "WJetsToLNu_HT200to400",
@@ -25,16 +26,16 @@ WJetsHTToLNu = {\
 'dir' : dirDaniel,
 }
 
-singleTop_inclusive = {\
-"name" : "singleTop_inclusive",
-"bins" : [
-"ST_tchannel_antitop_4f_inclusiveDecays_powheg",
-"ST_tW_antitop_5f_inclusiveDecays_powheg",
-],
-'dir' : dirDaniel,
-}
+#singleTop_inclusive = {\
+#"name" : "singleTop_inclusive",
+#"bins" : [
+#"ST_tchannel_antitop_4f_inclusiveDecays_powheg",
+#"ST_tW_antitop_5f_inclusiveDecays_powheg",
+#],
+#'dir' : dirDaniel,
+#}
 
-singleTop_lep = {\
+singleTop_lep_antiSel = {\
 "name" : "singleTop_lep",
 "bins" : [
 "ST_schannel_4f_leptonDecays",
@@ -45,7 +46,7 @@ singleTop_lep = {\
 'dir' : dirDaniel,
 }
 
-DY_madgraph = {\
+DY_madgraph_antiSel = {\
 "name" : "DY_madgraph",
 "bins" : [
 "DYJetsToLL_M50_madgraphMLM",
@@ -53,7 +54,18 @@ DY_madgraph = {\
 'dir' : dirDaniel,
 }
 
-DY_amc = {\
+DY_HT_antiSel = {\
+"name" : "DY_HT",
+"bins" : [
+"DYJetsToLL_M_50_HT_100to200",
+"DYJetsToLL_M_50_HT_200to400",
+"DYJetsToLL_M_50_HT_400to600",
+"DYJetsToLL_M_50_HT_600toInf",
+],
+'dir' : dirDaniel,
+}
+
+DY_amc_antiSel = {\
 "name" : "DY_amc",
 "bins" : [
 "DYJetsToLL_M_50_amcatnloFXFX_25ns",
@@ -62,7 +74,7 @@ DY_amc = {\
 }
 
 
-QCDHT = {\
+QCDHT_antiSel = {\
 "name":"QCD",
 "bins":[
 "QCD_HT1000to1500",
@@ -76,17 +88,17 @@ QCDHT = {\
 'dir' : dirDaniel,
 }
 
-diBoson = {\
-"name":"diBoson",
-"bins":[
-"DiBoson_WW",
-"DiBoson_WZ",
-"DiBoson_ZZ",
-],
-'dir': dirDaniel,
-}
+#diBoson = {\
+#"name":"diBoson",
+#"bins":[
+#"DiBoson_WW",
+#"DiBoson_WZ",
+#"DiBoson_ZZ",
+#],
+#'dir': dirDaniel,
+#}
 
-TTV = {
+TTV_antiSel = {
 "name":"TTV",
 "bins":[
 "TTWToLNu",

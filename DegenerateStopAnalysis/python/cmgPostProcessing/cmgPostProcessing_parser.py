@@ -55,7 +55,7 @@ def get_parser():
         action='store',
         nargs='?',
         type=str,
-        default='Spring15_7412pass2_mAODv2_v6',
+        default='Spring15_7412pass2_mAODv2_v7',
         help="Sample definition file (w/o .py) for the CMG ntuples to be post-processed"
         )
        
@@ -112,8 +112,7 @@ def get_parser():
         action='store',
         nargs='?',
         type=str,
-        choices=['soft', 'hard', 'inc', 'dilep'],
-        default='inc',
+        default='incLep',
         help="Lepton skimming to be applied for post-processing"
         )
     

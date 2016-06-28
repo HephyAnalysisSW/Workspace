@@ -13,7 +13,7 @@ from Workspace.RA4Analysis.helpers import *
 
 ROOT.gROOT.Reset()
 
-path = '/afs/hephy.at/user/d/dspitzbart/www/Spring15/25ns/templateFit_SFtemplates_fullSR_lep_data_2p25/'
+path = '/afs/hephy.at/user/d/dspitzbart/www/Spring15/25ns/templateFit_Spring16_templates_SR2015_lep_data_2p57/'
 
 files = [f for f in listdir(path) if isfile(join(path, f))]
 
@@ -141,7 +141,7 @@ for rfile in rootfiles:
   latex1.SetTextAlign(11)
   
   latex1.DrawLatex(0.16,0.96,'CMS #bf{#it{Preliminary}}')
-  latex1.DrawLatex(0.75,0.96,"#bf{2.3fb^{-1} (13TeV)}")
+  latex1.DrawLatex(0.75,0.96,"#bf{2.6fb^{-1} (13TeV)}")
   
   latex2 = ROOT.TLatex()
   latex2.SetNDC()
@@ -179,7 +179,7 @@ for rfile in rootfiles:
   leg.Draw()
   
   
-  printPath = '/afs/hephy.at/user/d/dspitzbart/www/Results2016/btagFitResults/'
+  printPath = '/afs/hephy.at/user/d/dspitzbart/www/Results2016B/btagFitResults_v2/'
   
   if not os.path.exists(printPath):
     os.makedirs(printPath)

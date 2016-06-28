@@ -42,7 +42,8 @@ separateBTagWeights = True
 
 defSampleStr = "TTJets_LO_HT600to800_25ns"
 
-subDir = "postProcessed_2016B_antiSelection_21062016"
+#subDir = "postProcessed_Spring16_antiSelection_3fb_v2"
+subDir = "postProcessed_2016B_antiSelection_23062016"
 
 #branches to be kept for data and MC
 branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert",
@@ -332,10 +333,10 @@ for isample, sample in enumerate(allSamples):
           s.puReweight_true_Down = PU_histo_66.GetBinContent(PU_histo_66.FindBin(nTrueInt))
           s.puReweight_true_Up = PU_histo_74.GetBinContent(PU_histo_74.FindBin(nTrueInt))
 
-          if "TTJets" in sample["name"] :
-            s.weight = lumiScaleFactor*genWeight
-          else:
-            s.weight = lumiScaleFactor*genWeight*xsectemp
+          #if "TTJets" in sample["name"] :
+          #  s.weight = lumiScaleFactor*genWeight
+          #else:
+          s.weight = lumiScaleFactor*genWeight*xsectemp
 
           if "TTJets" in sample['dbsName']:
             s.weight_XSecTTBar1p1 = s.weight*1.1 
@@ -462,7 +463,7 @@ for isample, sample in enumerate(allSamples):
           jets = filter(lambda j:j['pt']>30 and abs(j['eta'])<2.4 and j['id'], get_cmg_jets_fromStruct(r,j_list))
           #print "jets:" , jets
 #          lightJets_, bJetsCMVA = splitListOfObjects('btagCMVA', 0.732, jets) 
-          lightJets,  bJetsCSV = splitListOfObjects('btagCSV', 0.890, jets)
+          lightJets,  bJetsCSV = splitListOfObjects('btagCSV', 0.800, jets)
           #print "bjetsCMVA:" , bJetsCMVA , "bjetsCSV:" ,  bJetsCSV
           s.htJet30j = sum([x['pt'] for x in jets])
           s.nJet30 = len(jets)
@@ -477,7 +478,7 @@ for isample, sample in enumerate(allSamples):
         if options.leptonSelection == 'none':
 
           ### LEPTONS
-          vars = ['pt', 'eta', 'phi', 'mass', 'miniRelIso','relIso03', 'pdgId', 'eleCBID_SPRING15_25ns', 'eleCBID_SPRING15_25ns_ConvVetoDxyDz','mediumMuonId', 'sip3d', 'hOverE']
+          vars = ['pt', 'eta', 'phi', 'mass', 'miniRelIso','relIso03', 'pdgId', 'eleCBID_SPRING15_25ns', 'eleCBID_SPRING15_25ns_ConvVetoDxyDz','mediumMuonId', 'sip3d', 'hOverE', 'eleCutIdSpring15_25ns_v1']
           leptonIndices = [i for i in range(r.nLepGood)]
           leptons = [getObjDict(t, 'LepGood_', vars, i) for i in leptonIndices]
           nlep = len(leptonIndices)
@@ -545,9 +546,9 @@ for isample, sample in enumerate(allSamples):
               passConv = False
 
               #electron CutBased ID, ConvVeto, dxy,dz already included
-              passTightID = True if (lep['eleCBID_SPRING15_25ns_ConvVetoDxyDz'] == 4) else False
-              passMediumID = True if (lep['eleCBID_SPRING15_25ns_ConvVetoDxyDz'] >= 3) else False
-              passVetoID = True if (lep['eleCBID_SPRING15_25ns_ConvVetoDxyDz'] >= 1) else False
+              passTightID = True if (lep['eleCutIdSpring15_25ns_v1'] == 4) else False
+              passMediumID = True if (lep['eleCutIdSpring15_25ns_v1'] >= 3) else False
+              passVetoID = True if (lep['eleCutIdSpring15_25ns_v1'] >= 1) else False
 
               #selected electrons
               if passTightID:
@@ -615,8 +616,8 @@ for isample, sample in enumerate(allSamples):
               if lep['miniRelIso'] > 0.4: continue
 
               #use the eleCBID_SPRING15_25ns, ConvVeto, dxy, dz an not included
-              passMediumIDother = True if (lep['eleCBID_SPRING15_25ns'] >= 3) else False
-              passVetoIDother = True if (lep['eleCBID_SPRING15_25ns'] >= 1) else False
+              passMediumIDother = True if (lep['eleCutIdSpring15_25ns_v1'] >= 3) else False
+              passVetoIDother = True if (lep['eleCutIdSpring15_25ns_v1'] >= 1) else False
 
               #Anti-selected electrons with CBID <3
               if not passMediumIDother:
@@ -786,14 +787,14 @@ for isample, sample in enumerate(allSamples):
 
           s.nJet30clean = len(jet30Clean)
           s.htJet30clean = sum([j['pt'] for j in jet30Clean])
-#          lightJets,  bJetsCSV = splitListOfObjects('btagCSV', 0.890, jet30Clean)
+#          lightJets,  bJetsCSV = splitListOfObjects('btagCSV', 0.800, jet30Clean)
 
 #          print s.nJet30nonClean, s.nJet30clean
 #          print s.htJet30nonClean, s.htJet30clean
 
           bJetsCSV = []
           for i, j in enumerate(jet30Clean):
-            if j['btagCSV'] > 0.890:
+            if j['btagCSV'] > 0.800:
               bJetsCSV.append(j)
 
           s.nBJetMediumCSV30 = len(bJetsCSV)

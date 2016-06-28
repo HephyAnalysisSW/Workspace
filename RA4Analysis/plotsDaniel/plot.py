@@ -10,14 +10,16 @@ from Workspace.HEPHYPythonTools.helpers import *
 from Workspace.RA4Analysis.helpers import *
 from Workspace.RA4Analysis.signalRegions import *
 from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed import *
-#from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2_postProcessed import *
+from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2_postProcessed import *
 #from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed_2 import *
 
-#from Workspace.RA4Analysis.cmgTuples_Data25ns_miniAODv2_postprocessed import *
-#from Workspace.RA4Analysis.cmgTuples_Data25ns_Promtv2_postprocessed import *
+#from Workspace.RA4Analysis.cmgTuples_Data25ns_miniAODv2_postprocessed import * #2015 data
+from Workspace.RA4Analysis.cmgTuples_Data25ns_Promtv2_postprocessed import * #2016 data
 
 from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2_antiSel_postProcessed import *
 from Workspace.RA4Analysis.cmgTuples_Data25ns_Promtv2_antiSel_postprocessed import *
+
+from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_postProcessed_antiSel import *
 
 from Workspace.HEPHYPythonTools.user import username
 
@@ -38,6 +40,10 @@ totalWeight = 'weight'
 #25ns samples
 WJETS_15 = {'name':'WJets', 'chain':getChain(WJetsHTToLNu_25ns,histname=''), 'color':color('WJets')+1,'weight':totalWeight, 'niceName':'W+Jets S15', 'cut':''}
 WJETS_16 = {'name':'WJets', 'chain':getChain(WJetsHTToLNu,histname=''), 'color':color('WJets')-1,'weight':totalWeight, 'niceName':'W+Jets S16', 'cut':''}
+WJETS_16_antiSel = {'name':'WJets', 'chain':getChain(WJetsHTToLNu_antiSel,histname=''), 'color':color('WJets')-1,'weight':totalWeight, 'niceName':'W+Jets S16', 'cut':''}
+WJETS_15_antiSel = {'name':'WJets', 'chain':getChain(WJetsHTToLNu_25ns_antiSel,histname=''), 'color':color('WJets')+1,'weight':totalWeight, 'niceName':'W+Jets S16', 'cut':''}
+
+
 #WJETS_2 = {'name':'WJets', 'chain':getChain(WJetsHTToLNu_25ns_2,histname=''), 'color':ROOT.kOrange,'weight':totalWeight, 'niceName':'W+Jets fix', 'cut':''}
 
 
@@ -48,6 +54,7 @@ TTJets = {'name':'TTJets', 'chain':getChain(TTJets_HTLO_25ns,histname=''), 'colo
 TTJets_combined_15 = {'name':'TTJets', 'chain':getChain(TTJets_combined_25ns,histname=''), 'color':ROOT.kRed,'weight':totalWeight, 'niceName':'t#bar{t}+Jets S15', 'cut':''}
 #TTJets_combined_16 = {'name':'TTJets', 'chain':getChain(TTJets_combined,histname=''), 'color':ROOT.kCyan,'weight':totalWeight, 'niceName':'t#bar{t}+Jets S16', 'cut':''}
 TTJets_Lep_16 = {'name':'TTJets', 'chain':getChain(TTJets_Lep,histname=''), 'color':color('TTJets')-2,'weight':totalWeight, 'niceName':'t#bar{t}+Jets 1l S16', 'cut':''}
+TTJets_Lep_16_antiSel = {'name':'TTJets', 'chain':getChain(TTJets_Lep_antiSel,histname=''), 'color':color('TTJets')-2,'weight':totalWeight, 'niceName':'t#bar{t}+Jets 1l S16', 'cut':''}
 
 
 #TTJets_combined_2 = {'name':'TTJets', 'chain':getChain(TTJets_combined_2,histname=''), 'color':ROOT.kMagenta,'weight':totalWeight, 'niceName':'t#bar{t}+Jets fix', 'cut':''}
@@ -69,19 +76,28 @@ TTJets_combined_had_15 =       {'name':'TTJets', 'chain':TTJets_combined_15['cha
 
 DY_15 = {'name':'DY', 'chain':getChain(DY_25ns,histname=''), 'color':color('DY'),'weight':totalWeight, 'niceName':'Drell Yan', 'cut':''}
 DY_16_madgraph = {'name':'DY', 'chain':getChain(DY_madgraph,histname=''), 'color':color('DY')-1,'weight':totalWeight, 'niceName':'Drell Yan MG', 'cut':''}
+DY_16_madgraph_antiSel = {'name':'DY', 'chain':getChain(DY_madgraph_antiSel,histname=''), 'color':color('DY')-1,'weight':totalWeight, 'niceName':'Drell Yan', 'cut':''}
 DY_16_amc = {'name':'DY', 'chain':getChain(DY_amc,histname=''), 'color':ROOT.kYellow+1,'weight':totalWeight, 'niceName':'Drell Yan AMC', 'cut':''}
 
 singleTop_15 = {'name':'singleTop', 'chain':getChain(singleTop_25ns,histname=''), 'color':color('singleTop'),'weight':totalWeight, 'niceName':'t/#bar{t}', 'cut':''}
 singleTop_inc_16 = {'name':'singleTop', 'chain':getChain(singleTop_inclusive,histname=''), 'color':ROOT.kGreen+1,'weight':totalWeight, 'niceName':'t/#bar{t} S16 inc', 'cut':''}
 singleTop_lep_16 = {'name':'singleTop', 'chain':getChain(singleTop_lep,histname=''), 'color':color('singleTop')-2,'weight':totalWeight, 'niceName':'t/#bar{t} S16 lep', 'cut':''}
+singleTop_lep_16_antiSel = {'name':'singleTop', 'chain':getChain(singleTop_lep_antiSel,histname=''), 'color':color('singleTop')-2,'weight':totalWeight, 'niceName':'t/#bar{t} S16 lep', 'cut':''}
+
 
 QCD_15 = {'name':'QCD', 'chain':getChain(QCDHT_25ns,histname=''), 'color':color('QCD')+1,'weight':totalWeight, 'niceName':'QCD multijet S15', 'cut':''}
+QCD_15_antiSel = {'name':'QCD', 'chain':getChain(QCDHT_25ns_antiSel,histname=''), 'color':color('QCD')+1,'weight':totalWeight, 'niceName':'QCD multijet S15', 'cut':''}
+
 QCD_16 = {'name':'QCD', 'chain':getChain(QCDHT,histname=''), 'color':color('QCD')-1,'weight':totalWeight, 'niceName':'QCD multijet S16', 'cut':''}
+QCD_16_antiSel = {'name':'QCD', 'chain':getChain(QCDHT_antiSel,histname=''), 'color':color('QCD')-1,'weight':totalWeight, 'niceName':'QCD multijet S16', 'cut':''}
+
 
 #diBoson = {'name':'QCD', 'chain':getChain(diBoson,histname=''), 'color':ROOT.kMagenta,'weight':totalWeight, 'niceName':'WW/WZ/ZZ', 'cut':''}
 
 TTV_15 = {'name':'TTVH', 'chain':getChain(TTV_25ns,histname=''), 'color':color('TTV')+2,'weight':totalWeight, 'niceName':'t#bar{t}W/Z S15', 'cut':''}
 TTV_16 = {'name':'TTVH', 'chain':getChain(TTV,histname=''), 'color':color('TTV'),'weight':totalWeight, 'niceName':'t#bar{t}W/Z S16', 'cut':''}
+TTV_16_antiSel = {'name':'TTVH', 'chain':getChain(TTV_antiSel,histname=''), 'color':color('TTV'),'weight':totalWeight, 'niceName':'t#bar{t}W/Z S16', 'cut':''}
+
 
 Rest = {'name':'Rest', 'chain':getChain([TTV_25ns,singleTop_25ns,DY_25ns],histname=''), 'color':color('TTV'),'weight':totalWeight, 'niceName':'other EWK', 'cut':''}
 Bkg = {'name':'Bkg', 'chain':getChain([TTJets_HTLO_25ns,WJetsHTToLNu_25ns,QCDHT_25ns,TTV_25ns,singleTop_25ns,DY_25ns],histname=''), 'color':color('TTV'),'weight':totalWeight, 'niceName':'total Bkg', 'cut':''}
@@ -92,6 +108,12 @@ samples         = [WJETS_15, TTJets_combined_15, Rest, QCD_15]#, diBoson]
 samples2        = [WJETS_15, TTJets_combined_15, DY_15, singleTop_15, TTV_15, QCD_15]
 samplesTTcheck  = [WJETS_15, TTJets_combined_singleLep_15, TTJets_combined_diLep_15, TTJets_combined_had_15, Rest, QCD_15]#, diBoson]
 samples16       = [TTJets_Lep_16, DY_16_madgraph, WJETS_16, singleTop_lep_16, QCD_16, TTV_16]
+samples16_antiSel = [TTJets_Lep_16_antiSel, DY_16_madgraph_antiSel, WJETS_16_antiSel, singleTop_lep_16_antiSel, QCD_16_antiSel, TTV_16_antiSel]
+
+test_antiSel = {'name':'w/o DY', 'chain':getChain([TTV_antiSel,singleTop_lep_antiSel,TTJets_Lep_antiSel,WJetsHTToLNu_antiSel],histname=''), 'color':color('TTV'),'weight':totalWeight, 'niceName':'w/o DY', 'cut':''}
+EWK_antiSel = {'name':'w/o DY', 'chain':getChain([DY_madgraph_antiSel,TTV_antiSel,singleTop_lep_antiSel,TTJets_Lep_antiSel,WJetsHTToLNu_antiSel],histname=''), 'color':color('DY'),'weight':totalWeight, 'niceName':'all', 'cut':''}
+EWK_antiSel_15 = {'name':'w/o DY', 'chain':getChain([TTJets_combined_2_antiSel,WJetsHTToLNu_25ns_antiSel,TTV_25ns_antiSel,singleTop_25ns_antiSel,DY_25ns_antiSel],histname=''), 'color':ROOT.kGreen,'weight':totalWeight, 'niceName':'all', 'cut':''}
+
 
 #samplesComp = [WJETS, TTJETS, singleTop, DY, QCD]
 
@@ -142,8 +164,9 @@ stRB = {'name':'st', 'binning':[20,250,1250], 'titleX':'L_{T} [GeV]', 'titleY':'
 
 htRB = {'name':'htJet30j', 'binning':[22,500,2700], 'titleX':'H_{T} [GeV]', 'titleY':'Events', 'filename':'ht'}
 ht = {'name':'htJet30j', 'binning':[52,500,3100], 'titleX':'H_{T} [GeV]', 'titleY':'Events', 'filename':'ht'}
+htclean = {'name':'htJet30clean', 'binning':[31,0,3100], 'titleX':'H_{T} [GeV]', 'titleY':'Events', 'filename':'ht'}
 
-lp = {'name':'Lp', 'binning':[40,-2,2], 'titleX':'L_{P}', 'titleY':'Events', 'filename':'LP'}
+lp = {'name':'Lp', 'binning':[40,-1.5,2.5], 'titleX':'L_{P}', 'titleY':'Events', 'filename':'LP'}
 
 htSRB = {'name':'htJet30j', 'binning':[12,500,2500], 'titleX':'H_{T} [GeV]', 'titleY':'Events', 'filename':'ht'}
 
@@ -176,6 +199,16 @@ metNoHF = {'binning': [20, 0, 1000], 'name': 'metNoHF_pt', 'titleX': 'E_{T}^{mis
 metNoHFPhi = {'binning': [16, -3.2, 3.2], 'name': 'metNoHF_phi', 'titleX': '#Phi(E_{T}^{miss}) NoHF', 'titleY': 'Events'}
 #deltaPhiCMG = {'binning': [16, 0, 3.2], 'name': 'Sum$((acos((LepGood_pt+metNoHF_pt*cos(LepGood_phi-metNoHF_phi))/sqrt(LepGood_pt**2+metNoHF_pt**2+2*metNoHF_pt*LepGood_pt*cos(LepGood_phi-metNoHF_phi))))*'+electronId+')', 'titleX': '#Delta#Phi(W,l) NoHF', 'titleY': 'Events'}
 
+
+trigger = "&&((HLT_EleHT350||HLT_EleHT400)||(HLT_MuHT350||HLT_MuHT400))"
+filters = "&&Flag_goodVertices && Flag_HBHENoiseFilter_fix && Flag_eeBadScFilter && Flag_HBHENoiseIsoFilter "#&& veto_evt_list"
+
+presel = 'nLep==1&&nVeto==0&&leptonPt>25&&nEl==1&&Jet2_pt>80'
+antiSelStr = presel+'&&Selected==(-1)'+trigger+filters
+SelStr = presel+'&&Selected==1'+trigger+filters
+
+
+
 triggers = "(HLT_EleHT350||HLT_MuHT350)"
 #filters = "Flag_goodVertices && Flag_HBHENoiseFilter_fix && Flag_eeBadScFilter && Flag_HBHENoiseIsoFilter && veto_evt_list"
 filters = "Flag_goodVertices && Flag_HBHENoiseFilter_fix && Flag_eeBadScFilter && Flag_HBHENoiseIsoFilter"
@@ -192,6 +225,12 @@ multiMuonic = '(Sum$(abs(LepGood_pdgId)==13&&LepGood_pt>=25&&abs(LepGood_eta)<2.
 multiElectronic = '(Sum$(abs(LepGood_pdgId)==11&&LepGood_pt>=25&&abs(LepGood_eta)<2.5&&LepGood_miniRelIso<0.2&&LepGood_SPRING15_25ns_v1==4)>=1)'
 
 multiLeptonic = '('+multiMuonic+'||'+multiElectronic+')'
+
+
+presel_antiSel = 'nLep==1&&nVeto==0&&leptonPt>25&&nEl==1&&Jet2_pt>80'
+antiSelStr = presel_antiSel+'&&Selected==(-1)'
+SelStr = presel_antiSel+'&&Selected==1'+'&&(!isData||'+triggers + ')&&'+filters
+
 
 diMuonic = '(Sum$(abs(LepGood_pdgId)==13&&LepGood_pt>=25&&abs(LepGood_eta)<2.4&&LepGood_miniRelIso<0.2&&LepGood_mediumMuonId==1&&LepGood_sip3d<4.0)==2)'
 diElectronic = '(Sum$(abs(LepGood_pdgId)==11&&LepGood_pt>=25&&abs(LepGood_eta)<2.5&&LepGood_miniRelIso<0.2&&LepGood_SPRING15_25ns_v1==4)==2)'
@@ -269,6 +308,11 @@ newPreselCutEle = {'name':'presel','string':newpresel+'&&singleElectronic','nice
 newPreselCutMu  = {'name':'presel','string':newpresel+'&&singleMuonic','niceName':'Presel PosPdg'}
 
 newPreselCutMultiB = {'name':'presel','string':newpresel+'&&nJet30>5', 'signal':signalpresel, 'niceName':'Preselection'}
+
+name, cut = nameAndCut((250,-1),(500,-1),(3,4),btb=(0,0),presel=antiSelStr, charge="", btagVar = 'nBJetMediumCSV30', stVar = 'Lt', htVar = 'htJet30clean', njetVar='nJet30clean')
+QCD_SB_antiSel = {'name':'presel','string':cut, 'signal':'(1)', 'niceName':'Preselection'}
+name, cut = nameAndCut((250,-1),(500,-1),(3,4),btb=(0,0),presel=SelStr, charge="", btagVar = 'nBJetMediumCSV30', stVar = 'Lt', htVar = 'htJet30clean', njetVar='nJet30clean')
+QCD_SB_Sel = {'name':'presel','string':cut, 'signal':'(1)', 'niceName':'Preselection'}
 
 
 CutNeg = {'name':'presel','string':'leptonPdg<0','niceName':'Presel NegPdg'}
@@ -434,6 +478,7 @@ nbjetComp = {'name':btagStr, 'binning':[6,0,6], 'titleX':'n_{b-jets}', 'titleY':
 name, allSRcut = nameAndCut((250,-1),(500,-1),(3,-1),btb=(0,-1),presel=newpresel)
 #data = {'name':'data', 'chain':getChain([single_mu_Run2015D, single_ele_Run2015D],histname=''), 'cut':newpresel+allSRcut+'&&nBJetMediumCSV30==0'}
 data = {'name':'data', 'chain':getChain([single_mu_Run2016B, single_ele_Run2016B],histname=''), 'cut':newpresel+allSRcut+'&&nBJetMediumCSV30==0'}
+data_antiSel = {'name':'data', 'chain':getChain([single_mu_Run2016B_antiSel, single_ele_Run2016B_antiSel],histname=''), 'cut':newpresel+allSRcut+'&&nBJetMediumCSV30==0'}
 
 
 deltaPhiCMG_NoHF = {'binning': [30, 0, 3.2], 'name': 'Sum$((acos((LepGood_pt+metNoHF_pt*cos(LepGood_phi-metNoHF_phi))/sqrt(LepGood_pt**2+metNoHF_pt**2+2*metNoHF_pt*LepGood_pt*cos(LepGood_phi-metNoHF_phi))))*'+LeptonId+')', 'titleX': '#Delta#Phi(W,l) NoHF', 'titleY': 'Events'}

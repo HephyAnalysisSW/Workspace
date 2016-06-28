@@ -31,6 +31,8 @@ python cmgPostProcessing.py --overwrite  --calcbtagweights --manScaleFactor=1.0 
 #python cmgPostProcessing.py --overwrite  --calcbtagweights --manScaleFactor=1.0    --skim="LHEHTlg600" --samples=TTJets_LO_HT1200to2500_25ns
 #python cmgPostProcessing.py --overwrite  --calcbtagweights --manScaleFactor=1.0    --skim="LHEHTlg600" --samples=TTJets_LO_HT2500toInf_25ns
 
+#python cmgPostProcessing.py --overwrite  --calcbtagweights --skim="HT500ST250" --samples=TTJets_LO
+
 #python cmgPostProcessing.py --overwrite  --manScaleFactor=1.    --skim="HT500ST250" --samples=TTJets_LO
 
 

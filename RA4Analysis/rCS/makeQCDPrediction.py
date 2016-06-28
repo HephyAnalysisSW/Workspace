@@ -23,19 +23,19 @@ from math import *
 from Workspace.HEPHYPythonTools.user import username
 from LpTemplateFit import LpTemplateFit
 
-isData = False
+isData = True
 
 if isData:
   sampleStr = 'data'
 else:
   sampleStr = 'MC'
 
-preprefix = 'QCDestimation/2015SR_2p57fb/'+sampleStr
+preprefix = 'QCDestimation/validation_v3_2p57fb/'+sampleStr
 wwwDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/'+preprefix+'/'
 picklePath = '/data/'+username+'/Results2016/QCDEstimation/'
 prefix = 'Lp_singleElectronic_'
-picklePresel = '20160621_QCDestimation_2015SR_'+sampleStr+'2p57fb_pkl'
-pickleFit    = '20160621_fitResult_2015SR_'+sampleStr+'2p57fb_pkl'
+picklePresel = '20160623_v3_QCDestimation_validation_'+sampleStr+'2p57fb_pkl'
+pickleFit    = '20160623_v3_fitResult_validation_'+sampleStr+'2p57fb_pkl'
 
 if not os.path.exists(wwwDir):
   os.makedirs(wwwDir)
@@ -43,7 +43,7 @@ if not os.path.exists(wwwDir):
 ##############################################
 ###   Define sidebands for QCD estimation  ###
 ### (3,4) in std est., (3,3) in validation ###
-QCD_SB = (3,4)
+QCD_SB = (3,3)
 
 inclusiveTemplate = {QCD_SB: {(250,  -1): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}}}} #use inclusive LT,HT region to get the shape for the fit template
 
@@ -53,8 +53,8 @@ fitCR =  {QCD_SB: {(250,  -1): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}},
                    (350, 450): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}},
                    (450, -1):  {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}}}}
 
-#SRs = validationRegionAll
-SRs = signalRegion3fb
+SRs = validationRegionAll
+#SRs = signalRegion3fb
 
 signalRegion = makeQCDsignalRegions(SRs, QCDSB=QCD_SB)
 
@@ -62,7 +62,8 @@ btreg = [(0,0), (1,1), (2,-1)] #1b and 2b estimates are needed for the btag fit
 
 def makeWeight(lumi=3., sampleLumi=3.,debug=False):
   #reWeight = 'lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*TopPtWeight*0.94*puReweight_true_max4'
-  reWeight = 'lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*0.94*TopPtWeight'
+  #reWeight = 'lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*0.94*TopPtWeight'
+  reWeight = '(1)'
   if debug:
     print 'No lumi-reweighting done!!'
     return 'weight', 'weight*weight'
@@ -122,13 +123,13 @@ SelStr = presel+'&&Selected==1'
 #cQCD  = getChain(QCDHT_25ns,histname='')
 #cEWK  = getChain([WJetsHTToLNu_25ns, TTJets_combined_2, singleTop_25ns, DY_25ns, TTV_25ns],histname='')
 
-cQCD  = getChain(QCDHT,histname='')
-cEWK  = getChain([WJetsHTToLNu, TTJets_Lep, singleTop_lep, DY_amc, TTV],histname='')
+cQCD  = getChain(QCDHT_antiSel,histname='')
+cEWK  = getChain([WJetsHTToLNu_antiSel, TTJets_Lep_antiSel, singleTop_lep_antiSel, DY_HT_antiSel, TTV_antiSel],histname='')
 
 if isData:
-  cData = getChain(single_ele_Run2016B, histname='')
+  cData = getChain(single_ele_Run2016B_antiSel, histname='')
 else:
-  cData = getChain([QCDHT, WJetsHTToLNu, TTJets_Lep, singleTop_lep, DY_madgraph, TTV] , histname='')
+  cData = getChain([QCDHT_antiSel, WJetsHTToLNu_antiSel, TTJets_Lep_antiSel, singleTop_lep_antiSel, DY_HT_antiSel, TTV_antiSel] , histname='')
 
 #get template for fit method
 template_QCD = ROOT.TH1F('template_QCD','template_QCD',30,-0.5,2.5)

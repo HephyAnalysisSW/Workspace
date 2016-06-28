@@ -127,6 +127,17 @@ DY_madgraph = {\
 'dir' : dirDaniel,
 }
 
+DY_HT = {\
+"name" : "DY_HT",
+"bins" : [
+"DYJetsToLL_M_50_HT_100to200",
+"DYJetsToLL_M_50_HT_200to400",
+"DYJetsToLL_M_50_HT_400to600",
+"DYJetsToLL_M_50_HT_600toInf",
+],
+'dir' : dirDaniel,
+}
+
 DY_amc = {\
 "name" : "DY_amc",
 "bins" : [

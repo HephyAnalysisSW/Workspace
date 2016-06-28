@@ -13,9 +13,9 @@
 #       $1 compulsory; 
 #          set sample as defined in runPostProcessing.sh
 #       $2 optional for MC samples, must be set to 'DATA' for data
-#          if 'DATA', take cmgTuples="Data25ns_v6", for any other value takes cmgTuples="Spring15_7412pass2_mAODv2_v6"
+#          if 'DATA', take cmgTuples="Data25ns_v7", for any other value takes cmgTuples="Spring15_7412pass2_mAODv2_v7"
 #       $3 optional;
-#          if 'TEST', add to "_TEST" to CMG_POST_PROCESSING_TAG, e.g. "74X_postProcessing_v4_TEST"
+#          if 'TEST', add to "_TEST" to CMG_POST_PROCESSING_TAG, e.g. "74X_postProcessing_v6_TEST"
 #          with 'TEST', it also add '--verbose'
 #
 # 
@@ -39,20 +39,20 @@ SAMPLE_SET=$1
 
 # semi-hard-coded parameters
 if [[ ${2} == "DATA" ]]; then 
-    CMG_TUPLES="Data25ns_v6"
+    CMG_TUPLES="Data25ns_v7"
 else
-    CMG_TUPLES="Spring15_7412pass2_mAODv2_v6"
+    CMG_TUPLES="Spring15_7412pass2_mAODv2_v7"
 fi
 
-CMG_POST_PROCESSING_TAG="74X_postProcessing_v4"
+CMG_POST_PROCESSING_TAG="74X_postProcessing_v7"
 VERBOSE=""
 if [[ ${3} == "TEST" ]]; then 
-    CMG_POST_PROCESSING_TAG="74X_postProcessing_v4_TEST"
+    CMG_POST_PROCESSING_TAG="74X_postProcessing_v7_TEST"
     VERBOSE="--verbose"
 fi
 
 # hard-coded parameters - modify them according to desired full set
-CMG_PROCESSING_TAG="7412pass2_mAODv2_v6"
+CMG_PROCESSING_TAG="7412pass2_mAODv2_v7"
 PARAMETER_SET="analysisHephy_13TeV_v0"
 
 # the rest of the parameters are the default parameters from cmgPostProcessing_parser.py
@@ -80,8 +80,7 @@ if [[ ${CMSSW_ACTION} == "R" ]]; then
         --cmgPostProcessingTag=${CMG_POST_PROCESSING_TAG} \
         --processLepAll \
         --skimGeneral='' \
-        --skimLepton='inc' \
-        --skimPreselect \
+        --skimLepton='oneLep' \
         --run \
         ${VERBOSE}
 fi

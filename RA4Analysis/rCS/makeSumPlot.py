@@ -41,7 +41,9 @@ prefix = 'singleLeptonic_Spring16_'
 #pickleDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_fullSR_lep_data_Moriond_2p3/'
 #pickleDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_validation_4j_lep_data_2p3/'
 #pickleDir = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_VreducedSR_lep_data_0p8/'
-pickleDir = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_validation_4j_lep_data_2p57/'
+
+#pickleDir = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_validation_4j_lep_data_2p57/'
+pickleDir = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2015_lep_data_2p57/'
 
 res = pickle.load(file(pickleDir+'resultsFinal_withSystematics_pkl'))
 if withSystematics:
@@ -320,6 +322,23 @@ for srNJet in sorted(signalRegions):
         truth_H.SetBinContent(i,res[srNJet][stb][htb]['tot_truth'])
         truth_H.SetBinError(i,  res[srNJet][stb][htb]['tot_truth_err'])
         truth_H.GetXaxis().SetBinLabel(i, str(i))
+        
+        ratioX.append(i-0.5)
+        ratioY.append(1)
+        ratioXErr.append(0)
+        ratioYUp.append(0.)
+        ratioYDown.append(0.)
+
+        dataPX.append(i-0.5)
+        dataPY.append(1)
+        dataPXErr.append(0)
+        dataPYUp.append(0)
+        dataPYDown.append(0)
+
+        kappaPX.append(i-0.5)
+        kappaPY.append(res[srNJet][stb][htb]['tot_kappa'])
+        kappaPXErr.append(0.5)
+        kappaPYErr.append(res[srNJet][stb][htb]['tot_kappa_err'])
 
       if signal:
         benchmark1_H.SetBinContent(i,res[srNJet][stb][htb]['tot_pred_final']+sig[srNJet][stb][htb]['signals'][1000][700]['yield_MB_SR'])
@@ -395,7 +414,7 @@ h_Stack.Add(w_pred_H)
 h_Stack.Add(tt_pred_H)
 if validation:
   h_Stack.SetMaximum(300)
-  h_Stack.SetMinimum(0.080)
+  h_Stack.SetMinimum(0.40)
 else:
   h_Stack.SetMaximum(100)
   h_Stack.SetMinimum(0.080)
@@ -544,9 +563,9 @@ if not unblinded:
 else:
   suffix = ''
 
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_ICHEP.png')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_ICHEP.root')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_ICHEP.pdf')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_fullStatus_v2.png')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_fullStatus_v2.root')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_fullStatus_v2.pdf')
 
 can2 = ROOT.TCanvas('can2','can2',700,700)
 
@@ -585,7 +604,7 @@ leg2.Draw()
 latex2.DrawLatex(0.16,0.96,'CMS #bf{#it{'+latextitle+'}}')
 latex2.DrawLatex(0.79,0.96,"#bf{MC (13TeV)}")
 
-can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/'+predictionName+'_Kappa_ICHEP.png')
-can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/'+predictionName+'_Kappa_ICHEP.root')
-can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/'+predictionName+'_Kappa_ICHEP.pdf')
+can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/'+predictionName+'_Kappa_fullStatus.png')
+can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/'+predictionName+'_Kappa_fullStatus.root')
+can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/'+predictionName+'_Kappa_fullStatus.pdf')
 
