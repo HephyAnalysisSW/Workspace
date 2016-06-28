@@ -3,10 +3,10 @@ import os
 
 
 veto_lists_dict = {
-                  "csc":  "/data/easilar/EventVetoList_filters/csc2015_Dec01.txt",
-                  "ecal":   "/data/easilar/EventVetoList_filters/ecalscn1043093_Dec01.txt",
-                  "muon":   "/data/easilar/EventVetoList_filters/muonBadTrack.txt",
-                  "badresol":   "/data/easilar/EventVetoList_filters/badResolutionTrack.txt",
+                  "csc":  "/data/nrad/EventVetoLists/csc2015_Dec01.txt",
+                  "ecal":   "/data/nrad/EventVetoLists/ecalscn1043093_Dec01.txt",
+                  "muon":   "/data/nrad/EventVetoLists/muonBadTrack.txt",
+                  "badresol":   "/data/nrad/EventVetoLists/badResolutionTrack.txt",
                   }
 
 
