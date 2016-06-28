@@ -34,7 +34,7 @@ lepSels = [
 bkg_samples=[
 {'sample':'TTVH',      "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":TTV ,'tex':'t#bar{t}V','color':ROOT.kOrange-3},
 {"sample":"DiBosons",  "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":diBoson ,"tex":"WW/WZ/ZZ","color":ROOT.kRed+3},
-{"sample":"DY",        "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":DY_madgraph,"tex":"DY + jets",'color':ROOT.kRed-6},
+{"sample":"DY",        "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":DYHT,"tex":"DY + jets",'color':ROOT.kRed-6},
 {"sample":"singleTop", "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":singleTop_lep,"tex":"t/#bar{t}",'color': ROOT.kViolet+5},
 {"sample":"QCD",       "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":QCDHT, "tex":"QCD","color":ROOT.kCyan-6},
 {"sample":"WJets",     "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":WJetsHTToLNu,"tex":"W + jets","color":ROOT.kGreen-2},
@@ -44,14 +44,6 @@ bkg_samples=[
 for bkg in bkg_samples:
     bkg['chain'] = getChain(bkg['name'],maxN=maxN,histname="",treeName="Events")
 
-
-#samples=[
-#{"sample":"DY",           "list":[DY_HT200to400,DY_HT400to600,DY_HT600toInf],"tex":"DY + jets",'color':ROOT.kRed-6},
-#{"sample":"singleTop",    "list":[T_tWch,TBar_tWch,TToLeptons_tch],"tex":"single top",'color': ROOT.kViolet+5},
-#{"sample":"QCD",          "list":[QCD_HT200to300,QCD_HT300to500,QCD_HT500to700,QCD_HT700to1000,QCD_HT1000to1500,QCD_HT1500to2000,QCD_HT2000toInf], "tex":"QCD","color":ROOT.kCyan-6},        
-#{"sample":"WJets",        "list":[WJets],"tex":"W + jets","color":ROOT.kGreen-2},
-#{"sample":"ttJets",       "list":[TTJets], "tex":"ttbar + jets",'color':ROOT.kBlue-4},
-#]
 
 for lepSel in lepSels:
   cuts = [

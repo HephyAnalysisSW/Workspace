@@ -188,7 +188,7 @@ TTV = {
 "TTZToLLNuNu",
 #"TTZToQQ",
 ],
-'dir' : dirDaniel2,
+'dir' : dirDaniel,
 }
 
 allSignalStrings=[\
