@@ -4,39 +4,56 @@
 # contributions from:
 #   https://github.com/HephySusySW/Workspace
 #   https://github.com/CERN-PH-CMG/cmg-cmssw.git
-#   https://github.com/HephySusySW/cmg-cmssw.git
+#   https://github.com/HephySusySW/cmgtools-lite
 #
 # Usage: in sh shell execute
+#   source ./manageRelease.sh WORKSPACE_TAG_BRANCH CMGTOOLS_LITE_TAG_BRANCH
+#   or
 #   source ./manageRelease.sh WORKSPACE_TAG_BRANCH
+#   or
+#   source ./manageRelease.sh
+
 # in the directory where the realease has to be checkout and built
 #
-# if no argument is given, the default branch or tag given below will be used. 
+# if no argument or one argument is given, the default branch(es) or tag(s) given below will be used. 
 
 # set parameters
 CMSSW_ACTION="CB"
 
-if [[ $# -ne 1 ]]; then 
-    # default tag or branch
-    WORKSPACE_TAG_BRANCH="74X-master"
-else
+if [[ $# -eq 2 ]]; then
+    # Workspace and cmgtools-lite tags / branches from cli
     WORKSPACE_TAG_BRANCH=$1
+    CMGTOOLS_LITE_TAG_BRANCH=$2
+elif [[ $# -eq 1 ]]; then
+    # Workspace tag / branch only from cli, fixed tag / branch for cmgtools-lite
+    WORKSPACE_TAG_BRANCH=$1
+    CMGTOOLS_LITE_TAG_BRANCH="80X_DegStop"
+else
+    # default tags or branches
+    WORKSPACE_TAG_BRANCH="80X-master"
+    CMGTOOLS_LITE_TAG_BRANCH="80X_DegStop"
 fi
 
 # activate debuging
 set -vx
 
+# release and architecture, 
+CMSSW_RELEASE="CMSSW_8_0_11"
+SCRAM_ARCH_VAL="slc6_amd64_gcc530"
+
 if [[ ${CMSSW_ACTION} == "CB" || ${CMSSW_ACTION} == "R" ]]; then
 
-    export SCRAM_ARCH=slc6_amd64_gcc491
+    export SCRAM_ARCH=${SCRAM_ARCH_VAL}
 
-    scram project CMSSW CMSSW_7_4_12_patch4 
-    cd CMSSW_7_4_12_patch4/src
+    scram project CMSSW ${CMSSW_RELEASE}
+    cd ${CMSSW_RELEASE}/src
     eval `scram runtime -sh`
+    
 fi
 
 if [[ ${CMSSW_ACTION} == "CB" ]]; then
 
-    # create empty repository (with the cmssw trick to keep the repository small)
+    # create empty repository 
     git cms-init
     
     # clone Vienna Workspace repository
@@ -48,20 +65,12 @@ if [[ ${CMSSW_ACTION} == "CB" ]]; then
     cd ${CMSSW_BASE}/src
     eval `scram runtime -sh`
 
-    # add the central CMG repository, and fetch it
-    # limit the fetch to the 7_4_12-related branches, to avoid loading all the past history of CMGTools
-    git remote add cmg-central https://github.com/CERN-PH-CMG/cmg-cmssw.git -f \
-        -t CMGTools-from-CMSSW_7_4_12 -t heppy_74X
-    git fetch cmg-central
-
-    # add your mirror
-    git remote add cmg-hephy https://github.com/HephySusySW/cmg-cmssw.git -f \
-        -t CMGTools-from-CMSSW_7_4_12_LocalDevelopmentsPass2_DegStop
-    git fetch cmg-hephy
+    # add the central cmg-cmssw repository to get the Heppy 80X branch
+    git remote add cmg-central https://github.com/CERN-PH-CMG/cmg-cmssw.git  -f  -t heppy_80X
 
     # configure the sparse checkout
     git config core.sparsecheckout true
-    /bin/cp /afs/cern.ch/user/c/cmgtools/public/sparse-checkout_7412_heppy .git/info/sparse-checkout
+    /bin/cp /afs/cern.ch/user/c/cmgtools/public/sparse-checkout_80X_heppy .git/info/sparse-checkout
     
     echo
     echo "\n sparse-checkout file: \n"
@@ -69,23 +78,23 @@ if [[ ${CMSSW_ACTION} == "CB" ]]; then
     echo 
         
     # add some additional packages (optional)
-    echo "/CMGTools/ObjectStudies/" >> .git/info/sparse-checkout
     echo "/JetMETCorrections/Type1MET/" >> .git/info/sparse-checkout
     echo "/PhysicsTools/PatAlgos/" >> .git/info/sparse-checkout
     echo "/PhysicsTools/PatUtils/" >> .git/info/sparse-checkout
     echo "/DataFormats/FWLite/" >> .git/info/sparse-checkout
 
     
-    # checkout the CMGTools branch of the release
-    git checkout -b CMGTools-from-CMSSW_7_4_12_LocalDevelopmentsPass2_DegStop \
-        cmg-hephy/CMGTools-from-CMSSW_7_4_12_LocalDevelopmentsPass2_DegStop
+    # checkout the base heppy packages
+    git checkout -b heppy_80X cmg-central/heppy_80X
    
-    # create also the heppy branch
-    git branch heppy_74X cmg-central/heppy_74X
+    # get the CMGTools subsystem from the cmgtools-lite repository
+    git clone -o cmg-central https://github.com/CERN-PH-CMG/cmgtools-lite.git -b 80X CMGTools
+    cd CMGTools
     
-    #
-    git gc --prune=now
-    git read-tree -mu HEAD
+    # add your fork, fetch the changes, checkout the branch/tag
+    git remote add cmg-lite-hephy https://github.com/HephySusySW/cmgtools-lite.git
+    git fetch cmg-lite-hephy
+    git checkout -b ${CMGTOOLS_LITE_TAG_BRANCH} cmg-lite-hephy/${CMGTOOLS_LITE_TAG_BRANCH}
     
     #compile
     cd $CMSSW_BASE/src

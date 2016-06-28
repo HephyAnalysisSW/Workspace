@@ -5,7 +5,7 @@
 #    Prerequisite:
 #      set-up the production release (e.g. via manageRelease.sh from script directory)
 #      in the base repository (where the release was checked out)
-#        ln -s CMSSW_7_4_12_patch4/src/Workspace/DegenerateStopAnalysis/python/cmgPostProcessing/runPostProcessing.sh .
+#        ln -s CMSSW_8_0_11/src/Workspace/DegenerateStopAnalysis/python/cmgPostProcessing/runPostProcessing.sh .
 #    Run steps:   
 #       From the base repository, where the link was done:
 #       nohup krenew -t -K 10 -- bash -c "./runPostProcessing.sh $1 [$2 [3]]" & ; disown
@@ -13,9 +13,9 @@
 #       $1 compulsory; 
 #          set sample as defined in runPostProcessing.sh
 #       $2 optional for MC samples, must be set to 'DATA' for data
-#          if 'DATA', take cmgTuples="Data25ns_v7", for any other value takes cmgTuples="Spring15_7412pass2_mAODv2_v7"
+#          take cmgTuples=${CMG_TUPLES} as defined below in the if block
 #       $3 optional;
-#          if 'TEST', add to "_TEST" to CMG_POST_PROCESSING_TAG, e.g. "74X_postProcessing_v6_TEST"
+#          if 'TEST', add to "_TEST" to CMG_POST_PROCESSING_TAG, e.g. "80X_postProcessing_v0_TEST"
 #          with 'TEST', it also add '--verbose'
 #
 # 
@@ -28,8 +28,8 @@
 #set -vx
 
 # release and architecture, 
-CMSSW_RELEASE="CMSSW_7_4_12_patch4"
-SCRAM_ARCH_VAL="slc6_amd64_gcc491"
+CMSSW_RELEASE="CMSSW_8_0_11"
+SCRAM_ARCH_VAL="slc6_amd64_gcc530"
 CMSSW_ACTION="R"
 
 # set parameters 
@@ -39,21 +39,21 @@ SAMPLE_SET=$1
 
 # semi-hard-coded parameters
 if [[ ${2} == "DATA" ]]; then 
-    CMG_TUPLES="Data25ns_v7"
+    CMG_TUPLES="Data2016_v0"
 else
-    CMG_TUPLES="Spring15_7412pass2_mAODv2_v7"
+    CMG_TUPLES="RunIISpring16MiniAODv2_v0"
 fi
 
-CMG_POST_PROCESSING_TAG="74X_postProcessing_v7"
+CMG_POST_PROCESSING_TAG="80X_postProcessing_v0"
 VERBOSE=""
 if [[ ${3} == "TEST" ]]; then 
-    CMG_POST_PROCESSING_TAG="74X_postProcessing_v7_TEST"
+    CMG_POST_PROCESSING_TAG="80X_postProcessing_v0_TEST"
     VERBOSE="--verbose"
 fi
 
 # hard-coded parameters - modify them according to desired full set
-CMG_PROCESSING_TAG="7412pass2_mAODv2_v7"
-PARAMETER_SET="analysisHephy_13TeV_v0"
+CMG_PROCESSING_TAG="8011_mAODv2_v0"
+PARAMETER_SET="analysisHephy_13TeV_2016_v0"
 
 # the rest of the parameters are the default parameters from cmgPostProcessing_parser.py
 
@@ -80,7 +80,7 @@ if [[ ${CMSSW_ACTION} == "R" ]]; then
         --cmgPostProcessingTag=${CMG_POST_PROCESSING_TAG} \
         --processLepAll \
         --skimGeneral='' \
-        --skimLepton='oneLep' \
+        --skimPreselect \
         --run \
         ${VERBOSE}
 fi

@@ -53,6 +53,19 @@ sampleSets = {
                                         ],
                              
                             },
+
+                'wjets_Spring2016':{
+                            'samples':[
+                                         ["WJetsToLNu_HT100to200_ext", "--skimPreselect"],
+                                         ["WJetsToLNu_HT200to400", "--skimPreselect"],
+                                         ["WJetsToLNu_HT200to400_ext", "--skimPreselect"],
+                                         ["WJetsToLNu_HT400to600", "--skimPreselect"],
+                                         ["WJetsToLNu_HT600to800", "--skimPreselect"],
+                                         ["WJetsToLNu_HT800to1200_ext", "--skimPreselect"],
+                                        ],
+                             
+                            },
+
                 'ttjets':{
                             'samples':[
                                         "TTJets_LO",                                   
@@ -61,6 +74,18 @@ sampleSets = {
                                         "TTJets_LO_HT800to1200",
                                         "TTJets_LO_HT1200to2500",
                                         "TTJets_LO_HT2500toInf",
+                                        ],
+                             
+                            },
+                'ttjets_Spring16':{
+                            'samples':[
+                                        "TTJets_LO",                                   
+                                        ["TTJets_LO",                   "--skimGeneral='lheHTlow'"      ],
+                                        ["TTJets_LO_HT600to800_ext",    "--skimGeneral='lheHThigh'"     ],
+                                        "TTJets_LO_HT800to1200_ext",
+                                        "TTJets_LO_HT1200to2500_ext",
+                                        "TTJets_LO_HT2500toInf",
+                                        
                                         ],
                              
                             },
@@ -150,6 +175,16 @@ sampleSets = {
                                         "SingleElectron_Run2015D_v4",   
                                         "SingleMuon_Run2015D_05Oct",    
                                         "SingleMuon_Run2015D_v4",       
+                                        ],
+                             
+                            },
+
+                'data_2016':{
+                            'samples':[
+
+                                        "MET_Run2016B_PromptReco_v2",           
+                                        "SingleMuon_Run2016B_PromptReco_v2",              
+                                        "SingleElectron_Run2016B_PromptReco_v2",
                                         ],
                              
                             },

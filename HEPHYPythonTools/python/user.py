@@ -35,5 +35,5 @@ if os.environ['USER'] in ['dhandl']:
 if os.environ['USER'] in ['vghete']:
   defaultPlotPath = "/afs/hephy.at/user/v/vghete/www/"
   saveDir         = defaultPlotPath 
-  afsDataName  = 'vghete01'
+  afsDataName  = 'vghete02'
   username = 'vghete'
