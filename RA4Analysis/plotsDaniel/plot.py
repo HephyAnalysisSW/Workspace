@@ -317,9 +317,12 @@ newPreselCutMultiB = {'name':'presel','string':newpresel+'&&nJet30>5', 'signal':
 
 name, cut = nameAndCut((250,-1),(500,-1),(3,4),btb=(0,0),presel=antiSelStr, charge="", btagVar = 'nBJetMediumCSV30', stVar = 'Lt', htVar = 'htJet30clean', njetVar='nJet30clean')
 QCD_SB_antiSel = {'name':'presel','string':cut, 'signal':'(1)', 'niceName':'QCD SB, anti-sel'}
+name, cut = nameAndCut((250,350),(500,-1),(3,4),btb=(0,0),presel=antiSelStr, charge="", btagVar = 'nBJetMediumCSV30', stVar = 'Lt', htVar = 'htJet30clean', njetVar='nJet30clean')
+QCD_SB_antiSel_LT1 = {'name':'presel','string':cut, 'signal':'(1)', 'niceName':'QCD SB, anti-sel LT1'}
 name, cut = nameAndCut((250,-1),(500,-1),(3,4),btb=(0,0),presel=SelStr, charge="", btagVar = 'nBJetMediumCSV30', stVar = 'Lt', htVar = 'htJet30clean', njetVar='nJet30clean')
 QCD_SB_Sel = {'name':'presel','string':cut, 'signal':'(1)', 'niceName':'QCD SB, selected       '}
-
+name, cut = nameAndCut((250,350),(500,-1),(3,4),btb=(0,0),presel=SelStr, charge="", btagVar = 'nBJetMediumCSV30', stVar = 'Lt', htVar = 'htJet30clean', njetVar='nJet30clean')
+QCD_SB_Sel_LT1 = {'name':'presel','string':cut, 'signal':'(1)', 'niceName':'QCD SB, selected LT1         '}
 
 CutNeg = {'name':'presel','string':'leptonPdg<0','niceName':'Presel NegPdg'}
 CutPos = {'name':'presel','string':'leptonPdg>0','niceName':'Presel PosPdg'}
