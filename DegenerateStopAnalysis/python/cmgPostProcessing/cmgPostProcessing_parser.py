@@ -95,8 +95,8 @@ def get_parser():
         action='store',
         nargs='?',
         type=str,
-        choices=['analysisHephy_13TeV_v0', 'analysisHephy_8vs13TeV_v0', 'syncLip_v0', ],
-        default='analysisHephy_13TeV_v0',
+        choices=['analysisHephy_13TeV_2016_v0', 'analysisHephy_13TeV_v0', 'analysisHephy_8vs13TeV_v0', 'syncLip_v0', ],
+        default='analysisHephy_13TeV_2016_v0',
         help="Selection of the parameter set used for post-processing." 
         )
 
@@ -146,6 +146,11 @@ def get_parser():
     argParser.add_argument('--storeOnlyLepAll',
         action='store_true',
         help="Store only LepAll, do not store LepGood and LepOther. Effective only if processLepAll = True"
+        )
+
+    argParser.add_argument('--applyEventVetoList',
+        action='store_true',
+        help="Apply event veto list, if applyEventVetoList = True"
         )
 
     argParser.add_argument('--runSmallSample',

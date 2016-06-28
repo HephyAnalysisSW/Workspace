@@ -2389,7 +2389,7 @@ def cmgPostProcessing(argv=None):
                         saveTree = processGenTracksFunction(readTree, splitTree, saveTree)
                     
                     # process event veto list flags
-                    if isDataSample:
+                    if isDataSample and args.applyEventVetoList:
                         saveTree = processEventVetoList(
                             readTree, splitTree, saveTree, event_veto_list
                             )
