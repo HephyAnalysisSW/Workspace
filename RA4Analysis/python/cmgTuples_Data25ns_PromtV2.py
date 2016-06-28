@@ -8,7 +8,8 @@ import copy, os, sys
 #data_path_2 = '/data/dspitzbart/cmgTuples/Run2016B-PromptReco-v2/cmgTuples_SingleMuon_Run2016B-PromptReco-v2_heppy/'
 #data_path = '/data/easilar/cmgTuples/Run2016B-PromptReco-v2/fromHenning_804/'
 #data_path = '/afs/hephy.at/data/easilar01/cmgTuples/'
-data_path = '/data/easilar/cmgTuples/Run2016B-PromptReco-v2/lumi_2p5fb/'
+#data_path = '/data/easilar/cmgTuples/Run2016B-PromptReco-v2/lumi_2p5fb/'
+data_path = '/afs/hephy.at/data/easilar01/Ra40b/cmgTuples/4fb_HT350Skim_WithMETFilters_V2/'
 
 SingleElectron_Run2016B_PromptReco_v2 ={"name":"SingleElectron_Run2016B_PromptReco_v2",}
 SingleMuon_Run2016B_PromptReco_v2 ={"name":"SingleMuon_Run2016B_PromptReco_v2",}

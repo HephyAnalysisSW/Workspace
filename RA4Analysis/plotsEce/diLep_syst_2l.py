@@ -217,7 +217,7 @@ for srNJet in sorted(SR):
       h_ratio.GetYaxis().SetLabelSize(0.1)
       h_ratio.Draw("E1")
       print "mean:" , h_ratio.GetMean()
-      h_ratio.SaveAs(bin[srNJet][stb][htb]['path']+'_'+p['varname']+'_allWeights_diLep_4_Ratio_1b.root')
+      h_ratio.SaveAs(bin[srNJet][stb][htb]['path']+'_'+p['varname']+'_allWeights_diLep_Ratio_eq0b.root')
       Func.Draw("same")
       cb.Draw()
       cb.SaveAs(bin[srNJet][stb][htb]['path']+'_'+p['varname']+'_diLep_eq0b_nJet3_.png')

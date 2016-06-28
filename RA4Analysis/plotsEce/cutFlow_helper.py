@@ -45,7 +45,7 @@ ele_Eta_acc_cut_str = "((abs(LepGood_eta)<1.44||abs(LepGood_eta)>1.57)&&abs(LepG
 
 
 e_veto        = "(Sum$(abs(LepGood_pdgId)==11&&LepGood_pt>="+str(minPt_e_veto)+"))" #+"&&"+ele_Eta_acc_cut_str+"&&LepGood_miniRelIso<"+str(minRelIso_lep_loose)+"&&"+ele_MVAID_cutstr_loose+"))" 
-e_tight       = "(Sum$(abs(LepGood_pdgId)==11&&LepGood_pt>="+str(minPt_Lep)+"&&abs(LepGood_eta)<2.4&&LepGood_miniRelIso<"+str(minRelIso_e)+"&&"+ele_MVAID_cutstr_tight+"&&"+"LepGood_lostHits==0"+"&&"+"LepGood_convVeto"+"&&"+"LepGood_sip3d<"+str(max_sip3d)+"))" 
+e_tight       = "(Sum$(abs(LepGood_pdgId)==11&&LepGood_pt>=25&&abs(LepGood_eta)<2.4&&LepGood_miniRelIso<"+str(minRelIso_e)+"&&"+ele_MVAID_cutstr_tight+"&&"+"LepGood_lostHits==0"+"&&"+"LepGood_convVeto"+"&&"+"LepGood_sip3d<"+str(max_sip3d)+"))" 
 
 
 OneMu = "("+mu_tight+"==1"+")"

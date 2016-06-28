@@ -36,7 +36,8 @@ separateBTagWeights = True
 
 defSampleStr = "TTJets_LO"
 
-subDir = "postProcessing_Run2016B_v2"
+subDir = "postProcessing_Run2016B_4fb_data"
+#subDir = "postProcessing_Spring16_FIXED_v2"
 
 #branches to be kept for data and MC
 branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert",
@@ -95,7 +96,7 @@ if options.skim=='HT500ST250':
 if options.skim=='LHEHTsm600':
   skimCond = "lheHTIncoming<=600&&"+htLtSkim
 if options.skim=='LHEHTlg600':
-  skimCond = "lheHTIncoming>600&&"+htLtSkim
+  skimCond = "lheHTIncoming>600&&nJet>2&&Sum$(LepGood_pt>=25&&abs(LepGood_eta)<2.4)<3&&"+htLtSkim
 
 #skimCond += "&&Sum$(LepGood_pt>25&&abs(LepGood_eta)<2.5)>=0"
 
@@ -140,14 +141,14 @@ if sys.argv[0].count('ipython'):
 ##print evt_veto_list
 
 ###For PU reweight###
-PU_dir = "/data/easilar/tuples_from_Artur/JECv6recalibrateMET_2p2fb/PUhistos/"
-PU_File_66mb = ROOT.TFile(PU_dir+"/pileUp_66mb_map.root")
-PU_File_70mb = ROOT.TFile(PU_dir+"/pileUp_70mb_map.root")
-PU_File_74mb = ROOT.TFile(PU_dir+"/pileUp_74mb_map.root")
-PU_histo_66 = PU_File_66mb.Get("h_ratio_66")
-PU_histo_70 = PU_File_70mb.Get("h_ratio_70")
-PU_histo_74 = PU_File_74mb.Get("h_ratio_74")
-#####################
+#PU_dir = "/data/easilar/tuples_from_Artur/JECv6recalibrateMET_2p2fb/PUhistos/"
+#PU_File_66mb = ROOT.TFile(PU_dir+"/pileUp_66mb_map.root")
+#PU_File_70mb = ROOT.TFile(PU_dir+"/pileUp_70mb_map.root")
+#PU_File_74mb = ROOT.TFile(PU_dir+"/pileUp_74mb_map.root")
+#PU_histo_66 = PU_File_66mb.Get("h_ratio_66")
+#PU_histo_70 = PU_File_70mb.Get("h_ratio_70")
+#PU_histo_74 = PU_File_74mb.Get("h_ratio_74")
+######################
 
 ###For Lepton SF#####
 mu_mediumID_File = ROOT.TFile("/data/easilar/SF2015/TnP_MuonID_NUM_MediumID_DENOM_generalTracks_VAR_map_pt_eta.root")
@@ -299,8 +300,8 @@ for isample, sample in enumerate(allSamples):
   if options.small: chunks=chunks[:1]
   for chunk in chunks:
     sourceFileSize = os.path.getsize(chunk['file'])
-    nSplit = 1+int(sourceFileSize/(200*10**6)) #split into 200MB
-    if nSplit>1: print "Chunk too large, will split into",nSplit,"of appox 200MB"
+    nSplit = 1+int(sourceFileSize/(400*10**6)) #split into 400MB
+    if nSplit>1: print "Chunk too large, will split into",nSplit,"of appox 400MB"
     for iSplit in range(nSplit):
       cut = "("+skimCond+")&&("+sample['postProcessingCut']+")" if sample.has_key('postProcessingCut') else skimCond
       t = getTreeFromChunk(chunk, cut, iSplit, nSplit)
@@ -370,10 +371,10 @@ for isample, sample in enumerate(allSamples):
           s.eleDataSet = False
           s.weight =xsec_branch*lumiScaleFactor*genWeight
           nTrueInt = t.GetLeaf('nTrueInt').GetValue()
-          s.puReweight_true = PU_histo_70.GetBinContent(PU_histo_70.FindBin(nTrueInt))
-          s.puReweight_true_max4 = min(4,s.puReweight_true)
-          s.puReweight_true_Down = PU_histo_66.GetBinContent(PU_histo_66.FindBin(nTrueInt))
-          s.puReweight_true_Up = PU_histo_74.GetBinContent(PU_histo_74.FindBin(nTrueInt))
+          #s.puReweight_true = PU_histo_70.GetBinContent(PU_histo_70.FindBin(nTrueInt))
+          #s.puReweight_true_max4 = min(4,s.puReweight_true)
+          #s.puReweight_true_Down = PU_histo_66.GetBinContent(PU_histo_66.FindBin(nTrueInt))
+          #s.puReweight_true_Up = PU_histo_74.GetBinContent(PU_histo_74.FindBin(nTrueInt))
           ngenLep = t.GetLeaf('ngenLep').GetValue()
           ngenTau = t.GetLeaf('ngenTau').GetValue()
           genLeps = filter(lambda g:abs(g['grandmotherId'])==6 and abs(g['motherId'])==24,get_cmg_genLeps(t))
