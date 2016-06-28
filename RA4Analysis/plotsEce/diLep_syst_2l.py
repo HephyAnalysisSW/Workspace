@@ -38,6 +38,9 @@ lepSels = [
   'label':'_lep_', 'str':'1 $lep$' , 'trigger': trigger}\
 ]
 
+ngenTau = "Sum$(abs(genTau_grandmotherId)==6&&abs(genTau_motherId)==24)"
+ngenLep = "Sum$(abs(genLep_grandmotherId)==6&&abs(genLep_motherId)==24)"
+
 bkg_samples=[
 {'sample':'TTVH',           "weight":"(1)" ,"cut":nbtag,"add_Cut":"(1)","name":TTV ,'tex':'t#bar{t}V','color':ROOT.kOrange-3},
 {"sample":"DiBosons",       "weight":"(1)" ,"cut":nbtag ,"add_Cut":"(1)","name":diBoson ,"tex":"WW/WZ/ZZ","color":ROOT.kRed+3},
@@ -45,8 +48,8 @@ bkg_samples=[
 {"sample":"singleTop",      "weight":"(1)" ,"cut":nbtag ,"add_Cut":"(1)","name":singleTop_lep,"tex":"t/#bar{t}",'color': ROOT.kViolet+5},
 {"sample":"QCD",            "weight":"(1)" ,"cut":nbtag ,"add_Cut":"(1)","name":QCDHT, "tex":"QCD","color":ROOT.kCyan-6},
 {"sample":"WJets",          "weight":"(1)" ,"cut":nbtag ,"add_Cut":"(1)","name":WJetsHTToLNu,"tex":"W + jets","color":ROOT.kGreen-2},
-{"sample":"ttJets_diLep",   "weight":"(1)" ,"cut":nbtag ,"add_Cut":"((ngenLep+ngenTau)==2)","name":TTJets_Lep, "tex":"t#bar{t} ll + jets",'color':ROOT.kBlue},
-{"sample":"ttJets_semiLep", "weight":"(1)" ,"cut":nbtag ,"add_Cut":"(!((ngenLep+ngenTau)==2))","name":TTJets_Lep, "tex":"t#bar{t} l + jets",'color':ROOT.kBlue-7}        
+{"sample":"ttJets_diLep",   "weight":"(1)" ,"cut":nbtag ,"add_Cut":"(("+ngenLep+"+"+ngenTau+")==2)","name":TTJets_Lep, "tex":"t#bar{t} ll + jets",'color':ROOT.kBlue},
+{"sample":"ttJets_semiLep", "weight":"(1)" ,"cut":nbtag ,"add_Cut":"(!(("+ngenLep+"+"+ngenTau+")==2))","name":TTJets_Lep, "tex":"t#bar{t} l + jets",'color':ROOT.kBlue-7}        
 ]
 
 for bkg in bkg_samples:
