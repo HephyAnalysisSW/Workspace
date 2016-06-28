@@ -480,11 +480,10 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
     # common branches already defined in cmgTuples
     keepBranches_DATAMC = [
         'run', 'lumi', 'evt', 'isData', 'rho', 'nVert', 
-        'met*','puppi*',
+        'met*',
         'Flag_*','HLT_*',
         'nJet', 'Jet_*', 
         'nTauGood', 'TauGood_*',
-        'isoTrack_*', #'Tracks_*',
         ] 
 
     if (args.processLepAll and args.storeOnlyLepAll):
@@ -2113,7 +2112,10 @@ def cmgPostProcessing(argv=None):
     logger.info("\n Target luminosity: %f pb^{-1} \n", params['target_lumi'])
     
     # get the event veto list FIXME: are the values updated properly?   
-    event_veto_list = get_veto_list()['all']
+    if args.applyEventVetoList:
+        event_veto_list = get_veto_list()['all']
+    else:
+        event_veto_list = {}
 
     
     # loop over each sample, process all variables and fill the saved tree
@@ -2309,7 +2311,7 @@ def cmgPostProcessing(argv=None):
 
                 start_time = int(time.time())
                 last_time = start_time
-                nVerboseEvents = 1000
+                nVerboseEvents = 5000
                 
                 for iEv in xrange(nEvents):
                     
@@ -2322,7 +2324,7 @@ def cmgPostProcessing(argv=None):
                                 print "Event:{:<8}".format(nEvents_total), "@ {} events/sec".format(
                                     round(float(nVerboseEvents)/passed_time )
                                     )                      
-                            logger.debug(
+                            logger.info(
                                 "\n Processing event %i from %i events from chunk \n %s \n" + \
                                 "\n Total processed events from all chunks: %i \n",
                                 iEv, nEvents, chunk['name'], nEvents_total
