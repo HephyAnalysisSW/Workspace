@@ -2,7 +2,7 @@ import ROOT
 import pickle
 import sys, os, copy, random, subprocess, datetime
 from array import array
-from Workspace.RA4Analysis.cmgObjectSelection import cmgLooseLepIndices, splitIndList, get_cmg_jets_fromStruct, splitListOfObjects, cmgTightMuID, cmgTightEleID , get_cmg_genParts_fromStruct , get_cmg_JetsforMEt_fromStruct
+from Workspace.RA4Analysis.cmgObjectSelection import cmgLooseLepIndices, splitIndList, get_cmg_jets_fromStruct, splitListOfObjects, cmgTightMuID, cmgTightEleID , get_cmg_genParts_fromStruct , get_cmg_JetsforMEt_fromStruct , get_cmg_genLeps , get_cmg_genTaus
 from Workspace.HEPHYPythonTools.xsec import xsec
 from Workspace.HEPHYPythonTools.helpers import getObjFromFile, getObjDict, getFileList
 from Workspace.HEPHYPythonTools.convertHelpers import compileClass, readVar, printHeader, typeStr, createClassString
@@ -36,7 +36,6 @@ separateBTagWeights = True
 
 defSampleStr = "TTJets_LO"
 
-#subDir = "postProcessing_Spring16_v2/"
 subDir = "postProcessing_Run2016B_v2"
 
 #branches to be kept for data and MC
@@ -93,8 +92,10 @@ if options.skim=='HT400ST200':   ##tuples have already ST200 skim
   skimCond = "Sum$(Jet_pt)>400&&(LepGood_pt[0]+met_pt)>200"
 if options.skim=='HT500ST250':  
   skimCond = htLtSkim
-if options.skim=='LHEHT600':
-  skimCond = "lheHTIncoming<600"
+if options.skim=='LHEHTsm600':
+  skimCond = "lheHTIncoming<=600&&"+htLtSkim
+if options.skim=='LHEHTlg600':
+  skimCond = "lheHTIncoming>600&&"+htLtSkim
 
 #skimCond += "&&Sum$(LepGood_pt>25&&abs(LepGood_eta)<2.5)>=0"
 
@@ -239,6 +240,8 @@ for isample, sample in enumerate(allSamples):
          newVariables.extend(["DL_"+var_DL+"_"+lep_DL+"_"+action+"/F/-999."])
   if not sample['isData']: 
     readVectors.append({'prefix':'GenPart',  'nMax':100, 'vars':['eta/F','pt/F','phi/F','mass/F','charge/F', 'pdgId/I', 'motherId/F', 'grandmotherId/F']})
+    readVectors.append({'prefix':'genLep',  'nMax':100, 'vars':['eta/F','pt/F','phi/F','mass/F','charge/F', 'pdgId/I', 'motherId/F', 'grandmotherId/F']})
+    readVectors.append({'prefix':'genTau',  'nMax':100, 'vars':['eta/F','pt/F','phi/F','mass/F','charge/F', 'pdgId/I', 'motherId/F', 'grandmotherId/F']})
     readVectors.append({'prefix':'JetForMET',  'nMax':100, 'vars':['rawPt/F','pt/F', 'eta/F', 'phi/F', 'mass/F','id/I','hadronFlavour/F','btagCSV/F', 'btagCMVA/F','corr_JECUp/F','corr_JECDown/F','corr/F']})
     readVectors.append({'prefix':'Jet',  'nMax':100,       'vars':['rawPt/F','pt/F', 'eta/F', 'phi/F', 'mass/F','id/I','hadronFlavour/F','btagCSV/F', 'btagCMVA/F','corr_JECUp/F','corr_JECDown/F','corr/F']})
    
@@ -253,7 +256,7 @@ for isample, sample in enumerate(allSamples):
     for corrJEC_str in corr:
       for vars_str in vars_corr:
         newVariables.extend(["jec_"+vars_str+"_"+corrJEC_str+"/F/-999."])
-        print "jec_"+vars_str+"_"+corrJEC_str+"/F/-999."
+        #print "jec_"+vars_str+"_"+corrJEC_str+"/F/-999."
       for vars_str in vars_corr_1:
         newVariables.extend(["jec_"+vars_str+"_"+corrJEC_str+"/I/-999."])
     aliases.extend(['genMet:met_genPt', 'genMetPhi:met_genPhi'])
@@ -373,6 +376,14 @@ for isample, sample in enumerate(allSamples):
           s.puReweight_true_Up = PU_histo_74.GetBinContent(PU_histo_74.FindBin(nTrueInt))
           ngenLep = t.GetLeaf('ngenLep').GetValue()
           ngenTau = t.GetLeaf('ngenTau').GetValue()
+          genLeps = filter(lambda g:abs(g['grandmotherId'])==6 and abs(g['motherId'])==24,get_cmg_genLeps(t))
+          genTaus = filter(lambda g:abs(g['grandmotherId'])==6 and abs(g['motherId'])==24,get_cmg_genTaus(t))
+          s.ngenLep = len(genLeps)
+          s.ngenTau = len(genTaus)
+          #print "================================="
+          #print s.ngenLep , s.ngenTau
+          #print len(genLeps) , len(genTaus)
+          #print genLeps , genTaus 
           if ("TTJets" in sample['dbsName']):
             s.weight_XSecTTBar1p1 = s.weight*1.1
             s.weight_XSecTTBar0p9 = s.weight*0.9

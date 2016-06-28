@@ -4,11 +4,13 @@ import os,sys
 from Workspace.HEPHYPythonTools.user import username
 import Workspace.HEPHYPythonTools.xsec as xsec
 from Workspace.HEPHYPythonTools.helpers import getObjFromFile, getChain, getChunks, getCutYieldFromChain, getYieldFromChain
-from Workspace.RA4Analysis.cmgTuples_Spring15_v2 import *
-from cutFlow_helper import *
+#from Workspace.RA4Analysis.cmgTuples_Spring15_v2 import *
+from Workspace.RA4Analysis.cmgTuples_Data25ns_Promtv2_postprocessed import *
+from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2_postProcessed import *
+#from cutFlow_helper import *
+from general_config import *
 
-
-path = "/afs/hephy.at/user/e/easilar/www/Spring15/Cut_Flow/"
+path = "/afs/hephy.at/user/e/easilar/www/data/Run2016B/2571pb/Tables/"
 if not os.path.exists(path):
   os.makedirs(path)
 
@@ -16,37 +18,55 @@ maxN = 1
 small = False
 if not small : maxN = -1
 
-lumi = 42 #pb-1
 
+trigger = "(1)"
 lepSels = [
-#  {'cut':OneMu , 'veto':OneMu_lepveto, 'label':'_mu_', 'str':'1 $\\mu$' , 'trigger': '(HLT_MuHT350MET70 || HLT_Mu50)'},\
-#  {'cut':OneE ,  'veto':OneE_lepveto,  'label':'_ele_','str':'1 $e$', 'trigger': '(HLT_EleHT350MET70 || HLT_Ele105)'},\
-  {'cut':OneLep ,'veto':OneLep_lepveto,'label':'_lep_','str':'1 $lepton$', 'trigger': '((HLT_EleHT350MET70 || HLT_Ele105)||(HLT_MuHT350MET70 || HLT_Mu50))' },\
+{'cut':'(singleMuonic&&(!isData||(isData&&muonDataSet)))' , 'veto':'nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0',\
+ 'chain': getChain(single_mu_Run2016B,maxN=maxN,histname="",treeName="Events") ,\
+  'label':'_mu_', 'str':'1 $\\mu$' , 'trigger': trigger},\
+{'cut':'singleElectronic&&(!isData||(isData&&eleDataSet))' , 'veto':'nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0',\
+ 'chain': getChain(single_ele_Run2016B,maxN=maxN,histname="",treeName="Events") ,\
+  'label':'_ele_', 'str':'1 $\\e$' , 'trigger': trigger},\
+{'cut':'((!isData&&singleLeptonic)||(isData&&((eleDataSet&&singleElectronic)||(muonDataSet&&singleMuonic))))' , 'veto':'nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0',\
+ 'chain': getChain([single_ele_Run2016B,single_mu_Run2016B],maxN=maxN,histname="",treeName="Events") ,\
+  'label':'_lep_', 'str':'1 $lep$' , 'trigger': trigger}\
+]
+bkg_samples=[
+{'sample':'TTVH',      "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":TTV ,'tex':'t#bar{t}V','color':ROOT.kOrange-3},
+{"sample":"DiBosons",  "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":diBoson ,"tex":"WW/WZ/ZZ","color":ROOT.kRed+3},
+{"sample":"DY",        "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":DY_madgraph,"tex":"DY + jets",'color':ROOT.kRed-6},
+{"sample":"singleTop", "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":singleTop_lep,"tex":"t/#bar{t}",'color': ROOT.kViolet+5},
+{"sample":"QCD",       "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":QCDHT, "tex":"QCD","color":ROOT.kCyan-6},
+{"sample":"WJets",     "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":WJetsHTToLNu,"tex":"W + jets","color":ROOT.kGreen-2},
+{"sample":"ttJets",    "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":TTJets_Lep, "tex":"t#bar{t} ll + jets",'color':ROOT.kBlue},
 ]
 
+for bkg in bkg_samples:
+    bkg['chain'] = getChain(bkg['name'],maxN=maxN,histname="",treeName="Events")
 
-samples=[
-{"sample":"DY",           "list":[DY_HT200to400,DY_HT400to600,DY_HT600toInf],"tex":"DY + jets",'color':ROOT.kRed-6},
-{"sample":"singleTop",    "list":[T_tWch,TBar_tWch,TToLeptons_tch],"tex":"single top",'color': ROOT.kViolet+5},
+
+#samples=[
+#{"sample":"DY",           "list":[DY_HT200to400,DY_HT400to600,DY_HT600toInf],"tex":"DY + jets",'color':ROOT.kRed-6},
+#{"sample":"singleTop",    "list":[T_tWch,TBar_tWch,TToLeptons_tch],"tex":"single top",'color': ROOT.kViolet+5},
 #{"sample":"QCD",          "list":[QCD_HT200to300,QCD_HT300to500,QCD_HT500to700,QCD_HT700to1000,QCD_HT1000to1500,QCD_HT1500to2000,QCD_HT2000toInf], "tex":"QCD","color":ROOT.kCyan-6},        
-{"sample":"WJets",        "list":[WJets],"tex":"W + jets","color":ROOT.kGreen-2},
-{"sample":"ttJets",       "list":[TTJets], "tex":"ttbar + jets",'color':ROOT.kBlue-4},
-]
+#{"sample":"WJets",        "list":[WJets],"tex":"W + jets","color":ROOT.kGreen-2},
+#{"sample":"ttJets",       "list":[TTJets], "tex":"ttbar + jets",'color':ROOT.kBlue-4},
+#]
 
 for lepSel in lepSels:
   cuts = [
-    {'cut':'(1)', 'label':'no cut'},\
-    {'cut':lepSel['cut'], 'label':lepSel['str']},\
-    {'cut':"&&".join([lepSel['cut'],lepSel['veto']]), 'label':'lepton veto'},\
-    {'cut':"&&".join([lepSel['cut'],lepSel['veto'],ht_cut]), 'label':'$H_T >$ 500 GeV'},\
-    {'cut':"&&".join([lepSel['cut'],lepSel['veto'],ht_cut,st]), 'label':'$L_T >$ 250 GeV'},\
-    {'cut':"&&".join([lepSel['cut'],lepSel['veto'],ht_cut,st,njets_30_cut]), 'label':'2 jets ($\\geq$ 30 GeV)'},\
-    {'cut':"&&".join([lepSel['cut'],lepSel['veto'],ht_cut,st,njets_30_cut,jets_2_80]), 'label':'2. jets ($\\geq$ 80 GeV)'},\
-    {'cut':"&&".join([lepSel['cut'],lepSel['veto'],ht_cut,st,njets_30_cut,jets_2_80,nbjets_30_cut_zero]), 'label':'0 b-jets (CSVv2)'},\
-    {'cut':"&&".join([lepSel['cut'],lepSel['veto'],ht_cut,st,njets_30_cut,jets_2_80,nbjets_30_cut_zero,filters]), 'label':'Filters'},\
-    {'cut':"&&".join([lepSel['cut'],lepSel['veto'],ht_cut,st,njets_30_cut,jets_2_80,nbjets_30_cut_multi]), 'label':'$>=1 b-jets (CSVv2)$'},\
-    {'cut':"&&".join([lepSel['cut'],lepSel['veto'],ht_cut,st,njets_30_cut,jets_2_80,nbjets_30_cut_multi,filters]), 'label':'Filters'},\
-  ]
+  {'cut':"&&".join(['(1)']), 'label':'no cut'},\
+  {'cut':"&&".join([lepSel['cut']]), 'label': lepSel['str']},\
+  {'cut':"&&".join([lepSel['cut'],lepSel['veto']]), 'label': lepSel['str']+' veto'},\
+  {'cut':"&&".join([lepSel['cut'],lepSel['veto'],"nJet30>=5"]), 'label': 'nJet $\\geq$ 5'},\
+  {'cut':"&&".join([lepSel['cut'],lepSel['veto'],"nJet30>=5","(Jet_pt[1]>80)","(Jet_pt[1]>80)"]), 'label': '2. jets ($\\geq$ 80 GeV)'},\
+  {'cut':"&&".join([lepSel['cut'],lepSel['veto'],"nJet30>=5","(Jet_pt[1]>80)","(Jet_pt[1]>80)","htJet30j>500"]), 'label':'$H_T >$ 500 GeV'},\
+  {'cut':"&&".join([lepSel['cut'],lepSel['veto'],"nJet30>=5","(Jet_pt[1]>80)","htJet30j>500","st>250","(Jet_pt[1]>80)"]), 'label':'$L_T >$ 250 GeV'},\
+  {'cut':"&&".join([lepSel['cut'],lepSel['veto'],"nJet30>=5","(Jet_pt[1]>80)","htJet30j>500","st>250","nBJetMediumCSV30==0","(Jet_pt[1]>80)"]), 'label': '0 b-jets (CSVM)' },\
+  {'cut':"&&".join([lepSel['cut'],lepSel['veto'],"nJet30>=5","(Jet_pt[1]>80)","htJet30j>500","st>250","nBJetMediumCSV30==0","deltaPhi_Wl>1","(Jet_pt[1]>80)"]), 'label': '\\Delta\\Phi >1' },\
+  {'cut':"&&".join([lepSel['cut'],lepSel['veto'],"nJet30>=5","(Jet_pt[1]>80)","htJet30j>500","st>250","nBJetMediumCSV30>=1","nJet30>=6","(Jet_pt[1]>80)"]), 'label': 'multi b-jets (CSVM) nJet >=6' },\
+  {'cut':"&&".join([lepSel['cut'],lepSel['veto'],"nJet30>=5","(Jet_pt[1]>80)","htJet30j>500","st>250","nBJetMediumCSV30>=1","nJet30>=6","(Jet_pt[1]>80)","deltaPhi_Wl>1"]), 'label': '\\Delta\\Phi >1' },\
+   ]
   ofile = file(path+'cut_flow_'+str(lumi)+'pb_'+lepSel['label']+'_4jets_.tex','w')
   doc_header = '\\documentclass{article}\\usepackage[english]{babel}\\usepackage{graphicx}\\usepackage[margin=0.5in]{geometry}\\begin{document}'
   ofile.write(doc_header)
@@ -54,7 +74,7 @@ for lepSel in lepSels:
   table_header = '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{c | c | c | c | c | c | c | c | c | c}'
   ofile.write(table_header)
   ofile.write("\n")
-  for s in samples:
+  for s in bkg_samples:
     line = '&' + s['tex'] 
     ofile.write(line)
     ofile.write("\n")
@@ -65,23 +85,14 @@ for lepSel in lepSels:
     print cut['label']
     print cut['cut']
     ofile.write(cut['label'])
-    for s in samples:
+    for s in bkg_samples:
       tot_yields = 0
-      for b in s['list']:
-        #print b
-        #chunk = getChunks(b, treeName="treeProducerSusySingleLepton",maxN=maxN)
-        chunk = getChunks(b,maxN=maxN)
-        chain = getChain(chunk[0],maxN=maxN,histname="",treeName="tree")
-        #nEntry = chain.GetEntries()
-        nEntry = chunk[1]
-        #print nEntry 
-        #weight = lumi*xsec.xsec[b['dbsName']]/nEntry
-        #weight = 1 ##count the MC events
-        print "MC Events:" , chain.GetEntries(cut['cut'])
-        #y_remain = chain.GetEntries(cut['cut'])
-        y_remain = getYieldFromChain(chain,cutString = cut['cut'],weight = "(((xsec*genWeight)*"+str(lumi)+")/"+str(nEntry)+")")
-        tot_yields += y_remain
-      print tot_yields
+      chain = s['chain']
+      nEntry = chain.GetEntries()
+      #print "MC Events:" , chain.GetEntries(cut['cut'])
+      y_remain = getYieldFromChain(chain,cutString = cut['cut'],weight = weight_str_plot)
+      print tot_yields , y_remain
+      tot_yields = y_remain
       line_yield = '&' + str(format(tot_yields, '.1f'))
       ofile.write(line_yield)
     ofile.write('\\\\')
