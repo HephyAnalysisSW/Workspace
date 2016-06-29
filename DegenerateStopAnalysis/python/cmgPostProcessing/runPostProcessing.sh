@@ -15,7 +15,7 @@
 #       $2 optional for MC samples, must be set to 'DATA' for data
 #          take cmgTuples=${CMG_TUPLES} as defined below in the if block
 #       $3 optional;
-#          if 'TEST', add to "_TEST" to CMG_POST_PROCESSING_TAG, e.g. "80X_postProcessing_v0_TEST"
+#          if 'TEST', add to "_TEST" to CMG_POST_PROCESSING_TAG, e.g. "80X_postProcessing_v1_TEST"
 #          with 'TEST', it also add '--verbose'
 #
 # 
@@ -44,10 +44,10 @@ else
     CMG_TUPLES="RunIISpring16MiniAODv2_v0"
 fi
 
-CMG_POST_PROCESSING_TAG="80X_postProcessing_v0"
+CMG_POST_PROCESSING_TAG="80X_postProcessing_v1"
 VERBOSE=""
 if [[ ${3} == "TEST" ]]; then 
-    CMG_POST_PROCESSING_TAG="80X_postProcessing_v0_TEST"
+    CMG_POST_PROCESSING_TAG="80X_postProcessing_v1_TEST"
     VERBOSE="--verbose"
 fi
 
