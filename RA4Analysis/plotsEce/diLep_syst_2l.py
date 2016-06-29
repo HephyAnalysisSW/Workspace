@@ -13,13 +13,7 @@ ROOT.gROOT.LoadMacro("../../HEPHYPythonTools/scripts/root/tdrstyle.C")
 ROOT.setTDRStyle()
 maxN = -1
 ROOT.gStyle.SetOptStat(0)
-sample_lumi =3000
-#lumi = 804##pb
-#lumi_label = 2.571
-reweight      = '(weight*'+str(lumi)+')/'+str(sample_lumi)
-filters = "(Flag_goodVertices && Flag_HBHENoiseFilter_fix && Flag_eeBadScFilter && Flag_HBHENoiseIsoFilter)"
-weight_str = weight_str_plot
-path = "/afs/hephy.at/user/e/easilar/www/data/Run2016B/2571pb/diLep_syst_study_results/"
+path = "/afs/hephy.at/user/e/easilar/www/data/Run2016B/4fb/diLep_syst_study_results/"
 if not os.path.exists(path):
   os.makedirs(path)
 
@@ -44,12 +38,12 @@ ngenLep = "Sum$(abs(genLep_grandmotherId)==6&&abs(genLep_motherId)==24)"
 bkg_samples=[
 {'sample':'TTVH',           "weight":"(1)" ,"cut":nbtag,"add_Cut":"(1)","name":TTV ,'tex':'t#bar{t}V','color':ROOT.kOrange-3},
 {"sample":"DiBosons",       "weight":"(1)" ,"cut":nbtag ,"add_Cut":"(1)","name":diBoson ,"tex":"WW/WZ/ZZ","color":ROOT.kRed+3},
-{"sample":"DY",             "weight":"(1)" ,"cut":nbtag ,"add_Cut":"(1)","name":DY_madgraph,"tex":"DY + jets",'color':ROOT.kRed-6},
+{"sample":"DY",             "weight":"(1)" ,"cut":nbtag ,"add_Cut":"(1)","name":DYHT,"tex":"DY + jets",'color':ROOT.kRed-6},
 {"sample":"singleTop",      "weight":"(1)" ,"cut":nbtag ,"add_Cut":"(1)","name":singleTop_lep,"tex":"t/#bar{t}",'color': ROOT.kViolet+5},
 {"sample":"QCD",            "weight":"(1)" ,"cut":nbtag ,"add_Cut":"(1)","name":QCDHT, "tex":"QCD","color":ROOT.kCyan-6},
 {"sample":"WJets",          "weight":"(1)" ,"cut":nbtag ,"add_Cut":"(1)","name":WJetsHTToLNu,"tex":"W + jets","color":ROOT.kGreen-2},
-{"sample":"ttJets_diLep",   "weight":"(1)" ,"cut":nbtag ,"add_Cut":"(("+ngenLep+"+"+ngenTau+")==2)","name":TTJets_Lep, "tex":"t#bar{t} ll + jets",'color':ROOT.kBlue},
-{"sample":"ttJets_semiLep", "weight":"(1)" ,"cut":nbtag ,"add_Cut":"(!(("+ngenLep+"+"+ngenTau+")==2))","name":TTJets_Lep, "tex":"t#bar{t} l + jets",'color':ROOT.kBlue-7}        
+{"sample":"ttJets_diLep",   "weight":"(1)" ,"cut":nbtag ,"add_Cut":"(("+ngenLep+"+"+ngenTau+")==2)","name":TTJets_Comb, "tex":"t#bar{t} ll + jets",'color':ROOT.kBlue},
+{"sample":"ttJets_semiLep", "weight":"(1)" ,"cut":nbtag ,"add_Cut":"(!(("+ngenLep+"+"+ngenTau+")==2))","name":TTJets_Comb, "tex":"t#bar{t} l + jets",'color':ROOT.kBlue-7}        
 ]
 
 for bkg in bkg_samples:
@@ -81,7 +75,7 @@ for srNJet in sorted(SR):
         for bkg in bkg_samples:
           print bkg['name']
           bla_Name, Cut = nameAndCut(stb, htb, srNJet, btb=bkg['cut'], presel=presel, btagVar =  btagVarString, stVar =p['stVar'], htVar = p['htVar'], njetVar= p['var'])
-          bin[srNJet][stb][htb][p['varname']][bkg['sample']+str(i)] = getPlotFromChain(bkg['chain'], p['var'], p['bin'], cutString = "&&".join([presel,bkg["add_Cut"],Cut]), weight = "*".join([weight_str,bkg["weight"]]), binningIsExplicit=False, addOverFlowBin='both')
+          bin[srNJet][stb][htb][p['varname']][bkg['sample']+str(i)] = getPlotFromChain(bkg['chain'], p['var'], p['bin'], cutString = "&&".join([presel,bkg["add_Cut"],Cut]), weight = "*".join([weight_str_plot,bkg["weight"]]), binningIsExplicit=False, addOverFlowBin='both')
           print bkg['sample']+str(i)
       for i,p in enumerate(plots):
         bla_Name, Cut = nameAndCut(stb, htb, srNJet, btb=nbtag, presel=data_presel, btagVar =  btagVarString ,stVar =p['stVar'], htVar = p['htVar'], njetVar= p['var'])
@@ -180,7 +174,7 @@ for srNJet in sorted(SR):
       leg.SetFillColor(0)
       leg.Draw()
       latex.DrawLatex(0.16,0.958,"#font[22]{CMS}"+" #font[12]{Preliminary}")
-      latex.DrawLatex(0.75,0.958,"#bf{L=2.6 fb^{-1} (13 TeV)}")
+      latex.DrawLatex(0.75,0.958,"#bf{L=4 fb^{-1} (13 TeV)}")
       #if nJet[1] == -1: latex.DrawLatex(0.6,0.83,"N_{Jets}#geq"+str(nJet[0]))
       #if nJet[1] != -1: latex.DrawLatex(0.6,0.83,str(nJet[0])+"#leqN_{Jets}#leq"+str(nJet[1]))
       latex.DrawLatex(0.6,0.88,"#bf{N_{bjets}==0}")
@@ -198,7 +192,7 @@ for srNJet in sorted(SR):
       Func.SetLineColor(2)
       h_ratio = h_data.Clone('h_ratio')
       h_ratio.SetMinimum(0.0)
-      h_ratio.SetMaximum(2)
+      h_ratio.SetMaximum(4)
       h_ratio.Sumw2()
       h_ratio.SetStats(0)
       h_ratio.Divide(stack_hist)
@@ -220,9 +214,9 @@ for srNJet in sorted(SR):
       h_ratio.SaveAs(bin[srNJet][stb][htb]['path']+'_'+p['varname']+'_allWeights_diLep_Ratio_eq0b.root')
       Func.Draw("same")
       cb.Draw()
-      cb.SaveAs(bin[srNJet][stb][htb]['path']+'_'+p['varname']+'_diLep_eq0b_nJet3_.png')
-      cb.SaveAs(bin[srNJet][stb][htb]['path']+'_'+p['varname']+'_diLep_eq0b_nJet3_.pdf')
-      cb.SaveAs(bin[srNJet][stb][htb]['path']+'_'+p['varname']+'_diLep_eq0b_nJet3_.root')
+      cb.SaveAs(bin[srNJet][stb][htb]['path']+'_'+p['varname']+'_diLep_eq0b_.png')
+      cb.SaveAs(bin[srNJet][stb][htb]['path']+'_'+p['varname']+'_diLep_eq0b_.pdf')
+      cb.SaveAs(bin[srNJet][stb][htb]['path']+'_'+p['varname']+'_diLep_eq0b_.root')
       #cb.SaveAs(bin[srNJet][stb][htb]['path']+'_'+p['varname']+'_diLep_lg1b_nJet4_skim350_.png')
       #cb.SaveAs(bin[srNJet][stb][htb]['path']+'_'+p['varname']+'_diLep_lg1b_nJet4_skim350_.pdf')
       #cb.SaveAs(bin[srNJet][stb][htb]['path']+'_'+p['varname']+'_diLep_lg1b_nJet4_skim350_.root')

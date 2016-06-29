@@ -18,7 +18,7 @@ def Draw_CMS_header():
    tex.SetTextFont(42)
    tex.SetTextSize(0.05)
    tex.SetLineWidth(2)
-   tex.DrawLatex(0.96,0.96,"2.6 fb^{-1} (13 TeV)")
+   tex.DrawLatex(0.96,0.96,"4 fb^{-1} (13 TeV)")
    tex = ROOT.TLatex()
    tex.SetNDC()
    tex.SetTextFont(61)
@@ -81,9 +81,9 @@ maxN = -1
 ROOT.gStyle.SetOptStat(0)
 
 all_MB = False
-presel = True
+presel = False
 SB_w   = False 
-SB_tt  = False
+SB_tt  = True
 presel_1b = False
 test = False
 
@@ -141,16 +141,18 @@ lepSels = [
   'label':'_lep_', 'str':'1 $lep$' , 'trigger': trigger}\
 ]
 
+ngenTau = "Sum$(abs(genTau_grandmotherId)==6&&abs(genTau_motherId)==24)"
+ngenLep = "Sum$(abs(genLep_grandmotherId)==6&&abs(genLep_motherId)==24)"
 
 bkg_samples=[
-{'sample':'TTVH',           "weight":"(1)"       ,"cut":nbtag  ,"add_Cut":"(1)","name":TTV ,'tex':'t#bar{t}V','color':ROOT.kOrange-3},
-{"sample":"DiBosons",       "weight":btag_weight ,"cut":(0,-1) ,"add_Cut":"(1)","name":diBoson ,"tex":"WW/WZ/ZZ","color":ROOT.kRed+3},
-{"sample":"DY",             "weight":btag_weight ,"cut":(0,-1) ,"add_Cut":"(1)","name":DY_amc,"tex":"DY + jets",'color':ROOT.kRed-6},
-{"sample":"singleTop",      "weight":btag_weight ,"cut":(0,-1) ,"add_Cut":"(1)","name":singleTop_lep,"tex":"t/#bar{t}",'color': ROOT.kViolet+5},
-{"sample":"QCD",            "weight":"(1)"       ,"cut":nbtag  ,"add_Cut":"(1)","name":QCDHT, "tex":"QCD","color":ROOT.kCyan-6},
-{"sample":"WJets",          "weight":btag_weight ,"cut":(0,-1) ,"add_Cut":"(1)","name":WJetsHTToLNu,"tex":"W + jets","color":ROOT.kGreen-2},
-{"sample":"ttJets_diLep",   "weight":btag_weight ,"cut":(0,-1) ,"add_Cut":"((ngenLep+ngenTau)==2)","name":TTJets_Lep, "tex":"t#bar{t} ll + jets",'color':ROOT.kBlue},
-{"sample":"ttJets_semiLep", "weight":btag_weight ,"cut":(0,-1) ,"add_Cut":"(!((ngenLep+ngenTau)==2))","name":TTJets_Lep, "tex":"t#bar{t} l + jets",'color':ROOT.kBlue-7}
+{'sample':'TTVH',           "weight":"(1)" ,"cut":nbtag ,"add_Cut":"(1)","name":TTV ,'tex':'t#bar{t}V','color':ROOT.kOrange-3},
+{"sample":"DiBosons",       "weight":"(1)" ,"cut":nbtag ,"add_Cut":"(1)","name":diBoson ,"tex":"WW/WZ/ZZ","color":ROOT.kRed+3},
+{"sample":"DY",             "weight":"(1)" ,"cut":nbtag ,"add_Cut":"(1)","name":DYHT,"tex":"DY + jets",'color':ROOT.kRed-6},
+{"sample":"singleTop",      "weight":"(1)" ,"cut":nbtag ,"add_Cut":"(1)","name":singleTop_lep,"tex":"t/#bar{t}",'color': ROOT.kViolet+5},
+{"sample":"QCD",            "weight":"(1)" ,"cut":nbtag ,"add_Cut":"(1)","name":QCDHT, "tex":"QCD","color":ROOT.kCyan-6},
+{"sample":"WJets",          "weight":"(1)" ,"cut":nbtag ,"add_Cut":"(1)","name":WJetsHTToLNu,"tex":"W + jets","color":ROOT.kGreen-2},
+{"sample":"ttJets_diLep",   "weight":"(1)" ,"cut":nbtag ,"add_Cut":"(("+ngenLep+"+"+ngenTau+")==2)","name":TTJets_Comb, "tex":"t#bar{t} ll + jets",'color':ROOT.kBlue},
+{"sample":"ttJets_semiLep", "weight":"(1)" ,"cut":nbtag ,"add_Cut":"(!(("+ngenLep+"+"+ngenTau+")==2))","name":TTJets_Comb, "tex":"t#bar{t} l + jets",'color':ROOT.kBlue-7}
 ]
 
 for bkg in bkg_samples:
@@ -193,10 +195,11 @@ if presel_1b :
 if not draw_signal :
   signals = []
 
-lepSels = [lepSels[2]]
+
+#lepSels = [lepSels[2]]
 
 for lepSel in lepSels:
-  path = "/afs/hephy.at/user/e/easilar/www/data/Run2016B/2571pb/"+lepSel['label']
+  path = "/afs/hephy.at/user/e/easilar/www/data/Run2016B/4fb/plots/"+lepSel['label']
   if not os.path.exists(path):
     os.makedirs(path)
   print lepSel['label']
@@ -219,12 +222,15 @@ for lepSel in lepSels:
           os.makedirs(CR_path)
         for p in plots:
           bin[srNJet][stb][htb][p['varname']] = {}
+          tmp_yield = 0
           for bkg in bkg_samples:
             bla_Name, Cut = nameAndCut(stb, htb, srNJet, btb=bkg['cut'], presel="&&".join([bkg["add_Cut"],presel]), btagVar =  btagVarString)
             #Cut = "&&".join([Cut,"(1)"])
             #Cut = "("+Cut+")"
             print bkg["sample"], Cut
             bin[srNJet][stb][htb][p['varname']][bkg['sample']] = getPlotFromChain(bkg['chain'], p['var'], p['bin'], cutString = Cut, weight = "*".join([weight_str_plot , bkg["weight"]]) , binningIsExplicit=False ,addOverFlowBin='both',variableBinning=p["bin_set"])
+            tmp_yield += bin[srNJet][stb][htb][p['varname']][bkg['sample']].Integral()
+          tot_yield = tmp_yield
           bla_Name, Cut = nameAndCut(stb, htb,srNJet, btb=nbtag, presel=sig_presel, btagVar =  btagVarString)
           bin[srNJet][stb][htb][p['varname']]['signals'] = {}
           for sig in signals:
@@ -232,6 +238,8 @@ for lepSel in lepSels:
           bla_Name, Cut = nameAndCut(stb, htb,srNJet, btb=nbtag, presel=data_presel, btagVar =  btagVarString)
           print "Data" , Cut
           bin[srNJet][stb][htb][p['varname']]['data'] = getPlotFromChain(lepSel['chain'], p['var'], p['bin'], cutString = Cut , weight = "(1)", binningIsExplicit=False,addOverFlowBin='both',variableBinning=p["bin_set"])
+          data_yield = bin[srNJet][stb][htb][p['varname']]['data'].Integral()
+          bin[srNJet][stb][htb]['scale_fac'] = float(data_yield)/float(tot_yield) 
           bin[srNJet][stb][htb]['label'] = Name         
           bin[srNJet][stb][htb]['path'] = CR_path        
   for p in plots:
@@ -297,6 +305,7 @@ for lepSel in lepSels:
           for bkg in bkg_samples:
             color = bkg['color']
             histo = bin[srNJet][stb][htb][p['varname']][bkg['sample']]
+            histo.Scale(bin[srNJet][stb][htb]['scale_fac'])
             histo.SetFillColor(color)
             histo.SetLineColor(ROOT.kBlack)
             histo.SetLineWidth(1)
@@ -318,7 +327,7 @@ for lepSel in lepSels:
           else: stack_hist=ROOT.TH1F("stack_hist","stack_hist",p['bin'][0],p['bin'][1],p['bin'][2])
           stack_hist.Merge(h_Stack.GetHists())
 
-          max_bin = stack_hist.GetMaximum()*100
+          max_bin = stack_hist.GetMaximum()*200
 
           h_Stack.SetMaximum(max_bin)
           h_Stack.SetMinimum(0.11)
@@ -375,6 +384,7 @@ for lepSel in lepSels:
             latex.DrawLatex(0.32,0.6 ,nJetBinName(srNJet))
             latex.DrawLatex(0.32,0.55,varBinNamewithUnit(stb,'L_{T}',"GeV"))
             latex.DrawLatex(0.32,0.5 ,varBinNamewithUnit(htb,'H_{T}',"GeV"))
+          latex.DrawLatex(0.32,0.8 ,"Scale Factor:"+str(round(bin[srNJet][stb][htb]['scale_fac'],2)))
           #latex.DrawLatex(0.18,0.97,"#font[22]{CMS}"+" #font[12]{Preliminary}")
           #latex.DrawLatex(0.96,0.97,"#bf{"+str(lumi_label)+" fb^{-1} (13 TeV)}")
           Draw_CMS_header()
