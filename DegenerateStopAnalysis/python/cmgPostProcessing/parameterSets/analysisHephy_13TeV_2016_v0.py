@@ -280,7 +280,7 @@ def getParameterSet(args):
         'branches': [
             'pt/F', 'eta/F', 'phi/F', 'pdgId/I', 'mass/F', 'motherId/I',
             ],
-        'nMax': 30,        
+        'nMax': 100,        
         }
 
     params['GenSel'] = GenSel

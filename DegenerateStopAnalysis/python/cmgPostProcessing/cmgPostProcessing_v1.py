@@ -17,6 +17,7 @@ import copy
 import operator
 import collections
 import errno
+import subprocess
 
 
 # imports user modules or functions
@@ -656,8 +657,6 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
         'ngenPartAll','genPartAll_*',
         'ngenTau', 'genTau_*', 
         'ngenLepFromTau', 'genLepFromTau_*', 
-        'GenJet_*',
-        #'GenTracks_*',
         ]
     
     readVariables_MC = []
@@ -1938,21 +1937,27 @@ def haddFiles(sample_name, filesForHadd, temporaryDir, outputWriteDirectory):
         size += os.path.getsize(temporaryDir + '/' + f)
         files.append(f)
         if size > (maxFileSize * (10 ** 6)) or f == filesForHadd[-1] or len(files) > maxNumberFiles:
-            #ofile = outputWriteDirectory + '/' + sample['name'] + '_' + str(counter) + '.root'
-            ofile = outputWriteDirectory + '/' + sample_name+ '_' + str(counter) + '.root'
-            logger.debug(
-                "\n Running hadd on directory \n %s \n files: \n %s \n", 
-                temporaryDir, pprint.pformat(files)
+            ofile = ''.join([sample_name, '_', str(counter), '.root'])
+
+            os.chdir(temporaryDir)
+            logger.info(
+                "\n Running hadd on directory \n %s \n files: \n %s \n",
+                os.getcwd(), pprint.pformat(files)
                 )
-            os.system('cd ' + temporaryDir + ';hadd -f -v 0 ' + ofile + ' ' + ' '.join(files))
+            subprocess.call(['hadd', '-f', ofile, ' '.join(files)])
+
+            logger.debug(
+                "\n Move file \n %s \n to directory \n %s \n",
+                ofile, outputWriteDirectory
+                )
+            shutil.move(ofile, outputWriteDirectory)
             logger.debug("\n Written output file \n %s \n", ofile)
             size = 0
-            counter += 1 
+            counter += 1
             files = []
     
     # remove the temporary directory  
-    os.system('cd ' + outputWriteDirectory)
-    ROOT.gDirectory.cd("..")
+    os.chdir(outputWriteDirectory)
     shutil.rmtree(temporaryDir, onerror=retryRemove)
     if not os.path.exists(temporaryDir): 
         logger.debug("\n Temporary directory \n    %s \n deleted. \n", temporaryDir)

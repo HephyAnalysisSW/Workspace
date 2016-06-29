@@ -54,7 +54,7 @@ sampleSets = {
                              
                             },
 
-                'wjets_Spring2016':{
+                'wjets_Spring16':{
                             'samples':[
                                          ["WJetsToLNu_HT100to200_ext", "--skimPreselect"],
                                          ["WJetsToLNu_HT200to400", "--skimPreselect"],
