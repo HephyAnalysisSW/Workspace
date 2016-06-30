@@ -11,7 +11,7 @@ from predictionConfig import *
 
 ROOT.TH1F().SetDefaultSumw2()
 
-def makeTTPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, QCD=False):
+def makeTTPrediction(bins, samples, htb, stb, srNJet, presel, presel_MC, dPhiCut=1.0, QCD=False):
   #print "in make tt prediction lumi is :" , lumi
   weight_str, weight_err_str = makeWeight(lumi, sampleLumi, reWeight=MCweight)
   cWJets = samples['W']
@@ -30,15 +30,16 @@ def makeTTPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, QCD=F
   
   #TT Jets yield in srNJet, no b-tag cut, low DPhi
   fit_srName, fit_srCut = nameAndCut(stb, htb, srNJet, btb=None, presel=presel, btagVar = nBTagVar)
+  fit_srName, fit_srCut_MC = nameAndCut(stb, htb, srNJet, btb=None, presel=presel_MC, btagVar = nBTagVar)
 
   if QCD:
     #Get QCD yields in CR for b-tag fit
     QCD_dict={0:{'y':QCD[srNJet][stb][htb][(0,0)][dPhiCut]['NQCDpred_lowdPhi'], 'e':QCD[srNJet][stb][htb][(0,0)][dPhiCut]['NQCDpred_lowdPhi_err'], 'totalY':QCD[srNJet][stb][htb][(0,0)][dPhiCut]['NQCDpred'], 'totalY_err':QCD[srNJet][stb][htb][(0,0)][dPhiCut]['NQCDpred_err']},\
               1:{'y':QCD[srNJet][stb][htb][(1,1)][dPhiCut]['NQCDpred_lowdPhi'], 'e':QCD[srNJet][stb][htb][(1,1)][dPhiCut]['NQCDpred_lowdPhi_err'], 'totalY':QCD[srNJet][stb][htb][(1,1)][dPhiCut]['NQCDpred'], 'totalY_err':QCD[srNJet][stb][htb][(1,1)][dPhiCut]['NQCDpred_err']},\
               2:{'y':QCD[srNJet][stb][htb][(2,-1)][dPhiCut]['NQCDpred_lowdPhi'], 'e':QCD[srNJet][stb][htb][(2,-1)][dPhiCut]['NQCDpred_lowdPhi_err'], 'totalY':QCD[srNJet][stb][htb][(2,-1)][dPhiCut]['NQCDpred'], 'totalY_err':QCD[srNJet][stb][htb][(2,-1)][dPhiCut]['NQCDpred_err']}}
-    fit_srNJet_lowDPhi = binnedNBTagsFit(fit_srCut+"&&"+dPhiStr+"<"+str(dPhiCut), fit_srName+'_dPhi'+str(dPhiCut), samples = samples, prefix=fit_srName, QCD_dict=QCD_dict)
+    fit_srNJet_lowDPhi = binnedNBTagsFit(fit_srCut+"&&"+dPhiStr+"<"+str(dPhiCut), fit_srCut_MC+"&&"+dPhiStr+"<"+str(dPhiCut), fit_srName+'_dPhi'+str(dPhiCut), samples = samples, prefix=fit_srName, QCD_dict=QCD_dict)
   else:
-    fit_srNJet_lowDPhi = binnedNBTagsFit(fit_srCut+"&&"+dPhiStr+"<"+str(dPhiCut), fit_srName+'_dPhi'+str(dPhiCut), samples = samples, prefix=fit_srName)
+    fit_srNJet_lowDPhi = binnedNBTagsFit(fit_srCut+"&&"+dPhiStr+"<"+str(dPhiCut), fit_srCut_MC+"&&"+dPhiStr+"<"+str(dPhiCut), fit_srName+'_dPhi'+str(dPhiCut), samples = samples, prefix=fit_srName)
   
 #  fit_srNJet_lowDPhi = binnedNBTagsFit(fit_srCut+"&&"+dPhiStr+"<"+str(dPhiCut), samples = {'W':cWJets, 'TT':cTTJets}, nBTagVar = 'nBJetMedium25', prefix=fit_srName)
   rd['fit_srNJet_lowDPhi'] = fit_srNJet_lowDPhi
@@ -53,10 +54,11 @@ def makeTTPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, QCD=F
   print yTT_Var_srNJet_0b_lowDPhi
   print
 
-  rCS_crLowNJet_Name, rCS_crLowNJet_Cut = nameAndCut(stb, htb, (4,5), presel=presel, btagVar = nBTagVar)
-  rCS_sr_Name_0b, rCS_sr_Cut_0b = nameAndCut(stb, htb, srNJet, btb=(0,0), presel=presel, btagVar = nBTagVar)#for Check 
-  rCS_sr_Name, rCS_sr_Cut = nameAndCut(stb, htb, srNJet, btb=None, presel=presel, btagVar = nBTagVar)
+  rCS_crLowNJet_Name, rCS_crLowNJet_Cut = nameAndCut(stb, htb, (4,5), presel=presel_MC, btagVar = nBTagVar)
+  rCS_sr_Name_0b, rCS_sr_Cut_0b = nameAndCut(stb, htb, srNJet, btb=(0,0), presel=presel_MC, btagVar = nBTagVar)#for Check 
+  rCS_sr_Name, rCS_sr_Cut = nameAndCut(stb, htb, srNJet, btb=None, presel=presel_MC, btagVar = nBTagVar)
   rCS_crLowNJet_Name_1b, rCS_crLowNJet_Cut_1b = nameAndCut(stb, htb, (4,5), btb=(1,1), presel=presel, btagVar = nBTagVar)
+  rCS_crLowNJet_Name_1b_MC, rCS_crLowNJet_Cut_1b_MC = nameAndCut(stb, htb, (4,5), btb=(1,1), presel=presel_MC, btagVar = nBTagVar)
 
   if useBTagWeights:
     weight_str_1b = weight_str+'*weightBTag1'+btagWeightSuffix
@@ -68,7 +70,7 @@ def makeTTPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, QCD=F
     weight_str_0b = weight_str
     weight_str_1bMC = weight_str
     weight_str_0bMC = weight_str
-    rCS_crLowNJet_Cut = rCS_crLowNJet_Cut_1b
+    rCS_crLowNJet_Cut = rCS_crLowNJet_Cut_1b_MC
     rCS_sr_Cut = rCS_sr_Cut_0b
     
 
@@ -79,8 +81,8 @@ def makeTTPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, QCD=F
   yW_crNJet_1b_highDPhi_truth     = getYieldFromChain(cWJets, cutString = rCS_crLowNJet_Cut+'&&'+dPhiStr+'>'+str(dPhiCut),weight=weight_str_1bMC, returnError = True)
   yRest_crNJet_1b_lowDPhi_truth   = getYieldFromChain(cRest, cutString = rCS_crLowNJet_Cut+'&&'+dPhiStr+'<'+str(dPhiCut),weight=weight_str_1bMC, returnError = True)
   yRest_crNJet_1b_highDPhi_truth  = getYieldFromChain(cRest, cutString = rCS_crLowNJet_Cut+'&&'+dPhiStr+'>'+str(dPhiCut),weight=weight_str_1bMC, returnError = True)
-  yQCD_crNJet_1b_lowDPhi_truth    = getYieldFromChain(cQCD, cutString = rCS_crLowNJet_Cut_1b+'&&'+dPhiStr+'<'+str(dPhiCut),weight=weight_str, returnError = True)
-  yQCD_crNJet_1b_highDPhi_truth   = getYieldFromChain(cQCD, cutString = rCS_crLowNJet_Cut_1b+'&&'+dPhiStr+'>'+str(dPhiCut),weight=weight_str, returnError = True)
+  yQCD_crNJet_1b_lowDPhi_truth    = getYieldFromChain(cQCD, cutString = rCS_crLowNJet_Cut_1b_MC+'&&'+dPhiStr+'<'+str(dPhiCut),weight=weight_str, returnError = True)
+  yQCD_crNJet_1b_highDPhi_truth   = getYieldFromChain(cQCD, cutString = rCS_crLowNJet_Cut_1b_MC+'&&'+dPhiStr+'>'+str(dPhiCut),weight=weight_str, returnError = True)
 
   rd['yTT_crNJet_1b_lowDPhi_truth']       = yTT_crNJet_1b_lowDPhi_truth[0]
   rd['yTT_Var_crNJet_1b_lowDPhi_truth']   = yTT_crNJet_1b_lowDPhi_truth[1]**2
@@ -126,8 +128,8 @@ def makeTTPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, QCD=F
       yW_crNJet_1b_highDPhi     = getYieldFromChain(cWJets, cutString = rCS_crLowNJet_Cut+'&&'+dPhiStr+'>'+str(dPhiCut),weight=weight_str_1b, returnError = True)
       yRest_crNJet_1b_lowDPhi   = getYieldFromChain(cRest, cutString = rCS_crLowNJet_Cut+'&&'+dPhiStr+'<'+str(dPhiCut),weight=weight_str_1b, returnError = True)
       yRest_crNJet_1b_highDPhi  = getYieldFromChain(cRest, cutString = rCS_crLowNJet_Cut+'&&'+dPhiStr+'>'+str(dPhiCut),weight=weight_str_1b, returnError = True)
-      yQCD_crNJet_1b_lowDPhi    = getYieldFromChain(cQCD, cutString = rCS_crLowNJet_Cut_1b+'&&'+dPhiStr+'<'+str(dPhiCut),weight=weight_str, returnError = True)
-      yQCD_crNJet_1b_highDPhi   = getYieldFromChain(cQCD, cutString = rCS_crLowNJet_Cut_1b+'&&'+dPhiStr+'>'+str(dPhiCut),weight=weight_str, returnError = True)
+      yQCD_crNJet_1b_lowDPhi    = getYieldFromChain(cQCD, cutString = rCS_crLowNJet_Cut_1b_MC+'&&'+dPhiStr+'<'+str(dPhiCut),weight=weight_str, returnError = True)
+      yQCD_crNJet_1b_highDPhi   = getYieldFromChain(cQCD, cutString = rCS_crLowNJet_Cut_1b_MC+'&&'+dPhiStr+'>'+str(dPhiCut),weight=weight_str, returnError = True)
 
       y_LowDPhi_1b = yTT_crNJet_1b_lowDPhi[0] + yW_crNJet_1b_lowDPhi[0] + yRest_crNJet_1b_lowDPhi[0] + yQCD_crNJet_1b_lowDPhi[0] - QCD_lowDPhi['y']
       y_Var_LowDPhi_1b = yTT_crNJet_1b_lowDPhi[1]**2 + yW_crNJet_1b_lowDPhi[1]**2 + yRest_crNJet_1b_lowDPhi[1]**2 + yQCD_crNJet_1b_lowDPhi[1]**2 + QCD_lowDPhi['e']**2

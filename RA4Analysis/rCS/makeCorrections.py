@@ -78,13 +78,13 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
         ttJetRcsFitH1b = ROOT.TH1F("ttJetRcsFitH1b","",len(ttJetBins),0,len(ttJetBins))
 
         #Rcs values w/o b-tag weights
-        cname1bCRtt, cut1bCRtt = nameAndCut(stb,htb,(4,5), btb=(1,1) ,presel=presel)
-        cname0bCRtt, cut0bCRtt = nameAndCut(stb,htb,(4,5), btb=(0,0) ,presel=presel)
+        cname1bCRtt, cut1bCRtt = nameAndCut(stb,htb,(4,5), btb=(1,1) ,presel=presel_MC)
+        cname0bCRtt, cut0bCRtt = nameAndCut(stb,htb,(4,5), btb=(0,0) ,presel=presel_MC)
         rcs1bCRtt = getRCS(cBkg, cut1bCRtt, dPhiCut, weight = weight_str)
         rcs0bCRtt = getRCS(cTTJets, cut0bCRtt, dPhiCut, weight = weight_str)
         
         #Rcs values w/ b-tag weights
-        cnameCRtt, cutCRtt = nameAndCut(stb,htb,(4,5), btb=(0,-1) ,presel=presel)
+        cnameCRtt, cutCRtt = nameAndCut(stb,htb,(4,5), btb=(0,-1) ,presel=presel_MC)
         samples = [{'chain':cWJets, 'cut':cutCRtt, 'weight':weight_str+'*weightBTag1'+btagWeightSuffix}, {'chain':cTTJets, 'cut':cutCRtt, 'weight':weight_str+'*weightBTag1'+btagWeightSuffix},{'chain':cDY, 'cut':cut1bCRtt, 'weight':weight_str},{'chain':cTTV, 'cut':cut1bCRtt, 'weight':weight_str},{'chain':csingleTop, 'cut':cut1bCRtt, 'weight':weight_str}]
 
         rcs1bCRtt_btag = combineRCS(samples, dPhiCut)
@@ -100,8 +100,8 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
         # for the time being, bins with 0 entries (= Rcs=0) are not incorporated in the fit (same applies for wjets)
         for i_njbTT, njbTT in enumerate(ttJetBins):
           # get the Rcs plots, use b-tag weights and scale factors
-          cname, cut     = nameAndCut(stb,htb,njbTT, btb=(0,-1) ,presel=presel)
-          cname1b, cut1b = nameAndCut(stb,htb,njbTT, btb=(0,-1) ,presel=presel)
+          cname, cut     = nameAndCut(stb,htb,njbTT, btb=(0,-1) ,presel=presel_MC)
+          cname1b, cut1b = nameAndCut(stb,htb,njbTT, btb=(0,-1) ,presel=presel_MC)
           rcsD = getRCS(cTTJets, cut, dPhiCut, weight = weight_str+'*weightBTag0'+btagWeightSuffix, avoidNan=True)
           rcsD1b = getRCS(cTTJets, cut1b, dPhiCut, weight = weight_str+'*weightBTag1'+btagWeightSuffix, avoidNan=True)
           ttJetRcsFitH.GetXaxis().SetBinLabel(i_njbTT+1,nJetBinName(njbTT))
@@ -295,14 +295,14 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
       # Wjets corrections
       Wcharges = [{'name':'PosPdg','cut':'leptonPdg>0', 'string':'_PosPdg'},{'name':'NegPdg','cut':'leptonPdg<0', 'string':'_NegPdg'},{'name':'all', 'cut':'(1)', 'string':''}]
       for Wc in Wcharges:
-        cnameCRW, cutCRW = nameAndCut(stb,htb,(3,4), btb=(0,-1) ,presel=presel)
+        cnameCRW, cutCRW = nameAndCut(stb,htb,(3,4), btb=(0,-1) ,presel=presel_MC)
         rcsCRW = getRCS(cWJets, cutCRW+'&&'+Wc['cut'], dPhiCut, weight = weight_str+'*weightBTag0'+btagWeightSuffix)
         if createFits:
           wJetRcsFitH = ROOT.TH1F("wJetRcsFitH","",len(wJetBins),0,len(wJetBins))
           
           #fill histograms for linear fit to account for possible non-flat rcs values
           for i_njbW, njbW in enumerate(wJetBins):
-            cname, cut = nameAndCut(stb,htb,njbW, btb=(0,-1) ,presel=presel)
+            cname, cut = nameAndCut(stb,htb,njbW, btb=(0,-1) ,presel=presel_MC)
             rcsD = getRCS(cWJets, cut+'&&'+Wc['cut'], dPhiCut, weight = weight_str+'*weightBTag0'+btagWeightSuffix, avoidNan=True)
             if not math.isnan(rcsD['rCS']):
               wJetRcsFitH.SetBinContent(i_njbW+1, rcsD['rCS'])
@@ -384,7 +384,7 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
           wKE = loadedFit[njb][stb][htb][Wc['name']]['wKE']
         #difference of measured rcs and fit in 0b MC rcs
 
-        cnameCRW, cutCRW = nameAndCut(stb,htb,(3,4), btb=(0,-1) ,presel=presel)
+        cnameCRW, cutCRW = nameAndCut(stb,htb,(3,4), btb=(0,-1) ,presel=presel_MC)
         rcsCRW = getRCS(cWJets, cutCRW+'&&'+Wc['cut'], dPhiCut, weight = weight_str+'*weightBTag0'+btagWeightSuffix)
 
         print 'parameters for correction'
@@ -505,7 +505,12 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
       TT_pred_kappa, TT_pred_kappa_err = getPropagatedError([res[njb][stb][htb]['TT_pred'], kappaTT_btag['kappa'], TT_kappa], [res[njb][stb][htb]['TT_pred_err'], 0, 0], 1, 0, returnCalcResult=True)
       W_pred_kappa, W_pred_kappa_err = getPropagatedError([res[njb][stb][htb]['W_pred'], W_kappa], [res[njb][stb][htb]['W_pred_err'], 0], 1, 0, returnCalcResult=True)
       #W_pred_corrRest_kappa, W_pred_corrRest_kappa_err = getPropagatedError([res[njb][stb][htb]['W_pred_corrRest'], W_corrRest_kappa], [res[njb][stb][htb]['W_pred_corrRest_err'], W_corrRest_kappa_err], 1, 0, returnCalcResult=True)
-        
+      
+      if W_pred_kappa<0: W_pred_kappa = 0.
+      if TT_pred_kappa<0: TT_pred_kappa = 0.
+      if W_pred_kappa_err<0: W_pred_kappa_err = abs(W_pred_kappa_err)
+      if TT_pred_kappa_err<0: TT_pred_kappa_err = abs(TT_pred_kappa_err)
+      
       res[njb][stb][htb]['W_pred_final']      = W_pred_kappa
       res[njb][stb][htb]['W_pred_final_err']  = W_pred_kappa_err
       res[njb][stb][htb]['TT_pred_final']     = TT_pred_kappa

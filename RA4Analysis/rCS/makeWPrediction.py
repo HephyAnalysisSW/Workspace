@@ -11,7 +11,7 @@ from predictionConfig import *
 
 ROOT.TH1F().SetDefaultSumw2()
 
-def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, QCD=False):
+def makeWPrediction(bins, samples, htb, stb, srNJet, presel, presel_MC, dPhiCut=1.0, QCD=False):
   print "in W predition lumi is :"  , lumi
   if useBTagWeights: 'Will use b-tag weights for W-jets prediction!'
   weight_str, weight_err_str = makeWeight(lumi, sampleLumi, reWeight=MCweight)
@@ -33,17 +33,18 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, QCD=Fa
   
   #TT Jets yield in crNJet, no b-tag cut, low DPhi
   fit_crName, fit_crCut = nameAndCut(stb, htb, nJetCR, btb=None, presel=presel+'&&abs(leptonPdg)==13', btagVar = nBTagVar) 
-  fit_crNJet_lowDPhi = binnedNBTagsFit(fit_crCut+"&&"+dPhiStr+"<"+str(dPhiCut), fit_crName+'_dPhi'+str(dPhiCut)+'_muonChannel', samples=samples, prefix=fit_crName) #no QCD subtraction - there should only be a very small QCD contamination in muon channel
+  fit_crName, fit_crCut_MC = nameAndCut(stb, htb, nJetCR, btb=None, presel=presel_MC+'&&abs(leptonPdg)==13', btagVar = nBTagVar)
+  fit_crNJet_lowDPhi = binnedNBTagsFit(fit_crCut+"&&"+dPhiStr+"<"+str(dPhiCut), fit_crCut_MC+"&&"+dPhiStr+"<"+str(dPhiCut), fit_crName+'_dPhi'+str(dPhiCut)+'_muonChannel', samples=samples, prefix=fit_crName) #no QCD subtraction - there should only be a very small QCD contamination in muon channel
 #  fit_crNJet_lowDPhi = binnedNBTagsFit(fit_crCut+"&&"+dPhiStr+"<"+str(dPhiCut), samples = {'W':cWJets, 'TT':cTTJets}, nBTagVar = 'nBJetMedium25', prefix=fit_crName)
   rd['fit_crNJet_lowDPhi'] = fit_crNJet_lowDPhi
   
   crNameTruth, crCutTruth = nameAndCut(stb, htb, nJetCR,btb=(0,0), presel=presel, btagVar=nBTagVar)
   if useBTagWeights:
-    crName, crCut = nameAndCut(stb, htb, nJetCR, presel=presel, btagVar=nBTagVar)
+    crName, crCut = nameAndCut(stb, htb, nJetCR, presel=presel_MC, btagVar=nBTagVar)
     weight_str_0b = weight_str+'*weightBTag0'+btagWeightSuffix #this is used for everything that could also be data
     weight_str_0bMC = weight_str+'*weightBTag0_SF' #this is used for values that always come from MC and should not be varied when the SFs are
   else:
-    crName, crCut = nameAndCut(stb, htb, nJetCR,btb=(0,0), presel=presel, btagVar=nBTagVar)
+    crName, crCut = nameAndCut(stb, htb, nJetCR,btb=(0,0), presel=presel_MC, btagVar=nBTagVar)
     weight_str_0b = weight_str
     weight_str_0bMC = weight_str
   
@@ -177,14 +178,15 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, QCD=Fa
   rd['rCS_W_NegPdg_crNJet_0b_truth']         = getRCS(cWJets, 'leptonPdg<0&&'+crCut, dPhiCut, weight=weight_str_0bMC)
   
   fit_srName, fit_srCut = nameAndCut(stb, htb, srNJet, btb=None, presel=presel,btagVar = nBTagVar)
+  fit_srName, fit_srCut_MC = nameAndCut(stb, htb, srNJet, btb=None, presel=presel_MC,btagVar = nBTagVar)
   #QCD yields in CR for b-tag fit
   if QCD:
     QCD_dict={0:{'y':QCD[srNJet][stb][htb][(0,0)][dPhiCut]['NQCDpred_lowdPhi'], 'e':QCD[srNJet][stb][htb][(0,0)][dPhiCut]['NQCDpred_lowdPhi_err'], 'totalY':QCD[srNJet][stb][htb][(0,0)][dPhiCut]['NQCDpred'], 'totalY_err':QCD[srNJet][stb][htb][(0,0)][dPhiCut]['NQCDpred_err']},\
               1:{'y':QCD[srNJet][stb][htb][(1,1)][dPhiCut]['NQCDpred_lowdPhi'], 'e':QCD[srNJet][stb][htb][(1,1)][dPhiCut]['NQCDpred_lowdPhi_err'], 'totalY':QCD[srNJet][stb][htb][(1,1)][dPhiCut]['NQCDpred'], 'totalY_err':QCD[srNJet][stb][htb][(1,1)][dPhiCut]['NQCDpred_err']},\
               2:{'y':QCD[srNJet][stb][htb][(2,-1)][dPhiCut]['NQCDpred_lowdPhi'], 'e':QCD[srNJet][stb][htb][(2,-1)][dPhiCut]['NQCDpred_lowdPhi_err'], 'totalY':QCD[srNJet][stb][htb][(2,-1)][dPhiCut]['NQCDpred'], 'totalY_err':QCD[srNJet][stb][htb][(2,-1)][dPhiCut]['NQCDpred_err']}}
-    fit_srNJet_lowDPhi = binnedNBTagsFit(fit_srCut+"&&"+dPhiStr+"<"+str(dPhiCut), fit_srName+'_dPhi'+str(dPhiCut), samples = samples, prefix=fit_srName, QCD_dict=QCD_dict)
+    fit_srNJet_lowDPhi = binnedNBTagsFit(fit_srCut+"&&"+dPhiStr+"<"+str(dPhiCut), fit_srCut_MC+"&&"+dPhiStr+"<"+str(dPhiCut), fit_srName+'_dPhi'+str(dPhiCut), samples = samples, prefix=fit_srName, QCD_dict=QCD_dict)
   else:
-    fit_srNJet_lowDPhi = binnedNBTagsFit(fit_srCut+"&&"+dPhiStr+"<"+str(dPhiCut), fit_srName+'_dPhi'+str(dPhiCut), samples = samples, prefix=fit_srName)
+    fit_srNJet_lowDPhi = binnedNBTagsFit(fit_srCut+"&&"+dPhiStr+"<"+str(dPhiCut), fit_srCut_MC+"&&"+dPhiStr+"<"+str(dPhiCut), fit_srName+'_dPhi'+str(dPhiCut), samples = samples, prefix=fit_srName)
 #  fit_srNJet_lowDPhi = binnedNBTagsFit(fit_srCut+"&&"+dPhiStr+"<"+str(dPhiCut), samples = {'W':cWJets, 'TT':cTTJets}, nBTagVar = 'nBJetMedium25', prefix=fit_srName)
 
   rd['fit_srNJet_lowDPhi_W'] = fit_srNJet_lowDPhi
@@ -221,9 +223,9 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, dPhiCut=1.0, QCD=Fa
   rd['rCS_crLowNJet_0b_onlyW_mu_PosPdg'] = rCS_crLowNJet_0b_onlyW_mu_PosPdg
   rd['rCS_crLowNJet_0b_onlyW_mu_NegPdg'] = rCS_crLowNJet_0b_onlyW_mu_NegPdg
   
-  rCS_sr_Name_0b, rCS_sr_Cut_0b = nameAndCut(stb, htb, srNJet, btb=(0,0), presel=presel, btagVar = nBTagVar)#for Check 
+  rCS_sr_Name_0b, rCS_sr_Cut_0b = nameAndCut(stb, htb, srNJet, btb=(0,0), presel=presel_MC, btagVar = nBTagVar)#for Check 
   if useBTagWeights:
-    rCS_sr_Name, rCS_sr_Cut = nameAndCut(stb, htb, srNJet, btb=None, presel=presel, btagVar = nBTagVar)
+    rCS_sr_Name, rCS_sr_Cut = nameAndCut(stb, htb, srNJet, btb=None, presel=presel_MC, btagVar = nBTagVar)
   else:
     rCS_sr_Cut = rCS_sr_Cut_0b
   rCS_srNJet_0b_onlyW             = getRCS(cWJets, rCS_sr_Cut,  dPhiCut, weight=weight_str_0bMC)

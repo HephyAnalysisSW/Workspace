@@ -23,14 +23,14 @@ from math import *
 from Workspace.HEPHYPythonTools.user import username
 from LpTemplateFit import LpTemplateFit
 
-isData = True
-makeFit = True
-getYields = True
+isData = False
+makeFit = False
+getYields = False
 getResults = True
 isValidation = False
 
-readFit = '/data/dspitzbart/Results2016/QCDEstimation/20160628_fitResult_2015SR_EWKFit_MC2p57fb_pkl'
-readYields = '/data/dspitzbart/Results2016/QCDEstimation/20160628_QCDestimation_2015SR_v9_MC2p57fb_pkl'
+readFit     = '/data/dspitzbart/Results2016/QCDEstimation/20160628_fitResult_2016SR_preapp_MC10fb_pkl'
+readYields  = '/data/dspitzbart/Results2016/QCDEstimation/20160628_QCDestimation_2016SR_preapp_MC10fb_pkl'
 
 
 
@@ -39,7 +39,7 @@ if isData:
 else:
   sampleStr = 'MC'
 
-SRstring = '2016SR_preapp'
+SRstring = '2016SR_preapp_100p'
 if isValidation: SRstring = 'validation'
 
 preprefix = 'QCDestimation/'+SRstring+'_10fb/'+sampleStr
@@ -55,10 +55,11 @@ if not os.path.exists(wwwDir):
 mcFileIsHere = False
 if isData:
   mcFileIsHere = True
-  try: file(picklePath+'20160628_QCDestimation_'+SRstring+'_MC10fb_pkl')
+  mcFile = picklePath+'20160628_QCDestimation_2016SR_preapp_MC10fb_pkl'
+  try: file(mcFile)
   except IOError: mcFileIsHere = False
   if mcFileIsHere:
-    mc_bins = pickle.load(file(picklePath+'20160628_QCDestimation_'+SRstring+'_MC10fb_pkl'))
+    mc_bins = pickle.load(file(mcFile))
     print 'MC file successfully loaded, can assign correct uncertainties'
     mcFileIsHere = True
   else:
@@ -168,10 +169,11 @@ template_QCD = ROOT.TH1F('template_QCD','template_QCD',numberOfBins,-0.5,2.5)
 #print '!!!!!!!!!!!!!!! using sel QCD as template now'
 templateName, templateCut = nameAndCut((250,-1), (500,-1), (3,4), (0,0), presel=antiSelStr, charge="", btagVar = 'nBJetMediumCSV30', stVar = 'Lt', htVar = 'htJet30clean', njetVar='nJet30clean') ##changed from anitsel for check!!!
 
-if isData:
-  cData.Draw('Lp>>template_QCD','('+templateCut+trigger+filters+')','goff')
-else:
-  cData.Draw('Lp>>template_QCD','('+weight_str+')*('+templateCut+')','goff')
+if makeFit:
+  if isData:
+    cData.Draw('Lp>>template_QCD','('+templateCut+trigger+filters+')','goff')
+  else:
+    cData.Draw('Lp>>template_QCD','('+weight_str+')*('+templateCut+')','goff')
 
 histos = {}
 if makeFit:
@@ -517,12 +519,16 @@ for srNJet in sorted(signalRegion):
           NQCD_truth  = bins[srNJet][stb][htb][btb][dP]['NQCDSelMC']
           if isData and mcFileIsHere: #apply the relative uncertainty determined in MC to data
             NQCD_err_rel  = mc_bins[srNJet][stb][htb][btb][dP]['NQCDpred_err_rel']
+            NQCD_err_rel  = 1.
             NQCD_err      = NQCD_err_rel*NQCD
           elif isData and not mcFileIsHere:
             NQCD_err_rel  = 'Uncertainty not correct!!'
             NQCD_err      = NQCD_err
           else: #In MC, get the max of the determined error of the method and the non-closure
+            print NQCD_err, NQCD, NQCD_truth, NQCD
             NQCD_err_rel  = max([NQCD_err/NQCD, abs(1-NQCD_truth/NQCD)])
+            NQCD_err_rel  = 1.
+            print round(NQCD_err_rel,3)
             NQCD_err      = NQCD_err_rel*NQCD
           try: NQCD_lowDPhi = NQCD/(RcsAnti+1)
           except ZeroDivisionError: NQCD_lowDPhi = float('nan') 

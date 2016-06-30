@@ -17,6 +17,7 @@ import copy
 import operator
 import collections
 import errno
+import subprocess
 
 
 # imports user modules or functions
@@ -656,8 +657,6 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
         'ngenPartAll','genPartAll_*',
         'ngenTau', 'genTau_*', 
         'ngenLepFromTau', 'genLepFromTau_*', 
-        'GenJet_*',
-        #'GenTracks_*',
         ]
     
     readVariables_MC = []
@@ -1933,27 +1932,33 @@ def haddFiles(sample_name, filesForHadd, temporaryDir, outputWriteDirectory):
 
     size = 0
     counter = 0
-    files = []
+    root_files = []
     for f in filesForHadd:
         size += os.path.getsize(temporaryDir + '/' + f)
-        files.append(f)
-        if size > (maxFileSize * (10 ** 6)) or f == filesForHadd[-1] or len(files) > maxNumberFiles:
-            #ofile = outputWriteDirectory + '/' + sample['name'] + '_' + str(counter) + '.root'
-            ofile = outputWriteDirectory + '/' + sample_name+ '_' + str(counter) + '.root'
-            logger.debug(
-                "\n Running hadd on directory \n %s \n files: \n %s \n", 
-                temporaryDir, pprint.pformat(files)
+        root_files.append(f)
+        if size > (maxFileSize * (10 ** 6)) or f == filesForHadd[-1] or len(root_files) > maxNumberFiles:
+            output_file = ''.join([sample_name, '_', str(counter), '.root'])
+
+            os.chdir(temporaryDir)
+            logger.info(
+                "\n Running hadd on directory \n %s \n files: \n %s \n",
+                os.getcwd(), pprint.pformat(root_files)
                 )
-            os.system('cd ' + temporaryDir + ';hadd -f -v 0 ' + ofile + ' ' + ' '.join(files))
-            logger.debug("\n Written output file \n %s \n", ofile)
+            subprocess.check_call(['hadd', output_file] + root_files)
+
+            logger.debug(
+                "\n Move file \n %s \n to directory \n %s \n",
+                output_file, outputWriteDirectory
+                )
+            shutil.move(output_file, outputWriteDirectory)
+            logger.debug("\n Written output file \n %s \n", output_file)
             size = 0
-            counter += 1 
-            files = []
+            counter += 1
+            root_files = []
     
-    # remove the temporary directory  
-    os.system('cd ' + outputWriteDirectory)
-    ROOT.gDirectory.cd("..")
-    shutil.rmtree(temporaryDir, onerror=retryRemove)
+    # remove the temporary directory  - FIXME uncomment cleaning directory after solving hadd problem 
+    os.chdir(outputWriteDirectory)
+#     shutil.rmtree(temporaryDir, onerror=retryRemove)
     if not os.path.exists(temporaryDir): 
         logger.debug("\n Temporary directory \n    %s \n deleted. \n", temporaryDir)
     else:
@@ -2203,7 +2208,8 @@ def cmgPostProcessing(argv=None):
                 continue
         
         # python 2.7 version - must be removed by hand, preferably in a try: ... finalize:
-        temporaryDir = tempfile.mkdtemp(prefix='tmp_cmgPostProcessing_', dir=outputDirectory) 
+        tmpPrefix = ''.join(['tmp_postProcessing_', sampleName, '_'])
+        temporaryDir = tempfile.mkdtemp(prefix=tmpPrefix, dir=outputDirectory) 
         #
         # for 3.X use
         # temporaryDir = tempfile.TemporaryDirectory(suffix=None, prefix=None, dir=None)
@@ -2418,13 +2424,21 @@ def cmgPostProcessing(argv=None):
 
                 # 
                 
-                fileTreeSplit_full = sample_name + '_' + chunk['name'] + '_' + str(iSplit) + '.root' 
+                fileTreeSplit_full = ''.join([
+                    sample_name, '_', 
+                    chunk['name'], '_', 
+                    str(iSplit), '.root'
+                    ])
                 
                 file_length_limit = 256
                 if len(fileTreeSplit_full)> file_length_limit:
-                    fileTreeSplit = sample_name[:50] + '_' + chunk['name'][:50] + '_' + str(iSplit) + '.root'
+                    fileTreeSplit = ''.join([
+                        sample_name[:50].rsplit('_', 1)[0], '___', 
+                        chunk['name'][50:].split('_', 1)[1], '_', 
+                        str(iSplit), '.root'
+                        ])
                     logger.debug(
-                        "\n Length of fileTreeSplit name shortened to %d\n New file name: \n %s \n", 
+                        "\n Length of fileTreeSplit name over 256 characters, shortened to %d\n New file name: \n %s \n", 
                         len(fileTreeSplit), fileTreeSplit)
                 else:
                     fileTreeSplit = fileTreeSplit_full
@@ -2433,7 +2447,7 @@ def cmgPostProcessing(argv=None):
                 filesForHadd.append(fileTreeSplit)
 
                 if not testMethods:
-                    tfileTreeSplit = ROOT.TFile(temporaryDir + '/' + fileTreeSplit, 'recreate')
+                    tfileTreeSplit = ROOT.TFile(temporaryDir + '/' + fileTreeSplit, 'CREATE')
 
                     splitTree.SetBranchStatus("*", 0)
                     for b in (keepBranches + 

@@ -45,7 +45,7 @@ class cmgTuplesPostProcessed():
       ol['dir'] = ol['dir'] + '/oneLep/'
 
       pil = copy.deepcopy(sample)
-      pol['dir'] = pil['dir'] + '/skimPreselect/incLep/'
+      pil['dir'] = pil['dir'] + '/skimPreselect/incLep/'
 
       pol = copy.deepcopy(sample)
       pol['dir'] = pol['dir'] + '/skimPreselect/oneLep/'

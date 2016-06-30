@@ -83,10 +83,10 @@ for srNJet in signalRegions:
       print '## Using a dPhi cut value of',str(deltaPhiCut)
       print '#################################################'
       print
-      makeTTPrediction(rd, samples, htb, stb, srNJet, presel, dPhiCut=deltaPhiCut, QCD=QCDestimate)
+      makeTTPrediction(rd, samples, htb, stb, srNJet, presel, presel_MC, dPhiCut=deltaPhiCut, QCD=QCDestimate)
 
       #join W estimation results to dict
-      makeWPrediction(rd, samples, htb, stb, srNJet, presel, dPhiCut=deltaPhiCut, QCD=QCDestimate)
+      makeWPrediction(rd, samples, htb, stb, srNJet, presel, presel_MC, dPhiCut=deltaPhiCut, QCD=QCDestimate)
 
       ##If you want to make prediction of one of the bkgs, comment out all the estimation of total Bkgs
       #estimate total background
@@ -105,7 +105,7 @@ for srNJet in signalRegions:
       truth_total_NegPdg_err = sqrt((0.5*(rd['TT_truth_err']))**2 + rd['W_NegPdg_truth_err']**2 + rd['Rest_NegPdg_truth_err']**2)
       
       #write out data yields in MB, edit for blinding policies
-      if isData:
+      if isData or not useBTagWeights:
         srName, srCut = nameAndCut(stb, htb, srNJet, btb=(0,0), presel=presel, btagVar = nBTagVar)
         weight_str_sr = '(1)'
       else:
