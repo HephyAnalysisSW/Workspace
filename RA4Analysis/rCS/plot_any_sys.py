@@ -42,7 +42,7 @@ for srNJet in sorted(signalRegions):
 saveDir =  '/data/easilar/Results2016/ICHEP/Prediction_Spring16_templates_lep_data_4fb/'
 validation = False
 #dilep   = pickle.load(file('/data/easilar/Results2016/ICHEP/DiLep_SYS/V1/unc_with_SRAll_pkl'))
-dilep   = pickle.load(file('/data/easilar/Results2016/ICHEP/DiLep_SYS/V1/unc_with_SRAll_V3_pkl'))
+dilep   = pickle.load(file('/data/easilar/Results2016/ICHEP/DiLep_SYS/V1/unc_with_SRAll_V4_pkl'))
 
 colors = [ROOT.kBlue-7, ROOT.kCyan-9, ROOT.kCyan-2, ROOT.kGreen-6, ROOT.kOrange+6, ROOT.kRed+1, ROOT.kRed-6, ROOT.kYellow+2, ROOT.kGreen, ROOT.kGreen+3, ROOT.kBlue-2]
 
@@ -103,6 +103,10 @@ for injb,srNJet in enumerate(sorted(signalRegions)):
       dilepC.SetBinContent(i, constant_err)
       dilepS.SetBinContent(i, slope_err)
       print constant_err , slope_err
+      errorsForTotal = [constant_err , slope_err]
+      totalSyst_noKappa = 0
+      for err in errorsForTotal: totalSyst_noKappa += err**2
+      totalH.SetBinContent(i, sqrt(totalSyst_noKappa))
       
       i+=1
 
@@ -127,11 +131,13 @@ leg.SetFillColor(ROOT.kWhite)
 leg.SetShadowColor(ROOT.kWhite)
 leg.SetBorderSize(1)
 leg.SetTextSize(0.04)
+leg.AddEntry(totalH, 'Total', 'p')
 for i in range(2):
   leg.AddEntry(hists[i], '', 'f')
 
 
 h_Stack.Draw('hist')
+totalH.Draw('p same')
 #setNiceBinLabel(h_Stack, signalRegions )
 
 h_Stack.GetYaxis().SetTitle('Relative uncertainty')
@@ -152,6 +158,6 @@ latex1.SetTextAlign(11)
 latex1.DrawLatex(0.15,0.96,'CMS #bf{#it{Preliminary}}')
 latex1.DrawLatex(0.85,0.96,"#bf{(13TeV)}")
 
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/data/Run2016B/4fb/syst_uncertainties/diLepSys_ICHEP_kappa_tot_ttFix.png')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/data/Run2016B/4fb/syst_uncertainties/diLepSys_ICHEP_kappa_tot_ttFix.root')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/data/Run2016B/4fb/syst_uncertainties/diLepSys_ICHEP_kappa_tot_ttFix.pdf')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/data/Run2016B/4fb/syst_uncertainties/diLepSys_ICHEP_kappa_tot_V4.png')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/data/Run2016B/4fb/syst_uncertainties/diLepSys_ICHEP_kappa_tot_V4.root')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/data/Run2016B/4fb/syst_uncertainties/diLepSys_ICHEP_kappa_tot_V4.pdf')
