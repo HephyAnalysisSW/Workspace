@@ -36,7 +36,7 @@ def LpTemplateFit(LpTemplates, prefix="", printDir='/afs/hephy.at/user/'+usernam
     template_QCD.Scale(1./template_QCD.Integral())
 
   #Observable
-  x=ROOT.RooRealVar('Lp','L_{P}',-0.5,0.5)
+  x=ROOT.RooRealVar('Lp','L_{P}',-0.5,2.5) #set to 0.5 for alternative approach
 
   #import the contents of 'data' ROOT histogram into a RooDataHist object 
   data=ROOT.RooDataHist("data","data",ROOT.RooArgList(x),hData)

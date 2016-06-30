@@ -10,7 +10,7 @@ from rCShelpers import *# weight_str , weight_err_str , lumi
 
 from predictionConfig import *
 
-def binnedNBTagsFit(cut, cutname, samples, prefix = "", QCD_dict={0:{'y':0.,'e':0.,'totalY':0., 'totalY_err':0.}, 1:{'y':0.,'e':0.,'totalY':0., 'totalY_err':0.},2:{'y':0.,'e':0.,'totalY':0., 'totalY_err':0.}}, bootstrap=False):
+def binnedNBTagsFit(cut, MCcut, cutname, samples, prefix = "", QCD_dict={0:{'y':0.,'e':0.,'totalY':0., 'totalY_err':0.}, 1:{'y':0.,'e':0.,'totalY':0., 'totalY_err':0.},2:{'y':0.,'e':0.,'totalY':0., 'totalY_err':0.}}, bootstrap=False):
   #print "LUMI:" , lumi
   #if not os.path.exists(printDir):
   #   os.makedirs(printDir) 
@@ -52,10 +52,10 @@ def binnedNBTagsFit(cut, cutname, samples, prefix = "", QCD_dict={0:{'y':0.,'e':
     template_WJets_PosPdg = template_WJets_PosPdg_Dict['hist']
     tempFile_WJets_PosPdg = template_WJets_PosPdg_Dict['file']
   else:
-    template_WJets_PosPdg = getPlotFromChain(cWJets, nBTagVar, [0,1,2,3], 'leptonPdg>0&&'+cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
+    template_WJets_PosPdg = getPlotFromChain(cWJets, nBTagVar, [0,1,2,3], 'leptonPdg>0&&'+MCcut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
     if templateWeights:
       for i_nbjb, nbjb in enumerate(['0','1','2p']):
-        val, err = getYieldFromChain(cWJets, cutString = 'leptonPdg>0&&'+cut, weight = weight_str+'*weightBTag'+nbjb+templateWeightSuffix, returnError=True)
+        val, err = getYieldFromChain(cWJets, cutString = 'leptonPdg>0&&'+MCcut, weight = weight_str+'*weightBTag'+nbjb+templateWeightSuffix, returnError=True)
         template_WJets_PosPdg.SetBinContent(i_nbjb+1, val)
         template_WJets_PosPdg.SetBinError(i_nbjb+1,  errorScale*err)
     tempFile_WJets_PosPdg = ROOT.TFile(templateDir+cutname+'_WJets_PosPdg.root','new')
@@ -67,10 +67,10 @@ def binnedNBTagsFit(cut, cutname, samples, prefix = "", QCD_dict={0:{'y':0.,'e':
     template_WJets_NegPdg = template_WJets_NegPdg_Dict['hist']
     tempFile_WJets_NegPdg = template_WJets_NegPdg_Dict['file']
   else: 
-    template_WJets_NegPdg = getPlotFromChain(cWJets, nBTagVar, [0,1,2,3], 'leptonPdg<0&&'+cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
+    template_WJets_NegPdg = getPlotFromChain(cWJets, nBTagVar, [0,1,2,3], 'leptonPdg<0&&'+MCcut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
     if templateWeights:
       for i_nbjb, nbjb in enumerate(['0','1','2p']):
-        val, err = getYieldFromChain(cWJets, cutString = 'leptonPdg<0&&'+cut, weight = weight_str+'*weightBTag'+nbjb+templateWeightSuffix, returnError=True)
+        val, err = getYieldFromChain(cWJets, cutString = 'leptonPdg<0&&'+MCcut, weight = weight_str+'*weightBTag'+nbjb+templateWeightSuffix, returnError=True)
         template_WJets_NegPdg.SetBinContent(i_nbjb+1, val)
         template_WJets_NegPdg.SetBinError(i_nbjb+1,  errorScale*err)
     tempFile_WJets_NegPdg = ROOT.TFile(templateDir+cutname+'_WJets_NegPdg.root','new')
@@ -82,10 +82,10 @@ def binnedNBTagsFit(cut, cutname, samples, prefix = "", QCD_dict={0:{'y':0.,'e':
     template_TTJets = template_TTJets_Dict['hist']
     tempFile_TTJets = template_TTJets_Dict['file']
   else: 
-    template_TTJets = getPlotFromChain(cTTJets, nBTagVar, [0,1,2,3], cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
+    template_TTJets = getPlotFromChain(cTTJets, nBTagVar, [0,1,2,3], MCcut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
     if templateWeights:
       for i_nbjb, nbjb in enumerate(['0','1','2p']):
-        val, err = getYieldFromChain(cTTJets, cutString = cut, weight = weight_str+'*weightBTag'+nbjb+templateWeightSuffix, returnError=True)
+        val, err = getYieldFromChain(cTTJets, cutString = MCcut, weight = weight_str+'*weightBTag'+nbjb+templateWeightSuffix, returnError=True)
         template_TTJets.SetBinContent(i_nbjb+1, val)
         template_TTJets.SetBinError(i_nbjb+1,  errorScale*err)
     tempFile_TTJets = ROOT.TFile(templateDir+cutname+'_TTJets.root','new')
@@ -97,10 +97,10 @@ def binnedNBTagsFit(cut, cutname, samples, prefix = "", QCD_dict={0:{'y':0.,'e':
     template_Rest_PosPdg = template_Rest_PosPdg_Dict['hist']
     tempFile_Rest_PosPdg = template_Rest_PosPdg_Dict['file']
   else: 
-    template_Rest_PosPdg = getPlotFromChain(cRest, nBTagVar, [0,1,2,3], 'leptonPdg>0&&'+cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
+    template_Rest_PosPdg = getPlotFromChain(cRest, nBTagVar, [0,1,2,3], 'leptonPdg>0&&'+MCcut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
     if templateWeights:
       for i_nbjb, nbjb in enumerate(['0','1','2p']):
-        val, err = getYieldFromChain(cRest, cutString = 'leptonPdg>0&&'+cut, weight = weight_str+'*weightBTag'+nbjb+templateWeightSuffix, returnError=True)
+        val, err = getYieldFromChain(cRest, cutString = 'leptonPdg>0&&'+MCcut, weight = weight_str+'*weightBTag'+nbjb+templateWeightSuffix, returnError=True)
         template_Rest_PosPdg.SetBinContent(i_nbjb+1, val)
         template_Rest_PosPdg.SetBinError(i_nbjb+1,  errorScale*err)
     tempFile_Rest_PosPdg = ROOT.TFile(templateDir+cutname+'_Rest_PosPdg.root','new')
@@ -112,10 +112,10 @@ def binnedNBTagsFit(cut, cutname, samples, prefix = "", QCD_dict={0:{'y':0.,'e':
     template_Rest_NegPdg = template_Rest_NegPdg_Dict['hist']
     tempFile_Rest_NegPdg = template_Rest_NegPdg_Dict['file']
   else: 
-    template_Rest_NegPdg = getPlotFromChain(cRest, nBTagVar, [0,1,2,3], 'leptonPdg<0&&'+cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
+    template_Rest_NegPdg = getPlotFromChain(cRest, nBTagVar, [0,1,2,3], 'leptonPdg<0&&'+MCcut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
     if templateWeights:
       for i_nbjb, nbjb in enumerate(['0','1','2p']):
-        val, err = getYieldFromChain(cRest, cutString = 'leptonPdg<0&&'+cut, weight = weight_str+'*weightBTag'+nbjb+templateWeightSuffix, returnError=True)
+        val, err = getYieldFromChain(cRest, cutString = 'leptonPdg<0&&'+MCcut, weight = weight_str+'*weightBTag'+nbjb+templateWeightSuffix, returnError=True)
         template_Rest_NegPdg.SetBinContent(i_nbjb+1, val)
         template_Rest_NegPdg.SetBinError(i_nbjb+1,  errorScale*err)
     tempFile_Rest_NegPdg = ROOT.TFile(templateDir+cutname+'_Rest_NegPdg.root','new')
@@ -133,10 +133,10 @@ def binnedNBTagsFit(cut, cutname, samples, prefix = "", QCD_dict={0:{'y':0.,'e':
   
   # use this for fake data
   if not isData and useBTagWeights:
-    hData_PosPdg = getPlotFromChain(cQCD, nBTagVar, [0,1,2,3], 'leptonPdg>0&&'+cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
+    hData_PosPdg = getPlotFromChain(cQCD, nBTagVar, [0,1,2,3], 'leptonPdg>0&&'+MCcut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
     #hData_PosPdg.Sumw2()
     for i_nbjb, nbjb in enumerate(['0','1','2p']):
-      val, err = getYieldFromChain(cBkg, cutString = 'leptonPdg>0&&'+cut, weight = weight_str+'*weightBTag'+nbjb+btagWeightSuffix, returnError=True)
+      val, err = getYieldFromChain(cBkg, cutString = 'leptonPdg>0&&'+MCcut, weight = weight_str+'*weightBTag'+nbjb+btagWeightSuffix, returnError=True)
       if useQCDestimation:
         binV = hData_PosPdg.GetBinContent(i_nbjb+1)
         binVar = (hData_PosPdg.GetBinError(i_nbjb+1))**2
@@ -146,10 +146,10 @@ def binnedNBTagsFit(cut, cutname, samples, prefix = "", QCD_dict={0:{'y':0.,'e':
         hData_PosPdg.SetBinContent(i_nbjb+1, val)
         hData_PosPdg.SetBinError(i_nbjb+1, err)
     
-    hData_NegPdg = getPlotFromChain(cQCD, nBTagVar, [0,1,2,3], 'leptonPdg<0&&'+cut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
+    hData_NegPdg = getPlotFromChain(cQCD, nBTagVar, [0,1,2,3], 'leptonPdg<0&&'+MCcut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
     #hData_NegPdg.Sumw2()
     for i_nbjb, nbjb in enumerate(['0','1','2p']):
-      val, err = getYieldFromChain(cBkg, cutString = 'leptonPdg<0&&'+cut, weight = weight_str+'*weightBTag'+nbjb+btagWeightSuffix, returnError=True)
+      val, err = getYieldFromChain(cBkg, cutString = 'leptonPdg<0&&'+MCcut, weight = weight_str+'*weightBTag'+nbjb+btagWeightSuffix, returnError=True)
       if useQCDestimation:
         binV = hData_NegPdg.GetBinContent(i_nbjb+1)
         binVar = (hData_NegPdg.GetBinError(i_nbjb+1))**2
@@ -209,7 +209,7 @@ def binnedNBTagsFit(cut, cutname, samples, prefix = "", QCD_dict={0:{'y':0.,'e':
     template_WJets_NegPdg = getRandomHistOfTemplate(template_WJets_NegPdg)
     template_Rest_PosPdg = getRandomHistOfTemplate(template_Rest_PosPdg)
     template_Rest_NegPdg = getRandomHistOfTemplate(template_Rest_NegPdg)
-  template_TTJets.Scale(1./template_TTJets.Integral())
+  if template_TTJets.Integral()>0: template_TTJets.Scale(1./template_TTJets.Integral())
   template_WJets_PosPdg.Scale(1./template_WJets_PosPdg.Integral())
   template_WJets_NegPdg.Scale(1./template_WJets_NegPdg.Integral())
   y_Rest_PosPdg = template_Rest_PosPdg.Integral()*lumi/templateLumi
@@ -430,6 +430,8 @@ def binnedNBTagsFit(cut, cutname, samples, prefix = "", QCD_dict={0:{'y':0.,'e':
                      'yieldVar':(0.5*(yield_Rest_NegPdg.getErrorHi()-yield_Rest_NegPdg.getErrorLo()))**2, 'file':tempFile_Rest_NegPdg},
         }
   del model_NegPdg, model_PosPdg, data_PosPdg,  data_NegPdg,sumNLL
+  print 'going to return dict with those keys'
+  print res.keys()
   return res
   
 

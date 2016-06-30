@@ -62,7 +62,11 @@ lepSF_h2b = d.GetPrimitive('h2b')
 #pickleDir =  '/data/dspitzbart/Results2016/Prediction_SFtemplates_fullSR_lep_data_QCDerrChange_2p25/'
 #pickleDir =  '/data/dspitzbart/Results2016/Prediction_SFtemplates_validation_4j_lep_data_2p3/'
 #pickleDir =  '/data/dspitzbart/Results2016/Prediction_Spring16_templates_validation_4j_lep_data_2p57/'
-pickleDir =  '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2015_lep_data_2p57/'
+#pickleDir =  '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2015_lep_data_2p57/'
+#pickleDir =  '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2016_v1_QCD_lep_MC_3p99/'
+
+pickleDir =  '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2016_v1_100p_lep_data_3p99/'
+
 saveDir = pickleDir
 #saveDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_fullSR_lep_data_2p25/'
 
@@ -81,7 +85,7 @@ else:
   dilep   = pickle.load(file('/data/dspitzbart/Results2016/dilep_pkl'))
 
 
-validation = False
+validation = True
 
 #topPt_Err = pickle.load(file("/data/easilar/Spring15/25ns/extended_with_truth_counts_topPt_pkl"))
 #topPt_Err = pickle.load(file("/data/dspitzbart/Results2016/topErr_pkl_update"))
@@ -224,7 +228,7 @@ for injb,srNJet in enumerate(sorted(signalRegions)):
       
       #top pt
       if validation:
-        topErr = 0.12
+        topErr = 0.08
       else:
         topErr = abs(topPt_Err[srNJet][stb][htb]['delta_avarage'])  
       topErrH.SetBinContent(i, topErr)
@@ -245,7 +249,7 @@ for injb,srNJet in enumerate(sorted(signalRegions)):
       
       #JEC
       if validation:
-        jecErr = 0.06
+        jecErr = 0.09
       else:
         jecErr = (abs(jec[srNJet][stb][htb]['delta_Up_central']) + abs(jec[srNJet][stb][htb]['delta_Down_central']))/2
       jecErrH.SetBinContent(i, jecErr)
@@ -260,6 +264,9 @@ for injb,srNJet in enumerate(sorted(signalRegions)):
       #2l
       if validation:
         dilepErr = 0.05
+        if srNJet == (5,5): dilepErr = 0.075
+        if srNJet == (6,7): dilepErr = 0.15
+        if srNJet == (8,-1): dilepErr = 0.30
       else:
         dilepErr = dilep[srNJet][stb][htb]
       dilepErrH.SetBinContent(i, dilepErr)
@@ -521,9 +528,9 @@ total_err.Draw('2 same')
 
 can.cd()
 
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/syst_uncertainties/validation_fullStatus.png')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/syst_uncertainties/validation_fullStatus.root')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/syst_uncertainties/validation_fullStatus.pdf')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/syst_uncertainties/validation_fullStatus_2016_v1.png')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/syst_uncertainties/validation_fullStatus_2016_v1.root')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/syst_uncertainties/validation_fullStatus_2016_v1.pdf')
 
 
 savePickle = True
