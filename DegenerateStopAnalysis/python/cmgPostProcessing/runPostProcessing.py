@@ -116,6 +116,16 @@ sampleSets = {
                                          
                                         ],
                             },
+                'dyjets_Spring16':{
+                            'samples':[
+                                         'DYJetsToLL_M50_HT100to200_ext',
+                                         'DYJetsToLL_M50_HT200to400_ext',
+                                         'DYJetsToLL_M50_HT400to600_ext',
+                                         'DYJetsToLL_M50_HT600toInf',
+                                         'DYJetsToLL_M50_HT600toInf_ext',
+                                         
+                                        ],
+                            },
                 'zjets':{
                             'samples':[ 
 
@@ -123,6 +133,16 @@ sampleSets = {
                                         ["ZJetsToNuNu_HT200to400", "--skimPreselect"],
                                         ["ZJetsToNuNu_HT400to600", "--skimPreselect"],
                                         ["ZJetsToNuNu_HT600toInf", "--skimPreselect"],
+
+                                        ],
+                             
+                            },
+                'zjets_Spring16':{
+                            'samples':[ 
+
+                                        ["ZJetsToNuNu_HT600to800", "--skimPreselect"],
+                                        ["ZJetsToNuNu_HT1200to2500", "--skimPreselect"],
+                                        ["ZJetsToNuNu_HT2500toInf", "--skimPreselect"],
 
                                         ],
                              
