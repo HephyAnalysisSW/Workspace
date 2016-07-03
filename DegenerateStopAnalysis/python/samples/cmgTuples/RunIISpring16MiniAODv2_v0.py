@@ -543,11 +543,11 @@ ZJetsToNuNu_HT600to800 ={
 
 ZJetsToNuNu_HT1200to2500 ={
 "cmgComp":cmgSampleComponents.ZJetsToNuNu_HT1200to2500,
-"name" : "ZJetsToNuNu_HT-1200to2500_13TeV-madgraph_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+"name" : "ZJetsToNuNu_HT-1200To2500_13TeV-madgraph_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
 #"name" : cmgSampleComponents.ZJetsToNuNu_HT1200to2500.name,
-"chunkString":"ZJetsToNuNu_HT-1200to2500_13TeV-madgraph_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
-"dir": sample_dir +"/" + "ZJetsToNuNu_HT-1200to2500_13TeV-madgraph_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
-"dbsName" : "/ZJetsToNuNu_HT-1200to2500_13TeV-madgraph/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM",
+"chunkString":"ZJetsToNuNu_HT-1200To2500_13TeV-madgraph_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+"dir": sample_dir +"/" + "ZJetsToNuNu_HT-1200To2500_13TeV-madgraph_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+"dbsName" : "/ZJetsToNuNu_HT-1200To2500_13TeV-madgraph/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM",
 "rootFileLocation":"tree.root",
 "skimAnalyzerDir":"skimAnalyzerCount", 
 "treeName":"tree",
@@ -558,11 +558,11 @@ ZJetsToNuNu_HT1200to2500 ={
 
 ZJetsToNuNu_HT2500toInf ={
 "cmgComp":cmgSampleComponents.ZJetsToNuNu_HT2500toInf,
-"name" : "ZJetsToNuNu_HT-2500toInf_13TeV-madgraph_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+"name" : "ZJetsToNuNu_HT-2500ToInf_13TeV-madgraph_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
 #"name" : cmgSampleComponents.ZJetsToNuNu_HT2500toInf.name,
-"chunkString":"ZJetsToNuNu_HT-2500toInf_13TeV-madgraph_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
-"dir": sample_dir +"/" + "ZJetsToNuNu_HT-2500toInf_13TeV-madgraph_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
-"dbsName" : "/ZJetsToNuNu_HT-2500toInf_13TeV-madgraph/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM",
+"chunkString":"ZJetsToNuNu_HT-2500ToInf_13TeV-madgraph_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+"dir": sample_dir +"/" + "ZJetsToNuNu_HT-2500ToInf_13TeV-madgraph_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+"dbsName" : "/ZJetsToNuNu_HT-2500ToInf_13TeV-madgraph/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM",
 "rootFileLocation":"tree.root",
 "skimAnalyzerDir":"skimAnalyzerCount", 
 "treeName":"tree",
