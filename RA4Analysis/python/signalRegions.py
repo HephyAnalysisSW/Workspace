@@ -69,7 +69,7 @@ signalRegions2016 = {(5,5): {(250, 350): {(500, 750):   {'deltaPhi': 1.0, 'njet'
                               (450, -1): {(500, 1000):  {'deltaPhi': 0.75, 'njet':'#geq8j','LT':'LT3','HT': 'HT1'},
                                           (1000, -1):   {'deltaPhi': 0.75, 'njet':'#geq8j','LT':'LT3','HT': 'HT23'}}}}
 
-valdiation2016    = {(4,4): {(250, 350): {(500, 750):   {'deltaPhi': 1.0, 'njet':'4j','LT':'LT1','HT': 'HT1'},
+validation2016    = {(4,4): {(250, 350): {(500, 750):   {'deltaPhi': 1.0, 'njet':'4j','LT':'LT1','HT': 'HT1'},
                                           (750, -1):    {'deltaPhi': 1.0, 'njet':'4j','LT':'LT1','HT': 'HT23'}},
                              (350, 450): {(500, 750):   {'deltaPhi': 1.0, 'njet':'4j','LT':'LT2','HT': 'HT1'},
                                           (750, -1):    {'deltaPhi': 1.0, 'njet':'4j','LT':'LT2','HT': 'HT23'}},

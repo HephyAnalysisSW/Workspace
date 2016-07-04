@@ -34,9 +34,11 @@ def makeTTPrediction(bins, samples, htb, stb, srNJet, presel, presel_MC, dPhiCut
 
   if QCD:
     #Get QCD yields in CR for b-tag fit
-    QCD_dict={0:{'y':QCD[srNJet][stb][htb][(0,0)][dPhiCut]['NQCDpred_lowdPhi'], 'e':QCD[srNJet][stb][htb][(0,0)][dPhiCut]['NQCDpred_lowdPhi_err'], 'totalY':QCD[srNJet][stb][htb][(0,0)][dPhiCut]['NQCDpred'], 'totalY_err':QCD[srNJet][stb][htb][(0,0)][dPhiCut]['NQCDpred_err']},\
-              1:{'y':QCD[srNJet][stb][htb][(1,1)][dPhiCut]['NQCDpred_lowdPhi'], 'e':QCD[srNJet][stb][htb][(1,1)][dPhiCut]['NQCDpred_lowdPhi_err'], 'totalY':QCD[srNJet][stb][htb][(1,1)][dPhiCut]['NQCDpred'], 'totalY_err':QCD[srNJet][stb][htb][(1,1)][dPhiCut]['NQCDpred_err']},\
-              2:{'y':QCD[srNJet][stb][htb][(2,-1)][dPhiCut]['NQCDpred_lowdPhi'], 'e':QCD[srNJet][stb][htb][(2,-1)][dPhiCut]['NQCDpred_lowdPhi_err'], 'totalY':QCD[srNJet][stb][htb][(2,-1)][dPhiCut]['NQCDpred'], 'totalY_err':QCD[srNJet][stb][htb][(2,-1)][dPhiCut]['NQCDpred_err']}}
+    QCD_dictEnt = QCD[srNJet][stb][htb]
+    
+    QCD_dict={0:{'y':QCD_dictEnt[(0,0)][dPhiCut]['NQCDpred_lowdPhi'], 'e':QCD_dictEnt[(0,0)][dPhiCut]['NQCDpred_lowdPhi_err'], 'totalY':QCD_dictEnt[(0,0)][dPhiCut]['NQCDpred'], 'totalY_err':QCD_dictEnt[(0,0)][dPhiCut]['NQCDpred_err']},\
+              1:{'y':QCD_dictEnt[(1,1)][dPhiCut]['NQCDpred_lowdPhi'], 'e':QCD_dictEnt[(1,1)][dPhiCut]['NQCDpred_lowdPhi_err'], 'totalY':QCD_dictEnt[(1,1)][dPhiCut]['NQCDpred'], 'totalY_err':QCD_dictEnt[(1,1)][dPhiCut]['NQCDpred_err']},\
+              2:{'y':QCD_dictEnt[(2,-1)][dPhiCut]['NQCDpred_lowdPhi'],'e':QCD_dictEnt[(2,-1)][dPhiCut]['NQCDpred_lowdPhi_err'],'totalY':QCD_dictEnt[(2,-1)][dPhiCut]['NQCDpred'],'totalY_err':QCD_dictEnt[(2,-1)][dPhiCut]['NQCDpred_err']}}
     fit_srNJet_lowDPhi = binnedNBTagsFit(fit_srCut+"&&"+dPhiStr+"<"+str(dPhiCut), fit_srCut_MC+"&&"+dPhiStr+"<"+str(dPhiCut), fit_srName+'_dPhi'+str(dPhiCut), samples = samples, prefix=fit_srName, QCD_dict=QCD_dict)
   else:
     fit_srNJet_lowDPhi = binnedNBTagsFit(fit_srCut+"&&"+dPhiStr+"<"+str(dPhiCut), fit_srCut_MC+"&&"+dPhiStr+"<"+str(dPhiCut), fit_srName+'_dPhi'+str(dPhiCut), samples = samples, prefix=fit_srName)
@@ -105,8 +107,20 @@ def makeTTPrediction(bins, samples, htb, stb, srNJet, presel, presel_MC, dPhiCut
   rd['yQCD_Var_crNJet_1b_highDPhi_truth'] = yQCD_crNJet_1b_highDPhi_truth[1]**2
 
   if QCD: #get estimated QCD yields for Rcs calculation in 1b (high and low deltaPhi)
-    QCD_lowDPhi  = {'y':QCD[(4,5)][stb][htb][(1,1)][dPhiCut]['NQCDpred_lowdPhi'], 'e':QCD[(4,5)][stb][htb][(1,1)][dPhiCut]['NQCDpred_lowdPhi_err']}
-    QCD_highDPhi = {'y':QCD[(4,5)][stb][htb][(1,1)][dPhiCut]['NQCDpred_highdPhi'],'e':QCD[(4,5)][stb][htb][(1,1)][dPhiCut]['NQCDpred_highdPhi_err']}
+    yQCD = QCD[(4,5)][stb][htb][(1,1)][dPhiCut]['NQCDpred']
+    eQCD = QCD[(4,5)][stb][htb][(1,1)][dPhiCut]['NQCDpred_err']
+    eQCD_rel = eQCD/yQCD
+    if QCDup:
+      yQCD = yQCD + eQCD
+      eQCD = yQCD*eQCD_rel
+    elif QCDdown:
+      yQCD = yQCD - eQCD
+      if yQCD < 0: yQCD = 0
+      elif yQCD > 0: eQCD = yQCD*eQCD_rel
+    QCD_lowDPhi  = {'y':yQCD, 'e':eQCD}
+    #QCD_lowDPhi  = {'y':QCD[(4,5)][stb][htb][(1,1)][dPhiCut]['NQCDpred_lowdPhi'], 'e':QCD[(4,5)][stb][htb][(1,1)][dPhiCut]['NQCDpred_lowdPhi_err']}
+    QCD_highDPhi = {'y':0, 'e':0}
+    #QCD_highDPhi = {'y':QCD[(4,5)][stb][htb][(1,1)][dPhiCut]['NQCDpred_highdPhi'],'e':QCD[(4,5)][stb][htb][(1,1)][dPhiCut]['NQCDpred_highdPhi_err']}
     QCDlist = [QCD_lowDPhi, QCD_highDPhi]
     for q in QCDlist:
       for e in q:

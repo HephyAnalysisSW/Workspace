@@ -10,6 +10,8 @@ from Workspace.HEPHYPythonTools.convertHelpers import compileClass, readVar, pri
 from math import *
 from Workspace.HEPHYPythonTools.user import username
 
+ROOT.gROOT.ProcessLine(".L ../../HEPHYPythonTools/scripts/root/WPolarizationVariation.C+")
+ROOT.gROOT.ProcessLine(".L ../../HEPHYPythonTools/scripts/root/TTbarPolarization.C+")
 ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 
@@ -29,6 +31,12 @@ except IOError:
   mcEffDict = False
 
 target_lumi = 3000 #pb-1
+
+WPolNormTTUp    = 0.9353
+WPolNormTTDown  = 1.0733
+WPolNormWUp     = 0.8947
+WPolNormWDown   = 1.1334
+
 
 #maxConsideredBTagWeight = 2
 #calcSystematics = True
@@ -141,7 +149,8 @@ if sys.argv[0].count('ipython'):
 ##print evt_veto_list
 
 ###For PU reweight###
-PU_dir = "/afs/hephy.at/user/e/easilar/www/data/Run2016B/4fb/PU_histos/"
+#PU_dir = "/afs/hephy.at/user/e/easilar/www/data/Run2016B/4fb/PU_histos/"
+PU_dir = "/data/dspitzbart/PU_histos/"
 PU_File_66mb = ROOT.TFile(PU_dir+"/h_ratio_66.root")
 PU_File_70mb = ROOT.TFile(PU_dir+"/h_ratio_70.root")
 PU_File_74mb = ROOT.TFile(PU_dir+"/h_ratio_74.root")
@@ -190,6 +199,44 @@ def getTreeFromChunk(c, skimCond, iSplit, nSplit):
   del rf
   return t
  
+
+def getGenWandLepton(c):
+  genPartAll = [getObjDict(c, 'GenPart_', ['pt','eta','phi','mass','pdgId','motherId','motherIndex'], j) for j in range(int(c.GetLeaf('nGenPart').GetValue()))]
+  lepton = filter(lambda l:abs(l['pdgId']) in [11,13,15], genPartAll)
+  if len(lepton)==0:
+    print "no generated lepton found (hadronic ttjets event)!"
+    p4w=False
+    p4lepton=False
+    return p4w, p4lepton
+  lFromW = filter(lambda w:abs(w['motherId'])==24, lepton)
+  if len(lFromW)==0:
+    test = filter(lambda w:w['motherId']==24, lepton)
+    if len(test)==0: print 'No lepton from W found (hadronic ttjets event)!'
+    p4w=False
+    p4lepton=False
+    return p4w, p4lepton
+  elif len(lFromW)>0:
+    Ws = []
+    leps = []
+    for i in range(len(lFromW)):
+      if abs(lFromW[i]['motherId'])!=24: print '4)this should not have happened'
+      genW = getObjDict(c, 'GenPart_', ['pt','eta','phi','mass','pdgId','motherId','motherIndex'], int(lFromW[i]['motherIndex']))
+      if abs(genW['pdgId'])!=24: '5)this should not have happened'
+      W = ROOT.TLorentzVector()
+      W.SetPtEtaPhiM(genW['pt'],genW['eta'],genW['phi'],genW['mass'])
+      lep = ROOT.TLorentzVector()
+      lep.SetPtEtaPhiM(lFromW[i]['pt'],lFromW[i]['eta'],lFromW[i]['phi'],lFromW[i]['mass'])
+      p4lepton = ROOT.LorentzVector(lep.Px(),lep.Py(),lep.Pz(),lep.E())
+      p4w = ROOT.LorentzVector(W.Px(),W.Py(),W.Pz(),W.E())
+      Ws.append(p4w)
+      leps.append(p4lepton)
+    if len(lFromW)>2:
+      print '3)this should not have happened'
+  return Ws, leps
+
+
+
+
 exec('allSamples=['+options.allsamples+']')
 for isample, sample in enumerate(allSamples):
   chunks, sumWeight = getChunks(sample)
@@ -246,7 +293,7 @@ for isample, sample in enumerate(allSamples):
     readVectors.append({'prefix':'JetForMET',  'nMax':100, 'vars':['rawPt/F','pt/F', 'eta/F', 'phi/F', 'mass/F','id/I','hadronFlavour/F','btagCSV/F', 'btagCMVA/F','corr_JECUp/F','corr_JECDown/F','corr/F']})
     readVectors.append({'prefix':'Jet',  'nMax':100,       'vars':['rawPt/F','pt/F', 'eta/F', 'phi/F', 'mass/F','id/I','hadronFlavour/F','btagCSV/F', 'btagCMVA/F','corr_JECUp/F','corr_JECDown/F','corr/F']})
    
-    newVariables.extend(['puReweight_true/F','puReweight_true_max4/F','puReweight_true_Down/F','puReweight_true_Up/F','weight_diLepTTBar0p5/F','weight_diLepTTBar2p0/F','weight_XSecTTBar1p1/F','weight_XSecTTBar0p9/F','weight_XSecWJets1p1/F','weight_XSecWJets0p9/F'])
+    newVariables.extend(['puReweight_true/F','puReweight_true_max4/F','puReweight_true_Down/F','puReweight_true_Up/F','weight_diLepTTBar0p5/F','weight_diLepTTBar2p0/F','weight_XSecTTBar1p1/F','weight_XSecTTBar0p9/F','weight_XSecWJets1p1/F','weight_XSecWJets0p9/F', 'weight_WPolPlus10/F', 'weight_WPolMinus10/F', 'weight_TTPolPlus5/F', 'weight_TTPolMinus5/F'])
     newVariables.extend(['GenTopPt/F/-999.','GenAntiTopPt/F/-999.','TopPtWeight/F/1.','GenTTBarPt/F/-999.','GenTTBarWeight/F/1.','nGenTops/I/0.'])
     newVariables.extend(['lepton_muSF_looseID/D/1.','lepton_muSF_mediumID/D/1.','lepton_muSF_miniIso02/D/1.','lepton_muSF_sip3d/D/1.','lepton_eleSF_cutbasedID/D/1.','lepton_eleSF_miniIso01/D/1.'])
     newVariables.extend(['lepton_muSF_looseID_err/D/0.','lepton_muSF_mediumID_err/D/0.','lepton_muSF_miniIso02_err/D/0.','lepton_muSF_sip3d_err/D/0.','lepton_eleSF_cutbasedID_err/D/0.','lepton_eleSF_miniIso01_err/D/0.'])
@@ -447,9 +494,62 @@ for isample, sample in enumerate(allSamples):
           s.leptonEt = lep_vec.Et()
           s.singleMuonic      =  abs(s.leptonPdg)==13
           s.singleElectronic  =  abs(s.leptonPdg)==11
+          
+          if "ttjets" in sample["name"].lower(): #W polarization in TTbar
+            p4t, p4w, p4lepton = getGenTopWLepton(t)
+            if not p4t and not p4w and not p4lepton:
+              s.weight = s.weight
+              s.weight_WPolPlus10 = s.weight
+              s.weight_WPolMinus10 = s.weight
+              s.weight_TTPolPlus5 = s.weight
+              s.weight_TTPolMinus5 = s.weight
+            else:
+              weightUp = s.weight
+              weightDown = s.weight
+              for ilep, lep in enumerate(p4lepton):
+                cosTheta = ROOT.WjetPolarizationAngle(p4w[ilep], p4lepton[ilep])
+                weightUp *= (1. + 0.05*(1.-cosTheta)**2)
+                weightDown *= (1. - 0.05*(1.-cosTheta)**2)
+              s.weight = s.weight
+              s.weight_WPolPlus10 = s.weight
+              s.weight_WPolMinus10 = s.weight
+              s.weight_TTPolPlus5 = weightUp * WPolNormTTUp
+              s.weight_TTPolMinus5 = weightDown * WPolNormTTDown
+          elif "wjets" in sample["name"].lower() and not "ttw" in sample["name"].lower(): #W polarization in W+jets
+            p4w, p4lepton = getGenWandLepton(t)
+            if not p4w and not p4lepton: 
+              s.weight = s.weight
+              s.weight_WPolPlus10 = s.weight
+              s.weight_WPolMinus10 = s.weight
+              s.weight_TTPolPlus5 = s.weight
+              s.weight_TTPolMinus5 = s.weight
+            else:
+              weightUp = s.weight
+              weightDown = s.weight
+              for ilep, lep in enumerate(p4lepton):
+                cosTheta = ROOT.WjetPolarizationAngle(p4w[ilep], p4lepton[ilep])
+                weightUp *= (1. + 0.1*(1.-cosTheta)**2)
+                weightDown *= (1. - 0.1*(1.-cosTheta)**2)
+              s.weight = s.weight
+              s.weight_WPolPlus10 = weightUp * WPolNormWUp 
+              s.weight_WPolMinus10 = weightDown * WPolNormWDown
+              s.weight_TTPolPlus5 = s.weight
+              s.weight_TTPolMinus5 = s.weight 
+          else:
+            s.weight = s.weight
+            s.weight_WPolPlus10 = s.weight
+            s.weight_WPolMinus10 = s.weight
+            s.weight_TTPolPlus5 = s.weight
+            s.weight_TTPolMinus5 = s.weight
         else:
+          s.weight = s.weight
+          s.weight_WPolPlus10 = s.weight
+          s.weight_WPolMinus10 = s.weight
+          s.weight_TTPolPlus5 = s.weight
+          s.weight_TTPolMinus5 = s.weight
           s.singleMuonic      = False 
           s.singleElectronic  = False 
+
         j_list=['eta','pt','phi','btagCMVA', 'btagCSV', 'id']
         jets = filter(lambda j:j['pt']>30 and abs(j['eta'])<2.4 and j['id'], get_cmg_jets_fromStruct(r,j_list))
         lightJets,  bJetsCSV = splitListOfObjects('btagCSV', 0.800, jets)

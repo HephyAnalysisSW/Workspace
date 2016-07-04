@@ -75,7 +75,8 @@ if isData:
   QCDpickle  = '/data/dspitzbart/Results2016/QCDEstimation/20160628_QCDestimation_2016SR_preapp_100p_data10fb_pkl'
 if isData and validation:
   #QCDpickle  = '/data/dspitzbart/Results2016/QCDEstimation/20160218_QCDestimation_validation_data2p25fb_pkl'
-  QCDpickle  = '/data/dspitzbart/Results2016/QCDEstimation/20160623_v3_QCDestimation_validation_data2p57fb_pkl'
+  #QCDpickle  = '/data/dspitzbart/Results2016/QCDEstimation/20160623_v3_QCDestimation_validation_data2p57fb_pkl'
+  QCDpickle  = '/data/dspitzbart/Results2016/QCDEstimation/20160630_QCDestimation_2016val_preapp_v2_data4fb_pkl'
 #QCDpickle  = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_2p1fb_pkl'
 #QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_extendedClosureTest3to4j_2p1fb_pkl'
 #QCDpickle = '/data/dhandl/results2015/QCDEstimation/20151216_QCDestimation_closureTest4to5j_2p1fb_pkl'
@@ -93,20 +94,20 @@ else:
 
 ## signal region definition
 if validation:
-  signalRegions = validationRegionAll
+  signalRegions = validation2016
   regStr = 'validation_4j'
 else:
-  signalRegions = signalRegions2016
-  #signalRegions = signalRegion3fb
-  #regStr = 'fullSR'
-  regStr = 'SR2016_v1_100p'
+  #signalRegions = signalRegions2016
+  signalRegions = signalRegion3fb
+  regStr = 'fullSR'
+  #regStr = 'SR2016_v1_100p'
 #signalRegions = signalRegion3fbMerge
 
 ## weight calculations
-lumi = 3.99
-templateLumi = 3.99 # lumi that was used when template was created - if defined wrong, fixed rest backgrounds will be wrong
+lumi = 2.3
+templateLumi = 2.3 # lumi that was used when template was created - if defined wrong, fixed rest backgrounds will be wrong
 sampleLumi = 3.
-printlumi = '4.0'
+printlumi = '2.3'
 debugReweighting = False
 
 year = '2016'
@@ -127,19 +128,19 @@ if templateBootstrap: templateBootstrap = pickle.load(file(templateBootstrapDir)
 
 ## Directories for plots, results and templates
 if isData:
-  templateName   = 'Spring16_templates_'+regStr+'_lep_data'
+  templateName   = 'Spring15_templates_'+regStr+'_lep_data'
   predictionName = templateName + nameSuffix
 else:
-  templateName   = 'Spring16_templates_'+regStr+'_lep_MC'
+  templateName   = 'Spring15_templates_'+regStr+'_lep_MC'
   predictionName = templateName+btagWeightSuffix + nameSuffix
 printDir    = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/25ns/templateFit_'+predictionName+'_'+lumistr+'/'
 pickleDir   = '/data/'+username+'/Results'+year+'/Prediction_'+predictionName+'_'+lumistr+'/'
 templateDir = '/data/'+username+'/Results'+year+'/btagTemplates_'+templateName+'_'+templateLumistr+'/'
-prefix = 'singleLeptonic_Spring16_'
+prefix = 'singleLeptonic_Spring15_'
 
 if validation:
   #kappa_dict_dir = '/data/dspitzbart/Results'+year+'/Prediction_SFtemplates_validation_4j_lep_MC_SF_2p3/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'
-  kappa_dict_dir = '/data/dspitzbart/Results'+year+'/Prediction_Spring16_templates_validation_4j_lep_MC_SF_2p57/singleLeptonic_Spring16__estimationResults_pkl_kappa_corrected'
+  kappa_dict_dir = '/data/dspitzbart/Results'+year+'/Prediction_Spring16_templates_validation_4j_lep_MC_3p99/singleLeptonic_Spring16__estimationResults_pkl_kappa_corrected'
 else:
   #kappa_dict_dir = '/data/dspitzbart/Results'+year+'/Prediction_SFtemplates_fullSR_lep_MC_SFnoPUreweight_2p25/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'
   #kappa_dict_dir = '/data/dspitzbart/Results'+year+'/Prediction_SFtemplates_fullSR_lep_MC_SF_Moriond_2p3/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'

@@ -22,15 +22,16 @@ from Workspace.RA4Analysis.cmgTuples_Data25ns_Promtv2_antiSel_postprocessed impo
 from math import *
 from Workspace.HEPHYPythonTools.user import username
 from LpTemplateFit import LpTemplateFit
+from rCShelpers import *
 
-isData = False
+isData = True
 makeFit = False
 getYields = False
 getResults = True
-isValidation = False
+isValidation = True
 
-readFit     = '/data/dspitzbart/Results2016/QCDEstimation/20160628_fitResult_2016SR_preapp_MC10fb_pkl'
-readYields  = '/data/dspitzbart/Results2016/QCDEstimation/20160628_QCDestimation_2016SR_preapp_MC10fb_pkl'
+readFit     = '/data/dspitzbart/Results2016/QCDEstimation/20160630_fitResult_2016val_preapp_v2_data4fb_pkl'
+readYields  = '/data/dspitzbart/Results2016/QCDEstimation/20160630_QCDestimation_2016val_preapp_v2_data4fb_pkl'
 
 
 
@@ -40,14 +41,14 @@ else:
   sampleStr = 'MC'
 
 SRstring = '2016SR_preapp_100p'
-if isValidation: SRstring = 'validation'
+if isValidation: SRstring = '2016val_preapp_v2'
 
-preprefix = 'QCDestimation/'+SRstring+'_10fb/'+sampleStr
+preprefix = 'QCDestimation/'+SRstring+'_4fb/'+sampleStr
 wwwDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/'+preprefix+'/'
 picklePath = '/data/'+username+'/Results2016/QCDEstimation/'
 prefix = 'Lp_singleElectronic_'
-picklePresel = '20160628_QCDestimation_'+SRstring+'_'+sampleStr+'10fb_pkl'
-pickleFit    = '20160628_fitResult_'+SRstring+'_'+sampleStr+'10fb_pkl'
+picklePresel = '20160630_QCDestimation_'+SRstring+'_'+sampleStr+'4fb_pkl'
+pickleFit    = '20160630_fitResult_'+SRstring+'_'+sampleStr+'4fb_pkl'
 
 if not os.path.exists(wwwDir):
   os.makedirs(wwwDir)
@@ -55,7 +56,7 @@ if not os.path.exists(wwwDir):
 mcFileIsHere = False
 if isData:
   mcFileIsHere = True
-  mcFile = picklePath+'20160628_QCDestimation_2016SR_preapp_MC10fb_pkl'
+  mcFile = picklePath+'20160628_QCDestimation_2016val_preapp_MC4fb_pkl'
   try: file(mcFile)
   except IOError: mcFileIsHere = False
   if mcFileIsHere:
@@ -82,7 +83,7 @@ fitCR =  {QCD_SB: {(250,  -1): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}},
                    (350, 450): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}},
                    (450, -1):  {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}}}}
 
-if isValidation: SRs = validationRegionAll
+if isValidation: SRs = validation2016
 else:
   #SRs = signalRegion3fb
   SRs = signalRegions2016
@@ -91,43 +92,10 @@ signalRegion = makeQCDsignalRegions(SRs, QCDSB=QCD_SB)
 
 btreg = [(0,0), (1,1), (2,-1)] #1b and 2b estimates are needed for the btag fit
 
-def makeWeight(lumi=3., sampleLumi=3.,debug=False):
-  #reWeight = 'lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*TopPtWeight*0.94*puReweight_true_max4'
-  #reWeight = 'lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*0.94*TopPtWeight'
-  reWeight = '(1)'
-  if debug:
-    print 'No lumi-reweighting done!!'
-    return 'weight', 'weight*weight'
-  else:
-    weight_str = '((weight/'+str(sampleLumi)+')*'+str(lumi)+'*'+reWeight+')'
-    weight_err_str = '('+weight_str+'*'+weight_str+')'
-  return weight_str, weight_err_str
 
 lumi = 3.99
 sampleLumi = 3.0 #post processed sample already produced with 2.25fb-1
-weight_str, weight_err_str = makeWeight(lumi, sampleLumi)
-
-def getRCS(c, cut, dPhiCut, useWeight = False, weight = 'weight'):
-#  dPhiStr = 'acos((LepGood_pt+met_pt*cos(LepGood_phi-met_phi))/sqrt(LepGood_pt**2+met_pt**2+2*met_pt*LepGood_pt*cos(LepGood_phi-met_phi)))'
-  dPhiStr = 'deltaPhi_Wl'
-  if useWeight:
-    h = getPlotFromChain(c, dPhiStr, [0,dPhiCut,pi], cutString=cut, binningIsExplicit=True, weight =  weight)
-  else:
-    h = getPlotFromChain(c, dPhiStr, [0,dPhiCut,pi], cutString=cut, binningIsExplicit=True, weight='(1)')
-  h.Sumw2()
-  if h.GetBinContent(1)>0:
-    rcs = h.GetBinContent(2)/h.GetBinContent(1)
-    if h.GetBinContent(2)>0:
-      rCSE_sim = rcs*sqrt(h.GetBinError(2)**2/h.GetBinContent(2)**2 + h.GetBinError(1)**2/h.GetBinContent(1)**2)
-      rCSE_pred = rcs*sqrt(1./h.GetBinContent(2) + 1./h.GetBinContent(1))
-      del h
-      return {'rCS':rcs, 'rCSE_pred':rCSE_pred, 'rCSE_sim':rCSE_sim}
-    else:
-      del h
-      return {'rCS':rcs, 'rCSE_pred':float('nan'), 'rCSE_sim':float('nan')}
-  else:
-    del h
-    return {'rCS':float('nan'), 'rCSE_pred':float('nan'), 'rCSE_sim':float('nan')}
+weight_str, weight_err_str = makeWeight(lumi, sampleLumi, reWeight='TopPtWeight')
 
 def getPseudoRCS(small,smallE,large,largeE): 
   if small>0:
@@ -523,7 +491,9 @@ for srNJet in sorted(signalRegion):
             NQCD_err      = NQCD_err_rel*NQCD
           elif isData and not mcFileIsHere:
             NQCD_err_rel  = 'Uncertainty not correct!!'
+            NQCD_err_rel  = 1.
             NQCD_err      = NQCD_err
+            NQCD_err      = NQCD_err_rel*NQCD
           else: #In MC, get the max of the determined error of the method and the non-closure
             print NQCD_err, NQCD, NQCD_truth, NQCD
             NQCD_err_rel  = max([NQCD_err/NQCD, abs(1-NQCD_truth/NQCD)])
