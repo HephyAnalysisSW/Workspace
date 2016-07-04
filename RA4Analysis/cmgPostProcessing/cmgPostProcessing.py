@@ -32,8 +32,8 @@ except IOError:
 
 target_lumi = 3000 #pb-1
 
-WPolNormTTUp    = 0.935
-WPolNormTTDown  = 1.073
+WPolNormTTUp    = 0.9353
+WPolNormTTDown  = 1.0733
 WPolNormWUp     = 0.8947
 WPolNormWDown   = 1.1334
 
