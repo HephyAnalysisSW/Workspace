@@ -43,7 +43,7 @@ separateBTagWeights = True
 defSampleStr = "TTJets_LO_HT600to800_25ns"
 
 #subDir = "postProcessed_Spring16_antiSelection_3fb_v2"
-subDir = "postProcessed_2016B_antiSelection_28062016"
+subDir = "postProcessed_Spring16_antiSelection_TTJetsComb"
 
 #branches to be kept for data and MC
 branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert",
@@ -96,6 +96,11 @@ if options.skim=='HT500':
   skimCond = ht500
 if options.skim=='LHEHT600':
   skimCond = "lheHTIncoming>600"
+if options.skim=='LHEHTsm600':
+  skimCond = "lheHTIncoming<=600"
+if options.skim=='LHEHTlg600':
+  skimCond = "lheHTIncoming>600"
+
 
 ####dilep skim##
 if options.skim=='diLep':
@@ -146,13 +151,13 @@ if sys.argv[0].count('ipython'):
 ###For PU reweight###
 #PU_File = ROOT.TFile("/data/easilar/tuples_from_Artur/JECv6recalibrateMET_2100pb/trig_skim/PUhistos/ratio_PU.root")
 #PU_histo = PU_File.Get("h_ratio")
-PU_dir = "/data/easilar/tuples_from_Artur/JECv6recalibrateMET_2p2fb/PUhistos/"
-PU_File_66mb = ROOT.TFile(PU_dir+"/pileUp_66mb_map.root")
-PU_File_70mb = ROOT.TFile(PU_dir+"/pileUp_70mb_map.root")
-PU_File_74mb = ROOT.TFile(PU_dir+"/pileUp_74mb_map.root")
-PU_histo_66 = PU_File_66mb.Get("h_ratio_66")
-PU_histo_70 = PU_File_70mb.Get("h_ratio_70")
-PU_histo_74 = PU_File_74mb.Get("h_ratio_74")
+#PU_dir = "/data/easilar/tuples_from_Artur/JECv6recalibrateMET_2p2fb/PUhistos/"
+#PU_File_66mb = ROOT.TFile(PU_dir+"/pileUp_66mb_map.root")
+#PU_File_70mb = ROOT.TFile(PU_dir+"/pileUp_70mb_map.root")
+#PU_File_74mb = ROOT.TFile(PU_dir+"/pileUp_74mb_map.root")
+#PU_histo_66 = PU_File_66mb.Get("h_ratio_66")
+#PU_histo_70 = PU_File_70mb.Get("h_ratio_70")
+#PU_histo_74 = PU_File_74mb.Get("h_ratio_74")
 #####################
 
 #####################
@@ -328,10 +333,10 @@ for isample, sample in enumerate(allSamples):
           s.muonDataSet = False
           s.eleDataSet = False
           nTrueInt = t.GetLeaf('nTrueInt').GetValue()
-          s.puReweight_true = PU_histo_70.GetBinContent(PU_histo_70.FindBin(nTrueInt))
-          s.puReweight_true_max4 = min(4,s.puReweight_true)
-          s.puReweight_true_Down = PU_histo_66.GetBinContent(PU_histo_66.FindBin(nTrueInt))
-          s.puReweight_true_Up = PU_histo_74.GetBinContent(PU_histo_74.FindBin(nTrueInt))
+          #s.puReweight_true = PU_histo_70.GetBinContent(PU_histo_70.FindBin(nTrueInt))
+          #s.puReweight_true_max4 = min(4,s.puReweight_true)
+          #s.puReweight_true_Down = PU_histo_66.GetBinContent(PU_histo_66.FindBin(nTrueInt))
+          #s.puReweight_true_Up = PU_histo_74.GetBinContent(PU_histo_74.FindBin(nTrueInt))
 
           #if "TTJets" in sample["name"] :
           #  s.weight = lumiScaleFactor*genWeight

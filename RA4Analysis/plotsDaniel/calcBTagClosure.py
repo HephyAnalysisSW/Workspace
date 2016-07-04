@@ -52,9 +52,13 @@ baseDir = '/data/'+username+'/Results2016/'
 #QCD_downDir    = 'Prediction_SFtemplates_fullSR_lep_MC_SF_QCD_noPU_QCDdown_2p25/'
 #QCD_nominalDir = 'Prediction_SFtemplates_fullSR_lep_MC_SF_QCD_noPU_2p25/'
 
-QCD_upDir      = 'Prediction_Spring16_templates_SR2016_v1_QCD_lep_MC_QCDup_3p99/'
-QCD_downDir    = 'Prediction_Spring16_templates_SR2016_v1_QCD_lep_MC_QCDdown_3p99/'
-QCD_nominalDir = 'Prediction_Spring16_templates_SR2016_v1_QCD_lep_MC_3p99/'
+#QCD_upDir      = 'Prediction_Spring16_templates_SR2016_v1_QCD_lep_MC_QCDup_3p99/'
+#QCD_downDir    = 'Prediction_Spring16_templates_SR2016_v1_QCD_lep_MC_QCDdown_3p99/'
+#QCD_nominalDir = 'Prediction_Spring16_templates_SR2016_v1_QCD_lep_MC_3p99/'
+
+QCD_upDir      = 'Prediction_Spring16_templates_SR2016_v2_QCD_lep_MC_QCDup_3p99/'
+QCD_downDir    = 'Prediction_Spring16_templates_SR2016_v2_QCD_lep_MC_QCDdown_3p99/'
+QCD_nominalDir = 'Prediction_Spring16_templates_SR2016_v2_QCD_lep_MC_3p99/'
 
 
 b_upDir       = 'Prediction_SFtemplates_fullSR_lep_MC_SF_b_UpnoPUreweight_2p25/'
@@ -356,13 +360,14 @@ leg2.AddEntry(qcd_Down_H,'QCD down')
 
 leg2.Draw()
 
-latex1.DrawLatex(0.15,0.96,'CMS #bf{#it{simulation}}')
-latex1.DrawLatex(0.68,0.96,"L=2.1fb^{-1} (13TeV)")
+latex1.DrawLatex(0.16,0.96,'CMS #bf{#it{simulation}}')
+latex1.DrawLatex(0.81,0.96,"#bf{MC (13TeV)}")
 
 setNiceBinLabel(qcd_Up_H, signalRegions)
 
 qcd_Up_H.GetYaxis().SetTitle('#delta_{k}')
-qcd_Up_H.GetXaxis().SetLabelSize(0.02)
+qcd_Up_H.GetXaxis().SetLabelSize(0.027)
+qcd_Up_H.GetYaxis().SetLabelSize(0.04)
 qcd_Up_H.GetXaxis().SetTitle('')
 
 if savePkl:

@@ -1,6 +1,8 @@
 import copy, os, sys
 #dirDaniel = '/data/dspitzbart/cmgTuples/postProcessed_Spring16_antiSelection_3fb/none/'
 dirDaniel = '/data/dspitzbart/cmgTuples/postProcessed_2016B_antiSelection_23062016/none/'
+dirDaniel2 = '/data/dspitzbart/cmgTuples/postProcessed_Spring16_antiSelection_TTJetsComb/none/'
+
 
 TTJets_Lep_antiSel = {\
 "name" : "TTJets_singleLep",
@@ -12,6 +14,19 @@ TTJets_Lep_antiSel = {\
 'dir' : dirDaniel,
 }
 
+TTJets_Comb_antiSel = {\
+"name" : "TTJets_singleLep",
+"bins" : [
+"TTJets_SingleLeptonFromT_full",
+"TTJets_SingleLeptonFromTbar_full",
+"TTJets_DiLepton",
+"TTJets_LO_HT600to800",
+"TTJets_LO_HT800to1200",
+"TTJets_LO_HT1200to2500",
+"TTJets_LO_HT2500toInf",
+],
+'dir' : dirDaniel2,
+}
 
 WJetsHTToLNu_antiSel = {\
 "name" : "W+Jets",

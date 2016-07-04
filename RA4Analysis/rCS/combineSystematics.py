@@ -64,8 +64,8 @@ lepSF_h2b = d.GetPrimitive('h2b')
 #pickleDir =  '/data/dspitzbart/Results2016/Prediction_Spring16_templates_validation_4j_lep_data_2p57/'
 #pickleDir =  '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2015_lep_data_2p57/'
 #pickleDir =  '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2016_v1_QCD_lep_MC_3p99/'
-
-pickleDir =  '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2016_v1_100p_lep_data_3p99/'
+pickleDir =  '/data/dspitzbart/Results2016/Prediction_Spring16_templates_validation_4j_lep_data_3p99/'
+#pickleDir =  '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2016_v1_100p_lep_data_3p99/'
 
 saveDir = pickleDir
 #saveDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_fullSR_lep_data_2p25/'
@@ -263,7 +263,7 @@ for injb,srNJet in enumerate(sorted(signalRegions)):
       
       #2l
       if validation:
-        dilepErr = 0.05
+        dilepErr = 0.075
         if srNJet == (5,5): dilepErr = 0.075
         if srNJet == (6,7): dilepErr = 0.15
         if srNJet == (8,-1): dilepErr = 0.30
@@ -493,7 +493,7 @@ latex1.SetTextSize(0.04)
 latex1.SetTextAlign(11)
 
 latex1.DrawLatex(0.15,0.96,'CMS #bf{#it{Prelimiary}}')
-latex1.DrawLatex(0.81,0.96,"#bf{2.3fb^{-1} (13TeV)}")
+latex1.DrawLatex(0.81,0.96,"#bf{4.0fb^{-1} (13TeV)}")
 
 h_Stack.GetXaxis().SetLabelSize(0.04)
 h_Stack.GetYaxis().SetLabelSize(0.055)
@@ -511,7 +511,7 @@ pad2.cd()
 
 setNiceBinLabel(ratio, signalRegions)
 ratio.GetXaxis().SetTitleSize(0.13)
-ratio.GetXaxis().SetLabelSize(0.11)
+ratio.GetXaxis().SetLabelSize(0.09)
 ratio.GetXaxis().SetNdivisions(508)
 ratio.GetYaxis().SetTitle('Total unc.')
 ratio.GetYaxis().SetTitleSize(0.13)
@@ -528,9 +528,9 @@ total_err.Draw('2 same')
 
 can.cd()
 
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/syst_uncertainties/validation_fullStatus_2016_v1.png')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/syst_uncertainties/validation_fullStatus_2016_v1.root')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/syst_uncertainties/validation_fullStatus_2016_v1.pdf')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/syst_uncertainties/sys_validation_preapp_2016_v1.png')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/syst_uncertainties/sys_validation_preapp_2016_v1.root')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/syst_uncertainties/sys_validation_preapp_2016_v1.pdf')
 
 
 savePickle = True
