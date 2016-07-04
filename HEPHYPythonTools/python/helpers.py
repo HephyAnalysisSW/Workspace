@@ -149,14 +149,12 @@ def getChunks(sample,  maxN=-1, getPU=False):
       if os.path.isfile(logfile):
         line = [x for x in subprocess.check_output(["cat", logfile]).split('\n') if x.count(const)]
         assert len(line)==1,"Didn't find normalization constant '%s' in  number in file %s"%(const, logfile)
-        #n = int(float(line[0].split()[2]))
-        sumW = float(line[0].split()[2])
-        #if getPU: inputFilename = sample['dir']+'/'+s['name']+'/'+sample['rootFileLocation'].split("/")[0]+"/pileup.root"
         if getPU: 
             if len(sample['rootFileLocation'].split("/")) ==2: inputFilename = sample['dir']+'/'+s['name']+'/'+sample['rootFileLocation'].split("/")[0]+"/pileup.root"
             if len(sample['rootFileLocation'].split("/")) ==1: inputFilename = sample['dir']+'/'+s['name']+"/pileup.root"
             else : print "root file dir not proper for PU" 
         else: inputFilename = sample['dir']+'/'+s['name']+'/'+sample['rootFileLocation']
+        sumW = float(line[0].split()[2])
         #print sumW, inputFilename
         if os.path.isfile(inputFilename):
           sumWeights+=sumW
