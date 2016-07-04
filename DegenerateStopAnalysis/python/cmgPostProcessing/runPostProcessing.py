@@ -56,12 +56,14 @@ sampleSets = {
 
                 'wjets_Spring16':{
                             'samples':[
-                                         ["WJetsToLNu_HT100to200_ext", "--skimPreselect"],
-                                         ["WJetsToLNu_HT200to400", "--skimPreselect"],
-                                         ["WJetsToLNu_HT200to400_ext", "--skimPreselect"],
-                                         ["WJetsToLNu_HT400to600", "--skimPreselect"],
-                                         ["WJetsToLNu_HT600to800", "--skimPreselect"],
-                                         ["WJetsToLNu_HT800to1200_ext", "--skimPreselect"],
+                                        ["WJetsToLNu_HT100to200_ext", "--skimPreselect"],
+                                        ["WJetsToLNu_HT200to400", "--skimPreselect"],
+                                        ["WJetsToLNu_HT200to400_ext", "--skimPreselect"],
+                                        ["WJetsToLNu_HT400to600", "--skimPreselect"],
+                                        ["WJetsToLNu_HT600to800", "--skimPreselect"],
+                                        ["WJetsToLNu_HT800to1200_ext", "--skimPreselect"],
+                                        ["WJetsToLNu_HT1200to2500", "--skimPreselect"],
+                                        ["WJetsToLNu_HT2500toInf", "--skimPreselect"],
                                         ],
                              
                             },
@@ -89,6 +91,15 @@ sampleSets = {
                                         ],
                              
                             },
+                'ttjets_lep_Spring16':{
+                            'samples':[
+                                        "TTJets_SingleLeptonFromT",
+                                        "TTJets_SingleLeptonFromTbar",
+                                        "TTJets_DiLepton",
+                                        
+                                        ],
+                             
+                            },
                 'dyjets':{
                             'samples':[
                                          "DYJetsToLL_M5to50_LO",
@@ -105,6 +116,16 @@ sampleSets = {
                                          
                                         ],
                             },
+                'dyjets_Spring16':{
+                            'samples':[
+                                         'DYJetsToLL_M50_HT100to200_ext',
+                                         'DYJetsToLL_M50_HT200to400_ext',
+                                         'DYJetsToLL_M50_HT400to600_ext',
+                                         'DYJetsToLL_M50_HT600toInf',
+                                         'DYJetsToLL_M50_HT600toInf_ext',
+                                         
+                                        ],
+                            },
                 'zjets':{
                             'samples':[ 
 
@@ -112,6 +133,16 @@ sampleSets = {
                                         ["ZJetsToNuNu_HT200to400", "--skimPreselect"],
                                         ["ZJetsToNuNu_HT400to600", "--skimPreselect"],
                                         ["ZJetsToNuNu_HT600toInf", "--skimPreselect"],
+
+                                        ],
+                             
+                            },
+                'zjets_Spring16':{
+                            'samples':[ 
+
+                                        ["ZJetsToNuNu_HT600to800", "--skimPreselect"],
+                                        ["ZJetsToNuNu_HT1200to2500", "--skimPreselect"],
+                                        ["ZJetsToNuNu_HT2500toInf", "--skimPreselect"],
 
                                         ],
                              
@@ -131,6 +162,25 @@ sampleSets = {
                              
                             },
               
+                'qcd_Spring16':{
+                            'samples':[
+
+                                        ["QCD_HT300to500", "--skimPreselect"],  
+                                        ["QCD_HT300to500_ext", "--skimPreselect"],  
+                                        ["QCD_HT500to700_ext", "--skimPreselect"],  
+                                        ["QCD_HT700to1000", "--skimPreselect"], 
+                                        ["QCD_HT700to1000_ext", "--skimPreselect"], 
+                                        ["QCD_HT1000to1500", "--skimPreselect"],
+                                        ["QCD_HT1000to1500_ext", "--skimPreselect"],
+                                        ["QCD_HT1500to2000", "--skimPreselect"],
+                                        ["QCD_HT1500to2000_ext", "--skimPreselect"],
+                                        ["QCD_HT2000toInf", "--skimPreselect"], 
+                                        ["QCD_HT2000toInf_ext", "--skimPreselect"], 
+ 
+                                        ],
+                             
+                            },
+
                 'qcdpt':{
                             'samples':[
                                         #["QCD_Pt5to10", "--skimPreselect"],

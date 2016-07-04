@@ -12,9 +12,9 @@ import pickle
 
 # most recent paths, can be replaced when initializing the cmgTuplesPostProcessed class
 
-mc_path = "/afs/hephy.at/data/vghete02/cmgTuples/postProcessed_mAODv2/8011_mAODv2_v0/80X_postProcessing_v1/analysisHephy_13TeV_2016_v0/step1/RunIISpring16MiniAODv2_v0"
-signal_path = "/afs/hephy.at/data/vghete02/cmgTuples/postProcessed_mAODv2/8011_mAODv2_v0/80X_postProcessing_v1/analysisHephy_13TeV_2016_v0/step1/RunIISpring16MiniAODv2_v0"
-data_path = "/afs/hephy.at/data/vghete02/cmgTuples/postProcessed_mAODv2/8011_mAODv2_v0/80X_postProcessing_v1/analysisHephy_13TeV_2016_v0/step1/Data2016_v0"
+mc_path = "/afs/hephy.at/data/vghete02/cmgTuples/postProcessed_mAODv2/8011_mAODv2_v0/80X_postProcessing_v2/analysisHephy_13TeV_2016_v0/step1/RunIISpring16MiniAODv2_v0"
+signal_path = "/afs/hephy.at/data/vghete02/cmgTuples/postProcessed_mAODv2/8011_mAODv2_v0/80X_postProcessing_v2/analysisHephy_13TeV_2016_v0/step1/RunIISpring16MiniAODv2_v0"
+data_path = "/afs/hephy.at/data/vghete02/cmgTuples/postProcessed_mAODv2/8011_mAODv2_v0/80X_postProcessing_v2/analysisHephy_13TeV_2016_v0/step1/Data2016_v0"
 
 # Lumi that was used in the weight calculation of PostProcessing in pb-1
 lumi_mc = 10000.
@@ -124,6 +124,33 @@ class cmgTuplesPostProcessed():
             })
 
 
+        self.TTJets_SingleLeptonFromT = self.makeSample({
+            "name" : "TTJets_SingleLeptonFromT",
+            "bins" : [
+                "TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+                ],
+            'dir' : self.mc_path,
+            'sampleId': 60,
+            })
+
+        self.TTJets_SingleLeptonFromTbar = self.makeSample({
+            "name" : "TTJets_SingleLeptonFromTbar",
+            "bins" : [
+                "TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+                ],
+            'dir' : self.mc_path,
+            'sampleId': 65,
+            })
+
+        self.TTJets_DiLepton = self.makeSample({
+            "name" : "TTJets_DiLepton",
+            "bins" : [
+                "TTJets_DiLept_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v4",
+                ],
+            'dir' : self.mc_path,
+            'sampleId': 70,
+            })
+
         self.WJetsHT = self.makeSample({
             "name" : "WJetsHT",
             "bins" : [
@@ -207,18 +234,22 @@ class cmgTuplesPostProcessed():
 
 
         self.QCD = self.makeSample({
-        "name" : "QCD",
-        "bins" :  [
-#                     "QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
-#                     "QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
-#                     "QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
-#                     "QCD_HT200to300_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
-#                     "QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
-#                     "QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
-#                     "QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
-                  ],
-        'dir' : self.mc_path,
-        'sampleId' : 30,
+            "name" : "QCD",
+            "bins" :  [
+                "QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+                "QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1",
+                "QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1",
+                "QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+                "QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1",
+                "QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v2",
+                "QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1",
+                "QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v3",
+                "QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1",
+                "QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+                "QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1",
+                ],
+            'dir' : self.mc_path,
+            'sampleId' : 30,
 
         })
 
@@ -266,52 +297,52 @@ class cmgTuplesPostProcessed():
 
 
         self.ZJetsHT = self.makeSample({
-        "name" : "ZJetsHT",
-        "bins" :  [
-#                         "ZJetsToNuNu_HT-100To200_13TeV-madgraph_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
-#                         "ZJetsToNuNu_HT-200To400_13TeV-madgraph_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
-#                         "ZJetsToNuNu_HT-400To600_13TeV-madgraph_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
-#                         "ZJetsToNuNu_HT-600ToInf_13TeV-madgraph_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v2",
-                  ] ,
-        'dir' : self.mc_path ,
-        'sampleId': 40,
-        })
+            "name" : "ZJetsHT",
+            "bins" :  [
+                        "ZJetsToNuNu_HT-600To800_13TeV-madgraph_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+                        "ZJetsToNuNu_HT-1200To2500_13TeV-madgraph_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+                        "ZJetsToNuNu_HT-2500ToInf_13TeV-madgraph_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+                        ] ,
+            'dir' : self.mc_path ,
+            'sampleId': 40,
+            })
 
 
 
         self.DYJetsM5to50HT = self.makeSample({
-        "name" : "DYJetsM5to50HT",
-        "bins" :  [
+            "name" : "DYJetsM5to50HT",
+            "bins" :  [
 #                         "DYJetsToLL_M-5to50_HT-100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
 #                         "DYJetsToLL_M-5to50_HT-200to400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
 #                         "DYJetsToLL_M-5to50_HT-400to600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
 #                         "DYJetsToLL_M-5to50_HT-600toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1",
 #                         # 'DYJetsToLL_M-5to50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1',
-                  ] ,
-        'dir' : self.mc_path,
-        })
+                    ] ,
+            'dir' : self.mc_path,
+            })
 
 
         self.DYJetsM5to50 = self.makeSample({
-        "name" : "DYJetsM5to50",
-        "bins" :  [
-#                         'DYJetsToLL_M-5to50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1',
-                  ] ,
-        'dir' : self.mc_path
-        })
+            "name" : "DYJetsM5to50",
+            "bins" :  [
+#                 'DYJetsToLL_M-5to50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1',
+                ] ,
+            'dir' : self.mc_path
+            })
 
 
         self.DYJetsM50HT = self.makeSample({
-        "name" : "DYJetsM50HT",
-        "bins" :  [
-#                         'DYJetsToLL_M-50_HT-100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1',
-#                         'DYJetsToLL_M-50_HT-200to400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1',
-#                         'DYJetsToLL_M-50_HT-400to600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v2',
-#                         'DYJetsToLL_M-50_HT-600toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1',
-                  ] ,
-        'dir' : self.mc_path,
-        'sampleId': 50,
-        })
+            "name" : "DYJetsM50HT",
+            "bins" :  [
+                'DYJetsToLL_M-50_HT-100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1',
+                'DYJetsToLL_M-50_HT-200to400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1',
+                'DYJetsToLL_M-50_HT-400to600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1',
+                'DYJetsToLL_M-50_HT-600toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1',
+                'DYJetsToLL_M-50_HT-600toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1',
+                ] ,
+            'dir' : self.mc_path,
+            'sampleId': 50,
+            })
 
 
         self.DYJetsToNuNu = self.makeSample({
@@ -356,14 +387,9 @@ class cmgTuplesPostProcessed():
             setattr(self, s, sm)
 
 
-        # mass_dict_pickle = "/afs/hephy.at/user/n/nrad/CMSSW/fork/CMSSW_7_4_12_patch4/src/Workspace/DegenerateStopAnalysis/cmgPostProcessing/mass_dict_all.pkl"
-
-        mass_dict_pickle1 = "/data/nrad/cmgTuples/7412pass2_mAODv2_v6/RunIISpring15MiniAODv2//mass_dict.pkl"
-        mass_dict_pickle2 = "/afs/hephy.at/work/n/nrad/results/mass_dicts/mass_dict.pkl"
-        if os.path.isfile(mass_dict_pickle1):
-            mass_dict_pickle = mass_dict_pickle1
-        elif os.path.isfile(mass_dict_pickle2):
-            mass_dict_pickle = mass_dict_pickle2
+        mass_dict_pickle_file = os.path.join(signal_path, "mass_dict.pkl")
+        if os.path.isfile(mass_dict_pickle_file):
+            mass_dict_pickle = mass_dict_pickle_file
         else:
             print "!!!!! WARNING !!!!! NO MASS DICT FOUND!"
             mass_Dict_pickle = None

@@ -345,14 +345,15 @@ def getSamples(args):
     rtuple = collections.namedtuple(
         'rtuple', 
         [
-            'sampleFile', 
+            'sampleFile',
+            'cmgSamples',
             'componentList', 
             'outputDirectory', 
             'mass_dict'
             ]
         )
     
-    getSample_rtuple = rtuple(sampleFile, allComponentsList, outDir, mass_dict) 
+    getSample_rtuple = rtuple(sampleFile, cmgSamples, allComponentsList, outDir, mass_dict) 
     
     #    
     return getSample_rtuple
@@ -2043,11 +2044,11 @@ def cmgPostProcessing(argv=None):
         runSmallSample = True
         
     
-    # load FWLite libraries
-    
-    ROOT.gSystem.Load("libFWCoreFWLite.so")
-    ROOT.AutoLibraryLoader.enable()
-    
+#     # load FWLite libraries
+#     
+#     ROOT.gSystem.Load("libFWCoreFWLite.so")
+#     ROOT.AutoLibraryLoader.enable()
+#     
     # choose the sample(s) to process (allSamples), with results saved in outputDirectory
     
     cmgTuples = args.cmgTuples
@@ -2217,14 +2218,50 @@ def cmgPostProcessing(argv=None):
         logger.info("\n Output sample directory \n  %s \n", outputWriteDirectory) 
         logger.debug("\n Temporary directory \n  %s \n", temporaryDir) 
         
-        chunks, sumWeight = hephyHelpers.getChunks(sample)
-        
+        chunks, sampleSumWeight = hephyHelpers.getChunks(sample)
+
         logger.info(
-            "\n Sample %s of type %s has " + \
-            "\n   number of chunks: %i"\
-            "\n   sumWeights: %s \n", sampleName, sampleType, len(chunks), sumWeight
-            ) 
-        logger.debug("\n Chunks: \n \n %s", pprint.pformat(chunks)) 
+            ''.join([
+                "\n Sample %s of type %s has ",
+                "\n   number of chunks: %i",
+                "\n   sampleSumWeight: %s \n",
+                ]),
+                sampleName, sampleType, len(chunks), sampleSumWeight
+            )
+        logger.debug("\n Chunks: \n \n %s \n", pprint.pformat(chunks))
+
+        # sum all the weights for samples having extended datasets
+        
+        sumWeight = 0.
+        if 'ext' in sample:
+
+            printString = []
+            for sExt in sample['ext']:
+                extSample = getattr(getSamples_rtuple.cmgSamples, sExt)
+                if extSample:
+                    chunkExt, weightExt = hephyHelpers.getChunks(extSample)
+                    sumWeight += weightExt
+
+                    printString.append("\n  sample: ")
+                    printString.append(sExt)
+                    printString.append("\n    weight sum: ")
+                    printString.append(str(weightExt))
+                else:
+                    raise Exception("\n Extended dataset {0} requested for sample {1}, but not defined in {2}.".format(
+                        sExt, sampleName, getSamples_rtuple.sampleFile)
+                        )
+                    sys.exit()
+
+
+            logger.info(
+                ''.join([
+                    "\n Sum of weights summed for all extended samples \n %s",
+                    "\n   sumWeight: %s \n obtained from %s \n"
+                    ]),
+                sample['ext'], sumWeight, ''.join(printString)
+                )
+        else:
+            sumWeight = sampleSumWeight
         
         # stupid kludge to get the list of branches for an objects, to be able to add a merged collection to tree
         varsNameTypeTreeLep = varsTreeLep(chunks, skimCond)
