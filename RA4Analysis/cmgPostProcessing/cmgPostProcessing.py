@@ -149,7 +149,8 @@ if sys.argv[0].count('ipython'):
 ##print evt_veto_list
 
 ###For PU reweight###
-PU_dir = "/afs/hephy.at/user/e/easilar/www/data/Run2016B/4fb/PU_histos/"
+#PU_dir = "/afs/hephy.at/user/e/easilar/www/data/Run2016B/4fb/PU_histos/"
+PU_dir = "/data/dspitzbart/PU_histos/"
 PU_File_66mb = ROOT.TFile(PU_dir+"/h_ratio_66.root")
 PU_File_70mb = ROOT.TFile(PU_dir+"/h_ratio_70.root")
 PU_File_74mb = ROOT.TFile(PU_dir+"/h_ratio_74.root")
@@ -292,7 +293,7 @@ for isample, sample in enumerate(allSamples):
     readVectors.append({'prefix':'JetForMET',  'nMax':100, 'vars':['rawPt/F','pt/F', 'eta/F', 'phi/F', 'mass/F','id/I','hadronFlavour/F','btagCSV/F', 'btagCMVA/F','corr_JECUp/F','corr_JECDown/F','corr/F']})
     readVectors.append({'prefix':'Jet',  'nMax':100,       'vars':['rawPt/F','pt/F', 'eta/F', 'phi/F', 'mass/F','id/I','hadronFlavour/F','btagCSV/F', 'btagCMVA/F','corr_JECUp/F','corr_JECDown/F','corr/F']})
    
-    newVariables.extend(['puReweight_true/F','puReweight_true_max4/F','puReweight_true_Down/F','puReweight_true_Up/F','weight_diLepTTBar0p5/F','weight_diLepTTBar2p0/F','weight_XSecTTBar1p1/F','weight_XSecTTBar0p9/F','weight_XSecWJets1p1/F','weight_XSecWJets0p9/F'])
+    newVariables.extend(['puReweight_true/F','puReweight_true_max4/F','puReweight_true_Down/F','puReweight_true_Up/F','weight_diLepTTBar0p5/F','weight_diLepTTBar2p0/F','weight_XSecTTBar1p1/F','weight_XSecTTBar0p9/F','weight_XSecWJets1p1/F','weight_XSecWJets0p9/F', 'weight_WPolPlus10/F', 'weight_WPolMinus10/F', 'weight_TTPolPlus5/F', 'weight_TTPolMinus5/F'])
     newVariables.extend(['GenTopPt/F/-999.','GenAntiTopPt/F/-999.','TopPtWeight/F/1.','GenTTBarPt/F/-999.','GenTTBarWeight/F/1.','nGenTops/I/0.'])
     newVariables.extend(['lepton_muSF_looseID/D/1.','lepton_muSF_mediumID/D/1.','lepton_muSF_miniIso02/D/1.','lepton_muSF_sip3d/D/1.','lepton_eleSF_cutbasedID/D/1.','lepton_eleSF_miniIso01/D/1.'])
     newVariables.extend(['lepton_muSF_looseID_err/D/0.','lepton_muSF_mediumID_err/D/0.','lepton_muSF_miniIso02_err/D/0.','lepton_muSF_sip3d_err/D/0.','lepton_eleSF_cutbasedID_err/D/0.','lepton_eleSF_miniIso01_err/D/0.'])
@@ -529,7 +530,6 @@ for isample, sample in enumerate(allSamples):
                 cosTheta = ROOT.WjetPolarizationAngle(p4w[ilep], p4lepton[ilep])
                 weightUp *= (1. + 0.1*(1.-cosTheta)**2)
                 weightDown *= (1. - 0.1*(1.-cosTheta)**2)
-              cosTheta = ROOT.WjetPolarizationAngle(p4w, p4lepton)
               s.weight = s.weight
               s.weight_WPolPlus10 = weightUp * WPolNormWUp 
               s.weight_WPolMinus10 = weightDown * WPolNormWDown
