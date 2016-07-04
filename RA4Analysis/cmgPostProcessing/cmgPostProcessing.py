@@ -32,8 +32,8 @@ except IOError:
 
 target_lumi = 3000 #pb-1
 
-WPolNormTTUp    = 1.
-WPolNormTTDown  = 1.
+WPolNormTTUp    = 0.935
+WPolNormTTDown  = 1.073
 WPolNormWUp     = 0.8947
 WPolNormWDown   = 1.1334
 
@@ -203,14 +203,14 @@ def getGenWandLepton(c):
   genPartAll = [getObjDict(c, 'GenPart_', ['pt','eta','phi','mass','pdgId','motherId','motherIndex'], j) for j in range(int(c.GetLeaf('nGenPart').GetValue()))]
   lepton = filter(lambda l:abs(l['pdgId']) in [11,13,15], genPartAll)
   if len(lepton)==0:
-    print "no generated lepton found!"
+    print "no generated lepton found (hadronic ttjets event)!"
     p4w=False
     p4lepton=False
     return p4w, p4lepton
   lFromW = filter(lambda w:abs(w['motherId'])==24, lepton)
   if len(lFromW)==0:
     test = filter(lambda w:w['motherId']==24, lepton)
-    if len(test)==0: print '2)this should not have happened'
+    if len(test)==0: print 'No lepton from W found (hadronic ttjets event)!'
     p4w=False
     p4lepton=False
     return p4w, p4lepton
