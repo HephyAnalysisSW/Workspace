@@ -13,13 +13,7 @@ ROOT.gROOT.LoadMacro("../../HEPHYPythonTools/scripts/root/tdrstyle.C")
 ROOT.setTDRStyle()
 maxN = -1
 ROOT.gStyle.SetOptStat(0)
-sample_lumi =3000
-#lumi = 804##pb
-lumi_label = 2.571
-reweight      = '(weight*'+str(lumi)+')/'+str(sample_lumi)
-filters = "(Flag_goodVertices && Flag_HBHENoiseFilter_fix && Flag_eeBadScFilter && Flag_HBHENoiseIsoFilter)"
-weight_str = weight_str_plot
-path = "/afs/hephy.at/user/e/easilar/www/data/Run2016B/2571pb/diLep_syst_study_results/"
+path = "/afs/hephy.at/user/e/easilar/www/data/Run2016B/4fb/diLep_syst_study_results/"
 if not os.path.exists(path):
   os.makedirs(path)
 
@@ -38,15 +32,18 @@ lepSels = [
   'label':'_lep_', 'str':'1 $lep$' , 'trigger': trigger}\
 ]
 
+ngenTau = "Sum$(abs(genTau_grandmotherId)==6&&abs(genTau_motherId)==24)"
+ngenLep = "Sum$(abs(genLep_grandmotherId)==6&&abs(genLep_motherId)==24)"
+
 bkg_samples=[
 {'sample':'TTVH',           "weight":"(1)" ,"cut":nbtag ,"add_Cut":"(1)","name":TTV ,'tex':'t#bar{t}V','color':ROOT.kOrange-3},
 {"sample":"DiBosons",       "weight":"(1)" ,"cut":nbtag ,"add_Cut":"(1)","name":diBoson ,"tex":"WW/WZ/ZZ","color":ROOT.kRed+3},
-{"sample":"DY",             "weight":"(1)" ,"cut":nbtag ,"add_Cut":"(1)","name":DY_amc,"tex":"DY + jets",'color':ROOT.kRed-6},
+{"sample":"DY",             "weight":"(1)" ,"cut":nbtag ,"add_Cut":"(1)","name":DYHT,"tex":"DY + jets",'color':ROOT.kRed-6},
 {"sample":"singleTop",      "weight":"(1)" ,"cut":nbtag ,"add_Cut":"(1)","name":singleTop_lep,"tex":"t/#bar{t}",'color': ROOT.kViolet+5},
 {"sample":"QCD",            "weight":"(1)" ,"cut":nbtag ,"add_Cut":"(1)","name":QCDHT, "tex":"QCD","color":ROOT.kCyan-6},
 {"sample":"WJets",          "weight":"(1)" ,"cut":nbtag ,"add_Cut":"(1)","name":WJetsHTToLNu,"tex":"W + jets","color":ROOT.kGreen-2},
-{"sample":"ttJets_diLep",   "weight":"(1)" ,"cut":nbtag ,"add_Cut":"((ngenLep+ngenTau)==2)","name":TTJets_Lep, "tex":"t#bar{t} ll + jets",'color':ROOT.kBlue},
-{"sample":"ttJets_semiLep", "weight":"(1)" ,"cut":nbtag ,"add_Cut":"(!((ngenLep+ngenTau)==2))","name":TTJets_Lep, "tex":"t#bar{t} l + jets",'color':ROOT.kBlue-7}
+{"sample":"ttJets_diLep",   "weight":"(1)" ,"cut":nbtag ,"add_Cut":"(("+ngenLep+"+"+ngenTau+")==2)","name":TTJets_Comb, "tex":"t#bar{t} ll + jets",'color':ROOT.kBlue},
+{"sample":"ttJets_semiLep", "weight":"(1)" ,"cut":nbtag ,"add_Cut":"(!(("+ngenLep+"+"+ngenTau+")==2))","name":TTJets_Comb, "tex":"t#bar{t} l + jets",'color':ROOT.kBlue-7}
 ]
 
 for bkg in bkg_samples:
@@ -60,8 +57,6 @@ add_cut = "(deltaPhi_Wl<0.5)"
 lepSel = lepSels[0]
 presel = "&&".join([lepSel['cut'],lepSel['veto'],"Jet_pt[1]>80&&abs(LepGood_eta[0])<2.4",add_cut])
 data_presel = "&&".join([lepSel['cut'],lepSel['veto'],lepSel['trigger'],filters,"Jet_pt[1]>80&&abs(LepGood_eta[0])<2.4",add_cut])
-weight = "*".join([weight_str_plot , bkg["weight"]])
-weight_str = weight 
 
 bin = {}
 for srNJet in sorted(SR):
@@ -161,7 +156,7 @@ for p in plots:
         leg.SetFillColor(0)
         leg.Draw()
         latex.DrawLatex(0.16,0.958,"#font[22]{CMS}"+" #font[12]{Preliminary}")
-        latex.DrawLatex(0.75,0.958,"#bf{2.6 fb^{-1} (13 TeV)}")
+        latex.DrawLatex(0.75,0.958,"#bf{4 fb^{-1} (13 TeV)}")
         #if nJet[1] == -1: latex.DrawLatex(0.6,0.83,"N_{Jets}#geq"+str(nJet[0]))
         #if nJet[1] != -1: latex.DrawLatex(0.6,0.83,str(nJet[0])+"#leqN_{Jets}#leq"+str(nJet[1]))
         latex.DrawLatex(0.6,0.80,"#bf{N_{bjets}=="+str(nbtag[0])+"}")
@@ -180,7 +175,7 @@ for p in plots:
         Func.SetLineColor(2)
         h_ratio = h_data.Clone('h_ratio')
         h_ratio.SetMinimum(0.0)
-        h_ratio.SetMaximum(2)
+        h_ratio.SetMaximum(4)
         h_ratio.Sumw2()
         h_ratio.SetStats(0)
         h_ratio.Divide(stack_hist)
@@ -209,5 +204,5 @@ for p in plots:
         cb.Clear()
         del h_Stack
             
-pickle.dump(bin,file('/data/easilar/Results2016/ICHEP/DiLep_SYS/V1/data_mean_2p6_0b_pkl','w'))
+pickle.dump(bin,file('/data/easilar/Results2016/ICHEP/DiLep_SYS/V1/data_mean_4fb_0b_pkl','w'))
 

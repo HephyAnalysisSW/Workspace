@@ -84,6 +84,19 @@ def getFileList(dir, minAgeDPM=0, histname='histo', xrootPrefix='root://hephyse.
     filelist = filelist[:maxN]
   return filelist
 
+def getPUHistos(sL, histname='pileup'):
+  sL = sL[0]
+  i=0
+  histo = ROOT.TH1F()
+  for s in sL:
+    #print s
+    PU_file = ROOT.TFile(s['file'])   
+    histo.Add(PU_file.Get(histname))
+    i+=1
+  print "Added ",i,'files from sample',s['name']
+  return histo
+  
+
 def getChain(sL, minAgeDPM=0, histname='histo', xrootPrefix='root://hephyse.oeaw.ac.at/', maxN=-1, treeName="Events"):
   if not type(sL)==type([]):
     sList = [sL]
@@ -113,7 +126,7 @@ def getChain(sL, minAgeDPM=0, histname='histo', xrootPrefix='root://hephyse.oeaw
   print "Added ",i,'files from sample',s['name']
   return c
 
-def getChunks(sample,  maxN=-1):
+def getChunks(sample,  maxN=-1, getPU=False):
 #  print "sample" , sample , maxN
   import os, subprocess, datetime
   #print "sample dir:" , sample['dir']
@@ -136,9 +149,12 @@ def getChunks(sample,  maxN=-1):
       if os.path.isfile(logfile):
         line = [x for x in subprocess.check_output(["cat", logfile]).split('\n') if x.count(const)]
         assert len(line)==1,"Didn't find normalization constant '%s' in  number in file %s"%(const, logfile)
-        #n = int(float(line[0].split()[2]))
         sumW = float(line[0].split()[2])
-        inputFilename = sample['dir']+'/'+s['name']+'/'+sample['rootFileLocation']
+        if getPU: 
+            if len(sample['rootFileLocation'].split("/")) ==2: inputFilename = sample['dir']+'/'+s['name']+'/'+sample['rootFileLocation'].split("/")[0]+"/pileup.root"
+            if len(sample['rootFileLocation'].split("/")) ==1: inputFilename = sample['dir']+'/'+s['name']+"/pileup.root"
+            else : print "root file dir not proper for PU" 
+        else: inputFilename = sample['dir']+'/'+s['name']+'/'+sample['rootFileLocation']
         #print sumW, inputFilename
         if os.path.isfile(inputFilename):
           sumWeights+=sumW

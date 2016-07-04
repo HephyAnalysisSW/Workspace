@@ -14,12 +14,12 @@ ROOT.gStyle.SetOptStat(0)
 #lumi = 2250##pb
 #path = "/afs/hephy.at/user/e/easilar/www/data/Run2015D/2p3fb/diLep_syst_study_results/"
 #path = "/afs/hephy.at/user/e/easilar/www/data/Run2015D/2p25fb/diLep_syst_study_results/"
-path = "/afs/hephy.at/user/e/easilar/www/data/Run2016B/2751pb/diLep_syst_study_results/"
+path = "/afs/hephy.at/user/e/easilar/www/data/Run2016B/4fb/diLep_syst_study_results/"
 #path = "/afs/hephy.at/user/e/easilar/www/data/Run2015D/2p25fb/diLep_syst_study_results_nJet_Fix/"
 #data_mean = pickle.load(file('/data/easilar/Spring15/25ns/data_mean_25Feb_0p75_pkl'))
-data_mean = pickle.load(file('/data/easilar/Results2016/ICHEP/DiLep_SYS/V1/data_mean_2p75_lg1b_pkl'))
+data_mean = pickle.load(file('/data/easilar/Results2016/ICHEP/DiLep_SYS/V1/data_mean_4fb_0b_pkl'))
 #SR = signalRegion3fb
-SR = {(4,-1):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
+SR = {(3,-1):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
 
 btagVarString = 'nBJetMediumCSV30'
 p = {'ndiv':False,'yaxis':'Events','xaxis':'N_{Jets}','logy':False , 'var':'nJet30','varname':'nJet30', 'binlabel':1,  'bin':(6,4,9)}
@@ -33,32 +33,29 @@ for srNJet in sorted(SR):
       bin[srNJet][stb][htb] = {}
       Name, bla_Cut = nameAndCut(stb, htb, srNJet, btb=(0,0), presel="(1)", btagVar =  btagVarString)
       print Name
-      fratio_diLep = ROOT.TFile(path+'st250_ht500_njet4_nbtag1_nJet30_allWeights_diLep_4_Ratio_1b.root')
-      #fratio_diLep = ROOT.TFile(path+'st250_ht500_njet4_nbtagEq0_nJet30_allWeights_diLep_4_Ratio_0b.root')
-      fratio_oneLep = ROOT.TFile(path+'st250_ht500_njet4_nbtag1_nJet30_lg1b_Ratio.root')
+      fratio_diLep = ROOT.TFile(path+'st250_ht500_njet3_nbtagEq0_nJet30_allWeights_diLep_Ratio_eq0b.root')
+      fratio_oneLep = ROOT.TFile(path+'st250_ht500_njet3_nbtagEq0_nJet30_eq0b_Ratio.root')
       cb = ROOT.TCanvas("cb","cb",800,800)
       cb.cd()
       latex = ROOT.TLatex()
       latex.SetNDC()
       latex.SetTextSize(0.04)
       latex.SetTextAlign(11) 
-      hint1 = ROOT.TH1F("hint1", "1 sigma", 100, 4, 9)
-      hint2 = ROOT.TH1F("hint2", "2 sigma", 100, 4, 9)
+      hint1 = ROOT.TH1F("hint1", "1 sigma", 100, 3, 9)
+      hint2 = ROOT.TH1F("hint2", "2 sigma", 100, 3, 9)
       hint1.SetMarkerSize(0)
       hint2.SetMarkerSize(0)
       h_ratio_diLep = fratio_diLep.Get("h_ratio")
       h_ratio_oneLep = fratio_oneLep.Get("h_ratio")
       h_double_ratio = h_ratio_diLep.Clone("h_double_ratio")
       h_double_ratio.Divide(h_ratio_oneLep)
-      h_double_ratio.GetXaxis().SetLabelSize(0.1)
       h_double_ratio.GetXaxis().SetLabelSize(0.05)
       h_double_ratio.GetYaxis().SetLabelSize(0.05)
-      h_double_ratio.GetYaxis().SetTitleSize(0.1)
       h_double_ratio.GetYaxis().SetTitleSize(0.05)
       h_double_ratio.Sumw2()
       h_double_ratio.Draw()
       bin[srNJet][stb][htb]["nJetMean"] = data_mean[srNJet][stb][htb]["data_mean"]
-      func = ROOT.TF1("my","[0] + [1] * (x-"+str(format(bin[srNJet][stb][htb]["nJetMean"],'.3f'))+")",4,9)
+      func = ROOT.TF1("my","[0] + [1] * (x-"+str(format(bin[srNJet][stb][htb]["nJetMean"],'.3f'))+")",3,9)
       h_double_ratio.Fit(func)
       FitFunc     = h_double_ratio.GetFunction('my')
       latex.DrawLatex(0.6,0.85,"Fit:")
@@ -111,4 +108,4 @@ for srNJet in sorted(SR):
 
 
 
-pickle.dump(bin,file('/data/easilar/Results2016/ICHEP/DiLep_SYS/V1/DL_syst_1b_pkl','w'))
+pickle.dump(bin,file('/data/easilar/Results2016/ICHEP/DiLep_SYS/V1/DL_syst_eq0b_V2_pkl','w'))

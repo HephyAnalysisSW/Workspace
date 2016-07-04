@@ -16,7 +16,7 @@ ROOT.TH1F().SetDefaultSumw2()
 
 sample_lumi =3000
 #lumi = 804##pb
-reweight      = '(weight*'+str(lumi)+')/'+str(sample_lumi)
+#reweight      = '(weight*'+str(lumi)+')/'+str(sample_lumi)
 
 btagString = "nBJetMediumCSV30"
 maxN = -1
@@ -49,9 +49,9 @@ for srNJet in sorted(signalRegions):
 #constant = abs(DL[(4,-1)][(250,-1)][(500,-1)]["constant"]-1) 
 #nJetMean = DL[(4,-1)][(250,-1)][(500,-1)]["nJetMean"] 
 #slope    = DL[(4,-1)][(250,-1)][(500,-1)]["slope"] 
-constant = 0.35
-nJetMean = 5.24
-slope    = 0.04 
+constant = 0.36 #0.58 #0.35
+nJetMean = 5.11 #4.55 #5.24
+slope    = 0.1  #0.1  #0.04 
 
 constant_weight = "("+str(constant)+")"
 slope_weight = "((nJet30-"+str(nJetMean)+")*"+str(slope)+")"
@@ -67,14 +67,14 @@ ngenLep = "Sum$(abs(genLep_grandmotherId)==6&&abs(genLep_motherId)==24)"
 ndiLep   = "(("+ngenLep+"+"+ngenTau+")==2)&&"
 n_ndiLep = "(!(("+ngenLep+"+"+ngenTau+")==2))&&" 
 
-presel = presel = "&&".join([lepSel['cut'],lepSel['veto'],filters])
+presel = "&&".join([lepSel['cut'],lepSel['veto'],"Jet_pt[1]>80"])
 #c_tt = {"sample":"ttJets", "chain":getChain(TTJets_Lep, maxN=maxN,histname="",treeName="Events"), "weight1b":"weightBTag1_SF" , "weight0b":"weightBTag0_SF" ,"cut":(0,-1) , "name":TTJets_Comp, "tex":"ttbar + jets",'color':ROOT.kBlue-4}
-c_tt = {"sample":"ttJets", "chain":getChain(TTJets_Lep, maxN=maxN,histname="",treeName="Events"), "weight1b":"(1)" , "weight0b":"(1)" ,"cut_1b":(1,1) ,"cut_0b":(0,0) ,"name":TTJets_Lep, "tex":"ttbar + jets",'color':ROOT.kBlue-4}
-c_DY = {"sample":"DY", "chain":getChain(DY_madgraph, maxN=maxN,histname="",treeName="Events"),  "weight":"(1)" ,"cut":(0,0) , "name":DY_madgraph, "tex":"DY",'color':ROOT.kRed-6}
+c_tt = {"sample":"ttJets", "chain":getChain(TTJets_Comb, maxN=maxN,histname="",treeName="Events"), "weight1b":"(1)" , "weight0b":"(1)" ,"cut_1b":(1,1) ,"cut_0b":(0,0) ,"name":TTJets_Comb, "tex":"ttbar + jets",'color':ROOT.kBlue-4}
+c_DY = {"sample":"DY", "chain":getChain(DYHT, maxN=maxN,histname="",treeName="Events"),  "weight":"(1)" ,"cut":(0,0) , "name":DYHT, "tex":"DY",'color':ROOT.kRed-6}
 cRest = getChain([TTV,singleTop_lep],histname='') #no QCD
 cW = getChain([WJetsHTToLNu],histname='')
 #common_weight = lepSel['trigWeight']+"*lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*puReweight_true_max4*TopPtWeight*weight*2.3/3"
-common_weight = reweight
+common_weight = weight_str_plot
 
 res = {}
 for srNJet in sorted(signalRegions):
@@ -392,7 +392,7 @@ for srNJet in sorted(signalRegions):
           res[srNJet][stb][htb]['delta_'+calc['name']+'_'+variation[0]] = ((res[srNJet][stb][htb]['kappa_'+calc['name']+'_'+variation[0]]/res[srNJet][stb][htb]['kappa_original'])-1)
           print calc['name']+'_'+variation[0] , res[srNJet][stb][htb]['delta_'+calc['name']+'_'+variation[0]]
 
-pickle.dump(res,file('/data/easilar/Results2016/ICHEP/DiLep_SYS/V1/unc_with_SRAll_V2_pkl','w'))
+pickle.dump(res,file('/data/easilar/Results2016/ICHEP/DiLep_SYS/V1/unc_with_SRAll_V4_pkl','w'))
 
 
 

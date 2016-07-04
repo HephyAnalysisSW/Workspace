@@ -36,8 +36,8 @@ separateBTagWeights = True
 
 defSampleStr = "TTJets_LO"
 
-subDir = "postProcessing_Run2016B_4fb_data"
-#subDir = "postProcessing_Spring16_FIXED_v2"
+#subDir = "postProcessing_Run2016B_4fb_data"
+subDir = "postProcessing_Spring16_V3"
 
 #branches to be kept for data and MC
 branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert",
@@ -96,7 +96,7 @@ if options.skim=='HT500ST250':
 if options.skim=='LHEHTsm600':
   skimCond = "lheHTIncoming<=600&&"+htLtSkim
 if options.skim=='LHEHTlg600':
-  skimCond = "lheHTIncoming>600&&nJet>2&&Sum$(LepGood_pt>=25&&abs(LepGood_eta)<2.4)<3&&"+htLtSkim
+  skimCond = "lheHTIncoming>600&&"+htLtSkim
 
 #skimCond += "&&Sum$(LepGood_pt>25&&abs(LepGood_eta)<2.5)>=0"
 
@@ -141,13 +141,13 @@ if sys.argv[0].count('ipython'):
 ##print evt_veto_list
 
 ###For PU reweight###
-#PU_dir = "/data/easilar/tuples_from_Artur/JECv6recalibrateMET_2p2fb/PUhistos/"
-#PU_File_66mb = ROOT.TFile(PU_dir+"/pileUp_66mb_map.root")
-#PU_File_70mb = ROOT.TFile(PU_dir+"/pileUp_70mb_map.root")
-#PU_File_74mb = ROOT.TFile(PU_dir+"/pileUp_74mb_map.root")
-#PU_histo_66 = PU_File_66mb.Get("h_ratio_66")
-#PU_histo_70 = PU_File_70mb.Get("h_ratio_70")
-#PU_histo_74 = PU_File_74mb.Get("h_ratio_74")
+PU_dir = "/afs/hephy.at/user/e/easilar/www/data/Run2016B/4fb/PU_histos/"
+PU_File_66mb = ROOT.TFile(PU_dir+"/h_ratio_66.root")
+PU_File_70mb = ROOT.TFile(PU_dir+"/h_ratio_70.root")
+PU_File_74mb = ROOT.TFile(PU_dir+"/h_ratio_74.root")
+PU_histo_66 = PU_File_66mb.Get("h_ratio")
+PU_histo_70 = PU_File_70mb.Get("h_ratio")
+PU_histo_74 = PU_File_74mb.Get("h_ratio")
 ######################
 
 ###For Lepton SF#####
@@ -371,10 +371,10 @@ for isample, sample in enumerate(allSamples):
           s.eleDataSet = False
           s.weight =xsec_branch*lumiScaleFactor*genWeight
           nTrueInt = t.GetLeaf('nTrueInt').GetValue()
-          #s.puReweight_true = PU_histo_70.GetBinContent(PU_histo_70.FindBin(nTrueInt))
-          #s.puReweight_true_max4 = min(4,s.puReweight_true)
-          #s.puReweight_true_Down = PU_histo_66.GetBinContent(PU_histo_66.FindBin(nTrueInt))
-          #s.puReweight_true_Up = PU_histo_74.GetBinContent(PU_histo_74.FindBin(nTrueInt))
+          s.puReweight_true = PU_histo_70.GetBinContent(PU_histo_70.FindBin(nTrueInt))
+          s.puReweight_true_max4 = min(4,s.puReweight_true)
+          s.puReweight_true_Down = PU_histo_66.GetBinContent(PU_histo_66.FindBin(nTrueInt))
+          s.puReweight_true_Up = PU_histo_74.GetBinContent(PU_histo_74.FindBin(nTrueInt))
           ngenLep = t.GetLeaf('ngenLep').GetValue()
           ngenTau = t.GetLeaf('ngenTau').GetValue()
           genLeps = filter(lambda g:abs(g['grandmotherId'])==6 and abs(g['motherId'])==24,get_cmg_genLeps(t))

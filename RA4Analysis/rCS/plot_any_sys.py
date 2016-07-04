@@ -22,7 +22,7 @@ def getValErrString(val,err, precision=3):
   return str(round(val,precision))+' +/- '+str(round(err,precision))
 
 
-signalRegions = signalRegion3fb
+signalRegions = signalRegions2016
 
 rowsNJet = {}
 rowsSt = {}
@@ -33,13 +33,16 @@ for srNJet in sorted(signalRegions):
   rows = 0
   for stb in sorted(signalRegions[srNJet]):
     rows += len(signalRegions[srNJet][stb])
-    rowsSt[srNJet][stb] = {'n':len(signalRegions[srNJet][stb])}
-  rowsNJet[srNJet] = {'nST':len(signalRegions[srNJet]), 'n':rows}
+    rowsSt[srNJet][stb] = {'njet':len(signalRegions[srNJet][stb])}
+  rowsNJet[srNJet] = {'LT':len(signalRegions[srNJet]), 'n':rows}
   bins += rows
 
-saveDir =  '/data/easilar/Results2016/ICHEP/Prediction_Spring16_templates_lep_data_2p57/'
+#print signalRegions
+
+saveDir =  '/data/easilar/Results2016/ICHEP/Prediction_Spring16_templates_lep_data_4fb/'
 validation = False
-dilep   = pickle.load(file('/data/easilar/Results2016/ICHEP/DiLep_SYS/V1/unc_with_SRAll_pkl'))
+#dilep   = pickle.load(file('/data/easilar/Results2016/ICHEP/DiLep_SYS/V1/unc_with_SRAll_pkl'))
+dilep   = pickle.load(file('/data/easilar/Results2016/ICHEP/DiLep_SYS/V1/unc_with_SRAll_V4_pkl'))
 
 colors = [ROOT.kBlue-7, ROOT.kCyan-9, ROOT.kCyan-2, ROOT.kGreen-6, ROOT.kOrange+6, ROOT.kRed+1, ROOT.kRed-6, ROOT.kYellow+2, ROOT.kGreen, ROOT.kGreen+3, ROOT.kBlue-2]
 
@@ -100,6 +103,10 @@ for injb,srNJet in enumerate(sorted(signalRegions)):
       dilepC.SetBinContent(i, constant_err)
       dilepS.SetBinContent(i, slope_err)
       print constant_err , slope_err
+      errorsForTotal = [constant_err , slope_err]
+      totalSyst_noKappa = 0
+      for err in errorsForTotal: totalSyst_noKappa += err**2
+      totalH.SetBinContent(i, sqrt(totalSyst_noKappa))
       
       i+=1
 
@@ -124,12 +131,14 @@ leg.SetFillColor(ROOT.kWhite)
 leg.SetShadowColor(ROOT.kWhite)
 leg.SetBorderSize(1)
 leg.SetTextSize(0.04)
+leg.AddEntry(totalH, 'Total', 'p')
 for i in range(2):
   leg.AddEntry(hists[i], '', 'f')
 
 
 h_Stack.Draw('hist')
-setNiceBinLabel(h_Stack, signalRegions)
+totalH.Draw('p same')
+setNiceBinLabel(h_Stack, signalRegions )
 
 h_Stack.GetYaxis().SetTitle('Relative uncertainty')
 h_Stack.GetYaxis().SetTitleOffset(0.8)
@@ -137,7 +146,7 @@ h_Stack.GetYaxis().SetNdivisions(508)
 h_Stack.GetXaxis().SetLabelSize(0.04)
 h_Stack.GetXaxis().SetTitleSize(0.06)
 h_Stack.GetXaxis().SetTitleOffset(2)
-h_Stack.GetXaxis().SetLabelSize(0.04)
+h_Stack.GetXaxis().SetLabelSize(0.02)
 h_Stack.GetXaxis().SetNdivisions(508)
 leg.Draw()
 
@@ -149,6 +158,6 @@ latex1.SetTextAlign(11)
 latex1.DrawLatex(0.15,0.96,'CMS #bf{#it{Preliminary}}')
 latex1.DrawLatex(0.85,0.96,"#bf{(13TeV)}")
 
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/data/Run2016B/2571pb/syst_uncertainties/diLepSys_ICHEP_v4.png')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/data/Run2016B/2571pb/syst_uncertainties/diLepSys_ICHEP_v4.root')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/data/Run2016B/2571pb/syst_uncertainties/diLepSys_ICHEP_v4.pdf')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/data/Run2016B/4fb/syst_uncertainties/diLepSys_ICHEP_kappa_tot_V4.png')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/data/Run2016B/4fb/syst_uncertainties/diLepSys_ICHEP_kappa_tot_V4.root')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/data/Run2016B/4fb/syst_uncertainties/diLepSys_ICHEP_kappa_tot_V4.pdf')
