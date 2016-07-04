@@ -138,7 +138,7 @@ for i in range(2):
 
 h_Stack.Draw('hist')
 totalH.Draw('p same')
-#setNiceBinLabel(h_Stack, signalRegions )
+setNiceBinLabel(h_Stack, signalRegions )
 
 h_Stack.GetYaxis().SetTitle('Relative uncertainty')
 h_Stack.GetYaxis().SetTitleOffset(0.8)
@@ -146,7 +146,7 @@ h_Stack.GetYaxis().SetNdivisions(508)
 h_Stack.GetXaxis().SetLabelSize(0.04)
 h_Stack.GetXaxis().SetTitleSize(0.06)
 h_Stack.GetXaxis().SetTitleOffset(2)
-h_Stack.GetXaxis().SetLabelSize(0.04)
+h_Stack.GetXaxis().SetLabelSize(0.02)
 h_Stack.GetXaxis().SetNdivisions(508)
 leg.Draw()
 
