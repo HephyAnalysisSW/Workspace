@@ -361,9 +361,9 @@ class cmgTuplesPostProcessed():
         ######################################################################################################
 
         dataSamples = [
-            ["MET_v2", "MET_Run2016B_PromptReco_v2"],
-            ["SingleMu_v2", "SingleMuon_Run2016B_PromptReco_v2"],
-            ["SingleEl_v2", "SingleElectron_Run2016B_PromptReco_v2"],
+            ["MET_v2", "MET_Run2016B-PromptReco-v2"],
+            ["SingleMu_v2", "SingleMuon_Run2016B-PromptReco-v2"],
+            ["SingleEl_v2", "SingleElectron_Run2016B-PromptReco-v2"],
             ]
 
         allData = []
@@ -394,8 +394,11 @@ class cmgTuplesPostProcessed():
             print "!!!!! WARNING !!!!! NO MASS DICT FOUND!"
             mass_Dict_pickle = None
 
-        mass_dict = pickle.load(open(mass_dict_pickle, "r"))
-
+        if mass_Dict_pickle:
+            mass_dict = pickle.load(open(mass_dict_pickle, "r"))
+        else:
+            mass_dict = {}
+            
         self.mass_dict = mass_dict
         mass_scan = {}
 
