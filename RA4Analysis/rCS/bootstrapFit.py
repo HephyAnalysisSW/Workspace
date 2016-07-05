@@ -183,22 +183,28 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
       
       b += 1
 
-#tmpFile_TTJets =       ROOT.TFile('/data/dspitzbart/bootstrap/TTJets.root','new')
-#tt_err.Write()
-#tmpFile_TTJets.Close()
-#
-#tmpFile_WJets_PosPdg = ROOT.TFile('/data/dspitzbart/bootstrap/WJets_PosPdg.root','new')
-#w_pos_err.Write()
-#tmpFile_WJets_PosPdg.Close()
-#
-#tmpFile_WJets_NegPdg = ROOT.TFile('/data/dspitzbart/bootstrap/WJets_NegPdg.root','new')
-#w_neg_err.Write()
-#tmpFile_WJets_NegPdg.Close()
-#
-#tmpFile_Rest_PosPdg =  ROOT.TFile('/data/dspitzbart/bootstrap/Rest_PosPdg.root','new')
-#rest_pos_err.Write()
-#tmpFile_Rest_PosPdg.Close()
-#
-#tmpFile_Rest_NegPdg =  ROOT.TFile('/data/dspitzbart/bootstrap/Rest_NegPdg.root','new')
-#rest_neg_err.Write()
-#tmpFile_Rest_NegPdg.Close()
+tmpFile_TTJets =       ROOT.TFile('/data/dspitzbart/bootstrap2016/TTJets.root','new')
+tt_err.Write()
+tmpFile_TTJets.Close()
+
+tmpFile_TTJets_mu =    ROOT.TFile('/data/dspitzbart/bootstrap2016/TTJets_mu.root','new')
+tt_WSB_err.Write()
+tmpFile_TTJets_mu.Close()
+
+tmpFile_WJets_PosPdg = ROOT.TFile('/data/dspitzbart/bootstrap2016/WJets_PosPdg.root','new')
+w_pos_err.Write()
+tmpFile_WJets_PosPdg.Close()
+
+tmpFile_WJets_NegPdg = ROOT.TFile('/data/dspitzbart/bootstrap2016/WJets_NegPdg.root','new')
+w_neg_err.Write()
+tmpFile_WJets_NegPdg.Close()
+
+tmpFile_Rest_PosPdg =  ROOT.TFile('/data/dspitzbart/bootstrap2016/Rest_PosPdg.root','new')
+rest_pos_err.Write()
+tmpFile_Rest_PosPdg.Close()
+
+tmpFile_Rest_NegPdg =  ROOT.TFile('/data/dspitzbart/bootstrap2016/Rest_NegPdg.root','new')
+rest_neg_err.Write()
+tmpFile_Rest_NegPdg.Close()
+
+pickle.dump(templateBootstrap, file('/data/dspitzbart/bootstrap2016/bootstrap_unc_pkl','w'))

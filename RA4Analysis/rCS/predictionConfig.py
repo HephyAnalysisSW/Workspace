@@ -97,17 +97,17 @@ if validation:
   signalRegions = validation2016
   regStr = 'validation_4j'
 else:
-  #signalRegions = signalRegions2016
-  signalRegions = signalRegion3fb
-  regStr = 'fullSR'
-  #regStr = 'SR2016_v1_100p'
+  signalRegions = signalRegions2016
+  #signalRegions = signalRegion3fb
+  #regStr = 'fullSR'
+  regStr = 'SR2016_v1_100p'
 #signalRegions = signalRegion3fbMerge
 
 ## weight calculations
-lumi = 2.3
-templateLumi = 2.3 # lumi that was used when template was created - if defined wrong, fixed rest backgrounds will be wrong
+lumi = 3.99
+templateLumi = 3.99 # lumi that was used when template was created - if defined wrong, fixed rest backgrounds will be wrong
 sampleLumi = 3.
-printlumi = '2.3'
+printlumi = '4.0'
 debugReweighting = False
 
 year = '2016'
@@ -128,15 +128,15 @@ if templateBootstrap: templateBootstrap = pickle.load(file(templateBootstrapDir)
 
 ## Directories for plots, results and templates
 if isData:
-  templateName   = 'Spring15_templates_'+regStr+'_lep_data'
+  templateName   = 'Spring16_templates_'+regStr+'_lep_data'
   predictionName = templateName + nameSuffix
 else:
-  templateName   = 'Spring15_templates_'+regStr+'_lep_MC'
+  templateName   = 'Spring16_templates_'+regStr+'_lep_MC'
   predictionName = templateName+btagWeightSuffix + nameSuffix
 printDir    = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/25ns/templateFit_'+predictionName+'_'+lumistr+'/'
 pickleDir   = '/data/'+username+'/Results'+year+'/Prediction_'+predictionName+'_'+lumistr+'/'
 templateDir = '/data/'+username+'/Results'+year+'/btagTemplates_'+templateName+'_'+templateLumistr+'/'
-prefix = 'singleLeptonic_Spring15_'
+prefix = 'singleLeptonic_Spring16_'
 
 if validation:
   #kappa_dict_dir = '/data/dspitzbart/Results'+year+'/Prediction_SFtemplates_validation_4j_lep_MC_SF_2p3/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'

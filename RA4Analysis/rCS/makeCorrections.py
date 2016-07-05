@@ -23,8 +23,21 @@ if validation:
   wJetBins = [(3,3),(4,4),(5,5),(6,7),(8,-1)]
 else:
   wJetBins = [(3,4),(5,5),(6,7),(8,-1)]
+  wJetBinning = [2.5,4.5,5.5,7.5,10]
+
+njetFullBinning = [15,0,15]
+
+def getBinCOM(hist, bin1, bin2):
+  s = hist.Integral(bin1, bin2)
+  #vals = []
+  si = 0
+  for i,b in enumerate(range(bin1, bin2+1)):
+    si += hist.GetBinContent(b)*(i+1)
+  center = si/s
+  return center
 
 ttJetBins = [(4,4),(5,5),(6,7),(8,-1)]
+ttJetBinning = [3.5,4.5,5.5,7.5,10]
 
 bins = {}
 
@@ -80,6 +93,11 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
         #ttJets corrections
         ttJetRcsFitH = ROOT.TH1F("ttJetRcsFitH","",len(ttJetBins),0,len(ttJetBins))
         ttJetRcsFitH1b = ROOT.TH1F("ttJetRcsFitH1b","",len(ttJetBins),0,len(ttJetBins))
+        
+        #get njet hist
+        ttJetsNJetH = ROOT.TH1F('ttJetsNJetH','',len(njetFullBinning),0,len(njetFullBinning))
+        cname0bNJet, cut0bNJet = nameAndCut(stb,htb,(3,-1), btb=(0,-1) ,presel=presel_MC)
+        cTTJets.Draw('nJet30>>ttJetsNJetH',weight_str+'*('+cut0bNJet+')')
 
         #Rcs values w/o b-tag weights
         cname1bCRtt, cut1bCRtt = nameAndCut(stb,htb,(4,5), btb=(1,1) ,presel=presel_MC)
@@ -99,7 +117,11 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
         kappaTT_btag = divideRCSdict(rcs0bCRtt_btag,rcs1bCRtt_btag)
 
         fitResults[njb][stb][htb] = {'kappaTT':kappaTT, 'rcs1bCRtt_btag':rcs1bCRtt_btag, 'rcs1bCRtt':rcs1bCRtt, 'rcs0bCRtt':rcs0bCRtt, 'rcs0bCRtt_btag':rcs0bCRtt_btag, 'kappaTT_btag':kappaTT_btag}
-
+        
+        rcsVal = []
+        rcsErr = []
+        
+        
         #fill histograms
         # for the time being, bins with 0 entries (= Rcs=0) are not incorporated in the fit (same applies for wjets)
         for i_njbTT, njbTT in enumerate(ttJetBins):

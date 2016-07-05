@@ -28,7 +28,7 @@ withSystematics = True
 applyKappa      = True
 
 showMCtruth     = False
-signal = True
+signal = False
 plotPull = False
 
 latextitle = ''
@@ -39,7 +39,7 @@ prefix = 'singleLeptonic_Spring16_'
 #path = '/data/'+username+'/Results2015/Prediction_SFTemplate_MC_fullSR_lep_3.0/'
 #pickleDir = '/data/easilar/Results2016/Prediction_SFtemplates_fullSR_lep_data_2p25/'
 #pickleDir = '/data/dspitzbart/Results2015/Prediction_SFtemplates_validation_lep_data_2.1/'
-pickleDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_fullSR_lep_data_Moriond_2p3/'
+#pickleDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_fullSR_lep_data_Moriond_2p3/'
 #pickleDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_validation_4j_lep_data_2p3/'
 #pickleDir = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_VreducedSR_lep_data_0p8/'
 
@@ -48,7 +48,7 @@ pickleDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_fullSR_lep_data
 
 #pickleDir = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2016_v1_QCD_lep_MC_3p99/'
 #pickleDir = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_validation_4j_lep_data_3p99/'
-#pickleDir = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2016_v1_100p_lep_data_3p99/'#resultsFinal_withSystematics_pkl
+pickleDir = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2016_v1_100p_lep_data_3p99/'#resultsFinal_withSystematics_pkl
 
 res = pickle.load(file(pickleDir+'resultsFinal_withSystematics_pkl'))
 if withSystematics:
@@ -574,7 +574,7 @@ else:
   setNiceBinLabel(ratio2, signalRegions)
   
   ratio2.GetXaxis().SetTitleSize(0.13)
-  ratio2.GetXaxis().SetLabelSize(0.11)
+  ratio2.GetXaxis().SetLabelSize(0.09)
   ratio2.GetXaxis().SetNdivisions(508)
   ratio2.GetYaxis().SetTitleSize(0.13)
   ratio2.GetYaxis().SetLabelSize(0.13)
@@ -602,9 +602,9 @@ if not unblinded:
 else:
   suffix = ''
 
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_paper_15006_v2.png')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_paper_15006_v2.root')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_paper_15006_v2.pdf')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'.png')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'.root')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'.pdf')
 
 can2 = ROOT.TCanvas('can2','can2',700,700)
 one.SetLineStyle(2)
@@ -625,7 +625,7 @@ leg2.AddEntry(kappa_global,'total')
 
 setNiceBinLabel(kappa_global, signalRegions)
 kappa_global.GetYaxis().SetTitle('#kappa')
-kappa_global.GetXaxis().SetLabelSize(0.04)
+kappa_global.GetXaxis().SetLabelSize(0.027)
 
 latex2 = ROOT.TLatex()
 latex2.SetNDC()
@@ -644,7 +644,7 @@ leg2.Draw()
 latex2.DrawLatex(0.16,0.96,'CMS #bf{#it{'+latextitle+'}}')
 latex2.DrawLatex(0.79,0.96,"#bf{MC (13TeV)}")
 
-can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/'+predictionName+'_paper_15006.png')
-can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/'+predictionName+'_paper_15006.root')
-can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/'+predictionName+'_paper_15006.pdf')
+can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/'+predictionName+'_Kappa.png')
+can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/'+predictionName+'_Kappa.root')
+can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/'+predictionName+'_Kappa.pdf')
 
