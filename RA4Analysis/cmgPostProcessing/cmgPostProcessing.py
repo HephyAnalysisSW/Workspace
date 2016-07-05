@@ -18,7 +18,7 @@ ROOT.AutoLibraryLoader.enable()
 from Workspace.HEPHYPythonTools.helpers import getChunks
 from Workspace.RA4Analysis.cmgTuples_Data25ns_PromtV2 import SingleElectron_Run2016B_PromptReco_v2 , SingleMuon_Run2016B_PromptReco_v2
 from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2 import *
-from systematics_helper import calc_btag_systematics, calc_LeptonScale_factors_and_systematics, calc_TopPt_Weights , calcDLDictionary, calc_diLep_contributions ,  fill_branch_WithJEC
+from systematics_helper import calc_btag_systematics, calc_LeptonScale_factors_and_systematics, calc_TopPt_Weights , calcDLDictionary, calc_diLep_contributions ,  fill_branch_WithJEC , getGenWandLepton , getGenTopWLepton
 from btagEfficiency import *
 from readVetoEventList import *
 
@@ -45,7 +45,7 @@ separateBTagWeights = True
 defSampleStr = "TTJets_LO"
 
 #subDir = "postProcessing_Run2016B_4fb_data"
-subDir = "postProcessing_Spring16_V3"
+subDir = "postProcessing_Spring16_V6"
 
 #branches to be kept for data and MC
 branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert",
@@ -150,13 +150,13 @@ if sys.argv[0].count('ipython'):
 
 ###For PU reweight###
 #PU_dir = "/afs/hephy.at/user/e/easilar/www/data/Run2016B/4fb/PU_histos/"
-PU_dir = "/data/dspitzbart/PU_histos/"
-PU_File_66mb = ROOT.TFile(PU_dir+"/h_ratio_66.root")
-PU_File_70mb = ROOT.TFile(PU_dir+"/h_ratio_70.root")
-PU_File_74mb = ROOT.TFile(PU_dir+"/h_ratio_74.root")
-PU_histo_66 = PU_File_66mb.Get("h_ratio")
-PU_histo_70 = PU_File_70mb.Get("h_ratio")
-PU_histo_74 = PU_File_74mb.Get("h_ratio")
+PU_dir = "/data/easilar/PU_Histos/"
+PU_File_66mb = ROOT.TFile(PU_dir+"/h_ratio_67p7.root")
+PU_File_70mb = ROOT.TFile(PU_dir+"/h_ratio_71p3.root")
+PU_File_74mb = ROOT.TFile(PU_dir+"/h_ratio_74p9.root")
+PU_histo_66 = PU_File_66mb.Get("puRatio")
+PU_histo_70 = PU_File_70mb.Get("puRatio")
+PU_histo_74 = PU_File_74mb.Get("puRatio")
 ######################
 
 ###For Lepton SF#####
@@ -199,42 +199,6 @@ def getTreeFromChunk(c, skimCond, iSplit, nSplit):
   del rf
   return t
  
-
-def getGenWandLepton(c):
-  genPartAll = [getObjDict(c, 'GenPart_', ['pt','eta','phi','mass','pdgId','motherId','motherIndex'], j) for j in range(int(c.GetLeaf('nGenPart').GetValue()))]
-  lepton = filter(lambda l:abs(l['pdgId']) in [11,13,15], genPartAll)
-  if len(lepton)==0:
-    print "no generated lepton found (hadronic ttjets event)!"
-    p4w=False
-    p4lepton=False
-    return p4w, p4lepton
-  lFromW = filter(lambda w:abs(w['motherId'])==24, lepton)
-  if len(lFromW)==0:
-    test = filter(lambda w:w['motherId']==24, lepton)
-    if len(test)==0: print 'No lepton from W found (hadronic ttjets event)!'
-    p4w=False
-    p4lepton=False
-    return p4w, p4lepton
-  elif len(lFromW)>0:
-    Ws = []
-    leps = []
-    for i in range(len(lFromW)):
-      if abs(lFromW[i]['motherId'])!=24: print '4)this should not have happened'
-      genW = getObjDict(c, 'GenPart_', ['pt','eta','phi','mass','pdgId','motherId','motherIndex'], int(lFromW[i]['motherIndex']))
-      if abs(genW['pdgId'])!=24: '5)this should not have happened'
-      W = ROOT.TLorentzVector()
-      W.SetPtEtaPhiM(genW['pt'],genW['eta'],genW['phi'],genW['mass'])
-      lep = ROOT.TLorentzVector()
-      lep.SetPtEtaPhiM(lFromW[i]['pt'],lFromW[i]['eta'],lFromW[i]['phi'],lFromW[i]['mass'])
-      p4lepton = ROOT.LorentzVector(lep.Px(),lep.Py(),lep.Pz(),lep.E())
-      p4w = ROOT.LorentzVector(W.Px(),W.Py(),W.Pz(),W.E())
-      Ws.append(p4w)
-      leps.append(p4lepton)
-    if len(lFromW)>2:
-      print '3)this should not have happened'
-  return Ws, leps
-
-
 
 
 exec('allSamples=['+options.allsamples+']')
@@ -504,17 +468,12 @@ for isample, sample in enumerate(allSamples):
               s.weight_TTPolPlus5 = s.weight
               s.weight_TTPolMinus5 = s.weight
             else:
-              weightUp = s.weight
-              weightDown = s.weight
-              for ilep, lep in enumerate(p4lepton):
-                cosTheta = ROOT.WjetPolarizationAngle(p4w[ilep], p4lepton[ilep])
-                weightUp *= (1. + 0.05*(1.-cosTheta)**2)
-                weightDown *= (1. - 0.05*(1.-cosTheta)**2)
+              cosTheta = ROOT.ttbarPolarizationAngle(p4t, p4w, p4lepton)
               s.weight = s.weight
               s.weight_WPolPlus10 = s.weight
               s.weight_WPolMinus10 = s.weight
-              s.weight_TTPolPlus5 = weightUp * WPolNormTTUp
-              s.weight_TTPolMinus5 = weightDown * WPolNormTTDown
+              s.weight_TTPolPlus5 = s.weight * (1. + 0.05*(1.-cosTheta)**2) * 1./(1.+0.05*2./3.) * (1./1.0323239521945559)
+              s.weight_TTPolMinus5 = s.weight * (1. - 0.05*(1.-cosTheta)**2) * 1./(1.-0.05*2./3.) * (1.034553190276963956)          
           elif "wjets" in sample["name"].lower() and not "ttw" in sample["name"].lower(): #W polarization in W+jets
             p4w, p4lepton = getGenWandLepton(t)
             if not p4w and not p4lepton: 

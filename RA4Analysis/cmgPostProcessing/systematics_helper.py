@@ -340,3 +340,89 @@ def getISRWeight(s,genParts):
     if s.genGluGlu_pt > 600: s.ISRSigUp = 1.30; s.ISRSigDown = 0.70
 
   return
+
+
+
+def getGenWandLepton(c):
+  genPartAll = [getObjDict(c, 'GenPart_', ['pt','eta','phi','mass','pdgId','motherId','motherIndex'], j) for j in range(int(c.GetLeaf('nGenPart').GetValue()))]
+  lepton = filter(lambda l:abs(l['pdgId']) in [11,13,15], genPartAll)
+  if len(lepton)==0:
+    print "no generated lepton found (hadronic ttjets event)!"
+    p4w=False
+    p4lepton=False
+    return p4w, p4lepton
+  lFromW = filter(lambda w:abs(w['motherId'])==24, lepton)
+  if len(lFromW)==0:
+    test = filter(lambda w:w['motherId']==24, lepton)
+    if len(test)==0: print 'No lepton from W found (hadronic ttjets event)!'
+    p4w=False
+    p4lepton=False
+    return p4w, p4lepton
+  elif len(lFromW)>0:
+    Ws = []
+    leps = []
+    for i in range(len(lFromW)):
+      if abs(lFromW[i]['motherId'])!=24: print '4)this should not have happened'
+      genW = getObjDict(c, 'GenPart_', ['pt','eta','phi','mass','pdgId','motherId','motherIndex'], int(lFromW[i]['motherIndex']))
+      if abs(genW['pdgId'])!=24: '5)this should not have happened'
+      W = ROOT.TLorentzVector()
+      W.SetPtEtaPhiM(genW['pt'],genW['eta'],genW['phi'],genW['mass'])
+      lep = ROOT.TLorentzVector()
+      lep.SetPtEtaPhiM(lFromW[i]['pt'],lFromW[i]['eta'],lFromW[i]['phi'],lFromW[i]['mass'])
+      p4lepton = ROOT.LorentzVector(lep.Px(),lep.Py(),lep.Pz(),lep.E())
+      p4w = ROOT.LorentzVector(W.Px(),W.Py(),W.Pz(),W.E())
+      Ws.append(p4w)
+      leps.append(p4lepton)
+    if len(lFromW)>2:
+      print '3)this should not have happened'
+  return Ws, leps
+
+def getGenTopWLepton(c):
+  genPartAll = [getObjDict(c, 'GenPart_', ['pt','eta','phi','mass','pdgId','charge','motherId','motherIndex'], j) for j in range(int(c.GetLeaf('nGenPart').GetValue()))]
+  lepton = filter(lambda l:abs(l['pdgId']) in [11,13,15], genPartAll)
+  if len(lepton)==0:
+    p4t=False
+    p4w=False
+    p4lepton=False
+    return p4t, p4w, p4lepton
+  lFromW = filter(lambda w:abs(w['motherId'])==24, lepton)
+  if len(lFromW)>0:
+    if len(lFromW)==1:
+      if abs(lFromW[0]['motherId'])!=24: print '1)this should not have happened'
+      genW = getObjDict(c, 'GenPart_', ['pt','eta','phi','mass','pdgId','charge','motherId','motherIndex'], int(lFromW[0]['motherIndex']))
+      if abs(genW['pdgId'])!=24: '2)this should not have happened'
+      genTop = getObjDict(c, 'GenPart_', ['pt','eta','phi','mass','pdgId','charge','motherId','motherIndex'], int(genW['motherIndex']))
+      lep = ROOT.TLorentzVector()
+      lep.SetPtEtaPhiM(lFromW[0]['pt'],lFromW[0]['eta'],lFromW[0]['phi'],lFromW[0]['mass'])
+    elif len(lFromW)==2:
+      match = False
+      leadLep = getObjDict(c, 'LepGood_', ['pt','eta','phi','mass','pdgId','charge'], 0)
+      for l in lFromW:
+        if leadLep['charge'] == l['charge']:
+          match = True
+          genW = getObjDict(c, 'GenPart_', ['pt','eta','phi','mass','pdgId','charge','motherId','motherIndex'], int(l['motherIndex']))
+          genTop = getObjDict(c, 'GenPart_', ['pt','eta','phi','mass','pdgId','charge','motherId','motherIndex'], int(genW['motherIndex']))
+          lep = ROOT.TLorentzVector()
+          lep.SetPtEtaPhiM(l['pt'],l['eta'],l['phi'],l['mass'])
+      if not match:
+        print 'No match at all!'
+        p4t=False
+        p4w=False
+        p4lepton=False
+        return p4t, p4w, p4lepton
+  elif len(lFromW)>2 or len(lFromW)==0:
+    print "8) this should not have happened"
+    p4t=False
+    p4w=False
+    p4lepton=False
+    return p4t, p4w, p4lepton
+  t = ROOT.TLorentzVector()
+  W = ROOT.TLorentzVector()
+  W.SetPtEtaPhiM(genW['pt'],genW['eta'],genW['phi'],genW['mass'])
+  t.SetPtEtaPhiM(genTop['pt'],genTop['eta'],genTop['phi'],genTop['mass'])
+  p4lepton = ROOT.LorentzVector(lep.Px(),lep.Py(),lep.Pz(),lep.E())
+  p4w = ROOT.LorentzVector(W.Px(),W.Py(),W.Pz(),W.E())
+  p4t = ROOT.LorentzVector(t.Px(),t.Py(),t.Pz(),t.E())
+  return p4t, p4w, p4lepton
+
+
