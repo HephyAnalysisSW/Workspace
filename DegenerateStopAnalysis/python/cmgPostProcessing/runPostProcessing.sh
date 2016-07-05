@@ -80,7 +80,7 @@ if [[ ${CMSSW_ACTION} == "R" ]]; then
         --cmgPostProcessingTag=${CMG_POST_PROCESSING_TAG} \
         --processLepAll \
         --skimGeneral='' \
-        --skimPreselect \
+        --skimLepton='oneLep' \
         --run \
         ${VERBOSE}
 fi
