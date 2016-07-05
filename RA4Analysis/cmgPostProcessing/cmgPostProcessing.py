@@ -461,24 +461,11 @@ for isample, sample in enumerate(allSamples):
           s.singleElectronic  =  abs(s.leptonPdg)==11
           
           if "ttjets" in sample["name"].lower(): #W polarization in TTbar
-            p4t, p4w, p4lepton = getGenTopWLepton(t)
-            if not p4t and not p4w and not p4lepton:
-              s.weight = s.weight
-              s.weight_WPolPlus10 = s.weight
-              s.weight_WPolMinus10 = s.weight
-              s.weight_TTPolPlus5 = s.weight
-              s.weight_TTPolMinus5 = s.weight
-            else:
-              cosTheta = ROOT.ttbarPolarizationAngle(p4t, p4w, p4lepton)
-              s.weight = s.weight
-              s.weight_WPolPlus10 = s.weight
-              s.weight_WPolMinus10 = s.weight
-              s.weight_TTPolPlus5 = s.weight * (1. + 0.05*(1.-cosTheta)**2) * 1./(1.+0.05*2./3.) * (1./1.0323239521945559)
-              s.weight_TTPolMinus5 = s.weight * (1. - 0.05*(1.-cosTheta)**2) * 1./(1.-0.05*2./3.) * (1.034553190276963956)          
-          elif "wjets" in sample["name"].lower() and not "ttw" in sample["name"].lower(): #W polarization in W+jets
+            #p4t, p4w, p4lepton = getGenTopWLepton(t)
             p4w, p4lepton = getGenWandLepton(t)
-            if not p4w and not p4lepton: 
-              s.weight = s.weight
+            varFactor = 0.05
+            if not p4w and not p4lepton:
+              #s.weight = s.weight
               s.weight_WPolPlus10 = s.weight
               s.weight_WPolMinus10 = s.weight
               s.weight_TTPolPlus5 = s.weight
@@ -488,21 +475,45 @@ for isample, sample in enumerate(allSamples):
               weightDown = s.weight
               for ilep, lep in enumerate(p4lepton):
                 cosTheta = ROOT.WjetPolarizationAngle(p4w[ilep], p4lepton[ilep])
-                weightUp *= (1. + 0.1*(1.-cosTheta)**2)
-                weightDown *= (1. - 0.1*(1.-cosTheta)**2)
-              s.weight = s.weight
+                weightUp *=   (1. + varFactor * (1.-cosTheta)**2)
+                weightDown *= (1. - varFactor * (1.-cosTheta)**2)
+              #cosTheta = ROOT.ttbarPolarizationAngle(p4t, p4w, p4lepton)
+              #s.weight = s.weight
+              s.weight_WPolPlus10 = s.weight
+              s.weight_WPolMinus10 = s.weight
+              s.weight_TTPolPlus5 = weightUp * WPolNormTTUp
+              s.weight_TTPolMinus5 = weightDown * WPolNormTTDown
+              #s.weight_TTPolPlus5 = s.weight * (1. + 0.05*(1.-cosTheta)**2) * 1./(1.+0.05*2./3.) * (1./1.0323239521945559)
+              #s.weight_TTPolMinus5 = s.weight * (1. - 0.05*(1.-cosTheta)**2) * 1./(1.-0.05*2./3.) * (1.034553190276963956)          
+          elif "wjets" in sample["name"].lower() and not "ttw" in sample["name"].lower(): #W polarization in W+jets
+            p4w, p4lepton = getGenWandLepton(t)
+            varFactor = 0.1
+            if not p4w and not p4lepton: 
+              #s.weight = s.weight
+              s.weight_WPolPlus10 = s.weight
+              s.weight_WPolMinus10 = s.weight
+              s.weight_TTPolPlus5 = s.weight
+              s.weight_TTPolMinus5 = s.weight
+            else:
+              weightUp = s.weight
+              weightDown = s.weight
+              for ilep, lep in enumerate(p4lepton):
+                cosTheta = ROOT.WjetPolarizationAngle(p4w[ilep], p4lepton[ilep])
+                weightUp *=   (1. + varFactor * (1.-cosTheta)**2)
+                weightDown *= (1. - varFactor * (1.-cosTheta)**2)
+              #s.weight = s.weight
               s.weight_WPolPlus10 = weightUp * WPolNormWUp 
               s.weight_WPolMinus10 = weightDown * WPolNormWDown
               s.weight_TTPolPlus5 = s.weight
               s.weight_TTPolMinus5 = s.weight 
           else:
-            s.weight = s.weight
+            #s.weight = s.weight
             s.weight_WPolPlus10 = s.weight
             s.weight_WPolMinus10 = s.weight
             s.weight_TTPolPlus5 = s.weight
             s.weight_TTPolMinus5 = s.weight
         else:
-          s.weight = s.weight
+          #s.weight = s.weight
           s.weight_WPolPlus10 = s.weight
           s.weight_WPolMinus10 = s.weight
           s.weight_TTPolPlus5 = s.weight

@@ -9,7 +9,7 @@ from Workspace.RA4Analysis.cmgTuples_Data25ns_Promtv2_postprocessed import *
 from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2_postProcessed import *
 from Workspace.RA4Analysis.signalRegions import signalRegion3fb 
 from cutFlow_helper import *
-from general_config import *
+from Workspace.RA4Analysis.general_config import *
 from math import *
 def Draw_CMS_header():
    tex = ROOT.TLatex()
@@ -146,8 +146,8 @@ ngenLep = "Sum$(abs(genLep_grandmotherId)==6&&abs(genLep_motherId)==24)"
 
 bkg_samples=[
 {'sample':'TTVH',           "weight":"(1)" ,"cut":nbtag ,"add_Cut":"(1)","name":TTV ,'tex':'t#bar{t}V','color':ROOT.kOrange-3},
-{"sample":"DiBosons",       "weight":"(1)" ,"cut":nbtag ,"add_Cut":"(1)","name":diBoson ,"tex":"WW/WZ/ZZ","color":ROOT.kRed+3},
-{"sample":"DY",             "weight":"(1)" ,"cut":nbtag ,"add_Cut":"(1)","name":DYHT,"tex":"DY + jets",'color':ROOT.kRed-6},
+#{"sample":"DiBosons",       "weight":"(1)" ,"cut":nbtag ,"add_Cut":"(1)","name":diBoson ,"tex":"WW/WZ/ZZ","color":ROOT.kRed+3},
+{"sample":"DY",             "weight":"(1)" ,"cut":nbtag ,"add_Cut":"(1)","name":DY_HT,"tex":"DY + jets",'color':ROOT.kRed-6},
 {"sample":"singleTop",      "weight":"(1)" ,"cut":nbtag ,"add_Cut":"(1)","name":singleTop_lep,"tex":"t/#bar{t}",'color': ROOT.kViolet+5},
 {"sample":"QCD",            "weight":"(1)" ,"cut":nbtag ,"add_Cut":"(1)","name":QCDHT, "tex":"QCD","color":ROOT.kCyan-6},
 {"sample":"WJets",          "weight":"(1)" ,"cut":nbtag ,"add_Cut":"(1)","name":WJetsHTToLNu,"tex":"W + jets","color":ROOT.kGreen-2},
@@ -169,19 +169,19 @@ plots =[\
 {'ndiv':False,'yaxis':'< Events / 0.1>','xaxis':'#Delta#Phi(W,l)','logy':'True' , 'var':'deltaPhi_Wl',        'bin_set':True,          'varname':'deltaPhi_Wl',       'binlabel':1, 'bin':(len(dPhiBins)-1,dPhiBins)},\
 {'ndiv':True,'yaxis':'Events / ','xaxis':'L_{T} [GeV]','logy':'True' , 'var':  'st',                        'bin_set':False,          'varname':'LT',                  'binlabel':25,  'bin':(30,250,1000)},\
 {'ndiv':True,'yaxis':'Events / ','xaxis':'H_{T}','logy':'True' , 'var':'htJet30j',                    'bin_set':False,          'varname':'htJet30j',            'binlabel':50,  'bin':(40,500,2500)},\
-#{'ndiv':False,'yaxis':'Events','xaxis':'n_{jet}','logy':'True' , 'var':'nJet30',                     'bin_set':False,          'varname':'nJet30',                   'binlabel':1,  'bin':(15,0,15)},\
-#{'ndiv':True,'yaxis':'Events / ','xaxis':'p_{T}(l)','logy':'True' , 'var':'LepGood_pt[0]',            'bin_set':False,          'varname':'leptonPt',      'binlabel':15,  'bin':(40,25,625)},\
-#{'ndiv':False,'yaxis':'Events','xaxis':'n_{b-tag}','logy':'True' , 'var':'nBJetMediumCSV30',         'bin_set':False,          'varname':'nBJetMediumCSV30',      'binlabel':1,  'bin':(8,0,8),       'lowlimit':0,  'limit':8},\
-#{'ndiv':True,'yaxis':'Events / ','xaxis':'p_{T}(leading jet)','logy':'True' , 'var':'Jet_pt[0]',      'bin_set':False,          'varname':'leading_JetPt',  'binlabel':35,  'bin':(20,0,700)},\
-#{'ndiv':False,'yaxis':'Events','xaxis':'#eta(l)','logy':'True' , 'var':'LepGood_eta[0]',             'bin_set':False,          'varname':'leptonEta',      'binlabel':25,  'bin':(40,-4,4)},\
-#{'ndiv':True,'yaxis':'Events / ','xaxis':'#slash{E}_{T}','logy':'True' , 'var':'met_pt',              'bin_set':False,          'varname':'met',         'binlabel':50,  'bin':(28,0,1400)},\
-#{'ndiv':False,'yaxis':'Events / ','xaxis':'#slash{E}_{T} #Phi','logy':'True' , 'var':'met_phi',       'bin_set':False,          'varname':'met_phi',         'binlabel':50,  'bin':(30,-3.14,3.14)},\
-#{'ndiv':False,'yaxis':'Events','xaxis':'#phi(l)','logy':'True' , 'var':'LepGood_phi[0]',             'bin_set':False,          'varname':'leptonPhi',      'binlabel':25,  'bin':(40,-4,4)},\
-#{'ndiv':False,'yaxis':'Events','xaxis':'miniIso(l)','logy':'True' , 'var':'LepGood_miniRelIso[0]',   'bin_set':False,          'varname':'leptonminiIso',      'binlabel':30,  'bin':(40,0,0.5)},\
-##{'ndiv':False,'yaxis':'Events','xaxis':'minDeltaR','logy':'True' , 'var':'Min$(sqrt((abs(Jet_phi-LepGood_phi[0]))**2+(abs(Jet_eta-LepGood_eta[0]))**2))',       'varname':'Min_R_Jet_lepton',      'binlabel':1,  'bin':(50,0,10)},\
-#{'ndiv':False,'yaxis':'Events','xaxis':'Nvert','logy':'True' , 'var':'nVert',                        'bin_set':False,          'varname':'nVert',      'binlabel':1,  'bin':(50,0,50)},\
-#{'ndiv':False,'yaxis':'Events','xaxis':'Jet_btagCSV','logy':'True' , 'var':'Jet_btagCSV',                     'bin_set':False,          'varname':'Jet_btagCSV',      'binlabel':1,  'bin':(50,0,2)},\
-#{'ndiv':False,'yaxis':'Events','xaxis':'nbjets_30','logy':'True' , 'var':nbjets_30,                     'bin_set':False,          'varname':'nbjets_30',      'binlabel':1,  'bin':(8,0,8)}
+{'ndiv':False,'yaxis':'Events','xaxis':'n_{jet}','logy':'True' , 'var':'nJet30',                     'bin_set':False,          'varname':'nJet30',                   'binlabel':1,  'bin':(15,0,15)},\
+{'ndiv':True,'yaxis':'Events / ','xaxis':'p_{T}(l)','logy':'True' , 'var':'LepGood_pt[0]',            'bin_set':False,          'varname':'leptonPt',      'binlabel':15,  'bin':(40,25,625)},\
+{'ndiv':False,'yaxis':'Events','xaxis':'n_{b-tag}','logy':'True' , 'var':'nBJetMediumCSV30',         'bin_set':False,          'varname':'nBJetMediumCSV30',      'binlabel':1,  'bin':(8,0,8),       'lowlimit':0,  'limit':8},\
+{'ndiv':True,'yaxis':'Events / ','xaxis':'p_{T}(leading jet)','logy':'True' , 'var':'Jet_pt[0]',      'bin_set':False,          'varname':'leading_JetPt',  'binlabel':35,  'bin':(20,0,700)},\
+{'ndiv':False,'yaxis':'Events','xaxis':'#eta(l)','logy':'True' , 'var':'LepGood_eta[0]',             'bin_set':False,          'varname':'leptonEta',      'binlabel':25,  'bin':(40,-4,4)},\
+{'ndiv':True,'yaxis':'Events / ','xaxis':'#slash{E}_{T}','logy':'True' , 'var':'met_pt',              'bin_set':False,          'varname':'met',         'binlabel':50,  'bin':(28,0,1400)},\
+{'ndiv':False,'yaxis':'Events / ','xaxis':'#slash{E}_{T} #Phi','logy':'True' , 'var':'met_phi',       'bin_set':False,          'varname':'met_phi',         'binlabel':50,  'bin':(30,-3.14,3.14)},\
+{'ndiv':False,'yaxis':'Events','xaxis':'#phi(l)','logy':'True' , 'var':'LepGood_phi[0]',             'bin_set':False,          'varname':'leptonPhi',      'binlabel':25,  'bin':(40,-4,4)},\
+{'ndiv':False,'yaxis':'Events','xaxis':'miniIso(l)','logy':'True' , 'var':'LepGood_miniRelIso[0]',   'bin_set':False,          'varname':'leptonminiIso',      'binlabel':30,  'bin':(40,0,0.5)},\
+#{'ndiv':False,'yaxis':'Events','xaxis':'minDeltaR','logy':'True' , 'var':'Min$(sqrt((abs(Jet_phi-LepGood_phi[0]))**2+(abs(Jet_eta-LepGood_eta[0]))**2))',       'varname':'Min_R_Jet_lepton',      'binlabel':1,  'bin':(50,0,10)},\
+{'ndiv':False,'yaxis':'Events','xaxis':'Nvert','logy':'True' , 'var':'nVert',                        'bin_set':False,          'varname':'nVert',      'binlabel':1,  'bin':(50,0,50)},\
+{'ndiv':False,'yaxis':'Events','xaxis':'Jet_btagCSV','logy':'True' , 'var':'Jet_btagCSV',                     'bin_set':False,          'varname':'Jet_btagCSV',      'binlabel':1,  'bin':(50,0,2)},\
+{'ndiv':False,'yaxis':'Events','xaxis':'nbjets_30','logy':'True' , 'var':nbjets_30,                     'bin_set':False,          'varname':'nbjets_30',      'binlabel':1,  'bin':(8,0,8)}
   ]
 
 if test :
@@ -199,7 +199,7 @@ if not draw_signal :
 #lepSels = [lepSels[2]]
 
 for lepSel in lepSels:
-  path = "/afs/hephy.at/user/e/easilar/www/data/Run2016B/4fb/plots/"+lepSel['label']
+  path = "/afs/hephy.at/user/e/easilar/www/data/Run2016B/4fb/plots_v2/"+lepSel['label']
   if not os.path.exists(path):
     os.makedirs(path)
   print lepSel['label']

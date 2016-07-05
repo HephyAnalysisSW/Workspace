@@ -1,7 +1,8 @@
 import copy, os, sys
 dirEce = '/data/easilar/cmgTuples/postProcessing_Spring16_V6/HT500LT250Skim/'
 dirEce2 = '/data/easilar/cmgTuples/postProcessing_Spring16_FIXED_v2/'
-dirDaniel = '/data/dspitzbart/cmgTuples/postProcessing_Spring16/HT500LT250Skim/'
+dirDaniel = '/data/dspitzbart/cmgTuples/postProcessing_Spring16_V6/HT500LT250Skim/'
+
 ####usual HT combination####
 
 #TTJets_HTLO_25ns={\
@@ -71,7 +72,7 @@ TTJets_Comb = {\
 "TTJets_LO_HT1200to2500",
 "TTJets_LO_HT2500toInf",
 ],
-'dir' : dirEce2,
+'dir' : dirDaniel,
 }
 
 
