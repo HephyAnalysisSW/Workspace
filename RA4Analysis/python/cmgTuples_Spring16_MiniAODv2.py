@@ -429,6 +429,18 @@ ST_tchannel_antitop_4f_leptonDecays ={\
 'isData':False
 }
 
+###fake top channel
+ST_tchannel_top_4f_leptonDecays ={\
+"name" : "ST_tchannel_top_4f_leptonDecays_powheg",
+"chunkString":"cmgTuples_MC25ns_1l_13062016_ST_t-channel_antitop_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns_v2",
+"dir":  pathDaniel+"cmgTuples_MC25ns_1l_13062016_ST_t-channel_antitop_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns_v2/" ,
+"dbsName" : "",
+"skimAnalyzerDir":"",
+"rootFileLocation":"tree.root",
+"treeName":"tree",
+'isData':False
+}
+
 ST_tchannel_antitop_4f_inclusiveDecays ={\
 "name" : "ST_tchannel_antitop_4f_inclusiveDecays_powheg",
 "chunkString":"cmgTuples_MC25ns_1l_13062016_ST_t-channel_antitop_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_TuneCUETP8M1_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns_v2",

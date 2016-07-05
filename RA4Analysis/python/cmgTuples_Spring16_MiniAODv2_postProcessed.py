@@ -1,5 +1,5 @@
 import copy, os, sys
-dirEce = '/data/easilar/cmgTuples/postProcessing_Spring16_JECv3//HT500LT250Skim/'
+dirEce = '/data/easilar/cmgTuples/postProcessing_Spring16_V6/HT500LT250Skim/'
 dirEce2 = '/data/easilar/cmgTuples/postProcessing_Spring16_FIXED_v2/'
 dirDaniel = '/data/dspitzbart/cmgTuples/postProcessing_Spring16/HT500LT250Skim/'
 ####usual HT combination####
@@ -30,7 +30,7 @@ TTJets_combined = {\
 "TTJets_SingleLeptonFromTbar_full",
 #'TTJets_SingleLepton'
 ],
-'dir' : dirEce,
+'dir' : "/data/easilar/cmgTuples/postProcessing_Spring16_JECv3//HT500LT250Skim/",
 }
 
 TTJets_singleLep = {\
@@ -39,7 +39,7 @@ TTJets_singleLep = {\
 "TTJets_SingleLeptonFromT_full",
 "TTJets_SingleLeptonFromTbar_full",
 ],
-'dir' : dirDaniel,
+'dir' : dirEce,
 }
 
 TTJets_diLep = {\
@@ -47,7 +47,7 @@ TTJets_diLep = {\
 "bins" : [
 "TTJets_DiLepton",
 ],
-'dir' : dirDaniel,
+'dir' : dirEce,
 }
 
 TTJets_Lep = {\
@@ -57,7 +57,7 @@ TTJets_Lep = {\
 "TTJets_SingleLeptonFromTbar_full",
 "TTJets_DiLepton",
 ],
-'dir' : dirDaniel,
+'dir' : dirEce,
 }
 
 TTJets_Comb = {\
@@ -75,14 +75,6 @@ TTJets_Comb = {\
 }
 
 
-TTJets_incl = {\
-"name" : "TTJets_incl",
-"bins" : [
-"TTJets_LO",
-],
-'dir' : dirDaniel,
-}
-
 WJetsHTToLNu = {\
 "name" : "W+Jets",
 "bins" : [
@@ -95,17 +87,17 @@ WJetsHTToLNu = {\
 "WJetsToLNu_HT1200to2500",
 "WJetsToLNu_HT2500toInf",
 ],
-'dir' : dirDaniel,
+'dir' : dirEce,
 }
 
-singleTop_inclusive = {\
-"name" : "singleTop_inclusive",
-"bins" : [
-"ST_tchannel_antitop_4f_inclusiveDecays_powheg",
-"ST_tW_antitop_5f_inclusiveDecays_powheg",
-],
-'dir' : dirDaniel,
-}
+#singleTop_inclusive = {\
+#"name" : "singleTop_inclusive",
+#"bins" : [
+#"ST_tchannel_antitop_4f_inclusiveDecays_powheg",
+#"ST_tW_antitop_5f_inclusiveDecays_powheg",
+#],
+#'dir' : dirEce,
+#}
 
 singleTop_lep = {\
 "name" : "singleTop_lep",
@@ -116,16 +108,9 @@ singleTop_lep = {\
 "ST_tW_antitop_5f_inclusiveDecays_powheg",
 "ST_tW_top_5f_inclusiveDecays_powheg",
 ],
-'dir' : dirDaniel,
+'dir' : dirEce,
 }
 
-DY_madgraph = {\
-"name" : "DY_madgraph",
-"bins" : [
-"DYJetsToLL_M50_madgraphMLM",
-],
-'dir' : dirDaniel,
-}
 
 DY_HT = {\
 "name" : "DY_HT",
@@ -135,26 +120,9 @@ DY_HT = {\
 "DYJetsToLL_M_50_HT_400to600",
 "DYJetsToLL_M_50_HT_600toInf",
 ],
-'dir' : dirDaniel,
+'dir' : dirEce,
 }
 
-DY_amc = {\
-"name" : "DY_amc",
-"bins" : [
-"DYJetsToLL_M_50_amcatnloFXFX_25ns",
-],
-'dir' : dirDaniel,
-}
-DYHT = {\
-"name" : "DYHT",
-"bins" : [
-"DYJetsToLL_M_50_HT_100to200",
-"DYJetsToLL_M_50_HT_200to400",
-"DYJetsToLL_M_50_HT_400to600",
-"DYJetsToLL_M_50_HT_600toInf",
-],
-'dir' : dirDaniel,
-}
 
 QCDHT = {\
 "name":"QCD",
@@ -167,18 +135,18 @@ QCDHT = {\
 "QCD_HT500to700",
 "QCD_HT700to1000",
 ],
-'dir' : dirDaniel,
+'dir' : dirEce,
 }
 
-diBoson = {\
-"name":"diBoson",
-"bins":[
-"DiBoson_WW",
-"DiBoson_WZ",
-"DiBoson_ZZ",
-],
-'dir': dirDaniel,
-}
+#diBoson = {\
+#"name":"diBoson",
+#"bins":[
+#"DiBoson_WW",
+#"DiBoson_WZ",
+#"DiBoson_ZZ",
+#],
+#'dir': dirEce,
+#}
 
 TTV = {
 "name":"TTV",
@@ -188,7 +156,7 @@ TTV = {
 "TTZToLLNuNu",
 #"TTZToQQ",
 ],
-'dir' : dirDaniel,
+'dir' : dirEce,
 }
 
 allSignalStrings=[\
