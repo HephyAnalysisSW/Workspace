@@ -620,6 +620,91 @@ ZJetsToNuNu_HT2500toInf ={
 allComponents.append(ZJetsToNuNu_HT2500toInf)
 
 
+# signal samples
+
+# FIXME temporary solution, until 80X samples are available
+
+import CMGTools.RootTools.samples.samples_13TeV_74X_susyT2DegStopPriv as signals_priv
+
+sample_path_signal = "/data/mzarucki/cmgTuples/7412pass2_mAODv2_v7/RunIISpring15MiniAODv2/"
+
+allSignalData=[
+    [
+     sample_path_signal+"T2DegStop_300_270_GEN-SIM/",
+    "nrad-T2DegStop_300_270_MINIAODv2-RunIISpring15-MCRUN2_74_V9-25ns-4dc17ff0fe241c35c03aa547f2361414",
+    "T2DegStop_300_270", 
+    signals_priv.T2DegStop_300_270
+    ],
+    [
+     sample_path_signal+"T2DegStop_300_240_FastSim_v3/",
+     "nrad-T2DegStop_300_240FS-eb69b0448a13fda070ca35fd76ab4e24" ,
+     "T2DegStop_300_240_FastSim", 
+     signals_priv.T2DegStop_300_240_FastSim 
+     ],
+    [
+     sample_path_signal+"T2DegStop_300_270_FastSim_v3/",
+     "nrad-T2DegStop_300_270FS-eb69b0448a13fda070ca35fd76ab4e24",
+     "T2DegStop_300_270_FastSim", 
+     signals_priv.T2DegStop_300_270_FastSim 
+     ],
+    [
+     sample_path_signal+"T2DegStop_300_290_FastSim_v3/",
+     "nrad-T2DegStop_300_290FS-eb69b0448a13fda070ca35fd76ab4e24" ,
+     "T2DegStop_300_290_FastSim", 
+     signals_priv.T2DegStop_300_290_FastSim
+     ],
+    [
+     sample_path_signal+"T2tt_stop300_LSP270/",
+     "nrad-CMSSW_7_4_4_FastSim_PU25ns_MCRUN2_74_V9_7414_MINIAODv2-eb69b0448a13fda070ca35fd76ab4e24" ,
+     "T2tt_300_270_FastSim", 
+     signals_priv.T2tt_300_270_FastSim
+     ],
+    ]
+
+allSignalStrings = [s[2] for s in allSignalData]
+def getSignalSample(base_dir,chunk_dir, signal,component):
+  if signal in allSignalStrings:
+     
+    # dirty way of creating a CMG component        
+    #component = cfg.MCComponent(
+    #    dataset=signal,
+    #    name = signal,
+    #    files = [],
+    #    xSection = 0.0,
+    #    nGenEvents = 1,
+    #    triggers = [],
+    #    effCorrFactor = 1,
+    #    )
+      
+    return {\
+      'cmgComp': component,
+      "name" : signal,
+      #"name" : component.name,
+      "chunkString": chunk_dir,
+      'dir' : base_dir+"/"+chunk_dir,
+      'dbsName':component.dataset,
+      'isData':False,
+      #"rootFileLocation":"treeProducerSusySingleLepton/tree.root",
+      "rootFileLocation":"tree.root",
+      "treeName":"tree",
+      #"skimAnalyzerDir":"skimAnalyzerCount",
+      }
+  else:
+    print "Signal",signal,"unknown. Available: ",", ".join(allSignalStrings)
+
+allSignals=[]
+for sig in allSignalData:
+  #exec(s+"=getSignalSample('"+d+"','"+s+"')")
+  signal = getSignalSample(*sig)
+  exec("{s}=signal".format(s=sig[2]))
+  exec("allSignals.append({s})".format(s=sig[2]))
+  
+for sample in allSignals:
+    if hasattr(sample['cmgComp'],"xSection"):
+        sample['xsec'] = sample['cmgComp'].xSection
+
+allComponents.extend(allSignals)
+
 
 if __name__ == "__main__":
    import sys

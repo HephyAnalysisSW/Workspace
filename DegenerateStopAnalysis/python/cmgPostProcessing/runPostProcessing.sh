@@ -44,16 +44,23 @@ else
     CMG_TUPLES="RunIISpring16MiniAODv2_v0"
 fi
 
-CMG_POST_PROCESSING_TAG="80X_postProcessing_v2"
+CMG_POST_PROCESSING_TAG="80X_postProcessing_v2_1"
 VERBOSE=""
 if [[ ${3} == "TEST" ]]; then 
-    CMG_POST_PROCESSING_TAG="80X_postProcessing_v2_TEST"
+    CMG_POST_PROCESSING_TAG="80X_postProcessing_v2_1_TEST"
     VERBOSE="--verbose"
 fi
 
 # hard-coded parameters - modify them according to desired full set
 CMG_PROCESSING_TAG="8011_mAODv2_v0"
 PARAMETER_SET="analysisHephy_13TeV_2016_v0"
+
+#    comment / uncomment the desired ${SKIM_PRESELECT} and ${SKIM_LEPTON}
+${SKIM_PRESELECT}="--skimPreselect"
+${SKIM_PRESELECT}=""
+
+${SKIM_LEPTON}="--skimLepton=oneLep"
+${SKIM_LEPTON}=""
 
 # the rest of the parameters are the default parameters from cmgPostProcessing_parser.py
 
@@ -80,7 +87,8 @@ if [[ ${CMSSW_ACTION} == "R" ]]; then
         --cmgPostProcessingTag=${CMG_POST_PROCESSING_TAG} \
         --processLepAll \
         --skimGeneral='' \
-        --skimLepton='oneLep' \
+        ${SKIM_PRESELECT} \
+        ${SKIM_LEPTON} \
         --run \
         ${VERBOSE}
 fi
