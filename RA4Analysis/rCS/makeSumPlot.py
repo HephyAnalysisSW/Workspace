@@ -31,7 +31,7 @@ showMCtruth     = False
 signal = False
 plotPull = False
 
-latextitle = ''
+latextitle = 'preliminary'
 
 weight_str, weight_err_str = makeWeight(lumi, sampleLumi, reWeight=MCweight)
 
@@ -602,9 +602,9 @@ if not unblinded:
 else:
   suffix = ''
 
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'.png')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'.root')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'.pdf')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_preapp_v2.png')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_preapp_v2.root')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_preapp_v2.pdf')
 
 can2 = ROOT.TCanvas('can2','can2',700,700)
 one.SetLineStyle(2)

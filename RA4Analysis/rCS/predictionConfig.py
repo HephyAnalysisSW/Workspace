@@ -35,7 +35,7 @@ if QCDup: nameSuffix += '_QCDup'
 if QCDdown: nameSuffix += '_QCDdown'
 
 ## samples
-isData              = False
+isData              = True
 unblinded           = True
 validation          = False
 isCentralPrediction = True
@@ -100,7 +100,7 @@ else:
   signalRegions = signalRegions2016
   #signalRegions = signalRegion3fb
   #regStr = 'fullSR'
-  regStr = 'SR2016_v1'
+  regStr = 'SR2016_v1_100p'
 #signalRegions = signalRegion3fbMerge
 
 ## weight calculations
@@ -120,10 +120,10 @@ else:
   templateLumistr = str(templateLumi)#.replace('.','p')
 
 ## Template Bootstrap error dictionary
-templateBootstrap = False
+templateBootstrap = True
 if validation:
   templateBootstrap = False
-templateBootstrapDir = '/data/dspitzbart/bootstrap/combined_errs_pkl'
+templateBootstrapDir = '/data/dspitzbart/bootstrap2016/bootstrap_unc_pkl'
 if templateBootstrap: templateBootstrap = pickle.load(file(templateBootstrapDir))
 
 ## Directories for plots, results and templates

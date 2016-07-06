@@ -232,7 +232,7 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
         f3.SetLineStyle(2)
         f3.SetLineWidth(2)
 
-        ttLinear = {'ttD':ttD, 'ttDE':ttDE, 'ttK':ttK, 'ttKE':ttKE}
+        ttLinear = {'ttD':ttD, 'ttDE':ttDE, 'ttK':ttK, 'ttKE':ttKE, 'tt_meanNJet':tt_meanNJet}
         fitResults[njb][stb][htb].update({'ttLinear':ttLinear})
         f1 = ROOT.TF1("f1", "[0] + [1]*x", 0, 10)
         f1.SetParameters(rcs0bCRtt_btag['rCS'],0)
@@ -332,11 +332,11 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
         ttDE =      loadedFit[njb][stb][htb]['ttLinear']['ttDE']
         ttK =       loadedFit[njb][stb][htb]['ttLinear']['ttK']
         ttKE =      loadedFit[njb][stb][htb]['ttLinear']['ttKE']
+        tt_meanNJet  = loadedFit[njb][stb][htb]['ttLinear']['tt_meanNJet']
         ttConst0 =  loadedFit[njb][stb][htb]['ttC0']['ttConst0']
         ttConst0E = loadedFit[njb][stb][htb]['ttC0']['ttConst0E']
         ttConst1 =  loadedFit[njb][stb][htb]['ttC1']['ttConst1']
         ttConst1E = loadedFit[njb][stb][htb]['ttC1']['ttConst1E']
-        tt_meanNJet  = loadedFit[njb][stb][htb]['tt_meanNJet']
 
 
       kappaTTfit = ttConst0/ttConst1
@@ -486,7 +486,7 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
           #wDE = FitFunc.GetParError(0)
           #wK  = FitFunc.GetParameter(1)
           #wKE = FitFunc.GetParError(1)
-          fitResults[njb][stb][htb][Wc['name']] = {'wD':wD, 'wDE':wDE, 'wK':wK, 'wKE':wKE}
+          fitResults[njb][stb][htb][Wc['name']] = {'wD':wD, 'wDE':wDE, 'wK':wK, 'wKE':wKE, 'w_meanNJet':w_meanNJet}
           f1 = ROOT.TF1("f1", "[0] + [1]*x", 0, 10)
           f1.SetParameters(rcsCRW['rCS'],0)
           f1.SetLineWidth(2)
@@ -551,7 +551,7 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
           wDE = loadedFit[njb][stb][htb][Wc['name']]['wDE']
           wK  = loadedFit[njb][stb][htb][Wc['name']]['wK']
           wKE = loadedFit[njb][stb][htb][Wc['name']]['wKE']
-          w_meanNJet  = loadedFit[njb][stb][htb]['w_meanNJet']
+          w_meanNJet  = loadedFit[njb][stb][htb][Wc['name']]['w_meanNJet']
         #difference of measured rcs and fit in 0b MC rcs
 
         cnameCRW, cutCRW = nameAndCut(stb,htb,(3,4), btb=(0,-1) ,presel=presel_MC)
@@ -647,7 +647,6 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
         res[njb][stb][htb]['W_corrRest_kappa_err'] = W_corrRest_kappa_err
         res[njb][stb][htb]['tot_kappa'] =  global_kappa
         res[njb][stb][htb]['tot_kappa_err'] = global_kappa_err
-        res[njb][stb][htb]['w_meanNJet'] = w_meanNJet
         print 'kappa(TT):', getValErrString(TT_kappa,TT_kappa_err)
         print 'kappa(W):', getValErrString(W_kappa,W_kappa_err)
         print 'kappa(W_corrRest):', getValErrString(W_kappa,W_kappa_err)
