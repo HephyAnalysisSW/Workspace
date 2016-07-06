@@ -15,7 +15,8 @@ filters = "(Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCell
 trigger = "((HLT_EleHT350||HLT_EleHT400)||(HLT_MuHT350||HLT_MuHT400))"
 
 ##Common for Background and Signal
-trigger_scale = '((singleElectronic&&0.963)||(singleMuonic&&0.926))'
+#trigger_scale = '((singleElectronic&&0.963)||(singleMuonic&&0.926))'
+trigger_scale = '(singleMuonic*0.926+singleElectronic*0.963)'
 reweight      = '(weight*'+str(lumi)+')/'+str(sample_lumi)
 weight_0b     = 'weightBTag0_SF'
 weight_1b     = 'weightBTag1_SF'
