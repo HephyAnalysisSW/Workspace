@@ -39,6 +39,17 @@ sampleSets = {
                             },
 
 
+                'signals_Spring16':{
+                            'samples':[ 
+                                        ["T2tt_300_270_FastSim", "--skimPreselect"],
+                                        ["T2DegStop_300_270", "--skimPreselect"],
+                                        ["T2DegStop_300_290_FastSim", "--skimPreselect"],
+                                        ["T2DegStop_300_240_FastSim", "--skimPreselect"],
+                                        ["T2DegStop_300_270_FastSim", "--skimPreselect"],
+                                        ],
+                             
+                            },
+
                 'wjets':{
                             'samples':[
                                          ["WJetsToLNu", "--skimPreselect"],
