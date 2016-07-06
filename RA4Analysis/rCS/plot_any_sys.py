@@ -42,7 +42,8 @@ for srNJet in sorted(signalRegions):
 saveDir =  '/data/easilar/Results2016/ICHEP/Prediction_Spring16_templates_lep_data_4fb/'
 validation = False
 #dilep   = pickle.load(file('/data/easilar/Results2016/ICHEP/DiLep_SYS/V1/unc_with_SRAll_pkl'))
-dilep   = pickle.load(file('/data/easilar/Results2016/ICHEP/DiLep_SYS/V1/unc_with_SRAll_V4_pkl'))
+#dilep   = pickle.load(file('/data/easilar/Results2016/ICHEP/DiLep_SYS/V1/unc_with_SRAll_V4_pkl'))
+dilep   = pickle.load(file('/data/easilar/Results2016/ICHEP/DiLep_SYS/V1/unc_on_JEC_SRAll_v1_pkl'))
 
 colors = [ROOT.kBlue-7, ROOT.kCyan-9, ROOT.kCyan-2, ROOT.kGreen-6, ROOT.kOrange+6, ROOT.kRed+1, ROOT.kRed-6, ROOT.kYellow+2, ROOT.kGreen, ROOT.kGreen+3, ROOT.kBlue-2]
 
@@ -51,7 +52,8 @@ colors = range(28,100,2)
 dilepErrH = ROOT.TH1F('dilepErrH','dilep. events',bins,0,bins)
 
 
-dilepC   = ROOT.TH1F('dilepC','2l constant',bins,0,bins)
+#dilepC   = ROOT.TH1F('dilepC','2l constant',bins,0,bins)
+dilepC   = ROOT.TH1F('dilepC','JEC',bins,0,bins)
 dilepS   = ROOT.TH1F('dilepS','2l slope',bins,0,bins)
 
 dummy = ROOT.TH1F('dummy','',bins,0,bins)
@@ -96,14 +98,14 @@ for injb,srNJet in enumerate(sorted(signalRegions)):
       print '#############################################'
       print
 
-      #dilepErr = abs(dilep[srNJet][stb][htb]["delta_constant_Up"])*100
-      #dilepErrH
-      constant_err = (abs(dilep[srNJet][stb][htb]["delta_constant_Up"])+abs(dilep[srNJet][stb][htb]["delta_constant_Down"]))/2
-      slope_err = (abs(dilep[srNJet][stb][htb]["delta_slope_Up"])+abs(dilep[srNJet][stb][htb]["delta_slope_Down"]))/2
+      #constant_err = (abs(dilep[srNJet][stb][htb]["delta_constant_Up"])+abs(dilep[srNJet][stb][htb]["delta_constant_Down"]))/2
+      constant_err = (abs(dilep[srNJet][stb][htb]["delta_Up_central"])+abs(dilep[srNJet][stb][htb]["delta_Down_central"]))/2
+      #slope_err = (abs(dilep[srNJet][stb][htb]["delta_slope_Up"])+abs(dilep[srNJet][stb][htb]["delta_slope_Down"]))/2
       dilepC.SetBinContent(i, constant_err)
-      dilepS.SetBinContent(i, slope_err)
-      print constant_err , slope_err
-      errorsForTotal = [constant_err , slope_err]
+      #dilepS.SetBinContent(i, slope_err)
+      print constant_err #, slope_err
+      #errorsForTotal = [constant_err , slope_err]
+      errorsForTotal = [constant_err]
       totalSyst_noKappa = 0
       for err in errorsForTotal: totalSyst_noKappa += err**2
       totalH.SetBinContent(i, sqrt(totalSyst_noKappa))
@@ -158,6 +160,6 @@ latex1.SetTextAlign(11)
 latex1.DrawLatex(0.15,0.96,'CMS #bf{#it{Preliminary}}')
 latex1.DrawLatex(0.85,0.96,"#bf{(13TeV)}")
 
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/data/Run2016B/4fb/syst_uncertainties/diLepSys_ICHEP_kappa_tot_V4.png')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/data/Run2016B/4fb/syst_uncertainties/diLepSys_ICHEP_kappa_tot_V4.root')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/data/Run2016B/4fb/syst_uncertainties/diLepSys_ICHEP_kappa_tot_V4.pdf')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/data/Run2016B/4fb/syst_uncertainties/JECSys_ICHEP_kappa_tot_V4.png')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/data/Run2016B/4fb/syst_uncertainties/JECSys_ICHEP_kappa_tot_V4.root')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/data/Run2016B/4fb/syst_uncertainties/JECSys_ICHEP_kappa_tot_V4.pdf')

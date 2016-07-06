@@ -4,29 +4,28 @@ from array import array
 import operator
 from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYieldFromChain
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName, nBTagBinName, varBinName, varBin, UncertaintyDivision
-from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed import *
+#from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed import *
+from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2_postProcessed import *
 from Workspace.RA4Analysis.rCShelpers import *
 from Workspace.RA4Analysis.signalRegions import *
 from Workspace.HEPHYPythonTools.user import username
 from cutFlow_helper import *
+from Workspace.RA4Analysis.general_config import *
 
 
 ROOT.TH1D().SetDefaultSumw2()
 
-weight_str = "((weight*2.25)/3)"
-
-btagString = "nBJetMediumCSV30"
 maxN = -1
-lepSels = [ 
+lepSels = [
 {'cut':'((!isData&&singleLeptonic)||(isData&&((eleDataSet&&singleElectronic)||(muonDataSet&&singleMuonic))))' , 'veto':'nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0',\
- 'trigWeight': "0.94" ,\
-  'label':'_lep_', 'str':'1 $lep$' , 'trigger': '((HLT_EleHT350)||(HLT_MuHT350))'},\
-] 
+ #'chain': getChain([single_ele_Run2016B,single_mu_Run2016B],maxN=maxN,histname="",treeName="Events") ,\
+  'label':'_lep_', 'str':'1 $lep$' , 'trigger': trigger}\
+]
 
 lepSel = lepSels[0]
-#SR = {(8,-1):{(450,-1):{(500,-1):{"deltaPhi":0.75}}}}
-signalRegions = signalRegion3fb
-#signalRegions = SR
+signalRegions = signalRegions2016
+btagString = btagVarString
+
 rowsNJet = {}
 rowsSt = {}
 for srNJet in sorted(signalRegions):
@@ -38,10 +37,12 @@ for srNJet in sorted(signalRegions):
     rowsSt[srNJet][stb] = {'n':len(signalRegions[srNJet][stb])}
   rowsNJet[srNJet] = {'nST':len(signalRegions[srNJet]), 'n':rows}
 
-presel = presel = "&&".join([lepSel['cut'],lepSel['veto'],filters])
-cBkg = getChain([TTJets_combined,DY_25ns,WJetsHTToLNu_25ns,singleTop_25ns,TTV_25ns],histname='') #no QCD
-lep_weight = "lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID"
-weight_str =  "*".join([lep_weight,lepSel['trigWeight'],"weightBTag0_SF","puReweight_true_max4*TopPtWeight*weight*2.25/3"])
+presel = "&&".join([lepSel['cut'],lepSel['veto'],"Jet_pt[1]>80"])
+#cBkg = getChain([TTJets_combined,DY_25ns,WJetsHTToLNu_25ns,singleTop_25ns,TTV_25ns],histname='') #no QCD
+cBkg = getChain([TTJets_Comb,WJetsHTToLNu,TTV,singleTop_lep,DY_HT],histname='') #no QCD
+#lep_weight = "lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID"
+#weight_str =  "*".join([lep_weight,lepSel['trigWeight'],"weightBTag0_SF","puReweight_true_max4*TopPtWeight*weight*2.25/3"])
+weight_str = '*'.join([reweight,topPt,trigger_scale,PU])
 print "base weight" , weight_str
 
 bin = {}
@@ -54,21 +55,21 @@ for srNJet in sorted(signalRegions):
       deltaPhiCut = signalRegions[srNJet][stb][htb]['deltaPhi']
       cut_SR = "deltaPhi_Wl>"+str(deltaPhiCut)
       cut_CR = "deltaPhi_Wl<"+str(deltaPhiCut)
-      name_bla, SB_cut    = nameAndCut(stb, htb, (3,4), btb=(0,-1), presel=presel, btagVar = btagString)
+      name_bla, SB_cut    = nameAndCut(stb, htb, (3,4), btb=(0,0), presel=presel, btagVar = btagString)
       #name_bla, SB_cut_CR = nameAndCut(stb, htb, (3,4), btb=(0,-1), presel=presel+"&&"+cut_CR, btagVar = btagString)
       #name_bla, SB_cut_SR = nameAndCut(stb, htb, (3,4), btb=(0,-1), presel=presel+"&&"+cut_SR, btagVar = btagString)
-      name    , MB_cut    = nameAndCut(stb, htb, srNJet, btb=(0,-1), presel=presel, btagVar = btagString)
+      name    , MB_cut    = nameAndCut(stb, htb, srNJet, btb=(0,0), presel=presel, btagVar = btagString)
       #name_bla, MB_cut_CR = nameAndCut(stb, htb, srNJet, btb=(0,-1), presel=presel+"&&"+cut_CR, btagVar = btagString)
       #name_bla, MB_cut_SR = nameAndCut(stb, htb, srNJet, btb=(0,-1), presel=presel+"&&"+cut_SR, btagVar = btagString)
 
-      name_bla, SB_cut_jec_central   = nameAndCut(stb, htb, (3,4), btb=(0,-1), presel=presel, btagVar = "jec_nBJet_central" , stVar = 'jec_LT_central', htVar = 'jec_ht_central', njetVar='jec_nJet_central')
-      name_bla, MB_cut_jec_central   = nameAndCut(stb, htb, srNJet, btb=(0,-1), presel=presel, btagVar = "jec_nBJet_central" , stVar = 'jec_LT_central', htVar = 'jec_ht_central', njetVar='jec_nJet_central')
+      name_bla, SB_cut_jec_central   = nameAndCut(stb, htb, (3,4),  btb=(0,0), presel=presel, btagVar = "jec_nBJet_central" , stVar = 'jec_LT_central', htVar = 'jec_ht_central', njetVar='jec_nJet_central')
+      name_bla, MB_cut_jec_central   = nameAndCut(stb, htb, srNJet, btb=(0,0), presel=presel, btagVar = "jec_nBJet_central" , stVar = 'jec_LT_central', htVar = 'jec_ht_central', njetVar='jec_nJet_central')
 
-      name_bla, SB_cut_jec_up   = nameAndCut(stb, htb, (3,4), btb=(0,-1), presel=presel, btagVar = "jec_nBJet_up" , stVar = 'jec_LT_up', htVar = 'jec_ht_up', njetVar='jec_nJet_up')
-      name_bla, MB_cut_jec_up   = nameAndCut(stb, htb, srNJet, btb=(0,-1), presel=presel, btagVar = "jec_nBJet_up" , stVar = 'jec_LT_up', htVar = 'jec_ht_up', njetVar='jec_nJet_up')
+      name_bla, SB_cut_jec_up   = nameAndCut(stb, htb, (3,4), btb=(0,0), presel=presel, btagVar = "jec_nBJet_up" , stVar = 'jec_LT_up', htVar = 'jec_ht_up', njetVar='jec_nJet_up')
+      name_bla, MB_cut_jec_up   = nameAndCut(stb, htb, srNJet, btb=(0,0), presel=presel, btagVar = "jec_nBJet_up" , stVar = 'jec_LT_up', htVar = 'jec_ht_up', njetVar='jec_nJet_up')
 
-      name_bla, SB_cut_jec_down   = nameAndCut(stb, htb, (3,4), btb=(0,-1), presel=presel, btagVar = "jec_nBJet_down" , stVar = 'jec_LT_down', htVar = 'jec_ht_down', njetVar='jec_nJet_down')
-      name_bla, MB_cut_jec_down   = nameAndCut(stb, htb, srNJet, btb=(0,-1), presel=presel, btagVar = "jec_nBJet_down" , stVar = 'jec_LT_down', htVar = 'jec_ht_down', njetVar='jec_nJet_down')
+      name_bla, SB_cut_jec_down   = nameAndCut(stb, htb, (3,4), btb=(0,0), presel=presel, btagVar = "jec_nBJet_down" , stVar = 'jec_LT_down', htVar = 'jec_ht_down', njetVar='jec_nJet_down')
+      name_bla, MB_cut_jec_down   = nameAndCut(stb, htb, srNJet, btb=(0,0), presel=presel, btagVar = "jec_nBJet_down" , stVar = 'jec_LT_down', htVar = 'jec_ht_down', njetVar='jec_nJet_down')
 
       print name
 
@@ -108,6 +109,5 @@ for srNJet in sorted(signalRegions):
       bin[srNJet][stb][htb]['delta_Down_central'] = ((bin[srNJet][stb][htb]['kappa_down']/bin[srNJet][stb][htb]['kappa_central'])-1) 
       print "delta down_central:" , bin[srNJet][stb][htb]['delta_Down_central']
 
-
-pickle.dump(bin,file('/data/easilar/Spring15/25ns/Jec_syst_SRAll_pkl','w'))
+pickle.dump(bin,file('/data/easilar/Results2016/ICHEP/DiLep_SYS/V1/unc_on_JEC_SRAll_v2_pkl','w'))
 

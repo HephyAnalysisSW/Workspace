@@ -81,9 +81,9 @@ maxN = -1
 ROOT.gStyle.SetOptStat(0)
 
 all_MB = False
-presel = True
+presel = False
 SB_w   = False 
-SB_tt  = False
+SB_tt  = True
 presel_1b = False
 test = False
 
@@ -91,6 +91,7 @@ draw_signal = False
 blind = False
 
 add_cut = "(1)"
+
 
 if all_MB : 
   #SR = signalRegion3fb
@@ -130,12 +131,12 @@ if presel_1b :
 if blind: add_cut = "(deltaPhi_Wl<0.7)"
   
 lepSels = [
-#{'cut':'(singleMuonic&&(!isData||(isData&&muonDataSet)))' , 'veto':'nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0',\
-# 'chain': getChain(single_mu_Run2016B,maxN=maxN,histname="",treeName="Events") ,\
-#  'label':'_mu_', 'str':'1 $\\mu$' , 'trigger': trigger},\
-#{'cut':'singleElectronic&&(!isData||(isData&&eleDataSet))' , 'veto':'nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0',\
-# 'chain': getChain(single_ele_Run2016B,maxN=maxN,histname="",treeName="Events") ,\
-#  'label':'_ele_', 'str':'1 $\\e$' , 'trigger': trigger},\
+{'cut':'(singleMuonic&&(!isData||(isData&&muonDataSet)))' , 'veto':'nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0',\
+ 'chain': getChain(single_mu_Run2016B,maxN=maxN,histname="",treeName="Events") ,\
+  'label':'_mu_', 'str':'1 $\\mu$' ,'trigger': trigger},\
+{'cut':'singleElectronic&&(!isData||(isData&&eleDataSet))' , 'veto':'nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0',\
+ 'chain': getChain(single_ele_Run2016B,maxN=maxN,histname="",treeName="Events") ,\
+  'label':'_ele_', 'str':'1 $\\e$' , 'trigger': trigger},\
 {'cut':'((!isData&&singleLeptonic)||(isData&&((eleDataSet&&singleElectronic)||(muonDataSet&&singleMuonic))))' , 'veto':'nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0',\
  'chain': getChain([single_ele_Run2016B,single_mu_Run2016B],maxN=maxN,histname="",treeName="Events") ,\
   'label':'_lep_', 'str':'1 $lep$' , 'trigger': trigger}\
@@ -195,10 +196,11 @@ if presel_1b :
 if not draw_signal :
   signals = []
 
-
-#lepSels = [lepSels[2]]
+#plots = [plots[0]]
+#lepSels = [lepSels[0]]
 
 for lepSel in lepSels:
+  #weight_str_plot = '*'.join([reweight,topPt,PU,lepSel["trigger_weight"]]) 
   path = "/afs/hephy.at/user/e/easilar/www/data/Run2016B/4fb/plots_v2/"+lepSel['label']
   if not os.path.exists(path):
     os.makedirs(path)

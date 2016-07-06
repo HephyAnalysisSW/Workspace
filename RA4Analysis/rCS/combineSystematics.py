@@ -69,10 +69,10 @@ pickleDir =  '/data/dspitzbart/Results2016/Prediction_Spring16_templates_validat
 
 saveDir = pickleDir
 #saveDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_fullSR_lep_data_2p25/'
-
-wxsec   = pickle.load(file('/data/easilar/Spring15/25ns/WJetsxsec_syst_SRAll_pkl'))
+path_syst1 = '/data/easilar/Results2016/ICHEP/SYS/V1/'
+wxsec   = pickle.load(file(path_syst1+'Unc_on_WJets__syst_SRAll_pkl'))
+ttvxsec = pickle.load(file(path_syst1+'Unc_on_TTV__syst_SRAll_pkl'))
 ttxsec  = pickle.load(file('/data/easilar/Spring15/25ns/TTJetsxsec_syst_SRAll_pkl'))
-ttvxsec = pickle.load(file('/data/easilar/Spring15/25ns/TTVxsec_syst_SRAll_pkl'))
 wpol    = pickle.load(file('/data/dhandl/results2015/WPolarizationEstimation/20151218_wjetsPolSys_pkl'))
 b_err   = pickle.load(file('/data/dspitzbart/Results2016/btagErr_pkl_update'))
 l_err   = pickle.load(file('/data/dspitzbart/Results2016/mistagErr_pkl_update'))
@@ -82,17 +82,17 @@ rcs     = pickle.load(file(pickleDir+'singleLeptonic_Spring16__estimationResults
 if validation:
   dilep   = pickle.load(file('/data/dspitzbart/Results2016/dilep_val_pkl'))
 else:
-  dilep   = pickle.load(file('/data/dspitzbart/Results2016/dilep_pkl'))
+  dilep   = pickle.load(file(path_syst1+'unc_on_diLep_with_SRAll_V4_pkl'))
 
 
 validation = True
 
 #topPt_Err = pickle.load(file("/data/easilar/Spring15/25ns/extended_with_truth_counts_topPt_pkl"))
 #topPt_Err = pickle.load(file("/data/dspitzbart/Results2016/topErr_pkl_update"))
-topPt_Err = pickle.load(file("/data/easilar/Spring15/25ns/TTJets_combined_TopPtWeight_syst_SRAll_pkl"))
-
-pu_Unc    = pickle.load(file("/data/easilar/Spring15/25ns/extended_with_truth_counts_PU_pkl"))
+topPt_Err = pickle.load(file(path_syst1+"unc_on_topPt_SRAll_pkl"))
+pu_Unc    = pickle.load(file(path_syst1+"unc_on_PU_SRAll_pkl"))
 lep_Eff   = pickle.load(file("/data/easilar/Spring15/25ns/extended_with_truth_counts_LS_pkl"))
+#jec       = pickle.load(file(path_syst1+'/unc_on_JEC_SRAll_v1_pkl'))
 jec       = pickle.load(file('/data/easilar/Spring15/25ns/Jec_syst_SRAll_pkl'))
 
 dataResult = rcs

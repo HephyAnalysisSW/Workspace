@@ -4,12 +4,13 @@ from array import array
 import operator
 from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYieldFromChain
 from Workspace.RA4Analysis.helpers import nameAndCut, nJetBinName, nBTagBinName, varBinName, varBin, UncertaintyDivision
-from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed import *
+#from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed import *
+from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2_postProcessed import *
 from Workspace.RA4Analysis.rCShelpers import *
 from Workspace.RA4Analysis.signalRegions import *
 from Workspace.HEPHYPythonTools.user import username
 from cutFlow_helper import *
-from general_config import *
+from Workspace.RA4Analysis.general_config import *
 
 
 ROOT.TH1D().SetDefaultSumw2()
@@ -17,33 +18,37 @@ ROOT.TH1D().SetDefaultSumw2()
 
 btagString = "nBJetMediumCSV30"
 maxN = -1
-lepSels = [ 
+lepSels = [
 {'cut':'((!isData&&singleLeptonic)||(isData&&((eleDataSet&&singleElectronic)||(muonDataSet&&singleMuonic))))' , 'veto':'nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0',\
- 'trigWeight': "0.94" ,\
+ #'chain': getChain([single_ele_Run2015D,single_mu_Run2015D],maxN=maxN,histname="",treeName="Events") ,\
+# 'trigWeight': "0.94" ,\
   'label':'_lep_', 'str':'1 $lep$' , 'trigger': '((HLT_EleHT350)||(HLT_MuHT350))'},\
-] 
+]
 
 lepSel = lepSels[0]
-signalRegions = signalRegion3fb
-lep_weight_Up_Err = "(lepton_eleSF_miniIso01_err*lepton_eleSF_cutbasedID_err*lepton_muSF_sip3d_err*lepton_muSF_miniIso02_err*lepton_muSF_mediumID_err)"
-lep_weight_Up = lepton_Scale+"+"+lep_weight_Up_Err
+signalRegions = signalRegions2016
+#lep_weight_Up_Err = "(lepton_eleSF_miniIso01_err*lepton_eleSF_cutbasedID_err*lepton_muSF_sip3d_err*lepton_muSF_miniIso02_err*lepton_muSF_mediumID_err)"
+#lep_weight_Up = lepton_Scale+"+"+lep_weight_Up_Err
 #### Here enter which sample do you wanna reweight and the variation
-tot_list = [TTJets_combined,DY_25ns,WJetsHTToLNu_25ns,singleTop_25ns,TTV_25ns]
-search_c = tot_list
+#tot_list = [TTJets_combined,DY_25ns,WJetsHTToLNu_25ns,singleTop_25ns,TTV_25ns]
+tot_list = [TTV,singleTop_lep,DY_HT,WJetsHTToLNu,TTJets_Comb]
+search_c = WJetsHTToLNu
 #search_c = TTJets_combined
-variation = 0.0
-weight_var = '*'.join([trigger_scale,lep_weight_Up,reweight,topPt,weight_0b])
+variation = 0.3
+common_weight = '*'.join([reweight,topPt,trigger_scale,PU])
 
-presel =  "&&".join([lepSel['cut'],lepSel['veto'],filters])
+presel = "&&".join([lepSel['cut'],lepSel['veto'],"Jet_pt[1]>80"])
+signalRegions = signalRegions2016
 
 cTot = getChain(tot_list,histname='')
-#tot_list.remove(search_c)
+tot_list.remove(search_c)
 cBkg = getChain(tot_list,histname='')
 search_chain = getChain(search_c , histname='')
 #weight_str =  '*'.join([trigger_scale,lepton_Scale,reweight,topPt,weight_0b])
-weight_str = weight_str_CV 
-print "base weight" , weight_str
-
+weight_var = weight_str_plot 
+weight_str = weight_var
+print "base weight" , weight_var
+nbtag = (0,0)
 bin = {}
 for srNJet in sorted(signalRegions):
   bin[srNJet]={} 
@@ -54,12 +59,12 @@ for srNJet in sorted(signalRegions):
       deltaPhiCut = signalRegions[srNJet][stb][htb]['deltaPhi']
       cut_SR = "deltaPhi_Wl>"+str(deltaPhiCut)
       cut_CR = "deltaPhi_Wl<"+str(deltaPhiCut)
-      name_bla, SB_cut    = nameAndCut(stb, htb, (3,4), btb=(0,-1), presel=presel, btagVar = btagString)
-      name_bla, SB_cut_CR = nameAndCut(stb, htb, (3,4), btb=(0,-1), presel=presel+"&&"+cut_CR, btagVar = btagString)
-      name_bla, SB_cut_SR = nameAndCut(stb, htb, (3,4), btb=(0,-1), presel=presel+"&&"+cut_SR, btagVar = btagString)
-      name    , MB_cut    = nameAndCut(stb, htb, srNJet, btb=(0,-1), presel=presel, btagVar = btagString)
-      name_bla, MB_cut_CR = nameAndCut(stb, htb, srNJet, btb=(0,-1), presel=presel+"&&"+cut_CR, btagVar = btagString)
-      name_bla, MB_cut_SR = nameAndCut(stb, htb, srNJet, btb=(0,-1), presel=presel+"&&"+cut_SR, btagVar = btagString)
+      name_bla, SB_cut    = nameAndCut(stb, htb, (3,4),  btb=nbtag, presel=presel, btagVar = btagString)
+      name_bla, SB_cut_CR = nameAndCut(stb, htb, (3,4),  btb=nbtag, presel=presel+"&&"+cut_CR, btagVar = btagString)
+      name_bla, SB_cut_SR = nameAndCut(stb, htb, (3,4),  btb=nbtag, presel=presel+"&&"+cut_SR, btagVar = btagString)
+      name    , MB_cut    = nameAndCut(stb, htb, srNJet, btb=nbtag, presel=presel, btagVar = btagString)
+      name_bla, MB_cut_CR = nameAndCut(stb, htb, srNJet, btb=nbtag, presel=presel+"&&"+cut_CR, btagVar = btagString)
+      name_bla, MB_cut_SR = nameAndCut(stb, htb, srNJet, btb=nbtag, presel=presel+"&&"+cut_SR, btagVar = btagString)
 
       print name
 
@@ -118,6 +123,6 @@ for srNJet in sorted(signalRegions):
       bin[srNJet][stb][htb]['delta_avarage'] = (abs(bin[srNJet][stb][htb]['delta_Up'])+abs(bin[srNJet][stb][htb]['delta_Down']))/2 
 
 
-#pickle.dump(bin,file('/data/easilar/Spring15/25ns/'+search_c['name']+'_'+weight_var+'_syst_SRAll_pkl','w'))
-pickle.dump(bin,file('/data/easilar/Spring15/25ns/all_lepSF_syst_SRAll_pkl','w'))
+pickle.dump(bin,file('/data/easilar/Results2016/ICHEP/DiLep_SYS/V1/'+search_c['name']+'_'+'_syst_SRAll_pkl','w'))
+#pickle.dump(bin,file('/data/easilar/Spring15/25ns/all_lepSF_syst_SRAll_pkl','w'))
 

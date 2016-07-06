@@ -55,11 +55,11 @@ loadTemplate = True
 
 cWJets      = getChain(WJetsHTToLNu,histname='')
 cTTJets     = getChain(TTJets_Comb,histname='')
-cDY         = getChain(DYHT,histname='')
+cDY         = getChain(DY_HT,histname='')
 csingleTop  = getChain(singleTop_lep,histname='')
 cTTV        = getChain(TTV,histname='')
-cRest       = getChain([singleTop_lep, DYHT, TTV],histname='')#no QCD
-cBkg        = getChain([WJetsHTToLNu, TTJets_Comb, singleTop_lep, DYHT, TTV], histname='')#no QCD
+cRest       = getChain([singleTop_lep, DY_HT, TTV],histname='')#no QCD
+cBkg        = getChain([WJetsHTToLNu, TTJets_Comb, singleTop_lep, DY_HT, TTV], histname='')#no QCD
 cQCD        = getChain(QCDHT,histname='')
 
 
