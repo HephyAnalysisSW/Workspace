@@ -64,8 +64,10 @@ lepSF_h2b = d.GetPrimitive('h2b')
 #pickleDir =  '/data/dspitzbart/Results2016/Prediction_Spring16_templates_validation_4j_lep_data_2p57/'
 #pickleDir =  '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2015_lep_data_2p57/'
 #pickleDir =  '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2016_v1_QCD_lep_MC_3p99/'
-pickleDir =  '/data/dspitzbart/Results2016/Prediction_Spring16_templates_validation_4j_lep_data_3p99/'
+#pickleDir =  '/data/dspitzbart/Results2016/Prediction_Spring16_templates_validation_4j_lep_data_3p99/'
+
 #pickleDir =  '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2016_v1_100p_lep_data_3p99/'
+pickleDir =  '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2016_v1_lep_MC_3p99/'
 
 saveDir = pickleDir
 #saveDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_fullSR_lep_data_2p25/'
@@ -73,10 +75,11 @@ path_syst1 = '/data/easilar/Results2016/ICHEP/SYS/V1/'
 wxsec   = pickle.load(file(path_syst1+'Unc_on_WJets__syst_SRAll_pkl'))
 ttvxsec = pickle.load(file(path_syst1+'Unc_on_TTV__syst_SRAll_pkl'))
 ttxsec  = pickle.load(file('/data/easilar/Spring15/25ns/TTJetsxsec_syst_SRAll_pkl'))
-wpol    = pickle.load(file('/data/dhandl/results2015/WPolarizationEstimation/20151218_wjetsPolSys_pkl'))
+ttvxsec = pickle.load(file('/data/easilar/Spring15/25ns/TTVxsec_syst_SRAll_pkl'))
+wpol    = pickle.load(file('/data/dspitzbart/Results2016/systematics2016/Wpol_pkl'))
 b_err   = pickle.load(file('/data/dspitzbart/Results2016/btagErr_pkl_update'))
 l_err   = pickle.load(file('/data/dspitzbart/Results2016/mistagErr_pkl_update'))
-qcd_err = pickle.load(file('/data/dspitzbart/Results2016/qcdErr_pkl_update'))
+qcd_err = pickle.load(file('/data/dspitzbart/Results2016/systematics2016/qcdErr_pkl'))
 #rcs     = pickle.load(file(pickleDir+'singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'))
 rcs     = pickle.load(file(pickleDir+'singleLeptonic_Spring16__estimationResults_pkl_kappa_corrected'))
 if validation:
@@ -244,7 +247,8 @@ for injb,srNJet in enumerate(sorted(signalRegions)):
       if validation:
         wPErr = 0.04
       else:
-        wPErr = sqrt(((abs(wpol[srNJet][stb][htb]['uWPolMinus10'])+abs(wpol[srNJet][stb][htb]['uWPolPlus10']))/2)**2 + ((abs(wpol[srNJet][stb][htb]['uTTPolMinus5'])+abs(wpol[srNJet][stb][htb]['uTTPolPlus5']))/2)**2) # w pol for w and ttbar
+        wPErr = sqrt(wpol[srNJet][stb][htb]['W']**2 + wpol[srNJet][stb][htb]['TT']**2)
+        #wPErr = sqrt(((abs(wpol[srNJet][stb][htb]['uWPolMinus10'])+abs(wpol[srNJet][stb][htb]['uWPolPlus10']))/2)**2 + ((abs(wpol[srNJet][stb][htb]['uTTPolMinus5'])+abs(wpol[srNJet][stb][htb]['uTTPolPlus5']))/2)**2) # w pol for w and ttbar
       wPErrH.SetBinContent(i, wPErr)
       
       #JEC
@@ -528,9 +532,9 @@ total_err.Draw('2 same')
 
 can.cd()
 
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/syst_uncertainties/sys_validation_preapp_2016_v1.png')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/syst_uncertainties/sys_validation_preapp_2016_v1.root')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/syst_uncertainties/sys_validation_preapp_2016_v1.pdf')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/syst_uncertainties/sys_validation_MC_newRcs.png')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/syst_uncertainties/sys_validation_MC_newRcs.root')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/syst_uncertainties/sys_validation_MC_newRcs.pdf')
 
 
 savePickle = True

@@ -35,7 +35,7 @@ if QCDup: nameSuffix += '_QCDup'
 if QCDdown: nameSuffix += '_QCDdown'
 
 ## samples
-isData              = True
+isData              = False
 unblinded           = True
 validation          = False
 isCentralPrediction = True
@@ -64,7 +64,7 @@ cQCD        = getChain(QCDHT,histname='')
 
 
 ## QCD estimation
-useQCDestimation = True
+useQCDestimation = False
 if not isData and useQCDestimation:
   #QCDpickle = '/data/dspitzbart/Results2016/QCDEstimation/20160212_QCDestimation_MC2p25fb_pkl'
   QCDpickle = '/data/dspitzbart/Results2016/QCDEstimation/20160623_v3_QCDestimation_2015SR_MC2p57fb_pkl'
@@ -87,9 +87,9 @@ else: QCDestimate=False
 if isData:
   cData = getChain([single_mu_Run2016B, single_ele_Run2016B], histname='')
 elif not isData and useQCDestimation:
-  cData = getChain([WJetsHTToLNu, TTJets_Comb, singleTop_lep, DYHT, TTV, QCDHT], histname='')
+  cData = getChain([WJetsHTToLNu, TTJets_Comb, singleTop_lep, DY_HT, TTV, QCDHT], histname='')
 else:
-  cData = getChain([WJetsHTToLNu, TTJets_Comb, singleTop_lep, DYHT, TTV], histname='')
+  cData = getChain([WJetsHTToLNu, TTJets_Comb, singleTop_lep, DY_HT, TTV], histname='')
 
 
 ## signal region definition
@@ -100,7 +100,7 @@ else:
   signalRegions = signalRegions2016
   #signalRegions = signalRegion3fb
   #regStr = 'fullSR'
-  regStr = 'SR2016_v1_100p'
+  regStr = 'SR2016_v1'
 #signalRegions = signalRegion3fbMerge
 
 ## weight calculations
@@ -178,8 +178,8 @@ createFits = True # turn off if you already did one
 if not isCentralPrediction:
   createFits = False
 #fitDir = '/data/'+username+'/Results'+year+'/correctionFit_'+regStr+'_MC'+nameSuffix+'/'
-fitDir = '/data/'+username+'/Results'+year+'/correctionFit_SR2016_v1_MC/'
-fitPrintDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results'+year+'/25ns/RcsFit_'+predictionName+'_'+lumistr+'/'
+fitDir = '/data/'+username+'/Results'+year+'/correctionFit_SR2016_v1_MC_test/'
+fitPrintDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results'+year+'/25ns/RcsFit_'+predictionName+'_'+lumistr+'_test/'
 
 ## do stuff for test runs
 if testRun:
