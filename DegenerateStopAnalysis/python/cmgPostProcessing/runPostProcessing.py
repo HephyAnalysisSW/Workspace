@@ -240,11 +240,23 @@ sampleSets = {
                              
                             },
 
-                'data_2016':{
+                'data_2016_MET':{
                             'samples':[
 
-                                        "MET_Run2016B_PromptReco_v2",           
-                                        "SingleMuon_Run2016B_PromptReco_v2",              
+                                        "MET_Run2016B_PromptReco_v2",
+                                        ],
+                             
+                            },
+                'data_2016_Mu':{
+                            'samples':[
+
+                                        "SingleMuon_Run2016B_PromptReco_v2",
+                                        ],
+                             
+                            },
+                'data_2016_El':{
+                            'samples':[
+
                                         "SingleElectron_Run2016B_PromptReco_v2",
                                         ],
                              

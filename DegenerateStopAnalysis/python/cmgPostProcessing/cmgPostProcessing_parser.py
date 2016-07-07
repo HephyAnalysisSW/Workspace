@@ -63,7 +63,7 @@ def get_parser():
         action='store',
         nargs='?',
         type=str,
-        default='TTJets_LO',
+        default='',
         help="Sample to be post-processed, given as CMG component name"
         )
     
