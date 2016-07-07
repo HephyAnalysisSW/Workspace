@@ -12,12 +12,12 @@
 #
 #       $1 compulsory; 
 #          set sample as defined in runPostProcessing.sh
-#       $2 if set to "skimPreselect", run skimPreselect, otherwise do not run skimPreselect
-#          set it to "" if there is another non-empty parameter after it
-#       $3 if set to "skimLepton", run skimLepton, otherwise do not run skimLepton
-#          set it to "" if there is another non-empty parameter after it
-#       $4 optional for MC samples, must be set to 'DATA' for data
+#       $2 must be set to 'MC' for MC samples, and to 'DATA' for data
 #          take cmgTuples=${CMG_TUPLES} as defined below in the if block
+#       $3 if set to "skimPreselect", run skimPreselect, otherwise do not run skimPreselect
+#          set it to "" if there is another non-empty parameter after it
+#       $4 if set to "skimLepton", run skimLepton, otherwise do not run skimLepton
+#          set it to "" if there is another non-empty parameter after it
 #       $5 optional;
 #          if 'TEST', add to "_TEST" to CMG_POST_PROCESSING_TAG, e.g. "80X_postProcessing_v2_TEST"
 #          with 'TEST', it also add '--verbose'
