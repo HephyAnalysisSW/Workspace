@@ -338,9 +338,8 @@ class cmgTuplesPostProcessed():
         
         import pickle
 
-
-        #mass_dict_pickle = "/afs/hephy.at/user/n/nrad/CMSSW/fork/CMSSW_7_4_12_patch4/src/Workspace/DegenerateStopAnalysis/cmgPostProcessing/mass_dict_all.pkl"
-        mass_dict_pickle = "/data/nrad/cmgTuples/7412pass2_mAODv2_v6/RunIISpring15MiniAODv2//mass_dict.pkl"
+        #mass_dict_pickle = "/data/mzarucki/cmgTuples/7412pass2_mAODv2_v7/RunIISpring15MiniAODv2/mass_dict.pkl"
+        mass_dict_pickle = "/afs/hephy.at/data/mzarucki01/cmgTuples/postProcessed_mAODv2/7412pass2_mAODv2_v7/74X_postProcessing_v5/analysisHephy_13TeV_v0/step1/Spring15_7412pass2_mAODv2_v7/mass_dict.pkl"
         mass_dict = pickle.load(open(mass_dict_pickle,"r"))
 
         self.mass_dict = mass_dict

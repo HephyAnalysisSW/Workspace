@@ -1,11 +1,12 @@
-#eleIdFOM.py
+#fakes.py
 import ROOT
 import os, sys
 import argparse
 import Workspace.DegenerateStopAnalysis.toolsMateusz.ROOToptions
 from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
-from Workspace.DegenerateStopAnalysis.toolsMateusz.degTools import *
+from Workspace.DegenerateStopAnalysis.navidTools.NavidTools import Plots, getPlots, drawPlots, setup_style
+#from Workspace.DegenerateStopAnalysis.toolsMateusz.degTools import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.cutsEle import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.cmgTuplesPostProcessed_mAODv2_analysisHephy13TeV import cmgTuplesPostProcessed
 from Workspace.DegenerateStopAnalysis.toolsMateusz.getSamples_mAODv2_analysisHephy13TeV import getSamples
@@ -15,8 +16,8 @@ from Workspace.DegenerateStopAnalysis.toolsMateusz.getSamples_mAODv2_analysisHep
 from array import array
 from math import pi, sqrt #cos, sin, sinh, log
 
-ROOT.setTDRStyle(1)
-ROOT.gStyle.SetOptStat(0) #1111 #0 removes histogram statistics box #Name, Entries, Mean, RMS, Underflow, Overflow, Integral, Skewness, Kurtosis
+#TDR style
+setup_style()
 
 #Samples
 privateSignals = ["s10FS", "s30", "s30FS", "s60FS", "t2tt30FS"]
@@ -100,7 +101,7 @@ fakePt = "Max$(LepGood_pt*(" + fakeEleSel + "))"
 
 fakes = CutClass("fakes", [
    ["MET300","met > 300"],
-   ["HT300","ht_basJet > 200"],
+   ["HT300","ht_basJet > 300"],
    ["ISR110", "nIsrJet >= 1"],
    ["No3rdJet60","nVetoJet <= 2"],
    ["anti-QCD", "vetoJet_dPhi_j1j2 < 2.5"],
@@ -119,16 +120,18 @@ fakes = CutClass("fakes", [
 
 plotDict = {\
    "fakePt":{'var':fakePt, "bins":[25,0,25], "decor":{"title": "Electron Fakes pT Plot" ,"x":"Electron p_{T} / GeV" , "y":"Events","log":[0,1,0]}},
-#   "fakeMt":{'var':fakeMt, "bins":[30,1,150], "decor":{"title": "Electron Fakes mT Plot" ,"x":"m_{T} / GeV" , "y":"Events"}},
-#   "MET":{'var':"met", "bins":[20,150,900], "decor":{"title": "Electron Fakes MET Plot" ,"x":"Missing E_{T} / GeV" , "y":"Events"}},
+   "fakeMt":{'var':fakeMt, "bins":[30,1,150], "decor":{"title": "Electron Fakes mT Plot" ,"x":"m_{T} / GeV" , "y":"Events"}},
+   "MET":{'var':"met", "bins":[20,150,900], "decor":{"title": "Electron Fakes MET Plot" ,"x":"Missing E_{T} / GeV" , "y":"Events"}},
    #"HT":{'var':"ht", "bins":[100,0,100], "decor":{"title": "Electron ID FoM Plot: %s_%s_%s"%(ID, selection, WP) ,"x":"H_{T} / GeV" , "y":"Events" ,'log':[0,1,0]}}\
 }
 
 plotsDict = Plots(**plotDict)
-plotsList = ["fakePt"]#, "fakeMt", "MET"]#, "HT"]
+plotsList = ["fakePt", "fakeMt", "MET"]#, "HT"]
 
 plots = getPlots(samples, plotsDict, fakes, selectedSamples, plotList = plotsList)# addOverFlowBin='both')
-fakePlots1 = drawPlots(plots, fom=False, save=False, leg = True, plotMin=0.1)#, logy = 1  plotLimits = [0,20]
+#fakePlots1 = drawPlots(samples, plotsDict, fakes, selectedSamples, plotList = plotsList, fom=False, save=False, leg = True, plotMin=0.1)#, logy = 1  plotLimits = [0,20]
+fakePlots1 = drawPlots(samples, plotsDict, fakes, selectedSamples, plotList = plotsList, plotLimits = [0.1, 5000], denoms = ["bkg"], noms = ["bkg"], fom = "RATIO", fomLimits = [0,2.8], plotMin = 0.1, normalize = False, save = False)
+
 #fakePlots2 = drawPlots(samples, plots, fakes, sampleList = selectedSamples, plotList = ['MET'], fom=False, save=False, plotLimits = [0,900], leg = True)#, plotMin=0.001), logy = 1 
 
 #for leg in fakePlots1['legs']:

@@ -16,8 +16,8 @@ from Workspace.DegenerateStopAnalysis.toolsMateusz.cmgTuplesPostProcessed_mAODv2
 from array import array
 from math import pi, sqrt #cos, sin, sinh, log
 
-ROOT.setTDRStyle(1)
-ROOT.gStyle.SetOptStat(0) #1111 #0 removes histogram statistics box #Name, Entries, Mean, RMS, Underflow, Overflow, Integral, Skewness, Kurtosis
+#Set TDR style
+setup_style()
 
 #Input options
 parser = argparse.ArgumentParser(description = "Input options")

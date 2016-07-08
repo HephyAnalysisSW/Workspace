@@ -27,12 +27,13 @@ ROOT.gStyle.SetOptStat(0) #removes histogram statistics box
 #ABCD = args.ABCD
 save = args.save
 
-ABCDs = ["1", "2", "3", "4"]
+ABCDs = ["4"] #["1", "2", "3", "4"]
 
 for ABCD in ABCDs:
    filedir = "/afs/hephy.at/user/m/mzarucki/www/plots/QCD/ABCD/ABCD" + ABCD + "/estimation/Veto/highWeightVeto"
-   suffix = "_HT200_MET200"
+   suffix = "_HT300_MET300"
    if ABCD == "3": suffix += "_METloose150"
+   suffix += "_index"
    filename = "QCDyields_Veto" + suffix + ".txt"
    
    yields = {}
@@ -103,7 +104,7 @@ for ABCD in ABCDs:
    gr1 = emptyHist("", len(regions) - 1, 0, len(regions) - 1) 
    #gr1 = ROOT.TGraphErrors(len(regions), np.array(array), np.array(yvals), np.zeros(len(regions)), np.array(yval_errs))
    gr1.SetName("QCD")
-   gr1.SetTitle("Closure Test for ABCD" + ABCD + " Method | (MET, HT) > 300 GeV")
+   gr1.SetTitle("Closure Test for ABCD" + ABCD + " Method | (MET,HT) > (300,300) GeV")
    
    for k,reg in enumerate(regions):
       if yields[reg]: 
@@ -118,12 +119,12 @@ for ABCD in ABCDs:
    ROOT.gPad.Update()
    
    gr1.GetYaxis().SetTitle("Yield")
-   gr1.GetYaxis().SetRangeUser(0,10)
-   gr1.GetXaxis().SetRangeUser(0,15)
+   gr1.GetYaxis().SetRangeUser(0,0.2)
+   gr1.GetXaxis().SetRangeUser(0,13)
    
    gr1.SetMarkerStyle(33)
    gr1.SetMarkerColor(ROOT.kRed+1)
-   gr1.SetMarkerSize(1.5)
+   gr1.SetMarkerSize(2)
    gr1.SetLineColor(ROOT.kRed+1)
    gr1.SetLineWidth(2)
    
@@ -144,13 +145,13 @@ for ABCD in ABCDs:
    
    gr2.SetMarkerStyle(20)
    gr2.SetMarkerColor(ROOT.kBlue+1)
-   gr2.SetMarkerSize(1)
+   gr2.SetMarkerSize(1.5)
    gr2.SetLineColor(ROOT.kBlue+1)
    gr2.SetLineWidth(2)
    
    l1 = makeLegend2()
-   l1.AddEntry("QCD", "QCD est.", "P")
-   l1.AddEntry("MC", "MC", "P")
+   l1.AddEntry("QCD", "QCD Estimation", "P")
+   l1.AddEntry("MC", "MC Yield", "P")
    l1.Draw()
    
    ROOT.gPad.Modified()

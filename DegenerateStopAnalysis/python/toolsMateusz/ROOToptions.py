@@ -2,18 +2,11 @@
 import ROOT
 import os, sys
 
-cmsbase = os.getenv("CMSSW_BASE")
-print "CMSSW Release: ", cmsbase
+#cmsbase = os.getenv("CMSSW_BASE")
+#print "CMSSW Release: ", cmsbase
 
 ROOT.gROOT.Reset() #re-initialises ROOT
 #ROOT.gROOT.SetStyle("Plain")
-
-ROOT.gROOT.LoadMacro(cmsbase+"/src/Workspace/HEPHYPythonTools/scripts/root/tdrstyle.C")
-ROOT.setTDRStyle(0)
-#ROOT.gStyle.SetErrorX(0.5)
-#maxN = -1
-#ROOT.gStyle.SetPalette(1)
-##ROOT.gStyle.SetCanvasPreferGL(1)
 
 ROOT.gStyle.SetOptStat(1111) #0 removes histogram statistics box #Name, Entries, Mean, RMS, Underflow, Overflow, Integral, Skewness, Kurtosis
 ROOT.gStyle.SetOptFit(0) #1111 prints fits results on plot

@@ -1,16 +1,15 @@
-# eleIdEffs.py
+# eleIDeffs.py
 # Script to produce electron ID efficiency plots with different ID definitions: standard EG Spring 15 (25ns) ID, manually applied cuts, including isolation and with one cut removed (N-1)
 # Author: Mateusz Zarucki
 
 import ROOT
 import os, sys
 import Workspace.DegenerateStopAnalysis.toolsMateusz.ROOToptions
-from Workspace.DegenerateStopAnalysis.toolsMateusz.cmgTuplesPostProcessed_mAODv2_analysisHephy13TeV import cmgTuplesPostProcessed
-from Workspace.DegenerateStopAnalysis.toolsMateusz.getSamples_mAODv2_analysisHephy13TeV import getSamples
 from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
-from Workspace.DegenerateStopAnalysis.toolsMateusz.degTools import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.cutsEle import *
+from Workspace.DegenerateStopAnalysis.toolsMateusz.cmgTuplesPostProcessed_mAODv2_analysisHephy13TeV import cmgTuplesPostProcessed
+from Workspace.DegenerateStopAnalysis.toolsMateusz.getSamples_mAODv2_analysisHephy13TeV import getSamples
 #from Workspace.DegenerateStopAnalysis.toolsMateusz.cmgTuplesPostProcessed_mAODv2 import cmgTuplesPostProcessed
 #from Workspace.DegenerateStopAnalysis.toolsMateusz.getSamples_PP_mAODv2_7412pass2_scan import getSamples
 
@@ -23,7 +22,7 @@ ROOT.gStyle.SetOptStat(1111) #0 removes histogram statistics box #Name, Entries,
 #Input options
 parser = argparse.ArgumentParser(description="Input options")
 parser.add_argument("--plot", dest="plot",  help="Plot type", type=str, default="efficiency") # "efficiency" "misID" "misID2"
-parser.add_argument("--id", dest="ID",  help="Electron ID type", type=str, default="standard") # "standard" "manual" "iso"
+parser.add_argument("--id", dest="ID",  help="Electron ID type", type=str, default="standard") # "standard" "manual"
 parser.add_argument("--removedCut", dest="removedCut",  help="Variable removed from electron ID", type=str, default="") #"sigmaEtaEta" "dEta" "dPhi" "hOverE" "ooEmooP" "d0" "dz" "MissingHits" "convVeto"
 parser.add_argument("--iso", dest="iso",  help="Isolation", type=str, default="") #hybIso03
 parser.add_argument("--mvaWPs", dest="mvaWPs",  help="Add MVA WPs", type=int, default=0) # includes MVA WPs
@@ -44,7 +43,7 @@ if not len(sys.argv) > 1:
 plot = args.plot 
 ID = args.ID 
 removedCut = args.removedCut 
-isolation = args.iso
+iso = args.iso
 mvaWPs = args.mvaWPs
 presel = args.presel
 lowPt = args.lowPt 
@@ -57,12 +56,12 @@ save = args.save
 privateSignals = []#"s10FS", "s30", "s30FS", "s60FS", "t2tt30FS"]
 backgrounds=["w","tt", "z","qcd"]
 
-cmgPP = cmgTuplesPostProcessed()#mc_path, signal_path, data_path)
+cmgPP = cmgTuplesPostProcessed()
 
 samplesList = backgrounds # + privateSignals
-samples = getSamples(cmgPP = cmgPP, sampleList=samplesList, scan=False, useHT=True, getData=False)
+samples = getSamples(cmgPP = cmgPP, sampleList=samplesList, scan=True, useHT=True, getData=False)
 
-officialSignals = []#"s300_290", "s300_270", "s300_240"] #FIXME: crosscheck if these are in allOfficialSignals
+officialSignals = ["s300_290", "s300_270", "s300_240"] #FIXME: crosscheck if these are in allOfficialSignals
 
 allOfficialSignals = samples.massScanList()
 #allOfficialSignals = [s for s in samples if samples[s]['isSignal'] and not samples[s]['isData'] and s not in privateSignals and s not in backgrounds] 
@@ -79,6 +78,7 @@ else:
    print "!!! Sample " + sample + " unavailable."
    sys.exit(0)
 print makeLine()
+
 
 #Variable to plot
 if plot == "efficiency": variable = "genLep_pt[0]"
@@ -109,16 +109,18 @@ if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
  
    #Save path
    if not removedCut:
-      savedir += "/efficiencies"
-      if ID == "iso": savedir += "/%s/%s/%s"%(ID, isolation, plot)
-      else: savedir += "/%s/%s"%(ID, plot)
-      
+      savedir += "/efficiencies/" + ID
+      if iso: savedir += "/" + iso
+      savedir += "/" + plot 
       if lowPt: savedir += "/lowPt"
    
    else: #nMinus1
       savedir2 = savedir + "/nMinus1/histogramCounts/" + plot
-      if not removedCut: savedir += "/nMinus1/variables/None/" + plot  
-      else: savedir += "/nMinus1/variables/%s/no_%s/%s"%(removedCut, removedCut, plot)
+      if not removedCut: savedir += "/nMinus1/variables/None/"
+      else: savedir += "/nMinus1/variables/%s/no_%s"%(removedCut, removedCut)
+      
+      if iso: savedir += "/" + iso
+      savedir += "/" + plot 
    
       if lowPt: 
          savedir += "/lowPt"
@@ -131,7 +133,7 @@ if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
    
    #Histograms save file 
    if not removedCut:
-      if ID == "iso": histos = ROOT.TFile(savedir + "/root/histograms/histos_%s_%s_%s%s.root"%(plot, isolation, samples[sample].name, z), "recreate")
+      if iso: histos = ROOT.TFile(savedir + "/root/histograms/histos_%s_%s_%s%s.root"%(plot, iso, samples[sample].name, z), "recreate")
       else: histos = ROOT.TFile(savedir + "/root/histograms/histos_%s_%s_%s%s.root"%(plot, ID, samples[sample].name, z), "recreate")
    else: histos = ROOT.TFile(savedir + "/root/histograms/histos_%s_no_%s_%s%s.root"%(plot, removedCut, samples[sample].name, z), "recreate")
 
@@ -172,8 +174,10 @@ lowPtSel = "(genLep_pt > 6 && genLep_pt < 10)" #Pt selection
 misMatchSel = "LepGood_mcMatchId == 0"
 WPs = ["Veto", "Loose", "Medium", "Tight"]
 
-if removedCut: cutSel = electronIDs(ID = "nMinus1", removedCut = removedCut, iso = isolation, collection = "LepGood")
-else: cutSel = electronIDs(ID = ID, removedCut = "None", iso = isolation, collection = "LepGood")
+if removedCut: cutSel = electronIDs(ID = "nMinus1", removedCut = removedCut, iso = iso, collection = "LepGood")
+else: 
+   cutSel = electronIDs(ID = ID, removedCut = "None", iso = iso, collection = "LepGood")
+   if mvaWPs: mvaSel = electronIDs(ID = "MVA", removedCut = "None", iso = iso, collection = "LepGood")
 
 ##single-electron events (semileptonic & dileptonic)
 #elif nEles == "1": #semileptonic
@@ -295,10 +299,10 @@ if plot == "efficiency":
 elif plot == "misID" or plot == "misID2":
    l1.AddEntry("%s_total_noID"%(plot), "Reconstructed Electron p_{T}", "F")
 
-l1.AddEntry("%s_passed_Veto"%(plot), "Veto ID", "F")
-l1.AddEntry("%s_passed_Loose"%(plot), "Loose ID", "F")
-l1.AddEntry("%s_passed_Medium"%(plot), "Medium ID", "F")
-l1.AddEntry("%s_passed_Tight"%(plot), "Tight ID", "F")
+l1.AddEntry("%s_passed_Veto"%(plot), "Veto", "F")
+l1.AddEntry("%s_passed_Loose"%(plot), "Loose", "F")
+l1.AddEntry("%s_passed_Medium"%(plot), "Medium", "F")
+l1.AddEntry("%s_passed_Tight"%(plot), "Tight", "F")
 
 ROOT.gPad.Modified()
 ROOT.gPad.Update()
@@ -334,8 +338,8 @@ if mvaWPs:
    ROOT.gPad.Modified()
    ROOT.gPad.Update()
    
-   l1.AddEntry("%s_passed_WP90"%(plot), "MVA ID (WP90)", "F")
-   l1.AddEntry("%s_passed_WP80"%(plot), "MVA ID (WP80)", "F")
+   l1.AddEntry("%s_passed_WP90"%(plot), "MVA (WP90)", "F")
+   l1.AddEntry("%s_passed_WP80"%(plot), "MVA (WP80)", "F")
 
 ROOT.gPad.Modified()
 ROOT.gPad.Update()
@@ -432,10 +436,10 @@ ROOT.gPad.Modified()
 ROOT.gPad.Update()
 
 l2 = makeLegend2()
-l2.AddEntry("eff_Veto", "Veto ID", "P")
-l2.AddEntry("eff_Loose", "Loose ID", "P")
-l2.AddEntry("eff_Medium", "Medium ID", "P")
-l2.AddEntry("eff_Tight", "Tight ID", "P")
+l2.AddEntry("eff_Veto", "Veto", "P")
+l2.AddEntry("eff_Loose", "Loose", "P")
+l2.AddEntry("eff_Medium", "Medium", "P")
+l2.AddEntry("eff_Tight", "Tight", "P")
 
 if mvaWPs:
    effs['WP90'].SetMarkerColor(ROOT.kMagenta+2)
@@ -450,8 +454,8 @@ if mvaWPs:
    ROOT.gPad.Modified()
    ROOT.gPad.Update()
 
-   l2.AddEntry("eff_WP90", "MVA ID (WP90)", "P")
-   l2.AddEntry("eff_WP80", "MVA ID (WP80)", "P")
+   l2.AddEntry("eff_WP90", "MVA (WP90)", "P")
+   l2.AddEntry("eff_WP80", "MVA (WP80)", "P")
 
 ROOT.gPad.Modified()
 ROOT.gPad.Update()
@@ -464,10 +468,10 @@ c1.Update()
 #Save canvas
 if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
    if not removedCut:
-      if ID == "iso":
-         c1.SaveAs(savedir + "/%s_%s_%s%s.png"%(plot, isolation, samples[sample].name, z))
-         c1.SaveAs(savedir + "/pdf/%s_%s_%s%s.pdf"%(plot, isolation, samples[sample].name, z))
-         c1.SaveAs(savedir + "/root/%s_%s_%s%s.root"%(plot, isolation, samples[sample].name, z))
+      if iso:
+         c1.SaveAs(savedir + "/%s_%s_%s%s.png"%(plot, iso, samples[sample].name, z))
+         c1.SaveAs(savedir + "/pdf/%s_%s_%s%s.pdf"%(plot, iso, samples[sample].name, z))
+         c1.SaveAs(savedir + "/root/%s_%s_%s%s.root"%(plot, iso, samples[sample].name, z))
       else: 
          c1.SaveAs(savedir + "/%s_%s_%s%s.png"%(plot, ID, samples[sample].name, z))
          c1.SaveAs(savedir + "/pdf/%s_%s_%s%s.pdf"%(plot, ID, samples[sample].name, z))

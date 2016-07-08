@@ -14,9 +14,9 @@ filedir = "/afs/hephy.at/user/m/mzarucki/www/plots/electronID/efficiencies"
 
 #Input options
 parser = argparse.ArgumentParser(description="Input options")
-parser.add_argument("--num", dest="num",  help="Numerator ID type", type=str, default="manual") # "standard" "manual" "iso"
-parser.add_argument("--den", dest="den",  help="Denominator ID type", type=str, default="standard") # "standard" "manual" "iso"
-parser.add_argument("--iso", dest="iso",  help="Isolation", type=str, default="hybIso03") #"relIso03" "relIso04" "miniRelIso" "relIsoAn04"
+parser.add_argument("--num", dest="num",  help="Numerator ID type", type=str, default="manual") #"standard" "manual" "iso"
+parser.add_argument("--den", dest="den",  help="Denominator ID type", type=str, default="standard") #"standard" "manual" "iso"
+parser.add_argument("--iso", dest="iso",  help="Isolation", type=str, default="hybIso03") #"hybIso03" "hybIso04"
 parser.add_argument("--mvaWPs", dest="mvaWPs",  help="Add MVA WPs", type=int, default=0) # includes MVA WPs
 parser.add_argument("--zoom", dest="zoom",  help="Toggle zoom", type=int, default=1)
 parser.add_argument("--save", dest="save",  help="Toggle Save", type=int, default=1)
