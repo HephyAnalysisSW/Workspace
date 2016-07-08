@@ -183,7 +183,7 @@ def getHisMinMax(hist):
     return getHistMin(hist), getHistMax(hist)
 
 
-def getFOMFromTH1FIntegral(sHist,bHist,fom="AMSSYS",sysUnc=0.2, verbose=False, integral = False, reverse=True ):
+def getFOMFromTH1FIntegral(sHist,bHist,fom="AMSSYS",sysUnc=0.2, verbose=False, integral = False, reverse=False ):
     if not sHist.GetNbinsX() == bHist.GetNbinsX():
         print sHist, sHist.GetNbinsX()
         print bHist, bHist.GetNbinsX()
@@ -206,15 +206,14 @@ def getFOMFromTH1FIntegral(sHist,bHist,fom="AMSSYS",sysUnc=0.2, verbose=False, i
     if reverse:
         print "------- Reversing the FOM!"
         rangex.reverse()
-        points = lambda x: (x,nBinX)
+        points = lambda x: (x,nBinX)   ## cut:  val > x
     else:
-        points = lambda x: (0,x)
+        points = lambda x: (0,x)        ## cut: val < x
 
     if verbose:
         print "fom range:", rangex
         print "integral:", integral, "reverse:", reverse
     for x in rangex:
-                
         if integral:        
             s=u_float(sHist.Integral(*points(x)) )
             b=u_float(bHist.Integral(*points(x)) )

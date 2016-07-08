@@ -1,5 +1,5 @@
 import math
-from Workspace.DegenerateStopAnalysis.navidTools.NavidTools import CutClass, joinCutStrings, splitCutInPt, btw, less, more
+from Workspace.DegenerateStopAnalysis.tools.degTools import CutClass, joinCutStrings, splitCutInPt, btw, less, more
 #from Workspace.DegenerateStopAnalysis.cuts.common import presel_common
 from Workspace.DegenerateStopAnalysis.tools.cuts_common import presel_common
 

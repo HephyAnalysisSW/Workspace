@@ -126,40 +126,40 @@ class Samples(dict):
         return sorted( [samp for samp in self.__dict__.keys() if self[samp].isSignal==3 and not self[samp].isData ] )
     def dataList(self):
         return sorted( [samp for samp in self.__dict__.keys() if not self[samp].isSignal and  self[samp].isData ] )
-    def set_lumis(  self, 
-                    lumi_target = None,  
-                    lumi_data_blinded = None, 
-                    lumi_data_unblinded = None ,
-                    lumi_mc = None):
-        self[ self.__dict__.keys()[0] ].lumis = {
-                                                     "target_lumi"        : lumi_target        ,  
-                                                     "data_blinded_lumi"  : lumi_data_blinded  , 
-                                                     "data_unblinded_lumi": lumi_data_unblinded,
-                                                     "mc_lumi"            : lumi_mc            ,
-                                                }     
-    def get_lumis(self,key = None):
-        if key:
-            return self[ self.__dict__.keys()[0] ].lumis[key]
-        else:
-            return self[ self.__dict__.keys()[0] ].lumis
+    #def set_lumis(  self, 
+    #                lumi_target = None,  
+    #                lumi_data_blinded = None, 
+    #                lumi_data_unblinded = None ,
+    #                lumi_mc = None):
+    #    self[ self.__dict__.keys()[0] ].lumis = {
+    #                                                 "target_lumi"        : lumi_target        ,  
+    #                                                 "data_blinded_lumi"  : lumi_data_blinded  , 
+    #                                                 "data_unblinded_lumi": lumi_data_unblinded,
+    #                                                 "mc_lumi"            : lumi_mc            ,
+    #                                            }     
+    #def get_lumis(self,key = None):
+    #    if key:
+    #        return self[ self.__dict__.keys()[0] ].lumis[key]
+    #    else:
+    #        return self[ self.__dict__.keys()[0] ].lumis
 
  
-        #self.iterall = self.all.itervalues
-    def doStuff(self):        #### not sure how to add these without messing with the class/dict structre    
-        print [ self[samp].isData for samp in self.__dict__ ]
-        self.all = [samp for samp in self.__dict__ ] 
-        self.bkgs = [samp for samp in self.all if not self[samp].isData and not self[samp].isSignal ]
-        self.sigs = [samp for samp in self.all if self[samp].isSignal ]
-        self.data= [samp for samp in self.all if    self[samp].isData ]
-        if any( [self[samp].isData and self[samp].isSignal for samp in self.all ] ):
-            assert "A sample is Signal and Data??!... nice try, but no!"
+    #    #self.iterall = self.all.itervalues
+    #def doStuff(self):        #### not sure how to add these without messing with the class/dict structre    
+    #    print [ self[samp].isData for samp in self.__dict__ ]
+    #    self.all = [samp for samp in self.__dict__ ] 
+    #    self.bkgs = [samp for samp in self.all if not self[samp].isData and not self[samp].isSignal ]
+    #    self.sigs = [samp for samp in self.all if self[samp].isSignal ]
+    #    self.data= [samp for samp in self.all if    self[samp].isData ]
+    #    if any( [self[samp].isData and self[samp].isSignal for samp in self.all ] ):
+    #        assert "A sample is Signal and Data??!... nice try, but no!"
 
-        if len(ndata)>0:
-            print "Samples include data", "MC will be reweighted based on data lumi"
-            self.includes_data= True
-            
-        else:
-            self.includes_data= False
+    #    if len(ndata)>0:
+    #        print "Samples include data", "MC will be reweighted based on data lumi"
+    #        self.includes_data= True
+    #        
+    #    else:
+    #        self.includes_data= False
   
 
 

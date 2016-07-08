@@ -10,8 +10,8 @@ from copy import deepcopy
 
 from Workspace.HEPHYPythonTools.user import username
 from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYieldFromChain, getChunks
-from Workspace.DegenerateStopAnalysis.navidTools.getRatioPlot import *
-from Workspace.DegenerateStopAnalysis.navidTools.FOM import *
+from Workspace.DegenerateStopAnalysis.tools.ratioTools import *
+from Workspace.DegenerateStopAnalysis.tools.FOM import *
 
 import Workspace.DegenerateStopAnalysis.tools.colors as sample_colors_
 sample_colors = sample_colors_.colors
@@ -23,9 +23,11 @@ import multiprocessing
 import itertools
 
 import re
-#execfile('/afs/hephy.at/user/n/nrad/CMSSW/CMSSW_7_4_12_patch4/src/Workspace/DegenerateStopAnalysis/python/navidTools/FOM.py')
-#execfile('../../../python/navidTools/getRatioPlot.py')
-#reload(Workspace.DegenerateStopAnalysis.navidTools.getRatioPlot)
+import gc
+
+#execfile('/afs/hephy.at/user/n/nrad/CMSSW/CMSSW_7_4_12_patch4/src/Workspace/DegenerateStopAnalysis/python/tools/FOM.py')
+#execfile('../../../python/tools/getRatioPlot.py')
+#reload(Workspace.DegenerateStopAnalysis.tools.getRatioPlot)
 
 cmsbase = os.getenv("CMSSW_BASE")
 def setup_style(cmsbase=cmsbase):
@@ -93,7 +95,7 @@ def makeDir(path):
 
 def saveCanvas(canv,dir="./",name="",formats=["png"], extraFormats=["root","C","pdf"] , make_dir=True):
     if not os.path.isdir(dir) and make_dir: 
-        makeDir(save)
+        makeDir(dir)
     if type(formats)!=type([]):
         formats = [formats]
     for form in formats:
@@ -162,6 +164,25 @@ def getTerminalSize():
 
 
 
+
+def get_index(string,by, strict = True):
+    if strict:
+        sort_indices = [ i1 ==  string for i1 in by ]
+    else:
+        sort_indices = [ i1 in  string for i1 in by ]
+    try:
+        return sort_indices.index(True)  
+    except ValueError:
+        return -1
+
+
+def sortBy(l,by_l1 , reverse = True):
+    return sorted(l , key = lambda x:  get_index(x,by_l1)   , reverse=reverse ) ## ordering first by bin, then by processes 
+
+
+
+
+
 ############################################################################################################
 
 
@@ -169,20 +190,20 @@ def getTerminalSize():
 
 import argparse
 
-def get_args(sysargs):
+def get_args(sys_args):
     """ Setup the command line options. """
-    #if 'ipython' in sysargs[0].lower():
-    #    sysargs = sysargs[sysargs.index("--")+1:]
+    #if 'ipython' in sys_args[0].lower():
+    #    sys_args = sys_args[sys_args.index("--")+1:]
     #else: 
-    #    if "--" in sysargs: sysarg.remove("--")
-    #    sysargs = sysargs[1:]
+    #    if "--" in sys_args: sysarg.remove("--")
+    #    sys_args = sys_args[1:]
 
-    print sysargs
+    print sys_args
                 
     description = ''' 
         Basic function to be imported for simple and quick arg 
         '''
-    #parser = argparse.ArgumentParser(argument_default=sysargs, description=description)
+    #parser = argparse.ArgumentParser(argument_default=sys_args, description=description)
     parser = argparse.ArgumentParser( description=description)
 
 
@@ -199,7 +220,7 @@ def get_args(sysargs):
     parser.add_argument('-ht', '--useHT', action="store_true", 
                                       help='Use HT binned samples')
 
-    #return parser.parse_args(sysargs)
+    #return parser.parse_args(sys_args)
     return parser
 
 
@@ -209,8 +230,8 @@ def get_args(sysargs):
 
 
 class ArgParser(argparse.ArgumentParser):
-    def parse(self, sysargs, setdef=True):
-        self.sysargs = self._fix_args(sysargs)
+    def parse(self, sys_args, setdef=True):
+        self.sys_args = self._fix_args(sys_args)
         if setdef:
             self.add_argument('-s', '--sampleList', nargs='+',
                                          help='input Samples')
@@ -221,18 +242,18 @@ class ArgParser(argparse.ArgumentParser):
             self.add_argument('-ht', '--useHT', action="store_true", 
                                           help='Use HT binned samples')
 
-        parsed = self.parse_known_args(self.sysargs)
+        parsed = self.parse_known_args(self.sys_args)
         if parsed[1]:
             print "Some Options were not recognized:", parsed
         return parsed[0]
 
-    def _fix_args(self, sysargs):
-        if 'ipython' in sysargs[0].lower() and "--" in sysargs:
-            sysargs = sysargs[sysargs.index("--")+1:]
+    def _fix_args(self, sys_args):
+        if 'ipython' in sys_args[0].lower() and "--" in sys_args:
+            sys_args = sys_args[sys_args.index("--")+1:]
         else: 
-            if "--" in sysargs: sysarg.remove("--")
-            sysargs = sysargs[1:]
-        return sysargs
+            if "--" in sys_args: sys_args.remove("--")
+            sys_args = sys_args[1:]
+        return sys_args
 
         
 
@@ -315,6 +336,10 @@ def setEventListToChains(samples,sampleList,cutInst,verbose=True,opt="read"):
       print cutString
       pp.pprint( "Applying to samples in: %s"%sampleList)
     for sample in sampleList:
+      if not sample in samples.keys(): 
+        print "Sample %s not in samples.keys()"%sample
+        continue
+        
       eListName="eList_%s_%s"%(sample,cutName)
       stringsToBeHashed = [] 
       if samples[sample].has_key("dir"):
@@ -336,6 +361,9 @@ def setEventListToChains(samples,sampleList,cutInst,verbose=True,opt="read"):
         if verbose: print " "*12, "eListName:" , eListName
   else:
     for sample in sampleList:
+        if not sample in samples.keys(): 
+          print "Sample %s not in samples.keys()"%sample
+          continue
         samples[sample]['tree'].SetEventList(0)
     print "no cut... EventList set to 0" 
     #print "no cut... no EventList was set to samples" 
@@ -696,7 +724,7 @@ def getPlotFromYields(name, yields, keys=[]):
     return hist  
     
 
-def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin = 0.01, logs = [0,1], save=""):
+def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin = 0.01, logs = [0,1], save="", normalize = False):
 
     yld = yieldInst
 
@@ -709,7 +737,7 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
         keys = yld.cutNames
     bkgList =  [x for x in sampleList if x in yld.bkgList]
     sigList =  [x for x in sampleList if x in yld.sigList]
-    dataList = [x for x in sampleList if x in [] ] 
+    dataList = [x for x in sampleList if x in yld.dataList ] 
     yldplt = {}
     draw = True
     if draw:
@@ -720,7 +748,7 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
         dOpt = "hist"
         canvs[cMain].SetGrid(1,0)
     for sample in sampleList:
-        yldplt[sample] = getPlotFromYields(sample, yld.yieldDictFull[sample], keys=keys)
+        yldplt[sample] = getPlotFromYields(sample+"_"+name, yld.yieldDictFull[sample], keys=keys)
         if sample in bkgList:
             yldplt[sample].SetFillColor(  sample_colors.get(sample,1)  )
             
@@ -736,15 +764,30 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
     bkg_tot.SetFillStyle(3001)
     bkg_tot.SetFillColor(1)
     bkg_tot.SetMarkerSize(0)
+
+
+    drawError = True
+    if normalize:
+        drawError = False
+        for bkg in bkgList:
+            #yldplt[bkg] = yldplt[bkg].Clone() 
+            yldplt[bkg].Divide(bkg_tot)
+            #plotMin = 0.001 
+            #logs = [ 0 , 1 ] 
+
     
     if draw:
         stacks.Draw("hist")
         stacks.SetMinimum(plotMin)
-        bkg_tot.Draw("same E2")
+        if drawError:
+            bkg_tot.Draw("same E2")
         
     for sig in sigList:
         yldplt[sig].Draw("same")
     stacks.Draw("same AXIG")
+
+    if dataList and not normalize:
+        yldplt[dataList[0]].Draw("same")
 
     canvs[cMain].SetLogx(logs[0])
     canvs[cMain].SetLogy(logs[1])
@@ -759,18 +802,42 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
         ratio_ref.Reset()
         #if True: ## draw data/MC
         if dataList: ## draw data/MC
+            print 'data is here!'
             ratio_ref.Draw("hist")
             ratio_ref.GetYaxis().SetTitle("DATA/MC")
             ratio_ref.SetMaximum(1.8)    
-            ratio_ref.SetMinimum(0)    
+            ratio_ref.SetMinimum(0)
+   
             MCE = bkg_tot.Clone("MCError_%s"%name)
             bkg_tot_noe =  bkg_tot.Clone("bkg_tot_noe_%s"%name)
             bkg_tot_noe.SetError(ar.array( "d",[0]* bkg_tot_noe.GetNbinsX() ) )
-            #MCE.Divide( bkg_tot_noe  )
+            MCE.Divide( bkg_tot_noe  )
             MCE.SetFillStyle(3001)
             MCE.SetFillColor(1)
             MCE.SetMarkerSize(0)
-            #MCE.Draw("e2same")
+            MCE.Draw("e2same")
+
+            data_ratio = yldplt[dataList[0]].Clone()
+            data_ratio.Divide(bkg_tot_noe)
+            data_ratio.Draw("e0same")
+
+
+
+            #    bkg_tot = hists['bkg'][plot].Clone("bkg_tot")
+            #    bkg_tot.SetError(ar.array( "d",[0]*nBins ) )    # bkg_tot with no error
+            #    data_ratio = hists[dataList[0]][plot].Clone("data")
+            #    #data_ratio.Divide(bkg_tot)
+            #    #data_ratio.Draw("e")
+
+            #    MCE = hists['bkg'][plot].Clone("MCError_%s"%( hists['bkg'][plot].GetName() )  ) ## bkg_tot with error
+            #    MCE.Divide( bkg_tot)
+            #    MCE.SetFillStyle(3001)
+            #    MCE.SetFillColor(1)
+            #    MCE.SetMarkerSize(0)
+            #    MCE.Draw("e2same")
+            #    ret['junk'].append(MCE)
+
+
 
             pass
         elif sigList: ## draw Sig/BKG fom
@@ -785,15 +852,18 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
                 yldplt[fomplt] = getFOMFromTH1FIntegral( yldplt[sig], bkg_tot , fom =fomtype, integral=False )
                 yldplt[fomplt].Draw("same")
 
-        ratio_ref.GetXaxis().SetLabelSize(0.1)
-        ratio_ref.GetYaxis().SetLabelSize(0.1)
+        ratio_ref.SetNdivisions(505, "y")
+        ratio_ref.GetXaxis().SetLabelSize(0.12)
+        ratio_ref.GetYaxis().SetLabelSize(0.12)
         ratio_ref.GetYaxis().SetTitleOffset(0.75)
         canvs[cMain+1].Update()
+    else:
+        ratio_ref = None
 
     if save:
         saveCanvas(canvs[cSave], dir = save, name = name ) 
         canvs[cSave]
-
+    gc.collect()
     return canvs, yldplt, stacks, bkg_tot, ratio_ref 
 
 
@@ -818,7 +888,7 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
 
 
 
-def drawPlots(samples,plots,cut,sampleList=['s','w'],plotList=[],plotMin=False, plotLimits=[],logy=0,save=True,
+def drawPlots(samples,plots,cut,sampleList=['s','w'],plotList=[],plotMin=False, plotLimits=[],save=True,
                                             fom=True , normalize=False, 
                                             pairList=None,  fomTitles=False, 
                                             denoms=None,noms=None, ratioNorm=False, fomLimits=[],
@@ -909,7 +979,11 @@ def drawPlots(samples,plots,cut,sampleList=['s','w'],plotList=[],plotMin=False, 
         if plotMin: refStack.SetMinimum( plotMin )
         if plotLimits: 
             refStack.SetMinimum( plotLimits[0] )
-        refStack.SetMaximum( refStack.GetMaximum() * 30 )
+        if logy: 
+            refStack.SetMaximum( refStack.GetMaximum() * 20 )
+        else:
+            refStack.SetMaximum( refStack.GetMaximum() * 1.5 )
+                
 
         if leg:    #MAKE A LEGEND FUNCTION
             sigLegList = [samp for samp in sampleList if samp in samples.massScanList() + samples.privSigList()]
@@ -1339,8 +1413,8 @@ def draw2DPlots(samples,plots,cut,sampleList=['s','w'],plotList=[],min=False,log
                 #if plots[p]['decor'].has_key("title") : hists[samp][p].SetTitle(plots[p]['decor']['title'] ) 
             if leg:
                 leg = ROOT.TLegend(0.6,0.7,0.9,0.9)
-                leg.SetFillColorAlpha(0,0.001)
-                leg.SetBorderSize(0)
+                leg.SetFillColorAlpha(0,0.01)
+                leg.SetBorderSize(1)
                 ret.update({'leg':leg})
                 for bkg in bkgList:
                     leg.AddEntry(hists[bkg][p], samples[bkg].name , "f")    
@@ -1955,7 +2029,7 @@ class Yields():
         y=Yields(samples,['tt', 'w','s'],cuts.presel,tableName='{cut}_test',pklOpt=1);
     '''
     def __init__(   self,   samples,    sampleList, cutInst,    cutOpt='flow',  tableName='{cut}',  weight="(weight)",
-                    pklOpt=False,   pklDir="./pkl/",    nDigits=2, err=True, nProc = None,
+                    pklOpt=False,   pklDir="./pkl/",    nDigits=2, err=True, nProc = None, lumi = 'target_lumi',
                     isMVASample = None, 
                     verbose=False, nSpaces=None):
         if not (isinstance(cutInst,CutClass) or hasattr(cutInst,cutOpt)):
@@ -1965,7 +2039,7 @@ class Yields():
         self.cutInst        = cutInst
         self.weight         = weight
         self.tableName    = tableName.format(cut=self.cutInst.fullName)
-        self.sampleList     = [s for s in sampleList]
+        self.sampleList     = [s for s in sampleList if s in samples.keys()]
         self.sampleList.sort(key = lambda x: samples[x]['isSignal'])
         self.npsize="|S20"
         self.err = err
@@ -1973,8 +2047,8 @@ class Yields():
         self.isMVASample = isMVASample
 
 
-        self.lumi_string    =  "target_lumi"
-        self.lumi           =  samples.get_lumis( self.lumi_string ) 
+        self.lumi_string    =  lumi 
+        #self.lumi           =  samples.get_lumis( self.lumi_string ) 
         
         self.fomNames={}
 
@@ -2032,7 +2106,8 @@ class Yields():
             #                        [self.LatexTitles[sample] for sample in self.sigList] +  \
             #                        [self.LatexTitles[sample] for sample in getattr(self,"fomList",[]) ]
             self.sampleLegend   =   [self.LatexTitles[sample] for sample in self.bkgList] +\
-                                    ["Total"]
+                                    ["Total"] +\
+                                    [self.LatexTitles[d] for d in self.dataList ] 
             if self.fomNames:
                 for sample in self.sigList:
                     self.sampleLegend.extend( [self.LatexTitles[sample], self.LatexTitles["FOM_%s"%sample] ] ) 
@@ -2456,12 +2531,18 @@ def make_dict_manipulator( func ):
     dm = dict_manipulator( [sr1a,sr1b,sr1a], func = make_dict_manipulator( lambda *a: sum(a) ) )
     same as above, but can have arbitrary number of bins
 
+    bkg_tot =  yield_adder_func( *[ yld.getNiceYieldDict()[b] for b in ['WJets', 'QCD', 'DYJetsM50', 'TTJets', 'ZJetsInv'] ] )
+
+
     """
     def func_wrapper(*ds):
         return dict_manipulator( list(ds) , func)
     return func_wrapper
 
+
 yield_adder_func = make_dict_manipulator( lambda *bins: sum(bins)) 
+yield_adder_func2 = make_dict_manipulator( lambda *bins:  sum(bins).round(2) )
+
 
 def sig_yield_adder( bins = [ ] ):
     return dict_manipulator( bins, func = yield_adder_func )
@@ -2497,16 +2578,74 @@ def fixForLatex(x):
 
 
 
+from collections import OrderedDict
+fixDict = OrderedDict()
+
+#print fixDict
+
+#fixDict["MET200_ISR100_HT300"]  =  "$E_{T}^{miss}$ $>$ $200GeV$ , $H_{T}$ $>$ $300GeV$, $P_{T}$(Leading$ $Jet) $>$ $100GeV$ " 
+#fixDict["MET200_ISR110_HT300"]  =  "$E_{T}^{miss}$ $>$ $200GeV$ , $H_{T}$ $>$ $300GeV$, $P_{T}$(Leading$ $Jet) $>$ $110GeV$ "  
+fixDict["MET200-ISR100-HT300"]  =  "$C_{T}$ $>$ $200GeV$ ,$P_{T}(IsrJet)$ $>$ $100GeV$ " 
+fixDict["MET200-ISR110-HT300"]  =  "$C_{T}$ $>$ $200GeV$ ,$P_{T}(IsrJet)$ $>$ $110GeV$ "  
+fixDict["MET200"]  =  "$E_{T}^{miss}$ $>$ $200GeV$" 
+fixDict["HT300"]  =  "$H_{T}$ $>$ $300GeV$"  
+fixDict["CT300"]  =  "$C_{T}$ $>$ $300GeV$"  
+fixDict["ISR110"]  =  " $P_{T}(IsrJet)$  $>$ $110GeV$"  
+fixDict["ISR100"]  =  " $P_{T}(IsrJet)$  $>$ $100GeV$"  
+fixDict["ISR325"]  =  " $P_{T}(IsrJet)$  $>$ $325GeV$"  
+fixDict["Met300"]  =  "$E_{T}^{miss}$ $>$ $300$"  
+fixDict["No3rdJet60"]  =  "$Hard$ $3rd$ $Jet$ $Veto$"  
+fixDict["1Lep-2ndLep20Veto"]  =  "$Single$ $Lep$" 
+fixDict["negLep"]  =  "$Charge(l)$ $>$ $0$"  
+fixDict["BVeto"]  =  "$BJet$ $Veto$"  
+fixDict["TauVeto"]  =  "$Tau$ $Veto$"  
+fixDict["SoftBJet"]  =  "$Soft$ $BJet$"  
+fixDict["LepPt30" ]  =  "$ P_{T}(l)$ $<$ $30GeV$"  
+fixDict["LepPt_lt_30" ]  =  "$ P_{T}(l)$ $<$ $30GeV$"  
+fixDict["LepPt-lt-30" ]  =  "$ P_{T}(l)$ $<$ $30GeV$"  
+fixDict["LepEta1.5"]  =  "$ |\eta(l)|  $ $<$ $1.5$"  
+
+fixDict["Other"]  =  "Other" 
+fixDict["T2-4bd-"]  =  "Signal" 
+fixDict["T2_4bd_"]  =  "Signal" 
+fixDict["DYJetsM50"]  =  "DYJets" 
+fixDict["WJets"]  =  "WJets" 
+fixDict["ZJetsInv"]  =  "ZJetsInv" 
+fixDict["TTJets"]  =  "TTJets" 
+fixDict["Total"]  =  "Total S.M."
+fixDict["DataBlind"]  =  "Data"
+#fixDict["Total"]  =  "Total S.M."
+
+
+def fixRowCol(x):
+    ret = x[:]
+    fixed = False
+    #print "-----------------------------------------", x,ret , x==ret, fixed
+    for this,that in fixDict.iteritems():
+        if this in ret:
+            ret = ret.replace(this,that)
+            fixed = True
+            break 
+    #if not fixed:
+    #    if not "$" in ret:
+    #        ret = "$%s$"%ret
+
+    return ret
 
 import os
 
 
-#templateDir = "/afs/hephy.at/user/n/nrad/CMSSW/fork/CMSSW_7_4_12_patch4/src/Workspace/DegenerateStopAnalysis/python/navidTools/LaTexJinjaTemplates/"
-templateDir = cmsbase + "/src/Workspace/DegenerateStopAnalysis/python/navidTools/LaTexJinjaTemplates/"
+#templateDir = "/afs/hephy.at/user/n/nrad/CMSSW/fork/CMSSW_7_4_12_patch4/src/Workspace/DegenerateStopAnalysis/python/tools/LaTexJinjaTemplates/"
+templateDir = cmsbase + "/src/Workspace/DegenerateStopAnalysis/python/tools/LaTexJinjaTemplates/"
 
 class JinjaTexTable():
     def __init__(self,yieldInstance, yieldOpt=None, texDir="./tex/", pdfDir=pdfDir, outputName="",\
-                 searchpath=templateDir, template_file= "", removeJunk=True, tableNum=1, caption="", title="", transpose=False):
+                 searchpath=templateDir, template_file= "", removeJunk=True, tableNum=1, caption="", title="", transpose=False, noFOM =False, 
+                 combineBkgs = [] , seperators=[] ):
+        """
+            combineBkgs = [ ["DYJetsM50", "ZJetsInv", "QCD"] , "Other" ] 
+
+        """ 
         if not template_file:
             template_file = "LaTexTemplateWithFOM_v2.j2.tex"
         self.tableNum       = tableNum
@@ -2549,6 +2688,7 @@ class JinjaTexTable():
                       loader=templateLoader )
         self.templateEnv.filters['fixForLatex']=fixForLatex
         self.templateEnv.filters['fix']= fix
+        self.templateEnv.filters['fixRowCol']= fixRowCol
 
 
 
@@ -2567,6 +2707,8 @@ class JinjaTexTable():
                            # "transpose" :False, 
                            # "TAB"       :self.tableNum, 
                            #  "CAPTION"  :self.caption,
+        sampleLegend = ylds.sampleLegend[:]
+        cutNames     = ylds.cutNames[:]
 
         if not yieldOpt:
             yieldDict = ylds.getNiceYieldDict()
@@ -2575,22 +2717,41 @@ class JinjaTexTable():
         else:
             yieldDict = getattr(ylds, yieldOpt)
 
+
+        if noFOM:
+            yieldDict = { k:v for k,v in yieldDict.iteritems() if "FOM" not in k}
+            sampleLegend = [samp for samp in sampleLegend if "FOM" not in samp]
+        
+        #combine_bkgs = [ ] 
+        if combineBkgs:
+            bkgs_to_combine = combineBkgs[0]
+            combined_bkgs_name = combineBkgs[1]
+            combined_yields = yield_adder_func2( *[ yieldDict[bkg] for bkg in combineBkgs[0] ] )
+            yieldDict[ combined_bkgs_name ] = combined_yields
+            sampleLegend.insert( sampleLegend.index("Total"), combined_bkgs_name)
+            for bkg in bkgs_to_combine:
+                print "```", bkg
+                yieldDict.pop(bkg)
+                sampleLegend.remove(bkg)
+        sampleLegend = sortBy( sampleLegend , [ "TTJets","WJets" ]  , reverse=True)
+
         if transpose:
             self.info.update( {
                              "yieldDict"      :     yieldDict,  
-                             "rowList"        :     ylds.sampleLegend,
-                             "colList"        :     ylds.cutNames ,
+                             "rowList"        :     sampleLegend,
+                             "colList"        :     cutNames ,
                              "title"          :     self.title,
                              "caption"        :     self.caption,
                                 })
         else:
             self.info.update( {
                              "yieldDict"      :     ylds.getByBins( yieldDict ) ,
-                             "rowList"        :     ylds.cutNames ,
-                             "colList"        :     ylds.sampleLegend,
+                             "rowList"        :     cutNames ,
+                             "colList"        :     sampleLegend,
                              "title"          :     self.title,
                              "caption"        :     self.caption,
                             })
+        self.info.update( {"seperators":seperators} )
 
         self.makeTable(self.yields,self.outputName, self.info) 
 

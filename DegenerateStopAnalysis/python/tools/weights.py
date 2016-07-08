@@ -1,4 +1,4 @@
-from Workspace.DegenerateStopAnalysis.navidTools.NavidTools import Weight
+from Workspace.DegenerateStopAnalysis.tools.degTools import Weight
 
 
 
@@ -47,16 +47,16 @@ weightDict={
                     #"top_pt": ttptweight
                    },
               "s10FS":{
-                    "gen_filter_eff": 0.2546 ,
+                    "gen_filter_eff": "0.2546" ,
                     },
               "s30FS":{
-                    "gen_filter_eff": 0.2647 , 
+                    "gen_filter_eff": "0.2647" , 
                     },
               "s60FS":{
-                    "gen_filter_eff": 0.3520 ,
+                    "gen_filter_eff": "0.3520" ,
                     },
               "t2tt30FS":{
-                    "gen_filter_eff": 0.2783 ,
+                    "gen_filter_eff": "0.2783" ,
                     },
              "sigScan": {
                     "baseWeight": "weight",
@@ -94,12 +94,12 @@ weightDict={
 def_weights = {
 
             "baseWeight":"weight",
-            "lumis":{      
-                            "target_lumi"      :    2300, 
-                            "mc_lumi"          :    10000, 
-                            "DataBlind_lumi"   :    2245.386 ,
-                            "DataUnblind_lumi" :    139.63,
-                    },
+            #"lumis":{      
+            #                "target_lumi"      :    2300, 
+            #                "mc_lumi"          :    10000, 
+            #                "DataBlind_lumi"   :    2245.386 ,
+            #                "DataUnblind_lumi" :    139.63,
+            #        },
 
             "cuts":{
                         "SR1":"",
