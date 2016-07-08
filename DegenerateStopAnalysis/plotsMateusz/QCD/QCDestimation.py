@@ -11,13 +11,11 @@ import argparse
 import Workspace.DegenerateStopAnalysis.toolsMateusz.ROOToptions
 from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
-from Workspace.DegenerateStopAnalysis.toolsMateusz.degTools import *
+from Workspace.DegenerateStopAnalysis.navidTools.NavidTools import Plots, getPlots, drawPlots, Yields, setup_style
 from Workspace.DegenerateStopAnalysis.toolsMateusz.cutsEle import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.cmgTuplesPostProcessed_mAODv2_analysisHephy13TeV import cmgTuplesPostProcessed
 from Workspace.DegenerateStopAnalysis.toolsMateusz.getSamples_mAODv2_analysisHephy13TeV import getSamples
-#from Workspace.DegenerateStopAnalysis.navidTools.NavidTools import *
 #from Workspace.DegenerateStopAnalysis.toolsMateusz.cmgTuplesPostProcessed_mAODv2 import cmgTuplesPostProcessed
-#from Workspace.DegenerateStopAnalysis.toolsMateusz.getSamples_analysisHephy_13TeV import getSamples
 #from Workspace.DegenerateStopAnalysis.toolsMateusz.getSamples_PP_mAODv2_7412pass2_scan import getSamples
 
 from array import array
@@ -25,8 +23,6 @@ from math import pi, sqrt #cos, sin, sinh, log
 
 #Sets TDR style
 setup_style()
-#ROOT.setTDRStyle(1)
-#ROOT.gStyle.SetOptStat(0) #1111 #0 removes histogram statistics box #Name, Entries, Mean, RMS, Underflow, Overflow, Integral, Skewness, Kurtosis
 
 #Input options
 parser = argparse.ArgumentParser(description = "Input options")
@@ -40,7 +36,7 @@ parser.add_argument("--highWeightVeto", dest = "highWeightVeto",  help = "Remove
 parser.add_argument("--enriched", dest = "enriched",  help = "EM enriched QCD?", type = bool, default = False)
 parser.add_argument("--estimation", dest = "estimation",  help = "Toggle estimation", type = int, default = 1)
 parser.add_argument("--plot", dest = "plot",  help = "Toggle plot", type = int, default = 0)
-parser.add_argument("--getData", dest = "getData",  help = "Get data samples", type = int, default = 0)
+parser.add_argument("--getData", dest = "getData",  help = "Get data samples", type = int, default = 1)
 parser.add_argument("--logy", dest = "logy",  help = "Toggle logy", type = int, default = 0)
 parser.add_argument("--save", dest = "save",  help = "Toggle save", type = int, default = 1)
 parser.add_argument("-b", dest = "batch",  help = "Batch mode", action = "store_true", default = False)
@@ -483,13 +479,13 @@ if plot:
          "weight_" + sel:{'var':"weight", "bins":[20,0,400], "decor":{"title": "Weight Plot","x":"Event Weight" , "y":"Events", 'log':[0,1,0]}}
       }
    
-      plotsList[sel] = ["elePt_" + sel, "absIso_" + sel, "relIso_" + sel,"hybIso_" + sel, "hybIso2_" + sel, "absDxy_" + sel, "delPhi_" + sel, "eleMt_" + sel, "MET_" + sel, "HT_" + sel, "sigmaEtaEta_" + sel, "hOverE_" + sel, "weight_" + sel]
-      #plotsList[sel] = ["hybIso2_" + sel, "absDxy_" + sel, "delPhi_" + sel, "sigmaEtaEta_" + sel, "weight_" + sel]
+      #plotsList[sel] = ["elePt_" + sel, "absIso_" + sel, "relIso_" + sel,"hybIso_" + sel, "hybIso2_" + sel, "absDxy_" + sel, "delPhi_" + sel, "eleMt_" + sel, "MET_" + sel, "HT_" + sel, "sigmaEtaEta_" + sel, "hOverE_" + sel, "weight_" + sel]
+      plotsList[sel] = ["hybIso2_" + sel, "absDxy_" + sel, "delPhi_" + sel, "sigmaEtaEta_" + sel, "weight_" + sel]
       #plotsList[sel] = ["hybIso2_" + sel, "absDxy_" + sel, "delPhi_" + sel]
       plotsDict[sel] = Plots(**plotDict[sel])
-      plots[sel] = getPlots2(samples, plotsDict[sel], QCD['SR1'][sel], plotSamples, plotList = plotsList[sel], addOverFlowBin='upper')
-      if getData: plots2[sel] = drawPlots2(plots[sel], denoms=["bkg"], noms = ["dblind"], fom="RATIO", fomLimits=[0,2.8], plotMin = 0.1, normalize = False, save=False)
-      else: plots2[sel] = drawPlots2(plots[sel], fom=False, plotMin = 0.1, normalize = False, save=False)
+      plots[sel] = getPlots(samples, plotsDict[sel], QCD['SR1'][sel], plotSamples, plotList = plotsList[sel], addOverFlowBin='upper')
+      if getData: plots2[sel] = drawPlots(samples, plotsDict[sel], QCD['SR1'][sel], plotSamples, plotList = plotsList[sel], denoms=["bkg"], noms = ["dblind"], fom="RATIO", fomLimits=[0,2.8], plotMin = 0.1, normalize = False, save=False)
+      #else: plots2[sel] = drawPlots(samples, plotsDict[sel], QCD['SR1'][sel], plotSamples, plotList = plotsList, plotMin = 0.1, normalize = False, save=False)
    
       #Save canvas
       if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID

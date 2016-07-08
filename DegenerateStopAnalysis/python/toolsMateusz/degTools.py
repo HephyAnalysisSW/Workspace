@@ -12,8 +12,8 @@ import array as ar
 import pprint as pp
 
 from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYieldFromChain, getChunks
-from Workspace.DegenerateStopAnalysis.navidTools.getRatioPlot import *
-from Workspace.DegenerateStopAnalysis.navidTools.FOM import *
+from Workspace.DegenerateStopAnalysis.tools.getRatioPlot import *
+from Workspace.DegenerateStopAnalysis.tools.FOM import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
 
 cmsbase = os.getenv("CMSSW_BASE")
@@ -31,12 +31,12 @@ any_in = lambda a, b: any(i in b for i in a)
 def setup_style(cmsbase=cmsbase):
     print "CMSBASE", cmsbase
     ROOT.gROOT.LoadMacro(cmsbase+"/src/Workspace/HEPHYPythonTools/scripts/root/tdrstyle.C")
-    ROOT.setTDRStyle(1)
+    ROOT.setTDRStyle()
     ROOT.gStyle.SetErrorX(0.5)
     maxN = -1
     ROOT.gStyle.SetOptStat(0)
     ROOT.gStyle.SetPalette(1)
-    return cmsbase
+    return
 
 def mkdir_p(path):
     try:
@@ -150,6 +150,7 @@ class ArgParser(argparse.ArgumentParser):
 ##########################################  Chains and Plots  ###############################################
 ##########################################                    ###############################################
 #############################################################################################################
+
 def getPlot(sample,plot,cut,weight="(weight)", nMinus1="",cutStr="",addOverFlowBin=''):
     c     = sample.tree
     var = plot.var
@@ -171,6 +172,7 @@ def getPlot(sample,plot,cut,weight="(weight)", nMinus1="",cutStr="",addOverFlowB
         print "-----"*20
         print "Applying Triggers: %s"%sample['triggers']
         print "Applying Filters: %s"%sample['filters']
+
         print "-----"*20
         print "-----"*20
 
@@ -179,114 +181,48 @@ def getPlot(sample,plot,cut,weight="(weight)", nMinus1="",cutStr="",addOverFlowB
     else:
         print "No Weight is being applied"
         w = "(1)"
-    binningIsExplicit= False
-    if not len(plot.bins) in [3,6]:
-        if hasattr(plot, "binningIsExplicit"):
-            binningIsExplicit = plot.binningIsExplicit
-    hist = getPlotFromChain(sample.tree,plot.var,plot.bins,cutString,weight=w, addOverFlowBin=addOverFlowBin, binningIsExplicit=binningIsExplicit)
+    hist = getPlotFromChain(sample.tree,plot.var,plot.bins,cutString,weight=w, addOverFlowBin=addOverFlowBin)
     #plot.decorHistFunc(p)
     decorHist(sample,cut,hist,plot.decor)
-    plotName=plot.name + "_"+ cut.fullName
+    plotName=plot.name + "_"+ cut.name
     sample.plots[plotName]=hist
     if not sample.has_key("cuts"):
         sample.cuts=Dict()
-    if not sample.cuts.has_key(cut.fullName):
-        sample.cuts[cut.fullName]=Dict()
-    sample.cuts[cut.fullName][plot.name]=hist
+    if not sample.cuts.has_key(cut.name):
+        sample.cuts[cut.name]=Dict()
+    sample.cuts[cut.name][plot.name]=hist
 
-
-#def getPlots(samples,plotsDict,cut,sampleList=[],plotList=[],weight="(weight)",nMinus1="", addOverFlowBin='',verbose=True):
-#    if verbose:print "Getting Plots: "
-#
-#    sigList, bkgList, dataList = getSigBkgDataLists(samples, sampleList=sampleList)
-#    isDataPlot = bool(len(dataList))
-#    if isDataPlot:
-# 
-#        if "Blind" in samples[dataList[0]].name and "sr" in cut.name:
-#            raise Exception("NO DATA IN SIGNAL REGION: %s"%[dataList, cut.name])
-#        weight = samples[dataList[0]].name+"_weight"
-#
-#    if len(dataList) > 1:
-#        raise Exception("More than one Data Set in the sampleList... This could be dangerous: %s"%dataList)
-#
-#    for sample in samples.iterkeys():
-#        #if sample in sampleList or not sampleList:
-#        if not sample in sampleList:
-#            continue
-#        if verbose: print "  Sample:" , samples[sample].name, 
-#        weight_str = decide_weight(samples[sample], weight)
-#        if verbose: print "  Using Weight: %s"%(weight_str)
-#        plotList = plotList if plotList else plotsDict.keys()
-#        for plot in plotList:
-#            if plot not in plotsDict.keys():
-#                print "Ignoring %s .... not in the Plot Dictionary"%plot
-#                continue    
-#            
-#            cutStr = plotsDict[plot]['cut']  if plotsDict[plot].has_key("cut") and plotsDict[plot]['cut'] else ''
-#            if cutStr: print "Applying cut:", cutStr
-#            
-#            if verbose: print " "*15, plot
-#            if nMinus1:
-#                nMinus1String = nMinus1
-#                #nMinus1String = plotsDict[plot]["nMinus1"] if plotsDict[plot].has_key("nMinus1") else nMinus1
-#            else: nMinus1String=""
-#            getPlot(samples[sample],plotsDict[plot],cut,weight=weight_str,nMinus1=nMinus1String,cutStr=cutStr,addOverFlowBin=addOverFlowBin)
-#    
-#    ret = {'samples':samples, 'plotsDict':plotsDict, 'cut':cut, 'sampleList':sampleList, 'plotList':plotList} 
-#
-#    return ret
-
-def getPlots2(samples,plotsDict,cut,sampleList=[],plotList=[],weight="(weight)",nMinus1="", addOverFlowBin='',verbose=True):
+def getPlots(samples,plotsDict,cut,sampleList=[],plotList=[],weight="(weight)",nMinus1="", addOverFlowBin='',verbose=True):
     if verbose:print "Getting Plots: "
 
     sigList, bkgList, dataList = getSigBkgDataLists(samples, sampleList=sampleList)
     isDataPlot = bool(len(dataList))
     if isDataPlot:
-
-        if "Blind" in samples[dataList[0]].name and "sr" in cut.fullName:
-            raise Exception("NO DATA IN SIGNAL REGION: %s"%[dataList, cut.fullName])
-        #weight = samples[dataList[0]].name+"_weight"
-        lumi_weight = samples[dataList[0]].name+"_lumi"
-    else:
-        lumi_weight = "target_lumi"
+ 
+        if "Blind" in samples[dataList[0]].name and "sr" in cut.name:
+            raise Exception("NO DATA IN SIGNAL REGION: %s"%[dataList, cut.name])
+        weight = samples[dataList[0]].name+"_weight"
 
     if len(dataList) > 1:
         raise Exception("More than one Data Set in the sampleList... This could be dangerous: %s"%dataList)
 
-    if verbose: print " "*15, "Getting Plots: ", plotList
     for sample in samples.iterkeys():
         #if sample in sampleList or not sampleList:
         if not sample in sampleList:
             continue
-        if verbose: print "========= Sample:" , samples[sample].name,
-        #weight_str = decide_weight(samples[sample], weight)
-        weight_str = decide_weight2(samples[sample] , cut=cut.fullName, lumi=lumi_weight)
-        if verbose:
-            print "  Using Weight: %s"%(weight_str)
-            print "    lumi: ", lumi_weight
-            if samples[sample].isData:
-                print "-----"*10 , samples[sample].name
-                print "-----"*20
-                print "Applying Triggers: %s"%samples[sample]['triggers']
-                print "Applying Filters: %s"%samples[sample]['filters']
-                print "-----"*20
-                print "-----"*20
-
-
+        if verbose: print "  Sample:" , samples[sample].name, 
+        weight_str = decide_weight(samples[sample], weight)
+        if verbose: print "  Using Weight: %s"%(weight_str)
         plotList = plotList if plotList else plotsDict.keys()
         for plot in plotList:
             if plot not in plotsDict.keys():
                 print "Ignoring %s .... not in the Plot Dictionary"%plot
-                continue
-
+                continue    
+            
             cutStr = plotsDict[plot]['cut']  if plotsDict[plot].has_key("cut") and plotsDict[plot]['cut'] else ''
-            if hasattr(samples[sample], 'cut'):
-                cutStr = "({pltCut} {sampleCut})".format(pltCut="%s"%(cutStr +"&&" if cutStr else "") , sampleCut = samples[sample].cut )          ## For cuts specific to a sample
-            if cutStr: print "        ---applying cutString:", cutStr
-
-
-            print "cut_str" , cutStr, hasattr(sample,'cut')
-            #if verbose: print " "*15, plot
+            if cutStr: print "Applying cut:", cutStr
+            
+            if verbose: print " "*15, plot
             if nMinus1:
                 nMinus1String = nMinus1
                 #nMinus1String = plotsDict[plot]["nMinus1"] if plotsDict[plot].has_key("nMinus1") else nMinus1
@@ -296,79 +232,6 @@ def getPlots2(samples,plotsDict,cut,sampleList=[],plotList=[],weight="(weight)",
     ret = {'samples':samples, 'plotsDict':plotsDict, 'cut':cut, 'sampleList':sampleList, 'plotList':plotList} 
 
     return ret
-
-#Weight class
-
-def joinWeightList(weightStringList):
-    return "(" + " * ".join([ "("+c +")" for c in weightStringList])    +")"
-
-def makeDefaultDict(d, default_dict):
-        for key in default_dict:
-            d.setdefault(key,deepcopy(default_dict[key]))
-            if type( default_dict[key] ) == type({}):
-                if not type(d[key]) == type({}):
-                    raise Exception("There is inconsistancy between input dict and the default dict for key %s, dict:%s \n def_dict:%s \n"%(key,d, default_dict))
-                else:
-                    makeDefaultDict(d[key], default_dict[key])
-            else:
-                pass
-
-
-class Weight(object):
-    """
-
-    """
-    def __init__(self, weight_dict={}, def_weights={}):
-        self.weight_dict = deepcopy(weight_dict)
-        makeDefaultDict(self.weight_dict, def_weights)
-
-    def getWeightList(self, weight_dict, cut="default", lumi="target_lumi"):
-        weight_list=[]
-        for weight_key in weight_dict:
-            if weight_key == "cuts":
-                if weight_dict['cuts'].has_key(cut):
-                    new_weight =  weight_dict['cuts'][cut]
-                else:
-                    new_weight =  weight_dict['cuts']["default"]
-            elif weight_key == "lumis":
-                new_weight =  "%s/%s"%(weight_dict['lumis'][lumi], weight_dict['lumis']["mc_lumi"])
-            else:
-                new_weight =  weight_dict[weight_key]
-            if new_weight:
-                weight_list.append(new_weight)
-        return weight_list
-
-    def combine(self, weight_dict=None, cut="default", lumi="target_lumi"):
-        weights = self.weight_dict
-        #if not weight_dict:
-        #    weight_dict = self.weight_dict
-        if weight_dict:
-            weights.update(weight_dict)
-        self.weight_list = self.getWeightList(weights, cut, lumi)
-        return joinWeightList(self.weight_list)
-
-
-def decide_weight2(sample, weight=None, cut="default" , lumi="target_lumi"):
-    if sample.isData:
-        weight_str = "(1)"
-        return weight_str
-    if not weight:
-        weight = sample.weights
-    if hasattr(weight,"combine"):
-        weight_str = weight.combine(cut=cut, lumi=lumi)
-    #if isinstance(weight,Weight):
-    #    weight_str = weight.combine(cut=cut, lumi=lumi)
-    else:
-        if "weight" in weight.lower():
-            if sample.has_key("weight"):
-                weight_str = sample['weight']
-            if weight.endswith("_weight"):
-                if sample.has_key(weight):
-                    weight_str = sample[weight]
-                    #print sample, weight_str, samples[sample]
-        else:
-            weight_str=weight
-    return weight_str
 
 def getStackFromHists(histList,sName=None,scale=None, normalize=False, transparency=False):
   if sName:
@@ -386,8 +249,7 @@ def getStackFromHists(histList,sName=None,scale=None, normalize=False, transpare
   for i, hist in enumerate(histList):
     #h = hist.Clone()
     h = hist
-
-    #  h.ClearUnderflowAndOverflow()  remove for efficiecy plots
+    h.ClearUnderflowAndOverflow()
     if scale:
       print "    Scaling: ", sName if sName else [ hist.GetName(), hist.GetTitle() ]
       h.Scale(scale)
@@ -401,31 +263,22 @@ def getStackFromHists(histList,sName=None,scale=None, normalize=False, transpare
     stk.Add(h)
   return stk
 
-def getSamplePlots(samples,plots,cut,sampleList=[],plotList=[],plots_first = False):
-    cut_name = cut if type(cut) == type("") else cut.fullName
+def getSamplePlots(samples,plots,cut,sampleList=[],plotList=[]):
     if not sampleList: sampleList= samples.keys()
     bkgList=[samp for samp in sampleList if not samples[samp]['isSignal'] and not samples[samp]['isData'] ]
     dataList = [samp for samp in sampleList if samples[samp]['isData'] ]
     sigList=[samp for samp in sampleList if samples[samp]['isSignal'] ]
     if not plotList: plotList=plots.keys()
     hists={}
-
-    if plots_first:
+    for samp in sampleList:
+        hists[samp]={}
         for p in plotList:
-            hists[p]={}
-            for samp in sampleList:
-                hists[p][samp]= samples[samp]['cuts'][cut_name][p]
-    else:
-        for samp in sampleList:
-            hists[samp]={}
-            for p in plotList:
-                hists[samp][p]= samples[samp]['cuts'][cut_name][p]
+            v = p
+            hists[samp][v]= samples[samp]['cuts'][cut.name][v]
     return hists
-
+        
 def getBkgSigStacks(samples, plots, cut, sampleList=[],plotList=[], normalize=False, transparency=None):
     """Get stacks for signal and backgrounds. make vars in varlist are available in samples. no stacks for 2d histograms.     """
-    cut_name = cut if type(cut) == type("") else cut.fullName
-
     sampleList    = matchListToDictKeys(sampleList,samples)
     plotList     = matchListToDictKeys(plotList,plots)
     #sampleList=samples.keys()
@@ -436,195 +289,50 @@ def getBkgSigStacks(samples, plots, cut, sampleList=[],plotList=[], normalize=Fa
     dataStackDict={}
     for v in plotList:
         if len(plots[v]['bins'])!=6:
-            bkgStackDict[v]= getStackFromHists([ samples[samp]['cuts'][cut_name][v] for samp in sampleList if not samples[samp]['isSignal'] and not samples[samp]['isData']], normalize=normalize, transparency=transparency)
-            sigStackDict[v]= getStackFromHists([ samples[samp]['cuts'][cut_name][v] for samp in sampleList if samples[samp]['isSignal']], normalize=normalize, transparency=False)
-            dataStackDict[v]=getStackFromHists([ samples[samp]['cuts'][cut_name][v] for samp in sampleList if samples[samp]['isData']], normalize=normalize, transparency=False)
+            bkgStackDict[v]= getStackFromHists([ samples[samp]['cuts'][cut.name][v] for samp in sampleList if not samples[samp]['isSignal'] and not samples[samp]['isData']], normalize=normalize, transparency=transparency)
+            sigStackDict[v]= getStackFromHists([ samples[samp]['cuts'][cut.name][v] for samp in sampleList if samples[samp]['isSignal']], normalize=normalize, transparency=False)
+            dataStackDict[v]=getStackFromHists([ samples[samp]['cuts'][cut.name][v] for samp in sampleList if samples[samp]['isData']], normalize=normalize, transparency=False)
     return {'bkg': bkgStackDict,'sig': sigStackDict, 'data': dataStackDict}
-
-        
+ 
 def getSigBkgDataLists ( samples, sampleList):
     sigList=[samp for samp in sampleList if samples[samp]['isSignal'] ]
     bkgList=[samp for samp in sampleList if not samples[samp]['isSignal']  and not samples[samp]['isData'] ]
     dataList = [samp for samp in sampleList if samples[samp]['isData'] ]
     return sigList, bkgList, dataList
 
-#def drawPlots(plots ,plotMin=False, plotLimits=[], save=False, #logy=0,
-#                                            fom=True, normalize=False, 
-#                                            denoms=None,noms=None, ratioNorm=False,  fomLimits=[],
-#                                            leg=True,unity=True, verbose=False):
-#    cut = plots['cut']
-#    samples = plots['samples']     
-#    plotsDict = plots['plotsDict'] 
-#    sampleList = plots['sampleList']
-#    plotList = plots['plotList']
-#
-#    if normalize and fom and fom.lower() != "ratio":
-#        raise Exception("Using FOM on area normalized histograms... This can't be right!")
-#    
-#    #tfile = ROOT.TFile("test.root","new")
-#
-#    ret = {}
-#    canvs={}
-#    hists   = getSamplePlots(samples,plotsDict,cut,sampleList=sampleList, plotList=plotList)
-#    stacks  = getBkgSigStacks(samples,plotsDict,cut, sampleList=sampleList, plotList=plotList, normalize=normalize, transparency=normalize )
-#    sigList, bkgList, dataList = getSigBkgDataLists(samples, sampleList=sampleList)
-#    ret.update({
-#                'cut':cut       , 
-#                'canvs':canvs       , 
-#                'stacks':stacks     ,
-#                'hists':hists       ,
-#                'fomHists':{}       ,
-#                'sigBkgDataList': [sigList,bkgList,dataList],
-#                'legs':[],
-#                })
-#    
-#    if len(dataList) > 1:
-#        raise Exception("More than one Data Set in the sampleList... This could be dangerous. %"%dataList)       
-#    for p in plotsDict.iterkeys():
-#        if plotList and p not in plotList:
-#            continue
-#        if plotsDict[p]['is2d']:
-#            print "2D plots not supported:" , p
-#            continue
-#        if fom:
-#            denoms = denoms if type(denoms)==type([]) else [denoms]
-#            if not denoms or len(denoms)==1:
-#                padRatios=[2,1]
-#            else:
-#                padRatios=[2]+[1]*(len(denoms))
-#
-#            canvs[p] = makeCanvasMultiPads(c1Name="%s_%s"%(cut.name,p),c1ww=800,c1wh=800, joinPads=True, padRatios=padRatios, pads=[])
-#            cSave, cMain = 0, 1 # index of the main canvas and the canvas to be saved
-#        else: 
-#            canvs[p] = ROOT.TCanvas(p,p,800,800), None, None
-#            cSave, cMain = 0, 0
-#        
-#        canvs[p][cMain].cd()
-#        
-#        dOpt="hist"
-#       
-#        if normalize: 
-#            dOpt+="nostack"
-#        if len(bkgList):
-#            refStack=stacks['bkg'][p]
-#            refStack.Draw(dOpt)
-#            dOpt="same"
-#        else:
-#            refStack = stacks['sig'][p]
-#        if len(dataList):
-#            dataHist=hists[dataList[0]][p]            
-#            dataHist.Draw("E0Psame")
-#            dataHist.SetMarkerStyle(20)
-#            dataHist.SetMarkerSize(1.2)
-#            dOpt+=""
-#        
-#        stacks['sig'][p].Draw("%s nostack"%dOpt.replace("hist",""))
-#        #print "!!!!!!!!!!!!!!!!!!!!" , refStack, getattr(refStack,"Get%saxis"%"y".upper() )()
-#    
-#        if plotsDict[p].has_key("decor"):
-#            if plotsDict[p]['decor'].has_key("y") : decorAxis( refStack, 'y', t = plotsDict[p]['decor']['y'], tOffset=1.6, tSize = 0.045) #decorAxis(hist, axis,t="",tSize="",tFont="",tOffset="",lFont="",lSize="",func=""):
-#            if plotsDict[p]['decor'].has_key("x") : decorAxis( refStack, 'x', t = plotsDict[p]['decor']['x'], tOffset=1.3, tSize = 0.04) #decorAxis(hist, axis,t="",tSize="",tFont="",tOffset="",lFont="",lSize="",func=""):
-#            if plotsDict[p]['decor'].has_key("title") :refStack.SetTitle(plotsDict[p]['decor']['title'] ) 
-#            if plotsDict[p]['decor'].has_key("log"):
-#                logx, logy, logz = plotsDict[p]['decor']['log']
-#                if logx : canvs[p][cMain].SetLogx(1)
-#                if logy : canvs[p][cMain].SetLogy(1)
-#        if plotMin: refStack.SetMinimum( plotMin )
-#        if plotLimits: 
-#            refStack.SetMinimum(plotLimits[0])
-#            refStack.SetMaximum(plotLimits[1]) #refStack.GetMaximum() * 10 )
-#
-#        if leg:    #MAKE A LEGEND FUNCTION
-#            #if any_in(sampleList, bkgList):
-#            bkgLeg = makeLegend(samples, hists, bkgList, p, loc= [0.7,0.7,0.87,0.87] , name="Legend_bkgs_%s_%s"%(cut.name, p), legOpt="f" )
-#            bkgLeg.Draw()
-#            ret['legs'].append(bkgLeg)
-#            
-#            if any_in(sampleList, sigList): 
-#               sigLeg = makeLegend(samples, hists, sigList, p, loc= [0.4,0.75,0.7,0.87] , name="Legend_sigs_%s_%s"%(cut.name, p), legOpt="l" )
-#               sigLeg.Draw()
-#               ret['legs'].append(sigLeg)
-#
-#        if fom:
-#            getFOMPlotFromStacks( ret, p, sampleList ,fom=fom, normalize=normalize,
-#                                              denoms=denoms,noms=noms, ratioNorm=ratioNorm, fomLimits=fomLimits,
-#                                              leg=leg,unity=unity, verbose=verbose  )
-#        canvs[p][cMain].SetRightMargin(10)        
-#        #canvs[p][cMain].SetLeftMargin(15) 
-#        canvs[p][cMain].RedrawAxis()
-#        canvs[p][cMain].Update()
-#        canvs[p][cMain].cd()        
-#    
-#        isDataPlot = bool(len(dataList))
-#        #if isDataPlot:
-#        latex = ROOT.TLatex()
-#        latex.SetNDC()
-#        latex.SetTextSize(0.03)
-#        latex.SetTextAlign(11)
-#        ret['latex']=latex
-#        
-#        
-#        if isDataPlot:
-#           latex.DrawLatex(0.20,0.89,"#font[22]{CMS Preliminary}")
-#           latex.DrawLatex(0.60,0.89,"#bf{L = %0.2f fb^{-1} (13 TeV)}"%( round(samples[dataList[0]].lumi/1000.,2)) )
-#        else:
-#           latex.DrawLatex(0.20,0.89,"#font[22]{CMS Simulation}")
-#           latex.DrawLatex(0.60,0.89,"#bf{L = 2.3 fb^{-1} (13 TeV)}")
-#   
-#        canvs[p][cSave].Update()
-#
-#        #if save:
-#        #    saveDir = save + "/%s/"%cut.saveDir if type(save)==type('') else "./"
-#        #    #saveDir = save + "/%s/"%cut.name
-#        #    #canvs[p][cSave].SaveAs(saveDir+"/%s.png"%p)
-#        #    saveCanvas(canvs[p][cSave],saveDir, p, formats=["png"], extraFormats=["root","C","pdf"])
-#    return ret
-
-def drawPlots2(plots, plotMin=False, plotLimits=[],save=False,
-                                            fom=True , normalize=False,
-                                            pairList=None, fomTitles=False,
-                                            denoms=None,noms=None, ratioNorm=False, fomLimits=[],
-                                            leg=True, unity=True, verbose=False, dOpt="hist"):
+def drawPlots(plots ,plotMin=False, plotLimits=[], save=False, #logy=0,
+                                            fom=True, normalize=False, 
+                                            denoms=None,noms=None, ratioNorm=False,  fomLimits=[],
+                                            leg=True,unity=True, verbose=False):
     cut = plots['cut']
-    samples = plots['samples']
-    plotsDict = plots['plotsDict']
+    samples = plots['samples']     
+    plotsDict = plots['plotsDict'] 
     sampleList = plots['sampleList']
     plotList = plots['plotList']
 
     if normalize and fom and fom.lower() != "ratio":
-        raise Exception("Using FOM on area  normalized histograms... This can't be right!")
-
+        raise Exception("Using FOM on area normalized histograms... This can't be right!")
+    
     #tfile = ROOT.TFile("test.root","new")
 
-    cut_name = cut if type(cut) == type("") else cut.fullName
-
-    dOpt_ = dOpt
     ret = {}
     canvs={}
     hists   = getSamplePlots(samples,plotsDict,cut,sampleList=sampleList, plotList=plotList)
     stacks  = getBkgSigStacks(samples,plotsDict,cut, sampleList=sampleList, plotList=plotList, normalize=normalize, transparency=normalize )
     sigList, bkgList, dataList = getSigBkgDataLists(samples, sampleList=sampleList)
     ret.update({
-                'canvs':canvs       ,
+                'cut':cut       , 
+                'canvs':canvs       , 
                 'stacks':stacks     ,
                 'hists':hists       ,
                 'fomHists':{}       ,
                 'sigBkgDataList': [sigList,bkgList,dataList],
-                'legs':[]           ,
+                'legs':[],
                 })
-    isDataPlot = bool(len(dataList))
-
-    latex = ROOT.TLatex()
-    latex.SetNDC()
-    latex.SetTextSize(0.05)
-    latex.SetTextAlign(11)
-    ret['latex']=latex
-
-
+    
     if len(dataList) > 1:
-        raise Exception("More than one Data Set in the sampleList... This could be dangerous. %"%dataList)
+        raise Exception("More than one Data Set in the sampleList... This could be dangerous. %"%dataList)       
     for p in plotsDict.iterkeys():
-        dOpt = dOpt_
         if plotList and p not in plotList:
             continue
         if plotsDict[p]['is2d']:
@@ -632,172 +340,150 @@ def drawPlots2(plots, plotMin=False, plotLimits=[],save=False,
             continue
         if fom:
             denoms = denoms if type(denoms)==type([]) else [denoms]
-            if pairList:
-                padRatios=[2]+ [1]*(len(pairList))
-            elif not denoms or len(denoms)==1:
+            if not denoms or len(denoms)==1:
                 padRatios=[2,1]
-            else: 
+            else:
                 padRatios=[2]+[1]*(len(denoms))
-            #print "            padRatios:  ", padRatios
 
-            canvs[p]=makeCanvasMultiPads(c1Name="%s_%s"%(cut_name,p),c1ww=800,c1wh=800, joinPads=True, padRatios=padRatios, pads=[])
-            cSave , cMain=0,1   # index of the main canvas and the canvas to be saved
-        else:
+            canvs[p] = makeCanvasMultiPads(c1Name="%s_%s"%(cut.name,p),c1ww=800,c1wh=800, joinPads=True, padRatios=padRatios, pads=[])
+            cSave, cMain = 0, 1 # index of the main canvas and the canvas to be saved
+        else: 
             canvs[p] = ROOT.TCanvas(p,p,800,800), None, None
-            cSave , cMain=0,0
+            cSave, cMain = 0, 0
+        
         canvs[p][cMain].cd()
-        #dOpt="hist"
-        if normalize:
-            #stacks['bkg'][p].SetFillStyle(3001)
-            #stacks['bkg'][p].SetFillColorAlpha(kBlue, 0.35)
+        
+        dOpt="hist"
+       
+        if normalize: 
             dOpt+="nostack"
         if len(bkgList):
             refStack=stacks['bkg'][p]
             refStack.Draw(dOpt)
-            #if logy: canvs[p][cMain].SetLogy(logy)
             dOpt="same"
         else:
             refStack = stacks['sig'][p]
         if len(dataList):
-            dataHist=hists[dataList[0]][p]
-            dataHist.SetMarkerSize(0.9)
-            dataHist.SetMarkerStyle(20)
+            dataHist=hists[dataList[0]][p]            
             dataHist.Draw("E0Psame")
+            dataHist.SetMarkerStyle(20)
+            dataHist.SetMarkerSize(1.2)
             dOpt+=""
+        
         stacks['sig'][p].Draw("%s nostack"%dOpt.replace("hist",""))
         #print "!!!!!!!!!!!!!!!!!!!!" , refStack, getattr(refStack,"Get%saxis"%"y".upper() )()
-        #if True: return refStack, ret
+    
         if plotsDict[p].has_key("decor"):
-            if plotsDict[p]['decor'].has_key("y") : decorAxis( refStack, 'y', plotsDict[p]['decor']['y'], tOffset=1 )
-            if plotsDict[p]['decor'].has_key("title") :refStack.SetTitle(plotsDict[p]['decor']['title'] )
+            if plotsDict[p]['decor'].has_key("y") : decorAxis( refStack, 'y', t = plotsDict[p]['decor']['y'], tOffset=1.6, tSize = 0.045) #decorAxis(hist, axis,t="",tSize="",tFont="",tOffset="",lFont="",lSize="",func=""):
+            if plotsDict[p]['decor'].has_key("x") : decorAxis( refStack, 'x', t = plotsDict[p]['decor']['x'], tOffset=1.3, tSize = 0.04) #decorAxis(hist, axis,t="",tSize="",tFont="",tOffset="",lFont="",lSize="",func=""):
+            if plotsDict[p]['decor'].has_key("title") :refStack.SetTitle(plotsDict[p]['decor']['title'] ) 
             if plotsDict[p]['decor'].has_key("log"):
                 logx, logy, logz = plotsDict[p]['decor']['log']
                 if logx : canvs[p][cMain].SetLogx(1)
                 if logy : canvs[p][cMain].SetLogy(1)
         if plotMin: refStack.SetMinimum( plotMin )
-        if plotLimits:
-            refStack.SetMinimum( plotLimits[0] )
-        refStack.SetMaximum( refStack.GetMaximum() * 30 )
+        if plotLimits: 
+            refStack.SetMinimum(plotLimits[0])
+            refStack.SetMaximum(plotLimits[1]) #refStack.GetMaximum() * 10 )
+
         if leg:    #MAKE A LEGEND FUNCTION
-            sigLegList = [samp for samp in sampleList if samp in samples.massScanList() + samples.privSigList()]
-            bkgLegList = [samp for samp in sampleList if samp in samples.bkgList() + samples.otherSigList() ]
-            bkgLegList.reverse()
-            sigLegList.reverse()
-
-            bkgLeg = makeLegend(samples, hists, bkgLegList, p, loc= [0.75,0.67 ,0.9 ,0.87 ] , name="Legend_bkgs_%s_%s"%(cut_name, p), legOpt="f" )
-            sigLeg = makeLegend(samples, hists, sigLegList, p, loc= [0.5 ,0.67,0.75,0.87] , name="Legend_sigs_%s_%s"%(cut_name, p), legOpt="l" )
-
+            #if any_in(sampleList, bkgList):
+            bkgLeg = makeLegend(samples, hists, bkgList, p, loc= [0.7,0.7,0.87,0.87] , name="Legend_bkgs_%s_%s"%(cut.name, p), legOpt="f" )
             bkgLeg.Draw()
-            sigLeg.Draw()
-            ret['legs'].append([sigLeg, bkgLeg])
-
-            #leg = ROOT.TLegend(0.6,0.6,0.9,0.9)
-            #leg.SetFillColorAlpha(0,0.001)
-            #leg.SetBorderSize(0)
-
-            #ret.update({'leg':leg})
-            #for bkg in bkgList:
-            #    leg.AddEntry(hists[bkg][p], samples[bkg].name , "f")    
-            #for sig in sigList:
-            #    leg.AddEntry(hists[sig][p], samples[sig].name , "l")    
-            #leg.Draw("same")
+            ret['legs'].append(bkgLeg)
+            
+            if any_in(sampleList, sigList): 
+               sigLeg = makeLegend(samples, hists, sigList, p, loc= [0.4,0.75,0.7,0.87] , name="Legend_sigs_%s_%s"%(cut.name, p), legOpt="l" )
+               sigLeg.Draw()
+               ret['legs'].append(sigLeg)
 
         if fom:
-
-            if plotsDict[p]['decor'].has_key('fom_reverse') and plotsDict[p]['decor']['fom_reverse']:
-                fom_reverse=True
-            else: fom_reverse = False
-
-            #if pairList:
-            #    getFOMPlotFromStacksPair( ret, p, sampleList ,fom=fom, normalize=normalize,
-            #                                  denoms=denoms,noms=noms, ratioNorm=ratioNorm, fomLimits=fomLimits,pairList=pairList, fomTitles=fomTitles,
-            #                                  leg=leg,unity=unity, verbose=verbose  )
-            getFOMPlotFromStacks( ret, p, sampleList ,fom=fom, fom_reverse = fom_reverse , normalize=normalize,
-                                          denoms=denoms,noms=noms,  ratioNorm=ratioNorm, fomLimits=fomLimits,
-                                          leg=leg,unity=unity, verbose=verbose  )
-        canvs[p][cMain].cd()
-        if bkgList:
-            ret['hists']['bkg'][p].SetFillColor(1)
-            ret['hists']['bkg'][p].SetFillStyle(3001)
-            ret['hists']['bkg'][p].SetMarkerSize(0)
-            ret['hists']['bkg'][p].Draw("e2same")
-        for c in canvs[p]:
-            c.RedrawAxis()
+            getFOMPlotFromStacks( ret, p, sampleList ,fom=fom, normalize=normalize,
+                                              denoms=denoms,noms=noms, ratioNorm=ratioNorm, fomLimits=fomLimits,
+                                              leg=leg,unity=unity, verbose=verbose  )
+        canvs[p][cMain].SetRightMargin(10)        
+        #canvs[p][cMain].SetLeftMargin(15) 
         canvs[p][cMain].RedrawAxis()
         canvs[p][cMain].Update()
-        canvs[p][cMain].cd()
+        canvs[p][cMain].cd()        
+    
+        isDataPlot = bool(len(dataList))
+        #if isDataPlot:
+        latex = ROOT.TLatex()
+        latex.SetNDC()
+        latex.SetTextSize(0.03)
+        latex.SetTextAlign(11)
+        ret['latex']=latex
+        
+        
         if isDataPlot:
-            latex.DrawLatex(0.16,0.91,"#font[22]{CMS Preliminary}")
-            latex.DrawLatex(0.7,0.91,"#bf{L=%0.2f fb^{-1} (13 TeV)}"%( round(samples[dataList[0]].lumi/1000.,2)) )
+           latex.DrawLatex(0.20,0.89,"#font[22]{CMS Preliminary}")
+           latex.DrawLatex(0.60,0.89,"#bf{L = %0.2f fb^{-1} (13 TeV)}"%( round(samples[dataList[0]].lumi/1000.,2)) )
         else:
-            latex.DrawLatex(0.16,0.91,"#font[22]{CMS Simulation}")
-            #latex.DrawLatex(0.7,0.91,"#bf{L=%0.2f fb^{-1} (13 TeV)}"%( round(samples[sampleList[0]].lumi/1000.,2) ) )
-            latex.DrawLatex(0.7,0.91,"#bf{L=%0.2f fb^{-1} (13 TeV)}"%( round( samples.get_lumis("target_lumi")/1000.,2) ) )
-            #### asumes all samples in the sampleList have the same .lumi
-
-
+           latex.DrawLatex(0.20,0.89,"#font[22]{CMS Simulation}")
+           latex.DrawLatex(0.60,0.89,"#bf{L = 2.3 fb^{-1} (13 TeV)}")
+   
         canvs[p][cSave].Update()
 
-        #cut_saveDir = cut if type(cut) == type("") else cut.saveDir
-        #if explicitSaveDir:
-        #    cut_saveDir=""
-
-        if save:
-            saveDir = save  if type(save)==type('') else "./"
-            #saveDir = save + "/%s/"%cut_saveDir if type(save)==type('') else "./"
-            saveCanvas(canvs[p][cSave],saveDir, p, formats=["png"], extraFormats=["root","C","pdf"])
+        #if save:
+        #    saveDir = save + "/%s/"%cut.saveDir if type(save)==type('') else "./"
+        #    #saveDir = save + "/%s/"%cut.name
+        #    #canvs[p][cSave].SaveAs(saveDir+"/%s.png"%p)
+        #    saveCanvas(canvs[p][cSave],saveDir, p, formats=["png"], extraFormats=["root","C","pdf"])
     return ret
 
-def getFOMPlotFromStacks( ret, plot, sampleList ,fom=True, fom_reverse = False,  normalize=False,
+def getFOMPlotFromStacks( ret, plot, sampleList ,fom=True, normalize=False, 
                           denoms=None,noms=None, ratioNorm=False , fomLimits=[0.8,2],
                           unity=True, verbose=False , leg=True):
 
         hists = ret['hists']
-        hists['bkg']={}
+        hists['bkg']={} 
         stacks = ret['stacks']
         canvs = ret['canvs']
         fomHists = ret['fomHists']
         sigList, bkgList, dataList = ret['sigBkgDataList']
+    
+
         fomFunc = fom if type(fom)==type('') else "AMSSYS"
         fomIntegral = False if fomFunc =="RATIO" else True
         fomMax = 0
         fomMin = 999
         fomHists[plot]={}
-        ret['junk']=[]
+        #ret.update({'fomHist':fomHists})
         if "ratio" in fomFunc.lower():
             pass
-        #print "isdataplot:",  [ x in dataList for x in noms ]
-        if any( [ x in dataList for x in noms ]):
+        #denom = denom if type(denom)==type([]) else [denom]
+    
+        print "isdataplot:",  [ x in dataList for x in noms ]
+        if any( [ x in dataList for x in noms ]):       
             isDataPlot=True
-            fomPlotTitle_ = "DATA/MC     " if "bkg" in denoms else "AAAAAAAAAAAAAA"
-        else:
+            fomPlotTitle = "DATA/MC     " if "bkg" in denoms else "BAAAAAAAAAAAAAA"
+        else: 
             isDataPlot = False
-            fomPlotTitle_ = fomFunc
-        for idenom, denom in enumerate(denoms,2):
-            fomPlotTitle = "%s"%fomPlotTitle_
-            canvs[plot][idenom].cd()
-            canvs[plot][idenom].SetGridx(1)
-            canvs[plot][idenom].SetGridy(1)
+            fomPlotTitle = fomFunc
+            
 
-            fomHists[plot][denom]={}
+        for idenom, denom in enumerate(denoms,2):
+            canvs[plot][idenom].cd()
+            fomHists[plot][denom]={}  
             ## Getting the total BKG hist
             if bkgList:
-                hists['bkg'][plot]=stacks['bkg'][plot].GetHists()[0].Clone()
+                hists['bkg'][plot]=stacks['bkg'][plot].GetHists()[0].Clone( "stack_%s"%plot)
                 hists['bkg'][plot].Reset()
-                stack_name = "stack_%s"%stacks['bkg'][plot].GetHists()[0].GetName()
-                hists['bkg'][plot].SetName(  stack_name  )
-                hists['bkg'][plot].SetTitle( stack_name   )
+                hists['bkg'][plot].SetTitle("stack_%s"%plot)
                 hists['bkg'][plot].Merge( stacks['bkg'][plot].GetHists() )
             if denom:
                 fomHists[plot][denom]['denom']=hists[denom][plot]
                 if not isDataPlot: fomPlotTitle += " (%s)"%denom
             else:
                 fomHists[plot][denom]['denom']=hists[plot]['bkg'] if bkgList else False
+
+            #refStack.SetMaximum(getHistMax(fomHists[plot][denom]['denom'])[1]*1.3)
             nBins  = fomHists[plot][denom]['denom'].GetNbinsX()
             lowBin = fomHists[plot][denom]['denom'].GetBinLowEdge(1)
             hiBin  = fomHists[plot][denom]['denom'].GetBinLowEdge(fomHists[plot][denom]['denom'].GetNbinsX()+1)
-            #dOpt="" if not isDataPlot else "E1P"
 
+            #dOpt="" if not isDataPlot else "E1P"
             dOpt="" if not isDataPlot else "E0P"
 
             if not noms:
@@ -805,14 +491,18 @@ def getFOMPlotFromStacks( ret, plot, sampleList ,fom=True, fom_reverse = False, 
             else:
                 nomeratorList = [x for x in noms]
             if denom in nomeratorList: nomeratorList.remove(denom)
-
-            fomMin, fomMax = (100,-100)
             for nom in nomeratorList:
                 #sigHist= samples[sig]['cuts'][cut.name][plot]
                 sigHist= hists[nom][plot]
-                fomHists[plot][denom][nom] = getFOMFromTH1FIntegral(sigHist, fomHists[plot][denom]['denom'] ,fom=fomFunc, verbose = verbose, integral = fomIntegral, reverse=fom_reverse)
+                fomHists[plot][denom][nom] = getFOMFromTH1FIntegral(sigHist, fomHists[plot][denom]['denom'] ,fom=fomFunc, verbose =False, integral = fomIntegral)
+                #print "---------------------------------------------------"
+                #sigHist.Print("all")
+                #fomHists[plot][denom]['denom'].Print("all")
+                #fomHists[plot][denom][nom].Print("all")
+
+                #print "---------------------------------------------------"
                 if ratioNorm:
-                    fomHists[plot][denom][nom].Scale(1./fomHists[plot][denom][nom].Integral() )
+                    fomHists[plot][denom][nom].Scale(1./fomHists[plot][denom][nom].Integral() ) 
                 fomHists[plot][denom][nom].SetLineWidth(2)
                 fomHists[plot][denom][nom].Draw(dOpt)
                 fomMax = max(getHistMax(fomHists[plot][denom][nom])[1] ,fomMax)
@@ -827,23 +517,6 @@ def getFOMPlotFromStacks( ret, plot, sampleList ,fom=True, fom_reverse = False, 
                     decorAxis( fomHists[plot][denom][nom], 'y', t='%s  '%fomPlotTitle   , tOffset=0.8 ,  tSize=0.07, lSize=0.1, func= lambda axis: axis.SetNdivisions(506) )
                     fomHists[plot][denom][nom].SetTitle("")
                     dOpt="same"
-
-            if isDataPlot:
-                bkg_tot = hists['bkg'][plot].Clone("bkg_tot")
-                data_ratio = hists[dataList[0]][plot].Clone("data")
-                bkg_tot.SetError(ar.array( "d",[0]*nBins ) )
-                #data_ratio.Divide(bkg_tot)
-                #data_ratio.Draw("e")
-
-                MCE = hists['bkg'][plot].Clone("MCError_%s"%plot)
-                MCE.Divide( bkg_tot)
-                MCE.SetFillStyle(3001)
-                MCE.SetFillColor(1)
-                MCE.SetMarkerSize(0)
-                MCE.Draw("e2same")
-                ret['junk'].append(MCE)
-                #ll = TLine(Hr.GetXaxis().GetXmin(),1,Hr.GetXaxis().GetXma),1)
-
             if unity:
                 Func = ROOT.TF1('Func',"[0]",lowBin,hiBin)
                 Func.SetParameter(0,1)
@@ -852,24 +525,22 @@ def getFOMPlotFromStacks( ret, plot, sampleList ,fom=True, fom_reverse = False, 
                 Func.SetLineWidth(1)
                 Func.Draw("same")
                 fomHists[plot][denom].update({'func':Func})
-            #print 'fom min max', fomMin, fomMax
-            #print "first fom hist", first_nom
+            print 'fom min max', fomMin, fomMax
+            print "first fom hist", first_nom
             if fomLimits:
                 fomHists[plot][denom][first_nom].SetMinimum(fomLimits[0] )
                 fomHists[plot][denom][first_nom].SetMaximum(fomLimits[1] )
             else:
                 fomHists[plot][denom][first_nom].SetMaximum(fomMax*(1.2) )
                 fomHists[plot][denom][first_nom].SetMinimum(fomMin*(0.8) )
-            #print denom, first_nom, fomLimits, fomMin, fomMax
             fomHists[plot][denom][first_nom].Draw("same")
-            #print "idenom", idenom
+            print "idenom", idenom
             canvs[plot][idenom].RedrawAxis()
             canvs[plot][idenom].Update()
 
         #for canv in canvs[plot]:
         #    canv.cd()
         return ret
-
 
 def makeLegend(samples, hists, sampleList, plot, name="Legend",loc=[0.6,0.6,0.9,0.9],borderSize=0,legOpt="f"):
 
@@ -982,6 +653,7 @@ def makeStopLSPPlot(name, massDict, title="", bins = [22,100,650, 65,0,650 ], ke
     plot.SetTitle(title)
     plot.GetXaxis().SetTitle("m(#tilde{t})[GeV]")
     plot.GetYaxis().SetTitle("m(#tilde{#chi}^{0})[GeV]")
+    
     return plot
 
 
@@ -1505,7 +1177,7 @@ def fixForLatex(x):
 
 class JinjaTexTable():
     def __init__(self,yieldInstance, yieldOpt=None, texDir="./tex/", pdfDir="./tex/", outputName="",\
-                 searchpath=cmsbase+"/src/Workspace/DegenerateStopAnalysis/python/navidTools/LaTexJinjaTemplates", template_file= "", tableNum=1, caption="", title="", transpose=False):
+                 searchpath=cmsbase+"/src/Workspace/DegenerateStopAnalysis/python/tools/LaTexJinjaTemplates", template_file= "", tableNum=1, caption="", title="", transpose=False):
         if not template_file:
             template_file = "LaTexTemplateWithFOM_v2.j2.tex"
         self.tableNum       = tableNum
@@ -1715,8 +1387,8 @@ def setEventListToChains(samples,sampleList,cutInst,verbose=True,opt="read"):
 ##########################################                    ###############################################
 #############################################################################################################
 
-from Workspace.DegenerateStopAnalysis.cardFileWriter import cardFileWriter
-from Workspace.DegenerateStopAnalysis.navidTools.FOM import get_float
+from Workspace.DegenerateStopAnalysis.tools.cardFileWriter import cardFileWriter
+from Workspace.DegenerateStopAnalysis.tools.FOM import get_float
 
 from os.path import basename, splitext
 

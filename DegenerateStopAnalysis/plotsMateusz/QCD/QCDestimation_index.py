@@ -11,11 +11,10 @@ import argparse
 import Workspace.DegenerateStopAnalysis.toolsMateusz.ROOToptions
 from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
-from Workspace.DegenerateStopAnalysis.toolsMateusz.degTools import *
+from Workspace.DegenerateStopAnalysis.navidTools.NavidTools import Plots, getPlots, drawPlots, Yields, setup_style
 from Workspace.DegenerateStopAnalysis.toolsMateusz.cutsEle import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.cmgTuplesPostProcessed_mAODv2_analysisHephy13TeV import cmgTuplesPostProcessed
 from Workspace.DegenerateStopAnalysis.toolsMateusz.getSamples_mAODv2_analysisHephy13TeV import getSamples
-#from Workspace.DegenerateStopAnalysis.toolsMateusz.cmgTuplesPostProcessed_mAODv2 import cmgTuplesPostProcessed
 #from Workspace.DegenerateStopAnalysis.toolsMateusz.getSamples_analysisHephy_13TeV import getSamples
 #from Workspace.DegenerateStopAnalysis.toolsMateusz.getSamples_PP_mAODv2_7412pass2_scan import getSamples
 
@@ -24,8 +23,6 @@ from math import pi, sqrt #cos, sin, sinh, log
 
 #Sets TDR style
 setup_style()
-#ROOT.setTDRStyle(1)
-#ROOT.gStyle.SetOptStat(0) #1111 #0 removes histogram statistics box #Name, Entries, Mean, RMS, Underflow, Overflow, Integral, Skewness, Kurtosis
 
 #Input options
 parser = argparse.ArgumentParser(description = "Input options")
@@ -38,7 +35,7 @@ parser.add_argument("--removedCut", dest = "removedCut",  help = "Variable remov
 parser.add_argument("--highWeightVeto", dest = "highWeightVeto",  help = "Remove high weighted events", type = bool, default = False)
 parser.add_argument("--enriched", dest = "enriched",  help = "EM enriched QCD?", type = bool, default = False)
 parser.add_argument("--estimation", dest = "estimation",  help = "Toggle estimation", type = int, default = 1)
-parser.add_argument("--getData", dest = "getData",  help = "Get data samples", type = int, default = 0)
+parser.add_argument("--getData", dest = "getData",  help = "Get data samples", type = int, default = 1)
 parser.add_argument("--plot", dest = "plot",  help = "Toggle plot", type = int, default = 0)
 parser.add_argument("--logy", dest = "logy",  help = "Toggle logy", type = int, default = 0)
 parser.add_argument("--save", dest = "save",  help = "Toggle save", type = int, default = 1)
@@ -90,7 +87,7 @@ else: qcd = "qcd"
 
 cmgPP = cmgTuplesPostProcessed()#mc_path, signal_path, data_path)
 
-samplesList = ["qcd"] #"w","tt", "z"]
+samplesList = ["qcd"]
 
 if plot: samplesList.extend(["w", "tt", "z"])
 
@@ -239,13 +236,13 @@ SRs = {\
    'SRH1a':["SRH1a", combineCuts("LepAll_mt[" + ind + "] < 60", btw("LepAll_pt[" + ind + "]", 12, 20))],
    'SRV1a':["SRV1a", combineCuts("LepAll_mt[" + ind + "] < 60", btw("LepAll_pt[" + ind + "]", 20, 30))],
 
-   'SRL1b':["SRL1b", combineCuts(btw("LepAll_mt[" + ind + "]", 60, 88), btw("LepAll_pt[" + ind + "]", 5, 12))],
-   'SRH1b':["SRH1b", combineCuts(btw("LepAll_mt[" + ind + "]", 60, 88), btw("LepAll_pt[" + ind + "]", 12, 20))],
-   'SRV1b':["SRV1b", combineCuts(btw("LepAll_mt[" + ind + "]", 60, 88), btw("LepAll_pt[" + ind + "]", 20, 30))],
+   'SRL1b':["SRL1b", combineCuts(btw("LepAll_mt[" + ind + "]", 60, 95), btw("LepAll_pt[" + ind + "]", 5, 12))],
+   'SRH1b':["SRH1b", combineCuts(btw("LepAll_mt[" + ind + "]", 60, 95), btw("LepAll_pt[" + ind + "]", 12, 20))],
+   'SRV1b':["SRV1b", combineCuts(btw("LepAll_mt[" + ind + "]", 60, 95), btw("LepAll_pt[" + ind + "]", 20, 30))],
 
-   'SRL1c':["SRL1c", combineCuts("LepAll_mt[" + ind + "] > 88", btw("LepAll_pt[" + ind + "]", 5, 12))],
-   'SRH1c':["SRH1c", combineCuts("LepAll_mt[" + ind + "] > 88", btw("LepAll_pt[" + ind + "]", 12, 20))],
-   'SRV1c':["SRV1c", combineCuts("LepAll_mt[" + ind + "] > 88", btw("LepAll_pt[" + ind + "]", 20, 30))]}
+   'SRL1c':["SRL1c", combineCuts("LepAll_mt[" + ind + "] > 95", btw("LepAll_pt[" + ind + "]", 5, 12))],
+   'SRH1c':["SRH1c", combineCuts("LepAll_mt[" + ind + "] > 95", btw("LepAll_pt[" + ind + "]", 12, 20))],
+   'SRV1c':["SRV1c", combineCuts("LepAll_mt[" + ind + "] > 95", btw("LepAll_pt[" + ind + "]", 20, 30))]}
 
 QCD = {}
 regions = ['SR1', 'SR1a', 'SR1b', 'SR1c', 'SRL1a', 'SRH1a', 'SRV1a', 'SRL1b', 'SRH1b', 'SRV1b', 'SRL1c', 'SRH1c', 'SRV1c']
@@ -467,9 +464,9 @@ if plot:
       #plotsList[sel] = ["hybIso2_" + sel, "absDxy_" + sel, "delPhi_" + sel, "sigmaEtaEta_" + sel, "weight_" + sel]
       #plotsList[sel] = ["hybIso2_" + sel, "absDxy_" + sel, "delPhi_" + sel]
       plotsDict[sel] = Plots(**plotDict[sel])
-      plots[sel] = getPlots2(samples, plotsDict[sel], QCD['SR1'][sel], plotSamples, plotList = plotsList[sel], addOverFlowBin='upper')
-      if getData: plots2[sel] = drawPlots2(plots[sel], denoms=["bkg"], noms = ["dblind"], fom="RATIO", fomLimits=[0,2.8], plotMin = 0.1, normalize = False, save=False)
-      else: plots2[sel] = drawPlots2(plots[sel], fom=False, plotMin = 0.1, normalize = False, save=False)
+      plots[sel] = getPlots(samples, plotsDict[sel], QCD['SR1'][sel], plotSamples, plotList = plotsList[sel], addOverFlowBin='upper')
+      if getData: plots2[sel] = drawPlots(samples, plotsDict[sel], QCD['SR1'][sel], plotSamples, plotList = plotsList[sel], denoms=["bkg"], noms = ["dblind"], fom="RATIO", fomLimits=[0,2.8], plotMin = 0.1, normalize = False, save=False)
+      else: plots2[sel] = drawPlots(samples, plotsDict[sel], QCD['SR1'][sel], plotSamples, plotList = plotsList[sel], plotMin = 0.1, normalize = False, save=False)
  
       #Save canvas
       if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID

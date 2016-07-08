@@ -410,10 +410,11 @@ def cutClasses(eleIDsel, ID = "standard"):
                                ["MET200","met > 200"],
                                ["HT300","ht_basJet > 300"],
                                ["ISR110","nIsrJet >= 1"],
+                               ["No3rdJet60","nVetoJet <= 2"],
                                ["AntiQCD", "vetoJet_dPhi_j1j2 < 2.5"], # monojet
-                               #["TauElVeto","(Sum$(TauGood_idMVA) == 0) && (Sum$(abs(LepGood_pdgId) == 11 && abs(LepGood_eta) < " + str(etaAcc) + "&& LepGood_SPRING15_25ns_v1 == 1) == 0)"],
-                               #["1Mu-2ndMu20Veto", "(nlep==1 || (nlep ==2 && LepGood_pt[looseMuonIndex2] < 20) )"],
-                               ["No3rdJet60","nBasJet <= 2"],
+                               ["1El-2ndEl20Veto", "(nLepGood_el == 1 || (nLepGood_el == 2 && LepGood_pt[IndexLepGood_el[1]] < 20))"],
+                               ["MuVeto","(nLepGood_mu ==0 || (nLepGood_mu==1 && LepGood_pt[IndexLepGood_mu[0]] < 20))"],
+                               ["TauVeto","(Sum$(TauGood_idMVANewDM && TauGood_pt > 20 ) == 0)"],
                                ], baseCut=None)
    
    #SR1
@@ -477,7 +478,7 @@ def cutClasses(eleIDsel, ID = "standard"):
       sr1[iWP] = CutClass("SR1_" + iWP, [
                               ["CT300","min(met, ht_basJet - 100) > 300"],
                               ["BVeto","(nBSoftJet == 0 && nBHardJet == 0)"],
-                              ["negEle", "Max$(LepGood_pdgId*(" + electronSel[iWP] + ")) == 11"],
+                              #["negEle", "Max$(LepGood_pdgId*(" + electronSel[iWP] + ")) == 11"],
                               ["absEleEta1.5", absEleEta[iWP] + " < 1.5"],
                               ["elePt<30", elePt[iWP] + " < 30"],
                               ], baseCut = preselEle[iWP])
@@ -492,17 +493,17 @@ def cutClasses(eleIDsel, ID = "standard"):
    
       sr1abc_ptbin[iWP] = CutClass("SR1abc_ptbin_" + iWP, [
                               #["SR1a", eleMt[iWP] + " < 60"],
-                              ["SRL1a", combineCuts(eleMt[iWP] + " < 60", btw(elePt[iWP], 5, 12))],
-                              ["SRH1a", combineCuts(eleMt[iWP] + " < 60", btw(elePt[iWP], 12, 20))],
-                              ["SRV1a", combineCuts(eleMt[iWP] + " < 60", btw(elePt[iWP], 20, 30))],
+                              ["SRL1a", combineCuts(eleMt[iWP] + " < 60", btw(elePt[iWP], 5, 12), "Max$(LepGood_pdgId*(" + electronSel[iWP] + ")) == 11")],
+                              ["SRH1a", combineCuts(eleMt[iWP] + " < 60", btw(elePt[iWP], 12, 20), "Max$(LepGood_pdgId*(" + electronSel[iWP] + ")) == 11")],
+                              ["SRV1a", combineCuts(eleMt[iWP] + " < 60", btw(elePt[iWP], 20, 30), "Max$(LepGood_pdgId*(" + electronSel[iWP] + ")) == 11")],
                               #["SR1b",btw(eleMt[iWP], 60, 88)],
-                              ["SRL1b", combineCuts(btw(eleMt[iWP], 60, 88), btw(elePt[iWP], 5, 12))],
-                              ["SRH1b", combineCuts(btw(eleMt[iWP], 60, 88), btw(elePt[iWP], 12, 20))],
-                              ["SRV1b", combineCuts(btw(eleMt[iWP], 60, 88), btw(elePt[iWP], 20, 30))],
+                              ["SRL1b", combineCuts(btw(eleMt[iWP], 60, 95), btw(elePt[iWP], 5, 12), "Max$(LepGood_pdgId*(" + electronSel[iWP] + ")) == 11")],
+                              ["SRH1b", combineCuts(btw(eleMt[iWP], 60, 95), btw(elePt[iWP], 12, 20), "Max$(LepGood_pdgId*(" + electronSel[iWP] + ")) == 11")],
+                              ["SRV1b", combineCuts(btw(eleMt[iWP], 60, 95), btw(elePt[iWP], 20, 30), "Max$(LepGood_pdgId*(" + electronSel[iWP] + ")) == 11")],
                               #["SR1c",eleMt[iWP] + " > 88"],
-                              ["SRL1c", combineCuts(eleMt[iWP] + " > 88", btw(elePt[iWP], 5, 12))],
-                              ["SRH1c", combineCuts(eleMt[iWP] + " > 88", btw(elePt[iWP], 12, 20))],
-                              ["SRV1c", combineCuts(eleMt[iWP] + " > 88", btw(elePt[iWP], 20, 30))]
+                              ["SRL1c", combineCuts(eleMt[iWP] + " > 95", btw(elePt[iWP], 5, 12))],
+                              ["SRH1c", combineCuts(eleMt[iWP] + " > 95", btw(elePt[iWP], 12, 20))],
+                              ["SRV1c", combineCuts(eleMt[iWP] + " > 95", btw(elePt[iWP], 20, 30))]
                               ], baseCut = sr1[iWP])
       
       #mtabc[iWP] = CutClass ("MTabc_" + iWP, [
@@ -517,7 +518,7 @@ def cutClasses(eleIDsel, ID = "standard"):
       sr2[iWP] = CutClass("SR2_" + iWP, [
                               ["ISR325", "nIsrHJet > 0"],
                               ["MET300", "met > 300"],
-                              ["SoftBJet", "nBSoftJet >= 1 && nBHardJet == 0"],
+                              ["SoftBJet", "nBSoftJet >= 1"],# && nBHardJet == 0"],
                               ["elePt<30", elePt[iWP] + " < 30"]
                               ], baseCut = preselEle[iWP])
       
@@ -625,7 +626,7 @@ def cutClassesIndex(eleIDselIndex, ID = "standard"):
                                ["HT300","ht_basJet > 300"],
                                ["ISR110","nIsrJet >= 1"],
                                ["AntiQCD", "vetoJet_dPhi_j1j2 < 2.5"], # monojet
-                               ["No3rdJet60","nBasJet <= 2"],
+                               ["No3rdJet60","nVetoJet <= 2"],
                                #["TauElVeto","(Sum$(TauGood_idMVA) == 0) && (Sum$(abs(LepGood_pdgId) == 11 && abs(LepGood_eta) < " + str(etaAcc) + "&& LepGood_SPRING15_25ns_v1 == 1) == 0)"],
                                #["1Mu-2ndMu20Veto", "(nlep==1 || (nlep ==2 && LepGood_pt[looseMuonIndex2] < 20) )"],
                                ], baseCut=None)
@@ -635,7 +636,7 @@ def cutClassesIndex(eleIDselIndex, ID = "standard"):
                                ["HT200","ht_basJet > 200"],
                                ["ISR110","nIsrJet >= 1"],
                                ["AntiQCD", "vetoJet_dPhi_j1j2 < 2.5"], # monojet
-                               ["No3rdJet60","nBasJet <= 2"],
+                               ["No3rdJet60","nVetoJet <= 2"],
                                #["TauElVeto","(Sum$(TauGood_idMVA) == 0) && (Sum$(abs(LepGood_pdgId) == 11 && abs(LepGood_eta) < " + str(etaAcc) + "&& LepGood_SPRING15_25ns_v1 == 1) == 0)"],
                                #["1Mu-2ndMu20Veto", "(nlep==1 || (nlep ==2 && LepGood_pt[looseMuonIndex2] < 20) )"],
                                ], baseCut=None)

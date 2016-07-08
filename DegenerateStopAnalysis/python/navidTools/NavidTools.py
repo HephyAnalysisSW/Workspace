@@ -8,10 +8,10 @@ import jinja2
 import pprint as pp
 from copy import deepcopy
 
-#from Workspace.HEPHYPythonTools.user import username
+from Workspace.HEPHYPythonTools.user import username
 from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYieldFromChain, getChunks
-from Workspace.DegenerateStopAnalysis.navidTools.getRatioPlot import *
-from Workspace.DegenerateStopAnalysis.navidTools.FOM import *
+from Workspace.DegenerateStopAnalysis.tools.getRatioPlot import *
+from Workspace.DegenerateStopAnalysis.tools.FOM import *
 
 import Workspace.DegenerateStopAnalysis.tools.colors as sample_colors_
 sample_colors = sample_colors_.colors
@@ -27,6 +27,8 @@ import re
 #execfile('../../../python/navidTools/getRatioPlot.py')
 #reload(Workspace.DegenerateStopAnalysis.navidTools.getRatioPlot)
 
+dataIncomplete = 0
+
 cmsbase = os.getenv("CMSSW_BASE")
 def setup_style(cmsbase=cmsbase):
     print "CMSBASE", cmsbase
@@ -36,7 +38,7 @@ def setup_style(cmsbase=cmsbase):
     maxN = -1
     ROOT.gStyle.SetOptStat(0)
     ROOT.gStyle.SetPalette(1)
-    return cmsbase
+    return #cmsbase
 #ROOT.gStyle.SetCanvasPreferGL(1)
 
 #pp=prettyprint.PrettyPrinter(indent=3, depth=5, width=120)
@@ -623,7 +625,7 @@ def getPlots(samples,plots,cut,sampleList=[],plotList=[],weight="(weight)",nMinu
             if cutStr: print "        ---applying cutString:", cutStr
 
 
-            print "cut_str" , cutStr, hasattr(sample,'cut')            
+            #print "cut_str" , cutStr, hasattr(sample,'cut')            
             #if verbose: print " "*15, plot
             if nMinus1:
                 nMinus1String = nMinus1
@@ -682,169 +684,172 @@ def drawYields(samples, yieldInst, sampleList=[]):
 
 
 
-#def drawPlots(samples,plots,cut,sampleList=['s','w'],plotList=[],plotMin=False, plotLimits=[],logy=0,save=True,
-#                                            fom=True , normalize=False, 
-#                                            pairList=None,  fomTitles=False, 
-#                                            denoms=None,noms=None, ratioNorm=False, fomLimits=[],
-#                                            leg=True,unity=True, verbose=False , dOpt="hist"):
-#    if normalize and fom and fom.lower() != "ratio":
-#        raise Exception("Using FOM on area  normalized histograms... This can't be right!")
-#    
-#    #tfile = ROOT.TFile("test.root","new")
-#
-#    cut_name = cut if type(cut) == type("") else cut.fullName
-#
-#    dOpt_ = dOpt
-#    ret = {}
-#    canvs={}
-#    hists   = getSamplePlots(samples,plots,cut,sampleList=sampleList, plotList=plotList)
-#    stacks  = getBkgSigStacks(samples,plots,cut, sampleList=sampleList, plotList=plotList, normalize=normalize, transparency=normalize )
-#    sigList, bkgList, dataList = getSigBkgDataLists(samples, sampleList=sampleList)
-#    ret.update({
-#                'canvs':canvs       , 
-#                'stacks':stacks     ,
-#                'hists':hists       ,
-#                'fomHists':{}       ,
-#                'sigBkgDataList': [sigList,bkgList,dataList],
-#                'legs':[]           ,
-#                })
-#    isDataPlot = bool(len(dataList))
-#
-#    latex = ROOT.TLatex()
-#    latex.SetNDC()
-#    latex.SetTextSize(0.05)
-#    latex.SetTextAlign(11)
-#    ret['latex']=latex
-#
-#
-#    if len(dataList) > 1:
-#        raise Exception("More than one Data Set in the sampleList... This could be dangerous. %"%dataList)       
-#    for p in plots.iterkeys():
-#        dOpt = dOpt_ 
-#        if plotList and p not in plotList:
-#            continue
-#        if plots[p]['is2d']:
-#            print "2D plots not supported:" , p
-#            continue
-#        if fom:
-#            denoms = denoms if type(denoms)==type([]) else [denoms]
-#            if pairList:
-#                padRatios=[2]+ [1]*(len(pairList))   
-#            elif not denoms or len(denoms)==1:
-#                padRatios=[2,1]
-#            else:
-#                padRatios=[2]+[1]*(len(denoms))
-#            #print "            padRatios:  ", padRatios
-#
-#            canvs[p]=makeCanvasMultiPads(c1Name="%s_%s"%(cut_name,p),c1ww=800,c1wh=800, joinPads=True, padRatios=padRatios, pads=[])
-#            cSave , cMain=0,1   # index of the main canvas and the canvas to be saved
-#        else: 
-#            canvs[p] = ROOT.TCanvas(p,p,800,800), None, None
-#            cSave , cMain=0,0
-#        canvs[p][cMain].cd()
-#        #dOpt="hist"
-#        if normalize: 
-#            #stacks['bkg'][p].SetFillStyle(3001)
-#            #stacks['bkg'][p].SetFillColorAlpha(kBlue, 0.35)
-#            dOpt+="nostack"
-#        if len(bkgList):
-#            refStack=stacks['bkg'][p]
-#            refStack.Draw(dOpt)
-#            #if logy: canvs[p][cMain].SetLogy(logy)
-#            dOpt="same"
-#        else:
-#            refStack = stacks['sig'][p]
-#        if len(dataList):
-#            dataHist=hists[dataList[0]][p]            
-#            dataHist.SetMarkerSize(0.9)
-#            dataHist.SetMarkerStyle(20)
-#            dataHist.Draw("E0Psame")
-#            dOpt+=""
-#        stacks['sig'][p].Draw("%s nostack"%dOpt.replace("hist",""))
-#        #print "!!!!!!!!!!!!!!!!!!!!" , refStack, getattr(refStack,"Get%saxis"%"y".upper() )()
-#        #if True: return refStack, ret
-#        if plots[p].has_key("decor"):
-#            if plots[p]['decor'].has_key("y") : decorAxis( refStack, 'y', plots[p]['decor']['y'], tOffset=1 )
-#            if plots[p]['decor'].has_key("title") :refStack.SetTitle(plots[p]['decor']['title'] ) 
-#            if plots[p]['decor'].has_key("log"):
-#                logx, logy, logz = plots[p]['decor']['log']
-#                if logx : canvs[p][cMain].SetLogx(1)
-#                if logy : canvs[p][cMain].SetLogy(1)
-#        if plotMin: refStack.SetMinimum( plotMin )
-#        if plotLimits: 
-#            refStack.SetMinimum( plotLimits[0] )
-#        refStack.SetMaximum( refStack.GetMaximum() * 30 )
-#
-#        if leg:    #MAKE A LEGEND FUNCTION
-#            sigLegList = [samp for samp in sampleList if samp in samples.massScanList() + samples.privSigList()]
-#            bkgLegList = [samp for samp in sampleList if samp in samples.bkgList() + samples.otherSigList() ]
-#            bkgLegList.reverse()
-#            sigLegList.reverse()
-#
-#            bkgLeg = makeLegend(samples, hists, bkgLegList, p, loc= [0.75,0.67 ,0.9 ,0.87 ] , name="Legend_bkgs_%s_%s"%(cut_name, p), legOpt="f" )
-#            sigLeg = makeLegend(samples, hists, sigLegList, p, loc= [0.5 ,0.67,0.75,0.87] , name="Legend_sigs_%s_%s"%(cut_name, p), legOpt="l" )
-#
-#            bkgLeg.Draw()
-#            sigLeg.Draw()
-#            ret['legs'].append([sigLeg, bkgLeg])
-#
-#            #leg = ROOT.TLegend(0.6,0.6,0.9,0.9)
-#            #leg.SetFillColorAlpha(0,0.001)
-#            #leg.SetBorderSize(0)
-#
-#            #ret.update({'leg':leg})
-#            #for bkg in bkgList:
-#            #    leg.AddEntry(hists[bkg][p], samples[bkg].name , "f")    
-#            #for sig in sigList:
-#            #    leg.AddEntry(hists[sig][p], samples[sig].name , "l")    
-#            #leg.Draw("same")
-#
-#        if fom:
-#
-#            if plots[p]['decor'].has_key('fom_reverse') and plots[p]['decor']['fom_reverse']:
-#                fom_reverse=True
-#            else: fom_reverse = False
-#
-#            if pairList:
-#                getFOMPlotFromStacksPair( ret, p, sampleList ,fom=fom, normalize=normalize,
-#                                              denoms=denoms,noms=noms, ratioNorm=ratioNorm, fomLimits=fomLimits,pairList=pairList, fomTitles=fomTitles,
-#                                              leg=leg,unity=unity, verbose=verbose  )
-#            else:
-#                getFOMPlotFromStacks( ret, p, sampleList ,fom=fom, fom_reverse = fom_reverse , normalize=normalize,
-#                                              denoms=denoms,noms=noms,  ratioNorm=ratioNorm, fomLimits=fomLimits,
-#                                              leg=leg,unity=unity, verbose=verbose  )
-#        canvs[p][cMain].cd()
-#        if bkgList:
-#            ret['hists']['bkg'][p].SetFillColor(1)
-#            ret['hists']['bkg'][p].SetFillStyle(3001)
-#            ret['hists']['bkg'][p].SetMarkerSize(0)
-#            ret['hists']['bkg'][p].Draw("e2same")
-#        for c in canvs[p]:
-#            c.RedrawAxis()
-#        canvs[p][cMain].RedrawAxis()
-#        canvs[p][cMain].Update()
-#        canvs[p][cMain].cd()
-#        if isDataPlot:
-#            latex.DrawLatex(0.16,0.91,"#font[22]{CMS Preliminary}")
-#            latex.DrawLatex(0.7,0.91,"#bf{L=%0.2f fb^{-1} (13 TeV)}"%( round(samples[dataList[0]].lumi/1000.,2)) )
-#        else:
-#            latex.DrawLatex(0.16,0.91,"#font[22]{CMS Simulation}")
-#            #latex.DrawLatex(0.7,0.91,"#bf{L=%0.2f fb^{-1} (13 TeV)}"%( round(samples[sampleList[0]].lumi/1000.,2) ) )
-#            latex.DrawLatex(0.7,0.91,"#bf{L=%0.2f fb^{-1} (13 TeV)}"%( round( samples.get_lumis("target_lumi")/1000.,2) ) )
-#            #### asumes all samples in the sampleList have the same .lumi
-#
-#
-#        canvs[p][cSave].Update()
-#
-#        #cut_saveDir = cut if type(cut) == type("") else cut.saveDir
-#        #if explicitSaveDir:
-#        #    cut_saveDir=""
-#
-#        if save:
-#            saveDir = save  if type(save)==type('') else "./"
-#            #saveDir = save + "/%s/"%cut_saveDir if type(save)==type('') else "./"
-#            saveCanvas(canvs[p][cSave],saveDir, p, formats=["png"], extraFormats=["root","C","pdf"])
-#    return ret
+def drawPlots(samples,plots,cut,sampleList=['s','w'],plotList=[],plotMin=False, plotLimits=[],logy=0,save=True,
+                                            fom=True , normalize=False, 
+                                            pairList=None,  fomTitles=False, 
+                                            denoms=None,noms=None, ratioNorm=False, fomLimits=[],
+                                            leg=True,unity=True, verbose=False , dOpt="hist"):
+    if normalize and fom and fom.lower() != "ratio":
+        raise Exception("Using FOM on area  normalized histograms... This can't be right!")
+    
+    #tfile = ROOT.TFile("test.root","new")
+
+    cut_name = cut if type(cut) == type("") else cut.fullName
+
+    dOpt_ = dOpt
+    ret = {}
+    canvs={}
+    hists   = getSamplePlots(samples,plots,cut,sampleList=sampleList, plotList=plotList)
+    stacks  = getBkgSigStacks(samples,plots,cut, sampleList=sampleList, plotList=plotList, normalize=normalize, transparency=normalize )
+    sigList, bkgList, dataList = getSigBkgDataLists(samples, sampleList=sampleList)
+    ret.update({
+                'canvs':canvs       , 
+                'stacks':stacks     ,
+                'hists':hists       ,
+                'fomHists':{}       ,
+                'sigBkgDataList': [sigList,bkgList,dataList],
+                'legs':[]           ,
+                })
+    isDataPlot = bool(len(dataList))
+
+    latex = ROOT.TLatex()
+    latex.SetNDC()
+    latex.SetTextSize(0.05)
+    latex.SetTextAlign(11)
+    ret['latex']=latex
+
+
+    if len(dataList) > 1:
+        raise Exception("More than one Data Set in the sampleList... This could be dangerous. %"%dataList)       
+    for p in plots.iterkeys():
+        dOpt = dOpt_ 
+        if plotList and p not in plotList:
+            continue
+        if plots[p]['is2d']:
+            print "2D plots not supported:" , p
+            continue
+        if fom:
+            denoms = denoms if type(denoms)==type([]) else [denoms]
+            if pairList:
+                padRatios=[2]+ [1]*(len(pairList))   
+            elif not denoms or len(denoms)==1:
+                padRatios=[2,1]
+            else:
+                padRatios=[2]+[1]*(len(denoms))
+            #print "            padRatios:  ", padRatios
+
+            canvs[p]=makeCanvasMultiPads(c1Name="%s_%s"%(cut_name,p),c1ww=800,c1wh=800, joinPads=True, padRatios=padRatios, pads=[])
+            cSave , cMain=0,1   # index of the main canvas and the canvas to be saved
+        else: 
+            canvs[p] = ROOT.TCanvas(p,p,800,800), None, None
+            cSave , cMain=0,0
+        canvs[p][cMain].cd()
+        #dOpt="hist"
+        if normalize: 
+            #stacks['bkg'][p].SetFillStyle(3001)
+            #stacks['bkg'][p].SetFillColorAlpha(kBlue, 0.35)
+            dOpt+="nostack"
+        if len(bkgList):
+            refStack=stacks['bkg'][p]
+            refStack.Draw(dOpt)
+            #if logy: canvs[p][cMain].SetLogy(logy)
+            dOpt="same"
+        else:
+            refStack = stacks['sig'][p]
+        if len(dataList):
+            dataHist=hists[dataList[0]][p]            
+            dataHist.SetMarkerSize(0.9)
+            dataHist.SetMarkerStyle(20)
+            dataHist.Draw("E0Psame")
+            dOpt+=""
+        stacks['sig'][p].Draw("%s nostack"%dOpt.replace("hist",""))
+        #print "!!!!!!!!!!!!!!!!!!!!" , refStack, getattr(refStack,"Get%saxis"%"y".upper() )()
+        #if True: return refStack, ret
+        if plots[p].has_key("decor"):
+            if plots[p]['decor'].has_key("y") : decorAxis( refStack, 'y', plots[p]['decor']['y'], tOffset=1 )
+            if plots[p]['decor'].has_key("title") :refStack.SetTitle(plots[p]['decor']['title'] ) 
+            if plots[p]['decor'].has_key("log"):
+                logx, logy, logz = plots[p]['decor']['log']
+                if logx : canvs[p][cMain].SetLogx(1)
+                if logy : canvs[p][cMain].SetLogy(1)
+        if plotMin: refStack.SetMinimum( plotMin )
+        if plotLimits: 
+            refStack.SetMinimum( plotLimits[0] )
+        if logy: refStack.SetMaximum( refStack.GetMaximum() * 30 )
+        else: refStack.SetMaximum( refStack.GetMaximum() * 1.5 )
+
+        if leg:    #MAKE A LEGEND FUNCTION
+            sigLegList = [samp for samp in sampleList if samp in samples.massScanList() + samples.privSigList()]
+            bkgLegList = [samp for samp in sampleList if samp in samples.bkgList() + samples.otherSigList() ]
+            bkgLegList.reverse()
+            sigLegList.reverse()
+
+            bkgLeg = makeLegend(samples, hists, bkgLegList, p, loc= [0.75,0.67 ,0.9 ,0.87 ] , name="Legend_bkgs_%s_%s"%(cut_name, p), legOpt="f" )
+            sigLeg = makeLegend(samples, hists, sigLegList, p, loc= [0.5 ,0.67,0.75,0.87] , name="Legend_sigs_%s_%s"%(cut_name, p), legOpt="l" )
+
+            bkgLeg.Draw()
+            sigLeg.Draw()
+            ret['legs'].append([sigLeg, bkgLeg])
+
+            #from NavidTools
+            #leg = ROOT.TLegend(0.6,0.6,0.9,0.9)
+            #leg.SetFillColorAlpha(0,0.001)
+            #leg.SetBorderSize(0)
+
+            #ret.update({'leg':leg})
+            #for bkg in bkgList:
+            #    leg.AddEntry(hists[bkg][p], samples[bkg].name , "f")    
+            #for sig in sigList:
+            #    leg.AddEntry(hists[sig][p], samples[sig].name , "l")    
+            #leg.Draw("same")
+
+        if fom:
+
+            if plots[p]['decor'].has_key('fom_reverse') and plots[p]['decor']['fom_reverse']:
+                fom_reverse=True
+            else: fom_reverse = False
+
+            if pairList:
+                getFOMPlotFromStacksPair( ret, p, sampleList ,fom=fom, normalize=normalize,
+                                              denoms=denoms,noms=noms, ratioNorm=ratioNorm, fomLimits=fomLimits,pairList=pairList, fomTitles=fomTitles,
+                                              leg=leg,unity=unity, verbose=verbose  )
+            else:
+                getFOMPlotFromStacks( ret, p, sampleList ,fom=fom, fom_reverse = fom_reverse , normalize=normalize,
+                                              denoms=denoms,noms=noms,  ratioNorm=ratioNorm, fomLimits=fomLimits,
+                                              leg=leg,unity=unity, verbose=verbose  )
+        canvs[p][cMain].cd()
+        if bkgList and fom:
+            ret['hists']['bkg'][p].SetFillColor(1)
+            ret['hists']['bkg'][p].SetFillStyle(3001)
+            ret['hists']['bkg'][p].SetMarkerSize(0)
+            ret['hists']['bkg'][p].Draw("e2same")
+        if fom:
+           for c in canvs[p]:
+              c.RedrawAxis()
+        canvs[p][cMain].RedrawAxis()
+        canvs[p][cMain].Update()
+        canvs[p][cMain].cd()
+        if isDataPlot:
+            latex.DrawLatex(0.16,0.91,"#font[22]{CMS Preliminary}")
+            latex.DrawLatex(0.7,0.91,"#bf{L=%0.2f fb^{-1} (13 TeV)}"%( round(samples[dataList[0]].lumi/1000.,2)) )
+        else:
+            latex.DrawLatex(0.16,0.91,"#font[22]{CMS Simulation}")
+            #latex.DrawLatex(0.7,0.91,"#bf{L=%0.2f fb^{-1} (13 TeV)}"%( round(samples[sampleList[0]].lumi/1000.,2) ) )
+            latex.DrawLatex(0.7,0.91,"#bf{L=%0.2f fb^{-1} (13 TeV)}"%( round( samples.get_lumis("target_lumi")/1000.,2) ) )
+            #### asumes all samples in the sampleList have the same .lumi
+
+
+        canvs[p][cSave].Update()
+
+        #cut_saveDir = cut if type(cut) == type("") else cut.saveDir
+        #if explicitSaveDir:
+        #    cut_saveDir=""
+
+        if save:
+            saveDir = save  if type(save)==type('') else "./"
+            #saveDir = save + "/%s/"%cut_saveDir if type(save)==type('') else "./"
+            saveCanvas(canvs[p][cSave],saveDir, p, formats=["png"], extraFormats=["root","C","pdf"])
+    return ret
 
 
 
@@ -959,7 +964,7 @@ def getFOMPlotFromStacks( ret, plot, sampleList ,fom=True, fom_reverse = False, 
                 nomeratorList = sigList
             else:
                 nomeratorList = [x for x in noms]
-            if denom in nomeratorList: nomeratorList.remove(denom)
+            #if denom in nomeratorList: nomeratorList.remove(denom)
 
             fomMin, fomMax = (100,-100)
             for nom in nomeratorList:
@@ -1067,7 +1072,9 @@ def getFOMPlotFromStacksPair( ret, plot, sampleList ,fom=True, normalize=False,
                 fomPlotTitle = fomFunc if not fomTitles else fomTitles[ipad-2]
             if fomTitles:
                 fomPlotTitle=fomTitles[ipad-2]
+            
             dOpt="" if not isDataPlot else "E0P"
+            
             for pair in pairs:
                 pair = tuple(pair)
                 print "   pairs:   ",ipad, pair, dOpt
@@ -1724,10 +1731,12 @@ class Weight(object):
         self.weight_list = self.getWeightList(weights, cut, lumi)
         return joinWeightList(self.weight_list) 
 
+if dataIncomplete: dataWeight = "(1.79443166737)"
+else: dataWeight = "(1)"
 
 def decide_weight2( sample, weight=None, cut="default" , lumi="target_lumi"):
-    if sample.isData:
-        weight_str = "(1)"
+    if sample.isData: 
+        weight_str = dataWeight 
         return weight_str
     if not weight:
         weight = sample.weights
@@ -1826,7 +1835,14 @@ class Yields():
 
         self.lumi_string    =  "target_lumi"
         self.lumi           =  samples.get_lumis( self.lumi_string ) 
-        
+        #added
+        sigList, bkgList, dataList = getSigBkgDataLists(samples, sampleList=sampleList)
+        isDataPlot = bool(len(dataList))
+        if isDataPlot:
+           self.lumi_weight = samples[dataList[0]].name+"_lumi"
+        else:
+           self.lumi_weight = "target_lumi"
+        #end 
         self.fomNames={}
 
         self.updateSampleLists(samples,self.sampleList)
@@ -1874,7 +1890,7 @@ class Yields():
         #                                                         [samples[sample]['name'] for sample in self.sigList] ] )
 
         #self.weights        = { samp:decide_weight(samples[samp] , self.weight    ) for samp in self.sampleList }
-        self.weights        = { samp:decide_weight2(samples[samp] , cut=self.cutInst.name, lumi=self.lumi_string    ) for samp in self.sampleList } # need to fix lumi for comparison with data
+        self.weights        = { samp:decide_weight2(samples[samp] , cut=self.cutInst.name, lumi=self.lumi_weight    ) for samp in self.sampleList } # need to fix lumi for comparison with data
             
 
         if hasattr(self,"LatexTitles"):
@@ -2321,7 +2337,7 @@ def sig_yield_adder( bins = [ ] ):
 
 texDir="./tex/"
 #pdfDir="/afs/hephy.at/user/n/nrad/www/T2Deg13TeV/analysis/RunII/cutbased/dmt_regions/tables/"
-#pdfDir="/afs/hephy.at/user/n/%s/www/T2Deg13TeV/Test/"%username
+pdfDir="/afs/hephy.at/user/n/%s/www/T2Deg13TeV/Test/"%username
 pklDir="./pkl/dmt_regions/*.pkl"
 
 
@@ -2344,10 +2360,10 @@ import os
 
 
 #templateDir = "/afs/hephy.at/user/n/nrad/CMSSW/fork/CMSSW_7_4_12_patch4/src/Workspace/DegenerateStopAnalysis/python/navidTools/LaTexJinjaTemplates/"
-templateDir = cmsbase + "/src/Workspace/DegenerateStopAnalysis/python/navidTools/LaTexJinjaTemplates/"
+templateDir = cmsbase + "/src/Workspace/DegenerateStopAnalysis/python/tools/LaTexJinjaTemplates/"
 
 class JinjaTexTable():
-    def __init__(self,yieldInstance, yieldOpt=None, texDir="./tex/", pdfDir="./pdf", outputName="",\
+    def __init__(self,yieldInstance, yieldOpt=None, texDir="./tex/", pdfDir=pdfDir, outputName="",\
                  searchpath=templateDir, template_file= "", removeJunk=True, tableNum=1, caption="", title="", transpose=False):
         if not template_file:
             template_file = "LaTexTemplateWithFOM_v2.j2.tex"

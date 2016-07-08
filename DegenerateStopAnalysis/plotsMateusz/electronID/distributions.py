@@ -5,10 +5,12 @@
 import ROOT
 import os, sys
 import Workspace.DegenerateStopAnalysis.toolsMateusz.ROOToptions
-from Workspace.DegenerateStopAnalysis.toolsMateusz.cmgTuplesPostProcessed_mAODv2 import cmgTuplesPostProcessed
-from Workspace.DegenerateStopAnalysis.toolsMateusz.getSamples_PP_mAODv2_7412pass2_scan import getSamples
 from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
+from Workspace.DegenerateStopAnalysis.toolsMateusz.cmgTuplesPostProcessed_mAODv2_analysisHephy13TeV import cmgTuplesPostProcessed
+from Workspace.DegenerateStopAnalysis.toolsMateusz.getSamples_mAODv2_analysisHephy13TeV import getSamples
+#from Workspace.DegenerateStopAnalysis.toolsMateusz.cmgTuplesPostProcessed_mAODv2 import cmgTuplesPostProcessed
+#from Workspace.DegenerateStopAnalysis.toolsMateusz.getSamples_PP_mAODv2_7412pass2_scan import getSamples
 from array import array
 from math import pi, sqrt #cos, sin, sinh, log
 import argparse
@@ -17,8 +19,10 @@ import argparse
 privateSignals = ["s10FS", "s30", "s30FS", "s60FS", "t2tt30FS"]
 backgrounds=["w","tt", "z","qcd"]
 
+cmgPP = cmgTuplesPostProcessed()
+
 samplesList = backgrounds # + privateSignals
-samples = getSamples(sampleList=samplesList, scan=True, useHT=False, getData=False)#, cmgPP=cmgPP) 
+samples = getSamples(cmgPP=cmgPP, sampleList=samplesList, scan=True, useHT=True, getData=False)
 
 officialSignals = ["s300_290", "s300_270", "s300_240"] #FIXME: crosscheck if these are in allOfficialSignals
 
@@ -29,7 +33,7 @@ allSamples = allSignals + backgrounds
 
 #Input options
 parser = argparse.ArgumentParser(description="Input options")
-parser.add_argument("--var", dest="var",  help="Electron ID Variable (sigmaEtaEta, hOverE, ooEmooP, dPhi, dEta, d0, dz, MissingHits, convVeto)", type=str, default="sigmaEtaEta") #"sigmaEtaEta" "hOverE" "ooEmooP" "dPhi" "dEta" "d0" "dz" "MissingHits" "convVeto"
+parser.add_argument("--var", dest="var",  help="Electron ID Variable", type=str, default="sigmaEtaEta") #"sigmaEtaEta" "hOverE" "ooEmooP" "dPhi" "dEta" "d0" "dz" "MissingHits" "convVeto"
 parser.add_argument("--slice", dest="slice",  help="Pt Slice Bounds (low,up)", type=int, nargs=2, metavar = ('slice_low', 'slice_up'))
 parser.add_argument("--sample", dest="sample",  help="Sample", type=str, default="s300_270")
 parser.add_argument("--presel", dest="presel",  help="Add Preselection", type=int, default=1) # applies preselection
@@ -193,7 +197,7 @@ for i,reg in enumerate(geoSel.keys()):
          hlines2[iWP][var][reg].Draw()
    
    if i == 0: 
-      l1 = makeLegend()
+      l1 = makeLegend2()
       l1.AddEntry(hlines['Veto'][var][reg], "Veto ID", "l")
       l1.AddEntry(hlines['Loose'][var][reg], "Loose ID", "l")
       l1.AddEntry(hlines['Medium'][var][reg], "Medium ID", "l")

@@ -16,9 +16,6 @@ from Workspace.DegenerateStopAnalysis.toolsMateusz.getSamples_mAODv2_analysisHep
 from array import array
 from math import pi, sqrt #cos, sin, sinh, log
 
-ROOT.setTDRStyle(1)
-ROOT.gStyle.SetOptStat(0) #1111 #0 removes histogram statistics box #Name, Entries, Mean, RMS, Underflow, Overflow, Integral, Skewness, Kurtosis
-
 #Input options
 parser = argparse.ArgumentParser(description = "Input options")
 #parser.add_argument("--isolation", dest = "isolation",  help = "Isolation (hybIso03/hybIso04)", type = str, default = "hybIso03")

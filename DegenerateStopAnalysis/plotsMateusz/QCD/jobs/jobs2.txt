@@ -1,0 +1,11 @@
+python -b QCDestimation.py --plot 1 --ABCD 2 --highWeightVeto 1 --HT 300 --MET 300 --eleWP Veto  
+python -b QCDestimation.py --plot 1 --ABCD 2 --highWeightVeto 1 --HT 200 --MET 200 --eleWP Veto
+
+python -b QCDestimation.py --plot 1 --ABCD 1 --highWeightVeto 1 --HT 300 --MET 300 --eleWP Veto  
+python -b QCDestimation.py --plot 1 --ABCD 1 --highWeightVeto 1 --HT 200 --MET 200 --eleWP Veto
+
+python -b QCDestimation_index.py --plot 1 --ABCD 2 --highWeightVeto 1 --HT 300 --MET 300 --eleWP Veto  
+python -b QCDestimation_index.py --plot 1 --ABCD 2 --highWeightVeto 1 --HT 200 --MET 200 --eleWP Veto
+
+python -b QCDestimation_index.py --plot 1 --ABCD 1 --highWeightVeto 1 --HT 300 --MET 300 --eleWP Veto  
+python -b QCDestimation_index.py --plot 1 --ABCD 1 --highWeightVeto 1 --HT 200 --MET 200 --eleWP Veto

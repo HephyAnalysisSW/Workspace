@@ -1,20 +1,18 @@
+#getSamples_mAODv2_analysisHephy13TeV.py
+
 import ROOT
 from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYieldFromChain, getChunks
-from Workspace.DegenerateStopAnalysis.navidTools.Sample import Sample, Samples
-from Workspace.DegenerateStopAnalysis.colors import colors
+from Workspace.DegenerateStopAnalysis.tools.Sample import Sample, Samples
+from Workspace.DegenerateStopAnalysis.tools.colors import colors
 from Workspace.DegenerateStopAnalysis.toolsMateusz.cmgTuplesPostProcessed_mAODv2_analysisHephy13TeV import cmgTuplesPostProcessed
 from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
-from Workspace.DegenerateStopAnalysis.tools.weights import weights , def_weights , Weight
-#from Workspace.DegenerateStopAnalysis.weights import weights , def_weights , Weight
+from Workspace.DegenerateStopAnalysis.tools.weights import weights, def_weights, Weight
+
 #import Workspace.DegenerateStopAnalysis.cmgTuplesPostProcessed_mAODv2_scan as cmgTuplesPostProcessed
-#import Workspace.DegenerateStopAnalysis.weights as weights
 import os
 import re
 import glob
 #-------------------------
-
-#skim='presel'
-
 
 lumis = { 
             #'lumi_mc':10000, 
@@ -22,11 +20,6 @@ lumis = {
             'lumi_data_blinded':2245.386, 
             'lumi_data_unblinded':139.63,
         }
-
-#lumis = {'lumi_mc':10000.,
-#         'lumi_target':2300.,
-#         'lumi_data_blind':2245.386, 
-#         'lumi_data_unblind':139.63}
 
 print makeLine()
 for l in lumis: print l, ": ", lumis[l]
@@ -71,7 +64,8 @@ def getSamples( wtau  = False, sampleList=['w','tt','z','sig'],
     #             (Flag_eeBadScFilter))'
 
     data_filters = "Flag_METFilters && Flag_Veto_Event_List"
-    data_triggers= "HLT_PFMET170_JetIdCleaned"
+    data_triggers_MET = "HLT_PFMET90_PFMHT90_IDTight" #"HLT_PFMET170_JetIdCleaned"
+    data_triggers_Mu = "HLT_IsoMu27"
 
     sampleDict = {}
     htString = "HT" if useHT else "Inc"
@@ -125,25 +119,43 @@ def getSamples( wtau  = False, sampleList=['w','tt','z','sig'],
                         })
 
     if "d" in sampleList or "dblind" in sampleList:
-      skim = 'inc'
-      if blinded:
-        METDataOct05    = getChain(cmgPP.MET_Oct05[skim],histname='')
-        METDataUnblind  = METDataOct05.CopyTree("run<=257599")
-        METDataBlind    = getChain(cmgPP.MET_v4[skim],histname='')
-        METDataBlind.Add(METDataOct05)
-        sampleDict.update( {
-            "d":              {'tree':METDataUnblind       ,"sample":cmgPP.MET_Oct05[skim]   ,'name':"DataUnblind"      , 'color':ROOT.kBlack             , 'isSignal':0 ,'isData':1    ,"triggers":data_triggers   ,"filters":data_filters    ,'lumi': lumi_data_unblinded  },
-            "dblind":         {'tree':METDataBlind         ,"sample":cmgPP.MET_v4[skim]      ,'name':"DataBlind" , 'color':ROOT.kBlack          , 'isSignal':0 ,'isData':1              ,"triggers":data_triggers   ,"filters":data_filters    ,'lumi': lumi_data_blinded  },
-              })
-      else:
-          assert False
+      #if blinded:
+      METDataOct05    = getChain(cmgPP.MET_Oct05[skim],histname='')
+      METDataUnblind  = METDataOct05#.CopyTree("run<=257599")
+      METDataBlind    = getChain(cmgPP.MET_v4[skim],histname='')
+      METDataBlind.Add(METDataOct05)
+      sampleDict.update( {
+          "d":              {'tree':METDataUnblind       ,"sample":cmgPP.MET_Oct05[skim]   ,'name':"DataUnblind"      , 'color':ROOT.kBlack             , 'isSignal':0 ,'isData':1    ,"triggers":data_triggers_MET   ,"filters":data_filters    ,'lumi': lumi_data_unblinded, 'cut':"run<=257599"},
+          "dblind":         {'tree':METDataBlind         ,"sample":cmgPP.MET_v4[skim]      ,'name':"DataBlind" , 'color':ROOT.kBlack          , 'isSignal':0 ,'isData':1              ,"triggers":data_triggers_MET   ,"filters":data_filters    ,'lumi': lumi_data_blinded  },
+            })
+      #else: assert False
+      
+    elif "d1mu" in sampleList or "d1muBlind" in sampleList:
+      SingleMuDataOct05    = getChain(cmgPP.SingleMu_Oct05[skim],histname='')
+      SingleMuDataUnblind  = SingleMuDataOct05#.CopyTree("run<=257599")
+      SingleMuDataBlind    = getChain(cmgPP.SingleMu_v4[skim],histname='')
+      SingleMuDataBlind.Add(SingleMuDataOct05)
+      sampleDict.update( {
+          "d1mu":              {'tree':SingleMuDataUnblind       ,"sample":cmgPP.SingleMu_Oct05[skim]   ,'name':"SingleMuDataUnblind"      , 'color':ROOT.kBlack             , 'isSignal':0 ,'isData':1    ,"triggers":data_triggers_Mu   ,"filters":data_filters    ,'lumi': lumi_data_unblinded, 'cut':"run<=257599"},
+          "d1muBlind":         {'tree':SingleMuDataBlind         ,"sample":cmgPP.SingleMu_v4[skim]      ,'name':"SingleMuDataBlind" , 'color':ROOT.kBlack          , 'isSignal':0 ,'isData':1              ,"triggers":data_triggers_Mu   ,"filters":data_filters    ,'lumi': lumi_data_blinded  },
+            })
+
+    elif "d1el" in sampleList or "d1elBlind" in sampleList:
+      SingleElDataOct05    = getChain(cmgPP.SingleEl_Oct05[skim],histname='')
+      SingleElDataUnblind  = SingleElDataOct05#.CopyTree("run<=257599")
+      SingleElDataBlind    = getChain(cmgPP.SingleEl_v4[skim],histname='')
+      SingleElDataBlind.Add(SingleElDataOct05)
+      sampleDict.update( {
+          "d1el":              {'tree':SingleElDataUnblind       ,"sample":cmgPP.SingleEl_Oct05[skim]   ,'name':"SingleElDataUnblind"      , 'color':ROOT.kBlack             , 'isSignal':0 ,'isData':1    ,"triggers":data_triggers   ,"filters":data_filters    ,'lumi': lumi_data_unblinded, 'cut':"run<=257599"},
+          "d1elBlind":         {'tree':SingleElDataBlind         ,"sample":cmgPP.SingleEl_v4[skim]      ,'name':"SingleElDataBlind" , 'color':ROOT.kBlack          , 'isSignal':0 ,'isData':1              ,"triggers":data_triggers   ,"filters":data_filters    ,'lumi': lumi_data_blinded  },
+            })
 
     if "dy" in sampleList:
         DYJetsSample        = getChain(cmgPP.DYJetsM5to50HT[skim],histname='')
         sampleDict.update({
-              'dy5':               {'sample':cmgPP.DYJetsM5to50HT[skim]          ,'name':'DYJetsM5to50'  ,'color':colors['dy1']            , 'isSignal':0 ,'isData':0    ,"lumi":lumi_mc      },
+              #'dy5':               {'sample':cmgPP.DYJetsM5to50HT[skim]          ,'name':'DYJetsM5to50'  ,'color':colors['dy1']            , 'isSignal':0 ,'isData':0    ,"lumi":lumi_mc      },
               'dy50':              {'sample':cmgPP.DYJetsM50HT[skim]             ,'name':'DYJetsM50'  ,'color':colors['dy1']            , 'isSignal':0 ,'isData':0    ,"lumi":lumi_mc      },
-              'dyInv':             {'sample':cmgPP.DYJetsToNuNu[skim]            ,'name':'DYJetsInv'  ,'color':colors['dy1']            , 'isSignal':0 ,'isData':0    ,"lumi":lumi_mc      },
+              #'dyInv':             {'sample':cmgPP.DYJetsToNuNu[skim]            ,'name':'DYJetsInv'  ,'color':colors['dy1']            , 'isSignal':0 ,'isData':0    ,"lumi":lumi_mc      },
                         }) 
 
     if wtau:
@@ -223,21 +235,21 @@ def getSamples( wtau  = False, sampleList=['w','tt','z','sig'],
     samples = Samples(**sampleDict2)
     samples.set_lumis(lumi_target = lumi_target, lumi_data_blinded = lumi_data_blinded, lumi_data_unblinded = lumi_data_unblinded, lumi_mc = lumi_mc)
 
-    if "dblind" in samples: 
-      print makeLine()
-      print "Reweighting MC samples to blinded data luminosity of " + str(lumi_data_blinded) + " with factor: " + str(lumi_data_blinded/lumi_mc)
-      print makeLine()
-      samples.addWeight(lumi_data_blinded/lumi_mc) # scale to the target luminosity
-    elif "d" in samples: 
-      print makeLine()
-      print "Reweighting MC samples to unblinded data luminosity of " + str(lumi_data_unblinded) + " with factor: " + str(lumi_data_unblinded/lumi_mc)
-      print makeLine()
-      samples.addWeight(lumi_data_unblinded/lumi_mc) # scale to the target luminosity
-    else: 
-      print makeLine()
-      print "Reweighting to target luminosity of " + str(lumi_target) + " with factor: " + str(lumi_target/lumi_mc)
-      print makeLine()
-      samples.addWeight(lumi_target/lumi_mc) # scale to the target luminosity
+    #if "dblind" in samples: 
+    #  print makeLine()
+    #  print "Reweighting MC samples to blinded data luminosity of " + str(lumi_data_blinded) + " with factor: " + str(lumi_data_blinded/lumi_mc)
+    #  print makeLine()
+    #  samples.addWeight(lumi_data_blinded/lumi_mc) # scale to the target luminosity
+    #elif "d" in samples: 
+    #  print makeLine()
+    #  print "Reweighting MC samples to unblinded data luminosity of " + str(lumi_data_unblinded) + " with factor: " + str(lumi_data_unblinded/lumi_mc)
+    #  print makeLine()
+    #  samples.addWeight(lumi_data_unblinded/lumi_mc) # scale to the target luminosity
+    #else: 
+    #  print makeLine()
+    #  print "Reweighting to target luminosity of " + str(lumi_target) + " with factor: " + str(lumi_target/lumi_mc)
+    #  print makeLine()
+    #  samples.addWeight(lumi_target/lumi_mc) # scale to the target luminosity
     
 
     #samples.addLumiWeight( lumi_target = lumi_target, lumi_base = None , sampleList=[])         ## scale to the target luminosity
