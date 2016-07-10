@@ -8,8 +8,10 @@ colors ={
               'qcdem':         ROOT.kMagenta - 3, #ROOT.kRed -6         , 
               'wtau':          ROOT.kSpring-2       ,
               'wnotau':        ROOT.kSpring+2       ,
-              'dy1':           ROOT.kMagenta       ,
-              'dy2':           ROOT.kYellow        ,
+              'dy5to50':       ROOT.kMagenta       ,
+              'dy5to50Inc':    ROOT.kViolet        ,
+              'dy':            ROOT.kViolet-3        ,
+              'dyInv':         ROOT.kViolet+3        ,
 
 
 
@@ -27,15 +29,32 @@ dm_color_dict ={
                 20: ROOT.kViolet   ,
                 30: ROOT.kMagenta   ,
                 40: ROOT.kOrange      ,
-                50: ROOT.kYellow   ,
+                50: ROOT.kYellow + 3  ,
                 60: ROOT.kGreen   ,
                 70: ROOT.kSpring   ,
                 80: ROOT.kRed   ,
             }
 
-for mstop in  range(100, 601, 25):
-    for dm in range(10, 81,  10):
-        colors['s%s_%s'%(mstop,mstop-dm)] = dm_color_dict[dm]
+new_colors = {}
+
+
+max_mstop = 600
+min_mstop = 100
+max_dm   = 80
+min_dm   = 10
+mstop_range = range(min_mstop, max_mstop+1, 25)
+dm_range    = range(min_dm, max_dm+1,  10)
+for ims , mstop in  enumerate( mstop_range):
+    for idm , dm in enumerate(dm_range):
+        mlsp = mstop - dm
+        #ic = int( 300+ims*10 + idm  )
+        #r   = 1. * mstop / max_mstop   
+        #g   = 1. * mstop / max_mstop
+        #b   = 1. * dm    / max_dm
+        #new_colors[ic] = ROOT.TColor(ic, r,g,b)
+        #print ic
+        colors['s%s_%s'%(mstop,mstop-dm)] = dm_color_dict[dm] # + int(mstop/10.) -10
+        #colors['s%s_%s'%(mstop,mstop-dm)] = ic
         
 
 
