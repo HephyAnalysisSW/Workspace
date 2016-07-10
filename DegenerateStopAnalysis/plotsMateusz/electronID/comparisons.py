@@ -14,9 +14,9 @@ filedir = "/afs/hephy.at/user/m/mzarucki/www/plots/electronID/efficiencies"
 
 #Input options
 parser = argparse.ArgumentParser(description="Input options")
-parser.add_argument("--num", dest="num",  help="Numerator ID type", type=str, default="manual") # "standard" "manual" "iso"
-parser.add_argument("--den", dest="den",  help="Denominator ID type", type=str, default="standard") # "standard" "manual" "iso"
-parser.add_argument("--iso", dest="iso",  help="Isolation", type=str, default="relIso03") #"relIso03" "relIso04" "miniRelIso" "relIsoAn04"
+parser.add_argument("--num", dest="num",  help="Numerator ID type", type=str, default="manual") #"standard" "manual" "iso"
+parser.add_argument("--den", dest="den",  help="Denominator ID type", type=str, default="standard") #"standard" "manual" "iso"
+parser.add_argument("--iso", dest="iso",  help="Isolation", type=str, default="hybIso03") #"hybIso03" "hybIso04"
 parser.add_argument("--mvaWPs", dest="mvaWPs",  help="Add MVA WPs", type=int, default=0) # includes MVA WPs
 parser.add_argument("--zoom", dest="zoom",  help="Toggle zoom", type=int, default=1)
 parser.add_argument("--save", dest="save",  help="Toggle Save", type=int, default=1)
@@ -31,17 +31,17 @@ if not len(sys.argv) > 1:
 #Arguments
 num = args.num # "iso" | "manual"
 den = args.den # "manual" | "standard"
-if num == "iso" or den == "iso": isolations = ["miniRelIso", "relIso03", "relIso04"] #args.iso #relIsoAn04
+if num == "iso" or den == "iso": isolations = ["hybIso03", "hybIso04"] #["miniRelIso", "relIso03", "relIso04"] #args.iso #relIsoAn04
 else: isolations = [""]
 mvaWPs = args.mvaWPs # includes MVA WPs
 zooms = [0,1] #zoom
 save = 1 #args.save
 
-privateSignals = ["S300_240Fast", "S300_270", "S300_270Fast", "S300_290Fast", "T2tt300_270Fast"]
-officialSignals = ["T2_4bd300_240", "T2_4bd300_270", "T2_4bd300_290"]
+#privateSignals = ["S300_240Fast", "S300_270", "S300_270Fast", "S300_290Fast", "T2tt300_270Fast"]
+#officialSignals = ["T2_4bd300_240", "T2_4bd300_270", "T2_4bd300_290"]
 backgrounds=["WJets", "TTJets", "ZJetsInv", "QCD"] 
-signals = privateSignals + officialSignals
-samples = signals + backgrounds
+#signals = privateSignals + officialSignals
+samples = backgrounds #signals + 
 
 #Bin size 
 #nbins = 100
