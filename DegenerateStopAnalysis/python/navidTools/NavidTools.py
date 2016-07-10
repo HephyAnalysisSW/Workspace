@@ -10,8 +10,8 @@ from copy import deepcopy
 
 from Workspace.HEPHYPythonTools.user import username
 from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYieldFromChain, getChunks
-from Workspace.DegenerateStopAnalysis.navidTools.getRatioPlot import *
-from Workspace.DegenerateStopAnalysis.navidTools.FOM import *
+from Workspace.DegenerateStopAnalysis.tools.getRatioPlot import *
+from Workspace.DegenerateStopAnalysis.tools.FOM import *
 
 import Workspace.DegenerateStopAnalysis.tools.colors as sample_colors_
 sample_colors = sample_colors_.colors
@@ -27,6 +27,8 @@ import re
 #execfile('../../../python/navidTools/getRatioPlot.py')
 #reload(Workspace.DegenerateStopAnalysis.navidTools.getRatioPlot)
 
+dataIncomplete = 0
+
 cmsbase = os.getenv("CMSSW_BASE")
 def setup_style(cmsbase=cmsbase):
     print "CMSBASE", cmsbase
@@ -36,7 +38,7 @@ def setup_style(cmsbase=cmsbase):
     maxN = -1
     ROOT.gStyle.SetOptStat(0)
     ROOT.gStyle.SetPalette(1)
-    return cmsbase
+    return #cmsbase
 #ROOT.gStyle.SetCanvasPreferGL(1)
 
 #pp=prettyprint.PrettyPrinter(indent=3, depth=5, width=120)
@@ -91,9 +93,9 @@ def makeDir(path):
         mkdir_p(path)
 
 
-def saveCanvas(canv,dir="./",name="",formats=["png"], extraFormats=["root","C","pdf"] , make_dir=True):
-    if not os.path.isdir(dir) and make_dir: 
-        makeDir(save)
+def saveCanvas(canv,dir="./",name="",formats=["png"], extraFormats=["root","C","pdf"],overwrite=False, makeDir=True):
+    if not os.path.isdir(dir): 
+        mkdir_p(dir)
     if type(formats)!=type([]):
         formats = [formats]
     for form in formats:
@@ -246,21 +248,6 @@ class ArgParser(argparse.ArgumentParser):
 #############################################################################################################
 import hashlib
 
-
-def setMVASampleEventList(samples, sample, killTrain = False):
-    if not ( hasattr( samples[sample], 'cut' ) and samples[sample]['cut'] ) :
-        return
-    cuts = [ samples[sample].cut ]
-    if killTrain:
-        cuts.append("!trainingEvent")
-    cutStr = "&&".join("(%s)"%cut for cut in cuts )
-    cutInst = CutClass( samples[sample].name, [[ samples[sample].name, cutStr ]] , baseCut = None )
-    setEventListToChains( samples, [sample], cutInst , verbose=False)
-    return
-
-
-
-
 def getEventListFromFile(eListName,tmpDir=None,opt="read"):
   if opt.lower() in ["read","r"]:
     eListPath="%s/%s.root"%(tmpDir,eListName)
@@ -270,7 +257,7 @@ def getEventListFromFile(eListName,tmpDir=None,opt="read"):
   return eList
 
 
-def getEventListFromChain(sample,cut,eListName="",tmpDir="./",opt="write", verbose=True):
+def getEventListFromChain(sample,cut,eListName="",tmpDir="./",opt="write"):
   if not eListName or eListName.lower()=="elist" : 
     print "WARNING: Using Default eList Name, this could be dangerous! eList name should be customized by the sample name and cut" 
     eListName="eList" 
@@ -279,7 +266,7 @@ def getEventListFromChain(sample,cut,eListName="",tmpDir="./",opt="write", verbo
   eList=ROOT.gDirectory.Get(eListName)
   if opt.lower() in ["write", "w", "save", "s" ]:
     eListPath="%s/%s.root"%(tmpDir,eListName)
-    if verbose: print "EventList saved in: %s"%eListPath
+    print "EventList saved in: %s"%eListPath
     f = ROOT.TFile(eListPath,"recreate")
     eList.Write()
     f.Close()
@@ -293,10 +280,10 @@ def setEventListToChain(sample,cut,eListName="",verbose=True,tmpDir=None,opt="re
     if os.path.isfile(eListPath):
       eList = getEventListFromFile(eListName=eListName,tmpDir=tmpDir,opt=opt)
     else:
-      if verbose: print "eList was not found in:%s "%eListPath
+      print "eList was not found in:%s "%eListPath
       opt="write"
   if opt.lower() in ["make","m","write", "w","s","save"] : 
-    if verbose: print " "*12, "Creating EList", eListName 
+    if True: print " "*12, "Creating EList", eListName 
     eList = getEventListFromChain(sample,cut,eListName,tmpDir=tmpDir,opt=opt)
   if verbose: print " "*12, "Setting EventList to Chain: ", sample, "Reducing the raw nEvents from ", sample.GetEntries(), " to ", 
   sample.SetEventList(eList) 
@@ -316,29 +303,19 @@ def setEventListToChains(samples,sampleList,cutInst,verbose=True,opt="read"):
       pp.pprint( "Applying to samples in: %s"%sampleList)
     for sample in sampleList:
       eListName="eList_%s_%s"%(sample,cutName)
-      stringsToBeHashed = [] 
       if samples[sample].has_key("dir"):
-        stringsToBeHashed =  [samples[sample]['dir']]  
-      if samples[sample].has_key("sample") and samples[sample]['sample'] :
-        stringsToBeHashed.extend( sorted(samples[sample]['sample']['bins'])  )
-      stringsToBeHashed.append( cutString  )
-      #print stringsToBeHashed
-
-      stringToBeHashed = "/".join(stringsToBeHashed)
-      sampleHash = hashlib.sha1(stringToBeHashed).hexdigest()
-      eListName +="_%s"%sampleHash
+        stringToBeHashed = "/".join( [samples[sample]['dir']] + sorted(samples[sample]['sample']['bins'])+ [cutString] ) 
+        sampleHash = hashlib.sha1(stringToBeHashed).hexdigest()
+        eListName +="_%s"%sampleHash
       setEventListToChain(samples[sample]['tree'],cutString,eListName=eListName,verbose=False,opt=opt)
       if verbose:
         if samples[sample]['tree'].GetEventList():
-          if verbose: print " "*6 ,"Sample:", sample,   "Reducing the raw nEvents from ", samples[sample]['tree'].GetEntries(), " to ", samples[sample]['tree'].GetEventList().GetN()
+          print " "*6 ,"Sample:", sample,   "Reducing the raw nEvents from ", samples[sample]['tree'].GetEntries(), " to ", samples[sample]['tree'].GetEventList().GetN()
         else:
           print "FAILED Setting EventList to Sample", sample, samples[sample]['tree'].GetEventList() 
-        if verbose: print " "*12, "eListName:" , eListName
+        print " "*12, "eListName:" , eListName
   else:
-    for sample in sampleList:
-        samples[sample]['tree'].SetEventList(0)
-    print "no cut... EventList set to 0" 
-    #print "no cut... no EventList was set to samples" 
+    print "no cut... no EventList was set to samples" 
 
 
 
@@ -648,7 +625,7 @@ def getPlots(samples,plots,cut,sampleList=[],plotList=[],weight="(weight)",nMinu
             if cutStr: print "        ---applying cutString:", cutStr
 
 
-            print "cut_str" , cutStr, hasattr(sample,'cut')            
+            #print "cut_str" , cutStr, hasattr(sample,'cut')            
             #if verbose: print " "*15, plot
             if nMinus1:
                 nMinus1String = nMinus1
@@ -690,131 +667,20 @@ def getPlotFromYields(name, yields, keys=[]):
         #hist.SetBinContent(i,v)
         #hist.Fill(k,v)
         hist.SetBinContent(i,v)
-        hist.SetBinError(i,v_err)
         hist.GetXaxis().SetBinLabel(i,k)
+        graph.SetPoint(i,i,v)
+        graph_err.SetPointError(v_err,0)
     hist.GetXaxis().LabelsOption("v")
-    return hist  
+    return hist  , graph, graph_err
     
 
-def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin = 0.01, logs = [0,1], save=""):
+def drawYields(samples, yieldInst, sampleList=[]):
 
     yld = yieldInst
-
-    if type(yld)==type(""):
-        yld = pickle.load( open(yld))
-
     if not sampleList:
         sampleList = yld.bkgList
-    if not keys:
-        keys = yld.cutNames
-    bkgList =  [x for x in sampleList if x in yld.bkgList]
-    sigList =  [x for x in sampleList if x in yld.sigList]
-    dataList = [x for x in sampleList if x in [] ] 
-    yldplt = {}
-    draw = True
-    if draw:
-        padRatios = [3,1] if ratios else [1,0]
-        canvs = makeCanvasMultiPads(c1Name="%s_%s"%("Yields",name),c1ww=800,c1wh=800, joinPads=True, padRatios=padRatios, pads=[]  )
-        cSave, cMain = [0,1] if ratios else [0,0]
-        canvs[cMain].cd()
-        dOpt = "hist"
-        canvs[cMain].SetGrid(1,0)
-    for sample in sampleList:
-        yldplt[sample] = getPlotFromYields(sample, yld.yieldDictFull[sample], keys=keys)
-        if sample in bkgList:
-            yldplt[sample].SetFillColor(  sample_colors.get(sample,1)  )
-            
-        if sample in sigList:
-            yldplt[sample].SetLineColor(  sample_colors.get(sample,1)  )
-            yldplt[sample].SetMarkerSize(0)
-            yldplt[sample].SetMarkerSize(0)
 
-    stacks = getStackFromHists([yldplt[bkg] for bkg in bkgList])
-    bkg_tot = yldplt[bkg].Clone("bkg_tot_%s"%name)
-    bkg_tot.Reset()
-    bkg_tot.Merge(stacks.GetHists())
-    bkg_tot.SetFillStyle(3001)
-    bkg_tot.SetFillColor(1)
-    bkg_tot.SetMarkerSize(0)
-    
-    if draw:
-        stacks.Draw("hist")
-        stacks.SetMinimum(plotMin)
-        bkg_tot.Draw("same E2")
-        
-    for sig in sigList:
-        yldplt[sig].Draw("same")
-    stacks.Draw("same AXIG")
-
-    canvs[cMain].SetLogx(logs[0])
-    canvs[cMain].SetLogy(logs[1])
-    canvs[cMain].Update()
-
-    if ratios:
-        canvs[cMain+1].cd()
-        canvs[cMain+1].SetGrid()
-        ratio_ref = bkg_tot.Clone("ratio_ref_%s"%name)
-        #ratio_ref.SetError(ar.array( "d",[0]* ratio_ref.GetNbinsX() ) )
-        #ratio_ref.Divide(ratio_ref)
-        ratio_ref.Reset()
-        #if True: ## draw data/MC
-        if dataList: ## draw data/MC
-            ratio_ref.Draw("hist")
-            ratio_ref.GetYaxis().SetTitle("DATA/MC")
-            ratio_ref.SetMaximum(1.8)    
-            ratio_ref.SetMinimum(0)    
-            MCE = bkg_tot.Clone("MCError_%s"%name)
-            bkg_tot_noe =  bkg_tot.Clone("bkg_tot_noe_%s"%name)
-            bkg_tot_noe.SetError(ar.array( "d",[0]* bkg_tot_noe.GetNbinsX() ) )
-            #MCE.Divide( bkg_tot_noe  )
-            MCE.SetFillStyle(3001)
-            MCE.SetFillColor(1)
-            MCE.SetMarkerSize(0)
-            #MCE.Draw("e2same")
-
-            pass
-        elif sigList: ## draw Sig/BKG fom
-            fomtype = "AMSSYS"            
-            ratio_ref.GetYaxis().SetTitle(fomtype+"     ")
-            ratio_ref.Divide(ratio_ref)
-            ratio_ref.Draw("hist")
-            ratio_ref.SetMaximum(2.9)    
-            ratio_ref.SetMinimum(0)    
-            for sig in sigList:
-                fomplt = "FOM_%s"%sig
-                yldplt[fomplt] = getFOMFromTH1FIntegral( yldplt[sig], bkg_tot , fom =fomtype, integral=False )
-                yldplt[fomplt].Draw("same")
-
-        ratio_ref.GetXaxis().SetLabelSize(0.1)
-        ratio_ref.GetYaxis().SetLabelSize(0.1)
-        ratio_ref.GetYaxis().SetTitleOffset(0.75)
-        canvs[cMain+1].Update()
-
-    if save:
-        saveCanvas(canvs[cSave], dir = save, name = name ) 
-        canvs[cSave]
-
-    return canvs, yldplt, stacks, bkg_tot, ratio_ref 
-
-
-
-
-#                bkg_tot = hists['bkg'][plot].Clone("bkg_tot")
-#                bkg_tot.SetError(ar.array( "d",[0]*nBins ) )    # bkg_tot with no error
-#                data_ratio = hists[dataList[0]][plot].Clone("data")
-#                #data_ratio.Divide(bkg_tot)
-#                #data_ratio.Draw("e")
-#
-#                MCE = hists['bkg'][plot].Clone("MCError_%s"%( hists['bkg'][plot].GetName() )  ) ## bkg_tot with error
-#                MCE.Divide( bkg_tot)
-#                MCE.SetFillStyle(3001)
-#                MCE.SetFillColor(1)
-#                MCE.SetMarkerSize(0)
-#                MCE.Draw("e2same")
-#                ret['junk'].append(MCE)
-
-
-
+    canvs[p]=makeCanvasMultiPads(c1Name="%s_%s"%(cut.fullName,p),c1ww=800,c1wh=800, joinPads=True, padRatios=[3,1], pads=[])
 
 
 
@@ -909,7 +775,8 @@ def drawPlots(samples,plots,cut,sampleList=['s','w'],plotList=[],plotMin=False, 
         if plotMin: refStack.SetMinimum( plotMin )
         if plotLimits: 
             refStack.SetMinimum( plotLimits[0] )
-        refStack.SetMaximum( refStack.GetMaximum() * 30 )
+        if logy: refStack.SetMaximum( refStack.GetMaximum() * 30 )
+        else: refStack.SetMaximum( refStack.GetMaximum() * 1.5 )
 
         if leg:    #MAKE A LEGEND FUNCTION
             sigLegList = [samp for samp in sampleList if samp in samples.massScanList() + samples.privSigList()]
@@ -924,6 +791,7 @@ def drawPlots(samples,plots,cut,sampleList=['s','w'],plotList=[],plotMin=False, 
             sigLeg.Draw()
             ret['legs'].append([sigLeg, bkgLeg])
 
+            #from NavidTools
             #leg = ROOT.TLegend(0.6,0.6,0.9,0.9)
             #leg.SetFillColorAlpha(0,0.001)
             #leg.SetBorderSize(0)
@@ -937,9 +805,9 @@ def drawPlots(samples,plots,cut,sampleList=['s','w'],plotList=[],plotMin=False, 
 
         if fom:
 
-            if plots[p]['decor'].has_key('fom_reverse') :
-                fom_reverse= plots[p]['decor']['fom_reverse']
-            else: fom_reverse = True
+            if plots[p]['decor'].has_key('fom_reverse') and plots[p]['decor']['fom_reverse']:
+                fom_reverse=True
+            else: fom_reverse = False
 
             if pairList:
                 getFOMPlotFromStacksPair( ret, p, sampleList ,fom=fom, normalize=normalize,
@@ -950,13 +818,14 @@ def drawPlots(samples,plots,cut,sampleList=['s','w'],plotList=[],plotMin=False, 
                                               denoms=denoms,noms=noms,  ratioNorm=ratioNorm, fomLimits=fomLimits,
                                               leg=leg,unity=unity, verbose=verbose  )
         canvs[p][cMain].cd()
-        if bkgList:
+        if bkgList and fom:
             ret['hists']['bkg'][p].SetFillColor(1)
             ret['hists']['bkg'][p].SetFillStyle(3001)
             ret['hists']['bkg'][p].SetMarkerSize(0)
             ret['hists']['bkg'][p].Draw("e2same")
-        for c in canvs[p]:
-            c.RedrawAxis()
+        if fom:
+           for c in canvs[p]:
+              c.RedrawAxis()
         canvs[p][cMain].RedrawAxis()
         canvs[p][cMain].Update()
         canvs[p][cMain].cd()
@@ -1095,7 +964,7 @@ def getFOMPlotFromStacks( ret, plot, sampleList ,fom=True, fom_reverse = False, 
                 nomeratorList = sigList
             else:
                 nomeratorList = [x for x in noms]
-            if denom in nomeratorList: nomeratorList.remove(denom)
+            #if denom in nomeratorList: nomeratorList.remove(denom)
 
             fomMin, fomMax = (100,-100)
             for nom in nomeratorList:
@@ -1121,12 +990,12 @@ def getFOMPlotFromStacks( ret, plot, sampleList ,fom=True, fom_reverse = False, 
 
             if isDataPlot:
                 bkg_tot = hists['bkg'][plot].Clone("bkg_tot")
-                bkg_tot.SetError(ar.array( "d",[0]*nBins ) )    # bkg_tot with no error
                 data_ratio = hists[dataList[0]][plot].Clone("data")
+                bkg_tot.SetError(ar.array( "d",[0]*nBins ) )
                 #data_ratio.Divide(bkg_tot)
                 #data_ratio.Draw("e")
 
-                MCE = hists['bkg'][plot].Clone("MCError_%s"%( hists['bkg'][plot].GetName() )  ) ## bkg_tot with error
+                MCE = hists['bkg'][plot].Clone("MCError_%s"%plot)
                 MCE.Divide( bkg_tot)
                 MCE.SetFillStyle(3001)
                 MCE.SetFillColor(1)
@@ -1203,7 +1072,9 @@ def getFOMPlotFromStacksPair( ret, plot, sampleList ,fom=True, normalize=False,
                 fomPlotTitle = fomFunc if not fomTitles else fomTitles[ipad-2]
             if fomTitles:
                 fomPlotTitle=fomTitles[ipad-2]
+            
             dOpt="" if not isDataPlot else "E0P"
+            
             for pair in pairs:
                 pair = tuple(pair)
                 print "   pairs:   ",ipad, pair, dOpt
@@ -1749,10 +1620,8 @@ class CutClass():
                 if minusCut.lower() in cut[0].lower():
                     self.cutsToThrow.append(self.minusCutList.pop( self.minusCutList.index(cut)) )
         print "ignoring cuts," , self.cutsToThrow
-        if self.cutsToThrow:
-            return combineCutList(self.minusCutList)
-        else: 
-            return self.combined
+        return combineCutList(self.minusCutList)
+
 
     def add(self, cutInst, cutOpt="inclList", baseCutString="" ):
         if baseCutString:
@@ -1761,11 +1630,6 @@ class CutClass():
             cutList = getattr(cutInst,cutOpt)
         self.__init__(self.name,self.inclList + cutList , baseCut = self.baseCut)  
 
-    def __str__(self):
-        #return "%s Instance %s : %s"%(self.__class__.__name__ , self.name,   object.__str__(self) )
-        return "<%s Instance: %s>"%(self.__class__ , self.name )
-    def __repr__(self):
-        return "<%s Instance: %s>"%(self.__class__ , self.name  )
 
 
 def splitCutInPt(cutInst ):
@@ -1867,18 +1731,17 @@ class Weight(object):
         self.weight_list = self.getWeightList(weights, cut, lumi)
         return joinWeightList(self.weight_list) 
 
-
-
+if dataIncomplete: dataWeight = "(1.79443166737)"
+else: dataWeight = "(1)"
 
 def decide_weight2( sample, weight=None, cut="default" , lumi="target_lumi"):
-    if sample.isData:
-        weight_str = "(1)"
+    if sample.isData: 
+        weight_str = dataWeight 
         return weight_str
     if not weight:
         weight = sample.weights
 
-    #if isinstance(weight,Weight):
-    if hasattr(weight,"combine"):
+    if isinstance(weight,Weight):
         weight_str = weight.combine(cut=cut, lumi=lumi)
     else:
         if "weight" in weight.lower():
@@ -1956,7 +1819,6 @@ class Yields():
     '''
     def __init__(   self,   samples,    sampleList, cutInst,    cutOpt='flow',  tableName='{cut}',  weight="(weight)",
                     pklOpt=False,   pklDir="./pkl/",    nDigits=2, err=True, nProc = None,
-                    isMVASample = None, 
                     verbose=False, nSpaces=None):
         if not (isinstance(cutInst,CutClass) or hasattr(cutInst,cutOpt)):
             raise Exception("use an instance of cutClass")
@@ -1970,12 +1832,17 @@ class Yields():
         self.npsize="|S20"
         self.err = err
         self.nProc = nProc
-        self.isMVASample = isMVASample
-
 
         self.lumi_string    =  "target_lumi"
         self.lumi           =  samples.get_lumis( self.lumi_string ) 
-        
+        #added
+        sigList, bkgList, dataList = getSigBkgDataLists(samples, sampleList=sampleList)
+        isDataPlot = bool(len(dataList))
+        if isDataPlot:
+           self.lumi_weight = samples[dataList[0]].name+"_lumi"
+        else:
+           self.lumi_weight = "target_lumi"
+        #end 
         self.fomNames={}
 
         self.updateSampleLists(samples,self.sampleList)
@@ -2023,7 +1890,7 @@ class Yields():
         #                                                         [samples[sample]['name'] for sample in self.sigList] ] )
 
         #self.weights        = { samp:decide_weight(samples[samp] , self.weight    ) for samp in self.sampleList }
-        self.weights        = { samp:decide_weight2(samples[samp] , cut=self.cutInst.name, lumi=self.lumi_string    ) for samp in self.sampleList } # need to fix lumi for comparison with data
+        self.weights        = { samp:decide_weight2(samples[samp] , cut=self.cutInst.name, lumi=self.lumi_weight    ) for samp in self.sampleList } # need to fix lumi for comparison with data
             
 
         if hasattr(self,"LatexTitles"):
@@ -2134,13 +2001,8 @@ class Yields():
 
     def getYieldsForSample(self,samples, sample, cutList ):
         yieldDictSample={}
-        #if cfg and hasattr(cfg, "isMVASample") and cfg.isMVASample and not samples[sample]['tree'].GetEventList():
-        setSampleEventList = False
-        if self.isMVASample and not samples[sample]['tree'].GetEventList():
-            setSampleEventList = True
-            setMVASampleEventList(samples, sample)
-
         for ic, cut in enumerate(cutList):
+
             if hasattr(samples[sample], 'cut'):
                 cutStr = "((%s) && (%s) )"%(cut[1],samples[sample].cut)
             else:
@@ -2157,10 +2019,6 @@ class Yields():
             yieldDictSample[cut[0]] = yld
             self.yieldDictFull[sample][cut[0]] = yld
             #self.yieldDictRaw[sample].append(yld)
-        if setSampleEventList:
-            samples[sample]['tree'].SetEventList(0)
-            #setSampleEventList = False
-        
         if self.verbose:  
             
             self.pprint( [np.array([self.sampleNames[sample]]+[ yieldDictSample[cut] for cut in self.cutNames] , self.npsize)] , nSpaces=self.nSpaces   )     
@@ -2502,7 +2360,7 @@ import os
 
 
 #templateDir = "/afs/hephy.at/user/n/nrad/CMSSW/fork/CMSSW_7_4_12_patch4/src/Workspace/DegenerateStopAnalysis/python/navidTools/LaTexJinjaTemplates/"
-templateDir = cmsbase + "/src/Workspace/DegenerateStopAnalysis/python/navidTools/LaTexJinjaTemplates/"
+templateDir = cmsbase + "/src/Workspace/DegenerateStopAnalysis/python/tools/LaTexJinjaTemplates/"
 
 class JinjaTexTable():
     def __init__(self,yieldInstance, yieldOpt=None, texDir="./tex/", pdfDir=pdfDir, outputName="",\
@@ -2621,14 +2479,13 @@ class JinjaTexTable():
         self.fout.write( self.out)
         self.fout.close()
         print "LaTex File:", self.texDir+outputName
-        print "LaTex output:", self.outputTex
-        print "pdf output:", self.pdfDir
         os.system("pdflatex -output-directory=%s %s"%(self.pdfDir,self.outputTex))
 
 
         removeJunk=True 
         if removeJunk:
             out = self.pdfDir+"/"+outputName
+            print "output:", self.outputTex
             os.system("rm %s"%out.replace(".tex",".aux"))            
             os.system("rm %s"%out.replace(".tex",".log"))            
 

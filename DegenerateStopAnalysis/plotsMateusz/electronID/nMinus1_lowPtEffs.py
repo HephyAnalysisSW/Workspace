@@ -30,9 +30,9 @@ filedir = "/afs/hephy.at/user/m/mzarucki/www/plots/electronID/nMinus1/histogramC
 
 dummy = []
 
-signals = ["S300_240Fast", "S300_270Fast", "S300_290Fast", "S300_270", "T2tt300_270Fast"]
+#signals = ["S300_240Fast", "S300_270Fast", "S300_290Fast", "S300_270", "T2tt300_270Fast"]
 backgrounds = ["TTJets", "WJets"]#, "QCD", "ZJets"]
-allSamples = signals + backgrounds
+allSamples = backgrounds #signals + 
 
 passedCounts = {"None":{}, "sigmaEtaEta":{}, "dEta":{}, "dPhi":{}, "hOverE":{}, "ooEmooP":{}, "d0":{}, "dz":{}, "MissingHits":{}, "convVeto":{}}
 totalCounts = {"None":{}, "sigmaEtaEta":{}, "dEta":{}, "dPhi":{}, "hOverE":{}, "ooEmooP":{}, "d0":{}, "dz":{}, "MissingHits":{}, "convVeto":{}}
@@ -124,7 +124,7 @@ for sample in allSamples:
       graphs[plot]['Tight'].SetLineColor(ROOT.kRed+1)
       
       if i == 0: 
-         l1 = makeLegend()
+         l1 = makeLegend2()
          l1.AddEntry("n1eff_" + plot + "_Veto", "Veto ID", "P")
          l1.AddEntry("n1eff_" + plot + "_Loose", "Loose ID", "P")
          l1.AddEntry("n1eff_" + plot + "_Medium", "Medium ID", "P")
