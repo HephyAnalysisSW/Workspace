@@ -95,8 +95,8 @@ validation = False
 topPt_Err = pickle.load(file(path_syst1+"unc_on_topPt_SRAll_pkl"))
 pu_Unc    = pickle.load(file(path_syst1+"unc_on_PU_SRAll_pkl"))
 lep_Eff   = pickle.load(file("/data/dspitzbart/Results2016/systematics2016/lepEff_dummy_pkl"))
-#jec       = pickle.load(file(path_syst1+'/unc_on_JEC_SRAll_v1_pkl'))
-jec       = pickle.load(file('/data/dspitzbart/Results2016/systematics2016/JEC_dummy_pkl'))
+jec       = pickle.load(file(path_syst1+'/unc_on_JEC_SRAll_v1_pkl'))
+#jec       = pickle.load(file('/data/dspitzbart/Results2016/systematics2016/JEC_dummy_pkl'))
 
 dataResult = rcs
 

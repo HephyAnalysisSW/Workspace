@@ -24,14 +24,14 @@ from Workspace.HEPHYPythonTools.user import username
 from LpTemplateFit import LpTemplateFit
 from rCShelpers import *
 
-isData = True
-makeFit = False
+isData = False
+makeFit = True
 getYields = False
 getResults = True
-isValidation = True
+isValidation = False
 
-readFit     = '/data/dspitzbart/Results2016/QCDEstimation/20160630_fitResult_2016val_preapp_v2_data4fb_pkl'
-readYields  = '/data/dspitzbart/Results2016/QCDEstimation/20160630_QCDestimation_2016val_preapp_v2_data4fb_pkl'
+readFit     = '/data/dspitzbart/Results2016/QCDEstimation/20160707_fitResult_2016SR_selTemplate_Ltbinned_MC4fb_pkl'
+readYields  = '/data/dspitzbart/Results2016/QCDEstimation/20160707_QCDestimation_2016SR_selTemplate_Ltbinned_MC4fb_pkl'
 
 
 
@@ -40,15 +40,15 @@ if isData:
 else:
   sampleStr = 'MC'
 
-SRstring = '2016SR_preapp_100p'
+SRstring = '2016SR_selectedTemplate'
 if isValidation: SRstring = '2016val_preapp_v2'
 
 preprefix = 'QCDestimation/'+SRstring+'_4fb/'+sampleStr
 wwwDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/'+preprefix+'/'
 picklePath = '/data/'+username+'/Results2016/QCDEstimation/'
 prefix = 'Lp_singleElectronic_'
-picklePresel = '20160630_QCDestimation_'+SRstring+'_'+sampleStr+'4fb_pkl'
-pickleFit    = '20160630_fitResult_'+SRstring+'_'+sampleStr+'4fb_pkl'
+picklePresel = '20160707_QCDestimation_'+SRstring+'_'+sampleStr+'4fb_pkl'
+pickleFit    = '20160707_fitResult_'+SRstring+'_'+sampleStr+'4fb_pkl'
 
 if not os.path.exists(wwwDir):
   os.makedirs(wwwDir)
@@ -93,7 +93,7 @@ signalRegion = makeQCDsignalRegions(SRs, QCDSB=QCD_SB)
 btreg = [(0,0), (1,1), (2,-1)] #1b and 2b estimates are needed for the btag fit
 
 
-lumi = 3.99
+lumi = 4.33
 sampleLumi = 3.0 #post processed sample already produced with 2.25fb-1
 weight_str, weight_err_str = makeWeight(lumi, sampleLumi, reWeight='TopPtWeight')
 
@@ -124,24 +124,24 @@ SelStr = presel+'&&Selected==1'
 #cEWK  = getChain([WJetsHTToLNu_25ns, TTJets_combined_2, singleTop_25ns, DY_25ns, TTV_25ns],histname='')
 
 cQCD  = getChain(QCDHT_antiSel,histname='')
-cEWK  = getChain([WJetsHTToLNu_antiSel, TTJets_Lep_antiSel, singleTop_lep_antiSel, DY_HT_antiSel, TTV_antiSel],histname='')
+cEWK  = getChain([WJetsHTToLNu_antiSel, TTJets_Comb_antiSel, singleTop_lep_antiSel, DY_HT_antiSel, TTV_antiSel],histname='')
 
 if isData:
   cData = getChain(single_ele_Run2016B_antiSel, histname='')
 else:
-  cData = getChain([QCDHT_antiSel, WJetsHTToLNu_antiSel, TTJets_Lep_antiSel, singleTop_lep_antiSel, DY_HT_antiSel, TTV_antiSel] , histname='')
+  cData = getChain([QCDHT_antiSel, WJetsHTToLNu_antiSel, TTJets_Comb_antiSel, singleTop_lep_antiSel, DY_HT_antiSel, TTV_antiSel] , histname='')
 
 #get template for fit method
 numberOfBins = 30
 template_QCD = ROOT.TH1F('template_QCD','template_QCD',numberOfBins,-0.5,2.5)
 #print '!!!!!!!!!!!!!!! using sel QCD as template now'
-templateName, templateCut = nameAndCut((250,-1), (500,-1), (3,4), (0,0), presel=antiSelStr, charge="", btagVar = 'nBJetMediumCSV30', stVar = 'Lt', htVar = 'htJet30clean', njetVar='nJet30clean') ##changed from anitsel for check!!!
+templateName, templateCut = nameAndCut((250,-1), (500,-1), (3,4), (0,0), presel=SelStr, charge="", btagVar = 'nBJetMediumCSV30', stVar = 'Lt', htVar = 'htJet30clean', njetVar='nJet30clean') ##changed from anitsel for check!!!
 
 if makeFit:
   if isData:
     cData.Draw('Lp>>template_QCD','('+templateCut+trigger+filters+')','goff')
   else:
-    cData.Draw('Lp>>template_QCD','('+weight_str+')*('+templateCut+')','goff')
+    cQCD.Draw('Lp>>template_QCD','('+weight_str+')*('+templateCut+')','goff')
 
 histos = {}
 if makeFit:
@@ -181,7 +181,14 @@ if makeFit:
         text.SetNDC()
         text.SetTextSize(0.045)
         text.SetTextAlign(11)
-  
+
+        #templateName, templateCut = nameAndCut(ltb, (500,-1), (3,4), (0,0), presel=SelStr, charge="", btagVar = 'nBJetMediumCSV30', stVar = 'Lt', htVar = 'htJet30clean', njetVar='nJet30clean')
+        #if isData:
+        #  cData.Draw('Lp>>template_QCD','('+templateCut+trigger+filters+')','goff')
+        #else:
+        #  cQCD.Draw('Lp>>template_QCD','('+weight_str+')*('+templateCut+')','goff')
+        #cData.Draw('Lp>>template_QCD','('+templateCut+trigger+filters+')','goff')
+
         cQCD.Draw('Lp>>QCD_antiSelection','('+weight_str+')*('+antiSelCut+')')
         cQCD.Draw('Lp>>QCD_Selection','('+weight_str+')*('+SelCut+')')
         cEWK.Draw('Lp>>EWK_antiSelection','('+weight_str+')*('+antiSelCut+')')
