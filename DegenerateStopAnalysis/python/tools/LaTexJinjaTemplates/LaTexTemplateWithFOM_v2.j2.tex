@@ -23,7 +23,7 @@
 
 \#{ BLOCK{- set colSetup="|c"*2+ "|c"*nBkgs +"||c|" + "|c"*nSigs*2 +"|" }
 \#{ BLOCK{- set colSetup="|c"*(nCols+2) +"|" }
-\BLOCK{- set colSetup="|c| c|"+"c"*(nCols) +" | " }
+\BLOCK{- set colSetup="  r|"+"c"*(nCols) +" " }
 
 % \VAR{ rowList }
 %     nRow=\VAR{nRows}
@@ -34,7 +34,7 @@
 \begin{document}
 \begin{table}[ht]\begin{center}\resizebox{\textwidth}{!}
 {\begin{tabular}{\VAR{colSetup}}\hline
-&   \BLOCK{ for col in latexCols }  &  \VAR{ col}   \BLOCK{endfor } \\ 
+   \BLOCK{ for col in latexCols }  &  \VAR{ col | fixRowCol}   \BLOCK{endfor } \\ 
 \hline\hline\multirow{\VAR{nRows}}{*}{\begin{sideways} \VAR{title} \end{sideways}}
 
 \BLOCK{- for row in rowList }
@@ -43,13 +43,19 @@
    \BLOCK{- if rowLoop.first} 
     \BLOCK{- else}
     \BLOCK{- endif}
-\BLOCK{if "Total" in row} \cline{2-\VAR{nCols+2}}  \BLOCK{endif}
-& \VAR{row | fix }  \BLOCK{ for col in colList }  &  \VAR{ yieldDict[row][col] | replace("+-","$\pm$") }   \BLOCK{endfor } \\ 
-\BLOCK{if "FOM" in row or "Total" in row} \cline{2-\VAR{nCols+2}} \BLOCK{endif}
+%\BLOCK{if "Total" in row} \cline{1-\VAR{nCols+1}}  \BLOCK{endif}
+% title
+%\VAR{ row} 
+%\VAR{ seperators} 
+ \BLOCK{- if row in seperators }  
+    \hline 
+ \BLOCK{- endif}
+ \VAR{row | fix |fixRowCol }  \BLOCK{ for col in colList }  &  \VAR{ yieldDict[row][col] | replace("+-","$\pm$") | fixRowCol }   \BLOCK{endfor } \\ 
+\BLOCK{if "FOM" in row or "Total" in row} \cline{1-\VAR{nCols+1}} \BLOCK{endif}
 \BLOCK{- endfor }
 
 \hline
 \end{tabular}}
-\end{center}\caption{\VAR{caption}}\end{table}
+\end{center}\caption*{\VAR{caption}}\end{table}
 \end{document}
 

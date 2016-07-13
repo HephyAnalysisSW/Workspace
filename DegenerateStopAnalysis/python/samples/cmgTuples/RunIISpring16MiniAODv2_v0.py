@@ -12,8 +12,21 @@ import PhysicsTools.HeppyCore.framework.config as cfg
 
 import CMGTools.RootTools.samples.samples_13TeV_RunIISpring16MiniAODv2 as cmgSampleComponents
 
+def wikiPrint(sample):
+    
+    sampleName = sample['cmgComp'].name
+    dasString = "https://cmsweb.cern.ch/das/request?view=list&limit=50&instance=prod%2Fglobal&input=dataset%3D%2F"
+    dbsString = sample['dbsName'][1:]
+    datasetShort = sample['dbsName'].replace("RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0", "*")
+    
+    print "|-"
+    print "|| {0} || {1} || - || [{2}{3} {4}]".format(sampleName, sample['xsec'], dasString, dbsString, datasetShort)
+    print "|| Done || Done || DIRECTORY ||  ||"
+
+
 sample_dir = "/data/nrad/cmgTuples/8011_mAODv2_v0/RunIISpring16MiniAODv2"
 
+allComponents = []
 
 TTJets_LO ={
 "cmgComp":cmgSampleComponents.TTJets_LO,
@@ -29,6 +42,7 @@ TTJets_LO ={
 "xsec" : 831.76,
 
 }
+allComponents.append(TTJets_LO)
 
 
 TTJets_LO_HT600to800_ext ={
@@ -45,6 +59,7 @@ TTJets_LO_HT600to800_ext ={
 "xsec" : 2.66653444843,
 
 }
+allComponents.append(TTJets_LO_HT600to800_ext)
 
 
 TTJets_LO_HT800to1200_ext ={
@@ -61,6 +76,7 @@ TTJets_LO_HT800to1200_ext ={
 "xsec" : 1.09808219833,
 
 }
+allComponents.append(TTJets_LO_HT800to1200_ext)
 
 
 TTJets_LO_HT1200to2500_ext ={
@@ -77,6 +93,7 @@ TTJets_LO_HT1200to2500_ext ={
 "xsec" : 0.1987479092,
 
 }
+allComponents.append(TTJets_LO_HT1200to2500_ext)
 
 
 TTJets_LO_HT2500toInf ={
@@ -93,6 +110,7 @@ TTJets_LO_HT2500toInf ={
 "xsec" : 0.00236841258463,
 
 }
+allComponents.append(TTJets_LO_HT2500toInf)
 
 
 TTJets_SingleLeptonFromT ={
@@ -109,6 +127,7 @@ TTJets_SingleLeptonFromT ={
 "xsec" : 182.17540224,
 
 }
+allComponents.append(TTJets_SingleLeptonFromT)
 
 
 TTJets_SingleLeptonFromTbar ={
@@ -125,6 +144,7 @@ TTJets_SingleLeptonFromTbar ={
 "xsec" : 182.17540224,
 
 }
+allComponents.append(TTJets_SingleLeptonFromTbar)
 
 
 TTJets_DiLepton ={
@@ -141,6 +161,7 @@ TTJets_DiLepton ={
 "xsec" : 87.31483776,
 
 }
+allComponents.append(TTJets_DiLepton)
 
 
 WJetsToLNu_HT100to200_ext ={
@@ -157,6 +178,7 @@ WJetsToLNu_HT100to200_ext ={
 "xsec" : 1627.45,
 
 }
+allComponents.append(WJetsToLNu_HT100to200_ext)
 
 
 WJetsToLNu_HT200to400 ={
@@ -174,6 +196,7 @@ WJetsToLNu_HT200to400 ={
 "ext": ['WJetsToLNu_HT200to400', 'WJetsToLNu_HT200to400_ext'],
 
 }
+allComponents.append(WJetsToLNu_HT200to400)
 
 
 WJetsToLNu_HT200to400_ext ={
@@ -191,6 +214,7 @@ WJetsToLNu_HT200to400_ext ={
 "ext": ['WJetsToLNu_HT200to400', 'WJetsToLNu_HT200to400_ext'],
 
 }
+allComponents.append(WJetsToLNu_HT200to400_ext)
 
 
 WJetsToLNu_HT400to600 ={
@@ -207,6 +231,7 @@ WJetsToLNu_HT400to600 ={
 "xsec" : 59.1811,
 
 }
+allComponents.append(WJetsToLNu_HT400to600)
 
 
 WJetsToLNu_HT600to800 ={
@@ -223,6 +248,7 @@ WJetsToLNu_HT600to800 ={
 "xsec" : 14.5805,
 
 }
+allComponents.append(WJetsToLNu_HT600to800)
 
 
 WJetsToLNu_HT800to1200_ext ={
@@ -239,6 +265,7 @@ WJetsToLNu_HT800to1200_ext ={
 "xsec" : 6.65621,
 
 }
+allComponents.append(WJetsToLNu_HT800to1200_ext)
 
 
 WJetsToLNu_HT1200to2500 ={
@@ -255,6 +282,7 @@ WJetsToLNu_HT1200to2500 ={
 "xsec" : 1.60809,
 
 }
+allComponents.append(WJetsToLNu_HT1200to2500)
 
 
 WJetsToLNu_HT2500toInf ={
@@ -271,6 +299,7 @@ WJetsToLNu_HT2500toInf ={
 "xsec" : 0.0389136,
 
 }
+allComponents.append(WJetsToLNu_HT2500toInf)
 
 
 QCD_HT300to500 ={
@@ -288,6 +317,7 @@ QCD_HT300to500 ={
 "ext": ['QCD_HT300to500', 'QCD_HT300to500_ext'],
 
 }
+allComponents.append(QCD_HT300to500)
 
 QCD_HT300to500_ext ={
 "cmgComp":cmgSampleComponents.QCD_HT300to500_ext,
@@ -304,6 +334,7 @@ QCD_HT300to500_ext ={
 "ext": ['QCD_HT300to500', 'QCD_HT300to500_ext'],
 
 }
+allComponents.append(QCD_HT300to500_ext)
 
 QCD_HT500to700_ext ={
 "cmgComp":cmgSampleComponents.QCD_HT500to700_ext,
@@ -319,6 +350,7 @@ QCD_HT500to700_ext ={
 "xsec" : 31630,
 
 }
+allComponents.append(QCD_HT500to700_ext)
 
 QCD_HT700to1000 ={
 "cmgComp":cmgSampleComponents.QCD_HT700to1000,
@@ -335,6 +367,7 @@ QCD_HT700to1000 ={
 "ext": ['QCD_HT700to1000', 'QCD_HT700to1000_ext'],
 
 }
+allComponents.append(QCD_HT700to1000)
 
 QCD_HT700to1000_ext ={
 "cmgComp":cmgSampleComponents.QCD_HT700to1000_ext,
@@ -351,6 +384,7 @@ QCD_HT700to1000_ext ={
 "ext": ['QCD_HT700to1000', 'QCD_HT700to1000_ext'],
 
 }
+allComponents.append(QCD_HT700to1000_ext)
 
 QCD_HT1000to1500 ={
 "cmgComp":cmgSampleComponents.QCD_HT1000to1500,
@@ -367,6 +401,7 @@ QCD_HT1000to1500 ={
 "ext": ['QCD_HT1000to1500', 'QCD_HT1000to1500_ext'],
 
 }
+allComponents.append(QCD_HT1000to1500)
 
 QCD_HT1000to1500_ext ={
 "cmgComp":cmgSampleComponents.QCD_HT1000to1500_ext,
@@ -383,6 +418,7 @@ QCD_HT1000to1500_ext ={
 "ext": ['QCD_HT1000to1500', 'QCD_HT1000to1500_ext'],
 
 }
+allComponents.append(QCD_HT1000to1500_ext)
 
 QCD_HT1500to2000 ={
 "cmgComp":cmgSampleComponents.QCD_HT1500to2000,
@@ -399,6 +435,7 @@ QCD_HT1500to2000 ={
 "ext": ['QCD_HT1500to2000', 'QCD_HT1500to2000_ext'],
 
 }
+allComponents.append(QCD_HT1500to2000)
 
 QCD_HT1500to2000_ext ={
 "cmgComp":cmgSampleComponents.QCD_HT1500to2000_ext,
@@ -415,6 +452,7 @@ QCD_HT1500to2000_ext ={
 "ext": ['QCD_HT1500to2000', 'QCD_HT1500to2000_ext'],
 
 }
+allComponents.append(QCD_HT1500to2000_ext)
 
 QCD_HT2000toInf ={
 "cmgComp":cmgSampleComponents.QCD_HT2000toInf,
@@ -431,6 +469,7 @@ QCD_HT2000toInf ={
 "ext": ['QCD_HT2000toInf', 'QCD_HT2000toInf_ext'],
 
 }
+allComponents.append(QCD_HT2000toInf)
 
 QCD_HT2000toInf_ext ={
 "cmgComp":cmgSampleComponents.QCD_HT2000toInf_ext,
@@ -447,6 +486,7 @@ QCD_HT2000toInf_ext ={
 "ext": ['QCD_HT2000toInf', 'QCD_HT2000toInf_ext'],
 
 }
+allComponents.append(QCD_HT2000toInf_ext)
 
 DYJetsToLL_M50_HT100to200_ext ={
 "cmgComp":cmgSampleComponents.DYJetsToLL_M50_HT100to200_ext,
@@ -462,6 +502,7 @@ DYJetsToLL_M50_HT100to200_ext ={
 "xsec" : 171.462,
 
 }
+allComponents.append(DYJetsToLL_M50_HT100to200_ext)
 
 DYJetsToLL_M50_HT200to400_ext ={
 "cmgComp":cmgSampleComponents.DYJetsToLL_M50_HT200to400_ext,
@@ -477,6 +518,7 @@ DYJetsToLL_M50_HT200to400_ext ={
 "xsec" : 52.5825,
 
 }
+allComponents.append(DYJetsToLL_M50_HT200to400_ext)
 
 DYJetsToLL_M50_HT400to600_ext ={
 "cmgComp":cmgSampleComponents.DYJetsToLL_M50_HT400to600_ext,
@@ -492,6 +534,7 @@ DYJetsToLL_M50_HT400to600_ext ={
 "xsec" : 6.76131,
 
 }
+allComponents.append(DYJetsToLL_M50_HT400to600_ext)
 
 DYJetsToLL_M50_HT600toInf ={
 "cmgComp":cmgSampleComponents.DYJetsToLL_M50_HT600toInf,
@@ -508,6 +551,7 @@ DYJetsToLL_M50_HT600toInf ={
 "ext": ['DYJetsToLL_M50_HT600toInf', 'DYJetsToLL_M50_HT600toInf_ext'],
 
 }
+allComponents.append(DYJetsToLL_M50_HT600toInf)
 
 DYJetsToLL_M50_HT600toInf_ext ={
 "cmgComp":cmgSampleComponents.DYJetsToLL_M50_HT600toInf_ext,
@@ -524,6 +568,7 @@ DYJetsToLL_M50_HT600toInf_ext ={
 "ext": ['DYJetsToLL_M50_HT600toInf', 'DYJetsToLL_M50_HT600toInf_ext'],
 
 }
+allComponents.append(DYJetsToLL_M50_HT600toInf_ext)
 
 
 ZJetsToNuNu_HT600to800 ={
@@ -540,6 +585,7 @@ ZJetsToNuNu_HT600to800 ={
 "xsec" : 9.44271,
 
 }
+allComponents.append(ZJetsToNuNu_HT600to800)
 
 ZJetsToNuNu_HT1200to2500 ={
 "cmgComp":cmgSampleComponents.ZJetsToNuNu_HT1200to2500,
@@ -555,6 +601,7 @@ ZJetsToNuNu_HT1200to2500 ={
 "xsec" : 0.359406,
 
 }
+allComponents.append(ZJetsToNuNu_HT1200to2500)
 
 ZJetsToNuNu_HT2500toInf ={
 "cmgComp":cmgSampleComponents.ZJetsToNuNu_HT2500toInf,
@@ -570,3 +617,98 @@ ZJetsToNuNu_HT2500toInf ={
 "xsec" : 0.00851652,
 
 }
+allComponents.append(ZJetsToNuNu_HT2500toInf)
+
+
+# signal samples
+
+# FIXME temporary solution, until 80X samples are available
+
+import CMGTools.RootTools.samples.samples_13TeV_74X_susyT2DegStopPriv as signals_priv
+
+sample_path_signal = "/data/mzarucki/cmgTuples/7412pass2_mAODv2_v7/RunIISpring15MiniAODv2/"
+
+allSignalData=[
+    [
+     sample_path_signal+"T2DegStop_300_270_GEN-SIM/",
+    "nrad-T2DegStop_300_270_MINIAODv2-RunIISpring15-MCRUN2_74_V9-25ns-4dc17ff0fe241c35c03aa547f2361414",
+    "T2DegStop_300_270", 
+    signals_priv.T2DegStop_300_270
+    ],
+    [
+     sample_path_signal+"T2DegStop_300_240_FastSim_v3/",
+     "nrad-T2DegStop_300_240FS-eb69b0448a13fda070ca35fd76ab4e24" ,
+     "T2DegStop_300_240_FastSim", 
+     signals_priv.T2DegStop_300_240_FastSim 
+     ],
+    [
+     sample_path_signal+"T2DegStop_300_270_FastSim_v3/",
+     "nrad-T2DegStop_300_270FS-eb69b0448a13fda070ca35fd76ab4e24",
+     "T2DegStop_300_270_FastSim", 
+     signals_priv.T2DegStop_300_270_FastSim 
+     ],
+    [
+     sample_path_signal+"T2DegStop_300_290_FastSim_v3/",
+     "nrad-T2DegStop_300_290FS-eb69b0448a13fda070ca35fd76ab4e24" ,
+     "T2DegStop_300_290_FastSim", 
+     signals_priv.T2DegStop_300_290_FastSim
+     ],
+    [
+     sample_path_signal+"T2tt_stop300_LSP270/",
+     "nrad-CMSSW_7_4_4_FastSim_PU25ns_MCRUN2_74_V9_7414_MINIAODv2-eb69b0448a13fda070ca35fd76ab4e24" ,
+     "T2tt_300_270_FastSim", 
+     signals_priv.T2tt_300_270_FastSim
+     ],
+    ]
+
+allSignalStrings = [s[2] for s in allSignalData]
+def getSignalSample(base_dir,chunk_dir, signal,component):
+  if signal in allSignalStrings:
+     
+    # dirty way of creating a CMG component        
+    #component = cfg.MCComponent(
+    #    dataset=signal,
+    #    name = signal,
+    #    files = [],
+    #    xSection = 0.0,
+    #    nGenEvents = 1,
+    #    triggers = [],
+    #    effCorrFactor = 1,
+    #    )
+      
+    return {\
+      'cmgComp': component,
+      "name" : signal,
+      #"name" : component.name,
+      "chunkString": chunk_dir,
+      'dir' : base_dir+"/"+chunk_dir,
+      'dbsName':component.dataset,
+      'isData':False,
+      #"rootFileLocation":"treeProducerSusySingleLepton/tree.root",
+      "rootFileLocation":"tree.root",
+      "treeName":"tree",
+      #"skimAnalyzerDir":"skimAnalyzerCount",
+      }
+  else:
+    print "Signal",signal,"unknown. Available: ",", ".join(allSignalStrings)
+
+allSignals=[]
+for sig in allSignalData:
+  #exec(s+"=getSignalSample('"+d+"','"+s+"')")
+  signal = getSignalSample(*sig)
+  exec("{s}=signal".format(s=sig[2]))
+  exec("allSignals.append({s})".format(s=sig[2]))
+  
+for sample in allSignals:
+    if hasattr(sample['cmgComp'],"xSection"):
+        sample['xsec'] = sample['cmgComp'].xSection
+
+allComponents.extend(allSignals)
+
+
+if __name__ == "__main__":
+   import sys
+   if "printWiki" in sys.argv:
+       for comp in allComponents:
+           wikiPrint(comp)
+

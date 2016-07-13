@@ -45,7 +45,7 @@ QCD_downDir    = 'Prediction_Spring16_templates_SR2016_v2_QCD_lep_MC_QCDdown_3p9
 QCD_nominalDir = 'Prediction_Spring16_templates_SR2016_v2_QCD_lep_MC_3p99/'
 
 
-savePkl = False
+savePkl = True
 
 prefix = 'singleLeptonic_Spring16_'
 #postfix = '_kappa_corrected'
@@ -68,6 +68,7 @@ i = 1
 qcd_err = {}
 
 key = 'tot_pred'
+keyTruth = 'tot_truth'
 
 for i_njb, srNJet in enumerate(sorted(signalRegions)): #just changed this Nov 4th, not sorted before!
   qcd_err[srNJet] = {}
@@ -82,8 +83,11 @@ for i_njb, srNJet in enumerate(sorted(signalRegions)): #just changed this Nov 4t
       else:
         print '\t',srNJet,'\t',stb,'\t',htb
       print
-      qcd_upDiff = (qcd_up[srNJet][stb][htb][key]-qcd_nominal[srNJet][stb][htb][key])/qcd_nominal[srNJet][stb][htb][key]
-      qcd_downDiff = (qcd_down[srNJet][stb][htb][key]-qcd_nominal[srNJet][stb][htb][key])/qcd_nominal[srNJet][stb][htb][key]
+      qcd_upDiff    = (qcd_up[srNJet][stb][htb][key]    / qcd_up[srNJet][stb][htb][keyTruth])   / (qcd_nominal[srNJet][stb][htb][key]/qcd_nominal[srNJet][stb][htb][keyTruth]) - 1
+      qcd_downDiff  = (qcd_down[srNJet][stb][htb][key]  / qcd_down[srNJet][stb][htb][keyTruth]) / (qcd_nominal[srNJet][stb][htb][key]/qcd_nominal[srNJet][stb][htb][keyTruth]) - 1
+
+      #qcd_upDiff = (qcd_up[srNJet][stb][htb][key]-qcd_nominal[srNJet][stb][htb][key])/qcd_nominal[srNJet][stb][htb][key]
+      #qcd_downDiff = (qcd_down[srNJet][stb][htb][key]-qcd_nominal[srNJet][stb][htb][key])/qcd_nominal[srNJet][stb][htb][key]
       print 'qcd up, down:', qcd_upDiff, qcd_downDiff
       
       qcd_Up_H.SetBinContent(i,qcd_upDiff)
@@ -92,10 +96,6 @@ for i_njb, srNJet in enumerate(sorted(signalRegions)): #just changed this Nov 4t
       qcd_err[srNJet][stb][htb] = (abs(qcd_upDiff)+abs(qcd_downDiff))/2
       i += 1
 
-can = ROOT.TCanvas('can','can',700,700)
-
-signUp = 1
-signDown = 1
 
 qcd_Up_H.SetLineColor(426)
 qcd_Up_H.SetMarkerStyle(0)
@@ -145,6 +145,6 @@ qcd_Up_H.GetYaxis().SetLabelSize(0.04)
 qcd_Up_H.GetXaxis().SetTitle('')
 
 if savePkl:
-  pickle.dump(qcd_err, file(baseDir+'qcdErr_pkl_update','w'))
+  pickle.dump(qcd_err, file(baseDir+'systematics2016/qcdErr_pkl','w'))
 
 

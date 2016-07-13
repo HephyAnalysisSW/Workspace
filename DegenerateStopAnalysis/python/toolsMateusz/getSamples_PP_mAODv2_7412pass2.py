@@ -2,7 +2,7 @@
 import ROOT
 from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYieldFromChain, getChunks
 from Workspace.DegenerateStopAnalysis.cmgTuplesPostProcessed_mAODv2_7412pass2 import *
-from Workspace.DegenerateStopAnalysis.navidTools.Sample import Sample, Samples
+from Workspace.DegenerateStopAnalysis.tools.Sample import Sample, Samples
 
 skim='presel'
 

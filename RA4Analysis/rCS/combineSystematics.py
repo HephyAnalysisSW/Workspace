@@ -64,36 +64,39 @@ lepSF_h2b = d.GetPrimitive('h2b')
 #pickleDir =  '/data/dspitzbart/Results2016/Prediction_Spring16_templates_validation_4j_lep_data_2p57/'
 #pickleDir =  '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2015_lep_data_2p57/'
 #pickleDir =  '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2016_v1_QCD_lep_MC_3p99/'
-pickleDir =  '/data/dspitzbart/Results2016/Prediction_Spring16_templates_validation_4j_lep_data_3p99/'
+#pickleDir =  '/data/dspitzbart/Results2016/Prediction_Spring16_templates_validation_4j_lep_data_3p99/'
+
 #pickleDir =  '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2016_v1_100p_lep_data_3p99/'
+pickleDir =  '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2016_v1_100p_lep_data_3p99/'
 
 saveDir = pickleDir
 #saveDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_fullSR_lep_data_2p25/'
 path_syst1 = '/data/easilar/Results2016/ICHEP/SYS/V1/'
 wxsec   = pickle.load(file(path_syst1+'Unc_on_WJets__syst_SRAll_pkl'))
 ttvxsec = pickle.load(file(path_syst1+'Unc_on_TTV__syst_SRAll_pkl'))
-ttxsec  = pickle.load(file('/data/easilar/Spring15/25ns/TTJetsxsec_syst_SRAll_pkl'))
-wpol    = pickle.load(file('/data/dhandl/results2015/WPolarizationEstimation/20151218_wjetsPolSys_pkl'))
-b_err   = pickle.load(file('/data/dspitzbart/Results2016/btagErr_pkl_update'))
-l_err   = pickle.load(file('/data/dspitzbart/Results2016/mistagErr_pkl_update'))
-qcd_err = pickle.load(file('/data/dspitzbart/Results2016/qcdErr_pkl_update'))
+ttxsec  = pickle.load(file('/data/dspitzbart/Results2016/systematics2016/ttxsec_dummy_pkl'))
+wpol    = pickle.load(file('/data/dspitzbart/Results2016/systematics2016/Wpol_pkl'))
+b_err   = pickle.load(file('/data/dspitzbart/Results2016/systematics2016/btag_b_dummy_pkl'))
+l_err   = pickle.load(file('/data/dspitzbart/Results2016/systematics2016/btag_light_dummy_pkl'))
+qcd_err = pickle.load(file('/data/dspitzbart/Results2016/systematics2016/qcdErr_pkl'))
 #rcs     = pickle.load(file(pickleDir+'singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'))
 rcs     = pickle.load(file(pickleDir+'singleLeptonic_Spring16__estimationResults_pkl_kappa_corrected'))
 if validation:
   dilep   = pickle.load(file('/data/dspitzbart/Results2016/dilep_val_pkl'))
 else:
-  dilep   = pickle.load(file(path_syst1+'unc_on_diLep_with_SRAll_V4_pkl'))
+  #dilep   = pickle.load(file(path_syst1+'unc_on_diLep_with_SRAll_V4_pkl'))
+  dilep   = pickle.load(file('/data/dspitzbart/Results2016/systematics2016/dilep_envelope_pkl'))
 
 
-validation = True
+validation = False
 
 #topPt_Err = pickle.load(file("/data/easilar/Spring15/25ns/extended_with_truth_counts_topPt_pkl"))
 #topPt_Err = pickle.load(file("/data/dspitzbart/Results2016/topErr_pkl_update"))
 topPt_Err = pickle.load(file(path_syst1+"unc_on_topPt_SRAll_pkl"))
 pu_Unc    = pickle.load(file(path_syst1+"unc_on_PU_SRAll_pkl"))
-lep_Eff   = pickle.load(file("/data/easilar/Spring15/25ns/extended_with_truth_counts_LS_pkl"))
+lep_Eff   = pickle.load(file("/data/dspitzbart/Results2016/systematics2016/lepEff_dummy_pkl"))
 #jec       = pickle.load(file(path_syst1+'/unc_on_JEC_SRAll_v1_pkl'))
-jec       = pickle.load(file('/data/easilar/Spring15/25ns/Jec_syst_SRAll_pkl'))
+jec       = pickle.load(file('/data/dspitzbart/Results2016/systematics2016/JEC_dummy_pkl'))
 
 dataResult = rcs
 
@@ -223,7 +226,7 @@ for injb,srNJet in enumerate(sorted(signalRegions)):
       if validation:
         puErr = 0.1
       else:
-        puErr = abs(pu_Unc[srNJet][stb][htb]['delta_Up']) 
+        puErr = abs(pu_Unc[srNJet][stb][htb]['delta']) 
       puErrH.SetBinContent(i, puErr)
       
       #top pt
@@ -244,7 +247,8 @@ for injb,srNJet in enumerate(sorted(signalRegions)):
       if validation:
         wPErr = 0.04
       else:
-        wPErr = sqrt(((abs(wpol[srNJet][stb][htb]['uWPolMinus10'])+abs(wpol[srNJet][stb][htb]['uWPolPlus10']))/2)**2 + ((abs(wpol[srNJet][stb][htb]['uTTPolMinus5'])+abs(wpol[srNJet][stb][htb]['uTTPolPlus5']))/2)**2) # w pol for w and ttbar
+        wPErr = sqrt(wpol[srNJet][stb][htb]['W']**2 + wpol[srNJet][stb][htb]['TT']**2)
+        #wPErr = sqrt(((abs(wpol[srNJet][stb][htb]['uWPolMinus10'])+abs(wpol[srNJet][stb][htb]['uWPolPlus10']))/2)**2 + ((abs(wpol[srNJet][stb][htb]['uTTPolMinus5'])+abs(wpol[srNJet][stb][htb]['uTTPolPlus5']))/2)**2) # w pol for w and ttbar
       wPErrH.SetBinContent(i, wPErr)
       
       #JEC
@@ -276,7 +280,7 @@ for injb,srNJet in enumerate(sorted(signalRegions)):
       lumi_err = 0.045
       rest_xsec = 0.55
       
-      # Rcs uncertainties
+      # Rcs uncertainties, also considers the composition of W and ttbar and therefore is sensitive to using MC or data
       if rcs[srNJet][stb][htb]['tot_pred']>0: rcsErr = sqrt(rcs[srNJet][stb][htb]['W_pred_errs']['syst']**2+rcs[srNJet][stb][htb]['TT_rCS_fits_MC']['syst']**2)/rcs[srNJet][stb][htb]['tot_pred']
       else: rcsErr = 0.5
       if rcs[srNJet][stb][htb]['TT_pred']>0: rcsErr_tt = rcs[srNJet][stb][htb]['TT_rCS_fits_MC']['syst']/rcs[srNJet][stb][htb]['TT_pred']
@@ -528,9 +532,9 @@ total_err.Draw('2 same')
 
 can.cd()
 
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/data/Run2016B/4fb/syst_uncertainties/sys_validation_preapp_2016_v1.png')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/data/Run2016B/4fb/syst_uncertainties/sys_validation_preapp_2016_v1.root')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/data/Run2016B/4fb/syst_uncertainties/sys_validation_preapp_2016_v1.pdf')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/syst_uncertainties/sys_validation_data_test.png')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/syst_uncertainties/sys_validation_data_test.root')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/syst_uncertainties/sys_validation_data_test.pdf')
 
 
 savePickle = True
