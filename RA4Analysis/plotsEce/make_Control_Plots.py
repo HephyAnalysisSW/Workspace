@@ -81,9 +81,9 @@ maxN = -1
 ROOT.gStyle.SetOptStat(0)
 
 all_MB = False
-presel = False
+presel = True
 SB_w   = False 
-SB_tt  = True
+SB_tt  = False
 presel_1b = False
 test = False
 
@@ -129,7 +129,11 @@ if presel_1b :
   signal_suffix = "x10"
 
 if blind: add_cut = "(deltaPhi_Wl<0.7)"
-  
+
+#add_cut = "(met_pt>50&&abs(leptonEta)>1)&&acos(cos(met_phi-LepGood_phi[0]))>1"
+#add_cut = "(deltaPhi_Wl>0.7&&abs(leptonEta)<1)"
+add_cut = "(1)"
+ 
 lepSels = [
 {'cut':'(singleMuonic&&(!isData||(isData&&muonDataSet)))' , 'veto':'nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0',\
  'chain': getChain(single_mu_Run2016B,maxN=maxN,histname="",treeName="Events") ,\
@@ -171,7 +175,7 @@ plots =[\
 {'ndiv':True,'yaxis':'Events / ','xaxis':'L_{T} [GeV]','logy':'True' , 'var':  'st',                        'bin_set':False,          'varname':'LT',                  'binlabel':25,  'bin':(30,250,1000)},\
 {'ndiv':True,'yaxis':'Events / ','xaxis':'H_{T}','logy':'True' , 'var':'htJet30j',                    'bin_set':False,          'varname':'htJet30j',            'binlabel':50,  'bin':(40,500,2500)},\
 {'ndiv':False,'yaxis':'Events','xaxis':'n_{jet}','logy':'True' , 'var':'nJet30',                     'bin_set':False,          'varname':'nJet30',                   'binlabel':1,  'bin':(15,0,15)},\
-{'ndiv':True,'yaxis':'Events / ','xaxis':'p_{T}(l)','logy':'True' , 'var':'LepGood_pt[0]',            'bin_set':False,          'varname':'leptonPt',      'binlabel':15,  'bin':(40,25,625)},\
+{'ndiv':True,'yaxis':'Events / ','xaxis':'p_{T}(l)','logy':'True' , 'var':'LepGood_pt[0]',            'bin_set':False,          'varname':'leptonPt',      'binlabel':15,  'bin':(65,25,2275)},\
 {'ndiv':False,'yaxis':'Events','xaxis':'n_{b-tag}','logy':'True' , 'var':'nBJetMediumCSV30',         'bin_set':False,          'varname':'nBJetMediumCSV30',      'binlabel':1,  'bin':(8,0,8),       'lowlimit':0,  'limit':8},\
 {'ndiv':True,'yaxis':'Events / ','xaxis':'p_{T}(leading jet)','logy':'True' , 'var':'Jet_pt[0]',      'bin_set':False,          'varname':'leading_JetPt',  'binlabel':35,  'bin':(20,0,700)},\
 {'ndiv':False,'yaxis':'Events','xaxis':'#eta(l)','logy':'True' , 'var':'LepGood_eta[0]',             'bin_set':False,          'varname':'leptonEta',      'binlabel':25,  'bin':(40,-4,4)},\
@@ -180,6 +184,7 @@ plots =[\
 {'ndiv':False,'yaxis':'Events','xaxis':'#phi(l)','logy':'True' , 'var':'LepGood_phi[0]',             'bin_set':False,          'varname':'leptonPhi',      'binlabel':25,  'bin':(40,-4,4)},\
 {'ndiv':False,'yaxis':'Events','xaxis':'miniIso(l)','logy':'True' , 'var':'LepGood_miniRelIso[0]',   'bin_set':False,          'varname':'leptonminiIso',      'binlabel':30,  'bin':(40,0,0.5)},\
 #{'ndiv':False,'yaxis':'Events','xaxis':'minDeltaR','logy':'True' , 'var':'Min$(sqrt((abs(Jet_phi-LepGood_phi[0]))**2+(abs(Jet_eta-LepGood_eta[0]))**2))',       'varname':'Min_R_Jet_lepton',      'binlabel':1,  'bin':(50,0,10)},\
+{'ndiv':False,'yaxis':'Events','xaxis':'#Delta#Phi(met,l)','logy':'True' , 'var':'acos(cos(met_phi-LepGood_phi[0]))', 'bin_set':False  ,    'varname':'deltaPhi_metl',      'binlabel':1,  'bin':(50,0,3.14)},\
 {'ndiv':False,'yaxis':'Events','xaxis':'Nvert','logy':'True' , 'var':'nVert',                        'bin_set':False,          'varname':'nVert',      'binlabel':1,  'bin':(50,0,50)},\
 {'ndiv':False,'yaxis':'Events','xaxis':'Jet_btagCSV','logy':'True' , 'var':'Jet_btagCSV',                     'bin_set':False,          'varname':'Jet_btagCSV',      'binlabel':1,  'bin':(50,0,2)},\
 {'ndiv':False,'yaxis':'Events','xaxis':'nbjets_30','logy':'True' , 'var':nbjets_30,                     'bin_set':False,          'varname':'nbjets_30',      'binlabel':1,  'bin':(8,0,8)}
@@ -196,12 +201,12 @@ if presel_1b :
 if not draw_signal :
   signals = []
 
-#plots = [plots[0]]
-#lepSels = [lepSels[0]]
+plots = [plots[0]]
+lepSels = [lepSels[0]]
 
 for lepSel in lepSels:
   #weight_str_plot = '*'.join([reweight,topPt,PU,lepSel["trigger_weight"]]) 
-  path = "/afs/hephy.at/user/e/easilar/www/data/Run2016B/4fb/plots_v2/"+lepSel['label']
+  path = "/afs/hephy.at/user/e/easilar/www/data/Run2016B/4fb/plots_v3/"+lepSel['label']+""
   if not os.path.exists(path):
     os.makedirs(path)
   print lepSel['label']

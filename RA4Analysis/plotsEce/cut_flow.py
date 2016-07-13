@@ -8,7 +8,7 @@ from Workspace.HEPHYPythonTools.helpers import getObjFromFile, getChain, getChun
 from Workspace.RA4Analysis.cmgTuples_Data25ns_Promtv2_postprocessed import *
 from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2_postProcessed import *
 #from cutFlow_helper import *
-from general_config import *
+from Workspace.RA4Analysis.general_config import *
 
 path = "/afs/hephy.at/user/e/easilar/www/data/Run2016B/4fb/Tables/"
 if not os.path.exists(path):
@@ -20,20 +20,20 @@ if not small : maxN = -1
 
 
 lepSels = [
-#{'cut':'(singleMuonic&&(!isData||(isData&&muonDataSet)))' , 'veto':'nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0',\
-# 'chain': getChain(single_mu_Run2016B,maxN=maxN,histname="",treeName="Events") ,\
-#  'label':'_mu_', 'str':'1 $\\mu$' , 'trigger': trigger},\
-#{'cut':'singleElectronic&&(!isData||(isData&&eleDataSet))' , 'veto':'nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0',\
-# 'chain': getChain(single_ele_Run2016B,maxN=maxN,histname="",treeName="Events") ,\
-#  'label':'_ele_', 'str':'1 $\\e$' , 'trigger': trigger},\
-{'cut':'((!isData&&singleLeptonic)||(isData&&((eleDataSet&&singleElectronic)||(muonDataSet&&singleMuonic))))' , 'veto':'nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0',\
- 'chain': getChain([single_ele_Run2016B,single_mu_Run2016B],maxN=maxN,histname="",treeName="Events") ,\
-  'label':'_lep_', 'str':'1 $lep$' , 'trigger': trigger}\
+{'cut':'(singleMuonic&&(!isData||(isData&&muonDataSet)))' , 'veto':'nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0',\
+ 'chain': getChain(single_mu_Run2016B,maxN=maxN,histname="",treeName="Events") ,\
+  'label':'_mu_', 'str':'1 $\\mu$' , 'trigger': trigger},\
+{'cut':'singleElectronic&&(!isData||(isData&&eleDataSet))' , 'veto':'nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0',\
+ 'chain': getChain(single_ele_Run2016B,maxN=maxN,histname="",treeName="Events") ,\
+  'label':'_ele_', 'str':'1 $\\e$' , 'trigger': trigger},\
+#{'cut':'((!isData&&singleLeptonic)||(isData&&((eleDataSet&&singleElectronic)||(muonDataSet&&singleMuonic))))' , 'veto':'nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0',\
+# 'chain': getChain([single_ele_Run2016B,single_mu_Run2016B],maxN=maxN,histname="",treeName="Events") ,\
+#  'label':'_lep_', 'str':'1 $lep$' , 'trigger': trigger}\
 ]
 bkg_samples=[
 {'sample':'TTVH',      "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":TTV ,'tex':'t#bar{t}V','color':ROOT.kOrange-3},
-{"sample":"DiBosons",  "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":diBoson ,"tex":"WW/WZ/ZZ","color":ROOT.kRed+3},
-{"sample":"DY",        "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":DYHT,"tex":"DY + jets",'color':ROOT.kRed-6},
+#{"sample":"DiBosons",  "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":diBoson ,"tex":"WW/WZ/ZZ","color":ROOT.kRed+3},
+{"sample":"DY",        "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":DY_HT,"tex":"DY + jets",'color':ROOT.kRed-6},
 {"sample":"singleTop", "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":singleTop_lep,"tex":"t/#bar{t}",'color': ROOT.kViolet+5},
 {"sample":"QCD",       "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":QCDHT, "tex":"QCD","color":ROOT.kCyan-6},
 {"sample":"WJets",     "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":WJetsHTToLNu,"tex":"W + jets","color":ROOT.kGreen-2},
@@ -58,7 +58,7 @@ for lepSel in lepSels:
   {'cut':"&&".join([lepSel['cut'],lepSel['veto'],"nJet30>=5","(Jet_pt[1]>80)","htJet30j>500","st>250","nBJetMediumCSV30>=1","nJet30>=6","(Jet_pt[1]>80)"]), 'label': 'multi b-jets (CSVM) nJet >=6' },\
   {'cut':"&&".join([lepSel['cut'],lepSel['veto'],"nJet30>=5","(Jet_pt[1]>80)","htJet30j>500","st>250","nBJetMediumCSV30>=1","nJet30>=6","(Jet_pt[1]>80)","deltaPhi_Wl>1"]), 'label': '\\Delta\\Phi >1' },\
    ]
-  ofile = file(path+'cut_flow_'+lepSel['label']+'_.tex','w')
+  ofile = file(path+'cut_flow_'+lepSel['label']+'_weightsV1_.tex','w')
   doc_header = '\\documentclass{article}\\usepackage[english]{babel}\\usepackage{graphicx}\\usepackage[margin=0.5in]{geometry}\\begin{document}'
   ofile.write(doc_header)
   ofile.write("\n")

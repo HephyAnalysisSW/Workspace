@@ -230,7 +230,7 @@ for injb,srNJet in enumerate(sorted(signalRegions)):
       if validation:
         topErr = 0.08
       else:
-        topErr = abs(topPt_Err[srNJet][stb][htb]['delta_avarage'])  
+        topErr = abs(topPt_Err[srNJet][stb][htb]['delta'])  
       topErrH.SetBinContent(i, topErr)
       
       #lepton SF
@@ -528,9 +528,9 @@ total_err.Draw('2 same')
 
 can.cd()
 
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/syst_uncertainties/sys_validation_preapp_2016_v1.png')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/syst_uncertainties/sys_validation_preapp_2016_v1.root')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/syst_uncertainties/sys_validation_preapp_2016_v1.pdf')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/data/Run2016B/4fb/syst_uncertainties/sys_validation_preapp_2016_v1.png')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/data/Run2016B/4fb/syst_uncertainties/sys_validation_preapp_2016_v1.root')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/data/Run2016B/4fb/syst_uncertainties/sys_validation_preapp_2016_v1.pdf')
 
 
 savePickle = True
