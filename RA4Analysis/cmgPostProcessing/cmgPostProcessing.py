@@ -16,7 +16,7 @@ ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 
 from Workspace.HEPHYPythonTools.helpers import getChunks
-from Workspace.RA4Analysis.cmgTuples_Data25ns_PromtV2 import SingleElectron_Run2016B_PromptReco_v2 , SingleMuon_Run2016B_PromptReco_v2
+from Workspace.RA4Analysis.cmgTuples_Data25ns_PromptRecoV2 import *
 from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2 import *
 from systematics_helper import calc_btag_systematics, calc_LeptonScale_factors_and_systematics, calc_TopPt_Weights , calcDLDictionary, calc_diLep_contributions ,  fill_branch_WithJEC , getGenWandLepton , getGenTopWLepton
 from btagEfficiency import *
@@ -45,7 +45,7 @@ separateBTagWeights = True
 defSampleStr = "TTJets_LO"
 
 #subDir = "postProcessing_Run2016B_4fb_data"
-subDir = "postProcessing_Spring16_JECv6"
+subDir = "postProcessing_Run2016BC_JECv6"
 
 #branches to be kept for data and MC
 branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert",
@@ -204,7 +204,9 @@ def getTreeFromChunk(c, skimCond, iSplit, nSplit):
 exec('allSamples=['+options.allsamples+']')
 for isample, sample in enumerate(allSamples):
   chunks, sumWeight = getChunks(sample)
-  outDir = options.targetDir+"/".join([common_skim, sample['name']])
+  targetDir = options.targetDir
+  if sample.has_key('outDirOption'): outDir = targetDir+"/".join([common_skim, sample['name']+sample['outDirOption']])
+  else: outDir = targetDir+"/".join([common_skim, sample['name']])
   if os.path.exists(outDir) and os.listdir(outDir) != [] and not options.overwrite:
     print "Found non-empty directory: %s -> skipping!"%outDir
     continue

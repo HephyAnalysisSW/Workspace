@@ -24,14 +24,14 @@ from Workspace.HEPHYPythonTools.user import username
 from LpTemplateFit import LpTemplateFit
 from rCShelpers import *
 
-isData = False
+isData = True
 makeFit = True
 getYields = True
 getResults = True
 isValidation = False
 
-readFit     = '/data/dspitzbart/Results2016/QCDEstimation/20160707_fitResult_2016SR_selTemplate_Ltbinned_MC4fb_pkl'
-readYields  = '/data/dspitzbart/Results2016/QCDEstimation/20160707_QCDestimation_2016SR_selTemplate_Ltbinned_MC4fb_pkl'
+readFit     = '/data/dspitzbart/Results2016/QCDEstimation/20160714_fitResult_2016SR_MC7p62fb_pkl'
+readYields  = '/data/dspitzbart/Results2016/QCDEstimation/20160714_QCDestimation_2016SR_MC7p62fb_pkl'
 
 
 
@@ -56,7 +56,7 @@ if not os.path.exists(wwwDir):
 mcFileIsHere = False
 if isData:
   mcFileIsHere = True
-  mcFile = picklePath+'20160628_QCDestimation_2016val_preapp_MC4fb_pkl'
+  mcFile = picklePath+'20160714_QCDestimation_2016SR_MC7p62fb_pkl'
   try: file(mcFile)
   except IOError: mcFileIsHere = False
   if mcFileIsHere:

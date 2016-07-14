@@ -22,7 +22,7 @@ from Workspace.HEPHYPythonTools.helpers import getChunks
 #from Workspace.RA4Analysis.cmgTuples_Data25ns_miniAODv2 import *
 
 from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2 import *
-from Workspace.RA4Analysis.cmgTuples_Data25ns_PromtV2 import *
+from Workspace.RA4Analysis.cmgTuples_Data25ns_PromptRecoV2 import *
 
 
 from btagEfficiency import *
@@ -43,7 +43,7 @@ separateBTagWeights = True
 defSampleStr = "TTJets_LO_HT600to800_25ns"
 
 #subDir = "postProcessed_Spring16_antiSelection_3fb_v2"
-subDir = "postProcessing_Spring16_JECv6_antiSelection"
+subDir = "postProcessing_Run2016BC_JECv6_antiSelection"
 
 #branches to be kept for data and MC
 branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert",
@@ -86,6 +86,7 @@ parser.add_option("--manScaleFactor", dest="manScaleFactor", default = 1, action
 assert options.leptonSelection in ['soft', 'hard', 'none', 'dilep'], "Unknown leptonSelection: %s"%options.leptonSelection
 skimCond = "(1)"
 ht500 = "Sum$(Jet_pt)>500"
+common_skim = 'none'
 if options.skim.startswith('met'):
   skimCond = "met_pt>"+str(float(options.skim[3:]))
 if options.skim=='HT400':
@@ -205,7 +206,10 @@ for isample, sample in enumerate(allSamples):
   chunks, sumWeight = getChunks(sample)
   #chunks, nTotEvents = getChunksFromDPM(sample, options.inputTreeName)
 #  print "Chunks:" , chunks 
-  outDir = options.targetDir+'/'+"/".join([options.skim, options.leptonSelection, sample['name']])
+  targetDir = options.targetDir
+  if sample.has_key('outDirOption'): outDir = targetDir+"/".join([common_skim, sample['name']+sample['outDirOption']])
+  else: outDir = targetDir+"/".join([common_skim, sample['name']])
+  #outDir = options.targetDir+'/'+"/".join([options.skim, options.leptonSelection, sample['name']])
   if os.path.exists(outDir) and os.listdir(outDir) != [] and not options.overwrite:
     print "Found non-empty directory: %s -> skipping!"%outDir
     continue

@@ -67,7 +67,8 @@ lepSF_h2b = d.GetPrimitive('h2b')
 #pickleDir =  '/data/dspitzbart/Results2016/Prediction_Spring16_templates_validation_4j_lep_data_3p99/'
 
 #pickleDir =  '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2016_v1_100p_lep_data_3p99/'
-pickleDir =  '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2016_v1_100p_lep_data_3p99/'
+#pickleDir =  '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2016_v1_100p_lep_data_3p99/'
+pickleDir =  '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2016_v2_lep_MC_SF_7p62/'
 
 saveDir = pickleDir
 #saveDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_fullSR_lep_data_2p25/'
@@ -76,8 +77,8 @@ wxsec   = pickle.load(file(path_syst1+'Unc_on_WJets__syst_SRAll_pkl'))
 ttvxsec = pickle.load(file(path_syst1+'Unc_on_TTV__syst_SRAll_pkl'))
 ttxsec  = pickle.load(file('/data/dspitzbart/Results2016/systematics2016/ttxsec_dummy_pkl'))
 wpol    = pickle.load(file('/data/dspitzbart/Results2016/systematics2016/Wpol_pkl'))
-b_err   = pickle.load(file('/data/dspitzbart/Results2016/systematics2016/btag_b_dummy_pkl'))
-l_err   = pickle.load(file('/data/dspitzbart/Results2016/systematics2016/btag_light_dummy_pkl'))
+b_err   = pickle.load(file('/data/dspitzbart/Results2016/systematics2016/btagErr_pkl'))
+l_err   = pickle.load(file('/data/dspitzbart/Results2016/systematics2016/mistagErr_pkl'))
 qcd_err = pickle.load(file('/data/dspitzbart/Results2016/systematics2016/qcdErr_pkl'))
 #rcs     = pickle.load(file(pickleDir+'singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'))
 rcs     = pickle.load(file(pickleDir+'singleLeptonic_Spring16__estimationResults_pkl_kappa_corrected'))
@@ -180,17 +181,17 @@ for injb,srNJet in enumerate(sorted(signalRegions)):
         b_c_SF    = b_err['tot_pred'][srNJet][stb][htb]
       bErrH.SetBinContent(i, bErr)
       
-      #tt
-      if validation:
-        bErr_tt = 0.03
-      else:
-        bErr_tt = sqrt(b_err['TT_kappa'][srNJet][stb][htb]**2 + l_err['TT_kappa'][srNJet][stb][htb]**2) # sum of squares of b/c and mistag
-      
-      #W
-      if validation:
-        bErr_W = 0.12
-      else:
-        bErr_W = sqrt(b_err['W_kappa'][srNJet][stb][htb]**2 + l_err['W_kappa'][srNJet][stb][htb]**2) # sum of squares of b/c and mistag
+      ##tt
+      #if validation:
+      #  bErr_tt = 0.03
+      #else:
+      #  bErr_tt = sqrt(b_err['TT_kappa'][srNJet][stb][htb]**2 + l_err['TT_kappa'][srNJet][stb][htb]**2) # sum of squares of b/c and mistag
+      #
+      ##W
+      #if validation:
+      #  bErr_W = 0.12
+      #else:
+      #  bErr_W = sqrt(b_err['W_kappa'][srNJet][stb][htb]**2 + l_err['W_kappa'][srNJet][stb][htb]**2) # sum of squares of b/c and mistag
       
       #W x-sec
       if validation:
@@ -497,7 +498,7 @@ latex1.SetTextSize(0.04)
 latex1.SetTextAlign(11)
 
 latex1.DrawLatex(0.15,0.96,'CMS #bf{#it{Prelimiary}}')
-latex1.DrawLatex(0.81,0.96,"#bf{4.0fb^{-1} (13TeV)}")
+latex1.DrawLatex(0.81,0.96,"#bf{7.6fb^{-1} (13TeV)}")
 
 h_Stack.GetXaxis().SetLabelSize(0.04)
 h_Stack.GetYaxis().SetLabelSize(0.055)
@@ -532,9 +533,9 @@ total_err.Draw('2 same')
 
 can.cd()
 
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/syst_uncertainties/sys_validation_data_test.png')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/syst_uncertainties/sys_validation_data_test.root')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/syst_uncertainties/sys_validation_data_test.pdf')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/syst_uncertainties/sys_validation_MC_7p62.png')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/syst_uncertainties/sys_validation_MC_7p62.root')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/syst_uncertainties/sys_validation_MC_7p62.pdf')
 
 
 savePickle = True
