@@ -104,10 +104,10 @@ else:
 #signalRegions = signalRegion3fbMerge
 
 ## weight calculations
-lumi = 4.32
-templateLumi = 4.32 # lumi that was used when template was created - if defined wrong, fixed rest backgrounds will be wrong
+lumi = 7.62
+templateLumi = 7.62 # lumi that was used when template was created - if defined wrong, fixed rest backgrounds will be wrong
 sampleLumi = 3.
-printlumi = '4.3'
+printlumi = '7.6'
 debugReweighting = False
 
 year = '2016'

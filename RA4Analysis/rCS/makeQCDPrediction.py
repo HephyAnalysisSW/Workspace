@@ -26,7 +26,7 @@ from rCShelpers import *
 
 isData = False
 makeFit = True
-getYields = False
+getYields = True
 getResults = True
 isValidation = False
 
@@ -40,15 +40,15 @@ if isData:
 else:
   sampleStr = 'MC'
 
-SRstring = '2016SR_selectedTemplate'
+SRstring = '2016SR'
 if isValidation: SRstring = '2016val_preapp_v2'
 
-preprefix = 'QCDestimation/'+SRstring+'_4fb/'+sampleStr
+preprefix = 'QCDestimation/'+SRstring+'_7p62fb/'+sampleStr
 wwwDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/'+preprefix+'/'
 picklePath = '/data/'+username+'/Results2016/QCDEstimation/'
 prefix = 'Lp_singleElectronic_'
-picklePresel = '20160707_QCDestimation_'+SRstring+'_'+sampleStr+'4fb_pkl'
-pickleFit    = '20160707_fitResult_'+SRstring+'_'+sampleStr+'4fb_pkl'
+picklePresel = '20160714_QCDestimation_'+SRstring+'_'+sampleStr+'7p62fb_pkl'
+pickleFit    = '20160714_fitResult_'+SRstring+'_'+sampleStr+'7p62fb_pkl'
 
 if not os.path.exists(wwwDir):
   os.makedirs(wwwDir)
@@ -135,7 +135,7 @@ else:
 numberOfBins = 30
 template_QCD = ROOT.TH1F('template_QCD','template_QCD',numberOfBins,-0.5,2.5)
 #print '!!!!!!!!!!!!!!! using sel QCD as template now'
-templateName, templateCut = nameAndCut((250,-1), (500,-1), (3,4), (0,0), presel=SelStr, charge="", btagVar = 'nBJetMediumCSV30', stVar = 'Lt', htVar = 'htJet30clean', njetVar='nJet30clean') ##changed from anitsel for check!!!
+templateName, templateCut = nameAndCut((250,-1), (500,-1), (3,4), (0,0), presel=antiSelStr, charge="", btagVar = 'nBJetMediumCSV30', stVar = 'Lt', htVar = 'htJet30clean', njetVar='nJet30clean') ##changed from anitsel for check!!!
 
 if makeFit:
   if isData:
@@ -504,9 +504,9 @@ for srNJet in sorted(signalRegion):
           else: #In MC, get the max of the determined error of the method and the non-closure
             print NQCD_err, NQCD, NQCD_truth, NQCD
             NQCD_err_rel  = max([NQCD_err/NQCD, abs(1-NQCD_truth/NQCD)])
-            NQCD_err_rel  = 1.
+            #NQCD_err_rel  = 1.
             print round(NQCD_err_rel,3)
-            NQCD_err      = NQCD_err_rel*NQCD
+            #NQCD_err      = NQCD_err_rel*NQCD
           try: NQCD_lowDPhi = NQCD/(RcsAnti+1)
           except ZeroDivisionError: NQCD_lowDPhi = float('nan') 
           try: NQCD_lowDPhi_err = NQCD_lowDPhi*sqrt((NQCD_err/NQCD)**2 + (RcsAnti_err/(RcsAnti+1))**2)

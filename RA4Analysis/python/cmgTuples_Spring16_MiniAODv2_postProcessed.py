@@ -1,6 +1,6 @@
 import copy, os, sys
-#dirEce = '/data/easilar/cmgTuples/postProcessing_Spring16_V6/HT500LT250Skim/'
-#dirEce2 = '/data/easilar/cmgTuples/postProcessing_Spring16_FIXED_v2/'
+dirEce = '/data/easilar/cmgTuples/postProcessing_Spring16_V6/HT500LT250Skim/'
+dirEce2 = '/data/easilar/cmgTuples/postProcessing_Spring16_FIXED_v2/'
 dirDaniel = '/data/dspitzbart/cmgTuples/postProcessing_Spring16_JECv6/HT500LT250Skim/'
 
 ####usual HT combination####
