@@ -93,7 +93,7 @@ signalRegion = makeQCDsignalRegions(SRs, QCDSB=QCD_SB)
 btreg = [(0,0), (1,1), (2,-1)] #1b and 2b estimates are needed for the btag fit
 
 
-lumi = 4.33
+lumi = 7.62
 sampleLumi = 3.0 #post processed sample already produced with 2.25fb-1
 weight_str, weight_err_str = makeWeight(lumi, sampleLumi, reWeight='TopPtWeight')
 
@@ -116,7 +116,7 @@ filters = "&& (Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadC
 #filters = "&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFilter_fix&&Flag_HBHENoiseFilter&&Flag_goodVertices&&Flag_eeBadScFilter&&Flag_EcalDeadCellTriggerPrimitiveFilter"
 #filters = "&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFilter_fix&&Flag_HBHENoiseIsoFilter&&Flag_goodVertices&&Flag_eeBadScFilter"
 
-presel = 'nLep==1&&nVeto==0&&leptonPt>25&&nEl==1&&Jet2_pt>80'
+presel = 'nLep==1&&nVeto==0&&leptonPt>25&&nEl==1&&Jet2_pt>80&& Flag_badChargedHadronFilter && Flag_badMuonFilter'
 antiSelStr = presel+'&&Selected==(-1)'
 SelStr = presel+'&&Selected==1'
 

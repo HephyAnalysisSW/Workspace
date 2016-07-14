@@ -36,7 +36,7 @@ lepSel = 'hard'
 
 
 totalWeight = 'weight*lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*TopPtWeight*0.94*puReweight_true_max4'
-totalWeight = 'weight*TopPtWeight'#*(singleElectronic*0.963+singleMuonic*0.926)'
+totalWeight = 'weight*TopPtWeight*puReweight_true_max4*(singleElectronic*0.931+singleMuonic*0.923)'
 #25ns samples
 WJETS_15 = {'name':'WJets', 'chain':getChain(WJetsHTToLNu_25ns,histname=''), 'color':color('WJets')+1,'weight':totalWeight, 'niceName':'W+Jets S15', 'cut':''}
 WJETS_16 = {'name':'WJets', 'chain':getChain(WJetsHTToLNu,histname=''), 'color':color('WJets')-1,'weight':totalWeight, 'niceName':'W+Jets S16', 'cut':''}
@@ -53,10 +53,10 @@ TTJets = {'name':'TTJets', 'chain':getChain(TTJets_HTLO_25ns,histname=''), 'colo
 
 TTJets_combined_15 = {'name':'TTJets', 'chain':getChain(TTJets_combined_25ns,histname=''), 'color':ROOT.kRed,'weight':totalWeight, 'niceName':'t#bar{t}+Jets S15', 'cut':''}
 #TTJets_combined_16 = {'name':'TTJets', 'chain':getChain(TTJets_combined,histname=''), 'color':ROOT.kCyan,'weight':totalWeight, 'niceName':'t#bar{t}+Jets S16', 'cut':''}
-TTJets_Lep_16 = {'name':'TTJets', 'chain':getChain(TTJets_Lep,histname=''), 'color':color('TTJets')-2,'weight':totalWeight, 'niceName':'t#bar{t}+Jets 1l S16', 'cut':''}
+#TTJets_Lep_16 = {'name':'TTJets', 'chain':getChain(TTJets_Lep,histname=''), 'color':color('TTJets')-2,'weight':totalWeight, 'niceName':'t#bar{t}+Jets 1l S16', 'cut':''}
 TTJets_16 = {'name':'TTJets', 'chain':getChain(TTJets_Comb,histname=''), 'color':color('TTJets')-2,'weight':totalWeight, 'niceName':'t#bar{t}+Jets', 'cut':''}
 
-TTJets_Lep_16_antiSel = {'name':'TTJets', 'chain':getChain(TTJets_Lep_antiSel,histname=''), 'color':color('TTJets')-2,'weight':totalWeight, 'niceName':'t#bar{t}+Jets 1l S16', 'cut':''}
+#TTJets_Lep_16_antiSel = {'name':'TTJets', 'chain':getChain(TTJets_Lep_antiSel,histname=''), 'color':color('TTJets')-2,'weight':totalWeight, 'niceName':'t#bar{t}+Jets 1l S16', 'cut':''}
 
 
 #TTJets_combined_2 = {'name':'TTJets', 'chain':getChain(TTJets_combined_2,histname=''), 'color':ROOT.kMagenta,'weight':totalWeight, 'niceName':'t#bar{t}+Jets fix', 'cut':''}
@@ -79,7 +79,7 @@ TTJets_combined_had_15 =       {'name':'TTJets', 'chain':TTJets_combined_15['cha
 DY_15 = {'name':'DY', 'chain':getChain(DY_25ns,histname=''), 'color':color('DY'),'weight':totalWeight, 'niceName':'Drell Yan', 'cut':''}
 #DY_16 = {'name':'DY', 'chain':getChain(DY_HT,histname=''), 'color':color('DY'),'weight':totalWeight, 'niceName':'Drell Yan', 'cut':''}
 #DY_16_madgraph = {'name':'DY', 'chain':getChain(DY_madgraph,histname=''), 'color':color('DY')-1,'weight':totalWeight, 'niceName':'Drell Yan MG', 'cut':''}
-DY_16_madgraph_antiSel = {'name':'DY', 'chain':getChain(DY_madgraph_antiSel,histname=''), 'color':color('DY')-1,'weight':totalWeight, 'niceName':'Drell Yan', 'cut':''}
+#DY_16_madgraph_antiSel = {'name':'DY', 'chain':getChain(DY_madgraph_antiSel,histname=''), 'color':color('DY')-1,'weight':totalWeight, 'niceName':'Drell Yan', 'cut':''}
 DY_16_antiSel = {'name':'DY', 'chain':getChain(DY_HT_antiSel,histname=''), 'color':color('DY')-1,'weight':totalWeight, 'niceName':'Drell Yan', 'cut':''}
 
 #DY_16_amc = {'name':'DY', 'chain':getChain(DY_amc,histname=''), 'color':ROOT.kYellow+1,'weight':totalWeight, 'niceName':'Drell Yan AMC', 'cut':''}
@@ -89,7 +89,7 @@ DY_16 = {'name':'DY', 'chain':getChain(DY_HT,histname=''), 'color':color('DY'),'
 singleTop_15 = {'name':'singleTop', 'chain':getChain(singleTop_25ns,histname=''), 'color':color('singleTop'),'weight':totalWeight, 'niceName':'t/#bar{t}', 'cut':''}
 #singleTop_inc_16 = {'name':'singleTop', 'chain':getChain(singleTop_inclusive,histname=''), 'color':ROOT.kGreen+1,'weight':totalWeight, 'niceName':'t/#bar{t} S16 inc', 'cut':''}
 singleTop_lep_16 = {'name':'singleTop', 'chain':getChain(singleTop_lep,histname=''), 'color':color('singleTop')-2,'weight':totalWeight, 'niceName':'t/#bar{t} S16 lep', 'cut':''}
-singleTop_lep_16_antiSel = {'name':'singleTop', 'chain':getChain(singleTop_lep_antiSel,histname=''), 'color':color('singleTop')-2,'weight':totalWeight, 'niceName':'t/#bar{t} S16 lep', 'cut':''}
+#singleTop_lep_16_antiSel = {'name':'singleTop', 'chain':getChain(singleTop_lep_antiSel,histname=''), 'color':color('singleTop')-2,'weight':totalWeight, 'niceName':'t/#bar{t} S16 lep', 'cut':''}
 
 
 QCD_15 = {'name':'QCD', 'chain':getChain(QCDHT_25ns,histname=''), 'color':color('QCD')+1,'weight':totalWeight, 'niceName':'QCD multijet S15', 'cut':''}
@@ -115,12 +115,10 @@ samples         = [WJETS_15, TTJets_combined_15, Rest, QCD_15]#, diBoson]
 samples2        = [WJETS_15, TTJets_combined_15, DY_15, singleTop_15, TTV_15, QCD_15]
 samplesTTcheck  = [WJETS_15, TTJets_combined_singleLep_15, TTJets_combined_diLep_15, TTJets_combined_had_15, Rest, QCD_15]#, diBoson]
 samples16       = [TTJets_16, DY_16, WJETS_16, singleTop_lep_16, QCD_16, TTV_16]
-samples16_antiSel = [TTJets_Lep_16_antiSel, DY_16_madgraph_antiSel, WJETS_16_antiSel, singleTop_lep_16_antiSel, QCD_16_antiSel, TTV_16_antiSel]
+#samples16_antiSel = [TTJets_Lep_16_antiSel, DY_16_madgraph_antiSel, WJETS_16_antiSel, singleTop_lep_16_antiSel, QCD_16_antiSel, TTV_16_antiSel]
 
-test_antiSel = {'name':'w/o DY', 'chain':getChain([TTV_antiSel,singleTop_lep_antiSel,TTJets_Lep_antiSel,WJetsHTToLNu_antiSel],histname=''), 'color':color('TTV'),'weight':totalWeight, 'niceName':'w/o DY', 'cut':''}
-EWK_antiSel_mg = {'name':'DY MG', 'chain':getChain([DY_madgraph_antiSel,TTV_antiSel,singleTop_lep_antiSel,TTJets_Lep_antiSel,WJetsHTToLNu_antiSel],histname=''), 'color':color('DY'),'weight':totalWeight, 'niceName':'all DY MG', 'cut':''}
-EWK_antiSel_amc = {'name':'DY AMC', 'chain':getChain([DY_amc_antiSel,TTV_antiSel,singleTop_lep_antiSel,TTJets_Lep_antiSel,WJetsHTToLNu_antiSel],histname=''), 'color':ROOT.kBlue,'weight':totalWeight, 'niceName':'all DY AMC    ', 'cut':''}
-EWK_antiSel = {'name':'DY HT', 'chain':getChain([DY_HT_antiSel,TTV_antiSel,singleTop_lep_antiSel,TTJets_Lep_antiSel,WJetsHTToLNu_antiSel],histname=''), 'color':ROOT.kRed,'weight':totalWeight, 'niceName':'EWK Spring16', 'cut':''}
+#test_antiSel = {'name':'w/o DY', 'chain':getChain([TTV_antiSel,singleTop_lep_antiSel,TTJets_Lep_antiSel,WJetsHTToLNu_antiSel],histname=''), 'color':color('TTV'),'weight':totalWeight, 'niceName':'w/o DY', 'cut':''}
+#EWK_antiSel = {'name':'DY HT', 'chain':getChain([DY_HT_antiSel,TTV_antiSel,singleTop_lep_antiSel,TTJets_Lep_antiSel,WJetsHTToLNu_antiSel],histname=''), 'color':ROOT.kRed,'weight':totalWeight, 'niceName':'EWK Spring16', 'cut':''}
 EWK_antiSel_15 = {'name':'DY HT15', 'chain':getChain([TTJets_combined_2_antiSel,WJetsHTToLNu_25ns_antiSel,TTV_25ns_antiSel,singleTop_25ns_antiSel,DY_25ns_antiSel],histname=''), 'color':ROOT.kOrange+1,'weight':totalWeight, 'niceName':'EWK Spring15', 'cut':''}
 
 

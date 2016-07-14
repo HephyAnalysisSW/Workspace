@@ -162,7 +162,7 @@ singleMu_presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSof
 singleEle_presel = "((!isData&&singleElectronic)||(isData&&"+triggers+"&&(eleDataSet&&singleElectronic)&&"+filters+"))"
 singleEle_presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSoftLeptons==0 && Jet_pt[1]>80 && st>250 && nJet30>2 && htJet30j>500"
 
-presel_MC = "singleLeptonic" + "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSoftLeptons==0 && Jet_pt[1]>80 && st>250 && nJet30>2 && htJet30j>500"
+presel_MC = "singleLeptonic" + "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSoftLeptons==0 && Jet_pt[1]>80 && st>250 && nJet30>2 && htJet30j>500 && Flag_badChargedHadronFilter && Flag_badMuonFilter"
 
 if not isData: presel = presel_MC
 
@@ -171,7 +171,7 @@ if not isData: presel = presel_MC
 ## weights for MC
 #MCweight = 'lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*0.94'
 #MCweight = 'lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*TopPtWeight*0.94'
-MCweight = 'TopPtWeight'
+MCweight = 'TopPtWeight*puReweight_true_max4*(singleMuonic*0.923 + singleElectronic*0.931)'
 
 ## corrections
 createFits = True # turn off if you already did one
