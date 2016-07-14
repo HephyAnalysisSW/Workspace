@@ -308,7 +308,10 @@ def calc_mva_limit(cfg, args):
                 pickle.dump( yields[cut_name], open(yield_pkl,'w') )
                 print "Yield pickle dumped: %s"%yield_pkl
                 JinjaTexTable( yields[cut_name], pdfDir = tableDir, caption="" , transpose=True)
-            yldplts = drawYields( "BkgComposition_" +cut_name , cfg.yieldPkls[cut_name] , sampleList = cfg.bkgList  + ['s300_290' , 's300_270','s300_220'] , keys=[] , ratios=True , save= cfg.saveDirs[cut_name] )
+            #sigs = ['s300_290' , 's300_270','s300_220']
+            #sigs = [ 'S300-260Fast' , 'S300-270Fast' , 'S300-290Fast' , 'S300-270' ]
+            sigs = ['s10FS', 's30FS', 's60FS' , 's30'] 
+            yldplts = drawYields( "BkgComposition_" +cut_name , cfg.yieldPkls[cut_name] , sampleList = cfg.bkgList  + sigs  , keys=[] , ratios=True , save= cfg.saveDirs[cut_name] )
     
             def makeSignalCard(sig):
                 lim =  limitTools.getLimit(
@@ -478,7 +481,11 @@ def bkg_est(cfg, args):
         yldplt4 = drawYields("BkgVsSig_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList + cfg.signalList, ratios= True, save=cfg.saveDirs[cut_name], normalize = False, logs = [0,1], plotMin=0.01)
         yldplt5 = drawYields("BksVsDataVsSignal_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList + dataList + cfg.signalList , ratios= True, save=cfg.saveDirs[cut_name], normalize = False, logs = [0,1], plotMin=0.01)
 
-        yldplts = [ yldplt1,yldplt2, yldplt3, yldplt4, yldplt5, ]
+        crbins = [x for x in yields[cut_name].cutNames if 'ECR' in x]
+
+        yldplt6 = drawYields("BkgVsData_ECR_log_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList + dataList, keys=crbins, ratios= True, save=cfg.saveDirs[cut_name], normalize = False, logs = [0,1], plotMin=0.01)
+
+        yldplts = [ yldplt1,yldplt2, yldplt3, yldplt4, yldplt5, yldplt6 ]
 
         #yldplts
     
@@ -534,6 +541,7 @@ def cut_flow(cfg, args):
                                         cutOpt          =   "list", 
                                         weight          =   "weight", 
                                         pklOpt          =   True, 
+                                        pklDir          =   cfg.yieldPklDir, 
                                         tableName       =   "{cut}_%s%s"%(cfg.runTag,cfg.scan_tag), 
                                         nDigits         =   2 , 
                                         err             =   True , 

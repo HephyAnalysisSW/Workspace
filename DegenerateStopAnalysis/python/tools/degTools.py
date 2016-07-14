@@ -651,7 +651,8 @@ def getPlots(samples,plots,cut,sampleList=[],plotList=[],weight="(weight)",nMinu
             continue
         if verbose: print "========= Sample:" , samples[sample].name, 
         #weight_str = decide_weight(samples[sample], weight)
-        weight_str = decide_weight2(samples[sample] , cut=cut.fullName, lumi=lumi_weight)
+        #weight_str = decide_weight2(samples[sample] , cut=cut.fullName, lumi=lumi_weight)
+        weight_str = decide_weight2(samples[sample] , cut=cut.combined, lumi=lumi_weight)
         if verbose: 
             print "  Using Weight: %s"%(weight_str)
             print "    lumi: ", lumi_weight
@@ -741,7 +742,7 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
     yldplt = {}
     draw = True
     if draw:
-        padRatios = [3,1] if ratios else [1,0]
+        padRatios = [2,1] if ratios else [1,0]
         canvs = makeCanvasMultiPads(c1Name="%s_%s"%("Yields",name),c1ww=800,c1wh=800, joinPads=True, padRatios=padRatios, pads=[]  )
         cSave, cMain = [0,1] if ratios else [0,0]
         canvs[cMain].cd()
@@ -853,9 +854,17 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
                 yldplt[fomplt].Draw("same")
 
         ratio_ref.SetNdivisions(505, "y")
-        ratio_ref.GetXaxis().SetLabelSize(0.12)
+        
+
+        ratio_ref.GetXaxis().SetLabelSize(0.08)
         ratio_ref.GetYaxis().SetLabelSize(0.12)
         ratio_ref.GetYaxis().SetTitleOffset(0.75)
+        #canvs[0].SetTopMargin(0.05)
+        #canvs[1].SetTopMargin(0.05)
+        #canvs[2].SetTopMargin(0.05)
+        #canvs[0].SetBottomMargin(0.5)
+        #canvs[1].SetBottomMargin(0.5)
+        canvs[2].SetBottomMargin(0.5)
         canvs[cMain+1].Update()
     else:
         ratio_ref = None
@@ -1036,11 +1045,11 @@ def drawPlots(samples,plots,cut,sampleList=['s','w'],plotList=[],plotMin=False, 
         canvs[p][cMain].cd()
         if isDataPlot:
             latex.DrawLatex(0.16,0.91,"#font[22]{CMS Preliminary}")
-            latex.DrawLatex(0.7,0.91,"#bf{L=%0.2f fb^{-1} (13 TeV)}"%( round(samples[dataList[0]].lumi/1000.,2)) )
+            latex.DrawLatex(0.7,0.91,"#bf{L=%0.1f fb^{-1} (13 TeV)}"%( round(samples[dataList[0]].lumi/1000.,2)) )
         else:
             latex.DrawLatex(0.16,0.91,"#font[22]{CMS Simulation}")
             #latex.DrawLatex(0.7,0.91,"#bf{L=%0.2f fb^{-1} (13 TeV)}"%( round(samples[sampleList[0]].lumi/1000.,2) ) )
-            latex.DrawLatex(0.7,0.91,"#bf{L=%0.2f fb^{-1} (13 TeV)}"%( round( samples.get_lumis("target_lumi")/1000.,2) ) )
+            latex.DrawLatex(0.7,0.91,"#bf{L=%0.1f fb^{-1} (13 TeV)}"%( round( samples.get_lumis("target_lumi")/1000.,2) ) )
             #### asumes all samples in the sampleList have the same .lumi
 
 
@@ -1916,14 +1925,25 @@ class Weight(object):
         self.weight_dict = deepcopy(weight_dict)
         makeDefaultDict(self.weight_dict, def_weights)
     
-    def getWeightList(self, weight_dict, cut="default", lumi="target_lumi"):
+    def getWeightList(self, weight_dict, cut="", lumi="target_lumi"):
         weight_list=[]
         for weight_key in weight_dict:
+            print weight_key
+            new_weight = ""
             if weight_key == "cuts":
-                if weight_dict['cuts'].has_key(cut):
-                    new_weight =  weight_dict['cuts'][cut]
-                else:
-                    new_weight =  weight_dict['cuts']["default"]
+                found_a_match = False
+                for cut_category in weight_dict['cuts']:
+                    cut_weight , cut_finder_funct = weight_dict['cuts'][cut_category]
+                    #print "looking for a match for", cut_category
+                    if cut_finder_funct( cut ):
+                        print "found a match to the cut string!", cut_category    
+                        new_weight = cut_weight
+                        assert not found_a_match, "Multiple matches to the cutstring... not clear which weight to use "            
+                        found_a_match = True
+                #if weight_dict['cuts'].has_key(cut):
+                #    new_weight =  weight_dict['cuts'][cut]
+                #else:
+                #    new_weight =  weight_dict['cuts']["default"]
             elif weight_key == "lumis":
                 new_weight =  "%s/%s"%(weight_dict['lumis'][lumi], weight_dict['lumis']["mc_lumi"])
             else:
@@ -1945,6 +1965,7 @@ class Weight(object):
 
 
 def decide_weight2( sample, weight=None, cut="default" , lumi="target_lumi"):
+    print "Decideing weight:", sample.name, lumi, cut
     if sample.isData:
         weight_str = "(1)"
         return weight_str
@@ -2004,7 +2025,7 @@ def getYieldsForSampleFunc(samples,cutList, weights, err, nDigits, yieldDictFull
     def func(sample):
         yieldDictSample={}
         for ic, cut in enumerate(cutList):
-            yld = getYieldFromChain( samples[sample]['tree'], cut[1],weights[sample], returnError=err) #,nDigits) 
+            yld = getYieldFromChain( samples[sample]['tree'], cut[1],weights[cut[0]][sample], returnError=err) #,nDigits) 
             #print cut[0], "     ", "getYieldFromChain( %s, '%s', '%s',%s )"%( "samples."+sample+".tree", cut[1], weights[sample], True) + "==(%s,%s)"%yld 
             if err:
                     rounded = [ round(x,nDigits) for x in yld ]
@@ -2034,6 +2055,7 @@ class Yields():
                     verbose=False, nSpaces=None):
         if not (isinstance(cutInst,CutClass) or hasattr(cutInst,cutOpt)):
             raise Exception("use an instance of cutClass")
+        makeDir(pklDir)
         self.nDigits        = nDigits
         samples = samples
         self.cutInst        = cutInst
@@ -2045,6 +2067,7 @@ class Yields():
         self.err = err
         self.nProc = nProc
         self.isMVASample = isMVASample
+        self.cutOpt = cutOpt
 
 
         self.lumi_string    =  lumi 
@@ -2072,7 +2095,8 @@ class Yields():
         self.verbose = verbose
         if self.verbose:
            print "Weights:"
-           pp.pprint(self.weights)
+           #pp.pprint(self.weights)
+           pp.pprint(self.cut_weights)
 
         self.getYieldDictFull( samples, self.cutList )
 
@@ -2097,8 +2121,10 @@ class Yields():
         #                                                         [samples[sample]['name'] for sample in self.sigList] ] )
 
         #self.weights        = { samp:decide_weight(samples[samp] , self.weight    ) for samp in self.sampleList }
-        self.weights        = { samp:decide_weight2(samples[samp] , cut=self.cutInst.name, lumi=self.lumi_string    ) for samp in self.sampleList } # need to fix lumi for comparison with data
-            
+        
+        self.cut_weights = {}
+        for cutName, cutStr in getattr(self.cutInst, self.cutOpt):
+            self.cut_weights[cutName] = { samp:decide_weight2(samples[samp] , cut=cutStr , lumi=self.lumi_string    ) for samp in self.sampleList }     
 
         if hasattr(self,"LatexTitles"):
             #self.sampleLegend   =   [self.LatexTitles[sample] for sample in self.bkgList] +\
@@ -2216,20 +2242,22 @@ class Yields():
             setMVASampleEventList(samples, sample)
 
         for ic, cut in enumerate(cutList):
+            cutName = cut[0]
             if hasattr(samples[sample], 'cut'):
                 cutStr = "((%s) && (%s) )"%(cut[1],samples[sample].cut)
             else:
                 cutStr = cut[1]
 
 
-            yld = getYieldFromChain( samples[sample]['tree'], cutStr,self.weights[sample], returnError=self.err) #,self.nDigits) 
+            #yld = getYieldFromChain( samples[sample]['tree'], cutStr,self.weights[sample], returnError=self.err) #,self.nDigits) 
+            yld = getYieldFromChain( samples[sample]['tree'], cutStr,self.cut_weights[cutName][sample], returnError=self.err) #,self.nDigits) 
             #print cut[0], "     ", "getYieldFromChain( %s, '%s', '%s',%s )"%( "samples."+sample+".tree", cut[1], self.weights[sample], True) + "==(%s,%s)"%yld 
             if self.err:
                     rounded = [ round(x,self.nDigits) for x in yld ] 
                     yld = u_float(*rounded)
             else:
                     yld = u_float(yld)
-            yieldDictSample[cut[0]] = yld
+            yieldDictSample[cutName] = yld
             self.yieldDictFull[sample][cut[0]] = yld
             #self.yieldDictRaw[sample].append(yld)
         if setSampleEventList:
@@ -2252,15 +2280,8 @@ class Yields():
         if self.verbose: self.pprint(  self.cutLegend  , nSpaces=self.nSpaces )
 
         if self.nProc:
-            #def _getYieldsForSamples(self,samp):
-            #    #print "--------------------", samp
-            #    #yld = self.getYieldsForSample( samples, samp, cutList )
-            #    #yld = getYieldFromChain( samples[samp]['tree'], cutList[1][1] ,self.weights[samp], returnError=self.err)
-            #    print "--------------------", samp
-            #    return samp
-            #self._getYieldsForSamples = _getYieldsForSamples
-            #self._getYieldsForSamples(self, self.sampleList[0])
-            getYieldsFunc = getYieldsForSampleFunc( samples, cutList, self.weights, self.err, self.nDigits, self.yieldDictFull, self.verbose, self.pprint, self.sampleNames, self.cutNames, self.npsize, self.nSpaces)
+            #getYieldsFunc = getYieldsForSampleFunc( samples, cutList, self.weights, self.err, self.nDigits, self.yieldDictFull, self.verbose, self.pprint, self.sampleNames, self.cutNames, self.npsize, self.nSpaces)
+            getYieldsFunc = getYieldsForSampleFunc( samples, cutList, self.cut_weights, self.err, self.nDigits, self.yieldDictFull, self.verbose, self.pprint, self.sampleNames, self.cutNames, self.npsize, self.nSpaces)
             pickle.dump(getYieldsFunc, file("delme.pkl","w"))
             test = getYieldsFunc( self.sampleList[0])
         
@@ -2565,7 +2586,7 @@ pklDir="./pkl/dmt_regions/*.pkl"
 
 
 def fix(x):
-    return str(x).replace("_","-").replace("+-","$\pm$").replace("-+","$\mp$").replace(">","$>$")
+    return str(x).replace("_","-").replace("+-","$\pm$").replace("-+","$\mp$").replace(">","$>$").replace("/","/").replace("","")
 
 
 def fixForLatex(x):
@@ -2792,6 +2813,15 @@ class JinjaTexTable():
             out = self.pdfDir+"/"+outputName
             os.system("rm %s"%out.replace(".tex",".aux"))            
             os.system("rm %s"%out.replace(".tex",".log"))            
+
+
+
+def pdfLatex(texFile, pdfDir, removeJunk = True):
+    os.system("pdflatex -output-directory=%s %s"%( pdfDir, texFile))
+    if removeJunk:
+        out = pdfDir+"/"+os.path.basename( texFile ) 
+        os.system("rm %s"%out.replace(".tex",".aux"))
+        os.system("rm %s"%out.replace(".tex",".log"))
 
 
 

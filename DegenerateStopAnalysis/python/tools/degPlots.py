@@ -103,7 +103,7 @@ class DegPlots():
 
 
 if __name__ == "__main__":
-    lepPlots = DegPlots("LepGood","lep")
-    muPlots  = DegPlots("LepGood","mu")
-    elPlots  = DegPlots("LepGood","el")
+    lepPlots = degPlots("LepGood","lep")
+    muPlots  = degPlots("LepGood","mu")
+    elPlots  = degPlots("LepGood","el")
 
