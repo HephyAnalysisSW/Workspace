@@ -43,7 +43,7 @@ separateBTagWeights = True
 defSampleStr = "TTJets_LO_HT600to800_25ns"
 
 #subDir = "postProcessed_Spring16_antiSelection_3fb_v2"
-subDir = "postProcessed_Spring16_antiSelection_TTJetsComb"
+subDir = "postProcessing_Spring16_JECv6_antiSelection"
 
 #branches to be kept for data and MC
 branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert",
@@ -229,8 +229,8 @@ for isample, sample in enumerate(allSamples):
   aliases = [ "met:met_pt", "metPhi:met_phi"]
 
   readVectors = [\
-    {'prefix':'LepGood', 'nMax':8, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I', 'relIso03/F','SPRING15_25ns_v1/I','eleCBID_SPRING15_25ns/I', 'eleCBID_SPRING15_25ns_ConvVetoDxyDz/I', 'tightId/I', 'miniRelIso/F','mass/F','sip3d/F','mediumMuonId/I', 'mvaIdSpring15/F','lostHits/I', 'convVeto/I', 'charge/I', 'hOverE/F']},
-    {'prefix':'LepOther', 'nMax':8, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I', 'relIso03/F','eleCBID_SPRING15_25ns/I', 'eleCBID_SPRING15_25ns_ConvVetoDxyDz/I' ,'tightId/I', 'miniRelIso/F','mass/F','sip3d/F','mediumMuonId/I', 'lostHits/I', 'convVeto/I', 'charge/I', 'hOverE/F']},
+    {'prefix':'LepGood', 'nMax':8, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I', 'relIso03/F','SPRING15_25ns_v1/I','eleCBID_SPRING15_25ns/I', 'eleCBID_SPRING15_25ns_ConvVetoDxyDz/I', 'tightId/I', 'miniRelIso/F','mass/F','sip3d/F','mediumMuonId/I', 'ICHEPmediumMuonId/I', 'mvaIdSpring15/F','lostHits/I', 'convVeto/I', 'charge/I', 'hOverE/F']},
+    {'prefix':'LepOther', 'nMax':8, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I', 'relIso03/F','eleCBID_SPRING15_25ns/I', 'eleCBID_SPRING15_25ns_ConvVetoDxyDz/I' ,'tightId/I', 'miniRelIso/F','mass/F','sip3d/F','mediumMuonId/I', 'ICHEPmediumMuonId/I', 'lostHits/I', 'convVeto/I', 'charge/I', 'hOverE/F']},
     {'prefix':'Jet',  'nMax':100, 'vars':['pt/F', 'eta/F', 'phi/F', 'id/I','btagCSV/F', 'btagCMVA/F']},
   ]
   if not sample['isData']: 
@@ -369,7 +369,7 @@ for isample, sample in enumerate(allSamples):
           s.nTightSoftLeptons = len(tightSoftLepInd)
           s.nTightHardLeptons = len(tightHardLepInd)
           #print "tightHardLepInd:" , tightHardLepInd
-          vars = ['pt', 'eta', 'phi', 'miniRelIso','relIso03', 'pdgId', 'SPRING15_25ns_v1', 'mass']
+          vars = ['pt', 'eta', 'phi', 'miniRelIso','relIso03', 'pdgId', 'eleCBID_SPRING15_25ns_ConvVetoDxyDz', 'mass']
           allLeptons = [getObjDict(t, 'LepGood_', vars, i) for i in looseLepInd]
           looseSoftLep = [getObjDict(t, 'LepGood_', vars, i) for i in looseSoftLepInd] 
           looseHardLep = [getObjDict(t, 'LepGood_', vars, i) for i in looseHardLepInd]
@@ -390,7 +390,7 @@ for isample, sample in enumerate(allSamples):
             s.leptonPhi = r.LepGood_phi[leadingLepInd]
             s.leptonPdg = r.LepGood_pdgId[leadingLepInd]
             s.leptonMass= r.LepGood_mass[leadingLepInd]
-            s.leptonSPRING15_25ns_v1= r.LepGood_SPRING15_25ns_v1[leadingLepInd]
+            s.leptonSPRING15_25ns_v1= r.LepGood_eleCBID_SPRING15_25ns_ConvVetoDxyDz[leadingLepInd]
             s.st = r.met_pt + s.leptonPt
           s.singleLeptonic = s.nTightHardLeptons==1
           if s.singleLeptonic:
@@ -483,7 +483,7 @@ for isample, sample in enumerate(allSamples):
         if options.leptonSelection == 'none':
 
           ### LEPTONS
-          vars = ['pt', 'eta', 'phi', 'mass', 'miniRelIso','relIso03', 'pdgId', 'eleCBID_SPRING15_25ns', 'eleCBID_SPRING15_25ns_ConvVetoDxyDz','mediumMuonId', 'sip3d', 'hOverE', 'eleCutIdSpring15_25ns_v1']
+          vars = ['pt', 'eta', 'phi', 'mass', 'miniRelIso','relIso03', 'pdgId', 'eleCBID_SPRING15_25ns', 'eleCBID_SPRING15_25ns_ConvVetoDxyDz','ICHEPmediumMuonId', 'sip3d', 'hOverE', 'eleCutIdSpring15_25ns_v1']
           leptonIndices = [i for i in range(r.nLepGood)]
           leptons = [getObjDict(t, 'LepGood_', vars, i) for i in leptonIndices]
           nlep = len(leptonIndices)
@@ -522,7 +522,7 @@ for isample, sample in enumerate(allSamples):
               if (abs(lep['eta'])>2.4): continue
 
               #ID, IP and Iso check:
-              passID = True if lep['mediumMuonId'] == 1 else False
+              passID = True if lep['ICHEPmediumMuonId'] == 1 else False
               passIso = True if lep['miniRelIso'] < muMiniIsoCut else False
               passIP = True if lep['sip3d'] < goodMu_sip3d else False
 
@@ -551,9 +551,9 @@ for isample, sample in enumerate(allSamples):
               passConv = False
 
               #electron CutBased ID, ConvVeto, dxy,dz already included
-              passTightID = True if (lep['eleCutIdSpring15_25ns_v1'] == 4) else False
-              passMediumID = True if (lep['eleCutIdSpring15_25ns_v1'] >= 3) else False
-              passVetoID = True if (lep['eleCutIdSpring15_25ns_v1'] >= 1) else False
+              passTightID =   True if (lep['eleCBID_SPRING15_25ns_ConvVetoDxyDz'] == 4) else False
+              passMediumID =  True if (lep['eleCBID_SPRING15_25ns_ConvVetoDxyDz'] >= 3) else False
+              passVetoID =    True if (lep['eleCBID_SPRING15_25ns_ConvVetoDxyDz'] >= 1) else False
 
               #selected electrons
               if passTightID:
@@ -621,8 +621,8 @@ for isample, sample in enumerate(allSamples):
               if lep['miniRelIso'] > 0.4: continue
 
               #use the eleCBID_SPRING15_25ns, ConvVeto, dxy, dz an not included
-              passMediumIDother = True if (lep['eleCutIdSpring15_25ns_v1'] >= 3) else False
-              passVetoIDother = True if (lep['eleCutIdSpring15_25ns_v1'] >= 1) else False
+              passMediumIDother = True if (lep['eleCBID_SPRING15_25ns_ConvVetoDxyDz'] >= 3) else False
+              passVetoIDother =   True if (lep['eleCBID_SPRING15_25ns_ConvVetoDxyDz'] >= 1) else False
 
               #Anti-selected electrons with CBID <3
               if not passMediumIDother:

@@ -1,4 +1,4 @@
-#pathDaniel  = "/data/dspitzbart//cmgTuples/RunIISpring16MiniAODv2/" 
+pathDaniel  = "/data/dspitzbart//cmgTuples/RunIISpring16MiniAODv2/" 
 #pathEce     = "/afs/hephy.at/data/easilar01/cmgTuples/RunIISpring16MiniAODv2/"
 #pathEce2    = "/data/easilar/cmgTuples/RunIISpring16MiniAODv2/"
 pathEce     = "/afs/hephy.at/data/easilar01/Ra40b/cmgTuples/RunIISpring16MiniAODv2_v1/"
@@ -63,7 +63,7 @@ TTJets_LO_HT600to800_25ns={\
 TTJets_LO_HT800to1200_25ns={\
 "name" : "TTJets_LO_HT800to1200",
 "chunkString":"cmgTuples_MC25ns_v1_v3_1l_July_TTJets_HT-800to1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1_MC25ns_v1",
-"dir": pathDaniel+"cmgTuples_MC25ns_v1_v3_1l_July_TTJets_HT-800to1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1_MC25ns_v1/",
+"dir": pathEce+"cmgTuples_MC25ns_v1_v3_1l_July_TTJets_HT-800to1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1_MC25ns_v1/",
 "dbsName" : "/TTJets_HT-800to1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM",
 "skimAnalyzerDir":"skimAnalyzerCount/",
 "rootFileLocation":"tree.root",

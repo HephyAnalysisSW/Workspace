@@ -23,10 +23,10 @@ bjreg = (0,0)
 wjetsSB = (3,4)
 
 nBTagVar              = 'nBJetMediumCSV30'
-useBTagWeights        = False
-btagWeightSuffix      = ''#'_SF'
-templateWeights       = False
-templateWeightSuffix  = ''#'_SF'
+useBTagWeights        = True
+btagWeightSuffix      = '_SF'
+templateWeights       = True
+templateWeightSuffix  = '_SF'
 
 QCDup       = False
 QCDdown     = False
@@ -35,7 +35,7 @@ if QCDup: nameSuffix += '_QCDup'
 if QCDdown: nameSuffix += '_QCDdown'
 
 ## samples
-isData              = True
+isData              = False
 unblinded           = True
 validation          = False
 isCentralPrediction = True
@@ -100,14 +100,14 @@ else:
   signalRegions = signalRegions2016
   #signalRegions = signalRegion3fb
   #regStr = 'fullSR'
-  regStr = 'SR2016_v1_100p'
+  regStr = 'SR2016_v2'
 #signalRegions = signalRegion3fbMerge
 
 ## weight calculations
-lumi = 3.99
-templateLumi = 3.99 # lumi that was used when template was created - if defined wrong, fixed rest backgrounds will be wrong
+lumi = 4.32
+templateLumi = 4.32 # lumi that was used when template was created - if defined wrong, fixed rest backgrounds will be wrong
 sampleLumi = 3.
-printlumi = '4.0'
+printlumi = '4.3'
 debugReweighting = False
 
 year = '2016'
