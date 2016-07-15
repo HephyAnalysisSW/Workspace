@@ -1,7 +1,7 @@
 import copy, os, sys
 dirEce = '/data/easilar/cmgTuples/postProcessing_Spring16_V6/HT500LT250Skim/'
 dirEce2 = '/data/easilar/cmgTuples/postProcessing_Spring16_FIXED_v2/'
-dirDaniel = '/data/dspitzbart/cmgTuples/postProcessing_Spring16_V6/HT500LT250Skim/'
+dirDaniel = '/data/dspitzbart/cmgTuples/postProcessing_Spring16_JECv6/HT500LT250Skim/'
 
 ####usual HT combination####
 
@@ -88,7 +88,7 @@ WJetsHTToLNu = {\
 "WJetsToLNu_HT1200to2500",
 "WJetsToLNu_HT2500toInf",
 ],
-'dir' : dirEce,
+'dir' : dirDaniel,
 }
 
 #singleTop_inclusive = {\
@@ -109,7 +109,7 @@ singleTop_lep = {\
 "ST_tW_antitop_5f_inclusiveDecays_powheg",
 "ST_tW_top_5f_inclusiveDecays_powheg",
 ],
-'dir' : dirEce,
+'dir' : dirDaniel,
 }
 
 
@@ -121,7 +121,7 @@ DY_HT = {\
 "DYJetsToLL_M_50_HT_400to600",
 "DYJetsToLL_M_50_HT_600toInf",
 ],
-'dir' : dirEce,
+'dir' : dirDaniel,
 }
 
 
@@ -136,7 +136,7 @@ QCDHT = {\
 "QCD_HT500to700",
 "QCD_HT700to1000",
 ],
-'dir' : dirEce,
+'dir' : dirDaniel,
 }
 
 #diBoson = {\
@@ -155,9 +155,9 @@ TTV = {
 "TTWToLNu",
 "TTWToQQ",
 "TTZToLLNuNu",
-#"TTZToQQ",
+"TTZToQQ",
 ],
-'dir' : dirEce,
+'dir' : dirDaniel,
 }
 
 allSignalStrings=[\

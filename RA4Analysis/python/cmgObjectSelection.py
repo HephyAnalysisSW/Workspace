@@ -21,7 +21,7 @@ def cmgLooseMuID(r, nLep):
 def cmgTightMuID(r, nLep):
   return r.LepGood_pt[nLep]>=25 and abs(r.LepGood_eta[nLep])<=2.4\
      and r.LepGood_miniRelIso[nLep]<0.2\
-     and r.LepGood_mediumMuonId[nLep]\
+     and r.LepGood_ICHEPmediumMuonId[nLep]\
      and abs(r.LepGood_sip3d[nLep])<4
 
 def cmgLooseEleID(r, nLep):
@@ -30,7 +30,7 @@ def cmgLooseEleID(r, nLep):
 def cmgTightEleID(r, nLep):
   return r.LepGood_pt[nLep]>=10 and abs(r.LepGood_eta[nLep])<=2.4\
     and  r.LepGood_miniRelIso[nLep]<0.1  \
-    and  r.LepGood_eleCutIdSpring15_25ns_v1[nLep]==4 
+    and  r.LepGood_eleCBID_SPRING15_25ns_ConvVetoDxyDz[nLep]==4 
 
 #def cmgTightEleID(r, nLep):
 #  return r.LepGood_pt[nLep]>=25 and abs(r.LepGood_eta[nLep])<2.5\

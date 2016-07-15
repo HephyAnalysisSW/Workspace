@@ -16,7 +16,7 @@ ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 
 from Workspace.HEPHYPythonTools.helpers import getChunks
-from Workspace.RA4Analysis.cmgTuples_Data25ns_PromtV2 import SingleElectron_Run2016B_PromptReco_v2 , SingleMuon_Run2016B_PromptReco_v2
+from Workspace.RA4Analysis.cmgTuples_Data25ns_PromptRecoV2 import *
 from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2 import *
 from systematics_helper import calc_btag_systematics, calc_LeptonScale_factors_and_systematics, calc_TopPt_Weights , calcDLDictionary, calc_diLep_contributions ,  fill_branch_WithJEC , getGenWandLepton , getGenTopWLepton
 from btagEfficiency import *
@@ -45,7 +45,7 @@ separateBTagWeights = True
 defSampleStr = "TTJets_LO"
 
 #subDir = "postProcessing_Run2016B_4fb_data"
-subDir = "postProcessing_Spring16_V6"
+subDir = "postProcessing_Run2016BC_JECv6"
 
 #branches to be kept for data and MC
 branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert",
@@ -204,7 +204,9 @@ def getTreeFromChunk(c, skimCond, iSplit, nSplit):
 exec('allSamples=['+options.allsamples+']')
 for isample, sample in enumerate(allSamples):
   chunks, sumWeight = getChunks(sample)
-  outDir = options.targetDir+"/".join([common_skim, sample['name']])
+  targetDir = options.targetDir
+  if sample.has_key('outDirOption'): outDir = targetDir+"/".join([common_skim, sample['name']+sample['outDirOption']])
+  else: outDir = targetDir+"/".join([common_skim, sample['name']])
   if os.path.exists(outDir) and os.listdir(outDir) != [] and not options.overwrite:
     print "Found non-empty directory: %s -> skipping!"%outDir
     continue
@@ -239,7 +241,7 @@ for isample, sample in enumerate(allSamples):
   aliases = [ "met:met_pt", "metPhi:met_phi"]
 
   readVectors = [\
-    {'prefix':'LepGood', 'nMax':8, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I','charge/F' ,'relIso03/F','eleCutIdSpring15_25ns_v1/I', 'SPRING15_25ns_v1/I', 'eleCBID_SPRING15_25ns_ConvVetoDxyDz/I','eleCBID_SPRING15_25ns/I','tightId/I', 'miniRelIso/F','mass/F','sip3d/F','mediumMuonId/I', 'mvaIdSpring15/F','lostHits/I', 'convVeto/I']}
+    {'prefix':'LepGood', 'nMax':8, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I','charge/F' ,'relIso03/F','eleCutIdSpring15_25ns_v1/I', 'SPRING15_25ns_v1/I', 'eleCBID_SPRING15_25ns_ConvVetoDxyDz/I','eleCBID_SPRING15_25ns/I','tightId/I', 'miniRelIso/F','mass/F','sip3d/F','mediumMuonId/I', 'ICHEPmediumMuonId/I', 'mvaIdSpring15/F','lostHits/I', 'convVeto/I']}
   ]
   if sample['isData']:
     readVectors.append({'prefix':'Jet',  'nMax':100, 'vars':['rawPt/F','pt/F', 'eta/F', 'phi/F', 'mass/F','id/I','btagCSV/F', 'btagCMVA/F']})
@@ -432,7 +434,7 @@ for isample, sample in enumerate(allSamples):
         s.nLooseHardLeptons = len(looseHardLepInd)
         s.nTightSoftLeptons = len(tightSoftLepInd)
         s.nTightHardLeptons = len(tightHardLepInd)
-        vars = ['pt', 'eta', 'phi','mass' ,'charge' ,'miniRelIso','relIso03', 'pdgId', 'eleCutIdSpring15_25ns_v1']
+        vars = ['pt', 'eta', 'phi','mass' ,'charge' ,'miniRelIso','relIso03', 'pdgId', 'eleCBID_SPRING15_25ns_ConvVetoDxyDz']
         allLeptons = [getObjDict(t, 'LepGood_', vars, i) for i in looseLepInd]
         looseSoftLep = [getObjDict(t, 'LepGood_', vars, i) for i in looseSoftLepInd] 
         looseHardLep = [getObjDict(t, 'LepGood_', vars, i) for i in looseHardLepInd]
@@ -450,7 +452,7 @@ for isample, sample in enumerate(allSamples):
           #s.leptonPdg = r.LepGood_pdgId[leadingLepInd]
           s.leptonPdg = (-1)*r.LepGood_pdgId[leadingLepInd] if (sample['name']=="ST_tchannel_top_4f_leptonDecays_powheg") else r.LepGood_pdgId[leadingLepInd]
           s.leptonMass= r.LepGood_mass[leadingLepInd]
-          s.leptonSPRING15_25ns_v1= r.LepGood_eleCutIdSpring15_25ns_v1[leadingLepInd]
+          s.leptonSPRING15_25ns_v1= r.LepGood_eleCBID_SPRING15_25ns_ConvVetoDxyDz[leadingLepInd]
           s.st = r.met_pt + s.leptonPt
         s.singleLeptonic = s.nTightHardLeptons==1
         if s.singleLeptonic:

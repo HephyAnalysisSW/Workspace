@@ -20,7 +20,7 @@ lumis = {
             #'mc_lumi':10000, 
             #'lumi_data_blinded':2245.386, 
             #'lumi_data_unblinded':139.63,
-            'target_lumi'           :   2300.   ,   
+            'target_lumi'           :   4000.   ,   
             'DataBlind_lumi'      :   3990    , 
             'DataUnblind_lumi'    :   804.2   ,
         }
@@ -40,7 +40,7 @@ def getSamples( wtau  = False, sampleList=['w','tt','z','sig'],
                 data_triggers = 'HLT_PFMET100_PFMHT100_IDTight || HLT_PFMET110_PFMHT110_IDTight || HLT_PFMET120_PFMHT120_IDTight || HLT_PFMET90_PFMHT90_IDTight' , 
                 data_filters  = "",  
                 #mc_lumi=10000, lumi_data_blinded=2245.386, lumi_data_unblinded=139.63):
-                kill_low_qcd_ht = True,
+                kill_low_qcd_ht = False,
                 lumis = lumis , 
                 #lumi_target=lumis["lumi_target"], lumi_data_blinded=lumis['lumi_data_blinded'], lumi_data_unblinded=lumis['lumi_data_unblinded']):
                ):

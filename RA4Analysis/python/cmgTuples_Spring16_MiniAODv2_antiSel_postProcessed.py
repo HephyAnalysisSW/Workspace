@@ -1,18 +1,8 @@
 import copy, os, sys
 #dirDaniel = '/data/dspitzbart/cmgTuples/postProcessed_Spring16_antiSelection_3fb/none/'
-dirDaniel = '/data/dspitzbart/cmgTuples/postProcessed_2016B_antiSelection_23062016/none/'
-dirDaniel2 = '/data/dspitzbart/cmgTuples/postProcessed_Spring16_antiSelection_TTJetsComb/none/'
+dirDaniel = '/data/dspitzbart/cmgTuples/postProcessing_Spring16_JECv6_antiSelection/none/'
+#dirDaniel2 = '/data/dspitzbart/cmgTuples/postProcessed_Spring16_antiSelection_TTJetsComb/none/'
 
-
-TTJets_Lep_antiSel = {\
-"name" : "TTJets_singleLep",
-"bins" : [
-"TTJets_SingleLeptonFromT_full",
-"TTJets_SingleLeptonFromTbar_full",
-"TTJets_DiLepton",
-],
-'dir' : dirDaniel,
-}
 
 TTJets_Comb_antiSel = {\
 "name" : "TTJets_singleLep",
@@ -25,7 +15,7 @@ TTJets_Comb_antiSel = {\
 "TTJets_LO_HT1200to2500",
 "TTJets_LO_HT2500toInf",
 ],
-'dir' : dirDaniel2,
+'dir' : dirDaniel,
 }
 
 WJetsHTToLNu_antiSel = {\
@@ -55,16 +45,9 @@ singleTop_lep_antiSel = {\
 "bins" : [
 "ST_schannel_4f_leptonDecays",
 "ST_tchannel_antitop_4f_leptonDecays_powheg",
+"ST_tchannel_top_4f_leptonDecays_powheg",#fake sample
 "ST_tW_antitop_5f_inclusiveDecays_powheg",
 "ST_tW_top_5f_inclusiveDecays_powheg",
-],
-'dir' : dirDaniel,
-}
-
-DY_madgraph_antiSel = {\
-"name" : "DY_madgraph",
-"bins" : [
-"DYJetsToLL_M50_madgraphMLM",
 ],
 'dir' : dirDaniel,
 }
@@ -79,15 +62,6 @@ DY_HT_antiSel = {\
 ],
 'dir' : dirDaniel,
 }
-
-DY_amc_antiSel = {\
-"name" : "DY_amc",
-"bins" : [
-"DYJetsToLL_M_50_amcatnloFXFX_25ns",
-],
-'dir' : dirDaniel,
-}
-
 
 QCDHT_antiSel = {\
 "name":"QCD",
@@ -119,7 +93,7 @@ TTV_antiSel = {
 "TTWToLNu",
 "TTWToQQ",
 "TTZToLLNuNu",
-#"TTZToQQ",
+"TTZToQQ",
 ],
 'dir' : dirDaniel,
 }

@@ -141,7 +141,7 @@ for rfile in rootfiles:
   latex1.SetTextSize(0.04)
   latex1.SetTextAlign(11)
   
-  latex1.DrawLatex(0.16,0.96,'CMS #bf{#it{Preliminary}}')
+  latex1.DrawLatex(0.16,0.96,'CMS') #bf{#it{Preliminary}}')
   latex1.DrawLatex(0.75,0.96,"#bf{2.3fb^{-1} (13TeV)}")
   
   latex2 = ROOT.TLatex()

@@ -135,7 +135,7 @@ class TaskConfig():
         #self.cardDirBase=   "/data/nrad/results/cards_and_limits/"
 
         self.cardDirBase=   "/afs/hephy.at/work/n/nrad/results/cards_and_limits/%s/%s"%(self.cmgTag, self.ppTag)
-
+        self.yieldPklDir =  "/afs/hephy.at/work/n/nrad/results/yields/%s/%s/"%(self.cmgTag, self.ppTag) 
 
         #self.results_dir =   self.cardDirBase + "/13TeV/{ht}/{run}/{lumi}/{cut}/".format( ht = self.htString, lumi = self.lumi_tag, run = self.runTag, cut=cutName) 
         self.results_dir =   self.cardDirBase + "/13TeV/{lumi}/{ht}/{run}/".format( ht = self.htString, lumi = self.lumi_tag, run = self.runTag ) 

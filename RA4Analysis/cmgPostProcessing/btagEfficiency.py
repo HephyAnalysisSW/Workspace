@@ -17,7 +17,7 @@ ptBorders = [30, 40, 50, 60, 70, 80, 100, 120, 160, 210, 260, 320, 400, 500, 670
 ptBins = []
 etaBins = [[0,0.8], [0.8,1.6], [ 1.6, 2.4]]
 
-calib = ROOT.BTagCalibration("csvv2", "data/CSVv2.csv")
+calib = ROOT.BTagCalibration("csvv2", "data/CSVv2_4invfb.csv")
 calibFS = ROOT.BTagCalibration("csv", "data/CSV_13TEV_Combined_20_11_2015.csv")
 
 #SFb_errors = [\
@@ -134,13 +134,21 @@ def getSF(parton, pt, eta, year = 2012):
     sf_u = btag.getSFl(pt,eta,2,y)
   return {"SF":sf, "SF_down":sf_d,"SF_up":sf_u}
 
-# get SF
-readerCombUp      = ROOT.BTagCalibrationReader(calib, 1, "comb", "up")
+## get SFs
+# "comb" (combination of QCD and ttbar methods) for b and c jets
+readerCombUp      = ROOT.BTagCalibrationReader(calib, 1, "comb", "up") #1 reflects the medium working point
 readerCombCentral = ROOT.BTagCalibrationReader(calib, 1, "comb", "central")
 readerCombDown    = ROOT.BTagCalibrationReader(calib, 1, "comb", "down")
+
+# "mujets" (from QCD methods only) for b and c jets
 readerMuUp        = ROOT.BTagCalibrationReader(calib, 1, "mujets", "up")
 readerMuCentral   = ROOT.BTagCalibrationReader(calib, 1, "mujets", "central")
 readerMuDown      = ROOT.BTagCalibrationReader(calib, 1, "mujets", "down")
+
+# "incl" for light jets
+readerInclUp        = ROOT.BTagCalibrationReader(calib, 1, "incl", "up")
+readerInclCentral   = ROOT.BTagCalibrationReader(calib, 1, "incl", "central")
+readerInclDown      = ROOT.BTagCalibrationReader(calib, 1, "incl", "down")
 
 readerFSUp        = ROOT.BTagCalibrationReader(calibFS, 1, "fastsim", "up")
 readerFSCentral   = ROOT.BTagCalibrationReader(calibFS, 1, "fastsim", "central")
@@ -150,37 +158,37 @@ readerFSDown      = ROOT.BTagCalibrationReader(calibFS, 1, "fastsim", "down")
 def getSF2015(parton, pt, eta):
   if abs(parton)==5: #SF for b
     if pt>669.9:
-      sf   = readerMuCentral.eval(0, eta, 669.9)
-      sf_d = readerMuDown.eval(0, eta, 669.9)
-      sf_u = readerMuUp.eval(0, eta, 669.9)
+      sf   = readerCombCentral.eval(0, eta, 669.9)
+      sf_d = readerCombDown.eval(0, eta, 669.9)
+      sf_u = readerCombUp.eval(0, eta, 669.9)
       sf_d = 2*sf_d - sf
       sf_u = 2*sf_u - sf
     else:
-      sf   = readerMuCentral.eval(0, eta, pt)
-      sf_d = readerMuDown.eval(0, eta, pt)
-      sf_u = readerMuUp.eval(0, eta, pt)
+      sf   = readerCombCentral.eval(0, eta, pt)
+      sf_d = readerCombDown.eval(0, eta, pt)
+      sf_u = readerCombUp.eval(0, eta, pt)
   elif abs(parton)==4: #SF for c
     if pt>669.9:
-      sf   = readerMuCentral.eval(1, eta, 669.9)
-      sf_d = readerMuDown.eval(1, eta, 669.9)
-      sf_u = readerMuUp.eval(1, eta, 669.9)
+      sf   = readerCombCentral.eval(1, eta, 669.9)
+      sf_d = readerCombDown.eval(1, eta, 669.9)
+      sf_u = readerCombUp.eval(1, eta, 669.9)
       sf_d = 2*sf_d - sf
       sf_u = 2*sf_u - sf
     else:
-      sf   = readerMuCentral.eval(1, eta, pt)
-      sf_d = readerMuDown.eval(1, eta, pt)
-      sf_u = readerMuUp.eval(1, eta, pt)
+      sf   = readerCombCentral.eval(1, eta, pt)
+      sf_d = readerCombDown.eval(1, eta, pt)
+      sf_u = readerCombUp.eval(1, eta, pt)
   else: #SF for light flavours
     if pt>999:
-      sf   = readerCombCentral.eval(2, eta, 999)
-      sf_d = readerCombDown.eval(2, eta, 999)
-      sf_u = readerCombUp.eval(2, eta, 999)
+      sf   = readerInclCentral.eval(2, eta, 999)
+      sf_d = readerInclDown.eval(2, eta, 999)
+      sf_u = readerInclUp.eval(2, eta, 999)
       sf_d = 2*sf_d - sf
       sf_u = 2*sf_u - sf
     else:
-      sf   = readerCombCentral.eval(2, eta, pt)
-      sf_d = readerCombDown.eval(2, eta, pt)
-      sf_u = readerCombUp.eval(2, eta, pt)
+      sf   = readerInclCentral.eval(2, eta, pt)
+      sf_d = readerInclDown.eval(2, eta, pt)
+      sf_u = readerInclUp.eval(2, eta, pt)
   return {"SF":sf, "SF_down":sf_d,"SF_up":sf_u}
 
 # get MC efficiencies and scale factors for a specific jet (with parton flavor, pt and eta)

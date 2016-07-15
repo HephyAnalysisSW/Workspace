@@ -15,8 +15,9 @@ from array import array
 from predictionConfig import *
 
 #cData = getChain([single_mu_Run2015D, single_ele_Run2015D], histname='')
-isData = True
+isData = False
 #predictionName = 'SFtemplates_fullSR_lep_data'
+unblinded = False
 
 ROOT.gStyle.SetOptTitle(0);
 ROOT.gStyle.SetOptStat('')
@@ -27,7 +28,7 @@ signal          = False
 withSystematics = True
 applyKappa      = True
 
-showMCtruth     = False
+showMCtruth     = True
 signal = False
 plotPull = False
 
@@ -48,7 +49,8 @@ prefix = 'singleLeptonic_Spring16_'
 
 #pickleDir = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2016_v1_QCD_lep_MC_3p99/'
 #pickleDir = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_validation_4j_lep_data_3p99/'
-pickleDir = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2016_v1_100p_lep_data_3p99/'#resultsFinal_withSystematics_pkl
+#pickleDir = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2016_v1_100p_lep_data_3p99/'#resultsFinal_withSystematics_pkl
+pickleDir = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2016_v2_lep_MC_SF_7p62/'
 
 res = pickle.load(file(pickleDir+'resultsFinal_withSystematics_pkl'))
 if withSystematics:
@@ -602,9 +604,9 @@ if not unblinded:
 else:
   suffix = ''
 
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_preapp_v2.png')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_preapp_v2.root')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_preapp_v2.pdf')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_approval.png')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_approval.root')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_approval.pdf')
 
 can2 = ROOT.TCanvas('can2','can2',700,700)
 one.SetLineStyle(2)
