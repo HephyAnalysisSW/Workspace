@@ -56,19 +56,19 @@ if not os.path.exists(wwwDir):
   os.makedirs(wwwDir)
 
 mcFileIsHere = False
-if isData:
-  mcFileIsHere = True
-  mcFile = picklePath+'20160714_QCDestimation_2016SR_MC7p62fb_pkl'
-  try: file(mcFile)
-  except IOError: mcFileIsHere = False
-  if mcFileIsHere:
-    mc_bins = pickle.load(file(mcFile))
-    print 'MC file successfully loaded, can assign correct uncertainties'
-    mcFileIsHere = True
-  else:
-    print
-    print '! Correct Uncertainty can not get assigned at the end, MC file missing !'
-    print
+#if isData:
+#  mcFileIsHere = True
+#  mcFile = picklePath+'20160714_QCDestimation_2016SR_MC7p62fb_pkl'
+#  try: file(mcFile)
+#  except IOError: mcFileIsHere = False
+#  if mcFileIsHere:
+#    mc_bins = pickle.load(file(mcFile))
+#    print 'MC file successfully loaded, can assign correct uncertainties'
+#    mcFileIsHere = True
+#  else:
+#    print
+#    print '! Correct Uncertainty can not get assigned at the end, MC file missing !'
+#    print
 
 ##############################################
 ###   Define sidebands for QCD estimation  ###
