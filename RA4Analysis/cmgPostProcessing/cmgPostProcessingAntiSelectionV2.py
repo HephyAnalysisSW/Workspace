@@ -86,7 +86,7 @@ parser.add_option("--manScaleFactor", dest="manScaleFactor", default = 1, action
 assert options.leptonSelection in ['soft', 'hard', 'none', 'dilep'], "Unknown leptonSelection: %s"%options.leptonSelection
 skimCond = "(1)"
 ht500 = "Sum$(Jet_pt)>500"
-common_skim = 'none'
+common_skim = 'HT500'
 if options.skim.startswith('met'):
   skimCond = "met_pt>"+str(float(options.skim[3:]))
 if options.skim=='HT400':

@@ -10,7 +10,7 @@ from Workspace.HEPHYPythonTools.helpers import getChain
 #from Workspace.RA4Analysis.cmgTuples_Data25ns_miniAODv2_postprocessed import *
 from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2_postProcessed import *
 #from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed import *
-from Workspace.RA4Analysis.cmgTuples_Data25ns_Promtv2_postprocessed import *
+from Workspace.RA4Analysis.cmgTuples_Data25ns_PromptRecoV2_postprocessed import *
 
 from Workspace.HEPHYPythonTools.user import username
 from Workspace.RA4Analysis.signalRegions import *
@@ -35,8 +35,8 @@ if QCDup: nameSuffix += '_QCDup'
 if QCDdown: nameSuffix += '_QCDdown'
 
 ## samples
-isData              = False
-unblinded           = True
+isData              = True
+unblinded           = False
 validation          = False
 isCentralPrediction = True
 if isData:
@@ -72,7 +72,7 @@ if isData:
   #QCDpickle  = '/data/dspitzbart/Results2016/QCDEstimation/20160212_QCDestimation_data2p25fb_pkl'
   #QCDpickle  = '/data/dspitzbart/Results2016/QCDEstimation/20160623_v3_QCDestimation_2015SR_data2p57fb_pkl'
   #QCDpickle  = '/data/dspitzbart/Results2016/QCDEstimation/20160628_QCDestimation_2016SR_preapp_data10fb_pkl'
-  QCDpickle  = '/data/dspitzbart/Results2016/QCDEstimation/20160628_QCDestimation_2016SR_preapp_100p_data10fb_pkl'
+  QCDpickle  = '/data/dspitzbart/Results2016/QCDEstimation/20160714_QCDestimation_2016SR_data7p62fb_pkl'
 if isData and validation:
   #QCDpickle  = '/data/dspitzbart/Results2016/QCDEstimation/20160218_QCDestimation_validation_data2p25fb_pkl'
   #QCDpickle  = '/data/dspitzbart/Results2016/QCDEstimation/20160623_v3_QCDestimation_validation_data2p57fb_pkl'
@@ -144,11 +144,11 @@ if validation:
 else:
   #kappa_dict_dir = '/data/dspitzbart/Results'+year+'/Prediction_SFtemplates_fullSR_lep_MC_SFnoPUreweight_2p25/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'
   #kappa_dict_dir = '/data/dspitzbart/Results'+year+'/Prediction_SFtemplates_fullSR_lep_MC_SF_Moriond_2p3/singleLeptonic_Spring15__estimationResults_pkl_kappa_corrected'
-  kappa_dict_dir = '/data/dspitzbart/Results'+year+'/Prediction_Spring16_templates_SR2016_v1_lep_MC_3p99/singleLeptonic_Spring16__estimationResults_pkl_kappa_corrected'
+  kappa_dict_dir = '/data/dspitzbart/Results'+year+'/Prediction_Spring16_templates_SR2016_v2_lep_MC_SF_7p62/singleLeptonic_Spring16__estimationResults_pkl_kappa_corrected'
 
 ## Preselection cut
 #triggers = "(HLT_EleHT350||HLT_MuHT350)"
-triggers = "((HLT_EleHT350||HLT_EleHT400)||(HLT_MuHT350||HLT_MuHT400))"
+triggers = "((HLT_EleHT350||HLT_EleHT400||HLT_Ele105)||(HLT_MuHT350||HLT_MuHT400))"
 #filters = "Flag_goodVertices && Flag_HBHENoiseFilter_fix && Flag_CSCTightHaloFilter && Flag_eeBadScFilter && Flag_HBHENoiseIsoFilter"
 #filters = "Flag_goodVertices && Flag_HBHENoiseFilter_fix && Flag_eeBadScFilter && Flag_HBHENoiseIsoFilter && veto_evt_list"
 #filters = "Flag_goodVertices && Flag_HBHENoiseFilter_fix && Flag_eeBadScFilter && Flag_HBHENoiseIsoFilter"
@@ -171,8 +171,8 @@ if not isData: presel = presel_MC
 ## weights for MC
 #MCweight = 'lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*0.94'
 #MCweight = 'lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*TopPtWeight*0.94'
-#MCweight = 'TopPtWeight*puReweight_true_max4*(singleMuonic*0.923 + singleElectronic*0.931)'
-MCweight = 'TopPtWeight'
+MCweight = 'TopPtWeight*puReweight_true_max4*(singleMuonic*0.923 + singleElectronic*0.931)'
+#MCweight = 'TopPtWeight'
 
 ## corrections
 createFits = True # turn off if you already did one
