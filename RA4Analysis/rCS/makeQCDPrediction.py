@@ -96,7 +96,7 @@ btreg = [(0,0), (1,1), (2,-1)] #1b and 2b estimates are needed for the btag fit
 
 lumi = 7.62
 sampleLumi = 3.0 #post processed sample already produced with 2.25fb-1
-weight_str, weight_err_str = makeWeight(lumi, sampleLumi, reWeight='TopPtWeight')
+weight_str, weight_err_str = makeWeight(lumi, sampleLumi, reWeight='TopPtWeight*puReweight_true_max4*(singleMuonic*0.923 + singleElectronic*0.931)')
 
 def getPseudoRCS(small,smallE,large,largeE): 
   if small>0:
@@ -111,11 +111,8 @@ def getPseudoRCS(small,smallE,large,largeE):
     return {'rCS':float('nan'), 'rCSE_pred':float('nan'), 'rCSE_sim':float('nan')}
 
 #trigger and filters for real Data
-trigger = "&&((HLT_EleHT350||HLT_EleHT400)||(HLT_MuHT350||HLT_MuHT400))"
-#filters = "&&Flag_goodVertices && Flag_HBHENoiseFilter_fix && Flag_eeBadScFilter && Flag_HBHENoiseIsoFilter "#&& veto_evt_list"
+trigger = "&&((HLT_EleHT350||HLT_EleHT400||HLT_Ele105)||(HLT_MuHT350||HLT_MuHT400))"
 filters = "&& (Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_goodVertices && Flag_eeBadScFilter &&  Flag_globalTightHalo2016Filter && Flag_badChargedHadronFilter && Flag_badMuonFilter)"
-#filters = "&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFilter_fix&&Flag_HBHENoiseFilter&&Flag_goodVertices&&Flag_eeBadScFilter&&Flag_EcalDeadCellTriggerPrimitiveFilter"
-#filters = "&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFilter_fix&&Flag_HBHENoiseIsoFilter&&Flag_goodVertices&&Flag_eeBadScFilter"
 
 presel = 'nLep==1&&nVeto==0&&leptonPt>25&&nEl==1&&Jet2_pt>80&& Flag_badChargedHadronFilter && Flag_badMuonFilter'
 antiSelStr = presel+'&&Selected==(-1)'
@@ -128,7 +125,6 @@ cQCD  = getChain(QCDHT_antiSel,histname='')
 cEWK  = getChain([WJetsHTToLNu_antiSel, TTJets_Comb_antiSel, singleTop_lep_antiSel, DY_HT_antiSel, TTV_antiSel],histname='')
 
 if isData:
-  #cData = getChain(single_ele_Run2016B_antiSel, histname='')
   cData = getChain([single_ele_Run2016B_antiSel_1, single_ele_Run2016B_antiSel_2, single_ele_Run2016B_antiSel_3, single_ele_Run2016B_antiSel_4, single_ele_Run2016B_antiSel_5, single_ele_Run2016C_antiSel],histname='')
 else:
   cData = getChain([QCDHT_antiSel, WJetsHTToLNu_antiSel, TTJets_Comb_antiSel, singleTop_lep_antiSel, DY_HT_antiSel, TTV_antiSel] , histname='')
@@ -137,6 +133,7 @@ else:
 numberOfBins = 30
 template_QCD = ROOT.TH1F('template_QCD','template_QCD',numberOfBins,-0.5,2.5)
 #print '!!!!!!!!!!!!!!! using sel QCD as template now'
+print 'Creating template'
 templateName, templateCut = nameAndCut((250,-1), (500,-1), (3,4), (0,0), presel=antiSelStr, charge="", btagVar = 'nBJetMediumCSV30', stVar = 'Lt', htVar = 'htJet30clean', njetVar='nJet30clean') ##changed from anitsel for check!!!
 
 if makeFit:
