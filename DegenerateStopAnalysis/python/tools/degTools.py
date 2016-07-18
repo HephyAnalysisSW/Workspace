@@ -575,6 +575,8 @@ def getBkgSigStacks(samples, plots, cut, sampleList=[],plotList=[], normalize=Fa
 
 
 
+
+
   
 def getPlot(sample,plot,cut,weight="(weight)", nMinus1="",cutStr="",addOverFlowBin=''):
     c     = sample.tree
@@ -2241,13 +2243,32 @@ class Yields():
             setSampleEventList = True
             setMVASampleEventList(samples, sample)
 
+
+
+
         for ic, cut in enumerate(cutList):
             cutName = cut[0]
+            cut_strings = [cut[1]]
+            warn = False
             if hasattr(samples[sample], 'cut'):
-                cutStr = "((%s) && (%s) )"%(cut[1],samples[sample].cut)
-            else:
-                cutStr = cut[1]
+                cut_strings.append(samples[sample].cut) 
+            if hasattr(samples[sample],"triggers") and samples[sample]['triggers']:
+                cut_strings.append( samples[sample]['triggers'] )
+                warn = True
+            if hasattr(samples[sample],"filters") and samples[sample]['filters']:
+                cut_strings.append(  samples[sample]['filters'] ) 
+                warn = True
+            if warn:
+                print "-----"*10 , samples[sample].name
+                print "-----"*20
+                print "Applying Triggers: %s"%samples[sample]['triggers']
+                print "Applying Filters: %s"%samples[sample]['filters']
+                print "-----"*20
+                print "-----"*20
 
+            cutStr = "&&".join([ "(%s)"%x for x in cut_strings])
+
+            print cutStr
 
             #yld = getYieldFromChain( samples[sample]['tree'], cutStr,self.weights[sample], returnError=self.err) #,self.nDigits) 
             yld = getYieldFromChain( samples[sample]['tree'], cutStr,self.cut_weights[cutName][sample], returnError=self.err) #,self.nDigits) 
