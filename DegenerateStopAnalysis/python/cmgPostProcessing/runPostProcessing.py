@@ -73,8 +73,8 @@ sampleSets = {
                                         ["WJetsToLNu_HT400to600", "--skimPreselect"],
                                         ["WJetsToLNu_HT600to800", "--skimPreselect"],
                                         ["WJetsToLNu_HT800to1200_ext", "--skimPreselect"],
-                                        ["WJetsToLNu_HT1200to2500", "--skimPreselect"],
-                                        ["WJetsToLNu_HT2500toInf", "--skimPreselect"],
+                                        #["WJetsToLNu_HT1200to2500", "--skimPreselect"],
+                                        #["WJetsToLNu_HT2500toInf", "--skimPreselect"],
                                         ],
                              
                             },
@@ -239,6 +239,17 @@ sampleSets = {
                                         ],
                              
                             },
+
+
+                'data_2016':{
+                            'samples':[
+                                        "SingleMuon_Run2016B_PromptReco_v2",
+                                        "SingleElectron_Run2016B_PromptReco_v2",
+                                        "MET_Run2016B_PromptReco_v2",
+                                        ],
+                             
+                            },
+
 
                 'data_2016_MET':{
                             'samples':[

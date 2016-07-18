@@ -152,6 +152,36 @@ def getParameterSet(args):
         vectors_MC_List.append(GenTracksSel)
 
     params['vectors_MC_List'] = vectors_MC_List
+
+
+    if  args.processBTagWeights:
+        from Workspace.DegenerateStopAnalysis.cmgPostProcessing.btagEfficiency import btagEfficiency
+
+        sampleName = args.processSample
+        eff_dict_map = {
+                         "WJets_1j" : ["ZInv", "ZJets", "WJets", "DYJets" ] ,
+                         "TTJets_1j" : ["TTJets", ]
+                        }
+        eff_to_use = "TTJets_1j" #default
+        for eff_samp, sampleList in eff_dict_map.iteritems():
+            if any([ samp in sampleName for samp in sampleList]):
+                eff_to_use = eff_samp
+                break
+
+        print "Decided to use %s for the jet efficiency"%eff_to_use
+ 
+
+        params['beff']={}
+
+        params['beff']['effFile']             = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/%s.pkl'%eff_to_use
+        #params['beff']['effFile']             = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/TTJets_DiLepton_comb_2j_2l.pkl'
+        #params['beff']['sfFile']              = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/CSVv2_UNITY_TEST.csv'
+        params['beff']['sfFile']              = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/CSVv2_4invfb_systJuly15.csv'
+        params['beff']['sfFile_FastSim']      = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/CSV_13TEV_Combined_20_11_2015.csv'
+
+        params['beff']['btagEff'] = btagEfficiency( fastSim = False,  effFile = params['beff']['effFile'], sfFile = params['beff']['sfFile'], sfFile_FastSim =  params['beff']['sfFile_FastSim']  )
+
+
     
     #
     return params
@@ -274,7 +304,7 @@ def getSamples(args):
     for sampleName in processSampleList:
         foundSample = False
         
-        # cmgSamples.samples contains components or list of components  
+        # cmgSamples.allComponents contains components or list of components  
         try:
             sampleRequested = getattr(cmgSamples, sampleName)
             
@@ -300,7 +330,7 @@ def getSamples(args):
                 
                     
         except AttributeError:
-            sampleRequested = cmgSamples.samples + cmgSamples.allSignals
+            sampleRequested = cmgSamples.allComponents + cmgSamples.allSignals
 
             if isinstance(sampleRequested, dict):
                 # single component
@@ -325,7 +355,7 @@ def getSamples(args):
         
         if not foundSample:
             print "\n List of available samples in cmgTuples set {0}: \n {1} \n".format(
-                cmgTuples, pprint.pformat(cmgSamples.samples)
+                cmgTuples, pprint.pformat(cmgSamples.allComponents)
                 )
             print "\n List of available signal samples in cmgTuples set {0}: \n {1} \n".format(
                 cmgTuples, pprint.pformat(cmgSamples.allSignals)
@@ -481,7 +511,7 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
     
     # common branches already defined in cmgTuples
     keepBranches_DATAMC = [
-        'run', 'lumi', 'evt', 'isData', 'rho', 'nVert', 
+        'run', 'lumi', 'evt', 'isData', 'rho', 'nVert', 'rhoCN',
         'met*',
         'Flag_*','HLT_*',
         'nJet', 'Jet_*', 
@@ -542,6 +572,29 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
         'basJet_lepGood_invMass_lep1jmindR/F/-999.','basJet_lepGood_dR_j1lep1/F/-999.', 'basJet_lepGood_invMass_3j/F/-999.',
         'bJet_muGood_dR_jHdmu1/F/-999.','bJet_elGood_dR_jHdel1/F/-999.', 'bJet_lepGood_dR_jHdlep1/F/-999.',
         ])
+
+
+    #FIXME
+    if args.processBTagWeights:
+        bTagNames           = [ 'BTag'  , 'SBTag', 'HBTag'   ]  ## to be moved into the params
+        bTagWeightNames     = ['MC', 'SF', 'SF_b_Down', 'SF_b_Up', 'SF_l_Down', 'SF_l_Up'] ## from btagEff.btagWeightNames , also to be moved to params
+        maxMultBTagWeight   = 2    # move to params
+        bTagWeightVars      = []
+        for bTagName in bTagNames:
+            for var in bTagWeightNames:
+                #varName = "_%s"%var if var!="MC" else ""
+                varName= "_%s"%var
+                if var!='MC':
+                    bTagWeightVars.append(  "weight1a%s%s/F"%(bTagName, varName) )
+                for nB in range(maxMultBTagWeight+1):
+                    bTagWeightVars.append( "weight%s%s%s/F"%(bTagName, nB, varName) ) 
+                    if nB>0: 
+                        #print "weight%s%sp%s/F"%(bTagName, nB, varName)
+                        bTagWeightVars.append( "weight%s%sp%s/F"%(bTagName, nB, varName) ) 
+        bTagWeightVars.sort()
+        newVariables_DATAMC.extend( bTagWeightVars)
+    
+
 
     if args.processLepAll:
         newVariables_DATAMC.extend([
@@ -650,7 +703,7 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
     
     # common branches already defined in cmgTuples
     keepBranches_MC = [ 
-        'nTrueInt', 'genWeight', 'xsec', 'puWeight', 
+        'nTrueInt', 'genWeight', 'xsec', 'puWeight', 'LHEweight_original',
         'GenSusyMStop', 
         'GenSusyMNeutralino',        
         'ngenLep', 'genLep_*', 
@@ -658,6 +711,7 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
         'ngenPartAll','genPartAll_*',
         'ngenTau', 'genTau_*', 
         'ngenLepFromTau', 'genLepFromTau_*', 
+        'nGenJet', 'GenJet_*',
         ]
     
     readVariables_MC = []
@@ -1412,6 +1466,7 @@ def processJets(args, readTree, splitTree, saveTree, params):
 
     bJetSepPtSoftHard = JetSel['bjetSep']['ptSoftHard'][2]
     bSoftJetList, bHardJetList = jetObj.splitIndexList('pt', bJetSepPtSoftHard, bJetList)
+    softJetList, hardJetList   = jetObj.splitIndexList('pt', bJetSepPtSoftHard, basJetList)
     
     nBJet = len(bJetList)
     saveTree.nBJet = nBJet
@@ -1471,17 +1526,139 @@ def processJets(args, readTree, splitTree, saveTree, params):
             'jetObj',
             'basJetList',
             'bJetDiscSortList',
+            'bJetList',
+            'bSoftJetList',
+            'bHardJetList',
+            'softJetList',
+            'hardJetList',
             ]
         )
     
     processJets_rtuple = rtuple(
         jetObj,
         basJetList,
-        bJetDiscSortList
+        bJetDiscSortList,
+        bJetList,
+        bSoftJetList, 
+        bHardJetList,
+        softJetList,
+        hardJetList,
         )
 
     #    
     return saveTree, processJets_rtuple
+
+
+
+
+def processBTagWeights(
+        args, readTree, splitTree, saveTree,
+        params, processJets_rtuple,
+        ):
+    '''Process BTag Weights using Robert's btagEfficiency class. 
+    
+    TODO describe here the processing.
+    '''
+    #
+    #print "---------------------------------------- PROCESSING BTAG WEIGHTS" 
+    logger = logging.getLogger('cmgPostProcessing.processBTagWeights')
+
+    effFile          =   params['beff']['effFile']
+    #effFile         =   params['beff']['effFile'] 
+    sfFile           =   params['beff']['sfFile']
+    sfFile_FastSim   =   params['beff']['sfFile_FastSim']
+    
+    btagEff          =   params['beff']['btagEff']
+   
+ 
+    
+    jObj         = processJets_rtuple.jetObj
+    jetList      = processJets_rtuple.basJetList
+    bJetList     = processJets_rtuple.bJetList
+    bSoftJetList = processJets_rtuple.bSoftJetList
+    bHardJetList = processJets_rtuple.bHardJetList
+    softJetList  = processJets_rtuple.softJetList
+    hardJetList  = processJets_rtuple.hardJetList
+    
+    nonBJetList     = [x for x in jetList if x not in bJetList]
+    nonBSoftJetList = [x for x in jetList if x not in bSoftJetList]
+    nonBHardJetList = [x for x in jetList if x not in bHardJetList]
+    
+    
+    
+    for i in processJets_rtuple.basJetList:
+        btagEff.addBTagEffToJet(jObj,i)
+    setattr(readTree, "%s_%s" % (jObj.obj, 'beff'),jObj.beff)  ## in order for th getObjDict to work with beff
+    
+    
+    
+    varList = ['pt', 'eta', 'phi', 'mass', 'hadronFlavour', 'beff' ]
+    
+    nonBJetList = [x for x in jetList if x not in bJetList]
+    
+    jets     = jObj.getObjDictList(  varList , jetList )
+    softJets = jObj.getObjDictList(  varList , softJetList ) 
+    hardJets = jObj.getObjDictList(  varList , hardJetList ) 
+    bJets     = jObj.getObjDictList(  varList , bJetList )
+    bSoftJets = jObj.getObjDictList(  varList , bSoftJetList )
+    bHardJets = jObj.getObjDictList(  varList , bHardJetList )
+    nonBJets     = jObj.getObjDictList(  varList , nonBJetList )
+    nonBSoftJets = jObj.getObjDictList(  varList , nonBSoftJetList )
+    nonBHardJets = jObj.getObjDictList(  varList , nonBHardJetList )
+    
+    btag_nonbtag_list_pairs = {
+                            'BTag'  : ( bJetList, nonBJetList ),
+                            'SBTag' : ( bSoftJetList , nonBSoftJetList ),
+                            'HBTag' : ( bHardJetList , nonBHardJetList ),
+                              }
+    btag_nonbtag_pairs = {
+                            'BTag'  : ( bJets, nonBJets , jets),
+                            'SBTag' : ( bSoftJets , nonBSoftJets , softJets),
+                            'HBTag' : ( bHardJets , nonBHardJets , hardJets),
+                         }
+    
+    maxMultBTagWeight = 2
+    #print "---------------------------------------------------------------------------"
+    #print "    ", splitTree.evt
+    #print "---------------------------------------------------------------------------"
+    for bTagName, bJets_nonBJets_jets in btag_nonbtag_pairs.iteritems():
+        bj , nonbj , j = bJets_nonBJets_jets
+        for var in btagEff.btagWeightNames:
+            #varName = "_%s"%var if var!="MC" else ""
+            varName = "_%s"%var
+            #
+            # Method 1a:
+            #
+            if var!= 'MC':
+                setattr(saveTree, "weight1a%s%s"%(bTagName, varName), btagEff.getBTagSF_1a( var, bj, nonbj))
+            #
+            # Method 1b:
+            #
+            multiBTagWeightDict = btagEff.getWeightDict_1b( [  jj['beff'][var] for jj in j  ] , maxMultBTagWeight)
+            #print "-----------"*10
+            #pprint.pprint(multiBTagWeightDict)
+            for nB in range(maxMultBTagWeight+1):
+                #print nB 
+                setattr(saveTree, "weight%s%s%s"%(bTagName, nB, varName), multiBTagWeightDict[nB])
+                if nB>0:
+                    #pprint.pprint( "  %s"%multiBTagWeightDict.values()[:nB]  ) 
+                    #print 1 - sum( multiBTagWeightDict.values()[:nB] )
+                    #print "weight%s%sp%s"%(bTagName, nB, varName) 
+                    setattr(saveTree, "weight%s%sp%s"%(bTagName, nB, varName), 1 - sum( multiBTagWeightDict.values()[:nB] )   )  # more than nB  (i.e. 1p,2p)
+
+
+
+
+    processBTagWeights_rtuple = None #FIXME
+    #
+
+    return saveTree, processBTagWeights_rtuple
+
+
+
+
+
+
 
 
 def processLeptonJets(
@@ -1536,7 +1713,7 @@ def processLeptonJets(
             )
         
         # list of variables needed to compute invariant mass        
-        varList = ['pt', 'eta', 'phi', 'mass', ]
+        varList = ['pt', 'eta', 'phi', 'mass' ]
 
         # invariant mass of the selected leading lepton and the dR-closest jet  
         jlList = jetObj.getObjDictList(varList, [closestJetIndex]) + lepObj.getObjDictList(varList, [objList[0]])
@@ -2284,7 +2461,7 @@ def cmgPostProcessing(argv=None):
         
         
         if runSmallSample: 
-            chunks=chunks[:1]
+            chunks=chunks[:10]
             logger.debug("\n\n Running with runSmallSample option. Run only over chunk \n %s\n", pprint.pformat(chunks)) 
         
         filesForHadd=[]
@@ -2404,7 +2581,14 @@ def cmgPostProcessing(argv=None):
                     saveTree, processJets_rtuple = processJets(
                         args, readTree, splitTree, saveTree, params
                         )
-                    
+                    if args.runInteractively:
+                        print splitTree.evt
+                        print "WARNING runInteractively!"
+                        return readTree, splitTree, saveTree , processJets_rtuple  , params
+                    saveTree, processBTagWeights_rtuple = processBTagWeights(
+                        args, readTree, splitTree, saveTree,
+                        params, processJets_rtuple,
+                        )
                     # selected leptons - jets processing
                     saveTree = processLeptonJets(
                         readTree, splitTree, saveTree,
@@ -2539,4 +2723,10 @@ def cmgPostProcessing(argv=None):
         print '\n End of cmgPostProcessing script.\n'
  
 if __name__ == "__main__":
-    sys.exit(cmgPostProcessing())
+
+    args = get_parser().parse_args()
+    if args.runInteractively:
+        ret = cmgPostProcessing()
+
+    else:
+        sys.exit(cmgPostProcessing())

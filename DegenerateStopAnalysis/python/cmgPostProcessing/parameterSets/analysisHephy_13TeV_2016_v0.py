@@ -189,7 +189,7 @@ def getParameterSet(args):
     JetSel = {
         'branchPrefix': 'Jet',
         'branches': [
-            'pt/F', 'eta/F', 'phi/F', 'id/I','btagCSV/F', 'mass/F'
+            'pt/F', 'eta/F', 'phi/F', 'id/I','btagCSV/F', 'mass/F' , 'hadronFlavour/I',
             ],
         'nMax': 25,
         'bas': {
@@ -201,7 +201,7 @@ def getParameterSet(args):
             'pt': ('pt', operator.gt, 60),
             },
         'isr': {
-            'pt': ('pt', operator.gt, 110),
+            'pt': ('pt', operator.gt, 100),
             },
         'isrH': {
             'pt': ('pt', operator.gt, 325),
