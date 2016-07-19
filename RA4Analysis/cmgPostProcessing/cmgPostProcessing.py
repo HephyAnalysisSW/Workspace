@@ -45,7 +45,7 @@ separateBTagWeights = True
 defSampleStr = "TTJets_LO"
 
 #subDir = "postProcessing_Run2016B_4fb_data"
-subDir = "postProcessing_Run2016BC_JECv6"
+subDir = "postProcessing_Spring16_JECv6"
 
 #branches to be kept for data and MC
 branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert",

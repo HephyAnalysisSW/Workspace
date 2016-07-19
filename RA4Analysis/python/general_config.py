@@ -2,8 +2,8 @@
 ##General
 
 sample_lumi = 3000##pb
-lumi = 3990 #2300##pb
-lumi_label = 4
+lumi = 7700 #2300##pb
+lumi_label = 7.7
 scale = '(1)'
 btagVarString = 'nBJetMediumCSV30'
 
@@ -12,7 +12,7 @@ btagVarString = 'nBJetMediumCSV30'
 #filters = "(Flag_goodVertices && Flag_HBHENoiseFilter_fix && Flag_eeBadScFilter && Flag_HBHENoiseIsoFilter)" # && veto_evt_list)"
 filters = "(Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_goodVertices && Flag_eeBadScFilter &&  Flag_globalTightHalo2016Filter && Flag_badChargedHadronFilter && Flag_badMuonFilter)"
 
-trigger = "((HLT_EleHT350||HLT_EleHT400)||(HLT_MuHT350||HLT_MuHT400))"
+trigger = "((HLT_EleHT350||HLT_EleHT400||HLT_Ele105)||(HLT_MuHT350||HLT_MuHT400))"
 
 ##Common for Background and Signal
 #trigger_scale = '((singleElectronic&&0.963)||(singleMuonic&&0.926))'

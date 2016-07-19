@@ -15,7 +15,7 @@ ROOT.AutoLibraryLoader.enable()
 
 from Workspace.HEPHYPythonTools.helpers import getChunks
 from Workspace.RA4Analysis.cmgTuples_Data25ns_miniAODv2 import *
-from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns import *
+from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2 import *
 from systematics_helper import calc_btag_systematics, calc_LeptonScale_factors_and_systematics , getISRWeight , fill_branch_WithJEC
 from btagEfficiency import *
 from leptonFastSimSF import leptonFastSimSF as leptonFastSimSF_
@@ -33,18 +33,25 @@ target_lumi = 3000 #pb-1
 
 #maxConsideredBTagWeight = 2
 #calcSystematics = True
-separateBTagWeights = True
+separateBTagWeights = False
 
-defSampleStr = "T5qqqqVV_mGluino_1000To1075_mLSP_1To950"
+defSampleStr = "SMS_T5qqqqVV_TuneCUETP8M1_v1"
 
 ###For PU reweight###
-PU_dir = "/data/easilar/tuples_from_Artur/JECv6recalibrateMET_2p2fb/PUhistos/"
-PU_File_66mb = ROOT.TFile(PU_dir+"/pileUp_66mb_map.root")
-PU_File_70mb = ROOT.TFile(PU_dir+"/pileUp_70mb_map.root")
-PU_File_74mb = ROOT.TFile(PU_dir+"/pileUp_74mb_map.root")
-PU_histo_66 = PU_File_66mb.Get("h_ratio_66")
-PU_histo_70 = PU_File_70mb.Get("h_ratio_70")
-PU_histo_74 = PU_File_74mb.Get("h_ratio_74")
+#PU_dir = "/data/easilar/tuples_from_Artur/JECv6recalibrateMET_2p2fb/PUhistos/"
+#PU_File_66mb = ROOT.TFile(PU_dir+"/pileUp_66mb_map.root")
+#PU_File_70mb = ROOT.TFile(PU_dir+"/pileUp_70mb_map.root")
+#PU_File_74mb = ROOT.TFile(PU_dir+"/pileUp_74mb_map.root")
+#PU_histo_66 = PU_File_66mb.Get("h_ratio_66")
+#PU_histo_70 = PU_File_70mb.Get("h_ratio_70")
+#PU_histo_74 = PU_File_74mb.Get("h_ratio_74")
+PU_dir = "/data/easilar/PU_Histos/"
+PU_File_66mb = ROOT.TFile(PU_dir+"/h_ratio_67p7.root")
+PU_File_70mb = ROOT.TFile(PU_dir+"/h_ratio_71p3.root")
+PU_File_74mb = ROOT.TFile(PU_dir+"/h_ratio_74p9.root")
+PU_histo_66 = PU_File_66mb.Get("puRatio")
+PU_histo_70 = PU_File_70mb.Get("puRatio")
+PU_histo_74 = PU_File_74mb.Get("puRatio")
 #####################
 ###For Lepton SF#####
 mu_mediumID_File = ROOT.TFile("/data/easilar/SF2015/TnP_MuonID_NUM_MediumID_DENOM_generalTracks_VAR_map_pt_eta.root")
@@ -196,7 +203,7 @@ for isample, sample in enumerate(allSamples):
       aliases = [ "met:met_pt", "metPhi:met_phi"]
 
       readVectors = [\
-        {'prefix':'LepGood', 'nMax':8, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I', 'relIso03/F','SPRING15_25ns_v1/I' ,'tightId/I', 'miniRelIso/F','mass/F','sip3d/F','mediumMuonId/I', 'mvaIdPhys14/F','mvaIdSpring15/F','lostHits/I', 'convVeto/I']},
+        {'prefix':'LepGood', 'nMax':8, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I', 'relIso03/F','SPRING15_25ns_v1/I' ,'tightId/I', 'miniRelIso/F','mass/F','sip3d/F','mediumMuonId/I','ICHEPmediumMuonId/I', 'mvaIdPhys14/F','mvaIdSpring15/F','lostHits/I', 'convVeto/I']},
       ]
       newVariables.extend(['puReweight_true/F','puReweight_true_max4/F','puReweight_true_Down/F','puReweight_true_Up/F','weight_diLepTTBar0p5/F','weight_diLepTTBar2p0/F','weight_XSecTTBar1p1/F','weight_XSecTTBar0p9/F','weight_XSecWJets1p1/F','weight_XSecWJets0p9/F'])
       newVariables.extend(['ngenGluino/I','genGluGlu_pt/F','ISRSigUp/F/1','ISRSigDown/F/1'])

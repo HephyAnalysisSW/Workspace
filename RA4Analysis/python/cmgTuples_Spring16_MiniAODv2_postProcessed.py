@@ -1,7 +1,8 @@
 import copy, os, sys
-dirEce = '/data/easilar/cmgTuples/postProcessing_Spring16_V6/HT500LT250Skim/'
-dirEce2 = '/data/easilar/cmgTuples/postProcessing_Spring16_FIXED_v2/'
+#dirEce = '/data/easilar/cmgTuples/postProcessing_Spring16_V6/HT500LT250Skim/'
+#dirEce2 = '/data/easilar/cmgTuples/postProcessing_Spring16_FIXED_v2/'
 dirDaniel = '/data/dspitzbart/cmgTuples/postProcessing_Spring16_JECv6/HT500LT250Skim/'
+dirEce = '/data/easilar/cmgTuples/postProcessing_Spring16_JECv6/HT500LT250Skim/'
 
 ####usual HT combination####
 
@@ -40,7 +41,7 @@ TTJets_singleLep = {\
 "TTJets_SingleLeptonFromT_full",
 "TTJets_SingleLeptonFromTbar_full",
 ],
-'dir' : dirEce,
+'dir' : dirDaniel,
 }
 
 TTJets_diLep = {\
@@ -48,7 +49,7 @@ TTJets_diLep = {\
 "bins" : [
 "TTJets_DiLepton",
 ],
-'dir' : dirEce,
+'dir' : dirDaniel,
 }
 
 TTJets_Lep = {\
@@ -58,7 +59,7 @@ TTJets_Lep = {\
 "TTJets_SingleLeptonFromTbar_full",
 "TTJets_DiLepton",
 ],
-'dir' : dirEce,
+'dir' : dirDaniel,
 }
 
 TTJets_Comb = {\
@@ -97,7 +98,7 @@ WJetsHTToLNu = {\
 #"ST_tchannel_antitop_4f_inclusiveDecays_powheg",
 #"ST_tW_antitop_5f_inclusiveDecays_powheg",
 #],
-#'dir' : dirEce,
+#'dir' : dirDaniel,
 #}
 
 singleTop_lep = {\
@@ -139,15 +140,15 @@ QCDHT = {\
 'dir' : dirDaniel,
 }
 
-#diBoson = {\
-#"name":"diBoson",
-#"bins":[
-#"DiBoson_WW",
-#"DiBoson_WZ",
-#"DiBoson_ZZ",
-#],
-#'dir': dirEce,
-#}
+diBoson = {\
+"name":"diBoson",
+"bins":[
+"DiBoson_WW",
+"DiBoson_WZ",
+"DiBoson_ZZ",
+],
+'dir': dirEce,
+}
 
 TTV = {
 "name":"TTV",
