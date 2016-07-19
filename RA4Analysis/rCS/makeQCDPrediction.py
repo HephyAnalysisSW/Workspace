@@ -28,7 +28,7 @@ isData = True
 makeFit = True
 getYields = True
 getResults = True
-isValidation = False
+isValidation = True
 
 includeMCresults = False
 
@@ -43,14 +43,14 @@ else:
   sampleStr = 'MC'
 
 SRstring = '2016SR'
-if isValidation: SRstring = '2016val_preapp_v2'
+if isValidation: SRstring = '2016val_v2'
 
 preprefix = 'QCDestimation/'+SRstring+'_7p62fb/'+sampleStr
 wwwDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/'+preprefix+'/'
 picklePath = '/data/'+username+'/Results2016/QCDEstimation/'
 prefix = 'Lp_singleElectronic_'
-picklePresel = '20160714_QCDestimation_'+SRstring+'_'+sampleStr+'7p62fb_pkl'
-pickleFit    = '20160714_fitResult_'+SRstring+'_'+sampleStr+'7p62fb_pkl'
+picklePresel = '20160718_QCDestimation_'+SRstring+'_'+sampleStr+'7p62fb_pkl'
+pickleFit    = '20160718_fitResult_'+SRstring+'_'+sampleStr+'7p62fb_pkl'
 
 if not os.path.exists(wwwDir):
   os.makedirs(wwwDir)
@@ -96,7 +96,7 @@ btreg = [(0,0), (1,1), (2,-1)] #1b and 2b estimates are needed for the btag fit
 
 lumi = 7.62
 sampleLumi = 3.0 #post processed sample already produced with 2.25fb-1
-weight_str, weight_err_str = makeWeight(lumi, sampleLumi, reWeight='TopPtWeight*puReweight_true_max4*(singleMuonic*0.923 + singleElectronic*0.931)')
+weight_str, weight_err_str = makeWeight(lumi, sampleLumi, reWeight='TopPtWeight*0.963') #only use electron trigger efficiency (0.931), pureweight not yet implemented
 
 def getPseudoRCS(small,smallE,large,largeE): 
   if small>0:
@@ -170,7 +170,7 @@ if makeFit:
         histos['DATA']['antiSelection']=ROOT.TH1F('DATA_antiSelection','DATA_antiSelection',numberOfBins,-0.5,2.5)
         histos['DATA']['Selection']=ROOT.TH1F('DATA_Selection','DATA_Selection',numberOfBins,-0.5,2.5)
   
-        Canv = ROOT.TCanvas('Canv','Canv')
+        #Canv = ROOT.TCanvas('Canv','Canv')
         #mergeCanv.SetLogy()
         leg = ROOT.TLegend(0.7,0.75,0.98,0.95)
         leg.SetFillColor(0)
@@ -237,17 +237,28 @@ if makeFit:
         print 'Getting yields'
         nEWKSel_err = ROOT.Double()
         nEWKSel = histos['EWK']['Selection'].IntegralAndError(0,histos['EWK']['Selection'].GetNbinsX(),nEWKSel_err)
+        print nEWKSel
         nEWKAntiSel_err = ROOT.Double()
         nEWKAntiSel = histos['EWK']['antiSelection'].IntegralAndError(0,histos['EWK']['antiSelection'].GetNbinsX(),nEWKAntiSel_err)
+        print nEWKAntiSel
+
+        print 'QCD'
         nQCDSel_err = ROOT.Double()
         nQCDSel =  histos['QCD']['Selection'].IntegralAndError(0,histos['QCD']['Selection'].GetNbinsX(),nQCDSel_err)
+        print nQCDSel
         nQCDAntiSel_err = ROOT.Double()
         nQCDAntiSel = histos['QCD']['antiSelection'].IntegralAndError(0,histos['QCD']['antiSelection'].GetNbinsX(),nQCDAntiSel_err)
+        print nQCDAntiSel
+
+        print 'data'
         nDATASel_err = ROOT.Double()
         nDATASel = histos['DATA']['Selection'].IntegralAndError(0,histos['DATA']['Selection'].GetNbinsX(),nDATASel_err)
+        print nDATASel
         nDATAAntiSel_err = ROOT.Double()
         nDATAAntiSel = histos['DATA']['antiSelection'].IntegralAndError(0,histos['DATA']['antiSelection'].GetNbinsX(),nDATAAntiSel_err)
-  
+        print nDATAAntiSel
+
+        print 'writing dict'  
         fitRes[crNJet][ltb][htb] = {'NDATASel':nDATASel, 'NDATASel_err':float(nDATASel_err),\
                                     'NDATAAntiSel':nDATAAntiSel, 'NDATAAntiSel_err':float(nDATAAntiSel_err),\
                                     'NEWKSelMC':nEWKSel, 'NEWKSelMC_err':float(nEWKSel_err),\
@@ -256,7 +267,7 @@ if makeFit:
                                     'NQCDAntiSelMC':nQCDAntiSel, 'NQCDAntiSelMC_err':float(nQCDAntiSel_err),\
                                     'deltaPhiCut':deltaPhiCut, 'rCSselectedDATA':rCSsel, 'rCSantiSelectedDATA':rCSanti}
   
-        Canv.cd()
+        #Canv.cd()
         histos['QCD']['antiSelection'].SetLineColor(ROOT.kRed)
         histos['QCD']['antiSelection'].SetLineStyle(ROOT.kDashed)
         leg.AddEntry(histos['QCD']['antiSelection'],'QCD anti-selected','l')
@@ -275,11 +286,16 @@ if makeFit:
         histos['DATA']['Selection'].SetMarkerStyle(20)
         leg.AddEntry(histos['DATA']['antiSelection'],'Data anti-selected')
         leg.AddEntry(histos['DATA']['Selection'],'Data selected')
-  
+        
+        print 'drawing histos'
+        Canv = ROOT.TCanvas('Canv','Canv')
+        print 'QCD'
         histos['QCD']['antiSelection'].Draw('hist e')
         histos['QCD']['Selection'].Draw('hist same e')
+        print 'EWK'
         histos['EWK']['antiSelection'].Draw('hist same e')
         histos['EWK']['Selection'].Draw('hist same e')
+        print 'data'
         histos['DATA']['antiSelection'].Draw('same ep')
         histos['DATA']['Selection'].Draw('same ep')
   
@@ -289,7 +305,8 @@ if makeFit:
         histos['EWK']['Selection'].SetMaximum(1.5*histos['EWK']['Selection'].GetMaximum())
         histos['DATA']['antiSelection'].SetMaximum(1.5*histos['DATA']['antiSelection'].GetMaximum())
         histos['DATA']['Selection'].SetMaximum(1.5*histos['DATA']['Selection'].GetMaximum())
-  
+        
+        print 'drawing legend'
         leg.Draw()
         if isData:
           text.DrawLatex(0.16,.96,"CMS #bf{#it{Preliminary}}")
@@ -298,8 +315,9 @@ if makeFit:
   ##      text.DrawLatex(0.16,.96,"CMS #bf{#it{Preliminary}}")
   #      text.DrawLatex(0.16,.96,"CMS #bf{#it{Simulation}}")
         text.DrawLatex(0.62,0.96,"#bf{L="+str(lumi)+" fb^{-1} (13 TeV)}")
-  
-        Canv.cd()
+        
+        print 'Canvas gymnastics'
+        #Canv.cd()
         Canv.Print(wwwDir+prefix+Selname+'.png')
         Canv.Print(wwwDir+prefix+Selname+'.root')
         Canv.Print(wwwDir+prefix+Selname+'.pdf')
@@ -416,13 +434,13 @@ if getYields:
             nDATAAntiSel = histos['DATA']['antiSelection'].IntegralAndError(0,histos['DATA']['antiSelection'].GetNbinsX(),nDATAAntiSel_err)
   
             bins[srNJet][stb][htb][btb][dP] = {'NDATASel':nDATASel, 'NDATASel_err':float(nDATASel_err),\
-                                               'NDATAAntiSel':nDATAAntiSel, 'NDATAAntiSel_err':float(nDATAAntiSel_err)}
+                                               'NDATAAntiSel':nDATAAntiSel, 'NDATAAntiSel_err':float(nDATAAntiSel_err),\
+                                               'deltaPhiCut':deltaPhiCut, 'rCSselectedDATA':rCSsel, 'rCSantiSelectedDATA':rCSanti}
             if includeMCresults:
               bins[srNJet][stb][htb][btb][dP].update({'NEWKSelMC':nEWKSel, 'NEWKSelMC_err':float(nEWKSel_err),\
                                                'NEWKAntiSelMC':nEWKAntiSel, 'NEWKAntiSelMC_err':float(nEWKAntiSel_err),\
                                                'NQCDSelMC':nQCDSel, 'NQCDSelMC_err':float(nQCDSel_err),\
-                                               'NQCDAntiSelMC':nQCDAntiSel, 'NQCDAntiSelMC_err':float(nQCDAntiSel_err),\
-                                               'deltaPhiCut':deltaPhiCut, 'rCSselectedDATA':rCSsel, 'rCSantiSelectedDATA':rCSanti})
+                                               'NQCDAntiSelMC':nQCDAntiSel, 'NQCDAntiSelMC_err':float(nQCDAntiSel_err)})
             
             if includeMCresults:
               Canv.cd()

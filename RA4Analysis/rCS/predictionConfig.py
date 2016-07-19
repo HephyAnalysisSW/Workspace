@@ -6,7 +6,7 @@ import os,sys
 from Workspace.HEPHYPythonTools.helpers import getChain
 
 from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2_postProcessed import *
-from Workspace.RA4Analysis.cmgTuples_Data25ns_PromptRecoV2_postprocessed import *
+from Workspace.RA4Analysis.cmgTuples_Data25ns_Promtv2_postprocessed import *
 
 from Workspace.HEPHYPythonTools.user import username
 from Workspace.RA4Analysis.signalRegions import *
@@ -16,7 +16,6 @@ testRun = False
 ## b-tagging and other variables
 dPhiStr = 'deltaPhi_Wl'
 bjreg = (0,0)
-wjetsSB = (3,4)
 
 nBTagVar              = 'nBJetMediumCSV30'
 useBTagWeights        = True
@@ -32,7 +31,7 @@ if QCDdown: nameSuffix += '_QCDdown'
 
 ## samples
 isData              = True
-unblinded           = False
+unblinded           = True
 validation          = False
 isCentralPrediction = True
 if isData:
@@ -40,6 +39,8 @@ if isData:
 
 loadTemplate = True
 
+wjetsSB = (3,4)
+if validation: wjetsSB = (2,3)
 
 cWJets      = getChain(WJetsHTToLNu,histname='')
 cTTJets     = getChain(TTJets_Comb,histname='')
@@ -58,13 +59,13 @@ if not isData and useQCDestimation:
 if isData:
   QCDpickle  = '/data/dspitzbart/Results2016/QCDEstimation/20160714_QCDestimation_2016SR_data7p62fb_pkl'
 if isData and validation:
-  QCDpickle  = '/data/dspitzbart/Results2016/QCDEstimation/20160630_QCDestimation_2016val_preapp_v2_data4fb_pkl'
+  QCDpickle  = '/data/dspitzbart/Results2016/QCDEstimation/20160718_QCDestimation_2016val_v2_data7p62fb_pkl'
 
-if isData and useQCDestimation: QCDestimate = pickle.load(file(QCDpickle))
+if isData or useQCDestimation: QCDestimate = pickle.load(file(QCDpickle))
 else: QCDestimate=False
 
 if isData:
-  cData = getChain([single_mu_Run2016B, single_ele_Run2016B], histname='')
+  cData = getChain([single_mu_Run2016B, single_ele_Run2016B, single_mu_Run2016C, single_ele_Run2016C], histname='')
 elif not isData and useQCDestimation:
   cData = getChain([WJetsHTToLNu, TTJets_Comb, singleTop_lep, DY_HT, TTV, QCDHT], histname='')
 else:
@@ -74,16 +75,16 @@ else:
 ## signal region definition
 if validation:
   signalRegions = validation2016
-  regStr = 'validation_4j'
+  regStr = 'validation_4j_altWSB'
 else:
   signalRegions = signalRegions2016
   regStr = 'SR2016_v2'
 
 ## weight calculations
-lumi = 7.62
-templateLumi = 7.62 # lumi that was used when template was created - if defined wrong, fixed rest backgrounds will be wrong
+lumi = 7.7
+templateLumi = 7.7 # lumi that was used when template was created - if defined wrong, fixed rest backgrounds will be wrong
 sampleLumi = 3.
-printlumi = '7.6'
+printlumi = '7.7'
 debugReweighting = False
 
 year = '2016'
@@ -115,38 +116,38 @@ templateDir = '/data/'+username+'/Results'+year+'/btagTemplates_'+templateName+'
 prefix = 'singleLeptonic_Spring16_'
 
 if validation:
-  kappa_dict_dir = '/data/dspitzbart/Results'+year+'/Prediction_Spring16_templates_validation_4j_lep_MC_3p99/singleLeptonic_Spring16__estimationResults_pkl_kappa_corrected'
+  kappa_dict_dir = '/data/dspitzbart/Results'+year+'/Prediction_Spring16_templates_validation_4j_lep_MC_SF_7p7/singleLeptonic_Spring16__estimationResults_pkl_kappa_corrected'
 else:
-  kappa_dict_dir = '/data/dspitzbart/Results'+year+'/Prediction_Spring16_templates_SR2016_v2_lep_MC_SF_7p62/singleLeptonic_Spring16__estimationResults_pkl_kappa_corrected'
+  kappa_dict_dir = '/data/dspitzbart/Results'+year+'/Prediction_Spring16_templates_SR2016_v2_lep_MC_SF_7p7/singleLeptonic_Spring16__estimationResults_pkl_kappa_corrected'
 
 ## Preselection cut
 triggers = "((HLT_EleHT350||HLT_EleHT400||HLT_Ele105)||(HLT_MuHT350||HLT_MuHT400))"
 filters = "(Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_goodVertices && Flag_eeBadScFilter &&  Flag_globalTightHalo2016Filter && Flag_badChargedHadronFilter && Flag_badMuonFilter)"
 presel = "((!isData&&singleLeptonic)||(isData&&"+triggers+"&&((muonDataSet&&singleMuonic)||(eleDataSet&&singleElectronic))&&"+filters+"))"
-presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSoftLeptons==0 && Jet_pt[1]>80 && st>250 && nJet30>2 && htJet30j>500"
+presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSoftLeptons==0 && Jet_pt[1]>80 && st>250 && nJet30>1 && htJet30j>500"
 
 singleMu_presel = "((!isData&&singleMuonic)||(isData&&"+triggers+"&&(muonDataSet&&singleMuonic)&&"+filters+"))"
-singleMu_presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSoftLeptons==0 && Jet_pt[1]>80 && st>250 && nJet30>2 && htJet30j>500"
+singleMu_presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSoftLeptons==0 && Jet_pt[1]>80 && st>250 && nJet30>1 && htJet30j>500"
 
 singleEle_presel = "((!isData&&singleElectronic)||(isData&&"+triggers+"&&(eleDataSet&&singleElectronic)&&"+filters+"))"
-singleEle_presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSoftLeptons==0 && Jet_pt[1]>80 && st>250 && nJet30>2 && htJet30j>500"
+singleEle_presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSoftLeptons==0 && Jet_pt[1]>80 && st>250 && nJet30>1 && htJet30j>500"
 
-presel_MC = "singleLeptonic" + "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSoftLeptons==0 && Jet_pt[1]>80 && st>250 && nJet30>2 && htJet30j>500 && Flag_badChargedHadronFilter && Flag_badMuonFilter"
+presel_MC = "singleLeptonic" + "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSoftLeptons==0 && Jet_pt[1]>80 && st>250 && nJet30>1 && htJet30j>500 && Flag_badChargedHadronFilter && Flag_badMuonFilter"
 
 if not isData: presel = presel_MC
 
 #presel = singleMu_presel
 
 ## weights for MC
-MCweight = 'TopPtWeight*puReweight_true_max4*(singleMuonic*0.923 + singleElectronic*0.931)'
+MCweight = 'TopPtWeight*puReweight_true_max4*(singleMuonic*0.926 + singleElectronic*0.963)'
 #MCweight = 'TopPtWeight'
 
 ## corrections
 createFits = True # turn off if you already did one
 if not isCentralPrediction:
   createFits = False
-#fitDir = '/data/'+username+'/Results'+year+'/correctionFit_'+regStr+'_MC'+nameSuffix+'/'
-fitDir = '/data/'+username+'/Results'+year+'/correctionFit_SR2016_v1_MC_test/'
+fitDir = '/data/'+username+'/Results'+year+'/correctionFit_'+regStr+'_MC_'+lumistr+nameSuffix+'/'
+#fitDir = '/data/'+username+'/Results'+year+'/correctionFit_SR2016_v1_MC_test/'
 fitPrintDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results'+year+'/25ns/RcsFit_'+predictionName+'_'+lumistr+'_test/'
 
 ## do stuff for test runs

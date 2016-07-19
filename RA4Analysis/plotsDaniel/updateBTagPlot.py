@@ -13,8 +13,9 @@ from Workspace.RA4Analysis.helpers import *
 
 ROOT.gROOT.Reset()
 
-path = '/afs/hephy.at/user/d/dspitzbart/www/Spring15/25ns/templateFit_SFtemplates_fullSR_lep_data_2p25/'
+#path = '/afs/hephy.at/user/d/dspitzbart/www/Spring15/25ns/templateFit_SFtemplates_fullSR_lep_data_2p25/'
 #path = '/afs/hephy.at/user/d/dspitzbart/www/Spring15/25ns/templateFit_Spring16_templates_SR2016_v1_lep_data_3p99/'
+path = '/afs/hephy.at/user/d/dspitzbart/www/Spring15/25ns/templateFit_Spring16_templates_SR2016_v2_lep_data_7p7/'
 
 files = [f for f in listdir(path) if isfile(join(path, f))]
 
@@ -141,8 +142,8 @@ for rfile in rootfiles:
   latex1.SetTextSize(0.04)
   latex1.SetTextAlign(11)
   
-  latex1.DrawLatex(0.16,0.96,'CMS') #bf{#it{Preliminary}}')
-  latex1.DrawLatex(0.75,0.96,"#bf{2.3fb^{-1} (13TeV)}")
+  latex1.DrawLatex(0.16,0.96,'CMS #bf{#it{Preliminary}}')
+  latex1.DrawLatex(0.75,0.96,"#bf{7.7fb^{-1} (13TeV)}")
   
   latex2 = ROOT.TLatex()
   latex2.SetNDC()
@@ -181,7 +182,7 @@ for rfile in rootfiles:
   
   
   #printPath = '/afs/hephy.at/user/d/dspitzbart/www/Results2016B/btagFitResults_v3/'
-  printPath = '/afs/hephy.at/user/d/dspitzbart/www/Results2016/btagFitResults_update/'
+  printPath = '/afs/hephy.at/user/d/dspitzbart/www/Results2016B/btagFitResults_7p7/'
   
   if not os.path.exists(printPath):
     os.makedirs(printPath)

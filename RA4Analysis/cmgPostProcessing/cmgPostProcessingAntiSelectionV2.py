@@ -150,15 +150,14 @@ if sys.argv[0].count('ipython'):
 #evt_veto_list = evt_veto_list()
 
 ###For PU reweight###
-#PU_File = ROOT.TFile("/data/easilar/tuples_from_Artur/JECv6recalibrateMET_2100pb/trig_skim/PUhistos/ratio_PU.root")
-#PU_histo = PU_File.Get("h_ratio")
-#PU_dir = "/data/easilar/tuples_from_Artur/JECv6recalibrateMET_2p2fb/PUhistos/"
-#PU_File_66mb = ROOT.TFile(PU_dir+"/pileUp_66mb_map.root")
-#PU_File_70mb = ROOT.TFile(PU_dir+"/pileUp_70mb_map.root")
-#PU_File_74mb = ROOT.TFile(PU_dir+"/pileUp_74mb_map.root")
-#PU_histo_66 = PU_File_66mb.Get("h_ratio_66")
-#PU_histo_70 = PU_File_70mb.Get("h_ratio_70")
-#PU_histo_74 = PU_File_74mb.Get("h_ratio_74")
+#PU_dir = "/afs/hephy.at/user/e/easilar/www/data/Run2016B/4fb/PU_histos/"
+PU_dir = "/data/easilar/PU_Histos/"
+PU_File_66mb = ROOT.TFile(PU_dir+"/h_ratio_67p7.root")
+PU_File_70mb = ROOT.TFile(PU_dir+"/h_ratio_71p3.root")
+PU_File_74mb = ROOT.TFile(PU_dir+"/h_ratio_74p9.root")
+PU_histo_66 = PU_File_66mb.Get("puRatio")
+PU_histo_70 = PU_File_70mb.Get("puRatio")
+PU_histo_74 = PU_File_74mb.Get("puRatio")
 #####################
 
 #####################
@@ -337,10 +336,10 @@ for isample, sample in enumerate(allSamples):
           s.muonDataSet = False
           s.eleDataSet = False
           nTrueInt = t.GetLeaf('nTrueInt').GetValue()
-          #s.puReweight_true = PU_histo_70.GetBinContent(PU_histo_70.FindBin(nTrueInt))
-          #s.puReweight_true_max4 = min(4,s.puReweight_true)
-          #s.puReweight_true_Down = PU_histo_66.GetBinContent(PU_histo_66.FindBin(nTrueInt))
-          #s.puReweight_true_Up = PU_histo_74.GetBinContent(PU_histo_74.FindBin(nTrueInt))
+          s.puReweight_true = PU_histo_70.GetBinContent(PU_histo_70.FindBin(nTrueInt))
+          s.puReweight_true_max4 = min(4,s.puReweight_true)
+          s.puReweight_true_Down = PU_histo_66.GetBinContent(PU_histo_66.FindBin(nTrueInt))
+          s.puReweight_true_Up = PU_histo_74.GetBinContent(PU_histo_74.FindBin(nTrueInt))
 
           #if "TTJets" in sample["name"] :
           #  s.weight = lumiScaleFactor*genWeight
