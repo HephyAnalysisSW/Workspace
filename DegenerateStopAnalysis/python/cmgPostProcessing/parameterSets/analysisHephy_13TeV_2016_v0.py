@@ -122,8 +122,8 @@ def getParameterSet(args):
             'pdgId': ('pdgId', operator.eq, 13, operator.abs),
             'pt': ('pt', operator.gt, 5),
             'eta': ('eta', operator.lt, 2.4, operator.abs),
-            'dxy': ('dxy', operator.lt, 0.05, operator.abs),
-            'dz': ('dz', operator.lt, 0.2, operator.abs),
+            'dxy': ('dxy', operator.lt, 0.02, operator.abs),
+            'dz': ('dz', operator.lt, 0.5, operator.abs),
             'hybIso': {
                 'ptSwitch': 25, 
                 'relIso': {
@@ -189,7 +189,7 @@ def getParameterSet(args):
     JetSel = {
         'branchPrefix': 'Jet',
         'branches': [
-            'pt/F', 'eta/F', 'phi/F', 'id/I','btagCSV/F', 'mass/F' , 'hadronFlavour/I',
+            'pt/F', 'eta/F', 'phi/F', 'id/I','btagCSV/F', 'mass/F' , #'hadronFlavour/I',
             ],
         'nMax': 25,
         'bas': {
