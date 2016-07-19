@@ -160,7 +160,7 @@ def getParameterSet(args):
         sampleName = args.processSample
         eff_dict_map = {
                          "WJets_1j" : ["ZInv", "ZJets", "WJets", "DYJets" ] ,
-                         "TTJets_1j" : ["TTJets", ]
+                         "TTJets_1j" : ["TTJets" ]
                         }
         eff_to_use = "TTJets_1j" #default
         for eff_samp, sampleList in eff_dict_map.iteritems():
@@ -177,6 +177,7 @@ def getParameterSet(args):
         #params['beff']['effFile']             = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/TTJets_DiLepton_comb_2j_2l.pkl'
         #params['beff']['sfFile']              = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/CSVv2_UNITY_TEST.csv'
         params['beff']['sfFile']              = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/CSVv2_4invfb_systJuly15.csv'
+        #params['beff']['sfFile']              = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/CSVv2_4invfb.csv'
         params['beff']['sfFile_FastSim']      = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/CSV_13TEV_Combined_20_11_2015.csv'
 
         params['beff']['btagEff'] = btagEfficiency( fastSim = False,  effFile = params['beff']['effFile'], sfFile = params['beff']['sfFile'], sfFile_FastSim =  params['beff']['sfFile_FastSim']  )
@@ -1585,7 +1586,6 @@ def processBTagWeights(
     nonBHardJetList = [x for x in jetList if x not in bHardJetList]
     
     
-    
     for i in processJets_rtuple.basJetList:
         btagEff.addBTagEffToJet(jObj,i)
     setattr(readTree, "%s_%s" % (jObj.obj, 'beff'),jObj.beff)  ## in order for th getObjDict to work with beff
@@ -2585,10 +2585,12 @@ def cmgPostProcessing(argv=None):
                         print splitTree.evt
                         print "WARNING runInteractively!"
                         return readTree, splitTree, saveTree , processJets_rtuple  , params
-                    saveTree, processBTagWeights_rtuple = processBTagWeights(
-                        args, readTree, splitTree, saveTree,
-                        params, processJets_rtuple,
-                        )
+                    if args.processBTagWeights:
+                        print "processing btagweights!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                        saveTree, processBTagWeights_rtuple = processBTagWeights(
+                            args, readTree, splitTree, saveTree,
+                            params, processJets_rtuple,
+                            )
                     # selected leptons - jets processing
                     saveTree = processLeptonJets(
                         readTree, splitTree, saveTree,
