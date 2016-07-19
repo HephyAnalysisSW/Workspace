@@ -32,7 +32,7 @@ if QCDdown: nameSuffix += '_QCDdown'
 ## samples
 isData              = True
 unblinded           = True
-validation          = True
+validation          = False
 isCentralPrediction = True
 if isData:
   isCentralPrediction = False #should be false for data, otherwise kappa is measured in data!
@@ -40,7 +40,7 @@ if isData:
 loadTemplate = True
 
 wjetsSB = (3,4)
-if validation: wjetsSB = (3,3)
+if validation: wjetsSB = (2,3)
 
 cWJets      = getChain(WJetsHTToLNu,histname='')
 cTTJets     = getChain(TTJets_Comb,histname='')
@@ -75,7 +75,7 @@ else:
 ## signal region definition
 if validation:
   signalRegions = validation2016
-  regStr = 'validation_4j'
+  regStr = 'validation_4j_altWSB'
 else:
   signalRegions = signalRegions2016
   regStr = 'SR2016_v2'
@@ -118,21 +118,21 @@ prefix = 'singleLeptonic_Spring16_'
 if validation:
   kappa_dict_dir = '/data/dspitzbart/Results'+year+'/Prediction_Spring16_templates_validation_4j_lep_MC_SF_7p7/singleLeptonic_Spring16__estimationResults_pkl_kappa_corrected'
 else:
-  kappa_dict_dir = '/data/dspitzbart/Results'+year+'/Prediction_Spring16_templates_SR2016_v2_lep_MC_SF_7p62/singleLeptonic_Spring16__estimationResults_pkl_kappa_corrected'
+  kappa_dict_dir = '/data/dspitzbart/Results'+year+'/Prediction_Spring16_templates_SR2016_v2_lep_MC_SF_7p7/singleLeptonic_Spring16__estimationResults_pkl_kappa_corrected'
 
 ## Preselection cut
 triggers = "((HLT_EleHT350||HLT_EleHT400||HLT_Ele105)||(HLT_MuHT350||HLT_MuHT400))"
 filters = "(Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_goodVertices && Flag_eeBadScFilter &&  Flag_globalTightHalo2016Filter && Flag_badChargedHadronFilter && Flag_badMuonFilter)"
 presel = "((!isData&&singleLeptonic)||(isData&&"+triggers+"&&((muonDataSet&&singleMuonic)||(eleDataSet&&singleElectronic))&&"+filters+"))"
-presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSoftLeptons==0 && Jet_pt[1]>80 && st>250 && nJet30>2 && htJet30j>500"
+presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSoftLeptons==0 && Jet_pt[1]>80 && st>250 && nJet30>1 && htJet30j>500"
 
 singleMu_presel = "((!isData&&singleMuonic)||(isData&&"+triggers+"&&(muonDataSet&&singleMuonic)&&"+filters+"))"
-singleMu_presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSoftLeptons==0 && Jet_pt[1]>80 && st>250 && nJet30>2 && htJet30j>500"
+singleMu_presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSoftLeptons==0 && Jet_pt[1]>80 && st>250 && nJet30>1 && htJet30j>500"
 
 singleEle_presel = "((!isData&&singleElectronic)||(isData&&"+triggers+"&&(eleDataSet&&singleElectronic)&&"+filters+"))"
-singleEle_presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSoftLeptons==0 && Jet_pt[1]>80 && st>250 && nJet30>2 && htJet30j>500"
+singleEle_presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSoftLeptons==0 && Jet_pt[1]>80 && st>250 && nJet30>1 && htJet30j>500"
 
-presel_MC = "singleLeptonic" + "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSoftLeptons==0 && Jet_pt[1]>80 && st>250 && nJet30>2 && htJet30j>500 && Flag_badChargedHadronFilter && Flag_badMuonFilter"
+presel_MC = "singleLeptonic" + "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSoftLeptons==0 && Jet_pt[1]>80 && st>250 && nJet30>1 && htJet30j>500 && Flag_badChargedHadronFilter && Flag_badMuonFilter"
 
 if not isData: presel = presel_MC
 

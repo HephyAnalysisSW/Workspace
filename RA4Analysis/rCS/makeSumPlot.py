@@ -16,7 +16,7 @@ from predictionConfig import *
 
 #cData = getChain([single_mu_Run2015D, single_ele_Run2015D], histname='')
 #predictionName = 'SFtemplates_fullSR_lep_data'
-unblinded = False
+unblinded = True
 
 ROOT.gStyle.SetOptTitle(0);
 ROOT.gStyle.SetOptStat('')
@@ -24,14 +24,14 @@ ROOT.gStyle.SetOptStat('')
 useWcorrection  = False
 useTTcorrection = False
 signal          = False
-withSystematics = False
-useKappa        = False
+withSystematics = True
+useKappa        = True
 
 showMCtruth     = False
 signal = False
 plotPull = False
 
-latextitle = 'preliminary'
+latextitle = 'Preliminary'
 
 weight_str, weight_err_str = makeWeight(lumi, sampleLumi, reWeight=MCweight)
 
@@ -50,8 +50,8 @@ prefix = 'singleLeptonic_Spring16_'
 #pickleDir = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_validation_4j_lep_data_3p99/'
 #pickleDir = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2016_v1_100p_lep_data_3p99/'#resultsFinal_withSystematics_pkl
 #pickleDir = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2016_v2_lep_data_7p62/'
-pickleDir = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_validation_4j_lep_data_7p7/'
-
+#pickleDir = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_validation_4j_altWSB_lep_data_7p7/'
+pickleDir = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2016_v2_lep_data_7p7/'
 
 if not useKappa: res = pickle.load(file(pickleDir+'singleLeptonic_Spring16__estimationResults_pkl'))
 else: res = pickle.load(file(pickleDir+'resultsFinal_withSystematics_pkl'))
@@ -625,6 +625,8 @@ if not unblinded:
   suffix = '_blind'
 else:
   suffix = ''
+
+if plotPull: suffix += '_pull'
 
 can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_approval.png')
 can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_approval.root')
