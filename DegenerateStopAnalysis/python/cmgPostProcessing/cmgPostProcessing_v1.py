@@ -606,6 +606,14 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
             'basJet_lepAll_invMass_lep1jmindR/F/-999.','basJet_lepAll_dR_j1lep1/F/-999.', 'basJet_lepAll_invMass_3j/F/-999.',
             'bJet_muAll_dR_jHdmu1/F/-999.','bJet_elAll_dR_jHdel1/F/-999.', 'bJet_lepAll_dR_jHdlep1/F/-999.',
             ])
+        
+    # flag for vetoing events for FastSim samples, as resulted from 2016 "corridor studies"
+    #  = 0: fails event
+    #  = 1: pass event
+    newVariables_DATAMC.extend([
+        'Flag_veto_event_fastSimJets/I/1',
+        ])
+    
 
     newVectors_DATAMC = []
     
@@ -2053,13 +2061,100 @@ def processEventVetoList(readTree, splitTree, saveTree, veto_event_list):
             run_lumi_evt
             )
     else:
-        logger.debug(
+        logger.trace(
             "\n Run:LS:Event %s passed veto list",
             run_lumi_evt
             )
         
     #
     return saveTree    
+
+def processEventVetoFastSimJets(readTree, splitTree, saveTree, params):
+    ''' Flag for vetoing events for FastSim samples, as resulted from 2016 "corridor studies".
+    
+          = 0: fails event
+          = 1: pass event
+
+    '''
+
+    logger = logging.getLogger('cmgPostProcessing.processEventVetoFastSimJets')
+
+    run = int(splitTree.GetLeaf('run').GetValue())
+    lumi = int(splitTree.GetLeaf('lumi').GetValue())
+    evt = int(splitTree.GetLeaf('evt').GetValue())
+
+    run_lumi_evt = "%s:%s:%s\n" % (run, lumi, evt)
+
+    # get the parameters for this function
+    Veto_fastSimJets = params['Veto_fastSimJets']
+    JetVarList = params['JetVarList']
+
+    # selection of reco jets
+
+    Veto_fastSimJets_recoJet = Veto_fastSimJets['Veto_fastSimJets_recoJet']
+
+    recoObjBranches = Veto_fastSimJets_recoJet['branchPrefix']
+    recoJetObj = cmgObjectSelection.cmgObject(readTree, splitTree, recoObjBranches)
+
+    if logger.isEnabledFor(logging.DEBUG):
+        printStr = "\n List of " + recoObjBranches + " jets before selector: " + \
+            recoJetObj.printObjects(None, JetVarList)
+        logger.debug(printStr)
+
+    recoJetSel = Veto_fastSimJets_recoJet['recoJet']
+    recoJetSelector = cmgObjectSelection.objSelectorFunc(recoJetSel)
+    recoJetList = recoJetObj.getSelectionIndexList(readTree, recoJetSel)
+
+    # selection of generated jets
+
+    Veto_fastSimJets_genJet = Veto_fastSimJets['Veto_fastSimJets_genJet']
+
+    genObjBranches = Veto_fastSimJets_genJet['branchPrefix']
+    genJetObj = cmgObjectSelection.cmgObject(readTree, splitTree, genObjBranches)
+
+    if logger.isEnabledFor(logging.DEBUG):
+        printStr = "\n List of " + genObjBranches + " jets before selector: " + \
+            genJetObj.printObjects(None, JetVarList)
+        logger.debug(printStr)
+
+    genJetSel = Veto_fastSimJets_genJet['genJet']
+    genJetSelector = cmgObjectSelection.objSelectorFunc(genJetSel)
+    genJetList = genJetObj.getSelectionIndexList(readTree, genJetSel)
+
+    # compute the criteria
+
+    criteria_dR = Veto_fastSimJets['criteria']['dR']
+    noMatchedRecoJet = False
+
+    for recoJetIdx, recoJet in enumerate(recoJetList):
+        matchedRecoJet = False
+        for genJetIdx, genJet in enumerate(genJetList):
+            recoJet_genJet_dR = helpers.dR(recoJetList[recoJetIdx], genJetList[genJetIdx], recoJetObj, genJetObj)
+            selector = helpers.evalCutOperator(recoJet_genJet_dR, criteria_dR)
+
+            if selector:
+                matchedRecoJet = True
+                break
+
+        if not matchedRecoJet:
+            noMatchedRecoJet = True
+            break
+
+    if noMatchedRecoJet:
+        saveTree.Flag_veto_event_fastSimJets = 0
+        logger.debug(
+            "\n Run:LS:Event %s failed Veto_fastSimJets",
+            run_lumi_evt
+            )
+    else:
+        saveTree.Flag_veto_event_fastSimJets = 1
+        logger.trace(
+            "\n Run:LS:Event %s passed Veto_fastSimJets",
+            run_lumi_evt
+            )
+
+    #
+    return saveTree
 
 def computeWeight(sample, sumWeight,  splitTree, saveTree, params, xsec=None):
     ''' Compute the weight of each event.
@@ -2074,6 +2169,7 @@ def computeWeight(sample, sumWeight,  splitTree, saveTree, params, xsec=None):
         
     # sample type (data or MC, taken from CMG component)
     isDataSample = sample['isData']
+    isFastSimSample = sample.isFastSim
     
     # weight according to required luminosity 
     
@@ -2643,6 +2739,10 @@ def cmgPostProcessing(argv=None):
                         saveTree = processEventVetoList(
                             readTree, splitTree, saveTree, event_veto_list
                             )
+
+                    # compute flag for event veto for FastSim jets
+                    if isFastSimSample and args.applyEventVetoFastSimJets:
+                        saveTree = processEventVetoFastSimJets(readTree, splitTree, saveTree, params)
 
                     if not isDataSample:
                         saveTree = processGenSusyParticles(readTree, splitTree, saveTree, params)

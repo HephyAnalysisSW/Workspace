@@ -11,6 +11,7 @@ import random
 import tempfile
 import math
 import collections
+import operator
 
 # imports user modules or functions
 
@@ -533,4 +534,34 @@ def retryRemove(function, path, excinfo):
             path, exctype, value
             )
         
+
+def evalCutOperator(quantityValue, operatorDef):
+    ''' Evaluate the operator operatorDef for quantity value quantityValue.
+    
+    The dictionary entry for operatorDef has the following format:
+        ('quantity', operator.name, quantity_cut, operator_unary_quantity)
+        
+        'quantity': quantity name, not used here
+        operator.name: the name of the operator, from python operator module
+        quantity_cut: the numerical value of the cut to be applied
+        operator_unary_quantity: if given, the operator is applied on the quantity value
+    '''
+
+    logger = logging.getLogger(__name__ + '.evaluateOperator')
+
+    opResult = False
+    
+    # operators with two arguments
+    opForCut = operatorDef[1]
+    varCut = operatorDef[2]
+
+    if len(operatorDef) > 3:
+        # apply opForVar operator on variable value
+        opForVar = operatorDef[3]
+        opResult = opForCut(opForVar(quantityValue), varCut)
+    else:
+        opResult = opCut(quantityValue, varCut)
+        
+    return opResult
+
     
