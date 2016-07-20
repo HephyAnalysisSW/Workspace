@@ -153,6 +153,11 @@ def get_parser():
         help="Apply event veto list, if applyEventVetoList = True"
         )
 
+    argParser.add_argument('--applyEventVetoFastSimJets',
+        action='store_true',
+        help="Apply an event veto for FastJet samples (see 'corridor studies', if applyEventVetoList = True"
+        )
+
     argParser.add_argument('--runSmallSample',
         action='store_true',
         help="Run the file on a small sample (for test purpose), bool flag set to True if used"
