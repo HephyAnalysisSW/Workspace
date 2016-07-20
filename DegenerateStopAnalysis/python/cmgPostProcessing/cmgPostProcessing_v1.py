@@ -240,7 +240,6 @@ def getSamples(args):
 
     # cmg samples definition file
     cmgTuplesFullName = 'Workspace.DegenerateStopAnalysis.samples.cmgTuples.' + cmgTuples
-    
     cmssw_base = os.environ['CMSSW_BASE']
     sampleFile = os.path.join(cmssw_base, 'src/Workspace/DegenerateStopAnalysis/python/samples/cmgTuples') + \
         '/' + cmgTuples + '.py'
@@ -524,7 +523,7 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
     if args.processLepAll:
         newVariables_DATAMC.extend([
             "nLepOther_mu/I/-1", "nLepOther_el/I/-1", "nLepOther_lep/I/-1",
-            "nLepAll_mu/I/-1", "nLepAll_el/I/-1", "nLepAll_lep/I/-1",            
+            "nLepAll_mu/I/-1", "nLepAll_el/I/-1", "nLepAll_el2/I/-1", "nLepAll_lep/I/-1",            
             ])
 
     newVariables_DATAMC.extend([
@@ -602,6 +601,7 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
             'vars':[
                 'mu/I/-1',
                 'el/I/-1',
+                'el2/I/-1',
                 'lep/I/-1',
                 ] 
             },
@@ -613,6 +613,7 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
                 'vars':[
                     'mu/I/-1',
                     'el/I/-1',
+                    'el2/I/-1',
                     'lep/I/-1',
                     ] 
                 },
@@ -623,6 +624,7 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
                 'vars':[
                     'mu/I/-1',
                     'el/I/-1',
+                    'el2/I/-1',
                     'lep/I/-1',
                     ] 
                 },
@@ -1047,9 +1049,11 @@ def processLeptons(readTree, splitTree, saveTree, params, LepSelector):
 
     muSelector = cmgObjectSelection.objSelectorFunc(LepSel['mu'] )
     elSelector = cmgObjectSelection.objSelectorFunc(LepSel['el'])
+    el2Selector = cmgObjectSelection.objSelectorFunc(LepSel['el2'])
 
     muList = lepObj.getSelectionIndexList(readTree, muSelector)
     elList = lepObj.getSelectionIndexList(readTree, elSelector)
+    el2List = lepObj.getSelectionIndexList(readTree, el2Selector)
     # 
     sumElMuList = muList + elList
     lepList = lepObj.sort('pt', sumElMuList)
@@ -1058,11 +1062,13 @@ def processLeptons(readTree, splitTree, saveTree, params, LepSelector):
     
     saveTree = saveTreeLepObject(saveTree, LepColl, 'mu', muList)
     saveTree = saveTreeLepObject(saveTree, LepColl, 'el', elList)
+    saveTree = saveTreeLepObject(saveTree, LepColl, 'el2', el2List)
     saveTree = saveTreeLepObject(saveTree, LepColl, 'lep', lepList)
 
     if logger.isEnabledFor(logging.DEBUG):
         printDebug(saveTree, LepColl, 'mu', muList)
         printDebug(saveTree, LepColl, 'el', elList)
+        printDebug(saveTree, LepColl, 'el2', el2List)
         printDebug(saveTree, LepColl, 'lep', lepList)
         
     # define the named tuple to return the values
@@ -1072,6 +1078,7 @@ def processLeptons(readTree, splitTree, saveTree, params, LepSelector):
             'lepObj',
             'muList',
             'elList',
+            'el2List',
             'lepList',
             ]
         )
@@ -1080,6 +1087,7 @@ def processLeptons(readTree, splitTree, saveTree, params, LepSelector):
         lepObj, 
         muList, 
         elList, 
+        el2List, 
         lepList
         )
     #    
@@ -1168,6 +1176,7 @@ def processLeptonsAll(
 
     muList = []
     elList = []
+    el2List = []
     lepList = []        
     
     # add LepAll to the saveTree
@@ -1198,6 +1207,8 @@ def processLeptonsAll(
                 muList.append(idx)
             if lepIndex in processLepGood_rtuple.elList:
                 elList.append(idx)
+            if lepIndex in processLepGood_rtuple.el2List:
+                el2List.append(idx)
             if lepIndex in processLepGood_rtuple.lepList:
                 lepList.append(idx)
                 
@@ -1206,6 +1217,8 @@ def processLeptonsAll(
                 muList.append(idx)
             if lepIndex in processLepOther_rtuple.elList:
                 elList.append(idx)
+            if lepIndex in processLepOther_rtuple.el2List:
+                el2List.append(idx)
             if lepIndex in processLepOther_rtuple.lepList:
                 lepList.append(idx)
                             
@@ -1230,11 +1243,13 @@ def processLeptonsAll(
     
     saveTree = saveTreeLepObject(saveTree, LepColl, 'mu', muList)
     saveTree = saveTreeLepObject(saveTree, LepColl, 'el', elList)
+    saveTree = saveTreeLepObject(saveTree, LepColl, 'el2', el2List)
     saveTree = saveTreeLepObject(saveTree, LepColl, 'lep', lepList)
 
     if logger.isEnabledFor(logging.DEBUG):
         printDebug(saveTree, LepColl, 'mu', muList, LepVarList)
         printDebug(saveTree, LepColl, 'el', elList, LepVarList)
+        printDebug(saveTree, LepColl, 'el2', el2List, LepVarList)
         printDebug(saveTree, LepColl, 'lep', lepList, LepVarList)
         
     # get LepAll as cmgObject, print them in debug mode 
@@ -1254,6 +1269,7 @@ def processLeptonsAll(
             'lepObj',
             'muList',
             'elList',
+            'el2List',
             'lepList',
             ]
         )
@@ -1262,6 +1278,7 @@ def processLeptonsAll(
         lepAllObj,
         muList,
         elList,
+        el2List,
         lepList
         )
     #    
