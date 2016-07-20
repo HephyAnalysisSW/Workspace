@@ -17,8 +17,8 @@ ptBorders = [30, 40, 50, 60, 70, 80, 100, 120, 160, 210, 260, 320, 400, 500, 670
 ptBins = []
 etaBins = [[0,0.8], [0.8,1.6], [ 1.6, 2.4]]
 
-calib = ROOT.BTagCalibration("csvv2", "data/CSVv2_4invfb.csv")
-calibFS = ROOT.BTagCalibration("csv", "data/CSV_13TEV_Combined_20_11_2015.csv")
+calib = ROOT.BTagCalibration("csvv2", "data/CSVv2_4invfb_systJuly1.csv")
+calibFS = ROOT.BTagCalibration("csv", "data/CSV_13TEV_Combined_14_7_2016.csv")
 
 #SFb_errors = [\
 # 0.0209663,
@@ -44,7 +44,7 @@ for i in range(len(ptBorders)-1):
   if i == len(ptBorders)-2:
     ptBins.append([ptBorders[i+1], -1])
 
-ROOT.gROOT.ProcessLine(".L btagEff/FSimCorr_UCSB.C+")
+#ROOT.gROOT.ProcessLine(".L btagEff/FSimCorr_UCSB.C+")
 
 def partonName (parton):
   if parton==5:  return 'b'
