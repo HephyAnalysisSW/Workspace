@@ -18,53 +18,77 @@ import os
 
 
 
-def printSample(compName, comp):
+def printSample(compName, comp, ext_comp= None):
     sampleName = "_".join(comp.dataset.split("/")[1:3])
     xsec = comp.xSection if not comp.isData else None
+    ext_comp_string = '"ext":%s,'%ext_comp if ext_comp else ""
+
+
     temp =\
 """
 
 {compName} ={{
-'cmgName':"{compName}"
+'cmgName':"{compName}",
 "name" : "{sampleName}",
 #"name" : comp.name,
 "chunkString":"{sampleName}",
 "dir": sample_path +"/" + "{sampleName}",
 "dbsName" : "{dbsName}",
 "rootFileLocation":"tree.root",
+"skimAnalyzerDir":"skimAnalyzerCount",
 "treeName":"tree",
 "isData": {isData},
 "xsec": {xsec},
+{ext_comp}
 }}
 allComponents.append({compName})
 
-""".format(sampleName=sampleName, isData= comp.isData , dbsName = comp.dataset , xsec = xsec, compName = compName)
-    print temp
+""".format(sampleName=sampleName, isData= comp.isData , dbsName = comp.dataset , xsec = xsec, compName = compName, ext_comp = ext_comp_string)
+    #print temp
     return temp
 
-def printCMGProcessingFile(cmgPickle, mc_dir = "./", data_dir="./" , output_dir ="./", write = True):
-    #output_dir  = "$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/python/samples/cmgTuples/"
+def printCMGProcessingFile(     cmgPickle, 
+                                mc_path      =  "/data/nrad/cmgTuples/%s/RunIISpring16MiniAODv2"    , 
+                                data_path    =  "/data/nrad/cmgTuples/%s/Data25ns"    , 
+                                output_dir  =   "$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/python/samples/cmgTuples/"    , 
+                                write       =   True    ,
+                           ):
     output_dir  = os.path.expandvars(output_dir)
     tag = os.path.splitext(os.path.basename(cmgPickle))[0]
+    data_path = data_path%tag
+    mc_path   = mc_path%tag
     componentDict = pickle.load(file(cmgPickle))
     data_output = []
     mc_output   = []
-    data_output.append("sample_path = '%s'"%data_dir)
-    mc_output.append("sample_path = '%s'"%mc_dir)
-    for compName, comp in  componentDict.iteritems():
+    data_output.append( "sample_path = '%s'   \nallComponents=[] \n"%data_path)
+    mc_output.append(   "sample_path = '%s'   \nallComponents=[] \n"%mc_path)
+
+    for compName, comp in  sorted( componentDict.iteritems() ) :
         if not comp.isData:
+            ext_comps = []
+            if compName.endswith("_ext"):
+                norm_compName = compName.replace("_ext","")
+                if norm_compName in componentDict:
+                    ext_comps.append(compName)
+                    ext_comps.append(norm_compName)
+            elif compName+"_ext" in componentDict:
+                ext_comps.extend([compName, compName+"_ext"])
+            print ext_comps
             mc_output.append( printSample(compName, comp)) 
         else:
-            data_output.append( printSample(compName, comp)  )
+            data_output.append( printSample(compName, comp, ext_comps)  )
+    data_sample_file    = os.path.splitext(os.path.basename(data_path))[0]    
+    mc_sample_file      = os.path.splitext(os.path.basename(mc_path))[0]      
+
     if len(data_output)>1:
-        data_file_path = output_dir +"/Data25ns_%s.py"%tag
+        data_file_path = output_dir +"/%s.py"%data_sample_file
         data_file = open( data_file_path ,'w')
         for l in data_output:
             data_file.write(l)
         print "Data CMGProcessing sample file written to %s"%data_file_path
         data_file.close()
     if len(mc_output)>1:
-        mc_file_path = output_dir +"/RunIISpring16_%s.py"%tag
+        mc_file_path = output_dir +"/%s.py"%mc_sample_file
         mc_file = open( mc_file_path ,'w')
         for l in mc_output:
             mc_file.write(l)

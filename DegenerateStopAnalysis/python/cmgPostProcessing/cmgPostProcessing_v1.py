@@ -173,14 +173,15 @@ def getParameterSet(args):
 
         params['beff']={}
 
-        params['beff']['effFile']             = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/%s.pkl'%eff_to_use
-        #params['beff']['effFile']             = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/TTJets_DiLepton_comb_2j_2l.pkl'
-        #params['beff']['sfFile']              = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/CSVv2_UNITY_TEST.csv'
-        params['beff']['sfFile']              = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/CSVv2_4invfb_systJuly15.csv'
-        #params['beff']['sfFile']              = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/CSVv2_4invfb.csv'
-        params['beff']['sfFile_FastSim']      = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/CSV_13TEV_Combined_20_11_2015.csv'
-
-        params['beff']['btagEff'] = btagEfficiency( fastSim = False,  effFile = params['beff']['effFile'], sfFile = params['beff']['sfFile'], sfFile_FastSim =  params['beff']['sfFile_FastSim']  )
+        params['beff']['effFile']         = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/%s.pkl'%eff_to_use
+        params['beff']['sfFile']          = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/CSVv2_4invfb_systJuly15.csv'
+        params['beff']['sfFile_FastSim']  = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/CSV_13TEV_Combined_20_11_2015.csv'
+        params['beff']['btagEff']         = btagEfficiency( 
+                                                            fastSim = False,  
+                                                            effFile = params['beff']['effFile'], 
+                                                            sfFile = params['beff']['sfFile'], 
+                                                            sfFile_FastSim =  params['beff']['sfFile_FastSim']  
+                                                           )
 
 
     
@@ -311,7 +312,7 @@ def getSamples(args):
             
             if isinstance(sampleRequested, dict):
                 # single component
-                if (sampleName == sampleRequested['cmgComp'].name):
+                if (sampleName == sampleRequested['cmgName']):
                     allComponentsList.append(sampleRequested)
                     foundSample = True
                     continue      
@@ -335,7 +336,7 @@ def getSamples(args):
 
             if isinstance(sampleRequested, dict):
                 # single component
-                if (sampleName == sampleRequested['cmgComp'].name):
+                if (sampleName == sampleRequested['cmgName']):
                     allComponentsList.append(sampleRequested)
                     foundSample = True
                     break            
@@ -343,7 +344,7 @@ def getSamples(args):
                 # list of components
                 for comp in sampleRequested:
                     print "\n sampleRequested \n", (pprint.pformat(comp)), "\n"
-                    if (sampleName == comp['cmgComp'].name):
+                    if (sampleName == comp['cmgName']):
                         allComponentsList.append(comp)
                         foundSample = True
                         break 
@@ -2053,7 +2054,7 @@ def computeWeight(sample, sumWeight,  splitTree, saveTree, params, xsec=None):
     logger = logging.getLogger('cmgPostProcessing.computeWeight')
         
     # sample type (data or MC, taken from CMG component)
-    isDataSample = sample['cmgComp'].isData
+    isDataSample = sample['isData']
     
     # weight according to required luminosity 
     
@@ -2064,7 +2065,7 @@ def computeWeight(sample, sumWeight,  splitTree, saveTree, params, xsec=None):
         lumiScaleFactor = 1
     else:
         if not xsec:
-            xSection = sample['cmgComp'].xSection
+            xSection = sample['xsec']
         else:
             xSection = xsec
         lumiScaleFactor = xSection * target_lumi / float(sumWeight)
@@ -2079,9 +2080,9 @@ def computeWeight(sample, sumWeight,  splitTree, saveTree, params, xsec=None):
         "\n    sum of event weights: %f" + \
         "\n    luminosity scale factor: %f " + \
         "\n    Event weight: %f \n",
-        ('Data ' + sample['cmgComp'].name if isDataSample else 'MC ' + sample['cmgComp'].name),
+        ('Data ' + sample['cmgName'] if isDataSample else 'MC ' + sample['cmgName']),
         target_lumi, genWeight,
-        ('' if isDataSample else 'cross section: ' + str(sample['cmgComp'].xSection) + ' pb^{-1}'),
+        ('' if isDataSample else 'cross section: ' + str(sample['xsec']) + ' pb^{-1}'),
         sumWeight, lumiScaleFactor, saveTree.weight)
     
         
@@ -2253,7 +2254,7 @@ def cmgPostProcessing(argv=None):
     logLevel = args.logLevel
     
     # use a unique name for the log file, write file in the dataset directory
-    prefixLogFile = 'cmgPostProcessing_' + '_'.join([sample['cmgComp'].name for sample in allSamples]) + \
+    prefixLogFile = 'cmgPostProcessing_' + '_'.join([sample['cmgName'] for sample in allSamples]) + \
          '_' + logLevel + '_'
     logFile = tempfile.NamedTemporaryFile(suffix='.log', prefix=prefixLogFile, dir=outputDirectory, delete=False) 
 
@@ -2272,7 +2273,7 @@ def cmgPostProcessing(argv=None):
         "\n Samples to be processed: %i \n\n %s \n\n Detailed sample description: \n\n  %s \n" + \
         "\n Results will be written to directory \n %s \n",
         cmgTuples, getSamples_rtuple.sampleFile, len(allSamples), 
-        pprint.pformat([sample['cmgComp'].name for sample in allSamples]),
+        pprint.pformat([sample['cmgName'] for sample in allSamples]),
         pprint.pformat(allSamples),
         outputDirectory
         )
@@ -2305,10 +2306,10 @@ def cmgPostProcessing(argv=None):
     
     for isample, sample in enumerate(allSamples):
         
-        sampleName = sample['cmgComp'].name
+        sampleName = sample['cmgName']
         sample_name = sample['name']
         
-        isDataSample = True if sample['cmgComp'].isData else False
+        isDataSample = True if sample['isData'] else False
         sampleType = 'Data' if isDataSample else 'MC'
                               
         logger.info(
@@ -2586,7 +2587,6 @@ def cmgPostProcessing(argv=None):
                         print "WARNING runInteractively!"
                         return readTree, splitTree, saveTree , processJets_rtuple  , params
                     if args.processBTagWeights:
-                        print "processing btagweights!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
                         saveTree, processBTagWeights_rtuple = processBTagWeights(
                             args, readTree, splitTree, saveTree,
                             params, processJets_rtuple,
