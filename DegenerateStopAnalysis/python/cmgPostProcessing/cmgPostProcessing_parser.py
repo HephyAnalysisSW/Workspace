@@ -143,6 +143,11 @@ def get_parser():
         help="Process leptons from LepGood and LepOther, merging them in LepAll."
         )
      
+    argParser.add_argument('--processBTagWeights',
+        action='store_true',
+        help="Calculate BTag Weights for methods 1a and 1b"
+        )
+     
     argParser.add_argument('--storeOnlyLepAll',
         action='store_true',
         help="Store only LepAll, do not store LepGood and LepOther. Effective only if processLepAll = True"
@@ -162,6 +167,11 @@ def get_parser():
         action='store_true',
         help="Testing only the post-processing methods, without saving ROOT files, on runSmallSample files " + \
             "\n bool flag set to True if used. \n runSmallSample will be set automatically to True"
+        )
+    
+    argParser.add_argument('--runInteractively',
+        action='store_true',
+        help="For Debugging/Developing  purposes"
         )
     # 
     return argParser
