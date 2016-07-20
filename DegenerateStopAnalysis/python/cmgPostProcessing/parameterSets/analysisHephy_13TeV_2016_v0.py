@@ -294,6 +294,44 @@ def getParameterSet(args):
         }
 
     params['GenSel'] = GenSel
+    
+    # criteria to veto events for FastSim samples, as resulted from 2016 "corridor studies
+    # used to evaluate Flag_veto_event_fastSimJets
+    # https://twiki.cern.ch/twiki/bin/view/CMS/SUSRecommendationsICHEP16
         
+    Veto_fastSimJets_recoJet = {
+        'branchPrefix': 'Jet',
+        'branches': [
+            'pt/F', 'eta/F', 'phi/F', 'id/I','btagCSV/F', 'mass/F', 
+            ],
+        'nMax': 25,
+        'recoJet': {
+            'id': ('id', operator.ge, 1),
+            'pt': ('pt', operator.gt, 20),
+            'eta': ('eta', operator.lt, 2.5, operator.abs),
+            'chHEF': {'chHEF', operator.lt, 0.1}
+            },
+        }
+
+    Veto_fastSimJets_genJet = {
+        'branchPrefix': 'GenJet',
+        'branches': [
+            'pt/F', 'eta/F', 'phi/F', 'mass/F',
+            ],
+        'nMax': 25,
+        'genJet': {
+            },
+        }
+    
+    Veto_fastSimJets = {
+        'recoJet': Veto_fastSimJets_recoJet,
+        'genJet': Veto_fastSimJets_genJet,
+        'criteria': {
+            'dR': ('dR', operator.lt, 0.3),
+            }
+        }
+
+    params['Veto_fastSimJets'] = Veto_fastSimJets
+
     #
     return params
