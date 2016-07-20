@@ -151,9 +151,9 @@ scaleFactor = 1
 #detailled results table
 print "Results table"
 print
-print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrr|rrr|rrr|c|}\\hline'
-print ' \multirow{2}{*}{\\njet} & \LT       & \HT       & \multicolumn{3}{c|}{$tt+$Jets}  & \multicolumn{3}{c|}{$W+$ Jets}  & \multicolumn{3}{c|}{Other EW bkg.} & \multicolumn{3}{c|}{total bkg.} & \multirow{2}{*}{Observed}\\\%\hline'
-print '        & $[$GeV$]$ & $[$GeV$]$ & \multicolumn{3}{c|}{predicted} & \multicolumn{3}{c|}{predicted} & \multicolumn{3}{c|}{simulated}    & \multicolumn{3}{c|}{predicted} &  \\\\\hline'
+print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{c|c|c|l|rrr|rrr|rrr|rrr|c}\\hline'
+print ' \multirow{2}{*}{\\njet} & \LT       & \HT & \multirow{2}{*}{Bin name} & \multicolumn{3}{c|}{$tt+$Jets}  & \multicolumn{3}{c|}{$W+$ Jets}  & \multicolumn{3}{c|}{Other EW bkg.} & \multicolumn{3}{c|}{Predicted} & \multirow{2}{*}{Observed}\\\%\hline'
+print '        & $[$GeV$]$ & $[$GeV$]$ & & \multicolumn{3}{c|}{predicted} & \multicolumn{3}{c|}{predicted} & \multicolumn{3}{c|}{simulated}    & \multicolumn{3}{c|}{background} &  \\\\\hline'
 
 secondLine = False
 for srNJet in sorted(signalRegions):
@@ -168,12 +168,13 @@ for srNJet in sorted(signalRegions):
       if not first: print '&'
       first = False
       print '&$'+varBin(htb)+'$'
+      print ' & $'+signalRegions[srNJet][stb][htb]['tex'] +'$'
       print ' & '+getNumString(res[srNJet][stb][htb]['TT_pred_final'], res[srNJet][stb][htb]['TT_pred_final_tot_err'])\
            +' & '+getNumString(res[srNJet][stb][htb]['W_pred_final'], res[srNJet][stb][htb]['W_pred_final_tot_err'])\
            +' & '+getNumString(res[srNJet][stb][htb]['Rest_truth'], res[srNJet][stb][htb]['Rest_truth_err'])\
            +' & '+getNumString(res[srNJet][stb][htb]['tot_pred_final'], res[srNJet][stb][htb]['tot_pred_final_tot_err'])\
            +' & '+str(int(res[srNJet][stb][htb]['y_srNJet_0b_highDPhi'])) +'\\\\'
-      if htb[1] == -1 : print '\\cline{2-16}'
+      if htb[1] == -1 : print '\\cline{2-17}'
 print '\\hline\end{tabular}}\end{center}\caption{Background prediction and observation in the 0-tag regions, 7.7fb$^{-1}$}\label{tab:0b_resultsDetail}\end{table}'
 
 
