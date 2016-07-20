@@ -18,7 +18,7 @@ withSystematics = True
 
 prefix = 'singleLeptonic_Spring15_'
 #path = '/data/'+username+'/Results2016/Prediction_SFtemplates_fullSR_lep_data_2p3_BACKUP_APPROVAL/'
-path = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2016_v1_100p_lep_data_3p99/'
+path = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2016_v2_lep_data_7p7/'
 #path = '/data/'+username+'/Results2016/Prediction_SFtemplates_fullSR_lep_MC_SFnoPUreweight_2p25/'
 
 #path = '/data/'+username+'/Results2016/Prediction_SFtemplates_validation_lep_data_2p3/'
@@ -152,8 +152,8 @@ scaleFactor = 1
 print "Results table"
 print
 print '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{|c|c|c|rrr|rrr|rrr|rrr|c|}\\hline'
-print ' \\njet & \LT       & \HT       & \multicolumn{3}{c|}{$tt+$Jets}  & \multicolumn{3}{c|}{$W+$ Jets}  & \multicolumn{3}{c|}{Other EW bkg.} & \multicolumn{3}{c|}{total bkg.} & Observation\\\%\hline'
-print '        & $[$GeV$]$ & $[$GeV$]$ & \multicolumn{3}{c|}{prediction} & \multicolumn{3}{c|}{prediction} & \multicolumn{3}{c|}{simulation}    & \multicolumn{3}{c|}{prediction} &  \\\\\hline'
+print ' \multirow{2}{*}{\\njet} & \LT       & \HT       & \multicolumn{3}{c|}{$tt+$Jets}  & \multicolumn{3}{c|}{$W+$ Jets}  & \multicolumn{3}{c|}{Other EW bkg.} & \multicolumn{3}{c|}{total bkg.} & \multirow{2}{*}{Observed}\\\%\hline'
+print '        & $[$GeV$]$ & $[$GeV$]$ & \multicolumn{3}{c|}{predicted} & \multicolumn{3}{c|}{predicted} & \multicolumn{3}{c|}{simulated}    & \multicolumn{3}{c|}{predicted} &  \\\\\hline'
 
 secondLine = False
 for srNJet in sorted(signalRegions):
@@ -172,9 +172,9 @@ for srNJet in sorted(signalRegions):
            +' & '+getNumString(res[srNJet][stb][htb]['W_pred_final'], res[srNJet][stb][htb]['W_pred_final_tot_err'])\
            +' & '+getNumString(res[srNJet][stb][htb]['Rest_truth'], res[srNJet][stb][htb]['Rest_truth_err'])\
            +' & '+getNumString(res[srNJet][stb][htb]['tot_pred_final'], res[srNJet][stb][htb]['tot_pred_final_tot_err'])\
-           +' & '+str(round(res[srNJet][stb][htb]['y_srNJet_0b_highDPhi'],0)) +'\\\\'
+           +' & '+str(int(res[srNJet][stb][htb]['y_srNJet_0b_highDPhi'])) +'\\\\'
       if htb[1] == -1 : print '\\cline{2-16}'
-print '\\hline\end{tabular}}\end{center}\caption{Background prediction and observation in the 0-tag regions, 4.0fb$^{-1}$}\label{tab:0b_resultsDetail}\end{table}'
+print '\\hline\end{tabular}}\end{center}\caption{Background prediction and observation in the 0-tag regions, 7.7fb$^{-1}$}\label{tab:0b_resultsDetail}\end{table}'
 
 
 
