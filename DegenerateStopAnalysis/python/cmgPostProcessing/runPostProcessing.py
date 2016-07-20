@@ -50,7 +50,18 @@ sampleSets = {
                                         #["WJetsToLNu_HT1200to2500", "--skimPreselect"],
                                         #["WJetsToLNu_HT2500toInf", "--skimPreselect"],
                                         ],
-                             
+                            },
+                'wjets_onelep':{
+                            'samples':[
+                                        ["WJetsToLNu_HT100to200_ext"    , "--skimLepton=oneLep"],
+                                        ["WJetsToLNu_HT200to400"        , "--skimLepton=oneLep"],
+                                        ["WJetsToLNu_HT200to400_ext"    , "--skimLepton=oneLep"],
+                                        ["WJetsToLNu_HT400to600"        , "--skimLepton=oneLep"],
+                                        ["WJetsToLNu_HT600to800"        , "--skimLepton=oneLep"],
+                                        ["WJetsToLNu_HT800to1200_ext"   , "--skimLepton=oneLep"],
+                                        #["WJetsToLNu_HT1200to2500", "--skimPreselect"],
+                                        #["WJetsToLNu_HT2500toInf", "--skimPreselect"],
+                                        ],
                             },
                 'ttjets':{
                             'samples':[
@@ -80,6 +91,15 @@ sampleSets = {
                                          'DYJetsToLL_M50_HT400to600_ext',
                                          'DYJetsToLL_M50_HT600toInf',
                                          'DYJetsToLL_M50_HT600toInf_ext',
+
+                                         #'DYJetsToLL_M5to50_HT100to200',
+                                         #'DYJetsToLL_M5to50_HT100to200_ext',
+                                         #'DYJetsToLL_M5to50_HT200to400',
+                                         #'DYJetsToLL_M5to50_HT200to400_ext',
+                                         #'DYJetsToLL_M5to50_HT400to600',
+                                         #'DYJetsToLL_M5to50_HT600toInf',
+                                         #'DYJetsToLL_M5to50_HT600toInf_ext',
+
                                          
                                         ],
                             },
@@ -161,6 +181,25 @@ sampleSets = {
                             },
 
 
+                'other':{
+                            'samples':[
+                                            'WW',
+                                            'WZ',
+                                            'ZZ' 
+                                            'TBar_tch',
+                                            'TBarToLeptons_tch_powheg',
+                                            'T_tch',
+                                            'TToLeptons_tch_powheg',
+                                            'TBar_tWch',
+                                            'T_tWch',
+                                        ],
+
+                            },
+
+
+
+
+
                 'data':{
                             'samples':[
                                         "SingleMuon_Run2016B_PromptReco_v2",
@@ -186,6 +225,16 @@ sampleSets = {
                                         "SingleElectron_Run2016B_PromptReco_v2",
                                         ],
                             },
+
+                'data_onelep':{
+                            'samples':[
+                                        ["SingleMuon_Run2016B_PromptReco_v2",        "--skimLepton=oneLep"  ], 
+                                        ["SingleElectron_Run2016B_PromptReco_v2",    "--skimLepton=oneLep"  ],    
+                                        #["MET_Run2016B_PromptReco_v2",               "--skimLepton=oneLep"  ]     
+                                        ],
+                            },
+
+
             }
     
 

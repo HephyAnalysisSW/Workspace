@@ -68,7 +68,7 @@ DYJetsToLL_M50_HT600toInf ={
 "treeName":"tree",
 "isData": False,
 "xsec": 2.7183,
-
+"ext":['DYJetsToLL_M50_HT600toInf', 'DYJetsToLL_M50_HT600toInf_ext'],
 }
 allComponents.append(DYJetsToLL_M50_HT600toInf)
 
@@ -86,7 +86,7 @@ DYJetsToLL_M50_HT600toInf_ext ={
 "treeName":"tree",
 "isData": False,
 "xsec": 2.7183,
-
+"ext":['DYJetsToLL_M50_HT600toInf_ext', 'DYJetsToLL_M50_HT600toInf'],
 }
 allComponents.append(DYJetsToLL_M50_HT600toInf_ext)
 
@@ -104,7 +104,7 @@ DYJetsToLL_M5to50_HT100to200 ={
 "treeName":"tree",
 "isData": False,
 "xsec": 224.2,
-
+"ext":['DYJetsToLL_M5to50_HT100to200', 'DYJetsToLL_M5to50_HT100to200_ext'],
 }
 allComponents.append(DYJetsToLL_M5to50_HT100to200)
 
@@ -122,7 +122,7 @@ DYJetsToLL_M5to50_HT100to200_ext ={
 "treeName":"tree",
 "isData": False,
 "xsec": 224.2,
-
+"ext":['DYJetsToLL_M5to50_HT100to200_ext', 'DYJetsToLL_M5to50_HT100to200'],
 }
 allComponents.append(DYJetsToLL_M5to50_HT100to200_ext)
 
@@ -140,7 +140,7 @@ DYJetsToLL_M5to50_HT200to400 ={
 "treeName":"tree",
 "isData": False,
 "xsec": 37.2,
-
+"ext":['DYJetsToLL_M5to50_HT200to400', 'DYJetsToLL_M5to50_HT200to400_ext'],
 }
 allComponents.append(DYJetsToLL_M5to50_HT200to400)
 
@@ -158,7 +158,7 @@ DYJetsToLL_M5to50_HT200to400_ext ={
 "treeName":"tree",
 "isData": False,
 "xsec": 37.2,
-
+"ext":['DYJetsToLL_M5to50_HT200to400_ext', 'DYJetsToLL_M5to50_HT200to400'],
 }
 allComponents.append(DYJetsToLL_M5to50_HT200to400_ext)
 
@@ -194,7 +194,7 @@ DYJetsToLL_M5to50_HT600toInf ={
 "treeName":"tree",
 "isData": False,
 "xsec": 1.124,
-
+"ext":['DYJetsToLL_M5to50_HT600toInf', 'DYJetsToLL_M5to50_HT600toInf_ext'],
 }
 allComponents.append(DYJetsToLL_M5to50_HT600toInf)
 
@@ -212,7 +212,7 @@ DYJetsToLL_M5to50_HT600toInf_ext ={
 "treeName":"tree",
 "isData": False,
 "xsec": 1.124,
-
+"ext":['DYJetsToLL_M5to50_HT600toInf_ext', 'DYJetsToLL_M5to50_HT600toInf'],
 }
 allComponents.append(DYJetsToLL_M5to50_HT600toInf_ext)
 
@@ -248,7 +248,7 @@ QCD_HT1000to1500 ={
 "treeName":"tree",
 "isData": False,
 "xsec": 1206,
-
+"ext":['QCD_HT1000to1500', 'QCD_HT1000to1500_ext'],
 }
 allComponents.append(QCD_HT1000to1500)
 
@@ -266,7 +266,7 @@ QCD_HT1000to1500_ext ={
 "treeName":"tree",
 "isData": False,
 "xsec": 1206,
-
+"ext":['QCD_HT1000to1500_ext', 'QCD_HT1000to1500'],
 }
 allComponents.append(QCD_HT1000to1500_ext)
 
@@ -284,7 +284,7 @@ QCD_HT1500to2000 ={
 "treeName":"tree",
 "isData": False,
 "xsec": 120.4,
-
+"ext":['QCD_HT1500to2000', 'QCD_HT1500to2000_ext'],
 }
 allComponents.append(QCD_HT1500to2000)
 
@@ -302,7 +302,7 @@ QCD_HT1500to2000_ext ={
 "treeName":"tree",
 "isData": False,
 "xsec": 120.4,
-
+"ext":['QCD_HT1500to2000_ext', 'QCD_HT1500to2000'],
 }
 allComponents.append(QCD_HT1500to2000_ext)
 
@@ -320,7 +320,7 @@ QCD_HT2000toInf ={
 "treeName":"tree",
 "isData": False,
 "xsec": 25.25,
-
+"ext":['QCD_HT2000toInf', 'QCD_HT2000toInf_ext'],
 }
 allComponents.append(QCD_HT2000toInf)
 
@@ -338,7 +338,7 @@ QCD_HT2000toInf_ext ={
 "treeName":"tree",
 "isData": False,
 "xsec": 25.25,
-
+"ext":['QCD_HT2000toInf_ext', 'QCD_HT2000toInf'],
 }
 allComponents.append(QCD_HT2000toInf_ext)
 
@@ -356,7 +356,7 @@ QCD_HT300to500 ={
 "treeName":"tree",
 "isData": False,
 "xsec": 351300,
-
+"ext":['QCD_HT300to500', 'QCD_HT300to500_ext'],
 }
 allComponents.append(QCD_HT300to500)
 
@@ -374,7 +374,7 @@ QCD_HT300to500_ext ={
 "treeName":"tree",
 "isData": False,
 "xsec": 351300,
-
+"ext":['QCD_HT300to500_ext', 'QCD_HT300to500'],
 }
 allComponents.append(QCD_HT300to500_ext)
 
@@ -410,7 +410,7 @@ QCD_HT700to1000 ={
 "treeName":"tree",
 "isData": False,
 "xsec": 6802,
-
+"ext":['QCD_HT700to1000', 'QCD_HT700to1000_ext'],
 }
 allComponents.append(QCD_HT700to1000)
 
@@ -428,7 +428,7 @@ QCD_HT700to1000_ext ={
 "treeName":"tree",
 "isData": False,
 "xsec": 6802,
-
+"ext":['QCD_HT700to1000_ext', 'QCD_HT700to1000'],
 }
 allComponents.append(QCD_HT700to1000_ext)
 
@@ -752,7 +752,7 @@ WJetsToLNu_HT200to400 ={
 "treeName":"tree",
 "isData": False,
 "xsec": 435.237,
-
+"ext":['WJetsToLNu_HT200to400', 'WJetsToLNu_HT200to400_ext'],
 }
 allComponents.append(WJetsToLNu_HT200to400)
 
@@ -770,7 +770,7 @@ WJetsToLNu_HT200to400_ext ={
 "treeName":"tree",
 "isData": False,
 "xsec": 435.237,
-
+"ext":['WJetsToLNu_HT200to400_ext', 'WJetsToLNu_HT200to400'],
 }
 allComponents.append(WJetsToLNu_HT200to400_ext)
 
@@ -842,7 +842,7 @@ WJetsToLNu_HT800to1200 ={
 "treeName":"tree",
 "isData": False,
 "xsec": 6.65621,
-
+"ext":['WJetsToLNu_HT800to1200', 'WJetsToLNu_HT800to1200_ext'],
 }
 allComponents.append(WJetsToLNu_HT800to1200)
 
@@ -860,7 +860,7 @@ WJetsToLNu_HT800to1200_ext ={
 "treeName":"tree",
 "isData": False,
 "xsec": 6.65621,
-
+"ext":['WJetsToLNu_HT800to1200_ext', 'WJetsToLNu_HT800to1200'],
 }
 allComponents.append(WJetsToLNu_HT800to1200_ext)
 
@@ -932,7 +932,7 @@ ZJetsToNuNu_HT1200to2500 ={
 "treeName":"tree",
 "isData": False,
 "xsec": 0.359406,
-
+"ext":['ZJetsToNuNu_HT1200to2500', 'ZJetsToNuNu_HT1200to2500_ext'],
 }
 allComponents.append(ZJetsToNuNu_HT1200to2500)
 
@@ -950,7 +950,7 @@ ZJetsToNuNu_HT1200to2500_ext ={
 "treeName":"tree",
 "isData": False,
 "xsec": 0.359406,
-
+"ext":['ZJetsToNuNu_HT1200to2500_ext', 'ZJetsToNuNu_HT1200to2500'],
 }
 allComponents.append(ZJetsToNuNu_HT1200to2500_ext)
 
