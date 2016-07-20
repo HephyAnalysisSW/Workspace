@@ -1208,7 +1208,7 @@ def processLeptonsAll(
             if lepIndex in processLepGood_rtuple.elList:
                 elList.append(idx)
             if lepIndex in processLepGood_rtuple.el2List:
-                el2List2.append(idx2)
+                el2List.append(idx)
             if lepIndex in processLepGood_rtuple.lepList:
                 lepList.append(idx)
                 
