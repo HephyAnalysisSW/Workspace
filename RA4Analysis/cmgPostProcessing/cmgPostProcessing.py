@@ -150,6 +150,13 @@ if sys.argv[0].count('ipython'):
 
 ###For PU reweight###
 #PU_dir = "/afs/hephy.at/user/e/easilar/www/data/Run2016B/4fb/PU_histos/"
+#PU_dir = "/data/easilar/PU_Histos/"
+#PU_File_66mb = ROOT.TFile(PU_dir+"/h_ratio_67p7.root")
+#PU_File_70mb = ROOT.TFile(PU_dir+"/h_ratio_71p3.root")
+#PU_File_74mb = ROOT.TFile(PU_dir+"/h_ratio_74p9.root")
+#PU_histo_66 = PU_File_66mb.Get("puRatio")
+#PU_histo_70 = PU_File_70mb.Get("puRatio")
+#PU_histo_74 = PU_File_74mb.Get("puRatio")
 PU_dir = "/data/easilar/PU_Histos/"
 PU_File_66mb = ROOT.TFile(PU_dir+"/h_ratio_67p7.root")
 PU_File_70mb = ROOT.TFile(PU_dir+"/h_ratio_71p3.root")

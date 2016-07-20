@@ -83,9 +83,9 @@ ROOT.gStyle.SetOptStat(0)
 
 all_MB = False
 presel = False 
-SB_w   = False 
+SB_w   = True 
 SB_tt  = False
-presel_1b = True
+presel_1b = False
 test = False
 
 draw_signal = False
@@ -132,7 +132,9 @@ if presel_1b :
 if blind: add_cut = "(deltaPhi_Wl<0.7)"
 
 #add_cut = "(met_pt>50&&abs(leptonEta)>1)&&acos(cos(met_phi-LepGood_phi[0]))>1"
-#add_cut = "(deltaPhi_Wl>0.7)"  #&&abs(leptonEta)<1)"
+#add_cut = "(deltaPhi_Wl>0.7)&&abs(leptonEta)<1)"
+#add_cut = "(leptonMiniRelIso>0.15&&leptonMiniRelIso<0.2)"
+add_cut = "(leptonMiniRelIso<0.1)"  #&&leptonMiniRelIso<0.2)"
 #add_cut = "(1)"
  
 lepSels = [
@@ -203,13 +205,14 @@ if test :
 if not draw_signal :
   signals = []
 
-plots = [plots[5]]
-#lepSels = [lepSels[2]]
+plots = [plots[0]]
+lepSels = [lepSels[0]]
 
 for lepSel in lepSels:
   #weight_str_plot = '*'.join([reweight,topPt,PU,lepSel["trigger_weight"]]) 
   #path = "/afs/hephy.at/user/e/easilar/www/data/Run2016B/7p7fb/plots/"+lepSel['label']+"high_deltaPhi"
-  path = "/afs/hephy.at/user/e/easilar/www/data/Run2016B/7p7fb/plots/"+lepSel['label']
+  #path = "/afs/hephy.at/user/e/easilar/www/data/Run2016B/7p7fb/plots/"+lepSel['label']+"_Barrel"
+  path = "/afs/hephy.at/user/e/easilar/www/data/Run2016B/7p7fb/plots/"+lepSel['label']+"_miniIsoTight"
   if not os.path.exists(path):
     os.makedirs(path)
   print lepSel['label']
@@ -249,7 +252,8 @@ for lepSel in lepSels:
           print "Data" , Cut
           bin[srNJet][stb][htb][p['varname']]['data'] = getPlotFromChain(lepSel['chain'], p['var'], p['bin'], cutString = Cut , weight = "(1)", binningIsExplicit=False,addOverFlowBin='both',variableBinning=p["bin_set"])
           data_yield = bin[srNJet][stb][htb][p['varname']]['data'].Integral()
-          bin[srNJet][stb][htb]['scale_fac'] = float(data_yield)/float(tot_yield) 
+          if tot_yield > 0.0 : bin[srNJet][stb][htb]['scale_fac'] = float(data_yield)/float(tot_yield)
+          else : bin[srNJet][stb][htb]['scale_fac'] = 1 
           bin[srNJet][stb][htb]['label'] = Name         
           bin[srNJet][stb][htb]['path'] = CR_path        
   for p in plots:

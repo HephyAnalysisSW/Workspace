@@ -14,7 +14,7 @@ ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
 
 from Workspace.HEPHYPythonTools.helpers import getChunks
-from Workspace.RA4Analysis.cmgTuples_Data25ns_miniAODv2 import *
+#from Workspace.RA4Analysis.cmgTuples_Data25ns_miniAODv2 import *
 from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2 import *
 from systematics_helper import calc_btag_systematics, calc_LeptonScale_factors_and_systematics , getISRWeight , fill_branch_WithJEC
 from btagEfficiency import *
@@ -159,12 +159,12 @@ def getTreeFromChunk(c, skimCond, iSplit, nSplit):
        
 
 #pickleDir = '/data/'+username+'/Spring15/25ns/'
-pickleDir = '/data/easilar/Spring15/25ns/'
+pickleDir = '/afs/hephy.at/data/easilar01/Ra40b/pickleDir/T5qqqqWW_mass_nEvents_xsec_pkl'
 
 exec('allSamples=['+options.allsamples+']')
 for isample, sample in enumerate(allSamples):
   chunks, sumWeight = getChunks(sample)
-  mass_dict = pickle.load(file(pickleDir+sample["name"]+'_mass_nEvents_xsec_pkl'))
+  mass_dict = pickle.load(file(pickleDir))
   for mglu in mass_dict.keys():
     for mlsp in mass_dict[mglu].keys() :
       skimCond = "Sum$(abs(GenPart_pdgId)==1000022&&abs(GenPart_motherId)==1000024&&abs(GenPart_grandmotherId)==1000021)==2&&(Sum$(abs(GenPart_pdgId)==24)==2)"
@@ -187,7 +187,7 @@ for isample, sample in enumerate(allSamples):
         if ("TTJets" in sample['dbsName']): lumiScaleFactor = xsec[sample['dbsName']]*target_lumi/float(sumWeight)
         else: lumiScaleFactor = target_lumi/float(sumWeight)
         branchKeepStrings = branchKeepStrings_DATAMC + branchKeepStrings_MC
-      if ("T5qqqqVV" in sample['name']) : lumiScaleFactor = mass_point["xsec"]*target_lumi/mass_point["nEntry"]  
+      if ("T5qqqqVV" in sample['name']) : lumiScaleFactor = mass_point["xSec"]*target_lumi/mass_point["nEntry"]  
       
       sampleKey = ''
       if sample["name"] in mcEffDict.keys():
@@ -203,7 +203,7 @@ for isample, sample in enumerate(allSamples):
       aliases = [ "met:met_pt", "metPhi:met_phi"]
 
       readVectors = [\
-        {'prefix':'LepGood', 'nMax':8, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I', 'relIso03/F','SPRING15_25ns_v1/I' ,'tightId/I', 'miniRelIso/F','mass/F','sip3d/F','mediumMuonId/I','ICHEPmediumMuonId/I', 'mvaIdPhys14/F','mvaIdSpring15/F','lostHits/I', 'convVeto/I']},
+        {'prefix':'LepGood', 'nMax':8, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I', 'relIso03/F','SPRING15_25ns_v1/I' ,'tightId/I', 'miniRelIso/F','mass/F','sip3d/F','mediumMuonId/I','ICHEPmediumMuonId/I', 'mvaIdSpring15/F','lostHits/I', 'convVeto/I', 'eleCBID_SPRING15_25ns_ConvVetoDxyDz/I']},
       ]
       newVariables.extend(['puReweight_true/F','puReweight_true_max4/F','puReweight_true_Down/F','puReweight_true_Up/F','weight_diLepTTBar0p5/F','weight_diLepTTBar2p0/F','weight_XSecTTBar1p1/F','weight_XSecTTBar0p9/F','weight_XSecWJets1p1/F','weight_XSecWJets0p9/F'])
       newVariables.extend(['ngenGluino/I','genGluGlu_pt/F','ISRSigUp/F/1','ISRSigDown/F/1'])
@@ -350,7 +350,7 @@ for isample, sample in enumerate(allSamples):
             s.nLooseHardLeptons = len(looseHardLepInd)
             s.nTightSoftLeptons = len(tightSoftLepInd)
             s.nTightHardLeptons = len(tightHardLepInd)
-            vars = ['pt', 'eta', 'phi', 'miniRelIso','relIso03', 'pdgId', 'SPRING15_25ns_v1']
+            vars = ['pt', 'eta', 'phi', 'miniRelIso','relIso03', 'pdgId', 'SPRING15_25ns_v1','eleCBID_SPRING15_25ns_ConvVetoDxyDz']
             allLeptons = [getObjDict(t, 'LepGood_', vars, i) for i in looseLepInd]
             looseSoftLep = [getObjDict(t, 'LepGood_', vars, i) for i in looseSoftLepInd] 
             looseHardLep = [getObjDict(t, 'LepGood_', vars, i) for i in looseHardLepInd]
@@ -367,7 +367,8 @@ for isample, sample in enumerate(allSamples):
               s.leptonPhi = r.LepGood_phi[leadingLepInd]
               s.leptonPdg = r.LepGood_pdgId[leadingLepInd]
               s.leptonMass= r.LepGood_mass[leadingLepInd]
-              s.leptonSPRING15_25ns_v1= r.LepGood_SPRING15_25ns_v1[leadingLepInd]
+              #s.leptonSPRING15_25ns_v1= r.LepGood_SPRING15_25ns_v1[leadingLepInd]
+              s.leptonSPRING15_25ns_v1= r.LepGood_eleCBID_SPRING15_25ns_ConvVetoDxyDz[leadingLepInd]
               s.st = r.met_pt + s.leptonPt
             s.singleLeptonic = s.nTightHardLeptons==1
             if s.singleLeptonic:
