@@ -1825,7 +1825,7 @@ class Weight(object):
         return joinWeightList(self.weight_list) 
 
 def decide_weight2( sample, weight=None, cut="default" , lumi="target_lumi"):
-    print "Decideing weight:", sample.name, lumi, cut
+    #print "Deciding weight:", sample.name, lumi, cut
     if sample.isData:
         weight_str = "(1)"
         return weight_str
