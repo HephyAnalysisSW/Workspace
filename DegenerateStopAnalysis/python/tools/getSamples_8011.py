@@ -20,9 +20,9 @@ lumis = {
             #'mc_lumi':10000, 
             #'lumi_data_blinded':2245.386, 
             #'lumi_data_unblinded':139.63,
-            'target_lumi':4000.,   
-            'DataBlind_lumi':4320.0, 
-            'DataUnblind_lumi':804.2,
+            'target_lumi'         :   4000.   ,   
+            'DataBlind_lumi'      :   4320.0    , 
+            'DataUnblind_lumi'    :   804.2   ,
         }
 
 data_triggers_list = [
@@ -47,6 +47,8 @@ mc_filters_list = [
                       'Flag_badChargedHadronFilter',
                       'Flag_badMuonFilter',
                   ]
+
+
 
 import pickle
 #mass_dict_pickle = "/afs/hephy.at/user/n/nrad/CMSSW/fork/CMSSW_7_4_12_patch4/src/Workspace/DegenerateStopAnalysis/cmgPostProcessing/mass_dict_all.pkl"
