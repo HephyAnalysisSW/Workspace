@@ -119,7 +119,7 @@ def get_matched_Jets(jets,genParts):
         if ismatched :  break
         if (abs(genPart["pdgId"]) >5) : continue
         momid = genPart["motherId"] 
-        if not (momid==6 || momid==23 || momid==24 || momid==25 || momid>1e6) : continue 
+        if not (momid==6 or momid==23 or momid==24 or momid==25 or momid>1e6) : continue 
         dR = deltaR(jet,genPart)
         if dR < 0.3 : 
           ismatched = True
