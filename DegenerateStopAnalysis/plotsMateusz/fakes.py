@@ -7,7 +7,7 @@ from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
 from Workspace.DegenerateStopAnalysis.navidTools.NavidTools import Plots, getPlots, drawPlots, setup_style
 #from Workspace.DegenerateStopAnalysis.toolsMateusz.degTools import *
-from Workspace.DegenerateStopAnalysis.toolsMateusz.cutsEle import *
+from Workspace.DegenerateStopAnalysis.toolsMateusz.eleWPs import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.cmgTuplesPostProcessed_mAODv2_analysisHephy13TeV import cmgTuplesPostProcessed
 from Workspace.DegenerateStopAnalysis.toolsMateusz.getSamples_mAODv2_analysisHephy13TeV import getSamples
 #from Workspace.DegenerateStopAnalysis.toolsMateusz.cmgTuplesPostProcessed_mAODv2 import cmgTuplesPostProcessed
@@ -57,10 +57,6 @@ if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
 
 #Gets all cuts (electron, SR, CR) for given electron ID
 eleIDsel = electronIDs(ID = "standard", removedCut = "None", iso = "hybIso03")
-allCuts = cutClasses(eleIDsel, ID = "standard")
-
-##for s in samples.massScanList(): samples[s].weight = "weight" #removes ISR reweighting from official mass scan signal samples
-#for s in samples: samples[s].tree.SetAlias("eleSel", allCuts[WP]['eleSel'])
 
 #selectedSamples = privateSignals + officialSignals + backgrounds
 selectedSamples = ["qcd", "z", "tt", "w"]#, "s300_270"]"qcd", 
@@ -78,7 +74,6 @@ for s in selectedSamples:
 #print "ID type: ", ID, " | Selection Region: ", selection, " | Electron ID WP: ", WP, " | Electron ID Cut Removed: ", removedCut, " | Isolation applied: ", iso
 #print makeLine()
    
-#sel = allCuts[WP][selection]
 
 #elePt = "Max$(LepGood_pt*eleSel)"
 #eleMt = "Max$(LepGood_mt*eleSel)"

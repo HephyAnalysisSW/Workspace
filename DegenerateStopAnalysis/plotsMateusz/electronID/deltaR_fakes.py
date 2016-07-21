@@ -10,7 +10,7 @@ from Workspace.DegenerateStopAnalysis.toolsMateusz.getSamples_PP_mAODv2_7412pass
 from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.degTools import *
-from Workspace.DegenerateStopAnalysis.toolsMateusz.cutsEle import *
+from Workspace.DegenerateStopAnalysis.toolsMateusz.eleWPs import *
 from array import array
 from math import pi, sqrt #cos, sin, sinh, log
 import argparse

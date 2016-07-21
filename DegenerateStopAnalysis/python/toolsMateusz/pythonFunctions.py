@@ -61,4 +61,3 @@ def makeCutFlowList(cutList,baseCut=''):
     cutFlowString = joinCutStrings( cutsToJoin   )
     cutFlowList.append( [cutName, cutFlowString ])
   return cutFlowList
-
