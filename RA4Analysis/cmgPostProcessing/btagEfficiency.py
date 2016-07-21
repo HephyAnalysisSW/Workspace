@@ -17,7 +17,7 @@ ptBorders = [30, 40, 50, 60, 70, 80, 100, 120, 160, 210, 260, 320, 400, 500, 670
 ptBins = []
 etaBins = [[0,0.8], [0.8,1.6], [ 1.6, 2.4]]
 
-calib = ROOT.BTagCalibration("csvv2", "data/CSVv2_4invfb_systJuly1.csv")
+calib = ROOT.BTagCalibration("csvv2", "data/CSVv2_ichep.csv")
 calibFS = ROOT.BTagCalibration("csv", "data/CSV_13TEV_Combined_14_7_2016.csv")
 
 #SFb_errors = [\
