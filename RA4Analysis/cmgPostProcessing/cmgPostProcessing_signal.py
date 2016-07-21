@@ -2,7 +2,7 @@ import ROOT
 import pickle
 import sys, os, copy, random, subprocess, datetime
 from array import array
-from Workspace.RA4Analysis.cmgObjectSelection import cmgLooseLepIndices, splitIndList, get_cmg_jets_fromStruct, splitListOfObjects, cmgTightMuID, cmgTightEleID , get_cmg_genParts_fromStruct
+from Workspace.RA4Analysis.cmgObjectSelection import cmgLooseLepIndices, splitIndList, get_cmg_jets_fromStruct, splitListOfObjects, cmgTightMuID, cmgTightEleID , get_cmg_genParts_fromStruct , get_matched_Jets
 from Workspace.HEPHYPythonTools.xsec import xsec
 from Workspace.HEPHYPythonTools.helpers import getObjFromFile, getObjDict, getFileList
 from Workspace.HEPHYPythonTools.convertHelpers import compileClass, readVar, printHeader, typeStr, createClassString
@@ -16,7 +16,7 @@ ROOT.AutoLibraryLoader.enable()
 from Workspace.HEPHYPythonTools.helpers import getChunks
 #from Workspace.RA4Analysis.cmgTuples_Data25ns_miniAODv2 import *
 from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2 import *
-from systematics_helper import calc_btag_systematics, calc_LeptonScale_factors_and_systematics , getISRWeight , fill_branch_WithJEC
+from systematics_helper import calc_btag_systematics, calc_LeptonScale_factors_and_systematics , getISRWeight , fill_branch_WithJEC 
 from btagEfficiency import *
 from leptonFastSimSF import leptonFastSimSF as leptonFastSimSF_
 
@@ -228,6 +228,7 @@ for isample, sample in enumerate(allSamples):
 
       newVariables.extend( ['nLooseSoftLeptons/I', 'nLooseHardLeptons/I', 'nTightSoftLeptons/I', 'nTightHardLeptons/I'] )
       newVariables.extend( ['deltaPhi_Wl/F','nBJetMediumCSV30/I','nJet30/I','htJet30j/F','st/F'])
+      newVariables.extend( ['flag_jetCleaning_eventfilter/I/-2'])
       newVariables.extend( ['leptonPt/F','leptonEt/F','leptonMiniRelIso/F','leptonRelIso03/F' ,\
       'leptonEta/F', 'leptonPhi/F','leptonSPRING15_25ns_v1/I/-2','leptonPdg/I/0', 'leptonInd/I/-1',\
      'leptonMass/F', 'singleMuonic/I', 'singleElectronic/I', 'singleLeptonic/I' ]) #, 'mt2w/F'] )
@@ -240,7 +241,6 @@ for isample, sample in enumerate(allSamples):
       if leptonFastSim:
         newVariables.extend(['reweightLeptonFastSimSF/F', 'reweightLeptonFastSimSFUp/F', 'reweightLeptonFastSimSFDown/F'])
       newVars = [readVar(v, allowRenaming=False, isWritten = True, isRead=False) for v in newVariables]
-
       
       readVars = [readVar(v, allowRenaming=False, isWritten=False, isRead=True) for v in readVariables]
       for v in readVectors:
@@ -381,9 +381,9 @@ for isample, sample in enumerate(allSamples):
               s.singleMuonic      = False 
               s.singleElectronic  = False 
 
-            j_list=['eta','pt','phi','btagCMVA', 'btagCSV', 'id']
+            j_list=['eta','pt','phi','btagCMVA', 'btagCSV', 'id', 'mcMatchFlav']
             jets = filter(lambda j:j['pt']>30 and abs(j['eta'])<2.4 and j['id'], get_cmg_jets_fromStruct(r,j_list))
-            lightJets,  bJetsCSV = splitListOfObjects('btagCSV', 0.890, jets)
+            lightJets,  bJetsCSV = splitListOfObjects('btagCSV', 0.800, jets)
             s.htJet30j = sum([x['pt'] for x in jets])
             s.nJet30 = len(jets)
             s.nBJetMediumCSV30 = len(bJetsCSV)
@@ -391,8 +391,11 @@ for isample, sample in enumerate(allSamples):
             s.deltaPhi_Wl = acos((s.leptonPt+r.met_pt*cos(s.leptonPhi-r.met_phi))/sqrt(s.leptonPt**2+r.met_pt**2+2*r.met_pt*s.leptonPt*cos(s.leptonPhi-r.met_phi))) 
 
 
-            g_list=['eta','pt','phi','mass','charge', 'pdgId', 'motherId', 'grandmotherId']
+            g_list=['eta','pt','phi','mass','charge', 'pdgId', 'motherId', 'grandmotherId' , 'status']
             genParts = get_cmg_genParts_fromStruct(r,g_list)
+            ####
+            get_matched_Jets(jets,genParts)
+            ####
             getISRWeight(s,genParts)
             fill_branch_WithJEC(s,r)
             calc_LeptonScale_factors_and_systematics(s,histos_LS)

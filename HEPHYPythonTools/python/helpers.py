@@ -333,7 +333,7 @@ def getYieldFromChain(c, cutString = "(1)", weight = "weight", returnError=False
     return res, resErr**2
   return res 
 
-def getPlotFromChain(c, var, binning, cutString = "(1)", weight = "weight", binningIsExplicit=False ,addOverFlowBin='',variableBinning=False):
+def getPlotFromChain(c, var, binning, cutString = "(1)", weight = "weight", binningIsExplicit=False ,addOverFlowBin='',variableBinning=(False, 0.1)):
   if binningIsExplicit:
     h = ROOT.TH1D('h_tmp', 'h_tmp', len(binning)-1, array('d', binning))
 #    h.SetBins(len(binning), array('d', binning))
@@ -344,10 +344,10 @@ def getPlotFromChain(c, var, binning, cutString = "(1)", weight = "weight", binn
       h = ROOT.TH1D('h_tmp', 'h_tmp', *binning)
   c.Draw(var+">>h_tmp", weight+"*("+cutString+")", 'goff')
   res = h.Clone()
-  if variableBinning:
+  if variableBinning[0]:
     h = ROOT.TH1D('h_tmp', 'h_tmp', *binning)
     c.Draw(var+">>h_tmp", weight+"*("+cutString+")", 'goff')
-    h.Scale(0.1,"width")
+    h.Scale(variableBinning[1],"width")
     res = h.Clone()
   h.Delete()
   del h

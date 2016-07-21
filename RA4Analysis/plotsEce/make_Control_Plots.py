@@ -173,23 +173,25 @@ signals = [\
 ]
 
 dPhiBins  = array('d', [float(x)/1000. for x in range(0,500,100)+range(500,700,200)+range(700,1000,300)+range(1000,2000,500)+range(2000,3141,1141)+range(3141,4141,1000)])
+lTBins  = array('d', [float(x) for x in range(250,500,25)+range(500,800,50)+range(800,1000,100)])
+hTBins  = array('d', [float(x) for x in range(250,500,25)+range(500,800,50)+range(800,1000,100)+range(1000,2000,200)+range(2000,2500,250)])
 plots =[\
-{'ndiv':False,'yaxis':'< Events / 0.1>','xaxis':'#Delta#Phi(W,l)','logy':'True' , 'var':'deltaPhi_Wl',        'bin_set':True,          'varname':'deltaPhi_Wl',       'binlabel':1, 'bin':(len(dPhiBins)-1,dPhiBins)},\
-{'ndiv':True,'yaxis':'Events / ','xaxis':'L_{T} [GeV]','logy':'True' , 'var':  'st',                        'bin_set':False,          'varname':'LT',                  'binlabel':25,  'bin':(30,250,1000)},\
-{'ndiv':True,'yaxis':'Events / ','xaxis':'H_{T}','logy':'True' , 'var':'htJet30j',                    'bin_set':False,          'varname':'htJet30j',            'binlabel':50,  'bin':(40,500,2500)},\
-{'ndiv':False,'yaxis':'Events','xaxis':'n_{jet}','logy':'True' , 'var':'nJet30',                     'bin_set':False,          'varname':'nJet30',                   'binlabel':1,  'bin':(15,0,15)},\
+#{'ndiv':False,'yaxis':'< Events / 0.1>','xaxis':'#Delta#Phi(W,l)','logy':'True' , 'var':'deltaPhi_Wl',        'bin_set':True,          'varname':'deltaPhi_Wl',       'binlabel':1, 'bin':(len(dPhiBins)-1,dPhiBins)},\
+{'ndiv':True,'yaxis':'Events / ','xaxis':'L_{T} [GeV]','logy':'True' , 'var':  'st',                        'bin_set':(True,25),          'varname':'LT',                  'binlabel':1,  'bin':(len(lTBins)-1,lTBins)},\
+{'ndiv':True,'yaxis':'Events / ','xaxis':'H_{T}','logy':'True' , 'var':'htJet30j',                    'bin_set':(True,25),          'varname':'htJet30j',            'binlabel':1,  'bin':(len(hTBins)-1,hTBins)},\
+#{'ndiv':False,'yaxis':'Events','xaxis':'n_{jet}','logy':'True' , 'var':'nJet30',                     'bin_set':False,          'varname':'nJet30',                   'binlabel':1,  'bin':(15,0,15)},\
 #{'ndiv':True,'yaxis':'Events / ','xaxis':'p_{T}(l)','logy':'True' , 'var':'LepGood_pt[0]',            'bin_set':False,          'varname':'leptonPt',      'binlabel':15,  'bin':(65,25,2275)},\
-{'ndiv':True,'yaxis':'Events / ','xaxis':'p_{T}(l)','logy':'True' , 'var':'LepGood_pt[0]',            'bin_set':False,          'varname':'leptonPt',      'binlabel':25,  'bin':(39,25,1000)},\
-{'ndiv':False,'yaxis':'Events','xaxis':'n_{b-tag}','logy':'True' , 'var':'nBJetMediumCSV30',         'bin_set':False,          'varname':'nBJetMediumCSV30',      'binlabel':1,  'bin':(8,0,8),       'lowlimit':0,  'limit':8},\
-{'ndiv':True,'yaxis':'Events / ','xaxis':'p_{T}(leading jet)','logy':'True' , 'var':'Jet_pt[0]',      'bin_set':False,          'varname':'leading_JetPt',  'binlabel':35,  'bin':(20,0,700)},\
-{'ndiv':False,'yaxis':'Events','xaxis':'#eta(l)','logy':'True' , 'var':'LepGood_eta[0]',             'bin_set':False,          'varname':'leptonEta',      'binlabel':25,  'bin':(40,-4,4)},\
-{'ndiv':True,'yaxis':'Events / ','xaxis':'#slash{E}_{T}','logy':'True' , 'var':'met_pt',              'bin_set':False,          'varname':'met',         'binlabel':50,  'bin':(28,0,1400)},\
-{'ndiv':False,'yaxis':'Events / ','xaxis':'#slash{E}_{T} #Phi','logy':'True' , 'var':'met_phi',       'bin_set':False,          'varname':'met_phi',         'binlabel':50,  'bin':(30,-3.14,3.14)},\
+#{'ndiv':True,'yaxis':'Events / ','xaxis':'p_{T}(l)','logy':'True' , 'var':'LepGood_pt[0]',            'bin_set':False,          'varname':'leptonPt',      'binlabel':25,  'bin':(39,25,1000)},\
+#{'ndiv':False,'yaxis':'Events','xaxis':'n_{b-tag}','logy':'True' , 'var':'nBJetMediumCSV30',         'bin_set':False,          'varname':'nBJetMediumCSV30',      'binlabel':1,  'bin':(8,0,8),       'lowlimit':0,  'limit':8},\
+#{'ndiv':True,'yaxis':'Events / ','xaxis':'p_{T}(leading jet)','logy':'True' , 'var':'Jet_pt[0]',      'bin_set':False,          'varname':'leading_JetPt',  'binlabel':35,  'bin':(20,0,700)},\
+#{'ndiv':False,'yaxis':'Events','xaxis':'#eta(l)','logy':'True' , 'var':'LepGood_eta[0]',             'bin_set':False,          'varname':'leptonEta',      'binlabel':25,  'bin':(40,-4,4)},\
+#{'ndiv':True,'yaxis':'Events / ','xaxis':'#slash{E}_{T}','logy':'True' , 'var':'met_pt',              'bin_set':False,          'varname':'met',         'binlabel':50,  'bin':(28,0,1400)},\
+#{'ndiv':False,'yaxis':'Events / ','xaxis':'#slash{E}_{T} #Phi','logy':'True' , 'var':'met_phi',       'bin_set':False,          'varname':'met_phi',         'binlabel':50,  'bin':(30,-3.14,3.14)},\
 #{'ndiv':False,'yaxis':'Events','xaxis':'#phi(l)','logy':'True' , 'var':'LepGood_phi[0]',             'bin_set':False,          'varname':'leptonPhi',      'binlabel':25,  'bin':(40,-4,4)},\
-{'ndiv':False,'yaxis':'Events','xaxis':'miniIso(l)','logy':'True' , 'var':'LepGood_miniRelIso[0]',   'bin_set':False,          'varname':'leptonminiIso',      'binlabel':30,  'bin':(40,0,0.5)},\
-{'ndiv':False,'yaxis':'Events','xaxis':'minDeltaR','logy':'True' , 'var':'Min$(sqrt((abs(Jet_phi-LepGood_phi[0]))**2+(abs(Jet_eta-LepGood_eta[0]))**2))', 'bin_set':False  ,    'varname':'Min_R_Jet_lepton',      'binlabel':1,  'bin':(50,0,10)},\
-{'ndiv':False,'yaxis':'Events','xaxis':'#Delta#Phi(met,l)','logy':'True' , 'var':'acos(cos(met_phi-LepGood_phi[0]))', 'bin_set':False  ,    'varname':'deltaPhi_metl',      'binlabel':1,  'bin':(50,0,3.14)},\
-{'ndiv':False,'yaxis':'Events','xaxis':'Nvert','logy':'True' , 'var':'nVert',                        'bin_set':False,          'varname':'nVert',      'binlabel':1,  'bin':(50,0,50)},\
+#{'ndiv':False,'yaxis':'Events','xaxis':'miniIso(l)','logy':'True' , 'var':'LepGood_miniRelIso[0]',   'bin_set':False,          'varname':'leptonminiIso',      'binlabel':30,  'bin':(40,0,0.5)},\
+#{'ndiv':False,'yaxis':'Events','xaxis':'minDeltaR','logy':'True' , 'var':'Min$(sqrt((abs(Jet_phi-LepGood_phi[0]))**2+(abs(Jet_eta-LepGood_eta[0]))**2))', 'bin_set':False  ,    'varname':'Min_R_Jet_lepton',      'binlabel':1,  'bin':(50,0,10)},\
+#{'ndiv':False,'yaxis':'Events','xaxis':'#Delta#Phi(met,l)','logy':'True' , 'var':'acos(cos(met_phi-LepGood_phi[0]))', 'bin_set':False  ,    'varname':'deltaPhi_metl',      'binlabel':1,  'bin':(50,0,3.14)},\
+#{'ndiv':False,'yaxis':'Events','xaxis':'Nvert','logy':'True' , 'var':'nVert',                        'bin_set':False,          'varname':'nVert',      'binlabel':1,  'bin':(50,0,50)},\
 #{'ndiv':False,'yaxis':'Events','xaxis':'Jet_btagCSV','logy':'True' , 'var':'Jet_btagCSV',                     'bin_set':False,          'varname':'Jet_btagCSV',      'binlabel':1,  'bin':(50,0,2)},\
 #{'ndiv':False,'yaxis':'Events','xaxis':'nbjets_30','logy':'True' , 'var':nbjets_30,                     'bin_set':False,          'varname':'nbjets_30',      'binlabel':1,  'bin':(8,0,8)}
   ]
@@ -205,14 +207,14 @@ if test :
 if not draw_signal :
   signals = []
 
-plots = [plots[0]]
-lepSels = [lepSels[0]]
+#plots = [plots[0]]
+#lepSels = [lepSels[0]]
 
 for lepSel in lepSels:
   #weight_str_plot = '*'.join([reweight,topPt,PU,lepSel["trigger_weight"]]) 
   #path = "/afs/hephy.at/user/e/easilar/www/data/Run2016B/7p7fb/plots/"+lepSel['label']+"high_deltaPhi"
   #path = "/afs/hephy.at/user/e/easilar/www/data/Run2016B/7p7fb/plots/"+lepSel['label']+"_Barrel"
-  path = "/afs/hephy.at/user/e/easilar/www/data/Run2016B/7p7fb/plots/"+lepSel['label']+"_miniIsoTight"
+  path = "/afs/hephy.at/user/e/easilar/www/data/Run2016B/7p7fb/plots/"+lepSel['label']+"_varbinning_tests"
   if not os.path.exists(path):
     os.makedirs(path)
   print lepSel['label']

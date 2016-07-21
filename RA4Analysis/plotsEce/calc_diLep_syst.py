@@ -392,7 +392,7 @@ for srNJet in sorted(signalRegions):
           res[srNJet][stb][htb]['delta_'+calc['name']+'_'+variation[0]] = ((res[srNJet][stb][htb]['kappa_'+calc['name']+'_'+variation[0]]/res[srNJet][stb][htb]['kappa_original'])-1)
           print calc['name']+'_'+variation[0] , res[srNJet][stb][htb]['delta_'+calc['name']+'_'+variation[0]]
 
-pickle.dump(res,file('/data/easilar/Results2016/ICHEP/DiLep_SYS/unc_with_SRAll_V5_pkl','w'))
+pickle.dump(res,file('/data/easilar/Results2016/ICHEP/SYS/V1/unc_with_SRAll_V5_pkl','w'))
 
 
 

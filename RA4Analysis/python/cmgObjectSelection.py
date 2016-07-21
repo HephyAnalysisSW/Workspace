@@ -111,7 +111,20 @@ def get_cmg_recoMuons(c):
   res = [getObjDict(c, 'LepGood_', ['eta','pt','phi','charge', 'dxy', 'dz', 'relIso03','tightId', 'pdgId'], i) for i in range(int(getVarValue(c, 'nLepGood')))]
   return filter(lambda m:abs(m['pdgId'])==13, res)
 
-
+def get_matched_Jets(jets,genParts):
+    matched_jets = []
+    for jet in jets:
+      ismatched = False
+      for genPart in genParts:
+        if ismatched :  break
+        if (abs(genPart["pdgId"]) >5) : continue
+        momid = genPart["motherId"] 
+        if not (momid==6 || momid==23 || momid==24 || momid==25 || momid>1e6) : continue 
+        dR = deltaR(jet,genPart)
+        if dR < 0.3 : 
+          ismatched = True
+          matched_jets.append(jet)
+    return matched_jets
 
 #def cmgGoodLepID(r,  nLep, ptCut=10., absEtaCut=2.4, relIso03Cut=0.3):
 #  return cmgLooseLepID(r, nLep, ptCut, absEtaCut, relIso03Cut) and r.LepGood_tightId[nLep]
