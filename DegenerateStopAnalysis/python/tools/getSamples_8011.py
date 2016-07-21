@@ -21,9 +21,35 @@ lumis = {
             #'lumi_data_blinded':2245.386, 
             #'lumi_data_unblinded':139.63,
             'target_lumi'           :   4000.   ,   
-            'DataBlind_lumi'      :   3990    , 
+            'DataBlind_lumi'      :   4320.0    , 
             'DataUnblind_lumi'    :   804.2   ,
         }
+
+
+data_triggers_list = [
+                        'HLT_PFMET100_PFMHT100_IDTight',
+                        'HLT_PFMET110_PFMHT110_IDTight',  
+                        'HLT_PFMET120_PFMHT120_IDTight',  
+                        'HLT_PFMET90_PFMHT90_IDTight',
+                    ]
+
+data_filters_list = [
+                        "Flag_HBHENoiseFilter",
+                        "Flag_HBHENoiseIsoFilter",
+                        "Flag_EcalDeadCellTriggerPrimitiveFilter",
+                        "Flag_goodVertices",
+                        "Flag_eeBadScFilter",
+                        "Flag_globalTightHalo2016Filter",
+                        "Flag_badChargedHadronFilter",
+                        "Flag_badMuonFilter",
+                    ]
+
+mc_filters_list   = [
+                        "Flag_badChargedHadronFilter",
+                        "Flag_badMuonFilter",
+                    ]
+
+
 
 
 
@@ -37,8 +63,9 @@ import pickle
 def getSamples( wtau  = False, sampleList=['w','tt','z','sig'], 
                 useHT = False, getData = False, blinded=True, scan=True, massPoints=[] , skim='skimPresel', cmgPP=None, do8tev=False,
                 weights = weights, def_weights = def_weights,
-                data_triggers = 'HLT_PFMET100_PFMHT100_IDTight || HLT_PFMET110_PFMHT110_IDTight || HLT_PFMET120_PFMHT120_IDTight || HLT_PFMET90_PFMHT90_IDTight' , 
-                data_filters  = "",  
+                data_triggers = ' || '.join(data_triggers_list) ,
+                data_filters  = ' && '.join(data_filters_list),  
+                mc_filters    = ' && '.join(mc_filters_list),
                 #mc_lumi=10000, lumi_data_blinded=2245.386, lumi_data_unblinded=139.63):
                 kill_low_qcd_ht = False,
                 lumis = lumis , 
@@ -123,12 +150,24 @@ def getSamples( wtau  = False, sampleList=['w','tt','z','sig'],
             assert False
 
     if "dy" in sampleList:
-        DYJetsSample        = getChain(cmgPP.DYJetsM5to50HT[skim],histname='')
+        #DYJetsSample        = getChain(cmgPP.DYJetsM5to50HT[skim],histname='')
         sampleDict.update({
               'dy':                {'sample':cmgPP.DYJetsM50HT[skim]             ,'name':'DYJetsM50'        ,'color':colors['dy']            , 'isSignal':0 ,'isData':0    ,"lumi":mc_lumi      },
               'dy5to50':           {'sample':cmgPP.DYJetsM5to50HT[skim]          ,'name':'DYJetsM5to50'     ,'color':colors['dy5to50']            , 'isSignal':0 ,'isData':0    ,"lumi":mc_lumi      },
-              'dy5to50Inc':        {'sample':cmgPP.DYJetsM5to50[skim]            ,'name':'DYJetsM5to50Inc'  ,'color':colors['dy5to50Inc']            , 'isSignal':0 ,'isData':0    ,"lumi":mc_lumi      },
-              'dyInv':             {'sample':cmgPP.DYJetsToNuNu[skim]            ,'name':'DYJetsInv'        ,'color':colors['dyInv']            , 'isSignal':0 ,'isData':0    ,"lumi":mc_lumi      },
+              #'dy5to50Inc':        {'sample':cmgPP.DYJetsM5to50[skim]            ,'name':'DYJetsM5to50Inc'  ,'color':colors['dy5to50Inc']            , 'isSignal':0 ,'isData':0    ,"lumi":mc_lumi      },
+              #'dyInv':             {'sample':cmgPP.DYJetsToNuNu[skim]            ,'name':'DYJetsInv'        ,'color':colors['dyInv']            , 'isSignal':0 ,'isData':0    ,"lumi":mc_lumi      },
+                        }) 
+    if "vv" in sampleList:
+        #DYJetsSample        = getChain(cmgPP.DYJetsM5to50HT[skim],histname='')
+        sampleDict.update({
+              'vv':                {'sample':cmgPP.VV[skim]             ,'name':'Diboson'        ,'color':colors['vv']            , 'isSignal':0 ,'isData':0    ,"lumi":mc_lumi      },
+                        }) 
+    if any (["st" in samp for samp in sampleList]):
+        sampleDict.update({
+              'st_tch_lep':                {'sample':cmgPP.ST_tch_Lep[skim]              ,'name':'ST_tch_lep'        ,'color':colors['st_tch_lep']            , 'isSignal':0 ,'isData':0    ,"lumi":mc_lumi      },
+              'st_tch':                    {'sample':cmgPP.ST_tch[skim]                  ,'name':'ST_tch'            ,'color':colors['st_tch']            , 'isSignal':0 ,'isData':0    ,"lumi":mc_lumi      },
+              'st_wch':                    {'sample':cmgPP.ST_wch[skim]                  ,'name':'ST_wch'            ,'color':colors['st_wch']            , 'isSignal':0 ,'isData':0    ,"lumi":mc_lumi      },
+              'st':                        {'sample':cmgPP.ST[skim]                      ,'name':'ST'                ,'color':colors['st']                , 'isSignal':0 ,'isData':0    ,"lumi":mc_lumi      },
                         }) 
     if wtau:
         print "Getting the Tau and Non-Tau components of WJets"
@@ -196,6 +235,11 @@ def getSamples( wtau  = False, sampleList=['w','tt','z','sig'],
 
         sampleDict2[samp] = Sample(**sampleDict[samp])
     samples = Samples(**sampleDict2)
+    for samp_name, sample in samples.iteritems():
+        if not sample.isData:
+            sample.filter = mc_filters
+
+
     return samples
 
 
