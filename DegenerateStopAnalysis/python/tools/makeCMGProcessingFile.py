@@ -64,8 +64,8 @@ def printCMGProcessingFile(     cmgPickle,
     mc_output.append(   "sample_path = '%s'   \nallComponents=[] \n"%mc_path)
 
     for compName, comp in  sorted( componentDict.iteritems() ) :
+        ext_comps = []
         if not comp.isData:
-            ext_comps = []
             if compName.endswith("_ext"):
                 norm_compName = compName.replace("_ext","")
                 if norm_compName in componentDict:
@@ -74,9 +74,9 @@ def printCMGProcessingFile(     cmgPickle,
             elif compName+"_ext" in componentDict:
                 ext_comps.extend([compName, compName+"_ext"])
             print ext_comps
-            mc_output.append( printSample(compName, comp)) 
+            mc_output.append( printSample(compName, comp , ext_comps)) 
         else:
-            data_output.append( printSample(compName, comp, ext_comps)  )
+            data_output.append( printSample(compName, comp)  )
     data_sample_file    = os.path.splitext(os.path.basename(data_path))[0]    
     mc_sample_file      = os.path.splitext(os.path.basename(mc_path))[0]      
 

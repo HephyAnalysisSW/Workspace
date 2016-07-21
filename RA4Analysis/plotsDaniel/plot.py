@@ -109,12 +109,12 @@ TTV_16_antiSel = {'name':'TTVH', 'chain':getChain(TTV_antiSel,histname=''), 'col
 Rest = {'name':'Rest', 'chain':getChain([TTV_25ns,singleTop_25ns,DY_25ns],histname=''), 'color':color('TTV'),'weight':totalWeight, 'niceName':'other EWK', 'cut':''}
 Bkg = {'name':'Bkg', 'chain':getChain([TTJets_HTLO_25ns,WJetsHTToLNu_25ns,QCDHT_25ns,TTV_25ns,singleTop_25ns,DY_25ns],histname=''), 'color':color('TTV'),'weight':totalWeight, 'niceName':'total Bkg', 'cut':''}
 EWK = {'name':'Bkg', 'chain':getChain([TTJets_HTLO_25ns,WJetsHTToLNu_25ns,TTV_25ns,singleTop_25ns,DY_25ns],histname=''), 'color':color('TTV'),'weight':totalWeight, 'niceName':'total Bkg', 'cut':''}
-#diBoson = {'name':'diBoson', 'chain':getChain(diBosons_25ns,histname=''), 'color':ROOT.kMagenta,'weight':'weight', 'niceName':'diboson'}
+diBoson = {'name':'diBoson', 'chain':getChain(diBoson,histname=''), 'color':ROOT.kRed+2,'weight': totalWeight, 'niceName':'WW/WZ/ZZ', 'cut':''}
 
 samples         = [WJETS_15, TTJets_combined_15, Rest, QCD_15]#, diBoson]
 samples2        = [WJETS_15, TTJets_combined_15, DY_15, singleTop_15, TTV_15, QCD_15]
 samplesTTcheck  = [WJETS_15, TTJets_combined_singleLep_15, TTJets_combined_diLep_15, TTJets_combined_had_15, Rest, QCD_15]#, diBoson]
-samples16       = [TTJets_16, DY_16, WJETS_16, singleTop_lep_16, QCD_16, TTV_16]
+samples16       = [TTJets_16, DY_16, WJETS_16, singleTop_lep_16, QCD_16, TTV_16, diBoson]
 #samples16_antiSel = [TTJets_Lep_16_antiSel, DY_16_madgraph_antiSel, WJETS_16_antiSel, singleTop_lep_16_antiSel, QCD_16_antiSel, TTV_16_antiSel]
 
 #test_antiSel = {'name':'w/o DY', 'chain':getChain([TTV_antiSel,singleTop_lep_antiSel,TTJets_Lep_antiSel,WJetsHTToLNu_antiSel],histname=''), 'color':color('TTV'),'weight':totalWeight, 'niceName':'w/o DY', 'cut':''}
@@ -604,7 +604,6 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
   else: MCscale=1.
   for isample, sample in enumerate(samples):
     for icut, cut in enumerate(cuts):
-      print
       i = isample*ncuts+icut
       if nsamples>1: legendName = sample['niceName']
       else: legendName = cut['niceName']
@@ -622,15 +621,15 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
       #  print ' - weight:', weight
       #print normWeight
       #print normCut
+      print
+      print 'Drawing sample', sample['name']
+      print 'Using cut:'
+      print normCut
+      print 'Using weight:'
+      print str(MCscale*MClumiScale)+'*'+normWeight
       if sample['cut']:
         normCut = normCut + '&&' + sample['cut']
-        print ' - cut:', sample['name']
-      #else:
-      #  useCut = cut['string']
-      #  print ' - global cut'
-      print normCut, normWeight
-      print icut
-      print sample['name']
+        print 'Additional specific cut for this sample:', sample['name']
       sample['chain'].Draw(variable['name']+'>>h'+str(isample)+'_'+str(icut),str(MCscale*MClumiScale)+'*'+normWeight+'*('+normCut+')','goff')
       if normalize: h[i]['hist'].Scale(1/h[i]['hist'].Integral())
       totalH.Add(h[i]['hist'])
@@ -745,6 +744,10 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
     #if data['var']: variable = data['var']
     normCut, normWeight = getBTagCutAndWeight(data['chain'], btagcut, btagweight, cut['string'], (1))
     normCut += '&&'+datapresel
+    print
+    print 'Drawing data'
+    print 'Using cut:'
+    print normCut
     data['chain'].Draw(variable['name']+'>>data',normCut,'goff')
     #h_Stack.Draw('hist')
     h[-1]['hist'].Sumw2()
@@ -753,7 +756,7 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
     if legend: leg.AddEntry(h[-1]['hist'])
     if binningIsExplicit: dataMCH = ROOT.TH1F('dataMC','DataMC',len(variable['binning'])-1, array('d', variable['binning']))
     else: dataMCH = ROOT.TH1F('dataMC','DataMC',*variable['binning'])
-    dataMCH.Sumw2()
+    #dataMCH.Sumw2()
     dataMCH = h[-1]['hist'].Clone()
     totalH.Sumw2()
     totalH.Divide(scaleHist)

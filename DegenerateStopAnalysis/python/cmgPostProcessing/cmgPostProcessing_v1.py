@@ -155,6 +155,8 @@ def getParameterSet(args):
 
 
     if  args.processBTagWeights:
+
+        params['JetSel']['branches'].append('hadronFlavour/I')
         from Workspace.DegenerateStopAnalysis.cmgPostProcessing.btagEfficiency import btagEfficiency
 
         sampleName = args.processSample
