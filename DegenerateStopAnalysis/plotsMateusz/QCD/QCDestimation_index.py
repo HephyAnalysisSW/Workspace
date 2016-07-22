@@ -70,8 +70,8 @@ print makeDoubleLine()
 
 #Save
 if save: #web address: http://www.hephy.at/user/mzarucki/plots
-   if removedCut == "None": savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/QCD/2016/ABCD/ABCD" + ABCD + "/estimation/" + eleWP 
-   else: savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/QCD/2016/ABCD/ABCD" + ABCD + "/estimation/" + eleWP + "_no_" + removedCut
+   if removedCut == "None": savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/QCD/ABCD/ABCD" + ABCD + "/estimation/" + eleWP 
+   else: savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/QCD/ABCD/ABCD" + ABCD + "/estimation/" + eleWP + "_no_" + removedCut
    savedir += "/Index"
    if highWeightVeto: savedir += "/highWeightVeto" 
    if not os.path.exists(savedir): os.makedirs(savedir)
@@ -296,12 +296,12 @@ if estimation:
    QCD_A_IX = {}
    QCDexp1 = {}
    QCDexp2 = {}
-   
-   if not os.path.isfile("%s/QCDyields_%s.txt"%(savedir,suffix)):
-      outfile = open("%s/QCDyields_%s.txt"%(savedir,suffix), "w")
-      outfile.write(eleWP + " Electron ID and Preselection of (MET, HT) > (" + METcut + "," + HTcut + ")\n")
-      if ABCD == "1" or ABCD == "4": outfile.write("SR           IX_A                 XA_I                    IA_X                     IXA                       QCD                     MC                     Ratio\n".replace("X", Xs[ABCD]))
-      elif ABCD == "2" or ABCD == "3": outfile.write("SR           IX_A                 A_IX                     IXA                       QCD                     MC                     Ratio\n".replace("X", Xs[ABCD]))
+   if save: 
+      if not os.path.isfile("%s/QCDyields_%s.txt"%(savedir,suffix)):
+         outfile = open("%s/QCDyields_%s.txt"%(savedir,suffix), "w")
+         outfile.write(eleWP + " Electron ID and Preselection of (MET, HT) > (" + METcut + "," + HTcut + ")\n")
+         if ABCD == "1" or ABCD == "4": outfile.write("SR           IX_A                 XA_I                    IA_X                     IXA                       QCD                     MC                     Ratio\n".replace("X", Xs[ABCD]))
+         elif ABCD == "2" or ABCD == "3": outfile.write("SR           IX_A                 A_IX                     IXA                       QCD                     MC                     Ratio\n".replace("X", Xs[ABCD]))
    
    for reg in regions:
       yields[reg] = {}
@@ -381,8 +381,8 @@ if estimation:
 if plot:
    
    if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
-      if removedCut == "None": plotdir = "/afs/hephy.at/user/m/mzarucki/www/plots/QCD/2016/ABCD/ABCD" + ABCD + "/plots/" + eleWP
-      else: plotdir = "/afs/hephy.at/user/m/mzarucki/www/plots/QCD/2016/ABCD3/plots/" + eleWP + "_no_" + removedCut
+      if removedCut == "None": plotdir = "/afs/hephy.at/user/m/mzarucki/www/plots/QCD/ABCD/ABCD" + ABCD + "/plots/" + eleWP
+      else: plotdir = "/afs/hephy.at/user/m/mzarucki/www/plots/QCD/ABCD3/plots/" + eleWP + "_no_" + removedCut
      
       plotdir += "/" + plotReg + "/Index"
       
