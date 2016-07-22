@@ -1975,7 +1975,7 @@ class Yields():
         
         self.cut_weights = {}
         for cutName, cutStr in getattr(self.cutInst, self.cutOpt):
-            self.cut_weights[cutName] = { samp:decide_weight2(samples[samp] , cut=cutStr , lumi=self.lumi_string    ) for samp in self.sampleList }     
+            self.cut_weights[cutName] = {samp:decide_weight2(samples[samp], cut=cutStr, lumi=self.lumi_string) for samp in self.sampleList}     
 
         if hasattr(self,"LatexTitles"):
             #self.sampleLegend   =   [self.LatexTitles[sample] for sample in self.bkgList] +\
@@ -2114,7 +2114,7 @@ class Yields():
 
             cutStr = "&&".join([ "(%s)"%x for x in cut_strings])
             
-            yld = getYieldFromChain( samples[sample]['tree'], cutStr,self.weights[sample], returnError=self.err) #,self.nDigits) 
+            yld = getYieldFromChain(samples[sample]['tree'], cutStr,self.cut_weights[cutName][sample], returnError=self.err) #,self.nDigits) 
             #print cut[0], "     ", "getYieldFromChain( %s, '%s', '%s',%s )"%( "samples."+sample+".tree", cut[1], self.weights[sample], True) + "==(%s,%s)"%yld 
             if self.err:
                     rounded = [ round(x,self.nDigits) for x in yld ] 
@@ -2140,7 +2140,7 @@ class Yields():
 
         if self.nProc:
             #getYieldsFunc = getYieldsForSampleFunc( samples, cutList, self.weights, self.err, self.nDigits, self.yieldDictFull, self.verbose, self.pprint, self.sampleNames, self.cutNames, self.npsize, self.nSpaces)
-            getYieldsFunc = getYieldsForSampleFunc( samples, cutList, self.cut_weights, self.err, self.nDigits, self.yieldDictFull, self.verbose, self.pprint, self.sampleNames, self.cutNames, self.npsize, self.nSpaces)
+            getYieldsFunc = getYieldsForSampleFunc(samples, cutList, self.cut_weights, self.err, self.nDigits, self.yieldDictFull, self.verbose, self.pprint, self.sampleNames, self.cutNames, self.npsize, self.nSpaces)
             pickle.dump(getYieldsFunc, file("delme.pkl","w"))
             test = getYieldsFunc( self.sampleList[0])
         
