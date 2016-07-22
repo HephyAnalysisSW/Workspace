@@ -1904,7 +1904,9 @@ class Yields():
                  verbose=False, nSpaces=None):
         if not (isinstance(cutInst,CutClass) or hasattr(cutInst,cutOpt)):
             raise Exception("use an instance of cutClass")
-        makeDir(pklDir)
+        
+        if pklOpt: makeDir(pklDir)
+        
         self.nDigits        = nDigits
         samples = samples
         self.cutInst        = cutInst
