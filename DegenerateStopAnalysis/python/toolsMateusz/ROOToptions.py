@@ -1,10 +1,15 @@
 #ROOT Options
 import ROOT
+import os, sys
+
+#cmsbase = os.getenv("CMSSW_BASE")
+#print "CMSSW Release: ", cmsbase
+
 ROOT.gROOT.Reset() #re-initialises ROOT
 #ROOT.gROOT.SetStyle("Plain")
 
 ROOT.gStyle.SetOptStat(1111) #0 removes histogram statistics box #Name, Entries, Mean, RMS, Underflow, Overflow, Integral, Skewness, Kurtosis
-ROOT.gStyle.SetOptFit(1111) #1111 prints fits results on plot
+ROOT.gStyle.SetOptFit(0) #1111 prints fits results on plot
 #ROOT.gStyle.SetOptTitle(0) #suppresses title box
 #ROOT.gStyle.SetFuncWidth(1)
 #ROOT.gStyle.SetFuncColor(9)

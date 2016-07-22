@@ -94,7 +94,7 @@ def makeCanvasMultiPads(     c1Name="canvas",  c1ww=600, c1wh=600,  joinPads=Tru
     if not all(ms) or not nPads:
         bottom_marg = 0.05
         left_marg = 0
-        right_marg = 0
+        right_marg = 0.05
         top_marg = 0
         #if padRatios and len(padRatios)==len(pads):
         if padRatios:

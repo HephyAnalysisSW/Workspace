@@ -445,7 +445,7 @@ h_Stack = ROOT.THStack('h_Stack','Stack')
 
 print 'min and max of the different sources'
 for h in hists:
-  print h.GetName(), round(h.GetMinimum(),2), round(h.GetMaximum(),2)
+  print h.GetName(), round(h.GetMinimum(),3), round(h.GetMaximum(),3)
 
 for i_h,h in enumerate(hists):
   h_Stack.Add(h)

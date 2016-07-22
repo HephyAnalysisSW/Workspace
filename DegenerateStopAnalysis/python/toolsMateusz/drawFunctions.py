@@ -15,9 +15,9 @@ def newLine():
    return
 
 #Histograms
-def emptyHist(varname, nbins = 100, min = 0, max = 1000):
+def emptyHist(title, nbins = 100, min = 0, max = 1000):
    hist = ROOT.TH1F("hist", "Histogram", nbins, min, max)
-   hist.GetXaxis().SetTitle(varname)
+   hist.GetXaxis().SetTitle(title)
    hist.GetYaxis().SetTitle("Counts")
    hist.GetXaxis().CenterTitle()
    hist.GetYaxis().CenterTitle()
@@ -91,7 +91,7 @@ def makeEffPlot(passed,total):
    eff = ROOT.TEfficiency(passed,total)
    eff.SetTitle("Efficiency Plot")
    eff.SetMarkerStyle(33)
-   eff.SetMarkerSize(1.5)
+   eff.SetMarkerSize(2)
    eff.SetLineWidth(2)
    return eff
 
@@ -115,7 +115,7 @@ def makeEffPlot2(passed,total): #When ratio > 1
    eff.Divide(total)
    eff.SetTitle("Efficiency Plot")
    eff.SetMarkerStyle(33)
-   eff.SetMarkerSize(1.5)
+   eff.SetMarkerSize(2)
    eff.SetLineWidth(2)
    return eff
 
@@ -135,7 +135,7 @@ def setupEffPlot2(eff):
    ROOT.gPad.Update()
 
 #Legend
-def makeLegend(x1=0.775,x2=0.875,y1=0.45,y2= 0.65):
+def makeLegend2(x1=0.725,x2=0.875,y1=0.45,y2= 0.65):
    leg = ROOT.TLegend(x1,y1,x2,y2)
    leg.SetHeader("#bf{Legend}")
    header = leg.GetListOfPrimitives().First()
