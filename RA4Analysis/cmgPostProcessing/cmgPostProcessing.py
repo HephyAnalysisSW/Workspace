@@ -159,12 +159,12 @@ if sys.argv[0].count('ipython'):
 #PU_histo_70 = PU_File_70mb.Get("puRatio")
 #PU_histo_74 = PU_File_74mb.Get("puRatio")
 PU_dir = "/data/easilar/PU_Histos/"
-PU_File_66mb = ROOT.TFile(PU_dir+"/h_ratio_67p7.root")
-PU_File_70mb = ROOT.TFile(PU_dir+"/h_ratio_71p3.root")
-PU_File_74mb = ROOT.TFile(PU_dir+"/h_ratio_74p9.root")
-PU_histo_66 = PU_File_66mb.Get("puRatio")
-PU_histo_70 = PU_File_70mb.Get("puRatio")
-PU_histo_74 = PU_File_74mb.Get("puRatio")
+PU_File_67_7mb = ROOT.TFile(PU_dir+"/h_ratio_67_7.root")
+PU_File_71_3mb = ROOT.TFile(PU_dir+"/h_ratio_71_3.root")
+PU_File_74_9mb = ROOT.TFile(PU_dir+"/h_ratio_74_9.root")
+PU_histo_67_7 = PU_File_67_7mb.Get("h_ratio")
+PU_histo_71_3 = PU_File_71_3mb.Get("h_ratio")
+PU_histo_74_9 = PU_File_74_9mb.Get("h_ratio")
 ######################
 
 ###For Lepton SF#####
@@ -394,10 +394,10 @@ for isample, sample in enumerate(allSamples):
           s.eleDataSet = False
           s.weight =xsec_branch*lumiScaleFactor*genWeight
           nTrueInt = t.GetLeaf('nTrueInt').GetValue()
-          s.puReweight_true = PU_histo_70.GetBinContent(PU_histo_70.FindBin(nTrueInt))
+          s.puReweight_true = PU_histo_71_3.GetBinContent(PU_histo_71_3.FindBin(nTrueInt))
           s.puReweight_true_max4 = min(4,s.puReweight_true)
-          s.puReweight_true_Down = PU_histo_66.GetBinContent(PU_histo_66.FindBin(nTrueInt))
-          s.puReweight_true_Up = PU_histo_74.GetBinContent(PU_histo_74.FindBin(nTrueInt))
+          s.puReweight_true_Down = PU_histo_67_7.GetBinContent(PU_histo_67_7.FindBin(nTrueInt))
+          s.puReweight_true_Up = PU_histo_74_9.GetBinContent(PU_histo_74_9.FindBin(nTrueInt))
           ngenLep = t.GetLeaf('ngenLep').GetValue()
           ngenTau = t.GetLeaf('ngenTau').GetValue()
           genLeps = filter(lambda g:abs(g['grandmotherId'])==6 and abs(g['motherId'])==24,get_cmg_genLeps(t))

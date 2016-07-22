@@ -29,28 +29,31 @@ path = "~/www/data/Run2016B/4fb/PU_histos/"
 #tot_bkg_PU_histo.SaveAs(path+"MC.root")
 #mc_histo = tot_bkg_PU_histo
 
-file = ROOT.TFile(path+"/MC_histo.root")
-can = file.Get("cb")
-mc_histo = can.GetPrimitive("histo") 
-#mc_histo.Scale(1/mc_histo.Integral())
+file = ROOT.TFile("mcSpring16_25ns_pu.root")
+#can = file.Get("cb")
+#mc_histo = can.GetPrimitive("histo") 
+mc_histo = file.Get("pileup") 
+mc_histo.Scale(1/mc_histo.Integral())
 cb = ROOT.TCanvas("cb","cb",564,232,600,600)
 cb.cd()
-PU_var = [70 , 66, 74]
+PU_var = ["67_7", "71_3", "74_9"]
 
 for var in PU_var:
-  data_f = ROOT.TFile(path+"/pileup_data_"+str(var)+".root")
+  data_f = ROOT.TFile("DataPileupHisto4fb_Run2016B_"+var+"mb.root")
   h_data = data_f.Get("pileup")
   #h_data.Rebin(7)
   h_data.Scale(1/h_data.Integral())
   #mc_histo.Scale(h_data.Integral()/mc_histo.Integral())
   h_ratio = h_data.Clone('h_ratio')
   h_ratio.Divide(mc_histo)
-  h_ratio.SaveAs(path+"h_ratio_"+str(var)+".root")
+  h_ratio.SaveAs("~/www/data/Run2016B/7p7fb/PU_histos/h_ratio_"+str(var)+".root")
   cb = ROOT.TCanvas("cb","cb",564,232,600,600)
   cb.cd()
   h_ratio.Draw()
   h_ratio.SetMaximum(4)
-  cb.SaveAs(path+"h_ratio_"+str(var)+".png")
+  h_ratio.SetMinimum(-4)
+  cb.SaveAs("~/www/data/Run2016B/7p7fb/PU_histos/h_ratio_"+str(var)+".png")
+  del h_ratio , data_f , h_data
 
 
  
