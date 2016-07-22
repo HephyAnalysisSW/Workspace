@@ -578,17 +578,20 @@ def getPlots(samples,plots,cut,sampleList=[],plotList=[],weight="(weight)",nMinu
     sigList, bkgList, dataList = getSigBkgDataLists(samples, sampleList=sampleList)
     isDataPlot = bool(len(dataList))
     if isDataPlot:
- 
-        if "Blind" in samples[dataList[0]].name and "sr" in cut.fullName:
-            raise Exception("NO DATA IN SIGNAL REGION: %s"%[dataList, cut.fullName])
-        #weight = samples[dataList[0]].name+"_weight"
-        lumi_weight = samples[dataList[0]].name+"_lumi"
+       if "Blind" in samples[dataList[0]].name and "sr" in cut.fullName:
+           raise Exception("NO DATA IN SIGNAL REGION: %s"%[dataList, cut.fullName])
+
+       if "DataBlind" in samples[dataList[0]].name: lumi_weight = "DataBlind_lumi"
+       elif "DataUnblind" in samples[dataList[0]].name: lumi_weight = "DataUnblind_lumi"
+       else: assert False
+       print "Reweighting MC histograms to", lumi_weight, ":", round(samples[dataList[0]].lumi/1000.,2), "fb-1"
     else:
-        lumi_weight = "target_lumi"
+       lumi_weight = "target_lumi"
+       print "Reweighting MC histograms to", lumi_weight, ":", round(samples[bkgList[0]].weights.weight_dict['lumis']['target_lumi']/1000.,2), "fb-1"
 
     if len(dataList) > 1:
         raise Exception("More than one Data Set in the sampleList... This could be dangerous: %s"%dataList)
-
+ 
     if verbose: print " "*15, "Getting Plots: ", plotList
     for sample in samples.iterkeys():
         #if sample in sampleList or not sampleList:
