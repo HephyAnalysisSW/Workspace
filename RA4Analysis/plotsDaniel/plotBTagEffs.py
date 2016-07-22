@@ -21,7 +21,7 @@ can = ROOT.TCanvas('can','can',600,600)
 can.SetBottomMargin(0.22)
 
 #effs = pickle.load(file('/data/dspitzbart/Spring16/btagEfficiency/effs_presel_JECv6_pkl'))
-bTagEffFile = '/data/dspitzbart/Spring16/btagEfficiency/FS_full_v2_pkl'
+bTagEffFile = '/data/dspitzbart/Spring16/btagEfficiency/signal_inclusive_16_pkl'
 effs = pickle.load(file(bTagEffFile))
 
 #key = 'TTJets'
@@ -120,7 +120,7 @@ for key in effs.keys():
   latex1.DrawLatex(0.16,0.96,'CMS #bf{#it{Simulation}}')
   latex1.DrawLatex(0.85,0.96,'#bf{(13TeV)}')
   
-  can.Print('/afs/hephy.at/user/d/dspitzbart/www/Spring16/btagEfficiency/Signal_'+key+'_Spring16.png')
-  can.Print('/afs/hephy.at/user/d/dspitzbart/www/Spring16/btagEfficiency/Signal_'+key+'_Spring16.pdf')
-  can.Print('/afs/hephy.at/user/d/dspitzbart/www/Spring16/btagEfficiency/Signal_'+key+'_Spring16.root')
+  can.Print('/afs/hephy.at/user/d/dspitzbart/www/Spring16/btagEfficiency/'+key+'_Spring16.png')
+  can.Print('/afs/hephy.at/user/d/dspitzbart/www/Spring16/btagEfficiency/'+key+'_Spring16.pdf')
+  can.Print('/afs/hephy.at/user/d/dspitzbart/www/Spring16/btagEfficiency/'+key+'_Spring16.root')
   
