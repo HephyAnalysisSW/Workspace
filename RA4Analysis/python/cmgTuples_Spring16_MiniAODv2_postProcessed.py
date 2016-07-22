@@ -162,28 +162,31 @@ TTV = {
 }
 
 allSignalStrings=[\
-"T5qqqqVV_mGluino_600To675_mLSP_1to550",\
-"T5qqqqVV_mGluino_700To775_mLSP_1To650",\
-"T5qqqqVV_mGluino_800To975_mLSP_1To850",\
-"T5qqqqVV_mGluino_1000To1075_mLSP_1To950",\
-"T5qqqqVV_mGluino_1100To1175_mLSP_1to1050",\
-"T5qqqqVV_mGluino_1200To1275_mLSP_1to1150",\
-"T5qqqqVV_mGluino_1300To1375_mLSP_1to1250",\
-"T5qqqqVV_mGluino_1400To1550_mLSP_1To1275",\
-"T5qqqqVV_mGluino_1600To1750_mLSP_1To950",\
+#"T5qqqqVV_mGluino_600To675_mLSP_1to550",\
+#"T5qqqqVV_mGluino_700To775_mLSP_1To650",\
+#"T5qqqqVV_mGluino_800To975_mLSP_1To850",\
+#"T5qqqqVV_mGluino_1000To1075_mLSP_1To950",\
+#"T5qqqqVV_mGluino_1100To1175_mLSP_1to1050",\
+#"T5qqqqVV_mGluino_1200To1275_mLSP_1to1150",\
+#"T5qqqqVV_mGluino_1300To1375_mLSP_1to1250",\
+#"T5qqqqVV_mGluino_1400To1550_mLSP_1To1275",\
+#"T5qqqqVV_mGluino_1600To1750_mLSP_1To950",\
+"SMS_T5qqqqVV_TuneCUETP8M1_v1",\
 ]
 
 from Workspace.HEPHYPythonTools.user import username
 import pickle
 
-pickleDir = '/data/easilar/Spring15/25ns/'
+#pickleDir = '/data/easilar/Spring15/25ns/'
+pickleDir = '/afs/hephy.at/data/easilar01/Ra40b/pickleDir/T5qqqqWW_mass_nEvents_xsec_pkl'
 #signal_dir = '/data/easilar/cmgTuples/postProcessing_Signals/signal/'
+#signal_dir = '/data/easilar/cmgTuples/postProcessing_Signals_v4/signal/'
 signal_dir = '/data/easilar/cmgTuples/postProcessing_Signals_v4/signal/'
 
 def getSignalSample(signal):
   if signal in allSignalStrings:
     sig = {}
-    mass_dict = pickle.load(file(pickleDir+signal+'_mass_nEvents_xsec_pkl'))
+    mass_dict = pickle.load(file(pickleDir))
     for mglu in mass_dict.keys() :
       sig[mglu] = {}
       for mlsp in mass_dict[mglu].keys() :
