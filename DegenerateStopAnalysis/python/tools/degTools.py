@@ -1791,7 +1791,7 @@ class Weight(object):
     def getWeightList(self, weight_dict, cut="", lumi="target_lumi"):
         weight_list=[]
         for weight_key in weight_dict:
-            print weight_key
+            #print weight_key
             new_weight = ""
             if weight_key == "cuts":
                 found_a_match = False
@@ -1898,10 +1898,10 @@ class Yields():
         Usage:
         y=Yields(samples,['tt', 'w','s'],cuts.presel,tableName='{cut}_test',pklOpt=1);
     '''
-    def __init__(   self,   samples,    sampleList, cutInst,    cutOpt='flow',  tableName='{cut}',  weight="(weight)",
-                    pklOpt=False,   pklDir="./pkl/",    nDigits=2, err=True, nProc = None, lumi = 'target_lumi',
-                    isMVASample = None, 
-                    verbose=False, nSpaces=None):
+    def __init__(self,   samples,    sampleList, cutInst,    cutOpt='flow',  tableName='{cut}',  weight="(weight)",
+                 pklOpt=False,   pklDir="./pkl/",    nDigits=2, err=True, nProc = None, lumi = 'target_lumi',
+                 isMVASample = None, 
+                 verbose=False, nSpaces=None):
         if not (isinstance(cutInst,CutClass) or hasattr(cutInst,cutOpt)):
             raise Exception("use an instance of cutClass")
         makeDir(pklDir)
@@ -1963,10 +1963,13 @@ class Yields():
         
         isDataPlot = bool(len(self.dataList))
         if isDataPlot:
-           self.lumi_weight = samples[self.dataList[0]].name+"_lumi"
-           print "Reweighting MC yields to data" 
+           if "DataBlind" in samples[self.dataList[0]].name: self.lumi_weight = "DataBlind_lumi"
+           elif "DataUnblind" in samples[self.dataList[0]].name: self.lumi_weight = "DataUnblind_lumi"
+           else: assert False
+           print "Reweighting MC yields to", self.lumi_weight, ":", round(samples[self.dataList[0]].lumi/1000.,2), "/fb" 
         else:
            self.lumi_weight = "target_lumi" 
+           print "Reweighting MC yields to", self.lumi_weight, ":", round(samples[bkgList[0]].weights.weight_dict['lumis']['target_lumi']/1000.,2), "fb-1" 
         
         #self.sampleLegend   = np.array( [ [samples[sample]['name'] for sample in self.bkgList] + ["Total"] + 
         #                                                         [samples[sample]['name'] for sample in self.sigList] ] )
@@ -1975,7 +1978,7 @@ class Yields():
         
         self.cut_weights = {}
         for cutName, cutStr in getattr(self.cutInst, self.cutOpt):
-            self.cut_weights[cutName] = {samp:decide_weight2(samples[samp], cut=cutStr, lumi=self.lumi_string) for samp in self.sampleList}     
+            self.cut_weights[cutName] = {samp:decide_weight2(samples[samp], cut=cutStr, lumi=self.lumi_weight) for samp in self.sampleList}     
 
         if hasattr(self,"LatexTitles"):
             #self.sampleLegend   =   [self.LatexTitles[sample] for sample in self.bkgList] +\
@@ -2088,9 +2091,6 @@ class Yields():
         if self.isMVASample and not samples[sample]['tree'].GetEventList():
             setSampleEventList = True
             setMVASampleEventList(samples, sample)
-
-
-
 
         for ic, cut in enumerate(cutList):
             cutName = cut[0]
