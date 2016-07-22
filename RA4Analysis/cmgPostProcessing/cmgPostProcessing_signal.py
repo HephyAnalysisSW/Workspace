@@ -16,7 +16,7 @@ ROOT.AutoLibraryLoader.enable()
 from Workspace.HEPHYPythonTools.helpers import getChunks
 #from Workspace.RA4Analysis.cmgTuples_Data25ns_miniAODv2 import *
 from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2 import *
-from systematics_helper import calc_btag_systematics, calc_LeptonScale_factors_and_systematics , getISRWeight , fill_branch_WithJEC 
+from systematics_helper import calc_btag_systematics, calc_LeptonScale_factors_and_systematics , getISRWeight , getISRWeight_new ,fill_branch_WithJEC 
 from btagEfficiency import *
 from leptonFastSimSF import leptonFastSimSF as leptonFastSimSF_
 
@@ -210,6 +210,7 @@ for isample, sample in enumerate(allSamples):
       ]
       newVariables.extend(['puReweight_true/F','puReweight_true_max4/F','puReweight_true_Down/F','puReweight_true_Up/F','weight_diLepTTBar0p5/F','weight_diLepTTBar2p0/F','weight_XSecTTBar1p1/F','weight_XSecTTBar0p9/F','weight_XSecWJets1p1/F','weight_XSecWJets0p9/F'])
       newVariables.extend(['ngenGluino/I','genGluGlu_pt/F','ISRSigUp/F/1','ISRSigDown/F/1'])
+      newVariables.extend(['nISRJets_new/I','weight_ISR_new/F/1','ISRSigUp_new/F/1','ISRSigDown_new/F/1'])
       newVariables.extend(['lepton_muSF_looseID/D/1.','lepton_muSF_mediumID/D/1.','lepton_muSF_miniIso02/D/1.','lepton_muSF_sip3d/D/1.','lepton_eleSF_cutbasedID/D/1.','lepton_eleSF_miniIso01/D/1.'])
       newVariables.extend(['lepton_muSF_looseID_err/D/0.','lepton_muSF_mediumID_err/D/0.','lepton_muSF_miniIso02_err/D/0.','lepton_muSF_sip3d_err/D/0.','lepton_eleSF_cutbasedID_err/D/0.','lepton_eleSF_miniIso01_err/D/0.'])
 
@@ -397,7 +398,8 @@ for isample, sample in enumerate(allSamples):
             g_list=['eta','pt','phi','mass','charge', 'pdgId', 'motherId', 'grandmotherId' , 'status']
             genParts = get_cmg_genParts_fromStruct(r,g_list)
             ####
-            get_matched_Jets(jets,genParts)
+            isrJets = get_matched_Jets(jets,genParts)
+            getISRWeight_new(s,isrJets)
             ####
             getISRWeight(s,genParts)
             fill_branch_WithJEC(s,r)

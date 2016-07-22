@@ -345,6 +345,32 @@ def getISRWeight(s,genParts):
   return
 
 
+def getISRWeight_new(s,isrJets):
+  weight_dict = [
+                {0:{"weight":1    ,"sys":1,"stat":1}},\
+                {1:{"weight":0.882,"sys":0.059,"stat":0.014}},\
+                {2:{"weight":0.792,"sys":0.104,"stat":0.020}},\
+                {3:{"weight":0.702,"sys":0.149,"stat":0.031}},\
+                {4:{"weight":0.648,"sys":0.176,"stat":0.051}},\
+                {5:{"weight":0.601,"sys":0.199,"stat":0.088}},\
+                {6:{"weight":0.515,"sys":0.242,"stat":0.133}},\
+                ]
+  s.nISRJets_new = len(isrJets)
+  if s.nISRJets_new < 6:
+      s.weight_ISR_new = weight_dict[s.nISRJets_new]["weight"]
+      s.ISRSigUp_stat_new = 1+weight_dict[s.nISRJets_new]["stat"]
+      s.ISRSigDown_stat_new = 1-weight_dict[s.nISRJets_new]["stat"] 
+      s.ISRSigUp_sys_new = 1+weight_dict[s.nISRJets_new]["sys"]
+      s.ISRSigDown_sys_new = 1-weight_dict[s.nISRJets_new]["sys"]
+  if s.nISRJets_new >= 6: 
+      s.weight_ISR_new      = weight_dict[6]["weight"]
+      s.ISRSigUp_stat_new   = 1+weight_dict[6]["stat"]
+      s.ISRSigDown_stat_new = 1-weight_dict[6]["stat"] 
+      s.ISRSigUp_sys_new    = 1+weight_dict[6]["sys"]
+      s.ISRSigDown_sys_new  = 1-weight_dict[6]["sys"]
+      
+  return
+
 
 def getGenWandLepton(c):
   genPartAll = [getObjDict(c, 'GenPart_', ['pt','eta','phi','mass','pdgId','motherId','motherIndex'], j) for j in range(int(c.GetLeaf('nGenPart').GetValue()))]
