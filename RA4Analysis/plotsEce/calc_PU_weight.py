@@ -36,10 +36,10 @@ mc_histo = file.Get("pileup")
 mc_histo.Scale(1/mc_histo.Integral())
 cb = ROOT.TCanvas("cb","cb",564,232,600,600)
 cb.cd()
-PU_var = ["67_7", "71_3", "74_9"]
+PU_var = ["59p85", "63", "66p15"]
 
 for var in PU_var:
-  data_f = ROOT.TFile("DataPileupHisto4fb_Run2016B_"+var+"mb.root")
+  data_f = ROOT.TFile("/afs/cern.ch/user/e/easilar/public/acdv/PU/DataPileupHisto7p7fb_Run2016B_"+var+"mb.root")
   h_data = data_f.Get("pileup")
   #h_data.Rebin(7)
   h_data.Scale(1/h_data.Integral())
