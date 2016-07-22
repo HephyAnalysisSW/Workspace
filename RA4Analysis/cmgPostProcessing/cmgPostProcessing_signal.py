@@ -72,7 +72,7 @@ histos_LS = {
 }
 #####################
 
-subDir = "postProcessing_Signals_v4"
+subDir = "postProcessing_Signals_v5"
 
 #branches to be kept for data and MC
 branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert",
@@ -112,6 +112,7 @@ parser.add_option("--leptonFastSim", dest="leptonFastSim", default = False, acti
 parser.add_option("--btagWeight", dest="btagWeight", default = 2, action="store", help="Max nBJet to calculate the b-tag weight for")
 parser.add_option("--hadronicLeg", dest="hadronicLeg", default = False, action="store_true", help="Use only the hadronic leg of the sample?")
 parser.add_option("--manScaleFactor", dest="manScaleFactor", default = 1, action="store", help="define a scale factor for the whole sample")
+parser.add_option("--gluMass", dest="gluMass", default = 1000, action="store", help="gluino mass")
 
 (options, args) = parser.parse_args()
 skimCond = "(1)"
@@ -159,9 +160,9 @@ def getTreeFromChunk(c, skimCond, iSplit, nSplit):
   del rf
   return t
        
-
-#pickleDir = '/data/'+username+'/Spring15/25ns/'
-pickleDir = '/afs/hephy.at/data/easilar01/Ra40b/pickleDir/T5qqqqWW_mass_nEvents_xsec_pkl'
+##gluino mass to be processed
+mglu = options.gluMass 
+pickleDir = '/afs/hephy.at/data/easilar01/Ra40b/pickleDir/T5qqqqWW_mass_nEvents_xsec_'+str(mglu)+'_pkl'
 
 exec('allSamples=['+options.allsamples+']')
 for isample, sample in enumerate(allSamples):
@@ -172,7 +173,7 @@ for isample, sample in enumerate(allSamples):
       skimCond = "Sum$(abs(GenPart_pdgId)==1000022&&abs(GenPart_motherId)==1000024&&abs(GenPart_grandmotherId)==1000021)==2&&(Sum$(abs(GenPart_pdgId)==24)==2)"
       mass_point = mass_dict[mglu][mlsp]
       skimCond += "&&GenSusyMGluino=="+str(mglu)+"&&GenSusyMNeutralino=="+str(mlsp)
-      outDir = options.targetDir+"/".join([common_skim, sample['name'],str(mglu)+"_"+str(mlsp)])
+      outDir = options.targetDir+"/".join([common_skim, 'SMS_T5qqqqVV_TuneCUETP8M1',str(mglu)+"_"+str(mlsp)])
       if os.path.exists(outDir) and os.listdir(outDir) != [] and not options.overwrite:
         print "Found non-empty directory: %s -> skipping!"%outDir
         continue
