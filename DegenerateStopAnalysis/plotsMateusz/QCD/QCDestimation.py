@@ -12,7 +12,7 @@ import Workspace.DegenerateStopAnalysis.toolsMateusz.ROOToptions
 from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.eleWPs import *
-from Workspace.DegenerateStopAnalysis.tools.degTools import Plots, getPlots, drawPlots, Yields, setup_style
+from Workspace.DegenerateStopAnalysis.tools.degTools import CutClass, Plots, getPlots, drawPlots, Yields, setup_style
 from Workspace.DegenerateStopAnalysis.tools.getSamples_8011 import getSamples
 from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesPostProcessed_mAODv2_2016 import cmgTuplesPostProcessed
 #from Workspace.DegenerateStopAnalysis.toolsMateusz.getSamples_analysisHephy_13TeV import getSamples
@@ -27,8 +27,8 @@ setup_style()
 #Input options
 parser = argparse.ArgumentParser(description = "Input options")
 parser.add_argument("--ABCD", dest = "ABCD",  help = "ABCD method", type = str, default = "4")
-parser.add_argument("--MET", dest = "MET",  help = "MET Cut", type = str, default = "200")
-parser.add_argument("--HT", dest = "HT",  help = "HT Cut", type = str, default = "200")
+parser.add_argument("--MET", dest = "MET",  help = "MET Cut", type = str, default = "300")
+parser.add_argument("--HT", dest = "HT",  help = "HT Cut", type = str, default = "300")
 parser.add_argument("--METloose", dest = "METloose",  help = "Loose MET Cut", type = str, default = "200")
 parser.add_argument("--eleWP", dest = "eleWP",  help = "Electron WP", type = str, default = "Veto")
 parser.add_argument("--removedCut", dest = "removedCut",  help = "Variable removed from electron ID", type = str, default = "None") #"sigmaEtaEta" "hOverE" "ooEmooP" "dEta" "dPhi" "d0" "dz" "MissingHits" "convVeto"
@@ -70,8 +70,8 @@ print makeDoubleLine()
 
 #Save
 if save: #web address: http://www.hephy.at/user/mzarucki/plots/
-   if removedCut == "None": savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/QCD/2016/ABCD/ABCD" + ABCD + "/estimation/" + eleWP 
-   else: savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/QCD/2016/ABCD/ABCD" + ABCD + "/estimation/" + eleWP + "_no_" + removedCut
+   if removedCut == "None": savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/QCD/ABCD/ABCD" + ABCD + "/estimation/" + eleWP 
+   else: savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/QCD/ABCD/ABCD" + ABCD + "/estimation/" + eleWP + "_no_" + removedCut
    if highWeightVeto: savedir += "/highWeightVeto" 
    if not os.path.exists(savedir): os.makedirs(savedir)
 
@@ -343,12 +343,13 @@ if estimation:
    QCD_IXA = {}
    QCDexp1 = {}
    QCDexp2 = {}
-      
-   if not os.path.isfile(savedir + "/QCDyields" + suffix + ".txt"):
-      outfile = open(savedir + "/QCDyields" + suffix + ".txt", "w")
-      outfile.write(eleWP + " Electron ID and Preselection of (MET, HT) > (" + METcut + "," + HTcut + ")\n")
-      if ABCD == "1" or ABCD == "4" or ABCD == "5": outfile.write("SR           IX_A                 XA_I                    IA_X                     IXA                       QCD                     MC                     Ratio\n".replace("X", Xs[ABCD]))
-      elif ABCD == "2" or ABCD == "3": outfile.write("SR           IX_A                 A_IX                     IXA                       QCD                     MC                     Ratio\n".replace("X", Xs[ABCD]))
+   
+   if save:   
+      if not os.path.isfile(savedir + "/QCDyields" + suffix + ".txt"):
+         outfile = open(savedir + "/QCDyields" + suffix + ".txt", "w")
+         outfile.write(eleWP + " Electron ID and Preselection of (MET, HT) > (" + METcut + "," + HTcut + ")\n")
+         if ABCD == "1" or ABCD == "4" or ABCD == "5": outfile.write("SR           IX_A                 XA_I                    IA_X                     IXA                       QCD                     MC                     Ratio\n".replace("X", Xs[ABCD]))
+         elif ABCD == "2" or ABCD == "3": outfile.write("SR           IX_A                 A_IX                     IXA                       QCD                     MC                     Ratio\n".replace("X", Xs[ABCD]))
    
    for reg in regions:
       yields[reg] = {}
@@ -427,8 +428,8 @@ if estimation:
 
 if plot:
    if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
-      if removedCut == "None": plotdir = "/afs/hephy.at/user/m/mzarucki/www/plots/QCD/2016/ABCD/ABCD" + ABCD + "/plots/" + eleWP
-      else: plotdir = "/afs/hephy.at/user/m/mzarucki/www/plots/QCD/2016/ABCD3/plots/" + eleWP + "_no_" + removedCut
+      if removedCut == "None": plotdir = "/afs/hephy.at/user/m/mzarucki/www/plots/QCD/ABCD/ABCD" + ABCD + "/plots/" + eleWP
+      else: plotdir = "/afs/hephy.at/user/m/mzarucki/www/plots/QCD/ABCD3/plots/" + eleWP + "_no_" + removedCut
     
       plotdir += "/" + plotReg
  
