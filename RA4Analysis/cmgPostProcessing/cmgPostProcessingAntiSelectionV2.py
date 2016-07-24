@@ -25,7 +25,7 @@ from btagEfficiency import *
 from readVetoEventList import *
 from systematics_helper import calc_btag_systematics, calc_LeptonScale_factors_and_systematics, calc_TopPt_Weights , calcDLDictionary, calc_diLep_contributions , fill_branch_WithJEC
 
-bTagEffFile = '/data/dspitzbart/Results2015/MCEff_skim_pkl'
+bTagEffFile     = '/data/dspitzbart/Spring16/btagEfficiency/effs_presel_JECv6_pkl'
 scaleFactorDir  = '$CMSSW_BASE/src/Workspace/RA4Analysis/cmgPostProcessing/data/'
 
 try:
@@ -41,7 +41,7 @@ separateBTagWeights = True
 defSampleStr = "TTJets_LO_HT600to800_25ns"
 
 #subDir = "postProcessed_Spring16_antiSelection_3fb_v2"
-subDir = "postProcessing_Run2016BC_JECv6_antiSelection"
+subDir = "postProcessing_Spring16_JECv6_approval_antiSelection"
 
 #branches to be kept for data and MC
 branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert",
@@ -149,21 +149,21 @@ if sys.argv[0].count('ipython'):
 
 ###For PU reweight###
 PU_dir = "/data/easilar/PU_Histos/"
-PU_File_66mb = ROOT.TFile(PU_dir+"/h_ratio_67p7.root")
-PU_File_70mb = ROOT.TFile(PU_dir+"/h_ratio_71p3.root")
-PU_File_74mb = ROOT.TFile(PU_dir+"/h_ratio_74p9.root")
-PU_histo_66 = PU_File_66mb.Get("puRatio")
-PU_histo_70 = PU_File_70mb.Get("puRatio")
-PU_histo_74 = PU_File_74mb.Get("puRatio")
+PU_File_59p85mb = ROOT.TFile(PU_dir+"/h_ratio_59p85.root")
+PU_File_63mb = ROOT.TFile(PU_dir+"/h_ratio_63.root")
+PU_File_66p15mb = ROOT.TFile(PU_dir+"/h_ratio_66p15.root")
+PU_histo_59p85 = PU_File_59p85mb.Get("h_ratio")
+PU_histo_63 = PU_File_63mb.Get("h_ratio")
+PU_histo_66p15 = PU_File_66p15mb.Get("h_ratio")
 #####################
 
 ###For Lepton SF#####
-mu_mediumID_File = ROOT.TFile(scaleFactorDir+'TnP_MuonID_NUM_MediumID_DENOM_generalTracks_VAR_map_pt_eta.root')
-mu_looseID_File = ROOT.TFile(scaleFactorDir+'TnP_MuonID_NUM_LooseID_DENOM_generalTracks_VAR_map_pt_eta.root')
+mu_mediumID_File  = ROOT.TFile(scaleFactorDir+'TnP_MuonID_NUM_MediumID_DENOM_generalTracks_VAR_map_pt_eta.root')
+mu_looseID_File   = ROOT.TFile(scaleFactorDir+'TnP_MuonID_NUM_LooseID_DENOM_generalTracks_VAR_map_pt_eta.root')
 mu_miniIso02_File = ROOT.TFile(scaleFactorDir+'TnP_MuonID_NUM_MiniIsoTight_DENOM_MediumID_VAR_map_pt_eta.root')
-mu_sip3d_File = ROOT.TFile(scaleFactorDir+'TnP_MuonID_NUM_TightIP3D_DENOM_MediumID_VAR_map_pt_eta.root')
-mu_HIP_File = FOOT.TFile(scaleFactorDir+'general_tracks_and_early_general_tracks_corr_ratio.root')
-ele_kin_File = ROOT.TFile(scaleFactorDir+'eleScaleFactors.root')
+mu_sip3d_File     = ROOT.TFile(scaleFactorDir+'TnP_MuonID_NUM_TightIP3D_DENOM_MediumID_VAR_map_pt_eta.root')
+mu_HIP_File       = ROOT.TFile(scaleFactorDir+'general_tracks_and_early_general_tracks_corr_ratio.root')
+ele_kin_File      = ROOT.TFile(scaleFactorDir+'eleScaleFactors.root')
 #
 histos_LS = {
 'mu_mediumID_histo':  mu_mediumID_File.Get("pt_abseta_PLOT_pair_probeMultiplicity_bin0"),\
@@ -337,10 +337,10 @@ for isample, sample in enumerate(allSamples):
           s.muonDataSet = False
           s.eleDataSet = False
           nTrueInt = t.GetLeaf('nTrueInt').GetValue()
-          s.puReweight_true = PU_histo_70.GetBinContent(PU_histo_70.FindBin(nTrueInt))
+          s.puReweight_true = PU_histo_63.GetBinContent(PU_histo_63.FindBin(nTrueInt))
           s.puReweight_true_max4 = min(4,s.puReweight_true)
-          s.puReweight_true_Down = PU_histo_66.GetBinContent(PU_histo_66.FindBin(nTrueInt))
-          s.puReweight_true_Up = PU_histo_74.GetBinContent(PU_histo_74.FindBin(nTrueInt))
+          s.puReweight_true_Down = PU_histo_59p85.GetBinContent(PU_histo_59p85.FindBin(nTrueInt))
+          s.puReweight_true_Up = PU_histo_66p15.GetBinContent(PU_histo_66p15.FindBin(nTrueInt))
 
           #if "TTJets" in sample["name"] :
           #  s.weight = lumiScaleFactor*genWeight
