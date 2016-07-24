@@ -46,12 +46,12 @@ defSampleStr = "SMS_T5qqqqVV_TuneCUETP8M1_v1"
 #PU_histo_70 = PU_File_70mb.Get("h_ratio_70")
 #PU_histo_74 = PU_File_74mb.Get("h_ratio_74")
 PU_dir = "/data/easilar/PU_Histos/"
-PU_File_67_7mb = ROOT.TFile(PU_dir+"/h_ratio_67_7.root")
-PU_File_71_3mb = ROOT.TFile(PU_dir+"/h_ratio_71_3.root")
-PU_File_74_9mb = ROOT.TFile(PU_dir+"/h_ratio_74_9.root")
-PU_histo_67_7 = PU_File_67_7mb.Get("h_ratio")
-PU_histo_71_3 = PU_File_71_3mb.Get("h_ratio")
-PU_histo_74_9 = PU_File_74_9mb.Get("h_ratio")
+PU_File_59p85mb = ROOT.TFile(PU_dir+"/h_ratio_59p85.root")
+PU_File_63mb = ROOT.TFile(PU_dir+"/h_ratio_63.root")
+PU_File_66p15mb = ROOT.TFile(PU_dir+"/h_ratio_66p15.root")
+PU_histo_59p85 = PU_File_59p85mb.Get("h_ratio")
+PU_histo_63 = PU_File_63mb.Get("h_ratio")
+PU_histo_66p15 = PU_File_66p15mb.Get("h_ratio")
 
 scaleFactorDir = '$CMSSW_BASE/src/Workspace/RA4Analysis/cmgPostProcessing/data/'
 
@@ -75,7 +75,7 @@ histos_LS = {
 }
 #####################
 
-subDir = "postProcessing_Signals_v7"
+subDir = "postProcessing_Signals_v8"
 
 #branches to be kept for data and MC
 branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert",
@@ -315,10 +315,10 @@ for isample, sample in enumerate(allSamples):
             s.eleDataSet = False
             s.weight =xsec_branch*lumiScaleFactor*genWeight
             nTrueInt = t.GetLeaf('nTrueInt').GetValue()
-            s.puReweight_true = PU_histo_71_3.GetBinContent(PU_histo_71_3.FindBin(nTrueInt))
+            s.puReweight_true = PU_histo_63.GetBinContent(PU_histo_63.FindBin(nTrueInt))
             s.puReweight_true_max4 = min(4,s.puReweight_true)
-            s.puReweight_true_Down = PU_histo_67_7.GetBinContent(PU_histo_67_7.FindBin(nTrueInt))
-            s.puReweight_true_Up = PU_histo_74_9.GetBinContent(PU_histo_74_9.FindBin(nTrueInt))
+            s.puReweight_true_Down = PU_histo_59p85.GetBinContent(PU_histo_59p85.FindBin(nTrueInt))
+            s.puReweight_true_Up = PU_histo_66p15.GetBinContent(PU_histo_66p15.FindBin(nTrueInt))
             ngenLep = t.GetLeaf('ngenLep').GetValue()
             ngenTau = t.GetLeaf('ngenTau').GetValue()
             if ("TTJets" in sample['dbsName']):
