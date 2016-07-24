@@ -21,7 +21,7 @@ can = ROOT.TCanvas('can','can',600,600)
 can.SetBottomMargin(0.22)
 
 #effs = pickle.load(file('/data/dspitzbart/Spring16/btagEfficiency/effs_presel_JECv6_pkl'))
-bTagEffFile = '/data/dspitzbart/Spring16/btagEfficiency/signal_inclusive_16_pkl'
+bTagEffFile = '/data/dspitzbart/Spring16/btagEfficiency/signal_inclusive_pkl'
 effs = pickle.load(file(bTagEffFile))
 
 #key = 'TTJets'

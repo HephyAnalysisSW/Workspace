@@ -11,9 +11,9 @@ python cmgPostProcessing.py --overwrite --calcbtagweights --skim="HT500ST250"  -
 python cmgPostProcessing.py --overwrite --calcbtagweights --skim="HT500ST250"  --samples=ST_tW_antitop_5f_inclusiveDecays
 python cmgPostProcessing.py --overwrite --calcbtagweights --skim="HT500ST250"  --samples=ST_tW_top_5f_inclusiveDecays
 
-python cmgPostProcessing.py --overwrite  --skim="HT500ST250"  --samples=DiBoson_WW
-python cmgPostProcessing.py --overwrite  --skim="HT500ST250"  --samples=DiBoson_WZ
-python cmgPostProcessing.py --overwrite  --skim="HT500ST250"  --samples=DiBoson_ZZ
+python cmgPostProcessing.py --overwrite --calcbtagweights  --skim="HT500ST250"  --samples=DiBoson_WW
+python cmgPostProcessing.py --overwrite --calcbtagweights  --skim="HT500ST250"  --samples=DiBoson_WZ
+python cmgPostProcessing.py --overwrite --calcbtagweights  --skim="HT500ST250"  --samples=DiBoson_ZZ
 
 #python cmgPostProcessing.py --overwrite  --calcbtagweights --skim="HT500ST250"  --samples=TTWJetsToLNu_25ns
 #python cmgPostProcessing.py --overwrite  --calcbtagweights --skim="HT500ST250"  --samples=TTWJetsToQQ_25ns
