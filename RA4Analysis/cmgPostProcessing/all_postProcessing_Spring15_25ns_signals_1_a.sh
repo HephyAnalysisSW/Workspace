@@ -15,21 +15,21 @@
 
 
 #python cmgPostProcessing_signal.py  --overwrite --samples=SMS_T5qqqqVV_TuneCUETP8M1_v1
-python cmgPostProcessing_signal.py  --overwrite --gluMass 2050 --samples=SMS_T5qqqqVV_TuneCUETP8M1_v1
-python cmgPostProcessing_signal.py  --overwrite --gluMass 900 --samples=SMS_T5qqqqVV_TuneCUETP8M1_v1
-python cmgPostProcessing_signal.py  --overwrite --gluMass 1800 --samples=SMS_T5qqqqVV_TuneCUETP8M1_v1
-python cmgPostProcessing_signal.py  --overwrite --gluMass 650 --samples=SMS_T5qqqqVV_TuneCUETP8M1_v1
-python cmgPostProcessing_signal.py  --overwrite --gluMass 1550 --samples=SMS_T5qqqqVV_TuneCUETP8M1_v1
-python cmgPostProcessing_signal.py  --overwrite --gluMass 1300 --samples=SMS_T5qqqqVV_TuneCUETP8M1_v1
-python cmgPostProcessing_signal.py  --overwrite --gluMass 2200 --samples=SMS_T5qqqqVV_TuneCUETP8M1_v1
-python cmgPostProcessing_signal.py  --overwrite --gluMass 1050 --samples=SMS_T5qqqqVV_TuneCUETP8M1_v1
-python cmgPostProcessing_signal.py  --overwrite --gluMass 1950 --samples=SMS_T5qqqqVV_TuneCUETP8M1_v1
-python cmgPostProcessing_signal.py  --overwrite --gluMass 800 --samples=SMS_T5qqqqVV_TuneCUETP8M1_v1
-python cmgPostProcessing_signal.py  --overwrite --gluMass 1700 --samples=SMS_T5qqqqVV_TuneCUETP8M1_v1
-python cmgPostProcessing_signal.py  --overwrite --gluMass 1450 --samples=SMS_T5qqqqVV_TuneCUETP8M1_v1
-python cmgPostProcessing_signal.py  --overwrite --gluMass 1200 --samples=SMS_T5qqqqVV_TuneCUETP8M1_v1
-python cmgPostProcessing_signal.py  --overwrite --gluMass 2100 --samples=SMS_T5qqqqVV_TuneCUETP8M1_v1
-python cmgPostProcessing_signal.py  --overwrite --gluMass 950 --samples=SMS_T5qqqqVV_TuneCUETP8M1_v1
+#python cmgPostProcessing_signal.py  --overwrite --gluMass 2050 --samples=SMS_T5qqqqVV_TuneCUETP8M1_v1
+#python cmgPostProcessing_signal.py  --overwrite --gluMass 900 --samples=SMS_T5qqqqVV_TuneCUETP8M1_v1
+#python cmgPostProcessing_signal.py  --overwrite --gluMass 1800 --samples=SMS_T5qqqqVV_TuneCUETP8M1_v1
+#python cmgPostProcessing_signal.py  --overwrite --gluMass 650 --samples=SMS_T5qqqqVV_TuneCUETP8M1_v1
+#python cmgPostProcessing_signal.py  --overwrite --gluMass 1550 --samples=SMS_T5qqqqVV_TuneCUETP8M1_v1
+#python cmgPostProcessing_signal.py  --overwrite --gluMass 1300 --samples=SMS_T5qqqqVV_TuneCUETP8M1_v1
+#python cmgPostProcessing_signal.py  --overwrite --gluMass 2200 --samples=SMS_T5qqqqVV_TuneCUETP8M1_v1
+#python cmgPostProcessing_signal.py  --overwrite --gluMass 1050 --samples=SMS_T5qqqqVV_TuneCUETP8M1_v1
+#python cmgPostProcessing_signal.py  --overwrite --gluMass 1950 --samples=SMS_T5qqqqVV_TuneCUETP8M1_v1
+#python cmgPostProcessing_signal.py  --overwrite --gluMass 800 --samples=SMS_T5qqqqVV_TuneCUETP8M1_v1
+#python cmgPostProcessing_signal.py  --overwrite --gluMass 1700 --samples=SMS_T5qqqqVV_TuneCUETP8M1_v1
+#python cmgPostProcessing_signal.py  --overwrite --gluMass 1450 --samples=SMS_T5qqqqVV_TuneCUETP8M1_v1
+#python cmgPostProcessing_signal.py  --overwrite --gluMass 1200 --samples=SMS_T5qqqqVV_TuneCUETP8M1_v1
+#python cmgPostProcessing_signal.py  --overwrite --gluMass 2100 --samples=SMS_T5qqqqVV_TuneCUETP8M1_v1
+python cmgPostProcessing_signal.py  --overwrite --calcbtagweights --gluMass 950 --samples=SMS_T5qqqqVV_TuneCUETP8M1_v1
 #python cmgPostProcessing_signal.py  --overwrite --gluMass 1850 --samples=SMS_T5qqqqVV_TuneCUETP8M1_v1
 #python cmgPostProcessing_signal.py  --overwrite --gluMass 700 --samples=SMS_T5qqqqVV_TuneCUETP8M1_v1
 #python cmgPostProcessing_signal.py  --overwrite --gluMass 1600 --samples=SMS_T5qqqqVV_TuneCUETP8M1_v1

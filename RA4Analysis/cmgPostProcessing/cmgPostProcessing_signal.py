@@ -20,8 +20,8 @@ from systematics_helper import calc_btag_systematics, calc_LeptonScale_factors_a
 from btagEfficiency import *
 from leptonFastSimSF import leptonFastSimSF as leptonFastSimSF_
 
-#bTagEffFile = '/data/dspitzbart/Results2015/MCEff_skim_pkl'
-bTagEffFile = '/data/dspitzbart/Results2016/MCEff_skim_signal_pkl'
+bTagEffFile     = '/data/dspitzbart/Spring16/btagEfficiency/signal_inclusive_pkl'
+scaleFactorDir  = '$CMSSW_BASE/src/Workspace/RA4Analysis/cmgPostProcessing/data/'
 
 try:
   mcEffDict = pickle.load(file(bTagEffFile))
@@ -33,7 +33,7 @@ target_lumi = 3000 #pb-1
 
 #maxConsideredBTagWeight = 2
 #calcSystematics = True
-separateBTagWeights = False
+separateBTagWeights = True
 
 defSampleStr = "SMS_T5qqqqVV_TuneCUETP8M1_v1"
 
@@ -53,16 +53,15 @@ PU_histo_59p85 = PU_File_59p85mb.Get("h_ratio")
 PU_histo_63 = PU_File_63mb.Get("h_ratio")
 PU_histo_66p15 = PU_File_66p15mb.Get("h_ratio")
 
-scaleFactorDir = '$CMSSW_BASE/src/Workspace/RA4Analysis/cmgPostProcessing/data/'
 
 #####################
 ###For Lepton SF#####
-mu_mediumID_File = ROOT.TFile("/data/easilar/SF2015/TnP_MuonID_NUM_MediumID_DENOM_generalTracks_VAR_map_pt_eta.root")
-mu_looseID_File = ROOT.TFile("/data/easilar/SF2015/TnP_MuonID_NUM_LooseID_DENOM_generalTracks_VAR_map_pt_eta-2.root")
+mu_mediumID_File  = ROOT.TFile("/data/easilar/SF2015/TnP_MuonID_NUM_MediumID_DENOM_generalTracks_VAR_map_pt_eta.root")
+mu_looseID_File   = ROOT.TFile("/data/easilar/SF2015/TnP_MuonID_NUM_LooseID_DENOM_generalTracks_VAR_map_pt_eta-2.root")
 mu_miniIso02_File = ROOT.TFile("/data/easilar/SF2015/TnP_MuonID_NUM_MiniIsoTight_DENOM_LooseID_VAR_map_pt_eta.root")
-mu_sip3d_File = ROOT.TFile("/data/easilar/SF2015/TnP_MuonID_NUM_TightIP3D_DENOM_LooseID_VAR_map_pt_eta.root")
-ele_kin_File = ROOT.TFile("/data/easilar/SF2015/kinematicBinSFele.root")
-mu_HIP_File = ROOT.TFile(scaleFactorDir+'general_tracks_and_early_general_tracks_corr_ratio.root')
+mu_sip3d_File     = ROOT.TFile("/data/easilar/SF2015/TnP_MuonID_NUM_TightIP3D_DENOM_LooseID_VAR_map_pt_eta.root")
+ele_kin_File      = ROOT.TFile("/data/easilar/SF2015/kinematicBinSFele.root")
+mu_HIP_File       = ROOT.TFile(scaleFactorDir+'general_tracks_and_early_general_tracks_corr_ratio.root')
 #
 histos_LS = {
 'mu_mediumID_histo':  mu_mediumID_File.Get("pt_abseta_PLOT_pair_probeMultiplicity_bin0_&_tag_combRelIsoPF04dBeta_bin0_&_tag_pt_bin0_&_tag_IsoMu20_pass"),\
@@ -197,14 +196,14 @@ for isample, sample in enumerate(allSamples):
       branchKeepStrings = branchKeepStrings_DATAMC + branchKeepStrings_MC
     if ("T5qqqqVV" in sample['name']) : lumiScaleFactor = mass_point["xSec"]*target_lumi/mass_point["nEntry"]  
     
-    sampleKey = ''
-    if sample["name"] in mcEffDict.keys():
-      sampleKey = sample["name"]
-      print '##########################################'
-      print '# Found MC truth efficiencies dictionary #'
-      print '##########################################'
-      print sample["name"]
-    else: sampleKey = 'none'
+    sampleKey = 'signal_inclusive'
+    #if sample["name"] in mcEffDict.keys():
+    #  sampleKey = sample["name"]
+    #  print '##########################################'
+    #  print '# Found MC truth efficiencies dictionary #'
+    #  print '##########################################'
+    #  print sample["name"]
+    #else: sampleKey = 'none'
     
     readVariables = ['met_pt/F', 'met_phi/F', 'met_eta/F','met_mass/F' ,'nVert/I']
     newVariables = ['weight/F','muonDataSet/I','eleDataSet/I']

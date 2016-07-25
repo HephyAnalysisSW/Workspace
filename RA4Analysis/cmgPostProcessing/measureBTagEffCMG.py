@@ -13,7 +13,7 @@ from Workspace.HEPHYPythonTools.helpers import *
 #from Workspace.RA4Analysis.cmgTuples_Data25ns_PromptRecoV2 import *
 from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2 import *
 #from systematics_helper import calc_btag_systematics, calc_LeptonScale_factors_and_systematics, calc_TopPt_Weights , calcDLDictionary, calc_diLep_contributions ,  fill_branch_WithJEC , getGenWandLepton , getGenTopWLepton
-#from btagEfficiency import *
+from btagEfficiency import *
 #from readVetoEventList import *
 import time, hashlib
 
@@ -81,7 +81,9 @@ btagStr = 'Sum$(Jet_pt>30&&abs(Jet_eta)<2.4&&Jet_id&&Jet_btagCSV>0.800)'
 njetStr = 'Sum$(Jet_pt>30&&abs(Jet_eta)<2.4&&Jet_id)'
 cut_WW = "Sum$(abs(GenPart_pdgId)==1000022&&abs(GenPart_motherId)==1000024&&abs(GenPart_grandmotherId)==1000021)==2&&(Sum$(abs(GenPart_pdgId)==24)==2)"
 
-presel = singleLeptonic+'&&'+leptonVeto+'&&'+njetStr+'>2&&'+stStr+'>250&&'+htStr+'>500&&Jet_pt[1]>80&&'+cut_WW
+#presel = singleLeptonic+'&&'+leptonVeto+'&&'+njetStr+'>2&&'+stStr+'>250&&'+htStr+'>500&&Jet_pt[1]>80&&'+cut_WW
+presel = njetStr+'>0&&'+stStr+'>0&&'+htStr+'>0'
+
 
 mcpresel = 'singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&Jet_pt[1]>80&&st>250&&nJet30>2&&htJet30j>500'
 mcpresel = 'singleLeptonic&&nLooseHardLeptons==1&&Jet_pt[1]>80&&st>250&&nJet30>2&&htJet30j>500'
@@ -93,6 +95,7 @@ allChunks = chunks1+chunks2
 
 cSignal = getChain(allChunks, histname='', treeName='tree')
 
+#cSignal = getChain(chunks1[0:100], histname='', treeName='tree')
 
 #massPoints = pickle.load(file('/afs/hephy.at/data/easilar01/Ra40b/pickleDir/T5qqqqWW_mass_nEvents_xsec_pkl'))
 #
@@ -114,10 +117,11 @@ cSignal = getChain(allChunks, histname='', treeName='tree')
 #    if dM < (massPoint[0]-massPoint[1]): break
 #  massPointDict[dM].append(massPoint)
 
-debug = True
+debug = False
 
-binBorders = [0,200,400,600,800,1000]
-if debug: binBorders = [0,5]
+binBorders = [0,1000000]
+#binBorders = [0,100000]
+#if debug: binBorders = [0,5]
 bins = []
 
 for i,b in enumerate(binBorders):
@@ -135,9 +139,22 @@ for i,b in enumerate(bins):
   if b[1]>0: massWindowCut += '&&(GenSusyMGluino-GenSusyMNeutralino)<'+str(b[1])
   cut = presel + '&&' + massWindowCut
   print 'Using this mass window cut',massWindowCut
+  #print cut
   effs[b] = getBTagMCTruthEfficiencies2D(cSignal, cut = cut)
-  if debug:
-    if i>0: break
+  pickle.dump(effs, file('/data/dspitzbart/Spring16/btagEfficiency/FS_intermediate_pkl','w'))
+  print effs[b]
+  #if debug:
+  #  if i>0: break
     
 
+pickle.dump(effs, file('/data/dspitzbart/Spring16/btagEfficiency/FS_full_pkl','w'))
 
+#effs_update = {}
+#for b in enumerate(bins):
+#  newKey = 'Signal_deltaM_'
+#  newKey += str(b[0])
+#  if b[1]>0: newKey += 'to'+str(b[1])
+#  else: newKey += 'plus'
+#  effs_update[newKey] = effs[b]
+#
+#pickle.dump(effs_update, file('/data/dspitzbart/Spring16/btagEfficiency/FS_full_pkl','w'))
