@@ -2439,10 +2439,8 @@ def cmgPostProcessing(argv=None):
         sample_cmgName = sample['cmgName']
         sample_name = sample['name']
         
-        isDataSample = sample.get('isData', False)
-        isFastSimSample = sample.get('isFastSim', False)
-
-        sampleType = 'Data' if isDataSample else ('MC Fast Simulation' if isFastSimSample else 'MC Full Simulation')
+        isDataSample = True if sample['isData'] else False
+        sampleType = 'Data' if isDataSample else 'MC'
                               
         logger.info(
             "\n Running on CMG sample component %s of type %s \n",
