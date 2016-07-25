@@ -21,7 +21,8 @@ lumis = {
             #'lumi_data_blinded':2245.386, 
             #'lumi_data_unblinded':139.63,
             'target_lumi'           :   4000.   ,   
-            'DataBlind_lumi'      :   4320.0    , 
+            #'DataBlind_lumi'      :   4320.0    , 
+            'DataBlind_lumi'      :   7755.    , 
             'DataUnblind_lumi'    :   804.2   ,
         }
 
@@ -144,7 +145,7 @@ def getSamples( wtau  = False, sampleList=['w','tt','z','sig'],
           METDataUnblind  = MET.CopyTree("run<=274240")
           sampleDict.update( {
               "d":              {'tree':METDataUnblind       ,"sample":cmgPP.MET_v2[skim]   ,'name':"DataUnblind"      , 'color':ROOT.kBlack             , 'isSignal':0 ,'isData':1    ,"triggers":data_triggers   ,"filters":data_filters    ,'lumi': lumi_data_unblinded  },
-              "dblind":         {       "sample":cmgPP.MET_v2[skim]      ,'name':"DataBlind" , 'color':ROOT.kBlack          , 'isSignal':0 ,'isData':1              ,"triggers":data_triggers   ,"filters":data_filters    ,'lumi': lumi_data_blinded  },
+              "dblind":         {                             "sample":cmgPP.MET_v2[skim]   ,'name':"DataBlind" , 'color':ROOT.kBlack          , 'isSignal':0 ,'isData':1              ,"triggers":data_triggers   ,"filters":data_filters    ,'lumi': lumi_data_blinded  },
                 })
         else:
             assert False
@@ -237,7 +238,7 @@ def getSamples( wtau  = False, sampleList=['w','tt','z','sig'],
     samples = Samples(**sampleDict2)
     for samp_name, sample in samples.iteritems():
         if not sample.isData:
-            sample.filter = mc_filters
+            sample.filters = mc_filters
 
 
     return samples
