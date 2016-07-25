@@ -59,9 +59,10 @@ def calc_LeptonScale_factors_and_systematics(s,histos_LS):
   mu_looseID_histo    = histos_LS['mu_looseID_histo']
   mu_miniIso02_histo  = histos_LS['mu_miniIso02_histo']
   mu_sip3d_histo      = histos_LS['mu_sip3d_histo']
+  mu_HIP_histo        = histos_LS['mu_HIP_histo']
   ele_cutbased_histo  = histos_LS['ele_cutbased_histo']
   ele_miniIso01_histo = histos_LS['ele_miniIso01_histo']
-  mu_HIP_histo        = histos_LS['mu_HIP_histo']
+  ele_gsf_histo       = histos_LS['ele_gsf_histo']
   if s.singleMuonic and s.leptonPt<120:
     s.lepton_muSF_mediumID      = mu_mediumID_histo.GetBinContent(mu_mediumID_histo.FindBin(s.leptonPt,abs(s.leptonEta)))
     s.lepton_muSF_looseID       = mu_looseID_histo.GetBinContent(mu_looseID_histo.FindBin(s.leptonPt,abs(s.leptonEta)))
@@ -86,6 +87,7 @@ def calc_LeptonScale_factors_and_systematics(s,histos_LS):
   if s.singleElectronic:
     s.lepton_eleSF_cutbasedID     = ele_cutbased_histo.GetBinContent(ele_cutbased_histo.FindBin(s.leptonEt,abs(s.leptonEta)))      
     s.lepton_eleSF_miniIso01      = ele_miniIso01_histo.GetBinContent(ele_miniIso01_histo.FindBin(s.leptonEt,abs(s.leptonEta)))
+    s.lepton_eleSF_gsf            = ele_gsf_histo.GetBinContent(ele_gsf_histo.FindBin(s.leptonEta,100)) ##pt independent
     s.lepton_eleSF_cutbasedID_err = ele_cutbased_histo.GetBinError(ele_cutbased_histo.FindBin(s.leptonEt,abs(s.leptonEta)))
     s.lepton_eleSF_miniIso01_err  = ele_miniIso01_histo.GetBinError(ele_miniIso01_histo.FindBin(s.leptonEt,abs(s.leptonEta)))
   return
