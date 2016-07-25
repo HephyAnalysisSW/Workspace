@@ -2438,8 +2438,10 @@ def cmgPostProcessing(argv=None):
         sample_cmgName = sample['cmgName']
         sample_name = sample['name']
         
-        isDataSample = True if sample['isData'] else False
-        sampleType = 'Data' if isDataSample else 'MC'
+        isDataSample = sample.get('isData', False)
+        isFastSimSample = sample.get('isFastSim', False)
+
+        sampleType = 'Data' if isDataSample else ('MC Fast Simulation' if isFastSimSample else 'MC Full Simulation')
                               
         logger.info(
             "\n Running on CMG sample component %s of type %s \n",
@@ -2522,12 +2524,12 @@ def cmgPostProcessing(argv=None):
                     pass
                 else:
 
-                    logger.error(
+                    logger.info(
                         ''.join([
                             "\n Requested sample directory \n %s \n exists", 
                             "\n  overwriteOutputDir is set to False",
                             "\n  overwriteOutputFiles is set to False",
-                            "\n if root files for this chunk range exist, skip post-processing sample %s \n"
+                            "\n if root files for this chunk range exist, skip post-processing sample \n %s \n"
                             ]),
                         outputWriteDirectory, sample_name
                         )
@@ -2547,7 +2549,7 @@ def cmgPostProcessing(argv=None):
 
         logger.info(
             ''.join([
-                "\n Sample %s of type %s has ",
+                "\n Sample %s of type %s has in total",
                 "\n   number of chunks: %i",
                 "\n   chunk index range: %i - %i \n",
                 "\n   sampleSumWeight: %s \n",
@@ -2584,7 +2586,7 @@ def cmgPostProcessing(argv=None):
                 "\n   actual number of chunks: %i",
                 "\n"
                 ]),
-                len(selectedChunks), chunkRange[0], chunkRange[-1]
+                chunkRange[0], chunkRange[-1], len(selectedChunks) 
             )
         logger.debug(
             "\n Chunks selected to run over in this job: \n\n %s \n\n Selected chunk indices: \n %s \n",
@@ -2618,21 +2620,20 @@ def cmgPostProcessing(argv=None):
                     outputWriteDirectory, pprint.pformat(filelist_root)
                     )
             else:
-                logger.error(
-                    ''.join([
-                        "\n The following files, corresponding to the same chunk range,", 
-                        " exist in the directory \n %s: \n\n",
-                        "%s \n", 
-                        " and overwriteOutputFiles is set to False.",
-                        "\n Skip post-processing sample %s \n"
-                        ]), 
-                    outputWriteDirectory, pprint.pformat(filelist_root), sample_name
-                    )
+                if filelist_root:
+                    logger.error(
+                        ''.join([
+                            "\n The following files, corresponding to the same chunk range,", 
+                            " exist in the directory \n %s: \n\n",
+                            "%s \n", 
+                            " and overwriteOutputFiles is set to False.",
+                            "\n Skip post-processing sample %s \n"
+                            ]), 
+                        outputWriteDirectory, pprint.pformat(filelist_root), sample_name
+                        )
                 
-                continue
+                    continue
         
-        sys.exit()
-
         # sum all the weights for samples having extended datasets
         
         sumWeight = 0.
