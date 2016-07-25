@@ -12,6 +12,8 @@ import tempfile
 import math
 import collections
 import operator
+import time
+import shutil
 
 # imports user modules or functions
 
@@ -563,5 +565,30 @@ def evalCutOperator(quantityValue, operatorDef):
         opResult = opCut(quantityValue, varCut)
         
     return opResult
+
+
+def getChunkIndex(sample, chunks):
+    ''' Return a list of indices for a list of chunks of a given sample.
+    
+    '''
+
+    chunkIndex = []
+
+    chunkFullString = ''.join([sample['chunkString'], '_Chunk_'])
+
+    for chunk in chunks:
+        chunkIndexStr = chunk['name'].replace(chunkFullString, '')
+        try:
+            idx = int(chunkIndexStr)
+            chunkIndex.append(idx)
+        except ValueError:
+            print "\n Sample: %s ".format(sample['name'])
+            print "\n Unable to convert string %s to integer for chunk %s \n".format(chunkIndexStr, chunk)
+            return None
+
+    # sort the indices
+    chunkIndexSorted = sorted(chunkIndex, key=int)
+
+    return chunkIndexSorted
 
     
