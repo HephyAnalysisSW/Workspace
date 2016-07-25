@@ -199,7 +199,8 @@ def getParameterSet(args):
     JetSel = {
         'branchPrefix': 'Jet',
         'branches': [
-            'pt/F', 'eta/F', 'phi/F', 'id/I','btagCSV/F', 'mass/F' ,
+            'pt/F', 'eta/F', 'phi/F', 'id/I','btagCSV/F', 'mass/F' , 'chHEF/F',
+            'hadronFlavour/I',
             ],
         'nMax': 25,
         'bas': {
@@ -302,7 +303,7 @@ def getParameterSet(args):
     Veto_fastSimJets_recoJet = {
         'branchPrefix': 'Jet',
         'branches': [
-            'pt/F', 'eta/F', 'phi/F', 'id/I','btagCSV/F', 'mass/F', 
+            'pt/F', 'eta/F', 'phi/F', 'id/I','btagCSV/F', 'mass/F', 'chHEF',
             ],
         'nMax': 25,
         'recoJet': {
