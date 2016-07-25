@@ -6,6 +6,8 @@ import numpy as np
 import glob
 import jinja2
 import pprint as pp
+import time
+import hashlib
 from copy import deepcopy
 
 from Workspace.HEPHYPythonTools.user import username
@@ -122,6 +124,24 @@ def matchListToDictKeys(List,Dict):
         List.pop(List.index(l))
   return List
 
+
+import collections # requires Python 2.7 -- see note below if you're using an earlier version
+def merge_dict(d1, d2):
+    """
+    Modifies d1 in-place to contain values from d2.  If any value
+    in d1 is a dictionary (or dict-like), *and* the corresponding
+    value in d2 is also a dictionary, then merge them in-place.
+    stolen from: http://stackoverflow.com/questions/10703858/python-merge-multi-level-dictionaries
+    """
+    for k,v2 in d2.items():
+        v1 = d1.get(k) # returns None if v1 has no value for this key
+        if ( isinstance(v1, collections.Mapping) and 
+             isinstance(v2, collections.Mapping) ):
+            merge_dict(v1, v2)
+        else:
+            d1[k] = v2
+
+
 def getTerminalSize():
     """
     stolen from the consule module
@@ -154,6 +174,13 @@ def getTerminalSize():
         #except:
         #    cr = (25, 80)
     return int(cr[1]), int(cr[0])
+
+
+
+def uniqueHash():
+    return hashlib.md5("%s"%time.time()).hexdigest()    
+
+
 
 def get_index(string,by, strict = True):
     if strict:
@@ -236,7 +263,6 @@ class ArgParser(argparse.ArgumentParser):
 ##########################################    EVENT LISTS     ###############################################
 ##########################################                    ###############################################
 #############################################################################################################
-import hashlib
 
 
 def setMVASampleEventList(samples, sample, killTrain = False):
@@ -306,7 +332,7 @@ def setEventListToChains(samples,sampleList,cutInst,verbose=True,opt="read"):
       if not sample in samples.keys(): 
         print "Sample %s not in samples.keys()"%sample
         continue
-        
+      cutString = decide_cut( samples[sample], cutInst, plot=None, nMinus1=None  )
       eListName="eList_%s_%s"%(sample,cutName)
       stringsToBeHashed = [] 
       if samples[sample].has_key("dir"):
@@ -453,10 +479,10 @@ def getGoodPlotFromChain(c, var, binning,varName='', cutString='(1)', weight='we
   return ret
 
 def getStackFromHists(histList,sName=None,scale=None, normalize=False, transparency=False):
-  if sName:
-    stk=ROOT.THStack(sName,sName)
-  else:
-    stk=ROOT.THStack()
+  print "::::::::::::::::::::::::::::::::::::::::::: GETTIN STACKS" , sName
+  if not sName:
+    sName = "stack_%s"%uniqueHash()
+  stk=ROOT.THStack(sName,sName)
 
   if transparency:
     alphaBase=0.80
@@ -504,7 +530,29 @@ def getSamplePlots(samples,plots,cut,sampleList=[],plotList=[],plots_first = Fal
                 hists[samp][p]= samples[samp]['cuts'][cut_name][p]
     return hists
 
-def getBkgSigStacks(samples, plots, cut, sampleList=[],plotList=[], normalize=False, transparency=None):
+def getSamplePlotsInfo(samples,plots,cut,sampleList=[],plotList=[],plots_first = False):
+    cut_name = cut if type(cut) == type("") else cut.fullName
+    if not sampleList: sampleList= samples.keys()
+    bkgList=[samp for samp in sampleList if not samples[samp]['isSignal'] and not samples[samp]['isData'] ]
+    dataList = [samp for samp in sampleList if samples[samp]['isData'] ]
+    sigList=[samp for samp in sampleList if samples[samp]['isSignal'] ]
+    if not plotList: plotList=plots.keys()
+    hists={}
+    if plots_first:
+        for p in plotList:
+            hists[p]={}
+            for samp in sampleList:
+                hists[p][samp]= getattr( samples[samp]['cuts'][cut_name][p], "plot_info", {} )
+    else:
+        for samp in sampleList:
+            hists[samp]={}
+            for p in plotList:
+                hists[samp][p]= getattr( samples[samp]['cuts'][cut_name][p], "plot_info", {})
+    return hists
+
+
+
+def getBkgSigStacks(samples, plots, cut, sampleList=[],plotList=[], normalize=False, transparency=None, sName=None):
     """Get stacks for signal and backgrounds. make vars in varlist are available in samples. no stacks for 2d histograms.     """
     cut_name = cut if type(cut) == type("") else cut.fullName
 
@@ -517,46 +565,34 @@ def getBkgSigStacks(samples, plots, cut, sampleList=[],plotList=[], normalize=Fa
     sigStackDict={}
     dataStackDict={}
     for v in plotList:
+        sName_plot = sName + "_%s"%v if sName else None
         if len(plots[v]['bins'])!=6:
-            bkgStackDict[v]= getStackFromHists([ samples[samp]['cuts'][cut_name][v] for samp in sampleList if not samples[samp]['isSignal'] and not samples[samp]['isData']], normalize=normalize, transparency=transparency)
-            sigStackDict[v]= getStackFromHists([ samples[samp]['cuts'][cut_name][v] for samp in sampleList if samples[samp]['isSignal']], normalize=normalize, transparency=False)
-            dataStackDict[v]=getStackFromHists([ samples[samp]['cuts'][cut_name][v] for samp in sampleList if samples[samp]['isData']], normalize=normalize, transparency=False)
+            bkgStackDict[v]= getStackFromHists([ samples[samp]['cuts'][cut_name][v] for samp in sampleList if not samples[samp]['isSignal'] and not samples[samp]['isData']], normalize=normalize, transparency=transparency, sName= "stack_bkg_" + sName_plot)
+            sigStackDict[v]= getStackFromHists([ samples[samp]['cuts'][cut_name][v] for samp in sampleList if samples[samp]['isSignal']], normalize=normalize, transparency=False, sName= "stack_sig_" + sName_plot)
+            dataStackDict[v]=getStackFromHists([ samples[samp]['cuts'][cut_name][v] for samp in sampleList if samples[samp]['isData']], normalize=normalize, transparency=False, sName= "stack_data_" + sName_plot)
     return {'bkg': bkgStackDict,'sig': sigStackDict, 'data': dataStackDict}
   
-def getPlot(sample,plot,cut,weight="(weight)", nMinus1="",cutStr="",addOverFlowBin=''):
+def getPlot(sample,plot,cut,weight="", nMinus1="",cutStr="",addOverFlowBin='', lumi='target_lumi', verbose= False):
+    plot_info = {}
     c     = sample.tree
     var = plot.var
-    if nMinus1:
-        cutString = cut.nMinus1(nMinus1)
-    else:
-        cutString = cut.combined
-    if cutStr:
-        cutString += "&&(%s)"%cutStr
-    warn=False
-    if hasattr(sample,"triggers") and sample['triggers']:
-        cutString += "&&(%s)"%sample['triggers'] 
-        warn = True
-    if hasattr(sample,"filters") and sample['filters']:
-        cutString += "&&(%s)"%sample['filters'] 
-        warn = True
-    if warn:
-        print "-----"*10 , sample.name
-        print "-----"*20
-        print "Applying Triggers: %s"%sample['triggers']
-        print "Applying Filters: %s"%sample['filters']
-        print "-----"*20
-        print "-----"*20
+    cut_str, weight_str = decide_cut_weight( sample, cutInst = cut , weight=weight,  lumi=lumi, plot=plot, nMinus1=nMinus1 ,  )
+    plot_info = {'cut':cut_str, 'weight':weight_str}
 
-    if weight:
-        w = weight
-    else:
-        print "No Weight is being applied"
-        w = "(1)"
+    if verbose: 
+        print "\n  Using Weight:            %s "%(weight_str)
+        print "\n  And Cut:                 %s"%cut_str
+
     binningIsExplicit= False
     if not len(plot.bins) in [3,6]:
         if hasattr(plot, "binningIsExplicit"):
             binningIsExplicit = plot.binningIsExplicit
-    hist = getPlotFromChain(sample.tree,plot.var,plot.bins,cutString,weight=w, addOverFlowBin=addOverFlowBin, binningIsExplicit=binningIsExplicit)
+    if type(var) == type(""):
+        hist = getPlotFromChain(sample.tree,plot.var,plot.bins,cut_str,weight=weight_str, addOverFlowBin=addOverFlowBin, binningIsExplicit=binningIsExplicit)
+    elif hasattr(var, "__call__"):
+        hist = var( sample , bins = plot.bins, cutString=cut_str, weight=weight_str, addOverFlowBin=addOverFlowBin, binningIsExplicit=binningIsExplicit)
+    else:
+        raise Exception("I'm not sure what this variable is! %s"%var)
     #plot.decorHistFunc(p)
     decorHist(sample,cut,hist,plot.decor) 
     plotName=plot.name + "_"+ cut.fullName
@@ -566,19 +602,22 @@ def getPlot(sample,plot,cut,weight="(weight)", nMinus1="",cutStr="",addOverFlowB
     if not sample.cuts.has_key(cut.fullName):
         sample.cuts[cut.fullName]=Dict()
     sample.cuts[cut.fullName][plot.name]=hist
+    hist.plot_info = plot_info
+    return { "%s_%s"%(sample.name,plotName) : plot_info }
 
 def getPlotsSimple(samples,plots,cut):
   for sample in samples.itervalues():
     for plot in plots.itervalues():
       getPlot(sample,plot,cut)
 
-def getPlots(samples,plots,cut,sampleList=[],plotList=[],weight="(weight)",nMinus1="", addOverFlowBin='',verbose=True):
+
+def getPlots(samples,plots,cut,sampleList=[],plotList=[],weight="",nMinus1="", addOverFlowBin='',verbose=True):
     if verbose:print "Getting Plots: "
 
     sigList, bkgList, dataList = getSigBkgDataLists(samples, sampleList=sampleList)
     isDataPlot = bool(len(dataList))
     if isDataPlot:
-       if "Blind" in samples[dataList[0]].name and "sr" in cut.fullName:
+       if "Blind" in samples[dataList[0]].name and "sr" in cut.fullName.lower():
            raise Exception("NO DATA IN SIGNAL REGION: %s"%[dataList, cut.fullName])
 
        if "DataBlind" in samples[dataList[0]].name: lumi_weight = "DataBlind_lumi"
@@ -598,38 +637,15 @@ def getPlots(samples,plots,cut,sampleList=[],plotList=[],weight="(weight)",nMinu
         if not sample in sampleList:
             continue
         if verbose: print "========= Sample:" , samples[sample].name, 
-        #weight_str = decide_weight(samples[sample], weight)
-        #weight_str = decide_weight2(samples[sample] , cut=cut.fullName, lumi=lumi_weight)
-        weight_str = decide_weight2(samples[sample] , cut=cut.combined, lumi=lumi_weight)
-        if verbose: 
-            print "  Using Weight: %s"%(weight_str)
-            print "    lumi: ", lumi_weight
-            if samples[sample].isData:
-                print "-----"*10 , samples[sample].name
-                print "-----"*20
-                print "Applying Triggers: %s"%samples[sample]['triggers']
-                print "Applying Filters: %s"%samples[sample]['filters']
-                print "-----"*20
-                print "-----"*20
-
+        #weight_str = decide_weight2(samples[sample] , cut=cut.combined, lumi=lumi_weight)
+        #cut_str , weight_str = decide_cut_weight(samples[sample] , cut=cut.combined, lumi=lumi_weight)
         plotList = plotList if plotList else plots.keys()
-
         for plot in plotList:
             if plot not in plots.keys():
                 print "Ignoring %s .... not in the Plot Dictionary"%plot
                 continue    
-            
-            cutStr = plots[plot]['cut']  if plots[plot].has_key("cut") and plots[plot]['cut'] else ''
-            if hasattr(samples[sample], 'cut'):
-                cutStr = "({pltCut} {sampleCut})".format(pltCut="%s"%(cutStr +"&&" if cutStr else "") , sampleCut = samples[sample].cut )          ## For cuts specific to a sample
-            if cutStr: print "        ---applying cutString:", cutStr
+            getPlot(samples[sample],plots[plot],cut  , weight = weight , nMinus1=nMinus1,addOverFlowBin=addOverFlowBin, lumi=lumi_weight, verbose = verbose)
 
-            #if verbose: print " "*15, plot
-            if nMinus1:
-                nMinus1String = nMinus1
-                #nMinus1String = plots[plot]["nMinus1"] if plots[plot].has_key("nMinus1") else nMinus1
-            else: nMinus1String=""
-            getPlot(samples[sample],plots[plot],cut,weight=weight_str,nMinus1=nMinus1String,cutStr=cutStr,addOverFlowBin=addOverFlowBin)
           
 def getSigBkgDataLists ( samples, sampleList):
     sigList=[samp for samp in sampleList if samples[samp]['isSignal'] ]
@@ -699,7 +715,7 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
             yldplt[sample].SetMarkerSize(0)
             yldplt[sample].SetMarkerSize(0)
 
-    stacks = getStackFromHists([yldplt[bkg] for bkg in bkgList])
+    stacks  = getStackFromHists([yldplt[bkg] for bkg in bkgList])
     bkg_tot = yldplt[bkg].Clone("bkg_tot_%s"%name)
     bkg_tot.Reset()
     bkg_tot.Merge(stacks.GetHists())
@@ -808,7 +824,7 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
     if save:
         saveCanvas(canvs[cSave], dir = save, name = name ) 
         canvs[cSave]
-    gc.collect()
+    #gc.collect()
     return canvs, yldplt, stacks, bkg_tot, ratio_ref 
 
 #                bkg_tot = hists['bkg'][plot].Clone("bkg_tot")
@@ -841,8 +857,13 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
     ret = {}
     canvs={}
     hists   = getSamplePlots(samples,plots,cut,sampleList=sampleList, plotList=plotList)
-    stacks  = getBkgSigStacks(samples,plots,cut, sampleList=sampleList, plotList=plotList, normalize=normalize, transparency=normalize )
+    stacks  = getBkgSigStacks(samples,plots,cut, sampleList=sampleList, plotList=plotList, normalize=normalize, transparency=normalize, sName=cut_name )
     sigList, bkgList, dataList = getSigBkgDataLists(samples, sampleList=sampleList)
+
+
+
+
+
     ret.update({
                 'canvs':canvs       , 
                 'stacks':stacks     ,
@@ -850,8 +871,8 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
                 'fomHists':{}       ,
                 'sigBkgDataList': [sigList,bkgList,dataList],
                 'legs':[]           ,
+                'hist_info' : {}    ,
                 })
-   
     isDataPlot = bool(len(dataList))
 
     if len(dataList) > 1:
@@ -873,10 +894,10 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
                 padRatios=[2]+[1]*(len(denoms))
             #print "            padRatios:  ", padRatios
 
-            canvs[p]=makeCanvasMultiPads(c1Name="%s_%s"%(cut_name,p),c1ww=800,c1wh=800, joinPads=True, padRatios=padRatios, pads=[])
+            canvs[p]=makeCanvasMultiPads(c1Name="canv_%s_%s"%(cut_name,p),c1ww=800,c1wh=800, joinPads=True, padRatios=padRatios, pads=[])
             cSave , cMain=0,1   # index of the main canvas and the canvas to be saved
         else: 
-            canvs[p] = ROOT.TCanvas(p,p,800,800), None, None
+            canvs[p] = ROOT.TCanvas("canv_%s_%s"%(cut_name,p),"canv_%s_%s"%(cut_name,p),800,800), None, None
             cSave , cMain=0,0
         canvs[p][cMain].cd()
         #dOpt="hist"
@@ -983,10 +1004,19 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
         #if explicitSaveDir:
         #    cut_saveDir=""
 
+        sample_hist_info = getSamplePlotsInfo(samples,plots,cut,sampleList=sampleList,plotList=plotList, plots_first = True)
+        #canvs[p][cSave].plot_info =
+        print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    HIST INFO"
+        print sample_hist_info 
+        print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+
         if save:
             saveDir = save  if type(save)==type('') else "./"
             #saveDir = save + "/%s/"%cut_saveDir if type(save)==type('') else "./"
             saveCanvas(canvs[p][cSave],saveDir, p, formats=["png"], extraFormats=["root","C","pdf"])
+            pp.pprint(   sample_hist_info[p], 
+                         open( saveDir+"/extras/%s.txt"%p ,"w") ) 
+    #gc.collect()
     return ret
 
 class Draw():
@@ -1135,7 +1165,7 @@ def getFOMPlotFromStacks( ret, plot, sampleList ,fom=True, fom_reverse = False, 
                 #ll = TLine(Hr.GetXaxis().GetXmin(),1,Hr.GetXaxis().GetXma),1)
                  
             if unity:
-                Func = ROOT.TF1('Func',"[0]",lowBin,hiBin)
+                Func = ROOT.TF1('Func_%s'%uniqueHash(),"[0]",lowBin,hiBin)
                 Func.SetParameter(0,1)
                 #Func.SetLineStyle(3)
                 Func.SetLineColor(1)
@@ -1153,8 +1183,17 @@ def getFOMPlotFromStacks( ret, plot, sampleList ,fom=True, fom_reverse = False, 
             #print denom, first_nom, fomLimits, fomMin, fomMax
             fomHists[plot][denom][first_nom].Draw("same")
             #print "idenom", idenom
-            canvs[plot][idenom].RedrawAxis()
-            canvs[plot][idenom].Update()
+            if hasattr(canvs[plot][idenom], "RedrawAxis"):
+                canvs[plot][idenom].RedrawAxis()
+                canvs[plot][idenom].Update()
+            else:
+                print 
+                print "!!!!!!!!!!!!!!!!!!!!!!!!! SOMETHING WRONG WITH THE CANVAS!!!!!"
+                print 
+                print plot, idenom, canvs
+                print 
+                print "!!!!!!!!!!!!!!!!!!!!!!!!!" 
+                print 
 
         #for canv in canvs[plot]:
         #    canv.cd()
@@ -1295,6 +1334,9 @@ def draw2DPlots(samples,plots,cut,sampleList=['s','w'],plotList=[],min=False,log
     sigList=[samp for samp in sampleList if samples[samp]['isSignal'] ]
     bkgList=[samp for samp in sampleList if not samples[samp]['isSignal']  and not samples[samp]['isData'] ]
     fomHists={}
+
+
+
     for p in plots.iterkeys():
         if plotList and p not in plotList:
             continue
@@ -1803,19 +1845,16 @@ class Weight(object):
                     #print "looking for a match for", cut_category
                     if cut_finder_funct( cut ):
                         print "found a match to the cut string!", cut_category    
-                        new_weight = cut_weight
-                        assert not found_a_match, "Multiple matches to the cutstring... not clear which weight to use "            
+                        weight_list.append(  cut_weight )
+                        #assert not found_a_match, "WARNING! Multiple matches to the cutstring... using all matches! (could be dangerous!)"            
+                        if found_a_match : print  "WARNING! Multiple matches to the cutstring... using all matches! (could be dangerous!)"            
                         found_a_match = True
-                #if weight_dict['cuts'].has_key(cut):
-                #    new_weight =  weight_dict['cuts'][cut]
-                #else:
-                #    new_weight =  weight_dict['cuts']["default"]
             elif weight_key == "lumis":
-                new_weight =  "%s/%s"%(weight_dict['lumis'][lumi], weight_dict['lumis']["mc_lumi"])
+                weight_list.append(  "%s/%s"%(weight_dict['lumis'][lumi], weight_dict['lumis']["mc_lumi"]) )
             else:
-                new_weight =  weight_dict[weight_key]
-            if new_weight:
-                weight_list.append(new_weight)
+                weight_list.append(  weight_dict[weight_key] )
+            #if new_weight:
+            #    weight_list.append(new_weight)
         return weight_list
 
     def combine(self, weight_dict=None, cut="default", lumi="target_lumi"):
@@ -1849,6 +1888,72 @@ def decide_weight2( sample, weight=None, cut="default" , lumi="target_lumi"):
         else:
             weight_str=weight
     return weight_str
+
+
+
+from Workspace.DegenerateStopAnalysis.tools.btag_sf_map import btag_to_sf , sf_to_btag
+
+
+def decide_cut( sample, cut, plot=None, nMinus1=None):
+    cuts = []
+    if nMinus1:
+        main_cut_str = cut.nMinus1(nMinus1)
+    else:
+        main_cut_str = cut.combined
+    cuts.append(main_cut_str)
+    if getattr(sample, "cut", None):
+        cuts.append(   sample.cut  )
+    if plot and getattr(plot, "cut", None):
+        cuts.append(   plot.cut   )
+    warn=False
+    if getattr(sample,"triggers", None):
+        cuts.append( "(%s)"%sample['triggers'] )
+        warn = True
+    if getattr(sample,"filters" , None):
+        cuts.append( "(%s)"%sample['filters']   )
+        warn = True
+    if warn:
+        print "-----"*10 , sample.name
+        print "-----"*20
+        print "Applying Triggers: %s"%sample['triggers']
+        print "Applying Filters: %s"%sample['filters']
+        print "-----"*20
+        print "-----"*20
+    cut_str =  " && ".join(["( %s )"% c for c in cuts]) 
+    sfs = sf_to_btag.keys()
+    new_cut = cut_str[:]
+    modified = False
+    print '----------------------'
+    print cut_str
+    print '----------------------'
+    for sf in sfs:
+        if sf in new_cut:
+            print ' found sf: %s in cut_str'%sf
+            if sample.isData:
+                new_cut = new_cut.replace(sf, sf_to_btag[sf])
+                print 'replacing sf: %s , with %s'%(sf, sf_to_btag[sf])
+            else:
+                new_cut = new_cut.replace(sf, "(1)")
+                print 'replacing sf: %s , with %s'%(sf, "(1)") 
+            modified = True 
+    return new_cut
+
+
+
+
+def decide_cut_weight( sample, cutInst, weight=None,  lumi="target_lumi" , plot=None, nMinus1=None,  ):
+    #print "     ", sample 
+    #print "     ", cutInst 
+    #print "     ", weight 
+    #print "     ", lumi 
+    #print "     ", plot
+    #print "     ", nMinus1
+    weight_str = decide_weight2(sample, weight, cutInst.combined , lumi)
+    cut_str    = decide_cut(sample, cutInst, plot = plot, nMinus1 = nMinus1)
+    return cut_str, weight_str    
+
+
+
 
 def decide_weight( sample, weight ):
     if sample.isData:

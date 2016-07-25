@@ -30,7 +30,6 @@ def printSample(compName, comp, ext_comp= None):
 {compName} ={{
 'cmgName':"{compName}",
 "name" : "{sampleName}",
-#"name" : comp.name,
 "chunkString":"{sampleName}",
 "dir": sample_path +"/" + "{sampleName}",
 "dbsName" : "{dbsName}",
@@ -99,6 +98,6 @@ def printCMGProcessingFile(     cmgPickle,
 
 if __name__ == '__main__':
 
-    cmgPickle = "/afs/cern.ch/user/n/nrad/CMSSW/CMSSW_8_0_11/src/CMGTools/SUSYAnalysis/cfg/crab_with_das/8011_mAODv2_v1.pkl"
+    cmgPickle = "/afs/cern.ch/user/n/nrad/CMSSW/CMSSW_8_0_11/src/CMGTools/SUSYAnalysis/cfg/crab_with_das/8011_mAODv2_v1_1.pkl"
     out = printCMGProcessingFile(cmgPickle)
 

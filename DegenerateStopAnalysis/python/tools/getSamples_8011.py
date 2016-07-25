@@ -21,7 +21,7 @@ lumis = {
             #'lumi_data_blinded':2245.386, 
             #'lumi_data_unblinded':139.63,
             'target_lumi'         :   4000.   ,   
-            'DataBlind_lumi'      :   4320.0    , 
+            'DataBlind_lumi'      :   8554.    , 
             'DataUnblind_lumi'    :   804.2   ,
         }
 
@@ -245,6 +245,6 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
    
    for samp_name, sample in samples.iteritems():
       if not sample.isData:
-         sample.filter = mc_filters
+         sample.filters = mc_filters
    
    return samples

@@ -1,4 +1,54 @@
 import ROOT
+
+
+custom_colors_rgb = {
+    "violet"      : (189, 61,235)      ,    
+    "violet2"     : (102, 0,102)      ,    
+    "pink"        : (255, 228,206)      ,    
+    #"light_blue"  : (0,164,214)         ,        
+    "light_blue"  : (74,95,245)         ,        
+    "light_blue2" : (27,193,209)         ,        
+    "dark_blue"   : (0,26,80)           ,    
+    "orange"      : (254,189,38)        ,        
+    "red"         : (230,72,30)         ,        
+    "dark_green"  : (43,150,82)         ,        
+    #"light_green" : (141,185,66)        ,        
+    "light_green" : (22,209,92)        ,        
+    "grey_green"  : (193,197,158)       ,        
+    "yellow"      : (245,208,38)        ,
+    "sorkh"       : (235,27,54)         ,
+
+
+
+    'z'        :   (254,189,38)  , 
+    'dy'       :   (189, 61,235) ,
+    'qcd'      :   (102, 0,102)  , 
+    'st'       :   (64,224,208)     ,
+    'tt'       :   (74,95,245)   ,
+    'vv'       :   (43,150,82)   ,
+    'w'        :   (22,209,92)   , 
+
+
+}
+
+custom_colors_rgb_rel = {}
+for color, rgb in custom_colors_rgb.iteritems():
+    custom_colors_rgb_rel[color] = ( rgb[0]/255. , rgb[1]/255., rgb[2]/255.)
+
+color0 = 1700
+custom_colors = {}
+i = 0
+custom_colors_tc = {} 
+for color, rgb in custom_colors_rgb_rel.iteritems():
+    custom_colors_tc[color]  = ROOT.TColor(color0+i, *rgb )
+    custom_colors[color] = color0+i
+    i+=1
+
+
+
+
+
+
 colors ={
               'w':             ROOT.kSpring-5       , 
               'tt':            ROOT.kAzure-5        , 
@@ -11,9 +61,13 @@ colors ={
               'dy5to50':       ROOT.kMagenta       ,
               'dy5to50Inc':    ROOT.kViolet        ,
               'dy':            ROOT.kViolet-3        ,
-              'dyInv':         ROOT.kViolet+3        ,
+              'dyInv':         ROOT.kViolet-4        ,
 
-
+              'st_tch_lep':    ROOT.kAzure-10        ,
+              'st':        ROOT.kAzure+5        ,
+              'st_tch':        ROOT.kAzure+5        ,
+              'st_wch':        ROOT.kCyan-3        ,
+              'vv':            ROOT.kSpring-7        ,
 
               "s30":           ROOT.kRed+1          , 
               "s60FS":         ROOT.kOrange +7      , 
@@ -22,6 +76,18 @@ colors ={
               "t2tt30FS":      ROOT.kOrange-1       , 
             }
 
+
+new_colors ={
+              #'z'        :     custom_colors['z'  ],
+              'dy'       :     custom_colors['dy' ],
+              #'qcd'      :     custom_colors['qcd'],
+              'st'       :     custom_colors['st' ],
+              #'tt'       :     custom_colors['tt' ],
+              #'vv'       :     custom_colors['vv' ],
+              #'w'        :     custom_colors['w'  ],
+}
+
+colors.update(new_colors)
 
 
 dm_color_dict ={

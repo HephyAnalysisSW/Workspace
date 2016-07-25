@@ -1,7 +1,8 @@
 import ROOT
 from math import pi, sqrt, cos, sin, sinh, log
 from array import array
-
+import time
+import hashlib
 def test():
   return 1
 
@@ -333,21 +334,36 @@ def getYieldFromChain(c, cutString = "(1)", weight = "weight", returnError=False
     return res, resErr**2
   return res 
 
+<<<<<<< HEAD
 def getPlotFromChain(c, var, binning, cutString = "(1)", weight = "weight", binningIsExplicit=False ,addOverFlowBin='',variableBinning=(False, 0.1)):
+=======
+def getPlotFromChain(c, var, binning, cutString = "(1)", weight = "weight", binningIsExplicit=False ,addOverFlowBin='',variableBinning=False, uniqueName=False):
+  if uniqueName:
+    htmp = hashlib.md5("%s"%time.time()).hexdigest()
+  else:
+    htmp = "h_tmp"
+>>>>>>> a505d3d... Navid BTagWeight For Plots
   if binningIsExplicit:
-    h = ROOT.TH1D('h_tmp', 'h_tmp', len(binning)-1, array('d', binning))
+    h = ROOT.TH1D(htmp, htmp, len(binning)-1, array('d', binning))
 #    h.SetBins(len(binning), array('d', binning))
   else:
     if len(binning)==6:
-      h = ROOT.TH2D('h_tmp', 'h_tmp', *binning)
+      h = ROOT.TH2D(htmp, htmp, *binning)
     else:
-      h = ROOT.TH1D('h_tmp', 'h_tmp', *binning)
-  c.Draw(var+">>h_tmp", weight+"*("+cutString+")", 'goff')
+      h = ROOT.TH1D(htmp, htmp, *binning)
+  c.Draw(var+">>%s"%htmp, weight+"*("+cutString+")", 'goff')
   res = h.Clone()
+<<<<<<< HEAD
   if variableBinning[0]:
     h = ROOT.TH1D('h_tmp', 'h_tmp', *binning)
     c.Draw(var+">>h_tmp", weight+"*("+cutString+")", 'goff')
     h.Scale(variableBinning[1],"width")
+=======
+  if variableBinning:
+    h = ROOT.TH1D(htmp, htmp, *binning)
+    c.Draw(var+">>%s"%htmp, weight+"*("+cutString+")", 'goff')
+    h.Scale(0.1,"width")
+>>>>>>> a505d3d... Navid BTagWeight For Plots
     res = h.Clone()
   h.Delete()
   del h

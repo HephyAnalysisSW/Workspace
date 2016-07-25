@@ -9,6 +9,7 @@ import re , os
 import multiprocessing
 #from subprocess import call
 import subprocess 
+import gc 
 
 def round_(val, nDigit):
     if hasattr(val, "round"):
@@ -133,7 +134,7 @@ def bdt_eff(cfg, args):
     res = {}
     #effPlotDir = cfg.saveDir + "/EffPlots/"
     for cutInst in cfg.cutInstList:
-        getPlots(cfg.samples, cfg.plots , cutInst, sampleList= cfg.plotSampleList   , plotList= cfg.plotList , nMinus1=None , addOverFlowBin='both',weight="weight" )
+        getPlots(cfg.samples, cfg.plots , cutInst, sampleList= cfg.plotSampleList   , plotList= cfg.plotList , nMinus1=None , addOverFlowBin='both',weight="" )
     for samp in cfg.plotSampleList:
         for cutInst in cfg.cutInstList:
             #cutInst_tot = cutInst.baseCut
@@ -571,6 +572,7 @@ def data_plots(cfg,args):
 
     nminus1s = getattr(cfg, "nminus1s", {})
     verbose  = getattr(cfg, "verbose", True)
+    verbose  = False
 
     def getAndDrawFull(cutInst, mcList, data , plot , plotMin = 0.01 , plotDir = ""):
         sampleList = mcList + [data]
@@ -598,11 +600,25 @@ def data_plots(cfg,args):
             print eventListCutInst
             print "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
 
-        setEventListToChains(cfg.samples, mcList +[data] , eventListCutInst)
-        getPlots(cfg.samples, cfg.plots , cutInst  , sampleList = sampleList      , plotList=[plot] , nMinus1=nminus_list , addOverFlowBin='both',weight="weight"  )
+        if getattr(args, "setEventLists",False):
+            setEventListToChains(cfg.samples, mcList +[data] , eventListCutInst)
+        getPlots(cfg.samples, cfg.plots , cutInst  , sampleList = sampleList      , plotList=[plot] , nMinus1=nminus_list , addOverFlowBin='both',weight=""  )
+
         plt = drawPlots(cfg.samples,    cfg.plots , cutInst, sampleList = sampleList , # [ 'qcd','z','dy','tt','w','s300_250','s250_230' , 'dblind'],
                 plotList= [plot] ,save= plotDir, plotMin=plotMin,
                 normalize=False, denoms=["bkg"], noms=[data], fom="RATIO", fomLimits=[0,2.8])
+        #plt = None
+
+        print '\n==============================================================\n'
+        print plt
+        print '\n==============================================================\n'
+
+        print "\noutput:\n"
+        print pp.pprint( plt )
+        print pp.pprint( plt )
+        print plt
+        print "\nmoving on!\n"
+        #gc.collect()
         return plt
 
     result = {}
@@ -617,9 +633,43 @@ def data_plots(cfg,args):
         result[cut_name]={}
         data = 'd' if 'SR' in cut_name else 'dblind'   ## safeside : 'dblind' if 'CR' in cut_name else 'd'
         #data = 'dblind' if 'CR' in cut_name else 'd'   ## safeside : 'dblind' if 'CR' in cut_name else 'd'
-        plotMin =  0.001 if "SR" in cut_name else 0.1
+        plotMin =  0.01 if "SR" in cut_name else 1.0
         for plot in cfg.plotList:
-            result[cut_name][plot] = getAndDrawFull(cutInst, mcList = sampleList, data = data , plot = plot , plotMin = plotMin , plotDir = plotDir)
+            result[cut_name][plot]  = getAndDrawFull(cutInst, mcList = sampleList, data = data , plot = plot , plotMin = plotMin , plotDir = plotDir)
+            #result[cut_name][plot]  = drawPlots(cfg.samples,    cfg.plots , cutInst, sampleList = sampleList +[data],
+            #                                    plotList= [plot] ,save= plotDir, plotMin=plotMin,
+            #                                    normalize=False, denoms=["bkg"], noms=[data], fom="RATIO", fomLimits=[0,2.8])
+            print "Printing the Results ++++++++++++++++++++++++++++++++++++",
+            print result[cut_name][plot]
             #print "results:", cutInst.fullName, plot
             #pp.pprint( result) 
-    
+
+
+
+
+
+def get_plots(cfg,args):
+    nminus1s = getattr(cfg, "nminus1s", {})
+    verbose  = getattr(cfg, "verbose", True)
+    verbose  = False
+
+
+    result = {}
+    for cutInst in cfg.cutInstList:
+        cut_name = cutInst.fullName
+        cutSaveDir = cfg.saveDir + "/" + cutInst.saveDir
+        plotDir = cutSaveDir +"/DataPlots/"
+        result[cut_name]={}
+        data = 'd' if 'SR' in cut_name else 'dblind'   ## safeside : 'dblind' if 'CR' in cut_name else 'd'
+        plotMin =  0.01 if "SR" in cut_name else 1.0
+        for plot in cfg.plotList:
+            #result[cut_name][plot]  = getAndDrawFull(cutInst, mcList = sampleList, data = data , plot = plot , plotMin = plotMin , plotDir = plotDir)
+            result[cut_name][plot]  = drawPlots(cfg.samples,    cfg.plots , cutInst, sampleList = cfg.sampleList +[data],
+                                                plotList= [plot] ,save= plotDir, plotMin=plotMin,
+                                                normalize=False, denoms=["bkg"], noms=[data], fom="RATIO", fomLimits=[0,2.8])
+            print "Printing the Results ++++++++++++++++++++++++++++++++++++",
+            print result[cut_name][plot]
+            #print "results:", cutInst.fullName, plot
+            #pp.pprint( result) 
+
+    return result 
