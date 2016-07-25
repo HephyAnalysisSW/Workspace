@@ -164,6 +164,7 @@ mu_miniIso02_File = ROOT.TFile(scaleFactorDir+'TnP_MuonID_NUM_MiniIsoTight_DENOM
 mu_sip3d_File     = ROOT.TFile(scaleFactorDir+'TnP_MuonID_NUM_TightIP3D_DENOM_MediumID_VAR_map_pt_eta.root')
 mu_HIP_File       = ROOT.TFile(scaleFactorDir+'general_tracks_and_early_general_tracks_corr_ratio.root')
 ele_kin_File      = ROOT.TFile(scaleFactorDir+'eleScaleFactors.root')
+ele_gsf_File      = ROOT.TFile(scaleFactorDir+'egammaEffi.txt_SF2D.root')
 #
 histos_LS = {
 'mu_mediumID_histo':  mu_mediumID_File.Get("pt_abseta_PLOT_pair_probeMultiplicity_bin0"),\
@@ -173,6 +174,7 @@ histos_LS = {
 'mu_HIP_histo':       mu_HIP_File.Get("mutrksfptg10"),\
 'ele_cutbased_histo': ele_kin_File.Get("GsfElectronToTight"),\
 'ele_miniIso01_histo':ele_kin_File.Get("MVAVLooseElectronToMini"),\
+'ele_gsf_histo':      ele_gsf_File.Get("EGamma_SF2D"),\
 }
 #####################
 
@@ -249,8 +251,8 @@ for isample, sample in enumerate(allSamples):
   if options.leptonSelection.lower() == 'none':
     newVariables.extend( ['nLep/I', 'nVeto/I', 'nTightLep/I', 'nTightEl/I', 'nTightMu/I', 'nEl/I', 'nMu/I', 'Selected/I'] )
     newVariables.extend( ['deltaPhi_Wl/F', 'Lp/F', 'Lt/F', 'nBJetMediumCSV30/I','nJet30clean/I','htJet30clean/F', 'st/F', 'leptonPt/F','leptonMiniRelIso/F','leptonRelIso03/F' ,'leptonEta/F', 'leptonPhi/F', 'leptonPdg/I', 'leptonInd/I', 'leptonMass/F','leptonHoverE/F', 'leptonEt/F', 'lslJet80/I', 'Jet1_pt/F', 'Jet2_pt/F', 'nJet30nonClean/I', 'htJet30nonClean/F', 'singleMuonic/I', 'singleElectronic/I', 'singleLeptonic/I' ]) #, 'mt2w/F'] )
-    newVariables.extend( ['lepton_muSF_HIP/D/1.','lepton_muSF_looseID/D/1.','lepton_muSF_mediumID/D/1.','lepton_muSF_miniIso02/D/1.','lepton_muSF_sip3d/D/1.','lepton_eleSF_cutbasedID/D/1.','lepton_eleSF_miniIso01/D/1.'])
-    newVariables.extend( ['lepton_muSF_HIP_err/D/0.','lepton_muSF_looseID_err/D/0.','lepton_muSF_mediumID_err/D/0.','lepton_muSF_miniIso02_err/D/0.','lepton_muSF_sip3d_err/D/0.','lepton_eleSF_cutbasedID_err/D/0.','lepton_eleSF_miniIso01_err/D/0.'])
+    newVariables.extend( ['lepton_muSF_HIP/D/1.','lepton_muSF_looseID/D/1.','lepton_muSF_mediumID/D/1.','lepton_muSF_miniIso02/D/1.','lepton_muSF_sip3d/D/1.','lepton_eleSF_cutbasedID/D/1.','lepton_eleSF_miniIso01/D/1.', 'lepton_eleSF_gsf/D/1.'])
+    newVariables.extend( ['lepton_muSF_HIP_err/D/0.','lepton_muSF_looseID_err/D/0.','lepton_muSF_mediumID_err/D/0.','lepton_muSF_miniIso02_err/D/0.','lepton_muSF_sip3d_err/D/0.','lepton_eleSF_cutbasedID_err/D/0.','lepton_eleSF_miniIso01_err/D/0.', 'lepton_eleSF_gsf_err/D/0.', 'lepton_muSF_systematic/D/0.'])
 
     if calcSystematics:
       #newVariables.extend( ["weightBTag/F", "weightBTag_SF/F", "weightBTag_SF_b_Up/F", "weightBTag_SF_b_Down/F", "weightBTag_SF_light_Up/F", "weightBTag_SF_light_Down/F"])
@@ -733,6 +735,7 @@ for isample, sample in enumerate(allSamples):
           ele_cutbased_histo  = histos_LS['ele_cutbased_histo']
           ele_miniIso01_histo = histos_LS['ele_miniIso01_histo']
           mu_HIP_histo        = histos_LS['mu_HIP_histo']
+          
           if s.singleMuonic and s.leptonPt<120:
             s.lepton_muSF_mediumID      = mu_mediumID_histo.GetBinContent(mu_mediumID_histo.FindBin(s.leptonPt,abs(s.leptonEta)))
             s.lepton_muSF_looseID       = mu_looseID_histo.GetBinContent(mu_looseID_histo.FindBin(s.leptonPt,abs(s.leptonEta)))
@@ -757,8 +760,10 @@ for isample, sample in enumerate(allSamples):
           if s.singleElectronic:
             s.lepton_eleSF_cutbasedID     = ele_cutbased_histo.GetBinContent(ele_cutbased_histo.FindBin(s.leptonEt,abs(s.leptonEta)))
             s.lepton_eleSF_miniIso01      = ele_miniIso01_histo.GetBinContent(ele_miniIso01_histo.FindBin(s.leptonEt,abs(s.leptonEta)))
+            s.lepton_eleSF_gsf            = ele_gsf_histo.GetBinContent(ele_gsf_histo.FindBin(s.leptonEta,100)) ##pt independent
             s.lepton_eleSF_cutbasedID_err = ele_cutbased_histo.GetBinError(ele_cutbased_histo.FindBin(s.leptonEt,abs(s.leptonEta)))
             s.lepton_eleSF_miniIso01_err  = ele_miniIso01_histo.GetBinError(ele_miniIso01_histo.FindBin(s.leptonEt,abs(s.leptonEta)))
+            s.lepton_eleSF_gsf_err        = ele_gsf_histo.GetBinError(ele_gsf_histo.FindBin(s.leptonEta,100)) ##pt independent
           
 
           ### JETS
