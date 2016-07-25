@@ -2188,8 +2188,7 @@ def computeWeight(sample, sumWeight,  splitTree, saveTree, params, xsec=None):
         
     # sample type (data or MC, taken from CMG component)
     isDataSample = sample['isData']
-    isFastSimSample = sample.isFastSim
-
+    
     # weight according to required luminosity 
     
     genWeight = 1 if isDataSample else splitTree.GetLeaf('genWeight').GetValue()
