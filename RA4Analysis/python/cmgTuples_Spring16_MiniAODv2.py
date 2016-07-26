@@ -533,10 +533,10 @@ DiBoson_ZZ = {\
 
 ####Signal Samples###
 
-SMS_T5qqqqVV_TuneCUETP8M1_v1 ={\
-"name" : "SMS_T5qqqqVV_TuneCUETP8M1_v1",
+SMS_T5qqqqVV_TuneCUETP8M1 ={\
+"name" : "SMS_T5qqqqVV_TuneCUETP8M1",
 "chunkString":"SMS_T5qqqqVV_TuneCUETP8M1",
-"dir": "/afs/hephy.at/data/easilar01/Ra40b/cmgTuples/SignalScan_ICHEP/SignalScan_ICHEP_dirs/",
+"dir": "/afs/hephy.at/data/easilar01/Ra40b/cmgTuples/SignalScan_ICHEP_v2/shells/",
 "dbsName" : "",
 "skimAnalyzerDir":"skimAnalyzerCount",
 "rootFileLocation":"/treeProducerSusySingleLepton/tree.root",
@@ -544,16 +544,6 @@ SMS_T5qqqqVV_TuneCUETP8M1_v1 ={\
 'isData':False
 }
 
-SMS_T5qqqqVV_TuneCUETP8M1_v2 ={\
-"name" : "SMS_T5qqqqVV_TuneCUETP8M1_v2",
-"chunkString":"SMS_T5qqqqVV_TuneCUETP8M1",
-"dir": "/afs/hephy.at/data/easilar01/Ra40b/cmgTuples/SignalScan_ICHEP/SignalScan_ICHEP_dirs_2/",
-"dbsName" : "",
-"skimAnalyzerDir":"skimAnalyzerCount",
-"rootFileLocation":"/treeProducerSusySingleLepton/tree.root",
-"treeName":"tree",
-'isData':False
-}
 
 #T5qqqqVV_mGluino_600To675_mLSP_1to550 ={\
 #"name" : "T5qqqqVV_mGluino_600To675_mLSP_1to550",

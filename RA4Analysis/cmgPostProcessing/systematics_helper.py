@@ -373,6 +373,18 @@ def getISRWeight_new(s,isrJets):
       
   return
 
+def filter_crazy_jets(jets,genParts):
+    ismatched = True
+    for jet in jets:
+      ismatched = True
+      if not (abs(jet["eta"])<2.5 and jet["pt"]>20): continue
+      for genPart in genParts:
+        if not ismatched :  break
+        dR = deltaR(jet,genPart)
+        if dR >= 0.3 and jet["chHEF"]<0.1:
+          ismatched = False
+    return ismatched
+
 
 def getGenWandLepton(c):
   genPartAll = [getObjDict(c, 'GenPart_', ['pt','eta','phi','mass','pdgId','motherId','motherIndex'], j) for j in range(int(c.GetLeaf('nGenPart').GetValue()))]

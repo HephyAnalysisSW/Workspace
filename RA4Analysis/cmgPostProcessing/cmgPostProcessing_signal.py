@@ -16,7 +16,7 @@ ROOT.AutoLibraryLoader.enable()
 from Workspace.HEPHYPythonTools.helpers import getChunks
 #from Workspace.RA4Analysis.cmgTuples_Data25ns_miniAODv2 import *
 from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2 import *
-from systematics_helper import calc_btag_systematics, calc_LeptonScale_factors_and_systematics , getISRWeight , getISRWeight_new ,fill_branch_WithJEC 
+from systematics_helper import calc_btag_systematics, calc_LeptonScale_factors_and_systematics , getISRWeight , getISRWeight_new ,fill_branch_WithJEC , filter_crazy_jets
 from btagEfficiency import *
 from leptonFastSimSF import leptonFastSimSF as leptonFastSimSF_
 
@@ -35,7 +35,7 @@ target_lumi = 3000 #pb-1
 #calcSystematics = True
 separateBTagWeights = True
 
-defSampleStr = "SMS_T5qqqqVV_TuneCUETP8M1_v1"
+defSampleStr = "SMS_T5qqqqVV_TuneCUETP8M1"
 
 ###For PU reweight###
 #PU_dir = "/data/easilar/tuples_from_Artur/JECv6recalibrateMET_2p2fb/PUhistos/"
@@ -61,6 +61,7 @@ mu_looseID_File   = ROOT.TFile("/data/easilar/SF2015/TnP_MuonID_NUM_LooseID_DENO
 mu_miniIso02_File = ROOT.TFile("/data/easilar/SF2015/TnP_MuonID_NUM_MiniIsoTight_DENOM_LooseID_VAR_map_pt_eta.root")
 mu_sip3d_File     = ROOT.TFile("/data/easilar/SF2015/TnP_MuonID_NUM_TightIP3D_DENOM_LooseID_VAR_map_pt_eta.root")
 ele_kin_File      = ROOT.TFile("/data/easilar/SF2015/kinematicBinSFele.root")
+ele_gsf_File      = ROOT.TFile(scaleFactorDir+'egammaEffi_txt_SF2D.root')
 mu_HIP_File       = ROOT.TFile(scaleFactorDir+'general_tracks_and_early_general_tracks_corr_ratio.root')
 #
 histos_LS = {
@@ -71,10 +72,11 @@ histos_LS = {
 'mu_HIP_histo':       mu_HIP_File.Get("mutrksfptg10"),\
 'ele_cutbased_histo': ele_kin_File.Get("CutBasedTight"),\
 'ele_miniIso01_histo':ele_kin_File.Get("MiniIso0p1_vs_AbsEta"),\
+'ele_gsf_histo':ele_gsf_File.Get("EGamma_SF2D"),\
 }
 #####################
 
-subDir = "postProcessing_Signals_v8"
+subDir = "postProcessing_Signals_v2"
 
 #branches to be kept for data and MC
 branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert",
@@ -105,7 +107,7 @@ from optparse import OptionParser
 parser = OptionParser()
 parser.add_option("--samples", dest="allsamples", default=defSampleStr, type="string", action="store", help="samples:Which samples.")
 parser.add_option("--inputTreeName", dest="inputTreeName", default="treeProducerSusySingleLepton", type="string", action="store", help="samples:Which samples.")
-parser.add_option("--targetDir", dest="targetDir", default="/data/"+username+"/cmgTuples/"+subDir+'/', type="string", action="store", help="target directory.")
+parser.add_option("--targetDir", dest="targetDir", default="/afs/hephy.at/data/"+username+"01/cmgTuples/"+subDir+'/', type="string", action="store", help="target directory.")
 parser.add_option("--skim", dest="skim", default="signal", type="string", action="store", help="any skim condition?")
 parser.add_option("--small", dest="small", default = False, action="store_true", help="Just do a small subset.")
 parser.add_option("--overwrite", dest="overwrite", default = True, action="store_true", help="Overwrite?")
@@ -214,13 +216,13 @@ for isample, sample in enumerate(allSamples):
     ]
     newVariables.extend(['puReweight_true/F','puReweight_true_max4/F','puReweight_true_Down/F','puReweight_true_Up/F','weight_diLepTTBar0p5/F','weight_diLepTTBar2p0/F','weight_XSecTTBar1p1/F','weight_XSecTTBar0p9/F','weight_XSecWJets1p1/F','weight_XSecWJets0p9/F'])
     newVariables.extend(['ngenGluino/I','genGluGlu_pt/F','ISRSigUp/F/1','ISRSigDown/F/1'])
-    newVariables.extend(['nISRJets_new/I','weight_ISR_new/F/1','ISRSigUp_stat_new/F/1','ISRSigDown_stat_new/F/1','ISRSigUp_sys_new/F/1','ISRSigDown_sys_new/F/1'])
-    newVariables.extend(['lepton_muSF_looseID/D/1.','lepton_muSF_mediumID/D/1.','lepton_muSF_miniIso02/D/1.','lepton_muSF_sip3d/D/1.','lepton_eleSF_cutbasedID/D/1.','lepton_eleSF_miniIso01/D/1.'])
+    newVariables.extend(['flag_crazy_jets/I/1','nISRJets_new/I','weight_ISR_new/F/1','ISRSigUp_stat_new/F/1','ISRSigDown_stat_new/F/1','ISRSigUp_sys_new/F/1','ISRSigDown_sys_new/F/1'])
+    newVariables.extend(['lepton_muSF_looseID/D/1.','lepton_muSF_mediumID/D/1.','lepton_muSF_miniIso02/D/1.','lepton_muSF_sip3d/D/1.','lepton_eleSF_cutbasedID/D/1.','lepton_eleSF_miniIso01/D/1.','lepton_eleSF_gsf/D/1.'])
     newVariables.extend(['lepton_muSF_looseID_err/D/0.','lepton_muSF_mediumID_err/D/0.','lepton_muSF_miniIso02_err/D/0.','lepton_muSF_sip3d_err/D/0.','lepton_eleSF_cutbasedID_err/D/0.','lepton_eleSF_miniIso01_err/D/0.'])
 
     readVectors.append({'prefix':'GenPart',  'nMax':100, 'vars':['eta/F','pt/F','phi/F','mass/F','charge/F', 'pdgId/I', 'motherId/F', 'grandmotherId/F','status/F']})
     readVectors.append({'prefix':'JetForMET',  'nMax':100, 'vars':['rawPt/F','pt/F', 'eta/F', 'phi/F','mass/F' ,'id/I','hadronFlavour/F','btagCSV/F', 'btagCMVA/F','corr_JECUp/F','corr_JECDown/F','corr/F']})
-    readVectors.append({'prefix':'Jet',  'nMax':100, 'vars':['rawPt/F','pt/F', 'eta/F', 'phi/F','mass/F' ,'id/I','hadronFlavour/F','btagCSV/F', 'btagCMVA/F','corr_JECUp/F','corr_JECDown/F','corr/F']})
+    readVectors.append({'prefix':'Jet',  'nMax':100, 'vars':['rawPt/F','pt/F', 'eta/F', 'phi/F','mass/F' ,'id/I','hadronFlavour/F','btagCSV/F', 'btagCMVA/F','corr_JECUp/F','corr_JECDown/F','corr/F','chHEF/F']})
 
     aliases.extend(['genMet:met_genPt', 'genMetPhi:met_genPhi'])
     ### Vars for JEC ###
@@ -389,7 +391,7 @@ for isample, sample in enumerate(allSamples):
             s.singleMuonic      = False 
             s.singleElectronic  = False 
 
-          j_list=['eta','pt','phi','btagCMVA', 'btagCSV', 'id']
+          j_list=['eta','pt','phi','btagCMVA', 'btagCSV', 'id', 'chHEF']
           jets = filter(lambda j:j['pt']>30 and abs(j['eta'])<2.4 and j['id'], get_cmg_jets_fromStruct(r,j_list))
           lightJets,  bJetsCSV = splitListOfObjects('btagCSV', 0.800, jets)
           s.htJet30j = sum([x['pt'] for x in jets])
@@ -404,6 +406,7 @@ for isample, sample in enumerate(allSamples):
           ####
           isrJets = get_matched_Jets(jets,genParts)
           getISRWeight_new(s,isrJets)
+          s.flag_crazy_jets = filter_crazy_jets(jets,genParts)
           ####
           getISRWeight(s,genParts)
           fill_branch_WithJEC(s,r)
