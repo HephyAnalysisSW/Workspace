@@ -20,8 +20,8 @@ lumis = {
             #'mc_lumi':10000, 
             #'lumi_data_blinded':2245.386, 
             #'lumi_data_unblinded':139.63,
-            'target_lumi'         :   4000.   ,   
-            'DataBlind_lumi'      :   8554.    , 
+            'target_lumi'         :   10000.   ,   
+            'DataBlind_lumi'      :   8538.0    , 
             'DataUnblind_lumi'    :   804.2   ,
         }
 

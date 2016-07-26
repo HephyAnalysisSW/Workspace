@@ -1,7 +1,7 @@
 from Workspace.HEPHYPythonTools.helpers import getYieldFromChain
 from Workspace.HEPHYPythonTools.u_float import u_float
 import pickle
-from Workspace.DegenerateStopAnalysis.tools.degTools import cmsbase, getEfficiency, getPlots, drawPlots , saveCanvas, setEventListToChains , makeDir , decide_weight2 , JinjaTexTable, Yields, CutClass , setMVASampleEventList , drawYields 
+from Workspace.DegenerateStopAnalysis.tools.degTools import cmsbase, getEfficiency, getPlots, drawPlots , saveCanvas, setEventListToChains , makeDir , decide_weight2 , JinjaTexTable, Yields, CutClass , setMVASampleEventList , drawYields  , dict_operator, yield_adder_func2
 import Workspace.DegenerateStopAnalysis.tools.limitTools as limitTools
 
 import pprint as pp
@@ -312,7 +312,7 @@ def calc_mva_limit(cfg, args):
             #sigs = ['s300_290' , 's300_270','s300_220']
             #sigs = [ 'S300-260Fast' , 'S300-270Fast' , 'S300-290Fast' , 'S300-270' ]
             sigs = ['s10FS', 's30FS', 's60FS' , 's30'] 
-            yldplts = drawYields( "BkgComposition_" +cut_name , cfg.yieldPkls[cut_name] , sampleList = cfg.bkgList  + sigs  , keys=[] , ratios=True , save= cfg.saveDirs[cut_name] )
+            yldplts = drawYields( "BkgComposition_" +cut_name , cfg.yieldPkls[cut_name] , sampleList = cfg.bkgList  + sigs  , keys=[] , ratios=True , save= cfg.saveDirs[cut_name], plotMax = 1 )
     
             def makeSignalCard(sig):
                 lim =  limitTools.getLimit(
@@ -454,7 +454,7 @@ def bkg_est(cfg, args):
                                         sampleList + dataList, 
                                         cutInst, 
                                         cutOpt          =   "list2", 
-                                        weight          =   "weight",
+                                        weight          =   "",
                                         lumi            =   lumi,  
                                         pklOpt          =   True, 
                                         tableName       =   "{cut}_%s%s"%(cfg.runTag,cfg.scan_tag), 
@@ -476,17 +476,28 @@ def bkg_est(cfg, args):
         
         yldplts = []
 
-        yldplt1 = drawYields("BkgComp_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList , ratios= False, save=cfg.saveDirs[cut_name], normalize = True, logs = [0,0], plotMin=0)
+        yldplt1 = drawYields("BkgComp_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList , ratios= False, save=cfg.saveDirs[cut_name], normalize = True, logs = [0,0], plotMin=0, plotMax = 1.)
         yldplt2 = drawYields("BkgVsData_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList + dataList, ratios= True, save=cfg.saveDirs[cut_name], normalize = False, logs = [0,0], plotMin=0)
-        yldplt3 = drawYields("BkgVsData_log_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList + dataList, ratios= True, save=cfg.saveDirs[cut_name], normalize = False, logs = [0,1], plotMin=0.01)
-        yldplt4 = drawYields("BkgVsSig_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList + cfg.signalList, ratios= True, save=cfg.saveDirs[cut_name], normalize = False, logs = [0,1], plotMin=0.01)
-        yldplt5 = drawYields("BksVsDataVsSignal_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList + dataList + cfg.signalList , ratios= True, save=cfg.saveDirs[cut_name], normalize = False, logs = [0,1], plotMin=0.01)
+        yldplt3 = drawYields("BkgVsData_log_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList + dataList, ratios= True, save=cfg.saveDirs[cut_name], normalize = False, logs = [0,1], plotMin=0.1)
+        yldplt4 = drawYields("BkgVsSig_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList + cfg.signalList, ratios= True, save=cfg.saveDirs[cut_name], normalize = False, logs = [0,1], plotMin=0.1)
+        yldplt5 = drawYields("BksVsDataVsSignal_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList + dataList + cfg.signalList , ratios= True, save=cfg.saveDirs[cut_name], normalize = False, logs = [0,1], plotMin=0.1)
 
         crbins = [x for x in yields[cut_name].cutNames if 'ECR' in x]
 
-        yldplt6 = drawYields("BkgVsData_ECR_log_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList + dataList, keys=crbins, ratios= True, save=cfg.saveDirs[cut_name], normalize = False, logs = [0,1], plotMin=0.01)
+        yldplt6 = drawYields("BkgVsData_ECR_log_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList + dataList, keys=crbins, ratios= True, save=cfg.saveDirs[cut_name], normalize = False, logs = [0,1], plotMin=0.1)
 
         yldplts = [ yldplt1,yldplt2, yldplt3, yldplt4, yldplt5, yldplt6 ]
+
+
+        yld = yields[cut_name] 
+        other = dict_operator( yld.yieldDictFull , keys = [ bkg for bkg in cfg.bkgList if bkg not in ['tt','w']] , func = yield_adder_func2 )
+        yld.yieldDictFull['Other'] = other
+        print yld.makeLatexTable( yld.makeNumpyFromDict( yld.yieldDictFull , rowList = ['w','tt','Other','Total']+ dataList ) )
+
+
+
+
+
 
         #yldplts
     
@@ -540,7 +551,7 @@ def cut_flow(cfg, args):
                                         sampleList , 
                                         cutInst, 
                                         cutOpt          =   "list", 
-                                        weight          =   "weight", 
+                                        weight          =   "", 
                                         pklOpt          =   True, 
                                         pklDir          =   cfg.yieldPklDir, 
                                         tableName       =   "{cut}_%s%s"%(cfg.runTag,cfg.scan_tag), 

@@ -107,7 +107,62 @@ class DegPlots():
                 #"dPhiJetMet":  {'var':dPhiJetMet                      ,"bins":[20,0,3.2]          ,"nMinus1":None         ,"decor":{"title":"dPhi_JetMet"    ,"x":"dPhi_JetMet"      ,"y":"Events "  ,'log':[0,1,0], 'fom_reverse':True }},
                 #"MetOverHT":   {'var':"met_pt/htJet30j"               ,"bins":[20,0,4]            ,"nMinus1":None         ,"decor":{"title":"MetOverHT"    ,"x":"Met/HT"      ,"y":"Events "  ,'log':[0,1,0], 'fom_reverse':False }},
                 "isrPt":       {'var':"Jet_pt[IndexJet_basJet[0]]"     ,"bins":[45,100,1000]          ,"nMinus1":None         ,"decor":{"title":"Leading Jet P_{{T}}"    ,"x":"isrJetPt"      ,"y":"Events  "  ,'log':[0,1,0] }},
+
+
                 "isrPt2":       {'var':"Jet_pt[IndexJet_basJet[0]]"     ,"bins":[20,100,900]          ,"nMinus1":None         ,"decor":{"title":"Leading Jet P_{{T}}"    ,"x":"isrJetPt"      ,"y":"Events  "  ,'log':[0,1,0] }},
+                "isrEta":       {'var':"Jet_eta[IndexJet_basJet[0]]"   ,"bins":[20,-3,3]          ,"nMinus1":None         ,"decor":{"title":"Leading Jet Eta "    ,"x":"#eta(LeadingJet)"      ,"y":"Events  "  ,'log':[0,1,0] }},
+
+
+                #
+                #   ISR Quality Plots
+                #
+                "isrcharge":     {'var':"Jet_charge[IndexJet_basJet[0]]"     ,"bins":[20,-2,2]          ,"nMinus1":None         ,"decor":{"title":"Leading Jet Charge"                           ,"x": "Leading Jet Charge"                            ,"y":"Events  "  ,'log':[0,1,0] }},
+                "isrchHEF":      {'var':"Jet_chHEF[IndexJet_basJet[0]]"      ,"bins":[50,0,1]          ,"nMinus1":None          ,"decor":{"title":"Leading Jet Charge Hadron Fraction"           ,"x": "Leading Jet Charge Hadron Fraction"            ,"y":"Events  "  ,'log':[0,1,0] }},
+                "isrneHEF":      {'var':"Jet_neHEF[IndexJet_basJet[0]]"      ,"bins":[50,0,1]          ,"nMinus1":None          ,"decor":{"title":"Leading Jet Neutral Hadron Energy Fraction"   ,"x": "Leading Jet Neutral Hadron Energy Fraction"    ,"y":"Events  "  ,'log':[0,1,0] }},
+                "isrphEF":       {'var':"Jet_phEF[IndexJet_basJet[0]]"       ,"bins":[50,0,1]          ,"nMinus1":None          ,"decor":{"title":"Leading Jet Photon Energy Fraction"           ,"x": "Leading Jet Photon Energy Fraction"            ,"y":"Events  "  ,'log':[0,1,0] }},
+                "isreEF":        {'var':"Jet_eEF[IndexJet_basJet[0]]"        ,"bins":[50,0,1]          ,"nMinus1":None          ,"decor":{"title":"Leading Jet Electorn Energy Fraction"         ,"x": "Leading Jet Electorn Energy Fraction"          ,"y":"Events  "  ,'log':[0,1,0] }},
+                "isrmuEF":       {'var':"Jet_muEF[IndexJet_basJet[0]]"       ,"bins":[50,0,1]          ,"nMinus1":None          ,"decor":{"title":"Leading Jet Muon Energy Fraction"             ,"x": "Leading Jet Muon Energy Fraction"              ,"y":"Events  "  ,'log':[0,1,0] }},
+                "isrHFHEF":      {'var':"Jet_HFHEF[IndexJet_basJet[0]]"      ,"bins":[50,0,1]          ,"nMinus1":None          ,"decor":{"title":"Leading Jet HF Hadron Energy Fraction"        ,"x": "Leading Jet HF Hadron Energy Fraction"         ,"y":"Events  "  ,'log':[0,1,0] }},
+                "isrHFEMEF":     {'var':"Jet_HFEMEF[IndexJet_basJet[0]]"     ,"bins":[50,0,1]          ,"nMinus1":None          ,"decor":{"title":"Leading Jet HF EM Energy Fraction"            ,"x": "Leading Jet HF EM Energy Fraction"             ,"y":"Events  "  ,'log':[0,1,0] }},
+                "isrchHMult":    {'var':"Jet_chHMult[IndexJet_basJet[0]]"    ,"bins":[40,0,40]          ,"nMinus1":None         ,"decor":{"title":"Leading Jet Charge Hadron Multip"             ,"x": "Leading Jet Charge Hadron Multip"              ,"y":"Events  "  ,'log':[0,1,0] }},
+                "isrneHMult":    {'var':"Jet_neHMult[IndexJet_basJet[0]]"    ,"bins":[40,0,40]          ,"nMinus1":None         ,"decor":{"title":"Leading Jet Neutral Hadron Multip"            ,"x": "Leading Jet Neutral Hadron Multip"             ,"y":"Events  "  ,'log':[0,1,0] }},
+                "isrphMult":     {'var':"Jet_phMult[IndexJet_basJet[0]]"     ,"bins":[40,0,40]          ,"nMinus1":None         ,"decor":{"title":"Leading Jet Photon Multip"                    ,"x": "Leading Jet Photon Multip"                     ,"y":"Events  "  ,'log':[0,1,0] }},
+                "isreMult":      {'var':"Jet_eMult[IndexJet_basJet[0]]"      ,"bins":[6,0,6]          ,"nMinus1":None         ,"decor":{"title":"Leading Jet Electron Multip"                  ,"x": "Leading Jet Electron Multip"                   ,"y":"Events  "  ,'log':[0,1,0] }},
+                "isrmuMult":     {'var':"Jet_muMult[IndexJet_basJet[0]]"     ,"bins":[6,0,6]          ,"nMinus1":None         ,"decor":{"title":"Leading Jet Electron Multip"                  ,"x": "Leading Jet Electron Multip"                   ,"y":"Events  "  ,'log':[0,1,0] }},
+                "isrHFHMult":    {'var':"Jet_HFHMult[IndexJet_basJet[0]]"    ,"bins":[10,0,10]          ,"nMinus1":None         ,"decor":{"title":"Leading Jet HF Hadron Multip"                 ,"x": "Leading Jet HF Hadron Multip"                  ,"y":"Events  "  ,'log':[0,1,0] }},
+                "isrHFEMMult":   {'var':"Jet_HFEMMult[IndexJet_basJet[0]]"   ,"bins":[10,0,10]          ,"nMinus1":None         ,"decor":{"title":"Leading Jet HF EM Multip"                     ,"x": "Leading Jet HF EM Multip"                      ,"y":"Events  "  ,'log':[0,1,0] }},
+
+
+                #
+                # Jet Quality Plots
+                #
+
+
+                #"jetcharge":     {'var':"Jet_charge[]"     ,"bins":[20,-2,2]          ,"nMinus1":None         ,"decor":{"title":"Jet Charge"                           ,"x": "Jet Charge"                            ,"y":"Events  "  ,'log':[0,1,0] }},
+                #"jetchHEF":      {'var':"Jet_chHEF[]"      ,"bins":[50,0,1]          ,"nMinus1":None          ,"decor":{"title":"Jet Charge Hadron Fraction"           ,"x": "Jet Charge Hadron Fraction"            ,"y":"Events  "  ,'log':[0,1,0] }},
+                #"jetneHEF":      {'var':"Jet_neHEF[]"      ,"bins":[50,0,1]          ,"nMinus1":None          ,"decor":{"title":"Jet Neutral Hadron Energy Fraction"   ,"x": "Jet Neutral Hadron Energy Fraction"    ,"y":"Events  "  ,'log':[0,1,0] }},
+                #"jetphEF":       {'var':"Jet_phEF[]"       ,"bins":[50,0,1]          ,"nMinus1":None          ,"decor":{"title":"Jet Photon Energy Fraction"           ,"x": "Jet Photon Energy Fraction"            ,"y":"Events  "  ,'log':[0,1,0] }},
+                #"jeteEF":        {'var':"Jet_eEF[]"        ,"bins":[50,0,1]          ,"nMinus1":None          ,"decor":{"title":"Jet Electorn Energy Fraction"         ,"x": "Jet Electorn Energy Fraction"          ,"y":"Events  "  ,'log':[0,1,0] }},
+                #"jetmuEF":       {'var':"Jet_muEF[]"       ,"bins":[50,0,1]          ,"nMinus1":None          ,"decor":{"title":"Jet Muon Energy Fraction"             ,"x": "Jet Muon Energy Fraction"              ,"y":"Events  "  ,'log':[0,1,0] }},
+                #"jetHFHEF":      {'var':"Jet_HFHEF[]"      ,"bins":[50,0,1]          ,"nMinus1":None          ,"decor":{"title":"Jet HF Hadron Energy Fraction"        ,"x": "Jet HF Hadron Energy Fraction"         ,"y":"Events  "  ,'log':[0,1,0] }},
+                #"jetHFEMEF":     {'var':"Jet_HFEMEF[]"     ,"bins":[50,0,1]          ,"nMinus1":None          ,"decor":{"title":"Jet HF EM Energy Fraction"            ,"x": "Jet HF EM Energy Fraction"             ,"y":"Events  "  ,'log':[0,1,0] }},
+                #"jetchHMult":    {'var':"Jet_chHMult[]"    ,"bins":[10,0,10]          ,"nMinus1":None         ,"decor":{"title":"Jet Charge Hadron Multip"             ,"x": "Jet Charge Hadron Multip"              ,"y":"Events  "  ,'log':[0,1,0] }},
+                #"jetneHMult":    {'var':"Jet_neHMult[]"    ,"bins":[10,0,10]          ,"nMinus1":None         ,"decor":{"title":"Jet Neutral Hadron Multip"            ,"x": "Jet Neutral Hadron Multip"             ,"y":"Events  "  ,'log':[0,1,0] }},
+                #"jetphMult":     {'var':"Jet_phMult[]"     ,"bins":[10,0,10]          ,"nMinus1":None         ,"decor":{"title":"Jet Photon Multip"                    ,"x": "Jet Photon Multip"                     ,"y":"Events  "  ,'log':[0,1,0] }},
+                #"jeteMult":      {'var':"Jet_eMult[]"      ,"bins":[10,0,10]          ,"nMinus1":None         ,"decor":{"title":"Jet Electron Multip"                  ,"x": "Jet Electron Multip"                   ,"y":"Events  "  ,'log':[0,1,0] }},
+                #"jetmuMult":     {'var':"Jet_muMult[]"     ,"bins":[10,0,10]          ,"nMinus1":None         ,"decor":{"title":"Jet Electron Multip"                  ,"x": "Jet Electron Multip"                   ,"y":"Events  "  ,'log':[0,1,0] }},
+                #"jetHFHMult":    {'var':"Jet_HFHMult[]"    ,"bins":[10,0,10]          ,"nMinus1":None         ,"decor":{"title":"Jet HF Hadron Multip"                 ,"x": "Jet HF Hadron Multip"                  ,"y":"Events  "  ,'log':[0,1,0] }},
+                #"jetHFEMMult":   {'var':"Jet_HFEMMult[]"   ,"bins":[10,0,10]          ,"nMinus1":None         ,"decor":{"title":"Jet HF EM Multip"                     ,"x": "Jet HF EM Multip"                      ,"y":"Events  "  ,'log':[0,1,0] }},
+
+
+
+
+
+
+
+
+
+
                 "isrPt_fine":   {'var':"Jet_pt[IndexJet_basJet[0]]"    ,"bins":[100,0,1000]          ,"nMinus1":None         ,"decor":{"title":"Leading Jet P_{{T}} "    ,"x":"isrJetPt"      ,"y":"Events  "  ,'log':[0,1,0] }},
                 "nJets30":      {'var':"nBasJet"                       ,"bins":[10,0,10]          ,"nMinus1":None         ,"decor":{"title":"Number of Jets with P_{{T}} > 30GeV"    ,"x":"Number of Jets with P_{T} > 30GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
                 "nJets60":      {'var':"nVetoJet"                      ,"bins":[10,0,10]          ,"nMinus1":None         ,"decor":{"title":"Number of Jets with P_{{T}} > 60GeV"    ,"x":"Number of Jets with P_{T} > 60GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},

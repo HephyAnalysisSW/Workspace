@@ -682,7 +682,7 @@ def getPlotFromYields(name, yields, keys=[]):
     hist.GetXaxis().LabelsOption("v")
     return hist  
 
-def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin = 0.01, logs = [0,1], save="", normalize = False):
+def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin = 0.01, plotMax= None, logs = [0,1], save="", normalize = False):
 
     yld = yieldInst
 
@@ -735,6 +735,8 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
     if draw:
         stacks.Draw("hist")
         stacks.SetMinimum(plotMin)
+        maxval = plotMax if plotMax else stacks.GetMaximum()*1.15
+        stacks.SetMaximum( maxval)
         if drawError:
             bkg_tot.Draw("same E2")
         
@@ -1896,10 +1898,14 @@ from Workspace.DegenerateStopAnalysis.tools.btag_sf_map import btag_to_sf , sf_t
 
 def decide_cut( sample, cut, plot=None, nMinus1=None):
     cuts = []
-    if nMinus1:
-        main_cut_str = cut.nMinus1(nMinus1)
+
+    if hasattr(cut, "nMinus1"):
+        if nMinus1:
+            main_cut_str = cut.nMinus1(nMinus1)
+        else:          
+            main_cut_str = cut.combined
     else:
-        main_cut_str = cut.combined
+        main_cut_str = cut
     cuts.append(main_cut_str)
     if getattr(sample, "cut", None):
         cuts.append(   sample.cut  )
@@ -1908,10 +1914,10 @@ def decide_cut( sample, cut, plot=None, nMinus1=None):
     warn=False
     if getattr(sample,"triggers", None):
         cuts.append( "(%s)"%sample['triggers'] )
-        warn = True
+        #warn = True
     if getattr(sample,"filters" , None):
         cuts.append( "(%s)"%sample['filters']   )
-        warn = True
+        #warn = True
     if warn:
         print "-----"*10 , sample.name
         print "-----"*20
@@ -1923,9 +1929,9 @@ def decide_cut( sample, cut, plot=None, nMinus1=None):
     sfs = sf_to_btag.keys()
     new_cut = cut_str[:]
     modified = False
-    print '----------------------'
-    print cut_str
-    print '----------------------'
+    #print '----------------------'
+    #print cut_str
+    #print '----------------------'
     for sf in sfs:
         if sf in new_cut:
             print ' found sf: %s in cut_str'%sf
@@ -1948,7 +1954,8 @@ def decide_cut_weight( sample, cutInst, weight=None,  lumi="target_lumi" , plot=
     #print "     ", lumi 
     #print "     ", plot
     #print "     ", nMinus1
-    weight_str = decide_weight2(sample, weight, cutInst.combined , lumi)
+    cutStr = getattr( cutInst, "combined", cutInst )
+    weight_str = decide_weight2(sample, weight, cutStr , lumi)
     cut_str    = decide_cut(sample, cutInst, plot = plot, nMinus1 = nMinus1)
     return cut_str, weight_str    
 
@@ -2006,7 +2013,7 @@ class Yields():
         Usage:
         y=Yields(samples,['tt', 'w','s'],cuts.presel,tableName='{cut}_test',pklOpt=1);
     '''
-    def __init__(self,   samples,    sampleList, cutInst,    cutOpt='flow',  tableName='{cut}',  weight="(weight)",
+    def __init__(self,   samples,    sampleList, cutInst,    cutOpt='flow',  tableName='{cut}',  weight="",
                  pklOpt=False,   pklDir="./pkl/",    nDigits=2, err=True, nProc = None, lumi = 'target_lumi',
                  isMVASample = None, 
                  verbose=False, nSpaces=None):
@@ -2086,9 +2093,18 @@ class Yields():
 
         #self.weights        = { samp:decide_weight(samples[samp] , self.weight    ) for samp in self.sampleList }
         
+        #self.cut_weights_ = {}
+        #for cutName, cutStr in getattr(self.cutInst, self.cutOpt):
+        #    self.cut_weights_[cutName] = {samp:decide_weight2(samples[samp], cut=cutStr, lumi=self.lumi_weight) for samp in self.sampleList}     
+
         self.cut_weights = {}
-        for cutName, cutStr in getattr(self.cutInst, self.cutOpt):
-            self.cut_weights[cutName] = {samp:decide_weight2(samples[samp], cut=cutStr, lumi=self.lumi_weight) for samp in self.sampleList}     
+        for cutName, cutStr in getattr(self.cutInst, self.cutOpt):  
+            self.cut_weights[cutName] = {}
+            for samp in self.sampleList:
+                self.cut_weights[cutName][samp] =  decide_cut_weight( samples[samp] , cutInst = cutStr  ,  weight=self.weight,  lumi=self.lumi_weight, plot=None, nMinus1= None  )
+
+        #print "CUT AND WEIGHT SUMMARY:"
+        
 
         if hasattr(self,"LatexTitles"):
             #self.sampleLegend   =   [self.LatexTitles[sample] for sample in self.bkgList] +\
@@ -2138,7 +2154,7 @@ class Yields():
         for samp in rowList: 
             if first:
                 #exps.append( np.array([samp]+[ yieldDict[samp][cut] for cut in self.cutNames] , self.npsize) )
-                exps.append( np.array([ self.sampleNames[samp] ]+[ yieldDict[samp][cut] for cut in self.cutNames] , self.npsize) )
+                exps.append( np.array([ self.sampleNames.get(samp,samp) ]+[ yieldDict[samp][cut] for cut in self.cutNames] , self.npsize) )
             else:
                 exps.append( np.array([samp]+[ yieldDict[samp][cut] for cut in self.cutNames] , self.npsize) )
         return np.concatenate(  [ self.cutLegend, np.array(exps)] )                                            
@@ -2203,28 +2219,33 @@ class Yields():
             setMVASampleEventList(samples, sample)
 
         for ic, cut in enumerate(cutList):
-            cutName = cut[0]
-            cut_strings = [cut[1]]
-            warn = False
-            if hasattr(samples[sample], 'cut'):
-                cut_strings.append(samples[sample].cut) 
-            if hasattr(samples[sample],"triggers") and samples[sample]['triggers']:
-                cut_strings.append( samples[sample]['triggers'] )
-                warn = True
-            if hasattr(samples[sample],"filters") and samples[sample]['filters']:
-                cut_strings.append(  samples[sample]['filters'] )
-                warn = True
-            if warn:
-                print "-----"*10 , samples[sample].name
-                print "-----"*20
-                print "Applying Triggers: %s"%samples[sample]['triggers']
-                print "Applying Filters: %s"%samples[sample]['filters']
-                print "-----"*20
-                print "-----"*20
-
-            cutStr = "&&".join([ "(%s)"%x for x in cut_strings])
-            
-            yld = getYieldFromChain(samples[sample]['tree'], cutStr,self.cut_weights[cutName][sample], returnError=self.err) #,self.nDigits) 
+            #cutName = cut[0]
+            #cut_strings = [cut[1]]
+            #warn = False
+            #if hasattr(samples[sample], 'cut'):
+            #    cut_strings.append(samples[sample].cut) 
+            #if hasattr(samples[sample],"triggers") and samples[sample]['triggers']:
+            #    cut_strings.append( samples[sample]['triggers'] )
+            #    warn = True
+            #if hasattr(samples[sample],"filters") and samples[sample]['filters']:
+            #    cut_strings.append(  samples[sample]['filters'] )
+            #    warn = True
+            #if warn:
+            #    print "-----"*10 , samples[sample].name
+            #    print "-----"*20
+            #    print "Applying Triggers: %s"%samples[sample]['triggers']
+            #    print "Applying Filters: %s"%samples[sample]['filters']
+            #    print "-----"*20
+            #    print "-----"*20
+            #cutStr = "&&".join([ "(%s)"%x for x in cut_strings])
+            #print "CUT: ", cutName
+            #print "OLD ONE: "
+            #print cutStr
+            #cutStr , weightStr = self.cut_weights[cutName][sample]
+            #print "New ONE: "
+            #print cutStr
+            #yld = getYieldFromChain(samples[sample]['tree'], cutStr,self.cut_weights[cutName][sample], returnError=self.err) #,self.nDigits) 
+            yld = getYieldFromChain(samples[sample]['tree'], cutStr, weightStr, returnError=self.err) #,self.nDigits) 
             #print cut[0], "     ", "getYieldFromChain( %s, '%s', '%s',%s )"%( "samples."+sample+".tree", cut[1], self.weights[sample], True) + "==(%s,%s)"%yld 
             if self.err:
                     rounded = [ round(x,self.nDigits) for x in yld ] 
@@ -2315,7 +2336,18 @@ class Yields():
     def makeLatexTable(self,table=None):
         if table is None:
             table = self.FOMTable
-        ret = " \\\\\n".join([" & ".join(map(str,line)) for line in table])
+        lines = []
+        first = True
+        for line in table:
+            new_line = " & ".join(map(str,line)) 
+            fixed_line = fixForLatex( new_line)
+            fixed_line = fixRowCol( fixed_line)
+            fixed_line += " \\\ "
+            lines.append( fixed_line )
+        
+        if first:
+            lines[0] += "  \hline"
+        ret = " \n".join(lines)
         if self.verbose: print ret
         return ret
 
@@ -2528,6 +2560,21 @@ yield_adder_func2 = make_dict_manipulator( lambda *bins:  sum(bins).round(2) )
 def sig_yield_adder( bins = [ ] ):
     return dict_manipulator( bins, func = yield_adder_func )
 
+
+def dict_operator ( ylds , keys = [] , func =  lambda *x: sum(x) ):
+    """
+    use like this dict_operator( ylds.getByBins() , keys = ['DataBlind', 'Total'] , func = lambda a,b: a/b)
+
+    or for fancier use:
+    dict_operator( ylds.yieldDictFul, keys=['tt','w','d'] , func = yield_dict_adder )
+
+
+    """
+    args = [ ylds[x] for x in keys]
+    return func(*args)
+
+
+
 ###########################################################################################################################
 ###########################################################################################################################
 #########################################        TABLES         ###########################################################
@@ -2576,6 +2623,10 @@ fixDict["LepPt30" ]  =  "$ P_{T}(l)$ $<$ $30GeV$"
 fixDict["LepPt_lt_30" ]  =  "$ P_{T}(l)$ $<$ $30GeV$"  
 fixDict["LepPt-lt-30" ]  =  "$ P_{T}(l)$ $<$ $30GeV$"  
 fixDict["LepEta1.5"]  =  "$ |\eta(l)|  $ $<$ $1.5$"  
+fixDict["-pos"]  =  "-Q+"  
+fixDict["-neg"]  =  "-Q-"  
+
+
 
 fixDict["Other"]  =  "Other" 
 fixDict["T2-4bd-"]  =  "Signal" 
