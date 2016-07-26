@@ -2219,7 +2219,7 @@ class Yields():
             setMVASampleEventList(samples, sample)
 
         for ic, cut in enumerate(cutList):
-            #cutName = cut[0]
+            cutName = cut[0]
             #cut_strings = [cut[1]]
             #warn = False
             #if hasattr(samples[sample], 'cut'):
