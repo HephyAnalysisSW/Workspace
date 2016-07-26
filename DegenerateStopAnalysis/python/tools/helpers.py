@@ -11,6 +11,9 @@ import random
 import tempfile
 import math
 import collections
+import operator
+import time
+import shutil
 
 # imports user modules or functions
 
@@ -533,4 +536,59 @@ def retryRemove(function, path, excinfo):
             path, exctype, value
             )
         
+
+def evalCutOperator(quantityValue, operatorDef):
+    ''' Evaluate the operator operatorDef for quantity value quantityValue.
+    
+    The dictionary entry for operatorDef has the following format:
+        ('quantity', operator.name, quantity_cut, operator_unary_quantity)
+        
+        'quantity': quantity name, not used here
+        operator.name: the name of the operator, from python operator module
+        quantity_cut: the numerical value of the cut to be applied
+        operator_unary_quantity: if given, the operator is applied on the quantity value
+    '''
+
+    logger = logging.getLogger(__name__ + '.evaluateOperator')
+
+    opResult = False
+    
+    # operators with two arguments
+    opForCut = operatorDef[1]
+    varCut = operatorDef[2]
+
+    if len(operatorDef) > 3:
+        # apply opForVar operator on variable value
+        opForVar = operatorDef[3]
+        opResult = opForCut(opForVar(quantityValue), varCut)
+    else:
+        opResult = opCut(quantityValue, varCut)
+        
+    return opResult
+
+
+def getChunkIndex(sample, chunks):
+    ''' Return a list of indices for a list of chunks of a given sample.
+    
+    '''
+
+    chunkIndex = []
+
+    chunkFullString = ''.join([sample['chunkString'], '_Chunk_'])
+
+    for chunk in chunks:
+        chunkIndexStr = chunk['name'].replace(chunkFullString, '')
+        try:
+            idx = int(chunkIndexStr)
+            chunkIndex.append(idx)
+        except ValueError:
+            print "\n Sample: %s ".format(sample['name'])
+            print "\n Unable to convert string %s to integer for chunk %s \n".format(chunkIndexStr, chunk)
+            return None
+
+    # sort the indices
+    chunkIndexSorted = sorted(chunkIndex, key=int)
+
+    return chunkIndexSorted
+
     

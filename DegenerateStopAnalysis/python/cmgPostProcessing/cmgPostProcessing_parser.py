@@ -47,8 +47,11 @@ def get_parser():
     
     argParser.add_argument('--overwriteOutputFiles',
         action='store_true',
-        help="Overwrite existing output files, bool flag set to True  if used")
+        help="Overwrite existing output files for the requested chunk range, bool flag set to True  if used")
     
+    argParser.add_argument('--overwriteOutputDir',
+        action='store_true',
+        help="Overwrite the whole existing output directory, bool flag set to True  if used")
     
     argParser.add_argument('--cmgTuples',
         dest='cmgTuples',
@@ -158,9 +161,17 @@ def get_parser():
         help="Apply event veto list, if applyEventVetoList = True"
         )
 
-    argParser.add_argument('--runSmallSample',
+    argParser.add_argument('--applyEventVetoFastSimJets',
         action='store_true',
-        help="Run the file on a small sample (for test purpose), bool flag set to True if used"
+        help="Apply an event veto for FastJet samples (see 'corridor studies', if applyEventVetoList = True"
+        )
+
+    argParser.add_argument('--runChunks',
+        action='store',
+        nargs=2,
+        type=int,
+        help="Process a given range of chunks (from first argument to the second argument, inclusive)" + \
+             "\n If argument is missing, process all chunks"
         )
     
     argParser.add_argument('--testMethods',

@@ -24,11 +24,11 @@ from Workspace.HEPHYPythonTools.user import username
 from LpTemplateFit import LpTemplateFit
 from rCShelpers import *
 
-isData = True
+isData = False
 makeFit = True
 getYields = True
 getResults = True
-isValidation = True
+isValidation = False
 
 includeMCresults = False
 
@@ -44,13 +44,14 @@ else:
 
 SRstring = '2016SR'
 if isValidation: SRstring = '2016val_v2'
+lumiStr = '12p9fb'
 
-preprefix = 'QCDestimation/'+SRstring+'_7p62fb/'+sampleStr
+preprefix = 'QCDestimation/'+SRstring+'_'+lumiStr+'/'+sampleStr
 wwwDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/'+preprefix+'/'
 picklePath = '/data/'+username+'/Results2016/QCDEstimation/'
 prefix = 'Lp_singleElectronic_'
-picklePresel = '20160718_QCDestimation_'+SRstring+'_'+sampleStr+'7p62fb_pkl'
-pickleFit    = '20160718_fitResult_'+SRstring+'_'+sampleStr+'7p62fb_pkl'
+picklePresel = '20160725_QCDestimation_'+SRstring+'_'+sampleStr+lumiStr
+pickleFit    = '20160725_fitResult_'+SRstring+'_'+sampleStr+lumiStr
 
 if not os.path.exists(wwwDir):
   os.makedirs(wwwDir)
@@ -94,9 +95,12 @@ signalRegion = makeQCDsignalRegions(SRs, QCDSB=QCD_SB)
 btreg = [(0,0), (1,1), (2,-1)] #1b and 2b estimates are needed for the btag fit
 
 
-lumi = 7.62
-sampleLumi = 3.0 #post processed sample already produced with 2.25fb-1
-weight_str, weight_err_str = makeWeight(lumi, sampleLumi, reWeight='TopPtWeight*0.963') #only use electron trigger efficiency (0.931), pureweight not yet implemented
+lumi = 12.9
+sampleLumi = 3.0
+muTriggerEff = '0.926'
+eleTriggerErr = '0.963'
+MCweight = 'TopPtWeight*puReweight_true_max4*'+eleTriggerErr+'*lepton_muSF_HIP*lepton_muSF_mediumID*lepton_muSF_miniIso02*lepton_muSF_sip3d*lepton_eleSF_cutbasedID*lepton_eleSF_miniIso01*lepton_eleSF_gsf'
+weight_str, weight_err_str = makeWeight(lumi, sampleLumi, reWeight=MCweight) #only use electron trigger efficiency (0.931), pureweight not yet implemented
 
 def getPseudoRCS(small,smallE,large,largeE): 
   if small>0:

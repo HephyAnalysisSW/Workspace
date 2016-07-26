@@ -30,7 +30,7 @@ if QCDup: nameSuffix += '_QCDup'
 if QCDdown: nameSuffix += '_QCDdown'
 
 ## samples
-isData              = True
+isData              = False
 unblinded           = True
 validation          = False
 isCentralPrediction = True
@@ -40,7 +40,7 @@ if isData:
 loadTemplate = True
 
 wjetsSB = (3,4)
-if validation: wjetsSB = (2,3)
+if validation: wjetsSB = (3,3)
 
 cWJets      = getChain(WJetsHTToLNu,histname='')
 cTTJets     = getChain(TTJets_Comb,histname='')
@@ -81,10 +81,10 @@ else:
   regStr = 'SR2016_v2'
 
 ## weight calculations
-lumi = 7.7
-templateLumi = 7.7 # lumi that was used when template was created - if defined wrong, fixed rest backgrounds will be wrong
+lumi = 12.9
+templateLumi = 12.9 # lumi that was used when template was created - if defined wrong, fixed rest backgrounds will be wrong
 sampleLumi = 3.
-printlumi = '7.7'
+printlumi = '12.9'
 debugReweighting = False
 
 year = '2016'
@@ -139,8 +139,9 @@ if not isData: presel = presel_MC
 #presel = singleMu_presel
 
 ## weights for MC
-MCweight = 'TopPtWeight*puReweight_true_max4*(singleMuonic*0.926 + singleElectronic*0.963)'
-#MCweight = 'TopPtWeight'
+muTriggerEff = '0.926'
+eleTriggerErr = '0.963'
+MCweight = 'TopPtWeight*puReweight_true_max4*(singleMuonic*'+muTriggerEff+' + singleElectronic*'+eleTriggerErr+')*lepton_muSF_HIP*lepton_muSF_mediumID*lepton_muSF_miniIso02*lepton_muSF_sip3d*lepton_eleSF_cutbasedID*lepton_eleSF_miniIso01*lepton_eleSF_gsf'
 
 ## corrections
 createFits = True # turn off if you already did one
