@@ -2241,10 +2241,10 @@ class Yields():
             #print "CUT: ", cutName
             #print "OLD ONE: "
             #print cutStr
-            #cutStr , weightStr = self.cut_weights[cutName][sample]
             #print "New ONE: "
             #print cutStr
             #yld = getYieldFromChain(samples[sample]['tree'], cutStr,self.cut_weights[cutName][sample], returnError=self.err) #,self.nDigits) 
+            cutStr , weightStr = self.cut_weights[cutName][sample]
             yld = getYieldFromChain(samples[sample]['tree'], cutStr, weightStr, returnError=self.err) #,self.nDigits) 
             #print cut[0], "     ", "getYieldFromChain( %s, '%s', '%s',%s )"%( "samples."+sample+".tree", cut[1], self.weights[sample], True) + "==(%s,%s)"%yld 
             if self.err:
