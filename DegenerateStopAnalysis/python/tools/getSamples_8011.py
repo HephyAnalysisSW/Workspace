@@ -128,27 +128,11 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
       })
    
    if getData:
-      if "d" in sampleList or "dblind" in sampleList:
-         MET = getChain(cmgPP.MET_v2[skim],histname='')
-         METDataUnblind  = MET#.CopyTree("run<=274240") #instead cut on run # is applied
-         sampleDict.update({
-               "d":        {'name':"DataUnblind",         'sample':cmgPP.MET_v2[skim],      'tree':METDataUnblind,      'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":data_triggers, "filters":data_filters, 'lumi': lumi_data_unblinded, 'cut':"run<=274240"},
-         })
-         
-         if blinded: 
-            sampleDict.update({
-               "dblind":   {'name':"DataBlind",           'sample':cmgPP.MET_v2[skim],      'tree':MET,                 'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":data_triggers, "filters":data_filters, 'lumi': lumi_data_blinded},
-            })
-
-      elif "d1mu" in sampleList or "d1muBlind" in sampleList:
+      if "d1mu" in sampleList or "d1muBlind" in sampleList:
          SingleMuDataBlind = getChain(cmgPP.SingleMu_v2[skim],histname='')
          SingleMuDataUnblind  = SingleMuDataBlind#.CopyTree("run<=274240") #instead cut on run # is applied
          sampleDict.update({
                "d1mu":     {'name':"SingleMuDataUnblind", 'sample':cmgPP.SingleMu_v2[skim], 'tree':SingleMuDataUnblind, 'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":data_triggers, "filters":data_filters, 'lumi': lumi_data_unblinded, 'cut':"run<=274240"},
-         })
-        
-         if blinded: 
-            sampleDict.update({
                "d1muBlind":{'name':"SingleMuDataBlind",   'sample':cmgPP.SingleMu_v2[skim], 'tree':SingleMuDataBlind,   'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":data_triggers, "filters":data_filters, 'lumi': lumi_data_blinded},
             })
 
@@ -157,14 +141,16 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
          SingleElDataUnblind  = SingleElDataBlind#.CopyTree("run<=274240") #instead cut on run # is applied
          sampleDict.update({
                "d1el":     {'name':"SingleElDataUnblind", 'sample':cmgPP.SingleEl_v2[skim], 'tree':SingleElDataUnblind, 'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":data_triggers, "filters":data_filters, 'lumi': lumi_data_unblinded, 'cut':"run<=274240"},
-         })
-         
-         if blinded: 
-            sampleDict.update({
                "d1elBlind":{'name':"SingleElDataBlind",   'sample':cmgPP.SingleEl_v2[skim], 'tree':SingleElDataBlind,   'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":data_triggers, "filters":data_filters, 'lumi': lumi_data_blinded},
             })
-      else:
-         assert False
+      else: # "d" in sampleList or "dblind" in sampleList:
+         MET = getChain(cmgPP.MET_v2[skim],histname='')
+         METDataUnblind  = MET#.CopyTree("run<=274240") #instead cut on run # is applied
+         sampleDict.update({
+               "d":        {'name':"DataUnblind",         'sample':cmgPP.MET_v2[skim],      'tree':METDataUnblind,      'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":data_triggers, "filters":data_filters, 'lumi': lumi_data_unblinded, 'cut':"run<=274240"},
+               "dblind":   {'name':"DataBlind",           'sample':cmgPP.MET_v2[skim],      'tree':MET,                 'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":data_triggers, "filters":data_filters, 'lumi': lumi_data_blinded},
+            })
+
    
    if "dy" in sampleList:
       #DYJetsSample = getChain(cmgPP.DYJetsM5to50HT[skim],histname='')
