@@ -24,11 +24,11 @@ from Workspace.HEPHYPythonTools.user import username
 from LpTemplateFit import LpTemplateFit
 from rCShelpers import *
 
-isData = False
+isData = True
 makeFit = True
 getYields = True
 getResults = True
-isValidation = False
+isValidation = True
 
 includeMCresults = False
 
@@ -129,7 +129,7 @@ cQCD  = getChain(QCDHT_antiSel,histname='')
 cEWK  = getChain([WJetsHTToLNu_antiSel, TTJets_Comb_antiSel, singleTop_lep_antiSel, DY_HT_antiSel, TTV_antiSel],histname='')
 
 if isData:
-  cData = getChain([single_ele_Run2016B_antiSel_1, single_ele_Run2016B_antiSel_2, single_ele_Run2016B_antiSel_3, single_ele_Run2016B_antiSel_4, single_ele_Run2016B_antiSel_5, single_ele_Run2016C_antiSel],histname='')
+  cData = getChain([single_ele_Run2016B_antiSel, single_ele_Run2016C_antiSel, single_ele_Run2016D_antiSel],histname='')
 else:
   cData = getChain([QCDHT_antiSel, WJetsHTToLNu_antiSel, TTJets_Comb_antiSel, singleTop_lep_antiSel, DY_HT_antiSel, TTV_antiSel] , histname='')
 

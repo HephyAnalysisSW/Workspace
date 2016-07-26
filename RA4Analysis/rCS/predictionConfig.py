@@ -32,7 +32,7 @@ if QCDdown: nameSuffix += '_QCDdown'
 ## samples
 isData              = False
 unblinded           = True
-validation          = False
+validation          = True
 isCentralPrediction = True
 if isData:
   isCentralPrediction = False #should be false for data, otherwise kappa is measured in data!
