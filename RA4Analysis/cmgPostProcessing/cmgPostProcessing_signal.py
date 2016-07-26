@@ -20,8 +20,8 @@ from systematics_helper import calc_btag_systematics, calc_LeptonScale_factors_a
 from btagEfficiency import *
 from leptonFastSimSF import leptonFastSimSF as leptonFastSimSF_
 
-bTagEffFile     = '/data/dspitzbart/Spring16/btagEfficiency/signal_inclusive_pkl'
 scaleFactorDir  = '$CMSSW_BASE/src/Workspace/RA4Analysis/cmgPostProcessing/data/'
+bTagEffFile     = 'data/signal_inclusive_pkl'
 
 try:
   mcEffDict = pickle.load(file(bTagEffFile))
@@ -45,7 +45,7 @@ defSampleStr = "SMS_T5qqqqVV_TuneCUETP8M1"
 #PU_histo_66 = PU_File_66mb.Get("h_ratio_66")
 #PU_histo_70 = PU_File_70mb.Get("h_ratio_70")
 #PU_histo_74 = PU_File_74mb.Get("h_ratio_74")
-PU_dir = "/data/easilar/PU_Histos/"
+PU_dir = scaleFactorDir
 PU_File_59p85mb = ROOT.TFile(PU_dir+"/h_ratio_59p85.root")
 PU_File_63mb = ROOT.TFile(PU_dir+"/h_ratio_63.root")
 PU_File_66p15mb = ROOT.TFile(PU_dir+"/h_ratio_66p15.root")
@@ -56,11 +56,11 @@ PU_histo_66p15 = PU_File_66p15mb.Get("h_ratio")
 
 #####################
 ###For Lepton SF#####
-mu_mediumID_File  = ROOT.TFile("/data/easilar/SF2015/TnP_MuonID_NUM_MediumID_DENOM_generalTracks_VAR_map_pt_eta.root")
-mu_looseID_File   = ROOT.TFile("/data/easilar/SF2015/TnP_MuonID_NUM_LooseID_DENOM_generalTracks_VAR_map_pt_eta-2.root")
-mu_miniIso02_File = ROOT.TFile("/data/easilar/SF2015/TnP_MuonID_NUM_MiniIsoTight_DENOM_LooseID_VAR_map_pt_eta.root")
-mu_sip3d_File     = ROOT.TFile("/data/easilar/SF2015/TnP_MuonID_NUM_TightIP3D_DENOM_LooseID_VAR_map_pt_eta.root")
-ele_kin_File      = ROOT.TFile("/data/easilar/SF2015/kinematicBinSFele.root")
+mu_mediumID_File  = ROOT.TFile(scaleFactorDir+"TnP_MuonID_NUM_MediumID_DENOM_generalTracks_VAR_map_pt_eta.root")
+mu_looseID_File   = ROOT.TFile(scaleFactorDir+"TnP_MuonID_NUM_LooseID_DENOM_generalTracks_VAR_map_pt_eta-2.root")
+mu_miniIso02_File = ROOT.TFile(scaleFactorDir+"TnP_MuonID_NUM_MiniIsoTight_DENOM_LooseID_VAR_map_pt_eta.root")
+mu_sip3d_File     = ROOT.TFile(scaleFactorDir+"TnP_MuonID_NUM_TightIP3D_DENOM_LooseID_VAR_map_pt_eta.root")
+ele_kin_File      = ROOT.TFile(scaleFactorDir+"kinematicBinSFele.root")
 ele_gsf_File      = ROOT.TFile(scaleFactorDir+'egammaEffi_txt_SF2D.root')
 mu_HIP_File       = ROOT.TFile(scaleFactorDir+'general_tracks_and_early_general_tracks_corr_ratio.root')
 #
@@ -76,7 +76,7 @@ histos_LS = {
 }
 #####################
 
-subDir = "postProcessing_Signals_v2"
+subDir = "postProcessing_Signals_batch_final"
 
 #branches to be kept for data and MC
 branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert",
@@ -221,6 +221,7 @@ for isample, sample in enumerate(allSamples):
     newVariables.extend(['lepton_muSF_looseID_err/D/0.','lepton_muSF_mediumID_err/D/0.','lepton_muSF_miniIso02_err/D/0.','lepton_muSF_sip3d_err/D/0.','lepton_eleSF_cutbasedID_err/D/0.','lepton_eleSF_miniIso01_err/D/0.'])
 
     readVectors.append({'prefix':'GenPart',  'nMax':100, 'vars':['eta/F','pt/F','phi/F','mass/F','charge/F', 'pdgId/I', 'motherId/F', 'grandmotherId/F','status/F']})
+    #readVectors.append({'prefix':'genPartAll',  'nMax':100, 'vars':['eta/F','pt/F','phi/F','mass/F','charge/F', 'pdgId/I', 'motherId/F', 'grandmotherId/F','status/F']})
     readVectors.append({'prefix':'JetForMET',  'nMax':100, 'vars':['rawPt/F','pt/F', 'eta/F', 'phi/F','mass/F' ,'id/I','hadronFlavour/F','btagCSV/F', 'btagCMVA/F','corr_JECUp/F','corr_JECDown/F','corr/F']})
     readVectors.append({'prefix':'Jet',  'nMax':100, 'vars':['rawPt/F','pt/F', 'eta/F', 'phi/F','mass/F' ,'id/I','hadronFlavour/F','btagCSV/F', 'btagCMVA/F','corr_JECUp/F','corr_JECDown/F','corr/F','chHEF/F']})
 
@@ -260,12 +261,12 @@ for isample, sample in enumerate(allSamples):
     printHeader("Compiling class to write")
     writeClassName = "ClassToWrite_"+str(isample)
     writeClassString = createClassString(className=writeClassName, vars= newVars, vectors=[], nameKey = 'stage2Name', typeKey = 'stage2Type')
-    s = compileClass(className=writeClassName, classString=writeClassString, tmpDir='/data/'+username+'/tmp/')
+    s = compileClass(className=writeClassName, classString=writeClassString, tmpDir=options.targetDir+'/tmp/')
 
     readClassName = "ClassToRead_"+str(isample)
     readClassString = createClassString(className=readClassName, vars=readVars, vectors=readVectors, nameKey = 'stage1Name', typeKey = 'stage1Type', stdVectors=False)
     printHeader("Class to Read")
-    r = compileClass(className=readClassName, classString=readClassString, tmpDir='/data/'+username+'/tmp/')
+    r = compileClass(className=readClassName, classString=readClassString, tmpDir=options.targetDir+'/tmp/')
 
     filesForHadd=[]
     if options.small: chunks=chunks[:1]
@@ -276,6 +277,7 @@ for isample, sample in enumerate(allSamples):
       for iSplit in range(nSplit):
         cut = "("+skimCond+")&&("+sample['postProcessingCut']+")" if sample.has_key('postProcessingCut') else skimCond
         t = getTreeFromChunk(chunk, cut, iSplit, nSplit)
+        #t.GetListOfBranches().ls()
         if not t: 
           print "Tree object not found:", t
           continue
@@ -403,6 +405,7 @@ for isample, sample in enumerate(allSamples):
 
           g_list=['eta','pt','phi','mass','charge', 'pdgId', 'motherId', 'grandmotherId' , 'status']
           genParts = get_cmg_genParts_fromStruct(r,g_list)
+          #genPartsAll = get_cmg_genPartsAll(c)
           ####
           isrJets = get_matched_Jets(jets,genParts)
           getISRWeight_new(s,isrJets)

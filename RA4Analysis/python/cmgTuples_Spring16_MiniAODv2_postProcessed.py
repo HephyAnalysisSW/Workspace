@@ -172,7 +172,7 @@ allSignalStrings=[\
 #"T5qqqqVV_mGluino_1300To1375_mLSP_1to1250",\
 #"T5qqqqVV_mGluino_1400To1550_mLSP_1To1275",\
 #"T5qqqqVV_mGluino_1600To1750_mLSP_1To950",\
-"SMS_T5qqqqVV_TuneCUETP8M1_v1",\
+"SMS_T5qqqqVV_TuneCUETP8M1",\
 ]
 
 from Workspace.HEPHYPythonTools.user import username
@@ -182,7 +182,8 @@ import pickle
 pickleDir = '/afs/hephy.at/data/easilar01/Ra40b/pickleDir/T5qqqqWW_mass_nEvents_xsec_pkl'
 #signal_dir = '/data/easilar/cmgTuples/postProcessing_Signals/signal/'
 #signal_dir = '/data/easilar/cmgTuples/postProcessing_Signals_v4/signal/'
-signal_dir = '/data/easilar/cmgTuples/postProcessing_Signals_v4/signal/'
+#signal_dir = '/data/easilar/cmgTuples/postProcessing_Signals_v4/signal/'
+signal_dir = '/afs/hephy.at/data/easilar01/cmgTuples/postProcessing_Signals_batch_final/signal/'
 
 def getSignalSample(signal):
   if signal in allSignalStrings:

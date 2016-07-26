@@ -5,6 +5,8 @@ from math import *
 def calc_btag_systematics(t,s,r,mcEffDict,sampleKey,maxConsideredBTagWeight,separateBTagWeights, model=''):
   #separateBTagWeights = False
   zeroTagWeight = 1.
+  #print "yes2"
+  #print mcEffDict
   mceff = getMCEfficiencyForBTagSF(t, mcEffDict[sampleKey], sms=model)
   #print
   #print mceff["mceffs"]
@@ -341,6 +343,7 @@ def fill_branch_WithJEC(s,r):
   return
 
 def getISRWeight(s,genParts):
+  #print "ISR old  yes !!!"
   genGluino = filter(lambda g:abs(g['pdgId'])==1000021, genParts)
   s.ngenGluino = len(genGluino)
   if s.ngenGluino == 2:
@@ -358,6 +361,8 @@ def getISRWeight(s,genParts):
 
 
 def getISRWeight_new(s,isrJets):
+  #print "ISR new YES"
+  if not len(isrJets)==0: print len(isrJets)
   weight_dict = {
                 0:{"weight":1    ,"sys":1,"stat":1},\
                 1:{"weight":0.882,"sys":0.059,"stat":0.014},\
@@ -392,6 +397,7 @@ def filter_crazy_jets(jets,genParts):
         if not ismatched :  break
         dR = deltaR(jet,genPart)
         if dR >= 0.3 and jet["chHEF"]<0.1:
+          #print dR , jet["chHEF"]
           ismatched = False
     return ismatched
 

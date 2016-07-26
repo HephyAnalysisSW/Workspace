@@ -112,18 +112,26 @@ def get_cmg_recoMuons(c):
   return filter(lambda m:abs(m['pdgId'])==13, res)
 
 def get_matched_Jets(jets,genParts):
+    #print "get_matched_Jets"
     matched_jets = []
     for jet in jets:
       ismatched = False
       for genPart in genParts:
         if ismatched :  break
-        if (abs(genPart["pdgId"]) >5) : continue
-        momid = genPart["motherId"] 
-        if not (momid==6 or momid==23 or momid==24 or momid==25 or momid>1e6) : continue 
+        if (abs(genPart["motherId"]) >5) : 
+           #print genPart["motherId"]
+           continue
+        momid = genPart["grandmotherId"] 
+        if not (momid==6 or momid==23 or momid==24 or momid==25 or momid>1e6) : 
+          #print "momID:" , momid
+          continue 
         dR = deltaR(jet,genPart)
         if dR < 0.3 : 
+          #print jet , dR
+          #print genPart
           ismatched = True
-          matched_jets.append(jet)
+      if not ismatched : matched_jets.append(jet)
+    #print len(matched_jets) 
     return matched_jets
 
 #def cmgGoodLepID(r,  nLep, ptCut=10., absEtaCut=2.4, relIso03Cut=0.3):
