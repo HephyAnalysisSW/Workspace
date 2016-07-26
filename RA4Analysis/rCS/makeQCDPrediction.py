@@ -24,16 +24,16 @@ from Workspace.HEPHYPythonTools.user import username
 from LpTemplateFit import LpTemplateFit
 from rCShelpers import *
 
-isData = True
-makeFit = True
-getYields = True
+isData = False
+makeFit = False
+getYields = False
 getResults = True
-isValidation = True
+isValidation = False
 
 includeMCresults = False
 
-readFit     = '/data/dspitzbart/Results2016/QCDEstimation/20160714_fitResult_2016SRVVR_performanceTest_MC7p62fb_pkl'
-readYields  = '/data/dspitzbart/Results2016/QCDEstimation/20160714_QCDestimation_2016SR_MC7p62fb_pkl'
+readFit     = '/data/dspitzbart/Results2016/QCDEstimation/20160725_fitResult_2016SR_MC12p9fb'
+readYields  = '/data/dspitzbart/Results2016/QCDEstimation/20160725_QCDestimation_2016SR_MC12p9fb'
 
 
 
@@ -533,8 +533,8 @@ for srNJet in sorted(signalRegion):
           else: #In MC, get the max of the determined error of the method and the non-closure
             #print NQCD_err, NQCD, NQCD_truth, NQCD
             #NQCD_err_rel  = max([NQCD_err/NQCD, abs(1-NQCD_truth/NQCD)])
-            NQCD_err_rel  = max([NQCD_err/NQCD, sys])
-            #NQCD_err_rel  = 1.
+            #NQCD_err_rel  = max([NQCD_err/NQCD, sys])
+            NQCD_err_rel  = 1.
             print round(NQCD_err_rel,3)
             NQCD_err      = NQCD_err_rel*NQCD
           try: NQCD_lowDPhi = NQCD/(RcsAnti+1)
@@ -544,5 +544,5 @@ for srNJet in sorted(signalRegion):
           NQCD_highDPhi = NQCD - NQCD_lowDPhi
           NQCD_highDPhi_err = sqrt(RcsAnti_err**2*NQCD_lowDPhi**2 + RcsAnti**2*NQCD_lowDPhi_err**2)
           bins[srNJet][stb][htb][btb][dP].update({'NQCDpred':NQCD, 'NQCDpred_err':NQCD_err, 'NQCDpred_err_rel':NQCD_err_rel, 'NQCDpred_lowdPhi':NQCD_lowDPhi, 'NQCDpred_lowdPhi_err':NQCD_lowDPhi_err, 'NQCDpred_highdPhi':NQCD_highDPhi, 'NQCDpred_highdPhi_err':NQCD_highDPhi_err})
-          pickle.dump(bins, file(picklePath+picklePresel,'w'))
+          pickle.dump(bins, file(picklePath+picklePresel+'_100p','w'))
 
