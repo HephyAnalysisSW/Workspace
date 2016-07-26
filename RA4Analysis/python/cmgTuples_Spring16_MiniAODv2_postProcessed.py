@@ -1,8 +1,8 @@
 import copy, os, sys
 #dirEce = '/data/easilar/cmgTuples/postProcessing_Spring16_V6/HT500LT250Skim/'
 #dirEce2 = '/data/easilar/cmgTuples/postProcessing_Spring16_FIXED_v2/'
-#dirDaniel = '/afs/hephy.at/data/dspitzbart01/cmgTuples/postProcessing_Spring16_JECv6_v1/HT500LT250Skim/'
-dirDaniel = '/data/dspitzbart/cmgTuples/postProcessing_Spring16_JECv6/HT500LT250Skim/'
+dirDaniel = '/afs/hephy.at/data/dspitzbart01/cmgTuples/postProcessing_Spring16_JECv6_v1/HT500LT250Skim/'
+#dirDaniel = '/data/dspitzbart/cmgTuples/postProcessing_Spring16_JECv6/HT500LT250Skim/'
 dirEce = '/data/easilar/cmgTuples/postProcessing_Spring16_JECv6/HT500LT250Skim/'
 
 ####usual HT combination####
@@ -148,7 +148,7 @@ diBoson = {\
 "DiBoson_WZ",
 "DiBoson_ZZ",
 ],
-'dir': dirEce,
+'dir': dirDaniel,
 }
 
 TTV = {
