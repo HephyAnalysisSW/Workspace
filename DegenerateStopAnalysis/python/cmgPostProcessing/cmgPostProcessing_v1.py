@@ -167,8 +167,8 @@ def getParameterSet(args):
 
         sampleName = args.processSample
         eff_dict_map = {
-                         "WJets_1j" : ["ZInv", "ZJets", "WJets", "DYJets" ] ,
-                         "TTJets_1j" : ["TTJets" ]
+                         "WJets_1j" : ["ZInv", "ZJets", "WJets", "DYJets" ,"ZZ", "WZ", "WW" ] ,
+                         "TTJets_1j" : ["TTJets" , ]
                         }
         eff_to_use = "TTJets_1j" #default
         for eff_samp, sampleList in eff_dict_map.iteritems():

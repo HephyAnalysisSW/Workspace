@@ -153,13 +153,13 @@ class TaskConfig():
         for key, value in default_keys.iteritems():
             setattr(self,key, getattr(self,key,value) ) 
 
-        self.parameterSet = "analysisHephy_13TeV_2016_v0"
+        self.parameterSet =  "analysisHephy_13TeV_2016_v0"
         mc_path_tag       =  "RunIISpring16MiniAODv2"
         data_path_tag     =  "Data2016"
 
         self.mc_path       = "/afs/hephy.at/data/{ppUser}/cmgTuples/postProcessed_mAODv2/{cmgTag}/{ppTag}/{parameterSet}/{ppStep}/{mc_path_tag}_{cmgTagV}/".format(ppTag=ppTag,ppStep=self.ppStep, ppUser = self.ppUser , cmgTag = self.cmgTag, cmgTagV = self.cmgTagVer, parameterSet=self.parameterSet, mc_path_tag= mc_path_tag)
         self.signal_path   = "/afs/hephy.at/data/{ppUser}/cmgTuples/postProcessed_mAODv2/{cmgTag}/{ppTag}/{parameterSet}/{ppStep}/{mc_path_tag}_{cmgTagV}/".format(ppTag=ppTag,ppStep=self.ppStep, ppUser = self.ppUser , cmgTag = self.cmgTag, cmgTagV = self.cmgTagVer, parameterSet=self.parameterSet, mc_path_tag= mc_path_tag)
-        self.data_path     = "/afs/hephy.at/data/{ppUser}/cmgTuples/postProcessed_mAODv2/{cmgTag}/{ppTag}/{parameterSet}/{ppStep}/{data_path_tag}_{cmgTagV}/".format(ppTag=ppTag,ppStep=self.ppStep, ppUser = self.ppUser , cmgTag = self.cmgTag, cmgTagV = self.cmgTagVer, parameterSet=self.parameterSet, data_path_tag= data_path_tag)
+        self.data_path     = "/afs/hephy.at/data/{ppUser}/cmgTuples/postProcessed_mAODv2/{cmgTag}/{ppTag}/{parameterSet}/{ppStep}/{data_path_tag}_{cmgTagV}_1/".format(ppTag=ppTag,ppStep=self.ppStep, ppUser = self.ppUser , cmgTag = self.cmgTag, cmgTagV = self.cmgTagVer, parameterSet=self.parameterSet, data_path_tag= data_path_tag)
     
         if not samples:
             self.cmgPP         = cmgTuplesPostProcessed( self.mc_path, self.signal_path, self.data_path)

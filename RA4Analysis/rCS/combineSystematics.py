@@ -69,8 +69,8 @@ lepSF_h2b = d.GetPrimitive('h2b')
 #pickleDir =  '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2016_v1_100p_lep_data_3p99/'
 #pickleDir =  '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2016_v1_100p_lep_data_3p99/'
 #pickleDir =  '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2016_v2_lep_data_7p62/'
-#pickleDir =  '/data/dspitzbart/Results2016/Prediction_Spring16_templates_validation_4j_lep_data_7p7/'
-pickleDir =  '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2016_v2_lep_data_7p7/'
+pickleDir =  '/data/dspitzbart/Results2016/Prediction_Spring16_templates_validation_4j_altWSB_lep_data_12p9/'
+#pickleDir =  '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2016_v2_lep_data_7p7/'
 
 saveDir = pickleDir
 #saveDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_fullSR_lep_data_2p25/'
@@ -91,7 +91,7 @@ else:
   dilep   = pickle.load(file('/data/dspitzbart/Results2016/systematics2016/dilep_envelope_pkl'))
 
 
-validation = False
+validation = True
 
 #topPt_Err = pickle.load(file("/data/easilar/Spring15/25ns/extended_with_truth_counts_topPt_pkl"))
 #topPt_Err = pickle.load(file("/data/dspitzbart/Results2016/topErr_pkl_update"))
@@ -174,7 +174,7 @@ for injb,srNJet in enumerate(sorted(signalRegions)):
       #b-tag SF
       #total
       if validation:
-        bErr=0.05
+        bErr=0.08
         mistag_SF = 0.05/sqrt(2)
         b_c_SF = 0.05/sqrt(2)
       else:
@@ -256,21 +256,21 @@ for injb,srNJet in enumerate(sorted(signalRegions)):
       
       #JEC
       if validation:
-        jecErr = 0.09
+        jecErr = 0.20
       else:
         jecErr = (abs(jec[srNJet][stb][htb]['delta_Up_central']) + abs(jec[srNJet][stb][htb]['delta_Down_central']))/2
       jecErrH.SetBinContent(i, jecErr)
       
       #QCD fit
       if validation:
-        qcdErr = 0.03
+        qcdErr = 0.05
       else:
         qcdErr = qcd_err[srNJet][stb][htb]
       qcdErrH.SetBinContent(i, qcdErr)
       
       #2l
       if validation:
-        dilepErr = 0.075
+        dilepErr = 0.1
         if srNJet == (5,5): dilepErr = 0.075
         if srNJet == (6,7): dilepErr = 0.15
         if srNJet == (8,-1): dilepErr = 0.30
@@ -280,7 +280,7 @@ for injb,srNJet in enumerate(sorted(signalRegions)):
       
       # uncertainties on MC rest
       trigger_err = 0.01
-      lumi_err = 0.045
+      lumi_err = 0.062
       rest_xsec = 0.55
       
       # Rcs uncertainties, also considers the composition of W and ttbar and therefore is sensitive to using MC or data

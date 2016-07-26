@@ -17,7 +17,7 @@ from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2_postProcessed import *
 from Workspace.RA4Analysis.cmgTuples_Data25ns_Promtv2_postprocessed import * #2016 data
 
 from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2_antiSel_postProcessed import *
-from Workspace.RA4Analysis.cmgTuples_Data25ns_Promtv2_antiSel_postprocessed import *
+#from Workspace.RA4Analysis.cmgTuples_Data25ns_Promtv2_antiSel_postprocessed import *
 
 from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_postProcessed_antiSel import *
 
@@ -34,9 +34,12 @@ def getBTagCutAndWeight(chain, btagcut, btagweight, cut, weight):
 
 lepSel = 'hard'
 
+muTriggerEff = '0.926'
+eleTriggerErr = '0.963'
 
 #totalWeight = 'weight*lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*TopPtWeight*0.94*puReweight_true_max4'
 totalWeight = 'weight*TopPtWeight*puReweight_true_max4*(singleMuonic*0.926 + singleElectronic*0.963)'
+totalWeight = 'weight*TopPtWeight*puReweight_true_max4*(singleMuonic*'+muTriggerEff+' + singleElectronic*'+eleTriggerErr+')*lepton_muSF_HIP*lepton_muSF_mediumID*lepton_muSF_miniIso02*lepton_muSF_sip3d*lepton_eleSF_cutbasedID*lepton_eleSF_miniIso01*lepton_eleSF_gsf'
 #25ns samples
 WJETS_15 = {'name':'WJets', 'chain':getChain(WJetsHTToLNu_25ns,histname=''), 'color':color('WJets')+1,'weight':totalWeight, 'niceName':'W+Jets S15', 'cut':''}
 WJETS_16 = {'name':'WJets', 'chain':getChain(WJetsHTToLNu,histname=''), 'color':color('WJets')-1,'weight':totalWeight, 'niceName':'W+Jets S16', 'cut':''}
@@ -114,7 +117,7 @@ diBoson = {'name':'diBoson', 'chain':getChain(diBoson,histname=''), 'color':ROOT
 samples         = [WJETS_15, TTJets_combined_15, Rest, QCD_15]#, diBoson]
 samples2        = [WJETS_15, TTJets_combined_15, DY_15, singleTop_15, TTV_15, QCD_15]
 samplesTTcheck  = [WJETS_15, TTJets_combined_singleLep_15, TTJets_combined_diLep_15, TTJets_combined_had_15, Rest, QCD_15]#, diBoson]
-samples16       = [TTJets_16, DY_16, WJETS_16, singleTop_lep_16, QCD_16, TTV_16, diBoson]
+samples16       = [TTJets_16, DY_16, WJETS_16, singleTop_lep_16, QCD_16, TTV_16]
 #samples16_antiSel = [TTJets_Lep_16_antiSel, DY_16_madgraph_antiSel, WJETS_16_antiSel, singleTop_lep_16_antiSel, QCD_16_antiSel, TTV_16_antiSel]
 
 #test_antiSel = {'name':'w/o DY', 'chain':getChain([TTV_antiSel,singleTop_lep_antiSel,TTJets_Lep_antiSel,WJetsHTToLNu_antiSel],histname=''), 'color':color('TTV'),'weight':totalWeight, 'niceName':'w/o DY', 'cut':''}
@@ -268,7 +271,7 @@ preselMultiLep = '((isData&&'+triggers+'&&'+filters+')||(!isData))&&('+ multiLep
 
 noCut = {'name':'empty', 'string':'(1)', 'niceName':'no cut'}
 
-name, allSRcut = nameAndCut((250,-1),(500,-1),(5,-1),btb=(0,-1),presel=mcpresel)
+name, allSRcut = nameAndCut((250,-1),(500,-1),(5,-1),btb=(0,-1),presel=newpresel)
 allSR = {'name':name,'string':allSRcut,'niceName':'all SR'}
 allSR_test = {'name':name,'string':allSRcut+'&&weight<1','niceName':'all SR'}
 allSR_lowHT = {'name':name,'string':allSRcut+'&&htJet30j<900','niceName':'all SR'}
@@ -491,7 +494,7 @@ nbjetComp = {'name':btagStr, 'binning':[6,0,6], 'titleX':'n_{b-jets}', 'titleY':
 
 name, allSRcut = nameAndCut((250,-1),(500,-1),(3,-1),btb=(0,-1),presel=newpresel)
 #data = {'name':'data', 'chain':getChain([single_mu_Run2015D, single_ele_Run2015D],histname=''), 'cut':newpresel+allSRcut+'&&nBJetMediumCSV30==0'}
-data = {'name':'data', 'chain':getChain([single_mu_Run2016B, single_ele_Run2016B, single_mu_Run2016C, single_ele_Run2016C],histname=''), 'cut':newpresel+allSRcut+'&&nBJetMediumCSV30==0'}
+data = {'name':'data', 'chain':getChain([single_mu_Run2016B, single_ele_Run2016B, single_mu_Run2016C, single_ele_Run2016C, single_mu_Run2016D, single_ele_Run2016D],histname=''), 'cut':newpresel+allSRcut+'&&nBJetMediumCSV30==0'}
 #data_antiSel = {'name':'data', 'chain':getChain([single_mu_Run2016B_antiSel, single_ele_Run2016B_antiSel],histname=''), 'cut':newpresel+allSRcut+'&&nBJetMediumCSV30==0'}
 
 
@@ -521,6 +524,7 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
   if 'binningIsExplicit' in variable:
     binningIsExplicit = variable['binningIsExplicit']
     scaleHist = ROOT.TH1F('scaleH', 'scaleH', len(variable['binning'])-1, array('d', variable['binning']))
+    scaleWidth = scaleHist.GetXaxis().GetBinUpEdge(1) - scaleHist.GetXaxis().GetBinLowEdge(1)
     YAxisTitleAp = ' / '+str(variable['binNorm'])
     entry = True
     for i_eb, eb in enumerate(variable['binning']):
@@ -534,6 +538,7 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
     binningIsExplicit = False
     YAxisTitleAp = ''
     scaleHist = ROOT.TH1F('scaleH', 'scaleH', *variable['binning'])
+    scaleWidth = scaleHist.GetXaxis().GetBinUpEdge(1) - scaleHist.GetXaxis().GetBinLowEdge(1)
     for i_eb in range(variable['binning'][0]):
       scaleHist.SetBinContent(i_eb+1, 1)
       scaleHist.SetBinError(i_eb, 0)
@@ -682,7 +687,8 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
     h_Stack = ROOT.THStack('h_Stack','Stack')
     for item in h:
       item['hist'].Sumw2()
-      item['hist'].Divide(scaleHist)
+      item['hist'].Scale(scaleWidth,'width')
+      #item['hist'].Divide(scaleHist)
       h_Stack.Add(item['hist'])
     if minimum: h_Stack.SetMinimum(minimum)
     if maximum: h_Stack.SetMaximum(maximum)
@@ -700,7 +706,8 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
     first = True
     for item in reversed(h):
       item['hist'].Sumw2()
-      item['hist'].Divide(scaleHist)
+      item['hist'].Scale(scaleWidth,'width')
+      #item['hist'].Divide(scaleHist)
       if first:
         if drawError:
           item['hist'].Draw('e hist')
@@ -751,7 +758,8 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
     data['chain'].Draw(variable['name']+'>>data',normCut,'goff')
     #h_Stack.Draw('hist')
     h[-1]['hist'].Sumw2()
-    h[-1]['hist'].Divide(scaleHist)
+    h[-1]['hist'].Scale(scaleWidth, 'width')
+    #h[-1]['hist'].Divide(scaleHist)
     h[-1]['hist'].Draw('same e1p')
     if legend: leg.AddEntry(h[-1]['hist'])
     if binningIsExplicit: dataMCH = ROOT.TH1F('dataMC','DataMC',len(variable['binning'])-1, array('d', variable['binning']))
@@ -759,7 +767,8 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
     #dataMCH.Sumw2()
     dataMCH = h[-1]['hist'].Clone()
     totalH.Sumw2()
-    totalH.Divide(scaleHist)
+    totalH.Scale(scaleWidth, 'width')
+    #totalH.Divide(scaleHist)
     dataMCH.Divide(totalH)
     can.cd()
     pad2=ROOT.TPad("pad2","datavsMC",0.,0.,1.,.3)

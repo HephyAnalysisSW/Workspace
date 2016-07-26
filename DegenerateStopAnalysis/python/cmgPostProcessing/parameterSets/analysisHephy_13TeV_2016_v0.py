@@ -200,7 +200,6 @@ def getParameterSet(args):
         'branchPrefix': 'Jet',
         'branches': [
             'pt/F', 'eta/F', 'phi/F', 'id/I','btagCSV/F', 'mass/F' , 'chHEF/F',
-            'hadronFlavour/I',
             ],
         'nMax': 25,
         'bas': {

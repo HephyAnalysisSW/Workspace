@@ -81,7 +81,7 @@ def binnedNBTagsFit(cut, MCcut, cutname, samples, prefix = "", QCD_dict={0:{'y':
   if template_TTJets_Dict['loadTemp'] and loadTemplate:
     template_TTJets = template_TTJets_Dict['hist']
     tempFile_TTJets = template_TTJets_Dict['file']
-  else: 
+  else:
     template_TTJets = getPlotFromChain(cTTJets, nBTagVar, [0,1,2,3], MCcut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
     if templateWeights:
       for i_nbjb, nbjb in enumerate(['0','1','2p']):

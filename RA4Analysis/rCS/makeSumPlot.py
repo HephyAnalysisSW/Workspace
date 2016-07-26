@@ -50,8 +50,8 @@ prefix = 'singleLeptonic_Spring16_'
 #pickleDir = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_validation_4j_lep_data_3p99/'
 #pickleDir = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2016_v1_100p_lep_data_3p99/'#resultsFinal_withSystematics_pkl
 #pickleDir = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2016_v2_lep_data_7p62/'
-#pickleDir = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_validation_4j_altWSB_lep_data_7p7/'
-pickleDir = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2016_v2_lep_data_7p7/'
+pickleDir = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_validation_4j_altWSB_lep_data_12p9/'
+#pickleDir = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2016_v2_lep_data_7p7/'
 
 if not useKappa: res = pickle.load(file(pickleDir+'singleLeptonic_Spring16__estimationResults_pkl'))
 else: res = pickle.load(file(pickleDir+'resultsFinal_withSystematics_pkl'))
@@ -551,7 +551,7 @@ latex1.SetTextSize(0.04)
 latex1.SetTextAlign(11)
 
 latex1.DrawLatex(0.15,0.96,'CMS #bf{#it{'+latextitle+'}}')
-latex1.DrawLatex(0.81,0.96,'#bf{'+printlumi+"fb^{-1} (13TeV)}")
+latex1.DrawLatex(0.80,0.96,'#bf{'+printlumi+"fb^{-1} (13TeV)}")
 
 pad1.SetLogy()
 
@@ -604,8 +604,12 @@ else:
   ratio2.GetYaxis().SetLabelSize(0.13)
   ratio2.GetYaxis().SetTitleOffset(0.4)
   ratio2.GetYaxis().SetNdivisions(506)
+
+  maxRatio = 1.95
+  forceMaxRatioValue = False
+  if ratio2.GetBinContent(ratio2.GetMaximumBin())>maxRatio and not forceMaxRatioValue: maxRatio = ratio2.GetBinContent(ratio2.GetMaximumBin())+0.2
   ratio2.SetMinimum(0.)
-  ratio2.SetMaximum(1.95)
+  ratio2.SetMaximum(maxRatio)
     
   if validation or unblinded:
     #ratio2.GetYaxis().SetTitle('#frac{Data}{Prediction}')

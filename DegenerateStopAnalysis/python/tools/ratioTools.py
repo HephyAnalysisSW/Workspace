@@ -99,7 +99,7 @@ def makeCanvasMultiPads(     c1Name="canvas",  c1ww=600, c1wh=600,  joinPads=Tru
         #if padRatios and len(padRatios)==len(pads):
         if padRatios:
             if not nPads:
-                pads=[{"name":"p%s"%(ipad+1) , "m":[], "gridX":False, "gridY":False} for ipad in range(len(padRatios))]
+                pads=[{"name":"%s_p%s"%(c1Name, ipad+1) , "m":[], "gridX":False, "gridY":False} for ipad in range(len(padRatios))]
             padRatios = [float(x)/(sum(padRatios)) for x in padRatios]
             print "++++++++++++++ pads", padRatios 
             for ipad, pad in enumerate(pads):
