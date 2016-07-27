@@ -99,7 +99,7 @@ for injb,srNJet in enumerate(sorted(signalRegions)):
       print
       deltaPhiCut = signalRegions[srNJet][stb][htb]['deltaPhi']
       save_name,     cut_DY_SR =  nameAndCut(stb, htb, srNJet, btb=(0,0), presel="deltaPhi_Wl>"+str(deltaPhiCut), btagVar = "nBJetMediumCSV30") 
-      dilep   = pickle.load(file('/data/easilar/Results2016/ICHEP/SYS/V1//unc_with_SRAll_'+save_name+'_pkl'))
+      dilep   = pickle.load(file('/data/easilar/Results2016/ICHEP/SYS/V1//unc_with_12p88_SRAll_'+save_name+'_pkl'))
       constant_err = (abs(dilep[srNJet][stb][htb]["delta_constant_Up"])+abs(dilep[srNJet][stb][htb]["delta_constant_Down"]))/2
       #constant_err = (abs(dilep[srNJet][stb][htb]["delta_Up_central"])+abs(dilep[srNJet][stb][htb]["delta_Down_central"]))/2
       slope_err = (abs(dilep[srNJet][stb][htb]["delta_slope_Up"])+abs(dilep[srNJet][stb][htb]["delta_slope_Down"]))/2
@@ -162,6 +162,6 @@ latex1.SetTextAlign(11)
 latex1.DrawLatex(0.15,0.96,'CMS #bf{#it{Preliminary}}')
 latex1.DrawLatex(0.85,0.96,"#bf{(13TeV)}")
 
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/data/Run2016B/7p7fb/syst_uncertainties/dilepSys_ICHEP_kappa_tot.png')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/data/Run2016B/7p7fb/syst_uncertainties/dilepSys_ICHEP_kappa_tot.root')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/data/Run2016B/7p7fb/syst_uncertainties/dilepSys_ICHEP_kappa_tot.pdf')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/data/Run2016B/ICHEP_run/syst_uncertainties/dilepSys_ICHEP_kappa_tot.png')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/data/Run2016B/ICHEP_run/syst_uncertainties/dilepSys_ICHEP_kappa_tot.root')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/data/Run2016B/ICHEP_run/syst_uncertainties/dilepSys_ICHEP_kappa_tot.pdf')

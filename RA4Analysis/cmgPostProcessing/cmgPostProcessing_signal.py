@@ -76,10 +76,10 @@ histos_LS = {
 }
 #####################
 
-subDir = "postProcessing_Signals_batch_final"
+subDir = "postProcessing_Signals_batch_ISR_fix"
 
 #branches to be kept for data and MC
-branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert",
+branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert", "nIsr" ,
                      "nJet25", "nBJetLoose25", "nBJetMedium25", "nBJetTight25", "nJet40", "nJet40a", "nBJetLoose40", "nBJetMedium40", "nBJetTight40", 
                      "nLepGood20", "nLepGood15", "nLepGood10", "htJet25", "mhtJet25", "htJet40j", "htJet40", "mhtJet40", 
                      "met*","Flag_*","HLT_*",
@@ -167,7 +167,7 @@ def getTreeFromChunk(c, skimCond, iSplit, nSplit):
 ##gluino mass to be processed
 mglu = options.gluMass 
 print mglu
-pickleDir = '/afs/hephy.at/data/easilar01/Ra40b/pickleDir/T5qqqqWW_mass_nEvents_xsec_'+str(mglu)+'_pkl'
+pickleDir = '/afs/hephy.at/data/easilar01/Ra40b/pickleDir/T5qqqqWW_mass_nEvents_xsec_V2_'+str(mglu)+'_pkl'
 
 exec('allSamples=['+options.allsamples+']')
 for isample, sample in enumerate(allSamples):
@@ -207,7 +207,7 @@ for isample, sample in enumerate(allSamples):
     #  print sample["name"]
     #else: sampleKey = 'none'
     
-    readVariables = ['met_pt/F', 'met_phi/F', 'met_eta/F','met_mass/F' ,'nVert/I']
+    readVariables = ['met_pt/F', 'met_phi/F', 'met_eta/F','met_mass/F' ,'nVert/I', 'nIsr/F']
     newVariables = ['weight/F','muonDataSet/I','eleDataSet/I']
     aliases = [ "met:met_pt", "metPhi:met_phi"]
 
@@ -407,8 +407,10 @@ for isample, sample in enumerate(allSamples):
           genParts = get_cmg_genParts_fromStruct(r,g_list)
           #genPartsAll = get_cmg_genPartsAll(c)
           ####
-          isrJets = get_matched_Jets(jets,genParts)
-          getISRWeight_new(s,isrJets)
+          #isrJets = get_matched_Jets(jets,genParts)
+          nISR = r.nIsr
+          #print "ISR" , nISR
+          getISRWeight_new(s,nISR)
           s.flag_crazy_jets = filter_crazy_jets(jets,genParts)
           ####
           getISRWeight(s,genParts)

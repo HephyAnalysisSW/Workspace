@@ -183,7 +183,7 @@ pickleDir = '/afs/hephy.at/data/easilar01/Ra40b/pickleDir/T5qqqqWW_mass_nEvents_
 #signal_dir = '/data/easilar/cmgTuples/postProcessing_Signals/signal/'
 #signal_dir = '/data/easilar/cmgTuples/postProcessing_Signals_v4/signal/'
 #signal_dir = '/data/easilar/cmgTuples/postProcessing_Signals_v4/signal/'
-signal_dir = '/afs/hephy.at/data/easilar01/cmgTuples/postProcessing_Signals_batch_final/signal/'
+signal_dir = '/afs/hephy.at/data/easilar01/cmgTuples/postProcessing_Signals_batch_ISR_fix/signal/'
 
 def getSignalSample(signal):
   if signal in allSignalStrings:

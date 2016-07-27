@@ -17,7 +17,7 @@ def tryGluLSP(mass_dict, mglu, mlsp, def_val = 0):
         mass_dict[mglu][mlsp]=def_val
 
 
-samples = [SMS_T5qqqqVV_TuneCUETP8M1_v1 , SMS_T5qqqqVV_TuneCUETP8M1_v2 ]
+samples = [SMS_T5qqqqVV_TuneCUETP8M1] # , SMS_T5qqqqVV_TuneCUETP8M1_v2 ]
 #samples = [T5qqqqVV_mGluino_600To675_mLSP_1to550,T5qqqqVV_mGluino_700To775_mLSP_1To650]
 pickleDir = '/afs/hephy.at/data/easilar01/Ra40b/pickleDir/'
 
@@ -47,13 +47,14 @@ def getGluLSPInfo(sample):
   mass_dict = {}  
 
   #hist_name = "glu_lsp_%s"%sample_name
-  #hist = ROOT.TH2D(hist_name, hist_name, 2000,0,2000, 2000 , 0, 2000)
+  hist = ROOT.TH2D("hist", "hist", 3000,0,3000, 3000 , 0, 3000)
 
   #chain.Draw("GenSusyMNeutralino:GenSusyMGluino>>%s"%hist_name,cut_common)
+  chain.Draw("GenSusyMNeutralino:GenSusyMGluino>>hist",cut_common)
   
-  file = ROOT.TFile("/afs/hephy.at/user/e/easilar/www/data/Run2016B/7p7fb/plots/signal_crosscheck_plots/T5qqqqWW_mass_plain.root")
-  can = file.Get("cb")
-  hist = can.GetPrimitive("glu_lsp")
+  #file = ROOT.TFile("/afs/hephy.at/user/e/easilar/www/data/Run2016B/7p7fb/plots/signal_crosscheck_plots/T5qqqqWW_mass_plain.root")
+  #can = file.Get("cb")
+  #hist = can.GetPrimitive("glu_lsp")
 
   for xbin in xrange(hist.GetNbinsX()):
     for ybin in xrange(hist.GetNbinsY()):
@@ -77,13 +78,13 @@ def getGluLSPInfo(sample):
 #pool = multiprocessing.Pool(10)
 print samples
 chunks0 = getChunks(samples[0], maxN=-1)
-chunks1 = getChunks(samples[1], maxN=-1)
-chain = getChain(chunks0[0]+chunks1[0], maxN=-1, treeName='tree')
+#chunks1 = getChunks(samples[1], maxN=-1)
+chain = getChain(chunks0[0], maxN=-1, treeName='tree')
 results = getGluLSPInfo(chain)
 #results = pool.map(getGluLSPInfo , chain)
 print results
 #pool.close()
 #pool.join()
  
-pickle.dump(results, file(pickleDir+'T5qqqq'+VV_label+'_mass_nEvents_xsec_pkl','w'))
-print "written:" , pickleDir+'T5qqqq'+VV_label+'_mass_nEvents_xsec_pkl'
+pickle.dump(results, file(pickleDir+'T5qqqq'+VV_label+'_mass_nEvents_xsec_fullChunks_pkl','w'))
+print "written:" , pickleDir+'T5qqqq'+VV_label+'_mass_nEvents_xsec_fullChunks_pkl'

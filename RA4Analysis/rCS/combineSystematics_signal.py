@@ -41,7 +41,7 @@ for srNJet in sorted(signalRegions):
 path = "/data/easilar/Spring15/25ns/allSignals_2p25_allSyst_approval_pkl"
 res = pickle.load(file(path))
 
-expand_pickle = "/data/easilar/Spring15/25ns/allSignals_2p3_pkl"
+expand_pickle = "/data/easilar/Results2016/ICHEP/signal_Spring16/OnePointSignals_12p88_pkl"
 expand_dict = pickle.load(file(expand_pickle))
 
 colors = [ROOT.kBlue+2, ROOT.kBlue-4, ROOT.kBlue-7, ROOT.kBlue-9, ROOT.kCyan-9, ROOT.kCyan-6, ROOT.kCyan-2,ROOT.kGreen+3,ROOT.kGreen-2,ROOT.kGreen-6,ROOT.kGreen-7, ROOT.kOrange-4, ROOT.kOrange+1, ROOT.kOrange+8, ROOT.kRed, ROOT.kRed+1]
@@ -86,9 +86,9 @@ totalX = []
 totalY = []
 for sig in [allSignals[5]]:
   #for mglu in sig.keys() :
-  for mglu in [1200] :
+  for mglu in [1500] :
     #for mlsp in sig[mglu].keys() :
-    for mlsp in [800] :
+    for mlsp in [200] :
       i=1
       for injb,srNJet in enumerate(sorted(signalRegions)):
         for stb in sorted(signalRegions[srNJet]):
@@ -278,9 +278,9 @@ for sig in [allSignals[5]]:
       stat_err = ROOT.TGraphAsymmErrors(bins, ax, ay, aexl, aexh, aeyl, stat_aeyh)
       stat_err.Draw('p0 same')
       #ratio.Draw('p0 same')
-      can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/signal_syst_approval/syst_errors_signal_'+str(mglu)+'_'+str(mlsp)+'.png')
-      can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/signal_syst_approval/syst_errors_signal_'+str(mglu)+'_'+str(mlsp)+'.root')
-      can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/signal_syst_approval/syst_errors_signal_'+str(mglu)+'_'+str(mlsp)+'.pdf')
+      #can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/signal_syst_approval/syst_errors_signal_'+str(mglu)+'_'+str(mlsp)+'.png')
+      #can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/signal_syst_approval/syst_errors_signal_'+str(mglu)+'_'+str(mlsp)+'.root')
+      #can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/signal_syst_approval/syst_errors_signal_'+str(mglu)+'_'+str(mlsp)+'.pdf')
 
 
-#pickle.dump(expand_dict,file('/data/easilar/Spring15/25ns/allSignals_2p3_allSyst_pkl','w'))
+pickle.dump(expand_dict,file('/data/easilar/Spring15/25ns/allSignals_2p3_allSyst_pkl','w'))

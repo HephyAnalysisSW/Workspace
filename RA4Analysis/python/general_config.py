@@ -2,8 +2,8 @@
 ##General
 
 sample_lumi = 3000##pb
-lumi = 7700 #2300##pb
-lumi_label = 7.7
+lumi = 12880 #2300##pb
+lumi_label = 12.88
 scale = '(1)'
 btagVarString = 'nBJetMediumCSV30'
 
@@ -11,7 +11,6 @@ btagVarString = 'nBJetMediumCSV30'
 
 #filters = "(Flag_goodVertices && Flag_HBHENoiseFilter_fix && Flag_eeBadScFilter && Flag_HBHENoiseIsoFilter)" # && veto_evt_list)"
 filters = "(Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_goodVertices && Flag_eeBadScFilter &&  Flag_globalTightHalo2016Filter && Flag_badChargedHadronFilter && Flag_badMuonFilter)"
-
 trigger = "((HLT_EleHT350||HLT_EleHT400||HLT_Ele105)||(HLT_MuHT350||HLT_MuHT400))"
 
 ##Common for Background and Signal
@@ -22,11 +21,13 @@ weight_0b     = 'weightBTag0_SF'
 weight_1b     = 'weightBTag1_SF'
 
 ##For MC only
-lepton_Scale  = 'lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID'
+bkg_filters = "(Flag_badChargedHadronFilter && Flag_badMuonFilter)"
+#lepton_Scale  = 'lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID'
+lepton_Scale  = 'lepton_muSF_HIP*lepton_muSF_mediumID*lepton_muSF_miniIso02*lepton_muSF_sip3d*lepton_eleSF_cutbasedID*lepton_eleSF_miniIso01*lepton_eleSF_gsf'
 topPt         = 'TopPtWeight'
 PU            = 'puReweight_true_max4'
-weight_str_plot = '*'.join([reweight,topPt,trigger_scale,PU])
-#weight_str_plot = '*'.join([trigger_scale,lepton_Scale,topPt,PU,reweight])
+#weight_str_plot = '*'.join([reweight,topPt,trigger_scale,PU])
+weight_str_plot = '*'.join([trigger_scale,lepton_Scale,topPt,PU,reweight])
 #weight_str_CV   = '*'.join([trigger_scale,lepton_Scale,topPt,reweight])
 weight_str_CV   = reweight
 

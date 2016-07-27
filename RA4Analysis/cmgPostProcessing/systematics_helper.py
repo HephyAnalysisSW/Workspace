@@ -360,9 +360,9 @@ def getISRWeight(s,genParts):
   return
 
 
-def getISRWeight_new(s,isrJets):
+def getISRWeight_new(s,nisrJets):
   #print "ISR new YES"
-  if not len(isrJets)==0: print len(isrJets)
+  #if not nisrJets==0: print nisrJets
   weight_dict = {
                 0:{"weight":1    ,"sys":1,"stat":1},\
                 1:{"weight":0.882,"sys":0.059,"stat":0.014},\
@@ -372,14 +372,13 @@ def getISRWeight_new(s,isrJets):
                 5:{"weight":0.601,"sys":0.199,"stat":0.088},\
                 6:{"weight":0.515,"sys":0.242,"stat":0.133}
                 }
-  s.nISRJets_new = len(isrJets)
-  if s.nISRJets_new < 6:
-      s.weight_ISR_new = weight_dict[s.nISRJets_new]["weight"]
-      s.ISRSigUp_stat_new = 1+weight_dict[s.nISRJets_new]["stat"]
-      s.ISRSigDown_stat_new = 1-weight_dict[s.nISRJets_new]["stat"] 
-      s.ISRSigUp_sys_new = 1+weight_dict[s.nISRJets_new]["sys"]
-      s.ISRSigDown_sys_new = 1-weight_dict[s.nISRJets_new]["sys"]
-  if s.nISRJets_new >= 6: 
+  if nisrJets < 6:
+      s.weight_ISR_new        =   weight_dict[nisrJets]["weight"]
+      s.ISRSigUp_stat_new     = 1+weight_dict[nisrJets]["stat"]
+      s.ISRSigDown_stat_new   = 1-weight_dict[nisrJets]["stat"] 
+      s.ISRSigUp_sys_new      = 1+weight_dict[nisrJets]["sys"]
+      s.ISRSigDown_sys_new    = 1-weight_dict[nisrJets]["sys"]
+  if nisrJets >= 6: 
       s.weight_ISR_new      = weight_dict[6]["weight"]
       s.ISRSigUp_stat_new   = 1+weight_dict[6]["stat"]
       s.ISRSigDown_stat_new = 1-weight_dict[6]["stat"] 
