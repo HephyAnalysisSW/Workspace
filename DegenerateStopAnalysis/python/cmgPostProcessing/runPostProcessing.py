@@ -109,6 +109,7 @@ sampleSets = {
                                         ["ZJetsToNuNu_HT200to400_ext",    "--skimPreselect" ] ,  
                                         ["ZJetsToNuNu_HT400to600",        "--skimPreselect" ] ,  
                                         ["ZJetsToNuNu_HT600to800",        "--skimPreselect" ] ,  
+                                        ["ZJetsToNuNu_HT800to1200",        "--skimPreselect" ] ,  
                                         ["ZJetsToNuNu_HT1200to2500",      "--skimPreselect" ] ,      
                                         ["ZJetsToNuNu_HT1200to2500_ext",  "--skimPreselect" ] ,      
                                         ["ZJetsToNuNu_HT2500toInf",       "--skimPreselect" ] ,  
