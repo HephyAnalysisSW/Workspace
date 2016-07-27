@@ -11,9 +11,9 @@ import pickle
 
 
 # most recent paths, can be replaced when initializing the cmgTuplesPostProcessed class
-mc_path = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/8011_mAODv2_v1/80X_postProcessing_v3/analysisHephy_13TeV_2016_v0/step1/RunIISpring16MiniAODv2_v1"
+mc_path     = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/8011_mAODv2_v1/80X_postProcessing_v3/analysisHephy_13TeV_2016_v0/step1/RunIISpring16MiniAODv2_v1"
 signal_path = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/8011_mAODv2_v1/80X_postProcessing_v3/analysisHephy_13TeV_2016_v0/step1/RunIISpring16MiniAODv2_v1"
-data_path = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/8011_mAODv2_v1/80X_postProcessing_v3/analysisHephy_13TeV_2016_v0/step1/Data2016_v1"
+data_path   = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/8011_mAODv2_v1/80X_postProcessing_v3/analysisHephy_13TeV_2016_v0/step1/Data2016_v1_1"
 
 samples_path = "/afs/hephy.at/data/vghete02/cmgTuples/postProcessed_mAODv2/8011_mAODv2_v0/80X_postProcessing_v2/analysisHephy_13TeV_2016_v0/step1/"
 
@@ -309,6 +309,7 @@ class cmgTuplesPostProcessed():
                         "ZJetsToNuNu_HT-200To400_13TeV-madgraph_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1",
                         "ZJetsToNuNu_HT-400To600_13TeV-madgraph_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
                         "ZJetsToNuNu_HT-600To800_13TeV-madgraph_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+                        "ZJetsToNuNu_HT-800To1200_13TeV-madgraph_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v3",
                         "ZJetsToNuNu_HT-1200To2500_13TeV-madgraph_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1",
                         "ZJetsToNuNu_HT-1200To2500_13TeV-madgraph_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
                         "ZJetsToNuNu_HT-2500ToInf_13TeV-madgraph_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
