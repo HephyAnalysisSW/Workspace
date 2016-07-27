@@ -23,13 +23,12 @@ ROOT.gStyle.SetOptStat('')
 
 useWcorrection  = False
 useTTcorrection = False
-signal          = False
 withSystematics = True
 useKappa        = True
 
 showMCtruth     = False
-signal = False
-plotPull = False
+signal = True
+plotPull = True
 
 latextitle = 'Preliminary'
 
@@ -50,8 +49,8 @@ prefix = 'singleLeptonic_Spring16_'
 #pickleDir = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_validation_4j_lep_data_3p99/'
 #pickleDir = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2016_v1_100p_lep_data_3p99/'#resultsFinal_withSystematics_pkl
 #pickleDir = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2016_v2_lep_data_7p62/'
-pickleDir = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_validation_4j_altWSB_lep_data_12p9/'
-#pickleDir = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2016_v2_lep_data_7p7/'
+#pickleDir = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_validation_4j_altWSB_lep_data_12p9/'
+pickleDir = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2016_v2_lep_data_12p9/'
 
 if not useKappa: res = pickle.load(file(pickleDir+'singleLeptonic_Spring16__estimationResults_pkl'))
 else: res = pickle.load(file(pickleDir+'resultsFinal_withSystematics_pkl'))
@@ -60,7 +59,8 @@ if withSystematics:
 
 #sig = pickle.load(file('/data/easilar/Spring15/25ns/allSignals_2p3_v2_pkl'))
 #sig = pickle.load(file('/data/easilar/Spring15/25ns/allSignals_2p25_allSyst_approval_pkl'))
-sig = pickle.load(file('/data/easilar/Spring15/25ns/allSignals_2p3_allSyst_pkl'))
+#sig = pickle.load(file('/data/easilar/Spring15/25ns/allSignals_2p3_allSyst_pkl'))
+sig = pickle.load(file('/afs/hephy.at/data/easilar01/Ra40b/pickleDir/allSignals_12p88_2015Syst_pkl'))
 
 #signalRegions = validationRegion
 #signalRegions = signalRegionCRonly
@@ -91,9 +91,9 @@ if isData:
   data_truth_H.SetBinErrorOption(ROOT.TH1F.kPoisson)
 
 
-benchmark1_H = ROOT.TH1F('benchmark1_H','T5qqqqWW (1.0,0.7)',bins,0,bins)
-benchmark2_H = ROOT.TH1F('benchmark2_H','T5qqqqWW (1.2,0.8)',bins,0,bins)
-benchmark3_H = ROOT.TH1F('benchmark3_H','T5qqqqWW (1.5,0.1)',bins,0,bins)
+benchmark1_H = ROOT.TH1F('benchmark1_H','T5qqqqWW (1.2,0.8)',bins,0,bins)
+benchmark2_H = ROOT.TH1F('benchmark2_H','T5qqqqWW (1.4,1.0)',bins,0,bins)
+benchmark3_H = ROOT.TH1F('benchmark3_H','T5qqqqWW (1.6,0.1)',bins,0,bins)
 
 benchmark1_H.SetLineColor(ROOT.kAzure+9)
 benchmark2_H.SetLineColor(ROOT.kMagenta+2)
@@ -307,7 +307,6 @@ for srNJet in sorted(signalRegions):
           dcn, dc = nameAndCut(stb, htb, srNJet, (0,-1), presel+'&&deltaPhi_Wl>'+str(signalRegions[srNJet][stb][htb]['deltaPhi']))
         #data_yield = getYieldFromChain(cData, dc,weight)
         data_yield = res[srNJet][stb][htb]['y_srNJet_0b_highDPhi']
-        if plotPull: pull.SetBinContent(i, (data_yield-res[srNJet][stb][htb]['tot_pred_final'])/res[srNJet][stb][htb]['tot_pred_final_tot_err'])
         data_truth_H.SetBinContent(i,data_yield)
         data_truth_H.GetBinErrorLow(i)
         data_truth_H.GetBinErrorUp(i)
@@ -318,6 +317,9 @@ for srNJet in sorted(signalRegions):
         truth_H.GetXaxis().SetBinLabel(i, str(i))
         truthLowE = truth_H.GetBinErrorLow(i)
         truthUpE = truth_H.GetBinErrorUp(i)
+        if plotPull:
+          pull.SetBinContent(i, (data_yield-res[srNJet][stb][htb]['tot_pred_final'])/sqrt(res[srNJet][stb][htb]['tot_pred_final_tot_err']**2+(0.5*(truthLowE+truthUpE))**2))
+          pull.SetBinError(i, 1)
         #ratioUp = getPropagatedError(truth_H.GetBinContent(i), truthUpE, res[srNJet][stb][htb]['tot_pred_final'], res[srNJet][stb][htb]['tot_pred_final_err'], returnCalcResult=True)
         #ratioLow = getPropagatedError(truth_H.GetBinContent(i), truthLowE, res[srNJet][stb][htb]['tot_pred_final'], res[srNJet][stb][htb]['tot_pred_final_err'], returnCalcResult=True)
         if useKappa: total_pred = res[srNJet][stb][htb]['tot_pred_final']
@@ -380,16 +382,21 @@ for srNJet in sorted(signalRegions):
           kappaPYErr.append(res[srNJet][stb][htb]['tot_kappa_err'])
 
       if signal:
-        benchmark1_H.SetBinContent(i,res[srNJet][stb][htb]['tot_pred_final']+sig[srNJet][stb][htb]['signals'][1000][700]['yield_MB_SR'])
-        benchmark2_H.SetBinContent(i,res[srNJet][stb][htb]['tot_pred_final']+sig[srNJet][stb][htb]['signals'][1200][800]['yield_MB_SR'])
-        benchmark3_H.SetBinContent(i,res[srNJet][stb][htb]['tot_pred_final']+sig[srNJet][stb][htb]['signals'][1500][100]['yield_MB_SR'])
+        benchmark1_H.SetBinContent(i,res[srNJet][stb][htb]['tot_pred_final']+sig[srNJet][stb][htb]['signals'][1200][800]['yield_MB_SR'])
+        benchmark2_H.SetBinContent(i,res[srNJet][stb][htb]['tot_pred_final']+sig[srNJet][stb][htb]['signals'][1400][1000]['yield_MB_SR'])
+        benchmark3_H.SetBinContent(i,res[srNJet][stb][htb]['tot_pred_final']+sig[srNJet][stb][htb]['signals'][1600][100]['yield_MB_SR'])
 
       if unblinded:
         total_meas     += data_yield
-        total_yield     += res[srNJet][stb][htb]['tot_pred_final']
-        total_err       += res[srNJet][stb][htb]['tot_pred_final_tot_err']
-        #total_err       += res[srNJet][stb][htb]['systematics']['total']*res[srNJet][stb][htb]['tot_pred_final']
-        total_stat_var  += res[srNJet][stb][htb]['tot_pred_final_err']**2
+        if useKappa:
+          total_yield     += res[srNJet][stb][htb]['tot_pred_final']
+          total_err       += res[srNJet][stb][htb]['tot_pred_final_tot_err']
+          #total_err       += res[srNJet][stb][htb]['systematics']['total']*res[srNJet][stb][htb]['tot_pred_final']
+          total_stat_var  += res[srNJet][stb][htb]['tot_pred_final_err']**2
+        else:
+          total_yield     += res[srNJet][stb][htb]['tot_pred']
+          total_err       += res[srNJet][stb][htb]['tot_pred_err']
+          total_stat_var  += res[srNJet][stb][htb]['tot_pred_err']**2
 
       pred_H.GetXaxis().SetBinLabel(i,'#splitline{'+signalRegions[srNJet][stb][htb]['njet']+'}{#splitline{'+signalRegions[srNJet][stb][htb]['LT']+'}{'+signalRegions[srNJet][stb][htb]['HT']+'}}')
       i+=1
@@ -456,8 +463,8 @@ if validation:
   h_Stack.SetMaximum(300)
   h_Stack.SetMinimum(0.40)
 else:
-  h_Stack.SetMaximum(100)
-  h_Stack.SetMinimum(0.080)
+  h_Stack.SetMaximum(1000)
+  h_Stack.SetMinimum(0.20)
 
 #h_Stack.GetYaxis().SetTitle('Signal Region #')
 
@@ -632,9 +639,9 @@ else:
 
 if plotPull: suffix += '_pull'
 
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_approval.png')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_approval.root')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_approval.pdf')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_approval_v3.png')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_approval_v3.root')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_approval_v3.pdf')
 
 if useKappa:
   
