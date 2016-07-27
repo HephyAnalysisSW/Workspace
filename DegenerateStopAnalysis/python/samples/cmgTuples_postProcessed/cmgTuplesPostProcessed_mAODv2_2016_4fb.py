@@ -11,15 +11,13 @@ import pickle
 
 
 # most recent paths, can be replaced when initializing the cmgTuplesPostProcessed class
-mc_path     = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/8011_mAODv2_v1/80X_postProcessing_v3/analysisHephy_13TeV_2016_v0/step1/RunIISpring16MiniAODv2_v1"
+mc_path = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/8011_mAODv2_v1/80X_postProcessing_v3/analysisHephy_13TeV_2016_v0/step1/RunIISpring16MiniAODv2_v1"
 signal_path = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/8011_mAODv2_v1/80X_postProcessing_v3/analysisHephy_13TeV_2016_v0/step1/RunIISpring16MiniAODv2_v1"
-data_path   = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/8011_mAODv2_v1/80X_postProcessing_v3/analysisHephy_13TeV_2016_v0/step1/Data2016_v1_1"
+data_path = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/8011_mAODv2_v1/80X_postProcessing_v3/analysisHephy_13TeV_2016_v0/step1/Data2016_v1"
 
-#samples_path = "/afs/hephy.at/data/vghete02/cmgTuples/postProcessed_mAODv2/8011_mAODv2_v0/80X_postProcessing_v2/analysisHephy_13TeV_2016_v0/step1/"
-#
-#mc_path     = samples_path + "RunIISpring16MiniAODv2_v0"
-#signal_path = samples_path + "RunIISpring16MiniAODv2_v0"
-#data_path   = samples_path + "Data2016_v0"
+#mc_path = "/afs/hephy.at/data/vghete02/cmgTuples/postProcessed_mAODv2/8011_mAODv2_v0/80X_postProcessing_v2/analysisHephy_13TeV_2016_v0/step1/RunIISpring16MiniAODv2_v0"
+#signal_path = "/afs/hephy.at/data/vghete02/cmgTuples/postProcessed_mAODv2/8011_mAODv2_v0/80X_postProcessing_v2/analysisHephy_13TeV_2016_v0/step1/RunIISpring16MiniAODv2_v0"
+#data_path = "/afs/hephy.at/data/vghete02/cmgTuples/postProcessed_mAODv2/8011_mAODv2_v0/80X_postProcessing_v2/analysisHephy_13TeV_2016_v0/step1/Data2016_v0"
 
 # Lumi that was used in the weight calculation of PostProcessing in pb-1
 lumi_mc = 10000.
@@ -58,10 +56,10 @@ class cmgTuplesPostProcessed():
             'preOneLep':  pol
             }
 
-    def getDataSample(self, name, bins):
+    def getDataSample(self, name, sample):
         s = self.makeSample({
             "name" : name,
-            "bins" : [bins] if type(bins)==type("") else bins,
+            "bins" : [sample],
             'dir' : self.data_path,
             })
         #
@@ -305,15 +303,12 @@ class cmgTuplesPostProcessed():
             "name" : "ZJetsHT",
             "bins" :  [
 
-                        "ZJetsToNuNu_HT-100To200_13TeV-madgraph_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1",
-                        "ZJetsToNuNu_HT-200To400_13TeV-madgraph_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1",
-                        "ZJetsToNuNu_HT-400To600_13TeV-madgraph_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+
+
+
                         "ZJetsToNuNu_HT-600To800_13TeV-madgraph_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
-                        "ZJetsToNuNu_HT-800To1200_13TeV-madgraph_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v3",
-                        "ZJetsToNuNu_HT-1200To2500_13TeV-madgraph_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1",
                         "ZJetsToNuNu_HT-1200To2500_13TeV-madgraph_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
                         "ZJetsToNuNu_HT-2500ToInf_13TeV-madgraph_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
-
                         ] ,
             'dir' : self.mc_path ,
             'sampleId': 40,
@@ -430,9 +425,9 @@ class cmgTuplesPostProcessed():
         ######################################################################################################
 
         dataSamples = [
-                        ["MET_v2",      ["MET_Run2016B-PromptReco-v2"           , "MET_Run2016C-PromptReco-v2"            ]],#  ,  "MET_Run2016D-PromptReco-v2"            ]    ],
-                        ["SingleMu_v2", ["SingleMuon_Run2016B-PromptReco-v2"    , "SingleMuon_Run2016C-PromptReco-v2"     ]],#  ,  "SingleMuon_Run2016D-PromptReco-v2"     ]    ],
-                        ["SingleEl_v2", ["SingleElectron_Run2016B-PromptReco-v2", "SingleElectron_Run2016C-PromptReco-v2" ]],#  ,  "SingleElectron_Run2016D-PromptReco-v2" ]    ],
+            ["MET_v2", "MET_Run2016B-PromptReco-v2"],
+            ["SingleMu_v2", "SingleMuon_Run2016B-PromptReco-v2"],
+            ["SingleEl_v2", "SingleElectron_Run2016B-PromptReco-v2"],
             ]
 
         allData = []
@@ -485,6 +480,3 @@ class cmgTuplesPostProcessed():
         for sig in mass_scan:
             sm = self.makeSample(mass_scan[sig])
             setattr(self, sig, sm)
-
-if __name__=="__main__":
-    cmgPP = cmgTuplesPostProcessed( mc_path, signal_path, data_path ) 

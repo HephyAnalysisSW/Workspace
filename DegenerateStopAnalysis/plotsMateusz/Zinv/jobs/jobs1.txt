@@ -1,0 +1,95 @@
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SR1  --CT2 75   --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SR1  --CT2 100  --getData 1 --dataset SingleMu  
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SR1  --CT2 125  --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SR1  --CT2 150  --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SR1  --CT2 300  --getData 1 --dataset SingleMu
+
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRL1 --CT2 75   --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRL1 --CT2 100  --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRL1 --CT2 125  --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRL1 --CT2 150  --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRL1 --CT2 300  --getData 1 --dataset SingleMu
+
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRH1 --CT2 75   --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRH1 --CT2 100  --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRH1 --CT2 125  --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRH1 --CT2 150  --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRH1 --CT2 300  --getData 1 --dataset SingleMu
+
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRV1 --CT2 75   --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRV1 --CT2 100  --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRV1 --CT2 125  --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRV1 --CT2 150  --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRV1 --CT2 300  --getData 1 --dataset SingleMu
+
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SR1a --CT2 75   --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SR1a --CT2 100  --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SR1a --CT2 125  --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SR1a --CT2 150  --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SR1a --CT2 300  --getData 1 --dataset SingleMu
+
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SR1b --CT2 75   --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SR1b --CT2 100  --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SR1b --CT2 125  --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SR1b --CT2 150  --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SR1b --CT2 300  --getData 1 --dataset SingleMu
+
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SR1c --CT2 75   --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SR1c --CT2 100  --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SR1c --CT2 125  --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SR1c --CT2 150  --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SR1c --CT2 300  --getData 1 --dataset SingleMu
+
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRL1a --CT2 75  --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRL1a --CT2 100 --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRL1a --CT2 125 --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRL1a --CT2 150 --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRL1a --CT2 300 --getData 1 --dataset SingleMu
+
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRH1a --CT2 75  --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRH1a --CT2 100 --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRH1a --CT2 125 --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRH1a --CT2 150 --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRH1a --CT2 300 --getData 1 --dataset SingleMu
+
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRV1a --CT2 75  --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRV1a --CT2 100 --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRV1a --CT2 125 --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRV1a --CT2 150 --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRV1a --CT2 300 --getData 1 --dataset SingleMu
+
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRL1b --CT2 75  --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRL1b --CT2 100 --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRL1b --CT2 125 --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRL1b --CT2 150 --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRL1b --CT2 300 --getData 1 --dataset SingleMu
+
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRH1b --CT2 75  --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRH1b --CT2 100 --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRH1b --CT2 125 --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRH1b --CT2 150 --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRH1b --CT2 300 --getData 1 --dataset SingleMu
+
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRV1b --CT2 75  --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRV1b --CT2 100 --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRV1b --CT2 125 --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRV1b --CT2 150 --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRV1b --CT2 300 --getData 1 --dataset SingleMu
+
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRL1c --CT2 75  --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRL1c --CT2 100 --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRL1c --CT2 125 --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRL1c --CT2 150 --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRL1c --CT2 300 --getData 1 --dataset SingleMu
+
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRH1c --CT2 75  --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRH1c --CT2 100 --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRH1c --CT2 125 --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRH1c --CT2 150 --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRH1c --CT2 300 --getData 1 --dataset SingleMu
+
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRV1c --CT2 75  --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRV1c --CT2 100 --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRV1c --CT2 125 --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRV1c --CT2 150 --getData 1 --dataset SingleMu
+python -b ../ZinvEstimation.py --plot 1 --doYields 1 --Zpeak 1 --emulated 1 --leptons 1 --peak 1 --SR SRV1c --CT2 300 --getData 1 --dataset SingleMu

@@ -70,8 +70,8 @@ print makeDoubleLine()
 
 #Save
 if save: #web address: http://www.hephy.at/user/mzarucki/plots/
-   if removedCut == "None": savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/QCD/ABCD/ABCD" + ABCD + "/estimation/" + eleWP 
-   else: savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/QCD/ABCD/ABCD" + ABCD + "/estimation/" + eleWP + "_no_" + removedCut
+   if removedCut == "None": savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/QCD/TEST/ABCD/ABCD" + ABCD + "/estimation"# + eleWP 
+   else: savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/QCD/ABCD/ABCD" + ABCD + "/estimation"# + eleWP + "_no_" + removedCut
    if highWeightVeto: savedir += "/highWeightVeto" 
    if not os.path.exists(savedir): os.makedirs(savedir)
 
@@ -83,9 +83,9 @@ if enriched == True: suffix += "_EMenriched"
 if enriched == True: qcd = "qcdem"
 else: qcd = "qcd"
 
-cmgPP = cmgTuplesPostProcessed()#mc_path, signal_path, data_path)
+cmgPP = cmgTuplesPostProcessed()
 
-samplesList = ["qcd", "z", "dy", "tt", "w"]
+samplesList = ["qcd", "vv", "st", "z", "dy", "tt", "w"]
 
 if getData: samplesList.append("dblind")
 samples = getSamples(cmgPP = cmgPP, skim = 'preIncLep', sampleList = samplesList, scan = False, useHT = True, getData = getData) 
@@ -428,8 +428,8 @@ if estimation:
 
 if plot:
    if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
-      if removedCut == "None": plotdir = "/afs/hephy.at/user/m/mzarucki/www/plots/QCD/ABCD/ABCD" + ABCD + "/plots/" + eleWP
-      else: plotdir = "/afs/hephy.at/user/m/mzarucki/www/plots/QCD/ABCD3/plots/" + eleWP + "_no_" + removedCut
+      if removedCut == "None": plotdir = "/afs/hephy.at/user/m/mzarucki/www/plots/QCD/TEST/ABCD/ABCD" + ABCD + "/plots"# + eleWP
+      else: plotdir = "/afs/hephy.at/user/m/mzarucki/www/plots/QCD/ABCD3/plots"# + eleWP + "_no_" + removedCut
     
       plotdir += "/" + plotReg
  
@@ -493,9 +493,10 @@ if plot:
          "weight_" + sel:{'var':"weight", "bins":[20,0,400], "decor":{"title": "Weight Plot","x":"Event Weight" , "y":"Events", 'log':[0,1,0]}}
       }
    
-      plotsList[sel] = ["hybIso2_" + sel, "absDxy_" + sel, "delPhi_" + sel]
+      #plotsList[sel] = ["hybIso2_" + sel, "absDxy_" + sel, "delPhi_" + sel]
       #plotsList[sel] = ["hybIso2_" + sel, "absDxy_" + sel, "delPhi_" + sel, "sigmaEtaEta_" + sel, "weight_" + sel]
       #plotsList[sel] = ["elePt_" + sel, "absIso_" + sel, "relIso_" + sel,"hybIso_" + sel, "hybIso2_" + sel, "absDxy_" + sel, "delPhi_" + sel, "eleMt_" + sel, "MET_" + sel, "HT_" + sel, "sigmaEtaEta_" + sel, "hOverE_" + sel, "weight_" + sel]
+      plotsList[sel] = ["eleMt_" + sel, "MET_" + sel, "HT_" + sel]
       plotsDict[sel] = Plots(**plotDict[sel])
       plots[sel] = getPlots(samples, plotsDict[sel], QCD[plotReg][sel], samplesList, plotList = plotsList[sel], addOverFlowBin='upper')
       if getData: plots2[sel] = drawPlots(samples, plotsDict[sel], QCD[plotReg][sel], samplesList, plotList = plotsList[sel], denoms=["bkg"], noms = ["dblind"], fom="RATIO", fomLimits=[0,2.8], plotMin = 10, normalize = False, save=False)
