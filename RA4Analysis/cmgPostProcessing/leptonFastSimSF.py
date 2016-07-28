@@ -41,7 +41,7 @@ class leptonFastSimSF:
     if abs(pdgId)==13:
       res = (1+self.get3DSFUnc(pdgId, pt)*sigma)*self.mu3D.GetBinContent(self.mu3D.GetXaxis().FindBin(pt), self.mu3D.GetYaxis().FindBin(abs(eta)), self.mu3D.GetZaxis().FindBin(nvtx))
     elif abs(pdgId)==11:
-      res = (1+self.get3DSFUnc(pdgId, pt)*sigma)*self.ele3D.GetBinContent(self.mu3D.GetXaxis().FindBin(pt), self.mu3D.GetYaxis().FindBin(abs(eta)), self.mu3D.GetZaxis().FindBin(nvtx))
+      res = (1+self.get3DSFUnc(pdgId, pt)*sigma)*self.ele3D.GetBinContent(self.ele3D.GetXaxis().FindBin(pt), self.ele3D.GetYaxis().FindBin(abs(eta)), self.ele3D.GetZaxis().FindBin(nvtx))
     else:
       raise Exception("FastSim SF for PdgId %i not known"%pdgId)
     if res==0: res=1 #no SF for |eta|>2.19 for electrons? 
