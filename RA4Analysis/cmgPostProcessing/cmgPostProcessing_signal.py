@@ -18,7 +18,7 @@ from Workspace.HEPHYPythonTools.helpers import getChunks
 from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2 import *
 from systematics_helper import calc_btag_systematics, calc_LeptonScale_factors_and_systematics , getISRWeight , getISRWeight_new ,fill_branch_WithJEC , filter_crazy_jets
 from btagEfficiency import *
-from leptonFastSimSF import leptonFastSimSF as leptonFastSimSF_
+from leptonFastSimSF2016 import leptonFastSimSF as leptonFastSimSF_
 
 scaleFactorDir  = '$CMSSW_BASE/src/Workspace/RA4Analysis/cmgPostProcessing/data/'
 bTagEffFile     = 'data/signal_inclusive_pkl'
@@ -421,9 +421,9 @@ for isample, sample in enumerate(allSamples):
           
           if leptonFastSim:
             if s.nTightHardLeptons>=1:
-              s.reweightLeptonFastSimSF     = leptonFastSimSF.get3DSF(pdgId=s.leptonPdg, pt=s.leptonPt, eta=s.leptonEta, nvtx = r.nVert)
-              s.reweightLeptonFastSimSFUp   = leptonFastSimSF.get3DSF(pdgId=s.leptonPdg, pt=s.leptonPt, eta=s.leptonEta, nvtx = r.nVert, sigma = +1)
-              s.reweightLeptonFastSimSFDown = leptonFastSimSF.get3DSF(pdgId=s.leptonPdg, pt=s.leptonPt, eta=s.leptonEta, nvtx = r.nVert, sigma = -1)
+              s.reweightLeptonFastSimSF     = leptonFastSimSF.get2DSF(pdgId=s.leptonPdg, pt=s.leptonPt, eta=s.leptonEta, nvtx = r.nVert)
+              s.reweightLeptonFastSimSFUp   = leptonFastSimSF.get2DSF(pdgId=s.leptonPdg, pt=s.leptonPt, eta=s.leptonEta, nvtx = r.nVert, sigma = +1)
+              s.reweightLeptonFastSimSFDown = leptonFastSimSF.get2DSF(pdgId=s.leptonPdg, pt=s.leptonPt, eta=s.leptonEta, nvtx = r.nVert, sigma = -1)
             else:
               s.reweightLeptonFastSimSF     = -999 
               s.reweightLeptonFastSimSFUp   = -999
