@@ -45,14 +45,13 @@ defSampleStr = "SMS_T5qqqqVV_TuneCUETP8M1"
 #PU_histo_66 = PU_File_66mb.Get("h_ratio_66")
 #PU_histo_70 = PU_File_70mb.Get("h_ratio_70")
 #PU_histo_74 = PU_File_74mb.Get("h_ratio_74")
-PU_dir = scaleFactorDir
+PU_dir = "/data/easilar/PU_Histos/"
 PU_File_59p85mb = ROOT.TFile(PU_dir+"/h_ratio_59p85.root")
 PU_File_63mb = ROOT.TFile(PU_dir+"/h_ratio_63.root")
 PU_File_66p15mb = ROOT.TFile(PU_dir+"/h_ratio_66p15.root")
 PU_histo_59p85 = PU_File_59p85mb.Get("h_ratio")
 PU_histo_63 = PU_File_63mb.Get("h_ratio")
 PU_histo_66p15 = PU_File_66p15mb.Get("h_ratio")
-
 
 #####################
 ###For Lepton SF#####
