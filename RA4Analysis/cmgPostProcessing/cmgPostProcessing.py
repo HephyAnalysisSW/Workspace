@@ -172,8 +172,8 @@ mu_mediumID_File  = ROOT.TFile(scaleFactorDir+'TnP_MuonID_NUM_MediumID_DENOM_gen
 mu_looseID_File   = ROOT.TFile(scaleFactorDir+'TnP_MuonID_NUM_LooseID_DENOM_generalTracks_VAR_map_pt_eta.root')
 mu_miniIso02_File = ROOT.TFile(scaleFactorDir+'TnP_MuonID_NUM_MiniIsoTight_DENOM_MediumID_VAR_map_pt_eta.root')
 mu_sip3d_File     = ROOT.TFile(scaleFactorDir+'TnP_MuonID_NUM_TightIP3D_DENOM_MediumID_VAR_map_pt_eta.root')
-mu_HIP_File       = ROOT.TFile(scaleFactorDir+'general_tracks_and_early_general_tracks_corr_ratio.root')
-ele_kin_File      = ROOT.TFile(scaleFactorDir+'eleScaleFactors.root')
+mu_HIP_File       = ROOT.TFile(scaleFactorDir+'ratiosMuonHIP.root')
+ele_kin_File      = ROOT.TFile(scaleFactorDir+'eleScaleFactorsUpdate2607.root')
 ele_gsf_File      = ROOT.TFile(scaleFactorDir+'egammaEffi_txt_SF2D.root')
 #
 histos_LS = {
@@ -181,10 +181,10 @@ histos_LS = {
 'mu_looseID_histo':   mu_looseID_File.Get("pt_abseta_PLOT_pair_probeMultiplicity_bin0"),\
 'mu_miniIso02_histo': mu_miniIso02_File.Get("pt_abseta_PLOT_pair_probeMultiplicity_bin0_&_Medium2016_pass"),\
 'mu_sip3d_histo':     mu_sip3d_File.Get("pt_abseta_PLOT_pair_probeMultiplicity_bin0_&_Medium2016_pass"),\
-'mu_HIP_histo':       mu_HIP_File.Get("mutrksfptg10"),\
+'mu_HIP_histo':       mu_HIP_File.Get("ratio_eta"),\
 'ele_cutbased_histo': ele_kin_File.Get("GsfElectronToTight"),\
 'ele_miniIso01_histo':ele_kin_File.Get("MVAVLooseElectronToMini"),\
-'ele_gsf_histo':ele_gsf_File.Get("EGamma_SF2D"),\
+'ele_gsf_histo':      ele_gsf_File.Get("EGamma_SF2D"),\
 }
 #####################
 
