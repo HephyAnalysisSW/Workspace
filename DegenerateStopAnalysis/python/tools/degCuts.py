@@ -76,23 +76,23 @@ class Cuts():
 
 
         elif btag == 'sf':
-            veto_soft_bjet          = 'weightSBTag0_SF' 
-            one_soft_bjet           = 'weightSBTag1_SF' 
-            one_or_more_soft_bjet   = 'weightSBTag1p_SF'
-            veto_hard_bjet          = 'weightHBTag0_SF' 
-            one_hard_bjet           = 'weightHBTag1_SF' 
-            one_or_more_hard_bjet   = 'weightHBTag1p_SF'
-            veto_bjet               = 'weightBTag0_SF'   
-            one_bjet                = 'weightBTag1_SF'   
-            one_or_more_bjet        = 'weightBTag1p_SF'  
-            two_or_more_bjet        = 'weightBTag2p_SF'  
+            veto_soft_bjet          = '(weightSBTag0_SF)' 
+            one_soft_bjet           = '(weightSBTag1_SF)' 
+            one_or_more_soft_bjet   = '(weightSBTag1p_SF)'
+            veto_hard_bjet          = '(weightHBTag0_SF)' 
+            one_hard_bjet           = '(weightHBTag1_SF)' 
+            one_or_more_hard_bjet   = '(weightHBTag1p_SF)'
+            veto_bjet               = '(weightBTag0_SF)'   
+            one_bjet                = '(weightBTag1_SF)'   
+            one_or_more_bjet        = '(weightBTag1p_SF)'  
+            two_or_more_bjet        = '(weightBTag2p_SF)'  
 
             sr1_bjet                =  veto_bjet 
             sr2_bjet                =  "(weightSBTag1p_SF * weightHBTag0_SF)" 
             cr1_bjet                =  veto_bjet
             cr2_bjet                =  "(weightSBTag1p_SF * weightHBTag0_SF)" #"( (nBSoftJet>=1) && (nBHardJet==0)  )"
             crtt1_bjet              =  "(weightSBTag0_SF  * weightHBTag1_SF)" #"( (nBSoftJet==0) && (nBHardJet==1)  )"
-            crtt2_bjet              =  "(weightBTag2p_SF  * weightHBTag1p_SF)"#"( (nBJet>=2)     && (nBHardJet>=1) )"
+            crtt2_bjet              =  "(weightHBTag1p_SF-(weightSBTag0_SF*weightHBTag1_SF))"#"( (nBJet>=2)     && (nBHardJet>=1) )"
 
             pass
         else:
@@ -632,7 +632,7 @@ class Cuts():
 
 
         self.sr1SideBands = CutClass( "sr1SideBands",
-                                      [ [sb, sbInst.inclCombined] for  sb, sbInst in self.sr1_side_bands.iteritems() ]  
+                                      [ [sb, sbInst.inclCombined] for  sb, sbInst in sorted( self.sr1_side_bands.iteritems() ) ]  
                             ,
                             baseCut = self.presel
                             )
@@ -660,7 +660,7 @@ class Cuts():
                             )
 
             if pt == "sr":
-                cutLists.append( ["{lep}Pt_lt_30".format(lep=lep.title()),"{lepCol}_pt[{lepIndex}[0]]<30".format(lepCol=lepCollection, lepIndex=lepIndex)] )
+                cutLists.append(    ["{lep}Pt_lt_30".format(lep=lep.title()),"{lepCol}_pt[{lepIndex}[0]]<30".format(lepCol=lepCollection, lepIndex=lepIndex)] )
             if pt == "cr":
                 cutLists.append(    ["{lep}Pt_gt_30".format(lep=lep.title()),"{lepCol}_pt[{lepIndex}[0]]>30".format(lepCol=lepCollection, lepIndex=lepIndex)] )
             else:
@@ -682,17 +682,20 @@ class Cuts():
             else:
                 print "no MT....."
                 pass
-            return CutClass(  "MT%s"%mt +"_"+ side_band_cut_name +"_"+charge +"_PT%s"%(pt.upper()), cutLists, baseCut=baseCut)
+            return CutClass(  ( "MT%s_"%mt if mt else "" )+ side_band_cut_name + ("_%s"%charge if charge else "") +"_PT%s"%(pt.upper()), cutLists, baseCut=baseCut)
 
 
-        mtabc = ["a","b","c"]
         pts = ["sr","cr"]
-        charges = ["neg", "pos"]
+        #mtabc = ["a","b","c", ""]
+        #charges = ["neg", "pos", ""]
+        mtabc   = [""]
+        charges = ["pos", "neg", ""]
         sr2_side_band_cuts  = [ 
                                 #["ESR1", "min(met, ht_basJet - 100 ) > 300"],
                                 #["ECR1", "(min(met, ht_basJet - 100) < 300 )&&(min(met, ht_basJet - 100) > 200 )"],
-                                ["ESR2", "min(met, Jet_pt[IndexJet_isrJet[0]] - 25 ) > 300"],
-                                ["ECR2", "(min(met, Jet_pt[IndexJet_isrJet[0]] - 25) < 300 )&&(min(met, Jet_pt[IndexJet_isrJet[0]] - 25) > 200 )"],
+                                #["ESR2", "min(met, Jet_pt[IndexJet_isrJet[0]] - 25 ) > 300"],
+                                #["ECR2", "(min(met, Jet_pt[IndexJet_isrJet[0]] - 25) < 300 )&&(min(met, Jet_pt[IndexJet_isrJet[0]] - 25) > 200 )"],
+                                ["BCR2", "(1)"],
                           ]
 
 
@@ -703,22 +706,22 @@ class Cuts():
             for side_band_cut_name, side_band_cut in sr2_side_band_cuts:
                 for charge in charges:
                     for pt in pts:
-                        side_band ="MT%s"%mt_ +"_" + side_band_cut_name +"_"+charge +"_PT%s"%(pt.upper()) 
+                        side_band = ("MT%s_"%mt_ if mt_ else "")  + side_band_cut_name + ("_%s"%charge if charge else "") +"_PT%s"%(pt.upper()) 
                         self.sr2_side_band_dict[side_band] = {'side_band_cut_name':side_band_cut_name, 'side_band_cut':side_band_cut, 'mt':mt_, 'charge':charge, 'pt':pt}
                         #print self.side_band_dict
                         self.sr2_side_bands[side_band] = makeSR2SideBand(**self.sr2_side_band_dict[side_band]) 
 
 
         self.sr2SideBands = CutClass( "sr2SideBands",
-                                      [ [sb, sbInst.inclCombined] for  sb, sbInst in self.sr2_side_bands.iteritems() ]  
+                                      [ [sb, sbInst.inclCombined] for  sb, sbInst in sorted( self.sr2_side_bands.iteritems() ) ]  
                             ,
                             baseCut = self.presel
                             )
 
 
         self.sideBands = CutClass( "sideBands",
-                                      [ [sb, sbInst.inclCombined] for  sb, sbInst in self.sr1_side_bands.iteritems() ] + 
-                                      [ [sb, sbInst.inclCombined] for  sb, sbInst in self.sr2_side_bands.iteritems() ]  
+                                      [ [sb, sbInst.inclCombined] for  sb, sbInst in sorted( self.sr1_side_bands.iteritems() ) ] + 
+                                      [ [sb, sbInst.inclCombined] for  sb, sbInst in sorted( self.sr2_side_bands.iteritems() ) ]  
                             ,
                             baseCut = self.presel
                             )

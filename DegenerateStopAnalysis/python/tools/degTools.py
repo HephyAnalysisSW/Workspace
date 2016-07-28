@@ -1845,12 +1845,16 @@ class Weight(object):
                 for cut_category in weight_dict['cuts']:
                     cut_weight , cut_finder_funct = weight_dict['cuts'][cut_category]
                     #print "looking for a match for", cut_category
-                    if cut_finder_funct( cut ):
-                        print "found a match to the cut string!", cut_category    
-                        weight_list.append(  cut_weight )
-                        #assert not found_a_match, "WARNING! Multiple matches to the cutstring... using all matches! (could be dangerous!)"            
-                        if found_a_match : print  "WARNING! Multiple matches to the cutstring... using all matches! (could be dangerous!)"            
-                        found_a_match = True
+                    if cut_category in cut:
+                        weight_list.append(cut_weight)
+                    elif False:
+                        #### FIXME NOT SURE WHAT HAPPENS HERE! 
+                        if cut_finder_funct( cut ):
+                            print "found a match to the cut string!", cut_category    
+                            weight_list.append(  cut_weight )
+                            #assert not found_a_match, "WARNING! Multiple matches to the cutstring... using all matches! (could be dangerous!)"            
+                            if found_a_match : print  "WARNING! Multiple matches to the cutstring... using all matches! (could be dangerous!)"            
+                            found_a_match = True
             elif weight_key == "lumis":
                 weight_list.append(  "%s/%s"%(weight_dict['lumis'][lumi], weight_dict['lumis']["mc_lumi"]) )
             else:
@@ -1934,7 +1938,7 @@ def decide_cut( sample, cut, plot=None, nMinus1=None):
     #print '----------------------'
     for sf in sfs:
         if sf in new_cut:
-            print ' found sf: %s in cut_str'%sf
+            print ' found sf: %s in cut_str, \n%s'%(sf,new_cut)
             if sample.isData:
                 new_cut = new_cut.replace(sf, sf_to_btag[sf])
                 print 'replacing sf: %s , with %s'%(sf, sf_to_btag[sf])
@@ -2348,7 +2352,7 @@ class Yields():
         if first:
             lines[0] += "  \hline"
         ret = " \n".join(lines)
-        if self.verbose: print ret
+        #if self.verbose: print ret
         return ret
 
     def pprint(self, table=None,transpose=True, nSpaces=17, align="<", ret=None):

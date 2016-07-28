@@ -47,6 +47,10 @@ weightDict={
              "tt": {
                     #"top_pt": ttptweight
                    },
+             "z": {
+                    #"xsec_fix": "( 1 +  (-1+0.15404) * (xsec<1.4546&&xsec>1.4545) + ( (-1+0.42 ) * (xsec<9.44271&&xsec>9.4427) ))"
+                    #"top_pt": ttptweight
+                   },
               "s10FS":{
                     "gen_filter_eff": "0.2546" ,
                     },

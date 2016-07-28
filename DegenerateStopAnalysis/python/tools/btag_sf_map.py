@@ -39,7 +39,7 @@ sf_sr2_bjet                =  "(weightSBTag1p_SF * weightHBTag0_SF)"
 sf_cr1_bjet                =  sf_veto_bjet
 sf_cr2_bjet                =  "(weightSBTag1p_SF * weightHBTag0_SF)" #"( (nBSoftJet>=1) && (nBHardJet==0)  )"
 sf_crtt1_bjet              =  "(weightSBTag0_SF  * weightHBTag1_SF)" #"( (nBSoftJet==0) && (nBHardJet==1)  )"
-sf_crtt2_bjet              =  "(weightBTag2p_SF  * weightHBTag1p_SF)"#"( (nBJet>=2)     && (nBHardJet>=1) )"
+sf_crtt2_bjet              =  "((weightHBTag1p_SF-(weightSBTag0_SF*weightHBTag1_SF)))"#"( (nBJet>=2)     && (nBHardJet>=1) )"
 
 
 
