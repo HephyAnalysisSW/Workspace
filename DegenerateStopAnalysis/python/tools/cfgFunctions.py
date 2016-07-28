@@ -465,7 +465,7 @@ def bkg_est(cfg, args):
                                    )
             pickle.dump( yields[cut_name], open(yield_pkl,'w') )
             print "Yield pickle dumped: %s"%yield_pkl
-        combineBkgs = [ ["DYJetsM50", "ZJetsInv", "QCD"] , "Other" ] 
+        combineBkgs = [ ["DYJetsM50", "ZJetsInv", "QCD","ST","Diboson"] , "Other" ] 
         seperators = ["DataBlind", "Total"]
         JinjaTexTable( yields[cut_name], pdfDir = tableDir, caption="" , transpose=True)
         JinjaTexTable( yields[cut_name], pdfDir = tableDir, outputName = yields[cut_name].tableName+"_T.tex", caption="" , noFOM=True, transpose=False, seperators = seperators)
@@ -490,13 +490,22 @@ def bkg_est(cfg, args):
 
 
         yld = yields[cut_name] 
+        yld.verbose = False
+        print "\n Latex Table: \n"
+        print yld.makeLatexTable( yld.makeNumpyFromDict( yld.yieldDictFull , rowList = list( reversed( cfg.bkgList ) )   + ['Total']+ dataList ) )
+        print "\n Transvered: \n "
+        print yld.makeLatexTable( yld.makeNumpyFromDict( yld.yieldDictFull , rowList = list( reversed( cfg.bkgList ) )   + ['Total']+ dataList ).T )
+
+
         other = dict_operator( yld.yieldDictFull , keys = [ bkg for bkg in cfg.bkgList if bkg not in ['tt','w']] , func = yield_adder_func2 )
         yld.yieldDictFull['Other'] = other
+        print "\n Other BKG combined: \n "
         print yld.makeLatexTable( yld.makeNumpyFromDict( yld.yieldDictFull , rowList = ['w','tt','Other','Total']+ dataList ) )
+        print "\n Transvered: \n "
+        print yld.makeLatexTable( yld.makeNumpyFromDict( yld.yieldDictFull , rowList = ['w','tt','Other','Total']+ dataList ).T )
 
 
-
-
+        tmp_ = yld.yieldDictFull.pop("Other")
 
 
         #yldplts
@@ -562,7 +571,7 @@ def cut_flow(cfg, args):
                                    )
             pickle.dump( yields[cut_name], open(yield_pkl,'w') )
             print "Yield pickle dumped: %s"%yield_pkl
-        combineBkgs = [ ["DYJetsM50", "ZJetsInv", "QCD"] , "Other" ] 
+        combineBkgs = [ ["DYJetsM50", "ZJetsInv", "QCD","ST","Diboson"] , "Other" ] 
         seperators = ["CT300", "ISR325"]
         JinjaTexTable( yields[cut_name], pdfDir = tableDir, caption="" , transpose=True)
         JinjaTexTable( yields[cut_name], pdfDir = tableDir, outputName = yields[cut_name].tableName+"_T.tex", caption="" , noFOM=True, transpose=False, seperators = seperators)

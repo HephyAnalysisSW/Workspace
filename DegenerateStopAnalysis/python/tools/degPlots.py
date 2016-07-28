@@ -10,9 +10,26 @@ class DegPlots():
     @staticmethod
     def makeNBJetPlotFunc(bjet_var):
         def nBJetPlot( sample, bins, cutString, weight, addOverFlowBin = '', binningIsExplicit = False, bjet_var="nBJet"):
-            from Workspace.DegenerateStopAnalysis.tools.btag_sf_map import btag_to_weight_vars, weight_to_btag_vars
+            from Workspace.DegenerateStopAnalysis.tools.btag_sf_map import btag_to_weight_vars, weight_to_btag_vars, sf_to_btag , btag_to_sf
             nBs = min(bins[-1], 2)
             hists = []
+
+
+            #sfs = sf_to_btag.keys() + btag_to_sf.keys()
+            #for sf in sfs:
+            #    if sf in new_cut:
+            #        print ' found sf: %s in cut_str'%sf
+            #        if sample.isData:
+            #            new_cut = new_cut.replace(sf, sf_to_btag[sf])
+            #            print 'replacing sf: %s , with %s'%(sf, sf_to_btag[sf])
+            #        else:
+            #            new_cut = new_cut.replace(sf, "(1)")
+            #            print 'replacing sf: %s , with %s'%(sf, "(1)")
+            #        modified = True
+
+
+
+
             if sample.isData:
                 histo = getPlotFromChain( sample.tree, bjet_var,  bins, cutString, weight, addOverFlowBin=addOverFlowBin, binningIsExplicit=binningIsExplicit, uniqueName = True)
             else:

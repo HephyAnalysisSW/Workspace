@@ -430,9 +430,9 @@ class cmgTuplesPostProcessed():
         ######################################################################################################
 
         dataSamples = [
-                        ["MET_v2",      ["MET_Run2016B-PromptReco-v2"           , "MET_Run2016C-PromptReco-v2"            ]],#  ,  "MET_Run2016D-PromptReco-v2"            ]    ],
-                        ["SingleMu_v2", ["SingleMuon_Run2016B-PromptReco-v2"    , "SingleMuon_Run2016C-PromptReco-v2"     ]],#  ,  "SingleMuon_Run2016D-PromptReco-v2"     ]    ],
-                        ["SingleEl_v2", ["SingleElectron_Run2016B-PromptReco-v2", "SingleElectron_Run2016C-PromptReco-v2" ]],#  ,  "SingleElectron_Run2016D-PromptReco-v2" ]    ],
+                        ["MET_v2",      ["MET_Run2016B-PromptReco-v2"           , "MET_Run2016C-PromptReco-v2"              ,  "MET_Run2016D-PromptReco-v2"            ]    ],
+                        ["SingleMu_v2", ["SingleMuon_Run2016B-PromptReco-v2"    , "SingleMuon_Run2016C-PromptReco-v2"       ,  "SingleMuon_Run2016D-PromptReco-v2"     ]    ],
+                        ["SingleEl_v2", ["SingleElectron_Run2016B-PromptReco-v2", "SingleElectron_Run2016C-PromptReco-v2"   ,  "SingleElectron_Run2016D-PromptReco-v2" ]    ],
             ]
 
         allData = []

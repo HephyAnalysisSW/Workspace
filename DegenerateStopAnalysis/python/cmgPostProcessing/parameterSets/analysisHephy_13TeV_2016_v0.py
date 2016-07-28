@@ -143,6 +143,14 @@ def getParameterSet(args):
             'dxy': ('dxy', operator.lt, 0.02, operator.abs), #synchronisation with muons
             #'dz': ('dz', operator.lt, 0.5, operator.abs), #looser than Veto ID
             'SPRING15_25ns_v1': ('SPRING15_25ns_v1', operator.ge, 1), #EG POG Veto ID
+            'hybIso': {
+                'ptSwitch': 25, 
+                'relIso': {
+                    'type': 'relIso03',
+                    'cut': 0.2
+                    },
+                'absIso': 5
+                },
             },
         
         'el2': { #selection with Veto Electron ID without sigmaEtaEta cut
