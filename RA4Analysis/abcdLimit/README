@@ -1,0 +1,9 @@
+1) python calc_limit_ABCD.py -d <your-output-subdirectory-name> --method CalcAbcdLimit
+# you can use --signal <index> or --masses mglu,mlsp to restrict to a signal point
+2) python combine_limits.py <results_directory_from_previous_step>
+3) python -i limit_scan.py <results_directory_name>.pkl <output_name>
+#This will produce <output_name>.png and <output_name>.root (the latter one is the input for the final plots.
+
+#to get the nuisances (pre- / postfit)
+4) combine -M MaxLikelihoodFit --forceRecreateNLL <cardfile>
+5) python plotNuisances.py <cardfile> mlfit.root
