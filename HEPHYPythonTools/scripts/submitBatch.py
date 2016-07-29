@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 """
 Usage:
-submit_batch.py path/to/file_with_commands
+submitBatch.py path/to/file_with_commands
 or
-submit_batch.py command
+submitBatch.py command
 
 Will submit a batch job for each command line in the file_with_commands
 """
@@ -20,9 +20,10 @@ hephy_user = os.getenv("USER")
 hephy_user_initial = os.getenv("USER")[0]
 slurm_job_file="slurm_job"
 slurm_job_title="BATCHSUBMIT"
-slurm_output_dir="/afs/hephy.at/work/%s/%s/slurm"%(hephy_user_initial, hephy_user)
+slurm_output_dir="/afs/hephy.at/work/%s/%s/slurm_output/"%(hephy_user_initial, hephy_user)
 
-
+if not os.path.isdir(slurm_output_dir):
+    os.mkdir(slurm_output_dir)
 
 
 def make_slurm_job( slurm_job_file, slurm_job_title, slurm_output_dir , command ):
@@ -54,8 +55,6 @@ echo "{command}"
 
 
 if __name__ == '__main__':
-
-
     if not len(args) == 1:
         raise Exception("Only one argument accepted! Instead this was given: %s"%args)
     if os.path.isfile(args[0]):
