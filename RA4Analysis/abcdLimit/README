@@ -1,3 +1,4 @@
+use CMSSW_7_1_5
 1) python calc_limit_ABCD.py -d <your-output-subdirectory-name> --method CalcAbcdLimit
 # you can use --signal <index> or --masses mglu,mlsp to restrict to a signal point
 2) python combine_limits.py <results_directory_from_previous_step>
