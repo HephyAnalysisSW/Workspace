@@ -22,8 +22,8 @@ from systematics_helper import calc_btag_systematics, calc_LeptonScale_factors_a
 from btagEfficiency import *
 from readVetoEventList import *
 
-bTagEffFile     = '/data/dspitzbart/Spring16/btagEfficiency/effs_presel_JECv6_pkl'
 scaleFactorDir  = '$CMSSW_BASE/src/Workspace/RA4Analysis/cmgPostProcessing/data/'
+bTagEffFile     = scaleFactorDir+"/effs_presel_JECv6_pkl" 
 
 try:
   mcEffDict = pickle.load(file(bTagEffFile))

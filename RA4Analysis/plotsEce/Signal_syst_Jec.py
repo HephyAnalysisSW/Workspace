@@ -62,8 +62,8 @@ for srNJet in sorted(signalRegions):
       name_bla, MB_cut_jec_down      = nameAndCut(stb, htb, srNJet, btb=(0,-1), presel=presel+"&&deltaPhi_Wl>"+str(deltaPhiCut), btagVar = "jec_nBJet_down"    , stVar = 'jec_LT_down'   , htVar = 'jec_ht_down'   , njetVar='jec_nJet_down')
 
       bin[srNJet][stb][htb]["signals"] = {}
-      for mglu in signal.keys() :
-      #for mglu in [1000] :
+      #for mglu in signal.keys() :
+      for mglu in [mglu] :
         bin[srNJet][stb][htb]["signals"][mglu] = {}
         for mlsp in signal[mglu].keys() :
         #for mlsp in [100] :

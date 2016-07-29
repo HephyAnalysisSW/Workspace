@@ -19,8 +19,9 @@ parser.add_option("--mglu", dest="mglu", default="1000", action="store", help="m
 exec("tmp_mglu="+options.mglu)
 print type(tmp_mglu)
 mglu = tmp_mglu
+print mglu
 sig_dict = pickle.load(file('/data/easilar/Results2016/ICHEP/signal_Spring16/mglu'+str(mglu)+'Signals_12p88_pkl')) 
-
+#print sig_dict[(5,5)][(250, 350)][(750, -1)]["signals"][mglu].keys()
 weight_str    = '*'.join([trigger_scale,lepton_Scale_signal,weight_0b,PU,reweight])
 weight_str_Up = '*'.join([trigger_scale,lepton_Scale_signal,weight_0b,"puReweight_true_Up",reweight])
 weight_str_Down = '*'.join([trigger_scale,lepton_Scale_signal,weight_0b,"puReweight_true_Down",reweight])
@@ -58,8 +59,8 @@ for srNJet in sorted(signalRegions):
       name_bla, MB_cut               = nameAndCut(stb, htb, srNJet, btb=(0,-1), presel=presel+"&&deltaPhi_Wl>"+str(deltaPhiCut), btagVar = btagString)
 
       bin[srNJet][stb][htb]["signals"] = {}
-      for mglu in signal.keys() :
-      #for mglu in [1000] :
+      #for mglu in signal.keys() :
+      for mglu in [mglu] :
         bin[srNJet][stb][htb]["signals"][mglu] = {}
         for mlsp in signal[mglu].keys() :
         #for mlsp in [100] :
