@@ -21,7 +21,7 @@ print type(tmp_mglu)
 mglu = tmp_mglu
 sig_dict = pickle.load(file('/data/easilar/Results2016/ICHEP/signal_Spring16/mglu'+str(mglu)+'Signals_12p88_pkl')) 
 
-weight_str = weight_str_signal_plot
+weight_str = weight_str_signal_plot+"*"+weight_0b
 
 btagString = "nBJetMediumCSV30"
 
