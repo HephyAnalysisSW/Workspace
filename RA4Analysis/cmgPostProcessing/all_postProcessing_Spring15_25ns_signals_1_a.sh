@@ -1,10 +1,10 @@
 #!/bin/sh 
 
-python cmgPostProcessing_signal.py  --overwrite --calcbtagweights  --gluMass 2050 --samples=SMS_T5qqqqVV_TuneCUETP8M1
-python cmgPostProcessing_signal.py  --overwrite --calcbtagweights  --gluMass 900 --samples=SMS_T5qqqqVV_TuneCUETP8M1
-python cmgPostProcessing_signal.py  --overwrite --calcbtagweights  --gluMass 1800 --samples=SMS_T5qqqqVV_TuneCUETP8M1
-python cmgPostProcessing_signal.py  --overwrite --calcbtagweights  --gluMass 650 --samples=SMS_T5qqqqVV_TuneCUETP8M1
-python cmgPostProcessing_signal.py  --overwrite --calcbtagweights  --gluMass 1550 --samples=SMS_T5qqqqVV_TuneCUETP8M1
+python cmgPostProcessing_signal.py  --overwrite --calcbtagweights --leptonFastSim --gluMass 2050 --samples=SMS_T5qqqqVV_TuneCUETP8M1
+#python cmgPostProcessing_signal.py  --overwrite --calcbtagweights  --gluMass 900 --samples=SMS_T5qqqqVV_TuneCUETP8M1
+#python cmgPostProcessing_signal.py  --overwrite --calcbtagweights  --gluMass 1800 --samples=SMS_T5qqqqVV_TuneCUETP8M1
+#python cmgPostProcessing_signal.py  --overwrite --calcbtagweights  --gluMass 650 --samples=SMS_T5qqqqVV_TuneCUETP8M1
+#python cmgPostProcessing_signal.py  --overwrite --calcbtagweights  --gluMass 1550 --samples=SMS_T5qqqqVV_TuneCUETP8M1
 ##
 #python cmgPostProcessing_signal.py  --overwrite --calcbtagweights  --gluMass 1300 --samples=SMS_T5qqqqVV_TuneCUETP8M1
 #python cmgPostProcessing_signal.py  --overwrite --calcbtagweights  --gluMass 2200 --samples=SMS_T5qqqqVV_TuneCUETP8M1

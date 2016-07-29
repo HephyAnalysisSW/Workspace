@@ -18,7 +18,7 @@ from Workspace.HEPHYPythonTools.helpers import getChunks
 from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2 import *
 from systematics_helper import calc_btag_systematics, calc_LeptonScale_factors_and_systematics , getISRWeight , getISRWeight_new ,fill_branch_WithJEC , filter_crazy_jets
 from btagEfficiency import *
-from leptonFastSimSF import leptonFastSimSF as leptonFastSimSF_
+from leptonFastSimSF2016 import leptonFastSimSF as leptonFastSimSF_
 
 scaleFactorDir  = '$CMSSW_BASE/src/Workspace/RA4Analysis/cmgPostProcessing/data/'
 bTagEffFile     = 'data/signal_inclusive_pkl'
@@ -45,7 +45,7 @@ defSampleStr = "SMS_T5qqqqVV_TuneCUETP8M1"
 #PU_histo_66 = PU_File_66mb.Get("h_ratio_66")
 #PU_histo_70 = PU_File_70mb.Get("h_ratio_70")
 #PU_histo_74 = PU_File_74mb.Get("h_ratio_74")
-PU_dir = scaleFactorDir
+PU_dir = "/data/easilar/PU_Histos/"
 PU_File_59p85mb = ROOT.TFile(PU_dir+"/h_ratio_59p85.root")
 PU_File_63mb = ROOT.TFile(PU_dir+"/h_ratio_63.root")
 PU_File_66p15mb = ROOT.TFile(PU_dir+"/h_ratio_66p15.root")
@@ -53,27 +53,27 @@ PU_histo_59p85 = PU_File_59p85mb.Get("h_ratio")
 PU_histo_63 = PU_File_63mb.Get("h_ratio")
 PU_histo_66p15 = PU_File_66p15mb.Get("h_ratio")
 
-
 #####################
 ###For Lepton SF#####
-mu_mediumID_File  = ROOT.TFile(scaleFactorDir+"TnP_MuonID_NUM_MediumID_DENOM_generalTracks_VAR_map_pt_eta.root")
-mu_looseID_File   = ROOT.TFile(scaleFactorDir+"TnP_MuonID_NUM_LooseID_DENOM_generalTracks_VAR_map_pt_eta-2.root")
-mu_miniIso02_File = ROOT.TFile(scaleFactorDir+"TnP_MuonID_NUM_MiniIsoTight_DENOM_LooseID_VAR_map_pt_eta.root")
-mu_sip3d_File     = ROOT.TFile(scaleFactorDir+"TnP_MuonID_NUM_TightIP3D_DENOM_LooseID_VAR_map_pt_eta.root")
-ele_kin_File      = ROOT.TFile(scaleFactorDir+"kinematicBinSFele.root")
+mu_mediumID_File  = ROOT.TFile(scaleFactorDir+'TnP_MuonID_NUM_MediumID_DENOM_generalTracks_VAR_map_pt_eta.root')
+mu_looseID_File   = ROOT.TFile(scaleFactorDir+'TnP_MuonID_NUM_LooseID_DENOM_generalTracks_VAR_map_pt_eta.root')
+mu_miniIso02_File = ROOT.TFile(scaleFactorDir+'TnP_MuonID_NUM_MiniIsoTight_DENOM_MediumID_VAR_map_pt_eta.root')
+mu_sip3d_File     = ROOT.TFile(scaleFactorDir+'TnP_MuonID_NUM_TightIP3D_DENOM_MediumID_VAR_map_pt_eta.root')
+mu_HIP_File       = ROOT.TFile(scaleFactorDir+'ratiosMuonHIP.root')
+ele_kin_File      = ROOT.TFile(scaleFactorDir+'eleScaleFactorsUpdate2607.root')
 ele_gsf_File      = ROOT.TFile(scaleFactorDir+'egammaEffi_txt_SF2D.root')
-mu_HIP_File       = ROOT.TFile(scaleFactorDir+'general_tracks_and_early_general_tracks_corr_ratio.root')
 #
 histos_LS = {
-'mu_mediumID_histo':  mu_mediumID_File.Get("pt_abseta_PLOT_pair_probeMultiplicity_bin0_&_tag_combRelIsoPF04dBeta_bin0_&_tag_pt_bin0_&_tag_IsoMu20_pass"),\
-'mu_looseID_histo':   mu_looseID_File.Get("pt_abseta_PLOT_pair_probeMultiplicity_bin0_&_tag_combRelIsoPF04dBeta_bin0_&_tag_pt_bin0_&_tag_IsoMu20_pass"),\
-'mu_miniIso02_histo': mu_miniIso02_File.Get("pt_abseta_PLOT_pair_probeMultiplicity_bin0_&_tag_combRelIsoPF04dBeta_bin0_&_tag_pt_bin0_&_PF_pass_&_tag_IsoMu20_pass"),\
-'mu_sip3d_histo':     mu_sip3d_File.Get("pt_abseta_PLOT_pair_probeMultiplicity_bin0_&_tag_combRelIsoPF04dBeta_bin0_&_tag_pt_bin0_&_PF_pass_&_tag_IsoMu20_pass"),\
-'mu_HIP_histo':       mu_HIP_File.Get("mutrksfptg10"),\
-'ele_cutbased_histo': ele_kin_File.Get("CutBasedTight"),\
-'ele_miniIso01_histo':ele_kin_File.Get("MiniIso0p1_vs_AbsEta"),\
-'ele_gsf_histo':ele_gsf_File.Get("EGamma_SF2D"),\
+'mu_mediumID_histo':  mu_mediumID_File.Get("pt_abseta_PLOT_pair_probeMultiplicity_bin0"),\
+'mu_looseID_histo':   mu_looseID_File.Get("pt_abseta_PLOT_pair_probeMultiplicity_bin0"),\
+'mu_miniIso02_histo': mu_miniIso02_File.Get("pt_abseta_PLOT_pair_probeMultiplicity_bin0_&_Medium2016_pass"),\
+'mu_sip3d_histo':     mu_sip3d_File.Get("pt_abseta_PLOT_pair_probeMultiplicity_bin0_&_Medium2016_pass"),\
+'mu_HIP_histo':       mu_HIP_File.Get("ratio_eta"),\
+'ele_cutbased_histo': ele_kin_File.Get("GsfElectronToTight"),\
+'ele_miniIso01_histo':ele_kin_File.Get("MVAVLooseElectronToMini"),\
+'ele_gsf_histo':      ele_gsf_File.Get("EGamma_SF2D"),\
 }
+
 #####################
 
 subDir = "postProcessing_Signals_batch_ISR_fix"
@@ -217,8 +217,9 @@ for isample, sample in enumerate(allSamples):
     newVariables.extend(['puReweight_true/F','puReweight_true_max4/F','puReweight_true_Down/F','puReweight_true_Up/F','weight_diLepTTBar0p5/F','weight_diLepTTBar2p0/F','weight_XSecTTBar1p1/F','weight_XSecTTBar0p9/F','weight_XSecWJets1p1/F','weight_XSecWJets0p9/F'])
     newVariables.extend(['ngenGluino/I','genGluGlu_pt/F','ISRSigUp/F/1','ISRSigDown/F/1'])
     newVariables.extend(['flag_crazy_jets/I/1','nISRJets_new/I','weight_ISR_new/F/1','ISRSigUp_stat_new/F/1','ISRSigDown_stat_new/F/1','ISRSigUp_sys_new/F/1','ISRSigDown_sys_new/F/1'])
-    newVariables.extend(['lepton_muSF_looseID/D/1.','lepton_muSF_mediumID/D/1.','lepton_muSF_miniIso02/D/1.','lepton_muSF_sip3d/D/1.','lepton_eleSF_cutbasedID/D/1.','lepton_eleSF_miniIso01/D/1.','lepton_eleSF_gsf/D/1.'])
-    newVariables.extend(['lepton_muSF_looseID_err/D/0.','lepton_muSF_mediumID_err/D/0.','lepton_muSF_miniIso02_err/D/0.','lepton_muSF_sip3d_err/D/0.','lepton_eleSF_cutbasedID_err/D/0.','lepton_eleSF_miniIso01_err/D/0.'])
+    newVariables.extend(['lepton_muSF_HIP/D/1','lepton_muSF_looseID/D/1.','lepton_muSF_mediumID/D/1.','lepton_muSF_miniIso02/D/1.','lepton_muSF_sip3d/D/1.','lepton_eleSF_cutbasedID/D/1.','lepton_eleSF_miniIso01/D/1.','lepton_eleSF_gsf/D/1.'])
+    newVariables.extend(['lepton_muSF_HIP_err/D/0.','lepton_muSF_looseID_err/D/0.','lepton_muSF_mediumID_err/D/0.','lepton_muSF_miniIso02_err/D/0.','lepton_muSF_sip3d_err/D/0.','lepton_eleSF_cutbasedID_err/D/0.','lepton_eleSF_miniIso01_err/D/0.', 'lepton_eleSF_gsf_err/D/0.', 'lepton_muSF_systematic/D/0.'])
+
 
     readVectors.append({'prefix':'GenPart',  'nMax':100, 'vars':['eta/F','pt/F','phi/F','mass/F','charge/F', 'pdgId/I', 'motherId/F', 'grandmotherId/F','status/F']})
     #readVectors.append({'prefix':'genPartAll',  'nMax':100, 'vars':['eta/F','pt/F','phi/F','mass/F','charge/F', 'pdgId/I', 'motherId/F', 'grandmotherId/F','status/F']})
@@ -421,9 +422,9 @@ for isample, sample in enumerate(allSamples):
           
           if leptonFastSim:
             if s.nTightHardLeptons>=1:
-              s.reweightLeptonFastSimSF     = leptonFastSimSF.get3DSF(pdgId=s.leptonPdg, pt=s.leptonPt, eta=s.leptonEta, nvtx = r.nVert)
-              s.reweightLeptonFastSimSFUp   = leptonFastSimSF.get3DSF(pdgId=s.leptonPdg, pt=s.leptonPt, eta=s.leptonEta, nvtx = r.nVert, sigma = +1)
-              s.reweightLeptonFastSimSFDown = leptonFastSimSF.get3DSF(pdgId=s.leptonPdg, pt=s.leptonPt, eta=s.leptonEta, nvtx = r.nVert, sigma = -1)
+              s.reweightLeptonFastSimSF     = leptonFastSimSF.get2DSF(pdgId=s.leptonPdg, pt=s.leptonPt, eta=s.leptonEta, nvtx = r.nVert)
+              s.reweightLeptonFastSimSFUp   = leptonFastSimSF.get2DSF(pdgId=s.leptonPdg, pt=s.leptonPt, eta=s.leptonEta, nvtx = r.nVert, sigma = +1)
+              s.reweightLeptonFastSimSFDown = leptonFastSimSF.get2DSF(pdgId=s.leptonPdg, pt=s.leptonPt, eta=s.leptonEta, nvtx = r.nVert, sigma = -1)
             else:
               s.reweightLeptonFastSimSF     = -999 
               s.reweightLeptonFastSimSFUp   = -999

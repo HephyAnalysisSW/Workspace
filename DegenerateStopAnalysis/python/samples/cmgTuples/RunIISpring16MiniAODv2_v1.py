@@ -985,7 +985,7 @@ ZJetsToNuNu_HT2500toInf ={
 "skimAnalyzerDir":"skimAnalyzerCount",
 "treeName":"tree",
 "isData": False,
-"xsec": 0.00851652,
+"xsec": 0.00820,
 
 }
 allComponents.append(ZJetsToNuNu_HT2500toInf)
@@ -1021,7 +1021,7 @@ ZJetsToNuNu_HT600to800 ={
 "skimAnalyzerDir":"skimAnalyzerCount",
 "treeName":"tree",
 "isData": False,
-"xsec": 9.44271,
+"xsec": 3.221,
 
 }
 allComponents.append(ZJetsToNuNu_HT600to800)
@@ -1038,7 +1038,7 @@ ZJetsToNuNu_HT800to1200 ={
 "skimAnalyzerDir":"skimAnalyzerCount",
 "treeName":"tree",
 "isData": False,
-"xsec": 9.44271,
+"xsec": 1.474 ,
 
 }
 allComponents.append(ZJetsToNuNu_HT800to1200)
@@ -1061,4 +1061,10 @@ ZZ ={
 
 }
 allComponents.append(ZZ)
+
+
+
+if __name__ == '__main__':
+    #print " \\\ \n".join( sorted([x['dbsName'].rsplit("/")[1] for x in allComponents]))
+    print " \\\ \n".join( sorted([x['dbsName'].replace("_","-") for x in allComponents]))
 
