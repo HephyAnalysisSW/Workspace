@@ -536,7 +536,7 @@ DiBoson_ZZ = {\
 SMS_T5qqqqVV_TuneCUETP8M1 ={\
 "name" : "SMS_T5qqqqVV_TuneCUETP8M1",
 "chunkString":"SMS_T5qqqqVV_TuneCUETP8M1",
-"dir": "/afs/hephy.at/data/easilar01/Ra40b/cmgTuples/SignalScan_ICHEP_v3/Signal_ISR_fix/",
+"dir": "/afs/hephy.at/data/easilar01/Ra40b/cmgTuples/SignalScan_nocut/signal_noCUT/",
 "dbsName" : "",
 "skimAnalyzerDir":"skimAnalyzerCount",
 "rootFileLocation":"/treeProducerSusySingleLepton/tree.root",

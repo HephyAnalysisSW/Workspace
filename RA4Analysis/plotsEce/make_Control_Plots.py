@@ -173,14 +173,14 @@ signals = [\
 ]
 
 dPhiBins  = array('d', [float(x)/1000. for x in range(0,500,100)+range(500,700,200)+range(700,1000,300)+range(1000,2000,500)+range(2000,3141,1141)+range(3141,4141,1000)])
-hTBins  = [500, 750, 1000, 1250, 2500]
-lTBins = [250,350,450,600,950]
-#lTBins  = array('d', [float(x) for x in range(250,500,25)+range(500,800,50)+range(800,1000,100)])
-#hTBins  = array('d', [float(x) for x in range(250,500,25)+range(500,800,50)+range(800,1000,100)+range(1000,2000,200)+range(2000,2500,250)])
+#hTBins  = [500, 750, 1000, 1250, 2500]
+#lTBins = [250,350,450,600,950]
+lTBins  = array('d', [float(x) for x in range(250,450,100)+range(450,600,150)+range(600,950,350)+range(950,1300,350)])
+hTBins  = array('d', [float(x) for x in range(500,1250,250)+range(1250,2500,1250)+range(2500,3750,1250)])
 plots =[\
 #{'ndiv':False,'yaxis':'< Events / 0.1>','xaxis':'#Delta#Phi(W,l)','logy':'True' , 'var':'deltaPhi_Wl',        'bin_set':(True,0.1),          'varname':'deltaPhi_Wl',       'binlabel':1, 'bin':(len(dPhiBins)-1,dPhiBins)},\
-{'ndiv':True,'yaxis':'Events / ','xaxis':'L_{T} [GeV]','logy':'True' , 'var':  'st',                          'bin_set':(True,100),          'varname':'LT',                  'binlabel':1,  'bin':(len(lTBins)-1,lTBins)},\
-{'ndiv':True,'yaxis':'Events / ','xaxis':'H_{T}','logy':'True' , 'var':'htJet30j',                              'bin_set':(True,250),        'varname':'htJet30j',            'binlabel':1,  'bin':(len(hTBins)-1,hTBins)},\
+{'ndiv':True,'yaxis':'< Events / 100 GeV >','xaxis':'L_{T} [GeV]','logy':'True' , 'var':  'st',                          'bin_set':(True,100),          'varname':'LT',                  'binlabel':"",  'bin':(len(lTBins)-1,lTBins)},\
+{'ndiv':True,'yaxis':'< Events / 250 GeV >','xaxis':'H_{T}','logy':'True' , 'var':'htJet30j',                              'bin_set':(True,250),        'varname':'htJet30j',            'binlabel':"",  'bin':(len(hTBins)-1,hTBins)},\
 #{'ndiv':False,'yaxis':'Events','xaxis':'n_{jet}','logy':'True' , 'var':'nJet30',                               'bin_set':(False,25),         'varname':'nJet30',                   'binlabel':1,  'bin':(15,0,15)},\
 #{'ndiv':True,'yaxis':'Events / ','xaxis':'p_{T}(l)','logy':'True' , 'var':'LepGood_pt[0]',                      'bin_set':(False,25),          'varname':'leptonPt',      'binlabel':15,  'bin':(65,25,2275)},\
 #{'ndiv':True,'yaxis':'Events / ','xaxis':'p_{T}(l)','logy':'True' , 'var':'LepGood_pt[0]',                      'bin_set':(False,25),          'varname':'leptonPt',      'binlabel':25,  'bin':(39,25,1000)},\
@@ -330,7 +330,8 @@ for lepSel in lepSels:
             #histo.GetYaxis().SetTitleSize(2)
             if p['ndiv']:
                histo.GetXaxis().SetNdivisions(505)
-               histo.GetYaxis().SetTitle(p['yaxis']+str(p['binlabel'])+'GeV')
+               #histo.GetYaxis().SetTitle(p['yaxis']+str(p['binlabel'])+'GeV')
+               histo.GetYaxis().SetTitle(p['yaxis'])
             if not p['ndiv']:
                histo.GetYaxis().SetTitle(p['yaxis'])
             #leg.AddEntry(histo, bkg['tex'],"f")
@@ -342,7 +343,7 @@ for lepSel in lepSels:
           else: stack_hist=ROOT.TH1F("stack_hist","stack_hist",p['bin'][0],p['bin'][1],p['bin'][2])
           stack_hist.Merge(h_Stack.GetHists())
 
-          max_bin = stack_hist.GetMaximum()*500
+          max_bin = stack_hist.GetMaximum()*10000
 
           h_Stack.SetMaximum(max_bin)
           #h_Stack.SetMinimum(0.000000001)
@@ -375,7 +376,8 @@ for lepSel in lepSels:
           h_data.Draw("E1 Same")
           if p['ndiv']:
             h_data.GetXaxis().SetNdivisions(505)
-            h_data.GetYaxis().SetTitle(p['yaxis']+str(p['binlabel'])+' GeV')
+            #h_data.GetYaxis().SetTitle(p['yaxis']+str(p['binlabel'])+' GeV')
+            h_data.GetYaxis().SetTitle(p['yaxis'])
           if not p['ndiv']:
             h_data.GetYaxis().SetTitle(p['yaxis'])
           print "Integral of BKG:" , stack_hist.Integral()
