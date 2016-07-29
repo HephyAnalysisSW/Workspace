@@ -12,8 +12,16 @@ from Workspace.RA4Analysis.signalRegions import *
 
 from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2_postProcessed import *
 
-small = True
+from optparse import OptionParser
+parser = OptionParser()
+parser.add_option("--singleGluinoMassPoint", dest="singleMP", default=False, action="store_true", help="small set")
+parser.add_option("--small", dest="smallSR", default=False, action="store_true", help="small set of signalRegions")
+parser.add_option("--mgl", dest="gluinoMass", default=1200, action="store", help="Set gluino mass")
 
+(options, args) = parser.parse_args()
+
+#small = True
+#smallSR = False
 
 signalRegions = signalRegions2016
 
@@ -27,7 +35,7 @@ TTSB  = (4,5)
 
 lumi = 12.88
 
-weight = 'weight*'+str(lumi)+'/3.'
+weight = 'weight*('+str(lumi)+'/3.)'
 
 weight_Central_0b     = weight+'*weightBTag0_SF*reweightLeptonFastSimSF'
 weight_Central_1b     = weight+'*weightBTag1_SF*reweightLeptonFastSimSF'
@@ -36,16 +44,20 @@ weight_Central_1b     = weight+'*weightBTag1_SF*reweightLeptonFastSimSF'
 pickleDir = '/afs/hephy.at/data/easilar01/Ra40b/pickleDir/T5qqqqWW_mass_nEvents_xsec_pkl'
 mass_dict = pickle.load(file(pickleDir))
 
-smallSetMGL = 1200
+singleMP = options.singleMP
+smallSR = options.smallSR
+smallSetMGL = int(options.gluinoMass)
 
-if small: mass_dict = {smallSetMGL:mass_dict[smallSetMGL]}
+if singleMP: mass_dict = {smallSetMGL:mass_dict[smallSetMGL]}
 
-if small:
+if smallSR:
   signalRegions = {(5,5): {(350, 450): {(500, -1): {'deltaPhi': 1.}},
                             (450, -1):  {(500, -1): {'deltaPhi': .75}}},
                     (6,-1):{(350, 450): {(500, -1): {'deltaPhi': 1.}},
                             (450, -1):  {(500, -1): {'deltaPhi': .75}}}
                    }
+
+
 
 bins = ['MB_CR', 'MB_SR', 'SB_W_CR', 'SB_W_SR', 'SB_TT_CR', 'SB_TT_SR']
 
@@ -110,3 +122,15 @@ for srNJet in sorted(signalRegions):
           
           unc[srNJet][stb][htb][mGl][mLSP] = uncBin
           del c
+
+
+picklePath = '/afs/hephy.at/data/dspitzbart01/Results2016/signal_uncertainties/'
+pickleName = 'gen_met_study_'
+
+if singleMP: pickleName+='mgl'+str(smallSetMGL)
+else: pickleName+='mgl_all'
+
+pickle.dump(unc, file(picklePath+pickleName+'_pkl','w'))
+print
+print 'saved results in',picklePath+pickleName+'_pkl'
+
