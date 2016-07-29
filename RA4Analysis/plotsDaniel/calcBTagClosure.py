@@ -50,7 +50,7 @@ for srNJet in sorted(signalRegions):
 baseDir = '/data/'+username+'/Results2016/'
 
 
-b_upDir       = 'Prediction_Spring16_templates_SR2016_v2_lep_MC_SF_b_Down_12p9/'
+b_upDir       = 'Prediction_Spring16_templates_SR2016_v2_lep_MC_SF_b_Up_12p9/'
 b_downDir     = 'Prediction_Spring16_templates_SR2016_v2_lep_MC_SF_b_Down_12p9/'
 light_upDir   = 'Prediction_Spring16_templates_SR2016_v2_lep_MC_SF_light_Up_12p9/'
 light_downDir = 'Prediction_Spring16_templates_SR2016_v2_lep_MC_SF_light_Down_12p9/'
@@ -141,7 +141,7 @@ for key in keys:
         light_upDiff   = (light_up[srNJet][stb][htb][key]-nominal[srNJet][stb][htb][key])/nominal[srNJet][stb][htb][key]
         light_downDiff = (light_down[srNJet][stb][htb][key]-nominal[srNJet][stb][htb][key])/nominal[srNJet][stb][htb][key]
         print 'light up, down:', light_upDiff, light_downDiff
-        b_upDiff   = -(b_up[srNJet][stb][htb][key]-nominal[srNJet][stb][htb][key])/nominal[srNJet][stb][htb][key]
+        b_upDiff   = (b_up[srNJet][stb][htb][key]-nominal[srNJet][stb][htb][key])/nominal[srNJet][stb][htb][key]
         b_downDiff = (b_down[srNJet][stb][htb][key]-nominal[srNJet][stb][htb][key])/nominal[srNJet][stb][htb][key]
         print 'b/c up, down:', b_upDiff, b_downDiff
         
@@ -200,11 +200,11 @@ for key in keys:
   
   can = ROOT.TCanvas('can','can',700,700)
   can.SetGrid()
-  #pad1=ROOT.TPad("pad1","MyTitle",0.,0.0,1.,1.)
-  #pad1.SetLeftMargin(0.15)
-  #pad1.SetBottomMargin(0.15)
-  #pad1.Draw()
-  #pad1.cd()
+  pad1=ROOT.TPad("pad1","MyTitle",0.,0.0,1.,1.)
+  pad1.SetLeftMargin(0.15)
+  pad1.SetBottomMargin(0.15)
+  pad1.Draw()
+  pad1.cd()
   
   signUp = 1
   signDown = 1
@@ -220,88 +220,88 @@ for key in keys:
   print 'Max. change to nominal for variation up:',maxUp*signUp
   print 'Max. change to nominal for variation down:',maxDown*signDown
   
-  #Up_H.GetXaxis().SetTitle('Signal Region #')
-  #Up_H.GetXaxis().SetTitleSize(0.05)
-  #Up_H.GetXaxis().SetTitleOffset(1.0)
-  #Up_H.GetXaxis().SetLabelSize(0.08)
-  #
-  #Up_H.GetYaxis().SetTitle('#delta_{k}')
-  #
-  #Up_H.SetMinimum(-0.2)
-  #Up_H.SetMaximum(0.2)
-  #Up_H.SetFillColor(ROOT.kGray)
-  #Up_H.SetMarkerStyle(0)
-  #Down_H.SetFillColor(ROOT.kGray)
-  #Up_H.SetLineColor(ROOT.kBlack)
-  #Up_H.SetLineWidth(2)
-  #Down_H.SetLineColor(ROOT.kBlack)
-  #Down_H.SetLineWidth(2)
-  #b_Up_H.SetLineColor(ROOT.kOrange+8)
-  #b_Up_H.SetMarkerStyle(0)
-  #b_Up_H.SetLineWidth(2)
-  #
-  #b_Down_H.SetLineColor(ROOT.kOrange+8)
-  #b_Down_H.SetLineWidth(2)
-  #
-  #light_Up_H.SetLineColor(ROOT.kBlue)
-  #light_Up_H.SetMarkerStyle(0)
-  #light_Up_H.SetLineWidth(2)
-  #
-  #light_Down_H.SetLineColor(ROOT.kBlue)
-  #light_Down_H.SetLineWidth(2)
-  #
-  #for i in range(1,bins+1):
-  #  max_H.SetBinContent(i,maxUp*signUp)
-  #  min_H.SetBinContent(i,-maxDown*signDown)
-  #  zero_H.SetBinContent(i,0)
-  #max_H.SetLineStyle(3)
-  #min_H.SetLineStyle(3)
-  #
-  #Up_H.Draw()
-  #Down_H.Draw('same')
-  #b_Up_H.Draw('same')
-  #b_Down_H.Draw('same')
-  #light_Up_H.Draw('same')
-  #light_Down_H.Draw('same')
-  #
-  ##qcd_Up_H.Draw('same')
-  ##qcd_Down_H.Draw('same')
-  #
-  #max_H.Draw('same')
-  #min_H.Draw('same')
-  #zero_H.Draw('same')
-  #
-  #can.RedrawAxis()
-  #
-  #
-  #leg = ROOT.TLegend(0.65,0.8,0.98,0.95)
-  #leg.SetFillColor(ROOT.kWhite)
-  #leg.SetShadowColor(ROOT.kWhite)
-  #leg.SetBorderSize(1)
-  #leg.SetTextSize(0.04)
-  #leg.AddEntry(Up_H,'total')
-  #leg.AddEntry(b_Up_H,'b/c var')
-  #leg.AddEntry(light_Up_H,'light var')
-  #
-  #leg.Draw()
-  #
-  #latex1 = ROOT.TLatex()
-  #latex1.SetNDC()
-  #latex1.SetTextSize(0.035)
-  #latex1.SetTextAlign(11)
-  #
-  ##latex1.DrawLatex(0.18,0.96,'CMS Simulation')
-  #latex1.DrawLatex(0.15,0.96,'CMS #bf{#it{simulation}}')
-  #latex1.DrawLatex(0.68,0.96,"L=2.1fb^{-1} (13TeV)")
-  #
-  #setNiceBinLabel(Up_H, signalRegions)
-  #Up_H.GetXaxis().SetLabelSize(0.027)
-  #Up_H.GetXaxis().SetTitle('')
-  #
-  #can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2016/btag_uncertainty/'+key+'_approval.png')
-  #can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2016/btag_uncertainty/'+key+'_approval.pdf')
-  #can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2016/btag_uncertainty/'+key+'_approval.root')
-  #
+  Up_H.GetXaxis().SetTitle('Signal Region #')
+  Up_H.GetXaxis().SetTitleSize(0.05)
+  Up_H.GetXaxis().SetTitleOffset(1.0)
+  Up_H.GetXaxis().SetLabelSize(0.08)
+  
+  Up_H.GetYaxis().SetTitle('#delta_{k}')
+  
+  Up_H.SetMinimum(-0.1)
+  Up_H.SetMaximum(0.1)
+  Up_H.SetFillColor(ROOT.kGray)
+  Up_H.SetMarkerStyle(0)
+  Down_H.SetFillColor(ROOT.kGray)
+  Up_H.SetLineColor(ROOT.kBlack)
+  Up_H.SetLineWidth(2)
+  Down_H.SetLineColor(ROOT.kBlack)
+  Down_H.SetLineWidth(2)
+  b_Up_H.SetLineColor(ROOT.kOrange+8)
+  b_Up_H.SetMarkerStyle(0)
+  b_Up_H.SetLineWidth(2)
+  
+  b_Down_H.SetLineColor(ROOT.kOrange+8)
+  b_Down_H.SetLineWidth(2)
+  
+  light_Up_H.SetLineColor(ROOT.kBlue)
+  light_Up_H.SetMarkerStyle(0)
+  light_Up_H.SetLineWidth(2)
+  
+  light_Down_H.SetLineColor(ROOT.kBlue)
+  light_Down_H.SetLineWidth(2)
+  
+  for i in range(1,bins+1):
+    max_H.SetBinContent(i,maxUp*signUp)
+    min_H.SetBinContent(i,-maxDown*signDown)
+    zero_H.SetBinContent(i,0)
+  max_H.SetLineStyle(3)
+  min_H.SetLineStyle(3)
+  
+  Up_H.Draw()
+  Down_H.Draw('same')
+  b_Up_H.Draw('same')
+  b_Down_H.Draw('same')
+  light_Up_H.Draw('same')
+  light_Down_H.Draw('same')
+  
+  #qcd_Up_H.Draw('same')
+  #qcd_Down_H.Draw('same')
+  
+  max_H.Draw('same')
+  min_H.Draw('same')
+  zero_H.Draw('same')
+  
+  can.RedrawAxis()
+  
+  
+  leg = ROOT.TLegend(0.65,0.8,0.98,0.95)
+  leg.SetFillColor(ROOT.kWhite)
+  leg.SetShadowColor(ROOT.kWhite)
+  leg.SetBorderSize(1)
+  leg.SetTextSize(0.04)
+  leg.AddEntry(Up_H,'total')
+  leg.AddEntry(b_Up_H,'b/c var')
+  leg.AddEntry(light_Up_H,'light var')
+  
+  leg.Draw()
+  
+  latex1 = ROOT.TLatex()
+  latex1.SetNDC()
+  latex1.SetTextSize(0.035)
+  latex1.SetTextAlign(11)
+  
+  #latex1.DrawLatex(0.18,0.96,'CMS Simulation')
+  latex1.DrawLatex(0.15,0.96,'CMS #bf{#it{simulation}}')
+  latex1.DrawLatex(0.68,0.96,"L=2.1fb^{-1} (13TeV)")
+  
+  setNiceBinLabel(Up_H, signalRegions)
+  Up_H.GetXaxis().SetLabelSize(0.027)
+  Up_H.GetXaxis().SetTitle('')
+  
+  can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2016/btag_uncertainty/'+key+'_approval.png')
+  can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2016/btag_uncertainty/'+key+'_approval.pdf')
+  can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2016/btag_uncertainty/'+key+'_approval.root')
+  
   b_dict[key] = b_err
   l_dict[key] = l_err
 
