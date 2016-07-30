@@ -23,7 +23,7 @@ from btagEfficiency import *
 from readVetoEventList import *
 
 scaleFactorDir  = '$CMSSW_BASE/src/Workspace/RA4Analysis/cmgPostProcessing/data/'
-bTagEffFile     = scaleFactorDir+"/effs_presel_JECv6_pkl" 
+bTagEffFile     = "data/effs_presel_JECv6_pkl" 
 
 try:
   mcEffDict = pickle.load(file(bTagEffFile))
@@ -45,8 +45,8 @@ separateBTagWeights = True
 
 defSampleStr = "TTJets_LO"
 
-#subDir = "postProcessing_Run2016B_4fb_data"
-subDir = "postProcessing_Run2016BCD"
+subDir = "postProcessing_HT350"
+#subDir = "postProcessing_Run2016BCD"
 
 #branches to be kept for data and MC
 branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert",
@@ -96,16 +96,16 @@ if options.for_dilep :
   common_skim = "skim"
 if options.skim.startswith('met'):
   skimCond = "met_pt>"+str(float(options.skim[3:]))
-if options.skim=='HT400':
-  skimCond = "Sum$(Jet_pt)>400"
-if options.skim=='HT400ST200':   ##tuples have already ST200 skim
+if options.skim=='HT350':
+  skimCond = "Sum$(Jet_pt)>350"
+if options.skim=='HT400ST200':  
   skimCond = "Sum$(Jet_pt)>400&&(LepGood_pt[0]+met_pt)>200"
 if options.skim=='HT500ST250':  
   skimCond = htLtSkim
 if options.skim=='LHEHTsm600':
-  skimCond = "lheHTIncoming<=600&&"+htLtSkim
+  skimCond = "lheHTIncoming<=600"
 if options.skim=='LHEHTlg600':
-  skimCond = "lheHTIncoming>600&&"+htLtSkim
+  skimCond = "lheHTIncoming>600"
 
 #skimCond += "&&Sum$(LepGood_pt>25&&abs(LepGood_eta)<2.5)>=0"
 

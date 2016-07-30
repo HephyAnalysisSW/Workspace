@@ -13,10 +13,10 @@
 #python cmgPostProcessing.py --overwrite  --skim="HT500ST250"  --samples=DiBoson_WZ
 #python cmgPostProcessing.py --overwrite  --skim="HT500ST250"  --samples=DiBoson_ZZ
 
-python cmgPostProcessing.py --overwrite  --calcbtagweights --skim="HT500ST250"  --samples=TTWJetsToLNu
-python cmgPostProcessing.py --overwrite  --calcbtagweights --skim="HT500ST250"  --samples=TTWJetsToQQ
-python cmgPostProcessing.py --overwrite  --calcbtagweights --skim="HT500ST250"  --samples=TTZToLLNuNu
-python cmgPostProcessing.py --overwrite  --calcbtagweights --skim="HT500ST250"  --samples=TTZToQQ
+python cmgPostProcessing.py --overwrite  --calcbtagweights  --samples=TTWJetsToLNu
+python cmgPostProcessing.py --overwrite  --calcbtagweights  --samples=TTWJetsToQQ
+python cmgPostProcessing.py --overwrite  --calcbtagweights  --samples=TTZToLLNuNu
+python cmgPostProcessing.py --overwrite  --calcbtagweights  --samples=TTZToQQ
 
 
 
