@@ -26,7 +26,7 @@ setup_style()
 parser = argparse.ArgumentParser(description = "Input options")
 parser.add_argument("--ABCD", dest = "ABCD",  help = "ABCD method", type = str, default = "4")
 parser.add_argument("--MET", dest = "MET",  help = "MET Cut", type = str, default = "300")
-parser.add_argument("--HT", dest = "HT",  help = "HT Cut", type = str, default = "300")
+parser.add_argument("--HT", dest = "HT",  help = "HT Cut", type = str, default = "400")
 parser.add_argument("--METloose", dest = "METloose",  help = "Loose MET Cut", type = str, default = "200")
 parser.add_argument("--eleWP", dest = "eleWP",  help = "Electron WP", type = str, default = "Veto")
 parser.add_argument("--highWeightVeto", dest = "highWeightVeto",  help = "Remove high weighted events", type = int, default = 0)
@@ -92,6 +92,7 @@ if save: #web address: http://www.hephy.at/user/mzarucki/plots
 suffix = "_HT" + HTcut + "_MET" + METcut
 if ABCD == "3": suffix += "_METloose" + METloose
 if enriched == True: suffix += "_EMenriched"
+if plot: suffix += "_" + plotReg
 
 #suffix += "_index"
 
@@ -107,7 +108,7 @@ if getData: samplesList.append("dblind")
 samples = getSamples(cmgPP = cmgPP, skim = 'preIncLep', sampleList = samplesList, scan = False, useHT = True, getData = getData) 
 
 #officialSignals = ["s300_290", "s300_270", "s300_250"] #FIXME: crosscheck if these are in allOfficialSignals
-
+   
 if verbose:
    print makeLine()
    print "Using samples:"
@@ -118,10 +119,9 @@ if verbose:
          print "!!! Sample " + sample + " unavailable."
          sys.exit(0)
    
-   collection = "LepAll" 
-   print makeLine()
-   print "Using " + collection + " collection."
-   print makeLine()
+   #print makeLine()
+   #print "Using " + collection + " collection."
+   #print makeLine()
 
 #Removal of high weight events
 if highWeightVeto:
@@ -447,8 +447,20 @@ if plot:
    
    QCD[plotReg]['I_A'] = CutClass("QCD_I_A_" + plotReg, [
       SRs[plotReg],
-      ["A", dPhiCut], #applied
       ["anti-I", antiHybIsoCut], #inverted
+      ["A", dPhiCut], #applied
+      ], baseCut = presel)
+   
+   QCD[plotReg]['X_A'] = CutClass("QCD_X_A_" + plotReg, [
+      SRs[plotReg],
+      ["anti-X", invertedCut], #inverted
+      ["A", dPhiCut], #applied
+      ], baseCut = presel)
+   
+   QCD[plotReg]['A_X'] = CutClass("QCD_A_X_" + plotReg, [
+      SRs[plotReg],
+      ["anti-A", antidPhiCut], #inverted
+      ["X", appliedCut], #applied
       ], baseCut = presel)
       
    if ABCD != "3":
@@ -472,7 +484,7 @@ if plot:
    plots = {}
    plots2 = {}
    
-   if ABCD == "4": plotRegions = ['SR', 'A', 'IA', 'XA', 'I_A', 'A_I', 'IA_X', 'XA_I', 'IX_A', 'IXA']
+   if ABCD == "4": plotRegions = ['SR', 'A', 'IA', 'XA', 'I_A', 'A_I', 'X_A', 'A_X', 'IA_X', 'XA_I', 'IX_A', 'IXA']
   
    if getData: plotRegions.remove('SR')
    
@@ -493,10 +505,9 @@ if plot:
          "weight_" + sel:{'var':"weight", "bins":[20,0,400], "decor":{"title": "Weight Plot","x":"Event Weight" , "y":"Events", 'log':[0,1,0]}}
       }
       
-      if verbose: print "Cut string: ", QCD[plotReg][sel].combined   
-    
       #plotsList[sel] = ["hybIso2_" + sel, "absDxy_" + sel, "delPhi_" + sel]
-      plotsList[sel] = ["hybIso2_" + sel, "absDxy_" + sel, "delPhi_" + sel, "sigmaEtaEta_" + sel]#, "weight_" + sel]
+      plotsList[sel] = ["hybIso2_" + sel, "sigmaEtaEta_" + sel, "weight_" + sel]
+      #plotsList[sel] = ["hybIso2_" + sel, "absDxy_" + sel, "delPhi_" + sel, "sigmaEtaEta_" + sel, "weight_" + sel]
       #plotsList[sel] = ["elePt_" + sel, "absIso_" + sel, "relIso_" + sel,"hybIso_" + sel, "hybIso2_" + sel, "absDxy_" + sel, "delPhi_" + sel, "eleMt_" + sel, "MET_" + sel, "HT_" + sel, "sigmaEtaEta_" + sel, "hOverE_" + sel, "weight_" + sel]
       plotsDict[sel] = Plots(**plotDict[sel])
       plots[sel] = getPlots(samples, plotsDict[sel], QCD[plotReg][sel], samplesList, plotList = plotsList[sel], addOverFlowBin='upper')

@@ -75,15 +75,9 @@ if verbose:
       else: 
          print "!!! Sample " + sample + " unavailable."
          sys.exit(0)
-   
-   collection = "LepAll" 
-   print makeLine()
-   print "Using " + collection + " collection."
-   print makeLine()
-
 #Save
 if save: #web address: http://www.hephy.at/user/mzarucki/plots
-   savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/Zinv/8fb"
+   savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/Zinv"
    savedir += "/" + SR
    
    savedir1 = savedir + "/beforeEmul"
