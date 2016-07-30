@@ -395,7 +395,7 @@ for region_name in w_region_names:
                       ["W Frac. SR/CR",         "%s/%s"%(dataWFrac_sr.round(2).val, dataWFrac_cr.round(2).val )],
                       #["W SFSR",                w_sf_sr.round(2)],
                       ["W SFCR",                w_sf_cr.round(2)],
-                      #["W SFSR(MCTT)",          w_sf_sr_mctt.round(2)],
+                      ["W SFSR(MCTT)",          w_sf_sr_mctt.round(2)],
                       #["W SFCR(MCTT)",          w_sf_cr_mctt.round(2)],
                       #['TT SF SR'          ,   tt_sf_sr.round(2)  ],
                       ["W Closure",             closure_w_sr.round(2)],

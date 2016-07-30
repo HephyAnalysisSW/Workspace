@@ -1,5 +1,6 @@
 import math
 from Workspace.DegenerateStopAnalysis.tools.degTools import CutClass, joinCutStrings, splitCutInPt, btw, less, more
+import Workspace.DegenerateStopAnalysis.tools.btag_sf_map as btag_sf_map
 
 ## --------------------------------------------------------------
 ##                           Variables
@@ -54,45 +55,44 @@ class Cuts():
 
 
         if btag == 'btag':
-            veto_soft_bjet          = '(nBSoftJet == 0 )'
-            one_soft_bjet           = '(nBSoftJet == 1 )'
-            one_or_more_soft_bjet   = '(nBSoftJet >= 1 )'
-            veto_hard_bjet          = '(nBHardJet == 0 )'
-            one_hard_bjet           = '(nBHardJet == 1 )'
-            one_or_more_hard_bjet   = '(nBHardJet >= 1 )'
-            veto_bjet               = '(  nBJet   == 0 )'
-            one_bjet                = '(  nBJet   == 1 )'
-            one_or_more_bjet        = '(  nBJet   >= 1 )'
-            two_or_more_bjet        = '(  nBJet   >= 2 )'
+            veto_soft_bjet          = btag_sf_map.btag_veto_soft_bjet       #'(nBSoftJet == 0 )'
+            one_soft_bjet           = btag_sf_map.btag_one_soft_bjet        #'(nBSoftJet == 1 )'
+            one_or_more_soft_bjet   = btag_sf_map.btag_one_or_more_soft_bjet#'(nBSoftJet >= 1 )'
+            veto_hard_bjet          = btag_sf_map.btag_veto_hard_bjet       #'(nBHardJet == 0 )'
+            one_hard_bjet           = btag_sf_map.btag_one_hard_bjet        #'(nBHardJet == 1 )'
+            one_or_more_hard_bjet   = btag_sf_map.btag_one_or_more_hard_bjet#'(nBHardJet >= 1 )'
+            veto_bjet               = btag_sf_map.btag_veto_bjet            #'(  nBJet   == 0 )'
+            one_bjet                = btag_sf_map.btag_one_bjet             #'(  nBJet   == 1 )'
+            one_or_more_bjet        = btag_sf_map.btag_one_or_more_bjet     #'(  nBJet   >= 1 )'
+            two_or_more_bjet        = btag_sf_map.btag_two_or_more_bjet     #'(  nBJet   >= 2 )'
 
-
-            sr1_bjet                =  veto_bjet 
-            sr2_bjet                =  "( (nBSoftJet>=1) && (nBHardJet==0) )"
-            cr1_bjet                =  veto_bjet
-            cr2_bjet                =  "( (nBSoftJet>=1) && (nBHardJet==0)  )"
-            crtt1_bjet              =  "( (nBSoftJet==0) && (nBHardJet==1)  )"
-            crtt2_bjet              =  "( (nBJet>=2)     && (nBHardJet>=1) )"
+            sr1_bjet                = btag_sf_map.btag_sr1_bjet             # veto_bjet 
+            sr2_bjet                = btag_sf_map.btag_sr2_bjet             # "( (nBSoftJet>=1) && (nBHardJet==0) )"
+            cr1_bjet                = btag_sf_map.btag_cr1_bjet             # veto_bjet
+            cr2_bjet                = btag_sf_map.btag_cr2_bjet             # "( (nBSoftJet>=1) && (nBHardJet==0)  )"
+            crtt1_bjet              = btag_sf_map.btag_crtt1_bjet           # "( (nBSoftJet==0) && (nBHardJet==1)  )"
+            crtt2_bjet              = btag_sf_map.btag_crtt2_bjet           # "( (nBJet>=2)     && (nBHardJet>=1) )"
             
 
 
         elif btag == 'sf':
-            veto_soft_bjet          = '(weightSBTag0_SF)' 
-            one_soft_bjet           = '(weightSBTag1_SF)' 
-            one_or_more_soft_bjet   = '(weightSBTag1p_SF)'
-            veto_hard_bjet          = '(weightHBTag0_SF)' 
-            one_hard_bjet           = '(weightHBTag1_SF)' 
-            one_or_more_hard_bjet   = '(weightHBTag1p_SF)'
-            veto_bjet               = '(weightBTag0_SF)'   
-            one_bjet                = '(weightBTag1_SF)'   
-            one_or_more_bjet        = '(weightBTag1p_SF)'  
-            two_or_more_bjet        = '(weightBTag2p_SF)'  
-
-            sr1_bjet                =  veto_bjet 
-            sr2_bjet                =  "(weightSBTag1p_SF * weightHBTag0_SF)" 
-            cr1_bjet                =  veto_bjet
-            cr2_bjet                =  "(weightSBTag1p_SF * weightHBTag0_SF)" #"( (nBSoftJet>=1) && (nBHardJet==0)  )"
-            crtt1_bjet              =  "(weightSBTag0_SF  * weightHBTag1_SF)" #"( (nBSoftJet==0) && (nBHardJet==1)  )"
-            crtt2_bjet              =  "(weightHBTag1p_SF-(weightSBTag0_SF*weightHBTag1_SF))"#"( (nBJet>=2)     && (nBHardJet>=1) )"
+            veto_soft_bjet          = btag_sf_map.sf_veto_soft_bjet           #'(weightSBTag0_SF)' 
+            one_soft_bjet           = btag_sf_map.sf_one_soft_bjet            #'(weightSBTag1_SF)' 
+            one_or_more_soft_bjet   = btag_sf_map.sf_one_or_more_soft_bjet    #'(weightSBTag1p_SF)'
+            veto_hard_bjet          = btag_sf_map.sf_veto_hard_bjet           #'(weightHBTag0_SF)' 
+            one_hard_bjet           = btag_sf_map.sf_one_hard_bjet            #'(weightHBTag1_SF)' 
+            one_or_more_hard_bjet   = btag_sf_map.sf_one_or_more_hard_bjet    #'(weightHBTag1p_SF)'
+            veto_bjet               = btag_sf_map.sf_veto_bjet                #'(weightBTag0_SF)'   
+            one_bjet                = btag_sf_map.sf_one_bjet                 #'(weightBTag1_SF)'   
+            one_or_more_bjet        = btag_sf_map.sf_one_or_more_bjet         #'(weightBTag1p_SF)'  
+            two_or_more_bjet        = btag_sf_map.sf_two_or_more_bjet         #'(weightBTag2p_SF)'  
+                                                                              #
+            sr1_bjet                = btag_sf_map.sf_sr1_bjet                 # veto_bjet 
+            sr2_bjet                = btag_sf_map.sf_sr2_bjet                 # "(weightSBTag1p_SF * weightHBTag0_SF)" 
+            cr1_bjet                = btag_sf_map.sf_cr1_bjet                 # veto_bjet
+            cr2_bjet                = btag_sf_map.sf_cr2_bjet                 # "(weightSBTag1p_SF * weightHBTag0_SF)" #"( (nBSoftJet>=1) && (nBHardJet==0)  )"
+            crtt1_bjet              = btag_sf_map.sf_crtt1_bjet               # "(weightSBTag0_SF  * weightHBTag1_SF)" #"( (nBSoftJet==0) && (nBHardJet==1)  )"
+            crtt2_bjet              = btag_sf_map.sf_crtt2_bjet               # "(weightHBTag1p_SF-(weightSBTag0_SF*weightHBTag1_SF))"#"( (nBJet>=2)     && (nBHardJet>=1) )"
 
             pass
         else:
@@ -612,7 +612,7 @@ class Cuts():
         pts = ["sr","cr"]
         charges = ["neg", "pos"]
         sr1_side_band_cuts  = [ 
-                                ["ESR1", "min(met, ht_basJet - 100 ) > 300"],
+                                #["ESR1", "min(met, ht_basJet - 100 ) > 300"],
                                 ["ECR1", "(min(met, ht_basJet - 100) < 300 )&&(min(met, ht_basJet - 100) > 200 )"],
                                 #["ESR2", "min(met, Jet_pt[IndexJet_isrJet[0]] - 25 ) > 300"],
                                 #["ECR2", "(min(met, Jet_pt[IndexJet_isrJet[0]] - 25) < 300 )&&(min(met, Jet_pt[IndexJet_isrJet[0]] - 25) > 200 )"],

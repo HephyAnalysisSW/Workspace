@@ -203,15 +203,15 @@ sampleSets = {
 
                 'data':{
                             'samples':[
-                                        "SingleMuon_Run2016B_PromptReco_v2",
-                                        "SingleElectron_Run2016B_PromptReco_v2",
-                                        "MET_Run2016B_PromptReco_v2",
-                                        "SingleMuon_Run2016C_PromptReco_v2",
-                                        "SingleElectron_Run2016C_PromptReco_v2",
-                                        "MET_Run2016C_PromptReco_v2",
-                                        #"SingleMuon_Run2016D_PromptReco_v2",
-                                        #"SingleElectron_Run2016D_PromptReco_v2",
-                                        #"MET_Run2016D_PromptReco_v2",
+                                        #"SingleMuon_Run2016B_PromptReco_v2",
+                                        #"SingleElectron_Run2016B_PromptReco_v2",
+                                        #"MET_Run2016B_PromptReco_v2",
+                                        #"SingleMuon_Run2016C_PromptReco_v2",
+                                        #"SingleElectron_Run2016C_PromptReco_v2",
+                                        #"MET_Run2016C_PromptReco_v2",
+                                        "SingleMuon_Run2016D_PromptReco_v2",
+                                        "SingleElectron_Run2016D_PromptReco_v2",
+                                        "MET_Run2016D_PromptReco_v2",
                                         ],
                             },
 
@@ -220,14 +220,14 @@ sampleSets = {
                             'samples':[
                                         "MET_Run2016B_PromptReco_v2",
                                         "MET_Run2016C_PromptReco_v2",
-                                        #"MET_Run2016D_PromptReco_v2",
+                                        "MET_Run2016D_PromptReco_v2",
                                         ],
                             },
                 'data_mu':{
                             'samples':[
                                         "SingleMuon_Run2016B_PromptReco_v2",
                                         "SingleMuon_Run2016C_PromptReco_v2",
-                                        #"SingleMuon_Run2016D_PromptReco_v2",
+                                        "SingleMuon_Run2016D_PromptReco_v2",
                                         ],
                              
                             },
@@ -235,7 +235,7 @@ sampleSets = {
                             'samples':[
                                         "SingleElectron_Run2016B_PromptReco_v2",
                                         "SingleElectron_Run2016C_PromptReco_v2",
-                                        #"SingleElectron_Run2016D_PromptReco_v2",
+                                        "SingleElectron_Run2016D_PromptReco_v2",
                                         ],
                             },
 
@@ -269,6 +269,14 @@ sampleSets = {
                                         ["SingleMuon_Run2016C_PromptReco_v2",        "--skimLepton=oneLep",    "--runChunks",  "201"  ,"300"    ], 
                                         ["SingleMuon_Run2016C_PromptReco_v2",        "--skimLepton=oneLep",    "--runChunks",  "301"  ,"400"   ], 
                                     ] },
+                'data_mu_d_onelep':{
+                            'samples':[
+                                        ["SingleMuon_Run2016D_PromptReco_v2",               "--skimLepton=oneLep",    "--runChunks",  "0"   , "100"      ],     
+                                        ["SingleMuon_Run2016D_PromptReco_v2",               "--skimLepton=oneLep",    "--runChunks",  "101" , "200"       ],     
+                                        ["SingleMuon_Run2016D_PromptReco_v2",               "--skimLepton=oneLep",    "--runChunks",  "201" , "300"       ],     
+                                        ["SingleMuon_Run2016D_PromptReco_v2",               "--skimLepton=oneLep",    "--runChunks",  "401" , "500"       ],     
+                                        ["SingleMuon_Run2016D_PromptReco_v2",               "--skimLepton=oneLep",    "--runChunks",  "501" , "600"       ],     
+                                     ]},
                 'data_el_b_onelep':{
                             'samples':[
 
@@ -288,6 +296,15 @@ sampleSets = {
                                         ["SingleElectron_Run2016C_PromptReco_v2",    "--skimLepton=oneLep",    "--runChunks",  "201"  ,"300"        ],    
                                         ["SingleElectron_Run2016C_PromptReco_v2",    "--skimLepton=oneLep",    "--runChunks",  "301"  ,"400"        ],    
                                     ] },
+                'data_el_d_onelep':{
+                            'samples':[
+
+                                        ["SingleElectron_Run2016D_PromptReco_v2",               "--skimLepton=oneLep",    "--runChunks",  "0"   , "100"      ],     
+                                        ["SingleElectron_Run2016D_PromptReco_v2",               "--skimLepton=oneLep",    "--runChunks",  "101" , "200"       ],     
+                                        ["SingleElectron_Run2016D_PromptReco_v2",               "--skimLepton=oneLep",    "--runChunks",  "201" , "300"       ],     
+                                        ["SingleElectron_Run2016D_PromptReco_v2",               "--skimLepton=oneLep",    "--runChunks",  "401" , "500"       ],     
+                                        ["SingleElectron_Run2016D_PromptReco_v2",               "--skimLepton=oneLep",    "--runChunks",  "501" , "600"       ],     
+                                     ]},
                 'data_met_b_onelep':{
                             'samples':[
 
@@ -305,6 +322,15 @@ sampleSets = {
                                         ["MET_Run2016C_PromptReco_v2",               "--skimLepton=oneLep",    "--runChunks",  "101" , "200"       ],     
                                         ["MET_Run2016C_PromptReco_v2",               "--skimLepton=oneLep",    "--runChunks",  "201" , "300"       ],     
                                         ["MET_Run2016C_PromptReco_v2",               "--skimLepton=oneLep",    "--runChunks",  "301" , "400"       ],     
+                                     ]},
+                'data_met_d_onelep':{
+                            'samples':[
+
+                                        ["MET_Run2016D_PromptReco_v2",               "--skimLepton=oneLep",    "--runChunks",  "0"   , "100"      ],     
+                                        ["MET_Run2016D_PromptReco_v2",               "--skimLepton=oneLep",    "--runChunks",  "101" , "200"       ],     
+                                        ["MET_Run2016D_PromptReco_v2",               "--skimLepton=oneLep",    "--runChunks",  "201" , "300"       ],     
+                                        ["MET_Run2016D_PromptReco_v2",               "--skimLepton=oneLep",    "--runChunks",  "401" , "500"       ],     
+                                        ["MET_Run2016D_PromptReco_v2",               "--skimLepton=oneLep",    "--runChunks",  "501" , "600"       ],     
                                      ]},
 
 

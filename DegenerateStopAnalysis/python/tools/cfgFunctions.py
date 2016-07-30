@@ -413,11 +413,12 @@ def bkg_est(cfg, args):
         cut_name = cutInst.fullName
         sampleList = getattr(cfg, "bkgList") + getattr(cfg,"signalList")
 
-        if "CR" in cut_name or "sideband" in cut_name.lower():
+        if 'sr' in cut_name.lower():
+            dataList = ['d']
+        elif "cr" in cut_name.lower() or "sideband" in cut_name.lower():
             dataList = ['dblind']
         else:
-            dataList = ['d']
-
+            raise Exception("not sure which dataset to use!")
 
         lumi = cfg.samples[dataList[0]].name +"_lumi"
         tableDir = cfg.tableDirs[cut_name]
@@ -428,10 +429,6 @@ def bkg_est(cfg, args):
         redo_yields = args.redo_yields if args.redo_yields else cfg.redo_yields    # if args redo_yields overpower the cfg redo yields
 
         
-        pp.pprint(      {    sample_name:decide_weight2(samp, weight=None, cut=cutInst.fullName, lumi=lumi ) for sample_name, samp in cfg.samples.iteritems() if sample_name in sampleList} ,
-                         open( cutSaveDir+"/weights.txt" ,"w") )
-        pp.pprint(      cutInst.list ,  open( cutSaveDir +"/cuts.txt" ,"w"), width = 100, indent = 4 )
-        pickle.dump(    cutInst,        open( cutSaveDir +"/%s.pkl"%cutInst.fullName ,"w") )
     
     
     
@@ -465,6 +462,15 @@ def bkg_est(cfg, args):
                                    )
             pickle.dump( yields[cut_name], open(yield_pkl,'w') )
             print "Yield pickle dumped: %s"%yield_pkl
+
+
+
+        pp.pprint(      yields[cut_name].cut_weights  ,       open( cutSaveDir +"/cuts_weights.txt" ,"w"), width = 100, indent = 4 )
+        pickle.dump(    yields[cut_name].cut_weights ,        open( cutSaveDir +"/cuts_weights.pkl" ,"w") )
+
+
+
+
         combineBkgs = [ ["DYJetsM50", "ZJetsInv", "QCD","ST","Diboson"] , "Other" ] 
         seperators = ["DataBlind", "Total"]
         JinjaTexTable( yields[cut_name], pdfDir = tableDir, caption="" , transpose=True)
@@ -620,7 +626,7 @@ def data_plots(cfg,args):
             print eventListCutInst
             print "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
 
-        if getattr(args, "setEventLists",False):
+        if getattr(args, "setEventLists",True):
             setEventListToChains(cfg.samples, mcList +[data] , eventListCutInst)
         getPlots(cfg.samples, cfg.plots , cutInst  , sampleList = sampleList      , plotList=[plot] , nMinus1=nminus_list , addOverFlowBin='both',weight=""  )
 

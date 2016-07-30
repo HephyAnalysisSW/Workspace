@@ -177,6 +177,8 @@ class DegPlots():
 
 
 
+                "nVert":       {'var':"nVert"       ,"bins":[60,0,60]            ,"nMinus1":None         ,"decor":{"title":"nVert"                         ,"x":"nVert"      ,"y":"Events  "  ,'log':[0,1,0] }},
+                "nTrueInt":    {'var':"nTrueInt"    ,"bins":[50,0,50]            ,"nMinus1":None         ,"decor":{"title":"nTrueInt"                         ,"x":"nTrueInt"      ,"y":"Events  "  ,'log':[0,1,0] }},
 
 
 

@@ -50,6 +50,9 @@ mc_filters_list = [
 
 
 
+
+pu='(0.000716726893087 * (nTrueInt > 0.0 && nTrueInt <= 1.0) ) + (0.0185927895574 * (nTrueInt > 1.0 && nTrueInt <= 2.0) ) + (0.0210478201012 * (nTrueInt > 2.0 && nTrueInt <= 3.0) ) + (0.0381767871929 * (nTrueInt > 3.0 && nTrueInt <= 4.0) ) + (0.0551752616761 * (nTrueInt > 4.0 && nTrueInt <= 5.0) ) + (0.0460433383884 * (nTrueInt > 5.0 && nTrueInt <= 6.0) ) + (0.0914831472715 * (nTrueInt > 6.0 && nTrueInt <= 7.0) ) + (0.299025143868 * (nTrueInt > 7.0 && nTrueInt <= 8.0) ) + (0.536777576695 * (nTrueInt > 8.0 && nTrueInt <= 9.0) ) + (0.903041717606 * (nTrueInt > 9.0 && nTrueInt <= 10.0) ) + (1.26724526631 * (nTrueInt > 10.0 && nTrueInt <= 11.0) ) + (1.65711092476 * (nTrueInt > 11.0 && nTrueInt <= 12.0) ) + (1.92030582004 * (nTrueInt > 12.0 && nTrueInt <= 13.0) ) + (2.03226442534 * (nTrueInt > 13.0 && nTrueInt <= 14.0) ) + (2.03625006499 * (nTrueInt > 14.0 && nTrueInt <= 15.0) ) + (1.79221053799 * (nTrueInt > 15.0 && nTrueInt <= 16.0) ) + (1.52518574257 * (nTrueInt > 16.0 && nTrueInt <= 17.0) ) + (1.48412396974 * (nTrueInt > 17.0 && nTrueInt <= 18.0) ) + (1.32712358223 * (nTrueInt > 18.0 && nTrueInt <= 19.0) ) + (1.30853703561 * (nTrueInt > 19.0 && nTrueInt <= 20.0) ) + (1.05957036205 * (nTrueInt > 20.0 && nTrueInt <= 21.0) ) + (0.886314269785 * (nTrueInt > 21.0 && nTrueInt <= 22.0) ) + (0.792450219701 * (nTrueInt > 22.0 && nTrueInt <= 23.0) ) + (0.704506515573 * (nTrueInt > 23.0 && nTrueInt <= 24.0) ) + (0.563665449351 * (nTrueInt > 24.0 && nTrueInt <= 25.0) ) + (0.491267637691 * (nTrueInt > 25.0 && nTrueInt <= 26.0) ) + (0.346947948751 * (nTrueInt > 26.0 && nTrueInt <= 27.0) ) + (0.268604570291 * (nTrueInt > 27.0 && nTrueInt <= 28.0) ) + (0.171901824471 * (nTrueInt > 28.0 && nTrueInt <= 29.0) ) + (0.115931275117 * (nTrueInt > 29.0 && nTrueInt <= 30.0) ) + (0.0721370064808 * (nTrueInt > 30.0 && nTrueInt <= 31.0) ) + (0.0433521975368 * (nTrueInt > 31.0 && nTrueInt <= 32.0) ) + (0.0332048748986 * (nTrueInt > 32.0 && nTrueInt <= 33.0) ) + (0.0227170244329 * (nTrueInt > 33.0 && nTrueInt <= 34.0) ) + (0.0214261070726 * (nTrueInt > 34.0 && nTrueInt <= 35.0) ) + (0.0241375985927 * (nTrueInt > 35.0 && nTrueInt <= 36.0) ) + (0.0369467862253 * (nTrueInt > 36.0 && nTrueInt <= 37.0) ) + (0.0411041649529 * (nTrueInt > 37.0 && nTrueInt <= 38.0) )'
+
 import pickle
 #mass_dict_pickle = "/afs/hephy.at/user/n/nrad/CMSSW/fork/CMSSW_7_4_12_patch4/src/Workspace/DegenerateStopAnalysis/cmgPostProcessing/mass_dict_all.pkl"
 #mass_dict_pickle = "/data/nrad/cmgTuples/7412pass2_mAODv2_v6/RunIISpring15MiniAODv2//mass_dict.pkl"
@@ -246,5 +249,7 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
    for samp_name, sample in samples.iteritems():
       if not sample.isData:
          sample.filters = mc_filters
+         sample.tree.SetAlias("puWeight2",pu)
+
    
    return samples

@@ -1066,5 +1066,14 @@ allComponents.append(ZZ)
 
 if __name__ == '__main__':
     #print " \\\ \n".join( sorted([x['dbsName'].rsplit("/")[1] for x in allComponents]))
-    print " \\\ \n".join( sorted([x['dbsName'].replace("_","-") for x in allComponents]))
+    #print " \\\ \n".join( sorted( [ ' & '.join(  [x['dbsName'].replace("_","-") , x['xsec'] ] ) for x in allComponents)])
+    def smart_sort(x):
+        x
+    import re
+    def natural_sort(l): 
+        convert = lambda text: int(text) if text.isdigit() else text.lower() 
+        alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ] 
+        return sorted(l, key = alphanum_key)
 
+    print " \\\ \n".join( [ ' & '.join([x['dbsName'].replace("_","-") , str( round( x['xsec'] ,3) ) ] )  for x in sorted(allComponents, key=natural_sort) ] )
+    print

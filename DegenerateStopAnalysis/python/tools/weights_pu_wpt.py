@@ -11,8 +11,9 @@ isrWeight = isrWeightFunc(9.5e-5)
 isrWeight_8tev = "(1.+7.5e-5*Max$(gpM*(gpPdg==1000006)))*(1.*(ptISR<120.)+0.95*(ptISR>=120.&&ptISR<150.)+0.9*(ptISR>=150.&&ptISR<250.)+0.8*(ptISR>=250.))"
 
 
-lepCollection="LepGood" 
+lepCollection="LepAll" 
 lep="mu"
+lepCol = lepCollection
 lepIndex = "Index{lepCol}_{Lep}".format(lepCol=lepCollection, Lep=lep)
 
 wpt = "sqrt((  lepPt*cos(lepPhi) + met_pt*cos(met_phi) ) **2 + ( lepPt*sin(lepPhi)+met_pt*sin(met_phi) )**2 )"
@@ -58,9 +59,9 @@ ttptweight_8tev = "1.24*exp(0.156-0.5*0.00137*(gpPt[6]+gpPt[7]))"
 weightDict={
              "w": {
                     "cuts":{ 
-                                "neg_mu":      (wptweight_n  , lambda x: re.match( ".*nLepGood_mu==1", x ) and re.match( ".*LepGood_pdgId\[IndexLepGood_mu\[0\]\]==-13.*" , x )  ),   ## cut_finder tries to match to the cutstring
-                                "pos_mu":      (wptweight_p  , lambda x: re.match( ".*nLepGood_mu==1", x ) and re.match( ".*LepGood_pdgId\[IndexLepGood_mu\[0\]\]==13.*" , x  )  ),
-                                "mixed_mu":    (wptweight_a  , lambda x: re.match( ".*nLepGood_mu==1", x ) and not ( re.match( ".*LepGood_pdgId\[IndexLepGood_mu\[0\]\]==13.*" , x  ) or re.match( ".*LepGood_pdgId\[IndexLepGood_mu\[0\]\]==-13.*" , x  ) ) ),
+                                "neg_mu":      (wptweight_n  , lambda x: re.match( ".*n{lepCol}_{lep}==1".format(lepCol=lepCol, lep=lep), x ) and re.match( ".*{lepCol}_pdgId\[Index{lepCol}_{lep}\[0\]\]==-13.*".format(lepCol=lepCol, lep=lep) , x )  ),   ## cut_finder tries to match to the cutstring
+                                "pos_mu":      (wptweight_p  , lambda x: re.match( ".*n{lepCol}_{lep}==1".format(lepCol=lepCol, lep=lep), x ) and re.match( ".*{lepCol}_pdgId\[Index{lepCol}_{lep}\[0\]\]==13.*".format(lepCol=lepCol, lep=lep) , x  )  ),
+                                "mixed_mu":    (wptweight_a  , lambda x: re.match( ".*n{lepCol}_{lep}==1".format(lepCol=lepCol, lep=lep), x ) and not ( re.match( ".*{lepCol}_pdgId\[Index{lepCol}_{lep}\[0\]\]==13.*".format(lepCol=lepCol, lep=lep) , x  ) or re.match( ".*{lepCol}_pdgId\[Index{lepCol}_{lep}\[0\]\]==-13.*".format(lepCol=lepCol, lep=lep) , x  ) ) ),
                                 #"SR1":      wptweight_n  , 
                                 #"SR2":      wptweight_a  ,
                                 #"default":  wptweight_a  ,

@@ -266,100 +266,101 @@ class ArgParser(argparse.ArgumentParser):
 
 
 def setMVASampleEventList(samples, sample, killTrain = False):
-    if not ( hasattr( samples[sample], 'cut' ) and samples[sample]['cut'] ) :
+        if not ( hasattr( samples[sample], 'cut' ) and samples[sample]['cut'] ) :
+                return
+        cuts = [ samples[sample].cut ]
+        if killTrain:
+                cuts.append("!trainingEvent")
+        cutStr = "&&".join("(%s)"%cut for cut in cuts )
+        cutInst = CutClass( samples[sample].name, [[ samples[sample].name, cutStr ]] , baseCut = None )
+        setEventListToChains( samples, [sample], cutInst , verbose=False)
         return
-    cuts = [ samples[sample].cut ]
-    if killTrain:
-        cuts.append("!trainingEvent")
-    cutStr = "&&".join("(%s)"%cut for cut in cuts )
-    cutInst = CutClass( samples[sample].name, [[ samples[sample].name, cutStr ]] , baseCut = None )
-    setEventListToChains( samples, [sample], cutInst , verbose=False)
-    return
 
 def getEventListFromFile(eListName,tmpDir=None,opt="read"):
-  if opt.lower() in ["read","r"]:
-    eListPath="%s/%s.root"%(tmpDir,eListName)
-    f=ROOT.TFile(eListPath,"open") 
-    eList = f.Get(eListName)
-    eList.SetDirectory(0) 
-  return eList
+    if opt.lower() in ["read","r"]:
+        eListPath="%s/%s.root"%(tmpDir,eListName)
+        f=ROOT.TFile(eListPath,"open") 
+        eList = f.Get(eListName)
+        eList.SetDirectory(0) 
+    return eList
 
 def getEventListFromChain(sample,cut,eListName="",tmpDir="./",opt="write", verbose=True):
-  if not eListName or eListName.lower()=="elist" : 
-    print "WARNING: Using Default eList Name, this could be dangerous! eList name should be customized by the sample name and cut" 
-    eListName="eList" 
-  sample.SetEventList(0) 
-  sample.Draw(">>%s"%eListName,cut) 
-  eList=ROOT.gDirectory.Get(eListName)
-  if opt.lower() in ["write", "w", "save", "s" ]:
-    eListPath="%s/%s.root"%(tmpDir,eListName)
-    if verbose: print "EventList saved in: %s"%eListPath
-    f = ROOT.TFile(eListPath,"recreate")
-    eList.Write()
-    f.Close()
-  return eList
+    if not eListName or eListName.lower()=="elist" : 
+        print "WARNING: Using Default eList Name, this could be dangerous! eList name should be customized by the sample name and cut" 
+        eListName="eList" 
+    sample.SetEventList(0) 
+    sample.Draw(">>%s"%eListName,cut) 
+    eList=ROOT.gDirectory.Get(eListName)
+    if opt.lower() in ["write", "w", "save", "s" ]:
+        eListPath="%s/%s.root"%(tmpDir,eListName)
+        if verbose: print "EventList saved in: %s"%eListPath
+        f = ROOT.TFile(eListPath,"recreate")
+        eList.Write()
+        f.Close()
+    return eList
 
 def setEventListToChain(sample,cut,eListName="",verbose=True,tmpDir=None,opt="read"): 
-  if not tmpDir:
-    tmpDir = os.getenv("CMSSW_BASE")+"/src/Workspace/DegenerateStopAnalysis/plotsNavid/tmp/"
-  eListPath="%s/%s.root"%(tmpDir,eListName)
-  if opt.lower() in ["read","r"]: 
-    if os.path.isfile(eListPath):
-      eList = getEventListFromFile(eListName=eListName,tmpDir=tmpDir,opt=opt)
-    else:
-      if verbose: print "eList was not found in:%s "%eListPath
-      opt="write"
-  if opt.lower() in ["make","m","write", "w","s","save"] : 
-    if verbose: print " "*12, "Creating EList", eListName 
-    eList = getEventListFromChain(sample,cut,eListName,tmpDir=tmpDir,opt=opt)
-  if verbose: print " "*12, "Setting EventList to Chain: ", sample, "Reducing the raw nEvents from ", sample.GetEntries(), " to ", 
-  sample.SetEventList(eList) 
-  assert eList.GetN() == sample.GetEventList().GetN() 
-  return eList
+    if not tmpDir:
+        tmpDir = os.getenv("CMSSW_BASE")+"/src/Workspace/DegenerateStopAnalysis/plotsNavid/tmp/"
+    eListPath="%s/%s.root"%(tmpDir,eListName)
+    if opt.lower() in ["read","r"]: 
+        if os.path.isfile(eListPath):
+            eList = getEventListFromFile(eListName=eListName,tmpDir=tmpDir,opt=opt)
+        else:
+            if verbose: print "eList was not found in:%s "%eListPath
+            opt="write"
+    if opt.lower() in ["make","m","write", "w","s","save"] : 
+        if verbose: print " "*12, "Creating EList", eListName 
+        eList = getEventListFromChain(sample,cut,eListName,tmpDir=tmpDir,opt=opt)
+    if verbose: print " "*12, "Setting EventList to Chain: ", sample, "Reducing the raw nEvents from ", sample.GetEntries(), " to ", 
+    sample.SetEventList(eList) 
+    assert eList.GetN() == sample.GetEventList().GetN() 
+    return eList
 
 def setEventListToChains(samples,sampleList,cutInst,verbose=True,opt="read"):
-  if cutInst:
-    if isinstance(cutInst,CutClass) or hasattr(cutInst,"combined"):
-      cutName   = cutInst.fullName
-      cutString = cutInst.combined
-    else:
-      cutName, cutString = cutInst
-    if verbose:
-      print "Setting Eventlists Using cut: %s    :"%cutName
-      print cutString
-      pp.pprint( "Applying to samples in: %s"%sampleList)
-    for sample in sampleList:
-      if not sample in samples.keys(): 
-        print "Sample %s not in samples.keys()"%sample
-        continue
-      cutString = decide_cut( samples[sample], cutInst, plot=None, nMinus1=None  )
-      eListName="eList_%s_%s"%(sample,cutName)
-      stringsToBeHashed = [] 
-      if samples[sample].has_key("dir"):
-        stringsToBeHashed =  [samples[sample]['dir']]  
-      if samples[sample].has_key("sample") and samples[sample]['sample'] :
-        stringsToBeHashed.extend( sorted(samples[sample]['sample']['bins'])  )
-      stringsToBeHashed.append( cutString  )
-      #print stringsToBeHashed
-
-      stringToBeHashed = "/".join(stringsToBeHashed)
-      sampleHash = hashlib.sha1(stringToBeHashed).hexdigest()
-      eListName +="_%s"%sampleHash
-      setEventListToChain(samples[sample]['tree'],cutString,eListName=eListName,verbose=False,opt=opt)
-      if verbose:
-        if samples[sample]['tree'].GetEventList():
-          if verbose: print " "*6 ,"Sample:", sample,   "Reducing the raw nEvents from ", samples[sample]['tree'].GetEntries(), " to ", samples[sample]['tree'].GetEventList().GetN()
+    if cutInst:
+        if isinstance(cutInst,CutClass) or hasattr(cutInst,"combined"):
+            cutName     = cutInst.fullName
         else:
-          print "FAILED Setting EventList to Sample", sample, samples[sample]['tree'].GetEventList() 
-        if verbose: print " "*12, "eListName:" , eListName
-  else:
-    for sample in sampleList:
-        if not sample in samples.keys(): 
-          print "Sample %s not in samples.keys()"%sample
-          continue
-        samples[sample]['tree'].SetEventList(0)
-    print "no cut... EventList set to 0" 
-    #print "no cut... no EventList was set to samples" 
+            cutName, cutString = cutInst
+        if verbose:
+            #print "Setting Eventlists Using cut: %s        :"%cutName
+            #print cutString
+            pp.pprint( "Applying EventLists to samples in: %s"%sampleList)
+        for sample in sampleList:
+            if not sample in samples.keys(): 
+                print "Sample %s not in samples.keys()"%sample
+                continue
+            cutString = decide_cut( samples[sample], cutInst, plot=None, nMinus1=None    )
+            if verbose:
+                pp.pprint( "     applying cut %s: "%cutString)
+            eListName="eList_%s_%s"%(sample,cutName)
+            stringsToBeHashed = [] 
+            if samples[sample].has_key("dir"):
+                stringsToBeHashed =    [samples[sample]['dir']]    
+            if samples[sample].get("sample"): # and samples[sample]['sample'] :
+                stringsToBeHashed.extend( sorted( samples[sample]['sample']['bins'] )    )
+            stringsToBeHashed.append( cutString    )
+            #print stringsToBeHashed
+
+            stringToBeHashed = "/".join(stringsToBeHashed)
+            sampleHash = hashlib.sha1(stringToBeHashed).hexdigest()
+            eListName +="_%s"%sampleHash
+            setEventListToChain(samples[sample]['tree'],cutString,eListName=eListName,verbose=False,opt=opt)
+            if verbose:
+                if samples[sample]['tree'].GetEventList():
+                    if verbose: print " "*6 ,"Sample:", sample,     "Reducing the raw nEvents from ", samples[sample]['tree'].GetEntries(), " to ", samples[sample]['tree'].GetEventList().GetN()
+                else:
+                    print "FAILED Setting EventList to Sample", sample, samples[sample]['tree'].GetEventList() 
+                if verbose: print " "*12, "eListName:" , eListName
+    else:
+        for sample in sampleList:
+                if not sample in samples.keys(): 
+                    print "Sample %s not in samples.keys()"%sample
+                    continue
+                samples[sample]['tree'].SetEventList(0)
+        print "no cut... EventList set to 0" 
+        #print "no cut... no EventList was set to samples" 
 
 #############################################################################################################
 ##########################################                    ###############################################
@@ -1845,10 +1846,11 @@ class Weight(object):
                 for cut_category in weight_dict['cuts']:
                     cut_weight , cut_finder_funct = weight_dict['cuts'][cut_category]
                     #print "looking for a match for", cut_category
-                    if cut_category in cut:
-                        weight_list.append(cut_weight)
-                    elif False:
-                        #### FIXME NOT SURE WHAT HAPPENS HERE! 
+                    #if cut_category in cut:
+                    #    weight_list.append(cut_weight)
+                    if True:
+                        #### Should be careful of the weight_dict['cuts'] ...regex expresions confusing!
+                        #print cut_category
                         if cut_finder_funct( cut ):
                             print "found a match to the cut string!", cut_category    
                             weight_list.append(  cut_weight )
@@ -2086,11 +2088,11 @@ class Yields():
         if isDataPlot:
            if "DataBlind" in samples[self.dataList[0]].name: self.lumi_weight = "DataBlind_lumi"
            elif "DataUnblind" in samples[self.dataList[0]].name: self.lumi_weight = "DataUnblind_lumi"
-           else: assert False
+           else: raise Exception("Data sample not recognized! %s"%dataList)
            print "Reweighting MC yields to", self.lumi_weight, ":", round(samples[self.dataList[0]].lumi/1000.,2), "fb-1" 
         else:
            self.lumi_weight = "target_lumi" 
-           print "Reweighting MC yields to", self.lumi_weight, ":", round(samples[bkgList[0]].weights.weight_dict['lumis']['target_lumi']/1000.,2), "fb-1" 
+           print "Reweighting MC yields to", self.lumi_weight, ":", round(samples[self.bkgList[0]].weights.weight_dict['lumis']['target_lumi']/1000.,2), "fb-1" 
         
         #self.sampleLegend   = np.array( [ [samples[sample]['name'] for sample in self.bkgList] + ["Total"] + 
         #                                                         [samples[sample]['name'] for sample in self.sigList] ] )
