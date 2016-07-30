@@ -318,7 +318,8 @@ for srNJet in sorted(signalRegions):
         truthLowE = truth_H.GetBinErrorLow(i)
         truthUpE = truth_H.GetBinErrorUp(i)
         if plotPull:
-          pull.SetBinContent(i, (data_yield-res[srNJet][stb][htb]['tot_pred_final'])/sqrt(res[srNJet][stb][htb]['tot_pred_final_tot_err']**2+(0.5*(truthLowE+truthUpE))**2))
+          if data_yield>0: pull.SetBinContent(i, (data_yield-res[srNJet][stb][htb]['tot_pred_final'])/sqrt(res[srNJet][stb][htb]['tot_pred_final_tot_err']**2+(0.5*(truthLowE+truthUpE))**2))
+          else: pull.SetBinContent(i, (data_yield-res[srNJet][stb][htb]['tot_pred_final'])/sqrt(res[srNJet][stb][htb]['tot_pred_final_tot_err']**2+truthUpE**2))
           pull.SetBinError(i, 1)
         #ratioUp = getPropagatedError(truth_H.GetBinContent(i), truthUpE, res[srNJet][stb][htb]['tot_pred_final'], res[srNJet][stb][htb]['tot_pred_final_err'], returnCalcResult=True)
         #ratioLow = getPropagatedError(truth_H.GetBinContent(i), truthLowE, res[srNJet][stb][htb]['tot_pred_final'], res[srNJet][stb][htb]['tot_pred_final_err'], returnCalcResult=True)
