@@ -33,7 +33,8 @@ weight_str_CV   = reweight
 
 ##For Signal Only
 lepton_Scale_signal = 'reweightLeptonFastSimSF'
-weight_str_signal_plot = '*'.join([trigger_scale,lepton_Scale_signal,PU,reweight])
+ISR_weight = 'weight_ISR_new' ##use with a normalisation constant
+weight_str_signal_plot = '*'.join([trigger_scale,lepton_Scale,lepton_Scale_signal,PU,ISR_weight,reweight])
 weight_str_signal_CV = '*'.join([trigger_scale,lepton_Scale_signal,reweight])
 
 

@@ -49,6 +49,7 @@ smallSR = options.smallSR
 smallSetMGL = int(options.gluinoMass)
 
 if singleMP: mass_dict = {smallSetMGL:mass_dict[smallSetMGL]}
+  
 
 if smallSR:
   signalRegions = {(5,5): {(350, 450): {(500, -1): {'deltaPhi': 1.}},
@@ -68,6 +69,7 @@ for srNJet in sorted(signalRegions):
     unc[srNJet][stb] = {}
     for htb in sorted(signalRegions[srNJet][stb]):
       unc[srNJet][stb][htb] = {}
+      unc[srNJet][stb][htb]["signals"] = {}
       dPhi = signalRegions[srNJet][stb][htb]['deltaPhi']
 
       print
@@ -87,11 +89,11 @@ for srNJet in sorted(signalRegions):
 
       #loop over signal points
       for mGl in mass_dict:
-        unc[srNJet][stb][htb][mGl] = {}
+        unc[srNJet][stb][htb]["signals"][mGl] = {}
         print
         print 'Gluino mass', mGl
         for mLSP in mass_dict[mGl]:
-          unc[srNJet][stb][htb][mGl][mLSP] = {}
+          unc[srNJet][stb][htb]["signals"][mGl][mLSP] = {}
 
           print 'LSP mass', mLSP
 
@@ -120,7 +122,7 @@ for srNJet in sorted(signalRegions):
             uncBin['mod_yield_'+b] = (uncBin['yield_gen_'+b] + uncBin['yield_'+b])/2.
             uncBin['mod_err_'+b]   = abs(uncBin['yield_gen_'+b] - uncBin['yield_'+b])/2.
           
-          unc[srNJet][stb][htb][mGl][mLSP] = uncBin
+          unc[srNJet][stb][htb]["signals"][mGl][mLSP] = uncBin
           del c
 
 
