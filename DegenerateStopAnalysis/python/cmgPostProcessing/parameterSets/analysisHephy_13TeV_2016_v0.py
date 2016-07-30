@@ -151,6 +151,13 @@ def getParameterSet(args):
                     },
                 'absIso': 5
                 },
+            'etaSc': ('etaSc', operator.lt, 2.5, operator.abs),
+            'evalRange_isGap': {
+                'var': 'etaSc',
+                'operVar': operator.abs,
+                'lowRange': (operator.le, 1.4442),
+                'highRange': (operator.ge, 1.566),
+                },
             },
         
         'el2': { #selection with Veto Electron ID without sigmaEtaEta cut
@@ -160,6 +167,13 @@ def getParameterSet(args):
             'dxy': ('dxy', operator.lt, 0.02, operator.abs), #synchronisation with muons
             #'dz': ('dz', operator.lt, 0.5, operator.abs), #looser than Veto ID
             'convVeto': ('convVeto', operator.eq, 1),
+            'etaSc': ('etaSc', operator.lt, 2.5, operator.abs),
+            'evalRange_isGap': {
+                'var': 'etaSc',
+                'operVar': operator.abs,
+                'lowRange': (operator.le, 1.4442),
+                'highRange': (operator.ge, 1.566),
+                },
             'elWP': {
                 'eta_EB': 1.479, 'eta_EE': 2.5,
                 'vars': {
