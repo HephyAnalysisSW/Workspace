@@ -23,7 +23,7 @@ parser.add_option("--mgl", dest="gluinoMass", default=1200, action="store", help
 #small = True
 #smallSR = False
 
-useISR = True
+useISR = False
 
 signalRegions = signalRegions2016
 
