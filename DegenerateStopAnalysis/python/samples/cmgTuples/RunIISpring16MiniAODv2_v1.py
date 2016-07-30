@@ -1064,6 +1064,31 @@ allComponents.append(ZZ)
 
 
 
+
+sample_path_test = '/data/nrad/cmgTuples/mAODv2_v1_1_TEST/RunIISpring16MiniAODv2'   
+allSignalComponents = []
+SMS_T2tt_dM_10to80_2Lfilter ={
+'cmgName':"SMS_T2tt_dM_10to80_2Lfilter",
+"name" : "SMS-T2tt_dM-10to80_2Lfilter_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+"chunkString":"SMS-T2tt_dM-10to80_2Lfilter_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+"dir": sample_path_test +"/" + "SMS-T2tt_dM-10to80_2Lfilter_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+"dbsName" : "/SMS-T2tt_dM-10to80_2Lfilter_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM",
+"rootFileLocation":"tree.root",
+"skimAnalyzerDir":"skimAnalyzerCount",
+"treeName":"tree",
+"isData": False,
+"isFastSim":True,
+}
+#allComponents.append(SMS_T2tt_dM_10to80_2Lfilter)
+allSignalComponents.append(SMS_T2tt_dM_10to80_2Lfilter)
+
+
+
+
+
+
+
+
 if __name__ == '__main__':
     #print " \\\ \n".join( sorted([x['dbsName'].rsplit("/")[1] for x in allComponents]))
     #print " \\\ \n".join( sorted( [ ' & '.join(  [x['dbsName'].replace("_","-") , x['xsec'] ] ) for x in allComponents)])
