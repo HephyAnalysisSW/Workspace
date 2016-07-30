@@ -13,14 +13,23 @@ import hashlib, time
 import os
 
 parser = OptionParser()
-(options,args) = parser.parse_args()
 
+slurm_job_file="slurm_job"
+#slurm_job_title="BATCHSUBMIT"
+#slurm_output_dir="/afs/hephy.at/work/%s/%s/slurm_output/"%(hephy_user_initial, hephy_user)
 
 hephy_user = os.getenv("USER")
 hephy_user_initial = os.getenv("USER")[0]
-slurm_job_file="slurm_job"
-slurm_job_title="BATCHSUBMIT"
-slurm_output_dir="/afs/hephy.at/work/%s/%s/slurm_output/"%(hephy_user_initial, hephy_user)
+
+parser.add_option("--title", dest="title",
+                  help="Job Title viewied in squeue", default = "BATCHSUBMIT" )
+parser.add_option("--output", dest="output", 
+                  default="/afs/hephy.at/work/%s/%s/slurm_output/"%(hephy_user_initial, hephy_user),
+                  help="path for slurm output ")
+(options,args) = parser.parse_args()
+
+slurm_job_title  = options.title
+slurm_output_dir = options.output
 
 if not os.path.isdir(slurm_output_dir):
     os.mkdir(slurm_output_dir)
