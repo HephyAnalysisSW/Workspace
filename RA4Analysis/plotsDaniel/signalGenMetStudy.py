@@ -23,11 +23,13 @@ parser.add_option("--mgl", dest="gluinoMass", default=1200, action="store", help
 #small = True
 #smallSR = False
 
+useISR = True
+
 signalRegions = signalRegions2016
 
-presel = "!isData&&singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&Jet_pt[1]>80&&st>250&&nJet30>2&&htJet30j>500"
+presel = "!isData&&singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&Jet_pt[1]>80&&st>250&&nJet30>2&&htJet30j>500&&flag_crazy_jets"
 
-presel_mod = "!isData&&singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&Jet_pt[1]>80&&nJet30>2&&htJet30j>500&&(leptonPt+met_genPt)>250"
+presel_mod = "!isData&&singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&Jet_pt[1]>80&&nJet30>2&&htJet30j>500&&(leptonPt+met_genPt)>250&&flag_crazy_jets"
 deltaPhiGenMet = "acos((leptonPt+met_genPt*cos(leptonPhi-met_genPhi))/sqrt(leptonPt**2+met_genPt**2+2*met_genPt*leptonPt*cos(leptonPhi-met_genPhi)))"
 
 WSB   = (3,4)
@@ -35,10 +37,13 @@ TTSB  = (4,5)
 
 lumi = 12.88
 
-weight = 'weight*('+str(lumi)+'/3.)'
+weight = 'weight*('+str(lumi)+'/3.)*puReweight_true_max4*(singleMuonic*0.926+singleElectronic*0.963)*reweightLeptonFastSimSF*lepton_muSF_HIP*lepton_muSF_mediumID*lepton_muSF_miniIso02*lepton_muSF_sip3d*lepton_eleSF_cutbasedID*lepton_eleSF_miniIso01*lepton_eleSF_gsf'
 
-weight_Central_0b     = weight+'*weightBTag0_SF*reweightLeptonFastSimSF'
-weight_Central_1b     = weight+'*weightBTag1_SF*reweightLeptonFastSimSF'
+if useISR: weight+='*weight_ISR_new'
+
+
+weight_Central_0b     = weight+'*weightBTag0_SF'
+weight_Central_1b     = weight+'*weightBTag1_SF'
 
 
 pickleDir = '/afs/hephy.at/data/easilar01/Ra40b/pickleDir/T5qqqqWW_mass_nEvents_xsec_pkl'
@@ -89,12 +94,15 @@ for srNJet in sorted(signalRegions):
 
       #loop over signal points
       for mGl in mass_dict:
+        ISRweightDictPath = '/data/easilar/Results2016/ICHEP/signal_Spring16_noCut/mglu'+str(mGl)+'Signals_12p88_isr_scale_updated_fullSRs_pkl'
+        if useISR: ISRweightDict = pickle.load(file(ISRweightDictPath))
         unc[srNJet][stb][htb]["signals"][mGl] = {}
         print
         print 'Gluino mass', mGl
         for mLSP in mass_dict[mGl]:
           unc[srNJet][stb][htb]["signals"][mGl][mLSP] = {}
-
+          if useISR: ISRweight = ISRweightDict[srNJet][stb][htb]['signals'][mGl][mLSP]['scale_weight_ISR_new']
+          else: ISRweight = 1
           print 'LSP mass', mLSP
 
           c = getChain(allSignals[0][mGl][mLSP], histname='')
@@ -112,10 +120,10 @@ for srNJet in sorted(signalRegions):
           ]
           for job in d:
             h = getPlotFromChain(c, job['dPhiVar'], [0,dPhi,3.2], cutString = job['cut'], weight = job['weight'], binningIsExplicit=True)
-            uncBin['yield_'+job['name']+'_CR'] = h.GetBinContent(1)
-            uncBin['yield_'+job['name']+'_CR'] = h.GetBinError(1)
-            uncBin['yield_'+job['name']+'_SR'] = h.GetBinContent(2)
-            uncBin['yield_'+job['name']+'_SR'] = h.GetBinError(2)
+            uncBin['yield_'+job['name']+'_CR'] = h.GetBinContent(1)*ISRweight
+            uncBin['yield_'+job['name']+'_CR'] = h.GetBinError(1)*ISRweight
+            uncBin['yield_'+job['name']+'_SR'] = h.GetBinContent(2)*ISRweight
+            uncBin['yield_'+job['name']+'_SR'] = h.GetBinError(2)*ISRweight
             del h
           
           for b in bins:
@@ -124,10 +132,12 @@ for srNJet in sorted(signalRegions):
           
           unc[srNJet][stb][htb]["signals"][mGl][mLSP] = uncBin
           del c
+        del ISRweightDict
 
 
 picklePath = '/afs/hephy.at/data/dspitzbart01/Results2016/signal_uncertainties/'
 pickleName = 'gen_met_study_'
+if useISR: pickleName += 'ISR_'
 
 if singleMP: pickleName+='mgl'+str(smallSetMGL)
 else: pickleName+='mgl_all'

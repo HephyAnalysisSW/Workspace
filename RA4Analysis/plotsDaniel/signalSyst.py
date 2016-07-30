@@ -25,7 +25,7 @@ TTSB  = (4,5)
 
 lumi = 12.88
 
-weight = 'weight*'+str(lumi)+'/3.'
+weight = 'weight*('+str(lumi)+'/3.)*puReweight_true_max4*(singleMuonic*0.926+singleElectronic*0.963)*weight_ISR_new*lepton_muSF_HIP*lepton_muSF_mediumID*lepton_muSF_miniIso02*lepton_muSF_sip3d*lepton_eleSF_cutbasedID*lepton_eleSF_miniIso01*lepton_eleSF_gsf'
 
 weight_Central_0b     = weight+'*weightBTag0_SF*reweightLeptonFastSimSF'
 weight_Central_1b     = weight+'*weightBTag1_SF*reweightLeptonFastSimSF'
@@ -38,16 +38,16 @@ weight_lightDown_0b   = weight+'*weightBTag0_SF_light_Down*reweightLeptonFastSim
 weight_leptonUp_0b    = weight+'*weightBTag0_SF*reweightLeptonFastSimSFUp'
 weight_leptonDown_0b  = weight+'*weightBTag0_SF*reweightLeptonFastSimSFDown'
 
-#weights = [weight_bUp_0b,weight_bDown_0b,weight_lightUp_0b,weight_lightDown_0b,weight_leptonUp_0b,weight_leptonDown_0b]
+#weights = [weight_leptonUp_0b,weight_leptonDown_0b]
 weights = [weight_bUp_0b,weight_bDown_0b,weight_lightUp_0b,weight_lightDown_0b]
 
-#names = ['bUp', 'bDown', 'lightUp','lightDown','leptonUp','leptonDown']
+#names = ['leptonUp','leptonDown']
 names = ['bUp', 'bDown', 'lightUp','lightDown']
 
 
 savePickle = True
 
-signalFile = '/afs/hephy.at/data/dspitzbart01/Results2016/signal_uncertainties/signal_unc_Spring16_pkl'
+signalFile = '/afs/hephy.at/data/dspitzbart01/Results2016/signal_uncertainties/signal_btag_unc_Spring16_pkl'
 signalFile2 = signalFile + '_update'
 
 try:
@@ -93,7 +93,9 @@ for srNJet in sorted(signalRegions):
         unc[srNJet][stb][htb][mGl] = {}
         print
         print 'Gluino mass', mGl
-        for mLSP in mass_dict[mGl]:
+        if small: mLSPs = [500]
+        else: mLSPs = mass_dict[mGl]
+        for mLSP in mLSPs:
           unc[srNJet][stb][htb][mGl][mLSP] = {}
           
           print 'LSP mass', mLSP
