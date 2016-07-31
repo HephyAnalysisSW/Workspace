@@ -397,7 +397,7 @@ def objSelectorFunc(objSel):
         if highRangeOper(varValue, highRangeCut):
             passCutHigh = True
 
-        passCuts = passCutLow and passCutHigh
+        passCuts = passCutLow or passCutHigh
 
         return passCuts
     
