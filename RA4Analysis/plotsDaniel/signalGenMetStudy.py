@@ -17,13 +17,18 @@ parser = OptionParser()
 parser.add_option("--singleGluinoMassPoint", dest="singleMP", default=False, action="store_true", help="small set")
 parser.add_option("--small", dest="smallSR", default=False, action="store_true", help="small set of signalRegions")
 parser.add_option("--mgl", dest="gluinoMass", default=1200, action="store", help="Set gluino mass")
+parser.add_option("--useISR", dest="useISR", default=False, action="store_true", help="Use ISR reweighting")
+
 
 (options, args) = parser.parse_args()
 
 #small = True
 #smallSR = False
 
-useISR = True
+
+useISR = options.useISR
+
+print useISR
 
 signalRegions = signalRegions2016
 

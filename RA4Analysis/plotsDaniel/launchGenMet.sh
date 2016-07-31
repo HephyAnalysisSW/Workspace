@@ -20,19 +20,19 @@ python signalGenMetStudy.py --singleGluinoMassPoint --mgl=1600
 python signalGenMetStudy.py --singleGluinoMassPoint --mgl=1350
 python signalGenMetStudy.py --singleGluinoMassPoint --mgl=2250
 
-#python signalGenMetStudy.py --singleGluinoMassPoint --mgl=1100
-#python signalGenMetStudy.py --singleGluinoMassPoint --mgl=2000
-#python signalGenMetStudy.py --singleGluinoMassPoint --mgl=850
-#python signalGenMetStudy.py --singleGluinoMassPoint --mgl=1750
-#python signalGenMetStudy.py --singleGluinoMassPoint --mgl=600
-#python signalGenMetStudy.py --singleGluinoMassPoint --mgl=1500
-#python signalGenMetStudy.py --singleGluinoMassPoint --mgl=1250
-#python signalGenMetStudy.py --singleGluinoMassPoint --mgl=2150
-#python signalGenMetStudy.py --singleGluinoMassPoint --mgl=1000
-#python signalGenMetStudy.py --singleGluinoMassPoint --mgl=1900
-#
-#python signalGenMetStudy.py --singleGluinoMassPoint --mgl=750
-#python signalGenMetStudy.py --singleGluinoMassPoint --mgl=1650
-#python signalGenMetStudy.py --singleGluinoMassPoint --mgl=1400
-#python signalGenMetStudy.py --singleGluinoMassPoint --mgl=2300
-#python signalGenMetStudy.py --singleGluinoMassPoint --mgl=1150
+python signalGenMetStudy.py --singleGluinoMassPoint --mgl=1100
+python signalGenMetStudy.py --singleGluinoMassPoint --mgl=2000
+python signalGenMetStudy.py --singleGluinoMassPoint --mgl=850
+python signalGenMetStudy.py --singleGluinoMassPoint --mgl=1750
+python signalGenMetStudy.py --singleGluinoMassPoint --mgl=600
+python signalGenMetStudy.py --singleGluinoMassPoint --mgl=1500
+python signalGenMetStudy.py --singleGluinoMassPoint --mgl=1250
+python signalGenMetStudy.py --singleGluinoMassPoint --mgl=2150
+python signalGenMetStudy.py --singleGluinoMassPoint --mgl=1000
+python signalGenMetStudy.py --singleGluinoMassPoint --mgl=1900
+
+python signalGenMetStudy.py --singleGluinoMassPoint --mgl=750
+python signalGenMetStudy.py --singleGluinoMassPoint --mgl=1650
+python signalGenMetStudy.py --singleGluinoMassPoint --mgl=1400
+python signalGenMetStudy.py --singleGluinoMassPoint --mgl=2300
+python signalGenMetStudy.py --singleGluinoMassPoint --mgl=1150
