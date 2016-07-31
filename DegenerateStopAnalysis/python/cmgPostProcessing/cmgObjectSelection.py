@@ -366,6 +366,42 @@ def objSelectorFunc(objSel):
         return True
      
         
+    def evalRange(readTree, obj, objIndex, objSel, key):
+        ''' Evaluate if an object has the value of the variable var in a given range. 
+        
+        '''
+
+        evalRangeSel = objSel[key]
+
+        var = evalRangeSel['var']
+
+        lowRangeOper = evalRangeSel['lowRange'][0]
+        lowRangeCut = evalRangeSel['lowRange'][1]
+
+        highRangeOper = evalRangeSel['highRange'][0]
+        highRangeCut = evalRangeSel['highRange'][1]
+
+        operVar = evalRangeSel.get('operVar', None)
+
+        if operVar:
+            varValue = operVar(getattr(obj, var)[objIndex])
+        else:
+            varValue = getattr(obj, var)[objIndex]
+
+        passCutLow = False
+        passCutHigh = False
+
+        if lowRangeOper(varValue, lowRangeCut):
+            passCutLow = True
+
+        if highRangeOper(varValue, highRangeCut):
+            passCutHigh = True
+
+        passCuts = passCutLow and passCutHigh
+
+        return passCuts
+    
+
     def objSelector(readTree, obj, objIndex):
         
         selector = True
@@ -376,6 +412,8 @@ def objSelectorFunc(objSel):
                 selector &= hybIso(readTree, obj, objIndex, objSel)
             elif key == 'elWP':
                 selector &= elWP(readTree, obj, objIndex, objSel)                
+            elif 'evalRange_' in key:
+                selector &= evalRange(readTree, obj, objIndex, objSel, key)                
             else:
                 varValue = getattr(obj, keyValue[0])[objIndex]
             
