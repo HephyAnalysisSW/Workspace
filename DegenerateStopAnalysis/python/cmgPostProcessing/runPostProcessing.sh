@@ -11,7 +11,7 @@
 #       nohup krenew -t -K 10 -- bash -c "./runPostProcessing.sh $1 [$2 [$3] [$4] [$5]]" & ; disown
 #
 #       $1 compulsory; 
-#          set sample as defined in runPostProcessing.sh
+#          set sample as defined in runPostProcessing.py
 #       $2 must be set to 'MC' for MC samples, and to 'DATA' for data
 #          take cmgTuples=${CMG_TUPLES} as defined below in the if block
 #       $3 if set to "skimPreselect", run skimPreselect, otherwise do not run skimPreselect
@@ -43,9 +43,9 @@ SAMPLE_SET=$1
 
 # semi-hard-coded parameters
 if [[ ${2} == "DATA" ]]; then 
-    CMG_TUPLES="Data2016_v0"
+    CMG_TUPLES="Data2016_v1"
 else
-    CMG_TUPLES="RunIISpring16MiniAODv2_v0"
+    CMG_TUPLES="RunIISpring16MiniAODv2_v1"
 fi
 
 if [[ ${3} == "skimPreselect" ]]; then 
@@ -68,7 +68,7 @@ if [[ ${5} == "TEST" ]]; then
 fi
 
 # hard-coded parameters - modify them according to desired full set
-CMG_PROCESSING_TAG="8011_mAODv2_v0"
+CMG_PROCESSING_TAG="8011_mAODv2_v1"
 PARAMETER_SET="analysisHephy_13TeV_2016_v0"
 
 # the rest of the parameters are the default parameters from cmgPostProcessing_parser.py
@@ -106,5 +106,3 @@ fi
 #set +vx
 
 exit 0
-
-
