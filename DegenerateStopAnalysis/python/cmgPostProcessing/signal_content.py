@@ -2,7 +2,6 @@ import ROOT
 import pickle
 from Workspace.HEPHYPythonTools.user import username
 from Workspace.HEPHYPythonTools.helpers import getObjFromFile, getChain, getChunks, getCutYieldFromChain, getYieldFromChain
-import Workspace.DegenerateStopAnalysis.samples.cmgTuples.Spring15_7412pass2_mAODv2_v7 as cmgTuples
 from Workspace.HEPHYPythonTools.xsecSMS import *
 
 import pickle
@@ -16,25 +15,9 @@ dos={
 
 
 
+import Workspace.DegenerateStopAnalysis.samples.cmgTuples.RunIISpring16MiniAODv2_v1 as cmgTuples
 samples = [
-
-            cmgTuples.SMS_T2_4bd_mStop_100_mLSP_20to90              ,
-            cmgTuples.SMS_T2_4bd_mStop_125_mLSP_45to115             ,
-            cmgTuples.SMS_T2_4bd_mStop_150_mLSP_70to140             ,
-            cmgTuples.SMS_T2_4bd_mStop_175_mLSP_95to165             ,
-            cmgTuples.SMS_T2_4bd_mStop_200_mLSP_120to190            ,
-            cmgTuples.SMS_T2_4bd_mStop_225_mLSP_145to225            ,
-            cmgTuples.SMS_T2_4bd_mStop_250_mLSP_170to240            ,
-            cmgTuples.SMS_T2_4bd_mStop_275_mLSP_195to265            ,
-            cmgTuples.SMS_T2_4bd_mStop_300_mLSP_220to290            ,
-            cmgTuples.SMS_T2_4bd_mStop_325_mLSP_245to315            ,
-            cmgTuples.SMS_T2_4bd_mStop_350_mLSP_270to340            ,
-            cmgTuples.SMS_T2_4bd_mStop_375_mLSP_295to365            ,
-            cmgTuples.SMS_T2_4bd_mStop_400_mLSP_320to390            ,
-            cmgTuples.SMS_T2_4bd_mStop_425to475_mLSP_345to465       ,
-            cmgTuples.SMS_T2_4bd_mStop_500to550_mLSP_420to540        ,
-            cmgTuples.SMS_T2_4bd_mStop_550to600_mLSP_470to590        ,
-
+            cmgTuples.SMS_T2tt_dM_10to80_2Lfilter
         ]
 
 
