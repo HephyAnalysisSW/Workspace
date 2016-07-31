@@ -45,7 +45,7 @@ separateBTagWeights = True
 
 defSampleStr = "TTJets_LO"
 
-subDir = "postProcessing_HT350"
+subDir = "postProcessing_Spring16_JECv6_v2"
 #subDir = "postProcessing_Run2016BCD"
 
 #branches to be kept for data and MC
@@ -103,9 +103,9 @@ if options.skim=='HT400ST200':
 if options.skim=='HT500ST250':  
   skimCond = htLtSkim
 if options.skim=='LHEHTsm600':
-  skimCond = "lheHTIncoming<=600"
+  skimCond = "lheHTIncoming<=600&&"+htLtSkim
 if options.skim=='LHEHTlg600':
-  skimCond = "lheHTIncoming>600"
+  skimCond = "lheHTIncoming>600&&"+htLtSkim
 
 #skimCond += "&&Sum$(LepGood_pt>25&&abs(LepGood_eta)<2.5)>=0"
 

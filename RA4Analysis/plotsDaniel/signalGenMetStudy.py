@@ -23,7 +23,7 @@ parser.add_option("--mgl", dest="gluinoMass", default=1200, action="store", help
 #small = True
 #smallSR = False
 
-useISR = False
+useISR = True
 
 signalRegions = signalRegions2016
 
@@ -67,6 +67,7 @@ if smallSR:
 
 bins = ['MB_CR', 'MB_SR', 'SB_W_CR', 'SB_W_SR', 'SB_TT_CR', 'SB_TT_SR']
 
+
 unc = {}
 for srNJet in sorted(signalRegions):
   unc[srNJet] = {}
@@ -99,7 +100,9 @@ for srNJet in sorted(signalRegions):
         unc[srNJet][stb][htb]["signals"][mGl] = {}
         print
         print 'Gluino mass', mGl
-        for mLSP in mass_dict[mGl]:
+        #mLSPs = [100]
+        mLSPs = mass_dict[mGl]
+        for mLSP in mLSPs:
           unc[srNJet][stb][htb]["signals"][mGl][mLSP] = {}
           if useISR: ISRweight = ISRweightDict[srNJet][stb][htb]['signals'][mGl][mLSP]['scale_weight_ISR_new']
           else: ISRweight = 1
@@ -121,10 +124,12 @@ for srNJet in sorted(signalRegions):
           for job in d:
             h = getPlotFromChain(c, job['dPhiVar'], [0,dPhi,3.2], cutString = job['cut'], weight = job['weight'], binningIsExplicit=True)
             uncBin['yield_'+job['name']+'_CR'] = h.GetBinContent(1)*ISRweight
-            uncBin['yield_'+job['name']+'_CR'] = h.GetBinError(1)*ISRweight
+            uncBin['err_'+job['name']+'_CR'] = h.GetBinError(1)*ISRweight
             uncBin['yield_'+job['name']+'_SR'] = h.GetBinContent(2)*ISRweight
-            uncBin['yield_'+job['name']+'_SR'] = h.GetBinError(2)*ISRweight
+            uncBin['err_'+job['name']+'_SR'] = h.GetBinError(2)*ISRweight
             del h
+          #print d[0]
+          #print uncBin['yield_MB_SR']
           
           for b in bins:
             uncBin['mod_yield_'+b] = (uncBin['yield_gen_'+b] + uncBin['yield_'+b])/2.
@@ -132,7 +137,7 @@ for srNJet in sorted(signalRegions):
           
           unc[srNJet][stb][htb]["signals"][mGl][mLSP] = uncBin
           del c
-        del ISRweightDict
+        if useISR: del ISRweightDict
 
 
 picklePath = '/afs/hephy.at/data/dspitzbart01/Results2016/signal_uncertainties/'

@@ -12,7 +12,14 @@ from Workspace.RA4Analysis.signalRegions import *
 
 from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2_postProcessed import *
 
-small = False
+from optparse import OptionParser
+parser = OptionParser()
+parser.add_option("--singleGluinoMassPoint", dest="singleMP", default=False, action="store_true", help="small set")
+parser.add_option("--mgl", dest="gluinoMass", default=1200, action="store", help="Set gluino mass")
+
+(options, args) = parser.parse_args()
+
+small =False
 onlySystematics = True
 
 
@@ -38,37 +45,21 @@ weight_lightDown_0b   = weight+'*weightBTag0_SF_light_Down*reweightLeptonFastSim
 weight_leptonUp_0b    = weight+'*weightBTag0_SF*reweightLeptonFastSimSFUp'
 weight_leptonDown_0b  = weight+'*weightBTag0_SF*reweightLeptonFastSimSFDown'
 
-#weights = [weight_leptonUp_0b,weight_leptonDown_0b]
-weights = [weight_bUp_0b,weight_bDown_0b,weight_lightUp_0b,weight_lightDown_0b]
+weights = [weight_bUp_0b,weight_bDown_0b,weight_lightUp_0b,weight_lightDown_0b,weight_leptonUp_0b,weight_leptonDown_0b]
+#weights = [weight_bUp_0b,weight_bDown_0b,weight_lightUp_0b,weight_lightDown_0b]
 
 #names = ['leptonUp','leptonDown']
-names = ['bUp', 'bDown', 'lightUp','lightDown']
-
-
-savePickle = True
-
-signalFile = '/afs/hephy.at/data/dspitzbart01/Results2016/signal_uncertainties/signal_btag_unc_Spring16_pkl'
-signalFile2 = signalFile + '_update'
-
-try:
-  unc = pickle.load(file(signalFile))
-  print 'Loaded file from', signalFile
-  if savePickle: print 'Will update it and save new one here:',signalFile2
-except IOError:
-  print 'Unable to load signal file!'
-  if savePickle: print 'Creating new one here:',signalFile
-  unc = {}
-
-# update this
-#allSignals = [T5qqqqVV_mGluino_800To975_mLSP_1To850, T5qqqqVV_mGluino_1000To1075_mLSP_1To950, T5qqqqVV_mGluino_1100To1175_mLSP_1to1050]
+names = ['bUp', 'bDown', 'lightUp','lightDown','leptonUp','leptonDown']
 
 pickleDir = '/afs/hephy.at/data/easilar01/Ra40b/pickleDir/T5qqqqWW_mass_nEvents_xsec_pkl'
 mass_dict = pickle.load(file(pickleDir))
+    
+singleMP = options.singleMP
+smallSetMGL = int(options.gluinoMass)
 
-smallSetMGL = 2000
+if singleMP: mass_dict = {smallSetMGL:mass_dict[smallSetMGL]}
 
-if small: mass_dict = {smallSetMGL:mass_dict[smallSetMGL]}
-
+unc = {}
 for srNJet in sorted(signalRegions):
   unc[srNJet] = {}
   for stb in sorted(signalRegions[srNJet]):
@@ -134,11 +125,19 @@ for srNJet in sorted(signalRegions):
           #unc[srNJet][stb][htb][mGl][mLSP]['sys_light_MB_SR']   = (abs(unc_highDPhi['lightUp_MB_SR'])   + abs(unc_highDPhi['lightDown_MB_SR']))/2 #asymmetric - take max?
           unc[srNJet][stb][htb][mGl][mLSP]['sys_b_MB_SR']       = max([abs(unc_highDPhi['bUp_MB_SR']), abs(unc_highDPhi['bDown_MB_SR'])]) #asymmetric - take max?
           unc[srNJet][stb][htb][mGl][mLSP]['sys_light_MB_SR']   = max([abs(unc_highDPhi['lightUp_MB_SR']), abs(unc_highDPhi['lightDown_MB_SR'])]) #asymmetric - take max?
-          #unc[srNJet][stb][htb][mGl][mLSP]['sys_lepton_MB_SR']  = (abs(unc_highDPhi['leptonUp_MB_SR'])  + abs(unc_highDPhi['leptonDown_MB_SR']))/2 #symmetric, so take average
+          unc[srNJet][stb][htb][mGl][mLSP]['sys_lepton_MB_SR']  = (abs(unc_highDPhi['leptonUp_MB_SR'])  + abs(unc_highDPhi['leptonDown_MB_SR']))/2 #symmetric, so take average
           del c
 
 
-if savePickle:
-  pickle.dump(unc, file(signalFile,'w'))
+picklePath = '/afs/hephy.at/data/dspitzbart01/Results2016/signal_uncertainties/'
+pickleName = 'SF_unc_'
+
+if singleMP: pickleName+='mgl'+str(smallSetMGL)
+else: pickleName+='mgl_all'
+
+pickle.dump(unc, file(picklePath+pickleName+'_pkl','w'))
+print
+print 'saved results in',picklePath+pickleName+'_pkl'
+
 
 
