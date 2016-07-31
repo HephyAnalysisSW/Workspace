@@ -63,7 +63,8 @@ def mkdir_p(path):
     try:
         os.makedirs(path)
     except OSError as exc:  # Python >2.5
-        if exc.errno == errno.EEXIST and os.path.isdir(path):
+        #if exc.errno == errno.EEXIST and os.path.isdir(path):
+        if os.path.isdir(path):
             pass
         else:
             raise
@@ -941,21 +942,35 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
             refStack.SetMaximum(1.5*refStack.GetMaximum())
                 
         if leg:
-           bkgLegList = bkgList[:] 
-           sigLegList = sigList[:] 
-           
-           bkgLegList.reverse()
-           sigLegList.reverse()
-           
-           #if any_in(sampleList, bkgList):
-           bkgLeg = makeLegend(samples, hists, bkgLegList, p, loc=[0.7,0.7,0.87,0.87], name="Legend_bkgs_%s_%s"%(cut.name, p), legOpt="f")
-           bkgLeg.Draw()
-           ret['legs'].append(bkgLeg)
+            bkgLegList = bkgList[:] 
+            sigLegList = sigList[:] 
+            
+            bkgLegList.reverse()
+            sigLegList.reverse()
+            #bkgLeg = makeLegend(samples, hists, bkgLegList, p, loc=[0.7,0.7,0.87,0.87], name="Legend_bkgs_%s_%s"%(cut.name, p), legOpt="f")
+            #bkgLeg.Draw()
+            #ret['legs'].append(bkgLeg)
+            legy = [0.7, 0.87 ]
+            legx = [0.7, 0.95 ]  
+            nBkgInLeg = 4
+            if any_in(sampleList, bkgLegList):
+                subBkgLists = [ bkgLegList[x:x+nBkgInLeg] for x in range(0,len(bkgLegList),nBkgInLeg) ]
+                nBkgLegs = len(subBkgLists)
+                for i , subBkgList in enumerate( subBkgLists ):
+                    newLegY0 = legy[0] + (legy[1]-legy[0])* (1-1.*len(subBkgList)/nBkgInLeg)
+                    bkgLeg = makeLegend(samples, hists, subBkgList, p, loc=[legx[0], newLegY0 ,legx[1],legy[1]], name="Legend_bkgs%s_%s_%s"%(i, cut.name, p), legOpt="f")
+                    print "==========================================================================="
+                    print bkgLeg, subBkgList, legx 
+                    print "==========================================================================="
+                    ret['legs'].append(bkgLeg)
+                    ret['legs'][-1].Draw()
+                    legx = [ 2*legx[0] -legx[1] , legx[0]  ] 
+                    del bkgLeg
 
-           if any_in(sampleList, sigLegList):
-              sigLeg = makeLegend(samples, hists, sigLegList, p, loc=[0.4,0.75,0.7,0.87], name="Legend_sigs_%s_%s"%(cut.name, p), legOpt="l")
-              sigLeg.Draw()
-              ret['legs'].append(sigLeg)
+            if any_in(sampleList, sigLegList):
+               sigLeg = makeLegend(samples, hists, sigLegList, p, loc=[0.4,legy[0],0.7,legy[1]], name="Legend_sigs_%s_%s"%(cut.name, p), legOpt="l")
+               sigLeg.Draw()
+               ret['legs'].append(sigLeg)
 
         if fom:
            if plots[p]['decor'].has_key('fom_reverse'):

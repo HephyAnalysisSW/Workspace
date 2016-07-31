@@ -22,6 +22,7 @@ def printSample(compName, comp, ext_comp= None):
     sampleName = "_".join(comp.dataset.split("/")[1:3])
     xsec = comp.xSection if not comp.isData else None
     ext_comp_string = '"ext":%s,'%ext_comp if ext_comp else ""
+    isFastSim = '"isFastSim":True,' if getattr(comp,"isFastSim",False) else ""
 
 
     temp =\
@@ -39,10 +40,11 @@ def printSample(compName, comp, ext_comp= None):
 "isData": {isData},
 "xsec": {xsec},
 {ext_comp}
+{isFastSim}
 }}
 allComponents.append({compName})
 
-""".format(sampleName=sampleName, isData= comp.isData , dbsName = comp.dataset , xsec = xsec, compName = compName, ext_comp = ext_comp_string)
+""".format(sampleName=sampleName, isData= comp.isData , dbsName = comp.dataset , xsec = xsec, compName = compName, ext_comp = ext_comp_string, isFastSim=isFastSim)
     #print temp
     return temp
 
@@ -100,5 +102,6 @@ if __name__ == '__main__':
 
     cmgPickle = "/afs/cern.ch/user/n/nrad/CMSSW/CMSSW_8_0_11/src/CMGTools/SUSYAnalysis/cfg/crab_with_das/8011_mAODv2_v1_1.pkl"
     cmgPickle = "/afs/cern.ch/user/n/nrad/CMSSW/CMSSW_8_0_12/src/CMGTools/SUSYAnalysis/cfg/crab_with_das/8012_mAODv2_v0.pkl"
+    cmgPickle = "/afs/cern.ch/user/n/nrad/CMSSW/CMSSW_8_0_11/src/CMGTools/SUSYAnalysis/cfg/crab_with_das/mAODv2_v1_1.pkl" 
     out = printCMGProcessingFile(cmgPickle)
 

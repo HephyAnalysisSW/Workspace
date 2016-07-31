@@ -17,6 +17,7 @@ sigs           = [sig1, sig2]
 sigs = []
 allSamps       = allBkg + sigs + [data]
 side_band_name = 'presel_sideBands'
+#side_band_name = 'presel_CRs'
 
 mtabc       = ["a","b","c"]
 pts         = ["sr","cr"]
@@ -175,6 +176,8 @@ regions =\
  'BCR2_pos_PTCR',
  'BCR2_pos_PTSR']
 
+
+
 region_names = sorted( list( set( [x.replace("_PTSR","").replace("_PTCR","") for x in regions] )) )
 
 tt_region_names = [x for x in region_names if "BCR2" in x]
@@ -183,6 +186,10 @@ w_region_names = [x for x in region_names if "ECR1" in x]
 
 
 
+##FIX ME
+#regions = yld.cutNames
+#region_names = regions
+#tt_region_names = [x for x in region_names if "CRTT2" in x ]
 
 ##
 ## TT SideBand

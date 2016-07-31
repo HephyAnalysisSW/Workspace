@@ -356,4 +356,22 @@ def getParameterSet(args):
     params['Veto_fastSimJets'] = Veto_fastSimJets
 
     #
+    #
+    #   PU calculation:
+    #   https://twiki.cern.ch/twiki/bin/view/CMS/PileupJSONFileforData#Calculating_Your_Pileup_Distribu
+    #   https://hypernews.cern.ch/HyperNews/CMS/get/luminosity/611/2.html
+    #
+
+    #  FIXME could be moved to args
+    pu_xsec     = 63000   # in microbarn
+    pu_xsec_unc = 0.05    
+
+    pileup_dir = "$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/python/cmgPostProcessing/pileup"
+    puWeightDict = {    
+                 'up'      :    {'var': 'puReweight_up'    , 'xsec': pu_xsec*(1+pu_xsec_unc)   , 'pu_root_file': pileup_dir + '/PU_ratio_%s.root'%int(pu_xsec*(1+pu_xsec_unc))   , 'pu_hist_name':'PU_ratio'},    
+                 'central' :    {'var': 'puReweight'       , 'xsec': pu_xsec                   , 'pu_root_file': pileup_dir + '/PU_ratio_%s.root'%int(pu_xsec                )   , 'pu_hist_name':'PU_ratio'},
+                 'down'    :    {'var': 'puReweight_down'  , 'xsec': pu_xsec*(1-pu_xsec_unc)   , 'pu_root_file': pileup_dir + '/PU_ratio_%s.root'%int(pu_xsec*(1-pu_xsec_unc))   , 'pu_hist_name':'PU_ratio'},
+                }
+    params['puWeightDict'] = puWeightDict
+
     return params

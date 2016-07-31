@@ -189,10 +189,15 @@ def getParameterSet(args):
                                                             effFile = params['beff']['effFile'], 
                                                             sfFile = params['beff']['sfFile'], 
                                                             sfFile_FastSim =  params['beff']['sfFile_FastSim']  
-                                                           )
+                                                       )
+    puWeightDict = params.get("puWeightDict")
+    if puWeightDict:
+        for pu, pu_dict in puWeightDict.iteritems():
+            pu_var = pu_dict['var']
+            pu_dict['pu_tfile'] = ROOT.TFile( pu_dict['pu_root_file'] ) 
+            pu_dict['pu_thist'] = getattr( pu_dict['pu_tfile'], pu_dict['pu_hist_name'])
 
-
-    
+ 
     #
     return params
 
@@ -512,6 +517,9 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
         
     newVariables_DATAMC.extend([
         'weight/F/-999.',
+        'puReweight/F/-999.',
+        'puReweight_up/F/-999.',
+        'puReweight_down/F/-999.',
         'ht_basJet/F/-999.'
         ])
     
@@ -684,7 +692,7 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
     
     # common branches already defined in cmgTuples
     keepBranches_MC = [ 
-        'nTrueInt', 'genWeight', 'xsec', 'puWeight', 'LHEweight_original',
+        'nTrueInt', 'genWeight', 'xsec', 'LHEweight_original', #'puWeight', need to create a new puWeight
         'GenSusyMStop', 
         'GenSusyMNeutralino',        
         'ngenLep', 'genLep_*', 
@@ -2175,7 +2183,7 @@ def processEventVetoFastSimJets(readTree, splitTree, saveTree, params):
     #
     return saveTree
 
-def computeWeight(sample, sumWeight,  splitTree, saveTree, params, xsec=None):
+def computeWeight(sample, sumWeight,  splitTree, saveTree, params, xsec=None ):
     ''' Compute the weight of each event.
     
     Include all the weights used:
@@ -2189,6 +2197,8 @@ def computeWeight(sample, sumWeight,  splitTree, saveTree, params, xsec=None):
     # sample type (data or MC, taken from CMG component)
     isDataSample = sample['isData']
     
+
+
     # weight according to required luminosity 
     
     genWeight = 1 if isDataSample else splitTree.GetLeaf('genWeight').GetValue()
@@ -2217,7 +2227,23 @@ def computeWeight(sample, sumWeight,  splitTree, saveTree, params, xsec=None):
         target_lumi, genWeight,
         ('' if isDataSample else 'cross section: ' + str(sample['xsec']) + ' pb^{-1}'),
         sumWeight, lumiScaleFactor, saveTree.weight)
-    
+
+    puWeightDict = params.get('puWeightDict')    
+    if isDataSample:
+        pass
+    elif puWeightDict:
+        nTrueInt = splitTree.GetLeaf("nTrueInt").GetValue()
+        for pu, pu_dict in puWeightDict.iteritems():
+            pu_var   = pu_dict['var']
+            pu_thist = pu_dict['pu_thist'] 
+            pu_w     = pu_thist.GetBinContent( pu_thist.FindBin(nTrueInt) )
+            setattr(saveTree, pu_var, pu_w)
+        logger.debug(
+            "\n Computing PU weight for: %s sample \n" + \
+            "\n    ".join(["%s : %s "%(pu['var'], getattr(saveTree,pu['var']) )   for pu in puWeightDict.itervalues() ] ),
+            ('Data ' + sample['cmgName'] if isDataSample else 'MC ' + sample['cmgName']),
+
+            )
         
     #
     return saveTree
