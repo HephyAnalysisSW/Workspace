@@ -118,6 +118,10 @@ def getParameterSet(args):
     # use a common list for el and el2
     if 'el2' in LepGoodSel:
         LepVarList['el2'] = varListEl
+    
+    # use a common list for mu and mu2
+    if 'mu2' in LepGoodSel:
+        LepVarList['mu2'] = varListEl
 
 
     params['LepVarList'] = LepVarList
@@ -529,6 +533,11 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
             newVariables_DATAMC.extend([
                 "nLepAll_el2/I/-1",
                 ])
+        
+        if 'mu2' in params['LepGoodSel']:
+            newVariables_DATAMC.extend([
+                "nLepAll_mu2/I/-1",
+                ])
             
 
     newVariables_DATAMC.extend([
@@ -641,6 +650,11 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
     if 'el2' in params['LepGoodSel']:
         IndexLepVars.extend([
             'el2/I/-1',
+            ])
+    
+    if 'mu2' in params['LepGoodSel']:
+        IndexLepVars.extend([
+            'mu2/I/-1',
             ])
 
     newVectors_DATAMC.extend([
@@ -1108,14 +1122,19 @@ def processLeptons(readTree, splitTree, saveTree, params, LepSelector):
     saveTree = saveTreeLepObject(saveTree, LepColl, 'el', elList)
     saveTree = saveTreeLepObject(saveTree, LepColl, 'lep', lepList)
 
-    # check if one processses the el2 collection of electrons
+    # check if one processses the el2 collection of electrons or mu2 collection of muons
     processEl2 = LepSel.get('el2', False)
+    processMu2 = LepSel.get('mu2', False)
     
     if processEl2:
         el2Selector = cmgObjectSelection.objSelectorFunc(LepSel['el2'])
         el2List = lepObj.getSelectionIndexList(readTree, el2Selector)
         saveTree = saveTreeLepObject(saveTree, LepColl, 'el2', el2List)
-        
+    
+    if processMu2:
+        mu2Selector = cmgObjectSelection.objSelectorFunc(LepSel['mu2'])
+        mu2List = lepObj.getSelectionIndexList(readTree, mu2Selector)
+        saveTree = saveTreeLepObject(saveTree, LepColl, 'mu2', mu2List)
 
     if logger.isEnabledFor(logging.DEBUG):
         printDebug(saveTree, LepColl, 'mu', muList)
@@ -1124,6 +1143,9 @@ def processLeptons(readTree, splitTree, saveTree, params, LepSelector):
 
         if processEl2:
             printDebug(saveTree, LepColl, 'el2', el2List)
+        
+        if processMu2:
+            printDebug(saveTree, LepColl, 'mu2', mu2List)
         
     # define the named tuple to return the values
     
@@ -1136,18 +1158,38 @@ def processLeptons(readTree, splitTree, saveTree, params, LepSelector):
 
     if processEl2:
         rtupleLists.extend(['el2List'])
+    
+    if processMu2:
+        rtupleLists.extend(['mu2List'])
 
     rtuple = collections.namedtuple(
         'rtuple', rtupleLists
         )
     
-    if processEl2:
+    if processEl2 and not processMu2:
         processLeptons_rtuple = rtuple(
             lepObj, 
             muList, 
             elList, 
             lepList,
             el2List
+            )
+    elif processMu2 and not processEl2:
+        processLeptons_rtuple = rtuple(
+            lepObj, 
+            muList, 
+            elList, 
+            lepList,
+            mu2List
+            )
+    elif processEl2 and processMu2:
+        processLeptons_rtuple = rtuple(
+            lepObj, 
+            muList, 
+            elList, 
+            lepList,
+            el2List,
+            mu2List
             )
     else:
         processLeptons_rtuple = rtuple(
@@ -1245,11 +1287,14 @@ def processLeptonsAll(
     elList = []
     lepList = []        
 
-    # check if one processses the el2 collection of electrons
+    # check if one processses the el2 collection of electrons or mu2 collection of muons
     processEl2 = params['LepGoodSel'].get('el2', False)
+    processMu2 = params['LepGoodSel'].get('mu2', False)
     
     if processEl2:
         el2List = []
+    if processMu2:
+        mu2List = []
     
     # add LepAll to the saveTree
     for idx, lep in enumerate(lepAllList):
@@ -1285,6 +1330,9 @@ def processLeptonsAll(
             if processEl2:
                 if lepIndex in processLepGood_rtuple.el2List:
                     el2List.append(idx)
+            if processMu2:
+                if lepIndex in processLepGood_rtuple.mu2List:
+                    mu2List.append(idx)
                 
         else:
             if lepIndex in processLepOther_rtuple.muList:
@@ -1297,6 +1345,9 @@ def processLeptonsAll(
             if processEl2:
                 if lepIndex in processLepOther_rtuple.el2List:
                     el2List.append(idx)
+            if processMu2:
+                if lepIndex in processLepOther_rtuple.mu2List:
+                    mu2List.append(idx)
                             
     nLepAll = len(lepAllList)
     saveTree.nLepAll = nLepAll
@@ -1323,6 +1374,8 @@ def processLeptonsAll(
 
     if processEl2:
         saveTree = saveTreeLepObject(saveTree, LepColl, 'el2', el2List)
+    if processMu2:
+        saveTree = saveTreeLepObject(saveTree, LepColl, 'mu2', mu2List)
 
     if logger.isEnabledFor(logging.DEBUG):
         printDebug(saveTree, LepColl, 'mu', muList, LepVarList)
@@ -1331,6 +1384,8 @@ def processLeptonsAll(
 
         if processEl2:
             printDebug(saveTree, LepColl, 'el2', el2List, LepVarList)
+        if processMu2:
+            printDebug(saveTree, LepColl, 'mu2', mu2List, LepVarList)
         
     # get LepAll as cmgObject, print them in debug mode 
     lepAllObj = cmgObjectSelection.cmgObject(saveTree, splitTree, LepColl)
@@ -1353,18 +1408,37 @@ def processLeptonsAll(
 
     if processEl2:
         rtupleLists.extend(['el2List'])
+    if processMu2:
+        rtupleLists.extend(['mu2List'])
 
     rtuple = collections.namedtuple(
         'rtuple', rtupleLists
         )
     
-    if processEl2:
+    if processEl2 and not processMu2:
         lep_rtuple = rtuple(
             lepAllObj, 
             muList, 
             elList, 
             lepList,
             el2List
+            )
+    if processMu2 and not processEl2:
+        lep_rtuple = rtuple(
+            lepAllObj, 
+            muList, 
+            elList, 
+            lepList,
+            mu2List
+            )
+    if processEl2 and processMu2:
+        lep_rtuple = rtuple(
+            lepAllObj, 
+            muList, 
+            elList, 
+            lepList,
+            el2List,
+            mu2List
             )
     else:
         lep_rtuple = rtuple(

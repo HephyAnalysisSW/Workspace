@@ -133,6 +133,15 @@ def getParameterSet(args):
                 'absIso': 5
                 },
             },
+        
+         'mu2': { #muon selection without hybIso cut
+            'pdgId': ('pdgId', operator.eq, 13, operator.abs),
+            'pt': ('pt', operator.gt, 5),
+            'eta': ('eta', operator.lt, 2.4, operator.abs),
+            'dxy': ('dxy', operator.lt, 0.02, operator.abs),
+            'dz': ('dz', operator.lt, 0.5, operator.abs),
+            },
+        
         #
         # electron selection
         # https://twiki.cern.ch/twiki/bin/view/CMS/CutBasedElectronIdentificationRun2#Spring15_selection_25ns
@@ -141,8 +150,9 @@ def getParameterSet(args):
             'pt': ('pt', operator.gt, 5),
             'eta': ('eta', operator.lt, 2.5, operator.abs),
             'dxy': ('dxy', operator.lt, 0.02, operator.abs), #synchronisation with muons
-            #'dz': ('dz', operator.lt, 0.5, operator.abs), #looser than Veto ID
+            'dz': ('dz', operator.lt, 0.5, operator.abs), #synchronisation with muons
             'SPRING15_25ns_v1': ('SPRING15_25ns_v1', operator.ge, 1), #EG POG Veto ID
+            
             'hybIso': {
                 'ptSwitch': 25, 
                 'relIso': {
@@ -151,7 +161,7 @@ def getParameterSet(args):
                     },
                 'absIso': 5
                 },
-            'etaSc': ('etaSc', operator.lt, 2.5, operator.abs),
+            
             'evalRange_isGap': {
                 'var': 'etaSc',
                 'operVar': operator.abs,
@@ -160,21 +170,23 @@ def getParameterSet(args):
                 },
             },
         
-        'el2': { #selection with Veto Electron ID without sigmaEtaEta cut
+        'el2': { #selection with Veto Electron ID (without sigmaEtaEta cut) and no hybIso cut
             'pdgId': ('pdgId', operator.eq, 11, operator.abs),
             'pt': ('pt', operator.gt, 5),
             'eta': ('eta', operator.lt, 2.5, operator.abs),
             'dxy': ('dxy', operator.lt, 0.02, operator.abs), #synchronisation with muons
-            #'dz': ('dz', operator.lt, 0.5, operator.abs), #looser than Veto ID
-            'convVeto': ('convVeto', operator.eq, 1),
-            'etaSc': ('etaSc', operator.lt, 2.5, operator.abs),
+            'dz': ('dz', operator.lt, 0.5, operator.abs), #synchronisation with muons
+           
             'evalRange_isGap': {
                 'var': 'etaSc',
                 'operVar': operator.abs,
                 'lowRange': (operator.le, 1.4442),
                 'highRange': (operator.ge, 1.566),
                 },
-            'elWP': {
+            
+            'convVeto': ('convVeto', operator.eq, 1),
+            
+            'elWP': { #EG POG Veto ID without sigmaEtaEta
                 'eta_EB': 1.479, 'eta_EE': 2.5,
                 'vars': {
                     'hadronicOverEm': {

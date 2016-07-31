@@ -60,10 +60,10 @@ else
     SKIM_LEPTON=""
 fi
 
-CMG_POST_PROCESSING_TAG="80X_postProcessing_v2_2"
+CMG_POST_PROCESSING_TAG="80X_postProcessing_v5"
 VERBOSE=""
 if [[ ${5} == "TEST" ]]; then 
-    CMG_POST_PROCESSING_TAG="80X_postProcessing_v2_2_TEST"
+    CMG_POST_PROCESSING_TAG="80X_postProcessing_v5_TEST"
     VERBOSE="--verbose"
 fi
 
