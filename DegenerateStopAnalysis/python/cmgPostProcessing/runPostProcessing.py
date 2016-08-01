@@ -213,7 +213,7 @@ sampleSets = {
                                       ],
                             },
               
-                'other_onelep':{
+                'other':{
                             'samples':[
                                         ['WW',                       "--skimPreselect"],
                                         ['WZ',                       "--skimPreselect"],
