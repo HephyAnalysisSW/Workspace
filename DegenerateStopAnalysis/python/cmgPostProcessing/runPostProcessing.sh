@@ -34,7 +34,7 @@
 # release and architecture, 
 CMSSW_RELEASE="CMSSW_8_0_11"
 SCRAM_ARCH_VAL="slc6_amd64_gcc530"
-CMSSW_ACTION="R"
+CMSSW_ACTION="RO"
 
 # set parameters 
 
@@ -44,8 +44,10 @@ SAMPLE_SET=$1
 # semi-hard-coded parameters
 if [[ ${2} == "DATA" ]]; then 
     CMG_TUPLES="Data2016_v1_1"
+    BTAG_WEIGHTS=""
 else
     CMG_TUPLES="RunIISpring16MiniAODv2_v1"
+    BTAG_WEIGHTS="--processBTagWeights"
 fi
 
 if [[ ${3} == "skimPreselect" ]]; then 
@@ -83,7 +85,7 @@ if [[ ${CMSSW_ACTION} == "CB" || ${CMSSW_ACTION} == "R" ]]; then
     eval `scram runtime -sh`
 fi
 
-if [[ ${CMSSW_ACTION} == "R" ]]; then
+if [[ ${CMSSW_ACTION} == "RO" || ${CMSSW_ACTION} == "R" ]]; then
     
     cd ${CMSSW_BASE}/src/Workspace/DegenerateStopAnalysis/python/cmgPostProcessing
             
@@ -98,6 +100,7 @@ if [[ ${CMSSW_ACTION} == "R" ]]; then
         --skimGeneral='' \
         ${SKIM_PRESELECT} \
         ${SKIM_LEPTON} \
+        ${BTAG_WEIGHTS} \
         --run \
         ${VERBOSE}
 fi
