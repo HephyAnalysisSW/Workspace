@@ -74,7 +74,7 @@ weightDict={
 
 def_weights = {
 
-            "baseWeight":"puWeight*weight",
+            "baseWeight":"puReweight*weight",
             #"lumis":{      
             #                "target_lumi"      :    2300, 
             #                "mc_lumi"          :    10000, 
