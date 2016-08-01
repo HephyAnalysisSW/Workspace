@@ -343,7 +343,7 @@ def getParameterSet(args):
             'id': ('id', operator.ge, 1),
             'pt': ('pt', operator.gt, 20),
             'eta': ('eta', operator.lt, 2.5, operator.abs),
-            'chHEF': {'chHEF', operator.lt, 0.1}
+            'chHEF': ('chHEF', operator.lt, 0.1),
             },
         }
 

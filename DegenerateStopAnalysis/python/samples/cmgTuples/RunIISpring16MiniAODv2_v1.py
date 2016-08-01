@@ -1078,6 +1078,7 @@ SMS_T2tt_dM_10to80_2Lfilter ={
 "treeName":"tree",
 "isData": False,
 "isFastSim":True,
+'mass_dict': '/data/nrad/cmgTuples/8011_mAODv2_v1/RunIISpring16MiniAODv2/mass_dict.pkl',
 }
 #allComponents.append(SMS_T2tt_dM_10to80_2Lfilter)
 allSignalComponents.append(SMS_T2tt_dM_10to80_2Lfilter)

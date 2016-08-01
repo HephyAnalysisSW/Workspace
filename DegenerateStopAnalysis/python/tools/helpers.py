@@ -562,7 +562,7 @@ def evalCutOperator(quantityValue, operatorDef):
         opForVar = operatorDef[3]
         opResult = opForCut(opForVar(quantityValue), varCut)
     else:
-        opResult = opCut(quantityValue, varCut)
+        opResult = opForCut(quantityValue, varCut)
         
     return opResult
 
