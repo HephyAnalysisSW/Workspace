@@ -21,9 +21,12 @@ from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2 import *
 from systematics_helper import calc_btag_systematics, calc_LeptonScale_factors_and_systematics, calc_TopPt_Weights , calcDLDictionary, calc_diLep_contributions ,  fill_branch_WithJEC , getGenWandLepton , getGenTopWLepton
 from btagEfficiency import *
 from readVetoEventList import *
+from leptonSF import leptonSF as leptonSF_
 
-scaleFactorDir  = '$CMSSW_BASE/src/Workspace/RA4Analysis/cmgPostProcessing/data/'
-bTagEffFile     = "data/effs_presel_JECv6_pkl" 
+#bTagEffFile     = "$CMSSW_BASE/src/Workspace/RA4Analysis/cmgPostProcessing/data/effs_presel_JECv6_pkl" 
+bTagEffFile     = "data/effs_presel_JECv6_pkl"
+
+calcLeptonSF = leptonSF_()
 
 try:
   mcEffDict = pickle.load(file(bTagEffFile))
@@ -38,14 +41,11 @@ WPolNormTTDown  = 1.0733
 WPolNormWUp     = 0.8947
 WPolNormWDown   = 1.1334
 
-
-#maxConsideredBTagWeight = 2
-#calcSystematics = True
 separateBTagWeights = True
 
 defSampleStr = "TTJets_LO"
 
-subDir = "postProcessing_Spring16_JECv6_v2"
+subDir = "postProcessing_Spring16_JECv6_v3"
 #subDir = "postProcessing_Run2016BCD"
 
 #branches to be kept for data and MC
@@ -150,14 +150,6 @@ if sys.argv[0].count('ipython'):
 ##print evt_veto_list
 
 ###For PU reweight###
-#PU_dir = "/afs/hephy.at/user/e/easilar/www/data/Run2016B/4fb/PU_histos/"
-#PU_dir = "/data/easilar/PU_Histos/"
-#PU_File_66mb = ROOT.TFile(PU_dir+"/h_ratio_67p7.root")
-#PU_File_70mb = ROOT.TFile(PU_dir+"/h_ratio_71p3.root")
-#PU_File_74mb = ROOT.TFile(PU_dir+"/h_ratio_74p9.root")
-#PU_histo_66 = PU_File_66mb.Get("puRatio")
-#PU_histo_70 = PU_File_70mb.Get("puRatio")
-#PU_histo_74 = PU_File_74mb.Get("puRatio")
 PU_dir = "/data/easilar/PU_Histos/"
 PU_File_59p85mb = ROOT.TFile(PU_dir+"/h_ratio_59p85.root")
 PU_File_63mb = ROOT.TFile(PU_dir+"/h_ratio_63.root")
@@ -167,26 +159,6 @@ PU_histo_63 = PU_File_63mb.Get("h_ratio")
 PU_histo_66p15 = PU_File_66p15mb.Get("h_ratio")
 ######################
 
-###For Lepton SF#####
-mu_mediumID_File  = ROOT.TFile(scaleFactorDir+'TnP_MuonID_NUM_MediumID_DENOM_generalTracks_VAR_map_pt_eta.root')
-mu_looseID_File   = ROOT.TFile(scaleFactorDir+'TnP_MuonID_NUM_LooseID_DENOM_generalTracks_VAR_map_pt_eta.root')
-mu_miniIso02_File = ROOT.TFile(scaleFactorDir+'TnP_MuonID_NUM_MiniIsoTight_DENOM_MediumID_VAR_map_pt_eta.root')
-mu_sip3d_File     = ROOT.TFile(scaleFactorDir+'TnP_MuonID_NUM_TightIP3D_DENOM_MediumID_VAR_map_pt_eta.root')
-mu_HIP_File       = ROOT.TFile(scaleFactorDir+'ratiosMuonHIP.root')
-ele_kin_File      = ROOT.TFile(scaleFactorDir+'eleScaleFactorsUpdate2607.root')
-ele_gsf_File      = ROOT.TFile(scaleFactorDir+'egammaEffi_txt_SF2D.root')
-#
-histos_LS = {
-'mu_mediumID_histo':  mu_mediumID_File.Get("pt_abseta_PLOT_pair_probeMultiplicity_bin0"),\
-'mu_looseID_histo':   mu_looseID_File.Get("pt_abseta_PLOT_pair_probeMultiplicity_bin0"),\
-'mu_miniIso02_histo': mu_miniIso02_File.Get("pt_abseta_PLOT_pair_probeMultiplicity_bin0_&_Medium2016_pass"),\
-'mu_sip3d_histo':     mu_sip3d_File.Get("pt_abseta_PLOT_pair_probeMultiplicity_bin0_&_Medium2016_pass"),\
-'mu_HIP_histo':       mu_HIP_File.Get("ratio_eta"),\
-'ele_cutbased_histo': ele_kin_File.Get("GsfElectronToTight"),\
-'ele_miniIso01_histo':ele_kin_File.Get("MVAVLooseElectronToMini"),\
-'ele_gsf_histo':      ele_gsf_File.Get("EGamma_SF2D"),\
-}
-#####################
 
 maxConsideredBTagWeight = options.btagWeight
 calcSystematics = options.systematics
@@ -273,8 +245,7 @@ for isample, sample in enumerate(allSamples):
    
     newVariables.extend(['puReweight_true/F','puReweight_true_max4/F','puReweight_true_Down/F','puReweight_true_Up/F','weight_diLepTTBar0p5/F','weight_diLepTTBar2p0/F','weight_XSecTTBar1p1/F','weight_XSecTTBar0p9/F','weight_XSecWJets1p1/F','weight_XSecWJets0p9/F', 'weight_WPolPlus10/F', 'weight_WPolMinus10/F', 'weight_TTPolPlus5/F', 'weight_TTPolMinus5/F'])
     newVariables.extend(['GenTopPt/F/-999.','GenAntiTopPt/F/-999.','TopPtWeight/F/1.','GenTTBarPt/F/-999.','GenTTBarWeight/F/1.','nGenTops/I/0.'])
-    newVariables.extend(['lepton_muSF_HIP/D/1','lepton_muSF_looseID/D/1.','lepton_muSF_mediumID/D/1.','lepton_muSF_miniIso02/D/1.','lepton_muSF_sip3d/D/1.','lepton_eleSF_cutbasedID/D/1.','lepton_eleSF_miniIso01/D/1.','lepton_eleSF_gsf/D/1.'])
-    newVariables.extend(['lepton_muSF_HIP_err/D/0.','lepton_muSF_looseID_err/D/0.','lepton_muSF_mediumID_err/D/0.','lepton_muSF_miniIso02_err/D/0.','lepton_muSF_sip3d_err/D/0.','lepton_eleSF_cutbasedID_err/D/0.','lepton_eleSF_miniIso01_err/D/0.', 'lepton_eleSF_gsf_err/D/0.', 'lepton_muSF_systematic/D/0.'])
+    newVariables.extend(['leptonSF/D/1','leptonSFUp/D/1.','leptonSFDown/D/1.'])
     ### Vars for JEC ###
     corr = ["central", "up", "down"]
     vars_corr = ["ht","LT","MeT","deltaPhi_Wl"]
@@ -552,7 +523,15 @@ for isample, sample in enumerate(allSamples):
           g_list=['eta','pt','phi','mass','charge', 'pdgId', 'motherId', 'grandmotherId']
           genParts = get_cmg_genParts_fromStruct(r,g_list)
           calc_TopPt_Weights(s,genParts)
-          calc_LeptonScale_factors_and_systematics(s,histos_LS)
+          if s.nTightHardLeptons>=1:
+            s.leptonSF     = calcLeptonSF.getSF(pdgId=s.leptonPdg, pt=s.leptonPt, eta=s.leptonEta)
+            s.leptonSFUp   = calcLeptonSF.getSF(pdgId=s.leptonPdg, pt=s.leptonPt, eta=s.leptonEta, sigma = +1)
+            s.leptonSFDown = calcLeptonSF.getSF(pdgId=s.leptonPdg, pt=s.leptonPt, eta=s.leptonEta, sigma = -1)
+          else:
+            s.leptonSF     = -999
+            s.leptonSFUp   = -999
+            s.leptonSFDown = -999
+          #calc_LeptonScale_factors_and_systematics(s,histos_LS)
           fill_branch_WithJEC(s,r)
           if calcSystematics: 
             calc_btag_systematics(t,s,r,mcEffDict,sampleKey,maxConsideredBTagWeight,separateBTagWeights)

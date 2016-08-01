@@ -47,8 +47,9 @@ cTTJets     = getChain(TTJets_Comb,histname='')
 cDY         = getChain(DY_HT,histname='')
 csingleTop  = getChain(singleTop_lep,histname='')
 cTTV        = getChain(TTV,histname='')
-cRest       = getChain([singleTop_lep, DY_HT, TTV],histname='')#no QCD
-cBkg        = getChain([WJetsHTToLNu, TTJets_Comb, singleTop_lep, DY_HT, TTV], histname='')#no QCD
+cDiBoson    = getChain(diBoson, histname='')
+cRest       = getChain([singleTop_lep, DY_HT, TTV, diBoson],histname='')#no QCD
+cBkg        = getChain([WJetsHTToLNu, TTJets_Comb, singleTop_lep, DY_HT, TTV, diBoson], histname='')#no QCD
 cQCD        = getChain(QCDHT,histname='')
 
 
@@ -67,9 +68,9 @@ else: QCDestimate=False
 if isData:
   cData = getChain([single_mu_Run2016B, single_ele_Run2016B, single_mu_Run2016C, single_ele_Run2016C, single_mu_Run2016D, single_ele_Run2016D], histname='')
 elif not isData and useQCDestimation:
-  cData = getChain([WJetsHTToLNu, TTJets_Comb, singleTop_lep, DY_HT, TTV, QCDHT], histname='')
+  cData = getChain([WJetsHTToLNu, TTJets_Comb, singleTop_lep, DY_HT, TTV, diBoson, QCDHT], histname='')
 else:
-  cData = getChain([WJetsHTToLNu, TTJets_Comb, singleTop_lep, DY_HT, TTV], histname='')
+  cData = getChain([WJetsHTToLNu, TTJets_Comb, singleTop_lep, DY_HT, TTV, diBoson], histname='')
 
 
 ## signal region definition
@@ -78,6 +79,7 @@ if validation:
   regStr = 'validation_4j_altWSB'
 else:
   signalRegions = signalRegions2016
+  #regStr = 'SR2016_postApp'
   regStr = 'SR2016_v2'
 
 ## weight calculations

@@ -28,7 +28,7 @@ useKappa        = True
 
 showMCtruth     = False
 signal = True
-plotPull = True
+plotPull = False
 
 latextitle = 'Preliminary'
 
@@ -60,7 +60,7 @@ if withSystematics:
 #sig = pickle.load(file('/data/easilar/Spring15/25ns/allSignals_2p3_v2_pkl'))
 #sig = pickle.load(file('/data/easilar/Spring15/25ns/allSignals_2p25_allSyst_approval_pkl'))
 #sig = pickle.load(file('/data/easilar/Spring15/25ns/allSignals_2p3_allSyst_pkl'))
-sig = pickle.load(file('/afs/hephy.at/data/easilar01/Ra40b/pickleDir/allSignals_12p88_2015Syst_pkl'))
+sig = pickle.load(file('/afs/hephy.at/data/dspitzbart01/Results2016/signals_with_unc_pkl'))
 
 #signalRegions = validationRegion
 #signalRegions = signalRegionCRonly
@@ -383,9 +383,9 @@ for srNJet in sorted(signalRegions):
           kappaPYErr.append(res[srNJet][stb][htb]['tot_kappa_err'])
 
       if signal:
-        benchmark1_H.SetBinContent(i,res[srNJet][stb][htb]['tot_pred_final']+sig[srNJet][stb][htb]['signals'][1200][800]['yield_MB_SR'])
-        benchmark2_H.SetBinContent(i,res[srNJet][stb][htb]['tot_pred_final']+sig[srNJet][stb][htb]['signals'][1400][1000]['yield_MB_SR'])
-        benchmark3_H.SetBinContent(i,res[srNJet][stb][htb]['tot_pred_final']+sig[srNJet][stb][htb]['signals'][1600][100]['yield_MB_SR'])
+        benchmark1_H.SetBinContent(i,res[srNJet][stb][htb]['tot_pred_final']+sig[srNJet][stb][htb]['signals'][1200][800]['mod_yield_MB_SR'])
+        benchmark2_H.SetBinContent(i,res[srNJet][stb][htb]['tot_pred_final']+sig[srNJet][stb][htb]['signals'][1400][1000]['mod_yield_MB_SR'])
+        benchmark3_H.SetBinContent(i,res[srNJet][stb][htb]['tot_pred_final']+sig[srNJet][stb][htb]['signals'][1600][100]['mod_yield_MB_SR'])
 
       if unblinded:
         total_meas     += data_yield
@@ -640,9 +640,9 @@ else:
 
 if plotPull: suffix += '_pull'
 
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_approval_v4.png')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_approval_v4.root')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_approval_v4.pdf')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_approval_v5.png')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_approval_v5.root')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_approval_v5.pdf')
 
 if useKappa:
   

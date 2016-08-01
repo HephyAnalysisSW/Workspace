@@ -518,7 +518,7 @@ latex1.SetTextSize(0.04)
 latex1.SetTextAlign(11)
 
 latex1.DrawLatex(0.15,0.96,'CMS #bf{#it{Preliminary}}')
-latex1.DrawLatex(0.81,0.96,"#bf{"+printlumi+"fb^{-1} (13TeV)}")
+latex1.DrawLatex(0.80,0.96,"#bf{"+printlumi+"fb^{-1} (13TeV)}")
 
 h_Stack.GetXaxis().SetLabelSize(0.04)
 h_Stack.GetYaxis().SetLabelSize(0.055)

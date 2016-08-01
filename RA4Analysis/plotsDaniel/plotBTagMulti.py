@@ -15,13 +15,80 @@ from Workspace.RA4Analysis.cmgTuples_Data25ns_Promtv2_postprocessed import * #20
 
 from Workspace.HEPHYPythonTools.user import username
 
+ROOT.gStyle.SetErrorX(0.5)
 
-WJets = {'name':'WJets', 'chain':getChain(WJetsHTToLNu,histname=''), 'color':color('WJets'),'weight':'weight', 'niceName':'W+jets'}
-TTJets = {'name':'TTJets', 'chain':getChain(TTJets_Comb,histname=''), 'color':color('TTJets')-2,'weight':'weight', 'niceName':'t#bar{t}+jets'}
-DY = {'name':'DY', 'chain':getChain(DY_HT,histname=''), 'color':color('DY'),'weight':'weight', 'niceName':'Drell Yan'}
-singleTop = {'name':'singleTop', 'chain':getChain(singleTop_lep,histname=''), 'color':color('singleTop'),'weight':'weight', 'niceName':'t/#bar{t}+jets'}
-QCD = {'name':'QCD', 'chain':getChain(QCDHT,histname=''), 'color':color('QCD'),'weight':'weight', 'niceName':'QCD multijet'}
-TTVH = {'name':'TTVH', 'chain':getChain(TTV,histname=''), 'color':color('TTV'),'weight':'weight', 'niceName':'t#bar{t}W+jets'}
+def Draw_CMS_header():
+   tex = ROOT.TLatex()
+   tex.SetNDC()
+   tex.SetTextAlign(31)
+   tex.SetTextFont(42)
+   tex.SetTextSize(0.05)
+   tex.SetLineWidth(2)
+   tex.DrawLatex(0.96,0.96,"12.9 fb^{-1} (13 TeV)")
+   tex = ROOT.TLatex()
+   tex.SetNDC()
+   tex.SetTextFont(61)
+   tex.SetTextSize(0.05)
+   tex.SetLineWidth(2)
+   tex.DrawLatex(0.18,0.96,"CMS")
+   tex = ROOT.TLatex()
+   tex.SetNDC()
+   tex.SetTextFont(52)
+   tex.SetTextSize(0.05)
+   tex.SetLineWidth(2)
+   tex.DrawLatex(0.26,0.96,"Preliminary")
+   return
+
+def Set_axis_pad2(histo):
+   histo.GetXaxis().SetLabelFont(42)
+   histo.GetXaxis().SetLabelOffset(0.007)
+   histo.GetXaxis().SetLabelSize(0.11)
+   histo.GetXaxis().SetTitleSize(0.14)
+   histo.GetXaxis().SetTitleOffset(0.9)
+   histo.GetXaxis().SetTitleFont(42)
+   histo.GetYaxis().SetTitle("Data/Pred.")
+   histo.GetYaxis().SetDecimals()
+   histo.GetYaxis().SetNdivisions(505)
+   histo.GetYaxis().SetLabelFont(42)
+   histo.GetYaxis().SetLabelOffset(0.007)
+   histo.GetYaxis().SetLabelSize(0.11)
+   histo.GetYaxis().SetTitleSize(0.14)
+   histo.GetYaxis().SetTitleOffset(0.52)
+   histo.GetYaxis().SetTitleFont(42)
+   histo.GetZaxis().SetLabelFont(42)
+   histo.GetZaxis().SetLabelOffset(0.007)
+   histo.GetZaxis().SetLabelSize(0.05)
+   histo.GetZaxis().SetTitleSize(0.06)
+   histo.GetZaxis().SetTitleFont(42)
+   return
+
+def Set_axis_pad1(histo):
+   histo.GetXaxis().SetLabelFont(42)
+   histo.GetXaxis().SetLabelOffset(0.007)
+   histo.GetXaxis().SetLabelSize(0.05)
+   histo.GetXaxis().SetTitleSize(0.06)
+   histo.GetXaxis().SetTitleOffset(0.9)
+   histo.GetXaxis().SetTitleFont(42)
+   histo.GetYaxis().SetLabelFont(42)
+   histo.GetYaxis().SetLabelOffset(0.007)
+   histo.GetYaxis().SetLabelSize(0.05)
+   histo.GetYaxis().SetTitleSize(0.06)
+   histo.GetYaxis().SetTitleOffset(1.35)
+   histo.GetYaxis().SetTitleFont(42)
+   histo.GetZaxis().SetLabelFont(42)
+   histo.GetZaxis().SetLabelOffset(0.007)
+   histo.GetZaxis().SetLabelSize(0.05)
+   histo.GetZaxis().SetTitleSize(0.06)
+   histo.GetZaxis().SetTitleFont(42)
+   return
+
+
+WJets = {'name':'WJets', 'chain':getChain(WJetsHTToLNu,histname=''), 'color':color('WJets'),'weight':'weight', 'niceName':'W + jets'}
+TTJets = {'name':'TTJets', 'chain':getChain(TTJets_Comb,histname=''), 'color':color('TTJets')-2,'weight':'weight', 'niceName':'t#bar{t} + jets'}
+DY = {'name':'DY', 'chain':getChain(DY_HT,histname=''), 'color':color('DY'),'weight':'weight', 'niceName':'DY + jets'}
+singleTop = {'name':'singleTop', 'chain':getChain(singleTop_lep,histname=''), 'color':color('singleTop'),'weight':'weight', 'niceName':'t/#bar{t}'}
+QCD = {'name':'QCD', 'chain':getChain(QCDHT,histname=''), 'color':color('QCD'),'weight':'weight', 'niceName':'QCD'}
+TTVH = {'name':'TTVH', 'chain':getChain(TTV,histname=''), 'color':color('TTV'),'weight':'weight', 'niceName':'t#bar{t}V'}
 diBoson = {'name':'diBoson', 'chain':getChain(diBoson, histname=''), 'color':ROOT.kRed+3,'weight':'weight', 'niceName':'WW/WZ/ZZ'}
 rest = {'name':'other', 'chain':getChain([DY_HT,singleTop_lep,TTV],histname=''), 'color':color('ttv'),'weight':'weight', 'niceName':'other'}
 samples = [WJets, TTJets, DY, singleTop, TTVH, diBoson, QCD]
@@ -56,15 +123,47 @@ MCweight = '12.88/3.*weight*TopPtWeight*puReweight_true_max4*(singleMuonic*'+muT
 
 bTagWeightSuffices = ['0_SF', '1_SF', '2_SF', '3p_SF']
 
-can = ROOT.TCanvas('c','c',700,700)
+can = ROOT.TCanvas('c','c',564,232,600,600)
 bottomMargin = 0.
 marginForPad2 = 0.3
+can.SetHighLightColor(2)
+can.Range(0,0,1,1)
+can.SetFillColor(0)
+can.SetBorderMode(0)
+can.SetBorderSize(2)
+can.SetTickx(1)
+can.SetTicky(1)
+can.SetLeftMargin(0.18)
+can.SetRightMargin(0.04)
+can.SetTopMargin(0.05)
+can.SetBottomMargin(0.13)
+can.SetFrameFillStyle(0)
+can.SetFrameBorderMode(0)
+can.SetFrameFillStyle(0)
+can.SetFrameBorderMode(0)
+can.cd()
 
-pad1=ROOT.TPad("pad1","MyTitle",0.,marginForPad2,1.,1.)
-pad1.SetLeftMargin(0.13)
-pad1.SetBottomMargin(bottomMargin)
+
+
+pad1=ROOT.TPad("pad1","MyTitle",0,0.31,1,1)
 pad1.Draw()
 pad1.cd()
+pad1.SetFillColor(0)
+pad1.SetBorderMode(0)
+pad1.SetBorderSize(2)
+pad1.SetLogy()
+pad1.SetTickx(1)
+pad1.SetTicky(1)
+pad1.SetLeftMargin(0.18)
+pad1.SetRightMargin(0.04)
+pad1.SetTopMargin(0.055)
+pad1.SetBottomMargin(0)
+pad1.SetFrameFillStyle(0)
+pad1.SetFrameBorderMode(0)
+pad1.SetFrameFillStyle(0)
+pad1.SetFrameBorderMode(0)
+pad1.SetLogy()
+
 
 
 TT_SF_H   = ROOT.TH1F('TT_SF_H','',4,0,4) 
@@ -155,10 +254,20 @@ for i,sample in enumerate(samples):
   total_H.Add(bkg_H[-1])
 
 for h in EWK_SF_H:
+  h.Scale(0.9)
   total_SF_H.Add(h)
+  Set_axis_pad1(h)
 total_SF_H.Add(bkg_H[-1])
 
-data_H = getPlotFromChain(data['chain'], var, binning, cutString = datapresel, weight = '(1)', addOverFlowBin='upper')
+#data_H = getPlotFromChain(data['chain'], var, binning, cutString = datapresel, weight = '(1)', addOverFlowBin='upper')
+data_H = ROOT.TH1F('data','data',4,0,4)
+for a in range(3):
+  y = getYieldFromChain(data['chain'], datapresel+'&&nBJetMediumCSV30=='+str(a))
+  data_H.SetBinContent(a+1,y)
+  data_H.SetBinError(a+1, sqrt(y))
+y = getYieldFromChain(data['chain'], datapresel+'&&nBJetMediumCSV30>=3')
+data_H.SetBinContent(4,y)
+data_H.SetBinError(4, sqrt(y))
 
 h_Stack = ROOT.THStack('h_Stack','Stack')
 h_Stack_SF = ROOT.THStack('h_Stack_SF','Stack')
@@ -171,8 +280,8 @@ bkg_H[-1].SetLineColor(QCD['color'])
 bkg_H[-1].SetLineColor(ROOT.kBlack)
 bkg_H[-1].SetLineWidth(2)
 
-data_H.SetMarkerSize(1.2)
-data_H.SetLineWidth(2)
+data_H.SetMarkerStyle(20)
+data_H.SetMarkerSize(1.1)
 
 h_Stack_SF.Add(TTVH_SF_H)
 h_Stack_SF.Add(diBoson_SF_H)
@@ -224,23 +333,29 @@ leg3.AddEntry(T5qqqqWW_mGo1400_mChi1000_H)
 leg3.AddEntry(T5qqqqWW_mGo1600_mChi100_H)
 
 
+
 h_Stack_SF.SetMinimum(10.)
 h_Stack_SF.SetMaximum(1000000.)
 h_Stack_SF.Draw('hist')
 #h_Stack.GetXaxis().SetTitle(variable['titleX'])
 #h_Stack.GetXaxis().SetNdivisions(508)
 h_Stack_SF.GetYaxis().SetTitle('Events')
-h_Stack_SF.GetYaxis().SetTitleOffset(1.05)
+#h_Stack_SF.GetYaxis().SetTitleOffset(1.05)
 #h_Stack_SF.GetYaxis().SetLabelSize(0.06)
 
 pad1.SetLogy()
 
-h_Stack_SF.GetYaxis().SetLabelSize(0.06)
+#h_Stack_SF.GetYaxis().SetLabelSize(0.06)
 
 total_SF_H.Draw('hist')
 #total_H.Draw('hist same')
 h_Stack_SF.Draw('hist')
-data_H.Draw('e1p same')
+
+Set_axis_pad1(data_H)
+#data_H.GetYaxis().SetLabelSize(0.04)
+data_H.SetMarkerStyle(20)
+data_H.SetMarkerSize(1.1)
+data_H.Draw('E1 same')
 
 for s in signal_SF_H:
   s.Scale(signalScale)
@@ -272,14 +387,29 @@ dataMC_SF_H.Sumw2()
 dataMC_SF_H = data_H.Clone()
 dataMC_SF_H.Divide(total_SF_H)
 
+Draw_CMS_header()
+pad1.RedrawAxis()
+
 can.cd()
-pad2=ROOT.TPad("pad2","datavsMC",0.,0.,1.,.3)
-pad2.SetLeftMargin(0.13)
-pad2.SetBottomMargin(0.3)
-pad2.SetTopMargin(0.)
-#pad2.SetGrid()
+pad2 = ROOT.TPad("pad2", "pad2",  0, 0, 1, 0.31)
 pad2.Draw()
 pad2.cd()
+pad2.SetFillColor(0)
+pad2.SetFillStyle(4000)
+pad2.SetBorderMode(0)
+pad2.SetBorderSize(2)
+pad2.SetTickx(1)
+pad2.SetTicky(1)
+pad2.SetLeftMargin(0.18)
+pad2.SetRightMargin(0.04)
+pad2.SetTopMargin(0)
+pad2.SetBottomMargin(0.3)
+pad2.SetFrameFillStyle(0)
+pad2.SetFrameBorderMode(0)
+pad2.SetFrameFillStyle(0)
+pad2.SetFrameBorderMode(0)
+
+
 
 for i in range(3):
   dataMC_SF_H.GetXaxis().SetBinLabel(i+1,str(i))
@@ -293,30 +423,34 @@ dataMC_SF_H.GetYaxis().SetTitleSize(0.13)
 dataMC_SF_H.GetYaxis().SetLabelSize(0.13)
 dataMC_SF_H.GetYaxis().SetTitleOffset(0.5)
 dataMC_SF_H.GetYaxis().SetNdivisions(508)
-dataMC_SF_H.SetMinimum(0.)
-dataMC_SF_H.SetMaximum(2.2)
+dataMC_SF_H.SetMinimum(0.05)
+dataMC_SF_H.SetMaximum(1.95)
 #dataMC_SF_H.SetMarkerColor(ROOT.kRed+1)
 #dataMC_SF_H.SetMarkerStyle(22)
 #dataMC_SF_H.SetMarkerSize(1.4)
 #dataMCH.Draw('e1p')
 
+Set_axis_pad2(dataMC_SF_H)
+
+dataMC_SF_H.GetXaxis().SetLabelSize(0.18)
 #dataMC_SF_H.SetMarkerStyle(23)
 #dataMC_SF_H.SetMarkerSize(1.4)
-dataMC_SF_H.Draw('e1p')
+dataMC_SF_H.Draw('E1')
 one.Draw('hist same')
+dataMC_SF_H.Draw('E1 same')
 
 can.cd()
 pad1.cd()
 
-latex1 = ROOT.TLatex()
-latex1.SetNDC()
-latex1.SetTextSize(0.04)
-latex1.SetTextAlign(11)
+#latex1 = ROOT.TLatex()
+#latex1.SetNDC()
+#latex1.SetTextSize(0.04)
+#latex1.SetTextAlign(11)
+#
+#latex1.DrawLatex(0.13,0.96,'CMS #bf{#it{Preliminary}}')
+#latex1.DrawLatex(0.79,0.96,"12.9fb^{-1} (13TeV)")
 
-latex1.DrawLatex(0.13,0.96,'CMS #bf{#it{Preliminary}}')
-latex1.DrawLatex(0.79,0.96,"12.9fb^{-1} (13TeV)")
-
-can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2016B/nbjet_nJet5.png')
-can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2016B/nbjet_nJet5.pdf')
-can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2016B/nbjet_nJet5.root')
+can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2016B/nbjet_nJet5_v2.png')
+can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2016B/nbjet_nJet5_v2.pdf')
+can.Print('/afs/hephy.at/user/d/dspitzbart/www/Results2016B/nbjet_nJet5_v2.root')
 
