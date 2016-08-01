@@ -19,6 +19,7 @@ import operator
 import collections
 import errno
 import subprocess
+import pickle
 
 
 # imports user modules or functions
@@ -158,8 +159,12 @@ def getParameterSet(args):
     params['vectors_DATAMC_List'] = vectors_DATAMC_List
 
     vectors_MC_List = [GenSel]
+    
     if args.processGenTracks:
         vectors_MC_List.append(GenTracksSel)
+        
+    if args.applyEventVetoFastSimJets:
+        vectors_MC_List.append(params['Veto_fastSimJets']['genJet'])
 
     params['vectors_MC_List'] = vectors_MC_List
 
@@ -343,11 +348,6 @@ def getSamples(args):
                 "\n Exiting."
             sys.exit() 
     
-    if hasattr(cmgSamples,"mass_dict"):
-        mass_dict = cmgSamples.mass_dict_samples
-    else:
-        mass_dict = {}
-
     # define the named tuple to return the values
     rtuple = collections.namedtuple(
         'rtuple', 
@@ -356,11 +356,10 @@ def getSamples(args):
             'cmgSamples',
             'componentList', 
             'outputDirectory', 
-            'mass_dict'
             ]
         )
     
-    getSample_rtuple = rtuple(sampleFile, cmgSamples, allComponentsList, outDir, mass_dict) 
+    getSample_rtuple = rtuple(sampleFile, cmgSamples, allComponentsList, outDir) 
     
     #    
     return getSample_rtuple
@@ -2192,35 +2191,61 @@ def processEventVetoFastSimJets(readTree, splitTree, saveTree, params):
 
     # selection of reco jets
 
-    Veto_fastSimJets_recoJet = Veto_fastSimJets['Veto_fastSimJets_recoJet']
+    Veto_fastSimJets_recoJet = Veto_fastSimJets['recoJet']
 
     recoObjBranches = Veto_fastSimJets_recoJet['branchPrefix']
     recoJetObj = cmgObjectSelection.cmgObject(readTree, splitTree, recoObjBranches)
 
     if logger.isEnabledFor(logging.DEBUG):
-        printStr = "\n List of " + recoObjBranches + " jets before selector: " + \
+        printStr = ''.join([
+            "\n List of ", 
+            recoObjBranches,
+            " jets before selector: ",
             recoJetObj.printObjects(None, JetVarList)
+            ])
         logger.debug(printStr)
 
     recoJetSel = Veto_fastSimJets_recoJet['recoJet']
     recoJetSelector = cmgObjectSelection.objSelectorFunc(recoJetSel)
-    recoJetList = recoJetObj.getSelectionIndexList(readTree, recoJetSel)
+    recoJetList = recoJetObj.getSelectionIndexList(readTree, recoJetSelector)
+
+    if logger.isEnabledFor(logging.DEBUG):
+        printStr = ''.join([
+            "\n List of ", 
+            recoObjBranches,
+            " jets after selector: ",
+            recoJetObj.printObjects(recoJetList, JetVarList)
+            ])
+        logger.debug(printStr)
 
     # selection of generated jets
 
-    Veto_fastSimJets_genJet = Veto_fastSimJets['Veto_fastSimJets_genJet']
+    Veto_fastSimJets_genJet = Veto_fastSimJets['genJet']
 
     genObjBranches = Veto_fastSimJets_genJet['branchPrefix']
     genJetObj = cmgObjectSelection.cmgObject(readTree, splitTree, genObjBranches)
 
     if logger.isEnabledFor(logging.DEBUG):
-        printStr = "\n List of " + genObjBranches + " jets before selector: " + \
+        printStr = ''.join([
+            "\n List of ",
+            genObjBranches,
+            " jets before selector: ",
             genJetObj.printObjects(None, JetVarList)
+            ])
         logger.debug(printStr)
 
     genJetSel = Veto_fastSimJets_genJet['genJet']
     genJetSelector = cmgObjectSelection.objSelectorFunc(genJetSel)
-    genJetList = genJetObj.getSelectionIndexList(readTree, genJetSel)
+    genJetList = genJetObj.getSelectionIndexList(readTree, genJetSelector)
+
+    if logger.isEnabledFor(logging.DEBUG):
+        printStr = ''.join([
+            "\n List of ",
+            genObjBranches,
+            " jets after selector: ",
+            genJetObj.printObjects(genJetList, JetVarList)
+            ])
+        logger.debug(printStr)
 
     # compute the criteria
 
@@ -2233,24 +2258,37 @@ def processEventVetoFastSimJets(readTree, splitTree, saveTree, params):
             recoJet_genJet_dR = helpers.dR(recoJetList[recoJetIdx], genJetList[genJetIdx], recoJetObj, genJetObj)
             selector = helpers.evalCutOperator(recoJet_genJet_dR, criteria_dR)
 
+            logger.trace(
+                '\n Reconstructed jet with index %i, generated jet with index %i: recoJet_genJet_dR = %f \n', 
+                recoJetList[recoJetIdx], 
+                genJetList[genJetIdx], 
+                recoJet_genJet_dR
+                )
+
             if selector:
                 matchedRecoJet = True
+                logger.trace('Match True. Break for this reconstructed jet. \n')
                 break
-
+            else:
+                logger.trace('Match False. \n')
+                
         if not matchedRecoJet:
             noMatchedRecoJet = True
+            logger.debug(
+                '\n Reconstructed jet with index %i does not match any generated jet.', recoJetList[recoJetIdx]
+                )
             break
 
     if noMatchedRecoJet:
         saveTree.Flag_veto_event_fastSimJets = 0
         logger.debug(
-            "\n Run:LS:Event %s failed Veto_fastSimJets",
+            "\n Run:LS:Event %s failed Veto_fastSimJets \n",
             run_lumi_evt
             )
     else:
         saveTree.Flag_veto_event_fastSimJets = 1
         logger.trace(
-            "\n Run:LS:Event %s passed Veto_fastSimJets",
+            "\n Run:LS:Event %s passed Veto_fastSimJets \n",
             run_lumi_evt
             )
 
@@ -2299,7 +2337,7 @@ def computeWeight(sample, sumWeight,  splitTree, saveTree, params, xsec=None ):
         "\n    Event weight: %f \n",
         ('Data ' + sample['cmgName'] if isDataSample else 'MC ' + sample['cmgName']),
         target_lumi, genWeight,
-        ('' if isDataSample else 'cross section: ' + str(sample['xsec']) + ' pb^{-1}'),
+        ('' if isDataSample else 'cross section: ' + str(xSection) + ' pb^{-1}'),
         sumWeight, lumiScaleFactor, saveTree.weight)
 
     puWeightDict = params.get('puWeightDict')    
@@ -2551,17 +2589,41 @@ def cmgPostProcessing(argv=None):
         #   prepare for signal scan
         
         if args.processSignalScan:
-        
-            mass_dict = getSamples_rtuple.mass_dict[sample_name]
             
-            logger.debug("\n Mass dictionary: \n \n %s \n ", pprint.pformat(mass_dict)) 
-    
-            if len(mass_dict) ==0:
-                print "Mass dictionary, needed to split signal scan mass points, not available. \nExiting job."
-                raise Exception(
-                    "Mass dictionary, needed to split signal scan mass points, not available. \nExiting job."
+            mass_dict_file = sample.get('mass_dict', None)
+            if mass_dict_file is not None: 
+                if os.path.isfile(mass_dict_file):
+                    mass_dict = pickle.load(open(mass_dict_file, "r"))
+                else:
+                    print "Pickle file {0} with mass dictionary for sample {1} does not exist. \nExiting.".format(
+                        mass_dict_file, sample_cmgName)
+                    raise Exception(
+                        "Pickle file {0} with mass dictionary for sample {1} does not exist. \nExiting.".format(
+                            mass_dict_file, sample_cmgName
+                            )
+                        )
+            else:
+                print "No pickle file defined for mass dictionary of signal scan mass points {0}. \nExiting job".format(
+                    sample_cmgName
                     )
-    
+                raise Exception(
+                    "No pickle file defined for mass dictionary of signal scan mass points {0}. \nExiting job".format(
+                        sample_cmgName
+                        )
+                    )
+
+            logger.info("\n Mass dictionary: \n \n %s \n ", pprint.pformat(mass_dict))
+
+            if len(mass_dict) == 0:
+                print "Empty mass dictionary loaded from pickle file {0} for sample {1}. \nExiting job.".format(
+                    sample_cmgName
+                    )
+                raise Exception(
+                    "Empty mass dictionary loaded from pickle file {0} for sample {1}. \nExiting job.".format(
+                        sample_cmgName
+                        )
+                    )
+
             mstop = args.processSignalScan[0]
             mlsp = args.processSignalScan[1]
             xsec = mass_dict[int(mstop)][int(mlsp)]['xSec']
