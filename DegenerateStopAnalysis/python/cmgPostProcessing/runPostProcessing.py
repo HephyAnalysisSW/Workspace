@@ -58,13 +58,14 @@ sampleSets = {
                                         ["WJetsToLNu_HT100to200_ext",  "--skimLepton=oneLep", "--runChunks", "301", "300"],
                                         ["WJetsToLNu_HT100to200_ext",  "--skimLepton=oneLep", "--runChunks", "401", "500"],
                                         ["WJetsToLNu_HT100to200_ext",  "--skimLepton=oneLep", "--runChunks", "501", "600"],
-                                        ["WJetsToLNu_HT100to200_ext",  "--skimLepton=oneLep", "--runChunks", "601", "642"],
+                                        ["WJetsToLNu_HT100to200_ext",  "--skimLepton=oneLep", "--runChunks", "601", "700"],
                                         
                                         ["WJetsToLNu_HT200to400",      "--skimLepton=oneLep"],
                                         ["WJetsToLNu_HT200to400_ext",  "--skimLepton=oneLep", "--runChunks", "0",   "100"],
                                         ["WJetsToLNu_HT200to400_ext",  "--skimLepton=oneLep", "--runChunks", "101", "200"],
                                         ["WJetsToLNu_HT200to400_ext",  "--skimLepton=oneLep", "--runChunks", "201", "300"],
-                                        ["WJetsToLNu_HT200to400_ext",  "--skimLepton=oneLep", "--runChunks", "301", "343"],
+                                        ["WJetsToLNu_HT200to400_ext",  "--skimLepton=oneLep", "--runChunks", "301", "400"],
+                                        
                                         ["WJetsToLNu_HT400to600",      "--skimLepton=oneLep"],
                                         ["WJetsToLNu_HT600to800",      "--skimLepton=oneLep"],
                                         ["WJetsToLNu_HT800to1200_ext", "--skimLepton=oneLep"],
@@ -88,12 +89,15 @@ sampleSets = {
                             'samples':[
                                         ["TTJets_LO",                   "--skimLepton=oneLep", "--runChunks", "0",   "100"],
                                         ["TTJets_LO",                   "--skimLepton=oneLep", "--runChunks", "101", "200"],
-                                        ["TTJets_LO",                   "--skimLepton=oneLep", "--runChunks", "201", "297"],
+                                        ["TTJets_LO",                   "--skimLepton=oneLep", "--runChunks", "201", "300"],
+                                        
                                         ["TTJets_LO",                   "--skimLepton=oneLep",   "--skimGeneral=lheHTlow" ],
                                         ["TTJets_LO_HT600to800_ext",    "--skimLepton=oneLep",   "--skimGeneral=lheHThigh"],
+                                        
                                         ["TTJets_LO_HT800to1200_ext",   "--skimLepton=oneLep", "--runChunks", "0",   "100"],
                                         ["TTJets_LO_HT800to1200_ext",   "--skimLepton=oneLep", "--runChunks", "101", "200"],
-                                        ["TTJets_LO_HT800to1200_ext",   "--skimLepton=oneLep", "--runChunks", "201", "234"],
+                                        ["TTJets_LO_HT800to1200_ext",   "--skimLepton=oneLep", "--runChunks", "201", "300"],
+                                        
                                         ["TTJets_LO_HT1200to2500_ext",  "--skimLepton=oneLep"],
                                         ["TTJets_LO_HT2500toInf",       "--skimLepton=oneLep"],
                                       ],
@@ -128,12 +132,15 @@ sampleSets = {
                 'dyjets_onelep':{
                             'samples':[
                                         ['DYJetsToLL_M50_HT100to200_ext', "--skimLepton=oneLep", "--runChunks", "0",   "100"],
-                                        ['DYJetsToLL_M50_HT100to200_ext', "--skimLepton=oneLep", "--runChunks", "101", "198"],
+                                        ['DYJetsToLL_M50_HT100to200_ext', "--skimLepton=oneLep", "--runChunks", "101", "200"],
+                                        
                                         ['DYJetsToLL_M50_HT200to400_ext', "--skimLepton=oneLep", "--runChunks", "0",   "100"],
                                         ['DYJetsToLL_M50_HT200to400_ext', "--skimLepton=oneLep", "--runChunks", "101", "200"],
-                                        ['DYJetsToLL_M50_HT200to400_ext', "--skimLepton=oneLep", "--runChunks", "201", "233"],
+                                        ['DYJetsToLL_M50_HT200to400_ext', "--skimLepton=oneLep", "--runChunks", "201", "300"],
+                                        
                                         ['DYJetsToLL_M50_HT400to600_ext', "--skimLepton=oneLep", "--runChunks", "0",   "100"],
-                                        ['DYJetsToLL_M50_HT400to600_ext', "--skimLepton=oneLep", "--runChunks", "101", "192"],
+                                        ['DYJetsToLL_M50_HT400to600_ext', "--skimLepton=oneLep", "--runChunks", "101", "200"],
+                                        
                                         ['DYJetsToLL_M50_HT600toInf',     "--skimLepton=oneLep"],
                                         ['DYJetsToLL_M50_HT600toInf_ext', "--skimLepton=oneLep"],
 
@@ -314,7 +321,7 @@ sampleSets = {
                                         ["SingleMuon_Run2016B_PromptReco_v2",   "--skimLepton=oneLep",   "--runChunks", "0" ,   "200" ], 
                                         ["SingleMuon_Run2016B_PromptReco_v2",   "--skimLepton=oneLep",   "--runChunks", "201",  "400" ], 
                                         ["SingleMuon_Run2016B_PromptReco_v2",   "--skimLepton=oneLep",   "--runChunks", "401",  "600" ], 
-                                        ["SingleMuon_Run2016B_PromptReco_v2",   "--skimLepton=oneLep",   "--runChunks", "601",  "800" ], #not up to 810? 
+                                        ["SingleMuon_Run2016B_PromptReco_v2",   "--skimLepton=oneLep",   "--runChunks", "601",  "800" ],
                                         ["SingleMuon_Run2016B_PromptReco_v2",   "--skimLepton=oneLep",   "--runChunks", "801",  "1000"], 
                                         ["SingleMuon_Run2016B_PromptReco_v2",   "--skimLepton=oneLep",   "--runChunks", "1001", "1200"], 
                                       ]},
@@ -325,13 +332,14 @@ sampleSets = {
                                         ["SingleMuon_Run2016C_PromptReco_v2",   "--skimLepton=oneLep",   "--runChunks", "101", "200"], 
                                         ["SingleMuon_Run2016C_PromptReco_v2",   "--skimLepton=oneLep",   "--runChunks", "201", "300"], 
                                         ["SingleMuon_Run2016C_PromptReco_v2",   "--skimLepton=oneLep",   "--runChunks", "301", "400"], 
-                                    ] },
+                                      ]},
                 
                 'data_mu_d_onelep':{
                             'samples':[
                                         ["SingleMuon_Run2016D_PromptReco_v2",   "--skimLepton=oneLep",   "--runChunks", "0",   "100"],     
                                         ["SingleMuon_Run2016D_PromptReco_v2",   "--skimLepton=oneLep",   "--runChunks", "101", "200"],     
                                         ["SingleMuon_Run2016D_PromptReco_v2",   "--skimLepton=oneLep",   "--runChunks", "201", "300"],     
+                                        ["SingleMuon_Run2016D_PromptReco_v2",   "--skimLepton=oneLep",   "--runChunks", "301", "400"],     
                                         ["SingleMuon_Run2016D_PromptReco_v2",   "--skimLepton=oneLep",   "--runChunks", "401", "500"],     
                                         ["SingleMuon_Run2016D_PromptReco_v2",   "--skimLepton=oneLep",   "--runChunks", "501", "600"],     
                                      ]},
