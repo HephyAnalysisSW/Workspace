@@ -62,64 +62,7 @@ sampleFractions = { s:sampleMCFraction(s) for s in  sigs +[w,tt] }
 #   print align.format(*titles2)
 
 
-#from Workspace.DegenerateStopAnalysis.tools.degTools import fixForLatex
 
-def makeSimpleLatexTable( table_list , texDir, pdfDir, caption="" , align_char = 'c|'):
-    #\\begin{document}
-    #\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}
-    #{\\begin{tabular}{%s}
-    #\hline
-    header = \
-    """
-\documentclass[12pt]{paper}
-\usepackage{a4}
-%%\usepackage[usenames,dvipnames]{color}
-\usepackage{amssymb,amsmath}
-\usepackage{amsfonts}
-\usepackage{epsfig,graphics,graphicx,graphpap,color}
-\usepackage{slashed,xspace,setspace}
-\usepackage{caption}
-\usepackage{rotating}
-\usepackage{fullpage}
-\usepackage[top=0.83in]{geometry}
-\usepackage{longtable}
-\usepackage{multirow}
-\usepackage{hhline}
-\\begin{document}
-\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}
-{\\begin{tabular}{%s}
-    """%( align_char *len(table_list[1]))
-
-    body = ""
-    first_line = True
-    for row in table_list:
-        
-        body += " & ".join([ "%s"%fixForLatex( str(x)) for x in row]) #+ "\\\ \n"
-        if len(row)>1:
-            body += "\\\ "
-
-        body += "\n"
-
-        if first_line and len(row)>1:
-            body+= "\hline\n"
-            first_line = False
-
-    footer = \
-    """
-\end{tabular}}
-\end{center}\caption*{%s}\end{table}\end{document}
-    """%caption
-    
-    table = header + body + footer
-
-    f = open(texDir, 'w')
-    f.write( table)
-    f.close()
-
-    #os.system("pdflatex -output-directory=%s %s"%(pdfDir, texDir))
-    pdfLatex(texDir , pdfDir ) 
-
-    return header + body + footer
 
 
 def fix_region_name(name):
@@ -144,47 +87,48 @@ corrected_yields = {}
 
 
 
-regions =\
-['MTa_ECR1_neg_PTCR',
- 'MTa_ECR1_neg_PTSR',
- 'MTa_ECR1_pos_PTCR',
- 'MTa_ECR1_pos_PTSR',
- 'MTa_ESR1_neg_PTCR',
- 'MTa_ESR1_neg_PTSR',
- 'MTa_ESR1_pos_PTCR',
- 'MTa_ESR1_pos_PTSR',
- 'MTb_ECR1_neg_PTCR',
- 'MTb_ECR1_neg_PTSR',
- 'MTb_ECR1_pos_PTCR',
- 'MTb_ECR1_pos_PTSR',
- 'MTb_ESR1_neg_PTCR',
- 'MTb_ESR1_neg_PTSR',
- 'MTb_ESR1_pos_PTCR',
- 'MTb_ESR1_pos_PTSR',
- 'MTc_ECR1_neg_PTCR',
- 'MTc_ECR1_neg_PTSR',
- 'MTc_ECR1_pos_PTCR',
- 'MTc_ECR1_pos_PTSR',
- 'MTc_ESR1_neg_PTCR',
- 'MTc_ESR1_neg_PTSR',
- 'MTc_ESR1_pos_PTCR',
- 'MTc_ESR1_pos_PTSR',
- 'BCR2_PTCR',
- 'BCR2_PTSR',
- 'BCR2_neg_PTCR',
- 'BCR2_neg_PTSR',
- 'BCR2_pos_PTCR',
- 'BCR2_pos_PTSR']
+#regions =\
+#['MTa_ECR1_neg_PTCR',
+# 'MTa_ECR1_neg_PTSR',
+# 'MTa_ECR1_pos_PTCR',
+# 'MTa_ECR1_pos_PTSR',
+# 'MTa_ESR1_neg_PTCR',
+# 'MTa_ESR1_neg_PTSR',
+# 'MTa_ESR1_pos_PTCR',
+# 'MTa_ESR1_pos_PTSR',
+# 'MTb_ECR1_neg_PTCR',
+# 'MTb_ECR1_neg_PTSR',
+# 'MTb_ECR1_pos_PTCR',
+# 'MTb_ECR1_pos_PTSR',
+# 'MTb_ESR1_neg_PTCR',
+# 'MTb_ESR1_neg_PTSR',
+# 'MTb_ESR1_pos_PTCR',
+# 'MTb_ESR1_pos_PTSR',
+# 'MTc_ECR1_neg_PTCR',
+# 'MTc_ECR1_neg_PTSR',
+# 'MTc_ECR1_pos_PTCR',
+# 'MTc_ECR1_pos_PTSR',
+# 'MTc_ESR1_neg_PTCR',
+# 'MTc_ESR1_neg_PTSR',
+# 'MTc_ESR1_pos_PTCR',
+# 'MTc_ESR1_pos_PTSR',
+# 'BCR2_PTCR',
+# 'BCR2_PTSR',
+# 'BCR2_neg_PTCR',
+# 'BCR2_neg_PTSR',
+# 'BCR2_pos_PTCR',
+# 'BCR2_pos_PTSR']
 
 
-
+regions = yld.cutNames 
 region_names = sorted( list( set( [x.replace("_PTSR","").replace("_PTCR","") for x in regions] )) )
 
 tt_region_names = [x for x in region_names if "BCR2" in x]
-w_region_names = [x for x in region_names if "ECR1" in x]
+sr1_region_names = [x for x in region_names if "ECR1" in x]
 
+sr2_regions_names = [x for x in region_names if 'BCR1' in x or 'ECR2' in x]
 
-
+w_region_names = sr1_region_names+sr2_regions_names
 
 ##FIX ME
 #regions = yld.cutNames
@@ -281,7 +225,7 @@ for region_name in tt_region_names:
 
 
 
-tt_table = makeSimpleLatexTable( tt_table_list, "TTPtShape.tex", cfg.saveDir)
+tt_table = makeSimpleLatexTable( tt_table_list, "TTPtShape.tex", cfg.saveDirs[side_band_name])
 
 
 tt_region_cr = "BCR2_PTCR"
@@ -444,7 +388,7 @@ for region_name in w_region_names:
 
 
 
-w_table = makeSimpleLatexTable( w_table_list, "WPtShape.tex", cfg.saveDir)
+w_table = makeSimpleLatexTable( w_table_list, "WPtShape.tex", cfg.saveDirs[side_band_name])
 
 print tt_table
 print w_table

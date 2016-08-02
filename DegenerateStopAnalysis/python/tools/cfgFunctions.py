@@ -480,19 +480,21 @@ def bkg_est(cfg, args):
         JinjaTexTable( yields[cut_name], pdfDir = tableDir, outputName = yields[cut_name].tableName+"FOM_CombinedBKG_T.tex", caption="" , noFOM=False, transpose=False , combineBkgs = combineBkgs , seperators = seperators)
         #drawYields( cut_name , cfg.yieldPkls[cut_name] , sampleList = cfg.bkgList  + ['s300_290' , 's300_270','s300_220'] , keys=[] , ratios=True , save= cfg.cutSaveDirs[cut_name] )
         
-        yldplts = []
+        yldplts = {}
 
-        yldplt1 = drawYields("BkgComp_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList , ratios= False, save=cfg.saveDirs[cut_name], normalize = True, logs = [0,0], plotMin=0, plotMax = 1.)
-        yldplt2 = drawYields("BkgVsData_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList + dataList, ratios= True, save=cfg.saveDirs[cut_name], normalize = False, logs = [0,0], plotMin=0)
-        yldplt3 = drawYields("BkgVsData_log_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList + dataList, ratios= True, save=cfg.saveDirs[cut_name], normalize = False, logs = [0,1], plotMin=0.1)
-        yldplt4 = drawYields("BkgVsSig_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList + cfg.signalList, ratios= True, save=cfg.saveDirs[cut_name], normalize = False, logs = [0,1], plotMin=0.1)
-        yldplt5 = drawYields("BksVsDataVsSignal_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList + dataList + cfg.signalList , ratios= True, save=cfg.saveDirs[cut_name], normalize = False, logs = [0,1], plotMin=0.1)
+        yldplts[1] = drawYields("BkgComp_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList , ratios= False, save=cfg.saveDirs[cut_name], normalize = True, logs = [0,0], plotMin=0, plotMax = 1.)
+        yldplts[2] = drawYields("BkgVsData_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList + dataList, ratios= True, save=cfg.saveDirs[cut_name], normalize = False, logs = [0,0], plotMin=0)
+        yldplts[3] = drawYields("BkgVsData_log_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList + dataList, ratios= True, save=cfg.saveDirs[cut_name], normalize = False, logs = [0,1], plotMin=0.1)
+
+        if cfg.signalList:
+            yldplts[4] = drawYields("BkgVsSig_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList + cfg.signalList, ratios= True, save=cfg.saveDirs[cut_name], normalize = False, logs = [0,1], plotMin=0.1)
+            yldplts[5] = drawYields("BksVsDataVsSignal_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList + dataList + cfg.signalList , ratios= True, save=cfg.saveDirs[cut_name], normalize = False, logs = [0,1], plotMin=0.1)
 
         crbins = [x for x in yields[cut_name].cutNames if 'ECR' in x]
 
-        yldplt6 = drawYields("BkgVsData_ECR_log_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList + dataList, keys=crbins, ratios= True, save=cfg.saveDirs[cut_name], normalize = False, logs = [0,1], plotMin=0.1)
+        yldplts[6] = drawYields("BkgVsData_ECR_log_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList + dataList, keys=crbins, ratios= True, save=cfg.saveDirs[cut_name], normalize = False, logs = [0,1], plotMin=0.1)
 
-        yldplts = [ yldplt1,yldplt2, yldplt3, yldplt4, yldplt5, yldplt6 ]
+        #yldplts = [ yldplt1,yldplt2, yldplt3, yldplt4, yldplt5, yldplt6 ]
 
 
         yld = yields[cut_name] 
@@ -632,7 +634,7 @@ def data_plots(cfg,args):
 
         plt = drawPlots(cfg.samples,    cfg.plots , cutInst, sampleList = sampleList , # [ 'qcd','z','dy','tt','w','s300_250','s250_230' , 'dblind'],
                 plotList= [plot] ,save= plotDir, plotMin=plotMin,
-                normalize=False, denoms=["bkg"], noms=[data], fom="RATIO", fomLimits=[0,2.8])
+                normalize=False, denoms=["bkg"], noms=[data], fom="RATIO", fomLimits=[0,1.8])
         #plt = None
 
         print '\n==============================================================\n'

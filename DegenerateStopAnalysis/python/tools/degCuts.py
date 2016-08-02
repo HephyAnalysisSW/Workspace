@@ -558,14 +558,20 @@ class Cuts():
                             ) 
 
 
+        esr1      =  "(min(met, ht_basJet - 100 ) > 300)"
+        ecr1      =  "((min(met, ht_basJet - 100) < 300 )&&(min(met, ht_basJet - 100) > 200 ))"
+        esr2      =  "(min(met, Jet_pt[IndexJet_isrJet[0]] - 25 ) > 300)"
+        ecr2      =  "((min(met, Jet_pt[IndexJet_isrJet[0]] - 25) < 300 )&&(min(met, Jet_pt[IndexJet_isrJet[0]] - 25) > 200 ))"
 
 
 
+        ##
+        ##  W SideBands
+        ##
 
-        
-
-
-
+        #
+        #   sr1 side bands
+        #    
 
         def makeSR1SideBand( side_band_cut_name, side_band_cut, mt, charge, pt,  baseCut=self.presel ):
             cutLists= [ [side_band_cut_name, side_band_cut ] ]
@@ -638,16 +644,65 @@ class Cuts():
                             )
 
 
+        #
+        #   sr1 side bands
+        #    
         
 
+        def makeSR2SideBand( side_band_cut_name, side_band_cut,  pt,  baseCut=self.presel ):
+            cutLists= [ [side_band_cut_name, side_band_cut ] ]
+            cutLists.extend(      [
+                                      #["Veto Soft BJet",veto_soft_bjet],
+                                      #["Veto Hard BJet",veto_hard_bjet],
+                                      #["Veto BJet" , veto_bjet ] , 
+                                      #["{lep}Eta1.5".format(lep=lep.title()),"abs({lepCol}_eta[{lepIndex}[0]])<1.5".format(lepCol=lepCollection, lepIndex=lepIndex)],
+                                    ]
+                            )
+
+            if pt == "sr":
+                cutLists.append(    ["{lep}Pt_lt_30".format(lep=lep.title()),"{lepCol}_pt[{lepIndex}[0]]<30".format(lepCol=lepCollection, lepIndex=lepIndex)]  )
+            if pt == "cr":
+                cutLists.append(    ["{lep}Pt_gt_30".format(lep=lep.title()),"{lepCol}_pt[{lepIndex}[0]]>30".format(lepCol=lepCollection, lepIndex=lepIndex)]  )
+            else:
+                pass
+
+            return CutClass(  side_band_cut_name + "_PT%s"%(pt.upper()), cutLists, baseCut=baseCut)
+    
+
+
+        pts = ["sr","cr"]
+        sr2_side_band_cuts  = [ 
+                                #["ESR2", "min(met, ht_basJet - 100 ) > 300"],
+                                ["ECR2", " (min(met, Jet_pt[IndexJet_isrJet[0]] - 25) < 300 )&&(min(met, Jet_pt[IndexJet_isrJet[0]] - 25) > 200 )"],
+                                ["BCR1",  crtt1_bjet ],
+                                ["BCR1_ESR1","(%s) && (%s)"%(crtt1_bjet, esr1 )],
+                                ["BCR1_ESR2","(%s) && (%s)"%(crtt1_bjet, esr2 )],
+
+                          ]
+
+        self.sr2_side_band_dict = { }
+        self.sr2_side_bands     = { }
+        for side_band_cut_name, side_band_cut in sr2_side_band_cuts:
+            for pt in pts:
+                side_band = side_band_cut_name + "_PT%s"%(pt.upper()) 
+                self.sr2_side_band_dict[side_band] = {'side_band_cut_name':side_band_cut_name, 'side_band_cut':side_band_cut, 'pt':pt}
+                self.sr2_side_bands[side_band] = makeSR2SideBand(**self.sr2_side_band_dict[side_band]) 
+
+
+
+        self.sr2SideBands = CutClass( "sr2SideBands",
+                                      [ [sb, sbInst.inclCombined] for  sb, sbInst in sorted( self.sr2_side_bands.iteritems() ) ]  
+                            ,
+                            baseCut = self.presel
+                            )
 
 
         ##
-        ##  SR2SideBands
+        ##  TT SideBands
         ##
 
         # do the same with crtt, split in mt, charge etc
-        def makeSR2SideBand( side_band_cut_name, side_band_cut, mt, charge, pt,  baseCut=self.presel ):
+        def makeTTSideBand( side_band_cut_name, side_band_cut, mt, charge, pt,  baseCut=self.presel ):
             cutLists= [ [side_band_cut_name, side_band_cut ] ]
             cutLists.extend(      [
                                       #["2 or more BJets", two_or_more_bjet],
@@ -690,30 +745,31 @@ class Cuts():
         #charges = ["neg", "pos", ""]
         mtabc   = [""]
         charges = ["pos", "neg", ""]
-        sr2_side_band_cuts  = [ 
+        tt_side_band_cuts  = [ 
                                 #["ESR1", "min(met, ht_basJet - 100 ) > 300"],
                                 #["ECR1", "(min(met, ht_basJet - 100) < 300 )&&(min(met, ht_basJet - 100) > 200 )"],
                                 #["ESR2", "min(met, Jet_pt[IndexJet_isrJet[0]] - 25 ) > 300"],
                                 #["ECR2", "(min(met, Jet_pt[IndexJet_isrJet[0]] - 25) < 300 )&&(min(met, Jet_pt[IndexJet_isrJet[0]] - 25) > 200 )"],
                                 ["BCR2", "(1)"],
+                                #["{lep}Eta1.5".format(lep=lep.title()),"abs({lepCol}_eta[{lepIndex}[0]])<1.5".format(lepCol=lepCollection, lepIndex=lepIndex)],
                           ]
 
 
-        self.sr2_side_band_dict = { }
-        self.sr2_side_bands     = { }
-        sr2_side_band_legend = []
+        self.tt_side_band_dict = { }
+        self.tt_side_bands     = { }
+        tt_side_band_legend = []
         for mt_ in mtabc:
-            for side_band_cut_name, side_band_cut in sr2_side_band_cuts:
+            for side_band_cut_name, side_band_cut in tt_side_band_cuts:
                 for charge in charges:
                     for pt in pts:
                         side_band = ("MT%s_"%mt_ if mt_ else "")  + side_band_cut_name + ("_%s"%charge if charge else "") +"_PT%s"%(pt.upper()) 
-                        self.sr2_side_band_dict[side_band] = {'side_band_cut_name':side_band_cut_name, 'side_band_cut':side_band_cut, 'mt':mt_, 'charge':charge, 'pt':pt}
+                        self.tt_side_band_dict[side_band] = {'side_band_cut_name':side_band_cut_name, 'side_band_cut':side_band_cut, 'mt':mt_, 'charge':charge, 'pt':pt}
                         #print self.side_band_dict
-                        self.sr2_side_bands[side_band] = makeSR2SideBand(**self.sr2_side_band_dict[side_band]) 
+                        self.tt_side_bands[side_band] = makeTTSideBand(**self.tt_side_band_dict[side_band]) 
 
 
-        self.sr2SideBands = CutClass( "sr2SideBands",
-                                      [ [sb, sbInst.inclCombined] for  sb, sbInst in sorted( self.sr2_side_bands.iteritems() ) ]  
+        self.ttSideBands = CutClass( "ttSideBands",
+                                      [ [sb, sbInst.inclCombined] for  sb, sbInst in sorted( self.tt_side_bands.iteritems() ) ]  
                             ,
                             baseCut = self.presel
                             )
@@ -721,15 +777,16 @@ class Cuts():
 
         self.sideBands = CutClass( "sideBands",
                                       [ [sb, sbInst.inclCombined] for  sb, sbInst in sorted( self.sr1_side_bands.iteritems() ) ] + 
-                                      [ [sb, sbInst.inclCombined] for  sb, sbInst in sorted( self.sr2_side_bands.iteritems() ) ]  
+                                      [ [sb, sbInst.inclCombined] for  sb, sbInst in sorted( self.sr2_side_bands.iteritems() ) ] +
+                                      [ [sb, sbInst.inclCombined] for  sb, sbInst in sorted( self.tt_side_bands.iteritems()  ) ] 
                             ,
                             baseCut = self.presel
                             )
 
 
-        #self.sr2SideBands = CutClass("sr2SideBands",[], baseCut = self.presel)
-        #self.sr2SideBands.add( self.crtt2    , 'inclCombinedList' )
-        #self.sr2SideBands.add( self.crtt1    , 'inclCombinedList' )
+        #self.ttSideBands = CutClass("ttSideBands",[], baseCut = self.presel)
+        #self.ttSideBands.add( self.crtt2    , 'inclCombinedList' )
+        #self.ttSideBands.add( self.crtt1    , 'inclCombinedList' )
         
 
 

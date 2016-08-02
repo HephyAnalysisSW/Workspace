@@ -168,7 +168,6 @@ def getTerminalSize():
             pass
     if not cr:
         cr = (env.get('LINES', 25), env.get('COLUMNS', 80))
-
         ### Use get(key[, default]) instead of a try/catch
         #try:
         #    cr = (env['LINES'], env['COLUMNS'])
@@ -661,8 +660,10 @@ def makeLegend(samples, hists, sampleList, plot, name="Legend",loc=[0.6,0.6,0.9,
     leg.SetFillColorAlpha(0,0.001)
     leg.SetBorderSize(borderSize)
 
+
     for samp in sampleList:
-        leg.AddEntry(hists[samp][plot], samples[samp].name , legOpt)    
+        legOpt_ = "lep" if samples[samp]['isData'] else legOpt
+        leg.AddEntry(hists[samp][plot], samples[samp].name , legOpt_)    
     return leg
 
 def getPlotFromYields(name, yields, keys=[]):
@@ -947,11 +948,12 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
             
             bkgLegList.reverse()
             sigLegList.reverse()
+            bkgLegList += dataList
             #bkgLeg = makeLegend(samples, hists, bkgLegList, p, loc=[0.7,0.7,0.87,0.87], name="Legend_bkgs_%s_%s"%(cut.name, p), legOpt="f")
             #bkgLeg.Draw()
             #ret['legs'].append(bkgLeg)
             legy = [0.7, 0.87 ]
-            legx = [0.7, 0.95 ]  
+            legx = [0.75, 0.95 ]  
             nBkgInLeg = 4
             if any_in(sampleList, bkgLegList):
                 subBkgLists = [ bkgLegList[x:x+nBkgInLeg] for x in range(0,len(bkgLegList),nBkgInLeg) ]
@@ -1524,7 +1526,10 @@ def getEfficiency(samples,samp, plot, cutInst_pass, cutInst_tot ,ret = False ):
     if ret:
         return h_eff
 
-def makeStopLSPPlot(name, massDict, title="", bins = [13,87.5,412.5, 75, 17.5, 392.5 ] , key=None, func=None,setbin=False ):
+ 
+#[ len(mstops), min(mstops) - 0.5*dstops , max(mstops) + 0.5*dstops, (max(mstops) + min(dms) - ( min(stops)-max(dms))) /5.  ,min(stops)-max(dms)-5 , max(mstops) + min(dms)+5 ) ]
+
+def makeStopLSPPlot(name, massDict, title="", bins = [23,87.5,662.5, 127 , 17.5, 642.5] , key=None, func=None,setbin=False ):
     """
     massDict should be of the form {    
                                     stopmass1: { lsp_mass_1: a, lsp_mass_2: b ... },
@@ -1955,13 +1960,13 @@ def decide_cut( sample, cut, plot=None, nMinus1=None):
     #print '----------------------'
     for sf in sfs:
         if sf in new_cut:
-            print ' found sf: %s in cut_str, \n%s'%(sf,new_cut)
+            #print ' found sf: %s in cut_str, \n%s'%(sf,new_cut)
             if sample.isData:
                 new_cut = new_cut.replace(sf, sf_to_btag[sf])
-                print 'replacing sf: %s , with %s'%(sf, sf_to_btag[sf])
+                #print 'replacing sf: %s , with %s'%(sf, sf_to_btag[sf])
             else:
                 new_cut = new_cut.replace(sf, "(1)")
-                print 'replacing sf: %s , with %s'%(sf, "(1)") 
+                #print 'replacing sf: %s , with %s'%(sf, "(1)") 
             modified = True 
     return new_cut
 
@@ -2838,6 +2843,71 @@ def pdfLatex(texFile, pdfDir, removeJunk = True):
         out = pdfDir+"/"+os.path.basename( texFile ) 
         os.system("rm %s"%out.replace(".tex",".aux"))
         os.system("rm %s"%out.replace(".tex",".log"))
+
+
+
+
+def makeSimpleLatexTable( table_list , texName, outDir, caption="" , align_char = 'c|'):
+    #\\begin{document}
+    #\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}
+    #{\\begin{tabular}{%s}
+    #\hline
+    header = \
+    """
+\documentclass[12pt]{paper}
+\usepackage{a4}
+%%\usepackage[usenames,dvipnames]{color}
+\usepackage{amssymb,amsmath}
+\usepackage{amsfonts}
+\usepackage{epsfig,graphics,graphicx,graphpap,color}
+\usepackage{slashed,xspace,setspace}
+\usepackage{caption}
+\usepackage{rotating}
+\usepackage{fullpage}
+\usepackage[top=0.83in]{geometry}
+\usepackage{longtable}
+\usepackage{multirow}
+\usepackage{hhline}
+\\begin{document}
+\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}
+{\\begin{tabular}{%s}
+    """%( align_char *len(table_list[1]))
+
+    body = ""
+    first_line = True
+    for row in table_list:
+        
+        body += " & ".join([ "%s"%fixForLatex( str(x)) for x in row]) #+ "\\\ \n"
+        if len(row)>1:
+            body += "\\\ "
+
+        body += "\n"
+
+        if first_line and len(row)>1:
+            body+= "\hline\n"
+            first_line = False
+
+    footer = \
+    """
+\end{tabular}}
+\end{center}\caption*{%s}\end{table}\end{document}
+    """%caption
+    
+    table = header + body + footer
+
+    texFile = outDir+"/"+texName
+    f = open( texFile, 'w')
+    f.write( table)
+    f.close()
+
+    #os.system("pdflatex -output-directory=%s %s"%(pdfDir, texDir))
+    pdfLatex(texFile , outDir ) 
+
+    return header + body + footer
+
+
+
+
 
 ############################## Stop LSP Stuff
 
