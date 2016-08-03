@@ -6,6 +6,7 @@ import Workspace.DegenerateStopAnalysis.toolsMateusz.ROOToptions
 from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
 from Workspace.DegenerateStopAnalysis.tools.degTools import CutClass, Plots, getPlots, drawPlots, Yields, setup_style
+from Workspace.DegenerateStopAnalysis.tools.bTagWeights import bTagWeights
 from Workspace.DegenerateStopAnalysis.tools.getSamples_8011 import getSamples
 from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesPostProcessed_mAODv2_2016 import cmgTuplesPostProcessed
 
@@ -26,6 +27,7 @@ parser.add_argument("--afterEmul", dest = "afterEmul",  help = "afterEmul plot",
 parser.add_argument("--leptons", dest = "leptons",  help = "Extra lepton distributions", type = int, default = 1)
 parser.add_argument("--peak", dest = "peak",  help = "Z-peak selection", type = int, default = 0)
 parser.add_argument("--doYields", dest = "doYields",  help = "Calulate yields", type = int, default = 1)
+parser.add_argument("--btag", dest = "btag",  help = "B-tagging option", type = str, default = "")
 parser.add_argument("--getData", dest = "getData",  help = "Get data samples", type = int, default = 1)
 parser.add_argument("--plot", dest = "plot",  help = "Toggle plot", type = int, default = 0)
 parser.add_argument("--logy", dest = "logy",  help = "Toggle logy", type = int, default = 1)
@@ -49,6 +51,7 @@ peak = args.peak
 #METcut = args.MET
 #HTcut = args.HT
 doYields = args.doYields
+btag = args.btag
 getData = args.getData
 plot = args.plot
 logy = args.logy
@@ -78,6 +81,9 @@ if verbose:
 #Save
 if save: #web address: http://www.hephy.at/user/mzarucki/plots
    savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/Zinv"
+   
+   savedir += "/" + btag
+   
    savedir += "/" + SR
    
    savedir1 = savedir + "/beforeEmul"
@@ -146,6 +152,10 @@ def regions(ind):
       'SRV1c':["SRV1c", combineCuts("LepAll_mt[" + ind + "] > 95", btw("LepAll_pt[" + ind + "]", 20, 30))]}
    return SRs
 
+#btag weights
+bWeightDict = bTagWeights(btag)
+bTagString = bWeightDict['sr1_bjet']
+
 #SRs
 ind_el = "IndexLepAll_el[0]"
 ind_mu = "IndexLepAll_mu[2]"
@@ -165,7 +175,7 @@ else:
 dimuon = CutClass("dimuon", [
    ["ISR100", "nIsrJet >= 1"],
    ["TauVeto","Sum$(TauGood_idMVANewDM && TauGood_pt > 20) == 0"],
-   ["BVeto","nBSoftJet == 0 && nBHardJet == 0"],
+   ["BVeto", bTagString],
    ["No3rdJet60","nVetoJet <= 2"],
    ["2mu", "nLepAll_mu >= 2"], 
     

@@ -2,9 +2,8 @@ import ROOT
 from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYieldFromChain, getChunks
 from Workspace.DegenerateStopAnalysis.tools.Sample import Sample, Samples
 from Workspace.DegenerateStopAnalysis.tools.colors import colors
-#import Workspace.DegenerateStopAnalysis.cmgTuplesPostProcessed_mAODv2_scan as cmgTuplesPostProcessed
 from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesPostProcessed_mAODv2_2016 import cmgTuplesPostProcessed
-from Workspace.DegenerateStopAnalysis.tools.weights import weights, def_weights, Weight
+from Workspace.DegenerateStopAnalysis.tools.weights_pu2_btag import weights, def_weights, Weight
 import os
 import re
 import glob
@@ -16,12 +15,10 @@ import pprint as pp
 
 
 lumis = { 
-            'target_lumi'         :   7900.   ,   
-            'DataBlind_lumi'      :   8538.0    , 
-            'DataUnblind_lumi'    :   804.2   ,
+            'target_lumi'         :   10000.,
+            'DataBlind_lumi'      :   12434,
+            'DataUnblind_lumi'    :   804.2,
             #'mc_lumi':10000, 
-            #'lumi_data_blinded':2245.386, 
-            #'lumi_data_unblinded':139.63,
         }
 
 data_triggers_list = [
@@ -46,8 +43,6 @@ mc_filters_list = [
                       'Flag_badChargedHadronFilter',
                       'Flag_badMuonFilter',
                   ]
-
-
 
 import pickle
 #mass_dict_pickle = "/afs/hephy.at/user/n/nrad/CMSSW/fork/CMSSW_7_4_12_patch4/src/Workspace/DegenerateStopAnalysis/cmgPostProcessing/mass_dict_all.pkl"
@@ -131,16 +126,16 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
          SingleMuDataBlind = getChain(cmgPP.SingleMu_v2[skim],histname='')
          SingleMuDataUnblind  = SingleMuDataBlind#.CopyTree("run<=274240") #instead cut on run # is applied
          sampleDict.update({
-               "d1mu":     {'name':"SingleMuDataUnblind", 'sample':cmgPP.SingleMu_v2[skim], 'tree':SingleMuDataUnblind, 'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":"HLT_IsoMu27", "filters":data_filters, 'lumi': lumi_data_unblinded, 'cut':"run<=274240"},
-               "d1muBlind":{'name':"SingleMuDataBlind",   'sample':cmgPP.SingleMu_v2[skim], 'tree':SingleMuDataBlind,   'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":"HLT_IsoMu27", "filters":data_filters, 'lumi': lumi_data_blinded},
+               "d1mu":     {'name':"SingleMuDataUnblind", 'sample':cmgPP.SingleMu_v2[skim], 'tree':SingleMuDataUnblind, 'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":data_triggers, "filters":data_filters, 'lumi': lumi_data_unblinded, 'cut':"run<=274240"},
+               "d1muBlind":{'name':"SingleMuDataBlind",   'sample':cmgPP.SingleMu_v2[skim], 'tree':SingleMuDataBlind,   'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":data_triggers, "filters":data_filters, 'lumi': lumi_data_blinded},
             })
 
       elif "d1el" in sampleList or "d1elBlind" in sampleList:
          SingleElDataBlind = getChain(cmgPP.SingleEl_v2[skim],histname='')
          SingleElDataUnblind  = SingleElDataBlind#.CopyTree("run<=274240") #instead cut on run # is applied
          sampleDict.update({
-               "d1el":     {'name':"SingleElDataUnblind", 'sample':cmgPP.SingleEl_v2[skim], 'tree':SingleElDataUnblind, 'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":"1", "filters":data_filters, 'lumi': lumi_data_unblinded, 'cut':"run<=274240"},
-               "d1elBlind":{'name':"SingleElDataBlind",   'sample':cmgPP.SingleEl_v2[skim], 'tree':SingleElDataBlind,   'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":"1", "filters":data_filters, 'lumi': lumi_data_blinded},
+               "d1el":     {'name':"SingleElDataUnblind", 'sample':cmgPP.SingleEl_v2[skim], 'tree':SingleElDataUnblind, 'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":data_triggers, "filters":data_filters, 'lumi': lumi_data_unblinded, 'cut':"run<=274240"},
+               "d1elBlind":{'name':"SingleElDataBlind",   'sample':cmgPP.SingleEl_v2[skim], 'tree':SingleElDataBlind,   'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":data_triggers, "filters":data_filters, 'lumi': lumi_data_blinded},
             })
       else: # "d" in sampleList or "dblind" in sampleList:
          MET = getChain(cmgPP.MET_v2[skim],histname='')
@@ -241,9 +236,5 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
       sampleDict2[samp] = Sample(**sampleDict[samp])
    
    samples = Samples(**sampleDict2)
-   
-   for samp_name, sample in samples.iteritems():
-      if not sample.isData:
-         sample.filters = mc_filters
    
    return samples

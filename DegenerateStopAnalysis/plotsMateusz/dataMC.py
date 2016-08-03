@@ -6,6 +6,8 @@ import Workspace.DegenerateStopAnalysis.toolsMateusz.ROOToptions
 from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
 from Workspace.DegenerateStopAnalysis.tools.degTools import CutClass, Plots, getPlots, drawPlots, Yields, setup_style
+from Workspace.DegenerateStopAnalysis.tools.bTagWeights import bTagWeights
+#from Workspace.DegenerateStopAnalysis.tools.degCuts import *
 from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesPostProcessed_mAODv2_2016 import cmgTuplesPostProcessed
 from Workspace.DegenerateStopAnalysis.tools.getSamples_8011 import getSamples
 
@@ -18,6 +20,7 @@ setup_style()
 #Input options
 parser = argparse.ArgumentParser(description = "Input options")
 parser.add_argument("--getData", dest = "getData",  help = "Get data samples", type = int, default = 1)
+parser.add_argument("--btag", dest = "btag",  help = "B-tagging option", type = str, default = "btag")
 parser.add_argument("--logy", dest = "logy",  help = "Toggle logy", type = int, default = 1)
 parser.add_argument("--save", dest = "save",  help = "Toggle save", type = int, default = 1)
 parser.add_argument("--verbose", dest = "verbose",  help = "Verbosity switch", type = int, default = 0)
@@ -31,6 +34,7 @@ if not len(sys.argv) > 1:
 
 #Arguments
 getData = args.getData
+btag = args.btag
 logy = args.logy
 save = args.save
 verbose = args.verbose
@@ -55,15 +59,11 @@ if verbose:
       else: 
          print "!!! Sample " + sample + " unavailable."
          sys.exit(0)
-   
-   collection = "LepAll" 
-   print makeLine()
-   print "Using " + collection + " collection."
-   print makeLine()
-
+ 
 #Save
 if save: #web address: http://www.hephy.at/user/mzarucki/plots
    savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/dataMC"
+   savedir += "/" + btag
    suffix = ""   
    if not os.path.exists("%s/root"%(savedir)): os.makedirs("%s/root"%(savedir))
    if not os.path.exists("%s/pdf"%(savedir)): os.makedirs("%s/pdf"%(savedir))
@@ -73,6 +73,9 @@ if save: #web address: http://www.hephy.at/user/mzarucki/plots
 #ebSplit = 0.8 #barrel is split into two regions
 #ebeeSplit = 1.479 #division between barrel and endcap
 
+bWeightDict = bTagWeights(btag)
+bTagString = bWeightDict['sr1_bjet']
+
 presel = CutClass("presel", [
    ["MET200", "met > 200"],
    ["HT300", "ht_basJet > 300"],
@@ -80,11 +83,9 @@ presel = CutClass("presel", [
    ["No3rdJet60","nVetoJet<=2"],
    ["AntiQCD", "(vetoJet_dPhi_j1j2 < 2.5)"],
    ["TauVeto","Sum$(TauGood_idMVANewDM && TauGood_pt > 20) == 0"],
-   ["lep30Veto-2lep20Veto", "((nLepAll_lep == 1) || (nLepAll_lep == 2 && LepAll_pt[IndexLepAll_lep[1]] < 20))"]
-   #["BVeto","nBSoftJet == 0 && nBHardJet == 0"],
+   ["lep30Veto-2lep20Veto", "((nLepAll_lep == 1) || (nLepAll_lep == 2 && LepAll_pt[IndexLepAll_lep[1]] < 20))"],
+   ["BVeto", bTagString],
    ], baseCut = None)
-
-print presel.combined
 
 plotDict = {
    "lep_mt":           {'var':"LepAll_mt[IndexLepAll_lep[0]]"       ,"bins":[40,0,200]          ,"nMinus1":None         ,"decor":{"title":"lepMT"    ,"x":"M_{{T}}({lepLatex}) "      ,"y":"Events"  ,'log':[0,1,0] }},
@@ -118,6 +119,7 @@ plotDict = {
 #   "ISRpt":{'var':"Jet_pt[IndexJet_basJet[0]]", "bins":[45,100,1000], "decor":{"title":"Leading Jet p_{{T}}","x":"ISR Jet p_{T}","y":"Events", 'log':[0,1,0]}},
 #}
    
+#plotsList = ["nJets30", "nJets60", "nSoftBJets", "nHardBJets", "nBJets", "bJetPt", "bSoftJetPt", "bHardJetPt"]
 plotsList = ["met", "MetPhi", "lep_Pt", "lep_Eta"]
 
 plotsDict = Plots(**plotDict)
