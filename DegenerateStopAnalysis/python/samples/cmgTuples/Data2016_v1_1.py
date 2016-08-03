@@ -138,20 +138,20 @@ allComponents.append(SingleMuon_Run2016C_PromptReco_v2)
 
 
 
-SingleMuon_Run2016D_PromptReco_v2 ={
-'cmgName':"SingleMuon_Run2016D_PromptReco_v2",
-"name" : "SingleMuon_Run2016D-PromptReco-v2",
-"chunkString":"SingleMuon_Run2016D-PromptReco-v2",
-"dir": sample_path +"/" + "SingleMuon_Run2016D-PromptReco-v2",
-"dbsName" : "/SingleMuon/Run2016D-PromptReco-v2/MINIAOD",
-"rootFileLocation":"tree.root",
-"skimAnalyzerDir":"skimAnalyzerCount",
-"treeName":"tree",
-"isData": True,
-"xsec": None,
-
-}
-allComponents.append(SingleMuon_Run2016D_PromptReco_v2)
+#SingleMuon_Run2016D_PromptReco_v2 ={
+#'cmgName':"SingleMuon_Run2016D_PromptReco_v2",
+#"name" : "SingleMuon_Run2016D-PromptReco-v2",
+#"chunkString":"SingleMuon_Run2016D-PromptReco-v2",
+#"dir": sample_path +"/" + "SingleMuon_Run2016D-PromptReco-v2",
+#"dbsName" : "/SingleMuon/Run2016D-PromptReco-v2/MINIAOD",
+#"rootFileLocation":"tree.root",
+#"skimAnalyzerDir":"skimAnalyzerCount",
+#"treeName":"tree",
+#"isData": True,
+#"xsec": None,
+#
+#}
+#allComponents.append(SingleMuon_Run2016D_PromptReco_v2)
 
 
 
@@ -210,5 +210,3 @@ SingleMuon_Run2016D_PromptReco_v2 ={
 
 }
 allComponents.append(SingleMuon_Run2016D_PromptReco_v2)
-
-
