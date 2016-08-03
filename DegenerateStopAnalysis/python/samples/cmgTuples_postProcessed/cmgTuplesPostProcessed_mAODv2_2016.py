@@ -11,15 +11,15 @@ import pickle
 
 
 # most recent paths, can be replaced when initializing the cmgTuplesPostProcessed class
-mc_path     = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/8011_mAODv2_v1/80X_postProcessing_v3/analysisHephy_13TeV_2016_v0/step1/RunIISpring16MiniAODv2_v1"
-signal_path = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/8011_mAODv2_v1/80X_postProcessing_v3/analysisHephy_13TeV_2016_v0/step1/RunIISpring16MiniAODv2_v1"
-data_path   = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/8011_mAODv2_v1/80X_postProcessing_v3/analysisHephy_13TeV_2016_v0/step1/Data2016_v1_1"
+mc_path     = "/afs/hephy.at/data/mzarucki01/cmgTuples/postProcessed_mAODv2/8011_mAODv2_v1/80X_postProcessing_v5/analysisHephy_13TeV_2016_v0/step1/RunIISpring16MiniAODv2_v1"
+signal_path = "/afs/hephy.at/data/mzarucki01/cmgTuples/postProcessed_mAODv2/8011_mAODv2_v1/80X_postProcessing_v5/analysisHephy_13TeV_2016_v0/step1/RunIISpring16MiniAODv2_v1"
+data_path   = "/afs/hephy.at/data/mzarucki01/cmgTuples/postProcessed_mAODv2/8011_mAODv2_v1/80X_postProcessing_v5/analysisHephy_13TeV_2016_v0/step1/Data2016_v1_1"
 
-samples_path = "/afs/hephy.at/data/vghete02/cmgTuples/postProcessed_mAODv2/8011_mAODv2_v0/80X_postProcessing_v2/analysisHephy_13TeV_2016_v0/step1/"
-
-mc_path     = samples_path + "RunIISpring16MiniAODv2_v0"
-signal_path = samples_path + "RunIISpring16MiniAODv2_v0"
-data_path   = samples_path + "Data2016_v0"
+#samples_path = "/afs/hephy.at/data/vghete02/cmgTuples/postProcessed_mAODv2/8011_mAODv2_v0/80X_postProcessing_v2/analysisHephy_13TeV_2016_v0/step1/"
+#
+#mc_path     = samples_path + "RunIISpring16MiniAODv2_v0"
+#signal_path = samples_path + "RunIISpring16MiniAODv2_v0"
+#data_path   = samples_path + "Data2016_v0"
 
 # Lumi that was used in the weight calculation of PostProcessing in pb-1
 lumi_mc = 10000.

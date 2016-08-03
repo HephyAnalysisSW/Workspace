@@ -2,10 +2,8 @@ import ROOT
 from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYieldFromChain, getChunks
 from Workspace.DegenerateStopAnalysis.tools.Sample import Sample, Samples
 from Workspace.DegenerateStopAnalysis.tools.colors import colors
-#import Workspace.DegenerateStopAnalysis.cmgTuplesPostProcessed_mAODv2_scan as cmgTuplesPostProcessed
 from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesPostProcessed_mAODv2_2016 import cmgTuplesPostProcessed
-#import Workspace.DegenerateStopAnalysis.weights as weights
-from Workspace.DegenerateStopAnalysis.tools.weights import weights, def_weights, Weight
+from Workspace.DegenerateStopAnalysis.tools.weights_pu2_btag import weights, def_weights, Weight
 import os
 import re
 import glob
@@ -17,12 +15,10 @@ import pprint as pp
 
 
 lumis = { 
+            'target_lumi'         :   10000.,
+            'DataBlind_lumi'      :   12434,
+            'DataUnblind_lumi'    :   804.2,
             #'mc_lumi':10000, 
-            #'lumi_data_blinded':2245.386, 
-            #'lumi_data_unblinded':139.63,
-            'target_lumi'         :   10000.   ,   
-            'DataBlind_lumi'      :   1243.0    , 
-            'DataUnblind_lumi'    :   804.2   ,
         }
 
 data_triggers_list = [
@@ -47,14 +43,6 @@ mc_filters_list = [
                       'Flag_badChargedHadronFilter',
                       'Flag_badMuonFilter',
                   ]
-
-
-
-
-pu='(0.000488876427122 * (nTrueInt > 0.0 && nTrueInt <= 1.0) ) + (0.0151761562164 * (nTrueInt > 1.0 && nTrueInt <= 2.0) ) + (0.0183588773108 * (nTrueInt > 2.0 && nTrueInt <= 3.0) ) + (0.0333664659746 * (nTrueInt > 3.0 && nTrueInt <= 4.0) ) + (0.0483065573428 * (nTrueInt > 4.0 && nTrueInt <= 5.0) ) + (0.0402839565449 * (nTrueInt > 5.0 && nTrueInt <= 6.0) ) + (0.057229456542 * (nTrueInt > 6.0 && nTrueInt <= 7.0) )  + (0.185786803735 * (nTrueInt > 7.0 && nTrueInt <= 8.0) ) + (0.354258558515 * (nTrueInt > 8.0 && nTrueInt <= 9.0) ) + (0.63478267999 * (nTrueInt > 9.0 && nTrueInt <= 10.0) ) + (0.924729866345 * (nTrueInt > 10.0 && nTrueInt <= 11.0) ) + (1.28211894828 * (nTrueInt > 11.0 && nTrueInt <= 12.0) ) + (1.57418917522 * (nTrueInt > 12.0 && nTrueInt <= 13.0) ) + (1.71625399914 * (nTrueInt > 13.0 && nTrueInt <= 14.0) ) + (1.77500747401 * (nTrueInt > 14.0 && nTrueInt <= 15.0) ) + (1.6143356382  * (nTrueInt > 15.0 && nTrueInt <= 16.0) ) + (1.41243958433 * (nTrueInt > 16.0 && nTrueInt <= 17.0) ) + (1.41140446255 * (nTrueInt > 17.0 && nTrueInt <= 18.0) ) + (1.30200653416 * (nTrueInt > 18.0 && nTrueInt <= 19.0) ) + (1.33122481953 * (nTrueInt > 19.0 && nTrueInt <= 20.0) ) + (1.12053210702 * (nTrueInt > 20.0 && nTrueInt <= 21.0) ) + (0.97986467583 * (nTrueInt > 21.0 && nTrueInt <= 22.0) ) + (0.926955215044 * (nTrueInt > 22.0 && nTrueInt <= 23.0) ) + (0.883425521402 * (nTrueInt > 23.0 && nTrueInt <= 24.0) ) + (0.763767705156 * (nTrueInt > 24.0 && nTrueInt <= 25.0) ) + (0.721796242966 * (nTrueInt > 25.0 && nTrueInt <= 26.0) ) + (0.555326852123 * (nTrueInt > 26.0 && nTrueInt <= 27.0) ) + (0.472738437161 * (nTrueInt > 27.0 && nTrueInt <= 28.0) ) + (0.336529335244 * (nTrueInt > 28.0 && nTrueInt <= 29.0) ) + (0.254758566341 * (nTrueInt > 29.0 && nTrueInt <= 30.0) ) + (0.178877826996 * (nTrueInt > 30.0 && nTrueInt <= 31.0) ) + (0.12172745258 * (nTrueInt > 31.0 && nTrueInt <= 32.0) ) + (0.105837192589 * (nTrueInt > 32.0 && nTrueInt <= 33.0) ) + (0.0821827858547 * (nTrueInt > 33.0 && nTrueInt <= 34.0) ) + (0.0875271918878 * (nTrueInt > 34.0 && nTrueInt <= 35.0) ) + (0.109857294003 * (nTrueInt > 35.0 && nTrueInt <= 36.0) ) + (0.181669459093 * (nTrueInt > 36.0 && nTrueInt <= 37.0) ) + (0.20336544128 * (nTrueInt > 37.0 && nTrueInt <= 38.0) )'
-
-
-
 
 import pickle
 #mass_dict_pickle = "/afs/hephy.at/user/n/nrad/CMSSW/fork/CMSSW_7_4_12_patch4/src/Workspace/DegenerateStopAnalysis/cmgPostProcessing/mass_dict_all.pkl"
@@ -248,11 +236,5 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
       sampleDict2[samp] = Sample(**sampleDict[samp])
    
    samples = Samples(**sampleDict2)
-   
-   for samp_name, sample in samples.iteritems():
-      if not sample.isData:
-         sample.filters = mc_filters
-         sample.tree.SetAlias("puWeight2",pu)
-
    
    return samples

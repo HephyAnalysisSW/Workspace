@@ -617,9 +617,10 @@ def getPlots(samples,plots,cut,sampleList=[],plotList=[],weight="",nMinus1="", a
 
     sigList, bkgList, dataList = getSigBkgDataLists(samples, sampleList=sampleList)
     isDataPlot = bool(len(dataList))
+    print "CUT NAME: ", cut.fullName
     if isDataPlot:
-       if "Blind" in samples[dataList[0]].name and "sr" in cut.fullName.lower():
-           raise Exception("NO DATA IN SIGNAL REGION: %s"%[dataList, cut.fullName])
+       #if "Blind" in samples[dataList[0]].name and "sr" in cut.fullName.lower():
+       #    raise Exception("NO DATA IN SIGNAL REGION: %s"%[dataList, cut.fullName])
 
        if "DataBlind" in samples[dataList[0]].name: lumi_weight = "DataBlind_lumi"
        elif "DataUnblind" in samples[dataList[0]].name: lumi_weight = "DataUnblind_lumi"
@@ -1008,13 +1009,13 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
  
         if isDataPlot:
             latex.DrawLatex(0.16,0.92,"#font[22]{CMS Preliminary}")
-            latex.DrawLatex(0.7,0.92,"\\mathscr{L} = %0.1f fb^{-1} (13 TeV)"%( round(samples[dataList[0]].lumi/1000.,2)) )
+            latex.DrawLatex(0.7,0.92,"\\mathscr{L} = \\mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%( round(samples[dataList[0]].lumi/1000.,2)) )
         elif fom:
             latex.DrawLatex(0.16,0.92,"#font[22]{CMS Simulation}")
-            latex.DrawLatex(0.65,0.92,"\\mathscr{L} = %0.1f fb^{-1} (13 TeV)"%(round(samples[bkgList[0]].weights.weight_dict['lumis']['target_lumi']/1000.,2))) # assumes all samples in the sampleList have the same target_lumi
+            latex.DrawLatex(0.65,0.92,"\\mathscr{L} = \\mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%(round(samples[bkgList[0]].weights.weight_dict['lumis']['target_lumi']/1000.,2))) # assumes all samples in the sampleList have the same target_lumi
         else:
             latex.DrawLatex(0.16,0.96,"#font[22]{CMS Simulation}")
-            latex.DrawLatex(0.6,0.96,"\\mathscr{L} = %0.1f fb^{-1} (13 TeV)"%(round(samples[bkgList[0]].weights.weight_dict['lumis']['target_lumi']/1000.,2))) # assumes all samples in the sampleList have the same target_lumi
+            latex.DrawLatex(0.6,0.96,"\\mathscr{L} = \\mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%(round(samples[bkgList[0]].weights.weight_dict['lumis']['target_lumi']/1000.,2))) # assumes all samples in the sampleList have the same target_lumi
         
         ret['latex'] = latex
 
@@ -1023,12 +1024,13 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
         #cut_saveDir = cut if type(cut) == type("") else cut.saveDir
         #if explicitSaveDir:
         #    cut_saveDir=""
-
-        sample_hist_info = getSamplePlotsInfo(samples,plots,cut,sampleList=sampleList,plotList=plotList, plots_first = True)
-        #canvs[p][cSave].plot_info =
-        print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    HIST INFO"
-        print sample_hist_info 
-        print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+        
+        if verbose:
+            sample_hist_info = getSamplePlotsInfo(samples,plots,cut,sampleList=sampleList,plotList=plotList, plots_first = True)
+            #canvs[p][cSave].plot_info =
+            print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    HIST INFO"
+            print sample_hist_info 
+            print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
         if save:
             saveDir = save  if type(save)==type('') else "./"
@@ -2308,7 +2310,7 @@ class Yields():
             pool.join()
             for isamp, samp in enumerate( self.sampleList ):
                 yieldDict[samp] = results[isamp]
-            print yieldDict
+            #print yieldDict
             del results, pool             
 
         else:
@@ -2490,7 +2492,7 @@ def getSignalEffMapFromYields(name, title, yld, xsecs, lumi = None  , combine_bi
     cut_names.extend(combine_bins.keys())
 
     print cut_names
-    print  combine_bins
+    print combine_bins
     for cut_name in cut_names:
         #if cut_name in combine_bins:
         print "------------", cut_name
