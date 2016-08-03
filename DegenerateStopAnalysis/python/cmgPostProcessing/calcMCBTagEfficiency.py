@@ -3,10 +3,11 @@ import time, hashlib
 # get MC truth efficiencies for a specific sample
 def getBTagMCTruthEfficiencies(c, cut="(1)"):
     mceff = {}
+    c.SetEventList(0)
     if cut and cut.replace(" ","")!= "(1)":
         print "Setting Event List with cut: %s"%cut
         eListName = "eList_%s"%hashlib.md5("%s"%time.time()).hexdigest()
-        c.Draw(">>%s"%eListName,cut)
+        c.Draw(">>%s"%eListName,cut,'goff')
         c.SetEventList( getattr(ROOT,eListName))
     for ptBin in ptBins:
         mceff[tuple(ptBin)] = {}
@@ -33,6 +34,7 @@ def getBTagMCTruthEfficiencies(c, cut="(1)"):
 def getBTagMCTruthEfficiencies2D(c, cut="(1)"):
     from array import array
     mceff = {}
+    c.SetEventList(0)
     if cut and cut.replace(" ","")!= "(1)":
         print "Setting Event List with cut: %s"%cut
         eListName = "eList_%s"%hashlib.md5("%s"%time.time()).hexdigest()
@@ -99,27 +101,63 @@ if __name__ == '__main__':
     #                                    'lumis':def_weights['lumis'],
     #                                  }
 
-    mc_path = '/afs/hephy.at/data/vghete02/cmgTuples/postProcessed_mAODv2/8011_mAODv2_v0/80X_postProcessing_v2/analysisHephy_13TeV_2016_v0/step1/RunIISpring16MiniAODv2_v0/'
-    signal_path = '/afs/hephy.at/data/vghete02/cmgTuples/postProcessed_mAODv2/8011_mAODv2_v0/80X_postProcessing_v2/analysisHephy_13TeV_2016_v0/step1/RunIISpring16MiniAODv2_v0/'
-    data_path = '/afs/hephy.at/data/vghete02/cmgTuples/postProcessed_mAODv2/8011_mAODv2_v0/80X_postProcessing_v2/analysisHephy_13TeV_2016_v0/step1/Data2016_v0/'
+    mc_path     = '/afs/hephy.at/data/mzarucki01//cmgTuples/postProcessed_mAODv2/8011_mAODv2_v1/80X_postProcessing_v5/analysisHephy_13TeV_2016_v0/step1/RunIISpring16MiniAODv2_v1/'
+    signal_path = '/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/8011_mAODv2_v1/80X_postProcessing_v5/analysisHephy_13TeV_2016_v0/step1/RunIISpring16MiniAODv2_v1/'
+    data_path   = '/afs/hephy.at/data/mzarucki01//cmgTuples/postProcessed_mAODv2/8011_mAODv2_v1_1/80X_postProcessing_v5/analysisHephy_13TeV_2016_v0/step1/Data2016_v1_1/'
 
     from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesPostProcessed_mAODv2_2016 import cmgTuplesPostProcessed
     cmgPP         = cmgTuplesPostProcessed( mc_path, signal_path, data_path)
-    samples   =   getSamples(   cmgPP = cmgPP, sampleList = ['tt','w'] , useHT = True, skim='preIncLep', scan = False  )
+    samples   =   getSamples(   cmgPP = cmgPP, sampleList = ['tt','w'] , useHT = True, skim='preIncLep', scan = True  )
 
-    for samp in ['tt','w']:
-        tree = samples[samp]['tree']
-        sample_name = samples[samp]['name']
-        res=  getBTagMCTruthEfficiencies2D( tree,
-            cut="(Sum$(Jet_pt>30&&abs(Jet_eta)<2.4&&Jet_id))>=1"
-        )
-        print "%s Efficiencies:"%sample_name
-        print res
+    #for samp in ['tt','w', 'sig']:
+    for samp in ['sig']:
+        if samp == 'sig': 
+            import glob
+            tree = ROOT.TChain("tree")
+            
+            signal_cmg_files = "/data/nrad/cmgTuples/8011_mAODv2_v1/RunIISpring16MiniAODv2/SMS-T2tt_dM-10to80_genHT-160_genMET-80_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/" 
+            for f in glob.glob(signal_cmg_files+"/*/tree.root"):
+                tree.Add(f)
+            #skimPresel = '((met_pt>200)&&((Max$(Jet_pt*(abs(Jet_eta)<2.4 && Jet_id) ) > 90 ) >=1)&&(Sum$(Jet_pt*(Jet_pt>30 && abs(Jet_eta)<2.4 && (Jet_id)) ) >200))'
+            skimPresel = '((met_pt>200)&&(Sum$(Jet_pt*(Jet_pt>30 && abs(Jet_eta)<2.4 && (Jet_id)) ) >200))'
+            jetcut     = "(Sum$(Jet_pt>30&&abs(Jet_eta)<2.4&&Jet_id))>=1"
+            dms = {
+                        'allDM'  : "(1)",
+                        'lowDM'  : "(  (GenSusyMStop-GenSusyMNeutralino) < 31)",
+                        'midDM'  : "(( (GenSusyMStop-GenSusyMNeutralino) > 31) && (  (GenSusyMStop-GenSusyMNeutralino) < 61 ))",
+                        'highDM' : "(( (GenSusyMStop-GenSusyMNeutralino) > 61))",
+                    }
 
-        pickle.dump(res, \
-            #file(os.path.expandvars('$CMSSW_BASE/src/StopsDilepton/tools/data/btagEfficiencyData/TTJets_DiLepton_comb_2j_2l.pkl'), 'w')
-            file(os.path.expandvars('$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/%s_1j_2D.pkl'%sample_name), 'w')
-        )
+            for dm, dm_cut in dms.iteritems():
+                cut = ' && '.join([ dm_cut,  jetcut] )
+                print 'using cut for signal : %s'%cut    
+
+                res=  getBTagMCTruthEfficiencies2D( tree,
+                    cut=cut
+                )
+                print "Signal Efficiencies:", dm
+                print res
+
+                pickle.dump(res, \
+                    #file(os.path.expandvars('$CMSSW_BASE/src/StopsDilepton/tools/data/btagEfficiencyData/TTJets_DiLepton_comb_2j_2l.pkl'), 'w')
+                    file(os.path.expandvars('$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/T2tt_%s_1j.pkl'%dm), 'w')
+                )
+
+        else:
+            tree = samples[samp]['tree']
+            sample_name = samples[samp]['name']
+
+
+            res=  getBTagMCTruthEfficiencies2D( tree,
+                cut="(Sum$(Jet_pt>30&&abs(Jet_eta)<2.4&&Jet_id))>=1"
+            )
+            print "%s Efficiencies:"%sample_name
+            print res
+
+            pickle.dump(res, \
+                #file(os.path.expandvars('$CMSSW_BASE/src/StopsDilepton/tools/data/btagEfficiencyData/TTJets_DiLepton_comb_2j_2l.pkl'), 'w')
+                file(os.path.expandvars('$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/%s_1j_2D.pkl'%sample_name), 'w')
+            )
     #for samp in ['tt','w']:
     #    tree = samples[samp]['tree']
     #    sample_name = samples[samp]['name']

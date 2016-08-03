@@ -101,7 +101,7 @@ def printCMGProcessingFile(     cmgPickle,
 if __name__ == '__main__':
 
     cmgPickle = "/afs/cern.ch/user/n/nrad/CMSSW/CMSSW_8_0_11/src/CMGTools/SUSYAnalysis/cfg/crab_with_das/8011_mAODv2_v1_1.pkl"
-    cmgPickle = "/afs/cern.ch/user/n/nrad/CMSSW/CMSSW_8_0_12/src/CMGTools/SUSYAnalysis/cfg/crab_with_das/8012_mAODv2_v0.pkl"
-    cmgPickle = "/afs/cern.ch/user/n/nrad/CMSSW/CMSSW_8_0_11/src/CMGTools/SUSYAnalysis/cfg/crab_with_das/mAODv2_v1_1.pkl" 
+    #cmgPickle = "/afs/cern.ch/user/n/nrad/CMSSW/CMSSW_8_0_12/src/CMGTools/SUSYAnalysis/cfg/crab_with_das/8012_mAODv2_v0.pkl"
+    #cmgPickle = "/afs/cern.ch/user/n/nrad/CMSSW/CMSSW_8_0_11/src/CMGTools/SUSYAnalysis/cfg/crab_with_das/mAODv2_v1_1.pkl" 
     out = printCMGProcessingFile(cmgPickle)
 

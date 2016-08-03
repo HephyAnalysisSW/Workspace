@@ -33,8 +33,8 @@ massPointsFull = MassPoints(dmOpt, (100,601,25))
 
 bkgList = ['st', 'vv' , 'dy', 'qcd', 'z', 'tt', 'w' ]
 #bkgList = [ 'dy', 'qcd', 'z', 'tt', 'w' ]
-sigList = ['s60FS', 's30FS', 's10FS' , 's30']
-sigList = []
+#sigList = ['s60FS', 's30FS', 's10FS' , 's30']
+sigList = ['s300_270','s300_220']
 
 
 #signalList    = massPoints.sigList 
@@ -231,7 +231,7 @@ cfg = TaskConfig(
                    ppUser         =  ppUser , 
                    cmgTag         =  cmgTag , 
                    #saveDirBase   =  "/afs/hephy.at/user/n/nrad/www/T2Deg13TeV/mAODv2_7412pass2_v6/Studies_v1/" ,
-                   saveDirBase    =  "/afs/hephy.at/user/n/nrad/www/T2Deg13TeV/%s/%s/SUS_16_031/"%(cmgTag, ppTag) ,
+                   saveDirBase    =  "/afs/hephy.at/user/n/nrad/www/T2Deg13TeV/%s/%s/SUS_16_031_v0_0/"%(cmgTag, ppTag) ,
                    #saveDirBase    =  "/afs/hephy.at/user/n/nrad/www/T2Deg13TeV/%s/%s/Studies_v0_puWeight_wptrwgt/"%(cmgTag, ppTag) ,
                    #saveDirBase    =  "/afs/hephy.at/user/n/nrad/www/T2Deg13TeV/%s/%s/Studies_v0_puWeight_wptrwgt/"%(cmgTag, ppTag) ,
                    cutInst        =  cutInstList,
@@ -252,7 +252,7 @@ cfg = TaskConfig(
                                         "useHT"        :    True        , 
                                         "skim"         :    'preIncLep', 
                                         "kill_low_qcd_ht":  False       ,
-                                        "scan"         :    False        ,
+                                        "scan"         :    True        ,
                                         #"massPoints"   :    task_info['massPoints']  ,
                                         "getData"      :    task_info.get("data",False)    ,
                                         "weights"      :    task_weight.weights     ,

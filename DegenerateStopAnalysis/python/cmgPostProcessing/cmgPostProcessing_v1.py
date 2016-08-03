@@ -176,27 +176,30 @@ def getParameterSet(args):
 
         sampleName = args.processSample
         eff_dict_map = {
-                         "WJets_1j" : ["ZInv", "ZJets", "WJets", "DYJets" ,"ZZ", "WZ", "WW" ] ,
-                         "TTJets_1j" : ["TTJets" , ]
+                         "WJets_1j"      : { 'sampleList' : ["ZInv", "ZJets", "WJets", "DYJets" ,"ZZ", "WZ", "WW" ] ,  },
+                         "TTJets_1j"     : { 'sampleList' : ["TTJets" , ]  ,                                           },
+                         "T2tt_allDM_1j" : { 'sampleList' : ["SMS_T2tt" , ],       'isFastSim':True               },
                         }
         eff_to_use = "TTJets_1j" #default
-        for eff_samp, sampleList in eff_dict_map.iteritems():
-            if any([ samp in sampleName for samp in sampleList]):
+        isFastSim = False
+        for eff_samp, info in eff_dict_map.iteritems():
+            if any([ samp in sampleName for samp in info['sampleList'] ]):
                 eff_to_use = eff_samp
+                isFastSim = info.get("isFastSim",False)
                 break
 
         print "Decided to use %s for the jet efficiency"%eff_to_use
- 
+        if isFastSim: print "Including the FastSim/FullSim SF" 
 
         params['beff']={}
 
         params['beff']['effFile']         = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/%s.pkl'%eff_to_use
-        params['beff']['sfFile']          = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/CSVv2_4invfb_systJuly15.csv'
-        params['beff']['sfFile_FastSim']  = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/CSV_13TEV_Combined_20_11_2015.csv'
+        params['beff']['sfFile']          = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/CSVv2_ichep.csv'
+        params['beff']['sfFile_FastSim']  = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/CSV_13TEV_Combined_14_7_2016.csv'
         params['beff']['btagEff']         = btagEfficiency( 
-                                                            fastSim = False,  
-                                                            effFile = params['beff']['effFile'], 
-                                                            sfFile = params['beff']['sfFile'], 
+                                                            fastSim        = isFastSim,  
+                                                            effFile        = params['beff']['effFile'], 
+                                                            sfFile         = params['beff']['sfFile'], 
                                                             sfFile_FastSim =  params['beff']['sfFile_FastSim']  
                                                        )
     puWeightDict = params.get("puWeightDict")
@@ -1721,9 +1724,12 @@ def processBTagWeights(
     nonBSoftJetList = [x for x in jetList if x not in bSoftJetList]
     nonBHardJetList = [x for x in jetList if x not in bHardJetList]
     
-    
     for i in processJets_rtuple.basJetList:
         btagEff.addBTagEffToJet(jObj,i)
+    ### FIXME THIS CRASHES IF processJets_rtuple.basJetList IS EMPTY!!!! 
+    # if processJets_rtuple.baseJet:
+    # else. jObj
+    #
     setattr(readTree, "%s_%s" % (jObj.obj, 'beff'),jObj.beff)  ## in order for th getObjDict to work with beff
     
     
@@ -2295,7 +2301,7 @@ def processEventVetoFastSimJets(readTree, splitTree, saveTree, params):
     #
     return saveTree
 
-def computeWeight(sample, sumWeight,  splitTree, saveTree, params, xsec=None ):
+def computeWeight(sample, sumWeight,  splitTree, saveTree, params, xsec=None , filterEfficiency=1.0):
     ''' Compute the weight of each event.
     
     Include all the weights used:
@@ -2315,7 +2321,6 @@ def computeWeight(sample, sumWeight,  splitTree, saveTree, params, xsec=None ):
     
     genWeight = 1 if isDataSample else splitTree.GetLeaf('genWeight').GetValue()
 
-
     if isDataSample: 
         lumiScaleFactor = 1
     else:
@@ -2323,7 +2328,7 @@ def computeWeight(sample, sumWeight,  splitTree, saveTree, params, xsec=None ):
             xSection = sample['xsec']
         else:
             xSection = xsec
-        lumiScaleFactor = xSection * target_lumi / float(sumWeight)
+        lumiScaleFactor = filterEfficiency*xSection * target_lumi / float(sumWeight)
         
     saveTree.weight = lumiScaleFactor * genWeight
     
@@ -2332,12 +2337,14 @@ def computeWeight(sample, sumWeight,  splitTree, saveTree, params, xsec=None ):
         "\n    target luminosity: %f "
         "\n    genWeight: %f " + \
         "\n    %s" + \
+        "\n    %s" + \
         "\n    sum of event weights: %f" + \
         "\n    luminosity scale factor: %f " + \
         "\n    Event weight: %f \n",
         ('Data ' + sample['cmgName'] if isDataSample else 'MC ' + sample['cmgName']),
         target_lumi, genWeight,
         ('' if isDataSample else 'cross section: ' + str(xSection) + ' pb^{-1}'),
+        ('' if int(filterEfficiency) == 1 else 'filter efficiency: %s'%filterEfficiency),
         sumWeight, lumiScaleFactor, saveTree.weight)
 
     puWeightDict = params.get('puWeightDict')    
@@ -2627,6 +2634,7 @@ def cmgPostProcessing(argv=None):
             mstop = args.processSignalScan[0]
             mlsp = args.processSignalScan[1]
             xsec = mass_dict[int(mstop)][int(mlsp)]['xSec']
+            genFilterEff = mass_dict[int(mstop)][int(mlsp)]['genFilterEff']
             nEntries = mass_dict[int(mstop)][int(mlsp)]['nEvents']
             
             
@@ -2647,7 +2655,8 @@ def cmgPostProcessing(argv=None):
 
 
         if args.processSignalScan:
-            sample_name = "SMS_T2_4bd_mStop_%s_mLSP_%s"%(mstop,mlsp)
+            #sample_name = "SMS_T2_4bd_mStop_%s_mLSP_%s"%(mstop,mlsp)
+            sample_name = "SMS_T2tt_mStop_%s_mLSP_%s"%(mstop,mlsp)
                 
         logger.info(
             "\n Sample name (from sample file)  %s of type %s \n",
@@ -3023,7 +3032,7 @@ def cmgPostProcessing(argv=None):
                     if not args.processSignalScan:
                         saveTree = computeWeight(sample, sumWeight, splitTree, saveTree, params)
                     else:
-                        saveTree = computeWeight(sample, nEntries, splitTree, saveTree, params, xsec=xsec)
+                        saveTree = computeWeight(sample, nEntries, splitTree, saveTree, params, xsec=xsec, filterEfficiency=genFilterEff )
                             
                 
                     # fill all the new variables and the new vectors        

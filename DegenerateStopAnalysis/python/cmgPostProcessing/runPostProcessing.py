@@ -185,6 +185,23 @@ sampleSets = {
                              
                             },
 
+                'qcd_onelep':{
+                            'samples':[
+
+                                        ["QCD_HT300to500",       "--skimLepton=oneLep"],  
+                                        ["QCD_HT300to500_ext",   "--skimLepton=oneLep"],  
+                                        ["QCD_HT500to700_ext",   "--skimLepton=oneLep"],  
+                                        ["QCD_HT700to1000",      "--skimLepton=oneLep"], 
+                                        ["QCD_HT700to1000_ext",  "--skimLepton=oneLep"], 
+                                        ["QCD_HT1000to1500",     "--skimLepton=oneLep"],
+                                        ["QCD_HT1000to1500_ext", "--skimLepton=oneLep"],
+                                        ["QCD_HT1500to2000",     "--skimLepton=oneLep"],
+                                        ["QCD_HT1500to2000_ext", "--skimLepton=oneLep"],
+                                        ["QCD_HT2000toInf",      "--skimLepton=oneLep"], 
+                                        ["QCD_HT2000toInf_ext",  "--skimLepton=oneLep"], 
+                                      ],
+                             
+                            },
                 'qcdpt':{
                             'samples':[
                                         #["QCD_Pt5to10",     "--skimPreselect"],
@@ -401,219 +418,17 @@ sampleSets = {
             }
     
 
-StopSamples={
- '100': 'SMS_T2_4bd_mStop_100_mLSP_20to90',
- '125': 'SMS_T2_4bd_mStop_125_mLSP_45to115',
- '150': 'SMS_T2_4bd_mStop_150_mLSP_70to140',
- '175': 'SMS_T2_4bd_mStop_175_mLSP_95to165',
- '200': 'SMS_T2_4bd_mStop_200_mLSP_120to190',
- '225': 'SMS_T2_4bd_mStop_225_mLSP_145to225',
- '250': 'SMS_T2_4bd_mStop_250_mLSP_170to240',
- '275': 'SMS_T2_4bd_mStop_275_mLSP_195to265',
- '300': 'SMS_T2_4bd_mStop_300_mLSP_220to290',
- '325': 'SMS_T2_4bd_mStop_325_mLSP_245to315',
- '350': 'SMS_T2_4bd_mStop_350_mLSP_270to340',
- '375': 'SMS_T2_4bd_mStop_375_mLSP_295to365',
- '400': 'SMS_T2_4bd_mStop_400_mLSP_320to390',
- '500': 'SMS_T2_4bd_mStop_500to550_mLSP_420t540',
- '525': 'SMS_T2_4bd_mStop_500to550_mLSP_420t540',
- '525': 'SMS_T2_4bd_mStop_500to550_mLSP_420t540',
- '550': 'SMS_T2_4bd_mStop_550to600_mLSP_470t590',
- '600': 'SMS_T2_4bd_mStop_550to600_mLSP_470t590'}
 
+mstops = [250, 275, 300, 325, 350, 375, 400, 425, 450, 475, 500, 525, 550, 575, 600, 625, 650, 675, 700, 725, 750, 775, 800]
+dms    = [10, 20, 30, 40, 50, 60, 70, 80]
 
-signalSets=\
-{  'mStop100': {  'samples': [  ['SMS_T2_4bd_mStop_100_mLSP_20to90', '--skimPreselect', '--processSignalScan', "100", "20"],
-                                ['SMS_T2_4bd_mStop_100_mLSP_20to90', '--skimPreselect', '--processSignalScan', "100", "30"],
-                                ['SMS_T2_4bd_mStop_100_mLSP_20to90', '--skimPreselect', '--processSignalScan', "100", "40"],
-                                ['SMS_T2_4bd_mStop_100_mLSP_20to90', '--skimPreselect', '--processSignalScan', "100", "50"],
-                                ['SMS_T2_4bd_mStop_100_mLSP_20to90', '--skimPreselect', '--processSignalScan', "100", "60"],
-                                ['SMS_T2_4bd_mStop_100_mLSP_20to90', '--skimPreselect', '--processSignalScan', "100", "70"],
-                                ['SMS_T2_4bd_mStop_100_mLSP_20to90', '--skimPreselect', '--processSignalScan', "100", "80"],
-                                ['SMS_T2_4bd_mStop_100_mLSP_20to90', '--skimPreselect', '--processSignalScan', "100", "90"]]},
+signalOpts = ["--skimPreselect", "--applyEventVetoFastSimJets"]
+signalSample = "SMS_T2tt_dM_10to80_genHT_160_genMET_80"
 
-   'mStop125': {  'samples': [  ['SMS_T2_4bd_mStop_125_mLSP_45to115', '--skimPreselect', '--processSignalScan', "125", "45"],
-                                ['SMS_T2_4bd_mStop_125_mLSP_45to115', '--skimPreselect', '--processSignalScan', "125", "55"],
-                                ['SMS_T2_4bd_mStop_125_mLSP_45to115', '--skimPreselect', '--processSignalScan', "125", "65"],
-                                ['SMS_T2_4bd_mStop_125_mLSP_45to115', '--skimPreselect', '--processSignalScan', "125", "75"],
-                                ['SMS_T2_4bd_mStop_125_mLSP_45to115', '--skimPreselect', '--processSignalScan', "125", "85"],
-                                ['SMS_T2_4bd_mStop_125_mLSP_45to115', '--skimPreselect', '--processSignalScan', "125", "95"],
-                                ['SMS_T2_4bd_mStop_125_mLSP_45to115', '--skimPreselect', '--processSignalScan', "125", "105"],
-                                ['SMS_T2_4bd_mStop_125_mLSP_45to115', '--skimPreselect', '--processSignalScan', "125", "115"]]},
-
-   'mStop150': {  'samples': [  ['SMS_T2_4bd_mStop_150_mLSP_70to140', '--skimPreselect', '--processSignalScan', "150", "70"],
-                                ['SMS_T2_4bd_mStop_150_mLSP_70to140', '--skimPreselect', '--processSignalScan', "150", "80"],
-                                ['SMS_T2_4bd_mStop_150_mLSP_70to140', '--skimPreselect', '--processSignalScan', "150", "90"],
-                                ['SMS_T2_4bd_mStop_150_mLSP_70to140', '--skimPreselect', '--processSignalScan', "150", "100"],
-                                ['SMS_T2_4bd_mStop_150_mLSP_70to140', '--skimPreselect', '--processSignalScan', "150", "110"],
-                                ['SMS_T2_4bd_mStop_150_mLSP_70to140', '--skimPreselect', '--processSignalScan', "150", "120"],
-                                ['SMS_T2_4bd_mStop_150_mLSP_70to140', '--skimPreselect', '--processSignalScan', "150", "130"],
-                                ['SMS_T2_4bd_mStop_150_mLSP_70to140', '--skimPreselect', '--processSignalScan', "150", "140"]]},
-
-   'mStop175': {  'samples': [  ['SMS_T2_4bd_mStop_175_mLSP_95to165', '--skimPreselect', '--processSignalScan', "175", "95"],
-                                ['SMS_T2_4bd_mStop_175_mLSP_95to165', '--skimPreselect', '--processSignalScan', "175", "105"],
-                                ['SMS_T2_4bd_mStop_175_mLSP_95to165', '--skimPreselect', '--processSignalScan', "175", "115"],
-                                ['SMS_T2_4bd_mStop_175_mLSP_95to165', '--skimPreselect', '--processSignalScan', "175", "125"],
-                                ['SMS_T2_4bd_mStop_175_mLSP_95to165', '--skimPreselect', '--processSignalScan', "175", "135"],
-                                ['SMS_T2_4bd_mStop_175_mLSP_95to165', '--skimPreselect', '--processSignalScan', "175", "145"],
-                                ['SMS_T2_4bd_mStop_175_mLSP_95to165', '--skimPreselect', '--processSignalScan', "175", "155"],
-                                ['SMS_T2_4bd_mStop_175_mLSP_95to165', '--skimPreselect', '--processSignalScan', "175", "165"]]},
-
-   'mStop200': {  'samples': [  ['SMS_T2_4bd_mStop_200_mLSP_120to190', '--skimPreselect', '--processSignalScan', "200", "120"],
-                                ['SMS_T2_4bd_mStop_200_mLSP_120to190', '--skimPreselect', '--processSignalScan', "200", "130"],
-                                ['SMS_T2_4bd_mStop_200_mLSP_120to190', '--skimPreselect', '--processSignalScan', "200", "140"],
-                                ['SMS_T2_4bd_mStop_200_mLSP_120to190', '--skimPreselect', '--processSignalScan', "200", "150"],
-                                ['SMS_T2_4bd_mStop_200_mLSP_120to190', '--skimPreselect', '--processSignalScan', "200", "160"],
-                                ['SMS_T2_4bd_mStop_200_mLSP_120to190', '--skimPreselect', '--processSignalScan', "200", "170"],
-                                ['SMS_T2_4bd_mStop_200_mLSP_120to190', '--skimPreselect', '--processSignalScan', "200", "180"],
-                                ['SMS_T2_4bd_mStop_200_mLSP_120to190', '--skimPreselect', '--processSignalScan', "200", "190"]]},
-
-   'mStop225': {  'samples': [  ['SMS_T2_4bd_mStop_225_mLSP_145to225', '--skimPreselect', '--processSignalScan', "225", "145"],
-                                ['SMS_T2_4bd_mStop_225_mLSP_145to225', '--skimPreselect', '--processSignalScan', "225", "155"],
-                                ['SMS_T2_4bd_mStop_225_mLSP_145to225', '--skimPreselect', '--processSignalScan', "225", "165"],
-                                ['SMS_T2_4bd_mStop_225_mLSP_145to225', '--skimPreselect', '--processSignalScan', "225", "175"],
-                                ['SMS_T2_4bd_mStop_225_mLSP_145to225', '--skimPreselect', '--processSignalScan', "225", "185"],
-                                ['SMS_T2_4bd_mStop_225_mLSP_145to225', '--skimPreselect', '--processSignalScan', "225", "195"],
-                                ['SMS_T2_4bd_mStop_225_mLSP_145to225', '--skimPreselect', '--processSignalScan', "225", "205"],
-                                ['SMS_T2_4bd_mStop_225_mLSP_145to225', '--skimPreselect', '--processSignalScan', "225", "215"]]},
-
-   'mStop250': {  'samples': [  ['SMS_T2_4bd_mStop_250_mLSP_170to240', '--skimPreselect', '--processSignalScan', "250", "170"],
-                                ['SMS_T2_4bd_mStop_250_mLSP_170to240', '--skimPreselect', '--processSignalScan', "250", "180"],
-                                ['SMS_T2_4bd_mStop_250_mLSP_170to240', '--skimPreselect', '--processSignalScan', "250", "190"],
-                                ['SMS_T2_4bd_mStop_250_mLSP_170to240', '--skimPreselect', '--processSignalScan', "250", "200"],
-                                ['SMS_T2_4bd_mStop_250_mLSP_170to240', '--skimPreselect', '--processSignalScan', "250", "210"],
-                                ['SMS_T2_4bd_mStop_250_mLSP_170to240', '--skimPreselect', '--processSignalScan', "250", "220"],
-                                ['SMS_T2_4bd_mStop_250_mLSP_170to240', '--skimPreselect', '--processSignalScan', "250", "230"],
-                                ['SMS_T2_4bd_mStop_250_mLSP_170to240', '--skimPreselect', '--processSignalScan', "250", "240"]]},
-
-   'mStop275': {  'samples': [  ['SMS_T2_4bd_mStop_275_mLSP_195to265', '--skimPreselect', '--processSignalScan', "275", "195"],
-                                ['SMS_T2_4bd_mStop_275_mLSP_195to265', '--skimPreselect', '--processSignalScan', "275", "205"],
-                                ['SMS_T2_4bd_mStop_275_mLSP_195to265', '--skimPreselect', '--processSignalScan', "275", "215"],
-                                ['SMS_T2_4bd_mStop_275_mLSP_195to265', '--skimPreselect', '--processSignalScan', "275", "225"],
-                                ['SMS_T2_4bd_mStop_275_mLSP_195to265', '--skimPreselect', '--processSignalScan', "275", "235"],
-                                ['SMS_T2_4bd_mStop_275_mLSP_195to265', '--skimPreselect', '--processSignalScan', "275", "245"],
-                                ['SMS_T2_4bd_mStop_275_mLSP_195to265', '--skimPreselect', '--processSignalScan', "275", "255"],
-                                ['SMS_T2_4bd_mStop_275_mLSP_195to265', '--skimPreselect', '--processSignalScan', "275", "265"]]},
-
-   'mStop300': {  'samples': [  ['SMS_T2_4bd_mStop_300_mLSP_220to290', '--skimPreselect', '--processSignalScan', "300", "220"],
-                                ['SMS_T2_4bd_mStop_300_mLSP_220to290', '--skimPreselect', '--processSignalScan', "300", "230"],
-                                ['SMS_T2_4bd_mStop_300_mLSP_220to290', '--skimPreselect', '--processSignalScan', "300", "240"],
-                                ['SMS_T2_4bd_mStop_300_mLSP_220to290', '--skimPreselect', '--processSignalScan', "300", "250"],
-                                ['SMS_T2_4bd_mStop_300_mLSP_220to290', '--skimPreselect', '--processSignalScan', "300", "260"],
-                                ['SMS_T2_4bd_mStop_300_mLSP_220to290', '--skimPreselect', '--processSignalScan', "300", "270"],
-                                ['SMS_T2_4bd_mStop_300_mLSP_220to290', '--skimPreselect', '--processSignalScan', "300", "280"],
-                                ['SMS_T2_4bd_mStop_300_mLSP_220to290', '--skimPreselect', '--processSignalScan', "300", "290"]]},
-
-   'mStop325': {  'samples': [  ['SMS_T2_4bd_mStop_325_mLSP_245to315', '--skimPreselect', '--processSignalScan', "325", "245"],
-                                ['SMS_T2_4bd_mStop_325_mLSP_245to315', '--skimPreselect', '--processSignalScan', "325", "255"],
-                                ['SMS_T2_4bd_mStop_325_mLSP_245to315', '--skimPreselect', '--processSignalScan', "325", "265"],
-                                ['SMS_T2_4bd_mStop_325_mLSP_245to315', '--skimPreselect', '--processSignalScan', "325", "275"],
-                                ['SMS_T2_4bd_mStop_325_mLSP_245to315', '--skimPreselect', '--processSignalScan', "325", "285"],
-                                ['SMS_T2_4bd_mStop_325_mLSP_245to315', '--skimPreselect', '--processSignalScan', "325", "295"],
-                                ['SMS_T2_4bd_mStop_325_mLSP_245to315', '--skimPreselect', '--processSignalScan', "325", "305"],
-                                ['SMS_T2_4bd_mStop_325_mLSP_245to315', '--skimPreselect', '--processSignalScan', "325", "315"]]},
-
-   'mStop350': {  'samples': [  ['SMS_T2_4bd_mStop_350_mLSP_270to340', '--skimPreselect', '--processSignalScan', "350", "270"],
-                                ['SMS_T2_4bd_mStop_350_mLSP_270to340', '--skimPreselect', '--processSignalScan', "350", "280"],
-                                ['SMS_T2_4bd_mStop_350_mLSP_270to340', '--skimPreselect', '--processSignalScan', "350", "290"],
-                                ['SMS_T2_4bd_mStop_350_mLSP_270to340', '--skimPreselect', '--processSignalScan', "350", "300"],
-                                ['SMS_T2_4bd_mStop_350_mLSP_270to340', '--skimPreselect', '--processSignalScan', "350", "310"],
-                                ['SMS_T2_4bd_mStop_350_mLSP_270to340', '--skimPreselect', '--processSignalScan', "350", "320"],
-                                ['SMS_T2_4bd_mStop_350_mLSP_270to340', '--skimPreselect', '--processSignalScan', "350", "330"],
-                                ['SMS_T2_4bd_mStop_350_mLSP_270to340', '--skimPreselect', '--processSignalScan', "350", "340"]]},
-
-   'mStop375': {  'samples': [  ['SMS_T2_4bd_mStop_375_mLSP_295to365', '--skimPreselect', '--processSignalScan', "375", "295"],
-                                ['SMS_T2_4bd_mStop_375_mLSP_295to365', '--skimPreselect', '--processSignalScan', "375", "305"],
-                                ['SMS_T2_4bd_mStop_375_mLSP_295to365', '--skimPreselect', '--processSignalScan', "375", "315"],
-                                ['SMS_T2_4bd_mStop_375_mLSP_295to365', '--skimPreselect', '--processSignalScan', "375", "325"],
-                                ['SMS_T2_4bd_mStop_375_mLSP_295to365', '--skimPreselect', '--processSignalScan', "375", "335"],
-                                ['SMS_T2_4bd_mStop_375_mLSP_295to365', '--skimPreselect', '--processSignalScan', "375", "345"],
-                                ['SMS_T2_4bd_mStop_375_mLSP_295to365', '--skimPreselect', '--processSignalScan', "375", "355"],
-                                ['SMS_T2_4bd_mStop_375_mLSP_295to365', '--skimPreselect', '--processSignalScan', "375", "365"]]},
-
-   'mStop400': {  'samples': [  ['SMS_T2_4bd_mStop_400_mLSP_320to390', '--skimPreselect', '--processSignalScan', "400", "320"],
-                                ['SMS_T2_4bd_mStop_400_mLSP_320to390', '--skimPreselect', '--processSignalScan', "400", "330"],
-                                ['SMS_T2_4bd_mStop_400_mLSP_320to390', '--skimPreselect', '--processSignalScan', "400", "340"],
-                                ['SMS_T2_4bd_mStop_400_mLSP_320to390', '--skimPreselect', '--processSignalScan', "400", "350"],
-                                ['SMS_T2_4bd_mStop_400_mLSP_320to390', '--skimPreselect', '--processSignalScan', "400", "360"],
-                                ['SMS_T2_4bd_mStop_400_mLSP_320to390', '--skimPreselect', '--processSignalScan', "400", "370"],
-                                ['SMS_T2_4bd_mStop_400_mLSP_320to390', '--skimPreselect', '--processSignalScan', "400", "380"],
-                                ['SMS_T2_4bd_mStop_400_mLSP_320to390', '--skimPreselect', '--processSignalScan', "400", "390"]]},
-
-   'mStop425': {  'samples': [  ['SMS_T2_4bd_mStop_425to475_mLSP_345to465', '--skimPreselect', '--processSignalScan', "425", "345"],
-                                ['SMS_T2_4bd_mStop_425to475_mLSP_345to465', '--skimPreselect', '--processSignalScan', "425", "355"],
-                                ['SMS_T2_4bd_mStop_425to475_mLSP_345to465', '--skimPreselect', '--processSignalScan', "425", "365"],
-                                ['SMS_T2_4bd_mStop_425to475_mLSP_345to465', '--skimPreselect', '--processSignalScan', "425", "375"],
-                                ['SMS_T2_4bd_mStop_425to475_mLSP_345to465', '--skimPreselect', '--processSignalScan', "425", "385"],
-                                ['SMS_T2_4bd_mStop_425to475_mLSP_345to465', '--skimPreselect', '--processSignalScan', "425", "395"],
-                                ['SMS_T2_4bd_mStop_425to475_mLSP_345to465', '--skimPreselect', '--processSignalScan', "425", "405"],
-                                ['SMS_T2_4bd_mStop_425to475_mLSP_345to465', '--skimPreselect', '--processSignalScan', "425", "415"]]},
-
-   'mStop450': {  'samples': [  ['SMS_T2_4bd_mStop_425to475_mLSP_345to465', '--skimPreselect', '--processSignalScan', "450", "370"],
-                                ['SMS_T2_4bd_mStop_425to475_mLSP_345to465', '--skimPreselect', '--processSignalScan', "450", "380"],
-                                ['SMS_T2_4bd_mStop_425to475_mLSP_345to465', '--skimPreselect', '--processSignalScan', "450", "390"],
-                                ['SMS_T2_4bd_mStop_425to475_mLSP_345to465', '--skimPreselect', '--processSignalScan', "450", "400"],
-                                ['SMS_T2_4bd_mStop_425to475_mLSP_345to465', '--skimPreselect', '--processSignalScan', "450", "410"],
-                                ['SMS_T2_4bd_mStop_425to475_mLSP_345to465', '--skimPreselect', '--processSignalScan', "450", "420"],
-                                ['SMS_T2_4bd_mStop_425to475_mLSP_345to465', '--skimPreselect', '--processSignalScan', "450", "430"],
-                                ['SMS_T2_4bd_mStop_425to475_mLSP_345to465', '--skimPreselect', '--processSignalScan', "450", "440"]]},
-
-   'mStop475': {  'samples': [  ['SMS_T2_4bd_mStop_425to475_mLSP_345to465', '--skimPreselect', '--processSignalScan', "475", "495"],
-                                ['SMS_T2_4bd_mStop_425to475_mLSP_345to465', '--skimPreselect', '--processSignalScan', "475", "405"],
-                                ['SMS_T2_4bd_mStop_425to475_mLSP_345to465', '--skimPreselect', '--processSignalScan', "475", "415"],
-                                ['SMS_T2_4bd_mStop_425to475_mLSP_345to465', '--skimPreselect', '--processSignalScan', "475", "425"],
-                                ['SMS_T2_4bd_mStop_425to475_mLSP_345to465', '--skimPreselect', '--processSignalScan', "475", "435"],
-                                ['SMS_T2_4bd_mStop_425to475_mLSP_345to465', '--skimPreselect', '--processSignalScan', "475", "445"],
-                                ['SMS_T2_4bd_mStop_425to475_mLSP_345to465', '--skimPreselect', '--processSignalScan', "475", "455"],
-                                ['SMS_T2_4bd_mStop_425to475_mLSP_345to465', '--skimPreselect', '--processSignalScan', "475", "465"]]},
-
-   'mStop500': {  'samples': [  ['SMS_T2_4bd_mStop_500to550_mLSP_420to540', '--skimPreselect', '--processSignalScan', "500", "420"],
-                                ['SMS_T2_4bd_mStop_500to550_mLSP_420to540', '--skimPreselect', '--processSignalScan', "500", "430"],
-                                ['SMS_T2_4bd_mStop_500to550_mLSP_420to540', '--skimPreselect', '--processSignalScan', "500", "440"],
-                                ['SMS_T2_4bd_mStop_500to550_mLSP_420to540', '--skimPreselect', '--processSignalScan', "500", "450"],
-                                ['SMS_T2_4bd_mStop_500to550_mLSP_420to540', '--skimPreselect', '--processSignalScan', "500", "460"],
-                                ['SMS_T2_4bd_mStop_500to550_mLSP_420to540', '--skimPreselect', '--processSignalScan', "500", "470"],
-                                ['SMS_T2_4bd_mStop_500to550_mLSP_420to540', '--skimPreselect', '--processSignalScan', "500", "480"],
-                                ['SMS_T2_4bd_mStop_500to550_mLSP_420to540', '--skimPreselect', '--processSignalScan', "500", "490"]]},
-
-   'mStop525': {  'samples': [  ['SMS_T2_4bd_mStop_500to550_mLSP_420to540', '--skimPreselect', '--processSignalScan', "525", "445"],
-                                ['SMS_T2_4bd_mStop_500to550_mLSP_420to540', '--skimPreselect', '--processSignalScan', "525", "455"],
-                                ['SMS_T2_4bd_mStop_500to550_mLSP_420to540', '--skimPreselect', '--processSignalScan', "525", "465"],
-                                ['SMS_T2_4bd_mStop_500to550_mLSP_420to540', '--skimPreselect', '--processSignalScan', "525", "475"],
-                                ['SMS_T2_4bd_mStop_500to550_mLSP_420to540', '--skimPreselect', '--processSignalScan', "525", "485"],
-                                ['SMS_T2_4bd_mStop_500to550_mLSP_420to540', '--skimPreselect', '--processSignalScan', "525", "495"],
-                                ['SMS_T2_4bd_mStop_500to550_mLSP_420to540', '--skimPreselect', '--processSignalScan', "525", "505"],
-                                ['SMS_T2_4bd_mStop_500to550_mLSP_420to540', '--skimPreselect', '--processSignalScan', "525", "515"]]},
-
-   'mStop550': {  'samples': [  ['SMS_T2_4bd_mStop_550to600_mLSP_470to590', '--skimPreselect', '--processSignalScan', "550", "470"],
-                                ['SMS_T2_4bd_mStop_550to600_mLSP_470to590', '--skimPreselect', '--processSignalScan', "550", "480"],
-                                ['SMS_T2_4bd_mStop_550to600_mLSP_470to590', '--skimPreselect', '--processSignalScan', "550", "490"],
-                                ['SMS_T2_4bd_mStop_550to600_mLSP_470to590', '--skimPreselect', '--processSignalScan', "550", "500"],
-                                ['SMS_T2_4bd_mStop_550to600_mLSP_470to590', '--skimPreselect', '--processSignalScan', "550", "510"],
-                                ['SMS_T2_4bd_mStop_550to600_mLSP_470to590', '--skimPreselect', '--processSignalScan', "550", "520"],
-                                ['SMS_T2_4bd_mStop_550to600_mLSP_470to590', '--skimPreselect', '--processSignalScan', "550", "530"],
-                                ['SMS_T2_4bd_mStop_550to600_mLSP_470to590', '--skimPreselect', '--processSignalScan', "550", "540"]]},
-
-   'mStop575': {  'samples': [  ['SMS_T2_4bd_mStop_550to600_mLSP_470to590', '--skimPreselect', '--processSignalScan', "575", "495"],
-                                ['SMS_T2_4bd_mStop_550to600_mLSP_470to590', '--skimPreselect', '--processSignalScan', "575", "505"],
-                                ['SMS_T2_4bd_mStop_550to600_mLSP_470to590', '--skimPreselect', '--processSignalScan', "575", "515"],
-                                ['SMS_T2_4bd_mStop_550to600_mLSP_470to590', '--skimPreselect', '--processSignalScan', "575", "525"],
-                                ['SMS_T2_4bd_mStop_550to600_mLSP_470to590', '--skimPreselect', '--processSignalScan', "575", "535"],
-                                ['SMS_T2_4bd_mStop_550to600_mLSP_470to590', '--skimPreselect', '--processSignalScan', "575", "545"],
-                                ['SMS_T2_4bd_mStop_550to600_mLSP_470to590', '--skimPreselect', '--processSignalScan', "575", "555"],
-                                ['SMS_T2_4bd_mStop_550to600_mLSP_470to590', '--skimPreselect', '--processSignalScan', "575", "565"]]},
-
-   'mStop600': {  'samples': [  ['SMS_T2_4bd_mStop_550to600_mLSP_470to590', '--skimPreselect', '--processSignalScan', "600", "520"],
-                                ['SMS_T2_4bd_mStop_550to600_mLSP_470to590', '--skimPreselect', '--processSignalScan', "600", "530"],
-                                ['SMS_T2_4bd_mStop_550to600_mLSP_470to590', '--skimPreselect', '--processSignalScan', "600", "540"],
-                                ['SMS_T2_4bd_mStop_550to600_mLSP_470to590', '--skimPreselect', '--processSignalScan', "600", "550"],
-                                ['SMS_T2_4bd_mStop_550to600_mLSP_470to590', '--skimPreselect', '--processSignalScan', "600", "560"],
-                                ['SMS_T2_4bd_mStop_550to600_mLSP_470to590', '--skimPreselect', '--processSignalScan', "600", "570"],
-                                ['SMS_T2_4bd_mStop_550to600_mLSP_470to590', '--skimPreselect', '--processSignalScan', "600", "580"],
-                                ['SMS_T2_4bd_mStop_550to600_mLSP_470to590', '--skimPreselect', '--processSignalScan', "600", "590"]]}}
-
-
-
+signalSets = {}
+for mstop in mstops:
+    signalSet =  {  'samples': [ [signalSample, '--processSignalScan', str(mstop), str(mstop-dm)]+signalOpts for dm in dms ] }
+    signalSets.update({ 'mStop%s'%mstop:signalSet})
 
 sampleSets.update(signalSets)
 
@@ -870,6 +685,7 @@ def runPostProcessing(argv=None):
     logger.debug(msg_logger_debug)
 
     options_list = make_list_options(args, argsRun)
+    print options_list
     commands = make_command(args.sampleSet, options_list)
     
     logger.info(

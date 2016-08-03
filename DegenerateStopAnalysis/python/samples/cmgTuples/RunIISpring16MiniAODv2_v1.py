@@ -1065,26 +1065,41 @@ allComponents.append(ZZ)
 
 
 
-sample_path_test = '/data/nrad/cmgTuples/8011_mAODv2_v1_1_TEST/RunIISpring16MiniAODv2'   
-allSignalComponents = []
-SMS_T2tt_dM_10to80_2Lfilter ={
-'cmgName':"SMS_T2tt_dM_10to80_2Lfilter",
-"name" : "SMS-T2tt_dM-10to80_2Lfilter_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_mAODv2_v1_1",
-"chunkString":"SMS-T2tt_dM-10to80_2Lfilter_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_mAODv2_v1_1",
-"dir": sample_path_test +"/" + "SMS-T2tt_dM-10to80_2Lfilter_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_mAODv2_v1_1",
-"dbsName" : "/SMS-T2tt_dM-10to80_2Lfilter_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM",
+#sample_path_test = '/data/nrad/cmgTuples/8011_mAODv2_v1_1_TEST/RunIISpring16MiniAODv2'   
+#allSignalComponents = []
+#SMS_T2tt_dM_10to80_2Lfilter ={
+#'cmgName':"SMS_T2tt_dM_10to80_2Lfilter",
+#"name" : "SMS-T2tt_dM-10to80_2Lfilter_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_mAODv2_v1_1",
+#"chunkString":"SMS-T2tt_dM-10to80_2Lfilter_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_mAODv2_v1_1",
+#"dir": sample_path_test +"/" + "SMS-T2tt_dM-10to80_2Lfilter_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_mAODv2_v1_1",
+#"dbsName" : "/SMS-T2tt_dM-10to80_2Lfilter_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM",
+#"rootFileLocation":"tree.root",
+#"skimAnalyzerDir":"skimAnalyzerCount",
+#"treeName":"tree",
+#"isData": False,
+#"isFastSim":True,
+#'mass_dict': '/data/nrad/cmgTuples/8011_mAODv2_v1/RunIISpring16MiniAODv2/mass_dict.pkl',
+#}
+#allSignalComponents.append(SMS_T2tt_dM_10to80_2Lfilter)
+
+
+
+SMS_T2tt_dM_10to80_genHT_160_genMET_80 ={
+'cmgName':"SMS_T2tt_dM_10to80_genHT_160_genMET_80",
+"name" : "SMS-T2tt_dM-10to80_genHT-160_genMET-80_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+"chunkString":"SMS-T2tt_dM-10to80_genHT-160_genMET-80_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+"dir": sample_path +"/" + "SMS-T2tt_dM-10to80_genHT-160_genMET-80_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+"dbsName" : "/SMS-T2tt_dM-10to80_genHT-160_genMET-80_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM",
 "rootFileLocation":"tree.root",
 "skimAnalyzerDir":"skimAnalyzerCount",
 "treeName":"tree",
 "isData": False,
+'mass_dict': sample_path + '/mass_dict.pkl',
+"xsec": 1,
 "isFastSim":True,
-'mass_dict': '/data/nrad/cmgTuples/8011_mAODv2_v1/RunIISpring16MiniAODv2/mass_dict.pkl',
 }
-#allComponents.append(SMS_T2tt_dM_10to80_2Lfilter)
-allSignalComponents.append(SMS_T2tt_dM_10to80_2Lfilter)
-
-
-
+allComponents.append(SMS_T2tt_dM_10to80_genHT_160_genMET_80)
+#allSignalComponents=[]
 
 
 

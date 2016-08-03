@@ -1,5 +1,6 @@
 import ROOT
 import pickle
+import os
 from Workspace.HEPHYPythonTools.user import username
 from Workspace.HEPHYPythonTools.helpers import getObjFromFile, getChain, getChunks, getCutYieldFromChain, getYieldFromChain
 from Workspace.HEPHYPythonTools.xsecSMS import *
@@ -9,17 +10,27 @@ import pickle
 dos={
       "get_sig_info":True,
       "get_chains":False,
-
-
     }
 
 
+getGenFilterEff = True
 
 import Workspace.DegenerateStopAnalysis.samples.cmgTuples.RunIISpring16MiniAODv2_v1 as cmgTuples
 samples = [
-            cmgTuples.SMS_T2tt_dM_10to80_2Lfilter
+            #cmgTuples.SMS_T2tt_dM_10to80_2Lfilter
+            cmgTuples.SMS_T2tt_dM_10to80_genHT_160_genMET_80 
         ]
 
+
+genFilterEff_file = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/filterEfficiency/T2tt_dM_10to80_genHT160_genMET80/filterEffs_genHT160_genMET80.pkl'
+
+if getGenFilterEff:
+    genFilterEff_path = os.path.expandvars(genFilterEff_file)
+    if os.path.isfile(genFilterEff_path):
+       genFilterEff = pickle.load(open(genFilterEff_path)) 
+    else:
+        raise Exception("cannot find gen filter file! %s"%genFilterEff_path)
+        
 
 def tryStopLSP(mass_dict, mstop, mlsp, def_val = 0):
     try:
@@ -54,9 +65,9 @@ def getStopLSPInfo(sample):
                 mstop = xbin -1
                 mlsp = ybin -1
                 print mstop, mlsp, bin_cont
-                tryStopLSP(mass_dict_sample, mstop, mlsp, def_val= {"nEvents":0, "xSec":  stop13TeV_NLONLL[mstop]  } )
+                tryStopLSP(mass_dict_sample, mstop, mlsp, def_val= {"nEvents":0, "xSec":  stop13TeV_NLONLL[mstop] , 'genFilterEff':genFilterEff[mstop][mlsp] } )
                 mass_dict_sample[mstop][mlsp]['nEvents'] += bin_cont
-                tryStopLSP(mass_dict, mstop, mlsp, def_val={"nEvents":0, "xSec":  stop13TeV_NLONLL[mstop] , "samples": set()    })
+                tryStopLSP(mass_dict, mstop, mlsp, def_val={"nEvents":0, "xSec":  stop13TeV_NLONLL[mstop] , "samples": set()  ,  'genFilterEff':genFilterEff[mstop][mlsp]  })
                 mass_dict[mstop][mlsp]['samples'].add(sample_name)
                 mass_dict[mstop][mlsp]['nEvents'] += mass_dict_sample[mstop][mlsp]['nEvents']
     return {"sample_name":sample_name, "mass_dict":mass_dict, "mass_dict_sample":mass_dict_sample}
@@ -82,6 +93,9 @@ if __name__ == "__main__":
         pickle.dump(mass_dicts_samples_all, open(output_dir +"/mass_dict_samples.pkl","w") )
         pickle.dump(mass_dicts_all, open(output_dir +"/mass_dict.pkl","w") )
 
+        print "Pickles dumped:",
+        print output_dir +"/mass_dict_samples.pkl"
+        print output_dir +"/mass_dict.pkl"
 
     if dos['get_chains']:
         chains={}

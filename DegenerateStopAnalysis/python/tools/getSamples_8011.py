@@ -15,10 +15,11 @@ import pprint as pp
 
 
 lumis = { 
-            'target_lumi'         :   10000.,
-            'DataBlind_lumi'      :   12741,
-            'DataUnblind_lumi'    :   804.2,
-            #'mc_lumi':10000, 
+            #'lumi_data_blinded':2245.386, 
+            #'lumi_data_unblinded':139.63,
+            'target_lumi'         :   10000.   ,   
+            'DataBlind_lumi'      :   12430.0    , 
+            'DataUnblind_lumi'    :   804.2   ,
         }
 
 ###Baseline Triggers###
@@ -190,7 +191,7 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
    if scan:
       icolor = 1
       if not massPoints:
-         mstops = range(100,601,25)
+         mstops = range(250,801,25)
          dms = range(10,81,10)
       else:
          mstops = [x[0] for x in massPoints]
@@ -199,12 +200,16 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
       for mstop in mstops:
          for dm in dms:
             mlsp = mstop - dm
+            #s = getattr(cmgPP,"SMS_T2tt_mStop_%s_mLSP_%s"%(mstop,mlsp))[skim]
             s = getattr(cmgPP,"SMS_T2_4bd_mStop_%s_mLSP_%s"%(mstop,mlsp))[skim]
             if glob.glob("%s/%s/*.root"%(s['dir'],s['name'])):
                sampleDict.update({
-                  's%s_%s'%(mstop,mlsp):{'name':'T2_4bd_%s_%s'%(mstop,mlsp), 'sample':getattr(cmgPP,"SMS_T2_4bd_mStop_%s_mLSP_%s"%(mstop,mlsp))[skim], 'color':colors['s%s_%s'%(mstop,mlsp)], 'isSignal':1 , 'isData':0, 'lumi':mc_lumi},
+                  #'s%s_%s'%(mstop,mlsp):{'name':'T2_4bd_%s_%s'%(mstop,mlsp), 'sample':getattr(cmgPP,"SMS_T2tt_mStop_%s_mLSP_%s"%(mstop,mlsp))[skim], 'color':colors['s%s_%s'%(mstop,mlsp)], 'isSignal':1 , 'isData':0, 'lumi':mc_lumi},
+                  's%s_%s'%(mstop,mlsp):{'name':'T2_4bd_%s_%s'%(mstop,mlsp), 'sample':s, 'color':colors['s%s_%s'%(mstop,mlsp)], 'isSignal':1 , 'isData':0, 'lumi':mc_lumi},
             })
-            else: print "!!! Sample Not Found: %s, %s"%(mstop,mlsp)
+            else: 
+                #print "%s/%s/*.root"%(s['dir'],s['name'])
+                print "!!! Sample Not Found: %s, %s"%(mstop,mlsp)
    
    if do8tev:
       sampleDir_8tev = "/data/imikulec/monoJetTuples_v8/copyfiltered/"
@@ -252,5 +257,4 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
    for samp_name, sample in samples.iteritems():
        if not sample.isData:
           sample.filters = mc_filters 
-  
    return samples
