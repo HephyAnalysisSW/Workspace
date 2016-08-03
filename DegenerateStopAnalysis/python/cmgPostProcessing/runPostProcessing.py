@@ -394,6 +394,7 @@ sampleSets = {
                                         ["MET_Run2016D_PromptReco_v2",   "--skimLepton=oneLep",    "--runChunks", "0",   "100"],     
                                         ["MET_Run2016D_PromptReco_v2",   "--skimLepton=oneLep",    "--runChunks", "101", "200"],     
                                         ["MET_Run2016D_PromptReco_v2",   "--skimLepton=oneLep",    "--runChunks", "201", "300"],     
+                                        ["MET_Run2016D_PromptReco_v2",   "--skimLepton=oneLep",    "--runChunks", "301", "400"],     
                                         ["MET_Run2016D_PromptReco_v2",   "--skimLepton=oneLep",    "--runChunks", "401", "500"],     
                                         ["MET_Run2016D_PromptReco_v2",   "--skimLepton=oneLep",    "--runChunks", "501", "600"],     
                                       ]},
