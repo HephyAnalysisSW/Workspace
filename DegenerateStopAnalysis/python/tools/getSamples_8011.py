@@ -62,8 +62,8 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
                weights = weights, def_weights = def_weights,
                data_triggers = ' || '.join(data_triggers_list),
                data_filters  = ' && '.join(data_filters_list),  
-               data_mu_trigger = data_mu_trigger 
-               data_el_trigger = data_el_trigger 
+               data_mu_trigger = data_mu_trigger, 
+               data_el_trigger = data_el_trigger, 
                mc_filters    = ' && '.join(mc_filters_list),
                kill_low_qcd_ht = False,
                lumis = lumis, 
