@@ -248,4 +248,9 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
    
    samples = Samples(**sampleDict2)
    
+   #applying mc_filters
+   for samp_name, sample in samples.iteritems():
+       if not sample.isData:
+          sample.filters = mc_filters 
+  
    return samples
