@@ -16,11 +16,14 @@ import pprint as pp
 
 lumis = { 
             'target_lumi'         :   10000.,
-            'DataBlind_lumi'      :   12434,
+            'DataBlind_lumi'      :   12741,
             'DataUnblind_lumi'    :   804.2,
             #'mc_lumi':10000, 
         }
 
+###Baseline Triggers###
+
+#MET PD
 data_triggers_list = [
                          'HLT_PFMET100_PFMHT100_IDTight',
                          'HLT_PFMET110_PFMHT110_IDTight',  
@@ -28,6 +31,11 @@ data_triggers_list = [
                          'HLT_PFMET90_PFMHT90_IDTight',
                      ]
 
+#SingleMu and SingleEl PD
+data_mu_trigger = "HLT_IsoMu27"
+data_el_trigger = "HLT_Ele27_WPTight_Gsf"
+
+###Filters###
 data_filters_list = [
                         'Flag_HBHENoiseFilter',
                         'Flag_HBHENoiseIsoFilter',
@@ -54,6 +62,8 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
                weights = weights, def_weights = def_weights,
                data_triggers = ' || '.join(data_triggers_list),
                data_filters  = ' && '.join(data_filters_list),  
+               data_mu_trigger = data_mu_trigger 
+               data_el_trigger = data_el_trigger 
                mc_filters    = ' && '.join(mc_filters_list),
                kill_low_qcd_ht = False,
                lumis = lumis, 
@@ -75,24 +85,35 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
    
    sampleDict = {}
    htString = "HT" if useHT else "Inc"
-   if any( [x in sampleList for x in ["s30", "s30FS","s10FS","s60FS" , "t2tt30FS"]] ):
-      sampleDict.update({
-         "s30":     {'name':'S300_270',        'sample':cmgPP.T2DegStop_300_270[skim],         'color':colors["s30"],      'isSignal':2 , 'isData':0, 'lumi':mc_lumi},# ,'sumWeights':T2Deg[1], 'xsec':8.51615}, "weight":weights.isrWeight(9.5e-5)
-         "s60FS":   {'name':'S300_240Fast',    'sample':cmgPP.T2DegStop_300_240_FastSim[skim], 'color':colors["s60FS"],    'isSignal':2 , 'isData':0, 'lumi':mc_lumi},# ,"weight":"(weight*0.3520)"},#, 'sumWeights':T2Deg[1], 'xsec':8.51615},
-         "s30FS":   {'name':'S300_270Fast',    'sample':cmgPP.T2DegStop_300_270_FastSim[skim], 'color':colors["s30FS"],    'isSignal':2 , 'isData':0, 'lumi':mc_lumi},# ,"weight":"(weight*0.2647)"},#, 'sumWeights':T2Deg[1], 'xsec':8.51615},
-         "s10FS":   {'name':'S300_290Fast',    'sample':cmgPP.T2DegStop_300_290_FastSim[skim], 'color':colors["s10FS"],    'isSignal':2 , 'isData':0, 'lumi':mc_lumi},# ,"weight":"(weight*0.2546)"},#, 'sumWeights':T2Deg[1], 'xsec':8.51615},
-         "t2tt30FS":{'name':'T2tt300_270Fast', 'sample':cmgPP.T2tt_300_270_FastSim[skim],      'color':colors["t2tt30FS"], 'isSignal':2 , 'isData':0, 'lumi':mc_lumi},# ,"weight":"(weight*0.2783)"},#, 'sumWeights':T2Deg[1], 'xsec':8.51615},
-      })
    
+   if getData:
+      if "d1mu" in sampleList or "d1muBlind" in sampleList:
+         SingleMuDataBlind = getChain(cmgPP.SingleMu_v2[skim],histname='')
+         SingleMuDataUnblind  = SingleMuDataBlind#.CopyTree("run<=274240") #instead cut on run # is applied
+         sampleDict.update({
+               "d1mu":     {'name':"SingleMuDataUnblind", 'sample':cmgPP.SingleMu_v2[skim], 'tree':SingleMuDataUnblind, 'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":data_mu_trigger, "filters":data_filters, 'lumi': lumi_data_unblinded, 'cut':"run<=274240"},
+               "d1muBlind":{'name':"SingleMuDataBlind",   'sample':cmgPP.SingleMu_v2[skim], 'tree':SingleMuDataBlind,   'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":data_mu_trigger, "filters":data_filters, 'lumi': lumi_data_blinded},
+            })
+
+      elif "d1el" in sampleList or "d1elBlind" in sampleList:
+         SingleElDataBlind = getChain(cmgPP.SingleEl_v2[skim],histname='')
+         SingleElDataUnblind  = SingleElDataBlind#.CopyTree("run<=274240") #instead cut on run # is applied
+         sampleDict.update({
+               "d1el":     {'name':"SingleElDataUnblind", 'sample':cmgPP.SingleEl_v2[skim], 'tree':SingleElDataUnblind, 'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":data_el_trigger, "filters":data_filters, 'lumi': lumi_data_unblinded, 'cut':"run<=274240"},
+               "d1elBlind":{'name':"SingleElDataBlind",   'sample':cmgPP.SingleEl_v2[skim], 'tree':SingleElDataBlind,   'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":data_el_trigger, "filters":data_filters, 'lumi': lumi_data_blinded},
+            })
+      else: # "d" in sampleList or "dblind" in sampleList:
+         MET = getChain(cmgPP.MET_v2[skim],histname='')
+         METDataUnblind  = MET#.CopyTree("run<=274240") #instead cut on run # is applied
+         sampleDict.update({
+               "d":        {'name':"DataUnblind",         'sample':cmgPP.MET_v2[skim],      'tree':METDataUnblind,      'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":data_triggers, "filters":data_filters, 'lumi': lumi_data_unblinded, 'cut':"run<=274240"},
+               "dblind":   {'name':"DataBlind",           'sample':cmgPP.MET_v2[skim],      'tree':MET,                 'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":data_triggers, "filters":data_filters, 'lumi': lumi_data_blinded},
+            })
+
    if "w" in sampleList:
       WJetsSample     = cmgPP.WJetsHT[skim] if useHT else cmgPP.WJetsInc[skim]
       sampleDict.update({
          'w':{'name':'WJets', 'sample':WJetsSample, 'color':colors['w'], 'isSignal':0, 'isData':0, 'lumi':mc_lumi},
-      })
-   
-   if "z" in sampleList:
-      sampleDict.update({
-         'z':{'name':'ZJetsInv', 'sample':cmgPP.ZJetsHT[skim], 'color':colors['z'], 'isSignal':0 , 'isData':0, 'lumi':mc_lumi},
       })
    
    if "tt" in sampleList:
@@ -108,6 +129,11 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
             'tt':{'name':'TTJets', 'sample':cmgPP.TTJetsInc[skim], 'color':colors['tt'], 'isSignal':0 , 'isData':0, 'lumi':mc_lumi},
          })
    
+   if "z" in sampleList:
+      sampleDict.update({
+         'z':{'name':'ZJetsInv', 'sample':cmgPP.ZJetsHT[skim], 'color':colors['z'], 'isSignal':0 , 'isData':0, 'lumi':mc_lumi},
+      })
+   
    if "qcd" in sampleList:
       if kill_low_qcd_ht:
          print "WARNING: Removing low HT QCD bins:" ,
@@ -121,31 +147,6 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
             'qcdem': {'name':'QCDEM', 'sample':cmgPP.QCDPT_EM[skim], 'color':colors['qcdem'], 'isSignal':0 , 'isData':0, 'lumi':mc_lumi},
       })
    
-   if getData:
-      if "d1mu" in sampleList or "d1muBlind" in sampleList:
-         SingleMuDataBlind = getChain(cmgPP.SingleMu_v2[skim],histname='')
-         SingleMuDataUnblind  = SingleMuDataBlind#.CopyTree("run<=274240") #instead cut on run # is applied
-         sampleDict.update({
-               "d1mu":     {'name':"SingleMuDataUnblind", 'sample':cmgPP.SingleMu_v2[skim], 'tree':SingleMuDataUnblind, 'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":data_triggers, "filters":data_filters, 'lumi': lumi_data_unblinded, 'cut':"run<=274240"},
-               "d1muBlind":{'name':"SingleMuDataBlind",   'sample':cmgPP.SingleMu_v2[skim], 'tree':SingleMuDataBlind,   'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":data_triggers, "filters":data_filters, 'lumi': lumi_data_blinded},
-            })
-
-      elif "d1el" in sampleList or "d1elBlind" in sampleList:
-         SingleElDataBlind = getChain(cmgPP.SingleEl_v2[skim],histname='')
-         SingleElDataUnblind  = SingleElDataBlind#.CopyTree("run<=274240") #instead cut on run # is applied
-         sampleDict.update({
-               "d1el":     {'name':"SingleElDataUnblind", 'sample':cmgPP.SingleEl_v2[skim], 'tree':SingleElDataUnblind, 'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":data_triggers, "filters":data_filters, 'lumi': lumi_data_unblinded, 'cut':"run<=274240"},
-               "d1elBlind":{'name':"SingleElDataBlind",   'sample':cmgPP.SingleEl_v2[skim], 'tree':SingleElDataBlind,   'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":data_triggers, "filters":data_filters, 'lumi': lumi_data_blinded},
-            })
-      else: # "d" in sampleList or "dblind" in sampleList:
-         MET = getChain(cmgPP.MET_v2[skim],histname='')
-         METDataUnblind  = MET#.CopyTree("run<=274240") #instead cut on run # is applied
-         sampleDict.update({
-               "d":        {'name':"DataUnblind",         'sample':cmgPP.MET_v2[skim],      'tree':METDataUnblind,      'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":data_triggers, "filters":data_filters, 'lumi': lumi_data_unblinded, 'cut':"run<=274240"},
-               "dblind":   {'name':"DataBlind",           'sample':cmgPP.MET_v2[skim],      'tree':MET,                 'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":data_triggers, "filters":data_filters, 'lumi': lumi_data_blinded},
-            })
-
-   
    if "dy" in sampleList:
       #DYJetsSample = getChain(cmgPP.DYJetsM5to50HT[skim],histname='')
       sampleDict.update({
@@ -154,6 +155,7 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
             #'dy5to50Inc':{'name':'DYJetsM5to50Inc', 'sample':cmgPP.DYJetsM5to50[skim],   'color':colors['dy5to50Inc'], 'isSignal':0 , 'isData':0, 'lumi':mc_lumi},
             #'dyInv':     {'name':'DYJetsInv',       'sample':cmgPP.DYJetsToNuNu[skim],   'color':colors['dyInv'],      'isSignal':0 , 'isData':0, 'lumi':mc_lumi},
       }) 
+   
    if "vv" in sampleList:
       sampleDict.update({
             'vv': {'name':'Diboson', 'sample':cmgPP.VV[skim], 'color':colors['vv'], 'isSignal':0 , 'isData':0, 'lumi':mc_lumi},
@@ -174,6 +176,15 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
       sampleDict.update({
           'wtau':  {'name':'WTau%s'%htString,   'sample':WJetsTauSample,   'color':colors['wtau'],   'isSignal':0, 'isData':0, 'lumi':mc_lumi},
           'wnotau':{'name':'WNoTau%s'%htString, 'sample':WJetsNoTauSample, 'color':colors['wnotau'], 'isSignal':0, 'isData':0, 'lumi':mc_lumi}, 
+      })
+   
+   if any( [x in sampleList for x in ["s30", "s30FS","s10FS","s60FS" , "t2tt30FS"]] ):
+      sampleDict.update({
+         "s30":     {'name':'S300_270',        'sample':cmgPP.T2DegStop_300_270[skim],         'color':colors["s30"],      'isSignal':2 , 'isData':0, 'lumi':mc_lumi},# ,'sumWeights':T2Deg[1], 'xsec':8.51615}, "weight":weights.isrWeight(9.5e-5)
+         "s60FS":   {'name':'S300_240Fast',    'sample':cmgPP.T2DegStop_300_240_FastSim[skim], 'color':colors["s60FS"],    'isSignal':2 , 'isData':0, 'lumi':mc_lumi},# ,"weight":"(weight*0.3520)"},#, 'sumWeights':T2Deg[1], 'xsec':8.51615},
+         "s30FS":   {'name':'S300_270Fast',    'sample':cmgPP.T2DegStop_300_270_FastSim[skim], 'color':colors["s30FS"],    'isSignal':2 , 'isData':0, 'lumi':mc_lumi},# ,"weight":"(weight*0.2647)"},#, 'sumWeights':T2Deg[1], 'xsec':8.51615},
+         "s10FS":   {'name':'S300_290Fast',    'sample':cmgPP.T2DegStop_300_290_FastSim[skim], 'color':colors["s10FS"],    'isSignal':2 , 'isData':0, 'lumi':mc_lumi},# ,"weight":"(weight*0.2546)"},#, 'sumWeights':T2Deg[1], 'xsec':8.51615},
+         "t2tt30FS":{'name':'T2tt300_270Fast', 'sample':cmgPP.T2tt_300_270_FastSim[skim],      'color':colors["t2tt30FS"], 'isSignal':2 , 'isData':0, 'lumi':mc_lumi},# ,"weight":"(weight*0.2783)"},#, 'sumWeights':T2Deg[1], 'xsec':8.51615},
       })
    
    if scan:
