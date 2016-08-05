@@ -109,6 +109,17 @@ if __name__ == '__main__':
     cmgPP         = cmgTuplesPostProcessed( mc_path, signal_path, data_path)
     samples   =   getSamples(   cmgPP = cmgPP, sampleList = ['tt','w'] , useHT = True, skim='preIncLep', scan = True  )
 
+    skimPresel = '((met_pt>200)&&(Sum$(Jet_pt*(Jet_pt>30 && abs(Jet_eta)<2.4 && (Jet_id)) ) >200)) && ((Max$(Jet_pt*(abs(Jet_eta)<2.4 && Jet_id) ) > 90 ) >=1)'
+    jetCut1j   = "(Sum$(Jet_pt>30&&abs(Jet_eta)<2.4&&Jet_id))>=1"
+
+    setups = { 
+                'presel' : {'tag': '_presel',  'cut': skimPresel },
+                '1j'     : {'tag': '_1j'    ,  'cut': jetCut1j   },
+             }
+
+    setup = setups['presel']
+
+
     for samp in ['tt','w' ]:
     #for samp in ['sig']:
         if samp == 'sig': 
@@ -118,9 +129,8 @@ if __name__ == '__main__':
             signal_cmg_files = "/data/nrad/cmgTuples/8011_mAODv2_v1/RunIISpring16MiniAODv2/SMS-T2tt_dM-10to80_genHT-160_genMET-80_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/" 
             for f in glob.glob(signal_cmg_files+"/*/tree.root"):
                 tree.Add(f)
-            #skimPresel = '((met_pt>200)&&((Max$(Jet_pt*(abs(Jet_eta)<2.4 && Jet_id) ) > 90 ) >=1)&&(Sum$(Jet_pt*(Jet_pt>30 && abs(Jet_eta)<2.4 && (Jet_id)) ) >200))'
-            skimPresel = '((met_pt>200)&&(Sum$(Jet_pt*(Jet_pt>30 && abs(Jet_eta)<2.4 && (Jet_id)) ) >200))'
-            jetcut     = "(Sum$(Jet_pt>30&&abs(Jet_eta)<2.4&&Jet_id))>=1"
+            jetcut        = setup['cut']
+            tag           = setup['tag']
             dms = {
                         'allDM'  : "(1)",
                         'lowDM'  : "(  (GenSusyMStop-GenSusyMNeutralino) < 31)",
@@ -140,23 +150,24 @@ if __name__ == '__main__':
 
                 pickle.dump(res, \
                     #file(os.path.expandvars('$CMSSW_BASE/src/StopsDilepton/tools/data/btagEfficiencyData/TTJets_DiLepton_comb_2j_2l.pkl'), 'w')
-                    file(os.path.expandvars('$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/T2tt_%s_1j.pkl'%dm), 'w')
+                    file(os.path.expandvars('$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/T2tt_%s_%s.pkl'%(dm,tag) ), 'w')
                 )
 
         else:
             tree = samples[samp]['tree']
             sample_name = samples[samp]['name']
-            tag = "_v2"
+            tag = setup['tag']
 
             res=  getBTagMCTruthEfficiencies2D( tree,
-                cut="(Sum$(Jet_pt>30&&abs(Jet_eta)<2.4&&Jet_id))>=1"
+                #cut="(Sum$(Jet_pt>30&&abs(Jet_eta)<2.4&&Jet_id))>=1"
+                cut=setup['cut']
             )
             print "%s Efficiencies:"%sample_name
             print res
 
             pickle.dump(res, \
                 #file(os.path.expandvars('$CMSSW_BASE/src/StopsDilepton/tools/data/btagEfficiencyData/TTJets_DiLepton_comb_2j_2l.pkl'), 'w')
-                file(os.path.expandvars('$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/%s_1j_2D%s.pkl'%(sample_name,tag)), 'w')
+                file(os.path.expandvars('$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/%s_2D%s.pkl'%(sample_name,tag)), 'w')
             )
     #for samp in ['tt','w']:
     #    tree = samples[samp]['tree']
