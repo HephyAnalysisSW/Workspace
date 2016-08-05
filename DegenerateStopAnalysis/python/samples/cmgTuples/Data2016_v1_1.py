@@ -1,12 +1,12 @@
-data_sample_path = '/data/nrad/cmgTuples/8011_mAODv2_v1_1/Data25ns'   
-allComponents_data=[] 
+sample_path = '/data/nrad/cmgTuples/8011_mAODv2_v1_1/Data25ns'   
+allComponents=[] 
 
 
 MET_Run2016B_PromptReco_v2 ={
 'cmgName':"MET_Run2016B_PromptReco_v2",
 "name" : "MET_Run2016B-PromptReco-v2",
 "chunkString":"MET_Run2016B-PromptReco-v2",
-"dir": data_sample_path +"/" + "MET_Run2016B-PromptReco-v2",
+"dir": sample_path +"/" + "MET_Run2016B-PromptReco-v2",
 "dbsName" : "/MET/Run2016B-PromptReco-v2/MINIAOD",
 "rootFileLocation":"tree.root",
 "skimAnalyzerDir":"skimAnalyzerCount",
@@ -15,7 +15,7 @@ MET_Run2016B_PromptReco_v2 ={
 "xsec": None,
 
 }
-allComponents_data.append(MET_Run2016B_PromptReco_v2)
+allComponents.append(MET_Run2016B_PromptReco_v2)
 
 
 
@@ -23,7 +23,7 @@ MET_Run2016C_PromptReco_v2 ={
 'cmgName':"MET_Run2016C_PromptReco_v2",
 "name" : "MET_Run2016C-PromptReco-v2",
 "chunkString":"MET_Run2016C-PromptReco-v2",
-"dir": data_sample_path +"/" + "MET_Run2016C-PromptReco-v2",
+"dir": sample_path +"/" + "MET_Run2016C-PromptReco-v2",
 "dbsName" : "/MET/Run2016C-PromptReco-v2/MINIAOD",
 "rootFileLocation":"tree.root",
 "skimAnalyzerDir":"skimAnalyzerCount",
@@ -32,7 +32,7 @@ MET_Run2016C_PromptReco_v2 ={
 "xsec": None,
 
 }
-allComponents_data.append(MET_Run2016C_PromptReco_v2)
+allComponents.append(MET_Run2016C_PromptReco_v2)
 
 
 
@@ -40,7 +40,7 @@ MET_Run2016D_PromptReco_v2 ={
 'cmgName':"MET_Run2016D_PromptReco_v2",
 "name" : "MET_Run2016D-PromptReco-v2",
 "chunkString":"MET_Run2016D-PromptReco-v2",
-"dir": data_sample_path +"/" + "MET_Run2016D-PromptReco-v2",
+"dir": sample_path +"/" + "MET_Run2016D-PromptReco-v2",
 "dbsName" : "/MET/Run2016D-PromptReco-v2/MINIAOD",
 "rootFileLocation":"tree.root",
 "skimAnalyzerDir":"skimAnalyzerCount",
@@ -49,7 +49,7 @@ MET_Run2016D_PromptReco_v2 ={
 "xsec": None,
 
 }
-allComponents_data.append(MET_Run2016D_PromptReco_v2)
+allComponents.append(MET_Run2016D_PromptReco_v2)
 
 
 
@@ -57,7 +57,7 @@ SingleElectron_Run2016B_PromptReco_v2 ={
 'cmgName':"SingleElectron_Run2016B_PromptReco_v2",
 "name" : "SingleElectron_Run2016B-PromptReco-v2",
 "chunkString":"SingleElectron_Run2016B-PromptReco-v2",
-"dir": data_sample_path +"/" + "SingleElectron_Run2016B-PromptReco-v2",
+"dir": sample_path +"/" + "SingleElectron_Run2016B-PromptReco-v2",
 "dbsName" : "/SingleElectron/Run2016B-PromptReco-v2/MINIAOD",
 "rootFileLocation":"tree.root",
 "skimAnalyzerDir":"skimAnalyzerCount",
@@ -66,7 +66,7 @@ SingleElectron_Run2016B_PromptReco_v2 ={
 "xsec": None,
 
 }
-allComponents_data.append(SingleElectron_Run2016B_PromptReco_v2)
+allComponents.append(SingleElectron_Run2016B_PromptReco_v2)
 
 
 
@@ -74,7 +74,7 @@ SingleElectron_Run2016C_PromptReco_v2 ={
 'cmgName':"SingleElectron_Run2016C_PromptReco_v2",
 "name" : "SingleElectron_Run2016C-PromptReco-v2",
 "chunkString":"SingleElectron_Run2016C-PromptReco-v2",
-"dir": data_sample_path +"/" + "SingleElectron_Run2016C-PromptReco-v2",
+"dir": sample_path +"/" + "SingleElectron_Run2016C-PromptReco-v2",
 "dbsName" : "/SingleElectron/Run2016C-PromptReco-v2/MINIAOD",
 "rootFileLocation":"tree.root",
 "skimAnalyzerDir":"skimAnalyzerCount",
@@ -83,7 +83,7 @@ SingleElectron_Run2016C_PromptReco_v2 ={
 "xsec": None,
 
 }
-allComponents_data.append(SingleElectron_Run2016C_PromptReco_v2)
+allComponents.append(SingleElectron_Run2016C_PromptReco_v2)
 
 
 
@@ -91,7 +91,7 @@ SingleElectron_Run2016D_PromptReco_v2 ={
 'cmgName':"SingleElectron_Run2016D_PromptReco_v2",
 "name" : "SingleElectron_Run2016D-PromptReco-v2",
 "chunkString":"SingleElectron_Run2016D-PromptReco-v2",
-"dir": data_sample_path +"/" + "SingleElectron_Run2016D-PromptReco-v2",
+"dir": sample_path +"/" + "SingleElectron_Run2016D-PromptReco-v2",
 "dbsName" : "/SingleElectron/Run2016D-PromptReco-v2/MINIAOD",
 "rootFileLocation":"tree.root",
 "skimAnalyzerDir":"skimAnalyzerCount",
@@ -100,7 +100,7 @@ SingleElectron_Run2016D_PromptReco_v2 ={
 "xsec": None,
 
 }
-allComponents_data.append(SingleElectron_Run2016D_PromptReco_v2)
+allComponents.append(SingleElectron_Run2016D_PromptReco_v2)
 
 
 
@@ -108,7 +108,7 @@ SingleMuon_Run2016B_PromptReco_v2 ={
 'cmgName':"SingleMuon_Run2016B_PromptReco_v2",
 "name" : "SingleMuon_Run2016B-PromptReco-v2",
 "chunkString":"SingleMuon_Run2016B-PromptReco-v2",
-"dir": data_sample_path +"/" + "SingleMuon_Run2016B-PromptReco-v2",
+"dir": sample_path +"/" + "SingleMuon_Run2016B-PromptReco-v2",
 "dbsName" : "/SingleMuon/Run2016B-PromptReco-v2/MINIAOD",
 "rootFileLocation":"tree.root",
 "skimAnalyzerDir":"skimAnalyzerCount",
@@ -117,7 +117,7 @@ SingleMuon_Run2016B_PromptReco_v2 ={
 "xsec": None,
 
 }
-allComponents_data.append(SingleMuon_Run2016B_PromptReco_v2)
+allComponents.append(SingleMuon_Run2016B_PromptReco_v2)
 
 
 
@@ -125,7 +125,7 @@ SingleMuon_Run2016C_PromptReco_v2 ={
 'cmgName':"SingleMuon_Run2016C_PromptReco_v2",
 "name" : "SingleMuon_Run2016C-PromptReco-v2",
 "chunkString":"SingleMuon_Run2016C-PromptReco-v2",
-"dir": data_sample_path +"/" + "SingleMuon_Run2016C-PromptReco-v2",
+"dir": sample_path +"/" + "SingleMuon_Run2016C-PromptReco-v2",
 "dbsName" : "/SingleMuon/Run2016C-PromptReco-v2/MINIAOD",
 "rootFileLocation":"tree.root",
 "skimAnalyzerDir":"skimAnalyzerCount",
@@ -134,7 +134,7 @@ SingleMuon_Run2016C_PromptReco_v2 ={
 "xsec": None,
 
 }
-allComponents_data.append(SingleMuon_Run2016C_PromptReco_v2)
+allComponents.append(SingleMuon_Run2016C_PromptReco_v2)
 
 
 
@@ -142,7 +142,7 @@ allComponents_data.append(SingleMuon_Run2016C_PromptReco_v2)
 #'cmgName':"SingleMuon_Run2016D_PromptReco_v2",
 #"name" : "SingleMuon_Run2016D-PromptReco-v2",
 #"chunkString":"SingleMuon_Run2016D-PromptReco-v2",
-#"dir": data_sample_path +"/" + "SingleMuon_Run2016D-PromptReco-v2",
+#"dir": sample_path +"/" + "SingleMuon_Run2016D-PromptReco-v2",
 #"dbsName" : "/SingleMuon/Run2016D-PromptReco-v2/MINIAOD",
 #"rootFileLocation":"tree.root",
 #"skimAnalyzerDir":"skimAnalyzerCount",
@@ -151,22 +151,22 @@ allComponents_data.append(SingleMuon_Run2016C_PromptReco_v2)
 #"xsec": None,
 #
 #}
-#allComponents_data.append(SingleMuon_Run2016D_PromptReco_v2)
+#allComponents.append(SingleMuon_Run2016D_PromptReco_v2)
 
 
 
 
 
 
-data_sample_path_8012 = '/data/nrad/cmgTuples/8012_mAODv2_v0/Data25ns'   
-#allComponents_data=[] 
+sample_path_8012 = '/data/nrad/cmgTuples/8012_mAODv2_v0/Data25ns'   
+#allComponents=[] 
 
 
 MET_Run2016D_PromptReco_v2 ={
 'cmgName':"MET_Run2016D_PromptReco_v2",
 "name" : "MET_Run2016D-PromptReco-v2",
 "chunkString":"MET_Run2016D-PromptReco-v2",
-"dir": data_sample_path_8012 +"/" + "MET_Run2016D-PromptReco-v2",
+"dir": sample_path_8012 +"/" + "MET_Run2016D-PromptReco-v2",
 "dbsName" : "/MET/Run2016D-PromptReco-v2/MINIAOD",
 "rootFileLocation":"tree.root",
 "skimAnalyzerDir":"skimAnalyzerCount",
@@ -175,7 +175,7 @@ MET_Run2016D_PromptReco_v2 ={
 "xsec": None,
 
 }
-allComponents_data.append(MET_Run2016D_PromptReco_v2)
+allComponents.append(MET_Run2016D_PromptReco_v2)
 
 
 
@@ -183,7 +183,7 @@ SingleElectron_Run2016D_PromptReco_v2 ={
 'cmgName':"SingleElectron_Run2016D_PromptReco_v2",
 "name" : "SingleElectron_Run2016D-PromptReco-v2",
 "chunkString":"SingleElectron_Run2016D-PromptReco-v2",
-"dir": data_sample_path_8012 +"/" + "SingleElectron_Run2016D-PromptReco-v2",
+"dir": sample_path_8012 +"/" + "SingleElectron_Run2016D-PromptReco-v2",
 "dbsName" : "/SingleElectron/Run2016D-PromptReco-v2/MINIAOD",
 "rootFileLocation":"tree.root",
 "skimAnalyzerDir":"skimAnalyzerCount",
@@ -192,7 +192,7 @@ SingleElectron_Run2016D_PromptReco_v2 ={
 "xsec": None,
 
 }
-allComponents_data.append(SingleElectron_Run2016D_PromptReco_v2)
+allComponents.append(SingleElectron_Run2016D_PromptReco_v2)
 
 
 
@@ -200,7 +200,7 @@ SingleMuon_Run2016D_PromptReco_v2 ={
 'cmgName':"SingleMuon_Run2016D_PromptReco_v2",
 "name" : "SingleMuon_Run2016D-PromptReco-v2",
 "chunkString":"SingleMuon_Run2016D-PromptReco-v2",
-"dir": data_sample_path_8012 +"/" + "SingleMuon_Run2016D-PromptReco-v2",
+"dir": sample_path_8012 +"/" + "SingleMuon_Run2016D-PromptReco-v2",
 "dbsName" : "/SingleMuon/Run2016D-PromptReco-v2/MINIAOD",
 "rootFileLocation":"tree.root",
 "skimAnalyzerDir":"skimAnalyzerCount",
@@ -209,4 +209,4 @@ SingleMuon_Run2016D_PromptReco_v2 ={
 "xsec": None,
 
 }
-allComponents_data.append(SingleMuon_Run2016D_PromptReco_v2)
+allComponents.append(SingleMuon_Run2016D_PromptReco_v2)
