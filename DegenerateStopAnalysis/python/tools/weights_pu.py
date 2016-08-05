@@ -35,7 +35,6 @@ sf_two_or_more_bjet        = 'weightBTag2p_SF'
 
 
 
-
 weightDict={
              "w": {
                     "cuts":{ 
@@ -63,9 +62,9 @@ weightDict={
               "t2tt30FS":{
                     "gen_filter_eff": "0.2783" ,
                     },
-             "sigScan": {
-                    "baseWeight": "weight",
-                   },
+             #"sigScan": {
+             #       "baseWeight": "weight",
+             #      },
 
 
 

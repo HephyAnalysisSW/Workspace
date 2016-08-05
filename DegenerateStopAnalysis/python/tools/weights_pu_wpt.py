@@ -82,10 +82,10 @@ weightDict={
               "t2tt30FS":{
                     "gen_filter_eff": "0.2783" ,
                     },
-             "sigScan": {
-                    "baseWeight": "weight",
-                    #"isrWeight": isrWeight,
-                   },
+             #"sigScan": {
+             #       "baseWeight": "weight",
+             #       #"isrWeight": isrWeight,
+             #      },
 
 
              "tt8tev": {
@@ -106,10 +106,10 @@ weightDict={
                                 }
                    },
 
-             "sigScan_8tev": {
-                    "baseWeight": "puWeight*wpts4X",
-                    "isrWeight":  isrWeight_8tev,
-                   },
+             #"sigScan_8tev": {
+             #       "baseWeight": "puWeight*wpts4X",
+             #       "isrWeight":  isrWeight_8tev,
+             #      },
 
 
            }
@@ -117,7 +117,7 @@ weightDict={
 
 def_weights = {
 
-            "baseWeight":"puWeight*weight",
+            "baseWeight":"puReweight*weight",
             #"lumis":{      
             #                "target_lumi"      :    2300, 
             #                "mc_lumi"          :    10000, 

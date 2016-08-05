@@ -629,7 +629,8 @@ def data_plots(cfg,args):
             print "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
 
         if getattr(args, "setEventLists",True):
-            setEventListToChains(cfg.samples, mcList +[data] , eventListCutInst)
+            #setEventListToChains(cfg.samples, mcList +[data] , eventListCutInst)
+            setEventListToChains(cfg.samples, mcList +[data] , cutInst.baseCut)
         getPlots(cfg.samples, cfg.plots , cutInst  , sampleList = sampleList      , plotList=[plot] , nMinus1=nminus_list , addOverFlowBin='both',weight=""  )
 
         plt = drawPlots(cfg.samples,    cfg.plots , cutInst, sampleList = sampleList , # [ 'qcd','z','dy','tt','w','s300_250','s250_230' , 'dblind'],

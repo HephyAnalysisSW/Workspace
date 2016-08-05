@@ -9,10 +9,21 @@ class DegPlots():
 
     @staticmethod
     def makeNBJetPlotFunc(bjet_var):
-        def nBJetPlot( sample, bins, cutString, weight, addOverFlowBin = '', binningIsExplicit = False, bjet_var="nBJet"):
-            from Workspace.DegenerateStopAnalysis.tools.btag_sf_map import btag_to_weight_vars, weight_to_btag_vars, sf_to_btag , btag_to_sf
+        def nBJetPlot( sample, bins, cutString, weight, addOverFlowBin = '', binningIsExplicit = False, bjet_var=bjet_var):
+            #from Workspace.DegenerateStopAnalysis.tools.btag_sf_map import btag_to_weight_vars, weight_to_btag_vars, sf_to_btag , btag_to_sf
+            from Workspace.DegenerateStopAnalysis.tools.btag_sf_map import BTagSFMap
+            btag_sf_map = BTagSFMap('sf')
+
+            
+            btag_to_weight_vars    =  btag_sf_map.btag_to_weight_vars     
+            weight_to_btag_vars    =  btag_sf_map.weight_to_btag_vars         
+            sf_to_btag             =  btag_sf_map.sf_to_btag              
+            btag_to_sf             =  btag_sf_map.btag_to_sf              
+
             nBs = min(bins[-1], 2)
             hists = []
+
+
 
 
             #sfs = sf_to_btag.keys() + btag_to_sf.keys()
@@ -31,12 +42,16 @@ class DegPlots():
 
 
             if sample.isData:
-                histo = getPlotFromChain( sample.tree, bjet_var,  bins, cutString, weight, addOverFlowBin=addOverFlowBin, binningIsExplicit=binningIsExplicit, uniqueName = True)
+                cutString_ = cutString
+                #cutString_ = cutString_.replace("((nBHardJet + nBSoftJet)== 0 )","((nBHardJet)== 0 )")
+                #cutString_ = cutString_.replace("((nBHardJet + nBSoftJet)== 0 )","(1)")
+                histo = getPlotFromChain( sample.tree, bjet_var,  bins, cutString_, weight, addOverFlowBin=addOverFlowBin, binningIsExplicit=binningIsExplicit, uniqueName = True)
             else:
                 hist_lists = ROOT.TList()
                 for nB in range(nBs+1):
                     bTagWeight = btag_to_weight_vars[bjet_var]%nB 
-                    print bTagWeight
+                    #print btag_to_weight_vars
+                    print bjet_var + "  >>>  " + bTagWeight
                     hist_ = getPlotFromChain( sample.tree,  "%s"%nB ,  bins , cutString , weight +"* %s"%bTagWeight ,  addOverFlowBin= addOverFlowBin, binningIsExplicit= binningIsExplicit, uniqueName = True)
                     hist_lists.Add(hist_)
                 bTagWeight = "( %s - %s )"%( btag_to_weight_vars[bjet_var]%(str(nBs)+"p") ,  btag_to_weight_vars[bjet_var]%(nBs) )
@@ -91,6 +106,11 @@ class DegPlots():
         
                 }
 
+
+
+        wpt = "(sqrt(({lepCol}_pt[max(0,{lepIndex}[0])]*cos({lepCol}_phi[max(0,{lepIndex}[0])]) + met_pt*cos(met_phi) ) **2 + ( {lepCol}_pt[max(0,{lepIndex}[0])]*sin({lepCol}_phi[max(0,{lepIndex}[0])])+met_pt*sin(met_phi) )^2 ))".format(lepCol = lepCollection , lepIndex = lepIndex, Lep=lep)
+
+
         print fargs
 
 
@@ -125,6 +145,8 @@ class DegPlots():
                 #"MetOverHT":   {'var':"met_pt/htJet30j"               ,"bins":[20,0,4]            ,"nMinus1":None         ,"decor":{"title":"MetOverHT"    ,"x":"Met/HT"      ,"y":"Events "  ,'log':[0,1,0], 'fom_reverse':False }},
                 "isrPt":       {'var':"Jet_pt[IndexJet_basJet[0]]"     ,"bins":[45,100,1000]          ,"nMinus1":None         ,"decor":{"title":"Leading Jet P_{{T}}"    ,"x":"isrJetPt"      ,"y":"Events  "  ,'log':[0,1,0] }},
 
+
+                "wpt":          {'var':wpt                            ,"bins":[40,200,1000]        ,"nMinus1":""        ,"decor":{"title":"WPT"    ,"x":"P_{T}(W)"      ,"y":"Events"  ,'log':[0,1,0] }},
 
                 "isrPt2":       {'var':"Jet_pt[IndexJet_basJet[0]]"     ,"bins":[20,100,900]          ,"nMinus1":None         ,"decor":{"title":"Leading Jet P_{{T}}"    ,"x":"isrJetPt"      ,"y":"Events  "  ,'log':[0,1,0] }},
                 "isrEta":       {'var':"Jet_eta[IndexJet_basJet[0]]"   ,"bins":[20,-3,3]          ,"nMinus1":None         ,"decor":{"title":"Leading Jet Eta "    ,"x":"#eta(LeadingJet)"      ,"y":"Events  "  ,'log':[0,1,0] }},
@@ -185,6 +207,8 @@ class DegPlots():
                 "isrPt_fine":   {'var':"Jet_pt[IndexJet_basJet[0]]"    ,"bins":[100,0,1000]          ,"nMinus1":None         ,"decor":{"title":"Leading Jet P_{{T}} "    ,"x":"isrJetPt"      ,"y":"Events  "  ,'log':[0,1,0] }},
                 "nJets30":      {'var':"nBasJet"                       ,"bins":[10,0,10]          ,"nMinus1":None         ,"decor":{"title":"Number of Jets with P_{{T}} > 30GeV"    ,"x":"Number of Jets with P_{T} > 30GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
                 "nJets60":      {'var':"nVetoJet"                      ,"bins":[10,0,10]          ,"nMinus1":None         ,"decor":{"title":"Number of Jets with P_{{T}} > 60GeV"    ,"x":"Number of Jets with P_{T} > 60GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
+                "nJets30_2":      {'var':"nBasJet"                     ,"bins":[4,0,4]          ,"nMinus1":None         ,"decor":{"title":"Number of Jets with P_{{T}} > 30GeV"    ,"x":"Number of Jets with P_{T} > 30GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
+                "nJets60_2":      {'var':"nVetoJet"                    ,"bins":[4,0,4]          ,"nMinus1":None         ,"decor":{"title":"Number of Jets with P_{{T}} > 60GeV"    ,"x":"Number of Jets with P_{T} > 60GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
                 "nSoftBJets":   {'var':"(nBSoftJet)"                   ,"bins":[4,0,4]            ,"nMinus1":None         ,"decor":{"title":"Number of Soft B-Tagged Jets with P_{{T}} < 60GeV"    ,"x":"Number of Soft B-Tagged Jets with P_{T} < 60GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
                 "nHardBJets":   {'var':"(nBHardJet)"                   ,"bins":[4,0,4]            ,"nMinus1":None         ,"decor":{"title":"Number of B-Tagged Jets with P_{{T}} > 60GeV"    ,"x":"Number of Hard B-Tagged Jets with P_{T} > 60GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
                 "nBJets":       {'var':"(nBHardJet + nBSoftJet)"       ,"bins":[4,0,4]            ,"nMinus1":None         ,"decor":{"title":"Number of B-Tagged Jets"                         ,"x":"Number of B-Tagged Jets"      ,"y":"Events  "  ,'log':[0,1,0] }},
@@ -216,6 +240,8 @@ class DegPlots():
                             "{lep}Eta".format(**fargs) :       ["lepEta".format(**fargs) ]   , 
                             "nJets30":      ["",]   , 
                             "nJets60":      ["Jet60"]   , 
+                            "nJets30":      ["",]   , 
+                            "nJets60_2":      ["Jet60"]   , 
                             #"nBJets":       ["BVeto"]   , 
                             "nBJets":       ["BJet"]   , 
                             "nSoftBJets":   ["Soft"]   , 

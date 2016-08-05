@@ -14,6 +14,7 @@ from Workspace.DegenerateStopAnalysis.scripts.degStop import args
 
 
 import Workspace.DegenerateStopAnalysis.tools.weights_pu as weights_pu
+import Workspace.DegenerateStopAnalysis.tools.weights_pu_teff as weights_pu_teff
 import Workspace.DegenerateStopAnalysis.tools.weights_pu2 as weights_pu2
 import Workspace.DegenerateStopAnalysis.tools.weights_wpt as weights_wpt
 import Workspace.DegenerateStopAnalysis.tools.weights_pu_wpt as weights_pu_wpt
@@ -31,11 +32,11 @@ massPointsFull = MassPoints(dmOpt, (100,601,25))
 
 
 
-bkgList = ['st', 'vv' , 'dy', 'qcd', 'z', 'tt', 'w' ]
-#bkgList = [ 'dy', 'qcd', 'z', 'tt', 'w' ]
+bkgList = [ 'vv',  'qcd', 'st', 'z','dy', 'tt', 'w' ]
+#bkgList = [ 'vv', 'qcd', 'st', 'dy', 'tt', 'w'  ]
 #sigList = ['s60FS', 's30FS', 's10FS' , 's30']
-sigList = ['s300_270','s300_220']
-
+sigList = ['s300_270','s300_220', 's300_290']
+#sigList = [ ] 
 
 #signalList    = massPoints.sigList 
 #mstop_lsps = massPoints.mstop_lsps
@@ -115,6 +116,8 @@ task_info=tasks_info[task]
 #ppTag = "74X_postProcessing_v4"
 
 ppSets = [
+            ( "80X_postProcessing_v6" , "nrad01"   , '8011_mAODv2_v1'),
+            ( "80X_postProcessing_v7" , "nrad01"   , '8011_mAODv2_v1'),
             ( "80X_postProcessing_v5" , "mzarucki01"   , '8011_mAODv2_v1'),
             ( "80X_postProcessing_v4" , "nrad01"       , '8011_mAODv2_v1'),
             ( "80X_postProcessing_v3" , "nrad01"       , '8011_mAODv2_v1'),
@@ -137,7 +140,14 @@ def make_match_func(tothis):
 
 
 
-from Workspace.DegenerateStopAnalysis.tools.btag_sf_map import btag_to_sf , sf_to_btag
+from Workspace.DegenerateStopAnalysis.tools.btag_sf_map import BTagSFMap
+
+sf = 'sf' if btag=='btag' else btag
+
+btag_sf_map = BTagSFMap(sf)
+btag_to_sf = btag_sf_map.btag_to_sf
+sf_to_btag = btag_sf_map.sf_to_btag
+
 import re
 def_weights = {
 
@@ -147,7 +157,7 @@ def_weights = {
             "lumis":{
                             "mc_lumi"               :   10000   ,
                             'target_lumi'           :   13000.   ,
-                            'DataBlind_lumi'      :   12430    ,
+                            'DataBlind_lumi'      :   12741.    ,
                             'DataUnblind_lumi'    :   804.2   ,
                     },
                 }
@@ -210,6 +220,7 @@ mc_filters_list   = [
 
 weights = {
             'base': weights_base,
+            'pu_teff':   weights_pu_teff,
             'pu':   weights_pu,
             'pu2':   weights_pu2,
             'wpt':  weights_wpt, 
@@ -231,7 +242,7 @@ cfg = TaskConfig(
                    ppUser         =  ppUser , 
                    cmgTag         =  cmgTag , 
                    #saveDirBase   =  "/afs/hephy.at/user/n/nrad/www/T2Deg13TeV/mAODv2_7412pass2_v6/Studies_v1/" ,
-                   saveDirBase    =  "/afs/hephy.at/user/n/nrad/www/T2Deg13TeV/%s/%s/SUS_16_031_v0_0/"%(cmgTag, ppTag) ,
+                   saveDirBase    =  "/afs/hephy.at/user/n/nrad/www/T2Deg13TeV/%s/%s/SUS_16_031_v0_2/"%(cmgTag, ppTag) ,
                    #saveDirBase    =  "/afs/hephy.at/user/n/nrad/www/T2Deg13TeV/%s/%s/Studies_v0_puWeight_wptrwgt/"%(cmgTag, ppTag) ,
                    #saveDirBase    =  "/afs/hephy.at/user/n/nrad/www/T2Deg13TeV/%s/%s/Studies_v0_puWeight_wptrwgt/"%(cmgTag, ppTag) ,
                    cutInst        =  cutInstList,

@@ -971,7 +971,7 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
                     del bkgLeg
 
             if any_in(sampleList, sigLegList):
-               sigLeg = makeLegend(samples, hists, sigLegList, p, loc=[0.4,legy[0],0.7,legy[1]], name="Legend_sigs_%s_%s"%(cut.name, p), legOpt="l")
+               sigLeg = makeLegend(samples, hists, sigLegList, p, loc=[legx[0],legy[0],legx[1],legy[1]], name="Legend_sigs_%s_%s"%(cut.name, p), legOpt="l")
                sigLeg.Draw()
                ret['legs'].append(sigLeg)
 
@@ -1921,11 +1921,18 @@ def decide_weight2( sample, weight=None, cut="default" , lumi="target_lumi"):
 
 
 
-from Workspace.DegenerateStopAnalysis.tools.btag_sf_map import btag_to_sf , sf_to_btag
+#from Workspace.DegenerateStopAnalysis.tools.btag_sf_map import btag_to_sf , sf_to_btag
+from Workspace.DegenerateStopAnalysis.tools.btag_sf_map import BTagSFMap
+
 
 
 def decide_cut( sample, cut, plot=None, nMinus1=None):
     cuts = []
+
+    btag_sf_map = BTagSFMap("sf")
+    btag_to_sf  = btag_sf_map.btag_to_sf
+    sf_to_btag  = btag_sf_map.sf_to_btag
+
 
     if hasattr(cut, "nMinus1"):
         if nMinus1:
@@ -2720,6 +2727,9 @@ class JinjaTexTable():
         #            "rowLegend" : [x for x in yields.table[0][1:]],
         #            }
 
+        self.isDataTable = True if self.yields.dataList else False
+            
+
         self.templateEnv = jinja2.Environment( 
                       #"%<", ">%",
                       #"<<", ">>",
@@ -2763,6 +2773,15 @@ class JinjaTexTable():
             yieldDict = yieldOpt(ylds)
         else:
             yieldDict = getattr(ylds, yieldOpt)
+        yieldDict = deepcopy(yieldDict)
+
+        for d in ylds.dataList:
+            dataName = ylds.sampleNames[d] if ylds.sampleNames[d] in yieldDict.keys() else d
+            print yieldDict[dataName]
+            for dataBin in yieldDict[dataName].keys():
+                print "before" , yieldDict[dataName][dataBin]
+                yieldDict[dataName][dataBin] = int( getattr(yieldDict[dataName][dataBin],"val", yieldDict[dataName][dataBin] ) )
+                print "after" , yieldDict[dataName][dataBin]
 
 
         if noFOM:

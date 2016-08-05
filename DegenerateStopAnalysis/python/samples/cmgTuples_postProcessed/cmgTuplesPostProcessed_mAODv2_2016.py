@@ -473,8 +473,8 @@ class cmgTuplesPostProcessed():
 
         for mstop in mass_dict:
             for mlsp in mass_dict[mstop]:
-                #mass_point = "SMS_T2tt_mStop_%s_mLSP_%s" % (mstop, mlsp)
-                mass_point = "SMS_T2_4bd_mStop_%s_mLSP_%s" % (mstop, mlsp)
+                mass_point = "SMS_T2tt_mStop_%s_mLSP_%s" % (mstop, mlsp)
+                #mass_point = "SMS_T2_4bd_mStop_%s_mLSP_%s" % (mstop, mlsp)
                 mass_scan[mass_point] = {
                     "name" : mass_point,
                     "bins": [mass_point],

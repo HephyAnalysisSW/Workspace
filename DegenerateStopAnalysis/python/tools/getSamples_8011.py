@@ -18,7 +18,7 @@ lumis = {
             #'lumi_data_blinded':2245.386, 
             #'lumi_data_unblinded':139.63,
             'target_lumi'         :   10000.   ,   
-            'DataBlind_lumi'      :   12430.0    , 
+            'DataBlind_lumi'      :   12741    , 
             'DataUnblind_lumi'    :   804.2   ,
         }
 
@@ -119,6 +119,7 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
    
    if "tt" in sampleList:
       if useHT:
+      #if False:
          TTJetsHTRestChain = getChain(cmgPP.TTJetsHTRest[skim], histname='')
          TTJetsHTRestChain.Add(getChain(cmgPP.TTJetsHTLow[skim], histname=''))
          TTJetsHTRestChain.Add(getChain(cmgPP.TTJetsHTHigh[skim], histname=''))
@@ -200,12 +201,14 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
       for mstop in mstops:
          for dm in dms:
             mlsp = mstop - dm
-            #s = getattr(cmgPP,"SMS_T2tt_mStop_%s_mLSP_%s"%(mstop,mlsp))[skim]
-            s = getattr(cmgPP,"SMS_T2_4bd_mStop_%s_mLSP_%s"%(mstop,mlsp))[skim]
+            #print cmgPP.__dict__.keys()
+
+            s = getattr(cmgPP,"SMS_T2tt_mStop_%s_mLSP_%s"%(mstop,mlsp) )[skim]
+            #s = getattr(cmgPP,"SMS_T2_4bd_mStop_%s_mLSP_%s"%(mstop,mlsp))[skim]
             if glob.glob("%s/%s/*.root"%(s['dir'],s['name'])):
                sampleDict.update({
                   #'s%s_%s'%(mstop,mlsp):{'name':'T2_4bd_%s_%s'%(mstop,mlsp), 'sample':getattr(cmgPP,"SMS_T2tt_mStop_%s_mLSP_%s"%(mstop,mlsp))[skim], 'color':colors['s%s_%s'%(mstop,mlsp)], 'isSignal':1 , 'isData':0, 'lumi':mc_lumi},
-                  's%s_%s'%(mstop,mlsp):{'name':'T2_4bd_%s_%s'%(mstop,mlsp), 'sample':s, 'color':colors['s%s_%s'%(mstop,mlsp)], 'isSignal':1 , 'isData':0, 'lumi':mc_lumi},
+                  's%s_%s'%(mstop,mlsp):{'name':'T2tt_%s_%s'%(mstop,mlsp), 'sample':s, 'color':colors['s%s_%s'%(mstop,mlsp)], 'isSignal':1 , 'isData':0, 'lumi':mc_lumi},
             })
             else: 
                 #print "%s/%s/*.root"%(s['dir'],s['name'])
@@ -242,8 +245,8 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
    for samp in sampleDict:
       if weights.has_key(samp):
          sampleDict[samp]["weights"] = Weight( weights[samp].weight_dict , def_weights )
-      elif scan and re.match("s\d\d\d_\d\d\d|s\d\d\d_\d\d|",samp).group():
-         sampleDict[samp]["weights"] = weights["sigScan"]
+      #elif scan and re.match("s\d\d\d_\d\d\d|s\d\d\d_\d\d|",samp).group():
+      #   sampleDict[samp]["weights"] = weights["sigScan"]
       elif do8tev and re.match("s8tev\d\d\d_\d\d\d|s8tev\d\d\d_\d\d|",samp).group():                
          sampleDict[samp]["weights"] = weights["sigScan_8tev"]
       else:

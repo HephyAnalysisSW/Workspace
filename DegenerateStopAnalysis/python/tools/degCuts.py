@@ -1,6 +1,6 @@
 import math
 from Workspace.DegenerateStopAnalysis.tools.degTools import CutClass, joinCutStrings, splitCutInPt, btw, less, more
-import Workspace.DegenerateStopAnalysis.tools.btag_sf_map as btag_sf_map
+from Workspace.DegenerateStopAnalysis.tools.btag_sf_map import BTagSFMap 
 
 ## --------------------------------------------------------------
 ##                           Variables
@@ -21,6 +21,12 @@ class Cuts():
         sr1c_opt = [ "reload" , "MT95" , "MT95_IncCharge", "MT105_IncCharge_CT250" ]
 
         """
+        if btag == 'btag':
+            sf = 'sf'
+        else:
+            sf = btag
+        btag_sf_map = BTagSFMap(btag)
+
         self.collection = lepCollection
         self.lep = lep 
         lepIndex = "Index{lepCol}_{Lep}".format(lepCol=lepCollection, Lep=lep)
@@ -75,7 +81,7 @@ class Cuts():
             
 
 
-        elif btag == 'sf':
+        else: # btag == 'sf':
             veto_soft_bjet          = btag_sf_map.sf_veto_soft_bjet           #'(weightSBTag0_SF)' 
             one_soft_bjet           = btag_sf_map.sf_one_soft_bjet            #'(weightSBTag1_SF)' 
             one_or_more_soft_bjet   = btag_sf_map.sf_one_or_more_soft_bjet    #'(weightSBTag1p_SF)'
@@ -94,9 +100,8 @@ class Cuts():
             crtt1_bjet              = btag_sf_map.sf_crtt1_bjet               # "(weightSBTag0_SF  * weightHBTag1_SF)" #"( (nBSoftJet==0) && (nBHardJet==1)  )"
             crtt2_bjet              = btag_sf_map.sf_crtt2_bjet               # "(weightHBTag1p_SF-(weightSBTag0_SF*weightHBTag1_SF))"#"( (nBJet>=2)     && (nBHardJet>=1) )"
 
-            pass
-        else:
-            raise   Exception("btag option not recongized: %s"%btag)
+        #else:
+        #    raise   Exception("btag option not recongized: %s"%btag)
 
 
 
@@ -415,6 +420,21 @@ class Cuts():
                           baseCut = self.sr2,
                           )
         
+        self.srs_ptbin   = CutClass ("SRs_PtBinned",    [], baseCut= self.presel ) 
+        self.srs_ptbin.add( self.sr1ab_ptbin ,  baseCutString = self.sr1.inclCombined          )
+        self.srs_ptbin.add( self.sr1c_ptbin  ,  baseCutString = self.sr1c_baseCut.inclCombined )
+        self.srs_ptbin.add( self.sr2_ptbin   ,  baseCutString = self.sr2.inclCombined          )
+
+
+        self.srs_ptbin_sum   = CutClass ("SRs_PtBinnedSum",    [], baseCut= self.presel ) 
+        self.srs_ptbin_sum.add( self.sr1ab_ptbin ,  baseCutString = self.sr1.inclCombined          )
+        self.srs_ptbin_sum.add( self.sr1c_ptbin  ,  baseCutString = self.sr1c_baseCut.inclCombined )
+        self.srs_ptbin_sum.add( self.sr2_ptbin   ,  baseCutString = self.sr2.inclCombined          )
+        self.srs_ptbin_sum.add(   self.sr1a          , baseCutString =  self.sr1.combined           )
+        self.srs_ptbin_sum.add(   self.sr1b          , baseCutString =  self.sr1.combined           )
+        self.srs_ptbin_sum.add(   self.sr1c          , baseCutString =  self.sr1c_baseCut.combined  )
+        self.srs_ptbin_sum.add(   self.sr2   ,'inclCombinedList'     , baseCutString =  self.sr2.baseCut.combined  )
+
         ################################################################################################
         ####################################                 ###########################################
         #################################### Control Regions ###########################################
