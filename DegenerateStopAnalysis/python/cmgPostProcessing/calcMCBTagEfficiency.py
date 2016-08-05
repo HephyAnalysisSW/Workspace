@@ -109,8 +109,8 @@ if __name__ == '__main__':
     cmgPP         = cmgTuplesPostProcessed( mc_path, signal_path, data_path)
     samples   =   getSamples(   cmgPP = cmgPP, sampleList = ['tt','w'] , useHT = True, skim='preIncLep', scan = True  )
 
-    #for samp in ['tt','w', 'sig']:
-    for samp in ['sig']:
+    for samp in ['tt','w' ]:
+    #for samp in ['sig']:
         if samp == 'sig': 
             import glob
             tree = ROOT.TChain("tree")
@@ -146,7 +146,7 @@ if __name__ == '__main__':
         else:
             tree = samples[samp]['tree']
             sample_name = samples[samp]['name']
-
+            tag = "_v2"
 
             res=  getBTagMCTruthEfficiencies2D( tree,
                 cut="(Sum$(Jet_pt>30&&abs(Jet_eta)<2.4&&Jet_id))>=1"
@@ -156,7 +156,7 @@ if __name__ == '__main__':
 
             pickle.dump(res, \
                 #file(os.path.expandvars('$CMSSW_BASE/src/StopsDilepton/tools/data/btagEfficiencyData/TTJets_DiLepton_comb_2j_2l.pkl'), 'w')
-                file(os.path.expandvars('$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/%s_1j_2D.pkl'%sample_name), 'w')
+                file(os.path.expandvars('$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/%s_1j_2D%s.pkl'%(sample_name,tag)), 'w')
             )
     #for samp in ['tt','w']:
     #    tree = samples[samp]['tree']

@@ -29,7 +29,7 @@ def toFlavourKey(pdgId):
 
 
 effFile             = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/TTJets_1j.pkl'
-sfFile              = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/CSVv2_4invfb_systJuly15.csv'
+sfFile              = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/CSVv2_ichep.csv'
 sfFile_FastSim      = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/CSV_13TEV_Combined_14_7_2016.csv'
 
 class btagEfficiency:
@@ -92,13 +92,25 @@ class btagEfficiency:
         self.scaleFactorFileFS = sfFile_FastSim
         self.mcEfficiencyFile = effFile
 
+        print 
+        print "SF FILE   " , self.scaleFactorFile
+        print "SF FS FILE" , self.scaleFactorFileFS
+        print "EFF FILE  " , self.mcEfficiencyFile
+        print 
+
         logger.info ( "Loading scale factors from %s", os.path.expandvars(self.scaleFactorFile) )
         self.calib = ROOT.BTagCalibration("csvv2", os.path.expandvars(self.scaleFactorFile) )
 
         # Get readers
+        # "comb" (combination of QCD and ttbar methods) for b and c jets
+        self.readerCombUp      = ROOT.BTagCalibrationReader(self.calib, WP, "mujets", "up") #1 reflects the medium working point
+        self.readerCombCentral = ROOT.BTagCalibrationReader(self.calib, WP, "mujets", "central")
+        self.readerCombDown    = ROOT.BTagCalibrationReader(self.calib, WP, "mujets", "down")
+
         self.readerMuUp        = ROOT.BTagCalibrationReader(self.calib, WP, "mujets", "up")
         self.readerMuCentral   = ROOT.BTagCalibrationReader(self.calib, WP, "mujets", "central")
         self.readerMuDown      = ROOT.BTagCalibrationReader(self.calib, WP, "mujets", "down")
+
         self.readerLightUp      = ROOT.BTagCalibrationReader(self.calib, WP, "incl", "up")
         self.readerLightCentral = ROOT.BTagCalibrationReader(self.calib, WP, "incl", "central")
         self.readerLightDown    = ROOT.BTagCalibrationReader(self.calib, WP, "incl", "down")
@@ -147,15 +159,15 @@ class btagEfficiency:
             sf_fs_u = 1
             sf_fs_d = 1
         if abs(pdgId)==5: #SF for b
-            sf      = sf_fs*self.readerMuCentral.eval(ROOT.BTagEntry.FLAV_B, eta, pt_)
-            sf_b_d  = sf_fs*self.readerMuDown   .eval(ROOT.BTagEntry.FLAV_B, eta, pt_)
-            sf_b_u  = sf_fs*self.readerMuUp     .eval(ROOT.BTagEntry.FLAV_B, eta, pt_)
+            sf      = sf_fs*self.readerCombCentral.eval(ROOT.BTagEntry.FLAV_B, eta, pt_)
+            sf_b_d  = sf_fs*self.readerCombDown   .eval(ROOT.BTagEntry.FLAV_B, eta, pt_)
+            sf_b_u  = sf_fs*self.readerCombUp     .eval(ROOT.BTagEntry.FLAV_B, eta, pt_)
             sf_l_d  = 1.
             sf_l_u  = 1.
         elif abs(pdgId)==4: #SF for c
-            sf     = sf_fs*self.readerMuCentral.eval(ROOT.BTagEntry.FLAV_C, eta, pt_)
-            sf_b_d = sf_fs*self.readerMuDown .eval(ROOT.BTagEntry.FLAV_C, eta, pt_)
-            sf_b_u = sf_fs*self.readerMuUp   .eval(ROOT.BTagEntry.FLAV_C, eta, pt_)
+            sf     = sf_fs*self.readerCombCentral.eval(ROOT.BTagEntry.FLAV_C, eta, pt_)
+            sf_b_d = sf_fs*self.readerCombDown .eval(ROOT.BTagEntry.FLAV_C, eta, pt_)
+            sf_b_u = sf_fs*self.readerCombUp   .eval(ROOT.BTagEntry.FLAV_C, eta, pt_)
             sf_l_d = 1.
             sf_l_u = 1.
         else: #SF for light flavours

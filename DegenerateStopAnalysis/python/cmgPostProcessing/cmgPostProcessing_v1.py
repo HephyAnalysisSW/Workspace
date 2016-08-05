@@ -195,6 +195,7 @@ def getParameterSet(args):
 
         params['beff']['effFile']         = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/%s.pkl'%eff_to_use
         params['beff']['sfFile']          = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/CSVv2_ichep.csv'
+        #params['beff']['sfFile']          = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/CSVv2_4invfb_systJuly15.csv'
         params['beff']['sfFile_FastSim']  = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/CSV_13TEV_Combined_14_7_2016.csv'
         params['beff']['btagEff']         = btagEfficiency( 
                                                             fastSim        = isFastSim,  
