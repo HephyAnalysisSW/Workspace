@@ -461,9 +461,9 @@ class cmgTuplesPostProcessed():
             mass_dict_pickle = mass_dict_pickle_file
         else:
             print "!!!!! WARNING !!!!! NO MASS DICT FOUND!"
-            mass_Dict_pickle = None
+            mass_dict_pickle = None
 
-        if mass_Dict_pickle:
+        if mass_dict_pickle:
             mass_dict = pickle.load(open(mass_dict_pickle, "r"))
         else:
             mass_dict = {}
