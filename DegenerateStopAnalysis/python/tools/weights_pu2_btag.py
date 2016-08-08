@@ -1,6 +1,11 @@
 import re
 from Workspace.DegenerateStopAnalysis.tools.degTools import Weight
-from Workspace.DegenerateStopAnalysis.tools.btag_sf_map import btag_to_sf , sf_to_btag
+from Workspace.DegenerateStopAnalysis.tools.btag_sf_map import BTagSFMap
+
+
+btag_sf_map = BTagSFMap('sf')
+btag_to_sf  = btag_sf_map.btag_to_sf
+sf_to_btag  = btag_sf_map.sf_to_btag
 
 
 def make_match_func(tothis):

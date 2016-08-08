@@ -43,7 +43,7 @@ SAMPLE_SET=$1
 
 # semi-hard-coded parameters
 if [[ ${2} == "DATA" ]]; then 
-    CMG_TUPLES="Data2016_v1_1"
+    CMG_TUPLES="Data2016_v1_2"
     BTAG_WEIGHTS=""
 else
     CMG_TUPLES="RunIISpring16MiniAODv2_v1"
@@ -62,7 +62,7 @@ else
     SKIM_LEPTON=""
 fi
 
-CMG_POST_PROCESSING_TAG="80X_postProcessing_v7"
+CMG_POST_PROCESSING_TAG="80X_postProcessing_v6_1"
 VERBOSE="--verbose"
 if [[ ${5} == "TEST" ]]; then 
     CMG_POST_PROCESSING_TAG=$CMG_POST_PROCESSING_TAG"_TEST"

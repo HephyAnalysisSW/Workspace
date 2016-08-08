@@ -104,8 +104,8 @@ dm_color_dict ={
 new_colors = {}
 
 
-max_mstop = 600
-min_mstop = 100
+max_mstop = 800
+min_mstop = 250
 max_dm   = 80
 min_dm   = 10
 mstop_range = range(min_mstop, max_mstop+1, 25)

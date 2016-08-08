@@ -157,8 +157,8 @@ def_weights = {
             "lumis":{
                             "mc_lumi"               :   10000   ,
                             'target_lumi'           :   13000.   ,
-                            'DataBlind_lumi'      :   12741.    ,
-                            'DataUnblind_lumi'    :   804.2   ,
+                            'DataBlind_lumi'        :   12864.4    ,
+                            'DataUnblind_lumi'      :   804.2   ,
                     },
                 }
 
@@ -242,7 +242,7 @@ cfg = TaskConfig(
                    ppUser         =  ppUser , 
                    cmgTag         =  cmgTag , 
                    #saveDirBase   =  "/afs/hephy.at/user/n/nrad/www/T2Deg13TeV/mAODv2_7412pass2_v6/Studies_v1/" ,
-                   saveDirBase    =  "/afs/hephy.at/user/n/nrad/www/T2Deg13TeV/%s/%s/SUS_16_031_v0_2/"%(cmgTag, ppTag) ,
+                   saveDirBase    =  "/afs/hephy.at/user/n/nrad/www/T2Deg13TeV/%s/%s/SUS_16_031_v0_3/"%(cmgTag, ppTag) ,
                    #saveDirBase    =  "/afs/hephy.at/user/n/nrad/www/T2Deg13TeV/%s/%s/Studies_v0_puWeight_wptrwgt/"%(cmgTag, ppTag) ,
                    #saveDirBase    =  "/afs/hephy.at/user/n/nrad/www/T2Deg13TeV/%s/%s/Studies_v0_puWeight_wptrwgt/"%(cmgTag, ppTag) ,
                    cutInst        =  cutInstList,

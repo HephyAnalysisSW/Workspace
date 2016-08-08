@@ -120,8 +120,8 @@ if __name__ == '__main__':
     setup = setups['presel']
 
 
-    for samp in ['tt','w' ]:
-    #for samp in ['sig']:
+    #for samp in ['tt','w' ]:
+    for samp in ['sig']:
         if samp == 'sig': 
             import glob
             tree = ROOT.TChain("tree")

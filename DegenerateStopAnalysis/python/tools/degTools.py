@@ -1025,8 +1025,8 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
         #if explicitSaveDir:
         #    cut_saveDir=""
         
+        sample_hist_info = getSamplePlotsInfo(samples,plots,cut,sampleList=sampleList,plotList=plotList, plots_first = True)
         if verbose:
-            sample_hist_info = getSamplePlotsInfo(samples,plots,cut,sampleList=sampleList,plotList=plotList, plots_first = True)
             #canvs[p][cSave].plot_info =
             print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    HIST INFO"
             print sample_hist_info 
