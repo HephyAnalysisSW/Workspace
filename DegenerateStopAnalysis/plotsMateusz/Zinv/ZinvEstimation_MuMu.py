@@ -1,4 +1,4 @@
-# ZinvEstimation.py
+# ZinvEstimation_MuMu.py
 import ROOT
 import os, sys
 import argparse
@@ -82,7 +82,7 @@ if verbose:
 if save: #web address: http://www.hephy.at/user/mzarucki/plots
    savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/Zinv"
    
-   savedir += "/" + btag
+   savedir += "/bTagWeight_" + btag
    
    savedir += "/" + SR
    
@@ -164,12 +164,9 @@ SRs_el = regions(ind_el)
 SRs_mu = regions(ind_mu)
 
 if peak:
-   peak = CutClass("Zpeak", [
-      ["2mu", "nLepAll_mu >= 2"],
-      ["Zpeak","abs(dimuon_mass - 91.1876) < 15"],
-      ], baseCut = None)
+   peakCutString = "abs(dimuon_mass - 91.1876) < 15"   
 else:
-   peak = CutClass("None", [["None","1"]], baseCut = None)
+   peakCutString = "1"   
 
 #Preselection & basic SR cuts
 dimuon = CutClass("dimuon", [
@@ -179,11 +176,11 @@ dimuon = CutClass("dimuon", [
    ["No3rdJet60","nVetoJet <= 2"],
    ["2mu", "nLepAll_mu >= 2"], 
     
-   ["muon1", "abs(LepAll_pdgId[" + ind1 + "]) == 13"],
+   ["muon1", "abs(LepAll_pdgId[" + ind1 + "]) == 13"], #redundant
    ["relIso", "LepAll_relIso03[" + ind1 + "] < 0.12"],
    ["pt28", "LepAll_pt[" + ind1 + "] > 28"],
    # 
-   ["muon2", "abs(LepAll_pdgId[" + ind2 + "]) == 13"],
+   ["muon2", "abs(LepAll_pdgId[" + ind2 + "]) == 13"], #redundant
    ["relIso", "LepAll_relIso03[" + ind2 + "] < 0.12"],
    ["pt20", "LepAll_pt[" + ind2 + "] > 20"],
    #
@@ -191,8 +188,9 @@ dimuon = CutClass("dimuon", [
    #
    ["dimuon_mass","dimuon_mass > 55"],
    #["dimuon_pt","dimuon_pt > 75"],
-   ["met2","met2 > 75"],
-   ], baseCut = peak)
+   ["met2", "met2 > 75"],
+   ["peak", peakCutString],
+   ], baseCut = None)
 
 emulated = CutClass("emulated", [
    ["CT2","min(met2, ht_basJet - 100) >" + CT2cut],
@@ -315,16 +313,21 @@ if plot:
    plotsDict2 = Plots(**plotDict2)
    
    if beforeEmul:
+      setEventListToChains(samples, selectedSamples, dimuon)
       dimuonPlots = getPlots(samples, plotsDict, dimuon, samplesList, plotList = plotsList, addOverFlowBin='upper')
       dimuonPlots2 = drawPlots(samples, plotsDict, dimuon, samplesList, plotList = plotsList, plotLimits = [10, 100], denoms=["bkg"], noms = ["d1muBlind"], fom="RATIO", fomLimits=[0,2.8], plotMin = 0.01, normalize = False, save=False)
-   
+ 
    if afterEmul:
+      setEventListToChains(samples, selectedSamples, emulated)
       emulatedPlots = getPlots(samples, plotsDict, emulated, samplesList, plotList = plotsList, addOverFlowBin='upper')
       emulatedPlots2 = drawPlots(samples, plotsDict, emulated, samplesList, plotList = plotsList, plotLimits = [10, 100], denoms=["bkg"], noms = ["d1muBlind"], fom="RATIO", fomLimits=[0,2.8], plotMin = 0.01, normalize = False, save=False)
    
    if leptons:
+      setEventListToChains(samples, selectedSamples, electrons)
       elePlots = getPlots(samples, plotsDict2, electrons, samplesList, plotList = ["elePt"], addOverFlowBin='upper')
       elePlots2 = drawPlots(samples, plotsDict2, electrons, samplesList, plotList = ["elePt"], plotLimits = [10, 100], denoms=["bkg"], noms = ["d1muBlind"], fom="RATIO", fomLimits=[0,2.8], plotMin = 0.01, normalize = False, save=False)
+      
+      setEventListToChains(samples, selectedSamples, muons)
       muPlots = getPlots(samples, plotsDict2, muons, samplesList, plotList = ["muPt"], addOverFlowBin='upper')
       muPlots2 = drawPlots(samples, plotsDict2, muons, samplesList, plotList = ["muPt"], plotLimits = [10, 100], denoms=["bkg"], noms = ["d1muBlind"], fom="RATIO", fomLimits=[0,2.8], plotMin = 0.01, normalize = False, save=False)
    

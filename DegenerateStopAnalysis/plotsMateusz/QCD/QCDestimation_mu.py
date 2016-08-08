@@ -267,7 +267,7 @@ if estimation:
       if yields[reg]['IXA'].yieldDictFull['qcd']['QCD_IXA_' + reg].val:
       
          QCD_IX_A[reg] =      yields[reg]['IX_A'].yieldDictFull['qcd']['QCD_IX_A_' + reg]
-         QCD_A_IX[reg] =      yields[reg]['IA_X'].yieldDictFull['qcd']['QCD_IA_X_' + reg]
+         QCD_A_IX[reg] =      yields[reg]['A_IX'].yieldDictFull['qcd']['QCD_A_IX_' + reg]
          QCD_IXA_MC[reg] =    yields[reg]['IXA'].yieldDictFull['qcd']['QCD_IXA_' + reg]
          QCD_IXA_data[reg] =  yields[reg]['IXA'].yieldDictFull['dblind']['QCD_IXA_' + reg] - \
                               yields[reg]['IXA'].yieldDictFull['w']['QCD_IXA_' + reg] - \
@@ -309,7 +309,7 @@ if estimation:
             str(QCDest[reg].round(2)) + "             " +\
             str(yields[reg]['SR'].yieldDictFull['qcd']['QCD_SR_' + reg].round(2)) + "             ")
             if yields[reg]['SR'].yieldDictFull['qcd']['QCD_SR_' + reg].val:
-               outfile.write(str((QCDexp[reg]/yields[reg]['SR'].yieldDictFull['qcd']['QCD_SR_' + reg]).round(2)) + "\n")
+               outfile.write(str((QCDest[reg]/yields[reg]['SR'].yieldDictFull['qcd']['QCD_SR_' + reg]).round(2)) + "\n")
             else:
                outfile.write("\n")
 
@@ -327,14 +327,19 @@ if plot:
       ["anti-A", antidPhiCut], #inverted
       ["MET", "met >" + METcut], #tight MET
       ], baseCut = presel)
-   
+  
+   QCD[plotReg]['XA'] = CutClass("QCD_XA_" + reg, [ #loose MET
+      SRs[plotReg],
+      ["anti-A", antidPhiCut], #inverted
+      ], baseCut = presel)
+ 
    plotsList = {}
    plotDict = {}
    plotsDict = {}
    plots = {}
    plots2 = {}
    
-   plotRegions = ['SR', 'X_A', 'A_X', 'A_IX', 'IX_A', 'IXA']
+   plotRegions = ['SR', 'X_A', 'A_X', 'A_IX', 'IX_A', 'XA', 'IXA']
   
    if getData: plotRegions.remove('SR')
    

@@ -71,7 +71,7 @@ print makeDoubleLine()
 if save: #web address: http://www.hephy.at/user/mzarucki/plots
    savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/QCD/electron/ABCD" + ABCD 
 
-   savedir += "/" + btag
+   savedir += "/bTagWeight_" + btag
      
    estdir = savedir + "/estimation"
    
