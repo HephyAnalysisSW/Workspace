@@ -48,8 +48,8 @@ cDY         = getChain(DY_HT,histname='')
 csingleTop  = getChain(singleTop_lep,histname='')
 cTTV        = getChain(TTV,histname='')
 cDiBoson    = getChain(diBoson, histname='')
-cRest       = getChain([singleTop_lep, DY_HT, TTV, diBoson],histname='')#no QCD
-cBkg        = getChain([WJetsHTToLNu, TTJets_Comb, singleTop_lep, DY_HT, TTV, diBoson], histname='')#no QCD
+cRest       = getChain([singleTop_lep, DY_HT, TTV],histname='')#no QCD
+cBkg        = getChain([WJetsHTToLNu, TTJets_Comb, singleTop_lep, DY_HT, TTV], histname='')#no QCD
 cQCD        = getChain(QCDHT,histname='')
 
 
@@ -68,9 +68,9 @@ else: QCDestimate=False
 if isData:
   cData = getChain([single_mu_Run2016B, single_ele_Run2016B, single_mu_Run2016C, single_ele_Run2016C, single_mu_Run2016D, single_ele_Run2016D], histname='')
 elif not isData and useQCDestimation:
-  cData = getChain([WJetsHTToLNu, TTJets_Comb, singleTop_lep, DY_HT, TTV, diBoson, QCDHT], histname='')
+  cData = getChain([WJetsHTToLNu, TTJets_Comb, singleTop_lep, DY_HT, TTV, QCDHT], histname='')
 else:
-  cData = getChain([WJetsHTToLNu, TTJets_Comb, singleTop_lep, DY_HT, TTV, diBoson], histname='')
+  cData = getChain([WJetsHTToLNu, TTJets_Comb, singleTop_lep, DY_HT, TTV], histname='')
 
 
 ## signal region definition
@@ -79,8 +79,8 @@ if validation:
   regStr = 'validation_4j_altWSB'
 else:
   signalRegions = signalRegions2016
-  #regStr = 'SR2016_postApp'
-  regStr = 'SR2016_v2'
+  regStr = 'SR2016_postApp_v2'
+  #regStr = 'SR2016_v2'
 
 ## weight calculations
 lumi = 12.9
@@ -120,7 +120,7 @@ prefix = 'singleLeptonic_Spring16_'
 if validation:
   kappa_dict_dir = '/data/dspitzbart/Results'+year+'/Prediction_Spring16_templates_validation_4j_altWSB_lep_MC_SF_12p9/singleLeptonic_Spring16__estimationResults_pkl_kappa_corrected'
 else:
-  kappa_dict_dir = '/data/dspitzbart/Results'+year+'/Prediction_Spring16_templates_SR2016_v2_lep_MC_SF_12p9/singleLeptonic_Spring16__estimationResults_pkl_kappa_corrected'
+  kappa_dict_dir = '/data/dspitzbart/Results'+year+'/Prediction_Spring16_templates_SR2016_postApp_v2_lep_MC_SF_12p9/singleLeptonic_Spring16__estimationResults_pkl_kappa_corrected'
 
 ## Preselection cut
 triggers = "((HLT_EleHT350||HLT_EleHT400||HLT_Ele105)||(HLT_MuHT350||HLT_MuHT400))"

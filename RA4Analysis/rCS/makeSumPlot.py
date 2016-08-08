@@ -28,6 +28,7 @@ useKappa        = True
 
 showMCtruth     = False
 signal = True
+stackSignal = True
 plotPull = False
 
 latextitle = 'Preliminary'
@@ -50,7 +51,7 @@ prefix = 'singleLeptonic_Spring16_'
 #pickleDir = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2016_v1_100p_lep_data_3p99/'#resultsFinal_withSystematics_pkl
 #pickleDir = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2016_v2_lep_data_7p62/'
 #pickleDir = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_validation_4j_altWSB_lep_data_12p9/'
-pickleDir = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2016_v2_lep_data_12p9/'
+pickleDir = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2016_postApp_v2_lep_data_12p9/'
 
 if not useKappa: res = pickle.load(file(pickleDir+'singleLeptonic_Spring16__estimationResults_pkl'))
 else: res = pickle.load(file(pickleDir+'resultsFinal_withSystematics_pkl'))
@@ -383,10 +384,14 @@ for srNJet in sorted(signalRegions):
           kappaPYErr.append(res[srNJet][stb][htb]['tot_kappa_err'])
 
       if signal:
-        benchmark1_H.SetBinContent(i,res[srNJet][stb][htb]['tot_pred_final']+sig[srNJet][stb][htb]['signals'][1200][800]['mod_yield_MB_SR'])
-        benchmark2_H.SetBinContent(i,res[srNJet][stb][htb]['tot_pred_final']+sig[srNJet][stb][htb]['signals'][1400][1000]['mod_yield_MB_SR'])
-        benchmark3_H.SetBinContent(i,res[srNJet][stb][htb]['tot_pred_final']+sig[srNJet][stb][htb]['signals'][1600][100]['mod_yield_MB_SR'])
-
+        if stackSignal:
+          benchmark1_H.SetBinContent(i,res[srNJet][stb][htb]['tot_pred_final']+sig[srNJet][stb][htb]['signals'][1200][800]['mod_yield_MB_SR'])
+          benchmark2_H.SetBinContent(i,res[srNJet][stb][htb]['tot_pred_final']+sig[srNJet][stb][htb]['signals'][1400][1000]['mod_yield_MB_SR'])
+          benchmark3_H.SetBinContent(i,res[srNJet][stb][htb]['tot_pred_final']+sig[srNJet][stb][htb]['signals'][1600][100]['mod_yield_MB_SR'])
+        else:
+          benchmark1_H.SetBinContent(i,sig[srNJet][stb][htb]['signals'][1200][800]['mod_yield_MB_SR'])
+          benchmark2_H.SetBinContent(i,sig[srNJet][stb][htb]['signals'][1400][1000]['mod_yield_MB_SR'])
+          benchmark3_H.SetBinContent(i,sig[srNJet][stb][htb]['signals'][1600][100]['mod_yield_MB_SR'])
       if unblinded:
         total_meas     += data_yield
         if useKappa:
@@ -639,10 +644,11 @@ else:
   suffix = ''
 
 if plotPull: suffix += '_pull'
+if not stackSignal: suffix += '_overlaySignal'
 
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_approval_v5.png')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_approval_v5.root')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_approval_v5.pdf')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_postApproval_v2.png')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_postApproval_v2.root')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_postApproval_v2.pdf')
 
 if useKappa:
   

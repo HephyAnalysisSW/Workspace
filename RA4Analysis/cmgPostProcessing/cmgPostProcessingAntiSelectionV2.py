@@ -457,8 +457,8 @@ for isample, sample in enumerate(allSamples):
             s.leptonInd = leadingLepInd 
             s.leptonEta = r.LepGood_eta[leadingLepInd]
             s.leptonPhi = r.LepGood_phi[leadingLepInd]
-            #s.leptonPdg = r.LepGood_pdgId[leadingLepInd]
-            s.leptonPdg = (-1)*r.LepGood_pdgId[leadingLepInd] if (sample['name']=="ST_tchannel_top_4f_leptonDecays_powheg") else r.LepGood_pdgId[leadingLepInd]
+            s.leptonPdg = r.LepGood_pdgId[leadingLepInd]
+            #s.leptonPdg = (-1)*r.LepGood_pdgId[leadingLepInd] if (sample['name']=="ST_tchannel_top_4f_leptonDecays_powheg") else r.LepGood_pdgId[leadingLepInd]
             s.leptonMass= r.LepGood_mass[leadingLepInd]
             s.st = r.met_pt + s.leptonPt
           s.singleLeptonic = s.nTightSoftLeptons==1

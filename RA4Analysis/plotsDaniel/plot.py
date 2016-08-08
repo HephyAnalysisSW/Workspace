@@ -40,9 +40,12 @@ eleTriggerErr = '0.963'
 #totalWeight = 'weight*lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*TopPtWeight*0.94*puReweight_true_max4'
 totalWeight = 'weight*TopPtWeight*puReweight_true_max4*(singleMuonic*0.926 + singleElectronic*0.963)'
 totalWeight = 'weight*TopPtWeight*puReweight_true_max4*(singleMuonic*'+muTriggerEff+' + singleElectronic*'+eleTriggerErr+')*lepton_muSF_HIP*lepton_muSF_mediumID*lepton_muSF_miniIso02*lepton_muSF_sip3d*lepton_eleSF_cutbasedID*lepton_eleSF_miniIso01*lepton_eleSF_gsf'
+totalWeight = 'weight*TopPtWeight*puReweight_true_max4*(singleMuonic*'+muTriggerEff+' + singleElectronic*'+eleTriggerErr+')*leptonSF'
+
+
 #25ns samples
 WJETS_15 = {'name':'WJets', 'chain':getChain(WJetsHTToLNu_25ns,histname=''), 'color':color('WJets')+1,'weight':totalWeight, 'niceName':'W+Jets S15', 'cut':''}
-WJETS_16 = {'name':'WJets', 'chain':getChain(WJetsHTToLNu,histname=''), 'color':color('WJets')-1,'weight':totalWeight, 'niceName':'W+Jets S16', 'cut':''}
+WJETS_16 = {'name':'WJets', 'chain':getChain(WJetsHTToLNu,histname=''), 'color':color('WJets')-1,'weight':totalWeight, 'niceName':'W+Jets', 'cut':''}
 WJETS_16_antiSel = {'name':'WJets', 'chain':getChain(WJetsHTToLNu_antiSel,histname=''), 'color':color('WJets')-1,'weight':totalWeight, 'niceName':'W+Jets S16', 'cut':''}
 WJETS_15_antiSel = {'name':'WJets', 'chain':getChain(WJetsHTToLNu_25ns_antiSel,histname=''), 'color':color('WJets')+1,'weight':totalWeight, 'niceName':'W+Jets S16', 'cut':''}
 
@@ -58,6 +61,8 @@ TTJets_combined_15 = {'name':'TTJets', 'chain':getChain(TTJets_combined_25ns,his
 #TTJets_combined_16 = {'name':'TTJets', 'chain':getChain(TTJets_combined,histname=''), 'color':ROOT.kCyan,'weight':totalWeight, 'niceName':'t#bar{t}+Jets S16', 'cut':''}
 #TTJets_Lep_16 = {'name':'TTJets', 'chain':getChain(TTJets_Lep,histname=''), 'color':color('TTJets')-2,'weight':totalWeight, 'niceName':'t#bar{t}+Jets 1l S16', 'cut':''}
 TTJets_16 = {'name':'TTJets', 'chain':getChain(TTJets_Comb,histname=''), 'color':color('TTJets')-2,'weight':totalWeight, 'niceName':'t#bar{t}+Jets', 'cut':''}
+TTJets_LO = {'name':'TTJets', 'chain':getChain(TTJets_LO,histname=''), 'color':ROOT.kOrange,'weight':totalWeight, 'niceName':'t#bar{t}+Jets', 'cut':''}
+
 
 #TTJets_Lep_16_antiSel = {'name':'TTJets', 'chain':getChain(TTJets_Lep_antiSel,histname=''), 'color':color('TTJets')-2,'weight':totalWeight, 'niceName':'t#bar{t}+Jets 1l S16', 'cut':''}
 
@@ -91,33 +96,37 @@ DY_16 = {'name':'DY', 'chain':getChain(DY_HT,histname=''), 'color':color('DY'),'
 
 singleTop_15 = {'name':'singleTop', 'chain':getChain(singleTop_25ns,histname=''), 'color':color('singleTop'),'weight':totalWeight, 'niceName':'t/#bar{t}', 'cut':''}
 #singleTop_inc_16 = {'name':'singleTop', 'chain':getChain(singleTop_inclusive,histname=''), 'color':ROOT.kGreen+1,'weight':totalWeight, 'niceName':'t/#bar{t} S16 inc', 'cut':''}
-singleTop_lep_16 = {'name':'singleTop', 'chain':getChain(singleTop_lep,histname=''), 'color':color('singleTop'),'weight':totalWeight, 'niceName':'t/#bar{t} S16 lep', 'cut':''}
+singleTop_lep_16 = {'name':'singleTop', 'chain':getChain(singleTop_lep,histname=''), 'color':color('singleTop'),'weight':totalWeight, 'niceName':'t/#bar{t}', 'cut':''}
 #singleTop_lep_16_antiSel = {'name':'singleTop', 'chain':getChain(singleTop_lep_antiSel,histname=''), 'color':color('singleTop')-2,'weight':totalWeight, 'niceName':'t/#bar{t} S16 lep', 'cut':''}
 
 
 QCD_15 = {'name':'QCD', 'chain':getChain(QCDHT_25ns,histname=''), 'color':color('QCD')+1,'weight':totalWeight, 'niceName':'QCD multijet S15', 'cut':''}
 QCD_15_antiSel = {'name':'QCD', 'chain':getChain(QCDHT_25ns_antiSel,histname=''), 'color':color('QCD')+1,'weight':totalWeight, 'niceName':'QCD multijet S15     ', 'cut':''}
 
-QCD_16 = {'name':'QCD', 'chain':getChain(QCDHT,histname=''), 'color':color('QCD'),'weight':totalWeight, 'niceName':'QCD multijet S16', 'cut':''}
+QCD_16 = {'name':'QCD', 'chain':getChain(QCDHT,histname=''), 'color':color('QCD'),'weight':totalWeight, 'niceName':'QCD multijets', 'cut':''}
 QCD_16_antiSel = {'name':'QCD', 'chain':getChain(QCDHT_antiSel,histname=''), 'color':color('QCD')-1,'weight':totalWeight, 'niceName':'QCD multijet S16', 'cut':''}
 
 
 #diBoson = {'name':'QCD', 'chain':getChain(diBoson,histname=''), 'color':ROOT.kMagenta,'weight':totalWeight, 'niceName':'WW/WZ/ZZ', 'cut':''}
 
 TTV_15 = {'name':'TTVH', 'chain':getChain(TTV_25ns,histname=''), 'color':color('TTV')+2,'weight':totalWeight, 'niceName':'t#bar{t}W/Z S15', 'cut':''}
-TTV_16 = {'name':'TTVH', 'chain':getChain(TTV,histname=''), 'color':color('TTV'),'weight':totalWeight, 'niceName':'t#bar{t}W/Z S16', 'cut':''}
+TTV_16 = {'name':'TTVH', 'chain':getChain(TTV,histname=''), 'color':color('TTV'),'weight':totalWeight, 'niceName':'t#bar{t}W/Z', 'cut':''}
 TTV_16_antiSel = {'name':'TTVH', 'chain':getChain(TTV_antiSel,histname=''), 'color':color('TTV'),'weight':totalWeight, 'niceName':'t#bar{t}W/Z S16', 'cut':''}
 
 
 Rest = {'name':'Rest', 'chain':getChain([TTV_25ns,singleTop_25ns,DY_25ns],histname=''), 'color':color('TTV'),'weight':totalWeight, 'niceName':'other EWK', 'cut':''}
 Bkg = {'name':'Bkg', 'chain':getChain([TTJets_HTLO_25ns,WJetsHTToLNu_25ns,QCDHT_25ns,TTV_25ns,singleTop_25ns,DY_25ns],histname=''), 'color':color('TTV'),'weight':totalWeight, 'niceName':'total Bkg', 'cut':''}
 EWK = {'name':'Bkg', 'chain':getChain([TTJets_HTLO_25ns,WJetsHTToLNu_25ns,TTV_25ns,singleTop_25ns,DY_25ns],histname=''), 'color':color('TTV'),'weight':totalWeight, 'niceName':'total Bkg', 'cut':''}
+diBoson_incl = {'name':'diBoson', 'chain':getChain(diBoson_incl,histname=''), 'color':ROOT.kRed+2,'weight': totalWeight, 'niceName':'WW/WZ/ZZ', 'cut':''}
 diBoson = {'name':'diBoson', 'chain':getChain(diBoson,histname=''), 'color':ROOT.kRed+2,'weight': totalWeight, 'niceName':'WW/WZ/ZZ', 'cut':''}
+
+#'(Sum$(abs(GenPart_pdgId)==11)==2||Sum$(abs(GenPart_pdgId)==13)==2||(Sum$(abs(GenPart_pdgId)==11)==1&&Sum$(abs(GenPart_pdgId)==13)==1))'
 
 samples         = [WJETS_15, TTJets_combined_15, Rest, QCD_15]#, diBoson]
 samples2        = [WJETS_15, TTJets_combined_15, DY_15, singleTop_15, TTV_15, QCD_15]
 samplesTTcheck  = [WJETS_15, TTJets_combined_singleLep_15, TTJets_combined_diLep_15, TTJets_combined_had_15, Rest, QCD_15]#, diBoson]
-samples16       = [TTJets_16, DY_16, WJETS_16, singleTop_lep_16, QCD_16, TTV_16]
+samples16       = [TTJets_16, DY_16, WJETS_16, singleTop_lep_16, QCD_16, TTV_16, diBoson]
+samples16EWK    = [TTJets_16, DY_16, WJETS_16, singleTop_lep_16, TTV_16, diBoson]
 #samples16_antiSel = [TTJets_Lep_16_antiSel, DY_16_madgraph_antiSel, WJETS_16_antiSel, singleTop_lep_16_antiSel, QCD_16_antiSel, TTV_16_antiSel]
 
 #test_antiSel = {'name':'w/o DY', 'chain':getChain([TTV_antiSel,singleTop_lep_antiSel,TTJets_Lep_antiSel,WJetsHTToLNu_antiSel],histname=''), 'color':color('TTV'),'weight':totalWeight, 'niceName':'w/o DY', 'cut':''}
@@ -221,6 +230,7 @@ SelStr = presel+'&&Selected==1'+trigger+filters
 
 
 triggers = "((HLT_EleHT350||HLT_EleHT400||HLT_Ele105)||(HLT_MuHT350||HLT_MuHT400))"
+#triggers = "((HLT_EleHT350||HLT_EleHT400)||(HLT_MuHT350||HLT_MuHT400))"
 #filters = "Flag_goodVertices && Flag_HBHENoiseFilter_fix && Flag_eeBadScFilter && Flag_HBHENoiseIsoFilter && veto_evt_list"
 #filters = "Flag_goodVertices && Flag_HBHENoiseFilter_fix && Flag_eeBadScFilter && Flag_HBHENoiseIsoFilter"
 filters = "(Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_goodVertices && Flag_eeBadScFilter &&  Flag_globalTightHalo2016Filter && Flag_badChargedHadronFilter && Flag_badMuonFilter)"

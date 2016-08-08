@@ -1,7 +1,9 @@
 import copy, os, sys
 #dirEce = '/data/easilar/cmgTuples/postProcessing_Spring16_V6/HT500LT250Skim/'
 #dirEce2 = '/data/easilar/cmgTuples/postProcessing_Spring16_FIXED_v2/'
-dirDaniel = '/afs/hephy.at/data/dspitzbart01/cmgTuples/postProcessing_Spring16_JECv6_v2/HT500LT250Skim/'
+#dirDaniel = '/afs/hephy.at/data/dspitzbart01/cmgTuples/postProcessing_Spring16_JECv6_v2/HT500LT250Skim/'
+dirDaniel = '/afs/hephy.at/data/dspitzbart01/cmgTuples/postProcessing_Spring16_JECv6_v3/HT500LT250Skim/'
+
 #dirDaniel = '/data/dspitzbart/cmgTuples/postProcessing_Spring16_JECv6/HT500LT250Skim/'
 dirEce = '/data/easilar/cmgTuples/postProcessing_Spring16_JECv6/HT500LT250Skim/'
 
@@ -35,6 +37,15 @@ TTJets_combined = {\
 ],
 'dir' : "/data/easilar/cmgTuples/postProcessing_Spring16_JECv3//HT500LT250Skim/",
 }
+
+TTJets_LO = {\
+"name" : "TTJets_LO",
+"bins" : [
+"TTJets_LO",
+],
+'dir' : dirDaniel,
+}
+
 
 TTJets_singleLep = {\
 "name" : "TTJets_singleLep",
@@ -107,7 +118,7 @@ singleTop_lep = {\
 "bins" : [
 "ST_schannel_4f_leptonDecays",
 "ST_tchannel_antitop_4f_leptonDecays_powheg",
-"ST_tchannel_top_4f_leptonDecays_powheg",   ##This is a fake sample with inversed leptonPdg, fix asap!!!
+"ST_tchannel_top_4f_leptonDecays_powheg",
 "ST_tW_antitop_5f_inclusiveDecays_powheg",
 "ST_tW_top_5f_inclusiveDecays_powheg",
 ],
@@ -141,7 +152,7 @@ QCDHT = {\
 'dir' : dirDaniel,
 }
 
-diBoson = {\
+diBoson_incl = {\
 "name":"diBoson",
 "bins":[
 "DiBoson_WW",
@@ -150,6 +161,22 @@ diBoson = {\
 ],
 'dir': dirDaniel,
 }
+
+diBoson = {\
+"name":"diBoson",
+"bins":[
+"WWTo2L2Nu",
+"WWToLNuQQ",
+"WZTo1L1Nu2Q",
+"WZTo1L3Nu",
+"WZTo2L2Q",
+"ZZTo2L2Nu",
+"ZZTo2L2Q",
+"ZZTo2Q2Nu",
+],
+'dir': dirDaniel,
+}
+
 
 TTV = {
 "name":"TTV",
