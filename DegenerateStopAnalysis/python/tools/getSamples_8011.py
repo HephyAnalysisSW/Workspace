@@ -3,7 +3,8 @@ from Workspace.HEPHYPythonTools.helpers import getChain, getPlotFromChain, getYi
 from Workspace.DegenerateStopAnalysis.tools.Sample import Sample, Samples
 from Workspace.DegenerateStopAnalysis.tools.colors import colors
 from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesPostProcessed_mAODv2_2016 import cmgTuplesPostProcessed
-from Workspace.DegenerateStopAnalysis.tools.weights_pu2_btag import weights, def_weights, Weight
+from Workspace.DegenerateStopAnalysis.tools.weights import Weight , Weights
+#from Workspace.DegenerateStopAnalysis.tools.weights_pu2_btag import weights, def_weights, Weight
 import os
 import re
 import glob
@@ -57,6 +58,11 @@ import pickle
 #mass_dict_pickle = "/afs/hephy.at/user/n/nrad/CMSSW/fork/CMSSW_7_4_12_patch4/src/Workspace/DegenerateStopAnalysis/cmgPostProcessing/mass_dict_all.pkl"
 #mass_dict_pickle = "/data/nrad/cmgTuples/7412pass2_mAODv2_v6/RunIISpring15MiniAODv2//mass_dict.pkl"
 #mass_dict = pickle.load(open(mass_dict_pickle,"r"))
+
+
+weights_= Weights()
+def_weights=weights_.def_weights
+weights = weights_.weights
 
 def getSamples(wtau=False, sampleList=['w','tt','z','sig'], 
                useHT=False, getData=False, blinded=True, scan=True, massPoints=[], skim='skimPresel', cmgPP=None, do8tev=False,

@@ -25,9 +25,9 @@ sample_info_default  = {
                        }  
 
 lumi_info_default   = {
-                     'lumi_target'         :   2300.,
-                     'lumi_data_blinded'   :   2245.386,
-                     'lumi_data_unblinded' :   139.63,
+                     #'lumi_target'         :   2300.,
+                     #'lumi_data_blinded'   :   2245.386,
+                     #'lumi_data_unblinded' :   139.63,
                       }
 
 

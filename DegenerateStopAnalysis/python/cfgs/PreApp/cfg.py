@@ -13,13 +13,14 @@ from Workspace.DegenerateStopAnalysis.tools.degPlots import DegPlots
 from Workspace.DegenerateStopAnalysis.scripts.degStop import args
 
 
-import Workspace.DegenerateStopAnalysis.tools.weights_pu as weights_pu
-import Workspace.DegenerateStopAnalysis.tools.weights_pu_teff as weights_pu_teff
-import Workspace.DegenerateStopAnalysis.tools.weights_pu2 as weights_pu2
-import Workspace.DegenerateStopAnalysis.tools.weights_wpt as weights_wpt
-import Workspace.DegenerateStopAnalysis.tools.weights_pu_wpt as weights_pu_wpt
-import Workspace.DegenerateStopAnalysis.tools.weights_pu_ttpt as weights_pu_ttpt
-import Workspace.DegenerateStopAnalysis.tools.weights_base as weights_base
+#import Workspace.DegenerateStopAnalysis.tools.weights_pu as weights_pu
+#import Workspace.DegenerateStopAnalysis.tools.weights_pu_teff as weights_pu_teff
+#import Workspace.DegenerateStopAnalysis.tools.weights_pu2 as weights_pu2
+#import Workspace.DegenerateStopAnalysis.tools.weights_wpt as weights_wpt
+#import Workspace.DegenerateStopAnalysis.tools.weights_pu_wpt as weights_pu_wpt
+#import Workspace.DegenerateStopAnalysis.tools.weights_pu_ttpt as weights_pu_ttpt
+#import Workspace.DegenerateStopAnalysis.tools.weights_base as weights_base
+from Workspace.DegenerateStopAnalysis.tools.weights import Weights
 #import weights import weights_base
 
 
@@ -140,27 +141,31 @@ def make_match_func(tothis):
 
 
 
-from Workspace.DegenerateStopAnalysis.tools.btag_sf_map import BTagSFMap
+#from Workspace.DegenerateStopAnalysis.tools.btag_sf_map import BTagSFMap
+#
+#sf = 'sf' if btag=='btag' else btag
+#
+#btag_sf_map = BTagSFMap(sf)
+#btag_to_sf = btag_sf_map.btag_to_sf
+#sf_to_btag = btag_sf_map.sf_to_btag
+#
+#import re
+#def_weights = {
+#
+#            "cuts": dict( [ (sf, (sf, make_match_func(sf))  )  for sf in sf_to_btag.keys()  ]) , 
+#            "baseWeight":"puReweight*weight",
+#            #"baseWeight":"puWeight2*weight",
+#                }
 
-sf = 'sf' if btag=='btag' else btag
 
-btag_sf_map = BTagSFMap(sf)
-btag_to_sf = btag_sf_map.btag_to_sf
-sf_to_btag = btag_sf_map.sf_to_btag
 
-import re
-def_weights = {
-
-            "cuts": dict( [ (sf, (sf, make_match_func(sf))  )  for sf in sf_to_btag.keys()  ]) , 
-            "baseWeight":"puReweight*weight",
-            #"baseWeight":"puWeight2*weight",
-            "lumis":{
+lumis=              {
                             "mc_lumi"               :   10000   ,
                             'target_lumi'           :   13000.   ,
                             'DataBlind_lumi'        :   12864.4    ,
                             'DataUnblind_lumi'      :   804.2   ,
-                    },
-                }
+                    }
+
 
 print "arg cut:", getattr(args, "cutInst", "False")
 cutInstList = [] 
@@ -218,20 +223,41 @@ mc_filters_list   = [
 
 
 
-weights = {
-            'base': weights_base,
-            'pu_teff':   weights_pu_teff,
-            'pu':   weights_pu,
-            'pu2':   weights_pu2,
-            'wpt':  weights_wpt, 
-            'pu_wpt': weights_pu_wpt,
-            'pu_ttpt': weights_pu_ttpt,
+
+#weights = {
+#            'base': weights_base,
+#            'pu_teff':   weights_pu_teff,
+#            'pu':   weights_pu,
+#            'pu2':   weights_pu2,
+#            'wpt':  weights_wpt, 
+#            'pu_wpt': weights_pu_wpt,
+#            'pu_ttpt': weights_pu_ttpt,
+#          }
+
+
+weights_params = {
+            'base':      {'lumis':lumis  ,'lepCol':lepCol, 'lep':lep, 'pu':''               , 'btag':btag, 'wpt':'', 'ttpt':'', 'isr':''},
+            'pu_teff':   {'lumis':lumis  ,'lepCol':lepCol, 'lep':lep, 'pu':'puReweight'     , 'btag':btag, 'wpt':'', 'ttpt':'', 'isr':''},
+            'pu':        {'lumis':lumis  ,'lepCol':lepCol, 'lep':lep, 'pu':'puReweight'     , 'btag':btag, 'wpt':'', 'ttpt':'', 'isr':''},
+            'pu_up':     {'lumis':lumis  ,'lepCol':lepCol, 'lep':lep, 'pu':'puReweight_up'  , 'btag':btag, 'wpt':'', 'ttpt':'', 'isr':''},
+            'pu_down':   {'lumis':lumis  ,'lepCol':lepCol, 'lep':lep, 'pu':'puReweight_down', 'btag':btag, 'wpt':'', 'ttpt':'', 'isr':''},
+            'wpt':       {'lumis':lumis  ,'lepCol':lepCol, 'lep':lep, 'pu':''               , 'btag':btag, 'wpt':True, 'ttpt':'', 'isr':''},
+            'pu_wpt':    {'lumis':lumis  ,'lepCol':lepCol, 'lep':lep, 'pu':'puReweight'     , 'btag':btag, 'wpt':True, 'ttpt':'', 'isr':''},
+            'pu_ttpt':   {'lumis':lumis  ,'lepCol':lepCol, 'lep':lep, 'pu':'puReweight'     , 'btag':btag, 'wpt':'', 'ttpt':True, 'isr':''},
           }
+
+
 
 weight = getattr(args , "weight", "base") 
 weight_tag = '' if weight == 'base' else "_%s"%weight
 
-task_weight = weights[weight]
+
+weight_params = weights_params[weight]
+#weights_ = Weights(**weight_params)
+task_weight = Weights(**weight_params)
+
+
+
 
 
 cfg = TaskConfig(
@@ -267,13 +293,13 @@ cfg = TaskConfig(
                                         #"massPoints"   :    task_info['massPoints']  ,
                                         "getData"      :    task_info.get("data",False)    ,
                                         "weights"      :    task_weight.weights     ,
-                                        "def_weights"  :    def_weights     ,
+                                        "def_weights"  :    task_weight.def_weights     ,
                                         "data_triggers":    'HLT_PFMET100_PFMHT100_IDTight || HLT_PFMET110_PFMHT110_IDTight || HLT_PFMET120_PFMHT120_IDTight || HLT_PFMET90_PFMHT90_IDTight'                ,
                                         "data_filters" :    ' && '.join(data_filters_list), 
                                         "mc_filters"   :    ' && '.join(mc_filters_list),
-                                        'lumis':def_weights['lumis'],
+                                        'lumis'        :     task_weight.def_weights['lumis'],
                                       } , 
-                   lumi_info       = def_weights['lumis'],
+                   lumi_info       = task_weight.def_weights['lumis'],
                    #lumi_info      = task_info.get("lumi_info",{}),
                    nProc          =  15, 
                 )

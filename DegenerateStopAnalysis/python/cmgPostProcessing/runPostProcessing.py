@@ -295,6 +295,9 @@ sampleSets = {
                                       ],
                             },
 
+
+
+
                 'data_met':{
                             'samples':[
                                         ["MET_Run2016B_PromptReco_v2", "--skimPreselect"],
@@ -302,6 +305,42 @@ sampleSets = {
                                         ["MET_Run2016D_PromptReco_v2", "--skimPreselect"],
                                       ],
                             },
+
+
+
+                'data_met_b':{
+                            'samples':[
+                                        ["MET_Run2016B_PromptReco_v2",   "--skimPreselect",   "--runChunks", "0",    "200"], 
+                                        ["MET_Run2016B_PromptReco_v2",   "--skimPreselect",   "--runChunks", "201",  "400"], 
+                                        ["MET_Run2016B_PromptReco_v2",   "--skimPreselect",   "--runChunks", "401",  "600"], 
+                                        ["MET_Run2016B_PromptReco_v2",   "--skimPreselect",   "--runChunks", "601",  "800"], 
+                                        ["MET_Run2016B_PromptReco_v2",   "--skimPreselect",   "--runChunks", "801",  "1000"], 
+                                        ["MET_Run2016B_PromptReco_v2",   "--skimPreselect",   "--runChunks", "1001", "1200"], 
+                                      ]},
+                
+                'data_met_c':{
+                            'samples':[
+                                        ["MET_Run2016C_PromptReco_v2",   "--skimPreselect",    "--runChunks", "0",   "100"],     
+                                        ["MET_Run2016C_PromptReco_v2",   "--skimPreselect",    "--runChunks", "101", "200"],     
+                                        ["MET_Run2016C_PromptReco_v2",   "--skimPreselect",    "--runChunks", "201", "300"],     
+                                        ["MET_Run2016C_PromptReco_v2",   "--skimPreselect",    "--runChunks", "301", "400"],     
+                                      ]},
+                
+                'data_met_d':{
+                            'samples':[
+                                        ["MET_Run2016D_PromptReco_v2",   "--skimPreselect",    "--runChunks", "0",   "100"],     
+                                        ["MET_Run2016D_PromptReco_v2",   "--skimPreselect",    "--runChunks", "101", "200"],     
+                                        ["MET_Run2016D_PromptReco_v2",   "--skimPreselect",    "--runChunks", "201", "300"],     
+                                        ["MET_Run2016D_PromptReco_v2",   "--skimPreselect",    "--runChunks", "301", "400"],     
+                                        ["MET_Run2016D_PromptReco_v2",   "--skimPreselect",    "--runChunks", "401", "500"],     
+                                        ["MET_Run2016D_PromptReco_v2",   "--skimPreselect",    "--runChunks", "501", "600"],     
+                                      ]},
+
+
+
+
+
+
                 
                 'data_mu':{
                             'samples':[
