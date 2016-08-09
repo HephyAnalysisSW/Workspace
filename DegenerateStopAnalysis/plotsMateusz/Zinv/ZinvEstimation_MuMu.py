@@ -1,11 +1,11 @@
-# ZinvEstimation.py
+# ZinvEstimation_MuMu.py
 import ROOT
 import os, sys
 import argparse
 import Workspace.DegenerateStopAnalysis.toolsMateusz.ROOToptions
 from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
-from Workspace.DegenerateStopAnalysis.tools.degTools import CutClass, Plots, getPlots, drawPlots, Yields, setup_style
+from Workspace.DegenerateStopAnalysis.tools.degTools import CutClass, Plots, getPlots, drawPlots, Yields, setEventListToChains, setup_style
 from Workspace.DegenerateStopAnalysis.tools.bTagWeights import bTagWeights
 from Workspace.DegenerateStopAnalysis.tools.getSamples_8011 import getSamples
 from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesPostProcessed_mAODv2_2016 import cmgTuplesPostProcessed
@@ -27,7 +27,7 @@ parser.add_argument("--afterEmul", dest = "afterEmul",  help = "afterEmul plot",
 parser.add_argument("--leptons", dest = "leptons",  help = "Extra lepton distributions", type = int, default = 1)
 parser.add_argument("--peak", dest = "peak",  help = "Z-peak selection", type = int, default = 0)
 parser.add_argument("--doYields", dest = "doYields",  help = "Calulate yields", type = int, default = 1)
-parser.add_argument("--btag", dest = "btag",  help = "B-tagging option", type = str, default = "")
+parser.add_argument("--btag", dest = "btag",  help = "B-tagging option", type = str, default = "sf")
 parser.add_argument("--getData", dest = "getData",  help = "Get data samples", type = int, default = 1)
 parser.add_argument("--plot", dest = "plot",  help = "Toggle plot", type = int, default = 0)
 parser.add_argument("--logy", dest = "logy",  help = "Toggle logy", type = int, default = 1)
@@ -69,6 +69,9 @@ if getData: samplesList.append("d1muBlind")
 
 samples = getSamples(cmgPP = cmgPP, skim = 'oneLep', sampleList = samplesList, scan = False, useHT = True, getData = getData) 
 
+#adding low mt dy sample
+samplesList.append("dy5to50")
+
 if verbose:
    print makeLine()
    print "Using samples:"
@@ -82,7 +85,7 @@ if verbose:
 if save: #web address: http://www.hephy.at/user/mzarucki/plots
    savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/Zinv"
    
-   savedir += "/" + btag
+   #savedir += "/bTagWeight_" + btag
    
    savedir += "/" + SR
    
@@ -127,51 +130,58 @@ for s in samplesList:
    #samples[s].tree.SetAlias("electron_mt2", electron_mt2)
    #samples[s].tree.SetAlias("muon_mt2", muon_mt2)
 
-def regions(ind):
+#SRs
+def regions(lepton):
+   if lepton == "electron":
+      ind = "IndexLepAll_el[0]"
+      pdgId = "11"
+   elif lepton == "muon":
+      ind = "IndexLepAll_el[2]"
+      pdgId = "13"
+   else:
+      assert False
+    
    SRs = {\
-      'SR1':["SR1","LepAll_pt[" + ind + "] < 30"],
-   
-      'SR1a':["SR1a", combineCuts("LepAll_mt[" + ind + "] < 60", "LepAll_pt[" + ind + "] < 30")],
-      'SR1b':["SR1b", combineCuts(btw("LepAll_mt[" + ind + "]", 60, 95), "LepAll_pt[" + ind + "] < 30")],
-      'SR1c':["SR1c", combineCuts("LepAll_mt[" + ind + "] > 95", "LepAll_pt[" + ind + "] < 30")],
+      #'SR1':["SR1","LepAll_pt[" + ind + "] < 30"],
+      'SR1a':["SR1a",   combineCuts("LepAll_pdgId[" + ind + "] == " + pdgId, "LepAll_mt[" + ind + "] < 60", "LepAll_pt[" + ind + "] < 30")],
+      'SR1b':["SR1b",   combineCuts("LepAll_pdgId[" + ind + "] == " + pdgId, btw("LepAll_mt[" + ind + "]", 60, 95), "LepAll_pt[" + ind + "] < 30")],
+      'SR1c':["SR1c",   combineCuts("LepAll_mt[" + ind + "] > 95", "LepAll_pt[" + ind + "] < 30")],
       
       'SRL1':["SRL1", btw("LepAll_pt[" + ind + "]", 5, 12)],
       'SRH1':["SRH1", btw("LepAll_pt[" + ind + "]", 12, 20)],
       'SRV1':["SRV1", btw("LepAll_pt[" + ind + "]", 20, 30)],
    
-      'SRL1a':["SRL1a", combineCuts("LepAll_mt[" + ind + "] < 60", btw("LepAll_pt[" + ind + "]", 5, 12))],
-      'SRH1a':["SRH1a", combineCuts("LepAll_mt[" + ind + "] < 60", btw("LepAll_pt[" + ind + "]", 12, 20))],
-      'SRV1a':["SRV1a", combineCuts("LepAll_mt[" + ind + "] < 60", btw("LepAll_pt[" + ind + "]", 20, 30))],
+      'SRL1a':["SRL1a", combineCuts("LepAll_pdgId[" + ind + "] == " + pdgId, "LepAll_mt[" + ind + "] < 60", btw("LepAll_pt[" + ind + "]", 5, 12))],
+      'SRH1a':["SRH1a", combineCuts("LepAll_pdgId[" + ind + "] == " + pdgId, "LepAll_mt[" + ind + "] < 60", btw("LepAll_pt[" + ind + "]", 12, 20))],
+      'SRV1a':["SRV1a", combineCuts("LepAll_pdgId[" + ind + "] == " + pdgId, "LepAll_mt[" + ind + "] < 60", btw("LepAll_pt[" + ind + "]", 20, 30))],
    
-      'SRL1b':["SRL1b", combineCuts(btw("LepAll_mt[" + ind + "]", 60, 95), btw("LepAll_pt[" + ind + "]", 5, 12))],
-      'SRH1b':["SRH1b", combineCuts(btw("LepAll_mt[" + ind + "]", 60, 95), btw("LepAll_pt[" + ind + "]", 12, 20))],
-      'SRV1b':["SRV1b", combineCuts(btw("LepAll_mt[" + ind + "]", 60, 95), btw("LepAll_pt[" + ind + "]", 20, 30))],
+      'SRL1b':["SRL1b", combineCuts("LepAll_pdgId[" + ind + "] == " + pdgId, btw("LepAll_mt[" + ind + "]", 60, 95), btw("LepAll_pt[" + ind + "]", 5, 12))],
+      'SRH1b':["SRH1b", combineCuts("LepAll_pdgId[" + ind + "] == " + pdgId, btw("LepAll_mt[" + ind + "]", 60, 95), btw("LepAll_pt[" + ind + "]", 12, 20))],
+      'SRV1b':["SRV1b", combineCuts("LepAll_pdgId[" + ind + "] == " + pdgId, btw("LepAll_mt[" + ind + "]", 60, 95), btw("LepAll_pt[" + ind + "]", 20, 30))],
    
       'SRL1c':["SRL1c", combineCuts("LepAll_mt[" + ind + "] > 95", btw("LepAll_pt[" + ind + "]", 5, 12))],
       'SRH1c':["SRH1c", combineCuts("LepAll_mt[" + ind + "] > 95", btw("LepAll_pt[" + ind + "]", 12, 20))],
       'SRV1c':["SRV1c", combineCuts("LepAll_mt[" + ind + "] > 95", btw("LepAll_pt[" + ind + "]", 20, 30))]}
+   
+   SRs['SR1'] = ["SR1", "(" + SRs['SR1a'][1] + ") || (" + SRs['SR1b'][1] + ") || (" + SRs['SR1c'][1] + ")"]
+
    return SRs
+
+SRs_el = regions('electron')
+SRs_mu = regions('muon')
 
 #btag weights
 bWeightDict = bTagWeights(btag)
 bTagString = bWeightDict['sr1_bjet']
+#bTagString = "nBJet == 0" 
 
-#SRs
-ind_el = "IndexLepAll_el[0]"
-ind_mu = "IndexLepAll_mu[2]"
-
-SRs_el = regions(ind_el)
-SRs_mu = regions(ind_mu)
-
+#selection on Z-peak
 if peak:
-   peak = CutClass("Zpeak", [
-      ["2mu", "nLepAll_mu >= 2"],
-      ["Zpeak","abs(dimuon_mass - 91.1876) < 15"],
-      ], baseCut = None)
+   peakCutString = "abs(dimuon_mass - 91.1876) < 15"   
 else:
-   peak = CutClass("None", [["None","1"]], baseCut = None)
+   peakCutString = "1"   
 
-#Preselection & basic SR cuts
+#Preselection & selection of Z->mumu events
 dimuon = CutClass("dimuon", [
    ["ISR100", "nIsrJet >= 1"],
    ["TauVeto","Sum$(TauGood_idMVANewDM && TauGood_pt > 20) == 0"],
@@ -179,22 +189,23 @@ dimuon = CutClass("dimuon", [
    ["No3rdJet60","nVetoJet <= 2"],
    ["2mu", "nLepAll_mu >= 2"], 
     
-   ["muon1", "abs(LepAll_pdgId[" + ind1 + "]) == 13"],
+   ["muon1", "abs(LepAll_pdgId[" + ind1 + "]) == 13"], #redundant
    ["relIso", "LepAll_relIso03[" + ind1 + "] < 0.12"],
    ["pt28", "LepAll_pt[" + ind1 + "] > 28"],
-   # 
-   ["muon2", "abs(LepAll_pdgId[" + ind2 + "]) == 13"],
+    
+   ["muon2", "abs(LepAll_pdgId[" + ind2 + "]) == 13"], #redundant
    ["relIso", "LepAll_relIso03[" + ind2 + "] < 0.12"],
    ["pt20", "LepAll_pt[" + ind2 + "] > 20"],
-   #
+   
    ["OS", "LepAll_pdgId[" + ind1 + "] == -LepAll_pdgId[" + ind2 + "]"],
-   #
-   ["dimuon_mass","dimuon_mass > 55"],
-   #["dimuon_pt","dimuon_pt > 75"],
-   ["met2","met2 > 75"],
-   ], baseCut = peak)
+   
+   ["peak", peakCutString],
+   ], baseCut = None)
 
 emulated = CutClass("emulated", [
+   ["dimuon_mass","dimuon_mass > 55"],
+   #["dimuon_pt","dimuon_pt > 75"],
+   ["met2", "met2 > 75"], #instead of cut on dimuon pt
    ["CT2","min(met2, ht_basJet - 100) >" + CT2cut],
    ], baseCut = dimuon)
 
@@ -213,6 +224,8 @@ muons = CutClass("muons", [
    ["elVeto", "(nLepAll_el == 0 || (nLepAll_el == 1 && LepAll_pt[IndexLepAll_el[0]] < 20))"],
    SRs_mu[SR]
    ], baseCut = emulated)
+      
+setEventListToChains(samples, samplesList, dimuon)
 
 yields = {}
 if doYields and peak:
@@ -227,19 +240,20 @@ if doYields and peak:
    
    with open(savedir + "/ZinvYields" + suffix1 + ".txt", "a") as outfile:
       outfile.write(CT2cut + "     " +\
-      str(yields['Zpeak'].yieldDictFull['d1muBlind']['emulated'].round(2)) + "              " +\
-      str(yields['Zpeak'].yieldDictFull['dy']['emulated'].round(2)) + "              " +\
-      str(yields['Zpeak'].yieldDictFull['tt']['emulated'].round(2)) + "              " +\
-      str(yields['Nel'].yieldDictFull['d1muBlind']['electrons'].round(2)) + "              " +\
-      str(yields['Nel'].yieldDictFull['dy']['electrons'].round(2)) + "              " +\
-      str(yields['Nel'].yieldDictFull['tt']['electrons'].round(2)) + "              " +\
-      str(yields['Nmu'].yieldDictFull['d1muBlind']['muons'].round(2)) + "              " +\
-      str(yields['Nmu'].yieldDictFull['dy']['muons'].round(2)) + "              " +\
-      str(yields['Nmu'].yieldDictFull['tt']['muons'].round(2)) + "\n")
+      str( yields['Zpeak'].yieldDictFull['d1muBlind']['emulated'].round(2)) + "              " +\
+      str((yields['Zpeak'].yieldDictFull['dy']['emulated'] + yields['Zpeak'].yieldDictFull['dy']['emulated']).round(2)) + "              " +\
+      str( yields['Zpeak'].yieldDictFull['tt']['emulated'].round(2)) + "              " +\
+      str( yields['Nel'].yieldDictFull['d1muBlind']['electrons'].round(2)) + "              " +\
+      str((yields['Nel'].yieldDictFull['dy']['electrons'] + yields['Nel'].yieldDictFull['dy']['electrons']).round(2)) + "              " +\
+      str( yields['Nel'].yieldDictFull['tt']['electrons'].round(2)) + "              " +\
+      str( yields['Nmu'].yieldDictFull['d1muBlind']['muons'].round(2)) + "              " +\
+      str((yields['Nmu'].yieldDictFull['dy']['muons'] + yields['Nmu'].yieldDictFull['dy']['muons']).round(2)) + "              " +\
+      str( yields['Nmu'].yieldDictFull['tt']['muons'].round(2)) + "\n")
 
    #Z xsec
    Zpeak_dMC = (yields['Zpeak'].yieldDictFull['d1muBlind']['emulated']/\
                (yields['Zpeak'].yieldDictFull['dy']['emulated'] + \
+                yields['Zpeak'].yieldDictFull['dy5to50']['emulated'] + \
                 yields['Zpeak'].yieldDictFull['tt']['emulated'] + \
                 yields['Zpeak'].yieldDictFull['vv']['emulated']))
 
@@ -250,9 +264,11 @@ if doYields and peak:
    
    #probability of observing electron
    prob_el_MC = ((yields['Nel'].yieldDictFull['dy']['electrons'] + \
+                  yields['Nel'].yieldDictFull['dy5to50']['electrons'] + \
                   yields['Nel'].yieldDictFull['tt']['electrons'] + \
                   yields['Nel'].yieldDictFull['vv']['electrons'])/\
                  (yields['Zpeak'].yieldDictFull['dy']['emulated'] +\
+                  yields['Zpeak'].yieldDictFull['dy5to50']['emulated'] + \
                   yields['Zpeak'].yieldDictFull['tt']['emulated'] + \
                   yields['Zpeak'].yieldDictFull['vv']['emulated']))
    
@@ -260,9 +276,11 @@ if doYields and peak:
    
    #probability of observing muon
    prob_mu_MC = ((yields['Nmu'].yieldDictFull['dy']['muons'] + \
+                  yields['Nmu'].yieldDictFull['dy5to50']['muons'] + \
                   yields['Nmu'].yieldDictFull['tt']['muons'] + \
                   yields['Nmu'].yieldDictFull['vv']['muons'])/\
                  (yields['Zpeak'].yieldDictFull['dy']['emulated'] + 
+                  yields['Zpeak'].yieldDictFull['dy5to50']['emulated'] + 
                   yields['Zpeak'].yieldDictFull['tt']['emulated'] + 
                   yields['Zpeak'].yieldDictFull['vv']['emulated']))
    
@@ -309,24 +327,29 @@ if plot:
       #"muon_mt2":{'var':"muon_mt2", "bins":[10,0,100], "decor":{"title": "Muon mT Distribution" ,"x":"Muon m_{T2} / GeV" , "y":"Events", 'log':[0,logy,0]}}, 
    }
    
-   plotsList = ["dimuon_mass", "dimuon_pt", "MET", "MET2"]#, "HT", "nJets30", "nJets60", "ISRpt"]
+   plotsList = ["dimuon_mass", "dimuon_pt", "MET", "MET2", "HT", "nJets30", "nJets60", "ISRpt"]
    
    plotsDict = Plots(**plotDict)
    plotsDict2 = Plots(**plotDict2)
    
    if beforeEmul:
+      #setEventListToChains(samples, samplesList, dimuon)
       dimuonPlots = getPlots(samples, plotsDict, dimuon, samplesList, plotList = plotsList, addOverFlowBin='upper')
-      dimuonPlots2 = drawPlots(samples, plotsDict, dimuon, samplesList, plotList = plotsList, plotLimits = [10, 100], denoms=["bkg"], noms = ["d1muBlind"], fom="RATIO", fomLimits=[0,2.8], plotMin = 0.01, normalize = False, save=False)
-   
+      dimuonPlots2 = drawPlots(samples, plotsDict, dimuon, samplesList, plotList = plotsList, plotLimits = [10, 100], denoms=["bkg"], noms = ["d1muBlind"], fom="RATIO", fomLimits=[0,1.8], plotMin = 0.01, normalize = False, save=False)
+ 
    if afterEmul:
+      #setEventListToChains(samples, samplesList, emulated)
       emulatedPlots = getPlots(samples, plotsDict, emulated, samplesList, plotList = plotsList, addOverFlowBin='upper')
-      emulatedPlots2 = drawPlots(samples, plotsDict, emulated, samplesList, plotList = plotsList, plotLimits = [10, 100], denoms=["bkg"], noms = ["d1muBlind"], fom="RATIO", fomLimits=[0,2.8], plotMin = 0.01, normalize = False, save=False)
+      emulatedPlots2 = drawPlots(samples, plotsDict, emulated, samplesList, plotList = plotsList, plotLimits = [10, 100], denoms=["bkg"], noms = ["d1muBlind"], fom="RATIO", fomLimits=[0,1.8], plotMin = 0.01, normalize = False, save=False)
    
    if leptons:
+      #setEventListToChains(samples, samplesList, electrons)
       elePlots = getPlots(samples, plotsDict2, electrons, samplesList, plotList = ["elePt"], addOverFlowBin='upper')
-      elePlots2 = drawPlots(samples, plotsDict2, electrons, samplesList, plotList = ["elePt"], plotLimits = [10, 100], denoms=["bkg"], noms = ["d1muBlind"], fom="RATIO", fomLimits=[0,2.8], plotMin = 0.01, normalize = False, save=False)
+      elePlots2 = drawPlots(samples, plotsDict2, electrons, samplesList, plotList = ["elePt"], plotLimits = [10, 100], denoms=["bkg"], noms = ["d1muBlind"], fom="RATIO", fomLimits=[0,1.8], plotMin = 0.01, normalize = False, save=False)
+      
+      #setEventListToChains(samples, samplesList, muons)
       muPlots = getPlots(samples, plotsDict2, muons, samplesList, plotList = ["muPt"], addOverFlowBin='upper')
-      muPlots2 = drawPlots(samples, plotsDict2, muons, samplesList, plotList = ["muPt"], plotLimits = [10, 100], denoms=["bkg"], noms = ["d1muBlind"], fom="RATIO", fomLimits=[0,2.8], plotMin = 0.01, normalize = False, save=False)
+      muPlots2 = drawPlots(samples, plotsDict2, muons, samplesList, plotList = ["muPt"], plotLimits = [10, 100], denoms=["bkg"], noms = ["d1muBlind"], fom="RATIO", fomLimits=[0,1.8], plotMin = 0.01, normalize = False, save=False)
    
    #Save canvas
    if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID

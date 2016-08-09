@@ -9,7 +9,7 @@ import Workspace.DegenerateStopAnalysis.toolsMateusz.ROOToptions
 from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
 #from Workspace.DegenerateStopAnalysis.toolsMateusz.eleWPs import *
-from Workspace.DegenerateStopAnalysis.tools.degTools import CutClass, Plots, getPlots, drawPlots, Yields, setup_style
+from Workspace.DegenerateStopAnalysis.tools.degTools import CutClass, Plots, getPlots, drawPlots, Yields, setEventListToChains, setup_style
 from Workspace.DegenerateStopAnalysis.tools.bTagWeights import bTagWeights
 from Workspace.DegenerateStopAnalysis.tools.getSamples_8011 import getSamples
 from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesPostProcessed_mAODv2_2016 import cmgTuplesPostProcessed
@@ -71,7 +71,7 @@ else: ABCD = "2D"
 if save: #web address: http://www.hephy.at/user/mzarucki/plots
    savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/QCD/muon"
  
-   savedir += "/bTagWeight_" + btag
+   #savedir += "/bTagWeight_" + btag
      
    estdir = savedir + "/estimation"
    
@@ -131,7 +131,7 @@ if verbose:
       else: 
          print "!!! Sample " + sample + " unavailable."
          sys.exit(0)
-   
+         
 #Removal of high weight events
 if highWeightVeto:
    weightCut = "50"
@@ -143,17 +143,17 @@ else:
 ind = "IndexLepAll_mu2[0]" #index sel: no hybIso cut
 
 #Geometric cuts
-etaAcc = 2.1
+etaAcc = 1.5
 ebSplit = 0.8 #barrel is split into two regions
 ebeeSplit = 1.479 #division between barrel and endcap
 
 #selection on leading muon
-muSel = "abs(LepAll_pdgId[" + ind + "]) == 13 && abs(LepAll_eta[" + ind + "]) < " + str(etaAcc) #NOTE: pdg cut redundant as included in index
+muSel = "abs(LepAll_eta[" + ind + "]) < " + str(etaAcc) #eta acceptance 
 
 #Common QCD cuts
 hybIsoCut = "(LepAll_relIso03[" + ind + "]*min(LepAll_pt[" + ind + "], 25)) < 5" #hybIsoCut = "((LepAll_absIso03 < 5) || LepAll_relIso03 < 0.2))"
 antiHybIsoCut = "(LepAll_relIso03[" + ind + "]*min(LepAll_pt[" + ind + "], 25)) > 5" #antiHybIsoCut = "((LepAll_absIso03 > 5) && (LepAll_relIso03 > 0.2))"
-dPhiCut = "vetoJet_dPhi_j1j2 < 2.5"# || nVetoJet <= 1" #unnecessary as value set to -999 for monojet evts
+dPhiCut = "(vetoJet_dPhi_j1j2 < 2.5 || nVetoJet <= 1)" #unnecessary as value set to -999 for monojet evts
 antidPhiCut = "(vetoJet_dPhi_j1j2 > 2.5 || nVetoJet <= 1)" #or required for inclusion of monojet evts
 
 #Differing QCD cuts
@@ -176,7 +176,7 @@ bWeightDict = bTagWeights(btag)
 bTagString = bWeightDict['sr1_bjet'] #corresponds to bVeto
 
 #Preselection & basic SR cuts
-presel = CutClass("presel_SR", [
+baseline = CutClass("baseline", [
    ["HT","ht_basJet >" + HTcut],
    ["MET", METcutString],
    ["ISR100", "nIsrJet >= 1"],
@@ -188,28 +188,32 @@ presel = CutClass("presel_SR", [
    ["TauVeto","Sum$(TauGood_idMVANewDM && TauGood_pt > 20) == 0"],
    ["HighWeightVeto","weight < " + weightCut],
    ], baseCut = None)
+         
+setEventListToChains(samples, samplesList, baseline)
 
 abcd = {'SR':'I', 'A_IX': 'I', 'IX_A':'anti-I', 'IXA':'anti-I'}
 
 SRs ={}
 
 SRs = {\
-   'SR1':["SR1","LepAll_pt[" + ind + "] < 30"],
-   'SR1a':["SR1a", combineCuts("LepAll_mt[" + ind + "] < 60", "LepAll_pt[" + ind + "] < 30")],
-   'SR1b':["SR1b", combineCuts(btw("LepAll_mt[" + ind + "]", 60, 95), "LepAll_pt[" + ind + "] < 30")],
-   'SR1c':["SR1c", combineCuts("LepAll_mt[" + ind + "] > 95", "LepAll_pt[" + ind + "] < 30")],
+   #'SR1':["SR1","LepAll_pt[" + ind + "] < 30"],
+   'SR1a':["SR1a",   combineCuts("LepAll_pdgId[" + ind + "] == 13", "LepAll_mt[" + ind + "] < 60", "LepAll_pt[" + ind + "] < 30")],
+   'SR1b':["SR1b",   combineCuts("LepAll_pdgId[" + ind + "] == 13", btw("LepAll_mt[" + ind + "]", 60, 95), "LepAll_pt[" + ind + "] < 30")],
+   'SR1c':["SR1c",   combineCuts("LepAll_mt[" + ind + "] > 95", "LepAll_pt[" + ind + "] < 30")],
 
-   'SRL1a':["SRL1a", combineCuts("LepAll_mt[" + ind + "] < 60", btw("LepAll_pt[" + ind + "]", 5, 12))],
-   'SRH1a':["SRH1a", combineCuts("LepAll_mt[" + ind + "] < 60", btw("LepAll_pt[" + ind + "]", 12, 20))],
-   'SRV1a':["SRV1a", combineCuts("LepAll_mt[" + ind + "] < 60", btw("LepAll_pt[" + ind + "]", 20, 30))],
+   'SRL1a':["SRL1a", combineCuts("LepAll_pdgId[" + ind + "] == 13", "LepAll_mt[" + ind + "] < 60", btw("LepAll_pt[" + ind + "]", 5, 12))],
+   'SRH1a':["SRH1a", combineCuts("LepAll_pdgId[" + ind + "] == 13", "LepAll_mt[" + ind + "] < 60", btw("LepAll_pt[" + ind + "]", 12, 20))],
+   'SRV1a':["SRV1a", combineCuts("LepAll_pdgId[" + ind + "] == 13", "LepAll_mt[" + ind + "] < 60", btw("LepAll_pt[" + ind + "]", 20, 30))],
 
-   'SRL1b':["SRL1b", combineCuts(btw("LepAll_mt[" + ind + "]", 60, 95), btw("LepAll_pt[" + ind + "]", 5, 12))],
-   'SRH1b':["SRH1b", combineCuts(btw("LepAll_mt[" + ind + "]", 60, 95), btw("LepAll_pt[" + ind + "]", 12, 20))],
-   'SRV1b':["SRV1b", combineCuts(btw("LepAll_mt[" + ind + "]", 60, 95), btw("LepAll_pt[" + ind + "]", 20, 30))],
+   'SRL1b':["SRL1b", combineCuts("LepAll_pdgId[" + ind + "] == 13", btw("LepAll_mt[" + ind + "]", 60, 95), btw("LepAll_pt[" + ind + "]", 5, 12))],
+   'SRH1b':["SRH1b", combineCuts("LepAll_pdgId[" + ind + "] == 13", btw("LepAll_mt[" + ind + "]", 60, 95), btw("LepAll_pt[" + ind + "]", 12, 20))],
+   'SRV1b':["SRV1b", combineCuts("LepAll_pdgId[" + ind + "] == 13", btw("LepAll_mt[" + ind + "]", 60, 95), btw("LepAll_pt[" + ind + "]", 20, 30))],
 
    'SRL1c':["SRL1c", combineCuts("LepAll_mt[" + ind + "] > 95", btw("LepAll_pt[" + ind + "]", 5, 12))],
    'SRH1c':["SRH1c", combineCuts("LepAll_mt[" + ind + "] > 95", btw("LepAll_pt[" + ind + "]", 12, 20))],
    'SRV1c':["SRV1c", combineCuts("LepAll_mt[" + ind + "] > 95", btw("LepAll_pt[" + ind + "]", 20, 30))]}
+
+SRs['SR1'] = ["SR1", "(" + SRs['SR1a'][1] + ") || (" + SRs['SR1b'][1] + ") || (" + SRs['SR1c'][1] + ")"]
 
 QCD = {}
 regions = ['SR1', 'SR1a', 'SR1b', 'SR1c', 'SRL1a', 'SRH1a', 'SRV1a', 'SRL1b', 'SRH1b', 'SRV1b', 'SRL1c', 'SRH1c', 'SRV1c']
@@ -222,97 +226,98 @@ for reg in regions:
       ["MET", "met >" + METcut], #tight MET
       ["A", dPhiCut], #applied
       ["I", hybIsoCut],
-      ], baseCut = presel)
+      ], baseCut = baseline)
    
    QCD[reg]['IX_A'] = CutClass("QCD_IX_A_" + reg, [ #loose MET
       SRs[reg],
       ["A", dPhiCut], #applied
       ["anti-I", antiHybIsoCut], #inverted
-      ], baseCut = presel)
+      ], baseCut = baseline)
    
    QCD[reg]['A_IX'] = CutClass("QCD_A_IX_" + reg, [
       SRs[reg],
       ["MET", "met >" + METcut], #tight MET
       ["anti-A", antidPhiCut], #inverted
       ["I", hybIsoCut], #applied
-      ], baseCut = presel)
+      ], baseCut = baseline)
    
    QCD[reg]['IXA'] = CutClass("QCD_IXA_" + reg, [ #loose MET
       SRs[reg],
       ["anti-A", antidPhiCut], #inverted
       ["anti-I", antiHybIsoCut], #inverted
-      ], baseCut = presel)
+      ], baseCut = baseline)
       
 if estimation: 
    yields = {}
+   QCDyields = {}
    QCD_IX_A = {}
-   QCD_A_IX = {}
    
-   QCD_IXA_MC = {}
-   QCD_IXA_data = {}
-   SF_IXA_dataMC = {}
+   SF_dataMC = {}
    QCDest_MC = {}
    QCDest = {}
    if save: 
       if not os.path.isfile("%s/QCDyields%s.txt"%(estdir,suffix)):
          outfile = open("%s/QCDyields%s.txt"%(estdir,suffix), "w")
          outfile.write("QCD Estimation for Muon Channel [Preselection of (MET, HT) > (" + METcut + "," + HTcut + ")]\n")
-         outfile.write("SR           IX_A                 A_IX           |          IXA (Data-EWK)              IXA (MC)             SF_IXA_dataMC          |      QCD Est.               SR (QCD MC)                  Ratio\n".replace("X", Xs[ABCD]))
+         outfile.write("SR        IX_A (MC)           A_IX (MC)      |      IXA (MC)        IXA (data-EWK)        SF_dataMC (IXA)      |      QCD est. (MC)         SR (MC)        Ratio      |      QCD est. (data)\n".replace("X", Xs[ABCD]))
    
    for reg in regions:
       yields[reg] = {}
+      QCDyields[reg] = {}
+      SF_dataMC[reg] = {}
+      
       for sel in abcd:
+         #setEventListToChains(samples, samplesList, QCD[reg][sel])
          yields[reg][sel] = Yields(samples, samplesList, QCD[reg][sel], cutOpt = "combinedList", pklOpt = False, tableName = reg + "_" + sel, nDigits = 2, err = True, verbose = True, nSpaces = 1)
   
-      if yields[reg]['IXA'].yieldDictFull['qcd']['QCD_IXA_' + reg].val:
+      QCDyields[reg]['SR'] =        yields[reg]['SR'].yieldDictFull['qcd']['QCD_SR_' + reg]
+ 
+      QCDyields[reg]['IX_A'] =      yields[reg]['IX_A'].yieldDictFull['qcd']['QCD_IX_A_' + reg]
+      QCDyields[reg]['A_IX'] =      yields[reg]['A_IX'].yieldDictFull['qcd']['QCD_A_IX_' + reg]
+      QCDyields[reg]['IXA_MC'] =    yields[reg]['IXA'].yieldDictFull['qcd']['QCD_IXA_' + reg]
+      QCDyields[reg]['IXA_data'] =  yields[reg]['IXA'].yieldDictFull['dblind']['QCD_IXA_' + reg] - \
+                                    yields[reg]['IXA'].yieldDictFull['w']['QCD_IXA_' + reg] - \
+                                    yields[reg]['IXA'].yieldDictFull['tt']['QCD_IXA_' + reg] - \
+                                    yields[reg]['IXA'].yieldDictFull['z']['QCD_IXA_' + reg] - \
+                                    yields[reg]['IXA'].yieldDictFull['st']['QCD_IXA_' + reg] - \
+                                    yields[reg]['IXA'].yieldDictFull['vv']['QCD_IXA_' + reg]
       
-         QCD_IX_A[reg] =      yields[reg]['IX_A'].yieldDictFull['qcd']['QCD_IX_A_' + reg]
-         QCD_A_IX[reg] =      yields[reg]['IA_X'].yieldDictFull['qcd']['QCD_IA_X_' + reg]
-         QCD_IXA_MC[reg] =    yields[reg]['IXA'].yieldDictFull['qcd']['QCD_IXA_' + reg]
-         QCD_IXA_data[reg] =  yields[reg]['IXA'].yieldDictFull['dblind']['QCD_IXA_' + reg] - \
-                              yields[reg]['IXA'].yieldDictFull['w']['QCD_IXA_' + reg] - \
-                              yields[reg]['IXA'].yieldDictFull['tt']['QCD_IXA_' + reg] - \
-                              yields[reg]['IXA'].yieldDictFull['z']['QCD_IXA_' + reg] - \
-                              yields[reg]['IXA'].yieldDictFull['st']['QCD_IXA_' + reg] - \
-                              yields[reg]['IXA'].yieldDictFull['vv']['QCD_IXA_' + reg]
-         
-         
-         #Estimation from pure QCD MC 
-         QCDest_MC[reg] = ((QCD_IX_A[reg] * QCD_A_IX[reg])/(QCD_IXA_MC[reg]))
+      #Estimation from pure QCD MC 
+      QCDest_MC[reg] = ((QCDyields[reg]['IX_A'] * QCDyields[reg]['A_IX'])/(QCDyields[reg]['IXA_MC']))
 
-         SF_IXA_dataMC[reg] = (QCD_IXA_data[reg]/QCD_IXA_MC[reg]) 
-         
-         #Full estimation 
-         QCDest[reg] = SF_IXA_dataMC[reg]*QCDest_MC[reg]
-         
-         #Estimation from pure QCD MC
-         if verbose: 
-            print makeLine()
-            print "Region: ", reg
-            print "QCD MC in IX_A = ".replace("X", Xs[ABCD]), QCD_IX_A[reg] 
-            print "QCD MC in A_IX = ".replace("X", Xs[ABCD]), QCD_A_IX[reg] 
-            print "data | MC in IXA = ".replace("X", Xs[ABCD]),  QCD_IXA_data[reg], "   |   ", QCD_IXA_MC[reg] 
-            print "SF_dataMC in IXA = ", SF_IXA_dataMC[reg] 
-            print "QCD Estimation in ", reg, ": ", QCDest[reg], " (", QCDest_MC[reg], ")"
-            print "QCD MC yield in ", reg, ": ", yields[reg]['SR'].yieldDictFull['qcd']['QCD_SR_' + reg]
-            if yields[reg]['SR'].yieldDictFull['qcd']['QCD_SR_' + reg].val:
-               print "Closure ratio: ", QCDest[reg]/yields[reg]['SR'].yieldDictFull['qcd']['QCD_SR_' + reg]
-            print makeLine()
-   
-         with open("%s/QCDyields%s.txt"%(estdir,suffix), "a") as outfile:
-            outfile.write(reg + "     " +\
-            str(QCD_IX_A[reg].round(2)) + "             " +\
-            str(QCD_A_IX[reg].round(2)) + "             " +\
-            str(QCD_IXA_data[reg].round(2)) + "             " +\
-            str(QCD_IXA_MC[reg].round(2)) + "             " +\
-            str(SF_IXA_dataMC[reg].round(2)) + "             " +\
-            str(QCDest[reg].round(2)) + "             " +\
-            str(yields[reg]['SR'].yieldDictFull['qcd']['QCD_SR_' + reg].round(2)) + "             ")
-            if yields[reg]['SR'].yieldDictFull['qcd']['QCD_SR_' + reg].val:
-               outfile.write(str((QCDexp[reg]/yields[reg]['SR'].yieldDictFull['qcd']['QCD_SR_' + reg]).round(2)) + "\n")
-            else:
-               outfile.write("\n")
+      #Data-MC SF in IXA region
+      SF_dataMC[reg]['IXA'] = (QCDyields[reg]['IXA_data']/QCDyields[reg]['IXA_MC']) 
+      
+      #Full estimation 
+      QCDest[reg] = SF_dataMC[reg]['IXA']*QCDest_MC[reg]
+      if verbose: 
+         print makeLine()
+         print "Region: ", reg
+         print "QCD MC in IX_A = ".replace("X", Xs[ABCD]), QCDyields[reg]['IX_A'] 
+         print "QCD MC in A_IX = ".replace("X", Xs[ABCD]), QCDyields[reg]['A_IX'] 
+         print "QCD MC in IXA = ".replace("X", Xs[ABCD]), QCDyields[reg]['IXA_MC']
+         print "Data (EWK subtracted) in IXA = ".replace("X", Xs[ABCD]),  QCDyields[reg]['IXA_data'].round(2)
+         print "SF_dataMC in IXA = ".replace("X", Xs[ABCD]), SF_dataMC[reg]['IXA'].round(2)
+         print "QCD Estimation (pure MC) in ", reg, ": ", QCDest_MC[reg].round(2)
+         print "QCD MC yield in ", reg, ": ", QCDyields[reg]['SR']
+         if QCDyields[reg]['SR'].val:
+            print "Closure ratio (pure MC): ", (QCDest_MC[reg]/QCDyields[reg]['SR']).round(2)
+         print makeLine()
+         print "QCD Estimation in ", reg, ": ", QCDest[reg].round(2)
 
+      with open("%s/QCDyields%s.txt"%(estdir,suffix), "a") as outfile:
+         outfile.write(reg + "     " +\
+         str(QCDyields[reg]['IX_A'].round(2)) + "        " +\
+         str(QCDyields[reg]['A_IX'].round(2)) + "         " +\
+         str(QCDyields[reg]['IXA_MC'].round(2)) + "         " +\
+         str(QCDyields[reg]['IXA_data'].round(2)) + "         " +\
+         str(SF_dataMC[reg]['IXA'].round(2)) + "              " +\
+         str(QCDest_MC[reg].round(2)) + "         " +\
+         str(QCDyields[reg]['SR'].round(2)) + "         ")
+         if QCDyields[reg]['SR'].val: outfile.write(str((QCDest[reg]/QCDyields[reg]['SR']).round(2)) + "         ")
+         else: outfile.write("N/A         ")
+         outfile.write(str(QCDest[reg].round(2)) + "\n")
+ 
 abcd = {'SR':'I', 'A_IX': 'I', 'IX_A':'anti-I', 'IXA':'anti-I'}
 
 if plot:
@@ -320,21 +325,26 @@ if plot:
    QCD[plotReg]['X_A'] = CutClass("QCD_X_A_" + plotReg, [ #loose MET
       SRs[plotReg],
       ["A", dPhiCut], #applied
-      ], baseCut = presel)
+      ], baseCut = baseline)
    
    QCD[plotReg]['A_X'] = CutClass("QCD_A_X_" + plotReg, [
       SRs[plotReg],
       ["anti-A", antidPhiCut], #inverted
       ["MET", "met >" + METcut], #tight MET
-      ], baseCut = presel)
-   
+      ], baseCut = baseline)
+  
+   QCD[plotReg]['XA'] = CutClass("QCD_XA_" + reg, [ #loose MET
+      SRs[plotReg],
+      ["anti-A", antidPhiCut], #inverted
+      ], baseCut = baseline)
+ 
    plotsList = {}
    plotDict = {}
    plotsDict = {}
    plots = {}
    plots2 = {}
    
-   plotRegions = ['SR', 'X_A', 'A_X', 'A_IX', 'IX_A', 'IXA']
+   plotRegions = ['SR', 'X_A', 'A_X', 'A_IX', 'IX_A', 'XA', 'IXA']
   
    if getData: plotRegions.remove('SR')
    
@@ -352,12 +362,14 @@ if plot:
          "HT_" + sel:{'var':"ht_basJet", "bins":[50,0,500], "decor":{"title": "HT Plot","x":"H_{T} / GeV" , "y":"Events", 'log':[0,logy,0]}},
          "weight_" + sel:{'var':"weight", "bins":[20,0,400], "decor":{"title": "Weight Plot","x":"Event Weight" , "y":"Events", 'log':[0,1,0]}}
       }
+         
+      #setEventListToChains(samples, samplesList, QCD[plotReg][sel])
       
-      #plotsList[sel] = ["hybIso2_" + sel, "absDxy_" + sel, "delPhi_" + sel, "weight_" + sel]
-      plotsList[sel] = ["muPt_" + sel, "absIso_" + sel, "relIso_" + sel,"hybIso_" + sel, "hybIso2_" + sel, "absDxy_" + sel, "delPhi_" + sel, "muMt_" + sel, "MET_" + sel, "HT_" + sel, "weight_" + sel]
+      plotsList[sel] = ["hybIso2_" + sel, "absDxy_" + sel, "delPhi_" + sel, "weight_" + sel]
+      #plotsList[sel] = ["muPt_" + sel, "absIso_" + sel, "relIso_" + sel,"hybIso_" + sel, "hybIso2_" + sel, "absDxy_" + sel, "delPhi_" + sel, "muMt_" + sel, "MET_" + sel, "HT_" + sel, "weight_" + sel]
       plotsDict[sel] = Plots(**plotDict[sel])
       plots[sel] = getPlots(samples, plotsDict[sel], QCD[plotReg][sel], samplesList, plotList = plotsList[sel], addOverFlowBin='upper')
-      if getData: plots2[sel] = drawPlots(samples, plotsDict[sel], QCD[plotReg][sel], samplesList, plotList = plotsList[sel], denoms=["bkg"], noms = ["dblind"], fom="RATIO", fomLimits=[0,2.8], plotMin = 1, normalize = False, save=False)
+      if getData: plots2[sel] = drawPlots(samples, plotsDict[sel], QCD[plotReg][sel], samplesList, plotList = plotsList[sel], denoms=["bkg"], noms = ["dblind"], fom="RATIO", fomLimits=[0,1.8], plotMin = 1, normalize = False, save=False)
       else: plots2[sel] = drawPlots(samples, plotsDict[sel], QCD[plotReg][sel], samplesList, plotList = plotsList[sel], plotMin = 1, normalize = False, save=False)
       
       #Save canvas
