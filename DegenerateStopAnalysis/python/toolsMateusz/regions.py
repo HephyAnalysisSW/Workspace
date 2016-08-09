@@ -9,6 +9,45 @@ more = lambda var, val: "(%s > %s)"%(var,val)
 btw = lambda var, minVal, maxVal: "(%s > %s && %s < %s)"%(var, min(minVal, maxVal), var, max(minVal, maxVal))
 minAngle = lambda phi1, phi2 : "TMath::Min((2*pi) - abs({phi1}-{phi2}) , abs({phi1}-{phi2}))".format(phi1 = phi1, phi2 = phi2)  
 
+#Signal regions
+def signalRegions(lepton, index = ""):
+   if lepton == "electron":
+      pdgId = "11"
+      if index == "2": ind = "IndexLepAll_el2[0]"
+      else: ind = "IndexLepAll_el[0]"
+   elif lepton == "muon":
+      pdgId = "13"
+      if index == "2": ind = "IndexLepAll_mu2[0]"
+      else: ind = "IndexLepAll_mu[0]"
+   else:
+      assert False
+
+   SRs = {\
+      #'SR1':["SR1","LepAll_pt[" + ind + "] < 30"],
+      'SR1a':["SR1a",   combineCuts("LepAll_pdgId[" + ind + "] == " + pdgId, "LepAll_mt[" + ind + "] < 60", "LepAll_pt[" + ind + "] < 30")],
+      'SR1b':["SR1b",   combineCuts("LepAll_pdgId[" + ind + "] == " + pdgId, btw("LepAll_mt[" + ind + "]", 60, 95), "LepAll_pt[" + ind + "] < 30")],
+      'SR1c':["SR1c",   combineCuts("LepAll_mt[" + ind + "] > 95", "LepAll_pt[" + ind + "] < 30")],
+
+      'SRL1':["SRL1", btw("LepAll_pt[" + ind + "]", 5, 12)],
+      'SRH1':["SRH1", btw("LepAll_pt[" + ind + "]", 12, 20)],
+      'SRV1':["SRV1", btw("LepAll_pt[" + ind + "]", 20, 30)],
+
+      'SRL1a':["SRL1a", combineCuts("LepAll_pdgId[" + ind + "] == " + pdgId, "LepAll_mt[" + ind + "] < 60", btw("LepAll_pt[" + ind + "]", 5, 12))],
+      'SRH1a':["SRH1a", combineCuts("LepAll_pdgId[" + ind + "] == " + pdgId, "LepAll_mt[" + ind + "] < 60", btw("LepAll_pt[" + ind + "]", 12, 20))],
+      'SRV1a':["SRV1a", combineCuts("LepAll_pdgId[" + ind + "] == " + pdgId, "LepAll_mt[" + ind + "] < 60", btw("LepAll_pt[" + ind + "]", 20, 30))],
+
+      'SRL1b':["SRL1b", combineCuts("LepAll_pdgId[" + ind + "] == " + pdgId, btw("LepAll_mt[" + ind + "]", 60, 95), btw("LepAll_pt[" + ind + "]", 5, 12))],
+      'SRH1b':["SRH1b", combineCuts("LepAll_pdgId[" + ind + "] == " + pdgId, btw("LepAll_mt[" + ind + "]", 60, 95), btw("LepAll_pt[" + ind + "]", 12, 20))],
+      'SRV1b':["SRV1b", combineCuts("LepAll_pdgId[" + ind + "] == " + pdgId, btw("LepAll_mt[" + ind + "]", 60, 95), btw("LepAll_pt[" + ind + "]", 20, 30))],
+
+      'SRL1c':["SRL1c", combineCuts("LepAll_mt[" + ind + "] > 95", btw("LepAll_pt[" + ind + "]", 5, 12))],
+      'SRH1c':["SRH1c", combineCuts("LepAll_mt[" + ind + "] > 95", btw("LepAll_pt[" + ind + "]", 12, 20))],
+      'SRV1c':["SRV1c", combineCuts("LepAll_mt[" + ind + "] > 95", btw("LepAll_pt[" + ind + "]", 20, 30))]}
+
+   SRs['SR1'] = ["SR1", "(" + SRs['SR1a'][1] + ") || (" + SRs['SR1b'][1] + ") || (" + SRs['SR1c'][1] + ")"]
+
+   return SRs
+
 def cutClasses(eleIDsel, ID = "standard"):
    if not eleIDsel: 
       print makeLine() 

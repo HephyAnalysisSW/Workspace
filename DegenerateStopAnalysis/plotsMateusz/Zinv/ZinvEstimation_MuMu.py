@@ -69,9 +69,6 @@ if getData: samplesList.append("d1muBlind")
 
 samples = getSamples(cmgPP = cmgPP, skim = 'oneLep', sampleList = samplesList, scan = False, useHT = True, getData = getData) 
 
-#adding low mt dy sample
-samplesList.append("dy5to50")
-
 if verbose:
    print makeLine()
    print "Using samples:"
@@ -133,11 +130,11 @@ for s in samplesList:
 #SRs
 def regions(lepton):
    if lepton == "electron":
-      ind = "IndexLepAll_el[0]"
       pdgId = "11"
+      ind = "IndexLepAll_el[0]"
    elif lepton == "muon":
-      ind = "IndexLepAll_el[2]"
       pdgId = "13"
+      ind = "IndexLepAll_mu[2]"
    else:
       assert False
     
@@ -224,8 +221,12 @@ muons = CutClass("muons", [
    ["elVeto", "(nLepAll_el == 0 || (nLepAll_el == 1 && LepAll_pt[IndexLepAll_el[0]] < 20))"],
    SRs_mu[SR]
    ], baseCut = emulated)
-      
+
+#Sets event list      
 setEventListToChains(samples, samplesList, dimuon)
+
+#adding low mt dy sample
+samplesList.append("dy5to50")
 
 yields = {}
 if doYields and peak:
