@@ -159,7 +159,7 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
       #DYJetsSample = getChain(cmgPP.DYJetsM5to50HT[skim],histname='')
       sampleDict.update({
             'dy':         {'name':'DYJetsM50',       'sample':cmgPP.DYJetsM50HT[skim],    'color':colors['dy'],         'isSignal':0 , 'isData':0, 'lumi':mc_lumi},
-            'dy5to50':    {'name':'DYJetsM5to50',    'sample':cmgPP.DYJetsM5to50HT[skim], 'color':colors['dy5to50'],    'isSignal':0 , 'isData':0, 'lumi':mc_lumi},
+            'dy5to50':    {'name':'DYJetsM5to50',    'sample':cmgPP.DYJetsM5to50[skim], 'color':colors['dy5to50'],    'isSignal':0 , 'isData':0, 'lumi':mc_lumi},
             #'dy5to50Inc':{'name':'DYJetsM5to50Inc', 'sample':cmgPP.DYJetsM5to50[skim],   'color':colors['dy5to50Inc'], 'isSignal':0 , 'isData':0, 'lumi':mc_lumi},
             #'dyInv':     {'name':'DYJetsInv',       'sample':cmgPP.DYJetsToNuNu[skim],   'color':colors['dyInv'],      'isSignal':0 , 'isData':0, 'lumi':mc_lumi},
       }) 
