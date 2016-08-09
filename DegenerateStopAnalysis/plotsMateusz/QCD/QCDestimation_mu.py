@@ -11,7 +11,6 @@ from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.regions import signalRegions
 #from Workspace.DegenerateStopAnalysis.toolsMateusz.eleWPs import *
 from Workspace.DegenerateStopAnalysis.tools.degTools import CutClass, Plots, getPlots, drawPlots, Yields, setEventListToChains, setup_style
-from Workspace.DegenerateStopAnalysis.tools.weights import Weights
 from Workspace.DegenerateStopAnalysis.tools.bTagWeights import bTagWeights
 from Workspace.DegenerateStopAnalysis.tools.getSamples_8011 import getSamples
 from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesPostProcessed_mAODv2_2016 import cmgTuplesPostProcessed
@@ -94,13 +93,14 @@ if save: #web address: http://www.hephy.at/user/mzarucki/plots
       plotdir += "METloose" + METloose
       suffix += "_METloose" + METloose
 
-   if plot: suffix += "_" + plotReg
+   if plot: suffix2 = suffix + "_" + plotReg
    #if enriched == True: suffix += "_EMenriched"
    
    if highWeightVeto: 
       estdir += "/highWeightVeto" 
       plotdir += "/highWeightVeto"
       suffix += "_highWeightVeto"
+      if plot: suffix2 += "_highWeightVeto"
  
    #if enriched: 
    #   estdir += "_EMenriched"
@@ -203,7 +203,7 @@ lepsel2 = CutClass("lepsel2", [
    ["muSel", muSel2],
    ], baseCut = baseline)
 
-abcd = {'SR':'I', 'A_IX': 'I', 'IX_A':'anti-I', 'IXA':'anti-I'}
+abcd = {'SR':'I', 'XA_I': 'I', 'I_XA':'anti-I', 'IXA':'anti-I'}
 
 SRs = signalRegions("muon") #standard index
 SRs_2 = signalRegions("muon", index = "2") #lep2 index
@@ -221,14 +221,14 @@ for reg in regions:
       SRs[reg],
       ], baseCut = lepsel)
    
-   QCD[reg]['IX_A'] = CutClass("QCD_IX_A_" + reg, [ #loose MET
+   QCD[reg]['I_XA'] = CutClass("QCD_I_XA_" + reg, [ 
+      ["MET", "met >" + METcut], #tight MET
       ["A", dPhiCut], #applied
       ["anti-I", antiHybIsoCut], #inverted
       SRs_2[reg],
       ], baseCut = lepsel2)
    
-   QCD[reg]['A_IX'] = CutClass("QCD_A_IX_" + reg, [
-      ["MET", "met >" + METcut], #tight MET
+   QCD[reg]['XA_I'] = CutClass("QCD_XA_I_" + reg, [ #loose MET
       ["anti-A", antidPhiCut], #inverted
       ["I", hybIsoCut], #applied
       SRs_2[reg],
@@ -243,7 +243,6 @@ for reg in regions:
 if estimation: 
    yields = {}
    QCDyields = {}
-   QCD_IX_A = {}
    
    SF_dataMC = {}
    QCDest_MC = {}
@@ -252,7 +251,7 @@ if estimation:
       if not os.path.isfile("%s/QCDyields%s.txt"%(estdir,suffix)):
          outfile = open("%s/QCDyields%s.txt"%(estdir,suffix), "w")
          outfile.write("QCD Estimation for Muon Channel [Preselection of (MET, HT) > (" + METcut + "," + HTcut + ")]\n")
-         outfile.write("SR        IX_A (MC)           A_IX (MC)      |      IXA (MC)        IXA (data-EWK)        SF_dataMC (IXA)      |      QCD est. (MC)         SR (MC)        Ratio      |      QCD est. (data)\n".replace("X", Xs[ABCD]))
+         outfile.write("SR        I_XA (MC)           XA_I (MC)      |      IXA (MC)        IXA (data-EWK)        SF_dataMC (IXA)      |      QCD est. (MC)         SR (MC)        Ratio      |      QCD est. (data)\n".replace("X", Xs[ABCD]))
    
    for reg in regions:
       yields[reg] = {}
@@ -265,8 +264,8 @@ if estimation:
   
       QCDyields[reg]['SR'] =        yields[reg]['SR'].yieldDictFull['qcd']['QCD_SR_' + reg]
  
-      QCDyields[reg]['IX_A'] =      yields[reg]['IX_A'].yieldDictFull['qcd']['QCD_IX_A_' + reg]
-      QCDyields[reg]['A_IX'] =      yields[reg]['A_IX'].yieldDictFull['qcd']['QCD_A_IX_' + reg]
+      QCDyields[reg]['I_XA'] =      yields[reg]['I_XA'].yieldDictFull['qcd']['QCD_I_XA_' + reg]
+      QCDyields[reg]['XA_I'] =      yields[reg]['XA_I'].yieldDictFull['qcd']['QCD_XA_I_' + reg]
       QCDyields[reg]['IXA_MC'] =    yields[reg]['IXA'].yieldDictFull['qcd']['QCD_IXA_' + reg]
       QCDyields[reg]['IXA_data'] =  yields[reg]['IXA'].yieldDictFull['dblind']['QCD_IXA_' + reg] - \
                                     yields[reg]['IXA'].yieldDictFull['w']['QCD_IXA_' + reg] - \
@@ -276,7 +275,7 @@ if estimation:
                                     yields[reg]['IXA'].yieldDictFull['vv']['QCD_IXA_' + reg]
       
       #Estimation from pure QCD MC 
-      QCDest_MC[reg] = ((QCDyields[reg]['IX_A'] * QCDyields[reg]['A_IX'])/(QCDyields[reg]['IXA_MC']))
+      QCDest_MC[reg] = ((QCDyields[reg]['I_XA'] * QCDyields[reg]['XA_I'])/(QCDyields[reg]['IXA_MC']))
 
       #Data-MC SF in IXA region
       SF_dataMC[reg]['IXA'] = (QCDyields[reg]['IXA_data']/QCDyields[reg]['IXA_MC']) 
@@ -286,8 +285,8 @@ if estimation:
       if verbose: 
          print makeLine()
          print "Region: ", reg
-         print "QCD MC in IX_A = ".replace("X", Xs[ABCD]), QCDyields[reg]['IX_A'] 
-         print "QCD MC in A_IX = ".replace("X", Xs[ABCD]), QCDyields[reg]['A_IX'] 
+         print "QCD MC in I_XA = ".replace("X", Xs[ABCD]), QCDyields[reg]['I_XA'] 
+         print "QCD MC in XA_I = ".replace("X", Xs[ABCD]), QCDyields[reg]['XA_I'] 
          print "QCD MC in IXA = ".replace("X", Xs[ABCD]), QCDyields[reg]['IXA_MC']
          print "Data (EWK subtracted) in IXA = ".replace("X", Xs[ABCD]),  QCDyields[reg]['IXA_data'].round(2)
          print "SF_dataMC in IXA = ".replace("X", Xs[ABCD]), SF_dataMC[reg]['IXA'].round(2)
@@ -300,8 +299,8 @@ if estimation:
 
       with open("%s/QCDyields%s.txt"%(estdir,suffix), "a") as outfile:
          outfile.write(reg + "     " +\
-         str(QCDyields[reg]['IX_A'].round(2)) + "        " +\
-         str(QCDyields[reg]['A_IX'].round(2)) + "         " +\
+         str(QCDyields[reg]['I_XA'].round(2)) + "        " +\
+         str(QCDyields[reg]['XA_I'].round(2)) + "         " +\
          str(QCDyields[reg]['IXA_MC'].round(2)) + "         " +\
          str(QCDyields[reg]['IXA_data'].round(2)) + "         " +\
          str(SF_dataMC[reg]['IXA'].round(2)) + "              " +\
@@ -311,21 +310,10 @@ if estimation:
          else: outfile.write("N/A         ")
          outfile.write(str(QCDest[reg].round(2)) + "\n")
  
-abcd = {'SR':'I', 'A_IX': 'I', 'IX_A':'anti-I', 'IXA':'anti-I'}
+abcd = {'SR':'I', 'XA_I': 'I', 'I_XA':'anti-I', 'IXA':'anti-I'}
 
 if plot:
    
-   QCD[plotReg]['X_A'] = CutClass("QCD_X_A_" + plotReg, [ #loose MET
-      ["A", dPhiCut], #applied
-      SRs_2[plotReg],
-      ], baseCut = lepsel2)
-   
-   QCD[plotReg]['A_X'] = CutClass("QCD_A_X_" + plotReg, [
-      ["anti-A", antidPhiCut], #inverted
-      ["MET", "met >" + METcut], #tight MET
-      SRs_2[plotReg],
-      ], baseCut = lepsel2)
-  
    QCD[plotReg]['XA'] = CutClass("QCD_XA_" + reg, [ #loose MET
       ["anti-A", antidPhiCut], #inverted
       SRs_2[plotReg],
@@ -337,7 +325,7 @@ if plot:
    plots = {}
    plots2 = {}
    
-   plotRegions = ['SR', 'X_A', 'A_X', 'A_IX', 'IX_A', 'XA', 'IXA']
+   plotRegions = ['SR', 'XA_I', 'I_XA', 'XA', 'IXA']
   
    if getData: plotRegions.remove('SR')
    
@@ -373,6 +361,6 @@ if plot:
 
          for canv in plots2[sel]['canvs']:
             #if plot['canvs'][canv][0]:
-            plots2[sel]['canvs'][canv][0].SaveAs("%s/%s/%s%s.png"%(plotdir, sel.replace("X", Xs[ABCD]), canv, suffix))
-            plots2[sel]['canvs'][canv][0].SaveAs("%s/%s/root/%s%s.root"%(plotdir, sel.replace("X", Xs[ABCD]), canv, suffix))
-            plots2[sel]['canvs'][canv][0].SaveAs("%s/%s/pdf/%s%s.pdf"%(plotdir, sel.replace("X", Xs[ABCD]), canv, suffix))
+            plots2[sel]['canvs'][canv][0].SaveAs("%s/%s/%s%s.png"%(plotdir, sel.replace("X", Xs[ABCD]), canv, suffix2))
+            plots2[sel]['canvs'][canv][0].SaveAs("%s/%s/root/%s%s.root"%(plotdir, sel.replace("X", Xs[ABCD]), canv, suffix2))
+            plots2[sel]['canvs'][canv][0].SaveAs("%s/%s/pdf/%s%s.pdf"%(plotdir, sel.replace("X", Xs[ABCD]), canv, suffix2))
