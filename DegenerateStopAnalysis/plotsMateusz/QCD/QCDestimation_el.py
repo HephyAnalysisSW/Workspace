@@ -201,7 +201,7 @@ baseline = CutClass("baseline", [
    ["HighWeightVeto","weight < " + weightCut],
    ], baseCut = None)
          
-#setEventListToChains(samples, samplesList, baseline)
+setEventListToChains(samples, samplesList, baseline)
 
 # ABCD1: X = D (inverted) | ABCD2: X = D (loose) | ABCD3: X = M (loose) | ABCD4: X = S (inverted)
 abcd = {'SR':'SR', 'IX_A':'IX', 'IXA':'IX'}

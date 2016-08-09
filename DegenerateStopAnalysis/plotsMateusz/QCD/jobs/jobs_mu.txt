@@ -1,23 +1,23 @@
 python -b ../QCDestimation_mu.py --estimation 1 --plot 1 --highWeightVeto 0 --HT 400 --MET 300 --btag sf --plotReg SR1  --METloose 300 
 python -b ../QCDestimation_mu.py --estimation 1 --plot 1 --highWeightVeto 0 --HT 400 --MET 300 --btag sf --plotReg SR1  --METloose 200 
-python -b ../QCDestimation_mu.py --estimation 1 --plot 1 --highWeightVeto 0 --HT 300 --MET 300 --btag sf --plotReg SR1  --METloose 300 
-python -b ../QCDestimation_mu.py --estimation 1 --plot 1 --highWeightVeto 0 --HT 300 --MET 300 --btag sf --plotReg SR1  --METloose 200
-python -b ../QCDestimation_mu.py --estimation 1 --plot 1 --highWeightVeto 0 --HT 300 --MET 200 --btag sf --plotReg SR1  --METloose 200
-python -b ../QCDestimation_mu.py --estimation 1 --plot 1 --highWeightVeto 0 --HT 200 --MET 200 --btag sf --plotReg SR1  --METloose 200 
+python -b ../QCDestimation_mu.py --estimation 1 --plot 0 --highWeightVeto 0 --HT 300 --MET 300 --btag sf --plotReg SR1  --METloose 300 
+python -b ../QCDestimation_mu.py --estimation 1 --plot 0 --highWeightVeto 0 --HT 300 --MET 300 --btag sf --plotReg SR1  --METloose 200
+python -b ../QCDestimation_mu.py --estimation 1 --plot 0 --highWeightVeto 0 --HT 300 --MET 200 --btag sf --plotReg SR1  --METloose 200
+python -b ../QCDestimation_mu.py --estimation 1 --plot 0 --highWeightVeto 0 --HT 200 --MET 200 --btag sf --plotReg SR1  --METloose 200 
 
 python -b ../QCDestimation_mu.py --estimation 1 --plot 1 --highWeightVeto 1 --HT 400 --MET 300 --btag sf --plotReg SR1  --METloose 300 
 python -b ../QCDestimation_mu.py --estimation 1 --plot 1 --highWeightVeto 1 --HT 400 --MET 300 --btag sf --plotReg SR1  --METloose 200 
-python -b ../QCDestimation_mu.py --estimation 1 --plot 1 --highWeightVeto 1 --HT 300 --MET 300 --btag sf --plotReg SR1  --METloose 300 
-python -b ../QCDestimation_mu.py --estimation 1 --plot 1 --highWeightVeto 1 --HT 300 --MET 300 --btag sf --plotReg SR1  --METloose 200
-python -b ../QCDestimation_mu.py --estimation 1 --plot 1 --highWeightVeto 1 --HT 300 --MET 200 --btag sf --plotReg SR1  --METloose 200
-python -b ../QCDestimation_mu.py --estimation 1 --plot 1 --highWeightVeto 1 --HT 200 --MET 200 --btag sf --plotReg SR1  --METloose 200 
+python -b ../QCDestimation_mu.py --estimation 1 --plot 0 --highWeightVeto 1 --HT 300 --MET 300 --btag sf --plotReg SR1  --METloose 300 
+python -b ../QCDestimation_mu.py --estimation 1 --plot 0 --highWeightVeto 1 --HT 300 --MET 300 --btag sf --plotReg SR1  --METloose 200
+python -b ../QCDestimation_mu.py --estimation 1 --plot 0 --highWeightVeto 1 --HT 300 --MET 200 --btag sf --plotReg SR1  --METloose 200
+python -b ../QCDestimation_mu.py --estimation 1 --plot 0 --highWeightVeto 1 --HT 200 --MET 200 --btag sf --plotReg SR1  --METloose 200 
 
 python -b ../QCDestimation_mu.py --estimation 1 --plot 1 --highWeightVeto 0 --HT 400 --MET 300 --btag sf --plotReg SR1c --METloose 300 
 python -b ../QCDestimation_mu.py --estimation 1 --plot 1 --highWeightVeto 0 --HT 400 --MET 300 --btag sf --plotReg SR1c --METloose 200 
-python -b ../QCDestimation_mu.py --estimation 1 --plot 1 --highWeightVeto 0 --HT 300 --MET 200 --btag sf --plotReg SR1c --METloose 200
-python -b ../QCDestimation_mu.py --estimation 1 --plot 1 --highWeightVeto 0 --HT 200 --MET 200 --btag sf --plotReg SR1c --METloose 200 
+python -b ../QCDestimation_mu.py --estimation 1 --plot 0 --highWeightVeto 0 --HT 300 --MET 200 --btag sf --plotReg SR1c --METloose 200
+python -b ../QCDestimation_mu.py --estimation 1 --plot 0 --highWeightVeto 0 --HT 200 --MET 200 --btag sf --plotReg SR1c --METloose 200 
 
 python -b ../QCDestimation_mu.py --estimation 1 --plot 1 --highWeightVeto 1 --HT 400 --MET 300 --btag sf --plotReg SR1c --METloose 300 
 python -b ../QCDestimation_mu.py --estimation 1 --plot 1 --highWeightVeto 1 --HT 400 --MET 300 --btag sf --plotReg SR1c --METloose 200 
-python -b ../QCDestimation_mu.py --estimation 1 --plot 1 --highWeightVeto 1 --HT 300 --MET 200 --btag sf --plotReg SR1c --METloose 200
-python -b ../QCDestimation_mu.py --estimation 1 --plot 1 --highWeightVeto 1 --HT 200 --MET 200 --btag sf --plotReg SR1c --METloose 200 
+python -b ../QCDestimation_mu.py --estimation 1 --plot 0 --highWeightVeto 1 --HT 300 --MET 200 --btag sf --plotReg SR1c --METloose 200
+python -b ../QCDestimation_mu.py --estimation 1 --plot 0 --highWeightVeto 1 --HT 200 --MET 200 --btag sf --plotReg SR1c --METloose 200 
