@@ -20,6 +20,7 @@ setup_style()
 #Input options
 parser = argparse.ArgumentParser(description = "Input options")
 parser.add_argument("--getData", dest = "getData",  help = "Get data samples", type = int, default = 1)
+parser.add_argument("--doYields", dest = "doYields",  help = "Calulate yields", type = int, default = 0)
 parser.add_argument("--btag", dest = "btag",  help = "B-tagging option", type = str, default = "")
 parser.add_argument("--skim", dest = "skim",  help = "Skim", type = str, default = "preIncLep")
 parser.add_argument("--logy", dest = "logy",  help = "Toggle logy", type = int, default = 1)
@@ -35,6 +36,7 @@ if not len(sys.argv) > 1:
 
 #Arguments
 getData = args.getData
+doYields = args.doYields
 btag = args.btag
 skim = args.skim
 logy = args.logy
@@ -48,7 +50,7 @@ print makeDoubleLine()
 #Samples
 cmgPP = cmgTuplesPostProcessed()
 if skim == "preIncLep": 
-   samplesList = ["st", "vv", "qcd", "dy", "z", "tt", "w"]
+   samplesList = ["vv", "st", "qcd", "z", "dy", "tt", "w"]
    if getData: 
       data = "dblind"
       samplesList.append(data)
@@ -156,12 +158,13 @@ plotsDict = Plots(**plotDict)
 plots = getPlots(samples, plotsDict, presel, samplesList, plotList = plotsList, addOverFlowBin='upper')
 plots2 = drawPlots(samples, plotsDict, presel, samplesList, plotList = plotsList, plotLimits = [1, 100], denoms=["bkg"], noms = [data], fom="RATIO", fomLimits=[0,1.8], normalize = False, save=False) #, plotMin = 0.1
 
-yields = Yields(samples, samplesList, presel, cutOpt = "combinedList", pklOpt = False, tableName = "dataMC", nDigits = 2, err = True, verbose = True, nSpaces = 1)
-
-print makeLine()
-print "Yields"
-for samp in yields.yieldDictFull:
-   print samp, ": ", yields.yieldDictFull[samp]
+if doYields:
+   yields = Yields(samples, samplesList, presel, cutOpt = "combinedList", pklOpt = False, tableName = "dataMC", nDigits = 2, err = True, verbose = True, nSpaces = 1)
+   
+   print makeLine()
+   print "Yields"
+   for samp in yields.yieldDictFull:
+      print samp, ": ", yields.yieldDictFull[samp]
 
 #Save canvas
 if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID

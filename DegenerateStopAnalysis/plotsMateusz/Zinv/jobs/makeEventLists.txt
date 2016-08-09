@@ -1,0 +1,2 @@
+python -b ../ZinvEstimation_MuMu.py --plot 0 --doYields 0 --peak 0 --btag sf
+python -b ../ZinvEstimation_MuMu.py --plot 0 --doYields 0 --peak 1 --btag sf

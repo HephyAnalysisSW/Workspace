@@ -8,8 +8,10 @@ import argparse
 import Workspace.DegenerateStopAnalysis.toolsMateusz.ROOToptions
 from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
+from Workspace.DegenerateStopAnalysis.toolsMateusz.regions import signalRegions
 #from Workspace.DegenerateStopAnalysis.toolsMateusz.eleWPs import *
 from Workspace.DegenerateStopAnalysis.tools.degTools import CutClass, Plots, getPlots, drawPlots, Yields, setEventListToChains, setup_style
+from Workspace.DegenerateStopAnalysis.tools.weights import Weights
 from Workspace.DegenerateStopAnalysis.tools.bTagWeights import bTagWeights
 from Workspace.DegenerateStopAnalysis.tools.getSamples_8011 import getSamples
 from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesPostProcessed_mAODv2_2016 import cmgTuplesPostProcessed
@@ -118,7 +120,8 @@ cmgPP = cmgTuplesPostProcessed()
 samplesList = ["qcd", "vv", "st", "dy", "z", "tt", "w"]
 
 if getData: samplesList.append("dblind")
-samples = getSamples(cmgPP = cmgPP, skim = 'preIncLep', sampleList = samplesList, scan = False, useHT = True, getData = getData) 
+
+samples = getSamples(cmgPP = cmgPP, skim = "preIncLep", sampleList = samplesList, scan = False, useHT = True, getData = getData)
 
 #officialSignals = ["s300_290", "s300_270", "s300_250"] #FIXME: crosscheck if these are in allOfficialSignals
    
@@ -140,27 +143,25 @@ else:
 
 #Index of leading muon
 #NOTE: selection is implicit to index -> dependent on tuples!
-ind = "IndexLepAll_mu2[0]" #index sel: no hybIso cut
+ind = "IndexLepAll_mu[0]" #standard index sel 
+ind2 = "IndexLepAll_mu2[0]" #index sel: no hybIso cut
 
 #Geometric cuts
 etaAcc = 1.5
 ebSplit = 0.8 #barrel is split into two regions
 ebeeSplit = 1.479 #division between barrel and endcap
 
-#selection on leading muon
-muSel = "abs(LepAll_eta[" + ind + "]) < " + str(etaAcc) #eta acceptance 
-
 #Common QCD cuts
-hybIsoCut = "(LepAll_relIso03[" + ind + "]*min(LepAll_pt[" + ind + "], 25)) < 5" #hybIsoCut = "((LepAll_absIso03 < 5) || LepAll_relIso03 < 0.2))"
-antiHybIsoCut = "(LepAll_relIso03[" + ind + "]*min(LepAll_pt[" + ind + "], 25)) > 5" #antiHybIsoCut = "((LepAll_absIso03 > 5) && (LepAll_relIso03 > 0.2))"
+hybIsoCut = "(LepAll_relIso03[" + ind2 + "]*min(LepAll_pt[" + ind2 + "], 25)) < 5" #hybIsoCut = "((LepAll_absIso03 < 5) || LepAll_relIso03 < 0.2))"
+antiHybIsoCut = "(LepAll_relIso03[" + ind2 + "]*min(LepAll_pt[" + ind2 + "], 25)) > 5" #antiHybIsoCut = "((LepAll_absIso03 > 5) && (LepAll_relIso03 > 0.2))"
 dPhiCut = "(vetoJet_dPhi_j1j2 < 2.5 || nVetoJet <= 1)" #unnecessary as value set to -999 for monojet evts
 antidPhiCut = "(vetoJet_dPhi_j1j2 > 2.5 || nVetoJet <= 1)" #or required for inclusion of monojet evts
 
 #Differing QCD cuts
 
-variables = {'muPt':"LepAll_pt[" + ind + "]", 'muMt':"LepAll_mt[" + ind + "]"}
+variables = {'muPt':"LepAll_pt[" + ind2 + "]", 'muMt':"LepAll_mt[" + ind2 + "]"}
 
-if plot: variables.update({"absIso":"LepAll_absIso03[" + ind + "]", 'relIso':"LepAll_relIso03[" + ind + "]", "hybIso":"(LepAll_relIso03[" + ind + "]*min(LepAll_pt[" + ind + "], 25))", "absDxy":"LepAll_dxy[" + ind + "]"})
+if plot: variables.update({"absIso":"LepAll_absIso03[" + ind2 + "]", 'relIso':"LepAll_relIso03[" + ind2 + "]", "hybIso":"(LepAll_relIso03[" + ind2 + "]*min(LepAll_pt[" + ind2 + "], 25))", "absDxy":"LepAll_dxy[" + ind2 + "]"})
 
 #Redefining variables in terms of muon selection
 # ABCD1: X = D (inverted) | ABCD2: X = D (loose) | ABCD3: X = M (loose)
@@ -168,8 +169,6 @@ Xs = {'1':'D', '2':'D', '3':'M', '2D':''}
 
 if METloose == METcut: METcutString = "met >" + METcut
 elif ABCD == "3": METcutString = "met >" + METloose #loosened MET cut for ABCD3
-
-print "MET cut string: ", METcutString
 
 #bTagWeights
 bWeightDict = bTagWeights(btag)
@@ -180,40 +179,34 @@ baseline = CutClass("baseline", [
    ["HT","ht_basJet >" + HTcut],
    ["MET", METcutString],
    ["ISR100", "nIsrJet >= 1"],
-   ["nMu", "(nLepAll_mu2 == 1 || (nLepAll_mu2 == 2 && LepAll_pt[IndexLepAll_mu2[1]] < 20))"],
-   ["ElVeto","(nLepAll_el == 0 || (nLepAll_el == 1 && LepAll_pt[IndexLepAll_el[0]] < 20))"], 
-   ["muSel", muSel],
    ["No3rdJet60","nVetoJet <= 2"],
    ["BVeto", bTagString],
    ["TauVeto","Sum$(TauGood_idMVANewDM && TauGood_pt > 20) == 0"],
    ["HighWeightVeto","weight < " + weightCut],
    ], baseCut = None)
-         
+
 setEventListToChains(samples, samplesList, baseline)
+
+#lepton selection
+muSel = "abs(LepAll_eta[" + ind + "]) < " + str(etaAcc) # + "&& abs(LepAll_pdgId[" + ind + "]) == 13" #redundant due to index sel
+muSel2 = "abs(LepAll_eta[" + ind2 + "]) < " + str(etaAcc) # + "&& abs(LepAll_pdgId[" + ind2 + "]) == 13" #redundant due to index sel
+
+lepsel = CutClass("lepsel", [
+   ["nMu", "(nLepAll_mu == 1 || (nLepAll_mu == 2 && LepAll_pt[IndexLepAll_mu[1]] < 20))"],
+   ["ElVeto","(nLepAll_el == 0 || (nLepAll_el == 1 && LepAll_pt[IndexLepAll_el[0]] < 20))"], 
+   ["muSel", muSel],
+   ], baseCut = baseline)
+
+lepsel2 = CutClass("lepsel2", [
+   ["nMu", "(nLepAll_mu2 == 1 || (nLepAll_mu2 == 2 && LepAll_pt[IndexLepAll_mu2[1]] < 20))"],
+   ["ElVeto","(nLepAll_el == 0 || (nLepAll_el == 1 && LepAll_pt[IndexLepAll_el[0]] < 20))"], 
+   ["muSel", muSel2],
+   ], baseCut = baseline)
 
 abcd = {'SR':'I', 'A_IX': 'I', 'IX_A':'anti-I', 'IXA':'anti-I'}
 
-SRs ={}
-
-SRs = {\
-   #'SR1':["SR1","LepAll_pt[" + ind + "] < 30"],
-   'SR1a':["SR1a",   combineCuts("LepAll_pdgId[" + ind + "] == 13", "LepAll_mt[" + ind + "] < 60", "LepAll_pt[" + ind + "] < 30")],
-   'SR1b':["SR1b",   combineCuts("LepAll_pdgId[" + ind + "] == 13", btw("LepAll_mt[" + ind + "]", 60, 95), "LepAll_pt[" + ind + "] < 30")],
-   'SR1c':["SR1c",   combineCuts("LepAll_mt[" + ind + "] > 95", "LepAll_pt[" + ind + "] < 30")],
-
-   'SRL1a':["SRL1a", combineCuts("LepAll_pdgId[" + ind + "] == 13", "LepAll_mt[" + ind + "] < 60", btw("LepAll_pt[" + ind + "]", 5, 12))],
-   'SRH1a':["SRH1a", combineCuts("LepAll_pdgId[" + ind + "] == 13", "LepAll_mt[" + ind + "] < 60", btw("LepAll_pt[" + ind + "]", 12, 20))],
-   'SRV1a':["SRV1a", combineCuts("LepAll_pdgId[" + ind + "] == 13", "LepAll_mt[" + ind + "] < 60", btw("LepAll_pt[" + ind + "]", 20, 30))],
-
-   'SRL1b':["SRL1b", combineCuts("LepAll_pdgId[" + ind + "] == 13", btw("LepAll_mt[" + ind + "]", 60, 95), btw("LepAll_pt[" + ind + "]", 5, 12))],
-   'SRH1b':["SRH1b", combineCuts("LepAll_pdgId[" + ind + "] == 13", btw("LepAll_mt[" + ind + "]", 60, 95), btw("LepAll_pt[" + ind + "]", 12, 20))],
-   'SRV1b':["SRV1b", combineCuts("LepAll_pdgId[" + ind + "] == 13", btw("LepAll_mt[" + ind + "]", 60, 95), btw("LepAll_pt[" + ind + "]", 20, 30))],
-
-   'SRL1c':["SRL1c", combineCuts("LepAll_mt[" + ind + "] > 95", btw("LepAll_pt[" + ind + "]", 5, 12))],
-   'SRH1c':["SRH1c", combineCuts("LepAll_mt[" + ind + "] > 95", btw("LepAll_pt[" + ind + "]", 12, 20))],
-   'SRV1c':["SRV1c", combineCuts("LepAll_mt[" + ind + "] > 95", btw("LepAll_pt[" + ind + "]", 20, 30))]}
-
-SRs['SR1'] = ["SR1", "(" + SRs['SR1a'][1] + ") || (" + SRs['SR1b'][1] + ") || (" + SRs['SR1c'][1] + ")"]
+SRs = signalRegions("muon") #standard index
+SRs_2 = signalRegions("muon", index = "2") #lep2 index
 
 QCD = {}
 regions = ['SR1', 'SR1a', 'SR1b', 'SR1c', 'SRL1a', 'SRH1a', 'SRV1a', 'SRL1b', 'SRH1b', 'SRV1b', 'SRL1c', 'SRH1c', 'SRV1c']
@@ -222,30 +215,30 @@ for reg in regions:
    QCD[reg] = {}
 
    QCD[reg]['SR'] = CutClass("QCD_SR_" + reg, [
-      SRs[reg],
       ["MET", "met >" + METcut], #tight MET
       ["A", dPhiCut], #applied
-      ["I", hybIsoCut],
-      ], baseCut = baseline)
+      #["I", hybIsoCut], #part of standard index
+      SRs[reg],
+      ], baseCut = lepsel)
    
    QCD[reg]['IX_A'] = CutClass("QCD_IX_A_" + reg, [ #loose MET
-      SRs[reg],
       ["A", dPhiCut], #applied
       ["anti-I", antiHybIsoCut], #inverted
-      ], baseCut = baseline)
+      SRs_2[reg],
+      ], baseCut = lepsel2)
    
    QCD[reg]['A_IX'] = CutClass("QCD_A_IX_" + reg, [
-      SRs[reg],
       ["MET", "met >" + METcut], #tight MET
       ["anti-A", antidPhiCut], #inverted
       ["I", hybIsoCut], #applied
-      ], baseCut = baseline)
+      SRs_2[reg],
+      ], baseCut = lepsel2)
    
    QCD[reg]['IXA'] = CutClass("QCD_IXA_" + reg, [ #loose MET
-      SRs[reg],
       ["anti-A", antidPhiCut], #inverted
       ["anti-I", antiHybIsoCut], #inverted
-      ], baseCut = baseline)
+      SRs_2[reg],
+      ], baseCut = lepsel2)
       
 if estimation: 
    yields = {}
@@ -323,20 +316,20 @@ abcd = {'SR':'I', 'A_IX': 'I', 'IX_A':'anti-I', 'IXA':'anti-I'}
 if plot:
    
    QCD[plotReg]['X_A'] = CutClass("QCD_X_A_" + plotReg, [ #loose MET
-      SRs[plotReg],
       ["A", dPhiCut], #applied
-      ], baseCut = baseline)
+      SRs_2[plotReg],
+      ], baseCut = lepsel2)
    
    QCD[plotReg]['A_X'] = CutClass("QCD_A_X_" + plotReg, [
-      SRs[plotReg],
       ["anti-A", antidPhiCut], #inverted
       ["MET", "met >" + METcut], #tight MET
-      ], baseCut = baseline)
+      SRs_2[plotReg],
+      ], baseCut = lepsel2)
   
    QCD[plotReg]['XA'] = CutClass("QCD_XA_" + reg, [ #loose MET
-      SRs[plotReg],
       ["anti-A", antidPhiCut], #inverted
-      ], baseCut = baseline)
+      SRs_2[plotReg],
+      ], baseCut = lepsel2)
  
    plotsList = {}
    plotDict = {}

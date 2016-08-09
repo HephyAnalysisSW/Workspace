@@ -10,6 +10,7 @@ import Workspace.DegenerateStopAnalysis.toolsMateusz.ROOToptions
 from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.eleWPs import *
+from Workspace.DegenerateStopAnalysis.toolsMateusz.regions import signalRegions
 from Workspace.DegenerateStopAnalysis.tools.degTools import CutClass, Plots, getPlots, drawPlots, Yields, setEventListToChains, setup_style
 from Workspace.DegenerateStopAnalysis.tools.bTagWeights import bTagWeights
 from Workspace.DegenerateStopAnalysis.tools.getSamples_8011 import getSamples
@@ -129,7 +130,8 @@ else:
 
 #Index of leading electron
 #NOTE: selection is implicit to index -> dependent on tuples!
-ind = "IndexLepAll_el2[0]" #index sel: Veto ID w/o sigmaEtaEta and w/o hybIso
+ind = "IndexLepAll_el[0]" #standard index sel 
+ind2 = "IndexLepAll_el2[0]" #index sel: Veto ID w/o sigmaEtaEta and w/o hybIso
 
 ##Gets all cuts (electron, SR, CR) for given electron ID
 #if ABCD == "3":   eleIDsel = electronIDsIndex(ID = "standard", removedCut = "None", iso = False, collection = collection)
@@ -140,12 +142,9 @@ etaAcc = 1.5
 ebSplit = 0.8 #barrel is split into two regions
 ebeeSplit = 1.479 #division between barrel and endcap
 
-#leading electron acceptance cuts
-eleSel = "LepAll_pdgId[" + ind + "] == 11 && abs(LepAll_eta[" + ind + "]) < " + str(etaAcc)# + "&&" + eleIDsel[eleWP] #neg charge + eta acceptane 
-
 #Common QCD cuts
-hybIsoCut = "(LepAll_relIso03[" + ind + "]*min(LepAll_pt[" + ind + "], 25)) < 5" #hybIsoCut = "((LepAll_absIso03 < 5) || LepAll_relIso03 < 0.2))"
-antiHybIsoCut = "(LepAll_relIso03[" + ind + "]*min(LepAll_pt[" + ind + "], 25)) > 5" #antiHybIsoCut = "((LepAll_absIso03 > 5) && (LepAll_relIso03 > 0.2))"
+hybIsoCut = "(LepAll_relIso03[" + ind2 + "]*min(LepAll_pt[" + ind2 + "], 25)) < 5" #hybIsoCut = "((LepAll_absIso03 < 5) || LepAll_relIso03 < 0.2))"
+antiHybIsoCut = "(LepAll_relIso03[" + ind2 + "]*min(LepAll_pt[" + ind2 + "], 25)) > 5" #antiHybIsoCut = "((LepAll_absIso03 > 5) && (LepAll_relIso03 > 0.2))"
 dPhiCut = "(vetoJet_dPhi_j1j2 < 2.5 || nVetoJet <= 1)" #nVetoJet selection unnecessary as value set to -999 for monojet evts
 antidPhiCut = "(vetoJet_dPhi_j1j2 > 2.5 || nVetoJet <= 1)" #or required for inclusion of monojet evts
 
@@ -153,8 +152,8 @@ antidPhiCut = "(vetoJet_dPhi_j1j2 > 2.5 || nVetoJet <= 1)" #or required for incl
 #NOTE: ABCD 1 and 2 do not work as dxy cut is implicit to index
 
 geoSel= {\
-      'EB':"(abs(LepAll_eta[" + ind + "]) <= " + str(ebeeSplit) + ")", 
-      'EE':"(abs(LepAll_eta[" + ind + "]) > " + str(ebeeSplit) + " && abs(LepAll_eta[" + ind + "]) < " + str(etaAcc) + ")"}
+      'EB':"(abs(LepAll_eta[" + ind2 + "]) <= " + str(ebeeSplit) + ")", 
+      'EE':"(abs(LepAll_eta[" + ind2 + "]) > " + str(ebeeSplit) + " && abs(LepAll_eta[" + ind2 + "]) < " + str(etaAcc) + ")"}
 
 if ABCD == "4": #ABCD4
    
@@ -164,16 +163,16 @@ if ABCD == "4": #ABCD4
       'Medium':{'EB':0.0101, 'EE':0.0283},
       'Tight':{'EB':0.0101, 'EE':0.0279}}
    
-   sigmaEtaEtaCut = "((" + combineCuts(geoSel['EB'], "LepAll_sigmaIEtaIEta[" + ind + "] < " + str(sigmaEtaEtaCuts[eleWP]['EB'])) + ") || (" + combineCuts(geoSel['EE'], "LepAll_sigmaIEtaIEta[" + ind + "] < " + str(sigmaEtaEtaCuts[eleWP]['EE'])) + "))"
-   antiSigmaEtaEtaCut = "((" + combineCuts(geoSel['EB'], "LepAll_sigmaIEtaIEta[" + ind + "] > " + str(sigmaEtaEtaCuts[eleWP]['EB'])) + ") || (" + combineCuts(geoSel['EE'], "LepAll_sigmaIEtaIEta[" + ind + "] > " + str(sigmaEtaEtaCuts[eleWP]['EE'])) + "))"
+   sigmaEtaEtaCut = "((" + combineCuts(geoSel['EB'], "LepAll_sigmaIEtaIEta[" + ind2 + "] < " + str(sigmaEtaEtaCuts[eleWP]['EB'])) + ") || (" + combineCuts(geoSel['EE'], "LepAll_sigmaIEtaIEta[" + ind2 + "] < " + str(sigmaEtaEtaCuts[eleWP]['EE'])) + "))"
+   antiSigmaEtaEtaCut = "((" + combineCuts(geoSel['EB'], "LepAll_sigmaIEtaIEta[" + ind2 + "] > " + str(sigmaEtaEtaCuts[eleWP]['EB'])) + ") || (" + combineCuts(geoSel['EE'], "LepAll_sigmaIEtaIEta[" + ind2 + "] > " + str(sigmaEtaEtaCuts[eleWP]['EE'])) + "))"
 
    appliedCut = sigmaEtaEtaCut
    invertedCut = antiSigmaEtaEtaCut
 
-variables = {'elePt':"LepAll_pt[" + ind + "]", 'eleMt':"LepAll_mt[" + ind + "]"}
+variables = {'elePt':"LepAll_pt[" + ind2 + "]", 'eleMt':"LepAll_mt[" + ind2 + "]"}
 
-if plot: variables.update({"absIso":"LepAll_absIso03[" + ind + "]", 'relIso':"LepAll_relIso03[" + ind + "]", "hybIso":"(LepAll_relIso03[" + ind + "]*min(LepAll_pt[" + ind + "], 25))",  
-                           "absDxy":"LepAll_dxy[" + ind + "]", "sigmaEtaEta":"LepAll_sigmaIEtaIEta[" + ind + "]", "hOverE":"LepAll_hadronicOverEm[" + ind + "]"})
+if plot: variables.update({"absIso":"LepAll_absIso03[" + ind2 + "]", 'relIso':"LepAll_relIso03[" + ind2 + "]", "hybIso":"(LepAll_relIso03[" + ind2 + "]*min(LepAll_pt[" + ind2 + "], 25))",  
+                           "absDxy":"LepAll_dxy[" + ind2 + "]", "sigmaEtaEta":"LepAll_sigmaIEtaIEta[" + ind2 + "]", "hOverE":"LepAll_hadronicOverEm[" + ind2 + "]"})
 
 #Redefining variables in terms of electron selection
 # ABCD1: X = D (inverted) | ABCD2: X = D (loose) | ABCD3: X = M (loose) | ABCD4: X = S (inverted)
@@ -192,16 +191,29 @@ baseline = CutClass("baseline", [
    ["HT","ht_basJet >" + HTcut],
    ["MET", METcutString],
    ["ISR100", "nIsrJet >= 1"],
-   ["nEle", "(nLepAll_el2 == 1 || (nLepAll_el2 == 2 && LepAll_pt[IndexLepAll_el2[1]] < 20))"],
-   ["MuVeto","(nLepAll_mu == 0 || (nLepAll_mu == 1 && LepAll_pt[IndexLepAll_mu[0]] < 20))"], 
-   ["eleSel", eleSel],
    ["No3rdJet60","nVetoJet <= 2"],
    ["BVeto", bTagString],
    ["TauVeto","Sum$(TauGood_idMVANewDM && TauGood_pt > 20) == 0"],
    ["HighWeightVeto","weight < " + weightCut],
    ], baseCut = None)
          
-#setEventListToChains(samples, samplesList, baseline)
+setEventListToChains(samples, samplesList, baseline)
+
+#leading electron acceptance cuts
+eleSel = "abs(LepAll_eta[" + ind + "]) < " + str(etaAcc)# + "&& LepAll_pdgId[" + ind + "] == 11" # + "&&" + eleIDsel[eleWP] #redundant due to index sel
+eleSel2 = "abs(LepAll_eta[" + ind2 + "]) < " + str(etaAcc)# + "&& LepAll_pdgId[" + ind + "] == 11" # + "&&" + eleIDsel[eleWP] #redundant due to index sel
+
+lepsel = CutClass("lepsel", [
+   ["nEle", "(nLepAll_el == 1 || (nLepAll_el == 2 && LepAll_pt[IndexLepAll_el[1]] < 20))"],
+   ["MuVeto","(nLepAll_mu == 0 || (nLepAll_mu == 1 && LepAll_pt[IndexLepAll_mu[0]] < 20))"], 
+   ["eleSel", eleSel],
+   ], baseCut = baseline)
+
+lepsel2 = CutClass("lepsel2", [
+   ["nEle", "(nLepAll_el2 == 1 || (nLepAll_el2 == 2 && LepAll_pt[IndexLepAll_el2[1]] < 20))"],
+   ["MuVeto","(nLepAll_mu == 0 || (nLepAll_mu == 1 && LepAll_pt[IndexLepAll_mu[0]] < 20))"], 
+   ["eleSel", eleSel2],
+   ], baseCut = baseline)
 
 # ABCD1: X = D (inverted) | ABCD2: X = D (loose) | ABCD3: X = M (loose) | ABCD4: X = S (inverted)
 abcd = {'SR':'SR', 'IX_A':'IX', 'IXA':'IX'}
@@ -213,27 +225,8 @@ if ABCD == "4": # 3D ABCD
 #   abcd['SR'] = abcd['A_IX'] = 'I'
 #   abcd['IX_A'] = abcd['IXA'] = 'anti-I'
 
-SRs ={}
-
-SRs = {\
-   #'SR1':["SR1","LepAll_pt[" + ind + "] < 30"],
-   'SR1a':["SR1a",   combineCuts("LepAll_pdgId[" + ind + "] == 11", "LepAll_mt[" + ind + "] < 60", "LepAll_pt[" + ind + "] < 30")],
-   'SR1b':["SR1b",   combineCuts("LepAll_pdgId[" + ind + "] == 11", btw("LepAll_mt[" + ind + "]", 60, 95), "LepAll_pt[" + ind + "] < 30")],
-   'SR1c':["SR1c",   combineCuts("LepAll_mt[" + ind + "] > 95", "LepAll_pt[" + ind + "] < 30")],
-
-   'SRL1a':["SRL1a", combineCuts("LepAll_pdgId[" + ind + "] == 11", "LepAll_mt[" + ind + "] < 60", btw("LepAll_pt[" + ind + "]", 5, 12))],
-   'SRH1a':["SRH1a", combineCuts("LepAll_pdgId[" + ind + "] == 11", "LepAll_mt[" + ind + "] < 60", btw("LepAll_pt[" + ind + "]", 12, 20))],
-   'SRV1a':["SRV1a", combineCuts("LepAll_pdgId[" + ind + "] == 11", "LepAll_mt[" + ind + "] < 60", btw("LepAll_pt[" + ind + "]", 20, 30))],
-
-   'SRL1b':["SRL1b", combineCuts("LepAll_pdgId[" + ind + "] == 11", btw("LepAll_mt[" + ind + "]", 60, 95), btw("LepAll_pt[" + ind + "]", 5, 12))],
-   'SRH1b':["SRH1b", combineCuts("LepAll_pdgId[" + ind + "] == 11", btw("LepAll_mt[" + ind + "]", 60, 95), btw("LepAll_pt[" + ind + "]", 12, 20))],
-   'SRV1b':["SRV1b", combineCuts("LepAll_pdgId[" + ind + "] == 11", btw("LepAll_mt[" + ind + "]", 60, 95), btw("LepAll_pt[" + ind + "]", 20, 30))],
-
-   'SRL1c':["SRL1c", combineCuts("LepAll_mt[" + ind + "] > 95", btw("LepAll_pt[" + ind + "]", 5, 12))],
-   'SRH1c':["SRH1c", combineCuts("LepAll_mt[" + ind + "] > 95", btw("LepAll_pt[" + ind + "]", 12, 20))],
-   'SRV1c':["SRV1c", combineCuts("LepAll_mt[" + ind + "] > 95", btw("LepAll_pt[" + ind + "]", 20, 30))]}
-   
-SRs['SR1'] = ["SR1", "(" + SRs['SR1a'][1] + ") || (" + SRs['SR1b'][1] + ") || (" + SRs['SR1c'][1] + ")"]
+SRs = signalRegions("electron") #standard index
+SRs_2 = signalRegions("electron", index = "2") #lep2 index
 
 QCD = {}
 regions = ['SR1', 'SR1a', 'SR1b', 'SR1c', 'SRL1a', 'SRH1a', 'SRV1a', 'SRL1b', 'SRH1b', 'SRV1b', 'SRL1c', 'SRH1c', 'SRV1c']
@@ -243,66 +236,66 @@ for reg in regions:
 
    if ABCD == "4":
       QCD[reg]['SR'] = CutClass("QCD_SR_" + reg, [
-         SRs[reg],
-         ["I", hybIsoCut], #applied
-         ["X", appliedCut], #applied
+         #["I", hybIsoCut], #applied #part of standard index
+         #["X", appliedCut], #applied #part of standard index
          ["A", dPhiCut], #applied
-         ], baseCut = baseline)
+         SRs[reg],
+         ], baseCut = lepsel)
       
       QCD[reg]['IX_A'] = CutClass("QCD_IX_A_" + reg, [
-         SRs[reg],
          ["anti-I", antiHybIsoCut], #inverted,
          ["anti-X", invertedCut], #inverted (loose)
          ["A", dPhiCut], #applied
-         ], baseCut = baseline)
+         SRs_2[reg],
+         ], baseCut = lepsel2)
       
       QCD[reg]['IXA'] = CutClass("QCD_IXA_" + reg, [
-         SRs[reg],
          ["anti-I", antiHybIsoCut], #inverted, 
          ["anti-X", invertedCut], #inverted (loose)
          ["anti-A", antidPhiCut], #inverted
-         ], baseCut = baseline)
+         SRs_2[reg],
+         ], baseCut = lepsel2)
          
       QCD[reg]['XA_I'] = CutClass("QCD_XA_I_" + reg, [
-         SRs[reg],
          ["I", hybIsoCut], #applied
          ["anti-X", invertedCut], #inverted
          ["anti-A", antidPhiCut], #inverted
-         ], baseCut = baseline)
+         SRs_2[reg],
+         ], baseCut = lepsel2)
       
       QCD[reg]['IA_X'] = CutClass("QCD_IA_X_" + reg, [
-         SRs[reg],
          ["anti-I", antiHybIsoCut], #inverted
          ["X", appliedCut], #applied
          ["anti-A", antidPhiCut], #inverted
-         ], baseCut = baseline)
+         SRs_2[reg],
+         ], baseCut = lepsel2)
       
    #elif ABCD == "3": #loosened MET
    #   QCD[reg]['SR'] = CutClass("QCD_SR_" + reg, [
-   #      SRs[reg],
    #      ["MET", "met >" + METcut], #tight MET
    #      ["A", dPhiCut], #applied
    #      ["I", hybIsoCut],
-   #      ], baseCut = baseline)
+   #      SRs_2[reg],
+   #      ], baseCut = lepsel2)
    #
    #   QCD[reg]['IX_A'] = CutClass("QCD_IX_A_" + reg, [ #loose MET
-   #      SRs[reg],
    #      ["A", dPhiCut], #applied
    #      ["anti-I", antiHybIsoCut], #inverted
-   #      ], baseCut = baseline)
+   #      SRs_2[reg],
+   #      ], baseCut = lepsel2)
    #
    #   QCD[reg]['A_IX'] = CutClass("QCD_A_IX_" + reg, [
-   #      SRs[reg],
    #      ["MET", "met >" + METcut], #tight MET
    #      ["anti-A", antidPhiCut], #inverted
    #      ["I", hybIsoCut], #applied
-   #      ], baseCut = baseline)
+   #      SRs_2[reg],
+   #      ], baseCut = lepsel2)
    #
    #   QCD[reg]['IXA'] = CutClass("QCD_IXA_" + reg, [ #loose MET
-   #      SRs[reg],
    #      ["anti-A", antidPhiCut], #inverted
    #      ["anti-I", antiHybIsoCut], #inverted
-   #      ], baseCut = baseline)
+   #      SRs_2[reg],
+   #      ], baseCut = lepsel2)
       
 if estimation: 
    yields = {}
@@ -441,54 +434,54 @@ if estimation:
 if plot:
    
    QCD[plotReg]['A'] = CutClass("QCD_A_" + plotReg, [
-      SRs[plotReg],
       ["anti-A", antidPhiCut], #inverted
-      ], baseCut = baseline)
+      SRs_2[plotReg],
+      ], baseCut = lepsel2)
    
    QCD[plotReg]['XA'] = CutClass("QCD_XA_" + plotReg, [
-      SRs[plotReg],
       ["anti-X", invertedCut], #inverted
       ["anti-A", antidPhiCut], #inverted
-      ], baseCut = baseline)
+      SRs_2[plotReg],
+      ], baseCut = lepsel2)
    
    QCD[plotReg]['IA'] = CutClass("QCD_IA_" + plotReg, [
-      SRs[plotReg],
       ["anti-A", antidPhiCut], #inverted
       ["anti-I", antiHybIsoCut], #inverted
-      ], baseCut = baseline)
+      SRs_2[plotReg],
+      ], baseCut = lepsel2)
    
    QCD[plotReg]['I_A'] = CutClass("QCD_I_A_" + plotReg, [
-      SRs[plotReg],
       ["anti-I", antiHybIsoCut], #inverted
       ["A", dPhiCut], #applied
-      ], baseCut = baseline)
+      SRs_2[plotReg],
+      ], baseCut = lepsel2)
    
    QCD[plotReg]['X_A'] = CutClass("QCD_X_A_" + plotReg, [
-      SRs[plotReg],
       ["anti-X", invertedCut], #inverted
       ["A", dPhiCut], #applied
-      ], baseCut = baseline)
+      SRs_2[plotReg],
+      ], baseCut = lepsel2)
    
    QCD[plotReg]['A_X'] = CutClass("QCD_A_X_" + plotReg, [
-      SRs[plotReg],
       ["anti-A", antidPhiCut], #inverted
       ["X", appliedCut], #applied
-      ], baseCut = baseline)
+      SRs_2[plotReg],
+      ], baseCut = lepsel2)
       
    if ABCD != "3":
       QCD[plotReg]['A_I'] = CutClass("QCD_A_I_" + plotReg, [
-         SRs[plotReg],
          ["anti-A", antidPhiCut], #inverted
          ["I", hybIsoCut], #applied
-         ], baseCut = baseline)
+         SRs_2[plotReg],
+         ], baseCut = lepsel2)
    
    #elif ABCD == "3":
    #   QCD[plotReg]['A_I'] = CutClass("QCD_A_I_" + plotReg, [
-   #      SRs[plotReg],
    #      ["MET", "met >" + METcut], #tight MET
    #      ["anti-A", antidPhiCut], #inverted
    #      ["I", hybIsoCut], #applied
-   #      ], baseCut = baseline)
+   #      SRs_2[plotReg],
+   #      ], baseCut = lepsel2)
    
    plotsList = {}
    plotDict = {}
