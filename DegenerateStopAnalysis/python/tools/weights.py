@@ -22,7 +22,7 @@ class Weights():
     def __init__(   self,
                     lepCol="LepAll",
                     lep="lep",
-                    btag="SF",
+                    btag="sf",
                     jet="",
                     pu="puReweight", 
                     wpt="", 

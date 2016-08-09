@@ -1,7 +1,5 @@
-# QCDestimation_index.py
-# Combined script for the QCD estimation using 2 various ABCD methods:
-# ABCD3: 2D ABCD with loosened MET
-# ABCD4: 3D ABCD with ISA (inverted simgaEtaEta)
+# QCDestimation_el.py
+# QCD estimation for the electron channel 
 
 import ROOT
 import os, sys
@@ -24,10 +22,10 @@ setup_style()
 
 #Input options
 parser = argparse.ArgumentParser(description = "Input options")
-parser.add_argument("--ABCD", dest = "ABCD",  help = "ABCD method", type = str, default = "4")
+#parser.add_argument("--ABCD", dest = "ABCD",  help = "ABCD method", type = str, default = "4")
 parser.add_argument("--MET", dest = "MET",  help = "MET Cut", type = str, default = "300")
 parser.add_argument("--HT", dest = "HT",  help = "HT Cut", type = str, default = "400")
-parser.add_argument("--METloose", dest = "METloose",  help = "Loose MET Cut", type = str, default = "200")
+parser.add_argument("--METloose", dest = "METloose",  help = "Loose MET Cut", type = str, default = "300")
 parser.add_argument("--eleWP", dest = "eleWP",  help = "Electron WP", type = str, default = "Veto")
 parser.add_argument("--highWeightVeto", dest = "highWeightVeto",  help = "Remove high weighted events", type = int, default = 0)
 #parser.add_argument("--enriched", dest = "enriched",  help = "EM enriched QCD?", type = bool, default = False)
@@ -48,7 +46,7 @@ if not len(sys.argv) > 1:
    #exit()
 
 #Arguments
-ABCD = args.ABCD
+#ABCD = args.ABCD
 METcut = args.MET
 METloose = args.METloose
 HTcut = args.HT
@@ -64,13 +62,16 @@ logy = args.logy
 save = args.save
 verbose = args.verbose
 
+if METcut != METloose: ABCD = "5"
+else: ABCD = "4"
+
 print makeDoubleLine()
-print "Performing ABCD" + ABCD + " QCD estimation for electron channel."
+print "Performing ABCD", ABCD, " QCD estimation for electron channel."
 print makeDoubleLine()
 
 #Save
 if save: #web address: http://www.hephy.at/user/mzarucki/plots
-   savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/QCD/electron" #/ABCD" + ABCD 
+   savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/QCD/electron"
 
    #savedir += "/bTagWeight_" + btag
      
@@ -78,17 +79,29 @@ if save: #web address: http://www.hephy.at/user/mzarucki/plots
    
    plotdir = savedir + "/plots"
    plotdir += "/" + plotReg
-   plotdir += "/HT" + HTcut + "MET" + METcut
 
+   if ABCD == "3" or ABCD == "5":
+      estdir += "/METloose"
+      plotdir += "/METloose"
+   elif ABCD == "4":
+      estdir += "/noMETloose"
+      plotdir += "/noMETloose"
+
+   plotdir += "/HT" + HTcut + "MET" + METcut
    suffix = "_HT" + HTcut + "_MET" + METcut
-   if ABCD == "3": suffix += "_METloose" + METloose
+
+   if ABCD == "3" or ABCD == "5":
+      plotdir += "METloose" + METloose
+      suffix += "_METloose" + METloose
+   
    #if enriched == True: suffix += "_EMenriched"
-   if plot: suffix += "_" + plotReg
+   if plot: suffix2 = suffix + "_" + plotReg
    
    if highWeightVeto: 
       estdir += "/highWeightVeto" 
       plotdir += "/highWeightVeto"
       suffix += "_highWeightVeto"
+      if plot: suffix2 += "_highWeightVeto"
  
    #if enriched: 
    #   estdir += "_EMenriched"
@@ -155,7 +168,7 @@ geoSel= {\
       'EB':"(abs(LepAll_eta[" + ind2 + "]) <= " + str(ebeeSplit) + ")", 
       'EE':"(abs(LepAll_eta[" + ind2 + "]) > " + str(ebeeSplit) + " && abs(LepAll_eta[" + ind2 + "]) < " + str(etaAcc) + ")"}
 
-if ABCD == "4": #ABCD4
+if ABCD == "4" or ABCD == "5": #ABCD4
    
    sigmaEtaEtaCuts = {\
       'Veto':{'EB':0.0114, 'EE':0.0352},
@@ -176,10 +189,10 @@ if plot: variables.update({"absIso":"LepAll_absIso03[" + ind2 + "]", 'relIso':"L
 
 #Redefining variables in terms of electron selection
 # ABCD1: X = D (inverted) | ABCD2: X = D (loose) | ABCD3: X = M (loose) | ABCD4: X = S (inverted)
-Xs = {'3':'M', '4':'S'} #'1':'D', '2':'D'
+Xs = {'3':'M', '4':'S', '5':'S'} #'1':'D', '2':'D'
 
-if ABCD != "3": METcutString = "met >" + METcut
-elif ABCD == "3": METcutString = "met >" + METloose #loosened MET cut for ABCD3
+if ABCD == "3" or ABCD == "5": METcutString = "met >" + METloose #loosened MET cut for ABCD3 and ABCD5
+else: METcutString = "met >" + METcut
 
 #bTagWeights
 bWeightDict = bTagWeights(btag)
@@ -218,7 +231,7 @@ lepsel2 = CutClass("lepsel2", [
 # ABCD1: X = D (inverted) | ABCD2: X = D (loose) | ABCD3: X = M (loose) | ABCD4: X = S (inverted)
 abcd = {'SR':'SR', 'IX_A':'IX', 'IXA':'IX'}
 
-if ABCD == "4": # 3D ABCD
+if ABCD == "4" or ABCD == "5": # 3D ABCD
    abcd['IA_X'] = 'I_X' 
    abcd['XA_I'] = 'X_I'
 #elif ABCD == "3": # 2D ABCD
@@ -234,8 +247,9 @@ regions = ['SR1', 'SR1a', 'SR1b', 'SR1c', 'SRL1a', 'SRH1a', 'SRV1a', 'SRL1b', 'S
 for reg in regions:
    QCD[reg] = {}
 
-   if ABCD == "4":
+   if ABCD == "4" or ABCD == "5":
       QCD[reg]['SR'] = CutClass("QCD_SR_" + reg, [
+         ["MET", "met >" + METcut], #tight MET
          #["I", hybIsoCut], #applied #part of standard index
          #["X", appliedCut], #applied #part of standard index
          ["A", dPhiCut], #applied
@@ -243,20 +257,14 @@ for reg in regions:
          ], baseCut = lepsel)
       
       QCD[reg]['IX_A'] = CutClass("QCD_IX_A_" + reg, [
+         ["MET", "met >" + METcut], #tight MET
          ["anti-I", antiHybIsoCut], #inverted,
          ["anti-X", invertedCut], #inverted (loose)
          ["A", dPhiCut], #applied
          SRs_2[reg],
          ], baseCut = lepsel2)
       
-      QCD[reg]['IXA'] = CutClass("QCD_IXA_" + reg, [
-         ["anti-I", antiHybIsoCut], #inverted, 
-         ["anti-X", invertedCut], #inverted (loose)
-         ["anti-A", antidPhiCut], #inverted
-         SRs_2[reg],
-         ], baseCut = lepsel2)
-         
-      QCD[reg]['XA_I'] = CutClass("QCD_XA_I_" + reg, [
+      QCD[reg]['XA_I'] = CutClass("QCD_XA_I_" + reg, [ #loose MET
          ["I", hybIsoCut], #applied
          ["anti-X", invertedCut], #inverted
          ["anti-A", antidPhiCut], #inverted
@@ -264,8 +272,16 @@ for reg in regions:
          ], baseCut = lepsel2)
       
       QCD[reg]['IA_X'] = CutClass("QCD_IA_X_" + reg, [
+         ["MET", "met >" + METcut], #tight MET
          ["anti-I", antiHybIsoCut], #inverted
          ["X", appliedCut], #applied
+         ["anti-A", antidPhiCut], #inverted
+         SRs_2[reg],
+         ], baseCut = lepsel2)
+      
+      QCD[reg]['IXA'] = CutClass("QCD_IXA_" + reg, [ #loose MET
+         ["anti-I", antiHybIsoCut], #inverted, 
+         ["anti-X", invertedCut], #inverted (loose)
          ["anti-A", antidPhiCut], #inverted
          SRs_2[reg],
          ], baseCut = lepsel2)
@@ -309,7 +325,7 @@ if estimation:
       if not os.path.isfile("%s/QCDyields%s.txt"%(estdir,suffix)):
          outfile = open("%s/QCDyields%s.txt"%(estdir,suffix), "w")
          outfile.write("QCD Estimation for Electron Channel [" + eleWP + " Electron ID and Preselection of (MET, HT) > (" + METcut + "," + HTcut + ")]\n")
-         if ABCD == "4": outfile.write("SR        IX_A (MC)            XA_I (MC)            IA_X  (MC)        |\
+         if ABCD == "4" or ABCD == "5": outfile.write("SR        IX_A (MC)            XA_I (MC)            IA_X  (MC)        |\
          IXA (MC)           IXA (data-EWK)          SF_dataMC (IXA)         |\
          QCD est. (MC)          SR (MC)             Ratio       |        QCD est. (data)\n".replace("X", Xs[ABCD]))
          elif ABCD == "3": outfile.write("SR\
@@ -327,7 +343,7 @@ if estimation:
          #setEventListToChains(samples, samplesList, QCD[reg][sel])
          yields[reg][sel] = Yields(samples, samplesList, QCD[reg][sel], cutOpt = "combinedList", pklOpt = False, tableName = reg + "_" + sel, nDigits = 2, err = True, verbose = True, nSpaces = 1)
   
-      if ABCD == "4": #3D ABCD
+      if ABCD == "4" or ABCD == "5": #3D ABCD
          #MC yields
          QCDyields[reg]['SR'] =        yields[reg]['SR'].yieldDictFull['qcd']['QCD_SR_' + reg]
          QCDyields[reg]['IX_A'] =      yields[reg]['IX_A'].yieldDictFull['qcd']['QCD_IX_A_' + reg]
@@ -434,6 +450,7 @@ if estimation:
 if plot:
    
    QCD[plotReg]['A'] = CutClass("QCD_A_" + plotReg, [
+      ["MET", "met >" + METcut], #tight MET
       ["anti-A", antidPhiCut], #inverted
       SRs_2[plotReg],
       ], baseCut = lepsel2)
@@ -445,24 +462,28 @@ if plot:
       ], baseCut = lepsel2)
    
    QCD[plotReg]['IA'] = CutClass("QCD_IA_" + plotReg, [
+      ["MET", "met >" + METcut], #tight MET
       ["anti-A", antidPhiCut], #inverted
       ["anti-I", antiHybIsoCut], #inverted
       SRs_2[plotReg],
       ], baseCut = lepsel2)
    
    QCD[plotReg]['I_A'] = CutClass("QCD_I_A_" + plotReg, [
+      ["MET", "met >" + METcut], #tight MET
       ["anti-I", antiHybIsoCut], #inverted
       ["A", dPhiCut], #applied
       SRs_2[plotReg],
       ], baseCut = lepsel2)
    
    QCD[plotReg]['X_A'] = CutClass("QCD_X_A_" + plotReg, [
+      ["MET", "met >" + METcut], #tight MET
       ["anti-X", invertedCut], #inverted
       ["A", dPhiCut], #applied
       SRs_2[plotReg],
       ], baseCut = lepsel2)
    
    QCD[plotReg]['A_X'] = CutClass("QCD_A_X_" + plotReg, [
+      ["MET", "met >" + METcut], #tight MET
       ["anti-A", antidPhiCut], #inverted
       ["X", appliedCut], #applied
       SRs_2[plotReg],
@@ -489,7 +510,7 @@ if plot:
    plots = {}
    plots2 = {}
    
-   if ABCD == "4": plotRegions = ['SR', 'A', 'IA', 'XA', 'I_A', 'A_I', 'X_A', 'A_X', 'IA_X', 'XA_I', 'IX_A', 'IXA']
+   if ABCD == "4" or ABCD == "5": plotRegions = ['SR', 'A', 'IA', 'XA', 'I_A', 'A_I', 'X_A', 'A_X', 'IA_X', 'XA_I', 'IX_A', 'IXA']
   
    if getData: plotRegions.remove('SR')
    
@@ -529,6 +550,6 @@ if plot:
 
          for canv in plots2[sel]['canvs']:
             #if plot['canvs'][canv][0]:
-            plots2[sel]['canvs'][canv][0].SaveAs("%s/%s/%s%s.png"%(plotdir, sel.replace("X", Xs[ABCD]), canv, suffix))
-            plots2[sel]['canvs'][canv][0].SaveAs("%s/%s/root/%s%s.root"%(plotdir, sel.replace("X", Xs[ABCD]), canv, suffix))
-            plots2[sel]['canvs'][canv][0].SaveAs("%s/%s/pdf/%s%s.pdf"%(plotdir, sel.replace("X", Xs[ABCD]), canv, suffix))
+            plots2[sel]['canvs'][canv][0].SaveAs("%s/%s/%s%s.png"%(plotdir, sel.replace("X", Xs[ABCD]), canv, suffix2))
+            plots2[sel]['canvs'][canv][0].SaveAs("%s/%s/root/%s%s.root"%(plotdir, sel.replace("X", Xs[ABCD]), canv, suffix2))
+            plots2[sel]['canvs'][canv][0].SaveAs("%s/%s/pdf/%s%s.pdf"%(plotdir, sel.replace("X", Xs[ABCD]), canv, suffix2))

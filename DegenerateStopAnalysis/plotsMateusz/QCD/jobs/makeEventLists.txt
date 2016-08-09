@@ -1,10 +1,16 @@
-python -b ../QCDestimation_el.py --estimation 0 --plot 0 --ABCD 4 --highWeightVeto 0 --btag sf  --HT 400 --MET 300
-python -b ../QCDestimation_el.py --estimation 0 --plot 0 --ABCD 4 --highWeightVeto 0 --btag sf  --HT 300 --MET 300
-python -b ../QCDestimation_el.py --estimation 0 --plot 0 --ABCD 4 --highWeightVeto 0 --btag sf  --HT 200 --MET 300
-                                                                                               
-python -b ../QCDestimation_el.py --estimation 0 --plot 0 --ABCD 4 --highWeightVeto 1 --btag sf  --HT 400 --MET 300
-python -b ../QCDestimation_el.py --estimation 0 --plot 0 --ABCD 4 --highWeightVeto 1 --btag sf  --HT 300 --MET 300
-python -b ../QCDestimation_el.py --estimation 0 --plot 0 --ABCD 4 --highWeightVeto 1 --btag sf  --HT 200 --MET 200
+python -b ../QCDestimation_el.py --estimation 0 --plot 0 --highWeightVeto 0 --btag sf --HT 400 --MET 300 --METloose 300
+python -b ../QCDestimation_el.py --estimation 0 --plot 0 --highWeightVeto 0 --btag sf --HT 400 --MET 300 --METloose 200
+python -b ../QCDestimation_el.py --estimation 0 --plot 0 --highWeightVeto 0 --btag sf --HT 300 --MET 300 --METloose 300
+python -b ../QCDestimation_el.py --estimation 0 --plot 0 --highWeightVeto 0 --btag sf --HT 300 --MET 300 --METloose 200
+python -b ../QCDestimation_el.py --estimation 0 --plot 0 --highWeightVeto 0 --btag sf --HT 300 --MET 200 --METloose 200
+python -b ../QCDestimation_el.py --estimation 0 --plot 0 --highWeightVeto 0 --btag sf --HT 200 --MET 200 --METloose 200
+
+python -b ../QCDestimation_el.py --estimation 0 --plot 0 --highWeightVeto 1 --btag sf --HT 400 --MET 300 --METloose 300
+python -b ../QCDestimation_el.py --estimation 0 --plot 0 --highWeightVeto 1 --btag sf --HT 400 --MET 300 --METloose 200
+python -b ../QCDestimation_el.py --estimation 0 --plot 0 --highWeightVeto 1 --btag sf --HT 300 --MET 300 --METloose 300
+python -b ../QCDestimation_el.py --estimation 0 --plot 0 --highWeightVeto 1 --btag sf --HT 300 --MET 300 --METloose 200
+python -b ../QCDestimation_el.py --estimation 0 --plot 0 --highWeightVeto 1 --btag sf --HT 300 --MET 200 --METloose 200
+python -b ../QCDestimation_el.py --estimation 0 --plot 0 --highWeightVeto 1 --btag sf --HT 200 --MET 200 --METloose 200
 
 python -b ../QCDestimation_mu.py --estimation 0 --plot 0 --highWeightVeto 0 --btag sf --HT 400 --MET 300 --METloose 300
 python -b ../QCDestimation_mu.py --estimation 0 --plot 0 --highWeightVeto 0 --btag sf --HT 400 --MET 300 --METloose 200
