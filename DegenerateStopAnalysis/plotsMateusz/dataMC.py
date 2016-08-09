@@ -5,7 +5,7 @@ import argparse
 import Workspace.DegenerateStopAnalysis.toolsMateusz.ROOToptions
 from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
-from Workspace.DegenerateStopAnalysis.tools.degTools import CutClass, Plots, getPlots, drawPlots, Yields, setup_style
+from Workspace.DegenerateStopAnalysis.tools.degTools import CutClass, Plots, getPlots, drawPlots, Yields, setEventListToChains, setup_style
 from Workspace.DegenerateStopAnalysis.tools.bTagWeights import bTagWeights
 #from Workspace.DegenerateStopAnalysis.tools.degCuts import *
 from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesPostProcessed_mAODv2_2016 import cmgTuplesPostProcessed
@@ -58,7 +58,6 @@ elif skim == "oneLep":
       data = "d1muBlind"
       samplesList.append(data)
 
-
 samples = getSamples(cmgPP = cmgPP, skim = skim, sampleList = samplesList, scan = False, useHT = True, getData = getData) 
 
 if verbose:
@@ -75,8 +74,8 @@ if verbose:
 if save: #web address: http://www.hephy.at/user/mzarucki/plots
    savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/dataMC"
    savedir += "/" + skim
-   if btag: savedir += "/" + btag
-   else: savedir += "/no_btag"
+   #if btag: savedir += "/" + btag
+   #else: savedir += "/no_btag"
    suffix = ""   
    if not os.path.exists("%s/root"%(savedir)): os.makedirs("%s/root"%(savedir))
    if not os.path.exists("%s/pdf"%(savedir)): os.makedirs("%s/pdf"%(savedir))
@@ -146,14 +145,23 @@ plotDict = {
 #   "nJets60":{'var':"nVetoJet", "bins":[10,0,10], "decor":{"title":"Number of Jets with p_{{T}} > 60GeV", "x":"Number of Jets with p_{T} > 60GeV", "y":"Events", 'log':[0,1,0]}},
 #   "ISRpt":{'var':"Jet_pt[IndexJet_basJet[0]]", "bins":[45,100,1000], "decor":{"title":"Leading Jet p_{{T}}","x":"ISR Jet p_{T}","y":"Events", 'log':[0,1,0]}},
 #}
+
+setEventListToChains(samples, samplesList, presel)
    
 #plotsList = ["nJets30", "nJets60", "nSoftBJets", "nHardBJets", "nBJets", "bJetPt", "bSoftJetPt", "bHardJetPt"]
-plotsList = ["met"]#, "ht", "lep_Pt"]#, "lep_Eta", "lep_mt", "MetPhi", "nJets30", "nJets60"]
+plotsList = ["met", "ht", "lep_Pt", "lep_Eta", "lep_mt", "MetPhi", "nJets30", "nJets60"]
 
 plotsDict = Plots(**plotDict)
 
 plots = getPlots(samples, plotsDict, presel, samplesList, plotList = plotsList, addOverFlowBin='upper')
-plots2 = drawPlots(samples, plotsDict, presel, samplesList, plotList = plotsList, plotLimits = [1, 100], denoms=["bkg"], noms = [data], fom="RATIO", fomLimits=[0,2.8], normalize = False, save=False) #, plotMin = 0.1
+plots2 = drawPlots(samples, plotsDict, presel, samplesList, plotList = plotsList, plotLimits = [1, 100], denoms=["bkg"], noms = [data], fom="RATIO", fomLimits=[0,1.8], normalize = False, save=False) #, plotMin = 0.1
+
+yields = Yields(samples, samplesList, presel, cutOpt = "combinedList", pklOpt = False, tableName = "dataMC", nDigits = 2, err = True, verbose = True, nSpaces = 1)
+
+print makeLine()
+print "Yields"
+for samp in yields.yieldDictFull:
+   print samp, ": ", yields.yieldDictFull[samp]
 
 #Save canvas
 if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID

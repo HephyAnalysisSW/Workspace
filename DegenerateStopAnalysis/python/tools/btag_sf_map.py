@@ -1,6 +1,4 @@
-
-
-class BTagSFMap():
+class BTagSFMap:
     def __init__(self,sfvar):
 
         sfvar_dict = {
@@ -89,4 +87,3 @@ class BTagSFMap():
                               }
         
         self.weight_to_btag_vars = dict(   (reversed(item) for item in self.btag_to_weight_vars.items() ) )
-

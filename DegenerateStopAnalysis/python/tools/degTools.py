@@ -301,7 +301,7 @@ def getEventListFromChain(sample,cut,eListName="",tmpDir="./",opt="write", verbo
 
 def setEventListToChain(sample,cut,eListName="",verbose=True,tmpDir=None,opt="read"): 
     if not tmpDir:
-        tmpDir = os.getenv("CMSSW_BASE")+"/src/Workspace/DegenerateStopAnalysis/plotsNavid/tmp/"
+        tmpDir = os.getenv("CMSSW_BASE")+"/src/Workspace/DegenerateStopAnalysis/tmp/"
     eListPath="%s/%s.root"%(tmpDir,eListName)
     if opt.lower() in ["read","r"]: 
         if os.path.isfile(eListPath):
@@ -619,8 +619,8 @@ def getPlots(samples,plots,cut,sampleList=[],plotList=[],weight="",nMinus1="", a
     isDataPlot = bool(len(dataList))
     print "CUT NAME: ", cut.fullName
     if isDataPlot:
-       if "Blind" in samples[dataList[0]].name and "sr" in cut.fullName.lower():
-           raise Exception("NO DATA IN SIGNAL REGION: %s"%[dataList, cut.fullName])
+       #if "Blind" in samples[dataList[0]].name and "sr" in cut.fullName.lower():
+       #    raise Exception("NO DATA IN SIGNAL REGION: %s"%[dataList, cut.fullName])
 
        if "DataBlind" in samples[dataList[0]].name: lumi_weight = "DataBlind_lumi"
        elif "DataUnblind" in samples[dataList[0]].name: lumi_weight = "DataUnblind_lumi"

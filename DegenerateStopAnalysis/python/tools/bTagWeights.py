@@ -1,12 +1,15 @@
 import math
 from Workspace.DegenerateStopAnalysis.tools.degTools import CutClass, joinCutStrings, splitCutInPt, btw, less, more
-import Workspace.DegenerateStopAnalysis.tools.btag_sf_map as btag_sf_map
+from Workspace.DegenerateStopAnalysis.tools.btag_sf_map import BTagSFMap
 
 ## --------------------------------------------------------------
 ##                           Variables
 ## --------------------------------------------------------------
 
-minAngle = lambda phi1, phi2 : "TMath::Min( (2*pi) - abs({phi1}-{phi2}) , abs({phi1}-{phi2}) )".format(phi1=phi1,phi2=phi2)  
+#default values 
+btag_sf_map = BTagSFMap("sf")
+btag_to_sf  = btag_sf_map.btag_to_sf
+sf_to_btag  = btag_sf_map.sf_to_btag
 
 def bTagWeights(btag = 'btag'):
    #self.presel_common = presel_common
