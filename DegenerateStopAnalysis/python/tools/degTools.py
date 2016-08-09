@@ -1929,9 +1929,6 @@ from Workspace.DegenerateStopAnalysis.tools.btag_sf_map import BTagSFMap
 def decide_cut( sample, cut, plot=None, nMinus1=None):
     cuts = []
 
-    btag_sf_map = BTagSFMap("sf")
-    btag_to_sf  = btag_sf_map.btag_to_sf
-    sf_to_btag  = btag_sf_map.sf_to_btag
 
 
     if hasattr(cut, "nMinus1"):
@@ -1961,22 +1958,29 @@ def decide_cut( sample, cut, plot=None, nMinus1=None):
         print "-----"*20
         print "-----"*20
     cut_str =  " && ".join(["( %s )"% c for c in cuts]) 
-    sfs = sf_to_btag.keys()
-    new_cut = cut_str[:]
+
+    sf_list = ["SF","SF_b_Down", "SF_b_Up", "SF_l_Down", "SF_l_Up" ] 
+
     modified = False
-    #print '----------------------'
-    #print cut_str
-    #print '----------------------'
-    for sf in sfs:
-        if sf in new_cut:
-            #print ' found sf: %s in cut_str, \n%s'%(sf,new_cut)
-            if sample.isData:
-                new_cut = new_cut.replace(sf, sf_to_btag[sf])
-                #print 'replacing sf: %s , with %s'%(sf, sf_to_btag[sf])
-            else:
-                new_cut = new_cut.replace(sf, "(1)")
-                #print 'replacing sf: %s , with %s'%(sf, "(1)") 
-            modified = True 
+    new_cut = cut_str[:]
+    for sfOpt in sf_list:
+        btag_sf_map = BTagSFMap(sfOpt)
+        btag_to_sf  = btag_sf_map.btag_to_sf
+        sf_to_btag  = btag_sf_map.sf_to_btag
+        sfs = sf_to_btag.keys()
+        #print '----------------------'
+        #print cut_str
+        #print '----------------------'
+        for sf in sfs:
+            if sf in new_cut:
+                #print ' found sf: %s in cut_str, \n%s'%(sf,new_cut)
+                if sample.isData:
+                    new_cut = new_cut.replace(sf, sf_to_btag[sf])
+                    #print 'replacing sf: %s , with %s'%(sf, sf_to_btag[sf])
+                else:
+                    new_cut = new_cut.replace(sf, "(1)")
+                    #print 'replacing sf: %s , with %s'%(sf, "(1)") 
+                modified = True 
     return new_cut
 
 
@@ -2671,7 +2675,8 @@ fixDict["WJets"]  =  "WJets"
 fixDict["ZJetsInv"]  =  "ZJetsInv" 
 fixDict["TTJets"]  =  "TTJets" 
 fixDict["Total"]  =  "Total S.M."
-fixDict["DataBlind"]  =  "Data"
+fixDict["DataBlind"]  =  "Data(12.9fb-1)"
+fixDict["DataUnblind"]  =  "Data(4.0fb-1)"
 #fixDict["Total"]  =  "Total S.M."
 
 def fixRowCol(x):
@@ -2868,11 +2873,19 @@ def pdfLatex(texFile, pdfDir, removeJunk = True):
 
 
 
-def makeSimpleLatexTable( table_list , texName, outDir, caption="" , align_char = 'c|'):
+def makeSimpleLatexTable( table_list , texName, outDir, caption="" , align_char = 'c|', align_func= lambda align_char, table: (align_char *len(table[1])).rstrip("|")   ):
     #\\begin{document}
     #\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}
     #{\\begin{tabular}{%s}
     #\hline
+    """
+    align func takes align_char and table_list as arguments
+    default: align_func = lambda ac, table : ( ac * len(table[1]) ).strip("|")
+
+    """
+    #alignment = align_char *len(table_list[1]).rstrip("|")
+    alignment = align_func( align_char , table_list)
+    
     header = \
     """
 \documentclass[12pt]{paper}
@@ -2892,7 +2905,7 @@ def makeSimpleLatexTable( table_list , texName, outDir, caption="" , align_char 
 \\begin{document}
 \\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}
 {\\begin{tabular}{%s}
-    """%( align_char *len(table_list[1]))
+    """%( alignment )
 
     body = ""
     first_line = True

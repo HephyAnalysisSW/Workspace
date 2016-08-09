@@ -62,7 +62,8 @@ else
     SKIM_LEPTON=""
 fi
 
-CMG_POST_PROCESSING_TAG="80X_postProcessing_v6_1"
+#CMG_POST_PROCESSING_TAG="80X_postProcessing_v6_1"
+CMG_POST_PROCESSING_TAG="80X_postProcessing_v6"
 VERBOSE="--verbose"
 if [[ ${5} == "TEST" ]]; then 
     CMG_POST_PROCESSING_TAG=$CMG_POST_PROCESSING_TAG"_TEST"

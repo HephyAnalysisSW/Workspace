@@ -127,7 +127,8 @@ class TaskConfig():
         self.scan_tag   =   "Scan" if sample_info['scan'] else ""
         self.lumi_info  =   lumi_info
         #self.lumi_tag   =   make_lumi_tag(lumi_info['lumi_target'])
-        self.lumi_tag   =   make_lumi_tag(lumi_info['target_lumi'])
+
+
         self.saveDir    =   self.saveDirBase+'/%s/%s'%(self.runTag,self.htString)
         self.tableDir   =   self.saveDir+"/Tables/"
         self.dataPlotDir=   self.saveDir+"/DataPlots/"
@@ -137,8 +138,9 @@ class TaskConfig():
         self.cardDirBase=   "/afs/hephy.at/work/n/nrad/results/cards_and_limits/%s/%s"%(self.cmgTag, self.ppTag)
         self.yieldPklDir =  "/afs/hephy.at/work/n/nrad/results/yields/%s/%s/"%(self.cmgTag, self.ppTag) 
 
+        self.lumi_tag   =   make_lumi_tag(lumi_info['target_lumi'])
         #self.results_dir =   self.cardDirBase + "/13TeV/{ht}/{run}/{lumi}/{cut}/".format( ht = self.htString, lumi = self.lumi_tag, run = self.runTag, cut=cutName) 
-        self.results_dir =   self.cardDirBase + "/13TeV/{lumi}/{ht}/{run}/".format( ht = self.htString, lumi = self.lumi_tag, run = self.runTag ) 
+        self.results_dir =   self.cardDirBase + "/13TeV/{ht}/{run}/".format( ht = self.htString , run = self.runTag ) 
         #self.cardDir    =   self.results_dir + "BasicSys"
         sys_label       =   "AdjustedSys"
         self.cardDir    =   self.results_dir + sys_label
@@ -178,9 +180,18 @@ class TaskConfig():
         self.yieldPkls ={}
         self.tableDirs ={}
         self.saveDirs ={}
+
+        self.cutLumiTags ={}
         for cutInst in self.cutInstList:
             cut_name = cutInst.fullName
             cutSaveDir = self.saveDir + "/" + cutInst.saveDir
+
+            if 'sr' in cut_name.lower():
+                lumi = 'DataUnblind_lumi'
+            else:
+                lumi = 'DataBlind_lumi'
+            self.cutLumiTags[cut_name]= make_lumi_tag( lumi_info[lumi] )
+
             self.baseCutSaveDir = cutInst.baseCut.saveDir if getattr(cutInst,"baseCut") else cutInst.saveDir
             self.saveDirs[cut_name]  =  cutSaveDir
             self.cardDirs[cut_name]  =  self.cardDir + "/" + cutInst.saveDir  
@@ -188,8 +199,8 @@ class TaskConfig():
             self.dataPlotDirs[cut_name]  =  cutSaveDir +"/DataPlots/"
             self.limitDirs[cut_name] =  cutSaveDir +"/Limits/"  
             self.tableDirs[cut_name] =  cutSaveDir +"/Tables/"
-            self.limitPkls[cut_name] =  self.results_dir + sys_label  + "/" + self.baseCutSaveDir  + "/Limits_%s_%s_%s.pkl"%(self.lumi_tag, self.runTag, cutInst.fullName)
-            self.yieldPkls[cut_name] =  self.results_dir + sys_label  + "/" + self.baseCutSaveDir  + "/Yields_%s_%s_%s.pkl"%(self.lumi_tag, self.runTag, cutInst.fullName)
+            self.limitPkls[cut_name] =  self.results_dir + sys_label  + "/" + self.baseCutSaveDir  + "/Limits_%s_%s_%s.pkl"%(self.cutLumiTags[cut_name], self.runTag, cut_name)
+            self.yieldPkls[cut_name] =  self.results_dir + sys_label  + "/" + self.baseCutSaveDir  + "/Yields_%s_%s_%s.pkl"%(self.cutLumiTags[cut_name], self.runTag, cut_name)
 
 
 

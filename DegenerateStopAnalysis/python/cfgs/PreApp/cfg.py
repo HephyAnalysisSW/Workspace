@@ -8,6 +8,8 @@ from Workspace.DegenerateStopAnalysis.tools.TaskConfig import TaskConfig
 
 import Workspace.DegenerateStopAnalysis.tools.cfgFunctions as cfgFunctions
 from Workspace.DegenerateStopAnalysis.tools.massPoints import MassPoints
+from Workspace.DegenerateStopAnalysis.tools.degCuts_var import Cuts
+CutVars = Cuts
 from Workspace.DegenerateStopAnalysis.tools.degCuts import Cuts
 from Workspace.DegenerateStopAnalysis.tools.degPlots import DegPlots
 from Workspace.DegenerateStopAnalysis.scripts.degStop import args
@@ -27,7 +29,7 @@ from Workspace.DegenerateStopAnalysis.tools.weights import Weights
 
 dmOpt = "allDM"
 massPoints = MassPoints(dmOpt)
-massPointsFull = MassPoints(dmOpt, (100,601,25))
+massPointsFull = MassPoints(dmOpt, (250,801,25))
 
 
 
@@ -55,7 +57,6 @@ plotMStopLSPs = []
 plotSignalList = sigList
 
 
-sampleList = bkgList + sigList 
 
 #sampleList = ['tt']
 
@@ -83,7 +84,27 @@ sr1c_opts = [
 sr1c_opt = sr1c_opts[2]
 
 
-cuts = Cuts(lepCol, lep, sr1c_opt = sr1c_opt, isrpt=100, btag = btag )
+cuts     = Cuts(lepCol, lep, sr1c_opt = sr1c_opt, isrpt=100, btag = btag )
+
+jc='jec_central'
+cutvars = CutVars(lepCol, lep, sr1c_opt = sr1c_opt, isrpt=100, btag = btag , jc = jc)
+
+jet_corrs=[ 'jec_up'         ,'jec_central'    ,'jec_down'       ,'jer_up'          ,'jer_central'     ,'jer_down'        ]
+
+jet_corr_srs={}
+jet_corr_cuts={}
+for jet_corr in jet_corrs:
+    jet_corr_cuts[jet_corr] = CutVars( lepCol, lep, sr1c_opt = sr1c_opt, isrpt=100, btag = btag , jc = jet_corr)
+    jet_corr_srs[jet_corr]  = jet_corr_cuts[jet_corr].srs_ptbin_sum
+
+jet_corr_srs['central'] = cuts.srs_ptbin_sum
+
+jet_corr_cutinsts = [ x for x in jet_corr_srs.itervalues()]
+
+print jet_corr_cutinsts
+
+
+
 plots = DegPlots( lepCol, lep)
 
 limitCuts = cuts.bins 
@@ -97,13 +118,24 @@ crCuts = [ cuts.crs ]
 
 
 tasks_info =  {
-            'limits10fb':    {'taskList' : [ 'calc_mva_limit' ]  , 'sigList':  massPointsFull.sigList , 'massPoints':   massPointsFull.mstop_lsps   , 'cutInstList':  limitCuts    ,'plotList':plots.plots.keys()  , 'lumi_target' : 10000 }   ,
-            'limits':    {'taskList' : [ 'calc_mva_limit' ]  , 'sigList':  massPoints.sigList , 'massPoints':   massPoints.mstop_lsps   , 'cutInstList':  limitCuts         ,'plotList':plots.plots.keys()                   },
-            'bkg_est':    {'taskList' : [ 'bkg_est' ]  ,         'sigList': plotSignalList    , 'massPoints':   []                      , 'cutInstList':  crCuts            ,'plotList':plots.plots.keys()           , 'data': True        },
+            'limits10fb':    {'taskList' : [ 'calc_sig_limit' ]  , 'sigList':  massPointsFull.sigList , 'massPoints':   massPointsFull.mstop_lsps   , 'cutInstList':  limitCuts    ,'plotList':plots.plots.keys()  , 'lumi_target' : 10000 }   ,
+            'limits':     {'taskList' : [ 'calc_sig_limit' ]  ,  'sigList':  massPointsFull.sigList , 'massPoints':   massPointsFull.mstop_lsps   , 'cutInstList':  limitCuts         ,'plotList':plots.plots.keys()                   },
+            'bkg_est':    {'taskList' : [ 'bkg_est' ]  ,         'sigList': plotSignalList    , 'massPoints':   []                        , 'cutInstList':  crCuts            ,'plotList':plots.plots.keys()           , 'data': True        },
+            'jec_est':    {'taskList' : [ 'bkg_est' ]  ,         'sigList': plotSignalList    , 'massPoints':   []                        , 'cutInstList':  jet_corr_cutinsts ,'plotList':plots.plots.keys()           , 'data': False        },
+
+            #'jec_est1':    {'taskList' : [ 'bkg_est' ]  ,         'sigList': plotSignalList    , 'massPoints':   []                      , 'cutInstList':  jet_corr_cutinsts[0:1],'plotList':plots.plots.keys()           , 'data': False        },
+            'jec_est2':    {'taskList' : [ 'bkg_est' ]  ,         'sigList': plotSignalList    , 'massPoints':   []                      , 'cutInstList':  jet_corr_cutinsts[1:2],'plotList':plots.plots.keys()           , 'data': False        },
+            'jec_est3':    {'taskList' : [ 'bkg_est' ]  ,         'sigList': plotSignalList    , 'massPoints':   []                      , 'cutInstList':  jet_corr_cutinsts[2:3],'plotList':plots.plots.keys()           , 'data': False        },
+            'jec_est4':    {'taskList' : [ 'bkg_est' ]  ,         'sigList': plotSignalList    , 'massPoints':   []                      , 'cutInstList':  jet_corr_cutinsts[3:4],'plotList':plots.plots.keys()           , 'data': False        },
+            'jec_est5':    {'taskList' : [ 'bkg_est' ]  ,         'sigList': plotSignalList    , 'massPoints':   []                      , 'cutInstList':  jet_corr_cutinsts[4:5],'plotList':plots.plots.keys()           , 'data': False        },
+            'jec_est6':    {'taskList' : [ 'bkg_est' ]  ,         'sigList': plotSignalList    , 'massPoints':   []                      , 'cutInstList':  jet_corr_cutinsts[5:6],'plotList':plots.plots.keys()           , 'data': False        },
+            'jec_est7':    {'taskList' : [ 'bkg_est' ]  ,         'sigList': plotSignalList    , 'massPoints':   []                      , 'cutInstList':  jet_corr_cutinsts[6:7],'plotList':plots.plots.keys()           , 'data': False        },
+
+
             'plots':     {'taskList' : [ 'draw_plots'  ]     , 'sigList':  plotSignalList     , 'massPoints':   plotMStopLSPs           , 'cutInstList':  plotCuts[:]       ,'plotList':plots.plots.keys()[:]                },
             'cutflow':   {'taskList' : [ 'cut_flow' ]        , 'sigList':  plotSignalList     , 'massPoints':   plotMStopLSPs           , 'cutInstList':  flowCuts          ,'plotList':plots.plots.keys()[:]             },
             'data':      {'taskList' : [ 'data_plots' ]      , 'sigList':  plotSignalList     , 'massPoints':   plotMStopLSPs           , 'cutInstList':  plotCuts[:]       ,'plotList': plots.plots.keys()[:]   , 'data':True},
-            'limits2':    {'taskList' : [ 'calc_mva_limit' ]  , 'sigList':  massPoints.sigList , 'massPoints':   massPoints.mstop_lsps   , 'cutInstList':  limitCuts        ,'plotList':plots.plots.keys()[:]         , 'data':True},
+            'limits2':    {'taskList' : [ 'calc_sig_limit' ]  , 'sigList':  massPoints.sigList , 'massPoints':   massPoints.mstop_lsps   , 'cutInstList':  limitCuts        ,'plotList':plots.plots.keys()[:]         , 'data':True},
               }
 #task = 'cutflow'
 #task = 'limits10fb'
@@ -114,6 +146,7 @@ tasks_info =  {
 task = getattr( args, "task", "data")
 task_info=tasks_info[task]
 
+sampleList = bkgList + task_info['sigList']
 #ppTag = "74X_postProcessing_v4"
 
 ppSets = [
@@ -163,7 +196,7 @@ lumis=              {
                             "mc_lumi"               :   10000   ,
                             'target_lumi'           :   13000.   ,
                             'DataBlind_lumi'        :   12864.4    ,
-                            'DataUnblind_lumi'      :   804.2   ,
+                            'DataUnblind_lumi'      :   4303.0  ,
                     }
 
 
@@ -241,9 +274,11 @@ weights_params = {
             'pu':        {'lumis':lumis  ,'lepCol':lepCol, 'lep':lep, 'pu':'puReweight'     , 'btag':btag, 'wpt':'', 'ttpt':'', 'isr':''},
             'pu_up':     {'lumis':lumis  ,'lepCol':lepCol, 'lep':lep, 'pu':'puReweight_up'  , 'btag':btag, 'wpt':'', 'ttpt':'', 'isr':''},
             'pu_down':   {'lumis':lumis  ,'lepCol':lepCol, 'lep':lep, 'pu':'puReweight_down', 'btag':btag, 'wpt':'', 'ttpt':'', 'isr':''},
-            'wpt':       {'lumis':lumis  ,'lepCol':lepCol, 'lep':lep, 'pu':''               , 'btag':btag, 'wpt':True, 'ttpt':'', 'isr':''},
-            'pu_wpt':    {'lumis':lumis  ,'lepCol':lepCol, 'lep':lep, 'pu':'puReweight'     , 'btag':btag, 'wpt':True, 'ttpt':'', 'isr':''},
-            'pu_ttpt':   {'lumis':lumis  ,'lepCol':lepCol, 'lep':lep, 'pu':'puReweight'     , 'btag':btag, 'wpt':'', 'ttpt':True, 'isr':''},
+            'wpt':       {'lumis':lumis  ,'lepCol':lepCol, 'lep':lep, 'pu':''               , 'btag':btag, 'wpt':'wpt', 'ttpt':'', 'isr':''},
+            'pu_wpt':    {'lumis':lumis  ,'lepCol':lepCol, 'lep':lep, 'pu':'puReweight'     , 'btag':btag, 'wpt':'wpt', 'ttpt':'', 'isr':''},
+            'pu_2wpt':    {'lumis':lumis  ,'lepCol':lepCol, 'lep':lep, 'pu':'puReweight'    , 'btag':btag, 'wpt':'2wpt', 'ttpt':'', 'isr':''},
+            'pu_ttpt':   {'lumis':lumis  ,'lepCol':lepCol, 'lep':lep, 'pu':'puReweight'     , 'btag':btag, 'wpt':'', 'ttpt':'ttpt', 'isr':''},
+            'pu_2ttpt':   {'lumis':lumis  ,'lepCol':lepCol, 'lep':lep, 'pu':'puReweight'    , 'btag':btag, 'wpt':'', 'ttpt':'2ttpt', 'isr':''},
           }
 
 
@@ -275,7 +310,7 @@ cfg = TaskConfig(
                    plots          =  plots.plots         , 
                    plotList       =  plotList, 
                    nminus1s       =  plots.nminus1s, 
-                   calc_mva_limit =  cfgFunctions.calc_mva_limit , 
+                   calc_sig_limit =  cfgFunctions.calc_sig_limit , 
                    cut_flow       =  cfgFunctions.cut_flow       ,
                    data_plots     =  cfgFunctions.data_plots , 
                    bkg_est        =  cfgFunctions.bkg_est , 
@@ -305,7 +340,9 @@ cfg = TaskConfig(
                 )
 
 cfg.cuts = cuts
+cfg.cutvars = cutvars
 
+cfg.jet_corr_srs = jet_corr_srs
 
 print "............................................"
 print ""

@@ -215,7 +215,7 @@ def bdt_eff(cfg, args):
 
 
 
-def calc_mva_limit(cfg, args):
+def calc_sig_limit(cfg, args):
 
     yields={}
     signalList = getattr(cfg, "signalList", cfg.samples.massScanList() )
@@ -309,10 +309,10 @@ def calc_mva_limit(cfg, args):
                 pickle.dump( yields[cut_name], open(yield_pkl,'w') )
                 print "Yield pickle dumped: %s"%yield_pkl
                 JinjaTexTable( yields[cut_name], pdfDir = tableDir, caption="" , transpose=True)
-            #sigs = ['s300_290' , 's300_270','s300_220']
+            sigs = ['s300_290' , 's300_270','s300_220']
             #sigs = [ 'S300-260Fast' , 'S300-270Fast' , 'S300-290Fast' , 'S300-270' ]
-            sigs = ['s10FS', 's30FS', 's60FS' , 's30'] 
-            yldplts = drawYields( "BkgComposition_" +cut_name , cfg.yieldPkls[cut_name] , sampleList = cfg.bkgList  + sigs  , keys=[] , ratios=True , save= cfg.saveDirs[cut_name], plotMax = 1 )
+            #sigs = ['s10FS', 's30FS', 's60FS' , 's30'] 
+            yldplts = drawYields( "BkgComposition_" +cut_name , cfg.yieldPkls[cut_name] , sampleList = cfg.bkgList  , keys=[] , ratios=True , save= cfg.saveDirs[cut_name], plotMax = 1 )
     
             def makeSignalCard(sig):
                 lim =  limitTools.getLimit(
@@ -420,7 +420,13 @@ def bkg_est(cfg, args):
         else:
             raise Exception("not sure which dataset to use!")
 
-        lumi = cfg.samples[dataList[0]].name +"_lumi"
+
+        if dataList[0] in cfg.samples.dataList():
+            lumi = cfg.samples[dataList[0]].name +"_lumi"
+        else:
+            dataList = []
+            lumi = "DataUnblind_lumi" # or "target_lumi"
+            
         tableDir = cfg.tableDirs[cut_name]
         yield_pkl= cfg.yieldPkls[cut_name]
         cutSaveDir = cfg.saveDirs[cut_name]
@@ -440,11 +446,15 @@ def bkg_est(cfg, args):
 
         #yield_pkl   =   getattr(cfg, "yield_pkl", cfg.yield_pkl  )  ##huh?
         if os.path.isfile(yield_pkl) and not redo_yields:
-                print "reading Yields from pickle: %s"%yield_pkl
+                print "\n reading Yields from pickle: %s \n"%yield_pkl
                 yields[cut_name] = pickle.load(file(yield_pkl)) 
+                redo_plots_tables = False
         else:
+            print "\n Will (re)create yields and pickle to: %s \n"%yield_pkl
+            
             if not isMVASample:
                 setEventListToChains(cfg.samples, sampleList , cutInst.baseCut, opt=redo_eventLists )
+            redo_plots_tables = True
             makeDir(yield_pkl)
             yields[cut_name]=Yields(     
                                         cfg.samples, 
@@ -464,62 +474,70 @@ def bkg_est(cfg, args):
             print "Yield pickle dumped: %s"%yield_pkl
 
 
-
-        pp.pprint(      yields[cut_name].cut_weights  ,       open( cutSaveDir +"/cuts_weights.txt" ,"w"), width = 100, indent = 4 )
-        pickle.dump(    yields[cut_name].cut_weights ,        open( cutSaveDir +"/cuts_weights.pkl" ,"w") )
-
-
+        if redo_plots_tables:
+            pp.pprint(      yields[cut_name].cut_weights  ,       open( cutSaveDir +"/cuts_weights.txt" ,"w"), width = 100, indent = 4 )
+            pickle.dump(    yields[cut_name].cut_weights ,        open( cutSaveDir +"/cuts_weights.pkl" ,"w") )
 
 
-        combineBkgs = [ ["DYJetsM50", "ZJetsInv", "QCD","ST","Diboson"] , "Other" ] 
-        seperators = ["DataBlind", "Total"]
-        JinjaTexTable( yields[cut_name], pdfDir = tableDir, caption="" , transpose=True)
-        JinjaTexTable( yields[cut_name], pdfDir = tableDir, outputName = yields[cut_name].tableName+"_T.tex", caption="" , noFOM=True, transpose=False, seperators = seperators)
-        JinjaTexTable( yields[cut_name], pdfDir = tableDir, outputName = yields[cut_name].tableName+"_CombinedBKG.tex", caption="" , noFOM=True, transpose=True , combineBkgs = combineBkgs)
-        JinjaTexTable( yields[cut_name], pdfDir = tableDir, outputName = yields[cut_name].tableName+"_CombinedBKG_T.tex", caption="" , noFOM=True, transpose=False, combineBkgs = combineBkgs      , seperators = seperators)
-        JinjaTexTable( yields[cut_name], pdfDir = tableDir, outputName = yields[cut_name].tableName+"FOM_CombinedBKG_T.tex", caption="" , noFOM=False, transpose=False , combineBkgs = combineBkgs , seperators = seperators)
-        #drawYields( cut_name , cfg.yieldPkls[cut_name] , sampleList = cfg.bkgList  + ['s300_290' , 's300_270','s300_220'] , keys=[] , ratios=True , save= cfg.cutSaveDirs[cut_name] )
-        
-        yldplts = {}
-
-        yldplts[1] = drawYields("BkgComp_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList , ratios= False, save=cfg.saveDirs[cut_name], normalize = True, logs = [0,0], plotMin=0, plotMax = 1.)
-        yldplts[2] = drawYields("BkgVsData_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList + dataList, ratios= True, save=cfg.saveDirs[cut_name], normalize = False, logs = [0,0], plotMin=0)
-        yldplts[3] = drawYields("BkgVsData_log_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList + dataList, ratios= True, save=cfg.saveDirs[cut_name], normalize = False, logs = [0,1], plotMin=0.1)
-
-        if cfg.signalList:
-            yldplts[4] = drawYields("BkgVsSig_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList + cfg.signalList, ratios= True, save=cfg.saveDirs[cut_name], normalize = False, logs = [0,1], plotMin=0.1)
-            yldplts[5] = drawYields("BksVsDataVsSignal_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList + dataList + cfg.signalList , ratios= True, save=cfg.saveDirs[cut_name], normalize = False, logs = [0,1], plotMin=0.1)
-
-        crbins = [x for x in yields[cut_name].cutNames if 'ECR' in x]
-
-        yldplts[6] = drawYields("BkgVsData_ECR_log_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList + dataList, keys=crbins, ratios= True, save=cfg.saveDirs[cut_name], normalize = False, logs = [0,1], plotMin=0.1)
-
-        #yldplts = [ yldplt1,yldplt2, yldplt3, yldplt4, yldplt5, yldplt6 ]
 
 
-        yld = yields[cut_name] 
-        yld.verbose = False
-        print "\n Latex Table: \n"
-        print yld.makeLatexTable( yld.makeNumpyFromDict( yld.yieldDictFull , rowList = list( reversed( cfg.bkgList ) )   + ['Total']+ dataList ) )
-        print "\n Transvered: \n "
-        print yld.makeLatexTable( yld.makeNumpyFromDict( yld.yieldDictFull , rowList = list( reversed( cfg.bkgList ) )   + ['Total']+ dataList ).T )
+            combineBkgs = [ ["DYJetsM50", "ZJetsInv", "QCD","ST","Diboson"] , "Other" ] 
+            seperators = ["DataBlind", "Total"]
+            JinjaTexTable( yields[cut_name], pdfDir = tableDir, caption="" , transpose=True)
+            JinjaTexTable( yields[cut_name], pdfDir = tableDir, outputName = yields[cut_name].tableName+"_T.tex", caption="" , noFOM=True, transpose=False, seperators = seperators)
+            JinjaTexTable( yields[cut_name], pdfDir = tableDir, outputName = yields[cut_name].tableName+"_CombinedBKG.tex", caption="" , noFOM=True, transpose=True , combineBkgs = combineBkgs)
+            JinjaTexTable( yields[cut_name], pdfDir = tableDir, outputName = yields[cut_name].tableName+"_CombinedBKG_T.tex", caption="" , noFOM=True, transpose=False, combineBkgs = combineBkgs      , seperators = seperators)
+            JinjaTexTable( yields[cut_name], pdfDir = tableDir, outputName = yields[cut_name].tableName+"FOM_CombinedBKG_T.tex", caption="" , noFOM=False, transpose=False , combineBkgs = combineBkgs , seperators = seperators)
+            #drawYields( cut_name , cfg.yieldPkls[cut_name] , sampleList = cfg.bkgList  + ['s300_290' , 's300_270','s300_220'] , keys=[] , ratios=True , save= cfg.cutSaveDirs[cut_name] )
+            
+            yldplts = {}
+
+            yldplts[1] = drawYields("BkgComp_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList , ratios= False, save=cfg.saveDirs[cut_name], normalize = True, logs = [0,0], plotMin=0, plotMax = 1.)
+            yldplts[2] = drawYields("BkgVsData_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList + dataList, ratios= True, save=cfg.saveDirs[cut_name], normalize = False, logs = [0,0], plotMin=0)
+            yldplts[3] = drawYields("BkgVsData_log_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList + dataList, ratios= True, save=cfg.saveDirs[cut_name], normalize = False, logs = [0,1], plotMin=0.1)
+
+            if cfg.signalList:
+                yldplts[4] = drawYields("BkgVsSig_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList + cfg.signalList, ratios= True, save=cfg.saveDirs[cut_name], normalize = False, logs = [0,1], plotMin=0.1)
+                yldplts[5] = drawYields("BksVsDataVsSignal_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList + dataList + cfg.signalList , ratios= True, save=cfg.saveDirs[cut_name], normalize = False, logs = [0,1], plotMin=0.1)
+
+            crbins = [x for x in yields[cut_name].cutNames if 'ECR' in x]
+
+            yldplts[6] = drawYields("BkgVsData_ECR_log_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList + dataList, keys=crbins, ratios= True, save=cfg.saveDirs[cut_name], normalize = False, logs = [0,1], plotMin=0.1)
+
+            #yldplts = [ yldplt1,yldplt2, yldplt3, yldplt4, yldplt5, yldplt6 ]
 
 
-        other = dict_operator( yld.yieldDictFull , keys = [ bkg for bkg in cfg.bkgList if bkg not in ['tt','w']] , func = yield_adder_func2 )
-        yld.yieldDictFull['Other'] = other
-        print "\n Other BKG combined: \n "
-        print yld.makeLatexTable( yld.makeNumpyFromDict( yld.yieldDictFull , rowList = ['w','tt','Other','Total']+ dataList ) )
-        print "\n Transvered: \n "
-        print yld.makeLatexTable( yld.makeNumpyFromDict( yld.yieldDictFull , rowList = ['w','tt','Other','Total']+ dataList ).T )
+            yld = yields[cut_name] 
+            yld.verbose = False
+            print "\n Latex Table: \n"
+            print yld.makeLatexTable( yld.makeNumpyFromDict( yld.yieldDictFull , rowList = list( reversed( cfg.bkgList ) )   + ['Total']+ dataList ) )
+            print "\n Transvered: \n "
+            print yld.makeLatexTable( yld.makeNumpyFromDict( yld.yieldDictFull , rowList = list( reversed( cfg.bkgList ) )   + ['Total']+ dataList ).T )
 
 
-        tmp_ = yld.yieldDictFull.pop("Other")
+            other = dict_operator( yld.yieldDictFull , keys = [ bkg for bkg in cfg.bkgList if bkg not in ['tt','w']] , func = yield_adder_func2 )
+            yld.yieldDictFull['Other'] = other
+            print "\n Other BKG combined: \n "
+            print yld.makeLatexTable( yld.makeNumpyFromDict( yld.yieldDictFull , rowList = ['w','tt','Other','Total']+ dataList ) )
+            print "\n Transvered: \n "
+            print yld.makeLatexTable( yld.makeNumpyFromDict( yld.yieldDictFull , rowList = ['w','tt','Other','Total']+ dataList ).T )
 
 
-        #yldplts
+            tmp_ = yld.yieldDictFull.pop("Other")
+        else:
+            yldplts = []
+
+            #yldplts
     
     return yields, yldplts
 
+
+
+
+def pu_syst(cfg, args):
+    #for weight in pu_weights():
+    #    pass    
+    return 
 
 
 
