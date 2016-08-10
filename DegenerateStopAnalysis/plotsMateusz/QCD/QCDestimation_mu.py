@@ -346,8 +346,8 @@ if plot:
          
       #setEventListToChains(samples, samplesList, QCD[plotReg][sel])
       
-      plotsList[sel] = ["hybIso2_" + sel, "absDxy_" + sel, "delPhi_" + sel, "weight_" + sel]
-      #plotsList[sel] = ["muPt_" + sel, "absIso_" + sel, "relIso_" + sel,"hybIso_" + sel, "hybIso2_" + sel, "absDxy_" + sel, "delPhi_" + sel, "muMt_" + sel, "MET_" + sel, "HT_" + sel, "weight_" + sel]
+      #plotsList[sel] = ["hybIso2_" + sel, "absDxy_" + sel, "delPhi_" + sel, "weight_" + sel]
+      plotsList[sel] = ["muPt_" + sel, "absIso_" + sel, "relIso_" + sel,"hybIso_" + sel, "hybIso2_" + sel, "absDxy_" + sel, "delPhi_" + sel, "muMt_" + sel, "MET_" + sel, "HT_" + sel, "weight_" + sel]
       plotsDict[sel] = Plots(**plotDict[sel])
       plots[sel] = getPlots(samples, plotsDict[sel], QCD[plotReg][sel], samplesList, plotList = plotsList[sel], addOverFlowBin='upper')
       if getData: plots2[sel] = drawPlots(samples, plotsDict[sel], QCD[plotReg][sel], samplesList, plotList = plotsList[sel], denoms=["bkg"], noms = ["dblind"], fom="RATIO", fomLimits=[0,1.8], plotMin = 1, normalize = False, save=False)

@@ -4,8 +4,8 @@ import argparse
 import sys
 from Workspace.HEPHYPythonTools.helpers import getYieldFromChain # getChain, getPlotFromChain, getChunks
 from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import makeLine, makeDoubleLine
-#from Workspace.DegenerateStopAnalysis.samples.cmgTuples.RunIISpring16MiniAODv2_v1 import * #including sample_path and allComponents TODO: automatically get dir from here 
-#from Workspace.DegenerateStopAnalysis.samples.cmgTuples.Data2016_v1_1 import *  #including sample_path [and sample_path_8012 for Run2016D] and allComponents TODO: automatically get dir from here
+from Workspace.DegenerateStopAnalysis.samples.cmgTuples.RunIISpring16MiniAODv2_v1 import sample_path as mc_sample_path #including sample_path and allComponents TODO: automatically get dir from here 
+from Workspace.DegenerateStopAnalysis.samples.cmgTuples.Data2016_v1_1 import sample_path as data_sample_path  #including sample_path [and sample_path_8012 for Run2016D] and allComponents TODO: automatically get dir from here
 from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesPostProcessed_mAODv2_2016 import cmgTuplesPostProcessed
 from Workspace.DegenerateStopAnalysis.tools.getSamples_8011 import getSamples
 
@@ -40,6 +40,8 @@ cmgPP = cmgTuplesPostProcessed(mc_path, signal_path, data_path)
 samplesList = ["dy"]#, "vv", "st", "z", "dy", "w"] #"tt" is more complicated with lheHT skims 
 
 samples = getSamples(cmgPP = cmgPP, skim = skim, sampleList = samplesList, scan = False, useHT = True, getData = getData)
+
+samplesList = ["dy5to50"]
 
 if skim == "preIncLep": 
     # branches for preselection (scalars or vectors) must be included in readVar or readVectors
