@@ -12,7 +12,7 @@ from Workspace.HEPHYPythonTools import u_float
 #Sets TDR style
 setup_style()
 
-filename = "/afs/hephy.at/user/m/mzarucki/www/plots/Zinv/old/SR1/ZinvRatios_peak.txt"
+filename = "/afs/hephy.at/user/m/mzarucki/www/plots/Zinv/SR1/ZinvRatios_peak.txt"
 
 #def my_range(start, end, step):
 #    while start <= end:
