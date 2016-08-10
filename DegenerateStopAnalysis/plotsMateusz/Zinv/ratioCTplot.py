@@ -23,7 +23,7 @@ filename = "/afs/hephy.at/user/m/mzarucki/www/plots/Zinv/SR1/ZinvRatios_peak.txt
 #       'prob_el_dataMC' = [], 'prob_el_dataMC_err' = [],
 #       'prob_mu_dataMC' = [], 'prob_mu_dataMC_err' = []}
 
-ratios = {'CT75':{}, 'CT100':{}, 'CT125':{}, 'CT150':{}, 'CT300':{}}
+ratios = {'CT75':{}, 'CT100':{}, 'CT125':{}, 'CT150':{}, 'CT175':{}, 'CT200':{}, 'CT250':{}, 'CT300':{}}
 
 buffer = []
 
@@ -59,8 +59,8 @@ prob_mu = {}
 for CT in ratios:
    prob_el[CT] = u_float.u_float(ratios['CT300']['Zpeak_dataMC'], ratios['CT300']['Zpeak_dataMC_err'])*u_float.u_float(ratios[CT]['prob_el_dataMC'], ratios[CT]['prob_el_dataMC_err'])
    prob_mu[CT] = u_float.u_float(ratios['CT300']['Zpeak_dataMC'], ratios['CT300']['Zpeak_dataMC_err'])*u_float.u_float(ratios[CT]['prob_mu_dataMC'], ratios[CT]['prob_mu_dataMC_err'])
-   #print prob_el[CT]
-   #print prob_mu[CT]
+   print "CT", CT, " Prob el: ", prob_el[CT]
+   print "CT", CT, " Prob mu: ", prob_mu[CT]
 
 #arrays for plot
 CT_arr = []
@@ -94,16 +94,16 @@ gr1.SetTitle("Z_{inv} Correction Factors for N_{\nu\nu l}^{ MC}  as a Function C
 gr1.SetMarkerColor(ROOT.kBlue)
 gr1.SetMarkerStyle(ROOT.kFullCircle)
 gr1.SetMarkerSize(1)
-gr1.GetXaxis().SetTitle("C_{T2} = min(emulated MET, HT - 100)")
-gr1.GetYaxis().SetTitle("R_{\mu\mu}*R_{\mu\mu l/\mu\mu}")
+gr1.GetXaxis().SetTitle("C_{T}' = min(emulated MET, HT - 100)")
+gr1.GetYaxis().SetTitle("R_{\mu\mu l} = R_{\mu\mu}*R_{\mu\mu l/\mu\mu}")
 gr1.GetXaxis().CenterTitle()
 gr1.GetYaxis().CenterTitle()
 gr1.GetXaxis().SetTitleSize(0.04)
 gr1.GetYaxis().SetTitleSize(0.04)
 gr1.GetXaxis().SetTitleOffset(1.4)
 gr1.GetYaxis().SetTitleOffset(1.6)
-gr1.SetMinimum(0.5)
-gr1.SetMaximum(1.4)
+gr1.SetMinimum(0)
+gr1.SetMaximum(2)
 
 #for x in range(len(cuts)/2):
 #   print x
@@ -130,16 +130,16 @@ gr2.SetMarkerSize(1)
 
 gr2.Draw("Psame") #plots the graph with axes and points
 
-l1 = makeLegend2()
-l1.AddEntry(gr1, "Electron Channel", "P")
-l1.AddEntry(gr2, "Muon Channel", "P")
-l1.Draw() 
+leg = ROOT.TLegend(0.25, 0.2, 0.5, 0.35) #x1,y1,x2,y2
+leg .AddEntry(gr1, "Electron Channel", "P")
+leg .AddEntry(gr2, "Muon Channel", "P")
+leg .Draw() 
 #Save to Web
 savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/Zinv"
 
 if not os.path.exists(savedir):
       os.makedirs(savedir)
 
-c1.SaveAs(savedir + "ratioCTplot.png")
-c1.SaveAs(savedir + "ratioCTplot.pdf")
-c1.SaveAs(savedir + "ratioCTplot.root")
+c1.SaveAs(savedir + "/ratioCTplot.png")
+c1.SaveAs(savedir + "/ratioCTplot.pdf")
+c1.SaveAs(savedir + "/ratioCTplot.root")

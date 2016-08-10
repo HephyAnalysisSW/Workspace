@@ -64,7 +64,7 @@ print makeDoubleLine()
 
 #Samples
 cmgPP = cmgTuplesPostProcessed()
-samplesList = ["vv", "tt", "dy"] #"qcd", "w", "z", "st" 
+samplesList = ["vv", "tt", "dy5to50", "dy"] #"qcd", "w", "z", "st" 
 if getData: samplesList.append("d1muBlind")
 
 samples = getSamples(cmgPP = cmgPP, skim = 'oneLep', sampleList = samplesList, scan = False, useHT = True, getData = getData) 
@@ -224,9 +224,6 @@ muons = CutClass("muons", [
 
 #Sets event list      
 setEventListToChains(samples, samplesList, dimuon)
-
-#adding low mt dy sample
-samplesList.append("dy5to50")
 
 yields = {}
 if doYields and peak:
