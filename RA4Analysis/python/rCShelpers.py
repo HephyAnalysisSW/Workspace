@@ -1,6 +1,8 @@
 import ROOT
 import pickle
 from Workspace.HEPHYPythonTools.helpers import *# getChain, getPlotFromChain, getYieldFromChain
+from Workspace.HEPHYPythonTools.asym_float import *
+
 from Workspace.RA4Analysis.helpers import *#nameAndCut, nJetBinName, nBTagBinName, varBinName
 from math import sqrt, pi, cosh
 from array import array
@@ -100,6 +102,32 @@ def getRCS(c, cut, dPhiCut, useGenMet=False, useAllGen=False, useOnlyGenMetPt=Fa
     r.update({'num':h.GetBinContent(2), 'numE':h.GetBinError(2), 'denom':h.GetBinContent(1), 'denomE':h.GetBinError(1)})
   del h
   return r
+
+def getRCSasym(c, cut, dPhiCut, useWeight = True, weight='weight', QCD_lowDPhi=asym_float(0.,0.), QCD_highDPhi=asym_float(0.,0.), cutVar='deltaPhi_Wl', varMax=pi, returnValues=False, avoidNan=False, isData=False):
+  dPhiStr = cutVar
+  if useWeight and not isData:
+    h = getPlotFromChain(c, dPhiStr, [0,dPhiCut,varMax], cutString=cut, binningIsExplicit=True, weight=weight)
+  else:
+    h = getPlotFromChain(c, dPhiStr, [0,dPhiCut,varMax], cutString=cut, binningIsExplicit=True, weight='1')
+  h.Sumw2()
+  #print 'Subtraction in Rcs calculation'
+  #print QCD_highDPhi
+  #print QCD_lowDPhi
+  
+  if isData:
+    yHigh = asym_float(int(h.GetBinContent(2)), forcePoisson=True)
+    yLow  = asym_float(int(h.GetBinContent(1)), forcePoisson=True)
+    #print 'Rcs value for data with the following yields and uncertainties'
+    #print yHigh
+    #print yLow
+  else:
+    yHigh = asym_float(h.GetBinContent(2), h.GetBinError(2), h.GetBinError(2))
+    yLow  = asym_float(h.GetBinContent(1), h.GetBinError(1), h.GetBinError(1))
+  if (yLow-QCD_lowDPhi)>0:
+    rcs = (yHigh - QCD_highDPhi) / (yLow - QCD_lowDPhi)
+  else: rcs = asym_float(float('nan'),float('nan'))
+  del h
+  return rcs
 
 #get Rcs value with event loop
 def getRCSel(c, cut, dPhiCut, dPhiMetJet=0.45):

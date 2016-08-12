@@ -1,6 +1,8 @@
 import ROOT
 from Workspace.HEPHYPythonTools.helpers import getVarValue, findClosestObject, deltaPhi, deltaR, deltaR2, getObjDict
 from math import cos, sin, sqrt, acos, pi, atan2, cosh
+import contextlib
+import sys
 
 
 # h_1200_800  = kBlack
@@ -262,6 +264,16 @@ def binToFileName(a):
     if len(njetb)>1 and njetb[1]>=0:
       cut+='&&nJet30<='+str(njetb[1])
       name+='-'+str(njetb[1])
+
+class DummyFile(object):
+    def write(self, x): pass
+
+@contextlib.contextmanager
+def nostdout():
+    save_stdout = sys.stdout
+    sys.stdout = DummyFile()
+    yield
+    sys.stdout = save_stdout
 
 #def wRecoPt(chain):
 #  lPt = getVarValue(chain, "leptonPt")
