@@ -9,7 +9,7 @@ usage: ./calc_cards_limit.py "../cutbased/cards/reload_scan_2200pbm1/Reload_Inc_
 import glob
 import os 
 
-from Workspace.DegenerateStopAnalysis.tools.limitCalc import  getLimit, plotLimits, calcLimitFromCard
+#from Workspace.DegenerateStopAnalysis.tools.limitTools import  getLimit, plotLimits, calcLimitFromCard
 
 import pickle
 import json

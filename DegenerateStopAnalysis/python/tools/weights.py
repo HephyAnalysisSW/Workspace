@@ -39,32 +39,37 @@ class Weights():
         lep     = lep 
         lepIndex = "Index{lepCol}_{Lep}".format(lepCol=lepCol, Lep=lep)
 
-
-        if wpt:
-            if wpt=='2wpt':
-                wpt = "(2*sqrt(({lepCol}_pt[max(0,{lepIndex}[0])]*cos({lepCol}_phi[max(0,{lepIndex}[0])]) + met_pt*cos(met_phi) ) **2 + ( {lepCol}_pt[max(0,{lepIndex}[0])]*sin({lepCol}_phi[max(0,{lepIndex}[0])])+met_pt*sin(met_phi) )^2 ))".format(lepCol = lepCol , lepIndex = lepIndex, Lep=lep)
+        wptOpt = wpt
+        if wptOpt:
+            print wptOpt
+            if wptOpt=='2wpt':
+                wptweight_a_template = "(({wpt}<200)*1.+({wpt}>200&&{wpt}<250)*(2*1.008-1)+({wpt}>250&&{wpt}<350)*(2*1.063-1)+({wpt}>350&&{wpt}<450)*(2*0.992-1)+({wpt}>450&&{wpt}<650)*(2*0.847-1)+({wpt}>650&&{wpt}<800)*(2*0.726-1)+({wpt}>800)*(2*0.649-1))"
+                wptweight_p_template = "(({wpt}<200)*1.+({wpt}>200&&{wpt}<250)*(2*1.016-1)+({wpt}>250&&{wpt}<350)*(2*1.028-1)+({wpt}>350&&{wpt}<450)*(2*0.991-1)+({wpt}>450&&{wpt}<650)*(2*0.842-1)+({wpt}>650&&{wpt}<800)*(2*0.749-1)+({wpt}>800)*(2*0.704-1))"
+                wptweight_n_template = "(({wpt}<200)*1.+({wpt}>200&&{wpt}<250)*(2*0.997-1)+({wpt}>250&&{wpt}<350)*(2*1.129-1)+({wpt}>350&&{wpt}<450)*(2*1.003-1)+({wpt}>450&&{wpt}<650)*(2*0.870-1)+({wpt}>650&&{wpt}<800)*(2*0.687-1)+({wpt}>800)*(2*0.522-1))"
             else:
-                wpt = "(sqrt(({lepCol}_pt[max(0,{lepIndex}[0])]*cos({lepCol}_phi[max(0,{lepIndex}[0])]) + met_pt*cos(met_phi) ) **2 + ( {lepCol}_pt[max(0,{lepIndex}[0])]*sin({lepCol}_phi[max(0,{lepIndex}[0])])+met_pt*sin(met_phi) )^2 ))".format(lepCol = lepCol , lepIndex = lepIndex, Lep=lep)
+                wptweight_a_template = "(({wpt}<200)*1.+({wpt}>200&&{wpt}<250)*1.008+({wpt}>250&&{wpt}<350)*1.063+({wpt}>350&&{wpt}<450)*0.992+({wpt}>450&&{wpt}<650)*0.847+({wpt}>650&&{wpt}<800)*0.726+({wpt}>800)*0.649)"
+                wptweight_p_template = "(({wpt}<200)*1.+({wpt}>200&&{wpt}<250)*1.016+({wpt}>250&&{wpt}<350)*1.028+({wpt}>350&&{wpt}<450)*0.991+({wpt}>450&&{wpt}<650)*0.842+({wpt}>650&&{wpt}<800)*0.749+({wpt}>800)*0.704)"
+                wptweight_n_template = "(({wpt}<200)*1.+({wpt}>200&&{wpt}<250)*0.997+({wpt}>250&&{wpt}<350)*1.129+({wpt}>350&&{wpt}<450)*1.003+({wpt}>450&&{wpt}<650)*0.870+({wpt}>650&&{wpt}<800)*0.687+({wpt}>800)*0.522)"
 
-            wptweight_a_template = "(({wpt}<200)*1.+({wpt}>200&&{wpt}<250)*1.008+({wpt}>250&&{wpt}<350)*1.063+({wpt}>350&&{wpt}<450)*0.992+({wpt}>450&&{wpt}<650)*0.847+({wpt}>650&&{wpt}<800)*0.726+({wpt}>800)*0.649)"
-            wptweight_p_template = "(({wpt}<200)*1.+({wpt}>200&&{wpt}<250)*1.016+({wpt}>250&&{wpt}<350)*1.028+({wpt}>350&&{wpt}<450)*0.991+({wpt}>450&&{wpt}<650)*0.842+({wpt}>650&&{wpt}<800)*0.749+({wpt}>800)*0.704)"
-            wptweight_n_template = "(({wpt}<200)*1.+({wpt}>200&&{wpt}<250)*0.997+({wpt}>250&&{wpt}<350)*1.129+({wpt}>350&&{wpt}<450)*1.003+({wpt}>450&&{wpt}<650)*0.870+({wpt}>650&&{wpt}<800)*0.687+({wpt}>800)*0.522)"
+            wpt = "(sqrt(({lepCol}_pt[max(0,{lepIndex}[0])]*cos({lepCol}_phi[max(0,{lepIndex}[0])]) + met_pt*cos(met_phi) ) **2 + ( {lepCol}_pt[max(0,{lepIndex}[0])]*sin({lepCol}_phi[max(0,{lepIndex}[0])])+met_pt*sin(met_phi) )^2 ))".format(lepCol = lepCol , lepIndex = lepIndex, Lep=lep)
             wptweight_a = wptweight_a_template.format(wpt=wpt)
             wptweight_n = wptweight_n_template.format(wpt=wpt)
             wptweight_p = wptweight_p_template.format(wpt=wpt)
 
-
             weightDict.update({
                      "w": {
                             "cuts":{ 
-                                        "neg_mu":      (wptweight_n  , lambda x: re.match( "n{lepCol}_{lep}==1".format(lepCol=lepCol, lep=lep), x ) and re.match( ".*{lepCol}_pdgId\[{lepIndex}\[0\]\]==-13.*".format(lepCol=lepCol, lepIndex=lepIndex) , x )  ),   ## cut_finder tries to match to the cutstring
-                                        "pos_mu":      (wptweight_p  , lambda x: re.match( "n{lepCol}_{lep}==1".format(lepCol=lepCol, lep=lep), x ) and re.match( ".*{lepCol}_pdgId\[{lepIndex}\[0\]\]==13.*".format(lepCol=lepCol, lepIndex=lepIndex) , x  )  ),
-                                        "mixed_mu":    (wptweight_a  , lambda x: re.match( "n{lepCol}_{lep}==1".format(lepCol=lepCol, lep=lep), x ) and not ( re.match( ".*{lepCol}_pdgId\[{lepIndex}\[0\]\]==13.*".format(lepCol=lepCol, lepIndex=lepIndex) , x  ) or re.match( ".*{lepCol}_pdgId\[{lepIndex}\[0\]\]==13.*".format(lepCol=lepCol, lepIndex=lepIndex) , x  ) ) ),
+                                        #"neg_mu":      (wptweight_n  , lambda x: re.match( "n{lepCol}_{lep}==1".format(lepCol=lepCol, lep=lep), x ) and re.match( ".*{lepCol}_pdgId\[{lepIndex}\[0\]\]==-13.*".format(lepCol=lepCol, lepIndex=lepIndex) , x )  ),   ## cut_finder tries to match to the cutstring
+                                        #"pos_mu":      (wptweight_p  , lambda x: re.match( "n{lepCol}_{lep}==1".format(lepCol=lepCol, lep=lep), x ) and re.match( ".*{lepCol}_pdgId\[{lepIndex}\[0\]\]==13.*".format(lepCol=lepCol, lepIndex=lepIndex) , x  )  ),
+                                        #"mixed_mu":    (wptweight_a  , lambda x: re.match( "n{lepCol}_{lep}==1".format(lepCol=lepCol, lep=lep), x ) and not ( re.match( ".*{lepCol}_pdgId\[{lepIndex}\[0\]\]==13.*".format(lepCol=lepCol, lepIndex=lepIndex) , x  ) or re.match( ".*{lepCol}_pdgId\[{lepIndex}\[0\]\]==13.*".format(lepCol=lepCol, lepIndex=lepIndex) , x  ) ) ),
+                                        "neg_mu":      (wptweight_n  , lambda x:  ("n{lepCol}_{lep}==1".format(lepCol=lepCol, lep=lep) in x) and ( "{lepCol}_pdgId[{lepIndex}[0]]==13".format(lepCol=lepCol, lepIndex=lepIndex) in x ) )  ,   ## cut_finder tries to match to the cutstring
+                                        "pos_mu":      (wptweight_p  , lambda x: ( "n{lepCol}_{lep}==1".format(lepCol=lepCol, lep=lep) in x ) and ( "{lepCol}_pdgId[{lepIndex}[0]]==-13".format(lepCol=lepCol, lepIndex=lepIndex)  in x )),
+                                        "mixed_mu":    ( wptweight_a  , lambda x: ( "n{lepCol}_{lep}==1".format(lepCol=lepCol, lep=lep) in x ) and not ( ( "{lepCol}_pdgId[{lepIndex}[0]]==13".format(lepCol=lepCol, lepIndex=lepIndex) in x  ) or ( "{lepCol}_pdgId[{lepIndex}[0]]==13".format(lepCol=lepCol, lepIndex=lepIndex) in x  ) )) ,
                                    }
                            }})
         if ttpt:
             if ttpt=='2ttpt':
-                ttptweight = "2.0*1.24*exp(0.156-0.5*0.00137*({top1pt}+{top2pt}))".format(top1pt="Max$(GenPart_pt*(GenPart_pdgId==6))" , top2pt="Max$(GenPart_pt*(GenPart_pdgId==-6))")
+                ttptweight = "(1.24)*exp(0.156-0.5*0.00137*({top1pt}+{top2pt}))".format(top1pt="Max$(GenPart_pt*(GenPart_pdgId==6))" , top2pt="Max$(GenPart_pt*(GenPart_pdgId==-6))")
             else:
                 ttptweight = "1.24*exp(0.156-0.5*0.00137*({top1pt}+{top2pt}))".format(top1pt="Max$(GenPart_pt*(GenPart_pdgId==6))" , top2pt="Max$(GenPart_pt*(GenPart_pdgId==-6))")
             weightDict['tt'] = {

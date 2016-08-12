@@ -36,6 +36,7 @@ massPointsFull = MassPoints(dmOpt, (250,801,25))
 
 
 bkgList = [ 'vv',  'qcd', 'st', 'z','dy', 'tt', 'w' ]
+#bkgList = [  'w' ]
 #bkgList = [ 'vv', 'qcd', 'st', 'dy', 'tt', 'w'  ]
 #sigList = ['s60FS', 's30FS', 's10FS' , 's30']
 sigList = ['s300_270','s300_220', 's300_290']
@@ -95,9 +96,11 @@ jet_corr_srs={}
 jet_corr_cuts={}
 for jet_corr in jet_corrs:
     jet_corr_cuts[jet_corr] = CutVars( lepCol, lep, sr1c_opt = sr1c_opt, isrpt=100, btag = btag , jc = jet_corr)
-    jet_corr_srs[jet_corr]  = jet_corr_cuts[jet_corr].srs_ptbin_sum
+    #jet_corr_srs[jet_corr]  = jet_corr_cuts[jet_corr].srs_ptbin_sum
+    jet_corr_srs[jet_corr]  = jet_corr_cuts[jet_corr].bins_sum
+jet_corr_srs['central'] = cuts.bins_sum
 
-jet_corr_srs['central'] = cuts.srs_ptbin_sum
+#jet_corr_srs['central'] = cuts.srs_ptbin_sum
 
 jet_corr_cutinsts = [ x for x in jet_corr_srs.itervalues()]
 
@@ -119,11 +122,11 @@ crCuts = [ cuts.crs ]
 
 tasks_info =  {
             'limits10fb':    {'taskList' : [ 'calc_sig_limit' ]  , 'sigList':  massPointsFull.sigList , 'massPoints':   massPointsFull.mstop_lsps   , 'cutInstList':  limitCuts    ,'plotList':plots.plots.keys()  , 'lumi_target' : 10000 }   ,
-            'limits':     {'taskList' : [ 'calc_sig_limit' ]  ,  'sigList':  massPointsFull.sigList , 'massPoints':   massPointsFull.mstop_lsps   , 'cutInstList':  limitCuts         ,'plotList':plots.plots.keys()                   },
+            'explimits':     {'taskList' : [ 'calc_sig_limit' ]  ,  'sigList':  massPointsFull.sigList , 'massPoints':   massPointsFull.mstop_lsps   , 'cutInstList':  limitCuts         ,'plotList':plots.plots.keys()                   },
             'bkg_est':    {'taskList' : [ 'bkg_est' ]  ,         'sigList': plotSignalList    , 'massPoints':   []                        , 'cutInstList':  crCuts            ,'plotList':plots.plots.keys()           , 'data': True        },
-            'jec_est':    {'taskList' : [ 'bkg_est' ]  ,         'sigList': plotSignalList    , 'massPoints':   []                        , 'cutInstList':  jet_corr_cutinsts ,'plotList':plots.plots.keys()           , 'data': False        },
 
-            #'jec_est1':    {'taskList' : [ 'bkg_est' ]  ,         'sigList': plotSignalList    , 'massPoints':   []                      , 'cutInstList':  jet_corr_cutinsts[0:1],'plotList':plots.plots.keys()           , 'data': False        },
+            'jec_est':    {'taskList' : [ 'bkg_est' ]  ,         'sigList': plotSignalList    , 'massPoints':   []                        , 'cutInstList':  jet_corr_cutinsts ,'plotList':plots.plots.keys()              , 'data': False        },
+            'jec_est1':    {'taskList' : [ 'bkg_est' ]  ,         'sigList': plotSignalList    , 'massPoints':   []                      , 'cutInstList':  jet_corr_cutinsts[0:1],'plotList':plots.plots.keys()           , 'data': False        },
             'jec_est2':    {'taskList' : [ 'bkg_est' ]  ,         'sigList': plotSignalList    , 'massPoints':   []                      , 'cutInstList':  jet_corr_cutinsts[1:2],'plotList':plots.plots.keys()           , 'data': False        },
             'jec_est3':    {'taskList' : [ 'bkg_est' ]  ,         'sigList': plotSignalList    , 'massPoints':   []                      , 'cutInstList':  jet_corr_cutinsts[2:3],'plotList':plots.plots.keys()           , 'data': False        },
             'jec_est4':    {'taskList' : [ 'bkg_est' ]  ,         'sigList': plotSignalList    , 'massPoints':   []                      , 'cutInstList':  jet_corr_cutinsts[3:4],'plotList':plots.plots.keys()           , 'data': False        },
@@ -131,6 +134,7 @@ tasks_info =  {
             'jec_est6':    {'taskList' : [ 'bkg_est' ]  ,         'sigList': plotSignalList    , 'massPoints':   []                      , 'cutInstList':  jet_corr_cutinsts[5:6],'plotList':plots.plots.keys()           , 'data': False        },
             'jec_est7':    {'taskList' : [ 'bkg_est' ]  ,         'sigList': plotSignalList    , 'massPoints':   []                      , 'cutInstList':  jet_corr_cutinsts[6:7],'plotList':plots.plots.keys()           , 'data': False        },
 
+            'bkg_est_sr':    {'taskList' : [ 'bkg_est' ]  ,         'sigList': plotSignalList    , 'massPoints':   []                   , 'cutInstList':  cuts.srs_ptbin_sum     ,'plotList':plots.plots.keys()           , 'data': True        },
 
             'plots':     {'taskList' : [ 'draw_plots'  ]     , 'sigList':  plotSignalList     , 'massPoints':   plotMStopLSPs           , 'cutInstList':  plotCuts[:]       ,'plotList':plots.plots.keys()[:]                },
             'cutflow':   {'taskList' : [ 'cut_flow' ]        , 'sigList':  plotSignalList     , 'massPoints':   plotMStopLSPs           , 'cutInstList':  flowCuts          ,'plotList':plots.plots.keys()[:]             },
@@ -194,7 +198,7 @@ def make_match_func(tothis):
 
 lumis=              {
                             "mc_lumi"               :   10000   ,
-                            'target_lumi'           :   13000.   ,
+                            'target_lumi'           :   12864.0   ,
                             'DataBlind_lumi'        :   12864.4    ,
                             'DataUnblind_lumi'      :   4303.0  ,
                     }

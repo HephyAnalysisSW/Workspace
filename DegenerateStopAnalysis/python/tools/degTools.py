@@ -686,20 +686,32 @@ def getPlotFromYields(name, yields, keys=[]):
     hist.GetXaxis().LabelsOption("v")
     return hist  
 
-def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin = 0.01, plotMax= None, logs = [0,1], save="", normalize = False):
+def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin = 0.01, plotMax= None, logs = [0,1], save="", normalize = False, ratioLimits=[0,1.8]):
 
+    ret=[]
     yld = yieldInst
-
     if type(yld)==type(""):
         yld = pickle.load( open(yld))
 
-    if not sampleList:
-        sampleList = yld.bkgList
-    if not keys:
-        keys = yld.cutNames
-    bkgList =  [x for x in sampleList if x in yld.bkgList]
-    sigList =  [x for x in sampleList if x in yld.sigList]
-    dataList = [x for x in sampleList if x in yld.dataList ] 
+    if hasattr(yld, "yieldDict"):
+        if not sampleList:
+            sampleList = yld.bkgList
+        if not keys:
+            keys = yld.cutNames
+        bkgList =  [x for x in sampleList if x in yld.bkgList]
+        sigList =  [x for x in sampleList if x in yld.sigList]
+        dataList = [x for x in sampleList if x in yld.dataList ] 
+        yieldDict = yld.yieldDictFull 
+    else:
+        if not sampleList:
+            raise NotImplementedError()
+        if not keys:
+            raise NotImplementedError()
+        bkgList = [x for x in sampleList if x in [ 'Diboson', 'TTJets', 'ST', 'WJets', 'QCD', 'DYJetsM50', 'ZJetsInv' ] + ['dy', 'qcd', 'st', 'tt', 'vv', 'w', 'z'] ]
+        sigList = [x for x in sampleList if 'T2tt' in x]
+        dataList = [x for x in sampleList if 'data' in x.lower()] 
+        yieldDict = yld
+
     yldplt = {}
     draw = True
     if draw:
@@ -710,7 +722,7 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
         dOpt = "hist"
         canvs[cMain].SetGrid(1,0)
     for sample in sampleList:
-        yldplt[sample] = getPlotFromYields(sample+"_"+name, yld.yieldDictFull[sample], keys=keys)
+        yldplt[sample] = getPlotFromYields(sample+"_"+name, yieldDict[sample], keys=keys)
         if sample in bkgList:
             yldplt[sample].SetFillColor(  sample_colors.get(sample,1)  )
             
@@ -749,7 +761,9 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
     stacks.Draw("same AXIG")
 
     if dataList and not normalize:
-        yldplt[dataList[0]].Draw("same")
+        yldplt[dataList[0]].SetMarkerSize(1)
+        yldplt[dataList[0]].Sumw2()
+        yldplt[dataList[0]].Draw("same EP0")
 
     canvs[cMain].SetLogx(logs[0])
     canvs[cMain].SetLogy(logs[1])
@@ -767,8 +781,9 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
             print 'data is here!'
             ratio_ref.Draw("hist")
             ratio_ref.GetYaxis().SetTitle("DATA/MC")
-            ratio_ref.SetMaximum(1.8)    
-            ratio_ref.SetMinimum(0)
+            ratio_ref.GetYaxis().SetLabelSize(0.01)
+            ratio_ref.SetMinimum(ratioLimits[0])
+            ratio_ref.SetMaximum(ratioLimits[1])    
    
             MCE = bkg_tot.Clone("MCError_%s"%name)
             bkg_tot_noe =  bkg_tot.Clone("bkg_tot_noe_%s"%name)
@@ -778,11 +793,12 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
             MCE.SetFillColor(1)
             MCE.SetMarkerSize(0)
             MCE.Draw("e2same")
-
+        
             data_ratio = yldplt[dataList[0]].Clone()
             data_ratio.Divide(bkg_tot_noe)
             data_ratio.Draw("e0same")
 
+            ret.extend([bkg_tot_noe, MCE, data_ratio])
             #    bkg_tot = hists['bkg'][plot].Clone("bkg_tot")
             #    bkg_tot.SetError(ar.array( "d",[0]*nBins ) )    # bkg_tot with no error
             #    data_ratio = hists[dataList[0]][plot].Clone("data")
@@ -831,7 +847,7 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
         saveCanvas(canvs[cSave], dir = save, name = name ) 
         canvs[cSave]
     #gc.collect()
-    return canvs, yldplt, stacks, bkg_tot, ratio_ref 
+    return canvs, yldplt, stacks, bkg_tot, ratio_ref, ret 
 
 #                bkg_tot = hists['bkg'][plot].Clone("bkg_tot")
 #                bkg_tot.SetError(ar.array( "d",[0]*nBins ) )    # bkg_tot with no error
@@ -989,6 +1005,7 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
                                              denoms=denoms, noms=noms, ratioNorm=ratioNorm, fomLimits=fomLimits,
                                              leg=leg, unity=unity, verbose=verbose)
            if bkgList:
+               canvs[p][cMain].cd()
                ret['hists']['bkg'][p].SetFillColor(1)
                ret['hists']['bkg'][p].SetFillStyle(3001)
                ret['hists']['bkg'][p].SetMarkerSize(0)
@@ -1183,7 +1200,7 @@ def getFOMPlotFromStacks( ret, plot, sampleList ,fom=True, fom_reverse = False, 
                 MCE.SetFillColor(1)
                 MCE.SetMarkerSize(0)
                 MCE.Draw("e2same")
-                ret['junk'].append(MCE)
+                ret['junk'].extend([MCE, data_ratio, bkg_tot])
                 #ll = TLine(Hr.GetXaxis().GetXmin(),1,Hr.GetXaxis().GetXma),1)
                  
             if unity:
@@ -1193,6 +1210,7 @@ def getFOMPlotFromStacks( ret, plot, sampleList ,fom=True, fom_reverse = False, 
                 Func.SetLineColor(1)
                 Func.SetLineWidth(1)
                 Func.Draw("same")
+                ret['junk'].append(Func)
                 fomHists[plot][denom].update({'func':Func})
             #print 'fom min max', fomMin, fomMax
             #print "first fom hist", first_nom

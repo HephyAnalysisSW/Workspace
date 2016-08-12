@@ -48,7 +48,7 @@ def getLimit(yld, sig=None          , outDir    = "./cards/", postfix = ""     ,
     if simplify_processes:
 
         main_bkgs = ['w', 'tt']
-        rest_bkgs = ['qcd', 'z'] 
+        rest_bkgs = ['qcd', 'z', 'dy', 'vv', 'st'] 
 
         main_bkgs = [bkg for bkg in main_bkgs if bkg in yld.sampleNames ]
         rest_bkgs = [bkg for bkg in rest_bkgs if bkg in yld.sampleNames ]

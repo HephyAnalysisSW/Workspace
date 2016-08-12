@@ -233,20 +233,20 @@ def calc_sig_limit(cfg, args):
         ##
         cut_name = cutInst.fullName
         print " . . . . . . . . . . . . . Cut: %s . . . . . . . . . . . . . . "%cut_name
-        cutSaveDir = cfg.saveDir + "/" + cutInst.saveDir
-        tableDir = cutSaveDir +"/Tables/"
-        limitDir = cutSaveDir +"/Limits/"
-        cardDir = cfg.cardDir + "/" + cutInst.saveDir
+        #cutSaveDir = cfg.saveDir + "/" + cutInst.saveDir
+        cutSaveDir = cfg.saveDirs[cut_name]
+        tableDir = cfg.tableDirs[cut_name]
+        limitDir = cfg.limitDirs[cut_name]
+        cardDir = cfg.cardDirs[cut_name] #+ "/" + cutInst.saveDir
         print "card dir:", cardDir
         makeDir(cardDir)
         makeDir(tableDir)
         makeDir(limitDir)
         
-
-        pp.pprint(      {    sample_name:decide_weight2(samp, weight=None, cut=cutInst.fullName, lumi='target_lumi' ) for sample_name, samp in cfg.samples.iteritems() } ,
-                         open( limitDir+"/weights.txt" ,"w") )
-        pp.pprint(      cutInst.list ,  open( limitDir+"/cuts.txt" ,"w"), width = 100, indent = 4 )
-        pickle.dump(    cutInst,        open( limitDir+"/%s.pkl"%cutInst.fullName ,"w") )
+        #pp.pprint(      {    sample_name:decide_weight2(samp, weight=None, cut=cutInst.fullName, lumi='target_lumi' ) for sample_name, samp in cfg.samples.iteritems() } ,
+        #                 open( limitDir+"/weights.txt" ,"w") )
+        #pp.pprint(      cutInst.list ,  open( limitDir+"/cuts.txt" ,"w"), width = 100, indent = 4 )
+        #pickle.dump(    cutInst,        open( limitDir+"/%s.pkl"%cutInst.fullName ,"w") )
     
     
         ##
@@ -268,7 +268,7 @@ def calc_sig_limit(cfg, args):
         print "----------------------------------"
         print args.redo_limit , args.redo_yields
         print cfg.redo_limit  , cfg.redo_yields
-        print redo_limit      , redo_yields #, redo_eventLists
+        print "RedoLimit:", redo_limit      ,"  , Redo Yields:" , redo_yields #, redo_eventLists
         print "----------------------------------"
     
     
@@ -298,7 +298,7 @@ def calc_sig_limit(cfg, args):
                                             sampleList , 
                                             cutInst, 
                                             cutOpt          =   "list2", 
-                                            weight          =   "weight", 
+                                            weight          =   "", 
                                             pklOpt          =   True, 
                                             tableName       =   "{cut}_%s%s"%(cfg.runTag,cfg.scan_tag), 
                                             nDigits         =   2 , 
@@ -309,6 +309,8 @@ def calc_sig_limit(cfg, args):
                 pickle.dump( yields[cut_name], open(yield_pkl,'w') )
                 print "Yield pickle dumped: %s"%yield_pkl
                 JinjaTexTable( yields[cut_name], pdfDir = tableDir, caption="" , transpose=True)
+            pp.pprint(      yields[cut_name].cut_weights  ,       open( cutSaveDir +"/cuts_weights.txt" ,"w"), width = 100, indent = 4 )
+            pickle.dump(    yields[cut_name].cut_weights ,        open( cutSaveDir +"/cuts_weights.pkl" ,"w") )
             sigs = ['s300_290' , 's300_270','s300_220']
             #sigs = [ 'S300-260Fast' , 'S300-270Fast' , 'S300-290Fast' , 'S300-270' ]
             #sigs = ['s10FS', 's30FS', 's60FS' , 's30'] 
@@ -413,12 +415,13 @@ def bkg_est(cfg, args):
         cut_name = cutInst.fullName
         sampleList = getattr(cfg, "bkgList") + getattr(cfg,"signalList")
 
+        #if 'sr' in cut_name.lower() or ( 'binssummary' in cut_name.lower() ):
         if 'sr' in cut_name.lower():
             dataList = ['d']
-        elif "cr" in cut_name.lower() or "sideband" in cut_name.lower():
+        elif ("cr" in cut_name.lower()) or ("sideband" in cut_name.lower()) or ( 'bins' in cut_name.lower()  ):
             dataList = ['dblind']
         else:
-            raise Exception("not sure which dataset to use!")
+            raise Exception("not sure which dataset to use! cut_name: %s"%cut_name)
 
 
         if dataList[0] in cfg.samples.dataList():

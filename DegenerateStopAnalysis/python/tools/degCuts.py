@@ -842,7 +842,8 @@ class Cuts():
         
         
         self.bins        =   CutClass( "Bins" , [] , baseCut = self.presel )
-        self.bins.add(   self.sr1abc_ptbin   , 'inclList', baseCutString =  "" )
+        self.bins.add( self.sr1ab_ptbin ,  baseCutString = self.sr1.inclCombined          )
+        self.bins.add( self.sr1c_ptbin  ,  baseCutString = self.sr1c_baseCut.inclCombined )
         self.bins.add(   self.sr2_ptbin       , baseCutString =  self.sr2.inclCombined ) 
         #selfbinsI.add(   self.cr1abc          , baseCutString =  self.cr1.inclCombined )
         self.bins.add(   self.cr1a          , baseCutString =  self.cr1.inclCombined           )
@@ -851,6 +852,22 @@ class Cuts():
         self.bins.add(   self.cr2_             , baseCutString = self.cr2.inclCombined         ) 
         self.bins.add(   self.crtt2     ,'inclCombinedList',   ) 
         
+
+
+        self.bins_sum   = CutClass ("BinsSummary",    [], baseCut= self.presel ) 
+        self.bins_sum.add( self.sr1ab_ptbin ,  baseCutString = self.sr1.inclCombined          )
+        self.bins_sum.add( self.sr1c_ptbin  ,  baseCutString = self.sr1c_baseCut.inclCombined )
+        self.bins_sum.add( self.sr2_ptbin   ,  baseCutString = self.sr2.inclCombined          )
+        self.bins_sum.add(   self.sr1a          , baseCutString =  self.sr1.combined           )
+        self.bins_sum.add(   self.sr1b          , baseCutString =  self.sr1.combined           )
+        self.bins_sum.add(   self.sr1c          , baseCutString =  self.sr1c_baseCut.combined  )
+        self.bins_sum.add(   self.sr2   ,'inclCombinedList'     , baseCutString =  self.sr2.baseCut.combined  )
+        self.bins_sum.add(   self.cr1a          , baseCutString =  self.cr1.inclCombined           )
+        self.bins_sum.add(   self.cr1b          , baseCutString =  self.cr1.inclCombined           )
+        self.bins_sum.add(   self.cr1c          , baseCutString =  self.cr1c_baseCut.inclCombined  )
+        self.bins_sum.add(   self.cr2_             , baseCutString = self.cr2.inclCombined         ) 
+        self.bins_sum.add(   self.crtt2     ,'inclCombinedList',   ) 
+
         
         
         #self.presel_common = CutClass('presel_common', [], baseCut=None)

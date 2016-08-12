@@ -123,5 +123,18 @@ for ims , mstop in  enumerate( mstop_range):
         #colors['s%s_%s'%(mstop,mstop-dm)] = ic
         
 
+sampleNames = {
+ 'dy': 'DYJetsM50',
+ 'qcd': 'QCD',
+ 's300_220': 'T2tt-300-220',
+ 's300_270': 'T2tt-300-270',
+ 's300_290': 'T2tt-300-290',
+ 'st': 'ST',
+ 'tt': 'TTJets',
+ 'vv': 'Diboson',
+ 'w': 'WJets',
+ 'z': 'ZJetsInv'}
 
+for samp in sampleNames:
+    colors[sampleNames[samp]]=colors[samp]
 
