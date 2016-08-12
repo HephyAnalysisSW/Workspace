@@ -13,6 +13,7 @@ from Workspace.HEPHYPythonTools import u_float
 setup_style()
 
 filename = "/afs/hephy.at/user/m/mzarucki/www/plots/Zinv/SR1/ZinvRatios_peak.txt"
+savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/Zinv"
 
 #def my_range(start, end, step):
 #    while start <= end:
@@ -94,7 +95,7 @@ gr1.SetTitle("Z_{inv} Correction Factors for N_{\nu\nu l}^{ MC}  as a Function C
 gr1.SetMarkerColor(ROOT.kBlue)
 gr1.SetMarkerStyle(ROOT.kFullCircle)
 gr1.SetMarkerSize(1)
-gr1.GetXaxis().SetTitle("C_{T}' = min(emulated MET, HT - 100)")
+gr1.GetXaxis().SetTitle("Lower Cut on C_{T}' = min(emulated MET, HT - 100)")
 gr1.GetYaxis().SetTitle("R_{\mu\mu l} = R_{\mu\mu}*R_{\mu\mu l/\mu\mu}")
 gr1.GetXaxis().CenterTitle()
 gr1.GetYaxis().CenterTitle()
@@ -103,7 +104,7 @@ gr1.GetYaxis().SetTitleSize(0.04)
 gr1.GetXaxis().SetTitleOffset(1.4)
 gr1.GetYaxis().SetTitleOffset(1.6)
 gr1.SetMinimum(0)
-gr1.SetMaximum(2)
+gr1.SetMaximum(2.2)
 
 #for x in range(len(cuts)/2):
 #   print x
@@ -130,12 +131,12 @@ gr2.SetMarkerSize(1)
 
 gr2.Draw("Psame") #plots the graph with axes and points
 
-leg = ROOT.TLegend(0.25, 0.2, 0.5, 0.35) #x1,y1,x2,y2
-leg .AddEntry(gr1, "Electron Channel", "P")
-leg .AddEntry(gr2, "Muon Channel", "P")
-leg .Draw() 
+leg = ROOT.TLegend(0.25, 0.75, 0.7, 0.925) #x1,y1,x2,y2
+leg.AddEntry(gr1, "Electron Channel", "P")
+leg.AddEntry(gr2, "Muon Channel", "P")
+leg.SetTextSize(0.04)
+leg.Draw() 
 #Save to Web
-savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/Zinv"
 
 if not os.path.exists(savedir):
       os.makedirs(savedir)

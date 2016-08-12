@@ -5,6 +5,7 @@
 import ROOT
 import os, sys
 import argparse
+import pickle
 import Workspace.DegenerateStopAnalysis.toolsMateusz.ROOToptions
 from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
@@ -26,7 +27,7 @@ parser = argparse.ArgumentParser(description = "Input options")
 #parser.add_argument("--ABCD", dest = "ABCD",  help = "ABCD method", type = str, default = "4")
 parser.add_argument("--MET", dest = "MET",  help = "MET Cut", type = str, default = "300")
 parser.add_argument("--HT", dest = "HT",  help = "HT Cut", type = str, default = "400")
-parser.add_argument("--METloose", dest = "METloose",  help = "Loose MET Cut", type = str, default = "300")
+parser.add_argument("--METloose", dest = "METloose",  help = "Loose MET Cut", type = str, default = "200")
 parser.add_argument("--highWeightVeto", dest = "highWeightVeto",  help = "Remove high weighted events", type = int, default = 0)
 #parser.add_argument("--enriched", dest = "enriched",  help = "EM enriched QCD?", type = bool, default = False)
 parser.add_argument("--estimation", dest = "estimation",  help = "Toggle estimation", type = int, default = 1)
@@ -86,10 +87,12 @@ if save: #web address: http://www.hephy.at/user/mzarucki/plots
       estdir += "/noMETloose"
       plotdir += "/noMETloose"
    
-   suffix = "_HT" + HTcut + "_MET" + METcut
+   estdir += "/HT" + HTcut + "MET" + METcut
    plotdir += "/HT" + HTcut + "MET" + METcut
+   suffix = "_HT" + HTcut + "_MET" + METcut
    
    if ABCD == "3": 
+      estdir += "METloose" + METloose
       plotdir += "METloose" + METloose
       suffix += "_METloose" + METloose
 
@@ -165,7 +168,7 @@ if plot: variables.update({"absIso":"LepAll_absIso03[" + ind2 + "]", 'relIso':"L
 
 #Redefining variables in terms of muon selection
 # ABCD1: X = D (inverted) | ABCD2: X = D (loose) | ABCD3: X = M (loose)
-Xs = {'1':'D', '2':'D', '3':'M', '2D':''}
+Xs = {'3':'M', '2D':''} #'1':'D', '2':'D', 
 
 if METloose == METcut: METcutString = "met >" + METcut
 elif ABCD == "3": METcutString = "met >" + METloose #loosened MET cut for ABCD3
@@ -247,11 +250,13 @@ if estimation:
    SF_dataMC = {}
    QCDest_MC = {}
    QCDest = {}
+   EWKsys = {}
+
    if save: 
       if not os.path.isfile("%s/QCDyields%s.txt"%(estdir,suffix)):
          outfile = open("%s/QCDyields%s.txt"%(estdir,suffix), "w")
          outfile.write("QCD Estimation for Muon Channel [Preselection of (MET, HT) > (" + METcut + "," + HTcut + ")]\n")
-         outfile.write("SR        I_XA (MC)           XA_I (MC)      |      IXA (MC)        IXA (data-EWK)        SF_dataMC (IXA)      |      QCD est. (MC)         SR (MC)        Ratio      |      QCD est. (data)\n".replace("X", Xs[ABCD]))
+         outfile.write("SR        I_XA (MC)           XA_I (MC)      |      IXA (MC)            IXA (data)        IXA (data-EWK)        SF_dataMC (IXA)      |      QCD est. (MC)         SR (MC)        Ratio      |      QCD est. (data)      EWKsys\n".replace("X", Xs[ABCD]))
    
    for reg in regions:
       yields[reg] = {}
@@ -261,34 +266,43 @@ if estimation:
       for sel in abcd:
          #setEventListToChains(samples, samplesList, QCD[reg][sel])
          yields[reg][sel] = Yields(samples, samplesList, QCD[reg][sel], cutOpt = "combinedList", pklOpt = False, tableName = reg + "_" + sel, nDigits = 2, err = True, verbose = True, nSpaces = 1)
-  
+      
+      #MC 
       QCDyields[reg]['SR'] =        yields[reg]['SR'].yieldDictFull['qcd']['QCD_SR_' + reg]
  
       QCDyields[reg]['I_XA'] =      yields[reg]['I_XA'].yieldDictFull['qcd']['QCD_I_XA_' + reg]
       QCDyields[reg]['XA_I'] =      yields[reg]['XA_I'].yieldDictFull['qcd']['QCD_XA_I_' + reg]
       QCDyields[reg]['IXA_MC'] =    yields[reg]['IXA'].yieldDictFull['qcd']['QCD_IXA_' + reg]
-      QCDyields[reg]['IXA_data'] =  yields[reg]['IXA'].yieldDictFull['dblind']['QCD_IXA_' + reg] - \
+      
+      #Estimation from pure QCD MC 
+      QCDest_MC[reg] = ((QCDyields[reg]['I_XA'] * QCDyields[reg]['XA_I'])/(QCDyields[reg]['IXA_MC']))
+      
+      #Data 
+      QCDyields[reg]['IXA_data'] =  yields[reg]['IXA'].yieldDictFull['dblind']['QCD_IXA_' + reg]
+      
+      #EWK subtraction
+      QCDyields[reg]['IXA_data-EWK'] =  yields[reg]['IXA'].yieldDictFull['dblind']['QCD_IXA_' + reg] - \
                                     yields[reg]['IXA'].yieldDictFull['w']['QCD_IXA_' + reg] - \
                                     yields[reg]['IXA'].yieldDictFull['tt']['QCD_IXA_' + reg] - \
                                     yields[reg]['IXA'].yieldDictFull['z']['QCD_IXA_' + reg] - \
                                     yields[reg]['IXA'].yieldDictFull['st']['QCD_IXA_' + reg] - \
                                     yields[reg]['IXA'].yieldDictFull['vv']['QCD_IXA_' + reg]
       
-      #Estimation from pure QCD MC 
-      QCDest_MC[reg] = ((QCDyields[reg]['I_XA'] * QCDyields[reg]['XA_I'])/(QCDyields[reg]['IXA_MC']))
-
       #Data-MC SF in IXA region
-      SF_dataMC[reg]['IXA'] = (QCDyields[reg]['IXA_data']/QCDyields[reg]['IXA_MC']) 
+      SF_dataMC[reg]['IXA'] = (QCDyields[reg]['IXA_data-EWK']/QCDyields[reg]['IXA_MC']) 
       
       #Full estimation 
       QCDest[reg] = SF_dataMC[reg]['IXA']*QCDest_MC[reg]
+      EWKsys[reg] = 0.3*QCDyields[reg]['IXA_data-EWK']*QCDest_MC[reg]/QCDyields[reg]['IXA_MC']
+ 
       if verbose: 
          print makeLine()
          print "Region: ", reg
          print "QCD MC in I_XA = ".replace("X", Xs[ABCD]), QCDyields[reg]['I_XA'] 
          print "QCD MC in XA_I = ".replace("X", Xs[ABCD]), QCDyields[reg]['XA_I'] 
          print "QCD MC in IXA = ".replace("X", Xs[ABCD]), QCDyields[reg]['IXA_MC']
-         print "Data (EWK subtracted) in IXA = ".replace("X", Xs[ABCD]),  QCDyields[reg]['IXA_data'].round(2)
+         print "Data in IXA = ".replace("X", Xs[ABCD]),  QCDyields[reg]['IXA_data'].round(2)
+         print "Data (EWK subtracted) in IXA = ".replace("X", Xs[ABCD]),  QCDyields[reg]['IXA_data-EWK'].round(2)
          print "SF_dataMC in IXA = ".replace("X", Xs[ABCD]), SF_dataMC[reg]['IXA'].round(2)
          print "QCD Estimation (pure MC) in ", reg, ": ", QCDest_MC[reg].round(2)
          print "QCD MC yield in ", reg, ": ", QCDyields[reg]['SR']
@@ -296,6 +310,7 @@ if estimation:
             print "Closure ratio (pure MC): ", (QCDest_MC[reg]/QCDyields[reg]['SR']).round(2)
          print makeLine()
          print "QCD Estimation in ", reg, ": ", QCDest[reg].round(2)
+         print "Systematic unc. due to EWK subtraction in ", reg, ": ", EWKsys[reg].round(2)
 
       with open("%s/QCDyields%s.txt"%(estdir,suffix), "a") as outfile:
          outfile.write(reg + "     " +\
@@ -303,12 +318,35 @@ if estimation:
          str(QCDyields[reg]['XA_I'].round(2)) + "         " +\
          str(QCDyields[reg]['IXA_MC'].round(2)) + "         " +\
          str(QCDyields[reg]['IXA_data'].round(2)) + "         " +\
+         str(QCDyields[reg]['IXA_data-EWK'].round(2)) + "         " +\
          str(SF_dataMC[reg]['IXA'].round(2)) + "              " +\
          str(QCDest_MC[reg].round(2)) + "         " +\
          str(QCDyields[reg]['SR'].round(2)) + "         ")
          if QCDyields[reg]['SR'].val: outfile.write(str((QCDest[reg]/QCDyields[reg]['SR']).round(2)) + "         ")
          else: outfile.write("N/A         ")
-         outfile.write(str(QCDest[reg].round(2)) + "\n")
+         outfile.write(str(QCDest[reg].round(2)) + "        " +\
+         str(EWKsys[reg].round(2)) + "\n")
+
+   #Pickle results 
+   pickleFile1 = open("%s/QCDyields_muon%s.pkl"%(estdir,suffix), "w")
+   pickle.dump(QCDyields, pickleFile1)
+   pickleFile1.close()
+   
+   pickleFile2 = open("%s/SF_dataMC_muon%s.pkl"%(estdir,suffix), "w")
+   pickle.dump(SF_dataMC, pickleFile2)
+   pickleFile2.close()
+   
+   pickleFile3 = open("%s/QCDest_MC_muon%s.pkl"%(estdir,suffix), "w")
+   pickle.dump(QCDest_MC, pickleFile3)
+   pickleFile3.close()
+   
+   pickleFile4 = open("%s/QCDest_muon%s.pkl"%(estdir,suffix), "w")
+   pickle.dump(QCDest, pickleFile4)
+   pickleFile4.close()
+   
+   pickleFile5 = open("%s/EWKsys_muon%s.pkl"%(estdir,suffix), "w")
+   pickle.dump(EWKsys, pickleFile5)
+   pickleFile5.close()
  
 abcd = {'SR':'I', 'XA_I': 'I', 'I_XA':'anti-I', 'IXA':'anti-I'}
 
@@ -346,8 +384,8 @@ if plot:
          
       #setEventListToChains(samples, samplesList, QCD[plotReg][sel])
       
-      #plotsList[sel] = ["hybIso2_" + sel, "absDxy_" + sel, "delPhi_" + sel, "weight_" + sel]
-      plotsList[sel] = ["muPt_" + sel, "absIso_" + sel, "relIso_" + sel,"hybIso_" + sel, "hybIso2_" + sel, "absDxy_" + sel, "delPhi_" + sel, "muMt_" + sel, "MET_" + sel, "HT_" + sel, "weight_" + sel]
+      plotsList[sel] = ["hybIso2_" + sel, "absDxy_" + sel, "delPhi_" + sel, "weight_" + sel]
+      #plotsList[sel] = ["muPt_" + sel, "absIso_" + sel, "relIso_" + sel,"hybIso_" + sel, "hybIso2_" + sel, "absDxy_" + sel, "delPhi_" + sel, "muMt_" + sel, "MET_" + sel, "HT_" + sel, "weight_" + sel]
       plotsDict[sel] = Plots(**plotDict[sel])
       plots[sel] = getPlots(samples, plotsDict[sel], QCD[plotReg][sel], samplesList, plotList = plotsList[sel], addOverFlowBin='upper')
       if getData: plots2[sel] = drawPlots(samples, plotsDict[sel], QCD[plotReg][sel], samplesList, plotList = plotsList[sel], denoms=["bkg"], noms = ["dblind"], fom="RATIO", fomLimits=[0,1.8], plotMin = 1, normalize = False, save=False)

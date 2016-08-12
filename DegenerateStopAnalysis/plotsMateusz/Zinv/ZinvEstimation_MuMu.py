@@ -114,54 +114,60 @@ ind2 = "IndexLepAll_mu[1]"
 
 dimuon_mass = "sqrt(2*(LepAll_pt[" + ind1 + "] * LepAll_pt[" + ind2 + "]*(cosh(LepAll_eta[" + ind1 + "] - LepAll_eta[" + ind2 + "]) - cos(LepAll_phi[" + ind1 + "] - LepAll_phi[" + ind2 + "]))))"
 dimuon_pt = "sqrt(LepAll_pt[" + ind1 + "]*LepAll_pt[" + ind1 + "] + LepAll_pt[" + ind2 + "]*LepAll_pt[" + ind2 + "] + 2*(LepAll_pt[" + ind1 + "]*LepAll_pt[" + ind2 + "]*cos(LepAll_phi[" + ind1 + "] - LepAll_phi[" + ind2 + "])))"
-met2 = "met + dimuon_pt"
+dimuon_phi = "atan(\
+((LepAll_pt[" + ind1 + "]*sin(LepAll_phi[" + ind1 + "])) + (LepAll_pt[" + ind2 + "]*sin(LepAll_phi[" + ind2 + "])))/\
+((LepAll_pt[" + ind1 + "]*cos(LepAll_phi[" + ind1 + "])) + (LepAll_pt[" + ind2 + "]*cos(LepAll_phi[" + ind2 + "]))))"
+
+met2 = "(met + dimuon_pt)" #assuming residual MET is negligible
 #met2_phi = 
-#electron_mt2 = "sqrt(2*met2*LepAll_pt[IndexLepAll_el[0]]*(1 - cos(met2_phi - LepAll_phi[IndexLepAll_el[0]])))"
-#muon_mt2 = "sqrt(2*met2*LepAll_pt[IndexLepAll_mu[2]]*(1 - cos(met2_phi - LepAll_phi[IndexLepAll_mu[2]])))"
+electron_mt2 = "sqrt(2*met2*LepAll_pt[IndexLepAll_el[0]]*(1 - cos(dimuon_phi - LepAll_phi[IndexLepAll_el[0]])))"
+muon_mt2 = "sqrt(2*met2*LepAll_pt[IndexLepAll_mu[2]]*(1 - cos(dimuon_phi - LepAll_phi[IndexLepAll_mu[2]])))"
 
 for s in samplesList: 
    samples[s].tree.SetAlias("dimuon_mass", dimuon_mass)
    samples[s].tree.SetAlias("dimuon_pt", dimuon_pt)
+   samples[s].tree.SetAlias("dimuon_phi", dimuon_phi)
    samples[s].tree.SetAlias("met2", met2)
    #samples[s].tree.SetAlias("met2_phi", met2_phi)
-   #samples[s].tree.SetAlias("electron_mt2", electron_mt2)
-   #samples[s].tree.SetAlias("muon_mt2", muon_mt2)
+   samples[s].tree.SetAlias("electron_mt2", electron_mt2)
+   samples[s].tree.SetAlias("muon_mt2", muon_mt2)
 
 #SRs
 def regions(lepton):
    if lepton == "electron":
       pdgId = "11"
       ind = "IndexLepAll_el[0]"
+      mt2 = "electron_mt2"
    elif lepton == "muon":
       pdgId = "13"
       ind = "IndexLepAll_mu[2]"
+      mt2 = "muon_mt2"
    else:
       assert False
     
    SRs = {\
       #'SR1':["SR1","LepAll_pt[" + ind + "] < 30"],
-      'SR1a':["SR1a",   combineCuts("LepAll_pdgId[" + ind + "] == " + pdgId, "LepAll_mt[" + ind + "] < 60", "LepAll_pt[" + ind + "] < 30")],
-      'SR1b':["SR1b",   combineCuts("LepAll_pdgId[" + ind + "] == " + pdgId, btw("LepAll_mt[" + ind + "]", 60, 95), "LepAll_pt[" + ind + "] < 30")],
-      'SR1c':["SR1c",   combineCuts("LepAll_mt[" + ind + "] > 95", "LepAll_pt[" + ind + "] < 30")],
+      'SR1a':["SR1a",   combineCuts(mt2 + " < 60", "LepAll_pt[" + ind + "] < 30", "LepAll_pdgId[" + ind + "] == " + pdgId)],
+      'SR1b':["SR1b",   combineCuts(btw(mt2, 60, 95), "LepAll_pt[" + ind + "] < 30", "LepAll_pdgId[" + ind + "] == " + pdgId)],
+      'SR1c':["SR1c",   combineCuts(mt2 + " > 95", "LepAll_pt[" + ind + "] < 30")],
       
-      'SRL1':["SRL1", btw("LepAll_pt[" + ind + "]", 5, 12)],
-      'SRH1':["SRH1", btw("LepAll_pt[" + ind + "]", 12, 20)],
-      'SRV1':["SRV1", btw("LepAll_pt[" + ind + "]", 20, 30)],
+      'SRL1a':["SRL1a", combineCuts(mt2 + " < 60", btw("LepAll_pt[" + ind + "]", 5, 12), "LepAll_pdgId[" + ind + "] == " + pdgId)],
+      'SRH1a':["SRH1a", combineCuts(mt2 + " < 60", btw("LepAll_pt[" + ind + "]", 12, 20), "LepAll_pdgId[" + ind + "] == " + pdgId)],
+      'SRV1a':["SRV1a", combineCuts(mt2 + " < 60", btw("LepAll_pt[" + ind + "]", 20, 30), "LepAll_pdgId[" + ind + "] == " + pdgId)],
    
-      'SRL1a':["SRL1a", combineCuts("LepAll_pdgId[" + ind + "] == " + pdgId, "LepAll_mt[" + ind + "] < 60", btw("LepAll_pt[" + ind + "]", 5, 12))],
-      'SRH1a':["SRH1a", combineCuts("LepAll_pdgId[" + ind + "] == " + pdgId, "LepAll_mt[" + ind + "] < 60", btw("LepAll_pt[" + ind + "]", 12, 20))],
-      'SRV1a':["SRV1a", combineCuts("LepAll_pdgId[" + ind + "] == " + pdgId, "LepAll_mt[" + ind + "] < 60", btw("LepAll_pt[" + ind + "]", 20, 30))],
+      'SRL1b':["SRL1b", combineCuts(btw(mt2, 60, 95), btw("LepAll_pt[" + ind + "]", 5, 12), "LepAll_pdgId[" + ind + "] == " + pdgId)],
+      'SRH1b':["SRH1b", combineCuts(btw(mt2, 60, 95), btw("LepAll_pt[" + ind + "]", 12, 20), "LepAll_pdgId[" + ind + "] == " + pdgId)],
+      'SRV1b':["SRV1b", combineCuts(btw(mt2, 60, 95), btw("LepAll_pt[" + ind + "]", 20, 30), "LepAll_pdgId[" + ind + "] == " + pdgId)],
    
-      'SRL1b':["SRL1b", combineCuts("LepAll_pdgId[" + ind + "] == " + pdgId, btw("LepAll_mt[" + ind + "]", 60, 95), btw("LepAll_pt[" + ind + "]", 5, 12))],
-      'SRH1b':["SRH1b", combineCuts("LepAll_pdgId[" + ind + "] == " + pdgId, btw("LepAll_mt[" + ind + "]", 60, 95), btw("LepAll_pt[" + ind + "]", 12, 20))],
-      'SRV1b':["SRV1b", combineCuts("LepAll_pdgId[" + ind + "] == " + pdgId, btw("LepAll_mt[" + ind + "]", 60, 95), btw("LepAll_pt[" + ind + "]", 20, 30))],
+      'SRL1c':["SRL1c", combineCuts(mt2 + " > 95", btw("LepAll_pt[" + ind + "]", 5, 12))],
+      'SRH1c':["SRH1c", combineCuts(mt2 + " > 95", btw("LepAll_pt[" + ind + "]", 12, 20))],
+      'SRV1c':["SRV1c", combineCuts(mt2 + " > 95", btw("LepAll_pt[" + ind + "]", 20, 30))]}
    
-      'SRL1c':["SRL1c", combineCuts("LepAll_mt[" + ind + "] > 95", btw("LepAll_pt[" + ind + "]", 5, 12))],
-      'SRH1c':["SRH1c", combineCuts("LepAll_mt[" + ind + "] > 95", btw("LepAll_pt[" + ind + "]", 12, 20))],
-      'SRV1c':["SRV1c", combineCuts("LepAll_mt[" + ind + "] > 95", btw("LepAll_pt[" + ind + "]", 20, 30))]}
+   SRs['SR1'] =  ["SR1", "((" + SRs['SR1a'][1] + ") || (" + SRs['SR1b'][1] + ") || (" + SRs['SR1c'][1] + "))"]
+   SRs['SRL1'] = ["SRL1", combineCuts(SRs['SR1'][1], btw("LepAll_pt[" + ind + "]", 5, 12))]
+   SRs['SRH1'] = ["SRH1", combineCuts(SRs['SR1'][1], btw("LepAll_pt[" + ind + "]", 12, 20))]
+   SRs['SRV1'] = ["SRV1", combineCuts(SRs['SR1'][1], btw("LepAll_pt[" + ind + "]", 20, 30))]
    
-   SRs['SR1'] = ["SR1", "(" + SRs['SR1a'][1] + ") || (" + SRs['SR1b'][1] + ") || (" + SRs['SR1c'][1] + ")"]
-
    return SRs
 
 SRs_el = regions('electron')
@@ -225,8 +231,14 @@ muons = CutClass("muons", [
 #Sets event list      
 setEventListToChains(samples, samplesList, dimuon)
 
-yields = {}
 if doYields and peak:
+   yields = {}
+   ZinvYields = {}
+   ZinvYields['Zpeak'] = {}
+   ZinvYields['Nel'] = {}
+   ZinvYields['Nmu'] = {}
+   ZinvRatios = {}
+
    yields['Zpeak'] = Yields(samples, samplesList, emulated, cutOpt = "combinedList", pklOpt = False, nDigits = 2, err = True, verbose = True, nSpaces = 10)
    yields['Nel'] = Yields(samples, samplesList, electrons, cutOpt = "combinedList", pklOpt = False, nDigits = 2, err = True, verbose = True, nSpaces = 10)
    yields['Nmu'] = Yields(samples, samplesList, muons, cutOpt = "combinedList", pklOpt = False, nDigits = 2, err = True, verbose = True, nSpaces = 10)
@@ -239,26 +251,41 @@ if doYields and peak:
    with open(savedir + "/ZinvYields" + suffix1 + ".txt", "a") as outfile:
       outfile.write(CT2cut + "     " +\
       str( yields['Zpeak'].yieldDictFull['d1muBlind']['emulated'].round(2)) + "              " +\
-      str((yields['Zpeak'].yieldDictFull['dy']['emulated'] + yields['Zpeak'].yieldDictFull['dy']['emulated']).round(2)) + "              " +\
+      str((yields['Zpeak'].yieldDictFull['dy']['emulated'] + yields['Zpeak'].yieldDictFull['dy5to50']['emulated']).round(2)) + "              " +\
       str( yields['Zpeak'].yieldDictFull['tt']['emulated'].round(2)) + "              " +\
       str( yields['Nel'].yieldDictFull['d1muBlind']['electrons'].round(2)) + "              " +\
-      str((yields['Nel'].yieldDictFull['dy']['electrons'] + yields['Nel'].yieldDictFull['dy']['electrons']).round(2)) + "              " +\
+      str((yields['Nel'].yieldDictFull['dy']['electrons'] + yields['Nel'].yieldDictFull['dy5to50']['electrons']).round(2)) + "              " +\
       str( yields['Nel'].yieldDictFull['tt']['electrons'].round(2)) + "              " +\
       str( yields['Nmu'].yieldDictFull['d1muBlind']['muons'].round(2)) + "              " +\
-      str((yields['Nmu'].yieldDictFull['dy']['muons'] + yields['Nmu'].yieldDictFull['dy']['muons']).round(2)) + "              " +\
+      str((yields['Nmu'].yieldDictFull['dy']['muons'] + yields['Nmu'].yieldDictFull['dy5to50']['muons']).round(2)) + "              " +\
       str( yields['Nmu'].yieldDictFull['tt']['muons'].round(2)) + "\n")
+      
+   ZinvYields['Zpeak']['data'] = yields['Zpeak'].yieldDictFull['d1muBlind']['emulated'].round(2)
+   ZinvYields['Zpeak']['dy'] =  (yields['Zpeak'].yieldDictFull['dy']['emulated'] + yields['Zpeak'].yieldDictFull['dy5to50']['emulated']).round(2)
+   ZinvYields['Zpeak']['tt'] =   yields['Zpeak'].yieldDictFull['tt']['emulated'].round(2)
+   ZinvYields['Nel']['data'] =   yields['Nel'].yieldDictFull['d1muBlind']['electrons'].round(2)
+   ZinvYields['Nel']['dy'] =    (yields['Nel'].yieldDictFull['dy']['electrons'] + yields['Nel'].yieldDictFull['dy5to50']['electrons']).round(2)
+   ZinvYields['Nel']['tt'] =     yields['Nel'].yieldDictFull['tt']['electrons'].round(2)
+   ZinvYields['Nmu']['data'] =   yields['Nmu'].yieldDictFull['d1muBlind']['muons'].round(2)
+   ZinvYields['Nmu']['dy'] =    (yields['Nmu'].yieldDictFull['dy']['muons'] + yields['Nmu'].yieldDictFull['dy5to50']['muons']).round(2)
+   ZinvYields['Nmu']['tt'] =     yields['Nmu'].yieldDictFull['tt']['muons'].round(2)
 
    #Z xsec
-   Zpeak_dMC = (yields['Zpeak'].yieldDictFull['d1muBlind']['emulated']/\
+   Zpeak_dataMC = (yields['Zpeak'].yieldDictFull['d1muBlind']['emulated']/\
                (yields['Zpeak'].yieldDictFull['dy']['emulated'] + \
                 yields['Zpeak'].yieldDictFull['dy5to50']['emulated'] + \
                 yields['Zpeak'].yieldDictFull['tt']['emulated'] + \
                 yields['Zpeak'].yieldDictFull['vv']['emulated']))
 
+   ZinvRatios['Zpeak_dataMC'] = Zpeak_dataMC
+
    #probability of extra leptons
    if yields['Zpeak'].yieldDictFull['d1muBlind']['emulated'].val: 
       prob_el_data = (yields['Nel'].yieldDictFull['d1muBlind']['electrons']/yields['Zpeak'].yieldDictFull['d1muBlind']['emulated'])
       prob_mu_data = (yields['Nmu'].yieldDictFull['d1muBlind']['muons']/yields['Zpeak'].yieldDictFull['d1muBlind']['emulated'])
+   
+      ZinvRatios['prob_el_data'] = prob_el_data
+      ZinvRatios['prob_mu_data'] = prob_mu_data
    
    #probability of observing electron
    prob_el_MC = ((yields['Nel'].yieldDictFull['dy']['electrons'] + \
@@ -269,8 +296,12 @@ if doYields and peak:
                   yields['Zpeak'].yieldDictFull['dy5to50']['emulated'] + \
                   yields['Zpeak'].yieldDictFull['tt']['emulated'] + \
                   yields['Zpeak'].yieldDictFull['vv']['emulated']))
+  
+   ZinvRatios['prob_el_MC'] = prob_el_MC
    
-   prob_el_dMC = (prob_el_data/prob_el_MC)
+   prob_el_dataMC = (prob_el_data/prob_el_MC)
+   
+   ZinvRatios['prob_el_dataMC'] = prob_el_dataMC
    
    #probability of observing muon
    prob_mu_MC = ((yields['Nmu'].yieldDictFull['dy']['muons'] + \
@@ -282,12 +313,32 @@ if doYields and peak:
                   yields['Zpeak'].yieldDictFull['tt']['emulated'] + 
                   yields['Zpeak'].yieldDictFull['vv']['emulated']))
    
-   prob_mu_dMC = (prob_mu_data/prob_mu_MC)
+   ZinvRatios['prob_mu_MC'] = prob_mu_MC
+   
+   prob_mu_dataMC = (prob_mu_data/prob_mu_MC)
+   
+   ZinvRatios['prob_mu_dataMC'] = prob_mu_dataMC
    
    #double ratios
-   ratio_el = (Zpeak_dMC*prob_el_dMC)
-   ratio_mu = (Zpeak_dMC*prob_mu_dMC)
- 
+   ratio_el = (Zpeak_dataMC*prob_el_dataMC)
+   ratio_mu = (Zpeak_dataMC*prob_mu_dataMC)
+   
+   ZinvRatios['ratio_el'] = ratio_el
+   ZinvRatios['ratio_mu'] = ratio_mu
+
+   #Pickle results 
+   pickleFile1 = open("%s/ZinvYields%s.pkl"%(savedir,suffix1), "w")
+   pickle.dump(ZinvYields, pickleFile1)
+   pickleFile1.close()
+
+   pickleFile2 = open("%s/ZinvRatios%s.pkl"%(savedir,suffix1), "w")
+   pickle.dump(ZinvRatios, pickleFile2)
+   pickleFile2.close()
+   
+   pickleFile3 = open("%s/rawZinvYields%s.pkl"%(savedir,suffix1), "w")
+   pickle.dump(yields, pickleFile3)
+   pickleFile3.close()
+
    if not os.path.isfile(savedir + "/ZinvRatios" + suffix1 + ".txt"):
       outfile = open(savedir + "/ZinvRatios" + suffix1 + ".txt", "w")
       outfile.write("Zinv Estimation Ratios\n")
@@ -295,20 +346,20 @@ if doYields and peak:
    
    with open(savedir + "/ZinvRatios" + suffix1 + ".txt", "a") as outfile:
       outfile.write(CT2cut + "       " +\
-      str(Zpeak_dMC.round(3)) + "            " +\
+      str(Zpeak_dataMC.round(3)) + "            " +\
       str(prob_el_data.round(3)) + "            " +\
       str(prob_el_MC.round(3)) + "            " +\
-      str(prob_el_dMC.round(3)) + "            " +\
+      str(prob_el_dataMC.round(3)) + "            " +\
       str(prob_mu_data.round(3)) + "            " +\
       str(prob_mu_MC.round(3)) + "            " +\
-      str(prob_mu_dMC.round(3)) + "            " +\
+      str(prob_mu_dataMC.round(3)) + "            " +\
       str(ratio_el.round(3)) + "            " +\
       str(ratio_mu.round(3))+ "\n")
 
 if plot:
    
    plotDict = {\
-      "dimuon_mass":{'var':"dimuon_mass", "bins":[50, 0, 250], "decor":{"title": "Di-muon System Invariant Mass Distribution" ,"x":"M_{#mu#mu} / GeV" , "y":"Events", 'log':[0, logy,0]}},
+      "dimuon_mass":{'var':"dimuon_mass", "bins":[50, 5, 255], "decor":{"title": "Di-muon System Invariant Mass Distribution" ,"x":"M_{#mu#mu} / GeV" , "y":"Events", 'log':[0, logy,0]}},
       "dimuon_pt":{'var':"dimuon_pt", "bins":[50, 0, 250], "decor":{"title": "Di-muon System Transverse Momentum Distribution" ,"x":"p_{T_{#mu#mu}} / GeV" , "y":"Events", 'log':[0, logy,0]}},
       "MET":{'var':"met", "bins":[50,0,500], "decor":{"title": "MET Distribution" ,"x":"Missing E_{T} / GeV" , "y":"Events", 'log':[0,logy,0]}},
       "MET2":{'var':"met2", "bins":[50,0,500], "decor":{"title": "Emulated MET Distribution" ,"x":"Emulated Missing E_{T} / GeV" , "y":"Events", 'log':[0,logy,0]}},
@@ -319,10 +370,10 @@ if plot:
    }
       
    plotDict2 = {\
-      "elePt":{'var':"LepAll_pt[IndexLepAll_el[0]]", "bins":[10,0,50], "decor":{"title": "Electron pT Distribution" ,"x":"Electron p_{T} / GeV" , "y":"Events", 'log':[0,logy,0]}},
-      "muPt":{'var':"LepAll_pt[IndexLepAll_mu[2]]", "bins":[10,0,50], "decor":{"title": "Muon pT Distribution" ,"x":"Muon p_{T} / GeV" , "y":"Events", 'log':[0,logy,0]}},
-      #"electron_mt2":{'var':"electron_mt2", "bins":[10,0,100], "decor":{"title": "Electron mT Distribution" ,"x":"Electron m_{T2} / GeV" , "y":"Events", 'log':[0,logy,0]}}, 
-      #"muon_mt2":{'var':"muon_mt2", "bins":[10,0,100], "decor":{"title": "Muon mT Distribution" ,"x":"Muon m_{T2} / GeV" , "y":"Events", 'log':[0,logy,0]}}, 
+      "elePt":{'var':"LepAll_pt[IndexLepAll_el[0]]", "bins":[10,5,30], "decor":{"title": "Electron pT Distribution" ,"x":"Electron p_{T} / GeV" , "y":"Events", 'log':[0,logy,0]}},
+      "muPt":{'var':"LepAll_pt[IndexLepAll_mu[2]]", "bins":[10,5,30], "decor":{"title": "Muon pT Distribution" ,"x":"Muon p_{T} / GeV" , "y":"Events", 'log':[0,logy,0]}},
+      "electron_mt2":{'var':"electron_mt2", "bins":[10,0,100], "decor":{"title": "Electron mT Distribution" ,"x":"Electron m_{T2} / GeV" , "y":"Events", 'log':[0,logy,0]}}, 
+      "muon_mt2":{'var':"muon_mt2", "bins":[10,0,100], "decor":{"title": "Muon mT Distribution" ,"x":"Muon m_{T2} / GeV" , "y":"Events", 'log':[0,logy,0]}}, 
    }
    
    plotsList = ["dimuon_mass", "dimuon_pt", "MET", "MET2", "HT", "nJets30", "nJets60", "ISRpt"]
@@ -342,12 +393,12 @@ if plot:
    
    if leptons:
       #setEventListToChains(samples, samplesList, electrons)
-      elePlots = getPlots(samples, plotsDict2, electrons, samplesList, plotList = ["elePt"], addOverFlowBin='upper')
-      elePlots2 = drawPlots(samples, plotsDict2, electrons, samplesList, plotList = ["elePt"], plotLimits = [10, 100], denoms=["bkg"], noms = ["d1muBlind"], fom="RATIO", fomLimits=[0,1.8], plotMin = 0.01, normalize = False, save=False)
+      elePlots = getPlots(samples, plotsDict2, electrons, samplesList, plotList = ["elePt", "electron_mt2"], addOverFlowBin='upper')
+      elePlots2 = drawPlots(samples, plotsDict2, electrons, samplesList, plotList = ["elePt", "electron_mt2"], plotLimits = [10, 100], denoms=["bkg"], noms = ["d1muBlind"], fom="RATIO", fomLimits=[0,1.8], plotMin = 0.01, normalize = False, save=False)
       
       #setEventListToChains(samples, samplesList, muons)
-      muPlots = getPlots(samples, plotsDict2, muons, samplesList, plotList = ["muPt"], addOverFlowBin='upper')
-      muPlots2 = drawPlots(samples, plotsDict2, muons, samplesList, plotList = ["muPt"], plotLimits = [10, 100], denoms=["bkg"], noms = ["d1muBlind"], fom="RATIO", fomLimits=[0,1.8], plotMin = 0.01, normalize = False, save=False)
+      muPlots = getPlots(samples, plotsDict2, muons, samplesList, plotList = ["muPt", "muon_mt2"], addOverFlowBin='upper')
+      muPlots2 = drawPlots(samples, plotsDict2, muons, samplesList, plotList = ["muPt", "muon_mt2"], plotLimits = [10, 100], denoms=["bkg"], noms = ["d1muBlind"], fom="RATIO", fomLimits=[0,1.8], plotMin = 0.01, normalize = False, save=False)
    
    #Save canvas
    if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
