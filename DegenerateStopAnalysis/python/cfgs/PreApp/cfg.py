@@ -39,8 +39,8 @@ bkgList = [ 'vv',  'qcd', 'st', 'z','dy', 'tt', 'w' ]
 #bkgList = [  'w' ]
 #bkgList = [ 'vv', 'qcd', 'st', 'dy', 'tt', 'w'  ]
 #sigList = ['s60FS', 's30FS', 's10FS' , 's30']
-sigList = ['s300_270','s300_220', 's300_290']
-#sigList = [ ] 
+#sigList = ['s300_270','s300_220', 's300_290']
+sigList = [ ] 
 
 #signalList    = massPoints.sigList 
 #mstop_lsps = massPoints.mstop_lsps
@@ -154,6 +154,8 @@ sampleList = bkgList + task_info['sigList']
 #ppTag = "74X_postProcessing_v4"
 
 ppSets = [
+            ( "80X_postProcessing_v9" , "nrad01"   , '8011_mAODv2_v1'),
+            ( "80X_postProcessing_v8" , "nrad01"   , '8011_mAODv2_v1'),
             ( "80X_postProcessing_v6" , "nrad01"   , '8011_mAODv2_v1'),
             ( "80X_postProcessing_v7" , "nrad01"   , '8011_mAODv2_v1'),
             ( "80X_postProcessing_v5" , "mzarucki01"   , '8011_mAODv2_v1'),
@@ -307,7 +309,7 @@ cfg = TaskConfig(
                    ppUser         =  ppUser , 
                    cmgTag         =  cmgTag , 
                    #saveDirBase   =  "/afs/hephy.at/user/n/nrad/www/T2Deg13TeV/mAODv2_7412pass2_v6/Studies_v1/" ,
-                   saveDirBase    =  "/afs/hephy.at/user/n/nrad/www/T2Deg13TeV/%s/%s/SUS_16_031_v0_3/"%(cmgTag, ppTag) ,
+                   saveDirBase    =  "/afs/hephy.at/user/n/nrad/www/T2Deg13TeV/%s/%s/SUS_16_031_v0_4/"%(cmgTag, ppTag) ,
                    #saveDirBase    =  "/afs/hephy.at/user/n/nrad/www/T2Deg13TeV/%s/%s/Studies_v0_puWeight_wptrwgt/"%(cmgTag, ppTag) ,
                    #saveDirBase    =  "/afs/hephy.at/user/n/nrad/www/T2Deg13TeV/%s/%s/Studies_v0_puWeight_wptrwgt/"%(cmgTag, ppTag) ,
                    cutInst        =  cutInstList,
@@ -328,7 +330,7 @@ cfg = TaskConfig(
                                         "useHT"        :    True        , 
                                         "skim"         :    'preIncLep', 
                                         "kill_low_qcd_ht":  False       ,
-                                        "scan"         :    True        ,
+                                        "scan"         :    False        ,
                                         #"massPoints"   :    task_info['massPoints']  ,
                                         "getData"      :    task_info.get("data",False)    ,
                                         "weights"      :    task_weight.weights     ,

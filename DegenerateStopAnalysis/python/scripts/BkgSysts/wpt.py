@@ -48,6 +48,44 @@ if __name__ == '__main__':
     res_W_wpt  =    dict_manipulator( [ yieldW['wpt']  , yieldW['']  ] , lambda a,b: ( abs(1.-(a/b).val) ) * 100)
     #res_W_2wpt =    dict_manipulator( [ yieldW['2wpt'] , yieldW[''] ] , lambda a,b: ( abs(1.-(a/b).val) ) * 100)
 
+    tags         = tags
+    res_dir      = os.path.expandvars("$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/results/2016/%s_%s_%s/"%(cfg.cmgTag, cfg.ppTag, cfg.runTag) )
+    yldinsts_dir = "%s/YieldInsts/"%(res_dir)
+    ylds_dir     = "%s/YieldDicts/"%(res_dir)
+    global_yield_dict = res_dir + "/YieldDictWithVars.pkl"
+    makeDir(ylds_dir)
+    makeDir(yldinsts_dir)
+    for tag in tags:
+        pickle.dump(  yields[tag] , open( "%s/YieldInst_%s.pkl"%(yldinsts_dir, tag) ,'w' ) )
+        pickle.dump(  yieldDict[tag] , open( "%s/YieldDict_%s.pkl"%(ylds_dir, tag) ,'w' ) )
+    
+    for tag in tags:
+        if os.path.isfile(global_yield_dict):
+            global_pkl = pickle.load( file(global_yield_dict) )
+        else:
+            global_pkl = {}
+        global_pkl[tag] = yieldDict[tag]
+        pickle.dump(  global_pkl , open( "%s/YieldDictWithVars.pkl"%(res_dir ) ,'w' ) )
+
+
+
+    syst_name = "Wpt"
+    #sample_systs = {}
+    sample_card_systs = {} 
+    for samp in yieldDict[tag].keys():
+         #sample_systs[samp]     =  dict_manipulator( [yieldDict[x][samp] for x in tags  ] , lambda a,b,c: ( abs(1.-(a/c).val) + abs(1.-(b/c).val) )/2. * 100 if c.val else 0 )   
+         sample_card_systs[samp]=  dict_manipulator( [yieldDict[x][samp] for x in tags  ] , lambda a,c: 1+ round( ( abs(1.-(a/c).val)) , 3)  if c.val else 0 )   
+    global_syst_pkl =  "%s/SystDictRaw.pkl"%(res_dir)
+    bins_card_systs  =  Yields.getByBins(yields[tag], sample_card_systs)
+    if os.path.isfile(global_syst_pkl):
+        global_syst_dict = pickle.load( file(global_syst_pkl) )
+    else:
+        global_syst_dict = {}
+    global_syst_dict[syst_name] = {'bins':bins_card_systs , 'type':'lnN'}
+    pickle.dump( global_syst_dict ,  open( "%s/SystDictRaw.pkl"%(res_dir ) ,'w' ) ) 
+
+
+
     
     ##FIX ME
     #regions = yld.cutNames
@@ -123,7 +161,8 @@ if __name__ == '__main__':
             table_list.append( [x[1] for x in toPrint])
     
     
-    bkg_systs_dir = "$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/results/2016/BkgSysts/"
+    bkg_systs_dir = "$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/results/2016/%s_%s_%s/BkgSysts/"%(cfg.cmgTag, cfg.ppTag, cfg.runTag)
+    makeDir(os.path.expandvars(bkg_systs_dir))
     pickle.dump(res_W_wpt , open( os.path.expandvars( bkg_systs_dir+"/Wpt_wonly.pkl")  ,"w"))
     pickle.dump(res_wpt , open( os.path.expandvars( bkg_systs_dir+"/Wpt_fullbkg.pkl")  ,"w"))
     table = makeSimpleLatexTable( table_list, "WPt.tex", cfg.saveDirBase+"/BkgSysts/", align_char = "c"        ,  align_func= lambda char, table: "c|cc|c|c" )

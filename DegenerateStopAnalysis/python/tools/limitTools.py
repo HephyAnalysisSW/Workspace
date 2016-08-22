@@ -12,6 +12,14 @@ import os
 import ROOT
 import re
 
+def makeSystTemplate( syst_bins, sample_names, def_val = 0.0, syst_type ='lnN' ,syst_n = ''):
+    syst = {}
+    for b in syst_bins:
+        syst[b]={}
+        for s in sample_names:
+            syst[b][s] = def_val
+    ret = {'bins': syst , 'type':syst_type}
+    return ret
 
 
 def getLimit(yld, sig=None          , outDir    = "./cards/", postfix = ""     , 

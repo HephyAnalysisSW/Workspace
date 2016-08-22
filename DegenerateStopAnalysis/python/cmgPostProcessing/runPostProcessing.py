@@ -420,10 +420,11 @@ sampleSets = {
                 
                 'data_el_d_onelep':{
                             'samples':[
-                                        ["SingleElectron_Run2016D_PromptReco_v2",   "--skimLepton=oneLep",   "--runChunks", "0",   "100"],     
-                                        ["SingleElectron_Run2016D_PromptReco_v2",   "--skimLepton=oneLep",   "--runChunks", "101", "200"],     
-                                        ["SingleElectron_Run2016D_PromptReco_v2",   "--skimLepton=oneLep",   "--runChunks", "201", "300"],     
-                                        ["SingleElectron_Run2016D_PromptReco_v2",   "--skimLepton=oneLep",   "--runChunks", "401", "500"],     
+                                        #["SingleElectron_Run2016D_PromptReco_v2",   "--skimLepton=oneLep",   "--runChunks", "0",   "100"],     
+                                        #["SingleElectron_Run2016D_PromptReco_v2",   "--skimLepton=oneLep",   "--runChunks", "101", "200"],     
+                                        #["SingleElectron_Run2016D_PromptReco_v2",   "--skimLepton=oneLep",   "--runChunks", "201", "300"],     
+                                        #["SingleElectron_Run2016D_PromptReco_v2",   "--skimLepton=oneLep",   "--runChunks", "301", "400"],     
+                                        #["SingleElectron_Run2016D_PromptReco_v2",   "--skimLepton=oneLep",   "--runChunks", "401", "500"],     
                                         ["SingleElectron_Run2016D_PromptReco_v2",   "--skimLepton=oneLep",   "--runChunks", "501", "600"],     
                                       ]},
                 

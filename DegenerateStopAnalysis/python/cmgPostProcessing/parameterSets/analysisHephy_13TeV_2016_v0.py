@@ -124,6 +124,7 @@ def getParameterSet(args):
             'eta': ('eta', operator.lt, 2.4, operator.abs),
             'dxy': ('dxy', operator.lt, 0.02, operator.abs),
             'dz': ('dz', operator.lt, 0.5, operator.abs),
+            'looseMuonId': ('looseMuonId', operator.ge, 1 ),
             'hybIso': {
                 'ptSwitch': 25, 
                 'relIso': {
@@ -138,8 +139,9 @@ def getParameterSet(args):
             'pdgId': ('pdgId', operator.eq, 13, operator.abs),
             'pt': ('pt', operator.gt, 5),
             'eta': ('eta', operator.lt, 2.4, operator.abs),
-            'dxy': ('dxy', operator.lt, 0.02, operator.abs),
+            #'dxy': ('dxy', operator.lt, 0.02, operator.abs),
             'dz': ('dz', operator.lt, 0.5, operator.abs),
+            'looseMuonId': ('looseMuonId', operator.ge, 1 ),
             },
         
         #

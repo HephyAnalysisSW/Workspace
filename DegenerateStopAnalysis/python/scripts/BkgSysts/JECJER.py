@@ -45,13 +45,60 @@ if __name__ == '__main__':
     taskret = task_ret['bkg_est'][0]
     for jc in jcTags:
         bin_name = bin_name_base +"_%s"%jc if jc else bin_name_base
-        yieldPkls[jc] = taskret[bin_name]
-        yieldDict[jc]=yieldPkls[jc].getNiceYieldDict()
-        yieldTotals[jc]=yieldDict[jc]['Total'] 
+        yieldPkls[jc]   =   taskret[bin_name]
+        yields[jc]      =   yieldPkls[jc]
+        yieldDict[jc]   =   yieldPkls[jc].getNiceYieldDict()
+        yieldTotals[jc] =   yieldDict[jc]['Total']
+
 
 
     jec_res =    dict_manipulator( [ yieldTotals['jec_up'], yieldTotals['jec_central'] , yieldTotals['jec_down'] ] , lambda a,b,c: ( abs(1.-(a/c).val) + abs(1.-(b/c).val) )/2. * 100)
     jer_res =    dict_manipulator( [ yieldTotals['jer_up'], yieldTotals['jer_central'] , yieldTotals['jer_down'] ] , lambda a,b,c: ( abs(1.-(a/c).val) + abs(1.-(b/c).val) )/2. * 100)
+
+
+
+    tags         = jcTags
+    res_dir      = os.path.expandvars("$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/results/2016/%s_%s_%s/"%(cfg.cmgTag, cfg.ppTag, cfg.runTag) )
+    yldinsts_dir = "%s/YieldInsts/"%(res_dir)
+    ylds_dir     = "%s/YieldDicts/"%(res_dir)
+    global_yield_dict = res_dir + "/YieldDictWithVars.pkl"
+    makeDir(ylds_dir)
+    makeDir(yldinsts_dir)
+    for tag in tags:
+        pickle.dump(  yields[tag] , open( "%s/YieldInst_%s.pkl"%(yldinsts_dir, tag) ,'w' ) )
+        pickle.dump(  yieldDict[tag] , open( "%s/YieldDict_%s.pkl"%(ylds_dir, tag) ,'w' ) )
+    
+    for tag in tags:
+        if os.path.isfile(global_yield_dict):
+            global_pkl = pickle.load( file(global_yield_dict) )
+        else:
+            global_pkl = {}
+        global_pkl[tag] = yieldDict[tag]
+        pickle.dump(  global_pkl , open( "%s/YieldDictWithVars.pkl"%(res_dir ) ,'w' ) )
+
+
+    syst_name = ""
+    #sample_systs = {}
+    sample_card_systs_jec = {} 
+    sample_card_systs_jer = {} 
+    for samp in yieldDict[tag].keys():
+         #sample_systs[samp]     =  dict_manipulator( [yieldDict[x][samp] for x in tags  ] , lambda a,b,c: ( abs(1.-(a/c).val) + abs(1.-(b/c).val) )/2. * 100 if c.val else 0 )   
+         sample_card_systs_jec[samp]=  dict_manipulator( [yieldDict[x][samp] for x in ['jec_up', 'jec_down', 'jec_central']  ] , lambda a,b,c: 1+ round( ( abs(1.-(a/c).val) + abs(1.-(b/c).val) )/2. , 3)  if c.val else 0 )   
+         sample_card_systs_jer[samp]=  dict_manipulator( [yieldDict[x][samp] for x in ['jer_up', 'jer_down', 'jer_central']  ] , lambda a,b,c: 1+ round( ( abs(1.-(a/c).val) + abs(1.-(b/c).val) )/2. , 3)  if c.val else 0 )   
+
+    bins_card_systs_jec  =  Yields.getByBins(yields[tag], sample_card_systs_jec)
+    bins_card_systs_jer  =  Yields.getByBins(yields[tag], sample_card_systs_jer)
+    global_syst_pkl    =  "%s/SystDictRaw.pkl"%(res_dir)
+    if os.path.isfile(global_syst_pkl):
+        global_syst_dict = pickle.load( file(global_syst_pkl) )
+    else:
+        global_syst_dict = {}
+    global_syst_dict["JEC"] = {'bins':bins_card_systs_jec , 'type':'lnN'}
+    global_syst_dict["JER"] = {'bins':bins_card_systs_jer , 'type':'lnN'}
+    #global_syst_dict["JEC"] = bins_card_systs_jec
+    #global_syst_dict["JER"] = bins_card_systs_jer
+    pickle.dump( global_syst_dict ,  open( "%s/SystDictRaw.pkl"%(res_dir ) ,'w' ) ) 
+
 
     
     ##FIX ME
@@ -126,7 +173,8 @@ if __name__ == '__main__':
             table_list.append( [x[1] for x in toPrint])
     
     
-    bkg_systs_dir = "$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/results/2016/BkgSysts/"
+    bkg_systs_dir = "$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/results/2016/%s_%s_%s/BkgSysts/"%(cfg.cmgTag, cfg.ppTag, cfg.runTag)
+    makeDir(os.path.expandvars(bkg_systs_dir))
     pickle.dump(jec_res , open( os.path.expandvars( bkg_systs_dir+"/JEC.pkl")  ,"w"))
     pickle.dump(jer_res , open( os.path.expandvars( bkg_systs_dir+"/JER.pkl")  ,"w"))
     table = makeSimpleLatexTable( table_list, "JECJER.tex", cfg.saveDirBase+"/BkgSysts/", align_char = "c" ,  align_func= lambda char, table: "c|ccc|c|ccc|c" )

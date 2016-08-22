@@ -160,13 +160,13 @@ class DegPlots():
         
         plotDict =\
               {
-                "{lepTitle}mt".format(**fargs):           {'var':"{lepCol}_mt[{lepIndex}[0]]".format(**fargs)       ,"bins":[40,0,200]          ,"nMinus1":None         ,"decor":{"title":"{lep}MT".format(**fargs)    ,"x":"M_{{T}}({lepLatex}) ".format(**fargs)      ,"y":"Events"  ,'log':[0,1,0] }},
-                "{lepTitle}mtSR".format(**fargs):         {'var':"{lepCol}_mt[{lepIndex}[0]]".format(**fargs)       ,"bins":[20,0,200]          ,"nMinus1":None         ,"decor":{"title":"{lep}MT".format(**fargs)    ,"x":"M_{{T}}({lepLatex}) ".format(**fargs)      ,"y":"Events"  ,'log':[0,1,0] }},
+                "Lepmt":           {'var':"{lepCol}_mt[{lepIndex}[0]]".format(**fargs)       ,"bins":[40,0,200]          ,"nMinus1":None         ,"decor":{"title":"{lep}MT".format(**fargs)    ,"x":"M_{{T}}({lepLatex}) ".format(**fargs)      ,"y":"Events"  ,'log':[0,1,0] }},
+                "LepmtSR":         {'var':"{lepCol}_mt[{lepIndex}[0]]".format(**fargs)       ,"bins":[20,0,200]          ,"nMinus1":None         ,"decor":{"title":"{lep}MT".format(**fargs)    ,"x":"M_{{T}}({lepLatex}) ".format(**fargs)      ,"y":"Events"  ,'log':[0,1,0] }},
                 #"mtSR":        {'var':"mt"                           ,"bins":[30,0,150]          ,"nMinus1":None         ,"decor":{"title":"MT"    ,"x":"M_{T}"      ,"y":"Events / 5 GeV "  ,'log':[0,1,0] }},
-                "{lepTitle}Pt".format(**fargs) :        {'var':"{lepCol}_pt[{lepIndex}[0]]".format(**fargs)       ,"bins":[40,0,200]          ,"nMinus1":""      ,"decor":{"title":"{lep}Pt".format(**fargs)           ,"x":"P_{{T}}({lepLatex})".format(**fargs)       ,"y":"Events"  ,'log':[0,1,0] }},
-                "{lepTitle}PtSR".format(**fargs) :      {'var':"{lepCol}_pt[{lepIndex}[0]]".format(**fargs)        ,"bins":[35,0,35]           ,"nMinus1":""           ,"decor":{"title":"{lep}Pt".format(**fargs)     ,"x":"P_{{T}}({lepLatex})".format(**fargs)       ,"y":"Events"  ,'log':[0,1,0] }},
-                "{lepTitle}Eta".format(**fargs) :       {'var':"{lepCol}_eta[{lepIndex}[0]]".format(**fargs)                         ,"bins":[20,-3,3]           ,"nMinus1":""         ,"decor":{"title":"{lep}Eta".format(**fargs)     ,"x":"#eta({lepLatex})".format(**fargs)       ,"y":"Events  "  ,'log':[0,1,0] }},
-                "{lepTitle}Phi".format(**fargs) :      {'var':"{lepCol}_phi[{lepIndex}[0]]".format(**fargs)                         ,"bins":[20,-3.15,3.15]           ,"nMinus1":None         ,"decor":{"title":"{lep}Phi".format(**fargs)     ,"x":"{lep} Phi".format(**fargs)       ,"y":"Events  "  ,'log':[0,1,0] }},
+                "LepPt" :        {'var':"{lepCol}_pt[{lepIndex}[0]]".format(**fargs)       ,"bins":[40,0,200]          ,"nMinus1":""      ,"decor":{"title":"{lep}Pt".format(**fargs)           ,"x":"P_{{T}}({lepLatex})".format(**fargs)       ,"y":"Events"  ,'log':[0,1,0] }},
+                "LepPtSR" :      {'var':"{lepCol}_pt[{lepIndex}[0]]".format(**fargs)        ,"bins":[35,0,35]           ,"nMinus1":""           ,"decor":{"title":"{lep}Pt".format(**fargs)     ,"x":"P_{{T}}({lepLatex})".format(**fargs)       ,"y":"Events"  ,'log':[0,1,0] }},
+                "LepEta" :       {'var':"{lepCol}_eta[{lepIndex}[0]]".format(**fargs)                         ,"bins":[20,-3,3]           ,"nMinus1":""         ,"decor":{"title":"{lep}Eta".format(**fargs)     ,"x":"#eta({lepLatex})".format(**fargs)       ,"y":"Events  "  ,'log':[0,1,0] }},
+                "LepPhi" :      {'var':"{lepCol}_phi[{lepIndex}[0]]".format(**fargs)                         ,"bins":[20,-3.15,3.15]           ,"nMinus1":None         ,"decor":{"title":"{lep}Phi".format(**fargs)     ,"x":"{lep} Phi".format(**fargs)       ,"y":"Events  "  ,'log':[0,1,0] }},
                 "met":          {'var':"met"                            ,"bins":[40,200,1000]        ,"nMinus1":"met"        ,"decor":{"title":"MET"    ,"x":"E^{miss}_{T}"      ,"y":"Events"  ,'log':[0,1,0] }},
                 "ht":           {'var':"ht_basJet"                     ,"bins":[40,200,1000]        ,"nMinus1":""           ,"decor":{"title":"HT"    ,"x":"H_{T}"      ,"y":"Events"  ,'log':[0,1,0] }},
                 "ct":           {'var':"min(met_pt,ht_basJet)"         ,"bins":[40,100,1000]        ,"nMinus1":""           ,"decor":{"title":"CT"    ,"x":"C_{T}"      ,"y":"Events"  ,'log':[0,1,0] }},
@@ -225,8 +225,17 @@ class DegPlots():
                 #"jetHFEMMult":   {'var':"Jet_HFEMMult[]"   ,"bins":[10,0,10]          ,"nMinus1":None         ,"decor":{"title":"Jet HF EM Multip"                     ,"x": "Jet HF EM Multip"                      ,"y":"Events  "  ,'log':[0,1,0] }},
 
 
+                #
+                #   Lepton Quality Plots
+                #
 
-
+                "LepDxy":          {'var':"{lepCol}_dxy[{lepIndex}[0]]".format(**fargs)                 ,"bins":[40,-0.05,0.05]          ,"nMinus1":None          ,"decor":{"title":"{lep}_dxy".format(**fargs)           ,"x": "{lep}_dxy".format(**fargs)             ,"y":"Events"  ,'log':[0,1,0] }},
+                "LepDz":           {'var':"{lepCol}_dz[{lepIndex}[0]]".format(**fargs)                  ,"bins":[40,-0.1,0.1]          ,"nMinus1":None          ,"decor":{"title":"{lep}_dz".format(**fargs)            ,"x": "{lep}_dz".format(**fargs)              ,"y":"Events"  ,'log':[0,1,0] }},
+                "LepLooseMuonId":  {'var':"{lepCol}_looseMuonId[{lepIndex}[0]]".format(**fargs)         ,"bins":[3,0,3]          ,"nMinus1":None                ,"decor":{"title":"{lep}_LooseMuonId".format(**fargs)   ,"x": "{lep}_LooseMuonId".format(**fargs)     ,"y":"Events"  ,'log':[0,1,0] }},
+                "LepSpring15":     {'var':"{lepCol}_SPRING15_25ns_v1[{lepIndex}[0]]".format(**fargs)    ,"bins":[7,0,7]          ,"nMinus1":None                ,"decor":{"title":"{lep}_Spring15".format(**fargs)      ,"x": "{lep}_Spring15".format(**fargs)        ,"y":"Events"  ,'log':[0,1,0] }},
+                "LepPdgId":        {'var':"{lepCol}_pdgId[{lepIndex}[0]]".format(**fargs)               ,"bins":[40,-20,20]          ,"nMinus1":None            ,"decor":{"title":"{lep}_pdgId".format(**fargs)         ,"x": "{lep}_pdgId".format(**fargs)           ,"y":"Events"  ,'log':[0,1,0] }},
+                "LepRelIso":       {'var':"{lepCol}_relIso03[{lepIndex}[0]]".format(**fargs)            ,"bins":[40,0,1]          ,"nMinus1":None               ,"decor":{"title":"{lep}_relIso".format(**fargs)        ,"x": "{lep}_relIso".format(**fargs)          ,"y":"Events"  ,'log':[0,1,0] }},
+                "LepabsIso":          {'var':"{lepCol}_absIso03[{lepIndex}[0]]".format(**fargs)            ,"bins":[40,0,10]          ,"nMinus1":None           ,"decor":{"title":"{lep}_absIso".format(**fargs)        ,"x": "{lep}_absIso".format(**fargs)          ,"y":"Events"  ,'log':[0,1,0] }},
 
 
 
@@ -238,8 +247,8 @@ class DegPlots():
                 "isrPt_fine":   {'var':"Jet_pt[IndexJet_basJet[0]]"    ,"bins":[100,0,1000]          ,"nMinus1":None         ,"decor":{"title":"Leading Jet P_{{T}} "    ,"x":"isrJetPt"      ,"y":"Events  "  ,'log':[0,1,0] }},
                 "nJets30":      {'var':"nBasJet"                       ,"bins":[10,0,10]          ,"nMinus1":None         ,"decor":{"title":"Number of Jets with P_{{T}} > 30GeV"    ,"x":"Number of Jets with P_{T} > 30GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
                 "nJets60":      {'var':"nVetoJet"                      ,"bins":[10,0,10]          ,"nMinus1":None         ,"decor":{"title":"Number of Jets with P_{{T}} > 60GeV"    ,"x":"Number of Jets with P_{T} > 60GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
-                "nJets30_2":      {'var':"nBasJet"                     ,"bins":[4,0,4]          ,"nMinus1":None         ,"decor":{"title":"Number of Jets with P_{{T}} > 30GeV"    ,"x":"Number of Jets with P_{T} > 30GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
-                "nJets60_2":      {'var':"nVetoJet"                    ,"bins":[4,0,4]          ,"nMinus1":None         ,"decor":{"title":"Number of Jets with P_{{T}} > 60GeV"    ,"x":"Number of Jets with P_{T} > 60GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
+                "nJets30_2":    {'var':"nBasJet"                     ,"bins":[4,0,4]          ,"nMinus1":None         ,"decor":{"title":"Number of Jets with P_{{T}} > 30GeV"    ,"x":"Number of Jets with P_{T} > 30GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
+                "nJets60_2":    {'var':"nVetoJet"                    ,"bins":[4,0,4]          ,"nMinus1":None         ,"decor":{"title":"Number of Jets with P_{{T}} > 60GeV"    ,"x":"Number of Jets with P_{T} > 60GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
                 "nSoftBJets":   {'var':"(nBSoftJet)"                   ,"bins":[4,0,4]            ,"nMinus1":None         ,"decor":{"title":"Number of Soft B-Tagged Jets with P_{{T}} < 60GeV"    ,"x":"Number of Soft B-Tagged Jets with P_{T} < 60GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
                 "nHardBJets":   {'var':"(nBHardJet)"                   ,"bins":[4,0,4]            ,"nMinus1":None         ,"decor":{"title":"Number of B-Tagged Jets with P_{{T}} > 60GeV"    ,"x":"Number of Hard B-Tagged Jets with P_{T} > 60GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
                 "nBJets":       {'var':"(nBHardJet + nBSoftJet)"       ,"bins":[4,0,4]            ,"nMinus1":None         ,"decor":{"title":"Number of B-Tagged Jets"                         ,"x":"Number of B-Tagged Jets"      ,"y":"Events  "  ,'log':[0,1,0] }},

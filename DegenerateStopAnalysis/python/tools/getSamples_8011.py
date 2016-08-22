@@ -209,12 +209,12 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
             mlsp = mstop - dm
             #print cmgPP.__dict__.keys()
 
-            s = getattr(cmgPP,"SMS_T2tt_mStop_%s_mLSP_%s"%(mstop,mlsp) )[skim]
+            s = getattr(cmgPP,"SMS_T2tt_mStop_%s_mLSP_%s"%(mstop,mlsp) )
             #s = getattr(cmgPP,"SMS_T2_4bd_mStop_%s_mLSP_%s"%(mstop,mlsp))[skim]
-            if glob.glob("%s/%s/*.root"%(s['dir'],s['name'])):
+            if s and glob.glob("%s/%s/*.root"%(s[skim]['dir'],s[skim]['name'])):
                sampleDict.update({
                   #'s%s_%s'%(mstop,mlsp):{'name':'T2_4bd_%s_%s'%(mstop,mlsp), 'sample':getattr(cmgPP,"SMS_T2tt_mStop_%s_mLSP_%s"%(mstop,mlsp))[skim], 'color':colors['s%s_%s'%(mstop,mlsp)], 'isSignal':1 , 'isData':0, 'lumi':mc_lumi},
-                  's%s_%s'%(mstop,mlsp):{'name':'T2tt_%s_%s'%(mstop,mlsp), 'sample':s, 'color':colors['s%s_%s'%(mstop,mlsp)], 'isSignal':1 , 'isData':0, 'lumi':mc_lumi},
+                  's%s_%s'%(mstop,mlsp):{'name':'T2tt_%s_%s'%(mstop,mlsp), 'sample':s[skim], 'color':colors['s%s_%s'%(mstop,mlsp)], 'isSignal':1 , 'isData':0, 'lumi':mc_lumi},
             })
             else: 
                 #print "%s/%s/*.root"%(s['dir'],s['name'])

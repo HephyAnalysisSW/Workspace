@@ -415,20 +415,20 @@ def bkg_est(cfg, args):
         cut_name = cutInst.fullName
         sampleList = getattr(cfg, "bkgList") + getattr(cfg,"signalList")
 
-        #if 'sr' in cut_name.lower() or ( 'binssummary' in cut_name.lower() ):
-        if 'sr' in cut_name.lower():
-            dataList = ['d']
-        elif ("cr" in cut_name.lower()) or ("sideband" in cut_name.lower()) or ( 'bins' in cut_name.lower()  ):
-            dataList = ['dblind']
-        else:
-            raise Exception("not sure which dataset to use! cut_name: %s"%cut_name)
-
-
+        #if 'sr' in cut_name.lower():
+        #    dataList = ['d']
+        #elif ("cr" in cut_name.lower()) or ("sideband" in cut_name.lower()) or ( 'bins' in cut_name.lower()  ):
+        #    dataList = ['dblind']
+        #else:
+        #    raise Exception("not sure which dataset to use! cut_name: %s"%cut_name)
+        dataList = ['dblind']
         if dataList[0] in cfg.samples.dataList():
             lumi = cfg.samples[dataList[0]].name +"_lumi"
         else:
             dataList = []
             lumi = "DataUnblind_lumi" # or "target_lumi"
+
+
             
         tableDir = cfg.tableDirs[cut_name]
         yield_pkl= cfg.yieldPkls[cut_name]
@@ -681,7 +681,8 @@ def data_plots(cfg,args):
         sampleList = cfg.bkgList + cfg.signalList #cfg.sample_info['sampleList']  + cfg.signalList 
         print "------------------- - - -- - --- - - - -- ", sampleList  
         result[cut_name]={}
-        data = 'd' if 'SR' in cut_name else 'dblind'   ## safeside : 'dblind' if 'CR' in cut_name else 'd'
+        #data = 'd' if 'SR' in cut_name else 'dblind'   ## safeside : 'dblind' if 'CR' in cut_name else 'd'
+        data = 'dblind'
         #data = 'dblind' if 'CR' in cut_name else 'd'   ## safeside : 'dblind' if 'CR' in cut_name else 'd'
         plotMin =  0.01 if "SR" in cut_name else 1.0
         for plot in cfg.plotList:
