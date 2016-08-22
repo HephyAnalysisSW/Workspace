@@ -20,7 +20,8 @@ if __name__ == '__main__':
     sigs = []
     allSamps       = allBkg + sigs + [data]
     
-    side_band_name = 'presel_CRs'
+    #side_band_name = 'presel_CRs'
+    side_band_name = task_ret['bkg_est'][0].keys()[0]
     
     
     
@@ -75,7 +76,7 @@ if __name__ == '__main__':
     
     
     ##FIX ME
-    regions = yld.cutNames
+    regions = [x for x in yld.cutNames if "CR" in x]
     region_names = regions
     tt_region_names = [x for x in region_names if "CRTT2" in x ]
     w_region_names  = [x for x in region_names if x not in tt_region_names]

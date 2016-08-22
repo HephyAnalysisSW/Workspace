@@ -51,6 +51,51 @@ if __name__ == '__main__':
     res_l  =    dict_manipulator( [ yieldTotals['SF_L_DOWN'] , yieldTotals['SF_L_UP'] , yieldTotals['SF']  ] , lambda a,b,c: ( relsys(a,c) + relsys(b,c) ) /2.  * 100)
     res    =    dict_manipulator( [ yieldTotals['SF_L_DOWN'] , yieldTotals['SF_L_UP'] , yieldTotals['SF_B_DOWN'] , yieldTotals['SF_B_UP'] , yieldTotals['SF']  ] , lambda a,b,c,d,e: (relsys(a,e) + relsys(a,e)+ relsys(c,e) + relsys(d,e) )/4. * 100)
 
+
+    tags         = tags
+    res_dir      = os.path.expandvars("$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/results/2016/%s_%s_%s/"%(cfg.cmgTag, cfg.ppTag, cfg.runTag) )
+    yldinsts_dir = "%s/YieldInsts/"%(res_dir)
+    ylds_dir     = "%s/YieldDicts/"%(res_dir)
+    global_yield_dict = res_dir + "/YieldDictWithVars.pkl"
+    makeDir(ylds_dir)
+    makeDir(yldinsts_dir)
+    for tag in tags:
+        pickle.dump(  yields[tag] , open( "%s/YieldInst_%s.pkl"%(yldinsts_dir, tag) ,'w' ) )
+        pickle.dump(  yieldDict[tag] , open( "%s/YieldDict_%s.pkl"%(ylds_dir, tag) ,'w' ) )
+    
+    for tag in tags:
+        if os.path.isfile(global_yield_dict):
+            global_pkl = pickle.load( file(global_yield_dict) )
+        else:
+            global_pkl = {}
+        global_pkl[tag] = yieldDict[tag]
+        pickle.dump(  global_pkl , open( "%s/YieldDictWithVars.pkl"%(res_dir ) ,'w' ) )
+
+
+    syst_name = ""
+    #sample_systs = {}
+    sample_card_systs_b = {} 
+    sample_card_systs_l = {} 
+    for samp in yieldDict[tag].keys():
+         #sample_systs[samp]     =  dict_manipulator( [yieldDict[x][samp] for x in tags  ] , lambda a,b,c: ( abs(1.-(a/c).val) + abs(1.-(b/c).val) )/2. * 100 if c.val else 0 )   
+         sample_card_systs_b[samp]=  dict_manipulator( [yieldDict[x][samp] for x in ['SF_B_DOWN', 'SF_B_UP', 'SF']  ] , lambda a,b,c: 1+ round( ( abs(1.-(a/c).val) + abs(1.-(b/c).val) )/2. , 3)  if c.val else 0 )   
+         sample_card_systs_l[samp]=  dict_manipulator( [yieldDict[x][samp] for x in ['SF_L_DOWN', 'SF_L_UP', 'SF']  ] , lambda a,b,c: 1+ round( ( abs(1.-(a/c).val) + abs(1.-(b/c).val) )/2. , 3)  if c.val else 0 )   
+
+    bins_card_systs_b  =  Yields.getByBins(yields[tag], sample_card_systs_b)
+    bins_card_systs_l  =  Yields.getByBins(yields[tag], sample_card_systs_l)
+    global_syst_pkl =  "%s/SystDictRaw.pkl"%(res_dir)
+    if os.path.isfile(global_syst_pkl):
+        global_syst_dict = pickle.load( file(global_syst_pkl) )
+    else:
+        global_syst_dict = {}
+    global_syst_dict["Bb"] = {'bins':bins_card_systs_b , 'type':'lnN'}
+    global_syst_dict["Bl"] = {'bins':bins_card_systs_l , 'type':'lnN'}
+    #global_syst_dict["Bb"] = bins_card_systs_b
+    #global_syst_dict["Bl"] = bins_card_systs_l
+    pickle.dump( global_syst_dict ,  open( "%s/SystDictRaw.pkl"%(res_dir ) ,'w' ) ) 
+
+
+
     ##FIX ME
     #regions = yld.cutNames
 
@@ -125,7 +170,10 @@ if __name__ == '__main__':
     
 
 
-    bkg_systs_dir = "$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/results/2016/BkgSysts/"
+    bkg_systs_dir = "$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/results/2016/%s_%s_%s/BkgSysts/"%(cfg.cmgTag, cfg.ppTag, cfg.runTag)
+    makeDir(os.path.expandvars(bkg_systs_dir))
+
+
     pickle.dump(res   , open( os.path.expandvars( bkg_systs_dir+"/BTag.pkl")  ,"w"))
     pickle.dump(res_b , open( os.path.expandvars( bkg_systs_dir+"/BTag_b.pkl")  ,"w"))
     pickle.dump(res_l , open( os.path.expandvars( bkg_systs_dir+"/BTag_l.pkl")  ,"w"))
