@@ -80,16 +80,24 @@ if __name__ == '__main__':
     for samp in yieldDict[tag].keys():
          #sample_systs[samp]     =  dict_manipulator( [yieldDict[x][samp] for x in tags  ] , lambda a,b,c: ( abs(1.-(a/c).val) + abs(1.-(b/c).val) )/2. * 100 if c.val else 0 )   
          sample_card_systs[samp]=  dict_manipulator( [yieldDict[x][samp] for x in tags  ] , lambda a,b,c: 1+ round( ( abs(1.-(a/c).val) + abs(1.-(b/c).val) )/2. , 3)  if c.val else 0 )   
-    global_syst_pkl =  "%s/SystDictRaw.pkl"%(res_dir)
-    bins_card_systs  =  Yields.getByBins(yields[tag], sample_card_systs)
+    global_syst_pkl           =  "%s/SystDictForCards.pkl"%(res_dir)
+    bins_card_systs           =  Yields.getByBins(yields[tag], sample_card_systs)
     if os.path.isfile(global_syst_pkl):
         global_syst_dict = pickle.load( file(global_syst_pkl) )
     else:
         global_syst_dict = {}
-    global_syst_dict[syst_name] = {'bins':bins_card_systs , 'type':'lnN'}
+    global_syst_card_dict[syst_name] = {'bins':bins_card_systs , 'type':'lnN'}
     #global_syst_dict[syst_name] = bins_card_systs 
-    pickle.dump( global_syst_dict ,  open( "%s/SystDictRaw.pkl"%(res_dir ) ,'w' ) ) 
+    pickle.dump( global_syst_card_dict ,  open( "%s/SystDictForCards.pkl"%(res_dir ) ,'w' ) ) 
 
+    global_syst_dict_pkl      =  "%s/SystDict.pkl"%(res_dir)
+    if os.path.isfile(global_syst_pkl):
+        global_syst_dict = pickle.load( file(global_syst_pkl) )
+    else:
+        global_syst_dict = {}
+    global_syst_card_dict[syst_name] = sample_card_systs
+    #global_syst_dict[syst_name] = bins_card_systs 
+    pickle.dump( global_syst_card_dict ,  open( "%s/SystDict.pkl"%(res_dir ) ,'w' ) ) 
     
     ##FIX ME
     #regions = yld.cutNames

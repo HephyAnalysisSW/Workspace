@@ -209,7 +209,7 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
             mlsp = mstop - dm
             #print cmgPP.__dict__.keys()
 
-            s = getattr(cmgPP,"SMS_T2tt_mStop_%s_mLSP_%s"%(mstop,mlsp) )
+            s = getattr(cmgPP,"SMS_T2tt_mStop_%s_mLSP_%s"%(mstop,mlsp), None )
             #s = getattr(cmgPP,"SMS_T2_4bd_mStop_%s_mLSP_%s"%(mstop,mlsp))[skim]
             if s and glob.glob("%s/%s/*.root"%(s[skim]['dir'],s[skim]['name'])):
                sampleDict.update({

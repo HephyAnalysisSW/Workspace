@@ -434,6 +434,24 @@ allComponents.append(QCD_HT700to1000_ext)
 
 
 
+SMS_T2tt_dM_10to80_genHT_160_genMET_80 ={
+'cmgName':"SMS_T2tt_dM_10to80_genHT_160_genMET_80",
+"name" : "SMS-T2tt_dM-10to80_genHT-160_genMET-80_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+"chunkString":"SMS-T2tt_dM-10to80_genHT-160_genMET-80_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+"dir": sample_path +"/" + "SMS-T2tt_dM-10to80_genHT-160_genMET-80_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+"dbsName" : "/SMS-T2tt_dM-10to80_genHT-160_genMET-80_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM",
+"rootFileLocation":"tree.root",
+"skimAnalyzerDir":"skimAnalyzerCount",
+"treeName":"tree",
+"isData": False,
+"xsec": 1,
+
+"isFastSim":True,
+}
+allComponents.append(SMS_T2tt_dM_10to80_genHT_160_genMET_80)
+
+
+
 TBarToLeptons_tch_powheg ={
 'cmgName':"TBarToLeptons_tch_powheg",
 "name" : "ST_t-channel_antitop_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
@@ -521,6 +539,24 @@ TTJets_DiLepton ={
 
 }
 allComponents.append(TTJets_DiLepton)
+
+
+
+TTJets_FastSIM ={
+'cmgName':"TTJets_FastSIM",
+"name" : "TTJets_13TeV-madgraphMLM_RunIISpring16MiniAODv2-pLHE_PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+"chunkString":"TTJets_13TeV-madgraphMLM_RunIISpring16MiniAODv2-pLHE_PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+"dir": sample_path +"/" + "TTJets_13TeV-madgraphMLM_RunIISpring16MiniAODv2-pLHE_PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+"dbsName" : "/TTJets_13TeV-madgraphMLM/RunIISpring16MiniAODv2-pLHE_PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM",
+"rootFileLocation":"tree.root",
+"skimAnalyzerDir":"skimAnalyzerCount",
+"treeName":"tree",
+"isData": False,
+"xsec": 831.76,
+
+
+}
+allComponents.append(TTJets_FastSIM)
 
 
 

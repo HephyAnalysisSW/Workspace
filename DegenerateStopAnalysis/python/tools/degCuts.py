@@ -437,6 +437,15 @@ class Cuts():
                                    ] , 
                           baseCut = sr1c_baseCut,
                           )
+        self.srh1c_neg_nj2   = CutClass ("SR1c_neg_nj2",    [
+                                       ["SR1c","{lepCol}_mt[{lepIndex}[0]]>{mt1}".format(lepCol=lepCollection, lepIndex=lepIndex, **mts)],
+                                       ["SRH2",  btw("{lepCol}_pt[{lepIndex}[0]]".format(lepCol=lepCollection, lepIndex=lepIndex),12,20)   ],
+                                       ["neg{lep}".format(lep=lep.title()),"({lepCol}_pdgId[{lepIndex}[0]]==13 || {lepCol}_pdgId[{lepIndex}[0]]==11 )".format(lepCol=lepCollection, lepIndex=lepIndex)],
+                                       ["nj2"   ,  "nBasJet==2"],
+                                       #["SRH2"  ,  btw("{lepCol}_pt[{lepIndex}[0]]".format(lepCol=lepCollection, lepIndex=lepIndex),12,20)   ],
+                                   ] , 
+                          baseCut = sr1c_baseCut,
+                          )
         
         self.srs_ptbin   = CutClass ("SRs_PtBinned",    [], baseCut= self.presel ) 
         self.srs_ptbin.add( self.sr1ab_ptbin ,  baseCutString = self.sr1.inclCombined          )

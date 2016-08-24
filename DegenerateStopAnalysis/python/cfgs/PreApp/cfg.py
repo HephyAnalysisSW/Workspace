@@ -39,8 +39,8 @@ bkgList = [ 'vv',  'qcd', 'st', 'z','dy', 'tt', 'w' ]
 #bkgList = [  'w' ]
 #bkgList = [ 'vv', 'qcd', 'st', 'dy', 'tt', 'w'  ]
 #sigList = ['s60FS', 's30FS', 's10FS' , 's30']
-#sigList = ['s300_270','s300_220', 's300_290']
-sigList = [ ] 
+sigList = ['s300_270','s300_220', 's300_290']
+#sigList = [ ] 
 
 #signalList    = massPoints.sigList 
 #mstop_lsps = massPoints.mstop_lsps
@@ -330,7 +330,7 @@ cfg = TaskConfig(
                                         "useHT"        :    True        , 
                                         "skim"         :    'preIncLep', 
                                         "kill_low_qcd_ht":  False       ,
-                                        "scan"         :    False        ,
+                                        "scan"         :    len(sigList)>0       ,
                                         #"massPoints"   :    task_info['massPoints']  ,
                                         "getData"      :    task_info.get("data",False)    ,
                                         "weights"      :    task_weight.weights     ,
