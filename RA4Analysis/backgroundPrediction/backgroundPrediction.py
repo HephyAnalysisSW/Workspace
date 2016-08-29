@@ -233,7 +233,3 @@ for srNJet in signalRegions:
 pickle.dump(bins, file(pickleDir+prefix+'_estimationResults_pkl','w'))
 print "written:" , pickleDir+prefix+'_estimationResults_pkl'
 
-
-
-
-

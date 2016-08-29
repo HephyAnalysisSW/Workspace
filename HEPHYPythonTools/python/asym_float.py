@@ -1,6 +1,9 @@
-from math import *
-import ROOT
+# class for floats with asymetric uncertainties around the central value
+# using a method from Garwood (1936) to obtain correct coverage
+# 1 sigma (68.27%) uncertainties are used by default
 
+from math import *
+import scipy.stats as stats
 
 def getValErrString(val,errUp, errDown=0, precision=3):
   # maybe format output string for nicer printing
@@ -10,16 +13,16 @@ def getValErrString(val,errUp, errDown=0, precision=3):
     return str(round(val,precision))+' + '+str(round(errUp,precision))+' - '+str(round(errDown,precision))
 
 class asym_float:
-  def __init__(self, central, up=0, down=0, poisson=True, forcePoisson=False):
+  def __init__(self, central, up=0, down=0, poisson=True, forcePoisson=False, cl=0.682689492):
     self.central  = central
     if (up==0 and type(central)==int and poisson) or forcePoisson:
-      h = ROOT.TH1F('h','h',1,0,1)
-      h.GetSumw2().Set(0) 
-      h.SetBinErrorOption(ROOT.TH1F.kPoisson)
-      h.SetBinContent(1, float(central))
-      self.up       = h.GetBinErrorUp(1)
-      self.down     = h.GetBinErrorLow(1)
-      del h
+      upper = stats.chi2.ppf(1-(1-cl)/2,2*(central+1))/2
+      self.up = upper - central
+      if central==0:
+        self.down = 0
+      else:
+        lower = stats.chi2.ppf((1-cl)/2, 2*central)/2
+        self.down = central - lower
     else:
       self.up       = up
       if down==0:
