@@ -239,9 +239,9 @@ sampleSets = {
               
                 'other':{
                             'samples':[
-                                        ['WW',                       "--skimPreselect"],
-                                        ['WZ',                       "--skimPreselect"],
-                                        ['ZZ',                       "--skimPreselect"],
+                                        #['WW',                       "--skimPreselect"],
+                                        #['WZ',                       "--skimPreselect"],
+                                        #['ZZ',                       "--skimPreselect"],
                                         ['TBar_tch',                 "--skimPreselect"],
                                         ['TBarToLeptons_tch_powheg', "--skimPreselect"],
                                         ['T_tch',                    "--skimPreselect"],

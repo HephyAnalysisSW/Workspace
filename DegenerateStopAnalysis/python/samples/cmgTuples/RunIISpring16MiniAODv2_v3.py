@@ -445,7 +445,7 @@ SMS_T2tt_dM_10to80_genHT_160_genMET_80 ={
 "treeName":"tree",
 "isData": False,
 "xsec": 1,
-
+'mass_dict': sample_path + '/mass_dict.pkl',
 "isFastSim":True,
 }
 allComponents.append(SMS_T2tt_dM_10to80_genHT_160_genMET_80)

@@ -27,7 +27,7 @@ if __name__ == '__main__':
     
     mtabc       = ["a","b","c"]
     pts         = ["sr","cr"]
-    #charges     = ["pos","neg"]
+    #charges    = ["pos","neg"]
     charges     = ["pos", "neg"]
     side_bands  = [ "ECR1", "ECR2" ] 
     
@@ -35,8 +35,9 @@ if __name__ == '__main__':
     #def subtractAndDivide( a,b,c,d,
     
     
-    
-    
+    bkg_est_dir = "$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/results/2016/%s_%s_%s/BkgEst/"%(cfg.cmgTag, cfg.ppTag, cfg.runTag) 
+    bkg_est_dir = os.path.expandvars( bkg_est_dir ) 
+    makeDir(bkg_est_dir)
     
     
     yld = task_ret['bkg_est'][0][side_band_name]
@@ -90,7 +91,7 @@ if __name__ == '__main__':
     
     tt_sf_crtt     = dict_operator ( yldsByBins[tt_region_names[0]] , keys = [ data , w, tt] + otherBkg  , func = lambda a,b,c,*d: (a-b-sum(d))/c)
     
-    
+    cr_sf_dict = {} 
     for region_name in region_names:
             region   = region_name
             yields = yldsByBins[region]
@@ -104,7 +105,10 @@ if __name__ == '__main__':
             else:
                 w_sf     = dict_operator ( yldsByBins[region] , keys = [ data ,  tt, w] + otherBkg  , func = lambda a,b,c,*d: (a-b*tt_sf_crtt-sum(d))/c).round(2)
                 tt_sf    = "-" #, u_float( 1. )
-    
+            cr_sf_dict[region]={  
+                                    tt  : (tt_sf if not tt_sf == "-" else u_float(1.))   , 
+                                    w   : (w_sf  if not  w_sf == "-" else u_float(1.))  ,
+                               } 
             toPrint = [   
                           ["Region",                fix_region_name( region_name )], 
                           ['SFCR W'    , w_sf  ],
@@ -124,7 +128,7 @@ if __name__ == '__main__':
             tt_table_list.append( [x[1] for x in toPrint])
     
     
-    
+    pickle.dump( cr_sf_dict ,   open( bkg_est_dir + "/CR_SFs.pkl", "w")  ) 
     table = makeSimpleLatexTable( tt_table_list, "CR_ScaleFactors.tex", cfg.saveDirs[side_band_name])
     
     

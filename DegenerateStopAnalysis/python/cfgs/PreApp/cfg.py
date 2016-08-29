@@ -40,7 +40,7 @@ bkgList = [ 'vv',  'qcd', 'st', 'z','dy', 'tt', 'w' ]
 #bkgList = [ 'vv', 'qcd', 'st', 'dy', 'tt', 'w'  ]
 #sigList = ['s60FS', 's30FS', 's10FS' , 's30']
 sigList = ['s300_270','s300_220', 's300_290']
-#sigList = [ ] 
+sigList = [ ] 
 
 #signalList    = massPoints.sigList 
 #mstop_lsps = massPoints.mstop_lsps
@@ -154,6 +154,7 @@ sampleList = bkgList + task_info['sigList']
 #ppTag = "74X_postProcessing_v4"
 
 ppSets = [
+            ( "80X_postProcessing_v10" , "nrad01"   , '8012_mAODv2_v3'),
             ( "80X_postProcessing_v9" , "nrad01"   , '8011_mAODv2_v1'),
             ( "80X_postProcessing_v8" , "nrad01"   , '8011_mAODv2_v1'),
             ( "80X_postProcessing_v6" , "nrad01"   , '8011_mAODv2_v1'),

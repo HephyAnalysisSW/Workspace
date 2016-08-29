@@ -15,7 +15,7 @@ dos={
 
 getGenFilterEff = True
 
-import Workspace.DegenerateStopAnalysis.samples.cmgTuples.RunIISpring16MiniAODv2_v1 as cmgTuples
+import Workspace.DegenerateStopAnalysis.samples.cmgTuples.RunIISpring16MiniAODv2_v3 as cmgTuples
 samples = [
             #cmgTuples.SMS_T2tt_dM_10to80_2Lfilter
             cmgTuples.SMS_T2tt_dM_10to80_genHT_160_genMET_80 

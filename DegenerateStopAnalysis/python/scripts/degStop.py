@@ -46,6 +46,7 @@ if True:
     parser.add_argument('--plot',       default = '',     nargs = "+",  action="store", help='')
     parser.add_argument('--weight',     default = 'base',               action="store", help='')
     parser.add_argument('--btag',       default = 'btag',               action="store", help='')
+    parser.add_argument('--postFuncs',    default = '',     nargs = "+",  action="store", help='')
 
     args=parser.parse(sys.argv, setdef=False)
     
