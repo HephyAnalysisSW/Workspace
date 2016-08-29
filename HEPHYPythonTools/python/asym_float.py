@@ -16,7 +16,7 @@ class asym_float:
   def __init__(self, central, up=0, down=0, poisson=True, forcePoisson=False, cl=0.682689492):
     self.central  = central
     if (up==0 and type(central)==int and poisson) or forcePoisson:
-      upper = stats.chi2.ppf(1-(1-cl)/2,2*(central+1))/2
+      upper = stats.chi2.ppf((1+cl)/2,2*(central+1))/2
       self.up = upper - central
       if central==0:
         self.down = 0
