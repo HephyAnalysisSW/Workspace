@@ -177,7 +177,8 @@ def getParameterSet(args):
         sampleName = args.processSample
         eff_dict_map = {
                          "WJets_1j"      : { 'sampleList' : ["ZInv", "ZJets", "WJets", "DYJets" ,"ZZ", "WZ", "WW" ] ,  },
-                         "TTJets_1j"     : { 'sampleList' : ["TTJets" , ]  ,                                           },
+                         #"TTJets_1j"     : { 'sampleList' : ["TTJets" , ]  ,                                           },
+                         "TTJets_1j"     : { 'sampleList' : ["TTJets_FastSIM" , ]  ,     'isFastSim':True              },
                          "T2tt_allDM_1j" : { 'sampleList' : ["SMS_T2tt" , ],       'isFastSim':True               },
                         }
         eff_to_use = "TTJets_1j" #default
@@ -190,6 +191,7 @@ def getParameterSet(args):
 
         print "Decided to use %s for the jet efficiency"%eff_to_use
         if isFastSim: print "Including the FastSim/FullSim SF" 
+        print info
 
         params['beff']={}
 

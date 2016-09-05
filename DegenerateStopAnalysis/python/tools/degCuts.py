@@ -210,8 +210,8 @@ class Cuts():
 
 
         self.sr2      = CutClass ("SR2",   [ 
-                                        ["ISR325","nIsrHJet>0"],
                                         ["Met300","met>300"],
+                                        ["ISR325","nIsrHJet>0"],
                                         #["At Least 1 Soft BJet", one_or_more_soft_bjet],
                                         #["No Hard BJet",veto_hard_bjet],
                                         ["1 or More Soft but no Hard BJet", sr2_bjet],

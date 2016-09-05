@@ -315,7 +315,7 @@ def calc_sig_limit(cfg, args):
                                             weight          =   "", 
                                             pklOpt          =   True, 
                                             tableName       =   "{cut}_%s%s"%(cfg.runTag,cfg.scan_tag), 
-                                            nDigits         =   2 , 
+                                            nDigits         =   4 , 
                                             err             =   True , 
                                             verbose         =   True,
                                             isMVASample             =   isMVASample, 
@@ -427,7 +427,12 @@ def bkg_est(cfg, args):
     redo_eventLists = "write" if getattr(cfg, "redo_eventLists", False) else "read"
     for cutInst in cfg.cutInstList:
         cut_name = cutInst.fullName
-        sampleList = getattr(cfg, "bkgList") + getattr(cfg,"signalList")
+        #if cfg.signalList:
+        #    signalList = ['s300_290','s300_270','s300_220']
+        #else:
+        #    signalList = []
+        signalList = cfg.signalList
+        sampleList = getattr(cfg, "bkgList") + signalList
 
         #if 'sr' in cut_name.lower():
         #    dataList = ['d']
@@ -482,7 +487,7 @@ def bkg_est(cfg, args):
                                         lumi            =   lumi,  
                                         pklOpt          =   True, 
                                         tableName       =   "{cut}_%s%s"%(cfg.runTag,cfg.scan_tag), 
-                                        nDigits         =   2 , 
+                                        nDigits         =   4 , 
                                         err             =   True , 
                                         verbose         =   True,
                                         isMVASample             =   isMVASample, 
@@ -491,6 +496,7 @@ def bkg_est(cfg, args):
             print "Yield pickle dumped: %s"%yield_pkl
 
 
+        #redo_plots_tables = True
         if redo_plots_tables:
             pp.pprint(      yields[cut_name].cut_weights  ,       open( cutSaveDir +"/cuts_weights.txt" ,"w"), width = 100, indent = 4 )
             pickle.dump(    yields[cut_name].cut_weights ,        open( cutSaveDir +"/cuts_weights.pkl" ,"w") )
@@ -513,9 +519,9 @@ def bkg_est(cfg, args):
             yldplts[2] = drawYields("BkgVsData_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList + dataList, ratios= True, save=cfg.saveDirs[cut_name], normalize = False, logs = [0,0], plotMin=0)
             yldplts[3] = drawYields("BkgVsData_log_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList + dataList, ratios= True, save=cfg.saveDirs[cut_name], normalize = False, logs = [0,1], plotMin=0.1)
 
-            if cfg.signalList:
-                yldplts[4] = drawYields("BkgVsSig_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList + cfg.signalList, ratios= True, save=cfg.saveDirs[cut_name], normalize = False, logs = [0,1], plotMin=0.1)
-                yldplts[5] = drawYields("BksVsDataVsSignal_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList + dataList + cfg.signalList , ratios= True, save=cfg.saveDirs[cut_name], normalize = False, logs = [0,1], plotMin=0.1)
+            if signalList:
+                yldplts[4] = drawYields("BkgVsSig_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList + signalList, ratios= True, save=cfg.saveDirs[cut_name], normalize = False, logs = [0,1], plotMin=0.1)
+                yldplts[5] = drawYields("BksVsDataVsSignal_%s"%cut_name, yields[cut_name] , sampleList = cfg.bkgList + dataList + signalList , ratios= True, save=cfg.saveDirs[cut_name], normalize = False, logs = [0,1], plotMin=0.1)
 
             crbins = [x for x in yields[cut_name].cutNames if 'ECR' in x]
 
@@ -548,10 +554,12 @@ def bkg_est(cfg, args):
     postFuncs = getattr(args, "postFuncs", None)
     if postFuncs:
         print "Will run the following scripts: %s"%postFuncs
+        CR_SFs(cfg,args)
         for f in postFuncs:
-            print f
-            print(f+"(cfg,args)")
-            exec(f+"(cfg,args)")
+            pass
+            #print f
+            #print(f+"(cfg,args)")
+            #exec(f+"(cfg,args)")
                 #print open(f).read() 
                 #print "running %s"%f
                 #execfile(f)    
@@ -581,7 +589,12 @@ def cut_flow(cfg, args):
 
     yields={}
     #sampleList = getattr(cfg, "sampleList") +  
-    sampleList = getattr(cfg, "bkgList") +  getattr(cfg, "signalList")
+    if cfg.signalList:
+        signalList = ['s300_290', 's300_270', 's300_220']
+    #else:
+    #    signalList = cfg.signalList
+    #sampleList = getattr(cfg, "bkgList") +  getattr(cfg, "signalList")
+    sampleList = getattr(cfg, "bkgList") +  signalList
     isMVASample = getattr(cfg, "isMVASample", False)
     redo_eventLists = "write" if getattr(cfg, "redo_eventLists", False) else "read"
     for cutInst in cfg.cutInstList:
@@ -625,7 +638,7 @@ def cut_flow(cfg, args):
                                         pklOpt          =   True, 
                                         pklDir          =   cfg.yieldPklDir, 
                                         tableName       =   "{cut}_%s%s"%(cfg.runTag,cfg.scan_tag), 
-                                        nDigits         =   2 , 
+                                        nDigits         =   4 , 
                                         err             =   True , 
                                         verbose         =   True,
                                         isMVASample             =   isMVASample, 
@@ -710,7 +723,10 @@ def data_plots(cfg,args):
         cutSaveDir = cfg.saveDir + "/" + cutInst.saveDir
         plotDir = cutSaveDir +"/DataPlots/"
 
-        sampleList = cfg.bkgList + cfg.signalList #cfg.sample_info['sampleList']  + cfg.signalList 
+
+        if cfg.signalList:
+            signalList = ['s300_290', 's300_270', 's300_220']
+        sampleList = cfg.bkgList + signalList #cfg.sample_info['sampleList']  + cfg.signalList 
         print "------------------- - - -- - --- - - - -- ", sampleList  
         result[cut_name]={}
         #data = 'd' if 'SR' in cut_name else 'dblind'   ## safeside : 'dblind' if 'CR' in cut_name else 'd'
@@ -782,7 +798,8 @@ def CR_SFs(cfg,args):
     #mtabc       = ["a","b","c"]
     #pts         = ["sr","cr"]
     
-    bkg_est_dir = "$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/results/2016/%s_%s_%s/BkgEst/"%(cfg.cmgTag, cfg.ppTag, cfg.runTag) 
+    #bkg_est_dir = "$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/results/2016/%s_%s_%s/BkgEst/"%(cfg.cmgTag, cfg.ppTag, cfg.runTag) 
+    bkg_est_dir = "$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/results/2016/%s/%s/%s/BkgEst/"%(cfg.cmgTag, cfg.ppTag, cfg.runTag) 
     bkg_est_dir = os.path.expandvars( bkg_est_dir ) 
     makeDir(bkg_est_dir)
     
@@ -863,9 +880,10 @@ def CR_SFs(cfg,args):
     pickle.dump( cr_sf_dict ,   open( bkg_est_dir + "/CR_SFs.pkl", "w")  ) 
     table = makeSimpleLatexTable( tt_table_list, "CR_ScaleFactors.tex", cfg.saveDirs[side_band_name])
     
-    
-    print table
+    #print table
 
+    print "CR_SFs stored in: " 
+    print bkg_est_dir + "/CR_SFs.pkl"
 
 
 

@@ -15,15 +15,7 @@ from Workspace.DegenerateStopAnalysis.tools.degPlots import DegPlots
 from Workspace.DegenerateStopAnalysis.scripts.degStop import args
 
 
-#import Workspace.DegenerateStopAnalysis.tools.weights_pu as weights_pu
-#import Workspace.DegenerateStopAnalysis.tools.weights_pu_teff as weights_pu_teff
-#import Workspace.DegenerateStopAnalysis.tools.weights_pu2 as weights_pu2
-#import Workspace.DegenerateStopAnalysis.tools.weights_wpt as weights_wpt
-#import Workspace.DegenerateStopAnalysis.tools.weights_pu_wpt as weights_pu_wpt
-#import Workspace.DegenerateStopAnalysis.tools.weights_pu_ttpt as weights_pu_ttpt
-#import Workspace.DegenerateStopAnalysis.tools.weights_base as weights_base
 from Workspace.DegenerateStopAnalysis.tools.weights import Weights
-#import weights import weights_base
 
 
 
@@ -40,7 +32,9 @@ bkgList = [ 'vv',  'qcd', 'st', 'z','dy', 'tt', 'w' ]
 #bkgList = [ 'vv', 'qcd', 'st', 'dy', 'tt', 'w'  ]
 #sigList = ['s60FS', 's30FS', 's10FS' , 's30']
 sigList = ['s300_270','s300_220', 's300_290']
-sigList = [ ] 
+sigList = massPointsFull.sigList
+print sigList
+#sigList = [ ] 
 
 #signalList    = massPoints.sigList 
 #mstop_lsps = massPoints.mstop_lsps

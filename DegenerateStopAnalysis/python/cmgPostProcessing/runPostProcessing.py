@@ -76,12 +76,17 @@ sampleSets = {
                 
                 'ttjets':{
                             'samples':[
-                                        ["TTJets_LO",                   "--skimPreselect"],
-                                        ["TTJets_LO",                   "--skimPreselect",    "--skimGeneral=lheHTlow" ],
-                                        ["TTJets_LO_HT600to800_ext",    "--skimPreselect",    "--skimGeneral=lheHThigh"],
-                                        ["TTJets_LO_HT800to1200_ext",   "--skimPreselect"],
-                                        ["TTJets_LO_HT1200to2500_ext",  "--skimPreselect"],
-                                        ["TTJets_LO_HT2500toInf",       "--skimPreselect"],
+                                        ["TTJets_FastSIM",              "--skimPreselect"],
+                                        #["TTJets_LO",                   "--skimPreselect"],
+                                        #["TTJets_LO",                   "--skimPreselect",    "--skimGeneral=lheHTlow" ],
+                                        #######["TTJets_LO_HT600to800_ext",    "--skimPreselect",    "--skimGeneral=lheHThigh"],
+                                        #["TTJets_LO_HT600to800_ext",    "--skimPreselect",    "--skimGeneral=lheHThigh" , "--runChunks", "0",   "100"],
+                                        #["TTJets_LO_HT600to800_ext",    "--skimPreselect",    "--skimGeneral=lheHThigh" , "--runChunks", "101",   "200"],
+                                        #["TTJets_LO_HT600to800_ext",    "--skimPreselect",    "--skimGeneral=lheHThigh" , "--runChunks", "201",   "300"],
+                                        #["TTJets_LO_HT600to800_ext",    "--skimPreselect",    "--skimGeneral=lheHThigh" , "--runChunks", "301",   "400"],
+                                        #["TTJets_LO_HT800to1200_ext",   "--skimPreselect"],
+                                        #["TTJets_LO_HT1200to2500_ext",  "--skimPreselect"],
+                                        #["TTJets_LO_HT2500toInf",       "--skimPreselect"],
                                       ],
                             },
                 
@@ -239,9 +244,9 @@ sampleSets = {
               
                 'other':{
                             'samples':[
-                                        #['WW',                       "--skimPreselect"],
-                                        #['WZ',                       "--skimPreselect"],
-                                        #['ZZ',                       "--skimPreselect"],
+                                        ['WW',                       "--skimPreselect"],
+                                        ['WZ',                       "--skimPreselect"],
+                                        ['ZZ',                       "--skimPreselect"],
                                         ['TBar_tch',                 "--skimPreselect"],
                                         ['TBarToLeptons_tch_powheg', "--skimPreselect"],
                                         ['T_tch',                    "--skimPreselect"],
@@ -283,12 +288,12 @@ sampleSets = {
 
                 'data':{
                             'samples':[
-                                        #"SingleMuon_Run2016B_PromptReco_v2",
-                                        #"SingleElectron_Run2016B_PromptReco_v2",
-                                        #"MET_Run2016B_PromptReco_v2",
-                                        #"SingleMuon_Run2016C_PromptReco_v2",
-                                        #"SingleElectron_Run2016C_PromptReco_v2",
-                                        #"MET_Run2016C_PromptReco_v2",
+                                        "SingleMuon_Run2016B_PromptReco_v2",
+                                        "SingleElectron_Run2016B_PromptReco_v2",
+                                        "MET_Run2016B_PromptReco_v2",
+                                        "SingleMuon_Run2016C_PromptReco_v2",
+                                        "SingleElectron_Run2016C_PromptReco_v2",
+                                        "MET_Run2016C_PromptReco_v2",
                                         "SingleMuon_Run2016D_PromptReco_v2",
                                         "SingleElectron_Run2016D_PromptReco_v2",
                                         "MET_Run2016D_PromptReco_v2",

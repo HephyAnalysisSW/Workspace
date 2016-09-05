@@ -77,9 +77,17 @@ class Weights():
                            }
 
         if isr:
-            isrWeightFunc = lambda norm: '(1.+{norm}*GenPart_mass[stopIndex1]) *(1.*(stops_pt<120.)+0.95*(stops_pt>=120.&&stops_pt<150.)+0.9*(stops_pt>=150.&&stops_pt<250.)+0.8*(stops_pt>=250.))'.format(norm=norm)
-            isrWeight = isrWeightFunc(9.5e-5)
-            raise NotImplementedError
+            #isrWeightFunc = lambda norm: '(1.+{norm}*GenPart_mass[stopIndex1]) *(1.*(stops_pt<120.)+0.95*(stops_pt>=120.&&stops_pt<150.)+0.9*(stops_pt>=150.&&stops_pt<250.)+0.8*(stops_pt>=250.))'.format(norm=norm)
+            #isrWeight = isrWeightFunc(9.5e-5)
+            #isrWeightFunc = lambda norm: '(1.+{norm}*GenPart_mass[stopIndex1]) *(1.*(stops_pt<120.)+0.95*(stops_pt>=120.&&stops_pt<150.)+0.9*(stops_pt>=150.&&stops_pt<250.)+0.8*(stops_pt>=250.))'.format(norm=norm)
+            #isrWeight = isrWeightFunc(9.5e-5)
+            isrWeightString = "{normFact} * ( (nIsr==0) + (nIsr==1)*0.882  + (nIsr==2)*0.792  + (nIsr==3)*0.702  + (nIsr==4)*0.648  + (nIsr==5)*0.601  + (nIsr>=6)*0.515 ) "
+            isrWeightFunc   = lambda normFact: isrWeightString.format( normFact=normFact )
+            isrWeight       = isrWeightFunc("(7.279e-05 *(GenSusyMStop) + 1.108)")
+            weightDict['scan'] = {
+                                    'isrReweight' : isrWeight
+                                 }
+
 
         #
         # def_weights (i.e weights common to all MC samples)

@@ -452,6 +452,13 @@ allComponents.append(SMS_T2tt_dM_10to80_genHT_160_genMET_80)
 
 
 
+
+
+
+
+
+
+
 TBarToLeptons_tch_powheg ={
 'cmgName':"TBarToLeptons_tch_powheg",
 "name" : "ST_t-channel_antitop_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
@@ -552,9 +559,8 @@ TTJets_FastSIM ={
 "skimAnalyzerDir":"skimAnalyzerCount",
 "treeName":"tree",
 "isData": False,
+"isFastSim":True,
 "xsec": 831.76,
-
-
 }
 allComponents.append(TTJets_FastSIM)
 

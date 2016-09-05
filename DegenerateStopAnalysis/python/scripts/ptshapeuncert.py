@@ -344,11 +344,11 @@ for region_name in w_region_names:
         toPrint = [   
                       ["Region",                fix_region_name( region_name) ], 
                       ["W Frac. SR/CR",         "%s/%s"%(dataWFrac_sr.round(2).val, dataWFrac_cr.round(2).val )],
+                      ["W SFCR (corr. TT)",                w_sf_cr.round(2)],
+                      ["W Closure (Corr. TT)",             closure_w_sr.round(2)],
                       ["W SFCR",          w_sf_cr_mctt.round(2)],
-                      #["W SFCR (corr. TT)",                w_sf_cr.round(2)],
                       ["W Closure",       closure_w_sr_mctt.round(2)],
-                      #["W Closure (Corr. TT)",             closure_w_sr.round(2)],
-                      ["Closure",               closure_sr_mctt.round(2)],
+                      #["Closure",               closure_sr_mctt.round(2)],
                       #["Closure (Corr. TT)",               closure_sr.round(2)],
 
                    ]#dataCR( dataMCsf * yldDict[tt][region_cr]).round(2)  ]

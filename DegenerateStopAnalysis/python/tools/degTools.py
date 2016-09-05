@@ -57,6 +57,15 @@ getAllAlph = lambda str: ''.join(ch for ch in str if ch not in ".!>=|<$&@$%[]{}#
 addSquareSum = lambda x: math.sqrt(sum(( e**2 for e in x   )))
 any_in = lambda a, b: any(i in b for i in a)
 
+anyIn = any_in
+
+def whichIn(of_these, this):
+    rets = []
+    for thing in of_these:
+        if thing in this:
+            rets.append(thing)
+    return rets
+
 canvas_2d_size=(1500,1026)
 
 def mkdir_p(path):
@@ -257,6 +266,39 @@ class ArgParser(argparse.ArgumentParser):
             if "--" in sys_args: sys_args.remove("--")
             sys_args = sys_args[1:]
         return sys_args
+
+
+#############################################################################################################
+##########################################                    ###############################################
+##########################################   UNCERTAINTIES    ###############################################
+##########################################                    ###############################################
+#############################################################################################################
+
+
+import itertools
+def addInQuad(l):
+    s = 0
+    for v in l:
+        s += v**2
+    return math.sqrt(s) 
+def addInQuad100PerctCorr(l):
+    s = 0
+    for v in l:
+        s += v**2
+    chi = 0
+    for e1,e2 in itertools.combinations(l,2):
+        print e1,e2
+        chi += e1*e2
+    chi = 2*chi
+    print 'math.sqrt(%s+%s)'%(s,chi)
+    return math.sqrt(s+chi) 
+
+
+
+
+
+
+
 
 #############################################################################################################
 ##########################################                    ###############################################
@@ -663,8 +705,14 @@ def makeLegend(samples, hists, sampleList, plot, name="Legend",loc=[0.6,0.6,0.9,
 
 
     for samp in sampleList:
+        samp_name = samples[samp]['name']
+        if samp_name in fixDict:
+            samp_name = fixDict[samp_name]
         legOpt_ = "lep" if samples[samp]['isData'] else legOpt
-        leg.AddEntry(hists[samp][plot], samples[samp].name , legOpt_)    
+        if plot:
+            leg.AddEntry(hists[samp][plot], samp_name , legOpt_)    
+        else:
+            leg.AddEntry(hists[samp], samp_name , legOpt_)    
     return leg
 
 def getPlotFromYields(name, yields, keys=[]):
@@ -751,7 +799,7 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
     if draw:
         stacks.Draw("hist")
         stacks.SetMinimum(plotMin)
-        maxval = plotMax if plotMax else stacks.GetMaximum()*1.15
+        maxval = plotMax if plotMax else stacks.GetMaximum()* ( 1.35 + logs[1]*10  )
         stacks.SetMaximum( maxval)
         if drawError:
             bkg_tot.Draw("same E2")
@@ -764,6 +812,52 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
         yldplt[dataList[0]].SetMarkerSize(1)
         yldplt[dataList[0]].Sumw2()
         yldplt[dataList[0]].Draw("same EP0")
+
+
+    #
+    #   Making Legend
+    #
+
+    samples = {} # to make make legend happy!
+    for samp in bkgList + sigList:
+        samples[samp] = {'name':samp, 'isData':False}
+    for samp in dataList:
+        samples[samp] = {'name':samp, 'isData':True}
+        
+    bkgLegList = bkgList[:] 
+    sigLegList = sigList[:] 
+    
+    bkgLegList.reverse()
+    sigLegList.reverse()
+    bkgLegList += dataList
+    #bkgLeg = makeLegend(samples, hists, bkgLegList, p, loc=[0.7,0.7,0.87,0.87], name="Legend_bkgs_%s_%s"%(cut.name, p), legOpt="f")
+    #bkgLeg.Draw()
+    #ret['legs'].append(bkgLeg)
+    legy = [0.7, 0.87 ]
+    legx = [0.75, 0.95 ]  
+    nBkgInLeg = 4
+    if any_in(sampleList, bkgLegList):
+        subBkgLists = [ bkgLegList[x:x+nBkgInLeg] for x in range(0,len(bkgLegList),nBkgInLeg) ]
+        nBkgLegs = len(subBkgLists)
+        for i , subBkgList in enumerate( subBkgLists ):
+            newLegY0 = legy[0] + (legy[1]-legy[0])* (1-1.*len(subBkgList)/nBkgInLeg)
+            bkgLeg = makeLegend(samples, yldplt , subBkgList, None, loc=[legx[0], newLegY0 ,legx[1],legy[1]], name="Legend_bkgs%s_%s_%s"%(i, name, "LEG"), legOpt="f")
+            print "==========================================================================="
+            print bkgLeg, subBkgList, legx 
+            print "==========================================================================="
+            ret.append(bkgLeg)
+            ret[-1].Draw()
+            legx = [ 2*legx[0] -legx[1] , legx[0]  ] 
+            #del bkgLeg
+
+    if any_in(sampleList, sigLegList):
+       sigLeg = makeLegend(samples, yldplt, sigLegList, None, loc=[legx[0],legy[0],legx[1],legy[1]], name="Legend_sigs_%s_%s"%(name, "LEG"), legOpt="l")
+       sigLeg.Draw()
+       ret.append(sigLeg)
+       ret[-1].Draw()
+
+
+
 
     canvs[cMain].SetLogx(logs[0])
     canvs[cMain].SetLogy(logs[1])
@@ -1548,7 +1642,7 @@ def getEfficiency(samples,samp, plot, cutInst_pass, cutInst_tot ,ret = False ):
 
  
 #[ len(mstops), min(mstops) - 0.5*dstops , max(mstops) + 0.5*dstops, (max(mstops) + min(dms) - ( min(stops)-max(dms))) /5.  ,min(stops)-max(dms)-5 , max(mstops) + min(dms)+5 ) ]
-
+# [ len(mstops), min(mstops) - 0.5*dstops , max(mstops) + 0.5*dstops, (max(mstops) + min(dms) - ( min(mstops)-max(dms))) /5  ,min(mstops)-max(dms)-5 , max(mstops) + min(dms)+5 ] 
 def makeStopLSPPlot(name, massDict, title="", bins = [23,87.5,662.5, 127 , 17.5, 642.5] , key=None, func=None,setbin=False ):
     """
     massDict should be of the form {    
@@ -2644,7 +2738,12 @@ pdfDir="/afs/hephy.at/user/n/%s/www/T2Deg13TeV/Test/"%username
 pklDir="./pkl/dmt_regions/*.pkl"
 
 def fix(x):
-    return str(x).replace("_","-").replace("+-","$\pm$").replace("-+","$\mp$").replace(">","$>$").replace("/","/").replace("","")
+    ret = str(x).replace("+-","$\pm$").replace("-+","$\mp$").replace(">","$>$").replace("/","/").replace("","")
+    if "_{" in ret:
+        pass
+    else:
+        ret = ret.replace("_","-")
+    return ret 
 
 def fixForLatex(x):
   if type(x)==type(""):
@@ -2654,6 +2753,15 @@ def fixForLatex(x):
   if type(x) in [ type(np.array([])) ]:
     return np.array( [ fix(ix) for ix in x ] )
 
+def uround(x,n=2):
+    if hasattr(x,"round"):
+        return x.round(n)
+    elif type(x) == float:
+        return round(x,n)
+    elif type(x) == int:
+        return x
+
+
 from collections import OrderedDict
 fixDict = OrderedDict()
 
@@ -2661,18 +2769,20 @@ fixDict = OrderedDict()
 
 #fixDict["MET200_ISR100_HT300"]  =  "$E_{T}^{miss}$ $>$ $200GeV$ , $H_{T}$ $>$ $300GeV$, $P_{T}$(Leading$ $Jet) $>$ $100GeV$ " 
 #fixDict["MET200_ISR110_HT300"]  =  "$E_{T}^{miss}$ $>$ $200GeV$ , $H_{T}$ $>$ $300GeV$, $P_{T}$(Leading$ $Jet) $>$ $110GeV$ "  
-fixDict["MET200-ISR100-HT300"]  =  "$C_{T}$ $>$ $200GeV$ ,$P_{T}(IsrJet)$ $>$ $100GeV$ " 
-fixDict["MET200-ISR110-HT300"]  =  "$C_{T}$ $>$ $200GeV$ ,$P_{T}(IsrJet)$ $>$ $110GeV$ "  
+fixDict["MET200-ISR100-HT300"]  =  "$C_{T1}$ $>$ $200GeV$ ,$P_{T}(IsrJet)$ $>$ $100GeV$ " 
+fixDict["MET200-ISR110-HT300"]  =  "$C_{T1}$ $>$ $200GeV$ ,$P_{T}(IsrJet)$ $>$ $110GeV$ "  
 fixDict["MET200"]  =  "$E_{T}^{miss}$ $>$ $200GeV$" 
 fixDict["HT300"]  =  "$H_{T}$ $>$ $300GeV$"  
-fixDict["CT300"]  =  "$C_{T}$ $>$ $300GeV$"  
+fixDict["CT300"]  =  "$C_{T1}$ $>$ $300GeV$"  
 fixDict["ISR110"]  =  " $P_{T}(IsrJet)$  $>$ $110GeV$"  
 fixDict["ISR100"]  =  " $P_{T}(IsrJet)$  $>$ $100GeV$"  
-fixDict["ISR325"]  =  " $P_{T}(IsrJet)$  $>$ $325GeV$"  
+#fixDict["ISR325"]  =  " $P_{T}(IsrJet)$  $>$ $325GeV$"  
+fixDict["ISR325"]  =  " $C_{T2}(IsrJet)$  $>$ $300GeV$"  
 fixDict["Met300"]  =  "$E_{T}^{miss}$ $>$ $300$"  
 fixDict["No3rdJet60"]  =  "$Hard$ $3rd$ $Jet$ $Veto$"  
 fixDict["1Lep-2ndLep20Veto"]  =  "$Single$ $Lep$" 
-fixDict["negLep"]  =  "$Charge(l)$ $>$ $0$"  
+fixDict["AntiQCD"]  =  "$\Delta\phi(j1,j2)<2.5$ (if 2 hard jets)"
+fixDict["negLep"]  =  "$Charge(l)$ $<$ $0$"  
 fixDict["BVeto"]  =  "$BJet$ $Veto$"  
 fixDict["TauVeto"]  =  "$Tau$ $Veto$"  
 fixDict["SoftBJet"]  =  "$Soft$ $BJet$"  
@@ -2771,6 +2881,7 @@ class JinjaTexTable():
         self.templateEnv.filters['fixForLatex']=fixForLatex
         self.templateEnv.filters['fix']= fix
         self.templateEnv.filters['fixRowCol']= fixRowCol
+        self.templateEnv.filters['uround']= uround
 
         ylds = self.yields
         self.info     = {
@@ -2870,6 +2981,9 @@ class JinjaTexTable():
         # print(self.out)
         self.fout.write( self.out)
         self.fout.close()
+        self.fout2 = open( self.pdfDir + "/" + outputName ,'w')
+        self.fout2.write( self.out)
+        self.fout2.close()
         print "LaTex File:", self.texDir+outputName
         print "LaTex output:", self.outputTex
         print "pdf output:", self.pdfDir
@@ -2928,7 +3042,9 @@ def makeSimpleLatexTable( table_list , texName, outDir, caption="" , align_char 
     body = ""
     first_line = True
     for row in table_list:
-        
+        if "hline" in row[0] or "hline" in row:
+            body +="\hline \n"
+            continue
         body += " & ".join([ "%s"%fixForLatex( str(x)) for x in row]) #+ "\\\ \n"
         if len(row)>1:
             body += "\\\ "
