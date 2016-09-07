@@ -27,10 +27,11 @@ signal          = False
 withSystematics = True
 applyKappa      = True
 
-showMCtruth     = True
-signal = False
+showMCtruth     = False
+signal = True
 
-latextitle = 'Project Work'
+#latextitle = 'Project Work'
+latextitle = ''
 
 weight_str, weight_err_str = makeWeight(lumi, sampleLumi, reWeight=MCweight)
 
@@ -38,8 +39,8 @@ prefix = 'singleLeptonic_Spring15_'
 #path = '/data/'+username+'/Results2015/Prediction_SFTemplate_MC_fullSR_lep_3.0/'
 #pickleDir = '/data/easilar/Results2016/Prediction_SFtemplates_fullSR_lep_data_2p25/'
 #pickleDir = '/data/dspitzbart/Results2015/Prediction_SFtemplates_validation_lep_data_2.1/'
-#pickleDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_fullSR_lep_data_Moriond_2p3/'
-pickleDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_validation_4j_lep_data_2p3/'
+pickleDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_fullSR_lep_data_Moriond_2p3/'
+#pickleDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_validation_4j_lep_data_2p3/'
 
 res = pickle.load(file(pickleDir+'resultsFinal_withSystematics_pkl'))
 if withSystematics:
@@ -78,9 +79,9 @@ if isData:
   data_truth_H.SetBinErrorOption(ROOT.TH1F.kPoisson)
 
 
-benchmark1_H = ROOT.TH1F('benchmark1_H','T5q^{4}WW 1.0/0.7',bins,0,bins)
-benchmark2_H = ROOT.TH1F('benchmark2_H','T5q^{4}WW 1.2/0.8',bins,0,bins)
-benchmark3_H = ROOT.TH1F('benchmark3_H','T5q^{4}WW 1.5/0.1',bins,0,bins)
+benchmark1_H = ROOT.TH1F('benchmark1_H','T5qqqqWW (1.0,0.7)',bins,0,bins)
+benchmark2_H = ROOT.TH1F('benchmark2_H','T5qqqqWW (1.2,0.8)',bins,0,bins)
+benchmark3_H = ROOT.TH1F('benchmark3_H','T5qqqqWW (1.5,0.1)',bins,0,bins)
 
 benchmark1_H.SetLineColor(ROOT.kAzure+9)
 benchmark2_H.SetLineColor(ROOT.kMagenta+2)
@@ -447,11 +448,11 @@ if signal:
   benchmark2_H.Draw('hist same')
   benchmark3_H.Draw('hist same')
 
-  leg3 = ROOT.TLegend(0.35,0.75,0.65,0.9)
+  leg3 = ROOT.TLegend(0.25,0.75,0.55,0.925)
   leg3.SetFillColor(ROOT.kWhite)
   leg3.SetShadowColor(ROOT.kWhite)
   leg3.SetBorderSize(0)
-  leg3.SetTextSize(0.035)
+  leg3.SetTextSize(0.04)
   leg3.AddEntry(benchmark1_H)
   leg3.AddEntry(benchmark2_H)
   leg3.AddEntry(benchmark3_H)

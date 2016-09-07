@@ -25,12 +25,12 @@ def Draw_CMS_header():
    tex.SetTextSize(0.05)
    tex.SetLineWidth(2)
    tex.DrawLatex(0.18,0.96,"CMS")
-   tex = ROOT.TLatex()
-   tex.SetNDC()
-   tex.SetTextFont(52)
-   tex.SetTextSize(0.05)
-   tex.SetLineWidth(2)
-   tex.DrawLatex(0.26,0.96,"Preliminary")
+   #tex = ROOT.TLatex()
+   #tex.SetNDC()
+   #tex.SetTextFont(52)
+   #tex.SetTextSize(0.05)
+   #tex.SetLineWidth(2)
+   #tex.DrawLatex(0.26,0.96,"Preliminary")
    return
 def Set_axis_pad2(histo):
    histo.GetXaxis().SetLabelFont(42)
@@ -109,7 +109,8 @@ if SB_tt :
   nbtag = (1,1)
   signal_suffix = ""
 if test :
-  SR = {(6,7):{(450,-1):{(500,1000):{"deltaPhi":1}}}}
+  #SR = {(6,7):{(450,-1):{(500,1000):{"deltaPhi":1}}}}
+  SR = {(5,-1):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
   btag_weight = "(weightBTag0_SF)"
   nbtag = (0,0)
   signal_suffix = "x10"
@@ -133,42 +134,42 @@ bkg_samples=[
 {"sample":"singleTop",      "weight":btag_weight ,"cut":(0,-1) ,"add_Cut":"(1)","name":singleTop_25ns,"tex":"t/#bar{t}",'color': ROOT.kViolet+5},
 {"sample":"QCD",            "weight":"(1)"       ,"cut":nbtag  ,"add_Cut":"(1)","name":QCDHT_25ns, "tex":"QCD","color":ROOT.kCyan-6},
 {"sample":"WJets",          "weight":btag_weight ,"cut":(0,-1) ,"add_Cut":"(1)","name":WJetsHTToLNu_25ns,"tex":"W + jets","color":ROOT.kGreen-2},
-{"sample":"ttJets_diLep",   "weight":btag_weight ,"cut":(0,-1) ,"add_Cut":"((ngenLep+ngenTau)==2)","name":TTJets_combined, "tex":"t#bar{t} ll + jets",'color':ROOT.kBlue},
-{"sample":"ttJets_semiLep", "weight":btag_weight ,"cut":(0,-1) ,"add_Cut":"(!((ngenLep+ngenTau)==2))","name":TTJets_combined, "tex":"t#bar{t} l + jets",'color':ROOT.kBlue-7}
+{"sample":"ttJets_diLep",   "weight":btag_weight ,"cut":(0,-1) ,"add_Cut":"((ngenLep+ngenTau)==2)","name":TTJets_combined, "tex":"t#bar{t} (dileptonic)",'color':ROOT.kBlue},
+{"sample":"ttJets_semiLep", "weight":btag_weight ,"cut":(0,-1) ,"add_Cut":"(!((ngenLep+ngenTau)==2))","name":TTJets_combined, "tex":"t#bar{t} (semileptonic)",'color':ROOT.kBlue-7}
 ]
 
 for bkg in bkg_samples:
     bkg['chain'] = getChain(bkg['name'],maxN=maxN,histname="",treeName="Events")
 
 signals = [\
-{"chain":getChain(T5qqqqVV_mGluino_1000To1075_mLSP_1To950[1000][700],histname='')  ,"name":"s1000","tex":"T5q^{4}WW 1.0/0.7 "+signal_suffix,"color":ROOT.kAzure+9},\
-{"chain":getChain(T5qqqqVV_mGluino_1200To1275_mLSP_1to1150[1200][800],histname='') ,"name":"s1200","tex":"T5q^{4}WW 1.2/0.8 "+signal_suffix,"color":ROOT.kMagenta+2},\
-{"chain":getChain(T5qqqqVV_mGluino_1400To1550_mLSP_1To1275[1500][100],histname=''),"name":"s1500" ,"tex":"T5q^{4}WW 1.5/0.1 "+signal_suffix,"color":ROOT.kRed+1},\
+{"chain":getChain(T5qqqqVV_mGluino_1000To1075_mLSP_1To950[1000][700],histname='')  ,"name":"s1000","tex":"T5qqqqWW (1.0,0.7) "+signal_suffix,"color":ROOT.kAzure+9},\
+{"chain":getChain(T5qqqqVV_mGluino_1200To1275_mLSP_1to1150[1200][800],histname='') ,"name":"s1200","tex":"T5qqqqWW (1.2,0.8) "+signal_suffix,"color":ROOT.kMagenta+2},\
+{"chain":getChain(T5qqqqVV_mGluino_1400To1550_mLSP_1To1275[1500][100],histname=''),"name":"s1500" ,"tex":"T5qqqqWW (1.5,0.1) "+signal_suffix,"color":ROOT.kRed+1},\
 ]
 dPhiBins  = array('d', [float(x)/1000. for x in range(0,500,100)+range(500,700,200)+range(700,1000,300)+range(1000,2000,500)+range(2000,3141,1141)+range(3141,4141,1000)])
 plots =[\
-{'ndiv':False,'yaxis':'< Events / 0.1>','xaxis':'#Delta#Phi(W,l)','logy':'True' , 'var':'deltaPhi_Wl',        'bin_set':True,          'varname':'deltaPhi_Wl',       'binlabel':1, 'bin':(len(dPhiBins)-1,dPhiBins)},\
+{'ndiv':False,'yaxis':'< Events / 0.1>','xaxis':'#Delta#Phi [rad]','logy':'True' , 'var':'deltaPhi_Wl',        'bin_set':True,          'varname':'deltaPhi_Wl',       'binlabel':1, 'bin':(len(dPhiBins)-1,dPhiBins)},\
 {'ndiv':True,'yaxis':'Events / ','xaxis':'L_{T} [GeV]','logy':'True' , 'var':  'st',                        'bin_set':False,          'varname':'LT',                  'binlabel':25,  'bin':(30,250,1000)},\
-{'ndiv':True,'yaxis':'Events / ','xaxis':'H_{T}','logy':'True' , 'var':'htJet30j',                    'bin_set':False,          'varname':'htJet30j',            'binlabel':50,  'bin':(40,500,2500)},\
-{'ndiv':False,'yaxis':'Events','xaxis':'n_{jet}','logy':'True' , 'var':'nJet30',                     'bin_set':False,          'varname':'nJet30',                   'binlabel':1,  'bin':(15,0,15)},\
-{'ndiv':True,'yaxis':'Events / ','xaxis':'p_{T}(l)','logy':'True' , 'var':'LepGood_pt[0]',            'bin_set':False,          'varname':'leptonPt',      'binlabel':15,  'bin':(40,25,625)},\
-{'ndiv':False,'yaxis':'Events','xaxis':'n_{b-tag}','logy':'True' , 'var':'nBJetMediumCSV30',         'bin_set':False,          'varname':'nBJetMediumCSV30',      'binlabel':1,  'bin':(8,0,8),       'lowlimit':0,  'limit':8},\
-{'ndiv':True,'yaxis':'Events / ','xaxis':'p_{T}(leading jet)','logy':'True' , 'var':'Jet_pt[0]',      'bin_set':False,          'varname':'leading_JetPt',  'binlabel':35,  'bin':(20,0,700)},\
-{'ndiv':False,'yaxis':'Events','xaxis':'#eta(l)','logy':'True' , 'var':'LepGood_eta[0]',             'bin_set':False,          'varname':'leptonEta',      'binlabel':25,  'bin':(40,-4,4)},\
-{'ndiv':True,'yaxis':'Events / ','xaxis':'#slash{E}_{T}','logy':'True' , 'var':'met_pt',              'bin_set':False,          'varname':'met',         'binlabel':50,  'bin':(28,0,1400)},\
-{'ndiv':False,'yaxis':'Events / ','xaxis':'#slash{E}_{T} #Phi','logy':'True' , 'var':'met_phi',       'bin_set':False,          'varname':'met_phi',         'binlabel':50,  'bin':(30,-3.14,3.14)},\
-{'ndiv':False,'yaxis':'Events','xaxis':'#phi(l)','logy':'True' , 'var':'LepGood_phi[0]',             'bin_set':False,          'varname':'leptonPhi',      'binlabel':25,  'bin':(40,-4,4)},\
-{'ndiv':False,'yaxis':'Events','xaxis':'miniIso(l)','logy':'True' , 'var':'LepGood_miniRelIso[0]',   'bin_set':False,          'varname':'leptonminiIso',      'binlabel':30,  'bin':(40,0,0.5)},\
-#{'ndiv':False,'yaxis':'Events','xaxis':'minDeltaR','logy':'True' , 'var':'Min$(sqrt((abs(Jet_phi-LepGood_phi[0]))**2+(abs(Jet_eta-LepGood_eta[0]))**2))',       'varname':'Min_R_Jet_lepton',      'binlabel':1,  'bin':(50,0,10)},\
-{'ndiv':False,'yaxis':'Events','xaxis':'Nvert','logy':'True' , 'var':'nVert',                        'bin_set':False,          'varname':'nVert',      'binlabel':1,  'bin':(50,0,50)}
+{'ndiv':True,'yaxis':'Events / ','xaxis':'H_{T} [GeV]','logy':'True' , 'var':'htJet30j',                    'bin_set':False,          'varname':'htJet30j',            'binlabel':50,  'bin':(50,500,3000)},\
+#{'ndiv':False,'yaxis':'Events','xaxis':'n_{jet}','logy':'True' , 'var':'nJet30',                     'bin_set':False,          'varname':'nJet30',                   'binlabel':1,  'bin':(15,0,15)},\
+#{'ndiv':True,'yaxis':'Events / ','xaxis':'p_{T}(l)','logy':'True' , 'var':'LepGood_pt[0]',            'bin_set':False,          'varname':'leptonPt',      'binlabel':15,  'bin':(40,25,625)},\
+#{'ndiv':False,'yaxis':'Events','xaxis':'n_{b-tag}','logy':'True' , 'var':'nBJetMediumCSV30',         'bin_set':False,          'varname':'nBJetMediumCSV30',      'binlabel':1,  'bin':(8,0,8),       'lowlimit':0,  'limit':8},\
+#{'ndiv':True,'yaxis':'Events / ','xaxis':'p_{T}(leading jet)','logy':'True' , 'var':'Jet_pt[0]',      'bin_set':False,          'varname':'leading_JetPt',  'binlabel':35,  'bin':(20,0,700)},\
+#{'ndiv':False,'yaxis':'Events','xaxis':'#eta(l)','logy':'True' , 'var':'LepGood_eta[0]',             'bin_set':False,          'varname':'leptonEta',      'binlabel':25,  'bin':(40,-4,4)},\
+#{'ndiv':True,'yaxis':'Events / ','xaxis':'#slash{E}_{T}','logy':'True' , 'var':'met_pt',              'bin_set':False,          'varname':'met',         'binlabel':50,  'bin':(28,0,1400)},\
+#{'ndiv':False,'yaxis':'Events / ','xaxis':'#slash{E}_{T} #Phi','logy':'True' , 'var':'met_phi',       'bin_set':False,          'varname':'met_phi',         'binlabel':50,  'bin':(30,-3.14,3.14)},\
+#{'ndiv':False,'yaxis':'Events','xaxis':'#phi(l)','logy':'True' , 'var':'LepGood_phi[0]',             'bin_set':False,          'varname':'leptonPhi',      'binlabel':25,  'bin':(40,-4,4)},\
+#{'ndiv':False,'yaxis':'Events','xaxis':'miniIso(l)','logy':'True' , 'var':'LepGood_miniRelIso[0]',   'bin_set':False,          'varname':'leptonminiIso',      'binlabel':30,  'bin':(40,0,0.5)},\
+##{'ndiv':False,'yaxis':'Events','xaxis':'minDeltaR','logy':'True' , 'var':'Min$(sqrt((abs(Jet_phi-LepGood_phi[0]))**2+(abs(Jet_eta-LepGood_eta[0]))**2))',       'varname':'Min_R_Jet_lepton',      'binlabel':1,  'bin':(50,0,10)},\
+#{'ndiv':False,'yaxis':'Events','xaxis':'Nvert','logy':'True' , 'var':'nVert',                        'bin_set':False,          'varname':'nVert',      'binlabel':1,  'bin':(50,0,50)}
   ]
 
 if test :
-  plots = [plots[0]]
+  #plots = [plots[0]]
   lepSels = [lepSels[2]]
 
 for lepSel in lepSels:
-  path = "/afs/hephy.at/user/e/easilar/www/data/Run2015D/2p25fb/toAN_2p3/"+lepSel['label']
+  path = "/afs/hephy.at/user/e/easilar/www/data/Run2015D/2p3fb/plotsForpaper_v1/"+lepSel['label']
   if not os.path.exists(path):
     os.makedirs(path)
   print lepSel['label']
@@ -236,8 +237,9 @@ for lepSel in lepSels:
           
           leg = ROOT.TLegend(0.65,0.5,0.93,0.925)
           leg.SetBorderSize(1)
-          leg_sig = ROOT.TLegend(0.3,0.7,0.6,0.925)
+          leg_sig = ROOT.TLegend(0.25,0.75,0.55,0.925)
           leg_sig.SetBorderSize(1)
+          leg_sig.SetTextSize(.04)
           Pad1 = ROOT.TPad("Pad1", "Pad1", 0,0.31,1,1)
           Pad1.Draw()
           Pad1.cd()
@@ -338,7 +340,7 @@ for lepSel in lepSels:
           leg_sig.SetFillColor(0)
           leg_sig.SetLineColor(0)
           leg_sig.Draw()
-          if all_MB or test:
+          if all_MB:
             latex.DrawLatex(0.32,0.6 ,nJetBinName(srNJet))
             latex.DrawLatex(0.32,0.55,varBinNamewithUnit(stb,'L_{T}',"GeV"))
             latex.DrawLatex(0.32,0.5 ,varBinNamewithUnit(htb,'H_{T}',"GeV"))
@@ -387,7 +389,8 @@ for lepSel in lepSels:
           h_ratio.SetMarkerColor(ROOT.kBlack)
           h_ratio.SetTitle("")
           Set_axis_pad2(h_ratio)
-          h_ratio.GetYaxis().SetTitle("Data/Pred. ")
+          #h_ratio.GetYaxis().SetTitle("Data/Pred. ")
+          h_ratio.GetYaxis().SetTitle("Data/Sim. ")
           h_ratio.GetXaxis().SetTitle(p['xaxis'])
           h_ratio.GetYaxis().SetNdivisions(505)
           h_ratio.Draw("E1")
@@ -400,8 +403,10 @@ for lepSel in lepSels:
           if test:
             #cb.SaveAs("/afs/cern.ch/user/e/easilar/public/html/Notes/notes/SUS-15-006/trunk/fig/zerob/LT_zerob.pdf")
             #cb.SaveAs("/afs/cern.ch/user/e/easilar/public/html/Notes/notes/SUS-15-006/trunk/fig/zerob/"+p['varname']+".pdf")
-            cb.SaveAs("/afs/cern.ch/user/e/easilar/public/html/Notes/notes/SUS-15-006/trunk/TwikiPlots/dPhi_st450_ht500-1000_njet6-7_nbtagEq0.pdf")
-            cb.SaveAs("/afs/cern.ch/user/e/easilar/public/html/Notes/notes/SUS-15-006/trunk/TwikiPlots/dPhi_st450_ht500-1000_njet6-7_nbtagEq0.root")
+            #cb.SaveAs("/afs/cern.ch/user/e/easilar/public/html/Notes/notes/SUS-15-006/trunk/TwikiPlots/dPhi_st450_ht500-1000_njet6-7_nbtagEq0.pdf")
+            #cb.SaveAs("/afs/cern.ch/user/e/easilar/public/html/Notes/notes/SUS-15-006/trunk/TwikiPlots/dPhi_st450_ht500-1000_njet6-7_nbtagEq0.root")
+            cb.SaveAs("/afs/cern.ch/user/e/easilar/public/html/Papers/papers/SUS-15-006/trunk/fig/zerob/"+p['varname']+".pdf")
+            cb.SaveAs("/afs/cern.ch/user/e/easilar/public/html/Papers/papers/SUS-15-006/trunk/fig/zerob/"+p['varname']+".root")
           cb.Clear()
           del h_Stack
 
