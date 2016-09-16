@@ -45,7 +45,7 @@ class TaskConfig():
                  sample_info  = {},
                  samples      = None,
                  lumi_info    = {},
-                 saveDirBase = '/afs/hephy.at/user/n/nrad/www/T2Deg13TeV/mAODv2_7412pass2_v6/Optimization_v0/',
+                 saveDirBase = '%s/www/T2Deg13TeV/mAODv2_7412pass2_v6/Optimization_v0/'%os.path.expandvars("$HOME"),
                  **kwargs 
                  #samples     , 
                  #plots       , 
