@@ -192,7 +192,7 @@ postjob = ""
 postjob += "\n"+ "# ======================================= DONE MAKING CARDS ======================================"
 postjob += "\n"+ "## to calculate limits:"
 postjob += "\n"+ "comb  ## go to area with with HiggsCombTool and cmsenv" 
-postjob += "\n"+ "cd -"
+postjob += "\n"+ "tls ## go back the tools dir in the 80X env   /Workspace/DegenerateStopAnalysis/python/tools"  
 postjob += "\n"+ "./calc_cards_limit.py '{card_dir}/Full/T2tt-*'  {card_dir}/Full_Limits.pkl".format(card_dir = card_dir)
 postjob += "\n"+ "\n"
 postjob += "\n"+ "\n"

@@ -35,11 +35,11 @@ massPointsFull = MassPoints(dmOpt, (250,801,25))
 
 
 
-#bkgList = [ 'vv',  'qcd', 'st', 'z','dy', 'tt', 'w' ]
+bkgList = [ 'vv',  'qcd', 'st', 'z','dy', 'tt', 'w' ]
 #bkgList = [  'w' ]
 #bkgList = [ 'vv', 'qcd', 'st', 'dy', 'tt', 'w'  ]
 #sigList = ['s60FS', 's30FS', 's10FS' , 's30']
-bkgList = ['vv']
+#bkgList = ['vv']
 #sigList = [ ] 
 sigOpt = getattr(args,"sigOpt")
 

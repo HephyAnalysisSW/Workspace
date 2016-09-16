@@ -276,8 +276,7 @@ def getLimit(yld, sig=None          , outDir    = "./cards/", postfix = ""     ,
         systs_list={}
         systs_list['corr']={
                             'sig'  :   ['PU', 'jer', 'jec', 'ISR', 'met', 'BTag_b', 'BTag_l', 'BTag_FS',  ],
-                            #'both' :   ['lepEff']  ,
-                            'bkg'  :   ['PU', 'jer', 'jec',  'WPt', 'ttpt','BTag_b', 'BTag_l', ],
+                            'bkg'  :   ['PU', 'jer', 'jec',  'WPt', 'ttpt','BTag_b', 'BTag_l', ], # "WPol"],
                            }
         systs_list['uncorr']={
                             'bkg'  :   ['WPtShape','ttPtShape', 'ZInvEst', 'QCDEst',   'DYJetsM50XSec' ], #'DYJetsM50XSec', 'DibosonXSec', 'STXSec', 'ZInvEst', 'QCDEst'],

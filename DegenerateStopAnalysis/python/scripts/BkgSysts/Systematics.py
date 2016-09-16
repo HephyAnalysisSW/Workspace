@@ -349,10 +349,10 @@ SigAndBkgTagParams       =   {
 #bkgTagParams =   deepcopy( SigAndBkgTagParams )
 bkgTagParams  = {}
 bkgTagParams.update( {
-                      "WPol":\
-                            {
-                                'WPol'  :   { 'WPol':'_WPol'  },
-                            },
+                      #"WPol":\
+                      #      {
+                      #          '1x'  :   { 'other' : {w : {bin:syst} }  },
+                      #      },
                       "WPt":\
                             {
                                 '1x'  :   { 'wpt':'_wpt'  },
@@ -411,18 +411,18 @@ sigTagParams.update({
                                 'GenMET' :   { 'met':'met_gen' },
                                 'MET'    :   { 'met':'met_met' },       # same as central. in order to average the systematics
                             },
-                      "Q2":\
-                            {  
-                                 #'upup'           :   {'lhe':'_Q2upup'            }   ,
-                                 'centralcentral' :   {'lhe':'_Q2centralcentral'  }   ,
-                                 #'downdown'       :   {'lhe':'_Q2downdown'        }   ,
-                                 'downup'         :   {'lhe':'_Q2downup'          }   ,
-                                 'updown'         :   {'lhe':'_Q2updown'          }   ,
-                                 'downcentral'    :   {'lhe':'_Q2downcentral'     }   ,
-                                 'centralup'      :   {'lhe':'_Q2centralup'       }   ,
-                                 'centraldown'    :   {'lhe':'_Q2centraldown'     }   ,
-                                 'upcentral'      :   {'lhe':'_Q2upcentral'       }   ,
-                            },
+                      #"Q2":\
+                      #      {  
+                      #           #'upup'           :   {'lhe':'_Q2upup'            }   ,
+                      #           'centralcentral' :   {'lhe':'_Q2centralcentral'  }   ,
+                      #           #'downdown'       :   {'lhe':'_Q2downdown'        }   ,
+                      #           'downup'         :   {'lhe':'_Q2downup'          }   ,
+                      #           'updown'         :   {'lhe':'_Q2updown'          }   ,
+                      #           'downcentral'    :   {'lhe':'_Q2downcentral'     }   ,
+                      #           'centralup'      :   {'lhe':'_Q2centralup'       }   ,
+                      #           'centraldown'    :   {'lhe':'_Q2centraldown'     }   ,
+                      #           'upcentral'      :   {'lhe':'_Q2upcentral'       }   ,
+                      #      },
                       "ISR":\
                             {
                                 'noisr' :   { 'isr':'_noisr' },

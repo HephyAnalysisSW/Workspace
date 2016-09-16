@@ -1,12 +1,12 @@
-#python   degStop.py -- --cfg=ApprovalSys --task=bkg_est  --lepCol=LepAll --lep=lep --cutInst bins_sum         --weight=pu --btag=sf --redo_yields  --postFuncs=CF_SFs
-#
-#python   degStop.py -- --cfg=ApprovalSys --task=jec_est1 --lepCol=LepAll --lep=lep  --weight=pu --btag=SF   --redo_yields   
-#python   degStop.py -- --cfg=ApprovalSys --task=jec_est2 --lepCol=LepAll --lep=lep  --weight=pu --btag=SF   --redo_yields   
-#python   degStop.py -- --cfg=ApprovalSys --task=jec_est3 --lepCol=LepAll --lep=lep  --weight=pu --btag=SF   --redo_yields   
-#python   degStop.py -- --cfg=ApprovalSys --task=jec_est4 --lepCol=LepAll --lep=lep  --weight=pu --btag=SF   --redo_yields   
-#python   degStop.py -- --cfg=ApprovalSys --task=jec_est5 --lepCol=LepAll --lep=lep  --weight=pu --btag=SF   --redo_yields   
-#python   degStop.py -- --cfg=ApprovalSys --task=jec_est6 --lepCol=LepAll --lep=lep  --weight=pu --btag=SF   --redo_yields   
-#python   degStop.py -- --cfg=ApprovalSys --task=jec_est7 --lepCol=LepAll --lep=lep  --weight=pu --btag=SF   --redo_yields   
+python   degStop.py -- --cfg=ApprovalSys --task=bkg_est  --lepCol=LepAll --lep=lep --cutInst bins_sum   --weight=pu --btag=sf --redo_yields  --postFuncs=CF_SFs
+
+python   degStop.py -- --cfg=ApprovalSys --task=jec_est1 --lepCol=LepAll --lep=lep  --weight=pu --btag=SF   --redo_yields   
+python   degStop.py -- --cfg=ApprovalSys --task=jec_est2 --lepCol=LepAll --lep=lep  --weight=pu --btag=SF   --redo_yields   
+python   degStop.py -- --cfg=ApprovalSys --task=jec_est3 --lepCol=LepAll --lep=lep  --weight=pu --btag=SF   --redo_yields   
+python   degStop.py -- --cfg=ApprovalSys --task=jec_est4 --lepCol=LepAll --lep=lep  --weight=pu --btag=SF   --redo_yields   
+python   degStop.py -- --cfg=ApprovalSys --task=jec_est5 --lepCol=LepAll --lep=lep  --weight=pu --btag=SF   --redo_yields   
+python   degStop.py -- --cfg=ApprovalSys --task=jec_est6 --lepCol=LepAll --lep=lep  --weight=pu --btag=SF   --redo_yields   
+python   degStop.py -- --cfg=ApprovalSys --task=jec_est7 --lepCol=LepAll --lep=lep  --weight=pu --btag=SF   --redo_yields   
 
 python   degStop.py -- --cfg=ApprovalSys --task=bkg_est  --lepCol=LepAll --lep=lep  --cut=bins_sum --weight=pu_up   --btag=SF    --redo_yields    --postFuncs CR_SFs 
 python   degStop.py -- --cfg=ApprovalSys --task=bkg_est  --lepCol=LepAll --lep=lep  --cut=bins_sum --weight=pu      --btag=SF    --redo_yields    --postFuncs CR_SFs      
