@@ -52,7 +52,7 @@ elif sigOpt.lower() == 'nosig':
     sigList = []
 else:
     massPointsFull = MassPoints(dmOpt, (750,801,25))
-    sigList =massPointsFull.sigList
+    sigList = massPointsFull.sigList
     #sigList = [ 's800_790', 's800_720','s800_750']
 print "Signal Opt: ", sigOpt
 print "Signals to be used:", sigList
@@ -365,7 +365,7 @@ cfg = TaskConfig(
                    ppUser         =  ppUser , 
                    cmgTag         =  cmgTag , 
                    #saveDirBase   =  "/afs/hephy.at/user/n/nrad/www/T2Deg13TeV/mAODv2_7412pass2_v6/Studies_v1/" ,
-                   saveDirBase    =  "/afs/hephy.at/user/n/nrad/www/T2Deg13TeV/%s/%s/SUS_16_031_v1/"%(cmgTag, ppTag) ,
+                   saveDirBase    =  "%s/www/T2Deg13TeV/%s/%s/SUS_16_031_v1/"%(os.path.expandvars("$HOME"), cmgTag, ppTag) ,
                    #saveDirBase    =  "/afs/hephy.at/user/n/nrad/www/T2Deg13TeV/%s/%s/Studies_v0_puWeight_wptrwgt/"%(cmgTag, ppTag) ,
                    #saveDirBase    =  "/afs/hephy.at/user/n/nrad/www/T2Deg13TeV/%s/%s/Studies_v0_puWeight_wptrwgt/"%(cmgTag, ppTag) ,
                    cutInst        =  cutInstList,
