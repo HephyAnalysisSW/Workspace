@@ -433,19 +433,19 @@ QCD_HT700to1000_ext ={
 allComponents.append(QCD_HT700to1000_ext)
 
 
-
+signal_path = "/data/nrad/cmgTuples/8012_mAODv2_v3_1/RunIISpring16MiniAODv2/"
 SMS_T2tt_dM_10to80_genHT_160_genMET_80 ={
 'cmgName':"SMS_T2tt_dM_10to80_genHT_160_genMET_80",
 "name" : "SMS-T2tt_dM-10to80_genHT-160_genMET-80_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
 "chunkString":"SMS-T2tt_dM-10to80_genHT-160_genMET-80_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
-"dir": sample_path +"/" + "SMS-T2tt_dM-10to80_genHT-160_genMET-80_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+"dir": signal_path +"/" + "SMS-T2tt_dM-10to80_genHT-160_genMET-80_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
 "dbsName" : "/SMS-T2tt_dM-10to80_genHT-160_genMET-80_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM",
 "rootFileLocation":"tree.root",
 "skimAnalyzerDir":"skimAnalyzerCount",
 "treeName":"tree",
 "isData": False,
 "xsec": 1,
-'mass_dict': sample_path + '/mass_dict.pkl',
+'mass_dict': signal_path + '/mass_dict.pkl',
 "isFastSim":True,
 }
 allComponents.append(SMS_T2tt_dM_10to80_genHT_160_genMET_80)

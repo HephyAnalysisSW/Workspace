@@ -16,7 +16,7 @@ minAngle = lambda phi1, phi2 : "TMath::Min( (2*pi) - abs({phi1}-{phi2}) , abs({p
 lepCollection = "LepGood"
 
 class Cuts():
-    def __init__( self,  lepCollection="LepGood" , lep="mu", sr1c_opt = "reload" , isrpt=110, btag = 'btag' ):
+    def __init__( self,  lepCollection="LepGood" , lep="mu", sr1c_opt = "MT95_IncCharge" , isrpt=100, btag = 'btag' , jc='', met=''):
         """
         sr1c_opt = [ "reload" , "MT95" , "MT95_IncCharge", "MT105_IncCharge_CT250" ]
 
@@ -31,6 +31,98 @@ class Cuts():
         self.lep = lep 
         lepIndex = "Index{lepCol}_{Lep}".format(lepCol=lepCollection, Lep=lep)
 
+        #mt_var_template = "sqrt(2*{LepCol}_pt[{lepIndex}[0]]*{MetPtVar}*(1-cos( {LepCol}_phi[{LepIndex}[0]] - MetPhiVar)))"
+        mt_var_template_string = "sqrt(2*{lepCol}_pt[{lepIndex}[0]]*{metpt}*(1-cos( {lepCol}_phi[{lepIndex}[0]] - {metphi})))"
+        mt_var_temp     = lambda metpt, metphi : mt_var_template_string.format(lepCol=lepCollection,lepIndex=lepIndex, metpt = metpt, metphi = metphi)
+
+        varTag = ''
+        if jc=='':
+            varTag   +=""
+            jetpt    = 'Jet_pt'
+            isrIndex = 'IndexJet_isrJet[0]'
+            isrPt    = '%s[%s]'%(jetpt, isrIndex)
+            ht       = 'ht_basJet'
+            nIsr100  = "nIsrJet"
+            nIsr325  = "nIsrHJet"
+            metpt    = "met_pt"
+            metphi   = "met_phi"
+            mt_var   = mt_var_temp(metpt, metphi)
+    
+        else:
+            corrs = {
+                      'jec_up'     : 'Jet_corr_JECUp{index}  *( 100*(Jet_corr_JER{index}==-99) + Jet_corr_JER{index} )'    ,
+                      'jec_central': 'Jet_corr{index}        *( 100*(Jet_corr_JER{index}==-99) + Jet_corr_JER{index} )'    ,
+                      'jec_down'   : 'Jet_corr_JECDown{index}*( 100*(Jet_corr_JER{index}==-99) + Jet_corr_JER{index} )'    ,
+
+                      'jer_up'     : 'Jet_corr{index}*  ( 100*(Jet_corr_JER{index}==-99) + Jet_corr_JERUp{index}   ) '      ,
+                      'jer_central': 'Jet_corr{index}*  ( 100*(Jet_corr_JER{index}==-99) + Jet_corr_JER{index}     ) '      ,
+                      'jer_down'   : 'Jet_corr{index}*  ( 100*(Jet_corr_JER{index}==-99) + Jet_corr_JERDown{index} ) '      ,
+                     }
+
+
+        #met_JetEnDown_Pt    type1, JetEnDown, pt : 0 at: 0x67fc2e0
+        #met_JetEnDown_Phi   type1, JetEnDown, phi : 0 at: 0x680add0
+        #met_JetResDown_Pt   type1, JetResDown, pt : 0 at: 0x67ccc00
+        #met_JetResDown_Phi
+
+
+            met_corrs = {
+
+                       'jec_up'     : ["met_JetEnUp_Pt"   ,"met_JetEnUp_Phi"     ]             , 
+                       'jec_central': ["met_pt"           ,"met_phi"             ]             , 
+                       'jec_down'   : ["met_JetEnDown_Pt" ,"met_JetEnDown_Phi"   ]               , 
+
+                       'jer_up'     : ["met_JetResUp_Pt"  ,"met_JetResUp_Phi"    ]              , 
+                       'jer_central': ["met_pt"           ,"met_phi"             ]             ,    
+                       'jer_down'   : ["met_JetResDown_Pt","met_JetResDown_Phi"  ]                ,
+ 
+                        }
+            if jc not in corrs:
+                raise Exception("JEC/JER OPTION NOT RECOGNIZED: %s"%jc)
+
+        
+            varTag  += "_%s"%jc
+
+
+            isrIndex = 'IndexJet_isrJet[0]'
+            jetRawPt    = 'Jet_rawPt'
+            isrRawPt = 'Jet_rawPt[{isrIndex}]'
+            isrjecjer= corrs[jc].format(index="[%s]"%isrIndex)
+            jecjer   = corrs[jc].format(index="")
+
+            isrPt    = "((%s)*(%s))"%(isrjecjer, isrRawPt)
+            jetPt    = "((%s)*(%s))"%(jecjer, jetRawPt)
+            ht       = "Sum$(({jetpt}) * ({jetpt}>30  && abs(Jet_eta) < 2.4 && Jet_id))".format(jetpt=jetPt)
+            nIsr100  = "(Sum$({jetpt}>100 && abs(Jet_eta) < 2.4 && Jet_id))".format(jetpt=jetPt)
+            nIsr325  = "(Sum$({jetpt}>325 && abs(Jet_eta) < 2.4 && Jet_id))".format(jetpt=jetPt)
+            metpt, metphi = met_corrs[jc]
+            mt_var = mt_var_temp(metpt, metphi)
+       
+        #
+        #   for fastsim
+        #
+        if met:
+            if jc:
+                raise Exception("Cannot vary MET and JEC at the same time!")
+            if not met in ['met','gen', 'ave']:
+                raise Exception("Invalid MET option. valid options are: %s"%"['met','gen', 'ave']" )
+
+            metVarTags = {
+                        'met':'MET',
+                        'gen':'GenMET',
+                      }
+            varTag += "_" + metVarTags[met]
+
+            met_vars = {
+                            'met': ['met_pt', 'met_phi']  ,
+                            'gen': ['met_genPt', 'met_genPhi'] ,
+                       }
+
+            metpt, metphi = met_vars[met]
+            mt_var = mt_var_temp(metpt, metphi)
+
+
+        #mt_var = "{lepCol}_mt[{lepIndex}[0]]" 
 
 
 
@@ -107,10 +199,9 @@ class Cuts():
 
         #self.presel_noAntiQCD = CutClass ("PreselNoAntiQCD", [
         self.presel_noAntiQCD = CutClass ("MET200_ISR%s_HT300"%isrpt, [
-                                      ["MET200","met>200"],
-                                      ["ISR110","nIsrJet>=1" ],
-                                      #["ISR%s"%isrpt,"nBasJet>=0 && Jet_pt[IndexJet_basJet[0]] > %s"%isrpt ],
-                                      ["HT300","ht_basJet>300"],
+                                      ["MET200","%s>200"%metpt],
+                                      ["ISR100","{nIsr100}>=1".format(nIsr100=nIsr100) ],
+                                      ["HT300","{ht}>300".format(ht=ht)],
                                       #["No3rdJet60","nVetoJet<3"],
                                       #["TauElVeto","(Sum$(TauGood_idMVA)==0) && (Sum$(abs(LepGood_pdgId)==11 && LepGood_SPRING15_25ns_v1==1)==0)"],
                                       #["1Mu-2ndMu20Veto", "(nLepGood_mu==1 || (nLepGood_mu ==2 && LepGood_pt[IndexLepGood_mu[1]] < 20) )"],
@@ -182,7 +273,7 @@ class Cuts():
         
         
         self.sr1IncCharge   = CutClass ("SR1IncCharge",    [
-                                      ["CT300","min(met,ht_basJet-100) > 300 "],
+                                      ["CT300","min({metpt},{ht}-100) > 300 ".format(ht=ht,metpt=metpt)],
                                       #["Veto Soft BJet",veto_soft_bjet],
                                       #["Veto Hard BJet",veto_hard_bjet],
                                       ["Veto BJets",veto_bjet],
@@ -210,8 +301,9 @@ class Cuts():
 
 
         self.sr2      = CutClass ("SR2",   [ 
-                                        ["Met300","met>300"],
-                                        ["ISR325","nIsrHJet>0"],
+                                        #["ISR325","nIsrHJet>0"],
+                                        ["ISR325","{nIsr325}>0".format(nIsr325=nIsr325)],
+                                        ["Met300","%s>300"%metpt],
                                         #["At Least 1 Soft BJet", one_or_more_soft_bjet],
                                         #["No Hard BJet",veto_hard_bjet],
                                         ["1 or More Soft but no Hard BJet", sr2_bjet],
@@ -225,7 +317,7 @@ class Cuts():
         
         
         self.sr1CT250   = CutClass ("SR1_CT250",    [
-                                      ["CT250","min(met,ht_basJet-100) > 250 "],
+                                      ["CT250","min({metpt},{ht}-100) > 250 ".format(ht=ht,metpt=metpt)],
                                       #["Veto Soft BJet",veto_soft_bjet],
                                       #["Veto Hard BJet",veto_hard_bjet],
                                       ["Veto BJet",veto_bjet],
@@ -237,7 +329,7 @@ class Cuts():
                           )
 
         self.sr1CT200   = CutClass ("SR1_CT200",    [
-                                      ["CT200","min(met,ht_basJet-100) > 200 "],
+                                      ["CT200","min({metpt},{ht}-100) > 200 ".format(ht=ht, metpt=metpt)],
                                       #["Veto Soft BJet",veto_soft_bjet],
                                       #["Veto Hard BJet",veto_hard_bjet],
                                       ["Veto BJet",veto_bjet],
@@ -252,7 +344,7 @@ class Cuts():
 
 
         self.sr1IncChargeCT300   = CutClass ("SR1IncChargeCT300",    [
-                                      ["CT300","min(met,ht_basJet-100) > 300 "],
+                                      ["CT300","min({metpt},{ht}-100) > 300 ".format(ht=ht, metpt=metpt)],
                                       #["Veto Soft BJet",veto_soft_bjet],
                                       #["Veto Hard BJet",veto_hard_bjet],
                                       ["Veto BJet",veto_bjet],
@@ -262,7 +354,7 @@ class Cuts():
                           baseCut = self.presel,
                           )
         self.sr1IncChargeCT250   = CutClass ("SR1IncChargeCT250",    [
-                                      ["CT250","min(met,ht_basJet-100) > 250 "],
+                                      ["CT250","min({metpt},{ht}-100) > 250 ".format(ht=ht, metpt=metpt)],
                                       #["Veto Soft BJet",veto_soft_bjet],
                                       #["Veto Hard BJet",veto_hard_bjet],
                                       ["Veto BJet",veto_bjet],
@@ -272,7 +364,7 @@ class Cuts():
                           baseCut = self.presel,
                           )
         self.sr1IncChargeCT200   = CutClass ("SR1IncChargeCT200",    [
-                                      ["CT200","min(met,ht_basJet-100) > 200 "],
+                                      ["CT200","min({metpt},{ht}-100) > 200 ".format(ht=ht, metpt=metpt)],
                                       #["Veto Soft BJet",veto_soft_bjet],
                                       #["Veto Hard BJet",veto_hard_bjet],
                                       ["Veto BJet",veto_bjet],
@@ -284,7 +376,7 @@ class Cuts():
 
         # sr1 no eta, incCharge
         #self.sr1IncChargeIncEtaCT300   = CutClass ("SR1IncChargeIncEtaCT300",    [
-        #                              ["CT300","min(met,ht_basJet-100) > 300 "],
+        #                              ["CT300","min(met,{ht}-100) > 300 "],
         #                              ["BVeto","(nBSoftJet == 0 && nBHardJet ==0)"],
         #                              ["{lep}Pt30".format(lep=lep.title()),"{lepCol}_pt[{lepIndex}[0]]<30".format(lepCol=lepCollection, lepIndex=lepIndex)],
         #                           ] , 
@@ -292,14 +384,14 @@ class Cuts():
         #                  )
 
         #self.sr1IncChargeIncEtaCT250   = CutClass ("SR1IncChargeIncEtaCT250",    [
-        #                              ["CT250","min(met,ht_basJet-100) > 250 "],
+        #                              ["CT250","min(met,{ht}-100) > 250 "],
         #                              ["BVeto","(nBSoftJet == 0 && nBHardJet ==0)"],
         #                              ["{lep}Pt30".format(lep=lep.title()),"{lepCol}_pt[{lepIndex}[0]]<30".format(lepCol=lepCollection, lepIndex=lepIndex)],
         #                           ] , 
         #                  baseCut = self.presel,
         #                  )
         #self.sr1IncChargeIncEtaCT200   = CutClass ("SR1IncChargeIncEtaCT200",    [
-        #                              ["CT200","min(met,ht_basJet-100) > 200 "],
+        #                              ["CT200","min(met,{ht}-100) > 200 "],
         #                              ["BVeto","(nBSoftJet == 0 && nBHardJet ==0)"],
         #                              ["{lep}Pt30".format(lep=lep.title()),"{lepCol}_pt[{lepIndex}[0]]<30".format(lepCol=lepCollection, lepIndex=lepIndex)],
         #                           ] , 
@@ -333,9 +425,9 @@ class Cuts():
                 #'mt2' : mt[0],
               }
         self.mtabc   = CutClass ("MTabc",    [
-                                       ["MTa","{lepCol}_mt[{lepIndex}[0]]< {mt0}".format(lepCol=lepCollection, lepIndex=lepIndex, **mts )],
-                                       ["MTb",btw("{lepCol}_mt[{lepIndex}[0]]".format(lepCol=lepCollection, lepIndex=lepIndex), mt[0],mt[1] )],
-                                       ["MTc","{lepCol}_mt[{lepIndex}[0]]> {mt1}".format(lepCol=lepCollection, lepIndex=lepIndex, **mts )],
+                                       ["MTa","{mt_var}< {mt0}".format(mt_var=mt_var,lepCol=lepCollection, lepIndex=lepIndex, **mts )],
+                                       ["MTb",btw("{mt_var}".format(mt_var=mt_var, lepCol=lepCollection, lepIndex=lepIndex), mt[0],mt[1] )],
+                                       ["MTc","{mt_var}> {mt1}".format(mt_var=mt_var, lepCol=lepCollection, lepIndex=lepIndex, **mts )],
                                    ] , 
                           baseCut = self.sr1,
                           )
@@ -343,23 +435,23 @@ class Cuts():
 
 
         #self.sr1abc   = CutClass ("SR1abc",    [
-        #                               ["SR1a","{lepCol}_mt[{lepIndex}[0]]<{mt0}".format(lepCol=lepCollection, lepIndex=lepIndex, **mts)],
-        #                               ["SR1b",btw("{lepCol}_mt[{lepIndex}[0]]".format(lepCol=lepCollection, lepIndex=lepIndex),mt[0],mt[1])],
-        #                               ["SR1c","{lepCol}_mt[{lepIndex}[0]]>{mt1}".format(lepCol=lepCollection, lepIndex=lepIndex, **mts)],
+        #                               ["SR1a","{mt_var}<{mt0}".format(mt_var=mt_var, lepCol=lepCollection, lepIndex=lepIndex, **mts)],
+        #                               ["SR1b",btw("{mt_var}".format(mt_var=mt_var, lepCol=lepCollection, lepIndex=lepIndex),mt[0],mt[1])],
+        #                               ["SR1c","{mt_var}>{mt1}".format(mt_var=mt_var, lepCol=lepCollection, lepIndex=lepIndex, **mts)],
         #                           ] , 
         #                  baseCut = self.sr1,
         #                  )
         
         self.sr1ab_ptbin   = CutClass ("SR1ab_PtBinned",    [
-                                       #["SR1a","{lepCol}_mt[{lepIndex}[0]]<{mt0}"],
-                                          ["SRL1a",joinCutStrings(   ["{lepCol}_mt[{lepIndex}[0]]<{mt0}".format(lepCol=lepCollection, lepIndex=lepIndex, **mts),         btw("{lepCol}_pt[{lepIndex}[0]]".format(lepCol=lepCollection, lepIndex=lepIndex),5,12)]  )],
-                                          ["SRH1a",joinCutStrings(   ["{lepCol}_mt[{lepIndex}[0]]<{mt0}".format(lepCol=lepCollection, lepIndex=lepIndex, **mts),         btw("{lepCol}_pt[{lepIndex}[0]]".format(lepCol=lepCollection, lepIndex=lepIndex),12,20)] )],
-                                          ["SRV1a",joinCutStrings(   ["{lepCol}_mt[{lepIndex}[0]]<{mt0}".format(lepCol=lepCollection, lepIndex=lepIndex, **mts),         btw("{lepCol}_pt[{lepIndex}[0]]".format(lepCol=lepCollection, lepIndex=lepIndex),20,30)] )],
-                                       #["SR1b",btw("{lepCol}_mt[{lepIndex}[0]]",mt[0],mt[1])],
-                                          ["SRL1b",joinCutStrings(   [btw("{lepCol}_mt[{lepIndex}[0]]".format(lepCol=lepCollection, lepIndex=lepIndex),mt[0],mt[1]), btw("{lepCol}_pt[{lepIndex}[0]]".format(lepCol=lepCollection, lepIndex=lepIndex),5,12)]  )],
-                                          ["SRH1b",joinCutStrings(   [btw("{lepCol}_mt[{lepIndex}[0]]".format(lepCol=lepCollection, lepIndex=lepIndex),mt[0],mt[1]), btw("{lepCol}_pt[{lepIndex}[0]]".format(lepCol=lepCollection, lepIndex=lepIndex),12,20)] )],
-                                          ["SRV1b",joinCutStrings(   [btw("{lepCol}_mt[{lepIndex}[0]]".format(lepCol=lepCollection, lepIndex=lepIndex),mt[0],mt[1]), btw("{lepCol}_pt[{lepIndex}[0]]".format(lepCol=lepCollection, lepIndex=lepIndex),20,30)] )],
-                                       #["SR1c","{lepCol}_mt[{lepIndex}[0]]>{mt1}"],
+                                       #["SR1a","{mt_var}<{mt0}"],
+                                          ["SRL1a",joinCutStrings(   ["{mt_var}<{mt0}".format(mt_var=mt_var, lepCol=lepCollection, lepIndex=lepIndex, **mts),         btw("{lepCol}_pt[{lepIndex}[0]]".format(lepCol=lepCollection, lepIndex=lepIndex),5,12)]  )],
+                                          ["SRH1a",joinCutStrings(   ["{mt_var}<{mt0}".format(mt_var=mt_var, lepCol=lepCollection, lepIndex=lepIndex, **mts),         btw("{lepCol}_pt[{lepIndex}[0]]".format(lepCol=lepCollection, lepIndex=lepIndex),12,20)] )],
+                                          ["SRV1a",joinCutStrings(   ["{mt_var}<{mt0}".format(mt_var=mt_var, lepCol=lepCollection, lepIndex=lepIndex, **mts),         btw("{lepCol}_pt[{lepIndex}[0]]".format(lepCol=lepCollection, lepIndex=lepIndex),20,30)] )],
+                                       #["SR1b",btw("{mt_var}",mt[0],mt[1])],
+                                          ["SRL1b",joinCutStrings(   [btw("{mt_var}".format(mt_var=mt_var, lepCol=lepCollection, lepIndex=lepIndex),mt[0],mt[1]), btw("{lepCol}_pt[{lepIndex}[0]]".format(lepCol=lepCollection, lepIndex=lepIndex),5,12)]  )],
+                                          ["SRH1b",joinCutStrings(   [btw("{mt_var}".format(mt_var=mt_var, lepCol=lepCollection, lepIndex=lepIndex),mt[0],mt[1]), btw("{lepCol}_pt[{lepIndex}[0]]".format(lepCol=lepCollection, lepIndex=lepIndex),12,20)] )],
+                                          ["SRV1b",joinCutStrings(   [btw("{mt_var}".format(mt_var=mt_var, lepCol=lepCollection, lepIndex=lepIndex),mt[0],mt[1]), btw("{lepCol}_pt[{lepIndex}[0]]".format(lepCol=lepCollection, lepIndex=lepIndex),20,30)] )],
+                                       #["SR1c","{mt_var}>{mt1}"],
                                    ] , 
                           baseCut = self.sr1,
                           )
@@ -368,9 +460,9 @@ class Cuts():
 
 
         self.sr1c_ptbin     = CutClass ("SR1C_PtBinned",  [
-                                       ["SRL1c",joinCutStrings(   ["{lepCol}_mt[{lepIndex}[0]]>{mt1}".format(lepCol=lepCollection, lepIndex=lepIndex, **mts),         btw("{lepCol}_pt[{lepIndex}[0]]".format(lepCol=lepCollection, lepIndex=lepIndex),5,12)]  )],
-                                       ["SRH1c",joinCutStrings(   ["{lepCol}_mt[{lepIndex}[0]]>{mt1}".format(lepCol=lepCollection, lepIndex=lepIndex, **mts),         btw("{lepCol}_pt[{lepIndex}[0]]".format(lepCol=lepCollection, lepIndex=lepIndex),12,20)] )],
-                                       ["SRV1c",joinCutStrings(   ["{lepCol}_mt[{lepIndex}[0]]>{mt1}".format(lepCol=lepCollection, lepIndex=lepIndex, **mts),         btw("{lepCol}_pt[{lepIndex}[0]]".format(lepCol=lepCollection, lepIndex=lepIndex),20,30)] )],
+                                       ["SRL1c",joinCutStrings(   ["{mt_var}>{mt1}".format(mt_var=mt_var, lepCol=lepCollection, lepIndex=lepIndex, **mts),         btw("{lepCol}_pt[{lepIndex}[0]]".format(lepCol=lepCollection, lepIndex=lepIndex),5,12)]  )],
+                                       ["SRH1c",joinCutStrings(   ["{mt_var}>{mt1}".format(mt_var=mt_var, lepCol=lepCollection, lepIndex=lepIndex, **mts),         btw("{lepCol}_pt[{lepIndex}[0]]".format(lepCol=lepCollection, lepIndex=lepIndex),12,20)] )],
+                                       ["SRV1c",joinCutStrings(   ["{mt_var}>{mt1}".format(mt_var=mt_var, lepCol=lepCollection, lepIndex=lepIndex, **mts),         btw("{lepCol}_pt[{lepIndex}[0]]".format(lepCol=lepCollection, lepIndex=lepIndex),20,30)] )],
                                     ], 
                           baseCut = self.sr1c_baseCut
                           )
@@ -382,32 +474,32 @@ class Cuts():
         
         
         self.sr1a   = CutClass ("SR1a",    [
-                                       ["SR1a","{lepCol}_mt[{lepIndex}[0]]<{mt0}".format(lepCol=lepCollection, lepIndex=lepIndex, **mts)],
+                                       ["SR1a","{mt_var}<{mt0}".format(mt_var=mt_var, lepCol=lepCollection, lepIndex=lepIndex, **mts)],
                                    ] , 
                           baseCut = self.sr1,
                           )
         
         
         self.sr1b   = CutClass ("SR1b",    [
-                                       ["SR1b",btw("{lepCol}_mt[{lepIndex}[0]]".format(lepCol=lepCollection, lepIndex=lepIndex),mt[0],mt[1])],
+                                       ["SR1b",btw("{mt_var}".format(mt_var=mt_var, lepCol=lepCollection, lepIndex=lepIndex),mt[0],mt[1])],
                                    ] , 
                           baseCut = self.sr1,
                           )
         
         
         self.sr1c   = CutClass ("SR1c",    [
-                                       ["SR1c","{lepCol}_mt[{lepIndex}[0]]>{mt1}".format(lepCol=lepCollection, lepIndex=lepIndex, **mts)],
+                                       ["SR1c","{mt_var}>{mt1}".format(mt_var=mt_var, lepCol=lepCollection, lepIndex=lepIndex, **mts)],
                                    ] , 
                           baseCut = sr1c_baseCut,
                           )
         
         self.sr1cNegCharge   = CutClass ("SR1cNegCharge",    [
-                                       ["SR1cNegCharge","{lepCol}_mt[{lepIndex}[0]]>{mt1}".format(lepCol=lepCollection, lepIndex=lepIndex, **mts)],
+                                       ["SR1cNegCharge","{mt_var}>{mt1}".format(mt_var=mt_var, lepCol=lepCollection, lepIndex=lepIndex, **mts)],
                                    ] , 
                           baseCut = self.negCharge,
                           )
         self.sr1cPosCharge   = CutClass ("SR1cPosCharge",    [
-                                       ["SR1cPosCharge","{lepCol}_mt[{lepIndex}[0]]>{mt1}".format(lepCol=lepCollection, lepIndex=lepIndex, **mts)],
+                                       ["SR1cPosCharge","{mt_var}>{mt1}".format(mt_var=mt_var, lepCol=lepCollection, lepIndex=lepIndex, **mts)],
                                    ] , 
                           baseCut = self.posCharge,
                           )
@@ -418,33 +510,6 @@ class Cuts():
                                           ["SRV2",  btw("{lepCol}_pt[{lepIndex}[0]]".format(lepCol=lepCollection, lepIndex=lepIndex),20,30)   ],
                                    ] , 
                           baseCut = self.sr2,
-                          )
-        self.srl1c   = CutClass ("SR1c",    [
-                                       ["SR1c","{lepCol}_mt[{lepIndex}[0]]>{mt1}".format(lepCol=lepCollection, lepIndex=lepIndex, **mts)],
-                                       ["SRL2",  btw("{lepCol}_pt[{lepIndex}[0]]".format(lepCol=lepCollection, lepIndex=lepIndex),5,12)    ],
-                                   ] , 
-                          baseCut = sr1c_baseCut,
-                          )
-        self.srh1c   = CutClass ("SR1c",    [
-                                       ["SR1c","{lepCol}_mt[{lepIndex}[0]]>{mt1}".format(lepCol=lepCollection, lepIndex=lepIndex, **mts)],
-                                       ["SRH2",  btw("{lepCol}_pt[{lepIndex}[0]]".format(lepCol=lepCollection, lepIndex=lepIndex),12,20)   ],
-                                   ] , 
-                          baseCut = sr1c_baseCut,
-                          )
-        self.srv1c   = CutClass ("SR1c",    [
-                                       ["SR1c","{lepCol}_mt[{lepIndex}[0]]>{mt1}".format(lepCol=lepCollection, lepIndex=lepIndex, **mts)],
-                                       ["SRV2",  btw("{lepCol}_pt[{lepIndex}[0]]".format(lepCol=lepCollection, lepIndex=lepIndex),20,30)   ],
-                                   ] , 
-                          baseCut = sr1c_baseCut,
-                          )
-        self.srh1c_neg_nj2   = CutClass ("SR1c_neg_nj2",    [
-                                       ["SR1c","{lepCol}_mt[{lepIndex}[0]]>{mt1}".format(lepCol=lepCollection, lepIndex=lepIndex, **mts)],
-                                       ["SRH2",  btw("{lepCol}_pt[{lepIndex}[0]]".format(lepCol=lepCollection, lepIndex=lepIndex),12,20)   ],
-                                       ["neg{lep}".format(lep=lep.title()),"({lepCol}_pdgId[{lepIndex}[0]]==13 || {lepCol}_pdgId[{lepIndex}[0]]==11 )".format(lepCol=lepCollection, lepIndex=lepIndex)],
-                                       ["nj2"   ,  "nBasJet==2"],
-                                       #["SRH2"  ,  btw("{lepCol}_pt[{lepIndex}[0]]".format(lepCol=lepCollection, lepIndex=lepIndex),12,20)   ],
-                                   ] , 
-                          baseCut = sr1c_baseCut,
                           )
         
         self.srs_ptbin   = CutClass ("SRs_PtBinned",    [], baseCut= self.presel ) 
@@ -483,8 +548,8 @@ class Cuts():
 
         
         self.cr1Loose    = CutClass ( "cr1Loose", [
-                                      ["CT200","min(met,ht_basJet-100) > 200 "],
-                                      #["CT300","min(met,ht_basJet-100) > 300 "],
+                                      ["CT200","min({metpt},{ht}-100) > 200 ".format(ht=ht,metpt=metpt)],
+                                      #["CT300","min(met,{ht}-100) > 300 "],
                                       #["Veto Soft BJet",veto_soft_bjet],
                                       #["Veto Hard BJet",veto_hard_bjet],
                                       ["Veto BJet",veto_bjet],
@@ -513,7 +578,7 @@ class Cuts():
                         )
         
         self.cr1IncCharge   = CutClass ("CR1IncCharge",    [
-                                      ["CT300","min(met,ht_basJet-100) > 300 "],
+                                      ["CT300","min({metpt},{ht}-100) > 300 ".format(ht=ht,metpt=metpt)],
                                       ["{lep}Pt_gt_30".format(lep=lep.title()),"{lepCol}_pt[{lepIndex}[0]]>30".format(lepCol=lepCollection, lepIndex=lepIndex)],
                                       #["Veto Soft BJet",veto_soft_bjet],
                                       #["Veto Hard BJet",veto_hard_bjet],
@@ -521,7 +586,7 @@ class Cuts():
                                       ["{lep}Eta1.5".format(lep=lep.title()),"abs({lepCol}_eta[{lepIndex}[0]])<1.5".format(lepCol=lepCollection, lepIndex=lepIndex)],
                                       #["neg{lep}".format(lep=lep.title()),"( {lepCol}_pdgId[{lepIndex}[0]]==13 || {lepCol}_pdgId[{lepIndex}[0]]==11  )".format(lepCol=lepCollection, lepIndex=lepIndex)],
                                       #["BVeto_Medium25","nBJetMedium25==0"],
-                                      #["HT400 ","ht_basJet>400"],
+                                      #["HT400 ","{ht}>400"],
                                       #["met300","met>300"],
                                    ] , 
                           baseCut = self.presel,
@@ -536,30 +601,30 @@ class Cuts():
         
         
         self.cr1abc   = CutClass ("CR1abc",    [
-                                       ["CR1a", "{lepCol}_mt[{lepIndex}[0]]<{mt0}".format(lepCol=lepCollection, lepIndex=lepIndex, **mts)],
-                                       ["CR1b", btw("{lepCol}_mt[{lepIndex}[0]]".format(lepCol=lepCollection, lepIndex=lepIndex),mt[0],mt[1])],
-                                       ["CR1c", "{lepCol}_mt[{lepIndex}[0]]>{mt1}".format(lepCol=lepCollection, lepIndex=lepIndex, **mts)],
+                                       ["CR1a", "{mt_var}<{mt0}".format(mt_var=mt_var, lepCol=lepCollection, lepIndex=lepIndex, **mts)],
+                                       ["CR1b", btw("{mt_var}".format(mt_var=mt_var, lepCol=lepCollection, lepIndex=lepIndex),mt[0],mt[1])],
+                                       ["CR1c", "{mt_var}>{mt1}".format(mt_var=mt_var, lepCol=lepCollection, lepIndex=lepIndex, **mts)],
                                    ] , 
                           baseCut = self.cr1,
                           )
         self.cr1a   = CutClass ("CR1a",    [
-                                       ["CR1a", "{lepCol}_mt[{lepIndex}[0]]<{mt0}".format(lepCol=lepCollection, lepIndex=lepIndex, **mts)],
+                                       ["CR1a", "{mt_var}<{mt0}".format(mt_var=mt_var, lepCol=lepCollection, lepIndex=lepIndex, **mts)],
                                    ] , 
                           baseCut = self.cr1,
                           )
         self.cr1b   = CutClass ("CR1b",    [
-                                       ["CR1b", btw("{lepCol}_mt[{lepIndex}[0]]".format(lepCol=lepCollection, lepIndex=lepIndex),mt[0],mt[1])],
+                                       ["CR1b", btw("{mt_var}".format(mt_var=mt_var, lepCol=lepCollection, lepIndex=lepIndex),mt[0],mt[1])],
                                    ] , 
                           baseCut = self.cr1,
                           )
         self.cr1c   = CutClass ("CR1c",    [
-                                       ["CR1c", "{lepCol}_mt[{lepIndex}[0]]>{mt1}".format(lepCol=lepCollection, lepIndex=lepIndex, **mts)],
+                                       ["CR1c", "{mt_var}>{mt1}".format(mt_var=mt_var, lepCol=lepCollection, lepIndex=lepIndex, **mts)],
                                    ] , 
                           baseCut = self.cr1c_baseCut,
                           )
 
         self.cr2      = CutClass ("CR2",   [
-                                        ["Jet325","nIsrHJet>0"],
+                                        ["Jet325","{nIsr325}>0".format(nIsr325=nIsr325)],
                                         #["met300","met>300"],
                                         #["OneOrMoreSoftB", one_or_more_soft_bjet],
                                         #["noHardB", veto_hard_bjet],
@@ -591,24 +656,24 @@ class Cuts():
 
 
 
-        self.esr1      = CutClass( "ESR1", [ ["ESR1", "min(met, ht_basJet - 100 ) > 300"] ],
+        self.esr1      = CutClass( "ESR1", [ ["ESR1", "min({metpt}, {ht} - 100 ) > 300".format(ht=ht,metpt=metpt)] ],
                             baseCut = None
                             ) 
-        self.ecr1      = CutClass( "ECR1", [ ["ECR1", "(min(met, ht_basJet - 100) < 300 )&&(min(met, ht_basJet - 100) > 200 )"] ],
+        self.ecr1      = CutClass( "ECR1", [ ["ECR1", "(min({metpt}, {ht} - 100) < 300 )&&(min({metpt}, {ht} - 100) > 200 )".format(ht=ht,metpt=metpt)] ],
                             baseCut = None
                             ) 
-        self.esr2      = CutClass( "ESR2", [ ["ESR2", "min(met, Jet_pt[IndexJet_isrJet[0]] - 25 ) > 300"] ],
+        self.esr2      = CutClass( "ESR2", [ ["ESR2", "min({metpt}, Jet_pt[IndexJet_isrJet[0]] - 25 ) > 300".format(metpt=metpt)] ],
                             baseCut = None
                             ) 
-        self.ecr2      = CutClass( "ECR2", [ ["ECR2", "(min(met, Jet_pt[IndexJet_isrJet[0]] - 25) < 300 )&&(min(met, Jet_pt[IndexJet_isrJet[0]] - 25) > 200 )"] ],
+        self.ecr2      = CutClass( "ECR2", [ ["ECR2", "(min({metpt}, Jet_pt[IndexJet_isrJet[0]] - 25) < 300 )&&(min({metpt}, Jet_pt[IndexJet_isrJet[0]] - 25) > 200 )".format(metpt=metpt)] ],
                             baseCut = None
                             ) 
 
 
-        esr1      =  "(min(met, ht_basJet - 100 ) > 300)"
-        ecr1      =  "((min(met, ht_basJet - 100) < 300 )&&(min(met, ht_basJet - 100) > 200 ))"
-        esr2      =  "(min(met, Jet_pt[IndexJet_isrJet[0]] - 25 ) > 300)"
-        ecr2      =  "((min(met, Jet_pt[IndexJet_isrJet[0]] - 25) < 300 )&&(min(met, Jet_pt[IndexJet_isrJet[0]] - 25) > 200 ))"
+        esr1      =  "(min({metpt}, {ht} - 100 ) > 300)".format(ht=ht,metpt=metpt)  
+        ecr1      =  "((min({metpt}, {ht} - 100) < 300 )&&(min({metpt}, {ht} - 100) > 200 ))".format(ht=ht,metpt=metpt)
+        esr2      =  "(min({metpt}, Jet_pt[IndexJet_isrJet[0]] - 25 ) > 300)".format(metpt=metpt)
+        ecr2      =  "((min({metpt}, Jet_pt[IndexJet_isrJet[0]] - 25) < 300 )&&(min({metpt}, Jet_pt[IndexJet_isrJet[0]] - 25) > 200 ))".format(metpt=metpt)
 
 
 
@@ -634,12 +699,6 @@ class Cuts():
                 cutLists.append( ["{lep}Pt_lt_30".format(lep=lep.title()),"{lepCol}_pt[{lepIndex}[0]]<30".format(lepCol=lepCollection, lepIndex=lepIndex)] )
             if pt == "cr":
                 cutLists.append(    ["{lep}Pt_gt_30".format(lep=lep.title()),"{lepCol}_pt[{lepIndex}[0]]>30".format(lepCol=lepCollection, lepIndex=lepIndex)] )
-            if pt == "srl":
-                cutLists.append( ["{lep}Pt_btw_5_12".format(lep=lep.title()), btw("{lepCol}_pt[{lepIndex}[0]]".format(lepCol=lepCollection, lepIndex=lepIndex), 5, 12) ] )
-            if pt == "srh":
-                cutLists.append( ["{lep}Pt_btw_12_20".format(lep=lep.title()), btw("{lepCol}_pt[{lepIndex}[0]]".format(lepCol=lepCollection, lepIndex=lepIndex), 10, 20)]  )
-            if pt == "srv":
-                cutLists.append( ["{lep}Pt_btw_20_30".format(lep=lep.title()), btw("{lepCol}_pt[{lepIndex}[0]]".format(lepCol=lepCollection, lepIndex=lepIndex), 20, 30)]  )
             else:
                 pass
 
@@ -653,11 +712,11 @@ class Cuts():
                 pass
 
             if mt == "a":
-                cutLists.append( ["MTa","{lepCol}_mt[{lepIndex}[0]]< {mt0}".format(lepCol=lepCollection, lepIndex=lepIndex, **mts )]   )
+                cutLists.append( ["MTa","{mt_var}< {mt0}".format(mt_var=mt_var, lepCol=lepCollection, lepIndex=lepIndex, **mts )]   )
             elif mt == "b":
-                cutLists.append( ["MTb",btw("{lepCol}_mt[{lepIndex}[0]]".format(lepCol=lepCollection, lepIndex=lepIndex), mts['mt0'], mts['mt1'] )]   )
+                cutLists.append( ["MTb",btw("{mt_var}".format(mt_var=mt_var, lepCol=lepCollection, lepIndex=lepIndex), mts['mt0'], mts['mt1'] )]   )
             elif mt == "c":
-                cutLists.append( ["MTc","{lepCol}_mt[{lepIndex}[0]]> {mt1}".format(lepCol=lepCollection, lepIndex=lepIndex, **mts )]   )
+                cutLists.append( ["MTc","{mt_var}> {mt1}".format(mt_var=mt_var, lepCol=lepCollection, lepIndex=lepIndex, **mts )]   )
             else:
                 print "no MT....."
                 pass
@@ -671,8 +730,8 @@ class Cuts():
         pts = ["sr","cr"]
         charges = ["neg", "pos"]
         sr1_side_band_cuts  = [ 
-                                #["ESR1", "min(met, ht_basJet - 100 ) > 300"],
-                                ["ECR1", "(min(met, ht_basJet - 100) < 300 )&&(min(met, ht_basJet - 100) > 200 )"],
+                                #["ESR1", "min(met, {ht} - 100 ) > 300"],
+                                ["ECR1", "(min({metpt}, {ht} - 100) < 300 )&&(min({metpt}, {ht} - 100) > 200 )".format(ht=ht,metpt=metpt)],
                                 #["ESR2", "min(met, Jet_pt[IndexJet_isrJet[0]] - 25 ) > 300"],
                                 #["ECR2", "(min(met, Jet_pt[IndexJet_isrJet[0]] - 25) < 300 )&&(min(met, Jet_pt[IndexJet_isrJet[0]] - 25) > 200 )"],
                           ]
@@ -682,16 +741,13 @@ class Cuts():
         for mt_ in mtabc:
             for side_band_cut_name, side_band_cut in sr1_side_band_cuts:
                 for charge in charges:
-                    for pt in pts + ['srl','srh','srv'] :
+                    for pt in pts:
                         side_band ="MT%s"%mt_ +"_" + side_band_cut_name +"_"+charge +"_PT%s"%(pt.upper()) 
                         self.sr1_side_band_dict[side_band] = {'side_band_cut_name':side_band_cut_name, 'side_band_cut':side_band_cut, 'mt':mt_, 'charge':charge, 'pt':pt}
+                        #print self.side_band_dict
                         self.sr1_side_bands[side_band] = makeSR1SideBand(**self.sr1_side_band_dict[side_band]) 
-        for side_band_cut_name, side_band_cut in sr1_side_band_cuts:
-            for charge in charges:
-                for pt in pts + ['srl','srh','srv']:                    
-                    side_band ="MTInc" +"_" + side_band_cut_name +"_"+charge +"_PT%s"%(pt.upper()) 
-                    self.sr1_side_band_dict[side_band] = {'side_band_cut_name':side_band_cut_name, 'side_band_cut':side_band_cut, 'mt':'', 'charge':charge, 'pt':pt}
-                    self.sr1_side_bands[side_band] = makeSR1SideBand(**self.sr1_side_band_dict[side_band]) 
+
+
 
         self.sr1SideBands = CutClass( "sr1SideBands",
                                       [ [sb, sbInst.inclCombined] for  sb, sbInst in sorted( self.sr1_side_bands.iteritems() ) ]  
@@ -719,12 +775,6 @@ class Cuts():
                 cutLists.append(    ["{lep}Pt_lt_30".format(lep=lep.title()),"{lepCol}_pt[{lepIndex}[0]]<30".format(lepCol=lepCollection, lepIndex=lepIndex)]  )
             if pt == "cr":
                 cutLists.append(    ["{lep}Pt_gt_30".format(lep=lep.title()),"{lepCol}_pt[{lepIndex}[0]]>30".format(lepCol=lepCollection, lepIndex=lepIndex)]  )
-            if pt == "srl":
-                cutLists.append( ["{lep}Pt_btw_5_12".format(lep=lep.title()), btw("{lepCol}_pt[{lepIndex}[0]]".format(lepCol=lepCollection, lepIndex=lepIndex), 5, 12) ] )
-            if pt == "srh":
-                cutLists.append( ["{lep}Pt_btw_12_20".format(lep=lep.title()), btw("{lepCol}_pt[{lepIndex}[0]]".format(lepCol=lepCollection, lepIndex=lepIndex), 10, 20)]  )
-            if pt == "srv":
-                cutLists.append( ["{lep}Pt_btw_20_30".format(lep=lep.title()), btw("{lepCol}_pt[{lepIndex}[0]]".format(lepCol=lepCollection, lepIndex=lepIndex), 20, 30)]  )
             else:
                 pass
 
@@ -734,8 +784,8 @@ class Cuts():
 
         pts = ["sr","cr"]
         sr2_side_band_cuts  = [ 
-                                #["ESR2", "min(met, ht_basJet - 100 ) > 300"],
-                                ["ECR2", " (min(met, Jet_pt[IndexJet_isrJet[0]] - 25) < 300 )&&(min(met, Jet_pt[IndexJet_isrJet[0]] - 25) > 200 )"],
+                                #["ESR2", "min(met, {ht} - 100 ) > 300".format(ht=ht)],
+                                ["ECR2", " (min({metpt}, Jet_pt[IndexJet_isrJet[0]] - 25) < 300 )&&(min({metpt}, Jet_pt[IndexJet_isrJet[0]] - 25) > 200 )".format(metpt=metpt)],
                                 ["BCR1",  crtt1_bjet ],
                                 ["BCR1_ESR1","(%s) && (%s)"%(crtt1_bjet, esr1 )],
                                 ["BCR1_ESR2","(%s) && (%s)"%(crtt1_bjet, esr2 )],
@@ -745,7 +795,7 @@ class Cuts():
         self.sr2_side_band_dict = { }
         self.sr2_side_bands     = { }
         for side_band_cut_name, side_band_cut in sr2_side_band_cuts:
-            for pt in pts + ['srl','srh','srv']:
+            for pt in pts:
                 side_band = side_band_cut_name + "_PT%s"%(pt.upper()) 
                 self.sr2_side_band_dict[side_band] = {'side_band_cut_name':side_band_cut_name, 'side_band_cut':side_band_cut, 'pt':pt}
                 self.sr2_side_bands[side_band] = makeSR2SideBand(**self.sr2_side_band_dict[side_band]) 
@@ -791,11 +841,11 @@ class Cuts():
                 pass
 
             if mt == "a":
-                cutLists.append( ["MTa","{lepCol}_mt[{lepIndex}[0]]< {mt0}".format(lepCol=lepCollection, lepIndex=lepIndex, **mts )]   )
+                cutLists.append( ["MTa","{mt_var}< {mt0}".format(mt_var=mt_var, lepCol=lepCollection, lepIndex=lepIndex, **mts )]   )
             elif mt == "b":
-                cutLists.append( ["MTb",btw("{lepCol}_mt[{lepIndex}[0]]".format(lepCol=lepCollection, lepIndex=lepIndex), mts['mt0'], mts['mt1'] )]   )
+                cutLists.append( ["MTb",btw("{mt_var}".format(mt_var=mt_var, lepCol=lepCollection, lepIndex=lepIndex), mts['mt0'], mts['mt1'] )]   )
             elif mt == "c":
-                cutLists.append( ["MTc","{lepCol}_mt[{lepIndex}[0]]> {mt1}".format(lepCol=lepCollection, lepIndex=lepIndex, **mts )]   )
+                cutLists.append( ["MTc","{mt_var}> {mt1}".format(mt_var=mt_var, lepCol=lepCollection, lepIndex=lepIndex, **mts )]   )
             else:
                 print "no MT....."
                 pass
@@ -808,8 +858,8 @@ class Cuts():
         mtabc   = [""]
         charges = ["pos", "neg", ""]
         tt_side_band_cuts  = [ 
-                                #["ESR1", "min(met, ht_basJet - 100 ) > 300"],
-                                #["ECR1", "(min(met, ht_basJet - 100) < 300 )&&(min(met, ht_basJet - 100) > 200 )"],
+                                #["ESR1", "min(met, {ht} - 100 ) > 300".format(ht=ht)],
+                                #["ECR1", "(min(met, {ht} - 100) < 300 )&&(min(met, {ht} - 100) > 200 )".format(ht=ht)],
                                 #["ESR2", "min(met, Jet_pt[IndexJet_isrJet[0]] - 25 ) > 300"],
                                 #["ECR2", "(min(met, Jet_pt[IndexJet_isrJet[0]] - 25) < 300 )&&(min(met, Jet_pt[IndexJet_isrJet[0]] - 25) > 200 )"],
                                 ["BCR2", "(1)"],
@@ -886,7 +936,6 @@ class Cuts():
         self.bins        =   CutClass( "Bins" , [] , baseCut = self.presel )
         self.bins.add( self.sr1ab_ptbin ,  baseCutString = self.sr1.inclCombined          )
         self.bins.add( self.sr1c_ptbin  ,  baseCutString = self.sr1c_baseCut.inclCombined )
-        self.bins.add(   self.sr2_ptbin       , baseCutString =  self.sr2.inclCombined ) 
         #selfbinsI.add(   self.cr1abc          , baseCutString =  self.cr1.inclCombined )
         self.bins.add(   self.cr1a          , baseCutString =  self.cr1.inclCombined           )
         self.bins.add(   self.cr1b          , baseCutString =  self.cr1.inclCombined           )
@@ -894,8 +943,7 @@ class Cuts():
         self.bins.add(   self.cr2_             , baseCutString = self.cr2.inclCombined         ) 
         self.bins.add(   self.crtt2     ,'inclCombinedList',   ) 
         
-
-
+        
         self.bins_sum   = CutClass ("BinsSummary",    [], baseCut= self.presel ) 
         self.bins_sum.add( self.sr1ab_ptbin ,  baseCutString = self.sr1.inclCombined          )
         self.bins_sum.add( self.sr1c_ptbin  ,  baseCutString = self.sr1c_baseCut.inclCombined )
@@ -909,8 +957,6 @@ class Cuts():
         self.bins_sum.add(   self.cr1c          , baseCutString =  self.cr1c_baseCut.inclCombined  )
         self.bins_sum.add(   self.cr2_             , baseCutString = self.cr2.inclCombined         ) 
         self.bins_sum.add(   self.crtt2     ,'inclCombinedList',   ) 
-
-        
         
         #self.presel_common = CutClass('presel_common', [], baseCut=None)
         #self.presel_common.add( self.presel_noAntiQCD )
@@ -925,6 +971,13 @@ class Cuts():
         self.cutflow.add( self.lepSel           , 'inclFlow'        , baseCutString = self.presel_common.combined)
         self.cutflow.add( self.sr1              , 'inclFlow'    , baseCutString = self.presel.combined)
         self.cutflow.add( self.sr2              , 'inclFlow'    , baseCutString = self.presel.combined)
+
+
+
+        for cutInst in [ self.srs_ptbin_sum, self.srs_ptbin, self.presel, self.bins_sum]:
+            cutInst.name     += varTag
+            cutInst.fullName += varTag
+            cutInst.saveDir  += varTag
 
 
 

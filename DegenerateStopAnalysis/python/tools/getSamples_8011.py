@@ -214,7 +214,7 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
             if s and glob.glob("%s/%s/*.root"%(s[skim]['dir'],s[skim]['name'])):
                sampleDict.update({
                   #'s%s_%s'%(mstop,mlsp):{'name':'T2_4bd_%s_%s'%(mstop,mlsp), 'sample':getattr(cmgPP,"SMS_T2tt_mStop_%s_mLSP_%s"%(mstop,mlsp))[skim], 'color':colors['s%s_%s'%(mstop,mlsp)], 'isSignal':1 , 'isData':0, 'lumi':mc_lumi},
-                  's%s_%s'%(mstop,mlsp):{'name':'T2tt_%s_%s'%(mstop,mlsp), 'sample':s[skim], 'color':colors['s%s_%s'%(mstop,mlsp)], 'isSignal':1 , 'isData':0, 'lumi':mc_lumi},
+                  's%s_%s'%(mstop,mlsp):{'name':'T2tt_%s_%s'%(mstop,mlsp), 'sample':s[skim], 'cut':"Flag_veto_event_fastSimJets" , 'color':colors['s%s_%s'%(mstop,mlsp)], 'isSignal':1 , 'isData':0, 'lumi':mc_lumi},
             })
             else: 
                 #print "%s/%s/*.root"%(s['dir'],s['name'])
@@ -251,8 +251,10 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
    for samp in sampleDict:
       if weights.has_key(samp):
          sampleDict[samp]["weights"] = Weight( weights[samp].weight_dict , def_weights )
-      #elif scan and re.match("s\d\d\d_\d\d\d|s\d\d\d_\d\d|",samp).group():
-      #   sampleDict[samp]["weights"] = weights["sigScan"]
+      elif scan and re.match("s\d\d\d_\d\d\d|s\d\d\d_\d\d|",samp).group() and weights.has_key('sigScan'):
+         if not sampleDict[samp]['isSignal']: 
+            assert False, "ISR weight was going to be applied to a non-signal! something is wrong!"
+         sampleDict[samp]["weights"] = Weight( weights["sigScan"].weight_dict, def_weights)
       elif do8tev and re.match("s8tev\d\d\d_\d\d\d|s8tev\d\d\d_\d\d|",samp).group():                
          sampleDict[samp]["weights"] = weights["sigScan_8tev"]
       else:

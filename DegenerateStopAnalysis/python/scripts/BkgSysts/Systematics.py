@@ -2,6 +2,7 @@ from Workspace.DegenerateStopAnalysis.tools.degTools import fixForLatex , dict_o
 import os,sys
 import pickle
 import numpy as np
+from copy import deepcopy
 
 def fix_region_name(name):
     return name.replace("_","/").replace("pos","Q+").replace("neg","Q-")
@@ -32,7 +33,8 @@ def getPkl( pkl_path, def_dict={}):
 
 
 make_lumi_tag = lambda l: "%0.0fpbm1"%(l)
-absSysFunc = lambda a,b : (abs(1.- (b/a).val)   * 100) if a.val else 0
+absSysFunc    = lambda a,b : (abs(1.- (b/a).val)   * 100) if a.val else 0
+SignedSysFunc = lambda a,b : ((-1.+ (b/a).val)   * 100) if a.val else 0
 #sysFunc    = lambda a,b : abs((b/a).val)  
 #sysPercFunc= lambda a,b : abs(1.-(b/a).val)   
 mean   = lambda l :   sum(l)/float(len(l)) if len(l) else None
@@ -63,10 +65,20 @@ def meanSysSigned(*a): ### keep track of the signs somehow for systematics in ca
     if not variations:
         raise Exception("No Variations Given! %s"%a)
     systs = []
+    sign = 1
+    #signed_systs = []
     for var in variations:
-        systs.append( absSysFunc(central, var) ) 
+        syst_val = sign*SignedSysFunc(central, var) 
+        #syst_val = SignedSysFunc(central, var) 
+        systs.append( syst_val) 
+        #signed_systs.append( sign* syst_val ) 
+        sign *= -1
+    print systs
+    #print signed_systs
     #print systs, mean(systs)
-    return mean(systs)
+    syst_sign = (sum(systs) < 0)*(-1) + (sum(systs) >= 0)*(1)
+    syst_mean = mean([abs(x) for x in systs])
+    return syst_sign * syst_mean 
     
 
 import itertools
@@ -81,10 +93,10 @@ def addInQuad100PerctCorr(l):
         s += v**2
     chi = 0
     for e1,e2 in itertools.combinations(l,2):
-        print e1,e2
+        #print e1,e2
         chi += e1*e2
     chi = 2*chi
-    print 'math.sqrt(%s+%s)'%(s,chi)
+    #print 'math.sqrt(%s+%s)'%(s,chi)
     return math.sqrt(s+chi) 
 
 
@@ -295,7 +307,7 @@ puRunTagParams =    {
                     'up'    :   { 'pu':'pu_up' },
                     'down'  :   { 'pu':'pu_down' },
                     }
-tagParams       =   {
+SigAndBkgTagParams       =   {
                       ##"central":\
                       ##      {
                       ##          ''  :   { },
@@ -315,14 +327,6 @@ tagParams       =   {
                                 'up'    :   { 'btag':'SF_B_UP'  },
                                 'down'  :   { 'btag':'SF_B_DOWN'  },
                             },
-                      "WPt":\
-                            {
-                                '1x'  :   { 'wpt':'_wpt'  },
-                            },
-                      "ttpt":\
-                            {
-                                '1x'  :   { 'ttpt':'_ttpt'  },
-                            },
                       "jec":\
                             {
                                 'up'    :   { 'jec':'jec_up' },
@@ -333,14 +337,29 @@ tagParams       =   {
                                 'up'    :   { 'jer':'jer_up' },
                                 'down'  :   { 'jer':'jer_down' },
                             },
-
                       "lepEff":\
                             {  
                                'up':    { 'other': 5. }
                             },
-                      "Lumi":\
-                            {  
-                               'up':    { 'other': 6.2 }
+
+
+
+                    }
+
+#bkgTagParams =   deepcopy( SigAndBkgTagParams )
+bkgTagParams  = {}
+bkgTagParams.update( {
+                      "WPol":\
+                            {
+                                'WPol'  :   { 'WPol':'_WPol'  },
+                            },
+                      "WPt":\
+                            {
+                                '1x'  :   { 'wpt':'_wpt'  },
+                            },
+                      "ttpt":\
+                            {
+                                '1x'  :   { 'ttpt':'_ttpt'  },
                             },
                       "ttPtShape":\
                             {  
@@ -358,17 +377,63 @@ tagParams       =   {
                             {
                                'up':    { 'other': {z : other_bkg_sys[z] }  } 
                             },
-                    }
-tagParams.update({
+                    })
+bkgTagParams.update({
                       "%sXSec"%x: { 
                                 'up':      { 'other': {x   : other_bkg_sys['small_bkg_uncert'] }}
                             } for x in otherBkg
                     })
 
+
+
+
+#sigTagParams = { key,val for key,val in tagParams.iteritems() if key in ['PU','BTag_b', 'BTag_l', "jec", "jer", 'lepEff'] }
+#sigTagParams = deepcopy( SigAndBkgTagParams )
+sigTagParams = deepcopy( {} )
+sigTagParams.update({
+
+                      #"Lumi":\
+                      #      {  
+                      #         'up':    { 'other': 6.2 }
+                      #      },
+                      "FastFullEff":\
+                            {  
+                               'up':    { 'other': 5.  }
+                            },
+                      "BTag_FS":
+                            {
+                                'up'    :   { 'btag':'SF_FS_UP'  },
+                                'down'  :   { 'btag':'SF_FS_DOWN'  },
+                            },
+
+                      "met":\
+                            {
+                                'GenMET' :   { 'met':'met_gen' },
+                                'MET'    :   { 'met':'met_met' },       # same as central. in order to average the systematics
+                            },
+                      "Q2":\
+                            {  
+                                 #'upup'           :   {'lhe':'_Q2upup'            }   ,
+                                 'centralcentral' :   {'lhe':'_Q2centralcentral'  }   ,
+                                 #'downdown'       :   {'lhe':'_Q2downdown'        }   ,
+                                 'downup'         :   {'lhe':'_Q2downup'          }   ,
+                                 'updown'         :   {'lhe':'_Q2updown'          }   ,
+                                 'downcentral'    :   {'lhe':'_Q2downcentral'     }   ,
+                                 'centralup'      :   {'lhe':'_Q2centralup'       }   ,
+                                 'centraldown'    :   {'lhe':'_Q2centraldown'     }   ,
+                                 'upcentral'      :   {'lhe':'_Q2upcentral'       }   ,
+                            },
+                      "ISR":\
+                            {
+                                'noisr' :   { 'isr':'_noisr' },
+                                'rewgt' :   { 'isr':'' },       ## same as central in order to average the systematics
+                            },
+                      }
+                    ) 
 #tagParams = { key:val for key,val in tagParams.iteritems() if key in ["ZInvEst"] }#, "SmallBkg", "PU"] or "XSec" in key}
 
 
-centralParams   =   { 
+centralParamsBkg   =   { 
                     'lepCol':lepCol,
                     'lep'   :lep,
                     'pu'    :'pu',
@@ -377,23 +442,57 @@ centralParams   =   {
                     'jer'   :'',
                     'wpt'   :'',
                     'ttpt'  :'',
+                    'met'   :'',
+                    'lhe'   :'',
+                    'isr'   :'',
+                    }
+centralParamsSig   =   { 
+                    'lepCol':lepCol,
+                    'lep'   :lep,
+                    'pu'    :'pu',
+                    'btag'  :'SF',
+                    'jec'   :'',
+                    'jer'   :'',
+                    'wpt'   :'',
+                    'ttpt'  :'',
+                    'met'   :'',
+                    'lhe'   :'',
+                    #'isr'   :'_isr',
+                    'isr'   : '',
                     }
 
 class Systematics():
-    def __init__(self, cfg, variationTagParams = puRunTagParams, centralParams = centralParams , name = "Syst"):
+    def __init__(self, cfg, variationTagParams = puRunTagParams, centralParams = {}, name = "Syst", syst_type = "bkg"):
         self.name = name
         self.syst_name = name
         temp_dict = {}
+
+        isBkgSys = False
+        isSigSys = False
+        if syst_type == "bkg":
+            isBkgSys = True
+        if syst_type == "sig":
+            isSigSys = True
+        if syst_type == "both":
+            isSigSys = True
+            isBkgSys = True
+
         original_variations = variationTagParams.keys()
-        variations = ['%s_central'%self.name]
+        if any( [ 'central' in x for x in original_variations]):
+            makeCentral = False
+            variations  = []
+        else:
+            makeCentral = True
+            variations = ['%s_central'%self.name]
         for key, val in variationTagParams.iteritems():
             for def_key, def_val in centralParams.iteritems():
                 val.setdefault(def_key, def_val)
             temp_dict["%s_%s"%(self.name, key)] = val
         variations.extend( temp_dict.keys() )
-        temp_dict['%s_central'%self.name] = {}
-        for def_key, def_val in centralParams.iteritems():
-            temp_dict['%s_central'%self.name].setdefault(def_key, def_val)
+        if makeCentral:
+            temp_dict['%s_central'%self.name] = {}
+            for def_key, def_val in centralParams.iteritems():
+                temp_dict['%s_central'%self.name].setdefault(def_key, def_val)
         data          = 'DataBlind'
         data_lumi_tag = '%s_lumi'%data
         #for var, params in variationTagParams.iteritems():
@@ -404,28 +503,41 @@ class Systematics():
         self.variationTagParams = variationTagParams
         variationTagParams      = temp_dict
         #print variationTagParams
-        sys_label = "AdjustedSys"
-        cut_name = cfg.cutInstList[0].fullName
-        self.yieldPkls=  {}
-        self.yields   =  {}
-        self.yieldDict = {}
-        self.yieldTotals={}
-        variation_dict = {}
+        sys_label       = "AdjustedSys"
+        cut_name        = cfg.cutInstList[0].fullName
+        self.yieldPkls  = {}
+        self.yields     = {}
+        self.yieldDict  = {}
+        self.yieldTotals= {}
+        variation_dict  = {}
         #variations = variationTagParams.keys()
         self.variations = variations
         tags            = variations
         self.runTags    = {} 
+        print ""
         for variation, params in variationTagParams.iteritems():
             runTag_prefix = cfg.runTag.split("_")[0]
-            runTag = ('%s_Mt95_Inccharge_{lepCol}_{lep}_{pu}{wpt}{ttpt}_{btag}'%runTag_prefix).format(**params)
+            print params
+            runTag = ('%s_Mt95_Inccharge_{lepCol}_{lep}_{pu}{isr}{lhe}{wpt}{ttpt}_{btag}'%runTag_prefix).format(**params)
             self.runTags[variation] = runTag
             results_dir          =  cfg.cardDirBase + "/13TeV/{ht}/{run}/".format( ht = cfg.htString , run = runTag )
             #lumiTag              =  make_lumi_tag( cfg.lumi_info['DataUnblind_lumi'] )
             lumiTag              =  make_lumi_tag( cfg.lumi_info[data_lumi_tag] )
             self.yieldPkls[variation]     =  results_dir + sys_label  + "/" + cfg.baseCutSaveDir  + "/Yields_%s_%s_%s.pkl"%( lumiTag , runTag, cut_name)    
+            if params.get('WPol'):
+                print variation, params,
+                assert False, 'what to do now'
+    
             if params.get('jec') or params.get('jer'):
                 self.yieldPkls[variation] = self.yieldPkls[variation].replace(u'/presel/', u'/presel_%s/'%variation)
                 self.yieldPkls[variation] = self.yieldPkls[variation].replace(u'.pkl', u'_%s.pkl'%variation)
+            if params.get('met'):
+                vt   = variation.replace("met_","").replace("central","GenMET")
+                self.yieldPkls[variation] = self.yieldPkls[variation].replace(u'/presel/', u'/presel_%s/'%vt)
+                self.yieldPkls[variation] = self.yieldPkls[variation].replace(u'.pkl', u'_%s.pkl'%vt)
+                print params.get("met")
+                print vt, variation
+            #print self.yieldPkls
             self.yields[variation]        =  pickle.load(file( self.yieldPkls[variation]  ))
             self.yieldDict[variation]     =  self.yields[variation].getNiceYieldDict()
             #self.yieldTotals[variation]   =  self.yieldDict[variation]['Total']
@@ -433,13 +545,12 @@ class Systematics():
                 if "FOM" in samp:
                     self.yieldDict[variation].pop(samp)
         samples = [x for x in self.yieldDict[tags[0]].keys() if "FOM" not in x]
-        #if data in samples:
-        #    samples.pop(samples.index(data))
-        self.samples =  samples
+
+        self.samples    =  samples
         self.bkgTotList =  [x for x in samples if "Data" not in x and "SMS" not in x and "T2tt" not in x and "FOM" not in x]
-        self.bkgList =  [x for x in self.bkgTotList if "Total" not in x ]
-        self.bkgTotList = self.bkgList + ['Total']
-        self.sigList =  sorted( [x for x in samples if ("SMS" in x or "T2tt" in x) and "FOM" not in x] )
+        self.bkgList    =  [x for x in self.bkgTotList if "Total" not in x ]
+        self.bkgTotList =  self.bkgList + ['Total']
+        self.sigList    =  sorted( [x for x in samples if ("SMS" in x or "T2tt" in x) and "FOM" not in x] )
 
         ##
         ## creating yieldDict with flat systs (Lumi, pt shape uncerts, etc)
@@ -472,7 +583,7 @@ class Systematics():
                         #print '-+-+-+ ', samp, variation, unc_val, val, self.yieldDict[variation][samp][b]
 
                 
-        if "ZJetsInv" in samples:
+        if "ZJetsInv" in samples and isBkgSys:
             mu_yield_inst = self.yieldPkls[variations[0]].replace("lep","mu")
             el_yield_inst = self.yieldPkls[variations[0]].replace("lep","el")
             yieldDictMu   = pickle.load(open(mu_yield_inst,'r')).getNiceYieldDict()
@@ -480,6 +591,9 @@ class Systematics():
             print 'zinv yield insts:'
             print mu_yield_inst
             print el_yield_inst
+
+        
+                    
 
 
         #    print variation , params
@@ -508,6 +622,22 @@ class Systematics():
             other_predictions[samp]['dict'] = pickle.load( open(other_predictions[samp]['pkl_path']))
 
 
+        #
+        #   Dealing with Met for FastSim Signal
+        #
+
+        if True and isSigSys and  any(["genmet" in x.lower() for x in variations]):
+            print "MET SYST! .... Averaging MET and GEN MET acceptances"
+            yieldDictCentral = self.yieldDict[variations[0]]
+            #yieldDictCentral = deepcopy( self.all_yield_dict['PU_central'] )
+            for samp in self.sigList:
+                for b, yl in yieldDictCentral[samp].iteritems():
+                    ave_yl = (self.yieldDict[variations[1]][samp][b] + self.yieldDict[variations[2]][samp][b]) / 2.
+                    #print samp, b,  yl,  self.yieldDict[variations[1]][samp][b] , self.yieldDict[variations[2]][samp][b], ave_yl
+                    yieldDictCentral[samp][b] = ave_yl
+
+
+
 
         #
         # Loading SF
@@ -527,7 +657,10 @@ class Systematics():
                 self.bkg_est_dir[variation] = os.path.expandvars( "$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/results/2016/%s/%s/%s/BkgEst/"%(cfg.cmgTag, cfg.ppTag, cfg.runTag) )
 
             #print self.bkg_est_dir
-            self.CR_SFs[variation]      = pickle.load(file(self.bkg_est_dir[variation]+"/CR_SFs.pkl"))
+            if isBkgSys:
+                self.CR_SFs[variation]      = pickle.load(file(self.bkg_est_dir[variation]+"/CR_SFs.pkl"))
+            else:
+                self.CR_SFs[variation]      = pickle.load(file(self.bkg_est_dir[variations[0]]+"/CR_SFs.pkl"))
     
             #sf_bin_keys = [ '1a' , '1b' , '1c', '2']
             #SFs = {}
@@ -572,6 +705,7 @@ class Systematics():
 
             #for samp, binylds in self.yieldDict[variation].iteritems():
             for samp  in self.bkgList+self.sigList:
+                #print self.yieldDict[variation].keys()
                 binylds = self.yieldDict[variation][samp]
                 self.bkg_ests[variation][samp]={}
                 for b, y in binylds.iteritems():
@@ -588,7 +722,7 @@ class Systematics():
                     ##  For backgrounds predicated seperately
                     ##
                     if samp in other_predictions.keys():
-                        print variation 
+                        # print variation 
                         #print other_predictions[samp]['dict'].keys()
                         #for b in self.bkg_ests[variation][samp].keys():
                         if b in other_predictions[samp]['dict']:
@@ -596,7 +730,7 @@ class Systematics():
                             #print "OTHER PREDS:" , samp, b, self.bkg_ests[variation][samp][b], other_predictions[samp]['dict'][b]
                         else:
                             print "NOT IN OTHER PRED" , samp, b, other_predictions[samp]['dict'].keys() 
-                    elif samp=="ZJetsInv":
+                    elif samp=="ZJetsInv" and isBkgSys:
                         mu_val =  yieldDictMu[samp][b]
                         el_val =  yieldDictEl[samp][b]
                         mu_sf  =  zinv_mu_sf.get(b,1)
@@ -604,7 +738,7 @@ class Systematics():
                         zinv_pred =  mu_val * mu_sf + el_val*el_sf
         
                         zinv_mc_uncert = self.yieldDict[variation][samp][b]/self.yieldDict[variations[0]][samp][b] if self.yieldDict[variations[0]][samp][b].val else u_float(1.0 )
-                        print syst_name, variation, samp, b, self.yieldDict[variations[0]][samp][b], self.yieldDict[variation][samp][b], zinv_mc_uncert
+                        #print syst_name, variation, samp, b, self.yieldDict[variations[0]][samp][b], self.yieldDict[variation][samp][b], zinv_mc_uncert
                         self.bkg_ests[variation][samp][b]   = zinv_pred * (zinv_mc_uncert)
 
                     ##
@@ -665,6 +799,7 @@ class Systematics():
         all_syst_dict_pkl        =  "%s/SystDict.pkl"%(self.res_dir)
 
 
+        self.card_systs_pkl      = "%s/SystDictForCards.pkl"%(self.res_dir)
         sample_card_systs = {}
         sample_systs = {}
 
@@ -681,10 +816,12 @@ class Systematics():
             # N_pred
             if samp=="QCD":
                 sample_systs[samp]     =  dict_manipulator( [self.yieldDict[x][samp] for x in variations  ] , lambda *vals : meanSys(*vals)  )   
-                sample_card_systs[samp]=  dict_manipulator( [self.yieldDict[x][samp] for x in variations  ] , lambda *vals : 1+ meanSys(*vals)/100.  )   
+                sample_card_systs[samp]=  dict_manipulator( [self.yieldDict[x][samp] for x in variations  ] , lambda *vals : 1+ meanSysSigned(*vals)/100.  if meanSysSigned  else 1.0)   
             else: 
                 sample_systs[samp]     =  dict_manipulator( [self.bkg_ests[x][samp] for x in variations  ] , lambda *vals : meanSys(*vals)  )   
-                sample_card_systs[samp]=  dict_manipulator( [self.bkg_ests[x][samp] for x in variations  ] , lambda *vals : 1+ meanSys(*vals)/100.  )   
+                sample_card_systs[samp]=  dict_manipulator( [self.bkg_ests[x][samp] for x in variations  ] , lambda *vals : ( 1+ meanSysSigned(*vals)/100. ) if meanSysSigned(*vals) else 1.0  )   
+
+
 
         self.tot_sys = sample_systs['Total']
         bins_card_systs           =  Yields.getByBins(self.yields[tag], sample_card_systs)
@@ -708,6 +845,38 @@ class Systematics():
 
         if "WPt_central" in all_syst_dict: assert False,all_syst_dict.keys()
 
+
+
+        #
+        #   Getting the Syst range for signals
+        #
+        self.sample_systs   = sample_systs
+        if isSigSys:
+            syst_range = {}
+            syst_range_sample = {}
+            for b in bins_card_systs.keys():
+                #sig_systs = np.array( [ (sample_systs[sig][b],sig) if sample_systs[sig][b] else ( np.nan,sig)  for sig in self.sigList ] ) 
+                #max_syst  = np.nanmax(sig_systs) 
+                #min_syst  = np.nanmin(sig_systs) 
+                #sig_systs = np.array( [ (sample_systs[sig][b],sig)   for sig in self.sigList   if sample_systs[sig][b]]) 
+                #max_syst  = np.ndarray.tolist( max(sig_systs, key = lambda x: float(x[0]) ) )
+                #min_syst  = np.ndarray.tolist( min(sig_systs, key = lambda x: float(x[0]) ) )
+                sig_systs = [ (sample_systs[sig][b],sig)   for sig in self.sigList   if sample_systs[sig][b]] 
+                max_syst  = max(sig_systs, key = lambda x: x[0] ) 
+                min_syst  = min(sig_systs, key = lambda x: x[0] ) 
+                #print sig_systs
+                #print min_syst 
+                #print max_syst
+                syst_range_sample[b]= (min_syst, max_syst)
+                if not "%.2f"%min_syst[0] == "%.2f"%max_syst[0]:
+                    syst_range[b] = "%.2f-%.2f"%(float(min_syst[0]),float(max_syst[0]))
+                else:
+                    syst_range[b] = "%.2f"%max_syst[0]
+            self.syst_range = syst_range
+            self.syst_range_sample = syst_range_sample
+
+
+
         ##
         ##  Making Tables
         ##
@@ -717,17 +886,27 @@ class Systematics():
         base_systs_dir = "$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/results/2016/%s/%s/%s/"%(cfg.cmgTag, cfg.ppTag, cfg.runTag)
         base_systs_dir = os.path.expandvars(base_systs_dir)
 
+        if isBkgSys:
+            sig_bkg_infos = { \
+                                "BkgSysts":  { 'sampleList':self.bkgTotList  , 'total':True}  ,
+                            }
+        elif isSigSys:
+            benchMarkPoints    = ['T2tt-300-220', 'T2tt-300-270','T2tt-400-370']
+            sig_bkg_infos = { \
+                                "SigSysts": { 'sampleList':benchMarkPoints   , 'total':False} ,
+                            }
 
-        sig_bkg_infos = { \
-                            "BkgSysts":  { 'sampleList':self.bkgTotList  , 'total':True}  ,
-                            "SigSysts": { 'sampleList':self.sigList   , 'total':False} , 
-                        }
+
+        #sig_bkg_infos = { \
+        #                    "BkgSysts":  { 'sampleList':self.bkgTotList  , 'total':True}  ,
+        #                    "SigSysts": { 'sampleList':self.sigList   , 'total':False} , 
+        #                }
 
         self.rets = [] 
         for sampleType, info in sig_bkg_infos.iteritems():
             
             systs_dir = base_systs_dir + "/" + sampleType
-            samples   = info['sampleList']
+            sampleSet   = info['sampleList']
             doTotal   = info['total']
 
             first_row  = True
@@ -742,9 +921,15 @@ class Systematics():
                                   ["Region"     ,  fix_region_name( region_name )], 
                               ]
                     for var in variations:
-                        #toPrint.append( [ var , self.yieldTotals[var][region_name] ] )
-                        toPrint.append( [ var ,  self.bkg_ests[var]['Total'][region_name].round(2) ])
-                    toPrint.append(  ['Syst. ' , round (self.tot_sys[region_name] ,2)      ] )
+                        if isBkgSys:
+                            toPrint.append( [ var ,  self.bkg_ests[var]['Total'][region_name].round(2) ])
+                        if isSigSys:
+                            toPrint.append( [ var ,  self.bkg_ests[var]['T2tt-300-270'][region_name].round(2) ])
+
+                    if isBkgSys:                        
+                        toPrint.append(  ['Syst. ' , round (self.tot_sys[region_name] ,2)      ] )
+                    if isSigSys:
+                        toPrint.append( ['Syst Range. ' ,  self.syst_range[region_name] ])
                     align = "{:<20}"*len(toPrint)
                     if first_row:
                         print align.format(*[x[0] for x in toPrint])
@@ -771,7 +956,7 @@ class Systematics():
                     toPrint = [   
                                   ["Region"     ,  fix_region_name( region )], 
                               ]
-                    for samp in samples:
+                    for samp in sampleSet:
                         #toPrint.append( [ samp , self.yieldDict[variations[1]][samp][region]  ] )
                         for var in variations:
                             #toPrint.append( [ var , self.yieldDict[var][samp][region].round(3)] )
@@ -811,7 +996,7 @@ class Systematics():
                     toPrint = [   
                                   ["Region"     ,  fix_region_name( region )], 
                               ]
-                    for samp in samples:
+                    for samp in sampleSet:
                         #toPrint.append( [ samp , self.yieldDict[variations[1]][samp][region]  ] )
                         toPrint.append( [ samp ,   round( sample_systs[samp][region] ,2 ) ] )
                     toPrint.append(  ['Syst. ' , round (self.tot_sys[region] ,2)      ] )
@@ -820,7 +1005,6 @@ class Systematics():
                         print align.format(*[x[0] for x in toPrint])
                         first_row = False
                         table_list.append( [x[0] for x in toPrint]  ) 
-            
                     print align.format(*[x[1] for x in toPrint])
                     table_list.append( [x[1] for x in toPrint])
             makeDir(os.path.expandvars(systs_dir))
@@ -875,7 +1059,98 @@ class Systematics():
 if __name__ == "__main__":
     #jecSyst = Systematics(cfg, jecRunTagParams, centralParams, name="jec")
     #self = jecSyst
-    Systs = {}
-    for syst_name, systTagParams in tagParams.iteritems():
-       Systs[syst_name] = Systematics(cfg, systTagParams, centralParams, name=syst_name) 
-    self = Systs[syst_name]
+    BkgSysts = {}
+    #for syst_name, systTagParams in tagParams.iteritems():
+    SigSysts = {}
+    CommonSysts = {}
+
+    if True:
+        #for syst_name, systTagParams in bkgTagParams.iteritems():
+        #   BkgSysts[syst_name] = Systematics(cfg, systTagParams, centralParamsBkg, name=syst_name, syst_type = "bkg") 
+        for syst_name, systTagParams in SigAndBkgTagParams.iteritems():
+           CommonSysts[syst_name] = Systematics(cfg, systTagParams, centralParamsBkg, name=syst_name, syst_type = "both") 
+    for syst_name, systTagParams in sigTagParams.iteritems():
+        if syst_name =="met":
+            centralParamsSig_ = deepcopy( centralParamsSig )
+            centralParamsSig_['pu'] = 'nopu'
+        else:
+            centralParamsSig_ = deepcopy( centralParamsSig )
+        SigSysts[syst_name] = Systematics(cfg, systTagParams, centralParamsSig_, name=syst_name, syst_type = "sig") 
+    self = SigSysts[syst_name]
+
+
+
+    fixSystNameDict={
+                    'ttPtShape': "CR/SF transf. fact. W",
+                    'WPtShape' : "CR/SR transf. fact. tt",
+                    'ttpt'     : "tt $p_{T}$",
+                    'WPt'      : "W $p_{T}$",
+                    'jec'      : "JEC",
+                    'jer'      : "JER", 
+                'DYJetsM50XSec': 'Drell-Yan xsec',
+                'STXSec'       : 'Single top xsec',
+                'DibosonXSec'  : 'Diboson xsec',
+                'ZInvEst'      : '$Z_{Inv}$ estimation',
+                'QCDEst'       : 'QCD estimation',
+                'lepEff'       : "Lepton efficiency" ,
+                'PU'           : "Pile-up",
+                }
+    def fixSystName(name):
+        return fixSystNameDict.get(name,name)
+
+
+
+
+
+    
+
+    if SigSysts or CommonSysts:
+    
+        first_row = True
+        table_list = []
+        nptable = np.array([])
+        main_sr_table = []
+
+        syst_list = CommonSysts.keys() + SigSysts.keys()
+        allSigSysts={}
+        allSigSysts.update(CommonSysts)
+        allSigSysts.update(SigSysts)
+        
+
+        bmSig = 'T2tt-300-270'
+        #{b:v for b,v in x.syst_range.iteritems() if b in ['SR1a', 'SR1b', 'SR1c', 'SR2'] }
+        
+
+        table_list2=[]
+
+        for region in ['SR1a', 'SR1b', 'SR1c', 'SR2']:
+            toPrint = [
+                          ["Region"                     ,     region     ],
+                       ]
+            toPrint2=toPrint[:]
+            for syst_name in sorted(syst_list):
+                toPrint2.append( [  fixSystName(syst_name) , allSigSysts[syst_name].syst_range[region]  ] )
+                toPrint.append( [  fixSystName(syst_name) , round( allSigSysts[syst_name].sample_systs[bmSig][region],1 )  ] )
+    
+            align = "{:<20}"*len(toPrint)
+            if first_row:
+                print align.format(*[x[0] for x in toPrint])
+                first_row = False
+                table_list.append( [x[0] for x in toPrint]  )
+                table_list2.append( [x[0] for x in toPrint]  )
+            print align.format(*[x[1] for x in toPrint])
+            table_list.append( [x[1] for x in toPrint])
+            table_list2.append( [x[1] for x in toPrint2])
+
+        nptable = np.concatenate( [ [x] for x in table_list if 'hline' not in x[0]]  )
+        nptable2 = np.concatenate( [ [x] for x in table_list2 if 'hline' not in x[0]]  )
+        #main_sr_nptable = np.concatenate( [ [x] for x in main_sr_table if 'hline' not in x[0]]  )
+
+        table  = makeSimpleLatexTable( nptable.T, "SigSystExample_%s.tex"%bmSig, cfg.saveDir+"/SigSysts/", align_char = "c"        ,  align_func= lambda char, table: "c|"+ (char *(len(table[1])-1)).rstrip("|")  )
+        table2 = makeSimpleLatexTable( nptable2.T, "SigSystSummaryRange.tex", cfg.saveDir+"/SigSysts/", align_char = "c"        ,  align_func= lambda char, table: "c|"+ (char *(len(table[1])-1)).rstrip("|")  )
+        #table = makeSimpleLatexTable( table_list, "SigSummary_%s.tex"%lumitag, saveDirBase+"/Results/", align_char = "c"        ,  align_func= lambda char, table: "c|"+ (char *(len(table[1])-2)).rstrip("|") + "|c" )
+        #main_sr_nptable_T = main_sr_nptable.T
+        #main_sr_nptable_T[0][0]='Syst'
+        #SRtable = makeSimpleLatexTable( main_sr_nptable_T, "SystsSummaryMainSRs_%s.tex"%lumitag, saveDirBase+"/Results/", align_char = "c"        ,  align_func= lambda char, table: "c|"+ (char *(len(table[1])-1)).rstrip("|") )
+
+

@@ -175,21 +175,21 @@ def getParameterSet(args):
         from Workspace.DegenerateStopAnalysis.cmgPostProcessing.btagEfficiency import btagEfficiency
 
         sampleName = args.processSample
-        eff_dict_map = {
-                         "WJets_1j"      : { 'sampleList' : ["ZInv", "ZJets", "WJets", "DYJets" ,"ZZ", "WZ", "WW" ] ,  },
-                         #"TTJets_1j"     : { 'sampleList' : ["TTJets" , ]  ,                                           },
-                         "TTJets_1j"     : { 'sampleList' : ["TTJets_FastSIM" , ]  ,     'isFastSim':True              },
-                         "T2tt_allDM_1j" : { 'sampleList' : ["SMS_T2tt" , ],       'isFastSim':True               },
-                        }
+        eff_dict_map = [
+                        ( "WJets_1j"      , { 'sampleList' : ["ZInv", "ZJets", "WJets", "DYJets" ,"ZZ", "WZ", "WW" ] ,  }   ),
+                        ( "TTJets_1j"     , { 'sampleList' : ["TTJets_Tune" ,"TTJets_LO" ]  ,                           }   ),
+                        ( "TTJets_1j"     , { 'sampleList' : ["TTJets_FastSIM" , ]  ,     'isFastSim':True              }   ),
+                        ( "T2tt_allDM_1j" , { 'sampleList' : ["SMS_T2tt" , ],       'isFastSim':True                    }   ),
+                       ]
         eff_to_use = "TTJets_1j" #default
         isFastSim = False
-        for eff_samp, info in eff_dict_map.iteritems():
+        for eff_samp, info in eff_dict_map:
             if any([ samp in sampleName for samp in info['sampleList'] ]):
                 eff_to_use = eff_samp
                 isFastSim = info.get("isFastSim",False)
                 break
 
-        print "Decided to use %s for the jet efficiency"%eff_to_use
+        print "Decided to use %s for the jet efficiency for %s"%(eff_to_use, sampleName)
         if isFastSim: print "Including the FastSim/FullSim SF" 
         print info
 
@@ -573,7 +573,7 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
     #FIXME
     if args.processBTagWeights:
         bTagNames           = [ 'BTag'  , 'SBTag', 'HBTag'   ]  ## to be moved into the params
-        bTagWeightNames     = ['MC', 'SF', 'SF_b_Down', 'SF_b_Up', 'SF_l_Down', 'SF_l_Up'] ## from btagEff.btagWeightNames , also to be moved to params
+        bTagWeightNames     = ['MC', 'SF', 'SF_b_Down', 'SF_b_Up', 'SF_l_Down', 'SF_l_Up', 'SF_FS_Up', 'SF_FS_Down' ] ## from btagEff.btagWeightNames , also to be moved to params
         maxMultBTagWeight   = 2    # move to params
         bTagWeightVars      = []
         for bTagName in bTagNames:
@@ -712,8 +712,10 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
     # common branches already defined in cmgTuples
     keepBranches_MC = [ 
         'nTrueInt', 'genWeight', 'xsec', 'LHEweight_original', #'puWeight', need to create a new puWeight
+        'nIsr',
         'GenSusyMStop', 
         'GenSusyMNeutralino',        
+        'LHEWeights_*',
         'ngenLep', 'genLep_*', 
         'nGenPart', 'GenPart_*',
         'ngenPartAll','genPartAll_*',

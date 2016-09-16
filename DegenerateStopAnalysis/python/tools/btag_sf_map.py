@@ -9,6 +9,8 @@ class BTagSFMap:
                        "sf_b_up"    :"SF_b_Up"        ,
                        "sf_l_down"  :"SF_l_Down"      ,
                        "sf_l_up"    :"SF_l_Up"        ,
+                       "sf_fs_down" :"SF_FS_Down"      ,
+                       "sf_fs_up"   :"SF_FS_Up"        ,
                         }
 
         if not sfvar in sfvar_dict.values():

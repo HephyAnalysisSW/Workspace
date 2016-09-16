@@ -2,10 +2,10 @@
 
 
 make_stop_lsp_list = lambda mstop_range, dm_range: [ (mstop,mstop-dm) for mstop in mstop_range for dm in dm_range ]
-t2_4bd_sample_string = lambda mstop,mlsp : "SMS_T2_4bd_mStop_%s_mLSP_%s"%(mstop,mlsp)
+t2_4bd_sample_string = lambda mstop,mlsp : "SMS_T2tt_dM10to80_mStop_%s_mLSP_%s"%(mstop,mlsp)
 
 
-mstop_range   = range(100,451, 25) 
+mstop_range   = range(2500,801, 25) 
 dm_range_low  = range(10, 30,  10) 
 dm_range_mid  = range(30, 60,  10) 
 dm_range_high = range(60, 81,  10) 
@@ -23,7 +23,7 @@ dm_ranges =          {
 
 
 class MassPoints():
-    def __init__(self, dm_range_string , mstop_range = (100,451,25) ):
+    def __init__(self, dm_range_string , mstop_range = (250,801,25) ):
         allowed_dm_ranges = dm_ranges.keys()
         if not dm_range_string in allowed_dm_ranges:
             raise Exception("DeltaM Range %s, Not Recognized in %s"%(dm_range_string, allowed_dm_ranges))

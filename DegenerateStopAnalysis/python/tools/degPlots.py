@@ -65,6 +65,10 @@ class DegPlots():
             if sample.isData:
                 cutString_ = cutString[:]
                 sample.tree.SetEventList(0)
+                if bjet_var == "nBSoftJet":
+                    pass
+                elif bjet_var == "nBHardJet":
+                    pass
                 #cutString_ = cutString_.replace("((nBHardJet + nBSoftJet)== 0 )","((nBHardJet)== 0 )")
                 #cutString_ = cutString_.replace("((nBHardJet + nBSoftJet)== 0 )","(1)")
                 cutString_ = cutString_.replace("(nBSoftJet>=1) && (nBHardJet==0)","(nBHardJet==0)")
@@ -72,7 +76,8 @@ class DegPlots():
             else:
                 hist_lists = ROOT.TList()
                 for nB in range(nBs+1):
-                    bVeto = "weightHBTag0_SF"
+                    #bVeto = "weightHBTag0_SF"
+                    bVeto = "(1)"
                     bTagWeight = "(%s)*(%s)"%((btag_to_weight_vars[bjet_var]%nB), bVeto)
                     #print btag_to_weight_vars
                     print bjet_var + "  >>>  " + bTagWeight
@@ -253,9 +258,9 @@ class DegPlots():
                 "nSoftBJets":   {'var':"(nBSoftJet)"                   ,"bins":[4,0,4]            ,"nMinus1":None         ,"decor":{"title":"Number of Soft B-Tagged Jets with P_{{T}} < 60GeV"    ,"x":"Number of Soft B-Tagged Jets with P_{T} < 60GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
                 "nHardBJets":   {'var':"(nBHardJet)"                   ,"bins":[4,0,4]            ,"nMinus1":None         ,"decor":{"title":"Number of B-Tagged Jets with P_{{T}} > 60GeV"    ,"x":"Number of Hard B-Tagged Jets with P_{T} > 60GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
                 "nBJets":       {'var':"(nBHardJet + nBSoftJet)"       ,"bins":[4,0,4]            ,"nMinus1":None         ,"decor":{"title":"Number of B-Tagged Jets"                         ,"x":"Number of B-Tagged Jets"      ,"y":"Events  "  ,'log':[0,1,0] }},
-                "nBJetsWeight": {'var':self.makeNBJetPlotFunc("nBJet")       ,"bins":[4,0,4]            ,"nMinus1":None         ,"decor":{"title":"Number of B-Tagged Jets"                         ,"x":"Number of B-Tagged Jets"      ,"y":"Events  "  ,'log':[0,1,0] }},
+                "nBJetsWeight": {'var':self.makeNBJetPlotFunc2("nBJet")       ,"bins":[4,0,4]            ,"nMinus1":None         ,"decor":{"title":"Number of B-Tagged Jets"                         ,"x":"Number of B-Tagged Jets"      ,"y":"Events  "  ,'log':[0,1,0] }},
                 "nSoftBJetsWeight":   {'var':self.makeNBJetPlotFunc2("nBSoftJet")   ,"bins":[4,0,4]            ,"nMinus1":None         ,"decor":{"title":"Number of Soft B-Tagged Jets with P_{{T}} < 60GeV"    ,"x":"Number of Soft B-Tagged Jets with P_{T} < 60GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
-                "nHardBJetsWeight":   {'var':self.makeNBJetPlotFunc("nBHardJet")   ,"bins":[4,0,4]            ,"nMinus1":None         ,"decor":{"title":"Number of B-Tagged Jets with P_{{T}} > 60GeV"    ,"x":"Number of Hard B-Tagged Jets with P_{T} > 60GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
+                "nHardBJetsWeight":   {'var':self.makeNBJetPlotFunc2("nBHardJet")   ,"bins":[4,0,4]            ,"nMinus1":None         ,"decor":{"title":"Number of B-Tagged Jets with P_{{T}} > 60GeV"    ,"x":"Number of Hard B-Tagged Jets with P_{T} > 60GeV"      ,"y":"Events  "  ,'log':[0,1,0] }},
                 "bJetPt":       {'var':"Jet_pt[ max(IndexJet_bJet[0],0)] *(nBJet>0)"      ,"bins":[100,0,1000]          ,"nMinus1":None         ,"decor":{"title":"bJet P_{{T}} "    ,"x":"P_{T}(BJet)"      ,"y":"Events  "  ,'log':[0,1,0] }},
                 "bSoftJetPt":       {'var':"Jet_pt[ max(IndexJet_bSoftJet[0],0)] *(nBSoftJet>0)"      ,"bins":[10,20,70]          ,"nMinus1":None         ,"decor":{"title":"bSoftJet P_{{T}} "    ,"x":"P_{T}(Soft BJet)"      ,"y":"Events  "  ,'log':[0,1,0] }},
                 "bHardJetPt":       {'var':"Jet_pt[ max(IndexJet_bHardJet[0],0)] *(nBHardJet>0)"      ,"bins":[100,0,1000]          ,"nMinus1":None         ,"decor":{"title":"bHardJet P_{{T}} "    ,"x":"P_{T}(Hard BJet)"      ,"y":"Events  "  ,'log':[0,1,0] }},
@@ -278,7 +283,7 @@ class DegPlots():
                             "ht":           ["ht","CT"]   , 
                             "ct":           ["CT"]   , 
                             "{lep}Phi".format(**fargs) :       [""]   , 
-                            "{lep}Eta".format(**fargs) :       ["lepEta".format(**fargs) ]   , 
+                            "LepEta".format(**fargs) :       ["lepEta" ]   , 
                             "nJets30":      ["",]   , 
                             "nJets60":      ["Jet60"]   , 
                             "nJets30":      ["",]   , 

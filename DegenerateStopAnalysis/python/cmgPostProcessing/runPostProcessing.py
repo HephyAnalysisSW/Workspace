@@ -76,8 +76,14 @@ sampleSets = {
                 
                 'ttjets':{
                             'samples':[
-                                        ["TTJets_FastSIM",              "--skimPreselect"],
-                                        #["TTJets_LO",                   "--skimPreselect"],
+                                        ["TTJets_FastSIM",              "--skimPreselect",  "--runChunks", "0",   "100" ],
+                                        ["TTJets_FastSIM",              "--skimPreselect",  "--runChunks", "101", "200" ],
+                                        ["TTJets_FastSIM",              "--skimPreselect",  "--runChunks", "201", "300" ],
+                                        ["TTJets_FastSIM",              "--skimPreselect",  "--runChunks", "301", "400" ],
+                                        #["TTJets_LO",                   "--skimPreselect",  "--runChunks", "0",   "100" ],
+                                        #["TTJets_LO",                   "--skimPreselect",  "--runChunks", "101", "200" ],
+                                        #["TTJets_LO",                   "--skimPreselect",  "--runChunks", "201", "300" ],
+                                        #["TTJets_LO",                   "--skimPreselect",  "--runChunks", "301", "400" ],
                                         #["TTJets_LO",                   "--skimPreselect",    "--skimGeneral=lheHTlow" ],
                                         #######["TTJets_LO_HT600to800_ext",    "--skimPreselect",    "--skimGeneral=lheHThigh"],
                                         #["TTJets_LO_HT600to800_ext",    "--skimPreselect",    "--skimGeneral=lheHThigh" , "--runChunks", "0",   "100"],
@@ -508,7 +514,7 @@ def get_parser():
     argsRun.add_argument('--numberOfProcesses',
         action='store',
         type=int,
-        default='7',
+        default='10',
         help="Number of processes to run in parallel"
         )
 

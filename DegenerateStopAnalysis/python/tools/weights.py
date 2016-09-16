@@ -30,10 +30,12 @@ class Weights():
                     isr="",
                     teff="",
                     lumis="",
+                    lhe  = '',
                 ):
 
 
         weightDict={}
+        weightDict['sigScan']= {}
 
         lepCol  = lepCol
         lep     = lep 
@@ -55,7 +57,6 @@ class Weights():
             wptweight_a = wptweight_a_template.format(wpt=wpt)
             wptweight_n = wptweight_n_template.format(wpt=wpt)
             wptweight_p = wptweight_p_template.format(wpt=wpt)
-
             weightDict.update({
                      "w": {
                             "cuts":{ 
@@ -76,25 +77,18 @@ class Weights():
                             "top_pt": ttptweight
                            }
 
-        if isr:
-            #isrWeightFunc = lambda norm: '(1.+{norm}*GenPart_mass[stopIndex1]) *(1.*(stops_pt<120.)+0.95*(stops_pt>=120.&&stops_pt<150.)+0.9*(stops_pt>=150.&&stops_pt<250.)+0.8*(stops_pt>=250.))'.format(norm=norm)
-            #isrWeight = isrWeightFunc(9.5e-5)
-            #isrWeightFunc = lambda norm: '(1.+{norm}*GenPart_mass[stopIndex1]) *(1.*(stops_pt<120.)+0.95*(stops_pt>=120.&&stops_pt<150.)+0.9*(stops_pt>=150.&&stops_pt<250.)+0.8*(stops_pt>=250.))'.format(norm=norm)
-            #isrWeight = isrWeightFunc(9.5e-5)
-            isrWeightString = "{normFact} * ( (nIsr==0) + (nIsr==1)*0.882  + (nIsr==2)*0.792  + (nIsr==3)*0.702  + (nIsr==4)*0.648  + (nIsr==5)*0.601  + (nIsr>=6)*0.515 ) "
-            isrWeightFunc   = lambda normFact: isrWeightString.format( normFact=normFact )
-            isrWeight       = isrWeightFunc("(7.279e-05 *(GenSusyMStop) + 1.108)")
-            weightDict['scan'] = {
-                                    'isrReweight' : isrWeight
-                                 }
-
+        isrWeightString = "{normFact} * ( (nIsr==0) + (nIsr==1)*0.882  + (nIsr==2)*0.792  + (nIsr==3)*0.702  + (nIsr==4)*0.648  + (nIsr==5)*0.601  + (nIsr>=6)*0.515 ) "
+        isrWeightFunc   = lambda normFact: isrWeightString.format( normFact=normFact )
+        isrWeight       = isrWeightFunc("(7.279e-05 *(GenSusyMStop) + 1.108)")
+        weightDict['sigScan']['isrReweight'] = isrWeight
+        if isr == 'noisr':
+            weightDict['sigScan']['isrReweight']= "(1)"
 
         #
         # def_weights (i.e weights common to all MC samples)
         #
 
         def_weights = {}
-
         def_weights['baseWeight']= "weight"
 
         if teff:
@@ -114,6 +108,34 @@ class Weights():
             sf_to_btag  = btag_sf_map.sf_to_btag
             def_weights["cuts"]=dict( [ (sf, (sf, make_match_func(sf))  )  for sf in sf_to_btag.keys()  ])
 
+        if str(lhe):
+            lhe_order ={0: 'Q2central_central',
+                        1: 'Q2up_central',
+                        2: 'Q2down_central',
+                        3: 'Q2central_up',
+                        4: 'Q2up_up',
+                        5: 'Q2down_up',
+                        6: 'Q2central_down',
+                        7: 'Q2up_down',
+                        8: 'Q2down_down'}
+
+
+
+            lhenorms = {'Q2central_central': '1.000 * exp(0.000e+00 * (GenSusyMStop)  )',
+             'Q2central_down': '0.312 * exp(9.930e-03 * (GenSusyMStop)  )',
+             'Q2central_up': '0.283 * exp(9.882e-03 * (GenSusyMStop)  )',
+             'Q2down_central': '0.305 * exp(9.799e-03 * (GenSusyMStop)  )',
+             'Q2down_down': '0.257 * exp(9.963e-03 * (GenSusyMStop)  )',
+             'Q2down_up': '0.234 * exp(9.915e-03 * (GenSusyMStop)  )',
+             'Q2up_central': '0.255 * exp(9.826e-03 * (GenSusyMStop)  )',
+             'Q2up_down': '0.373 * exp(9.903e-03 * (GenSusyMStop)  )',
+             'Q2up_up': '0.338 * exp(9.854e-03 * (GenSusyMStop)  )'}
+            
+            lhenorm = lhenorms[lhe_order[lhe]]
+            #lhenorm = "(1)"
+
+            lheWeight = 'LHEWeights_wgt[%s]'%lhe
+            weightDict['sigScan']['LHEWeight'] =   "( (%s)*(%s) )"%(lhenorm, lheWeight )
 
         self.def_weights = def_weights
         self.weights={}

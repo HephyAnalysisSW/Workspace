@@ -1643,7 +1643,7 @@ def getEfficiency(samples,samp, plot, cutInst_pass, cutInst_tot ,ret = False ):
  
 #[ len(mstops), min(mstops) - 0.5*dstops , max(mstops) + 0.5*dstops, (max(mstops) + min(dms) - ( min(stops)-max(dms))) /5.  ,min(stops)-max(dms)-5 , max(mstops) + min(dms)+5 ) ]
 # [ len(mstops), min(mstops) - 0.5*dstops , max(mstops) + 0.5*dstops, (max(mstops) + min(dms) - ( min(mstops)-max(dms))) /5  ,min(mstops)-max(dms)-5 , max(mstops) + min(dms)+5 ] 
-def makeStopLSPPlot(name, massDict, title="", bins = [23,87.5,662.5, 127 , 17.5, 642.5] , key=None, func=None,setbin=False ):
+def makeStopLSPPlot(name, massDict, title="", bins = [23,87.5,662.5, 127 , 17.5, 642.5] , key=None, func=None,setbin=False, massFunc = None ):
     """
     massDict should be of the form {    
                                     stopmass1: { lsp_mass_1: a, lsp_mass_2: b ... },
@@ -1653,6 +1653,7 @@ def makeStopLSPPlot(name, massDict, title="", bins = [23,87.5,662.5, 127 , 17.5,
     with a, b, c,d ... the bin content TH2D
     if key available then key(a) will be evaluated
     if func available then func(mstop,mlsp) will be evaluted. (func will override key)
+    if massFunc:  stop_mass, lsp_mass  = massFunc(key)
     """
     plot = ROOT.TH2F(name,title, *bins )
     if setbin:
@@ -1665,6 +1666,16 @@ def makeStopLSPPlot(name, massDict, title="", bins = [23,87.5,662.5, 127 , 17.5,
                     plot.SetBinContent(x,y,massDict[xbin][ybin])
                 except KeyError:
                     pass
+    elif massFunc:
+        for k,val in massDict.iteritems():
+            masses  = massFunc(k)
+            if not masses: 
+                continue
+            stop_mass, lsp_mass = masses
+            val = val if not key else key(val) 
+            plot.Fill(int(stop_mass), int(lsp_mass), val)
+
+
     else:
         for stop_mass in massDict:
             for lsp_mass in massDict[stop_mass]:
@@ -2093,6 +2104,13 @@ def decide_cut( sample, cut, plot=None, nMinus1=None):
                     new_cut = new_cut.replace(sf, "(1)")
                     #print 'replacing sf: %s , with %s'%(sf, "(1)") 
                 modified = True 
+    if "met_genPt" in new_cut and not sample.isSignal:
+        print "-------------------- Detected non-signal with genmet cut!"
+        print "BEFORE:", new_cut
+        new_cut = new_cut.replace("met_genPt","met_pt").replace("met_genPhi","met_phi")
+        print "AFTER:" , new_cut
+        print "--------------------"
+
     return new_cut
 
 
@@ -2913,9 +2931,9 @@ class JinjaTexTable():
             dataName = ylds.sampleNames[d] if ylds.sampleNames[d] in yieldDict.keys() else d
             print yieldDict[dataName]
             for dataBin in yieldDict[dataName].keys():
-                print "before" , yieldDict[dataName][dataBin]
+                #print "before" , yieldDict[dataName][dataBin]
                 yieldDict[dataName][dataBin] = int( getattr(yieldDict[dataName][dataBin],"val", yieldDict[dataName][dataBin] ) )
-                print "after" , yieldDict[dataName][dataBin]
+                #print "after" , yieldDict[dataName][dataBin]
 
 
         if noFOM:
@@ -3094,6 +3112,23 @@ def getMasses(string):
         masses.append(s)
     if len(masses)!=2 or int(masses[0]) < int(masses[1]):
         raise Exception("Failed to Extract masses from string: %s , only got %s "%(string, masses))
+    return [int(m) for m in masses]
+
+def getMasses2(string):
+    masses = []
+    string = get_filename(string)
+    splitted = re.split("_|-", string)
+    #splitted = string.rsplit("_"):
+    for s in splitted:
+        if s.startswith("s8tev"):
+            s = s[5:]
+        if s.startswith("s"):
+            s = s[1:]
+        if not s.isdigit():
+            continue
+        masses.append(s)
+    if len(masses)!=2 or int(masses[0]) < int(masses[1]):
+        return False
     return [int(m) for m in masses]
 
 def getValueFromDict(x, val="0.500", default=999):  ##  can use dict.get()?

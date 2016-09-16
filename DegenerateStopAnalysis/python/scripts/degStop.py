@@ -48,6 +48,7 @@ if True:
     parser.add_argument('--btag',       default = 'btag',               action="store", help='')
     parser.add_argument('--postFuncs',    default = '',     nargs = "+",  action="store", help='')
 
+    parser.add_argument('--sigOpt',    default='All',       action="store", help='BM= benchmark points only, NoSig=NoSignal , All=allsignal')
     args=parser.parse(sys.argv, setdef=False)
     
 if __name__=="__main__":
