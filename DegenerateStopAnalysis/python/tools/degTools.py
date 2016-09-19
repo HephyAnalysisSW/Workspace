@@ -1110,7 +1110,7 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
         canvs[p][cMain].cd()
         canvs[p][cMain].RedrawAxis()
         canvs[p][cMain].Update()
-        if not isDataPlot: canvs[p][cMain].SetRightMargin(10)
+        if not isDataPlot and not fom: canvs[p][cMain].SetRightMargin(10)
         #canvs[p][cMain].SetLeftMargin(15) 
         
         latex = ROOT.TLatex()
@@ -3081,7 +3081,7 @@ def makeSimpleLatexTable( table_list , texName, outDir, caption="" , align_char 
     
     table = header + body + footer
 
-    texFile = outDir+"/"+texName
+    texFile = outDir+"/"+texName + ".tex"
     f = open( texFile, 'w')
     f.write( table)
     f.close()

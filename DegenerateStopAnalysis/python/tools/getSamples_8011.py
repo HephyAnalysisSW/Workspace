@@ -34,7 +34,7 @@ data_triggers_list = [
                      ]
 
 #SingleMu and SingleEl PD
-data_mu_trigger = "HLT_IsoMu27"
+data_mu_trigger = "HLT_IsoMu24"
 data_el_trigger = "HLT_Ele27_WPTight_Gsf"
 
 ###Filters###

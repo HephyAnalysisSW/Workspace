@@ -14,7 +14,6 @@ MET_Run2016B_PromptReco_v2 ={
 "isData": True,
 "xsec": None,
 
-
 }
 allComponents.append(MET_Run2016B_PromptReco_v2)
 
@@ -31,7 +30,6 @@ MET_Run2016C_PromptReco_v2 ={
 "treeName":"tree",
 "isData": True,
 "xsec": None,
-
 
 }
 allComponents.append(MET_Run2016C_PromptReco_v2)
@@ -50,7 +48,6 @@ MET_Run2016D_PromptReco_v2 ={
 "isData": True,
 "xsec": None,
 
-
 }
 allComponents.append(MET_Run2016D_PromptReco_v2)
 
@@ -67,7 +64,6 @@ SingleElectron_Run2016B_PromptReco_v2 ={
 "treeName":"tree",
 "isData": True,
 "xsec": None,
-
 
 }
 allComponents.append(SingleElectron_Run2016B_PromptReco_v2)
@@ -86,7 +82,6 @@ SingleElectron_Run2016C_PromptReco_v2 ={
 "isData": True,
 "xsec": None,
 
-
 }
 allComponents.append(SingleElectron_Run2016C_PromptReco_v2)
 
@@ -103,7 +98,6 @@ SingleElectron_Run2016D_PromptReco_v2 ={
 "treeName":"tree",
 "isData": True,
 "xsec": None,
-
 
 }
 allComponents.append(SingleElectron_Run2016D_PromptReco_v2)
@@ -122,7 +116,6 @@ SingleMuon_Run2016B_PromptReco_v2 ={
 "isData": True,
 "xsec": None,
 
-
 }
 allComponents.append(SingleMuon_Run2016B_PromptReco_v2)
 
@@ -139,7 +132,6 @@ SingleMuon_Run2016C_PromptReco_v2 ={
 "treeName":"tree",
 "isData": True,
 "xsec": None,
-
 
 }
 allComponents.append(SingleMuon_Run2016C_PromptReco_v2)
@@ -158,7 +150,11 @@ SingleMuon_Run2016D_PromptReco_v2 ={
 "isData": True,
 "xsec": None,
 
-
 }
 allComponents.append(SingleMuon_Run2016D_PromptReco_v2)
+
+
+
+
+
 

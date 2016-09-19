@@ -1,0 +1,7 @@
+nohup krenew -t -K 10 -- bash -c "python -b ../ZinvEstimation.py --plot 0 --doYields 1 --beforeEmul 0 --afterEmul 1 --leptons 1 --peak 1 --SR pt_30_60  --CT2 75   --getData 1 --btag sf --Zchannel Zmumu --lepEta 2.5" & disown
+nohup krenew -t -K 10 -- bash -c "python -b ../ZinvEstimation.py --plot 0 --doYields 1 --beforeEmul 0 --afterEmul 1 --leptons 1 --peak 1 --SR pt_30_60  --CT2 150   --getData 1 --btag sf --Zchannel Zmumu --lepEta 2.5" & disown
+nohup krenew -t -K 10 -- bash -c "python -b ../ZinvEstimation.py --plot 0 --doYields 1 --beforeEmul 0 --afterEmul 1 --leptons 1 --peak 1 --SR pt_30_60  --CT2 300   --getData 1 --btag sf --Zchannel Zmumu --lepEta 2.5" & disown
+
+nohup krenew -t -K 10 -- bash -c "python -b ../ZinvEstimation.py --plot 0 --doYields 1 --beforeEmul 0 --afterEmul 1 --leptons 1 --peak 1 --SR pt_30_60  --CT2 75   --getData 1 --btag sf --Zchannel Zee --lepEta 2.5" & disown
+nohup krenew -t -K 10 -- bash -c "python -b ../ZinvEstimation.py --plot 0 --doYields 1 --beforeEmul 0 --afterEmul 1 --leptons 1 --peak 1 --SR pt_30_60  --CT2 150   --getData 1 --btag sf --Zchannel Zee --lepEta 2.5" & disown
+nohup krenew -t -K 10 -- bash -c "python -b ../ZinvEstimation.py --plot 0 --doYields 1 --beforeEmul 0 --afterEmul 1 --leptons 1 --peak 1 --SR pt_30_60  --CT2 300   --getData 1 --btag sf --Zchannel Zee --lepEta 2.5" & disown
