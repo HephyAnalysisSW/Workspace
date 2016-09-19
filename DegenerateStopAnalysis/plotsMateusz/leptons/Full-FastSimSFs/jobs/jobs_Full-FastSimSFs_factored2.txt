@@ -1,0 +1,14 @@
+python -b ../Full-FastSimSFs_factored2.py --standardBins 1 --varBins 1 --lep mu --base ID --variable HI
+python -b ../Full-FastSimSFs_factored2.py --standardBins 1 --varBins 0 --lep mu --base ID --variable HI
+python -b ../Full-FastSimSFs_factored2.py --standardBins 0 --varBins 1 --lep mu --base ID --variable HI
+python -b ../Full-FastSimSFs_factored2.py --standardBins 0 --varBins 0 --lep mu --base ID --variable HI
+
+python -b ../Full-FastSimSFs_factored2.py --standardBins 1 --varBins 1 --lep mu --base ID --variable IP
+python -b ../Full-FastSimSFs_factored2.py --standardBins 1 --varBins 0 --lep mu --base ID --variable IP
+python -b ../Full-FastSimSFs_factored2.py --standardBins 0 --varBins 1 --lep mu --base ID --variable IP
+python -b ../Full-FastSimSFs_factored2.py --standardBins 0 --varBins 0 --lep mu --base ID --variable IP
+
+python -b ../Full-FastSimSFs_factored2.py --standardBins 1 --varBins 1 --lep mu --base ID --variable HI+IP
+python -b ../Full-FastSimSFs_factored2.py --standardBins 1 --varBins 0 --lep mu --base ID --variable HI+IP
+python -b ../Full-FastSimSFs_factored2.py --standardBins 0 --varBins 1 --lep mu --base ID --variable HI+IP
+python -b ../Full-FastSimSFs_factored2.py --standardBins 0 --varBins 0 --lep mu --base ID --variable HI+IP
