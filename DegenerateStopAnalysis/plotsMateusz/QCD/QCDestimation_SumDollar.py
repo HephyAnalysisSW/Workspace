@@ -4,6 +4,8 @@
 # ABCD2: 2D ABCD with loosened D
 # ABCD3: 2D ABCD with loosened MET
 # ABCD4: 3D ABCD with ISA (inverted simgaEtaEta)
+# Mateusz Zarucki 2016
+
 
 import ROOT
 import os, sys
@@ -13,11 +15,8 @@ from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.eleWPs import *
 from Workspace.DegenerateStopAnalysis.tools.degTools import CutClass, Plots, getPlots, drawPlots, Yields, setup_style
-from Workspace.DegenerateStopAnalysis.tools.getSamples_8011 import getSamples
+from Workspace.DegenerateStopAnalysis.tools.getSamples_8012 import getSamples
 from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesPostProcessed_mAODv2_2016 import cmgTuplesPostProcessed
-#from Workspace.DegenerateStopAnalysis.toolsMateusz.getSamples_analysisHephy_13TeV import getSamples
-#from Workspace.DegenerateStopAnalysis.toolsMateusz.getSamples_PP_mAODv2_7412pass2_scan import getSamples
-
 from array import array
 from math import pi, sqrt #cos, sin, sinh, log
 
@@ -70,10 +69,11 @@ print makeDoubleLine()
 
 #Save
 if save: #web address: http://www.hephy.at/user/mzarucki/plots/
-   if removedCut == "None": savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/QCD/ABCD/ABCD" + ABCD + "/estimation"# + eleWP 
-   else: savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/QCD/ABCD/ABCD" + ABCD + "/estimation"# + eleWP + "_no_" + removedCut
+   tag = samples[samples.keys()[0]].dir.split('/')[7] + "/" + samples[samples.keys()[0]].dir.split('/')[8]
+   if removedCut == "None": savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/QCD/SumDollar/ABCD/ABCD%s/estimation"%(tag, ABCD)
+   else: savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%sQCD/SumDollar/ABCD/ABCD%s/estimation"%(tag, ABCD)
    if highWeightVeto: savedir += "/highWeightVeto" 
-   if not os.path.exists(savedir): os.makedirs(savedir)
+   makeDir(savedir)
 
 suffix = "_" + eleWP + "_HT" + HTcut + "_MET" + METcut
 if ABCD == "3": suffix += "_METloose" + METloose
@@ -99,11 +99,6 @@ for s in samplesList:
       print "!!! Sample " + sample + " unavailable."
       sys.exit(0)
    
-collection = "LepAll" 
-print makeLine()
-print "Using " + collection + " collection."
-print makeLine()
-
 #Removal of high weight events
 if highWeightVeto:
    weightCut = "50"
@@ -111,6 +106,8 @@ else:
    weightCut = "100000"
 
 #Gets all cuts (electron, SR, CR) for given electron ID
+collection = "LepAll" 
+
 if ABCD == "1" or ABCD == "2": eleIDsel = electronIDs(ID = "nMinus1", removedCut = "d0", iso = False, collection = collection)
 elif ABCD == "3":              
    if removedCut == "None":    eleIDsel = electronIDs(ID = "standard", removedCut = "None", iso = False, collection = collection)

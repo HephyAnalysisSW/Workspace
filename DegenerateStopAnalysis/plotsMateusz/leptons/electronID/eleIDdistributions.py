@@ -4,38 +4,21 @@
 
 import ROOT
 import os, sys
+import argparse
 import Workspace.DegenerateStopAnalysis.toolsMateusz.ROOToptions
 from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
-from Workspace.DegenerateStopAnalysis.toolsMateusz.cmgTuplesPostProcessed_mAODv2_analysisHephy13TeV import cmgTuplesPostProcessed
-from Workspace.DegenerateStopAnalysis.toolsMateusz.getSamples_mAODv2_analysisHephy13TeV import getSamples
-#from Workspace.DegenerateStopAnalysis.toolsMateusz.cmgTuplesPostProcessed_mAODv2 import cmgTuplesPostProcessed
-#from Workspace.DegenerateStopAnalysis.toolsMateusz.getSamples_PP_mAODv2_7412pass2_scan import getSamples
+from Workspace.DegenerateStopAnalysis.tools.degTools import *
+from Workspace.DegenerateStopAnalysis.tools.getSamples_8012 import getSamples
+from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesPostProcessed_mAODv2_2016 import cmgTuplesPostProcessed
 from array import array
 from math import pi, sqrt #cos, sin, sinh, log
-import argparse
-
-#Samples
-privateSignals = ["s10FS", "s30", "s30FS", "s60FS", "t2tt30FS"]
-backgrounds=["w","tt", "z","qcd"]
-
-cmgPP = cmgTuplesPostProcessed()
-
-samplesList = backgrounds # + privateSignals
-samples = getSamples(cmgPP=cmgPP, sampleList=samplesList, scan=True, useHT=True, getData=False)
-
-officialSignals = ["s300_290", "s300_270", "s300_240"] #FIXME: crosscheck if these are in allOfficialSignals
-
-allOfficialSignals = samples.massScanList()
-#allOfficialSignals = [s for s in samples if samples[s]['isSignal'] and not samples[s]['isData'] and s not in privateSignals and s not in backgrounds] 
-allSignals = privateSignals + allOfficialSignals
-allSamples = allSignals + backgrounds
 
 #Input options
 parser = argparse.ArgumentParser(description="Input options")
 parser.add_argument("--var", dest="var",  help="Electron ID Variable", type=str, default="sigmaEtaEta") #"sigmaEtaEta" "hOverE" "ooEmooP" "dPhi" "dEta" "d0" "dz" "MissingHits" "convVeto"
 parser.add_argument("--slice", dest="slice",  help="Pt Slice Bounds (low,up)", type=int, nargs=2, metavar = ('slice_low', 'slice_up'))
-parser.add_argument("--sample", dest="sample",  help="Sample", type=str, default="s300_270")
+parser.add_argument("--sample", dest="sample",  help="Sample", type=str, default="qcd")
 parser.add_argument("--presel", dest="presel",  help="Add Preselection", type=int, default=1) # applies preselection
 parser.add_argument("--save", dest="save",  help="Toggle Save", type=int, default=1)
 parser.add_argument("-b", dest="batch",  help="Batch Mode", action="store_true", default=False)
@@ -53,13 +36,21 @@ presel = args.presel
 slice = args.slice
 save = args.save
 
-variables = {'sigmaEtaEta':"sigmaIEtaIEta",'hOverE':"hadronicOverEm",'ooEmooP':"eInvMinusPInv",'dPhi':"dPhiScTrkIn",'dEta':"dEtaScTrkIn",'d0':"dxy",'dz':"dz",'MissingHits':"lostHits",'convVeto':"convVeto"} # Variable counterparts in tuples
+#Samples
+privateSignals = ["s10FS", "s30", "s30FS", "s60FS", "t2tt30FS"]
+backgrounds=["w","tt", "z","qcd"]
 
-if var not in variables.keys(): 
-   print makeLine()
-   print "!!! Wrong variable input."
-   print makeLine()
-   sys.exit(0)
+samplesList = backgrounds # + privateSignals
+
+cmgPP = cmgTuplesPostProcessed()
+samples = getSamples(cmgPP = cmgPP, skim = 'preIncLep', sampleList = samplesList, scan = False, useHT = True, getData = False)
+
+officialSignals = ["s300_290", "s300_270", "s300_240"] #FIXME: crosscheck if these are in allOfficialSignals
+
+allOfficialSignals = samples.massScanList()
+#allOfficialSignals = [s for s in samples if samples[s]['isSignal'] and not samples[s]['isData'] and s not in privateSignals and s not in backgrounds] 
+allSignals = privateSignals + allOfficialSignals
+allSamples = allSignals + backgrounds
 
 print makeLine()
 print "Samples:"
@@ -72,6 +63,21 @@ else:
    print "!!! Sample " + sample + " unavailable."
    sys.exit(0)
 print makeLine()
+
+if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
+   tag = samples[samples.keys()[0]].dir.split('/')[7] + "/" + samples[samples.keys()[0]].dir.split('/')[8]
+   savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/electronID/nMinus1/distributions/%s/%s"%(tag, var, samples[sample].name)
+   
+   makeDir(savedir + "/root")
+   makeDir(savedir + "/pdf")
+
+variables = {'sigmaEtaEta':"sigmaIEtaIEta",'hOverE':"hadronicOverEm",'ooEmooP':"eInvMinusPInv",'dPhi':"dPhiScTrkIn",'dEta':"dEtaScTrkIn",'d0':"dxy",'dz':"dz",'MissingHits':"lostHits",'convVeto':"convVeto"} # Variable counterparts in tuples
+
+if var not in variables.keys(): 
+   print makeLine()
+   print "!!! Wrong variable input."
+   print makeLine()
+   sys.exit(0)
 
 #Geometric divisions
 ebSplit = 0.8 #barrel is split into two regions
@@ -125,14 +131,15 @@ genSel1 = "(abs(genLep_pdgId[0]) == 11 && abs(genLep_eta[0]) < " + str(etaAcc) +
 genSel = nSel + "&&" + genSel1
 
 #Reconstructed electron selection
-deltaR = "sqrt((genLep_eta[0] - LepGood_eta)^2 + (genLep_phi[0] - LepGood_phi)^2)"
-matchSel = "(" + deltaR +"*(abs(LepGood_pdgId) == 11 && abs(LepGood_eta) < " + str(etaAcc) + " && LepGood_mcMatchId != 0) <" + str(deltaRcut) +\
-"&& (" + deltaR +"*(abs(LepGood_pdgId) == 11 && abs(LepGood_eta) < " + str(etaAcc) + " && LepGood_mcMatchId != 0)) != 0)"
+matchSel = "LepAll_mcMatchId != 0"
+#deltaR = "sqrt((genLep_eta[0] - LepAll_eta)^2 + (genLep_phi[0] - LepAll_phi)^2)"
+#matchSel = "(" + deltaR +"*(abs(LepAll_pdgId) == 11 && abs(LepAll_eta) < " + str(etaAcc) + " && LepAll_mcMatchId != 0) <" + str(deltaRcut) +\
+#"&& (" + deltaR +"*(abs(LepAll_pdgId) == 11 && abs(LepAll_eta) < " + str(etaAcc) + " && LepAll_mcMatchId != 0)) != 0)"
 
 ##single-electron events (semileptonic & dileptonic)
 #elif nEles == "1":
 #   #Generated electron selection
-#   nSel = "ngenLep > 0" #redundant with genSel2 #nLepGood > 0 introduces bias
+#   nSel = "ngenLep > 0" #redundant with genSel2 #nLepAll > 0 introduces bias
 #   genSel1 = "(abs(genLep_pdgId) == 11 && abs(genLep_eta) < " + str(etaAcc) + ")" #electron selection (includes dielectron evts) #ngenLep == 1 would remove dileptonic events # index [0] does not include single-electron events with muon 
 #   genSel2 = "(Sum$(abs(genLep_pdgId) == 11 && abs(genLep_eta) < " + str(etaAcc) + ") == 1)" # = number of electrons (includes dileptonic and semileptonic events) 
 #   genSel = nSel + "&&" + genSel1 + "&&" + genSel2
@@ -151,10 +158,10 @@ c1.Divide(1,2)
 WPs = ['Veto', 'Loose', 'Medium', 'Tight']
 
 #cutSel = {}
-#recoSel = "(abs(LepGood_pdgId) == 11)"
-#misMatchSel = "(LepGood_mcMatchId == 0)"
+#recoSel = "(abs(LepAll_pdgId) == 11)"
+#misMatchSel = "(LepAll_mcMatchId == 0)"
 
-geoSel= {'EB':"(abs(LepGood_eta) <= " + str(ebeeSplit) + ")", 'EE':"(abs(LepGood_eta) > " + str(ebeeSplit) + "&& abs(LepGood_eta) < " + str(etaAcc) + ")"}
+geoSel= {'EB':"(abs(LepAll_eta) <= " + str(ebeeSplit) + ")", 'EE':"(abs(LepAll_eta) > " + str(ebeeSplit) + "&& abs(LepAll_eta) < " + str(etaAcc) + ")"}
 
 hists = {}
 hlines = {'Veto':{var:{}}, 'Loose':{var:{}}, 'Medium':{var:{}}, 'Tight':{var:{}}}
@@ -163,7 +170,7 @@ hlines2 = {'Veto':{var:{}}, 'Loose':{var:{}}, 'Medium':{var:{}}, 'Tight':{var:{}
 #2D Histograms (wrt. pT)
 for i,reg in enumerate(geoSel.keys()):
    c1.cd(i+1)
-   hists["2D_" + var + "_" + reg] = make2DHist(samples[sample].tree, "LepGood_pt", "LepGood_" + variables[var], weight + "*(" + preSel + "&&" + genSel + "&&" + matchSel + "&&" + geoSel[reg] + ")", nbins, xmin['Pt'], xmax['Pt'], nbins, xmin[reg], xmax[reg])
+   hists["2D_" + var + "_" + reg] = make2DHist(samples[sample].tree, "LepAll_pt", "LepAll_" + variables[var], weight + "*(" + preSel + "&&" + genSel + "&&" + matchSel + "&&" + geoSel[reg] + ")", nbins, xmin['Pt'], xmax['Pt'], nbins, xmin[reg], xmax[reg])
    hists["2D_" + var + "_" + reg].SetName("2D_" + var + "_" + reg)
    hists["2D_" + var + "_" + reg].SetTitle(var + " and Electron p_{T} Distribution (" + reg + ")")
    hists["2D_" + var + "_" + reg].GetXaxis().SetTitle("Reconstructed Electron p_{T}")
@@ -221,14 +228,14 @@ vlines = {'Veto':{var:{}}, 'Loose':{var:{}}, 'Medium':{var:{}}, 'Tight':{var:{}}
 vlines2 = {'Veto':{var:{}}, 'Loose':{var:{}}, 'Medium':{var:{}}, 'Tight':{var:{}}}
 
 if slice is not None:
-   ptSel = "(LepGood_pt >" + str(slice[0]) + "&& LepGood_pt <" + str(slice[1]) + ")"
+   ptSel = "(LepAll_pt >" + str(slice[0]) + "&& LepAll_pt <" + str(slice[1]) + ")"
 else:
    ptSel = "1"
 
 #1D Histogram
 for i,reg in enumerate(geoSel.keys()):
    c2.cd(i+1)
-   hists[var + "_" + reg] = makeHist(samples[sample].tree, "LepGood_" + variables[var], weight + "*(" + preSel + "&&" + genSel + "&&" + matchSel + "&&" + geoSel[reg] + "&&" + ptSel + ")", nbins, xmin[reg], xmax[reg])
+   hists[var + "_" + reg] = makeHist(samples[sample].tree, "LepAll_" + variables[var], weight + "*(" + preSel + "&&" + genSel + "&&" + matchSel + "&&" + geoSel[reg] + "&&" + ptSel + ")", nbins, xmin[reg], xmax[reg])
    hists[var + "_" + reg].SetName(var + "_" + reg)
    if slice is not None: hists[var + "_" + reg].SetTitle(var + " Distribution between " + str(slice[0]) + "-" + str(slice[1]) + " GeV Electron p_{T} (" + reg + " ; " + samples[sample].name + " Sample)")
    else: hists[var + "_" + reg].SetTitle("Total " + var + " Distribution (" + reg + " ; " + samples[sample].name + " Sample)")
@@ -270,14 +277,8 @@ for i,reg in enumerate(geoSel.keys()):
 c2.Modified()
 c2.Update()
 
-#Write to file
+#Save
 if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
-   savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/electronID/nMinus1/distributions/" + var + "/" + samples[sample].name
-   
-   if not os.path.exists(savedir + "/root"): os.makedirs(savedir + "/root")
-   if not os.path.exists(savedir + "/pdf"): os.makedirs(savedir + "/pdf")
-
-   #Save to Web
    if slice is None:
       c1.SaveAs(savedir + "/%s_2D_%s.png"%(var, samples[sample].name))
       c1.SaveAs(savedir + "/root/%s_2D_%s.root"%(var, samples[sample].name))

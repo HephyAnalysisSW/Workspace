@@ -4,13 +4,11 @@
 
 import ROOT
 import os, sys
+import argparse
 import Workspace.DegenerateStopAnalysis.toolsMateusz.ROOToptions
 from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from array import array
 from math import pi, sqrt #cos, sin, sinh, log
-import argparse
-
-filedir = "/afs/hephy.at/user/m/mzarucki/www/plots/electronID/efficiencies"
 
 #Input options
 parser = argparse.ArgumentParser(description="Input options")
@@ -41,7 +39,10 @@ save = 1 #args.save
 #officialSignals = ["T2_4bd300_240", "T2_4bd300_270", "T2_4bd300_290"]
 backgrounds=["WJets", "TTJets", "ZJetsInv", "QCD"] 
 #signals = privateSignals + officialSignals
-samples = backgrounds #signals + 
+samples = backgrounds # + signals
+
+tag = "8012_mAODv2_v3/80X_postProcessing_v10"
+path = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/electronID/efficiencies"%tag
 
 #Bin size 
 #nbins = 100
@@ -74,11 +75,11 @@ for sample in samples:
          passed = {"efficiency":{}, "misID":{}, "misID2":{}}
          
          for plot in plots: 
-            if den == "iso": denFile = ROOT.TFile(filedir + "/iso/" + isolation + "/" + plot + "/root/%s_%s_%s%s.root"%(plot, isolation, sample, z), "read")
-            else: denFile = ROOT.TFile(filedir + "/" + den + "/" + plot + "/root/%s_%s_%s%s.root"%(plot, den, sample, z), "read")
+            if den == "iso": denFile = ROOT.TFile(path + "/iso/" + isolation + "/" + plot + "/root/%s_%s_%s%s.root"%(plot, isolation, sample, z), "read")
+            else: denFile = ROOT.TFile(path + "/" + den + "/" + plot + "/root/%s_%s_%s%s.root"%(plot, den, sample, z), "read")
             
-            if num == "iso": numFile = ROOT.TFile(filedir + "/iso/" + isolation + "/" + plot + "/root/%s_%s_%s%s.root"%(plot, isolation, sample, z), "read")
-            else: numFile = ROOT.TFile(filedir + "/" + num + "/" + plot + "/root/%s_%s_%s%s.root"%(plot, num, sample, z), "read")
+            if num == "iso": numFile = ROOT.TFile(path + "/iso/" + isolation + "/" + plot + "/root/%s_%s_%s%s.root"%(plot, isolation, sample, z), "read")
+            else: numFile = ROOT.TFile(path + "/" + num + "/" + plot + "/root/%s_%s_%s%s.root"%(plot, num, sample, z), "read")
             
             for iWP in WPs:
                   total[plot][iWP] = denFile.Get("c1").GetPrimitive("c1_1").GetPrimitive(plot + "_passed_" + iWP) 
@@ -148,12 +149,13 @@ for sample in samples:
          
          #Write to file
          if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
-            if num == "iso": savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/electronID/efficiencies/comparisons/" + isolation + "_" + den
-            elif den == "iso": savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/electronID/efficiencies/comparisons/" + num + "_" + isolation
-            else: savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/electronID/efficiencies/comparisons/" + num + "_" + den
+            tag = samples[samples.keys()[0]].dir.split('/')[7] + "/" + samples[samples.keys()[0]].dir.split('/')[8]
+            if num == "iso": savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/electronID/efficiencies/comparisons/%s_%s"%(tag, isolation, den)
+            elif den == "iso": savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/electronID/efficiencies/comparisons/%s_%s"%(tag, num, isolation)
+            else: savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/electronID/efficiencies/comparisons/%s_%s"%(tag, num, den)
             
-            if not os.path.exists(savedir + "/root"): os.makedirs(savedir + "/root")
-            if not os.path.exists(savedir + "/pdf"): os.makedirs(savedir + "/pdf")
+            makeDir(savedir + "/root")
+            makeDir(savedir + "/pdf")
             
             #Save to Web
             if num == "iso": 

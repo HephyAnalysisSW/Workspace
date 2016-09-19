@@ -4,18 +4,15 @@
 
 import ROOT
 import os, sys
+import argparse
 import Workspace.DegenerateStopAnalysis.toolsMateusz.ROOToptions
 from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.eleWPs import *
-from Workspace.DegenerateStopAnalysis.tools.getSamples_8011 import getSamples
+from Workspace.DegenerateStopAnalysis.tools.getSamples_8012 import getSamples
 from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesPostProcessed_mAODv2_2016 import cmgTuplesPostProcessed
-#from Workspace.DegenerateStopAnalysis.toolsMateusz.cmgTuplesPostProcessed_mAODv2_analysisHephy13TeV import cmgTuplesPostProcessed
-#from Workspace.DegenerateStopAnalysis.toolsMateusz.getSamples_mAODv2_analysisHephy13TeV import getSamples
-
 from array import array
 from math import pi, sqrt #cos, sin, sinh, log
-import argparse
 
 ROOT.gStyle.SetOptStat(1111) #0 removes histogram statistics box #Name, Entries, Mean, RMS, Underflow, Overflow, Integral, Skewness, Kurtosis
 
@@ -53,13 +50,13 @@ save = args.save
 #nEles = "01" # 01,01tau,1,2 #Number of electrons in event
 
 #Samples
-privateSignals = []#"s10FS", "s30", "s30FS", "s60FS", "t2tt30FS"]
+privateSignals = ["s10FS", "s30", "s30FS", "s60FS", "t2tt30FS"]
 backgrounds=["w","tt", "z","qcd"]
 
-cmgPP = cmgTuplesPostProcessed()
-
 samplesList = backgrounds # + privateSignals
-samples = getSamples(cmgPP = cmgPP, sampleList=samplesList, scan=True, useHT=True, getData=False)
+
+cmgPP = cmgTuplesPostProcessed()
+samples = getSamples(cmgPP = cmgPP, skim = 'preIncLep', sampleList = samplesList, scan = True, useHT = True, getData = False)
 
 officialSignals = ["s300_290", "s300_270", "s300_240"] #FIXME: crosscheck if these are in allOfficialSignals
 
@@ -79,33 +76,10 @@ else:
    sys.exit(0)
 print makeLine()
 
-
-#Variable to plot
-if plot == "efficiency": variable = "genLep_pt[0]"
-elif plot == "misID" or plot == "misID2": variable = "LepGood_pt"
-
-#Bin size 
-#nbins = 100
-xmin = 0
-#xmax = 1000
-
-#Zoom
-if not zoom:
-   xmax = 150
-   
-   bins = array('d', range(xmin,50,2) + range(50,100,5) + range(100,xmax+10,10)) #Variable bin size
-   normFactor = "((" + variable + " < 50)*0.5 + (" + variable + " >= 50 &&" + variable + " < 100)*0.2 + (" + variable + " >= 100)*0.1)"
-   z = ""
-else: #zoomed
-   #nbins = 10
-   xmax = 20
-   bins = array('d',range(xmin,xmax+2,2))
-   normFactor = "(0.5)"
-   z = "_zoom"
-
 #Save
 if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
-   savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/electronID"
+   tag = samples[samples.keys()[0]].dir.split('/')[7] + "/" + samples[samples.keys()[0]].dir.split('/')[8]
+   savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/electronID"%tag
  
    #Save path
    if not removedCut:
@@ -126,16 +100,39 @@ if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
          savedir += "/lowPt"
          savedir2 += "/lowPt"
    
-      if not os.path.exists(savedir2): os.makedirs(savedir2)
+      makeDir(savedir2)
       
-   if not os.path.exists(savedir + "/root/histograms"): os.makedirs(savedir + "/root/histograms")
-   if not os.path.exists(savedir + "/pdf"): os.makedirs(savedir + "/pdf")
+   makeDir(savedir + "/root/histograms")
+   makeDir(savedir + "/pdf")
    
    #Histograms save file 
    if not removedCut:
       if iso: histos = ROOT.TFile(savedir + "/root/histograms/histos_%s_%s_%s%s.root"%(plot, iso, samples[sample].name, z), "recreate")
       else: histos = ROOT.TFile(savedir + "/root/histograms/histos_%s_%s_%s%s.root"%(plot, ID, samples[sample].name, z), "recreate")
    else: histos = ROOT.TFile(savedir + "/root/histograms/histos_%s_no_%s_%s%s.root"%(plot, removedCut, samples[sample].name, z), "recreate")
+
+#Variable to plot
+if plot == "efficiency": variable = "genLep_pt[0]"
+elif plot == "misID" or plot == "misID2": variable = "LepAll_pt"
+
+#Bin size 
+#nbins = 100
+xmin = 0
+#xmax = 1000
+
+#Zoom
+if not zoom:
+   xmax = 150
+   
+   bins = array('d', range(xmin,50,2) + range(50,100,5) + range(100,xmax+10,10)) #Variable bin size
+   normFactor = "((" + variable + " < 50)*0.5 + (" + variable + " >= 50 &&" + variable + " < 100)*0.2 + (" + variable + " >= 100)*0.1)"
+   z = ""
+else: #zoomed
+   #nbins = 10
+   xmax = 20
+   bins = array('d',range(xmin,xmax+2,2))
+   normFactor = "(0.5)"
+   z = "_zoom"
 
 #Geometric divisions
 etaAcc = 2.5 #eta acceptance
@@ -165,24 +162,25 @@ genSel1 = "(abs(genLep_pdgId[0]) == 11 && abs(genLep_eta[0]) < " + str(etaAcc) +
 genSel = combineCuts(nSel, genSel1)
 
 #Reconstructed electron selection
-deltaR = "sqrt((genLep_eta[0] - LepGood_eta)^2 + (genLep_phi[0] - LepGood_phi)^2)"
-matchSel = "(" + deltaR +"*(abs(LepGood_pdgId) == 11 && abs(LepGood_eta) < " + str(etaAcc) + " && LepGood_mcMatchId != 0) <" + str(deltaRcut) +\
-"&& (" + deltaR +"*(abs(LepGood_pdgId) == 11 && abs(LepGood_eta) < " + str(etaAcc) + " && LepGood_mcMatchId != 0)) != 0)"
+matchSel = "LepAll_mcMatchId != 0"
+#deltaR = "sqrt((genLep_eta[0] - LepAll_eta)^2 + (genLep_phi[0] - LepAll_phi)^2)"
+#matchSel = "(" + deltaR +"*(abs(LepAll_pdgId) == 11 && abs(LepAll_eta) < " + str(etaAcc) + " && LepAll_mcMatchId != 0) <" + str(deltaRcut) +\
+#"&& (" + deltaR +"*(abs(LepAll_pdgId) == 11 && abs(LepAll_eta) < " + str(etaAcc) + " && LepAll_mcMatchId != 0)) != 0)"
 
-recoSel = "(abs(LepGood_pdgId) == 11 && abs(LepGood_eta) <" + str(etaAcc) + ")"
+recoSel = "(abs(LepAll_pdgId) == 11 && abs(LepAll_eta) <" + str(etaAcc) + ")"
 lowPtSel = "(genLep_pt > 6 && genLep_pt < 10)" #Pt selection
-misMatchSel = "LepGood_mcMatchId == 0"
+misMatchSel = "LepAll_mcMatchId == 0"
 WPs = ["Veto", "Loose", "Medium", "Tight"]
 
-if removedCut: cutSel = electronIDs(ID = "nMinus1", removedCut = removedCut, iso = iso, collection = "LepGood")
+if removedCut: cutSel = electronIDs(ID = "nMinus1", removedCut = removedCut, iso = iso, collection = "LepAll")
 else: 
-   cutSel = electronIDs(ID = ID, removedCut = "None", iso = iso, collection = "LepGood")
-   if mvaWPs: mvaSel = electronIDs(ID = "MVA", removedCut = "None", iso = iso, collection = "LepGood")
+   cutSel = electronIDs(ID = ID, removedCut = "None", iso = iso, collection = "LepAll")
+   if mvaWPs: mvaSel = electronIDs(ID = "MVA", removedCut = "None", iso = iso, collection = "LepAll")
 
 ##single-electron events (semileptonic & dileptonic)
 #elif nEles == "1": #semileptonic
 #   #Generated electron selection
-#   nSel = "ngenLep > 0" #redundant with genSel2 #nLepGood > 0 introduces bias
+#   nSel = "ngenLep > 0" #redundant with genSel2 #nLepAll > 0 introduces bias
 #   genSel1 = "(abs(genLep_pdgId) == 11 && abs(genLep_eta) < " + str(etaAcc) + ")" #electron selection (includes dielectron evts) #ngenLep == 1 would remove dileptonic events # index [0] does not include single-electron events with muon 
 #   genSel2 = "(Sum$(abs(genLep_pdgId) == 11 && abs(genLep_eta) < " + str(etaAcc) + ") == 1)" # = number of electrons (includes dileptonic and semileptonic events) 
 #   genSel = nSel + "&&" + genSel1 + "&&" + genSel2

@@ -5,15 +5,11 @@ import argparse
 import Workspace.DegenerateStopAnalysis.toolsMateusz.ROOToptions
 from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
-from Workspace.DegenerateStopAnalysis.toolsMateusz.degTools import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.eleWPs import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.regions import *
-#from Workspace.DegenerateStopAnalysis.tools.Cuts import *
-from Workspace.DegenerateStopAnalysis.toolsMateusz.cmgTuplesPostProcessed_mAODv2_analysisHephy13TeV import cmgTuplesPostProcessed
-from Workspace.DegenerateStopAnalysis.toolsMateusz.getSamples_mAODv2_analysisHephy13TeV import getSamples
-#from Workspace.DegenerateStopAnalysis.toolsMateusz.cmgTuplesPostProcessed_mAODv2 import cmgTuplesPostProcessed
-#from Workspace.DegenerateStopAnalysis.toolsMateusz.getSamples_PP_mAODv2_7412pass2_scan import getSamples
-
+from Workspace.DegenerateStopAnalysis.tools.degTools import *
+from Workspace.DegenerateStopAnalysis.tools.getSamples_8012 import getSamples
+from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesPostProcessed_mAODv2_2016 import cmgTuplesPostProcessed
 from array import array
 from math import pi, sqrt #cos, sin, sinh, log
 
@@ -60,7 +56,8 @@ else:
 
 #Save
 if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
-   savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/electronID"
+   tag = samples[samples.keys()[0]].dir.split('/')[7] + "/" + samples[samples.keys()[0]].dir.split('/')[8]
+   savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/electronID"%tag
    savedir1 = savedir2 = savedir3 = savedir
    
    savedir1 += "/limits"
@@ -76,9 +73,9 @@ if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
       savedir += "/noIso"
       isoString = ""
    
-   if not os.path.exists("%s/cards/%s/%s%s"%(savedir1, string1, WP, string2)): os.makedirs("%s/cards/%s/%s%s"%(savedir1, string1, WP, string2))
-   if not os.path.exists("%s/tex/%s/%s%s"%(savedir1, string1, WP, string2)): os.makedirs("%s/tex/%s/%s%s"%(savedir1, string1, WP, string2))
-   if not os.path.exists("%s/tex/%s/%s%s"%(savedir2, string1, WP, string2)): os.makedirs("%s/tex/%s/%s%s"%(savedir2, string1, WP, string2))
+   makeDir("%s/cards/%s/%s%s"%(savedir1, string1, WP, string2))
+   makeDir("%s/tex/%s/%s%s"%(savedir1, string1, WP, string2))
+   makeDir("%s/tex/%s/%s%s"%(savedir2, string1, WP, string2))
    
    #if os.path.isfile(limitPkl):
    #      limits = pickle.load(file(limitPkl))
@@ -87,10 +84,10 @@ if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
 privateSignals = ["s10FS", "s30", "s30FS", "s60FS", "t2tt30FS"]
 backgrounds = ["w","tt", "z","qcd"]
 
-cmgPP = cmgTuplesPostProcessed()
-
 samplesList = backgrounds # + privateSignals
-samples = getSamples(cmgPP = cmgPP, sampleList = samplesList, scan = True, useHT = True, getData = False)
+
+cmgPP = cmgTuplesPostProcessed()
+samples = getSamples(cmgPP = cmgPP, skim = 'preIncLep', sampleList = samplesList, scan = False, useHT = True, getData = False)
 
 officialSignals = ["s300_290", "s300_270", "s300_240"] #FIXME: crosscheck if these are in allOfficialSignals
 
@@ -167,9 +164,9 @@ elif doPlots or doCutFlow:
    for s in samples: samples[s].tree.SetAlias("eleSel", allCuts[WP]['eleSel'])
 
    if doPlots:
-      elePt = "Max$(LepGood_pt*eleSel)"
-      eleMt = "Max$(LepGood_mt*eleSel)"
-      #eleMt = "Max$(sqrt(2*met*{pt}*(1 - cos(met_phi - LepGood_phi)))*(LepGood_pt == {pt}))".format(pt=elePt)  #%(elePt[iWP], elePhi[iWP], elePt[iWP])#
+      elePt = "Max$(LepAll_pt*eleSel)"
+      eleMt = "Max$(LepAll_mt*eleSel)"
+      #eleMt = "Max$(sqrt(2*met*{pt}*(1 - cos(met_phi - LepAll_phi)))*(LepAll_pt == {pt}))".format(pt=elePt)  #%(elePt[iWP], elePhi[iWP], elePt[iWP])#
    
       plotDict = {\
          "elePt":{'var':elePt, "bins":[100,1,101], "decor":{"title": "Electron ID FoM Plot: %s_%s_%s"%(ID, selection, WP) ,"x":"Electron p_{T} / GeV" , "y":"Events" ,'log':[0,1,0]}},\
@@ -196,8 +193,8 @@ elif doPlots or doCutFlow:
    if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
       if doPlots:
          for canv in fomPlots['canvs']:
-            if not os.path.exists("%s/plots/%s/root"%(savedir, canv)): os.makedirs("%s/plots/%s/root"%(savedir, canv))
-            if not os.path.exists("%s/plots/%s/pdf"%(savedir, canv)): os.makedirs("%s/plots/%s/pdf"%(savedir, canv))
+            makeDir("%s/plots/%s/root"%(savedir, canv))
+            makeDir("%s/plots/%s/pdf"%(savedir, canv))
    
             if ID != "nMinus1":
                fomPlots['canvs'][canv][0].SaveAs("%s/plots/%s/eleID_FoM_%s_%s%s.png"%(savedir, canv, sel.name, canv, isoString))

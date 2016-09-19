@@ -3,11 +3,18 @@ import math
 from Workspace.DegenerateStopAnalysis.tools.degTools import CutClass, splitCutInPt
 from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import makeLine
 from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
+#from Workspace.DegenerateStopAnalysis.tools.bTagWeights import bTagWeights
 
 less = lambda var, val: "(%s < %s)"%(var,val)
 more = lambda var, val: "(%s > %s)"%(var,val)
 btw = lambda var, minVal, maxVal: "(%s > %s && %s < %s)"%(var, min(minVal, maxVal), var, max(minVal, maxVal))
 minAngle = lambda phi1, phi2 : "TMath::Min((2*pi) - abs({phi1}-{phi2}) , abs({phi1}-{phi2}))".format(phi1 = phi1, phi2 = phi2)  
+
+etaAcc = 2.5
+
+##bTagWeights
+#bWeightDict = bTagWeights('sf')
+#bTagString = bWeightDict['sr1_bjet'] #corresponds to bVeto
 
 #Signal regions
 def signalRegions(lepton, index = ""):
@@ -28,10 +35,6 @@ def signalRegions(lepton, index = ""):
       'SR1b':["SR1b",   combineCuts("LepAll_pdgId[" + ind + "] == " + pdgId, btw("LepAll_mt[" + ind + "]", 60, 95), "LepAll_pt[" + ind + "] < 30")],
       'SR1c':["SR1c",   combineCuts("LepAll_mt[" + ind + "] > 95", "LepAll_pt[" + ind + "] < 30")],
 
-      'SRL1':["SRL1", btw("LepAll_pt[" + ind + "]", 5, 12)],
-      'SRH1':["SRH1", btw("LepAll_pt[" + ind + "]", 12, 20)],
-      'SRV1':["SRV1", btw("LepAll_pt[" + ind + "]", 20, 30)],
-
       'SRL1a':["SRL1a", combineCuts("LepAll_pdgId[" + ind + "] == " + pdgId, "LepAll_mt[" + ind + "] < 60", btw("LepAll_pt[" + ind + "]", 5, 12))],
       'SRH1a':["SRH1a", combineCuts("LepAll_pdgId[" + ind + "] == " + pdgId, "LepAll_mt[" + ind + "] < 60", btw("LepAll_pt[" + ind + "]", 12, 20))],
       'SRV1a':["SRV1a", combineCuts("LepAll_pdgId[" + ind + "] == " + pdgId, "LepAll_mt[" + ind + "] < 60", btw("LepAll_pt[" + ind + "]", 20, 30))],
@@ -44,7 +47,11 @@ def signalRegions(lepton, index = ""):
       'SRH1c':["SRH1c", combineCuts("LepAll_mt[" + ind + "] > 95", btw("LepAll_pt[" + ind + "]", 12, 20))],
       'SRV1c':["SRV1c", combineCuts("LepAll_mt[" + ind + "] > 95", btw("LepAll_pt[" + ind + "]", 20, 30))]}
 
-   SRs['SR1'] = ["SR1", "(" + SRs['SR1a'][1] + ") || (" + SRs['SR1b'][1] + ") || (" + SRs['SR1c'][1] + ")"]
+   SRs['SR1'] = ["SR1", "((" + SRs['SR1a'][1] + ") || (" + SRs['SR1b'][1] + ") || (" + SRs['SR1c'][1] + "))"]
+   
+   SRs['SRL1'] = ["SRL1", combineCuts(SRs['SR1'][1], btw("LepAll_pt[" + ind + "]", 5, 12))]
+   SRs['SRH1'] = ["SRH1", combineCuts(SRs['SR1'][1], btw("LepAll_pt[" + ind + "]", 12, 20))]
+   SRs['SRV1'] = ["SRV1", combineCuts(SRs['SR1'][1], btw("LepAll_pt[" + ind + "]", 20, 30))]
 
    return SRs
 

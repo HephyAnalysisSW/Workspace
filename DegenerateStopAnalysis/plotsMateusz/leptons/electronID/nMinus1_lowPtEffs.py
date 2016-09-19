@@ -5,6 +5,7 @@
 import ROOT
 import os, sys
 import Workspace.DegenerateStopAnalysis.toolsMateusz.ROOToptions
+from Workspace.DegenerateStopAnalysis.tools.degTools import makeDir
 from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from array import array
 from math import pi, sqrt #cos, sin, sinh, log
@@ -26,7 +27,14 @@ ROOT.gStyle.SetOptStat(0) #removes histogram statistics box
 #Arguments 
 save = args.save
 
-filedir = "/afs/hephy.at/user/m/mzarucki/www/plots/electronID/nMinus1/histogramCounts"
+tag = "8012_mAODv2_v3/80X_postProcessing_v10"
+filedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/electronID/nMinus1/histogramCounts"%tag
+   
+if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
+   savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/electronID/nMinus1/lowPtEffs"%tag
+
+   makeDir(savedir + "/root")
+   makeDir(savedir + "/pdf")
 
 dummy = []
 
@@ -141,14 +149,8 @@ for sample in allSamples:
    c1.Modified()
    c1.Update()
    
-   #Write to file
+   #Save
    if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
-      savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/electronID/nMinus1/lowPtEffs"
- 
-      if not os.path.exists(savedir + "/root"): os.makedirs(savedir + "/root")
-      if not os.path.exists(savedir + "/pdf"): os.makedirs(savedir + "/pdf")
-   
-      #Save to Web
       c1.SaveAs(savedir + "/nMinus1_lowPtEffs_%s.png"%(sample))
       c1.SaveAs(savedir + "/root/nMinus1_lowPtEffs_%s.root"%(sample))
       c1.SaveAs(savedir + "/pdf/nMinus1_lowPtEffs_%s.pdf"%(sample))

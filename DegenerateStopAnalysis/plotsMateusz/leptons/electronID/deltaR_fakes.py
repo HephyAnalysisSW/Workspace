@@ -4,30 +4,17 @@
 
 import ROOT
 import os, sys
+import argparse
 import Workspace.DegenerateStopAnalysis.toolsMateusz.ROOToptions
-from Workspace.DegenerateStopAnalysis.toolsMateusz.cmgTuplesPostProcessed_mAODv2 import cmgTuplesPostProcessed
-from Workspace.DegenerateStopAnalysis.toolsMateusz.getSamples_PP_mAODv2_7412pass2_scan import getSamples
 from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
-from Workspace.DegenerateStopAnalysis.toolsMateusz.degTools import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.eleWPs import *
+from Workspace.DegenerateStopAnalysis.toolsMateusz.regions import *
+from Workspace.DegenerateStopAnalysis.tools.degTools import *
+from Workspace.DegenerateStopAnalysis.tools.getSamples_8012 import getSamples
+from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesPostProcessed_mAODv2_2016 import cmgTuplesPostProcessed
 from array import array
 from math import pi, sqrt #cos, sin, sinh, log
-import argparse
-
-#Samples
-privateSignals = ["s10FS", "s30", "s30FS", "s60FS", "t2tt30FS"]
-backgrounds=["w","tt", "z","qcd"]
-
-samplesList = backgrounds # + privateSignals
-samples = getSamples(sampleList=samplesList, scan=True, useHT=True, getData=False)#, cmgPP=cmgPP) 
-
-officialSignals = ["s300_290", "s300_270", "s300_240"] #FIXME: crosscheck if these are in allOfficialSignals
-
-allOfficialSignals = samples.massScanList()
-#allOfficialSignals = [s for s in samples if samples[s]['isSignal'] and not samples[s]['isData'] and s not in privateSignals and s not in backgrounds] 
-allSignals = privateSignals + allOfficialSignals
-allSamples = allSignals + backgrounds
 
 #Input options
 parser = argparse.ArgumentParser(description="Input options")
@@ -56,6 +43,22 @@ save = args.save
 #if ID == "iso": isolation = args.iso
 #nEles = "01" # 01,01tau,1,2 #Number of electrons in event
 
+#Samples
+privateSignals = ["s10FS", "s30", "s30FS", "s60FS", "t2tt30FS"]
+backgrounds=["w","tt", "z","qcd"]
+
+samplesList = backgrounds # + privateSignals
+
+cmgPP = cmgTuplesPostProcessed()
+samples = getSamples(cmgPP = cmgPP, skim = 'preIncLep', sampleList = samplesList, scan = False, useHT = True, getData = False)
+
+officialSignals = ["s300_290", "s300_270", "s300_240"] #FIXME: crosscheck if these are in allOfficialSignals
+
+allOfficialSignals = samples.massScanList()
+#allOfficialSignals = [s for s in samples if samples[s]['isSignal'] and not samples[s]['isData'] and s not in privateSignals and s not in backgrounds] 
+allSignals = privateSignals + allOfficialSignals
+allSamples = allSignals + backgrounds
+
 print makeLine()
 print "Samples:"
 newLine()
@@ -67,6 +70,14 @@ else:
    print "!!! Sample " + sample + " unavailable."
    sys.exit(0)
 print makeLine()
+
+#Write to file
+if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
+   tag = samples[samples.keys()[0]].dir.split('/')[7] + "/" + samples[samples.keys()[0]].dir.split('/')[8]
+   savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/electronID/fakes/deltaR"%tag
+   
+   makeDir(savedir + "/root")
+   makeDir(savedir + "/pdf")
 
 #Geometric divisions
 ebSplit = 0.8 #barrel is split into two regions
@@ -108,24 +119,23 @@ genSel = "(abs(genLep_pdgId[0]) == 11 && abs(genLep_eta[0]) < " + str(etaAcc) + 
 #genSel = nSel + "&&" + genSel1
 
 #Reconstructed electron selection
-
 etaAcc = 1.4442
 
-fakeEleSel = "(abs(LepGood_pdgId) == 11 && abs(LepGood_eta) < " + str(etaAcc) + " && " + eleIDsel['Loose'] + " && LepGood_relIso03 < 0.2 && LepGood_miniRelIso < 0.1 && LepGood_mcMatchId == 0)"
-#fakeEleSel2 = "abs(LepGood_pdgId) == 11 && abs(LepGood_eta) < " + str(etaAcc) + " && " + eleIDsel['Veto'] + " && LepGood_miniRelIso < 0.5 && LepGood_mcMatchId == 0"
+fakeEleSel = "(abs(LepAll_pdgId) == 11 && abs(LepAll_eta) < " + str(etaAcc) + " && " + eleIDsel['Loose'] + " && LepAll_relIso03 < 0.2 && LepAll_miniRelIso < 0.1 && LepAll_mcMatchId == 0)"
+#fakeEleSel2 = "abs(LepAll_pdgId) == 11 && abs(LepAll_eta) < " + str(etaAcc) + " && " + eleIDsel['Veto'] + " && LepAll_miniRelIso < 0.5 && LepAll_mcMatchId == 0"
 
-fakeMt = "Max$(LepGood_mt*(" + fakeEleSel + "))"
-fakePt = "Max$(LepGood_pt*(" + fakeEleSel + "))"
-deltaR = "(sqrt((genLep_eta[0] - LepGood_eta)^2 + (genLep_phi[0] - LepGood_phi)^2)*" + fakeEleSel + ")" 
-ptRatio = "((LepGood_pt/genLep_pt[0])*" + fakeEleSel + ")"
-#deltaRjet = "Min$(sqrt((LepGood_eta[0] - Jet_eta)^2 + (LepGood_phi[0] - Jet_phi)^2))"
+fakeMt = "Max$(LepAll_mt*(" + fakeEleSel + "))"
+fakePt = "Max$(LepAll_pt*(" + fakeEleSel + "))"
+deltaR = "(sqrt((genLep_eta[0] - LepAll_eta)^2 + (genLep_phi[0] - LepAll_phi)^2)*" + fakeEleSel + ")" 
+ptRatio = "((LepAll_pt/genLep_pt[0])*" + fakeEleSel + ")"
+#deltaRjet = "Min$(sqrt((LepAll_eta[0] - Jet_eta)^2 + (LepAll_phi[0] - Jet_phi)^2))"
 
 fakes = CutClass("fakes", [
    ["MET200","met > 200"],
-   ["HT200","htJet30j > 200"],
+   ["HT200","ht_basJet > 200"],
    ["dPhi(j1234, MET)>0.3", "Min$(acos(cos(Jet_phi - met_phi)) > 0.3)"],
    #["dPhi(j1234, MET)>0.3", "Min$(" + minAngle("Jet_phi", "met_phi") + " > 0.3)"],
-   ["Jets>=1","nJet30 >= 1"], #nJet60
+   ["Jets>=1","nBasJet >= 1"], #nJet60
    ["fake", "Sum$(" + fakeEleSel + ") >= 1"],
    ["Mt>20", fakeMt + " > 20"],
    ["Pt<20", fakePt + " < 20"],
@@ -135,8 +145,8 @@ fakes = CutClass("fakes", [
 
    #["AntiQCD", " (deltaPhi_j12 < 2.5)"], # monojet
    #["ISR110","nJet110 >= 1" ],
-   #["TauElVeto","(Sum$(TauGood_idMVA) == 0) && (Sum$(abs(LepGood_pdgId) == 11 && abs(LepGood_eta) < " + str(etaAcc) + "&& LepGood_SPRING15_25ns_v1 == 1) == 0)"],
-   #["1Mu-2ndMu20Veto", "(nlep==1 || (nlep ==2 && LepGood_pt[looseMuonIndex2] < 20) )"],
+   #["TauElVeto","(Sum$(TauGood_idMVA) == 0) && (Sum$(abs(LepAll_pdgId) == 11 && abs(LepAll_eta) < " + str(etaAcc) + "&& LepAll_SPRING15_25ns_v1 == 1) == 0)"],
+   #["1Mu-2ndMu20Veto", "(nlep==1 || (nlep ==2 && LepAll_pt[looseMuonIndex2] < 20) )"],
    #["No3rdJet60","nJet60 <= 2"],
 
 ##################################################################################Canvas 1#############################################################################################
@@ -152,7 +162,7 @@ hists = {'deltaR':{}, 'ptRatio':{}}#, 'deltaRjet':{}}
 #cutSel = {}
 
 #for i,iWP in enumerate(WPs):
-#   cutSel[iWP] = "LepGood_SPRING15_25ns_v1 >= " + str(i+1)
+#   cutSel[iWP] = "LepAll_SPRING15_25ns_v1 >= " + str(i+1)
 
 variables = {'deltaR':deltaR, 'ptRatio':ptRatio}#, 'deltaRjet':deltaRjet} # 
 
@@ -206,62 +216,13 @@ for i,var in enumerate(variables.items()):
    ROOT.gPad.Modified()
    ROOT.gPad.Update()
    
-   #if i == 0: 
-   #   l1 = makeLegend()
-   #   #if var[0] == "deltaR": l1.AddEntry("DeltaR", "DeltaR", "F")
-   #   #elif var[0] == "ptRatio": l1.AddEntry("RatioPt", "RecoEle p_{T} / GenEle p_{T}", "F")
-   #   #elif var[0] == "deltaRjet": l1.AddEntry("DeltaRjet", "Min(dR_ele_jet)", "F")
-   #   l1.AddEntry(var[0] + "_Veto", "Veto ID", "F")
-   #   l1.AddEntry(var[0] + "_Loose", "Loose ID", "F")
-   #   l1.AddEntry(var[0] + "_Medium", "Medium ID", "F")
-   #   l1.AddEntry(var[0] + "_Tight", "Tight ID", "F")
-   
-   #Electron MVA IDs
-   #if mvaWPs:
-   #   mvaCuts = {'WP90':\
-   #             {'EB1_lowPt':-0.083313, 'EB2_lowPt':-0.235222, 'EE_lowPt':-0.67099, 'EB1':0.913286, 'EB2':0.805013, 'EE':0.358969},\
-   #              'WP80':\
-   #             {'EB1_lowPt':0.287435, 'EB2_lowPt':0.221846, 'EE_lowPt':-0.303263, 'EB1':0.967083, 'EB2':0.929117, 'EE':0.726311}}
-   #   
-   #   for iWP in mvaCuts.keys():
-   #      mvaSel = "(\
-   #      (LepGood_pt <= " + str(ptSplit) + " && abs(LepGood_eta) < " + str(ebSplit) + " && LepGood_mvaIdSpring15 >= " + str(mvaCuts[iWP]['EB1_lowPt']) + ") || \
-   #      (LepGood_pt <= " + str(ptSplit) + " && abs(LepGood_eta) >= " + str(ebSplit) + " && abs(LepGood_eta) < " + str(ebeeSplit) + " && LepGood_mvaIdSpring15 >= " + str(mvaCuts[iWP]['EB2_lowPt']) + ") || \
-   #      (LepGood_pt <= " + str(ptSplit) + " && abs(LepGood_eta) >= " + str(ebeeSplit) + " && abs(LepGood_eta) < " + str(etaAcc) + " && LepGood_mvaIdSpring15 >= " + str(mvaCuts[iWP]['EE_lowPt']) + ") || \
-   #      (LepGood_pt > " + str(ptSplit) + " && abs(LepGood_eta) < " + str(ebSplit) + " && LepGood_mvaIdSpring15 >= " + str(mvaCuts[iWP]['EB1']) + ") || \
-   #      (LepGood_pt > " + str(ptSplit) + " && abs(LepGood_eta) >= " + str(ebSplit) + " && abs(LepGood_eta) < " + str(ebeeSplit) + " && LepGood_mvaIdSpring15 >= " + str(mvaCuts[iWP]['EB2']) + ") || \
-   #      (LepGood_pt > " + str(ptSplit) + " && abs(LepGood_eta) >= " + str(ebeeSplit) + " && abs(LepGood_eta) < " + str(etaAcc) + " && LepGood_mvaIdSpring15 >= " + str(mvaCuts[iWP]['EE']) + "))"
-   #      hists[var[0]][iWP] = makeHist(samples[sample].tree, var[1], weight + "*(" + preSel + "&&" + genSel + "&&" + matchSel + "&&" + mvaSel + ")", nbins, xmax, xmin)
-   #      hists[var[0]][iWP].SetName(var[0] + "_" + iWP)
-   #      hists[var[0]][iWP].SetFillColor(0)
-   #      hists[var[0]][iWP].Draw("histsame")
-   #  
-   #   hists[var[0]]['WP90'].SetLineColor(ROOT.kMagenta+2)
-   #   hists[var[0]]['WP80'].SetLineColor(ROOT.kAzure+5)
-   #
-   #   ROOT.gPad.Modified()
-   #   ROOT.gPad.Update()
-   #   
-   #   if i == 0: 
-   #      l1.AddEntry(var[0] + "_WP90", "MVA ID (WP90)", "F")
-   #      l1.AddEntry(var[0] + "_WP80", "MVA ID (WP80)", "F")
-   
-   ROOT.gPad.Modified()
-   ROOT.gPad.Update()
-   
    #l1.Draw()
 
 c1.Modified()
 c1.Update()
 
-#Write to file
+#Save
 if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
-   savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/electronID/fakes/deltaR"
-   
-   if not os.path.exists(savedir + "/root"): os.makedirs(savedir + "/root")
-   if not os.path.exists(savedir + "/pdf"): os.makedirs(savedir + "/pdf")
-
-   #Save to Web
    c1.SaveAs(savedir + "/deltaR_%s.png"%(samples[sample].name))
    c1.SaveAs(savedir + "/pdf/deltaR_%s.pdf"%(samples[sample].name))
    c1.SaveAs(savedir + "/root/deltaR_%s.root"%(samples[sample].name))

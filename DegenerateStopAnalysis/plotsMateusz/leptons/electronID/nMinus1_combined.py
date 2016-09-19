@@ -5,12 +5,14 @@
 import ROOT
 import os, sys
 import Workspace.DegenerateStopAnalysis.toolsMateusz.ROOToptions
+from Workspace.DegenerateStopAnalysis.tools.degTools import makeDir
 from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from array import array
 from math import pi, sqrt #cos, sin, sinh, log
 import argparse
 
-filedir = "/afs/hephy.at/user/m/mzarucki/www/plots/electronID/nMinus1"
+tag = "8012_mAODv2_v3/80X_postProcessing_v10"
+filedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/electronID/nMinus1"%tag
 
 #Input options
 parser = argparse.ArgumentParser(description="Input options")
@@ -20,11 +22,11 @@ parser.add_argument("-b", dest="batch",  help="Batch Mode", action="store_true",
 #parser.add_argument("--mvaWPs", dest="mvaWPs",  help="Add MVA WPs", type=int, default=0) # includes MVA WPs
 #parser.add_argument("--iso", dest="iso",  help="Isolation", type=str, default="relIso03") #"relIso03" "relIso04" "miniRelIso" "relIsoAn04"
 args = parser.parse_args()
-#if not len(sys.argv) > 1:
-#   print makeLine()
-#   print "No arguments given. Using default settings."
-#   print makeLine()
-#   #exit()
+if not len(sys.argv) > 1:
+   print makeLine()
+   print "No arguments given. Using default settings."
+   print makeLine()
+   #exit()
 
 #Arguments
 #mvaWPs = args.mvaWPs # includes MVA WPs
@@ -148,8 +150,8 @@ for var in variables:
          if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
             savedir = filedir + "/variables/" + var + "/combined"
             
-            if not os.path.exists(savedir + "/root"): os.makedirs(savedir + "/root")
-            if not os.path.exists(savedir + "/pdf"): os.makedirs(savedir + "/pdf")
+            makeDir(savedir + "/root")
+            makeDir(savedir + "/pdf")
             
             #Save to Web
             c1.SaveAs(savedir + "/nMinus1_%s_%s%s.png"%(var, sample, z))

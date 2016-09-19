@@ -5,11 +5,13 @@
 import ROOT
 import os, sys
 import Workspace.DegenerateStopAnalysis.toolsMateusz.ROOToptions
+from Workspace.DegenerateStopAnalysis.tools.degTools import makeDir
 from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from array import array
 from math import pi, sqrt #cos, sin, sinh, log
 import argparse
 
+tag = "8012_mAODv2_v3/80X_postProcessing_v10"
 filedir = "/afs/hephy.at/user/m/mzarucki/www/plots/electronID/nMinus1"
 
 #Input options
@@ -38,7 +40,7 @@ variables = ["sigmaEtaEta", "dEta", "dPhi", "hOverE", "ooEmooP", "d0", "dz", "Mi
 privateSignals = ["S300_240Fast", "S300_270", "S300_270Fast", "S300_290Fast", "T2tt300_270Fast"]
 officialSignals = ["T2_4bd300_240", "T2_4bd300_270", "T2_4bd300_290"]
 backgrounds=["WJets", "TTJets", "ZJetsInv", "QCD"]
-signals = privateSignals# + officialSignals
+signals = privateSignals + officialSignals
 samples = signals + backgrounds
 
 print makeLine()
@@ -274,8 +276,8 @@ for var in variables:
             if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
                savedir = filedir + "/variables/" + var + "/full/" + plot
                
-               if not os.path.exists(savedir + "/root"): os.makedirs(savedir + "/root")
-               if not os.path.exists(savedir + "/pdf"): os.makedirs(savedir + "/pdf")
+               makeDir(savedir + "/root")
+               makeDir(savedir + "/pdf")
                
                #Save to Web
                c1.SaveAs(savedir + "/nMinus1_%s_%s_%s%s.png"%(plot, var, sample,z))
