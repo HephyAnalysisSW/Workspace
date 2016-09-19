@@ -1,0 +1,17 @@
+python -b ../ZinvEstimation.py --plot 0 --doYields 1 --beforeEmul 0 --afterEmul 1 --leptons 1 --peak 1 --getData 1 --btag sf --SR SR1 --CT2 75  --Zchannel Zmumu --lepEta 2.5 
+python -b ../ZinvEstimation.py --plot 0 --doYields 1 --beforeEmul 0 --afterEmul 1 --leptons 1 --peak 1 --getData 1 --btag sf --SR SR1 --CT2 100 --Zchannel Zmumu --lepEta 2.5 
+python -b ../ZinvEstimation.py --plot 0 --doYields 1 --beforeEmul 0 --afterEmul 1 --leptons 1 --peak 1 --getData 1 --btag sf --SR SR1 --CT2 125 --Zchannel Zmumu --lepEta 2.5 
+python -b ../ZinvEstimation.py --plot 0 --doYields 1 --beforeEmul 0 --afterEmul 1 --leptons 1 --peak 1 --getData 1 --btag sf --SR SR1 --CT2 150 --Zchannel Zmumu --lepEta 2.5 
+python -b ../ZinvEstimation.py --plot 0 --doYields 1 --beforeEmul 0 --afterEmul 1 --leptons 1 --peak 1 --getData 1 --btag sf --SR SR1 --CT2 175 --Zchannel Zmumu --lepEta 2.5 
+python -b ../ZinvEstimation.py --plot 0 --doYields 1 --beforeEmul 0 --afterEmul 1 --leptons 1 --peak 1 --getData 1 --btag sf --SR SR1 --CT2 200 --Zchannel Zmumu --lepEta 2.5 
+python -b ../ZinvEstimation.py --plot 0 --doYields 1 --beforeEmul 0 --afterEmul 1 --leptons 1 --peak 1 --getData 1 --btag sf --SR SR1 --CT2 250 --Zchannel Zmumu --lepEta 2.5 
+python -b ../ZinvEstimation.py --plot 0 --doYields 1 --beforeEmul 0 --afterEmul 1 --leptons 1 --peak 1 --getData 1 --btag sf --SR SR1 --CT2 300 --Zchannel Zmumu --lepEta 2.5 
+
+python -b ../ZinvEstimation.py --plot 0 --doYields 1 --beforeEmul 0 --afterEmul 1 --leptons 1 --peak 1 --getData 1 --btag sf --SR SR1 --CT2 75  --Zchannel Zmumu --lepEta 1.5 
+python -b ../ZinvEstimation.py --plot 0 --doYields 1 --beforeEmul 0 --afterEmul 1 --leptons 1 --peak 1 --getData 1 --btag sf --SR SR1 --CT2 100 --Zchannel Zmumu --lepEta 1.5 
+python -b ../ZinvEstimation.py --plot 0 --doYields 1 --beforeEmul 0 --afterEmul 1 --leptons 1 --peak 1 --getData 1 --btag sf --SR SR1 --CT2 125 --Zchannel Zmumu --lepEta 1.5 
+python -b ../ZinvEstimation.py --plot 0 --doYields 1 --beforeEmul 0 --afterEmul 1 --leptons 1 --peak 1 --getData 1 --btag sf --SR SR1 --CT2 150 --Zchannel Zmumu --lepEta 1.5 
+python -b ../ZinvEstimation.py --plot 0 --doYields 1 --beforeEmul 0 --afterEmul 1 --leptons 1 --peak 1 --getData 1 --btag sf --SR SR1 --CT2 175 --Zchannel Zmumu --lepEta 1.5 
+python -b ../ZinvEstimation.py --plot 0 --doYields 1 --beforeEmul 0 --afterEmul 1 --leptons 1 --peak 1 --getData 1 --btag sf --SR SR1 --CT2 200 --Zchannel Zmumu --lepEta 1.5 
+python -b ../ZinvEstimation.py --plot 0 --doYields 1 --beforeEmul 0 --afterEmul 1 --leptons 1 --peak 1 --getData 1 --btag sf --SR SR1 --CT2 250 --Zchannel Zmumu --lepEta 1.5 
+python -b ../ZinvEstimation.py --plot 0 --doYields 1 --beforeEmul 0 --afterEmul 1 --leptons 1 --peak 1 --getData 1 --btag sf --SR SR1 --CT2 300 --Zchannel Zmumu --lepEta 1.5 

@@ -1,0 +1,2 @@
+python -b ../ZinvEstimation_MuMu_loop.py --peak 1
+python -b ../ZinvEstimation_MuMu_loop.py --peak 0
