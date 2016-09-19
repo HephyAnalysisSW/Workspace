@@ -1,0 +1,17 @@
+python -b ../ZinvSystematics.py --makeTables 1 --SR SR1 
+python -b ../ZinvSystematics.py --makeTables 1 --SR SR1a 
+python -b ../ZinvSystematics.py --makeTables 1 --SR SR1b
+python -b ../ZinvSystematics.py --makeTables 1 --SR SR1c
+python -b ../ZinvSystematics.py --makeTables 1 --SR SRL1
+python -b ../ZinvSystematics.py --makeTables 1 --SR SRH1
+python -b ../ZinvSystematics.py --makeTables 1 --SR SRV1
+
+python -b ../ZinvSystematics.py --makeTables 1 --SR SRL1a
+python -b ../ZinvSystematics.py --makeTables 1 --SR SRH1a
+python -b ../ZinvSystematics.py --makeTables 1 --SR SRV1a
+python -b ../ZinvSystematics.py --makeTables 1 --SR SRL1b
+python -b ../ZinvSystematics.py --makeTables 1 --SR SRH1b
+python -b ../ZinvSystematics.py --makeTables 1 --SR SRV1b
+python -b ../ZinvSystematics.py --makeTables 1 --SR SRL1c
+python -b ../ZinvSystematics.py --makeTables 1 --SR SRH1c
+python -b ../ZinvSystematics.py --makeTables 1 --SR SRV1c

@@ -1,0 +1,2 @@
+python -b ../QCDestimation_el.py --estimation 0 --plot 0 --highWeightVeto 0 --btag sf 
+python -b ../QCDestimation_mu.py --estimation 0 --plot 0 --highWeightVeto 0 --btag sf 
