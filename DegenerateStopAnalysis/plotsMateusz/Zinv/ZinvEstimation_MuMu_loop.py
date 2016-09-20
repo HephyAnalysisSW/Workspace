@@ -95,10 +95,10 @@ if save: #web address: http://www.hephy.at/user/mzarucki/plots
    #
    #suffix1 = "_" + SR
    #suffix2 = suffix1 + "_" + CT2cut
-
-   #if peak: 
-   #   suffix1 = "_peak"
-   #   suffix2 = "_peak"
+   suffix = ""
+   
+   if peak: 
+      suffix += "_peak"
    #   savedir1 += "/peak"
    #   savedir2 += "/peak"
 
@@ -243,7 +243,7 @@ for samp in samples:
 
    for i in range(nListEntries):
       #print "eList index", i
-      if i == 50000: break
+      #if i == 50000: break
    
       samples[samp].tree.GetEntry(eList.GetEntry(i))
       #TTree:GetEntry(entry) = Read all branches of entry and return total number of bytes read. The function returns the number of bytes read from the input buffer. If entry does not exist the function returns 0. If an I/O error occurs, the function returns -1.
@@ -339,26 +339,32 @@ for samp in samples:
       hists[samp]['MET2'].Fill(MET2.P(), totalWeight)
       hists[samp]['MET2_phi'].Fill(MET2.Phi(), totalWeight)
    
-      if ((nEl == 1 and ele1_pt < 30) or (nEl == 2 and ele1_pt < 30 and ele2_pt < 20)) and (nMu == 2 or (nMu == 3 and muon3_pt < 20)): hists[samp]['elePt'].Fill(ele1_pt) 
-      if ((nMu == 3 and muon3_pt < 30) or (nMu == 4 and muon3_pt < 30 and muon4_pt < 20)) and (nEl == 0 or (nEl == 1 and ele1_pt < 20)): hists[samp]['muPt'].Fill(muon3_pt)
+      if ((nEl == 1 and ele1_pt < 30) or (nEl == 2 and ele1_pt < 30 and ele2_pt < 20)) and (nMu == 2 or (nMu == 3 and muon3_pt < 20)): hists[samp]['elePt'].Fill(ele1_pt, totalWeight) 
+      if ((nMu == 3 and muon3_pt < 30) or (nMu == 4 and muon3_pt < 30 and muon4_pt < 20)) and (nEl == 0 or (nEl == 1 and ele1_pt < 20)): hists[samp]['muPt'].Fill(muon3_pt, totalWeight)
 
 for hist in hists['dy']:
    canvs[hist] = ROOT.TCanvas("canv_" + hist , "Canvas " + hist, 1800, 1500)
    for samp in samples: 
       hists[samp][hist].SetName(hist)
-      hists[samp][hist].SetTitle(hist + " Plot")
+      hists[samp][hist].SetTitle("Zinv Estimation (Z->#mu#mu) " +hist + " Plot")
       hists[samp][hist].GetXaxis().SetTitle(hist)
       hists[samp][hist].SetFillColor(samples[samp].color)
+      hists[samp][hist].SetMaximum(100000)
       #hist.SetLineColor(ROOT.kBlack)
       #hist.SetLineWidth(3)
-      hists[hist].Draw('hist same')
-
+      
+      if not samples[samp].isData: 
+         hists[samp][hist].Draw('hist same')
+      else: 
+         hists[samp][hist].SetMarkerStyle(ROOT.kCircle)
+         hists[samp][hist].Draw("P same")
+      
       if logy: ROOT.gPad.SetLogy()
       ROOT.gPad.Modified()
       ROOT.gPad.Update()
 
 #Save canvas
    if save: #web address: http://www.hephy.at/user/mzarucki/plots
-      canvs[hist].SaveAs("%s/%s.png"%(savedir, hist))
-      canvs[hist].SaveAs("%s/root/%s.root"%(savedir, hist))
-      canvs[hist].SaveAs("%s/pdf/%s.pdf"%(savedir, hist))
+      canvs[hist].SaveAs("%s/%s%s.png"%(savedir, hist, suffix))
+      canvs[hist].SaveAs("%s/root/%s%s.root"%(savedir, hist, suffix))
+      canvs[hist].SaveAs("%s/pdf/%s%s.pdf"%(savedir, hist, suffix))

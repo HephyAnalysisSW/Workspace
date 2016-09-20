@@ -147,7 +147,7 @@ for samp in samplesList:
             print "Number of PPS events in bin", bin, ":", nBin['pps'][bin] 
          print makeLine()
    
-   if nBin['pps'][bin]/nBin['cmg'][bin] == 1: 
+   if nPPs/nCMG == 1: 
       #print "Total number of Events @ CMG: ", nCMG
       #print "Total number of Events @ PPS: ", nPPS, 
       #if compareBins: print "Total number of Events @ PPS (x-check): ", nPPS2  
