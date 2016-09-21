@@ -12,8 +12,8 @@ import pickle
 ppsDir = '/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/8012_mAODv2_v3/80X_postProcessing_v10/analysisHephy_13TeV_2016_v0/step1'
 
 mc_path     = ppsDir + "/RunIISpring16MiniAODv2_v3"
-signal_path = ppsDir + "/RunIISpring16MiniAODv2_v3"
 data_path   = ppsDir + "/Data2016_v3"
+signal_path = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/8012_mAODv2_v3_1/80X_postProcessing_v10_1/analysisHephy_13TeV_2016_v0/step1/RunIISpring16MiniAODv2_v3" 
 
 # Lumi that was used in the weight calculation of PostProcessing in pb-1
 lumi_mc = 10000.
