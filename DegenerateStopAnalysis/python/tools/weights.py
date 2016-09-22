@@ -109,27 +109,36 @@ class Weights():
             def_weights["cuts"]=dict( [ (sf, (sf, make_match_func(sf))  )  for sf in sf_to_btag.keys()  ])
 
         if str(lhe):
-            lhe_order ={0: 'Q2central_central',
-                        1: 'Q2up_central',
-                        2: 'Q2down_central',
-                        3: 'Q2central_up',
-                        4: 'Q2up_up',
-                        5: 'Q2down_up',
-                        6: 'Q2central_down',
-                        7: 'Q2up_down',
-                        8: 'Q2down_down'}
+            lhe_order ={1: 'Q2central_central',
+                        2: 'Q2up_central',
+                        3: 'Q2down_central',
+                        4: 'Q2central_up',
+                        5: 'Q2up_up',
+                        6: 'Q2down_up',
+                        7: 'Q2central_down',
+                        8: 'Q2up_down',
+                        9: 'Q2down_down'}
+
+            lhenorms = {'Q2central_central': '(1.000e+00 + ( 6.359e-14 * (GenSusyMStop)) + ( -5.897e-17 * (GenSusyMStop)*(GenSusyMStop) ) )  ',
+             'Q2central_down': '(9.394e-01 + ( -1.747e-04 * (GenSusyMStop)) + ( 9.838e-08 * (GenSusyMStop)*(GenSusyMStop) ) )  ',
+             'Q2central_up': '(1.062e+00 + ( 1.817e-04 * (GenSusyMStop)) + ( -9.773e-08 * (GenSusyMStop)*(GenSusyMStop) ) )  ',
+             'Q2down_central': '(8.039e-01 + ( 9.310e-05 * (GenSusyMStop)) + ( -5.135e-08 * (GenSusyMStop)*(GenSusyMStop) ) )  ',
+             'Q2down_down': '(7.564e-01 + ( -6.149e-05 * (GenSusyMStop)) + ( 3.450e-08 * (GenSusyMStop)*(GenSusyMStop) ) )  ',
+             'Q2down_up': '(8.524e-01 + ( 2.537e-04 * (GenSusyMStop)) + ( -1.366e-07 * (GenSusyMStop)*(GenSusyMStop) ) )  ',
+             'Q2up_central': '(1.217e+00 + ( -1.113e-04 * (GenSusyMStop)) + ( 6.175e-08 * (GenSusyMStop)*(GenSusyMStop) ) )  ',
+             'Q2up_down': '(1.142e+00 + ( -3.070e-04 * (GenSusyMStop)) + ( 1.733e-07 * (GenSusyMStop)*(GenSusyMStop) ) )  ',
+             'Q2up_up': '(1.294e+00 + ( 9.238e-05 * (GenSusyMStop)) + ( -4.909e-08 * (GenSusyMStop)*(GenSusyMStop) ) )  '}
 
 
-
-            lhenorms = {'Q2central_central': '1.000 * exp(0.000e+00 * (GenSusyMStop)  )',
-             'Q2central_down': '0.312 * exp(9.930e-03 * (GenSusyMStop)  )',
-             'Q2central_up': '0.283 * exp(9.882e-03 * (GenSusyMStop)  )',
-             'Q2down_central': '0.305 * exp(9.799e-03 * (GenSusyMStop)  )',
-             'Q2down_down': '0.257 * exp(9.963e-03 * (GenSusyMStop)  )',
-             'Q2down_up': '0.234 * exp(9.915e-03 * (GenSusyMStop)  )',
-             'Q2up_central': '0.255 * exp(9.826e-03 * (GenSusyMStop)  )',
-             'Q2up_down': '0.373 * exp(9.903e-03 * (GenSusyMStop)  )',
-             'Q2up_up': '0.338 * exp(9.854e-03 * (GenSusyMStop)  )'}
+            #lhenorms = {'Q2central_central': '1.000 * exp(0.000e+00 * (GenSusyMStop)  )',
+            # 'Q2central_down': '0.312 * exp(9.930e-03 * (GenSusyMStop)  )',
+            # 'Q2central_up': '0.283 * exp(9.882e-03 * (GenSusyMStop)  )',
+            # 'Q2down_central': '0.305 * exp(9.799e-03 * (GenSusyMStop)  )',
+            # 'Q2down_down': '0.257 * exp(9.963e-03 * (GenSusyMStop)  )',
+            # 'Q2down_up': '0.234 * exp(9.915e-03 * (GenSusyMStop)  )',
+            # 'Q2up_central': '0.255 * exp(9.826e-03 * (GenSusyMStop)  )',
+            # 'Q2up_down': '0.373 * exp(9.903e-03 * (GenSusyMStop)  )',
+            # 'Q2up_up': '0.338 * exp(9.854e-03 * (GenSusyMStop)  )'}
             
             lhenorm = lhenorms[lhe_order[lhe]]
             #lhenorm = "(1)"

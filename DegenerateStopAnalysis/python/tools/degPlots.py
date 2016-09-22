@@ -279,7 +279,8 @@ class DegPlots():
         
         self.nminus1s=   {
                             "met":          ["",""]   , 
-                            "mt":           ["mt"]   , 
+                            "Lepmt":           ["mt"]   , 
+                            "LepmtSR":           ["SR1c"]   , 
                             "ht":           ["ht","CT"]   , 
                             "ct":           ["CT"]   , 
                             "{lep}Phi".format(**fargs) :       [""]   , 

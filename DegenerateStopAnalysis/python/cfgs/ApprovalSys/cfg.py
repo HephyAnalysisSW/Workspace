@@ -323,15 +323,15 @@ weights_params = {
 
 
 lhe_weights = {
-                0:  {'muR': 'central'     ,'muF':  'central'          } ,        ## <weight id="1001"> muR=1 muF=1 
-                1:  {'muR': 'central'     ,'muF':  'up'               } ,        ## <weight id="1002"> muR=1 muF=2 
-                2:  {'muR': 'central'     ,'muF':  'down'             } ,        ## <weight id="1003"> muR=1 muF=0.5 
-                3:  {'muR': 'up'          ,'muF':  'central'          } ,        ## <weight id="1004"> muR=2 muF=1 
-                4:  {'muR': 'up'          ,'muF':  'up'               } ,        ## <weight id="1005"> muR=2 muF=2 
-                5:  {'muR': 'up'          ,'muF':  'down'             } ,        ## <weight id="1006"> muR=2 muF=0.5 
-                6:  {'muR': 'down'        ,'muF':  'central'          } ,        ## <weight id="1007"> muR=0.5 muF=1 
-                7:  {'muR': 'down'        ,'muF':  'up'               } ,        ## <weight id="1008"> muR=0.5 muF=2 
-                8:  {'muR': 'down'        ,'muF':  'down'             } ,        ## <weight id="1009"> muR=0.5 muF=0.5 
+                1:  {'muR': 'central'     ,'muF':  'central'          } ,        ## <weight id="1001"> muR=1 muF=1 
+                2:  {'muR': 'central'     ,'muF':  'up'               } ,        ## <weight id="1002"> muR=1 muF=2 
+                3:  {'muR': 'central'     ,'muF':  'down'             } ,        ## <weight id="1003"> muR=1 muF=0.5 
+                4:  {'muR': 'up'          ,'muF':  'central'          } ,        ## <weight id="1004"> muR=2 muF=1 
+                5:  {'muR': 'up'          ,'muF':  'up'               } ,        ## <weight id="1005"> muR=2 muF=2 
+                6:  {'muR': 'up'          ,'muF':  'down'             } ,        ## <weight id="1006"> muR=2 muF=0.5 
+                7:  {'muR': 'down'        ,'muF':  'central'          } ,        ## <weight id="1007"> muR=0.5 muF=1 
+                8:  {'muR': 'down'        ,'muF':  'up'               } ,        ## <weight id="1008"> muR=0.5 muF=2 
+                9:  {'muR': 'down'        ,'muF':  'down'             } ,        ## <weight id="1009"> muR=0.5 muF=0.5 
               }
 
 for lhe_weight_num, muR_muF in lhe_weights.iteritems():

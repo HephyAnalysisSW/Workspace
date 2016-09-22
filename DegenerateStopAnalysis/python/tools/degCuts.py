@@ -419,19 +419,19 @@ class Cuts():
                                    ] , 
                           baseCut = self.sr2,
                           )
-        self.srl1c   = CutClass ("SR1c",    [
+        self.srl1c   = CutClass ("SRL1c",    [
                                        ["SR1c","{lepCol}_mt[{lepIndex}[0]]>{mt1}".format(lepCol=lepCollection, lepIndex=lepIndex, **mts)],
                                        ["SRL2",  btw("{lepCol}_pt[{lepIndex}[0]]".format(lepCol=lepCollection, lepIndex=lepIndex),5,12)    ],
                                    ] , 
                           baseCut = sr1c_baseCut,
                           )
-        self.srh1c   = CutClass ("SR1c",    [
+        self.srh1c   = CutClass ("SRH1c",    [
                                        ["SR1c","{lepCol}_mt[{lepIndex}[0]]>{mt1}".format(lepCol=lepCollection, lepIndex=lepIndex, **mts)],
                                        ["SRH2",  btw("{lepCol}_pt[{lepIndex}[0]]".format(lepCol=lepCollection, lepIndex=lepIndex),12,20)   ],
                                    ] , 
                           baseCut = sr1c_baseCut,
                           )
-        self.srv1c   = CutClass ("SR1c",    [
+        self.srv1c   = CutClass ("SRV1c",    [
                                        ["SR1c","{lepCol}_mt[{lepIndex}[0]]>{mt1}".format(lepCol=lepCollection, lepIndex=lepIndex, **mts)],
                                        ["SRV2",  btw("{lepCol}_pt[{lepIndex}[0]]".format(lepCol=lepCollection, lepIndex=lepIndex),20,30)   ],
                                    ] , 
