@@ -7,15 +7,19 @@ yield_temp = "/afs/hephy.at/work/n/nrad/results/cards_and_limits/8012_mAODv2_v3/
 
 
 
-qvars     ={1: 'Q2centralcentral',
-            2: 'Q2upcentral',
-            3: 'Q2downcentral',
-            4: 'Q2centralup',
-            5: 'Q2upup',
-            6: 'Q2downup',
-            7: 'Q2centraldown',
-            8: 'Q2updown',
-            9: 'Q2downdown'}
+qvars     ={
+                            1: 'Q2centralcentral'   ,        ## <weight id="1001"> muR=1 muF=1 
+                            2: 'Q2centralup'        ,        ## <weight id="1002"> muR=1 muF=2 
+                            3: 'Q2centraldown'      ,        ## <weight id="1003"> muR=1 muF=0.5 
+                            4: 'Q2upcentral'        ,   ## <weight id="1004"> muR=2 muF=1 
+                            5: 'Q2upup'             ,   ## <weight id="1005"> muR=2 muF=2 
+                            6: 'Q2updown'           ,   ## <weight id="1006"> muR=2 muF=0.5 
+                            7: 'Q2downcentral'      ,     ## <weight id="1007"> muR=0.5 muF=1 
+                            8: 'Q2downup'           ,     ## <weight id="1008"> muR=0.5 muF=2 
+                            9: 'Q2downdown'         ,     ## <weight id="1009"> muR=0.5 muF=0.5 
+                          }
+
+
 
 bins    =       [       'SRL1a', 'SRH1a', 'SRV1a',  'SR1a', 
                         'SRL1b', 'SRH1b', 'SRV1b',  'SR1b' ,
