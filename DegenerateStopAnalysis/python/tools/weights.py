@@ -109,17 +109,35 @@ class Weights():
             def_weights["cuts"]=dict( [ (sf, (sf, make_match_func(sf))  )  for sf in sf_to_btag.keys()  ])
 
         if str(lhe):
-            lhe_order ={1: 'Q2central_central',
-                        2: 'Q2up_central',
-                        3: 'Q2down_central',
-                        4: 'Q2central_up',
-                        5: 'Q2up_up',
-                        6: 'Q2down_up',
-                        7: 'Q2central_down',
-                        8: 'Q2up_down',
-                        9: 'Q2down_down'}
+            #lhe_order ={1: 'Q2central_central',
+            #            2: 'Q2up_central',
+            #            3: 'Q2down_central',
+            #            4: 'Q2central_up',
+            #            5: 'Q2up_up',
+            #            6: 'Q2down_up',
+            #            7: 'Q2central_down',
+            #            8: 'Q2up_down',
+            #            9: 'Q2down_down'}
 
-            lhenorms = {'Q2central_central': '(1.000e+00 + ( 6.359e-14 * (GenSusyMStop)) + ( -5.897e-17 * (GenSusyMStop)*(GenSusyMStop) ) )  ',
+            lhe_order = {
+                            1: 'Q2central_central'   ,        ## <weight id="1001"> muR=1 muF=1 
+                            2: 'Q2central_up'        ,        ## <weight id="1002"> muR=1 muF=2 
+                            3: 'Q2central_down'      ,        ## <weight id="1003"> muR=1 muF=0.5 
+                            4: 'Q2up_central'        ,   ## <weight id="1004"> muR=2 muF=1 
+                            5: 'Q2up_up'             ,   ## <weight id="1005"> muR=2 muF=2 
+                            6: 'Q2up_down'           ,   ## <weight id="1006"> muR=2 muF=0.5 
+                            7: 'Q2down_central'      ,     ## <weight id="1007"> muR=0.5 muF=1 
+                            8: 'Q2down_up'           ,     ## <weight id="1008"> muR=0.5 muF=2 
+                            9: 'Q2down_down'         ,     ## <weight id="1009"> muR=0.5 muF=0.5 
+                          }
+
+
+
+
+
+            lhenorms = {
+             #'Q2central_central': '(1.000e+00 + ( 6.359e-14 * (GenSusyMStop)) + ( -5.897e-17 * (GenSusyMStop)*(GenSusyMStop) ) )  ',
+             'Q2central_central': '(1.0)',
              'Q2central_down': '(9.394e-01 + ( -1.747e-04 * (GenSusyMStop)) + ( 9.838e-08 * (GenSusyMStop)*(GenSusyMStop) ) )  ',
              'Q2central_up': '(1.062e+00 + ( 1.817e-04 * (GenSusyMStop)) + ( -9.773e-08 * (GenSusyMStop)*(GenSusyMStop) ) )  ',
              'Q2down_central': '(8.039e-01 + ( 9.310e-05 * (GenSusyMStop)) + ( -5.135e-08 * (GenSusyMStop)*(GenSusyMStop) ) )  ',

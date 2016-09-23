@@ -7,7 +7,7 @@ yield_temp = "/afs/hephy.at/work/n/nrad/results/cards_and_limits/8012_mAODv2_v3/
 
 
 
-qvars     ={#1: 'Q2centralcentral',
+qvars     ={1: 'Q2centralcentral',
             2: 'Q2upcentral',
             3: 'Q2downcentral',
             4: 'Q2centralup',
@@ -37,15 +37,17 @@ sigList = [ qyields[qvar].sampleNames[samp] for samp in qyields[qvar].sigList]
 
 
 qpairs = [
-           #( 'Q2centralup' , 'Q2centraldown'  )  ,
+           ( 'Q2centralup' , 'Q2centraldown'  )  ,
            ( 'Q2upcentral' , 'Q2downcentral'  )  ,
            ( 'Q2updown'    , 'Q2downup'  )          ,
           ]
 
-ycen = qyieldDicts['Q2upup']
+ycen = qyieldDicts['Q2centralcentral']
 systs = {}
+syst_env ={}
 for sig in sigList:
     systs [sig]={}
+    syst_env[sig]={}
     for b in bins:
         systs[sig][b]=[]
         for iv, ( var1, var2 ) in enumerate( qpairs):
@@ -57,12 +59,12 @@ for sig in sigList:
             relsys2 = 100 *  abs(1-(y2/yc).val) if yc.val else 0
             averel  = 0.5 * (relsys1 + relsys2 )
             systs[sig][b].append(averel)
-
+        syst_env[sig][b] = max( systs[sig][b] )
 
 
 systs_range_samples={}
 for b in bins:
-    mins = min([ (systs[sig][b], sig) for sig in sigList])
-    maxs = max([ (systs[sig][b], sig) for sig in sigList])
-    systs_range[b] = [mins, maxs]
+    mins = min([ (syst_env[sig][b], sig) for sig in sigList])
+    maxs = max([ (syst_env[sig][b], sig) for sig in sigList])
+    systs_range_samples[b] = [mins, maxs]
     
