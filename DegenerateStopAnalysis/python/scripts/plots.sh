@@ -62,33 +62,33 @@
 
 
 
-python  degStop.py  --cfg=Approval  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=presel  --plot=Lepmt
-python  degStop.py  --cfg=Approval  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=presel  --plot=ht
-python  degStop.py  --cfg=Approval  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=presel  --plot=ct
-python  degStop.py  --cfg=Approval  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=presel  --plot=met
-python  degStop.py  --cfg=Approval  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=presel  --plot=LepmtSR
-python  degStop.py  --cfg=Approval  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=presel  --plot=nHardBJets
-python  degStop.py  --cfg=Approval  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=presel  --plot=LepPt
-python  degStop.py  --cfg=Approval  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=presel  --plot=nJets60
-python  degStop.py  --cfg=Approval  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=presel  --plot=MetPhi
-python  degStop.py  --cfg=Approval  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=presel  --plot=nVert
-python  degStop.py  --cfg=Approval  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=presel  --plot=isrPt
-python  degStop.py  --cfg=Approval  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=presel  --plot=nJets30
-python  degStop.py  --cfg=Approval  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=presel  --plot=nJets60_2
-python  degStop.py  --cfg=Approval  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=presel  --plot=nJets30_2
-python  degStop.py  --cfg=Approval  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=presel  --plot=nBJets
-python  degStop.py  --cfg=Approval  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=presel  --plot=bSoftJetPt
-python  degStop.py  --cfg=Approval  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=presel  --plot=nSoftBJets
-python  degStop.py  --cfg=Approval  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=presel  --plot=LepEta
-python  degStop.py  --cfg=Approval  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=presel  --plot=nBJetsWeight
-python  degStop.py  --cfg=Approval  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=presel  --plot=isrPt_fine
-python  degStop.py  --cfg=Approval  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=presel  --plot=bJetPt
-python  degStop.py  --cfg=Approval  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=presel  --plot=isrPt2
-python  degStop.py  --cfg=Approval  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=presel  --plot=LepPtSR
-python  degStop.py  --cfg=Approval  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=presel  --plot=LepPhi
-python  degStop.py  --cfg=Approval  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=presel  --plot=nSoftBJetsWeight
-python  degStop.py  --cfg=Approval  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=presel  --plot=bHardJetPt
-python  degStop.py  --cfg=Approval  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=presel  --plot=nHardBJetsWeight
+python  degStop.py  --cfg=ApprovalSys  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=presel  --plot=Lepmt
+python  degStop.py  --cfg=ApprovalSys  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=presel  --plot=ht
+python  degStop.py  --cfg=ApprovalSys  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=presel  --plot=ct
+python  degStop.py  --cfg=ApprovalSys  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=presel  --plot=met
+python  degStop.py  --cfg=ApprovalSys  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=presel  --plot=LepmtSR
+python  degStop.py  --cfg=ApprovalSys  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=presel  --plot=nHardBJets
+python  degStop.py  --cfg=ApprovalSys  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=presel  --plot=LepPt
+python  degStop.py  --cfg=ApprovalSys  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=presel  --plot=nJets60
+python  degStop.py  --cfg=ApprovalSys  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=presel  --plot=MetPhi
+python  degStop.py  --cfg=ApprovalSys  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=presel  --plot=nVert
+python  degStop.py  --cfg=ApprovalSys  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=presel  --plot=isrPt
+python  degStop.py  --cfg=ApprovalSys  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=presel  --plot=nJets30
+python  degStop.py  --cfg=ApprovalSys  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=presel  --plot=nJets60_2
+python  degStop.py  --cfg=ApprovalSys  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=presel  --plot=nJets30_2
+python  degStop.py  --cfg=ApprovalSys  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=presel  --plot=nBJets
+python  degStop.py  --cfg=ApprovalSys  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=presel  --plot=bSoftJetPt
+python  degStop.py  --cfg=ApprovalSys  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=presel  --plot=nSoftBJets
+python  degStop.py  --cfg=ApprovalSys  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=presel  --plot=LepEta
+python  degStop.py  --cfg=ApprovalSys  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=presel  --plot=nBJetsWeight
+python  degStop.py  --cfg=ApprovalSys  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=presel  --plot=isrPt_fine
+python  degStop.py  --cfg=ApprovalSys  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=presel  --plot=bJetPt
+python  degStop.py  --cfg=ApprovalSys  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=presel  --plot=isrPt2
+python  degStop.py  --cfg=ApprovalSys  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=presel  --plot=LepPtSR
+python  degStop.py  --cfg=ApprovalSys  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=presel  --plot=LepPhi
+python  degStop.py  --cfg=ApprovalSys  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=presel  --plot=nSoftBJetsWeight
+python  degStop.py  --cfg=ApprovalSys  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=presel  --plot=bHardJetPt
+python  degStop.py  --cfg=ApprovalSys  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=presel  --plot=nHardBJetsWeight
 
 
 #python  degStop.py  --cfg=PreApp  --btag=sf  --task=data  --lepCol=LepAll  --lep=lep  --weight=pu  --cut=sr1  --plot=MetPhi

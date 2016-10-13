@@ -1,3 +1,13 @@
+"""
+To be used after having ran, BkgSysts/Systematics.py, results.py 
+
+Run after running 
+
+
+
+
+"""
+
 import Workspace.DegenerateStopAnalysis.tools.limitTools as limitTools
 from Workspace.DegenerateStopAnalysis.tools.degTools import makeDir , getMasses
 from copy import deepcopy
@@ -5,7 +15,7 @@ import multiprocessing
 
 
 
-prefix      = "CRSystFix_v0"
+prefix      = "SigWMassCorr_v2"
 #postfix     = "13TeV_RunII2016_12p9fbm1"
 postfix     = ""
 #limit_pkl    = 
@@ -65,22 +75,43 @@ fastfull_sfs={
               },
             }
 
-
+applyGenWSignalCorr = True
+if applyGenWSignalCorr:
+    corrFactDir = base_res_dir.replace("_SF","_BTAG_mcMatch").replace("LepAll","LepGood").replace("lep","mu")  ## cor factors based on LepGood(no mcMatch for lepall) Mu( loose el selection in 74x) and NoPU noISR (not avail. in 74x)
+    yldMCmatchPkl = cfg.yieldPkls['presel_BinsSummary'].replace("_SF","_SF_mcMatch").replace("LepAll","LepGood")
+    yldMCmatch = pickle.load(file(yldMCmatchPkl)).getNiceYieldDict()
+    genWMassCorrFacts  = pickle.load(file(corrFactDir+"/SignalCorrFactors.pkl"))
+    
 applyFastFullSF = False
+
+raw_card_yields = {}
 for sig in sigList:
+    raw_card_yields[sig]={}
     card_yields[sig] = {} 
     print "-----------------------------------------------------", sig
+
     for b in bins:
         met_val     =  sig_yields_dict_met[sig][b]
         genmet_val  =  sig_yields_dict_genmet[sig][b]
         avemet_val  =  sig_yields_dict_avemet[sig][b]
-        factor      =  avemet_val/met_val if met_val.val else 1.
-        new_val      =  factor * mc_yields['PU_central'][sig][b]
+        genMETcorrFactor      =  avemet_val/met_val if met_val.val else 1.
+        new_val      =  genMETcorrFactor * mc_yields['PU_central'][sig][b]
 
-
-
-        print  '         ', b, "before: ", mc_yields['PU_central'][sig][b], "after: ", new_val, "factor: ", factor
-
+        raw_card_yields[sig][b] = u_float(new_val.val, new_val.sigma)
+        print  '         GenMETave: ', b, "before: ", mc_yields['PU_central'][sig][b], "after: ", new_val, "genmet factor: ", genMETcorrFactor
+        if applyGenWSignalCorr:
+            mstop, mlsp = getMasses(sig)
+            dm = mstop - mlsp
+            yld_mcmatch = yldMCmatch[sig][b] 
+            
+            if ( dm == 10 and ( 'SRL' in b )) or (dm == 20 and ('SR' in b)):
+                genWCorrFact = genWMassCorrFacts[b][dm]       
+                before_val   = new_val
+                #new_val      = before_val - yld_mcmatch*( u_float(1) - genWCorrFact )
+                genWCorrFactError = genWCorrFact.sigma * (yld_mcmatch.val/before_val.val) if before_val.val else genWCorrFact.sigma
+                new_val      = before_val - yld_mcmatch*( u_float(1) - u_float(genWCorrFact.val, genWCorrFactError  ))
+                #new_val      = before_val - yld_mcmatch*( 1.0 - genWCorrFact.val )
+                print  '        -- genWMass:  ', b, "before: ", before_val, "after: ", new_val, "corr factor: ",  genWCorrFact
         if applyFastFullSF:
             matched_bin = [  x for x in fastfull_sfs['el'].keys() if x in b ]
             assert len(matched_bin)==1
@@ -94,24 +125,27 @@ for sig in sigList:
         card_yields[sig][b] =  new_val
     #card_yields[sig] = deepcopy( sig_yields_dict[sig])
 for bkg in mc_bkg_list:
+    raw_card_yields[bkg] = deepcopy( mc_yields_dict[bkg] )
     card_yields[bkg] = deepcopy( mc_yields_dict[bkg] )
 for bkg in pred_bkg_list:
+    raw_card_yields[bkg] = deepcopy( pred_yields_dict[bkg] )
     card_yields[bkg] = deepcopy( pred_yields_dict[bkg] )
 
 #card_yields["Total"] = deepcopy( mc_yields_dict['Total'] )
 card_yields['Data']  = deepcopy( sig_yields_dict['DataBlind'] )
 
 pickle.dump( card_yields, open( base_res_dir+"/CardYields.pkl", 'w') )
+pickle.dump( raw_card_yields, open( base_res_dir+"/RawCardYields.pkl", 'w') )
 
 
 def makeSignalCard(sig):
     ret = limitTools.getLimit( 
-                card_yields , 
-                sig             = sig, 
+                card_yields                             , 
+                sig             = sig                   , 
                 outDir          = card_dir+"/Full"      ,      
-                postfix         = postfix       ,  
-                calc_limit      = False         , 
-                sys_pkl         = syst_pkl         ,
+                postfix         = postfix               ,  
+                calc_limit      = False                 , 
+                sys_pkl         = syst_pkl              ,
                 data            = 'Data'
             )
     mstop, mlsp = getMasses(sig)
@@ -239,17 +273,46 @@ print "To calc limits and draw and split into bins run the jobs in %s"%("%s.sh"%
 
 
 
+if applyGenWSignalCorr:
+
+    ROOT.gStyle.SetPaintTextFormat("0.2f")
+    latex = ROOT.TLatex()
+    latex.SetNDC()
+    latex.SetTextSize(0.04)
 
 
 
+    plts_raw = {}
+    plts_corr= {}
+    ratios   = {}
+    c1 = ROOT.TCanvas("c1","c1", 1400, 950)  
+    saveDir = cfg.saveDir +"/Results/%s/"%prefix
+    makeDir(saveDir)
+
+    for b in bins:
+        plts_raw[b]  = makeStopLSPPlot("RAW_%s"%b,raw_card_yields, bins= [ 23, 237.5, 812.5, 63, 167.5, 795] , key= lambda x:x[b].val, massFunc = getMasses2 )
+        plts_corr[b] = makeStopLSPPlot("CORR_%s"%b,card_yields   , bins= [ 23, 237.5, 812.5, 63, 167.5, 795] , key= lambda x:x[b].val, massFunc = getMasses2 )
+        ratios[b]=plts_corr[b].Clone("Ratio_%s"%b)
+        ratios[b].Divide(plts_raw[b])
+        plts_raw[b].Draw("COLZ TEXT")
+        latex.DrawLatex(0.2,0.7, "Yields (METAverage) %s"%b)
+        c1.SaveAs(saveDir+"YldsMETAve_%s.png"%(b))
+        plts_corr[b].Draw("COLZ TEXT")
+        latex.DrawLatex(0.2,0.7, "Yields (Gen W Corr.) %s"%b)
+        c1.SaveAs(saveDir+"YldsGenWCorr_%s.png"%(b))
+        ratios[b].Draw("COLZ TEXT")
+        latex.DrawLatex(0.2,0.7, "#frac{MET Ave}{Gen W Corr} %s"%b)
+        c1.SaveAs(saveDir+"RatioMETAVEoGenWCorr_%s.png"%(b))
 
 
+drawEffMap = False
+if drawEffMap:
 
+    c1 = ROOT.TCanvas("c2","c2", 1400, 950)  
+    saveDir = cfg.saveDir +"/EffMaps/%s/"%prefix
+    makeDir(saveDir)
 
-
-
-
-
-
+    for b in bins:
+       plts_raw[b]  = makeStopLSPPlot("RAW_%s"%b,raw_card_yields, bins= [ 23, 237.5, 812.5, 63, 167.5, 795] , key= lambda x:x[b].val, massFunc = getMasses2 ) 
 
 

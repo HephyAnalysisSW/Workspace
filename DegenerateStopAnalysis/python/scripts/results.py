@@ -2,7 +2,8 @@ import pickle
 import os
 #from Workspace.DegenerateStopAnalysis.tools.degTools import fixForLatex, dict_manipulator, Yield
 from Workspace.DegenerateStopAnalysis.tools.degTools import makeDir, fixForLatex , u_float, make_dict_manipulator , dict_manipulator, makeSimpleLatexTable, dict_operator, drawYields, setup_style#, dict_manipulator, Yield
-from Workspace.DegenerateStopAnalysis.scripts.BkgSysts.Systematics import regions, main_cr, main_sr, bins , card_bins, pt_srs , getPkl, tagParams, Systematics
+#from Workspace.DegenerateStopAnalysis.scripts.BkgSysts.Systematics import regions, main_cr, main_sr, bins , card_bins, pt_srs , getPkl, tagParams, Systematics
+from Workspace.DegenerateStopAnalysis.scripts.BkgSysts.Systematics import * 
 from copy import deepcopy
 import math
 import numpy
@@ -40,8 +41,8 @@ def addInQuad100PerctCorr(l):
 
 
 fixSystNameDict={
-                'ttPtShape': "CR/SF transf. fact. W",
-                'WPtShape' : "CR/SR transf. fact. tt",
+                'ttPtShape': "CR/SF transf. fact. tt",
+                'WPtShape' : "CR/SR transf. fact. W",
                 'ttpt'     : "tt $p_{T}$",
                 'WPt'      : "W $p_{T}$",
                 'jec'      : "JEC",
@@ -120,7 +121,8 @@ base_res_path = os.path.expandvars(base_res_path)
 bkg_est_path  = "%s/BkgEst"%base_res_path
 bkg_systs_path  = "%s/BkgSysts"%base_res_path
 sig_systs_path  = "%s/SigSysts"%base_res_path
-
+card_yields_path = base_res_path + "/CardYields.pkl"
+#card_yields  = pickle.load(
 
 dict_pkls = {
             'bkg_pred'      :"BkgPredWithVars.pkl"          ,
@@ -128,7 +130,8 @@ dict_pkls = {
             'card_systs'    :"SystDictForCards.pkl"         ,
             'syst_dict'     :"SystDict.pkl"                 ,   
             'bkg_mctruth'   :"YieldDictWithVars.pkl"        ,
-        }
+            'card_yields'   :"CardYields.pkl"               , 
+       }
 
 dicts={}
 for name, pkl in dict_pkls.iteritems():
@@ -140,9 +143,9 @@ yld = getPkl( base_res_path + "/YieldInsts/YieldInst_PU_central.pkl" )
 
 systs     = dicts['syst_dict']
 syst_list = dicts['syst_dict'].keys()
-corr_systs_original   = ['PU','jec' , 'jer', 'BTag_l', 'BTag_b' , 'lepEff', 'WPt', 'ttpt']
+corr_systs_original   = ['PU','jec' , 'jer', 'BTag_l', 'BTag_b' , 'lepEff', 'WPt', 'ttpt', 'WPol']
 uncorr_systs_original = ['WPtShape', 'ttPtShape', 'QCDEst', 'ZInvEst','STXSec', 'DYJetsM50XSec', 'DibosonXSec',  ]
-signal_systs          = ['Lumi', ]  
+#signal_systs          = ['Lumi', ]  
 #uncorr_systs_original =
 
 corr_systs_list = [x for x in corr_systs_original if x in syst_list ] 
@@ -151,8 +154,8 @@ uncorr_systs_list= [x for x in uncorr_systs_original if x in syst_list and not x
 
 
 
-sig_systs = ['jer','jec', 'PU', 'Lumi', 'Btag_b', 'BTag_l', 'lepEff', ] # QCD, FastSim/FullSim SF
-
+signal_systs = ['jer','jec', 'PU' , 'BTag_b', 'BTag_l', 'lepEff', 'Q2']
+#signal_systs = []
 
 yieldDictCentral = dicts['bkg_pred']['PU_central']
 sampleList       = [x for x in yieldDictCentral.keys() if "FOM" not in x]
@@ -290,9 +293,11 @@ for sampleType, info in sig_bkg_infos.iteritems():
 
     first_row = True
     result_table_list = []
+    result_table_list_comb = []
     for region in regions:
             if region == "\hline":
                 result_table_list.append([region])
+                result_table_list_comb.append([region])
                 continue
             if not 'SR' in region: 
                 continue
@@ -302,6 +307,10 @@ for sampleType, info in sig_bkg_infos.iteritems():
             toPrint = [
                           ["Region"     ,  fixForLatex( region )],
                       ]
+            toPrint2 = [
+                          ["Region"     ,  fixForLatex( region )],
+                      ]
+            addedOtherBkg = False
             for bkg in bkgTotList:
                 #toPrint.append( [bkg        ,   (yldsByBins[region][bkg]*SF).round(2).__str__()+"+-%s"%bkgSyst ]         ) 
                 bkgSystPerc     =    systs["Total_Systs"][bkg][region]
@@ -315,7 +324,19 @@ for sampleType, info in sig_bkg_infos.iteritems():
                 #toPrint.append( [bkg       ,   (centralVal).round(2).__str__()+"+-%s"%bkgSyst ]         ) 
                 #toPrint.append( [bkg        ,  round(centralValue,2), "+-%s"%round(stat,2), "+-%s"%round(syst,2) ]         ) 
                 toPrint.append( [bkg        ,  "%s"%round(centralValue,2)+ "+-%s"%round(stat,2)+ "+-%s"%round(syst,2) ]         ) 
-
+                #toPrint2.append(toPrint[-1])
+                if bkg in otherBkg:
+                    centralValueStat   = sum([yieldDictCentral[obkg][region] for obkg in otherBkg])
+                    centralValue, stat = (centralValueStat.val , centralValueStat.sigma ) 
+                    syst        = addInQuad( [ yieldDictCentral[obkg][region].val*systs["Total_Systs"][obkg][region]/100 for obkg in otherBkg]) 
+                    #print centralValue, stat, syst, region
+                    #syst               = centralValue * bkgSystPerc/100.
+                    #syst               = 
+                    if addedOtherBkg: continue
+                    toPrint2.append( ["Other"        ,  "%s"%round(centralValue,2)+ "+-%s"%round(stat,2)+ "+-%s"%round(syst,2) ] )
+                    addedOtherBkg = True
+                    #assert False
+                else:   toPrint2.append(toPrint[-1])
             if blinded:
                 observed     = int( yldsByBins[region]['DataUnblind'].val)
                 toPrint.append( ["Data (4.3$fb^{-1}$)", observed] )
@@ -323,37 +344,51 @@ for sampleType, info in sig_bkg_infos.iteritems():
                 #observed     = int( yldsByBins[region]['DataBlind'].val)
                 observed     = int( yld.getNiceYieldDict()["DataBlind"][region].val)
                 toPrint.append( ["Data (12.9$fb^{-1}$)", observed] )
+                toPrint2.append(toPrint[-1])
                 #finalYieldDict["Data"][region] = u_float(observed,math.sqrt( observed ) )
             align = "{:<20}"*len(toPrint)
             if first_row:
                 print align.format(*[x[0] for x in toPrint])
                 first_row = False
                 result_table_list.append( [x[0] for x in toPrint]  )
+                result_table_list_comb.append( [x[0] for x in toPrint2]  )
     
             print align.format(*[x[1] for x in toPrint])
             result_table_list.append( [x[1] for x in toPrint])
+            result_table_list_comb.append( [x[1] for x in toPrint2])
 
-    ResTable = makeSimpleLatexTable( result_table_list, "BkgEstSRSummary_%s.tex"%lumitag, saveDirBase+"/Results/", align_char = "r"        ,  align_func= lambda char, table: "r|"+ (char *(len(table[1])-1)).rstrip("|") )
+    ResTable     = makeSimpleLatexTable( result_table_list, "BkgEstSRSummary_%s.tex"%lumitag, saveDirBase+"/Results/", align_char = "r"        ,  align_func= lambda char, table: "r|"+ (char *(len(table[1])-1)).rstrip("|") )
+    ResTableComb = makeSimpleLatexTable( result_table_list_comb, "BkgEstSRSummaryComb_%s.tex"%lumitag, saveDirBase+"/Results/", align_char = "r"        ,  align_func= lambda char, table: "r|"+ (char *(len(table[1])-1)).rstrip("|") )
 
 
     #finalYieldDict = yieldDictCentral
     finalYieldDict = {}
+
     for samp in yieldDictCentral.keys():
         finalYieldDict[samp]={}
         for b in yieldDictCentral[samp].keys():
             val = yieldDictCentral[samp][b]
             cent = val.val
             stat = val.sigma
-            syst = systs['Total_Systs'][samp][b] if systs['Total_Systs'].has_key(samp) else 0
+            if systs['Total_Systs'].has_key(samp):
+               syst = systs['Total_Systs'][samp][b]
+            elif systs['Signal_Systs'].has_key(samp):
+                syst = systs['Signal_Systs'][samp][b]
+                print b, samp, syst
+            else: 
+                syst = 0
+            if getMasses2(samp):
+                cent = dicts['card_yields'][samp][b].val        
+
             final_value = u_float(cent,stat) + u_float(0,cent*syst/100)
             finalYieldDict[samp][b]=final_value
     
     if blinded:
         setup_style()
-        plt1= drawYields("Results_SRsPtBinned_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + ['DataBlind'], keys = pt_srs, save= saveDirBase+"/Results/",ratioLimits=[0,2.5] )
-        plt2= drawYields("Results_MainSRs_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + ['Data'], keys = main_sr, save= saveDirBase+"/Results/",ratioLimits=[0,2.5] )
-        plt3= drawYields("Results_NoLog_SRsPtBinned_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + ['Data'], keys = pt_srs, save= saveDirBase+"/Results/",ratioLimits=[0,2.5] , logs=[0,0])
-        plt4= drawYields("Results_NoLog_MainSRs_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + ['Data'], keys = main_sr, save= saveDirBase+"/Results/",ratioLimits=[0,2.5] , logs=[0,0])
+        plt1= drawYields("Results_SRsPtBinned_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + ['DataBlind'], keys = pt_srs, save= saveDirBase+"/Results/",ratioLimits=[0,2.4] )
+        plt2= drawYields("Results_MainSRs_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + ['Data'], keys = main_sr, save= saveDirBase+"/Results/",ratioLimits=[0,2.4] )
+        plt3= drawYields("Results_NoLog_SRsPtBinned_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + ['Data'], keys = pt_srs, save= saveDirBase+"/Results/",ratioLimits=[0,2.4] , logs=[0,0])
+        plt4= drawYields("Results_NoLog_MainSRs_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + ['Data'], keys = main_sr, save= saveDirBase+"/Results/",ratioLimits=[0,2.4] , logs=[0,0])
     elif True:
         #finalYieldDict = dicts['bkg_pred'][        
         data = "DataBlind"
@@ -362,14 +397,14 @@ for sampleType, info in sig_bkg_infos.iteritems():
         sigs = [ 'T2tt-300-290' , 'T2tt-300-270', 'T2tt-300-220']
 
         setup_style()
-        plt1= drawYields("Results_SRsPtBinned_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + [data], keys = pt_srs, save= saveDirBase+"/Results/",ratioLimits=[0,2.5] )
-        plt2= drawYields("Results_MainSRs_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + [data], keys = main_sr, save= saveDirBase+"/Results/",ratioLimits=[0,2.5] )
-        plt3= drawYields("Results_NoLog_SRsPtBinned_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + [data], keys = pt_srs, save= saveDirBase+"/Results/",ratioLimits=[0,2.5] , logs=[0,0])
-        plt4= drawYields("Results_NoLog_MainSRs_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + [data], keys = main_sr, save= saveDirBase+"/Results/",ratioLimits=[0,2.5] , logs=[0,0])
-        plt1s= drawYields("Results_withSigs_SRsPtBinned_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + [data] + sigs, keys = pt_srs, save= saveDirBase+"/Results/",ratioLimits=[0,2.5] )
-        plt2s= drawYields("Results_withSigs_MainSRs_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + [data] + sigs, keys = main_sr, save= saveDirBase+"/Results/",ratioLimits=[0,2.5] )
-        plt3s= drawYields("Results_withSigs_NoLog_SRsPtBinned_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + [data] + sigs, keys = pt_srs, save= saveDirBase+"/Results/",ratioLimits=[0,2.5] , logs=[0,0])
-        plt4s= drawYields("Results_withSigs_NoLog_MainSRs_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + [data] + sigs, keys = main_sr, save= saveDirBase+"/Results/",ratioLimits=[0,2.5] , logs=[0,0])
+        plt1= drawYields("Results_SRsPtBinned_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + [data], keys = pt_srs, save= saveDirBase+"/Results/",ratioLimits=[0,2.4] )
+        plt2= drawYields("Results_MainSRs_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + [data], keys = main_sr, save= saveDirBase+"/Results/",ratioLimits=[0,2.4] )
+        plt3= drawYields("Results_NoLog_SRsPtBinned_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + [data], keys = pt_srs, save= saveDirBase+"/Results/",ratioLimits=[0,2.4] , logs=[0,0])
+        plt4= drawYields("Results_NoLog_MainSRs_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + [data], keys = main_sr, save= saveDirBase+"/Results/",ratioLimits=[0,2.4] , logs=[0,0])
+        plt1s= drawYields("Results_withSigs_SRsPtBinned_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + [data] + sigs, keys = pt_srs, save= saveDirBase+"/Results/",ratioLimits=[0,2.4] )
+        plt2s= drawYields("Results_withSigs_MainSRs_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + [data] + sigs, keys = main_sr, save= saveDirBase+"/Results/",ratioLimits=[0,2.4] )
+        plt3s= drawYields("Results_withSigs_NoLog_SRsPtBinned_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + [data] + sigs, keys = pt_srs, save= saveDirBase+"/Results/",ratioLimits=[0,2.4] , logs=[0,0])
+        plt4s= drawYields("Results_withSigs_NoLog_MainSRs_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + [data] + sigs, keys = main_sr, save= saveDirBase+"/Results/",ratioLimits=[0,2.4] , logs=[0,0])
 
 
 #def makeSystPklForLimits( systs_dict ,  corr_keys, uncorr_keys, sample_names ):
@@ -425,6 +460,7 @@ if __name__ == "":
             first_row = False
             table_list.append( [x[0] for x in toPrint]  )
             main_sr_table.append( [x[0] for x in toPrint] )
+
         print align.format(*[x[1] for x in toPrint])
         table_list.append( [x[1] for x in toPrint])
         if isMainSR: main_sr_table.append( [x[1] for x in toPrint] )
@@ -540,16 +576,16 @@ if __name__ == "":
     
     if blinded:
         setup_style()
-        plt1= drawYields("Results_SRsPtBinned_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + ['Data'], keys = pt_srs, save= saveDirBase+"/Results/",ratioLimits=[0,2.5] )
-        plt2= drawYields("Results_MainSRs_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + ['Data'], keys = main_sr, save= saveDirBase+"/Results/",ratioLimits=[0,2.5] )
-        plt3= drawYields("Results_NoLog_SRsPtBinned_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + ['Data'], keys = pt_srs, save= saveDirBase+"/Results/",ratioLimits=[0,2.5] , logs=[0,0])
-        plt4= drawYields("Results_NoLog_MainSRs_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + ['Data'], keys = main_sr, save= saveDirBase+"/Results/",ratioLimits=[0,2.5] , logs=[0,0])
+        plt1= drawYields("Results_SRsPtBinned_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + ['Data'], keys = pt_srs, save= saveDirBase+"/Results/",ratioLimits=[0,2.4] )
+        plt2= drawYields("Results_MainSRs_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + ['Data'], keys = main_sr, save= saveDirBase+"/Results/",ratioLimits=[0,2.4] )
+        plt3= drawYields("Results_NoLog_SRsPtBinned_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + ['Data'], keys = pt_srs, save= saveDirBase+"/Results/",ratioLimits=[0,2.4] , logs=[0,0])
+        plt4= drawYields("Results_NoLog_MainSRs_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + ['Data'], keys = main_sr, save= saveDirBase+"/Results/",ratioLimits=[0,2.4] , logs=[0,0])
     else:
         setup_style()
-        plt1= drawYields("Results_SRsPtBinned_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + ['Data'], keys = pt_srs, save= saveDirBase+"/Results/",ratioLimits=[0,2.5] )
-        plt2= drawYields("Results_MainSRs_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + ['Data'], keys = main_sr, save= saveDirBase+"/Results/",ratioLimits=[0,2.5] )
-        plt3= drawYields("Results_NoLog_SRsPtBinned_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + ['Data'], keys = pt_srs, save= saveDirBase+"/Results/",ratioLimits=[0,2.5] , logs=[0,0])
-        plt4= drawYields("Results_NoLog_MainSRs_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + ['Data'], keys = main_sr, save= saveDirBase+"/Results/",ratioLimits=[0,2.5] , logs=[0,0])
+        plt1= drawYields("Results_SRsPtBinned_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + ['Data'], keys = pt_srs, save= saveDirBase+"/Results/",ratioLimits=[0,2.4] )
+        plt2= drawYields("Results_MainSRs_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + ['Data'], keys = main_sr, save= saveDirBase+"/Results/",ratioLimits=[0,2.4] )
+        plt3= drawYields("Results_NoLog_SRsPtBinned_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + ['Data'], keys = pt_srs, save= saveDirBase+"/Results/",ratioLimits=[0,2.4] , logs=[0,0])
+        plt4= drawYields("Results_NoLog_MainSRs_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + ['Data'], keys = main_sr, save= saveDirBase+"/Results/",ratioLimits=[0,2.4] , logs=[0,0])
 
 
 
@@ -598,13 +634,13 @@ if __name__ == "":
         
         #if blinded:
         #    setup_style()
-        #    plt1= drawYields("Results_SRsPtBinned_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + ['Data'], keys = pt_srs, save= saveDirBase+"/Results/",ratioLimits=[0,2.5] )
-        #    plt2= drawYields("Results_MainSRs_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + ['Data'], keys = main_sr, save= saveDirBase+"/Results/",ratioLimits=[0,2.5] )
-        #    plt3= drawYields("Results_NoLog_SRsPtBinned_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + ['Data'], keys = pt_srs, save= saveDirBase+"/Results/",ratioLimits=[0,2.5] , logs=[0,0])
-        #    plt4= drawYields("Results_NoLog_MainSRs_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + ['Data'], keys = main_sr, save= saveDirBase+"/Results/",ratioLimits=[0,2.5] , logs=[0,0])
+        #    plt1= drawYields("Results_SRsPtBinned_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + ['Data'], keys = pt_srs, save= saveDirBase+"/Results/",ratioLimits=[0,2.4] )
+        #    plt2= drawYields("Results_MainSRs_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + ['Data'], keys = main_sr, save= saveDirBase+"/Results/",ratioLimits=[0,2.4] )
+        #    plt3= drawYields("Results_NoLog_SRsPtBinned_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + ['Data'], keys = pt_srs, save= saveDirBase+"/Results/",ratioLimits=[0,2.4] , logs=[0,0])
+        #    plt4= drawYields("Results_NoLog_MainSRs_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + ['Data'], keys = main_sr, save= saveDirBase+"/Results/",ratioLimits=[0,2.4] , logs=[0,0])
         #else:
         #    setup_style()
-        #    plt1= drawYields("Results_SRsPtBinned_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + ['Data'], keys = pt_srs, save= saveDirBase+"/Results/",ratioLimits=[0,2.5] )
-        #    plt2= drawYields("Results_MainSRs_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + ['Data'], keys = main_sr, save= saveDirBase+"/Results/",ratioLimits=[0,2.5] )
-        #    plt3= drawYields("Results_NoLog_SRsPtBinned_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + ['Data'], keys = pt_srs, save= saveDirBase+"/Results/",ratioLimits=[0,2.5] , logs=[0,0])
-        #    plt4= drawYields("Results_NoLog_MainSRs_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + ['Data'], keys = main_sr, save= saveDirBase+"/Results/",ratioLimits=[0,2.5] , logs=[0,0])
+        #    plt1= drawYields("Results_SRsPtBinned_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + ['Data'], keys = pt_srs, save= saveDirBase+"/Results/",ratioLimits=[0,2.4] )
+        #    plt2= drawYields("Results_MainSRs_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + ['Data'], keys = main_sr, save= saveDirBase+"/Results/",ratioLimits=[0,2.4] )
+        #    plt3= drawYields("Results_NoLog_SRsPtBinned_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + ['Data'], keys = pt_srs, save= saveDirBase+"/Results/",ratioLimits=[0,2.4] , logs=[0,0])
+        #    plt4= drawYields("Results_NoLog_MainSRs_%s"%lumitag, finalYieldDict , sampleList = ['ST', 'QCD', 'Diboson', 'DYJetsM50', 'ZJetsInv', 'TTJets', 'WJets']  + ['Data'], keys = main_sr, save= saveDirBase+"/Results/",ratioLimits=[0,2.4] , logs=[0,0])

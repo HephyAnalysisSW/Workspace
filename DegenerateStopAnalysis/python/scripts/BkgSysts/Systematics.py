@@ -55,10 +55,40 @@ def meanSys(*a):
         systs.append( absSysFunc(central, var) ) 
     #print systs, mean(systs)
     return mean(systs)
+
+
+
+qpairs = [
+           ( 'Q2centralup' , 'Q2centraldown'  )  ,
+           ( 'Q2upcentral' , 'Q2downcentral'  )  ,
+           ( 'Q2updown'    , 'Q2downup'  )          ,
+         ]
+qvariations = ['Q2_centralcentral', 'Q2_centralup', 'Q2_centraldown', 'Q2_upcentral', 'Q2_downcentral', 'Q2_updown', 'Q2_downup']
+
+def q2EvSys(*a):
+    """assume first value is the central value"""
+    central = a[0]
+    variations = a[1:]
+    assert len(a)==7
+
+    qsysts = []
+    for nq in range(len(qvariations)):
+        qvars = variations[nq:nq+2]
+        print list(qvars)
+        print [central]
+        print list(qvars) + [central]
+        qsysts.append( meanSys(*[central]+list(qvars) ) )
+
+    if not variations:
+        raise Exception("No Variations Given! %s"%a)
+    systs = []
+    for var in variations:
+        systs.append( absSysFunc(central, var) ) 
+    #print systs, mean(systs)
+    return mean(systs)
     
 def meanSysSigned(*a): ### keep track of the signs somehow for systematics in cards
     """assume first value is the central value
-       
     """
     central = a[0]
     variations = a[1:]
@@ -276,16 +306,21 @@ other_bkg_sys.update({
     })
 
 
-qcd_pred_pkl = "/afs/hephy.at/user/m/mzarucki/public/QCDyields_stat.pkl"  
+qcd_pred_pkl = "/afs/hephy.at/user/m/mzarucki/public/results/QCD/QCDyields_final_stat.pkl"  
 qcd_pred     = pickle.load( open(qcd_pred_pkl) ) 
-qcd_sys_pkl  = "/afs/hephy.at/user/m/mzarucki/public/QCDyields_sys.pkl"  
+qcd_sys_pkl  = "/afs/hephy.at/user/m/mzarucki/public/results/QCD/QCDyields_final_sys.pkl"  
 qcd_sys      = pickle.load( open(qcd_sys_pkl) ) 
 
-zinv_el_sf_pkl = "/afs/hephy.at/user/m/mzarucki/public/ZinvSFs_electrons_stat.pkl"
-zinv_mu_sf_pkl = "/afs/hephy.at/user/m/mzarucki/public/ZinvSFs_muons_stat.pkl"
+zinv_el_sf_pkl = "/afs/hephy.at/user/m/mzarucki/public/results/Zinv/ZinvSFs_electrons_stat.pkl"
+zinv_mu_sf_pkl = "/afs/hephy.at/user/m/mzarucki/public/results/Zinv/ZinvSFs_muons_stat.pkl"
 zinv_el_sf     = pickle.load(open(zinv_el_sf_pkl,'r'))
 zinv_mu_sf     = pickle.load(open(zinv_mu_sf_pkl,'r'))
 
+
+wpol_sys_pkl  = "/afs/hephy.at/user/m/mzarucki/public/results/Wpol/WpolSysUnc.pkl"  
+wpol_sys      = pickle.load( open(wpol_sys_pkl) ) 
+
+other_bkg_sys.update({w:wpol_sys})
 
 
 #
@@ -351,37 +386,37 @@ bkgTagParams  = {}
 bkgTagParams.update( {
                       #"WPol":\
                       #      {
-                      #          '1x'  :   { 'other' : {w : {bin:syst} }  },
+                      #         'up':    { 'other': {w : other_bkg_sys[w] }  } 
                       #      },
                       "WPt":\
                             {
                                 '1x'  :   { 'wpt':'_wpt'  },
                             },
-                      "ttpt":\
-                            {
-                                '1x'  :   { 'ttpt':'_ttpt'  },
-                            },
-                      "ttPtShape":\
-                            {  
-                               'up':    { 'other': {tt: ptShapeUncerts[tt] }  } 
-                            },
-                      "WPtShape":\
-                            {  
-                               'up':    { 'other': {w : ptShapeUncerts[w] }  } 
-                            },
-                      "QCDEst":
-                            {
-                               'up':    { 'other': {qcd : other_bkg_sys[qcd] }  } 
-                            },
-                      "ZInvEst":
-                            {
-                               'up':    { 'other': {z : other_bkg_sys[z] }  } 
-                            },
+                      #"ttpt":\
+                      #      {
+                      #          '1x'  :   { 'ttpt':'_ttpt'  },
+                      #      },
+                      #"ttPtShape":\
+                      #      {  
+                      #         'up':    { 'other': {tt: ptShapeUncerts[tt] }  } 
+                      #      },
+                      #"WPtShape":\
+                      #      {  
+                      #         'up':    { 'other': {w : ptShapeUncerts[w] }  } 
+                      #      },
+                      #"QCDEst":
+                      #      {
+                      #         'up':    { 'other': {qcd : other_bkg_sys[qcd] }  } 
+                      #      },
+                      #"ZInvEst":
+                      #      {
+                      #         'up':    { 'other': {z : other_bkg_sys[z] }  } 
+                      #      },
                     })
 bkgTagParams.update({
-                      "%sXSec"%x: { 
-                                'up':      { 'other': {x   : other_bkg_sys['small_bkg_uncert'] }}
-                            } for x in otherBkg
+                      #"%sXSec"%x: { 
+                      #          'up':      { 'other': {x   : other_bkg_sys['small_bkg_uncert'] }}
+                      #      } for x in otherBkg
                     })
 
 
@@ -396,10 +431,10 @@ sigTagParams.update({
                       #      {  
                       #         'up':    { 'other': 6.2 }
                       #      },
-                      "FastFullEff":\
-                            {  
-                               'up':    { 'other': 5.  }
-                            },
+                      #"FastFullEff":\
+                      #      {  
+                      #         'up':    { 'other': 5.  }
+                      #      },
                       "BTag_FS":
                             {
                                 'up'    :   { 'btag':'SF_FS_UP'  },
@@ -411,18 +446,18 @@ sigTagParams.update({
                                 'GenMET' :   { 'met':'met_gen' },
                                 'MET'    :   { 'met':'met_met' },       # same as central. in order to average the systematics
                             },
-                      #"Q2":\
-                      #      {  
-                      #           #'upup'           :   {'lhe':'_Q2upup'            }   ,
-                      #           'centralcentral' :   {'lhe':'_Q2centralcentral'  }   ,
-                      #           #'downdown'       :   {'lhe':'_Q2downdown'        }   ,
-                      #           'downup'         :   {'lhe':'_Q2downup'          }   ,
-                      #           'updown'         :   {'lhe':'_Q2updown'          }   ,
-                      #           'downcentral'    :   {'lhe':'_Q2downcentral'     }   ,
-                      #           'centralup'      :   {'lhe':'_Q2centralup'       }   ,
-                      #           'centraldown'    :   {'lhe':'_Q2centraldown'     }   ,
-                      #           'upcentral'      :   {'lhe':'_Q2upcentral'       }   ,
-                      #      },
+                      "Q2":\
+                            {  
+                                 #'upup'           :   {'lhe':'_Q2upup'            }   ,
+                                 'centralcentral' :   {'lhe':'_Q2centralcentral'  }   ,
+                                 #'downdown'       :   {'lhe':'_Q2downdown'        }   ,
+                                 'downup'         :   {'lhe':'_Q2downup'          }   ,
+                                 'updown'         :   {'lhe':'_Q2updown'          }   ,
+                                 'downcentral'    :   {'lhe':'_Q2downcentral'     }   ,
+                                 'centralup'      :   {'lhe':'_Q2centralup'       }   ,
+                                 'centraldown'    :   {'lhe':'_Q2centraldown'     }   ,
+                                 'upcentral'      :   {'lhe':'_Q2upcentral'       }   ,
+                            },
                       "ISR":\
                             {
                                 'noisr' :   { 'isr':'_noisr' },
@@ -430,6 +465,8 @@ sigTagParams.update({
                             },
                       }
                     ) 
+
+
 #tagParams = { key:val for key,val in tagParams.iteritems() if key in ["ZInvEst"] }#, "SmallBkg", "PU"] or "XSec" in key}
 
 
@@ -517,7 +554,7 @@ class Systematics():
         print ""
         for variation, params in variationTagParams.iteritems():
             runTag_prefix = cfg.runTag.split("_")[0]
-            print params
+            print "Printing variation, params in variationTagParams: ", params
             runTag = ('%s_Mt95_Inccharge_{lepCol}_{lep}_{pu}{isr}{lhe}{wpt}{ttpt}_{btag}'%runTag_prefix).format(**params)
             self.runTags[variation] = runTag
             results_dir          =  cfg.cardDirBase + "/13TeV/{ht}/{run}/".format( ht = cfg.htString , run = runTag )
@@ -763,8 +800,6 @@ class Systematics():
             #print "Before",
             #print self.bkg_ests[variation]["Total"]
             self.bkg_ests[variation]["Total"] = dict_manipulator( [ self.bkg_ests[variation][bkg] for bkg in self.bkgList],  lambda *a: sum(a) )
-            #pp.pprint(self.yieldDict[variation])
-
             self.yieldDict[variation]["Total"] = dict_manipulator( [ self.yieldDict[variation][bkg] for bkg in self.bkgList],  lambda *a: sum(a) )
             #print self.bkg_ests[variation]["Total"]
             #print "------------------------------------------------------"
@@ -814,6 +849,13 @@ class Systematics():
             #sample_mctruth_systs[samp]     =  dict_manipulator( [self.yieldDict[x][samp] for x in variations  ] , lambda *vals : meanSys(*vals)  )   
             #sample_card_systs[samp]=  dict_manipulator( [self.yieldDict[x][samp] for x in variations  ] , lambda *vals : 1+ meanSys(*vals)/100.  )   
             # N_pred
+
+
+            #if isSigSys and self.name == 'Q2':
+            #    print variations
+            #    sample_systs[samp]     =  dict_manipulator( [self.bkg_ests[x][samp] for x in qvariations  ] , lambda *vals : q2EvSys(*vals)  )   
+            #    #sample_card_systs[samp]=  dict_manipulator( [self.bkg_ests[x][samp] for x in variations  ] , lambda *vals : ( 1+ envSysSigned(*vals)/100. ) if envSysSigned(*vals) else 1.0  )   
+                #assert False
             if samp=="QCD":
                 sample_systs[samp]     =  dict_manipulator( [self.yieldDict[x][samp] for x in variations  ] , lambda *vals : meanSys(*vals)  )   
                 sample_card_systs[samp]=  dict_manipulator( [self.yieldDict[x][samp] for x in variations  ] , lambda *vals : 1+ meanSysSigned(*vals)/100.  if meanSysSigned  else 1.0)   
@@ -836,7 +878,10 @@ class Systematics():
 
         all_syst_cards_dict[self.name] = {'bins':bins_card_systs , 'type':'lnN'}
         all_syst_dict[self.name]       = sample_systs
-
+        #for x in all_syst_cards_dict:
+        #    print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+        #    print x
+        #    print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
         pickle.dump( all_syst_cards_dict ,  open( all_syst_cards_pkl ,'w' ) ) 
         pickle.dump( all_syst_dict       ,  open( all_syst_dict_pkl , 'w' ) )  
 
@@ -939,6 +984,7 @@ class Systematics():
                     print align.format(*[x[1] for x in toPrint])
                     table_list.append( [x[1] for x in toPrint])
             #pickle.dump(res , open( os.path.expandvars( bkg_systs_dir+"/%s.pkl"%self.name)  ,"w"))
+            makeDir(cfg.saveDir+"/%s/"%sampleType) #NOTE: Added
             table = makeSimpleLatexTable( table_list, "%s.tex"%self.name, cfg.saveDir+"/%s/"%sampleType, align_char = "c" ,  align_func= lambda char, table: "c|"+ (char *(len(table[1])-2)).rstrip("|")+"|c" )
             #print table
 
@@ -1065,23 +1111,24 @@ if __name__ == "__main__":
     CommonSysts = {}
 
     if True:
-        #for syst_name, systTagParams in bkgTagParams.iteritems():
-        #   BkgSysts[syst_name] = Systematics(cfg, systTagParams, centralParamsBkg, name=syst_name, syst_type = "bkg") 
-        for syst_name, systTagParams in SigAndBkgTagParams.iteritems():
-           CommonSysts[syst_name] = Systematics(cfg, systTagParams, centralParamsBkg, name=syst_name, syst_type = "both") 
-    for syst_name, systTagParams in sigTagParams.iteritems():
-        if syst_name =="met":
-            centralParamsSig_ = deepcopy( centralParamsSig )
-            centralParamsSig_['pu'] = 'nopu'
-        else:
-            centralParamsSig_ = deepcopy( centralParamsSig )
-        SigSysts[syst_name] = Systematics(cfg, systTagParams, centralParamsSig_, name=syst_name, syst_type = "sig") 
-    self = SigSysts[syst_name]
+        pass
+        for syst_name, systTagParams in bkgTagParams.iteritems(): #NOTE: WAS COMMENTED OUT
+           BkgSysts[syst_name] = Systematics(cfg, systTagParams, centralParamsBkg, name=syst_name, syst_type = "bkg") #NOTE: WAS COMMENTED OUT 
+        #for syst_name, systTagParams in SigAndBkgTagParams.iteritems():
+        #   CommonSysts[syst_name] = Systematics(cfg, systTagParams, centralParamsBkg, name=syst_name, syst_type = "both") 
+    #for syst_name, systTagParams in sigTagParams.iteritems():
+    #    if syst_name =="met":
+    #        centralParamsSig_ = deepcopy( centralParamsSig )
+    #        centralParamsSig_['pu'] = 'nopu'
+    #    else:
+    #        centralParamsSig_ = deepcopy( centralParamsSig )
+    #    SigSysts[syst_name] = Systematics(cfg, systTagParams, centralParamsSig_, name=syst_name, syst_type = "sig") 
+    #self = SigSysts[syst_name]
 
 
 
     fixSystNameDict={
-                    'ttPtShape': "CR/SF transf. fact. W",
+                    'ttPtShape': "CR/SR transf. fact. W",
                     'WPtShape' : "CR/SR transf. fact. tt",
                     'ttpt'     : "tt $p_{T}$",
                     'WPt'      : "W $p_{T}$",

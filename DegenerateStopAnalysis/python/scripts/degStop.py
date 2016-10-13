@@ -46,9 +46,11 @@ if True:
     parser.add_argument('--plot',       default = '',     nargs = "+",  action="store", help='')
     parser.add_argument('--weight',     default = 'base',               action="store", help='')
     parser.add_argument('--btag',       default = 'btag',               action="store", help='')
+    parser.add_argument('--mcMatch',     action="store_true", help='do mcMatch for lepton (should not be used with LepAll for now)')
     parser.add_argument('--postFuncs',    default = '',     nargs = "+",  action="store", help='')
 
     parser.add_argument('--sigOpt',    default='All',       action="store", help='BM= benchmark points only, NoSig=NoSignal , All=allsignal')
+    parser.add_argument('--ppSet',     default='80X',          action="store", help='')
     args=parser.parse(sys.argv, setdef=False)
     
 if __name__=="__main__":

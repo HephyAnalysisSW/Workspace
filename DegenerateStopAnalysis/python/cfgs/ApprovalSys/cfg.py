@@ -36,7 +36,7 @@ massPointsFull = MassPoints(dmOpt, (250,801,25))
 
 
 bkgList = [ 'vv',  'qcd', 'st', 'z','dy', 'tt', 'w' ]
-#bkgList = [  'w' ]
+#bkgList = [  'vv' ]
 #bkgList = [ 'vv', 'qcd', 'st', 'dy', 'tt', 'w'  ]
 #sigList = ['s60FS', 's30FS', 's10FS' , 's30']
 #bkgList = ['vv']
@@ -98,8 +98,12 @@ sr1c_opts = [
 
 sr1c_opt = sr1c_opts[2]
 
+mcMatch = getattr(args, 'mcMatch', False)
+mcMatchTag = "_mcMatch" if mcMatch else ""
+if lepCol=="LepAll" and mcMatch: assert False, "mcMatchId not compatible with LepAll for now!"
 
-cuts     = Cuts(lepCol, lep, sr1c_opt = sr1c_opt, isrpt=100, btag = btag )
+
+cuts     = Cuts(lepCol, lep, sr1c_opt = sr1c_opt, isrpt=100, btag = btag , mcMatch = mcMatch )
 
 jc='jec_central'
 cutvars = CutVars(lepCol, lep, sr1c_opt = sr1c_opt, isrpt=100, btag = btag , jc = jc)
@@ -180,7 +184,7 @@ sampleList = bkgList + task_info['sigList']
 #ppTag = "74X_postProcessing_v4"
 
 ppSets = [
-            ( "80X_postProcessing_v10" , "nrad01"   , '8012_mAODv2_v3'),
+            ( "80X_postProcessing_v10" , "nrad01"   , '8012_mAODv2_v3' , 'analysisHephy_13TeV_2016_v0', 'Data2016' , 'RunIISpring16MiniAODv2'),
             ( "80X_postProcessing_v9" , "nrad01"   , '8011_mAODv2_v1'),
             ( "80X_postProcessing_v8" , "nrad01"   , '8011_mAODv2_v1'),
             ( "80X_postProcessing_v6" , "nrad01"   , '8011_mAODv2_v1'),
@@ -188,14 +192,22 @@ ppSets = [
             ( "80X_postProcessing_v5" , "mzarucki01"   , '8011_mAODv2_v1'),
             ( "80X_postProcessing_v4" , "nrad01"       , '8011_mAODv2_v1'),
             ( "80X_postProcessing_v3" , "nrad01"       , '8011_mAODv2_v1'),
+            ("74X_postProcessing_v4" , "vghete01"   , '7412pass2_mAODv2_v6', 'analysisHephy_13TeV_v0', 'Data25ns', 'Spring15_7412pass2_mAODv2'),
          ]
 
-ppSet  = 0 
+cfgPPSet =getattr(args, 'ppSet','80x')
+if cfgPPSet.lower() == '80x':
+    ppSet  = 0 
+elif cfgPPSet.lower() =='74x':
+    ppSet  = ppSets.index( ("74X_postProcessing_v4" , "vghete01"   , '7412pass2_mAODv2_v6', 'analysisHephy_13TeV_v0', 'Data25ns', 'Spring15_7412pass2_mAODv2') )
+    sampleList = ['tt','w','z','qcd','dy'] + task_info['sigList']
 ppTag  = ppSets[ppSet][0]
 ppUser = ppSets[ppSet][1]
 cmgTag = ppSets[ppSet][2]
-
-
+parameterSet = ppSets[ppSet][3]
+dataDir      = ppSets[ppSet][4]
+mcDir        = ppSets[ppSet][5]
+ppSkim       = 'skimPresel' if '74' in ppTag else 'preIncLep'
 
 def make_match_func(tothis):
     def match_func(x):
@@ -316,6 +328,20 @@ weights_params = {
             'nopu':        {'lumis':lumis  ,'lepCol':lepCol, 'lep':lep, 'pu':''    , 'btag':btag, 'wpt':'', 'ttpt':'', 'isr':''},
             'nopu_noisr':  {'lumis':lumis  ,'lepCol':lepCol, 'lep':lep, 'pu':''    , 'btag':btag, 'wpt':'', 'ttpt':'', 'isr':'noisr'},
 
+
+            'pu_gt20':        {'lumis':lumis  ,'lepCol':lepCol, 'lep':lep, 'pu':'puReweight*(nTrueInt>=20)'  , 'btag':btag, 'wpt':'', 'ttpt':'', 'isr':''},
+            'pu_lt20':        {'lumis':lumis  ,'lepCol':lepCol, 'lep':lep, 'pu':'puReweight*(nTrueInt<20)'   , 'btag':btag, 'wpt':'', 'ttpt':'', 'isr':''},
+            'pu_gt15':        {'lumis':lumis  ,'lepCol':lepCol, 'lep':lep, 'pu':'puReweight*(nTrueInt>=15)'  , 'btag':btag, 'wpt':'', 'ttpt':'', 'isr':''},
+            'pu_lt15':        {'lumis':lumis  ,'lepCol':lepCol, 'lep':lep, 'pu':'puReweight*(nTrueInt<15)'   , 'btag':btag, 'wpt':'', 'ttpt':'', 'isr':''},
+            'pu_gt25':        {'lumis':lumis  ,'lepCol':lepCol, 'lep':lep, 'pu':'puReweight*(nTrueInt>=25)'  , 'btag':btag, 'wpt':'', 'ttpt':'', 'isr':''},
+            'pu_lt25':        {'lumis':lumis  ,'lepCol':lepCol, 'lep':lep, 'pu':'puReweight*(nTrueInt<25)'   , 'btag':btag, 'wpt':'', 'ttpt':'', 'isr':''},
+
+            'nopu_gt20':        {'lumis':lumis  ,'lepCol':lepCol, 'lep':lep, 'pu':'(nTrueInt>=20)'  , 'btag':btag, 'wpt':'', 'ttpt':'', 'isr':''},
+            'nopu_lt20':        {'lumis':lumis  ,'lepCol':lepCol, 'lep':lep, 'pu':'(nTrueInt<20)'   , 'btag':btag, 'wpt':'', 'ttpt':'', 'isr':''},
+            'nopu_gt15':        {'lumis':lumis  ,'lepCol':lepCol, 'lep':lep, 'pu':'(nTrueInt>=15)'  , 'btag':btag, 'wpt':'', 'ttpt':'', 'isr':''},
+            'nopu_lt15':        {'lumis':lumis  ,'lepCol':lepCol, 'lep':lep, 'pu':'(nTrueInt<15)'   , 'btag':btag, 'wpt':'', 'ttpt':'', 'isr':''},
+            'nopu_gt25':        {'lumis':lumis  ,'lepCol':lepCol, 'lep':lep, 'pu':'(nTrueInt>=25)'  , 'btag':btag, 'wpt':'', 'ttpt':'', 'isr':''},
+            'nopu_lt25':        {'lumis':lumis  ,'lepCol':lepCol, 'lep':lep, 'pu':'(nTrueInt<25)'   , 'btag':btag, 'wpt':'', 'ttpt':'', 'isr':''},
           }
 
 
@@ -358,14 +384,17 @@ task_weight = Weights(**weight_params)
 
 
 cfg = TaskConfig(
-                   runTag         =  os.path.basename(os.path.dirname(os.path.realpath(__file__)) ) + "_"  + sr1c_opt.title()  + "_"+lepTag + weight_tag + ( "_%s"%btag.upper() ),   ## should be the same as the name of the directory that the cfg is in
+                   runTag         =  os.path.basename(os.path.dirname(os.path.realpath(__file__)) ) + "_"  + sr1c_opt.title()  + "_"+lepTag + weight_tag + ( "_%s"%btag.upper() ) +mcMatchTag,   ## should be the same as the name of the directory that the cfg is in
                    taskList       =  task_info['taskList'],
                    ppTag          =  ppTag , 
                    ppStep         =  'step1',    ## step1 for mva
                    ppUser         =  ppUser , 
                    cmgTag         =  cmgTag , 
+                   parameterSet    =  parameterSet,
+                   dataDir        =  dataDir,
+                   mcDir          =  mcDir, 
                    #saveDirBase   =  "/afs/hephy.at/user/n/nrad/www/T2Deg13TeV/mAODv2_7412pass2_v6/Studies_v1/" ,
-                   saveDirBase    =  "%s/www/T2Deg13TeV/%s/%s/SUS_16_031_v1/"%(os.path.expandvars("$HOME"), cmgTag, ppTag) ,
+                   saveDirBase    =  "%s/www/T2Deg13TeV/%s/%s/SUS_16_031_v2/"%(os.path.expandvars("$HOME"), cmgTag, ppTag) ,
                    #saveDirBase    =  "/afs/hephy.at/user/n/nrad/www/T2Deg13TeV/%s/%s/Studies_v0_puWeight_wptrwgt/"%(cmgTag, ppTag) ,
                    #saveDirBase    =  "/afs/hephy.at/user/n/nrad/www/T2Deg13TeV/%s/%s/Studies_v0_puWeight_wptrwgt/"%(cmgTag, ppTag) ,
                    cutInst        =  cutInstList,
@@ -384,16 +413,16 @@ cfg = TaskConfig(
                                         "sampleList"   :    sampleList  ,
                                         "wtau"         :    False       , 
                                         "useHT"        :    True        , 
-                                        "skim"         :    'preIncLep', 
+                                        "skim"         :    ppSkim, 
                                         "kill_low_qcd_ht":  False       ,
                                         "scan"         :    len(sigList)>0       ,
                                         #"massPoints"   :    task_info['massPoints']  ,
                                         "getData"      :    task_info.get("data",False)    ,
                                         "weights"      :    task_weight.weights     ,
                                         "def_weights"  :    task_weight.def_weights     ,
-                                        "data_triggers":    'HLT_PFMET100_PFMHT100_IDTight || HLT_PFMET110_PFMHT110_IDTight || HLT_PFMET120_PFMHT120_IDTight || HLT_PFMET90_PFMHT90_IDTight'                ,
-                                        "data_filters" :    ' && '.join(data_filters_list), 
-                                        "mc_filters"   :    ' && '.join(mc_filters_list),
+                                        "data_triggers":    'HLT_PFMET100_PFMHT100_IDTight || HLT_PFMET110_PFMHT110_IDTight || HLT_PFMET120_PFMHT120_IDTight || HLT_PFMET90_PFMHT90_IDTight'             if '80' in cmgTag  else '' ,
+                                        "data_filters" :    ' && '.join(data_filters_list) if '80' in cmgTag else '', 
+                                        "mc_filters"   :    ' && '.join(mc_filters_list) if '80' in cmgTag else '',
                                         'lumis'        :     task_weight.def_weights['lumis'],
                                       } , 
                    lumi_info       = task_weight.def_weights['lumis'],
@@ -401,6 +430,9 @@ cfg = TaskConfig(
                    nProc          =  15, 
                 )
 
+
+cfg.weight = task_weight.weights
+cfg.def_weights = task_weight.def_weights
 cfg.cuts = cuts
 #cfg.cutvars = cutvars
 cfg.met_var_srs  = met_var_srs
