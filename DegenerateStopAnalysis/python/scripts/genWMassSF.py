@@ -177,9 +177,14 @@ if True:
     dmplts={}
     dOpt = ""
     leg = ROOT.TLegend(0.7,0.7,0.9,0.9)
+    colors = {
+              10: ROOT.kBlue,
+              20: ROOT.kRed
+              }
+
     for dm in range(10,21,10):
         dmplts[dm] = makeHistoFromDict({k:v[dm] for k,v in finalCorrFacts.iteritems() }, name="DM%s"%dm, bin_order=srbins)
-        dmplts[dm].SetLineColor(3+dm/10)
+        dmplts[dm].SetLineColor(colors[dm])
         dmplts[dm].SetLineWidth(1)
         dmplts[dm].SetMarkerSize(0)
         dmplts[dm].SetMaximum(2)

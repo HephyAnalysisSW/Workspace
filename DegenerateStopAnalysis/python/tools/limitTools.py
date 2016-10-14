@@ -813,10 +813,8 @@ def getValueFromDictFunc(val="0.500"):
     def func(x, val=val, default=999):
         try:
             ret = x[val]
-        except KeyError:
+        except:
             ret = default
-        #else:
-        #    raise Exception("cannot find value %s in  %s"%(val, x))
         return float(ret)
     return func
 
@@ -1006,7 +1004,7 @@ def calcSignif(card, options=""):
     unique=False
     fname = card
     if fname=="":
-        uniqueDirname = str(uuid.uuid4())
+        uniqueDirname = "tmp_"+str(uuid.uuid4())
         unique=True
         os.system('mkdir '+uniqueDirname)
         fname = str(uuid.uuid4())+".txt"
@@ -1015,7 +1013,9 @@ def calcSignif(card, options=""):
         pass
         #self.writeToFile(fname)
     #os.system("cd "+uniqueDirname+";combine --saveWorkspace    -M ProfileLikelihood --significance "+fname+" -t -1 --expectSignal=1 ")
+    print "combine  -M ProfileLikelihood  --uncapped 1 --significance --rMin -5  " +fname
     os.system("cd "+uniqueDirname+";combine  -M ProfileLikelihood  --uncapped 1 --significance --rMin -5  " +fname)
+
     try:
         res= readResFile(uniqueDirname+"/higgsCombineTest.ProfileLikelihood.mH120.root")
     except:

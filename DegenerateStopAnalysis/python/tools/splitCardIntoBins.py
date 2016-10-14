@@ -100,6 +100,21 @@ srBinsToUse = {
           "SR1b": ['SRL1b', 'SRH1b', 'SRV1b'    , 'CR1b', 'CRTT2'] ,
           "SR1c": ['SRL1c', 'SRH1c', 'SRV1c'    , 'CR1c', 'CRTT2'],
           "SR2" : ['SRL2', 'SRH2', 'SRV2'       , 'CR2' , 'CRTT2'],
+
+          'SRL1a': ['SRL1a', 'CR1a', 'CRTT2'] , 
+          'SRH1a': ['SRH1a', 'CR1a', 'CRTT2'] , 
+          'SRV1a': ['SRV1a', 'CR1a', 'CRTT2'] , 
+          'SRL1b': ['SRL1b', 'CR1b', 'CRTT2'] , 
+          'SRH1b': ['SRH1b', 'CR1b', 'CRTT2'] , 
+          'SRV1b': ['SRV1b', 'CR1b', 'CRTT2'] , 
+          'SRL1c': ['SRL1c', 'CR1c', 'CRTT2'] , 
+          'SRH1c': ['SRH1c', 'CR1c', 'CRTT2'] , 
+          'SRV1c': ['SRV1c', 'CR1c', 'CRTT2'] , 
+          'SRL2' : ['SRL2', 'CR2', 'CRTT2'] , 
+          'SRH2' : ['SRH2', 'CR2', 'CRTT2'] , 
+          'SRV2' : ['SRV2', 'CR2', 'CRTT2'] , 
+
+
           #"SR1" : ['SRL1a', 'SRH1a', 'SRV1a', 'SRL1b', 'SRH1b', 'SRV1b' , 'SRL1c', 'SRH1c', 'SRV1c' , 'SRL2', 'SRH2', 'SRV2' ]
     
         }

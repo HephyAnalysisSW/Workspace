@@ -64,38 +64,38 @@ def getVal(uf):
     else:
         return uf
 
-
-
-for era in yldpkls.keys():
-    yldInsts[era] = pickle.load(file(yldpkls[era]))
-    yldDicts[era] = yldInsts[era].getNiceYieldDict()
-    #yldMaps[era]  = yldInsts[era].getSignalYieldMap()
-    effMaps[era] , yldMaps[era] = yldInsts[era].getSignalEffMap(stop_xsecs, lumi = 12864.4)
-
-    bins = yldInsts[era].cutNames
-    for b in bins:
-        yldPlots[era] = makeStopLSPPlot("Yields_"+b+"_"+era, yldMaps[era][b], "Yields_"+b +"_"+era, key = lambda x: x.val)
-        effPlots[era] = makeStopLSPPlot("AccEff_"+b+"_"+era, effMaps[era][b], "AccEff_"+b +"_"+era, key = lambda x: x.val) 
-
-
+doStuff = False
+if doStuff:
+    for era in yldpkls.keys():
+        yldInsts[era] = pickle.load(file(yldpkls[era]))
+        yldDicts[era] = yldInsts[era].getNiceYieldDict()
+        #yldMaps[era]  = yldInsts[era].getSignalYieldMap()
+        effMaps[era] , yldMaps[era] = yldInsts[era].getSignalEffMap(stop_xsecs, lumi = 12864.4)
     
-c1 = ROOT.TCanvas("Ratios","Ratios", 1400,950)
-makeDir(saveDir+"/vs74x/")
-makeDir(saveDir+"/vs8TeV/")
-
-for b in bins:
-    ratio80x74xPlots[b]      = makeStopLSPRatioPlot("Ratio80xVs74x%s"%b   , effMaps['80x'][b], effMaps['74x'][b], bins= [23, 237.5, 812.5, 127, 167.5, 792.5] , key =  lambda x: x.val )
-    ratio80x74xPlots[b][0].Draw("COLZ TEXT")
-    c1.SaveAs(saveDir+"/vs74x/%s.png"%b)
-
-    if b in combined_bins.values():
-        ratio13TeVvs8TeVPlots[b] = makeStopLSPRatioPlot("Ratio13TeVvs8TeV%s"%b, effMaps['80x'][b], eff8tev[b], bins= [23, 237.5, 812.5, 127, 167.5, 792.5] , key =  lambda x: getVal(x) )
-        ratio13TeVvs8TeVPlots[b][0].Draw("COLZ TEXT")
-        c1.SaveAs(saveDir+"/vs8TeV/%s.png"%b)
-
-
-
-
+        bins = yldInsts[era].cutNames
+        for b in bins:
+            yldPlots[era] = makeStopLSPPlot("Yields_"+b+"_"+era, yldMaps[era][b], "Yields_"+b +"_"+era, key = lambda x: x.val)
+            effPlots[era] = makeStopLSPPlot("AccEff_"+b+"_"+era, effMaps[era][b], "AccEff_"+b +"_"+era, key = lambda x: x.val) 
+    
+    
+        
+    c1 = ROOT.TCanvas("Ratios","Ratios", 1400,950)
+    makeDir(saveDir+"/vs74x/")
+    makeDir(saveDir+"/vs8TeV/")
+    
+    for b in bins:
+        ratio80x74xPlots[b]      = makeStopLSPRatioPlot("Ratio80xVs74x%s"%b   , effMaps['80x'][b], effMaps['74x'][b], bins= [23, 237.5, 812.5, 127, 167.5, 792.5] , key =  lambda x: x.val )
+        ratio80x74xPlots[b][0].Draw("COLZ TEXT")
+        c1.SaveAs(saveDir+"/vs74x/%s.png"%b)
+    
+        if b in combined_bins.values():
+            ratio13TeVvs8TeVPlots[b] = makeStopLSPRatioPlot("Ratio13TeVvs8TeV%s"%b, effMaps['80x'][b], eff8tev[b], bins= [23, 237.5, 812.5, 127, 167.5, 792.5] , key =  lambda x: getVal(x) )
+            ratio13TeVvs8TeVPlots[b][0].Draw("COLZ TEXT")
+            c1.SaveAs(saveDir+"/vs8TeV/%s.png"%b)
+    
+    
+    
+    
 getChains = True
 if getChains:
     mc_path_80x =   "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/8012_mAODv2_v3/80X_postProcessing_v10/analysisHephy_13TeV_2016_v0/step1/RunIISpring16MiniAODv2_v3/"
@@ -112,7 +112,7 @@ if getChains:
     sample_info  = {
                      "sampleList"   :    ['tt', 'w','qcd','z','s300_270','s300_290','s300_220']          ,
                      "wtau"         :    False          ,
-                     "useHT"        :    False          ,
+                     "useHT"        :    True          ,
                      "skim"         :    'preIncLep'       ,
                      "scan"         :    True           ,
                      "getData"      :    False          ,
