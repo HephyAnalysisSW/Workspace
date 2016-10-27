@@ -30,9 +30,6 @@
 <library   file="MuonTupelizer.cc" name="MuonTupelizer">
   <flags   EDM_PLUGIN="1"/>
 </library>
-<library   file="ElectronTupelizer.cc" name="ElectronTupelizer">
-  <flags   EDM_PLUGIN="1"/>
-</library>
 <library   file="TauTupelizer.cc" name="TauTupelizer">
   <flags   EDM_PLUGIN="1"/>
 </library>

@@ -67,8 +67,10 @@ for sig in sigList:
 
 
 systs_range_samples={}
+systs_ave = {}
 for b in bins:
     mins = min([ (syst_env[sig][b], sig) for sig in sigList])
     maxs = max([ (syst_env[sig][b], sig) for sig in sigList])
+    ave =  sum([syst_env[sig][b] for sig in sigList])/len(sigList)
     systs_range_samples[b] = [mins, maxs]
-    
+    systs_ave[b] = ave

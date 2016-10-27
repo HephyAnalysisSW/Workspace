@@ -275,8 +275,8 @@ def getLimit(yld, sig=None          , outDir    = "./cards/", postfix = ""     ,
 
         systs_list={}
         systs_list['corr']={
-                            'sig'  :   ['PU', 'jer', 'jec', 'ISR', 'met', 'BTag_b', 'BTag_l', 'BTag_FS',  ],
-                            'bkg'  :   ['PU', 'jer', 'jec',  'WPt', 'ttpt','BTag_b', 'BTag_l', ], # "WPol"],
+                            'sig'  :   ['PU', 'jer', 'jec', 'ISR', 'met', 'BTag_b', 'BTag_l', 'BTag_FS', "Q2" ],
+                            'bkg'  :   ['PU', 'jer', 'jec',  'WPt', 'ttpt','BTag_b', 'BTag_l', 'WPol'], # "WPol"],
                            }
         systs_list['uncorr']={
                             'bkg'  :   ['WPtShape','ttPtShape', 'ZInvEst', 'QCDEst',   'DYJetsM50XSec' ], #'DYJetsM50XSec', 'DibosonXSec', 'STXSec', 'ZInvEst', 'QCDEst'],
@@ -653,6 +653,7 @@ def plotLimits(limitDict):
 import subprocess
 
 #def calcLimitFromCard(card="./cards/T2DegStop_300_270_cards.txt"): 
+
 def calcLimitFromCard(card="./cards/T2DegStop_300_270_cards.txt", name="", mass=""):
     command = ['combine', '--saveWorkspace', '-M', 'Asymptotic'] 
     if name:
@@ -686,7 +687,48 @@ def calcLimitFromCard(card="./cards/T2DegStop_300_270_cards.txt", name="", mass=
         limit[limit_sig]=limit_val
     return limit
 
+def calcSigFromCard(card="./cards/T2DegStop_300_270_cards.txt", name="", mass=""):
+    command = ['combine', '-M', 'ProfileLikelihood', '--uncapped', '1', '--significance', '--rMin', '-5']
+    if name:
+        command.extend(["--name", name])
+    if mass:
+        command.extend(["--mass, mass"])
+    command.append(card)
+    out = subprocess.Popen(command, stdout = subprocess.PIPE)
+    start = False
+    end   = False
+    limit = {}
+    ret = []
+    for line in out.stdout.readlines():
+        if " -- Profile Likelihood --" in line:
+            start = True
+            continue
+        if not start:
+            continue
+        if line == "\n":
+            break
+        #print line
+        for v in [":","%", "\n", "r <"]:
+            line = line.replace(v,"")
+        ret.append(line)
+        print line
+        sp = line.rsplit()
 
+        print sp
+        if len(sp)==2:
+            limit_sig, limit_val = sp
+        elif len(sp) ==3:
+            nl = line.replace("(","").replace(")","").replace("=","")
+            print nl
+            limit_sig, limit_val = nl.rsplit()
+        print limit_sig, limit_val
+        if "limit" in limit_sig.lower(): # this should be the observed limit
+            limit_sig = "-1"
+        else:
+            limit_sig = "%s"%(limit_sig)
+        
+        limit[limit_sig]=limit_val
+    return limit
 
 
 
@@ -781,7 +823,7 @@ def getValueFromDictFunc(val="0.500"):
 
 
 
-def drawExpectedLimit( limitDict, plotDir, bins=None, key=None , title="", csize=(1500,1026) ):
+def drawExpectedLimit( limitDict, plotDir, bins=[23, 237.5, 812.5, 125, 167.5, 792.5], key=None , title="", csize=(1500,1026) ):
     saveDir = plotDir
     
     if type(limitDict)==type({}):
@@ -850,7 +892,7 @@ limit_keys = {
             }
 
 
-def drawExclusionLimit( limitDict, plotDir, bins=None, csize=(1500,950) ):
+def drawExclusionLimit( limitDict, plotDir, bins=[23, 237.5, 812.5, 125, 167.5, 792.5], csize=(1500,950) , key=None):
     filename = os.path.basename(plotDir)
     basename, ext = os.path.splitext(filename)
     saveDir    =  plotDir.replace(filename,"")
@@ -873,7 +915,6 @@ def drawExclusionLimit( limitDict, plotDir, bins=None, csize=(1500,950) ):
             bins = [23,87.5,662.5, 127 , 17.5, 642.5]
         else:
             bins = [13,87.5,412.5, 75, 17.5, 392.5 ]
-    
 
     ROOT.gStyle.SetOptStat(0)
     ROOT.gStyle.SetPaintTextFormat("0.2f")
@@ -883,8 +924,9 @@ def drawExclusionLimit( limitDict, plotDir, bins=None, csize=(1500,950) ):
     rootfile = saveDir + basename +".root"
     tfile = ROOT.TFile( rootfile, "RECREATE" )
     for limit_var, k in limit_keys.iteritems():
-        
-        key = getValueFromDictFunc(k)
+
+        if not key:        
+            key = getValueFromDictFunc(k)
         plots[limit_var] = makeStopLSPPlot(limit_var, limits, bins=bins, key=key )
 
         plots[limit_var].SetContour(2 )
@@ -972,7 +1014,8 @@ def calcSignif(card, options=""):
     else:
         pass
         #self.writeToFile(fname)
-    os.system("cd "+uniqueDirname+";combine --saveWorkspace    -M ProfileLikelihood --significance "+fname+" -t -1 --expectSignal=1 ")
+    #os.system("cd "+uniqueDirname+";combine --saveWorkspace    -M ProfileLikelihood --significance "+fname+" -t -1 --expectSignal=1 ")
+    os.system("cd "+uniqueDirname+";combine  -M ProfileLikelihood  --uncapped 1 --significance --rMin -5  " +fname)
     try:
         res= readResFile(uniqueDirname+"/higgsCombineTest.ProfileLikelihood.mH120.root")
     except:

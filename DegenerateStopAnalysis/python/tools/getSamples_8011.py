@@ -64,6 +64,22 @@ weights_= Weights()
 def_weights=weights_.def_weights
 weights = weights_.weights
 
+
+sample_names = {
+                    'vv':"VV",
+                    'z':r'#Z\rightarrow \nu\nu+jets',
+                    'st':'Single top',
+                    'dy':r'#Z/\gamma^{*} \rightarrow \nu\nu+jets',
+                }
+
+sample_names = {
+                    "vv":"Diboson",
+                    'z':'ZJetsInv',
+                    'st':'ST',
+                    'dy':'DYJetsM50',
+                }
+
+
 def getSamples(wtau=False, sampleList=['w','tt','z','sig'], 
                useHT=False, getData=False, blinded=True, scan=True, massPoints=[], skim='skimPresel', cmgPP=None, do8tev=False,
                weights = weights, def_weights = def_weights,
@@ -94,7 +110,13 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
    htString = "HT" if useHT else "Inc"
    
    if getData:
-      if "d1mu" in sampleList or "d1muBlind" in sampleList:
+      if "74" in cmgPP.data_path:
+         MET = getChain(cmgPP.MET_v4[skim])
+         sampleDict.update({
+               "d":        {'name':"Data2015",         'sample':cmgPP.MET_v4[skim],         'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":"", "filters":"", 'lumi': lumi_data_unblinded, 'cut':""},
+               #"dblind":   {'name':"DataBlind",           'sample':cmgPP.MET_v4[skim],      'tree':MET,                 'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":data_triggers, "filters":data_filters, 'lumi': lumi_data_blinded},
+            })
+      elif "d1mu" in sampleList or "d1muBlind" in sampleList:
          SingleMuDataBlind = getChain(cmgPP.SingleMu_v2[skim],histname='')
          SingleMuDataUnblind  = SingleMuDataBlind#.CopyTree("run<=274240") #instead cut on run # is applied
          sampleDict.update({
@@ -139,7 +161,8 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
    
    if "z" in sampleList:
       sampleDict.update({
-         'z':{'name':'ZJetsInv', 'sample':cmgPP.ZJetsHT[skim], 'color':colors['z'], 'isSignal':0 , 'isData':0, 'lumi':mc_lumi},
+         #'z':{'name':'ZJetsInv', 'sample':cmgPP.ZJetsHT[skim], 'color':colors['z'], 'isSignal':0 , 'isData':0, 'lumi':mc_lumi},
+         'z':{'name':sample_names['z'], 'sample':cmgPP.ZJetsHT[skim], 'color':colors['z'], 'isSignal':0 , 'isData':0, 'lumi':mc_lumi},
       })
    
    if "qcd" in sampleList:
@@ -158,7 +181,7 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
    if "dy" in sampleList:
       #DYJetsSample = getChain(cmgPP.DYJetsM5to50HT[skim],histname='')
       sampleDict.update({
-            'dy':         {'name':'DYJetsM50',       'sample':cmgPP.DYJetsM50HT[skim],    'color':colors['dy'],         'isSignal':0 , 'isData':0, 'lumi':mc_lumi},
+            'dy':         {'name':sample_names['dy'],       'sample':cmgPP.DYJetsM50HT[skim],    'color':colors['dy'],         'isSignal':0 , 'isData':0, 'lumi':mc_lumi},
             'dy5to50':    {'name':'DYJetsM5to50',    'sample':cmgPP.DYJetsM5to50[skim], 'color':colors['dy5to50'],    'isSignal':0 , 'isData':0, 'lumi':mc_lumi},
             #'dy5to50Inc':{'name':'DYJetsM5to50Inc', 'sample':cmgPP.DYJetsM5to50[skim],   'color':colors['dy5to50Inc'], 'isSignal':0 , 'isData':0, 'lumi':mc_lumi},
             #'dyInv':     {'name':'DYJetsInv',       'sample':cmgPP.DYJetsToNuNu[skim],   'color':colors['dyInv'],      'isSignal':0 , 'isData':0, 'lumi':mc_lumi},
@@ -166,7 +189,7 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
    
    if "vv" in sampleList:
       sampleDict.update({
-            'vv': {'name':'Diboson', 'sample':cmgPP.VV[skim], 'color':colors['vv'], 'isSignal':0 , 'isData':0, 'lumi':mc_lumi},
+            'vv': {'name':sample_names['vv'], 'sample':cmgPP.VV[skim], 'color':colors['vv'], 'isSignal':0 , 'isData':0, 'lumi':mc_lumi},
    }) 
    
    if any (["st" in samp for samp in sampleList]):
@@ -174,7 +197,7 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
             'st_tch_lep':{'name':'ST_tch_lep', 'sample':cmgPP.ST_tch_Lep[skim], 'color':colors['st_tch_lep'], 'isSignal':0, 'isData':0, 'lumi':mc_lumi},
             'st_tch':    {'name':'ST_tch',     'sample':cmgPP.ST_tch[skim],     'color':colors['st_tch'],     'isSignal':0, 'isData':0, 'lumi':mc_lumi},
             'st_wch':    {'name':'ST_wch',     'sample':cmgPP.ST_wch[skim],     'color':colors['st_wch'],     'isSignal':0, 'isData':0, 'lumi':mc_lumi},
-            'st':        {'name':'ST',         'sample':cmgPP.ST[skim],         'color':colors['st'],         'isSignal':0, 'isData':0, 'lumi':mc_lumi},
+            'st':        {'name':sample_names['st'],         'sample':cmgPP.ST[skim],         'color':colors['st'],         'isSignal':0, 'isData':0, 'lumi':mc_lumi},
       }) 
    
    if wtau:
@@ -209,12 +232,19 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
             mlsp = mstop - dm
             #print cmgPP.__dict__.keys()
 
-            s = getattr(cmgPP,"SMS_T2tt_mStop_%s_mLSP_%s"%(mstop,mlsp), None )
+            if '74' in cmgPP.mc_path:
+                s = getattr(cmgPP,"SMS_T2_4bd_mStop_%s_mLSP_%s"%(mstop,mlsp), None )
+                signal_cut = "(1)"
+                sigPostFix = "74X"
+            else:
+                s = getattr(cmgPP,"SMS_T2tt_mStop_%s_mLSP_%s"%(mstop,mlsp), None )
+                signal_cut = "Flag_veto_event_fastSimJets"
+                sigPostFix = ""
             #s = getattr(cmgPP,"SMS_T2_4bd_mStop_%s_mLSP_%s"%(mstop,mlsp))[skim]
             if s and glob.glob("%s/%s/*.root"%(s[skim]['dir'],s[skim]['name'])):
                sampleDict.update({
                   #'s%s_%s'%(mstop,mlsp):{'name':'T2_4bd_%s_%s'%(mstop,mlsp), 'sample':getattr(cmgPP,"SMS_T2tt_mStop_%s_mLSP_%s"%(mstop,mlsp))[skim], 'color':colors['s%s_%s'%(mstop,mlsp)], 'isSignal':1 , 'isData':0, 'lumi':mc_lumi},
-                  's%s_%s'%(mstop,mlsp):{'name':'T2tt_%s_%s'%(mstop,mlsp), 'sample':s[skim], 'cut':"Flag_veto_event_fastSimJets" , 'color':colors['s%s_%s'%(mstop,mlsp)], 'isSignal':1 , 'isData':0, 'lumi':mc_lumi},
+                  's%s_%s'%(mstop,mlsp):{'name':'T2tt%s_%s_%s'%(sigPostFix, mstop,mlsp), 'sample':s[skim], 'cut':signal_cut , 'color':colors['s%s_%s'%(mstop,mlsp)], 'isSignal':1 , 'isData':0, 'lumi':mc_lumi},
             })
             else: 
                 #print "%s/%s/*.root"%(s['dir'],s['name'])

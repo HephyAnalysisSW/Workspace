@@ -16,7 +16,7 @@ minAngle = lambda phi1, phi2 : "TMath::Min( (2*pi) - abs({phi1}-{phi2}) , abs({p
 lepCollection = "LepGood"
 
 class Cuts():
-    def __init__( self,  lepCollection="LepGood" , lep="mu", sr1c_opt = "reload" , isrpt=110, btag = 'btag' ):
+    def __init__( self,  lepCollection="LepGood" , lep="mu", sr1c_opt = "reload" , isrpt=110, btag = 'btag' , mcMatch=False):
         """
         sr1c_opt = [ "reload" , "MT95" , "MT95_IncCharge", "MT105_IncCharge_CT250" ]
 
@@ -108,6 +108,7 @@ class Cuts():
         #self.presel_noAntiQCD = CutClass ("PreselNoAntiQCD", [
         self.presel_noAntiQCD = CutClass ("MET200_ISR%s_HT300"%isrpt, [
                                       ["MET200","met>200"],
+                                      #["MET220","met>220"],
                                       ["ISR110","nIsrJet>=1" ],
                                       #["ISR%s"%isrpt,"nBasJet>=0 && Jet_pt[IndexJet_basJet[0]] > %s"%isrpt ],
                                       ["HT300","ht_basJet>300"],
@@ -166,7 +167,8 @@ class Cuts():
         if otherLepVeto:
             lepSelCuts.insert(1,otherLepVeto)
 
-        
+        if mcMatch:
+            lepSelCuts.append(['mcMatch','{lepCol}_mcMatchId[{lepIndex}[0]]'.format(lepCol=lepCollection, lepIndex=lepIndex)]) 
 
 
         self.lepSel = CutClass ("{lep}Sel".format(lep=lep),  lepSelCuts, 
@@ -174,6 +176,7 @@ class Cuts():
                                 )
         
         
+        #self.presel = CutClass('preselMET220', [], baseCut=None)
         self.presel = CutClass('presel', [], baseCut=None)
         self.presel.add(self.presel_common)
         self.presel.add(self.lepSel)

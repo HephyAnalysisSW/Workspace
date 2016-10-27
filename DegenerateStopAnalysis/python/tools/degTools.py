@@ -702,6 +702,14 @@ def makeLegend(samples, hists, sampleList, plot, name="Legend",loc=[0.6,0.6,0.9,
     leg.SetName(name)
     leg.SetFillColorAlpha(0,0.001)
     leg.SetBorderSize(borderSize)
+    
+
+    sample_names = {
+                    'z':r'#Z\rightarrow \nu\nu+jets',
+                    'st':'Single top',
+                    'dy':r'#Z/\gamma^{*} \rightarrow \nu\nu+jets',
+                }
+
 
 
     for samp in sampleList:
@@ -798,6 +806,7 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
     
     if draw:
         stacks.Draw("hist")
+        stacks.GetYaxis().SetTitle("Events")
         stacks.SetMinimum(plotMin)
         maxval = plotMax if plotMax else stacks.GetMaximum()* ( 1.35 + logs[1]*10  )
         stacks.SetMaximum( maxval)
@@ -805,6 +814,7 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
             bkg_tot.Draw("same E2")
         
     for sig in sigList:
+        yldplt[sig].SetLineWidth(2)
         yldplt[sig].Draw("same")
     stacks.Draw("same AXIG")
 
@@ -856,6 +866,14 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
        ret.append(sigLeg)
        ret[-1].Draw()
 
+    if len(dataList):
+            latex = ROOT.TLatex()
+            latex.SetNDC()
+            latex.SetTextSize(0.04)
+
+            latex.DrawLatex(0.165,0.92,"#font[22]{CMS Preliminary}")
+            latex.DrawLatex(0.76,0.92,"\\mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%( 12.9) )
+            ret.append(latex)    
 
 
 
@@ -873,9 +891,10 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
         #if True: ## draw data/MC
         if dataList: ## draw data/MC
             print 'data is here!'
+            ratio_ref.SetLabelSize(0.04,"Y")
+        
             ratio_ref.Draw("hist")
             ratio_ref.GetYaxis().SetTitle("DATA/MC")
-            ratio_ref.GetYaxis().SetLabelSize(0.01)
             ratio_ref.SetMinimum(ratioLimits[0])
             ratio_ref.SetMaximum(ratioLimits[1])    
    
@@ -924,9 +943,10 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
         ratio_ref.SetNdivisions(505, "y")
         
 
-        ratio_ref.GetXaxis().SetLabelSize(0.08)
-        ratio_ref.GetYaxis().SetLabelSize(0.12)
-        ratio_ref.GetYaxis().SetTitleOffset(0.75)
+        ratio_ref.GetXaxis().SetLabelSize(0.10)
+        ratio_ref.GetYaxis().SetLabelSize(0.09)
+        ratio_ref.GetYaxis().SetTitleOffset(0.85)
+        ratio_ref.GetYaxis().SetTitleSize(0.09)
         #canvs[0].SetTopMargin(0.05)
         #canvs[1].SetTopMargin(0.05)
         #canvs[2].SetTopMargin(0.05)
@@ -936,6 +956,8 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
         canvs[cMain+1].Update()
     else:
         ratio_ref = None
+
+
 
     if save:
         saveCanvas(canvs[cSave], dir = save, name = name ) 
@@ -1643,7 +1665,8 @@ def getEfficiency(samples,samp, plot, cutInst_pass, cutInst_tot ,ret = False ):
  
 #[ len(mstops), min(mstops) - 0.5*dstops , max(mstops) + 0.5*dstops, (max(mstops) + min(dms) - ( min(stops)-max(dms))) /5.  ,min(stops)-max(dms)-5 , max(mstops) + min(dms)+5 ) ]
 # [ len(mstops), min(mstops) - 0.5*dstops , max(mstops) + 0.5*dstops, (max(mstops) + min(dms) - ( min(mstops)-max(dms))) /5  ,min(mstops)-max(dms)-5 , max(mstops) + min(dms)+5 ] 
-def makeStopLSPPlot(name, massDict, title="", bins = [23,87.5,662.5, 127 , 17.5, 642.5] , key=None, func=None,setbin=False, massFunc = None ):
+#def makeStopLSPPlot(name, massDict, title="", bins = [23,87.5,662.5, 127 , 17.5, 642.5] , key=None, func=None,setbin=False, massFunc = None ):
+def makeStopLSPPlot(name, massDict, title="", bins = [23, 237.5, 812.5, 125, 167.5, 792.5]  , key=None, func=None,setbin=False, massFunc = None ):
     """
     massDict should be of the form {    
                                     stopmass1: { lsp_mass_1: a, lsp_mass_2: b ... },
@@ -1687,13 +1710,14 @@ def makeStopLSPPlot(name, massDict, title="", bins = [23,87.5,662.5, 127 , 17.5,
                     val = massDict[stop_mass][lsp_mass]
                 plot.Fill(int(stop_mass), int(lsp_mass) , val )
     plot.SetTitle(title)
+
     plot.SetNdivisions(0,"z")
     plot.SetNdivisions(410,"x")
     plot.GetXaxis().SetTitle("m(#tilde{t})[GeV]")
     plot.GetYaxis().SetTitle("m(#tilde{#chi}^{0})[GeV]")
     return plot
 
-def makeStopLSPRatioPlot(name, massDictNom, massDictDenom, title="", bins=[22,100,650, 65,0,650], key=None ):
+def makeStopLSPRatioPlot(name, massDictNom, massDictDenom, title="", bins=[23, 237.5, 812.5, 125, 167.5, 792.5], key=None ):
     """
     massDict should be of the form {    
                                     stopmass1: { lsp_mass_1: a, lsp_mass_2: b ... },
@@ -1714,9 +1738,9 @@ def makeStopLSPRatioPlot(name, massDictNom, massDictDenom, title="", bins=[22,10
                     print "Nomerator Dict missing value for %s, %s"%(mstop, mlsp)
                     continue
                 if key:
-                    val = key( massDictNom[mstop][mlsp] ) / key( massDictDenom[mstop][mlsp]  )
+                    val = key( massDictNom[mstop][mlsp] ) / key( massDictDenom[mstop][mlsp]  ) if  key( massDictDenom[mstop][mlsp]  ) else 0 
                 else:
-                    val = massDictNom[mstop][mlsp] / massDictDenom[mstop][mlsp]
+                    val = massDictNom[mstop][mlsp] / massDictDenom[mstop][mlsp] if massDictDenom[mstop][mlsp] else 0
                 ratio_dict[mstop][mlsp] = val 
     ratio_pl = makeStopLSPPlot( name, ratio_dict, title=title , bins=bins )
     return ratio_pl, ratio_dict
@@ -2785,6 +2809,13 @@ fixDict = OrderedDict()
 
 #print fixDict
 
+
+sample_names = {
+                    'z':r'#Z\rightarrow \nu\nu+jets',
+                    'st':'Single top',
+                    'dy':r'#Z/\gamma^{*} \rightarrow \nu\nu+jets',
+                }
+
 #fixDict["MET200_ISR100_HT300"]  =  "$E_{T}^{miss}$ $>$ $200GeV$ , $H_{T}$ $>$ $300GeV$, $P_{T}$(Leading$ $Jet) $>$ $100GeV$ " 
 #fixDict["MET200_ISR110_HT300"]  =  "$E_{T}^{miss}$ $>$ $200GeV$ , $H_{T}$ $>$ $300GeV$, $P_{T}$(Leading$ $Jet) $>$ $110GeV$ "  
 fixDict["MET200-ISR100-HT300"]  =  "$C_{T1}$ $>$ $200GeV$ ,$P_{T}(IsrJet)$ $>$ $100GeV$ " 
@@ -2811,14 +2842,19 @@ fixDict["LepEta1.5"]  =  "$ |\eta(l)|  $ $<$ $1.5$"
 fixDict["-pos"]  =  "-Q+"  
 fixDict["-neg"]  =  "-Q-"  
 
-
+fixDict['z'] = sample_names['z']
+fixDict['ZJetsInv'] = sample_names['z']
+fixDict['st']       = sample_names['st'] 
+fixDict['ST']       = sample_names['st'] 
+fixDict['dy']       = sample_names['dy'] 
+fixDict['DYJetsM50']       = sample_names['dy'] 
 
 fixDict["Other"]  =  "Other" 
 fixDict["T2-4bd-"]  =  "Signal" 
 fixDict["T2_4bd_"]  =  "Signal" 
-fixDict["DYJetsM50"]  =  "DYJets" 
+#fixDict["DYJetsM50"]  =  "DYJets" 
 fixDict["WJets"]  =  "WJets" 
-fixDict["ZJetsInv"]  =  "ZJetsInv" 
+#fixDict["ZJetsInv"]  =  "ZJetsInv" 
 fixDict["TTJets"]  =  "TTJets" 
 fixDict["Total"]  =  "Total S.M."
 fixDict["DataBlind"]  =  "Data(12.9fb-1)"
@@ -3139,3 +3175,33 @@ def getValueFromDict(x, val="0.500", default=999):  ##  can use dict.get()?
     #else:
     #    raise Exception("cannot find value %s in  %s"%(val, x))
     return float(ret)
+
+
+
+def makeHistoFromList(lst, bins=None,name ="Histo"):
+    if not bins:
+        bins = [len(lst),0,len(lst)]
+    h = ROOT.TH1F(name,name,*bins)
+    for ib,l in enumerate(lst,1):
+        if hasattr(l,"sigma"):
+            h.SetBinContent(ib,l.val)
+            h.SetBinError(ib,l.sigma)        
+        else:
+            h.SetBinContent(ib,l)
+    return h
+
+
+def makeHistoFromDict(di , bins=None, name="Histo", bin_order=None):
+    if bin_order:
+        lst   = [ di[x] for x in bin_order if x in di]
+        labels = [ x for x in bin_order if x in di]
+    else:
+        lst    = di.values()
+        labels = di.keys()
+    print lst
+    print labels
+
+    h = makeHistoFromList(lst, bins, name)
+    for ib, bin_label in enumerate(labels,1):
+        h.GetXaxis().SetBinLabel( ib, bin_label)
+    return h
