@@ -11,7 +11,13 @@ SingleMuon_Run2016B_PromptReco_v2 = {"name":"SingleMuon_Run2016B_PromptReco_v2"}
 SingleMuon_Run2016C_PromptReco_v2 = {"name":"SingleMuon_Run2016C_PromptReco_v2"}
 SingleMuon_Run2016D_PromptReco_v2 = {"name":"SingleMuon_Run2016D_PromptReco_v2"}
 
-allSamples_Data25ns_0l = [SingleElectron_Run2016B_PromptReco_v2, SingleElectron_Run2016C_PromptReco_v2, SingleElectron_Run2016D_PromptReco_v2, SingleMuon_Run2016B_PromptReco_v2, SingleMuon_Run2016C_PromptReco_v2, SingleMuon_Run2016D_PromptReco_v2]
+MET_Run2016B_PromptReco_v2 = {"name":"MET_Run2016B_PromptReco_v2"}
+MET_Run2016C_PromptReco_v2 = {"name":"MET_Run2016C_PromptReco_v2"}
+MET_Run2016D_PromptReco_v2 = {"name":"MET_Run2016D_PromptReco_v2"}
+
+allSamples_Data25ns_0l = [SingleElectron_Run2016B_PromptReco_v2, SingleElectron_Run2016C_PromptReco_v2, SingleElectron_Run2016D_PromptReco_v2,\
+                          SingleMuon_Run2016B_PromptReco_v2, SingleMuon_Run2016C_PromptReco_v2, SingleMuon_Run2016D_PromptReco_v2,\
+                          MET_Run2016B_PromptReco_v2,MET_Run2016C_PromptReco_v2,MET_Run2016D_PromptReco_v2]
 
 
 for s in allSamples_Data25ns_0l:
