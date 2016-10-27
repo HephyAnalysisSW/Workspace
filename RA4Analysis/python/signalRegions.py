@@ -218,43 +218,35 @@ sideBand10fb =  {(4, 5):     {(250, 350): {(500, 750):    {'deltaPhi': 1.0},
                                           (750, 1000):    {'deltaPhi': 1.0},
                                           (1000, -1):     {'deltaPhi': 1.0}}}}
 
-signalRegion10fbStaticDPhi =  {(5, 5): {(250, 350): {(500, 750): {'deltaPhi': 1.0},
-                                           (750, 1000): {'deltaPhi': 1.0},
-                                           (1000, 1250): {'deltaPhi': 1.0},
-                                           (1250, -1): {'deltaPhi': 1.0}},
-                              (350, 450): {(500, 750): {'deltaPhi': 1.0},
-                                           (750, 1000): {'deltaPhi': 1.0},
-                                           (1000, 1250): {'deltaPhi': 1.0},
-                                           (1250, -1): {'deltaPhi': 1.0}},
-                              (450, -1): {(500, 750): {'deltaPhi': 1.0},
-                                          (750, 1000): {'deltaPhi': 1.0},
-                                          (1000, 1250): {'deltaPhi': 1.0},
-                                          (1250, -1): {'deltaPhi': 1.0}}},
-                     (6, 7): {(250, 350): {(500, 750): {'deltaPhi': 1.0},
-                                           (750, 1000): {'deltaPhi': 1.0},
-                                           (1000, 1250): {'deltaPhi': 1.0},
-                                           (1250, -1): {'deltaPhi': 1.0}},
-                              (350, 450): {(500, 750): {'deltaPhi': 1.0},
-                                           (750, 1000): {'deltaPhi': 1.0},
-                                           (1000, 1250): {'deltaPhi': 1.0},
-                                           (1250, -1): {'deltaPhi': 1.0}},
-                              (450, -1): {(500, 750): {'deltaPhi': 1.0},
-                                          (750, 1000): {'deltaPhi': 1.0},
-                                          (1000, 1250): {'deltaPhi': 1.0},
-                                          (1250, -1): {'deltaPhi': 1.0}}},
-                     (8, -1): {(250, 350): {(500, 750): {'deltaPhi': 1.0},
-                                            (750, 1000): {'deltaPhi': 1.0},
-                                            (1000, 1250): {'deltaPhi': 1.0},
-                                            (1250, -1): {'deltaPhi': 1.0}},
-                               (350, 450): {(500, 750): {'deltaPhi': 1.0},
-                                            (750, 1000): {'deltaPhi': 1.0},
-                                            (1000, 1250): {'deltaPhi': 1.0},
-                                            (1250, -1): {'deltaPhi': 1.0}},
-                               (450, -1): {(500, 750): {'deltaPhi': 1.0},
-                                           (750, 1000): {'deltaPhi': 1.0},
-                                           (1000, 1250): {'deltaPhi': 1.0},
-                                           (1250, -1): {'deltaPhi': 1.0}}}
-                    }
+signalRegions_Moriond2017 = {(5,5): {(250, 350): {(500, 750):   {'deltaPhi': 1.0, 'njet':'5j','LT':'LT1','HT': 'HT1',  'tex':'\\textrm{LT1}, \\textrm{HT1}'},
+                                          (750, -1):          {'deltaPhi': 1.0, 'njet':'5j','LT':'LT1','HT': 'HT2', 'tex':'\\textrm{LT1}, \\textrm{HT23}'}},
+                             (350, 450): {(500, 750):         {'deltaPhi': 1.0, 'njet':'5j','LT':'LT2','HT': 'HT1',  'tex':'\\textrm{LT2}, \\textrm{HT1}'},
+                                          (750, -1):          {'deltaPhi': 1.0, 'njet':'5j','LT':'LT2','HT': 'HT2', 'tex':'\\textrm{LT2}, \\textrm{HT23}'}},
+                             (450, 650): {(500, 750):         {'deltaPhi': 0.75, 'njet':'5j','LT':'LT3','HT': 'HT1',  'tex':'\\textrm{LT2}, \\textrm{HT1}'},
+                                          (750, 1250):         {'deltaPhi': 0.75, 'njet':'5j','LT':'LT3','HT': 'HT23',  'tex':'\\textrm{LT2}, \\textrm{HT1}'},
+                                          (1250, -1):          {'deltaPhi': 0.75, 'njet':'5j','LT':'LT3','HT': 'HT3', 'tex':'\\textrm{LT2}, \\textrm{HT23}'}},
+                             (650, -1): {(500, 750):         {'deltaPhi': 0.5, 'njet':'5j','LT':'LT4','HT': 'HT1',  'tex':'\\textrm{LT2}, \\textrm{HT1}'},
+                                          (750, 1250):         {'deltaPhi': 0.5, 'njet':'5j','LT':'LT4','HT': 'HT23',  'tex':'\\textrm{LT2}, \\textrm{HT1}'},
+                                          (1250, -1):          {'deltaPhi': 0.5, 'njet':'5j','LT':'LT4','HT': 'HT3', 'tex':'\\textrm{LT2}, \\textrm{HT23}'}}},
+                     (6,7): {(250, 350): {(500, 1000):         {'deltaPhi': 1.0, 'njet':'6-7j','LT':'LT1','HT': 'HT1',  'tex':'\\textrm{LT1}, \\textrm{HT1}'},
+                                          (1000, -1):          {'deltaPhi': 1.0, 'njet':'6-7j','LT':'LT1','HT': 'HT23', 'tex':'\\textrm{LT1}, \\textrm{HT23}'}},
+                             (350, 450): {(500, 1000):         {'deltaPhi': 1.0, 'njet':'6-7j','LT':'LT2','HT': 'HT1',  'tex':'\\textrm{LT2}, \\textrm{HT1}'},
+                                          (1000, -1):          {'deltaPhi': 1.0, 'njet':'6-7j','LT':'LT2','HT': 'HT23', 'tex':'\\textrm{LT2}, \\textrm{HT23}'}},
+                             (450, 650): {(500, 750):         {'deltaPhi': 0.75, 'njet':'5j','LT':'LT3','HT': 'HT1',  'tex':'\\textrm{LT2}, \\textrm{HT1}'},
+                                          (750, 1250):         {'deltaPhi': 0.75, 'njet':'5j','LT':'LT3','HT': 'HT1',  'tex':'\\textrm{LT2}, \\textrm{HT1}'},
+                                          (1250, -1):          {'deltaPhi': 0.75, 'njet':'5j','LT':'LT3','HT': 'HT23', 'tex':'\\textrm{LT2}, \\textrm{HT23}'}},
+                             (650, -1): {(500, 750):         {'deltaPhi': 0.5, 'njet':'5j','LT':'LT4','HT': 'HT1',  'tex':'\\textrm{LT2}, \\textrm{HT1}'},
+                                          (750, 1250):         {'deltaPhi': 0.5, 'njet':'5j','LT':'LT4','HT': 'HT1',  'tex':'\\textrm{LT2}, \\textrm{HT1}'},
+                                          (1250, -1):          {'deltaPhi': 0.5, 'njet':'5j','LT':'LT4','HT': 'HT23', 'tex':'\\textrm{LT2}, \\textrm{HT23}'}}},
+                     (8,-1): {(250, 350):{(500, 1000):         {'deltaPhi': 1.0, 'njet':'#geq8j','LT':'LT1','HT': 'HT1',  'tex':'\\textrm{LT1}, \\textrm{HT1}'},
+                                          (1000, -1):          {'deltaPhi': 1.0, 'njet':'#geq8j','LT':'LT1','HT': 'HT23', 'tex':'\\textrm{LT1}, \\textrm{HT23}'}},
+                              (350, 450):{(500, 1000):         {'deltaPhi': 1.0, 'njet':'#geq8j','LT':'LT2','HT': 'HT1',  'tex':'\\textrm{LT2}, \\textrm{HT1}'},
+                                          (1000, -1):          {'deltaPhi': 1.0, 'njet':'#geq8j','LT':'LT2','HT': 'HT23', 'tex':'\\textrm{LT2}, \\textrm{HT23}'}},
+                             (450, 650): {(500, 1250):         {'deltaPhi': 0.75, 'njet':'5j','LT':'LT3','HT': 'HT1',  'tex':'\\textrm{LT2}, \\textrm{HT1}'},
+                                          (1250, -1):          {'deltaPhi': 0.75, 'njet':'5j','LT':'LT3','HT': 'HT23', 'tex':'\\textrm{LT2}, \\textrm{HT23}'}},
+                             (650, -1): {(500, 1250):         {'deltaPhi': 0.5, 'njet':'5j','LT':'LT4','HT': 'HT1',  'tex':'\\textrm{LT2}, \\textrm{HT1}'},
+                                          (1250, -1):          {'deltaPhi': 0.5, 'njet':'5j','LT':'LT4','HT': 'HT23', 'tex':'\\textrm{LT2}, \\textrm{HT23}'}}}}
+
 
 
 def addKey(d, newDict='deltaPhiCut'):
@@ -313,5 +305,3 @@ def makeQCDsignalRegions(d2, QCDSB = (3,4), ttSB = (4,5)):
           except KeyError: dQCD[ttSB][lt][ht][dPhi] = {'deltaPhi':dPhi, 'sys':sys}
           #dQCD[(4,5)] = {lt:{ht:{dPhi:{'deltaPhi':dPhi, 'sys':sys}}}}
   return dQCD
-
-
