@@ -11,7 +11,7 @@ btag_sf_map = BTagSFMap("sf")
 btag_to_sf  = btag_sf_map.btag_to_sf
 sf_to_btag  = btag_sf_map.sf_to_btag
 
-def bTagWeights(btag = 'btag'):
+def bTagWeights(btag = 'sf'):
    #self.presel_common = presel_common
    """
    cutdict["B1"] = "nBJet==1"

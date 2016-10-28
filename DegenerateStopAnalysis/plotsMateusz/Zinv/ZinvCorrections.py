@@ -33,8 +33,10 @@ lepEta = args.lepEta
 
 tag = "8012_mAODv2_v3/80X_postProcessing_v10"
 savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/Zinv/corrections/lepEta%s"%(tag,lepEta)
-makeDir(savedir)
+if not os.path.exists(savedir): os.makedirs(savedir)
+#makeDir(savedir)
 
+#regions = ['SR1', 'SRL1', 'SRH1', 'SRV1']
 regions = ['SR1', 'SR1a', 'SR1b', 'SR1c', 'SRL1', 'SRH1', 'SRV1', 'SRL1a', 'SRH1a', 'SRV1a', 'SRL1b', 'SRH1b', 'SRV1b', 'SRL1c', 'SRH1c', 'SRV1c']
  
 ZinvRows = []

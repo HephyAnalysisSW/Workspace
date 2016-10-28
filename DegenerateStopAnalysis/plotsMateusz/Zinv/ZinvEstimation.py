@@ -121,7 +121,7 @@ if verbose:
 #Save
 if save: #web address: http://www.hephy.at/user/mzarucki/plots
    tag = samples[samples.keys()[0]].dir.split('/')[7] + "/" + samples[samples.keys()[0]].dir.split('/')[8]
-   savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/Zinv"%tag
+   savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/Zinv/"%tag
 
    if getData: savedir += "/" + Zchannel
    
@@ -135,13 +135,11 @@ if save: #web address: http://www.hephy.at/user/mzarucki/plots
    savedir4 = savedir + "/pickle"
   
    suffix1 = "_" + Zchannel + "_" + SR
-   suffix2 = "_" + SR + "_CT" + CT2cut
-   suffix3 = "_" + Zchannel + suffix2
+   suffix2 = suffix1 + "_CT" + CT2cut
 
    if peak: 
       suffix1 += "_peak"
       suffix2 += "_peak"
-      suffix3 += "_peak"
       savedir1 += "/peak"
       savedir2 += "/peak"
       savedir3 += "/peak"
@@ -160,12 +158,12 @@ dilepton_mass = "sqrt(2*(LepAll_pt[" + ind1 + "] * LepAll_pt[" + ind2 + "]*(cosh
 
 dilepton_pt = "sqrt(LepAll_pt[" + ind1 + "]*LepAll_pt[" + ind1 + "] + LepAll_pt[" + ind2 + "]*LepAll_pt[" + ind2 + "] + 2*LepAll_pt[" + ind1 + "]*LepAll_pt[" + ind2 + "]*cos(LepAll_phi[" + ind1 + "] - LepAll_phi[" + ind2 + "]))"
 
-dilepton_phi = "atan(\
-((LepAll_pt[" + ind1 + "]*sin(LepAll_phi[" + ind1 + "])) + (LepAll_pt[" + ind2 + "]*sin(LepAll_phi[" + ind2 + "])))/\
+dilepton_phi = "atan2(\
+((LepAll_pt[" + ind1 + "]*sin(LepAll_phi[" + ind1 + "])) + (LepAll_pt[" + ind2 + "]*sin(LepAll_phi[" + ind2 + "]))),\
 ((LepAll_pt[" + ind1 + "]*cos(LepAll_phi[" + ind1 + "])) + (LepAll_pt[" + ind2 + "]*cos(LepAll_phi[" + ind2 + "]))))"
 
 met2 = "sqrt(met*met + dilepton_pt*dilepton_pt + 2*met*dilepton_pt*cos(met_phi - dilepton_phi))"
-met2_phi = "atan((met*sin(met_phi) + dilepton_pt*sin(dilepton_phi))/(met*cos(met_phi) + dilepton_pt*cos(dilepton_phi)))"
+met2_phi = "atan2((met*sin(met_phi) + dilepton_pt*sin(dilepton_phi)),(met*cos(met_phi) + dilepton_pt*cos(dilepton_phi)))"
 
 electron_mt_emul = "sqrt(2*met2*LepAll_pt[IndexLepAll_el[{ind}]]*(1 - cos(met2_phi - LepAll_phi[IndexLepAll_el[{ind}]])))".format(ind = ind_el)
 muon_mt_emul = "sqrt(2*met2*LepAll_pt[IndexLepAll_mu[{ind}]]*(1 - cos(met2_phi - LepAll_phi[IndexLepAll_mu[{ind}]])))".format(ind = ind_mu)
@@ -220,6 +218,8 @@ def regions(lepton, ind):
    SRs['SRH1'] = ["SRH1", combineCuts(SRs['SR1'][1], btw("LepAll_pt[" + ind + "]", 12, 20))]
    SRs['SRV1'] = ["SRV1", combineCuts(SRs['SR1'][1], btw("LepAll_pt[" + ind + "]", 20, 30))]
    
+   #SRs['pt_30_60'] = ["pt_30_60", btw("LepAll_pt[" + ind + "]", 30, 60)]
+   
    return SRs
 
 SRs_el = regions('electron', "IndexLepAll_el[" + ind_el + "]")
@@ -256,13 +256,30 @@ dilepton = CutClass("dilepton", [
    ], baseCut = None)
 
 emulated = CutClass("emulated", [
-   ["peak", peakCutString],
    ["dilepton_mass","dilepton_mass > 55"],
-   #["dilepton_pt","dilepton_pt > 75"],
    ["met2", "met2 > 75"], #instead of cut on dilepton pt
+   #["dilepton_pt","dilepton_pt > 75"], #replaced
    ["CT2","min(met2, ht_basJet - 100) > " + CT2cut],
+   ["peak", peakCutString],
    ], baseCut = dilepton)
 
+#if SR == "pt_30_60":
+#   electrons = CutClass("electrons", [
+#      #["ele","nLepAll_el >= 1"], #redundant
+#      ["diele-lep30Veto-2Lep20Veto", "((nLepAll_el == ({ind} + 1) && LepAll_pt[IndexLepAll_el[{ind}]] > 30) || (nLepAll_el == ({ind} + 2) && LepAll_pt[IndexLepAll_el[{ind}]] > 30 && LepAll_pt[IndexLepAll_el[{ind} + 1]] < 20))".format(ind = ind_el)],
+#      ["muVeto", "(nLepAll_mu == {ind} ||  (nLepAll_mu == ({ind} + 1) && LepAll_pt[IndexLepAll_mu[{ind}]] < 20))".format(ind = ind_mu)],
+#      ["eta", "abs(LepAll_eta[IndexLepAll_el[{ind}]]) < ".format(ind = ind_el) + lepEta],
+#      SRs_el[SR]
+#      ], baseCut = emulated)
+#   
+#   muons = CutClass("muons", [
+#      #["mu","nLepAll_mu >= 3"], #redundant
+#      ["dilepton-lep30Veto-2Lep20Veto", "((nLepAll_mu == ({ind} + 1) && LepAll_pt[IndexLepAll_mu[{ind}]] > 30) || (nLepAll_mu == ({ind} + 2) && LepAll_pt[IndexLepAll_mu[{ind}]] > 30 && LepAll_pt[IndexLepAll_mu[{ind} + 1]] < 20))".format(ind = ind_mu)],
+#      ["elVeto", "(nLepAll_el == {ind} || (nLepAll_el == ({ind} + 1) && LepAll_pt[IndexLepAll_el[0]] < 20))".format(ind = ind_el)],
+#      ["eta", "abs(LepAll_eta[IndexLepAll_mu[{ind}]]) < ".format(ind = ind_mu) + lepEta],
+#      SRs_mu[SR]
+#      ], baseCut = emulated)
+#else:
 electrons = CutClass("electrons", [
    #["ele","nLepAll_el >= 1"], #redundant
    ["diele-lep30Veto-2Lep20Veto", "((nLepAll_el == ({ind} + 1) && LepAll_pt[IndexLepAll_el[{ind}]] < 30) || (nLepAll_el == ({ind} + 2) && LepAll_pt[IndexLepAll_el[{ind}]] < 30 && LepAll_pt[IndexLepAll_el[{ind} + 1]] < 20))".format(ind = ind_el)],
@@ -360,15 +377,15 @@ if doYields and peak:
    ZinvRatios['ratio_mu'] = (ZinvRatios['Zpeak_dataMC']*ZinvRatios['prob_mu_dataMC'])
 
    #Pickle results 
-   pickleFile1 = open("%s/ZinvYields%s.pkl"%(savedir4,suffix3), "w")
+   pickleFile1 = open("%s/ZinvYields%s.pkl"%(savedir4,suffix2), "w")
    pickle.dump(ZinvYields, pickleFile1)
    pickleFile1.close()
 
-   pickleFile2 = open("%s/ZinvRatios%s.pkl"%(savedir4,suffix3), "w")
+   pickleFile2 = open("%s/ZinvRatios%s.pkl"%(savedir4,suffix2), "w")
    pickle.dump(ZinvRatios, pickleFile2)
    pickleFile2.close()
    
-   pickleFile3 = open("%s/rawZinvYields%s.pkl"%(savedir4,suffix3), "w")
+   pickleFile3 = open("%s/rawZinvYields%s.pkl"%(savedir4,suffix2), "w")
    pickle.dump(yields, pickleFile3)
    pickleFile3.close()
 
@@ -397,8 +414,8 @@ if plot:
       "dilepton_phi":{  'var':"dilepton_phi",               'bins':[20,-3.15,3.15], 'decor':{'title':"Di-lepton System Phi Distribution",                 'x':"Dilepton System Phi / GeV",         'y':"Events", 'log':[0,logy,0]}},
       "MET":{           'var':"met",                        'bins':[50,0,500],      'decor':{'title':"MET Distribution",                                  'x':"Missing E_{T} / GeV",               'y':"Events", 'log':[0,logy,0]}},
       "MET_phi":{       'var':"met_phi",                    'bins':[20,-3.15,3.15], 'decor':{'title':"MET Phi Distribution",                              'x':"MET Phi",                           'y':"Events", 'log':[0,logy,0]}},
-      "MET_emul":{          'var':"met2",                       'bins':[50,0,500],      'decor':{'title':"Emulated MET Distribution",                         'x':"Emulated Missing E_{T} / GeV",      'y':"Events", 'log':[0,logy,0]}},
-      "MET_emul_phi":{      'var':"met2_phi",                   'bins':[20,-3.15,3.15], 'decor':{'title':"Emulated MET Phi Distribution",                     'x':"Emulated MET Phi",                  'y':"Events", 'log':[0,logy,0]}},
+      "MET_emul":{      'var':"met2",                       'bins':[50,0,500],      'decor':{'title':"Emulated MET Distribution",                         'x':"Emulated Missing E_{T} / GeV",      'y':"Events", 'log':[0,logy,0]}},
+      "MET_emul_phi":{  'var':"met2_phi",                   'bins':[20,-3.15,3.15], 'decor':{'title':"Emulated MET Phi Distribution",                     'x':"Emulated MET Phi",                  'y':"Events", 'log':[0,logy,0]}},
       "HT":{            'var':"ht_basJet",                  'bins':[50,0,500],      'decor':{'title':"H_{{T}} Distribution",                              'x':"H_{T} / GeV",                       'y':"Events", 'log':[0,logy,0]}},
       "nJets30":{       'var':"nBasJet",                    'bins':[10,0,10],       'decor':{'title':"Number of Jets with p_{{T}} > 30GeV",               'x':"Number of Jets with p_{T} > 30GeV", 'y':"Events", 'log':[0,logy,0]}},      
       "nJets60":{       'var':"nVetoJet",                   'bins':[10,0,10],       'decor':{'title':"Number of Jets with p_{{T}} > 60GeV",               'x':"Number of Jets with p_{T} > 60GeV", 'y':"Events", 'log':[0,logy,0]}},
@@ -409,7 +426,7 @@ if plot:
       "electron_mt_emul":{'var':"electron_mt_emul",                                      'bins':[10,0,150], 'decor':{'title': "Emulated Electron mT Distribution", 'x':"Emulated Electron m_{T} / GeV", 'y':"Events", 'log':[0,0,0]}}, 
       "muon_mt_emul":{    'var':"muon_mt_emul",                                          'bins':[10,0,150], 'decor':{'title': "Emulated Muon mT Distribution",     'x':"Emulated Muon m_{T} / GeV",     'y':"Events", 'log':[0,0,0]}}, 
       "dilepton_mass_l3":{'var':"dilepton_mass_l3", 'bins':[25,5,255],  'decor':{'title':"Invariant Mass Distribution Between Leptons 1 and 3",                    'x':"M_{ll} / GeV",              'y':"Events", 'log':[0,0,0]}},
-      "minDeltaR_l3":{    'var':"minDeltaR_l3",     'bins':[10,0,1], 'decor':{'title':"Min deltaR between 3rd lepton and Z leptons",                            'x':"min(deltaR)",                   'y':"Events", 'log':[0,0,0]}},
+      "minDeltaR_l3":{    'var':"minDeltaR_l3",     'bins':[20,0,0.5], 'decor':{'title':"Min deltaR between 3rd lepton and Z leptons",                            'x':"min(deltaR)",                   'y':"Events", 'log':[0,0,0]}},
    }
    
    plotsList1 = ["dilepton_mass", "dilepton_pt", "dilepton_phi", "MET", "MET_phi", "MET_emul", "MET_emul_phi", "HT", "nJets30", "nJets60", "ISRpt"]
@@ -424,15 +441,15 @@ if plot:
    if beforeEmul:
       #setEventListToChains(samples, samplesList, dilepton)
       dileptonPlots = getPlots(samples, plotsDict, dilepton, samplesList, plotList = plotsList1, addOverFlowBin='upper')
-      dileptonPlots2 = drawPlots(samples, plotsDict, dilepton, samplesList, plotList = plotsList1, plotLimits = [10, 100], denoms=["bkg"], noms = [dataKey], fom="RATIO", fomLimits=[0,1.8], plotMin = 0.01, normalize = False, save=False)
+      dileptonPlots2 = drawPlots(samples, plotsDict, dilepton, samplesList, plotList = plotsList1, plotLimits = [10, 100], denoms=["bkg"], noms = [dataKey], fom="RATIO", fomLimits=[0,1.8], plotMin = 1, normalize = False, save=False)
  
    if afterEmul:
       #setEventListToChains(samples, samplesList, emulated)
       emulatedPlots = getPlots(samples, plotsDict, emulated, samplesList, plotList = plotsList1, addOverFlowBin='upper')
-      emulatedPlots2 = drawPlots(samples, plotsDict, emulated, samplesList, plotList = plotsList1, plotLimits = [10, 100], denoms=["bkg"], noms = [dataKey], fom="RATIO", fomLimits=[0,1.8], plotMin = 0.01, normalize = False, save=False)
+      emulatedPlots2 = drawPlots(samples, plotsDict, emulated, samplesList, plotList = plotsList1, plotLimits = [10, 100], denoms=["bkg"], noms = [dataKey], fom="RATIO", fomLimits=[0,1.8], plotMin = 1, normalize = False, save=False)
       
-   plotDict["dilepton_mass"]['decor']['log'] = [0,0,0]
-   plotsDict = Plots(**plotDict)
+   #plotDict["dilepton_mass"]['decor']['log'] = [0,0,0]
+   #plotsDict = Plots(**plotDict)
    
    if leptons:
       #setEventListToChains(samples, samplesList, muons)
