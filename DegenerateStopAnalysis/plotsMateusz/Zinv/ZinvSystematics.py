@@ -53,8 +53,8 @@ makeDir(tabledir)
 makeDir(plotdir)
 makeDir(path3)
 
-CTs = ['75', '100', '125', '150', '175', '200', '250', '300']
-#CTs = ['75', '150', '300']
+if SR == "SR1": CTs = ['75', '100', '125', '150', '175', '200', '250', '300']
+else: CTs = ['75', '150', '300']
 
 ZinvRatios = {'Zmumu':{}, 'Zee':{}, 'combined': {}} 
 ZinvYields = {'Zmumu':{}, 'Zee':{}, 'combined': {}}
@@ -182,7 +182,7 @@ pickleFile3.close()
 
 if saveFactors:
 
-   publicdir = "/afs/hephy.at/user/m/mzarucki/public/Zinv"
+   publicdir = "/afs/hephy.at/user/m/mzarucki/public/results/Zinv"
    makeDir(publicdir)
  
    regions = ['SR1a', 'SR1b', 'SR1c', 'SRL1a', 'SRH1a', 'SRV1a', 'SRL1b', 'SRH1b', 'SRV1b', 'SRL1c', 'SRH1c', 'SRV1c']
@@ -335,8 +335,8 @@ if plot:
       gr1.GetYaxis().SetNdivisions(512);
       gr1.GetXaxis().SetTitleOffset(1.4)
       gr1.GetYaxis().SetTitleOffset(1.6)
-      gr1.SetMinimum(0.2)
-      gr1.SetMaximum(2.7)
+      gr1.SetMinimum(0)
+      gr1.SetMaximum(2)
       gr1.Draw("AP") #plots the graph with axes and points
       
       gr2 = ROOT.TGraphErrors(len(CT_arr), np.array(CT_arr, 'float64'), np.array(corr_mu_arr, 'float64'), np.array([0]), np.array(corr_mu_err_arr, 'float64')) #graph object with error bars using arrays of data

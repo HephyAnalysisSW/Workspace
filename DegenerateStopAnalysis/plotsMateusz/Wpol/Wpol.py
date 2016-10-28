@@ -28,6 +28,7 @@ setup_style()
 
 #Input options
 parser = argparse.ArgumentParser(description = "Input options")
+parser.add_argument("--variation", dest = "variation",  help = "Variation", type = str, default = "FLminusFR") #simplified
 parser.add_argument("--plot", dest = "plot",  help = "Toggle plotting", type = int, default = 1)
 parser.add_argument("--makeTable", dest = "makeTable",  help = "Make table", type = int, default = 1)
 parser.add_argument("--logy", dest = "logy",  help = "Toggle logy", type = int, default = 1)
@@ -42,6 +43,7 @@ if not len(sys.argv) > 1:
    #exit()
 
 #Arguments
+variation = args.variation
 plot = args.plot
 makeTable = args.makeTable
 logy = args.logy
@@ -70,10 +72,49 @@ if verbose:
 #Save
 if save: #web address: http://www.hephy.at/user/mzarucki/plots
    tag = samples[samples.keys()[0]].dir.split('/')[7] + "/" + samples[samples.keys()[0]].dir.split('/')[8]
-   savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/Wpol"%tag
-   
+   savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/Wpol/13TeV_fractions"%tag
+   savedir += "/" + variation
+    
    makeDir(savedir + "/root")
    makeDir(savedir + "/pdf")
+
+#f = ROOT.TFile("Wpol_fractions_8TeV.root")
+#
+#WpolFractions = {}
+#
+#WpolFractions['h_W_plus_fl'] = f.Get("h_W_plus_fl")
+#WpolFractions['h_W_plus_fr'] = f.Get("h_W_plus_fr")
+#WpolFractions['h_W_plus_f0'] = f.Get("h_W_plus_f0")
+#
+#WpolFractions['h_W_minus_fl'] = f.Get("h_W_minus_fl")
+#WpolFractions['h_W_minus_fr'] = f.Get("h_W_minus_fr")
+#WpolFractions['h_W_minus_f0'] = f.Get("h_W_minus_f0")
+
+#binX = h.GetXaxis().FindBin(pt)
+#binY = h.GetYaxis().FindBin(abs(eta))
+#
+#if binX < h.GetXaxis().GetFirst():
+#   print "pt out of SF range. Using first bin value"
+#   binX = h.GetXaxis().GetFirst()
+#if binX > h.GetXaxis().GetLast():
+#   print "pt out of SF range. Using last bin value"
+#   binX = h.GetXaxis().GetLast()
+#
+#
+#if binY > h.GetYaxis().GetLast():
+#   print "eta out of SF range. Using last bin value"
+#   binY = h.GetYaxis().GetLast()
+#
+##bin = h.FindBin(pt,abs(eta)) #NOTE: not modified to take last bin value
+#bin = h.GetBin(binX, binY)
+#
+#print "x-bin #:", binX, "y-bin #:", binY,"Global bin #", bin
+#
+#if binY < h.GetYaxis().GetFirst():
+#   print "ybin < first. Something is wrong. Exiting"
+#   sys.exit(0)
+#
+#SF = h.GetBinContent(bin)
 
 #Preselection
 
@@ -107,6 +148,7 @@ WpolYields = {}
 
 for reg in regions:
    #Sets event list 
+   #chain.SetBranchStatus("*", 1)
    setEventListToChains(samples, ['w'], regions[reg])
    #samples[samp].tree.Draw(">>eList", degcuts.presel.combined)
    #eList = ROOT.gDirectory.Get("eList")
@@ -119,6 +161,7 @@ for reg in regions:
    
    usedBranches = ["GenPart_" + x for x in ['pt','eta','phi','mass','pdgId','motherId','motherIndex']]
    usedBranches.extend(['weight', 'puReweight', 'weightBTag0_SF', 'weightSBTag0_SF', 'weightSBTag1p_SF', 'weightHBTag0_SF', 'weightHBTag1p_SF', 'weightHBTag1_SF'])
+   usedBranches.extend(['met', 'met_pt'])
    
    for branch in chain.GetListOfBranches():
       if branch.GetName() in usedBranches:
@@ -133,7 +176,7 @@ for reg in regions:
    
    for i in range(nListEntries):
       #print "eList index", i
-      #if i == 50000: break
+      #if i == 1000: break
    
       chain.GetEntry(eList.GetEntry(i))
       #TTree:GetEntry(entry) = Read all branches of entry and return total number of bytes read. The function returns the number of bytes read from the input buffer. If entry does not exist the function returns 0. If an I/O error occurs,
@@ -211,9 +254,46 @@ for reg in regions:
       p4lep = ROOT.LorentzVector(lep.Px(), lep.Py(), lep.Pz(), lep.E())
    
       cosThetaStar = ROOT.WjetPolarizationAngle(p4W, p4lep)
+
+      #float GetWeightWjetsPolarizationFLminusFR(TLorentzVector _p4W, TLorentzVector _p4lepton,float PercentVariation, bool isWplus){
+      #uses: float GetWeightFLminusFR(float x,float var,LorentzVector p4W, bool Wplus ){ // variable x is cos(theta) here
       
-      WpolWeight = (1 + 0.1*(1-cosThetaStar)**2)
+      #float GetWeightWjetsPolarizationF0(TLorentzVector _p4W, TLorentzVector _p4lepton,float PercentVariation, bool isWplus){
+      #uses: float GetWeightF0(float x,float var,LorentzVector p4W, bool Wplus ){
       
+      if variation == "simplified": 
+         WpolWeight = (1 + 0.1*(1-cosThetaStar)**2)
+
+      elif variation == "FLminusFR":
+         #print makeLine()
+         #print 'cosThetaStar: ', cosThetaStar
+         #print 'pdgId ', genPart.pdgId[wIndex]
+         #print 'isWplus ', genPart.pdgId[wIndex] > 0
+         #print makeLine()
+ 
+         WpolWeight = ROOT.GetWeightFLminusFR(cosThetaStar, 10, p4W, genPart.pdgId[wIndex] > 0)
+         #print makeLine()
+         #print "Wpol weight: ", WpolWeight
+         #print "Wpol weight (xcheck): ", ROOT.GetWeightWjetsPolarizationF0(p4W, p4lep, 10, genPart.pdgId[wIndex] > 0) 
+         #print makeLine()
+      
+      elif variation == "F0":
+         WpolWeight = ROOT.GetWeightF0(cosThetaStar, 10, p4W, genPart.pdgId[wIndex] > 0)
+      
+      elif variation == "FLFR+":
+         if genPart.pdgId[wIndex] > 0:
+            WpolWeight = ROOT.GetWeightFLminusFR(cosThetaStar, 5, p4W, True)
+            #WpolWeight = ROOT.GetWeightFLFR(cosThetaStar, 5, p4W, True)
+         else:
+            WpolWeight = 1
+      
+      elif variation == "FLFR-":
+         if genPart.pdgId[wIndex] < 0:
+            WpolWeight = ROOT.GetWeightFLminusFR(cosThetaStar, 5, p4W, False)
+            #WpolWeight = ROOT.GetWeightFLFR(cosThetaStar, 5, p4W, False)
+         else:
+            WpolWeight = 1
+
       #print "COS THETA", cosThetaStar
       hist1.Fill(5, weight*puWeight*bTagWeight*lumiWeight)
       hist2.Fill(5, weight*puWeight*bTagWeight*lumiWeight*WpolWeight)
@@ -222,25 +302,20 @@ for reg in regions:
  
    nOrigVal = hist1.GetBinContent(hist1.FindBin(5))
    nOrigErr = hist1.GetBinError(hist1.FindBin(5))
-   nOrig = u_float.u_float(nOrigVal, nOrigErr)
 
    nCorrVal = hist2.GetBinContent(hist2.FindBin(5))
    nCorrErr = hist2.GetBinError(hist2.FindBin(5))
-   nCorr = u_float.u_float(nCorrVal, nCorrErr)
+   
+   WpolYields[reg] = {}
+   WpolYields[reg]['original'] = u_float.u_float(nOrigVal, nOrigErr)
+   WpolYields[reg]['corrected'] = u_float.u_float(nCorrVal, nCorrErr)
 
+   print reg, " Yields - original: ", WpolYields[reg]['original'], " | corrected: ", WpolYields[reg]['corrected'] 
+   
    #nOrig = hist_cosThetaStar1.Integral()
    #nCorr = hist_cosThetaStar2.Integral()
    #nOrig = hist_cosThetaStar1.IntegralAndError()
    #nCorr = hist_cosThetaStar2.IntegralAndError()
-   
-   print reg, " Yields - original: ", nOrig, " | corrected: ", nCorr
-   
-   WpolYields[reg] = {}
-   WpolYields[reg]['original'] = nOrig
-   WpolYields[reg]['corrected'] = nCorr
-
-   #uncertainties[reg] = abs(nOrig-nCorr)/nOrig*100 
-   #print "% UNC.: ", uncertainties[reg]
 
    if plot:  
       canv = ROOT.TCanvas("canv", "Canvas", 1800, 1500)
@@ -304,9 +379,20 @@ ratios = {} #SR/CR
 
 for reg in SRs:
    ratios[reg] = {}
-   ratios[reg]['original'] = WpolYields[reg]['original']/WpolYields[SRs[reg]]['original']
-   ratios[reg]['corrected'] = WpolYields[reg]['corrected']/WpolYields[SRs[reg]]['corrected']
-   ratios[reg]['ratio'] = ratios[reg]['corrected']/ratios[reg]['original']
+   if WpolYields[SRs[reg]]['original'].val: 
+      ratios[reg]['original'] = WpolYields[reg]['original']/WpolYields[SRs[reg]]['original']
+   else: 
+      ratios[reg]['original'] = u_float.u_float(0., 0.)  
+   
+   if WpolYields[SRs[reg]]['corrected'].val: 
+      ratios[reg]['corrected'] = WpolYields[reg]['corrected']/WpolYields[SRs[reg]]['corrected']
+   else:
+      ratios[reg]['corrected'] = u_float.u_float(0., 0.)
+
+   if ratios[reg]['original'].val: 
+      ratios[reg]['ratio'] = ratios[reg]['corrected']/ratios[reg]['original']
+   else:
+      ratios[reg]['ratio'] = u_float.u_float(0., 0.)
 
 pickleFile2 = open("%s/WpolRatios.pkl"%(savedir), "w")
 pickle.dump(ratios, pickleFile2)
@@ -315,7 +401,7 @@ pickleFile2.close()
 if makeTable:
    print "Making table"
    WpolRows = []
-   listTitle = ['$\mathbf{Region}$', '$\mathbf{Original~Yield}', '$\mathbf{Corrected~Yield}$', '$\mathbf{SF(SR-CR)~[Original]}$', '$\mathbf{SF(SR-CR)~[Corrected]}$', '$\mathbf{SF(SR-CR)~Ratio}$']
+   listTitle = ['$\mathbf{Region}$', '$\mathbf{Original~Yield}$', '$\mathbf{Corrected~Yield}$', '$\mathbf{SF(SR-CR)~[Original]}$', '$\mathbf{SF(SR-CR)~[Corrected]}$', '$\mathbf{SF(SR-CR)~Ratio}$']
    WpolRows.append(listTitle)
    for reg in SRs_2:
       WpolRows.append([reg, str(WpolYields[reg]['original'].round(2)), str(WpolYields[reg]['corrected'].round(2)), str(ratios[reg]['original'].round(2)), str(ratios[reg]['corrected'].round(2)), str(ratios[reg]['ratio'].round(2))])

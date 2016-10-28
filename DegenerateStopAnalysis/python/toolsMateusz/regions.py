@@ -3,7 +3,7 @@ import math
 from Workspace.DegenerateStopAnalysis.tools.degTools import CutClass, splitCutInPt
 from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import makeLine
 from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
-#from Workspace.DegenerateStopAnalysis.tools.bTagWeights import bTagWeights
+from Workspace.DegenerateStopAnalysis.tools.bTagWeights import bTagWeights
 
 less = lambda var, val: "(%s < %s)"%(var,val)
 more = lambda var, val: "(%s > %s)"%(var,val)
@@ -11,10 +11,9 @@ btw = lambda var, minVal, maxVal: "(%s > %s && %s < %s)"%(var, min(minVal, maxVa
 minAngle = lambda phi1, phi2 : "TMath::Min((2*pi) - abs({phi1}-{phi2}) , abs({phi1}-{phi2}))".format(phi1 = phi1, phi2 = phi2)  
 
 etaAcc = 2.5
-
+   
 ##bTagWeights
-#bWeightDict = bTagWeights('sf')
-#bTagString = bWeightDict['sr1_bjet'] #corresponds to bVeto
+#bWeightDict = bTagWeights(btag)
 
 #Signal regions
 def signalRegions(lepton, index = ""):
@@ -52,6 +51,39 @@ def signalRegions(lepton, index = ""):
    SRs['SRL1'] = ["SRL1", combineCuts(SRs['SR1'][1], btw("LepAll_pt[" + ind + "]", 5, 12))]
    SRs['SRH1'] = ["SRH1", combineCuts(SRs['SR1'][1], btw("LepAll_pt[" + ind + "]", 12, 20))]
    SRs['SRV1'] = ["SRV1", combineCuts(SRs['SR1'][1], btw("LepAll_pt[" + ind + "]", 20, 30))]
+
+   #extra regions
+   sr2 = CutClass("SR2", [ 
+      ["ISR325","nIsrHJet>0"],
+      ["pt<30","LepAll_pt[" + ind + "] < 30"], #eta?
+      ], 
+      baseCut = None) #self.presel,
+
+   SRs['SR2'] = ["SR2", sr2.combined]
+   SRs['SRL2'] = ["SRL2", combineCuts(SRs['SR2'][1], btw("LepAll_pt[" + ind + "]", 5, 12))]
+   SRs['SRH2'] = ["SRH2", combineCuts(SRs['SR2'][1], btw("LepAll_pt[" + ind + "]", 12, 20))]
+   SRs['SRV2'] = ["SRV2", combineCuts(SRs['SR2'][1], btw("LepAll_pt[" + ind + "]", 20, 30))]
+   
+   CRs = {\
+      #'CR1':["CR1","LepAll_pt[" + ind + "] > 30"],
+      'CR1a':["CR1a",   combineCuts("LepAll_pdgId[" + ind + "] == " + pdgId, "LepAll_mt[" + ind + "] < 60", "LepAll_pt[" + ind + "] > 30")],
+      'CR1b':["CR1b",   combineCuts("LepAll_pdgId[" + ind + "] == " + pdgId, btw("LepAll_mt[" + ind + "]", 60, 95), "LepAll_pt[" + ind + "] > 30")],
+      'CR1c':["CR1c",   combineCuts("LepAll_mt[" + ind + "] > 95", "LepAll_pt[" + ind + "] > 30")]}
+   
+   CRs['CR1'] = ["CR1", "((" + CRs['CR1a'][1] + ") || (" + CRs['CR1b'][1] + ") || (" + CRs['CR1c'][1] + "))"]
+
+   #cr1 = CutClass("CR1", [
+   #   #["CT300","min(met,ht_basJet-100) > 300 "],
+   #   ["pt>30", "LepAll_pt[" + ind + "] > 30"],
+   #   ["negLep", "LepAll_pdgId[" + ind + "] == " + pdgId],
+   #   ], baseCut = None) #self.presel,
+   #
+   #cr1b = CutClass("CR1b", [["mt", btw("LepAll_mt[" + ind + "]", 60, 95)]], baseCut = cr1)
+   #
+   #SRs['CR1'] = ["CR1", cr1.combined]
+   #SRs['CR1b'] = ["CR1b", cr1b.combined]
+
+   SRs.update(CRs)
 
    return SRs
 

@@ -18,7 +18,7 @@ def newLine():
 
 #Histograms
 def emptyHist(title, nbins = 100, min = 0, max = 1000):
-   hist = ROOT.TH1D("hist", "Histogram", nbins, min, max)
+   hist = ROOT.TH1D("hist_"+title, "Histogram", nbins, min, max)
    hist.GetXaxis().SetTitle(title)
    hist.GetYaxis().SetTitle("Events")
    hist.GetXaxis().CenterTitle()
@@ -71,6 +71,17 @@ def makeHistVarBins(sample, varname, sel, xbins): # xbins = array('d', [range(xm
    hist.SetFillColor(ROOT.kBlue-9)
    hist.SetLineColor(ROOT.kBlack)
    hist.SetLineWidth(3)
+   return hist
+
+def empty2Dhist(nbins1 = 100, min1 = 0, max1 = 1000, nbins2 = 100, min2 = 0, max2 = 1000):
+   hist = ROOT.TH2D("hist", "Histogram", nbins1, min1, max1, nbins2, min2, max2)
+   hist.GetZaxis().SetTitle("Events")
+   hist.GetXaxis().CenterTitle()
+   hist.GetYaxis().CenterTitle()
+   hist.GetZaxis().CenterTitle()
+   hist.GetXaxis().SetTitleOffset(1.2) 
+   hist.GetYaxis().SetTitleOffset(1.2) 
+   hist.GetZaxis().SetTitleOffset(1.2) 
    return hist
 
 def make2DHist(sample, var1, var2, sel = "", nbins1 = 100, min1 = 0, max1 = 1000, nbins2 = 100, min2 = 0, max2 = 1000):
