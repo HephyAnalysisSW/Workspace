@@ -1,0 +1,12 @@
+python -b ../QCDestimation_mu.py --ABCD 2D --estimation 1 --plot 0 --highWeightVeto 0 --btag sf --plotReg SR1  --HT 400 --MET 300  --loosenMET 1 --METloose 200 --loosenIP 1
+python -b ../QCDestimation_el.py --ABCD 2D --estimation 1 --plot 0 --highWeightVeto 0 --btag sf --plotReg SR1  --HT 400 --MET 300  --loosenMET 1 --METloose 200 --invertSigmaEtaEta 1
+
+python -b ../QCDestimation_mu2.py --ABCD 2D --estimation 1 --plot 0 --highWeightVeto 0 --btag sf --reg SR2  --HT 400 --MET 300  --loosenMET 1 --METloose 200 --loosenIP 1
+python -b ../QCDestimation_mu2.py --ABCD 2D --estimation 1 --plot 0 --highWeightVeto 0 --btag sf --reg SRL2  --HT 400 --MET 300  --loosenMET 1 --METloose 200 --loosenIP 1
+python -b ../QCDestimation_mu2.py --ABCD 2D --estimation 1 --plot 0 --highWeightVeto 0 --btag sf --reg SRH2  --HT 400 --MET 300  --loosenMET 1 --METloose 200 --loosenIP 1
+python -b ../QCDestimation_mu2.py --ABCD 2D --estimation 1 --plot 0 --highWeightVeto 0 --btag sf --reg SRV2  --HT 400 --MET 300  --loosenMET 1 --METloose 200 --loosenIP 1
+
+python -b ../QCDestimation_el2.py --ABCD 2D --estimation 1 --plot 0 --highWeightVeto 0 --btag sf --reg SR2  --HT 400 --MET 300  --loosenMET 1 --METloose 200 --invertSigmaEtaEta 1
+python -b ../QCDestimation_el2.py --ABCD 2D --estimation 1 --plot 0 --highWeightVeto 0 --btag sf --reg SRL2  --HT 400 --MET 300  --loosenMET 1 --METloose 200 --invertSigmaEtaEta 1
+python -b ../QCDestimation_el2.py --ABCD 2D --estimation 1 --plot 0 --highWeightVeto 0 --btag sf --reg SRH2  --HT 400 --MET 300  --loosenMET 1 --METloose 200 --invertSigmaEtaEta 1
+python -b ../QCDestimation_el2.py --ABCD 2D --estimation 1 --plot 0 --highWeightVeto 0 --btag sf --reg SRV2  --HT 400 --MET 300  --loosenMET 1 --METloose 200 --invertSigmaEtaEta 1

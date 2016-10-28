@@ -1,2 +1,4 @@
-python -b ../ZinvEstimation_MuMu_loop.py --peak 1
-python -b ../ZinvEstimation_MuMu_loop.py --peak 0
+python -b ../ZinvEstimation_MuMu_loop.py --peak 1 --CT2 75 
+python -b ../ZinvEstimation_MuMu_loop.py --peak 0 --CT2 75 
+python -b ../ZinvEstimation_MuMu_loop.py --peak 1 --CT2 300 
+python -b ../ZinvEstimation_MuMu_loop.py --peak 0 --CT2 300 
