@@ -522,6 +522,7 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
                         
     newVariables_DATAMC.extend([
         'Flag_Veto_Event_List/I/1',
+        'Flag_Filters/I/1',
         ])
         
     newVariables_DATAMC.extend([
@@ -2181,7 +2182,37 @@ def processEventVetoList(readTree, splitTree, saveTree, veto_event_list):
             run_lumi_evt
             )
         
-    #
+    return saveTree    
+
+def processEventVetoFilters(sample, readTree, splitTree, saveTree, params):
+    ''' 
+    Flag for vetoing events which do not pass the specified filters      
+    '''
+    
+    logger = logging.getLogger('cmgPostProcessing.processEventVetoFilters')
+
+    run_lumi_evt = saveTree.run_lumi_evt 
+    
+    # sample type (data or MC, taken from CMG component)
+    isDataSample = sample['isData']
+   
+    if isDataSample: filters = params['filters']['data']
+    else: filters = params['filters']['MC']
+
+    filterFlags = hephyHelpers.getObjDict(splitTree, "Flag_", filters, 0)
+ 
+    if 0 in filterFlags.values():
+        saveTree.Flag_Filters = 0
+        logger.debug(
+            "\n Run:LS:Event %s failed filters",
+            run_lumi_evt
+            )
+    else:
+        logger.trace(
+            "\n Run:LS:Event %s passed filters",
+            run_lumi_evt
+            )
+        
     return saveTree    
 
 def processEventVetoFastSimJets(readTree, splitTree, saveTree, params):
@@ -3023,6 +3054,12 @@ def cmgPostProcessing(argv=None):
                     if isDataSample and args.applyEventVetoList:
                         saveTree = processEventVetoList(
                             readTree, splitTree, saveTree, event_veto_list
+                            )
+                    
+                    # process event veto filters flags
+                    if args.applyEventVetoFilters:
+                        saveTree = processEventVetoFilters(sample,
+                            readTree, splitTree, saveTree, params
                             )
 
                     # compute flag for event veto for FastSim jets
