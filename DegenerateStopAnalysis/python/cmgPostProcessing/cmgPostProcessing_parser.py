@@ -94,14 +94,21 @@ def get_parser():
         help="Name of the post-processing tag, preferably a tag for Workspace"
         )
 
-    argParser.add_argument('--parameterSet',
+    argParser.add_argument(
+        '--parameterSet',
         action='store',
         nargs='?',
         type=str,
-        choices=['analysisHephy_13TeV_2016_v0', 'analysisHephy_13TeV_v0', 'analysisHephy_8vs13TeV_v0', 'syncLip_v0', ],
+        choices=[
+            'analysisHephy_13TeV_2016_v1',
+            'analysisHephy_13TeV_2016_v0',
+            'analysisHephy_13TeV_v0',
+            'analysisHephy_8vs13TeV_v0',
+            'syncLip_v0',
+        ],
         default='analysisHephy_13TeV_2016_v0',
-        help="Selection of the parameter set used for post-processing." 
-        )
+        help="Selection of the parameter set used for post-processing."
+    )
 
     argParser.add_argument('--skimGeneral',
         action='store',

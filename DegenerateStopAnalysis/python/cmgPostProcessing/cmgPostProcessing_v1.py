@@ -431,7 +431,43 @@ def eventsSkimPreselect(skimGeneral, skimLepton, skimPreselectFlag, params, skim
     #
     return skimCond
 
- 
+
+def indexObjNames(obj_selector):
+
+    branchPrefix = obj_selector['branchPrefix']
+    object = obj_selector['object']
+    selectorId = obj_selector['selectorId']
+
+    nObjName = ''.join(['n', branchPrefix, '_', object, '_', selectorId])
+
+    prefixToAdd = ''.join(['Index', branchPrefix])
+    indexName = ''.join(
+        [prefixToAdd, '_', object, '_', selectorId]
+    )
+
+    varToAdd = ''.join([object, '_', selectorId])
+
+    rtuple = collections.namedtuple(
+        'rtuple',
+        [
+            'nObjName',
+            'prefix',
+            'indexName',
+            'var',
+        ]
+    )
+
+    my_rtuple = rtuple(
+        nObjName,
+        prefixToAdd,
+        indexName,
+        varToAdd
+    )
+    #
+    return my_rtuple
+   
+
+    
  
 def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, params={} ):
     '''Define the read / write tree classes for data and MC.
@@ -513,7 +549,9 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
     readVariables_DATAMC = []
     aliases_DATAMC = []
     newVariables_DATAMC = []
+
     readVectors_DATAMC = []
+    newVectors_DATAMC = []
     
     readVariables_DATAMC.extend(['met_pt/F', 'met_phi/F'])
     aliases_DATAMC.extend([ 'met:met_pt', 'metPhi:met_phi'])
@@ -608,7 +646,6 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
         ])
     
 
-    newVectors_DATAMC = []
     
     newVectors_DATAMC = appendVectors(params, 'vectors_DATAMC_List', 'new', newVectors_DATAMC)
     
@@ -804,8 +841,216 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
         # readVectors for generated tracks added already via GenTracksSel to 
         # readVectors_MC
    
+    # add variables and vectors from the selectors
 
-    # sum up branches to be defined for each sample, depending on the sample type (data or MC)
+    def appendNewQuantities(nObjName, prefixToAdd, indexName, varInIndex, nMax, new_variables, new_vectors):
+        ''' Append variable and vectors defined in each selector. 
+
+                '''
+
+        varToAdd = ''.join([varInIndex, '/I/-1'])
+
+        if nObjName not in new_variables:
+            new_variables.extend([
+                ''.join([nObjName, '/I/-1'])
+            ])
+            logger.trace("\n Add variable: \n %s \n", nObjName)
+        else:
+            raise Exception(
+                '\n Multiple definition of variable {var}.'.format(var=nObjName))
+            sys.exit()
+
+        prefixFound = False
+
+        for vec in new_vectors:
+
+            if prefixToAdd == vec['prefix']:
+                prefixFound = True
+                logger.trace(
+                    "\n Found prefix: \n %s \n", pprint.pformat(prefixToAdd))
+
+                if nMax != vec['nMax']:
+                    raise Exception(
+                        ''.join([
+                            '\n nMax from selector for {indexName}  = {nMax}',
+                            ' different from nMax = {nMaxEx} for existing prefix'
+                        ]).format(
+                            indexName=indexName, nMax=nMax, nMaxEx=vec[
+                                'nMax']
+                        )
+                    )
+                    sys.exit()
+
+                if varToAdd not in vec['vars']:
+                    vec['vars'].append(varToAdd)
+                    logger.trace(
+                        "\n Add variable: \n %s \n to vector \n %s \n", varToAdd, vec)
+                else:
+                    raise Exception(
+                        '\n Multiple definition of variable {var}.'.format(var=varToAdd))
+                    sys.exit()
+
+        if not prefixFound:
+            new_vec = {'prefix': prefixToAdd, 'nMax': nMax, 'size': nObjName,
+                       'vars': varToAdd
+                       }
+            logger.trace(
+                "\n Append new vector: \n %s \n", pprint.pformat(new_vec))
+
+            new_vectors.extend([new_vec])
+
+    def appendSelQuantities(obj_selector, read_variables, new_variables, read_vectors, new_vectors):
+        ''' Append variable and vectors defined in each selector. 
+
+            '''
+
+        object = obj_selector['object']
+        selectorId = obj_selector['selectorId']
+
+        branchesToRead = obj_selector['branchesToRead']
+
+        nMax = obj_selector['nMax']
+
+        index_rtuple = indexObjNames(obj_selector)
+        
+        nObjName = index_rtuple.nObjName
+        indexName = index_rtuple.indexName
+        prefixToAdd = index_rtuple.prefix
+        varInIndex = index_rtuple.var
+        
+        appendNewQuantities(nObjName, prefixToAdd, indexName, varInIndex, nMax, new_variables, new_vectors)
+
+#         varToAdd = ''.join([index_rtuple.var, '/I/-1'])
+# 
+#         if nObjName not in new_variables:
+#             new_variables.extend([
+#                 ''.join([nObjName, '/I/-1'])
+#             ])
+#             logger.trace("\n Add variable: \n %s \n", nObjName)
+#         else:
+#             raise Exception(
+#                 '\n Multiple definition of variable {var}.'.format(var=nObjName))
+#             sys.exit()
+# 
+#         prefixFound = False
+# 
+#         for vec in new_vectors:
+# 
+#             if prefixToAdd == vec['prefix']:
+#                 prefixFound = True
+#                 logger.trace(
+#                     "\n Found prefix: \n %s \n", pprint.pformat(prefixToAdd))
+# 
+#                 if nMax != vec['nMax']:
+#                     raise Exception(
+#                         ''.join([
+#                                 '\n nMax from selector {prefix}_{obj}_{name}  = {nMax}',
+#                                 ' different from nMax = {nMaxEx} for existing prefix'
+#                                 ]).format(
+#                             prefix=prefixToAdd, obj=object, name=selectorId, nMax=nMax, nMaxEx=vec[
+#                                 'nMax']
+#                         )
+#                     )
+#                     sys.exit()
+# 
+#                 if varToAdd not in vec['vars']:
+#                     vec['vars'].append(varToAdd)
+#                     logger.trace(
+#                         "\n Add variable: \n %s \n to vector \n %s \n", varToAdd, vec)
+#                 else:
+#                     raise Exception(
+#                         '\n Multiple definition of variable {var}.'.format(var=varToAdd))
+#                     sys.exit()
+# 
+#         if not prefixFound:
+#             new_vec = {'prefix': prefixToAdd, 'nMax': nMax,
+#                        'vars': varToAdd
+#                        }
+#             logger.trace(
+#                 "\n Append new vector: \n %s \n", pprint.pformat(new_vec))
+# 
+#             new_vectors.extend([new_vec])
+        
+
+    
+    selectorList = params['selectorList']
+
+    for obj_selector in selectorList:
+
+        logger.trace(
+            "\n Append variables and vectors for selector: \n %s \n", pprint.pformat(
+                obj_selector)
+        )
+
+        sampleType = obj_selector['sampleType']
+
+        if ('data' in sampleType) and ('mc' in sampleType):
+
+            appendSelQuantities(
+                obj_selector,
+                readVariables_DATAMC, newVariables_DATAMC,
+                readVectors_DATAMC, newVectors_DATAMC
+            )
+
+        elif ('mc' in sampleType):
+            appendSelQuantities(
+                obj_selector,
+                readVariables_MC, newVariables_MC,
+                readVectors_MC, newVectors_MC
+            )
+
+        elif ('data' in sampleType):
+            appendSelQuantities(
+                obj_selector,
+                readVariables_DATA, newVariables_DATA,
+                readVectors_DATA, newVectors_DATA
+            )
+
+        else:
+            pass
+
+    mergeLeptonSelectors = params['mergeLeptonSelectors']
+
+    for sels in mergeLeptonSelectors:
+        muSelector = sels[0]
+        elSelector = sels[1]
+
+        index_rtuple_mu = indexObjNames(muSelector)
+        index_rtuple_el = indexObjNames(elSelector)
+
+        nObjName = index_rtuple_mu.nObjName.replace('_mu_', '_lep_')
+        prefixToAdd = index_rtuple_mu.prefix
+        indexName = index_rtuple_mu.indexName.replace('_mu_', '_lep_')
+        varInIndex = index_rtuple_mu.var.replace('mu_', 'lep_')
+
+        nMax = muSelector['nMax']
+
+        sampleType = muSelector['sampleType']
+
+        if ('data' in sampleType) and ('mc' in sampleType):
+            appendNewQuantities(
+                nObjName, prefixToAdd, indexName,
+                varInIndex, nMax, newVariables_DATAMC, newVectors_DATAMC
+            )
+
+        elif ('mc' in sampleType):
+            appendNewQuantities(
+                nObjName, prefixToAdd, indexName,
+                varInIndex, nMax, newVariables_MC, newVectors_MC
+            )
+
+        elif ('data' in sampleType):
+            appendNewQuantities(
+                nObjName, prefixToAdd, indexName,
+                varInIndex, nMax, newVariables_DATA, newVectors_DATA
+            )
+
+        else:
+            pass
+
+    
+    # sum up branches to be defined for each sample, depending on the sample
+    # type (data or MC)
     
     if sample['isData']: 
         keepBranches = keepBranches_DATAMC + keepBranches_DATA
@@ -945,6 +1190,127 @@ def getRunLumiEvt(splitTree, saveTree):
     return saveTree
 
 
+def getListFromSaveTree(saveTree, listName):
+    '''Get a list from saveTree.
+
+    TODO a more decent way to retrieve the list of indices?
+    '''
+
+    logger = logging.getLogger('cmgPostProcessing.getListFromSaveTree')
+
+    if listName is not None:
+        savedList = []
+        list_ptr = getattr(saveTree, listName)
+        for i in range(len(list_ptr)):
+            idx = list_ptr[i]
+            if idx >= 0:
+                savedList.append(idx)
+
+    else:
+        savedList = None
+
+    logger.debug(
+        '\n {name} list retrieved from saveTree \n {indexList} \n'.format(
+            name=listName,
+            indexList=pprint.pformat(savedList)
+        )
+    )
+
+    #
+    return savedList
+
+def evaluateSelectors(readTree, splitTree, saveTree, params):
+    '''Evaluate all selectors defined in the parameter file. 
+
+    For each selector, produce the index array Index{branchPrefix}_{obj}_{selectorId} 
+    and the number of objects in the selected list n{Object}
+    '''
+
+    logger = logging.getLogger('cmgPostProcessing.evaluateSelectors')
+
+    selectorList = params['selectorList']
+
+    for obj_selector in selectorList:
+
+        branchPrefix = obj_selector['branchPrefix']
+        object = obj_selector['object']
+        selectorId = obj_selector['selectorId']
+        
+        branchesToRead = obj_selector['branchesToRead']
+        branchesToPrint = obj_selector['branchesToPrint']
+
+        # get from saveTree the actual list for inputIndexList_str, if not None
+        # TODO a more decent way to retrieve the list of indices?
+
+        inputIndexList_str = obj_selector['inputIndexList']
+
+        if inputIndexList_str is not None:
+            inputIndexList =[]
+            inputIndexList_ptr = getattr(saveTree, inputIndexList_str)
+            for i in range(len(inputIndexList_ptr)):
+                idx = inputIndexList_ptr[i]
+                if idx >= 0:
+                    inputIndexList.append(idx)
+            
+        else:
+            inputIndexList = None
+
+        logger.debug(
+            '\n Input list of object indices for selector {prefix}_{obj}_{name} \n {indexList} \n'.format(
+                prefix=branchPrefix, obj=object, name=selectorId,
+                indexList=pprint.pformat(inputIndexList)
+            )
+        )
+        
+        #
+        
+        cmgObj = cmgObjectSelection.cmgObject(
+            readTree, splitTree, branchPrefix)
+
+        if logger.isEnabledFor(logging.DEBUG):
+            printStr = ''.join([
+                '\n List of ',
+                branchPrefix,
+                ' ',
+                object, ' before selector: ',
+                cmgObj.printObjects(inputIndexList, branchesToPrint)
+            ])
+            logger.debug(printStr)
+
+        #
+        selector_expression = obj_selector['selector']
+        selector_function = cmgObjectSelection.objSelectorFunc(
+            selector_expression)
+        objList = cmgObj.selectionIndexList(
+            readTree, selector_function, inputIndexList)
+
+        index_rtuple = indexObjNames(obj_selector)
+        nObjName = index_rtuple.nObjName
+        indexName = index_rtuple.indexName
+
+        setattr(saveTree, nObjName, len(objList))
+        for idx, val in enumerate(objList):
+            var = getattr(saveTree, indexName)
+            var[idx] = val
+
+        if logger.isEnabledFor(logging.DEBUG):
+            printStr = ''.join([
+                '\n ',
+                branchPrefix,
+                ' ',
+                object, ' selector \n\n',
+                cmgObj.printObjects(objList, branchesToPrint),
+                '\n',
+                'saveTree.', nObjName, ' = %i',
+                '\n ', indexName, ': ', pprint.pformat(objList),
+                '\n'
+            ])
+            logger.debug(printStr, getattr(saveTree, nObjName))
+
+    return saveTree
+
+
+
 def processGenSusyParticles(readTree, splitTree, saveTree, params):
 
 
@@ -1034,6 +1400,65 @@ def saveTreeLepObject(saveTree, LepColl, objName, objList):
         var[idx] = val
         
     return saveTree
+
+
+def mergeLeptons(readTree, splitTree, saveTree, params):
+    '''Merge muons and electrons for a muon and an electron selectors. 
+
+    The two selectors must have the same branchPrefix and the same selectorId.
+    '''
+
+    logger = logging.getLogger('cmgPostProcessing.mergeLeptons')
+
+    mergeLeptonSelectors = params['mergeLeptonSelectors']
+
+    for sels in mergeLeptonSelectors:
+        muSelector = sels[0]
+        elSelector = sels[1]
+
+        index_rtuple_mu = indexObjNames(muSelector)
+        muListName = index_rtuple_mu.indexName
+
+        index_rtuple_el = indexObjNames(elSelector)
+        elListName = index_rtuple_el.indexName
+
+        nObjName = index_rtuple_mu.nObjName.replace('_mu_', '_lep_')
+        indexName = index_rtuple_mu.indexName.replace('_mu_', '_lep_')
+
+        lepColl = muSelector['branchPrefix']
+
+        muList = getListFromSaveTree(saveTree, muListName)
+        elList = getListFromSaveTree(saveTree, elListName)
+        #
+        sumElMuList = muList + elList
+
+        lepObj = cmgObjectSelection.cmgObject(readTree, splitTree, lepColl)
+
+        lepList = lepObj.sort('pt', sumElMuList)
+
+        # save number of selected objects and their indices
+
+        setattr(saveTree, nObjName, len(lepList))
+        for idx, val in enumerate(lepList):
+            var = getattr(saveTree, indexName)
+            var[idx] = val
+
+        if logger.isEnabledFor(logging.DEBUG):
+            printStr = ''.join([
+                '\n ',
+                lepColl,
+                ' ',
+                ' lep ', ' selector \n\n',
+                lepObj.printObjects(lepList, muSelector['branchesToPrint']),
+                '\n',
+                'saveTree.', nObjName, ' = %i',
+                '\n ', indexName, ': ', pprint.pformat(lepList),
+                '\n'
+            ])
+            logger.debug(printStr, getattr(saveTree, nObjName))
+
+    return saveTree
+
 
 def processLeptons(readTree, splitTree, saveTree, params, LepSelector):
     '''Process leptons. 
@@ -2959,6 +3384,12 @@ def cmgPostProcessing(argv=None):
                         "\n * Processing Run:LS:Event %s \n",
                         saveTree.run_lumi_evt 
                         )
+                    
+                    # evaluate all selectors
+                    saveTree = evaluateSelectors(readTree, splitTree, saveTree, params)
+                    
+                    # merge muon and electrons for the required selectors
+                    saveTree = mergeLeptons(readTree, splitTree, saveTree, params)
                     
                     # leptons processing
                     saveTree, processLepGood_rtuple = processLeptons(

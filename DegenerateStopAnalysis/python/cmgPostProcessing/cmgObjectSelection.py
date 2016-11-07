@@ -128,8 +128,52 @@ class cmgObject():
         a PassFailList.
 
         """
-        return getIndexList(self.getPassFailList(readTree, selectorFunc, objPassFailList=objPassFailList))
+        indexList = getIndexList(self.getPassFailList(readTree, selectorFunc, objPassFailList=objPassFailList))
+        #
+        return indexList
     
+    def selectionIndexList(self, readTree, selectorFunc, objIndexList=None):
+        ''' Outputs a list of indices of the objects that have passed the selectorFunc.
+
+            SelectorFunc should take as input arguments the readTree, cmgObject instance and object index.
+
+            If another objIndexList is given as input,  it will evaluate SelectorFunc only 
+            for the indices which are given in objIndexList, instead of looping over the entire collection.
+
+        '''
+
+        logger = logging.getLogger(
+            __name__ + '.cmgObject' + '.selectionIndexList')
+
+        indexList = []
+
+        if objIndexList is None:
+            # loop over all objs in the collection, if no list is given as
+            # input
+            objList = list(range(self.nObj))
+        else:
+            objList = []
+            for i in objIndexList:
+                if i in range(self.nObj):
+                    objList.append(i)
+                else:
+                    raise Exception(
+                        "\n Index in input list {i} outside allowed range {i_range}.".format(
+                            i=i, i_range=range(self.nObj)
+                        )
+                    )
+                    sys.exit()
+
+        logger.trace(
+            "\n Object index list to run selectFunc %s \n",
+            pprint.pformat(objList)
+        )
+
+        for idx in objList:
+            if selectorFunc(readTree, self, idx):
+                indexList.append(idx)
+
+        return indexList
 
     def splitIndexList(self, var, varCutValue, indexList=[]):
         ''' Split a list of object indices in two lists, for a given variable and the corresponding cut value.  
@@ -229,13 +273,14 @@ class cmgObject():
 
         for ind in indexList:
             printStr += "\n + " + self.obj + " object index: " + str(ind) + '\n'
-            logger.trace(printStr)
             for var in varListCurrent:
                 varValue = cmgObjVar(self.readTree, self.obj, var)[ind]
                 varName = self.obj + '_' + var
                 printStr += varName + " = " + str(varValue) + '\n'
             printStr += '\n'
 
+        logger.trace(printStr)
+        
         #
         return printStr
         
@@ -283,7 +328,7 @@ def objSelectorFunc(objSel):
     For operators, use the python standard module "operator" https://docs.python.org/2/library/operator.html
     
     For cut_name with complex expression (e.g. hyb_iso) a dedicated function must be defined separately, see hyb_iso
-    implementation. The format of the dictionary depends on the deduicated function implementation.
+    implementation. The format of the dictionary depends on the dedicated function implementation.
     '''
         
     def hybIso(readTree, obj, objIndex, objSel):
@@ -401,37 +446,44 @@ def objSelectorFunc(objSel):
 
         return passCuts
     
-
     def objSelector(readTree, obj, objIndex):
-        
+
+        logger = logging.getLogger(
+            __name__ + '.objSelectorFunc' + '.objSelector')
+
         selector = True
-            
-        for key, keyValue in objSel.iteritems(): 
-            
+
+        for key, keyValue in objSel.iteritems():
+
             if key == 'hybIso':
                 selector &= hybIso(readTree, obj, objIndex, objSel)
             elif key == 'elWP':
-                selector &= elWP(readTree, obj, objIndex, objSel)                
+                selector &= elWP(readTree, obj, objIndex, objSel)
             elif 'evalRange_' in key:
-                selector &= evalRange(readTree, obj, objIndex, objSel, key)                
+                selector &= evalRange(readTree, obj, objIndex, objSel, key)
             else:
+                logger.trace(
+                    '\n Key: {key} \n Key value: {keyValue} \n objIndex {objIndex} \n'.format(
+                        key=key, keyValue=keyValue, objIndex=objIndex)
+                )
+
                 varValue = getattr(obj, keyValue[0])[objIndex]
-            
+
                 # operators with two arguments
                 opCut = keyValue[1]
                 varCut = keyValue[2]
-            
+
                 if len(keyValue) > 3:
                     # apply opVar operator on variable value
                     opVar = keyValue[3]
                     selector &= opCut(opVar(varValue), varCut)
                 else:
                     selector &= opCut(varValue, varCut)
-                    
+
             #
             if not selector:
                 break
-            
+
         return selector
 
     return objSelector
