@@ -335,7 +335,7 @@ def getParameterSet(args):
     if args.applyEventVetoFilters:
    
       filters = {
-         'MC_data':[
+         'data':[
                       'HBHENoiseFilter',
                       'HBHENoiseIsoFilter',
                       'EcalDeadCellTriggerPrimitiveFilter',

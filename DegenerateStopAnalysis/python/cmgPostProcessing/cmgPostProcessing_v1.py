@@ -2196,7 +2196,7 @@ def processEventVetoFilters(sample, readTree, splitTree, saveTree, params):
     # sample type (data or MC, taken from CMG component)
     isDataSample = sample['isData']
    
-    if isDataSample: filters = params['filters']['MC_data']
+    if isDataSample: filters = params['filters']['data']
     else: filters = params['filters']['MC']
 
     filterFlags = hephyHelpers.getObjDict(splitTree, "Flag_", filters, 0)
@@ -2204,12 +2204,12 @@ def processEventVetoFilters(sample, readTree, splitTree, saveTree, params):
     if 0 in filterFlags.values():
         saveTree.Flag_Filters = 0
         logger.debug(
-            "\n Run:LS:Event %s failed MET filters",
+            "\n Run:LS:Event %s failed filters",
             run_lumi_evt
             )
     else:
         logger.trace(
-            "\n Run:LS:Event %s passed MET filters",
+            "\n Run:LS:Event %s passed filters",
             run_lumi_evt
             )
         
