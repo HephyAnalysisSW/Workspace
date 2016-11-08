@@ -590,10 +590,10 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
 
             read_vectors.extend([new_vec])
 
-    def appendSelQuantities(obj_selector, read_variables, new_variables, read_vectors, new_vectors):
+    def appendSelectorQuantities(obj_selector, read_variables, new_variables, read_vectors, new_vectors):
         ''' Append variable and vectors defined in each selector. 
 
-            '''
+                '''
 
         branchPrefix = obj_selector['branchPrefix']
         object = obj_selector['object']
@@ -601,18 +601,20 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
 
         branchesToRead = obj_selector['branchesToRead']
         nMax = obj_selector['nMax']
-        
+
         nObjNameColl = ''.join(['n', branchPrefix, '/I'])
 
         index_rtuple = indexObjNames(obj_selector)
-        
+
         nObjName = index_rtuple.nObjName
         indexName = index_rtuple.indexName
         prefixToAdd = index_rtuple.prefix
         varInIndex = index_rtuple.var
-        
-        appendReadQuantities(branchPrefix, nObjNameColl, branchesToRead, nMax, read_variables, read_vectors)
-        appendNewQuantities(nObjName, prefixToAdd, indexName, varInIndex, nMax, new_variables, new_vectors)
+
+        appendReadQuantities(
+            branchPrefix, nObjNameColl, branchesToRead, nMax, read_variables, read_vectors)
+        appendNewQuantities(
+            nObjName, prefixToAdd, indexName, varInIndex, nMax, new_variables, new_vectors)
         
     
     selectorList = params['selectorList']
@@ -628,14 +630,14 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
 
         if ('data' in sampleType) and sample['isData']:
 
-            appendSelQuantities(
+            appendSelectorQuantities(
                 obj_selector,
                 readVariables, newVariables,
                 readVectors, newVectors
             )
 
         if ('mc' in sampleType) and (not sample['isData']):
-            appendSelQuantities(
+            appendSelectorQuantities(
                 obj_selector,
                 readVariables, newVariables,
                 readVectors, newVectors
@@ -934,6 +936,70 @@ def evaluateSelectors(readTree, splitTree, saveTree, params):
     return saveTree
 
 
+def computeVariablesSelectors(readTree, splitTree, saveTree, params, computeVariablesFunctions):
+    '''Evaluate 'computeVariables' for all selectors.
+
+    The variables depend only on the selector indices and on quantities 
+    already existing in the tree.
+
+    '''
+
+    logger = logging.getLogger('cmgPostProcessing.computeVariablesSelectors')
+
+    selectorList = params['selectorList']
+
+    for obj_selector in selectorList:
+
+        branchPrefix = obj_selector['branchPrefix']
+        object = obj_selector['object']
+        selectorId = obj_selector['selectorId']
+
+        index_rtuple = indexObjNames(obj_selector)
+        index_name = index_rtuple.indexName
+
+        computeVariables = obj_selector.get('computeVariables', None)
+        if computeVariables is None:
+            logger.trace(
+                '\n No computeVariables defined for {index_name} \n'.format(
+                    index_name=index_name
+                )
+            )
+
+            continue
+
+        # get from saveTree the actual list of indices for the selector and the
+        # collection objects from the readTree
+
+        indexList = getListFromSaveTree(saveTree, index_name)
+
+        if indexList is None:
+            logger.warning(
+                '\n List of object indices {index_name} is None. \n Skipping computeVariables\n'.format(
+                    index_name=index_name
+                )
+            )
+
+            continue
+
+        cmgObj = cmgObjectSelection.cmgObject(
+            readTree, splitTree, branchPrefix)
+
+        # call the corresponding function
+
+        vars_function = computeVariables['function']
+        if vars_function in computeVariablesFunctions:
+            computeVariablesFunctions[vars_function](
+                args, readTree, splitTree, saveTree, params, cmgObj, indexList)
+        else:
+            logger.warning(
+                '\n No implementation available for {func}. \n Skipping computeVariables for {index_name}\n'.format(
+                    func=vars_function, index_name=index_name
+                )
+            )
+
+            continue
+
+    return saveTree
 
 def processGenSusyParticles(readTree, splitTree, saveTree, params):
 
@@ -1516,6 +1582,41 @@ def processLeptonsAll(
     return saveTree, lep_rtuple
     
 
+def processJets_bas(args, readTree, splitTree, saveTree, params, jetObj, indexList):
+    '''Process jets. 
+    
+    TODO describe here the processing.
+    '''
+
+    #
+    logger = logging.getLogger('cmgPostProcessing.processJets_bas')
+    
+    verbose = args.verbose
+    
+    # HT as sum of jets from the given collection
+    
+    ht_basJet = sum (jetObj.pt[ind] for ind in indexList)
+    saveTree.ht_basJet = ht_basJet
+    
+    print 'ht_basJet = ', saveTree.ht_basJet
+    
+    # dR and dPhi between the first two jets
+    
+    if len(indexList) > 1:
+        basJet_dR_j1j2 = helpers.dR(indexList[0], indexList[1], jetObj)
+        saveTree.basJet_dR_j1j2 = basJet_dR_j1j2
+        
+        basJet_dPhi_j1j2 = helpers.dPhi(indexList[0], indexList[1], jetObj)
+        saveTree.basJet_dPhi_j1j2 = basJet_dPhi_j1j2
+                
+    else:
+        saveTree.basJet_dR_j1j2 = -999.
+        saveTree.basJet_dPhi_j1j2 = -999.
+        
+    print 'basJet_dR_j1j2 = ', saveTree.basJet_dR_j1j2
+    print 'basJet_dPhi_j1j2 = ', saveTree.basJet_dPhi_j1j2
+
+    
 
 def processJets(args, readTree, splitTree, saveTree, params):
     '''Process jets. 
@@ -2623,13 +2724,19 @@ def cmgPostProcessing(argv=None):
     logger.info("\n Entries in the parameter dictionary: \n\n" + printParams + '\n\n')
     logger.info("\n Target luminosity: %f pb^{-1} \n", params['target_lumi'])
     
+    # create the dictionary of functions available to compute the 'computeVariables' from the defined selectors
+    # this dictionary must be updated whenever new functions are defined
+    computeVariablesFunctions = {
+        'processJets_bas': processJets_bas,
+        }
+    
+    
     # get the event veto list FIXME: are the values updated properly?   
     if args.applyEventVetoList:
         event_veto_list = get_veto_list()['all']
     else:
         event_veto_list = {}
 
-    
     # loop over each sample, process all variables and fill the saved tree
     
     for isample, sample in enumerate(allSamples):
@@ -3015,11 +3122,20 @@ def cmgPostProcessing(argv=None):
                         )
                     
                     # evaluate all selectors
-                    saveTree = evaluateSelectors(readTree, splitTree, saveTree, params)
-                    
+                    saveTree = evaluateSelectors(
+                        readTree, splitTree, saveTree, params)
+
                     # merge muon and electrons for the required selectors
-                    saveTree = mergeLeptons(readTree, splitTree, saveTree, params)
-                    
+                    saveTree = mergeLeptons(
+                        readTree, splitTree, saveTree, params)
+
+                    # evaluate 'computeVariables' for all selectors
+                    # the variables depend on the selector indices and on
+                    # quantities already existing in the tree only
+
+                    saveTree = computeVariablesSelectors(
+                        readTree, splitTree, saveTree, params, computeVariablesFunctions)
+
 #                     # leptons processing
 #                     saveTree, processLepGood_rtuple = processLeptons(
 #                         readTree, splitTree, saveTree, params, params['LepGoodSel']

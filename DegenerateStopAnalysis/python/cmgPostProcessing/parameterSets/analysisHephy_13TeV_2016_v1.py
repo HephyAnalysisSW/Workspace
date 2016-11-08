@@ -424,6 +424,13 @@ def getParameterSet(args):
             'pt': ('pt', operator.gt, 30),
             'eta': ('eta', operator.lt, 2.4, operator.abs),
         },
+        # compute variables depending on the this selector indices and on
+        # quantities already existing in the tree
+        'computeVariables': {
+            'variableList': ['ht/F/-999.', 'dR_j1j2/F/-999.', 'dPhi_j1j2/F/-999.'],
+            'function': 'processJets_bas',
+            'args': []
+        },
     }
 
     selectorList.append(Jet_basJet_def)
