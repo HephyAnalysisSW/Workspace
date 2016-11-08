@@ -473,7 +473,11 @@ def objSelectorFunc(objSel):
                 opCut = keyValue[1]
                 varCut = keyValue[2]
 
-                if len(keyValue) > 3:
+                if len(keyValue) > 4:
+                    # apply opCut operator on variable value in reverse order (e.g. contains())
+                    opVar = keyValue[3]
+                    selector &= opCut(varCut, opVar(varValue))
+                elif len(keyValue) > 3:
                     # apply opVar operator on variable value
                     opVar = keyValue[3]
                     selector &= opCut(opVar(varValue), varCut)

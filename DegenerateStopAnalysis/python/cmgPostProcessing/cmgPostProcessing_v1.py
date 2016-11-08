@@ -467,11 +467,6 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
     
     aliases_MC.extend(['genMet:met_genPt', 'genMetPhi:met_genPhi'])
     
-    newVariables_MC.extend([
-        "Gen_stop_pt_12/F/-999.", "Gen_stop_eta_12/F/-999.", "Gen_stop_phi_12/F/-999.", 
-        "Gen_lsp_pt_12/F/-999.", "Gen_lsp_eta_12/F/-999.", "Gen_lsp_phi_12/F/-999.", 
-        ])
-
     
     # data samples only
     
@@ -1083,82 +1078,6 @@ def computeVariablesSelectors(readTree, splitTree, saveTree, params, computeVari
 
     return saveTree
 
-def processGenSusyParticles(readTree, splitTree, saveTree, params):
-
-
-    genPart = cmgObjectSelection.cmgObject(readTree, splitTree, params['GenSel']['branchPrefix'])
-
-    stopIndices = genPart.getSelectionIndexList(readTree,
-                            lambda readTree, gp, igp: abs(gp.pdgId[igp]) == 1000006
-                            )
-    if len(stopIndices) == 0:  # not a susy event... move on
-        return saveTree
-
-
-    isrIndices = genPart.getSelectionIndexList(readTree,
-                            lambda readTree, gp, igp: abs(gp.pdgId[igp]) != 1000006 and gp.motherId == -9999
-                            )
-    lspIndices = genPart.getSelectionIndexList(readTree,
-                            lambda readTree, gp, igp: abs(gp.pdgId[igp]) == 1000022
-                            )
-    bIndices = genPart.getSelectionIndexList(readTree,
-                            lambda readTree, gp, igp: abs(gp.pdgId[igp]) == 5
-                            )
-    lepIndices = genPart.getSelectionIndexList(readTree,
-                            lambda readTree, gp, igp: abs(gp.pdgId[igp]) in [11, 13]
-                            )
-
-    for ind, val in enumerate(stopIndices):
-        saveTree.IndexGen_stop[ind] = val
-
-    for ind, val in enumerate(lspIndices):
-        saveTree.IndexGen_lsp[ind] = val
-
-    for ind, val in enumerate(bIndices):
-        saveTree.IndexGen_b[ind] = val
-
-    for ind, val in enumerate(lepIndices):
-        saveTree.IndexGen_lep[ind] = val
-
-
-    stop1_lv = ROOT.TLorentzVector()
-    stop2_lv = ROOT.TLorentzVector()
-
-    stop1_lv.SetPtEtaPhiM(
-        genPart.pt[stopIndices[0]], genPart.eta[stopIndices[0]], genPart.phi[stopIndices[0]],
-        genPart.mass[stopIndices[0]]
-        )
-    stop2_lv.SetPtEtaPhiM(
-        genPart.pt[stopIndices[1]], genPart.eta[stopIndices[1]], genPart.phi[stopIndices[1]],
-        genPart.mass[stopIndices[1]]
-        )
-
-    stops = stop1_lv + stop2_lv
-
-    saveTree.Gen_stop_pt_12 = stops.Pt()
-    saveTree.Gen_stop_eta_12 = stops.Eta()
-    saveTree.Gen_stop_phi_12 = stops.Phi()
-
-
-
-    lsp1_lv = ROOT.TLorentzVector()
-    lsp2_lv = ROOT.TLorentzVector()
-    
-    lsp1_lv.SetPtEtaPhiM(
-        genPart.pt[lspIndices[0]], genPart.eta[lspIndices[0]], genPart.phi[lspIndices[0]],
-        genPart.mass[lspIndices[0]]
-        )
-    lsp2_lv.SetPtEtaPhiM(
-        genPart.pt[lspIndices[1]], genPart.eta[lspIndices[1]], genPart.phi[lspIndices[1]],
-        genPart.mass[lspIndices[1]]
-        )
-    lsps = lsp1_lv + lsp2_lv
-    
-    saveTree.Gen_lsp_pt_12 = lsps.Pt()
-    saveTree.Gen_lsp_eta_12 = lsps.Eta()
-    saveTree.Gen_lsp_phi_12 = lsps.Phi()
-    
-    return saveTree
 
 # some auxiliary functions, identical for mu, el, lep 
 
@@ -3067,10 +2986,6 @@ def cmgPostProcessing(argv=None):
 #                     # compute flag for event veto for FastSim jets
 #                     if isFastSimSample and args.applyEventVetoFastSimJets:
 #                         saveTree = processEventVetoFastSimJets(readTree, splitTree, saveTree, params)
-# 
-#                     if not isDataSample:
-#                         saveTree = processGenSusyParticles(readTree, splitTree, saveTree, params)
-
 
                     # compute the weight of the event
                     if not args.processSignalScan:

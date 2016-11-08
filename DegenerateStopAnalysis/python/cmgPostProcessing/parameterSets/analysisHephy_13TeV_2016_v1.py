@@ -42,7 +42,7 @@ def treeVariables(args):
             'nLepGood', 'LepGood_*',
             'nLepOther', 'LepOther_*',
         ])
-        
+
     # branches to drop:
     dropBranches_DATAMC = [
         'met_mass',
@@ -116,7 +116,6 @@ def treeVariables(args):
     return treeVariables_rtuple
 
 
-
 def getParameterSet(args):
     '''Return a dictionary containing all the parameters used for post-processing.
 
@@ -184,9 +183,10 @@ def getParameterSet(args):
     }
 
     params['SkimParameters'] = SkimParameters
-    
-    # add the variables and vectors to be kept or created, other than the one defined for selectors
-    
+
+    # add the variables and vectors to be kept or created, other than the one
+    # defined for selectors
+
     treeVariables_rtuple = treeVariables(args)
     params['treeVariables'] = treeVariables_rtuple
 
@@ -544,7 +544,6 @@ def getParameterSet(args):
     }
 
     selectorList.append(Jet_bJetDiscSort_def)
-    
 
     # soft bjets, with separation soft - hard at ptSoftHard value
     Jet_bJetSoft_def = {
@@ -596,9 +595,9 @@ def getParameterSet(args):
     ]
     branchesToPrint_gen = helpers.getVariableNameList(branchesToRead_gen)
 
-    GenPart_gen_def = {
+    GenPart_stop_def = {
         'branchPrefix': 'GenPart',
-        'object': 'gen',
+        'object': 'stop',
         'selectorId': 'def',
         'sampleType': ['mc'],
         'inputIndexList': None,
@@ -610,10 +609,96 @@ def getParameterSet(args):
         #
         # object selector
         'selector': {
+            'pdgId': ('pdgId', operator.eq, 1000006, operator.abs),
+
         },
     }
 
-    selectorList.append(GenPart_gen_def)
+    selectorList.append(GenPart_stop_def)
+
+    GenPart_lsp_def = {
+        'branchPrefix': 'GenPart',
+        'object': 'lsp',
+        'selectorId': 'def',
+        'sampleType': ['mc'],
+        'inputIndexList': None,
+        'branchesToRead': branchesToRead_gen,
+        'branchesToPrint': branchesToPrint_gen,
+        #
+        # maximum number of objects kept
+        'nMax': nMax_gen,
+        #
+        # object selector
+        'selector': {
+            'pdgId': ('pdgId', operator.eq, 1000022, operator.abs),
+
+        },
+    }
+
+    selectorList.append(GenPart_lsp_def)
+
+    GenPart_b_def = {
+        'branchPrefix': 'GenPart',
+        'object': 'b',
+        'selectorId': 'def',
+        'sampleType': ['mc'],
+        'inputIndexList': None,
+        'branchesToRead': branchesToRead_gen,
+        'branchesToPrint': branchesToPrint_gen,
+        #
+        # maximum number of objects kept
+        'nMax': nMax_gen,
+        #
+        # object selector
+        'selector': {
+            'pdgId': ('pdgId', operator.eq, 5, operator.abs),
+
+        },
+    }
+
+    selectorList.append(GenPart_b_def)
+
+    GenPart_lep_def = {
+        'branchPrefix': 'GenPart',
+        'object': 'lep',
+        'selectorId': 'def',
+        'sampleType': ['mc'],
+        'inputIndexList': None,
+        'branchesToRead': branchesToRead_gen,
+        'branchesToPrint': branchesToPrint_gen,
+        #
+        # maximum number of objects kept
+        'nMax': nMax_gen,
+        #
+        # object selector ( len(keyValue) > 4 gives reverse evaluation, needed for contains)
+        'selector': {
+            'pdgId': ('pdgId', operator.contains, [11, 13], operator.abs, 1),
+ 
+        },
+    }
+ 
+    selectorList.append(GenPart_lep_def)
+
+    GenPart_tau_def = {
+        'branchPrefix': 'GenPart',
+        'object': 'tau',
+        'selectorId': 'def',
+        'sampleType': ['mc'],
+        'inputIndexList': None,
+        'branchesToRead': branchesToRead_gen,
+        'branchesToPrint': branchesToPrint_gen,
+        #
+        # maximum number of objects kept
+        'nMax': nMax_gen,
+        #
+        # object selector
+        'selector': {
+            'pdgId': ('pdgId', operator.eq, 15, operator.abs),
+
+        },
+    }
+
+    selectorList.append(GenPart_tau_def)
 
     # criteria to veto events for FastSim samples, as resulted from 2016 "corridor studies
     # used to evaluate Flag_veto_event_fastSimJets
@@ -704,7 +789,79 @@ def getParameterSet(args):
     }
     params['puWeightDict'] = puWeightDict
 
+    # another set of selectors, with lower pt cuts
+
     #
+    LepGood_mu_lowpt = copy.deepcopy(LepGood_mu_def)
+    LepGood_mu_lowpt['selectorId'] = 'lowpt'
+    LepGood_mu_lowpt['selector']['pt'] = ('pt', operator.gt, 3)
+
+    selectorList.append(LepGood_mu_lowpt)
+
+    #
+    LepGood_el_lowpt = copy.deepcopy(LepGood_el_def)
+    LepGood_el_lowpt['selectorId'] = 'lowpt'
+    LepGood_el_lowpt['selector']['pt'] = ('pt', operator.gt, 3)
+
+    selectorList.append(LepGood_el_lowpt)
+    mergeLeptonSelectors.append((LepGood_mu_lowpt, LepGood_el_lowpt))
+
+    #
+    Jet_basJet_lowpt = copy.deepcopy(Jet_basJet_def)
+    Jet_basJet_lowpt['selectorId'] = 'lowpt'
+    Jet_basJet_lowpt['selector']['pt'] = ('pt', operator.gt, 20)
+
+    selectorList.append(Jet_basJet_lowpt)
+
+    #
+    Jet_vetoJet_lowpt = copy.deepcopy(Jet_vetoJet_def)
+    Jet_vetoJet_lowpt['selectorId'] = 'lowpt'
+    Jet_vetoJet_lowpt['inputIndexList'] = 'IndexJet_basJet_lowpt'
+
+    selectorList.append(Jet_vetoJet_lowpt)
+
+    #
+    Jet_isrJet_lowpt = copy.deepcopy(Jet_isrJet_def)
+    Jet_isrJet_lowpt['selectorId'] = 'lowpt'
+    Jet_isrJet_lowpt['inputIndexList'] = 'IndexJet_basJet_lowpt'
+
+    selectorList.append(Jet_isrJet_lowpt)
+
+    #
+    Jet_isrHJet_lowpt = copy.deepcopy(Jet_isrHJet_def)
+    Jet_isrHJet_lowpt['selectorId'] = 'lowpt'
+    Jet_isrHJet_lowpt['inputIndexList'] = 'IndexJet_basJet_lowpt'
+
+    selectorList.append(Jet_isrHJet_lowpt)
+
+    #
+    Jet_bJet_lowpt = copy.deepcopy(Jet_bJet_def)
+    Jet_bJet_lowpt['selectorId'] = 'lowpt'
+    Jet_bJet_lowpt['inputIndexList'] = 'IndexJet_basJet_lowpt'
+
+    selectorList.append(Jet_bJet_lowpt)
+
+    #
+    Jet_bJetDiscSort_lowpt = copy.deepcopy(Jet_bJetDiscSort_def)
+    Jet_bJetDiscSort_lowpt['selectorId'] = 'lowpt'
+    Jet_bJetDiscSort_lowpt['inputIndexList'] = 'IndexJet_bJet_lowpt'
+
+    selectorList.append(Jet_bJetDiscSort_lowpt)
+
+    #
+    Jet_bJetSoft_lowpt = copy.deepcopy(Jet_bJetSoft_def)
+    Jet_bJetSoft_lowpt['selectorId'] = 'lowpt'
+    Jet_bJetSoft_lowpt['inputIndexList'] = 'IndexJet_bJet_lowpt'
+
+    selectorList.append(Jet_bJetSoft_lowpt)
+
+    #
+    Jet_bJetHard_lowpt = copy.deepcopy(Jet_bJetHard_def)
+    Jet_bJetHard_lowpt['selectorId'] = 'lowpt'
+    Jet_bJetHard_lowpt['inputIndexList'] = 'IndexJet_bJet_lowpt'
+
+    selectorList.append(Jet_bJetHard_lowpt)
+
     # add to params
 
     params['selectorList'] = selectorList
