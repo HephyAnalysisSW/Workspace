@@ -8,7 +8,7 @@ import argparse
 import Workspace.DegenerateStopAnalysis.toolsMateusz.ROOToptions
 from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
-from Workspace.DegenerateStopAnalysis.tools.degTools import CutClass, Plots, getPlots, drawPlots, Yields, setEventListToChains, setup_style
+from Workspace.DegenerateStopAnalysis.tools.degTools import CutClass, Plots, getPlots, drawPlots, Yields, setEventListToChains, setup_style, makeDir
 from Workspace.DegenerateStopAnalysis.tools.bTagWeights import bTagWeights
 #from Workspace.DegenerateStopAnalysis.tools.degCuts import *
 from Workspace.DegenerateStopAnalysis.tools.getSamples_8012 import getSamples
@@ -82,8 +82,8 @@ if save: #web address: http://www.hephy.at/user/mzarucki/plots
    #if btag: savedir += "/" + btag
    #else: savedir += "/no_btag"
    suffix = ""   
-   if not os.path.exists("%s/root"%(savedir)): os.makedirs("%s/root"%(savedir))
-   if not os.path.exists("%s/pdf"%(savedir)): os.makedirs("%s/pdf"%(savedir))
+   makeDir("%s/root"%(savedir))
+   makeDir("%s/pdf"%(savedir))
 
 if btag:
    bWeightDict = bTagWeights(btag)
