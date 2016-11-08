@@ -986,6 +986,15 @@ def evaluateSelectors(readTree, splitTree, saveTree, params):
         index_rtuple = indexObjNames(obj_selector)
         nObjName = index_rtuple.nObjName
         indexName = index_rtuple.indexName
+        
+        # check if sorting after another variable is requested
+        # if requested, sort and replace the original list with the sorted list 
+        
+        sortVariable = obj_selector.get('sort', None)
+
+        if sortVariable is not None:
+            sortedList = cmgObj.sort(sortVariable, objList)
+            objList = sortedList
 
         setattr(saveTree, nObjName, len(objList))
         for idx, val in enumerate(objList):
@@ -1655,7 +1664,7 @@ def processLeptonsAll(
     return saveTree, lep_rtuple
     
 
-def processJets_ht(args, readTree, splitTree, saveTree, params, computeVariables, cmgObj, indexList):
+def processJets_func(args, readTree, splitTree, saveTree, params, computeVariables, cmgObj, indexList):
     '''Process jets. 
 
     Compute computeVariables quantities required in a jet selector, using 
@@ -1663,17 +1672,11 @@ def processJets_ht(args, readTree, splitTree, saveTree, params, computeVariables
     '''
 
     #
-    logger = logging.getLogger('cmgPostProcessing.processJets_ht')
+    logger = logging.getLogger('cmgPostProcessing.processJets_func')
 
     verbose = args.verbose
 
     computeVariablesName = computeVariables['computeVariablesName']
-
-    # HT as sum of jets from the given collection
-
-    ht = sum(cmgObj.pt[idx] for idx in indexList)
-
-    # dR and dPhi between the first two jets
 
     if len(indexList) > 1:
         dR_j1j2 = helpers.dR(indexList[0], indexList[1], cmgObj)
@@ -1684,16 +1687,27 @@ def processJets_ht(args, readTree, splitTree, saveTree, params, computeVariables
 
     for var in computeVariablesName:
         if 'ht' in var:
+            # HT as sum of jets from the given collection
+            ht = sum(cmgObj.pt[idx] for idx in indexList)
+
             setattr(saveTree, var, ht)
 
+        # dR and dPhi between the first two jets
+
         if 'dR_j1j2' in var:
-            setattr(saveTree, var, dR_j1j2)
+            if len(indexList) > 1:
+                dR_j1j2 = helpers.dR(indexList[0], indexList[1], cmgObj)
+
+                setattr(saveTree, var, dR_j1j2)
 
         if 'dPhi_j1j2' in var:
-            setattr(saveTree, var, dPhi_j1j2)
+            if len(indexList) > 1:
+                dPhi_j1j2 = helpers.dPhi(indexList[0], indexList[1], cmgObj)
+
+                setattr(saveTree, var, dPhi_j1j2)
 
     if logger.isEnabledFor(logging.DEBUG):
-        printStr = ["\n Quantities computed in processJets_ht"]
+        printStr = ["\n Quantities computed in processJets_func"]
 
         for var in computeVariablesName:
             printStr.append('\n savTree.')
@@ -1703,234 +1717,6 @@ def processJets_ht(args, readTree, splitTree, saveTree, params, computeVariables
 
         logger.debug(''.join(printStr))
         
-
-def processJets(args, readTree, splitTree, saveTree, params):
-    '''Process jets. 
-    
-    TODO describe here the processing.
-    '''
-
-    #
-    logger = logging.getLogger('cmgPostProcessing.processJets')
-    
-    verbose = args.verbose
-    
-    # selection of jets
-    
-    JetVarList = params['JetVarList'] 
-    JetSel = params['JetSel']
-    
-    objBranches = JetSel['branchPrefix']
-    jetObj = cmgObjectSelection.cmgObject(readTree, splitTree, objBranches)
-    
-    if logger.isEnabledFor(logging.DEBUG):
-        printStr = "\n List of " + objBranches + " jets before selector: " + \
-            jetObj.printObjects(None, JetVarList)
-        logger.debug(printStr)
-    
-    # TODO modify the getSelectionIndexList to take as input a list of indices, instead of 
-    # a PassFailList, then get rid of the two steps in basic jet selection 
-
-    # basics jets
-        
-    basJetSel = JetSel['bas']
-    basJetSelector = cmgObjectSelection.objSelectorFunc(basJetSel)
-    basJetPassFailList = jetObj.getPassFailList(readTree, basJetSelector)
-    basJetList = jetObj.getSelectionIndexList(readTree, basJetSelector, basJetPassFailList)
-    
-    saveTree.nBasJet = len(basJetList)
-    for ind, val in enumerate(basJetList):
-        saveTree.IndexJet_basJet[ind] = val
-
-
-    if logger.isEnabledFor(logging.DEBUG):
-        printStr = "\n  " + objBranches + " basic jet selector \n " + \
-            '\n ' + jetObj.printObjects(basJetList, JetVarList) + \
-            "\n saveTree.nBasJet = %i \n  Index list: " + pprint.pformat(basJetList) + "\n "
-        logger.debug(printStr, saveTree.nBasJet)
-
-    # veto jets
-    
-    vetoJetSel = JetSel['veto']
-    vetoJetSelector = cmgObjectSelection.objSelectorFunc(vetoJetSel)
-    vetoJetList = jetObj.getSelectionIndexList(readTree, vetoJetSelector, basJetPassFailList)
-
-    saveTree.nVetoJet = len(vetoJetList)
-    for ind, val in enumerate(vetoJetList):
-        saveTree.IndexJet_vetoJet[ind] = val
-
-    if logger.isEnabledFor(logging.DEBUG):
-        printStr = "\n  " + objBranches + " veto jet selector (from basic jets) \n " + \
-            '\n ' + jetObj.printObjects(vetoJetList, JetVarList) + \
-            "\n saveTree.nVetoJet = %i \n  Index list: " + pprint.pformat(vetoJetList) + "\n "
-        logger.debug(printStr, saveTree.nVetoJet)
-
-    
-    # ISR jets
-
-    isrJetSel = JetSel['isr']
-    isrJetSelector = cmgObjectSelection.objSelectorFunc(isrJetSel)
-    isrJetList = jetObj.getSelectionIndexList(readTree, isrJetSelector, basJetPassFailList)
-
-    saveTree.nIsrJet = len(isrJetList)
-    for ind, val in enumerate(isrJetList):
-        saveTree.IndexJet_isrJet[ind] = val
-
-    if logger.isEnabledFor(logging.DEBUG):
-        printStr = "\n  " + objBranches + " isr jet selector (from basic jets) \n " + \
-            '\n ' + jetObj.printObjects(isrJetList, JetVarList) + \
-            "\n saveTree.nIsrJet = %i \n  Index list: " + pprint.pformat(isrJetList) + "\n "
-        logger.debug(printStr, saveTree.nIsrJet)
-
-
-    # ISR jet, higher threshold for SR2
-    
-    isrHJetSel = JetSel['isrH']
-    isrHJetSelector = cmgObjectSelection.objSelectorFunc(isrHJetSel)
-    isrHJetList = jetObj.getSelectionIndexList(readTree, isrHJetSelector, basJetPassFailList)
-    
-    saveTree.nIsrHJet = len(isrHJetList)
-    for ind, val in enumerate(isrHJetList):
-        saveTree.IndexJet_isrHJet[ind] = val
-
-    if logger.isEnabledFor(logging.DEBUG):
-        printStr = "\n  " + objBranches + " isr high jet selector (from basic jets) \n " + \
-            '\n ' + jetObj.printObjects(isrHJetList, JetVarList) + \
-            "\n saveTree.nIsrHJet = %i \n  Index list: " + pprint.pformat(isrHJetList) + "\n "
-        logger.debug(printStr, saveTree.nIsrHJet)
-        
-    
-    # save some additional jet quantities
-    
-    if len(basJetList) > 1:
-        basJet_dR_j1j2 = helpers.dR(basJetList[0], basJetList[1], jetObj)
-        saveTree.basJet_dR_j1j2 = basJet_dR_j1j2
-        
-        basJet_dPhi_j1j2 = helpers.dPhi(basJetList[0], basJetList[1], jetObj)
-        saveTree.basJet_dPhi_j1j2 = basJet_dPhi_j1j2
-                
-    else:
-        saveTree.basJet_dR_j1j2 = -999.
-        saveTree.basJet_dPhi_j1j2 = -999.
-                
-        
-    if len(vetoJetList) > 1:
-        vetoJet_dPhi_j1j2 = helpers.dPhi(vetoJetList[0], vetoJetList[1], jetObj)
-        saveTree.vetoJet_dPhi_j1j2 = vetoJet_dPhi_j1j2
-                    
-    else:
-        saveTree.vetoJet_dPhi_j1j2 = -999.
-        
-
-    logger.debug(
-        "\n Number of jets: \n  basic jets: %i \n  veto jets: %i " + \
-        "\n  isr jet: %i \n  isr high Jet: %i \n" +\
-        "\n Jet separation: " + \
-        "\n   basJet_dR_j1j2 = %f \n   basJet_dPhi_j1j2 = %f \n" + \
-        "\n   vetoJet_dPhi_j1j2 = %f \n" ,
-        saveTree.nBasJet, saveTree.nVetoJet, 
-        saveTree.nIsrJet, saveTree.nIsrHJet,
-        saveTree.basJet_dR_j1j2, saveTree.basJet_dPhi_j1j2,
-        saveTree.vetoJet_dPhi_j1j2
-        )
-     
-    # b jet selection: bJet, bSoftJet and bHardJet are sorted after pt value, like other jets
-    
-    bJetSel = JetSel['bjet']
-    bJetSelector = cmgObjectSelection.objSelectorFunc(bJetSel)
-    bJetList = jetObj.getSelectionIndexList(readTree, bJetSelector, basJetPassFailList)
-    
-    # sort after discriminant variable
-    bTagDisc = bJetSel['btag'][0]
-    bJetDiscSortList = jetObj.sort(bTagDisc, bJetList)
-
-
-    bJetSepPtSoftHard = JetSel['bjetSep']['ptSoftHard'][2]
-    bSoftJetList, bHardJetList = jetObj.splitIndexList('pt', bJetSepPtSoftHard, bJetList)
-    softJetList, hardJetList   = jetObj.splitIndexList('pt', bJetSepPtSoftHard, basJetList)
-    
-    nBJet = len(bJetList)
-    saveTree.nBJet = nBJet
-    for ind, val in enumerate(bJetList):
-        saveTree.IndexJet_bJet[ind] = val
-
-    for ind, val in enumerate(bJetDiscSortList):
-        saveTree.IndexJet_bJetDiscSort[ind] = val
-
-    nBSoftJet = len(bSoftJetList)
-    saveTree.nBSoftJet = nBSoftJet
-    for ind, val in enumerate(bSoftJetList):
-        saveTree.IndexJet_bSoftJet[ind] = val
-
-    nBHardJet = len(bHardJetList)
-    saveTree.nBHardJet = nBHardJet
-    for ind, val in enumerate(bHardJetList):
-        saveTree.IndexJet_bHardJet[ind] = val
-    
-    if logger.isEnabledFor(logging.DEBUG):
-        printStr = "\n  " + objBranches + " b jet selector (from basic jets), sorted after jet pt \n " + \
-            '\n ' + jetObj.printObjects(bJetList, JetVarList) + \
-            "\n saveTree.nBJet = %i \n  Index list: " + pprint.pformat(bJetList) + "\n "
-        logger.debug(printStr, saveTree.nBJet)
-        
-        printStr = "\n  " + objBranches + " b jet selector (from basic jets), sorted after jet b discriminant \n " + \
-            "\n saveTree.nBJet = %i \n  Index list: " + pprint.pformat(bJetDiscSortList) + "\n "
-        logger.debug(printStr, saveTree.nBJet)
-
-        printStr = "\n  " + objBranches + " b soft jet selector, sorted after jet pt \n " + \
-            '\n pt soft/hard threshold: %f ' + \
-            '\n ' + jetObj.printObjects(bSoftJetList, JetVarList) + \
-            "\n saveTree.nBSoftJet = %i \n  Index list: " + pprint.pformat(bSoftJetList) + "\n "
-        logger.debug(printStr, bJetSepPtSoftHard, saveTree.nBSoftJet)
-
-        printStr = "\n  " + objBranches + " b hard jet selector, sorted after jet pt \n " + \
-            '\n pt soft/hard threshold: %f ' + \
-            '\n ' + jetObj.printObjects(bHardJetList, JetVarList) + \
-            "\n saveTree.nBHardJet = %i \n  Index list: " + pprint.pformat(bHardJetList) + "\n "
-        logger.debug(printStr, bJetSepPtSoftHard, saveTree.nBHardJet)
-
-    # HT as sum of basic jets
-    
-    ht_basJet = sum (jetObj.pt[ind] for ind in basJetList)
-    saveTree.ht_basJet = ht_basJet
-    
-    logger.debug(
-        "\n Missing transverse energy: \n  met_pt =  %f GeV \n  met_phi = %f \n" + \
-        "\n Total hadronic energy: \n  ht_basJet = %f \n\n ", 
-            readTree.met_pt, readTree.met_phi, ht_basJet
-            )
-    
-    # define the named tuple to return the values
-    rtuple = collections.namedtuple(
-        'rtuple', 
-        [
-            'jetObj',
-            'basJetList',
-            'bJetDiscSortList',
-            'bJetList',
-            'bSoftJetList',
-            'bHardJetList',
-            'softJetList',
-            'hardJetList',
-            ]
-        )
-    
-    processJets_rtuple = rtuple(
-        jetObj,
-        basJetList,
-        bJetDiscSortList,
-        bJetList,
-        bSoftJetList, 
-        bHardJetList,
-        softJetList,
-        hardJetList,
-        )
-
-    #    
-    return saveTree, processJets_rtuple
-
-
-
 
 def processBTagWeights(
         args, readTree, splitTree, saveTree,
@@ -2813,7 +2599,7 @@ def cmgPostProcessing(argv=None):
     # create the dictionary of functions available to compute the 'computeVariables' from the defined selectors
     # this dictionary must be updated whenever new functions are defined
     computeVariablesFunctions = {
-        'processJets_ht': processJets_ht,
+        'processJets_func': processJets_func,
         }
     
     
@@ -3237,15 +3023,6 @@ def cmgPostProcessing(argv=None):
 #                             processLepGood_rtuple, processLepOther_rtuple
 #                             )
 #                                             
-#                     
-#                     # jets processing
-#                     saveTree, processJets_rtuple = processJets(
-#                         args, readTree, splitTree, saveTree, params
-#                         )
-#                     if args.runInteractively:
-#                         print splitTree.evt
-#                         print "WARNING runInteractively!"
-#                         return readTree, splitTree, saveTree , processJets_rtuple  , params
 #                     
 #                     if args.processBTagWeights:
 #                         saveTree, processBTagWeights_rtuple = processBTagWeights(

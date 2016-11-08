@@ -428,7 +428,7 @@ def getParameterSet(args):
         # quantities already existing in the tree
         'computeVariables': {
             'variableList': ['ht/F/-999.', 'dR_j1j2/F/-999.', 'dPhi_j1j2/F/-999.'],
-            'function': 'processJets_ht',
+            'function': 'processJets_func',
             'args': []
         },
     }
@@ -450,6 +450,13 @@ def getParameterSet(args):
         # object selector
         'selector': {
             'pt': ('pt', operator.gt, 60),
+        },
+        # compute variables depending on the this selector indices and on
+        # quantities already existing in the tree
+        'computeVariables': {
+            'variableList': ['dPhi_j1j2/F/-999.'],
+            'function': 'processJets_func',
+            'args': []
         },
     }
 
@@ -495,6 +502,7 @@ def getParameterSet(args):
 
     selectorList.append(Jet_isrHJet_def)
 
+    # b jets, pt sorted
     Jet_bJet_def = {
         'branchPrefix': 'Jet',
         'object': 'bJet',
@@ -515,12 +523,57 @@ def getParameterSet(args):
 
     selectorList.append(Jet_bJet_def)
 
-    Jet_bJetSep_def = {
+    # b jets, discriminant sorted
+    Jet_bJetDiscSort_def = {
         'branchPrefix': 'Jet',
-        'object': 'bJetSep',
+        'object': 'bJetDiscSort',
         'selectorId': 'def',
         'sampleType': ['data', 'mc'],
-        'inputIndexList': 'IndexJet_basJet_def',
+        'inputIndexList': 'IndexJet_bJet_def',
+        'branchesToRead': branchesToRead_jets,
+        'branchesToPrint': branchesToPrint_jets,
+        #
+        # maximum number of objects kept
+        'nMax': nMax_jets,
+        #
+        # object selector
+        'selector': {
+            'btag': ('btagCSV', operator.gt, 0.800),
+        },
+        'sort': 'btagCSV',
+    }
+
+    selectorList.append(Jet_bJetDiscSort_def)
+    
+
+    # soft bjets, with separation soft - hard at ptSoftHard value
+    Jet_bJetSoft_def = {
+        'branchPrefix': 'Jet',
+        'object': 'bJetSoft',
+        'selectorId': 'def',
+        'sampleType': ['data', 'mc'],
+        'inputIndexList': 'IndexJet_bJet_def',
+        'branchesToRead': branchesToRead_jets,
+        'branchesToPrint': branchesToPrint_jets,
+        #
+        # maximum number of objects kept
+        'nMax': nMax_jets,
+        #
+        # object selector
+        'selector': {
+            'ptSoftHard':  ('pt', operator.le, 60),
+        },
+    }
+
+    selectorList.append(Jet_bJetSoft_def)
+
+    # soft bjets, with separation soft - hard at ptSoftHard value
+    Jet_bJetHard_def = {
+        'branchPrefix': 'Jet',
+        'object': 'bJetHard',
+        'selectorId': 'def',
+        'sampleType': ['data', 'mc'],
+        'inputIndexList': 'IndexJet_bJet_def',
         'branchesToRead': branchesToRead_jets,
         'branchesToPrint': branchesToPrint_jets,
         #
@@ -533,7 +586,7 @@ def getParameterSet(args):
         },
     }
 
-    selectorList.append(Jet_bJetSep_def)
+    selectorList.append(Jet_bJetHard_def)
 
     # generated particles
 
