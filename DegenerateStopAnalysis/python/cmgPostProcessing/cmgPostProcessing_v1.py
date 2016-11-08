@@ -484,13 +484,16 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
     
     # add variables and vectors from the selectors
 
-    def appendNewQuantities(nObjName, prefixToAdd, indexName, varInIndex, nMax, new_variables, new_vectors):
+    def appendNewQuantities(
+            nObjName, prefixToAdd, indexName, varInIndex, nMax,
+            computeVars, computeVectors,
+            new_variables, new_vectors):
         ''' Append variable and vectors defined in each selector. 
 
                 '''
 
         varToAdd = ''.join([varInIndex, '/I/-1'])
-        
+
         if nObjName not in new_variables:
             new_variables.extend([
                 ''.join([nObjName, '/I/-1'])
@@ -501,6 +504,18 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
                 '\n Multiple definition of variable {var}.'.format(var=nObjName))
             sys.exit()
 
+        for var in computeVars:
+            if var not in new_variables:
+                new_variables.append(var)
+                logger.trace("\n Add variable: \n %s \n", var)
+            else:
+                raise Exception(
+                    '\n Multiple definition of variable {var}.'.format(var=var))
+                sys.exit()
+            
+
+        # FIXME add computeVectors
+        
         prefixFound = False
 
         for vec in new_vectors:
@@ -593,7 +608,7 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
     def appendSelectorQuantities(obj_selector, read_variables, new_variables, read_vectors, new_vectors):
         ''' Append variable and vectors defined in each selector. 
 
-                '''
+                    '''
 
         branchPrefix = obj_selector['branchPrefix']
         object = obj_selector['object']
@@ -611,12 +626,66 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
         prefixToAdd = index_rtuple.prefix
         varInIndex = index_rtuple.var
 
+        # read computeVariables, change their name to make them selector dependent, and save the names
+        # to a dictionary key
+
+        computeVariables = obj_selector.get('computeVariables', None)
+
+        # lists to collect the computeVariables (simple variables or array)
+        computeVectors = []
+        computeVars = []
+
+        if computeVariables is None:
+            logger.trace(
+                '\n No computeVariables defined for {indexName} \n'.format(
+                    indexName=indexName
+                )
+            )
+        else:
+            computeVariablesList = computeVariables['variableList']
+            computeVariablesName = []
+            for var in computeVariablesList:
+                var_name = helpers.getVariableName(var)
+                var_size = helpers.getVariableSize(var)
+                var_type = helpers.getVariableType(var)
+
+                var_initializer = helpers.getVariableInitializer(var)
+                # do not accept variables without initializer
+                if var_initializer is None:
+                    raise Exception(
+                        ''.join([
+                                "\n Variable [var] has no initializer defined.\n".format(
+                                    var=var),
+                                "\n Define variable in the format 'name[size]/type/initializer' or 'name/type/initializer'"
+                                ])
+                    )
+                    sys.exit()
+
+                # change name
+                new_name = ''.join([var_name, '_', object, '_', selectorId])
+
+                if var_size > 1:
+                    new_var = ''.join(
+                        [new_name, '[', str(var_size), ']', '/', var_type, '/', str(var_initializer)])
+                    computeVectors.append(new_var)
+                else:
+                    new_var = ''.join(
+                        [new_name, '/', var_type, '/', str(var_initializer)])
+                    computeVars.append(new_var)
+
+                computeVariablesName.append(new_name)
+
+            computeVariables['computeVariablesName'] = computeVariablesName
+            obj_selector['computeVariables'] = computeVariables
+
         appendReadQuantities(
-            branchPrefix, nObjNameColl, branchesToRead, nMax, read_variables, read_vectors)
+            branchPrefix, nObjNameColl, branchesToRead, nMax,
+            read_variables, read_vectors)
         appendNewQuantities(
-            nObjName, prefixToAdd, indexName, varInIndex, nMax, new_variables, new_vectors)
-        
-    
+            nObjName, prefixToAdd, indexName, varInIndex, nMax,
+            computeVars, computeVectors,
+            new_variables, new_vectors)
+
     selectorList = params['selectorList']
 
     for obj_selector in selectorList:
@@ -659,6 +728,10 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
 
         nMax = muSelector['nMax']
 
+        # dummy lists to match appendNewQuantities calls
+        computeVectors = []
+        computeVars = []
+
         sampleType = muSelector['sampleType']
 
         if ('data' in sampleType) and sample['isData']:
@@ -669,9 +742,9 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
 
         if ('mc' in sampleType) and (not sample['isData']):
             appendNewQuantities(
-                nObjName, prefixToAdd, indexName,
-                varInIndex, nMax, newVariables, newVectors
-            )
+                nObjName, prefixToAdd, indexName, varInIndex, nMax,
+                computeVars, computeVectors,
+                newVariables, newVectors)
 
     # sum up branches to be defined for each sample, depending on the sample
     # type (data or MC)
@@ -989,7 +1062,7 @@ def computeVariablesSelectors(readTree, splitTree, saveTree, params, computeVari
         vars_function = computeVariables['function']
         if vars_function in computeVariablesFunctions:
             computeVariablesFunctions[vars_function](
-                args, readTree, splitTree, saveTree, params, cmgObj, indexList)
+                args, readTree, splitTree, saveTree, params, computeVariables, cmgObj, indexList)
         else:
             logger.warning(
                 '\n No implementation available for {func}. \n Skipping computeVariables for {index_name}\n'.format(
@@ -1582,41 +1655,54 @@ def processLeptonsAll(
     return saveTree, lep_rtuple
     
 
-def processJets_bas(args, readTree, splitTree, saveTree, params, jetObj, indexList):
+def processJets_ht(args, readTree, splitTree, saveTree, params, computeVariables, cmgObj, indexList):
     '''Process jets. 
-    
-    TODO describe here the processing.
+
+    Compute computeVariables quantities required in a jet selector, using 
+    the cmgObj collection of jets and indices from the selector.
     '''
 
     #
-    logger = logging.getLogger('cmgPostProcessing.processJets_bas')
-    
-    verbose = args.verbose
-    
-    # HT as sum of jets from the given collection
-    
-    ht_basJet = sum (jetObj.pt[ind] for ind in indexList)
-    saveTree.ht_basJet = ht_basJet
-    
-    print 'ht_basJet = ', saveTree.ht_basJet
-    
-    # dR and dPhi between the first two jets
-    
-    if len(indexList) > 1:
-        basJet_dR_j1j2 = helpers.dR(indexList[0], indexList[1], jetObj)
-        saveTree.basJet_dR_j1j2 = basJet_dR_j1j2
-        
-        basJet_dPhi_j1j2 = helpers.dPhi(indexList[0], indexList[1], jetObj)
-        saveTree.basJet_dPhi_j1j2 = basJet_dPhi_j1j2
-                
-    else:
-        saveTree.basJet_dR_j1j2 = -999.
-        saveTree.basJet_dPhi_j1j2 = -999.
-        
-    print 'basJet_dR_j1j2 = ', saveTree.basJet_dR_j1j2
-    print 'basJet_dPhi_j1j2 = ', saveTree.basJet_dPhi_j1j2
+    logger = logging.getLogger('cmgPostProcessing.processJets_ht')
 
-    
+    verbose = args.verbose
+
+    computeVariablesName = computeVariables['computeVariablesName']
+
+    # HT as sum of jets from the given collection
+
+    ht = sum(cmgObj.pt[idx] for idx in indexList)
+
+    # dR and dPhi between the first two jets
+
+    if len(indexList) > 1:
+        dR_j1j2 = helpers.dR(indexList[0], indexList[1], cmgObj)
+        dPhi_j1j2 = helpers.dPhi(indexList[0], indexList[1], cmgObj)
+    else:
+        dR_j1j2 = -999.
+        dPhi_j1j2 = -999.
+
+    for var in computeVariablesName:
+        if 'ht' in var:
+            setattr(saveTree, var, ht)
+
+        if 'dR_j1j2' in var:
+            setattr(saveTree, var, dR_j1j2)
+
+        if 'dPhi_j1j2' in var:
+            setattr(saveTree, var, dPhi_j1j2)
+
+    if logger.isEnabledFor(logging.DEBUG):
+        printStr = ["\n Quantities computed in processJets_ht"]
+
+        for var in computeVariablesName:
+            printStr.append('\n savTree.')
+            printStr.append(var)
+            printStr.append(' = ')
+            printStr.append(str(getattr(saveTree, var)))
+
+        logger.debug(''.join(printStr))
+        
 
 def processJets(args, readTree, splitTree, saveTree, params):
     '''Process jets. 
@@ -2727,7 +2813,7 @@ def cmgPostProcessing(argv=None):
     # create the dictionary of functions available to compute the 'computeVariables' from the defined selectors
     # this dictionary must be updated whenever new functions are defined
     computeVariablesFunctions = {
-        'processJets_bas': processJets_bas,
+        'processJets_ht': processJets_ht,
         }
     
     

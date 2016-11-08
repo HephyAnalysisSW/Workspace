@@ -428,7 +428,7 @@ def getParameterSet(args):
         # quantities already existing in the tree
         'computeVariables': {
             'variableList': ['ht/F/-999.', 'dR_j1j2/F/-999.', 'dPhi_j1j2/F/-999.'],
-            'function': 'processJets_bas',
+            'function': 'processJets_ht',
             'args': []
         },
     }
