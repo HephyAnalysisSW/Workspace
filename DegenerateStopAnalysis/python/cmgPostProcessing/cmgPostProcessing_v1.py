@@ -83,95 +83,9 @@ def getParameterSet(args):
     # 
     params = parameters.getParameterSet(args)
     
-    # list of variables for muon, electrons, leptons (electrons plus muons)
-    
-    LepGoodSel = params['LepGoodSel']
-    
-    # existing branches
-    varsCommon = helpers.getVariableNameList(LepGoodSel['branches']['common'])
-    varsMu = helpers.getVariableNameList(LepGoodSel['branches']['mu'])
-    varsEl = helpers.getVariableNameList(LepGoodSel['branches']['el'])
-    
-    varListMu = varsCommon + varsMu
-    varListEl = varsCommon + varsEl
-    varListLep = varsCommon + varsMu + varsEl
-    
-    # new branches
-    varsCommon = helpers.getVariableNameList(LepGoodSel['newBranches']['common'])
-    varsMu = helpers.getVariableNameList(LepGoodSel['newBranches']['mu'])
-    varsEl = helpers.getVariableNameList(LepGoodSel['newBranches']['el'])
-    
-    varListExtMu = varsCommon + varsMu
-    varListExtEl = varsCommon + varsEl
-    varListExtLep = varsCommon + varsMu + varsEl
-
-    # add the lists to params
-        
-    LepVarList = {
-        'mu': varListMu,
-        'el': varListEl,
-        'lep': varListLep,
-        'extMu': varListExtMu,
-        'extEl': varListExtEl,
-        'extLep': varListExtLep,
-        }
-    
-    # use a common list for el and el2
-    if 'el2' in LepGoodSel:
-        LepVarList['el2'] = varListEl
-    
-    # use a common list for mu and mu2
-    if 'mu2' in LepGoodSel:
-        LepVarList['mu2'] = varListEl
-
-
-    params['LepVarList'] = LepVarList
-    
-    if processLepAll:
-        LepOtherSel = params['LepOtherSel']
-
-    
-    # list of variables for jets
-    JetSel = params['JetSel']
-
-    JetVarList = helpers.getVariableNameList(JetSel['branches'])
-    params['JetVarList'] = JetVarList
-
-    # track selectors
-    TracksSel = params['TracksSel']
-    if args.processGenTracks:
-        GenTracksSel = params['GenTracksSel']
-    
-    # generated particle selector 
-    GenSel = params['GenSel']
-    
-
-    # for the object selectors defined here, add the list of branches defined in the selector 
-
-    if processLepAll:
-        vectors_DATAMC_List = [LepGoodSel, LepOtherSel, JetSel]
-    else:
-        vectors_DATAMC_List = [LepGoodSel, JetSel]
-        
-    if args.processTracks:
-        vectors_DATAMC_List.append(TracksSel)
-        
-    params['vectors_DATAMC_List'] = vectors_DATAMC_List
-
-    vectors_MC_List = [GenSel]
-    
-    if args.processGenTracks:
-        vectors_MC_List.append(GenTracksSel)
-        
-    if args.applyEventVetoFastSimJets:
-        vectors_MC_List.append(params['Veto_fastSimJets']['genJet'])
-
-    params['vectors_MC_List'] = vectors_MC_List
-
-
     if  args.processBTagWeights:
 
-        params['JetSel']['branches'].append('hadronFlavour/I')
+#        params['JetSel']['branches'].append('hadronFlavour/I')
         from Workspace.DegenerateStopAnalysis.cmgPostProcessing.btagEfficiency import btagEfficiency
 
         sampleName = args.processSample
@@ -475,77 +389,21 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
     '''
     logger = logging.getLogger('cmgPostProcessing.rwTreeClasses')
 
-    # define some internal functions
-    
-    def appendVectors(params, key, vectorType, vectorsList):
-        ''' Append to vectorsList the vectors defied as dictionary in the getParameterSet
-        
-        '''
-        
-        if params.has_key(key):
-            
-            for sel in params[key]:
-                
-                # get the list of branches 
-                if vectorType == 'read':
-                    if sel.has_key('branches'):
-                        branches = sel['branches']
-                    else:
-                         return vectorsList                        
-                elif vectorType == 'new':
-                    if sel.has_key('newBranches'):
-                        branches = sel['newBranches']
-                    else:
-                         return vectorsList
-                else:
-                    raise Exception("\n No such vector type defined to append to {0}.".format(vectorType))
-                    sys.exit()
-                    
-                varList = []
-                if isinstance(branches, dict):
-                    # dictionary with list of branches
-                    for key, value in branches.iteritems():
-                        varList.extend(value)
-                elif isinstance(branches, list):
-                    # list of branches
-                    varList = branches
-                else:
-                    raise Exception("\n Not possible to build list of branches for {0}.".format(branches))
-                    sys.exit()
-            
-                vec = {
-                    'prefix': sel['branchPrefix'], 'nMax': sel['nMax'],
-                        'vars': varList,
-                    }
-                vectorsList.append(vec)
-                
-        #
-        return vectorsList
+    # get the variables defined in the parameter file
+    treeVariables_params = params['treeVariables']
 
+    # sum up branches to be defined for each sample, depending on the sample
+    # type (data or MC)
+
+    readVariables = []
+    aliases = []
+    newVariables = []
+
+    readVectors = []
+    newVectors = []
     
     # define the branches and the variables to be kept and/or read for data and MC
         
-    # common branches for data and MC samples 
-    
-    # common branches already defined in cmgTuples
-    keepBranches_DATAMC = [
-        'run', 'lumi', 'evt', 'isData', 'rho', 'nVert', 'rhoCN',
-        'met*',
-        'Flag_*','HLT_*',
-        'nJet', 'Jet_*', 
-        'nTauGood', 'TauGood_*',
-        ] 
-
-    if (args.processLepAll and args.storeOnlyLepAll):
-        keepBranches_DATAMC.extend([ 
-            'nLepGood', 'nLepOther',
-            ])
-    else:        
-        keepBranches_DATAMC.extend([ 
-            'nLepGood', 'LepGood_*', 
-            'nLepOther', 'LepOther_*',
-            ])
-
     readVariables_DATAMC = []
     aliases_DATAMC = []
     newVariables_DATAMC = []
@@ -556,7 +414,6 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
     readVariables_DATAMC.extend(['met_pt/F', 'met_phi/F'])
     aliases_DATAMC.extend([ 'met:met_pt', 'metPhi:met_phi'])
     
-    readVectors_DATAMC = appendVectors(params, 'vectors_DATAMC_List', 'read', readVectors_DATAMC)
                         
     newVariables_DATAMC.extend([
         'Flag_Veto_Event_List/I/1',
@@ -568,43 +425,6 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
         'puReweight_up/F/-999.',
         'puReweight_down/F/-999.',
         'ht_basJet/F/-999.'
-        ])
-    
-    newVariables_DATAMC.extend([
-        "nLepGood_mu/I/-1", "nLepGood_el/I/-1", "nLepGood_lep/I/-1",
-        ])
-    
-    if args.processLepAll:
-        newVariables_DATAMC.extend([
-            "nLepOther_mu/I/-1", "nLepOther_el/I/-1", "nLepOther_lep/I/-1",
-            "nLepAll_mu/I/-1", "nLepAll_el/I/-1", "nLepAll_lep/I/-1",
-            ])
-        
-        if 'el2' in params['LepGoodSel']:
-            newVariables_DATAMC.extend([
-                "nLepAll_el2/I/-1",
-                ])
-        
-        if 'mu2' in params['LepGoodSel']:
-            newVariables_DATAMC.extend([
-                "nLepAll_mu2/I/-1",
-                ])
-            
-
-    newVariables_DATAMC.extend([
-        'nBasJet/I/-1', 'nVetoJet/I/-1', 'nIsrJet/I/-1', 'nIsrHJet/I/-1',
-        'nBJet/I/-1', 'nBSoftJet/I/-1', 'nBHardJet/I/-1',
-        ])
-        
-    newVariables_DATAMC.extend([
-        'basJet_dR_j1j2/F/-999.', 'basJet_dPhi_j1j2/F/-999.', 'vetoJet_dPhi_j1j2/F/-999.',
-        ])
-    
-    newVariables_DATAMC.extend([
-        'basJet_muGood_invMass_mu1jmindR/F/-999.','basJet_muGood_dR_j1mu1/F/-999.', 'basJet_muGood_invMass_3j/F/-999.',
-        'basJet_elGood_invMass_el1jmindR/F/-999.','basJet_elGood_dR_j1el1/F/-999.', 'basJet_elGood_invMass_3j/F/-999.',
-        'basJet_lepGood_invMass_lep1jmindR/F/-999.','basJet_lepGood_dR_j1lep1/F/-999.', 'basJet_lepGood_invMass_3j/F/-999.',
-        'bJet_muGood_dR_jHdmu1/F/-999.','bJet_elGood_dR_jHdel1/F/-999.', 'bJet_lepGood_dR_jHdlep1/F/-999.',
         ])
 
 
@@ -628,16 +448,6 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
         bTagWeightVars.sort()
         newVariables_DATAMC.extend( bTagWeightVars)
     
-
-
-    if args.processLepAll:
-        newVariables_DATAMC.extend([
-            'basJet_muAll_invMass_mu1jmindR/F/-999.','basJet_muAll_dR_j1mu1/F/-999.', 'basJet_muAll_invMass_3j/F/-999.',
-            'basJet_elAll_invMass_el1jmindR/F/-999.','basJet_elAll_dR_j1el1/F/-999.', 'basJet_elAll_invMass_3j/F/-999.',
-            'basJet_lepAll_invMass_lep1jmindR/F/-999.','basJet_lepAll_dR_j1lep1/F/-999.', 'basJet_lepAll_invMass_3j/F/-999.',
-            'bJet_muAll_dR_jHdmu1/F/-999.','bJet_elAll_dR_jHdel1/F/-999.', 'bJet_lepAll_dR_jHdlep1/F/-999.',
-            ])
-        
     # flag for vetoing events for FastSim samples, as resulted from 2016 "corridor studies"
     #  = 0: fails event
     #  = 1: pass event
@@ -645,121 +455,8 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
         'Flag_veto_event_fastSimJets/I/1',
         ])
     
-
     
-    newVectors_DATAMC = appendVectors(params, 'vectors_DATAMC_List', 'new', newVectors_DATAMC)
-    
-    # LepAll collection kludge - needs all Lep*_* branches to clone LepGood and LepOther in LepAll
-    if args.processLepAll:
-        
-        varsNameTypeTreeLepAll = copy.deepcopy(varsNameTypeTreeLep)
-        
-        for vec in readVectors_DATAMC:
-            if vec['prefix'] in ['LepGood', 'LepOther']:
-                vec['vars'] = varsNameTypeTreeLep
-                
-    
-        for vec in newVectors_DATAMC:
-            if vec['prefix'] is 'LepGood':
-                for var in vec['vars']:
-                    varsNameTypeTreeLepAll.append(var)
-        
-        newVariables_DATAMC.extend([
-            "nLepAll/I/-1",
-            ])
-    
-        LepAllVect = [{
-            'prefix':'LepAll',
-            'nMax': params['LepGoodSel']['nMax'] + params['LepOtherSel']['nMax'],
-            'vars': varsNameTypeTreeLepAll,
-            }, ]
-        
-        newVectors_DATAMC.extend(LepAllVect)
-        
-        # add list of variables for leptons in readTree to params
-        vars_LepTree = [helpers.getVariableName(var) for var in varsNameTypeTreeLepAll]
-        params['vars_LepTree'] = vars_LepTree
-        
-        logger.info(
-            "\n Additional entries in the parameter dictionary: variables for LepGood tree \n\n %s \n\n", 
-            pprint.pformat(params['vars_LepTree'])
-            )
-    
-        # end of kludge
-    
-    
-    # index sorting
-    
-    # leptons are sorted after pt
-    
-    IndexLepVars = [
-                'mu/I/-1',
-                'el/I/-1',
-                'lep/I/-1',
-                ]
-    if 'el2' in params['LepGoodSel']:
-        IndexLepVars.extend([
-            'el2/I/-1',
-            ])
-    
-    if 'mu2' in params['LepGoodSel']:
-        IndexLepVars.extend([
-            'mu2/I/-1',
-            ])
-
-    newVectors_DATAMC.extend([
-        {'prefix':'IndexLepGood', 'nMax': params['LepGoodSel']['nMax'], 
-            'vars':IndexLepVars
-            },
-        ])
-
-    if args.processLepAll:
-        newVectors_DATAMC.extend([
-            {'prefix':'IndexLepOther', 'nMax': params['LepOtherSel']['nMax'], 
-                'vars':IndexLepVars
-                },
-            ])
-    
-        newVectors_DATAMC.extend([
-            {'prefix':'IndexLepAll', 'nMax': params['LepGoodSel']['nMax'] + params['LepOtherSel']['nMax'], 
-                'vars':IndexLepVars
-                },
-            ])
-
-    # basJet, vetoJet, isrJet, isrHJet are sorted after pt
-    # bJet, bSoftJet, bHardJet are sorted also after pt
-    newVectors_DATAMC.extend([
-        {'prefix':'IndexJet', 'nMax': params['JetSel']['nMax'], 
-            'vars':[
-                'basJet/I/-1',
-                'vetoJet/I/-1',
-                'isrJet/I/-1',
-                'isrHJet/I/-1',
-                'bJet/I/-1',
-                'bSoftJet/I/-1',
-                'bHardJet/I/-1',
-                'bJetDiscSort/I/-1',                
-                ] 
-            },
-        ])
-    
-
     # MC samples only
-    
-    # common branches already defined in cmgTuples
-    keepBranches_MC = [ 
-        'nTrueInt', 'genWeight', 'xsec', 'LHEweight_original', #'puWeight', need to create a new puWeight
-        'nIsr',
-        'GenSusyMStop', 
-        'GenSusyMNeutralino',        
-        'LHEWeights_*',
-        'ngenLep', 'genLep_*', 
-        'nGenPart', 'GenPart_*',
-        'ngenPartAll','genPartAll_*',
-        'ngenTau', 'genTau_*', 
-        'ngenLepFromTau', 'genLepFromTau_*', 
-        'nGenJet', 'GenJet_*',
-        ]
     
     readVariables_MC = []
     aliases_MC = []
@@ -776,23 +473,7 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
         ])
 
     
-    readVectors_MC = appendVectors(params, 'vectors_MC_List', 'read', readVectors_MC)
-    
-    newVectors_MC.extend([
-        {'prefix':'IndexGen', 'nMax': params['GenSel']['nMax'], 
-            'vars':[
-                'stop/I/-1',
-                'lsp/I/-1',
-                'b/I/-1',
-                'lep/I/-1',
-                ] 
-            },
-        ])
-
     # data samples only
-    
-    # branches already defined in cmgTuples
-    keepBranches_DATA = []
     
     readVariables_DATA = []
     aliases_DATA = []
@@ -801,46 +482,6 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
     readVectors_DATA = []
     newVectors_DATA = []
     
-    
-    # branches for tracks (DATAMC/MC/DATA)
-    TracksSel = params['TracksSel']
-      
-    trackMinPtList = TracksSel['trackMinPtList'] 
-    hemiSectorList = TracksSel['hemiSectorList']
-    nISRsList      = TracksSel['nISRsList']
-       
-    if args.processTracks:
-        trkVar=TracksSel['branchPrefix']
-        trkCountVars = [ "n%s"%trkVar ] 
-        trkCountVars.extend([ 
-                    "n%sOpp%sJet%s"%(trkVar,hemiSec,nISRs) for hemiSec in hemiSectorList  for nISRs in nISRsList     
-                    ])
-        newTrackVars = []
-        for minTrkPt in trackMinPtList:
-            ptString = str(minTrkPt).replace(".","p")
-            newTrackVars.extend( [ x+"_pt%s"%ptString+"/I" for x in  trkCountVars  ] )
-        newVariables_DATAMC.extend(newTrackVars) 
-        
-        # readVectors for tracks added already to readVectors_DATAMC via TracksSel
-        
-                      
-    # branches for generated tracks (DATAMC/MC/DATA)
-
-    if args.processGenTracks:
-        genTrkVar=params['GenTracksSel']['branchPrefix']
-        genTrkCountVars = [ "n%s"%genTrkVar ] 
-        genTrkCountVars.extend([ 
-                    "n%sOpp%sJet%s"%(genTrkVar,hemiSec,nISRs) for hemiSec in hemiSectorList  for nISRs in nISRsList     
-                    ])
-        newGenTrackVars = []
-        for minGenTrkPt in trackMinPtList:
-            ptString = str(minGenTrkPt).replace(".","p")
-            newGenTrackVars.extend( [ x+"_pt%s"%ptString+"/I" for x in  genTrkCountVars  ] )
-        newVariables_DATAMC.extend(newGenTrackVars)        
-
-        # readVectors for generated tracks added already via GenTracksSel to 
-        # readVectors_MC
-   
     # add variables and vectors from the selectors
 
     def appendNewQuantities(nObjName, prefixToAdd, indexName, varInIndex, nMax, new_variables, new_vectors):
@@ -849,7 +490,7 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
                 '''
 
         varToAdd = ''.join([varInIndex, '/I/-1'])
-
+        
         if nObjName not in new_variables:
             new_variables.extend([
                 ''.join([nObjName, '/I/-1'])
@@ -883,6 +524,7 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
 
                 if varToAdd not in vec['vars']:
                     vec['vars'].append(varToAdd)
+                    vec['size'].update({indexName:nObjName})
                     logger.trace(
                         "\n Add variable: \n %s \n to vector \n %s \n", varToAdd, vec)
                 else:
@@ -891,25 +533,76 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
                     sys.exit()
 
         if not prefixFound:
-            new_vec = {'prefix': prefixToAdd, 'nMax': nMax, 'size': nObjName,
-                       'vars': varToAdd
+            new_vec = {'prefix': prefixToAdd, 'nMax': nMax, 'size': {indexName:nObjName},
+                       'vars': [varToAdd]
                        }
             logger.trace(
                 "\n Append new vector: \n %s \n", pprint.pformat(new_vec))
 
             new_vectors.extend([new_vec])
 
+    def appendReadQuantities(branchPrefix, nObjName, branchesToRead, nMax, read_variables, read_vectors):
+        ''' Append variable and vectors defined in each selector. 
+
+        '''
+
+        if nObjName not in read_variables:
+            read_variables.extend([nObjName])
+            logger.trace("\n Add variable: \n %s \n", nObjName)
+
+        prefixFound = False
+
+        for vec in read_vectors:
+
+            if branchPrefix == vec['prefix']:
+                prefixFound = True
+                logger.trace(
+                    "\n Found prefix: \n %s \n", pprint.pformat(branchPrefix))
+
+                if nMax != vec['nMax']:
+                    raise Exception(
+                        ''.join([
+                            '\n nMax from selector for {indexName}  = {nMax}',
+                            ' different from nMax = {nMaxEx} for existing prefix'
+                        ]).format(
+                            indexName=indexName, nMax=nMax, nMaxEx=vec[
+                                'nMax']
+                        )
+                    )
+                    sys.exit()
+
+                for var in branchesToRead:
+
+                    if var not in vec['vars']:
+                        vec['vars'].append(var)
+                        logger.trace(
+                            "\n Add variable: \n %s \n to vector \n %s \n", var, vec)
+                    else:
+                        logger.trace(
+                            "\n Variable: \n %s \n already in vector \n %s \n", var, vec)
+
+        if not prefixFound:
+            new_vec = {'prefix': branchPrefix, 'nMax': nMax, 'size': nObjName,
+                       'vars': branchesToRead
+                       }
+            logger.trace(
+                "\n Append new vector: \n %s \n", pprint.pformat(new_vec))
+
+            read_vectors.extend([new_vec])
+
     def appendSelQuantities(obj_selector, read_variables, new_variables, read_vectors, new_vectors):
         ''' Append variable and vectors defined in each selector. 
 
             '''
 
+        branchPrefix = obj_selector['branchPrefix']
         object = obj_selector['object']
         selectorId = obj_selector['selectorId']
 
         branchesToRead = obj_selector['branchesToRead']
-
         nMax = obj_selector['nMax']
+        
+        nObjNameColl = ''.join(['n', branchPrefix, '/I'])
 
         index_rtuple = indexObjNames(obj_selector)
         
@@ -918,60 +611,9 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
         prefixToAdd = index_rtuple.prefix
         varInIndex = index_rtuple.var
         
+        appendReadQuantities(branchPrefix, nObjNameColl, branchesToRead, nMax, read_variables, read_vectors)
         appendNewQuantities(nObjName, prefixToAdd, indexName, varInIndex, nMax, new_variables, new_vectors)
-
-#         varToAdd = ''.join([index_rtuple.var, '/I/-1'])
-# 
-#         if nObjName not in new_variables:
-#             new_variables.extend([
-#                 ''.join([nObjName, '/I/-1'])
-#             ])
-#             logger.trace("\n Add variable: \n %s \n", nObjName)
-#         else:
-#             raise Exception(
-#                 '\n Multiple definition of variable {var}.'.format(var=nObjName))
-#             sys.exit()
-# 
-#         prefixFound = False
-# 
-#         for vec in new_vectors:
-# 
-#             if prefixToAdd == vec['prefix']:
-#                 prefixFound = True
-#                 logger.trace(
-#                     "\n Found prefix: \n %s \n", pprint.pformat(prefixToAdd))
-# 
-#                 if nMax != vec['nMax']:
-#                     raise Exception(
-#                         ''.join([
-#                                 '\n nMax from selector {prefix}_{obj}_{name}  = {nMax}',
-#                                 ' different from nMax = {nMaxEx} for existing prefix'
-#                                 ]).format(
-#                             prefix=prefixToAdd, obj=object, name=selectorId, nMax=nMax, nMaxEx=vec[
-#                                 'nMax']
-#                         )
-#                     )
-#                     sys.exit()
-# 
-#                 if varToAdd not in vec['vars']:
-#                     vec['vars'].append(varToAdd)
-#                     logger.trace(
-#                         "\n Add variable: \n %s \n to vector \n %s \n", varToAdd, vec)
-#                 else:
-#                     raise Exception(
-#                         '\n Multiple definition of variable {var}.'.format(var=varToAdd))
-#                     sys.exit()
-# 
-#         if not prefixFound:
-#             new_vec = {'prefix': prefixToAdd, 'nMax': nMax,
-#                        'vars': varToAdd
-#                        }
-#             logger.trace(
-#                 "\n Append new vector: \n %s \n", pprint.pformat(new_vec))
-# 
-#             new_vectors.extend([new_vec])
         
-
     
     selectorList = params['selectorList']
 
@@ -984,30 +626,20 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
 
         sampleType = obj_selector['sampleType']
 
-        if ('data' in sampleType) and ('mc' in sampleType):
+        if ('data' in sampleType) and sample['isData']:
 
             appendSelQuantities(
                 obj_selector,
-                readVariables_DATAMC, newVariables_DATAMC,
-                readVectors_DATAMC, newVectors_DATAMC
+                readVariables, newVariables,
+                readVectors, newVectors
             )
 
-        elif ('mc' in sampleType):
+        if ('mc' in sampleType) and (not sample['isData']):
             appendSelQuantities(
                 obj_selector,
-                readVariables_MC, newVariables_MC,
-                readVectors_MC, newVectors_MC
+                readVariables, newVariables,
+                readVectors, newVectors
             )
-
-        elif ('data' in sampleType):
-            appendSelQuantities(
-                obj_selector,
-                readVariables_DATA, newVariables_DATA,
-                readVectors_DATA, newVectors_DATA
-            )
-
-        else:
-            pass
 
     mergeLeptonSelectors = params['mergeLeptonSelectors']
 
@@ -1027,54 +659,44 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
 
         sampleType = muSelector['sampleType']
 
-        if ('data' in sampleType) and ('mc' in sampleType):
+        if ('data' in sampleType) and sample['isData']:
             appendNewQuantities(
                 nObjName, prefixToAdd, indexName,
-                varInIndex, nMax, newVariables_DATAMC, newVectors_DATAMC
+                varInIndex, nMax, newVariables, newVectors
             )
 
-        elif ('mc' in sampleType):
+        if ('mc' in sampleType) and (not sample['isData']):
             appendNewQuantities(
                 nObjName, prefixToAdd, indexName,
-                varInIndex, nMax, newVariables_MC, newVectors_MC
+                varInIndex, nMax, newVariables, newVectors
             )
 
-        elif ('data' in sampleType):
-            appendNewQuantities(
-                nObjName, prefixToAdd, indexName,
-                varInIndex, nMax, newVariables_DATA, newVectors_DATA
-            )
-
-        else:
-            pass
-
-    
     # sum up branches to be defined for each sample, depending on the sample
     # type (data or MC)
-    
-    if sample['isData']: 
-        keepBranches = keepBranches_DATAMC + keepBranches_DATA
-    
-        readVariables = readVariables_DATAMC + readVariables_DATA
-        aliases = aliases_DATAMC + aliases_DATA
-        readVectors = readVectors_DATAMC + readVectors_DATA
-        newVariables = newVariables_DATAMC + newVariables_DATA
-        newVectors = newVectors_DATAMC + newVectors_DATA
-    else:
-        keepBranches = keepBranches_DATAMC + keepBranches_MC
-    
-        readVariables = readVariables_DATAMC + readVariables_MC
-        aliases = aliases_DATAMC + aliases_MC
-        readVectors = readVectors_DATAMC + readVectors_MC
-        newVariables = newVariables_DATAMC + newVariables_MC
-        newVectors = newVectors_DATAMC + newVectors_MC
 
+    if sample['isData']:
+        keepBranches = treeVariables_params.keepBranches_DATAMC + treeVariables_params.keepBranches_DATA
+        dropBranches = treeVariables_params.dropBranches_DATAMC + treeVariables_params.dropBranches_DATA
+
+#         readVariables = readVariables_DATAMC + readVariables_DATA
+#         aliases = aliases_DATAMC + aliases_DATA
+#         readVectors = readVectors_DATAMC + readVectors_DATA
+#         newVariables = newVariables_DATAMC + newVariables_DATA
+#         newVectors = newVectors_DATAMC + newVectors_DATA
+    else:
+        keepBranches = treeVariables_params.keepBranches_DATAMC + treeVariables_params.keepBranches_MC
+        dropBranches = treeVariables_params.dropBranches_DATAMC + treeVariables_params.dropBranches_MC
+
+#         readVariables = readVariables_DATAMC + readVariables_MC
+#         aliases = aliases_DATAMC + aliases_MC
+#         readVectors = readVectors_DATAMC + readVectors_MC
+#         newVariables = newVariables_DATAMC + newVariables_MC
+#         newVectors = newVectors_DATAMC + newVectors_MC
 
     readVars = [convertHelpers.readVar(v, allowRenaming=False, isWritten=False, isRead=True) for v in readVariables]
     newVars = [convertHelpers.readVar(v, allowRenaming=False, isWritten = True, isRead=False) for v in newVariables]
   
     for v in readVectors:
-        readVars.append(convertHelpers.readVar('n'+v['prefix']+'/I', allowRenaming=False, isWritten=False, isRead=True))
         v['vars'] = [convertHelpers.readVar(
             v['prefix']+'_'+vvar, allowRenaming=False, isWritten=False, isRead=True) for vvar in v['vars']
             ]
@@ -1112,6 +734,7 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
         'rtuple', 
         [
             'keepBranches', 
+            'dropBranches',
             'readVars', 
             'aliases', 
             'readVectors',
@@ -1124,6 +747,7 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
     
     rwTreeClasses_rtuple = rtuple(
         keepBranches, 
+        dropBranches,
         readVars, 
         aliases, 
         readVectors, 
@@ -3275,6 +2899,7 @@ def cmgPostProcessing(argv=None):
         rwTreeClasses_rtuple = rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, params) 
         #
         keepBranches = rwTreeClasses_rtuple.keepBranches 
+        dropBranches = rwTreeClasses_rtuple.dropBranches
              
         readVars = rwTreeClasses_rtuple.readVars
         aliases = rwTreeClasses_rtuple.aliases 
@@ -3335,12 +2960,16 @@ def cmgPostProcessing(argv=None):
     
                 for v in newVectors:
                     for var in v['vars']:
+                        if v.has_key('size'):
+                            vecSize = v['size'][var['stage2Name']]
+                        else:
+                            vecSize = v['nMax']
                         var['branch'] = splitTree.Branch(
                             var['stage2Name'], 
                             ROOT.AddressOf(saveTree,var['stage2Name']), 
-                            var['stage2Name']+'[' + str(v['nMax']) + ']/'+var['stage2Type']
+                            #var['stage2Name']+'[' + str(v['nMax']) + ']/'+var['stage2Type']
+                            var['stage2Name']+'[' + vecSize + ']/'+var['stage2Type']
                             )
-                        
 
                 # get entries for tree and loop over events
                 
@@ -3391,77 +3020,77 @@ def cmgPostProcessing(argv=None):
                     # merge muon and electrons for the required selectors
                     saveTree = mergeLeptons(readTree, splitTree, saveTree, params)
                     
-                    # leptons processing
-                    saveTree, processLepGood_rtuple = processLeptons(
-                        readTree, splitTree, saveTree, params, params['LepGoodSel']
-                        )
-                                        
-                    if processLepAll:
-                        saveTree, processLepOther_rtuple = processLeptons(
-                            readTree, splitTree, saveTree, params, params['LepOtherSel']
-                            )
-                    
-                        saveTree, processLepAll_rtuple = processLeptonsAll(
-                            readTree, splitTree, saveTree, params,
-                            processLepGood_rtuple, processLepOther_rtuple
-                            )
-                                            
-                    
-                    # jets processing
-                    saveTree, processJets_rtuple = processJets(
-                        args, readTree, splitTree, saveTree, params
-                        )
-                    if args.runInteractively:
-                        print splitTree.evt
-                        print "WARNING runInteractively!"
-                        return readTree, splitTree, saveTree , processJets_rtuple  , params
-                    
-                    if args.processBTagWeights:
-                        saveTree, processBTagWeights_rtuple = processBTagWeights(
-                            args, readTree, splitTree, saveTree,
-                            params, processJets_rtuple,
-                            )
-                        
-                    # selected leptons - jets processing
-                    saveTree = processLeptonJets(
-                        readTree, splitTree, saveTree,
-                        processLepGood_rtuple, processJets_rtuple
-                        )
-
-                    if processLepAll:
-                        saveTree = processLeptonJets(
-                            readTree, splitTree, saveTree,
-                            processLepAll_rtuple, processJets_rtuple
-                            )
-                    
-                    # tracks
-                    if args.processTracks:
-                        saveTree = processTracksFunction(
-                            readTree, splitTree, saveTree, params, 
-                            processLepGood_rtuple, processJets_rtuple
-                            )
-
-                        if processLepAll:
-                            saveTree = processTracksFunction(
-                                readTree, splitTree, saveTree, params, 
-                                processLepAll_rtuple, processJets_rtuple
-                                )
-
-                    if (not isDataSample) and args.processGenTracks:
-                        saveTree = processGenTracksFunction(readTree, splitTree, saveTree)
-                    
-                    # process event veto list flags
-                    if isDataSample and args.applyEventVetoList:
-                        saveTree = processEventVetoList(
-                            readTree, splitTree, saveTree, event_veto_list
-                            )
-
-                    # compute flag for event veto for FastSim jets
-                    if isFastSimSample and args.applyEventVetoFastSimJets:
-                        saveTree = processEventVetoFastSimJets(readTree, splitTree, saveTree, params)
-
-                    if not isDataSample:
-                        saveTree = processGenSusyParticles(readTree, splitTree, saveTree, params)
+#                     # leptons processing
+#                     saveTree, processLepGood_rtuple = processLeptons(
+#                         readTree, splitTree, saveTree, params, params['LepGoodSel']
+#                         )
+#                                         
+#                     if processLepAll:
+#                         saveTree, processLepOther_rtuple = processLeptons(
+#                             readTree, splitTree, saveTree, params, params['LepOtherSel']
+#                             )
+#                     
+#                         saveTree, processLepAll_rtuple = processLeptonsAll(
+#                             readTree, splitTree, saveTree, params,
+#                             processLepGood_rtuple, processLepOther_rtuple
+#                             )
+#                                             
+#                     
+#                     # jets processing
+#                     saveTree, processJets_rtuple = processJets(
+#                         args, readTree, splitTree, saveTree, params
+#                         )
+#                     if args.runInteractively:
+#                         print splitTree.evt
+#                         print "WARNING runInteractively!"
+#                         return readTree, splitTree, saveTree , processJets_rtuple  , params
+#                     
+#                     if args.processBTagWeights:
+#                         saveTree, processBTagWeights_rtuple = processBTagWeights(
+#                             args, readTree, splitTree, saveTree,
+#                             params, processJets_rtuple,
+#                             )
+#                         
+#                     # selected leptons - jets processing
+#                     saveTree = processLeptonJets(
+#                         readTree, splitTree, saveTree,
+#                         processLepGood_rtuple, processJets_rtuple
+#                         )
+# 
+#                     if processLepAll:
+#                         saveTree = processLeptonJets(
+#                             readTree, splitTree, saveTree,
+#                             processLepAll_rtuple, processJets_rtuple
+#                             )
+#                     
+#                     # tracks
+#                     if args.processTracks:
+#                         saveTree = processTracksFunction(
+#                             readTree, splitTree, saveTree, params, 
+#                             processLepGood_rtuple, processJets_rtuple
+#                             )
+# 
+#                         if processLepAll:
+#                             saveTree = processTracksFunction(
+#                                 readTree, splitTree, saveTree, params, 
+#                                 processLepAll_rtuple, processJets_rtuple
+#                                 )
+# 
+#                     if (not isDataSample) and args.processGenTracks:
+#                         saveTree = processGenTracksFunction(readTree, splitTree, saveTree)
+#                     
+#                     # process event veto list flags
+#                     if isDataSample and args.applyEventVetoList:
+#                         saveTree = processEventVetoList(
+#                             readTree, splitTree, saveTree, event_veto_list
+#                             )
+# 
+#                     # compute flag for event veto for FastSim jets
+#                     if isFastSimSample and args.applyEventVetoFastSimJets:
+#                         saveTree = processEventVetoFastSimJets(readTree, splitTree, saveTree, params)
+# 
+#                     if not isDataSample:
+#                         saveTree = processGenSusyParticles(readTree, splitTree, saveTree, params)
 
 
                     # compute the weight of the event
@@ -3512,6 +3141,8 @@ def cmgPostProcessing(argv=None):
                               [v['stage2Name'] for v in newVars] + 
                               [v.split(':')[1] for v in aliases]):
                         splitTree.SetBranchStatus(b, 1)
+                    for b in dropBranches:
+                        splitTree.SetBranchStatus(b,0)
                     for v in newVectors:
                         for var in v['vars']:
                             splitTree.SetBranchStatus(var['stage2Name'], 1)
