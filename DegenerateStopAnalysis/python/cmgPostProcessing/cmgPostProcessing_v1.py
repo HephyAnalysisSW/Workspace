@@ -2098,10 +2098,10 @@ def processEventVetoFastSimJets(readTree, splitTree, saveTree, params):
     # selection of reco jets
     
     recoJet_selector = Veto_fastSimJets_conf['recoJet']
+    recoJet_obj_branches = recoJet_selector['branchPrefix']
+    
     recoJet_index_rtuple = indexObjNames(recoJet_selector)
-
     recoJet_index_name = recoJet_index_rtuple.indexName
-    recoJet_obj_branches = recoJet_index_rtuple.branchPrefix
     
     recoJetObj = cmgObjectSelection.cmgObject(readTree, splitTree, recoJet_obj_branches)
     recoJetList = getListFromSaveTree(saveTree, recoJet_index_name)
@@ -2109,10 +2109,10 @@ def processEventVetoFastSimJets(readTree, splitTree, saveTree, params):
     # selection of generated jets
         
     genJet_selector = Veto_fastSimJets_conf['genJet']
+    genJet_obj_branches = genJet_selector['branchPrefix']
+    
     genJet_index_rtuple = indexObjNames(genJet_selector)
-
     genJet_index_name = genJet_index_rtuple.indexName
-    genJet_obj_branches = genJet_index_rtuple.branchPrefix
     
     genJetObj = cmgObjectSelection.cmgObject(readTree, splitTree, genJet_obj_branches)
     genJetList = getListFromSaveTree(saveTree, genJet_index_name)

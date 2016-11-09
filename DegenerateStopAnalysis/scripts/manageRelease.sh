@@ -38,7 +38,7 @@ fi
 set -vx
 
 # release and architecture, 
-CMSSW_RELEASE="CMSSW_8_0_11"
+CMSSW_RELEASE="CMSSW_8_0_20"
 SCRAM_ARCH_VAL="slc6_amd64_gcc530"
 
 if [[ ${CMSSW_ACTION} == "CB" || ${CMSSW_ACTION} == "R" ]]; then
