@@ -94,7 +94,7 @@ for samp in samplesList:
       canv.Update()   
 
       if save:
-         savedir = ppsDict['dir']
+         savedir = "%s/plots/%s/%s"%(ppsDict['dir'], skim, samp)
          makeDir(savedir + "/root")
          
          canv.SaveAs("%s/%s.png"%(savedir, branchName))
