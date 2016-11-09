@@ -271,6 +271,21 @@ def getVariableType(var):
     return ''
 
 
+def getVariableInitializer(var):
+    """ Return the variable initializer.
+
+    It assumes a root variable in the format 'name[size]/type/initializer' or 'name/type/initializer'
+
+    The format is not checked, it is assumed to be correct. Return None if no initializer is given..
+    """
+    if var.count('/') == 2:
+        return var.split('/')[2]
+    else:
+        print "\n Error: the variable " + var + \
+            " is not given in the format 'name[size]/type/initializer' or 'name/type/initializer"
+
+    return None
+
 def getVariableNameList(rootVarList):
     """ Return a list of variable names for a list of root variables fiven
         in the format 'name[size]/type/initializer' or 'name/type/initializer'
