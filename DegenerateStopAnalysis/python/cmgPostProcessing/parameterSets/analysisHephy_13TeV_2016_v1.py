@@ -16,6 +16,8 @@ import Workspace.DegenerateStopAnalysis.tools.helpers as helpers
 
 def treeVariables(args):
     '''Define variables and vectors.
+    
+    Most of the read and new variables are added automatically, depending on the selectors used.
 
     '''
 
@@ -62,7 +64,37 @@ def treeVariables(args):
         "Jet_ctagCsvB",
     ]
 
-    # MC samples only
+    aliases_DATAMC = []
+    aliases_DATAMC.extend([ 'met:met_pt', 'metPhi:met_phi'])
+
+    # 
+    readVariables_DATAMC = []
+    newVariables_DATAMC = []
+
+    readVectors_DATAMC = []
+    newVectors_DATAMC = []
+    
+    readVariables_DATAMC.extend(['met_pt/F', 'met_phi/F'])
+    
+    # flag for vetoing events for FastSim samples, as resulted from 2016 "corridor studies"
+    #  = 0: fails event
+    #  = 1: pass event
+    newVariables_DATAMC.extend([
+        'Flag_veto_event_fastSimJets/I/1',
+    ])
+
+    newVariables_DATAMC.extend([
+        'Flag_Veto_Event_List/I/1',
+        ])
+        
+    newVariables_DATAMC.extend([
+        'weight/F/-999.',
+        'puReweight/F/-999.',
+        'puReweight_up/F/-999.',
+        'puReweight_down/F/-999.',
+        ])
+
+   # MC samples only
 
     # common branches already defined in cmgTuples
     keepBranches_MC = [
@@ -82,6 +114,17 @@ def treeVariables(args):
     # branches to drop
     dropBranches_MC = []
 
+    aliases_MC = []
+    aliases_MC.extend(['genMet:met_genPt', 'genMetPhi:met_genPhi'])
+    
+     # 
+    readVariables_MC = []
+    newVariables_MC = []
+
+    readVectors_MC = []
+    newVectors_MC = []
+   
+
     # data samples only
 
     # branches already defined in cmgTuples
@@ -90,6 +133,15 @@ def treeVariables(args):
     # branches to drop
     dropBranches_DATA = []
 
+    aliases_DATA = []
+    
+     # 
+    readVariables_DATA = []
+    newVariables_DATA = []
+
+    readVectors_DATA = []
+    newVectors_DATA = []
+
     # define the named tuple to return the values
     rtuple = collections.namedtuple(
         'rtuple',
@@ -97,9 +149,31 @@ def treeVariables(args):
             'keepBranches_DATAMC',
             'keepBranches_MC',
             'keepBranches_DATA',
+
             'dropBranches_DATAMC',
             'dropBranches_MC',
             'dropBranches_DATA',
+
+            'aliases_DATAMC',
+            'aliases_MC',
+            'aliases_DATA',
+
+            'readVariables_DATAMC',
+            'readVariables_MC',
+            'readVariables_DATA',
+
+            'newVariables_DATAMC',
+            'newVariables_MC',
+            'newVariables_DATA',
+
+            'readVectors_DATAMC',
+            'readVectors_MC',
+            'readVectors_DATA',
+
+            'newVectors_DATAMC',
+            'newVectors_MC',
+            'newVectors_DATA',
+
         ]
     )
 
@@ -107,9 +181,30 @@ def treeVariables(args):
         keepBranches_DATAMC,
         keepBranches_MC,
         keepBranches_DATA,
+
         dropBranches_DATAMC,
         dropBranches_MC,
-        dropBranches_DATA
+        dropBranches_DATA,
+
+        aliases_DATAMC,
+        aliases_MC,
+        aliases_DATA,
+
+        readVariables_DATAMC,
+        readVariables_MC,
+        readVariables_DATA,
+
+        newVariables_DATAMC,
+        newVariables_MC,
+        newVariables_DATA,
+
+        readVectors_DATAMC,
+        readVectors_MC,
+        readVectors_DATA,
+
+        newVectors_DATAMC,
+        newVectors_MC,
+        newVectors_DATA
     )
 
     #
@@ -711,10 +806,10 @@ def getParameterSet(args):
     branchesToPrint_fastSim_recoJet = helpers.getVariableNameList(
         branchesToRead_fastSim_recoJet)
 
-    Veto_fastSimJets_recoJet = {
+    Jet_fastSim_recoJet = {
         'branchPrefix': 'Jet',
         'object': 'fastSim_recoJet',
-        'selectorId': 'def',
+        'selectorId': 'veto',
         'sampleType': ['mc'],
         'inputIndexList': None,
         'branchesToRead': branchesToRead_fastSim_recoJet,
@@ -732,7 +827,7 @@ def getParameterSet(args):
         },
     }
 
-    selectorList.append(Veto_fastSimJets_recoJet)
+    selectorList.append(Jet_fastSim_recoJet)
 
     nMax_fastSim_genJet = nMax_fastSim_recoJet
     branchesToRead_fastSim_genJet = [
@@ -741,10 +836,10 @@ def getParameterSet(args):
     branchesToPrint_fastSim_genJet = helpers.getVariableNameList(
         branchesToRead_fastSim_genJet)
 
-    Veto_fastSimJets_genJet = {
+    Jet_fastSim_genJet = {
         'branchPrefix': 'Jet',
         'object': 'fastSim_genJet',
-        'selectorId': 'def',
+        'selectorId': 'veto',
         'sampleType': ['mc'],
         'inputIndexList': None,
         'branchesToRead': branchesToRead_fastSim_genJet,
@@ -758,17 +853,18 @@ def getParameterSet(args):
         },
     }
 
-    selectorList.append(Veto_fastSimJets_genJet)
+    selectorList.append(Jet_fastSim_genJet)
 
-    Veto_fastSimJets = {
-        'recoJet': Veto_fastSimJets_recoJet,
-        'genJet': Veto_fastSimJets_genJet,
+    # configuration to veto events for FastSim samples
+    Veto_fastSimJets_conf = {
+        'recoJet': Jet_fastSim_recoJet,
+        'genJet': Jet_fastSim_genJet,
         'criteria': {
             'dR': ('dR', operator.lt, 0.3),
         }
     }
 
-    params['Veto_fastSimJets'] = Veto_fastSimJets
+    params['Veto_fastSimJets_conf'] = Veto_fastSimJets_conf
 
     #
     #
@@ -788,6 +884,22 @@ def getParameterSet(args):
         'down':    {'var': 'puReweight_down', 'xsec': pu_xsec * (1 - pu_xsec_unc), 'pu_root_file': pileup_dir + '/PU_ratio_%s.root' % int(pu_xsec * (1 - pu_xsec_unc)), 'pu_hist_name': 'PU_ratio'},
     }
     params['puWeightDict'] = puWeightDict
+    
+    # btag weights configuration
+        
+    if args.processBTagWeights:
+        
+        BTagWeights_conf = {
+            'bTagNames': ['BTag', 'SBTag', 'HBTag'],
+            'bTagWeightNames': ['MC', 'SF', 'SF_b_Down', 'SF_b_Up', 'SF_l_Down', 'SF_l_Up', 'SF_FS_Up', 'SF_FS_Down'],
+            'maxMultBTagWeight': 2,
+            'jetColl': 'Jet',
+            'jet': 'IndexJet_basJet_def',
+            'bjet': 'IndexJet_bJet_def', 
+            'bJetSoft': 'IndexJet_bJetSoft_def',
+            'bJetHard': 'IndexJet_bJetHard_def',
+        }
+        params['BTagWeights_conf'] = BTagWeights_conf
 
     # another set of selectors, with lower pt cuts
 

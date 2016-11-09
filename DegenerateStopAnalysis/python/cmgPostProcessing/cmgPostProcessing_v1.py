@@ -85,7 +85,6 @@ def getParameterSet(args):
     
     if  args.processBTagWeights:
 
-#        params['JetSel']['branches'].append('hadronFlavour/I')
         from Workspace.DegenerateStopAnalysis.cmgPostProcessing.btagEfficiency import btagEfficiency
 
         sampleName = args.processSample
@@ -396,87 +395,11 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
     # type (data or MC)
 
     readVariables = []
-    aliases = []
     newVariables = []
 
     readVectors = []
     newVectors = []
-    
-    # define the branches and the variables to be kept and/or read for data and MC
-        
-    readVariables_DATAMC = []
-    aliases_DATAMC = []
-    newVariables_DATAMC = []
-
-    readVectors_DATAMC = []
-    newVectors_DATAMC = []
-    
-    readVariables_DATAMC.extend(['met_pt/F', 'met_phi/F'])
-    aliases_DATAMC.extend([ 'met:met_pt', 'metPhi:met_phi'])
-    
-                        
-    newVariables_DATAMC.extend([
-        'Flag_Veto_Event_List/I/1',
-        ])
-        
-    newVariables_DATAMC.extend([
-        'weight/F/-999.',
-        'puReweight/F/-999.',
-        'puReweight_up/F/-999.',
-        'puReweight_down/F/-999.',
-        'ht_basJet/F/-999.'
-        ])
-
-
-    #FIXME
-    if args.processBTagWeights:
-        bTagNames           = [ 'BTag'  , 'SBTag', 'HBTag'   ]  ## to be moved into the params
-        bTagWeightNames     = ['MC', 'SF', 'SF_b_Down', 'SF_b_Up', 'SF_l_Down', 'SF_l_Up', 'SF_FS_Up', 'SF_FS_Down' ] ## from btagEff.btagWeightNames , also to be moved to params
-        maxMultBTagWeight   = 2    # move to params
-        bTagWeightVars      = []
-        for bTagName in bTagNames:
-            for var in bTagWeightNames:
-                #varName = "_%s"%var if var!="MC" else ""
-                varName= "_%s"%var
-                if var!='MC':
-                    bTagWeightVars.append(  "weight1a%s%s/F"%(bTagName, varName) )
-                for nB in range(maxMultBTagWeight+1):
-                    bTagWeightVars.append( "weight%s%s%s/F"%(bTagName, nB, varName) ) 
-                    if nB>0: 
-                        #print "weight%s%sp%s/F"%(bTagName, nB, varName)
-                        bTagWeightVars.append( "weight%s%sp%s/F"%(bTagName, nB, varName) ) 
-        bTagWeightVars.sort()
-        newVariables_DATAMC.extend( bTagWeightVars)
-    
-    # flag for vetoing events for FastSim samples, as resulted from 2016 "corridor studies"
-    #  = 0: fails event
-    #  = 1: pass event
-    newVariables_DATAMC.extend([
-        'Flag_veto_event_fastSimJets/I/1',
-        ])
-    
-    
-    # MC samples only
-    
-    readVariables_MC = []
-    aliases_MC = []
-    newVariables_MC = []
-    
-    readVectors_MC = []
-    newVectors_MC = []
-    
-    aliases_MC.extend(['genMet:met_genPt', 'genMetPhi:met_genPhi'])
-    
-    
-    # data samples only
-    
-    readVariables_DATA = []
-    aliases_DATA = []
-    newVariables_DATA = []
-    
-    readVectors_DATA = []
-    newVectors_DATA = []
-    
+            
     # add variables and vectors from the selectors
 
     def appendNewQuantities(
@@ -741,27 +664,65 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
                 computeVars, computeVectors,
                 newVariables, newVectors)
 
+    # create the variables for btag weights
+    # FIXME the addition of manually entered bTagWeightVars is not checked for
+    # consistency
+    if args.processBTagWeights:
+
+        BTagWeights_conf = params['BTagWeights_conf']
+        
+        bTagNames = BTagWeights_conf['bTagNames']
+        bTagWeightNames = BTagWeights_conf['bTagWeightNames']
+        maxMultBTagWeight = BTagWeights_conf['maxMultBTagWeight']
+
+        bTagWeightVars = []
+        for bTagName in bTagNames:
+            for var in bTagWeightNames:
+                varName = "_%s" % var
+                if var != 'MC':
+                    bTagWeightVars.append(
+                        "weight1a%s%s/F" % (bTagName, varName))
+                for nB in range(maxMultBTagWeight + 1):
+                    bTagWeightVars.append(
+                        "weight%s%s%s/F" % (bTagName, nB, varName))
+                    if nB > 0:
+                        bTagWeightVars.append(
+                            "weight%s%sp%s/F" % (bTagName, nB, varName))
+        bTagWeightVars.sort()
+        
+        newVariables.extend(bTagWeightVars)
+
     # sum up branches to be defined for each sample, depending on the sample
     # type (data or MC)
+    # FIXME the addition of manually entered quantities is not checked for consistency
 
+    readVariables.extend(treeVariables_params.readVariables_DATAMC)
+    readVectors.extend(treeVariables_params.readVectors_DATAMC)
+    
+    newVariables.extend(treeVariables_params.newVariables_DATAMC)
+    newVectors.extend(treeVariables_params.newVectors_DATAMC)
+   
     if sample['isData']:
         keepBranches = treeVariables_params.keepBranches_DATAMC + treeVariables_params.keepBranches_DATA
         dropBranches = treeVariables_params.dropBranches_DATAMC + treeVariables_params.dropBranches_DATA
 
-#         readVariables = readVariables_DATAMC + readVariables_DATA
-#         aliases = aliases_DATAMC + aliases_DATA
-#         readVectors = readVectors_DATAMC + readVectors_DATA
-#         newVariables = newVariables_DATAMC + newVariables_DATA
-#         newVectors = newVectors_DATAMC + newVectors_DATA
+        aliases = treeVariables_params.aliases_DATAMC + treeVariables_params.aliases_DATA
+
+        readVariables.extend(treeVariables_params.readVariables_DATA)        
+        readVectors.extend(treeVariables_params.readVectors_DATA)
+        
+        newVariables.extend(treeVariables_params.newVariables_DATA)        
+        newVectors.extend(treeVariables_params.newVectors_DATA)
     else:
         keepBranches = treeVariables_params.keepBranches_DATAMC + treeVariables_params.keepBranches_MC
         dropBranches = treeVariables_params.dropBranches_DATAMC + treeVariables_params.dropBranches_MC
+        aliases = treeVariables_params.aliases_DATAMC + treeVariables_params.aliases_MC
 
-#         readVariables = readVariables_DATAMC + readVariables_MC
-#         aliases = aliases_DATAMC + aliases_MC
-#         readVectors = readVectors_DATAMC + readVectors_MC
-#         newVariables = newVariables_DATAMC + newVariables_MC
-#         newVectors = newVectors_DATAMC + newVectors_MC
+        readVariables.extend(treeVariables_params.readVariables_MC)        
+        readVectors.extend(treeVariables_params.readVectors_MC)
+        
+        newVariables.extend(treeVariables_params.newVariables_MC)        
+        newVectors.extend(treeVariables_params.newVectors_MC)
 
     readVars = [convertHelpers.readVar(v, allowRenaming=False, isWritten=False, isRead=True) for v in readVariables]
     newVars = [convertHelpers.readVar(v, allowRenaming=False, isWritten = True, isRead=False) for v in newVariables]
@@ -1154,7 +1115,7 @@ def mergeLeptons(readTree, splitTree, saveTree, params):
 def processLeptons(readTree, splitTree, saveTree, params, LepSelector):
     '''Process leptons. 
     
-    TODO describe here the processing.
+    NOTE: obsolete, not used anymore, kept here for reference only until full migration is done
     '''
 
     logger = logging.getLogger('cmgPostProcessing.processLeptons')
@@ -1339,6 +1300,7 @@ def processLeptonsAll(
     ):
     '''Process LepAll collection, LepGood + LepOther 
     
+    NOTE: obsolete, not used anymore, kept here for reference only until full migration is done
     '''
 
     logger = logging.getLogger('cmgPostProcessing.processLeptonsAll')
@@ -1639,60 +1601,62 @@ def processJets_func(args, readTree, splitTree, saveTree, params, computeVariabl
 
 def processBTagWeights(
         args, readTree, splitTree, saveTree,
-        params, processJets_rtuple,
+        params
         ):
     '''Process BTag Weights using Robert's btagEfficiency class. 
     
     TODO describe here the processing.
     '''
-    #
-    #print "---------------------------------------- PROCESSING BTAG WEIGHTS" 
+
     logger = logging.getLogger('cmgPostProcessing.processBTagWeights')
 
+    # get the configuration parameters for this function
+    
+    BTagWeights_conf = params['BTagWeights_conf']
+    
+    maxMultBTagWeight = BTagWeights_conf['maxMultBTagWeight']
+
     effFile          =   params['beff']['effFile']
-    #effFile         =   params['beff']['effFile'] 
     sfFile           =   params['beff']['sfFile']
     sfFile_FastSim   =   params['beff']['sfFile_FastSim']
     
     btagEff          =   params['beff']['btagEff']
    
- 
+    # get the lists of indices 
     
-    jObj         = processJets_rtuple.jetObj
-    jetList      = processJets_rtuple.basJetList
-    bJetList     = processJets_rtuple.bJetList
-    bSoftJetList = processJets_rtuple.bSoftJetList
-    bHardJetList = processJets_rtuple.bHardJetList
-    softJetList  = processJets_rtuple.softJetList
-    hardJetList  = processJets_rtuple.hardJetList
+    jetColl = BTagWeights_conf['jetColl']
+    jetObj = cmgObjectSelection.cmgObject(readTree, splitTree, jetColl)
+    
+    jetList = getListFromSaveTree(saveTree, BTagWeights_conf['jet'])
+    bJetList = getListFromSaveTree(saveTree, BTagWeights_conf['bjet'])
+    bSoftJetList = getListFromSaveTree(saveTree, BTagWeights_conf['bJetSoft'])
+    bHardJetList = getListFromSaveTree(saveTree, BTagWeights_conf['bJetHard'])
+
+    # FIXME
+    softJetList  = getListFromSaveTree(saveTree, BTagWeights_conf['jet'])
+    hardJetList  = getListFromSaveTree(saveTree, BTagWeights_conf['jet'])
     
     nonBJetList     = [x for x in jetList if x not in bJetList]
     nonBSoftJetList = [x for x in jetList if x not in bSoftJetList]
     nonBHardJetList = [x for x in jetList if x not in bHardJetList]
     
-    for i in processJets_rtuple.basJetList:
-        btagEff.addBTagEffToJet(jObj,i)
-    ### FIXME THIS CRASHES IF processJets_rtuple.basJetList IS EMPTY!!!! 
-    # if processJets_rtuple.baseJet:
-    # else. jObj
-    #
-    setattr(readTree, "%s_%s" % (jObj.obj, 'beff'),jObj.beff)  ## in order for th getObjDict to work with beff
+    for i in jetList:
+        btagEff.addBTagEffToJet(jetObj,i)
     
-    
+    ## in order for th getObjDict to work with beff
+    setattr(readTree, "%s_%s" % (jetObj.obj, 'beff'),jetObj.beff)  
     
     varList = ['pt', 'eta', 'phi', 'mass', 'hadronFlavour', 'beff' ]
     
-    nonBJetList = [x for x in jetList if x not in bJetList]
-    
-    jets     = jObj.getObjDictList(  varList , jetList )
-    softJets = jObj.getObjDictList(  varList , softJetList ) 
-    hardJets = jObj.getObjDictList(  varList , hardJetList ) 
-    bJets     = jObj.getObjDictList(  varList , bJetList )
-    bSoftJets = jObj.getObjDictList(  varList , bSoftJetList )
-    bHardJets = jObj.getObjDictList(  varList , bHardJetList )
-    nonBJets     = jObj.getObjDictList(  varList , nonBJetList )
-    nonBSoftJets = jObj.getObjDictList(  varList , nonBSoftJetList )
-    nonBHardJets = jObj.getObjDictList(  varList , nonBHardJetList )
+    jets     = jetObj.getObjDictList(  varList , jetList )
+    softJets = jetObj.getObjDictList(  varList , softJetList ) 
+    hardJets = jetObj.getObjDictList(  varList , hardJetList ) 
+    bJets     = jetObj.getObjDictList(  varList , bJetList )
+    bSoftJets = jetObj.getObjDictList(  varList , bSoftJetList )
+    bHardJets = jetObj.getObjDictList(  varList , bHardJetList )
+    nonBJets     = jetObj.getObjDictList(  varList , nonBJetList )
+    nonBSoftJets = jetObj.getObjDictList(  varList , nonBSoftJetList )
+    nonBHardJets = jetObj.getObjDictList(  varList , nonBHardJetList )
     
     btag_nonbtag_list_pairs = {
                             'BTag'  : ( bJetList, nonBJetList ),
@@ -1705,10 +1669,6 @@ def processBTagWeights(
                             'HBTag' : ( bHardJets , nonBHardJets , hardJets),
                          }
     
-    maxMultBTagWeight = 2
-    #print "---------------------------------------------------------------------------"
-    #print "    ", splitTree.evt
-    #print "---------------------------------------------------------------------------"
     for bTagName, bJets_nonBJets_jets in btag_nonbtag_pairs.iteritems():
         bj , nonbj , j = bJets_nonBJets_jets
         for var in btagEff.btagWeightNames:
@@ -1735,18 +1695,9 @@ def processBTagWeights(
                     setattr(saveTree, "weight%s%sp%s"%(bTagName, nB, varName), 1 - sum( multiBTagWeightDict.values()[:nB] )   )  # more than nB  (i.e. 1p,2p)
 
 
-
-
     processBTagWeights_rtuple = None #FIXME
-    #
-
+    
     return saveTree, processBTagWeights_rtuple
-
-
-
-
-
-
 
 
 def processLeptonJets(
@@ -1762,6 +1713,7 @@ def processLeptonJets(
         
         Jets are considered having mass here, lepton have mass zero.
         
+    NOTE: obsolete, not used anymore, kept here for reference only until full migration is done
     '''
     
     logger = logging.getLogger('cmgPostProcessing.processLeptonJets')
@@ -1915,6 +1867,7 @@ def processTracksFunction(
     
     TODO describe here the processing.
     FIXME the function needs a serious clean up...
+    NOTE: obsolete, not used anymore, kept here for reference only until full migration is done
     '''
     logger = logging.getLogger('cmgPostProcessing.processTracksFunction')
     
@@ -2036,6 +1989,7 @@ def processGenTracksFunction(readTree, splitTree, saveTree):
     
     TODO describe here the processing.
     FIXME the function needs a serious clean up...
+    NOTE: obsolete, not used anymore, kept here for reference only until full migration is done
     '''
     
     logger = logging.getLogger('cmgPostProcessing.processGenTracksFunction')
@@ -2137,71 +2091,35 @@ def processEventVetoFastSimJets(readTree, splitTree, saveTree, params):
 
     run_lumi_evt = saveTree.run_lumi_evt 
 
-    # get the parameters for this function
-    Veto_fastSimJets = params['Veto_fastSimJets']
-    JetVarList = params['JetVarList']
+    # get the configuration parameters for this function
+    
+    Veto_fastSimJets_conf = params['Veto_fastSimJets_conf']
 
     # selection of reco jets
+    
+    recoJet_selector = Veto_fastSimJets_conf['recoJet']
+    recoJet_index_rtuple = indexObjNames(recoJet_selector)
 
-    Veto_fastSimJets_recoJet = Veto_fastSimJets['recoJet']
-
-    recoObjBranches = Veto_fastSimJets_recoJet['branchPrefix']
-    recoJetObj = cmgObjectSelection.cmgObject(readTree, splitTree, recoObjBranches)
-
-    if logger.isEnabledFor(logging.DEBUG):
-        printStr = ''.join([
-            "\n List of ", 
-            recoObjBranches,
-            " jets before selector: ",
-            recoJetObj.printObjects(None, JetVarList)
-            ])
-        logger.debug(printStr)
-
-    recoJetSel = Veto_fastSimJets_recoJet['recoJet']
-    recoJetSelector = cmgObjectSelection.objSelectorFunc(recoJetSel)
-    recoJetList = recoJetObj.getSelectionIndexList(readTree, recoJetSelector)
-
-    if logger.isEnabledFor(logging.DEBUG):
-        printStr = ''.join([
-            "\n List of ", 
-            recoObjBranches,
-            " jets after selector: ",
-            recoJetObj.printObjects(recoJetList, JetVarList)
-            ])
-        logger.debug(printStr)
+    recoJet_index_name = recoJet_index_rtuple.indexName
+    recoJet_obj_branches = recoJet_index_rtuple.branchPrefix
+    
+    recoJetObj = cmgObjectSelection.cmgObject(readTree, splitTree, recoJet_obj_branches)
+    recoJetList = getListFromSaveTree(saveTree, recoJet_index_name)
 
     # selection of generated jets
+        
+    genJet_selector = Veto_fastSimJets_conf['genJet']
+    genJet_index_rtuple = indexObjNames(genJet_selector)
 
-    Veto_fastSimJets_genJet = Veto_fastSimJets['genJet']
-
-    genObjBranches = Veto_fastSimJets_genJet['branchPrefix']
-    genJetObj = cmgObjectSelection.cmgObject(readTree, splitTree, genObjBranches)
-
-    if logger.isEnabledFor(logging.DEBUG):
-        printStr = ''.join([
-            "\n List of ",
-            genObjBranches,
-            " jets before selector: ",
-            genJetObj.printObjects(None, JetVarList)
-            ])
-        logger.debug(printStr)
-
-    genJetSel = Veto_fastSimJets_genJet['genJet']
-    genJetSelector = cmgObjectSelection.objSelectorFunc(genJetSel)
-    genJetList = genJetObj.getSelectionIndexList(readTree, genJetSelector)
-
-    if logger.isEnabledFor(logging.DEBUG):
-        printStr = ''.join([
-            "\n List of ",
-            genObjBranches,
-            " jets after selector: ",
-            genJetObj.printObjects(genJetList, JetVarList)
-            ])
-        logger.debug(printStr)
+    genJet_index_name = genJet_index_rtuple.indexName
+    genJet_obj_branches = genJet_index_rtuple.branchPrefix
+    
+    genJetObj = cmgObjectSelection.cmgObject(readTree, splitTree, genJet_obj_branches)
+    genJetList = getListFromSaveTree(saveTree, genJet_index_name)
 
     # compute the criteria
 
-    criteria_dR = Veto_fastSimJets['criteria']['dR']
+    criteria_dR = Veto_fastSimJets_conf['criteria']['dR']
     noMatchedRecoJet = False
 
     for recoJetIdx, recoJet in enumerate(recoJetList):
@@ -2942,13 +2860,13 @@ def cmgPostProcessing(argv=None):
 #                             processLepGood_rtuple, processLepOther_rtuple
 #                             )
 #                                             
-#                     
-#                     if args.processBTagWeights:
-#                         saveTree, processBTagWeights_rtuple = processBTagWeights(
-#                             args, readTree, splitTree, saveTree,
-#                             params, processJets_rtuple,
-#                             )
-#                         
+
+                    if args.processBTagWeights:
+                        saveTree, processBTagWeights_rtuple = processBTagWeights(
+                            args, readTree, splitTree, saveTree,
+                            params
+                        )
+
 #                     # selected leptons - jets processing
 #                     saveTree = processLeptonJets(
 #                         readTree, splitTree, saveTree,
@@ -2977,15 +2895,15 @@ def cmgPostProcessing(argv=None):
 #                     if (not isDataSample) and args.processGenTracks:
 #                         saveTree = processGenTracksFunction(readTree, splitTree, saveTree)
 #                     
-#                     # process event veto list flags
-#                     if isDataSample and args.applyEventVetoList:
-#                         saveTree = processEventVetoList(
-#                             readTree, splitTree, saveTree, event_veto_list
-#                             )
-# 
-#                     # compute flag for event veto for FastSim jets
-#                     if isFastSimSample and args.applyEventVetoFastSimJets:
-#                         saveTree = processEventVetoFastSimJets(readTree, splitTree, saveTree, params)
+                    # process event veto list flags
+                    if isDataSample and args.applyEventVetoList:
+                        saveTree = processEventVetoList(
+                            readTree, splitTree, saveTree, event_veto_list
+                            )
+ 
+                    # compute flag for event veto for FastSim jets
+                    if isFastSimSample and args.applyEventVetoFastSimJets:
+                        saveTree = processEventVetoFastSimJets(readTree, splitTree, saveTree, params)
 
                     # compute the weight of the event
                     if not args.processSignalScan:
