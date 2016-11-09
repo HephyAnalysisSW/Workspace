@@ -597,6 +597,46 @@ def getParameterSet(args):
 
     selectorList.append(Jet_isrHJet_def)
 
+    Jet_softJet_def = {
+        'branchPrefix': 'Jet',
+        'object': 'softJet',
+        'selectorId': 'def',
+        'sampleType': ['data', 'mc'],
+        'inputIndexList': 'IndexJet_basJet_def',
+        'branchesToRead': branchesToRead_jets,
+        'branchesToPrint': branchesToPrint_jets,
+        #
+        # maximum number of objects kept
+        'nMax': nMax_jets,
+        #
+        # object selector
+        'selector': {
+            'ptSoftHard':  ('pt', operator.le, 60),
+        },
+    }
+
+    selectorList.append(Jet_softJet_def)
+
+    Jet_hardJet_def = {
+        'branchPrefix': 'Jet',
+        'object': 'hardJet',
+        'selectorId': 'def',
+        'sampleType': ['data', 'mc'],
+        'inputIndexList': 'IndexJet_basJet_def',
+        'branchesToRead': branchesToRead_jets,
+        'branchesToPrint': branchesToPrint_jets,
+        #
+        # maximum number of objects kept
+        'nMax': nMax_jets,
+        #
+        # object selector
+        'selector': {
+            'ptSoftHard':  ('pt', operator.gt, 60),
+        },
+    }
+
+    selectorList.append(Jet_hardJet_def)
+
     # b jets, pt sorted
     Jet_bJet_def = {
         'branchPrefix': 'Jet',
