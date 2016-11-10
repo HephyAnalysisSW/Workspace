@@ -987,6 +987,20 @@ def getParameterSet(args):
     selectorList.append(Jet_isrHJet_lowpt)
 
     #
+    Jet_softJet_lowpt = copy.deepcopy(Jet_softJet_def)
+    Jet_softJet_lowpt['selectorId'] = 'lowpt'
+    Jet_softJet_lowpt['inputIndexList'] = 'IndexJet_basJet_lowpt'
+
+    selectorList.append(Jet_softJet_lowpt)
+
+    #
+    Jet_hardJet_lowpt = copy.deepcopy(Jet_hardJet_def)
+    Jet_hardJet_lowpt['selectorId'] = 'lowpt'
+    Jet_hardJet_lowpt['inputIndexList'] = 'IndexJet_basJet_lowpt'
+
+    selectorList.append(Jet_hardJet_lowpt)
+
+    #
     Jet_bJet_lowpt = copy.deepcopy(Jet_bJet_def)
     Jet_bJet_lowpt['selectorId'] = 'lowpt'
     Jet_bJet_lowpt['inputIndexList'] = 'IndexJet_basJet_lowpt'
