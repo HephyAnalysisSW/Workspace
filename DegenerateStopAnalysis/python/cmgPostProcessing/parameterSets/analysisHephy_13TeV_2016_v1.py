@@ -808,7 +808,7 @@ def getParameterSet(args):
         # object selector ( len(keyValue) > 4 gives reverse evaluation, needed for contains)
         'selector': {
             'pdgId': ('pdgId', operator.contains, [11, 13], operator.abs, 1),
- 
+
         },
     }
  
@@ -912,8 +912,8 @@ def getParameterSet(args):
     #   https://twiki.cern.ch/twiki/bin/view/CMS/PileupJSONFileforData#Calculating_Your_Pileup_Distribu
     #   https://hypernews.cern.ch/HyperNews/CMS/get/luminosity/611/2.html
     #
-
     #  FIXME could be moved to args
+
     pu_xsec = 63000   # in microbarn
     pu_xsec_unc = 0.05
 
@@ -928,18 +928,38 @@ def getParameterSet(args):
     # btag weights configuration
         
     if args.processBTagWeights:
-        
-        BTagWeights_conf = {
-            'bTagNames': ['BTag', 'SBTag', 'HBTag'],
-            'bTagWeightNames': ['MC', 'SF', 'SF_b_Down', 'SF_b_Up', 'SF_l_Down', 'SF_l_Up', 'SF_FS_Up', 'SF_FS_Down'],
-            'maxMultBTagWeight': 2,
-            'jetColl': 'Jet',
-            'jet': 'IndexJet_basJet_def',
-            'bjet': 'IndexJet_bJet_def', 
-            'bJetSoft': 'IndexJet_bJetSoft_def',
-            'bJetHard': 'IndexJet_bJetHard_def',
+        BTagWeights_conf_def = {
+            'bTagNames'         :  ['BTag', 'SBTag', 'HBTag'],
+            'bTagWeightNames'   :  ['MC', 'SF', 'SF_b_Down', 'SF_b_Up', 'SF_l_Down', 'SF_l_Up', 'SF_FS_Up', 'SF_FS_Down'],
+            'maxMultBTagWeight' :  2,
+            'jetColl'           :  'Jet',
+            'jet'               :  'IndexJet_basJet_def',
+            'jetSoft'           :  'IndexJet_softJet_def',
+            'jetHard'           :  'IndexJet_hardJet_def',
+            'bjet'              :  'IndexJet_bJet_def', 
+            'bJetSoft'          :  'IndexJet_bJetSoft_def',
+            'bJetHard'          :  'IndexJet_bJetHard_def',
+            'jetSelectorId'     :  'def',
         }
-        params['BTagWeights_conf'] = BTagWeights_conf
+        params['BTagWeights_conf_def'] = BTagWeights_conf_def
+
+        ExtraBTagSelectorIDs = ['lowpt']
+        #ExtraBTagSelectorIDs = []
+
+        for selectorId in ExtraBTagSelectorIDs:
+
+            conf_name = 'BTagWeights_conf_%s'%selectorId
+            params[conf_name]              = copy.deepcopy( BTagWeights_conf_def)
+            params[conf_name]['jet'     ]  =  'IndexJet_basJet_%s'%selectorId
+            params[conf_name]['bjet'    ]  =  'IndexJet_bJet_%s'%selectorId
+            params[conf_name]['jetSoft' ]  =  'IndexJet_softJet_%s'%selectorId
+            params[conf_name]['jetHard' ]  =  'IndexJet_hardJet_%s'%selectorId
+            params[conf_name]['bJetSoft']  =  'IndexJet_bJetSoft_%s'%selectorId
+            params[conf_name]['bJetHard']  =  'IndexJet_bJetHard_%s'%selectorId
+            params[conf_name]['jetSelectorId'] = selectorId 
+        #params.pop("BTagWeights_conf_def")
+        #params['BTagWeights_conf_names'] = [ p for p in params.keys() if "BTagWeights_conf" in p ]
+        params['BTagWeights_conf_names'] = ['BTagWeights_conf_def' ,'BTagWeights_conf_lowpt']
 
     # another set of selectors, with lower pt cuts
 

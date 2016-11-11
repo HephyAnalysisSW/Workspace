@@ -89,12 +89,14 @@ def getParameterSet(args):
 
         sampleName = args.processSample
         eff_dict_map = [
-                        ( "WJets_1j"      , { 'sampleList' : ["ZInv", "ZJets", "WJets", "DYJets" ,"ZZ", "WZ", "WW" ] ,  }   ),
-                        ( "TTJets_1j"     , { 'sampleList' : ["TTJets_Tune" ,"TTJets_LO" ]  ,                           }   ),
-                        ( "TTJets_1j"     , { 'sampleList' : ["TTJets_FastSIM" , ]  ,     'isFastSim':True              }   ),
-                        ( "T2tt_allDM_1j" , { 'sampleList' : ["SMS_T2tt" , ],       'isFastSim':True                    }   ),
+                        ( "WJetsToLNu_HT_2D_presel"             , { 'sampleList' : ["ZInv", "ZJets", "WJets", "DYJets" ,"ZZ", "WZ", "WW" ] ,  }   ),
+                        #( "TTJets_HT_presel"     , { 'sampleList' : ["TTJets_Tune" ,"TTJets_LO" ]  ,                           }   ),
+                        ( "TTJets_HT_2D_presel"             , { 'sampleList' : ["TTJets_HT" ]  ,                           }   ),
+                        #( "TTJets_1j"                    , { 'sampleList' : ["TTJets_FastSIM" , ]  ,     'isFastSim':True              }   ),
+                        #( "T2tt_allDM_1j" , { 'sampleList' : ["SMS_T2tt" , ],       'isFastSim':True                    }   ),
+                        ( "T2tt_allDM__presel"           , { 'sampleList' : ["SMS_T2tt" , ],       'isFastSim':True                    }   ),
                        ]
-        eff_to_use = "TTJets_1j" #default
+        eff_to_use = "TTJets_HT_2D_presel" #default
         isFastSim = False
         for eff_samp, info in eff_dict_map:
             if any([ samp in sampleName for samp in info['sampleList'] ]):
@@ -668,29 +670,35 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
     # FIXME the addition of manually entered bTagWeightVars is not checked for
     # consistency
     if args.processBTagWeights:
-
-        BTagWeights_conf = params['BTagWeights_conf']
         
-        bTagNames = BTagWeights_conf['bTagNames']
-        bTagWeightNames = BTagWeights_conf['bTagWeightNames']
-        maxMultBTagWeight = BTagWeights_conf['maxMultBTagWeight']
+        BTagWeights_conf_names = params['BTagWeights_conf_names']
 
-        bTagWeightVars = []
-        for bTagName in bTagNames:
-            for var in bTagWeightNames:
-                varName = "_%s" % var
-                if var != 'MC':
-                    bTagWeightVars.append(
-                        "weight1a%s%s/F" % (bTagName, varName))
-                for nB in range(maxMultBTagWeight + 1):
-                    bTagWeightVars.append(
-                        "weight%s%s%s/F" % (bTagName, nB, varName))
-                    if nB > 0:
+
+        for conf_name in BTagWeights_conf_names:
+
+            BTagWeights_conf = params[conf_name]
+            
+            bTagNames = BTagWeights_conf['bTagNames']
+            bTagWeightNames = BTagWeights_conf['bTagWeightNames']
+            maxMultBTagWeight = BTagWeights_conf['maxMultBTagWeight']
+
+            bTagWeightVars = []
+            for bTagName in bTagNames:
+                jetSelectorId = BTagWeights_conf['jetSelectorId']
+                for var in bTagWeightNames:
+                    varName = "_%s_%s" % (var, jetSelectorId)
+                    if var != 'MC':
                         bTagWeightVars.append(
-                            "weight%s%sp%s/F" % (bTagName, nB, varName))
-        bTagWeightVars.sort()
-        
-        newVariables.extend(bTagWeightVars)
+                            "weight1a%s%s/F" % (bTagName, varName))
+                    for nB in range(maxMultBTagWeight + 1):
+                        bTagWeightVars.append(
+                            "weight%s%s%s/F" % (bTagName, nB, varName))
+                        if nB > 0:
+                            bTagWeightVars.append(
+                                "weight%s%sp%s/F" % (bTagName, nB, varName))
+            bTagWeightVars.sort()
+            
+            newVariables.extend(bTagWeightVars)
 
     # sum up branches to be defined for each sample, depending on the sample
     # type (data or MC)
@@ -1611,88 +1619,112 @@ def processBTagWeights(
     logger = logging.getLogger('cmgPostProcessing.processBTagWeights')
 
     # get the configuration parameters for this function
-    
-    BTagWeights_conf = params['BTagWeights_conf']
-    
-    maxMultBTagWeight = BTagWeights_conf['maxMultBTagWeight']
 
-    effFile          =   params['beff']['effFile']
-    sfFile           =   params['beff']['sfFile']
-    sfFile_FastSim   =   params['beff']['sfFile_FastSim']
+    BTagWeights_conf_names = params['BTagWeights_conf_names']  
     
-    btagEff          =   params['beff']['btagEff']
+    
+    for conf_name in BTagWeights_conf_names:
+
+        BTagWeights_conf = params[conf_name]
+        jetSelectorId    = BTagWeights_conf['jetSelectorId']
+        
+        maxMultBTagWeight = BTagWeights_conf['maxMultBTagWeight']
+
+        effFile          =   params['beff']['effFile']
+        sfFile           =   params['beff']['sfFile']
+        sfFile_FastSim   =   params['beff']['sfFile_FastSim']
+        
+        btagEff          =   params['beff']['btagEff']
    
-    # get the lists of indices 
-    
-    jetColl = BTagWeights_conf['jetColl']
-    jetObj = cmgObjectSelection.cmgObject(readTree, splitTree, jetColl)
-    
-    jetList = getListFromSaveTree(saveTree, BTagWeights_conf['jet'])
-    bJetList = getListFromSaveTree(saveTree, BTagWeights_conf['bjet'])
-    bSoftJetList = getListFromSaveTree(saveTree, BTagWeights_conf['bJetSoft'])
-    bHardJetList = getListFromSaveTree(saveTree, BTagWeights_conf['bJetHard'])
+        # get the lists of indices 
+        
+        jetColl = BTagWeights_conf['jetColl']
+        jetObj = cmgObjectSelection.cmgObject(readTree, splitTree, jetColl)
+        
+        jetList      = getListFromSaveTree(saveTree, BTagWeights_conf['jet'])
+        bJetList     = getListFromSaveTree(saveTree, BTagWeights_conf['bjet'])
+        bSoftJetList = getListFromSaveTree(saveTree, BTagWeights_conf['bJetSoft'])
+        bHardJetList = getListFromSaveTree(saveTree, BTagWeights_conf['bJetHard'])
+        softJetList  = getListFromSaveTree(saveTree, BTagWeights_conf['jetSoft'])
+        hardJetList  = getListFromSaveTree(saveTree, BTagWeights_conf['jetHard'])
+        
+        nonBJetList     = [x for x in jetList if x not in bJetList]
+        nonBSoftJetList = [x for x in jetList if x not in bSoftJetList]
+        nonBHardJetList = [x for x in jetList if x not in bHardJetList]
+        
+        for i in jetList:
+            btagEff.addBTagEffToJet(jetObj,i)
+        
+        ## in order for th getObjDict to work with beff
+        setattr(readTree, "%s_%s" % (jetObj.obj, 'beff'),jetObj.beff)  
+        
+        varList = ['pt', 'eta', 'phi', 'mass', 'hadronFlavour', 'beff' ]
+        
+        jets         = jetObj.getObjDictList(  varList , jetList         )
+        softJets     = jetObj.getObjDictList(  varList , softJetList     ) 
+        hardJets     = jetObj.getObjDictList(  varList , hardJetList     ) 
+        bJets        = jetObj.getObjDictList(  varList , bJetList        )
+        bSoftJets    = jetObj.getObjDictList(  varList , bSoftJetList    )
+        bHardJets    = jetObj.getObjDictList(  varList , bHardJetList    )
+        nonBJets     = jetObj.getObjDictList(  varList , nonBJetList     )
+        nonBSoftJets = jetObj.getObjDictList(  varList , nonBSoftJetList )
+        nonBHardJets = jetObj.getObjDictList(  varList , nonBHardJetList )
+        
+        #btag_nonbtag_list_pairs = {
+        #                        'BTag'  : ( bJetList, nonBJetList ),
+        #                        'SBTag' : ( bSoftJetList , nonBSoftJetList ),
+        #                        'HBTag' : ( bHardJetList , nonBHardJetList ),
+        #                          }
+        btag_nonbtag_pairs = {
+                                'BTag'  : ( bJets, nonBJets , jets),
+                                'SBTag' : ( bSoftJets , nonBSoftJets , softJets),
+                                'HBTag' : ( bHardJets , nonBHardJets , hardJets),
+                             }
 
-    # FIXME
-    softJetList  = getListFromSaveTree(saveTree, BTagWeights_conf['jet'])
-    hardJetList  = getListFromSaveTree(saveTree, BTagWeights_conf['jet'])
-    
-    nonBJetList     = [x for x in jetList if x not in bJetList]
-    nonBSoftJetList = [x for x in jetList if x not in bSoftJetList]
-    nonBHardJetList = [x for x in jetList if x not in bHardJetList]
-    
-    for i in jetList:
-        btagEff.addBTagEffToJet(jetObj,i)
-    
-    ## in order for th getObjDict to work with beff
-    setattr(readTree, "%s_%s" % (jetObj.obj, 'beff'),jetObj.beff)  
-    
-    varList = ['pt', 'eta', 'phi', 'mass', 'hadronFlavour', 'beff' ]
-    
-    jets     = jetObj.getObjDictList(  varList , jetList )
-    softJets = jetObj.getObjDictList(  varList , softJetList ) 
-    hardJets = jetObj.getObjDictList(  varList , hardJetList ) 
-    bJets     = jetObj.getObjDictList(  varList , bJetList )
-    bSoftJets = jetObj.getObjDictList(  varList , bSoftJetList )
-    bHardJets = jetObj.getObjDictList(  varList , bHardJetList )
-    nonBJets     = jetObj.getObjDictList(  varList , nonBJetList )
-    nonBSoftJets = jetObj.getObjDictList(  varList , nonBSoftJetList )
-    nonBHardJets = jetObj.getObjDictList(  varList , nonBHardJetList )
-    
-    btag_nonbtag_list_pairs = {
-                            'BTag'  : ( bJetList, nonBJetList ),
-                            'SBTag' : ( bSoftJetList , nonBSoftJetList ),
-                            'HBTag' : ( bHardJetList , nonBHardJetList ),
-                              }
-    btag_nonbtag_pairs = {
-                            'BTag'  : ( bJets, nonBJets , jets),
-                            'SBTag' : ( bSoftJets , nonBSoftJets , softJets),
-                            'HBTag' : ( bHardJets , nonBHardJets , hardJets),
-                         }
-    
-    for bTagName, bJets_nonBJets_jets in btag_nonbtag_pairs.iteritems():
-        bj , nonbj , j = bJets_nonBJets_jets
-        for var in btagEff.btagWeightNames:
-            #varName = "_%s"%var if var!="MC" else ""
-            varName = "_%s"%var
-            #
-            # Method 1a:
-            #
-            if var!= 'MC':
-                setattr(saveTree, "weight1a%s%s"%(bTagName, varName), btagEff.getBTagSF_1a( var, bj, nonbj))
-            #
-            # Method 1b:
-            #
-            multiBTagWeightDict = btagEff.getWeightDict_1b( [  jj['beff'][var] for jj in j  ] , maxMultBTagWeight)
-            #print "-----------"*10
-            #pprint.pprint(multiBTagWeightDict)
-            for nB in range(maxMultBTagWeight+1):
-                #print nB 
-                setattr(saveTree, "weight%s%s%s"%(bTagName, nB, varName), multiBTagWeightDict[nB])
-                if nB>0:
-                    #pprint.pprint( "  %s"%multiBTagWeightDict.values()[:nB]  ) 
-                    #print 1 - sum( multiBTagWeightDict.values()[:nB] )
-                    #print "weight%s%sp%s"%(bTagName, nB, varName) 
-                    setattr(saveTree, "weight%s%sp%s"%(bTagName, nB, varName), 1 - sum( multiBTagWeightDict.values()[:nB] )   )  # more than nB  (i.e. 1p,2p)
+        if False:
+            print "\n==================================================================================="
+            print "Conf Name   "  ,  conf_name
+            print "jets        "  ,  [ [x['pt']] for x in jets         ] 
+            print "sofJets     "  ,  [ [x['pt']] for x in softJets     ]  
+            print "hardJets    "  ,  [ [x['pt']] for x in hardJets     ] 
+            print "bJets       "  ,  [ [x['pt']] for x in bJets        ]
+            print "bSoftJets   "  ,  [ [x['pt']] for x in bSoftJets    ] 
+            print "bHardJets   "  ,  [ [x['pt']] for x in bHardJets    ] 
+            print "nonBJets    "  ,  [ [x['pt']] for x in nonBJets     ] 
+            print "nonBSoftJets"  ,  [ [x['pt']] for x in nonBSoftJets ]     
+            print "nonBHardJets"  ,  [ [x['pt']] for x in nonBHardJets ] 
+            print "===================================================================================\n"
+
+       
+        for bTagName, bJets_nonBJets_jets in btag_nonbtag_pairs.iteritems():
+            bj , nonbj , j = bJets_nonBJets_jets
+            #print "  ", bTagName, "  -----------"*10
+            for var in btagEff.btagWeightNames:
+                #varName = "_%s"%var if var!="MC" else ""
+                varName = "_%s_%s"%(var, jetSelectorId)
+                #
+                # Method 1a:
+                #
+                if var!= 'MC':
+                    setattr(saveTree, "weight1a%s%s"%(bTagName, varName), btagEff.getBTagSF_1a( var, bj, nonbj))
+                #
+                # Method 1b:
+                #
+                #print "\nVAR:"  , var
+                #print "\nBJets:", bj
+                #print "\nNonBJets:", nonbj
+                #print "\nAllJets:", j
+                multiBTagWeightDict = btagEff.getWeightDict_1b( [  jj['beff'][var] for jj in j  ] , maxMultBTagWeight)
+                #print "-----------"*10, var
+                #pprint.pprint(multiBTagWeightDict)
+                for nB in range(maxMultBTagWeight+1):
+                    #print nB 
+                    setattr(saveTree, "weight%s%s%s"%(bTagName, nB, varName), multiBTagWeightDict[nB])
+                    if nB>0:
+                        #pprint.pprint( "  %s"%multiBTagWeightDict.values()[:nB]  ) 
+                        #print 1 - sum( multiBTagWeightDict.values()[:nB] )
+                        #print "weight%s%sp%s"%(bTagName, nB, varName) 
+                        setattr(saveTree, "weight%s%sp%s"%(bTagName, nB, varName), 1 - sum( multiBTagWeightDict.values()[:nB] )   )  # more than nB  (i.e. 1p,2p)
 
 
     processBTagWeights_rtuple = None #FIXME

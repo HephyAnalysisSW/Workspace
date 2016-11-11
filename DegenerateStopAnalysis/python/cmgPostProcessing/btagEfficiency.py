@@ -10,7 +10,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 #binning in pt and eta
-ptBorders = [30, 40, 50, 60, 70, 80, 100, 120, 160, 210, 260, 320, 400, 500, 670]
+ptBorders = [20, 30, 40, 50, 60, 70, 80, 100, 120, 160, 210, 260, 320, 400, 500, 670]
 ptBins = []
 etaBins = [[0,0.8], [0.8,1.6], [ 1.6, 2.4]]
 for i in range(len(ptBorders)-1):
@@ -44,10 +44,12 @@ class btagEfficiency:
             zeroTagWeight*=(1-e)
 
         tagWeight={}
+        #print "\n\nEFFS:", effs, maxMultBTagWeight
         for i in range(min(len(effs), maxMultBTagWeight)+1):
             tagWeight[i]=zeroTagWeight
             twfSum = 0.
             for tagged in itertools.combinations(effs, i):
+                #print i, tagged
                 twf=1.
                 for fac in [x/(1-x) for x in tagged]:
                     twf*=fac
@@ -57,6 +59,7 @@ class btagEfficiency:
         for i in range(maxMultBTagWeight+1):
             if not tagWeight.has_key(i):
                 tagWeight[i] = 0.
+        #print "EFFs2", effs
 
         return tagWeight
 
