@@ -76,23 +76,23 @@ sampleSets = {
                 
                 'ttjets':{
                             'samples':[
-                                        ["TTJets_FastSIM",              "--skimPreselect",  "--runChunks", "0",   "100" ],
-                                        ["TTJets_FastSIM",              "--skimPreselect",  "--runChunks", "101", "200" ],
-                                        ["TTJets_FastSIM",              "--skimPreselect",  "--runChunks", "201", "300" ],
-                                        ["TTJets_FastSIM",              "--skimPreselect",  "--runChunks", "301", "400" ],
-                                        #["TTJets_LO",                   "--skimPreselect",  "--runChunks", "0",   "100" ],
-                                        #["TTJets_LO",                   "--skimPreselect",  "--runChunks", "101", "200" ],
-                                        #["TTJets_LO",                   "--skimPreselect",  "--runChunks", "201", "300" ],
-                                        #["TTJets_LO",                   "--skimPreselect",  "--runChunks", "301", "400" ],
-                                        #["TTJets_LO",                   "--skimPreselect",    "--skimGeneral=lheHTlow" ],
+                                        #["TTJets_FastSIM",              "--skimPreselect",  "--runChunks", "0",   "100" ],
+                                        #["TTJets_FastSIM",              "--skimPreselect",  "--runChunks", "101", "200" ],
+                                        #["TTJets_FastSIM",              "--skimPreselect",  "--runChunks", "201", "300" ],
+                                        #["TTJets_FastSIM",              "--skimPreselect",  "--runChunks", "301", "400" ],
+                                        ["TTJets_LO",                   "--skimPreselect",  "--runChunks", "0",   "100" ],
+                                        ["TTJets_LO",                   "--skimPreselect",  "--runChunks", "101", "200" ],
+                                        ["TTJets_LO",                   "--skimPreselect",  "--runChunks", "201", "300" ],
+                                        ["TTJets_LO",                   "--skimPreselect",  "--runChunks", "301", "400" ],
+                                        ["TTJets_LO",                   "--skimPreselect",    "--skimGeneral=lheHTlow" ],
                                         #######["TTJets_LO_HT600to800_ext",    "--skimPreselect",    "--skimGeneral=lheHThigh"],
-                                        #["TTJets_LO_HT600to800_ext",    "--skimPreselect",    "--skimGeneral=lheHThigh" , "--runChunks", "0",   "100"],
-                                        #["TTJets_LO_HT600to800_ext",    "--skimPreselect",    "--skimGeneral=lheHThigh" , "--runChunks", "101",   "200"],
-                                        #["TTJets_LO_HT600to800_ext",    "--skimPreselect",    "--skimGeneral=lheHThigh" , "--runChunks", "201",   "300"],
-                                        #["TTJets_LO_HT600to800_ext",    "--skimPreselect",    "--skimGeneral=lheHThigh" , "--runChunks", "301",   "400"],
-                                        #["TTJets_LO_HT800to1200_ext",   "--skimPreselect"],
-                                        #["TTJets_LO_HT1200to2500_ext",  "--skimPreselect"],
-                                        #["TTJets_LO_HT2500toInf",       "--skimPreselect"],
+                                        ["TTJets_LO_HT600to800_ext",    "--skimPreselect",    "--skimGeneral=lheHThigh" , "--runChunks", "0",   "100"],
+                                        ["TTJets_LO_HT600to800_ext",    "--skimPreselect",    "--skimGeneral=lheHThigh" , "--runChunks", "101",   "200"],
+                                        ["TTJets_LO_HT600to800_ext",    "--skimPreselect",    "--skimGeneral=lheHThigh" , "--runChunks", "201",   "300"],
+                                        ["TTJets_LO_HT600to800_ext",    "--skimPreselect",    "--skimGeneral=lheHThigh" , "--runChunks", "301",   "400"],
+                                        ["TTJets_LO_HT800to1200_ext",   "--skimPreselect"],
+                                        ["TTJets_LO_HT1200to2500_ext",  "--skimPreselect"],
+                                        ["TTJets_LO_HT2500toInf",       "--skimPreselect"],
                                       ],
                             },
                 
@@ -303,6 +303,10 @@ sampleSets = {
                                         "SingleMuon_Run2016D_PromptReco_v2",
                                         "SingleElectron_Run2016D_PromptReco_v2",
                                         "MET_Run2016D_PromptReco_v2",
+
+                                        #"SingleMuon_Run2016E_PromptReco_v2",
+                                        #"SingleElectron_Run2016E_PromptReco_v2",
+                                        #"MET_Run2016E_PromptReco_v2",
                                       ],
                             },
 
@@ -468,20 +472,69 @@ sampleSets = {
                                       ]},
             }
     
+import pickle
 
-
-mstops = [250, 275, 300, 325, 350, 375, 400, 425, 450, 475, 500, 525, 550, 575, 600, 625, 650, 675, 700, 725, 750, 775, 800]
-dms    = [10, 20, 30, 40, 50, 60, 70, 80]
+#mstops = [250, 275, 300, 325, 350, 375, 400, 425, 450, 475, 500, 525, 550, 575, 600, 625, 650, 675, 700, 725, 750, 775, 800]
+#dms    = [10, 20, 30, 40, 50, 60, 70, 80]
 
 signalOpts = ["--skimPreselect", "--applyEventVetoFastSimJets"]
 signalSample = "SMS_T2tt_dM_10to80_genHT_160_genMET_80"
 
 signalSets = {}
-for mstop in mstops:
-    signalSet =  {  'samples': [ [signalSample, '--processSignalScan', str(mstop), str(mstop-dm)]+signalOpts for dm in dms ] }
-    signalSets.update({ 'mStop%s'%mstop:signalSet})
+mass_dict = pickle.load(file("/data/nrad/cmgTuples/8020_mAODv2_v0/RunIISpring16MiniAODv2/%s_mass_dict.pkl"%signalSample))
+for mstop in mass_dict.keys():
+    signalSet =  {  'samples': [ [signalSample, '--processSignalScan', str(mstop), str(mlsp)]+signalOpts for mlsp in mass_dict[mstop].keys() ] }
+    signalSets.update({ 'T2tt_old%s'%mstop:signalSet})
 
 sampleSets.update(signalSets)
+
+#
+#
+#
+
+signalOpts = ["--skimPreselect", "--applyEventVetoFastSimJets"]
+signalSample = "SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1"
+signalSets = {}
+mass_dict = pickle.load(file("/data/nrad/cmgTuples/8020_mAODv2_v0/RunIISpring16MiniAODv2/%s_mass_dict.pkl"%signalSample))
+for mstop in mass_dict.keys():
+    signalSet =  {  'samples': [ [signalSample, '--processSignalScan', str(mstop), str(mlsp)]+signalOpts for mlsp in mass_dict[mstop].keys() ] }
+    signalSets.update({ 'T2tt%s'%mstop:signalSet})
+sampleSets.update(signalSets)
+
+#
+#
+#
+
+signalOpts = ["--skimPreselect", "--applyEventVetoFastSimJets"]
+signalSample = "SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1"
+signalSets = {}
+mass_dict = pickle.load(file("/data/nrad/cmgTuples/8020_mAODv2_v0/RunIISpring16MiniAODv2/%s_mass_dict.pkl"%signalSample))
+for mstop in mass_dict.keys():
+    signalSet =  {  'samples': [ [signalSample, '--processSignalScan', str(mstop), str(mlsp)]+signalOpts for mlsp in mass_dict[mstop].keys()] }
+    signalSets.update({ 'T2bW%s'%mstop:signalSet})
+sampleSets.update(signalSets)
+
+
+
+all_samps = ['ttjets', 'wjets', 'dyjets','zjets', ] + [x for x in sampleSets.keys() if 'T2tt' in x or 'T2bW' in x]
+
+all_samples = []
+for samp in all_samps:
+    all_samples.extend(sampleSets[samp]['samples'])
+
+sampleSets['all'] = { 
+                        'samples': all_samples,
+                    }
+
+
+import pprint as pp
+
+pp.pprint(all_samples)
+pp.pprint(sampleSets['ttjets'])
+#assert false
+
+#print sampleSets['all']
+#assert False
 
 
 
@@ -519,6 +572,11 @@ def get_parser():
         )
 
     argsRun.add_argument('--run',
+        action='store_true',
+        help="Run Post processing!"
+        )
+    
+    argsRun.add_argument('--batchScript',
         action='store_true',
         help="Run Post processing!"
         )
@@ -588,7 +646,7 @@ def make_command(sampleSet, options_list=[]):
             extraOptions = samp[1:]
         else:
             raise Exception("\n type not recognized for %s" % samp)
-        
+
         logger.debug(
             "\n Extra options from sample definition for sample %s: \n %s \n",
             sampName, pprint_cust.pformat(extraOptions)
@@ -647,7 +705,7 @@ def make_command(sampleSet, options_list=[]):
                     
         commandPostProcessing = [
             'python',
-            'cmgPostProcessing_v1.py',
+            'cmgPostProcessing_v2.py',
             ]
         
         commandPostProcessing.extend(options_current)
@@ -743,6 +801,37 @@ def runPostProcessing(argv=None):
         "\n Final commands to be processed: \n %s \n",
         pprint_cust.pformat(commands)
         )
+    if args.batchScript:
+        fname = 'batch_script.sh'
+        print 'writing batch script: %s'%fname
+        f = file(fname, 'a')
+
+        #new_commands = [] 
+        #for c in commands:
+        #    cset = set(c)
+        #    new_commands.append(sorted(list(cset)))
+        #commands = new_commands
+
+        align_commands = False
+
+        if align_commands:
+            longest_command = max(commands, key = len)
+            max_opt_lens = [1 for c in longest_command ]
+            print max_opt_lens
+            print commands[0]
+            for i, c in enumerate(commands):
+                for io, o in enumerate(c):
+                    max_opt_lens[io] = max(len(o), max_opt_lens[io])
+            print max_opt_lens
+
+            for c in commands:
+                alignment_list = ['{:<%s}'%max_opt_lens[i] for i in range(len(c))]
+                alignment = '  '.join(alignment_list)
+                f.write("\n"+alignment.format(*c))
+        else:
+            for c in commands:
+                f.write("\n"+'  '.join(c))
+        f.close()
 
     if args.run:
         pool = multiprocessing.Pool(processes=args.numberOfProcesses)

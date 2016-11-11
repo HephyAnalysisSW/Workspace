@@ -44,10 +44,10 @@ SAMPLE_SET=$1
 # semi-hard-coded parameters
 if [[ ${2} == "DATA" ]]; then 
     #CMG_TUPLES="Data2016_v1_2"
-    CMG_TUPLES="Data2016_v3"
+    CMG_TUPLES="Data2016_v0"
     BTAG_WEIGHTS=""
 else
-    CMG_TUPLES="RunIISpring16MiniAODv2_v3"
+    CMG_TUPLES="RunIISpring16MiniAODv2_v0"
     BTAG_WEIGHTS="--processBTagWeights"
 fi
 
@@ -63,7 +63,19 @@ else
     SKIM_LEPTON=""
 fi
 
-CMG_POST_PROCESSING_TAG="80X_postProcessing_v10"
+RUNMODE="BATCH"
+if [[ ${RUNMODE} == "BATCH" ]]; then
+    RUNOPT="--batchScript"
+    echo ${RUNOPT} RUNNING BATCH MODE
+fi
+if [[ ${RUNMODE} == "RUN" ]]; then
+    RUNOPT="--run"
+fi
+
+
+
+
+CMG_POST_PROCESSING_TAG="80X_postProcessing_v0"
 #CMG_POST_PROCESSING_TAG="80X_postProcessing_v10_1"
 VERBOSE="--verbose"
 if [[ ${5} == "TEST" ]]; then 
@@ -72,9 +84,9 @@ if [[ ${5} == "TEST" ]]; then
 fi
 
 # hard-coded parameters - modify them according to desired full set
-CMG_PROCESSING_TAG="8012_mAODv2_v3"
+CMG_PROCESSING_TAG="8020_mAODv2_v0"
 #CMG_PROCESSING_TAG="8012_mAODv2_v3"
-PARAMETER_SET="analysisHephy_13TeV_2016_v0"
+PARAMETER_SET="analysisHephy_13TeV_2016_v2"
 
 # the rest of the parameters are the default parameters from cmgPostProcessing_parser.py
 
@@ -99,12 +111,11 @@ if [[ ${CMSSW_ACTION} == "RO" || ${CMSSW_ACTION} == "R" ]]; then
         --parameterSet=${PARAMETER_SET} \
         --cmgProcessingTag=${CMG_PROCESSING_TAG} \
         --cmgPostProcessingTag=${CMG_POST_PROCESSING_TAG} \
-        --processLepAll \
         --skimGeneral='' \
         ${SKIM_PRESELECT} \
         ${SKIM_LEPTON} \
         ${BTAG_WEIGHTS} \
-        --run \
+        ${RUNOPT} \
         ${VERBOSE}
 fi
 
