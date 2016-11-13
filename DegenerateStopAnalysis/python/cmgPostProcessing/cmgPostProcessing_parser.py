@@ -169,9 +169,14 @@ def get_parser():
         help="Apply event veto list, if applyEventVetoList = True"
         )
 
+    argParser.add_argument('--applyEventVetoFilters',
+         action='store_true',
+         help="Apply event veto list, if applyEventVetoFilters = True"
+         )
+
     argParser.add_argument('--applyEventVetoFastSimJets',
         action='store_true',
-        help="Apply an event veto for FastJet samples (see 'corridor studies', if applyEventVetoList = True"
+        help="Apply an event veto for FastSim samples (see 'corridor studies), if applyEventVetoFastSimJets = True"
         )
 
     argParser.add_argument('--runChunks',

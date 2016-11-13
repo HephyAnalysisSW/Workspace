@@ -72,11 +72,8 @@ if [[ ${RUNMODE} == "RUN" ]]; then
     RUNOPT="--run"
 fi
 
-
-
-
 CMG_POST_PROCESSING_TAG="80X_postProcessing_v0"
-#CMG_POST_PROCESSING_TAG="80X_postProcessing_v10_1"
+
 VERBOSE="--verbose"
 if [[ ${5} == "TEST" ]]; then 
     CMG_POST_PROCESSING_TAG=$CMG_POST_PROCESSING_TAG"_TEST"
@@ -85,7 +82,7 @@ fi
 
 # hard-coded parameters - modify them according to desired full set
 CMG_PROCESSING_TAG="8020_mAODv2_v0"
-#CMG_PROCESSING_TAG="8012_mAODv2_v3"
+
 PARAMETER_SET="analysisHephy_13TeV_2016_v2"
 
 # the rest of the parameters are the default parameters from cmgPostProcessing_parser.py

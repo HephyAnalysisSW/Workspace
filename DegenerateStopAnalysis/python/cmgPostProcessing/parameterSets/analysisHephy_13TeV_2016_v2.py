@@ -30,7 +30,8 @@ def treeVariables(args):
     keepBranches_DATAMC = [
         'run', 'lumi', 'evt', 'isData', 'rho', 'nVert', 'rhoCN',
         'met*',
-        'Flag_*', 'HLT_*',
+        'Flag_*', 
+        'HLT_*',
         'nJet', 'Jet_*',
         'nTauGood', 'TauGood_*',
     ]
@@ -75,16 +76,14 @@ def treeVariables(args):
     newVectors_DATAMC = []
     
     readVariables_DATAMC.extend(['met_pt/F', 'met_phi/F'])
-    
-    # flag for vetoing events for FastSim samples, as resulted from 2016 "corridor studies"
+   
+    # Flags used for vetoing events 
     #  = 0: fails event
     #  = 1: pass event
     newVariables_DATAMC.extend([
-        'Flag_veto_event_fastSimJets/I/1',
-    ])
-
-    newVariables_DATAMC.extend([
-        'Flag_Veto_Event_List/I/1',
+        'Flag_Veto_Event_List/I/1', #list of veto events
+        'Flag_Filters/I/1', #combination of event filters defined in parameterSet
+        'Flag_veto_event_fastSimJets/I/1', # flag for vetoing events for FastSim samples, as resulted from 2016 "corridor studies"
         ])
         
     newVariables_DATAMC.extend([
@@ -284,6 +283,29 @@ def getParameterSet(args):
 
     treeVariables_rtuple = treeVariables(args)
     params['treeVariables'] = treeVariables_rtuple
+
+    # Filters
+    if args.applyEventVetoFilters:
+   
+      filters = {
+         'data':[
+                      'HBHENoiseFilter',
+                      'HBHENoiseIsoFilter',
+                      'EcalDeadCellTriggerPrimitiveFilter',
+                      'goodVertices',
+                      'eeBadScFilter',
+                      'globalTightHalo2016Filter',
+                      'badChargedHadronFilter',
+                      'badMuonFilter',
+                   ],
+
+         'MC':[
+               'badChargedHadronFilter',
+               'badMuonFilter',
+              ]
+         }
+
+      params['filters'] = filters
 
     # selector list, to be evaluated in evaluateSelectors
 
