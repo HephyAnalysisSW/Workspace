@@ -656,8 +656,9 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
 
         if ('data' in sampleType) and sample['isData']:
             appendNewQuantities(
-                nObjName, prefixToAdd, indexName,
-                varInIndex, nMax, newVariables, newVectors
+                nObjName, prefixToAdd, indexName, varInIndex, nMax, 
+                computeVars, computeVectors,
+                newVariables, newVectors
             )
 
         if ('mc' in sampleType) and (not sample['isData']):

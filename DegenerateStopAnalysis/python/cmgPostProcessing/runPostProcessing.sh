@@ -44,7 +44,7 @@ SAMPLE_SET=$1
 # semi-hard-coded parameters
 if [[ ${2} == "DATA" ]]; then 
     #CMG_TUPLES="Data2016_v1_2"
-    CMG_TUPLES="Data2016_v0"
+    CMG_TUPLES="Data2016_v3"
     BTAG_WEIGHTS=""
 else
     CMG_TUPLES="RunIISpring16MiniAODv2_v0"
