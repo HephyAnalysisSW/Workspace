@@ -83,7 +83,7 @@ fi
 # hard-coded parameters - modify them according to desired full set
 CMG_PROCESSING_TAG="8020_mAODv2_v0"
 
-PARAMETER_SET="analysisHephy_13TeV_2016_v2"
+PARAMETER_SET="analysisHephy_13TeV_2016_v2_0"
 
 # the rest of the parameters are the default parameters from cmgPostProcessing_parser.py
 
