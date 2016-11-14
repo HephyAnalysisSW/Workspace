@@ -100,8 +100,7 @@ def get_parser():
         nargs='?',
         type=str,
         choices=[
-            'analysisHephy_13TeV_2016_v2',
-            'analysisHephy_13TeV_2016_v1',
+            'analysisHephy_13TeV_2016_v2_0',
             'analysisHephy_13TeV_2016_v0',
             'analysisHephy_13TeV_v0',
             'analysisHephy_8vs13TeV_v0',
