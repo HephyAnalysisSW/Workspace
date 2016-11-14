@@ -615,23 +615,20 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
                 obj_selector)
         )
 
-        sampleType = obj_selector['sampleType']
+        selector_sampleType = obj_selector['sampleType']
 
-        if ('data' in sampleType) and sample['isData']:
+        if (
+            (('data' in selector_sampleType) and sample['isData'])
+            or
+            (('mc' in selector_sampleType) and (not sample['isData']))
+        ):
 
             appendSelectorQuantities(
                 obj_selector,
                 readVariables, newVariables,
                 readVectors, newVectors
             )
-
-        if ('mc' in sampleType) and (not sample['isData']):
-            appendSelectorQuantities(
-                obj_selector,
-                readVariables, newVariables,
-                readVectors, newVectors
-            )
-
+            
     mergeLeptonSelectors = params['mergeLeptonSelectors']
 
     for sels in mergeLeptonSelectors:
@@ -652,20 +649,19 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
         computeVectors = []
         computeVars = []
 
-        sampleType = muSelector['sampleType']
+        selector_sampleType = muSelector['sampleType']
 
-        if ('data' in sampleType) and sample['isData']:
+        if (
+            (('data' in selector_sampleType) and sample['isData'])
+            or
+            (('mc' in selector_sampleType) and (not sample['isData']))
+        ):
             appendNewQuantities(
-                nObjName, prefixToAdd, indexName, varInIndex, nMax, 
+                nObjName, prefixToAdd, indexName, varInIndex, nMax,
                 computeVars, computeVectors,
                 newVariables, newVectors
             )
 
-        if ('mc' in sampleType) and (not sample['isData']):
-            appendNewQuantities(
-                nObjName, prefixToAdd, indexName, varInIndex, nMax,
-                computeVars, computeVectors,
-                newVariables, newVectors)
 
     # create the variables for btag weights
     # FIXME the addition of manually entered bTagWeightVars is not checked for
@@ -883,7 +879,7 @@ def getListFromSaveTree(saveTree, listName):
     #
     return savedList
 
-def evaluateSelectors(readTree, splitTree, saveTree, params):
+def evaluateSelectors(readTree, splitTree, saveTree, params, isDataSample):
     '''Evaluate all selectors defined in the parameter file. 
 
     For each selector, produce the index array Index{branchPrefix}_{obj}_{selectorId} 
@@ -895,7 +891,17 @@ def evaluateSelectors(readTree, splitTree, saveTree, params):
     selectorList = params['selectorList']
 
     for obj_selector in selectorList:
+        
+        # evaluate the selector only on sample type it was requested for
+        
+        selector_sampleType = obj_selector['sampleType']
+        if isDataSample and (not ('data' in selector_sampleType)):
+            continue
+        if (not isDataSample) and (not ('mc' in selector_sampleType)):
+            continue
 
+        #
+        
         branchPrefix = obj_selector['branchPrefix']
         object = obj_selector['object']
         selectorId = obj_selector['selectorId']
@@ -2900,7 +2906,7 @@ def cmgPostProcessing(argv=None):
                     
                     # evaluate all selectors
                     saveTree = evaluateSelectors(
-                        readTree, splitTree, saveTree, params)
+                        readTree, splitTree, saveTree, params, isDataSample)
 
                     # merge muon and electrons for the required selectors
                     saveTree = mergeLeptons(
