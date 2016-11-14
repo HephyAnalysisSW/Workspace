@@ -656,8 +656,9 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
 
         if ('data' in sampleType) and sample['isData']:
             appendNewQuantities(
-                nObjName, prefixToAdd, indexName,
-                varInIndex, nMax, newVariables, newVectors
+                nObjName, prefixToAdd, indexName, varInIndex, nMax, 
+                computeVars, computeVectors,
+                newVariables, newVectors
             )
 
         if ('mc' in sampleType) and (not sample['isData']):
@@ -2111,6 +2112,37 @@ def processEventVetoList(readTree, splitTree, saveTree, veto_event_list):
     #
     return saveTree    
 
+def processEventVetoFilters(sample, readTree, splitTree, saveTree, params):
+    ''' 
+    Flag for vetoing events which do not pass the specified filters      
+    '''
+    
+    logger = logging.getLogger('cmgPostProcessing.processEventVetoFilters')
+
+    run_lumi_evt = saveTree.run_lumi_evt 
+    
+    # sample type (data or MC, taken from CMG component)
+    isDataSample = sample['isData']
+   
+    if isDataSample: filters = params['filters']['data']
+    else: filters = params['filters']['MC']
+
+    filterFlags = hephyHelpers.getObjDict(splitTree, "Flag_", filters, 0)
+ 
+    if 0 in filterFlags.values():
+        saveTree.Flag_Filters = 0
+        logger.debug(
+            "\n Run:LS:Event %s failed filters",
+            run_lumi_evt
+            )
+    else:
+        logger.trace(
+            "\n Run:LS:Event %s passed filters",
+            run_lumi_evt
+            )
+        
+    return saveTree
+
 def processEventVetoFastSimJets(readTree, splitTree, saveTree, params):
     ''' Flag for vetoing events for FastSim samples, as resulted from 2016 "corridor studies".
     
@@ -2933,9 +2965,11 @@ def cmgPostProcessing(argv=None):
 #                     
                     # process event veto list flags
                     if isDataSample and args.applyEventVetoList:
-                        saveTree = processEventVetoList(
-                            readTree, splitTree, saveTree, event_veto_list
-                            )
+                        saveTree = processEventVetoList(readTree, splitTree, saveTree, event_veto_list)
+
+                    # process event veto filters flags
+                    if args.applyEventVetoFilters:
+                        saveTree = processEventVetoFilters(sample, readTree, splitTree, saveTree, params)
  
                     # compute flag for event veto for FastSim jets
                     if isFastSimSample and args.applyEventVetoFastSimJets:
