@@ -122,6 +122,10 @@ def treeVariables(args):
 
     readVectors_MC = []
     newVectors_MC = []
+    
+    readVariables_MC.extend(
+        ['Jet_hadronFlavour/I', ]
+    )
    
 
     # data samples only
@@ -519,7 +523,7 @@ def getParameterSet(args):
 
     nMax_jets = 25
     branchesToRead_jets = [
-        'pt/F', 'eta/F', 'phi/F', 'id/I', 'btagCSV/F', 'mass/F', 'chHEF/F', 'hadronFlavour/I',
+        'pt/F', 'eta/F', 'phi/F', 'id/I', 'btagCSV/F', 'mass/F', 'chHEF/F',
     ]
     branchesToPrint_jets = helpers.getVariableNameList(branchesToRead_jets)
 
