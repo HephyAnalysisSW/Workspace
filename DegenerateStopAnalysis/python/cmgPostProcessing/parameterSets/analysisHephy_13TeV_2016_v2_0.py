@@ -30,8 +30,6 @@ def treeVariables(args):
     keepBranches_DATAMC = [
         'run', 'lumi', 'evt', 'isData', 'rho', 'nVert', 'rhoCN',
         'met*',
-        'Flag_*', 
-        'HLT_*',
         'nJet', 'Jet_*',
         'nTauGood', 'TauGood_*',
     ]
@@ -77,15 +75,25 @@ def treeVariables(args):
     
     readVariables_DATAMC.extend(['met_pt/F', 'met_phi/F'])
    
-    # Flags used for vetoing events 
+    # Flags used for vetoing events
     #  = 0: fails event
     #  = 1: pass event
-    newVariables_DATAMC.extend([
-        'Flag_Veto_Event_List/I/1', #list of veto events
-        'Flag_Filters/I/1', #combination of event filters defined in parameterSet
-        'Flag_veto_event_fastSimJets/I/1', # flag for vetoing events for FastSim samples, as resulted from 2016 "corridor studies"
+    if not args.discardEvents:
+        keepBranches_DATAMC.extend([
+            'Flag_*',
         ])
-        
+
+        newVariables_DATAMC.extend([
+            # flag from list of veto events
+            'Flag_Veto_Event_List/I/1',
+            # combination of event filters defined in parameterSet
+            'Flag_Filters/I/1',
+            # flag for vetoing events for FastSim samples, as resulted from
+            # 2016 "corridor studies" (kept in all samples for uniformity)
+            'Flag_veto_event_fastSimJets/I/1',
+        ])
+
+
     newVariables_DATAMC.extend([
         'weight/F/-999.',
         'puReweight/F/-999.',
@@ -131,7 +139,9 @@ def treeVariables(args):
     # data samples only
 
     # branches already defined in cmgTuples
-    keepBranches_DATA = []
+    keepBranches_DATA = [
+        'HLT_*',
+    ]
 
     # branches to drop
     dropBranches_DATA = []

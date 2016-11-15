@@ -1126,438 +1126,6 @@ def mergeLeptons(readTree, splitTree, saveTree, params):
 
     return saveTree
 
-
-def processLeptons(readTree, splitTree, saveTree, params, LepSelector):
-    '''Process leptons. 
-    
-    NOTE: obsolete, not used anymore, kept here for reference only until full migration is done
-    '''
-
-    logger = logging.getLogger('cmgPostProcessing.processLeptons')
-    
-    # some auxiliary functions, identical for mu, el, lep 
-    
-    def printDebug(saveTree, LepColl, objName, objList):
-        ''' Debug message for each list of indices.
-    
-        '''
-        logger = logging.getLogger('cmgPostProcessing.processLeptons.printDebug')
-
-        selectorName = 'lep (mu + el)' if objName is 'lep' else objName
-        printStr = "\n  {0} {1} selector \n ".format(LepColl, selectorName)
-        
-        printStr += '\n ' + lepObj.printObjects(objList, LepVarList[objName])
-
-        printStr += "\n saveTree.n{0}_{1} = %i \n  Index list: ".format(LepColl, objName) + \
-            pprint.pformat(objList) + "\n "
-
-        logger.debug(printStr, getattr(saveTree, 'n' + LepColl + '_' + objName))
-
-
-    # initialize returned variables (other than saveTree)
-    
-    lepObj = None
-    
-    # lepton selection
-    
-    LepVarList = params['LepVarList'] 
-    
-    LepSel = LepSelector
-    
-    LepColl = LepSel['branchPrefix']
-    objBranches = LepSel['branchPrefix']
-    
-    lepObj = cmgObjectSelection.cmgObject(readTree, splitTree, LepColl)
-    
-    # compute the additional quantities for leptons
-    
-    for lepIndex in range(lepObj.nObj):
-        
-        lep_pt = getattr(lepObj, 'pt')[lepIndex]
-        lep_phi = getattr(lepObj, 'phi')[lepIndex]
-
-        lt = readTree.met_pt + lep_pt
-  
-        dPhiLepW = math.acos(
-            (lep_pt + readTree.met_pt * math.cos(lep_phi - readTree.met_phi)) / 
-            (math.sqrt(lep_pt ** 2 + readTree.met_pt ** 2 + 
-                      2 * readTree.met_pt * lep_pt * math.cos(lep_phi - readTree.met_phi))
-                )
-            ) 
-        
-        if LepColl == 'LepGood':
-            saveTree.LepGood_lt[lepIndex] = lt
-            saveTree.LepGood_dPhiLepW[lepIndex] = dPhiLepW
-            saveTree.LepGood_isLepGood[lepIndex] = 1
-            saveTree.LepGood_isLepOther[lepIndex] = 0
-        else:
-            saveTree.LepOther_lt[lepIndex] = lt
-            saveTree.LepOther_dPhiLepW[lepIndex] = dPhiLepW
-            saveTree.LepOther_isLepGood[lepIndex] = 0
-            saveTree.LepOther_isLepOther[lepIndex] = 1
-        
-        
-              
-    if logger.isEnabledFor(logging.DEBUG):
-        printStr = "\n List of " + objBranches + " leptons before selector: " + \
-            lepObj.printObjects(None, LepVarList['lep'])
-
-        for ind in range(lepObj.nObj):
-            printStr += "\n Extended quantities for " + objBranches + " leptons before selector: " + \
-            "\n Lepton index {0}: \n".format(ind)
-            for var in LepVarList['extLep']:
-                varName = objBranches + '_' + var
-                varValue = getattr(saveTree, varName)[ind]
-                printStr += varName + " = " + str(varValue) + '\n'
-            printStr += '\n'
-            
-        logger.debug(printStr)
-        
-
-    muSelector = cmgObjectSelection.objSelectorFunc(LepSel['mu'] )
-    elSelector = cmgObjectSelection.objSelectorFunc(LepSel['el'])
-
-    muList = lepObj.getSelectionIndexList(readTree, muSelector)
-    elList = lepObj.getSelectionIndexList(readTree, elSelector)
-    # 
-    sumElMuList = muList + elList
-    lepList = lepObj.sort('pt', sumElMuList)
- 
-    # save number of selected objects and their indices
-    
-    saveTree = saveTreeLepObject(saveTree, LepColl, 'mu', muList)
-    saveTree = saveTreeLepObject(saveTree, LepColl, 'el', elList)
-    saveTree = saveTreeLepObject(saveTree, LepColl, 'lep', lepList)
-
-    # check if one processses the el2 collection of electrons or mu2 collection of muons
-    processEl2 = LepSel.get('el2', False)
-    processMu2 = LepSel.get('mu2', False)
-    
-    if processEl2:
-        el2Selector = cmgObjectSelection.objSelectorFunc(LepSel['el2'])
-        el2List = lepObj.getSelectionIndexList(readTree, el2Selector)
-        saveTree = saveTreeLepObject(saveTree, LepColl, 'el2', el2List)
-    
-    if processMu2:
-        mu2Selector = cmgObjectSelection.objSelectorFunc(LepSel['mu2'])
-        mu2List = lepObj.getSelectionIndexList(readTree, mu2Selector)
-        saveTree = saveTreeLepObject(saveTree, LepColl, 'mu2', mu2List)
-
-    if logger.isEnabledFor(logging.DEBUG):
-        printDebug(saveTree, LepColl, 'mu', muList)
-        printDebug(saveTree, LepColl, 'el', elList)
-        printDebug(saveTree, LepColl, 'lep', lepList)
-
-        if processEl2:
-            printDebug(saveTree, LepColl, 'el2', el2List)
-        
-        if processMu2:
-            printDebug(saveTree, LepColl, 'mu2', mu2List)
-        
-    # define the named tuple to return the values
-    
-    rtupleLists = [
-        'lepObj',
-        'muList',
-        'elList',
-        'lepList',
-        ]
-
-    if processEl2:
-        rtupleLists.extend(['el2List'])
-    
-    if processMu2:
-        rtupleLists.extend(['mu2List'])
-
-    rtuple = collections.namedtuple(
-        'rtuple', rtupleLists
-        )
-    
-    if processEl2 and not processMu2:
-        processLeptons_rtuple = rtuple(
-            lepObj, 
-            muList, 
-            elList, 
-            lepList,
-            el2List
-            )
-    elif processMu2 and not processEl2:
-        processLeptons_rtuple = rtuple(
-            lepObj, 
-            muList, 
-            elList, 
-            lepList,
-            mu2List
-            )
-    elif processEl2 and processMu2:
-        processLeptons_rtuple = rtuple(
-            lepObj, 
-            muList, 
-            elList, 
-            lepList,
-            el2List,
-            mu2List
-            )
-    else:
-        processLeptons_rtuple = rtuple(
-            lepObj, 
-            muList, 
-            elList, 
-            lepList
-            )
-        
-    #    
-    return saveTree, processLeptons_rtuple
-
-def processLeptonsAll(
-    readTree, splitTree, saveTree, params,
-    processLepGood_rtuple, processLepOther_rtuple
-    ):
-    '''Process LepAll collection, LepGood + LepOther 
-    
-    NOTE: obsolete, not used anymore, kept here for reference only until full migration is done
-    '''
-
-    logger = logging.getLogger('cmgPostProcessing.processLeptonsAll')
-    
-    LepVarList = params['LepVarList']
-    
-    # some auxiliary functions, identical for mu, el, lep 
-    
-    def printDebug(saveTree, LepColl, objName, objList, LepVarList):
-        ''' Debug message for each list of indices.
-    
-        '''
-        logger = logging.getLogger('cmgPostProcessing.processLeptonsAll.printDebug')
-
-        selectorName = 'lep (mu + el)' if objName is 'lep' else objName
-        printStr = "\n  {0} {1} selector \n ".format(LepColl, selectorName)
-        
-        printStr += "\n Number of selected {0} objects: {1} \n".format(
-            LepColl, getattr(saveTree, 'n' + LepColl + '_' + objName)
-            )
-        for iLep in range(getattr(saveTree, 'n' + LepColl + '_' + objName)):
-            printStr += "\n + " + LepColl + " object index: " + str(objList[iLep]) + '\n'
-            for var in LepVarList[objName]:
-                printStr += LepColl + '_' + var + ' = ' + \
-                    str(getattr(saveTree, LepColl + '_' + var)[objList[iLep]]) + '\n'
-        printStr += "\n saveTree.n{0}_{1} = %i \n  Index list: ".format(LepColl, objName) + \
-            pprint.pformat(objList) + "\n "
-        logger.debug(printStr, getattr(saveTree, 'n' + LepColl + '_' + objName))
-
-    
-    LepColl = 'LepAll'
-
-    # 
-    lepGoodObj = processLepGood_rtuple.lepObj
-    lepOtherObj = processLepOther_rtuple.lepObj
-    
-    # 
-    varList = ['pt']
-    
-    #
-    lepGoodList = lepGoodObj.getObjDictList(
-        varList,
-        list(range(0, lepGoodObj.nObj))
-        )
-
-    for idx, lep in enumerate(lepGoodList):
-        lep['index'] = idx
-        lep['isLepGood'] = 1
-        
-    logger.debug('\n LepGood list before selector \n %s \n', pprint.pformat(lepGoodList))
-    
-    lepOtherList = lepOtherObj.getObjDictList(
-        varList,
-        list(range(0, lepOtherObj.nObj))
-        )
-
-    for idx, lep in enumerate(lepOtherList):
-        lep['index'] = idx
-        lep['isLepGood'] = 0
-
-    logger.debug('\n LepOther list before selector \n %s \n', pprint.pformat(lepOtherList))
-
-    lepAllList = lepGoodList + lepOtherList
-    lepAllList = sorted(lepAllList , key=lambda lep: lep['pt'], reverse=True)
-
-    logger.debug('\n LepGood + LepOther list before selector, pt sorted \n %s \n', pprint.pformat(lepAllList))
-    
-    logger.debug(
-        '\n Input index lists of selected lep objects: \n' + \
-        'processLepGood_rtuple.lepList \n %s \n' + \
-        'processLepOther_rtuple.lepList \n %s \n',
-        pprint.pformat(processLepGood_rtuple.lepList),
-        pprint.pformat(processLepOther_rtuple.lepList)
-        )
-
-    muList = []
-    elList = []
-    lepList = []        
-
-    # check if one processses the el2 collection of electrons or mu2 collection of muons
-    processEl2 = params['LepGoodSel'].get('el2', False)
-    processMu2 = params['LepGoodSel'].get('mu2', False)
-    
-    if processEl2:
-        el2List = []
-    if processMu2:
-        mu2List = []
-    
-    # add LepAll to the saveTree
-    for idx, lep in enumerate(lepAllList):
-        isLepGood = lep['isLepGood']
-        lepIndex = lep['index']
-        
-        # variables for each lepton
-        for var in params['vars_LepTree']:
-            # extended (new) variables are read from saveTree, others from readTree
-            if var in LepVarList['extLep']:
-                if isLepGood:
-                    value = getattr(saveTree, 'LepGood_' + var)[lepIndex]
-                else:
-                    value = getattr(saveTree, 'LepOther_' + var)[lepIndex]
-            else:
-                if isLepGood:
-                    value = getattr(lepGoodObj, var)[lepIndex]
-                else:
-                    value = getattr(lepOtherObj, var)[lepIndex]
-                
-            idxVar = getattr(saveTree, LepColl + '_' + var)
-            idxVar[idx] = value
-            
-        # index lists
-        if isLepGood:
-            if lepIndex in processLepGood_rtuple.muList:
-                muList.append(idx)
-            if lepIndex in processLepGood_rtuple.elList:
-                elList.append(idx)
-            if lepIndex in processLepGood_rtuple.lepList:
-                lepList.append(idx)
-
-            if processEl2:
-                if lepIndex in processLepGood_rtuple.el2List:
-                    el2List.append(idx)
-            if processMu2:
-                if lepIndex in processLepGood_rtuple.mu2List:
-                    mu2List.append(idx)
-                
-        else:
-            if lepIndex in processLepOther_rtuple.muList:
-                muList.append(idx)
-            if lepIndex in processLepOther_rtuple.elList:
-                elList.append(idx)
-            if lepIndex in processLepOther_rtuple.lepList:
-                lepList.append(idx)
-
-            if processEl2:
-                if lepIndex in processLepOther_rtuple.el2List:
-                    el2List.append(idx)
-            if processMu2:
-                if lepIndex in processLepOther_rtuple.mu2List:
-                    mu2List.append(idx)
-                            
-    nLepAll = len(lepAllList)
-    saveTree.nLepAll = nLepAll
-
-    if logger.isEnabledFor(logging.DEBUG):
-        printStr = "\n List of LepAll leptons before selector: \n nLepAll = {0}\n".format(nLepAll)
-        
-        for idx in range(nLepAll):
-            printStr += "\n Lepton index {0}: \n".format(idx)
-            for var in params['vars_LepTree']:
-                varName = LepColl + '_' + var
-                varValue = getattr(saveTree, varName)[idx]
-                printStr += varName + " = " + str(varValue) + '\n'
-            printStr += '\n'
-            
-        printStr += '\n'
-        logger.debug(printStr)
-
-    # save number of selected objects and their indices
-    
-    saveTree = saveTreeLepObject(saveTree, LepColl, 'mu', muList)
-    saveTree = saveTreeLepObject(saveTree, LepColl, 'el', elList)
-    saveTree = saveTreeLepObject(saveTree, LepColl, 'lep', lepList)
-
-    if processEl2:
-        saveTree = saveTreeLepObject(saveTree, LepColl, 'el2', el2List)
-    if processMu2:
-        saveTree = saveTreeLepObject(saveTree, LepColl, 'mu2', mu2List)
-
-    if logger.isEnabledFor(logging.DEBUG):
-        printDebug(saveTree, LepColl, 'mu', muList, LepVarList)
-        printDebug(saveTree, LepColl, 'el', elList, LepVarList)
-        printDebug(saveTree, LepColl, 'lep', lepList, LepVarList)
-
-        if processEl2:
-            printDebug(saveTree, LepColl, 'el2', el2List, LepVarList)
-        if processMu2:
-            printDebug(saveTree, LepColl, 'mu2', mu2List, LepVarList)
-        
-    # get LepAll as cmgObject, print them in debug mode 
-    lepAllObj = cmgObjectSelection.cmgObject(saveTree, splitTree, LepColl)
-    
-    if logger.isEnabledFor(logging.DEBUG):
-        printStr = "\n List of " + LepColl + " leptons before selector, from LepAll defined as cmgObject: " + \
-            lepAllObj.printObjects(None, LepVarList['lep'])
-
-        logger.debug(printStr)
-    
-
-    # define the named tuple to return the values
-    
-    rtupleLists = [
-        'lepObj',
-        'muList',
-        'elList',
-        'lepList',
-        ]
-
-    if processEl2:
-        rtupleLists.extend(['el2List'])
-    if processMu2:
-        rtupleLists.extend(['mu2List'])
-
-    rtuple = collections.namedtuple(
-        'rtuple', rtupleLists
-        )
-    
-    if processEl2 and not processMu2:
-        lep_rtuple = rtuple(
-            lepAllObj, 
-            muList, 
-            elList, 
-            lepList,
-            el2List
-            )
-    if processMu2 and not processEl2:
-        lep_rtuple = rtuple(
-            lepAllObj, 
-            muList, 
-            elList, 
-            lepList,
-            mu2List
-            )
-    if processEl2 and processMu2:
-        lep_rtuple = rtuple(
-            lepAllObj, 
-            muList, 
-            elList, 
-            lepList,
-            el2List,
-            mu2List
-            )
-    else:
-        lep_rtuple = rtuple(
-            lepAllObj, 
-            muList, 
-            elList, 
-            lepList
-            )
-
-    #    
-    return saveTree, lep_rtuple
     
 
 def processJets_func(args, readTree, splitTree, saveTree, params, computeVariables, cmgObj, indexList):
@@ -1739,361 +1307,6 @@ def processBTagWeights(
     return saveTree, processBTagWeights_rtuple
 
 
-def processLeptonJets(
-        readTree, splitTree, saveTree, 
-        processLeptons_rtuple, processJets_rtuple
-        ):
-    '''Process correlations between the leading selected lepton and jets. 
-    
-    Compute:
-        dR separation of selected lepton and first jet
-        invariant mass of the selected leading lepton and the dR-closest jet
-        invariant mass of 1, 2, 3 jets, other than the closest jet associated to lepton 
-        
-        Jets are considered having mass here, lepton have mass zero.
-        
-    NOTE: obsolete, not used anymore, kept here for reference only until full migration is done
-    '''
-    
-    logger = logging.getLogger('cmgPostProcessing.processLeptonJets')
-    
-    def variablesLeptonJets (getFieldsOnly, lepObj, jetObj, objList, basJetList, bJetDiscSortList):
-        
-        # define the named tuple to return the values
-        rtuple = collections.namedtuple(
-            'rtuple',
-            [
-                'basJet_obj_dR_j1obj1',
-                'basJet_obj_invMass_obj1jmindR',
-                'basJet_obj_invMass_3j',
-                'bJet_obj_dR_jHdobj1',
-                ]
-            )
-
-        if getFieldsOnly:
-            rtuple_fields = rtuple._fields
-            return rtuple_fields
-        
-        #
-        
-        basJet_obj_dR_j1obj1 = helpers.dR(basJetList[0], objList[0], jetObj, lepObj)
-        
-        # find the dR-closest jet to selected muon / electron / lepton
-        # basJet_obj1_indexClosestJet gives the position in basJetList of the jet index closestJetIndex 
-        # giving the minimum dR
-        basJet_obj1_indexClosestJet = min(
-            range(len(basJetList)), key=lambda j:helpers.dR(basJetList[j], objList[0], jetObj, lepObj)
-            )
-        closestJetIndex = basJetList[basJet_obj1_indexClosestJet]
-        logger.debug(
-            "\n Leading lepton index: %i \n Closest basic jet index: %i \n dR(obj1, jet): %f \n",
-            objList[0], closestJetIndex,
-            helpers.dR(closestJetIndex, objList[0], jetObj, lepObj)
-            )
-        
-        # list of variables needed to compute invariant mass        
-        varList = ['pt', 'eta', 'phi', 'mass' ]
-
-        # invariant mass of the selected leading lepton and the dR-closest jet  
-        jlList = jetObj.getObjDictList(varList, [closestJetIndex]) + lepObj.getObjDictList(varList, [objList[0]])
-        basJet_obj_invMass_obj1jmindR = helpers.invMass(jlList)
-        
-        # invariant mass of 1, 2, 3 jets, other than the closest jet associated to lepton 
-    
-        indexList = [i for i in basJetList if i != closestJetIndex]  
-        logger.debug(
-            "\n Number of jets, excluding the closest jet: %i jets \n List of jet indices: \n %s \n ",
-            len(indexList), pprint.pformat(indexList)
-            )
-         
-        basJet_obj_invMass_3j = -999.
-              
-        if saveTree.nBasJet == 1: 
-            basJet_obj_invMass_3j = 0.
-        elif saveTree.nBasJet == 2:
-            jetList = jetObj.getObjDictList(varList, [indexList[0]])
-            basJet_obj_invMass_3j = helpers.invMass(jetList)
-        elif saveTree.nBasJet == 3:
-            jetList = jetObj.getObjDictList(varList, ([indexList[i] for i in range(2)]))
-            basJet_obj_invMass_3j = helpers.invMass(jetList)
-        else:
-            jetList = jetObj.getObjDictList(varList, ([indexList[i] for i in range(3)]))
-            basJet_obj_invMass_3j = helpers.invMass(jetList)
-   
-        # dR between leading lepton and b jet with highest discriminant
-        if len(bJetDiscSortList) > 0:
-            bJet_obj_dR_jHdobj1 = helpers.dR(bJetDiscSortList[0], objList[0], jetObj, lepObj)
-        else:
-            bJet_obj_dR_jHdobj1 = -999.
-        #
-        
-        # fill the return tuple    
-        variablesLeptonJets_rtuple = rtuple(
-            basJet_obj_dR_j1obj1,
-            basJet_obj_invMass_obj1jmindR,
-            basJet_obj_invMass_3j,
-            bJet_obj_dR_jHdobj1
-            )
-    
-        #    
-        return variablesLeptonJets_rtuple
-    #    
-            
-    #
-    lepObj = processLeptons_rtuple.lepObj
-    jetObj = processJets_rtuple.jetObj
-     
-    basJetList = processJets_rtuple.basJetList
-    bJetDiscSortList = processJets_rtuple.bJetDiscSortList
-    
-    objNameList = ['mu', 'el', 'lep']
-    
-    # get here the list of fields only, to be used also for debug when lepjObj is empty
-    # objects lists used are irrelevant to get the fields, use e.g. muList
-    getFieldsOnly = True
-    rtuple_fields = variablesLeptonJets(
-        getFieldsOnly, lepObj, jetObj, processLeptons_rtuple.muList, basJetList, bJetDiscSortList
-        )
-    getFieldsOnly = False
-     
-    # normal usage: fill the variables            
-    if (lepObj is not None) and (saveTree.nBasJet > 0):
- 
-        for obj in objNameList:
-            
-            objList = getattr(processLeptons_rtuple, obj + 'List')
-            if not objList: continue
-            
-            variablesLeptonJets_rtuple = variablesLeptonJets(
-                getFieldsOnly, lepObj, jetObj, objList, basJetList, bJetDiscSortList
-                )
-            
-            for var in rtuple_fields:
-                varName = var.replace('_obj_', '_' + obj + (lepObj.obj).replace('Lep', '') + '_')
-                varName = varName.replace('obj', obj)
-                setattr(saveTree, varName, getattr(variablesLeptonJets_rtuple, var))
-                              
-    if logger.isEnabledFor(logging.DEBUG):
-         
-        logString = ''
-        
-        for obj in objNameList:            
-            for var in rtuple_fields:
-                varName = var.replace('_obj_', '_' + obj + (lepObj.obj).replace('Lep', '') + '_')
-                varName = varName.replace('obj', obj)
-                varValue = getattr(saveTree, varName)
-                
-                logString += ('\n ' + varName + ' = {}').format(varValue)
-            #
-            logString += '\n\n'     
-        #
-        logger.debug(logString)
-
-    #
-    return saveTree
-
-
-
-def hemiSectorCosine(x):
-    return round( math.cos(math.pi- 0.5*(x* math.pi/180)),3)
-
-
-def processTracksFunction(
-    readTree, splitTree, saveTree, params,
-    processLeptons_rtuple, processJets_rtuple
-    ):
-    '''Process tracks. 
-    
-    TODO describe here the processing.
-    FIXME the function needs a serious clean up...
-    NOTE: obsolete, not used anymore, kept here for reference only until full migration is done
-    '''
-    logger = logging.getLogger('cmgPostProcessing.processTracksFunction')
-    
-    # get the track parameters and matching parameters outside the track loop
-    # to speed the program
-    
-    TracksSel = params['TracksSel']
-
-    trackMinPtList = TracksSel['trackMinPtList']
-    hemiSectorList = TracksSel['hemiSectorList']
-    nISRsList      = TracksSel['nISRsList']
-    
-    # track selection
-    TracksSelBas = TracksSel['bas']
-    basTrackPt = TracksSelBas['pt']
-    basTrackEta = TracksSelBas['eta']
-    basTrackDxy = TracksSelBas['dxy']
-    basTrackDz = TracksSelBas['dz']
-    basTrackPdgId = TracksSelBas['pdgId']
-
-    # track - jet matching
-    jetPtThreshold = TracksSel['ptMatchJet']
-    dRmatchJetTrack = TracksSel['dRmatchJetTrack']
-    
-    # track - leading lepton matching
-    dRLepTrack = TracksSel['dRLepTrack']
-    ratioPtLepTrackMin = TracksSel['ratioPtLepTrackMin']
-    ratioPtLepTrackMax = TracksSel['ratioPtLepTrackMax']
-    
-    # selected leptons and jets 
-
-    lepObj = processLeptons_rtuple.lepObj
-    jetObj = processJets_rtuple.jetObj
-    
-    muList = processLeptons_rtuple.muList
-    elList = processLeptons_rtuple.elList
-    lepList = processLeptons_rtuple.lepList
-    
-    basJetList = processJets_rtuple.basJetList
-
-    # leading lepton, jet collection as dictionaries
-
-    if muList:
-        lep = lepObj.getObjDictList(params['LepVarList']['mu'], muList[0])
-    else:
-        lep = {}
-        
-    jets = jetObj.getObjDictList(params['JetVarList'], basJetList)
-     
-    ### corresponding to 90, 135, 150 degree diff between jet and track
-    hemiSectorCosines = {  x:hemiSectorCosine(x) for x in hemiSectorList } 
-      
-    varList = [
-        'pt', 'eta', 'phi', "dxy", "dz", 'pdgId',
-        "matchedJetIndex", "matchedJetDr",
-        "CosPhiJet1", "CosPhiJet12", "CosPhiJetAll"
-        ]
-    trkVar=TracksSel['branchPrefix']
-    nTracks = getattr(readTree,"n%s"%trkVar)
-    tracks = (hephyHelpers.getObjDict(splitTree, trkVar+"_", varList, i) for i in range(nTracks))
-    nTrkDict = {
-                 "nTracks": { minPt : 0 for minPt in trackMinPtList}
-               }
-
-    nTrkDict.update({
-                "nTracksOpp%sJet%s"%(hemiSec,nISRs) : { minPt : 0 for minPt in trackMinPtList} 
-                                         for nISRs in nISRsList for hemiSec in hemiSectorList          
-                })
-    
-    for track in tracks:
-        if not (
-                abs(track['eta']) < basTrackEta and track['pt']>=basTrackPt and
-                abs(track['dxy']) < basTrackDxy and abs( track['dz'] ) < basTrackDz 
-                ) :
-            continue
-        if abs(track['pdgId']) in basTrackPdgId:
-            #if len(selectedLeptons)>0 and hephyHelpers.deltaR(track, selectedLeptons[0] ) <0.1:
-            if lep and hephyHelpers.deltaR(track, lep) < dRLepTrack and lep['pdgId']==track['pdgId'] :
-                #Possible lepton track... shouldn't count the lepton that's being used, let's check Pt first ", deltaR(track, lep)
-                if lep['pt']/track['pt'] < ratioPtLepTrackMax and lep['pt']/track['pt'] > ratioPtLepTrackMin:
-                    #print "   yes most definitely is!"
-                    continue
-        if  (track['matchedJetDr'] < dRmatchJetTrack  ): 
-            # Possible ISR track, will not count track if the jet pt greater than jetPtThreshold
-            #matchedJet = allJets[int(track['matchedJetIndex'])]
-            matchedJet = jets[int(track['matchedJetIndex'])]
-            if matchedJet['pt'] > jetPtThreshold:
-                # Track is matched with dr<dRmatchJetTrack to a jet with pt higher than jetpthtreshold. Dont want to count such a track!
-                continue
-        for minTrkPt in trackMinPtList:
-            if track['pt'] > minTrkPt:
-                nTrkDict['nTracks'][minTrkPt] +=1
-                ## tracks in the opp sectors
-                for hemiSector in hemiSectorList:
-                    for nISRs in nISRsList:
-                        nTrkVarName = "nTracksOpp%sJet%s"%(hemiSector,nISRs)
-                        #print "trk cosine", track['CosPhiJet%s'%nISRs ], hemiSectorCosines[hemiSector]
-                        if track['CosPhiJet%s'%nISRs ] < hemiSectorCosines[hemiSector]:
-                            #print "  yes" 
-                            nTrkDict[nTrkVarName][minTrkPt]+=1
-    for minTrkPt in trackMinPtList:
-        ptString = str(minTrkPt).replace(".","p")
-        setattr(saveTree, "n"+trkVar+"_pt%s"%ptString, nTrkDict["n"+trkVar][minTrkPt] )
-        for hemiSector in hemiSectorList:
-            for nISRs in nISRsList:
-                nTrkVarName = "nTracksOpp%sJet%s"%(hemiSector,nISRs)
-                setattr(saveTree,nTrkVarName+"_pt%s"%ptString, nTrkDict[nTrkVarName][minTrkPt] )
-    for hemiSector in hemiSectorList:
-        for nISRs in nISRsList:
-            nTrkVarName = "nTracksOpp%sJet%s"%(hemiSector,nISRs)
-            #print nTrkVarName, { trkPt: getattr(saveTree,nTrkVarName+"_pt%s"%str(trkPt).replace(".","p") ) for trkPt in trackMinPtList }
-            
-    return saveTree 
- 
-
-  
-def processGenTracksFunction(readTree, splitTree, saveTree):
-    '''Process generated particles. 
-    
-    TODO describe here the processing.
-    FIXME the function needs a serious clean up...
-    NOTE: obsolete, not used anymore, kept here for reference only until full migration is done
-    '''
-    
-    logger = logging.getLogger('cmgPostProcessing.processGenTracksFunction')
-    
-    # get the generated track parameters and matching parameters outside the track loop
-    # to speed the program
-    
-    GenTracksSel = params['GenTracksSel']
-
-    genPartMinPtList = TracksSel['genPartMinPtList']
-    hemiSectorList = TracksSel['hemiSectorList']
-    nISRsList      = TracksSel['nISRsList']
-    
-    # track selection
-    GenTracksSelBas = GenTracksSel['bas']
-    basGenTrack_pt = GenTracksSelBas['pt']
-    basGenTrack_eta = GenTracksSelBas['eta']
-
-    # 
-    varList = ['pt', 'eta', 'phi', 'pdgId' ]
-    genPartPkds = (hephyHelpers.getObjDict(splitTree, 'genPartPkd_', varList, i) for i in range(readTree.ngenPartPkd))
-    
-    ngenPartPkds = { minPt : 0 for minPt in genPartMinPtList}
-    ngenPartPkdsOppJet1 = { minPt : 0 for minPt in genPartMinPtList}
-    ngenPartPkdsOpp90ISR = { minPt : 0 for minPt in genPartMinPtList}
-    ngenPartPkdsOppJet12 = { minPt : 0 for minPt in genPartMinPtList}
-    ngenPartPkdsOpp90ISR2 = { minPt : 0 for minPt in genPartMinPtList}
-    
-    for genPartPkd in genPartPkds:
-        if not (abs(genPartPkd['eta']) < basGenTrack_eta and genPartPkd['pt'] >= basGenTrack_pt) :
-            continue
-        
-        logger.trace("\n Selected generated particle: \n %s \n", pprint.pformat(genPartPkd))
-
-        if math.cos(genPartPkd['phi'] - saveTree.jet1Phi) < 0:
-            for genPartPkdMinPt in genPartMinPtList:
-                if genPartPkd['pt'] > genPartPkdMinPt:
-                    ngenPartPkdsOppJet1[genPartPkdMinPt] += 1
-            if math.cos(genPartPkd['phi'] - saveTree.jet1Phi) < - math.sqrt(2) / 2:
-                for genPartPkdMinPt in genPartMinPtList:
-                    if genPartPkd['pt'] > genPartPkdMinPt:
-                        ngenPartPkdsOpp90ISR[genPartPkdMinPt] += 1
-
-        for genPartPkdMinPt in genPartMinPtList:
-            if genPartPkd['pt'] > genPartPkdMinPt:
-                ngenPartPkds[genPartPkdMinPt] += 1
-                logger.trace("\n added one genPartPkd to genPartPkdMinPt = %f with ngenPartPkds[genPartPkdMinPt] %i \n ", 
-                    genPartPkdMinPt, ngenPartPkds[genPartPkdMinPt])
-     
-    saveTree.ngenPartPkd_1 = ngenPartPkds[1]    
-    saveTree.ngenPartPkd_1p5 = ngenPartPkds[1.5]    
-    saveTree.ngenPartPkd_2 = ngenPartPkds[2]    
-     
-
-    saveTree.ngenPartPkdOppJet1_1 = ngenPartPkdsOppJet1[1]  
-    saveTree.ngenPartPkdOppJet1_1p5 = ngenPartPkdsOppJet1[1.5]  
-    saveTree.ngenPartPkdOppJet1_2 = ngenPartPkdsOppJet1[2]  
-
-    saveTree.ngenPartPkdO90isr_1 = ngenPartPkdsOpp90ISR[1]  
-    saveTree.ngenPartPkdO90isr_1p5 = ngenPartPkdsOpp90ISR[1.5]  
-    saveTree.ngenPartPkdO90isr_2 = ngenPartPkdsOpp90ISR[2]  
-
-    #
-    return saveTree
-
 def processEventVetoList(readTree, splitTree, saveTree, veto_event_list):
     ''' 
         
@@ -2104,19 +1317,20 @@ def processEventVetoList(readTree, splitTree, saveTree, veto_event_list):
     run_lumi_evt = saveTree.run_lumi_evt 
     
     if run_lumi_evt in veto_event_list:
-        saveTree.Flag_Veto_Event_List = 0
+        flag_Veto_Event_List = 0
         logger.debug(
             "\n Run:LS:Event %s failed veto list",
             run_lumi_evt
             )
     else:
+        flag_Veto_Event_List = 1
         logger.trace(
             "\n Run:LS:Event %s passed veto list",
             run_lumi_evt
             )
         
     #
-    return saveTree    
+    return flag_Veto_Event_List    
 
 def processEventVetoFilters(sample, readTree, splitTree, saveTree, params):
     ''' 
@@ -2136,18 +1350,19 @@ def processEventVetoFilters(sample, readTree, splitTree, saveTree, params):
     filterFlags = hephyHelpers.getObjDict(splitTree, "Flag_", filters, 0)
  
     if 0 in filterFlags.values():
-        saveTree.Flag_Filters = 0
+        flag_Filters = 0
         logger.debug(
             "\n Run:LS:Event %s failed filters",
             run_lumi_evt
             )
     else:
+        flag_Filters = 1
         logger.trace(
             "\n Run:LS:Event %s passed filters",
             run_lumi_evt
             )
         
-    return saveTree
+    return flag_Filters
 
 def processEventVetoFastSimJets(readTree, splitTree, saveTree, params):
     ''' Flag for vetoing events for FastSim samples, as resulted from 2016 "corridor studies".
@@ -2220,20 +1435,20 @@ def processEventVetoFastSimJets(readTree, splitTree, saveTree, params):
             break
 
     if noMatchedRecoJet:
-        saveTree.Flag_veto_event_fastSimJets = 0
+        flag_veto_event_fastSimJets = 0
         logger.debug(
             "\n Run:LS:Event %s failed Veto_fastSimJets \n",
             run_lumi_evt
             )
     else:
-        saveTree.Flag_veto_event_fastSimJets = 1
+        flag_veto_event_fastSimJets = 1
         logger.trace(
             "\n Run:LS:Event %s passed Veto_fastSimJets \n",
             run_lumi_evt
             )
 
     #
-    return saveTree
+    return flag_veto_event_fastSimJets
 
 def computeWeight(sample, sumWeight,  splitTree, saveTree, params, xsec=None , filterEfficiency=1.0):
     ''' Compute the weight of each event.
@@ -2421,6 +1636,8 @@ def cmgPostProcessing(argv=None):
     
     processLepAll = args.processLepAll
     storeOnlyLepAll = args.storeOnlyLepAll
+    
+    args_discardEvents = args.discardEvents
     
     if not processLepAll:
         if storeOnlyLepAll:
@@ -2903,7 +2120,40 @@ def cmgPostProcessing(argv=None):
                         "\n * Processing Run:LS:Event %s \n",
                         saveTree.run_lumi_evt 
                         )
+
+                    # compute first a flag for keeping / discarding the event
+                    # if flag_keepEvent is 1, the event is kept
+                    flag_keepEvent = 1
                     
+                    # process event veto list flags
+                    if isDataSample and args.applyEventVetoList:
+                        flag_Veto_Event_List = processEventVetoList(readTree, splitTree, saveTree, event_veto_list)
+                        flag_keepEvent = flag_keepEvent and flag_Veto_Event_List
+                        if not args_discardEvents:
+                            saveTree.Flag_Veto_Event_List = flag_Veto_Event_List
+
+                    # process event veto filters flags
+                    if args.applyEventVetoFilters:
+                        flag_Filters = processEventVetoFilters(sample, readTree, splitTree, saveTree, params)
+                        flag_keepEvent = flag_keepEvent and flag_Filters
+                        if not args_discardEvents:
+                            saveTree.Flag_Filters = flag_Filters
+
+                    # compute flag for event veto for FastSim jets
+                    if isFastSimSample and args.applyEventVetoFastSimJets:
+                        flag_veto_event_fastSimJets = processEventVetoFastSimJets(readTree, splitTree, saveTree, params)
+                        flag_keepEvent = flag_keepEvent and flag_veto_event_fastSimJets
+                        if not args_discardEvents:
+                            saveTree.Flag_veto_event_fastSimJets = flag_veto_event_fastSimJets
+
+                    if args_discardEvents and (not flag_keepEvent):
+                        logger.debug(
+                            "\n Run:LS:Event %s discarded. \n",
+                            saveTree.run_lumi_evt
+                        )
+                        continue
+
+
                     # evaluate all selectors
                     saveTree = evaluateSelectors(
                         readTree, splitTree, saveTree, params, isDataSample)
@@ -2919,67 +2169,11 @@ def cmgPostProcessing(argv=None):
                     saveTree = computeVariablesSelectors(
                         readTree, splitTree, saveTree, params, computeVariablesFunctions)
 
-#                     # leptons processing
-#                     saveTree, processLepGood_rtuple = processLeptons(
-#                         readTree, splitTree, saveTree, params, params['LepGoodSel']
-#                         )
-#                                         
-#                     if processLepAll:
-#                         saveTree, processLepOther_rtuple = processLeptons(
-#                             readTree, splitTree, saveTree, params, params['LepOtherSel']
-#                             )
-#                     
-#                         saveTree, processLepAll_rtuple = processLeptonsAll(
-#                             readTree, splitTree, saveTree, params,
-#                             processLepGood_rtuple, processLepOther_rtuple
-#                             )
-#                                             
-
                     if args.processBTagWeights:
                         saveTree, processBTagWeights_rtuple = processBTagWeights(
                             args, readTree, splitTree, saveTree,
                             params
                         )
-
-#                     # selected leptons - jets processing
-#                     saveTree = processLeptonJets(
-#                         readTree, splitTree, saveTree,
-#                         processLepGood_rtuple, processJets_rtuple
-#                         )
-# 
-#                     if processLepAll:
-#                         saveTree = processLeptonJets(
-#                             readTree, splitTree, saveTree,
-#                             processLepAll_rtuple, processJets_rtuple
-#                             )
-#                     
-#                     # tracks
-#                     if args.processTracks:
-#                         saveTree = processTracksFunction(
-#                             readTree, splitTree, saveTree, params, 
-#                             processLepGood_rtuple, processJets_rtuple
-#                             )
-# 
-#                         if processLepAll:
-#                             saveTree = processTracksFunction(
-#                                 readTree, splitTree, saveTree, params, 
-#                                 processLepAll_rtuple, processJets_rtuple
-#                                 )
-# 
-#                     if (not isDataSample) and args.processGenTracks:
-#                         saveTree = processGenTracksFunction(readTree, splitTree, saveTree)
-#                     
-                    # process event veto list flags
-                    if isDataSample and args.applyEventVetoList:
-                        saveTree = processEventVetoList(readTree, splitTree, saveTree, event_veto_list)
-
-                    # process event veto filters flags
-                    if args.applyEventVetoFilters:
-                        saveTree = processEventVetoFilters(sample, readTree, splitTree, saveTree, params)
- 
-                    # compute flag for event veto for FastSim jets
-                    if isFastSimSample and args.applyEventVetoFastSimJets:
-                        saveTree = processEventVetoFastSimJets(readTree, splitTree, saveTree, params)
 
                     # compute the weight of the event
                     if not args.processSignalScan:
