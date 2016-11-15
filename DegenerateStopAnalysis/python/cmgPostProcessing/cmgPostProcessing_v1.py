@@ -163,7 +163,7 @@ def getParameterSet(args):
     if args.processGenTracks:
         vectors_MC_List.append(GenTracksSel)
         
-    if args.applyEventVetoFastSimJets:
+    if args.processEventVetoFastSimJets:
         vectors_MC_List.append(params['Veto_fastSimJets']['genJet'])
 
     params['vectors_MC_List'] = vectors_MC_List
@@ -2575,7 +2575,7 @@ def cmgPostProcessing(argv=None):
     logger.info("\n Target luminosity: %f pb^{-1} \n", params['target_lumi'])
     
     # get the event veto list FIXME: are the values updated properly?   
-    if args.applyEventVetoList:
+    if args.processEventVetoList:
         event_veto_list = get_veto_list()['all']
     else:
         event_veto_list = {}
@@ -3020,13 +3020,13 @@ def cmgPostProcessing(argv=None):
                         saveTree = processGenTracksFunction(readTree, splitTree, saveTree)
                     
                     # process event veto list flags
-                    if isDataSample and args.applyEventVetoList:
+                    if isDataSample and args.processEventVetoList:
                         saveTree = processEventVetoList(
                             readTree, splitTree, saveTree, event_veto_list
                             )
 
                     # compute flag for event veto for FastSim jets
-                    if isFastSimSample and args.applyEventVetoFastSimJets:
+                    if isFastSimSample and args.processEventVetoFastSimJets:
                         saveTree = processEventVetoFastSimJets(readTree, splitTree, saveTree, params)
 
                     if not isDataSample:
