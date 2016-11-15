@@ -529,8 +529,8 @@ sampleSets['all'] = {
 
 import pprint as pp
 
-pp.pprint(all_samples)
-pp.pprint(sampleSets['ttjets'])
+#pp.pprint(all_samples)
+#pp.pprint(sampleSets['ttjets'])
 #assert false
 
 #print sampleSets['all']
