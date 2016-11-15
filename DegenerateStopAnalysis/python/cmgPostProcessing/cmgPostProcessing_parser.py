@@ -178,6 +178,11 @@ def get_parser():
         help="Apply an event veto for FastSim samples (see 'corridor studies), if applyEventVetoFastSimJets = True"
         )
 
+    argParser.add_argument('--discardEvents',
+         action='store_true',
+         help="Discard an event if one of the event veto filter is True, if discardEvents = True"
+         )
+
     argParser.add_argument('--runChunks',
         action='store',
         nargs=2,
