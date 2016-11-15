@@ -1642,6 +1642,10 @@ def cmgPostProcessing(argv=None):
     args_processEventVetoFastSimJets = args.processEventVetoFastSimJets
     args_discardEvents = args.discardEvents
     
+    if args_discardEvents:
+        raise Exception("\n args.discardEvents not fully implemented yet.\n")
+        sys.exit()
+    
     if not processLepAll:
         if storeOnlyLepAll:
             raise Exception("\n storeOnlyLepAll option can only be used with processLepAll\n")
