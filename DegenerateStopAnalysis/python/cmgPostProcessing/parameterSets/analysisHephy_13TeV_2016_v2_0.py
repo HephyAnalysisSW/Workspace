@@ -78,7 +78,7 @@ def treeVariables(args):
     # Flags used for vetoing events
     #  = 0: fails event
     #  = 1: pass event
-    if not args.discardEvents:
+    if not args.processEventVetoFilters: 
         keepBranches_DATAMC.extend([
             'Flag_*',
         ])
