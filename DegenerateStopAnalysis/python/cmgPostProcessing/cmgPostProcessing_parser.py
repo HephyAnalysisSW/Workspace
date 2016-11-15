@@ -163,19 +163,19 @@ def get_parser():
         help="Store only LepAll, do not store LepGood and LepOther. Effective only if processLepAll = True"
         )
 
-    argParser.add_argument('--applyEventVetoList',
+    argParser.add_argument('--processEventVetoList',
         action='store_true',
-        help="Apply event veto list, if applyEventVetoList = True"
+        help="Apply event veto list, if processEventVetoList = True"
         )
 
-    argParser.add_argument('--applyEventVetoFilters',
+    argParser.add_argument('--processEventVetoFilters',
          action='store_true',
-         help="Apply event veto list, if applyEventVetoFilters = True"
+         help="Apply event veto list, if processEventVetoFilters = True"
          )
 
-    argParser.add_argument('--applyEventVetoFastSimJets',
+    argParser.add_argument('--processEventVetoFastSimJets',
         action='store_true',
-        help="Apply an event veto for FastSim samples (see 'corridor studies), if applyEventVetoFastSimJets = True"
+        help="Apply an event veto for FastSim samples (see 'corridor studies), if processEventVetoFastSimJets = True"
         )
 
     argParser.add_argument('--discardEvents',

@@ -1637,6 +1637,9 @@ def cmgPostProcessing(argv=None):
     processLepAll = args.processLepAll
     storeOnlyLepAll = args.storeOnlyLepAll
     
+    args_processEventVetoList = args.processEventVetoList
+    args_processEventVetoFilters = args.processEventVetoFilters
+    args_processEventVetoFastSimJets = args.processEventVetoFastSimJets
     args_discardEvents = args.discardEvents
     
     if not processLepAll:
@@ -1727,7 +1730,7 @@ def cmgPostProcessing(argv=None):
     
     
     # get the event veto list FIXME: are the values updated properly?   
-    if args.applyEventVetoList:
+    if args_processEventVetoList:
         event_veto_list = get_veto_list()['all']
     else:
         event_veto_list = {}
@@ -2126,21 +2129,21 @@ def cmgPostProcessing(argv=None):
                     flag_keepEvent = 1
                     
                     # process event veto list flags
-                    if isDataSample and args.applyEventVetoList:
+                    if isDataSample and args_processEventVetoList:
                         flag_Veto_Event_List = processEventVetoList(readTree, splitTree, saveTree, event_veto_list)
                         flag_keepEvent = flag_keepEvent and flag_Veto_Event_List
                         if not args_discardEvents:
                             saveTree.Flag_Veto_Event_List = flag_Veto_Event_List
 
                     # process event veto filters flags
-                    if args.applyEventVetoFilters:
+                    if args_processEventVetoFilters:
                         flag_Filters = processEventVetoFilters(sample, readTree, splitTree, saveTree, params)
                         flag_keepEvent = flag_keepEvent and flag_Filters
                         if not args_discardEvents:
                             saveTree.Flag_Filters = flag_Filters
 
                     # compute flag for event veto for FastSim jets
-                    if isFastSimSample and args.applyEventVetoFastSimJets:
+                    if isFastSimSample and args_processEventVetoFastSimJets:
                         flag_veto_event_fastSimJets = processEventVetoFastSimJets(readTree, splitTree, saveTree, params)
                         flag_keepEvent = flag_keepEvent and flag_veto_event_fastSimJets
                         if not args_discardEvents:

@@ -477,7 +477,7 @@ import pickle
 #mstops = [250, 275, 300, 325, 350, 375, 400, 425, 450, 475, 500, 525, 550, 575, 600, 625, 650, 675, 700, 725, 750, 775, 800]
 #dms    = [10, 20, 30, 40, 50, 60, 70, 80]
 
-signalOpts = ["--skimPreselect", "--applyEventVetoFastSimJets"]
+signalOpts = ["--skimPreselect", "--processEventVetoFastSimJets"]
 signalSample = "SMS_T2tt_dM_10to80_genHT_160_genMET_80"
 
 signalSets = {}
@@ -492,7 +492,7 @@ sampleSets.update(signalSets)
 #
 #
 
-signalOpts = ["--skimPreselect", "--applyEventVetoFastSimJets"]
+signalOpts = ["--skimPreselect", "--processEventVetoFastSimJets"]
 signalSample = "SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1"
 signalSets = {}
 mass_dict = pickle.load(file("/data/nrad/cmgTuples/8020_mAODv2_v0/RunIISpring16MiniAODv2/%s_mass_dict.pkl"%signalSample))
@@ -505,7 +505,7 @@ sampleSets.update(signalSets)
 #
 #
 
-signalOpts = ["--skimPreselect", "--applyEventVetoFastSimJets"]
+signalOpts = ["--skimPreselect", "--processEventVetoFastSimJets"]
 signalSample = "SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1"
 signalSets = {}
 mass_dict = pickle.load(file("/data/nrad/cmgTuples/8020_mAODv2_v0/RunIISpring16MiniAODv2/%s_mass_dict.pkl"%signalSample))

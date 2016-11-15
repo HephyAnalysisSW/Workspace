@@ -83,16 +83,24 @@ def treeVariables(args):
             'Flag_*',
         ])
 
-        newVariables_DATAMC.extend([
-            # flag from list of veto events
-            'Flag_Veto_Event_List/I/1',
-            # combination of event filters defined in parameterSet
-            'Flag_Filters/I/1',
-            # flag for vetoing events for FastSim samples, as resulted from
-            # 2016 "corridor studies" (kept in all samples for uniformity)
-            'Flag_veto_event_fastSimJets/I/1',
-        ])
+        # flag from list of veto events
+        if args.processEventVetoList:
+            newVariables_DATAMC.extend([
+                'Flag_Veto_Event_List/I/1',
+            ])
 
+        # flag for combination of event filters defined in parameterSet
+        if args.processEventVetoFilters:
+            newVariables_DATAMC.extend([
+                'Flag_Filters/I/1',
+            ])
+
+        # flag for vetoing events for FastSim samples, as resulted from
+        # 2016 "corridor studies" (kept in all samples for uniformity)
+        if args.processEventVetoFastSimJets:
+            newVariables_DATAMC.extend([
+                'Flag_veto_event_fastSimJets/I/1',
+            ])
 
     newVariables_DATAMC.extend([
         'weight/F/-999.',
@@ -299,7 +307,7 @@ def getParameterSet(args):
     params['treeVariables'] = treeVariables_rtuple
 
     # Filters
-    if args.applyEventVetoFilters:
+    if args.processEventVetoFilters:
    
       filters = {
          'data':[
