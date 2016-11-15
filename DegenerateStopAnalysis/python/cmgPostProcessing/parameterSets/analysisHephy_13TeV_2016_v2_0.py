@@ -78,10 +78,7 @@ def treeVariables(args):
     # Flags used for vetoing events
     #  = 0: fails event
     #  = 1: pass event
-    if not args.processEventVetoFilters: 
-        keepBranches_DATAMC.extend([
-            'Flag_*',
-        ])
+    if not args.discardEvents:
 
         # flag from list of veto events
         if args.processEventVetoList:
@@ -93,6 +90,10 @@ def treeVariables(args):
         if args.processEventVetoFilters:
             newVariables_DATAMC.extend([
                 'Flag_Filters/I/1',
+            ])
+        else:
+            keepBranches_DATAMC.extend([
+                'Flag_*',
             ])
 
         # flag for vetoing events for FastSim samples, as resulted from
