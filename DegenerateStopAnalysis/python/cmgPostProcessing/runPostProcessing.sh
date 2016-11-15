@@ -108,7 +108,7 @@ if [[ ${CMSSW_ACTION} == "RO" || ${CMSSW_ACTION} == "R" ]]; then
         --parameterSet=${PARAMETER_SET} \
         --cmgProcessingTag=${CMG_PROCESSING_TAG} \
         --cmgPostProcessingTag=${CMG_POST_PROCESSING_TAG} \
-        --skimGeneral='' \
+        --applyEventVetoFilters \
         ${SKIM_PRESELECT} \
         ${SKIM_LEPTON} \
         ${BTAG_WEIGHTS} \

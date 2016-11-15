@@ -46,11 +46,11 @@ def treeVariables(args):
 
     # branches to drop:
     dropBranches_DATAMC = [
-        #'met_mass',
-        #'met_MuonEn*',
-        #'met_ElectronEn*',
-        #'met_TauEn*',
-        #'met_UnclusteredEn*',
+        'met_mass',
+        'met_MuonEn*',
+        'met_ElectronEn*',
+        'met_TauEn*',
+        'met_UnclusteredEn*',
         #'met_calo*',
         #"Jet_area",
         #"Jet_qgl",
@@ -339,7 +339,7 @@ def getParameterSet(args):
     branchesToRead_mu = [
         'pdgId/I',
         'pt/F', 'eta/F', 'phi/F',
-        'relIso03/F', 'relIso04/F', 'miniRelIso/F', 'absIso03/F', 'absIso/F', 'sip3d/F',
+        'relIso03/F', 'relIso04/F' , 'absIso03/F', 'absIso/F', 'sip3d/F',
         'dxy/F', 'dz/F',
         'mass/F', 'Q80/F', 'mt/F', 'cosPhiLepMet/F',
         'looseMuonId/I',
@@ -412,7 +412,7 @@ def getParameterSet(args):
     branchesToRead_el = [
         'pdgId/I',
         'pt/F', 'eta/F', 'phi/F',
-        'relIso03/F', 'relIso04/F', 'miniRelIso/F', 'absIso03/F', 'absIso/F', 'sip3d/F',
+        'relIso03/F', 'relIso04/F' , 'absIso03/F', 'absIso/F', 'sip3d/F',
         'dxy/F', 'dz/F',
         'mass/F', 'Q80/F', 'mt/F', 'cosPhiLepMet/F',
 
