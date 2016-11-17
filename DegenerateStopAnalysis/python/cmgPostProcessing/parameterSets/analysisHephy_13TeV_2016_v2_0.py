@@ -114,16 +114,16 @@ def treeVariables(args):
 
     # common branches already defined in cmgTuples
     keepBranches_MC = [
-        'nTrueInt', 'genWeight', 'xsec', 'LHEweight_original',
+        'nTrueInt', 'genWeight', 'xsec', #'LHEweight_original',
         'nIsr',
         'GenSusyMStop',
         'GenSusyMNeutralino',
         'LHEWeights_*',
-        'ngenLep', 'genLep_*',
+        #'ngenLep', 'genLep_*',
         'nGenPart', 'GenPart_*',
-        'ngenPartAll', 'genPartAll_*',
-        'ngenTau', 'genTau_*',
-        'ngenLepFromTau', 'genLepFromTau_*',
+        #'ngenPartAll', 'genPartAll_*',
+        #'ngenTau', 'genTau_*',
+        #'ngenLepFromTau', 'genLepFromTau_*',
         'nGenJet', 'GenJet_*',
     ]
 
@@ -140,9 +140,9 @@ def treeVariables(args):
     readVectors_MC = []
     newVectors_MC = []
     
-    readVariables_MC.extend(
-        ['Jet_hadronFlavour/I', ]
-    )
+    #readVariables_MC.extend(
+    #    ['Jet_hadronFlavour/I', ]
+    #)
    
 
     # data samples only
@@ -542,7 +542,7 @@ def getParameterSet(args):
 
     nMax_jets = 25
     branchesToRead_jets = [
-        'pt/F', 'eta/F', 'phi/F', 'id/I', 'btagCSV/F', 'mass/F', 'chHEF/F',
+        'pt/F', 'eta/F', 'phi/F', 'id/I', 'btagCSV/F', 'mass/F', 'chHEF/F', 'hadronFlavour/I' 
     ]
     branchesToPrint_jets = helpers.getVariableNameList(branchesToRead_jets)
 

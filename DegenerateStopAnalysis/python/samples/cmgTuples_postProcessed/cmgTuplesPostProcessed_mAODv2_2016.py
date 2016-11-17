@@ -9,11 +9,10 @@ import sys
 import pickle
 
 # most recent paths, can be replaced when initializing the cmgTuplesPostProcessed class
-ppsDir = '/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/8012_mAODv2_v3/80X_postProcessing_v10/analysisHephy_13TeV_2016_v0/step1'
-
-mc_path     = ppsDir + "/RunIISpring16MiniAODv2_v3"
-data_path   = ppsDir + "/Data2016_v3"
-signal_path = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/8012_mAODv2_v3_1/80X_postProcessing_v10_1/analysisHephy_13TeV_2016_v0/step1/RunIISpring16MiniAODv2_v3" 
+ppsDir = '/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/8020_mAODv2_v0/80X_postProcessing_v0/analysisHephy_13TeV_2016_v2_0/step1'
+mc_path     = ppsDir + "/RunIISpring16MiniAODv2_v0"
+data_path   = ppsDir + "/Data2016_v0"
+signal_path = mc_path
 
 # Lumi that was used in the weight calculation of PostProcessing in pb-1
 lumi_mc = 10000.
@@ -445,36 +444,45 @@ class cmgTuplesPostProcessed():
             setattr(self, s, sm)
 
 
-        mass_dict_pickle_file = os.path.join(signal_path, "mass_dict.pkl")
-        if os.path.isfile(mass_dict_pickle_file):
-            mass_dict_pickle = mass_dict_pickle_file
-        else:
-            print "!!!!! WARNING !!!!! NO MASS DICT FOUND!"
-            mass_dict_pickle = None
+        signal_mass_dicts = {
+                                'SMS_T2tt_mStop_%s_mLSP_%s'          :  {'pkl':'SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1_mass_dict.pkl'     ,'sampleId':1 , 'shortName':'t2tt%s_%s'       , 'niceName':'T2tt_mStop_%s_mLSP_%s_mWMin5'},
+                                'SMS_T2bW_X05_mStop_%s_mLSP_%s_mWMin0p1' :  {'pkl':'SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1_mass_dict.pkl' ,'sampleId':2 , 'shortName':'t2bw%s_%s'       , 'niceName':'T2bW_mStop_%s_mLSP_%s'},
+                                'SMS_T2tt_mStop_%s_mLSP_%s_mWMin0p1' :  {'pkl':'SMS_T2tt_dM_10to80_genHT_160_genMET_80_mass_dict.pkl'               ,'sampleId':3 , 'shortName':'t2ttold%s_%s'    , 'niceName':'T2tt_mStop_%s_mLSP_%s'},             
 
-        if mass_dict_pickle:
-            mass_dict = pickle.load(open(mass_dict_pickle, "r"))
-        else:
-            mass_dict = {}
-            
-        self.mass_dict = mass_dict
-        mass_scan = {}
+                            }
+        self.signals_info = signal_mass_dicts
 
-        for mstop in mass_dict:
-            for mlsp in mass_dict[mstop]:
-                mass_point = "SMS_T2tt_mStop_%s_mLSP_%s" % (mstop, mlsp)
-                #mass_point = "SMS_T2_4bd_mStop_%s_mLSP_%s" % (mstop, mlsp)
-                mass_scan[mass_point] = {
-                    "name" : mass_point,
-                    "bins": [mass_point],
-                    'dir' : self.signal_path,
-                    'sampleId': "%s%s" % (mstop, mlsp)
-                    }
+        for signal_name, signal_info in signal_mass_dicts.items():
+            sampleId              = signal_info['sampleId']
+            signal_mass_dict      = signal_info['pkl']
+            mass_dict_pickle_file = os.path.join(signal_path, signal_mass_dict)
+
+            if os.path.isfile(mass_dict_pickle_file):
+                mass_dict_pickle = mass_dict_pickle_file
+                mass_dict        = pickle.load(open(mass_dict_pickle,"r"))
+            else:
+                print "!!!!! WARNING !!!!! NO MASS DICT FOUND! %s"%mass_dict_pickle_file
+                mass_dict_pickle = None
+                mass_dict        = {}
+            self.mass_dict = mass_dict
+             
+            mass_scan = {}
+
+            for mstop in mass_dict:
+                for mlsp in mass_dict[mstop]:
+                    #mass_point = "SMS_T2tt_mStop_%s_mLSP_%s" % (mstop, mlsp)
+                    mass_point = signal_name % (mstop, mlsp)
+                    mass_scan[mass_point] = {
+                        "name" : mass_point,
+                        "bins": [mass_point],
+                        'dir' : self.signal_path,
+                        'sampleId': "%s%s" % (mstop, mlsp)
+                        }
 
 
-        for sig in mass_scan:
-            sm = self.makeSample(mass_scan[sig])
-            setattr(self, sig, sm)
+            for sig in mass_scan:
+                sm = self.makeSample(mass_scan[sig])
+                setattr(self, sig, sm)
 
 if __name__=="__main__":
     cmgPP = cmgTuplesPostProcessed( mc_path, signal_path, data_path ) 

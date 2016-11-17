@@ -119,16 +119,16 @@ for ims , mstop in  enumerate( mstop_range):
         #b   = 1. * dm    / max_dm
         #new_colors[ic] = ROOT.TColor(ic, r,g,b)
         #print ic
-        colors['s%s_%s'%(mstop,mstop-dm)] = dm_color_dict[dm] # + int(mstop/10.) -10
+        colors['%s_%s'%(mstop,mstop-dm)] = dm_color_dict[dm] # + int(mstop/10.) -10
         #colors['s%s_%s'%(mstop,mstop-dm)] = ic
         
 
 sampleNames = {
  'dy': 'DYJetsM50',
  'qcd': 'QCD',
- 's300_220': 'T2tt-300-220',
- 's300_270': 'T2tt-300-270',
- 's300_290': 'T2tt-300-290',
+ #'s300_220': 'T2tt-300-220',
+ #'s300_270': 'T2tt-300-270',
+ #'s300_290': 'T2tt-300-290',
  'st': 'ST',
  'tt': 'TTJets',
  'vv': 'Diboson',
