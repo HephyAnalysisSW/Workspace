@@ -1,25 +1,9 @@
 import copy, os, sys
-#spring15_soft_sample_dir = "/data/nrad/cmgTuples/postProcessed_Spring15/"
-#spring15_inc_sample_dir = "/data/nrad/cmgTuples/postProcessed_Spring15_vasile_v1/"
-
 
 #from Workspace.DegenerateStopAnalysis.cmgTuples_Spring15_7412pass2_mAODv2_v4 import mass_dict
-## somehow import mass_dict without having to load files in cmgSample file.... (?)
+# somehow import mass_dict without having to load files in cmgSample file.... (?)
 
-
-
-## most recent paths:
-#mc_path     = "/afs/hephy.at/data/vghete01/cmgTuples/postProcessed_mAODv2/7412pass2_mAODv2_v6/74X_postProcessing_v2/analysisHephy_13TeV_v0/Spring15_7412pass2_mAODv2_v6" 
-#signal_path = "/afs/hephy.at/data/vghete01/cmgTuples/postProcessed_mAODv2/7412pass2_mAODv2_v6/74X_postProcessing_v2/analysisHephy_13TeV_v0/Spring15_7412pass2_mAODv2_v6" 
-#data_path   = "/afs/hephy.at/data/vghete01/cmgTuples/postProcessed_mAODv2/7412pass2_mAODv2_v6/74X_postProcessing_v2/analysisHephy_13TeV_v0/Data25ns_v6" 
-
-
-##
-#mc_path     = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2_v6/7412pass2_SMSScan_v2/RunIISpring15DR74_25ns"
-#signal_path = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2_v6/7412pass2_SMSScan_v2/RunIISpring15DR74_25ns"
-#data_path   = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2_v6/7412pass2_SMSScan_v2/Data_25ns"
-
-## most recent paths
+# most recent paths
 mc_path     =  "/afs/hephy.at/data/vghete01/cmgTuples/postProcessed_mAODv2/7412pass2_mAODv2_v6/74X_postProcessing_v4/analysisHephy_13TeV_v0/step1/Spring15_7412pass2_mAODv2_v6/"
 signal_path =  "/afs/hephy.at/data/vghete01/cmgTuples/postProcessed_mAODv2/7412pass2_mAODv2_v6/74X_postProcessing_v4/analysisHephy_13TeV_v0/step1/Spring15_7412pass2_mAODv2_v6/"
 data_path   =  "/afs/hephy.at/data/vghete01/cmgTuples/postProcessed_mAODv2/7412pass2_mAODv2_v6/74X_postProcessing_v4/analysisHephy_13TeV_v0/step1/Data25ns_v6/"
@@ -133,13 +117,6 @@ class cmgTuplesPostProcessed():
         'sampleId': 20,
         })
         
-        
-        
-        
-        
-        
-        
-        
         self.WJetsHT=self.makeSample({\
         "name" : "WJetsHT",
         "bins" : [
@@ -190,8 +167,6 @@ class cmgTuplesPostProcessed():
         'dir' : self.mc_path
         })
         
-        
-        
         self.WJetsInc=self.makeSample({\
         "name" : "WJetsInc",
         "bins" : [
@@ -200,8 +175,6 @@ class cmgTuplesPostProcessed():
         'dir' : self.mc_path,
         'sampleId': 10,
         })
-        
-        
         
         self.WJetsTauInc=self.makeSample({\
         "name" : "WJetsTauInc",
@@ -219,7 +192,6 @@ class cmgTuplesPostProcessed():
         'dir' : self.mc_path
         })
         
-        
         self.QCD=self.makeSample({\
         "name" : "QCD",
         "bins" :  [
@@ -235,8 +207,6 @@ class cmgTuplesPostProcessed():
         'sampleId' : 30,
 
         })
-        
-
 
         self.QCDPT=self.makeSample({\
         "name" : "QCDPT",
@@ -259,8 +229,6 @@ class cmgTuplesPostProcessed():
         'dir' : self.mc_path 
         })
         
-       
-
         self.QCDPT_EM=self.makeSample({\
         "name" : "QCDPT_EM",
         "bins" :  [
@@ -277,7 +245,6 @@ class cmgTuplesPostProcessed():
                   ], 
         'dir' : self.mc_path 
         })
-
  
         self.ZJetsHT=self.makeSample({\
         "name" : "ZJetsHT",
@@ -291,8 +258,6 @@ class cmgTuplesPostProcessed():
         'sampleId': 40, 
         })
         
-        
-        
         self.DYJetsM5to50HT=self.makeSample({\
         "name" : "DYJetsM5to50HT",
         "bins" :  [
@@ -305,7 +270,6 @@ class cmgTuplesPostProcessed():
         'dir' : self.mc_path,
         })
 
-
         self.DYJetsM5to50=self.makeSample({\
         "name" : "DYJetsM5to50",
         "bins" :  [
@@ -313,7 +277,6 @@ class cmgTuplesPostProcessed():
                   ] ,
         'dir' : self.mc_path 
         })
-
         
         self.DYJetsM50HT=self.makeSample({\
         "name" : "DYJetsM50HT",
@@ -326,7 +289,6 @@ class cmgTuplesPostProcessed():
         'dir' : self.mc_path,
         'sampleId': 50,
         })
-
 
         self.DYJetsToNuNu=self.makeSample({\
         "name" : "DYJetsToNuNu",
@@ -352,18 +314,12 @@ class cmgTuplesPostProcessed():
                       [  "SingleEl_Oct05"      , "SingleElectron_Run2015D-05Oct2015-v1"], 
                     ]
         
-        
-        
         allData=[]
         for data in dataSamples:
             sample = self.getDataSample(*data )
             #exec('{name}=sample'.format(name=data[0]) )
             setattr(self,data[0],sample)
             #exec('{name}=sample'.format(name=data[0]) )
-        
-        
-        
-        
         
         allSignalStrings=[\
         "T2DegStop_300_270",
@@ -373,19 +329,16 @@ class cmgTuplesPostProcessed():
         "T2tt_300_270_FastSim",
         ]
         
-        
         for s in allSignalStrings:
           sm = self.makeSample(self.getSignalSample(s))
           #exec(s+"=sm")
           setattr(self,s,sm)
         
-        
         import pickle
-
 
         #mass_dict_pickle = "/afs/hephy.at/user/n/nrad/CMSSW/fork/CMSSW_7_4_12_patch4/src/Workspace/DegenerateStopAnalysis/cmgPostProcessing/mass_dict_all.pkl"
         
-        mass_dict_pickle1 = "/data/nrad/cmgTuples/7412pass2_mAODv2_v6/RunIISpring15MiniAODv2//mass_dict.pkl"
+        mass_dict_pickle1 = "/data/nrad/cmgTuples/7412pass2_mAODv2_v6/RunIISpring15MiniAODv2/mass_dict.pkl"
         mass_dict_pickle2 = "/afs/hephy.at/work/n/nrad/results/mass_dicts/mass_dict.pkl" 
         if os.path.isfile(mass_dict_pickle1):
             mass_dict_pickle = mass_dict_pickle1
@@ -410,10 +363,7 @@ class cmgTuplesPostProcessed():
                                             'sampleId': "%s%s"%(mstop,mlsp) 
                                         }
         
-        
         for sig in mass_scan:
             sm = self.makeSample(mass_scan[sig])
             #exec(sig+"=sm")
             setattr(self,sig,sm)
-        
-        

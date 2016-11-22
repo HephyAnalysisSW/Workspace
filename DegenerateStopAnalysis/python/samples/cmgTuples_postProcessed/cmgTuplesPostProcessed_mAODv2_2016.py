@@ -1,7 +1,21 @@
-''' Sample definition file for 2016 data and MC samples.
+""" Sample definition file for CMG post-processed ntuples using 2016 data and MC production at 25 ns for the degenerate stop analysis.
+ 
+Each set of ntuples is produced with a git tag of HephySusySW.Workspace repository and and is saved in a directory:
+  
+   {path}/cmgTuples/{processingEra}/{processingTag}/{campaign}/{inc/soft/...}
+   
+    processingEra: postProcessed_mAODv2_v* (always starts with "postProcessed_")
+    processingTag: 80X_postProcessing_v* (git tag of HephySusySW.Workspace)
+    
+    campaign:
+        MC production campaign for MC samples  (e.g. RunIISpring16MiniAODv2, with _25ns added as additional identification)
+        Energy, reconstruction tag, era for data (e.g. 13TeV_PromptReco_Collisions15_25ns, taken from JSON name file)
+    
+The corresponding py sample files are called: 
+    RunIISpring16MiniAODv2_v*.py 
+    Data2016_v*.py
 
-TODO Add the rest of the samples when available.
-'''
+"""
 
 import copy
 import os
@@ -261,7 +275,6 @@ class cmgTuplesPostProcessed():
         })
 
 
-
         self.QCDPT = self.makeSample({
         "name" : "QCDPT",
         "bins" :  [
@@ -408,9 +421,6 @@ class cmgTuplesPostProcessed():
         'dir' : self.mc_path
         })
 
-
-
-
         ######################################################################################################
         #####################################                  ###############################################
         #####################################       DATA       ###############################################
@@ -485,4 +495,4 @@ class cmgTuplesPostProcessed():
                 setattr(self, sig, sm)
 
 if __name__=="__main__":
-    cmgPP = cmgTuplesPostProcessed( mc_path, signal_path, data_path ) 
+    cmgPP = cmgTuplesPostProcessed(mc_path, signal_path, data_path)
