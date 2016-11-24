@@ -484,7 +484,7 @@ def bkg_est(cfg, args):
                                         sampleList + dataList, 
                                         cutInst, 
                                         #cutOpt          =   "list2", 
-                                        cutOpt          =   "list", 
+                                        cutOpt          =   "list2", 
                                         weight          =   "",
                                         lumi            =   lumi,  
                                         pklOpt          =   True, 
@@ -492,7 +492,9 @@ def bkg_est(cfg, args):
                                         nDigits         =   10 , 
                                         err             =   True , 
                                         verbose         =   True,
-                                        isMVASample             =   isMVASample, 
+                                        isMVASample     =   isMVASample, 
+                                        cuts            =   [cfg.cuts, "bins_sum"],
+                                        nProc           =   nProc, 
                                    )
             pickle.dump( yields[cut_name], open(yield_pkl,'w') )
             print "Yield pickle dumped: %s"%yield_pkl

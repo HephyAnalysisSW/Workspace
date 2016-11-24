@@ -23,12 +23,13 @@ dm_ranges =          {
 
 
 class MassPoints():
-    def __init__(self, dm_range_string , mstop_range = (250,801,25) ):
+    def __init__(self, dm_range_string , mstop_range = (250,801,25) , prefix="t2tt"):
         allowed_dm_ranges = dm_ranges.keys()
         if not dm_range_string in allowed_dm_ranges:
             raise Exception("DeltaM Range %s, Not Recognized in %s"%(dm_range_string, allowed_dm_ranges))
         self.dm_range = dm_ranges[dm_range_string]
         self.mstops = range(*mstop_range )
+        self.prefix = prefix
 
         mstops_lsps_ranges = { 
                         "lowDM":   make_stop_lsp_list(  self.mstops , dm_range_low) ,
@@ -38,7 +39,7 @@ class MassPoints():
                              } 
         self.mstop_lsps = mstops_lsps_ranges[dm_range_string]
         self.testPoints = [ (mstop,mlsp) for mstop,mlsp in self.mstop_lsps if mstop==300]
-        self.sigList    = [ "s%s_%s"%(mstop,mlsp) for mstop,mlsp in self.mstop_lsps ]
+        self.sigList    = [ "%s%s_%s"%(self.prefix, mstop,mlsp) for mstop,mlsp in self.mstop_lsps ]
         self.sampleStrings = [ t2_4bd_sample_string(mstop,mlsp) for mstop,mlsp in self.mstop_lsps ]
         #self.benchMarksMasses = [ (mstop,mlsp) for mstop,mlsp in self.mstop_lsps if mstop==300 ]
 

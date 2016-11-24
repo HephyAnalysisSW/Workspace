@@ -50,6 +50,7 @@ if True:
     parser.add_argument('--postFuncs',    default = '',     nargs = "+",  action="store", help='')
 
     parser.add_argument('--sigOpt',    default='All',       action="store", help='BM= benchmark points only, NoSig=NoSignal , All=allsignal')
+    parser.add_argument('--bkgs',       nargs="+",      help='')
     parser.add_argument('--ppSet',     default='80X',          action="store", help='')
     args=parser.parse(sys.argv, setdef=False)
     

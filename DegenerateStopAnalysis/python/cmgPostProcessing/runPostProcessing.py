@@ -1399,7 +1399,8 @@ for mstop in mass_dict.keys():
 sampleSets.update(signalSets)
 
 
-all_samps = ['ttjets', 'wjets', 'dyjets','zjets', ] + [x for x in sampleSets.keys() if 'T2tt' in x or 'T2bW' in x]
+all_samps = ['ttjets', 'wjets', 'dyjets','zjets', 'qcd', 'other' ] + [x for x in sampleSets.keys() if 'T2tt' in x or 'T2bW' in x]
+all_samps = ['qcd', 'other']
 
 all_samples = []
 for samp in all_samps:
