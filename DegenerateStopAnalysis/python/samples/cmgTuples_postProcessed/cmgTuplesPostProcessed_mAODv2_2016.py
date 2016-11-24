@@ -455,9 +455,9 @@ class cmgTuplesPostProcessed():
 
 
         signal_mass_dicts = {
-                                'SMS_T2tt_mStop_%s_mLSP_%s'          :  {'pkl':'SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1_mass_dict.pkl'     ,'sampleId':1 , 'shortName':'t2tt%s_%s'       , 'niceName':'T2tt_mStop_%s_mLSP_%s_mWMin5'},
+                                'SMS_T2tt_mStop_%s_mLSP_%s'          :  {'pkl':'SMS_T2tt_dM_10to80_genHT_160_genMET_80_mass_dict.pkl'     ,'sampleId':1 , 'shortName':'t2ttold%s_%s'       , 'niceName':'T2tt_mStop_%s_mLSP_%s_mWMin5'},
                                 'SMS_T2bW_X05_mStop_%s_mLSP_%s_mWMin0p1' :  {'pkl':'SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1_mass_dict.pkl' ,'sampleId':2 , 'shortName':'t2bw%s_%s'       , 'niceName':'T2bW_mStop_%s_mLSP_%s'},
-                                'SMS_T2tt_mStop_%s_mLSP_%s_mWMin0p1' :  {'pkl':'SMS_T2tt_dM_10to80_genHT_160_genMET_80_mass_dict.pkl'               ,'sampleId':3 , 'shortName':'t2ttold%s_%s'    , 'niceName':'T2tt_mStop_%s_mLSP_%s'},             
+                                'SMS_T2tt_mStop_%s_mLSP_%s_mWMin0p1' :  {'pkl':'SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1_mass_dict.pkl'               ,'sampleId':3 , 'shortName':'t2tt%s_%s'    , 'niceName':'T2tt_mStop_%s_mLSP_%s'},             
 
                             }
         self.signals_info = signal_mass_dicts
