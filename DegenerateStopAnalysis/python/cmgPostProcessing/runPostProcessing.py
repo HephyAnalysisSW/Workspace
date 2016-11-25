@@ -1401,7 +1401,7 @@ sampleSets.update(signalSets)
 
 mc_samps = ['ttjets_chunks', 'wjets_chunks', 'dyjets_chunks','zjets', 'qcd', 'other' ]
 signal_samps = [x for x in sampleSets.keys() if 'T2tt' in x or 'T2bW' in x]
-data_samps = ['data_met_chunks', 'data_el_chunks', 'data_mu_chunks']
+data_samps = ['data_met_chunks']#, 'data_el_chunks', 'data_mu_chunks', 'data_jet_chunks'
 
 all_samps = mc_samps + signal_samps + data_samps
  
