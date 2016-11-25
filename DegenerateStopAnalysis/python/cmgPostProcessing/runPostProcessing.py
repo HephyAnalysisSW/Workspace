@@ -1399,9 +1399,12 @@ for mstop in mass_dict.keys():
 sampleSets.update(signalSets)
 
 
-all_samps = ['ttjets', 'wjets', 'dyjets','zjets', 'qcd', 'other' ] + [x for x in sampleSets.keys() if 'T2tt' in x or 'T2bW' in x]
-all_samps = ['qcd', 'other']
+mc_samps = ['ttjets_chunks', 'wjets_chunks', 'dyjets_chunks','zjets', 'qcd', 'other' ]
+signal_samps = [x for x in sampleSets.keys() if 'T2tt' in x or 'T2bW' in x]
+data_samps = ['data_met_chunks', 'data_el_chunks', 'data_mu_chunks']
 
+all_samps = mc_samps + signal_samps + data_samps
+ 
 all_samples = []
 for samp in all_samps:
     all_samples.extend(sampleSets[samp]['samples'])
@@ -1493,7 +1496,6 @@ def make_list_options(args, argsRun):
            
     logger.debug("\n options_list: \n %s \n", pprint_cust.pformat(options_list))
 
-    #
     return options_list
 
 
@@ -1644,8 +1646,6 @@ def runPostProcessing(argv=None):
 
     get_logger_rtuple = helpers.get_logger('runPostProcessing', logLevel, logFile.name)
     logger = get_logger_rtuple.logger
-
-    #
 
     if verbose:    
         print "{:-^80}".format(" Running Post Processing! ")
