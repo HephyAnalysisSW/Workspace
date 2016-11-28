@@ -175,6 +175,7 @@ class cmgTuplesPostProcessed():
         self.WJetsHT = self.makeSample({
             "name" : "WJetsHT",
             "bins" : [
+                    #"WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
                     "WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1",
                     "WJetsToLNu_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
                     "WJetsToLNu_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1",
@@ -427,17 +428,24 @@ class cmgTuplesPostProcessed():
         #####################################                  ###############################################
         ######################################################################################################
 
-        dataSamples = [
-                        ["MET_v2",      ["MET_Run2016B-PromptReco-v2"           , "MET_Run2016C-PromptReco-v2"              ,  "MET_Run2016D-PromptReco-v2"            ]    ],
-                        ["SingleMu_v2", ["SingleMuon_Run2016B-PromptReco-v2"    , "SingleMuon_Run2016C-PromptReco-v2"       ,  "SingleMuon_Run2016D-PromptReco-v2"     ]    ],
-                        ["SingleEl_v2", ["SingleElectron_Run2016B-PromptReco-v2", "SingleElectron_Run2016C-PromptReco-v2"   ,  "SingleElectron_Run2016D-PromptReco-v2" ]    ],
-            ]
+        dataSamples = [\
+           ["MET",      ["MET_Run2016B-23Sep2016-v3",            "MET_Run2016C-23Sep2016-v1",            "MET_Run2016D-23Sep2016-v1",             "MET_Run2016E-23Sep2016-v1", 
+                         "MET_Run2016F-23Sep2016-v1",            "MET_Run2016G-23Sep2016-v1",            "MET_Run2016H-PromptReco-v2",            "MET_Run2016H-PromptReco-v3"]], #NOTE: H PromptReco
+           
+           ["SingleMu", ["SingleMuon_Run2016B-23Sep2016-v3",     "SingleMuon_Run2016C-23Sep2016-v1",     "SingleMuon_Run2016D-23Sep2016-v1",      "SingleMuon_Run2016E-23Sep2016-v1", 
+                         "SingleMuon_Run2016F-23Sep2016-v1",     "SingleMuon_Run2016G-23Sep2016-v1",     "SingleMuon_Run2016H-PromptReco-v2",     "SingleMuon_Run2016H-PromptReco-v3"]], #NOTE: H PromptReco
+           
+           ["SingleEl", ["SingleElectron_Run2016B-23Sep2016-v3", "SingleElectron_Run2016C-23Sep2016-v1", "SingleElectron_Run2016D-23Sep2016-v1",  "SingleElectron_Run2016E-23Sep2016-v1", 
+                         "SingleElectron_Run2016F-23Sep2016-v1", "SingleElectron_Run2016G-23Sep2016-v1", "SingleElectron_Run2016H-PromptReco-v2", "SingleElectron_Run2016H-PromptReco-v3"]], #NOTE: H PromptReco
+           
+           ["JetHT",    ["JetHT_Run2016B-23Sep2016-v3",          "JetHT_Run2016C-23Sep2016-v1",          "JetHT_Run2016D-23Sep2016-v1",           "JetHT_Run2016E-23Sep2016-v1", 
+                         "JetHT_Run2016F-23Sep2016-v1",          "JetHT_Run2016G-23Sep2016-v1",          "JetHT_Run2016H-PromptReco-v2",          "JetHT_Run2016H-PromptReco-v3"]], #NOTE: H PromptReco
+        ]
 
         allData = []
         for data in dataSamples:
             sample = self.getDataSample(*data)
             setattr(self, data[0], sample)
-
 
         # signal samples
 
