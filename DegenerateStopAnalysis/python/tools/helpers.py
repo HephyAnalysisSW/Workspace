@@ -610,7 +610,7 @@ def getChunkIndex(sample, chunks):
     return chunkIndexSorted
 
 
-def getMassDictionary(sample):
+def getMassDictionary(sample, sample_dict_file=None):
     ''' Get the mass dictionary for a sample, if it exists.
 
     If a mass dictionary is retrieved, check if it is empty. 
@@ -637,9 +637,19 @@ def getMassDictionary(sample):
             )
         )
 
-    mass_dict_file = sample.get('mass_dict', None)
+    mass_dict_file_sample = sample.get('mass_dict', None)
 
-    if mass_dict_file is not None:
+    if mass_dict_file_sample is not None:
+        # if the signal path is given, replace in the mass_dict_file the path with the new one
+        # (concrete case: read it from /afs post-processed instead of /data cmg tuple) 
+        if sample_dict_file is not None:
+            mass_dict_file = sample_dict_file
+            logger.debug(
+                "\n Sample mass dictionary \n %s \n replaced with \n %s \n", mass_dict_file_sample, mass_dict_file
+            )
+        else:
+            mass_dict_file = mass_dict_file_sample
+            
         if os.path.isfile(mass_dict_file):
             mass_dict = pickle.load(open(mass_dict_file, "r"))
         else:
