@@ -45,7 +45,7 @@ SAMPLE_SET=$1
 RUNMODE="BATCH"
 CMG_PROCESSING_TAG="8020_mAODv2_v0"
 CMG_POST_PROCESSING_TAG="80X_postProcessing_v0"
-PARAMETER_SET="analysisHephy_13TeV_2016_v2_0"
+PARAMETER_SET="analysisHephy_13TeV_2016_v2_1"
 VERBOSE="" #--verbose"
 
 # semi-hard-coded parameters
@@ -64,7 +64,7 @@ else
 fi
 
 if [[ ${4} == "skimLepton" ]]; then 
-    SKIM_LEPTON="--skimLepton=oneLep"
+    SKIM_LEPTON="--skimLepton=oneLep20"
 else
     SKIM_LEPTON=""
 fi
