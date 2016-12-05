@@ -112,11 +112,14 @@ if skim == "preIncLep":
 elif skim == 'oneLep':
     skimString = "(nLepGood >=1 || nLepOther >=1)"
 
+elif skim == 'oneLepGood':
+    skimString = "(nLepGood >=1)"
+
 elif skim == 'oneLep20':
-    skimString = " ((nLepGood >=1 && LepGood_pt[0] > 20) || (nLepOther >=1 && LepOther_pt[0] > 20))"
+    skimString = "((nLepGood >=1 && LepGood_pt[0] > 20) || (nLepOther >=1 && LepOther_pt[0] > 20))"
 
 elif skim == 'oneLepGood_HT800':
-    skimString = " (nLepGood >=1 && (Sum$(Jet_pt*(Jet_pt > 30 && abs(Jet_eta) < 2.4 && (Jet_id))) > 800))"
+    skimString = "(nLepGood >=1 && (Sum$(Jet_pt*(Jet_pt > 30 && abs(Jet_eta) < 2.4 && (Jet_id))) > 800))"
 
 nBin = {'cmg':{}, 'pps':{}}
 
