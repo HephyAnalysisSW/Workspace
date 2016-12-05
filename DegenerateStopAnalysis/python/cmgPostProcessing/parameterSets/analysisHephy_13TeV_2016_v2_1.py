@@ -284,11 +284,13 @@ def getParameterSet(args):
         # keep an empty string for inclusive lepton
         skimLeptonCondition = ''
     elif skimLepton == 'oneLep':
-        skimLeptonCondition = " (nLepGood >=1 || nLepOther >=1)"
+        skimLeptonCondition = "(nLepGood >=1 || nLepOther >=1)"
+    elif skimLepton == 'oneLepGood':
+        skimLeptonCondition = "(nLepGood >=1)"
     elif skimLepton == 'oneLep20':
-        skimLeptonCondition = " ((nLepGood >=1 && LepGood_pt[0] > 20) || (nLepOther >=1 && LepOther_pt[0] > 20))"
+        skimLeptonCondition = "((nLepGood >=1 && LepGood_pt[0] > 20) || (nLepOther >=1 && LepOther_pt[0] > 20))"
     elif skimLepton == 'oneLepGood_HT800':
-        skimLeptonCondition = " (nLepGood >=1 && (Sum$(Jet_pt*(Jet_pt > 30 && abs(Jet_eta) < 2.4 && (Jet_id))) > 800))"
+        skimLeptonCondition = "(nLepGood >=1 && (Sum$(Jet_pt*(Jet_pt > 30 && abs(Jet_eta) < 2.4 && (Jet_id))) > 800))"
     else:
         pass
 
