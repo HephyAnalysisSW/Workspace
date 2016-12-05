@@ -268,7 +268,7 @@ def getParameterSet(args):
         # readVar or readVectors
         metCut = "(met_pt>200)"
         leadingJet_pt = "((Max$(Jet_pt*(abs(Jet_eta)<2.4 && Jet_id) ) > 90 ) >=1)"
-        HTCut = "(Sum$(Jet_pt*(Jet_pt>30 && abs(Jet_eta)<2.4 && (Jet_id)) ) >200)"
+        HTCut = "(Sum$(Jet_pt*(Jet_pt>30 && abs(Jet_eta)<2.4 && (Jet_id))) >200)"
 
         skimPreselectCondition = "(%s)" % '&&'.join(
             [metCut, leadingJet_pt, HTCut])
@@ -287,6 +287,8 @@ def getParameterSet(args):
         skimLeptonCondition = " (nLepGood >=1 || nLepOther >=1)"
     elif skimLepton == 'oneLep20':
         skimLeptonCondition = " ((nLepGood >=1 && LepGood_pt[0] > 20) || (nLepOther >=1 && LepOther_pt[0] > 20))"
+    elif skimLepton == 'oneLepGood_HT800':
+        skimLeptonCondition = " (nLepGood >=1 && (Sum$(Jet_pt*(Jet_pt > 30 && abs(Jet_eta) < 2.4 && (Jet_id))) > 800))"
     else:
         pass
 

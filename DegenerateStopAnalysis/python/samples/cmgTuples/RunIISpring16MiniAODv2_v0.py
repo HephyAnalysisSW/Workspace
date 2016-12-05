@@ -37,6 +37,7 @@ WJetsToLNu_HT100to200 ={
 "treeName":"tree",
 "isData": False,
 "xsec": 1627.45,
+"ext":['WJetsToLNu_HT100to200', 'WJetsToLNu_HT100to200_ext'],
 }
 allComponents.append(WJetsToLNu_HT100to200)
 
@@ -51,6 +52,7 @@ WJetsToLNu_HT100to200_ext ={
 "treeName":"tree",
 "isData": False,
 "xsec": 1627.45,
+"ext":['WJetsToLNu_HT100to200', 'WJetsToLNu_HT100to200_ext'],
 }
 allComponents.append(WJetsToLNu_HT100to200_ext)
 
