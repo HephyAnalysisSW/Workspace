@@ -23,7 +23,8 @@ import sys
 import pickle
 
 # most recent paths, can be replaced when initializing the cmgTuplesPostProcessed class
-ppsDir = '/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/8020_mAODv2_v0/80X_postProcessing_v0/analysisHephy_13TeV_2016_v2_0/step1'
+ppsDir = '/afs/hephy.at/data/mzarucki01/cmgTuples/postProcessed_mAODv2/8020_mAODv2_v0/80X_postProcessing_v0/analysisHephy_13TeV_2016_v2_0/step1'
+#ppsDir = '/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/8020_mAODv2_v0/80X_postProcessing_v0/analysisHephy_13TeV_2016_v2_0/step1'
 mc_path     = ppsDir + "/RunIISpring16MiniAODv2_v0"
 data_path   = ppsDir + "/Data2016_v0"
 signal_path = mc_path
@@ -48,6 +49,15 @@ class cmgTuplesPostProcessed():
 
         ol = copy.deepcopy(sample)
         ol['dir'] = os.path.join(ol['dir'], 'oneLep')
+        
+        ol20 = copy.deepcopy(sample)
+        ol20['dir'] = os.path.join(ol20['dir'], 'oneLep20')
+        
+        olg = copy.deepcopy(sample)
+        olg['dir'] = os.path.join(olg['dir'], 'oneLepGood')
+        
+        olg_ht800 = copy.deepcopy(sample)
+        olg_ht800['dir'] = os.path.join(olg_ht800['dir'], 'oneLepGood_HT800')
 
         pil = copy.deepcopy(sample)
         pil['dir'] = os.path.join(pil['dir'], 'skimPreselect', 'incLep')
@@ -61,6 +71,9 @@ class cmgTuplesPostProcessed():
             'skimPresel': p,
             'incLep': il,
             'oneLep': ol,
+            'oneLep20': ol20,
+            'oneLepGood': olg,
+            'oneLepGood_HT800': olg_ht800,
             'preIncLep': pil,
             'preOneLep':  pol
             }
