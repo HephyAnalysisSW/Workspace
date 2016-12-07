@@ -1528,8 +1528,8 @@ def haddFiles(sample_name, root_output_file_prefix, filesForHadd, temporaryDir, 
 
     logger = logging.getLogger('cmgPostProcessing.haddFiles')
         
-    maxFileSize = 500 # split into maxFileSize MB
-    maxNumberFiles = 200
+    maxFileSize = 100 # split into maxFileSize MB
+    maxNumberFiles = 100
     logger.debug(
         "\n " + \
         "\n Sum up the split files in files smaller as %f MB \n",
