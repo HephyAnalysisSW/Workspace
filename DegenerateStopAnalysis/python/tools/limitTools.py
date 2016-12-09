@@ -48,7 +48,7 @@ def getLimit(yld, sig=None          , outDir    = "./cards/", postfix = ""     ,
         bins        = yld.cutNames
         sigList     = yld.sigList
         bkgList     = yld.bkgList
-        sampleNames = yldsampleNames
+        sampleNames = yld.sampleNames
     else:
         bins_order  = ['SRL1a', 'SRH1a', 'SRV1a', 'SRL1b', 'SRH1b', 'SRV1b', 'SRL1c', 'SRH1c', 'SRV1c', 'SRL2', 'SRH2', 'SRV2', 'CR1a', 'CR1b', 'CR1c', 'CR2', 'CRTT2']
         bins        = yld[yld.keys()[0]].keys()

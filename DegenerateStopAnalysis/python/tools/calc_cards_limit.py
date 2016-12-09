@@ -100,3 +100,19 @@ if __name__ == '__main__':
     json.dump(limits, open(json_out,"w") , indent = 4)
     print "json and pickle written in  \n %s  \n %s"%(pkl_out, json_out)
 
+    #if runMode == 'batch':
+    #    import Workspace.DegenerateStopAnalysis.tools.degTools as degTools
+    #    cards_hash = {}
+    #    def calcLimitFromCard2(card, dir):
+    #        ret = calcLimit(card)
+    #        pickle.dump(ret,dir)
+
+
+
+    #    for card in cards:
+    #        card_hash = hashlib.sha1(card + degTools.time.time() ).hexdigest()
+    #        card_unique_pkl = "tmp_calc_card_limit_%s.pkl"%card_hash
+    #        cards_hash [card] = card_unique_pkl
+    #        calcLimitFromCard2( card, card_unique_pkl )
+
+
