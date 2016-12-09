@@ -164,9 +164,9 @@ class TaskConfig():
         data_path_tag     =  getattr(self, "dataDir", "Data2016")
 
         self.mc_path       = "/afs/hephy.at/data/{ppUser}/cmgTuples/postProcessed_mAODv2/{cmgTag}/{ppTag}/{parameterSet}/{ppStep}/{mc_path_tag}_{cmgTagV}/".format(ppTag=ppTag,ppStep=self.ppStep, ppUser = self.ppUser , cmgTag = self.cmgTag, cmgTagV = self.cmgTagVer, parameterSet=self.parameterSet, mc_path_tag= mc_path_tag)
-        if '80' in self.cmgTag:
-            #self.signal_path   = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/{cmgTag}_1/{ppTag}_1/{parameterSet}/{ppStep}/{mc_path_tag}_{cmgTagV}/".format(ppTag=ppTag,ppStep=self.ppStep, ppUser = self.ppUser , cmgTag = self.cmgTag, cmgTagV = self.cmgTagVer, parameterSet=self.parameterSet, mc_path_tag= mc_path_tag)
-            self.signal_path   = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/{cmgTag}/{ppTag}/{parameterSet}/{ppStep}/{mc_path_tag}_{cmgTagV}/".format(ppTag=ppTag,ppStep=self.ppStep, ppUser = self.ppUser , cmgTag = self.cmgTag, cmgTagV = self.cmgTagVer, parameterSet=self.parameterSet, mc_path_tag= mc_path_tag)
+        if '8012' in self.cmgTag or '8011' in self.cmgTag:
+            self.signal_path   = "/afs/hephy.at/data/{ppUser}/cmgTuples/postProcessed_mAODv2/{cmgTag}_1/{ppTag}_1/{parameterSet}/{ppStep}/{mc_path_tag}_{cmgTagV}/".format(ppTag=ppTag,ppStep=self.ppStep, ppUser = self.ppUser , cmgTag = self.cmgTag, cmgTagV = self.cmgTagVer, parameterSet=self.parameterSet, mc_path_tag= mc_path_tag)
+            #self.signal_path   = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/{cmgTag}/{ppTag}/{parameterSet}/{ppStep}/{mc_path_tag}_{cmgTagV}/".format(ppTag=ppTag,ppStep=self.ppStep, ppUser = self.ppUser , cmgTag = self.cmgTag, cmgTagV = self.cmgTagVer, parameterSet=self.parameterSet, mc_path_tag= mc_path_tag)
         else:
             self.signal_path   = "/afs/hephy.at/data/{ppUser}/cmgTuples/postProcessed_mAODv2/{cmgTag}/{ppTag}/{parameterSet}/{ppStep}/{mc_path_tag}_{cmgTagV}/".format(ppTag=ppTag,ppStep=self.ppStep, ppUser = self.ppUser , cmgTag = self.cmgTag, cmgTagV = self.cmgTagVer, parameterSet=self.parameterSet, mc_path_tag= mc_path_tag)
             #self.signal_path   = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/{cmgTag}_1/{ppTag}_1/{parameterSet}/{ppStep}/{mc_path_tag}_{cmgTagV}/".format(ppTag=ppTag,ppStep=self.ppStep, ppUser = self.ppUser , cmgTag = self.cmgTag, cmgTagV = self.cmgTagVer, parameterSet=self.parameterSet, mc_path_tag= mc_path_tag)

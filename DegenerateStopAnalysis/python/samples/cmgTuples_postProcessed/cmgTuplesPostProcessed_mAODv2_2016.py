@@ -494,6 +494,12 @@ class cmgTuplesPostProcessed():
                 print "!!!!! WARNING !!!!! NO MASS DICT FOUND! %s"%mass_dict_pickle_file
                 mass_dict_pickle = None
                 mass_dict        = {}
+
+                useProxyMassDict = True
+                if useProxyMassDict:
+                    mass_dict_pickle = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/8012_mAODv2_v3/80X_postProcessing_v10/analysisHephy_13TeV_2016_v0/step1/RunIISpring16MiniAODv2_v3/SMS_T2tt_dM_10to80_genHT_160_genMET_80_mass_dict.pkl"
+                    mass_dict        = pickle.load(open(mass_dict_pickle,"r"))
+                    print "!!!!!!!!!!! DOUBLE WARNING! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! USING PROXY MASS PICKLE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
             self.mass_dict = mass_dict
              
             mass_scan = {}

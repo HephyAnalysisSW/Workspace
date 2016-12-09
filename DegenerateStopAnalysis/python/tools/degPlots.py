@@ -126,18 +126,22 @@ class DegPlots():
 
 
 
-    def __init__( self,  lepCollection="LepGood" , lep="mu"):
+    def __init__( self,  lepCollection="LepGood" , lep="mu", lepThresh="", jetThresh="", variables=None):
+        """
+        
+
+        """
 
         self.collection = lepCollection
-        self.lep = lep
-        lepIndex = "Index{lepCol}_{Lep}".format(lepCol=lepCollection, Lep=lep)
+        self.lep = lep if not lepThresh else lep+"_"+lepThresh
+        lepIndex = "Index{lepCol}_{Lep}".format(lepCol=lepCollection, Lep=self.lep)
 
 
         fargs = {
                    "lepCol"  : lepCollection,
-                   "lep"     : lep,
+                   "lep"     : lep if not lepThresh else lep+"_"+lepThresh,
                    "lepIndex": lepIndex,
-                    "lepLatex": { "mu":"mu", "el":"e","lep":"l" }[lep],
+                    "lepLatex": { "mu":"mu", "el":"e","lep":"l"    }[lep],
                     "lepTitle": { "mu":"Mu", "el":"El","lep":"Lep" }[lep],
         
                 }
@@ -209,6 +213,11 @@ class DegPlots():
                 "isrHFEMMult":   {'var':"Jet_HFEMMult[IndexJet_basJet[0]]"   ,"bins":[10,0,10]          ,"nMinus1":None         ,"decor":{"title":"Leading Jet HF EM Multip"                     ,"x": "Leading Jet HF EM Multip"                      ,"y":"Events  "  ,'log':[0,1,0] }},
 
 
+
+                
+
+
+
                 #
                 # Jet Quality Plots
                 #
@@ -266,10 +275,24 @@ class DegPlots():
                 "bHardJetPt":       {'var':"Jet_pt[ max(IndexJet_bHardJet[0],0)] *(nBHardJet>0)"      ,"bins":[100,0,1000]          ,"nMinus1":None         ,"decor":{"title":"bHardJet P_{{T}} "    ,"x":"P_{T}(Hard BJet)"      ,"y":"Events  "  ,'log':[0,1,0] }},
               }
         
-        
-        
-        
-        
+        mva_vars = {
+        "mva_methodId"       :{'bins':[20,-0.8,0.8] , 'decor':{} },      
+        "mva_response"       :{'bins':[20,-0.8,0.8] , 'decor':{} },       
+        "mva_signalTag"      :{'bins':[20,-0.8,0.8] , 'decor':{} },       
+        "mva_backgroundTag"  :{'bins':[20,-0.8,0.8] , 'decor':{} },           
+        "mva_trainingEvent"  :{'bins':[20,-0.8,0.8] , 'decor':{} },           
+        "mva_testEvent"      :{'bins':[20,-0.8,0.8] , 'decor':{} },           
+        }
+        nMVAMethods = 10
+        for mva_var, var_dict in mva_vars.items():
+            for imethod in range(nMVAMethods):
+                varname = "%s_%s"%(mva_var , imethod) 
+                decor = var_dict['decor']
+                decor = {'title':varname, 'x':varname, 'y': 'nEvents', 'log':[0,1,0]}
+                plotDict[varname]={
+                                    'var':"%s[%s]"%(mva_var, imethod),      'bins':var_dict['bins']  , 'decor':decor,
+
+                                    }
         
         
         self.plots = Plots(**plotDict)

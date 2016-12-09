@@ -1,6 +1,13 @@
 ''' Run in multiprocessing the CMG post-processing script for the samples defined here.
 
 https://docs.python.org/2/library/multiprocessing.html
+
+
+You can get the number of Chunks for each data sample with:
+
+for f in `ls -d *`; do echo "'"$f"'" ":" `ls -d $f/* | grep -c Chunk` ; done
+
+
 '''
 
 # imports python standard modules or functions
@@ -310,6 +317,80 @@ sampleSets = {
 
    }
 
+
+
+dataChunks = {
+'JetHT_Run2016B-23Sep2016-v3' : 1043  ,
+'JetHT_Run2016C-23Sep2016-v1' : 348  ,
+'JetHT_Run2016D-23Sep2016-v1' : 583  ,
+'JetHT_Run2016F-23Sep2016-v1' : 369  ,
+'JetHT_Run2016G-23Sep2016-v1' : 857  ,
+'JetHT_Run2016H-PromptReco-v2' : 926  ,
+'JetHT_Run2016H-PromptReco-v3' : 25  ,
+'MET_Run2016B-23Sep2016-v3' : 1046  ,
+'MET_Run2016B-PromptReco-v2' : 1045  ,
+'MET_Run2016C-23Sep2016-v1' : 348  ,
+'MET_Run2016C-PromptReco-v2' : 348  ,
+'MET_Run2016D-23Sep2016-v1' : 584  ,
+'MET_Run2016D-PromptReco-v2' : 584  ,
+'MET_Run2016E-23Sep2016-v1' : 496  ,
+'MET_Run2016E-PromptReco-v2' : 491  ,
+'MET_Run2016F-23Sep2016-v1' : 368  ,
+'MET_Run2016G-23Sep2016-v1' : 854  ,
+'MET_Run2016G-PromptReco-v1' : 832  ,
+'MET_Run2016H-PromptReco-v2' : 926  ,
+'MET_Run2016H-PromptReco-v3' : 25  ,
+'SingleElectron_Run2016B-23Sep2016-v3' : 1054  ,
+'SingleElectron_Run2016B-PromptReco-v2' : 1046  ,
+'SingleElectron_Run2016C-23Sep2016-v1' : 347  ,
+'SingleElectron_Run2016C-PromptReco-v2' : 348  ,
+'SingleElectron_Run2016D-23Sep2016-v1' : 589  ,
+'SingleElectron_Run2016D-PromptReco-v2' : 584  ,
+'SingleElectron_Run2016E-23Sep2016-v1' : 496  ,
+'SingleElectron_Run2016F-23Sep2016-v1' : 362  ,
+'SingleElectron_Run2016G-23Sep2016-v1' : 854  ,
+'SingleElectron_Run2016H-PromptReco-v2' : 926  ,
+'SingleElectron_Run2016H-PromptReco-v3' : 25  ,
+'SingleMuon_Run2016B-23Sep2016-v3' : 1045  ,
+'SingleMuon_Run2016B-PromptReco-v2' : 1045  ,
+'SingleMuon_Run2016C-23Sep2016-v1' : 348  ,
+'SingleMuon_Run2016C-PromptReco-v2' : 348  ,
+'SingleMuon_Run2016D-23Sep2016-v1' : 584  ,
+'SingleMuon_Run2016D-PromptReco-v2' : 584  ,
+'SingleMuon_Run2016E-23Sep2016-v1' : 496  ,
+'SingleMuon_Run2016E-PromptReco-v2' : 219  ,
+'SingleMuon_Run2016F-23Sep2016-v1' : 361  ,
+'SingleMuon_Run2016F-PromptReco-v1' : 351  ,
+'SingleMuon_Run2016G-23Sep2016-v1' : 856  ,
+'SingleMuon_Run2016G-PromptReco-v1' : 844  ,
+'SingleMuon_Run2016H-PromptReco-v2' : 925  ,
+'SingleMuon_Run2016H-PromptReco-v3' : 25  ,
+}
+
+def roundup(x):
+    return x if x % 100 == 0 else x + 100 - x % 100
+
+
+data_names = {
+                "JetHT":"jet",
+                "MET"  :'met',
+           "SingleMuon":"mu" ,
+       "SingleElectron":"el" ,
+             }
+
+for data_samp , nChunk in dataChunks.iteritems():
+    name = ""
+    for data_name, nameTag in data_names.items():
+        if data_name in data_samp:
+            name = nameTag            
+            break
+    n = name + " " +  ""
+    n = name + " " +  ""     
+ 
+
+    #maxChunkSplit = roundup(nChunk)  
+
+
 ### Signal ###
 
 #mstops = [250, 275, 300, 325, 350, 375, 400, 425, 450, 475, 500, 525, 550, 575, 600, 625, 650, 675, 700, 725, 750, 775, 800]
@@ -375,6 +456,9 @@ for samp in all_samps:
 sampleSets['all'] = { 
                         'samples': all_samples,
                     }
+
+
+
 
 def get_parser():
     ''' Argument parser for running the post processing module.

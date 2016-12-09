@@ -293,7 +293,7 @@ def calc_sig_limit(cfg, args):
             limits = pickle.load( file(limit_pkl) )
             pp.pprint(limits) 
         else:
-            nProc   =   getattr(cfg, "nProc", 16) 
+            nProc   =   getattr(args, "nProc", 1) 
             #nProc   =   min(len(signalList) -1 , getattr(cfg, "nProc", 16) ) 
             nProc   =   min(nProc, 16)    ## num processess shouldn't be too much more than twice the number of cores ( according to the internets )
             limits  =   {}
@@ -426,6 +426,7 @@ def bkg_est(cfg, args):
     isMVASample = getattr(cfg, "isMVASample", False)
     redo_eventLists = "write" if getattr(cfg, "redo_eventLists", False) else "read"
     for cutInst in cfg.cutInstList:
+        cutInstName = cutInst.name
         cut_name = cutInst.fullName
         #if cfg.signalList:
         #    signalList = ['s300_290','s300_270','s300_220']
@@ -441,6 +442,7 @@ def bkg_est(cfg, args):
         #else:
         #    raise Exception("not sure which dataset to use! cut_name: %s"%cut_name)
         dataList = ['dblind']
+        dataList = [getattr(args,'data')]
         if dataList[0] in cfg.samples.dataList():
             lumi = cfg.samples[dataList[0]].name +"_lumi"
         else:
@@ -460,12 +462,11 @@ def bkg_est(cfg, args):
     
     
     
-        nProc   =   getattr(cfg, "nProc", 16) 
+        nProc   =   getattr(args, "nProc", 1) 
         #nProc   =   min(len(signalList) -1 , getattr(cfg, "nProc", 16) ) 
         nProc   =   min(nProc, 16)    ## num processess shouldn't be too much more than twice the number of cores ( according to the internets )
         limits  =   {}
         #yield_pkl =  cfg.results_dir + "/%s/Yields_%s_%s.pkl"%(cutInst.fullName , cfg.runTag , cfg.scan_tag)
-
         #yield_pkl   =   getattr(cfg, "yield_pkl", cfg.yield_pkl  )  ##huh?
         if os.path.isfile(yield_pkl) and not redo_yields:
                 print "\n reading Yields from pickle: %s \n"%yield_pkl
@@ -493,7 +494,7 @@ def bkg_est(cfg, args):
                                         err             =   True , 
                                         verbose         =   True,
                                         isMVASample     =   isMVASample, 
-                                        cuts            =   [cfg.cuts, "bins_sum"],
+                                        cuts            =   [cfg.cuts, cutInstName ],
                                         nProc           =   nProc, 
                                    )
             pickle.dump( yields[cut_name], open(yield_pkl,'w') )
@@ -745,7 +746,12 @@ def data_plots(cfg,args):
         if getattr(args, "setEventLists",True):
             setEventListToChains(cfg.samples, mcList +[data] , eventListCutInst)
             #setEventListToChains(cfg.samples, mcList +[data] , cutInst.baseCut)
-        getPlots(cfg.samples, cfg.plots , cutInst  , sampleList = sampleList      , plotList=[plot] , nMinus1=nminus_list , addOverFlowBin='both',weight=""  )
+
+        if cfg.isFancyCut:
+            #cutInst
+            getPlots(cfg.samples, cfg.plots , [cfg.cuts, cutInst.name]  , sampleList = sampleList      , plotList=[plot] , nMinus1=nminus_list , addOverFlowBin='both',weight=""  )
+        else:
+            getPlots(cfg.samples, cfg.plots , cutInst  , sampleList = sampleList      , plotList=[plot] , nMinus1=nminus_list , addOverFlowBin='both',weight=""  )
 
         plt = drawPlots(cfg.samples,    cfg.plots , cutInst, sampleList = sampleList , # [ 'qcd','z','dy','tt','w','s300_250','s250_230' , 'dblind'],
                 plotList= [plot] ,save= plotDir, plotMin=plotMin,
@@ -765,6 +771,12 @@ def data_plots(cfg,args):
         return plt
 
     result = {}
+    ###
+    ##cfg.cutInstList
+    isFancyCut = True
+    if hasattr(cfg.cuts, "getSampleCutWeight"):
+        isFancyCut = True
+    cfg.isFancyCut = isFancyCut
     for cutInst in cfg.cutInstList:
         cut_name = cutInst.fullName
         #print " . . . . . . . . . . . . . Cut: %s . . . . . . . . . . . . . . "%cut_name
@@ -773,12 +785,13 @@ def data_plots(cfg,args):
 
 
         if cfg.signalList:
-            signalList = ['s300_290', 's300_270', 's300_220']
+            #signalList = ['s300_290', 's300_270', 's300_220']
+            signalList = cfg.signalList#['s300_290', 's300_270', 's300_220']
         sampleList = cfg.bkgList + signalList #cfg.sample_info['sampleList']  + cfg.signalList 
         print "------------------- - - -- - --- - - - -- ", sampleList  
         result[cut_name]={}
         #data = 'd' if 'SR' in cut_name else 'dblind'   ## safeside : 'dblind' if 'CR' in cut_name else 'd'
-        data = 'dblind'
+        data = getattr(args, 'data', 'd')
         #data = 'dblind' if 'CR' in cut_name else 'd'   ## safeside : 'dblind' if 'CR' in cut_name else 'd'
         plotMin =  0.01 if "SR" in cut_name else 1.0
         for plot in cfg.plotList:
