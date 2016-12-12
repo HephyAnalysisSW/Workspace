@@ -17,6 +17,7 @@ import multiprocessing
 import errno
 import pickle
 import pprint as pp
+import importlib
 
 # imports user modules or functions
 
@@ -38,7 +39,7 @@ sampleSets = {
    
    'wjets':{
                'samples':[
-                           "WJetsToLNu_HT100to200",
+                           #"WJetsToLNu_HT100to200",
                            "WJetsToLNu_HT100to200_ext",
                            "WJetsToLNu_HT200to400",
                            "WJetsToLNu_HT200to400_ext",
@@ -50,64 +51,14 @@ sampleSets = {
                          ],
                },
    
-   'wjets_chunks':{
-               'samples':[
-                           ["WJetsToLNu_HT100to200",],
-                           ["WJetsToLNu_HT100to200_ext",  "--runChunks", "0",   "100"],
-                           ["WJetsToLNu_HT100to200_ext",  "--runChunks", "101", "200"],
-                           ["WJetsToLNu_HT100to200_ext",  "--runChunks", "201", "300"],
-                           ["WJetsToLNu_HT100to200_ext",  "--runChunks", "301", "300"],
-                           ["WJetsToLNu_HT100to200_ext",  "--runChunks", "401", "500"],
-                           ["WJetsToLNu_HT100to200_ext",  "--runChunks", "501", "600"],
-                           ["WJetsToLNu_HT100to200_ext",  "--runChunks", "601", "700"],
-                           
-                           ["WJetsToLNu_HT200to400",],
-                           ["WJetsToLNu_HT200to400_ext", "--runChunks", "0",   "100"],
-                           ["WJetsToLNu_HT200to400_ext", "--runChunks", "101", "200"],
-                           ["WJetsToLNu_HT200to400_ext", "--runChunks", "201", "300"],
-                           ["WJetsToLNu_HT200to400_ext", "--runChunks", "301", "400"],
-                           
-                           ["WJetsToLNu_HT400to600",],
-                           ["WJetsToLNu_HT600to800",],
-                           ["WJetsToLNu_HT800to1200_ext",],
-                           ["WJetsToLNu_HT1200to2500",],
-                           ["WJetsToLNu_HT2500toInf",],
-                         ],
-               },
-   
    'ttjets':{
                'samples':[
-                           ["TTJets_LO",],
+                           "TTJets_LO",
                            ["TTJets_LO",                "--skimGeneral=lheHTlow"],
                            ["TTJets_LO_HT600to800_ext", "--skimGeneral=lheHThigh"],
-                           ["TTJets_LO_HT800to1200_ext",],
-                           ["TTJets_LO_HT1200to2500_ext",],
-                           ["TTJets_LO_HT2500toInf",],
-                           #["TTJets_FastSIM",          "--runChunks", "0",   "100"],
-                           #["TTJets_FastSIM",          "--runChunks", "101", "200"],
-                           #["TTJets_FastSIM",          "--runChunks", "201", "300"],
-                           #["TTJets_FastSIM",          "--runChunks", "301", "400"],
-                         ],
-               },
-   
-   'ttjets_chunks':{
-               'samples':[
-                           ["TTJets_LO",                "--runChunks", "0",   "100" ],
-                           ["TTJets_LO",                "--runChunks", "101", "200" ],
-                           ["TTJets_LO",                "--runChunks", "201", "300" ],
-                           ["TTJets_LO",                "--runChunks", "301", "400" ],
-                           ["TTJets_LO",                                             "--skimGeneral=lheHTlow"],
-                           ["TTJets_LO_HT600to800_ext", "--runChunks", "0",   "100", "--skimGeneral=lheHThigh"],
-                           ["TTJets_LO_HT600to800_ext", "--runChunks", "101", "200", "--skimGeneral=lheHThigh"],
-                           ["TTJets_LO_HT600to800_ext", "--runChunks", "201", "300", "--skimGeneral=lheHThigh"],
-                           ["TTJets_LO_HT600to800_ext", "--runChunks", "301", "400", "--skimGeneral=lheHThigh"],
-                           ["TTJets_LO_HT800to1200_ext",],
-                           ["TTJets_LO_HT1200to2500_ext",],
-                           ["TTJets_LO_HT2500toInf",],
-                           #["TTJets_FastSIM",          "--runChunks", "0",   "100"],
-                           #["TTJets_FastSIM",          "--runChunks", "101", "200"],
-                           #["TTJets_FastSIM",          "--runChunks", "201", "300"],
-                           #["TTJets_FastSIM",          "--runChunks", "301", "400"],
+                           "TTJets_LO_HT800to1200_ext",
+                           "TTJets_LO_HT1200to2500_ext",
+                           "TTJets_LO_HT2500toInf",
                          ],
                },
    
@@ -136,31 +87,6 @@ sampleSets = {
                            'DYJetsToLL_M5to50_HT400to600',
                            'DYJetsToLL_M5to50_HT600toInf',
                            'DYJetsToLL_M5to50_HT600toInf_ext',
-                         ],
-               },
-   
-   'dyjets_chunks':{
-               'samples':[
-                           ['DYJetsToLL_M50_HT100to200_ext', "--runChunks", "0",   "100"],
-                           ['DYJetsToLL_M50_HT100to200_ext', "--runChunks", "101", "200"],
-                           
-                           ['DYJetsToLL_M50_HT200to400_ext', "--runChunks", "0",   "100"],
-                           ['DYJetsToLL_M50_HT200to400_ext', "--runChunks", "101", "200"],
-                           ['DYJetsToLL_M50_HT200to400_ext', "--runChunks", "201", "300"],
-                           
-                           ['DYJetsToLL_M50_HT400to600_ext', "--runChunks", "0",   "100"],
-                           ['DYJetsToLL_M50_HT400to600_ext', "--runChunks", "101", "200"],
-                           
-                           ['DYJetsToLL_M50_HT600toInf',],
-                           ['DYJetsToLL_M50_HT600toInf_ext',],
-   
-                           ['DYJetsToLL_M5to50_HT100to200',],
-                           ['DYJetsToLL_M5to50_HT100to200_ext',],
-                           ['DYJetsToLL_M5to50_HT200to400',],
-                           ['DYJetsToLL_M5to50_HT200to400_ext',],
-                           ['DYJetsToLL_M5to50_HT400to600',],
-                           ['DYJetsToLL_M5to50_HT600toInf',],
-                           ['DYJetsToLL_M5to50_HT600toInf_ext',],
                          ],
                },
    
@@ -247,7 +173,8 @@ sampleSets = {
                             ############DATA############
                             ############################
    
-   ### ReReco ###
+   ### Re-Reco ###
+   #NOTE: H Re-Reco not available
    
    # MET PD
    'data_met':{
@@ -261,119 +188,6 @@ sampleSets = {
                          ],
                   },
    
-   'data_met_chunks':{
-               'samples':[
-                           #B (v3)
-                           ["MET_Run2016B_23Sep2016_v3", "--runChunks", "0",    "100"], 
-                           ["MET_Run2016B_23Sep2016_v3", "--runChunks", "101",  "200"], 
-                           ["MET_Run2016B_23Sep2016_v3", "--runChunks", "201",  "300"], 
-                           ["MET_Run2016B_23Sep2016_v3", "--runChunks", "301",  "400"], 
-                           ["MET_Run2016B_23Sep2016_v3", "--runChunks", "401",  "500"], 
-                           ["MET_Run2016B_23Sep2016_v3", "--runChunks", "501",  "600"], 
-                           ["MET_Run2016B_23Sep2016_v3", "--runChunks", "601",  "700"], 
-                           ["MET_Run2016B_23Sep2016_v3", "--runChunks", "701",  "800"], 
-                           ["MET_Run2016B_23Sep2016_v3", "--runChunks", "801",  "900"], 
-                           ["MET_Run2016B_23Sep2016_v3", "--runChunks", "901",  "1000"], 
-                           ["MET_Run2016B_23Sep2016_v3", "--runChunks", "1001", "1100"], 
-                           #C  
-                           ["MET_Run2016C_23Sep2016_v1", "--runChunks", "0",   "100"],
-                           ["MET_Run2016C_23Sep2016_v1", "--runChunks", "101", "200"],
-                           ["MET_Run2016C_23Sep2016_v1", "--runChunks", "201", "300"],
-                           ["MET_Run2016C_23Sep2016_v1", "--runChunks", "301", "400"],
-                           #D
-                           ["MET_Run2016D_23Sep2016_v1", "--runChunks", "0",   "100"],
-                           ["MET_Run2016D_23Sep2016_v1", "--runChunks", "101", "200"],
-                           ["MET_Run2016D_23Sep2016_v1", "--runChunks", "201", "300"],
-                           ["MET_Run2016D_23Sep2016_v1", "--runChunks", "301", "400"],
-                           ["MET_Run2016D_23Sep2016_v1", "--runChunks", "401", "500"],
-                           ["MET_Run2016D_23Sep2016_v1", "--runChunks", "501", "600"],
-                           #E
-                           ["MET_Run2016E_23Sep2016_v1", "--runChunks", "0",   "100"],
-                           ["MET_Run2016E_23Sep2016_v1", "--runChunks", "101", "200"],
-                           ["MET_Run2016E_23Sep2016_v1", "--runChunks", "201", "300"],
-                           ["MET_Run2016E_23Sep2016_v1", "--runChunks", "301", "400"],
-                           ["MET_Run2016E_23Sep2016_v1", "--runChunks", "401", "500"],
-                           #F
-                           ["MET_Run2016F_23Sep2016_v1", "--runChunks", "0",   "100"],
-                           ["MET_Run2016F_23Sep2016_v1", "--runChunks", "101", "200"],
-                           ["MET_Run2016F_23Sep2016_v1", "--runChunks", "201", "300"],
-                           ["MET_Run2016F_23Sep2016_v1", "--runChunks", "301", "400"],
-                           #G
-                           ["MET_Run2016G_23Sep2016_v1", "--runChunks", "0",   "100"],
-                           ["MET_Run2016G_23Sep2016_v1", "--runChunks", "101", "200"],
-                           ["MET_Run2016G_23Sep2016_v1", "--runChunks", "201", "300"],
-                           ["MET_Run2016G_23Sep2016_v1", "--runChunks", "301", "400"],
-                           ["MET_Run2016G_23Sep2016_v1", "--runChunks", "401", "500"],
-                           ["MET_Run2016G_23Sep2016_v1", "--runChunks", "501", "600"],
-                           ["MET_Run2016G_23Sep2016_v1", "--runChunks", "601", "700"],
-                           ["MET_Run2016G_23Sep2016_v1", "--runChunks", "701", "800"],
-                           ["MET_Run2016G_23Sep2016_v1", "--runChunks", "801", "900"],
-                         ]},
-   
-   'data_met_b':{
-               'samples':[
-                           ["MET_Run2016B_23Sep2016_v3", "--runChunks", "0",    "100"],
-                           ["MET_Run2016B_23Sep2016_v3", "--runChunks", "101",  "200"],
-                           ["MET_Run2016B_23Sep2016_v3", "--runChunks", "201",  "300"],
-                           ["MET_Run2016B_23Sep2016_v3", "--runChunks", "301",  "400"],
-                           ["MET_Run2016B_23Sep2016_v3", "--runChunks", "401",  "500"],
-                           ["MET_Run2016B_23Sep2016_v3", "--runChunks", "501",  "600"],
-                           ["MET_Run2016B_23Sep2016_v3", "--runChunks", "601",  "700"],
-                           ["MET_Run2016B_23Sep2016_v3", "--runChunks", "701",  "800"],
-                           ["MET_Run2016B_23Sep2016_v3", "--runChunks", "801",  "900"],
-                           ["MET_Run2016B_23Sep2016_v3", "--runChunks", "901",  "1000"],
-                           ["MET_Run2016B_23Sep2016_v3", "--runChunks", "1001", "1100"],
-                         ]},
-   
-   'data_met_c':{
-               'samples':[
-                           ["MET_Run2016C_23Sep2016_v1", "--runChunks", "0",   "100"],
-                           ["MET_Run2016C_23Sep2016_v1", "--runChunks", "101", "200"],
-                           ["MET_Run2016C_23Sep2016_v1", "--runChunks", "201", "300"],
-                           ["MET_Run2016C_23Sep2016_v1", "--runChunks", "301", "400"],
-                         ]},
-   
-   'data_met_d':{
-               'samples':[
-                           ["MET_Run2016D_23Sep2016_v1", "--runChunks", "0",   "100"],
-                           ["MET_Run2016D_23Sep2016_v1", "--runChunks", "101", "200"],
-                           ["MET_Run2016D_23Sep2016_v1", "--runChunks", "201", "300"],
-                           ["MET_Run2016D_23Sep2016_v1", "--runChunks", "301", "400"],
-                           ["MET_Run2016D_23Sep2016_v1", "--runChunks", "401", "500"],
-                           ["MET_Run2016D_23Sep2016_v1", "--runChunks", "501", "600"],
-                         ]},
-   
-   'data_met_e':{
-               'samples':[
-                           ["MET_Run2016E_23Sep2016_v1", "--runChunks", "0",   "100"],
-                           ["MET_Run2016E_23Sep2016_v1", "--runChunks", "101", "200"],
-                           ["MET_Run2016E_23Sep2016_v1", "--runChunks", "201", "300"],
-                           ["MET_Run2016E_23Sep2016_v1", "--runChunks", "301", "400"],
-                           ["MET_Run2016E_23Sep2016_v1", "--runChunks", "401", "500"],
-                         ]},
-   
-   'data_met_f':{
-               'samples':[
-                           ["MET_Run2016F_23Sep2016_v1", "--runChunks", "0",   "100"],
-                           ["MET_Run2016F_23Sep2016_v1", "--runChunks", "101", "200"],
-                           ["MET_Run2016F_23Sep2016_v1", "--runChunks", "201", "300"],
-                           ["MET_Run2016F_23Sep2016_v1", "--runChunks", "301", "400"],
-                         ]},
-   
-   'data_met_g':{
-               'samples':[
-                           ["MET_Run2016G_23Sep2016_v1", "--runChunks", "0",   "100"],
-                           ["MET_Run2016G_23Sep2016_v1", "--runChunks", "101", "200"],
-                           ["MET_Run2016G_23Sep2016_v1", "--runChunks", "201", "300"],
-                           ["MET_Run2016G_23Sep2016_v1", "--runChunks", "301", "400"],
-                           ["MET_Run2016G_23Sep2016_v1", "--runChunks", "401", "500"],
-                           ["MET_Run2016G_23Sep2016_v1", "--runChunks", "501", "600"],
-                           ["MET_Run2016G_23Sep2016_v1", "--runChunks", "601", "700"],
-                           ["MET_Run2016G_23Sep2016_v1", "--runChunks", "701", "800"],
-                           ["MET_Run2016G_23Sep2016_v1", "--runChunks", "801", "900"],
-                         ]},
-   
-   #NOTE: H Re-Reco not available
   
  
    # SingleElectron PD
@@ -389,120 +203,6 @@ sampleSets = {
                          ],
                   },
    
-   'data_el_chunks':{
-               'samples':[
-                           #B (v3)
-                           ["SingleElectron_Run2016B_23Sep2016_v3", "--runChunks", "0",    "100"],
-                           ["SingleElectron_Run2016B_23Sep2016_v3", "--runChunks", "101",  "200"],
-                           ["SingleElectron_Run2016B_23Sep2016_v3", "--runChunks", "201",  "300"],
-                           ["SingleElectron_Run2016B_23Sep2016_v3", "--runChunks", "301",  "400"],
-                           ["SingleElectron_Run2016B_23Sep2016_v3", "--runChunks", "401",  "500"],
-                           ["SingleElectron_Run2016B_23Sep2016_v3", "--runChunks", "501",  "600"],
-                           ["SingleElectron_Run2016B_23Sep2016_v3", "--runChunks", "601",  "700"],
-                           ["SingleElectron_Run2016B_23Sep2016_v3", "--runChunks", "701",  "800"],
-                           ["SingleElectron_Run2016B_23Sep2016_v3", "--runChunks", "801",  "900"],
-                           ["SingleElectron_Run2016B_23Sep2016_v3", "--runChunks", "901",  "1000"],
-                           ["SingleElectron_Run2016B_23Sep2016_v3", "--runChunks", "1001", "1100"],
-                           #C  
-                           ["SingleElectron_Run2016C_23Sep2016_v1", "--runChunks", "0",   "100"],
-                           ["SingleElectron_Run2016C_23Sep2016_v1", "--runChunks", "101", "200"],
-                           ["SingleElectron_Run2016C_23Sep2016_v1", "--runChunks", "201", "300"],
-                           ["SingleElectron_Run2016C_23Sep2016_v1", "--runChunks", "301", "400"],
-                           #D
-                           ["SingleElectron_Run2016D_23Sep2016_v1", "--runChunks", "0",   "100"],
-                           ["SingleElectron_Run2016D_23Sep2016_v1", "--runChunks", "101", "200"],
-                           ["SingleElectron_Run2016D_23Sep2016_v1", "--runChunks", "201", "300"],
-                           ["SingleElectron_Run2016D_23Sep2016_v1", "--runChunks", "301", "400"],
-                           ["SingleElectron_Run2016D_23Sep2016_v1", "--runChunks", "401", "500"],
-                           ["SingleElectron_Run2016D_23Sep2016_v1", "--runChunks", "501", "600"],
-                           #E
-                           ["SingleElectron_Run2016E_23Sep2016_v1", "--runChunks", "0",   "100"],
-                           ["SingleElectron_Run2016E_23Sep2016_v1", "--runChunks", "101", "200"],
-                           ["SingleElectron_Run2016E_23Sep2016_v1", "--runChunks", "201", "300"],
-                           ["SingleElectron_Run2016E_23Sep2016_v1", "--runChunks", "301", "400"],
-                           ["SingleElectron_Run2016E_23Sep2016_v1", "--runChunks", "401", "500"],
-                           #F
-                           ["SingleElectron_Run2016F_23Sep2016_v1", "--runChunks", "0",   "100"],
-                           ["SingleElectron_Run2016F_23Sep2016_v1", "--runChunks", "101", "200"],
-                           ["SingleElectron_Run2016F_23Sep2016_v1", "--runChunks", "201", "300"],
-                           ["SingleElectron_Run2016F_23Sep2016_v1", "--runChunks", "301", "400"],
-                           #G
-                           ["SingleElectron_Run2016G_23Sep2016_v1", "--runChunks", "0",   "100"],
-                           ["SingleElectron_Run2016G_23Sep2016_v1", "--runChunks", "101", "200"],
-                           ["SingleElectron_Run2016G_23Sep2016_v1", "--runChunks", "201", "300"],
-                           ["SingleElectron_Run2016G_23Sep2016_v1", "--runChunks", "301", "400"],
-                           ["SingleElectron_Run2016G_23Sep2016_v1", "--runChunks", "401", "500"],
-                           ["SingleElectron_Run2016G_23Sep2016_v1", "--runChunks", "501", "600"],
-                           ["SingleElectron_Run2016G_23Sep2016_v1", "--runChunks", "601", "700"],
-                           ["SingleElectron_Run2016G_23Sep2016_v1", "--runChunks", "701", "800"],
-                           ["SingleElectron_Run2016G_23Sep2016_v1", "--runChunks", "801", "900"],
-                         ]},
-   
-   'data_el_b':{
-               'samples':[
-                           ["SingleElectron_Run2016B_23Sep2016_v3", "--runChunks", "0",    "100"],
-                           ["SingleElectron_Run2016B_23Sep2016_v3", "--runChunks", "101",  "200"],
-                           ["SingleElectron_Run2016B_23Sep2016_v3", "--runChunks", "201",  "300"],
-                           ["SingleElectron_Run2016B_23Sep2016_v3", "--runChunks", "301",  "400"],
-                           ["SingleElectron_Run2016B_23Sep2016_v3", "--runChunks", "401",  "500"],
-                           ["SingleElectron_Run2016B_23Sep2016_v3", "--runChunks", "501",  "600"],
-                           ["SingleElectron_Run2016B_23Sep2016_v3", "--runChunks", "601",  "700"],
-                           ["SingleElectron_Run2016B_23Sep2016_v3", "--runChunks", "701",  "800"],
-                           ["SingleElectron_Run2016B_23Sep2016_v3", "--runChunks", "801",  "900"],
-                           ["SingleElectron_Run2016B_23Sep2016_v3", "--runChunks", "901",  "1000"],
-                           ["SingleElectron_Run2016B_23Sep2016_v3", "--runChunks", "1001", "1100"],
-                         ]},
-   
-   'data_el_c':{
-               'samples':[
-                           ["SingleElectron_Run2016C_23Sep2016_v1", "--runChunks", "0",   "100"],
-                           ["SingleElectron_Run2016C_23Sep2016_v1", "--runChunks", "101", "200"],
-                           ["SingleElectron_Run2016C_23Sep2016_v1", "--runChunks", "201", "300"],
-                           ["SingleElectron_Run2016C_23Sep2016_v1", "--runChunks", "301", "400"],
-                         ]},
-   
-   'data_el_d':{
-               'samples':[
-                           ["SingleElectron_Run2016D_23Sep2016_v1", "--runChunks", "0",   "100"],
-                           ["SingleElectron_Run2016D_23Sep2016_v1", "--runChunks", "101", "200"],
-                           ["SingleElectron_Run2016D_23Sep2016_v1", "--runChunks", "201", "300"],
-                           ["SingleElectron_Run2016D_23Sep2016_v1", "--runChunks", "301", "400"],
-                           ["SingleElectron_Run2016D_23Sep2016_v1", "--runChunks", "401", "500"],
-                           ["SingleElectron_Run2016D_23Sep2016_v1", "--runChunks", "501", "600"],
-                         ]},
-   
-   'data_el_e':{
-               'samples':[
-                           ["SingleElectron_Run2016E_23Sep2016_v1", "--runChunks", "0",   "100"],
-                           ["SingleElectron_Run2016E_23Sep2016_v1", "--runChunks", "101", "200"],
-                           ["SingleElectron_Run2016E_23Sep2016_v1", "--runChunks", "201", "300"],
-                           ["SingleElectron_Run2016E_23Sep2016_v1", "--runChunks", "301", "400"],
-                           ["SingleElectron_Run2016E_23Sep2016_v1", "--runChunks", "401", "500"],
-                         ]},
-   
-   'data_el_f':{
-               'samples':[
-                           ["SingleElectron_Run2016F_23Sep2016_v1", "--runChunks", "0",   "100"],
-                           ["SingleElectron_Run2016F_23Sep2016_v1", "--runChunks", "101", "200"],
-                           ["SingleElectron_Run2016F_23Sep2016_v1", "--runChunks", "201", "300"],
-                           ["SingleElectron_Run2016F_23Sep2016_v1", "--runChunks", "301", "400"],
-                         ]},
-   
-   'data_el_g':{
-               'samples':[
-                           ["SingleElectron_Run2016G_23Sep2016_v1", "--runChunks", "0",   "100"],
-                           ["SingleElectron_Run2016G_23Sep2016_v1", "--runChunks", "101", "200"],
-                           ["SingleElectron_Run2016G_23Sep2016_v1", "--runChunks", "201", "300"],
-                           ["SingleElectron_Run2016G_23Sep2016_v1", "--runChunks", "301", "400"],
-                           ["SingleElectron_Run2016G_23Sep2016_v1", "--runChunks", "401", "500"],
-                           ["SingleElectron_Run2016G_23Sep2016_v1", "--runChunks", "501", "600"],
-                           ["SingleElectron_Run2016G_23Sep2016_v1", "--runChunks", "601", "700"],
-                           ["SingleElectron_Run2016G_23Sep2016_v1", "--runChunks", "701", "800"],
-                           ["SingleElectron_Run2016G_23Sep2016_v1", "--runChunks", "801", "900"],
-                         ]},
-   
-   #NOTE: H Re-Reco not available
-   
    # SingleMuon PD
    
    'data_mu':{
@@ -516,120 +216,6 @@ sampleSets = {
                          ],
                   },
    
-   'data_mu_chunks':{
-               'samples':[
-                           #B (v3)
-                           ["SingleMuon_Run2016B_23Sep2016_v3", "--runChunks", "0",    "100"],
-                           ["SingleMuon_Run2016B_23Sep2016_v3", "--runChunks", "101",  "200"],
-                           ["SingleMuon_Run2016B_23Sep2016_v3", "--runChunks", "201",  "300"],
-                           ["SingleMuon_Run2016B_23Sep2016_v3", "--runChunks", "301",  "400"],
-                           ["SingleMuon_Run2016B_23Sep2016_v3", "--runChunks", "401",  "500"],
-                           ["SingleMuon_Run2016B_23Sep2016_v3", "--runChunks", "501",  "600"],
-                           ["SingleMuon_Run2016B_23Sep2016_v3", "--runChunks", "601",  "700"],
-                           ["SingleMuon_Run2016B_23Sep2016_v3", "--runChunks", "701",  "800"],
-                           ["SingleMuon_Run2016B_23Sep2016_v3", "--runChunks", "801",  "900"],
-                           ["SingleMuon_Run2016B_23Sep2016_v3", "--runChunks", "901",  "1000"],
-                           ["SingleMuon_Run2016B_23Sep2016_v3", "--runChunks", "1001", "1100"],
-                           #C  
-                           ["SingleMuon_Run2016C_23Sep2016_v1", "--runChunks", "0",   "100"],
-                           ["SingleMuon_Run2016C_23Sep2016_v1", "--runChunks", "101", "200"],
-                           ["SingleMuon_Run2016C_23Sep2016_v1", "--runChunks", "201", "300"],
-                           ["SingleMuon_Run2016C_23Sep2016_v1", "--runChunks", "301", "400"],
-                           #D
-                           ["SingleMuon_Run2016D_23Sep2016_v1", "--runChunks", "0",   "100"],
-                           ["SingleMuon_Run2016D_23Sep2016_v1", "--runChunks", "101", "200"],
-                           ["SingleMuon_Run2016D_23Sep2016_v1", "--runChunks", "201", "300"],
-                           ["SingleMuon_Run2016D_23Sep2016_v1", "--runChunks", "301", "400"],
-                           ["SingleMuon_Run2016D_23Sep2016_v1", "--runChunks", "401", "500"],
-                           ["SingleMuon_Run2016D_23Sep2016_v1", "--runChunks", "501", "600"],
-                           #E
-                           ["SingleMuon_Run2016E_23Sep2016_v1", "--runChunks", "0",   "100"],
-                           ["SingleMuon_Run2016E_23Sep2016_v1", "--runChunks", "101", "200"],
-                           ["SingleMuon_Run2016E_23Sep2016_v1", "--runChunks", "201", "300"],
-                           ["SingleMuon_Run2016E_23Sep2016_v1", "--runChunks", "301", "400"],
-                           ["SingleMuon_Run2016E_23Sep2016_v1", "--runChunks", "401", "500"],
-                           #F
-                           ["SingleMuon_Run2016F_23Sep2016_v1", "--runChunks", "0",   "100"],
-                           ["SingleMuon_Run2016F_23Sep2016_v1", "--runChunks", "101", "200"],
-                           ["SingleMuon_Run2016F_23Sep2016_v1", "--runChunks", "201", "300"],
-                           ["SingleMuon_Run2016F_23Sep2016_v1", "--runChunks", "301", "400"],
-                           #G
-                           ["SingleMuon_Run2016G_23Sep2016_v1", "--runChunks", "0",   "100"],
-                           ["SingleMuon_Run2016G_23Sep2016_v1", "--runChunks", "101", "200"],
-                           ["SingleMuon_Run2016G_23Sep2016_v1", "--runChunks", "201", "300"],
-                           ["SingleMuon_Run2016G_23Sep2016_v1", "--runChunks", "301", "400"],
-                           ["SingleMuon_Run2016G_23Sep2016_v1", "--runChunks", "401", "500"],
-                           ["SingleMuon_Run2016G_23Sep2016_v1", "--runChunks", "501", "600"],
-                           ["SingleMuon_Run2016G_23Sep2016_v1", "--runChunks", "601", "700"],
-                           ["SingleMuon_Run2016G_23Sep2016_v1", "--runChunks", "701", "800"],
-                           ["SingleMuon_Run2016G_23Sep2016_v1", "--runChunks", "801", "900"],
-                         ]},
-   
-   'data_mu_b':{
-               'samples':[
-                           ["SingleMuon_Run2016B_23Sep2016_v3", "--runChunks", "0",    "100"],
-                           ["SingleMuon_Run2016B_23Sep2016_v3", "--runChunks", "101",  "200"],
-                           ["SingleMuon_Run2016B_23Sep2016_v3", "--runChunks", "201",  "300"],
-                           ["SingleMuon_Run2016B_23Sep2016_v3", "--runChunks", "301",  "400"],
-                           ["SingleMuon_Run2016B_23Sep2016_v3", "--runChunks", "401",  "500"],
-                           ["SingleMuon_Run2016B_23Sep2016_v3", "--runChunks", "501",  "600"],
-                           ["SingleMuon_Run2016B_23Sep2016_v3", "--runChunks", "601",  "700"],
-                           ["SingleMuon_Run2016B_23Sep2016_v3", "--runChunks", "701",  "800"],
-                           ["SingleMuon_Run2016B_23Sep2016_v3", "--runChunks", "801",  "900"],
-                           ["SingleMuon_Run2016B_23Sep2016_v3", "--runChunks", "901",  "1000"],
-                           ["SingleMuon_Run2016B_23Sep2016_v3", "--runChunks", "1001", "1100"],
-                         ]},
-   
-   'data_mu_c':{
-               'samples':[
-                           ["SingleMuon_Run2016C_23Sep2016_v1", "--runChunks", "0",   "100"],
-                           ["SingleMuon_Run2016C_23Sep2016_v1", "--runChunks", "101", "200"],
-                           ["SingleMuon_Run2016C_23Sep2016_v1", "--runChunks", "201", "300"],
-                           ["SingleMuon_Run2016C_23Sep2016_v1", "--runChunks", "301", "400"],
-                         ]},
-   
-   'data_mu_d':{
-               'samples':[
-                           ["SingleMuon_Run2016D_23Sep2016_v1", "--runChunks", "0",   "100"],
-                           ["SingleMuon_Run2016D_23Sep2016_v1", "--runChunks", "101", "200"],
-                           ["SingleMuon_Run2016D_23Sep2016_v1", "--runChunks", "201", "300"],
-                           ["SingleMuon_Run2016D_23Sep2016_v1", "--runChunks", "301", "400"],
-                           ["SingleMuon_Run2016D_23Sep2016_v1", "--runChunks", "401", "500"],
-                           ["SingleMuon_Run2016D_23Sep2016_v1", "--runChunks", "501", "600"],
-                         ]},
-   
-   'data_mu_e':{
-               'samples':[
-                           ["SingleMuon_Run2016E_23Sep2016_v1", "--runChunks", "0",   "100"],
-                           ["SingleMuon_Run2016E_23Sep2016_v1", "--runChunks", "101", "200"],
-                           ["SingleMuon_Run2016E_23Sep2016_v1", "--runChunks", "201", "300"],
-                           ["SingleMuon_Run2016E_23Sep2016_v1", "--runChunks", "301", "400"],
-                           ["SingleMuon_Run2016E_23Sep2016_v1", "--runChunks", "401", "500"],
-                         ]},
-   
-   'data_mu_f':{
-               'samples':[
-                           ["SingleMuon_Run2016F_23Sep2016_v1", "--runChunks", "0",   "100"],
-                           ["SingleMuon_Run2016F_23Sep2016_v1", "--runChunks", "101", "200"],
-                           ["SingleMuon_Run2016F_23Sep2016_v1", "--runChunks", "201", "300"],
-                           ["SingleMuon_Run2016F_23Sep2016_v1", "--runChunks", "301", "400"],
-                         ]},
-   
-   'data_mu_g':{
-               'samples':[
-                           ["SingleMuon_Run2016G_23Sep2016_v1", "--runChunks", "0",   "100"],
-                           ["SingleMuon_Run2016G_23Sep2016_v1", "--runChunks", "101", "200"],
-                           ["SingleMuon_Run2016G_23Sep2016_v1", "--runChunks", "201", "300"],
-                           ["SingleMuon_Run2016G_23Sep2016_v1", "--runChunks", "301", "400"],
-                           ["SingleMuon_Run2016G_23Sep2016_v1", "--runChunks", "401", "500"],
-                           ["SingleMuon_Run2016G_23Sep2016_v1", "--runChunks", "501", "600"],
-                           ["SingleMuon_Run2016G_23Sep2016_v1", "--runChunks", "601", "700"],
-                           ["SingleMuon_Run2016G_23Sep2016_v1", "--runChunks", "701", "800"],
-                           ["SingleMuon_Run2016G_23Sep2016_v1", "--runChunks", "801", "900"],
-                         ]},
-   
-   #NOTE: H Re-Reco not available
-   
    # JetHT PD
    'data_jet':{
                'samples':[
@@ -641,120 +227,6 @@ sampleSets = {
                            "JetHT_Run2016G_23Sep2016_v1",
                          ],
                   },
-   
-   'data_jet_chunks':{
-               'samples':[
-                           #B (v3)
-                           ["JetHT_Run2016B_23Sep2016_v3", "--runChunks", "0",    "100"], 
-                           ["JetHT_Run2016B_23Sep2016_v3", "--runChunks", "101",  "200"], 
-                           ["JetHT_Run2016B_23Sep2016_v3", "--runChunks", "201",  "300"], 
-                           ["JetHT_Run2016B_23Sep2016_v3", "--runChunks", "301",  "400"], 
-                           ["JetHT_Run2016B_23Sep2016_v3", "--runChunks", "401",  "500"], 
-                           ["JetHT_Run2016B_23Sep2016_v3", "--runChunks", "501",  "600"], 
-                           ["JetHT_Run2016B_23Sep2016_v3", "--runChunks", "601",  "700"], 
-                           ["JetHT_Run2016B_23Sep2016_v3", "--runChunks", "701",  "800"], 
-                           ["JetHT_Run2016B_23Sep2016_v3", "--runChunks", "801",  "900"], 
-                           ["JetHT_Run2016B_23Sep2016_v3", "--runChunks", "901",  "1000"], 
-                           ["JetHT_Run2016B_23Sep2016_v3", "--runChunks", "1001", "1100"], 
-                           #C  
-                           ["JetHT_Run2016C_23Sep2016_v1", "--runChunks", "0",   "100"],
-                           ["JetHT_Run2016C_23Sep2016_v1", "--runChunks", "101", "200"],
-                           ["JetHT_Run2016C_23Sep2016_v1", "--runChunks", "201", "300"],
-                           ["JetHT_Run2016C_23Sep2016_v1", "--runChunks", "301", "400"],
-                           #D
-                           ["JetHT_Run2016D_23Sep2016_v1", "--runChunks", "0",   "100"],
-                           ["JetHT_Run2016D_23Sep2016_v1", "--runChunks", "101", "200"],
-                           ["JetHT_Run2016D_23Sep2016_v1", "--runChunks", "201", "300"],
-                           ["JetHT_Run2016D_23Sep2016_v1", "--runChunks", "301", "400"],
-                           ["JetHT_Run2016D_23Sep2016_v1", "--runChunks", "401", "500"],
-                           ["JetHT_Run2016D_23Sep2016_v1", "--runChunks", "501", "600"],
-                           #E
-                           ["JetHT_Run2016E_23Sep2016_v1", "--runChunks", "0",   "100"],
-                           ["JetHT_Run2016E_23Sep2016_v1", "--runChunks", "101", "200"],
-                           ["JetHT_Run2016E_23Sep2016_v1", "--runChunks", "201", "300"],
-                           ["JetHT_Run2016E_23Sep2016_v1", "--runChunks", "301", "400"],
-                           ["JetHT_Run2016E_23Sep2016_v1", "--runChunks", "401", "500"],
-                           #F
-                           ["JetHT_Run2016F_23Sep2016_v1", "--runChunks", "0",   "100"],
-                           ["JetHT_Run2016F_23Sep2016_v1", "--runChunks", "101", "200"],
-                           ["JetHT_Run2016F_23Sep2016_v1", "--runChunks", "201", "300"],
-                           ["JetHT_Run2016F_23Sep2016_v1", "--runChunks", "301", "400"],
-                           #G
-                           ["JetHT_Run2016G_23Sep2016_v1", "--runChunks", "0",   "100"],
-                           ["JetHT_Run2016G_23Sep2016_v1", "--runChunks", "101", "200"],
-                           ["JetHT_Run2016G_23Sep2016_v1", "--runChunks", "201", "300"],
-                           ["JetHT_Run2016G_23Sep2016_v1", "--runChunks", "301", "400"],
-                           ["JetHT_Run2016G_23Sep2016_v1", "--runChunks", "401", "500"],
-                           ["JetHT_Run2016G_23Sep2016_v1", "--runChunks", "501", "600"],
-                           ["JetHT_Run2016G_23Sep2016_v1", "--runChunks", "601", "700"],
-                           ["JetHT_Run2016G_23Sep2016_v1", "--runChunks", "701", "800"],
-                           ["JetHT_Run2016G_23Sep2016_v1", "--runChunks", "801", "900"],
-                         ]},
-   
-   'data_jet_b':{
-               'samples':[
-                           ["JetHT_Run2016B_23Sep2016_v3", "--runChunks", "0",    "100"],
-                           ["JetHT_Run2016B_23Sep2016_v3", "--runChunks", "101",  "200"],
-                           ["JetHT_Run2016B_23Sep2016_v3", "--runChunks", "201",  "300"],
-                           ["JetHT_Run2016B_23Sep2016_v3", "--runChunks", "301",  "400"],
-                           ["JetHT_Run2016B_23Sep2016_v3", "--runChunks", "401",  "500"],
-                           ["JetHT_Run2016B_23Sep2016_v3", "--runChunks", "501",  "600"],
-                           ["JetHT_Run2016B_23Sep2016_v3", "--runChunks", "601",  "700"],
-                           ["JetHT_Run2016B_23Sep2016_v3", "--runChunks", "701",  "800"],
-                           ["JetHT_Run2016B_23Sep2016_v3", "--runChunks", "801",  "900"],
-                           ["JetHT_Run2016B_23Sep2016_v3", "--runChunks", "901",  "1000"],
-                           ["JetHT_Run2016B_23Sep2016_v3", "--runChunks", "1001", "1100"],
-                         ]},
-   
-   'data_jet_c':{
-               'samples':[
-                           ["JetHT_Run2016C_23Sep2016_v1", "--runChunks", "0",   "100"],
-                           ["JetHT_Run2016C_23Sep2016_v1", "--runChunks", "101", "200"],
-                           ["JetHT_Run2016C_23Sep2016_v1", "--runChunks", "201", "300"],
-                           ["JetHT_Run2016C_23Sep2016_v1", "--runChunks", "301", "400"],
-                         ]},
-   
-   'data_jet_d':{
-               'samples':[
-                           ["JetHT_Run2016D_23Sep2016_v1", "--runChunks", "0",   "100"],
-                           ["JetHT_Run2016D_23Sep2016_v1", "--runChunks", "101", "200"],
-                           ["JetHT_Run2016D_23Sep2016_v1", "--runChunks", "201", "300"],
-                           ["JetHT_Run2016D_23Sep2016_v1", "--runChunks", "301", "400"],
-                           ["JetHT_Run2016D_23Sep2016_v1", "--runChunks", "401", "500"],
-                           ["JetHT_Run2016D_23Sep2016_v1", "--runChunks", "501", "600"],
-                         ]},
-   
-   'data_jet_e':{
-               'samples':[
-                           ["JetHT_Run2016E_23Sep2016_v1", "--runChunks", "0",   "100"],
-                           ["JetHT_Run2016E_23Sep2016_v1", "--runChunks", "101", "200"],
-                           ["JetHT_Run2016E_23Sep2016_v1", "--runChunks", "201", "300"],
-                           ["JetHT_Run2016E_23Sep2016_v1", "--runChunks", "301", "400"],
-                           ["JetHT_Run2016E_23Sep2016_v1", "--runChunks", "401", "500"],
-                         ]},
-   
-   'data_jet_f':{
-               'samples':[
-                           ["JetHT_Run2016F_23Sep2016_v1", "--runChunks", "0",   "100"],
-                           ["JetHT_Run2016F_23Sep2016_v1", "--runChunks", "101", "200"],
-                           ["JetHT_Run2016F_23Sep2016_v1", "--runChunks", "201", "300"],
-                           ["JetHT_Run2016F_23Sep2016_v1", "--runChunks", "301", "400"],
-                         ]},
-   
-   'data_jet_g':{
-               'samples':[
-                           ["JetHT_Run2016G_23Sep2016_v1", "--runChunks", "0",   "100"],
-                           ["JetHT_Run2016G_23Sep2016_v1", "--runChunks", "101", "200"],
-                           ["JetHT_Run2016G_23Sep2016_v1", "--runChunks", "201", "300"],
-                           ["JetHT_Run2016G_23Sep2016_v1", "--runChunks", "301", "400"],
-                           ["JetHT_Run2016G_23Sep2016_v1", "--runChunks", "401", "500"],
-                           ["JetHT_Run2016G_23Sep2016_v1", "--runChunks", "501", "600"],
-                           ["JetHT_Run2016G_23Sep2016_v1", "--runChunks", "601", "700"],
-                           ["JetHT_Run2016G_23Sep2016_v1", "--runChunks", "701", "800"],
-                           ["JetHT_Run2016G_23Sep2016_v1", "--runChunks", "801", "900"],
-                         ]},
-   
-   #NOTE: H Re-Reco not available
    
    
    ### PromptReco (PR) ###
@@ -774,175 +246,6 @@ sampleSets = {
                          ],
                   },
    
-   'data_PR_met_chunks':{
-               'samples':[
-                           #B
-                           ["MET_Run2016B_PromptReco_v2", "--runChunks", "0",    "100"],
-                           ["MET_Run2016B_PromptReco_v2", "--runChunks", "101",  "200"],
-                           ["MET_Run2016B_PromptReco_v2", "--runChunks", "201",  "300"],
-                           ["MET_Run2016B_PromptReco_v2", "--runChunks", "301",  "400"],
-                           ["MET_Run2016B_PromptReco_v2", "--runChunks", "401",  "500"],
-                           ["MET_Run2016B_PromptReco_v2", "--runChunks", "501",  "600"],
-                           ["MET_Run2016B_PromptReco_v2", "--runChunks", "601",  "700"],
-                           ["MET_Run2016B_PromptReco_v2", "--runChunks", "701",  "800"],
-                           ["MET_Run2016B_PromptReco_v2", "--runChunks", "801",  "900"],
-                           ["MET_Run2016B_PromptReco_v2", "--runChunks", "901",  "1000"],
-                           ["MET_Run2016B_PromptReco_v2", "--runChunks", "1001", "1100"],
-                           ["MET_Run2016B_PromptReco_v2", "--runChunks", "1100", "1200"],
-                           #C 
-                           ["MET_Run2016C_PromptReco_v2", "--runChunks", "0",   "100"],
-                           ["MET_Run2016C_PromptReco_v2", "--runChunks", "101", "200"],
-                           ["MET_Run2016C_PromptReco_v2", "--runChunks", "201", "300"],
-                           ["MET_Run2016C_PromptReco_v2", "--runChunks", "301", "400"],
-                           #D
-                           ["MET_Run2016D_PromptReco_v2", "--runChunks", "0",   "100"],
-                           ["MET_Run2016D_PromptReco_v2", "--runChunks", "101", "200"],
-                           ["MET_Run2016D_PromptReco_v2", "--runChunks", "201", "300"],
-                           ["MET_Run2016D_PromptReco_v2", "--runChunks", "301", "400"],
-                           ["MET_Run2016D_PromptReco_v2", "--runChunks", "401", "500"],
-                           ["MET_Run2016D_PromptReco_v2", "--runChunks", "501", "600"],
-                           #E
-                           ["MET_Run2016E_PromptReco_v2", "--runChunks", "0",   "100"],
-                           ["MET_Run2016E_PromptReco_v2", "--runChunks", "101", "200"],
-                           ["MET_Run2016E_PromptReco_v2", "--runChunks", "201", "300"],
-                           ["MET_Run2016E_PromptReco_v2", "--runChunks", "301", "400"],
-                           ["MET_Run2016E_PromptReco_v2", "--runChunks", "401", "500"],
-                           ##F 
-                           #["MET_Run2016F_PromptReco_v1", "--runChunks", "0",   "100"],
-                           #["MET_Run2016F_PromptReco_v1", "--runChunks", "101", "200"],
-                           #["MET_Run2016F_PromptReco_v1", "--runChunks", "201", "300"],
-                           #["MET_Run2016F_PromptReco_v1", "--runChunks", "301", "400"],
-                           #["MET_Run2016F_PromptReco_v1", "--runChunks", "401", "500"],
-                           #["MET_Run2016F_PromptReco_v1", "--runChunks", "501", "600"],
-                           #G 
-                           ["MET_Run2016G_PromptReco_v1", "--runChunks", "0",   "100"],
-                           ["MET_Run2016G_PromptReco_v1", "--runChunks", "101", "200"],
-                           ["MET_Run2016G_PromptReco_v1", "--runChunks", "201", "300"],
-                           ["MET_Run2016G_PromptReco_v1", "--runChunks", "301", "400"],
-                           ["MET_Run2016G_PromptReco_v1", "--runChunks", "401", "500"],
-                           ["MET_Run2016G_PromptReco_v1", "--runChunks", "501", "600"],
-                           ["MET_Run2016G_PromptReco_v1", "--runChunks", "601", "700"],
-                           ["MET_Run2016G_PromptReco_v1", "--runChunks", "701", "800"],
-                           ["MET_Run2016G_PromptReco_v1", "--runChunks", "801", "900"],
-                           #H 
-                           #["MET_Run2016H_PromptReco_v1", "--runChunks", "0",   "100"],
-                           #["MET_Run2016H_PromptReco_v1", "--runChunks", "101", "200"],
-                           #["MET_Run2016H_PromptReco_v1", "--runChunks", "201", "300"],
-                           #["MET_Run2016H_PromptReco_v1", "--runChunks", "301", "400"],
-                           #["MET_Run2016H_PromptReco_v1", "--runChunks", "401", "500"],
-                           #["MET_Run2016H_PromptReco_v1", "--runChunks", "501", "600"],
-                           #["MET_Run2016H_PromptReco_v1", "--runChunks", "601", "700"],
-                           #["MET_Run2016H_PromptReco_v1", "--runChunks", "701", "800"],
-                           #["MET_Run2016H_PromptReco_v1", "--runChunks", "801", "900"],
-                           #["MET_Run2016H_PromptReco_v1", "--runChunks", "901", "1000"],
-                           
-                           ["MET_Run2016H_PromptReco_v2", "--runChunks", "0",   "100"],
-                           ["MET_Run2016H_PromptReco_v2", "--runChunks", "101", "200"],
-                           ["MET_Run2016H_PromptReco_v2", "--runChunks", "201", "300"],
-                           ["MET_Run2016H_PromptReco_v2", "--runChunks", "301", "400"],
-                           ["MET_Run2016H_PromptReco_v2", "--runChunks", "401", "500"],
-                           ["MET_Run2016H_PromptReco_v2", "--runChunks", "501", "600"],
-                           ["MET_Run2016H_PromptReco_v2", "--runChunks", "601", "700"],
-                           ["MET_Run2016H_PromptReco_v2", "--runChunks", "701", "800"],
-                           ["MET_Run2016H_PromptReco_v2", "--runChunks", "801", "900"],
-                           ["MET_Run2016H_PromptReco_v2", "--runChunks", "901", "1000"],
-                           
-                           ["MET_Run2016H_PromptReco_v3", "--runChunks", "0",   "30"],
-                         ]},
-   
-   'data_PR_met_b':{
-               'samples':[
-                           ["MET_Run2016B_PromptReco_v2", "--runChunks", "0",    "100"],
-                           ["MET_Run2016B_PromptReco_v2", "--runChunks", "101",  "200"],
-                           ["MET_Run2016B_PromptReco_v2", "--runChunks", "201",  "300"],
-                           ["MET_Run2016B_PromptReco_v2", "--runChunks", "301",  "400"],
-                           ["MET_Run2016B_PromptReco_v2", "--runChunks", "401",  "500"],
-                           ["MET_Run2016B_PromptReco_v2", "--runChunks", "501",  "600"],
-                           ["MET_Run2016B_PromptReco_v2", "--runChunks", "601",  "700"],
-                           ["MET_Run2016B_PromptReco_v2", "--runChunks", "701",  "800"],
-                           ["MET_Run2016B_PromptReco_v2", "--runChunks", "801",  "900"],
-                           ["MET_Run2016B_PromptReco_v2", "--runChunks", "901",  "1000"],
-                           ["MET_Run2016B_PromptReco_v2", "--runChunks", "1001", "1100"],
-                           ["MET_Run2016B_PromptReco_v2", "--runChunks", "1100", "1200"],
-                         ]},
-   
-   'data_PR_met_c':{
-               'samples':[
-                           ["MET_Run2016C_PromptReco_v2", "--runChunks", "0",   "100"],
-                           ["MET_Run2016C_PromptReco_v2", "--runChunks", "101", "200"],
-                           ["MET_Run2016C_PromptReco_v2", "--runChunks", "201", "300"],
-                           ["MET_Run2016C_PromptReco_v2", "--runChunks", "301", "400"],
-                         ]},
-   
-   'data_PR_met_d':{
-               'samples':[
-                           ["MET_Run2016D_PromptReco_v2", "--runChunks", "0",   "100"],
-                           ["MET_Run2016D_PromptReco_v2", "--runChunks", "101", "200"],
-                           ["MET_Run2016D_PromptReco_v2", "--runChunks", "201", "300"],
-                           ["MET_Run2016D_PromptReco_v2", "--runChunks", "301", "400"],
-                           ["MET_Run2016D_PromptReco_v2", "--runChunks", "401", "500"],
-                           ["MET_Run2016D_PromptReco_v2", "--runChunks", "501", "600"],
-                         ]},
-   
-   'data_PR_met_e':{
-               'samples':[
-                           ["MET_Run2016E_PromptReco_v2", "--runChunks", "0",   "100"],
-                           ["MET_Run2016E_PromptReco_v2", "--runChunks", "101", "200"],
-                           ["MET_Run2016E_PromptReco_v2", "--runChunks", "201", "300"],
-                           ["MET_Run2016E_PromptReco_v2", "--runChunks", "301", "400"],
-                           ["MET_Run2016E_PromptReco_v2", "--runChunks", "401", "500"],
-                         ]},
-   
-   #'data_PR_met_f':{
-   #            'samples':[
-   #                        ["MET_Run2016F_PromptReco_v1", "--runChunks", "0",   "100"],
-   #                        ["MET_Run2016F_PromptReco_v1", "--runChunks", "101", "200"],
-   #                        ["MET_Run2016F_PromptReco_v1", "--runChunks", "201", "300"],
-   #                        ["MET_Run2016F_PromptReco_v1", "--runChunks", "301", "400"],
-   #                        ["MET_Run2016F_PromptReco_v1", "--runChunks", "401", "500"],
-   #                        ["MET_Run2016F_PromptReco_v1", "--runChunks", "501", "600"],
-   #                      ]},
-   
-   'data_PR_met_g':{
-               'samples':[
-                           ["MET_Run2016G_PromptReco_v1", "--runChunks", "0",   "100"],
-                           ["MET_Run2016G_PromptReco_v1", "--runChunks", "101", "200"],
-                           ["MET_Run2016G_PromptReco_v1", "--runChunks", "201", "300"],
-                           ["MET_Run2016G_PromptReco_v1", "--runChunks", "301", "400"],
-                           ["MET_Run2016G_PromptReco_v1", "--runChunks", "401", "500"],
-                           ["MET_Run2016G_PromptReco_v1", "--runChunks", "501", "600"],
-                           ["MET_Run2016G_PromptReco_v1", "--runChunks", "601", "700"],
-                           ["MET_Run2016G_PromptReco_v1", "--runChunks", "701", "800"],
-                           ["MET_Run2016G_PromptReco_v1", "--runChunks", "801", "900"],
-                         ]},
-   
-   'data_PR_met_h':{
-               'samples':[
-                           #["MET_Run2016H_PromptReco_v1", "--runChunks", "0",   "100"],
-                           #["MET_Run2016H_PromptReco_v1", "--runChunks", "101", "200"],
-                           #["MET_Run2016H_PromptReco_v1", "--runChunks", "201", "300"],
-                           #["MET_Run2016H_PromptReco_v1", "--runChunks", "301", "400"],
-                           #["MET_Run2016H_PromptReco_v1", "--runChunks", "401", "500"],
-                           #["MET_Run2016H_PromptReco_v1", "--runChunks", "501", "600"],
-                           #["MET_Run2016H_PromptReco_v1", "--runChunks", "601", "700"],
-                           #["MET_Run2016H_PromptReco_v1", "--runChunks", "701", "800"],
-                           #["MET_Run2016H_PromptReco_v1", "--runChunks", "801", "900"],
-                           #["MET_Run2016H_PromptReco_v1", "--runChunks", "901", "1000"],
-                           
-                           ["MET_Run2016H_PromptReco_v2", "--runChunks", "0",   "100"],
-                           ["MET_Run2016H_PromptReco_v2", "--runChunks", "101", "200"],
-                           ["MET_Run2016H_PromptReco_v2", "--runChunks", "201", "300"],
-                           ["MET_Run2016H_PromptReco_v2", "--runChunks", "301", "400"],
-                           ["MET_Run2016H_PromptReco_v2", "--runChunks", "401", "500"],
-                           ["MET_Run2016H_PromptReco_v2", "--runChunks", "501", "600"],
-                           ["MET_Run2016H_PromptReco_v2", "--runChunks", "601", "700"],
-                           ["MET_Run2016H_PromptReco_v2", "--runChunks", "701", "800"],
-                           ["MET_Run2016H_PromptReco_v2", "--runChunks", "801", "900"],
-                           ["MET_Run2016H_PromptReco_v2", "--runChunks", "901", "1000"],
-                           
-                           ["MET_Run2016H_PromptReco_v3", "--runChunks", "0",   "30"],
-                         ]},
-   
    # SingleElectron PD
    
    'data_PR_el':{
@@ -958,170 +261,6 @@ sampleSets = {
                            "SingleElectron_Run2016H_PromptReco_v3", #NOTE: use?
                          ],
                },
-   
-   'data_PR_el_chunks':{
-               'samples':[
-                           #B
-                           ["SingleElectron_Run2016B_PromptReco_v2", "--runChunks", "0",    "100"],
-                           ["SingleElectron_Run2016B_PromptReco_v2", "--runChunks", "101",  "200"],
-                           ["SingleElectron_Run2016B_PromptReco_v2", "--runChunks", "201",  "300"],
-                           ["SingleElectron_Run2016B_PromptReco_v2", "--runChunks", "301",  "400"],
-                           ["SingleElectron_Run2016B_PromptReco_v2", "--runChunks", "401",  "500"],
-                           ["SingleElectron_Run2016B_PromptReco_v2", "--runChunks", "501",  "600"],
-                           ["SingleElectron_Run2016B_PromptReco_v2", "--runChunks", "601",  "700"],
-                           ["SingleElectron_Run2016B_PromptReco_v2", "--runChunks", "701",  "800"],
-                           ["SingleElectron_Run2016B_PromptReco_v2", "--runChunks", "801",  "900"],
-                           ["SingleElectron_Run2016B_PromptReco_v2", "--runChunks", "901",  "1000"],
-                           ["SingleElectron_Run2016B_PromptReco_v2", "--runChunks", "1001", "1100"],
-                           ["SingleElectron_Run2016B_PromptReco_v2", "--runChunks", "1100", "1200"],
-                           #C
-                           ["SingleElectron_Run2016C_PromptReco_v2", "--runChunks", "0",   "100"],
-                           ["SingleElectron_Run2016C_PromptReco_v2", "--runChunks", "101", "200"],
-                           ["SingleElectron_Run2016C_PromptReco_v2", "--runChunks", "201", "300"],
-                           ["SingleElectron_Run2016C_PromptReco_v2", "--runChunks", "301", "400"],
-                           #D 
-                           ["SingleElectron_Run2016D_PromptReco_v2", "--runChunks", "0",   "100"],
-                           ["SingleElectron_Run2016D_PromptReco_v2", "--runChunks", "101", "200"],
-                           ["SingleElectron_Run2016D_PromptReco_v2", "--runChunks", "201", "300"],
-                           ["SingleElectron_Run2016D_PromptReco_v2", "--runChunks", "301", "400"],
-                           ["SingleElectron_Run2016D_PromptReco_v2", "--runChunks", "401", "500"],
-                           ["SingleElectron_Run2016D_PromptReco_v2", "--runChunks", "501", "600"],
-                           ##E 
-                           #["SingleElectron_Run2016E_PromptReco_v2", "--runChunks", "0",   "100"],
-                           #["SingleElectron_Run2016E_PromptReco_v2", "--runChunks", "101", "200"],
-                           #["SingleElectron_Run2016E_PromptReco_v2", "--runChunks", "201", "300"],
-                           #["SingleElectron_Run2016E_PromptReco_v2", "--runChunks", "301", "400"],
-                           #["SingleElectron_Run2016E_PromptReco_v2", "--runChunks", "401", "500"],
-                           ##F 
-                           #["SingleElectron_Run2016F_PromptReco_v1", "--runChunks", "0",   "100"],
-                           #["SingleElectron_Run2016F_PromptReco_v1", "--runChunks", "101", "200"],
-                           #["SingleElectron_Run2016F_PromptReco_v1", "--runChunks", "201", "300"],
-                           #["SingleElectron_Run2016F_PromptReco_v1", "--runChunks", "301", "400"],
-                           #["SingleElectron_Run2016F_PromptReco_v1", "--runChunks", "401", "500"],
-                           #["SingleElectron_Run2016F_PromptReco_v1", "--runChunks", "501", "600"],
-                           ##G 
-                           #["SingleElectron_Run2016G_PromptReco_v1", "--runChunks", "0",   "100"],
-                           #["SingleElectron_Run2016G_PromptReco_v1", "--runChunks", "101", "200"],
-                           #["SingleElectron_Run2016G_PromptReco_v1", "--runChunks", "201", "300"],
-                           #["SingleElectron_Run2016G_PromptReco_v1", "--runChunks", "301", "400"],
-                           #["SingleElectron_Run2016G_PromptReco_v1", "--runChunks", "401", "500"],
-                           #["SingleElectron_Run2016G_PromptReco_v1", "--runChunks", "501", "600"],
-                           #H
-                           #["SingleElectron_Run2016H_PromptReco_v1", "--runChunks", "0",   "100"],
-                           #["SingleElectron_Run2016H_PromptReco_v1", "--runChunks", "101", "200"],
-                           #["SingleElectron_Run2016H_PromptReco_v1", "--runChunks", "201", "300"],
-                           #["SingleElectron_Run2016H_PromptReco_v1", "--runChunks", "301", "400"],
-                           #["SingleElectron_Run2016H_PromptReco_v1", "--runChunks", "401", "500"],
-                           #["SingleElectron_Run2016H_PromptReco_v1", "--runChunks", "501", "600"],
-                           #["SingleElectron_Run2016H_PromptReco_v1", "--runChunks", "601", "700"],
-                           #["SingleElectron_Run2016H_PromptReco_v1", "--runChunks", "701", "800"],
-                           #["SingleElectron_Run2016H_PromptReco_v1", "--runChunks", "801", "900"],
-                           #["SingleElectron_Run2016H_PromptReco_v1", "--runChunks", "901", "1000"],
-                           
-                           ["SingleElectron_Run2016H_PromptReco_v2", "--runChunks", "0",   "100"],
-                           ["SingleElectron_Run2016H_PromptReco_v2", "--runChunks", "101", "200"],
-                           ["SingleElectron_Run2016H_PromptReco_v2", "--runChunks", "201", "300"],
-                           ["SingleElectron_Run2016H_PromptReco_v2", "--runChunks", "301", "400"],
-                           ["SingleElectron_Run2016H_PromptReco_v2", "--runChunks", "401", "500"],
-                           ["SingleElectron_Run2016H_PromptReco_v2", "--runChunks", "501", "600"],
-                           ["SingleElectron_Run2016H_PromptReco_v2", "--runChunks", "601", "700"],
-                           ["SingleElectron_Run2016H_PromptReco_v2", "--runChunks", "701", "800"],
-                           ["SingleElectron_Run2016H_PromptReco_v2", "--runChunks", "801", "900"],
-                           ["SingleElectron_Run2016H_PromptReco_v2", "--runChunks", "901", "1000"],
-                           
-                           ["SingleElectron_Run2016H_PromptReco_v3", "--runChunks", "0",   "30"],
-                         ],
-               },
-   
-   'data_PR_el_b':{
-               'samples':[
-                           ["SingleElectron_Run2016B_PromptReco_v2", "--runChunks", "0",    "100"],
-                           ["SingleElectron_Run2016B_PromptReco_v2", "--runChunks", "101",  "200"],
-                           ["SingleElectron_Run2016B_PromptReco_v2", "--runChunks", "201",  "300"],
-                           ["SingleElectron_Run2016B_PromptReco_v2", "--runChunks", "301",  "400"],
-                           ["SingleElectron_Run2016B_PromptReco_v2", "--runChunks", "401",  "500"],
-                           ["SingleElectron_Run2016B_PromptReco_v2", "--runChunks", "501",  "600"],
-                           ["SingleElectron_Run2016B_PromptReco_v2", "--runChunks", "601",  "700"],
-                           ["SingleElectron_Run2016B_PromptReco_v2", "--runChunks", "701",  "800"],
-                           ["SingleElectron_Run2016B_PromptReco_v2", "--runChunks", "801",  "900"],
-                           ["SingleElectron_Run2016B_PromptReco_v2", "--runChunks", "901",  "1000"],
-                           ["SingleElectron_Run2016B_PromptReco_v2", "--runChunks", "1001", "1100"],
-                           ["SingleElectron_Run2016B_PromptReco_v2", "--runChunks", "1100", "1200"],
-                         ]},
-   
-   'data_PR_el_c':{
-               'samples':[
-                           ["SingleElectron_Run2016C_PromptReco_v2", "--runChunks", "0",   "100"],
-                           ["SingleElectron_Run2016C_PromptReco_v2", "--runChunks", "101", "200"],
-                           ["SingleElectron_Run2016C_PromptReco_v2", "--runChunks", "201", "300"],
-                           ["SingleElectron_Run2016C_PromptReco_v2", "--runChunks", "301", "400"],
-                         ]},
-   
-   'data_PR_el_d':{
-               'samples':[
-                           ["SingleElectron_Run2016D_PromptReco_v2", "--runChunks", "0",   "100"],
-                           ["SingleElectron_Run2016D_PromptReco_v2", "--runChunks", "101", "200"],
-                           ["SingleElectron_Run2016D_PromptReco_v2", "--runChunks", "201", "300"],
-                           ["SingleElectron_Run2016D_PromptReco_v2", "--runChunks", "301", "400"],
-                           ["SingleElectron_Run2016D_PromptReco_v2", "--runChunks", "401", "500"],
-                           ["SingleElectron_Run2016D_PromptReco_v2", "--runChunks", "501", "600"],
-                         ]},
-   
-   #'data_PR_el_e':{
-   #            'samples':[
-   #                        ["SingleElectron_Run2016E_PromptReco_v2", "--runChunks", "0",   "100"],
-   #                        ["SingleElectron_Run2016E_PromptReco_v2", "--runChunks", "101", "200"],
-   #                        ["SingleElectron_Run2016E_PromptReco_v2", "--runChunks", "201", "300"],
-   #                        ["SingleElectron_Run2016E_PromptReco_v2", "--runChunks", "301", "400"],
-   #                        ["SingleElectron_Run2016E_PromptReco_v2", "--runChunks", "401", "500"],
-   #                      ]},
-   
-   #'data_PR_el_f':{
-   #            'samples':[
-   #                        ["SingleElectron_Run2016F_PromptReco_v1", "--runChunks", "0",   "100"],
-   #                        ["SingleElectron_Run2016F_PromptReco_v1", "--runChunks", "101", "200"],
-   #                        ["SingleElectron_Run2016F_PromptReco_v1", "--runChunks", "201", "300"],
-   #                        ["SingleElectron_Run2016F_PromptReco_v1", "--runChunks", "301", "400"],
-   #                        ["SingleElectron_Run2016F_PromptReco_v1", "--runChunks", "401", "500"],
-   #                        ["SingleElectron_Run2016F_PromptReco_v1", "--runChunks", "501", "600"],
-   #                      ]},
-   
-   #'data_PR_el_g':{
-   #            'samples':[
-   #                        ["SingleElectron_Run2016G_PromptReco_v1", "--runChunks", "0",   "100"],
-   #                        ["SingleElectron_Run2016G_PromptReco_v1", "--runChunks", "101", "200"],
-   #                        ["SingleElectron_Run2016G_PromptReco_v1", "--runChunks", "201", "300"],
-   #                        ["SingleElectron_Run2016G_PromptReco_v1", "--runChunks", "301", "400"],
-   #                        ["SingleElectron_Run2016G_PromptReco_v1", "--runChunks", "401", "500"],
-   #                        ["SingleElectron_Run2016G_PromptReco_v1", "--runChunks", "501", "600"],
-   #                      ]},
-   
-   'data_PR_el_h':{
-               'samples':[
-                           #["SingleElectron_Run2016H_PromptReco_v1", "--runChunks", "0",   "100"],
-                           #["SingleElectron_Run2016H_PromptReco_v1", "--runChunks", "101", "200"],
-                           #["SingleElectron_Run2016H_PromptReco_v1", "--runChunks", "201", "300"],
-                           #["SingleElectron_Run2016H_PromptReco_v1", "--runChunks", "301", "400"],
-                           #["SingleElectron_Run2016H_PromptReco_v1", "--runChunks", "401", "500"],
-                           #["SingleElectron_Run2016H_PromptReco_v1", "--runChunks", "501", "600"],
-                           #["SingleElectron_Run2016H_PromptReco_v1", "--runChunks", "601", "700"],
-                           #["SingleElectron_Run2016H_PromptReco_v1", "--runChunks", "701", "800"],
-                           #["SingleElectron_Run2016H_PromptReco_v1", "--runChunks", "801", "900"],
-                           #["SingleElectron_Run2016H_PromptReco_v1", "--runChunks", "901", "1000"],
-                           
-                           ["SingleElectron_Run2016H_PromptReco_v2", "--runChunks", "0",   "100"],
-                           ["SingleElectron_Run2016H_PromptReco_v2", "--runChunks", "101", "200"],
-                           ["SingleElectron_Run2016H_PromptReco_v2", "--runChunks", "201", "300"],
-                           ["SingleElectron_Run2016H_PromptReco_v2", "--runChunks", "301", "400"],
-                           ["SingleElectron_Run2016H_PromptReco_v2", "--runChunks", "401", "500"],
-                           ["SingleElectron_Run2016H_PromptReco_v2", "--runChunks", "501", "600"],
-                           ["SingleElectron_Run2016H_PromptReco_v2", "--runChunks", "601", "700"],
-                           ["SingleElectron_Run2016H_PromptReco_v2", "--runChunks", "701", "800"],
-                           ["SingleElectron_Run2016H_PromptReco_v2", "--runChunks", "801", "900"],
-                           ["SingleElectron_Run2016H_PromptReco_v2", "--runChunks", "901", "1000"],
-                           
-                           ["SingleElectron_Run2016H_PromptReco_v3", "--runChunks", "0",   "30"],
-                         ]},
    
    # SingleMuon PD
    
@@ -1139,174 +278,6 @@ sampleSets = {
                          ],
                },
    
-   'data_PR_mu_chunks':{
-               'samples':[
-                           #B
-                           ["SingleMuon_Run2016B_PromptReco_v2", "--runChunks", "0",    "100"],
-                           ["SingleMuon_Run2016B_PromptReco_v2", "--runChunks", "101",  "200"],
-                           ["SingleMuon_Run2016B_PromptReco_v2", "--runChunks", "201",  "300"],
-                           ["SingleMuon_Run2016B_PromptReco_v2", "--runChunks", "301",  "400"],
-                           ["SingleMuon_Run2016B_PromptReco_v2", "--runChunks", "401",  "500"],
-                           ["SingleMuon_Run2016B_PromptReco_v2", "--runChunks", "501",  "600"],
-                           ["SingleMuon_Run2016B_PromptReco_v2", "--runChunks", "601",  "700"],
-                           ["SingleMuon_Run2016B_PromptReco_v2", "--runChunks", "701",  "800"],
-                           ["SingleMuon_Run2016B_PromptReco_v2", "--runChunks", "801",  "900"],
-                           ["SingleMuon_Run2016B_PromptReco_v2", "--runChunks", "901",  "1000"],
-                           ["SingleMuon_Run2016B_PromptReco_v2", "--runChunks", "1001", "1100"],
-                           ["SingleMuon_Run2016B_PromptReco_v2", "--runChunks", "1100", "1200"],
-                           #C
-                           ["SingleMuon_Run2016C_PromptReco_v2", "--runChunks", "0",   "100"],
-                           ["SingleMuon_Run2016C_PromptReco_v2", "--runChunks", "101", "200"],
-                           ["SingleMuon_Run2016C_PromptReco_v2", "--runChunks", "201", "300"],
-                           ["SingleMuon_Run2016C_PromptReco_v2", "--runChunks", "301", "400"],
-                           #D
-                           ["SingleMuon_Run2016D_PromptReco_v2", "--runChunks", "0",   "100"],
-                           ["SingleMuon_Run2016D_PromptReco_v2", "--runChunks", "101", "200"],
-                           ["SingleMuon_Run2016D_PromptReco_v2", "--runChunks", "201", "300"],
-                           ["SingleMuon_Run2016D_PromptReco_v2", "--runChunks", "301", "400"],
-                           ["SingleMuon_Run2016D_PromptReco_v2", "--runChunks", "401", "500"],
-                           ["SingleMuon_Run2016D_PromptReco_v2", "--runChunks", "501", "600"],
-                           #E
-                           ["SingleMuon_Run2016E_PromptReco_v2", "--runChunks", "0",   "100"],
-                           ["SingleMuon_Run2016E_PromptReco_v2", "--runChunks", "101", "200"],
-                           ["SingleMuon_Run2016E_PromptReco_v2", "--runChunks", "201", "300"],
-                           ["SingleMuon_Run2016E_PromptReco_v2", "--runChunks", "301", "400"],
-                           ["SingleMuon_Run2016E_PromptReco_v2", "--runChunks", "401", "500"],
-                           #F 
-                           ["SingleMuon_Run2016F_PromptReco_v1", "--runChunks", "0",   "100"],
-                           ["SingleMuon_Run2016F_PromptReco_v1", "--runChunks", "101", "200"],
-                           ["SingleMuon_Run2016F_PromptReco_v1", "--runChunks", "201", "300"],
-                           ["SingleMuon_Run2016F_PromptReco_v1", "--runChunks", "301", "400"],
-                           ["SingleMuon_Run2016F_PromptReco_v1", "--runChunks", "401", "500"],
-                           #G
-                           ["SingleMuon_Run2016G_PromptReco_v1", "--runChunks", "0",   "100"],
-                           ["SingleMuon_Run2016G_PromptReco_v1", "--runChunks", "101", "200"],
-                           ["SingleMuon_Run2016G_PromptReco_v1", "--runChunks", "201", "300"],
-                           ["SingleMuon_Run2016G_PromptReco_v1", "--runChunks", "301", "400"],
-                           ["SingleMuon_Run2016G_PromptReco_v1", "--runChunks", "401", "500"],
-                           ["SingleMuon_Run2016G_PromptReco_v1", "--runChunks", "501", "600"],
-                           ["SingleMuon_Run2016G_PromptReco_v1", "--runChunks", "601", "700"],
-                           ["SingleMuon_Run2016G_PromptReco_v1", "--runChunks", "701", "800"],
-                           ["SingleMuon_Run2016G_PromptReco_v1", "--runChunks", "801", "900"],
-                           #H
-                           #["SingleMuon_Run2016H_PromptReco_v1", "--runChunks", "0",   "100"],
-                           #["SingleMuon_Run2016H_PromptReco_v1", "--runChunks", "101", "200"],
-                           #["SingleMuon_Run2016H_PromptReco_v1", "--runChunks", "201", "300"],
-                           #["SingleMuon_Run2016H_PromptReco_v1", "--runChunks", "301", "400"],
-                           #["SingleMuon_Run2016H_PromptReco_v1", "--runChunks", "401", "500"],
-                           #["SingleMuon_Run2016H_PromptReco_v1", "--runChunks", "501", "600"],
-                           #["SingleMuon_Run2016H_PromptReco_v1", "--runChunks", "601", "700"],
-                           #["SingleMuon_Run2016H_PromptReco_v1", "--runChunks", "701", "800"],
-                           #["SingleMuon_Run2016H_PromptReco_v1", "--runChunks", "801", "900"],
-                           #["SingleMuon_Run2016H_PromptReco_v1", "--runChunks", "901", "1000"],
-                           
-                           ["SingleMuon_Run2016H_PromptReco_v2", "--runChunks", "0",   "100"],
-                           ["SingleMuon_Run2016H_PromptReco_v2", "--runChunks", "101", "200"],
-                           ["SingleMuon_Run2016H_PromptReco_v2", "--runChunks", "201", "300"],
-                           ["SingleMuon_Run2016H_PromptReco_v2", "--runChunks", "301", "400"],
-                           ["SingleMuon_Run2016H_PromptReco_v2", "--runChunks", "401", "500"],
-                           ["SingleMuon_Run2016H_PromptReco_v2", "--runChunks", "501", "600"],
-                           ["SingleMuon_Run2016H_PromptReco_v2", "--runChunks", "601", "700"],
-                           ["SingleMuon_Run2016H_PromptReco_v2", "--runChunks", "701", "800"],
-                           ["SingleMuon_Run2016H_PromptReco_v2", "--runChunks", "801", "900"],
-                           ["SingleMuon_Run2016H_PromptReco_v2", "--runChunks", "901", "1000"],
-                           
-                           ["SingleMuon_Run2016H_PromptReco_v3", "--runChunks", "0",   "30"],
-                         ],
-               },
-   
-   'data_PR_mu_b':{
-               'samples':[
-                           ["SingleMuon_Run2016B_PromptReco_v2", "--runChunks", "0",    "100"],
-                           ["SingleMuon_Run2016B_PromptReco_v2", "--runChunks", "101",  "200"],
-                           ["SingleMuon_Run2016B_PromptReco_v2", "--runChunks", "201",  "300"],
-                           ["SingleMuon_Run2016B_PromptReco_v2", "--runChunks", "301",  "400"],
-                           ["SingleMuon_Run2016B_PromptReco_v2", "--runChunks", "401",  "500"],
-                           ["SingleMuon_Run2016B_PromptReco_v2", "--runChunks", "501",  "600"],
-                           ["SingleMuon_Run2016B_PromptReco_v2", "--runChunks", "601",  "700"],
-                           ["SingleMuon_Run2016B_PromptReco_v2", "--runChunks", "701",  "800"],
-                           ["SingleMuon_Run2016B_PromptReco_v2", "--runChunks", "801",  "900"],
-                           ["SingleMuon_Run2016B_PromptReco_v2", "--runChunks", "901",  "1000"],
-                           ["SingleMuon_Run2016B_PromptReco_v2", "--runChunks", "1001", "1100"],
-                           ["SingleMuon_Run2016B_PromptReco_v2", "--runChunks", "1100", "1200"],
-                         ]},
-   
-   'data_PR_mu_c':{
-               'samples':[
-                           ["SingleMuon_Run2016C_PromptReco_v2", "--runChunks", "0",   "100"],
-                           ["SingleMuon_Run2016C_PromptReco_v2", "--runChunks", "101", "200"],
-                           ["SingleMuon_Run2016C_PromptReco_v2", "--runChunks", "201", "300"],
-                           ["SingleMuon_Run2016C_PromptReco_v2", "--runChunks", "301", "400"],
-                         ]},
-   
-   'data_PR_mu_d':{
-               'samples':[
-                           ["SingleMuon_Run2016D_PromptReco_v2", "--runChunks", "0",   "100"],
-                           ["SingleMuon_Run2016D_PromptReco_v2", "--runChunks", "101", "200"],
-                           ["SingleMuon_Run2016D_PromptReco_v2", "--runChunks", "201", "300"],
-                           ["SingleMuon_Run2016D_PromptReco_v2", "--runChunks", "301", "400"],
-                           ["SingleMuon_Run2016D_PromptReco_v2", "--runChunks", "401", "500"],
-                           ["SingleMuon_Run2016D_PromptReco_v2", "--runChunks", "501", "600"],
-                        ]},
-   
-   'data_PR_mu_e':{
-               'samples':[
-                           ["SingleMuon_Run2016E_PromptReco_v2", "--runChunks", "0",   "100"],
-                           ["SingleMuon_Run2016E_PromptReco_v2", "--runChunks", "101", "200"],
-                           ["SingleMuon_Run2016E_PromptReco_v2", "--runChunks", "201", "300"],
-                           ["SingleMuon_Run2016E_PromptReco_v2", "--runChunks", "301", "400"],
-                           ["SingleMuon_Run2016E_PromptReco_v2", "--runChunks", "401", "500"],
-                         ]},
-   
-   'data_PR_mu_f':{
-               'samples':[
-                           ["SingleMuon_Run2016F_PromptReco_v1", "--runChunks", "0",   "100"],
-                           ["SingleMuon_Run2016F_PromptReco_v1", "--runChunks", "101", "200"],
-                           ["SingleMuon_Run2016F_PromptReco_v1", "--runChunks", "201", "300"],
-                           ["SingleMuon_Run2016F_PromptReco_v1", "--runChunks", "301", "400"],
-                           ["SingleMuon_Run2016F_PromptReco_v1", "--runChunks", "401", "500"],
-                         ]},
-   
-   'data_PR_mu_g':{
-               'samples':[
-                           ["SingleMuon_Run2016G_PromptReco_v1", "--runChunks", "0",   "100"],
-                           ["SingleMuon_Run2016G_PromptReco_v1", "--runChunks", "101", "200"],
-                           ["SingleMuon_Run2016G_PromptReco_v1", "--runChunks", "201", "300"],
-                           ["SingleMuon_Run2016G_PromptReco_v1", "--runChunks", "301", "400"],
-                           ["SingleMuon_Run2016G_PromptReco_v1", "--runChunks", "401", "500"],
-                           ["SingleMuon_Run2016G_PromptReco_v1", "--runChunks", "501", "600"],
-                           ["SingleMuon_Run2016G_PromptReco_v1", "--runChunks", "601", "700"],
-                           ["SingleMuon_Run2016G_PromptReco_v1", "--runChunks", "701", "800"],
-                           ["SingleMuon_Run2016G_PromptReco_v1", "--runChunks", "801", "900"],
-                         ]},
-   
-   'data_PR_mu_h':{
-               'samples':[
-                           #["SingleMuon_Run2016H_PromptReco_v1", "--runChunks", "0",   "100"],
-                           #["SingleMuon_Run2016H_PromptReco_v1", "--runChunks", "101", "200"],
-                           #["SingleMuon_Run2016H_PromptReco_v1", "--runChunks", "201", "300"],
-                           #["SingleMuon_Run2016H_PromptReco_v1", "--runChunks", "301", "400"],
-                           #["SingleMuon_Run2016H_PromptReco_v1", "--runChunks", "401", "500"],
-                           #["SingleMuon_Run2016H_PromptReco_v1", "--runChunks", "501", "600"],
-                           #["SingleMuon_Run2016H_PromptReco_v1", "--runChunks", "601", "700"],
-                           #["SingleMuon_Run2016H_PromptReco_v1", "--runChunks", "701", "800"],
-                           #["SingleMuon_Run2016H_PromptReco_v1", "--runChunks", "801", "900"],
-                           #["SingleMuon_Run2016H_PromptReco_v1", "--runChunks", "901", "1000"],
-                           
-                           ["SingleMuon_Run2016H_PromptReco_v2", "--runChunks", "0",   "100"],
-                           ["SingleMuon_Run2016H_PromptReco_v2", "--runChunks", "101", "200"],
-                           ["SingleMuon_Run2016H_PromptReco_v2", "--runChunks", "201", "300"],
-                           ["SingleMuon_Run2016H_PromptReco_v2", "--runChunks", "301", "400"],
-                           ["SingleMuon_Run2016H_PromptReco_v2", "--runChunks", "401", "500"],
-                           ["SingleMuon_Run2016H_PromptReco_v2", "--runChunks", "501", "600"],
-                           ["SingleMuon_Run2016H_PromptReco_v2", "--runChunks", "601", "700"],
-                           ["SingleMuon_Run2016H_PromptReco_v2", "--runChunks", "701", "800"],
-                           ["SingleMuon_Run2016H_PromptReco_v2", "--runChunks", "801", "900"],
-                           ["SingleMuon_Run2016H_PromptReco_v2", "--runChunks", "901", "1000"],
-                           
-                           ["SingleMuon_Run2016H_PromptReco_v3", "--runChunks", "0",   "30"],
-                         ]},
-   
    # JetHT PD
    'data_PR_jet':{
                'samples':[
@@ -1322,33 +293,6 @@ sampleSets = {
                          ],
                   },
    
-   'data_PR_jet_h':{
-               'samples':[
-                           #["JetHT_Run2016H_PromptReco_v1", "--runChunks", "0",   "100"],
-                           #["JetHT_Run2016H_PromptReco_v1", "--runChunks", "101", "200"],
-                           #["JetHT_Run2016H_PromptReco_v1", "--runChunks", "201", "300"],
-                           #["JetHT_Run2016H_PromptReco_v1", "--runChunks", "301", "400"],
-                           #["JetHT_Run2016H_PromptReco_v1", "--runChunks", "401", "500"],
-                           #["JetHT_Run2016H_PromptReco_v1", "--runChunks", "501", "600"],
-                           #["JetHT_Run2016H_PromptReco_v1", "--runChunks", "601", "700"],
-                           #["JetHT_Run2016H_PromptReco_v1", "--runChunks", "701", "800"],
-                           #["JetHT_Run2016H_PromptReco_v1", "--runChunks", "801", "900"],
-                           #["JetHT_Run2016H_PromptReco_v1", "--runChunks", "901", "1000"],
-                           
-                           ["JetHT_Run2016H_PromptReco_v2", "--runChunks", "0",   "100"],
-                           ["JetHT_Run2016H_PromptReco_v2", "--runChunks", "101", "200"],
-                           ["JetHT_Run2016H_PromptReco_v2", "--runChunks", "201", "300"],
-                           ["JetHT_Run2016H_PromptReco_v2", "--runChunks", "301", "400"],
-                           ["JetHT_Run2016H_PromptReco_v2", "--runChunks", "401", "500"],
-                           ["JetHT_Run2016H_PromptReco_v2", "--runChunks", "501", "600"],
-                           ["JetHT_Run2016H_PromptReco_v2", "--runChunks", "601", "700"],
-                           ["JetHT_Run2016H_PromptReco_v2", "--runChunks", "701", "800"],
-                           ["JetHT_Run2016H_PromptReco_v2", "--runChunks", "801", "900"],
-                           ["JetHT_Run2016H_PromptReco_v2", "--runChunks", "901", "1000"],
-                           
-                           ["JetHT_Run2016H_PromptReco_v3", "--runChunks", "0",   "30"],
-                         ]},
-  
    # 2015 Data 
    'data_2015':{
                'samples':[
@@ -1399,9 +343,9 @@ for mstop in mass_dict.keys():
 sampleSets.update(signalSets)
 
 
-mc_samps = ['ttjets_chunks', 'wjets_chunks', 'dyjets_chunks','zjets', 'qcd', 'other' ]
+mc_samps = ['ttjets', 'wjets', 'dyjets','zjets', 'qcd', 'other' ]
 signal_samps = [x for x in sampleSets.keys() if 'T2tt' in x or 'T2bW' in x]
-data_samps = ['data_met_chunks']#, 'data_el_chunks', 'data_mu_chunks', 'data_jet_chunks'
+data_samps = ['data_met']#, 'data_el', 'data_mu', 'data_jet'
 
 all_samps = mc_samps + signal_samps # + data_samps #FIXME: mc and data cannot be run simulatneously
  
@@ -1417,7 +361,7 @@ def get_parser():
     ''' Argument parser for running the post processing module.
     
     Include all the options from cmgPostProcessing_parser, which are also used in 
-    cmgPostProcessing_v1 script.
+    cmgPostProcessing_v2 script.
     
     '''
         
@@ -1446,25 +390,31 @@ def get_parser():
         help="Number of processes to run in parallel"
         )
 
+    argsRun.add_argument('--splitChunks',
+        action='store',
+        type=int,
+        default=0,
+        help="Split processing over chunks automatically. Argument is the size of the chunk splitting."
+        )
+
+    argsRun.add_argument('--batchScript',
+        action='store_true',
+        help="Create batch script"
+        )
+    
     argsRun.add_argument('--run',
         action='store_true',
         help="Run Post processing!"
         )
     
-    argsRun.add_argument('--batchScript',
-        action='store_true',
-        help="Run Post processing!"
-        )
-    
-    # 
     return argParser, argsRun
 
 
 def make_list_options(args, argsRun):
     ''' Create the list of options for post-processing script.
         
-    The list of options is created from the arguments of the cmgPostProcessing_v1.py
-    given on the command line for runPostProcessing and the default values of the cmgPostProcessing_v1.py 
+    The list of options is created from the arguments of the cmgPostProcessing_v2.py
+    given on the command line for runPostProcessing and the default values of the cmgPostProcessing_v2.py 
     arguments (for arguments not given on the command line). 
     
     The arguments specific to runPostProcessing script only, given in argsRun group, are not considered.
@@ -1498,8 +448,47 @@ def make_list_options(args, argsRun):
 
     return options_list
 
+def getSampleDir(args, sampleName):
+   ''' Gets directory of CMG sample from the cmgTuples sample definition file. '''
 
-def make_command(sampleSet, options_list=[]):
+   cmgTuples = args.cmgTuples
+
+   cmgTuplesFullName = 'Workspace.DegenerateStopAnalysis.samples.cmgTuples.' + cmgTuples
+   try:
+      sampleFileLib = importlib.import_module(cmgTuplesFullName)
+   except ImportError, err:
+      print "\nImport error from {0} \n ".format(cmgTuplesFullName) + \
+          "\nCorrect the name and re-run the script. \n Exiting."
+      sys.exit()
+
+   sampleDict = {}
+   for samp in sampleFileLib.allComponents:
+      sampleDict[samp['cmgName']] = samp
+
+   try: 
+      path = sampleDict[sampleName]['dir']
+   except KeyError:
+      print "\nKey Error with {0} \n ".format(sampleName) + \
+      "\nCheck if sample exists in {0}.py. \n Exiting.".format(cmgTuplesFullName.replace('.', '/'))
+      sys.exit()
+   
+   return path
+
+def countChunks(path):
+
+   if os.path.exists(path):
+      chunkFiles = [f for f in os.listdir(path) if "Chunk" in f]
+   else:
+      print "\nPath {0} does not exist. Exiting.".format(path)
+      sys.exit()
+
+   numChunks = len(chunkFiles)
+
+   #print "Directory: \n%s\nChunks: %s.\n"%(path, numChunks) 
+ 
+   return numChunks 
+
+def make_command(args, options_list=[]):
     ''' Create the final command for post-processing script.
     
     The command is created using the list of options, replacing the "--processSample=..." argument 
@@ -1507,22 +496,26 @@ def make_command(sampleSet, options_list=[]):
     replace also the arguments from the list of options. 
     '''
     logger = logging.getLogger('runPostProcessing.make_command')
-    
+   
+    sampleSet = args.sampleSet   
+ 
     commands = []
+    
     for samp in sampleSets[sampleSet]['samples']:
         
         options_current = []
         extraOptions = []
+
         if type(samp) == type(""):
             sampName = samp
         elif type(samp) == type([]):
             sampName = samp[0]
             extraOptions = samp[1:]
         else:
-            raise Exception("\n type not recognized for %s" % samp)
-
+            raise Exception("\nType not recognized for %s" % samp)
+        
         logger.debug(
-            "\n Extra options from sample definition for sample %s: \n %s \n",
+            "\nExtra options from sample definition for sample %s: \n %s \n",
             sampName, pprint_cust.pformat(extraOptions)
             )
         
@@ -1568,15 +561,13 @@ def make_command(sampleSet, options_list=[]):
                             '\n     added option from file: %s \n', opt
                             ) 
                                                
-            
             if addOption:
                 if not 'None' in arg:        
                     options_current.append(arg)
                     logger.trace (
                         '\n     added option from initial list: %s \n', arg
                         ) 
-                
-                    
+        
         commandPostProcessing = [
             'python',
             'cmgPostProcessing_v2.py',
@@ -1584,19 +575,56 @@ def make_command(sampleSet, options_list=[]):
         
         commandPostProcessing.extend(options_current)
 
-        pprint_cust.pprint(" ".join(commandPostProcessing))
-        
-        logger.info(
-            "\n Command to be processed: \n %s \n",
-            pprint_cust.pformat(" ".join(commandPostProcessing))
-            )
-        
+        #Automatic chunk splitting
+        if args.splitChunks:
+              
+           sampDir = getSampleDir(args, sampName) 
+           numChunks = countChunks(sampDir) 
 
-        commands.append(commandPostProcessing)
-    
-    #
+           chunkSplitting = args.splitChunks 
+           
+           print "\n**********************************************************************************************************************************************************************************************************"
+           print "\nSplitting post-processing of sample %s with %s chunks into %s chunk intervals.\n"%(sampName, numChunks, chunkSplitting),
+           print "Directory: ", sampDir 
+           logger.info(
+              "\nSplitting post-processing of sample %s with %s chunks into %s chunk intervals.\nDirectory: %s"%(sampName, numChunks, chunkSplitting, sampDir),
+              )
+           
+           print "\nCommands:" 
+              
+           for n in range(0, numChunks/chunkSplitting + 1):
+              
+              baseCommand = commandPostProcessing[:]
+              
+              if n == 0: 
+                 baseCommand.extend(["--runChunks", "0", str(chunkSplitting)])
+              else: 
+                 baseCommand.extend(["--runChunks", str(n*chunkSplitting + 1), str((n+1)*chunkSplitting)])
+
+              pprint_cust.pprint(" ".join(baseCommand))
+              
+              logger.info(
+                  "\nCommand to be processed: \n %s \n",
+                  pprint_cust.pformat(" ".join(baseCommand))
+                  )
+              
+              commands.append(baseCommand)
+        
+        else:
+           
+           print "\nCommands:" 
+           
+           pprint_cust.pprint(" ".join(commandPostProcessing))
+
+           logger.info(
+               "\nCommand to be processed: \n %s \n",
+               pprint_cust.pformat(" ".join(commandPostProcessing))
+               )
+
+           commands.append(commandPostProcessing)
+ 
     return commands
-
+    
 def runPostProcessing(argv=None):
     
     if argv is None:
@@ -1610,10 +638,10 @@ def runPostProcessing(argv=None):
     verbose = args.verbose
     
     # create the output top directory - here, it is used to write the logging messages
-    # cmgPostProcessing_v1.py creates its own outputDirectory
+    # cmgPostProcessing_v2.py creates its own outputDirectory
     
     # WARNING: this directory must be in agreement with the directory created by  
-    # cmgPostProcessing_v1.py
+    # cmgPostProcessing_v2.py
     
     outputDirectory = os.path.join(
         args.targetDir, 
@@ -1625,16 +653,15 @@ def runPostProcessing(argv=None):
     try:
         os.makedirs(outputDirectory)
         msg_logger_debug = \
-            "\n Requested output directory \n {0} \n does not exists.".format(outputDirectory) + \
-            "\n Created new directory. \n"
+            "\nRequested output directory \n {0} \n does not exist.".format(outputDirectory) + \
+            "\nCreated new directory. \n"
     except OSError as exception:
         if exception.errno != errno.EEXIST:
             raise
         else:
             msg_logger_debug = \
-                "\n Requested output directory \n {0} \n already exists.\n".format(outputDirectory)
+                "\nRequested output directory \n {0} \n already exists.\n".format(outputDirectory)
 
-    
     # logging
     
     logLevel = args.logLevel
@@ -1666,16 +693,17 @@ def runPostProcessing(argv=None):
     logger.debug(msg_logger_debug)
 
     options_list = make_list_options(args, argsRun)
-    print options_list
-    commands = make_command(args.sampleSet, options_list)
+    commands = make_command(args, options_list)
     
     logger.info(
-        "\n Final commands to be processed: \n %s \n",
+        "\nFinal commands to be processed: \n %s \n",
         pprint_cust.pformat(commands)
         )
     if args.batchScript:
         fname = 'batch_script.sh'
-        print 'writing batch script: %s'%fname
+        
+        print '%s written to current directory.'%fname
+        
         f = file(fname, 'a')
 
         #new_commands = [] 
@@ -1689,20 +717,20 @@ def runPostProcessing(argv=None):
         if align_commands:
             longest_command = max(commands, key = len)
             max_opt_lens = [1 for c in longest_command ]
-            print max_opt_lens
-            print commands[0]
+            #print max_opt_lens
+            #print commands[0]
             for i, c in enumerate(commands):
                 for io, o in enumerate(c):
                     max_opt_lens[io] = max(len(o), max_opt_lens[io])
-            print max_opt_lens
+            #print max_opt_lens
 
             for c in commands:
                 alignment_list = ['{:<%s}'%max_opt_lens[i] for i in range(len(c))]
                 alignment = '  '.join(alignment_list)
-                f.write("\n"+alignment.format(*c))
+                f.write(alignment.format(*c)+"\n")
         else:
             for c in commands:
-                f.write("\n"+'  '.join(c))
+                f.write('  '.join(c)+"\n")
         f.close()
 
     if args.run:
@@ -1715,15 +743,14 @@ def runPostProcessing(argv=None):
             print "{:-^80}".format(" FIN ")
     else:
         # do not put this print unter verbose
-        print "\n Run the script adding the option --run to actually run over the chosen sample.\n "
+        print "\nRun the script adding the option --run to actually run over the chosen sample.\n "
         
     logger.info(
-        "\n " + \
-        "\n End of runPostProcessing run on sample set %s. \n" + \
-        "\n *******************************************************************************\n",
+        "\n" + \
+        "\nEnd of runPostProcessing run on sample set %s. \n" + \
+        "\n*******************************************************************************\n",
         args.sampleSet
         )
 
-        
 if __name__ == "__main__":
     sys.exit(runPostProcessing())

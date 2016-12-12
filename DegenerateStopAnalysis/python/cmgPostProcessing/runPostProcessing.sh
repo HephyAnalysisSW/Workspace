@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# shell script to run runPostProcessing_v1.py  
+# shell script to run runPostProcessing_v2.py  
 # Steps:
 #    Prerequisite:
 #      set-up the production release (e.g. via manageRelease.sh from script directory)
@@ -46,6 +46,7 @@ RUNMODE="BATCH"
 CMG_PROCESSING_TAG="8020_mAODv2_v0"
 CMG_POST_PROCESSING_TAG="80X_postProcessing_v0"
 PARAMETER_SET="analysisHephy_13TeV_2016_v2_1"
+CHUNK_SPLITTING="100"
 VERBOSE="" #--verbose"
 
 # semi-hard-coded parameters
@@ -74,11 +75,16 @@ if [[ ${5} == "TEST" ]]; then
     VERBOSE="--verbose"
 fi
 
-if [[ ${RUNMODE} == "BATCH" ]]; then
-    RUNOPT="--batchScript"
-    echo Creating batch script
+if [[ ${CHUNK_SPLITTING} ]]; then
+    SPLIT_CHUNKS="--splitChunks "$CHUNK_SPLITTING
+else
+    SPLIT_CHUNKS=""
 fi
-if [[ ${RUNMODE} == "RUN" ]]; then
+
+if [[ ${RUNMODE} == "BATCH" ]]; then
+    echo "Creating batch script (to run set RUNMODE to RUN).."
+    RUNOPT="--batchScript"
+elif [[ ${RUNMODE} == "RUN" ]]; then
     RUNOPT="--run"
 fi
 
@@ -109,6 +115,7 @@ if [[ ${CMSSW_ACTION} == "RO" || ${CMSSW_ACTION} == "R" ]]; then
         ${SKIM_PRESELECT} \
         ${SKIM_LEPTON} \
         ${BTAG_WEIGHTS} \
+        ${SPLIT_CHUNKS} \
         ${RUNOPT} \
         ${VERBOSE}
 fi
