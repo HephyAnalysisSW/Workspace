@@ -488,7 +488,7 @@ def countChunks(path):
  
    return numChunks 
 
-def make_command(args, options_list=[]):
+def make_command(args, options_list=[], procScript='cmgPostProcessing_v2.py'):
     ''' Create the final command for post-processing script.
     
     The command is created using the list of options, replacing the "--processSample=..." argument 
@@ -570,7 +570,7 @@ def make_command(args, options_list=[]):
         
         commandPostProcessing = [
             'python',
-            'cmgPostProcessing_v2.py',
+            procScript,
             ]
         
         commandPostProcessing.extend(options_current)
