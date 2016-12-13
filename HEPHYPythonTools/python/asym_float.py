@@ -116,3 +116,11 @@ class asym_float:
   def printValues(self):
     return getValErrString(self.central, self.up, self.down)
 
+  def getTexString(self, acc=2):
+    if self.up==self.down:
+      s = "$"+str(round(self.central,acc))+str('\pm')+str(round(self.up,acc))+"$"
+      return s
+    else:
+      s = "$"+str(round(self.central,acc))+"^{+"+str(round(self.up,acc))+"}_{-"+str(round(self.down,acc))+"}$"
+      return s
+

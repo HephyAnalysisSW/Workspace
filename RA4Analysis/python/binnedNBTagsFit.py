@@ -31,13 +31,15 @@ def binnedNBTagsFit(cut, MCcut, cutname, samples, configs, QCD_dict={}, bootstra
   loadTemplate      = configs['loadTemplate']
   printDir          = configs['printDir']
   dPhiStr           = configs['dPhiStr']
-
+  useQCDestimation  = configs['useQCDestimation']
   
 
-  cWJets = samples['W']
+  cWJets  = samples['W']
   cTTJets = samples['TT']
-  cRest = samples['Rest']
-  cData = samples['Data']
+  cRest   = samples['Rest']
+  cData   = samples['Data']
+  cQCD    = samples['QCD']
+  cBkg    = samples['Bkg']
   
   errorScale = 1
   if errorScale != 1:
