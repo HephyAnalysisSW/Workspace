@@ -319,7 +319,12 @@ signalOpts = ["--skimPreselect", "--processEventVetoFastSimJets"]
 signalSample = "SMS_T2tt_dM_10to80_genHT_160_genMET_80"
 
 signalSets = {}
-mass_dict = pickle.load(file("/data/nrad/cmgTuples/8020_mAODv2_v0/RunIISpring16MiniAODv2/%s_mass_dict.pkl"%signalSample))
+try:
+   mass_dict = pickle.load(file("/data/nrad/cmgTuples/8020_mAODv2_v0/RunIISpring16MiniAODv2/%s_mass_dict.pkl"%signalSample))
+except:
+   print "mass dict not found for %s"%signalSample
+   mass_dict = {}
+   
 for mstop in mass_dict.keys():
     signalSet =  {  'samples': [ [signalSample, '--processSignalScan', str(mstop), str(mlsp)]+signalOpts for mlsp in mass_dict[mstop].keys() ] }
     signalSets.update({ 'T2tt_old%s'%mstop:signalSet})
@@ -330,7 +335,12 @@ sampleSets.update(signalSets)
 signalOpts = ["--skimPreselect", "--processEventVetoFastSimJets"]
 signalSample = "SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1"
 signalSets = {}
-mass_dict = pickle.load(file("/data/nrad/cmgTuples/8020_mAODv2_v0/RunIISpring16MiniAODv2/%s_mass_dict.pkl"%signalSample))
+try:
+   mass_dict = pickle.load(file("/data/nrad/cmgTuples/8020_mAODv2_v0/RunIISpring16MiniAODv2/%s_mass_dict.pkl"%signalSample))
+except:
+   print "mass dict not found for %s"%signalSample
+   mass_dict = {}
+
 for mstop in mass_dict.keys():
     signalSet =  {  'samples': [ [signalSample, '--processSignalScan', str(mstop), str(mlsp)]+signalOpts for mlsp in mass_dict[mstop].keys() ] }
     signalSets.update({ 'T2tt%s'%mstop:signalSet})
@@ -340,7 +350,12 @@ sampleSets.update(signalSets)
 signalOpts = ["--skimPreselect", "--processEventVetoFastSimJets"]
 signalSample = "SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1"
 signalSets = {}
-mass_dict = pickle.load(file("/data/nrad/cmgTuples/8020_mAODv2_v0/RunIISpring16MiniAODv2/%s_mass_dict.pkl"%signalSample))
+try:
+   mass_dict = pickle.load(file("/data/nrad/cmgTuples/8020_mAODv2_v0/RunIISpring16MiniAODv2/%s_mass_dict.pkl"%signalSample))
+except:
+   print "mass dict not found for %s"%signalSample
+   mass_dict = {}
+
 for mstop in mass_dict.keys():
     signalSet =  {  'samples': [ [signalSample, '--processSignalScan', str(mstop), str(mlsp)]+signalOpts for mlsp in mass_dict[mstop].keys()] }
     signalSets.update({ 'T2bW%s'%mstop:signalSet})
