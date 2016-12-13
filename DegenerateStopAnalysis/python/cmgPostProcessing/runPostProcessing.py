@@ -24,6 +24,10 @@ import importlib
 import Workspace.DegenerateStopAnalysis.cmgPostProcessing.cmgPostProcessing_parser as cmgPostProcessing_parser
 import Workspace.DegenerateStopAnalysis.tools.helpers as helpers
 
+# logger
+logger = logging.getLogger(__name__)
+logger.propagate = False
+
 pprint_cust = pprint.PrettyPrinter(indent=3, depth=5 , width=140)
 
 sampleSets = {
@@ -488,7 +492,7 @@ def countChunks(path):
  
    return numChunks 
 
-def make_command(args, options_list=[], procScript='cmgPostProcessing_v2.py'):
+def make_command(args, options_list=[], procScript='cmgPostProcessing_v2.py', sample_paths=[]):
     ''' Create the final command for post-processing script.
     
     The command is created using the list of options, replacing the "--processSample=..." argument 
@@ -578,7 +582,14 @@ def make_command(args, options_list=[], procScript='cmgPostProcessing_v2.py'):
         #Automatic chunk splitting
         if args.splitChunks:
               
-           sampDir = getSampleDir(args, sampName) 
+           if sample_paths:
+               sampDir = ''
+               for s_path in sample_paths:
+                   if s_path['sampleName'] == sampName:
+                       sampDir = s_path['samplePath']
+           else:
+               sampDir = getSampleDir(args, sampName) 
+               
            numChunks = countChunks(sampDir) 
 
            chunkSplitting = args.splitChunks 
@@ -587,20 +598,19 @@ def make_command(args, options_list=[], procScript='cmgPostProcessing_v2.py'):
            print "\nSplitting post-processing of sample %s with %s chunks into %s chunk intervals.\n"%(sampName, numChunks, chunkSplitting),
            print "Directory: ", sampDir 
            logger.info(
-              "\nSplitting post-processing of sample %s with %s chunks into %s chunk intervals.\nDirectory: %s"%(sampName, numChunks, chunkSplitting, sampDir),
+              "\nSplitting post-processing of sample %s with %s chunks into %s-chunk intervals.\nDirectory: %s"%(sampName, numChunks, chunkSplitting, sampDir),
               )
            
            print "\nCommands:" 
               
-           for n in range(0, numChunks/chunkSplitting + 1):
+           firstChunk = 0
+           for n in range(numChunks):
               
               baseCommand = commandPostProcessing[:]
               
-              if n == 0: 
-                 baseCommand.extend(["--runChunks", "0", str(chunkSplitting)])
-              else: 
-                 baseCommand.extend(["--runChunks", str(n*chunkSplitting + 1), str((n+1)*chunkSplitting)])
-
+              lastChunk = firstChunk + chunkSplitting - 1              
+              baseCommand.extend(["--runChunks", str(firstChunk), str(lastChunk)])
+              
               pprint_cust.pprint(" ".join(baseCommand))
               
               logger.info(
@@ -609,6 +619,11 @@ def make_command(args, options_list=[], procScript='cmgPostProcessing_v2.py'):
                   )
               
               commands.append(baseCommand)
+              
+              firstChunk = lastChunk + 1
+              if firstChunk > numChunks:
+                  break
+              
         
         else:
            
