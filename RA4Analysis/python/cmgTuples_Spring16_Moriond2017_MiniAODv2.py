@@ -54,7 +54,12 @@ bkg_samples = [
           ]
 
 for bkg in bkg_samples:
-  exec(bkg+'={"name":bkg,"chunkString":bkg,"dir":path+bkg,"dbsName":"","skimAnalyzerDir":"skimAnalyzerCount/",\
+  exec(bkg+'={"name":bkg,"chunkString":bkg,"dir":path,"dbsName":"","skimAnalyzerDir":"skimAnalyzerCount/",\
               "rootFileLocation":"treeProducerSusySingleLepton/tree.root",\
               "treeName":"tree","isData":False\
               }')
+
+for bkg in bkg_samples:
+  print 'python cmgPostProcessing.py --overwrite --skim="HT350" --calcbtagweights  --samples='+bkg
+
+
