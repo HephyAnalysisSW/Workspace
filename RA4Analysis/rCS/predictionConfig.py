@@ -78,7 +78,8 @@ if validation:
   signalRegions = validation2016
   regStr = 'validation_4j_altWSB'
 else:
-  signalRegions = signalRegions2016
+  #signalRegions = signalRegions2016
+  signalRegions = signalRegion3fb
   regStr = 'SR2016_postApp_v2'
   #regStr = 'SR2016_v2'
 
@@ -86,7 +87,7 @@ else:
 lumi = 12.9
 templateLumi = 12.9 # lumi that was used when template was created - if defined wrong, fixed rest backgrounds will be wrong
 sampleLumi = 3.
-printlumi = '12.9'
+printlumi = '2.3'
 debugReweighting = False
 
 year = '2016'

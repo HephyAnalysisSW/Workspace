@@ -40,8 +40,8 @@ eleTriggerErr = '0.963'
 #totalWeight = 'weight*lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*TopPtWeight*0.94*puReweight_true_max4'
 totalWeight = 'weight*TopPtWeight*puReweight_true_max4*(singleMuonic*0.926 + singleElectronic*0.963)'
 totalWeight = 'weight*TopPtWeight*puReweight_true_max4*(singleMuonic*'+muTriggerEff+' + singleElectronic*'+eleTriggerErr+')*lepton_muSF_HIP*lepton_muSF_mediumID*lepton_muSF_miniIso02*lepton_muSF_sip3d*lepton_eleSF_cutbasedID*lepton_eleSF_miniIso01*lepton_eleSF_gsf'
-totalWeight = 'weight*TopPtWeight*puReweight_true_max4*(singleMuonic*'+muTriggerEff+' + singleElectronic*'+eleTriggerErr+')*leptonSF'
-
+#totalWeight = 'weight*TopPtWeight*puReweight_true_max4*(singleMuonic*'+muTriggerEff+' + singleElectronic*'+eleTriggerErr+')*leptonSF'
+totalWeight = 'weight'
 
 #25ns samples
 WJETS_15 = {'name':'WJets', 'chain':getChain(WJetsHTToLNu_25ns,histname=''), 'color':color('WJets')+1,'weight':totalWeight, 'niceName':'W+Jets S15', 'cut':''}
@@ -60,6 +60,8 @@ TTJets = {'name':'TTJets', 'chain':getChain(TTJets_HTLO_25ns,histname=''), 'colo
 TTJets_combined_15 = {'name':'TTJets', 'chain':getChain(TTJets_combined_25ns,histname=''), 'color':ROOT.kRed,'weight':totalWeight, 'niceName':'t#bar{t}+Jets S15', 'cut':''}
 #TTJets_combined_16 = {'name':'TTJets', 'chain':getChain(TTJets_combined,histname=''), 'color':ROOT.kCyan,'weight':totalWeight, 'niceName':'t#bar{t}+Jets S16', 'cut':''}
 #TTJets_Lep_16 = {'name':'TTJets', 'chain':getChain(TTJets_Lep,histname=''), 'color':color('TTJets')-2,'weight':totalWeight, 'niceName':'t#bar{t}+Jets 1l S16', 'cut':''}
+TTJets_16_semilep = {'name':'TTJets', 'chain':getChain(TTJets_Comb,histname=''), 'color':color('TTJets')-2,'weight':totalWeight, 'niceName':'t#bar{t}+Jets 1l', 'cut':'(ngenLep+ngenTau)==1'}
+TTJets_16_dilep = {'name':'TTJets', 'chain':getChain(TTJets_Comb,histname=''), 'color':color('TTJets')+4,'weight':totalWeight, 'niceName':'t#bar{t}+Jets 2l', 'cut':'(ngenLep+ngenTau)==2'}
 TTJets_16 = {'name':'TTJets', 'chain':getChain(TTJets_Comb,histname=''), 'color':color('TTJets')-2,'weight':totalWeight, 'niceName':'t#bar{t}+Jets', 'cut':''}
 TTJets_LO = {'name':'TTJets', 'chain':getChain(TTJets_LO,histname=''), 'color':ROOT.kOrange,'weight':totalWeight, 'niceName':'t#bar{t}+Jets', 'cut':''}
 
@@ -117,8 +119,23 @@ TTV_16_antiSel = {'name':'TTVH', 'chain':getChain(TTV_antiSel,histname=''), 'col
 Rest = {'name':'Rest', 'chain':getChain([TTV_25ns,singleTop_25ns,DY_25ns],histname=''), 'color':color('TTV'),'weight':totalWeight, 'niceName':'other EWK', 'cut':''}
 Bkg = {'name':'Bkg', 'chain':getChain([TTJets_HTLO_25ns,WJetsHTToLNu_25ns,QCDHT_25ns,TTV_25ns,singleTop_25ns,DY_25ns],histname=''), 'color':color('TTV'),'weight':totalWeight, 'niceName':'total Bkg', 'cut':''}
 EWK = {'name':'Bkg', 'chain':getChain([TTJets_HTLO_25ns,WJetsHTToLNu_25ns,TTV_25ns,singleTop_25ns,DY_25ns],histname=''), 'color':color('TTV'),'weight':totalWeight, 'niceName':'total Bkg', 'cut':''}
-diBoson_incl = {'name':'diBoson', 'chain':getChain(diBoson_incl,histname=''), 'color':ROOT.kRed+2,'weight': totalWeight, 'niceName':'WW/WZ/ZZ', 'cut':''}
-diBoson = {'name':'diBoson', 'chain':getChain(diBoson,histname=''), 'color':ROOT.kRed+2,'weight': totalWeight, 'niceName':'WW/WZ/ZZ', 'cut':''}
+DiBoson_incl = {'name':'diBoson', 'chain':getChain(diBoson_incl,histname=''), 'color':ROOT.kRed+2,'weight': totalWeight, 'niceName':'WW/WZ/ZZ', 'cut':''}
+DiBoson = {'name':'diBoson', 'chain':getChain(diBoson,histname=''), 'color':ROOT.kRed+2,'weight': totalWeight, 'niceName':'WW/WZ/ZZ', 'cut':''}
+
+EWK16 = {'name':'Bkg', 'chain':getChain([TTJets_Comb,WJetsHTToLNu,DY_HT,singleTop_lep,TTV,diBoson],histname=''), 'color':color('TTV'),'weight':totalWeight, 'niceName':'total Bkg', 'cut':''}
+EWK16_2 = {'name':'Bkg', 'chain':getChain([TTJets_Comb,WJetsHTToLNu,DY_HT,singleTop_lep,TTV,diBoson_incl],histname=''), 'color':color('TTV'),'weight':totalWeight, 'niceName':'total Bkg', 'cut':''}
+
+dB_WW_incl_noskim = {'name':'diBoson', 'chain':getChain(WW_incl_noskim,histname=''), 'color':ROOT.kRed+2,'weight': totalWeight, 'niceName':'WW incl', 'cut':''}
+dB_WWToLNuQQ_powheg_noskim = {'name':'diBoson', 'chain':getChain(WWToLNuQQ_noskim,histname=''), 'color':ROOT.kGreen+2,'weight': totalWeight, 'niceName':'WW 1l powheg', 'cut':''}
+dB_WWToLNuQQ_amc_noskim = {'name':'diBoson', 'chain':getChain(WWToLNuQQ_amc_noskim,histname=''), 'color':ROOT.kBlue,'weight': totalWeight, 'niceName':'WW 1l amc@NLO     ', 'cut':''}
+
+dB_LNuQQ = {'name':'diBoson', 'chain':getChain(diBosonLNuQQ,histname=''), 'color':ROOT.kYellow+1,'weight': totalWeight, 'niceName':'WW/WZ 1l 2q        ', 'cut':''}
+dB_WZTo1L3Nu = {'name':'diBoson', 'chain':getChain(WZTo1L3Nu,histname=''), 'color':ROOT.kOrange,'weight': totalWeight, 'niceName':'WZ 1l 3nu     ', 'cut':''}
+dB_DiLep = {'name':'diBoson', 'chain':getChain(diBosonDiLep,histname=''), 'color':ROOT.kRed,'weight': totalWeight, 'niceName':'VV 2l     ', 'cut':''}
+
+dB_WWLNuQQ_ext = {'name':'diBoson', 'chain':getChain(WWToLNuQQ_ext,histname=''), 'color':ROOT.kYellow+1,'weight': totalWeight, 'niceName':'WW 1l 2q        ', 'cut':''}
+dB_WWLNuQQ = {'name':'diBoson', 'chain':getChain(WWToLNuQQ,histname=''), 'color':ROOT.kYellow+6,'weight': totalWeight, 'niceName':'WW 1l 2q        ', 'cut':''}
+
 
 #'(Sum$(abs(GenPart_pdgId)==11)==2||Sum$(abs(GenPart_pdgId)==13)==2||(Sum$(abs(GenPart_pdgId)==11)==1&&Sum$(abs(GenPart_pdgId)==13)==1))'
 
@@ -717,6 +734,8 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
     for item in reversed(h):
       item['hist'].Sumw2()
       item['hist'].Scale(scaleWidth,'width')
+      if minimum: item['hist'].SetMinimum(minimum)
+      if maximum: item['hist'].SetMaximum(maximum)
       #item['hist'].Divide(scaleHist)
       if first:
         if drawError:
@@ -798,7 +817,7 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
     dataMCH.GetYaxis().SetTitleOffset(0.4)
     dataMCH.GetYaxis().SetNdivisions(508)
     dataMCH.SetMinimum(0.1)
-    dataMCH.SetMaximum(2.2)
+    dataMCH.SetMaximum(3.2)
     h.append({'hist':dataMCH, 'yield':0., 'legendName':'notInLegend'})
     dataMCH.Draw('same e1p')
     pad2.RedrawAxis()
@@ -809,13 +828,17 @@ def plot(samples, variable, cuts, signals=False, data=False, maximum=False, mini
     latex1.SetNDC()
     latex1.SetTextSize(0.04)
     latex1.SetTextAlign(11) # align right
-  if titleText: latex1.DrawLatex(leftMargin,0.96,'CMS #bf{#it{'+titleText+'}}')
+  if titleText:
+    latex1.DrawLatex(leftMargin,0.96,'CMS #bf{#it{'+titleText+'}}')
+    latex1.DrawLatex(0.85,0.96,"(13TeV)")
+
   if MCscale and (MCscale>1.001 or MCscale<0.99) :
     latex1.DrawLatex(0.82, 0.95-height-0.04,'#bf{MC scale:}')
     latex1.DrawLatex(0.82, 0.95-height-0.04*2, str(round(MCscale,2))+'\pm'+str(round(MCscaleError,2)))
+
   if lumi:
-    if data: latex1.DrawLatex(0.8,0.96,str(lumi)+"fb^{-1} (13TeV)")
-    else: latex1.DrawLatex(0.73,0.96,str(lumi)+"fb^{-1} (13TeV)")
+    if data: latex1.DrawLatex(0.8,0.96,str(lumi)+"fb^{-1}")
+    else: latex1.DrawLatex(0.73,0.96,str(lumi)+"fb^{-1}")
   if legend:
     leg.Draw()
     if signals: signalLegend.Draw()

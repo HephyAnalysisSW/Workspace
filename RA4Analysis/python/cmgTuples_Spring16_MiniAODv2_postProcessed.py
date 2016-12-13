@@ -3,6 +3,7 @@ import copy, os, sys
 #dirEce2 = '/data/easilar/cmgTuples/postProcessing_Spring16_FIXED_v2/'
 #dirDaniel = '/afs/hephy.at/data/dspitzbart01/cmgTuples/postProcessing_Spring16_JECv6_v2/HT500LT250Skim/'
 dirDaniel = '/afs/hephy.at/data/dspitzbart01/cmgTuples/postProcessing_Spring16_JECv6_v3/HT500LT250Skim/'
+dirDaniel2 = '/afs/hephy.at/data/dspitzbart01/cmgTuples/postProcessing_Spring16_JECv6_v4/HT500LT250Skim/'
 
 #dirDaniel = '/data/dspitzbart/cmgTuples/postProcessing_Spring16_JECv6/HT500LT250Skim/'
 dirEce = '/data/easilar/cmgTuples/postProcessing_Spring16_JECv6/HT500LT250Skim/'
@@ -116,7 +117,8 @@ WJetsHTToLNu = {\
 singleTop_lep = {\
 "name" : "singleTop_lep",
 "bins" : [
-"ST_schannel_4f_leptonDecays",
+#"ST_schannel_4f_leptonDecays",
+#"ST_tchannel_4f_leptonDecays",
 "ST_tchannel_antitop_4f_leptonDecays_powheg",
 "ST_tchannel_top_4f_leptonDecays_powheg",
 "ST_tW_antitop_5f_inclusiveDecays_powheg",
@@ -162,6 +164,32 @@ diBoson_incl = {\
 'dir': dirDaniel,
 }
 
+WW_incl = {\
+"name":"WW",
+"bins":[
+"DiBoson_WW",
+],
+'dir': dirDaniel,
+}
+
+WZ_incl = {\
+"name":"WZ",
+"bins":[
+"DiBoson_WZ",
+],
+'dir': dirDaniel,
+}
+
+ZZ_incl = {\
+"name":"ZZ",
+"bins":[
+"DiBoson_ZZ",
+],
+'dir': dirDaniel,
+}
+
+
+
 diBoson = {\
 "name":"diBoson",
 "bins":[
@@ -176,6 +204,124 @@ diBoson = {\
 ],
 'dir': dirDaniel,
 }
+
+diBosonLNuQQ = {\
+"name":"diBosonLNuQQ",
+"bins":[
+"WWToLNuQQ",
+"WZTo1L1Nu2Q",
+],
+'dir': dirDaniel,
+}
+
+WWToLNuQQ_ext = {\
+"name":"WWToLNuQQ",
+"bins":[
+"WWToLNuQQ_extended",
+],
+'dir': dirDaniel2,
+}
+
+WWToLNuQQ = {\
+"name":"WWToLNuQQ",
+"bins":[
+"WWToLNuQQ",
+],
+'dir': dirDaniel,
+}
+
+WZToLNuQQ = {\
+"name":"WZToLNuQQ",
+"bins":[
+"WZTo1L1Nu2Q",
+],
+'dir': dirDaniel,
+}
+
+WZTo1L3Nu = {\
+"name":"WZTo1L3Nu",
+"bins":[
+"WZTo1L3Nu",
+],
+'dir': dirDaniel,
+}
+
+diBosonDiLep = {\
+"name":"diBosonDiLep",
+"bins":[
+"WWTo2L2Nu",
+"WZTo2L2Q",
+"ZZTo2L2Nu",
+"ZZTo2L2Q",
+],
+'dir': dirDaniel,
+}
+
+diBosonHad = {\
+"name":"diBosonHad",
+"bins":[
+"ZZTo2Q2Nu",
+],
+'dir': dirDaniel,
+}
+
+WW_incl_noskim = {\
+"name":"WW_incl_noskim",
+"bins":["DiBoson_WW"],
+"dir":dirDaniel2,
+}
+
+WWToLNuQQ_noskim = {\
+"name":"WWToLNuQQ_noskim",
+"bins":["WWToLNuQQ_powheg"],
+"dir":dirDaniel2,
+}
+
+WWToLNuQQ_amc_noskim = {\
+"name":"WWToLNuQQ_noskim",
+"bins":["WWToLNuQQ"],
+"dir":dirDaniel2,
+}
+
+WW = {\
+"name":"WW",
+"bins":[
+"WWTo2L2Nu",
+"WWToLNuQQ",
+],
+'dir': dirDaniel,
+}
+
+WZ = {\
+"name":"WZ",
+"bins":[
+"WZTo1L1Nu2Q",
+"WZTo1L3Nu",
+"WZTo2L2Q",
+],
+'dir': dirDaniel,
+}
+
+WZsemilep = {\
+"name":"WZsemilep",
+"bins":[
+"WZTo1L1Nu2Q",
+"WZTo1L3Nu",
+],
+'dir': dirDaniel,
+}
+
+
+ZZ = {\
+"name":"ZZ",
+"bins":[
+"ZZTo2L2Nu",
+"ZZTo2L2Q",
+"ZZTo2Q2Nu",
+],
+'dir': dirDaniel,
+}
+
 
 
 TTV = {
