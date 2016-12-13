@@ -17,8 +17,9 @@ ptBorders = [30, 40, 50, 60, 70, 80, 100, 120, 160, 210, 260, 320, 400, 500, 670
 ptBins = []
 etaBins = [[0,0.8], [0.8,1.6], [ 1.6, 2.4]]
 
-calib = ROOT.BTagCalibration("csvv2", "data/CSVv2_ichep.csv")
-calibFS = ROOT.BTagCalibration("csv", "data/CSV_13TEV_Combined_14_7_2016.csv")
+scaleFactorFile   = 'CMSSW_BASE/src/Workspace/RA4Analysis/cmgPostProcessing/data/CSVv2_ichep.csv'
+scaleFactorFileFS = 'CMSSW_BASE/src/Workspace/RA4Analysis/cmgPostProcessing/data/CSV_13TEV_Combined_14_7_2016.csv'
+
 
 #SFb_errors = [\
 # 0.0209663,
@@ -62,7 +63,10 @@ def getSignalChain(signal):
   c = getChain(l, histname='')
   return c
 
-
+def toFlavourKey(pdgId):
+    if abs(pdgId)==5: return ROOT.BTagEntry.FLAV_B
+    if abs(pdgId)==4: return ROOT.BTagEntry.FLAV_C
+    return ROOT.BTagEntry.FLAV_UDSG
 
 
 # get MC truth efficiencies for a specific sample
@@ -135,60 +139,41 @@ def getSF(parton, pt, eta, year = 2012):
   return {"SF":sf, "SF_down":sf_d,"SF_up":sf_u}
 
 ## get SFs
-# "comb" (combination of QCD and ttbar methods) for b and c jets
-readerCombUp      = ROOT.BTagCalibrationReader(calib, 1, "comb", "up") #1 reflects the medium working point
-readerCombCentral = ROOT.BTagCalibrationReader(calib, 1, "comb", "central")
-readerCombDown    = ROOT.BTagCalibrationReader(calib, 1, "comb", "down")
+ROOT.gSystem.Load('libCondFormatsBTauObjects')
+ROOT.gSystem.Load('libCondToolsBTau')
+calib = ROOT.BTagCalibration("csvv2", os.path.expandvars(scaleFactorFile))
+calibFS = ROOT.BTagCalibration("csv", os.path.expandvars(scaleFactorFileFS))
 
-# "mujets" (from QCD methods only) for b and c jets
-readerMuUp        = ROOT.BTagCalibrationReader(calib, 1, "mujets", "up")
-readerMuCentral   = ROOT.BTagCalibrationReader(calib, 1, "mujets", "central")
-readerMuDown      = ROOT.BTagCalibrationReader(calib, 1, "mujets", "down")
+v_sys = getattr(ROOT, 'vector<string>')()
+v_sys.push_back('up')
+v_sys.push_back('down')
+reader = ROOT.BTagCalibrationReader(WP, "central", v_sys)
+reader.load(calib, 0, "comb")
+reader.load(calib, 1, "comb")
+reader.load(calib, 2, "incl")
 
-# "incl" for light jets
-readerInclUp        = ROOT.BTagCalibrationReader(calib, 1, "incl", "up")
-readerInclCentral   = ROOT.BTagCalibrationReader(calib, 1, "incl", "central")
-readerInclDown      = ROOT.BTagCalibrationReader(calib, 1, "incl", "down")
-
-readerFSUp        = ROOT.BTagCalibrationReader(calibFS, 1, "fastsim", "up")
-readerFSCentral   = ROOT.BTagCalibrationReader(calibFS, 1, "fastsim", "central")
-readerFSDown      = ROOT.BTagCalibrationReader(calibFS, 1, "fastsim", "down")
+calibFS = ROOT.BTagCalibration("csv", os.path.expandvars( scaleFactorFileFS ) )
+readerFS = ROOT.BTagCalibrationReader(WP, "central", v_sys)
+readerFS.load(calibFS, 0, "fastsim")
+readerFS.load(calibFS, 1, "fastsim")
+readerFS.load(calibFS, 2, "fastsim")
 
 
 def getSF2015(parton, pt, eta):
-  if abs(parton)==5: #SF for b
-    if pt>669.9:
-      sf   = readerCombCentral.eval(0, eta, 669.9)
-      sf_d = readerCombDown.eval(0, eta, 669.9)
-      sf_u = readerCombUp.eval(0, eta, 669.9)
-      sf_d = 2*sf_d - sf
-      sf_u = 2*sf_u - sf
-    else:
-      sf   = readerCombCentral.eval(0, eta, pt)
-      sf_d = readerCombDown.eval(0, eta, pt)
-      sf_u = readerCombUp.eval(0, eta, pt)
-  elif abs(parton)==4: #SF for c
-    if pt>669.9:
-      sf   = readerCombCentral.eval(1, eta, 669.9)
-      sf_d = readerCombDown.eval(1, eta, 669.9)
-      sf_u = readerCombUp.eval(1, eta, 669.9)
-      sf_d = 2*sf_d - sf
-      sf_u = 2*sf_u - sf
-    else:
-      sf   = readerCombCentral.eval(1, eta, pt)
-      sf_d = readerCombDown.eval(1, eta, pt)
-      sf_u = readerCombUp.eval(1, eta, pt)
+
+  if pt<20: raise ValueError( "BTag SF Not implemented below 20 GeV. Got %f"%pt )
+  flavKey = toFlavourKey(parton)
+
+  #FullSim SFs (times FSSF)
+  if abs(pdgId)==5 or abs(pdgId)==4: #SF for b/c
+      sf    = reader.eval_auto_bounds('central',  flavKey, eta, pt)
+      sf_d  = reader.eval_auto_bounds('down',     flavKey, eta, pt)
+      sf_u  = reader.eval_auto_bounds('up',       flavKey, eta, pt)
   else: #SF for light flavours
-    if pt>999:
-      sf   = readerInclCentral.eval(2, eta, 999)
-      sf_d = readerInclDown.eval(2, eta, 999)
-      sf_u = readerInclUp.eval(2, eta, 999)
-      sf_d = 2*sf_d - sf
-      sf_u = 2*sf_u - sf
-    else:
-      sf   = readerInclCentral.eval(2, eta, pt)
-      sf_d = readerInclDown.eval(2, eta, pt)
-      sf_u = readerInclUp.eval(2, eta, pt)
+      sf    = reader.eval_auto_bounds('central',  flavKey, eta, pt)
+      sf_d  = reader.eval_auto_bounds('down',     flavKey, eta, pt)
+      sf_u  = reader.eval_auto_bounds('up',       flavKey, eta, pt)
+
   return {"SF":sf, "SF_down":sf_d,"SF_up":sf_u}
 
 # get MC efficiencies and scale factors for a specific jet (with parton flavor, pt and eta)
@@ -248,22 +233,15 @@ def getMCEfficiencyForBTagSF(c, mcEff, onlyLightJetSystem = False, sms=""):
   mceffs_SF_light_Down = tuple()
   for jParton, jPt, jEta, r in jets:
     if sms!="":
-      if abs(jParton)==5: #SF for b
-        hadId = 0
-      elif abs(jParton)==4: #SF for c
-        hadId = 1
-      else: #SF for light flavours
-        hadId = 2
-      if jPt < 799.9:
-        fsim_SF       = readerFSCentral.eval(hadId, jEta, jPt)
-        fsim_SF_down  = readerFSDown.eval(hadId, jEta, jPt)
-        fsim_SF_up    = readerFSUp.eval(hadId, jEta, jPt)
-      else:
-        fsim_SF       = readerFSCentral.eval(hadId, jEta, 799.9)
-        fsim_SF_down  = readerFSDown.eval(hadId, jEta, 799.9)
-        fsim_SF_up    = readerFSUp.eval(hadId, jEta, 799.9)
-        fsim_SF_down  = 2*fsim_SF_down - fsim_SF
-        fsim_SF_up    = 2*fsim_SF_up - fsim_SF
+      flavKey = toFlavourKey(jParton)
+      #FastSim SFs
+      fsim_SF       = readerFS.eval_auto_bounds('central', flavKey, jEta, jPt)
+      fsim_SF_down  = readerFS.eval_auto_bounds('down',    flavKey, jEta, jPt)
+      fsim_SF_up    = readerFS.eval_auto_bounds('up',      flavKey, jEta, jPt)
+      if fsim_SF == 0:  # should not happen, however, if pt=1000 (exactly) the reader will return a sf of 0.
+          fsim_SF       = 1
+          fsim_SF_up    = 1
+          fsim_SF_down  = 1
     else:
       fsim_SF = 1.
       fsim_SF_up = 1.
