@@ -17,7 +17,7 @@ ROOT.AutoLibraryLoader.enable()
 
 from Workspace.HEPHYPythonTools.helpers import getChunks
 from Workspace.RA4Analysis.cmgTuples_Data25ns_PromptRecoV2 import *
-from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2 import *
+from Workspace.RA4Analysis.cmgTuples_Spring16_Moriond2017_MiniAODv2 import *
 from systematics_helper import calc_btag_systematics, calc_LeptonScale_factors_and_systematics, calc_TopPt_Weights , calcDLDictionary, calc_diLep_contributions ,  fill_branch_WithJEC , getGenWandLepton , getGenTopWLepton
 from btagEfficiency import *
 from readVetoEventList import *
