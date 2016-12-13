@@ -1,18 +1,17 @@
-#fakes.py
+# fakes.py
+# Script for plotting MC fakes in SR
+# Mateusz Zarucki 2016
+
 import ROOT
 import os, sys
 import argparse
 import Workspace.DegenerateStopAnalysis.toolsMateusz.ROOToptions
 from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
-from Workspace.DegenerateStopAnalysis.navidTools.NavidTools import Plots, getPlots, drawPlots, setup_style
-#from Workspace.DegenerateStopAnalysis.toolsMateusz.degTools import *
+from Workspace.DegenerateStopAnalysis.tools.degTools import Plots, getPlots, drawPlots, setup_style
 from Workspace.DegenerateStopAnalysis.toolsMateusz.eleWPs import *
-from Workspace.DegenerateStopAnalysis.toolsMateusz.cmgTuplesPostProcessed_mAODv2_analysisHephy13TeV import cmgTuplesPostProcessed
-from Workspace.DegenerateStopAnalysis.toolsMateusz.getSamples_mAODv2_analysisHephy13TeV import getSamples
-#from Workspace.DegenerateStopAnalysis.toolsMateusz.cmgTuplesPostProcessed_mAODv2 import cmgTuplesPostProcessed
-#from Workspace.DegenerateStopAnalysis.toolsMateusz.getSamples_PP_mAODv2_7412pass2_scan import getSamples
-
+from Workspace.DegenerateStopAnalysis.tools.getSamples_8012 import getSamples
+from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesPostProcessed_mAODv2_2016 import cmgTuplesPostProcessed
 from array import array
 from math import pi, sqrt #cos, sin, sinh, log
 
@@ -26,7 +25,7 @@ backgrounds = ["w","tt", "z", "qcd"]
 cmgPP = cmgTuplesPostProcessed()#mc_path, signal_path, data_path)
 
 samplesList = backgrounds # + privateSignals
-samples = getSamples(cmgPP = cmgPP, skim = 'presel', sampleList = samplesList, scan = False, useHT = True, getData = False)
+samples = getSamples(cmgPP = cmgPP, skim = 'preIncLep', sampleList = samplesList, scan = False, useHT = True, getData = False)
 
 officialSignals = ["s300_290", "s300_270", "s300_250"] #FIXME: crosscheck if these are in allOfficialSignals
 
@@ -53,7 +52,8 @@ save = args.save
 
 #Save
 if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
-   savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/QCD/fakes"
+   tag = samples[samples.keys()[0]].dir.split('/')[7] + "/" + samples[samples.keys()[0]].dir.split('/')[8]
+   savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/fakes"%tag
 
 #Gets all cuts (electron, SR, CR) for given electron ID
 eleIDsel = electronIDs(ID = "standard", removedCut = "None", iso = "hybIso03")
@@ -70,29 +70,11 @@ for s in selectedSamples:
       print "!!! Sample " + sample + " unavailable."
       sys.exit(0)
 
-#print makeLine()
-#print "ID type: ", ID, " | Selection Region: ", selection, " | Electron ID WP: ", WP, " | Electron ID Cut Removed: ", removedCut, " | Isolation applied: ", iso
-#print makeLine()
-   
-
-#elePt = "Max$(LepGood_pt*eleSel)"
-#eleMt = "Max$(LepGood_mt*eleSel)"
-#eleMt = "Max$(sqrt(2*met*{pt}*(1 - cos(met_phi - LepGood_phi)))*(LepGood_pt == {pt}))".format(pt=elePt)  #%(elePt[iWP], elePhi[iWP], elePt[iWP])#
-
-#medMuId = "Sum$(abs(LepGood_pdgId) == 13 && abs(LepGood_eta) < 2.4 && 
-#           abs(LepGood_dz) < 0.2  && abs(LepGood_dxy)<0.05 && 
-#           (LepGood_relIso04 < 0.2 || LepGood_relIso04 < 5) && 
-#           LepGood_mediumMuonId == 1) == 1"
-
 etaAcc = 2.1
-fakeEleSel = "abs(LepGood_pdgId) == 11 && abs(LepGood_eta) < " + str(etaAcc) + " && " + eleIDsel['Veto'] + " && LepGood_mcMatchId == 0" #(LepGood_relIso03*min(LepGood_pt, 25)) < 5 
-#fakeEleSel = "abs(LepGood_pdgId) == 11 && abs(LepGood_eta) < " + str(etaAcc) + "&& LepGood_mcMatchId == 0"
-#fakeEleSel = "abs(LepGood_pdgId) == 11 && abs(LepGood_eta) < " + str(etaAcc) + " && LepGood_relIso03 < 0.2 && LepGood_miniRelIso < 0.1 && LepGood_mcMatchId == 0"
-#fakeEleSel = "abs(LepGood_pdgId) == 11 && abs(LepGood_eta) < " + str(etaAcc) + " && " + eleIDsel['Loose'] + " && LepGood_mcMatchId == 0"
-#fakeEleSel2 = "abs(LepGood_pdgId) == 11 && abs(LepGood_eta) < " + str(etaAcc) + " && " + eleIDsel['Veto'] + " && LepGood_miniRelIso < 0.5 && LepGood_mcMatchId == 0"
+fakeEleSel = "abs(LepAll_pdgId) == 11 && abs(LepAll_eta) < " + str(etaAcc) + " && " + eleIDsel['Veto'] + " && LepAll_mcMatchId == 0" #(LepAll_relIso03*min(LepAll_pt, 25)) < 5 
 
-fakePt = "Max$(LepGood_pt*(" + fakeEleSel + "))"
-#fakeMt = "Max$(LepGood_mt*(" + fakeEleSel + "))"
+fakePt = "Max$(LepAll_pt*(" + fakeEleSel + "))"
+fakeMt = "Max$(LepAll_mt*(" + fakeEleSel + "))"
 
 fakes = CutClass("fakes", [
    ["MET300","met > 300"],
@@ -109,8 +91,8 @@ fakes = CutClass("fakes", [
    
    #["AntiQCD", " (deltaPhi_j12 < 2.5)"], # monojet
    #["ISR110","nJet110 >= 1" ],
-   #["TauElVeto","(Sum$(TauGood_idMVA) == 0) && (Sum$(abs(LepGood_pdgId) == 11 && abs(LepGood_eta) < " + str(etaAcc) + "&& LepGood_SPRING15_25ns_v1 == 1) == 0)"],
-   #["1Mu-2ndMu20Veto", "(nlep==1 || (nlep ==2 && LepGood_pt[looseMuonIndex2] < 20) )"],
+   #["TauElVeto","(Sum$(TauGood_idMVA) == 0) && (Sum$(abs(LepAll_pdgId) == 11 && abs(LepAll_eta) < " + str(etaAcc) + "&& LepAll_SPRING15_25ns_v1 == 1) == 0)"],
+   #["1Mu-2ndMu20Veto", "(nlep==1 || (nlep ==2 && LepAll_pt[looseMuonIndex2] < 20) )"],
    #["No3rdJet60","nJet60 <= 2"],
 
 plotDict = {\
@@ -124,10 +106,7 @@ plotsDict = Plots(**plotDict)
 plotsList = ["fakePt", "fakeMt", "MET"]#, "HT"]
 
 plots = getPlots(samples, plotsDict, fakes, selectedSamples, plotList = plotsList)# addOverFlowBin='both')
-#fakePlots1 = drawPlots(samples, plotsDict, fakes, selectedSamples, plotList = plotsList, fom=False, save=False, leg = True, plotMin=0.1)#, logy = 1  plotLimits = [0,20]
 fakePlots1 = drawPlots(samples, plotsDict, fakes, selectedSamples, plotList = plotsList, plotLimits = [0.1, 5000], denoms = ["bkg"], noms = ["bkg"], fom = "RATIO", fomLimits = [0,2.8], plotMin = 0.1, normalize = False, save = False)
-
-#fakePlots2 = drawPlots(samples, plots, fakes, sampleList = selectedSamples, plotList = ['MET'], fom=False, save=False, plotLimits = [0,900], leg = True)#, plotMin=0.001), logy = 1 
 
 #for leg in fakePlots1['legs']:
 #   leg.Draw()
@@ -142,8 +121,3 @@ if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
       fakePlots1['canvs'][canv1][0].SaveAs("%s/%s.png"%(savedir, canv1))
       fakePlots1['canvs'][canv1][0].SaveAs("%s/root/%s.root"%(savedir, canv1))
       fakePlots1['canvs'][canv1][0].SaveAs("%s/pdf/%s.pdf"%(savedir, canv1))
-   
-#   for canv2 in fakePlots2['canvs']:
-#      fakePlots2['canvs'][canv2][0].SaveAs("%s/%s.png"%(savedir, canv2))
-#      fakePlots2['canvs'][canv2][0].SaveAs("%s/root/%s.root"%(savedir, canv2))
-#      fakePlots2['canvs'][canv2][0].SaveAs("%s/pdf/%s.pdf"%(savedir, canv2))

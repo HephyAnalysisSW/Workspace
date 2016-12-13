@@ -16,6 +16,11 @@
 # in the directory where the realease has to be checkout and built
 #
 # if no argument or one argument is given, the default branch(es) or tag(s) given below will be used. 
+# Note: when using tags (to be given as tags/TAG_NAME), 
+#       git checkout tags/TAG_NAME, 
+#       the repository goes in "detached head", so you can not commit 
+#       your changes. 
+#       Use tags only for producing tuples.
 
 # set parameters
 CMSSW_ACTION="CB"
@@ -38,7 +43,7 @@ fi
 set -vx
 
 # release and architecture, 
-CMSSW_RELEASE="CMSSW_8_0_11"
+CMSSW_RELEASE="CMSSW_8_0_20"
 SCRAM_ARCH_VAL="slc6_amd64_gcc530"
 
 if [[ ${CMSSW_ACTION} == "CB" || ${CMSSW_ACTION} == "R" ]]; then
@@ -56,7 +61,7 @@ if [[ ${CMSSW_ACTION} == "CB" ]]; then
     # create empty repository 
     git cms-init
     
-    # clone Vienna Workspace repository
+    # clone github Vienna Workspace repository
     git clone https://github.com/HephySusySW/Workspace 
     cd Workspace
     git checkout ${WORKSPACE_TAG_BRANCH}
@@ -64,7 +69,7 @@ if [[ ${CMSSW_ACTION} == "CB" ]]; then
     # 
     cd ${CMSSW_BASE}/src
     eval `scram runtime -sh`
-
+            
     # add the central cmg-cmssw repository to get the Heppy 80X branch
     git remote add cmg-central https://github.com/CERN-PH-CMG/cmg-cmssw.git  -f  -t heppy_80X
 

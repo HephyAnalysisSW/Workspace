@@ -20,7 +20,7 @@ ptSplit = 10 #we have above and below 10 GeV categories
 #Electron ID Definitions
 #IDs: 0 - none, 1 - veto (~95% eff), 2 - loose (~90% eff), 3 - medium (~80% eff), 4 - tig (~70% eff)
 
-def electronIDs(ID = "standard", removedCut = "None", iso = "", collection = "LepGood"):
+def electronIDs(ID = "standard", removedCut = "None", iso = "", collection = "LepAll"):
   
    WPs = ['None', 'Veto', 'Loose', 'Medium', 'Tight']
 

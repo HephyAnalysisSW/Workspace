@@ -3,7 +3,8 @@ import sys,os
 #from Workspace.DegenerateStopAnalysis.tools.degTools import *
 #from Workspace.DegenerateStopAnalysis.cmgTuplesPostProcessed_mAODv2 import cmgTuplesPostProcessed
 from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesPostProcessed_mAODv2_2016 import cmgTuplesPostProcessed
-from Workspace.DegenerateStopAnalysis.tools.getSamples_8011 import getSamples , weights
+#from Workspace.DegenerateStopAnalysis.tools.getSamples_8011 import getSamples , weights
+from Workspace.DegenerateStopAnalysis.tools.getSamples import getSamples , weights
 
 
 
@@ -45,7 +46,7 @@ class TaskConfig():
                  sample_info  = {},
                  samples      = None,
                  lumi_info    = {},
-                 saveDirBase = '/afs/hephy.at/user/n/nrad/www/T2Deg13TeV/mAODv2_7412pass2_v6/Optimization_v0/',
+                 saveDirBase = '%s/www/T2Deg13TeV/mAODv2_7412pass2_v6/Optimization_v0/'%os.path.expandvars("$HOME"),
                  **kwargs 
                  #samples     , 
                  #plots       , 
@@ -135,8 +136,11 @@ class TaskConfig():
         self.plotDir    =   self.saveDir+"/FOMPlots/"
         #self.cardDirBase=   "/data/nrad/results/cards_and_limits/"
 
-        self.cardDirBase=   "/afs/hephy.at/work/n/nrad/results/cards_and_limits/%s/%s"%(self.cmgTag, self.ppTag)
-        self.yieldPklDir =  "/afs/hephy.at/work/n/nrad/results/yields/%s/%s/"%(self.cmgTag, self.ppTag) 
+        #self.cardDirBase=   "/afs/hephy.at/work/n/nrad/results/cards_and_limits/%s/%s"%(self.cmgTag, self.ppTag)
+        #self.yieldPklDir =  "/afs/hephy.at/work/n/nrad/results/yields/%s/%s/"%(self.cmgTag, self.ppTag) 
+        workDir         = os.path.expandvars("$WORK")
+        self.cardDirBase=   "%s/results/cards_and_limits/%s/%s"%(workDir, self.cmgTag, self.ppTag)
+        self.yieldPklDir =  "%s/results/yields/%s/%s/"%(workDir, self.cmgTag, self.ppTag) 
 
         self.lumi_tag   =   make_lumi_tag(lumi_info['target_lumi'])
         #self.results_dir =   self.cardDirBase + "/13TeV/{ht}/{run}/{lumi}/{cut}/".format( ht = self.htString, lumi = self.lumi_tag, run = self.runTag, cut=cutName) 
@@ -155,17 +159,28 @@ class TaskConfig():
         for key, value in default_keys.iteritems():
             setattr(self,key, getattr(self,key,value) ) 
 
-        self.parameterSet =  "analysisHephy_13TeV_2016_v0"
-        mc_path_tag       =  "RunIISpring16MiniAODv2"
-        data_path_tag     =  "Data2016"
+        self.parameterSet =  getattr(self, "parameterSet","analysisHephy_13TeV_2016_v0")
+        mc_path_tag       =  getattr(self, "mcDir", "RunIISpring16MiniAODv2")
+        data_path_tag     =  getattr(self, "dataDir", "Data2016")
 
         self.mc_path       = "/afs/hephy.at/data/{ppUser}/cmgTuples/postProcessed_mAODv2/{cmgTag}/{ppTag}/{parameterSet}/{ppStep}/{mc_path_tag}_{cmgTagV}/".format(ppTag=ppTag,ppStep=self.ppStep, ppUser = self.ppUser , cmgTag = self.cmgTag, cmgTagV = self.cmgTagVer, parameterSet=self.parameterSet, mc_path_tag= mc_path_tag)
-        #self.signal_path   = "/afs/hephy.at/data/{ppUser}/cmgTuples/postProcessed_mAODv2/{cmgTag}/{ppTag}/{parameterSet}/{ppStep}/{mc_path_tag}_{cmgTagV}/".format(ppTag=ppTag,ppStep=self.ppStep, ppUser = self.ppUser , cmgTag = self.cmgTag, cmgTagV = self.cmgTagVer, parameterSet=self.parameterSet, mc_path_tag= mc_path_tag)
-        self.signal_path   = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/{cmgTag}/{ppTag}/{parameterSet}/{ppStep}/{mc_path_tag}_{cmgTagV}/".format(ppTag=ppTag,ppStep=self.ppStep, ppUser = self.ppUser , cmgTag = self.cmgTag, cmgTagV = self.cmgTagVer, parameterSet=self.parameterSet, mc_path_tag= mc_path_tag)
+        if '80' in self.cmgTag:
+            #self.signal_path   = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/{cmgTag}_1/{ppTag}_1/{parameterSet}/{ppStep}/{mc_path_tag}_{cmgTagV}/".format(ppTag=ppTag,ppStep=self.ppStep, ppUser = self.ppUser , cmgTag = self.cmgTag, cmgTagV = self.cmgTagVer, parameterSet=self.parameterSet, mc_path_tag= mc_path_tag)
+            self.signal_path   = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/{cmgTag}/{ppTag}/{parameterSet}/{ppStep}/{mc_path_tag}_{cmgTagV}/".format(ppTag=ppTag,ppStep=self.ppStep, ppUser = self.ppUser , cmgTag = self.cmgTag, cmgTagV = self.cmgTagVer, parameterSet=self.parameterSet, mc_path_tag= mc_path_tag)
+        else:
+            self.signal_path   = "/afs/hephy.at/data/{ppUser}/cmgTuples/postProcessed_mAODv2/{cmgTag}/{ppTag}/{parameterSet}/{ppStep}/{mc_path_tag}_{cmgTagV}/".format(ppTag=ppTag,ppStep=self.ppStep, ppUser = self.ppUser , cmgTag = self.cmgTag, cmgTagV = self.cmgTagVer, parameterSet=self.parameterSet, mc_path_tag= mc_path_tag)
+            #self.signal_path   = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/{cmgTag}_1/{ppTag}_1/{parameterSet}/{ppStep}/{mc_path_tag}_{cmgTagV}/".format(ppTag=ppTag,ppStep=self.ppStep, ppUser = self.ppUser , cmgTag = self.cmgTag, cmgTagV = self.cmgTagVer, parameterSet=self.parameterSet, mc_path_tag= mc_path_tag)
         self.data_path     = "/afs/hephy.at/data/{ppUser}/cmgTuples/postProcessed_mAODv2/{cmgTag}/{ppTag}/{parameterSet}/{ppStep}/{data_path_tag}_{cmgTagV}/".format(ppTag=ppTag,ppStep=self.ppStep, ppUser = self.ppUser , cmgTag = self.cmgTag, cmgTagV = self.cmgTagVer, parameterSet=self.parameterSet, data_path_tag= data_path_tag)
         #self.data_path     = "/afs/hephy.at/data/{ppUser}/cmgTuples/postProcessed_mAODv2/{cmgTag}/{ppTag}/{parameterSet}/{ppStep}/{data_path_tag}_{cmgTagV}/".format(ppTag=ppTag,ppStep=self.ppStep, ppUser = self.ppUser , cmgTag = self.cmgTag, cmgTagV = self.cmgTagVer, parameterSet=self.parameterSet, data_path_tag= data_path_tag)
     
         if not samples:
+
+            if '74' in self.cmgTag:
+                from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesPostProcessed_mAODv2 import cmgTuplesPostProcessed
+            else:
+                from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesPostProcessed_mAODv2_2016 import cmgTuplesPostProcessed
+    
+
             self.cmgPP         = cmgTuplesPostProcessed( self.mc_path, self.signal_path, self.data_path)
             self.samples   =   getSamples(   cmgPP = self.cmgPP, **sample_info   )
         else:

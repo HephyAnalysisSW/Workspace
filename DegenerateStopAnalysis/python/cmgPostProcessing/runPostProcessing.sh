@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# shell script to run runPostProcessing_v1.py  
+# shell script to run runPostProcessing_v2.py  
 # Steps:
 #    Prerequisite:
 #      set-up the production release (e.g. via manageRelease.sh from script directory)
@@ -32,7 +32,7 @@
 #set -vx
 
 # release and architecture, 
-CMSSW_RELEASE="CMSSW_8_0_11"
+CMSSW_RELEASE="CMSSW_8_0_20"
 SCRAM_ARCH_VAL="slc6_amd64_gcc530"
 CMSSW_ACTION="RO"
 
@@ -41,13 +41,20 @@ CMSSW_ACTION="RO"
 # cli parameters
 SAMPLE_SET=$1
 
+# hard-coded parameters - modify them according to desired full set
+RUNMODE="BATCH"
+CMG_PROCESSING_TAG="8020_mAODv2_v0"
+CMG_POST_PROCESSING_TAG="80X_postProcessing_v0"
+PARAMETER_SET="analysisHephy_13TeV_2016_v2_1"
+CHUNK_SPLITTING="100"
+VERBOSE="" #--verbose"
+
 # semi-hard-coded parameters
 if [[ ${2} == "DATA" ]]; then 
-    #CMG_TUPLES="Data2016_v1_2"
-    CMG_TUPLES="Data2016_v3"
+    CMG_TUPLES="Data2016_v0"
     BTAG_WEIGHTS=""
 else
-    CMG_TUPLES="RunIISpring16MiniAODv2_v3"
+    CMG_TUPLES="RunIISpring16MiniAODv2_v0"
     BTAG_WEIGHTS="--processBTagWeights"
 fi
 
@@ -58,25 +65,32 @@ else
 fi
 
 if [[ ${4} == "skimLepton" ]]; then 
-    SKIM_LEPTON="--skimLepton=oneLep"
+    SKIM_LEPTON="--skimLepton=oneLep20"
 else
     SKIM_LEPTON=""
 fi
 
-CMG_POST_PROCESSING_TAG="80X_postProcessing_v10"
-VERBOSE="--verbose"
 if [[ ${5} == "TEST" ]]; then 
     CMG_POST_PROCESSING_TAG=$CMG_POST_PROCESSING_TAG"_TEST"
     VERBOSE="--verbose"
 fi
 
-# hard-coded parameters - modify them according to desired full set
-CMG_PROCESSING_TAG="8012_mAODv2_v3"
-PARAMETER_SET="analysisHephy_13TeV_2016_v0"
+if [[ ${CHUNK_SPLITTING} ]]; then
+    SPLIT_CHUNKS="--splitChunks "$CHUNK_SPLITTING
+else
+    SPLIT_CHUNKS=""
+fi
+
+if [[ ${RUNMODE} == "BATCH" ]]; then
+    echo "Creating batch script (to run set RUNMODE to RUN).."
+    RUNOPT="--batchScript"
+elif [[ ${RUNMODE} == "RUN" ]]; then
+    RUNOPT="--run"
+fi
+
 
 # the rest of the parameters are the default parameters from cmgPostProcessing_parser.py
 
-# 
 if [[ ${CMSSW_ACTION} == "CB" || ${CMSSW_ACTION} == "R" ]]; then
 
     export SCRAM_ARCH=${SCRAM_ARCH_VAL}
@@ -97,12 +111,12 @@ if [[ ${CMSSW_ACTION} == "RO" || ${CMSSW_ACTION} == "R" ]]; then
         --parameterSet=${PARAMETER_SET} \
         --cmgProcessingTag=${CMG_PROCESSING_TAG} \
         --cmgPostProcessingTag=${CMG_POST_PROCESSING_TAG} \
-        --processLepAll \
-        --skimGeneral='' \
+        --processEventVetoFilters \
         ${SKIM_PRESELECT} \
         ${SKIM_LEPTON} \
         ${BTAG_WEIGHTS} \
-        --run \
+        ${SPLIT_CHUNKS} \
+        ${RUNOPT} \
         ${VERBOSE}
 fi
 

@@ -74,7 +74,8 @@ if __name__ == '__main__':
             limits[mstop]
         except KeyError:
             limits[mstop]={}
-        limits[mstop][mlsp] = [ None, limit,]
+        #limits[mstop][mlsp] = [card, limit,]
+        limits[mstop][mlsp] = limit 
         
         
     

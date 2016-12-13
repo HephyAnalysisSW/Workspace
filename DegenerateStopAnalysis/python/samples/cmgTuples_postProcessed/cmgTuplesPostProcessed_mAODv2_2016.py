@@ -1,7 +1,21 @@
-''' Sample definition file for 2016 data and MC samples.
+""" Sample definition file for CMG post-processed ntuples using 2016 data and MC production at 25 ns for the degenerate stop analysis.
+ 
+Each set of ntuples is produced with a git tag of HephySusySW.Workspace repository and and is saved in a directory:
+  
+   {path}/cmgTuples/{processingEra}/{processingTag}/{campaign}/{inc/soft/...}
+   
+    processingEra: postProcessed_mAODv2_v* (always starts with "postProcessed_")
+    processingTag: 80X_postProcessing_v* (git tag of HephySusySW.Workspace)
+    
+    campaign:
+        MC production campaign for MC samples  (e.g. RunIISpring16MiniAODv2, with _25ns added as additional identification)
+        Energy, reconstruction tag, era for data (e.g. 13TeV_PromptReco_Collisions15_25ns, taken from JSON name file)
+    
+The corresponding py sample files are called: 
+    RunIISpring16MiniAODv2_v*.py 
+    Data2016_v*.py
 
-TODO Add the rest of the samples when available.
-'''
+"""
 
 import copy
 import os
@@ -9,15 +23,11 @@ import sys
 import pickle
 
 # most recent paths, can be replaced when initializing the cmgTuplesPostProcessed class
-mc_path =     "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/8011_mAODv2_v1/80X_postProcessing_v6/analysisHephy_13TeV_2016_v0/step1/RunIISpring16MiniAODv2_v1"
-signal_path = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/8011_mAODv2_v1/80X_postProcessing_v6_1/analysisHephy_13TeV_2016_v0/step1/RunIISpring16MiniAODv2_v1"
-data_path =   "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/8011_mAODv2_v1/80X_postProcessing_v6_1/analysisHephy_13TeV_2016_v0/step1/Data2016_v1_2"
-
-#samples_path = "/afs/hephy.at/data/vghete02/cmgTuples/postProcessed_mAODv2/8011_mAODv2_v0/80X_postProcessing_v2/analysisHephy_13TeV_2016_v0/step1/"
-
-#mc_path     = samples_path + "RunIISpring16MiniAODv2_v0"
-#signal_path = samples_path + "RunIISpring16MiniAODv2_v0"
-#data_path   = samples_path + "Data2016_v0"
+ppsDir = '/afs/hephy.at/data/mzarucki01/cmgTuples/postProcessed_mAODv2/8020_mAODv2_v0/80X_postProcessing_v0/analysisHephy_13TeV_2016_v2_0/step1'
+#ppsDir = '/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/8020_mAODv2_v0/80X_postProcessing_v0/analysisHephy_13TeV_2016_v2_0/step1'
+mc_path     = ppsDir + "/RunIISpring16MiniAODv2_v0"
+data_path   = ppsDir + "/Data2016_v0"
+signal_path = mc_path
 
 # Lumi that was used in the weight calculation of PostProcessing in pb-1
 lumi_mc = 10000.
@@ -39,6 +49,15 @@ class cmgTuplesPostProcessed():
 
         ol = copy.deepcopy(sample)
         ol['dir'] = os.path.join(ol['dir'], 'oneLep')
+        
+        ol20 = copy.deepcopy(sample)
+        ol20['dir'] = os.path.join(ol20['dir'], 'oneLep20')
+        
+        olg = copy.deepcopy(sample)
+        olg['dir'] = os.path.join(olg['dir'], 'oneLepGood')
+        
+        olg_ht800 = copy.deepcopy(sample)
+        olg_ht800['dir'] = os.path.join(olg_ht800['dir'], 'oneLepGood_HT800')
 
         pil = copy.deepcopy(sample)
         pil['dir'] = os.path.join(pil['dir'], 'skimPreselect', 'incLep')
@@ -52,6 +71,9 @@ class cmgTuplesPostProcessed():
             'skimPresel': p,
             'incLep': il,
             'oneLep': ol,
+            'oneLep20': ol20,
+            'oneLepGood': olg,
+            'oneLepGood_HT800': olg_ht800,
             'preIncLep': pil,
             'preOneLep':  pol
             }
@@ -94,8 +116,17 @@ class cmgTuplesPostProcessed():
             'dir' : self.mc_path,
             'sampleId' : 20,
             })
-
+        
         self.TTJets_LO = self.TTJetsInc
+        
+        self.TTJetsInc_FS = self.makeSample({
+            "name" : "TTJetsInc_FastSim",
+            "bins" : [
+                "TTJets_13TeV-madgraphMLM_RunIISpring16MiniAODv2-pLHE_PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+                ],
+            'dir' : self.mc_path,
+            'sampleId' : 20,
+            })
 
         self.TTJetsHTLow = self.makeSample({
             "name" : "TTJetsHTLow",
@@ -157,6 +188,7 @@ class cmgTuplesPostProcessed():
         self.WJetsHT = self.makeSample({
             "name" : "WJetsHT",
             "bins" : [
+                    #"WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
                     "WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1",
                     "WJetsToLNu_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
                     "WJetsToLNu_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1",
@@ -255,7 +287,6 @@ class cmgTuplesPostProcessed():
             'sampleId' : 30,
 
         })
-
 
 
         self.QCDPT = self.makeSample({
@@ -404,26 +435,30 @@ class cmgTuplesPostProcessed():
         'dir' : self.mc_path
         })
 
-
-
-
         ######################################################################################################
         #####################################                  ###############################################
         #####################################       DATA       ###############################################
         #####################################                  ###############################################
         ######################################################################################################
 
-        dataSamples = [
-                        ["MET_v2",      ["MET_Run2016B-PromptReco-v2"           , "MET_Run2016C-PromptReco-v2"              ,  "MET_Run2016D-PromptReco-v2"            ]    ],
-                        ["SingleMu_v2", ["SingleMuon_Run2016B-PromptReco-v2"    , "SingleMuon_Run2016C-PromptReco-v2"       ,  "SingleMuon_Run2016D-PromptReco-v2"     ]    ],
-                        ["SingleEl_v2", ["SingleElectron_Run2016B-PromptReco-v2", "SingleElectron_Run2016C-PromptReco-v2"   ,  "SingleElectron_Run2016D-PromptReco-v2" ]    ],
-            ]
+        dataSamples = [\
+           ["MET",      ["MET_Run2016B-23Sep2016-v3",            "MET_Run2016C-23Sep2016-v1",            "MET_Run2016D-23Sep2016-v1",             "MET_Run2016E-23Sep2016-v1", 
+                         "MET_Run2016F-23Sep2016-v1",            "MET_Run2016G-23Sep2016-v1",            "MET_Run2016H-PromptReco-v2",            "MET_Run2016H-PromptReco-v3"]], #NOTE: H PromptReco
+           
+           ["SingleMu", ["SingleMuon_Run2016B-23Sep2016-v3",     "SingleMuon_Run2016C-23Sep2016-v1",     "SingleMuon_Run2016D-23Sep2016-v1",      "SingleMuon_Run2016E-23Sep2016-v1", 
+                         "SingleMuon_Run2016F-23Sep2016-v1",     "SingleMuon_Run2016G-23Sep2016-v1",     "SingleMuon_Run2016H-PromptReco-v2",     "SingleMuon_Run2016H-PromptReco-v3"]], #NOTE: H PromptReco
+           
+           ["SingleEl", ["SingleElectron_Run2016B-23Sep2016-v3", "SingleElectron_Run2016C-23Sep2016-v1", "SingleElectron_Run2016D-23Sep2016-v1",  "SingleElectron_Run2016E-23Sep2016-v1", 
+                         "SingleElectron_Run2016F-23Sep2016-v1", "SingleElectron_Run2016G-23Sep2016-v1", "SingleElectron_Run2016H-PromptReco-v2", "SingleElectron_Run2016H-PromptReco-v3"]], #NOTE: H PromptReco
+           
+           ["JetHT",    ["JetHT_Run2016B-23Sep2016-v3",          "JetHT_Run2016C-23Sep2016-v1",          "JetHT_Run2016D-23Sep2016-v1",           "JetHT_Run2016E-23Sep2016-v1", 
+                         "JetHT_Run2016F-23Sep2016-v1",          "JetHT_Run2016G-23Sep2016-v1",          "JetHT_Run2016H-PromptReco-v2",          "JetHT_Run2016H-PromptReco-v3"]], #NOTE: H PromptReco
+        ]
 
         allData = []
         for data in dataSamples:
             sample = self.getDataSample(*data)
             setattr(self, data[0], sample)
-
 
         # signal samples
 
@@ -440,36 +475,45 @@ class cmgTuplesPostProcessed():
             setattr(self, s, sm)
 
 
-        mass_dict_pickle_file = os.path.join(signal_path, "mass_dict.pkl")
-        if os.path.isfile(mass_dict_pickle_file):
-            mass_dict_pickle = mass_dict_pickle_file
-        else:
-            print "!!!!! WARNING !!!!! NO MASS DICT FOUND!"
-            mass_dict_pickle = None
+        signal_mass_dicts = {
+                                'SMS_T2tt_mStop_%s_mLSP_%s'          :  {'pkl':'SMS_T2tt_dM_10to80_genHT_160_genMET_80_mass_dict.pkl'     ,'sampleId':1 , 'shortName':'t2ttold%s_%s'       , 'niceName':'T2tt_mStop_%s_mLSP_%s_mWMin5'},
+                                'SMS_T2bW_X05_mStop_%s_mLSP_%s_mWMin0p1' :  {'pkl':'SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1_mass_dict.pkl' ,'sampleId':2 , 'shortName':'t2bw%s_%s'       , 'niceName':'T2bW_mStop_%s_mLSP_%s'},
+                                'SMS_T2tt_mStop_%s_mLSP_%s_mWMin0p1' :  {'pkl':'SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1_mass_dict.pkl'               ,'sampleId':3 , 'shortName':'t2tt%s_%s'    , 'niceName':'T2tt_mStop_%s_mLSP_%s'},             
 
-        if mass_dict_pickle:
-            mass_dict = pickle.load(open(mass_dict_pickle, "r"))
-        else:
-            mass_dict = {}
-            
-        self.mass_dict = mass_dict
-        mass_scan = {}
+                            }
+        self.signals_info = signal_mass_dicts
 
-        for mstop in mass_dict:
-            for mlsp in mass_dict[mstop]:
-                mass_point = "SMS_T2tt_mStop_%s_mLSP_%s" % (mstop, mlsp)
-                #mass_point = "SMS_T2_4bd_mStop_%s_mLSP_%s" % (mstop, mlsp)
-                mass_scan[mass_point] = {
-                    "name" : mass_point,
-                    "bins": [mass_point],
-                    'dir' : self.signal_path,
-                    'sampleId': "%s%s" % (mstop, mlsp)
-                    }
+        for signal_name, signal_info in signal_mass_dicts.items():
+            sampleId              = signal_info['sampleId']
+            signal_mass_dict      = signal_info['pkl']
+            mass_dict_pickle_file = os.path.join(signal_path, signal_mass_dict)
+
+            if os.path.isfile(mass_dict_pickle_file):
+                mass_dict_pickle = mass_dict_pickle_file
+                mass_dict        = pickle.load(open(mass_dict_pickle,"r"))
+            else:
+                print "!!!!! WARNING !!!!! NO MASS DICT FOUND! %s"%mass_dict_pickle_file
+                mass_dict_pickle = None
+                mass_dict        = {}
+            self.mass_dict = mass_dict
+             
+            mass_scan = {}
+
+            for mstop in mass_dict:
+                for mlsp in mass_dict[mstop]:
+                    #mass_point = "SMS_T2tt_mStop_%s_mLSP_%s" % (mstop, mlsp)
+                    mass_point = signal_name % (mstop, mlsp)
+                    mass_scan[mass_point] = {
+                        "name" : mass_point,
+                        "bins": [mass_point],
+                        'dir' : self.signal_path,
+                        'sampleId': "%s%s" % (mstop, mlsp)
+                        }
 
 
-        for sig in mass_scan:
-            sm = self.makeSample(mass_scan[sig])
-            setattr(self, sig, sm)
+            for sig in mass_scan:
+                sm = self.makeSample(mass_scan[sig])
+                setattr(self, sig, sm)
 
 if __name__=="__main__":
-    cmgPP = cmgTuplesPostProcessed( mc_path, signal_path, data_path ) 
+    cmgPP = cmgTuplesPostProcessed(mc_path, signal_path, data_path)

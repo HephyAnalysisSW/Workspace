@@ -14,6 +14,8 @@ import collections
 import operator
 import time
 import shutil
+import pickle
+import pprint
 
 # imports user modules or functions
 
@@ -21,6 +23,7 @@ import ROOT
 
 # logger
 logger = logging.getLogger(__name__)   
+logger.propagate = False
 
 # functions
 
@@ -267,6 +270,21 @@ def getVariableType(var):
     
     return ''
 
+
+def getVariableInitializer(var):
+    """ Return the variable initializer.
+
+    It assumes a root variable in the format 'name[size]/type/initializer' or 'name/type/initializer'
+
+    The format is not checked, it is assumed to be correct. Return None if no initializer is given..
+    """
+    if var.count('/') == 2:
+        return var.split('/')[2]
+    else:
+        print "\n Error: the variable " + var + \
+            " is not given in the format 'name[size]/type/initializer' or 'name/type/initializer"
+
+    return None
 
 def getVariableNameList(rootVarList):
     """ Return a list of variable names for a list of root variables fiven
@@ -591,4 +609,78 @@ def getChunkIndex(sample, chunks):
 
     return chunkIndexSorted
 
-    
+
+def getMassDictionary(sample, sample_dict_file=None):
+    ''' Get the mass dictionary for a sample, if it exists.
+
+    If a mass dictionary is retrieved, check if it is empty. 
+
+    For samples assumed to have mass dictionary, raise an exception if the pickle file does not exist
+    or the dictionary is empty. 
+    '''
+
+    logger = logging.getLogger(__name__ + '.getMassDictionary')
+
+    # get the sample name, either as cmgName (for cmg tuples) or as name for
+    # post-processed tuples
+
+    sample_name = sample.get('cmgName', None)
+    if sample_name is None:
+        sample_name = sample.get('name', None)
+
+    if sample_name is None:
+        print "\n No sample name can be retrieved for sample {sample}. \nExiting.".format(
+            sample=pprint.pformat(sample))
+        raise Exception(
+            "\n No sample name can be retrieved for sample {sample}. \nExiting.".format(
+                sample=pprint.pformat(sample)
+            )
+        )
+
+    mass_dict_file_sample = sample.get('mass_dict', None)
+
+    if mass_dict_file_sample is not None:
+        # if the signal path is given, replace in the mass_dict_file the path with the new one
+        # (concrete case: read it from /afs post-processed instead of /data cmg tuple) 
+        if sample_dict_file is not None:
+            mass_dict_file = sample_dict_file
+            logger.debug(
+                "\n Sample mass dictionary \n %s \n replaced with \n %s \n", mass_dict_file_sample, mass_dict_file
+            )
+        else:
+            mass_dict_file = mass_dict_file_sample
+            
+        if os.path.isfile(mass_dict_file):
+            mass_dict = pickle.load(open(mass_dict_file, "r"))
+        else:
+            print "Pickle file {0} with mass dictionary for sample {1} does not exist. \nExiting.".format(
+                mass_dict_file, sample_name)
+            raise Exception(
+                "Pickle file {0} with mass dictionary for sample {1} does not exist. \nExiting.".format(
+                    mass_dict_file, sample_name
+                )
+            )
+    else:
+        print "No pickle file defined for mass dictionary of signal scan mass points {0}. \nExiting job".format(
+            sample_name
+        )
+        raise Exception(
+            "No pickle file defined for mass dictionary of signal scan mass points {0}. \nExiting job".format(
+                sample_name
+            )
+        )
+
+    logger.info("\n Mass dictionary: \n \n %s \n ", pprint.pformat(mass_dict))
+
+    if len(mass_dict) == 0:
+        print "Empty mass dictionary loaded from pickle file {0} for sample {1}. \nExiting job.".format(
+            sample_name
+        )
+        raise Exception(
+            "Empty mass dictionary loaded from pickle file {0} for sample {1}. \nExiting job.".format(
+                sample_name
+            )
+        )
+
+    #
+    return mass_dict

@@ -121,7 +121,8 @@ corrected_yields = {}
 
 
 regions = yld.cutNames 
-region_names = sorted( list( set( [x.replace("_PTSR","").replace("_PTCR","") for x in regions] )) )
+#region_names = sorted( list( set( [x.replace("_PTSR","").replace("_PTCR","") for x in regions] )) )
+region_names = sorted( list( set( [x.replace("_PTSRL","").replace("_PTSRH","").replace("_PTSRV","").replace("_PTSR","").replace("_PTCR","") for x in regions] )) )
 
 tt_region_names = [x for x in region_names if "BCR2" in x]
 sr1_region_names = [x for x in region_names if "ECR1" in x]
@@ -240,10 +241,13 @@ w_table_list = []
 # W SideBand
 #
 
+srtags= ['L','H','V','']
 
 for region_name in w_region_names:
+    for srtag in srtags:
 
-        region_sr   = region_name + "_PTSR" 
+
+        region_sr   = region_name + "_PTSR" +srtag
         region_cr   = region_name + "_PTCR"
 
         w_region_sr   = region_sr 
@@ -342,7 +346,7 @@ for region_name in w_region_names:
 
                    ]
         toPrint = [   
-                      ["Region",                fix_region_name( region_name) ], 
+                      ["Region",                fix_region_name( region_name +("_"+srtag if srtag else '')) ], 
                       ["W Frac. SR/CR",         "%s/%s"%(dataWFrac_sr.round(2).val, dataWFrac_cr.round(2).val )],
                       ["W SFCR (corr. TT)",                w_sf_cr.round(2)],
                       ["W Closure (Corr. TT)",             closure_w_sr.round(2)],
@@ -379,11 +383,13 @@ for region_name in w_region_names:
             w_table_list.append( [x[0] for x in toPrint]  ) 
 
         print align.format(*[x[1] for x in toPrint])
+        if srtag =='' : w_table_list.append(["\\hline"])
         w_table_list.append( [x[1] for x in toPrint])
+        if srtag =='' : w_table_list.append(["\\hline"])
 
 
 
-w_table = makeSimpleLatexTable( w_table_list, "WPtShape.tex", cfg.saveDirs[side_band_name])
+w_table = makeSimpleLatexTable( w_table_list, "WPtShape.tex", cfg.saveDirs[side_band_name], align_func = lambda ac, table : "l|"+( 'c' * (len(table[1]) -1)).strip("|") )
 
 print tt_table
 print w_table

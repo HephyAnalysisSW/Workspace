@@ -14,6 +14,9 @@ parser.add_option("--logFilename", dest="logFilename", default="output.log_", ty
 parser.add_option("--targetSubDir", dest="targetSubDir", default=".", type="string", action="store", help="target directory in users NFS folder")
 parser.add_option("--targetBaseDir", dest="targetBaseDir", default="/data", type="string", action="store", help="base directory")
 parser.add_option("--dpmDir", dest="dpmDir", default="/dpm/oeaw.ac.at/home/cms/store/user/", type="string", action="store", help="default dpm string /dpm/oeaw.ac.at/home/cms/store/user/")
+parser.add_option("--seperator", dest="seperator", default="_", type="string", action="store", help="character to seperate the DPM directories")
+parser.add_option("--strip", dest="strip", default="", type="string", action="store", help="strip string from the end of the suggested target dir")
+
 parser.add_option("--overwrite", dest="overwrite", action="store_true", default=False, help="Overwrite chunks?") 
 parser.add_option("--verbose", dest="verbose", action="store_true", default=False, help="verbose") 
 parser.add_option("--suggest", dest="suggest", action="store_true", default=False, help="suggest copy commands by descending into subdirectories") 
@@ -87,7 +90,11 @@ def suggestTargetDir(relpath):
   if len(s)>0:
     if '_' in s[-1] and False not in [x.isdigit() for x in s[-1].split('_')]: #last but one path is /data_time/ -> remove it
       s=s[:-1]
-  return '_'.join(s)
+  if options.seperator == "_":
+      return options.seperator.join(s)
+  if options.seperator == "/":
+      return options.seperator.join(s[:-1]) + "_" + (s[-1].replace(options.strip,"") if options.strip else s[-1])
+
 
 def walkPath(relpath):
   res=ls(relpath)

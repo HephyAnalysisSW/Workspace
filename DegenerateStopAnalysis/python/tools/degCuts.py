@@ -16,7 +16,7 @@ minAngle = lambda phi1, phi2 : "TMath::Min( (2*pi) - abs({phi1}-{phi2}) , abs({p
 lepCollection = "LepGood"
 
 class Cuts():
-    def __init__( self,  lepCollection="LepGood" , lep="mu", sr1c_opt = "reload" , isrpt=110, btag = 'btag' ):
+    def __init__( self,  lepCollection="LepGood" , lep="mu", sr1c_opt = "reload" , isrpt=110, btag = 'btag' , mcMatch=False):
         """
         sr1c_opt = [ "reload" , "MT95" , "MT95_IncCharge", "MT105_IncCharge_CT250" ]
 
@@ -108,6 +108,7 @@ class Cuts():
         #self.presel_noAntiQCD = CutClass ("PreselNoAntiQCD", [
         self.presel_noAntiQCD = CutClass ("MET200_ISR%s_HT300"%isrpt, [
                                       ["MET200","met>200"],
+                                      #["MET220","met>220"],
                                       ["ISR110","nIsrJet>=1" ],
                                       #["ISR%s"%isrpt,"nBasJet>=0 && Jet_pt[IndexJet_basJet[0]] > %s"%isrpt ],
                                       ["HT300","ht_basJet>300"],
@@ -166,7 +167,8 @@ class Cuts():
         if otherLepVeto:
             lepSelCuts.insert(1,otherLepVeto)
 
-        
+        if mcMatch:
+            lepSelCuts.append(['mcMatch','{lepCol}_mcMatchId[{lepIndex}[0]]'.format(lepCol=lepCollection, lepIndex=lepIndex)]) 
 
 
         self.lepSel = CutClass ("{lep}Sel".format(lep=lep),  lepSelCuts, 
@@ -174,6 +176,7 @@ class Cuts():
                                 )
         
         
+        #self.presel = CutClass('preselMET220', [], baseCut=None)
         self.presel = CutClass('presel', [], baseCut=None)
         self.presel.add(self.presel_common)
         self.presel.add(self.lepSel)
@@ -419,19 +422,19 @@ class Cuts():
                                    ] , 
                           baseCut = self.sr2,
                           )
-        self.srl1c   = CutClass ("SR1c",    [
+        self.srl1c   = CutClass ("SRL1c",    [
                                        ["SR1c","{lepCol}_mt[{lepIndex}[0]]>{mt1}".format(lepCol=lepCollection, lepIndex=lepIndex, **mts)],
                                        ["SRL2",  btw("{lepCol}_pt[{lepIndex}[0]]".format(lepCol=lepCollection, lepIndex=lepIndex),5,12)    ],
                                    ] , 
                           baseCut = sr1c_baseCut,
                           )
-        self.srh1c   = CutClass ("SR1c",    [
+        self.srh1c   = CutClass ("SRH1c",    [
                                        ["SR1c","{lepCol}_mt[{lepIndex}[0]]>{mt1}".format(lepCol=lepCollection, lepIndex=lepIndex, **mts)],
                                        ["SRH2",  btw("{lepCol}_pt[{lepIndex}[0]]".format(lepCol=lepCollection, lepIndex=lepIndex),12,20)   ],
                                    ] , 
                           baseCut = sr1c_baseCut,
                           )
-        self.srv1c   = CutClass ("SR1c",    [
+        self.srv1c   = CutClass ("SRV1c",    [
                                        ["SR1c","{lepCol}_mt[{lepIndex}[0]]>{mt1}".format(lepCol=lepCollection, lepIndex=lepIndex, **mts)],
                                        ["SRV2",  btw("{lepCol}_pt[{lepIndex}[0]]".format(lepCol=lepCollection, lepIndex=lepIndex),20,30)   ],
                                    ] , 
@@ -634,6 +637,12 @@ class Cuts():
                 cutLists.append( ["{lep}Pt_lt_30".format(lep=lep.title()),"{lepCol}_pt[{lepIndex}[0]]<30".format(lepCol=lepCollection, lepIndex=lepIndex)] )
             if pt == "cr":
                 cutLists.append(    ["{lep}Pt_gt_30".format(lep=lep.title()),"{lepCol}_pt[{lepIndex}[0]]>30".format(lepCol=lepCollection, lepIndex=lepIndex)] )
+            if pt == "srl":
+                cutLists.append( ["{lep}Pt_btw_5_12".format(lep=lep.title()), btw("{lepCol}_pt[{lepIndex}[0]]".format(lepCol=lepCollection, lepIndex=lepIndex), 5, 12) ] )
+            if pt == "srh":
+                cutLists.append( ["{lep}Pt_btw_12_20".format(lep=lep.title()), btw("{lepCol}_pt[{lepIndex}[0]]".format(lepCol=lepCollection, lepIndex=lepIndex), 10, 20)]  )
+            if pt == "srv":
+                cutLists.append( ["{lep}Pt_btw_20_30".format(lep=lep.title()), btw("{lepCol}_pt[{lepIndex}[0]]".format(lepCol=lepCollection, lepIndex=lepIndex), 20, 30)]  )
             else:
                 pass
 
@@ -676,13 +685,16 @@ class Cuts():
         for mt_ in mtabc:
             for side_band_cut_name, side_band_cut in sr1_side_band_cuts:
                 for charge in charges:
-                    for pt in pts:
+                    for pt in pts + ['srl','srh','srv'] :
                         side_band ="MT%s"%mt_ +"_" + side_band_cut_name +"_"+charge +"_PT%s"%(pt.upper()) 
                         self.sr1_side_band_dict[side_band] = {'side_band_cut_name':side_band_cut_name, 'side_band_cut':side_band_cut, 'mt':mt_, 'charge':charge, 'pt':pt}
-                        #print self.side_band_dict
                         self.sr1_side_bands[side_band] = makeSR1SideBand(**self.sr1_side_band_dict[side_band]) 
-
-
+        for side_band_cut_name, side_band_cut in sr1_side_band_cuts:
+            for charge in charges:
+                for pt in pts + ['srl','srh','srv']:                    
+                    side_band ="MTInc" +"_" + side_band_cut_name +"_"+charge +"_PT%s"%(pt.upper()) 
+                    self.sr1_side_band_dict[side_band] = {'side_band_cut_name':side_band_cut_name, 'side_band_cut':side_band_cut, 'mt':'', 'charge':charge, 'pt':pt}
+                    self.sr1_side_bands[side_band] = makeSR1SideBand(**self.sr1_side_band_dict[side_band]) 
 
         self.sr1SideBands = CutClass( "sr1SideBands",
                                       [ [sb, sbInst.inclCombined] for  sb, sbInst in sorted( self.sr1_side_bands.iteritems() ) ]  
@@ -710,6 +722,12 @@ class Cuts():
                 cutLists.append(    ["{lep}Pt_lt_30".format(lep=lep.title()),"{lepCol}_pt[{lepIndex}[0]]<30".format(lepCol=lepCollection, lepIndex=lepIndex)]  )
             if pt == "cr":
                 cutLists.append(    ["{lep}Pt_gt_30".format(lep=lep.title()),"{lepCol}_pt[{lepIndex}[0]]>30".format(lepCol=lepCollection, lepIndex=lepIndex)]  )
+            if pt == "srl":
+                cutLists.append( ["{lep}Pt_btw_5_12".format(lep=lep.title()), btw("{lepCol}_pt[{lepIndex}[0]]".format(lepCol=lepCollection, lepIndex=lepIndex), 5, 12) ] )
+            if pt == "srh":
+                cutLists.append( ["{lep}Pt_btw_12_20".format(lep=lep.title()), btw("{lepCol}_pt[{lepIndex}[0]]".format(lepCol=lepCollection, lepIndex=lepIndex), 10, 20)]  )
+            if pt == "srv":
+                cutLists.append( ["{lep}Pt_btw_20_30".format(lep=lep.title()), btw("{lepCol}_pt[{lepIndex}[0]]".format(lepCol=lepCollection, lepIndex=lepIndex), 20, 30)]  )
             else:
                 pass
 
@@ -730,7 +748,7 @@ class Cuts():
         self.sr2_side_band_dict = { }
         self.sr2_side_bands     = { }
         for side_band_cut_name, side_band_cut in sr2_side_band_cuts:
-            for pt in pts:
+            for pt in pts + ['srl','srh','srv']:
                 side_band = side_band_cut_name + "_PT%s"%(pt.upper()) 
                 self.sr2_side_band_dict[side_band] = {'side_band_cut_name':side_band_cut_name, 'side_band_cut':side_band_cut, 'pt':pt}
                 self.sr2_side_bands[side_band] = makeSR2SideBand(**self.sr2_side_band_dict[side_band]) 

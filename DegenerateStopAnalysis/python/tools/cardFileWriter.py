@@ -71,13 +71,20 @@ class cardFileWriter:
     self.contamination[b] = cont
     self.hasContamination = True
 
-  def specifyFlatUncertainty(self, u,  val):
+  def specifyFlatUncertainty(self, u,  val, bins=None, processes=None):
     if u not in self.uncertainties:
       print "This uncertainty has not been added yet!",u,"Available:",self.uncertainties
       return
-    print "Adding ",u,"=",val,"for all bins and processes!"
-    for b in self.bins:
-      for p in self.processes[b]:
+    if not bins:
+      bins = self.bins
+    print "Adding ",u,"=",val,"for bins: %s and processes: %s!"%( bins , (processes if processes else self.processes[bins[0]] ))
+    useDefaultProcesses = False if processes else True
+    for b in bins:
+      if useDefaultProcesses:
+        processes_ = self.processes[b][:]
+      else:
+        processes_ = processes[:]
+      for p in processes_:
         self.uncertaintyVal[(u,b,p)] = val
 
   def specifyUncertainty(self, u, b, p, val):

@@ -1,5 +1,7 @@
 #drawFunctions.py - ROOT Draw Functions
 import ROOT
+import math
+
 #import array
 def makeLine():
    line = "\n************************************************************************************************************************************************************************\n"
@@ -16,9 +18,9 @@ def newLine():
 
 #Histograms
 def emptyHist(title, nbins = 100, min = 0, max = 1000):
-   hist = ROOT.TH1F("hist", "Histogram", nbins, min, max)
+   hist = ROOT.TH1D("hist_"+title, "Histogram", nbins, min, max)
    hist.GetXaxis().SetTitle(title)
-   hist.GetYaxis().SetTitle("Counts")
+   hist.GetYaxis().SetTitle("Events")
    hist.GetXaxis().CenterTitle()
    hist.GetYaxis().CenterTitle()
    hist.GetXaxis().SetTitleOffset(1.2) 
@@ -29,9 +31,9 @@ def emptyHist(title, nbins = 100, min = 0, max = 1000):
    return hist
 
 def emptyHistVarBins(varname, xbins):
-   hist = ROOT.TH1F("hist", "Histogram", len(xbins)-1, xbins)
+   hist = ROOT.TH1D("hist", "Histogram", len(xbins)-1, xbins)
    hist.GetXaxis().SetTitle(varname)
-   hist.GetYaxis().SetTitle("Counts")
+   hist.GetYaxis().SetTitle("Events")
    hist.GetXaxis().CenterTitle()
    hist.GetYaxis().CenterTitle()
    hist.GetXaxis().SetTitleOffset(1.2) 
@@ -42,11 +44,11 @@ def emptyHistVarBins(varname, xbins):
    return hist
 
 def makeHist(sample, varname, sel = "", nbins = 100, min = 0, max = 1000):
-   hist = ROOT.TH1F("hist", "Histogram", nbins, min, max)
+   hist = ROOT.TH1D("hist", "Histogram", nbins, min, max)
    sample.Draw(varname + ">>hist", sel, "goff")
    hist.SetTitle(varname + " Plot")
    hist.GetXaxis().SetTitle(varname)
-   hist.GetYaxis().SetTitle("Counts")
+   hist.GetYaxis().SetTitle("Events")
    hist.GetXaxis().CenterTitle()
    hist.GetYaxis().CenterTitle()
    hist.GetXaxis().SetTitleOffset(1.2) 
@@ -57,11 +59,11 @@ def makeHist(sample, varname, sel = "", nbins = 100, min = 0, max = 1000):
    return hist
 
 def makeHistVarBins(sample, varname, sel, xbins): # xbins = array('d', [range(xmin,xmax,5)])
-   hist = ROOT.TH1F("hist", "Histogram", len(xbins)-1, xbins)
+   hist = ROOT.TH1D("hist", "Histogram", len(xbins)-1, xbins)
    sample.Draw(varname + ">>hist", sel, "goff")
    hist.SetTitle(varname + " Plot")
    hist.GetXaxis().SetTitle(varname)
-   hist.GetYaxis().SetTitle("Counts")
+   hist.GetYaxis().SetTitle("Events")
    hist.GetXaxis().CenterTitle()
    hist.GetYaxis().CenterTitle()
    hist.GetXaxis().SetTitleOffset(1.2) 
@@ -71,13 +73,39 @@ def makeHistVarBins(sample, varname, sel, xbins): # xbins = array('d', [range(xm
    hist.SetLineWidth(3)
    return hist
 
+def empty2Dhist(nbins1 = 100, min1 = 0, max1 = 1000, nbins2 = 100, min2 = 0, max2 = 1000):
+   hist = ROOT.TH2D("hist", "Histogram", nbins1, min1, max1, nbins2, min2, max2)
+   hist.GetZaxis().SetTitle("Events")
+   hist.GetXaxis().CenterTitle()
+   hist.GetYaxis().CenterTitle()
+   hist.GetZaxis().CenterTitle()
+   hist.GetXaxis().SetTitleOffset(1.2) 
+   hist.GetYaxis().SetTitleOffset(1.2) 
+   hist.GetZaxis().SetTitleOffset(1.2) 
+   return hist
+
 def make2DHist(sample, var1, var2, sel = "", nbins1 = 100, min1 = 0, max1 = 1000, nbins2 = 100, min2 = 0, max2 = 1000):
-   hist = ROOT.TH2F("hist", "Histogram", nbins1, min1, max1, nbins2, min2, max2)
+   hist = ROOT.TH2D("hist", "Histogram", nbins1, min1, max1, nbins2, min2, max2)
    sample.Draw(var2 + ":" + var1 + ">>hist", sel, "goff") # (y:x>>hist)
    hist.SetTitle(var1 + " and " + var2 + " Distribution")
    hist.GetXaxis().SetTitle(var1)
    hist.GetYaxis().SetTitle(var2)
-   hist.GetZaxis().SetTitle("Counts")
+   hist.GetZaxis().SetTitle("Events")
+   hist.GetXaxis().CenterTitle()
+   hist.GetYaxis().CenterTitle()
+   hist.GetZaxis().CenterTitle()
+   hist.GetXaxis().SetTitleOffset(1.2) 
+   hist.GetYaxis().SetTitleOffset(1.2) 
+   hist.GetZaxis().SetTitleOffset(1.2) 
+   return hist
+
+def make2DHistVarBins(sample, var1, var2, sel, xbins, ybins):
+   hist = ROOT.TH2D("hist", "Histogram", len(xbins)-1, xbins, len(ybins)-1, ybins)
+   sample.Draw(var2 + ":" + var1 + ">>hist", sel, "goff") # (y:x>>hist)
+   hist.SetTitle(var1 + " and " + var2 + " Distribution")
+   hist.GetXaxis().SetTitle(var1)
+   hist.GetYaxis().SetTitle(var2)
+   hist.GetZaxis().SetTitle("Events")
    hist.GetXaxis().CenterTitle()
    hist.GetYaxis().CenterTitle()
    hist.GetZaxis().CenterTitle()
@@ -88,7 +116,9 @@ def make2DHist(sample, var1, var2, sel = "", nbins1 = 100, min1 = 0, max1 = 1000
 
 #Efficiency
 def makeEffPlot(passed,total):
-   eff = ROOT.TEfficiency(passed,total)
+   a = passed.Clone()
+   b = total.Clone()
+   eff = ROOT.TEfficiency(a,b)
    eff.SetTitle("Efficiency Plot")
    eff.SetMarkerStyle(33)
    eff.SetMarkerSize(2)
@@ -111,13 +141,14 @@ def setupEffPlot(eff):
    ROOT.gPad.Update()
 
 def makeEffPlot2(passed,total): #When ratio > 1
-   eff = passed
-   eff.Divide(total)
-   eff.SetTitle("Efficiency Plot")
-   eff.SetMarkerStyle(33)
-   eff.SetMarkerSize(2)
-   eff.SetLineWidth(2)
-   return eff
+   a = passed.Clone()
+   b = total.Clone()
+   a.Divide(b)
+   a.SetTitle("Efficiency Plot")
+   a.SetMarkerStyle(33)
+   a.SetMarkerSize(2)
+   a.SetLineWidth(2)
+   return a
 
 def setupEffPlot2(eff):
    ROOT.gPad.Modified()
@@ -175,6 +206,187 @@ def alignLegend(leg,x1=0.775,x2=0.875,y1=0.2,y2=0.4):
    
    ROOT.gPad.Modified()
    ROOT.gPad.Update()
+
+#def divideEff(e1,e2):
+#   res = e1.GetTotalHistogram().Clone()
+#   res.Reset()
+#   
+#   n = res.GetNbinsX()
+#   
+#   #print 'n: ', n
+#   
+#   for i in range(n):
+#      a = res.GetBinLowEdge(i+1)
+#      w = res.GetBinWidth(i+1)
+#   
+#      #print 'a: ', a, 'w: ', w
+#   
+#      v1 = e1.GetEfficiency(i+1)
+#      u1 = e1.GetEfficiencyErrorUp(i+1)
+#      d1 = e1.GetEfficiencyErrorLow(i+1)
+#      
+#      v2 = e2.GetEfficiency(i+1)
+#      u2 = e2.GetEfficiencyErrorUp(i+1)
+#      d2 = e2.GetEfficiencyErrorLow(i+1)
+#      
+#      if v1*v2 == 0:
+#          v = 0.
+#          u = 0.
+#          d = 0.
+#      
+#      else:
+#          v = v1/v2 if v2>0. else 0.
+#          u = v*math.sqrt(pow(u1/v1,2)+pow(u2/v2,2))
+#          d = v*math.sqrt(pow(d1/v1,2)+pow(d2/v2,2))
+#      
+#      #print i,v,u,d
+#      
+#      res.SetBinContent(i+1,v)
+#      res.SetBinError(i+1, u)
+#      res.SetLineWidth(2)
+# 
+#   return res
+
+def divideEff(e1,e2): #VarBins
+   
+   n = e1.GetTotalHistogram().GetNbinsX()
+
+   #print 'n: ', n
+
+   res = ROOT.TGraphAsymmErrors(n)
+   
+   for i in range(n):
+      a = e1.GetTotalHistogram().GetBinLowEdge(i+1)
+      w = e1.GetTotalHistogram().GetBinWidth(i+1)
+   
+      #print 'a: ', a, 'w: ', w
+   
+      v1 = e1.GetEfficiency(i+1)
+      u1 = e1.GetEfficiencyErrorUp(i+1)
+      d1 = e1.GetEfficiencyErrorLow(i+1)
+      
+      v2 = e2.GetEfficiency(i+1)
+      u2 = e2.GetEfficiencyErrorUp(i+1)
+      d2 = e2.GetEfficiencyErrorLow(i+1)
+      
+      if v1*v2 == 0:
+          v = 0.
+          u = 0.
+          d = 0.
+      
+      else:
+          v = v1/v2 if v2>0. else 0.
+          u = v*math.sqrt(pow(u1/v1,2)+pow(u2/v2,2))
+          d = v*math.sqrt(pow(d1/v1,2)+pow(d2/v2,2))
+      
+      #print i,v,u,d
+      
+      x = a+w*0.5
+      res.SetPoint(i,x,v)
+      res.SetPointError(i,0.5*w,0.5*w,d,u)
+      res.SetLineWidth(2)
+ 
+   return res
+
+def multiplyHists(h1,h2):
+   res = h1.Clone()
+   res.Reset()
+   
+   n = res.GetNbinsX()
+   
+   #print 'n: ', n
+   
+   for i in range(n):
+      a = res.GetBinLowEdge(i+1)
+      w = res.GetBinWidth(i+1)
+   
+      #print 'a: ', a, 'w: ', w
+   
+      v1 = h1.GetBinContent(i+1)
+      e1 = h1.GetBinError(i+1)
+      
+      v2 = h2.GetBinContent(i+1)
+      e2 = h2.GetBinError(i+1)
+      
+      if v1*v2 == 0:
+          v = 0.
+          u = 0.
+          d = 0.
+      
+      else:
+          v = v1*v2 if v2>0. else 0.
+          e = v*math.sqrt(pow(e1,2)+pow(e2,2))
+      
+      #print i,v,u,d
+      
+      res.SetBinContent(i+1,v)
+      res.SetBinError(i+1, e)
+      res.SetLineWidth(2)
+ 
+   return res
+
+def addSystematicHist(h1,sys):
+   res = h1.Clone()
+   
+   n = res.GetNbinsX()
+   
+   #print 'n: ', n
+   
+   for i in range(n):
+      a = res.GetBinLowEdge(i+1)
+      w = res.GetBinWidth(i+1)
+   
+      #print 'a: ', a, 'w: ', w
+   
+      v1 = h1.GetBinContent(i+1)
+      e1 = h1.GetBinError(i+1)
+     
+      print sys/100. 
+      e = math.sqrt(pow(e1,2)+pow(sys/100.*v1,2))
+      
+      res.SetBinError(i+1, e)
+      res.SetLineWidth(2)
+ 
+   return res
+
+#def divideEff(e1,e2):
+#   
+#   n = e1.GetTotalHistogram().GetNbinsX()
+#   a = e1.GetTotalHistogram().GetBinLowEdge(1)
+#   w = e1.GetTotalHistogram().GetBinWidth(1)
+#   
+#   #print 'n: ', n, 'a: ', a, 'w: ', w
+#   
+#   res = ROOT.TGraphAsymmErrors(n)
+#   
+#   for i in range(n):
+#      v1 = e1.GetEfficiency(i+1)
+#      u1 = e1.GetEfficiencyErrorUp(i+1)
+#      d1 = e1.GetEfficiencyErrorLow(i+1)
+#      
+#      v2 = e2.GetEfficiency(i+1)
+#      u2 = e2.GetEfficiencyErrorUp(i+1)
+#      d2 = e2.GetEfficiencyErrorLow(i+1)
+#      
+#      if v1*v2 == 0:
+#          v = 0.
+#          u = 0.
+#          d = 0.
+#      
+#      else:
+#          v = v1/v2 if v2>0. else 0.
+#          u = v*math.sqrt(pow(u1/v1,2)+pow(u2/v2,2))
+#          d = v*math.sqrt(pow(d1/v1,2)+pow(d2/v2,2))
+#      
+#      #print i,v,u,d
+#      
+#      x = a+(i+0.5)*w
+#      res.SetPoint(i,x,v)
+#      res.SetPointError(i,0.5*w,0.5*w,d,u)
+#      res.SetLineWidth(2)
+#   
+#   return res
+
 
 ##Variable bin size
 #nSec = 3

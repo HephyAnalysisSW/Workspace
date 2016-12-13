@@ -315,7 +315,7 @@ def calc_sig_limit(cfg, args):
                                             weight          =   "", 
                                             pklOpt          =   True, 
                                             tableName       =   "{cut}_%s%s"%(cfg.runTag,cfg.scan_tag), 
-                                            nDigits         =   4 , 
+                                            nDigits         =   10 , 
                                             err             =   True , 
                                             verbose         =   True,
                                             isMVASample             =   isMVASample, 
@@ -476,21 +476,25 @@ def bkg_est(cfg, args):
             
             if not isMVASample:
                 setEventListToChains(cfg.samples, sampleList , cutInst.baseCut, opt=redo_eventLists )
+                #seteventlists(cfg,args, cutInst)
             redo_plots_tables = True
             makeDir(yield_pkl)
             yields[cut_name]=Yields(     
                                         cfg.samples, 
                                         sampleList + dataList, 
                                         cutInst, 
+                                        #cutOpt          =   "list2", 
                                         cutOpt          =   "list2", 
                                         weight          =   "",
                                         lumi            =   lumi,  
                                         pklOpt          =   True, 
                                         tableName       =   "{cut}_%s%s"%(cfg.runTag,cfg.scan_tag), 
-                                        nDigits         =   4 , 
+                                        nDigits         =   10 , 
                                         err             =   True , 
                                         verbose         =   True,
-                                        isMVASample             =   isMVASample, 
+                                        isMVASample     =   isMVASample, 
+                                        cuts            =   [cfg.cuts, "bins_sum"],
+                                        nProc           =   nProc, 
                                    )
             pickle.dump( yields[cut_name], open(yield_pkl,'w') )
             print "Yield pickle dumped: %s"%yield_pkl
@@ -638,7 +642,7 @@ def cut_flow(cfg, args):
                                         pklOpt          =   True, 
                                         pklDir          =   cfg.yieldPklDir, 
                                         tableName       =   "{cut}_%s%s"%(cfg.runTag,cfg.scan_tag), 
-                                        nDigits         =   4 , 
+                                        nDigits         =   10 , 
                                         err             =   True , 
                                         verbose         =   True,
                                         isMVASample             =   isMVASample, 
@@ -656,6 +660,50 @@ def cut_flow(cfg, args):
 
     
     return yields
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def seteventlists(cfg,args, cutInst=None):
+
+    signalList = cfg.signalList
+    sampleList = getattr(cfg, "bkgList") + signalList
+    nProc      = 10
+    if not cutInst:
+        cutInst = cfg.cutInstList[0]
+    def setelistforparal(samp):
+        #setEventListToChains(cfg.samples, [samp], cutInst, opt=redo_eventLists )
+        setEventListToChains(cfg.samples, [samp], cutInst  )
+    
+    pool    =   multiprocessing.Pool( processes = nProc )
+    results = pool.map(setelistforparal, sampleList)
+    pool.close()
+    pool.join()
+    return results
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

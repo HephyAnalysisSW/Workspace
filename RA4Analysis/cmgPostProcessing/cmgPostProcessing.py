@@ -24,6 +24,7 @@ from readVetoEventList import *
 from leptonSF import leptonSF as leptonSF_
 
 #bTagEffFile     = "$CMSSW_BASE/src/Workspace/RA4Analysis/cmgPostProcessing/data/effs_presel_JECv6_pkl" 
+scaleFactorDir  = '$CMSSW_BASE/src/Workspace/RA4Analysis/cmgPostProcessing/data/'
 bTagEffFile     = "data/effs_presel_JECv6_pkl"
 
 calcLeptonSF = leptonSF_()
@@ -90,7 +91,8 @@ parser.add_option("--useXSecFile", dest="readXsecFromFile", default = False, act
 (options, args) = parser.parse_args()
 skimCond = "(1)"
 htLtSkim = "Sum$(Jet_pt)>500&&(LepGood_pt[0]+met_pt)>250"
-common_skim = "HT500LT250Skim"
+#common_skim = "HT500LT250Skim"
+common_skim = "HT350"
 if options.for_dilep :
   htLtSkim = "(1)"
   common_skim = "skim"
@@ -150,7 +152,7 @@ if sys.argv[0].count('ipython'):
 ##print evt_veto_list
 
 ###For PU reweight###
-PU_dir = "/data/easilar/PU_Histos/"
+PU_dir = scaleFactorDir
 PU_File_59p85mb = ROOT.TFile(PU_dir+"/h_ratio_59p85.root")
 PU_File_63mb = ROOT.TFile(PU_dir+"/h_ratio_63.root")
 PU_File_66p15mb = ROOT.TFile(PU_dir+"/h_ratio_66p15.root")
@@ -279,13 +281,13 @@ for isample, sample in enumerate(allSamples):
   printHeader("Compiling class to write")
   writeClassName = "ClassToWrite_"+str(isample)
   writeClassString = createClassString(className=writeClassName, vars= newVars, vectors=[], nameKey = 'stage2Name', typeKey = 'stage2Type')
-  s = compileClass(className=writeClassName, classString=writeClassString, tmpDir='/data/'+username+'/tmp/')
+  s = compileClass(className=writeClassName, classString=writeClassString, tmpDir=options.targetDir+'/tmp/')
 
   readClassName = "ClassToRead_"+str(isample)
   readClassString = createClassString(className=readClassName, vars=readVars, vectors=readVectors, nameKey = 'stage1Name', typeKey = 'stage1Type', stdVectors=False)
   printHeader("Class to Read")
   
-  r = compileClass(className=readClassName, classString=readClassString, tmpDir='/data/'+username+'/tmp/')
+  r = compileClass(className=readClassName, classString=readClassString, tmpDir=options.targetDir+'/tmp/')
 
   veto_csc_list = []
   veto_ecal_list = []

@@ -20,9 +20,11 @@ class u_float():
             self.sigma  = float(sigma)
 
     def round(self,ndigits=0):
-        self.val = round(self.val, ndigits)
-        self.sigma = round(self.sigma, ndigits)
-        return self
+        #self.val = round(self.val, ndigits)
+        #self.sigma = round(self.sigma, ndigits)
+        val   = round(self.val, ndigits)
+        sigma = round(self.sigma, ndigits)
+        return u_float(val,sigma)
 
     def __add__(self,other):
         if not type(other)==type(self):

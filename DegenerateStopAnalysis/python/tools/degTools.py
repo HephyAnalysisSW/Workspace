@@ -135,6 +135,12 @@ def matchListToDictKeys(List,Dict):
   return List
 
 
+def makeFuncStar(func):
+    def funcStar(a_b):
+        """Convert `f([1,2])` to `f(1,2)` call."""
+        return func(*a_b)
+    return funcStar
+
 import collections # requires Python 2.7 -- see note below if you're using an earlier version
 def merge_dict(d1, d2):
     """
@@ -615,11 +621,14 @@ def getBkgSigStacks(samples, plots, cut, sampleList=[],plotList=[], normalize=Fa
             dataStackDict[v]=getStackFromHists([ samples[samp]['cuts'][cut_name][v] for samp in sampleList if samples[samp]['isData']], normalize=normalize, transparency=False, sName= "stack_data_" + sName_plot)
     return {'bkg': bkgStackDict,'sig': sigStackDict, 'data': dataStackDict}
   
-def getPlot(sample,plot,cut,weight="", nMinus1="",cutStr="",addOverFlowBin='', lumi='target_lumi', verbose= False):
+def getPlot(sample,plot,cut,weight="", nMinus1="",cutStr="",addOverFlowBin='', lumi='target_lumi', verbose= False, cuts=None):
     plot_info = {}
     c     = sample.tree
     var = plot.var
-    cut_str, weight_str = decide_cut_weight( sample, cutInst = cut , weight=weight,  lumi=lumi, plot=plot, nMinus1=nMinus1 ,  )
+    if not cuts:
+        cut_str, weight_str = decide_cut_weight( sample, cutInst = cut , weight=weight,  lumi=lumi, plot=plot, nMinus1=nMinus1 ,  )
+    if cuts and type(cut)==type(""):
+        cut_str, weight_str = cuts.getSampleCutWeight(sample.name, [cut]) 
     plot_info = {'cut':cut_str, 'weight':weight_str}
 
     if verbose: 
@@ -702,6 +711,14 @@ def makeLegend(samples, hists, sampleList, plot, name="Legend",loc=[0.6,0.6,0.9,
     leg.SetName(name)
     leg.SetFillColorAlpha(0,0.001)
     leg.SetBorderSize(borderSize)
+    
+
+    sample_names = {
+                    'z':r'#Z\rightarrow \nu\nu+jets',
+                    'st':'Single top',
+                    'dy':r'#Z/\gamma^{*} \rightarrow \nu\nu+jets',
+                }
+
 
 
     for samp in sampleList:
@@ -798,6 +815,7 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
     
     if draw:
         stacks.Draw("hist")
+        stacks.GetYaxis().SetTitle("Events")
         stacks.SetMinimum(plotMin)
         maxval = plotMax if plotMax else stacks.GetMaximum()* ( 1.35 + logs[1]*10  )
         stacks.SetMaximum( maxval)
@@ -805,6 +823,7 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
             bkg_tot.Draw("same E2")
         
     for sig in sigList:
+        yldplt[sig].SetLineWidth(2)
         yldplt[sig].Draw("same")
     stacks.Draw("same AXIG")
 
@@ -856,6 +875,14 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
        ret.append(sigLeg)
        ret[-1].Draw()
 
+    if len(dataList):
+            latex = ROOT.TLatex()
+            latex.SetNDC()
+            latex.SetTextSize(0.04)
+
+            latex.DrawLatex(0.165,0.92,"#font[22]{CMS Preliminary}")
+            latex.DrawLatex(0.76,0.92,"\\mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%( 12.9) )
+            ret.append(latex)    
 
 
 
@@ -873,9 +900,10 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
         #if True: ## draw data/MC
         if dataList: ## draw data/MC
             print 'data is here!'
+            ratio_ref.SetLabelSize(0.04,"Y")
+        
             ratio_ref.Draw("hist")
             ratio_ref.GetYaxis().SetTitle("DATA/MC")
-            ratio_ref.GetYaxis().SetLabelSize(0.01)
             ratio_ref.SetMinimum(ratioLimits[0])
             ratio_ref.SetMaximum(ratioLimits[1])    
    
@@ -924,9 +952,10 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
         ratio_ref.SetNdivisions(505, "y")
         
 
-        ratio_ref.GetXaxis().SetLabelSize(0.08)
-        ratio_ref.GetYaxis().SetLabelSize(0.12)
-        ratio_ref.GetYaxis().SetTitleOffset(0.75)
+        ratio_ref.GetXaxis().SetLabelSize(0.10)
+        ratio_ref.GetYaxis().SetLabelSize(0.09)
+        ratio_ref.GetYaxis().SetTitleOffset(0.85)
+        ratio_ref.GetYaxis().SetTitleSize(0.09)
         #canvs[0].SetTopMargin(0.05)
         #canvs[1].SetTopMargin(0.05)
         #canvs[2].SetTopMargin(0.05)
@@ -936,6 +965,8 @@ def drawYields( name , yieldInst, sampleList=[], keys=[], ratios=True, plotMin =
         canvs[cMain+1].Update()
     else:
         ratio_ref = None
+
+
 
     if save:
         saveCanvas(canvs[cSave], dir = save, name = name ) 
@@ -1110,7 +1141,7 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
         canvs[p][cMain].cd()
         canvs[p][cMain].RedrawAxis()
         canvs[p][cMain].Update()
-        if not isDataPlot: canvs[p][cMain].SetRightMargin(10)
+        if not isDataPlot and not fom: canvs[p][cMain].SetRightMargin(10)
         #canvs[p][cMain].SetLeftMargin(15) 
         
         latex = ROOT.TLatex()
@@ -1641,9 +1672,22 @@ def getEfficiency(samples,samp, plot, cutInst_pass, cutInst_tot ,ret = False ):
         return h_eff
 
  
-#[ len(mstops), min(mstops) - 0.5*dstops , max(mstops) + 0.5*dstops, (max(mstops) + min(dms) - ( min(stops)-max(dms))) /5.  ,min(stops)-max(dms)-5 , max(mstops) + min(dms)+5 ) ]
-# [ len(mstops), min(mstops) - 0.5*dstops , max(mstops) + 0.5*dstops, (max(mstops) + min(dms) - ( min(mstops)-max(dms))) /5  ,min(mstops)-max(dms)-5 , max(mstops) + min(dms)+5 ] 
-def makeStopLSPPlot(name, massDict, title="", bins = [23,87.5,662.5, 127 , 17.5, 642.5] , key=None, func=None,setbin=False ):
+
+def getBinning( m1_range, m2_range ):
+    min_m1 , max_m1, step_m1 = m1_range
+    min_m2 , max_m2, step_m2 = m2_range
+    max_m1 -= max_m1%10
+    max_m2 -= max_m2%10
+    m1s = range(  *m1_range )
+    m2s = range(  *m2_range )
+    n_m1 = len(m1s)
+    n_m2 = len(m2s)
+    return [n_m1+1, min_m1 - 0.5* step_m1 , max_m1 + 0.5*step_m1, int( ( (max_m1 - min_m2)+5/2.   -  (min_m1-max_m2-5/2.) )/5) , min_m1-max_m2-5/2. , (max_m1 - min_m2)+5/2. ]
+
+
+
+
+def makeStopLSPPlot(name, massDict, title="", bins = [23, 237.5, 812.5, 125, 167.5, 792.5]  , key=None, func=None,setbin=False, massFunc = None , xtitle="m(#tilde{t})[GeV]", ytitle="m(#tilde{#chi}^{0})[GeV]"):
     """
     massDict should be of the form {    
                                     stopmass1: { lsp_mass_1: a, lsp_mass_2: b ... },
@@ -1653,6 +1697,7 @@ def makeStopLSPPlot(name, massDict, title="", bins = [23,87.5,662.5, 127 , 17.5,
     with a, b, c,d ... the bin content TH2D
     if key available then key(a) will be evaluated
     if func available then func(mstop,mlsp) will be evaluted. (func will override key)
+    if massFunc:  stop_mass, lsp_mass  = massFunc(key)
     """
     plot = ROOT.TH2F(name,title, *bins )
     if setbin:
@@ -1665,6 +1710,16 @@ def makeStopLSPPlot(name, massDict, title="", bins = [23,87.5,662.5, 127 , 17.5,
                     plot.SetBinContent(x,y,massDict[xbin][ybin])
                 except KeyError:
                     pass
+    elif massFunc:
+        for k,val in massDict.iteritems():
+            masses  = massFunc(k)
+            if not masses: 
+                continue
+            stop_mass, lsp_mass = masses
+            val = val if not key else key(val) 
+            plot.Fill(int(stop_mass), int(lsp_mass), val)
+
+
     else:
         for stop_mass in massDict:
             for lsp_mass in massDict[stop_mass]:
@@ -1676,13 +1731,14 @@ def makeStopLSPPlot(name, massDict, title="", bins = [23,87.5,662.5, 127 , 17.5,
                     val = massDict[stop_mass][lsp_mass]
                 plot.Fill(int(stop_mass), int(lsp_mass) , val )
     plot.SetTitle(title)
+
     plot.SetNdivisions(0,"z")
     plot.SetNdivisions(410,"x")
     plot.GetXaxis().SetTitle("m(#tilde{t})[GeV]")
     plot.GetYaxis().SetTitle("m(#tilde{#chi}^{0})[GeV]")
     return plot
 
-def makeStopLSPRatioPlot(name, massDictNom, massDictDenom, title="", bins=[22,100,650, 65,0,650], key=None ):
+def makeStopLSPRatioPlot(name, massDictNom, massDictDenom, title="", bins=[23, 237.5, 812.5, 125, 167.5, 792.5], key=None ):
     """
     massDict should be of the form {    
                                     stopmass1: { lsp_mass_1: a, lsp_mass_2: b ... },
@@ -1703,9 +1759,9 @@ def makeStopLSPRatioPlot(name, massDictNom, massDictDenom, title="", bins=[22,10
                     print "Nomerator Dict missing value for %s, %s"%(mstop, mlsp)
                     continue
                 if key:
-                    val = key( massDictNom[mstop][mlsp] ) / key( massDictDenom[mstop][mlsp]  )
+                    val = key( massDictNom[mstop][mlsp] ) / key( massDictDenom[mstop][mlsp]  ) if  key( massDictDenom[mstop][mlsp]  ) else 0 
                 else:
-                    val = massDictNom[mstop][mlsp] / massDictDenom[mstop][mlsp]
+                    val = massDictNom[mstop][mlsp] / massDictDenom[mstop][mlsp] if massDictDenom[mstop][mlsp] else 0
                 ratio_dict[mstop][mlsp] = val 
     ratio_pl = makeStopLSPPlot( name, ratio_dict, title=title , bins=bins )
     return ratio_pl, ratio_dict
@@ -2093,6 +2149,13 @@ def decide_cut( sample, cut, plot=None, nMinus1=None):
                     new_cut = new_cut.replace(sf, "(1)")
                     #print 'replacing sf: %s , with %s'%(sf, "(1)") 
                 modified = True 
+    if "met_genPt" in new_cut and not sample.isSignal:
+        print "-------------------- Detected non-signal with genmet cut!"
+        print "BEFORE:", new_cut
+        new_cut = new_cut.replace("met_genPt","met_pt").replace("met_genPhi","met_phi")
+        print "AFTER:" , new_cut
+        print "--------------------"
+
     return new_cut
 
 
@@ -2138,7 +2201,35 @@ def getYieldsTEST(samp):
     print samp
     return samp
 
-def getYieldsForSampleFunc(samples,cutList, weights, err, nDigits, yieldDictFull, verbose, pprint, sampleNames, cutNames, npsize, nSpaces): ## This is to make a picklable function for the multiprocessing. Better solution? 
+
+
+#getYieldFromChainStar =  makeFuncStar(getYieldFromChain)
+#funcStar = getYieldFromChainStar
+
+def getYieldFromChainStar(args):
+    return getYieldFromChain(*args)
+def getYieldFromChainCutWeights(args):
+    (chain_dict, cut_weight, samp,b) = args
+    c,w = cut_weight
+    ret = (b,u_float(* getYieldFromChain(chain_dict[samp], c,w , returnError=True) ) )
+    #print samp, b, ret
+    return ret 
+
+def getYieldsForSampleParal( self, tree_dict, cut_weights ):
+    yieldDict = {}
+    for samp in self.sampleList:
+        bins = cut_weights.keys() 
+        pool    = multiprocessing.Pool( processes = max( len(bins),18)  )
+        yieldDict_samp = pool.map( getYieldFromChainCutWeights , [ [tree_dict, cut_weights[b][samp], samp, b  ] for b in bins ]    )
+        pool.close()
+        pool.join()
+        yieldDict[samp]={v[0]:v[1] for v in yieldDict_samp}
+        if self.verbose:
+            self.pprint( [np.array([self.sampleNames[samp]]+[ uround(yieldDict[samp][cut],3) for cut in self.cutNames] , self.npsize)] , nSpaces=self.nSpaces   )
+    print yieldDict
+    return yieldDict        
+
+def getYieldsForSampleFunc(samples, cutList, weights, err, nDigits, yieldDictFull, verbose, pprint, sampleNames, cutNames, npsize, nSpaces): ## This is to make a picklable function for the multiprocessing. Better solution? 
     def func(sample):
         yieldDictSample={}
         for ic, cut in enumerate(cutList):
@@ -2167,7 +2258,9 @@ class Yields():
     def __init__(self,   samples,    sampleList, cutInst,    cutOpt='flow',  tableName='{cut}',  weight="",
                  pklOpt=False,   pklDir="./pkl/",    nDigits=2, err=True, nProc = None, lumi = 'target_lumi',
                  isMVASample = None, 
-                 verbose=False, nSpaces=None):
+                 verbose=False, nSpaces=None,
+                 cuts = None
+                 ):
         if not (isinstance(cutInst,CutClass) or hasattr(cutInst,cutOpt)):
             raise Exception("use an instance of cutClass")
         
@@ -2175,6 +2268,14 @@ class Yields():
         
         self.nDigits        = nDigits
         samples = samples
+        if cuts:
+            #self.cuts = cuts[0]
+            print "Using Fancy Cut Class!! .... %s"%cuts
+            cutInst = getattr(cuts[0], cuts[1])
+            cuts    = cuts[0]
+        else: 
+            cuts    = None
+            
         self.cutInst        = cutInst
         self.weight         = weight
         self.tableName    = tableName.format(cut=self.cutInst.fullName)
@@ -2191,7 +2292,7 @@ class Yields():
         
         self.fomNames={}
 
-        self.updateSampleLists(samples,self.sampleList)
+        self.updateSampleLists(samples,self.sampleList, cuts)
 
         self.cutList        = getattr(cutInst,cutOpt)
         self.cutLegend =     np.array( [[""]+[cut[0] for cut in self.cutList]])
@@ -2212,13 +2313,13 @@ class Yields():
            #pp.pprint(self.weights)
            pp.pprint(self.cut_weights)
 
-        self.getYieldDictFull( samples, self.cutList )
+        self.getYieldDictFull( samples, self.cutList , cuts = cuts)
 
         #self.getYields(samples, self.cutList,err)
         if self.pklOpt:
             self.pickle(self.pklOpt,self.pklDir)
 
-    def updateSampleLists(self, samples, sampleList):
+    def updateSampleLists(self, samples, sampleList, cuts=None):
         self.bkgList        = [samp for samp in   samples.bkgList()  if samp in sampleList]
         self.sigList        = [samp for samp in   samples.sigList()  if samp in sampleList]
         self.dataList       = [samp for samp in   samples.dataList()  if samp in sampleList]
@@ -2252,7 +2353,10 @@ class Yields():
         for cutName, cutStr in getattr(self.cutInst, self.cutOpt):  
             self.cut_weights[cutName] = {}
             for samp in self.sampleList:
-                self.cut_weights[cutName][samp] =  decide_cut_weight( samples[samp] , cutInst = cutStr  ,  weight=self.weight,  lumi=self.lumi_weight, plot=None, nMinus1= None  )
+                if cuts:
+                    self.cut_weights[cutName][samp] = cuts.getSampleCutWeight( samples[samp].name, cutListNames = [cutName], weightListNames = [], )
+                else: 
+                    self.cut_weights[cutName][samp] =  decide_cut_weight( samples[samp] , cutInst = cutStr  ,  weight=self.weight,  lumi=self.lumi_weight, plot=None, nMinus1= None  )
 
         #print "CUT AND WEIGHT SUMMARY:"
         
@@ -2270,7 +2374,7 @@ class Yields():
                     self.sampleLegend.extend( [self.LatexTitles[sample], self.LatexTitles["FOM_%s"%sample] ] ) 
                                     #[self.LatexTitles[sample] for sample in getattr(self,"fomList",[]) ]
 
-    def addYieldDict(self,samples,yieldDict):
+    def addYieldDict(self,samples,yieldDict, cuts=None):
         """
         Updating the current Yield Dictionary with a new one. 
         yieldDict should be of the format yd = { 'samp1': {'cut1':u_float(val,sigma), ...}, ... }
@@ -2284,14 +2388,14 @@ class Yields():
             else:
                 raise Exception("%s not currently in the samples dictionary. could this be a problem?"%s)
                 self.sampleList = self.sampleList + new_samples
-        self.updateSampleLists(samples,self.sampleList)
+        self.updateSampleLists(samples,self.sampleList,)
         for samp in new_samples:
             cuts = yieldDict[samp].keys()
             if not sorted(cuts) ==  sorted( list( self.cutLegend[0][1:] ) ) :
                 raise Exception("The new yield dictionary seems to have different cuts than the current one  %s \n vs. %s"%(cuts, sorted( list(self.cutLegend[0][1:]) ) ))
         self.yieldDict.update(yieldDict)
         #self.yieldDictFull.update(yieldDict)  ### FIX ME, should also combine Totals, FOMs, etc
-        self.getYieldDictFull(samples, yieldDict = self.yieldDict )
+        self.getYieldDictFull(samples, yieldDict = self.yieldDict , cuts=cuts)
 
     def makeNumpyFromDict(self, yieldDict=None,rowList=[]):
         """
@@ -2371,30 +2475,6 @@ class Yields():
 
         for ic, cut in enumerate(cutList):
             cutName = cut[0]
-            #cut_strings = [cut[1]]
-            #warn = False
-            #if hasattr(samples[sample], 'cut'):
-            #    cut_strings.append(samples[sample].cut) 
-            #if hasattr(samples[sample],"triggers") and samples[sample]['triggers']:
-            #    cut_strings.append( samples[sample]['triggers'] )
-            #    warn = True
-            #if hasattr(samples[sample],"filters") and samples[sample]['filters']:
-            #    cut_strings.append(  samples[sample]['filters'] )
-            #    warn = True
-            #if warn:
-            #    print "-----"*10 , samples[sample].name
-            #    print "-----"*20
-            #    print "Applying Triggers: %s"%samples[sample]['triggers']
-            #    print "Applying Filters: %s"%samples[sample]['filters']
-            #    print "-----"*20
-            #    print "-----"*20
-            #cutStr = "&&".join([ "(%s)"%x for x in cut_strings])
-            #print "CUT: ", cutName
-            #print "OLD ONE: "
-            #print cutStr
-            #print "New ONE: "
-            #print cutStr
-            #yld = getYieldFromChain(samples[sample]['tree'], cutStr,self.cut_weights[cutName][sample], returnError=self.err) #,self.nDigits) 
             cutStr , weightStr = self.cut_weights[cutName][sample]
             yld = getYieldFromChain(samples[sample]['tree'], cutStr, weightStr, returnError=self.err) #,self.nDigits) 
             #print cut[0], "     ", "getYieldFromChain( %s, '%s', '%s',%s )"%( "samples."+sample+".tree", cut[1], self.weights[sample], True) + "==(%s,%s)"%yld 
@@ -2422,20 +2502,27 @@ class Yields():
 
         if self.nProc:
             #getYieldsFunc = getYieldsForSampleFunc( samples, cutList, self.weights, self.err, self.nDigits, self.yieldDictFull, self.verbose, self.pprint, self.sampleNames, self.cutNames, self.npsize, self.nSpaces)
-            getYieldsFunc = getYieldsForSampleFunc(samples, cutList, self.cut_weights, self.err, self.nDigits, self.yieldDictFull, self.verbose, self.pprint, self.sampleNames, self.cutNames, self.npsize, self.nSpaces)
-            pickle.dump(getYieldsFunc, file("delme.pkl","w"))
-            test = getYieldsFunc( self.sampleList[0])
-        
-            print "--------------------", test
-            pool    = multiprocessing.Pool( processes = self.nProc       )
-            results = pool.map( getYieldsFunc, self.sampleList     )# [ [samples, samp, cutList] for samp in self.sampleList] )
-            pool.close()
-            pool.join()
-            for isamp, samp in enumerate( self.sampleList ):
-                yieldDict[samp] = results[isamp]
-            #print yieldDict
-            del results, pool             
+            #
+            #            getYieldsFunc = getYieldsForSampleFunc(samples, cutList, self.cut_weights, self.err, self.nDigits, self.yieldDictFull, self.verbose, self.pprint, self.sampleNames, self.cutNames, self.npsize, self.nSpaces)
 
+
+            #pickle.dump(getYieldsFunc, file("delme.pkl","w"))
+            #print self.sampleList[0]
+            #test = getYieldsFunc( [samples, self.sampleList[0],cutList] )
+        
+            #print "--------------------", test
+            #pool    = multiprocessing.Pool( processes = self.nProc       )
+            #getYieldsFunc = makeFuncStar( self.getYieldsForSample)
+            #results = pool.map( getYieldsFunc, self.sampleList     )# [ [samples, samp, cutList] for samp in self.sampleList] )
+            #pool.close()
+            #pool.join()
+            #for isamp, samp in enumerate( self.sampleList ):
+            #    yieldDict[samp] = results[isamp]
+            ##print yieldDict
+            #del results, pool             
+            yieldDict = getYieldsForSampleParal(self, {k:samples[k].tree for k in self.sampleList} , self.cut_weights )
+
+            print yieldDict.keys()
         else:
             for samp in self.sampleList:
                 yieldDict[samp] = self.getYieldsForSample(samples,samp, cutList )
@@ -2444,7 +2531,7 @@ class Yields():
         #print yieldDict
         return yieldDict
         
-    def getYieldDictFull(self, samples, cutList=None, yieldDict=None, yieldDictTotal=None, yieldDictFOMs=None,  fom="AMSSYS", uncert=0.2, nDigits = 3 ):
+    def getYieldDictFull(self, samples, cutList=None, yieldDict=None, yieldDictTotal=None, yieldDictFOMs=None,  fom="AMSSYS", uncert=0.2, nDigits = 3 , cuts = None):
         yieldDictFull = {}
         if not yieldDict:
             if cutList:
@@ -2465,7 +2552,7 @@ class Yields():
         self.yieldDictFull  = yieldDictFull
         self.FOMTable       =   self.makeNumpyFromDict(self.yieldDict)
         self.table          =   self.makeNumpyFromDict(self.yieldDictFull)
-        self.updateSampleLists(samples,self.sampleList)
+        self.updateSampleLists(samples,self.sampleList, cuts)
         return yieldDictFull
 
     def pickle(self,pklOpt,pklDir):
@@ -2507,7 +2594,9 @@ class Yields():
             table = self.FOMTable.T
         block = "| {:%s%s}"%(align,nSpaces)
         #ret = [( block*len(line) ).format(*map(lambda x: "%s"%x,line)) for line in a.T]
-        ret = [( block*len(line) ).format(*line) for line in table]
+        ret = [( block*len(line) ).format(*[uround(col) for col in line] ) for line in table]
+        #print "---------" ,line
+        #print " " , [uround(col) for col in line]
         print ret
         if ret:
             return ret
@@ -2754,18 +2843,26 @@ def fixForLatex(x):
     return np.array( [ fix(ix) for ix in x ] )
 
 def uround(x,n=2):
-    if hasattr(x,"round"):
+    if hasattr(x,"round") and hasattr(x,'sigma'):
         return x.round(n)
     elif type(x) == float:
         return round(x,n)
-    elif type(x) == int:
+    elif type(x) == int or type(x)==type(""):
         return x
-
+    else:
+        return x
 
 from collections import OrderedDict
 fixDict = OrderedDict()
 
 #print fixDict
+
+
+sample_names = {
+                    'z':r'#Z\rightarrow \nu\nu+jets',
+                    'st':'Single top',
+                    'dy':r'#Z/\gamma^{*} \rightarrow \nu\nu+jets',
+                }
 
 #fixDict["MET200_ISR100_HT300"]  =  "$E_{T}^{miss}$ $>$ $200GeV$ , $H_{T}$ $>$ $300GeV$, $P_{T}$(Leading$ $Jet) $>$ $100GeV$ " 
 #fixDict["MET200_ISR110_HT300"]  =  "$E_{T}^{miss}$ $>$ $200GeV$ , $H_{T}$ $>$ $300GeV$, $P_{T}$(Leading$ $Jet) $>$ $110GeV$ "  
@@ -2793,14 +2890,19 @@ fixDict["LepEta1.5"]  =  "$ |\eta(l)|  $ $<$ $1.5$"
 fixDict["-pos"]  =  "-Q+"  
 fixDict["-neg"]  =  "-Q-"  
 
-
+fixDict['z'] = sample_names['z']
+fixDict['ZJetsInv'] = sample_names['z']
+fixDict['st']       = sample_names['st'] 
+fixDict['ST']       = sample_names['st'] 
+fixDict['dy']       = sample_names['dy'] 
+fixDict['DYJetsM50']       = sample_names['dy'] 
 
 fixDict["Other"]  =  "Other" 
 fixDict["T2-4bd-"]  =  "Signal" 
 fixDict["T2_4bd_"]  =  "Signal" 
-fixDict["DYJetsM50"]  =  "DYJets" 
+#fixDict["DYJetsM50"]  =  "DYJets" 
 fixDict["WJets"]  =  "WJets" 
-fixDict["ZJetsInv"]  =  "ZJetsInv" 
+#fixDict["ZJetsInv"]  =  "ZJetsInv" 
 fixDict["TTJets"]  =  "TTJets" 
 fixDict["Total"]  =  "Total S.M."
 fixDict["DataBlind"]  =  "Data(12.9fb-1)"
@@ -2913,9 +3015,9 @@ class JinjaTexTable():
             dataName = ylds.sampleNames[d] if ylds.sampleNames[d] in yieldDict.keys() else d
             print yieldDict[dataName]
             for dataBin in yieldDict[dataName].keys():
-                print "before" , yieldDict[dataName][dataBin]
+                #print "before" , yieldDict[dataName][dataBin]
                 yieldDict[dataName][dataBin] = int( getattr(yieldDict[dataName][dataBin],"val", yieldDict[dataName][dataBin] ) )
-                print "after" , yieldDict[dataName][dataBin]
+                #print "after" , yieldDict[dataName][dataBin]
 
 
         if noFOM:
@@ -3063,7 +3165,7 @@ def makeSimpleLatexTable( table_list , texName, outDir, caption="" , align_char 
     
     table = header + body + footer
 
-    texFile = outDir+"/"+texName
+    texFile = outDir+"/"+texName + ".tex"
     f = open( texFile, 'w')
     f.write( table)
     f.close()
@@ -3078,22 +3180,49 @@ def makeSimpleLatexTable( table_list , texName, outDir, caption="" , align_char 
 
 
 ############################## Stop LSP Stuff
+sig_prefixes = ['s','cwz', 'cww', 't2tt','t2bw','t2ttold']
 
 def getMasses(string):
+    masses = []
+    string = get_filename(string)
+    #splitted = re.split("_|-", string)
+    #splitted = string.rsplit("_"):
+
+    for sig_prefix in sig_prefixes:
+        if re.match(sig_prefix+"\d\d\d_\d\d\d", string):
+            string =  string.replace(sig_prefix,"")
+            break
+    masses = re.split("_|-", string)
+    # 
+
+    # for s in splitted:
+    #     for sig_prefix in sig_prefixes:
+    #         if re.match(sig_prefix+"\d\d\d_\d\d\d",s):
+    #             s.replace(sig_prefix,"")
+    #         if s.startswith(sig_prefix):
+    #             s = s[len(sig_prefix):]
+
+    #     if not s.isdigit():
+    #         continue
+    #     masses.append(s)
+    if len(masses)!=2 or int(masses[0]) < int(masses[1]):
+        raise Exception("Failed to Extract masses from string: %s , only got %s "%(string, masses))
+    return [int(m) for m in masses]
+
+def getMasses2(string):
     masses = []
     string = get_filename(string)
     splitted = re.split("_|-", string)
     #splitted = string.rsplit("_"):
     for s in splitted:
-        if s.startswith("s8tev"):
-            s = s[5:]
-        if s.startswith("s"):
-            s = s[1:]
+        for sig_prefix in sig_prefixes:
+            if s.startswith(sig_prefix):
+                s = s[len(sig_prefix):]
         if not s.isdigit():
             continue
         masses.append(s)
     if len(masses)!=2 or int(masses[0]) < int(masses[1]):
-        raise Exception("Failed to Extract masses from string: %s , only got %s "%(string, masses))
+        return False
     return [int(m) for m in masses]
 
 def getValueFromDict(x, val="0.500", default=999):  ##  can use dict.get()?
@@ -3104,3 +3233,34 @@ def getValueFromDict(x, val="0.500", default=999):  ##  can use dict.get()?
     #else:
     #    raise Exception("cannot find value %s in  %s"%(val, x))
     return float(ret)
+
+
+
+def makeHistoFromList(lst, bins=None,name ="Histo", func=None):
+    if not bins:
+        bins = [len(lst),0,len(lst)]
+    h = ROOT.TH1F(name,name,*bins)
+    for ib,l in enumerate(lst,1):
+        if func:
+            l = func(l)
+        if hasattr(l,"sigma"):
+            h.SetBinContent(ib,l.val)
+            h.SetBinError(ib,l.sigma)        
+        else:
+            h.SetBinContent(ib,l)
+    return h
+
+def makeHistoFromDict(di , bins=None, name="Histo", bin_order=None,func=None):
+    if bin_order:
+        lst   = [ di[x] for x in bin_order if x in di]
+        labels = [ x for x in bin_order if x in di]
+    else:
+        lst    = di.values()
+        labels = di.keys()
+    #print lst
+    #print labels
+
+    h = makeHistoFromList(lst, bins, name, func)
+    for ib, bin_label in enumerate(labels,1):
+        h.GetXaxis().SetBinLabel( ib, bin_label)
+    return h

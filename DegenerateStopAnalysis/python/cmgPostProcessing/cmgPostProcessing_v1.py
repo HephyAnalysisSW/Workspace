@@ -163,7 +163,7 @@ def getParameterSet(args):
     if args.processGenTracks:
         vectors_MC_List.append(GenTracksSel)
         
-    if args.applyEventVetoFastSimJets:
+    if args.processEventVetoFastSimJets:
         vectors_MC_List.append(params['Veto_fastSimJets']['genJet'])
 
     params['vectors_MC_List'] = vectors_MC_List
@@ -175,21 +175,21 @@ def getParameterSet(args):
         from Workspace.DegenerateStopAnalysis.cmgPostProcessing.btagEfficiency import btagEfficiency
 
         sampleName = args.processSample
-        eff_dict_map = {
-                         "WJets_1j"      : { 'sampleList' : ["ZInv", "ZJets", "WJets", "DYJets" ,"ZZ", "WZ", "WW" ] ,  },
-                         #"TTJets_1j"     : { 'sampleList' : ["TTJets" , ]  ,                                           },
-                         "TTJets_1j"     : { 'sampleList' : ["TTJets_FastSIM" , ]  ,     'isFastSim':True              },
-                         "T2tt_allDM_1j" : { 'sampleList' : ["SMS_T2tt" , ],       'isFastSim':True               },
-                        }
+        eff_dict_map = [
+                        ( "WJets_1j"      , { 'sampleList' : ["ZInv", "ZJets", "WJets", "DYJets" ,"ZZ", "WZ", "WW" ] ,  }   ),
+                        ( "TTJets_1j"     , { 'sampleList' : ["TTJets_Tune" ,"TTJets_LO" ]  ,                           }   ),
+                        ( "TTJets_1j"     , { 'sampleList' : ["TTJets_FastSIM" , ]  ,     'isFastSim':True              }   ),
+                        ( "T2tt_allDM_1j" , { 'sampleList' : ["SMS_T2tt" , ],       'isFastSim':True                    }   ),
+                       ]
         eff_to_use = "TTJets_1j" #default
         isFastSim = False
-        for eff_samp, info in eff_dict_map.iteritems():
+        for eff_samp, info in eff_dict_map:
             if any([ samp in sampleName for samp in info['sampleList'] ]):
                 eff_to_use = eff_samp
                 isFastSim = info.get("isFastSim",False)
                 break
 
-        print "Decided to use %s for the jet efficiency"%eff_to_use
+        print "Decided to use %s for the jet efficiency for %s"%(eff_to_use, sampleName)
         if isFastSim: print "Including the FastSim/FullSim SF" 
         print info
 
@@ -573,7 +573,7 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
     #FIXME
     if args.processBTagWeights:
         bTagNames           = [ 'BTag'  , 'SBTag', 'HBTag'   ]  ## to be moved into the params
-        bTagWeightNames     = ['MC', 'SF', 'SF_b_Down', 'SF_b_Up', 'SF_l_Down', 'SF_l_Up'] ## from btagEff.btagWeightNames , also to be moved to params
+        bTagWeightNames     = ['MC', 'SF', 'SF_b_Down', 'SF_b_Up', 'SF_l_Down', 'SF_l_Up', 'SF_FS_Up', 'SF_FS_Down' ] ## from btagEff.btagWeightNames , also to be moved to params
         maxMultBTagWeight   = 2    # move to params
         bTagWeightVars      = []
         for bTagName in bTagNames:
@@ -712,8 +712,10 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
     # common branches already defined in cmgTuples
     keepBranches_MC = [ 
         'nTrueInt', 'genWeight', 'xsec', 'LHEweight_original', #'puWeight', need to create a new puWeight
+        'nIsr',
         'GenSusyMStop', 
         'GenSusyMNeutralino',        
+        'LHEWeights_*',
         'ngenLep', 'genLep_*', 
         'nGenPart', 'GenPart_*',
         'ngenPartAll','genPartAll_*',
@@ -2573,7 +2575,7 @@ def cmgPostProcessing(argv=None):
     logger.info("\n Target luminosity: %f pb^{-1} \n", params['target_lumi'])
     
     # get the event veto list FIXME: are the values updated properly?   
-    if args.applyEventVetoList:
+    if args.processEventVetoList:
         event_veto_list = get_veto_list()['all']
     else:
         event_veto_list = {}
@@ -3018,13 +3020,13 @@ def cmgPostProcessing(argv=None):
                         saveTree = processGenTracksFunction(readTree, splitTree, saveTree)
                     
                     # process event veto list flags
-                    if isDataSample and args.applyEventVetoList:
+                    if isDataSample and args.processEventVetoList:
                         saveTree = processEventVetoList(
                             readTree, splitTree, saveTree, event_veto_list
                             )
 
                     # compute flag for event veto for FastSim jets
-                    if isFastSimSample and args.applyEventVetoFastSimJets:
+                    if isFastSimSample and args.processEventVetoFastSimJets:
                         saveTree = processEventVetoFastSimJets(readTree, splitTree, saveTree, params)
 
                     if not isDataSample:
