@@ -140,9 +140,7 @@ def getChunks(sample,  maxN=-1, getPU=False):
   goodChunks  =[] 
   const = 'All Events' if sample['isData'] else 'Sum Weights'
   for i, s in enumerate(chunks):
-      #nameLen = len(s['name'])
-      #if nameLen>30: nameLen = 30
-      #s['shortName'] = s['name'][0:nameLen]
+      inputFilename = sample['dir']+'/'+s['name']+'/'+sample['rootFileLocation']
       if not sample.has_key("skimAnalyzerDir"):
         logfile = sample['dir']+'/'+s['name']+'/SkimReport.txt'
       else:
@@ -151,19 +149,20 @@ def getChunks(sample,  maxN=-1, getPU=False):
         line = [x for x in subprocess.check_output(["cat", logfile]).split('\n') if x.count(const)]
         assert len(line)==1,"Didn't find normalization constant '%s' in  number in file %s"%(const, logfile)
         sumW = float(line[0].split()[2])
+        sumWeights+=sumW
         if getPU: 
             if len(sample['rootFileLocation'].split("/")) ==2: inputFilename = sample['dir']+'/'+s['name']+'/'+sample['rootFileLocation'].split("/")[0]+"/pileup.root"
             if len(sample['rootFileLocation'].split("/")) ==1: inputFilename = sample['dir']+'/'+s['name']+"/pileup.root"
             else : print "root file dir not proper for PU" 
-        else: inputFilename = sample['dir']+'/'+s['name']+'/'+sample['rootFileLocation']
-        #print sumW, inputFilename
         if os.path.isfile(inputFilename):
-          sumWeights+=sumW
           s['file']=inputFilename
           goodChunks.append(s)
         else:
           failedChunks.append(chunks[i])
-      else:
+      if sample['isData'] and not os.path.isfile(logfile):
+          s['file']=inputFilename
+          goodChunks.append(s)
+      if not sample['isData'] and not os.path.isfile(logfile):
         print "log file not found:  ", logfile
         failedChunks.append(chunks[i])
 #    except: print "Chunk",s,"could not be added"
