@@ -17,8 +17,8 @@ ptBorders = [30, 40, 50, 60, 70, 80, 100, 120, 160, 210, 260, 320, 400, 500, 670
 ptBins = []
 etaBins = [[0,0.8], [0.8,1.6], [ 1.6, 2.4]]
 
-scaleFactorFile   = 'CMSSW_BASE/src/Workspace/RA4Analysis/cmgPostProcessing/data/CSVv2_ichep.csv'
-scaleFactorFileFS = 'CMSSW_BASE/src/Workspace/RA4Analysis/cmgPostProcessing/data/CSV_13TEV_Combined_14_7_2016.csv'
+scaleFactorFile   = '$CMSSW_BASE/src/Workspace/RA4Analysis/cmgPostProcessing/data/CSVv2_ichep.csv'
+scaleFactorFileFS = '$CMSSW_BASE/src/Workspace/RA4Analysis/cmgPostProcessing/data/CSV_13TEV_Combined_14_7_2016.csv'
 
 
 #SFb_errors = [\
@@ -142,6 +142,11 @@ def getSF(parton, pt, eta, year = 2012):
 WP = ROOT.BTagEntry.OP_MEDIUM
 ROOT.gSystem.Load('libCondFormatsBTauObjects')
 ROOT.gSystem.Load('libCondToolsBTau')
+
+print 'Loading SF files:'
+print os.path.expandvars(scaleFactorFile)
+print os.path.expandvars(scaleFactorFileFS)
+
 calib   = ROOT.BTagCalibration("csvv2", os.path.expandvars(scaleFactorFile))
 calibFS = ROOT.BTagCalibration("csv", os.path.expandvars(scaleFactorFileFS))
 
@@ -166,7 +171,7 @@ def getSF2015(parton, pt, eta):
   flavKey = toFlavourKey(parton)
 
   #FullSim SFs (times FSSF)
-  if abs(pdgId)==5 or abs(pdgId)==4: #SF for b/c
+  if abs(parton)==5 or abs(parton)==4: #SF for b/c
       sf    = reader.eval_auto_bounds('central',  flavKey, eta, pt)
       sf_d  = reader.eval_auto_bounds('down',     flavKey, eta, pt)
       sf_u  = reader.eval_auto_bounds('up',       flavKey, eta, pt)
