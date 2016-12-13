@@ -10,6 +10,7 @@ Will submit a batch job for each command line in the file_with_commands
 
 from optparse import OptionParser
 import hashlib, time
+import sys
 import os
 
 parser = OptionParser()
@@ -24,15 +25,13 @@ hephy_user_initial = os.getenv("USER")[0]
 parser.add_option("--title", dest="title",
                   help="Job Title viewied in squeue", default = "BATCHSUBMIT" )
 parser.add_option("--output", dest="output", 
-                  default="/afs/hephy.at/work/%s/%s/slurm_output/"%(hephy_user_initial, hephy_user),
+                  default="/afs/hephy.at/work/%s/%s/slurm_output"%(hephy_user_initial, hephy_user),
                   help="path for slurm output ")
 (options,args) = parser.parse_args()
 
 slurm_job_title  = options.title
 slurm_output_dir = options.output
 
-if not os.path.isdir(slurm_output_dir):
-    os.mkdir(slurm_output_dir)
 
 
 def make_slurm_job( slurm_job_file, slurm_job_title, slurm_output_dir , command ):
@@ -41,7 +40,7 @@ def make_slurm_job( slurm_job_file, slurm_job_title, slurm_output_dir , command 
 #!/bin/sh
 #SBATCH -J {slurm_job_title}
 #SBATCH -D {pwd}
-#SBATCH -o {slurm_output_dir}slurm-test.%j.out
+#SBATCH -o {slurm_output_dir}/{slurm_job_title_u}.%j.out
 
 eval \`"scram runtime -sh"\` 
 echo CMSSW_BASE: {cmssw_base} 
@@ -54,6 +53,7 @@ echo "{command}"
                 cmssw_base       = os.getenv("CMSSW_BASE"),
                 slurm_output_dir = slurm_output_dir,
                 slurm_job_title  = slurm_job_title,
+                slurm_job_title_u  = slurm_job_title.replace(" ", "_"),
                 pwd              = os.getenv("PWD")
               )
 
@@ -67,19 +67,33 @@ if __name__ == '__main__':
     if not len(args) == 1:
         raise Exception("Only one argument accepted! Instead this was given: %s"%args)
     if os.path.isfile(args[0]):
-        print "Reading commands from file: %s"%args[0]
+        print "Reading commands from file: %s\n"%args[0]
         commands = []
         with open(args[0]) as f:
             for line in f.xreadlines():
                 line = line.rstrip("\n")
                 if line:
-                    if line.startswith("#"):    
+                    line_slurm_output_dir = "@ slurm_output_dir: "
+                    if line.startswith("@"): 
+                        slurm_output_dir = line.replace(line_slurm_output_dir, "")  
+                    elif line.startswith("#"): 
                         print "Skipping line, seems to be a comment %s"%line
                         continue
-                    commands.append(line)
+                    else:
+                        commands.append(line)
+            
     elif type(args[0]) == type(""):
         commands = [args[0]]
+    else:
+        pass
+        
     if commands:
+
+        if not os.path.isdir(slurm_output_dir):
+            os.mkdir(slurm_output_dir)
+        
+        print "\n Batch system .out file to be written in directory \n %s \n "%slurm_output_dir
+        
         #hash_string = hashlib.md5("%s"%time.time()).hexdigest()
         #tmp_job_dir = "tmp_%s"%hash_string
         #os.mkdir(tmp_job_dir)
