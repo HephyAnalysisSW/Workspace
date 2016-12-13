@@ -1,4 +1,4 @@
-import ROOT, pickle, itertools
+import ROOT, pickle, itertools, os
 
 from Workspace.HEPHYPythonTools.helpers import *
 from Workspace.RA4Analysis.helpers import *
@@ -139,9 +139,10 @@ def getSF(parton, pt, eta, year = 2012):
   return {"SF":sf, "SF_down":sf_d,"SF_up":sf_u}
 
 ## get SFs
+WP = ROOT.BTagEntry.OP_MEDIUM
 ROOT.gSystem.Load('libCondFormatsBTauObjects')
 ROOT.gSystem.Load('libCondToolsBTau')
-calib = ROOT.BTagCalibration("csvv2", os.path.expandvars(scaleFactorFile))
+calib   = ROOT.BTagCalibration("csvv2", os.path.expandvars(scaleFactorFile))
 calibFS = ROOT.BTagCalibration("csv", os.path.expandvars(scaleFactorFileFS))
 
 v_sys = getattr(ROOT, 'vector<string>')()
