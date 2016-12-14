@@ -4,44 +4,45 @@ import os,sys
 from Workspace.HEPHYPythonTools.user import username
 import Workspace.HEPHYPythonTools.xsec as xsec
 from Workspace.HEPHYPythonTools.helpers import getObjFromFile, getChain, getChunks, getCutYieldFromChain, getYieldFromChain
-#from Workspace.RA4Analysis.cmgTuples_Spring15_v2 import *
-from Workspace.RA4Analysis.cmgTuples_Data25ns_Promtv2_postprocessed import *
-from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2_postProcessed import *
+from Workspace.RA4Analysis.cmgTuples_Data25ns_Moriond2017_postprocessed import *
+from Workspace.RA4Analysis.cmgTuples_Spring16_Moriond2017_MiniAODv2_postProcessed import *
+#from Workspace.RA4Analysis.cmgTuples_Data25ns_Promtv2_postprocessed import *
+#from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2_postProcessed import *
 #from cutFlow_helper import *
 from Workspace.RA4Analysis.general_config import *
 
-path = "/afs/hephy.at/user/e/easilar/www/data/Run2016B/4fb/Tables/"
+path = "/afs/hephy.at/user/e/easilar/www/Moriond2017/cutFlows/"
 if not os.path.exists(path):
   os.makedirs(path)
 
-maxN = 1
-small = False
-if not small : maxN = -1
-
+ICHEP = True
 
 lepSels = [
 {'cut':'(singleMuonic&&(!isData||(isData&&muonDataSet)))' , 'veto':'nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0',\
- 'chain': getChain(single_mu_Run2016B,maxN=maxN,histname="",treeName="Events") ,\
+ 'chain': getChain(single_mu,histname="",treeName="Events") ,\
   'label':'_mu_', 'str':'1 $\\mu$' , 'trigger': trigger},\
 {'cut':'singleElectronic&&(!isData||(isData&&eleDataSet))' , 'veto':'nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0',\
- 'chain': getChain(single_ele_Run2016B,maxN=maxN,histname="",treeName="Events") ,\
+ 'chain': getChain(single_ele,histname="",treeName="Events") ,\
   'label':'_ele_', 'str':'1 $\\e$' , 'trigger': trigger},\
-#{'cut':'((!isData&&singleLeptonic)||(isData&&((eleDataSet&&singleElectronic)||(muonDataSet&&singleMuonic))))' , 'veto':'nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0',\
-# 'chain': getChain([single_ele_Run2016B,single_mu_Run2016B],maxN=maxN,histname="",treeName="Events") ,\
-#  'label':'_lep_', 'str':'1 $lep$' , 'trigger': trigger}\
+{'cut':'((!isData&&singleLeptonic)||(isData&&((eleDataSet&&singleElectronic)||(muonDataSet&&singleMuonic))))' , 'veto':'nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0',\
+ 'chain': getChain([single_ele,single_mu],maxN=maxN,histname="",treeName="Events") ,\
+  'label':'_lep_', 'str':'1 $lep$' , 'trigger': trigger}\
 ]
+
+lepSels = [lepSels[2]]
+
 bkg_samples=[
-#{'sample':'TTVH',      "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":TTV ,'tex':'t#bar{t}V','color':ROOT.kOrange-3},
-##{"sample":"DiBosons",  "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":diBoson ,"tex":"WW/WZ/ZZ","color":ROOT.kRed+3},
-#{"sample":"DY",        "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":DY_HT,"tex":"DY + jets",'color':ROOT.kRed-6},
-#{"sample":"singleTop", "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":singleTop_lep,"tex":"t/#bar{t}",'color': ROOT.kViolet+5},
-#{"sample":"QCD",       "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":QCDHT, "tex":"QCD","color":ROOT.kCyan-6},
-#{"sample":"WJets",     "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":WJetsHTToLNu,"tex":"W + jets","color":ROOT.kGreen-2},
-{"sample":"ttJets",    "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":TTJets_Comb, "tex":"t#bar{t} ll + jets",'color':ROOT.kBlue},
+{'sample':'TTVH',      "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":TTV ,'tex':'t#bar{t}V','color':ROOT.kOrange-3},
+{"sample":"DiBosons",  "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":diBoson ,"tex":"WW/WZ/ZZ","color":ROOT.kRed+3},
+{"sample":"DY",        "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":DY_HT,"tex":"DY + jets",'color':ROOT.kRed-6},
+{"sample":"singleTop", "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":singleTop_lep,"tex":"t/#bar{t}",'color': ROOT.kViolet+5},
+{"sample":"QCD",       "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":QCDHT, "tex":"QCD","color":ROOT.kCyan-6},
+{"sample":"WJets",     "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":WJetsHTToLNu,"tex":"W + jets","color":ROOT.kGreen-2},
+{"sample":"ttJets",    "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":TTJets_Comb, "tex":"t#bar{t} + jets",'color':ROOT.kBlue},
 ]
 
 for bkg in bkg_samples:
-    bkg['chain'] = getChain(bkg['name'],maxN=maxN,histname="",treeName="Events")
+    bkg['chain'] = getChain(bkg['name'],histname="",treeName="Events")
 
 
 for lepSel in lepSels:
@@ -58,7 +59,8 @@ for lepSel in lepSels:
   {'cut':"&&".join([lepSel['cut'],lepSel['veto'],"nJet30>=5","(Jet_pt[1]>80)","htJet30j>500","st>250","nBJetMediumCSV30>=1","nJet30>=6","(Jet_pt[1]>80)"]), 'label': 'multi b-jets (CSVM) nJet >=6' },\
   {'cut':"&&".join([lepSel['cut'],lepSel['veto'],"nJet30>=5","(Jet_pt[1]>80)","htJet30j>500","st>250","nBJetMediumCSV30>=1","nJet30>=6","(Jet_pt[1]>80)","deltaPhi_Wl>1"]), 'label': '\\Delta\\Phi >1' },\
    ]
-  ofile = file(path+'cut_flow_'+lepSel['label']+'_weightsV1_.tex','w')
+  ofile = file(path+'cut_flow_'+lepSel['label']+'_.tex','w')
+  if ICHEP: ofile = file(path+'cut_flow_'+lepSel['label']+'_ICHEP_.tex','w')
   doc_header = '\\documentclass{article}\\usepackage[english]{babel}\\usepackage{graphicx}\\usepackage[margin=0.5in]{geometry}\\begin{document}'
   ofile.write(doc_header)
   ofile.write("\n")
@@ -84,6 +86,7 @@ for lepSel in lepSels:
       y_remain = getYieldFromChain(chain,cutString = cut['cut'],weight = weight_str_plot)
       print tot_yields , y_remain
       tot_yields = y_remain
+      if ICHEP : tot_yields = (tot_yields*12900)/36450 
       line_yield = '&' + str(format(tot_yields, '.1f'))
       ofile.write(line_yield)
     ofile.write('\\\\')

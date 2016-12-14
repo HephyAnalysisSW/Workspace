@@ -3,8 +3,8 @@ import ROOT
 ##General
 
 sample_lumi = 3000##pb
-lumi = 12880 #2300##pb
-lumi_label = 12.88
+lumi = 36450 #2300##pb
+lumi_label = 36
 scale = '(1)'
 btagVarString = 'nBJetMediumCSV30'
 
@@ -41,7 +41,7 @@ weight_str_signal_plot = '*'.join([trigger_scale,lepton_Scale_signal_fast,lepton
 weight_str_signal_CV = '*'.join([trigger_scale,lepton_Scale_signal,reweight])
 
 
-def Draw_CMS_header(lumi_label=12.88):
+def Draw_CMS_header(lumi_label=36):
    tex = ROOT.TLatex()
    tex.SetNDC()
    tex.SetTextAlign(31)

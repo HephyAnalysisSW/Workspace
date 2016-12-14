@@ -6,8 +6,8 @@ dirEce = '/afs/hephy.at/data/easilar01/cmgTuples/postProcessing_Spring16_Moriond
 TTJets_Comb = {\
 "name" : "TTJets_Comb",
 "bins" : [
-"TTJets_SingleLeptonFromT_full",
-"TTJets_SingleLeptonFromTbar_full",
+"TTJets_SingleLeptonFromT",
+"TTJets_SingleLeptonFromTbar",
 "TTJets_DiLepton",
 ],
 'dir' : dirEce,
@@ -18,7 +18,7 @@ WJetsHTToLNu = {\
 "name" : "W+Jets",
 "bins" : [
   'WJetsToLNu_HT100to200',\
-  'WJetsToLNu_HT100to200_ext',\
+  #'WJetsToLNu_HT100to200_ext',\
   'WJetsToLNu_HT1200to2500',\
   #'WJetsToLNu_HT1200to2500_ext',\
   'WJetsToLNu_HT200to400',\
@@ -26,12 +26,12 @@ WJetsHTToLNu = {\
   'WJetsToLNu_HT2500toInf',\
   #'WJetsToLNu_HT2500toInf_ext',\
   'WJetsToLNu_HT400to600',\
-  'WJetsToLNu_HT400to600_ext',\
+  #'WJetsToLNu_HT400to600_ext',\
   'WJetsToLNu_HT600to800',\
   'WJetsToLNu_HT800to1200',\
   #'WJetsToLNu_HT800to1200_ext',\
 ],
-'dir' : dirDaniel,
+'dir' : dirEce,
 }
 
 
@@ -44,7 +44,7 @@ singleTop_lep = {\
   'ST_t_channel_antitop_4f_leptonDecays',\
   'ST_t_channel_top_4f_leptonDecays',\
 ],
-'dir' : dirDaniel,
+'dir' : dirEce,
 }
 
 
@@ -52,15 +52,15 @@ DY_HT = {\
 "name" : "DY_HT",
 "bins" : [
   'DYJetsToLL_M50_HT100to200',\
-  'DYJetsToLL_M50_HT100to200_ext',\
+  #'DYJetsToLL_M50_HT100to200_ext',\
   'DYJetsToLL_M50_HT200to400',\
-  'DYJetsToLL_M50_HT200to400_ext',\
+  #'DYJetsToLL_M50_HT200to400_ext',\
   'DYJetsToLL_M50_HT400to600',\
   #'DYJetsToLL_M50_HT400to600_ext',\
   'DYJetsToLL_M50_HT600toInf',\
-  'DYJetsToLL_M50_HT600toInf_ext',\
+  #'DYJetsToLL_M50_HT600toInf_ext',\
 ],
-'dir' : dirDaniel,
+'dir' : dirEce,
 }
 
 
@@ -75,7 +75,7 @@ QCDHT = {\
 "QCD_HT500to700",
 "QCD_HT700to1000",
 ],
-'dir' : dirDaniel,
+'dir' : dirEce,
 }
 
 diBoson = {\
@@ -90,7 +90,7 @@ diBoson = {\
 #"ZZTo2L2Q",
 "ZZTo2Q2Nu",
 ],
-'dir': dirDaniel,
+'dir': dirEce,
 }
 
 
@@ -102,7 +102,7 @@ TTV = {
 "TTZToLLNuNu",
 "TTZToQQ",
 ],
-'dir' : dirDaniel,
+'dir' : dirEce,
 }
 
 allSignalStrings=[\
