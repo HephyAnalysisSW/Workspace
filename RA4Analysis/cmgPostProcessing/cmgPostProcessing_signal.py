@@ -367,7 +367,7 @@ for isample, sample in enumerate(allSamples):
           s.nLooseHardLeptons = len(looseHardLepInd)
           s.nTightSoftLeptons = len(tightSoftLepInd)
           s.nTightHardLeptons = len(tightHardLepInd)
-          vars = ['pt', 'eta', 'phi', 'charge','miniRelIso','relIso03', 'pdgId', 'SPRING15_25ns_v1','eleCBID_SPRING15_25ns_ConvVetoDxyDz']
+          vars = ['pt', 'eta', 'phi', 'mass','charge','miniRelIso','relIso03', 'pdgId', 'SPRING15_25ns_v1','eleCBID_SPRING15_25ns_ConvVetoDxyDz']
           allLeptons = [getObjDict(t, 'LepGood_', vars, i) for i in looseLepInd]
           looseSoftLep = [getObjDict(t, 'LepGood_', vars, i) for i in looseSoftLepInd] 
           looseHardLep = [getObjDict(t, 'LepGood_', vars, i) for i in looseHardLepInd]
