@@ -686,7 +686,6 @@ ZZTo2Q2Nu = {\
 }
 
 ####Signal Samples###
-
 SMS_T5qqqqVV_TuneCUETP8M1 ={\
 "name" : "SMS_T5qqqqVV_TuneCUETP8M1",
 "chunkString":"SMS_T5qqqqVV_TuneCUETP8M1",

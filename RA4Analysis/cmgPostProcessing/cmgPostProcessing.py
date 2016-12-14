@@ -47,7 +47,7 @@ separateBTagWeights = True
 
 defSampleStr = "TTJets_LO"
 
-subDir = "postProcessing_MC_Moriond2017_v2"
+subDir = "postProcessing_data_Moriond2017_v2"
 #subDir = "deleteme"
 
 #branches to be kept for data and MC
@@ -530,17 +530,17 @@ for isample, sample in enumerate(allSamples):
         s.iso_Veto = True
         #if lumi_branch==25753 and evt_branch==20752673:
         if s.nTightHardLeptons >=1 and r.nisoTrack>=1:
-          print lumi_branch , evt_branch
-          print "nLeptons:" , s.nTightHardLeptons
-          print "!!!!!nisoTrack!!!!!1" , r.nisoTrack
-          print "tight lepton pt: " , tightHardLep[0]["pt"] 
+          #print lumi_branch , evt_branch
+          #print "nLeptons:" , s.nTightHardLeptons
+          #print "!!!!!nisoTrack!!!!!1" , r.nisoTrack
+          #print "tight lepton pt: " , tightHardLep[0]["pt"] 
           var_list = ['pt', 'eta', 'phi','charge','pdgId','mass']
           tracks = get_cmg_isoTracks_fromStruct(r,var_list)
           met_4vec = ROOT.TLorentzVector()
           met_4vec.SetPtEtaPhiM(r.met_pt,r.met_eta,r.met_phi,r.met_mass)
           get_mt2(s,r,tightHardLep,tracks,met_4vec)
-          print "met pt :" , r.met_pt
-          print s.iso_had , s.iso_pt , s.iso_MT2 , s.iso_Veto
+          #print "met pt :" , r.met_pt
+          #print s.iso_had , s.iso_pt , s.iso_MT2 , s.iso_Veto
         #s.mt2w = mt2w.mt2w(met = {'pt':r.met_pt, 'phi':r.met_phi}, l={'pt':s.leptonPt, 'phi':s.leptonPhi, 'eta':s.leptonEta}, ljets=lightJets, bjets=bJetsCSV)
         s.deltaPhi_Wl = acos((s.leptonPt+r.met_pt*cos(s.leptonPhi-r.met_phi))/sqrt(s.leptonPt**2+r.met_pt**2+2*r.met_pt*s.leptonPt*cos(s.leptonPhi-r.met_phi))) 
         #print s.nJet30
