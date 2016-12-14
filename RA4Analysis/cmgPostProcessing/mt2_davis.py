@@ -38,6 +38,6 @@ def get_mt2(s,r,tightHardLep,tracks,met_4vec):
     else: 
         s.iso_had = 1  #hadronic track
         cut=hadMT2cut
-    if s.iso_MT2 <= cut: s.iso_Veto = True
+    if s.iso_MT2 <= cut: s.iso_Veto = False   #this will veto
 
   del mt2

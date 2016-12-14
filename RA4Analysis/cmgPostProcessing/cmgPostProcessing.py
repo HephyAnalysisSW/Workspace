@@ -47,8 +47,8 @@ separateBTagWeights = True
 
 defSampleStr = "TTJets_LO"
 
-#subDir = "postProcessing_data_Moriond2017_v1"
-subDir = "deleteme"
+subDir = "postProcessing_MC_Moriond2017_v2"
+#subDir = "deleteme"
 
 #branches to be kept for data and MC
 branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert",
@@ -112,17 +112,26 @@ if options.skim=='LHEHTlg600':
 #skimCond += "&&Sum$(LepGood_pt>25&&abs(LepGood_eta)<2.5)>=0"
 
 ##skim conditions for fancy ttJets combination##
+ngenTau = "Sum$(abs(genTau_grandmotherId)==6&&abs(genTau_motherId)==24)"
+ngenLep = "Sum$(abs(genLep_grandmotherId)==6&&abs(genLep_motherId)==24)"
+dilep = "(("+ngenLep+"+"+ngenTau+")==2)"
+semilep = "(("+ngenLep+"+"+ngenTau+")==1)"
+hadronic = "(("+ngenLep+"+"+ngenTau+")==0)"
 
 ####dilep skim##
-if options.skim=='HT500ST250diLep':
+if options.skim=='diLep':
   #skimCond = "((ngenLep+ngenTau)==2)&&lheHTIncoming<=1000&&"+htLtSkim
-  skimCond = "((ngenLep+ngenTau)==2)&&"+htLtSkim
+  #skimCond = "((ngenLep+ngenTau)==2)&&"+htLtSkim
+   skimCond = "&&".join([dilep,htLtSkim])
 ###semilep skim###
-if options.skim=='HT500ST250semiLep':
-  skimCond = "((ngenLep+ngenTau)==1)&&"+htLtSkim
-###Full hadronic###
-if options.skim=='HT500ST250LHE_FullHadronic_inc':
-  skimCond = "((ngenLep+ngenTau)==0)&&"+htLtSkim
+if options.skim=='semiLep':
+  #skimCond = "((ngenLep+ngenTau)==1)&&"+htLtSkim
+  skimCond = "&&".join([semilep,htLtSkim])
+###had skim###
+if options.hadronicLeg:
+  #skimCond += "&&(ngenLep+ngenTau)==0"
+  skimCond = "&&".join([hadronic,htLtSkim])
+
 ###Full hadronic for the ht binned###
 if options.skim=='HT500ST250LHE_FullHadronic':
   skimCond = "lheHTIncoming>600&&lheHTIncoming<=1000&&((ngenLep+ngenTau)==0)&&"+htLtSkim
@@ -131,8 +140,6 @@ if options.skim=='LHEHT1000':
   skimCond = "lheHTIncoming>1000&&"+htLtSkim
 
 
-if options.hadronicLeg:
-  skimCond += "&&(ngenLep+ngenTau)==0"
 
 if options.manScaleFactor!=1:
   target_lumi = target_lumi*float(options.manScaleFactor)
@@ -437,7 +444,7 @@ for isample, sample in enumerate(allSamples):
           s.leptonEta = r.LepGood_eta[leadingLepInd]
           s.leptonPhi = r.LepGood_phi[leadingLepInd]
           s.leptonPdg = r.LepGood_pdgId[leadingLepInd]
-          s.leptonCharge = r.LepGood_charge[leadingLepInd]
+          #s.leptonCharge = r.LepGood_charge[leadingLepInd]
           #s.leptonPdg = (-1)*r.LepGood_pdgId[leadingLepInd] if (sample['name']=="ST_tchannel_top_4f_leptonDecays_powheg") else r.LepGood_pdgId[leadingLepInd]
           s.leptonMass= r.LepGood_mass[leadingLepInd]
           s.leptonSPRING15_25ns_v1= r.LepGood_eleCBID_SPRING15_25ns_ConvVetoDxyDz[leadingLepInd]
@@ -520,7 +527,7 @@ for isample, sample in enumerate(allSamples):
         s.iso_had  = 999        
         s.iso_pt   = 999
         s.iso_MT2  = 999
-        s.iso_Veto = False
+        s.iso_Veto = True
         #if lumi_branch==25753 and evt_branch==20752673:
         if s.nTightHardLeptons >=1 and r.nisoTrack>=1:
           print lumi_branch , evt_branch
