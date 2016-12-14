@@ -35,7 +35,7 @@ for s in allSamples_Data:
             "dir":"/".join([data_path,s.split("_")[0]]),\
             }')
 
-create_run_file = True
+create_run_file = False
 if create_run_file :
   for s in allSamples_Data:
     print 'python cmgPostProcessing.py --overwrite  --skim=""  --samples='+s

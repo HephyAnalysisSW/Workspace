@@ -15,7 +15,7 @@ path = "/afs/hephy.at/user/e/easilar/www/Moriond2017/cutFlows/"
 if not os.path.exists(path):
   os.makedirs(path)
 
-ICHEP = True
+ICHEP = False
 
 lepSels = [
 {'cut':'(singleMuonic&&(!isData||(isData&&muonDataSet)))' , 'veto':'nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0',\
@@ -59,7 +59,7 @@ for lepSel in lepSels:
   {'cut':"&&".join([lepSel['cut'],lepSel['veto'],"nJet30>=5","(Jet_pt[1]>80)","htJet30j>500","st>250","nBJetMediumCSV30>=1","nJet30>=6","(Jet_pt[1]>80)"]), 'label': 'multi b-jets (CSVM) nJet >=6' },\
   {'cut':"&&".join([lepSel['cut'],lepSel['veto'],"nJet30>=5","(Jet_pt[1]>80)","htJet30j>500","st>250","nBJetMediumCSV30>=1","nJet30>=6","(Jet_pt[1]>80)","deltaPhi_Wl>1"]), 'label': '\\Delta\\Phi >1' },\
    ]
-  ofile = file(path+'cut_flow_'+lepSel['label']+'_.tex','w')
+  ofile = file(path+'cut_flow_'+lepSel['label']+'_rawNum_.tex','w')
   if ICHEP: ofile = file(path+'cut_flow_'+lepSel['label']+'_ICHEP_.tex','w')
   doc_header = '\\documentclass{article}\\usepackage[english]{babel}\\usepackage{graphicx}\\usepackage[margin=0.5in]{geometry}\\begin{document}'
   ofile.write(doc_header)
@@ -81,13 +81,15 @@ for lepSel in lepSels:
     for s in bkg_samples:
       tot_yields = 0
       chain = s['chain']
-      nEntry = chain.GetEntries()
-      #print "MC Events:" , chain.GetEntries(cut['cut'])
-      y_remain = getYieldFromChain(chain,cutString = cut['cut'],weight = weight_str_plot)
-      print tot_yields , y_remain
-      tot_yields = y_remain
-      if ICHEP : tot_yields = (tot_yields*12900)/36450 
-      line_yield = '&' + str(format(tot_yields, '.1f'))
+      #nEntry = chain.GetEntries()
+      nEntry = chain.GetEntries(cut['cut'])
+      print "MC Events:" , nEntry
+      ###y_remain = getYieldFromChain(chain,cutString = cut['cut'],weight = weight_str_plot)
+      #print tot_yields , y_remain
+      ###tot_yields = y_remain
+      ###if ICHEP : tot_yields = (tot_yields*12900)/36450 
+      #line_yield = '&' + str(format(tot_yields, '.1f'))
+      line_yield = '&' + str(format(nEntry, '.1f'))
       ofile.write(line_yield)
     ofile.write('\\\\')
     ofile.write('\n')
