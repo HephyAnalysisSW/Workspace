@@ -42,7 +42,7 @@ separateBTagWeights = True
 defSampleStr = "TTJets_LO_HT600to800_25ns"
 
 #subDir = "postProcessed_Spring16_antiSelection_3fb_v2"
-subDir = "postProcessed_Spring16_antiSelection_isoTrack_v1"
+subDir = "postProcessed_Spring16_antiSelection_isoTrack_v2"
 
 #branches to be kept for data and MC
 branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert",
@@ -249,9 +249,9 @@ for isample, sample in enumerate(allSamples):
     #readVectors[1]['vars'].extend('partonId/I')
   if options.leptonSelection.lower() in ['soft', 'hard']:
     newVariables.extend( ['nLooseSoftLeptons/I', 'nLooseHardLeptons/I', 'nTightSoftLeptons/I', 'nTightHardLeptons/I' ])
-    newVariables.extend( ['deltaPhi_Wl/F', 'Lp/F', 'Lt/F', 'nBJetMediumCSV30/I','nJet30/I','htJet30j/F', 'st/F', 'leptonPt/F','leptonMiniRelIso/F','leptonRelIso03/F' ,'leptonEta/F', 'leptonPhi/F', 'leptonSPRING15_25ns_v1/I/-2', 'leptonPdg/I/0', 'leptonInd/I/-1', 'leptonMass/F', 'singleMuonic/I', 'singleElectronic/I', 'singleLeptonic/I', 'lslJet80/I', 'leptonCharge/I/-100', "iso_had/F", "iso_pt/F","iso_MT2/F","iso_Veto/F" ]) #, 'mt2w/F'] )
+    newVariables.extend( ['deltaPhi_Wl/F', 'Lp/F', 'Lt/F', 'nBJetMediumCSV30/I','nJet30/I','htJet30j/F', 'st/F', 'leptonPt/F','leptonMiniRelIso/F','leptonRelIso03/F' ,'leptonEta/F', 'leptonPhi/F', 'leptonSPRING15_25ns_v1/I/-2', 'leptonPdg/I/0', 'leptonInd/I/-1', 'leptonMass/F', 'singleMuonic/I', 'singleElectronic/I', 'singleLeptonic/I', 'lslJet80/I', 'leptonCharge/I/-100', "iso_had/F", "iso_pt/F","iso_MT2/F","iso_Veto/I/1" ]) #, 'mt2w/F'] )
   if options.leptonSelection.lower() == 'none':
-    newVariables.extend( ['nLep/I', 'nVeto/I', 'nTightLep/I', 'nTightEl/I', 'nTightMu/I', 'nEl/I', 'nMu/I', 'Selected/I'] )
+    newVariables.extend( ['nLep/I', 'nVeto/I', 'nTightLep/I', 'nTightEl/I', 'nTightMu/I', 'nEl/I', 'nMu/I', 'Selected/I', "iso_had/F", "iso_pt/F","iso_MT2/F","iso_Veto/I/1", 'leptonCharge/I/-100'] )
     newVariables.extend( ['deltaPhi_Wl/F', 'Lp/F', 'Lt/F', 'nBJetMediumCSV30/I','nJet30clean/I','htJet30clean/F', 'st/F', 'leptonPt/F','leptonMiniRelIso/F','leptonRelIso03/F' ,'leptonEta/F', 'leptonPhi/F', 'leptonPdg/I', 'leptonInd/I', 'leptonMass/F','leptonHoverE/F', 'leptonEt/F', 'lslJet80/I', 'Jet1_pt/F', 'Jet2_pt/F', 'nJet30nonClean/I', 'htJet30nonClean/F', 'singleMuonic/I', 'singleElectronic/I', 'singleLeptonic/I' ]) #, 'mt2w/F'] )
     newVariables.extend( ['lepton_muSF_HIP/D/1.','lepton_muSF_looseID/D/1.','lepton_muSF_mediumID/D/1.','lepton_muSF_miniIso02/D/1.','lepton_muSF_sip3d/D/1.','lepton_eleSF_cutbasedID/D/1.','lepton_eleSF_miniIso01/D/1.', 'lepton_eleSF_gsf/D/1.'])
     newVariables.extend( ['lepton_muSF_HIP_err/D/0.','lepton_muSF_looseID_err/D/0.','lepton_muSF_mediumID_err/D/0.','lepton_muSF_miniIso02_err/D/0.','lepton_muSF_sip3d_err/D/0.','lepton_eleSF_cutbasedID_err/D/0.','lepton_eleSF_miniIso01_err/D/0.', 'lepton_eleSF_gsf_err/D/0.', 'lepton_muSF_systematic/D/0.'])
@@ -486,7 +486,7 @@ for isample, sample in enumerate(allSamples):
           s.iso_had  = 999        
           s.iso_pt   = 999
           s.iso_MT2  = 999
-          s.iso_Veto = False
+          s.iso_Veto = True
           if s.nTightHardLeptons >=1 and r.nisoTrack>=1:
             var_list = ['pt', 'eta', 'phi','charge','pdgId','mass']
             tracks = get_cmg_isoTracks_fromStruct(r,var_list)
@@ -714,7 +714,7 @@ for isample, sample in enumerate(allSamples):
             s.iso_had  = 999        
             s.iso_pt   = 999
             s.iso_MT2  = 999
-            s.iso_Veto = False
+            s.iso_Veto = True
 
             if r.nisoTrack>=1:
               var_list = ['pt', 'eta', 'phi','charge','pdgId','mass']
