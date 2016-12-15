@@ -55,7 +55,7 @@ Davismt2::Davismt2(){
 	momenta_set = false;
 	mt2_b  = 0.;
 	scale = 1.;
-	verbose = 1;
+	verbose = 0;
 }
 
 Davismt2::~Davismt2(){}
