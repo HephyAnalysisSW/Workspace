@@ -1,7 +1,7 @@
 import copy, os, sys
 #dirDaniel = '/data/dspitzbart/cmgTuples/postProcessed_Spring16_antiSelection_3fb/none/'
 #dirDaniel = '/data/dspitzbart/cmgTuples/postProcessing_Spring16_JECv6_antiSelection/none/'
-dirDaniel = '/afs/hephy.at/data/dspitzbart01/cmgTuples/postProcessed_Spring16_antiSelection_isoTrack_v2/HT500/'
+dirDaniel = '/afs/hephy.at/data/dspitzbart01/cmgTuples/postProcessed_Spring16_antiSelection_isoTrack_v5/HT500/'
 #dirDaniel2 = '/data/dspitzbart/cmgTuples/postProcessed_Spring16_antiSelection_TTJetsComb/none/'
 
 
