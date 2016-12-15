@@ -12,10 +12,14 @@ python cmgPostProcessing.py --overwrite --skim="HT350" --calcbtagweights  --samp
 python cmgPostProcessing.py --overwrite --skim="HT350" --calcbtagweights  --samples=ST_t_channel_antitop_4f_leptonDecays
 python cmgPostProcessing.py --overwrite --skim="HT350" --calcbtagweights  --samples=ST_t_channel_top_4f_leptonDecays
 python cmgPostProcessing.py --overwrite --skim="diLep" --calcbtagweights  --samples=TTJets_DiLepton
-python cmgPostProcessing.py --overwrite --skim="HT350" --hadronicLeg --calcbtagweights  --samples=TTJets_LO_HT1200to2500_ext
-python cmgPostProcessing.py --overwrite --skim="HT350" --hadronicLeg --calcbtagweights  --samples=TTJets_LO_HT2500toInf
-python cmgPostProcessing.py --overwrite --skim="HT350" --hadronicLeg --calcbtagweights  --samples=TTJets_LO_HT600to800_ext
-python cmgPostProcessing.py --overwrite --skim="HT350" --hadronicLeg --calcbtagweights  --samples=TTJets_LO_HT800to1200_ext
+python cmgPostProcessing.py --overwrite --skim="htfordilep" --calcbtagweights  --samples=TTJets_LO_HT1200to2500_ext
+python cmgPostProcessing.py --overwrite --skim="htfordilep" --calcbtagweights  --samples=TTJets_LO_HT2500toInf
+python cmgPostProcessing.py --overwrite --skim="htfordilep" --calcbtagweights  --samples=TTJets_LO_HT600to800_ext
+python cmgPostProcessing.py --overwrite --skim="htfordilep" --calcbtagweights  --samples=TTJets_LO_HT800to1200_ext
+python cmgPostProcessing.py --overwrite --skim="htforsemilep" --calcbtagweights  --samples=TTJets_LO_HT1200to2500_ext
+python cmgPostProcessing.py --overwrite --skim="htforsemilep" --calcbtagweights  --samples=TTJets_LO_HT2500toInf
+python cmgPostProcessing.py --overwrite --skim="htforsemilep" --calcbtagweights  --samples=TTJets_LO_HT600to800_ext
+python cmgPostProcessing.py --overwrite --skim="htforsemilep" --calcbtagweights  --samples=TTJets_LO_HT800to1200_ext
 python cmgPostProcessing.py --overwrite --skim="semiLep" --calcbtagweights  --samples=TTJets_SingleLeptonFromT
 python cmgPostProcessing.py --overwrite --skim="semiLep" --calcbtagweights  --samples=TTJets_SingleLeptonFromTbar
 python cmgPostProcessing.py --overwrite --skim="HT350" --calcbtagweights  --samples=TTWToLNu

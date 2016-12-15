@@ -47,7 +47,7 @@ separateBTagWeights = True
 
 defSampleStr = "TTJets_LO"
 
-subDir = "postProcessing_data_Moriond2017_v2"
+subDir = "postProcessing_MC_Moriond2017_v3"
 #subDir = "deleteme"
 
 #branches to be kept for data and MC
@@ -122,11 +122,18 @@ hadronic = "(("+ngenLep+"+"+ngenTau+")==0)"
 if options.skim=='diLep':
   #skimCond = "((ngenLep+ngenTau)==2)&&lheHTIncoming<=1000&&"+htLtSkim
   #skimCond = "((ngenLep+ngenTau)==2)&&"+htLtSkim
-   skimCond = "&&".join([dilep,htLtSkim])
+  skimCond =  "(lheHTIncoming<=600)"
+  # skimCond = "&&".join([dilep,htLtSkim])
 ###semilep skim###
 if options.skim=='semiLep':
   #skimCond = "((ngenLep+ngenTau)==1)&&"+htLtSkim
-  skimCond = "&&".join([semilep,htLtSkim])
+  skimCond =  "(lheHTIncoming<=600)"
+  #skimCond = "&&".join([semilep,htLtSkim])
+if options.skim=='htfordilep':
+  skimCond = "(Sum$(abs(genTau_grandmotherId)==6&&abs(genTau_motherId)==24)+Sum$(abs(genLep_grandmotherId)==6&&abs(genLep_motherId)==24)==2)"
+if options.skim=='htforsemilep':
+  skimCond = "(Sum$(abs(genTau_grandmotherId)==6&&abs(genTau_motherId)==24)+Sum$(abs(genLep_grandmotherId)==6&&abs(genLep_motherId)==24)<2)"
+
 ###had skim###
 if options.hadronicLeg:
   #skimCond += "&&(ngenLep+ngenTau)==0"
@@ -234,8 +241,8 @@ for isample, sample in enumerate(allSamples):
   aliases = [ "met:met_pt", "metPhi:met_phi"]
 
   readVectors = [\
-    {'prefix':'LepGood', 'nMax':8, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I','charge/F' ,'relIso03/F','eleCutIdSpring15_25ns_v1/I', 'SPRING15_25ns_v1/I', 'eleCBID_SPRING15_25ns_ConvVetoDxyDz/I','eleCBID_SPRING15_25ns/I','tightId/I', 'miniRelIso/F','mass/F','sip3d/F','mediumMuonId/I', 'ICHEPmediumMuonId/I', 'mvaIdSpring15/F','lostHits/I', 'convVeto/I']},
-    {'prefix':'isoTrack', 'nMax': 8, 'vars':['pt/F', 'eta/F', 'phi/F','charge/F', 'pdgId/F','mass/F']}
+    {'prefix':'LepGood', 'nMax':8, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I','charge/I' ,'relIso03/F','eleCutIdSpring15_25ns_v1/I', 'SPRING15_25ns_v1/I', 'eleCBID_SPRING15_25ns_ConvVetoDxyDz/I','eleCBID_SPRING15_25ns/I','tightId/I', 'miniRelIso/F','mass/F','sip3d/F','mediumMuonId/I', 'ICHEPmediumMuonId/I', 'mvaIdSpring15/F','lostHits/I', 'convVeto/I']},
+    {'prefix':'isoTrack', 'nMax': 8, 'vars':['pt/F', 'eta/F', 'phi/F','charge/I', 'pdgId/F','mass/F']}
   ]
   if sample['isData']:
     readVectors.append({'prefix':'Jet',  'nMax':100, 'vars':['rawPt/F','pt/F', 'eta/F', 'phi/F', 'mass/F','id/I','btagCSV/F', 'btagCMVA/F']})
@@ -247,9 +254,9 @@ for isample, sample in enumerate(allSamples):
        for lep_DL in ["lepToDiscard" , "lepToKeep"]:
          newVariables.extend(["DL_"+var_DL+"_"+lep_DL+"_"+action+"/F/-999."])
   if not sample['isData']: 
-    readVectors.append({'prefix':'GenPart',  'nMax':100, 'vars':['eta/F','pt/F','phi/F','mass/F','charge/F', 'pdgId/I', 'motherId/F', 'grandmotherId/F']})
-    readVectors.append({'prefix':'genLep',  'nMax':100, 'vars':['eta/F','pt/F','phi/F','mass/F','charge/F', 'pdgId/I', 'motherId/F', 'grandmotherId/F']})
-    readVectors.append({'prefix':'genTau',  'nMax':100, 'vars':['eta/F','pt/F','phi/F','mass/F','charge/F', 'pdgId/I', 'motherId/F', 'grandmotherId/F']})
+    readVectors.append({'prefix':'GenPart',  'nMax':100, 'vars':['eta/F','pt/F','phi/F','mass/F','charge/I', 'pdgId/I', 'motherId/F', 'grandmotherId/F']})
+    readVectors.append({'prefix':'genLep',  'nMax':100, 'vars':['eta/F','pt/F','phi/F','mass/F','charge/I', 'pdgId/I', 'motherId/F', 'grandmotherId/F']})
+    readVectors.append({'prefix':'genTau',  'nMax':100, 'vars':['eta/F','pt/F','phi/F','mass/F','charge/I', 'pdgId/I', 'motherId/F', 'grandmotherId/F']})
     readVectors.append({'prefix':'JetForMET',  'nMax':100, 'vars':['rawPt/F','pt/F', 'eta/F', 'phi/F', 'mass/F','id/I','hadronFlavour/F','btagCSV/F', 'btagCMVA/F','corr_JECUp/F','corr_JECDown/F','corr/F']})
     readVectors.append({'prefix':'Jet',  'nMax':100,       'vars':['rawPt/F','pt/F', 'eta/F', 'phi/F', 'mass/F','id/I','hadronFlavour/F','btagCSV/F', 'btagCMVA/F','corr_JECUp/F','corr_JECDown/F','corr/F']})
    

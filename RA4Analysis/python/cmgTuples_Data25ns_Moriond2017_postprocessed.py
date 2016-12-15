@@ -1,6 +1,6 @@
 import copy, os, sys
 
-datadir = '/afs/hephy.at/data/easilar01/cmgTuples/postProcessing_data_Moriond2017_v1/HT350/'
+datadir = '/afs/hephy.at/data/easilar01/cmgTuples/postProcessing_data_Moriond2017_v2/HT350/'
 
 singleElectron_samples = [\
                         "SingleElectron_Run2016B_23Sep2016",\
@@ -36,4 +36,17 @@ single_ele = {\
 "bins" : singleElectron_samples ,
 'dir' : datadir,
 }
+
+single_mu_unblind = {\
+"name" : "SingleMuon_unblind",
+"bins" : singleMuon_samples[:-5] ,
+'dir' : datadir,
+}
+
+single_ele_unblind = {\
+"name" : "SingleElectron_unblind",
+"bins" : singleElectron_samples[:-5] ,
+'dir' : datadir,
+}
+
 
