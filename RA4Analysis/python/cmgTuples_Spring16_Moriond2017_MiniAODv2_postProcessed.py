@@ -1,6 +1,35 @@
 import copy, os, sys
 
-dirEce = '/afs/hephy.at/data/easilar01/cmgTuples/postProcessing_Spring16_Moriond2017_v1/HT350/'
+dirEce = '/afs/hephy.at/data/easilar01/cmgTuples/postProcessing_MC_Moriond2017_v2/HT350/'
+
+
+TTJets_diLep = {\
+"name" : "TTJets_diLep",
+"bins" : [
+"TTJets_DiLepton",
+],
+'dir' : dirEce,
+}
+
+TTJets_semiLep = {\
+"name" : "TTJets_semiLep",
+"bins" : [
+"TTJets_SingleLeptonFromT",
+"TTJets_SingleLeptonFromTbar",
+],
+'dir' : dirEce,
+}
+
+TTJets_HTbinned = {\
+"name" : "TTJets_HTbinned",
+"bins" : [
+'TTJets_LO_HT1200to2500_ext',
+'TTJets_LO_HT2500toInf',
+'TTJets_LO_HT600to800_ext',
+'TTJets_LO_HT800to1200_ext',
+],
+'dir' : dirEce,
+}
 
 
 TTJets_Comb = {\
@@ -9,6 +38,10 @@ TTJets_Comb = {\
 "TTJets_SingleLeptonFromT",
 "TTJets_SingleLeptonFromTbar",
 "TTJets_DiLepton",
+#'TTJets_LO_HT1200to2500_ext',
+#'TTJets_LO_HT2500toInf',
+#'TTJets_LO_HT600to800_ext',
+#'TTJets_LO_HT800to1200_ext',
 ],
 'dir' : dirEce,
 }
@@ -126,7 +159,8 @@ pickleDir = '/afs/hephy.at/data/easilar01/Ra40b/pickleDir/T5qqqqWW_mass_nEvents_
 #signal_dir = '/data/easilar/cmgTuples/postProcessing_Signals/signal/'
 #signal_dir = '/data/easilar/cmgTuples/postProcessing_Signals_v4/signal/'
 #signal_dir = '/data/easilar/cmgTuples/postProcessing_Signals_v4/signal/'
-signal_dir = '/afs/hephy.at/data/easilar01/cmgTuples/postProcessing_Signals_batch_no_Cut/signal/'
+#signal_dir = '/afs/hephy.at/data/easilar01/cmgTuples/postProcessing_Signals_batch_no_Cut/signal/'
+signal_dir = '/afs/hephy.at/data/easilar01/cmgTuples/postProcessing_Signals_Spring16_Moriond2017/signal/'
 
 def getSignalSample(signal):
   if signal in allSignalStrings:

@@ -29,7 +29,8 @@ lepton_Scale  = 'leptonSF'
 topPt         = 'TopPtWeight'
 PU            = 'puReweight_true_max4'
 #weight_str_plot = '*'.join([reweight,topPt,trigger_scale,PU])
-weight_str_plot = '*'.join([trigger_scale,lepton_Scale,topPt,PU,reweight])
+#weight_str_plot = '*'.join([trigger_scale,lepton_Scale,topPt,PU,reweight])
+weight_str_plot = reweight
 #weight_str_CV   = '*'.join([trigger_scale,lepton_Scale,topPt,reweight])
 weight_str_CV   = reweight
 
@@ -37,7 +38,8 @@ weight_str_CV   = reweight
 lepton_Scale_signal_fast = 'reweightLeptonFastSimSF'
 ISR_weight = 'weight_ISR_new' ##use with a normalisation constant
 lepton_Scale_signal  = 'lepton_muSF_HIP*lepton_muSF_mediumID*lepton_muSF_miniIso02*lepton_muSF_sip3d*lepton_eleSF_cutbasedID*lepton_eleSF_miniIso01*lepton_eleSF_gsf'
-weight_str_signal_plot = '*'.join([trigger_scale,lepton_Scale_signal_fast,lepton_Scale_signal,PU,ISR_weight,reweight])
+#weight_str_signal_plot = '*'.join([trigger_scale,lepton_Scale_signal_fast,lepton_Scale_signal,PU,ISR_weight,reweight])
+weight_str_signal_plot = reweight
 weight_str_signal_CV = '*'.join([trigger_scale,lepton_Scale_signal,reweight])
 
 
