@@ -5,7 +5,7 @@
 import ROOT
 import glob
 import argparse
-import sys
+import sys, os
 import importlib
 from pprint import pprint
 from Workspace.HEPHYPythonTools.helpers import getYieldFromChain # getChain, getPlotFromChain, getChunks
@@ -36,7 +36,7 @@ if not len(sys.argv) > 1:
    print "No arguments given. Using default settings."
    print makeLine()
 
-#Arguments
+# Arguments
 if isinstance(args.samples, list): samplesList  = args.samples
 else: samplesList = [args.samples]
 cmgUserDir = args.cmgUserDir
@@ -102,8 +102,14 @@ print "PP tuples:"
 print pprint(ppDict)
 print makeDoubleLine()
 
+
 #Results written to file   
-outfile = open("compareCMG-%s-andPP-%s-%s.txt"%(cmgDict['tag'], ppDict['version'], skim), "w")
+
+i = 0
+while os.path.exists("compareCMG-%s-andPP-%s-%s-%s.txt"%(cmgDict['tag'], ppDict['version'], skim, i)): # appends name by number if file exists
+    i += 1
+
+outfile = open("compareCMG-%s-andPP-%s-%s-%s.txt"%(cmgDict['tag'], ppDict['version'], skim, i), "w")
 outfile.write(makeDoubleLine() + "\n")
 outfile.write("Samples:")
 for x in samplesList:

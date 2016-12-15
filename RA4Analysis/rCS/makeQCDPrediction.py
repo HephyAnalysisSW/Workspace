@@ -15,7 +15,7 @@ from Workspace.RA4Analysis.signalRegions import *
 #from Workspace.RA4Analysis.cmgTuples_Spring15_25ns_postProcessed_antiSel import *
 #from Workspace.RA4Analysis.cmgTuples_Data_25ns_postProcessed_antiSel import *
 
-from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2_antiSel_postProcessed import *
+from Workspace.RA4Analysis.cmgTuples_Spring16_Moriond2017_MiniAODv2_antiSel_postProcessed import *
 from Workspace.RA4Analysis.cmgTuples_Data25ns_Promtv2_antiSel_postprocessed import *
 
 #from draw_helpers import *
@@ -118,9 +118,11 @@ def getPseudoRCS(small,smallE,large,largeE):
 trigger = "&&((HLT_EleHT350||HLT_EleHT400||HLT_Ele105)||(HLT_MuHT350||HLT_MuHT400))"
 filters = "&& (Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_goodVertices && Flag_eeBadScFilter &&  Flag_globalTightHalo2016Filter && Flag_badChargedHadronFilter && Flag_badMuonFilter)"
 
-presel = 'nLep==1&&nVeto==0&&leptonPt>25&&nEl==1&&Jet2_pt>80&& Flag_badChargedHadronFilter && Flag_badMuonFilter'
-antiSelStr = presel+'&&Selected==(-1)'
-SelStr = presel+'&&Selected==1'
+presel        = 'nLep==1&&nVeto==0&&leptonPt>25&&nEl==1&&Jet2_pt>80&& Flag_badChargedHadronFilter && Flag_badMuonFilter'
+antiSelStr    = presel + '&&Selected==(-1)'
+SelStr        = presel + '&&Selected==1'
+antiSelStrIso = antiSelStr + '&&iso_Veto==1'
+SelStrIso     = SelStr + '&&iso_Veto==1'
 
 #cQCD  = getChain(QCDHT_25ns,histname='')
 #cEWK  = getChain([WJetsHTToLNu_25ns, TTJets_combined_2, singleTop_25ns, DY_25ns, TTV_25ns],histname='')
