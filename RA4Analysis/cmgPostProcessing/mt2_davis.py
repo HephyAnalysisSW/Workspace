@@ -16,9 +16,9 @@ def get_mt2(s,r,tightHardLep,tracks,met_4vec):
   # MT2 cuts for hadronic and leptonic veto tracks
   hadMT2cut = 60
   lepMT2cut = 80
-
+  
   filtered_tracks = filter(lambda t:not((tightHardLep[0]['charge']==t['charge']) and deltaR(tightHardLep[0],t)<minDR) ,tracks)
-  sorted_tracks = sorted(filtered_tracks, key=lambda k: k['pt'])
+  sorted_tracks = sorted(filtered_tracks, key=lambda k: k['pt'], reverse=True)
   t = sorted_tracks[0]
   p1 = ROOT.TLorentzVector()
   p1.SetPtEtaPhiM(tightHardLep[0]['pt'],tightHardLep[0]['eta'],tightHardLep[0]['phi'],tightHardLep[0]['mass'])
