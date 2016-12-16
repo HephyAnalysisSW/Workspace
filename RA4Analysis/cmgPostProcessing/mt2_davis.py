@@ -21,6 +21,7 @@ def get_mt2(s,r,tightHardLep,tracks,met_4vec):
   filtered_tracks = [ track for track in tracks if not ((tightHardLep[0]['charge']==track['charge']) or deltaR(tightHardLep[0],track)<minDR) ]
   #filtered_tracks = filter(lambda t:not((tightHardLep[0]['charge']==t['charge']) and deltaR(tightHardLep[0],t)<minDR) ,tracks)
   sorted_tracks = sorted(filtered_tracks, key=lambda k: k['pt'], reverse=True)
+  #print sorted_tracks
   if len(sorted_tracks)>0:
     t = sorted_tracks[0]
     p1 = ROOT.TLorentzVector()
@@ -34,6 +35,7 @@ def get_mt2(s,r,tightHardLep,tracks,met_4vec):
     mt2.set_mn(0)
     s.iso_MT2 = mt2.get_mt2()
     s.iso_pt = p2.Pt()
+    #print "iso_mt2:",s.iso_MT2
     if abs(t['pdgId'])>10 and abs(t['pdgId'])<14:
         s.iso_had = 0  #leptonic
         cut=lepMT2cut
@@ -41,5 +43,5 @@ def get_mt2(s,r,tightHardLep,tracks,met_4vec):
         s.iso_had = 1  #hadronic track
         cut=hadMT2cut
     if s.iso_MT2 <= cut: s.iso_Veto = False   #this will veto
-    
+    #print s.iso_Veto 
   del mt2

@@ -47,7 +47,7 @@ separateBTagWeights = True
 
 defSampleStr = "TTJets_LO"
 
-subDir = "postProcessing_MC_Moriond2017_v3"
+subDir = "postProcessing_Data_Moriond2017_v5"
 #subDir = "deleteme"
 
 #branches to be kept for data and MC
@@ -132,7 +132,7 @@ if options.skim=='semiLep':
 if options.skim=='htfordilep':
   skimCond = "(Sum$(abs(genTau_grandmotherId)==6&&abs(genTau_motherId)==24)+Sum$(abs(genLep_grandmotherId)==6&&abs(genLep_motherId)==24)==2)"
 if options.skim=='htforsemilep':
-  skimCond = "(Sum$(abs(genTau_grandmotherId)==6&&abs(genTau_motherId)==24)+Sum$(abs(genLep_grandmotherId)==6&&abs(genLep_motherId)==24)<2)"
+  skimCond = "((Sum$(abs(genTau_grandmotherId)==6&&abs(genTau_motherId)==24)+Sum$(abs(genLep_grandmotherId)==6&&abs(genLep_motherId)==24))<2)"
 
 ###had skim###
 if options.hadronicLeg:

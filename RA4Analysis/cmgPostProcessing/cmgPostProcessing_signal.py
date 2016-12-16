@@ -78,7 +78,7 @@ histos_LS = {
 
 #####################
 
-subDir = "postProcessing_Signals_Spring16_Moriond2017_v3"
+subDir = "postProcessing_Signals_Spring16_Moriond2017_v4"
 
 #branches to be kept for data and MC
 branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert", "nIsr" ,

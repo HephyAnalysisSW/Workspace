@@ -347,7 +347,8 @@ def fill_branch_WithJEC(s,r):
 
 def getISRWeight(s,genParts):
   #print "ISR old  yes !!!"
-  genGluino = filter(lambda g:abs(g['pdgId'])==1000021, genParts)
+  #genGluino = filter(lambda g:abs(g['pdgId'])==1000021, genParts)
+  genGluino = [genPart for genPart in genParts if abs(genPart['pdgId'])==1000021]
   s.ngenGluino = len(genGluino)
   if s.ngenGluino == 2:
     genGluino1_vec = ROOT.TLorentzVector() 
@@ -368,12 +369,12 @@ def getISRWeight_new(s,nisrJets):
   #if not nisrJets==0: print nisrJets
   weight_dict = {
                 0:{"weight":1    ,"sys":1,"stat":1},\
-                1:{"weight":0.882,"sys":0.059,"stat":0.014},\
-                2:{"weight":0.792,"sys":0.104,"stat":0.020},\
-                3:{"weight":0.702,"sys":0.149,"stat":0.031},\
-                4:{"weight":0.648,"sys":0.176,"stat":0.051},\
-                5:{"weight":0.601,"sys":0.199,"stat":0.088},\
-                6:{"weight":0.515,"sys":0.242,"stat":0.133}
+                1:{"weight":0.920,"sys":0.040,"stat":0.005},\
+                2:{"weight":0.821,"sys":0.090,"stat":0.006},\
+                3:{"weight":0.715,"sys":0.143,"stat":0.009},\
+                4:{"weight":0.662,"sys":0.169,"stat":0.016},\
+                5:{"weight":0.561,"sys":0.219,"stat":0.027},\
+                6:{"weight":0.511,"sys":0.244,"stat":0.041}
                 }
   if nisrJets < 6:
       s.weight_ISR_new        =   weight_dict[nisrJets]["weight"]
