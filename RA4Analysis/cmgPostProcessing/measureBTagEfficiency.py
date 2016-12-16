@@ -29,7 +29,7 @@ dataDir = '/afs/hephy.at/work/d/dspitzbart/gluinos/CMSSW_8_0_21/src/Workspace/RA
 for btag in btags:
   print
   print 'Working on b-tagging type %s with WP %f' %(btag['name'],btag['WP'])
-  eff = {}
+  effs = {}
   bTagEffFile = dataDir+'Moriond17_v1_%s_%s.pkl'%(btag['name'],str(btag['WP']).replace('.','p'))
   effs['TTJets']  = getBTagMCTruthEfficiencies(cTT, cut=presel, btagVar=btag['var'], btagWP=btag['WP'])
   effs['WJets']   = getBTagMCTruthEfficiencies(cW, cut=presel, btagVar=btag['var'], btagWP=btag['WP'])
