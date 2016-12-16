@@ -209,13 +209,13 @@ for isample, sample in enumerate(allSamples):
     #  print sample["name"]
     #else: sampleKey = 'none'
     
-    readVariables = ['met_pt/F', 'met_phi/F', 'met_eta/F','met_mass/F' ,'nVert/I', 'nIsr/F']
-    newVariables = ['weight/F','muonDataSet/I','eleDataSet/I']
+    readVariables = ['met_pt/F', 'met_phi/F', 'met_eta/F','met_mass/F' ,'nVert/I', 'nIsr/I']
+    newVariables = ['weight/F','muonDataSet/I','eleDataSet/I','METDataSet/I']
     aliases = [ "met:met_pt", "metPhi:met_phi"]
 
     readVectors = [\
       {'prefix':'LepGood', 'nMax':8, 'vars':['pt/F', 'eta/F', 'phi/F', 'charge/I','pdgId/I', 'relIso03/F','SPRING15_25ns_v1/I' ,'tightId/I', 'miniRelIso/F','mass/F','sip3d/F','mediumMuonId/I','ICHEPmediumMuonId/I', 'mvaIdSpring15/F','lostHits/I', 'convVeto/I', 'eleCBID_SPRING15_25ns_ConvVetoDxyDz/I']},\
-      {'prefix':'isoTrack', 'nMax': 8, 'vars':['pt/F', 'eta/F', 'phi/F','charge/I', 'pdgId/F','mass/F']}
+      {'prefix':'isoTrack', 'nMax': 8, 'vars':['pt/F', 'eta/F', 'phi/F','charge/I', 'pdgId/I','mass/F']}
     ]
     newVariables.extend(['puReweight_true/F','puReweight_true_max4/F','puReweight_true_Down/F','puReweight_true_Up/F','weight_diLepTTBar0p5/F','weight_diLepTTBar2p0/F','weight_XSecTTBar1p1/F','weight_XSecTTBar0p9/F','weight_XSecWJets1p1/F','weight_XSecWJets0p9/F'])
     newVariables.extend(['ngenGluino/I','genGluGlu_pt/F','ISRSigUp/F/1','ISRSigDown/F/1'])
@@ -224,7 +224,7 @@ for isample, sample in enumerate(allSamples):
     newVariables.extend(['lepton_muSF_HIP_err/D/0.','lepton_muSF_looseID_err/D/0.','lepton_muSF_mediumID_err/D/0.','lepton_muSF_miniIso02_err/D/0.','lepton_muSF_sip3d_err/D/0.','lepton_eleSF_cutbasedID_err/D/0.','lepton_eleSF_miniIso01_err/D/0.', 'lepton_eleSF_gsf_err/D/0.', 'lepton_muSF_systematic/D/0.'])
 
 
-    readVectors.append({'prefix':'GenPart',  'nMax':100, 'vars':['eta/F','pt/F','phi/F','mass/F','charge/I', 'pdgId/I', 'motherId/F', 'grandmotherId/F','status/F']})
+    readVectors.append({'prefix':'GenPart',  'nMax':100, 'vars':['eta/F','pt/F','phi/F','mass/F','charge/I', 'pdgId/I', 'motherId/I', 'grandmotherId/I','status/F']})
     #readVectors.append({'prefix':'genPartAll',  'nMax':100, 'vars':['eta/F','pt/F','phi/F','mass/F','charge/F', 'pdgId/I', 'motherId/F', 'grandmotherId/F','status/F']})
     readVectors.append({'prefix':'JetForMET',  'nMax':100, 'vars':['rawPt/F','pt/F', 'eta/F', 'phi/F','mass/F' ,'id/I','hadronFlavour/F','btagCSV/F', 'btagCMVA/F','corr_JECUp/F','corr_JECDown/F','corr/F']})
     readVectors.append({'prefix':'Jet',  'nMax':100, 'vars':['rawPt/F','pt/F', 'eta/F', 'phi/F','mass/F' ,'id/I','hadronFlavour/F','btagCSV/F', 'btagCMVA/F','corr_JECUp/F','corr_JECDown/F','corr/F','chHEF/F']})
@@ -312,15 +312,22 @@ for isample, sample in enumerate(allSamples):
             if "Muon" in sample['name']:
               s.muonDataSet = True
               s.eleDataSet = False
+              s.METDataSet = False
             if "Electron" in sample['name']:
               s.muonDataSet = False
               s.eleDataSet = True
+              s.METDataSet = False
+            if "MET" in sample['name']:
+              s.muonDataSet = False
+              s.eleDataSet = False
+              s.METDataSet = True
 
           nTrueInt = t.GetLeaf('nTrueInt').GetValue()
           
           if not sample['isData']:
             s.muonDataSet = False
             s.eleDataSet = False
+            s.METDataSet = False
             s.weight =xsec_branch*lumiScaleFactor*genWeight
             nTrueInt = t.GetLeaf('nTrueInt').GetValue()
             s.puReweight_true = PU_histo_63.GetBinContent(PU_histo_63.FindBin(nTrueInt))
@@ -400,7 +407,7 @@ for isample, sample in enumerate(allSamples):
 
           j_list=['eta','pt','phi','btagCMVA', 'btagCSV', 'id', 'chHEF']
           jets = filter(lambda j:j['pt']>30 and abs(j['eta'])<2.4 and j['id'], get_cmg_jets_fromStruct(r,j_list))
-          lightJets,  bJetsCSV = splitListOfObjects('btagCSV', 0.800, jets)
+          lightJets,  bJetsCSV = splitListOfObjects('btagCSV', 0.8484, jets)
           s.htJet30j = sum([x['pt'] for x in jets])
           s.nJet30 = len(jets)
           s.nBJetMediumCSV30 = len(bJetsCSV)

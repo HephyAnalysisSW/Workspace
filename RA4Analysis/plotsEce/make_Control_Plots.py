@@ -21,8 +21,18 @@ test = False
 unblind = False
 draw_signal = True
 blind = True
+add_cut = ["(1)","no_isoVeto"]
+#add_cut = ["(iso_Veto)","_isoVeto"]
+#add_cut = "(1)"
 
-add_cut = "(1)"
+from optparse import OptionParser
+parser = OptionParser()
+parser.add_option("--iplot", dest="iplot", default=0, action="store", help="enter numbers 0,1,4 this the order of plot you want to plot 0 is deltaphi")
+(options, args) = parser.parse_args()
+
+exec("tmp_iplot="+options.iplot)
+print type(tmp_iplot)
+iplot = tmp_iplot
 
 #signalRegions_tests ={(5,-1): {(450, 650):{(500, -1):   {'deltaPhi': 1.0, 'njet':'#geq8j','LT':'LT1','HT': 'HT1',  'tex':'\\textrm{LT1}, \\textrm{HT1}'}}}}
 #signalRegions_tests ={(5,-1): {(650, -1):{(500, -1):   {'deltaPhi': 1.0, 'njet':'#geq8j','LT':'LT1','HT': 'HT1',  'tex':'\\textrm{LT1}, \\textrm{HT1}'}}}}
@@ -66,7 +76,8 @@ if presel_1b :
   nbtag = (0,-1)
   signal_suffix = "x10"
 
-if blind: add_cut = "(deltaPhi_Wl<0.5)"
+if blind: 
+  add_cut = [add_cut[0]+"&&"+"(deltaPhi_Wl<0.5)","dPhiltp5"+add_cut[1]]
 
  
 lepSels = [
@@ -91,8 +102,8 @@ bkg_samples=[
 {"sample":"singleTop",      "weight":btag_weight ,"cut":nbtag ,"add_Cut":"(1)","name":singleTop_lep,"tex":"t/#bar{t}",'color': ROOT.kViolet+5},
 {"sample":"QCD",            "weight":"(1)"       ,"cut":nbtag ,"add_Cut":"(1)","name":QCDHT, "tex":"QCD","color":ROOT.kCyan-6},
 {"sample":"WJets",          "weight":btag_weight ,"cut":nbtag ,"add_Cut":"(1)","name":WJetsHTToLNu,"tex":"W + jets","color":ROOT.kGreen-2},
-{"sample":"ttJets_diLep",   "weight":btag_weight ,"cut":nbtag ,"add_Cut":"(1)","name":TTJets_diLep, "tex":"t#bar{t} ll + jets",'color':ROOT.kBlue},
-{"sample":"ttJets_semiLep", "weight":btag_weight ,"cut":nbtag ,"add_Cut":"(1)","name":TTJets_semiLep, "tex":"t#bar{t} l + jets",'color':ROOT.kBlue-7}
+{"sample":"ttJets_diLep",   "weight":btag_weight ,"cut":nbtag ,"add_Cut":"(Sum$(abs(genTau_grandmotherId)==6&&abs(genTau_motherId)==24)+Sum$(abs(genLep_grandmotherId)==6&&abs(genLep_motherId)==24)==2)","name":TTJets_Comb, "tex":"t#bar{t} ll + jets",'color':ROOT.kBlue},
+{"sample":"ttJets_semiLep", "weight":btag_weight ,"cut":nbtag ,"add_Cut":"(Sum$(abs(genTau_grandmotherId)==6&&abs(genTau_motherId)==24)+Sum$(abs(genLep_grandmotherId)==6&&abs(genLep_motherId)==24)<2)","name":TTJets_Comb, "tex":"t#bar{t} l + jets",'color':ROOT.kBlue-7}
 ]
 
 for bkg in bkg_samples:
@@ -116,9 +127,9 @@ plots =[\
 {'ndiv':True,'yaxis':'Events / ','xaxis':'H_{T} [GeV]','logy':'True' , 'var':'htJet30j',                    'bin_set':(False,25),          'varname':'htJet30j_binned',            'binlabel':50,  'bin':(50,500,3000)},\
 {'ndiv':False,'yaxis':'Events','xaxis':'n_{jet}','logy':'True' , 'var':'nJet30',                               'bin_set':(False,25),         'varname':'nJet30',                   'binlabel':1,  'bin':(15,0,15)},\
 {'ndiv':True,'yaxis':'Events / ','xaxis':'p_{T}(l)','logy':'True' , 'var':'LepGood_pt[0]',                      'bin_set':(False,25),          'varname':'leptonPt',      'binlabel':15,  'bin':(65,25,2275)},\
-#{'ndiv':True,'yaxis':'Events / ','xaxis':'mt2','logy':'True' , 'var':'iso_MT2','bin_set':(False,25),          'varname':'iso_MT2',      'binlabel':25,  'bin':(40,0,1000)},\
+{'ndiv':True,'yaxis':'Events / ','xaxis':'mt2','logy':'True' , 'var':'iso_MT2','bin_set':(False,25),          'varname':'iso_MT2',      'binlabel':25,  'bin':(40,0,1000)},\
 #{'ndiv':True,'yaxis':'Events / ','xaxis':'p_{T}(l)','logy':'True' , 'var':'LepGood_pt[0]',                      'bin_set':(False,25),          'varname':'leptonPt',      'binlabel':25,  'bin':(39,25,1000)},\
-#{'ndiv':False,'yaxis':'Events','xaxis':'n_{b-tag}','logy':'True' , 'var':'nBJetMediumCSV30',                   'bin_set':(False,25),          'varname':'nBJetMediumCSV30',      'binlabel':1,  'bin':(8,0,8),       'lowlimit':0,  'limit':8},\
+{'ndiv':False,'yaxis':'Events','xaxis':'n_{b-tag}','logy':'True' , 'var':'nBJetMediumCSV30',                   'bin_set':(False,25),          'varname':'nBJetMediumCSV30',      'binlabel':1,  'bin':(8,0,8),       'lowlimit':0,  'limit':8},\
 {'ndiv':True,'yaxis':'Events / ','xaxis':'p_{T}(leading jet)','logy':'True' , 'var':'Jet_pt[0]',                'bin_set':(False,25),          'varname':'leading_JetPt',  'binlabel':35,  'bin':(20,0,700)},\
 #{'ndiv':False,'yaxis':'Events','xaxis':'#eta(l)','logy':'True' , 'var':'LepGood_eta[0]',                       'bin_set':(False,25),          'varname':'leptonEta',      'binlabel':25,  'bin':(40,-4,4)},\
 {'ndiv':True,'yaxis':'Events / ','xaxis':'#slash{E}_{T}','logy':'True' , 'var':'met_pt',                        'bin_set':(False,25),          'varname':'met',         'binlabel':50,  'bin':(28,0,1400)},\
@@ -127,7 +138,7 @@ plots =[\
 #{'ndiv':False,'yaxis':'Events','xaxis':'miniIso(l)','logy':'True' , 'var':'LepGood_miniRelIso[0]',           'bin_set':(False,25),          'varname':'leptonminiIso',      'binlabel':30,  'bin':(40,0,0.5)},\
 #{'ndiv':False,'yaxis':'Events','xaxis':'minDeltaR','logy':'True' , 'var':'Min$(sqrt((abs(Jet_phi-LepGood_phi[0]))**2+(abs(Jet_eta-LepGood_eta[0]))**2))', 'bin_set':False  ,    'varname':'Min_R_Jet_lepton',      'binlabel':1,  'bin':(50,0,10)},\
 #{'ndiv':False,'yaxis':'Events','xaxis':'#Delta#Phi(met,l)','logy':'True' , 'var':'acos(cos(met_phi-LepGood_phi[0]))', 'bin_set':False  ,    'varname':'deltaPhi_metl',      'binlabel':1,  'bin':(50,0,3.14)},\
-#{'ndiv':False,'yaxis':'Events','xaxis':'Nvert','logy':'True' , 'var':'nVert',                               'bin_set':(False,25),          'varname':'nVert',      'binlabel':1,  'bin':(50,0,50)},\
+{'ndiv':False,'yaxis':'Events','xaxis':'Nvert','logy':'True' , 'var':'nVert',                               'bin_set':(False,25),          'varname':'nVert',      'binlabel':1,  'bin':(50,0,50)},\
 #{'ndiv':False,'yaxis':'Events','xaxis':'Jet_btagCSV','logy':'True' , 'var':'Jet_btagCSV',                             'bin_set':False,          'varname':'Jet_btagCSV',      'binlabel':1,  'bin':(50,0,2)},\
 #{'ndiv':False,'yaxis':'Events','xaxis':'nbjets_30','logy':'True' , 'var':nbjets_30,                             'bin_set':False,          'varname':'nbjets_30',      'binlabel':1,  'bin':(8,0,8)}
   ]
@@ -143,7 +154,7 @@ if test :
 if not draw_signal :
   signals = []
 
-#plots = [plots[0]]
+plots = [plots[iplot]]
 lepSels = [lepSels[2]]
 if unblind : 
   reweight      = '(weight*12900)/3000'
@@ -152,14 +163,15 @@ if unblind :
   weight_str_signal_plot = reweight
 
 for lepSel in lepSels:
-  path = "/afs/hephy.at/user/e/easilar/www/Moriond2017/plots/"+lepSel['label']
+  path = "/afs/hephy.at/user/e/easilar/www/Moriond2017/plots/"+lepSel['label']+add_cut[1]
   if not os.path.exists(path):
     os.makedirs(path)
   print lepSel['label']
   print "====== "
-  presel = "&&".join([lepSel['cut'],lepSel['veto'],"Jet_pt[1]>80&&abs(LepGood_eta[0])<2.4",bkg_filters,add_cut])
-  sig_presel = "&&".join([lepSel['cut'],lepSel['veto'],"Jet_pt[1]>80&&abs(LepGood_eta[0])<2.4",add_cut]) #"flag_crazy_jets"
-  data_presel = "&&".join([lepSel['cut'],lepSel['veto'],lepSel['trigger'],filters,"Jet_pt[1]>80&&abs(LepGood_eta[0])<2.4",add_cut])
+  presel = "&&".join([lepSel['cut'],lepSel['veto'],"Jet_pt[1]>80&&abs(LepGood_eta[0])<2.4",bkg_filters,add_cut[0]])
+  sig_presel = "&&".join([lepSel['cut'],lepSel['veto'],"Jet_pt[1]>80&&abs(LepGood_eta[0])<2.4",add_cut[0]]) #"flag_crazy_jets"
+  data_presel = "&&".join([lepSel['cut'],lepSel['veto'],lepSel['trigger'],filters,"Jet_pt[1]>80&&abs(LepGood_eta[0])<2.4",add_cut[0]])
+  print presel
   bin = {}
   for srNJet in sorted(SR):
     bin[srNJet]={}
@@ -178,8 +190,6 @@ for lepSel in lepSels:
           tmp_yield = 0
           for bkg in bkg_samples:
             bla_Name, Cut = nameAndCut(stb, htb, srNJet, btb=bkg['cut'], presel="&&".join([bkg["add_Cut"],presel]), btagVar =  btagVarString)
-            #Cut = "&&".join([Cut,"(1)"])
-            #Cut = "("+Cut+")"
             print bkg["sample"], Cut
             bin[srNJet][stb][htb][p['varname']][bkg['sample']] = getPlotFromChain(bkg['chain'], p['var'], p['bin'], cutString = Cut, weight = "*".join([weight_str_plot , bkg["weight"]]) , binningIsExplicit=False ,addOverFlowBin='both',variableBinning=p["bin_set"])
             tmp_yield += bin[srNJet][stb][htb][p['varname']][bkg['sample']].Integral()

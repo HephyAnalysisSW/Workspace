@@ -19,9 +19,10 @@ def cmgLooseMuID(r, nLep):
   return r.LepGood_miniRelIso[nLep]<0.4 and r.LepGood_pt[nLep]>=10 and abs(r.LepGood_eta[nLep])<=2.4
 
 def cmgTightMuID(r, nLep):
+  #r.LepGood_ICHEPmediumMuonId[nLep]\
   return r.LepGood_pt[nLep]>=25 and abs(r.LepGood_eta[nLep])<=2.4\
      and r.LepGood_miniRelIso[nLep]<0.2\
-     and r.LepGood_ICHEPmediumMuonId[nLep]\
+     and r.LepGood_mediumMuonId[nLep]\
      and abs(r.LepGood_sip3d[nLep])<4
 
 def cmgLooseEleID(r, nLep):
