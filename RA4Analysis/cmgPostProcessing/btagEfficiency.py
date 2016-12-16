@@ -70,7 +70,7 @@ def toFlavourKey(pdgId):
 
 
 # get MC truth efficiencies for a specific sample
-def getBTagMCTruthEfficiencies(c, cut="(1)", overwrite=False):
+def getBTagMCTruthEfficiencies(c, cut="(1)", overwrite=False, btagVar='Jet_btagCSV', btagWP='0.8484'):
   print c, cut
   mceff = {}
   commoncf=cut+"&&"
@@ -80,12 +80,12 @@ def getBTagMCTruthEfficiencies(c, cut="(1)", overwrite=False):
       mceff[tuple(ptBin)][tuple(etaBin)] = {}
       #c.Draw("Sum$(jetsBtag>0.679&&jetsParton==5&&jetsPt>40&&jetsPt<50&&abs(jetsEta)>0&&abs(jetsEta)<1)/Sum$(jetsParton==5&&jetsPt>40&&jetsPt<50&&abs(jetsEta)>0&&abs(jetsEta)<1)")
       etaCut = "abs(Jet_eta)>"+str(etaBin[0])+"&&abs(Jet_eta)<"+str(etaBin[1])
-      ptCut = "abs(Jet_pt)>"+str(ptBin[0])
+      ptCut = "Jet_pt>"+str(ptBin[0])
       if ptBin[1]>0:
-        ptCut += "&&abs(Jet_pt)<"+str(ptBin[1])
-      c.Draw(commoncf+"(Jet_btagCSV>0.800)>>hbQuark(100,-1,2)",commoncf+"abs(Jet_hadronFlavour)==5&&                     "+etaCut+"&&"+ptCut)
-      c.Draw(commoncf+"(Jet_btagCSV>0.800)>>hcQuark(100,-1,2)",commoncf+"abs(Jet_hadronFlavour)==4&&                     "+etaCut+"&&"+ptCut)
-      c.Draw(commoncf+"(Jet_btagCSV>0.800)>>hOther(100,-1,2)" ,commoncf+"(abs(Jet_hadronFlavour) < 4  || abs(Jet_hadronFlavour) > 5)&&  "+etaCut+"&&"+ptCut)
+        ptCut += "&&Jet_pt<"+str(ptBin[1])
+      c.Draw(commoncf+"("+btagVar+">"+str(btagWP)+")>>hbQuark(100,-1,2)",commoncf+"abs(Jet_hadronFlavour)==5&&                     "+etaCut+"&&"+ptCut)
+      c.Draw(commoncf+"("+btagVar+">"+str(btagWP)+")>>hcQuark(100,-1,2)",commoncf+"abs(Jet_hadronFlavour)==4&&                     "+etaCut+"&&"+ptCut)
+      c.Draw(commoncf+"("+btagVar+">"+str(btagWP)+")>>hOther(100,-1,2)" ,commoncf+"(abs(Jet_hadronFlavour) < 4  || abs(Jet_hadronFlavour) > 5)&&  "+etaCut+"&&"+ptCut)
       hbQuark = ROOT.gDirectory.Get("hbQuark")
       hcQuark = ROOT.gDirectory.Get("hcQuark")
       hOther = ROOT.gDirectory.Get("hOther")
