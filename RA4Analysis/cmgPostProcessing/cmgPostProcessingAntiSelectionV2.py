@@ -18,7 +18,7 @@ ROOT.AutoLibraryLoader.enable()
 
 from Workspace.HEPHYPythonTools.helpers import getChunks
 
-from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2 import *
+from Workspace.RA4Analysis.cmgTuples_Spring16_Moriond2017_MiniAODv2 import *
 #from Workspace.RA4Analysis.cmgTuples_Data25ns_PromptRecoV2 import *
 from Workspace.RA4Analysis.cmgTuples_Data25ns_Moriond2017 import *
 
@@ -35,7 +35,7 @@ except IOError:
   print 'Unable to load MC efficiency file!'
   mcEffDict = False
 
-target_lumi = 1000 #pb-1
+target_lumi = 1000 #pb-1 #FIXME change to 1000
 
 separateBTagWeights = True
 
