@@ -479,7 +479,7 @@ for isample, sample in enumerate(allSamples):
           jets = filter(lambda j:j['pt']>30 and abs(j['eta'])<2.4 and j['id'], get_cmg_jets_fromStruct(r,j_list))
           #print "jets:" , jets
 #          lightJets_, bJetsCMVA = splitListOfObjects('btagCMVA', 0.732, jets) 
-          lightJets,  bJetsCSV = splitListOfObjects('btagCSV', 0.800, jets)
+          lightJets,  bJetsCSV = splitListOfObjects('btagCSV', 0.8484, jets)
           s.htJet30j = sum([x['pt'] for x in jets])
           s.nJet30 = len(jets)
           s.nBJetMediumCSV30 = len(bJetsCSV)

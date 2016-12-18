@@ -19,14 +19,14 @@ ROOT.AutoLibraryLoader.enable()
 from Workspace.HEPHYPythonTools.helpers import getChunks
 from Workspace.RA4Analysis.cmgTuples_Data25ns_Moriond2017 import *
 from Workspace.RA4Analysis.cmgTuples_Spring16_Moriond2017_MiniAODv2 import *
-from systematics_helper import calc_btag_systematics, calc_LeptonScale_factors_and_systematics, calc_TopPt_Weights , calcDLDictionary, calc_diLep_contributions ,  fill_branch_WithJEC , getGenWandLepton , getGenTopWLepton
+from systematics_helper import calc_btag_systematics, calc_LeptonScale_factors_and_systematics, calc_TopPt_Weights , calcDLDictionary, calc_diLep_contributions , getISRWeight_new , fill_branch_WithJEC , getGenWandLepton , getGenTopWLepton
 from btagEfficiency import *
 from readVetoEventList import *
 from leptonSF import leptonSF as leptonSF_
 
 #bTagEffFile     = "$CMSSW_BASE/src/Workspace/RA4Analysis/cmgPostProcessing/data/effs_presel_JECv6_pkl" 
 scaleFactorDir  = '$CMSSW_BASE/src/Workspace/RA4Analysis/cmgPostProcessing/data/'
-bTagEffFile     = "data/effs_presel_JECv6_pkl"
+bTagEffFile     = "data/Moriond17_v1_CSVv2_0p8484.pkl"
 
 calcLeptonSF = leptonSF_()
 
@@ -35,6 +35,8 @@ try:
 except IOError:
   print 'Unable to load MC efficiency file!'
   mcEffDict = False
+
+debug = False
 
 target_lumi = 3000 #pb-1
 
@@ -47,11 +49,12 @@ separateBTagWeights = True
 
 defSampleStr = "TTJets_LO"
 
-subDir = "postProcessing_Data_Moriond2017_v5"
+#subDir = "postProcessing_Data_Moriond2017_v6"
+subDir = "postProcessing_MC_Spring16_Moriond2017_v6"
 #subDir = "deleteme"
 
 #branches to be kept for data and MC
-branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert",
+branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert", "nIsr" ,
                      "nJet25", "nBJetLoose25", "nBJetMedium25", "nBJetTight25", "nJet40", "nJet40a", "nBJetLoose40", "nBJetMedium40", "nBJetTight40", 
                      "nLepGood20", "nLepGood15", "nLepGood10", "htJet25", "mhtJet25", "htJet40j", "htJet40", "mhtJet40",
                      "met*","Flag_*","HLT_*",
@@ -105,9 +108,9 @@ if options.skim=='HT400ST200':
 if options.skim=='HT500ST250':  
   skimCond = htLtSkim
 if options.skim=='LHEHTsm600':
-  skimCond = "lheHTIncoming<=600&&"+htLtSkim
+  skimCond = "lheHTIncoming<=600"
 if options.skim=='LHEHTlg600':
-  skimCond = "lheHTIncoming>600&&"+htLtSkim
+  skimCond = "lheHTIncoming>600"
 
 #skimCond += "&&Sum$(LepGood_pt>25&&abs(LepGood_eta)<2.5)>=0"
 
@@ -122,17 +125,17 @@ hadronic = "(("+ngenLep+"+"+ngenTau+")==0)"
 if options.skim=='diLep':
   #skimCond = "((ngenLep+ngenTau)==2)&&lheHTIncoming<=1000&&"+htLtSkim
   #skimCond = "((ngenLep+ngenTau)==2)&&"+htLtSkim
-  skimCond =  "(lheHTIncoming<=600)"
-  # skimCond = "&&".join([dilep,htLtSkim])
+  #skimCond =  "(lheHTIncoming<=600)"
+  skimCond = "&&".join([dilep,htLtSkim])
 ###semilep skim###
 if options.skim=='semiLep':
   #skimCond = "((ngenLep+ngenTau)==1)&&"+htLtSkim
-  skimCond =  "(lheHTIncoming<=600)"
-  #skimCond = "&&".join([semilep,htLtSkim])
-if options.skim=='htfordilep':
-  skimCond = "(Sum$(abs(genTau_grandmotherId)==6&&abs(genTau_motherId)==24)+Sum$(abs(genLep_grandmotherId)==6&&abs(genLep_motherId)==24)==2)"
-if options.skim=='htforsemilep':
-  skimCond = "((Sum$(abs(genTau_grandmotherId)==6&&abs(genTau_motherId)==24)+Sum$(abs(genLep_grandmotherId)==6&&abs(genLep_motherId)==24))<2)"
+  #skimCond =  "(lheHTIncoming<=600)"
+  skimCond = "&&".join([semilep,htLtSkim])
+#if options.skim=='htfordilep':
+#  skimCond = "(Sum$(abs(genTau_grandmotherId)==6&&abs(genTau_motherId)==24)+Sum$(abs(genLep_grandmotherId)==6&&abs(genLep_motherId)==24)==2)"
+#if options.skim=='htforsemilep':
+#  skimCond = "((Sum$(abs(genTau_grandmotherId)==6&&abs(genTau_motherId)==24)+Sum$(abs(genLep_grandmotherId)==6&&abs(genLep_motherId)==24))<2)"
 
 ###had skim###
 if options.hadronicLeg:
@@ -236,27 +239,28 @@ for isample, sample in enumerate(allSamples):
   if readXsecFromFile:
     xsecFromFile = xsec[sample['dbsName']]
   
-  readVariables = ['met_pt/F', 'met_phi/F','met_eta/F','met_mass/F']
-  newVariables = ['weight/F','muonDataSet/I','eleDataSet/I']#,'veto_evt_list/I/1']
+  readVariables = ['met_pt/F', 'met_phi/F','met_eta/F','met_mass/F' ,'nVert/I', 'nIsr/I']
+  newVariables = ['weight/F','muonDataSet/I','eleDataSet/I','METDataSet/I']#,'veto_evt_list/I/1']
   aliases = [ "met:met_pt", "metPhi:met_phi"]
 
   readVectors = [\
     {'prefix':'LepGood', 'nMax':8, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I','charge/I' ,'relIso03/F','eleCutIdSpring15_25ns_v1/I', 'SPRING15_25ns_v1/I', 'eleCBID_SPRING15_25ns_ConvVetoDxyDz/I','eleCBID_SPRING15_25ns/I','tightId/I', 'miniRelIso/F','mass/F','sip3d/F','mediumMuonId/I', 'ICHEPmediumMuonId/I', 'mvaIdSpring15/F','lostHits/I', 'convVeto/I']},
-    {'prefix':'isoTrack', 'nMax': 8, 'vars':['pt/F', 'eta/F', 'phi/F','charge/I', 'pdgId/F','mass/F']}
+    {'prefix':'isoTrack', 'nMax': 8, 'vars':['pt/F', 'eta/F', 'phi/F','charge/I', 'pdgId/I','mass/F']}
   ]
   if sample['isData']:
     readVectors.append({'prefix':'Jet',  'nMax':100, 'vars':['rawPt/F','pt/F', 'eta/F', 'phi/F', 'mass/F','id/I','btagCSV/F', 'btagCMVA/F']})
   newVariables.extend(['LepToKeep_pdgId/I','l1l2ovMET_lepToKeep/F','Vecl1l2ovMET_lepToKeep/F','DPhil1l2_lepToKeep/F'])
   newVariables.extend(['l1l2ovMET_lepToDiscard/F','Vecl1l2ovMET_lepToDiscard/F','DPhil1l2_lepToDiscard/F'])
+  newVariables.extend(['nISRJets_new/I','weight_ISR_new/F/1','ISRSigUp_stat_new/F/1','ISRSigDown_stat_new/F/1','ISRSigUp_sys_new/F/1','ISRSigDown_sys_new/F/1'])
   ### diLepton variables ##
   for action in ["notAddLepMet" , "AddLepMet" , "AddLep1ov3Met"]:
     for var_DL in ["ST","HT","dPhiLepW","nJet"] :
        for lep_DL in ["lepToDiscard" , "lepToKeep"]:
          newVariables.extend(["DL_"+var_DL+"_"+lep_DL+"_"+action+"/F/-999."])
   if not sample['isData']: 
-    readVectors.append({'prefix':'GenPart',  'nMax':100, 'vars':['eta/F','pt/F','phi/F','mass/F','charge/I', 'pdgId/I', 'motherId/F', 'grandmotherId/F']})
-    readVectors.append({'prefix':'genLep',  'nMax':100, 'vars':['eta/F','pt/F','phi/F','mass/F','charge/I', 'pdgId/I', 'motherId/F', 'grandmotherId/F']})
-    readVectors.append({'prefix':'genTau',  'nMax':100, 'vars':['eta/F','pt/F','phi/F','mass/F','charge/I', 'pdgId/I', 'motherId/F', 'grandmotherId/F']})
+    readVectors.append({'prefix':'GenPart',  'nMax':100, 'vars':['eta/F','pt/F','phi/F','mass/F','charge/I', 'pdgId/I', 'motherId/I', 'grandmotherId/I']})
+    readVectors.append({'prefix':'genLep',  'nMax':100, 'vars':['eta/F','pt/F','phi/F','mass/F','charge/I', 'pdgId/I', 'motherId/I', 'grandmotherId/I']})
+    readVectors.append({'prefix':'genTau',  'nMax':100, 'vars':['eta/F','pt/F','phi/F','mass/F','charge/I', 'pdgId/I', 'motherId/I', 'grandmotherId/I']})
     readVectors.append({'prefix':'JetForMET',  'nMax':100, 'vars':['rawPt/F','pt/F', 'eta/F', 'phi/F', 'mass/F','id/I','hadronFlavour/F','btagCSV/F', 'btagCMVA/F','corr_JECUp/F','corr_JECDown/F','corr/F']})
     readVectors.append({'prefix':'Jet',  'nMax':100,       'vars':['rawPt/F','pt/F', 'eta/F', 'phi/F', 'mass/F','id/I','hadronFlavour/F','btagCSV/F', 'btagCMVA/F','corr_JECUp/F','corr_JECDown/F','corr/F']})
    
@@ -280,7 +284,7 @@ for isample, sample in enumerate(allSamples):
   newVariables.extend( ['leptonPt/F','leptonEt/F','leptonMiniRelIso/F','leptonRelIso03/F' ,\
   'leptonEta/F', 'leptonPhi/F','leptonSPRING15_25ns_v1/I/-2','leptonPdg/I/0','leptonCharge/I/-100' ,'leptonInd/I/-1',\
  'leptonMass/F', 'singleMuonic/I', 'singleElectronic/I', 'singleLeptonic/I'])
-  newVariables.extend( ["iso_had/F", "iso_pt/F","iso_MT2/F","iso_Veto/F"] )
+  newVariables.extend( ["iso_had/I/999", "iso_pt/F/999","iso_MT2/F/999","iso_Veto/I/1"] )
   if calcSystematics:
     #newVariables.extend( ["weightBTag/F", "weightBTag_SF/F", "weightBTag_SF_b_Up/F", "weightBTag_SF_b_Down/F", "weightBTag_SF_light_Up/F", "weightBTag_SF_light_Down/F"])
     for i in range(maxConsideredBTagWeight+1):
@@ -349,40 +353,23 @@ for isample, sample in enumerate(allSamples):
         s.weight = lumiScaleFactor*genWeight
         if sample['isData']:
 
-          #vetoEvt = str(int(t.GetLeaf('run').GetValue()))+":"+str(int(lumi_branch))+":"+str(int(evt_branch))+"\n"
-          ##check_fake_evt = str(int(254790))+":"+str(int(111))+":"+str(int(120263348))+"\n"
-          ##if check_fake_evt in evt_veto_list: print "YESSS!!!"
-          ##print "Event :" , vetoEvt
-          #if vetoEvt in evt_veto_list["csc"] : 
-          #  print "!!!!this event is skipped due to csc!!!" , t.GetLeaf('run').GetValue() , lumi_branch , evt_branch
-          #  veto_csc_list.append(vetoEvt)
-
-          #if vetoEvt in evt_veto_list["ecal"] : 
-          #  print "!!!!this event is skipped due to ecal!!!" , t.GetLeaf('run').GetValue() , lumi_branch , evt_branch
-          #  veto_ecal_list.append(vetoEvt)
-          #
-          #if vetoEvt in evt_veto_list["muon"] : 
-          #  print "!!!!this event is skipped due to muon!!!" , t.GetLeaf('run').GetValue() , lumi_branch , evt_branch
-          #  veto_muon_list.append(vetoEvt)
-
-          #if vetoEvt in evt_veto_list["badreso"] : 
-          #  print "!!!!this event is skipped due to badreso!!!" , t.GetLeaf('run').GetValue() , lumi_branch , evt_branch
-          #  veto_badreso_list.append(vetoEvt)
-
-          #if vetoEvt in evt_veto_list["ultimate"] :
-          #  s.veto_evt_list = False
-          #  #continue
-
           if "Muon" in sample['name']:
             s.muonDataSet = True
             s.eleDataSet = False
+            s.METDataSet = False
           if "Electron" in sample['name']:
             s.muonDataSet = False
             s.eleDataSet = True
+            s.METDataSet = False
+          if "MET" in sample['name']:
+            s.muonDataSet = False
+            s.eleDataSet = False
+            s.METDataSet = True
 
         if not sample['isData']:
           s.muonDataSet = False
           s.eleDataSet = False
+          s.METDataSet = False
           s.weight =xsec_branch*lumiScaleFactor*genWeight
           nTrueInt = t.GetLeaf('nTrueInt').GetValue()
           s.puReweight_true = PU_histo_63.GetBinContent(PU_histo_63.FindBin(nTrueInt))
@@ -399,7 +386,7 @@ for isample, sample in enumerate(allSamples):
           #print s.ngenLep , s.ngenTau
           #print len(genLeps) , len(genTaus)
           #print genLeps , genTaus 
-          if ("TTJets" in sample['dbsName']):
+          if ("TTJets" in sample['name']):
             s.weight_XSecTTBar1p1 = s.weight*1.1
             s.weight_XSecTTBar0p9 = s.weight*0.9
             if ngenLep+ngenTau == 2:
@@ -413,7 +400,7 @@ for isample, sample in enumerate(allSamples):
             s.weight_XSecTTBar0p9 = s.weight
             s.weight_diLepTTBar2p0 = s.weight
             s.weight_diLepTTBar0p5 = s.weight
-          if "WJets" in sample['dbsName']:
+          if "WJets" in sample['name']:
             s.weight_XSecWJets1p1 = s.weight*1.1
             s.weight_XSecWJets0p9 = s.weight*0.9
           else :
@@ -527,15 +514,10 @@ for isample, sample in enumerate(allSamples):
 
         j_list=['eta','pt','phi','btagCMVA', 'btagCSV', 'id']
         jets = filter(lambda j:j['pt']>30 and abs(j['eta'])<2.4 and j['id'], get_cmg_jets_fromStruct(r,j_list))
-        lightJets,  bJetsCSV = splitListOfObjects('btagCSV', 0.800, jets)
+        lightJets,  bJetsCSV = splitListOfObjects('btagCSV', 0.8484 , jets)
         s.htJet30j = sum([x['pt'] for x in jets])
         s.nJet30 = len(jets)
         s.nBJetMediumCSV30 = len(bJetsCSV)
-        s.iso_had  = 999        
-        s.iso_pt   = 999
-        s.iso_MT2  = 999
-        s.iso_Veto = True
-        #if lumi_branch==25753 and evt_branch==20752673:
         if s.nTightHardLeptons >=1 and r.nisoTrack>=1:
           #print lumi_branch , evt_branch
           #print "nLeptons:" , s.nTightHardLeptons
@@ -546,12 +528,17 @@ for isample, sample in enumerate(allSamples):
           met_4vec = ROOT.TLorentzVector()
           met_4vec.SetPtEtaPhiM(r.met_pt,r.met_eta,r.met_phi,r.met_mass)
           get_mt2(s,r,tightHardLep,tracks,met_4vec)
-          #print "met pt :" , r.met_pt
-          #print s.iso_had , s.iso_pt , s.iso_MT2 , s.iso_Veto
+          if debug :
+            print "MT2 Calc"
+            print "met pt :" , r.met_pt
+            print s.iso_had , s.iso_pt , s.iso_MT2 , s.iso_Veto
         #s.mt2w = mt2w.mt2w(met = {'pt':r.met_pt, 'phi':r.met_phi}, l={'pt':s.leptonPt, 'phi':s.leptonPhi, 'eta':s.leptonEta}, ljets=lightJets, bjets=bJetsCSV)
         s.deltaPhi_Wl = acos((s.leptonPt+r.met_pt*cos(s.leptonPhi-r.met_phi))/sqrt(s.leptonPt**2+r.met_pt**2+2*r.met_pt*s.leptonPt*cos(s.leptonPhi-r.met_phi))) 
         #print s.nJet30
-
+        nISR = r.nIsr
+        if debug: print "n ISR" , nISR
+        if "ttjets" in sample["name"].lower(): getISRWeight_new(s,nISR)        
+        if debug: print "ISR weight" , s.weight_ISR_new
         #For systematics 
         rand_input = evt_branch*lumi_branch
         calc_diLep_contributions(s,r,tightHardLep,rand_input)

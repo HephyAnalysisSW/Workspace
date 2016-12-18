@@ -6,6 +6,10 @@ TTJets_diLep = {\
 "name" : "TTJets_diLep",
 "bins" : [
 "TTJets_DiLepton",
+'TTJets_LO_HT1200to2500_ext',
+'TTJets_LO_HT2500toInf',
+'TTJets_LO_HT600to800_ext',
+'TTJets_LO_HT800to1200_ext',
 ],
 'dir' : dirEce,
 }
@@ -37,10 +41,10 @@ TTJets_Comb = {\
 "TTJets_SingleLeptonFromT",
 "TTJets_SingleLeptonFromTbar",
 "TTJets_DiLepton",
-#'TTJets_LO_HT1200to2500_ext',
-#'TTJets_LO_HT2500toInf',
-#'TTJets_LO_HT600to800_ext',
-#'TTJets_LO_HT800to1200_ext',
+'TTJets_LO_HT1200to2500_ext',
+'TTJets_LO_HT2500toInf',
+'TTJets_LO_HT600to800_ext',
+'TTJets_LO_HT800to1200_ext',
 ],
 'dir' : dirEce,
 }
