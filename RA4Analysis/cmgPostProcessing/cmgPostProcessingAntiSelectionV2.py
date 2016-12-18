@@ -35,14 +35,14 @@ except IOError:
   print 'Unable to load MC efficiency file!'
   mcEffDict = False
 
-target_lumi = 3000 #pb-1
+target_lumi = 1000 #pb-1
 
 separateBTagWeights = True
 
 defSampleStr = "TTJets_LO_HT600to800_25ns"
 
 #subDir = "postProcessed_Spring16_antiSelection_3fb_v2"
-subDir = "postProcessed_Spring16_antiSelection_isoTrack_v5"
+subDir = "postProcessed_Spring16_antiSelection_isoTrack_v6"
 
 #branches to be kept for data and MC
 branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert",
@@ -499,7 +499,7 @@ for isample, sample in enumerate(allSamples):
         if options.leptonSelection == 'none':
 
           ### LEPTONS
-          vars = ['pt', 'eta', 'phi', 'mass', 'miniRelIso','relIso03', 'pdgId', 'eleCBID_SPRING15_25ns', 'eleCBID_SPRING15_25ns_ConvVetoDxyDz','ICHEPmediumMuonId', 'sip3d', 'hOverE', 'eleCutIdSpring15_25ns_v1', 'charge']
+          vars = ['pt', 'eta', 'phi', 'mass', 'miniRelIso','relIso03', 'pdgId', 'eleCBID_SPRING15_25ns', 'eleCBID_SPRING15_25ns_ConvVetoDxyDz','mediumMuonId', 'sip3d', 'hOverE', 'eleCutIdSpring15_25ns_v1', 'charge']
           leptonIndices = [i for i in range(r.nLepGood)]
           leptons = [getObjDict(t, 'LepGood_', vars, i) for i in leptonIndices]
           nlep = len(leptonIndices)
@@ -538,7 +538,7 @@ for isample, sample in enumerate(allSamples):
               if (abs(lep['eta'])>2.4): continue
 
               #ID, IP and Iso check:
-              passID = True if lep['ICHEPmediumMuonId'] == 1 else False
+              passID = True if lep['mediumMuonId'] == 1 else False
               passIso = True if lep['miniRelIso'] < muMiniIsoCut else False
               passIP = True if lep['sip3d'] < goodMu_sip3d else False
 

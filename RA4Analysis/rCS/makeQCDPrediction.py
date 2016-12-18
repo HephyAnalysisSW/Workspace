@@ -25,8 +25,8 @@ from LpTemplateFit import LpTemplateFit
 from rCShelpers import *
 
 isData = False
-makeFit = False
-getYields = False
+makeFit = True
+getYields = True
 getResults = True
 isValidation = False
 
@@ -44,7 +44,7 @@ else:
 
 SRstring = '2016SR'
 if isValidation: SRstring = '2016val_v2'
-lumiStr = '12p9fb'
+lumiStr = '36p5fb'
 
 preprefix = 'QCDestimation/'+SRstring+'_'+lumiStr+'/'+sampleStr
 wwwDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/'+preprefix+'/'
