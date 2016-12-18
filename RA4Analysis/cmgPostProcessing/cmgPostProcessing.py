@@ -36,7 +36,7 @@ except IOError:
   print 'Unable to load MC efficiency file!'
   mcEffDict = False
 
-debug = False
+debug = True
 
 target_lumi = 3000 #pb-1
 
@@ -49,8 +49,8 @@ separateBTagWeights = True
 
 defSampleStr = "TTJets_LO"
 
-#subDir = "postProcessing_Data_Moriond2017_v6"
-subDir = "postProcessing_MC_Spring16_Moriond2017_v6"
+subDir = "postProcessing_Data_Moriond2017_v6"
+#subDir = "postProcessing_MC_Spring16_Moriond2017_v6"
 #subDir = "deleteme"
 
 #branches to be kept for data and MC
@@ -239,9 +239,11 @@ for isample, sample in enumerate(allSamples):
   if readXsecFromFile:
     xsecFromFile = xsec[sample['dbsName']]
   
-  readVariables = ['met_pt/F', 'met_phi/F','met_eta/F','met_mass/F' ,'nVert/I', 'nIsr/I']
+  readVariables = ['met_pt/F', 'met_phi/F','met_eta/F','met_mass/F' ,'nVert/I', 'nIsr/F']
   newVariables = ['weight/F','muonDataSet/I','eleDataSet/I','METDataSet/I']#,'veto_evt_list/I/1']
   aliases = [ "met:met_pt", "metPhi:met_phi"]
+  if ("Muon" in sample['name']) or "Electron" in sample['name'] :
+    newVariables.extend(['HLT_MET110MHT110/I/0'])
 
   readVectors = [\
     {'prefix':'LepGood', 'nMax':8, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I','charge/I' ,'relIso03/F','eleCutIdSpring15_25ns_v1/I', 'SPRING15_25ns_v1/I', 'eleCBID_SPRING15_25ns_ConvVetoDxyDz/I','eleCBID_SPRING15_25ns/I','tightId/I', 'miniRelIso/F','mass/F','sip3d/F','mediumMuonId/I', 'ICHEPmediumMuonId/I', 'mvaIdSpring15/F','lostHits/I', 'convVeto/I']},
@@ -537,7 +539,9 @@ for isample, sample in enumerate(allSamples):
         #print s.nJet30
         nISR = r.nIsr
         if debug: print "n ISR" , nISR
-        if "ttjets" in sample["name"].lower(): getISRWeight_new(s,nISR)        
+        if "ttjets" in sample["name"].lower(): 
+            if debug : print "sample is TTJets"
+            getISRWeight_new(s,nISR)        
         if debug: print "ISR weight" , s.weight_ISR_new
         #For systematics 
         rand_input = evt_branch*lumi_branch

@@ -12,7 +12,15 @@ btagVarString = 'nBJetMediumCSV30'
 
 #filters = "(Flag_goodVertices && Flag_HBHENoiseFilter_fix && Flag_eeBadScFilter && Flag_HBHENoiseIsoFilter)" # && veto_evt_list)"
 filters = "(Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_goodVertices && Flag_eeBadScFilter &&  Flag_globalTightHalo2016Filter && Flag_badChargedHadronFilter && Flag_badMuonFilter)"
-trigger = "((HLT_EleHT350||HLT_EleHT400||HLT_Ele105)||(HLT_MuHT350||HLT_MuHT400))"
+#trigger = "((HLT_EleHT350||HLT_EleHT400||HLT_Ele105)||(HLT_MuHT350||HLT_MuHT400))"
+trigger_or_ele = "(HLT_Ele105||HLT_Ele115||HLT_Ele50PFJet165||HLT_IsoEle27T||HLT_EleHT400||HLT_EleHT350)"
+trigger_or_mu = "(HLT_Mu50||HLT_IsoMu24||HLT_MuHT400||HLT_MuHT350)"
+trigger_or_lep = "%s||%s"%(trigger_or_ele,trigger_or_mu)
+trigger_or_met = "(HLT_MET100MHT100||HLT_MET110MHT110||HLT_MET120MHT120)"
+#trigger = "(!isData||(%s||%s||%s))"%(trigger_or_ele,trigger_or_mu,trigger_or_met)
+trigger_xor_ele = "(!isData || (eleDataSet&&%s))"%(trigger_or_ele)
+trigger_xor_mu = "(!isData || (muonDataSet&&%s&&!(%s)))"%(trigger_or_mu,trigger_or_ele)
+trigger_xor_met = "(!isData || (METDataSet&&%s&&!(%s)&&!(%s)) )"%(trigger_or_met,trigger_or_ele,trigger_or_mu)
 
 ##Common for Background and Signal
 #trigger_scale = '((singleElectronic&&0.963)||(singleMuonic&&0.926))'
@@ -30,7 +38,7 @@ topPt         = 'TopPtWeight'
 PU            = 'puReweight_true_max4'
 #weight_str_plot = '*'.join([reweight,topPt,trigger_scale,PU])
 #weight_str_plot = '*'.join([trigger_scale,lepton_Scale,topPt,PU,reweight])
-weight_str_plot = reweight
+weight_str_plot = '*'.join([reweight,topPt])
 #weight_str_CV   = '*'.join([trigger_scale,lepton_Scale,topPt,reweight])
 weight_str_CV   = reweight
 

@@ -78,7 +78,7 @@ histos_LS = {
 
 #####################
 
-subDir = "postProcessing_Signals_Spring16_Moriond2017_v4"
+subDir = "postProcessing_Signals_Spring16_Moriond2017_v6"
 
 #branches to be kept for data and MC
 branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert", "nIsr" ,
@@ -209,7 +209,7 @@ for isample, sample in enumerate(allSamples):
     #  print sample["name"]
     #else: sampleKey = 'none'
     
-    readVariables = ['met_pt/F', 'met_phi/F', 'met_eta/F','met_mass/F' ,'nVert/I', 'nIsr/I']
+    readVariables = ['met_pt/F', 'met_phi/F', 'met_eta/F','met_mass/F' ,'nVert/I', 'nIsr/F']
     newVariables = ['weight/F','muonDataSet/I','eleDataSet/I','METDataSet/I']
     aliases = [ "met:met_pt", "metPhi:met_phi"]
 
