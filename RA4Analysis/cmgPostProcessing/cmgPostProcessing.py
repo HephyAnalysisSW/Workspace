@@ -49,7 +49,7 @@ separateBTagWeights = True
 
 defSampleStr = "TTJets_LO"
 
-subDir = "postProcessing_Data_Moriond2017_v7_test"
+subDir = "postProcessing_Data_Moriond2017_v7_Trigskimmed"
 #subDir = "postProcessing_MC_Spring16_Moriond2017_v6"
 #subDir = "deleteme"
 
@@ -149,7 +149,13 @@ if options.skim=='HT500ST250LHE_FullHadronic':
 if options.skim=='LHEHT1000':
   skimCond = "lheHTIncoming>1000&&"+htLtSkim
 
-
+####Data trigger skims########
+if options.skim=='eleDataSet':
+  skimCond = "(HLT_Ele105||HLT_Ele115||HLT_Ele50PFJet165||HLT_IsoEle27T||HLT_EleHT400||HLT_EleHT350)"
+if options.skim=='muDataSet':
+  skimCond = "(HLT_Mu50||HLT_IsoMu24||HLT_MuHT400||HLT_MuHT350)"
+if options.skim=='metDataSet':
+  skimCond = "(HLT_MET100MHT100||HLT_MET110MHT110||HLT_MET120MHT120)"
 
 if options.manScaleFactor!=1:
   target_lumi = target_lumi*float(options.manScaleFactor)
@@ -242,9 +248,9 @@ for isample, sample in enumerate(allSamples):
   readVariables = ['met_pt/F', 'met_phi/F','met_eta/F','met_mass/F' ,'nVert/I', 'nIsr/F']
   newVariables = ['weight/F','muonDataSet/I','eleDataSet/I','METDataSet/I']#,'veto_evt_list/I/1']
   aliases = [ "met:met_pt", "metPhi:met_phi"]
-  if ("Muon" in sample['name']) or "Electron" in sample['name'] :
-    print 'HLT_MET110MHT110' , sample['name']
-    newVariables.extend(['HLT_MET110MHT110/I/0'])
+  if ("Muon" in sample['name']) or ("Electron" in sample['name']) :
+    #print 'HLT_MET110MHT110' , sample['name']
+    newVariables.extend(['HLT_MET110MHT110/I/0','HLT_MET120MHT120/I/0'])
 
   readVectors = [\
     {'prefix':'LepGood', 'nMax':8, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I','charge/I' ,'relIso03/F','eleCutIdSpring15_25ns_v1/I', 'SPRING15_25ns_v1/I', 'eleCBID_SPRING15_25ns_ConvVetoDxyDz/I','eleCBID_SPRING15_25ns/I','tightId/I', 'miniRelIso/F','mass/F','sip3d/F','mediumMuonId/I', 'ICHEPmediumMuonId/I', 'mvaIdSpring15/F','lostHits/I', 'convVeto/I']},

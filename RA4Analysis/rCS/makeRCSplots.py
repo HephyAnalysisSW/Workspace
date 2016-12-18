@@ -52,8 +52,8 @@ diLep = "((ngenLep+ngenTau)==2)"
 semiLep = "((ngenLep+ngenTau)==1)"
 suffix = ""
 max_plot = 0.1
-plot_dilep = False
-plot_semilep = True
+plot_dilep = True
+plot_semilep = False
 plot_WJets = False
 plot_ttJets = True
 if plot_dilep:
@@ -406,15 +406,20 @@ if plot_ttJets :
         for crNJet in nJetbins:
           deltaPhiCut = signalRegions[srNJet][stb][htb]['deltaPhi']
           bin[srNJet][stb][htb]['deltaPhi'] = deltaPhiCut
+          rCS_crLowNJet_Name_2b, rCS_crLowNJet_Cut_2b = nameAndCut(stb, htb, crNJet, btb=(0,-1), presel=presel, btagVar = btagVarString)
           rCS_crLowNJet_Name_1b, rCS_crLowNJet_Cut_1b = nameAndCut(stb, htb, crNJet, btb=(0,-1), presel=presel, btagVar = btagVarString)
           rCS_crLowNJet_Name_0b, rCS_crLowNJet_Cut_0b = nameAndCut(stb, htb, crNJet, btb=(0,-1), presel=presel, btagVar = btagVarString)
           print rCS_crLowNJet_Name_1b
+          rCS_2b = getRCS(cTTJets , rCS_crLowNJet_Cut_2b,  deltaPhiCut,weight = "weight*(weightBTag2_SF)")
           rCS_1b = getRCS(cTTJets , rCS_crLowNJet_Cut_1b,  deltaPhiCut,weight = "weight*weightBTag1_SF")
           rCS_0b = getRCS(cTTJets , rCS_crLowNJet_Cut_0b,  deltaPhiCut,weight = "weight*weightBTag0_SF")
-          print "rCS 1b from function:" , rCS_1b['rCS'] , rCS_1b['rCSE_sim']
-          print "rCS 0b from function:" , rCS_0b['rCS'] , rCS_0b['rCSE_sim']
+          print "rCS 2b from function:" , rCS_2b['rCS'] ,"+-",rCS_2b['rCSE_sim']
+          print "rCS 1b from function:" , rCS_1b['rCS'] ,"+-",rCS_1b['rCSE_sim']
+          print "rCS 0b from function:" , rCS_0b['rCS'] ,"+-",rCS_0b['rCSE_sim']
           bin[srNJet][stb][htb][crNJet] = {\
           'label':  nJetBinName(crNJet),\
+          '2b_value': rCS_2b['rCS'],\
+          '2b_error': rCS_2b['rCSE_sim'],\
           '1b_value': rCS_1b['rCS'],\
           '1b_error': rCS_1b['rCSE_sim'],\
           '0b_value': rCS_0b['rCS'],\
@@ -435,6 +440,24 @@ if plot_ttJets :
         leg = ROOT.TLegend(0.3,0.6,0.6,0.7)
         leg.SetBorderSize(1)
         ROOT.gStyle.SetHistMinimumZero()
+        h2b = ROOT.TH1F("h2b","h2b",4,0,4)
+        h2b.SetMarkerColor(ROOT.kGreen)
+        h2b.SetLineColor(ROOT.kGreen)
+        h2b.SetLineWidth(2)
+        h2b.SetBarWidth(1)
+        h2b.SetBarOffset(0)
+        h2b.SetStats(0)
+        h2b.SetMinimum(0)
+        h2b.SetMaximum(max_plot)
+        #h2b.SetMaximum(0.05) 
+        for i , crNJet in enumerate(nJetbins):
+            h2b.SetBinContent(i+1, njet_dict[crNJet]['2b_value'])
+            h2b.SetBinError(i+1, njet_dict[crNJet]['2b_error'])
+        #   h2b.SetBinContent(i+1, d_35_0[i])
+            h2b.GetXaxis().SetBinLabel(i+1,njet_dict[crNJet]['label'])
+        leg.AddEntry(h2b, "n_{b_tag} = 2" ,"l")
+        h2b.GetYaxis().SetTitle("R_{CS}")
+        h2b.Draw("EH1")
         h1b = ROOT.TH1F("h1b","h1b",4,0,4)
         h1b.SetMarkerColor(ROOT.kBlue) 
         h1b.SetLineColor(ROOT.kBlue) 
@@ -451,7 +474,7 @@ if plot_ttJets :
             h1b.GetXaxis().SetBinLabel(i+1,njet_dict[crNJet]['label'])
         leg.AddEntry(h1b, "n_{b_tag} = 1" ,"l") 
         h1b.GetYaxis().SetTitle("R_{CS}")
-        h1b.Draw("EH1")
+        h1b.Draw("EH1 same")
         h0b = ROOT.TH1F("h0b","h0b",4,0,4)
         h0b.SetMarkerColor(ROOT.kRed)
         h0b.SetLineColor(ROOT.kRed)  
@@ -483,7 +506,7 @@ if plot_ttJets :
         latex.DrawLatex(0.3,0.85,"ttjets"+suffix)
         #latex.DrawLatex(0.3,0.8,"di-Lepton")
         cb.Draw()
-        cb.SaveAs(path+'/TTJets_rCS_LT'+str(stb[0])+str(stb[1])+'_HT'+str(htb[0])+str(htb[1])+'_nJET'+str(srNJet[0])+str(srNJet[1])+'btagW_'+suffix+add_cut[1]+'.png')
-        cb.SaveAs(path+'/TTJets_rCS_LT'+str(stb[0])+str(stb[1])+'_HT'+str(htb[0])+str(htb[1])+'_nJET'+str(srNJet[0])+str(srNJet[1])+'btagW_'+suffix+add_cut[1]+'.pdf')
-        cb.SaveAs(path+'/TTJets_rCS_LT'+str(stb[0])+str(stb[1])+'_HT'+str(htb[0])+str(htb[1])+'_nJET'+str(srNJet[0])+str(srNJet[1])+'btagW_'+suffix+add_cut[1]+'.root')
+        cb.SaveAs(path+'/TTJets_rCS_LT'+str(stb[0])+str(stb[1])+'_HT'+str(htb[0])+str(htb[1])+'_nJET'+str(srNJet[0])+str(srNJet[1])+'btagW_'+suffix+add_cut[1]+'_with2bSB.png')
+        cb.SaveAs(path+'/TTJets_rCS_LT'+str(stb[0])+str(stb[1])+'_HT'+str(htb[0])+str(htb[1])+'_nJET'+str(srNJet[0])+str(srNJet[1])+'btagW_'+suffix+add_cut[1]+'_with2bSB.pdf')
+        cb.SaveAs(path+'/TTJets_rCS_LT'+str(stb[0])+str(stb[1])+'_HT'+str(htb[0])+str(htb[1])+'_nJET'+str(srNJet[0])+str(srNJet[1])+'btagW_'+suffix+add_cut[1]+'_with2bSB.root')
 
