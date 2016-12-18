@@ -4,7 +4,7 @@ import os,sys
 from Workspace.HEPHYPythonTools.user import username
 import Workspace.HEPHYPythonTools.xsec as xsec
 from Workspace.HEPHYPythonTools.helpers import getObjFromFile, getChain, getChunks, getCutYieldFromChain, getYieldFromChain
-#from Workspace.RA4Analysis.cmgTuples_Data25ns_Moriond2017_postprocessed import *
+from Workspace.RA4Analysis.cmgTuples_Data25ns_Moriond2017_postprocessed import *
 from Workspace.RA4Analysis.cmgTuples_Spring16_Moriond2017_MiniAODv2_postProcessed import *
 #from Workspace.RA4Analysis.cmgTuples_Data25ns_Promtv2_postprocessed import *
 #from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2_postProcessed import *
@@ -19,17 +19,19 @@ ICHEP = False
 
 lepSels = [
 {'cut':'(singleMuonic&&(!isData||(isData&&muonDataSet)))' , 'veto':'nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0',\
-# 'chain': getChain(single_mu,histname="",treeName="Events") ,\
+ 'chain': getChain(single_mu,histname="",treeName="Events") ,\
   'label':'_mu_', 'str':'1 $\\mu$' , 'trigger': trigger},\
 {'cut':'singleElectronic&&(!isData||(isData&&eleDataSet))' , 'veto':'nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0',\
-# 'chain': getChain(single_ele,histname="",treeName="Events") ,\
+ 'chain': getChain(single_ele,histname="",treeName="Events") ,\
   'label':'_ele_', 'str':'1 $\\e$' , 'trigger': trigger},\
-{'cut':'((!isData&&singleLeptonic)||(isData&&((eleDataSet&&singleElectronic)||(muonDataSet&&singleMuonic))))' , 'veto':'nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0',\
-# 'chain': getChain([single_ele,single_mu],maxN=maxN,histname="",treeName="Events") ,\
+{'cut':'((!isData&&singleLeptonic)||(isData&&((eleDataSet&&singleElectronic)||(muonDataSet&&singleMuonic)||(METDataSet&&singleLeptonic))))' , 'veto':'nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0',\
+ 'chain': getChain([single_ele,single_mu,met],maxN=maxN,histname="",treeName="Events") ,\
   'label':'_lep_', 'str':'1 $lep$' , 'trigger': trigger}\
 ]
 
 lepSels = [lepSels[2]]
+diLep = "(Sum$(abs(genTau_grandmotherId)==6&&abs(genTau_motherId)==24)+Sum$(abs(genLep_grandmotherId)==6&&abs(genLep_motherId)==24)==2)"
+semiLep = "(Sum$(abs(genTau_grandmotherId)==6&&abs(genTau_motherId)==24)+Sum$(abs(genLep_grandmotherId)==6&&abs(genLep_motherId)==24)<2)"
 
 bkg_samples=[
 {'sample':'TTVH',      "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":TTV ,'tex':'t#bar{t}V','color':ROOT.kOrange-3},
@@ -38,8 +40,8 @@ bkg_samples=[
 {"sample":"singleTop", "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":singleTop_lep,"tex":"t/#bar{t}",'color': ROOT.kViolet+5},
 {"sample":"QCD",       "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":QCDHT, "tex":"QCD","color":ROOT.kCyan-6},
 {"sample":"WJets",     "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":WJetsHTToLNu,"tex":"W + jets","color":ROOT.kGreen-2},
-{"sample":"ttJets",    "weight":"(1)" ,"cut":(0,0),"add_Cut":"(Sum$(abs(genTau_grandmotherId)==6&&abs(genTau_motherId)==24)+Sum$(abs(genLep_grandmotherId)==6&&abs(genLep_motherId)==24)==2)","name":TTJets_Comb, "tex":"t#bar{t} ll + jets from htbinned samples",'color':ROOT.kBlue},
-{"sample":"ttJets",    "weight":"(1)" ,"cut":(0,0),"add_Cut":"(Sum$(abs(genTau_grandmotherId)==6&&abs(genTau_motherId)==24)+Sum$(abs(genLep_grandmotherId)==6&&abs(genLep_motherId)==24)<2)","name":TTJets_Comb, "tex":"t#bar{t} l + jets from htbinned samples",'color':ROOT.kBlue-7},
+{"sample":"ttJets",    "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":TTJets_diLep, "tex":"t#bar{t} ll + jets",'color':ROOT.kBlue},
+{"sample":"ttJets",    "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":TTJets_semiLep, "tex":"t#bar{t} l + jets",'color':ROOT.kBlue-7},
 ]
 
 for bkg in bkg_samples:
@@ -66,7 +68,7 @@ for lepSel in lepSels:
   #{'cut':"&&".join([lepSel['cut'],lepSel['veto'],"nJet30>=5","(Jet_pt[1]>80)","htJet30j>500","st>250","nBJetMediumCSV30>=1","nJet30>=6","(Jet_pt[1]>80)","deltaPhi_Wl>1"]), 'label': '\\Delta\\Phi >1' },\
    ]
   if ICHEP: ofile = file(path+'cut_flow_'+lepSel['label']+'_ICHEP_onlyWJets.tex','w')
-  else: ofile = file(path+'cut_flow_'+lepSel['label']+'_reweightOnly_.tex','w')
+  else: ofile = file(path+'cut_flow_'+lepSel['label']+'_reweightTopPt_.tex','w')
   doc_header = '\\documentclass{article}\\usepackage[english]{babel}\\usepackage{graphicx}\\usepackage[margin=0.5in]{geometry}\\begin{document}'
   ofile.write(doc_header)
   ofile.write("\n")
@@ -102,7 +104,7 @@ for lepSel in lepSels:
       #nEntry = chain.GetEntries()
       #nEntry = chain.GetEntries("&&".join([s["add_Cut"],cut['cut']]))
       #print "MC Events:" , nEntry
-      y_remain = getYieldFromChain(chain,cutString = "&&".join([s["add_Cut"],cut['cut']]) , weight = reweight)
+      y_remain = getYieldFromChain(chain,cutString = "&&".join([s["add_Cut"],cut['cut']]) , weight = weight_str_plot)
       print tot_yields , y_remain
       tot_yields = y_remain
       #tot_yields = nEntry
@@ -119,10 +121,11 @@ for lepSel in lepSels:
     sum_all = []
     for sig in signals:
       chain = sig['chain']
-      y_remain = getYieldFromChain(chain,cutString = "&&".join([sig["add_Cut"],cut['cut']]) , weight = reweight)
+      y_remain = getYieldFromChain(chain,cutString = "&&".join([sig["add_Cut"],cut['cut']]) , weight = weight_str_signal_plot)
       print  y_remain
       ofile.write(line_yield)
       line_yield = '&' + str(format(y_remain , '.1f'))
+    line_yield = '&' + str(format(y_remain , '.1f'))
     ofile.write(line_yield)
     ofile.write('\\\\')
     ofile.write('\n')
