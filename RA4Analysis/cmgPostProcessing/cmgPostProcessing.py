@@ -49,7 +49,7 @@ separateBTagWeights = True
 
 defSampleStr = "TTJets_LO"
 
-subDir = "postProcessing_Data_Moriond2017_v6"
+subDir = "postProcessing_Data_Moriond2017_v7_test"
 #subDir = "postProcessing_MC_Spring16_Moriond2017_v6"
 #subDir = "deleteme"
 
@@ -243,6 +243,7 @@ for isample, sample in enumerate(allSamples):
   newVariables = ['weight/F','muonDataSet/I','eleDataSet/I','METDataSet/I']#,'veto_evt_list/I/1']
   aliases = [ "met:met_pt", "metPhi:met_phi"]
   if ("Muon" in sample['name']) or "Electron" in sample['name'] :
+    print 'HLT_MET110MHT110' , sample['name']
     newVariables.extend(['HLT_MET110MHT110/I/0'])
 
   readVectors = [\
