@@ -2,6 +2,7 @@ import ROOT
 from ROOT import RooFit as rf
 import pickle 
 import copy, os, sys
+import time, datetime
 ROOT.gROOT.LoadMacro("../../HEPHYPythonTools/scripts/root/tdrstyle.C")
 ROOT.TH1F().SetDefaultSumw2()
 ROOT.setTDRStyle()
@@ -25,8 +26,8 @@ from LpTemplateFit import LpTemplateFit
 from rCShelpers import *
 
 isData = False
-makeFit = False
-getYields = False
+makeFit = True
+getYields = True
 getResults = True
 isValidation = False
 
@@ -42,16 +43,18 @@ if isData:
 else:
   sampleStr = 'MC'
 
-SRstring = '2016SR'
+SRstring = 'Moriond17SR'
 if isValidation: SRstring = '2016val_v2'
-lumiStr = '12p9fb'
+lumiStr = '36p5fb'
 
 preprefix = 'QCDestimation/'+SRstring+'_'+lumiStr+'/'+sampleStr
 wwwDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/'+preprefix+'/'
-picklePath = '/data/'+username+'/Results2016/QCDEstimation/'
+picklePath = '/afs/hephy.at/data/dspitzbart01/RA4/Moriond2017/QCDEstimation/'
 prefix = 'Lp_singleElectronic_'
-picklePresel = '20160725_QCDestimation_'+SRstring+'_'+sampleStr+lumiStr
-pickleFit    = '20160725_fitResult_'+SRstring+'_'+sampleStr+lumiStr
+time_stamp = time.time()
+st = datetime.datetime.fromtimestamp(time_stamp).strftime('%Y%m%d')
+picklePresel = '%s_QCDestimation_%s_%s%s'%(st,SRstring,sampleStr,lumiStr)
+pickleFit    = '%s_fitResult_%s_%s%s'%(st,SRstring,sampleStr,lumiStr)
 
 if not os.path.exists(wwwDir):
   os.makedirs(wwwDir)
@@ -82,24 +85,26 @@ inclusiveTemplate = {QCD_SB: {(250,  -1): {(500, -1):   {(1.0):    {'deltaPhi': 
 
 fitCR =  {QCD_SB: {(250, 350): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}},  #QCD CR exclusive in LT and inclusive in HT, where the fits are performed
                    (350, 450): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}},
-                   (450, -1):  {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}}}}
+                   (450, 650): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}},
+                   (650,  -1): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}}}}
 
 
 if isValidation: SRs = validation2016
 else:
   #SRs = signalRegion3fb
-  SRs = signalRegions2016
+  #SRs = signalRegions2016
+  SRs = signalRegions_Moriond2017
 
 signalRegion = makeQCDsignalRegions(SRs, QCDSB=QCD_SB)
 
 btreg = [(0,0), (1,1), (2,-1)] #1b and 2b estimates are needed for the btag fit
 
 
-lumi = 12.9
-sampleLumi = 3.0
+lumi = 36.5
+sampleLumi = 3.0 #FIXME update!!
 muTriggerEff = '0.926'
 eleTriggerErr = '0.963'
-MCweight = 'TopPtWeight*puReweight_true_max4*'+eleTriggerErr+'*lepton_muSF_HIP*lepton_muSF_mediumID*lepton_muSF_miniIso02*lepton_muSF_sip3d*lepton_eleSF_cutbasedID*lepton_eleSF_miniIso01*lepton_eleSF_gsf'
+MCweight = 'TopPtWeight*puReweight_true_max4*'+eleTriggerErr#+'*lepton_muSF_HIP*lepton_muSF_mediumID*lepton_muSF_miniIso02*lepton_muSF_sip3d*lepton_eleSF_cutbasedID*lepton_eleSF_miniIso01*lepton_eleSF_gsf'
 weight_str, weight_err_str = makeWeight(lumi, sampleLumi, reWeight=MCweight) #only use electron trigger efficiency (0.931), pureweight not yet implemented
 
 def getPseudoRCS(small,smallE,large,largeE): 
@@ -118,7 +123,8 @@ def getPseudoRCS(small,smallE,large,largeE):
 trigger = "&&((HLT_EleHT350||HLT_EleHT400||HLT_Ele105)||(HLT_MuHT350||HLT_MuHT400))"
 filters = "&& (Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_goodVertices && Flag_eeBadScFilter &&  Flag_globalTightHalo2016Filter && Flag_badChargedHadronFilter && Flag_badMuonFilter)"
 
-presel        = 'nLep==1&&nVeto==0&&leptonPt>25&&nEl==1&&Jet2_pt>80&& Flag_badChargedHadronFilter && Flag_badMuonFilter'
+#presel        = 'nLep==1&&nVeto==0&&leptonPt>25&&nEl==1&&Jet2_pt>80&& Flag_badChargedHadronFilter && Flag_badMuonFilter'
+presel        = 'nLep==1&&nVeto==0&&leptonPt>25&&nEl==1&&Jet2_pt>80&& iso_Veto'
 antiSelStr    = presel + '&&Selected==(-1)'
 SelStr        = presel + '&&Selected==1'
 antiSelStrIso = antiSelStr + '&&iso_Veto==1'
