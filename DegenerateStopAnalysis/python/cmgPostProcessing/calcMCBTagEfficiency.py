@@ -31,12 +31,20 @@ def getBTagMCTruthEfficiencies(c, cut="(1)"):
     return mceff
 
 btag_wps= {
-                "0.46" : { 'name': "CSVv2L" },
-                "0.80"  : { 'name': "CSVv2M" },
-                "0.935" : { 'name': "CSVv2T" },
-              }
+            #    "0.46" : { 'name': "CSVv2L" },
+            #    "0.80"  : { 'name': "CSVv2M" },
+            #    "0.935" : { 'name': "CSVv2T" },
+            #  }
+    "cMVAv2L" : {'discCut':'-0.715'     ,'discVar':'Jet_btagCMVA' }, 
+    "cMVAv2M" : {'discCut':'0.185'      ,'discVar':'Jet_btagCMVA' }, 
+    "cMVAv2T" : {'discCut':'0.875'      ,'discVar':'Jet_btagCMVA' }, 
+    "CSVv2L"  : {'discCut':'0.460'      ,'discVar':'Jet_btagCSV'  }, 
+    "CSVv2M"  : {'discCut':'0.80'       ,'discVar':'Jet_btagCSV'  }, 
+    "CSVv2T"  : {'discCut':'0.935'      ,'discVar':'Jet_btagCSV'  }, 
 
-def getBTagMCTruthEfficiencies2D(c, cut="(1)", btag_wp="0.80"):
+       }
+
+def getBTagMCTruthEfficiencies2D(c, cut="(1)", btag_wp_name = "CSVv2M"):
     from array import array
     mceff = {}
     c.SetEventList(0)
@@ -52,11 +60,13 @@ def getBTagMCTruthEfficiencies2D(c, cut="(1)", btag_wp="0.80"):
     total_hists = {}
     ratios = {}
 
-    btag_var = "Jet_btagCSV"
+    #btag_var = "Jet_btagCSV"
     #btag_wp  = "0.80"
-    if btag_wp not in btag_wps:
-        raise Exception("BTag WP %s not recongnized in: %s"%(btag_wp, btag_wps))
-    btag_name = btag_wps[btag_wp]['name']
+    if btag_wp_name not in btag_wps:
+        raise Exception("BTag WP %s not recongnized in: %s"%(btag_wp_name, btag_wps))
+    btag_var = btag_wps[btag_wp_name]['discVar']
+    btag_wp  = btag_wps[btag_wp_name]['discCut']
+    #btag_name = btag_wps[btag_wp]['name']
 
 
 
@@ -100,8 +110,11 @@ if __name__ == '__main__':
     import ROOT, pickle, os
     #from Workspace.DegenerateStopAnalysis.tools.getSamples_8011 import getSamples 
 
-    btag_wp = "0.46"
-    btag_name = btag_wps[btag_wp]
+    #btag_wp = "0.46"
+    #btag_wp = "0.80"
+    #btag_name = btag_wps[btag_wp]['name']
+
+    btag_wp_name = "cMVAv2M"
     #sample_info    =  {
     #                                    "sampleList"   :    sampleList  ,
     #                                    "wtau"         :    False       ,
@@ -125,26 +138,44 @@ if __name__ == '__main__':
     #cmgPP         = cmgTuplesPostProcessed( mc_path, signal_path, data_path)
     #samples   =   getSamples(   cmgPP = cmgPP, sampleList = ['tt','w'] , useHT = True, skim='preIncLep', scan = True  )
 
-    skimPresel = '((met_pt>200)&&(Sum$(Jet_pt*(Jet_pt>30 && abs(Jet_eta)<2.4 && (Jet_id)) ) >200)) && ((Max$(Jet_pt*(abs(Jet_eta)<2.4 && Jet_id) ) > 90 ) >=1)'
-    jetCut1j   = "(Sum$(Jet_pt>30&&abs(Jet_eta)<2.4&&Jet_id))>=1"
+    skimPresel        = '((met_pt>200)&&(Sum$(Jet_pt*(Jet_pt>20 && abs(Jet_eta)<2.4 && (Jet_id)) ) >200)) && ((Max$(Jet_pt*(abs(Jet_eta)<2.4 && Jet_id) ) > 90 ) >=1)'
+    skimPreselBoosted = '((met_pt>200)&&(Sum$(Jet_pt*(Jet_pt>20 && abs(Jet_eta)<2.4 && (Jet_id)) ) >200)) && ((Max$(Jet_pt*(abs(Jet_eta)<2.4 && Jet_id) ) > 300 ) >=1)'
+    jetCut1j   = "(Sum$(Jet_pt>20&&abs(Jet_eta)<2.4&&Jet_id))>=1"
 
-    setups = { 
-                'presel' : {'tag': '_presel',  'cut': skimPresel },
-                '1j'     : {'tag': '_1j'    ,  'cut': jetCut1j   },
+    setups = {
+                'boosted': {'tag': 'boosted', 'cut': skimPreselBoosted }, 
+                'presel' : {'tag': 'presel',  'cut': skimPresel },
+                '1j'     : {'tag': '1j'    ,  'cut': jetCut1j   },
              }
 
     setup = setups['presel']
 
 
+    samples_dir = "/data/nrad/cmgTuples/8020_mAODv2_v0/RunIISpring16MiniAODv2/"
+    samples_dir_8012 = "/data/nrad/cmgTuples/8012_mAODv2_v3/RunIISpring16MiniAODv2/"
+    samples = {
+                'TTJets': samples_dir + "/" +  "TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+                "WJets" : '',
+                'T2ttold': samples_dir + "/" + "SMS-T2tt_dM-10to80_genHT-160_genMET-80_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/" ,
+                'T2ttold_OldJetClean': samples_dir_8012 + "/" + "SMS-T2tt_dM-10to80_genHT-160_genMET-80_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/" ,
+              }
+
+    samples_to_use = [ 'T2ttold_OldJetClean']
+
     #for samp in ['tt','w' ]:
-    for samp in ['sig']:
-        if samp == 'sig': 
+    for samp in samples_to_use:
+        if "T2tt" in samp or "T2bw" in samp: 
             import glob
             tree = ROOT.TChain("tree")
             
-            signal_cmg_files = "/data/nrad/cmgTuples/8011_mAODv2_v1/RunIISpring16MiniAODv2/SMS-T2tt_dM-10to80_genHT-160_genMET-80_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/" 
+            #signal_cmg_files = "/data/nrad/cmgTuples/8011_mAODv2_v1/RunIISpring16MiniAODv2/SMS-T2tt_dM-10to80_genHT-160_genMET-80_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/" 
+            #signal_cmg_files = "/data/nrad/cmgTuples/8020_mAODv2_v0/RunIISpring16MiniAODv2/SMS-T2tt_dM-10to80_genHT-160_genMET-80_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/" 
+
+            signal_cmg_files = samples[samp]
+
             for f in glob.glob(signal_cmg_files+"/*/tree.root"):
                 tree.Add(f)
+
             jetcut        = setup['cut']
             tag           = setup['tag']
             dms = {
@@ -160,32 +191,46 @@ if __name__ == '__main__':
 
                 res=  getBTagMCTruthEfficiencies2D( tree,
                     cut=cut,
-                    btag_wp = btag_wp
+                    btag_wp_name = btag_wp_name
                 )
                 print "Signal Efficiencies:", dm
                 print res
 
                 pickle.dump(res, \
                     #file(os.path.expandvars('$CMSSW_BASE/src/StopsDilepton/tools/data/btagEfficiencyData/TTJets_DiLepton_comb_2j_2l.pkl'), 'w')
-                    file(os.path.expandvars('$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/T2tt_%s_%s_%s.pkl'%(dm,tag,btag_name) ), 'w')
+                    file(os.path.expandvars('$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/%s_%s_%s_%s.pkl'%(samp, dm,tag,btag_wp_name) ), 'w')
                 )
+                print os.path.expandvars('$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/%s_%s_%s_%s.pkl'%(samp, dm,tag,btag_wp_name) )
 
         else:
-            tree = samples[samp]['tree']
-            sample_name = samples[samp]['name']
+            #tree = samples[samp]['tree']
+            #sample_name = samples[samp]['name']
+             
+            import glob
+            tree = ROOT.TChain("tree")
+            cmg_files = samples[samp]
+            sample_name = samp
+            for f in glob.glob(cmg_files+"/*/tree.root"):
+                tree.Add(f)
+
+            
+
+
             tag = setup['tag']
 
             res=  getBTagMCTruthEfficiencies2D( tree,
                 #cut="(Sum$(Jet_pt>30&&abs(Jet_eta)<2.4&&Jet_id))>=1"
-                cut=setup['cut']
+                cut=setup['cut'],
+                btag_wp_name = btag_wp_name,
             )
             print "%s Efficiencies:"%sample_name
             print res
 
             pickle.dump(res, \
                 #file(os.path.expandvars('$CMSSW_BASE/src/StopsDilepton/tools/data/btagEfficiencyData/TTJets_DiLepton_comb_2j_2l.pkl'), 'w')
-                file(os.path.expandvars('$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/%s_2D%s_%s.pkl'%(sample_name,tag, btag_name)), 'w')
+                file(os.path.expandvars('$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/%s_2D_%s_%s.pkl'%(sample_name,tag, btag_wp_name)), 'w')
             )
+            print os.path.expandvars('$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/btagEfficiencyData/%s_2D_%s_%s.pkl'%(sample_name,tag, btag_wp_name)) 
     #for samp in ['tt','w']:
     #    tree = samples[samp]['tree']
     #    sample_name = samples[samp]['name']
