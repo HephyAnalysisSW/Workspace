@@ -8,7 +8,10 @@ from array import array
 
 from Workspace.HEPHYPythonTools.helpers import getVarValue, getChain, deltaPhi
 #from Workspace.RA4Analysis.cmgTuplesPostProcessed_v8_Phys14V3_HT400ST200 import *
-from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed import *
+#from Workspace.RA4Analysis.cmgTuples_Spring15_MiniAODv2_25ns_postProcessed import *
+
+from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2_postProcessed import *
+
 
 from Workspace.RA4Analysis.helpers import *
 from rCShelpers import *
@@ -17,7 +20,8 @@ from rCShelpers import *
 binning=[30,0,1500]
 
 #prepresel = 'singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftPt10Leptons==0&&Jet_pt[1]>80'
-prepresel = 'singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&Jet_pt[1]>80'
+#prepresel = 'singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&Jet_pt[1]>80'
+prepresel = '!isData&&singleLeptonic&&nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0&&Jet_pt[1]>80&&st>250&&nJet30>2&&htJet30j>500'
 
 bVar = 'nBJetMediumCSV30'
 
@@ -29,10 +33,10 @@ lepSel = 'hard'
 
 nBtagReg=[(0,0),(1,1)]#,(2,-1)]
 nJetReg=[(5,5),(6,7),(8,-1)]
-stReg=[(250,350),(350,450),(450,-1)]
-htReg=[(500,750),(750,1000),(1000,-1)]
+stReg=[(250,350),(350,450),(450,600),(600,-1)]
+htReg=[(500,750),(750,1000),(1000,1250),(1250,-1)]
 
-targetLumi = 10. #fb^-1
+targetLumi = 40. #fb^-1
 sampleLumi = 3. #fb^-1
 threshold = 1.
 
@@ -41,16 +45,20 @@ scaleFactor = targetLumi/sampleLumi
 
 #Load the Background Chain
 #cBkg = getChain([WJetsHTToLNu[lepSel], ttJets[lepSel], DY[lepSel], singleTop[lepSel], TTVH[lepSel]],histname='')
-cBkg = getChain([TTJets_combined_25ns, WJetsHTToLNu_25ns, singleTop_25ns, DY_25ns, TTV_25ns],histname='')
+#cBkg = getChain([TTJets_combined_25ns, WJetsHTToLNu_25ns, singleTop_25ns, DY_25ns, TTV_25ns],histname='')
+cBkg = getChain([TTJets_Comb,WJetsHTToLNu,DY_HT,singleTop_lep,TTV],histname='')
 
 #signal1 = getChain(T5qqqqWW_mGo1000_mCh800_mChi700[lepSel],histname='')
 #signal2 = getChain(T5qqqqWW_mGo1200_mCh1000_mChi800[lepSel],histname='')
 #signal3 = getChain(T5qqqqWW_mGo1500_mCh800_mChi100[lepSel],histname='')
 
-signal1 = getChain(T5qqqqVV_mGluino_1000To1075_mLSP_1To950[1000][700], histname='')
-signal2 = getChain(T5qqqqVV_mGluino_1200To1275_mLSP_1to1150[1200][800],histname='')
-signal3 = getChain(T5qqqqVV_mGluino_1400To1550_mLSP_1To1275[1500][100],histname='')
+#signal1 = getChain(T5qqqqVV_mGluino_1000To1075_mLSP_1To950[1000][700], histname='')
+#signal2 = getChain(T5qqqqVV_mGluino_1200To1275_mLSP_1to1150[1200][800],histname='')
+#signal3 = getChain(T5qqqqVV_mGluino_1400To1550_mLSP_1To1275[1800][100],histname='')
 
+signal1 = getChain(allSignals[0][1400][900], histname='') 
+signal2 = getChain(allSignals[0][1600][800], histname='')
+signal3 = getChain(allSignals[0][1800][100], histname='')
 
 
 bkgH = ROOT.TH1F('bkgH','',len(twoBin)-1, array('d', twoBin))
@@ -61,8 +69,14 @@ sig1H = ROOT.TH1F('sig1H','',len(twoBin)-1, array('d', twoBin))
 sig2H = ROOT.TH1F('sig2H','',len(twoBin)-1, array('d', twoBin))
 sig3H = ROOT.TH1F('sig3H','',len(twoBin)-1, array('d', twoBin))
 
-weight = 'weight*lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*TopPtWeight*0.94'
-signalWeight = 'weight*lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*0.94'
+#weight = 'weight*lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*TopPtWeight*0.94'
+muTriggerEff = '0.926'
+eleTriggerEff = '0.963'
+weight = 'weight*TopPtWeight*puReweight_true_max4*(singleMuonic*'+muTriggerEff+' + singleElectronic*'+eleTriggerEff+')*leptonSF'
+
+#signalWeight = 'weight*lepton_eleSF_miniIso01*lepton_eleSF_cutbasedID*lepton_muSF_sip3d*lepton_muSF_miniIso02*lepton_muSF_mediumID*0.94'
+signalWeight = 'weight*puReweight_true_max4*(singleMuonic*'+muTriggerEff+'+singleElectronic*'+eleTriggerEff+')*reweightLeptonFastSimSF*lepton_muSF_HIP*lepton_muSF_mediumID*lepton_muSF_miniIso02*lepton_muSF_sip3d*lepton_eleSF_cutbasedID*lepton_eleSF_miniIso01*lepton_eleSF_gsf'
+
 
 bins = []
 yields = {}
@@ -197,7 +211,7 @@ for njb in reversed(nJetReg):
       yWSB_CR += yields[njb][htb][stb]['WSB_CR']*scaleFactor
       yTTSB_SR += yields[njb][htb][stb]['TTSB_SR']*scaleFactor
       yTTSB_CR += yields[njb][htb][stb]['TTSB_CR']*scaleFactor
-
+      k = 0.3
       bin.append(htb)
       if yS1>threshold or yS2>threshold or yS3>threshold:
         flag = True

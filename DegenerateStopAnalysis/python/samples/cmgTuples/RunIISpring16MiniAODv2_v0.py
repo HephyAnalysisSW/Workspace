@@ -25,20 +25,21 @@ WJetsToLNu ={
 }
 allComponents.append(WJetsToLNu)
 
-
-WJetsToLNu_HT100to200 ={
-'cmgName':"WJetsToLNu_HT100to200",
-"name" : "WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v3",
-"chunkString":"WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v3",
-"dir": sample_path +"/" + "WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v3",
-"dbsName" : "/WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v3/MINIAODSIM",
-"rootFileLocation":"tree.root",
-"skimAnalyzerDir":"skimAnalyzerCount",
-"treeName":"tree",
-"isData": False,
-"xsec": 1627.45,
-}
-allComponents.append(WJetsToLNu_HT100to200)
+#TODO: Add whenever sample is available
+#WJetsToLNu_HT100to200 ={
+#'cmgName':"WJetsToLNu_HT100to200",
+#"name" : "WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v3",
+#"chunkString":"WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v3",
+#"dir": sample_path +"/" + "WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v3",
+#"dbsName" : "/WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v3/MINIAODSIM",
+#"rootFileLocation":"tree.root",
+#"skimAnalyzerDir":"skimAnalyzerCount",
+#"treeName":"tree",
+#"isData": False,
+#"xsec": 1627.45,
+#"ext":['WJetsToLNu_HT100to200', 'WJetsToLNu_HT100to200_ext'],
+#}
+#allComponents.append(WJetsToLNu_HT100to200)
 
 WJetsToLNu_HT100to200_ext ={
 'cmgName':"WJetsToLNu_HT100to200_ext",
@@ -51,6 +52,7 @@ WJetsToLNu_HT100to200_ext ={
 "treeName":"tree",
 "isData": False,
 "xsec": 1627.45,
+#"ext":['WJetsToLNu_HT100to200', 'WJetsToLNu_HT100to200_ext'],
 }
 allComponents.append(WJetsToLNu_HT100to200_ext)
 

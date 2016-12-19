@@ -36,7 +36,7 @@ print 'Imported configuration from '+configFile+'.py'
 ROOT.TH1F().SetDefaultSumw2()
 
 weight_str, weight_err_str = makeWeight(lumi, sampleLumi=sampleLumi, reWeight=MCweight)
-samples={'W':cWJets, 'TT':cTTJets, 'Rest':cRest, 'Bkg':cBkg, 'Data': cData}
+samples={'W':cWJets, 'TT':cTTJets, 'Rest':cRest, 'Bkg':cBkg, 'Data': cData, 'QCD': cQCD}
 
 
 if isData: dataSetString = 'data'
@@ -93,7 +93,7 @@ configs['loadTemplate']     = loadTemplate
 configs['printDir']         = printDir
 configs['dPhiStr']          = dPhiStr
 configs['templateBootstrap']= templateBootstrap
-
+configs['useQCDestimation'] = useQCDestimation
 
 zero = asym_float(0.,0.)
 SBfits = {}
@@ -167,7 +167,7 @@ for srNJet in signalRegions:
         for nb in [(0,0),(1,1),(2,-1)]:
           if QCDup: QCD_dict[nb] = asym_float(QCD_dictEnt[nb][deltaPhiCut]['NQCDpred'] + QCD_dictEnt[nb][deltaPhiCut]['NQCDpred_err'], QCD_dictEnt[nb][deltaPhiCut]['NQCDpred_err'])
           elif QCDdown:
-            if (QCD_dictEnt[nb][deltaPhiCut]['NQCDpred']-QCD_dictEnt[nb][deltaPhiCut]['NQCDpred_err'])>0:
+            if (QCD_dictEnt[nb][deltaPhiCut]['NQCDpred']-QCD_dictEnt[nb][deltaPhiCut]['NQCDpred_err']) > 0:
               QCD_dict[nb] = asym_float(QCD_dictEnt[nb][deltaPhiCut]['NQCDpred'] - QCD_dictEnt[nb][deltaPhiCut]['NQCDpred_err'], QCD_dictEnt[nb][deltaPhiCut]['NQCDpred_err'])
             else:
               QCD_dict[nb] = asym_float(0., QCD_dictEnt[nb][deltaPhiCut]['NQCDpred_err'])
@@ -205,7 +205,10 @@ for srNJet in signalRegions:
         weight_str_0b = weight_str
         
       Rest_truth  = asym_float(*getYieldFromChain(cRest, MB_SR_cut_MC, weight_str_0b, returnError=True))
-      total_truth = asym_float(getYieldFromChain(cData, MC_SR_cut, '(1)'), forcePoisson=True)
+      if unblinded:
+        if isData: weight = '(1)'
+        else: weight = weight_str_0b
+        total_truth = asym_float(getYieldFromChain(cData, MC_SR_cut, weight), forcePoisson=True)
       total_pred  = W_pred + TT_pred + Rest_truth
       
 
@@ -216,8 +219,9 @@ for srNJet in signalRegions:
       print fmt.format('tt+jets',TT_pred.round())
       print fmt.format('Rest',Rest_truth.round())
       print fmt.format('total',total_pred.round())
-      print
-      print fmt.format('observed',total_truth.round())
+      if unblinded:
+        print
+        print fmt.format('observed',total_truth.round())
       #print fmt.format('Rest',round(rest,2))
       print
       
@@ -225,15 +229,12 @@ for srNJet in signalRegions:
       rd['TT_pred']     = TT_pred
       rd['Rest_truth']  = Rest_truth
       rd['tot_pred']    = total_pred
-      rd['tot_truth']   = total_truth
+      if unblinded:
+        rd['tot_truth'] = total_truth
       
       bins[srNJet][stb][htb] = rd
 
 
 pickle.dump(bins, file(pickleDir+prefix+'_estimationResults_pkl','w'))
 print "written:" , pickleDir+prefix+'_estimationResults_pkl'
-
-
-
-
 

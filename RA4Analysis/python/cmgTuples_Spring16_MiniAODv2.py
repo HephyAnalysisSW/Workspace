@@ -431,6 +431,17 @@ ST_schannel_4f_leptonDecays = {\
 'isData':False
 }
 
+ST_tchannel_4f_leptonDecays ={\
+"name" : "ST_tchannel_4f_leptonDecays",
+"chunkString":"cmgTuples_MC25ns_1l_September_ST_t-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1_RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14_ext1-v1_MC25ns_v1",
+"dir":  pathDaniel+"cmgTuples_MC25ns_1l_September_ST_t-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1_RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14_ext1-v1_MC25ns_v1/" ,
+"dbsName" : "",
+"skimAnalyzerDir":"skimAnalyzerCount/",
+"rootFileLocation":"tree.root",
+"treeName":"tree",
+'isData':False
+}
+
 ST_tchannel_antitop_4f_leptonDecays ={\
 "name" : "ST_tchannel_antitop_4f_leptonDecays_powheg",
 "chunkString":"cmgTuples_MC25ns_v1_v3_1l_July_ST_t-channel_antitop_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns_v1",
@@ -498,10 +509,32 @@ ST_tW_top_5f_inclusiveDecays ={\
 #'isData':False
 #}
 
+#DiBoson_WW = {\
+#"name" : "DiBoson_WW",
+#"chunkString":"cmgTuples_MC25ns_v1_v3_1l_July_WW_TuneCUETP8M1_13TeV-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns_v1",
+#"dir":  pathEce+"cmgTuples_MC25ns_v1_v3_1l_July_WW_TuneCUETP8M1_13TeV-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns_v1/",
+#"dbsName" : "",
+#"skimAnalyzerDir":"skimAnalyzerCount/",
+#"rootFileLocation":"tree.root",
+#"treeName":"tree",
+#'isData':False
+#}
+
+DiBoson_WW_noskim = {\
+"name" : "DiBoson_WW",
+"chunkString":"cmgTuples_MC25ns_September_noSkim_WW_TuneCUETP8M1_13TeV-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns_noSkim",
+"dir":  pathDaniel+"cmgTuples_MC25ns_September_noSkim_WW_TuneCUETP8M1_13TeV-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns_noSkim/",
+"dbsName" : "",
+"skimAnalyzerDir":"skimAnalyzerCount/",
+"rootFileLocation":"tree.root",
+"treeName":"tree",
+'isData':False
+}
+
 DiBoson_WW = {\
 "name" : "DiBoson_WW",
-"chunkString":"cmgTuples_MC25ns_v1_v3_1l_July_WW_TuneCUETP8M1_13TeV-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns_v1",
-"dir":  pathEce+"cmgTuples_MC25ns_v1_v3_1l_July_WW_TuneCUETP8M1_13TeV-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns_v1/",
+"chunkString":"cmgTuples_MC25ns_1l_September_WW_TuneCUETP8M1_13TeV-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns_v1",
+"dir":  pathDaniel+"cmgTuples_MC25ns_1l_September_WW_TuneCUETP8M1_13TeV-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns_v1/",
 "dbsName" : "",
 "skimAnalyzerDir":"skimAnalyzerCount/",
 "rootFileLocation":"tree.root",
@@ -546,6 +579,39 @@ WWToLNuQQ = {\
 "name" : "WWToLNuQQ",
 "chunkString":"cmgTuples_MC25ns_1l_August_WWToLNuQQ_13TeV-powheg_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns_v1",
 "dir": pathDaniel+"cmgTuples_MC25ns_1l_August_WWToLNuQQ_13TeV-powheg_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns_v1/",
+"dbsName" : "",
+"skimAnalyzerDir":"skimAnalyzerCount/",
+"rootFileLocation":"tree.root",
+"treeName":"tree",
+'isData':False
+}
+
+WWToLNuQQ_noskim = {\
+"name" : "WWToLNuQQ_powheg",
+"chunkString":"cmgTuples_MC25ns_September_noSkim_WWToLNuQQ_13TeV-powheg_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns_noSkim",
+"dir": pathDaniel+"cmgTuples_MC25ns_September_noSkim_WWToLNuQQ_13TeV-powheg_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns_noSkim/",
+"dbsName" : "",
+"skimAnalyzerDir":"skimAnalyzerCount/",
+"rootFileLocation":"tree.root",
+"treeName":"tree",
+'isData':False
+}
+
+WWToLNuQQ_withExt = {\
+"name" : "WWToLNuQQ_extended",
+"chunkString":"cmgTuples_MC25ns_September_noSkim_WWToLNuQQ_13TeV-powheg_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns_withExt",
+"dir": pathDaniel+"cmgTuples_MC25ns_September_noSkim_WWToLNuQQ_13TeV-powheg_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns_comb/",
+"dbsName" : "",
+"skimAnalyzerDir":"skimAnalyzerCount/",
+"rootFileLocation":"tree.root",
+"treeName":"tree",
+'isData':False
+}
+
+WWToLNuQQ_amc_noskim = {\
+"name" : "WWToLNuQQ",
+"chunkString":"cmgTuples_MC25ns_September_noSkim_WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns_noSkim",
+"dir": pathDaniel+"cmgTuples_MC25ns_September_noSkim_WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MC25ns_noSkim/",
 "dbsName" : "",
 "skimAnalyzerDir":"skimAnalyzerCount/",
 "rootFileLocation":"tree.root",
@@ -620,7 +686,6 @@ ZZTo2Q2Nu = {\
 }
 
 ####Signal Samples###
-
 SMS_T5qqqqVV_TuneCUETP8M1 ={\
 "name" : "SMS_T5qqqqVV_TuneCUETP8M1",
 "chunkString":"SMS_T5qqqqVV_TuneCUETP8M1",

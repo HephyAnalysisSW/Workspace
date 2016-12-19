@@ -1,0 +1,2 @@
+works standalone:
+python make_bar_plot.py

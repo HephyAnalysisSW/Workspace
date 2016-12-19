@@ -31,15 +31,17 @@ signal = True
 stackSignal = True
 plotPull = False
 
-latextitle = 'Preliminary'
+latextitle = ''
+#latextitle = 'Preliminary'
 
 weight_str, weight_err_str = makeWeight(lumi, sampleLumi, reWeight=MCweight)
 
-prefix = 'singleLeptonic_Spring16_'
+prefix = 'singleLeptonic_Spring15_'
+#prefix = 'singleLeptonic_Spring16_'
 #path = '/data/'+username+'/Results2015/Prediction_SFTemplate_MC_fullSR_lep_3.0/'
 #pickleDir = '/data/easilar/Results2016/Prediction_SFtemplates_fullSR_lep_data_2p25/'
 #pickleDir = '/data/dspitzbart/Results2015/Prediction_SFtemplates_validation_lep_data_2.1/'
-#pickleDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_fullSR_lep_data_Moriond_2p3/'
+pickleDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_fullSR_lep_data_Moriond_2p3/'
 #pickleDir = '/data/dspitzbart/Results2016/Prediction_SFtemplates_validation_4j_lep_data_2p3/'
 #pickleDir = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_VreducedSR_lep_data_0p8/'
 
@@ -51,7 +53,7 @@ prefix = 'singleLeptonic_Spring16_'
 #pickleDir = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2016_v1_100p_lep_data_3p99/'#resultsFinal_withSystematics_pkl
 #pickleDir = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2016_v2_lep_data_7p62/'
 #pickleDir = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_validation_4j_altWSB_lep_data_12p9/'
-pickleDir = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2016_postApp_v2_lep_data_12p9/'
+#pickleDir = '/data/dspitzbart/Results2016/Prediction_Spring16_templates_SR2016_postApp_v2_lep_data_12p9/'
 
 if not useKappa: res = pickle.load(file(pickleDir+'singleLeptonic_Spring16__estimationResults_pkl'))
 else: res = pickle.load(file(pickleDir+'resultsFinal_withSystematics_pkl'))
@@ -60,8 +62,8 @@ if withSystematics:
 
 #sig = pickle.load(file('/data/easilar/Spring15/25ns/allSignals_2p3_v2_pkl'))
 #sig = pickle.load(file('/data/easilar/Spring15/25ns/allSignals_2p25_allSyst_approval_pkl'))
-#sig = pickle.load(file('/data/easilar/Spring15/25ns/allSignals_2p3_allSyst_pkl'))
-sig = pickle.load(file('/afs/hephy.at/data/dspitzbart01/Results2016/signals_with_unc_pkl'))
+sig = pickle.load(file('/data/easilar/Spring15/25ns/allSignals_2p3_allSyst_pkl'))
+#sig = pickle.load(file('/afs/hephy.at/data/dspitzbart01/Results2016/signals_with_unc_pkl'))
 
 #signalRegions = validationRegion
 #signalRegions = signalRegionCRonly
@@ -92,11 +94,16 @@ if isData:
   data_truth_H.SetBinErrorOption(ROOT.TH1F.kPoisson)
 
 
-benchmark1_H = ROOT.TH1F('benchmark1_H','T5qqqqWW (1.2,0.8)',bins,0,bins)
-benchmark2_H = ROOT.TH1F('benchmark2_H','T5qqqqWW (1.4,1.0)',bins,0,bins)
-benchmark3_H = ROOT.TH1F('benchmark3_H','T5qqqqWW (1.6,0.1)',bins,0,bins)
+#benchmark1_H = ROOT.TH1F('benchmark1_H','T5qqqqWW (1.2,0.8)',bins,0,bins)
+#benchmark2_H = ROOT.TH1F('benchmark2_H','T5qqqqWW (1.4,1.0)',bins,0,bins)
+#benchmark3_H = ROOT.TH1F('benchmark3_H','T5qqqqWW (1.6,0.1)',bins,0,bins)
 
-benchmark1_H.SetLineColor(ROOT.kAzure+9)
+benchmark1_H = ROOT.TH1F('benchmark1_H','T5qqqqWW (1.0,0.7)',bins,0,bins)
+benchmark2_H = ROOT.TH1F('benchmark2_H','T5qqqqWW (1.2,0.8)',bins,0,bins)
+benchmark3_H = ROOT.TH1F('benchmark3_H','T5qqqqWW (1.5,0.1)',bins,0,bins)
+
+
+benchmark1_H.SetLineColor(ROOT.kSpring+10)
 benchmark2_H.SetLineColor(ROOT.kMagenta+2)
 benchmark3_H.SetLineColor(ROOT.kRed+1)
 
@@ -130,17 +137,18 @@ rest_H.SetFillColorAlpha(color('TTVH'), 0.8)
 rest_H.SetLineWidth(2)
 w_truth_H.SetLineColor(color('DY'))
 
-pred_H  = ROOT.TH1F('pred_H','total pred.', bins,0,bins)
-pred_H.SetBarWidth(0.4)
-pred_H.SetBarOffset(0.1)
+pred_H  = ROOT.TH1F('pred_H','Total', bins,0,bins)
+#pred_H.SetBarWidth(0.4)
+#pred_H.SetBarOffset(0.1)
 truth_H = ROOT.TH1F('truth_H','Total MC truth',bins,0,bins)
 if isData:
   truth_H.SetBinErrorOption(ROOT.TH1F.kPoisson)
 
 
 pred_H.SetLineColor(ROOT.kGray+1)
-pred_H.SetMarkerStyle(1)
-pred_H.SetLineWidth(2)
+pred_H.SetMarkerStyle(0)
+pred_H.SetMarkerSize(0)
+pred_H.SetLineWidth(3)
 
 truth_H.SetLineColor(ROOT.kBlack)
 truth_H.SetLineWidth(2)
@@ -385,13 +393,19 @@ for srNJet in sorted(signalRegions):
 
       if signal:
         if stackSignal:
-          benchmark1_H.SetBinContent(i,res[srNJet][stb][htb]['tot_pred_final']+sig[srNJet][stb][htb]['signals'][1200][800]['mod_yield_MB_SR'])
-          benchmark2_H.SetBinContent(i,res[srNJet][stb][htb]['tot_pred_final']+sig[srNJet][stb][htb]['signals'][1400][1000]['mod_yield_MB_SR'])
-          benchmark3_H.SetBinContent(i,res[srNJet][stb][htb]['tot_pred_final']+sig[srNJet][stb][htb]['signals'][1600][100]['mod_yield_MB_SR'])
+          #benchmark1_H.SetBinContent(i,res[srNJet][stb][htb]['tot_pred_final']+sig[srNJet][stb][htb]['signals'][1200][800]['mod_yield_MB_SR'])
+          #benchmark2_H.SetBinContent(i,res[srNJet][stb][htb]['tot_pred_final']+sig[srNJet][stb][htb]['signals'][1400][1000]['mod_yield_MB_SR'])
+          #benchmark3_H.SetBinContent(i,res[srNJet][stb][htb]['tot_pred_final']+sig[srNJet][stb][htb]['signals'][1600][100]['mod_yield_MB_SR'])
+          benchmark1_H.SetBinContent(i,res[srNJet][stb][htb]['tot_pred_final']+sig[srNJet][stb][htb]['signals'][1000][700]['yield_MB_SR'])
+          benchmark2_H.SetBinContent(i,res[srNJet][stb][htb]['tot_pred_final']+sig[srNJet][stb][htb]['signals'][1200][800]['yield_MB_SR'])
+          benchmark3_H.SetBinContent(i,res[srNJet][stb][htb]['tot_pred_final']+sig[srNJet][stb][htb]['signals'][1500][100]['yield_MB_SR'])
         else:
-          benchmark1_H.SetBinContent(i,sig[srNJet][stb][htb]['signals'][1200][800]['mod_yield_MB_SR'])
-          benchmark2_H.SetBinContent(i,sig[srNJet][stb][htb]['signals'][1400][1000]['mod_yield_MB_SR'])
-          benchmark3_H.SetBinContent(i,sig[srNJet][stb][htb]['signals'][1600][100]['mod_yield_MB_SR'])
+          #benchmark1_H.SetBinContent(i,sig[srNJet][stb][htb]['signals'][1200][800]['mod_yield_MB_SR'])
+          #benchmark2_H.SetBinContent(i,sig[srNJet][stb][htb]['signals'][1400][1000]['mod_yield_MB_SR'])
+          #benchmark3_H.SetBinContent(i,sig[srNJet][stb][htb]['signals'][1600][100]['mod_yield_MB_SR'])
+          benchmark1_H.SetBinContent(i,sig[srNJet][stb][htb]['signals'][1000][700]['yield_MB_SR'])
+          benchmark2_H.SetBinContent(i,sig[srNJet][stb][htb]['signals'][1200][800]['yield_MB_SR'])
+          benchmark3_H.SetBinContent(i,sig[srNJet][stb][htb]['signals'][1500][100]['yield_MB_SR'])
       if unblinded:
         total_meas     += data_yield
         if useKappa:
@@ -469,8 +483,10 @@ if validation:
   h_Stack.SetMaximum(300)
   h_Stack.SetMinimum(0.40)
 else:
-  h_Stack.SetMaximum(1000)
-  h_Stack.SetMinimum(0.20)
+  h_Stack.SetMaximum(100)
+  #h_Stack.SetMaximum(1000)
+  h_Stack.SetMinimum(0.080)
+  #h_Stack.SetMinimum(0.20)
 
 #h_Stack.GetYaxis().SetTitle('Signal Region #')
 
@@ -487,14 +503,19 @@ data_err.SetLineWidth(2)
 
 pred_err = ROOT.TGraphAsymmErrors(bins, ax, ay, aexl, aexh, aeyl, aeyh)
 pred_err.SetFillColor(ROOT.kGray+1)
-pred_err.SetFillStyle(3244)
+pred_err.SetFillStyle(3444)
+pred_err.SetLineWidth(3)
+pred_err.SetLineColor(ROOT.kGray+1)
+pred_err.SetMarkerColor(ROOT.kGray+1)
+pred_err.SetMarkerStyle(0)
+pred_err.SetMarkerSize(0)
 
 if useKappa:
   kappa_err = ROOT.TGraphAsymmErrors(bins, kx, ky, kex, kex, key, key)
   kappa_err.SetFillColor(ROOT.kGray+1)
   kappa_err.SetFillStyle(3444)
 
-leg = ROOT.TLegend(0.65,0.65,0.98,0.95)
+leg = ROOT.TLegend(0.62,0.65,0.98,0.95)
 leg.SetFillColor(ROOT.kWhite)
 leg.SetShadowColor(ROOT.kWhite)
 leg.SetBorderSize(1)
@@ -508,10 +529,12 @@ if isData:
 else:
   if showMCtruth:
     leg.AddEntry(truth_H, 'MC truth')
+#leg.AddEntry(pred_H,'','l')
+leg.AddEntry(pred_err,'Pred. + uncertainty')
 leg.AddEntry(tt_pred_H,'','f')
 leg.AddEntry(w_pred_H,'','f')
 leg.AddEntry(rest_H,'','f')
-leg.AddEntry(pred_err,'Pred. Uncertainty','f')
+#leg.AddEntry(pred_err,'Pred. uncertainty')
 
 h_Stack.Draw('hist')
 h_Stack.GetYaxis().SetTitle('Events')
@@ -540,13 +563,15 @@ truth_H.SetMarkerStyle(22)
 
 pred_rel_err = ROOT.TGraphAsymmErrors(bins, ax, a_r_y, aexl, aexh, a_r_eyl, a_r_eyh)
 pred_rel_err.SetFillColor(ROOT.kGray+1)
-pred_rel_err.SetFillStyle(3244)
+pred_rel_err.SetFillStyle(3444)
 #pred_err.Draw('2 same')
 
 ratio_err = ROOT.TGraphAsymmErrors(bins, rx, ry, rexl, rexh, reyl, reyh)
 ratio_err.SetMarkerStyle(10)
 ratio_err.SetMarkerSize(1.1)
 ratio_err.SetLineWidth(2)
+
+pred_H.Draw('hist same')
 
 
 if unblinded or validation:
@@ -564,7 +589,7 @@ latex1.SetTextSize(0.04)
 latex1.SetTextAlign(11)
 
 latex1.DrawLatex(0.15,0.96,'CMS #bf{#it{'+latextitle+'}}')
-latex1.DrawLatex(0.80,0.96,'#bf{'+printlumi+"fb^{-1} (13TeV)}")
+latex1.DrawLatex(0.80,0.96,'#bf{'+printlumi+" fb^{-1} (13 TeV)}")
 
 pad1.SetLogy()
 
@@ -611,14 +636,16 @@ else:
   setNiceBinLabel(ratio2, signalRegions)
   
   ratio2.GetXaxis().SetTitleSize(0.13)
-  ratio2.GetXaxis().SetLabelSize(0.09)
+  ratio2.GetXaxis().SetLabelSize(0.11)
   ratio2.GetXaxis().SetNdivisions(508)
+  ratio2.GetXaxis().SetLabelOffset(0.02)
   ratio2.GetYaxis().SetTitleSize(0.13)
   ratio2.GetYaxis().SetLabelSize(0.13)
   ratio2.GetYaxis().SetTitleOffset(0.4)
   ratio2.GetYaxis().SetNdivisions(506)
 
-  maxRatio = 1.95
+  #maxRatio = 1.95
+  maxRatio = 3.2
   forceMaxRatioValue = False
   if ratio2.GetBinContent(ratio2.GetMaximumBin())>maxRatio and not forceMaxRatioValue: maxRatio = ratio2.GetBinContent(ratio2.GetMaximumBin())+0.2
   ratio2.SetMinimum(0.)
@@ -631,7 +658,7 @@ else:
     ratio2.GetYaxis().SetTitle('MC/pred.')
   ratio2.Draw('p')
   #one.Draw('hist same')
-  pred_rel_err.Draw('2 same')
+  pred_rel_err.Draw('e2 same')
   ratio_err.Draw("P0 same")
   one.Draw('hist same')
 
@@ -646,9 +673,9 @@ else:
 if plotPull: suffix += '_pull'
 if not stackSignal: suffix += '_overlaySignal'
 
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_postApproval_v2.png')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_postApproval_v2.root')
-can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_postApproval_v2.pdf')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_paper.png')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_paper.root')
+can.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/Prediction_'+predictionName+'_'+lumistr+suffix+'_paper.pdf')
 
 if useKappa:
   
@@ -690,7 +717,7 @@ if useKappa:
   latex2.DrawLatex(0.16,0.96,'CMS #bf{#it{'+latextitle+'}}')
   latex2.DrawLatex(0.79,0.96,"#bf{MC (13TeV)}")
   
-  can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/'+predictionName+'_Kappa.png')
-  can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/'+predictionName+'_Kappa.root')
-  can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016B/sumPlot/'+predictionName+'_Kappa.pdf')
+  can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/'+predictionName+'_Kappa.png')
+  can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/'+predictionName+'_Kappa.root')
+  can2.Print('/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results2016/sumPlot/'+predictionName+'_Kappa.pdf')
   

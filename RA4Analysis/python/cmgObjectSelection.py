@@ -19,9 +19,10 @@ def cmgLooseMuID(r, nLep):
   return r.LepGood_miniRelIso[nLep]<0.4 and r.LepGood_pt[nLep]>=10 and abs(r.LepGood_eta[nLep])<=2.4
 
 def cmgTightMuID(r, nLep):
+  #r.LepGood_ICHEPmediumMuonId[nLep]\
   return r.LepGood_pt[nLep]>=25 and abs(r.LepGood_eta[nLep])<=2.4\
      and r.LepGood_miniRelIso[nLep]<0.2\
-     and r.LepGood_ICHEPmediumMuonId[nLep]\
+     and r.LepGood_mediumMuonId[nLep]\
      and abs(r.LepGood_sip3d[nLep])<4
 
 def cmgLooseEleID(r, nLep):
@@ -81,6 +82,13 @@ def get_cmg_JetsforMEt_fromStruct(r,jforMET_list):
   return [{p:getattr(r, 'JetForMET'+'_'+p)[i] for p in jforMET_list} for i in range(r.nJetForMET)]
 def get_cmg_fatJets(c):
   return [getObjDict(c, 'FatJet_', ['eta','pt','phi','btagCMVA','btagCSV','mcPt','mcFlavour' ,'prunedMass','tau2', 'tau1'], i) for i in range(int(getVarValue(c, 'nFatJet')))]
+def get_cmg_isoTracks_fromStruct(r,var_list):
+  try:
+    tmp = [{p:getattr(r, 'isoTrack'+'_'+p)[i] for p in var_list} for i in range(r.nisoTrack)]
+  except IndexError:
+    tmp = [{p:0. for p in var_list}]
+    print 'Index Error occured. Using dummy track dictionary. Error Code: 12345.'
+  return tmp
 def get_cmg_index_and_DR(objs,objPhi,objEta):
   obj = findClosestObject(objs,{'phi':objPhi, 'eta':objEta})
   if obj and obj['index']<10:

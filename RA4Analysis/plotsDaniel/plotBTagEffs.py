@@ -1,4 +1,5 @@
 import ROOT, pickle, itertools
+import os
 
 from Workspace.HEPHYPythonTools.helpers import *
 from Workspace.RA4Analysis.helpers import *
@@ -19,10 +20,14 @@ def getHistMCTruthEfficiencies(MCEff, histname, etaBin = (0,0.8), hadron='b'):
 
 can = ROOT.TCanvas('can','can',600,600)
 can.SetBottomMargin(0.22)
+#can.SetLogy()
 
 #effs = pickle.load(file('/data/dspitzbart/Spring16/btagEfficiency/effs_presel_JECv6_pkl'))
-bTagEffFile = '/data/dspitzbart/Spring16/btagEfficiency/signal_inclusive_pkl'
-effs = pickle.load(file(bTagEffFile))
+#bTagEffFile = '/data/dspitzbart/Spring16/btagEfficiency/signal_inclusive_pkl'
+#bTagEffFile = '$CMSSW_BASE/src/Workspace/RA4Analysis/cmgPostProcessing/data/Moriond17_v1_CSVv2_0p8484.pkl'
+#bTagEffFile = '$CMSSW_BASE/src/Workspace/RA4Analysis/cmgPostProcessing/data/Moriond17_v1_deepFlavour_0p6324.pkl'
+bTagEffFile = '$CMSSW_BASE/src/Workspace/RA4Analysis/cmgPostProcessing/data/Moriond17_v1_deepFlavourBBplusB_0p6324.pkl'
+effs = pickle.load(file(os.path.expandvars(bTagEffFile)))
 
 #key = 'TTJets'
 #key = 'T5qqqqVV_mGluino_1300To1375_mLSP_1to1250'
@@ -65,7 +70,7 @@ for key in effs.keys():
   h_b_1.GetXaxis().SetTitleOffset(2.3)
   
   h_b_1.SetMaximum(1)
-  h_b_1.SetMinimum(0)
+  h_b_1.SetMinimum(0.00)
   h_b_1.LabelsOption("v")
   
   
@@ -120,7 +125,9 @@ for key in effs.keys():
   latex1.DrawLatex(0.16,0.96,'CMS #bf{#it{Simulation}}')
   latex1.DrawLatex(0.85,0.96,'#bf{(13TeV)}')
   
-  can.Print('/afs/hephy.at/user/d/dspitzbart/www/Spring16/btagEfficiency/'+key+'_Spring16.png')
-  can.Print('/afs/hephy.at/user/d/dspitzbart/www/Spring16/btagEfficiency/'+key+'_Spring16.pdf')
-  can.Print('/afs/hephy.at/user/d/dspitzbart/www/Spring16/btagEfficiency/'+key+'_Spring16.root')
+  #can.SetLogy()
+   
+  can.Print('/afs/hephy.at/user/d/dspitzbart/www/Spring16/btagEfficiency_Moriond17/'+key+'_Spring16_deepFlavourV2.png')
+  can.Print('/afs/hephy.at/user/d/dspitzbart/www/Spring16/btagEfficiency_Moriond17/'+key+'_Spring16_deepFlavourV2.pdf')
+  can.Print('/afs/hephy.at/user/d/dspitzbart/www/Spring16/btagEfficiency_Moriond17/'+key+'_Spring16_deepFlavourV2.root')
   

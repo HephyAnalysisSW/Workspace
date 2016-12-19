@@ -2,13 +2,14 @@ import ROOT
 import pickle
 import sys, os, copy, random, subprocess, datetime
 from array import array
-from Workspace.RA4Analysis.cmgObjectSelection import cmgLooseLepIndices, splitIndList, get_cmg_jets_fromStruct, splitListOfObjects, cmgTightMuID, cmgTightEleID , get_cmg_genParts_fromStruct , get_matched_Jets
+from Workspace.RA4Analysis.cmgObjectSelection import cmgLooseLepIndices, splitIndList, get_cmg_jets_fromStruct, splitListOfObjects, cmgTightMuID, cmgTightEleID , get_cmg_genParts_fromStruct , get_matched_Jets, get_cmg_isoTracks_fromStruct
 from Workspace.HEPHYPythonTools.xsec import xsec
 from Workspace.HEPHYPythonTools.helpers import getObjFromFile, getObjDict, getFileList
 from Workspace.HEPHYPythonTools.convertHelpers import compileClass, readVar, printHeader, typeStr, createClassString
 
 from math import *
 from Workspace.HEPHYPythonTools.user import username
+from mt2_davis import get_mt2
 
 ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.AutoLibraryLoader.enable()
@@ -77,7 +78,7 @@ histos_LS = {
 
 #####################
 
-subDir = "postProcessing_Signals_batch_no_Cut"
+subDir = "postProcessing_Signals_Spring16_Moriond2017_v6"
 
 #branches to be kept for data and MC
 branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert", "nIsr" ,
@@ -209,11 +210,12 @@ for isample, sample in enumerate(allSamples):
     #else: sampleKey = 'none'
     
     readVariables = ['met_pt/F', 'met_phi/F', 'met_eta/F','met_mass/F' ,'nVert/I', 'nIsr/F']
-    newVariables = ['weight/F','muonDataSet/I','eleDataSet/I']
+    newVariables = ['weight/F','muonDataSet/I','eleDataSet/I','METDataSet/I']
     aliases = [ "met:met_pt", "metPhi:met_phi"]
 
     readVectors = [\
-      {'prefix':'LepGood', 'nMax':8, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I', 'relIso03/F','SPRING15_25ns_v1/I' ,'tightId/I', 'miniRelIso/F','mass/F','sip3d/F','mediumMuonId/I','ICHEPmediumMuonId/I', 'mvaIdSpring15/F','lostHits/I', 'convVeto/I', 'eleCBID_SPRING15_25ns_ConvVetoDxyDz/I']},
+      {'prefix':'LepGood', 'nMax':8, 'vars':['pt/F', 'eta/F', 'phi/F', 'charge/I','pdgId/I', 'relIso03/F','SPRING15_25ns_v1/I' ,'tightId/I', 'miniRelIso/F','mass/F','sip3d/F','mediumMuonId/I','ICHEPmediumMuonId/I', 'mvaIdSpring15/F','lostHits/I', 'convVeto/I', 'eleCBID_SPRING15_25ns_ConvVetoDxyDz/I']},\
+      {'prefix':'isoTrack', 'nMax': 8, 'vars':['pt/F', 'eta/F', 'phi/F','charge/I', 'pdgId/I','mass/F']}
     ]
     newVariables.extend(['puReweight_true/F','puReweight_true_max4/F','puReweight_true_Down/F','puReweight_true_Up/F','weight_diLepTTBar0p5/F','weight_diLepTTBar2p0/F','weight_XSecTTBar1p1/F','weight_XSecTTBar0p9/F','weight_XSecWJets1p1/F','weight_XSecWJets0p9/F'])
     newVariables.extend(['ngenGluino/I','genGluGlu_pt/F','ISRSigUp/F/1','ISRSigDown/F/1'])
@@ -222,7 +224,7 @@ for isample, sample in enumerate(allSamples):
     newVariables.extend(['lepton_muSF_HIP_err/D/0.','lepton_muSF_looseID_err/D/0.','lepton_muSF_mediumID_err/D/0.','lepton_muSF_miniIso02_err/D/0.','lepton_muSF_sip3d_err/D/0.','lepton_eleSF_cutbasedID_err/D/0.','lepton_eleSF_miniIso01_err/D/0.', 'lepton_eleSF_gsf_err/D/0.', 'lepton_muSF_systematic/D/0.'])
 
 
-    readVectors.append({'prefix':'GenPart',  'nMax':100, 'vars':['eta/F','pt/F','phi/F','mass/F','charge/F', 'pdgId/I', 'motherId/F', 'grandmotherId/F','status/F']})
+    readVectors.append({'prefix':'GenPart',  'nMax':100, 'vars':['eta/F','pt/F','phi/F','mass/F','charge/I', 'pdgId/I', 'motherId/I', 'grandmotherId/I','status/F']})
     #readVectors.append({'prefix':'genPartAll',  'nMax':100, 'vars':['eta/F','pt/F','phi/F','mass/F','charge/F', 'pdgId/I', 'motherId/F', 'grandmotherId/F','status/F']})
     readVectors.append({'prefix':'JetForMET',  'nMax':100, 'vars':['rawPt/F','pt/F', 'eta/F', 'phi/F','mass/F' ,'id/I','hadronFlavour/F','btagCSV/F', 'btagCMVA/F','corr_JECUp/F','corr_JECDown/F','corr/F']})
     readVectors.append({'prefix':'Jet',  'nMax':100, 'vars':['rawPt/F','pt/F', 'eta/F', 'phi/F','mass/F' ,'id/I','hadronFlavour/F','btagCSV/F', 'btagCMVA/F','corr_JECUp/F','corr_JECDown/F','corr/F','chHEF/F']})
@@ -245,6 +247,7 @@ for isample, sample in enumerate(allSamples):
     newVariables.extend( ['leptonPt/F','leptonEt/F','leptonMiniRelIso/F','leptonRelIso03/F' ,\
     'leptonEta/F', 'leptonPhi/F','leptonSPRING15_25ns_v1/I/-2','leptonPdg/I/0', 'leptonInd/I/-1',\
    'leptonMass/F', 'singleMuonic/I', 'singleElectronic/I', 'singleLeptonic/I' ]) #, 'mt2w/F'] )
+    newVariables.extend( ["iso_had/F", "iso_pt/F","iso_MT2/F","iso_Veto/F"] )
     if calcSystematics:
       #newVariables.extend( ["weightBTag/F", "weightBTag_SF/F", "weightBTag_SF_b_Up/F", "weightBTag_SF_b_Down/F", "weightBTag_SF_light_Up/F", "weightBTag_SF_light_Down/F"])
       for i in range(maxConsideredBTagWeight+1):
@@ -309,15 +312,22 @@ for isample, sample in enumerate(allSamples):
             if "Muon" in sample['name']:
               s.muonDataSet = True
               s.eleDataSet = False
+              s.METDataSet = False
             if "Electron" in sample['name']:
               s.muonDataSet = False
               s.eleDataSet = True
+              s.METDataSet = False
+            if "MET" in sample['name']:
+              s.muonDataSet = False
+              s.eleDataSet = False
+              s.METDataSet = True
 
           nTrueInt = t.GetLeaf('nTrueInt').GetValue()
           
           if not sample['isData']:
             s.muonDataSet = False
             s.eleDataSet = False
+            s.METDataSet = False
             s.weight =xsec_branch*lumiScaleFactor*genWeight
             nTrueInt = t.GetLeaf('nTrueInt').GetValue()
             s.puReweight_true = PU_histo_63.GetBinContent(PU_histo_63.FindBin(nTrueInt))
@@ -364,7 +374,7 @@ for isample, sample in enumerate(allSamples):
           s.nLooseHardLeptons = len(looseHardLepInd)
           s.nTightSoftLeptons = len(tightSoftLepInd)
           s.nTightHardLeptons = len(tightHardLepInd)
-          vars = ['pt', 'eta', 'phi', 'miniRelIso','relIso03', 'pdgId', 'SPRING15_25ns_v1','eleCBID_SPRING15_25ns_ConvVetoDxyDz']
+          vars = ['pt', 'eta', 'phi', 'mass','charge','miniRelIso','relIso03', 'pdgId', 'SPRING15_25ns_v1','eleCBID_SPRING15_25ns_ConvVetoDxyDz']
           allLeptons = [getObjDict(t, 'LepGood_', vars, i) for i in looseLepInd]
           looseSoftLep = [getObjDict(t, 'LepGood_', vars, i) for i in looseSoftLepInd] 
           looseHardLep = [getObjDict(t, 'LepGood_', vars, i) for i in looseHardLepInd]
@@ -397,13 +407,28 @@ for isample, sample in enumerate(allSamples):
 
           j_list=['eta','pt','phi','btagCMVA', 'btagCSV', 'id', 'chHEF']
           jets = filter(lambda j:j['pt']>30 and abs(j['eta'])<2.4 and j['id'], get_cmg_jets_fromStruct(r,j_list))
-          lightJets,  bJetsCSV = splitListOfObjects('btagCSV', 0.800, jets)
+          lightJets,  bJetsCSV = splitListOfObjects('btagCSV', 0.8484, jets)
           s.htJet30j = sum([x['pt'] for x in jets])
           s.nJet30 = len(jets)
           s.nBJetMediumCSV30 = len(bJetsCSV)
           #s.mt2w = mt2w.mt2w(met = {'pt':r.met_pt, 'phi':r.met_phi}, l={'pt':s.leptonPt, 'phi':s.leptonPhi, 'eta':s.leptonEta}, ljets=lightJets, bjets=bJetsCSV)
           s.deltaPhi_Wl = acos((s.leptonPt+r.met_pt*cos(s.leptonPhi-r.met_phi))/sqrt(s.leptonPt**2+r.met_pt**2+2*r.met_pt*s.leptonPt*cos(s.leptonPhi-r.met_phi))) 
-
+          s.iso_had  = 999        
+          s.iso_pt   = 999
+          s.iso_MT2  = 999
+          s.iso_Veto = True
+          if s.nTightHardLeptons >=1 and r.nisoTrack>=1:
+            #print lumi_branch , evt_branch
+            #print "nLeptons:" , s.nTightHardLeptons
+            #print "!!!!!nisoTrack!!!!!1" , r.nisoTrack
+            #print "tight lepton pt: " , tightHardLep[0]["pt"] 
+            var_list = ['pt', 'eta', 'phi','charge','pdgId','mass']
+            tracks = get_cmg_isoTracks_fromStruct(r,var_list)
+            met_4vec = ROOT.TLorentzVector()
+            met_4vec.SetPtEtaPhiM(r.met_pt,r.met_eta,r.met_phi,r.met_mass)
+            get_mt2(s,r,tightHardLep,tracks,met_4vec)
+            #print "met pt :" , r.met_pt
+            #print s.iso_had , s.iso_pt , s.iso_MT2 , s.iso_Veto
 
           g_list=['eta','pt','phi','mass','charge', 'pdgId', 'motherId', 'grandmotherId' , 'status']
           genParts = get_cmg_genParts_fromStruct(r,g_list)

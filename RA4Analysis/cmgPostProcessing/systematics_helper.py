@@ -1,8 +1,9 @@
 from Workspace.RA4Analysis.cmgObjectSelection import cmgLooseLepIndices, splitIndList, get_cmg_jets_fromStruct, splitListOfObjects, cmgTightMuID, cmgTightEleID , get_cmg_genParts_fromStruct , get_cmg_JetsforMEt_fromStruct
+from Workspace.HEPHYPythonTools.helpers import *
 from btagEfficiency import *
 from math import *
 
-def calc_btag_systematics(t,s,r,mcEffDict,sampleKey,maxConsideredBTagWeight,separateBTagWeights, model=''):
+def calc_btag_systematics(t,s,r,mcEffDict,sampleKey,maxConsideredBTagWeight,separateBTagWeights, model='', weightName="weightBTag"):
   #separateBTagWeights = False
   zeroTagWeight = 1.
   #print "yes2"
@@ -17,43 +18,43 @@ def calc_btag_systematics(t,s,r,mcEffDict,sampleKey,maxConsideredBTagWeight,sepa
   mceffW_SF_light_Up    = getTagWeightDict(mceff["mceffs_SF_light_Up"], maxConsideredBTagWeight)
   mceffW_SF_light_Down  = getTagWeightDict(mceff["mceffs_SF_light_Down"], maxConsideredBTagWeight)
   if not separateBTagWeights:
-    lweight = str(s.weight)
-  else: lweight = "(1.)"
+    lweight = s.weight
+  else: lweight = 1.
   #if not separateBTagWeights:
   for i in range(1, maxConsideredBTagWeight+2):
-    exec("s.weightBTag"+str(i)+"p="+lweight)
-    exec("s.weightBTag"+str(i)+"p_SF="+lweight)
-    exec("s.weightBTag"+str(i)+"p_SF_b_Up="+lweight)
-    exec("s.weightBTag"+str(i)+"p_SF_b_Down="+lweight)
-    exec("s.weightBTag"+str(i)+"p_SF_light_Up="+lweight)
-    exec("s.weightBTag"+str(i)+"p_SF_light_Down="+lweight)
+    setattr(s, weightName+str(i)+'p', lweight)
+    setattr(s, weightName+str(i)+'p_SF', lweight)
+    setattr(s, weightName+str(i)+'p_SF_b_Up', lweight)
+    setattr(s, weightName+str(i)+'p_SF_b_Down', lweight)
+    setattr(s, weightName+str(i)+'p_SF_light_Up', lweight)
+    setattr(s, weightName+str(i)+'p_SF_light_Down', lweight)
   for i in range(maxConsideredBTagWeight+1):
-    exec("s.weightBTag"+str(i)+"="              +str(mceffW[i])+'*'+lweight)
-    exec("s.weightBTag"+str(i)+"_SF="           +str(mceffW_SF[i])+'*'+lweight)
-    exec("s.weightBTag"+str(i)+"_SF_b_Up="      +str(mceffW_SF_b_Up[i])+'*'+lweight)
-    exec("s.weightBTag"+str(i)+"_SF_b_Down="    +str(mceffW_SF_b_Down[i])+'*'+lweight)
-    exec("s.weightBTag"+str(i)+"_SF_light_Up="  +str(mceffW_SF_light_Up[i])+'*'+lweight)
-    exec("s.weightBTag"+str(i)+"_SF_light_Down="+str(mceffW_SF_light_Down[i])+'*'+lweight)
+    setattr(s, weightName+str(i),                  mceffW[i]*lweight)
+    setattr(s, weightName+str(i)+"_SF",            mceffW_SF[i]*lweight)
+    setattr(s, weightName+str(i)+"_SF_b_Up",       mceffW_SF_b_Up[i]*lweight)
+    setattr(s, weightName+str(i)+"_SF_b_Down",     mceffW_SF_b_Down[i]*lweight)
+    setattr(s, weightName+str(i)+"_SF_light_Up",   mceffW_SF_light_Up[i]*lweight)
+    setattr(s, weightName+str(i)+"_SF_light_Down", mceffW_SF_light_Down[i]*lweight)
     for j in range(i+1, maxConsideredBTagWeight+2):
-      exec("s.weightBTag"+str(j)+"p               -="+str(mceffW[i])+'*'+lweight) #prob. for >=j b-tagged jets
-      exec("s.weightBTag"+str(j)+"p_SF            -="+str(mceffW_SF[i])+'*'+lweight)
-      exec("s.weightBTag"+str(j)+"p_SF_b_Up       -="+str(mceffW_SF_b_Up[i])+'*'+lweight)
-      exec("s.weightBTag"+str(j)+"p_SF_b_Down     -="+str(mceffW_SF_b_Down[i])+'*'+lweight)
-      exec("s.weightBTag"+str(j)+"p_SF_light_Up   -="+str(mceffW_SF_light_Up[i])+'*'+lweight)
-      exec("s.weightBTag"+str(j)+"p_SF_light_Down -="+str(mceffW_SF_light_Down[i])+'*'+lweight)
+      setattr(s, weightName+str(j)+"p",               getattr(s, weightName+str(j)+"p")               - mceffW[i]*lweight) #prob. for >=j b-tagged jets
+      setattr(s, weightName+str(j)+"p_SF",            getattr(s, weightName+str(j)+"p_SF")            - mceffW_SF[i]*lweight)
+      setattr(s, weightName+str(j)+"p_SF_b_Up",       getattr(s, weightName+str(j)+"p_SF_b_Up")       - mceffW_SF_b_Up[i]*lweight)
+      setattr(s, weightName+str(j)+"p_SF_b_Down",     getattr(s, weightName+str(j)+"p_SF_b_Down")     - mceffW_SF_b_Down[i]*lweight)
+      setattr(s, weightName+str(j)+"p_SF_light_Up",   getattr(s, weightName+str(j)+"p_SF_light_Up")   - mceffW_SF_light_Up[i]*lweight)
+      setattr(s, weightName+str(j)+"p_SF_light_Down", getattr(s, weightName+str(j)+"p_SF_light_Down") - mceffW_SF_light_Down[i]*lweight)
   for i in range (int(r.nJet)+1, maxConsideredBTagWeight+1):
-    exec("s.weightBTag"+str(i)+"               = 0.")
-    exec("s.weightBTag"+str(i)+"_SF            = 0.")
-    exec("s.weightBTag"+str(i)+"_SF_b_Up       = 0.")
-    exec("s.weightBTag"+str(i)+"_SF_b_Down     = 0.")
-    exec("s.weightBTag"+str(i)+"_SF_light_Up   = 0.")
-    exec("s.weightBTag"+str(i)+"_SF_light_Down = 0.")
-    exec("s.weightBTag"+str(i)+"p              = 0.")
-    exec("s.weightBTag"+str(i)+"p_SF           = 0.")
-    exec("s.weightBTag"+str(i)+"p_SF_b_Up      = 0.")
-    exec("s.weightBTag"+str(i)+"p_SF_b_Down    = 0.")
-    exec("s.weightBTag"+str(i)+"p_SF_light_Up  = 0.")
-    exec("s.weightBTag"+str(i)+"p_SF_light_Down= 0.")
+    setattr(s, weightName+str(i),                   0.)
+    setattr(s, weightName+str(i)+"_SF",             0.)
+    setattr(s, weightName+str(i)+"_SF_b_Up",        0.)
+    setattr(s, weightName+str(i)+"_SF_b_Down",      0.)
+    setattr(s, weightName+str(i)+"_SF_light_Up",    0.)
+    setattr(s, weightName+str(i)+"_SF_light_Down",  0.)
+    setattr(s, weightName+str(i)+"p",               0.)
+    setattr(s, weightName+str(i)+"p_SF",            0.)
+    setattr(s, weightName+str(i)+"p_SF_b_Up",       0.)
+    setattr(s, weightName+str(i)+"p_SF_b_Down",     0.)
+    setattr(s, weightName+str(i)+"p_SF_light_Up",   0.)
+    setattr(s, weightName+str(i)+"p_SF_light_Down", 0.)
   return
 
 def calc_LeptonScale_factors_and_systematics(s,histos_LS):
@@ -346,7 +347,8 @@ def fill_branch_WithJEC(s,r):
 
 def getISRWeight(s,genParts):
   #print "ISR old  yes !!!"
-  genGluino = filter(lambda g:abs(g['pdgId'])==1000021, genParts)
+  #genGluino = filter(lambda g:abs(g['pdgId'])==1000021, genParts)
+  genGluino = [genPart for genPart in genParts if abs(genPart['pdgId'])==1000021]
   s.ngenGluino = len(genGluino)
   if s.ngenGluino == 2:
     genGluino1_vec = ROOT.TLorentzVector() 
@@ -367,12 +369,12 @@ def getISRWeight_new(s,nisrJets):
   #if not nisrJets==0: print nisrJets
   weight_dict = {
                 0:{"weight":1    ,"sys":1,"stat":1},\
-                1:{"weight":0.882,"sys":0.059,"stat":0.014},\
-                2:{"weight":0.792,"sys":0.104,"stat":0.020},\
-                3:{"weight":0.702,"sys":0.149,"stat":0.031},\
-                4:{"weight":0.648,"sys":0.176,"stat":0.051},\
-                5:{"weight":0.601,"sys":0.199,"stat":0.088},\
-                6:{"weight":0.515,"sys":0.242,"stat":0.133}
+                1:{"weight":0.920,"sys":0.040,"stat":0.005},\
+                2:{"weight":0.821,"sys":0.090,"stat":0.006},\
+                3:{"weight":0.715,"sys":0.143,"stat":0.009},\
+                4:{"weight":0.662,"sys":0.169,"stat":0.016},\
+                5:{"weight":0.561,"sys":0.219,"stat":0.027},\
+                6:{"weight":0.511,"sys":0.244,"stat":0.041}
                 }
   if nisrJets < 6:
       s.weight_ISR_new        =   weight_dict[nisrJets]["weight"]

@@ -69,6 +69,15 @@ singleTop       = {'name':'singleTop', 'chain':getChain(singleTop_lep,histname='
 QCD             = {'name':'QCD', 'chain':getChain(QCDHT,histname=''), 'color':color('QCD'), 'niceName':'QCD multijet', 'cut':''}
 TTV             = {'name':'TTV', 'chain':getChain(TTV,histname=''), 'color':color('TTV'), 'niceName':'t#bar{t}W', 'cut':''}
 diBoson         = {'name':'diBoson', 'chain':getChain(diBoson,histname=''), 'color':ROOT.kRed+2, 'niceName':'WW/WZ/ZZ', 'cut':''}
+diBosonHad      = {'name':'diBoson', 'chain':getChain(diBosonHad,histname=''), 'color':ROOT.kRed-4, 'niceName':'VV 0l', 'cut':''}
+dBWZLNuQQ       = {'name':'diBoson', 'chain':getChain(WZToLNuQQ,histname=''), 'color':ROOT.kRed+2, 'niceName':'WZ lnuqq', 'cut':''}
+dBWWLNuQQ_ext   = {'name':'diBoson', 'chain':getChain(WWToLNuQQ_ext,histname=''), 'color':ROOT.kRed+4, 'niceName':'WW lnuqq', 'cut':''}
+diBosonSemiLep  = {'name':'diBoson', 'chain':getChain([WWToLNuQQ_ext,WZToLNuQQ],histname=''), 'color':ROOT.kRed+2, 'niceName':'WW/WZ 1l 2q', 'cut':''}
+diBosonDiLep    = {'name':'diBoson', 'chain':getChain(diBosonDiLep,histname=''), 'color':ROOT.kRed-9, 'niceName':'VV 2l', 'cut':''}
+diBoson1L3Nu    = {'name':'diBoson', 'chain':getChain(WZTo1L3Nu,histname=''), 'color':ROOT.kMagenta+1, 'niceName':'WZ 1l 3nu', 'cut':''}
+
+#WZsemilep       = {'name':'diBoson', 'chain':getChain(WZsemilep,histname=''), 'color':ROOT.kYellow+1, 'niceName':'WZ 1l', 'cut':''}
+
 
 ##samples 2015
 #TTJets_combined = {'name':'TTJets', 'chain':getChain(TTJets_combined_2_antiSel,histname=''), 'color':color('TTJets')-2, 'niceName':'t#bar{t}+Jets', 'cut':''}
@@ -82,7 +91,7 @@ dummy = ROOT.TH1F('dummy','',*binning)
 dummy.SetLineColor(ROOT.kWhite)
 dummy.SetFillColor(ROOT.kWhite)
 
-samples = [TTJets_combined, WJETS, DY, singleTop, TTV, diBoson]
+samples = [TTJets_combined, WJETS, DY, singleTop, TTV, diBosonHad, diBosonSemiLep,diBosonDiLep,diBoson1L3Nu]
 for s in samples:
   s['hist'] = ROOT.TH1F(s['name'], s['name'], *binning)
   s['hist'].SetFillColor(s['color'])
@@ -115,9 +124,11 @@ for injb,njet in enumerate(sorted(signalRegions)):
         n,cut = nameAndCut(lt, ht, njet, btb=nbjet, presel=presel)
         #n,cut = nameAndCut(lt, ht, njet, btb=nbjet, presel=antiSelStr, charge="", btagVar = 'nBJetMediumCSV30', stVar = 'Lt', htVar = 'htJet30clean', njetVar='nJet30clean')
         y = getYieldFromChain(s['chain'], cut, weight_str)
-        if ht[0]>900: dPhiCut = 0.75
-        else: dPhiCut = 1.
-        yHDP = getYieldFromChain(s['chain'], cut+'&&deltaPhi_Wl>'+str(dPhiCut), weight_str)
+        dPhiCut = signalRegions[njet][lt][ht]['deltaPhi']
+#        if ht[0]>900: dPhiCut = 0.75
+#        else: dPhiCut = 1.
+        cut += '&&deltaPhi_Wl>'+str(dPhiCut)
+        yHDP = getYieldFromChain(s['chain'], cut, weight_str)
         if y<0: y = 0.
         total = total + y
         if yHDP<0: yHDP=0.
@@ -191,7 +202,7 @@ latex1.SetTextAlign(11)
 latex1.DrawLatex(0.16,0.96,'CMS #bf{#it{Simulation}}')
 latex1.DrawLatex(0.79,0.96,"MC (13TeV)")
 
-filestr = '/afs/hephy.at/user/d/dspitzbart/www/Spring16/composition/postICHEP/signalRegions_btagweight_newDiBoson'
+filestr = '/afs/hephy.at/user/d/dspitzbart/www/Spring16/composition/postICHEP/signalRegions_btagweight_newDiBoson_split_detail_4_oldST'
 
 can.Print(filestr+'.png')
 can.Print(filestr+'.pdf')

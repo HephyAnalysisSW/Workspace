@@ -2,74 +2,65 @@ import ROOT
 import pickle
 import os,sys
 from Workspace.HEPHYPythonTools.user import username
-#import Workspace.HEPHYPythonTools.xsec as xsec
+import Workspace.HEPHYPythonTools.xsec as xsec
 from Workspace.HEPHYPythonTools.helpers import getObjFromFile, getChain, getChunks, getCutYieldFromChain, getYieldFromChain
-#from Workspace.RA4Analysis.cmgTuples_Spring15_v2 import *
-#from Workspace.RA4Analysis.cmgTuples_Data25ns_0l import *
-#from Workspace.RA4Analysis.cmgTuples_Spring15 import *
-from cutFlow_helper import *
-#from localInfo import username
-#from Workspace.RA4Analysis.cmgTuples_data_25ns_fromArtur import *
-from Workspace.RA4Analysis.cmgTuples_Data25ns_PromtV2 import *
-#path = "/afs/hephy.at/user/e/easilar/www/data/Cut_Flow_metNoHF/"
-path = "/afs/hephy.at/user/e/easilar/www/data/Run2015D/2p3fb/"
+from Workspace.RA4Analysis.cmgTuples_Data25ns_Moriond2017_postprocessed import *
+from Workspace.RA4Analysis.cmgTuples_Spring16_Moriond2017_MiniAODv2_postProcessed import *
+#from Workspace.RA4Analysis.cmgTuples_Data25ns_Promtv2_postprocessed import *
+#from Workspace.RA4Analysis.cmgTuples_Spring16_MiniAODv2_postProcessed import *
+#from cutFlow_helper import *
+from Workspace.RA4Analysis.general_config import *
 
-
+path = "/afs/hephy.at/user/e/easilar/www/Moriond2017/cutFlows/"
 if not os.path.exists(path):
   os.makedirs(path)
 
-maxN = 1
-small = False
-if not small : maxN = -1
-print "maxN:" , maxN
+ICHEP = False
 
 lepSels = [
-{'cut':OneLep ,'veto':OneLep_lepveto,'label':'_lep_','str':'1 $lepton$', 'trigger': '((HLT_EleHT350)||(HLT_MuHT350))' },\
-{'cut':OneE ,  'veto':OneE_lepveto,  'label':'_ele_','str':'1 $e$', 'trigger': '((HLT_EleHT350)||(HLT_MuHT350))'},\
-{'cut':OneMu , 'veto':OneMu_lepveto, 'label':'_mu_', 'str':'1 $\\mu$' , 'trigger': '((HLT_EleHT350)||(HLT_MuHT350))'},\
+{'cut':'singleElectronic' , 'veto':'nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0',\
+ 'chain': getChain(single_mu,histname="",treeName="Events") ,\
+  'label':'_mu_', 'str':'1 $\\mu$' , 'trigger': trigger_or_mu , "trigger_xor": trigger_xor_mu},\
+{'cut':'singleElectronic' , 'veto':'nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0',\
+ 'chain': getChain(single_ele,histname="",treeName="Events") ,\
+  'label':'_ele_', 'str':'1 $\\e$' , 'trigger': trigger_or_ele , "trigger_xor": trigger_xor_ele},\
+{'cut':'singleElectronic' , 'veto':'nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0',\
+ 'chain': getChain(met,maxN=maxN,histname="",treeName="Events") ,\
+  'label':'_met_', 'str':'1 $lep from MET$' , 'trigger': trigger_or_met, 'trigger_xor': trigger_xor_met},\
+{'cut':'singleElectronic' , 'veto':'nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0',\
+ 'chain': getChain([single_ele,single_mu,met],maxN=maxN,histname="",treeName="Events") ,\
+  'label':'_lep_', 'str':'1 $lep$' , 'trigger': trigger, 'trigger_xor': trigger_xor}\
 ]
 
-samples=[
-#{"sample":"data_mu" ,   "list":SingleMuon_Run2015D_v4 , "tex":"Single_Muon","color":ROOT.kBlack},\
-{"sample":"data_ele",   "list":SingleElectron_Run2015D_v4  , "tex":"Single_Electron", "color":ROOT.kBlack},\
-]
+#lepSels = [lepSels[2]]
 
-for s in samples:
-  print "SLIST: " , s['list']
-  s['chunk'] , s['norm']  = getChunks(s['list'],maxN=maxN)
-  print s['chunk']
-  print s['norm']  
-  ###chunks.append(s['list'])
-  ###print chunks
-#data = getChain([chunks[0][0][0],chunks[1][0][0]],maxN=maxN,histname="",treeName="tree")
-data = getChain(samples[1]['chunk']+samples[0]['chunk'],maxN=maxN,histname="",treeName="tree")
-###data = getChain(samples[0]['chunk'],maxN=maxN,histname="",treeName="tree")
-print data.GetEntries()
+if ICHEP: ofile = file(path+'cut_flow_'+lepSel['label']+'_ICHEP_onlyWJets.tex','w')
+else: ofile = file(path+'cut_flow_Electron_split_data_.tex','w')
+doc_header = '\\documentclass{article}\\usepackage[english]{babel}\\usepackage{graphicx}\\usepackage[margin=0.5in]{geometry}\\begin{document}'
+ofile.write(doc_header)
+
 for lepSel in lepSels:
   cuts = [
-    {'cut':'(1)', 'label':'no cut'},\
-    #{'cut':"&&".join([ht_cut]), 'label':'$H_T >$ 500 GeV'},\
-    {'cut':"&&".join([lepSel['cut']]), 'label': lepSel['str']},\
-    {'cut':"&&".join([lepSel['cut'],lepSel['veto']]), 'label': lepSel['str']+"_veto" },\
-    #{'cut':"&&".join([lepSel['cut'],lepSel['veto'],lep_hard]), 'label': lepSel['str']+"_hard"},\
-    {'cut':"&&".join([lepSel['cut'],lepSel['veto'],lep_hard,"((HLT_EleHT350)||(HLT_MuHT350))"]), 'label': 'Trigger'},\
-    {'cut':"&&".join([lepSel['cut'],lepSel['veto'],lep_hard,"((HLT_EleHT350)||(HLT_MuHT350))",njets_30+">=5"]), 'label': 'nJet $\\geq$ 5'},\
-    {'cut':"&&".join([lepSel['cut'],lepSel['veto'],lep_hard,"((HLT_EleHT350)||(HLT_MuHT350))",njets_30+">=5",jets_2_80]), 'label': '2. jets ($\\geq$ 80 GeV)'},\
-    {'cut':"&&".join([lepSel['cut'],lepSel['veto'],lep_hard,"((HLT_EleHT350)||(HLT_MuHT350))",njets_30+">=5",jets_2_80,ht_cut]), 'label': '$H_T >$ 500 GeV'},\
-    {'cut':"&&".join([lepSel['cut'],lepSel['veto'],lep_hard,"((HLT_EleHT350)||(HLT_MuHT350))",njets_30+">=5",jets_2_80,ht_cut,jets_2_80,st]), 'label': '$L_T >$ 250 GeV'},\
-    {'cut':"&&".join([lepSel['cut'],lepSel['veto'],lep_hard,"((HLT_EleHT350)||(HLT_MuHT350))",njets_30+">=5",jets_2_80,ht_cut,jets_2_80,st,filters]), 'label': 'filters'},\
-    {'cut':"&&".join([lepSel['cut'],lepSel['veto'],lep_hard,"((HLT_EleHT350)||(HLT_MuHT350))",njets_30+">=5",jets_2_80,ht_cut,jets_2_80,st,filters,nbjets_30_cut_zero,jets_2_80]), 'label': '0 b-jets (CSVv2)'},\
-    {'cut':"&&".join([lepSel['cut'],lepSel['veto'],lep_hard,"((HLT_EleHT350)||(HLT_MuHT350))",njets_30+">=5",jets_2_80,ht_cut,jets_2_80,st,filters,nbjets_30_cut_multi,jets_2_80]), 'label': '$>=1 b-jets (CSVv2)$'},\
-  ]
-  ofile = file(path+'cut_flow_'+lepSel['label']+'data_2p25_.tex','w')
-  doc_header = '\\documentclass{article}\\usepackage[english]{babel}\\usepackage{graphicx}\\usepackage[margin=0.5in]{geometry}\\begin{document}'
-  ofile.write(doc_header)
+  #{'cut':"&&".join(['(1)']), 'label':'no cut'},\
+  #{'cut':"&&".join([lepSel['cut']]), 'label': lepSel['str']},\
+  #{'cut':"&&".join([lepSel['cut'],lepSel['veto']]), 'label': lepSel['str']+' veto'},\
+  #{'cut':"&&".join([lepSel['cut'],lepSel['veto'],lepSel["trigger_xor"]]), 'label': 'trigger xor'},\
+  #{'cut':"&&".join([lepSel['cut'],lepSel['veto'],lepSel["trigger_xor"],filters]), 'label': 'filters'},\
+  #{'cut':"&&".join([lepSel['cut'],lepSel['veto'],lepSel["trigger_xor"],filters,"iso_Veto"]), 'label': 'iso Veto' },\
+  #{'cut':"&&".join([lepSel['cut'],lepSel['veto'],lepSel["trigger_xor"],filters,"iso_Veto","nJet30>=5"]), 'label': 'nJet $\\geq$ 5'},\
+  #{'cut':"&&".join([lepSel['cut'],lepSel['veto'],lepSel["trigger_xor"],filters,"iso_Veto","nJet30>=5","(Jet_pt[1]>80)","(Jet_pt[1]>80)"]), 'label': '2. jets ($\\geq$ 80 GeV)'},\
+  #{'cut':"&&".join([lepSel['cut'],lepSel['veto'],lepSel["trigger_xor"],filters,"iso_Veto","nJet30>=5","(Jet_pt[1]>80)","(Jet_pt[1]>80)","htJet30j>500"]), 'label':'$H_T >$ 500 GeV'},\
+  #{'cut':"&&".join([lepSel['cut'],lepSel['veto'],lepSel["trigger_xor"],filters,"iso_Veto","nJet30>=5","(Jet_pt[1]>80)","htJet30j>500","st>250","(Jet_pt[1]>80)"]), 'label':'$L_T >$ 250 GeV'},\
+  #{'cut':"&&".join([lepSel['cut'],lepSel['veto'],lepSel["trigger_xor"],filters,"iso_Veto","nJet30>=5","(Jet_pt[1]>80)","htJet30j>500","st>250","nBJetMediumCSV30>=0","iso_Veto","(Jet_pt[1]>80)"]), 'label': '0 b-jets (CSVM)' },\
+  {'cut':"&&".join([lepSel['cut'],lepSel['veto'],lepSel["trigger_xor"],filters,"iso_Veto","nJet30>=5","(Jet_pt[1]>80)","htJet30j>500","st>250","nBJetMediumCSV30>=0","deltaPhi_Wl<0.5","(Jet_pt[1]>80)"]), 'label': '\\Delta\\Phi < 0.5' },\
+  #{'cut':"&&".join([lepSel['cut'],lepSel['veto'],"nJet30>=5","(Jet_pt[1]>80)","htJet30j>500","st>250","nBJetMediumCSV30>=1","nJet30>=6","(Jet_pt[1]>80)"]), 'label': 'multi b-jets (CSVM) nJet >=6' },\
+  #{'cut':"&&".join([lepSel['cut'],lepSel['veto'],"nJet30>=5","(Jet_pt[1]>80)","htJet30j>500","st>250","nBJetMediumCSV30>=1","nJet30>=6","(Jet_pt[1]>80)","deltaPhi_Wl>1"]), 'label': '\\Delta\\Phi >1' },\
+   ]
   ofile.write("\n")
-  table_header = '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{c | c | c | c | c | c | c | c | c | c}'
+  table_header = '\\begin{table}[ht]\\begin{center}\\resizebox{\\textwidth}{!}{\\begin{tabular}{c | c | c | c | c | c | c | c | c | c | c | c | c | c}'
   ofile.write(table_header)
   ofile.write("\n")
-  #for s in samples:
-  line = '&' + s['tex'] 
+  line = '& data all'
   ofile.write(line)
   ofile.write("\n")
   line_end = '\\\ \\hline'
@@ -79,20 +70,10 @@ for lepSel in lepSels:
     print cut['label']
     print cut['cut']
     ofile.write(cut['label'])
-    #for s in samples:
-    tot_yields = 0
-    #for b in s['list']:
-    #print b
-    #chunk = getChunks(b, treeName="treeProducerSusySingleLepton",maxN=maxN)
-    nEntry = data.GetEntries()
-    #nEntry = chunk[1]
-    print nEntry 
-    #weight = lumi*xsec.xsec[b['dbsName']]/nEntry
-    y_remain = data.GetEntries(cut['cut'])
-    #y_remain = getYieldFromChain(data,cutString = cut['cut'],weight = "(1)")
-    tot_yields += y_remain
-    print tot_yields
-    line_yield = '&' + str(format(tot_yields, '.1f'))
+    d_chain = lepSel["chain"] 
+    y_remain = d_chain.GetEntries(cut['cut']) 
+    print  y_remain
+    line_yield = '&' + str(format(y_remain , '.1f'))
     ofile.write(line_yield)
     ofile.write('\\\\')
     ofile.write('\n')
@@ -100,7 +81,8 @@ for lepSel in lepSels:
   table_end = '\end{tabular}}\end{center}\caption{CutFlow}\label{tab:CutFlow}\end{table}'
   ofile.write(table_end)
   ofile.write("\n")
-  doc_end = '\\end{document}'
-  ofile.write(doc_end)
-  ofile.close()
-  print "Written", ofile.name
+doc_end = '\\end{document}'
+ofile.write(doc_end)
+ofile.close()
+print "Written", ofile.name
+

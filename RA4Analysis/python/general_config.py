@@ -3,8 +3,8 @@ import ROOT
 ##General
 
 sample_lumi = 3000##pb
-lumi = 12880 #2300##pb
-lumi_label = 12.88
+lumi = 36500 #2300##pb
+lumi_label = 36
 scale = '(1)'
 btagVarString = 'nBJetMediumCSV30'
 
@@ -12,7 +12,16 @@ btagVarString = 'nBJetMediumCSV30'
 
 #filters = "(Flag_goodVertices && Flag_HBHENoiseFilter_fix && Flag_eeBadScFilter && Flag_HBHENoiseIsoFilter)" # && veto_evt_list)"
 filters = "(Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_goodVertices && Flag_eeBadScFilter &&  Flag_globalTightHalo2016Filter && Flag_badChargedHadronFilter && Flag_badMuonFilter)"
-trigger = "((HLT_EleHT350||HLT_EleHT400||HLT_Ele105)||(HLT_MuHT350||HLT_MuHT400))"
+#trigger = "((HLT_EleHT350||HLT_EleHT400||HLT_Ele105)||(HLT_MuHT350||HLT_MuHT400))"
+trigger_or_ele = "(HLT_Ele105||HLT_Ele115||HLT_Ele50PFJet165||HLT_IsoEle27T||HLT_EleHT400||HLT_EleHT350)"
+trigger_or_mu = "(HLT_Mu50||HLT_IsoMu24||HLT_MuHT400||HLT_MuHT350)"
+trigger_or_lep = "%s||%s"%(trigger_or_ele,trigger_or_mu)
+trigger_or_met = "(HLT_MET100MHT100||HLT_MET110MHT110||HLT_MET120MHT120)"
+trigger = "((%s||%s||%s))"%(trigger_or_ele,trigger_or_mu,trigger_or_met)
+trigger_xor_ele = "((eleDataSet&&%s))"%(trigger_or_ele)
+trigger_xor_mu = "((muonDataSet&&%s&&!(%s)))"%(trigger_or_mu,trigger_or_ele)
+trigger_xor_met = "((METDataSet&&%s&&!(%s)&&!(%s)) )"%(trigger_or_met,trigger_or_ele,trigger_or_mu)
+trigger_xor = "(%s||%s||%s)"%(trigger_xor_ele,trigger_xor_mu,trigger_xor_met)
 
 ##Common for Background and Signal
 #trigger_scale = '((singleElectronic&&0.963)||(singleMuonic&&0.926))'
@@ -27,9 +36,11 @@ bkg_filters = "(Flag_badChargedHadronFilter && Flag_badMuonFilter)"
 #lepton_Scale  = 'lepton_muSF_HIP*lepton_muSF_mediumID*lepton_muSF_miniIso02*lepton_muSF_sip3d*lepton_eleSF_cutbasedID*lepton_eleSF_miniIso01*lepton_eleSF_gsf'
 lepton_Scale  = 'leptonSF'
 topPt         = 'TopPtWeight'
+top_ISR_weight = 'weight_ISR_new' ##use with a normalisation constant
 PU            = 'puReweight_true_max4'
 #weight_str_plot = '*'.join([reweight,topPt,trigger_scale,PU])
-weight_str_plot = '*'.join([trigger_scale,lepton_Scale,topPt,PU,reweight])
+#weight_str_plot = '*'.join([trigger_scale,lepton_Scale,topPt,PU,reweight])
+weight_str_plot = '*'.join([reweight,topPt])
 #weight_str_CV   = '*'.join([trigger_scale,lepton_Scale,topPt,reweight])
 weight_str_CV   = reweight
 
@@ -37,11 +48,12 @@ weight_str_CV   = reweight
 lepton_Scale_signal_fast = 'reweightLeptonFastSimSF'
 ISR_weight = 'weight_ISR_new' ##use with a normalisation constant
 lepton_Scale_signal  = 'lepton_muSF_HIP*lepton_muSF_mediumID*lepton_muSF_miniIso02*lepton_muSF_sip3d*lepton_eleSF_cutbasedID*lepton_eleSF_miniIso01*lepton_eleSF_gsf'
-weight_str_signal_plot = '*'.join([trigger_scale,lepton_Scale_signal_fast,lepton_Scale_signal,PU,ISR_weight,reweight])
+#weight_str_signal_plot = '*'.join([trigger_scale,lepton_Scale_signal_fast,lepton_Scale_signal,PU,ISR_weight,reweight])
+weight_str_signal_plot = reweight
 weight_str_signal_CV = '*'.join([trigger_scale,lepton_Scale_signal,reweight])
 
 
-def Draw_CMS_header(lumi_label=12.88):
+def Draw_CMS_header(lumi_label=36):
    tex = ROOT.TLatex()
    tex.SetNDC()
    tex.SetTextAlign(31)
