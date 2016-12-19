@@ -24,14 +24,15 @@ lepSels = [
 {'cut':'singleElectronic&&(!isData||(isData&&eleDataSet))' , 'veto':'nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0',\
  'chain': getChain(single_ele,histname="",treeName="Events") ,\
   'label':'_ele_', 'str':'1 $\\e$' , 'trigger': trigger_or_ele , "trigger_xor": trigger_xor_ele},\
-#{'cut':'((!isData&&singleLeptonic)||(isData&&((eleDataSet&&singleElectronic)||(muonDataSet&&singleMuonic)||(METDataSet&&singleLeptonic))))' , 'veto':'nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0',\
-# 'chain': getChain([single_ele,single_mu,met],maxN=maxN,histname="",treeName="Events") ,\
-#  'label':'_lep_', 'str':'1 $lep$' , 'trigger': trigger}\
 {'cut':'singleLeptonic&&(!isData||(isData&&METDataSet))' , 'veto':'nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0',\
  'chain': getChain(met,maxN=maxN,histname="",treeName="Events") ,\
-  'label':'_met_', 'str':'1 $lep from MET$' , 'trigger': trigger_or_met, 'trigger_xor': trigger_xor_met}\
+  'label':'_met_', 'str':'1 $lep from MET$' , 'trigger': trigger_or_met, 'trigger_xor': trigger_xor_met},\
+{'cut':'((!isData&&singleLeptonic)||(isData&&((eleDataSet&&singleElectronic)||(muonDataSet&&singleMuonic)||(METDataSet&&singleLeptonic))))' , 'veto':'nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0',\
+ 'chain': getChain([single_ele,single_mu,met],maxN=maxN,histname="",treeName="Events") ,\
+  'label':'_lep_', 'str':'1 $lep$' , 'trigger': trigger, 'trigger_xor': trigger_xor_met}\
 ]
 
+lepSels = [lepSels[3]]
 
 for lepSel in lepSels:
   cuts = [

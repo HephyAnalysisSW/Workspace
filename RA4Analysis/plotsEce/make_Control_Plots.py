@@ -13,16 +13,16 @@ from Workspace.RA4Analysis.general_config import *
 from math import *
 
 all_MB = False
-presel = True
+presel = False
 SB_w   = False 
 SB_tt  = False
-presel_1b = False
+presel_1b = True
 test = False
 unblind = False
 draw_signal = True
 blind = True
-add_cut = ["(1)","no_isoVeto"]
-#add_cut = ["(iso_Veto)","_isoVeto"]
+#add_cut = ["(1)","no_isoVeto"]
+add_cut = ["(iso_Veto)","_isoVeto"]
 #add_cut = "(1)"
 
 from optparse import OptionParser
@@ -47,7 +47,6 @@ if all_MB :
   nbtag = (0,0)
   signal_suffix = ""
 if presel : 
-  #blind = False
   SR = {(5,-1):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
   #btag_weight = "(weightBTag0_SF)"
   btag_weight = "(1)"
@@ -89,7 +88,10 @@ lepSels = [
   'label':'_ele_', 'str':'1 $\\e$' , 'trigger': trigger},\
 {'cut':'((!isData&&singleLeptonic)||(isData&&((eleDataSet&&singleElectronic)||(muonDataSet&&singleMuonic))))' , 'veto':'nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0',\
  'chain': getChain([single_ele,single_mu],histname="",treeName="Events") ,\
-  'label':'_lep_', 'str':'1 $lep$' , 'trigger': trigger}\
+  'label':'_lep_', 'str':'1 $lep$' , 'trigger': trigger},\
+{'cut':'((!isData&&singleLeptonic)||(isData&&((eleDataSet&&singleElectronic)||(muonDataSet&&singleMuonic)||(METDataSet&&singleLeptonic))))' , 'veto':'nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0',\
+ 'chain': getChain([single_ele,single_mu,met],maxN=maxN,histname="",treeName="Events") ,\
+  'label':'_lep_', 'str':'1 $lep$' , 'trigger': trigger, 'trigger_xor': trigger_xor_met}\
 ]
 
 ngenTau = "Sum$(abs(genTau_grandmotherId)==6&&abs(genTau_motherId)==24)"
@@ -102,8 +104,8 @@ bkg_samples=[
 {"sample":"singleTop",      "weight":btag_weight ,"cut":nbtag ,"add_Cut":"(1)","name":singleTop_lep,"tex":"t/#bar{t}",'color': ROOT.kViolet+5},
 {"sample":"QCD",            "weight":"(1)"       ,"cut":nbtag ,"add_Cut":"(1)","name":QCDHT, "tex":"QCD","color":ROOT.kCyan-6},
 {"sample":"WJets",          "weight":btag_weight ,"cut":nbtag ,"add_Cut":"(1)","name":WJetsHTToLNu,"tex":"W + jets","color":ROOT.kGreen-2},
-{"sample":"ttJets_diLep",   "weight":btag_weight ,"cut":nbtag ,"add_Cut":"(Sum$(abs(genTau_grandmotherId)==6&&abs(genTau_motherId)==24)+Sum$(abs(genLep_grandmotherId)==6&&abs(genLep_motherId)==24)==2)","name":TTJets_Comb, "tex":"t#bar{t} ll + jets",'color':ROOT.kBlue},
-{"sample":"ttJets_semiLep", "weight":btag_weight ,"cut":nbtag ,"add_Cut":"(Sum$(abs(genTau_grandmotherId)==6&&abs(genTau_motherId)==24)+Sum$(abs(genLep_grandmotherId)==6&&abs(genLep_motherId)==24)<2)","name":TTJets_Comb, "tex":"t#bar{t} l + jets",'color':ROOT.kBlue-7}
+{"sample":"ttJets_diLep",   "weight":btag_weight ,"cut":nbtag ,"add_Cut":"(Sum$(abs(genTau_grandmotherId)==6&&abs(genTau_motherId)==24)+Sum$(abs(genLep_grandmotherId)==6&&abs(genLep_motherId)==24)==2)","name":TTJets_diLep, "tex":"t#bar{t} ll + jets",'color':ROOT.kBlue},
+{"sample":"ttJets_semiLep", "weight":btag_weight ,"cut":nbtag ,"add_Cut":"(Sum$(abs(genTau_grandmotherId)==6&&abs(genTau_motherId)==24)+Sum$(abs(genLep_grandmotherId)==6&&abs(genLep_motherId)==24)<2)","name":TTJets_semiLep, "tex":"t#bar{t} l + jets",'color':ROOT.kBlue-7}
 ]
 
 for bkg in bkg_samples:
@@ -155,12 +157,12 @@ if not draw_signal :
   signals = []
 
 plots = [plots[iplot]]
-lepSels = [lepSels[2]]
+lepSels = [lepSels[3]]
 if unblind : 
   reweight      = '(weight*12900)/3000'
   lepSels[0]["chain"] = getChain([single_ele_unblind,single_mu_unblind],histname="",treeName="Events")
-  weight_str_plot = reweight
-  weight_str_signal_plot = reweight
+  #weight_str_plot = reweight
+  #weight_str_signal_plot = reweight
 
 for lepSel in lepSels:
   path = "/afs/hephy.at/user/e/easilar/www/Moriond2017/plots/"+lepSel['label']+add_cut[1]
@@ -170,7 +172,7 @@ for lepSel in lepSels:
   print "====== "
   presel = "&&".join([lepSel['cut'],lepSel['veto'],"Jet_pt[1]>80&&abs(LepGood_eta[0])<2.4",bkg_filters,add_cut[0]])
   sig_presel = "&&".join([lepSel['cut'],lepSel['veto'],"Jet_pt[1]>80&&abs(LepGood_eta[0])<2.4",add_cut[0]]) #"flag_crazy_jets"
-  data_presel = "&&".join([lepSel['cut'],lepSel['veto'],lepSel['trigger'],filters,"Jet_pt[1]>80&&abs(LepGood_eta[0])<2.4",add_cut[0]])
+  data_presel = "&&".join([lepSel['cut'],lepSel['veto'],lepSel['trigger'],lepSel['trigger_xor'],filters,"Jet_pt[1]>80&&abs(LepGood_eta[0])<2.4",add_cut[0]])
   print presel
   bin = {}
   for srNJet in sorted(SR):
