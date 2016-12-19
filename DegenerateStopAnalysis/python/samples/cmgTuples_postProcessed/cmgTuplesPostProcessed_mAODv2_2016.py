@@ -474,39 +474,47 @@ class cmgTuplesPostProcessed():
             setattr(self, s, sm)
 
 
-        signal_mass_dicts = {
-                                'SMS_T2tt_mStop_%s_mLSP_%s'          :  {'pkl':'SMS_T2tt_dM_10to80_genHT_160_genMET_80_mass_dict.pkl'     ,'sampleId':1 , 'shortName':'t2ttold%s_%s'       , 'niceName':'T2tt_mStop_%s_mLSP_%s_mWMin5'},
-                                'SMS_T2bW_X05_mStop_%s_mLSP_%s_mWMin0p1' :  {'pkl':'SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1_mass_dict.pkl' ,'sampleId':2 , 'shortName':'t2bw%s_%s'       , 'niceName':'T2bW_mStop_%s_mLSP_%s'},
-                                'SMS_T2tt_mStop_%s_mLSP_%s_mWMin0p1' :  {'pkl':'SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1_mass_dict.pkl'               ,'sampleId':3 , 'shortName':'t2tt%s_%s'    , 'niceName':'T2tt_mStop_%s_mLSP_%s'},             
-
+        signals_info = {
+                             "SMS_T2tt_dM_10to80_genHT_160_genMET_80"                 :    { 'mass_template':  'SMS_T2tt_mStop_%s_mLSP_%s'              , 'pkl':'SMS_T2tt_dM_10to80_genHT_160_genMET_80_mass_dict.pkl'               ,'scanId':1 , 'shortName':'t2ttold%s_%s'       , 'niceName':'T2tt_mStop_%s_mLSP_%s_mWMin5'},
+                             "SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1"   :    { 'mass_template':  'SMS_T2bW_X05_mStop_%s_mLSP_%s_mWMin0p1' , 'pkl':'SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1_mass_dict.pkl' ,'scanId':2 , 'shortName':'t2bw%s_%s'       , 'niceName':'T2bW_mStop_%s_mLSP_%s'},
+                             "SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1"       :    { 'mass_template':  'SMS_T2tt_mStop_%s_mLSP_%s_mWMin0p1'     , 'pkl':'SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1_mass_dict.pkl'     ,'scanId':3 , 'shortName':'t2tt%s_%s'    , 'niceName':'T2tt_mStop_%s_mLSP_%s'},             
                             }
-        self.signals_info = signal_mass_dicts
+  
+        self.signals_info = signals_info
 
-        for signal_name, signal_info in signal_mass_dicts.items():
-            sampleId              = signal_info['sampleId']
-            signal_mass_dict      = signal_info['pkl']
-            mass_dict_pickle_file = os.path.join(signal_path, signal_mass_dict)
+        for signal_name, signal_info in signals_info.items():
+            mass_template            = signal_info['mass_template']
+            scanId                   = signal_info['scanId']
+            signal_mass_dict         = signal_info['pkl']
+            mass_dict_pickle_file    = os.path.join(signal_path, signal_mass_dict)
+            signal_info['mass_dict'] = mass_dict_pickle_file 
 
             if os.path.isfile(mass_dict_pickle_file):
                 mass_dict_pickle = mass_dict_pickle_file
                 mass_dict        = pickle.load(open(mass_dict_pickle,"r"))
             else:
                 print "!!!!! WARNING !!!!! NO MASS DICT FOUND! %s"%mass_dict_pickle_file
+                print "!!!!! If no other fix available, enable useProxyMassDict and set mass_dict_pickle by hand !"
                 mass_dict_pickle = None
                 mass_dict        = {}
-            self.mass_dict = mass_dict
+
+                useProxyMassDict = False
+                if useProxyMassDict:
+                    mass_dict_pickle = "/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/8012_mAODv2_v3/80X_postProcessing_v10/analysisHephy_13TeV_2016_v0/step1/RunIISpring16MiniAODv2_v3/SMS_T2tt_dM_10to80_genHT_160_genMET_80_mass_dict.pkl"
+                    mass_dict        = pickle.load(open(mass_dict_pickle,"r"))
+                    print "!!!!!!!!!!! DOUBLE WARNING! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! USING PROXY MASS PICKLE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
              
             mass_scan = {}
 
             for mstop in mass_dict:
                 for mlsp in mass_dict[mstop]:
                     #mass_point = "SMS_T2tt_mStop_%s_mLSP_%s" % (mstop, mlsp)
-                    mass_point = signal_name % (mstop, mlsp)
+                    mass_point = mass_template % (mstop, mlsp)
                     mass_scan[mass_point] = {
                         "name" : mass_point,
                         "bins": [mass_point],
                         'dir' : self.signal_path,
-                        'sampleId': "%s%s" % (mstop, mlsp)
+                        'sampleId': "%s%s%s" % (scanId, mstop, mlsp)
                         }
 
 
