@@ -71,7 +71,7 @@ all_analysis["StopandSbottom"]['16-016-T2bb']  = {'max'  : {'050': [1050, 'SUS-1
 all_analysis["StopandSbottom"]['16-015-T2bb']  = {'max'  : {'050': [1030, 'SUS-16-015', 13, lumi]}, 'min': {}, 'decay': T2bb,     'delta': {'050': [0, 'SUS-16-015', 13, lumi]},}
 
 #EW Gauginos
-all_analysis["EWKGauginos"]['empty']        = {'max'  : {'050': [0.0, ''           , 0 , 0   ]}, 'min': {}, 'decay': ''  ,     'delta': {'050': [0.0,''         , 0 , 0]}}
+#all_analysis["EWKGauginos"]['empty']        = {'max'  : {'050': [0.0, ''           , 0 , 0   ]}, 'min': {}, 'decay': ''  ,     'delta': {'050': [0.0,''         , 0 , 0]}}
 all_analysis["EWKGauginos"]['16-024-TChiChipmSlepL']       = {'max'  : {'050': [1000, 'SUS-16-024', 13, lumi]},'min': {}, 'decay': TChiChipmSlepL, 'delta': {'050': [0, 'SUS-16-024', 13, lumi] }}
 all_analysis["EWKGauginos"]['16-024-TChiChipmStauStau']    = {'max'  : {'050': [460, 'SUS-16-024', 13, lumi]}, 'min': {}, 'decay': TChiChipmStauStau, 'delta': {'050': [0, 'SUS-16-024', 13, lumi]}}
 all_analysis["EWKGauginos"]['16-024-TChiWZ']               = {'max'  : {'050': [375, 'SUS-16-024', 13, lumi]}, 'min': {}, 'decay': TChiWZ, 'delta': {'050': [0, 'SUS-16-024', 13, lumi]},}

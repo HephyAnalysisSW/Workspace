@@ -22,7 +22,9 @@ histo_xaxis_max = 2200
 line_color = ROOT.kBlue
 line_depence = 1.03
 path = "/afs/hephy.at/user/e/easilar/www/barplots/"
+filename='barplot_v2'
 #----------------------------#------------------------#----------------------#
+
 
 for analysis_group in all_analysis.keys():
   print "there are " , len([x for x in all_analysis[analysis_group].keys() if "-" in x]) , " analysis for " , all_analysis[analysis_group]["name_tex"]
@@ -91,6 +93,7 @@ latex_ana.SetLineWidth(2)
 latex_ana.Draw()
 pas_place = 0.2
 i = 0
+
 for analysis_group in all_analysis:
   name_tex = all_analysis[str(analysis_group)]["name_tex"]
   print "writing pas for :" , name_tex
@@ -100,6 +103,7 @@ for analysis_group in all_analysis:
     if not "name" in interp :
       latex_pas.DrawLatex(20,pas_place ,interp_dict["max"]["050"][1])
       if "empty" in interp :
+          print "empty from " , name_tex
           exec('line_'+str(i)+' = ROOT.TLine(-320,(i*line_depence)+0.5,histo_xaxis_max,(i*line_depence)+0.5)')
           exec('line_'+str(i)+'.SetLineColor(line_color)')
           exec('line_'+str(i)+'.SetLineStyle(7)')
@@ -146,7 +150,6 @@ tex6.Draw();
 if not os.path.exists(path):
     os.makedirs(path)
 
-filename='barplot_v1'
 c.Print(path+filename+".pdf")
 c.Print(path+filename+".C")
 c.Print(path+filename+".png")
