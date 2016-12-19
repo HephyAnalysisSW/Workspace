@@ -42,7 +42,7 @@ separateBTagWeights = True
 defSampleStr = "TTJets_LO_HT600to800_25ns"
 
 #subDir = "postProcessed_Spring16_antiSelection_3fb_v2"
-subDir = "postProcessed_Run2016_antiSelection_isoTrack_v6"
+subDir = "postProcessed_Spring16_antiSelection_isoTrack_v6"
 
 #branches to be kept for data and MC
 branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert",
@@ -86,8 +86,8 @@ assert options.leptonSelection in ['soft', 'hard', 'none', 'dilep'], "Unknown le
 skimCond = "(1)"
 ht500 = "Sum$(Jet_pt)>500"
 common_skim = 'HT500'
-if options.skim.startswith('met'):
-  skimCond = "met_pt>"+str(float(options.skim[3:]))
+#if options.skim.startswith('met'):
+#  skimCond = "met_pt>"+str(float(options.skim[3:]))
 if options.skim=='HT400':
   skimCond = "Sum$(Jet_pt)>400"
 if options.skim=='HT400ST200':   ##tuples have already ST200 skim
@@ -100,6 +100,14 @@ if options.skim=='LHEHTsm600':
   skimCond = "lheHTIncoming<=600&&"+ht500
 if options.skim=='LHEHTlg600':
   skimCond = "lheHTIncoming>600&&"+ht500
+
+####Data trigger skims########
+if options.skim=='eleDataSet':
+  skimCond = "(HLT_Ele105||HLT_Ele115||HLT_Ele50PFJet165||HLT_IsoEle27T||HLT_EleHT400||HLT_EleHT350)&&"+ht500
+if options.skim=='muDataSet':
+  skimCond = "(HLT_Mu50||HLT_IsoMu24||HLT_MuHT400||HLT_MuHT350)&&"+ht500
+if options.skim=='metDataSet':
+  skimCond = "(HLT_MET100MHT100||HLT_MET110MHT110||HLT_MET120MHT120)&&"+ht500
 
 
 ####dilep skim##
@@ -235,7 +243,7 @@ for isample, sample in enumerate(allSamples):
   newVariables = ['weight/F', 'muonDataSet/I', 'eleDataSet/I']#, 'veto_evt_list/I/1']
   aliases = [ "met:met_pt", "metPhi:met_phi"]
   if ("Muon" in sample['name']) or "Electron" in sample['name'] :
-    newVariables.extend(['HLT_MET110MHT110/I/0'])
+    newVariables.extend(['HLT_MET110MHT110/I/0','HLT_MET120MHT120/I/0'])
 
   readVectors = [\
     {'prefix':'LepGood', 'nMax':8, 'vars':['pt/F', 'eta/F', 'phi/F', 'pdgId/I', 'relIso03/F','SPRING15_25ns_v1/I','eleCBID_SPRING15_25ns/I', 'eleCBID_SPRING15_25ns_ConvVetoDxyDz/I', 'tightId/I', 'miniRelIso/F','mass/F','sip3d/F','mediumMuonId/I', 'ICHEPmediumMuonId/I', 'mvaIdSpring15/F','lostHits/I', 'convVeto/I', 'charge/I', 'hOverE/F']},

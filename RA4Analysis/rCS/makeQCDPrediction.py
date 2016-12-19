@@ -25,7 +25,7 @@ from Workspace.HEPHYPythonTools.user import username
 from LpTemplateFit import LpTemplateFit
 from rCShelpers import *
 
-isData = False
+isData = True
 makeFit = True
 getYields = True
 getResults = True
@@ -101,7 +101,7 @@ btreg = [(0,0), (1,1), (2,-1)] #1b and 2b estimates are needed for the btag fit
 
 
 lumi = 36.5
-sampleLumi = 3.0 #FIXME update!!
+sampleLumi = 1.0 #FIXME update!!
 muTriggerEff = '0.926'
 eleTriggerErr = '0.963'
 MCweight = 'TopPtWeight*puReweight_true_max4*'+eleTriggerErr#+'*lepton_muSF_HIP*lepton_muSF_mediumID*lepton_muSF_miniIso02*lepton_muSF_sip3d*lepton_eleSF_cutbasedID*lepton_eleSF_miniIso01*lepton_eleSF_gsf'
@@ -120,7 +120,18 @@ def getPseudoRCS(small,smallE,large,largeE):
     return {'rCS':float('nan'), 'rCSE_pred':float('nan'), 'rCSE_sim':float('nan')}
 
 #trigger and filters for real Data
-trigger = "&&((HLT_EleHT350||HLT_EleHT400||HLT_Ele105)||(HLT_MuHT350||HLT_MuHT400))"
+#trigger = "&&((HLT_EleHT350||HLT_EleHT400||HLT_Ele105)||(HLT_MuHT350||HLT_MuHT400))"
+
+trigger_or_ele = "(HLT_Ele105||HLT_Ele115||HLT_Ele50PFJet165||HLT_IsoEle27T||HLT_EleHT400||HLT_EleHT350)"
+trigger_or_mu = "(HLT_Mu50||HLT_IsoMu24||HLT_MuHT400||HLT_MuHT350)"
+trigger_or_lep = "%s||%s"%(trigger_or_ele,trigger_or_mu)
+trigger_or_met = "(HLT_MET100MHT100||HLT_MET110MHT110||HLT_MET120MHT120)"
+trigger = "(!isData||(%s||%s||%s))"%(trigger_or_ele,trigger_or_mu,trigger_or_met)
+trigger_xor_ele = "(!isData || (eleDataSet&&%s))"%(trigger_or_ele)
+trigger_xor_mu = "(!isData || (muonDataSet&&%s&&!(%s)))"%(trigger_or_mu,trigger_or_ele)
+trigger_xor_met = "(!isData || (METDataSet&&%s&&!(%s)&&!(%s)) )"%(trigger_or_met,trigger_or_ele,trigger_or_mu)
+trigger_xor = "&&(%s||%s||%s)"%(trigger_xor_ele,trigger_xor_mu,trigger_xor_met)
+
 filters = "&& (Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_goodVertices && Flag_eeBadScFilter &&  Flag_globalTightHalo2016Filter && Flag_badChargedHadronFilter && Flag_badMuonFilter)"
 
 #presel        = 'nLep==1&&nVeto==0&&leptonPt>25&&nEl==1&&Jet2_pt>80&& Flag_badChargedHadronFilter && Flag_badMuonFilter'
@@ -137,7 +148,7 @@ cQCD  = getChain(QCDHT_antiSel,histname='')
 cEWK  = getChain([WJetsHTToLNu_antiSel, TTJets_Comb_antiSel, singleTop_lep_antiSel, DY_HT_antiSel, TTV_antiSel],histname='')
 
 if isData:
-  cData = getChain([single_ele_Run2016B_antiSel, single_ele_Run2016C_antiSel, single_ele_Run2016D_antiSel],histname='')
+  cData = getChain([single_ele_antiSel,met_antiSel],histname='')
 else:
   cData = getChain([QCDHT_antiSel, WJetsHTToLNu_antiSel, TTJets_Comb_antiSel, singleTop_lep_antiSel, DY_HT_antiSel, TTV_antiSel] , histname='')
 
@@ -150,7 +161,7 @@ templateName, templateCut = nameAndCut((250,-1), (500,-1), (3,4), (0,0), presel=
 
 if makeFit:
   if isData:
-    cData.Draw('Lp>>template_QCD','('+templateCut+trigger+filters+')','goff')
+    cData.Draw('Lp>>template_QCD','('+templateCut+trigger_xor+filters+')','goff')
   else:
     cQCD.Draw('Lp>>template_QCD','('+weight_str+')*('+templateCut+')','goff')
 
@@ -195,10 +206,10 @@ if makeFit:
 
         #templateName, templateCut = nameAndCut(ltb, (500,-1), (3,4), (0,0), presel=SelStr, charge="", btagVar = 'nBJetMediumCSV30', stVar = 'Lt', htVar = 'htJet30clean', njetVar='nJet30clean')
         #if isData:
-        #  cData.Draw('Lp>>template_QCD','('+templateCut+trigger+filters+')','goff')
+        #  cData.Draw('Lp>>template_QCD','('+templateCut+trigger_xor+filters+')','goff')
         #else:
         #  cQCD.Draw('Lp>>template_QCD','('+weight_str+')*('+templateCut+')','goff')
-        #cData.Draw('Lp>>template_QCD','('+templateCut+trigger+filters+')','goff')
+        #cData.Draw('Lp>>template_QCD','('+templateCut+trigger_xor+filters+')','goff')
         
         print 'Drawing QCD'
         cQCD.Draw('Lp>>QCD_antiSelection','('+weight_str+')*('+antiSelCut+')')
@@ -208,26 +219,26 @@ if makeFit:
         cEWK.Draw('Lp>>EWK_Selection','('+weight_str+')*('+SelCut+')')
         if isData:
           print 'Drawing data'
-          cData.Draw('Lp>>DATA_antiSelection','('+antiSelCut+trigger+filters+')')
-          cData.Draw('Lp>>DATA_Selection','('+SelCut+trigger+filters+')')
+          cData.Draw('Lp>>DATA_antiSelection','('+antiSelCut+trigger_xor+filters+')')
+          cData.Draw('Lp>>DATA_Selection','('+SelCut+trigger_xor+filters+')')
         else:
           print 'Drawing pseudo data'
           cData.Draw('Lp>>DATA_antiSelection','('+weight_str+')*('+antiSelCut+')')
           cData.Draw('Lp>>DATA_Selection','('+weight_str+')*('+SelCut+')')
-  ##      cData.Draw('Lp>>DATA_antiSelection','('+antiSelCut+trigger+filters+')')
+  ##      cData.Draw('Lp>>DATA_antiSelection','('+antiSelCut+trigger_xor+filters+')')
   #      cData.Draw('Lp>>DATA_antiSelection','('+weight_str+')*('+antiSelCut+')')
-  ##      cData.Draw('Lp>>DATA_Selection','('+SelCut+trigger+filters+')')
+  ##      cData.Draw('Lp>>DATA_Selection','('+SelCut+trigger_xor+filters+')')
   #      cData.Draw('Lp>>DATA_Selection','('+weight_str+')*('+SelCut+')')
         
         print 'Getting Rcs'
         if isData:
-          rCSanti = getRCS(cData, antiSelCut+trigger+filters, deltaPhiCut, useWeight = False, weight = weight_str)
-          rCSsel = getRCS(cData, SelCut+trigger+filters, deltaPhiCut, useWeight = False, weight = weight_str)
+          rCSanti = getRCS(cData, antiSelCut+trigger_xor+filters, deltaPhiCut, useWeight = False, weight = weight_str)
+          rCSsel = getRCS(cData, SelCut+trigger_xor+filters, deltaPhiCut, useWeight = False, weight = weight_str)
         else:
           rCSanti = getRCS(cData, antiSelCut, deltaPhiCut, useWeight = True, weight = weight_str)
           rCSsel = getRCS(cData, SelCut, deltaPhiCut, useWeight = True, weight = weight_str)
-  ##      rCSanti = getRCS(cData, antiSelCut+trigger+filters, deltaPhiCut, useWeight = False, weight = weight_str)
-  ##      rCSsel = getRCS(cData, SelCut+trigger+filters, deltaPhiCut, useWeight = False, weight = weight_str)
+  ##      rCSanti = getRCS(cData, antiSelCut+trigger_xor+filters, deltaPhiCut, useWeight = False, weight = weight_str)
+  ##      rCSsel = getRCS(cData, SelCut+trigger_xor+filters, deltaPhiCut, useWeight = False, weight = weight_str)
   #      rCSanti = getRCS(cData, antiSelCut, deltaPhiCut, useWeight = True, weight = weight_str)
   #      rCSsel = getRCS(cData, SelCut, deltaPhiCut, useWeight = True, weight = weight_str)
   
@@ -402,15 +413,15 @@ if getYields:
               cEWK.Draw('Lp>>EWK_Selection','('+weight_str+')*('+SelCut+')')
 
             if isData:
-              cData.Draw('Lp>>DATA_antiSelection','('+antiSelCut+trigger+filters+')')
-              cData.Draw('Lp>>DATA_Selection','('+SelCut+trigger+filters+')')
+              cData.Draw('Lp>>DATA_antiSelection','('+antiSelCut+trigger_xor+filters+')')
+              cData.Draw('Lp>>DATA_Selection','('+SelCut+trigger_xor+filters+')')
             else:
               cData.Draw('Lp>>DATA_antiSelection','('+weight_str+')*('+antiSelCut+')')
               cData.Draw('Lp>>DATA_Selection','('+weight_str+')*('+SelCut+')')
   
             if isData:
-              rCSanti = getRCS(cData, antiSelCut+trigger+filters, deltaPhiCut, useWeight = False, weight = weight_str)
-              rCSsel = getRCS(cData, SelCut+trigger+filters, deltaPhiCut, useWeight = False, weight = weight_str)
+              rCSanti = getRCS(cData, antiSelCut+trigger_xor+filters, deltaPhiCut, useWeight = False, weight = weight_str)
+              rCSsel = getRCS(cData, SelCut+trigger_xor+filters, deltaPhiCut, useWeight = False, weight = weight_str)
             else:
               rCSanti = getRCS(cData, antiSelCut, deltaPhiCut, useWeight = True, weight = weight_str)
               rCSsel = getRCS(cData, SelCut, deltaPhiCut, useWeight = True, weight = weight_str)
