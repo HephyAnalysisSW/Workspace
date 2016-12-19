@@ -15,17 +15,18 @@ dos={
 
 #signal_name = "SMS_TChipmWW"
 signal_name = "SMS_TChiWZ_ZToLL"
-signal_name = "SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1"
-signal_name = "SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1"
 signal_name = "SMS_T2tt_dM_10to80_genHT_160_genMET_80"
+signal_name = "SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1"
+signal_name = "SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1"
 
 #getGenFilterEff = True
 
 #import Workspace.DegenerateStopAnalysis.samples.cmgTuples.RunIISpring16MiniAODv2_v3 as cmgTuples_v3
-import Workspace.DegenerateStopAnalysis.samples.cmgTuples.RunIISpring16MiniAODv2_v0 as cmgTuples
 
 import Workspace.DegenerateStopAnalysis.samples.cmgTuples.MC_8020_mAODv2_OldJetClean_v2 as cmgTuplesOldJetClean
 
+#import Workspace.DegenerateStopAnalysis.samples.cmgTuples.RunIISpring16MiniAODv2_v0 as cmgTuples
+import Workspace.DegenerateStopAnalysis.samples.cmgTuples.RunIISpring16MiniAODv2_v0_2 as cmgTuples
 
 #genFilterEff_file = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/filterEfficiency/T2tt_dM_10to80_genHT160_genMET80/filterEffs_genHT160_genMET80.pkl'
 genFilterEff_file = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/filterEfficiency/{sample}/filterEffs_{sample}.pkl'
@@ -33,28 +34,28 @@ genFilterEff_file = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/filte
 
 
 signals={
-            #'SMS_T2tt_dM_10to80_genHT_160_genMET_80':
-            #        {
-            #            'xsec'        : xsecSMS.stop13TeV_NLONLL,
-            #            'genFilterEff': genFilterEff_file,
-            #            'cmgTuple'    : cmgTuples,
-            #            'samples'     : [ cmgTuples.SMS_T2tt_dM_10to80_genHT_160_genMET_80 ] ,
-            #            'massVars'    : [
-            #                                {'var':'GenSusyMStop', 'name':'mstop'},
-            #                                {'var':'GenSusyMNeutralino', 'name':'mlsp'},
-            #                            ]
-            #        },
             'SMS_T2tt_dM_10to80_genHT_160_genMET_80':
                     {
                         'xsec'        : xsecSMS.stop13TeV_NLONLL,
                         'genFilterEff': genFilterEff_file,
-                        'cmgTuple'    : cmgTuplesOldJetClean,
-                        'samples'     : [ cmgTuplesOldJetClean.SMS_T2tt_dM_10to80_genHT_160_genMET_80 ] ,
+                        'cmgTuple'    : cmgTuples,
+                        'samples'     : [ cmgTuples.SMS_T2tt_dM_10to80_genHT_160_genMET_80 ] ,
                         'massVars'    : [
                                             {'var':'GenSusyMStop', 'name':'mstop'},
                                             {'var':'GenSusyMNeutralino', 'name':'mlsp'},
                                         ]
                     },
+            #'SMS_T2tt_dM_10to80_genHT_160_genMET_80':
+            #        {
+            #            'xsec'        : xsecSMS.stop13TeV_NLONLL,
+            #            'genFilterEff': genFilterEff_file,
+            #            'cmgTuple'    : cmgTuplesOldJetClean,
+            #            'samples'     : [ cmgTuplesOldJetClean.SMS_T2tt_dM_10to80_genHT_160_genMET_80 ] ,
+            #            'massVars'    : [
+            #                                {'var':'GenSusyMStop', 'name':'mstop'},
+            #                                {'var':'GenSusyMNeutralino', 'name':'mlsp'},
+            #                            ]
+            #        },
             'SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1':
                     {
                         'xsec'        : xsecSMS.stop13TeV_NLONLL,

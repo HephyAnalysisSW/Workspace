@@ -1,7 +1,32 @@
+import Workspace.DegenerateStopAnalysis.tools.degTools as degTools
 from Workspace.DegenerateStopAnalysis.tools.degTools import Plots
 #import Workspace.DegenerateStopAnalysis.tools.tracks as tracks
 from Workspace.DegenerateStopAnalysis.tools.degTools import getPlotFromChain
 import ROOT
+
+
+
+def compareBJets( tree, btag_var="nJet_bJet_def", btag_weight = "weightBTag%s_MC_def"):
+    unq = degTools.uniqueHash()
+    def_col = tree.GetLineColor()
+    tree.SetLineWidth(2)
+    tree.SetLineColor(ROOT.kBlue)
+    binning = (4,0,4)
+    btname = btag_var + "_"+unq
+    tree.Draw(btag_var+">>%s%s"%(btname, str(binning)))
+    tree.SetLineColor(def_col)
+    tree.SetLineWidth(1)
+    bwname = btag_weight.replace(r"%s","")+"_"+unq
+    tree.Draw("(0)>>%s%s"%(bwname, str(binning)), btag_weight%"0", "same")
+    tree.Draw("(1)>>+%s"%(bwname), btag_weight%"1", "same")
+    tree.Draw("(2)>>+%s"%(bwname), btag_weight%"2", "same")
+    tree.Draw("(3)>>+%s"%(bwname), btag_weight%"2p" + "-" + btag_weight%"2", "same" )
+    h1 = getattr(ROOT,btname)
+    h2 = getattr(ROOT,bwname)
+    return h1,h2
+
+
+
 
 class DegPlots():
 
