@@ -17,10 +17,10 @@ trigger_or_ele = "(HLT_Ele105||HLT_Ele115||HLT_Ele50PFJet165||HLT_IsoEle27T||HLT
 trigger_or_mu = "(HLT_Mu50||HLT_IsoMu24||HLT_MuHT400||HLT_MuHT350)"
 trigger_or_lep = "%s||%s"%(trigger_or_ele,trigger_or_mu)
 trigger_or_met = "(HLT_MET100MHT100||HLT_MET110MHT110||HLT_MET120MHT120)"
-trigger = "(!isData||(%s||%s||%s))"%(trigger_or_ele,trigger_or_mu,trigger_or_met)
-trigger_xor_ele = "(!isData || (eleDataSet&&%s))"%(trigger_or_ele)
-trigger_xor_mu = "(!isData || (muonDataSet&&%s&&!(%s)))"%(trigger_or_mu,trigger_or_ele)
-trigger_xor_met = "(!isData || (METDataSet&&%s&&!(%s)&&!(%s)) )"%(trigger_or_met,trigger_or_ele,trigger_or_mu)
+trigger = "((%s||%s||%s))"%(trigger_or_ele,trigger_or_mu,trigger_or_met)
+trigger_xor_ele = "((eleDataSet&&%s))"%(trigger_or_ele)
+trigger_xor_mu = "((muonDataSet&&%s&&!(%s)))"%(trigger_or_mu,trigger_or_ele)
+trigger_xor_met = "((METDataSet&&%s&&!(%s)&&!(%s)) )"%(trigger_or_met,trigger_or_ele,trigger_or_mu)
 trigger_xor = "(%s||%s||%s)"%(trigger_xor_ele,trigger_xor_mu,trigger_xor_met)
 
 ##Common for Background and Signal
@@ -36,6 +36,7 @@ bkg_filters = "(Flag_badChargedHadronFilter && Flag_badMuonFilter)"
 #lepton_Scale  = 'lepton_muSF_HIP*lepton_muSF_mediumID*lepton_muSF_miniIso02*lepton_muSF_sip3d*lepton_eleSF_cutbasedID*lepton_eleSF_miniIso01*lepton_eleSF_gsf'
 lepton_Scale  = 'leptonSF'
 topPt         = 'TopPtWeight'
+top_ISR_weight = 'weight_ISR_new' ##use with a normalisation constant
 PU            = 'puReweight_true_max4'
 #weight_str_plot = '*'.join([reweight,topPt,trigger_scale,PU])
 #weight_str_plot = '*'.join([trigger_scale,lepton_Scale,topPt,PU,reweight])
