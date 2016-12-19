@@ -100,8 +100,8 @@ QCDHT_antiSel_test = {\
 TTV_antiSel = {
 "name":"TTV",
 "bins":[
-#"TTWToLNu",
-#"TTWToQQ",
+"TTWToLNu",
+"TTWToQQ",
 "TTZToLLNuNu",
 "TTZToQQ",
 ],

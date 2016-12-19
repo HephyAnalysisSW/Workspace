@@ -42,7 +42,7 @@ separateBTagWeights = True
 defSampleStr = "TTJets_LO_HT600to800_25ns"
 
 #subDir = "postProcessed_Spring16_antiSelection_3fb_v2"
-subDir = "postProcessed_Spring16_antiSelection_isoTrack_v6"
+subDir = "postProcessed_Run2016_antiSelection_isoTrack_v7"
 
 #branches to be kept for data and MC
 branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert",
@@ -240,7 +240,7 @@ for isample, sample in enumerate(allSamples):
     branchKeepStrings = branchKeepStrings_DATAMC + branchKeepStrings_MC
   
   readVariables = ['met_pt/F', 'met_phi/F', 'met_eta/F', 'met_mass/F']
-  newVariables = ['weight/F', 'muonDataSet/I', 'eleDataSet/I']#, 'veto_evt_list/I/1']
+  newVariables = ['weight/F', 'muonDataSet/I', 'eleDataSet/I','METDataSet/I']#, 'veto_evt_list/I/1']
   aliases = [ "met:met_pt", "metPhi:met_phi"]
   if ("Muon" in sample['name']) or "Electron" in sample['name'] :
     newVariables.extend(['HLT_MET110MHT110/I/0','HLT_MET120MHT120/I/0'])

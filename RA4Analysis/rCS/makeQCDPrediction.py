@@ -17,7 +17,7 @@ from Workspace.RA4Analysis.signalRegions import *
 #from Workspace.RA4Analysis.cmgTuples_Data_25ns_postProcessed_antiSel import *
 
 from Workspace.RA4Analysis.cmgTuples_Spring16_Moriond2017_MiniAODv2_antiSel_postProcessed import *
-from Workspace.RA4Analysis.cmgTuples_Data25ns_Promtv2_antiSel_postprocessed import *
+from Workspace.RA4Analysis.cmgTuples_Data25ns_Moriond2017_antiSel_postprocessed import *
 
 #from draw_helpers import *
 from math import *
@@ -43,7 +43,7 @@ if isData:
 else:
   sampleStr = 'MC'
 
-SRstring = 'Moriond17SR'
+SRstring = 'Moriond17SR_v3'
 if isValidation: SRstring = '2016val_v2'
 lumiStr = '36p5fb'
 
@@ -101,7 +101,7 @@ btreg = [(0,0), (1,1), (2,-1)] #1b and 2b estimates are needed for the btag fit
 
 
 lumi = 36.5
-sampleLumi = 1.0 #FIXME update!!
+sampleLumi = 1.0
 muTriggerEff = '0.926'
 eleTriggerErr = '0.963'
 MCweight = 'TopPtWeight*puReweight_true_max4*'+eleTriggerErr#+'*lepton_muSF_HIP*lepton_muSF_mediumID*lepton_muSF_miniIso02*lepton_muSF_sip3d*lepton_eleSF_cutbasedID*lepton_eleSF_miniIso01*lepton_eleSF_gsf'
@@ -132,17 +132,14 @@ trigger_xor_mu = "(!isData || (muonDataSet&&%s&&!(%s)))"%(trigger_or_mu,trigger_
 trigger_xor_met = "(!isData || (METDataSet&&%s&&!(%s)&&!(%s)) )"%(trigger_or_met,trigger_or_ele,trigger_or_mu)
 trigger_xor = "&&(%s||%s||%s)"%(trigger_xor_ele,trigger_xor_mu,trigger_xor_met)
 
+#trigger_xor = '&&(%s)'%(trigger_xor_ele) #FIXME
+
 filters = "&& (Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_goodVertices && Flag_eeBadScFilter &&  Flag_globalTightHalo2016Filter && Flag_badChargedHadronFilter && Flag_badMuonFilter)"
 
 #presel        = 'nLep==1&&nVeto==0&&leptonPt>25&&nEl==1&&Jet2_pt>80&& Flag_badChargedHadronFilter && Flag_badMuonFilter'
 presel        = 'nLep==1&&nVeto==0&&leptonPt>25&&nEl==1&&Jet2_pt>80&& iso_Veto'
 antiSelStr    = presel + '&&Selected==(-1)'
 SelStr        = presel + '&&Selected==1'
-antiSelStrIso = antiSelStr + '&&iso_Veto==1'
-SelStrIso     = SelStr + '&&iso_Veto==1'
-
-#cQCD  = getChain(QCDHT_25ns,histname='')
-#cEWK  = getChain([WJetsHTToLNu_25ns, TTJets_combined_2, singleTop_25ns, DY_25ns, TTV_25ns],histname='')
 
 cQCD  = getChain(QCDHT_antiSel,histname='')
 cEWK  = getChain([WJetsHTToLNu_antiSel, TTJets_Comb_antiSel, singleTop_lep_antiSel, DY_HT_antiSel, TTV_antiSel],histname='')
@@ -155,7 +152,6 @@ else:
 #get template for fit method
 numberOfBins = 30
 template_QCD = ROOT.TH1F('template_QCD','template_QCD',numberOfBins,-0.5,2.5)
-#print '!!!!!!!!!!!!!!! using sel QCD as template now'
 print 'Creating template'
 templateName, templateCut = nameAndCut((250,-1), (500,-1), (3,4), (0,0), presel=antiSelStr, charge="", btagVar = 'nBJetMediumCSV30', stVar = 'Lt', htVar = 'htJet30clean', njetVar='nJet30clean') ##changed from anitsel for check!!!
 
