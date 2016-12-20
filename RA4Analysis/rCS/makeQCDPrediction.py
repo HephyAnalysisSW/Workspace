@@ -25,13 +25,13 @@ from Workspace.HEPHYPythonTools.user import username
 from LpTemplateFit import LpTemplateFit
 from rCShelpers import *
 
-isData = True
+isData = False
 makeFit = True
 getYields = True
 getResults = True
 isValidation = False
 
-includeMCresults = False
+includeMCresults = True
 
 readFit     = '/data/dspitzbart/Results2016/QCDEstimation/20160725_fitResult_2016SR_MC12p9fb'
 readYields  = '/data/dspitzbart/Results2016/QCDEstimation/20160725_QCDestimation_2016SR_MC12p9fb'
