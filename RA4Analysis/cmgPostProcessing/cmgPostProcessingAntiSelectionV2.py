@@ -42,7 +42,7 @@ separateBTagWeights = True
 defSampleStr = "TTJets_LO_HT600to800_25ns"
 
 #subDir = "postProcessed_Spring16_antiSelection_3fb_v2"
-subDir = "postProcessed_Run2016_antiSelection_isoTrack_v7"
+subDir = "postProcessed_Run2016_antiSelection_isoTrack_v8"
 
 #branches to be kept for data and MC
 branchKeepStrings_DATAMC = ["run", "lumi", "evt", "isData", "rho", "nVert",
@@ -342,14 +342,21 @@ for isample, sample in enumerate(allSamples):
           if "Muon" in sample['name']:
             s.muonDataSet = True
             s.eleDataSet = False
+            s.METDataSet = False
           if "Electron" in sample['name']:
             s.muonDataSet = False
             s.eleDataSet = True
+            s.METDataSet = False
+          if "MET" in sample['name']:
+            s.muonDataSet = False
+            s.eleDataSet = False
+            s.METDataSet = True
             
         #calculatedWeight = True
         if not sample['isData']:
           s.muonDataSet = False
           s.eleDataSet = False
+          s.METDataSet = False
           nTrueInt = t.GetLeaf('nTrueInt').GetValue()
           s.puReweight_true = PU_histo_63.GetBinContent(PU_histo_63.FindBin(nTrueInt))
           s.puReweight_true_max4 = min(4,s.puReweight_true)

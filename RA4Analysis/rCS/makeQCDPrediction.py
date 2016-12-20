@@ -26,16 +26,17 @@ from LpTemplateFit import LpTemplateFit
 from rCShelpers import *
 
 isData = False
-makeFit = True
-getYields = True
-getResults = True
+makeFit = False
+getYields = False
+getResults = False
 isValidation = False
 
-includeMCresults = True
+includeMCresults = False
 
-readFit     = '/data/dspitzbart/Results2016/QCDEstimation/20160725_fitResult_2016SR_MC12p9fb'
-readYields  = '/data/dspitzbart/Results2016/QCDEstimation/20160725_QCDestimation_2016SR_MC12p9fb'
-
+#readFit     = '/data/dspitzbart/Results2016/QCDEstimation/20160725_fitResult_2016SR_MC12p9fb'
+readFit     = '/afs/hephy.at/data/dspitzbart01/RA4/Moriond2017/QCDEstimation/20161220_fitResult_Moriond17SR_v3_MC36p5fb'
+#readYields  = '/data/dspitzbart/Results2016/QCDEstimation/20160725_QCDestimation_2016SR_MC12p9fb'
+readYields  = '/afs/hephy.at/data/dspitzbart01/RA4/Moriond2017/QCDEstimation/20161220_QCDestimation_Moriond17SR_v3_MC36p5fb'
 
 
 if isData:
@@ -126,13 +127,13 @@ trigger_or_ele = "(HLT_Ele105||HLT_Ele115||HLT_Ele50PFJet165||HLT_IsoEle27T||HLT
 trigger_or_mu = "(HLT_Mu50||HLT_IsoMu24||HLT_MuHT400||HLT_MuHT350)"
 trigger_or_lep = "%s||%s"%(trigger_or_ele,trigger_or_mu)
 trigger_or_met = "(HLT_MET100MHT100||HLT_MET110MHT110||HLT_MET120MHT120)"
-trigger = "(!isData||(%s||%s||%s))"%(trigger_or_ele,trigger_or_mu,trigger_or_met)
-trigger_xor_ele = "(!isData || (eleDataSet&&%s))"%(trigger_or_ele)
-trigger_xor_mu = "(!isData || (muonDataSet&&%s&&!(%s)))"%(trigger_or_mu,trigger_or_ele)
-trigger_xor_met = "(!isData || (METDataSet&&%s&&!(%s)&&!(%s)) )"%(trigger_or_met,trigger_or_ele,trigger_or_mu)
+trigger = "(%s||%s||%s)"%(trigger_or_ele,trigger_or_mu,trigger_or_met)
+trigger_xor_ele = "(eleDataSet&&%s)"%(trigger_or_ele)
+trigger_xor_mu = "(muonDataSet&&%s&&!(%s))"%(trigger_or_mu,trigger_or_ele)
+trigger_xor_met = "(METDataSet&&%s&&!(%s)&&!(%s))"%(trigger_or_met,trigger_or_ele,trigger_or_mu)
 trigger_xor = "&&(%s||%s||%s)"%(trigger_xor_ele,trigger_xor_mu,trigger_xor_met)
 
-#trigger_xor = '&&(%s)'%(trigger_xor_ele) #FIXME
+#trigger_xor = '&&(%s)'%(trigger_or_ele) #FIXME
 
 filters = "&& (Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_goodVertices && Flag_eeBadScFilter &&  Flag_globalTightHalo2016Filter && Flag_badChargedHadronFilter && Flag_badMuonFilter)"
 
@@ -145,7 +146,8 @@ cQCD  = getChain(QCDHT_antiSel,histname='')
 cEWK  = getChain([WJetsHTToLNu_antiSel, TTJets_Comb_antiSel, singleTop_lep_antiSel, DY_HT_antiSel, TTV_antiSel],histname='')
 
 if isData:
-  cData = getChain([single_ele_antiSel,met_antiSel],histname='')
+  cData = getChain([single_ele_antiSel,met_antiSel,single_mu_antiSel],histname='')
+  #cData = getChain([single_ele_antiSel],histname='')
 else:
   cData = getChain([QCDHT_antiSel, WJetsHTToLNu_antiSel, TTJets_Comb_antiSel, singleTop_lep_antiSel, DY_HT_antiSel, TTV_antiSel] , histname='')
 
@@ -526,7 +528,7 @@ for srNJet in sorted(signalRegion):
         for dP in sorted(signalRegion[srNJet][stb][htb]):
           deltaPhiCut = signalRegion[srNJet][stb][htb][dP]['deltaPhi']
           sys         = signalRegion[srNJet][stb][htb][dP]['sys']
-          print sys
+          #print sys
           Fsta        = fitRes[inclusiveTemplate.keys()[0]][stb][(500,-1)]['F_seltoantisel']
           Fsta_err    = fitRes[inclusiveTemplate.keys()[0]][stb][(500,-1)]['F_seltoantisel_err']
           Nanti       = bins[srNJet][stb][htb][btb][dP]['NDATAAntiSel']
@@ -549,9 +551,10 @@ for srNJet in sorted(signalRegion):
             #print NQCD_err, NQCD, NQCD_truth, NQCD
             #NQCD_err_rel  = max([NQCD_err/NQCD, abs(1-NQCD_truth/NQCD)])
             #NQCD_err_rel  = max([NQCD_err/NQCD, sys])
-            NQCD_err_rel  = 1.
-            print round(NQCD_err_rel,3)
-            NQCD_err      = NQCD_err_rel*NQCD
+            #NQCD_err_rel  = 1.
+            NQCD_err_rel  = NQCD_err/NQCD
+            print round(NQCD_err,3)
+            #NQCD_err      = NQCD_err_rel*NQCD
           try: NQCD_lowDPhi = NQCD/(RcsAnti+1)
           except ZeroDivisionError: NQCD_lowDPhi = float('nan') 
           try: NQCD_lowDPhi_err = NQCD_lowDPhi*sqrt((NQCD_err/NQCD)**2 + (RcsAnti_err/(RcsAnti+1))**2)
@@ -559,5 +562,5 @@ for srNJet in sorted(signalRegion):
           NQCD_highDPhi = NQCD - NQCD_lowDPhi
           NQCD_highDPhi_err = sqrt(RcsAnti_err**2*NQCD_lowDPhi**2 + RcsAnti**2*NQCD_lowDPhi_err**2)
           bins[srNJet][stb][htb][btb][dP].update({'NQCDpred':NQCD, 'NQCDpred_err':NQCD_err, 'NQCDpred_err_rel':NQCD_err_rel, 'NQCDpred_lowdPhi':NQCD_lowDPhi, 'NQCDpred_lowdPhi_err':NQCD_lowDPhi_err, 'NQCDpred_highdPhi':NQCD_highDPhi, 'NQCDpred_highdPhi_err':NQCD_highDPhi_err})
-          pickle.dump(bins, file(picklePath+picklePresel+'_100p','w'))
+          pickle.dump(bins, file(picklePath+picklePresel+'_orig','w'))
 
