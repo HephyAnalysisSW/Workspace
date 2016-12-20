@@ -36,7 +36,7 @@ except IOError:
   print 'Unable to load MC efficiency file!'
   mcEffDict = False
 
-debug = True
+debug = False
 
 target_lumi = 3000 #pb-1
 
@@ -49,7 +49,7 @@ separateBTagWeights = True
 
 defSampleStr = "TTJets_LO"
 
-subDir = "postProcessing_Data_Moriond2017_v7_Trigskimmed"
+subDir = "postProcessing_Data_Moriond2017_v9_Trigskimmed_METTest"
 #subDir = "postProcessing_MC_Spring16_Moriond2017_v6"
 #subDir = "deleteme"
 
@@ -94,13 +94,12 @@ parser.add_option("--useXSecFile", dest="readXsecFromFile", default = False, act
 (options, args) = parser.parse_args()
 skimCond = "(1)"
 htLtSkim = "Sum$(Jet_pt)>500&&(LepGood_pt[0]+met_pt)>250"
-#common_skim = "HT500LT250Skim"
 common_skim = "HT350"
 if options.for_dilep :
   htLtSkim = "(1)"
   common_skim = "skim"
-if options.skim.startswith('met'):
-  skimCond = "met_pt>"+str(float(options.skim[3:]))
+#if options.skim.startswith('met'):
+#  skimCond = "met_pt>"+str(float(options.skim[3:]))
 if options.skim=='HT350':
   skimCond = "Sum$(Jet_pt)>350"
 if options.skim=='HT400ST200':  
@@ -426,7 +425,7 @@ for isample, sample in enumerate(allSamples):
         tightHardLepInd = filter(lambda i:(abs(r.LepGood_pdgId[i])==11 and cmgTightEleID(r,i)) \
                                        or (abs(r.LepGood_pdgId[i])==13 and cmgTightMuID(r,i)), looseHardLepInd)  
 
-
+        if debug : print s.nLooseSoftLeptons
         s.nLooseSoftLeptons = len(looseSoftLepInd)
         s.nLooseHardLeptons = len(looseHardLepInd)
         s.nTightSoftLeptons = len(tightSoftLepInd)
