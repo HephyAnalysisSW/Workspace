@@ -111,7 +111,7 @@ for srNJet in sorted(sideBand3fb):
                          {'chain':cDiboson,   'cut':cut1bCRtt, 'weight':weight_str+'*weightBTag1p_SF'},\
                           ]
 
-      ttJets_samples_0b =[{'chain':cTTJets,     'cut':cut1bCRtt,'weight':weight_str+'*weightBTag0_SF*'+top_ISR_weight}]
+      ttJets_samples_0b =[{'chain':cTTJets,     'cut':cut1bCRtt,'weight':weight_str+'*weightBTag0_SF*'+top_ISR_weight+"*1.071"}]
       #rcs1bCRewk = getRCS(cEWK, cut1bCRtt, dPhiCut, weight_str+"*"+"weightBTag1_SF")
       rcs1bCRewk = combineRCS(ewk_samples_1b, dPhiCut)
       #rcs2bCRewk = getRCS(cEWK, cut2bCRtt, dPhiCut, weight_str+"*"+"weightBTag1p_SF")
