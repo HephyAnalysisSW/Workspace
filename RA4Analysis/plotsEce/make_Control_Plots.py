@@ -13,14 +13,15 @@ from Workspace.RA4Analysis.general_config import *
 from math import *
 
 all_MB = False
-presel = True
+presel = False
 SB_w   = False 
-SB_tt  = True
-presel_1b = False
+SB_tt  = False
+new_SB_tt  = False
+presel_1b = True
 test = False
 unblind = False
 draw_signal = True
-blind = False
+blind = True
 #add_cut = ["(1)","no_isoVeto"]
 add_cut = ["(iso_Veto)","_isoVeto"]
 #add_cut = "(1)"
@@ -69,6 +70,11 @@ if SB_tt :
   SR = {(4,5):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
   btag_weight = "(weightBTag1_SF)"
   nbtag = (1,1)
+  signal_suffix = ""
+if new_SB_tt : 
+  SR = {(4,5):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
+  btag_weight = "(weightBTag1p_SF)"
+  nbtag = (1,-1)
   signal_suffix = ""
 if test :
   SR = {(6,7):{(450,-1):{(500,1000):{"deltaPhi":1}}}}
