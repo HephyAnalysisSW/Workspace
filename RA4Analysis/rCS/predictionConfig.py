@@ -50,7 +50,7 @@ cTTV        = getChain(TTV,histname='')
 cDiBoson    = getChain(diBoson, histname='')
 cDiboson_rest = getChain(diBoson_rest,histname='')
 cDiboson_1l = getChain(diBoson_1L1Nu2Q,histname='')
-cRest       = getChain([singleTop_lep, DY_HT, TTV],histname='')#no QCD
+cRest       = getChain([singleTop_lep, DY_HT, TTV,diBoson_rest],histname='')#no QCD
 cBkg        = getChain([WJetsHTToLNu, TTJets_Comb, singleTop_lep, DY_HT, TTV], histname='')#no QCD
 cQCD        = getChain(QCDHT,histname='')
 
