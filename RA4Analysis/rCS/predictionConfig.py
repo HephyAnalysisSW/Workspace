@@ -18,9 +18,9 @@ dPhiStr = 'deltaPhi_Wl'
 bjreg = (0,0)
 
 nBTagVar              = 'nBJetMediumCSV30'
-useBTagWeights        = True
+useBTagWeights        = False
 btagWeightSuffix      = '_SF'
-templateWeights       = True
+templateWeights       = False
 templateWeightSuffix  = '_SF'
 
 QCDup       = False
@@ -81,7 +81,7 @@ if validation:
   regStr = 'validation_4j_altWSB'
 else:
   #signalRegions = signalRegions2016
-  signalRegions = signalRegions_Moriond2017
+  ##signalRegions = signalRegions_Moriond2017
   regStr = 'SR_Moriond2017_v1'
   #regStr = 'SR2016_v2'
 

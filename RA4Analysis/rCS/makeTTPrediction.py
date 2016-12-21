@@ -77,8 +77,8 @@ def makeTTPrediction(bins, samples, htb, stb, srNJet, presel, presel_MC, dPhiCut
     
 
   # get MC truth values for W and ttbar
-  yTT_crNJet_1b_lowDPhi_truth     = getYieldFromChain(cTTJets, cutString = rCS_crLowNJet_Cut+'&&'+dPhiStr+'<'+str(dPhiCut),weight=weight_str_1bMC, returnError = True)
-  yTT_crNJet_1b_highDPhi_truth    = getYieldFromChain(cTTJets, cutString = rCS_crLowNJet_Cut+'&&'+dPhiStr+'>'+str(dPhiCut),weight=weight_str_1bMC, returnError = True)
+  yTT_crNJet_1b_lowDPhi_truth     = getYieldFromChain(cTTJets, cutString = rCS_crLowNJet_Cut+'&&'+dPhiStr+'<'+str(dPhiCut),weight=weight_str_1bMC+"*"+ttJetsweight, returnError = True)
+  yTT_crNJet_1b_highDPhi_truth    = getYieldFromChain(cTTJets, cutString = rCS_crLowNJet_Cut+'&&'+dPhiStr+'>'+str(dPhiCut),weight=weight_str_1bMC+"*"+ttJetsweight, returnError = True)
   yW_crNJet_1b_lowDPhi_truth      = getYieldFromChain(cWJets, cutString = rCS_crLowNJet_Cut+'&&'+dPhiStr+'<'+str(dPhiCut),weight=weight_str_1bMC, returnError = True)
   yW_crNJet_1b_highDPhi_truth     = getYieldFromChain(cWJets, cutString = rCS_crLowNJet_Cut+'&&'+dPhiStr+'>'+str(dPhiCut),weight=weight_str_1bMC, returnError = True)
   yRest_crNJet_1b_lowDPhi_truth   = getYieldFromChain(cRest, cutString = rCS_crLowNJet_Cut+'&&'+dPhiStr+'<'+str(dPhiCut),weight=weight_str_1bMC, returnError = True)
@@ -136,8 +136,8 @@ def makeTTPrediction(bins, samples, htb, stb, srNJet, presel, presel_MC, dPhiCut
 
   else:
     if useQCDestimation:
-      yTT_crNJet_1b_lowDPhi     = getYieldFromChain(cTTJets, cutString = rCS_crLowNJet_Cut+'&&'+dPhiStr+'<'+str(dPhiCut),weight=weight_str_1b, returnError = True)
-      yTT_crNJet_1b_highDPhi    = getYieldFromChain(cTTJets, cutString = rCS_crLowNJet_Cut+'&&'+dPhiStr+'>'+str(dPhiCut),weight=weight_str_1b, returnError = True)
+      yTT_crNJet_1b_lowDPhi     = getYieldFromChain(cTTJets, cutString = rCS_crLowNJet_Cut+'&&'+dPhiStr+'<'+str(dPhiCut),weight=weight_str_1b+"*"+ttJetsweight, returnError = True)
+      yTT_crNJet_1b_highDPhi    = getYieldFromChain(cTTJets, cutString = rCS_crLowNJet_Cut+'&&'+dPhiStr+'>'+str(dPhiCut),weight=weight_str_1b+"*"+ttJetsweight, returnError = True)
       yW_crNJet_1b_lowDPhi      = getYieldFromChain(cWJets, cutString = rCS_crLowNJet_Cut+'&&'+dPhiStr+'<'+str(dPhiCut),weight=weight_str_1b, returnError = True)
       yW_crNJet_1b_highDPhi     = getYieldFromChain(cWJets, cutString = rCS_crLowNJet_Cut+'&&'+dPhiStr+'>'+str(dPhiCut),weight=weight_str_1b, returnError = True)
       yRest_crNJet_1b_lowDPhi   = getYieldFromChain(cRest, cutString = rCS_crLowNJet_Cut+'&&'+dPhiStr+'<'+str(dPhiCut),weight=weight_str_1b, returnError = True)
@@ -156,10 +156,10 @@ def makeTTPrediction(bins, samples, htb, stb, srNJet, presel, presel_MC, dPhiCut
     else:    
       rCS_crLowNJet_1b = getRCS(cBkg, rCS_crLowNJet_Cut, dPhiCut, weight = weight_str_1b, returnValues=True)
 
-  rCS_crLowNJet_1b_onlyTT = getRCS(cTTJets, rCS_crLowNJet_Cut,  dPhiCut, weight = weight_str_1bMC)
-  rCS_crLowNJet_0b_onlyTT = getRCS(cTTJets, rCS_crLowNJet_Cut,  dPhiCut, weight = weight_str_0bMC)
-  rCS_srNJet_0b_onlyTT    = getRCS(cTTJets, rCS_sr_Cut,  dPhiCut, weight = weight_str_0bMC)
-  rCS_srNJet_1b_onlyTT    = getRCS(cTTJets, rCS_sr_Cut,  dPhiCut, weight = weight_str_1bMC)
+  rCS_crLowNJet_1b_onlyTT = getRCS(cTTJets, rCS_crLowNJet_Cut,  dPhiCut, weight = weight_str_1bMC+"*"+ttJetsweight)
+  rCS_crLowNJet_0b_onlyTT = getRCS(cTTJets, rCS_crLowNJet_Cut,  dPhiCut, weight = weight_str_0bMC+"*"+ttJetsweight)
+  rCS_srNJet_0b_onlyTT    = getRCS(cTTJets, rCS_sr_Cut,  dPhiCut, weight = weight_str_0bMC+"*"+ttJetsweight)
+  rCS_srNJet_1b_onlyTT    = getRCS(cTTJets, rCS_sr_Cut,  dPhiCut, weight = weight_str_1bMC+"*"+ttJetsweight)
 
   rd['yTT_srNJet_0b_lowDPhi']     = yTT_srNJet_0b_lowDPhi
   rd['yTT_Var_srNJet_0b_lowDPhi'] = yTT_Var_srNJet_0b_lowDPhi
@@ -185,8 +185,8 @@ def makeTTPrediction(bins, samples, htb, stb, srNJet, presel, presel_MC, dPhiCut
   rd['rCS_srNJet_1b_onlyTT']    = rCS_srNJet_1b_onlyTT
 
   #true yields measured from MC samples
-  truth_TT, truth_TT_var = getYieldFromChain(cTTJets, rCS_sr_Cut+"&&"+dPhiStr+">"+str(dPhiCut), weight = weight_str_0bMC, returnVar=True)
-  truth_TT_CR, truth_TT_CR_var = getYieldFromChain(cTTJets, rCS_sr_Cut+"&&"+dPhiStr+"<"+str(dPhiCut), weight = weight_str_0bMC, returnVar=True)
+  truth_TT, truth_TT_var = getYieldFromChain(cTTJets, rCS_sr_Cut+"&&"+dPhiStr+">"+str(dPhiCut), weight = weight_str_0bMC+"*"+ttJetsweight, returnVar=True)
+  truth_TT_CR, truth_TT_CR_var = getYieldFromChain(cTTJets, rCS_sr_Cut+"&&"+dPhiStr+"<"+str(dPhiCut), weight = weight_str_0bMC+"*"+ttJetsweight, returnVar=True)
   rd['yTT_srNJet_0b_lowDPhi_truth'] = truth_TT_CR
   rd['yTT_Var_srNJet_0b_lowDPhi_truth'] = truth_TT_CR_var
 #  truth_TT_var    = getYieldFromChain(cTTJets, rCS_sr_Cut_0b+"&&"+dPhiStr+">"+str(dPhiCut), weight = weight_err_str)

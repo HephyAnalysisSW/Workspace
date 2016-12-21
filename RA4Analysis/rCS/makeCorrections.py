@@ -102,20 +102,29 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
         #get njet hist
         ttJetsNJetH = ROOT.TH1F('ttJetsNJetH','',*njetFullBinning)
         cname0bNJet, cut0bNJet = nameAndCut(stb,htb,(3,-1), btb=(0,-1) ,presel=presel_MC)
-        cTTJets.Draw('nJet30>>ttJetsNJetH',weight_str+'*weightBTag0*('+cut0bNJet+')')
+        cTTJets.Draw('nJet30>>ttJetsNJetH',weight_str+'*weightBTag0*('+cut0bNJet+')'+'*'+ttJetsweight)
 
         #Rcs values w/o b-tag weights
         cname1bCRtt, cut1bCRtt = nameAndCut(stb,htb,(4,5), btb=(1,1) ,presel=presel_MC)
         cname0bCRtt, cut0bCRtt = nameAndCut(stb,htb,(4,5), btb=(0,0) ,presel=presel_MC)
         rcs1bCRtt = getRCS(cBkg, cut1bCRtt, dPhiCut, weight = weight_str)
-        rcs0bCRtt = getRCS(cTTJets, cut0bCRtt, dPhiCut, weight = weight_str)
+        rcs0bCRtt = getRCS(cTTJets, cut0bCRtt, dPhiCut, weight = weight_str+'*'+ttJetsweight)
         
         #Rcs values w/ b-tag weights
         cnameCRtt, cutCRtt = nameAndCut(stb,htb,(4,5), btb=(0,-1) ,presel=presel_MC)
-        samples = [{'chain':cWJets, 'cut':cutCRtt, 'weight':weight_str+'*weightBTag1'+btagWeightSuffix}, {'chain':cTTJets, 'cut':cutCRtt, 'weight':weight_str+'*weightBTag1'+btagWeightSuffix},{'chain':cDY, 'cut':cut1bCRtt, 'weight':weight_str},{'chain':cTTV, 'cut':cut1bCRtt, 'weight':weight_str},{'chain':csingleTop, 'cut':cut1bCRtt, 'weight':weight_str}]
+        #samples = [{'chain':cWJets, 'cut':cutCRtt, 'weight':weight_str+'*weightBTag1'+btagWeightSuffix},\
+        #           {'chain':cTTJets, 'cut':cutCRtt, 'weight':weight_str+'*weightBTag1'+btagWeightSuffix},\
+        #           {'chain':cDY, 'cut':cut1bCRtt, 'weight':weight_str},{'chain':cTTV, 'cut':cut1bCRtt, 'weight':weight_str},{'chain':csingleTop, 'cut':cut1bCRtt, 'weight':weight_str}]
+        samples = [{'chain':cWJets,      'cut':cutCRtt, 'weight':weight_str+'*weightBTag1'+btagWeightSuffix},\
+                   {'chain':cTTJets,     'cut':cutCRtt, 'weight':weight_str+'*weightBTag1'+btagWeightSuffix+'*'+top_ISR_weight},\
+                   {'chain':cDY,         'cut':cutCRtt, 'weight':weight_str+'*weightBTag1'+btagWeightSuffix},\
+                   {'chain':cTTV,        'cut':cutCRtt, 'weight':weight_str+'*weightBTag1'+btagWeightSuffix},\
+                   {'chain':csingleTop,  'cut':cutCRtt, 'weight':weight_str+'*weightBTag1'+btagWeightSuffix},\
+                   {'chain':cDiboson,    'cut':cutCRtt, 'weight':weight_str+'*weightBTag1'+btagWeightSuffix},\
+                   ]
 
         rcs1bCRtt_btag = combineRCS(samples, dPhiCut)
-        rcs0bCRtt_btag = getRCS(cTTJets, cutCRtt, dPhiCut, weight = weight_str+'*weightBTag0'+btagWeightSuffix)
+        rcs0bCRtt_btag = getRCS(cTTJets, cutCRtt, dPhiCut, weight = weight_str+'*weightBTag0'+btagWeightSuffix+'*'+top_ISR_weight)
 
         #Kappa now calculated only in the SB bin (4,5) jets 1b allEWK MC vs 0b tt MC - no fit applied for the moment!
         kappaTT = divideRCSdict(rcs0bCRtt,rcs1bCRtt)
@@ -137,8 +146,8 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
           # get the Rcs plots, use b-tag weights and scale factors
           cname, cut     = nameAndCut(stb,htb,njbTT, btb=(0,-1) ,presel=presel_MC)
           cname1b, cut1b = nameAndCut(stb,htb,njbTT, btb=(0,-1) ,presel=presel_MC)
-          rcsD = getRCS(cTTJets, cut, dPhiCut, weight = weight_str+'*weightBTag0'+btagWeightSuffix, avoidNan=True)
-          rcsD1b = getRCS(cTTJets, cut1b, dPhiCut, weight = weight_str+'*weightBTag1'+btagWeightSuffix, avoidNan=True)
+          rcsD = getRCS(cTTJets, cut, dPhiCut, weight = weight_str+'*weightBTag0'+btagWeightSuffix+'*'+top_ISR_weight, avoidNan=True)
+          rcsD1b = getRCS(cTTJets, cut1b, dPhiCut, weight = weight_str+'*weightBTag1'+btagWeightSuffix+'*'+top_ISR_weight, avoidNan=True)
           ttJetRcsFitH.GetXaxis().SetBinLabel(i_njbTT+1,nJetBinName(njbTT))
           
           if (i_njbTT+1)%2 == 0: ticksH.SetBinContent(i_njbTT,0.005)
