@@ -1,7 +1,7 @@
 
 import copy, os, sys
 
-datadir = '/afs/hephy.at/data/dspitzbart01/cmgTuples/postProcessed_Run2016_antiSelection_isoTrack_v7/HT500/'
+datadir = '/afs/hephy.at/data/dspitzbart01/cmgTuples/postProcessed_Run2016_antiSelection_isoTrack_v8/HT500/'
 
 singleElectron_samples = [\
                         "SingleElectron_Run2016B_23Sep2016",\

@@ -25,8 +25,8 @@ from Workspace.HEPHYPythonTools.user import username
 from LpTemplateFit import LpTemplateFit
 from rCShelpers import *
 
-isData = False
-makeFit = False
+isData = True
+makeFit = True
 getYields = False
 getResults = False
 isValidation = False
@@ -44,7 +44,7 @@ if isData:
 else:
   sampleStr = 'MC'
 
-SRstring = 'Moriond17SR_v3'
+SRstring = 'Moriond17SR_v8'
 if isValidation: SRstring = '2016val_v2'
 lumiStr = '36p5fb'
 
@@ -89,6 +89,13 @@ fitCR =  {QCD_SB: {(250, 350): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}},  #Q
                    (450, 650): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}},
                    (650,  -1): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}}}}
 
+fitCR_multib = {QCD_SB: {(250,  -1): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}},
+                         (250, 450): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}},
+                         (450, 600): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}},
+                         (600, 750): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}},
+                         (750,  -1): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}}}}
+
+fitCR = fitCR_multib
 
 if isValidation: SRs = validation2016
 else:

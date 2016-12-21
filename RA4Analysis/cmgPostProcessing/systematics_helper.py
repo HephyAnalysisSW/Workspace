@@ -3,7 +3,7 @@ from Workspace.HEPHYPythonTools.helpers import *
 from btagEfficiency import *
 from math import *
 
-def calc_btag_systematics(t,s,r,mcEffDict,sampleKey,maxConsideredBTagWeight,separateBTagWeights, model=''):
+def calc_btag_systematics(t,s,r,mcEffDict,sampleKey,maxConsideredBTagWeight,separateBTagWeights, model='', weightName="weightBTag"):
   #separateBTagWeights = False
   zeroTagWeight = 1.
   #print "yes2"
@@ -18,43 +18,43 @@ def calc_btag_systematics(t,s,r,mcEffDict,sampleKey,maxConsideredBTagWeight,sepa
   mceffW_SF_light_Up    = getTagWeightDict(mceff["mceffs_SF_light_Up"], maxConsideredBTagWeight)
   mceffW_SF_light_Down  = getTagWeightDict(mceff["mceffs_SF_light_Down"], maxConsideredBTagWeight)
   if not separateBTagWeights:
-    lweight = str(s.weight)
-  else: lweight = "(1.)"
+    lweight = s.weight
+  else: lweight = 1.
   #if not separateBTagWeights:
   for i in range(1, maxConsideredBTagWeight+2):
-    exec("s.weightBTag"+str(i)+"p="+lweight)
-    exec("s.weightBTag"+str(i)+"p_SF="+lweight)
-    exec("s.weightBTag"+str(i)+"p_SF_b_Up="+lweight)
-    exec("s.weightBTag"+str(i)+"p_SF_b_Down="+lweight)
-    exec("s.weightBTag"+str(i)+"p_SF_light_Up="+lweight)
-    exec("s.weightBTag"+str(i)+"p_SF_light_Down="+lweight)
+    setattr(s, weightName+str(i)+'p', lweight)
+    setattr(s, weightName+str(i)+'p_SF', lweight)
+    setattr(s, weightName+str(i)+'p_SF_b_Up', lweight)
+    setattr(s, weightName+str(i)+'p_SF_b_Down', lweight)
+    setattr(s, weightName+str(i)+'p_SF_light_Up', lweight)
+    setattr(s, weightName+str(i)+'p_SF_light_Down', lweight)
   for i in range(maxConsideredBTagWeight+1):
-    exec("s.weightBTag"+str(i)+"="              +str(mceffW[i])+'*'+lweight)
-    exec("s.weightBTag"+str(i)+"_SF="           +str(mceffW_SF[i])+'*'+lweight)
-    exec("s.weightBTag"+str(i)+"_SF_b_Up="      +str(mceffW_SF_b_Up[i])+'*'+lweight)
-    exec("s.weightBTag"+str(i)+"_SF_b_Down="    +str(mceffW_SF_b_Down[i])+'*'+lweight)
-    exec("s.weightBTag"+str(i)+"_SF_light_Up="  +str(mceffW_SF_light_Up[i])+'*'+lweight)
-    exec("s.weightBTag"+str(i)+"_SF_light_Down="+str(mceffW_SF_light_Down[i])+'*'+lweight)
+    setattr(s, weightName+str(i),                  mceffW[i]*lweight)
+    setattr(s, weightName+str(i)+"_SF",            mceffW_SF[i]*lweight)
+    setattr(s, weightName+str(i)+"_SF_b_Up",       mceffW_SF_b_Up[i]*lweight)
+    setattr(s, weightName+str(i)+"_SF_b_Down",     mceffW_SF_b_Down[i]*lweight)
+    setattr(s, weightName+str(i)+"_SF_light_Up",   mceffW_SF_light_Up[i]*lweight)
+    setattr(s, weightName+str(i)+"_SF_light_Down", mceffW_SF_light_Down[i]*lweight)
     for j in range(i+1, maxConsideredBTagWeight+2):
-      exec("s.weightBTag"+str(j)+"p               -="+str(mceffW[i])+'*'+lweight) #prob. for >=j b-tagged jets
-      exec("s.weightBTag"+str(j)+"p_SF            -="+str(mceffW_SF[i])+'*'+lweight)
-      exec("s.weightBTag"+str(j)+"p_SF_b_Up       -="+str(mceffW_SF_b_Up[i])+'*'+lweight)
-      exec("s.weightBTag"+str(j)+"p_SF_b_Down     -="+str(mceffW_SF_b_Down[i])+'*'+lweight)
-      exec("s.weightBTag"+str(j)+"p_SF_light_Up   -="+str(mceffW_SF_light_Up[i])+'*'+lweight)
-      exec("s.weightBTag"+str(j)+"p_SF_light_Down -="+str(mceffW_SF_light_Down[i])+'*'+lweight)
+      setattr(s, weightName+str(j)+"p",               getattr(s, weightName+str(j)+"p")               - mceffW[i]*lweight) #prob. for >=j b-tagged jets
+      setattr(s, weightName+str(j)+"p_SF",            getattr(s, weightName+str(j)+"p_SF")            - mceffW_SF[i]*lweight)
+      setattr(s, weightName+str(j)+"p_SF_b_Up",       getattr(s, weightName+str(j)+"p_SF_b_Up")       - mceffW_SF_b_Up[i]*lweight)
+      setattr(s, weightName+str(j)+"p_SF_b_Down",     getattr(s, weightName+str(j)+"p_SF_b_Down")     - mceffW_SF_b_Down[i]*lweight)
+      setattr(s, weightName+str(j)+"p_SF_light_Up",   getattr(s, weightName+str(j)+"p_SF_light_Up")   - mceffW_SF_light_Up[i]*lweight)
+      setattr(s, weightName+str(j)+"p_SF_light_Down", getattr(s, weightName+str(j)+"p_SF_light_Down") - mceffW_SF_light_Down[i]*lweight)
   for i in range (int(r.nJet)+1, maxConsideredBTagWeight+1):
-    exec("s.weightBTag"+str(i)+"               = 0.")
-    exec("s.weightBTag"+str(i)+"_SF            = 0.")
-    exec("s.weightBTag"+str(i)+"_SF_b_Up       = 0.")
-    exec("s.weightBTag"+str(i)+"_SF_b_Down     = 0.")
-    exec("s.weightBTag"+str(i)+"_SF_light_Up   = 0.")
-    exec("s.weightBTag"+str(i)+"_SF_light_Down = 0.")
-    exec("s.weightBTag"+str(i)+"p              = 0.")
-    exec("s.weightBTag"+str(i)+"p_SF           = 0.")
-    exec("s.weightBTag"+str(i)+"p_SF_b_Up      = 0.")
-    exec("s.weightBTag"+str(i)+"p_SF_b_Down    = 0.")
-    exec("s.weightBTag"+str(i)+"p_SF_light_Up  = 0.")
-    exec("s.weightBTag"+str(i)+"p_SF_light_Down= 0.")
+    setattr(s, weightName+str(i),                   0.)
+    setattr(s, weightName+str(i)+"_SF",             0.)
+    setattr(s, weightName+str(i)+"_SF_b_Up",        0.)
+    setattr(s, weightName+str(i)+"_SF_b_Down",      0.)
+    setattr(s, weightName+str(i)+"_SF_light_Up",    0.)
+    setattr(s, weightName+str(i)+"_SF_light_Down",  0.)
+    setattr(s, weightName+str(i)+"p",               0.)
+    setattr(s, weightName+str(i)+"p_SF",            0.)
+    setattr(s, weightName+str(i)+"p_SF_b_Up",       0.)
+    setattr(s, weightName+str(i)+"p_SF_b_Down",     0.)
+    setattr(s, weightName+str(i)+"p_SF_light_Up",   0.)
+    setattr(s, weightName+str(i)+"p_SF_light_Down", 0.)
   return
 
 def calc_LeptonScale_factors_and_systematics(s,histos_LS):
