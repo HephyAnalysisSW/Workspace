@@ -39,6 +39,8 @@ bins = xmax
 xmin = 0
 #----------create TH1F with fixed bins-----------------
 hmax05 = ROOT.TH1F('hmax05', '', bins, xmin, xmax+1)
+#hlabel = Clone(hmax05)
+#axis1 = ROOT.TAxis(35,0,35)
 histos = {} #including empties
 
 #-----------fill histograms--------------
@@ -57,7 +59,10 @@ for analysis_group in all_analysis:
       print "with label :" , interp_dict["decay"]
       print 'The bin considered is', index
       hmax05.SetBinContent(index+1, interp_dict["max"]["050"][0])
-      hmax05.GetXaxis().SetBinLabel(index+1, interp_dict["decay"])
+      #hmax05.GetXaxis().SetBinLabel(index+1, interp_dict["decay"])
+      hmax05.GetXaxis().SetBinLabel(index+1, interp_dict["max"]["050"][1])
+      #hlabel.GetXaxis().SetBinLabel(index+1, interp_dict["max"]["050"][1])
+      #axis1.SetBinLabel(index+1, interp_dict["max"]["050"][1])
       index +=1
 
 #----------draw plot-----------
@@ -73,13 +78,19 @@ hmax05.SetYTitle("Mass scale [GeV]")
 hmax05.GetYaxis().SetTitleFont(42)
 hmax05.SetTitleSize(0.025, "Y")
 hmax05.GetYaxis().SetTitleOffset(1.1)
-hmax05.SetLabelSize(0.015, "X")
+hmax05.SetLabelSize(0.025, "X")
 hmax05.SetLabelSize(0.025, "Y")
+hmax05.SetLabelOffset(0)
 hmax05.SetLabelFont(42, "X")
 hmax05.SetLabelFont(42, "Y")
 #hmax05.GetYaxis().CenterTitle() 
 hmax05.SetMaximum(histo_xaxis_max)
 hmax05.Draw('HBAR0')
+#hlabel.SetLabelOffset(0.5)
+#hlabel.SetLabelSize(0.025, "X")
+#hlabel.SetLabelFont(42, "X")
+#ROOT.gPad.RedrawAxis()
+#hlabel.Draw()
 #------For PAS numbers / mid lines------
 latex_pas = ROOT.TLatex()
 latex_pas.SetTextSize(0.013)
@@ -101,7 +112,7 @@ for analysis_group in all_analysis:
   for interp in all_analysis[str(analysis_group)] :
     interp_dict = all_analysis[analysis_group][interp]
     if not "name" in interp :
-      latex_pas.DrawLatex(20,pas_place ,interp_dict["max"]["050"][1])
+      #latex_pas.DrawLatex(20,pas_place ,interp_dict["max"]["050"][1])
       if "empty" in interp :
           print "empty from " , name_tex
           exec('line_'+str(i)+' = ROOT.TLine(-320,(i*line_depence)+0.5,histo_xaxis_max,(i*line_depence)+0.5)')
@@ -129,22 +140,23 @@ tex3.SetTextSize(0.025)
 tex3.SetLineWidth(2)
 tex3.Draw()
 #-------------Foot note--------------------------#
-tex4 = ROOT.TLatex(1450,2.2,"#splitline{For decays with intermediate mass,}{m_{intermediate} = 0.5#upoint(m_{mother}+m_{lsp})}");
-tex4.SetTextFont(42);
-tex4.SetTextSize(0.02);
-tex4.SetLineWidth(2);
-tex4.Draw();
-tex5 = ROOT.TLatex(-0,-3.5,"#splitline{Observed limits at 95% C.L. - theory uncertainties not included}{Only a selection of available mass limits}");
-tex5.SetTextFont(42);
-tex5.SetTextSize(0.021);
-tex5.SetLineWidth(2);
-tex5.Draw();
-tex6 = ROOT.TLatex(-0,-5.1,"Probe *up to* the quoted mass limit for m_{lsp}= 0 GeV");
-tex6.SetTextFont(42);
-tex6.SetTextSize(0.021);
-tex6.SetLineWidth(2);
-tex6.Draw();
+tex4 = ROOT.TLatex(1450,2.2,"#splitline{For decays with intermediate mass,}{m_{intermediate} = 0.5#upoint(m_{mother}+m_{lsp})}")
+tex4.SetTextFont(42)
+tex4.SetTextSize(0.02)
+tex4.SetLineWidth(2)
+tex4.Draw()
+tex5 = ROOT.TLatex(-0,-3.5,"#splitline{Observed limits at 95% C.L. - theory uncertainties not included}{Only a selection of available mass limits}")
+tex5.SetTextFont(42)
+tex5.SetTextSize(0.021)
+tex5.SetLineWidth(2)
+tex5.Draw()
+tex6 = ROOT.TLatex(-0,-5.1,"Probe *up to* the quoted mass limit for m_{lsp}= 0 GeV")
+tex6.SetTextFont(42)
+tex6.SetTextSize(0.021)
+tex6.SetLineWidth(2)
+tex6.Draw()
 
+#axis1.Draw()
 #------------put save directories----------------#
 
 if not os.path.exists(path):
