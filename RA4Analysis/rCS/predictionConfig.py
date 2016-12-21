@@ -42,7 +42,7 @@ loadTemplate = True
 wjetsSB = (3,4)
 if validation: wjetsSB = (3,3)
 
-cWJets      = getChain(WJetsHTToLNu,histname='')
+cWJets      = getChain([WJetsHTToLNu,diBoson_1L1Nu2Q],histname='') #FIXME: For now add this to WJets
 cTTJets     = getChain(TTJets_Comb,histname='')
 cDY         = getChain(DY_HT,histname='')
 csingleTop  = getChain(singleTop_lep,histname='')
