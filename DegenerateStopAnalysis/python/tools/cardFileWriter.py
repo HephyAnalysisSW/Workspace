@@ -72,6 +72,9 @@ class cardFileWriter:
     self.hasContamination = True
 
   def specifyFlatUncertainty(self, u,  val, bins=None, processes=None):
+    """
+    will be moved to CombinedCard Class
+    """
     if u not in self.uncertainties:
       print "This uncertainty has not been added yet!",u,"Available:",self.uncertainties
       return

@@ -28,7 +28,7 @@ def getLimit(yld, sig=None          , outDir    = "./cards/", postfix = ""     ,
                   data      = "Data", 
                   calc_limit=False  , debug     = False     , simplify_processes = True, 
                   defWidth = 15, maxUncNameWidth = 20, maxUncStrWidth= 10 , percision = 6,
-
+                  bins_order= [] 
                 ):
     """
     sys_map = { 'new_bin':'old_bin'  } can be used for bins which are not in the sys_pkl
@@ -52,12 +52,15 @@ def getLimit(yld, sig=None          , outDir    = "./cards/", postfix = ""     ,
     else:
         bins_order  = ['SRL1a', 'SRH1a', 'SRV1a', 'SRL1b', 'SRH1b', 'SRV1b', 'SRL1c', 'SRH1c', 'SRV1c', 'SRL2', 'SRH2', 'SRV2', 'CR1a', 'CR1b', 'CR1c', 'CR2', 'CRTT2']
         bins        = yld[yld.keys()[0]].keys()
-        bins        = [x for x in bins_order if x in bins]
+        #bins        = [x for x in bins_order if x in bins]
         sampleList  = [x for x in yld.keys() if not 'fom' in x.lower() and 'total' not in x.lower()]
         sigList     = [x for x in sampleList if 'T2tt' in x]  ### will fail with names like s300_270
         bkgList     = [x for x in sampleList if x not in sigList and 'data' not in x.lower()]
         sampleNames = sampleList
-      
+
+    if bins_order:
+        bins = [x for x in bins_order if x in bins]
+ 
     if not sig:
         sig  = sigList[0]
     elif sig in sigList:
@@ -126,6 +129,7 @@ def getLimit(yld, sig=None          , outDir    = "./cards/", postfix = ""     ,
     #! this part is not maintained
     if isYieldInst:
         yieldDictFull = yld.yieldDictFull
+        #yieldDictFull = yld.getNiceYieldDict()
         yieldDict     = yieldDictFull 
     else:
         yieldDictFull = yld
@@ -170,10 +174,12 @@ def getLimit(yld, sig=None          , outDir    = "./cards/", postfix = ""     ,
             other_exp = sum([get_float(yieldDict[rest_bkg][bin])  for rest_bkg in other_bkgs])
             c.specifyExpectation(bin,"other", other_exp)
             c.specifyExpectation(bin,"signal",get_float(yieldDictFull[sig][bin]))
-
-        if sys_pkl.endswith(".pkl"):
+        
+        if type(sys_pkl)==dict:
+            card = sys_pkl
+        elif type(sys_pkl)==type("") and sys_pkl.endswith(".pkl"):
             card    = pickle.load(open(sys_pkl,"r"))
-        elif sys_pkl.endswith(".json"):
+        elif type(sys_pkl)==type("") and sys_pkl.endswith(".json"):
             card    = yaml.safe_load(open(sys_pkl,"r"))
         else:
             raise Exception("sys_pkl should be either json or pkl, but it's neither: %s"%sys_pkl)
@@ -276,7 +282,8 @@ def getLimit(yld, sig=None          , outDir    = "./cards/", postfix = ""     ,
         systs_list={}
         systs_list['corr']={
                             'sig'  :   ['PU', 'jer', 'jec', 'ISR', 'met', 'BTag_b', 'BTag_l', 'BTag_FS', "Q2" ],
-                            'bkg'  :   ['PU', 'jer', 'jec',  'WPt', 'ttpt','BTag_b', 'BTag_l', 'WPol'], # "WPol"],
+                            #'sig'  :  [],# ['PU', 'jer', 'jec' , 'BTag_b', 'BTag_l', 'BTag_FS', "Q2" ],
+                            'bkg'  :   ['PU', 'jer', 'jec',  'WPt', 'ttpt','BTag_b', 'BTag_l',] #'WPol'], # "WPol"],
                            }
         systs_list['uncorr']={
                             'bkg'  :   ['WPtShape','ttPtShape', 'ZInvEst', 'QCDEst',   'DYJetsM50XSec' ], #'DYJetsM50XSec', 'DibosonXSec', 'STXSec', 'ZInvEst', 'QCDEst'],
@@ -309,13 +316,13 @@ def getLimit(yld, sig=None          , outDir    = "./cards/", postfix = ""     ,
         #   CR_Corr
         #
         c.addUncertainty        ( "CR1a_corr","lnN")
-        c.specifyFlatUncertainty( "CR1a_corr",  2, bins=['CR1a','SRL1a', 'SRH1a', 'SRV1a'], processes=['WJets'])
+        c.specifyFlatUncertainty( "CR1a_corr",  2, bins=['cr1a','cr1la', 'sr1ma', 'sr1ha'], processes=['WJets'])
         c.addUncertainty        ( "CR1b_corr","lnN")
-        c.specifyFlatUncertainty( "CR1b_corr",  2, bins=['CR1b','SRL1b', 'SRH1b', 'SRV1b'], processes=['WJets'])
+        c.specifyFlatUncertainty( "CR1b_corr",  2, bins=['cr1b','cr1lb', 'sr1mb', 'sr1hb'], processes=['WJets'])
         c.addUncertainty        ( "CR1c_corr","lnN")
-        c.specifyFlatUncertainty( "CR1c_corr",  2, bins=['CR1c','SRL1c', 'SRH1c', 'SRV1c'], processes=['WJets'])
+        c.specifyFlatUncertainty( "CR1c_corr",  2, bins=['cr1c','cr1lc', 'sr1mc', 'sr1hc'], processes=['WJets'])
         c.addUncertainty        ( "CR2_corr","lnN")
-        c.specifyFlatUncertainty( "CR2_corr",  2,  bins=['CR2','SRL2', 'SRH2', 'SRV2'], processes=['WJets'])
+        c.specifyFlatUncertainty( "CR2_corr",  2,  bins=['cr2' ,'cr2l' , 'sr2m' , 'sr2h'], processes=['WJets'])
         c.addUncertainty        ( "CRTT_corr","lnN")
         c.specifyFlatUncertainty( "CRTT_corr",  2, bins=[], processes=['TTJets'])
 
@@ -332,6 +339,7 @@ def getLimit(yld, sig=None          , outDir    = "./cards/", postfix = ""     ,
                     syst_list = systs_list[rel][s]
                     sigtag = 'Sig' if s=='sig' else ''
                     for systname in syst_list:
+                        print "DEBUG", sigtag, systname, s, sample_lists[s]
                         assign_syst_to_cfw( c, sigtag+systname, systs[systname], sample_lists[s] )
             if rel =='uncorr':
                 for s in ['bkg']:
@@ -344,6 +352,7 @@ def getLimit(yld, sig=None          , outDir    = "./cards/", postfix = ""     ,
                                 c.addUncertainty        ( new_name,"lnN")
                                 c.specifyFlatUncertainty( new_name,  1.5,  bins=[b], processes=['other'])
                             else:
+                                print "UNCORR SYST", c, new_name, systname, samp, b
                                 assign_syst_to_cfw( c,new_name, systs[systname], sample_list = [samp], bin_list=[b])
 
         for syst_name in [ 'WPt', 'ttpt','BTag_b', 'BTag_l' ]:
@@ -414,8 +423,10 @@ def getLimit(yld, sig=None          , outDir    = "./cards/", postfix = ""     ,
                 for pName in main_bkgs + ['signal'] + ['other']:
                     sname = pName+ b + "Sta"
                     pList = [x for x in bkgs+[sig] if processNames[x]==pName ]
+                    if pName in processNames:
+                        pName = processNames[pName]
                     #print "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz" , pName, pList    
-                    value = 0
+                    value = u_float(0)
                     for p in pList:                  ### Combining Yields for "other" samples...
                         if hasattr( yieldDictFull[p][b], "sigma"):        
                             value += yieldDictFull[p][b]
@@ -423,8 +434,11 @@ def getLimit(yld, sig=None          , outDir    = "./cards/", postfix = ""     ,
                         else:
                             raise NotImplementedError("yield dict values should be instance of the u_float class")
                     #print sname, pName, b, value, pList
+                    print b, sname, pName
                     v = value.val
                     sigma = value.sigma
+                    #print "STAT UNCERT", sname, b, pName 
+                    
                     if v >= lnn_gmn_threshold:    #Use logNormal:
                         c.addUncertainty(sname, 'lnN')
                         unc = 1 + round(sigma/v,4) if v else 1    ## relative unc. 
@@ -555,9 +569,11 @@ def assign_syst_to_cfw(cfw, sname, syst, sample_list=[], bin_list=[]):
         if bin_list and b not in bin_list:
             continue
         elif not b in cfw.bins:
+            #print "WEIRDERRR", b, cfw.bins
             continue
         # ... and processes
         othersAdded=False
+        #print ".............WTFF",sbins[b]
         for p in sbins[b]:
             #print "~~~~~~~~~~~~~~",sname, p
             #if not p in cfw.processes[cfw.processes.keys()[0]]:
@@ -569,7 +585,9 @@ def assign_syst_to_cfw(cfw, sname, syst, sample_list=[], bin_list=[]):
                 pname = sample_list[p]
             else: 
                 pname = p
+            print "PNAME", p
             if p in cfw.other_bkgs:     ## combine values for "other" bkg. For this cfw needs to have yieldDict attribute.
+                print "..... pname in other bkgs"
                 if othersAdded:
                     continue
                 else:
@@ -582,12 +600,13 @@ def assign_syst_to_cfw(cfw, sname, syst, sample_list=[], bin_list=[]):
                     othersAdded = True
             else:
                 v = sbins[b][p]
-            print ',,,,,', othersAdded, sname, b, p, v, cfw.yieldDict[p][b].val
+            #print ',,,,,', othersAdded, sname, b, p, v, cfw.yieldDict[p][b].val
             #print ',,,,,,,', p,pname
             # extract value and add it, if non-zero
             if v>1.e-6:
                 if abs(1-v) < 9.e-5:
                     v=1.0
+                print "SYSSS", sname, b, pname, v
                 cfw.specifyUncertainty(sname,b,pname,v)
 
 def assign_uncert_to_cfw(cfw, sname, stype, sbins, sn = 0.0):

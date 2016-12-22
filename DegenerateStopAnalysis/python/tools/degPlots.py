@@ -1,7 +1,32 @@
+import Workspace.DegenerateStopAnalysis.tools.degTools as degTools
 from Workspace.DegenerateStopAnalysis.tools.degTools import Plots
 #import Workspace.DegenerateStopAnalysis.tools.tracks as tracks
 from Workspace.DegenerateStopAnalysis.tools.degTools import getPlotFromChain
 import ROOT
+
+
+
+def compareBJets( tree, btag_var="nJet_bJet_def", btag_weight = "weightBTag%s_MC_def"):
+    unq = degTools.uniqueHash()
+    def_col = tree.GetLineColor()
+    tree.SetLineWidth(2)
+    tree.SetLineColor(ROOT.kBlue)
+    binning = (4,0,4)
+    btname = btag_var + "_"+unq
+    tree.Draw(btag_var+">>%s%s"%(btname, str(binning)))
+    tree.SetLineColor(def_col)
+    tree.SetLineWidth(1)
+    bwname = btag_weight.replace(r"%s","")+"_"+unq
+    tree.Draw("(0)>>%s%s"%(bwname, str(binning)), btag_weight%"0", "same")
+    tree.Draw("(1)>>+%s"%(bwname), btag_weight%"1", "same")
+    tree.Draw("(2)>>+%s"%(bwname), btag_weight%"2", "same")
+    tree.Draw("(3)>>+%s"%(bwname), btag_weight%"2p" + "-" + btag_weight%"2", "same" )
+    h1 = getattr(ROOT,btname)
+    h2 = getattr(ROOT,bwname)
+    return h1,h2
+
+
+
 
 class DegPlots():
 
@@ -126,18 +151,22 @@ class DegPlots():
 
 
 
-    def __init__( self,  lepCollection="LepGood" , lep="mu"):
+    def __init__( self,  lepCollection="LepGood" , lep="mu", lepThresh="", jetThresh="", variables=None):
+        """
+        
+
+        """
 
         self.collection = lepCollection
-        self.lep = lep
-        lepIndex = "Index{lepCol}_{Lep}".format(lepCol=lepCollection, Lep=lep)
+        self.lep = lep if not lepThresh else lep+"_"+lepThresh
+        lepIndex = "Index{lepCol}_{Lep}".format(lepCol=lepCollection, Lep=self.lep)
 
 
         fargs = {
                    "lepCol"  : lepCollection,
-                   "lep"     : lep,
+                   "lep"     : lep if not lepThresh else lep+"_"+lepThresh,
                    "lepIndex": lepIndex,
-                    "lepLatex": { "mu":"mu", "el":"e","lep":"l" }[lep],
+                    "lepLatex": { "mu":"mu", "el":"e","lep":"l"    }[lep],
                     "lepTitle": { "mu":"Mu", "el":"El","lep":"Lep" }[lep],
         
                 }
@@ -209,6 +238,11 @@ class DegPlots():
                 "isrHFEMMult":   {'var':"Jet_HFEMMult[IndexJet_basJet[0]]"   ,"bins":[10,0,10]          ,"nMinus1":None         ,"decor":{"title":"Leading Jet HF EM Multip"                     ,"x": "Leading Jet HF EM Multip"                      ,"y":"Events  "  ,'log':[0,1,0] }},
 
 
+
+                
+
+
+
                 #
                 # Jet Quality Plots
                 #
@@ -266,10 +300,24 @@ class DegPlots():
                 "bHardJetPt":       {'var':"Jet_pt[ max(IndexJet_bHardJet[0],0)] *(nBHardJet>0)"      ,"bins":[100,0,1000]          ,"nMinus1":None         ,"decor":{"title":"bHardJet P_{{T}} "    ,"x":"P_{T}(Hard BJet)"      ,"y":"Events  "  ,'log':[0,1,0] }},
               }
         
-        
-        
-        
-        
+        mva_vars = {
+        "mva_methodId"       :{'bins':[20,-0.8,0.8] , 'decor':{} },      
+        "mva_response"       :{'bins':[20,-0.8,0.8] , 'decor':{} },       
+        "mva_signalTag"      :{'bins':[20,-0.8,0.8] , 'decor':{} },       
+        "mva_backgroundTag"  :{'bins':[20,-0.8,0.8] , 'decor':{} },           
+        "mva_trainingEvent"  :{'bins':[20,-0.8,0.8] , 'decor':{} },           
+        "mva_testEvent"      :{'bins':[20,-0.8,0.8] , 'decor':{} },           
+        }
+        nMVAMethods = 10
+        for mva_var, var_dict in mva_vars.items():
+            for imethod in range(nMVAMethods):
+                varname = "%s_%s"%(mva_var , imethod) 
+                decor = var_dict['decor']
+                decor = {'title':varname, 'x':varname, 'y': 'nEvents', 'log':[0,1,0]}
+                plotDict[varname]={
+                                    'var':"%s[%s]"%(mva_var, imethod),      'bins':var_dict['bins']  , 'decor':decor,
+
+                                    }
         
         
         self.plots = Plots(**plotDict)

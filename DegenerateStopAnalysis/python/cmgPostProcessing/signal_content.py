@@ -3,7 +3,7 @@ import pickle
 import os
 from Workspace.HEPHYPythonTools.user import username
 from Workspace.HEPHYPythonTools.helpers import getObjFromFile, getChain, getChunks, getCutYieldFromChain, getYieldFromChain
-from Workspace.HEPHYPythonTools.xsecSMS import *
+import Workspace.HEPHYPythonTools.xsecSMS as xsecSMS
 
 import pickle
 
@@ -13,24 +13,112 @@ dos={
     }
 
 
-getGenFilterEff = True
+#signal_name = "SMS_TChipmWW"
+signal_name = "SMS_TChiWZ_ZToLL"
+signal_name = "SMS_T2tt_dM_10to80_genHT_160_genMET_80"
+signal_name = "SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1"
+signal_name = "SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1"
 
-import Workspace.DegenerateStopAnalysis.samples.cmgTuples.RunIISpring16MiniAODv2_v3 as cmgTuples
-samples = [
-            #cmgTuples.SMS_T2tt_dM_10to80_2Lfilter
-            cmgTuples.SMS_T2tt_dM_10to80_genHT_160_genMET_80 
-        ]
+#getGenFilterEff = True
+
+#import Workspace.DegenerateStopAnalysis.samples.cmgTuples.RunIISpring16MiniAODv2_v3 as cmgTuples_v3
+
+import Workspace.DegenerateStopAnalysis.samples.cmgTuples.MC_8020_mAODv2_OldJetClean_v2 as cmgTuplesOldJetClean
+
+#import Workspace.DegenerateStopAnalysis.samples.cmgTuples.RunIISpring16MiniAODv2_v0 as cmgTuples
+import Workspace.DegenerateStopAnalysis.samples.cmgTuples.RunIISpring16MiniAODv2_v0_2 as cmgTuples
+
+#genFilterEff_file = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/filterEfficiency/T2tt_dM_10to80_genHT160_genMET80/filterEffs_genHT160_genMET80.pkl'
+genFilterEff_file = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/filterEfficiency/{sample}/filterEffs_{sample}.pkl'
 
 
-genFilterEff_file = '$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/data/filterEfficiency/T2tt_dM_10to80_genHT160_genMET80/filterEffs_genHT160_genMET80.pkl'
+
+signals={
+            'SMS_T2tt_dM_10to80_genHT_160_genMET_80':
+                    {
+                        'xsec'        : xsecSMS.stop13TeV_NLONLL,
+                        'genFilterEff': genFilterEff_file,
+                        'cmgTuple'    : cmgTuples,
+                        'samples'     : [ cmgTuples.SMS_T2tt_dM_10to80_genHT_160_genMET_80 ] ,
+                        'massVars'    : [
+                                            {'var':'GenSusyMStop', 'name':'mstop'},
+                                            {'var':'GenSusyMNeutralino', 'name':'mlsp'},
+                                        ]
+                    },
+            #'SMS_T2tt_dM_10to80_genHT_160_genMET_80':
+            #        {
+            #            'xsec'        : xsecSMS.stop13TeV_NLONLL,
+            #            'genFilterEff': genFilterEff_file,
+            #            'cmgTuple'    : cmgTuplesOldJetClean,
+            #            'samples'     : [ cmgTuplesOldJetClean.SMS_T2tt_dM_10to80_genHT_160_genMET_80 ] ,
+            #            'massVars'    : [
+            #                                {'var':'GenSusyMStop', 'name':'mstop'},
+            #                                {'var':'GenSusyMNeutralino', 'name':'mlsp'},
+            #                            ]
+            #        },
+            'SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1':
+                    {
+                        'xsec'        : xsecSMS.stop13TeV_NLONLL,
+                        'genFilterEff': genFilterEff_file,
+                        'cmgTuple'    : cmgTuples,
+                        'samples'     : [ cmgTuples.SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1 ] ,
+                        'massVars'    : [
+                                            {'var':'GenSusyMStop', 'name':'mstop'},
+                                            {'var':'GenSusyMNeutralino', 'name':'mlsp'},
+                                        ]
+                    },
+            'SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1':
+                    {
+                        'xsec'        : xsecSMS.stop13TeV_NLONLL,
+                        'genFilterEff': genFilterEff_file,
+                        'cmgTuple'    : cmgTuples,
+                        'samples'     : [ cmgTuples.SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1 ] ,
+                        'massVars'    : [
+                                            {'var':'GenSusyMStop', 'name':'mstop'},
+                                            {'var':'GenSusyMNeutralino', 'name':'mlsp'},
+                                        ]
+                    },
+            #'SMS_TChipmWW':
+            #        {
+            #            'xsec'        : xsecSMS.c1c1_13TeV_NLONLL ,
+            #            'cmgTuple'    : cmgTuples_v3_1,
+            #            'samples'     : [cmgTuples_v3_1.SMS_TChipmWW],
+            #            'massVars'    : [
+            #                                {'var':'GenSusyMChargino', 'name':'mchi'},
+            #                                {'var':'GenSusyMNeutralino', 'name':'mlsp'},
+            #                            ]
+            #        },
+            #'SMS_TChiWZ_ZToLL':
+            #        {
+            #            'xsec'        : xsecSMS.c1n2_13TeV_NLONLL,
+            #            'cmgTuple'    : cmgTuples_v3_1,
+            #            'samples'     : [cmgTuples_v3_1.SMS_TChiWZ_ZToLL],
+            #            'massVars'    : [
+            #                                {'var':'GenSusyMChargino', 'name':'mchi'},
+            #                                {'var':'GenSusyMNeutralino', 'name':'mlsp'},
+            #                            ]
+            #        }
+        }
+
+
+signal_info = signals[signal_name]
+samples = signal_info['samples']
+massVar1     = signal_info['massVars'][0]['var']
+massVar1name = signal_info['massVars'][0]['name']
+massVar2     = signal_info['massVars'][1]['var']
+massVar2name = signal_info['massVars'][1]['name']
+xsecs        = signal_info['xsec']
+
+getGenFilterEff = signal_info.has_key("genFilterEff")
 
 if getGenFilterEff:
-    genFilterEff_path = os.path.expandvars(genFilterEff_file)
+    genFilterEff_path = os.path.expandvars(genFilterEff_file.format(sample=signal_name))
     if os.path.isfile(genFilterEff_path):
        genFilterEff = pickle.load(open(genFilterEff_path)) 
     else:
         raise Exception("cannot find gen filter file! %s"%genFilterEff_path)
-        
+else:
+    genFilterEff = None
 
 def tryStopLSP(mass_dict, mstop, mlsp, def_val = 0):
     try:
@@ -43,7 +131,7 @@ def tryStopLSP(mass_dict, mstop, mlsp, def_val = 0):
         mass_dict[mstop][mlsp]=def_val
 
 
-output_dir = cmgTuples.sample_path
+output_dir = signal_info['cmgTuple'].sample_path
 
 def getStopLSPInfo(sample):
     sample_name = sample["name"]
@@ -51,11 +139,12 @@ def getStopLSPInfo(sample):
     chunks = getChunks(sample, maxN=-1)
     chunk = chunks[0]
     chain = getChain(chunk, minAgeDPM=0, histname='histo', xrootPrefix='root://hephyse.oeaw.ac.at/', maxN=-1, treeName='tree')
-    hist_name = "stop_lsp_%s"%sample_name
+    hist_name = "%s_%s_%s"%(massVar1name, massVar2name, sample_name)
     mass_dict_sample={}
     mass_dict={}
     hist = ROOT.TH2D(hist_name, hist_name, 1000,0,1000, 1000 , 0, 1000)
-    chain.Draw("GenSusyMNeutralino:GenSusyMStop>>%s"%hist_name)
+    #chain.Draw("GenSusyMNeutralino:GenSusyMStop>>%s"%hist_name)
+    chain.Draw("%s:%s>>%s"%(massVar2, massVar1, hist_name))
     nBinsX = hist.GetNbinsX()
     nBinsY = hist.GetNbinsY()
     for xbin in xrange(nBinsX):
@@ -65,9 +154,16 @@ def getStopLSPInfo(sample):
                 mstop = xbin -1
                 mlsp = ybin -1
                 print mstop, mlsp, bin_cont
-                tryStopLSP(mass_dict_sample, mstop, mlsp, def_val= {"nEvents":0, "xSec":  stop13TeV_NLONLL[mstop] , 'genFilterEff':genFilterEff[mstop][mlsp] } )
+                def_dict = {"nEvents":0, "xSec":  xsecs[mstop]  }
+                def_dict2= {"nEvents":0, "xSec":  xsecs[mstop] , "samples": set() }
+                #def_dict = {"nEvents":0 }
+                #def_dict2= {"nEvents":0, "samples": set() }
+                if genFilterEff: 
+                    def_dict['genFilterEff']=genFilterEff[mstop][mlsp] 
+                    def_dict2['genFilterEff']=genFilterEff[mstop][mlsp]  
+                tryStopLSP(mass_dict_sample, mstop, mlsp, def_val = def_dict ) 
                 mass_dict_sample[mstop][mlsp]['nEvents'] += bin_cont
-                tryStopLSP(mass_dict, mstop, mlsp, def_val={"nEvents":0, "xSec":  stop13TeV_NLONLL[mstop] , "samples": set()  ,  'genFilterEff':genFilterEff[mstop][mlsp]  })
+                tryStopLSP(mass_dict, mstop, mlsp, def_val=def_dict2)
                 mass_dict[mstop][mlsp]['samples'].add(sample_name)
                 mass_dict[mstop][mlsp]['nEvents'] += mass_dict_sample[mstop][mlsp]['nEvents']
     return {"sample_name":sample_name, "mass_dict":mass_dict, "mass_dict_sample":mass_dict_sample}
@@ -90,12 +186,12 @@ if __name__ == "__main__":
             mass_dicts_samples_all[result['sample_name']] =  result['mass_dict_sample']
             mass_dicts_all.update(result['mass_dict'])
 
-        pickle.dump(mass_dicts_samples_all, open(output_dir +"/mass_dict_samples.pkl","w") )
-        pickle.dump(mass_dicts_all, open(output_dir +"/mass_dict.pkl","w") )
+        pickle.dump(mass_dicts_samples_all, open(output_dir +"/%s_mass_dict_samples.pkl"%signal_name,"w") )
+        pickle.dump(mass_dicts_all, open(output_dir +"/%s_mass_dict.pkl"%signal_name,"w") )
 
         print "Pickles dumped:",
-        print output_dir +"/mass_dict_samples.pkl"
-        print output_dir +"/mass_dict.pkl"
+        print output_dir +"/%s_mass_dict_samples.pkl"%signal_name
+        print output_dir +"/%s_mass_dict.pkl"%signal_name
 
     if dos['get_chains']:
         chains={}
