@@ -64,6 +64,10 @@ def printCMGProcessingFile(     cmgPickle,
     data_output.append( "sample_path = '%s'   \nallComponents=[] \n"%data_path)
     mc_output.append(   "sample_path = '%s'   \nallComponents=[] \n"%mc_path)
 
+    debug = False
+    if debug:
+        return componentDict.keys()
+
     for compName, comp in  sorted( componentDict.iteritems() ) :
         ext_comps = []
         if not comp.isData:
@@ -100,7 +104,8 @@ def printCMGProcessingFile(     cmgPickle,
 
 if __name__ == '__main__':
 
-    cmgPickle = "/afs/cern.ch/user/n/nrad/CMSSW/CMSSW_8_0_20/src/CMGTools/SUSYAnalysis/cfg/crab_with_das/8020_mAODv2_v0.pkl"
+    #cmgPickle = "/afs/cern.ch/user/n/nrad/CMSSW/CMSSW_8_0_20/src/CMGTools/SUSYAnalysis/cfg/crab_with_das/8020_mAODv2_v0.pkl"
+    cmgPickle = "/afs/cern.ch/user/n/nrad/CMSSW/CMSSW_8_0_20/src/CMGTools/SUSYAnalysis/cfg/crab_with_das/8020_mAODv2_v5.pkl"
     #cmgPickle = "/afs/cern.ch/user/n/nrad/CMSSW/CMSSW_8_0_20/src/CMGTools/SUSYAnalysis/cfg/crab_with_das/8020_mAODv2_OldJetClean_v2.pkl"
     #cmgPickle = "/afs/cern.ch/user/n/nrad/CMSSW/CMSSW_8_0_12/src/CMGTools/SUSYAnalysis/cfg/crab_with_das/8012_mAODv2_v3_1.pkl"
     #cmgPickle = "/afs/cern.ch/user/n/nrad/CMSSW/CMSSW_8_0_11/src/CMGTools/SUSYAnalysis/cfg/crab_with_das/8011_mAODv2_v1_1.pkl"

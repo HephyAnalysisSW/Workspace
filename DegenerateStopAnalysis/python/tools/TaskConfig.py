@@ -180,8 +180,9 @@ class TaskConfig():
             else:
                 from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesPostProcessed_mAODv2_2016 import cmgTuplesPostProcessed
     
-
-            self.cmgPP         = cmgTuplesPostProcessed( self.mc_path, self.signal_path, self.data_path)
+            ichepdata          = True
+            self.cmgPP         = cmgTuplesPostProcessed( self.mc_path, self.signal_path, self.data_path, ichepdata = ichepdata)
+            print self.cmgPP
             self.samples   =   getSamples(   cmgPP = self.cmgPP, **sample_info   )
         else:
             self.samples   =   samples
