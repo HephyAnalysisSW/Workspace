@@ -31,7 +31,7 @@ if QCDdown: nameSuffix += '_QCDdown'
 
 ## samples
 isData              = True
-unblinded           = True
+unblinded           = False
 validation          = False
 isCentralPrediction = True
 if isData:
