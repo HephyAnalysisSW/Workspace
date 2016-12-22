@@ -82,7 +82,7 @@ if validation:
 else:
   #signalRegions = signalRegions2016
   ##signalRegions = signalRegions_Moriond2017
-  regStr = 'SR_Moriond2017_v1'
+  regStr = 'SR_Moriond2017_v3'
   #regStr = 'SR2016_v2'
 
 ## weight calculations

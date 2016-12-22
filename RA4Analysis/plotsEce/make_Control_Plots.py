@@ -16,12 +16,12 @@ all_MB = False
 presel = False
 SB_w   = False 
 SB_tt  = False
-new_SB_tt  = False
-presel_1b = True
+new_SB_tt  = True
+presel_1b = False
 test = False
 unblind = False
 draw_signal = True
-blind = True
+blind = False
 #add_cut = ["(1)","no_isoVeto"]
 add_cut = ["(iso_Veto)","_isoVeto"]
 #add_cut = "(1)"
@@ -63,17 +63,19 @@ if presel :
   signal_suffix = "x10"
 if SB_w : 
   SR = {(3,4):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
-  btag_weight = "(weightBTag0_SF)"
+  btag_weight = "(1)"
   nbtag = (0,0)
   signal_suffix = ""
 if SB_tt : 
   SR = {(4,5):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
-  btag_weight = "(weightBTag1_SF)"
+  #btag_weight = "(weightBTag1_SF)"
+  btag_weight = "(1)"
   nbtag = (1,1)
   signal_suffix = ""
 if new_SB_tt : 
   SR = {(4,5):{(250,-1):{(500,-1):{"deltaPhi":1}}}}
-  btag_weight = "(weightBTag1p_SF)"
+  #btag_weight = "(weightBTag1p_SF)"
+  btag_weight = "(1)"
   nbtag = (1,-1)
   signal_suffix = ""
 if test :
@@ -115,8 +117,8 @@ bkg_samples=[
 {"sample":"singleTop",      "weight":btag_weight ,"cut":nbtag ,"add_Cut":"(1)","name":singleTop_lep,"tex":"t/#bar{t}",'color': ROOT.kViolet+5},
 {"sample":"QCD",            "weight":"(1)"       ,"cut":nbtag ,"add_Cut":"(1)","name":QCDHT, "tex":"QCD","color":ROOT.kCyan-6},
 {"sample":"WJets",          "weight":btag_weight ,"cut":nbtag ,"add_Cut":"(1)","name":WJetsHTToLNu,"tex":"W + jets","color":ROOT.kGreen-2},
-{"sample":"ttJets_diLep",   "weight":btag_weight ,"cut":nbtag ,"add_Cut":"(1)","name":TTJets_diLep, "tex":"t#bar{t} ll + jets",'color':ROOT.kBlue},
-{"sample":"ttJets_semiLep", "weight":btag_weight ,"cut":nbtag ,"add_Cut":"(1)","name":TTJets_semiLep, "tex":"t#bar{t} l + jets",'color':ROOT.kBlue-7}
+{"sample":"ttJets_diLep",   "weight":"("+top_ISR_weight+"*1.071)","cut":nbtag ,"add_Cut":"(1)","name":TTJets_diLep, "tex":"t#bar{t} ll + jets",'color':ROOT.kBlue},
+{"sample":"ttJets_semiLep", "weight":"("+top_ISR_weight+"*1.071)","cut":nbtag ,"add_Cut":"(1)","name":TTJets_semiLep, "tex":"t#bar{t} l + jets",'color':ROOT.kBlue-7}
 ]
 
 for bkg in bkg_samples:
@@ -151,7 +153,7 @@ plots =[\
 {'ndiv':False,'yaxis':'Events','xaxis':'miniIso(l)','logy':'True' , 'var':'LepGood_miniRelIso[0]',           'bin_set':(False,25),          'varname':'leptonminiIso',      'binlabel':30,  'bin':(40,0,0.5)},\
 {'ndiv':False,'yaxis':'Events','xaxis':'minDeltaR','logy':'True' , 'var':'Min$(sqrt((abs(Jet_phi-LepGood_phi[0]))**2+(abs(Jet_eta-LepGood_eta[0]))**2))', 'bin_set':False  ,    'varname':'Min_R_Jet_lepton',      'binlabel':1,  'bin':(50,0,10)},\
 {'ndiv':False,'yaxis':'Events','xaxis':'Nvert','logy':'True' , 'var':'nVert',                               'bin_set':(False,25),          'varname':'nVert',      'binlabel':1,  'bin':(50,0,50)},\
-#{'ndiv':False,'yaxis':'Events','xaxis':'Jet_btagCSV','logy':'True' , 'var':'Jet_btagCSV',                             'bin_set':False,          'varname':'Jet_btagCSV',      'binlabel':1,  'bin':(50,0,2)},\
+{'ndiv':False,'yaxis':'Events','xaxis':'Jet_btagCSV','logy':'True' , 'var':'Jet_btagCSV',                             'bin_set':(False,25),          'varname':'Jet_btagCSV',      'binlabel':1,  'bin':(50,0,2)},\
 #{'ndiv':False,'yaxis':'Events','xaxis':'#Delta#Phi(met,l)','logy':'True' , 'var':'acos(cos(met_phi-LepGood_phi[0]))', 'bin_set':False  ,    'varname':'deltaPhi_metl',      'binlabel':1,  'bin':(50,0,3.14)},\
   ]
 
@@ -166,13 +168,7 @@ if test :
 if not draw_signal :
   signals = []
 topWeight = [("TopPtWeight","topPt"),(top_ISR_weight,"ISR"),("(1)","non")]
-if top_index==1 : 
-  bkg_samples[6]["weight"] = top_ISR_weight 
-  bkg_samples[7]["weight"] = top_ISR_weight
-  print bkg_samples[6] , bkg_samples[7]
-  weight_str_plot = reweight
-else: 
-  weight_str_plot = '*'.join([reweight,topWeight[top_index][0]])
+weight_str_plot = reweight
 print topWeight[top_index][1]
 plots = [plots[iplot]]
 lepSels = [lepSels[lepSel_index]]
@@ -188,11 +184,12 @@ for lepSel in lepSels:
     os.makedirs(path)
   print lepSel['label']
   print "====== "
-  presel = "&&".join([lepSel['cut'],lepSel['veto'],"Jet_pt[1]>80&&abs(LepGood_eta[0])<2.4",bkg_filters,add_cut[0]])
-  sig_presel = "&&".join([lepSel['cut'],lepSel['veto'],"Jet_pt[1]>80&&abs(LepGood_eta[0])<2.4",add_cut[0]]) #"flag_crazy_jets"
-  data_presel = "&&".join([lepSel['cut'],lepSel['veto'],lepSel['trigger_xor'],filters,"Jet_pt[1]>80&&abs(LepGood_eta[0])<2.4",add_cut[0]])
+  presel = "&&".join([lepSel['cut'],lepSel['veto'],"Jet_pt[1]>80",bkg_filters,add_cut[0]])
+  sig_presel = "&&".join([lepSel['cut'],lepSel['veto'],"Jet_pt[1]>80",add_cut[0]]) #"flag_crazy_jets"
+  data_presel = "&&".join([lepSel['cut'],lepSel['veto'],lepSel['trigger_xor'],filters,"Jet_pt[1]>80",add_cut[0]])
   print "DATA Presel" , data_presel
-  print presel
+  print "MC presel " , presel
+  print "Signal presel " , sig_presel
   bin = {}
   for srNJet in sorted(SR):
     bin[srNJet]={}
@@ -223,6 +220,7 @@ for lepSel in lepSels:
           print "Data" , Cut
           bin[srNJet][stb][htb][p['varname']]['data'] = getPlotFromChain(lepSel['chain'], p['var'], p['bin'], cutString = Cut , weight = "(1)", binningIsExplicit=False,addOverFlowBin='both',variableBinning=p["bin_set"])
           data_yield = bin[srNJet][stb][htb][p['varname']]['data'].Integral()
+          print data_yield , tot_yield
           if tot_yield > 0.0 : bin[srNJet][stb][htb]['scale_fac'] = float(data_yield)/float(tot_yield)
           else : bin[srNJet][stb][htb]['scale_fac'] = 1 
           #bin[srNJet][stb][htb]['scale_fac'] = 1 
@@ -291,7 +289,7 @@ for lepSel in lepSels:
           for bkg in bkg_samples:
             color = bkg['color']
             histo = bin[srNJet][stb][htb][p['varname']][bkg['sample']]
-            if "ttjets" in bkg["sample"].lower() : histo.Scale(bin[srNJet][stb][htb]['scale_fac']*1.071)
+            if "ttjets" in bkg["sample"].lower() : histo.Scale(bin[srNJet][stb][htb]['scale_fac'])
             else : histo.Scale(bin[srNJet][stb][htb]['scale_fac'])
             histo.SetFillColor(color)
             histo.SetLineColor(ROOT.kBlack)

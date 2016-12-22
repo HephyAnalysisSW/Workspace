@@ -21,7 +21,7 @@ lepSels = [
 {'cut':'(singleMuonic&&(!isData||(isData&&muonDataSet)))' , 'veto':'nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0',\
  'chain': getChain(single_mu,histname="",treeName="Events") ,\
   'label':'_mu_', 'str':'1 $\\mu$' , 'trigger': trigger},\
-{'cut':'singleElectronic&&(!isData||(isData&&eleDataSet))' , 'veto':'nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0',\
+{'cut':'singleElectronic' , 'veto':'nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0',\
  'chain': getChain(single_ele,histname="",treeName="Events") ,\
   'label':'_ele_', 'str':'1 $\\e$' , 'trigger': trigger},\
 {'cut':'((!isData&&singleLeptonic)||(isData&&((eleDataSet&&singleElectronic)||(muonDataSet&&singleMuonic)||(METDataSet&&singleLeptonic))))' , 'veto':'nLooseHardLeptons==1&&nTightHardLeptons==1&&nLooseSoftLeptons==0',\
@@ -29,19 +29,19 @@ lepSels = [
   'label':'_lep_', 'str':'1 $lep$' , 'trigger': trigger}\
 ]
 
-lepSels = [lepSels[2]]
+lepSels = [lepSels[1]]
 diLep = "(Sum$(abs(genTau_grandmotherId)==6&&abs(genTau_motherId)==24)+Sum$(abs(genLep_grandmotherId)==6&&abs(genLep_motherId)==24)==2)"
 semiLep = "(Sum$(abs(genTau_grandmotherId)==6&&abs(genTau_motherId)==24)+Sum$(abs(genLep_grandmotherId)==6&&abs(genLep_motherId)==24)<2)"
 
 bkg_samples=[
-#{'sample':'TTVH',      "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":TTV ,'tex':'t#bar{t}V','color':ROOT.kOrange-3},
-#{"sample":"DiBosons",  "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":diBoson ,"tex":"WW/WZ/ZZ","color":ROOT.kRed+3},
-#{"sample":"DY",        "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":DY_HT,"tex":"DY + jets",'color':ROOT.kRed-6},
-#{"sample":"singleTop", "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":singleTop_lep,"tex":"t/#bar{t}",'color': ROOT.kViolet+5},
-#{"sample":"QCD",       "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":QCDHT, "tex":"QCD","color":ROOT.kCyan-6},
-#{"sample":"WJets",     "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":WJetsHTToLNu,"tex":"W + jets","color":ROOT.kGreen-2},
-{"sample":"ttJets",    "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":TTJets_diLep, "tex":"t#bar{t} ll + jets",'color':ROOT.kBlue},
-{"sample":"ttJets",    "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":TTJets_semiLep, "tex":"t#bar{t} l + jets",'color':ROOT.kBlue-7},
+{'sample':'TTVH',      "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":TTV ,'tex':'t#bar{t}V','color':ROOT.kOrange-3},
+{"sample":"DiBosons",  "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":diBoson ,"tex":"WW/WZ/ZZ","color":ROOT.kRed+3},
+{"sample":"DY",        "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":DY_HT,"tex":"DY + jets",'color':ROOT.kRed-6},
+{"sample":"singleTop", "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":singleTop_lep,"tex":"t/#bar{t}",'color': ROOT.kViolet+5},
+{"sample":"QCD",       "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":QCDHT, "tex":"QCD","color":ROOT.kCyan-6},
+{"sample":"WJets",     "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":WJetsHTToLNu,"tex":"W + jets","color":ROOT.kGreen-2},
+{"sample":"ttJets",    "weight":"("+top_ISR_weight+"*1.071)" ,"cut":(0,0),"add_Cut":"(1)","name":TTJets_diLep, "tex":"t#bar{t} ll + jets",'color':ROOT.kBlue},
+{"sample":"ttJets",    "weight":"("+top_ISR_weight+"*1.071)" ,"cut":(0,0),"add_Cut":"(1)","name":TTJets_semiLep, "tex":"t#bar{t} l + jets",'color':ROOT.kBlue-7},
 ]
 
 for bkg in bkg_samples:
@@ -54,15 +54,15 @@ signals = [\
 
 for lepSel in lepSels:
   cuts = [
-  {'cut':"&&".join(['(1)']), 'label':'no cut'},\
-  {'cut':"&&".join([lepSel['cut']]), 'label': lepSel['str']},\
-  {'cut':"&&".join([lepSel['cut'],lepSel['veto']]), 'label': lepSel['str']+' veto'},\
-  {'cut':"&&".join([lepSel['cut'],lepSel['veto'],"iso_Veto"]), 'label': 'iso Veto' },\
-  {'cut':"&&".join([lepSel['cut'],lepSel['veto'],"iso_Veto","nJet30>=5"]), 'label': 'nJet $\\geq$ 5'},\
-  {'cut':"&&".join([lepSel['cut'],lepSel['veto'],"iso_Veto","nJet30>=5","(Jet_pt[1]>80)","(Jet_pt[1]>80)"]), 'label': '2. jets ($\\geq$ 80 GeV)'},\
-  {'cut':"&&".join([lepSel['cut'],lepSel['veto'],"iso_Veto","nJet30>=5","(Jet_pt[1]>80)","(Jet_pt[1]>80)","htJet30j>500"]), 'label':'$H_T >$ 500 GeV'},\
-  {'cut':"&&".join([lepSel['cut'],lepSel['veto'],"iso_Veto","nJet30>=5","(Jet_pt[1]>80)","htJet30j>500","st>250","(Jet_pt[1]>80)"]), 'label':'$L_T >$ 250 GeV'},\
-  {'cut':"&&".join([lepSel['cut'],lepSel['veto'],"iso_Veto","nJet30>=5","(Jet_pt[1]>80)","htJet30j>500","st>250","nBJetMediumCSV30==0","iso_Veto","(Jet_pt[1]>80)"]), 'label': '0 b-jets (CSVM)' },\
+  #{'cut':"&&".join(['(1)']), 'label':'no cut'},\
+  #{'cut':"&&".join([lepSel['cut']]), 'label': lepSel['str']},\
+  #{'cut':"&&".join([lepSel['cut'],lepSel['veto']]), 'label': lepSel['str']+' veto'},\
+  #{'cut':"&&".join([lepSel['cut'],lepSel['veto'],"iso_Veto"]), 'label': 'iso Veto' },\
+  #{'cut':"&&".join([lepSel['cut'],lepSel['veto'],"iso_Veto","nJet30>=5"]), 'label': 'nJet $\\geq$ 5'},\
+  #{'cut':"&&".join([lepSel['cut'],lepSel['veto'],"iso_Veto","nJet30>=5","(Jet_pt[1]>80)","(Jet_pt[1]>80)"]), 'label': '2. jets ($\\geq$ 80 GeV)'},\
+  #{'cut':"&&".join([lepSel['cut'],lepSel['veto'],"iso_Veto","nJet30>=5","(Jet_pt[1]>80)","(Jet_pt[1]>80)","htJet30j>500"]), 'label':'$H_T >$ 500 GeV'},\
+  #{'cut':"&&".join([lepSel['cut'],lepSel['veto'],"iso_Veto","nJet30>=5","(Jet_pt[1]>80)","htJet30j>500","st>250","(Jet_pt[1]>80)"]), 'label':'$L_T >$ 250 GeV'},\
+  {'cut':"&&".join([lepSel['cut'],lepSel['veto'],"iso_Veto","nJet30>=4&&nJet30<=5","(Jet_pt[1]>80)","htJet30j>500","st>250","nBJetMediumCSV30>=1","iso_Veto",bkg_filters,"(Jet_pt[1]>80)"]), 'label': 'multi b-jets (CSVM)' },\
   #{'cut':"&&".join([lepSel['cut'],lepSel['veto'],"nJet30>=5","(Jet_pt[1]>80)","htJet30j>500","st>250","nBJetMediumCSV30==0","deltaPhi_Wl>1","(Jet_pt[1]>80)"]), 'label': '\\Delta\\Phi >' },\
   #{'cut':"&&".join([lepSel['cut'],lepSel['veto'],"nJet30>=5","(Jet_pt[1]>80)","htJet30j>500","st>250","nBJetMediumCSV30>=1","nJet30>=6","(Jet_pt[1]>80)"]), 'label': 'multi b-jets (CSVM) nJet >=6' },\
   #{'cut':"&&".join([lepSel['cut'],lepSel['veto'],"nJet30>=5","(Jet_pt[1]>80)","htJet30j>500","st>250","nBJetMediumCSV30>=1","nJet30>=6","(Jet_pt[1]>80)","deltaPhi_Wl>1"]), 'label': '\\Delta\\Phi >1' },\
@@ -104,7 +104,7 @@ for lepSel in lepSels:
       #nEntry = chain.GetEntries()
       #nEntry = chain.GetEntries("&&".join([s["add_Cut"],cut['cut']]))
       #print "MC Events:" , nEntry
-      y_remain = getYieldFromChain(chain,cutString = "&&".join([s["add_Cut"],cut['cut']]) , weight = weight_str_plot)
+      y_remain = getYieldFromChain(chain,cutString = "&&".join([s["add_Cut"],cut['cut']]) , weight = weight_str_plot+"*"+bkg["weight"])
       print tot_yields , y_remain
       tot_yields = y_remain
       #tot_yields = nEntry
@@ -117,12 +117,13 @@ for lepSel in lepSels:
     line_yield = '&' + str(format(sum(sum_tt), '.1f'))
     ofile.write(line_yield)
     line_yield = '&' + str(format(sum(sum_all), '.1f'))
+    print sum(sum_all)
     sum_tt = []
     sum_all = []
     for sig in signals:
       chain = sig['chain']
       y_remain = getYieldFromChain(chain,cutString = "&&".join([sig["add_Cut"],cut['cut']]) , weight = weight_str_signal_plot)
-      print  y_remain
+      #print  y_remain
       ofile.write(line_yield)
       line_yield = '&' + str(format(y_remain , '.1f'))
     line_yield = '&' + str(format(y_remain , '.1f'))
