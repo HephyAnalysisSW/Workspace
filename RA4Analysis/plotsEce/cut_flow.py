@@ -34,12 +34,12 @@ diLep = "(Sum$(abs(genTau_grandmotherId)==6&&abs(genTau_motherId)==24)+Sum$(abs(
 semiLep = "(Sum$(abs(genTau_grandmotherId)==6&&abs(genTau_motherId)==24)+Sum$(abs(genLep_grandmotherId)==6&&abs(genLep_motherId)==24)<2)"
 
 bkg_samples=[
-{'sample':'TTVH',      "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":TTV ,'tex':'t#bar{t}V','color':ROOT.kOrange-3},
-{"sample":"DiBosons",  "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":diBoson ,"tex":"WW/WZ/ZZ","color":ROOT.kRed+3},
-{"sample":"DY",        "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":DY_HT,"tex":"DY + jets",'color':ROOT.kRed-6},
-{"sample":"singleTop", "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":singleTop_lep,"tex":"t/#bar{t}",'color': ROOT.kViolet+5},
-{"sample":"QCD",       "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":QCDHT, "tex":"QCD","color":ROOT.kCyan-6},
-{"sample":"WJets",     "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":WJetsHTToLNu,"tex":"W + jets","color":ROOT.kGreen-2},
+#{'sample':'TTVH',      "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":TTV ,'tex':'t#bar{t}V','color':ROOT.kOrange-3},
+#{"sample":"DiBosons",  "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":diBoson ,"tex":"WW/WZ/ZZ","color":ROOT.kRed+3},
+#{"sample":"DY",        "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":DY_HT,"tex":"DY + jets",'color':ROOT.kRed-6},
+#{"sample":"singleTop", "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":singleTop_lep,"tex":"t/#bar{t}",'color': ROOT.kViolet+5},
+#{"sample":"QCD",       "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":QCDHT, "tex":"QCD","color":ROOT.kCyan-6},
+#{"sample":"WJets",     "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":WJetsHTToLNu,"tex":"W + jets","color":ROOT.kGreen-2},
 {"sample":"ttJets",    "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":TTJets_diLep, "tex":"t#bar{t} ll + jets",'color':ROOT.kBlue},
 {"sample":"ttJets",    "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":TTJets_semiLep, "tex":"t#bar{t} l + jets",'color':ROOT.kBlue-7},
 ]
@@ -68,7 +68,7 @@ for lepSel in lepSels:
   #{'cut':"&&".join([lepSel['cut'],lepSel['veto'],"nJet30>=5","(Jet_pt[1]>80)","htJet30j>500","st>250","nBJetMediumCSV30>=1","nJet30>=6","(Jet_pt[1]>80)","deltaPhi_Wl>1"]), 'label': '\\Delta\\Phi >1' },\
    ]
   if ICHEP: ofile = file(path+'cut_flow_'+lepSel['label']+'_ICHEP_onlyWJets.tex','w')
-  else: ofile = file(path+'cut_flow_'+lepSel['label']+'_reweightTopPt_.tex','w')
+  else: ofile = file(path+'cut_flow_'+lepSel['label']+'_reweight_tests.tex','w')
   doc_header = '\\documentclass{article}\\usepackage[english]{babel}\\usepackage{graphicx}\\usepackage[margin=0.5in]{geometry}\\begin{document}'
   ofile.write(doc_header)
   ofile.write("\n")

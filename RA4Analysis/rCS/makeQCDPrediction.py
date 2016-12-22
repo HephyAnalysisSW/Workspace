@@ -17,7 +17,7 @@ from Workspace.RA4Analysis.signalRegions import *
 #from Workspace.RA4Analysis.cmgTuples_Data_25ns_postProcessed_antiSel import *
 
 from Workspace.RA4Analysis.cmgTuples_Spring16_Moriond2017_MiniAODv2_antiSel_postProcessed import *
-from Workspace.RA4Analysis.cmgTuples_Data25ns_Promtv2_antiSel_postprocessed import *
+from Workspace.RA4Analysis.cmgTuples_Data25ns_Moriond2017_antiSel_postprocessed import *
 
 #from draw_helpers import *
 from math import *
@@ -25,17 +25,18 @@ from Workspace.HEPHYPythonTools.user import username
 from LpTemplateFit import LpTemplateFit
 from rCShelpers import *
 
-isData = False
+isData = True
 makeFit = True
-getYields = True
-getResults = True
+getYields = False
+getResults = False
 isValidation = False
 
 includeMCresults = False
 
-readFit     = '/data/dspitzbart/Results2016/QCDEstimation/20160725_fitResult_2016SR_MC12p9fb'
-readYields  = '/data/dspitzbart/Results2016/QCDEstimation/20160725_QCDestimation_2016SR_MC12p9fb'
-
+#readFit     = '/data/dspitzbart/Results2016/QCDEstimation/20160725_fitResult_2016SR_MC12p9fb'
+readFit     = '/afs/hephy.at/data/dspitzbart01/RA4/Moriond2017/QCDEstimation/20161220_fitResult_Moriond17SR_v3_MC36p5fb'
+#readYields  = '/data/dspitzbart/Results2016/QCDEstimation/20160725_QCDestimation_2016SR_MC12p9fb'
+readYields  = '/afs/hephy.at/data/dspitzbart01/RA4/Moriond2017/QCDEstimation/20161220_QCDestimation_Moriond17SR_v3_MC36p5fb'
 
 
 if isData:
@@ -43,7 +44,7 @@ if isData:
 else:
   sampleStr = 'MC'
 
-SRstring = 'Moriond17SR'
+SRstring = 'Moriond17SR_v8'
 if isValidation: SRstring = '2016val_v2'
 lumiStr = '36p5fb'
 
@@ -88,6 +89,13 @@ fitCR =  {QCD_SB: {(250, 350): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}},  #Q
                    (450, 650): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}},
                    (650,  -1): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}}}}
 
+fitCR_multib = {QCD_SB: {(250,  -1): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}},
+                         (250, 450): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}},
+                         (450, 600): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}},
+                         (600, 750): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}},
+                         (750,  -1): {(500, -1):   {(1.0):    {'deltaPhi': 1.0}}}}}
+
+fitCR = fitCR_multib
 
 if isValidation: SRs = validation2016
 else:
@@ -101,7 +109,7 @@ btreg = [(0,0), (1,1), (2,-1)] #1b and 2b estimates are needed for the btag fit
 
 
 lumi = 36.5
-sampleLumi = 3.0 #FIXME update!!
+sampleLumi = 1.0
 muTriggerEff = '0.926'
 eleTriggerErr = '0.963'
 MCweight = 'TopPtWeight*puReweight_true_max4*'+eleTriggerErr#+'*lepton_muSF_HIP*lepton_muSF_mediumID*lepton_muSF_miniIso02*lepton_muSF_sip3d*lepton_eleSF_cutbasedID*lepton_eleSF_miniIso01*lepton_eleSF_gsf'
@@ -120,37 +128,45 @@ def getPseudoRCS(small,smallE,large,largeE):
     return {'rCS':float('nan'), 'rCSE_pred':float('nan'), 'rCSE_sim':float('nan')}
 
 #trigger and filters for real Data
-trigger = "&&((HLT_EleHT350||HLT_EleHT400||HLT_Ele105)||(HLT_MuHT350||HLT_MuHT400))"
+#trigger = "&&((HLT_EleHT350||HLT_EleHT400||HLT_Ele105)||(HLT_MuHT350||HLT_MuHT400))"
+
+trigger_or_ele = "(HLT_Ele105||HLT_Ele115||HLT_Ele50PFJet165||HLT_IsoEle27T||HLT_EleHT400||HLT_EleHT350)"
+trigger_or_mu = "(HLT_Mu50||HLT_IsoMu24||HLT_MuHT400||HLT_MuHT350)"
+trigger_or_lep = "%s||%s"%(trigger_or_ele,trigger_or_mu)
+trigger_or_met = "(HLT_MET100MHT100||HLT_MET110MHT110||HLT_MET120MHT120)"
+trigger = "(%s||%s||%s)"%(trigger_or_ele,trigger_or_mu,trigger_or_met)
+trigger_xor_ele = "(eleDataSet&&%s)"%(trigger_or_ele)
+trigger_xor_mu = "(muonDataSet&&%s&&!(%s))"%(trigger_or_mu,trigger_or_ele)
+trigger_xor_met = "(METDataSet&&%s&&!(%s)&&!(%s))"%(trigger_or_met,trigger_or_ele,trigger_or_mu)
+trigger_xor = "&&(%s||%s||%s)"%(trigger_xor_ele,trigger_xor_mu,trigger_xor_met)
+
+#trigger_xor = '&&(%s)'%(trigger_or_ele) #FIXME
+
 filters = "&& (Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_goodVertices && Flag_eeBadScFilter &&  Flag_globalTightHalo2016Filter && Flag_badChargedHadronFilter && Flag_badMuonFilter)"
 
 #presel        = 'nLep==1&&nVeto==0&&leptonPt>25&&nEl==1&&Jet2_pt>80&& Flag_badChargedHadronFilter && Flag_badMuonFilter'
 presel        = 'nLep==1&&nVeto==0&&leptonPt>25&&nEl==1&&Jet2_pt>80&& iso_Veto'
 antiSelStr    = presel + '&&Selected==(-1)'
 SelStr        = presel + '&&Selected==1'
-antiSelStrIso = antiSelStr + '&&iso_Veto==1'
-SelStrIso     = SelStr + '&&iso_Veto==1'
-
-#cQCD  = getChain(QCDHT_25ns,histname='')
-#cEWK  = getChain([WJetsHTToLNu_25ns, TTJets_combined_2, singleTop_25ns, DY_25ns, TTV_25ns],histname='')
 
 cQCD  = getChain(QCDHT_antiSel,histname='')
 cEWK  = getChain([WJetsHTToLNu_antiSel, TTJets_Comb_antiSel, singleTop_lep_antiSel, DY_HT_antiSel, TTV_antiSel],histname='')
 
 if isData:
-  cData = getChain([single_ele_Run2016B_antiSel, single_ele_Run2016C_antiSel, single_ele_Run2016D_antiSel],histname='')
+  cData = getChain([single_ele_antiSel,met_antiSel,single_mu_antiSel],histname='')
+  #cData = getChain([single_ele_antiSel],histname='')
 else:
   cData = getChain([QCDHT_antiSel, WJetsHTToLNu_antiSel, TTJets_Comb_antiSel, singleTop_lep_antiSel, DY_HT_antiSel, TTV_antiSel] , histname='')
 
 #get template for fit method
 numberOfBins = 30
 template_QCD = ROOT.TH1F('template_QCD','template_QCD',numberOfBins,-0.5,2.5)
-#print '!!!!!!!!!!!!!!! using sel QCD as template now'
 print 'Creating template'
 templateName, templateCut = nameAndCut((250,-1), (500,-1), (3,4), (0,0), presel=antiSelStr, charge="", btagVar = 'nBJetMediumCSV30', stVar = 'Lt', htVar = 'htJet30clean', njetVar='nJet30clean') ##changed from anitsel for check!!!
 
 if makeFit:
   if isData:
-    cData.Draw('Lp>>template_QCD','('+templateCut+trigger+filters+')','goff')
+    cData.Draw('Lp>>template_QCD','('+templateCut+trigger_xor+filters+')','goff')
   else:
     cQCD.Draw('Lp>>template_QCD','('+weight_str+')*('+templateCut+')','goff')
 
@@ -195,10 +211,10 @@ if makeFit:
 
         #templateName, templateCut = nameAndCut(ltb, (500,-1), (3,4), (0,0), presel=SelStr, charge="", btagVar = 'nBJetMediumCSV30', stVar = 'Lt', htVar = 'htJet30clean', njetVar='nJet30clean')
         #if isData:
-        #  cData.Draw('Lp>>template_QCD','('+templateCut+trigger+filters+')','goff')
+        #  cData.Draw('Lp>>template_QCD','('+templateCut+trigger_xor+filters+')','goff')
         #else:
         #  cQCD.Draw('Lp>>template_QCD','('+weight_str+')*('+templateCut+')','goff')
-        #cData.Draw('Lp>>template_QCD','('+templateCut+trigger+filters+')','goff')
+        #cData.Draw('Lp>>template_QCD','('+templateCut+trigger_xor+filters+')','goff')
         
         print 'Drawing QCD'
         cQCD.Draw('Lp>>QCD_antiSelection','('+weight_str+')*('+antiSelCut+')')
@@ -208,26 +224,26 @@ if makeFit:
         cEWK.Draw('Lp>>EWK_Selection','('+weight_str+')*('+SelCut+')')
         if isData:
           print 'Drawing data'
-          cData.Draw('Lp>>DATA_antiSelection','('+antiSelCut+trigger+filters+')')
-          cData.Draw('Lp>>DATA_Selection','('+SelCut+trigger+filters+')')
+          cData.Draw('Lp>>DATA_antiSelection','('+antiSelCut+trigger_xor+filters+')')
+          cData.Draw('Lp>>DATA_Selection','('+SelCut+trigger_xor+filters+')')
         else:
           print 'Drawing pseudo data'
           cData.Draw('Lp>>DATA_antiSelection','('+weight_str+')*('+antiSelCut+')')
           cData.Draw('Lp>>DATA_Selection','('+weight_str+')*('+SelCut+')')
-  ##      cData.Draw('Lp>>DATA_antiSelection','('+antiSelCut+trigger+filters+')')
+  ##      cData.Draw('Lp>>DATA_antiSelection','('+antiSelCut+trigger_xor+filters+')')
   #      cData.Draw('Lp>>DATA_antiSelection','('+weight_str+')*('+antiSelCut+')')
-  ##      cData.Draw('Lp>>DATA_Selection','('+SelCut+trigger+filters+')')
+  ##      cData.Draw('Lp>>DATA_Selection','('+SelCut+trigger_xor+filters+')')
   #      cData.Draw('Lp>>DATA_Selection','('+weight_str+')*('+SelCut+')')
         
         print 'Getting Rcs'
         if isData:
-          rCSanti = getRCS(cData, antiSelCut+trigger+filters, deltaPhiCut, useWeight = False, weight = weight_str)
-          rCSsel = getRCS(cData, SelCut+trigger+filters, deltaPhiCut, useWeight = False, weight = weight_str)
+          rCSanti = getRCS(cData, antiSelCut+trigger_xor+filters, deltaPhiCut, useWeight = False, weight = weight_str)
+          rCSsel = getRCS(cData, SelCut+trigger_xor+filters, deltaPhiCut, useWeight = False, weight = weight_str)
         else:
           rCSanti = getRCS(cData, antiSelCut, deltaPhiCut, useWeight = True, weight = weight_str)
           rCSsel = getRCS(cData, SelCut, deltaPhiCut, useWeight = True, weight = weight_str)
-  ##      rCSanti = getRCS(cData, antiSelCut+trigger+filters, deltaPhiCut, useWeight = False, weight = weight_str)
-  ##      rCSsel = getRCS(cData, SelCut+trigger+filters, deltaPhiCut, useWeight = False, weight = weight_str)
+  ##      rCSanti = getRCS(cData, antiSelCut+trigger_xor+filters, deltaPhiCut, useWeight = False, weight = weight_str)
+  ##      rCSsel = getRCS(cData, SelCut+trigger_xor+filters, deltaPhiCut, useWeight = False, weight = weight_str)
   #      rCSanti = getRCS(cData, antiSelCut, deltaPhiCut, useWeight = True, weight = weight_str)
   #      rCSsel = getRCS(cData, SelCut, deltaPhiCut, useWeight = True, weight = weight_str)
   
@@ -402,15 +418,15 @@ if getYields:
               cEWK.Draw('Lp>>EWK_Selection','('+weight_str+')*('+SelCut+')')
 
             if isData:
-              cData.Draw('Lp>>DATA_antiSelection','('+antiSelCut+trigger+filters+')')
-              cData.Draw('Lp>>DATA_Selection','('+SelCut+trigger+filters+')')
+              cData.Draw('Lp>>DATA_antiSelection','('+antiSelCut+trigger_xor+filters+')')
+              cData.Draw('Lp>>DATA_Selection','('+SelCut+trigger_xor+filters+')')
             else:
               cData.Draw('Lp>>DATA_antiSelection','('+weight_str+')*('+antiSelCut+')')
               cData.Draw('Lp>>DATA_Selection','('+weight_str+')*('+SelCut+')')
   
             if isData:
-              rCSanti = getRCS(cData, antiSelCut+trigger+filters, deltaPhiCut, useWeight = False, weight = weight_str)
-              rCSsel = getRCS(cData, SelCut+trigger+filters, deltaPhiCut, useWeight = False, weight = weight_str)
+              rCSanti = getRCS(cData, antiSelCut+trigger_xor+filters, deltaPhiCut, useWeight = False, weight = weight_str)
+              rCSsel = getRCS(cData, SelCut+trigger_xor+filters, deltaPhiCut, useWeight = False, weight = weight_str)
             else:
               rCSanti = getRCS(cData, antiSelCut, deltaPhiCut, useWeight = True, weight = weight_str)
               rCSsel = getRCS(cData, SelCut, deltaPhiCut, useWeight = True, weight = weight_str)
@@ -519,7 +535,7 @@ for srNJet in sorted(signalRegion):
         for dP in sorted(signalRegion[srNJet][stb][htb]):
           deltaPhiCut = signalRegion[srNJet][stb][htb][dP]['deltaPhi']
           sys         = signalRegion[srNJet][stb][htb][dP]['sys']
-          print sys
+          #print sys
           Fsta        = fitRes[inclusiveTemplate.keys()[0]][stb][(500,-1)]['F_seltoantisel']
           Fsta_err    = fitRes[inclusiveTemplate.keys()[0]][stb][(500,-1)]['F_seltoantisel_err']
           Nanti       = bins[srNJet][stb][htb][btb][dP]['NDATAAntiSel']
@@ -542,9 +558,10 @@ for srNJet in sorted(signalRegion):
             #print NQCD_err, NQCD, NQCD_truth, NQCD
             #NQCD_err_rel  = max([NQCD_err/NQCD, abs(1-NQCD_truth/NQCD)])
             #NQCD_err_rel  = max([NQCD_err/NQCD, sys])
-            NQCD_err_rel  = 1.
-            print round(NQCD_err_rel,3)
-            NQCD_err      = NQCD_err_rel*NQCD
+            #NQCD_err_rel  = 1.
+            NQCD_err_rel  = NQCD_err/NQCD
+            print round(NQCD_err,3)
+            #NQCD_err      = NQCD_err_rel*NQCD
           try: NQCD_lowDPhi = NQCD/(RcsAnti+1)
           except ZeroDivisionError: NQCD_lowDPhi = float('nan') 
           try: NQCD_lowDPhi_err = NQCD_lowDPhi*sqrt((NQCD_err/NQCD)**2 + (RcsAnti_err/(RcsAnti+1))**2)
@@ -552,5 +569,5 @@ for srNJet in sorted(signalRegion):
           NQCD_highDPhi = NQCD - NQCD_lowDPhi
           NQCD_highDPhi_err = sqrt(RcsAnti_err**2*NQCD_lowDPhi**2 + RcsAnti**2*NQCD_lowDPhi_err**2)
           bins[srNJet][stb][htb][btb][dP].update({'NQCDpred':NQCD, 'NQCDpred_err':NQCD_err, 'NQCDpred_err_rel':NQCD_err_rel, 'NQCDpred_lowdPhi':NQCD_lowDPhi, 'NQCDpred_lowdPhi_err':NQCD_lowDPhi_err, 'NQCDpred_highdPhi':NQCD_highDPhi, 'NQCDpred_highdPhi_err':NQCD_highDPhi_err})
-          pickle.dump(bins, file(picklePath+picklePresel+'_100p','w'))
+          pickle.dump(bins, file(picklePath+picklePresel+'_orig','w'))
 

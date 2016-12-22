@@ -1,6 +1,7 @@
+
 import copy, os, sys
 
-datadir = '/afs/hephy.at/data/easilar01/cmgTuples/postProcessing_Data_Moriond2017_v9_Trigskimmed/HT350/'
+datadir = '/afs/hephy.at/data/dspitzbart01/cmgTuples/postProcessed_Run2016_antiSelection_isoTrack_v8/HT500/'
 
 singleElectron_samples = [\
                         "SingleElectron_Run2016B_23Sep2016",\
@@ -34,34 +35,21 @@ met_samples = [\
                         "MET_Run2016H_PromptReco_v3"\
                         ]
 
-single_mu = {\
+single_mu_antiSel = {\
 "name" : "SingleMuon",
 "bins" : singleMuon_samples ,
 'dir' : datadir,
 }
 
-single_ele = {\
+single_ele_antiSel = {\
 "name" : "SingleElectron",
 "bins" : singleElectron_samples ,
 'dir' : datadir,
 }
 
-met = {\
+met_antiSel = {\
 "name" : "MET",
 "bins" : met_samples ,
-'dir' : "/afs/hephy.at/data/easilar01/cmgTuples/postProcessing_Data_Moriond2017_v9_Trigskimmed_METTest/HT350/",
-}
-
-single_mu_unblind = {\
-"name" : "SingleMuon_unblind",
-"bins" : singleMuon_samples[:-5] ,
 'dir' : datadir,
 }
-
-single_ele_unblind = {\
-"name" : "SingleElectron_unblind",
-"bins" : singleElectron_samples[:-5] ,
-'dir' : datadir,
-}
-
 

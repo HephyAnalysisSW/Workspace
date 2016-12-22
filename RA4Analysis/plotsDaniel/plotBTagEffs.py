@@ -24,8 +24,9 @@ can.SetBottomMargin(0.22)
 
 #effs = pickle.load(file('/data/dspitzbart/Spring16/btagEfficiency/effs_presel_JECv6_pkl'))
 #bTagEffFile = '/data/dspitzbart/Spring16/btagEfficiency/signal_inclusive_pkl'
-bTagEffFile = '$CMSSW_BASE/src/Workspace/RA4Analysis/cmgPostProcessing/data/Moriond17_v1_CSVv2_0p8484.pkl'
+#bTagEffFile = '$CMSSW_BASE/src/Workspace/RA4Analysis/cmgPostProcessing/data/Moriond17_v1_CSVv2_0p8484.pkl'
 #bTagEffFile = '$CMSSW_BASE/src/Workspace/RA4Analysis/cmgPostProcessing/data/Moriond17_v1_deepFlavour_0p6324.pkl'
+bTagEffFile = '$CMSSW_BASE/src/Workspace/RA4Analysis/cmgPostProcessing/data/Moriond17_v1_deepFlavourBBplusB_0p6324.pkl'
 effs = pickle.load(file(os.path.expandvars(bTagEffFile)))
 
 #key = 'TTJets'
@@ -68,8 +69,8 @@ for key in effs.keys():
   h_b_1.GetXaxis().SetTitleSize(0.05)
   h_b_1.GetXaxis().SetTitleOffset(2.3)
   
-  h_b_1.SetMaximum(10)
-  h_b_1.SetMinimum(0.001)
+  h_b_1.SetMaximum(1)
+  h_b_1.SetMinimum(0.00)
   h_b_1.LabelsOption("v")
   
   
@@ -124,9 +125,9 @@ for key in effs.keys():
   latex1.DrawLatex(0.16,0.96,'CMS #bf{#it{Simulation}}')
   latex1.DrawLatex(0.85,0.96,'#bf{(13TeV)}')
   
-  can.SetLogy()
+  #can.SetLogy()
    
-  can.Print('/afs/hephy.at/user/d/dspitzbart/www/Spring16/btagEfficiency_Moriond17/'+key+'_Spring16_CSVv2_log.png')
-  can.Print('/afs/hephy.at/user/d/dspitzbart/www/Spring16/btagEfficiency_Moriond17/'+key+'_Spring16_CSVv2_log.pdf')
-  can.Print('/afs/hephy.at/user/d/dspitzbart/www/Spring16/btagEfficiency_Moriond17/'+key+'_Spring16_CSVv2_log.root')
+  can.Print('/afs/hephy.at/user/d/dspitzbart/www/Spring16/btagEfficiency_Moriond17/'+key+'_Spring16_deepFlavourV2.png')
+  can.Print('/afs/hephy.at/user/d/dspitzbart/www/Spring16/btagEfficiency_Moriond17/'+key+'_Spring16_deepFlavourV2.pdf')
+  can.Print('/afs/hephy.at/user/d/dspitzbart/www/Spring16/btagEfficiency_Moriond17/'+key+'_Spring16_deepFlavourV2.root')
   

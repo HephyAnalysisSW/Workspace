@@ -27,16 +27,25 @@ from leptonSF import leptonSF as leptonSF_
 #bTagEffFile     = "$CMSSW_BASE/src/Workspace/RA4Analysis/cmgPostProcessing/data/effs_presel_JECv6_pkl" 
 scaleFactorDir  = '$CMSSW_BASE/src/Workspace/RA4Analysis/cmgPostProcessing/data/'
 bTagEffFile     = "data/Moriond17_v1_CSVv2_0p8484.pkl"
+bTagEffFileDF   = "data/Moriond17_v1_deepFlavourBBplusB_0p6324.pkl"
+
 
 calcLeptonSF = leptonSF_()
 
 try:
   mcEffDict = pickle.load(file(bTagEffFile))
 except IOError:
-  print 'Unable to load MC efficiency file!'
+  print 'Unable to load MC efficiency file %s'%bTagEffFile
   mcEffDict = False
 
-debug = True
+try:
+  mcEffDictDF = pickle.load(file(bTagEffFileDF))
+except IOError:
+  print 'Unable to load MC efficiency file %s'%bTagEffFileDF
+  mcEffDictDF = False
+
+
+debug = False
 
 target_lumi = 3000 #pb-1
 
@@ -49,8 +58,8 @@ separateBTagWeights = True
 
 defSampleStr = "TTJets_LO"
 
-subDir = "postProcessing_Data_Moriond2017_v7_Trigskimmed"
-#subDir = "postProcessing_MC_Spring16_Moriond2017_v6"
+#subDir = "postProcessing_Data_Moriond2017_v9_Trigskimmed_METTest"
+subDir = "postProcessing_MC_Spring16_Moriond2017_v6"
 #subDir = "deleteme"
 
 #branches to be kept for data and MC
@@ -94,13 +103,12 @@ parser.add_option("--useXSecFile", dest="readXsecFromFile", default = False, act
 (options, args) = parser.parse_args()
 skimCond = "(1)"
 htLtSkim = "Sum$(Jet_pt)>500&&(LepGood_pt[0]+met_pt)>250"
-#common_skim = "HT500LT250Skim"
 common_skim = "HT350"
 if options.for_dilep :
   htLtSkim = "(1)"
   common_skim = "skim"
-if options.skim.startswith('met'):
-  skimCond = "met_pt>"+str(float(options.skim[3:]))
+#if options.skim.startswith('met'):
+#  skimCond = "met_pt>"+str(float(options.skim[3:]))
 if options.skim=='HT350':
   skimCond = "Sum$(Jet_pt)>350"
 if options.skim=='HT400ST200':  
@@ -298,8 +306,12 @@ for isample, sample in enumerate(allSamples):
     #newVariables.extend( ["weightBTag/F", "weightBTag_SF/F", "weightBTag_SF_b_Up/F", "weightBTag_SF_b_Down/F", "weightBTag_SF_light_Up/F", "weightBTag_SF_light_Down/F"])
     for i in range(maxConsideredBTagWeight+1):
       newVariables.extend( ["weightBTag"+str(i)+"/F", "weightBTag"+str(i)+"_SF/F", "weightBTag"+str(i)+"_SF_b_Up/F", "weightBTag"+str(i)+"_SF_b_Down/F", "weightBTag"+str(i)+"_SF_light_Up/F", "weightBTag"+str(i)+"_SF_light_Down/F"])
+      newVariables.extend( ["weightBTagDF"+str(i)+"/F", "weightBTagDF"+str(i)+"_SF/F", "weightBTagDF"+str(i)+"_SF_b_Up/F", "weightBTagDF"+str(i)+"_SF_b_Down/F", "weightBTagDF"+str(i)+"_SF_light_Up/F", "weightBTagDf"+str(i)+"_SF_light_Down/F"])
+
       #if i>0:
       newVariables.extend( ["weightBTag"+str(i+1)+"p/F", "weightBTag"+str(i+1)+"p_SF/F", "weightBTag"+str(i+1)+"p_SF_b_Up/F", "weightBTag"+str(i+1)+"p_SF_b_Down/F", "weightBTag"+str(i+1)+"p_SF_light_Up/F", "weightBTag"+str(i+1)+"p_SF_light_Down/F"])
+      newVariables.extend( ["weightBTagDF"+str(i+1)+"p/F", "weightBTagDF"+str(i+1)+"p_SF/F", "weightBTagDF"+str(i+1)+"p_SF_b_Up/F", "weightBTagDF"+str(i+1)+"p_SF_b_Down/F", "weightBTagDF"+str(i+1)+"p_SF_light_Up/F", "weightBTagDF"+str(i+1)+"p_SF_light_Down/F"])
+
   newVars = [readVar(v, allowRenaming=False, isWritten = True, isRead=False) for v in newVariables]
 
   readVars = [readVar(v, allowRenaming=False, isWritten=False, isRead=True) for v in readVariables]
@@ -426,7 +438,7 @@ for isample, sample in enumerate(allSamples):
         tightHardLepInd = filter(lambda i:(abs(r.LepGood_pdgId[i])==11 and cmgTightEleID(r,i)) \
                                        or (abs(r.LepGood_pdgId[i])==13 and cmgTightMuID(r,i)), looseHardLepInd)  
 
-
+        if debug : print s.nLooseSoftLeptons
         s.nLooseSoftLeptons = len(looseSoftLepInd)
         s.nLooseHardLeptons = len(looseHardLepInd)
         s.nTightSoftLeptons = len(tightSoftLepInd)
@@ -568,8 +580,8 @@ for isample, sample in enumerate(allSamples):
           #calc_LeptonScale_factors_and_systematics(s,histos_LS)
           fill_branch_WithJEC(s,r)
           if calcSystematics: 
-            calc_btag_systematics(t,s,r,mcEffDict,sampleKey,maxConsideredBTagWeight,separateBTagWeights)
-
+            calc_btag_systematics(t,s,r,mcEffDict,sampleKey,maxConsideredBTagWeight,separateBTagWeights,weightName="weightBTag")
+            calc_btag_systematics(t,s,r,mcEffDictDF,sampleKey,maxConsideredBTagWeight,separateBTagWeights,weightName="weightBTagDF")
         for v in newVars:
           v['branch'].Fill()
       print "Event loop end"

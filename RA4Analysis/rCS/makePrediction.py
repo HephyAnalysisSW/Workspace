@@ -18,15 +18,14 @@ ROOT.TH1F().SetDefaultSumw2()
 
 weight_str, weight_err_str = makeWeight(lumi, sampleLumi=sampleLumi, reWeight=MCweight)
 
-samples={'W':cWJets, 'TT':cTTJets, 'Rest':cRest, 'Bkg':cBkg, 'Data': cData}
+samples={'W':cWJets, 'TT':cTTJets ,'Rest':cRest, 'Bkg':cBkg, 'Data': cData} #FIXME 'DiBoson1l':cDiboson_1l
 
 signal = False
 lepSel = 'hard'
 if signal:
   allSignals=[
-            {'name':'T5q^{4} 1.2/1.0/0.8', 'sample':T5qqqqWW_mGo1200_mCh1000_mChi800[lepSel], 'weight':weight_str, 'color':ROOT.kBlack},
-            {'name':'T5q^{4} 1.5/0.8/0.1', 'sample':T5qqqqWW_mGo1500_mCh800_mChi100[lepSel],  'weight':weight_str, 'color':ROOT.kMagenta},
-            {'name':'T5q^{4} 1.0/0.8/0.7', 'sample':T5qqqqWW_mGo1000_mCh800_mChi700[lepSel],  'weight':weight_str, 'color':ROOT.kYellow},
+            {'name':'T5q^{4} 1.5/1.0', 'sample':SMS_T5qqqqVV_TuneCUETP8M1[1500][1000],  'weight':weight_str, 'color':ROOT.kAzure+9},
+            {'name':'T5q^{4} 1.9/0.1', 'sample':SMS_T5qqqqVV_TuneCUETP8M1[1900][100],  'weight':weight_str, 'color':ROOT.kMagenta+2},
   ]
 
   for s in allSignals:
