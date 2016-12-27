@@ -89,12 +89,12 @@ def getParameterSet(args):
 
         sampleName = args.processSample
         eff_dict_map = [
-                        ( "WJetsToLNu_HT_2D_presel"             , { 'sampleList' : ["ZInv", "ZJets", "WJets", "DYJets" ,"ZZ", "WZ", "WW" ] ,  }   ),
-                        #( "TTJets_HT_presel"     , { 'sampleList' : ["TTJets_Tune" ,"TTJets_LO" ]  ,                           }   ),
-                        ( "TTJets_HT_2D_presel"             , { 'sampleList' : ["TTJets_HT" ]  ,                           }   ),
-                        #( "TTJets_1j"                    , { 'sampleList' : ["TTJets_FastSIM" , ]  ,     'isFastSim':True              }   ),
-                        #( "T2tt_allDM_1j" , { 'sampleList' : ["SMS_T2tt" , ],       'isFastSim':True                    }   ),
-                        ( "T2tt_allDM__presel"           , { 'sampleList' : ["SMS_T2tt" , ],       'isFastSim':True                    }   ),
+                        ( "WJets_2D_presel_CSVv2M"             , { 'sampleList' : ["ZInv", "ZJets", "WJets", "DYJets" ,"ZZ", "WZ", "WW" ] ,  }   ),
+                        ( "TTJets_2D_presel_CSVv2M"                 , { 'sampleList' : ["TTJets_HT" ]  ,                           }   ),
+                        #( "TTJets_1j"                          , { 'sampleList' : ["TTJets_FastSIM" , ]  ,     'isFastSim':True              }   ),
+                        ( "T2tt_allDM_presel_CSVv2M"             , { 'sampleList' : ["SMS_T2tt_dM_10to80_genHT_160_genMET_80"               , ],       'isFastSim':True                    }   ),
+                        ( "T2tt_mWMin0p1_allDM_presel_CSVv2M"          , { 'sampleList' : ["SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1"     , ],       'isFastSim':True      }   ),
+                        ( "T2bW_mWMin0p1_allDM_presel_CSVv2M"          , { 'sampleList' : ["SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1" , ],       'isFastSim':True      }   ),
                        ]
         eff_to_use = "TTJets_HT_2D_presel" #default
         isFastSim = False
