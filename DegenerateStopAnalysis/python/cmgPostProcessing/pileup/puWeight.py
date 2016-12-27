@@ -22,17 +22,28 @@ import ROOT
 """
 
 
-PU_var = { \
+PU_vars = { \
                 #"8p5_up"        :   {'xsec': "59p85"  , 'file': 'DataPUHisto_8p5_Run2016BC_%smb.root'} , 
                 #"8p5_central"   :   {'xsec': "63"     , 'file': 'DataPUHisto_8p5_Run2016BC_%smb.root'} , 
                 #"8p5_down"      :   {'xsec': "66p15"  , 'file': 'DataPUHisto_8p5_Run2016BC_%smb.root'} ,
-                "up"            :   {'xsec': "59850"  , 'file': 'DataPUHisto_12p9_Run2016BCD_%smicrob.root'} , 
-                "central"       :   {'xsec': "63000"  , 'file': 'DataPUHisto_12p9_Run2016BCD_%smicrob.root'} , 
-                "down"          :   {'xsec': "66150"  , 'file': 'DataPUHisto_12p9_Run2016BCD_%smicrob.root'} ,
+
+                #"up"            :   {'xsec': "59850"  , 'file': 'DataPUHisto_12p9_Run2016BCD_%smicrob.root'} , 
+                #"central"       :   {'xsec': "63000"  , 'file': 'DataPUHisto_12p9_Run2016BCD_%smicrob.root'} , 
+                #"down"          :   {'xsec': "66150"  , 'file': 'DataPUHisto_12p9_Run2016BCD_%smicrob.root'} ,
+
+            '23Sep2016':{
+                "up"            :   {'xsec': "59850"  , 'file': '23Sep2016/DataMET_35p6fbm1_%smicrob.root'} ,
+                "central"       :   {'xsec': "63000"  , 'file': '23Sep2016/DataMET_35p6fbm1_%smicrob.root'} ,
+                "down"          :   {'xsec': "66150"  , 'file': '23Sep2016/DataMET_35p6fbm1_%smicrob.root'} ,
+                        }
+
                 #"up_CJ"        :   {'xsec': "59p85"  , 'file': 'DataPUHisto_12p9_Run2016BCD_%smb_CentralJSON.root'} , 
                 #"central_CJ"   :   {'xsec': "63"     , 'file': 'DataPUHisto_12p9_Run2016BCD_%smb_CentralJSON.root'} , 
                 #"down_CJ"      :   {'xsec': "66p15"  , 'file': 'DataPUHisto_12p9_Run2016BCD_%smb_CentralJSON.root'} ,
           }
+
+data_tag='23Sep2016'
+PU_var = PU_vars[data_tag]
 
 mc_histo_file = "mcSpring16_25ns_pu.root"
 import os
@@ -54,14 +65,14 @@ for var, info in PU_var.iteritems():
   h_ratio = h_data.Clone('PU_ratio')
   h_ratio.Divide(mc_histo)
   h_ratio.SetTitle( var )
-  h_ratio.SaveAs( PU_dir + "/PU_ratio_%s.root"%(xsec))
+  h_ratio.SaveAs( PU_dir + "/PU_ratio_%s_%s.root"%(data_tag,xsec))
   cb = ROOT.TCanvas("cb","cb",564,232,600,600)
   cb.cd()
   h_ratio.Draw()
   h_ratio.SetMaximum(4)
   h_ratio.SetMinimum(-4)
-  cb.SaveAs( PU_dir + "/PU_ratio_%s.png"%(xsec) )
-  cb.SaveAs( "/afs/hephy.at/user/n/nrad/www/data/2016/PU/" + "/PU_ratio_%s.png"%(xsec))
+  cb.SaveAs( PU_dir + "/PU_ratio_%s_%s.png"%(data_tag, xsec) )
+  cb.SaveAs( "/afs/hephy.at/user/n/nrad/www/data/2016/PU/%s"%data_tag + "/PU_ratio_%s.png"%(xsec))
   del h_ratio , data_f , h_data
 
 

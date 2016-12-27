@@ -1,6 +1,8 @@
 from Workspace.DegenerateStopAnalysis.cmgPostProcessing.btagEfficiency import *
 import time, hashlib
+import glob
 # get MC truth efficiencies for a specific sample
+
 def getBTagMCTruthEfficiencies(c, cut="(1)"):
     mceff = {}
     c.SetEventList(0)
@@ -114,7 +116,8 @@ if __name__ == '__main__':
     #btag_wp = "0.80"
     #btag_name = btag_wps[btag_wp]['name']
 
-    btag_wp_name = "cMVAv2M"
+    #btag_wp_name = "cMVAv2M"
+    btag_wp_name = "CSVv2M"
     #sample_info    =  {
     #                                    "sampleList"   :    sampleList  ,
     #                                    "wtau"         :    False       ,
@@ -130,9 +133,9 @@ if __name__ == '__main__':
     #                                    'lumis':def_weights['lumis'],
     #                                  }
 
-    mc_path     = '/afs/hephy.at/data/mzarucki01//cmgTuples/postProcessed_mAODv2/8011_mAODv2_v1/80X_postProcessing_v5/analysisHephy_13TeV_2016_v0/step1/RunIISpring16MiniAODv2_v1/'
-    signal_path = '/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/8011_mAODv2_v1/80X_postProcessing_v5/analysisHephy_13TeV_2016_v0/step1/RunIISpring16MiniAODv2_v1/'
-    data_path   = '/afs/hephy.at/data/mzarucki01//cmgTuples/postProcessed_mAODv2/8011_mAODv2_v1_1/80X_postProcessing_v5/analysisHephy_13TeV_2016_v0/step1/Data2016_v1_1/'
+    #mc_path     = '/afs/hephy.at/data/mzarucki01//cmgTuples/postProcessed_mAODv2/8011_mAODv2_v1/80X_postProcessing_v5/analysisHephy_13TeV_2016_v0/step1/RunIISpring16MiniAODv2_v1/'
+    #signal_path = '/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/8011_mAODv2_v1/80X_postProcessing_v5/analysisHephy_13TeV_2016_v0/step1/RunIISpring16MiniAODv2_v1/'
+    #data_path   = '/afs/hephy.at/data/mzarucki01//cmgTuples/postProcessed_mAODv2/8011_mAODv2_v1_1/80X_postProcessing_v5/analysisHephy_13TeV_2016_v0/step1/Data2016_v1_1/'
 
     #from Workspace.DegenerateStopAnalysis.samples.cmgTuples_postProcessed.cmgTuplesPostProcessed_mAODv2_2016 import cmgTuplesPostProcessed
     #cmgPP         = cmgTuplesPostProcessed( mc_path, signal_path, data_path)
@@ -151,30 +154,115 @@ if __name__ == '__main__':
     setup = setups['presel']
 
 
-    samples_dir = "/data/nrad/cmgTuples/8020_mAODv2_v0/RunIISpring16MiniAODv2/"
+    wjet_bins = [
+                    
+
+
+                ]
+
+
+    samples_dir = "/data/nrad/cmgTuples/8020_mAODv2_v5/RunIISpring16MiniAODv2/"
     samples_dir_8012 = "/data/nrad/cmgTuples/8012_mAODv2_v3/RunIISpring16MiniAODv2/"
     samples = {
-                'TTJets': samples_dir + "/" +  "TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
-                "WJets" : '',
-                'T2ttold': samples_dir + "/" + "SMS-T2tt_dM-10to80_genHT-160_genMET-80_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/" ,
-                'T2ttold_OldJetClean': samples_dir_8012 + "/" + "SMS-T2tt_dM-10to80_genHT-160_genMET-80_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/" ,
+                'TTJets'             : [
+                                         samples_dir + "/" +  "TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+                                         samples_dir + "/" +  "TTJets_HT-600to800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1", 
+                                         samples_dir + "/" +  "TTJets_HT-800to1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1",
+                                         samples_dir + "/" +  "TTJets_HT-1200to2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1",
+                                         samples_dir + "/" +  "TTJets_HT-2500toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1" ,
+                                       ],
+                "WJets"              : [
+                                            #samples_dir + "/" + "WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+                                            samples_dir + "/" + "WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1",
+                                            samples_dir + "/" + "WJetsToLNu_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+                                            samples_dir + "/" + "WJetsToLNu_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1",
+                                            samples_dir + "/" + "WJetsToLNu_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+                                            samples_dir + "/" + "WJetsToLNu_HT-600To800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+                                            samples_dir + "/" + "WJetsToLNu_HT-800To1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1",
+                                            samples_dir + "/" + "WJetsToLNu_HT-1200To2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+                                            samples_dir + "/" + "WJetsToLNu_HT-2500ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+                                       ],
+                'T2tt'               : [
+                                         samples_dir + "/" + "SMS-T2tt_dM-10to80_genHT-160_genMET-80_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/" ,
+                                       ],
+                'T2tt_mWMin0p1'      : [
+                                         samples_dir + "/" + "SMS-T2tt_dM-10to80_genHT-160_genMET-80_mWMin-0p1_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/" , 
+                                       ],
+                'T2bW_mWMin0p1'      : [
+                                         samples_dir + "/" + "SMS-T2bW_X05_dM-10to80_genHT-160_genMET-80_mWMin-0p1_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/" ,
+                                       ],
+                'T2ttold_OldJetClean': [
+                                         samples_dir_8012 + "/" + "SMS-T2tt_dM-10to80_genHT-160_genMET-80_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/" ,
+                                       ],
+              } 
+
+
+
+    import Workspace.DegenerateStopAnalysis.samples.cmgTuples.RunIISpring16MiniAODv2_v5 as cmgTuples
+
+
+    samples2 = {
+                'WJets': [  cmgTuples.WJetsToLNu_HT100to200      ,   
+                            cmgTuples.WJetsToLNu_HT100to200_ext  ,       
+                            cmgTuples.WJetsToLNu_HT1200to2500    ,   
+                            cmgTuples.WJetsToLNu_HT200to400      ,   
+                            cmgTuples.WJetsToLNu_HT200to400_ext  ,       
+                            cmgTuples.WJetsToLNu_HT2500toInf     ,   
+                            cmgTuples.WJetsToLNu_HT400to600      , 
+                            cmgTuples.WJetsToLNu_HT600to800      ,
+                            cmgTuples.WJetsToLNu_HT800to1200     ,
+                            cmgTuples.WJetsToLNu_HT800to1200_ext ,   
+                        ], 
+                 'TTJets':[
+                            cmgTuples.TTJets_LO                   ,    
+                            cmgTuples.TTJets_LO_HT1200to2500_ext  ,    
+                            cmgTuples.TTJets_LO_HT2500toInf       ,         
+                            cmgTuples.TTJets_LO_HT600to800_ext    ,        
+                            cmgTuples.TTJets_LO_HT800to1200_ext   ,        
+                          ],
+                 'T2tt' :[
+                           cmgTuples.SMS_T2tt_dM_10to80_genHT_160_genMET_80,
+                         ],
+                 'T2tt_mWMin0p1' :[
+                           cmgTuples.SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1,
+                         ],
+                 'T2bW_mWMin0p1' :[
+                           cmgTuples.SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1,
+                         ],
               }
 
-    samples_to_use = [ 'T2ttold_OldJetClean']
+    #samples_to_use = ['WJets']
+    samples_to_use = [ 'T2tt_mWMin0p1' , 'T2tt' ]
 
     #for samp in ['tt','w' ]:
     for samp in samples_to_use:
+
+        #sample_name = samp
+        #cmgTupleDicts = samples[samp]
+        #chains = [cmgDict['getChain']() for cmgDict in cmgTupleDicts]
+        #for cmgDict in cmgTupleDicts:
+        #    cmgComp.
+
+        tree = ROOT.TChain("tree")
+        cmg_files_ = [ glob.glob( samp_dir + "/*/tree.root") for samp_dir in  samples[samp] ]
+        cmg_files = [ f for ff in cmg_files_ for f in ff]
+        sample_name = samp
+        for f in cmg_files:
+            tree.Add(f)
+        #assert False
+
+
         if "T2tt" in samp or "T2bw" in samp: 
             import glob
-            tree = ROOT.TChain("tree")
+            #tree = ROOT.TChain("tree")
             
             #signal_cmg_files = "/data/nrad/cmgTuples/8011_mAODv2_v1/RunIISpring16MiniAODv2/SMS-T2tt_dM-10to80_genHT-160_genMET-80_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/" 
             #signal_cmg_files = "/data/nrad/cmgTuples/8020_mAODv2_v0/RunIISpring16MiniAODv2/SMS-T2tt_dM-10to80_genHT-160_genMET-80_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/" 
 
-            signal_cmg_files = samples[samp]
+            #signal_cmg_files = samples[samp]
 
-            for f in glob.glob(signal_cmg_files+"/*/tree.root"):
-                tree.Add(f)
+            #for f in glob.glob(signal_cmg_files+"/*/tree.root"):
+            #    tree.Add(f)
 
             jetcut        = setup['cut']
             tag           = setup['tag']
@@ -207,11 +295,11 @@ if __name__ == '__main__':
             #sample_name = samples[samp]['name']
              
             import glob
-            tree = ROOT.TChain("tree")
-            cmg_files = samples[samp]
-            sample_name = samp
-            for f in glob.glob(cmg_files+"/*/tree.root"):
-                tree.Add(f)
+            #tree = ROOT.TChain("tree")
+            #cmg_files = samples[samp]
+            #sample_name = samp
+            #for f in glob.glob(cmg_files+"/*/tree.root"):
+            #    tree.Add(f)
 
             
 
