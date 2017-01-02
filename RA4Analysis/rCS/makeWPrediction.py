@@ -48,7 +48,7 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, presel_MC, dPhiCut=
     weight_str_0b = weight_str
     weight_str_0bMC = weight_str
   
-  rCS_crNJet_0b_onlyTT = getRCS(cTTJets, crCut+'&&abs(leptonPdg)==13',  dPhiCut, weight=weight_str_0bMC)
+  rCS_crNJet_0b_onlyTT = getRCS(cTTJets, crCut+'&&abs(leptonPdg)==13',  dPhiCut, weight=weight_str_0bMC+"*"+ttJetsweight)
   rd['rCS_crNJet_0b_onlyTT'] = rCS_crNJet_0b_onlyTT #no reweighting here, still from MC!
 
   #low njet CR: crNJet, 0-btags, low DPhi
@@ -64,13 +64,13 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, presel_MC, dPhiCut=
   # Get all the MC truth yields and save them in the pickle file, use all available SFs.
 
   chargeList = [{'charge':'', 'muonCut':"&&abs(leptonPdg)==13&&"},{'charge':'_PosPdg', 'muonCut':'&&leptonPdg>0&&abs(leptonPdg)==13&&'}, {'charge':'_NegPdg', 'muonCut':'&&leptonPdg<0&&abs(leptonPdg)==13&&'}]
-  MCsamples = [{'name':'TT', 'chain':cTTJets}, {'name':'W', 'chain':cWJets}, {'name':'Rest','chain':cRest}]
+  MCsamples = [{'name':'TT', 'chain':cTTJets, 'weight':ttJetsweight}, {'name':'W', 'chain':cWJets , "weight":"(1)"}, {'name':'Rest','chain':cRest ,"weight":"(1)"}]
   
   for charge in chargeList:
     for s in MCsamples:
       
-      truthYield_lowDPhi  = getYieldFromChain(s['chain'], crCut+charge['muonCut']+dPhiStr+"<"+str(dPhiCut), weight = weight_str+'*weightBTag0'+btagWeightSuffix, returnError = True)
-      truthYield_highDPhi = getYieldFromChain(s['chain'], crCut+charge['muonCut']+dPhiStr+">"+str(dPhiCut), weight = weight_str+'*weightBTag0'+btagWeightSuffix, returnError = True)
+      truthYield_lowDPhi  = getYieldFromChain(s['chain'], crCut+charge['muonCut']+dPhiStr+"<"+str(dPhiCut), weight = weight_str+'*weightBTag0'+btagWeightSuffix+"*"+s["weight"], returnError = True)
+      truthYield_highDPhi = getYieldFromChain(s['chain'], crCut+charge['muonCut']+dPhiStr+">"+str(dPhiCut), weight = weight_str+'*weightBTag0'+btagWeightSuffix+"*"+s["weight"], returnError = True)
       
       rd['y'+s['name']+'_crNJet_0b_lowDPhi_truth'+charge['charge']]      = truthYield_lowDPhi[0]
       rd['y'+s['name']+'_Var_crNJet_0b_lowDPhi_truth'+charge['charge']]  = truthYield_lowDPhi[1]**2

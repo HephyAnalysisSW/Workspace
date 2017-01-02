@@ -125,7 +125,28 @@ diBoson = {\
 'dir': dirEce,
 }
 
+diBoson_1L1Nu2Q = {\
+"name":"diBoson",
+"bins":[
+"WZTo1L1Nu2Q",
+],
+'dir': dirEce,
+}
 
+diBoson_rest = {\
+"name":"diBoson",
+"bins":[
+"WWTo2L2Nu",
+"WWToLNuQQ",
+#"WZTo1L1Nu2Q",
+"WZTo1L3Nu",
+"WZTo2L2Q",
+"ZZTo2L2Nu",
+#"ZZTo2L2Q",
+"ZZTo2Q2Nu",
+],
+'dir': dirEce,
+}
 TTV = {
 "name":"TTV",
 "bins":[

@@ -41,14 +41,15 @@ sample_names = {
                     'vv':"VV", #"Diboson"
                     'z':r'#Z\rightarrow \nu\nu+jets', #'ZJetsInv'
                     'st':'Single top', #'ST'
-                    'dy':r'#Z/\gamma^{*} \rightarrow \nu\nu+jets', #'DYJetsM50'
+                    'dy':r'#Z/\gamma^{*} +jets', #'DYJetsM50'
                 }
 
 def getSamples(wtau=False, sampleList=['w','tt','z','sig'], 
                useHT=False, getData=False, blinded=True, scan=True, massPoints=[], skim='skimPresel', cmgPP=None, do8tev=False,
                weights = weights, def_weights = def_weights,
                data_triggers = ' || '.join(data_triggers_list),
-               filters  = "Flag_Filters", 
+               mc_filters   = "Flag_Filters",
+               data_filters = "Flag_Filters", 
                data_mu_trigger = data_mu_trigger, 
                data_el_trigger = data_el_trigger, 
                kill_low_qcd_ht = False,
@@ -70,32 +71,32 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
          JetHTDataBlind = getChain(cmgPP.JetHT[skim],histname='')
          JetHTDataUnblind  = JetHTDataBlind#.CopyTree("run<=274240") #instead cut on run # is applied
          sampleDict.update({
-               "djet":     {'name':"JetHTDataUnblind", 'sample':cmgPP.JetHT[skim], 'tree':JetHTDataUnblind, 'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":"1", "filters":filters, 'lumi': lumis['DataUnblind_lumi'], 'cut':"run<=275073"},
-               "djetBlind":{'name':"JetHTDataBlind",   'sample':cmgPP.JetHT[skim], 'tree':JetHTDataBlind,   'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":"1", "filters":filters, 'lumi': lumis['DataBlind_lumi']},
+               "djet":     {'name':"JetHTDataUnblind", 'sample':cmgPP.JetHT[skim], 'tree':JetHTDataUnblind, 'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":"1", "filters":data_filters, 'lumi': lumis['DataUnblind_lumi'], 'cut':"run<=275073"},
+               "djetBlind":{'name':"JetHTDataBlind",   'sample':cmgPP.JetHT[skim], 'tree':JetHTDataBlind,   'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":"1", "filters":data_filters, 'lumi': lumis['DataBlind_lumi']},
             })
       
       elif "d1mu" in sampleList or "d1muBlind" in sampleList:
          SingleMuDataBlind = getChain(cmgPP.SingleMu[skim],histname='')
          SingleMuDataUnblind  = SingleMuDataBlind#.CopyTree("run<=274240") #instead cut on run # is applied
          sampleDict.update({
-               "d1mu":     {'name':"SingleMuDataUnblind", 'sample':cmgPP.SingleMu[skim], 'tree':SingleMuDataUnblind, 'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":data_mu_trigger, "filters":filters, 'lumi': lumis['DataUnblind_lumi'], 'cut':"run<=275073"},
-               "d1muBlind":{'name':"SingleMuDataBlind",   'sample':cmgPP.SingleMu[skim], 'tree':SingleMuDataBlind,   'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":data_mu_trigger, "filters":filters, 'lumi': lumis['DataBlind_lumi']},
+               "d1mu":     {'name':"SingleMuDataUnblind", 'sample':cmgPP.SingleMu[skim], 'tree':SingleMuDataUnblind, 'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":data_mu_trigger, "filters":data_filters, 'lumi': lumis['DataUnblind_lumi'], 'cut':"run<=275073"},
+               "d1muBlind":{'name':"SingleMuDataBlind",   'sample':cmgPP.SingleMu[skim], 'tree':SingleMuDataBlind,   'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":data_mu_trigger, "filters":data_filters, 'lumi': lumis['DataBlind_lumi']},
             })
 
       elif "d1el" in sampleList or "d1elBlind" in sampleList:
          SingleElDataBlind = getChain(cmgPP.SingleEl[skim],histname='')
          SingleElDataUnblind  = SingleElDataBlind#.CopyTree("run<=274240") #instead cut on run # is applied
          sampleDict.update({
-               "d1el":     {'name':"SingleElDataUnblind", 'sample':cmgPP.SingleEl[skim], 'tree':SingleElDataUnblind, 'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":data_el_trigger, "filters":filters, 'lumi': lumis['DataUnblind_lumi'], 'cut':"run<=275073"},
-               "d1elBlind":{'name':"SingleElDataBlind",   'sample':cmgPP.SingleEl[skim], 'tree':SingleElDataBlind,   'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":data_el_trigger, "filters":filters, 'lumi': lumis['DataBlind_lumi']},
+               "d1el":     {'name':"SingleElDataUnblind", 'sample':cmgPP.SingleEl[skim], 'tree':SingleElDataUnblind, 'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":data_el_trigger, "filters":data_filters, 'lumi': lumis['DataUnblind_lumi'], 'cut':"run<=275073"},
+               "d1elBlind":{'name':"SingleElDataBlind",   'sample':cmgPP.SingleEl[skim], 'tree':SingleElDataBlind,   'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":data_el_trigger, "filters":data_filters, 'lumi': lumis['DataBlind_lumi']},
             })
       
       else: # "d" in sampleList or "dblind" in sampleList:
          MET = getChain(cmgPP.MET[skim],histname='')
          METDataUnblind  = MET#.CopyTree("run<=274240") #instead cut on run # is applied
          sampleDict.update({
-               "d":        {'name':"DataUnblind",         'sample':cmgPP.MET[skim],      'tree':METDataUnblind,      'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":data_triggers, "filters":filters, 'lumi': lumis['DataUnblind_lumi'], 'cut':"run<=275073"},
-               "dblind":   {'name':"DataBlind",           'sample':cmgPP.MET[skim],      'tree':MET,                 'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":data_triggers, "filters":filters, 'lumi': lumis['DataBlind_lumi']},
+               "d":        {'name':"DataUnblind",         'sample':cmgPP.MET[skim],      'tree':METDataUnblind,      'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":data_triggers, "filters":data_filters, 'lumi': lumis['DataUnblind_lumi'], 'cut':"run<=275073"},
+               "dblind":   {'name':"DataBlind",           'sample':cmgPP.MET[skim],      'tree':MET,                 'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":data_triggers, "filters":data_filters, 'lumi': lumis['DataBlind_lumi']},
             })
 
    if "w" in sampleList:
@@ -181,28 +182,54 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
    
    if scan:
       icolor = 1
-      if not massPoints:
-         mstops = range(250,801,25)
-         dms = range(10,81,10)
-      else:
-         mstops = [x[0] for x in massPoints]
-         dms = [x[0]-x[1] for x in massPoints]
-      
-      for mstop in mstops:
-         for dm in dms:
-            mlsp = mstop - dm
-            #print cmgPP.__dict__.keys()
+      signals_info = cmgPP.signals_info
 
-            s = getattr(cmgPP,"SMS_T2tt_mStop_%s_mLSP_%s"%(mstop,mlsp) )[skim]
-            #s = getattr(cmgPP,"SMS_T2_4bd_mStop_%s_mLSP_%s"%(mstop,mlsp))[skim]
-            if glob.glob("%s/%s/*.root"%(s['dir'],s['name'])):
-               sampleDict.update({
-                  #'s%s_%s'%(mstop,mlsp):{'name':'T2_4bd_%s_%s'%(mstop,mlsp), 'sample':getattr(cmgPP,"SMS_T2tt_mStop_%s_mLSP_%s"%(mstop,mlsp))[skim], 'color':colors['s%s_%s'%(mstop,mlsp)], 'isSignal':1 , 'isData':0, 'lumi':lumis["mc_lumi"]},
-                  's%s_%s'%(mstop,mlsp):{'name':'T2tt_%s_%s'%(mstop,mlsp), 'sample':s, 'color':colors['%s_%s'%(mstop,mlsp)], 'isSignal':1 , 'isData':0, 'lumi':lumis["mc_lumi"]}
-            })
-            else: 
-                #print "%s/%s/*.root"%(s['dir'],s['name'])
-                print "!!! Sample Not Found: %s, %s"%(mstop,mlsp)
+
+      for signal_name, signal_info in signals_info.items():
+            #sampleId              = signal_info['scanId']
+            signal_mass_dict      = signal_info['pkl']
+            mass_template         = signal_info['mass_template']
+            mass_dict_pickle_file = os.path.join( cmgPP.signal_path, signal_mass_dict )
+            if not os.path.isfile(mass_dict_pickle_file) and not massPoints: 
+                print '------------------------ skiping' , mass_dict_pickle_file
+            else:
+                mass_dict = pickle.load(file(mass_dict_pickle_file))
+                print 'found mass dict', signal_name, mass_dict.keys() 
+        
+            if not massPoints:
+               mstops = range(250,800,25)
+               dms = range(10,81,10)
+            else:
+               mstops   = [x[0] for x in massPoints]
+               dms      = [x[0]-x[1] for x in massPoints]
+            
+            for mstop in mstops:
+               for dm in dms:
+                  mlsp = mstop - dm
+                  #print cmgPP.__dict__.keys()
+
+                  if '74' in cmgPP.mc_path:
+                      s = getattr(cmgPP,"SMS_T2_4bd_mStop_%s_mLSP_%s"%(mstop,mlsp), None )
+                      signal_cut  = "(1)"
+                      sigPostFix  = "74X"
+                  else:
+                      #s = getattr(cmgPP,"SMS_T2tt_mStop_%s_mLSP_%s"%(mstop,mlsp), None )
+                      s = getattr(cmgPP, mass_template%(mstop,mlsp), None )
+                      signal_cut = "Flag_veto_event_fastSimJets"
+                      sigPostFix = ""
+
+                  #s = getattr(cmgPP,"SMS_T2_4bd_mStop_%s_mLSP_%s"%(mstop,mlsp))[skim]
+                  if s and glob.glob("%s/%s/*.root"%(s[skim]['dir'],s[skim]['name'])):
+                     #print signal_info['shortName']
+                     #print signal_info['niceName']
+                     sampleDict.update({
+                        #'s%s_%s'%(mstop,mlsp):{'name':'T2_4bd_%s_%s'%(mstop,mlsp), 'sample':getattr(cmgPP,"SMS_T2tt_mStop_%s_mLSP_%s"%(mstop,mlsp))[skim], 'color':colors['s%s_%s'%(mstop,mlsp)], 'isSignal':1 , 'isData':0, 'lumi':mc_lumi},
+                        #'s%s_%s'%(mstop,mlsp):{'name':'T2tt%s_%s_%s'%(sigPostFix, mstop,mlsp), 'sample':s[skim], 'cut':signal_cut , 'color':colors['s%s_%s'%(mstop,mlsp)], 'isSignal':1 , 'isData':0, 'lumi':mc_lumi},
+                        signal_info['shortName']%(mstop,mlsp):{'name':signal_info['niceName']%(mstop,mlsp), 'sample':s[skim], 'cut':signal_cut , 'color':colors['%s_%s'%(mstop,mlsp)], 'isSignal':1 , 'isData':0, 'lumi':lumis["mc_lumi"]},
+                      })
+                  else: 
+                      #print "%s/%s/*.root"%(s['dir'],s['name'])
+                      print "!!! Sample Not Found:"  , mass_template%(mstop,mlsp)
    
    if do8tev:
       sampleDir_8tev = "/data/imikulec/monoJetTuples_v8/copyfiltered/"
@@ -230,18 +257,18 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
       })
    
    sampleDict2 = {}
-   def_weights.update({'lumis':lumis})
+   #def_weights.update({'lumis':lumis})
 
    for samp in sampleDict:
-      if weights.has_key(samp):
-         sampleDict[samp]["weights"] = Weight( weights[samp].weight_dict , def_weights )
-      #elif scan and re.match("s\d\d\d_\d\d\d|s\d\d\d_\d\d|",samp).group():
-      #   sampleDict[samp]["weights"] = weights["sigScan"]
-      elif do8tev and re.match("s8tev\d\d\d_\d\d\d|s8tev\d\d\d_\d\d|",samp).group():                
-         sampleDict[samp]["weights"] = weights["sigScan_8tev"]
-      else:
-         sampleDict[samp]["weights"] = Weight({}, def_weights)
-      
+   #   if weights.has_key(samp):
+   #      sampleDict[samp]["weights"] = Weight( weights[samp].weight_dict , def_weights )
+   #   #elif scan and re.match("s\d\d\d_\d\d\d|s\d\d\d_\d\d|",samp).group():
+   #   #   sampleDict[samp]["weights"] = weights["sigScan"]
+   #   elif do8tev and re.match("s8tev\d\d\d_\d\d\d|s8tev\d\d\d_\d\d|",samp).group():                
+   #      sampleDict[samp]["weights"] = weights["sigScan_8tev"]
+   #   else:
+   #      sampleDict[samp]["weights"] = Weight({}, def_weights)
+   #   
       sampleDict2[samp] = Sample(**sampleDict[samp])
    
    samples = Samples(**sampleDict2)
@@ -249,5 +276,5 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
    #applying filters
    for samp_name, sample in samples.iteritems():
        if not sample.isData:
-          sample.filters = filters 
+          sample.filters = mc_filters 
    return samples

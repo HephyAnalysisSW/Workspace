@@ -1,6 +1,13 @@
 ''' Run in multiprocessing the CMG post-processing script for the samples defined here.
 
 https://docs.python.org/2/library/multiprocessing.html
+
+
+You can get the number of Chunks for each data sample with:
+
+for f in `ls -d *`; do echo "'"$f"'" ":" `ls -d $f/* | grep -c Chunk` ; done
+
+
 '''
 
 # imports python standard modules or functions
@@ -183,12 +190,14 @@ sampleSets = {
    # MET PD
    'data_met':{
                'samples':[
-                           "MET_Run2016B_23Sep2016_v3", #NOTE: v3
-                           "MET_Run2016C_23Sep2016_v1",
-                           "MET_Run2016D_23Sep2016_v1",
-                           "MET_Run2016E_23Sep2016_v1",
-                           "MET_Run2016F_23Sep2016_v1",
-                           "MET_Run2016G_23Sep2016_v1",
+                           "MET_Run2016B_23Sep2016", #NOTE: v3
+                           "MET_Run2016C_23Sep2016",
+                           "MET_Run2016D_23Sep2016",
+                           "MET_Run2016E_23Sep2016",
+                           "MET_Run2016F_23Sep2016",
+                           "MET_Run2016G_23Sep2016",
+                           "MET_Run2016H_PromptReco_v2",
+                           "MET_Run2016H_PromptReco_v3", #NOTE: use?
                          ],
                   },
    
@@ -198,12 +207,14 @@ sampleSets = {
    
    'data_el':{
                'samples':[
-                           "SingleElectron_Run2016B_23Sep2016_v3", #NOTE: v3
-                           "SingleElectron_Run2016C_23Sep2016_v1",
-                           "SingleElectron_Run2016D_23Sep2016_v1",
-                           "SingleElectron_Run2016E_23Sep2016_v1",
-                           "SingleElectron_Run2016F_23Sep2016_v1",
-                           "SingleElectron_Run2016G_23Sep2016_v1",
+                           "SingleElectron_Run2016B_23Sep2016", #NOTE: v3
+                           "SingleElectron_Run2016C_23Sep2016",
+                           "SingleElectron_Run2016D_23Sep2016",
+                           "SingleElectron_Run2016E_23Sep2016",
+                           "SingleElectron_Run2016F_23Sep2016",
+                           "SingleElectron_Run2016G_23Sep2016",
+                           "SingleElectron_Run2016H_PromptReco_v2",
+                           "SingleElectron_Run2016H_PromptReco_v3", #NOTE: use?
                          ],
                   },
    
@@ -211,24 +222,28 @@ sampleSets = {
    
    'data_mu':{
                'samples':[
-                           "SingleMuon_Run2016B_23Sep2016_v3", #NOTE: v3
-                           "SingleMuon_Run2016C_23Sep2016_v1",
-                           "SingleMuon_Run2016D_23Sep2016_v1",
-                           "SingleMuon_Run2016E_23Sep2016_v1",
-                           "SingleMuon_Run2016F_23Sep2016_v1",
-                           "SingleMuon_Run2016G_23Sep2016_v1",
+                           "SingleMuon_Run2016B_23Sep2016", #NOTE: v3
+                           "SingleMuon_Run2016C_23Sep2016",
+                           "SingleMuon_Run2016D_23Sep2016",
+                           "SingleMuon_Run2016E_23Sep2016",
+                           "SingleMuon_Run2016F_23Sep2016",
+                           "SingleMuon_Run2016G_23Sep2016",
+                           "SingleMuon_Run2016H_PromptReco_v2",
+                           "SingleMuon_Run2016H_PromptReco_v3", #NOTE: use?
                          ],
                   },
    
    # JetHT PD
    'data_jet':{
                'samples':[
-                           "JetHT_Run2016B_23Sep2016_v3", #NOTE: v3
-                           "JetHT_Run2016C_23Sep2016_v1",
-                           "JetHT_Run2016D_23Sep2016_v1",
-                           "JetHT_Run2016E_23Sep2016_v1",
-                           "JetHT_Run2016F_23Sep2016_v1",
-                           "JetHT_Run2016G_23Sep2016_v1",
+                           "JetHT_Run2016B_23Sep2016", #NOTE: v3
+                           "JetHT_Run2016C_23Sep2016",
+                           "JetHT_Run2016D_23Sep2016",
+                           "JetHT_Run2016E_23Sep2016",
+                           "JetHT_Run2016F_23Sep2016",
+                           "JetHT_Run2016G_23Sep2016",
+                           "JetHT_Run2016H_PromptReco_v2",
+                           "JetHT_Run2016H_PromptReco_v3", #NOTE: use?
                          ],
                   },
    
@@ -310,6 +325,80 @@ sampleSets = {
 
    }
 
+
+
+#   dataChunks = {
+#   'JetHT_Run2016B-23Sep2016-v3' : 1043  ,
+#   'JetHT_Run2016C-23Sep2016-v1' : 348  ,
+#   'JetHT_Run2016D-23Sep2016-v1' : 583  ,
+#   'JetHT_Run2016F-23Sep2016-v1' : 369  ,
+#   'JetHT_Run2016G-23Sep2016-v1' : 857  ,
+#   'JetHT_Run2016H-PromptReco-v2' : 926  ,
+#   'JetHT_Run2016H-PromptReco-v3' : 25  ,
+#   'MET_Run2016B-23Sep2016-v3' : 1046  ,
+#   'MET_Run2016B-PromptReco-v2' : 1045  ,
+#   'MET_Run2016C-23Sep2016-v1' : 348  ,
+#   'MET_Run2016C-PromptReco-v2' : 348  ,
+#   'MET_Run2016D-23Sep2016-v1' : 584  ,
+#   'MET_Run2016D-PromptReco-v2' : 584  ,
+#   'MET_Run2016E-23Sep2016-v1' : 496  ,
+#   'MET_Run2016E-PromptReco-v2' : 491  ,
+#   'MET_Run2016F-23Sep2016-v1' : 368  ,
+#   'MET_Run2016G-23Sep2016-v1' : 854  ,
+#   'MET_Run2016G-PromptReco-v1' : 832  ,
+#   'MET_Run2016H-PromptReco-v2' : 926  ,
+#   'MET_Run2016H-PromptReco-v3' : 25  ,
+#   'SingleElectron_Run2016B-23Sep2016-v3' : 1054  ,
+#   'SingleElectron_Run2016B-PromptReco-v2' : 1046  ,
+#   'SingleElectron_Run2016C-23Sep2016-v1' : 347  ,
+#   'SingleElectron_Run2016C-PromptReco-v2' : 348  ,
+#   'SingleElectron_Run2016D-23Sep2016-v1' : 589  ,
+#   'SingleElectron_Run2016D-PromptReco-v2' : 584  ,
+#   'SingleElectron_Run2016E-23Sep2016-v1' : 496  ,
+#   'SingleElectron_Run2016F-23Sep2016-v1' : 362  ,
+#   'SingleElectron_Run2016G-23Sep2016-v1' : 854  ,
+#   'SingleElectron_Run2016H-PromptReco-v2' : 926  ,
+#   'SingleElectron_Run2016H-PromptReco-v3' : 25  ,
+#   'SingleMuon_Run2016B-23Sep2016-v3' : 1045  ,
+#   'SingleMuon_Run2016B-PromptReco-v2' : 1045  ,
+#   'SingleMuon_Run2016C-23Sep2016-v1' : 348  ,
+#   'SingleMuon_Run2016C-PromptReco-v2' : 348  ,
+#   'SingleMuon_Run2016D-23Sep2016-v1' : 584  ,
+#   'SingleMuon_Run2016D-PromptReco-v2' : 584  ,
+#   'SingleMuon_Run2016E-23Sep2016-v1' : 496  ,
+#   'SingleMuon_Run2016E-PromptReco-v2' : 219  ,
+#   'SingleMuon_Run2016F-23Sep2016-v1' : 361  ,
+#   'SingleMuon_Run2016F-PromptReco-v1' : 351  ,
+#   'SingleMuon_Run2016G-23Sep2016-v1' : 856  ,
+#   'SingleMuon_Run2016G-PromptReco-v1' : 844  ,
+#   'SingleMuon_Run2016H-PromptReco-v2' : 925  ,
+#   'SingleMuon_Run2016H-PromptReco-v3' : 25  ,
+#   }
+#   
+#   def roundup(x):
+#       return x if x % 100 == 0 else x + 100 - x % 100
+#   
+#   
+#   data_names = {
+#                   "JetHT":"jet",
+#                   "MET"  :'met',
+#              "SingleMuon":"mu" ,
+#          "SingleElectron":"el" ,
+#                }
+#   
+#   for data_samp , nChunk in dataChunks.iteritems():
+#       name = ""
+#       for data_name, nameTag in data_names.items():
+#           if data_name in data_samp:
+#               name = nameTag            
+#               break
+#       n = name + " " +  ""
+#       n = name + " " +  ""     
+#    
+#   
+#       #maxChunkSplit = roundup(nChunk)  
+
+
 ### Signal ###
 
 #mstops = [250, 275, 300, 325, 350, 375, 400, 425, 450, 475, 500, 525, 550, 575, 600, 625, 650, 675, 700, 725, 750, 775, 800]
@@ -362,11 +451,12 @@ for mstop in mass_dict.keys():
 sampleSets.update(signalSets)
 
 
-mc_samps = ['ttjets', 'wjets', 'dyjets','zjets', 'qcd', 'other' ]
+#mc_samps = ['ttjets', 'wjets', 'dyjets','zjets', 'qcd', 'other' ]
+mc_samps = ['ttjets', 'wjets', 'dyjets','zjets' ]#, 'other' ]
 signal_samps = [x for x in sampleSets.keys() if 'T2tt' in x or 'T2bW' in x]
 data_samps = ['data_met']#, 'data_el', 'data_mu', 'data_jet'
 
-all_samps = mc_samps + signal_samps # + data_samps #FIXME: mc and data cannot be run simulatneously
+all_samps = mc_samps #+ signal_samps # + data_samps #FIXME: mc and data cannot be run simulatneously
  
 all_samples = []
 for samp in all_samps:
@@ -375,6 +465,9 @@ for samp in all_samps:
 sampleSets['all'] = { 
                         'samples': all_samples,
                     }
+
+
+
 
 def get_parser():
     ''' Argument parser for running the post processing module.
@@ -421,6 +514,13 @@ def get_parser():
         help="Create batch script"
         )
     
+    argsRun.add_argument('--batchScriptName',
+        action='store',
+        type=str,
+        default='batch_script',
+        help="Set of samples to run the post processing on"
+        )
+
     argsRun.add_argument('--run',
         action='store_true',
         help="Run Post processing!"
@@ -488,7 +588,7 @@ def getSampleDir(args, sampleName):
       path = sampleDict[sampleName]['dir']
    except KeyError:
       print "\nKey Error with {0} \n ".format(sampleName) + \
-      "\nCheck if sample exists in {0}.py. \n Exiting.".format(cmgTuplesFullName.replace('.', '/'))
+      "\nCheck if sample exists in {0} \n Exiting.".format(sampleFileLib.__file__.replace(".pyc",".py"))
       sys.exit()
    
    return path
@@ -730,8 +830,8 @@ def runPostProcessing(argv=None):
         pprint_cust.pformat(commands)
         )
     if args.batchScript:
-        fname = 'batch_script.sh'
-        
+        #fname = 'batch_script.sh'
+        fname = args.batchScriptName +".sh"
         print '%s written to current directory.'%fname
         
         f = file(fname, 'a')

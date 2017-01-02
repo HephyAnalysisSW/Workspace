@@ -621,14 +621,21 @@ def getBkgSigStacks(samples, plots, cut, sampleList=[],plotList=[], normalize=Fa
             dataStackDict[v]=getStackFromHists([ samples[samp]['cuts'][cut_name][v] for samp in sampleList if samples[samp]['isData']], normalize=normalize, transparency=False, sName= "stack_data_" + sName_plot)
     return {'bkg': bkgStackDict,'sig': sigStackDict, 'data': dataStackDict}
   
-def getPlot(sample,plot,cut,weight="", nMinus1="",cutStr="",addOverFlowBin='', lumi='target_lumi', verbose= False, cuts=None):
+def getPlot(sample,plot,cut,weight="", nMinus1="",cutStr="",addOverFlowBin='', lumi='target_lumi', verbose= False ):
     plot_info = {}
     c     = sample.tree
     var = plot.var
-    if not cuts:
+
+    isFancyCut = False
+    if type(cut)==type([]) and len(cut)==2:
+        isFancyCut = True
+        cuts , cutInstName = cut
+        cut  = getattr(cuts, cutInstName)
+        cut_str, weight_str = cuts.getSampleCutWeight(sample.name, [cutInstName]) 
+        cut_str = getSampleTriggersFilters( sample, cut_str)
+    else:
         cut_str, weight_str = decide_cut_weight( sample, cutInst = cut , weight=weight,  lumi=lumi, plot=plot, nMinus1=nMinus1 ,  )
-    if cuts and type(cut)==type(""):
-        cut_str, weight_str = cuts.getSampleCutWeight(sample.name, [cut]) 
+
     plot_info = {'cut':cut_str, 'weight':weight_str}
 
     if verbose: 
@@ -640,9 +647,9 @@ def getPlot(sample,plot,cut,weight="", nMinus1="",cutStr="",addOverFlowBin='', l
         if hasattr(plot, "binningIsExplicit"):
             binningIsExplicit = plot.binningIsExplicit
     if type(var) == type(""):
-        hist = getPlotFromChain(sample.tree,plot.var,plot.bins,cut_str,weight=weight_str, addOverFlowBin=addOverFlowBin, binningIsExplicit=binningIsExplicit)
+        hist = getPlotFromChain(sample.tree,plot.var,plot.bins,cut_str,weight=weight_str, addOverFlowBin=addOverFlowBin, binningIsExplicit=binningIsExplicit, uniqueName = True)
     elif hasattr(var, "__call__"):
-        hist = var( sample , bins = plot.bins, cutString=cut_str, weight=weight_str, addOverFlowBin=addOverFlowBin, binningIsExplicit=binningIsExplicit)
+        hist = var( sample , bins = plot.bins, cutString=cut_str, weight=weight_str, addOverFlowBin=addOverFlowBin, binningIsExplicit=binningIsExplicit, uniqueName = True)
     else:
         raise Exception("I'm not sure what this variable is! %s"%var)
     #plot.decorHistFunc(p)
@@ -668,7 +675,17 @@ def getPlots(samples,plots,cut,sampleList=[],plotList=[],weight="",nMinus1="", a
 
     sigList, bkgList, dataList = getSigBkgDataLists(samples, sampleList=sampleList)
     isDataPlot = bool(len(dataList))
-    print "CUT NAME: ", cut.fullName
+    isFancyCut = False
+    if type(cut)==type([]) and len(cut)==2:
+        isFancyCut = True
+        cuts , cutname = cut
+        cutInst = getattr(cuts,cutname)
+        cutFullName = cutInst.fullName
+        #cut = cuts
+    else:
+        cutInst = cut
+        cutFullName = cut.fullName
+    print "CUT NAME: ", cutFullName
     if isDataPlot:
        #if "Blind" in samples[dataList[0]].name and "sr" in cut.fullName.lower():
        #    raise Exception("NO DATA IN SIGNAL REGION: %s"%[dataList, cut.fullName])
@@ -678,8 +695,13 @@ def getPlots(samples,plots,cut,sampleList=[],plotList=[],weight="",nMinus1="", a
        else: assert False
        print "Reweighting MC histograms to", lumi_weight, ":", round(samples[dataList[0]].lumi/1000.,2), "fb-1"
     else:
-       lumi_weight = "target_lumi"
-       print "Reweighting MC histograms to", lumi_weight, ":", round(samples[bkgList[0]].weights.weight_dict['lumis']['target_lumi']/1000.,2), "fb-1"
+       if not isFancyCut:
+           lumi_weight = "target_lumi"
+           print "Reweighting MC histograms to", lumi_weight, ":", round(samples[bkgList[0]].weights.weight_dict['lumis']['target_lumi']/1000.,2), "fb-1"
+       else:
+            lumi_weight = "DataBlind"
+            print  lumi_weight 
+
 
     if len(dataList) > 1:
         raise Exception("More than one Data Set in the sampleList... This could be dangerous: %s"%dataList)
@@ -998,6 +1020,13 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
     
     #tfile = ROOT.TFile("test.root","new")
 
+    isFancyCut = False
+    if type(cut)==list and len(cut) ==2 and hasattr(cut, "getSampleCutWeight"):
+        isFancyCut = True
+        cuts, cutInstName = cut
+        cut = getattr(cuts,cutInstName)
+
+    print isFancyCut, cut
     cut_name = cut if type(cut) == type("") else cut.fullName
 
     dOpt_ = dOpt
@@ -1682,7 +1711,9 @@ def getBinning( m1_range, m2_range ):
     m2s = range(  *m2_range )
     n_m1 = len(m1s)
     n_m2 = len(m2s)
-    return [n_m1+1, min_m1 - 0.5* step_m1 , max_m1 + 0.5*step_m1, int( ( (max_m1 - min_m2)+5/2.   -  (min_m1-max_m2-5/2.) )/5) , min_m1-max_m2-5/2. , (max_m1 - min_m2)+5/2. ]
+    x=10
+    return [    n_m1+1,     min_m1 - 0.5* step_m1 ,    max_m1 + 0.5*step_m1, 
+                int( ( (max_m1 - min_m2)+x/2.   -  (min_m1-max_m2-x/2.) )/x) , (min_m1-max_m2)-x/2. , (max_m1 - min_m2)+x/2. ]
 
 
 
@@ -2092,7 +2123,15 @@ def decide_weight2( sample, weight=None, cut="default" , lumi="target_lumi"):
 #from Workspace.DegenerateStopAnalysis.tools.btag_sf_map import btag_to_sf , sf_to_btag
 from Workspace.DegenerateStopAnalysis.tools.btag_sf_map import BTagSFMap
 
-
+def getSampleTriggersFilters(sample, cutString=''):
+    triggers = getattr(sample, 'triggers','')
+    filters = getattr(sample, 'filters','')
+    cuts = getattr(sample, 'cuts','')
+    cutList = []
+    for cutItem in [cutString, triggers, filters, cuts] :
+        if cutItem:
+            cutList.append(cutItem)
+    return "&&".join(["(%s)"%c for c in cutList])
 
 def decide_cut( sample, cut, plot=None, nMinus1=None):
     cuts = []
@@ -2215,11 +2254,14 @@ def getYieldFromChainCutWeights(args):
     #print samp, b, ret
     return ret 
 
-def getYieldsForSampleParal( self, tree_dict, cut_weights ):
+def getYieldsForSampleParal( self, tree_dict, cut_weights, nProc=None ):
     yieldDict = {}
     for samp in self.sampleList:
+        print nProc
         bins = cut_weights.keys() 
-        pool    = multiprocessing.Pool( processes = max( len(bins),18)  )
+        if not nProc:
+            nProc = max(len(bins), 18)
+        pool    = multiprocessing.Pool( processes = nProc  )
         yieldDict_samp = pool.map( getYieldFromChainCutWeights , [ [tree_dict, cut_weights[b][samp], samp, b  ] for b in bins ]    )
         pool.close()
         pool.join()
@@ -2265,7 +2307,7 @@ class Yields():
             raise Exception("use an instance of cutClass")
         
         if pklOpt: makeDir(pklDir)
-        
+       
         self.nDigits        = nDigits
         samples = samples
         if cuts:
@@ -2335,10 +2377,10 @@ class Yields():
            if "DataBlind" in samples[self.dataList[0]].name: self.lumi_weight = "DataBlind_lumi"
            elif "DataUnblind" in samples[self.dataList[0]].name: self.lumi_weight = "DataUnblind_lumi"
            else: raise Exception("Data sample not recognized! %s"%dataList)
-           print "Reweighting MC yields to", self.lumi_weight, ":", round(samples[self.dataList[0]].lumi/1000.,2), "fb-1" 
+           #print "Reweighting MC yields to", self.lumi_weight, ":", round(samples[self.dataList[0]].lumi/1000.,2), "fb-1" 
         else:
            self.lumi_weight = "target_lumi" 
-           print "Reweighting MC yields to", self.lumi_weight, ":", round(samples[self.bkgList[0]].weights.weight_dict['lumis']['target_lumi']/1000.,2), "fb-1" 
+           #print "Reweighting MC yields to", self.lumi_weight, ":", round(samples[self.bkgList[0]].weights.weight_dict['lumis']['target_lumi']/1000.,2), "fb-1" 
         
         #self.sampleLegend   = np.array( [ [samples[sample]['name'] for sample in self.bkgList] + ["Total"] + 
         #                                                         [samples[sample]['name'] for sample in self.sigList] ] )
@@ -2354,7 +2396,9 @@ class Yields():
             self.cut_weights[cutName] = {}
             for samp in self.sampleList:
                 if cuts:
-                    self.cut_weights[cutName][samp] = cuts.getSampleCutWeight( samples[samp].name, cutListNames = [cutName], weightListNames = [], )
+                    c,w = cuts.getSampleCutWeight( samples[samp].name, cutListNames = [cutName], weightListNames = [], )
+                    c = getSampleTriggersFilters( samples[samp], c)
+                    self.cut_weights[cutName][samp] = (c,w) #cuts.getSampleCutWeight( samples[samp].name, cutListNames = [cutName], weightListNames = [], )
                 else: 
                     self.cut_weights[cutName][samp] =  decide_cut_weight( samples[samp] , cutInst = cutStr  ,  weight=self.weight,  lumi=self.lumi_weight, plot=None, nMinus1= None  )
 
@@ -2520,7 +2564,7 @@ class Yields():
             #    yieldDict[samp] = results[isamp]
             ##print yieldDict
             #del results, pool             
-            yieldDict = getYieldsForSampleParal(self, {k:samples[k].tree for k in self.sampleList} , self.cut_weights )
+            yieldDict = getYieldsForSampleParal(self, {k:samples[k].tree for k in self.sampleList} , self.cut_weights, self.nProc )
 
             print yieldDict.keys()
         else:
@@ -3185,14 +3229,28 @@ sig_prefixes = ['s','cwz', 'cww', 't2tt','t2bw','t2ttold']
 def getMasses(string):
     masses = []
     string = get_filename(string)
+    string = string.replace("-","_")
     #splitted = re.split("_|-", string)
     #splitted = string.rsplit("_"):
+    
+    #s = string[-7:]
+    #masses = re.split("_", s)
 
-    for sig_prefix in sig_prefixes:
-        if re.match(sig_prefix+"\d\d\d_\d\d\d", string):
-            string =  string.replace(sig_prefix,"")
-            break
-    masses = re.split("_|-", string)
+    search = re.search("\d\d\d_\d\d\d", string)
+    if search:
+        masses = search.group().rsplit("_")
+
+
+    #   for sig_prefix in sig_prefixes:
+    #       if re.match(sig_prefix+"\d\d\d_\d\d\d", string):
+    #           string =  string.replace(sig_prefix,"")
+    #           break
+    #   #masses = re.split("_|-", string)
+    #   masses = re.split("_", string)
+
+
+
+
     # 
 
     # for s in splitted:
@@ -3206,7 +3264,8 @@ def getMasses(string):
     #         continue
     #     masses.append(s)
     if len(masses)!=2 or int(masses[0]) < int(masses[1]):
-        raise Exception("Failed to Extract masses from string: %s , only got %s "%(string, masses))
+        return False
+        #raise Exception("Failed to Extract masses from string: %s , only got %s "%(string, masses))
     return [int(m) for m in masses]
 
 def getMasses2(string):

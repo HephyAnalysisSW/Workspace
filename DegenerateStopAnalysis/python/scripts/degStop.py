@@ -49,9 +49,15 @@ if True:
     parser.add_argument('--mcMatch',     action="store_true", help='do mcMatch for lepton (should not be used with LepAll for now)')
     parser.add_argument('--postFuncs',    default = '',     nargs = "+",  action="store", help='')
 
+
+    parser.add_argument('--lepThresh',        default = '',                action="store", help='')
+    parser.add_argument('--jetThresh',        default = '',                action="store", help='')
+
     parser.add_argument('--sigOpt',    default='All',       action="store", help='BM= benchmark points only, NoSig=NoSignal , All=allsignal')
     parser.add_argument('--bkgs',       nargs="+",      help='')
+    parser.add_argument('--data',      default="d",      help='')
     parser.add_argument('--ppSet',     default='80X',          action="store", help='')
+    parser.add_argument('--nProc',     default=1,      type=int,    action="store" , help="Number of processes. if more than 1 multicores will be used" )
     args=parser.parse(sys.argv, setdef=False)
     
 if __name__=="__main__":

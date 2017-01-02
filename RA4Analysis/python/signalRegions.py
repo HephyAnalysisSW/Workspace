@@ -287,7 +287,34 @@ signalRegions_Moriond2017 = {(5,5): {(250, 350): {(500, 750):   {'deltaPhi': 1.0
                              (650, -1): {(500, 1250):         {'deltaPhi': 0.5, 'njet':'5j','LT':'LT4','HT': 'HT1',  'tex':'\\textrm{LT2}, \\textrm{HT1}'},
                                           (1250, -1):          {'deltaPhi': 0.5, 'njet':'5j','LT':'LT4','HT': 'HT23', 'tex':'\\textrm{LT2}, \\textrm{HT23}'}}}}
 
-
+signalRegions_Moriond2017_onebyone = [{(5,5): {(250, 350): {(500, 750):   {'deltaPhi': 1.0, 'njet':'5j','LT':'LT1','HT': 'HT1',  'tex':'\\textrm{LT1}, \\textrm{HT1}'}}}},
+                                      {(5,5): {(250, 350): {(750, -1):          {'deltaPhi': 1.0, 'njet':'5j','LT':'LT1','HT': 'HT2', 'tex':'\\textrm{LT1}, \\textrm{HT23}'}}}},
+                                      {(5,5): {(350, 450): {(500, 750):         {'deltaPhi': 1.0, 'njet':'5j','LT':'LT2','HT': 'HT1',  'tex':'\\textrm{LT2}, \\textrm{HT1}'}}}},
+                             {(5,5): {(350, 450): {(750, -1):     {'deltaPhi': 1.0, 'njet':'5j','LT':'LT2','HT': 'HT2', 'tex':'\\textrm{LT2}, \\textrm{HT23}'}}}},
+                             {(5,5): {(450, 650): {(500, 750):    {'deltaPhi': 0.75, 'njet':'5j','LT':'LT3','HT': 'HT1',  'tex':'\\textrm{LT2}, \\textrm{HT1}'}}}},
+                             {(5,5): {(450, 650): {(750, 1250):    {'deltaPhi': 0.75, 'njet':'5j','LT':'LT3','HT': 'HT23',  'tex':'\\textrm{LT2}, \\textrm{HT1}'}}}},
+                             {(5,5): {(450, 650): {(1250, -1):     {'deltaPhi': 0.75, 'njet':'5j','LT':'LT3','HT': 'HT3', 'tex':'\\textrm{LT2}, \\textrm{HT23}'}}}},
+                             {(5,5): {(650, -1): {(500, 750):    {'deltaPhi': 0.5, 'njet':'5j','LT':'LT4','HT': 'HT1',  'tex':'\\textrm{LT2}, \\textrm{HT1}'}}}},
+                             {(5,5): {(650, -1): {(750, 1250):    {'deltaPhi': 0.5, 'njet':'5j','LT':'LT4','HT': 'HT23',  'tex':'\\textrm{LT2}, \\textrm{HT1}'}}}},
+                             {(5,5): {(650, -1): {(1250, -1):     {'deltaPhi': 0.5, 'njet':'5j','LT':'LT4','HT': 'HT3', 'tex':'\\textrm{LT2}, \\textrm{HT23}'}}}},
+                     {(6,7): {(250, 350): {(500, 1000):         {'deltaPhi': 1.0, 'njet':'6-7j','LT':'LT1','HT': 'HT1',  'tex':'\\textrm{LT1}, \\textrm{HT1}'}}}},
+                      {(6,7): {(250, 350): {(1000, -1):          {'deltaPhi': 1.0, 'njet':'6-7j','LT':'LT1','HT': 'HT23', 'tex':'\\textrm{LT1}, \\textrm{HT23}'}}}},
+                            {(6,7): { (350, 450): {(500, 1000):         {'deltaPhi': 1.0, 'njet':'6-7j','LT':'LT2','HT': 'HT1',  'tex':'\\textrm{LT2}, \\textrm{HT1}'}}}},
+                                         {(6,7): { (350, 450): { (1000, -1):          {'deltaPhi': 1.0, 'njet':'6-7j','LT':'LT2','HT': 'HT23', 'tex':'\\textrm{LT2}, \\textrm{HT23}'}}}},
+                            {(6,7): { (450, 650): {(500, 750):         {'deltaPhi': 0.75, 'njet':'5j','LT':'LT3','HT': 'HT1',  'tex':'\\textrm{LT2}, \\textrm{HT1}'}}}},
+                                          {(6,7): { (450, 650): {(750, 1250):         {'deltaPhi': 0.75, 'njet':'5j','LT':'LT3','HT': 'HT1',  'tex':'\\textrm{LT2}, \\textrm{HT1}'}}}},
+                                          {(6,7): { (450, 650): {(1250, -1):          {'deltaPhi': 0.75, 'njet':'5j','LT':'LT3','HT': 'HT23', 'tex':'\\textrm{LT2}, \\textrm{HT23}'}}}},
+                            {(6,7): { (650, -1): {(500, 750):         {'deltaPhi': 0.5, 'njet':'5j','LT':'LT4','HT': 'HT1',  'tex':'\\textrm{LT2}, \\textrm{HT1}'}}}},
+                                          {(6,7): { (650, -1): {(750, 1250):         {'deltaPhi': 0.5, 'njet':'5j','LT':'LT4','HT': 'HT1',  'tex':'\\textrm{LT2}, \\textrm{HT1}'}}}},
+                                          {(6,7): { (650, -1): {(1250, -1):          {'deltaPhi': 0.5, 'njet':'5j','LT':'LT4','HT': 'HT23', 'tex':'\\textrm{LT2}, \\textrm{HT23}'}}}},
+                     {(8,-1): {(250, 350):{(500, 1000):         {'deltaPhi': 1.0, 'njet':'#geq8j','LT':'LT1','HT': 'HT1',  'tex':'\\textrm{LT1}, \\textrm{HT1}'}}}},
+                                          {(8,-1): {(250, 350):{ (1000, -1):          {'deltaPhi': 1.0, 'njet':'#geq8j','LT':'LT1','HT': 'HT23', 'tex':'\\textrm{LT1}, \\textrm{HT23}'}}}},
+                                {(8,-1): {(350, 450):{(500, 1000):         {'deltaPhi': 1.0, 'njet':'#geq8j','LT':'LT2','HT': 'HT1',  'tex':'\\textrm{LT2}, \\textrm{HT1}'}}}},
+                                         {(8,-1): {(350, 450):{ (1000, -1):          {'deltaPhi': 1.0, 'njet':'#geq8j','LT':'LT2','HT': 'HT23', 'tex':'\\textrm{LT2}, \\textrm{HT23}'}}}},
+                               {(8,-1): {(450, 650): {(500, 1250):         {'deltaPhi': 0.75, 'njet':'5j','LT':'LT3','HT': 'HT1',  'tex':'\\textrm{LT2}, \\textrm{HT1}'}}}},
+                                          {(8,-1): {(450, 650): {(1250, -1):          {'deltaPhi': 0.75, 'njet':'5j','LT':'LT3','HT': 'HT23', 'tex':'\\textrm{LT2}, \\textrm{HT23}'}}}},
+                               {(8,-1): {(650, -1): {(500, 1250):         {'deltaPhi': 0.5, 'njet':'5j','LT':'LT4','HT': 'HT1',  'tex':'\\textrm{LT2}, \\textrm{HT1}'}}}},
+                                          {(8,-1): {(650, -1): {(1250, -1):          {'deltaPhi': 0.5, 'njet':'5j','LT':'LT4','HT': 'HT23', 'tex':'\\textrm{LT2}, \\textrm{HT23}'}}}}]
 
 def addKey(d, newDict='deltaPhiCut'):
   for k, v in d.iteritems():

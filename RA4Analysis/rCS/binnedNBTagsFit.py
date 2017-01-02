@@ -82,10 +82,10 @@ def binnedNBTagsFit(cut, MCcut, cutname, samples, prefix = "", QCD_dict={0:{'y':
     template_TTJets = template_TTJets_Dict['hist']
     tempFile_TTJets = template_TTJets_Dict['file']
   else:
-    template_TTJets = getPlotFromChain(cTTJets, nBTagVar, [0,1,2,3], MCcut, weight_str, binningIsExplicit=True,addOverFlowBin='upper')
+    template_TTJets = getPlotFromChain(cTTJets, nBTagVar, [0,1,2,3], MCcut, weight_str+"*"+ttJetsweight, binningIsExplicit=True,addOverFlowBin='upper')
     if templateWeights:
       for i_nbjb, nbjb in enumerate(['0','1','2p']):
-        val, err = getYieldFromChain(cTTJets, cutString = MCcut, weight = weight_str+'*weightBTag'+nbjb+templateWeightSuffix, returnError=True)
+        val, err = getYieldFromChain(cTTJets, cutString = MCcut, weight = weight_str+'*weightBTag'+nbjb+templateWeightSuffix+"*"+ttJetsweight, returnError=True)
         template_TTJets.SetBinContent(i_nbjb+1, val)
         template_TTJets.SetBinError(i_nbjb+1,  errorScale*err)
     tempFile_TTJets = ROOT.TFile(templateDir+cutname+'_TTJets.root','new')
