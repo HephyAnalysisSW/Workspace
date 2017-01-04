@@ -34,7 +34,7 @@ HTbinsMultiB = [(500,1000), (1000,1500), (500,1500), (1500,-1)]
 HTbinsMultiB_names = ['HT0i'] + ['HT01','HT23','HT03','HT4i']*4
 
 HTbinsZeroB  = [(500,-1),(500,750), (500,1000), (500,1250), (750,1250), (750,-1), (1000,-1), (1250,-1)]
-HTbinsZeroB_names = ['HT0i','HT0i','HT0','HT01','HT02','HT12','HT2i','HT3i','HT4i']
+HTbinsZeroB_names = ['HT0i','HT0i','HT0','HT01','HT02','HT12','HT1i','HT2i','HT3i']
 
 nJbinsMultiB = [(4,5),(6,8),(9,-1)]
 nBJbinsMultiB = [(0,0),(1,1),(2,2),(3,-1)]
