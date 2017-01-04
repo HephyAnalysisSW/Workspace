@@ -429,7 +429,7 @@ def decorHist(samp,cut,hist,decorDict):
         hist.SetFillColor(samp['color'])
         hist.SetLineColor(ROOT.kBlack)
     elif samp.isSignal:
-        hist.SetLineWidth(2)
+        hist.SetLineWidth(3)
         hist.SetLineColor(samp['color'])
         hist.SetMarkerStyle(0)
     if dd.has_key("style") and dd['style']:
@@ -1180,7 +1180,7 @@ def drawPlots(samples, plots, cut, sampleList=['s','w'], plotList=[], plotMin=Fa
  
         if isDataPlot:
             latex.DrawLatex(0.16,0.92,"#font[22]{CMS Preliminary}")
-            latex.DrawLatex(0.7,0.92,"\\mathscr{L} = \\mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%( round(samples[dataList[0]].lumi/1000.,2)) )
+            latex.DrawLatex(0.75,0.92,"\\mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%( round(samples[dataList[0]].lumi/1000.,2)) )
         elif fom:
             latex.DrawLatex(0.16,0.92,"#font[22]{CMS Simulation}")
             latex.DrawLatex(0.65,0.92,"\\mathscr{L} = \\mathrm{%0.1f\, fb^{-1} (13\, TeV)}"%(round(samples[bkgList[0]].weights.weight_dict['lumis']['target_lumi']/1000.,2))) # assumes all samples in the sampleList have the same target_lumi
@@ -1604,7 +1604,7 @@ def getAndDrawQuickPlots(samples,var,bins=[],varName='',cut="(1)",weight="weight
         samp = samples[sampKey]
         weightStr = decide_weight2(samp, weight)
         if sampKey in sigList:
-            ret['hists'][sampKey]=getGoodPlotFromChain(samp.tree, var, binning = bins, varName=varName, cutString=cut, weight=weightStr, color = samp.color, lineWidth=2 )
+            ret['hists'][sampKey]=getGoodPlotFromChain(samp.tree, var, binning = bins, varName=varName, cutString=cut, weight=weightStr, color = samp.color, lineWidth=3 )
         if sampKey in bkgList:
             ret['hists'][sampKey]=getGoodPlotFromChain(samp.tree, var, binning = bins, varName=varName, cutString=cut, weight=weightStr, color = 1, fillColor = samp.color )
         

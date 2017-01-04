@@ -171,9 +171,9 @@ sampleSets = {
                            'WZ',
                            'ZZ',
                            'TBar_tch',
-                           'TBarToLeptons_tch_powheg', 
+                           #'TBarToLeptons_tch_powheg', 
                            'T_tch',
-                           'TToLeptons_tch_powheg',
+                           #'TToLeptons_tch_powheg',
                            'TBar_tWch',
                            'T_tWch',
                          ],
@@ -457,6 +457,7 @@ signal_samps = [x for x in sampleSets.keys() if 'T2tt' in x or 'T2bW' in x]
 data_samps = ['data_met']#, 'data_el', 'data_mu', 'data_jet'
 
 all_samps = mc_samps #+ signal_samps # + data_samps #FIXME: mc and data cannot be run simulatneously
+
  
 all_samples = []
 for samp in all_samps:

@@ -11,9 +11,20 @@ if __name__ == '__main__':
     sig2           =    'S300-240Fast'
     
     
-    tt             =   'TTJets'
-    w              =   "WJets"
-    otherBkg       = ['DYJetsM50', "QCD", "ZJetsInv", "ST", "Diboson"]
+    #tt             =   'TTJets'
+    #w              =   "WJets"
+
+    dy      = '#Z/\\gamma^{*} +jets'
+    qcd     = 'QCD'
+    st      = 'Single top'
+    tt      = 'TTJets'
+    vv      = 'VV'
+    w       = 'WJets'
+    z       = '#Z\\rightarrow \\nu\\nu+jets'
+
+
+    #otherBkg       = ['DYJetsM50', "QCD", "ZJetsInv", "ST", "Diboson"]
+    otherBkg       = [ dy, qcd, z, st, vv]
     allBkg         = [w,tt] + otherBkg
     data           = 'DataBlind'
     sigs           = [sig1, sig2]
@@ -77,9 +88,9 @@ if __name__ == '__main__':
     
     
     ##FIX ME
-    regions = [x for x in yld.cutNames if "CR" in x]
+    regions = [x for x in yld.cutNames if "cr" in x]
     region_names = regions
-    tt_region_names = [x for x in region_names if "CRTT2" in x ]
+    tt_region_names = [x for x in region_names if "crtt" in x ]
     w_region_names  = [x for x in region_names if x not in tt_region_names]
     ##
     ## TT SideBand
@@ -133,3 +144,5 @@ if __name__ == '__main__':
     
     
     print table
+    print 
+    print "pickle dumped in: \n %s \n"%(bkg_est_dir + "/CR_SFs.pkl")

@@ -156,8 +156,9 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
    
    if any (["st" in samp for samp in sampleList]):
       sampleDict.update({
-            'st_tch':    {'name':'ST_tch',           'sample':cmgPP.ST_tch[skim],     'color':colors['st_tch'],     'isSignal':0, 'isData':0, 'lumi':lumis["mc_lumi"]},
-            'st_wch':    {'name':'ST_wch',           'sample':cmgPP.ST_wch[skim],     'color':colors['st_wch'],     'isSignal':0, 'isData':0, 'lumi':lumis["mc_lumi"]},
+            #'st_tch_lep':{'name':'ST_tch_lep',       'sample':cmgPP.ST_tch_Lep[skim], 'color':colors['st_tch_lep'], 'isSignal':0, 'isData':0, 'lumi':lumis["mc_lumi"]},
+            #'st_tch':    {'name':'ST_tch',           'sample':cmgPP.ST_tch[skim],     'color':colors['st_tch'],     'isSignal':0, 'isData':0, 'lumi':lumis["mc_lumi"]},
+            #'st_wch':    {'name':'ST_wch',           'sample':cmgPP.ST_wch[skim],     'color':colors['st_wch'],     'isSignal':0, 'isData':0, 'lumi':lumis["mc_lumi"]},
             'st':        {'name':sample_names['st'], 'sample':cmgPP.ST[skim],         'color':colors['st'],         'isSignal':0, 'isData':0, 'lumi':lumis["mc_lumi"]},
             #'st_tch_lep':{'name':'ST_tch_lep',       'sample':cmgPP.ST_tch_Lep[skim], 'color':colors['st_tch_lep'], 'isSignal':0, 'isData':0, 'lumi':lumis["mc_lumi"]},
       }) 
