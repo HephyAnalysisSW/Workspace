@@ -23,9 +23,9 @@ import sys
 import pickle
 
 # most recent paths, can be replaced when initializing the cmgTuplesPostProcessed class
-ppDir = '/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/8020_mAODv2_v0/80X_postProcessing_v0/analysisHephy_13TeV_2016_v2_0/step1'
-mc_path     = ppDir + "/RunIISpring16MiniAODv2_v0"
-data_path   = ppDir + "/Data2016_v0"
+ppDir = '/afs/hephy.at/data/nrad01/cmgTuples/postProcessed_mAODv2/8020_mAODv2_v5/80X_postProcessing_v0/analysisHephy_13TeV_2016_v2_1/step1'
+mc_path     = ppDir + "/RunIISpring16MiniAODv2_v5"
+data_path   = ppDir + "/Data2016_v5"
 signal_path = mc_path
 
 # Lumi that was used in the weight calculation of PostProcessing in pb-1
