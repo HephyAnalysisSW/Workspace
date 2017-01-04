@@ -18,9 +18,9 @@ parser = argparse.ArgumentParser(description = "Input options")
 parser.add_argument("--cmgUserDir", dest = "cmgUserDir",  help = "CMG user directory", type = str, default = "")
 parser.add_argument("--cmgInAFS", dest = "cmgInAFS",  help = "cmgInAFS", type = int, default = 1)
 parser.add_argument("--ppUserDir", dest = "ppUserDir",  help = "PP user directory", type = str, default = "")
-parser.add_argument("--cmgTag", dest = "cmgTag",  help = "CMG Tag", type = str, default = "8020_mAODv2_v0")
+parser.add_argument("--cmgTag", dest = "cmgTag",  help = "CMG Tag", type = str, default = "8020_mAODv2_v5")
 parser.add_argument("--ppTag", dest = "ppTag",  help = "PP Tag", type = str, default = "v0")
-parser.add_argument("--parameterSet", dest = "parameterSet",  help = "Parameter set", type = str, default = "analysisHephy_13TeV_2016_v2_0")
+parser.add_argument("--parameterSet", dest = "parameterSet",  help = "Parameter set", type = str, default = "analysisHephy_13TeV_2016_v2_1")
 parser.add_argument("--samples", dest = "samples",  help = "Samples", type = str, nargs = "+", default = "all")
 parser.add_argument("--signalScan", action = "store_true",  help = "Compare bins")
 parser.add_argument("--getData", action = "store_true",  help = "Compare bins")
@@ -89,7 +89,8 @@ else: #directory taken from manual input
    ppDict['data_path'] =   ppDict['dir'] + "/Data2016_%s"%cmgDict['version']
    ppDict['signal_path'] = ppDict['mc_path'] 
 
-if samplesList[0] == "all": samplesList = ['w', 'tt', 'qcd', 'dy', 'st', 'vv'] #FIXME: Add LHE skim for tt+jets
+if samplesList[0] == "all": samplesList = ['w', 'tt', 'qcd', 'dy', 'st', 'vv']
+
 
 print makeDoubleLine()
 print "Comparing CMG and PP tuples:"
@@ -101,7 +102,6 @@ print makeLine()
 print "PP tuples:"
 print pprint(ppDict)
 print makeDoubleLine()
-
 
 #Results written to file   
 
@@ -133,6 +133,8 @@ samples = getSamples(cmgPP = cmgPP, skim = skim, sampleList = samplesList, scan 
 if 'tt' in samplesList and not useHT: 
    samplesList.remove('tt')
    samplesList.append('ttInc')
+
+#FIXME: Add LHE skim for tt+jets
 
 if skim == "preIncLep": 
     # branches for preselection (scalars or vectors) must be included in readVar or readVectors
