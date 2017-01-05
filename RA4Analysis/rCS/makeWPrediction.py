@@ -11,7 +11,7 @@ from predictionConfig import *
 
 ROOT.TH1F().SetDefaultSumw2()
 
-def makeWPrediction(bins, samples, htb, stb, srNJet, presel, presel_MC, dPhiCut=1.0, QCD=False):
+def makeWPrediction(bins, samples, htb, stb, srNJet, presel, presel_MC, dPhiCut=1.0, QCD=False, nSR=1):
   print "in W predition lumi is :"  , lumi
   if useBTagWeights: 'Will use b-tag weights for W-jets prediction!'
   weight_str, weight_err_str = makeWeight(lumi, sampleLumi, reWeight=MCweight)
@@ -34,7 +34,8 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, presel_MC, dPhiCut=
   #TT Jets yield in crNJet, no b-tag cut, low DPhi
   fit_crName, fit_crCut = nameAndCut(stb, htb, nJetCR, btb=None, presel=presel+'&&abs(leptonPdg)==13', btagVar = nBTagVar) 
   fit_crName, fit_crCut_MC = nameAndCut(stb, htb, nJetCR, btb=None, presel=presel_MC+'&&abs(leptonPdg)==13', btagVar = nBTagVar)
-  fit_crNJet_lowDPhi = binnedNBTagsFit(fit_crCut+"&&"+dPhiStr+"<"+str(dPhiCut), fit_crCut_MC+"&&"+dPhiStr+"<"+str(dPhiCut), fit_crName+'_dPhi'+str(dPhiCut)+'_muonChannel', samples=samples, prefix=fit_crName) #no QCD subtraction - there should only be a very small QCD contamination in muon channel
+  #no QCD subtraction - there should only be a very small QCD contamination in muon channel
+  fit_crNJet_lowDPhi = binnedNBTagsFit(fit_crCut+"&&"+dPhiStr+"<"+str(dPhiCut), fit_crCut_MC+"&&"+dPhiStr+"<"+str(dPhiCut), fit_crName+'_dPhi'+str(dPhiCut)+'_muonChannel', samples=samples, prefix=fit_crName, nSR=nSR)
 #  fit_crNJet_lowDPhi = binnedNBTagsFit(fit_crCut+"&&"+dPhiStr+"<"+str(dPhiCut), samples = {'W':cWJets, 'TT':cTTJets}, nBTagVar = 'nBJetMedium25', prefix=fit_crName)
   rd['fit_crNJet_lowDPhi'] = fit_crNJet_lowDPhi
   

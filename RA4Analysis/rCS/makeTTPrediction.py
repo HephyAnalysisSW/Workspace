@@ -11,7 +11,7 @@ from predictionConfig import *
 
 ROOT.TH1F().SetDefaultSumw2()
 
-def makeTTPrediction(bins, samples, htb, stb, srNJet, presel, presel_MC, dPhiCut=1.0, QCD=False):
+def makeTTPrediction(bins, samples, htb, stb, srNJet, presel, presel_MC, dPhiCut=1.0, QCD=False, nSR=1):
   #print "in make tt prediction lumi is :" , lumi
   weight_str, weight_err_str = makeWeight(lumi, sampleLumi, reWeight=MCweight)
   cWJets = samples['W']
@@ -39,9 +39,9 @@ def makeTTPrediction(bins, samples, htb, stb, srNJet, presel, presel_MC, dPhiCut
     QCD_dict={0:{'y':QCD_dictEnt[(0,0)][dPhiCut]['NQCDpred_lowdPhi'], 'e':QCD_dictEnt[(0,0)][dPhiCut]['NQCDpred_lowdPhi_err'], 'totalY':QCD_dictEnt[(0,0)][dPhiCut]['NQCDpred'], 'totalY_err':QCD_dictEnt[(0,0)][dPhiCut]['NQCDpred_err']},\
               1:{'y':QCD_dictEnt[(1,1)][dPhiCut]['NQCDpred_lowdPhi'], 'e':QCD_dictEnt[(1,1)][dPhiCut]['NQCDpred_lowdPhi_err'], 'totalY':QCD_dictEnt[(1,1)][dPhiCut]['NQCDpred'], 'totalY_err':QCD_dictEnt[(1,1)][dPhiCut]['NQCDpred_err']},\
               2:{'y':QCD_dictEnt[(2,-1)][dPhiCut]['NQCDpred_lowdPhi'],'e':QCD_dictEnt[(2,-1)][dPhiCut]['NQCDpred_lowdPhi_err'],'totalY':QCD_dictEnt[(2,-1)][dPhiCut]['NQCDpred'],'totalY_err':QCD_dictEnt[(2,-1)][dPhiCut]['NQCDpred_err']}}
-    fit_srNJet_lowDPhi = binnedNBTagsFit(fit_srCut+"&&"+dPhiStr+"<"+str(dPhiCut), fit_srCut_MC+"&&"+dPhiStr+"<"+str(dPhiCut), fit_srName+'_dPhi'+str(dPhiCut), samples = samples, prefix=fit_srName, QCD_dict=QCD_dict)
+    fit_srNJet_lowDPhi = binnedNBTagsFit(fit_srCut+"&&"+dPhiStr+"<"+str(dPhiCut), fit_srCut_MC+"&&"+dPhiStr+"<"+str(dPhiCut), fit_srName+'_dPhi'+str(dPhiCut), samples = samples, prefix=fit_srName, QCD_dict=QCD_dict, nSR=nSR)
   else:
-    fit_srNJet_lowDPhi = binnedNBTagsFit(fit_srCut+"&&"+dPhiStr+"<"+str(dPhiCut), fit_srCut_MC+"&&"+dPhiStr+"<"+str(dPhiCut), fit_srName+'_dPhi'+str(dPhiCut), samples = samples, prefix=fit_srName)
+    fit_srNJet_lowDPhi = binnedNBTagsFit(fit_srCut+"&&"+dPhiStr+"<"+str(dPhiCut), fit_srCut_MC+"&&"+dPhiStr+"<"+str(dPhiCut), fit_srName+'_dPhi'+str(dPhiCut), samples = samples, prefix=fit_srName, nSR=nSR)
   
 #  fit_srNJet_lowDPhi = binnedNBTagsFit(fit_srCut+"&&"+dPhiStr+"<"+str(dPhiCut), samples = {'W':cWJets, 'TT':cTTJets}, nBTagVar = 'nBJetMedium25', prefix=fit_srName)
   rd['fit_srNJet_lowDPhi'] = fit_srNJet_lowDPhi

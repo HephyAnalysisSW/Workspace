@@ -10,17 +10,23 @@ from rCShelpers import *# weight_str , weight_err_str , lumi
 
 from predictionConfig import *
 
-def binnedNBTagsFit(cut, MCcut, cutname, samples, prefix = "", QCD_dict={0:{'y':0.,'e':0.,'totalY':0., 'totalY_err':0.}, 1:{'y':0.,'e':0.,'totalY':0., 'totalY_err':0.},2:{'y':0.,'e':0.,'totalY':0., 'totalY_err':0.}}, bootstrap=False):
+def binnedNBTagsFit(cut, MCcut, cutname, samples, prefix = "", QCD_dict={0:{'y':0.,'e':0.,'totalY':0., 'totalY_err':0.}, 1:{'y':0.,'e':0.,'totalY':0., 'totalY_err':0.},2:{'y':0.,'e':0.,'totalY':0., 'totalY_err':0.}}, bootstrap=False, nSR=1):
   #print "LUMI:" , lumi
   #if not os.path.exists(printDir):
   #   os.makedirs(printDir) 
-  #if not os.path.exists(templateDir):
-  #   os.makedirs(templateDir)
+  #if not os.path.exists(templateDirSR):
+  #   os.makedirs(templateDirSR)
   weight_str, weight_err_str = makeWeight(lumi, sampleLumi, reWeight=MCweight)
   cWJets = samples['W']
   cTTJets = samples['TT']
   cRest = samples['Rest']
   cData = samples['Data']
+  
+  templateDirSR = templateDir+'SR'+str(nSR)+'/'
+  if not os.path.exists(templateDirSR):
+    os.makedirs(templateDirSR) 
+  
+  cutname = cutname.replace('.','p')
   
   errorScale = 1
   if errorScale != 1:
@@ -47,7 +53,7 @@ def binnedNBTagsFit(cut, MCcut, cutname, samples, prefix = "", QCD_dict={0:{'y':
   hQCD.Scale(0.5) #split in +/- charge
   
   #Get histograms binned in b-tag multiplicity
-  template_WJets_PosPdg_Dict = getTemplate(cutname, templateDir, 'WJets_PosPdg') #these templates will always be MC, so a reweighting (e.g. b-tagging) should not be used
+  template_WJets_PosPdg_Dict = getTemplate(cutname, templateDirSR, 'WJets_PosPdg') #these templates will always be MC, so a reweighting (e.g. b-tagging) should not be used
   if template_WJets_PosPdg_Dict['loadTemp'] and loadTemplate:
     template_WJets_PosPdg = template_WJets_PosPdg_Dict['hist']
     tempFile_WJets_PosPdg = template_WJets_PosPdg_Dict['file']
@@ -58,11 +64,11 @@ def binnedNBTagsFit(cut, MCcut, cutname, samples, prefix = "", QCD_dict={0:{'y':
         val, err = getYieldFromChain(cWJets, cutString = 'leptonPdg>0&&'+MCcut, weight = weight_str+'*weightBTag'+nbjb+templateWeightSuffix, returnError=True)
         template_WJets_PosPdg.SetBinContent(i_nbjb+1, val)
         template_WJets_PosPdg.SetBinError(i_nbjb+1,  errorScale*err)
-    tempFile_WJets_PosPdg = ROOT.TFile(templateDir+cutname+'_WJets_PosPdg.root','new')
+    tempFile_WJets_PosPdg = ROOT.TFile(templateDirSR+cutname+'_WJets_PosPdg.root','new')
     template_WJets_PosPdg.Write()
     #tempFile.Close()
 
-  template_WJets_NegPdg_Dict = getTemplate(cutname, templateDir, 'WJets_NegPdg') #these templates will always be MC, so a reweighting (e.g. b-tagging) should not be used
+  template_WJets_NegPdg_Dict = getTemplate(cutname, templateDirSR, 'WJets_NegPdg') #these templates will always be MC, so a reweighting (e.g. b-tagging) should not be used
   if template_WJets_NegPdg_Dict['loadTemp'] and loadTemplate:
     template_WJets_NegPdg = template_WJets_NegPdg_Dict['hist']
     tempFile_WJets_NegPdg = template_WJets_NegPdg_Dict['file']
@@ -73,11 +79,11 @@ def binnedNBTagsFit(cut, MCcut, cutname, samples, prefix = "", QCD_dict={0:{'y':
         val, err = getYieldFromChain(cWJets, cutString = 'leptonPdg<0&&'+MCcut, weight = weight_str+'*weightBTag'+nbjb+templateWeightSuffix, returnError=True)
         template_WJets_NegPdg.SetBinContent(i_nbjb+1, val)
         template_WJets_NegPdg.SetBinError(i_nbjb+1,  errorScale*err)
-    tempFile_WJets_NegPdg = ROOT.TFile(templateDir+cutname+'_WJets_NegPdg.root','new')
+    tempFile_WJets_NegPdg = ROOT.TFile(templateDirSR+cutname+'_WJets_NegPdg.root','new')
     template_WJets_NegPdg.Write()
     #tempFile.Close()
 
-  template_TTJets_Dict = getTemplate(cutname, templateDir, 'TTJets') #these templates will always be MC, so a reweighting (e.g. b-tagging) should not be used
+  template_TTJets_Dict = getTemplate(cutname, templateDirSR, 'TTJets') #these templates will always be MC, so a reweighting (e.g. b-tagging) should not be used
   if template_TTJets_Dict['loadTemp'] and loadTemplate:
     template_TTJets = template_TTJets_Dict['hist']
     tempFile_TTJets = template_TTJets_Dict['file']
@@ -88,11 +94,11 @@ def binnedNBTagsFit(cut, MCcut, cutname, samples, prefix = "", QCD_dict={0:{'y':
         val, err = getYieldFromChain(cTTJets, cutString = MCcut, weight = weight_str+'*weightBTag'+nbjb+templateWeightSuffix+"*"+ttJetsweight, returnError=True)
         template_TTJets.SetBinContent(i_nbjb+1, val)
         template_TTJets.SetBinError(i_nbjb+1,  errorScale*err)
-    tempFile_TTJets = ROOT.TFile(templateDir+cutname+'_TTJets.root','new')
+    tempFile_TTJets = ROOT.TFile(templateDirSR+cutname+'_TTJets.root','new')
     template_TTJets.Write()
     #tempFile.Close()
 
-  template_Rest_PosPdg_Dict = getTemplate(cutname, templateDir, 'Rest_PosPdg') #these templates will always be MC, so a reweighting (e.g. b-tagging) should not be used
+  template_Rest_PosPdg_Dict = getTemplate(cutname, templateDirSR, 'Rest_PosPdg') #these templates will always be MC, so a reweighting (e.g. b-tagging) should not be used
   if template_Rest_PosPdg_Dict['loadTemp'] and loadTemplate:
     template_Rest_PosPdg = template_Rest_PosPdg_Dict['hist']
     tempFile_Rest_PosPdg = template_Rest_PosPdg_Dict['file']
@@ -103,11 +109,11 @@ def binnedNBTagsFit(cut, MCcut, cutname, samples, prefix = "", QCD_dict={0:{'y':
         val, err = getYieldFromChain(cRest, cutString = 'leptonPdg>0&&'+MCcut, weight = weight_str+'*weightBTag'+nbjb+templateWeightSuffix, returnError=True)
         template_Rest_PosPdg.SetBinContent(i_nbjb+1, val)
         template_Rest_PosPdg.SetBinError(i_nbjb+1,  errorScale*err)
-    tempFile_Rest_PosPdg = ROOT.TFile(templateDir+cutname+'_Rest_PosPdg.root','new')
+    tempFile_Rest_PosPdg = ROOT.TFile(templateDirSR+cutname+'_Rest_PosPdg.root','new')
     template_Rest_PosPdg.Write()
     #tempFile.Close()
 
-  template_Rest_NegPdg_Dict = getTemplate(cutname, templateDir, 'Rest_NegPdg') #these templates will always be MC, so a reweighting (e.g. b-tagging) should not be used
+  template_Rest_NegPdg_Dict = getTemplate(cutname, templateDirSR, 'Rest_NegPdg') #these templates will always be MC, so a reweighting (e.g. b-tagging) should not be used
   if template_Rest_NegPdg_Dict['loadTemp'] and loadTemplate:
     template_Rest_NegPdg = template_Rest_NegPdg_Dict['hist']
     tempFile_Rest_NegPdg = template_Rest_NegPdg_Dict['file']
@@ -118,7 +124,7 @@ def binnedNBTagsFit(cut, MCcut, cutname, samples, prefix = "", QCD_dict={0:{'y':
         val, err = getYieldFromChain(cRest, cutString = 'leptonPdg<0&&'+MCcut, weight = weight_str+'*weightBTag'+nbjb+templateWeightSuffix, returnError=True)
         template_Rest_NegPdg.SetBinContent(i_nbjb+1, val)
         template_Rest_NegPdg.SetBinError(i_nbjb+1,  errorScale*err)
-    tempFile_Rest_NegPdg = ROOT.TFile(templateDir+cutname+'_Rest_NegPdg.root','new')
+    tempFile_Rest_NegPdg = ROOT.TFile(templateDirSR+cutname+'_Rest_NegPdg.root','new')
     template_Rest_NegPdg.Write()
     #tempFile.Close()
 
@@ -164,9 +170,9 @@ def binnedNBTagsFit(cut, MCcut, cutname, samples, prefix = "", QCD_dict={0:{'y':
     hData_NegPdg = getPlotFromChain(cData, nBTagVar, [0,1,2,3], 'leptonPdg<0&&'+cut, w, binningIsExplicit=True,addOverFlowBin='upper')
     #hData_PosPdg.Add(hQCD,-1)
     #hData_NegPdg.Add(hQCD,-1)
-  hData_PosPdg_File = ROOT.TFile(templateDir+cutname+'_PosPdg_DataHist.root','new')
+  hData_PosPdg_File = ROOT.TFile(templateDirSR+cutname+'_PosPdg_DataHist.root','new')
   hData_PosPdg.Write()
-  hData_NegPdg_File = ROOT.TFile(templateDir+cutname+'_NegPdg_DataHist.root','new')
+  hData_NegPdg_File = ROOT.TFile(templateDirSR+cutname+'_NegPdg_DataHist.root','new')
   hData_NegPdg.Write()
     
   print "Nominal yields data Pos:", hData_PosPdg.Integral()
@@ -398,7 +404,7 @@ def binnedNBTagsFit(cut, MCcut, cutname, samples, prefix = "", QCD_dict={0:{'y':
   fitFrame_NegPdg.GetYaxis().SetTitleOffset(1.4)
   fitFrame_NegPdg.GetXaxis().SetTitle(nBTagVar)
   fitFrame_NegPdg.Draw()
-
+  
   c1.Print(printDir+'/'+prefix+'_nBTagFitRes.png')
   c1.Print(printDir+'/'+prefix+'_nBTagFitRes.pdf')
   c1.Print(printDir+'/'+prefix+'_nBTagFitRes.root')

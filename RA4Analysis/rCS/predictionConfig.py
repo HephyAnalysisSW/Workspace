@@ -30,7 +30,7 @@ if QCDup: nameSuffix += '_QCDup'
 if QCDdown: nameSuffix += '_QCDdown'
 
 ## samples
-isData              = True
+isData              = False
 unblinded           = False
 validation          = False
 isCentralPrediction = True
@@ -81,9 +81,9 @@ if validation:
   regStr = 'validation_4j_altWSB'
 else:
   #signalRegions = signalRegions2016
-  ##signalRegions = signalRegions_Moriond2017
-  regStr = 'SR_Moriond2017_v3'
   #regStr = 'SR2016_v2'
+  signalRegions = signalRegions_Moriond2017
+  regStr = 'SR_Moriond2017'
 
 ## weight calculations
 lumi = 36.5
@@ -169,8 +169,8 @@ if testRun:
   signalRegions = oneRegion
   predictionName = 'testRun'
   printDir    = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results'+year+'/25ns/templateFit_'+predictionName+'_'+lumistr+'/'
-  pickleDir   = '/data/'+username+'/Results'+year+'/Prediction_'+predictionName+'_'+lumistr+'/'
-  templateDir = '/data/'+username+'/Results'+year+'/btagTemplates_'+predictionName+'_'+templateLumistr+'/'
+  pickleDir   = '/afs/hephy.at/data/'+username+'01/Results'+year+'/Prediction_'+predictionName+'_'+lumistr+'/'
+  templateDir = '/afs/hephy.at/data/'+username+'01/Results'+year+'/btagTemplates_'+predictionName+'_'+templateLumistr+'/'
 
 
 

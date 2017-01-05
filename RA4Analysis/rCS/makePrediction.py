@@ -92,10 +92,10 @@ for srNJet in signalRegions:
       print '## Using a dPhi cut value of',str(deltaPhiCut)
       print '#################################################'
       print
-      makeTTPrediction(rd, samples, htb, stb, srNJet, presel, presel_MC, dPhiCut=deltaPhiCut, QCD=QCDestimate)
+      makeTTPrediction(rd, samples, htb, stb, srNJet, presel, presel_MC, dPhiCut=deltaPhiCut, QCD=QCDestimate, nSR=nSR)
 
       #join W estimation results to dict
-      makeWPrediction(rd, samples, htb, stb, srNJet, presel, presel_MC, dPhiCut=deltaPhiCut, QCD=QCDestimate)
+      makeWPrediction(rd, samples, htb, stb, srNJet, presel, presel_MC, dPhiCut=deltaPhiCut, QCD=QCDestimate, nSR=nSR)
 
       ##If you want to make prediction of one of the bkgs, comment out all the estimation of total Bkgs
       #estimate total background
