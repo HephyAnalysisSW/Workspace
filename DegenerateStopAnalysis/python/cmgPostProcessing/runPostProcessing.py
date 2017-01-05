@@ -50,7 +50,7 @@ sampleSets = {
    
    'wjets':{
                'samples':[
-                           #"WJetsToLNu_HT100to200",
+                           "WJetsToLNu_HT100to200",
                            "WJetsToLNu_HT100to200_ext",
                            "WJetsToLNu_HT200to400",
                            "WJetsToLNu_HT200to400_ext",
@@ -171,9 +171,9 @@ sampleSets = {
                            'WZ',
                            'ZZ',
                            'TBar_tch',
-                           'TBarToLeptons_tch_powheg', 
+                           #'TBarToLeptons_tch_powheg', 
                            'T_tch',
-                           'TToLeptons_tch_powheg',
+                           #'TToLeptons_tch_powheg',
                            'TBar_tWch',
                            'T_tWch',
                          ],
@@ -190,12 +190,14 @@ sampleSets = {
    # MET PD
    'data_met':{
                'samples':[
-                           "MET_Run2016B_23Sep2016_v3", #NOTE: v3
-                           "MET_Run2016C_23Sep2016_v1",
-                           "MET_Run2016D_23Sep2016_v1",
-                           "MET_Run2016E_23Sep2016_v1",
-                           "MET_Run2016F_23Sep2016_v1",
-                           "MET_Run2016G_23Sep2016_v1",
+                           "MET_Run2016B_23Sep2016", #NOTE: v3
+                           "MET_Run2016C_23Sep2016",
+                           "MET_Run2016D_23Sep2016",
+                           "MET_Run2016E_23Sep2016",
+                           "MET_Run2016F_23Sep2016",
+                           "MET_Run2016G_23Sep2016",
+                           "MET_Run2016H_PromptReco_v2",
+                           "MET_Run2016H_PromptReco_v3", #NOTE: use?
                          ],
                   },
    
@@ -205,12 +207,14 @@ sampleSets = {
    
    'data_el':{
                'samples':[
-                           "SingleElectron_Run2016B_23Sep2016_v3", #NOTE: v3
-                           "SingleElectron_Run2016C_23Sep2016_v1",
-                           "SingleElectron_Run2016D_23Sep2016_v1",
-                           "SingleElectron_Run2016E_23Sep2016_v1",
-                           "SingleElectron_Run2016F_23Sep2016_v1",
-                           "SingleElectron_Run2016G_23Sep2016_v1",
+                           "SingleElectron_Run2016B_23Sep2016", #NOTE: v3
+                           "SingleElectron_Run2016C_23Sep2016",
+                           "SingleElectron_Run2016D_23Sep2016",
+                           "SingleElectron_Run2016E_23Sep2016",
+                           "SingleElectron_Run2016F_23Sep2016",
+                           "SingleElectron_Run2016G_23Sep2016",
+                           "SingleElectron_Run2016H_PromptReco_v2",
+                           "SingleElectron_Run2016H_PromptReco_v3", #NOTE: use?
                          ],
                   },
    
@@ -218,24 +222,28 @@ sampleSets = {
    
    'data_mu':{
                'samples':[
-                           "SingleMuon_Run2016B_23Sep2016_v3", #NOTE: v3
-                           "SingleMuon_Run2016C_23Sep2016_v1",
-                           "SingleMuon_Run2016D_23Sep2016_v1",
-                           "SingleMuon_Run2016E_23Sep2016_v1",
-                           "SingleMuon_Run2016F_23Sep2016_v1",
-                           "SingleMuon_Run2016G_23Sep2016_v1",
+                           "SingleMuon_Run2016B_23Sep2016", #NOTE: v3
+                           "SingleMuon_Run2016C_23Sep2016",
+                           "SingleMuon_Run2016D_23Sep2016",
+                           "SingleMuon_Run2016E_23Sep2016",
+                           "SingleMuon_Run2016F_23Sep2016",
+                           "SingleMuon_Run2016G_23Sep2016",
+                           "SingleMuon_Run2016H_PromptReco_v2",
+                           "SingleMuon_Run2016H_PromptReco_v3", #NOTE: use?
                          ],
                   },
    
    # JetHT PD
    'data_jet':{
                'samples':[
-                           "JetHT_Run2016B_23Sep2016_v3", #NOTE: v3
-                           "JetHT_Run2016C_23Sep2016_v1",
-                           "JetHT_Run2016D_23Sep2016_v1",
-                           "JetHT_Run2016E_23Sep2016_v1",
-                           "JetHT_Run2016F_23Sep2016_v1",
-                           "JetHT_Run2016G_23Sep2016_v1",
+                           "JetHT_Run2016B_23Sep2016", #NOTE: v3
+                           "JetHT_Run2016C_23Sep2016",
+                           "JetHT_Run2016D_23Sep2016",
+                           "JetHT_Run2016E_23Sep2016",
+                           "JetHT_Run2016F_23Sep2016",
+                           "JetHT_Run2016G_23Sep2016",
+                           "JetHT_Run2016H_PromptReco_v2",
+                           "JetHT_Run2016H_PromptReco_v3", #NOTE: use?
                          ],
                   },
    
@@ -443,11 +451,13 @@ for mstop in mass_dict.keys():
 sampleSets.update(signalSets)
 
 
-mc_samps = ['ttjets', 'wjets', 'dyjets','zjets', 'qcd', 'other' ]
+#mc_samps = ['ttjets', 'wjets', 'dyjets','zjets', 'qcd', 'other' ]
+mc_samps = ['ttjets', 'wjets', 'dyjets','zjets' ]#, 'other' ]
 signal_samps = [x for x in sampleSets.keys() if 'T2tt' in x or 'T2bW' in x]
 data_samps = ['data_met']#, 'data_el', 'data_mu', 'data_jet'
 
-all_samps = mc_samps + signal_samps # + data_samps #FIXME: mc and data cannot be run simulatneously
+all_samps = mc_samps #+ signal_samps # + data_samps #FIXME: mc and data cannot be run simulatneously
+
  
 all_samples = []
 for samp in all_samps:
@@ -505,6 +515,13 @@ def get_parser():
         help="Create batch script"
         )
     
+    argsRun.add_argument('--batchScriptName',
+        action='store',
+        type=str,
+        default='batch_script',
+        help="Set of samples to run the post processing on"
+        )
+
     argsRun.add_argument('--run',
         action='store_true',
         help="Run Post processing!"
@@ -572,7 +589,7 @@ def getSampleDir(args, sampleName):
       path = sampleDict[sampleName]['dir']
    except KeyError:
       print "\nKey Error with {0} \n ".format(sampleName) + \
-      "\nCheck if sample exists in {0}.py. \n Exiting.".format(cmgTuplesFullName.replace('.', '/'))
+      "\nCheck if sample exists in {0} \n Exiting.".format(sampleFileLib.__file__.replace(".pyc",".py"))
       sys.exit()
    
    return path
@@ -814,8 +831,8 @@ def runPostProcessing(argv=None):
         pprint_cust.pformat(commands)
         )
     if args.batchScript:
-        fname = 'batch_script.sh'
-        
+        #fname = 'batch_script.sh'
+        fname = args.batchScriptName +".sh"
         print '%s written to current directory.'%fname
         
         f = file(fname, 'a')

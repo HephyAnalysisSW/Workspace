@@ -13,7 +13,27 @@ def getValErrString(val,errUp, errDown=0, precision=3):
     return str(round(val,precision))+' + '+str(round(errUp,precision))+' - '+str(round(errDown,precision))
 
 class asym_float:
-  def __init__(self, central, up=0, down=0, poisson=True, forcePoisson=False, cl=0.682689492):
+  sigmas = {1:0.682689492, 2:0.954499736, 3:0.997300204, 4:0.99993666, 5:0.999999426697, 6:0.999999998027}
+
+  def __init__(self, central, up=0, down=0, poisson=True, forcePoisson=False, sigma=1, cl=False):
+    if type(central)==type(()):
+      if len(central)==2:
+        up = central[1]
+        central = central[0]
+      elif len(central)==3:
+        up = central[1]
+        down = central[2]
+        central = central[0]
+      else:
+        raise ValueError( "unsupported length of tuple" )
+    
+    if not cl:
+      try:
+        cl = self.sigmas[sigma]
+      except KeyError:
+        print 'A sigma of %f is not implemented, using 1 sigma instead' % sigma
+        cl = self.sigmas[1]
+    
     self.central  = central
     if (up==0 and type(central)==int and poisson) or forcePoisson:
       upper = stats.chi2.ppf((1+cl)/2,2*(central+1))/2

@@ -6,6 +6,8 @@ allComponents=[]
 import os
 if not os.path.isdir(sample_path_base + sample_path_tag):
     sample_path_base = '/data/nrad/cmgTuples/'
+    if not os.path.isdir(sample_path_base + sample_path_tag):
+        raise Exception("Cannot acces either afs-data or /data ")
 sample_path = sample_path_base + sample_path_tag
 
 
@@ -985,6 +987,181 @@ ZZ ={
 allComponents.append(ZZ)
 
 
+
+
+QCD_HT300to500 ={
+'cmgName':"QCD_HT300to500",
+"name" : "QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+"chunkString":"QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+"dir": sample_path +"/" + "QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+"dbsName" : "/QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM",
+"rootFileLocation":"tree.root",
+"skimAnalyzerDir":"skimAnalyzerCount",
+"treeName":"tree",
+"isData": False,
+"xsec": 351300,
+"ext":['QCD_HT300to500', 'QCD_HT300to500_ext'],
+}
+allComponents.append(QCD_HT300to500)
+
+
+QCD_HT300to500_ext ={
+'cmgName':"QCD_HT300to500_ext",
+"name" : "QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1",
+"chunkString":"QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1",
+"dir": sample_path +"/" + "QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1",
+"dbsName" : "/QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM",
+"rootFileLocation":"tree.root",
+"skimAnalyzerDir":"skimAnalyzerCount",
+"treeName":"tree",
+"isData": False,
+"xsec": 351300,
+"ext":['QCD_HT300to500_ext', 'QCD_HT300to500'],
+}
+allComponents.append(QCD_HT300to500_ext)
+
+
+QCD_HT500to700_ext ={
+'cmgName':"QCD_HT500to700_ext",
+"name" : "QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1",
+"chunkString":"QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1",
+"dir": sample_path +"/" + "QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1",
+"dbsName" : "/QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM",
+"rootFileLocation":"tree.root",
+"skimAnalyzerDir":"skimAnalyzerCount",
+"treeName":"tree",
+"isData": False,
+"xsec": 31630,
+}
+allComponents.append(QCD_HT500to700_ext)
+
+
+QCD_HT700to1000 ={
+'cmgName':"QCD_HT700to1000",
+"name" : "QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+"chunkString":"QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+"dir": sample_path +"/" + "QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+"dbsName" : "/QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM",
+"rootFileLocation":"tree.root",
+"skimAnalyzerDir":"skimAnalyzerCount",
+"treeName":"tree",
+"isData": False,
+"xsec": 6802,
+"ext":['QCD_HT700to1000', 'QCD_HT700to1000_ext'],
+}
+allComponents.append(QCD_HT700to1000)
+
+
+QCD_HT700to1000_ext ={
+'cmgName':"QCD_HT700to1000_ext",
+"name" : "QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1",
+"chunkString":"QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1",
+"dir": sample_path +"/" + "QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1",
+"dbsName" : "/QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM",
+"rootFileLocation":"tree.root",
+"skimAnalyzerDir":"skimAnalyzerCount",
+"treeName":"tree",
+"isData": False,
+"xsec": 6802,
+"ext":['QCD_HT700to1000_ext', 'QCD_HT700to1000'],
+}
+allComponents.append(QCD_HT700to1000_ext)
+
+
+QCD_HT1000to1500 ={
+'cmgName':"QCD_HT1000to1500",
+"name" : "QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v2",
+"chunkString":"QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v2",
+"dir": sample_path +"/" + "QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v2",
+"dbsName" : "/QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v2/MINIAODSIM",
+"rootFileLocation":"tree.root",
+"skimAnalyzerDir":"skimAnalyzerCount",
+"treeName":"tree",
+"isData": False,
+"xsec": 1206,
+"ext":['QCD_HT1000to1500', 'QCD_HT1000to1500_ext'],
+}
+allComponents.append(QCD_HT1000to1500)
+
+
+QCD_HT1000to1500_ext ={
+'cmgName':"QCD_HT1000to1500_ext",
+"name" : "QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1",
+"chunkString":"QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1",
+"dir": sample_path +"/" + "QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1",
+"dbsName" : "/QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM",
+"rootFileLocation":"tree.root",
+"skimAnalyzerDir":"skimAnalyzerCount",
+"treeName":"tree",
+"isData": False,
+"xsec": 1206,
+"ext":['QCD_HT1000to1500_ext', 'QCD_HT1000to1500'],
+}
+allComponents.append(QCD_HT1000to1500_ext)
+
+
+QCD_HT1500to2000 ={
+'cmgName':"QCD_HT1500to2000",
+"name" : "QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v3",
+"chunkString":"QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v3",
+"dir": sample_path +"/" + "QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v3",
+"dbsName" : "/QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v3/MINIAODSIM",
+"rootFileLocation":"tree.root",
+"skimAnalyzerDir":"skimAnalyzerCount",
+"treeName":"tree",
+"isData": False,
+"xsec": 120.4,
+"ext":['QCD_HT1500to2000', 'QCD_HT1500to2000_ext'],
+}
+allComponents.append(QCD_HT1500to2000)
+
+
+QCD_HT1500to2000_ext ={
+'cmgName':"QCD_HT1500to2000_ext",
+"name" : "QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1",
+"chunkString":"QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1",
+"dir": sample_path +"/" + "QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1",
+"dbsName" : "/QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM",
+"rootFileLocation":"tree.root",
+"skimAnalyzerDir":"skimAnalyzerCount",
+"treeName":"tree",
+"isData": False,
+"xsec": 120.4,
+"ext":['QCD_HT1500to2000_ext', 'QCD_HT1500to2000'],
+}
+allComponents.append(QCD_HT1500to2000_ext)
+
+
+QCD_HT2000toInf ={
+'cmgName':"QCD_HT2000toInf",
+"name" : "QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+"chunkString":"QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+"dir": sample_path +"/" + "QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1",
+"dbsName" : "/QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM",
+"rootFileLocation":"tree.root",
+"skimAnalyzerDir":"skimAnalyzerCount",
+"treeName":"tree",
+"isData": False,
+"xsec": 25.25,
+"ext":['QCD_HT2000toInf', 'QCD_HT2000toInf_ext'],
+}
+allComponents.append(QCD_HT2000toInf)
+
+
+QCD_HT2000toInf_ext ={
+'cmgName':"QCD_HT2000toInf_ext",
+"name" : "QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1",
+"chunkString":"QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1",
+"dir": sample_path +"/" + "QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1",
+"dbsName" : "/QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/MINIAODSIM",
+"rootFileLocation":"tree.root",
+"skimAnalyzerDir":"skimAnalyzerCount",
+"treeName":"tree",
+"isData": False,
+"xsec": 25.25,
+"ext":['QCD_HT2000toInf_ext', 'QCD_HT2000toInf'],
+}
+allComponents.append(QCD_HT2000toInf_ext)
 
 
 

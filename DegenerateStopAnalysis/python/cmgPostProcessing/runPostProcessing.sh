@@ -43,7 +43,7 @@ SAMPLE_SET=$1
 
 # hard-coded parameters - modify them according to desired full set
 RUNMODE="BATCH"
-CMG_PROCESSING_TAG="8020_mAODv2_v0"
+CMG_PROCESSING_TAG="8020_mAODv2_v5"
 CMG_POST_PROCESSING_TAG="80X_postProcessing_v0"
 PARAMETER_SET="analysisHephy_13TeV_2016_v2_1"
 CHUNK_SPLITTING="100"
@@ -51,11 +51,13 @@ VERBOSE="" #--verbose"
 
 # semi-hard-coded parameters
 if [[ ${2} == "DATA" ]]; then 
-    CMG_TUPLES="Data2016_v0"
+    CMG_TUPLES="Data2016_v5"
     BTAG_WEIGHTS=""
+    BATCH_TAG="Data"
 else
-    CMG_TUPLES="RunIISpring16MiniAODv2_v0"
+    CMG_TUPLES="RunIISpring16MiniAODv2_v5"
     BTAG_WEIGHTS="--processBTagWeights"
+    BATCH_TAG="MC"
 fi
 
 if [[ ${3} == "skimPreselect" ]]; then 
@@ -65,7 +67,8 @@ else
 fi
 
 if [[ ${4} == "skimLepton" ]]; then 
-    SKIM_LEPTON="--skimLepton=oneLep20"
+    #SKIM_LEPTON="--skimLepton=oneLep20"
+    SKIM_LEPTON="--skimLepton=oneLepGood"
 else
     SKIM_LEPTON=""
 fi
@@ -83,7 +86,9 @@ fi
 
 if [[ ${RUNMODE} == "BATCH" ]]; then
     echo "Creating batch script (to run set RUNMODE to RUN).."
-    RUNOPT="--batchScript"
+    BATCHSCRIPTNAME="batchScript-"$CMG_PROCESSING_TAG"-"$CMG_POST_PROCESSING_TAG"-"$BATCH_TAG 
+    RUNOPT="--batchScript  --batchScriptName "$BATCHSCRIPTNAME
+    
 elif [[ ${RUNMODE} == "RUN" ]]; then
     RUNOPT="--run"
 fi

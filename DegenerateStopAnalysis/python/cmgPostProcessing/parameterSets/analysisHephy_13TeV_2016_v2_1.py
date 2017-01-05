@@ -975,11 +975,11 @@ def getParameterSet(args):
     pu_xsec = 63000   # in microbarn
     pu_xsec_unc = 0.05
 
-    pileup_dir = "$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/python/cmgPostProcessing/pileup"
+    pileup_dir = "$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/python/cmgPostProcessing/pileup/"
     puWeightDict = {
-        'up':    {'var': 'puReweight_up', 'xsec': pu_xsec * (1 + pu_xsec_unc), 'pu_root_file': pileup_dir + '/PU_ratio_%s.root' % int(pu_xsec * (1 + pu_xsec_unc)), 'pu_hist_name': 'PU_ratio'},
-        'central':    {'var': 'puReweight', 'xsec': pu_xsec, 'pu_root_file': pileup_dir + '/PU_ratio_%s.root' % int(pu_xsec), 'pu_hist_name': 'PU_ratio'},
-        'down':    {'var': 'puReweight_down', 'xsec': pu_xsec * (1 - pu_xsec_unc), 'pu_root_file': pileup_dir + '/PU_ratio_%s.root' % int(pu_xsec * (1 - pu_xsec_unc)), 'pu_hist_name': 'PU_ratio'},
+        'up':         {'var': 'puReweight_up',   'xsec': pu_xsec * (1 + pu_xsec_unc), 'pu_root_file': pileup_dir + '/PU_ratio_23Sep2016_%s.root' % int(pu_xsec * (1 + pu_xsec_unc)), 'pu_hist_name': 'PU_ratio'},
+        'central':    {'var': 'puReweight',      'xsec': pu_xsec,                     'pu_root_file': pileup_dir + '/PU_ratio_23Sep2016_%s.root' % int(pu_xsec), 'pu_hist_name': 'PU_ratio'},
+        'down':       {'var': 'puReweight_down', 'xsec': pu_xsec * (1 - pu_xsec_unc), 'pu_root_file': pileup_dir + '/PU_ratio_23Sep2016_%s.root' % int(pu_xsec * (1 - pu_xsec_unc)), 'pu_hist_name': 'PU_ratio'},
     }
     params['puWeightDict'] = puWeightDict
     
