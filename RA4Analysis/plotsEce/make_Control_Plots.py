@@ -13,15 +13,15 @@ from Workspace.RA4Analysis.general_config import *
 from math import *
 
 all_MB = False
-presel = False
+presel = True
 SB_w   = False 
 SB_tt  = False
-new_SB_tt  = True
+new_SB_tt  = False
 presel_1b = False
 test = False
 unblind = False
 draw_signal = True
-blind = False
+blind = True
 #add_cut = ["(1)","no_isoVeto"]
 add_cut = ["(iso_Veto)","_isoVeto"]
 #add_cut = "(1)"
@@ -29,7 +29,7 @@ add_cut = ["(iso_Veto)","_isoVeto"]
 from optparse import OptionParser
 parser = OptionParser()
 parser.add_option("--iplot", dest="iplot", default=0, action="store", help="enter numbers 0,1,2..11 this the order of plot you want to plot 0 is deltaphi")
-parser.add_option("--top_index", dest="top_index", default=0, action="store", help="enter numbers 0,1,2 this the order oftopPt weight")
+#parser.add_option("--top_index", dest="top_index", default=0, action="store", help="enter numbers 0,1,2 this the order oftopPt weight")
 parser.add_option("--lepSel_index", dest="lepSel_index", default=0, action="store", help="enter numbers 0,1,2 this the order oftopPt weight")
 (options, args) = parser.parse_args()
 
@@ -38,9 +38,9 @@ print type(tmp_iplot)
 iplot = tmp_iplot
 #iplot = 0
 
-exec("tmp_topindex="+options.top_index)
-print type(tmp_topindex)
-top_index = tmp_topindex
+#exec("tmp_topindex="+options.top_index)
+#print type(tmp_topindex)
+#top_index = tmp_topindex
 #top_index = 1
 
 exec("tmp_lepsel="+options.lepSel_index)
@@ -107,8 +107,8 @@ lepSels = [
   'label':'_lep_', 'str':'1 $\\lep$' , 'trigger': trigger, 'trigger_xor': trigger_xor},\
 ]
 
-ngenTau = "Sum$(abs(genTau_grandmotherId)==6&&abs(genTau_motherId)==24)"
-ngenLep = "Sum$(abs(genLep_grandmotherId)==6&&abs(genLep_motherId)==24)"
+diLep = "(Sum$(abs(genTau_grandmotherId)==6&&abs(genTau_motherId)==24)+Sum$(abs(genLep_grandmotherId)==6&&abs(genLep_motherId)==24)==2)"
+semiLep = "(Sum$(abs(genTau_grandmotherId)==6&&abs(genTau_motherId)==24)+Sum$(abs(genLep_grandmotherId)==6&&abs(genLep_motherId)==24)<2)"
 
 bkg_samples=[
 {'sample':'TTVH',           "weight":btag_weight ,"cut":nbtag ,"add_Cut":"(1)","name":TTV ,'tex':'t#bar{t}V','color':ROOT.kOrange-3},
@@ -117,8 +117,8 @@ bkg_samples=[
 {"sample":"singleTop",      "weight":btag_weight ,"cut":nbtag ,"add_Cut":"(1)","name":singleTop_lep,"tex":"t/#bar{t}",'color': ROOT.kViolet+5},
 {"sample":"QCD",            "weight":"(1)"       ,"cut":nbtag ,"add_Cut":"(1)","name":QCDHT, "tex":"QCD","color":ROOT.kCyan-6},
 {"sample":"WJets",          "weight":btag_weight ,"cut":nbtag ,"add_Cut":"(1)","name":WJetsHTToLNu,"tex":"W + jets","color":ROOT.kGreen-2},
-{"sample":"ttJets_diLep",   "weight":"("+top_ISR_weight+"*1.071)","cut":nbtag ,"add_Cut":"(1)","name":TTJets_diLep, "tex":"t#bar{t} ll + jets",'color':ROOT.kBlue},
-{"sample":"ttJets_semiLep", "weight":"("+top_ISR_weight+"*1.071)","cut":nbtag ,"add_Cut":"(1)","name":TTJets_semiLep, "tex":"t#bar{t} l + jets",'color':ROOT.kBlue-7}
+{"sample":"ttJets_diLep",   "weight":"(1.071)","cut":nbtag ,"add_Cut":diLep,"name":[TTJets_diLep,TTJets_HTbinned], "tex":"t#bar{t} ll + jets",'color':ROOT.kBlue},
+{"sample":"ttJets_semiLep", "weight":"(1.071)","cut":nbtag ,"add_Cut":semiLep,"name":[TTJets_semiLep,TTJets_HTbinned], "tex":"t#bar{t} l + jets",'color':ROOT.kBlue-7}
 ]
 
 for bkg in bkg_samples:
@@ -168,8 +168,8 @@ if test :
 if not draw_signal :
   signals = []
 topWeight = [("TopPtWeight","topPt"),(top_ISR_weight,"ISR"),("(1)","non")]
-weight_str_plot = reweight
-print topWeight[top_index][1]
+#weight_str_plot = reweight
+#print topWeight[top_index][1]
 plots = [plots[iplot]]
 lepSels = [lepSels[lepSel_index]]
 if unblind : 
@@ -179,7 +179,7 @@ if unblind :
   #weight_str_signal_plot = reweight
 
 for lepSel in lepSels:
-  path = "/afs/hephy.at/user/e/easilar/www/Moriond2017/plots/Fix_"+topWeight[top_index][1]+lepSel['label']+add_cut[1]
+  path = "/afs/hephy.at/user/e/easilar/www/Moriond2017/plots/"+lepSel['label']+add_cut[1]
   if not os.path.exists(path):
     os.makedirs(path)
   print lepSel['label']
@@ -208,7 +208,9 @@ for lepSel in lepSels:
           tmp_yield = 0
           for bkg in bkg_samples:
             bla_Name, Cut = nameAndCut(stb, htb, srNJet, btb=bkg['cut'], presel="&&".join([bkg["add_Cut"],presel]), btagVar =  btagVarString)
+            print 8*"*"
             print bkg["sample"], Cut
+            print "WEIGHT : " ,  "*".join([weight_str_plot , bkg["weight"]])
             bin[srNJet][stb][htb][p['varname']][bkg['sample']] = getPlotFromChain(bkg['chain'], p['var'], p['bin'], cutString = Cut, weight = "*".join([weight_str_plot , bkg["weight"]]) , binningIsExplicit=False ,addOverFlowBin='both',variableBinning=p["bin_set"])
             tmp_yield += bin[srNJet][stb][htb][p['varname']][bkg['sample']].Integral()
           tot_yield = tmp_yield
@@ -223,7 +225,7 @@ for lepSel in lepSels:
           print data_yield , tot_yield
           if tot_yield > 0.0 : bin[srNJet][stb][htb]['scale_fac'] = float(data_yield)/float(tot_yield)
           else : bin[srNJet][stb][htb]['scale_fac'] = 1 
-          #bin[srNJet][stb][htb]['scale_fac'] = 1 
+          print "scale factor is :" , bin[srNJet][stb][htb]['scale_fac']
           bin[srNJet][stb][htb]['label'] = Name         
           bin[srNJet][stb][htb]['path'] = CR_path        
   for p in plots:
@@ -289,8 +291,8 @@ for lepSel in lepSels:
           for bkg in bkg_samples:
             color = bkg['color']
             histo = bin[srNJet][stb][htb][p['varname']][bkg['sample']]
-            if "ttjets" in bkg["sample"].lower() : histo.Scale(bin[srNJet][stb][htb]['scale_fac'])
-            else : histo.Scale(bin[srNJet][stb][htb]['scale_fac'])
+            #if "ttjets" in bkg["sample"].lower() : histo.Scale(bin[srNJet][stb][htb]['scale_fac'])
+            histo.Scale(bin[srNJet][stb][htb]['scale_fac'])
             histo.SetFillColor(color)
             histo.SetLineColor(ROOT.kBlack)
             histo.SetLineWidth(1)

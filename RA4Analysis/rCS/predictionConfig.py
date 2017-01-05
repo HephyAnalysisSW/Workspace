@@ -48,10 +48,10 @@ cDY         = getChain(DY_HT,histname='')
 csingleTop  = getChain(singleTop_lep,histname='')
 cTTV        = getChain(TTV,histname='')
 cDiBoson    = getChain(diBoson, histname='')
-cDiboson_rest = getChain(diBoson_rest,histname='')
-cDiboson_1l = getChain(diBoson_1L1Nu2Q,histname='')
+cDiBoson_rest = getChain(diBoson_rest,histname='')
+cDiBoson_1l = getChain(diBoson_1L1Nu2Q,histname='')
 cRest       = getChain([singleTop_lep, DY_HT, TTV,diBoson_rest],histname='')#no QCD
-cBkg        = getChain([WJetsHTToLNu, TTJets_Comb, singleTop_lep, DY_HT, TTV], histname='')#no QCD
+cBkg        = getChain([WJetsHTToLNu, TTJets_Comb, singleTop_lep, DY_HT, TTV,diBoson], histname='')#no QCD
 cQCD        = getChain(QCDHT,histname='')
 
 
@@ -81,9 +81,8 @@ if validation:
   regStr = 'validation_4j_altWSB'
 else:
   #signalRegions = signalRegions2016
-  #regStr = 'SR2016_v2'
-  signalRegions = signalRegions_Moriond2017
-  regStr = 'SR_Moriond2017'
+  ##signalRegions = signalRegions_Moriond2017
+  regStr = 'SR_Moriond2017_v7'
 
 ## weight calculations
 lumi = 36.5
@@ -112,18 +111,19 @@ if templateBootstrap: templateBootstrap = pickle.load(file(templateBootstrapDir)
 if isData:
   templateName   = 'Spring16_templates_'+regStr+'_lep_data'
   predictionName = templateName + nameSuffix
+  getKappaSuffix = '_lep_MC'
 else:
   templateName   = 'Spring16_templates_'+regStr+'_lep_MC'
   predictionName = templateName+btagWeightSuffix + nameSuffix
-printDir    = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Spring15/25ns/templateFit_'+predictionName+'_'+lumistr+'/'
+printDir    = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results'+year+'/templateFit_'+predictionName+'_'+lumistr+'/'
 pickleDir   = '/afs/hephy.at/data/'+username+'01/Results'+year+'/Prediction_'+predictionName+'_'+lumistr+'/'
-templateDir = '/afs/hephy.at/data/'+username+'01/Results'+year+'/btagTemplates_'+templateName+'_'+templateLumistr+'/'
-prefix = 'singleLeptonic_Spring16_'
+templateDir = '/afs/hephy.at/user/'+username[0]+'/'+username+'/www/Results'+year+'/btagTemplates_'+templateName+'_'+templateLumistr+'/'
+prefix = 'singleLeptonic_Spring16_iso_Veto_ISRforttJets_OLDttJetsSB_addDiBoson'
 
 if validation:
   kappa_dict_dir = '/data/dspitzbart/Results'+year+'/Prediction_Spring16_templates_validation_4j_altWSB_lep_MC_SF_12p9/singleLeptonic_Spring16__estimationResults_pkl_kappa_corrected'
 else:
-  kappa_dict_dir = '/afs/hephy.at/data/'+username+'01/Results'+year+'/Prediction_Spring16_templates_SR2016_postApp_v2_lep_MC_SF_12p9/singleLeptonic_Spring16__estimationResults_pkl_kappa_corrected'
+  kappa_dict_dir = '/afs/hephy.at/data/'+username+'01/Results'+year+'/Prediction_Spring16_templates_'+regStr+'_lep_MC'+btagWeightSuffix+nameSuffix+'_'+lumistr+'/'
 
 ## Preselection cut
 trigger_or_ele = "(HLT_Ele105||HLT_Ele115||HLT_Ele50PFJet165||HLT_IsoEle27T||HLT_EleHT400||HLT_EleHT350)"
@@ -137,7 +137,7 @@ triggers = trigger_xor
 filters = "(Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_goodVertices && Flag_eeBadScFilter &&  Flag_globalTightHalo2016Filter && Flag_badChargedHadronFilter && Flag_badMuonFilter)"
 presel = "((!isData&&singleLeptonic)||(isData&&"+triggers+"&&"+filters+"))"
 presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSoftLeptons==0 && Jet_pt[1]>80 && st>250 && nJet30>1 && htJet30j>500"
-
+presel += "&& iso_Veto"
 singleMu_presel = "((!isData&&singleMuonic)||(isData&&"+triggers+"&&"+filters+"))"
 singleMu_presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSoftLeptons==0 && Jet_pt[1]>80 && st>250 && nJet30>1 && htJet30j>500"
 
@@ -145,6 +145,7 @@ singleEle_presel = "((!isData&&singleElectronic)||(isData&&"+triggers+"&&"+filte
 singleEle_presel += "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSoftLeptons==0 && Jet_pt[1]>80 && st>250 && nJet30>1 && htJet30j>500"
 
 presel_MC = "singleLeptonic" + "&& nLooseHardLeptons==1 && nTightHardLeptons==1 && nLooseSoftLeptons==0 && Jet_pt[1]>80 && st>250 && nJet30>1 && htJet30j>500 && Flag_badChargedHadronFilter && Flag_badMuonFilter"
+presel_MC += "&& iso_Veto" 
 
 if not isData: presel = presel_MC
 
@@ -153,8 +154,8 @@ if not isData: presel = presel_MC
 ## weights for MC
 muTriggerEff = '0.926'
 eleTriggerErr = '0.963'
-ttJetsweight = '(weight_ISR_new*1.071)'  ### this is temperary change this 
-MCweight = '(1)'
+ttJetsweight = '(1.071)'  ### this is temperary change this 
+MCweight = '(weight_ISR_new)'
 
 ## corrections
 createFits = True # turn off if you already did one

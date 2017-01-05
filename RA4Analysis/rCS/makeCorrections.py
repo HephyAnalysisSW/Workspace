@@ -131,7 +131,7 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
                    {'chain':cDY,         'cut':cutCRtt, 'weight':weight_str+'*weightBTag1'+btagWeightSuffix},\
                    {'chain':cTTV,        'cut':cutCRtt, 'weight':weight_str+'*weightBTag1'+btagWeightSuffix},\
                    {'chain':csingleTop,  'cut':cutCRtt, 'weight':weight_str+'*weightBTag1'+btagWeightSuffix},\
-                   {'chain':cDiboson,    'cut':cutCRtt, 'weight':weight_str+'*weightBTag1'+btagWeightSuffix},\
+                   {'chain':cDiBoson,    'cut':cutCRtt, 'weight':weight_str+'*weightBTag1'+btagWeightSuffix},\
                    ]
 
         rcs1bCRtt_btag = combineRCS(samples, dPhiCut)
@@ -672,7 +672,7 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
         print 'kappa(W_corrRest):', getValErrString(W_kappa,W_kappa_err)
         print 'kappa(total):', getValErrString(global_kappa,global_kappa_err)
       else:
-        kappa_dict = pickle.load(file(kappa_dict_dir))
+        kappa_dict = pickle.load(file(kappa_dict_dir+prefix+'_estimationResults_pkl_kappa_corrected'))
         TT_kappa              = kappa_dict[njb][stb][htb]['TT_kappa']
         TT_kappa_err          = kappa_dict[njb][stb][htb]['TT_kappa_err']
         W_kappa               = kappa_dict[njb][stb][htb]['W_kappa']

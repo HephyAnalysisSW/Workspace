@@ -29,7 +29,7 @@ lepSels = [
   'label':'_lep_', 'str':'1 $lep$' , 'trigger': trigger}\
 ]
 
-lepSels = [lepSels[1]]
+lepSels = [lepSels[2]]
 diLep = "(Sum$(abs(genTau_grandmotherId)==6&&abs(genTau_motherId)==24)+Sum$(abs(genLep_grandmotherId)==6&&abs(genLep_motherId)==24)==2)"
 semiLep = "(Sum$(abs(genTau_grandmotherId)==6&&abs(genTau_motherId)==24)+Sum$(abs(genLep_grandmotherId)==6&&abs(genLep_motherId)==24)<2)"
 
@@ -40,8 +40,8 @@ bkg_samples=[
 {"sample":"singleTop", "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":singleTop_lep,"tex":"t/#bar{t}",'color': ROOT.kViolet+5},
 {"sample":"QCD",       "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":QCDHT, "tex":"QCD","color":ROOT.kCyan-6},
 {"sample":"WJets",     "weight":"(1)" ,"cut":(0,0),"add_Cut":"(1)","name":WJetsHTToLNu,"tex":"W + jets","color":ROOT.kGreen-2},
-{"sample":"ttJets",    "weight":"("+top_ISR_weight+"*1.071)" ,"cut":(0,0),"add_Cut":"(1)","name":TTJets_diLep, "tex":"t#bar{t} ll + jets",'color':ROOT.kBlue},
-{"sample":"ttJets",    "weight":"("+top_ISR_weight+"*1.071)" ,"cut":(0,0),"add_Cut":"(1)","name":TTJets_semiLep, "tex":"t#bar{t} l + jets",'color':ROOT.kBlue-7},
+{"sample":"ttJets",    "weight":"(1.071)" ,"cut":(0,0),"add_Cut":diLep,"name":[TTJets_diLep,TTJets_HTbinned], "tex":"t#bar{t} ll + jets",'color':ROOT.kBlue},
+{"sample":"ttJets",    "weight":"(1.071)" ,"cut":(0,0),"add_Cut":semiLep,"name":[TTJets_semiLep,TTJets_HTbinned], "tex":"t#bar{t} l + jets",'color':ROOT.kBlue-7},
 ]
 
 for bkg in bkg_samples:
@@ -62,12 +62,13 @@ for lepSel in lepSels:
   #{'cut':"&&".join([lepSel['cut'],lepSel['veto'],"iso_Veto","nJet30>=5","(Jet_pt[1]>80)","(Jet_pt[1]>80)"]), 'label': '2. jets ($\\geq$ 80 GeV)'},\
   #{'cut':"&&".join([lepSel['cut'],lepSel['veto'],"iso_Veto","nJet30>=5","(Jet_pt[1]>80)","(Jet_pt[1]>80)","htJet30j>500"]), 'label':'$H_T >$ 500 GeV'},\
   #{'cut':"&&".join([lepSel['cut'],lepSel['veto'],"iso_Veto","nJet30>=5","(Jet_pt[1]>80)","htJet30j>500","st>250","(Jet_pt[1]>80)"]), 'label':'$L_T >$ 250 GeV'},\
-  {'cut':"&&".join([lepSel['cut'],lepSel['veto'],"iso_Veto","nJet30>=4&&nJet30<=5","(Jet_pt[1]>80)","htJet30j>500","st>250","nBJetMediumCSV30>=1","iso_Veto",bkg_filters,"(Jet_pt[1]>80)"]), 'label': 'multi b-jets (CSVM)' },\
+  #{'cut':"&&".join([lepSel['cut'],lepSel['veto'],"iso_Veto","nJet30>=4&&nJet30<=5","(Jet_pt[1]>80)","htJet30j>500","st>250","nBJetMediumCSV30>=1","iso_Veto",bkg_filters,"(Jet_pt[1]>80)"]), 'label': 'multi b-jets (CSVM)' },\
+  {'cut':"&&".join([lepSel['cut'],lepSel['veto'],"iso_Veto","nJet30>=4&&nJet30<=5","(Jet_pt[1]>80)","htJet30j>500","st>250","nBJetMediumCSV30==1","iso_Veto",bkg_filters,"(Jet_pt[1]>80)"]), 'label': '0 b-jets (CSVM)' },\
   #{'cut':"&&".join([lepSel['cut'],lepSel['veto'],"nJet30>=5","(Jet_pt[1]>80)","htJet30j>500","st>250","nBJetMediumCSV30==0","deltaPhi_Wl>1","(Jet_pt[1]>80)"]), 'label': '\\Delta\\Phi >' },\
   #{'cut':"&&".join([lepSel['cut'],lepSel['veto'],"nJet30>=5","(Jet_pt[1]>80)","htJet30j>500","st>250","nBJetMediumCSV30>=1","nJet30>=6","(Jet_pt[1]>80)"]), 'label': 'multi b-jets (CSVM) nJet >=6' },\
   #{'cut':"&&".join([lepSel['cut'],lepSel['veto'],"nJet30>=5","(Jet_pt[1]>80)","htJet30j>500","st>250","nBJetMediumCSV30>=1","nJet30>=6","(Jet_pt[1]>80)","deltaPhi_Wl>1"]), 'label': '\\Delta\\Phi >1' },\
    ]
-  if ICHEP: ofile = file(path+'cut_flow_'+lepSel['label']+'_ICHEP_onlyWJets.tex','w')
+  if ICHEP: ofile = file(path+'cut_flow_'+lepSel['label']+'_ICHEP_onlyttJets.tex','w')
   else: ofile = file(path+'cut_flow_'+lepSel['label']+'_reweight_tests.tex','w')
   doc_header = '\\documentclass{article}\\usepackage[english]{babel}\\usepackage{graphicx}\\usepackage[margin=0.5in]{geometry}\\begin{document}'
   ofile.write(doc_header)
@@ -104,9 +105,9 @@ for lepSel in lepSels:
       #nEntry = chain.GetEntries()
       #nEntry = chain.GetEntries("&&".join([s["add_Cut"],cut['cut']]))
       #print "MC Events:" , nEntry
-      y_remain = getYieldFromChain(chain,cutString = "&&".join([s["add_Cut"],cut['cut']]) , weight = weight_str_plot+"*"+bkg["weight"])
-      print tot_yields , y_remain
+      y_remain = getYieldFromChain(chain,cutString = "&&".join([s["add_Cut"],cut['cut']]) , weight = weight_str_plot+"*"+s["weight"])
       tot_yields = y_remain
+      print tot_yields
       #tot_yields = nEntry
       if ICHEP : tot_yields = (tot_yields*12880)/36450 
       if s["sample"] == "ttJets": sum_tt.append(tot_yields)  

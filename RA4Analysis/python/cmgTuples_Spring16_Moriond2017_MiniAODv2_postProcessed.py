@@ -7,7 +7,7 @@ TTJets_diLep = {\
 "bins" : [
 "TTJets_DiLepton",
 ],
-'dir' : dirEce,
+'dir' : '/afs/hephy.at/data/easilar01/cmgTuples/postProcessing_Data_Moriond2017_v6/ttLeps/',
 }
 
 TTJets_semiLep = {\
@@ -16,7 +16,7 @@ TTJets_semiLep = {\
 "TTJets_SingleLeptonFromT",
 "TTJets_SingleLeptonFromTbar",
 ],
-'dir' : dirEce,
+'dir' : '/afs/hephy.at/data/easilar01/cmgTuples/postProcessing_Data_Moriond2017_v6/ttLeps/',
 }
 
 TTJets_HTbinned = {\
@@ -31,20 +31,29 @@ TTJets_HTbinned = {\
 }
 
 
+TTJets_Comb_Lep = {\
+"name" : "TTJets_Comb_Lep",
+"bins" : [
+"TTJets_SingleLeptonFromT",
+"TTJets_SingleLeptonFromTbar",
+"TTJets_DiLepton",
+],
+'dir' : '/afs/hephy.at/data/easilar01/cmgTuples/postProcessing_Data_Moriond2017_v6/ttLeps/',
+}
+
 TTJets_Comb = {\
 "name" : "TTJets_Comb",
 "bins" : [
 "TTJets_SingleLeptonFromT",
 "TTJets_SingleLeptonFromTbar",
 "TTJets_DiLepton",
-#'TTJets_LO_HT1200to2500_ext',
-#'TTJets_LO_HT2500toInf',
-#'TTJets_LO_HT600to800_ext',
-#'TTJets_LO_HT800to1200_ext',
+'TTJets_LO_HT1200to2500_ext',
+'TTJets_LO_HT2500toInf',
+'TTJets_LO_HT600to800_ext',
+'TTJets_LO_HT800to1200_ext',
 ],
 'dir' : dirEce,
 }
-
 
 WJetsHTToLNu = {\
 "name" : "W+Jets",

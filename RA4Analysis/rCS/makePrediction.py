@@ -17,7 +17,7 @@ from optparse import OptionParser
 parser = OptionParser()
 parser.add_option("--nSR", dest="nSR", default=0, action="store", help="enter the number of SR you want to enter 0-27")
 (options, args) = parser.parse_args()
-          
+         
 nSR = int(options.nSR)
 prefix = prefix+"_"+str(nSR)
 signalRegions = signalRegions_Moriond2017_onebyone[nSR]
