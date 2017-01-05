@@ -300,7 +300,7 @@ def multiplyHists(h1,h2):
       a = res.GetBinLowEdge(i+1)
       w = res.GetBinWidth(i+1)
    
-      #print 'a: ', a, 'w: ', w
+      #print 'i: ', i, 'a: ', a, 'w: ', w
    
       v1 = h1.GetBinContent(i+1)
       e1 = h1.GetBinError(i+1)
@@ -308,16 +308,12 @@ def multiplyHists(h1,h2):
       v2 = h2.GetBinContent(i+1)
       e2 = h2.GetBinError(i+1)
       
-      if v1*v2 == 0:
-          v = 0.
-          u = 0.
-          d = 0.
+      #print 'v1: ', v1, 'e1: ', e1, 'v2: ', v2, 'e2: ', e2
       
-      else:
-          v = v1*v2 if v2>0. else 0.
-          e = v*math.sqrt(pow(e1,2)+pow(e2,2))
+      v = v1*v2
+      e = v*math.sqrt(pow(e1,2)+pow(e2,2))
       
-      #print i,v,u,d
+      #print 'Value : ', v, '+=: ', e
       
       res.SetBinContent(i+1,v)
       res.SetBinError(i+1, e)

@@ -155,7 +155,7 @@ eta = "abs(LepAll_eta[%s])"%(ind)
 #lowPtSel = "(genLep_pt > 6 && genLep_pt < 10)" #Pt selection
 #misMatchSel = "LepAll_mcMatchId == 0"
 
-selection = "(nLepAll_{} > 0 && abs(LepAll_pdgId[{ind}]) == {} & abs(LepAll_eta[{ind}]) < {} && LepAll_mcMatchId[{ind}] != 0)".format(lep, pdgId, etaAcc, ind = ind)
+selection = "(nLepAll_{} > 0 && abs(LepAll_pdgId[{ind}]) == {} && abs(LepAll_eta[{ind}]) < {} && LepAll_mcMatchId[{ind}] != 0)".format(lep, pdgId, etaAcc, ind = ind)
 #selection = "Sum$(abs(LepAll_pdgId) == %s && abs(LepAll_eta) < %s && LepAll_mcMatchId != 0) > 0"
 #print selection
 #xmin = 0
