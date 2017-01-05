@@ -59,7 +59,7 @@ separateBTagWeights = True
 defSampleStr = "TTJets_LO"
 
 #subDir = "postProcessing_Data_Moriond2017_v9_Trigskimmed_METTest"
-subDir = "postProcessing_MC_Spring16_Moriond2017_v6"
+subDir = "postProcessing_MC_Spring16_Moriond2017_ttJets_v2"
 #subDir = "deleteme"
 
 #branches to be kept for data and MC
@@ -102,7 +102,8 @@ parser.add_option("--useXSecFile", dest="readXsecFromFile", default = False, act
 
 (options, args) = parser.parse_args()
 skimCond = "(1)"
-htLtSkim = "Sum$(Jet_pt)>500&&(LepGood_pt[0]+met_pt)>250"
+#htLtSkim = "Sum$(Jet_pt)>500&&(LepGood_pt[0]+met_pt)>250"
+htLtSkim = "Sum$(Jet_pt)>350"
 common_skim = "HT350"
 if options.for_dilep :
   htLtSkim = "(1)"

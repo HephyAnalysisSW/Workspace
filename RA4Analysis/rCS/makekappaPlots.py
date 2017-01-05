@@ -50,7 +50,7 @@ add_cut = ["(iso_Veto)","_isoVeto"]
 lepSel = lepSels[0]
 presel = "&&".join([lepSel['cut'],lepSel['veto'],"Jet_pt[1]>80&&abs(LepGood_eta[0])<2.4",add_cut[0]])
 data_presel = "&&".join([lepSel['cut'],lepSel['veto'],lepSel['trigger'],filters,"Jet_pt[1]>80&&abs(LepGood_eta[0])<2.4",add_cut[0]])
-weight_str = "weight" 
+weight_str = weight_str_plot 
 
 diLep = "((ngenLep+ngenTau)==2)"
 semiLep = "((ngenLep+ngenTau)==1)"
@@ -96,7 +96,7 @@ for srNJet in sorted(sideBand3fb):
       cname1bCRtt, cut1bCRtt = nameAndCut(stb,htb,nJet, btb=(1,1) ,presel=presel, btagVar = btagVarString)
       cname0bCRtt, cut0bCRtt = nameAndCut(stb,htb,nJet, btb=(0,0) ,presel=presel, btagVar = btagVarString)
       ewk_samples_1b = [{'chain':cWJets,       'cut':cut1bCRtt,   'weight':weight_str},\
-                         {'chain':cTTJets,     'cut':cut1bCRtt,   'weight':weight_str+'*'+top_ISR_weight+"*1.071"},\
+                         {'chain':cTTJets,     'cut':cut1bCRtt,   'weight':weight_str+"*1.071"},\
                          {'chain':cDY,         'cut':cut1bCRtt,   'weight':weight_str},\
                          {'chain':cTTV,        'cut':cut1bCRtt,   'weight':weight_str},\
                          {'chain':csingleTop,  'cut':cut1bCRtt,   'weight':weight_str},\
@@ -104,14 +104,14 @@ for srNJet in sorted(sideBand3fb):
                          ]
 
       ewk_samples_1pb = [{'chain':cWJets,     'cut':cut2bCRtt,   'weight':weight_str},\
-                         {'chain':cTTJets,    'cut':cut2bCRtt,   'weight':weight_str+'*'+top_ISR_weight+"*1.071"},\
+                         {'chain':cTTJets,    'cut':cut2bCRtt,   'weight':weight_str+"*1.071"},\
                          {'chain':cDY,        'cut':cut2bCRtt,   'weight':weight_str},\
                          {'chain':cTTV,       'cut':cut2bCRtt,   'weight':weight_str},\
                          {'chain':csingleTop, 'cut':cut2bCRtt,   'weight':weight_str},\
                          {'chain':cDiboson,   'cut':cut2bCRtt,   'weight':weight_str},\
                           ]
 
-      ttJets_samples_0b =[{'chain':cTTJets,     'cut':cut0bCRtt,'weight':weight_str+"*"+top_ISR_weight+"*1.071"}]
+      ttJets_samples_0b =[{'chain':cTTJets,     'cut':cut0bCRtt,'weight':weight_str+"*1.071"}]
       #rcs1bCRewk = getRCS(cEWK, cut1bCRtt, dPhiCut, weight_str+"*"+"weightBTag1_SF")
       rcs1bCRewk = combineRCS(ewk_samples_1b, dPhiCut)
       #rcs2bCRewk = getRCS(cEWK, cut2bCRtt, dPhiCut, weight_str+"*"+"weightBTag1p_SF")
@@ -252,8 +252,8 @@ h2.GetYaxis().SetLabelSize(0.1)
 h2.Draw()
 h_ratio.Draw("E1 same")
 cb.Draw()
-cb.SaveAs(path+'/kappa_tt_'+str(nJet[0])+str(nJet[1])+'_nobtagweight_ISR_diboson_included.png')
-cb.SaveAs(path+'/kappa_tt_'+str(nJet[0])+str(nJet[1])+'_nobtagweight_ISR_diboson_included.pdf')
-cb.SaveAs(path+'/kappa_tt_'+str(nJet[0])+str(nJet[1])+'_nobtagweight_ISR_diboson_included.root')
+cb.SaveAs(path+'/kappa_tt_'+str(nJet[0])+str(nJet[1])+'_nobtagweight_ISR_diboson_included'+add_cut[1]+'.png')
+cb.SaveAs(path+'/kappa_tt_'+str(nJet[0])+str(nJet[1])+'_nobtagweight_ISR_diboson_included'+add_cut[1]+'.pdf')
+cb.SaveAs(path+'/kappa_tt_'+str(nJet[0])+str(nJet[1])+'_nobtagweight_ISR_diboson_included'+add_cut[1]+'.root')
 
 

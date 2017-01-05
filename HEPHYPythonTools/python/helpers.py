@@ -88,7 +88,7 @@ def getFileList(dir, minAgeDPM=0, histname='histo', xrootPrefix='root://hephyse.
 def getPUHistos(sL, histname='pileup'):
   sL = sL[0]
   i=0
-  histo = ROOT.TH1F()
+  histo = ROOT.TH1D()
   for s in sL:
     #print s
     PU_file = ROOT.TFile(s['file'])   
