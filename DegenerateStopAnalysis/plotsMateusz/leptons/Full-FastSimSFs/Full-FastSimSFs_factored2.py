@@ -152,8 +152,8 @@ eta = "abs(LepAll_eta[%s])"%(ind2)
 #eta = "genLep_eta[0]"
 
 
-baseSel = "(nLepAll_{}2 > 0 && abs(LepAll_pdgId[{ind}]) == {} & abs(LepAll_eta[{ind}]) < {} && LepAll_mcMatchId[{ind}] != 0)".format(lep, pdgId, etaAcc, ind = ind2)
-selection = "(nLepAll_{} > 0 && abs(LepAll_pdgId[{ind}]) == {} & abs(LepAll_eta[{ind}]) < {} && LepAll_mcMatchId[{ind}] != 0)".format(lep, pdgId, etaAcc, ind = ind1)
+baseSel = "(nLepAll_{}2 > 0 && abs(LepAll_pdgId[{ind}]) == {} && abs(LepAll_eta[{ind}]) < {} && LepAll_mcMatchId[{ind}] != 0)".format(lep, pdgId, etaAcc, ind = ind2)
+selection = "(nLepAll_{} > 0 && abs(LepAll_pdgId[{ind}]) == {} && abs(LepAll_eta[{ind}]) < {} && LepAll_mcMatchId[{ind}] != 0)".format(lep, pdgId, etaAcc, ind = ind1)
 
 #baseString = "(abs(LepAll_pdgId) == {} && LepAll_pt > 5 && abs(LepAll_eta) < {} && {} && LepAll_mcMatchId != 0)".format(pdgId, etaAcc, IDCut)
 #baseString = "(abs(LepAll_pdgId) == {} && LepAll_pt > 5 && abs(LepAll_eta) < {} && LepAll_mcMatchId != 0)".format(pdgId, etaAcc)
