@@ -12,6 +12,7 @@ from optparse import OptionParser
 import hashlib, time
 import sys
 import os
+import time
 
 parser = OptionParser()
 
@@ -22,8 +23,12 @@ slurm_job_file="slurm_job"
 hephy_user = os.getenv("USER")
 hephy_user_initial = os.getenv("USER")[0]
 
+
+submit_time = time.strftime("%a%H%M%S", time.gmtime())
 parser.add_option("--title", dest="title",
-                  help="Job Title viewied in squeue", default = "BATCHSUBMIT" )
+                  help="Job Title viewied in squeue", default = submit_time )
+parser.add_option("--qos", dest="qos", 
+                  help="Job Title viewied in squeue", default = "" )
 parser.add_option("--output", dest="output", 
                   default="/afs/hephy.at/work/%s/%s/slurm_output"%(hephy_user_initial, hephy_user),
                   help="path for slurm output ")
@@ -31,7 +36,10 @@ parser.add_option("--output", dest="output",
 
 slurm_job_title  = options.title
 slurm_output_dir = options.output
-
+qos        = options.qos
+qos_options = ['1h']
+if qos and qos not in qos_options:
+    raise Exception("The queue option (%s) is not recognized .... it should be one of %s"%(qos, qos_options))
 
 
 def make_slurm_job( slurm_job_file, slurm_job_title, slurm_output_dir , command ):
@@ -53,7 +61,7 @@ echo "{command}"
                 cmssw_base       = os.getenv("CMSSW_BASE"),
                 slurm_output_dir = slurm_output_dir,
                 slurm_job_title  = slurm_job_title,
-                slurm_job_title_u  = slurm_job_title.replace(" ", "_"),
+                slurm_job_title_u= slurm_job_title.replace(" ", "_"),
                 pwd              = os.getenv("PWD")
               )
 
@@ -102,5 +110,5 @@ if __name__ == '__main__':
             hash_string = hashlib.md5("%s"%time.time()).hexdigest()
             job_file = slurm_job_file.rstrip(".sh")+"_%s.sh"%hash_string
             make_slurm_job( job_file , slurm_job_title, slurm_output_dir , command  )
-            os.system("sbatch %s"%job_file)
+            os.system("sbatch %s %s"%(job_file , qos))
             os.remove(job_file)
