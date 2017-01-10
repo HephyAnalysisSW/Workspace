@@ -299,8 +299,11 @@ class VarsCutsWeightsRegions():
                     "isr"   : {'var': "{isrNormFact} * ( (nIsr==0) + (nIsr==1)*0.882  + (nIsr==2)*0.792  + (nIsr==3)*0.702  + (nIsr==4)*0.648  + (nIsr==5)*0.601  + (nIsr>=6)*0.515 ) ",               "latex":""},
                     "isrNormFact" : {'var': "(7.279e-05 *(GenSusyMStop) + 1.108)",               "latex":""},
                     "pu"          : {'var': "puReweight",                                        "latex":""},
+                    "pu_up"       : {'var': "puReweight_up",                                        "latex":""},
+                    "pu_down"     : {'var': "puReweight_down",                                        "latex":""},
                     "DataBlind"   : {'var': "(%s/%s)"%(settings['dataBlindLumi'],   settings['mcLumi'])                 ,"latex":""},
                     "DataUnblind" : {'var': "(%s/%s)"%(settings['dataUnblindLumi'], settings['mcLumi'])                 ,"latex":""},
+                    "DataICHEP"   : {'var': "(%s/%s)"%(12864.4, settings['mcLumi'])                 ,"latex":""},
                     "mcLumi"      : {'var': settings['mcLumi'],                                             "latex":""},
     
                     'bTagSF'      : {'var': "{sf}{jt}",                                            "latex":""},

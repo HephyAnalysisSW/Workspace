@@ -452,7 +452,7 @@ sampleSets.update(signalSets)
 
 
 #mc_samps = ['ttjets', 'wjets', 'dyjets','zjets', 'qcd', 'other' ]
-mc_samps = ['ttjets', 'wjets', 'dyjets','zjets' ]#, 'other' ]
+mc_samps = ['wjets', 'qcd', 'dyjets', 'zjets']
 signal_samps = [x for x in sampleSets.keys() if 'T2tt' in x or 'T2bW' in x]
 data_samps = ['data_met']#, 'data_el', 'data_mu', 'data_jet'
 

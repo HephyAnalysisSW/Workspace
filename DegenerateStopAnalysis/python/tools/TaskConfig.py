@@ -146,7 +146,7 @@ class TaskConfig():
         #self.results_dir =   self.cardDirBase + "/13TeV/{ht}/{run}/{lumi}/{cut}/".format( ht = self.htString, lumi = self.lumi_tag, run = self.runTag, cut=cutName) 
         self.results_dir =   self.cardDirBase + "/13TeV/{ht}/{run}/".format( ht = self.htString , run = self.runTag ) 
         #self.cardDir    =   self.results_dir + "BasicSys"
-        sys_label       =   "AdjustedSys"
+        sys_label       =   getattr(self, "sys_label", "AdjustedSys")
         self.cardDir    =   self.results_dir + sys_label
         self.yield_pkl  =   self.results_dir + "/Yields_%s_%s_%s.pkl"%(cutName , self.runTag, self.scan_tag)
 
@@ -198,15 +198,27 @@ class TaskConfig():
         self.saveDirs ={}
 
         self.cutLumiTags ={}
+        useData = getattr(self, "data" )
         for cutInst in self.cutInstList:
             cut_name = cutInst.fullName
             cutSaveDir = self.saveDir + "/" + cutInst.saveDir
 
-            if 'sr' in cut_name.lower():
-                lumi = 'DataUnblind_lumi'
+            
+            if useData:
+                if 'sr' in cut_name.lower():
+                    lumi = 'DataUnblind_lumi'
+                if useData == 'd':
+                    lumi = 'DataUnblind_lumi'
+                elif useData =='dblind':
+                    lumi = 'DataBlind_lumi'
+                elif useData =='dichep':
+                    lumi = 'DataICHEP_lumi'
+                else:   
+                    raise Exception("Data name not recognized: %s"%useData)
             else:
-                lumi = 'DataBlind_lumi'
+                lumiWeight = 'target_lumi'
             self.cutLumiTags[cut_name]= make_lumi_tag( lumi_info[lumi] )
+
 
             self.baseCutSaveDir = cutInst.baseCut.saveDir if getattr(cutInst,"baseCut") else cutInst.saveDir
             self.saveDirs[cut_name]  =  cutSaveDir
