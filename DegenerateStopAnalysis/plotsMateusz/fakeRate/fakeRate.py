@@ -17,6 +17,7 @@ from math import pi, sqrt #cos, sin, sinh, log
 from fakeRegions import regions
 
 #ROOT.gStyle.SetOptStat(1111) #0 removes histogram statistics box #Name, Entries, Mean, RMS, Underflow, Overflow, Integral, Skewness, Kurtosis
+ROOT.gStyle.SetOptStat(0)
 
 #Input options
 parser = argparse.ArgumentParser(description="Input options")
@@ -104,7 +105,9 @@ if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
    makeDir(savedir + "/root")
    makeDir(savedir + "/pdf")
   
-   if subtractEWK and "measurement" in region: resultsDir = "/afs/hephy.at/user/m/mzarucki/public/results2017/fakeRate"
+   if subtractEWK and "measurement" in region: 
+      resultsDir = "/afs/hephy.at/user/m/mzarucki/public/results2017/fakeRate"
+      makeDir(resultsDir)
  
 #Geometric divisions
 if lep == 'el': etaAcc = 2.5 #eta acceptance
@@ -176,14 +179,14 @@ for samp in samplesList:
    if samples[samp].isData:
       selList['loose'].append(selection['trigger'])
    elif not subtractEWK:
-      selList['loose'].append(selection['looseFake'])
+      selList['loose'].append(selection['fakeLoose'])
    
    #tight definition
    selList['tight'] = selList['loose'][:]
    selList['tight'].extend([selection['tight'], selection['match']]) 
   
    if not (samples[sample].isData or subtractEWK):
-      selList['tight'].append(selection['tightFake'])
+      selList['tight'].append(selection['fakeTight'])
 
    # Histograms
    if not varBins:
@@ -296,8 +299,8 @@ c1.cd(2)
 ratios['pt'][sample].Draw("P")
 
 #setupEffPlot(ratios['pt'][sample])
-#ratios['pt'][sample].SetMinimum(0)
-ratios['pt'][sample].SetMaximum(0.6)
+ratios['pt'][sample].SetMinimum(0)
+ratios['pt'][sample].SetMaximum(1.0)
 
 #ratios['pt'][sample].GetPaintedGraph().SetMinimum(0)
 #ratios['pt'][sample].GetPaintedGraph().SetMaximum(0.6)
@@ -353,7 +356,7 @@ c2.cd(2)
 
 ratios['eta'][sample].Draw("P")
 
-#ratios['eta'][sample].SetMinimum(0)
+ratios['eta'][sample].SetMinimum(0)
 ratios['eta'][sample].SetMaximum(0.6)
 
 #setupEffPlot(ratios['eta'][sample])

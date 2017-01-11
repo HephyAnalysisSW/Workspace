@@ -45,20 +45,16 @@ verbose = args.verbose
 #Samples
 cmgPP = cmgTuplesPostProcessed()
 
-samplesList = ["w", "tt", "qcd"]
-
-if "application" in region:
-   samplesList.reverse()
+if "measurement" in region:
+   skim = "oneLepGood_HT800"
+   samplesList = ["w", "tt", "qcd"]
+elif "application" in region:
+   skim = "preIncLep"
+   samplesList = ["qcd", "z", "dy", "tt", "w"] #"st" "vv" 
+   getData = False #NOTE: For now, do not plot data near SR
 
 if getData and "measurement" in region: 
    samplesList.append("djetBlind")
-
-if "measurement" in region:
-   skim = "oneLepGood_HT800"
-elif "application" in region:
-   skim = "preIncLep"
-
-if "application" in region: getData = False #NOTE: For now, do not plot data near SR
 
 samples = getSamples(cmgPP = cmgPP, skim = skim, sampleList = samplesList, scan = False, useHT = True, getData = getData)
 

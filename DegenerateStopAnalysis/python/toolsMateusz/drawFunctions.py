@@ -207,45 +207,6 @@ def alignLegend(leg,x1=0.775,x2=0.875,y1=0.2,y2=0.4):
    ROOT.gPad.Modified()
    ROOT.gPad.Update()
 
-#def divideEff(e1,e2):
-#   res = e1.GetTotalHistogram().Clone()
-#   res.Reset()
-#   
-#   n = res.GetNbinsX()
-#   
-#   #print 'n: ', n
-#   
-#   for i in range(n):
-#      a = res.GetBinLowEdge(i+1)
-#      w = res.GetBinWidth(i+1)
-#   
-#      #print 'a: ', a, 'w: ', w
-#   
-#      v1 = e1.GetEfficiency(i+1)
-#      u1 = e1.GetEfficiencyErrorUp(i+1)
-#      d1 = e1.GetEfficiencyErrorLow(i+1)
-#      
-#      v2 = e2.GetEfficiency(i+1)
-#      u2 = e2.GetEfficiencyErrorUp(i+1)
-#      d2 = e2.GetEfficiencyErrorLow(i+1)
-#      
-#      if v1*v2 == 0:
-#          v = 0.
-#          u = 0.
-#          d = 0.
-#      
-#      else:
-#          v = v1/v2 if v2>0. else 0.
-#          u = v*math.sqrt(pow(u1/v1,2)+pow(u2/v2,2))
-#          d = v*math.sqrt(pow(d1/v1,2)+pow(d2/v2,2))
-#      
-#      #print i,v,u,d
-#      
-#      res.SetBinContent(i+1,v)
-#      res.SetBinError(i+1, u)
-#      res.SetLineWidth(2)
-# 
-#   return res
 
 def divideEff(e1,e2): #VarBins
    
@@ -311,7 +272,11 @@ def multiplyHists(h1,h2):
       #print 'v1: ', v1, 'e1: ', e1, 'v2: ', v2, 'e2: ', e2
       
       v = v1*v2
-      e = v*math.sqrt(pow(e1,2)+pow(e2,2))
+      
+      if v == 0: 
+         e = 0. 
+      else:
+         e = v*math.sqrt(pow(e1/v1,2)+pow(e2/v2,2))
       
       #print 'Value : ', v, '+=: ', e
       
@@ -346,16 +311,19 @@ def addSystematicHist(h1,sys):
    return res
 
 #def divideEff(e1,e2):
+#   res = e1.GetTotalHistogram().Clone()
+#   res.Reset()
 #   
-#   n = e1.GetTotalHistogram().GetNbinsX()
-#   a = e1.GetTotalHistogram().GetBinLowEdge(1)
-#   w = e1.GetTotalHistogram().GetBinWidth(1)
+#   n = res.GetNbinsX()
 #   
-#   #print 'n: ', n, 'a: ', a, 'w: ', w
-#   
-#   res = ROOT.TGraphAsymmErrors(n)
+#   #print 'n: ', n
 #   
 #   for i in range(n):
+#      a = res.GetBinLowEdge(i+1)
+#      w = res.GetBinWidth(i+1)
+#   
+#      #print 'a: ', a, 'w: ', w
+#   
 #      v1 = e1.GetEfficiency(i+1)
 #      u1 = e1.GetEfficiencyErrorUp(i+1)
 #      d1 = e1.GetEfficiencyErrorLow(i+1)
@@ -376,13 +344,11 @@ def addSystematicHist(h1,sys):
 #      
 #      #print i,v,u,d
 #      
-#      x = a+(i+0.5)*w
-#      res.SetPoint(i,x,v)
-#      res.SetPointError(i,0.5*w,0.5*w,d,u)
+#      res.SetBinContent(i+1,v)
+#      res.SetBinError(i+1, u)
 #      res.SetLineWidth(2)
-#   
+# 
 #   return res
-
 
 ##Variable bin size
 #nSec = 3

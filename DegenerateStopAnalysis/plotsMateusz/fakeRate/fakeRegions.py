@@ -39,7 +39,6 @@ def regions(region, lep, METcut = "40", MTcut = "30"):
       ["antiQCD","dPhi_j1j2_vetoJet_def < 2.5"],
       ["BVeto", "nJet_bJet_def < 1"],
       ["TauVeto","Sum$(TauGood_idMVANewDM && TauGood_pt > 20) == 0"],
-      #["MuVeto","(nLepGood_mu == 0 || (nLepGood_mu == 1 && LepGood_pt[IndexLepGood_mu[0]] < 20))"],
       ], baseCut = None)
    
    #setEventListToChains(samples, samplesList, baseline)
@@ -48,8 +47,10 @@ def regions(region, lep, METcut = "40", MTcut = "30"):
       'trigger': trigger, 
       'filters': filters, 
       'index': index,
-      'looseFake': "(LepGood_mcMatchId[{ind}] == 0)".format(ind = index['loose']),
-      'tightFake': "(LepGood_mcMatchId[{ind}] == 0)".format(ind = index['tight']),
+      'fakeLoose':   "(LepGood_mcMatchId[{ind}] == 0)".format(ind = index['loose']),
+      'fakeTight':   "(LepGood_mcMatchId[{ind}] == 0)".format(ind = index['tight']),
+      'promptLoose': "(LepGood_mcMatchId[{ind}] != 0)".format(ind = index['loose']),
+      'promptTight': "(LepGood_mcMatchId[{ind}] != 0)".format(ind = index['tight']),
       'match': "(%s == %s)"%(index['loose'], index['tight']),
    }
 
@@ -63,8 +64,10 @@ def regions(region, lep, METcut = "40", MTcut = "30"):
       selection['loose'] = "(nLepGood_{lep}_loose > 0)".format(lep = lep) 
       selection['tight'] = "(nLepGood_{lep}_def > 0)".format(lep = lep)
    elif "sr1" in region: 
-      selection['loose'] = "((nLepGood_{lep}_loose == 1 && abs(LepGood_eta[{ind}]) < 1.5) || (nLepGood_{lep}_loose == 2 && LepGood_pt[IndexLepGood_{lep}_loose[1]] < 20))".format(lep = lep, ind = index['loose'])
-      selection['tight'] = "((nLepGood_{lep}_def == 1 && abs(LepGood_eta[{ind}]) < 1.5) || (nLepGood_{lep}_def == 2 && LepGood_pt[IndexLepGood_{lep}_def[1]] < 20))".format(lep = lep, ind = index['tight'])
+      selection['loose'] = "((nLepGood_{lep}_loose == 1 && LepGood_pt[{ind}] < 30 && abs(LepGood_eta[{ind}]) < 1.5 ) ||\
+                             (nLepGood_{lep}_loose == 2 && LepGood_pt[IndexLepGood_{lep}_loose[1]] < 20))".format(lep = lep, ind = index['loose'])
+      selection['tight'] = "((nLepGood_{lep}_def == 1   && LepGood_pt[{ind}] < 30 && abs(LepGood_eta[{ind}]) < 1.5) ||\
+                             (nLepGood_{lep}_def == 2   && LepGood_pt[IndexLepGood_{lep}_def[1]] < 20))".format(lep = lep, ind = index['tight'])
 
    return selection
 
