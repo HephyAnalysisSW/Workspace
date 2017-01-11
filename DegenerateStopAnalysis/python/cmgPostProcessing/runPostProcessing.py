@@ -404,70 +404,86 @@ sampleSets = {
 #mstops = [250, 275, 300, 325, 350, 375, 400, 425, 450, 475, 500, 525, 550, 575, 600, 625, 650, 675, 700, 725, 750, 775, 800]
 #dms    = [10, 20, 30, 40, 50, 60, 70, 80]
 
-signalOpts = ["--skimPreselect", "--processEventVetoFastSimJets"]
-signalSample = "SMS_T2tt_dM_10to80_genHT_160_genMET_80"
+parser = cmgPostProcessing_parser.get_parser()
+args, runArgs= parser.parse_known_args()
+cmgTuplesName = args.cmgTuples
 
-signalSets = {}
-try:
-   mass_dict = pickle.load(file("/data/nrad/cmgTuples/8020_mAODv2_v0/RunIISpring16MiniAODv2/%s_mass_dict.pkl"%signalSample))
-except:
-   print "mass dict not found for %s"%signalSample
-   mass_dict = {}
-   
-for mstop in mass_dict.keys():
-    signalSet =  {  'samples': [ [signalSample, '--processSignalScan', str(mstop), str(mlsp)]+signalOpts for mlsp in mass_dict[mstop].keys() ] }
-    signalSets.update({ 'T2tt_old%s'%mstop:signalSet})
+def getSignalMassDict( cmgTuplesName, signalSampleName):
+    cmgTuplesFullName = 'Workspace.DegenerateStopAnalysis.samples.cmgTuples.' + cmgTuplesName
+    try:
+       sampleFileLib = importlib.import_module(cmgTuplesFullName)
+    except ImportError, err:
+       print "\nImport error from {0} \n ".format(cmgTuplesFullName) + \
+           "\nCorrect the name and re-run the script. \n Exiting."
+       sys.exit()
+    
+    cmgTuples =sampleFileLib
+    cmgDir = sampleFileLib.sample_path
 
-sampleSets.update(signalSets)
+    try:
+        signalComponent = getattr(cmgTuples, signalSample )
+        mass_dict_file  = signalComponent.get("mass_dict","")
+        mass_dict       = pickle.load( file( mass_dict_file ))
+    except:
+        print "mass dict not found for %s"%signalSample
+        mass_dict = {}
+    return mass_dict
 
 
-signalOpts = ["--skimPreselect", "--processEventVetoFastSimJets"]
-signalSample = "SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1"
-signalSets = {}
-try:
-   mass_dict = pickle.load(file("/data/nrad/cmgTuples/8020_mAODv2_v0/RunIISpring16MiniAODv2/%s_mass_dict.pkl"%signalSample))
-except:
-   print "mass dict not found for %s"%signalSample
-   mass_dict = {}
-
-for mstop in mass_dict.keys():
-    signalSet =  {  'samples': [ [signalSample, '--processSignalScan', str(mstop), str(mlsp)]+signalOpts for mlsp in mass_dict[mstop].keys() ] }
-    signalSets.update({ 'T2tt%s'%mstop:signalSet})
-sampleSets.update(signalSets)
 
 
 signalOpts = ["--skimPreselect", "--processEventVetoFastSimJets"]
-signalSample = "SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1"
-signalSets = {}
-try:
-   mass_dict = pickle.load(file("/data/nrad/cmgTuples/8020_mAODv2_v0/RunIISpring16MiniAODv2/%s_mass_dict.pkl"%signalSample))
-except:
-   print "mass dict not found for %s"%signalSample
-   mass_dict = {}
-
-for mstop in mass_dict.keys():
-    signalSet =  {  'samples': [ [signalSample, '--processSignalScan', str(mstop), str(mlsp)]+signalOpts for mlsp in mass_dict[mstop].keys()] }
-    signalSets.update({ 'T2bW%s'%mstop:signalSet})
-sampleSets.update(signalSets)
+signalSamples = {
+                    "SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1"    : {'opts': signalOpts , 'name':'T2tt'      } ,  
+                    "SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1": {'opts': signalOpts , 'name':'T2bW'      } , 
+                    "SMS_T2tt_dM_10to80_genHT_160_genMET_80"              : {'opts': signalOpts , 'name':'T2tt_old'  } , ## This is the old signal before the mWMin fix... should only be for comparisons 
+                }
 
 
-#mc_samps = ['ttjets', 'wjets', 'dyjets','zjets', 'qcd', 'other' ]
-mc_samps = ['wjets', 'qcd', 'dyjets', 'zjets']
+for signalSample, signalSampleInfo in signalSamples.items():
+
+    mass_dict = getSignalMassDict(cmgTuplesName, signalSample)
+
+    signalSets = {}
+    opts = signalSampleInfo['opts']
+    name = signalSampleInfo['name']
+    for mstop in mass_dict.keys():
+        signalSet =  {  'samples': [ [signalSample, '--processSignalScan', str(mstop), str(mlsp)]+signalOpts for mlsp in mass_dict[mstop].keys()] }
+        signalSets.update({ "%s%s"%(name,mstop):signalSet})
+    sampleSets.update(signalSets)
+
+    print signalSample, signalSets
+
+
+
+
+
+mc_samps     = ['ttjets', 'wjets', 'qcd', 'dyjets', 'zjets', 'other']
 signal_samps = [x for x in sampleSets.keys() if 'T2tt' in x or 'T2bW' in x]
-data_samps = ['data_met']#, 'data_el', 'data_mu', 'data_jet'
+data_samps   = ['data_met']#, 'data_el', 'data_mu', 'data_jet'
 
 all_samps = mc_samps #+ signal_samps # + data_samps #FIXME: mc and data cannot be run simulatneously
 
+
+composite_samp_definitions = {
+                'all'      : mc_samps + signal_samps + data_samps              ,
+                'allmc'    : mc_samps + signal_samps              ,
+                'bkg'      : mc_samps              ,
+                'T2tt_old' : [x for x in sampleSets.keys() if 'T2tt_old' in x and "mWMin" not in x] ,
+                'T2tt'     : [x for x in sampleSets.keys() if 'T2tt'     in x and "T2tt_old" not in x    ]  ,
+                'T2bW'     : [x for x in sampleSets.keys() if 'T2bW'     in x    ],
+                'allsig'   : signal_samps ,
+             }
+
  
-all_samples = []
-for samp in all_samps:
-    all_samples.extend(sampleSets[samp]['samples'])
+for composite_samp_name , composite_samples in composite_samp_definitions.iteritems() :
+    composite_set = []
+    for s in composite_samples:
+        composite_set.extend(sampleSets[s]['samples'])
 
-sampleSets['all'] = { 
-                        'samples': all_samples,
-                    }
-
-
+    sampleSets[composite_samp_name] = { 
+                            'samples': composite_set 
+                        }
 
 
 def get_parser():
