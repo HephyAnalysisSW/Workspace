@@ -37,453 +37,379 @@ logger.propagate = False
 
 pprint_cust = pprint.PrettyPrinter(indent=3, depth=5 , width=140)
 
-sampleSets = {
-   'signals':{
-               'samples':[ 
-                           "T2tt_300_270_FastSim",
-                           "T2DegStop_300_270",
-                           "T2DegStop_300_290_FastSim",
-                           "T2DegStop_300_240_FastSim",
-                           "T2DegStop_300_270_FastSim",
-                         ],
-               },
-   
-   'wjets':{
-               'samples':[
-                           "WJetsToLNu_HT100to200",
-                           "WJetsToLNu_HT100to200_ext",
-                           "WJetsToLNu_HT200to400",
-                           "WJetsToLNu_HT200to400_ext",
-                           "WJetsToLNu_HT400to600",
-                           "WJetsToLNu_HT600to800",
-                           "WJetsToLNu_HT800to1200_ext",
-                           "WJetsToLNu_HT1200to2500",
-                           "WJetsToLNu_HT2500toInf",
-                         ],
-               },
-   
-   'ttjets':{
-               'samples':[
-                           "TTJets_LO",
-                           ["TTJets_LO",                "--skimGeneral=lheHTlow"],
-                           ["TTJets_LO_HT600to800_ext", "--skimGeneral=lheHThigh"],
-                           "TTJets_LO_HT800to1200_ext",
-                           "TTJets_LO_HT1200to2500_ext",
-                           "TTJets_LO_HT2500toInf",
-                         ],
-               },
-   
-   'ttjets_lep':{
-               'samples':[
-                           "TTJets_SingleLeptonFromT",   
-                           "TTJets_SingleLeptonFromTbar",
-                           "TTJets_DiLepton",            
-                         ],
-               },
-   
-   'dyjets':{
-               'samples':[
-                           #M50
-                           'DYJetsToLL_M50_HT100to200_ext',
-                           'DYJetsToLL_M50_HT200to400_ext',
-                           'DYJetsToLL_M50_HT400to600_ext',
-                           'DYJetsToLL_M50_HT600toInf',
-                           'DYJetsToLL_M50_HT600toInf_ext',
-                           
-                           #M5to50
-                           'DYJetsToLL_M5to50_HT100to200',
-                           'DYJetsToLL_M5to50_HT100to200_ext',
-                           'DYJetsToLL_M5to50_HT200to400',
-                           'DYJetsToLL_M5to50_HT200to400_ext',
-                           'DYJetsToLL_M5to50_HT400to600',
-                           'DYJetsToLL_M5to50_HT600toInf',
-                           'DYJetsToLL_M5to50_HT600toInf_ext',
-                         ],
-               },
-   
-   'zjets':{
-               'samples':[ 
-                           "ZJetsToNuNu_HT100to200_ext",
-                           "ZJetsToNuNu_HT200to400_ext",
-                           "ZJetsToNuNu_HT400to600",
-                           "ZJetsToNuNu_HT600to800",
-                           "ZJetsToNuNu_HT800to1200",
-                           "ZJetsToNuNu_HT1200to2500",
-                           "ZJetsToNuNu_HT1200to2500_ext",
-                           "ZJetsToNuNu_HT2500toInf",
-                         ],
-               },
-   
-   'qcd':{
-               'samples':[
-                           "QCD_HT300to500",
-                           "QCD_HT300to500_ext",
-                           "QCD_HT500to700_ext",
-                           "QCD_HT700to1000",
-                           "QCD_HT700to1000_ext",
-                           "QCD_HT1000to1500",
-                           "QCD_HT1000to1500_ext",
-                           "QCD_HT1500to2000",
-                           "QCD_HT1500to2000_ext",
-                           "QCD_HT2000toInf",
-                           "QCD_HT2000toInf_ext",
-                         ],
-               },
-   
-   'qcd_pt':{
-               'samples':[
-                           #"QCD_Pt5to10",
-                           #"QCD_Pt10to15",
-                           "QCD_Pt15to30",
-                           "QCD_Pt30to50",
-                           "QCD_Pt50to80",
-                           "QCD_Pt80to120",
-                           "QCD_Pt120to170",
-                           "QCD_Pt170to300",
-                           "QCD_Pt300to470",
-                           "QCD_Pt470to600",
-                           "QCD_Pt600to800",
-                           "QCD_Pt800to1000",
-                           "QCD_Pt1000to1400",
-                           "QCD_Pt1400to1800",
-                           "QCD_Pt1800to2400",
-                           "QCD_Pt2400to3200",
-                           #"QCD_Pt3200toInf",
-                         ],
-               },
-   
-   'qcdpt_em':{
-               'samples':[
-                           'QCD_Pt15to20_EMEnriched',
-                           'QCD_Pt20to30_EMEnriched',
-                           'QCD_Pt30to50_EMEnriched',
-                           'QCD_Pt50to80_EMEnriched',
-                           'QCD_Pt80to120_EMEnriched',
-                           'QCD_Pt120to170_EMEnriched',
-                           'QCD_Pt170to300_EMEnriched',
-                           'QCD_Pt300toInf_EMEnriched',
-                         ],
-               },
-   
-   'other':{
-               'samples':[
-                           'WW',
-                           'WZ',
-                           'ZZ',
-                           'TBar_tch',
-                           #'TBarToLeptons_tch_powheg', 
-                           'T_tch',
-                           #'TToLeptons_tch_powheg',
-                           'TBar_tWch',
-                           'T_tWch',
-                         ],
-               },
-   
-   
-                            ############################
-                            ############DATA############
-                            ############################
-   
-   ### Re-Reco ###
-   #NOTE: H Re-Reco not available
-   
-   # MET PD
-   'data_met':{
-               'samples':[
-                           "MET_Run2016B_23Sep2016", #NOTE: v3
-                           "MET_Run2016C_23Sep2016",
-                           "MET_Run2016D_23Sep2016",
-                           "MET_Run2016E_23Sep2016",
-                           "MET_Run2016F_23Sep2016",
-                           "MET_Run2016G_23Sep2016",
-                           "MET_Run2016H_PromptReco_v2",
-                           "MET_Run2016H_PromptReco_v3", #NOTE: use?
-                         ],
-                  },
-   
-  
- 
-   # SingleElectron PD
-   
-   'data_el':{
-               'samples':[
-                           "SingleElectron_Run2016B_23Sep2016", #NOTE: v3
-                           "SingleElectron_Run2016C_23Sep2016",
-                           "SingleElectron_Run2016D_23Sep2016",
-                           "SingleElectron_Run2016E_23Sep2016",
-                           "SingleElectron_Run2016F_23Sep2016",
-                           "SingleElectron_Run2016G_23Sep2016",
-                           "SingleElectron_Run2016H_PromptReco_v2",
-                           "SingleElectron_Run2016H_PromptReco_v3", #NOTE: use?
-                         ],
-                  },
-   
-   # SingleMuon PD
-   
-   'data_mu':{
-               'samples':[
-                           "SingleMuon_Run2016B_23Sep2016", #NOTE: v3
-                           "SingleMuon_Run2016C_23Sep2016",
-                           "SingleMuon_Run2016D_23Sep2016",
-                           "SingleMuon_Run2016E_23Sep2016",
-                           "SingleMuon_Run2016F_23Sep2016",
-                           "SingleMuon_Run2016G_23Sep2016",
-                           "SingleMuon_Run2016H_PromptReco_v2",
-                           "SingleMuon_Run2016H_PromptReco_v3", #NOTE: use?
-                         ],
-                  },
-   
-   # JetHT PD
-   'data_jet':{
-               'samples':[
-                           "JetHT_Run2016B_23Sep2016", #NOTE: v3
-                           "JetHT_Run2016C_23Sep2016",
-                           "JetHT_Run2016D_23Sep2016",
-                           "JetHT_Run2016E_23Sep2016",
-                           "JetHT_Run2016F_23Sep2016",
-                           "JetHT_Run2016G_23Sep2016",
-                           "JetHT_Run2016H_PromptReco_v2",
-                           "JetHT_Run2016H_PromptReco_v3", #NOTE: use?
-                         ],
-                  },
-   
-   
-   ### PromptReco (PR) ###
-   
-   # MET PD
-   'data_PR_met':{
-               'samples':[
-                           "MET_Run2016B_PromptReco_v2",
-                           "MET_Run2016C_PromptReco_v2",
-                           "MET_Run2016D_PromptReco_v2",
-                           "MET_Run2016E_PromptReco_v2",
-                           #"MET_Run2016F_PromptReco_v1",
-                           "MET_Run2016G_PromptReco_v1",
-                           #"MET_Run2016H_PromptReco_v1", #NOTE: use?
-                           "MET_Run2016H_PromptReco_v2",
-                           "MET_Run2016H_PromptReco_v3", #NOTE: use?
-                         ],
-                  },
-   
-   # SingleElectron PD
-   
-   'data_PR_el':{
-               'samples':[
-                           "SingleElectron_Run2016B_PromptReco_v2",
-                           "SingleElectron_Run2016C_PromptReco_v2",
-                           "SingleElectron_Run2016D_PromptReco_v2",
-                           #"SingleElectron_Run2016E_PromptReco_v2",
-                           #"SingleElectron_Run2016F_PromptReco_v1",
-                           #"SingleElectron_Run2016G_PromptReco_v1",
-                           #"SingleElectron_Run2016H_PromptReco_v1", #NOTE: use?
-                           "SingleElectron_Run2016H_PromptReco_v2",
-                           "SingleElectron_Run2016H_PromptReco_v3", #NOTE: use?
-                         ],
-               },
-   
-   # SingleMuon PD
-   
-   'data_PR_mu':{
-               'samples':[
-                           "SingleMuon_Run2016B_PromptReco_v2",
-                           "SingleMuon_Run2016C_PromptReco_v2",
-                           "SingleMuon_Run2016D_PromptReco_v2",
-                           "SingleMuon_Run2016E_PromptReco_v2",
-                           "SingleMuon_Run2016F_PromptReco_v1",
-                           "SingleMuon_Run2016G_PromptReco_v1",
-                           #"SingleMuon_Run2016H_PromptReco_v1", #NOTE: use?
-                           "SingleMuon_Run2016H_PromptReco_v2",
-                           "SingleMuon_Run2016H_PromptReco_v3", #NOTE: use?
-                         ],
-               },
-   
-   # JetHT PD
-   'data_PR_jet':{
-               'samples':[
-                           #"JetHT_Run2016B_PromptReco_v2",
-                           #"JetHT_Run2016C_PromptReco_v2",
-                           #"JetHT_Run2016D_PromptReco_v2",
-                           #"JetHT_Run2016E_PromptReco_v2",
-                           #"JetHT_Run2016F_PromptReco_v1",
-                           #"JetHT_Run2016G_PromptReco_v1",
-                           #"JetHT_Run2016H_PromptReco_v1", #NOTE: use?
-                           "JetHT_Run2016H_PromptReco_v2",
-                           "JetHT_Run2016H_PromptReco_v3", #NOTE: use?
-                         ],
-                  },
-   
-   # 2015 Data 
-   'data_2015':{
-               'samples':[
-                           "MET_Run2015D_05Oct",
-                           "MET_Run2015D_v4",
-                           "SingleElectron_Run2015D_05Oct",
-                           "SingleElectron_Run2015D_v4",
-                           "SingleMuon_Run2015D_05Oct",
-                           "SingleMuon_Run2015D_v4",
-                           ]},
-
-   }
-
-
-
-#   dataChunks = {
-#   'JetHT_Run2016B-23Sep2016-v3' : 1043  ,
-#   'JetHT_Run2016C-23Sep2016-v1' : 348  ,
-#   'JetHT_Run2016D-23Sep2016-v1' : 583  ,
-#   'JetHT_Run2016F-23Sep2016-v1' : 369  ,
-#   'JetHT_Run2016G-23Sep2016-v1' : 857  ,
-#   'JetHT_Run2016H-PromptReco-v2' : 926  ,
-#   'JetHT_Run2016H-PromptReco-v3' : 25  ,
-#   'MET_Run2016B-23Sep2016-v3' : 1046  ,
-#   'MET_Run2016B-PromptReco-v2' : 1045  ,
-#   'MET_Run2016C-23Sep2016-v1' : 348  ,
-#   'MET_Run2016C-PromptReco-v2' : 348  ,
-#   'MET_Run2016D-23Sep2016-v1' : 584  ,
-#   'MET_Run2016D-PromptReco-v2' : 584  ,
-#   'MET_Run2016E-23Sep2016-v1' : 496  ,
-#   'MET_Run2016E-PromptReco-v2' : 491  ,
-#   'MET_Run2016F-23Sep2016-v1' : 368  ,
-#   'MET_Run2016G-23Sep2016-v1' : 854  ,
-#   'MET_Run2016G-PromptReco-v1' : 832  ,
-#   'MET_Run2016H-PromptReco-v2' : 926  ,
-#   'MET_Run2016H-PromptReco-v3' : 25  ,
-#   'SingleElectron_Run2016B-23Sep2016-v3' : 1054  ,
-#   'SingleElectron_Run2016B-PromptReco-v2' : 1046  ,
-#   'SingleElectron_Run2016C-23Sep2016-v1' : 347  ,
-#   'SingleElectron_Run2016C-PromptReco-v2' : 348  ,
-#   'SingleElectron_Run2016D-23Sep2016-v1' : 589  ,
-#   'SingleElectron_Run2016D-PromptReco-v2' : 584  ,
-#   'SingleElectron_Run2016E-23Sep2016-v1' : 496  ,
-#   'SingleElectron_Run2016F-23Sep2016-v1' : 362  ,
-#   'SingleElectron_Run2016G-23Sep2016-v1' : 854  ,
-#   'SingleElectron_Run2016H-PromptReco-v2' : 926  ,
-#   'SingleElectron_Run2016H-PromptReco-v3' : 25  ,
-#   'SingleMuon_Run2016B-23Sep2016-v3' : 1045  ,
-#   'SingleMuon_Run2016B-PromptReco-v2' : 1045  ,
-#   'SingleMuon_Run2016C-23Sep2016-v1' : 348  ,
-#   'SingleMuon_Run2016C-PromptReco-v2' : 348  ,
-#   'SingleMuon_Run2016D-23Sep2016-v1' : 584  ,
-#   'SingleMuon_Run2016D-PromptReco-v2' : 584  ,
-#   'SingleMuon_Run2016E-23Sep2016-v1' : 496  ,
-#   'SingleMuon_Run2016E-PromptReco-v2' : 219  ,
-#   'SingleMuon_Run2016F-23Sep2016-v1' : 361  ,
-#   'SingleMuon_Run2016F-PromptReco-v1' : 351  ,
-#   'SingleMuon_Run2016G-23Sep2016-v1' : 856  ,
-#   'SingleMuon_Run2016G-PromptReco-v1' : 844  ,
-#   'SingleMuon_Run2016H-PromptReco-v2' : 925  ,
-#   'SingleMuon_Run2016H-PromptReco-v3' : 25  ,
-#   }
-#   
-#   def roundup(x):
-#       return x if x % 100 == 0 else x + 100 - x % 100
-#   
-#   
-#   data_names = {
-#                   "JetHT":"jet",
-#                   "MET"  :'met',
-#              "SingleMuon":"mu" ,
-#          "SingleElectron":"el" ,
-#                }
-#   
-#   for data_samp , nChunk in dataChunks.iteritems():
-#       name = ""
-#       for data_name, nameTag in data_names.items():
-#           if data_name in data_samp:
-#               name = nameTag            
-#               break
-#       n = name + " " +  ""
-#       n = name + " " +  ""     
-#    
-#   
-#       #maxChunkSplit = roundup(nChunk)  
-
-
-### Signal ###
-
-#mstops = [250, 275, 300, 325, 350, 375, 400, 425, 450, 475, 500, 525, 550, 575, 600, 625, 650, 675, 700, 725, 750, 775, 800]
-#dms    = [10, 20, 30, 40, 50, 60, 70, 80]
-
-parser = cmgPostProcessing_parser.get_parser()
-args, runArgs= parser.parse_known_args()
-cmgTuplesName = args.cmgTuples
-
-def getSignalMassDict( cmgTuplesName, signalSampleName):
-    cmgTuplesFullName = 'Workspace.DegenerateStopAnalysis.samples.cmgTuples.' + cmgTuplesName
-    try:
-       sampleFileLib = importlib.import_module(cmgTuplesFullName)
-    except ImportError, err:
-       print "\nImport error from {0} \n ".format(cmgTuplesFullName) + \
-           "\nCorrect the name and re-run the script. \n Exiting."
-       sys.exit()
+def getSampleSets(args):
     
-    cmgTuples =sampleFileLib
-    cmgDir = sampleFileLib.sample_path
-
-    try:
-        signalComponent = getattr(cmgTuples, signalSample )
-        mass_dict_file  = signalComponent.get("mass_dict","")
-        mass_dict       = pickle.load( file( mass_dict_file ))
-    except:
-        print "mass dict not found for %s"%signalSample
-        mass_dict = {}
-    return mass_dict
-
-
-
-
-signalOpts = ["--skimPreselect", "--processEventVetoFastSimJets"]
-signalSamples = {
-                    "SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1"    : {'opts': signalOpts , 'name':'T2tt'      } ,  
-                    "SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1": {'opts': signalOpts , 'name':'T2bW'      } , 
-                    "SMS_T2tt_dM_10to80_genHT_160_genMET_80"              : {'opts': signalOpts , 'name':'T2tt_old'  } , ## This is the old signal before the mWMin fix... should only be for comparisons 
-                }
-
-
-for signalSample, signalSampleInfo in signalSamples.items():
-
-    mass_dict = getSignalMassDict(cmgTuplesName, signalSample)
-
-    signalSets = {}
-    opts = signalSampleInfo['opts']
-    name = signalSampleInfo['name']
-    for mstop in mass_dict.keys():
-        signalSet =  {  'samples': [ [signalSample, '--processSignalScan', str(mstop), str(mlsp)]+signalOpts for mlsp in mass_dict[mstop].keys()] }
-        signalSets.update({ "%s%s"%(name,mstop):signalSet})
-    sampleSets.update(signalSets)
-
-    print signalSample, signalSets
-
-
-
-
-
-mc_samps     = ['ttjets', 'wjets', 'qcd', 'dyjets', 'zjets', 'other']
-signal_samps = [x for x in sampleSets.keys() if 'T2tt' in x or 'T2bW' in x]
-data_samps   = ['data_met']#, 'data_el', 'data_mu', 'data_jet'
-
-all_samps = mc_samps #+ signal_samps # + data_samps #FIXME: mc and data cannot be run simulatneously
-
-
-composite_samp_definitions = {
-                'all'      : mc_samps + signal_samps + data_samps              ,
-                'allmc'    : mc_samps + signal_samps              ,
-                'bkg'      : mc_samps              ,
-                'T2tt_old' : [x for x in sampleSets.keys() if 'T2tt_old' in x and "mWMin" not in x] ,
-                'T2tt'     : [x for x in sampleSets.keys() if 'T2tt'     in x and "T2tt_old" not in x    ]  ,
-                'T2bW'     : [x for x in sampleSets.keys() if 'T2bW'     in x    ],
-                'allsig'   : signal_samps ,
-             }
-
- 
-for composite_samp_name , composite_samples in composite_samp_definitions.iteritems() :
-    composite_set = []
-    for s in composite_samples:
-        composite_set.extend(sampleSets[s]['samples'])
-
-    sampleSets[composite_samp_name] = { 
-                            'samples': composite_set 
-                        }
+    sampleSets = {
+       'signals':{
+                   'samples':[ 
+                               "T2tt_300_270_FastSim",
+                               "T2DegStop_300_270",
+                               "T2DegStop_300_290_FastSim",
+                               "T2DegStop_300_240_FastSim",
+                               "T2DegStop_300_270_FastSim",
+                             ],
+                   },
+       
+       'wjets':{
+                   'samples':[
+                               "WJetsToLNu_HT100to200",
+                               "WJetsToLNu_HT100to200_ext",
+                               "WJetsToLNu_HT200to400",
+                               "WJetsToLNu_HT200to400_ext",
+                               "WJetsToLNu_HT400to600",
+                               "WJetsToLNu_HT600to800",
+                               "WJetsToLNu_HT800to1200_ext",
+                               "WJetsToLNu_HT1200to2500",
+                               "WJetsToLNu_HT2500toInf",
+                             ],
+                   },
+       
+       'ttjets':{
+                   'samples':[
+                               "TTJets_LO",
+                               ["TTJets_LO",                "--skimGeneral=lheHTlow"],
+                               ["TTJets_LO_HT600to800_ext", "--skimGeneral=lheHThigh"],
+                               "TTJets_LO_HT800to1200_ext",
+                               "TTJets_LO_HT1200to2500_ext",
+                               "TTJets_LO_HT2500toInf",
+                             ],
+                   },
+       
+       'ttjets_lep':{
+                   'samples':[
+                               "TTJets_SingleLeptonFromT",   
+                               "TTJets_SingleLeptonFromTbar",
+                               "TTJets_DiLepton",            
+                             ],
+                   },
+       
+       'dyjets':{
+                   'samples':[
+                               #M50
+                               'DYJetsToLL_M50_HT100to200_ext',
+                               'DYJetsToLL_M50_HT200to400_ext',
+                               'DYJetsToLL_M50_HT400to600_ext',
+                               'DYJetsToLL_M50_HT600toInf',
+                               'DYJetsToLL_M50_HT600toInf_ext',
+                               
+                               #M5to50
+                               'DYJetsToLL_M5to50_HT100to200',
+                               'DYJetsToLL_M5to50_HT100to200_ext',
+                               'DYJetsToLL_M5to50_HT200to400',
+                               'DYJetsToLL_M5to50_HT200to400_ext',
+                               'DYJetsToLL_M5to50_HT400to600',
+                               'DYJetsToLL_M5to50_HT600toInf',
+                               'DYJetsToLL_M5to50_HT600toInf_ext',
+                             ],
+                   },
+       
+       'zjets':{
+                   'samples':[ 
+                               "ZJetsToNuNu_HT100to200_ext",
+                               "ZJetsToNuNu_HT200to400_ext",
+                               "ZJetsToNuNu_HT400to600",
+                               "ZJetsToNuNu_HT600to800",
+                               "ZJetsToNuNu_HT800to1200",
+                               "ZJetsToNuNu_HT1200to2500",
+                               "ZJetsToNuNu_HT1200to2500_ext",
+                               "ZJetsToNuNu_HT2500toInf",
+                             ],
+                   },
+       
+       'qcd':{
+                   'samples':[
+                               "QCD_HT300to500",
+                               "QCD_HT300to500_ext",
+                               "QCD_HT500to700_ext",
+                               "QCD_HT700to1000",
+                               "QCD_HT700to1000_ext",
+                               "QCD_HT1000to1500",
+                               "QCD_HT1000to1500_ext",
+                               "QCD_HT1500to2000",
+                               "QCD_HT1500to2000_ext",
+                               "QCD_HT2000toInf",
+                               "QCD_HT2000toInf_ext",
+                             ],
+                   },
+       
+       'qcd_pt':{
+                   'samples':[
+                               #"QCD_Pt5to10",
+                               #"QCD_Pt10to15",
+                               "QCD_Pt15to30",
+                               "QCD_Pt30to50",
+                               "QCD_Pt50to80",
+                               "QCD_Pt80to120",
+                               "QCD_Pt120to170",
+                               "QCD_Pt170to300",
+                               "QCD_Pt300to470",
+                               "QCD_Pt470to600",
+                               "QCD_Pt600to800",
+                               "QCD_Pt800to1000",
+                               "QCD_Pt1000to1400",
+                               "QCD_Pt1400to1800",
+                               "QCD_Pt1800to2400",
+                               "QCD_Pt2400to3200",
+                               #"QCD_Pt3200toInf",
+                             ],
+                   },
+       
+       'qcdpt_em':{
+                   'samples':[
+                               'QCD_Pt15to20_EMEnriched',
+                               'QCD_Pt20to30_EMEnriched',
+                               'QCD_Pt30to50_EMEnriched',
+                               'QCD_Pt50to80_EMEnriched',
+                               'QCD_Pt80to120_EMEnriched',
+                               'QCD_Pt120to170_EMEnriched',
+                               'QCD_Pt170to300_EMEnriched',
+                               'QCD_Pt300toInf_EMEnriched',
+                             ],
+                   },
+       
+       'other':{
+                   'samples':[
+                               'WW',
+                               'WZ',
+                               'ZZ',
+                               'TBar_tch',
+                               #'TBarToLeptons_tch_powheg', 
+                               'T_tch',
+                               #'TToLeptons_tch_powheg',
+                               'TBar_tWch',
+                               'T_tWch',
+                             ],
+                   },
+       
+       
+                                ############################
+                                ############DATA############
+                                ############################
+       
+       ### Re-Reco ###
+       #NOTE: H Re-Reco not available
+       
+       # MET PD
+       'data_met':{
+                   'samples':[
+                               "MET_Run2016B_23Sep2016", #NOTE: v3
+                               "MET_Run2016C_23Sep2016",
+                               "MET_Run2016D_23Sep2016",
+                               "MET_Run2016E_23Sep2016",
+                               "MET_Run2016F_23Sep2016",
+                               "MET_Run2016G_23Sep2016",
+                               "MET_Run2016H_PromptReco_v2",
+                               "MET_Run2016H_PromptReco_v3", #NOTE: use?
+                             ],
+                      },
+       
+      
+     
+       # SingleElectron PD
+       
+       'data_el':{
+                   'samples':[
+                               "SingleElectron_Run2016B_23Sep2016", #NOTE: v3
+                               "SingleElectron_Run2016C_23Sep2016",
+                               "SingleElectron_Run2016D_23Sep2016",
+                               "SingleElectron_Run2016E_23Sep2016",
+                               "SingleElectron_Run2016F_23Sep2016",
+                               "SingleElectron_Run2016G_23Sep2016",
+                               "SingleElectron_Run2016H_PromptReco_v2",
+                               "SingleElectron_Run2016H_PromptReco_v3", #NOTE: use?
+                             ],
+                      },
+       
+       # SingleMuon PD
+       
+       'data_mu':{
+                   'samples':[
+                               "SingleMuon_Run2016B_23Sep2016", #NOTE: v3
+                               "SingleMuon_Run2016C_23Sep2016",
+                               "SingleMuon_Run2016D_23Sep2016",
+                               "SingleMuon_Run2016E_23Sep2016",
+                               "SingleMuon_Run2016F_23Sep2016",
+                               "SingleMuon_Run2016G_23Sep2016",
+                               "SingleMuon_Run2016H_PromptReco_v2",
+                               "SingleMuon_Run2016H_PromptReco_v3", #NOTE: use?
+                             ],
+                      },
+       
+       # JetHT PD
+       'data_jet':{
+                   'samples':[
+                               "JetHT_Run2016B_23Sep2016", #NOTE: v3
+                               "JetHT_Run2016C_23Sep2016",
+                               "JetHT_Run2016D_23Sep2016",
+                               "JetHT_Run2016E_23Sep2016",
+                               "JetHT_Run2016F_23Sep2016",
+                               "JetHT_Run2016G_23Sep2016",
+                               "JetHT_Run2016H_PromptReco_v2",
+                               "JetHT_Run2016H_PromptReco_v3", #NOTE: use?
+                             ],
+                      },
+       
+       
+       ### PromptReco (PR) ###
+       
+       # MET PD
+       'data_PR_met':{
+                   'samples':[
+                               "MET_Run2016B_PromptReco_v2",
+                               "MET_Run2016C_PromptReco_v2",
+                               "MET_Run2016D_PromptReco_v2",
+                               "MET_Run2016E_PromptReco_v2",
+                               #"MET_Run2016F_PromptReco_v1",
+                               "MET_Run2016G_PromptReco_v1",
+                               #"MET_Run2016H_PromptReco_v1", #NOTE: use?
+                               "MET_Run2016H_PromptReco_v2",
+                               "MET_Run2016H_PromptReco_v3", #NOTE: use?
+                             ],
+                      },
+       
+       # SingleElectron PD
+       
+       'data_PR_el':{
+                   'samples':[
+                               "SingleElectron_Run2016B_PromptReco_v2",
+                               "SingleElectron_Run2016C_PromptReco_v2",
+                               "SingleElectron_Run2016D_PromptReco_v2",
+                               #"SingleElectron_Run2016E_PromptReco_v2",
+                               #"SingleElectron_Run2016F_PromptReco_v1",
+                               #"SingleElectron_Run2016G_PromptReco_v1",
+                               #"SingleElectron_Run2016H_PromptReco_v1", #NOTE: use?
+                               "SingleElectron_Run2016H_PromptReco_v2",
+                               "SingleElectron_Run2016H_PromptReco_v3", #NOTE: use?
+                             ],
+                   },
+       
+       # SingleMuon PD
+       
+       'data_PR_mu':{
+                   'samples':[
+                               "SingleMuon_Run2016B_PromptReco_v2",
+                               "SingleMuon_Run2016C_PromptReco_v2",
+                               "SingleMuon_Run2016D_PromptReco_v2",
+                               "SingleMuon_Run2016E_PromptReco_v2",
+                               "SingleMuon_Run2016F_PromptReco_v1",
+                               "SingleMuon_Run2016G_PromptReco_v1",
+                               #"SingleMuon_Run2016H_PromptReco_v1", #NOTE: use?
+                               "SingleMuon_Run2016H_PromptReco_v2",
+                               "SingleMuon_Run2016H_PromptReco_v3", #NOTE: use?
+                             ],
+                   },
+       
+       # JetHT PD
+       'data_PR_jet':{
+                   'samples':[
+                               #"JetHT_Run2016B_PromptReco_v2",
+                               #"JetHT_Run2016C_PromptReco_v2",
+                               #"JetHT_Run2016D_PromptReco_v2",
+                               #"JetHT_Run2016E_PromptReco_v2",
+                               #"JetHT_Run2016F_PromptReco_v1",
+                               #"JetHT_Run2016G_PromptReco_v1",
+                               #"JetHT_Run2016H_PromptReco_v1", #NOTE: use?
+                               "JetHT_Run2016H_PromptReco_v2",
+                               "JetHT_Run2016H_PromptReco_v3", #NOTE: use?
+                             ],
+                      },
+       
+       # 2015 Data 
+       'data_2015':{
+                   'samples':[
+                               "MET_Run2015D_05Oct",
+                               "MET_Run2015D_v4",
+                               "SingleElectron_Run2015D_05Oct",
+                               "SingleElectron_Run2015D_v4",
+                               "SingleMuon_Run2015D_05Oct",
+                               "SingleMuon_Run2015D_v4",
+                               ]},
+    
+       }
+    
+    
+    ### Signal ###
+    
+    #mstops = [250, 275, 300, 325, 350, 375, 400, 425, 450, 475, 500, 525, 550, 575, 600, 625, 650, 675, 700, 725, 750, 775, 800]
+    #dms    = [10, 20, 30, 40, 50, 60, 70, 80]
+    
+    def getSignalMassDict(args, signalSampleName):
+    
+        cmgTuplesName = args.cmgTuples
+    
+        cmgTuplesFullName = 'Workspace.DegenerateStopAnalysis.samples.cmgTuples.' + cmgTuplesName
+        try:
+           sampleFileLib = importlib.import_module(cmgTuplesFullName)
+        except ImportError, err:
+           print "\nImport error from {0} \n ".format(cmgTuplesFullName) + \
+               "\nCorrect the name and re-run the script. \n Exiting."
+           sys.exit()
+        
+        cmgTuples =sampleFileLib
+        cmgDir = sampleFileLib.sample_path
+    
+        try:
+            signalComponent = getattr(cmgTuples, signalSample )
+            mass_dict_file  = signalComponent.get("mass_dict","")
+            mass_dict       = pickle.load( file( mass_dict_file ))
+        except:
+            print "mass dict not found for %s"%signalSample
+            mass_dict = {}
+        return mass_dict
+    
+    
+    
+    
+    signalOpts = ["--skimPreselect", "--processEventVetoFastSimJets"]
+    signalSamples = {
+                        "SMS_T2tt_dM_10to80_genHT_160_genMET_80_mWMin_0p1"    : {'opts': signalOpts , 'name':'T2tt'      } ,  
+                        "SMS_T2bW_X05_dM_10to80_genHT_160_genMET_80_mWMin_0p1": {'opts': signalOpts , 'name':'T2bW'      } , 
+                        "SMS_T2tt_dM_10to80_genHT_160_genMET_80"              : {'opts': signalOpts , 'name':'T2tt_old'  } , ## This is the old signal before the mWMin fix... should only be for comparisons 
+                    }
+    
+    
+    for signalSample, signalSampleInfo in signalSamples.items():
+    
+        mass_dict = getSignalMassDict(args, signalSample)
+    
+        signalSets = {}
+        opts = signalSampleInfo['opts']
+        name = signalSampleInfo['name']
+        for mstop in mass_dict.keys():
+            signalSet =  {  'samples': [ [signalSample, '--processSignalScan', str(mstop), str(mlsp)]+signalOpts for mlsp in mass_dict[mstop].keys()] }
+            signalSets.update({ "%s%s"%(name,mstop):signalSet})
+        sampleSets.update(signalSets)
+        
+    
+    mc_samps     = ['ttjets', 'wjets', 'qcd', 'dyjets', 'zjets', 'other']
+    signal_samps = [x for x in sampleSets.keys() if 'T2tt' in x or 'T2bW' in x]
+    data_samps   = ['data_met']#, 'data_el', 'data_mu', 'data_jet'
+    
+    all_samps = mc_samps #+ signal_samps # + data_samps #FIXME: mc and data cannot be run simulatneously
+    
+    
+    composite_samp_definitions = {
+                    'all'      : mc_samps + signal_samps + data_samps              ,
+                    'allmc'    : mc_samps + signal_samps              ,
+                    'bkg'      : mc_samps              ,
+                    'T2tt_old' : [x for x in sampleSets.keys() if 'T2tt_old' in x and "mWMin" not in x] ,
+                    'T2tt'     : [x for x in sampleSets.keys() if 'T2tt'     in x and "T2tt_old" not in x    ]  ,
+                    'T2bW'     : [x for x in sampleSets.keys() if 'T2bW'     in x    ],
+                    'allsig'   : signal_samps ,
+                 }
+    
+     
+    for composite_samp_name , composite_samples in composite_samp_definitions.iteritems() :
+        composite_set = []
+        for s in composite_samples:
+            composite_set.extend(sampleSets[s]['samples'])
+    
+        sampleSets[composite_samp_name] = { 
+                                'samples': composite_set 
+                            }
+        
+    #
+    return sampleSets
 
 
 def get_parser():
@@ -507,7 +433,6 @@ def get_parser():
     argsRun.add_argument('--sampleSet',
         action='store',
         type=str,
-        choices=sampleSets.keys(),
         default='ttjets',
         help="Set of samples to run the post processing on"
         )
@@ -624,7 +549,7 @@ def countChunks(path):
  
    return numChunks 
 
-def make_command(args, options_list=[], procScript='cmgPostProcessing_v2.py', sample_paths=[]):
+def make_command(args, sampleSets, options_list=[], procScript='cmgPostProcessing_v2.py', sample_paths=[]):
     ''' Create the final command for post-processing script.
     
     The command is created using the list of options, replacing the "--processSample=..." argument 
@@ -717,7 +642,7 @@ def make_command(args, options_list=[], procScript='cmgPostProcessing_v2.py', sa
            if sample_paths:
                sampDir = ''
                for s_path in sample_paths:
-                   if s_path['sampleName'] == sampName:
+                   if s_path['sample'] == samp:
                        sampDir = s_path['samplePath']
            else:
                sampDir = getSampleDir(args, sampName) 
@@ -820,6 +745,23 @@ def runPostProcessing(argv=None):
 
     get_logger_rtuple = helpers.get_logger('runPostProcessing', logLevel, logFile.name)
     logger = get_logger_rtuple.logger
+    
+    # get sampleSets
+    sampleSets = getSampleSets(args)
+
+    # check if the required sampleSet is defined in sampleSets
+    if args.sampleSet not in sampleSets.keys():
+        msg_exception = ''.join([
+            "\n The requested sampleSet {sampleSet} is not defined in sampleSets".format(
+                        sampleSet=args.sampleSet),
+            "\n Available sampleSets: \n {sampleSets}".format(
+                sampleSets=pprint_cust.pformat(sorted(sampleSets.keys())))
+        ])
+
+        print msg_exception
+        raise Exception(msg_exception)
+        sys.exit()
+
 
     if verbose:    
         print "{:-^80}".format(" Running Post Processing! ")
@@ -834,13 +776,14 @@ def runPostProcessing(argv=None):
         "\n some arguments will be overwritten from sample definition: \n\n %s \n", 
         pprint.pformat(vars(args))
         )
-    logger.info("\n Samples: \n %s \n", pprint_cust.pformat(sampleSets[args.sampleSet]))
-
     # write the debug message kept in the msg_logger_debug
     logger.debug(msg_logger_debug)
+    
+
+    logger.info("\n Samples: \n %s \n", pprint_cust.pformat(sampleSets[args.sampleSet]))
 
     options_list = make_list_options(args, argsRun)
-    commands = make_command(args, options_list)
+    commands = make_command(args, sampleSets, options_list)
     
     logger.info(
         "\nFinal commands to be processed: \n %s \n",
