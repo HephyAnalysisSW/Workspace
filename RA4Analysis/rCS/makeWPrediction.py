@@ -56,7 +56,7 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, presel_MC, dPhiCut=
 
   yTT_crNJet_0b_lowDPhi         = fit_crNJet_lowDPhi['TT_AllPdg']['yield']*fit_crNJet_lowDPhi['TT_AllPdg']['template'].GetBinContent(1)
   yTT_Var_crNJet_0b_lowDPhi     = fit_crNJet_lowDPhi['TT_AllPdg']['yieldVar']*fit_crNJet_lowDPhi['TT_AllPdg']['template'].GetBinContent(1)**2
-  if templateBootstrap: yTT_Var_crNJet_0b_lowDPhi += fit_crNJet_lowDPhi['TT_AllPdg']['yield']**2*templateBootstrap['TTJets_mu'][srNJet][stb][htb]**2
+  if templateBootstrap: yTT_Var_crNJet_0b_lowDPhi += fit_crNJet_lowDPhi['TT_AllPdg']['yield']**2*templateBootstrap[srNJet][stb][htb]['TTJets_mu']**2
   yTT_crNJet_0b_highDPhi        = rCS_crNJet_0b_onlyTT['rCS']*yTT_crNJet_0b_lowDPhi
   yTT_Var_crNJet_0b_highDPhi    = rCS_crNJet_0b_onlyTT['rCSE_sim']**2*yTT_crNJet_0b_lowDPhi**2 + rCS_crNJet_0b_onlyTT['rCS']**2*yTT_Var_crNJet_0b_lowDPhi #rCSE_pred changed to rCSE_sim
   yTT_Var_crNJet_0b_highDPhi_MC = rCS_crNJet_0b_onlyTT['rCSE_sim']**2*yTT_crNJet_0b_lowDPhi**2 + rCS_crNJet_0b_onlyTT['rCS']**2*yTT_Var_crNJet_0b_lowDPhi
@@ -199,16 +199,16 @@ def makeWPrediction(bins, samples, htb, stb, srNJet, presel, presel_MC, dPhiCut=
                         +  fit_srNJet_lowDPhi['W_NegPdg']['yield']*fit_srNJet_lowDPhi['W_NegPdg']['template'].GetBinContent(1)
   yW_Var_srNJet_0b_lowDPhi  =  fit_srNJet_lowDPhi['W_PosPdg']['yieldVar']*fit_srNJet_lowDPhi['W_PosPdg']['template'].GetBinContent(1)**2\
                             +  fit_srNJet_lowDPhi['W_NegPdg']['yieldVar']*fit_srNJet_lowDPhi['W_NegPdg']['template'].GetBinContent(1)**2#FIXME I add that uncorrelated
-  if templateBootstrap: yW_Var_srNJet_0b_lowDPhi += fit_srNJet_lowDPhi['W_PosPdg']['yield']**2*templateBootstrap['WJets_PosPdg'][srNJet][stb][htb]**2\
-                                                  + fit_srNJet_lowDPhi['W_NegPdg']['yield']**2*templateBootstrap['WJets_NegPdg'][srNJet][stb][htb]**2
+  if templateBootstrap: yW_Var_srNJet_0b_lowDPhi += fit_srNJet_lowDPhi['W_PosPdg']['yield']**2*templateBootstrap[srNJet][stb][htb]['WJets_PosPdg']**2\
+                                                  + fit_srNJet_lowDPhi['W_NegPdg']['yield']**2*templateBootstrap[srNJet][stb][htb]['WJets_NegPdg']**2
 
   yW_PosPdg_srNJet_0b_lowDPhi = fit_srNJet_lowDPhi['W_PosPdg']['yield']*fit_srNJet_lowDPhi['W_PosPdg']['template'].GetBinContent(1)
   yW_PosPdg_Var_srNJet_0b_lowDPhi = fit_srNJet_lowDPhi['W_PosPdg']['yieldVar']*fit_srNJet_lowDPhi['W_PosPdg']['template'].GetBinContent(1)**2
-  if templateBootstrap: yW_PosPdg_Var_srNJet_0b_lowDPhi += fit_srNJet_lowDPhi['W_PosPdg']['yield']**2*templateBootstrap['WJets_PosPdg'][srNJet][stb][htb]**2
+  if templateBootstrap: yW_PosPdg_Var_srNJet_0b_lowDPhi += fit_srNJet_lowDPhi['W_PosPdg']['yield']**2*templateBootstrap[srNJet][stb][htb]['WJets_PosPdg']**2
   
   yW_NegPdg_srNJet_0b_lowDPhi = fit_srNJet_lowDPhi['W_NegPdg']['yield']*fit_srNJet_lowDPhi['W_NegPdg']['template'].GetBinContent(1)
   yW_NegPdg_Var_srNJet_0b_lowDPhi = fit_srNJet_lowDPhi['W_NegPdg']['yieldVar']*fit_srNJet_lowDPhi['W_NegPdg']['template'].GetBinContent(1)**2
-  if templateBootstrap: yW_NegPdg_Var_srNJet_0b_lowDPhi += fit_srNJet_lowDPhi['W_NegPdg']['yield']**2*templateBootstrap['WJets_NegPdg'][srNJet][stb][htb]**2
+  if templateBootstrap: yW_NegPdg_Var_srNJet_0b_lowDPhi += fit_srNJet_lowDPhi['W_NegPdg']['yield']**2*templateBootstrap[srNJet][stb][htb]['WJets_NegPdg']**2
 
   # for systematics
   rCS_crLowNJet_0b_onlyW            = getRCS(cWJets, crCut, dPhiCut, weight=weight_str_0bMC)

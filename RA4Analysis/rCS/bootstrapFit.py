@@ -17,6 +17,9 @@ from predictionConfig import *
 from optparse import OptionParser
 parser = OptionParser()
 parser.add_option("--nSR", dest="nSR", default=0, action="store", help="enter the number of SR you want to enter 0-27")
+parser.add_option("--small", dest="test", action="store_true", help="enter the number of SR you want to enter 0-27")
+
+
 (options, args) = parser.parse_args()
 
 
@@ -27,7 +30,7 @@ weight_str, weight_err_str = makeWeight(lumi, sampleLumi=sampleLumi, reWeight=MC
 samples={'W':cWJets, 'TT':cTTJets, 'Rest':cRest, 'Bkg':cBkg, 'Data': cData}
 
 isData = False
-test = False
+#test = False
 
 nSR = int(options.nSR)
 prefix = prefix+"_"+str(nSR)
@@ -36,36 +39,22 @@ signalRegions = signalRegions_Moriond2017_onebyone[nSR]
 
 
 #b = 1
+test = False
 
-n_bootstrap = 100
-if test: n_bootstrap = 1
+n_bootstrap = 500
+if test: n_bootstrap = 10
 WSB = False
 
-templateBootstrap = {'TTJets':{},'TTJets_mu':{}, 'WJets_PosPdg':{}, 'WJets_NegPdg':{}, 'Rest_PosPdg':{}, 'Rest_NegPdg':{}}
+templateBootstrap = {}# {'TTJets':{},'TTJets_mu':{}, 'WJets_PosPdg':{}, 'WJets_NegPdg':{}, 'Rest_PosPdg':{}, 'Rest_NegPdg':{}}
 
 for i_njb, njb in enumerate(sorted(signalRegions)):
-  templateBootstrap['TTJets'][njb] = {}
-  templateBootstrap['TTJets_mu'][njb] = {}
-  templateBootstrap['WJets_PosPdg'][njb] = {}
-  templateBootstrap['WJets_NegPdg'][njb] = {}
-  templateBootstrap['Rest_PosPdg'][njb] = {}
-  templateBootstrap['Rest_NegPdg'][njb] = {}
+  templateBootstrap[njb] = {}
 
   for stb in sorted(signalRegions[njb]):
-    templateBootstrap['TTJets'][njb][stb] = {}
-    templateBootstrap['TTJets_mu'][njb][stb] = {}
-    templateBootstrap['WJets_PosPdg'][njb][stb] = {}
-    templateBootstrap['WJets_NegPdg'][njb][stb] = {}
-    templateBootstrap['Rest_PosPdg'][njb][stb] = {}
-    templateBootstrap['Rest_NegPdg'][njb][stb] = {}
+    templateBootstrap[njb][stb] = {}
 
     for htb in sorted(signalRegions[njb][stb]):
-      templateBootstrap['TTJets'][njb][stb][htb] = {}
-      templateBootstrap['TTJets_mu'][njb][stb][htb] = {}
-      templateBootstrap['WJets_PosPdg'][njb][stb][htb] = {}
-      templateBootstrap['WJets_NegPdg'][njb][stb][htb] = {}
-      templateBootstrap['Rest_PosPdg'][njb][stb][htb] = {}
-      templateBootstrap['Rest_NegPdg'][njb][stb][htb] = {}
+      templateBootstrap[njb][stb][htb] = {}
 
       print
       print '#############################################'
@@ -123,17 +112,17 @@ for i_njb, njb in enumerate(sorted(signalRegions)):
         rest_neg.Fill(fit['Rest_NegPdg']['template'].GetBinContent(1)*fit['Rest_NegPdg']['yield'])
       
       if tt.GetMean()>0:
-        templateBootstrap['TTJets'][njb][stb][htb] = tt.GetRMS()/tt.GetMean()
+        templateBootstrap[njb][stb][htb]['TTJets'] = tt.GetRMS()/tt.GetMean()
       if tt_WSB.GetMean()>0:
-        templateBootstrap['TTJets_mu'][njb][stb][htb] = tt_WSB.GetRMS()/tt_WSB.GetMean()
+        templateBootstrap[njb][stb][htb]['TTJets_mu'] = tt_WSB.GetRMS()/tt_WSB.GetMean()
       if w_pos.GetMean()>0:
-        templateBootstrap['WJets_PosPdg'][njb][stb][htb] = w_pos.GetRMS()/w_pos.GetMean()
+        templateBootstrap[njb][stb][htb]['WJets_PosPdg'] = w_pos.GetRMS()/w_pos.GetMean()
       if w_neg.GetMean()>0:
-        templateBootstrap['WJets_NegPdg'][njb][stb][htb] = w_neg.GetRMS()/w_neg.GetMean()
+        templateBootstrap[njb][stb][htb]['WJets_NegPdg'] = w_neg.GetRMS()/w_neg.GetMean()
       if rest_pos.GetMean()>0:
-        templateBootstrap['Rest_PosPdg'][njb][stb][htb] = rest_pos.GetRMS()/rest_pos.GetMean()
+        templateBootstrap[njb][stb][htb]['Rest_PosPdg'] = rest_pos.GetRMS()/rest_pos.GetMean()
       if rest_neg.GetMean()>0:
-        templateBootstrap['Rest_NegPdg'][njb][stb][htb] = rest_neg.GetRMS()/rest_neg.GetMean()
+        templateBootstrap[njb][stb][htb]['Rest_NegPdg'] = rest_neg.GetRMS()/rest_neg.GetMean()
       
       #b += 1
 
