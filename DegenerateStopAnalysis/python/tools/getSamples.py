@@ -15,6 +15,7 @@ from Workspace.DegenerateStopAnalysis.tools.colors import colors
 
 lumis = { 
             'target_lumi'     :10000.,   
+            'DataICHEP_lumi'  :12864.4,
             'DataBlind_lumi'  :36416.7,
             'DataUnblind_lumi':4303.0,
         }
@@ -95,6 +96,7 @@ def getSamples(wtau=False, sampleList=['w','tt','z','sig'],
          MET = getChain(cmgPP.MET[skim],histname='')
          METDataUnblind  = MET#.CopyTree("run<=274240") #instead cut on run # is applied
          sampleDict.update({
+               "dichep":        {'name':"DataICHEP",         'sample':cmgPP.MET[skim],      'tree':METDataUnblind,      'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":data_triggers, "filters":data_filters, 'lumi': lumis['DataICHEP_lumi'], 'cut':"run<=276811"},
                "d":        {'name':"DataUnblind",         'sample':cmgPP.MET[skim],      'tree':METDataUnblind,      'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":data_triggers, "filters":data_filters, 'lumi': lumis['DataUnblind_lumi'], 'cut':"run<=275073"},
                "dblind":   {'name':"DataBlind",           'sample':cmgPP.MET[skim],      'tree':MET,                 'color':ROOT.kBlack, 'isSignal':0 , 'isData':1, "triggers":data_triggers, "filters":data_filters, 'lumi': lumis['DataBlind_lumi']},
             })

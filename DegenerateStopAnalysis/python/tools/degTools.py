@@ -1747,8 +1747,12 @@ def makeStopLSPPlot(name, massDict, title="", bins = [23, 237.5, 812.5, 125, 167
             if not masses: 
                 continue
             stop_mass, lsp_mass = masses
-            val = val if not key else key(val) 
-            plot.Fill(int(stop_mass), int(lsp_mass), val)
+            val = val if not key else key(val)
+            bin_to_fill = plot.FindBin(int(stop_mass),int(lsp_mass) ) 
+            if plot.GetBinContent(bin_to_fill):
+                raise Exception("Seems binning seems to fill dublicate values for %s, %s..... check the binning!"%(stop_mass,lsp_mass))
+            plot.SetBinContent(bin_to_fill, val)
+            #plot.Fill(int(stop_mass), int(lsp_mass), val)
 
 
     else:
@@ -1760,7 +1764,11 @@ def makeStopLSPPlot(name, massDict, title="", bins = [23, 237.5, 812.5, 125, 167
                     val = key(massDict[stop_mass][lsp_mass])
                 else:
                     val = massDict[stop_mass][lsp_mass]
-                plot.Fill(int(stop_mass), int(lsp_mass) , val )
+                bin_to_fill = plot.FindBin(int(stop_mass),int(lsp_mass) ) 
+                if plot.GetBinContent(bin_to_fill):
+                    raise Exception("Seems binning seems to fill dublicate values for %s, %s..... check the binning!"%(stop_mass,lsp_mass))
+                plot.SetBinContent(bin_to_fill, val)
+                #plot.Fill(int(stop_mass), int(lsp_mass) , val )
     plot.SetTitle(title)
 
     plot.SetNdivisions(0,"z")
@@ -2376,7 +2384,8 @@ class Yields():
         if isDataPlot:
            if "DataBlind" in samples[self.dataList[0]].name: self.lumi_weight = "DataBlind_lumi"
            elif "DataUnblind" in samples[self.dataList[0]].name: self.lumi_weight = "DataUnblind_lumi"
-           else: raise Exception("Data sample not recognized! %s"%dataList)
+           else: self.lumi_weight = samples[self.dataList[0]].name+"_lumi"
+           #else: raise Exception("Data sample not recognized! %s"%dataList)
            #print "Reweighting MC yields to", self.lumi_weight, ":", round(samples[self.dataList[0]].lumi/1000.,2), "fb-1" 
         else:
            self.lumi_weight = "target_lumi" 
@@ -2649,6 +2658,22 @@ class Yields():
     ################## Fancy Stuff #####################
     ####################################################
 
+    def getYieldMaps(self, sigList):
+            yld_mass_map = {}
+            ylds = self
+            if not sigList:
+                sigList = self.sigList 
+            for cut_name in ylds.cutNames:
+                yieldDict = ylds.getByBin(cut_name)
+                yld_mass_map[cut_name] = {}
+                for sig in sigList:
+                    yld_value = yieldDict[sig]
+                    mstop, mlsp = getMasses(sig)
+                    set_dict_key_val( yld_mass_map[cut_name], mstop, {} )
+                    set_dict_key_val( yld_mass_map[cut_name][mstop] , mlsp, yld_value)
+            return yld_mass_map
+
+
     def getSignalYieldMap(self):
         """
         Getting the Yield per each bin on the stop lsp plane
@@ -2670,7 +2695,7 @@ class Yields():
         Getting the Yield per each bin for each background
 
         """
-        name = lambda x: self.sampleNames[x] if nice_names else lambda x: x
+        name = (lambda x: self.sampleNames[x]) if nice_names else ( lambda x: x)
         yld_bkg_map  = self.getByBins( { name(bkg):self.yieldDict[bkg] for bkg in self.bkgList} )
         #nom_ylds.getByBins( { nom_ylds.sampleNames[bkg]:nom_ylds.yieldDict[bkg] for bkg in nom_ylds.bkgList} )
 
@@ -2949,7 +2974,7 @@ fixDict["WJets"]  =  "WJets"
 #fixDict["ZJetsInv"]  =  "ZJetsInv" 
 fixDict["TTJets"]  =  "TTJets" 
 fixDict["Total"]  =  "Total S.M."
-fixDict["DataBlind"]  =  "Data(12.9fb-1)"
+fixDict["DataBlind"]  =  "Data(36.4fb-1)"
 fixDict["DataUnblind"]  =  "Data(4.0fb-1)"
 #fixDict["Total"]  =  "Total S.M."
 
