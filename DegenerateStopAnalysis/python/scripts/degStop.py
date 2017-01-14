@@ -91,11 +91,11 @@ if __name__=="__main__":
     cutInstList  = cfg.cutInstList
     sampleList   = getattr(cfg, "sampleList", cfg.samples.keys() )[:]
     cutName      = cfg.cutName
-    fullTag = "%s_%s_%s"%( cfg.runTag , cfg.lumi_tag , cfg.htString )
+    fullTag = "%s_%s"%( cfg.runTag , cfg.htString )
 
 
-    massScanList = samples.massScanList() if cfg.scan_tag else []
-    signalList = getattr( cfg, "signalList", massScanList )[:]
+    
+    signalList = getattr( cfg, "signalList", [] )
     if args.small:
         signalList = signalList[:1]
     sampleList += signalList
@@ -128,16 +128,19 @@ if __name__=="__main__":
         results[task] = {}
         task_ret[task] = {}
         makeDir(cfg.saveDir)
-        if task == 'draw_plots':
-            pass
-        elif task == "limit_calc":
-            pass 
-        else:
-            task_func = getattr(cfg,task,None)
-            if not task_func:
-                raise Exception("Config has no function attribute ( cfg.{task} ) for the user defined task {task})".format(task=task))
-            else:
-                task_ret[task] = task_func( cfg, args )
+        task_func      = cfg.taskFuncs[task]
+
+        print "\n \n Now Running Task: %s -> %s \n \n "%(task, task_func)
+        task_ret[task] = task_func( cfg, args )
+        #if task == 'draw_plots':
+        #    pass
+        #elif task == "limit_calc":
+        #    pass 
+        #else:
+        #    task_func = getattr(cfg,task,None)
+        #    if not task_func:
+        #        raise Exception("Config has no function attribute ( cfg.{task} ) for the user defined task {task})".format(task=task))
+        #    else:
 
 
             #if getattr(cfg,"do_effMap", True):

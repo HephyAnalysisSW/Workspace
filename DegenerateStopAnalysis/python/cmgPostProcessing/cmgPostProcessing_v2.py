@@ -127,7 +127,16 @@ def getParameterSet(args):
             pu_dict['pu_tfile'] = ROOT.TFile( pu_dict['pu_root_file'] ) 
             pu_dict['pu_thist'] = getattr( pu_dict['pu_tfile'], pu_dict['pu_hist_name'])
 
- 
+    ## setup hists for lepton sfs
+    leptonSFsDict = params.get("leptonSFsDict")
+    if leptonSFsDict:
+        for sfname, sfdict in leptonSFsDict.items():
+            sf_root_file = ROOT.TFile( sfdict["hist_file"] )
+            leptonSFsDict[sfname]['sf_root_file'] = sf_root_file
+            leptonSFsDict[sfname]['sf_hist'] = getattr(sf_root_file, sfdict['hist_name'])
+            print sf_root_file
+            print leptonSFsDict[sfname]['sf_hist']        
+
     #
     return params
 
@@ -754,6 +763,10 @@ def rwTreeClasses(sample, isample, args, temporaryDir, varsNameTypeTreeLep, para
             
             newVariables.extend(bTagWeightVars)
 
+    
+    if params.get("leptonSFsDict"):
+        pass
+
     # sum up branches to be defined for each sample, depending on the sample
     # type (data or MC)
     # FIXME the addition of manually entered quantities is not checked for consistency
@@ -1218,8 +1231,8 @@ def mergeLeptons(readTree, splitTree, saveTree, params):
         #
         sumElMuList = muList + elList
 
-        lepObj = cmgObjectSelection.cmgObject(readTree, splitTree, lepColl)
-
+        lepObj  = cmgObjectSelection.cmgObject(readTree, splitTree, lepColl)
+        
         lepList = lepObj.sort('pt', sumElMuList)
 
         # save number of selected objects and their indices
@@ -1242,6 +1255,28 @@ def mergeLeptons(readTree, splitTree, saveTree, params):
                 '\n'
             ])
             logger.debug(printStr, getattr(saveTree, nObjName))
+
+        leptonSFsDict = params.get("leptonSFsDict")
+        if leptonSFsDict:
+            for ilep in range(lepObj.nObj):
+                leptonSFs = {}
+                for sfname, sfdict in leptonSFsDict.items():
+                    sf_hist       =   sfdict['sf_hist']
+                    maxPt         =   sfdict['maxPt'] 
+                    maxEta        =   sfdict['maxEta'] 
+                    #print sf_hist, sfname, lepObj.pdgId[ilep], lepObj.pt[ilep], lepObj.eta[ilep]   
+
+                    requirement   =   sfdict['requirement']
+                    if requirement( lepObj, ilep):
+                        sf = getLeptonSF( lepObj.pt[ilep], lepObj.eta[ilep], sf_hist , maxPt = maxPt , maxEta = maxEta, minPt=10 )            
+                    else:
+                        sf = 1.0
+                    #print sfname, lepObj.pdgId[ilep], lepObj.pt[ilep], lepObj.eta[ilep] , sf 
+                    leptonSFs[sfname] = sf
+                print "SF: ", ilep, lepObj.nObj, lepObj.pt[ilep], lepObj.eta[ilep],    lepObj.pdgId[ilep], leptonSFs
+                
+            pass
+
 
     return saveTree
 
@@ -1288,7 +1323,24 @@ def extend_LepGood_func(args, readTree, splitTree, saveTree, params, extend_var,
     return saveTree
     
     
-    
+def getLeptonSF( lepPt, lepEta, sf_hist, maxPt = None, maxEta = None , minPt = None, def_val = 1):
+    #print '---------------------------'
+    #print lepPt, lepEta, sf_hist 
+    lepEta = abs(lepEta)
+    if minPt and lepPt < minPt:
+        lepPt  = minPt
+
+    if maxPt and lepPt > maxPt:
+        lepPt  = maxPt*0.99
+    if maxEta and lepEta > maxEta:
+        lepEta = maxEta*0.99
+    b = sf_hist.FindBin(lepPt,lepEta)
+    sf = sf_hist.GetBinContent(b)
+    if not sf:
+        assert False
+        #sf = def_val
+    return sf
+
 
 def processJets_func(args, readTree, splitTree, saveTree, params, computeVariables, cmgObj, indexList):
     '''Process jets. 
@@ -1667,7 +1719,6 @@ def computeWeight(sample, sumWeight,  splitTree, saveTree, params, xsec=None , f
             ('Data ' + sample['cmgName'] if isDataSample else 'MC ' + sample['cmgName']),
 
             )
-        
     #
     return saveTree
 
@@ -1871,6 +1922,8 @@ def cmgPostProcessing(argv=None):
 
     # define job parameters and log the parameters used in this job
     params = getParameterSet(args)
+    if args.runInteractively:
+        return params 
     # a more decent print of the dictionary of parameters 
     printParams = ''
     for key, value in params.iteritems():
@@ -2333,6 +2386,10 @@ def cmgPostProcessing(argv=None):
                     # merge muon and electrons for the required selectors
                     saveTree = mergeLeptons(
                         readTree, splitTree, saveTree, params)
+
+                    if args.runInteractively:
+                        return readTree, splitTree, saveTree, params
+                     
 
                     # evaluate 'computeVariables' for all selectors
                     # the variables depend on the selector indices and on

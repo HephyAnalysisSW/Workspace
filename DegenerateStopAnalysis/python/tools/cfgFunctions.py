@@ -314,7 +314,7 @@ def calc_sig_limit(cfg, args):
                                             cutOpt          =   "list2", 
                                             weight          =   "", 
                                             pklOpt          =   True, 
-                                            tableName       =   "{cut}_%s%s"%(cfg.runTag,cfg.scan_tag), 
+                                            tableName       =   "{cut}_%s"%(cfg.runTag), 
                                             nDigits         =   10 , 
                                             err             =   True , 
                                             verbose         =   True,
@@ -489,7 +489,7 @@ def bkg_est(cfg, args):
                                         weight          =   "",
                                         lumi            =   lumi,  
                                         pklOpt          =   True, 
-                                        tableName       =   "{cut}_%s%s"%(cfg.runTag,cfg.scan_tag), 
+                                        tableName       =   "{cut}_%s"%(cfg.runTag), 
                                         nDigits         =   10 , 
                                         err             =   True , 
                                         verbose         =   True,
@@ -556,20 +556,20 @@ def bkg_est(cfg, args):
             yldplts = []
 
             #yldplts
-    postFuncs = getattr(args, "postFuncs", None)
-    if postFuncs:
-        print "Will run the following scripts: %s"%postFuncs
-        CR_SFs(cfg,args)
-        for f in postFuncs:
-            pass
-            #print f
-            #print(f+"(cfg,args)")
-            #exec(f+"(cfg,args)")
-                #print open(f).read() 
-                #print "running %s"%f
-                #execfile(f)    
-                #exec(open(f).read() ,globals() ) 
-                #execfile("CR_SFssss.py")    
+    #postFuncs = getattr(args, "postFuncs", None)
+    #if postFuncs:
+    #    print "Will run the following scripts: %s"%postFuncs
+    #    #CR_SFs(cfg,args)
+    #    for f in postFuncs:
+    #        pass
+    #        #print f
+    #        #print(f+"(cfg,args)")
+    #        #exec(f+"(cfg,args)")
+    #            #print open(f).read() 
+    #            #print "running %s"%f
+    #            #execfile(f)    
+    #            #exec(open(f).read() ,globals() ) 
+    #            #execfile("CR_SFssss.py")    
                 
     
     
@@ -642,7 +642,7 @@ def cut_flow(cfg, args):
                                         weight          =   "", 
                                         pklOpt          =   True, 
                                         pklDir          =   cfg.yieldPklDir, 
-                                        tableName       =   "{cut}_%s%s"%(cfg.runTag,cfg.scan_tag), 
+                                        tableName       =   "{cut}_%s"%(cfg.runTag), 
                                         nDigits         =   10 , 
                                         err             =   True , 
                                         verbose         =   True,
@@ -862,7 +862,7 @@ def CR_SFs(cfg,args):
 
     #otherBkg       = ['DYJetsM50', "QCD", "ZJetsInv", "ST", "Diboson"]
     #allBkg         = [w,tt] + otherBkg
-    data           = 'DataBlind'
+    data           = cfg.samples[args.data]['name']
     sigs           = [sig1, sig2]
     sigs = []
     allSamps       = allBkg + sigs + [data]
@@ -873,7 +873,8 @@ def CR_SFs(cfg,args):
     #pts         = ["sr","cr"]
     
     #bkg_est_dir = "$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/results/2016/%s_%s_%s/BkgEst/"%(cfg.cmgTag, cfg.ppTag, cfg.runTag) 
-    bkg_est_dir = "$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/results/2016/%s/%s/%s/BkgEst/"%(cfg.cmgTag, cfg.ppTag, cfg.runTag) 
+    #bkg_est_dir = "$CMSSW_BASE/src/Workspace/DegenerateStopAnalysis/results/2016/%s/%s/%s/BkgEst/"%(cfg.cmgTag, cfg.ppTag, cfg.runTag) 
+    bkg_est_dir = "/%s/BkgEst/"%(cfg.results_dir ) 
     bkg_est_dir = os.path.expandvars( bkg_est_dir ) 
     makeDir(bkg_est_dir)
     

@@ -11,7 +11,7 @@ from Workspace.DegenerateStopAnalysis.tools.getSamples import getSamples , weigh
 
 
 
-tasks = [ 'limit_calc', 'draw_plots' ]#'yields', 'fom_plot', 'data_plot']
+#tasks = [ 'limit_calc', 'draw_plots' ]#'yields', 'fom_plot', 'data_plot']
 make_lumi_tag = lambda l: "%0.0fpbm1"%(l)
 
 
@@ -39,6 +39,7 @@ class TaskConfig():
     """
     def __init__(self,  
                  taskList     ,
+                 cfgTag       ,
                  runTag       ,
                  ppTag        ,
                  cutInst      ,  
@@ -46,6 +47,7 @@ class TaskConfig():
                  sample_info  = {},
                  samples      = None,
                  lumi_info    = {},
+                 taskModules  = [],
                  saveDirBase = '%s/www/T2Deg13TeV/mAODv2_7412pass2_v6/Optimization_v0/'%os.path.expandvars("$HOME"),
                  **kwargs 
                  #samples     , 
@@ -71,17 +73,25 @@ class TaskConfig():
         #else:
         #    if 
         #    raise Exception("task, %s , not defined %s"%(taskList, tasks))
+        self.taskFuncs= {}
         for task in taskList:
-            if task.lower() in tasks:
-                pass
-            elif hasattr(self,task):
-                pass
-            else:
-                raise Exception("Task {task} either needs to be a predifined task {tasks} or it needs to have a user defined func, self.{task}".format(task=task, tasks=tasks) )
+            task_is_ok = False
+            if hasattr(self,task):
+                task_is_ok = True
+                self.taskFuncs[task] = getattr( self, task )
+            elif taskModules:
+                for taskMod in taskModules:
+                    foundtask = getattr( taskMod, task, "")
+                    print taskMod, foundtask
+                    if foundtask:
+                        self.taskFuncs[task]= getattr(taskMod, task)
+                        task_is_ok = True
+            if not task_is_ok:
+                raise Exception("Task {task} either needs to be a predifined task {tasks} or it needs to have a user defined func, self.{task} or it should be a function in one of the modules specified in the taskModules option ({modules})".format(task=task, tasks=tasks, modules=taskModules) )
 
 
 
-        args = ['taskList','runTag','ppTag', 'saveDirBase' ]
+        args = ['cfgTag', 'taskList','runTag','ppTag', 'saveDirBase' ]
         for arg in args:
             setattr(self, arg, eval(arg) )
 
@@ -125,34 +135,26 @@ class TaskConfig():
 
         useHT           =   self.sample_info['useHT']
         self.htString   =   "HT" if useHT else "Inc"
-        self.scan_tag   =   "Scan" if sample_info['scan'] else ""
+        workDir         = os.path.expandvars("$WORK")
         self.lumi_info  =   lumi_info
         #self.lumi_tag   =   make_lumi_tag(lumi_info['lumi_target'])
 
 
-        self.saveDir    =   self.saveDirBase+'/%s/%s'%(self.runTag,self.htString)
-        self.tableDir   =   self.saveDir+"/Tables/"
-        self.dataPlotDir=   self.saveDir+"/DataPlots/"
-        self.plotDir    =   self.saveDir+"/FOMPlots/"
-        #self.cardDirBase=   "/data/nrad/results/cards_and_limits/"
+        #self.tableDir   =   self.saveDir+"/Tables/"
+        #self.dataPlotDir=   self.saveDir+"/DataPlots/"
+        #self.plotDir    =   self.saveDir+"/FOMPlots/"
 
         #self.cardDirBase=   "/afs/hephy.at/work/n/nrad/results/cards_and_limits/%s/%s"%(self.cmgTag, self.ppTag)
         #self.yieldPklDir =  "/afs/hephy.at/work/n/nrad/results/yields/%s/%s/"%(self.cmgTag, self.ppTag) 
-        workDir         = os.path.expandvars("$WORK")
-        self.cardDirBase=   "%s/results/cards_and_limits/%s/%s"%(workDir, self.cmgTag, self.ppTag)
-        self.yieldPklDir =  "%s/results/yields/%s/%s/"%(workDir, self.cmgTag, self.ppTag) 
-
-        self.lumi_tag   =   make_lumi_tag(lumi_info['target_lumi'])
+        #self.yieldPklDir =  "%s/results/yields/%s/%s/"%(workDir, self.cmgTag, self.ppTag) 
+        #self.scan_tag   =   "Scan" if sample_info['scan'] else ""
+        #self.lumi_tag   =   make_lumi_tag(lumi_info['target_lumi'])
         #self.results_dir =   self.cardDirBase + "/13TeV/{ht}/{run}/{lumi}/{cut}/".format( ht = self.htString, lumi = self.lumi_tag, run = self.runTag, cut=cutName) 
-        self.results_dir =   self.cardDirBase + "/13TeV/{ht}/{run}/".format( ht = self.htString , run = self.runTag ) 
         #self.cardDir    =   self.results_dir + "BasicSys"
-        sys_label       =   getattr(self, "sys_label", "AdjustedSys")
-        self.cardDir    =   self.results_dir + sys_label
-        self.yield_pkl  =   self.results_dir + "/Yields_%s_%s_%s.pkl"%(cutName , self.runTag, self.scan_tag)
+        #self.yield_pkl  =   self.results_dir + "/Yields_%s_%s_%s.pkl"%(cutName , self.runTag, self.scan_tag)
 
         default_keys       = {  
-                                #"limit_pkl" : "13TeV/%s/%s_%s/BasicSys.pkl"%( self.htString, self.lumi_tag, self.runTag ),
-                                "limit_pkl" : self.results_dir + "%s.pkl"%sys_label,
+                                #"limit_pkl" : self.results_dir + "%s.pkl"%sys_label,
                                 "redo_limit"     :   False      ,
                                 "redo_yields"    :   False       ,
                             }
@@ -188,6 +190,7 @@ class TaskConfig():
             self.samples   =   samples
 
 
+        sys_label       =   getattr(self, "sys_label", "AdjustedSys")
         self.cardDirs ={}
         self.limitDirs ={}
         self.dataPlotDirs ={}
@@ -199,6 +202,12 @@ class TaskConfig():
 
         self.cutLumiTags ={}
         useData = getattr(self, "data" )
+        self.cardDirBase=   "%s/results/cards_and_limits/"%(workDir)
+        #self.cardDirBase =   os.path.expandvars("$CMSSW_BASE") + "/src/Workspace/DegenerateStopAnalysis/results/2016/"
+        #self.cardDir    =   self.results_dir + sys_label
+        self.taskTag     =  "_".join([x for x in  [ self.cfgTag, self.generalTag, self.runTag] if x ] )
+        self.results_dir =   self.cardDirBase + "/13TeV/{cmgTag}/{ppTag}/{cfgTag}/{generalTag}/{run}/".format(cmgTag = self.cmgTag, ppTag = self.ppTag,   run = self.runTag, generalTag = self.generalTag, cfgTag = self.cfgTag ) 
+        self.saveDir     =   self.saveDirBase +       "/{cmgTag}/{ppTag}/{cfgTag}/{generalTag}/{run}/".format(cmgTag = self.cmgTag, ppTag = self.ppTag,   run = self.runTag, generalTag = self.generalTag, cfgTag = self.cfgTag )
         for cutInst in self.cutInstList:
             cut_name = cutInst.fullName
             cutSaveDir = self.saveDir + "/" + cutInst.saveDir
@@ -219,16 +228,16 @@ class TaskConfig():
                 lumiWeight = 'target_lumi'
             self.cutLumiTags[cut_name]= make_lumi_tag( lumi_info[lumi] )
 
-
+            
             self.baseCutSaveDir = cutInst.baseCut.saveDir if getattr(cutInst,"baseCut") else cutInst.saveDir
             self.saveDirs[cut_name]  =  cutSaveDir
-            self.cardDirs[cut_name]  =  self.cardDir + "/" + cutInst.saveDir  
             self.fomPlotDirs[cut_name]   =  cutSaveDir +"/FOMPlots/"
             self.dataPlotDirs[cut_name]  =  cutSaveDir +"/DataPlots/"
             self.limitDirs[cut_name] =  cutSaveDir +"/Limits/"  
             self.tableDirs[cut_name] =  cutSaveDir +"/Tables/"
-            self.limitPkls[cut_name] =  self.results_dir + sys_label  + "/" + self.baseCutSaveDir  + "/Limits_%s_%s_%s.pkl"%(self.cutLumiTags[cut_name], self.runTag, cut_name)
-            self.yieldPkls[cut_name] =  self.results_dir + sys_label  + "/" + self.baseCutSaveDir  + "/Yields_%s_%s_%s.pkl"%(self.cutLumiTags[cut_name], self.runTag, cut_name)
+            self.cardDirs[cut_name]  =  self.results_dir + "/" + self.baseCutSaveDir  + "/" + sys_label + "/" + cutInst.name + "/"
+            self.limitPkls[cut_name] =  self.results_dir + "/" + self.baseCutSaveDir  + "/" + sys_label + "/Limits_%s_%s_%s.pkl"%(self.cutLumiTags[cut_name], self.taskTag, cut_name)
+            self.yieldPkls[cut_name] =  self.results_dir + "/" + self.baseCutSaveDir                    + "/Yields_%s_%s_%s.pkl"%(self.cutLumiTags[cut_name], self.taskTag, cut_name)
 
 
 

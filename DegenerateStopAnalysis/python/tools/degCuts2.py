@@ -47,18 +47,29 @@ class Variables():
             setattr(self, varName, Variable( varName, varInfo['var'], varInfo['latex'])) 
         self.vars_dict_format = { varName: varInfo['var'] for varName, varInfo in self.vars_dict.iteritems() } 
 
+def isDataSample(sample):
+    isDataSample = False
+    dataSampleNames  = ['data', 'dblind', 'dunblind', 'dichep' ]
+    if getattr( sample, "isData", ""):
+        pass #isDataSample = True
+    elif type(sample)==str:
+        if any([dataSampleName in sample.lower() for dataSampleName in dataSampleNames]):
+            isDataSample = True
+    return isDataSample 
 
 class Weights(Variables):
     def combine( self, weightList):
         #weights_to_combine = [ getattr(self.weights,wname) for wname in weightList]
         weights_to_combine = [ getattr(self,wname) for wname in weightList]
         return '*'.join(['(%s)'%w for w in weights_to_combine])
-    def makeCutWeightOptFunc( self, sample_list, cut_options):
+
+
+    def _makeCutWeightOptFunc( self, sample_list, cut_options):
         """
         Create a function to add weights based on sample name and cut
         """
         def cutWeightOptFunc(sample, cutListNames, weightListNames):
-            if "data" in sample.lower() or "dblind" in sample.lower() or "dunblind" in sample.lower():
+            if isDataSample(sample):
                 #return sample, cutListNames, weightListNames
                 return sample, cutListNames, ["noweight"]
             if sample_list and not any([x in sample for x in sample_list]): #sample not in sample_list:
@@ -86,10 +97,10 @@ class Weights(Variables):
         setattr( cutWeightOptFunc, "sample_list", sample_list)
         return cutWeightOptFunc
 
-    def makeCutWeightFuncs(self,  weight_options):
+    def _makeCutWeightFuncs(self,  weight_options):
         self.cut_weight_funcs = {}
         for weight_option_name, weight_option in weight_options.items():
-            self.cut_weight_funcs[weight_option_name] = self.makeCutWeightOptFunc( weight_option['sample_list'], weight_option['cut_options'] )
+            self.cut_weight_funcs[weight_option_name] = self._makeCutWeightOptFunc( weight_option['sample_list'], weight_option['cut_options'] )
             ### Here I change the name of the func and add it to make it picklable..... a better solution?
             funcname = "cutWeightOptFunc_"+weight_option_name
             self.cut_weight_funcs[weight_option_name].__name__ = funcname
@@ -105,7 +116,7 @@ class Cuts():
             regions                = varsCutsWeightsRegions.regions
             cuts_dict              = varsCutsWeightsRegions.cuts_dict
             weights                = Weights(weights_dict)
-            weights.makeCutWeightFuncs(weight_options)
+            weights._makeCutWeightFuncs(weight_options)
 
             vars                   = varsCutsWeightsRegions.vars_dict
             if alternative_vars:
@@ -240,6 +251,22 @@ class Cuts():
             #print sample, cutListNames, weightListNames
         return sample, cutListNames, weightListNames
             
+    def getSampleTriggersFilters(self, sample, cutString=''):
+        """ NOT FULLY IMPLEMENTED YET """
+        triggers = getattr(sample, 'triggers','')
+        filters = getattr(sample, 'filters','')
+        cuts = getattr(sample, 'cuts','')
+        cutList = []
+        for cutItem in [cutString, triggers, filters, cuts] :
+            if cutItem:
+                cutList.append(cutItem)
+        return "&&".join(["(%s)"%c for c in cutList])
+
+    def getSampleFullCutWeights():
+        # getsamplecutweight
+        # getsampleTriggersFilters
+        return 
+
     def getSampleCutWeight(self, sample, cutListNames, weightListNames=None,  options=None, returnString = False, returnCutWeight=True):
         if not weightListNames:
             weightListNames = self.def_weights

@@ -47,7 +47,8 @@ CMG_PROCESSING_TAG="8020_mAODv2_v5"
 CMG_POST_PROCESSING_TAG="80X_postProcessing_v0"
 PARAMETER_SET="analysisHephy_13TeV_2016_v2_1"
 CHUNK_SPLITTING="100"
-VERBOSE="" #--verbose"
+#VERBOSE="--verbose"
+VERBOSE="" 
 
 # semi-hard-coded parameters
 if [[ ${2} == "DATA" ]]; then 
