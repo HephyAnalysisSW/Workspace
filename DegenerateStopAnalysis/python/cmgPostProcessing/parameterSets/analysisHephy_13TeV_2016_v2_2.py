@@ -409,7 +409,6 @@ def getParameterSet(args):
             'dxy': ('dxy', operator.lt, 0.02, operator.abs),
             'dz': ('dz', operator.lt, 0.1, operator.abs),
             'looseMuonId': ('looseMuonId', operator.ge, 1),
-            
             'hybIso': {
                 'ptSwitch': 25,
                 'relIso': {
@@ -419,7 +418,15 @@ def getParameterSet(args):
                 'absIso': 5
             },
         },
+       'computeVariables': {
+            'variableList': ['SF/F/1'],
+            'function': 'processLeptonSF_func',
+            'args': []
+        },
     }
+    
+         
+
 
     selectorList.append(LepGood_mu_def)
 
@@ -446,6 +453,7 @@ def getParameterSet(args):
             'dz': ('dz', operator.lt, 0.5, operator.abs), #loosened
             'looseMuonId': ('looseMuonId', operator.ge, 1),
             
+            # ECAL gap masking
             'hybIso': {
                 'ptSwitch': 25,
                 'relIso': {
@@ -518,6 +526,11 @@ def getParameterSet(args):
                 'lowRange': (operator.le, 1.4442),
                 'highRange': (operator.ge, 1.566),
             },
+        },
+        'computeVariables': {
+            'variableList': ['SF/F/1'],
+            'function': 'processLeptonSF_func',
+            'args': []
         },
     }
 
@@ -1010,6 +1023,18 @@ def getParameterSet(args):
         'down':       {'var': 'puReweight_down', 'xsec': pu_xsec * (1 - pu_xsec_unc), 'pu_root_file': pileup_dir + '/PU_ratio_23Sep2016_%s.root' % int(pu_xsec * (1 - pu_xsec_unc)), 'pu_hist_name': 'PU_ratio'},
     }
     params['puWeightDict'] = puWeightDict
+
+
+    ##  lepton SFs
+
+    leptonSFsDict = {
+                       "mu_loose" : { "hist_file":"leptonSFs/MuonDataFulSimMCSF_12p9fbm1.root"      , "hist_name" : "histo2D"             , "maxPt" : 120 , "maxEta" : 2.4 ,  'requirement': lambda lepObj, ilep : abs( lepObj.pdgId[ilep] ) == 13  },
+                       "el_veto"  : { "hist_file":"leptonSFs/ElectronDataFullSimMCSF_12p9fbm1.root" , "hist_name" : "GsfElectronToVeto"   , "maxPt" : 200 , "maxEta" : 2.5 ,  'requirement': lambda lepObj, ilep : abs( lepObj.pdgId[ilep] ) == 11  },
+                       #"mu_loose" : { "hist_file":"" , "maxPt"=120 , "maxEta"=2.4 },
+                     }
+
+    params['leptonSFsDict'] = leptonSFsDict
+
     
     # btag weights configuration
         
@@ -1149,6 +1174,7 @@ def getParameterSet(args):
 
     # add to params
     params['extendCollectionList'] = extendCollectionList
+
     params['selectorList'] = selectorList
     params['mergeLeptonSelectors'] = mergeLeptonSelectors
 
