@@ -13,7 +13,7 @@ def regions(region, lep, METcut = "40", MTcut = "30"):
 
    #filters
    filters = "Flag_Filters"
-   if "measurement" in region: trigger = "HLT_PFHT800"
+   if "measurement" in region: trigger = "(HLT_PFHT800 || HLT_PFJet450 || HLT_AK8PFJet450)"
    else: trigger = "1"
       
    #index
@@ -41,8 +41,6 @@ def regions(region, lep, METcut = "40", MTcut = "30"):
       ["TauVeto","Sum$(TauGood_idMVANewDM && TauGood_pt > 20) == 0"],
       ], baseCut = None)
    
-   #setEventListToChains(samples, samplesList, baseline)
-   
    selection = {
       'trigger': trigger, 
       'filters': filters, 
@@ -54,8 +52,8 @@ def regions(region, lep, METcut = "40", MTcut = "30"):
       'match': "(%s == %s)"%(index['loose'], index['tight']),
    }
 
-   if "measurement" in region: selection['measurement'] = measurement.combined
-   elif "sr1" in region:       selection['application_sr1'] = sr1.combined
+   if "measurement" in region: selection['measurement'] = measurement
+   elif "sr1" in region:       selection['application_sr1'] = sr1
    else:
       print "Region unknown. Exiting."
       sys.exit()
@@ -64,12 +62,51 @@ def regions(region, lep, METcut = "40", MTcut = "30"):
       selection['loose'] = "(nLepGood_{lep}_loose > 0)".format(lep = lep) 
       selection['tight'] = "(nLepGood_{lep}_def > 0)".format(lep = lep)
    elif "sr1" in region: 
-      selection['loose'] = "((nLepGood_{lep}_loose == 1 && LepGood_pt[{ind}] < 30 && abs(LepGood_eta[{ind}]) < 1.5 ) ||\
-                             (nLepGood_{lep}_loose == 2 && LepGood_pt[IndexLepGood_{lep}_loose[1]] < 20))".format(lep = lep, ind = index['loose'])
-      selection['tight'] = "((nLepGood_{lep}_def == 1   && LepGood_pt[{ind}] < 30 && abs(LepGood_eta[{ind}]) < 1.5) ||\
-                             (nLepGood_{lep}_def == 2   && LepGood_pt[IndexLepGood_{lep}_def[1]] < 20))".format(lep = lep, ind = index['tight'])
+      selection['loose'] = "((nLepGood_{lep}_loose == 1) || (nLepGood_{lep}_loose == 2 && LepGood_pt[IndexLepGood_{lep}_loose[1]] < 20)) && abs(LepGood_eta[{ind}]) < 1.5".format(lep = lep, ind = index['loose']) #LepGood_pt[{ind}] < 30 && 
+      selection['tight'] = "((nLepGood_{lep}_def == 1)   || (nLepGood_{lep}_def == 2   && LepGood_pt[IndexLepGood_{lep}_def[1]] < 20))   && abs(LepGood_eta[{ind}]) < 1.5".format(lep = lep, ind = index['tight']) #LepGood_pt[{ind}] < 30 && 
+
+      #Veto on other leptons
+      otherLepVeto = {}
+      otherLepVeto['loose'] = "(nLepGood_{otherLep}_loose == 0 || (nLepGood_{otherLep}_loose == 1 && LepGood_pt[IndexLepGood_{otherLep}_loose[0]] < 20))"
+      otherLepVeto['tight'] = "(nLepGood_{otherLep}_def == 0 || (nLepGood_{otherLep}_def == 1 && LepGood_pt[IndexLepGood_{otherLep}_def[0]] < 20))"
+
+      for x in ['loose', 'tight']:
+         if lep == 'mu':
+            otherLepVeto[x] = otherLepVeto[x].format(otherLep = 'el') 
+         elif lep == 'el':
+            otherLepVeto[x] = otherLepVeto[x].format(otherLep = 'mu') 
+         elif lep == 'lep':
+            otherLepVeto[x] = None
+         
+         if otherLepVeto[x]:
+            selection[x] = combineCuts(selection[x], otherLepVeto[x])
 
    return selection
+
+def binning(lep, xmax = 200, varBins = False):
+
+   if lep == "el":    etaAcc = 2.5
+   elif lep == "mu":  etaAcc = 2.4
+   elif lep == "lep": etaAcc = 2.5
+   else:
+      print "Lepton input not recongised. Choose from: el, mu, lep. Exiting."
+      sys.exit()
+
+   if not varBins:
+      bins = {'pt':[int(xmax/10), 0, xmax], 'eta':[int(etaAcc*10), 0, etaAcc], 'mt':[int(xmax/10), 0, xmax]}
+   else: # variable bin size
+      bins = {}
+      bins['pt'] = [0, 5, 12, 20, 30, 50, 100, xmax]
+      bins['mt'] = [0, 30, 60, 95, 120, xmax]
+
+      if lep == 'mu':
+         bins['eta'] = [0, 0.9, 1.2, 2.1, etaAcc]
+      elif lep == 'el':
+         bins['eta'] = [0, 0.7, 1.5, etaAcc]
+      else:
+         bins['eta'] = [0, 0.9, 1.2, 1.5, 2.1, etaAcc]
+
+   return bins
 
 ##Yields
 #if doYields:

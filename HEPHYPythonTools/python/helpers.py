@@ -357,8 +357,10 @@ def getPlotFromChain(c, var, binning, cutString = "(1)", weight = "weight", binn
       h = ROOT.TH1D(htmp, htmp, *binning)
   c.Draw(var+">>%s"%htmp, weight+"*("+cutString+")", 'goff')
   res = h.Clone()
+  
   if variableBinning[0]:
-    h = ROOT.TH1D('h_tmp', 'h_tmp', *binning)
+    h = ROOT.TH1D(htmp, htmp, len(binning)-1, array('d', binning))
+    #h = ROOT.TH1D('h_tmp', 'h_tmp', *binning)
     c.Draw(var+">>h_tmp", weight+"*("+cutString+")", 'goff')
     h.Scale(variableBinning[1],"width")
     res = h.Clone()

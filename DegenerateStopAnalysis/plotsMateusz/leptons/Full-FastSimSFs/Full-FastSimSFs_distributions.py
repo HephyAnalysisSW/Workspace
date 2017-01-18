@@ -198,7 +198,7 @@ for sim in ['FullSim', 'FastSim']:
    hists[sim]['2D']['num'].GetXaxis().SetTitle("%s p_{T}"%lepton)
    hists[sim]['2D']['num'].GetYaxis().SetTitle("%s |#eta|"%lepton)
    
-   ratios[sim]['2D'] = makeEffPlot2(hists[sim]['2D']['num'], hists[sim]['2D']['den'])
+   ratios[sim]['2D'] = divideHists(hists[sim]['2D']['num'], hists[sim]['2D']['den'])
    ratios[sim]['2D'].SetName("%s_ratios_2D"%(sim))
    ratios[sim]['2D'].SetTitle("%s Efficiency for %s TTJets Sample"%(variable, sim))
    #ratios[sim]['2D'].GetXaxis().SetTitle("%s p_{T}"%lepton)

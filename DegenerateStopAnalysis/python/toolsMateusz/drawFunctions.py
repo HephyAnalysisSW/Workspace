@@ -1,8 +1,15 @@
 #drawFunctions.py - ROOT Draw Functions
 import ROOT
 import math
+import hashlib
+import time
+from array import array
+from Workspace.DegenerateStopAnalysis.tools.ratioTools import makeCanvasMultiPads
+from Workspace.DegenerateStopAnalysis.tools.degTools import decorAxis 
 
-#import array
+def uniqueHash():
+    return hashlib.md5("%s"%time.time()).hexdigest()
+
 def makeLine():
    line = "\n************************************************************************************************************************************************************************\n"
    return line
@@ -16,7 +23,163 @@ def newLine():
    print ""
    return
 
-#Histograms
+# Canvas
+
+def drawPlot(plot_, dOpt="hist", isDataPlot = False, legend = None, decor = False, latexText = None, plotMin=False, normalize=False, ratio = (None, None), ratioTitle = "Ratio", ratioLimits=[], unity = True): #ratioNorm=False, verbose=False, 
+
+   ret = {}
+   ret['junk'] = []
+
+   plot = plot_.Clone()
+
+   drawRatio = (ratio[0] != None and ratio[1] != None) or type(ratio) != type(())
+
+   if drawRatio:
+      padRatios=[2,1]
+      #else:
+      #    padRatios=[2]+[1]*(len(den))
+     
+      canvs = makeCanvasMultiPads(c1Name = "Canvas_"+plot.GetName(), c1ww=800, c1wh=800, joinPads=True, padRatios=padRatios, pads=[])
+      cSave, cMain, cRatio = 0, 1, 2   # indices of the main canvas, lower canvas and canvas to be saved
+      canvs[cSave].SetRightMargin(0.03)
+      canvs[cMain].SetRightMargin(0.03)
+      canvs[cRatio].SetRightMargin(0.03)
+      #canvs[cMain].SetLeftMargin(15) 
+  
+   else:
+      canvs = ROOT.TCanvas("Canvas", "Canvas", 800, 800), None, None
+      cSave, cMain = 0, 0
+  
+   canvs[cMain].cd()
+   plot.Draw(dOpt) 
+   canvs[cMain].RedrawAxis()
+   canvs[cMain].Modified()
+   canvs[cMain].Update()
+   
+   #if isDataPlot:
+   #    dataHist=hists[dataList[0]][p]
+   #    dataHist.SetMarkerSize(0.9)
+   #    dataHist.SetMarkerStyle(20)
+   #    dataHist.Draw("E0Psame")
+   #    dOpt+=""
+   
+   if plotMin: plot.SetMinimum(plotMin)
+   
+   if legend:
+      if type(legend) != type([]): legend = [legend]
+
+      ret['leg'] = []
+      
+      for leg in legend:
+         leg_ = leg.Clone() 
+         leg_.Draw()
+   
+         ret['leg'].append(leg_)
+   
+   if drawRatio:
+      num = ratio[0].Clone()
+      den = ratio[1].Clone()     
+
+      if type(num) == ROOT.THStack: num = num.GetStack().Last().Clone()
+      if type(den) == ROOT.THStack: den = den.GetStack().Last().Clone()
+
+      ret['den'] = den
+      ret['num'] = num
+      
+      canvs[cRatio].cd() 
+      canvs[cRatio].SetGridx() 
+      canvs[cRatio].SetGridy() 
+      
+      if type(ratio) != type(()): 
+         ratio.Draw()
+      elif (num and den):
+         num.Divide(den)
+         num.SetFillColor(ROOT.kBlue-8)
+         num.SetFillStyle(3003)
+         num.SetMarkerSize(1)
+         num.SetLineWidth(2)
+         num.Draw("E2") #adds shaded area around error bars
+         num.Draw("same")
+            
+      decorAxis(num, 'y', ratioTitle, tOffset = 0.6, tSize = 0.1, lSize = 0.08, center = True)
+     
+      if ratioLimits:
+         num.SetMinimum(ratioLimits[0])
+         num.SetMaximum(ratioLimits[1])
+   
+      if unity:
+         lowBin = num.GetBinLowEdge(1)
+         hiBin  = num.GetBinLowEdge(num.GetNbinsX()+1)
+
+         func = ROOT.TF1('Func_%s'%uniqueHash(),"[0]",lowBin,hiBin)
+         func.SetParameter(0,1)
+         #func.SetLineStyle(3)
+         func.SetLineColor(1)
+         func.SetLineWidth(2)
+         func.Draw("same")
+         ret['junk'].append(func)
+ 
+      canvs[cRatio].RedrawAxis()
+      canvs[cRatio].Modified()
+      canvs[cRatio].Update()
+   
+   canvs[cMain].cd()
+   
+   if decor:
+      if decor.has_key("x"):
+         if drawRatio: 
+            decorAxis(num, 'x', decor['x'], tOffset = 1, tSize = 0.11, lSize = 0.1)
+         else:
+            decorAxis(plot, 'x', decor['x'], tOffset = 0.9, tSize = 0.11)
+
+      if decor.has_key("y"): decorAxis(plot, 'y', decor['y'], tOffset = 0.9, tSize = 0.06)
+      if decor.has_key("title"): plot.SetTitle(decor['title'])
+      if decor.has_key("log"):
+         logx, logy, logz = decor['log']
+         if logx : canvs[cMain].SetLogx(1)
+         if logy : canvs[cMain].SetLogy(1)
+      else:
+         logx, logy, logz = 0, 0, 0
+  
+      if logy:
+         plot.SetMaximum(10*plot.GetMaximum())
+      else:
+         plot.SetMaximum(1.3*plot.GetMaximum())
+   
+   latex = ROOT.TLatex()
+   latex.SetNDC()
+   latex.SetTextSize(0.04)
+   #latex.SetTextAlign(11)
+   
+   if not latexText:
+      latexText = {}
+      latexText['R'] = "\\mathrm{13\, TeV}"
+      if isDataPlot: 
+         latexText['L'] = "#font[22]{CMS Preliminary}"
+      else:
+         latexText['L'] = "#font[22]{CMS Simulation}"
+       
+   if isDataPlot or ratio:
+      latex.DrawLatex(0.16,0.92, latexText['L'])
+      latex.DrawLatex(0.7,0.92,  latexText['R'])
+   else:
+      latex.DrawLatex(0.16,0.96, latexText['L'])
+      latex.DrawLatex(0.6,0.96,  latexText['R'])
+
+   for c in canvs:      
+      c.Modified()
+      c.Update()
+      
+   #canvs[cSave].cd() 
+   ret['plot'] = plot 
+   ret['canvs'] = canvs
+
+   ROOT.gPad.Modified()
+   ROOT.gPad.Update()
+ 
+   return ret
+
+# Histograms
 def emptyHist(title, nbins = 100, min = 0, max = 1000):
    hist = ROOT.TH1D("hist_"+title, "Histogram", nbins, min, max)
    hist.GetXaxis().SetTitle(title)
@@ -58,9 +221,14 @@ def makeHist(sample, varname, sel = "", nbins = 100, min = 0, max = 1000):
    hist.SetLineWidth(3)
    return hist
 
-def makeHistVarBins(sample, varname, sel, xbins): # xbins = array('d', [range(xmin,xmax,5)])
-   hist = ROOT.TH1D("hist", "Histogram", len(xbins)-1, xbins)
+def makeHistVarBins(sample, varname, sel, xbins, variableBinning = (False, 0)): 
+   hist = ROOT.TH1D("hist", "Histogram", len(xbins)-1, array('d', xbins))
    sample.Draw(varname + ">>hist", sel, "goff")
+
+   if variableBinning[0]: 
+      if variableBinning[1]: hist.Scale(variableBinning[1], "width") #scales each bin to value and wrt. bin width 
+      else:                  hist.Scale(xbins[1]-xbins[0],  "width") #scales each bin to first bin width and wrt. bin width
+ 
    hist.SetTitle(varname + " Plot")
    hist.GetXaxis().SetTitle(varname)
    hist.GetYaxis().SetTitle("Events")
@@ -140,14 +308,15 @@ def setupEffPlot(eff):
    ROOT.gPad.Modified()
    ROOT.gPad.Update()
 
-def makeEffPlot2(passed,total): #When ratio > 1
+def divideHists(passed,total): #When ratio > 1
    a = passed.Clone()
    b = total.Clone()
    a.Divide(b)
    a.SetTitle("Efficiency Plot")
-   a.SetMarkerStyle(33)
-   a.SetMarkerSize(2)
-   a.SetLineWidth(2)
+   a.SetName("ratio")
+   #a.SetMarkerStyle(33)
+   #a.SetMarkerSize(2)
+   #a.SetLineWidth(2)
    return a
 
 def setupEffPlot2(eff):

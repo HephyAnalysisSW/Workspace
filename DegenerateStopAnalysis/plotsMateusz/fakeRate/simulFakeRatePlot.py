@@ -20,6 +20,7 @@ parser = argparse.ArgumentParser(description="Input options")
 parser.add_argument("--lep", dest = "lep",  help = "Lepton", type = str, default = "lep")
 parser.add_argument("--region", dest = "region",  help = "Measurement or application region", type = str, default = "measurement")
 parser.add_argument("--getData", dest = "getData",  help = "Get data", type = int, default = 1)
+parser.add_argument("--varBins", dest = "varBins",  help = "Variable bin size", action = "store_true")
 parser.add_argument("--logy", dest = "logy",  help = "Toggle logy", type = int, default = 1)
 parser.add_argument("--save", dest="save",  help="Toggle save", type=int, default=1)
 parser.add_argument("--verbose", dest="verbose",  help="Verbosity switch", type=int, default=1)
@@ -35,6 +36,7 @@ if not len(sys.argv) > 1:
 lep = args.lep
 region = args.region
 getData = args.getData
+varBins = args.varBins
 logy = args.logy
 save = args.save
 verbose = args.verbose
@@ -44,14 +46,11 @@ cmgPP = cmgTuplesPostProcessed()
 
 samplesList = ["w", "tt", "qcd"]
 
-if "application" in region:
-   samplesList.reverse()
-
 if getData and "measurement" in region: 
    samplesList.append("djetBlind")
 
 if "measurement" in region:
-   skim = "oneLepGood_HT800"
+   skim = "oneLepGood"
 elif "application" in region:
    skim = "preIncLep"
 else:
@@ -69,10 +68,15 @@ elif lep == "lep": lepton = "Lepton"
 #Save
 if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
    tag = samples[samples.keys()[0]].dir.split('/')[7] + "/" + samples[samples.keys()[0]].dir.split('/')[8]
-   savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/fakesEstimation/noRunH"%tag
+   savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/fakesEstimation"%tag
 
    savedir += "/%s/fakeRate/simulPlots"%region
+  
+   if not varBins: binDir = "/fixedBins"
+   else:           binDir = "/varBins"   
    
+   savedir += binDir 
+ 
    suffix = "_%s"%lep
    
    makeDir(savedir + "/root")
@@ -81,7 +85,8 @@ if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
 #####
 # Root file with fake rate
 
-variables = {'pt':'lepPt', 'eta':'lepEta'}
+variables = {'pt':'lepPt'}#, 'eta':'lepEta'}
+#variables = {'eta':'lepEta'}#,'pt':'lepPt'}
 canvs = {'pt':'c1', 'eta':'c2'}
 fakeRate = {}
 rootFile = {}
@@ -95,7 +100,7 @@ for var in variables:
    leg = makeLegend2(0.15,0.3,0.65,0.85) 
   
    for i, samp in enumerate(samplesList):
-      fakeRateDir = "/afs/hephy.at/user/m/mzarucki/www/plots/8020_mAODv2_v0/80X_postProcessing_v0/fakesEstimation/noRunH/%s/fakeRate/%s/root/"%(region, lepton)
+      fakeRateDir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/fakesEstimation/%s/fakeRate/%s%s/root/"%(tag, region, lepton, binDir)
       fakeRateFile = "FakeRate_TightToLoose_%s_%s_%s.root"%(variables[var], lep, samp)
       plot = "ratio_%s_%s"%(samp, var)
       
@@ -106,7 +111,7 @@ for var in variables:
       
       if i == 0: 
          dOpt = "P"
-         fakeRate[var][samp].SetTitle("%ss: Tight to Loose Ratios in %s Region"%(lepton, region.title()))
+         fakeRate[var][samp].SetTitle("%ss: Tight to Loose Ratio in %s Region"%(lepton, region.title()))
       else: dOpt = "Psame"
 
       fakeRate[var][samp].SetMarkerColor(2+i)

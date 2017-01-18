@@ -465,7 +465,7 @@ d = ratios['FastSim']['2D'].GetTotalHistogram().Clone()
 a.Divide(b)
 c.Divide(d)
 
-ratios['Full-Fast']['2D'] = makeEffPlot2(a,c)
+ratios['Full-Fast']['2D'] = divideHists(a,c)
 ratios['Full-Fast']['2D'].SetName("Full-Fast_ratios_2D")
 ratios['Full-Fast']['2D'].SetTitle("%ss: Factorised HI & IP FullSim-FastSim SFs for TTJets Sample"%lepton)
 ratios['Full-Fast']['2D'].GetXaxis().SetTitle("%s p_{T}"%lepton)
