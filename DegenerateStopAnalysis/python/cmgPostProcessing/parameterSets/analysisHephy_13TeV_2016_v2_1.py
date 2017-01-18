@@ -381,6 +381,7 @@ def getParameterSet(args):
             'dxy': ('dxy', operator.lt, 0.02, operator.abs),
             'dz': ('dz', operator.lt, 0.1, operator.abs),
             'looseMuonId': ('looseMuonId', operator.ge, 1),
+            
             'hybIso': {
                 'ptSwitch': 25,
                 'relIso': {
@@ -417,7 +418,6 @@ def getParameterSet(args):
             'dz': ('dz', operator.lt, 0.5, operator.abs), #loosened
             'looseMuonId': ('looseMuonId', operator.ge, 1),
             
-            # ECAL gap masking
             'hybIso': {
                 'ptSwitch': 25,
                 'relIso': {
