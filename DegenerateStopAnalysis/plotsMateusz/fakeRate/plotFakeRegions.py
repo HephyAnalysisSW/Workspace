@@ -52,10 +52,12 @@ cmgPP = cmgTuplesPostProcessed()
 if "measurement" in region:
    skim = "oneLepGood"
    samplesList = ["w", "tt", "qcd"]
+   fom = "RATIO"
 elif "application" in region:
    skim = "preIncLep"
    samplesList = ["st", "vv", "qcd", "z", "dy", "tt", "w"]
    getData = False #NOTE: For now, do not plot data near SR
+   fom = False
 
 if getData and "measurement" in region: 
    samplesList.append("djetBlind")
@@ -82,6 +84,11 @@ if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
    savedir = "/afs/hephy.at/user/m/mzarucki/www/plots/%s/fakesEstimation"%tag
 
    savedir += "/%s/distribution/%s"%(region, lepton)
+
+   if not varBins: savedir += "/fixedBins"
+   else:           savedir += "/varBins"
+
+   if logy: savedir += "/log"
    
    suffix = "_%s_%s"%(lep, WP)
    
@@ -120,7 +127,12 @@ plotDict = {\
    "met":{   'var': "met",           "bins":[30,0,300],  "decor":{"title": "MET Plot" ,     "y":"Events", "x":"MET / GeV",   "log":[0,logy,0]}},
 }
 
-if "application" in region and not varBins: plotDict['met']['bins'] = [100, 0, 1000]
+if "application" in region:
+   if logy: plotMin = 10
+   else: plotMin = 0
+   if not varBins: plotDict['met']['bins'] = [100, 0, 1000]
+elif "measurement" in region:
+   plotMin = 100
 
 plotsDict = Plots(**plotDict)
 plotsList = ["lepPt", "lepMt", "lepEta"]
@@ -132,12 +144,9 @@ setup_style()
 c1 = ROOT.TCanvas("c1", "Canvas 1", 1200, 1700)
 
 if doPlots:   
-   plots = getPlots(samples, plotsDict, regionCuts, samplesList, plotList = plotsList)# addOverFlowBin='both')
+   plots = getPlots(samples, plotsDict, regionCuts, samplesList, plotList = plotsList, addOverFlowBin='both')
    
-   if "measurement" in region:
-      fakePlots = drawPlots(samples, plotsDict, regionCuts, samplesList, plotList = plotsList, plotLimits = [100, 100], denoms = ["bkg"], noms = ["djetBlind"], fom = "RATIO", fomLimits = [0,2.8], plotMin = 1000, normalize = False, save = False)
-   else: 
-      fakePlots = drawPlots(samples, plotsDict, regionCuts, samplesList, plotList = plotsList, plotLimits = [1, 100], denoms = ["bkg"], noms = ["qcd"], fom = "RATIO", fomLimits = [0,2.8], plotMin = 1000, normalize = False, save = False)
+   fakePlots = drawPlots(samples, plotsDict, regionCuts, samplesList, plotList = plotsList, plotLimits = [plotMin, 100], denoms = ["bkg"], noms = ["djetBlind"], fom = fom, fomLimits = [0,2.8], plotMin = plotMin, normalize = False, save = False)
    
    if save: #web address: http://www.hephy.at/user/mzarucki/plots/electronID
       for canv in fakePlots['canvs']:

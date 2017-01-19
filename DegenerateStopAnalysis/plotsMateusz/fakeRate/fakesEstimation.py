@@ -171,7 +171,7 @@ region_prompt = CutClass(reg + "_prompt", [
 # Loose (not-Tight) CR
 
 if looseNotTight:
-   looseNotTightString = "nLepGood_%s_def == 0"%lep
+   looseNotTightString = selection['notTight'] 
 else:
    looseNotTightString = "1"
 
@@ -203,27 +203,27 @@ plotDict = {\
    
 plotsDict = Plots(**plotDict)
 
-if logy: plotMin = 0.1
+if logy: plotMin = 1
 else: plotMin = 0
 
 if doControlPlots:
    plots =                getPlots(samples, plotsDict, region,        samplesList, plotList = ['lepPt_tight'])# addOverFlowBin='both')
-   regPlots     =        drawPlots(samples, plotsDict, region,        samplesList, plotList = ['lepPt_tight'], plotLimits = [plotMin, 100], denoms = ["bkg"], noms = ["qcd"], fom = None, fomLimits = [0,2.8], plotMin = plotMin, normalize = False, save = False)
+   regPlots     =        drawPlots(samples, plotsDict, region,        samplesList, plotList = ['lepPt_tight'], plotLimits = [10, 100], denoms = ["bkg"], noms = ["qcd"], fom = None, fomLimits = [0,2.8], plotMin = 10, normalize = False, save = False)
    
    plots =                getPlots(samples, plotsDict, region_prompt, samplesList, plotList = ['lepPt_tight'])
-   regPlots_prompt =     drawPlots(samples, plotsDict, region_prompt, samplesList, plotList = ['lepPt_tight'], plotLimits = [plotMin, 100], denoms = ["bkg"], noms = ["qcd"], fom = "RATIO", fomLimits = [0,2.8], plotMin = plotMin, normalize = False, save = False)
+   regPlots_prompt =     drawPlots(samples, plotsDict, region_prompt, samplesList, plotList = ['lepPt_tight'], plotLimits = [10, 100], denoms = ["bkg"], noms = ["qcd"], fom = None, fomLimits = [0,2.8], plotMin = 10, normalize = False, save = False)
    
    plots =                getPlots(samples, plotsDict, looseCR,        samplesList, plotList = ['lepPt_loose'])
-   looseCRplots =        drawPlots(samples, plotsDict, looseCR,        samplesList, plotList = ['lepPt_loose'], plotLimits = [plotMin, 100], denoms = ["bkg"], noms = ["qcd"], fom = "RATIO", fomLimits = [0,2.8], plotMin = plotMin, normalize = False, save = False)
+   looseCRplots =        drawPlots(samples, plotsDict, looseCR,        samplesList, plotList = ['lepPt_loose'], plotLimits = [10, 100], denoms = ["bkg"], noms = ["qcd"], fom = None, fomLimits = [0,2.8], plotMin = 10, normalize = False, save = False)
    
    plots =                getPlots(samples, plotsDict, looseCR_prompt, samplesList, plotList = ['lepPt_loose'])
-   looseCRplots_prompt = drawPlots(samples, plotsDict, looseCR_prompt, samplesList, plotList = ['lepPt_loose'], plotLimits = [plotMin, 100], denoms = ["bkg"], noms = ["qcd"], fom = "RATIO", fomLimits = [0,2.8], plotMin = plotMin, normalize = False, save = False)
+   looseCRplots_prompt = drawPlots(samples, plotsDict, looseCR_prompt, samplesList, plotList = ['lepPt_loose'], plotLimits = [10, 100], denoms = ["bkg"], noms = ["qcd"], fom = None, fomLimits = [0,2.8], plotMin = 10, normalize = False, save = False)
    
 plots =                   getPlots(samples, plotsDict, region_fakes,  samplesList, plotList = ['lepPt_tight'])
 regPlots_fakes =         drawPlots(samples, plotsDict, region_fakes,  samplesList, plotList = ['lepPt_tight'], plotLimits = [plotMin, 100], denoms = ["bkg"], noms = ["qcd"], fom = None, fomLimits = [0,2.8], plotMin = plotMin, normalize = False, save = False)
 
 plots =                   getPlots(samples, plotsDict, looseCR_fakes,  samplesList, plotList = ['lepPt_loose'])
-looseCRplots_fakes =     drawPlots(samples, plotsDict, looseCR_fakes,  samplesList, plotList = ['lepPt_loose'], plotLimits = [plotMin, 100], denoms = ["bkg"], noms = ["qcd"], fom = "RATIO", fomLimits = [0,2.8], plotMin = plotMin, normalize = False, save = False)
+looseCRplots_fakes =     drawPlots(samples, plotsDict, looseCR_fakes,  samplesList, plotList = ['lepPt_loose'], plotLimits = [plotMin, 100], denoms = ["bkg"], noms = ["qcd"], fom = None, fomLimits = [0,2.8], plotMin = plotMin, normalize = False, save = False)
 
 ####
 ## Multiplying fake rate histogram with total bkg

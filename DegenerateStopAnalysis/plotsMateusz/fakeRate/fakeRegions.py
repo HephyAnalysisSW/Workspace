@@ -9,7 +9,12 @@ from Workspace.DegenerateStopAnalysis.toolsMateusz.drawFunctions import *
 from Workspace.DegenerateStopAnalysis.toolsMateusz.pythonFunctions import *
 from Workspace.DegenerateStopAnalysis.tools.degTools import CutClass
 
-def regions(region, lep, METcut = "40", MTcut = "30"):
+def regions(region, lep, METcut = "40", MTcut = "30", lowPt = False):
+
+   #if lowPt:
+   #   lowPtString = "_lowpt"
+   #else:
+   #   lowPtString = ""
 
    #filters
    filters = "Flag_Filters"
@@ -41,6 +46,42 @@ def regions(region, lep, METcut = "40", MTcut = "30"):
       ["TauVeto","Sum$(TauGood_idMVANewDM && TauGood_pt > 20) == 0"],
       ], baseCut = None)
    
+   sr1_invertedAntiQCD = CutClass("SR1_invertedAntiQCD", [
+      ["MET","met > 300"],
+      ["HT","ht_basJet_def > 400"],
+      ["ISR100", "nJet_isrHJet_def >= 1"],
+      ["No3rdJet60","nJet_vetoJet_def <= 2"],
+      ["antiQCD","dPhi_j1j2_vetoJet_def > 2.5"],
+      ["BVeto", "nJet_bJet_def < 1"],
+      ["TauVeto","Sum$(TauGood_idMVANewDM && TauGood_pt > 20) == 0"],
+      ], baseCut = None)
+   
+   sr1_invertedAntiQCD_CT200 = CutClass("SR1_invertedAntiQCD_CT200", [
+      ["MET","met > 200"],
+      ["HT","ht_basJet_def > 300"],
+      ["ISR100", "nJet_isrHJet_def >= 1"],
+      ["No3rdJet60","nJet_vetoJet_def <= 2"],
+      ["antiQCD","dPhi_j1j2_vetoJet_def > 2.5"],
+      ["BVeto", "nJet_bJet_def < 1"],
+      ["TauVeto","Sum$(TauGood_idMVANewDM && TauGood_pt > 20) == 0"],
+      ], baseCut = None)
+   
+   sr1_noAntiQCD = CutClass("SR1_noAntiQCD", [
+      ["MET","met > 300"],
+      ["HT","ht_basJet_def > 400"],
+      ["ISR100", "nJet_isrHJet_def >= 1"],
+      ["BVeto", "nJet_bJet_def < 1"],
+      ["TauVeto","Sum$(TauGood_idMVANewDM && TauGood_pt > 20) == 0"],
+      ], baseCut = None)
+   
+   sr1_noAntiQCD_CT200 = CutClass("SR1_noAntiQCD_CT200", [
+      ["MET","met > 200"],
+      ["HT","ht_basJet_def > 300"],
+      ["ISR100", "nJet_isrHJet_def >= 1"],
+      ["BVeto", "nJet_bJet_def < 1"],
+      ["TauVeto","Sum$(TauGood_idMVANewDM && TauGood_pt > 20) == 0"],
+      ], baseCut = None)
+   
    selection = {
       'trigger': trigger, 
       'filters': filters, 
@@ -53,7 +94,12 @@ def regions(region, lep, METcut = "40", MTcut = "30"):
    }
 
    if "measurement" in region: selection['measurement'] = measurement
-   elif "sr1" in region:       selection['application_sr1'] = sr1
+   elif "sr1" in region:       
+      selection['application_sr1'] = sr1
+      selection['application_sr1_noAntiQCD'] = sr1_noAntiQCD
+      selection['application_sr1_noAntiQCD_CT200'] = sr1_noAntiQCD_CT200
+      selection['application_sr1_invertedAntiQCD'] = sr1_invertedAntiQCD
+      selection['application_sr1_invertedAntiQCD_CT200'] = sr1_invertedAntiQCD_CT200
    else:
       print "Region unknown. Exiting."
       sys.exit()
@@ -62,8 +108,9 @@ def regions(region, lep, METcut = "40", MTcut = "30"):
       selection['loose'] = "(nLepGood_{lep}_loose > 0)".format(lep = lep) 
       selection['tight'] = "(nLepGood_{lep}_def > 0)".format(lep = lep)
    elif "sr1" in region: 
-      selection['loose'] = "((nLepGood_{lep}_loose == 1) || (nLepGood_{lep}_loose == 2 && LepGood_pt[IndexLepGood_{lep}_loose[1]] < 20)) && abs(LepGood_eta[{ind}]) < 1.5".format(lep = lep, ind = index['loose']) #LepGood_pt[{ind}] < 30 && 
-      selection['tight'] = "((nLepGood_{lep}_def == 1)   || (nLepGood_{lep}_def == 2   && LepGood_pt[IndexLepGood_{lep}_def[1]] < 20))   && abs(LepGood_eta[{ind}]) < 1.5".format(lep = lep, ind = index['tight']) #LepGood_pt[{ind}] < 30 && 
+      selection['loose'] =    "((nLepGood_{lep}_loose == 1) && abs(LepGood_eta[{ind}]) < 1.5)".format(lep = lep, ind = index['loose']) #LepGood_pt[{ind}] < 30  || (nLepGood_{lep}_loose == 2 && LepGood_pt[IndexLepGood_{lep}_loose[1]] < 20))
+      selection['tight'] =    "((nLepGood_{lep}_def == 1)   && abs(LepGood_eta[{ind}]) < 1.5)".format(lep = lep, ind = index['tight']) #LepGood_pt[{ind}] < 30  || (nLepGood_{lep}_def == 2   && LepGood_pt[IndexLepGood_{lep}_def[1]] < 20))  
+      selection['notTight'] = "(nLepGood_{lep}_loose != nLepGood_{lep}_def)".format(lep = lep) #(%s != %s)"%(index['loose'], index['tight']) #NOTE: when index array empty, evaluates incorrectly as zero
 
       #Veto on other leptons
       otherLepVeto = {}
