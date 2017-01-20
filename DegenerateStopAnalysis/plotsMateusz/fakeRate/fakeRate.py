@@ -157,14 +157,12 @@ mt = "LepGood_mt[%s]"%index['loose']
 
 bins = binning(lep, varBins = varBins)
  
-#normFactor = {}
+#normFactor = {} #NOTE: update later with TH1:Scale("width")
 #normFactor['pt'] =  "((nLepGood_{lep}_loose > 0)*(({var} < 5) + ({var} >= 5 && {var} < 12)*0.714 + ({var} >= 12 && {var} < 20)*0.625 + ({var} >= 20 && {var} < 30)*0.5 + ({var} >= 30 && {var} < 200)*0.0294))".format(lep = lep, var = pt)
 #normFactor['eta'] = "((nLepGood_{lep}_loose > 0)*(({var} < 0.9)*0.111 + ({var} >= 0.9 && {var} < 1.2)*0.333 + ({var} >= 1.2 && {var} < 2.1)*0.111 + ({var} >= 2.1 && {var} < 2.4)*0.333))".format(lep = lep, var = eta)
 
 #bins = {'pt': array('d', range(0,30,5) + range(30,60,10) + range(60,100,20) + range(100,200+50,50))} #old binning
 #normFactor = {'pt': "(({var} < 30) + ({var} >= 30 && {var} < 60)*0.5 + ({var} >= 60 && {var} < 100)*0.25 + ({var} >= 100 && {var} < 200)*0.1)".format(var = pt)} #old binning
-
-#"binningIsExplicit":varBins, "variableBinning":(varBins, bins['pt'][1]-bins['pt'][0])
 
 ##################################################################################################################################################################################
 
@@ -186,15 +184,28 @@ for samp in samplesList:
    
    if samples[samp].isData:
       selList['loose'].append(selection['trigger'])
-   elif not subtractEWK:
-      selList['loose'].append(selection['fakeLoose'])
-   
+   else: 
+      if not subtractEWK: 
+         selList['loose'].append(selection['fakeLoose'])
+      else: 
+         selList['loose'].append(selection['promptLoose'])# select prompts which will be subtracted from EWK contributions
+      
    #tight definition
    selList['tight'] = selList['loose'][:]
    selList['tight'].extend([selection['tight'], selection['match']]) 
   
-   if not (samples[sample].isData or subtractEWK):
-      selList['tight'].append(selection['fakeTight'])
+   if not samples[sample].isData:
+      if not subtractEWK:
+         selList['tight'].append(selection['fakeTight'])
+      else:
+         selList['tight'].append(selection['promptTight'])
+
+   if verbose:
+      print makeLine() 
+      print "Sample:", samp
+      print "Selection loose:", selList['loose'] 
+      print "Selection tight:", selList['tight'] 
+      print makeLine() 
 
    # Histograms
    if not varBins:
@@ -212,9 +223,9 @@ for samp in samplesList:
       hists['loose']['eta'][samp] = makeHistVarBins(samples[samp].tree, eta, finalWeight + "*(" + combineCutsList(selList['loose']) + ")", bins['eta'], variableBinning = (varBins, bins['eta'][1]-bins['eta'][0]))
       hists['tight']['eta'][samp] = makeHistVarBins(samples[samp].tree, eta, finalWeight + "*(" + combineCutsList(selList['tight']) + ")", bins['eta'], variableBinning = (varBins, bins['eta'][1]-bins['eta'][0]))
      
-      if do2D: 
-         hists['loose']['2D'][samp] = make2DHistVarBins(samples[samp].tree, pt, eta, finalWeight + "*" + normFactor['pt']  + "*" + normFactor['eta'] + "*(" + combineCutsList(selList['loose']) + ")", bins['pt'], bins['eta'])
-         hists['tight']['2D'][samp] = make2DHistVarBins(samples[samp].tree, pt, eta, finalWeight + "*" + normFactor['pt']  + "*" + normFactor['eta'] + "*(" + combineCutsList(selList['tight']) + ")", bins['pt'], bins['eta'])
+      #if do2D: 
+      #   hists['loose']['2D'][samp] = make2DHistVarBins(samples[samp].tree, pt, eta, finalWeight + "*" + normFactor['pt']  + "*" + normFactor['eta'] + "*(" + combineCutsList(selList['loose']) + ")", bins['pt'], bins['eta'])
+      #   hists['tight']['2D'][samp] = make2DHistVarBins(samples[samp].tree, pt, eta, finalWeight + "*" + normFactor['pt']  + "*" + normFactor['eta'] + "*(" + combineCutsList(selList['tight']) + ")", bins['pt'], bins['eta'])
    
       #hists['loose']['pt'][samp].GetYaxis().SetTitle("Events / 5 GeV")
       #hists['loose']['eta'][samp].GetYaxis().SetTitle("Events / 0.1 rad")
