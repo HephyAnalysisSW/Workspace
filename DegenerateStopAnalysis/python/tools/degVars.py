@@ -5,14 +5,14 @@ import collections
 
 settings = {
                     
-                'lepCol':             "LepGood"             ,     
+                'lepCol':             "LepGood",     
                 'lep':                "lep"                 ,        
                 'lepTag':             "def"                ,    
                 'jetTag':             "def"                ,        
                 'btagSF':             "SF"                 ,  
-                'dataBlindLumi':       "12864.4"            ,         
-                'dataUnblindLumi':     "804.2"              ,       
-                'mcLumi':              "10000"              ,
+                'DataBlind_lumi':     "12864.4"            ,         
+                'DataUnblind_lumi':   "804.2"              ,       
+                'mc_lumi':            "10000"              ,
 
             }        
 
@@ -38,14 +38,14 @@ class VarsCutsWeightsRegions():
 
     def __init__(
                 self, 
-                lepCol           =  "LepGood"             ,     
-                lep              =  "lep"                 ,        
-                lepTag           =  "def"                 ,    
-                jetTag           =  "def"                 ,        
-                btagSF           =  "SF"                  ,
-                dataBlindLumi    =  "12864.4"            ,         
-                dataUnblindLumi  =  "804.2"              ,       
-                mcLumi           =  "10000"              ,
+                lepCol           =   "LepGood"             ,     
+                lep              =   "lep"                 ,        
+                lepTag           =   "def"                 ,    
+                jetTag           =   "def"                 ,        
+                btagSF           =   "SF"                  ,
+                DataBlind_lumi    =  "12864.4"            ,         
+                DataUnblind_lumi  =  "804.2"              ,       
+                mc_lumi           =  "10000"              ,
                 ):
         """
         """
@@ -58,9 +58,9 @@ class VarsCutsWeightsRegions():
                  "lepTag"          : lepTag                   ,    
                  "jetTag"          : jetTag                   ,        
                  "btagSF"          : btagSF                   , 
-                 "dataBlindLumi"   : dataBlindLumi            ,         
-                 "dataUnblindLumi" : dataUnblindLumi          ,       
-                 "mcLumi"          : mcLumi                   ,
+                 "DataBlind_lumi"   : DataBlind_lumi            ,         
+                 "DataUnblind_lumi" : DataUnblind_lumi          ,       
+                 "mc_lumi"          : mc_lumi                   ,
             
         }
         self.update()
@@ -118,9 +118,8 @@ class VarsCutsWeightsRegions():
                        # MET 
                        'met'       :       {    'var' : 'met_pt'                    ,   'latex':""            },
                        'met_phi'   :       {    'var' : 'met_phi'                   ,   'latex':""            },
-                       ''          :       {    'var' : ''                          ,   'latex':""            },
-
-
+                       #''          :       {    'var' : ''                          ,   'latex':""            },
+                       #MVA
                        'mvaId'    :       {     'var': 'Sum$((mva_methodId==35) * Iteration$)' , 'latex':''  },
 
                   }
@@ -144,7 +143,7 @@ class VarsCutsWeightsRegions():
                     # presel
                     'AntiQCD'           : {'cut': '{dPhi} < 2.5'                                                  , 'latex':'' },
                     '3rdJetVeto'        : {'cut': '{nVetoJet}<=2'                                        , 'latex':'' },
-                    'TauVeto'           : {'cut': '(Sum$(TauGood_idMVANewDM && TauGood_pt > 20 )==0)'       , 'latex':'' },
+                    'TauVeto'           : {'cut': '(Sum$(TauGood_idMVANewDM && TauGood_pt > 20)==0)'       , 'latex':'' },
                     '1Lep-2ndLep20Veto' : {'cut': '{nLep}==1 || ( {nLep}==2 && {lepCol}_pt[{lepIndex2}]<20 )' , 'latex':'' },
                     #'1Lep-2ndLep20Veto' : {'cut': '{nLep}==1 || ( {nLep}>=2 && {lepCol}_pt[{lepIndex2}]<20 )' , 'latex':'' },
     
@@ -165,7 +164,7 @@ class VarsCutsWeightsRegions():
                     'ISR325'            : {'cut' : '{nHardIsr}>0'                 ,'latex':''},
                     'negLep'            : {'cut' : '(({lepPdgId}==13) || ({lepPdgId}==11))'                ,'latex':''},
                     'posLep'            : {'cut' : '(({lepPdgId}==-13) || ({lepPdgId}==-11))'              ,'latex':''},
-                    ''                  : {'cut' :  ''               ,'latex':''},
+                    #''                  : {'cut' :  ''               ,'latex':''},
                     # CR
 
                     #MVA
@@ -252,8 +251,8 @@ class VarsCutsWeightsRegions():
 
 
 
-        def_weights = ['weight', 'pu' ]
-        options     = ['wpt']
+        #def_weights = ['weight', 'pu' ]
+        #options     = ['wpt']
 
 
 
@@ -301,10 +300,10 @@ class VarsCutsWeightsRegions():
                     "pu"          : {'var': "puReweight",                                        "latex":""},
                     "pu_up"       : {'var': "puReweight_up",                                        "latex":""},
                     "pu_down"     : {'var': "puReweight_down",                                        "latex":""},
-                    "DataBlind"   : {'var': "(%s/%s)"%(settings['dataBlindLumi'],   settings['mcLumi'])                 ,"latex":""},
-                    "DataUnblind" : {'var': "(%s/%s)"%(settings['dataUnblindLumi'], settings['mcLumi'])                 ,"latex":""},
-                    "DataICHEP"   : {'var': "(%s/%s)"%(12864.4, settings['mcLumi'])                 ,"latex":""},
-                    "mcLumi"      : {'var': settings['mcLumi'],                                             "latex":""},
+                    "DataBlind"   : {'var': "(%s/%s)"%(settings['DataBlind_lumi'],   settings['mc_lumi'])                 ,"latex":""},
+                    "DataUnblind" : {'var': "(%s/%s)"%(settings['DataUnblind_lumi'], settings['mc_lumi'])                 ,"latex":""},
+                    "DataICHEP"   : {'var': "(%s/%s)"%(12864.4, settings['mc_lumi'])                 ,"latex":""},
+                    "mc_lumi"      : {'var': settings['mc_lumi'],                                             "latex":""},
     
                     'bTagSF'      : {'var': "{sf}{jt}",                                            "latex":""},
                     'BSR1'        : {'var': "(weightBTag0_{bTagSF})"  ,                         "latex":""},
@@ -399,6 +398,3 @@ class VarsCutsWeightsRegions():
         self.cuts_dict      =   cuts_dict
         self.regions        =   regions
         self.weight_options =   weight_options
-
-
-
