@@ -644,7 +644,7 @@ def getPlot(sample,plot,cut,weight="", nMinus1="",cutStr="",addOverFlowBin='', l
         print "\n  Using Weight:            %s "%(weight_str)
         print "\n  And Cut:                 %s"%cut_str
 
-    binningIsExplicit= False
+    binningIsExplicit = False
     variableBinning = (False, 1)
 
     if hasattr(plot, "binningIsExplicit"):
@@ -652,9 +652,9 @@ def getPlot(sample,plot,cut,weight="", nMinus1="",cutStr="",addOverFlowBin='', l
     if hasattr(plot, "variableBinning"):
         variableBinning = plot.variableBinning
     if type(var) == type(""):
-        hist = getPlotFromChain(sample.tree,plot.var,plot.bins,cut_str,weight=weight_str, addOverFlowBin=addOverFlowBin, binningIsExplicit=binningIsExplicit, variableBinning=variableBinning, uniqueName = True)
+        hist = getPlotFromChain(sample.tree,plot.var,plot.bins,cut_str,weight=weight_str, addOverFlowBin=addOverFlowBin, binningIsExplicit=binningIsExplicit, variableBinning=variableBinning, uniqueName = False)
     elif hasattr(var, "__call__"):
-        hist = var( sample , bins = plot.bins, cutString=cut_str, weight=weight_str, addOverFlowBin=addOverFlowBin, binningIsExplicit=binningIsExplicit, variableBinning=variableBinning, uniqueName = True)
+        hist = var( sample , bins = plot.bins, cutString=cut_str, weight=weight_str, addOverFlowBin=addOverFlowBin, binningIsExplicit=binningIsExplicit, variableBinning=variableBinning, uniqueName = False)
     else:
         raise Exception("I'm not sure what this variable is! %s"%var)
     #plot.decorHistFunc(p)
