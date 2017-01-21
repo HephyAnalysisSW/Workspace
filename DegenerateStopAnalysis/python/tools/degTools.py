@@ -530,7 +530,7 @@ def getGoodPlotFromChain(c, var, binning,varName='', cutString='(1)', weight='we
   return ret
 
 def getStackFromHists(histList,sName=None,scale=None, normalize=False, transparency=False):
-  print "::::::::::::::::::::::::::::::::::::::::::: GETTIN STACKS" , sName
+  #print "::::::::::::::::::::::::::::::::::::::::::: Getting stack" , sName
   if not sName:
     sName = "stack_%s"%uniqueHash()
   stk=ROOT.THStack(sName,sName)
@@ -539,8 +539,8 @@ def getStackFromHists(histList,sName=None,scale=None, normalize=False, transpare
     alphaBase=0.80
     alphaDiff=0.70
     alphas=[alphaBase-i*alphaDiff/len(histList) for i in range(len(histList)) ]
-    print alphas
-    print histList
+    #print alphas
+    #print histList
 
   for i, hist in enumerate(histList):
     #h = hist.Clone()
@@ -649,6 +649,8 @@ def getPlot(sample,plot,cut,weight="", nMinus1="",cutStr="",addOverFlowBin='', l
 
     if hasattr(plot, "binningIsExplicit"):
         binningIsExplicit = plot.binningIsExplicit
+    if hasattr(plot, "variableBinning"):
+        variableBinning = plot.variableBinning
     if type(var) == type(""):
         hist = getPlotFromChain(sample.tree,plot.var,plot.bins,cut_str,weight=weight_str, addOverFlowBin=addOverFlowBin, binningIsExplicit=binningIsExplicit, variableBinning=variableBinning, uniqueName = True)
     elif hasattr(var, "__call__"):
@@ -1848,7 +1850,7 @@ class Plot(dict):
     if len(self.bins)==3:
       self.is1d = True
     else: self.is1d=  False
-    if len(self.bins)==6 and not getattr(self,binningIsExplicit,False) :
+    if len(self.bins)==6 and not getattr(self,"binningIsExplicit",False) :
       self.is2d = True
     else: self.is2d = False
     if "hists" not in self.__dict__:
